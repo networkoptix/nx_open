@@ -240,6 +240,7 @@ void parseUsers(QList<T>& users, const PbUserList& pb_users)
 
         user->setName(QString::fromUtf8(pb_user.name().c_str()));
         user->setAdmin(pb_user.isadmin());
+		user->setGuid(pb_user.guid().c_str());
 
         users.append(user);
     }
@@ -570,6 +571,7 @@ void QnApiPbSerializer::serializeUser(const QnUserResourcePtr& userPtr, QByteArr
     pb_user.set_name(userPtr->getName().toUtf8().constData());
     pb_user.set_password(userPtr->getPassword().toUtf8().constData());
     pb_user.set_isadmin(userPtr->isAdmin());
+	pb_user.set_guid(userPtr->getGuid().toAscii().constData());
 
     std::string str;
     pb_users.SerializeToString(&str);
