@@ -60,9 +60,10 @@ void QnWorkbenchSynchronizer::submit() {
             synchronizer->setAutoDeleting(true);
             synchronizer->submit();
 
-            resourcePool()->addResource(resource);
             if(context()->user())
-                context()->user()->addLayout(resource); /* Leave layout a toplevel resource if there is no current user. */
+                resource->setParentId(context()->user()->getId());
+
+            resourcePool()->addResource(resource);
         }
     }
 }
