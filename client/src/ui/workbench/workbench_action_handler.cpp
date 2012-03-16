@@ -58,17 +58,17 @@
 // -------------------------------------------------------------------------- //
 // QnResourceStatusReplyProcessor
 // -------------------------------------------------------------------------- //
-detail::QnResourceStatusReplyProcessor::QnResourceStatusReplyProcessor(QnWorkbenchActionHandler *handler, const QnResourceList &resources, const QList<int> &oldStatuses):
+detail::QnResourceStatusReplyProcessor::QnResourceStatusReplyProcessor(QnWorkbenchActionHandler *handler, const QnResourceList &resources, const QList<int> &oldDisabledFlags):
     m_handler(handler),
     m_resources(resources),
-    m_oldStatuses(oldStatuses)
+	m_oldDisabledFlags(oldDisabledFlags)
 {
-    assert(oldStatuses.size() == resources.size());
+	assert(oldDisabledFlags.size() == resources.size());
 }
 
 void detail::QnResourceStatusReplyProcessor::at_replyReceived(int status, const QByteArray& data, const QByteArray& errorString, int handle) {
     if(m_handler)
-        m_handler.data()->at_resources_statusSaved(status, errorString, m_resources, m_oldStatuses);
+		m_handler.data()->at_resources_statusSaved(status, errorString, m_resources, m_oldDisabledFlags);
     
     deleteLater();
 }
@@ -693,7 +693,7 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
         return;
 
     QnResourceList modifiedResources;
-    QList<int> oldStatuses;
+	QList<int> oldDisabledFlags;
 
     foreach(const QnResourcePtr &resource, resources) {
         if(resource->getParentId() == server->getId())
@@ -716,19 +716,19 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
         }
 
         if(replacedNetwork) {
-            oldStatuses.push_back(replacedNetwork->getStatus());
+			oldDisabledFlags.push_back(replacedNetwork->isDisabled());
             modifiedResources.push_back(replacedNetwork);
-            replacedNetwork->setStatus(QnResource::Offline);
+			replacedNetwork->setDisabled(false);
 
-            oldStatuses.push_back(network->getStatus());
+			oldDisabledFlags.push_back(network->isDisabled());
             modifiedResources.push_back(network);
-            network->setStatus(QnResource::Disabled);
+			network->setDisabled(true);
         }
     }
 
     if(!modifiedResources.empty()) {
-        detail::QnResourceStatusReplyProcessor *processor = new detail::QnResourceStatusReplyProcessor(this, modifiedResources, oldStatuses);
-        connection()->setResourcesStatusAsync(modifiedResources, processor, SLOT(at_replyReceived(int, const QByteArray &, const QByteArray &, int)));
+		detail::QnResourceStatusReplyProcessor *processor = new detail::QnResourceStatusReplyProcessor(this, modifiedResources, oldDisabledFlags);
+		connection()->setResourcesDisabledAsync(modifiedResources, processor, SLOT(at_replyReceived(int, const QByteArray &, const QByteArray &, int)));
     }
 }
 
@@ -1279,7 +1279,7 @@ void QnWorkbenchActionHandler::at_resource_deleted(int status, const QByteArray 
     QMessageBox::critical(widget(), tr(""), tr("Could not delete resource from application server. \n\nError description: '%2'").arg(QLatin1String(errorString.data())));
 }
 
-void QnWorkbenchActionHandler::at_resources_statusSaved(int status, const QByteArray &errorString, const QnResourceList &resources, const QList<int> &oldStatuses) {
+void QnWorkbenchActionHandler::at_resources_statusSaved(int status, const QByteArray &errorString, const QnResourceList &resources, const QList<int> &oldDisabledFlags) {
     if(status == 0 || resources.isEmpty())
         return;
 
@@ -1293,6 +1293,6 @@ void QnWorkbenchActionHandler::at_resources_statusSaved(int status, const QByteA
     );
 
     for(int i = 0; i < resources.size(); i++)
-        resources[i]->setStatus(static_cast<QnResource::Status>(oldStatuses[i]));
+		resources[i]->setDisabled(oldDisabledFlags[i]);
 }
 

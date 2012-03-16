@@ -23,10 +23,6 @@ public:
     QnNetworkResource();
     virtual ~QnNetworkResource();
 
-    virtual void setStatus(QnResource::Status newStatus, bool silenceMode = false) override;
-
-    bool needUpdateStatus() const;
-
     void deserialize(const QnResourceParameters& parameters);
 
     virtual bool equalsTo(const QnResourcePtr other) const;

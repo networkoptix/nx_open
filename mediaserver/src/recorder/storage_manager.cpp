@@ -140,7 +140,7 @@ QnTimePeriodList QnStorageManager::getRecordedPeriods(QnResourceList resList, qi
                 if (!cameras.last().isEmpty())
                 {
                     QnTimePeriod& lastPeriod = cameras.last().last();
-                    bool isActive = camera->getStatus() == QnResource::Online || camera->getStatus() == QnResource::Recording;
+					bool isActive = !camera->isDisabled() && (camera->getStatus() == QnResource::Online || camera->getStatus() == QnResource::Recording);
                     if (lastPeriod.durationMs == -1 && !isActive)
                     {
                         lastPeriod.durationMs = 0;

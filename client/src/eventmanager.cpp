@@ -86,6 +86,19 @@ void QnEventManager::eventReceived(QnEvent event)
     {
         QnAppServerConnectionFactory::createConnection()->getLicensesAsync(this, SLOT(licensesReceived(int,QByteArray,QnLicenseList,int)));
     }
+	else if (event.eventType == QN_EVENT_RES_DISABLED_CHANGE)
+	{
+		QnResourcePtr resource;
+		if (!event.resourceGuid.isEmpty())
+			resource = qnResPool->getResourceByGuid(event.resourceGuid);
+		else
+			resource = qnResPool->getResourceById(event.objectId);
+
+		if (resource)
+		{
+			resource->setDisabled(event.data.toInt());
+		}
+	}
     else if (event.eventType == QN_EVENT_RES_STATUS_CHANGE)
     {
         QnResourcePtr resource;

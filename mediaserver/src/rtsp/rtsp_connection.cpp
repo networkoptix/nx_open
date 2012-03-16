@@ -558,7 +558,7 @@ int QnRtspConnectionProcessor::composePlay()
     if (d->liveMode) 
     {
         int copySize = 0;
-        if (status == QnResource::Online || status == QnResource::Recording) {
+		if (!getResource()->isDisabled() && (status == QnResource::Online || status == QnResource::Recording)) {
             copySize = d->dataProcessor->copyLastGopFromCamera(d->quality == MEDIA_Quality_High, 0);
         }
 
