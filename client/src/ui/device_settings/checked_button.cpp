@@ -1,4 +1,4 @@
-#include "qncheckedbutton.h"
+#include "checked_button.h"
 
 #include <QtGui/QPainter>
 
