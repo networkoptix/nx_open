@@ -23,7 +23,7 @@ QnWorkbenchItem::QnWorkbenchItem(const QnLayoutItemData &data, QObject *parent):
     m_rotation(0.0)
 {
     if(m_resourceUid.isEmpty()) {
-        //qnWarning("Creating a workbench item from item data with invalid unique id.");
+        qnWarning("Creating a workbench item from item data with invalid unique id.");
         // TODO: bring this warning back, fix layout item data conventions.
 
         QnResourcePtr resource = qnResPool->getResourceById(data.resource.id);
