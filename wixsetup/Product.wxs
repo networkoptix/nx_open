@@ -121,6 +121,10 @@
         <CustomAction Id="AssignServerRtspPort" Property="SERVER_RTSP_PORT" Value="[FREEPORT2]"/>
         <CustomAction Id="AssignServerApiPort" Property="SERVER_API_PORT" Value="[FREEPORT3]"/>
         
+    	<!-- Assign default values for Quick installation -->
+    	<CustomAction Id="AssignServerAppServerPort" Property="SERVER_APPSERVER_PORT" Value="[APPSERVER_PORT]"/>
+    	<CustomAction Id="AssignClientAppServerPort" Property="CLIENT_APPSERVER_PORT" Value="[APPSERVER_PORT]"/>
+    	
         <CustomAction Id="AssignServerFolder" Property="SERVER_DIRECTORY" Value="[ROOTDRIVE]\HDWitness" />
         <CustomAction Id="AssignClientFolder" Property="CLIENT_DIRECTORY" Value="[MOVIESFOLDER]\HD Witness Client Media" />
         
@@ -151,7 +155,9 @@
             <Custom Action="AssignOldServerApiPort" Before="AssignAppServerPort">1</Custom>
             <Custom Action="AssignAppServerPort" Before="AssignServerRtspPort">NOT APPSERVER_PORT</Custom>
             <Custom Action="AssignServerRtspPort" Before="AssignServerApiPort">NOT SERVER_RTSP_PORT</Custom>
-            <Custom Action="AssignServerApiPort" Before="SetMoviesFolder">NOT SERVER_API_PORT</Custom>
+            <Custom Action="AssignServerApiPort" Before="AssignServerAppServerPort">NOT SERVER_API_PORT</Custom>
+        	<Custom Action="AssignServerAppServerPort" Before="AssignClientAppServerPort">1</Custom>
+        	<Custom Action="AssignClientAppServerPort" Before="SetMoviesFolder">1</Custom>
             <Custom Action="SetMoviesFolder" Before="AssignClientFolder" />
             
             <Custom Action="ResetClientFolder" Before="CostInitialize"/>
