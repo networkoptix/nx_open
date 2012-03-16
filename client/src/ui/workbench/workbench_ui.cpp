@@ -311,7 +311,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     QGraphicsLinearLayout *titleLayout = new QGraphicsLinearLayout();
 
     titleLayout->setSpacing(2);
-    titleLayout->setContentsMargins(0, 0, 0, 0);
+    titleLayout->setContentsMargins(4, 0, 4, 0);
     QGraphicsLinearLayout *titleLeftButtonsLayout = new QGraphicsLinearLayout();
     titleLeftButtonsLayout->setSpacing(2);
     titleLeftButtonsLayout->setContentsMargins(0, 4, 0, 0);
