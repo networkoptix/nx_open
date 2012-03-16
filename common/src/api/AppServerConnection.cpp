@@ -11,22 +11,23 @@ void conn_detail::ReplyProcessor::finished(int status, const QByteArray &result,
 {
     QByteArray errorString = errorStringIn;
 
-    if (m_objectName == "server")
+	if (status != 0)
+	{
+		errorString += "\n" + result;
+		QnResourceList resources;
+		emit finished(status, errorString, resources, handle);
+		return;
+	}
+
+	if (m_objectName == "server")
     {
         QnVideoServerResourceList servers;
 
-        if (status == 0)
-        {
-            try {
-                m_serializer.deserializeServers(servers, result);
-            } catch (const QnSerializeException& e) {
-                errorString += e.errorString();
-            }
-        } else
-        {
-            errorString += SessionManager::formatNetworkError(status);
-        }
-
+		try {
+			m_serializer.deserializeServers(servers, result);
+		} catch (const QnSerializeException& e) {
+			errorString += e.errorString();
+		}
 
         QnResourceList resources;
         qCopy(servers.begin(), servers.end(), std::back_inserter(resources));
@@ -35,17 +36,11 @@ void conn_detail::ReplyProcessor::finished(int status, const QByteArray &result,
     {
         QnVirtualCameraResourceList cameras;
 
-        if (status == 0)
-        {
-            try {
-                m_serializer.deserializeCameras(cameras, result, m_resourceFactory);
-            } catch (const QnSerializeException& e) {
-                errorString += e.errorString();
-            }
-        } else
-        {
-            errorString += SessionManager::formatNetworkError(status);
-        }
+		try {
+			m_serializer.deserializeCameras(cameras, result, m_resourceFactory);
+		} catch (const QnSerializeException& e) {
+			errorString += e.errorString();
+		}
 
         QnResourceList resources;
         qCopy(cameras.begin(), cameras.end(), std::back_inserter(resources));
@@ -54,17 +49,11 @@ void conn_detail::ReplyProcessor::finished(int status, const QByteArray &result,
     {
         QnUserResourceList users;
 
-        if (status == 0)
-        {
-            try {
-                m_serializer.deserializeUsers(users, result);
-            } catch (const QnSerializeException& e) {
-                errorString += e.errorString();
-            }
-        } else
-        {
-            errorString += SessionManager::formatNetworkError(status);
-        }
+		try {
+			m_serializer.deserializeUsers(users, result);
+		} catch (const QnSerializeException& e) {
+			errorString += e.errorString();
+		}
 
         QnResourceList resources;
         qCopy(users.begin(), users.end(), std::back_inserter(resources));
@@ -73,17 +62,11 @@ void conn_detail::ReplyProcessor::finished(int status, const QByteArray &result,
     {
         QnLayoutResourceList layouts;
 
-        if (status == 0)
-        {
-            try {
-                m_serializer.deserializeLayouts(layouts, result);
-            } catch (const QnSerializeException& e) {
-                errorString += e.errorString();
-            }
-        } else
-        {
-            errorString += SessionManager::formatNetworkError(status);
-        }
+		try {
+			m_serializer.deserializeLayouts(layouts, result);
+		} catch (const QnSerializeException& e) {
+			errorString += e.errorString();
+		}
 
         QnResourceList resources;
         qCopy(layouts.begin(), layouts.end(), std::back_inserter(resources));
