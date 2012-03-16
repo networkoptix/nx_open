@@ -327,7 +327,7 @@ void NavigationItem::addReserveCamera(CLVideoCamera *camera)
     updateActualCamera();
     m_forceTimePeriodLoading = !updateRecPeriodList(true);
     //m_liveButton->setEnabled(true);
-    m_syncButton->setEnabled(true);
+    //m_syncButton->setEnabled(true);
 }
 
 void NavigationItem::removeReserveCamera(CLVideoCamera *camera)
@@ -342,7 +342,7 @@ void NavigationItem::removeReserveCamera(CLVideoCamera *camera)
     repaintMotionPeriods();
     if(m_reserveCameras.empty()) {
         //m_liveButton->setEnabled(false);
-        m_syncButton->setEnabled(false);
+        //m_syncButton->setEnabled(false);
     }
 }
 
@@ -407,14 +407,13 @@ void NavigationItem::setActualCamera(CLVideoCamera *camera)
         m_timeSlider->setScalingFactor(0);
     }
 
-    m_syncButton->setEnabled(camera != 0 && !m_reserveCameras.isEmpty());
-
     if(zoomResetNeeded) {
         updateSlider();
 
         m_timeSlider->setScalingFactor(m_zoomByCamera.value(m_camera, 0.0));
     }
 
+    m_syncButton->setEnabled(m_reserveCameras.contains(camera));
     m_liveButton->setEnabled(m_reserveCameras.contains(camera));
 
     emit actualCameraChanged(m_camera);
