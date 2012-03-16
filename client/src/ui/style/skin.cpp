@@ -123,14 +123,14 @@ QIcon QnSkin::icon(const QString &name, const QString &checkedName) {
 
     /* Create pressed icon. */
     QnIconBuilder pressedBuilder;
-    pressedBuilder.addPixmap(icon.pixmap(QSize(1024, 1024), Active, Off), Off);
-    pressedBuilder.addPixmap(icon.pixmap(QSize(1024, 1024), Active, On), On);
+    pressedBuilder.addPixmap(icon.pixmap(QSize(1024, 1024), Normal, Off), Off);
+    pressedBuilder.addPixmap(icon.pixmap(QSize(1024, 1024), Normal, On), On);
 
     if(hasPixmap(pressedPath))
-        pressedBuilder.addPixmap(pixmap(pressedPath), Active);
+        pressedBuilder.addPixmap(pixmap(pressedPath), Normal);
         
     if(hasPixmap(checkedPressedPath)) 
-        pressedBuilder.addPixmap(pixmap(checkedPressedPath), Active, On);
+        pressedBuilder.addPixmap(pixmap(checkedPressedPath), Normal, On);
 
     QIcon pressedIcon = pressedBuilder.createIcon();
 
@@ -167,7 +167,7 @@ QPixmap QnSkin::pixmap(const QString &name, const QSize &size, Qt::AspectRatioMo
 
 QPixmap	QnSkin::pixmap(const QIcon &icon, const QSize &size, QIcon::Mode mode, QIcon::State state) const {
     if(mode == Pressed) {
-        return m_pressedIconByKey.value(icon.cacheKey()).pixmap(size, Active, state);
+        return m_pressedIconByKey.value(icon.cacheKey(), icon).pixmap(size, Normal, state);
     } else {
         return icon.pixmap(size, mode, state);
     }

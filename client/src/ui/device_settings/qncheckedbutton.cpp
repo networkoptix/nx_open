@@ -1,50 +1,50 @@
 #include "qncheckedbutton.h"
-#include "ui/common/color_transform.h"
+
+#include <QtGui/QPainter>
+
+namespace {
+    QPixmap generatePixmap(int size, const QColor &color, bool hovered, bool checked) {
+        QPixmap result(size, size);
+        result.fill(QColor(Qt::gray));
+
+        QPainter painter(&result);
+        painter.setPen(QColor(Qt::black));
+        painter.setBrush(hovered ? color.lighter() : color);
+        int offset = checked ? 4 : 0;
+        painter.drawRect(offset, offset, result.width() - offset * 2, result.height() - offset * 2);
+        painter.end();
+
+        return result;
+    }
+
+} // anonymous namespace
 
 QnCheckedButton::QnCheckedButton(QWidget* parent): QToolButton(parent)
 {
-    m_checkonLastPaint = -1;
+    updateIcon();
 }
 
-void QnCheckedButton::checkStateSet()
-{
-    QPixmap image(width(),height());
-    {
-        QPainter p (&image);
-        p.setPen(QColor(0,0,0));
-        if (isChecked())
-            p.setBrush(m_checkedColor);
-        else
-            p.setBrush(m_color);
-        int Offs = isChecked() ? 4 : 0;
-        p.drawRect(Offs, Offs, image.width() - Offs*2, image.height() - Offs*2);
-    }
-
+void QnCheckedButton::updateIcon() {
     QIcon icon;
 
-    icon.addPixmap(image, QIcon::Normal, QIcon::Off);
-    icon.addPixmap(image, QIcon::Normal, QIcon::On);
+    const int size = 64;
 
-    icon.addPixmap(image, QIcon::Disabled, QIcon::Off);
-    icon.addPixmap(image, QIcon::Disabled, QIcon::On);
+    QPixmap normal          = generatePixmap(64, m_color,           false,  false);
+    QPixmap normalHovered   = generatePixmap(64, m_color,           true,   false);
+    QPixmap checked         = generatePixmap(64, m_checkedColor,    false,  true);
+    QPixmap checkedHovered  = generatePixmap(64, m_checkedColor,    true,   true);
 
-    icon.addPixmap(image, QIcon::Active, QIcon::Off);
-    icon.addPixmap(image, QIcon::Active, QIcon::On);
+    icon.addPixmap(normal, QIcon::Normal, QIcon::Off);
+    icon.addPixmap(normal, QIcon::Disabled, QIcon::Off);
+    icon.addPixmap(normalHovered, QIcon::Active, QIcon::Off);
+    icon.addPixmap(normal, QIcon::Selected, QIcon::Off);
 
-    icon.addPixmap(image, QIcon::Selected, QIcon::Off);
-    icon.addPixmap(image, QIcon::Selected, QIcon::On);
+    icon.addPixmap(checked, QIcon::Normal, QIcon::On);
+    icon.addPixmap(checked, QIcon::Disabled, QIcon::On);
+    icon.addPixmap(checkedHovered, QIcon::Active, QIcon::On);
+    icon.addPixmap(checked, QIcon::Selected, QIcon::On);
 
     setIcon(icon);
-}
-
-void QnCheckedButton::paintEvent(QPaintEvent * event)
-{
-    if (m_checkonLastPaint != (int) isChecked())
-    {
-        checkStateSet();
-        m_checkonLastPaint = (int) isChecked();
-    }
-    QToolButton::paintEvent(event);
 }
 
 QColor QnCheckedButton::color() const
@@ -54,10 +54,25 @@ QColor QnCheckedButton::color() const
 
 void QnCheckedButton::setColor(const QColor& color)
 {
+    if(m_color == color)
+        return;
+
     m_color = color;
+
+    updateIcon();
+}
+
+QColor QnCheckedButton::checkedColor() const
+{
+    return m_checkedColor;
 }
 
 void QnCheckedButton::setCheckedColor(const QColor& color)
 {
+    if(m_checkedColor == color)
+        return;
+
     m_checkedColor = color;
+
+    updateIcon();
 }
