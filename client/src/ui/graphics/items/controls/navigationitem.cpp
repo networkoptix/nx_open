@@ -276,8 +276,8 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     rightLayoutV->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
     rightLayoutV->setContentsMargins(0, 3, 0, 0);
     rightLayoutV->setSpacing(0);
-    rightLayoutV->addItem(rightLayoutHU);
     rightLayoutV->addItem(rightLayoutHL);
+    rightLayoutV->addItem(rightLayoutHU);
     rightLayoutV->addItem(m_timeLabel);
 
     QGraphicsLinearLayout *mainLayout = new QGraphicsLinearLayout(Qt::Horizontal);
