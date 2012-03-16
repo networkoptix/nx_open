@@ -232,6 +232,7 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     m_timeLabel = new GraphicsLabel(this);
     m_timeLabel->setObjectName("TimeLabel");
     m_timeLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, QSizePolicy::Label);
+    m_timeLabel->setText(QLatin1String(" ")); /* So that it takes some space right away. */
     {
         QPalette pal = m_timeLabel->palette();
         pal.setColor(QPalette::Window, QColor(0, 0, 0, 0));
@@ -257,59 +258,35 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     leftLayoutV->setContentsMargins(0, 0, 0, 0);
     leftLayoutV->setSpacing(0);
     leftLayoutV->addItem(m_speedSlider);
-    leftLayoutV->setAlignment(m_speedSlider, Qt::AlignTop);
     leftLayoutV->addItem(buttonsLayout);
-    leftLayoutV->setAlignment(buttonsLayout, Qt::AlignBottom);
 
-    QGraphicsLinearLayout *rightSublayoutVL = new QGraphicsLinearLayout(Qt::Vertical);
-    rightSublayoutVL->setContentsMargins(0, 0, 0, 0);
-    rightSublayoutVL->setSpacing(0);
-    rightSublayoutVL->addItem(m_timeLabel);
-    rightSublayoutVL->setAlignment(m_timeLabel, Qt::AlignLeft | Qt::AlignVCenter);
-    rightSublayoutVL->addItem(m_mrsButton);
-    rightSublayoutVL->setAlignment(m_mrsButton, Qt::AlignCenter);
+    QGraphicsLinearLayout *rightLayoutHU = new QGraphicsLinearLayout(Qt::Horizontal);
+    rightLayoutHU->setContentsMargins(0, 0, 0, 0);
+    rightLayoutHU->setSpacing(3);
+    rightLayoutHU->addItem(m_liveButton);
+    rightLayoutHU->addItem(m_syncButton);
 
-    QGraphicsLinearLayout *rightSublayoutVR = new QGraphicsLinearLayout(Qt::Vertical);
-    rightSublayoutVR->setContentsMargins(0, 0, 0, 0);
-    rightSublayoutVR->setSpacing(0);
-    rightSublayoutVR->addItem(m_syncButton);
-    rightSublayoutVR->setAlignment(m_syncButton, Qt::AlignCenter);
-    rightSublayoutVR->addItem(m_liveButton);
-    rightSublayoutVR->setAlignment(m_liveButton, Qt::AlignCenter);
-
-    QGraphicsLinearLayout *rightLayoutH = new QGraphicsLinearLayout(Qt::Horizontal);
-    rightLayoutH->setContentsMargins(0, 0, 0, 0);
-    rightLayoutH->setSpacing(3);
-    rightLayoutH->addItem(rightSublayoutVL);
-    rightLayoutH->setAlignment(rightSublayoutVL, Qt::AlignLeft | Qt::AlignVCenter);
-    rightLayoutH->addItem(rightSublayoutVR);
-    rightLayoutH->setAlignment(rightSublayoutVR, Qt::AlignCenter);
-    rightLayoutH->addItem(m_muteButton);
-    rightLayoutH->setAlignment(m_muteButton, Qt::AlignRight | Qt::AlignTop);
+    QGraphicsLinearLayout *rightLayoutHL = new QGraphicsLinearLayout(Qt::Horizontal);
+    rightLayoutHL->setContentsMargins(0, 0, 0, 0);
+    rightLayoutHL->setSpacing(3);
+    rightLayoutHL->addItem(m_volumeSlider);
+    rightLayoutHL->addItem(m_muteButton);
 
     QGraphicsLinearLayout *rightLayoutV = new QGraphicsLinearLayout(Qt::Vertical);
     rightLayoutV->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
     rightLayoutV->setContentsMargins(0, 3, 0, 0);
     rightLayoutV->setSpacing(0);
-    rightLayoutV->addItem(m_volumeSlider);
-    rightLayoutV->setAlignment(m_volumeSlider, Qt::AlignCenter);
-    rightLayoutV->addStretch();
-    rightLayoutV->addItem(rightLayoutH);
-    rightLayoutV->setAlignment(rightLayoutH, Qt::AlignBottom);
+    rightLayoutV->addItem(rightLayoutHU);
+    rightLayoutV->addItem(rightLayoutHL);
+    rightLayoutV->addItem(m_timeLabel);
 
     QGraphicsLinearLayout *mainLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     mainLayout->setContentsMargins(5, 0, 5, 0);
     mainLayout->setSpacing(10);
     mainLayout->addItem(leftLayoutV);
-    mainLayout->setAlignment(leftLayoutV, Qt::AlignLeft | Qt::AlignVCenter);
     mainLayout->addItem(m_timeSlider);
-    mainLayout->setAlignment(m_timeSlider, Qt::AlignCenter);
     mainLayout->addItem(rightLayoutV);
-    mainLayout->setAlignment(rightLayoutV, Qt::AlignRight | Qt::AlignVCenter);
     setLayout(mainLayout);
-
-    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-
 
     QAction *playAction = new QAction(tr("Play / Pause"), m_playButton);
     playAction->setShortcut(tr("Space"));
@@ -317,12 +294,13 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     connect(playAction, SIGNAL(triggered()), m_playButton, SLOT(click()));
     addAction(playAction);
 
-
     setVideoCamera(0);
     m_fullTimePeriodHandle = 0;
     m_timePeriodUpdateTime = 0;
     m_forceTimePeriodLoading = false;
     m_timePeriodLoadErrors = 0;
+
+    updateGeometry();
 }
 
 NavigationItem::~NavigationItem()
@@ -348,7 +326,7 @@ void NavigationItem::addReserveCamera(CLVideoCamera *camera)
 
     updateActualCamera();
     m_forceTimePeriodLoading = !updateRecPeriodList(true);
-    m_liveButton->setEnabled(true);
+    //m_liveButton->setEnabled(true);
     m_syncButton->setEnabled(true);
 }
 
@@ -363,7 +341,7 @@ void NavigationItem::removeReserveCamera(CLVideoCamera *camera)
         m_motionPeriodLoader.remove(netRes);
     repaintMotionPeriods();
     if(m_reserveCameras.empty()) {
-        m_liveButton->setEnabled(false);
+        //m_liveButton->setEnabled(false);
         m_syncButton->setEnabled(false);
     }
 }
@@ -437,6 +415,8 @@ void NavigationItem::setActualCamera(CLVideoCamera *camera)
         m_timeSlider->setScalingFactor(m_zoomByCamera.value(m_camera, 0.0));
     }
 
+    m_liveButton->setEnabled(m_reserveCameras.contains(camera));
+
     emit actualCameraChanged(m_camera);
 }
 
@@ -476,7 +456,7 @@ void NavigationItem::updateSlider()
         if (m_timeSlider->minimumValue() == 0)
             m_timeLabel->setText(formatDuration(m_timeSlider->length() / 1000));
         else
-            m_timeLabel->setText(QString()); //(QDateTime::fromMSecsSinceEpoch(m_timeSlider->maximumValue()).toString(Qt::SystemLocaleShortDate));
+            m_timeLabel->setText(QLatin1String(" ")); //(QDateTime::fromMSecsSinceEpoch(m_timeSlider->maximumValue()).toString(Qt::SystemLocaleShortDate));
         m_timeLabel->setVisible(!m_camera->getCamDisplay()->isRealTimeSource());
 
         quint64 time = m_camera->getCurrentTime();
@@ -494,6 +474,7 @@ void NavigationItem::updateSlider()
         m_forwardButton->setEnabled(false);
         m_stepForwardButton->setEnabled(false);
     } else {
+        m_liveButton->setChecked(false);
         m_forwardButton->setEnabled(true);
         m_stepForwardButton->setEnabled(true);
     }
