@@ -109,6 +109,7 @@ void QnResourcePool::addResources(const QnResourceList &resources)
     {
         connect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)), this, SLOT(handleStatusChange()), Qt::QueuedConnection);
         connect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)), this, SLOT(handleResourceChange()), Qt::QueuedConnection);
+		connect(resource.data(), SIGNAL(disabledChanged()), this, SLOT(handleResourceChange()), Qt::QueuedConnection);
         connect(resource.data(), SIGNAL(resourceChanged()), this, SLOT(handleResourceChange()), Qt::QueuedConnection);
 
         TRACE("RESOURCE ADDED" << resource->metaObject()->className() << resource->getName());

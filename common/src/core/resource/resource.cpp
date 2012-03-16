@@ -94,6 +94,7 @@ void QnResource::update(QnResourcePtr other)
         updateInner(other); // this is virtual atomic operation; so mutexes shold be outside
     }
     setStatus(other->m_status);
+	setDisabled(other->m_disabled);
     emit resourceChanged();
 
     foreach (QnResourceConsumer *consumer, m_consumers)
@@ -123,6 +124,9 @@ void QnResource::deserialize(const QnResourceParameters& parameters)
 
     if (parameters.contains(QLatin1String("status")))
         m_status = (QnResource::Status)parameters[QLatin1String("status")].toInt();
+
+	if (parameters.contains(QLatin1String("disabled")))
+		m_disabled = parameters[QLatin1String("disabled")].toInt();
 
     blockSignals(signalsBlocked);
 }
@@ -718,6 +722,9 @@ bool QnResource::isDisabled() const
 void QnResource::setDisabled(bool disabled)
 {
 	QMutexLocker mutexLocker(&m_mutex);
+
+	if (m_disabled != disabled)
+		emit disabledChanged();
 
 	m_disabled = disabled;
 }
