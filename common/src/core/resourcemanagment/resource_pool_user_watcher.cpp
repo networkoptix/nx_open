@@ -20,8 +20,8 @@ QnResourcePoolUserWatcher::QnResourcePoolUserWatcher(QnResourcePool *resourcePoo
         return;
     }
 
-    connect(m_resourcePool, SIGNAL(resourceAdded(const QnResourcePtr &)), this, SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)), Qt::QueuedConnection);
-    connect(m_resourcePool, SIGNAL(resourceRemoved(const QnResourcePtr &)), this, SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)), Qt::QueuedConnection);
+    connect(m_resourcePool, SIGNAL(resourceAdded(const QnResourcePtr &)), this, SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
+    connect(m_resourcePool, SIGNAL(resourceRemoved(const QnResourcePtr &)), this, SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
     foreach(const QnResourcePtr &resource, m_resourcePool->getResources())
         at_resourcePool_resourceAdded(resource);
 }
