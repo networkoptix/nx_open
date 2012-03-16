@@ -73,15 +73,13 @@ Q_DECLARE_METATYPE(VariantAnimator *)
 
 namespace {
 
-    QnImageButtonWidget *newActionButton(QAction *action, QGraphicsItem *parent = NULL) {
+    QnImageButtonWidget *newActionButton(QAction *action, qreal sizeMultiplier = 1.0, QGraphicsItem *parent = NULL) {
         int baseSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);
 
-        qreal scaleFactor = 1.0; //0.85;
-        qreal height = baseSize / scaleFactor;
+        qreal height = baseSize * sizeMultiplier;
         qreal width = height * SceneUtility::aspectRatio(action->icon().actualSize(QSize(1024, 1024)));
 
         QnZoomingImageButtonWidget *button = new QnZoomingImageButtonWidget(parent);
-        button->setScaleFactor(scaleFactor);
         button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, QSizePolicy::ToolButton);
         button->setMaximumSize(width, height);
         button->setMinimumSize(width, height);
@@ -306,7 +304,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_tabBarWidget->setAttribute(Qt::WA_TranslucentBackground);
     m_tabBarItem->setWidget(m_tabBarWidget);
 
-    m_mainMenuButton = newActionButton(action(Qn::LightMainMenuAction));
+    m_mainMenuButton = newActionButton(action(Qn::LightMainMenuAction), 1.5);
 
     QGraphicsLinearLayout *titleLayout = new QGraphicsLinearLayout();
 
@@ -314,10 +312,11 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     titleLayout->setContentsMargins(4, 0, 4, 0);
     QGraphicsLinearLayout *titleLeftButtonsLayout = new QGraphicsLinearLayout();
     titleLeftButtonsLayout->setSpacing(2);
-    titleLeftButtonsLayout->setContentsMargins(0, 4, 0, 0);
+    titleLeftButtonsLayout->setContentsMargins(0, 0, 0, 0);
     titleLeftButtonsLayout->addItem(m_mainMenuButton);
     titleLayout->addItem(titleLeftButtonsLayout);
     titleLayout->addItem(m_tabBarItem);
+    titleLayout->setAlignment(m_tabBarItem, Qt::AlignCenter);
     QGraphicsLinearLayout *titleRightButtonsLayout = new QGraphicsLinearLayout();
     titleRightButtonsLayout->setSpacing(2);
     titleRightButtonsLayout->setContentsMargins(0, 4, 0, 0);
@@ -855,11 +854,11 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate) {
 QRectF QnWorkbenchUi::updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry) {
     QPointF pos(
         treeGeometry.x(),
-        ((!m_titleVisible || !m_titleUsed) && m_treeVisible) ? 0.0 : qMax(titleGeometry.bottom(), 0.0)
+        ((!m_titleVisible || !m_titleUsed) && m_treeVisible) ? 0.0 : qMax(titleGeometry.bottom() + 30.0, 0.0)
     );
     QSizeF size(
         treeGeometry.width(),
-        ((!m_sliderVisible && m_treeVisible) ? m_controlsWidgetRect.bottom() : qMin(sliderGeometry.y(), m_controlsWidgetRect.bottom())) - pos.y()
+        ((!m_sliderVisible && m_treeVisible) ? m_controlsWidgetRect.bottom() : qMin(sliderGeometry.y() - 30.0, m_controlsWidgetRect.bottom() - 30.0)) - pos.y()
     );
     return QRectF(pos, size);
 }
@@ -912,11 +911,11 @@ void QnWorkbenchUi::updateTreeGeometry() {
 QRectF QnWorkbenchUi::updatedHelpGeometry(const QRectF &helpGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry) {
     QPointF pos(
         helpGeometry.x(),
-        ((!m_titleVisible || !m_titleUsed) && m_helpVisible) ? 0.0 : qMax(titleGeometry.bottom(), 0.0)
+        ((!m_titleVisible || !m_titleUsed) && m_helpVisible) ? 0.0 : qMax(titleGeometry.bottom() + 30.0, 0.0)
     );
     QSizeF size(
         helpGeometry.width(),
-        ((!m_sliderVisible && m_helpVisible) ? m_controlsWidgetRect.bottom() : qMin(sliderGeometry.y(), m_controlsWidgetRect.bottom())) - pos.y()
+        ((!m_sliderVisible && m_helpVisible) ? m_controlsWidgetRect.bottom() : qMin(sliderGeometry.y() - 30.0, m_controlsWidgetRect.bottom() - 30.0)) - pos.y()
     );
     return QRectF(pos, size);
 }
