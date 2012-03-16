@@ -55,7 +55,6 @@ public:
 
     bool hasSuchResouce(const QString &uniqid) const;
 
-
     QnResourcePtr getResourceByUrl(const QString &url) const;
 
     QnNetworkResourcePtr getNetResourceByMac(const QString &mac) const;

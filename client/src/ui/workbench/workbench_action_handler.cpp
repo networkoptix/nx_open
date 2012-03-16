@@ -461,11 +461,29 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
     if(!user)
         return;
 
-    /* Move all orphaned local layouts to the new user. */
-    foreach(const QnResourcePtr &resource, context()->resourcePool()->getResourcesWithParentId(QnId()))
-        if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
-            if(snapshotManager()->isLocal(layout))
-                user->addLayout(layout);
+    /* Open all user's layouts. */
+    QnResourceList layouts = QnResourceCriterion::filter<QnLayoutResource, QnResourceList>(context()->resourcePool()->getResourcesWithParentId(user->getId()));
+    menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
+
+    /* Delete empty orphaned layouts, move non-empty to the new user. */
+    foreach(const QnResourcePtr &resource, context()->resourcePool()->getResourcesWithParentId(QnId())) {
+        if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
+            if(snapshotManager()->isLocal(layout)) {
+                if(layout->getItems().empty()) {
+                    resourcePool()->removeResource(layout);
+                } else {
+                    layout->setParentId(user->getId());
+                }
+            }
+        }
+    }
+
+    /* Close all other layouts. */
+    foreach(QnWorkbenchLayout *layout, workbench()->layouts()) {
+        QnLayoutResourcePtr resource = layout->resource();
+        if(resource->getParentId() != user->getId())
+            workbench()->removeLayout(layout);
+    }
 }
 
 void QnWorkbenchActionHandler::at_workbench_layoutsChanged() {
@@ -619,10 +637,8 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
         newLayout = QnLayoutResourcePtr(new QnLayoutResource());
         newLayout->setGuid(QUuid::createUuid());
         newLayout->setName(name);
-
+        newLayout->setParentId(user->getId());
         context()->resourcePool()->addResource(newLayout);
-        if(user)
-            user->addLayout(newLayout);
 
         QnLayoutItemDataList items = layout->getItems().values();
         for(int i = 0; i < items.size(); i++)
@@ -1072,9 +1088,8 @@ void QnWorkbenchActionHandler::at_newUserLayoutAction_triggered() {
     QnLayoutResourcePtr layout(new QnLayoutResource());
     layout->setGuid(QUuid::createUuid());
     layout->setName(dialog->name());
+    layout->setParentId(user->getId());
     resourcePool()->addResource(layout);
-
-    user->addLayout(layout);
 
     snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
 
@@ -1159,22 +1174,24 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->setWindowTitle(tr("User Settings"));
 
+    QnUserSettingsDialog::ElementFlags zero(0);
+
     QnUserSettingsDialog::ElementFlags flags = 
-        ((permissions & Qn::ReadPermission) ? QnUserSettingsDialog::Visible : 0) | 
-        ((permissions & Qn::WritePermission) ? QnUserSettingsDialog::Editable : 0);
+        ((permissions & Qn::ReadPermission) ? QnUserSettingsDialog::Visible : zero) |
+        ((permissions & Qn::WritePermission) ? QnUserSettingsDialog::Editable : zero);
 
     QnUserSettingsDialog::ElementFlags loginFlags = 
-        ((permissions & Qn::ReadPermission) ? QnUserSettingsDialog::Visible : 0) | 
-        ((permissions & Qn::WriteLoginPermission) ? QnUserSettingsDialog::Editable : 0);
+        ((permissions & Qn::ReadPermission) ? QnUserSettingsDialog::Visible : zero) |
+        ((permissions & Qn::WriteLoginPermission) ? QnUserSettingsDialog::Editable : zero);
 
     QnUserSettingsDialog::ElementFlags passwordFlags = 
-        ((permissions & Qn::WritePasswordPermission) ? QnUserSettingsDialog::Visible : 0) | /* There is no point to display flag edit field if password cannot be changed. */
-        ((permissions & Qn::WritePasswordPermission) ? QnUserSettingsDialog::Editable : 0);
+        ((permissions & Qn::WritePasswordPermission) ? QnUserSettingsDialog::Visible : zero) | /* There is no point to display flag edit field if password cannot be changed. */
+        ((permissions & Qn::WritePasswordPermission) ? QnUserSettingsDialog::Editable : zero);
     passwordFlags &= flags;
 
     QnUserSettingsDialog::ElementFlags accessRightsFlags = 
-        ((permissions & Qn::ReadPermission) ? QnUserSettingsDialog::Visible : 0) | 
-        ((permissions & Qn::WriteAccessRightsPermission) ? QnUserSettingsDialog::Editable : 0);
+        ((permissions & Qn::ReadPermission) ? QnUserSettingsDialog::Visible : zero) |
+        ((permissions & Qn::WriteAccessRightsPermission) ? QnUserSettingsDialog::Editable : zero);
     accessRightsFlags &= flags;
 
     dialog->setElementFlags(QnUserSettingsDialog::Login, loginFlags);

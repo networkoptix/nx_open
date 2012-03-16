@@ -240,13 +240,7 @@ void parseUsers(QList<T>& users, const PbUserList& pb_users)
 
         user->setName(QString::fromUtf8(pb_user.name().c_str()));
         user->setAdmin(pb_user.isadmin());
-
-        if (pb_user.layout_size() > 0)
-        {
-            QnLayoutResourceList layouts;
-            parseLayouts(layouts, pb_user.layout());
-            user->setLayouts(layouts);
-        }
+		user->setGuid(pb_user.guid().c_str());
 
         users.append(user);
     }
@@ -478,16 +472,8 @@ void QnApiPbSerializer::deserializeResources(QnResourceList& resources, const QB
 
     parseCameras(resources, pb_resources.camera(), resourceFactory);
     parseServers(resources, pb_resources.server());
-
-    QnUserResourceList users;
-    parseUsers(users, pb_resources.user());
-    qCopy(users.begin(), users.end(), std::back_inserter(resources));
-
-    foreach(const QnUserResourcePtr& user, users)
-    {
-        const QnLayoutResourceList& layouts = user->getLayouts();
-        qCopy(layouts.begin(), layouts.end(), std::back_inserter(resources));
-    }
+	parseUsers(resources, pb_resources.user());
+	parseLayouts(resources, pb_resources.layout());
 }
 
 void QnApiPbSerializer::deserializeResourceTypes(QnResourceTypeList& resourceTypes, const QByteArray& data)
@@ -585,11 +571,7 @@ void QnApiPbSerializer::serializeUser(const QnUserResourcePtr& userPtr, QByteArr
     pb_user.set_name(userPtr->getName().toUtf8().constData());
     pb_user.set_password(userPtr->getPassword().toUtf8().constData());
     pb_user.set_isadmin(userPtr->isAdmin());
-
-    foreach(const QnLayoutResourcePtr& layoutIn, userPtr->getLayouts()) {
-        proto::pb::Layout& pb_layout = *pb_user.add_layout();
-        serializeLayout_i(pb_layout, layoutIn);
-    }
+	pb_user.set_guid(userPtr->getGuid().toAscii().constData());
 
     std::string str;
     pb_users.SerializeToString(&str);

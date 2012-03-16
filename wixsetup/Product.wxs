@@ -42,15 +42,15 @@
         <Property Id="BUSYPORT" Secure="yes"/>
         
         <!-- AppServer properties-->
-    	<Property Id="APPSERVER_PORT" Secure="yes">
+        <Property Id="APPSERVER_PORT" Secure="yes">
             <RegistrySearch Id="AppServerPortReg"
                     Root="HKLM"
                     Key="Software\Network Optix\VMS Application Server"
                     Name="port"
                     Type="raw" 
                     Win64="no"/>
-    	</Property>
-    	
+        </Property>
+        
         <Property Id="APPSERVER_LOGIN" Secure="yes" Value="admin"/>
         <Property Id="APPSERVER_PASSWORD" Secure="yes" Value="123"/>
         
@@ -59,22 +59,22 @@
         <Property Id="SERVER_APPSERVER_PORT" Secure="yes" Value="8000"/>
         <Property Id="SERVER_APPSERVER_LOGIN" Secure="yes" Value="admin"/>
         <Property Id="SERVER_APPSERVER_PASSWORD" Secure="yes" Value="123"/>
-    	<Property Id="SERVER_RTSP_PORT" Secure="yes">
+        <Property Id="SERVER_RTSP_PORT" Secure="yes">
             <RegistrySearch Id="ServerRtspPortReg"
                     Root="HKLM"
                     Key="Software\Network Optix\VMS Media Server"
                     Name="rtspPort"
                     Type="raw" 
                     Win64="no"/>
-    	</Property>
-    	<Property Id="SERVER_API_PORT" Secure="yes">
+        </Property>
+        <Property Id="SERVER_API_PORT" Secure="yes">
             <RegistrySearch Id="ServerApiPortReg"
                     Root="HKLM"
                     Key="Software\Network Optix\VMS Media Server"
                     Name="apiPort"
                     Type="raw" 
                     Win64="no"/>
-    	</Property>
+        </Property>
         <Property Id="SERVER_DIRECTORY_REG" Secure="yes">
             <RegistrySearch Id="ServerDirectoryReg"
                     Root="HKLM"
@@ -83,8 +83,8 @@
                     Type="raw" 
                     Win64="no"/>
         </Property>
-            	
-    	
+                
+        
         <!-- Client properties-->
         <Property Id="CLIENT_APPSERVER_HOST" Secure="yes" Value="localhost"/>
         <Property Id="CLIENT_APPSERVER_PORT" Secure="yes" Value="7001"/>
@@ -112,16 +112,16 @@
         <CustomAction Id="CheckPorts" BinaryKey="NetworkCA.dll" DllEntry="CheckPorts"/>
         <CustomAction Id="CheckPorts2" BinaryKey="NetworkCA.dll" DllEntry="CheckPorts"/>
         
-    	
+        
         <CustomAction Id="AssignOldAppServerPort" Property="OLD_APPSERVER_PORT" Value="[APPSERVER_PORT]"/>
         <CustomAction Id="AssignOldServerRtspPort" Property="OLD_SERVER_RTSP_PORT" Value="[SERVER_RTSP_PORT]"/>
         <CustomAction Id="AssignOldServerApiPort" Property="OLD_SERVER_API_PORT" Value="[SERVER_API_PORT]"/>
-    	
+        
         <CustomAction Id="AssignAppServerPort" Property="APPSERVER_PORT" Value="[FREEPORT1]"/>
         <CustomAction Id="AssignServerRtspPort" Property="SERVER_RTSP_PORT" Value="[FREEPORT2]"/>
         <CustomAction Id="AssignServerApiPort" Property="SERVER_API_PORT" Value="[FREEPORT3]"/>
         
-        <CustomAction Id="AssignServerFolder" Property="SERVER_DIRECTORY" Value="[MOVIESFOLDER]\HD Witness Server Media" />
+        <CustomAction Id="AssignServerFolder" Property="SERVER_DIRECTORY" Value="[ROOTDRIVE]\HDWitness" />
         <CustomAction Id="AssignClientFolder" Property="CLIENT_DIRECTORY" Value="[MOVIESFOLDER]\HD Witness Client Media" />
         
         <CustomAction Id="ResetServerFolder" Property="SERVER_DIRECTORY" Value="[SERVER_DIRECTORY_REG]" />
@@ -154,11 +154,11 @@
             <Custom Action="AssignServerApiPort" Before="SetMoviesFolder">NOT SERVER_API_PORT</Custom>
             <Custom Action="SetMoviesFolder" Before="AssignClientFolder" />
             
-            <Custom Action="ResetClientFolder" Before="AssignClientFolder"/>
-            <Custom Action="ResetServerFolder" Before="AssignServerFolder"/>
+            <Custom Action="ResetClientFolder" Before="CostInitialize"/>
+            <Custom Action="ResetServerFolder" Before="CostInitialize"/>
             
-            <Custom Action="AssignClientFolder" Before="CostInitialize">CLIENT_DIRECTORY=""</Custom>
-            <Custom Action="AssignServerFolder" Before="CostInitialize">SERVER_DIRECTORY=""</Custom>
+            <Custom Action="AssignClientFolder" After="CostInitialize">CLIENT_DIRECTORY=""</Custom>
+            <Custom Action="AssignServerFolder" After="CostInitialize">SERVER_DIRECTORY=""</Custom>
             
   <!--          <Custom Action="ResetClientFolder" Before="CostFinalize">Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
             <Custom Action="ResetServerFolder" Before="CostFinalize">Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
@@ -564,7 +564,7 @@
             <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Event="SpawnDialog" Value="BrowseDlg" Order="2">1</Publish>
             
             <Publish Dialog="AppServerDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg">1</Publish>
-        	<Publish Dialog="AppServerDlg" Control="Next" Property="BUSYPORT" Value="{}">1</Publish>
+            <Publish Dialog="AppServerDlg" Control="Next" Property="BUSYPORT" Value="{}">1</Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Property="PORTSTOTEST" Value="[APPSERVER_PORT]" Order="1">1</Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Event="DoAction" Value="CheckPorts" Order="2"><![CDATA[ APPSERVER_PORT <> OLD_APPSERVER_PORT]]></Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Event="NewDialog" Value="PortIsBusyDlg" Order="3">BUSYPORT</Publish>
@@ -608,11 +608,11 @@
             <Publish Dialog="MediaServerDlg" Control="Next" Property="CLIENT_APPSERVER_LOGIN" Value="[SERVER_APPSERVER_LOGIN]" Order="4">1</Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Property="CLIENT_APPSERVER_PASSWORD" Value="[SERVER_APPSERVER_PASSWORD]" Order="4">1</Publish>
             
-        	<Publish Dialog="MediaServerDlg" Control="Next" Property="BUSYPORT" Value="{}">1</Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Property="BUSYPORT" Value="{}">1</Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Property="PORTSTOTEST" Value="[SERVER_API_PORT]" Order="1"><![CDATA[ SERVER_RTSP_PORT = RTSP_PORT OR SERVER_API_PORT <> OLD_API_PORT]]></Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Property="PORTSTOTEST" Value="[SERVER_RTSP_PORT]" Order="1"><![CDATA[ SERVER_RTSP_PORT <> RTSP_PORT OR SERVER_API_PORT = OLD_API_PORT]]></Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Property="PORTSTOTEST" Value="[SERVER_API_PORT] [SERVER_RTSP_PORT]" Order="1"><![CDATA[ SERVER_RTSP_PORT <> RTSP_PORT AND SERVER_API_PORT <> OLD_API_PORT]]></Publish>
-        	
+            
             <Publish Dialog="MediaServerDlg" Control="Next" Event="DoAction" Value="CheckPorts2" Order="2"><![CDATA[ SERVER_RTSP_PORT <> RTSP_PORT OR SERVER_API_PORT <> OLD_API_PORT]]></Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="PortIsBusyDlg" Order="3">BUSYPORT</Publish>
             

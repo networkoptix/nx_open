@@ -23,7 +23,7 @@ QnWorkbenchItem::QnWorkbenchItem(const QnLayoutItemData &data, QObject *parent):
     m_rotation(0.0)
 {
     if(m_resourceUid.isEmpty()) {
-        //qnWarning("Creating a workbench item from item data with invalid unique id.");
+        qnWarning("Creating a workbench item from item data with invalid unique id.");
         // TODO: bring this warning back, fix layout item data conventions.
 
         QnResourcePtr resource = qnResPool->getResourceById(data.resource.id);
@@ -61,7 +61,8 @@ bool QnWorkbenchItem::update(const QnLayoutItemData &data) {
         qnWarning("Updating item '%1' from data with different uuid (%2 != %3).", resourceUid(), data.uuid.toString(), uuid().toString());
 
 #ifdef _DEBUG
-    QnId localId = qnResPool->getResourceByUniqId(resourceUid())->getId();
+    QnResourcePtr resource = qnResPool->getResourceByUniqId(resourceUid());
+    QnId localId = resource ? resource->getId() : QnId();
     if(data.resource.id != localId && data.resource.path != m_resourceUid)
         qnWarning("Updating item '%1' from a data with different ids (%2 != %3 and %4 != %5).", resourceUid(), localId.toString(), data.resource.id.toString(), data.resource.path, m_resourceUid);
 #endif

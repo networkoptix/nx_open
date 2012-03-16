@@ -252,15 +252,6 @@ namespace {
 
             user->setName(i->name().c_str());
 
-            if (i->layouts().present())
-            {
-                const Layouts::layout_sequence& xsdLayouts = (*(i->layouts())).layout();
-
-                QnLayoutResourceList layouts;
-                parseLayouts(layouts, xsdLayouts);
-                user->setLayouts(layouts);
-            }
-
             users.append(user);
         }
     }
@@ -463,11 +454,6 @@ void QnApiXmlSerializer::deserializeResources(QnResourceList& resources, const Q
         parseUsers(users, xsdResources->users().user());
         qCopy(users.begin(), users.end(), std::back_inserter(resources));
 
-        foreach(const QnUserResourcePtr& user, users)
-        {
-            const QnLayoutResourceList& layouts = user->getLayouts();
-            qCopy(layouts.begin(), layouts.end(), std::back_inserter(resources));
-        }
     }
     catch (const xml_schema::exception& e) {
         errorString += "\nQnApiXmlSerializer::deserializeResources(): ";
@@ -545,34 +531,6 @@ void QnApiXmlSerializer::serializeUser(const QnUserResourcePtr& userPtr, QByteAr
 
     user.status(QnResource::Online);
     user.password(userPtr->getPassword().toUtf8().constData());
-
-    xsd::api::layouts::Layouts layouts;
-    foreach(const QnLayoutResourcePtr& layoutIn, userPtr->getLayouts()) {
-        xsd::api::layouts::Layout layout(layoutIn->getName().toUtf8().constData(), layoutIn->getParentId().toString().toUtf8().constData());
-
-        if (!layoutIn->getItems().isEmpty()) {
-            xsd::api::layouts::Items items;
-
-            foreach(const QnLayoutItemData& itemIn, layoutIn->getItems()) {
-                // XXX: There is no support for local files here
-                xsd::api::layouts::Item item(itemIn.resource.id.toString().toUtf8().constData(),
-                                             itemIn.uuid.toString().toUtf8().constData(),
-                                             itemIn.flags,
-                                             itemIn.combinedGeometry.left(),
-                                             itemIn.combinedGeometry.top(),
-                                             itemIn.combinedGeometry.right(),
-                                             itemIn.combinedGeometry.bottom(),
-                                             itemIn.rotation);
-                items.item().push_back(item);
-            }
-
-            layout.items(items);
-        }
-
-        layouts.layout().push_back(layout);
-    }
-
-    user.layouts(layouts);
 
     std::ostringstream os;
     ::xsd::api::users::Users users;

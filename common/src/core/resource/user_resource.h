@@ -15,11 +15,6 @@ public:
 
     virtual QString getUniqueId() const override;
 
-    void setLayouts(const QnLayoutResourceList &layouts);    
-    QnLayoutResourceList getLayouts() const;
-    void addLayout(const QnLayoutResourcePtr &layout);
-    void removeLayout(const QnLayoutResourcePtr &layout);
-
     QString getPassword() const;    
     void setPassword(const QString &password);
 
@@ -32,7 +27,6 @@ protected:
 private:
     QString m_password;
     bool m_isAdmin;
-    QnLayoutResourceList m_layouts;
 };
 
 Q_DECLARE_METATYPE(QnUserResourcePtr);

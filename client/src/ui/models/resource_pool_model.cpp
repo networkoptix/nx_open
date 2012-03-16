@@ -77,11 +77,11 @@ public:
             break;
         case Qn::ServersNode:
             m_name = tr("Servers");
-            m_icon = qnResIconCache->icon(QnResourceIconCache::Server);
+            m_icon = qnResIconCache->icon(QnResourceIconCache::Servers);
             break;
         case Qn::UsersNode:
             m_name = tr("Users");
-            m_icon = qnResIconCache->icon(QnResourceIconCache::User);
+            m_icon = qnResIconCache->icon(QnResourceIconCache::Users);
             break;
         default:
             break;

@@ -9,11 +9,13 @@ QnResourceIconCache::QnResourceIconCache(QObject *parent) {
     m_cache.insert(Unknown,                 QIcon());
     m_cache.insert(Local,                   qnSkin->icon("home.png"));
     m_cache.insert(Server,                  qnSkin->icon("server.png"));
+    m_cache.insert(Servers,                 qnSkin->icon("servers.png"));
     m_cache.insert(Layout,                  qnSkin->icon("layout.png"));
     m_cache.insert(Camera,                  qnSkin->icon("camera.png"));
     m_cache.insert(Image,                   qnSkin->icon("snapshot.png"));
     m_cache.insert(Media,                   qnSkin->icon("media.png"));
     m_cache.insert(User,                    qnSkin->icon("user.png"));
+    m_cache.insert(Users,                   qnSkin->icon("users.png"));
 
     m_cache.insert(Server | Offline,        qnSkin->icon("server_offline.png"));
     m_cache.insert(Camera | Offline,        qnSkin->icon("camera_offline.png"));

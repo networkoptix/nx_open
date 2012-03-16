@@ -17,6 +17,7 @@
 
 class QnAbstractStreamDataProvider;
 class QnResourceConsumer;
+class QnResourcePool;
 
 enum QN_EXPORT QnDomain
 {
@@ -130,6 +131,8 @@ public:
     QDateTime getLastDiscoveredTime() const;
     void setLastDiscoveredTime(const QDateTime &time);
 
+    QnResourcePool *resourcePool() const;
+    void setResourcePool(QnResourcePool *resourcePool);
 
     virtual QString toString() const;
     virtual QString toSearchString() const;
@@ -252,6 +255,9 @@ protected:
     mutable QMutex m_mutex;
 
 private:
+    /** Resource pool this this resource belongs to. */
+    QnResourcePool *m_resourcePool;
+
     /** Weak reference to this, to make conversion to shared pointer possible. */
     QWeakPointer<QnResource> m_weakPointer;
 

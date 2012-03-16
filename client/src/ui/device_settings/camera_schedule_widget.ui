@@ -504,7 +504,7 @@
   <customwidget>
    <class>QnCheckedButton</class>
    <extends>QToolButton</extends>
-   <header>ui/device_settings/qncheckedbutton.h</header>
+   <header>ui/device_settings/checked_button.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
