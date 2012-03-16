@@ -12,7 +12,6 @@ syntax: glob
 *.sln
 *.suo
 *.user
-*.vcproj
 *.vcproj.filters
 *.vcxproj
 *.vcxproj.filters
@@ -43,11 +42,13 @@ client/src/version.h
 client/src/Makefile
 client/src/client.mak*
 client/src/ipch
+client/src/client.vcproj
 
 common/src/common.pro
 common/src/plugins/resources/archive/filetypes.h
 common/src/Makefile
 common/src/common.mak*
+common/src/common.vcproj
 
 client/contrib/bespin/debug
 client/contrib/bespin/release
@@ -57,6 +58,7 @@ mediaserver/src/server.pro
 mediaserver/src/version.h
 mediaserver/src/Makefile
 mediaserver/src/server.mak*
+mediaserver/src/server.vcproj
 
 winbuild/msvc2010/setup.bat
 
@@ -67,3 +69,4 @@ My Amplifier XE Results*
 
 traytool/src/traytool.pro
 traytool/src/version.h
+traytool/src/traytool.vcproj
