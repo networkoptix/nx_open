@@ -461,6 +461,7 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
     if(!user)
         return;
 
+    /* Open all user's layouts. */
     QnResourceList layouts = QnResourceCriterion::filter<QnLayoutResource, QnResourceList>(context()->resourcePool()->getResourcesWithParentId(user->getId()));
     menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
 
