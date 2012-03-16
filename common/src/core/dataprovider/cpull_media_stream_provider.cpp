@@ -90,7 +90,7 @@ void QnClientPullMediaStreamProvider::run()
             {
                 if (getResource().dynamicCast<QnPhysicalCameraResource>())
                 {
-                    getResource()->setStatusIfNotDisabled(QnResource::Offline);
+					getResource()->setStatus(QnResource::Offline);
                 }
 
 				m_stat[0].onLostConnection();
@@ -120,7 +120,7 @@ void QnClientPullMediaStreamProvider::run()
         if (getResource().dynamicCast<QnPhysicalCameraResource>())
         {
             if (getResource()->getStatus() == QnResource::Unauthorized || getResource()->getStatus() == QnResource::Offline)
-                getResource()->setStatusIfNotDisabled(QnResource::Online);
+				getResource()->setStatus(QnResource::Online);
         }
 
 		QnCompressedVideoDataPtr videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(data);

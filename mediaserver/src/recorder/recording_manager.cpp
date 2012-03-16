@@ -87,8 +87,9 @@ QnServerStreamRecorder* QnRecordingManager::createRecorder(QnResourcePtr res, Qn
 
 bool QnRecordingManager::isResourceDisabled(QnResourcePtr res) const
 {
-    if (res->getStatus() == QnResource::Disabled)
+	if (res->isDisabled())
         return true;
+
     QnVirtualCameraResourcePtr cameraRes = qSharedPointerDynamicCast<QnVirtualCameraResource>(res);
     return  cameraRes && cameraRes->isScheduleDisabled();
 }
@@ -168,7 +169,7 @@ void QnRecordingManager::updateCamera(QnSecurityCamResourcePtr res)
 
             startOrStopRecording(res, camera, recorders.recorderHiRes, recorders.recorderLowRes);
         }
-        else if (res->getStatus() != QnResource::Disabled)
+		else if (!res->isDisabled())
         {
             QnServerStreamRecorder* recorderHiRes = createRecorder(res, camera, QnResource::Role_LiveVideo);
             QnServerStreamRecorder* recorderLowRes = createRecorder(res, camera, QnResource::Role_SecondaryLiveVideo);

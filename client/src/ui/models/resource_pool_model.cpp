@@ -841,10 +841,8 @@ void QnResourcePoolModel::at_resource_parentIdChanged() {
 }
 
 void QnResourcePoolModel::at_resource_resourceChanged(const QnResourcePtr &resource) {
-    QnResource::Status status = resource->getStatus();
-
     node(resource)->update();
-    node(resource)->setBastard(status == QnResource::Disabled);
+	node(resource)->setBastard(resource->isDisabled());
     foreach(Node *node, m_itemNodesByResource[resource.data()])
         node->update();
 }

@@ -602,6 +602,22 @@ int QnAppServerConnection::setResourcesStatusAsync(const QnResourceList &resourc
         n++;
     }
 
-    return SessionManager::instance()->sendAsyncPostRequest(m_url, "status", requestParams, "", target, slot);
+	return SessionManager::instance()->sendAsyncPostRequest(m_url, "status", requestParams, "", target, slot);
+}
+
+int QnAppServerConnection::setResourcesDisabledAsync(const QnResourceList &resources, QObject *target, const char *slot)
+{
+	QnRequestParamList requestParams;
+
+	int n = 1;
+	foreach (const QnResourcePtr resource, resources)
+	{
+		requestParams.append(QnRequestParam(QString("id%1").arg(n), resource->getId().toString()));
+		requestParams.append(QnRequestParam(QString("disabled%1").arg(n), QString::number((int)resource->isDisabled())));
+
+		n++;
+	}
+
+	return SessionManager::instance()->sendAsyncPostRequest(m_url, "disabled", requestParams, "", target, slot);
 }
 

@@ -279,7 +279,7 @@ int QnResourcePool::activeCameras() const
         if (!camera)
             continue;
 
-        if (camera->getStatus() != QnResource::Disabled && !camera->isScheduleDisabled())
+		if (!camera->isDisabled() && !camera->isScheduleDisabled())
             count++;
     }
 

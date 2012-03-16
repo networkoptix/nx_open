@@ -42,7 +42,7 @@ void CLServerPushStreamreader::run()
                 if (mFramesLost == MAX_LOST_FRAME) // if we lost 2 frames => connection is lost for sure (2)
                 {
                     if (getResource().dynamicCast<QnPhysicalCameraResource>())
-                        getResource()->setStatusIfNotDisabled(QnResource::Offline);
+						getResource()->setStatus(QnResource::Offline);
 
                     m_stat[0].onLostConnection();
                 }
@@ -70,7 +70,7 @@ void CLServerPushStreamreader::run()
 			if (mFramesLost == MAX_LOST_FRAME) // if we lost 2 frames => connection is lost for sure (2)
             {
 				if (getResource().dynamicCast<QnPhysicalCameraResource>())
-                    getResource()->setStatusIfNotDisabled(QnResource::Offline);
+					getResource()->setStatus(QnResource::Offline);
 
                 m_stat[0].onLostConnection();
             }
@@ -86,7 +86,7 @@ void CLServerPushStreamreader::run()
         if (getResource().dynamicCast<QnPhysicalCameraResource>())
         {
             if (getResource()->getStatus() == QnResource::Unauthorized || getResource()->getStatus() == QnResource::Offline)
-                getResource()->setStatusIfNotDisabled(QnResource::Online);
+				getResource()->setStatus(QnResource::Online);
         }
 
 		QnCompressedVideoDataPtr videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(data);

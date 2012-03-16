@@ -68,7 +68,10 @@ bool QnEvent::load(const QVariant& parsed)
     eventType = dict["type"].toString();
 
     if (eventType != QN_EVENT_RES_CHANGE && eventType != QN_EVENT_RES_DELETE
-            && eventType != QN_EVENT_RES_SETPARAM && eventType != QN_EVENT_RES_STATUS_CHANGE && eventType != QN_EVENT_LICENSE_CHANGE)
+			&& eventType != QN_EVENT_RES_SETPARAM
+			&& eventType != QN_EVENT_RES_STATUS_CHANGE
+			&& eventType != QN_EVENT_RES_DISABLED_CHANGE
+			&& eventType != QN_EVENT_LICENSE_CHANGE)
     {
         return false;
     }

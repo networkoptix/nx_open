@@ -71,7 +71,7 @@ void PlDlinkStreamReader::openStream()
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
-        getResource()->setStatusIfNotDisabled(QnResource::Unauthorized);
+		getResource()->setStatus(QnResource::Unauthorized);
         return;
     }
 
@@ -440,7 +440,7 @@ QnMetaDataV1Ptr PlDlinkStreamReader::getMetaData()
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
-        res->setStatusIfNotDisabled(QnResource::Unauthorized);
+		res->setStatus(QnResource::Unauthorized);
         return QnMetaDataV1Ptr(0);
     }
 
