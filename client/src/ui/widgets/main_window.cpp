@@ -55,13 +55,13 @@ Q_DECLARE_METATYPE(QnWorkbenchLayout *);
 
 namespace {
 
-    QToolButton *newActionButton(QAction *action)
+    QToolButton *newActionButton(QAction *action, qreal sizeMultiplier = 1.0)
     {
         QToolButton *button = new QToolButton();
         button->setDefaultAction(action);
 
         qreal aspectRatio = SceneUtility::aspectRatio(action->icon().actualSize(QSize(1024, 1024)));
-        int iconHeight = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, 0, button);
+        int iconHeight = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, 0, button) * sizeMultiplier;
         int iconWidth = iconHeight * aspectRatio;
         button->setFixedSize(iconWidth, iconHeight);
 
@@ -203,7 +203,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
      * main menu is updated. However, menu buttons do not activate their corresponding 
      * actions as they do not receive release events. We work this around by making
      * some hacky connections. */
-    m_mainMenuButton = newActionButton(action(Qn::DarkMainMenuAction));
+    m_mainMenuButton = newActionButton(action(Qn::DarkMainMenuAction), 1.5);
     m_mainMenuButton->setPopupMode(QToolButton::InstantPopup);
 
     disconnect(m_mainMenuButton,            SIGNAL(pressed()),                              m_mainMenuButton,                       SLOT(_q_buttonPressed()));
@@ -216,7 +216,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_titleLayout = new QHBoxLayout();
     m_titleLayout->setContentsMargins(0, 0, 0, 0);
     m_titleLayout->setSpacing(2);
-    m_titleLayout->addSpacing(6);
     m_titleLayout->addWidget(m_mainMenuButton);
     m_titleLayout->addLayout(tabBarLayout);
     m_titleLayout->addWidget(newActionButton(action(Qn::OpenNewTabAction)));
@@ -224,7 +223,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_titleLayout->addWidget(newActionButton(action(Qn::MinimizeAction)));
     m_titleLayout->addWidget(newActionButton(action(Qn::FullscreenAction)));
     m_titleLayout->addWidget(newActionButton(action(Qn::ExitAction)));
-    m_titleLayout->addSpacing(6);
 
     /* Layouts. */
     m_viewLayout = new QVBoxLayout();
@@ -390,7 +388,7 @@ void QnMainWindow::updateDwmState()
 
         setContentsMargins(0, 0, 0, 0);
 
-        m_titleLayout->setContentsMargins(frameMargins.left(), 2, 2, 0);
+        m_titleLayout->setContentsMargins(frameMargins.left(), 2, frameMargins.right(), 0);
         m_viewLayout->setContentsMargins(
             frameMargins.left(),
             isTitleVisible() ? 0 : frameMargins.top(),
@@ -421,7 +419,7 @@ void QnMainWindow::updateDwmState()
 
         setContentsMargins(0, 0, 0, 0);
 
-        m_titleLayout->setContentsMargins(frameMargins.left(), 2, 2, 0);
+        m_titleLayout->setContentsMargins(frameMargins.left(), 2, frameMargins.right(), 0);
         m_viewLayout->setContentsMargins(
             frameMargins.left(),
             isTitleVisible() ? 0 : frameMargins.top(),
