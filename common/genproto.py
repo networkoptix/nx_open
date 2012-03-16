@@ -28,6 +28,7 @@ def generate_xsd(toolsdir, outdir): # build/debug/generated
 def generate_pb(toolsdir, outdir):
     PB_FILES = ('src/api/pb/camera.proto',
                 'src/api/pb/user.proto',
+                'src/api/pb/layout.proto',
                 'src/api/pb/resourceType.proto',
                 'src/api/pb/resource.proto',
                 'src/api/pb/server.proto',

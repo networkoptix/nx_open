@@ -3,9 +3,11 @@ package proto.pb;
 import "camera.proto";
 import "server.proto";
 import "user.proto";
+import "layout.proto";
 
 message Resources {
     repeated Camera camera = 1;
     repeated Server server = 2;
     repeated User user     = 3;
+    repeated Layout layout = 4;
 }
