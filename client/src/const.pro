@@ -1,6 +1,7 @@
 
 INCLUDEPATH += ../../common/src
 INCLUDEPATH += ../../common/contrib/qjson/include
+INCLUDEPATH += ../../common/contrib/qt
 
 win* {
   INCLUDEPATH += ../../common/contrib/ffmpeg-misc-headers-win32
