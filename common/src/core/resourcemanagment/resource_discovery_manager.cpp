@@ -266,7 +266,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
             continue;
 
         QnNetworkResourcePtr netRes = res.dynamicCast<QnNetworkResource>();
-        if (netRes)
+        if (netRes && netRes->shoudResolveConflicts())
         {
             quint32 ips = netRes->getHostAddress().toIPv4Address();
             if (ipsList.count(ips) > 0 && ipsList[ips] > 1)
@@ -541,7 +541,7 @@ void QnResourceDiscoveryManager::check_if_accessible(QnResourceList& justfoundLi
             continue;
 
         QnNetworkResourcePtr nr = res.dynamicCast<QnNetworkResource>();
-        if (!nr)
+        if (!nr || !nr->shoudResolveConflicts())
             continue;
 
         bool inSameSubnet = m_netState.isResourceInMachineSubnet(nr->getHostAddress(), nr->getDiscoveryAddr());

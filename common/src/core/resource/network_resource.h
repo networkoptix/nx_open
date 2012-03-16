@@ -91,6 +91,8 @@ public:
 
     bool hasRunningLiveProvider() const;
 
+    virtual bool shoudResolveConflicts() const;
+
 private:
     QAuthenticator m_auth;
     bool m_authenticated;

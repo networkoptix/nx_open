@@ -230,6 +230,11 @@ bool QnNetworkResource::hasRunningLiveProvider() const
     return false;
 }
 
+bool QnNetworkResource::shoudResolveConflicts() const
+{
+    return true;
+}
+
 bool QnNetworkResource::conflicting()
 {
     if (checkNetworkStatus(QnNetworkResource::BadHostAddr))
