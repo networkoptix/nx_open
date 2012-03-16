@@ -1159,22 +1159,24 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->setWindowTitle(tr("User Settings"));
 
+    QnUserSettingsDialog::ElementFlags zero(0);
+
     QnUserSettingsDialog::ElementFlags flags = 
-        ((permissions & Qn::ReadPermission) ? QnUserSettingsDialog::Visible : 0) | 
-        ((permissions & Qn::WritePermission) ? QnUserSettingsDialog::Editable : 0);
+        ((permissions & Qn::ReadPermission) ? QnUserSettingsDialog::Visible : zero) |
+        ((permissions & Qn::WritePermission) ? QnUserSettingsDialog::Editable : zero);
 
     QnUserSettingsDialog::ElementFlags loginFlags = 
-        ((permissions & Qn::ReadPermission) ? QnUserSettingsDialog::Visible : 0) | 
-        ((permissions & Qn::WriteLoginPermission) ? QnUserSettingsDialog::Editable : 0);
+        ((permissions & Qn::ReadPermission) ? QnUserSettingsDialog::Visible : zero) |
+        ((permissions & Qn::WriteLoginPermission) ? QnUserSettingsDialog::Editable : zero);
 
     QnUserSettingsDialog::ElementFlags passwordFlags = 
-        ((permissions & Qn::WritePasswordPermission) ? QnUserSettingsDialog::Visible : 0) | /* There is no point to display flag edit field if password cannot be changed. */
-        ((permissions & Qn::WritePasswordPermission) ? QnUserSettingsDialog::Editable : 0);
+        ((permissions & Qn::WritePasswordPermission) ? QnUserSettingsDialog::Visible : zero) | /* There is no point to display flag edit field if password cannot be changed. */
+        ((permissions & Qn::WritePasswordPermission) ? QnUserSettingsDialog::Editable : zero);
     passwordFlags &= flags;
 
     QnUserSettingsDialog::ElementFlags accessRightsFlags = 
-        ((permissions & Qn::ReadPermission) ? QnUserSettingsDialog::Visible : 0) | 
-        ((permissions & Qn::WriteAccessRightsPermission) ? QnUserSettingsDialog::Editable : 0);
+        ((permissions & Qn::ReadPermission) ? QnUserSettingsDialog::Visible : zero) |
+        ((permissions & Qn::WriteAccessRightsPermission) ? QnUserSettingsDialog::Editable : zero);
     accessRightsFlags &= flags;
 
     dialog->setElementFlags(QnUserSettingsDialog::Login, loginFlags);

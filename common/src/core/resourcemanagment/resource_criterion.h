@@ -174,7 +174,7 @@ namespace QnResourceCriterionExpressions {
     public:
         QnResourceCriterionExpression(QnResourceCriterion criterion): m_criterion(criterion) {}
 
-        operator QnResourceCriterion () {
+        operator QnResourceCriterion () const {
             return m_criterion;
         }
 
@@ -190,7 +190,7 @@ namespace QnResourceCriterionExpressions {
         return QnResourceCriterion(status, QnResourceCriterion::Equality, QnResourceProperty::status);
     }
 
-    inline QnResourceCriterionExpression operator||(QnResourceCriterionExpression &le, QnResourceCriterionExpression &re) {
+    inline QnResourceCriterionExpression operator||(const QnResourceCriterionExpression &le, const QnResourceCriterionExpression &re) {
         QnResourceCriterion l = le, r = re;
 
         QnResourceCriterionGroup result;
@@ -217,7 +217,7 @@ namespace QnResourceCriterionExpressions {
         return result;
     }
 
-    inline QnResourceCriterionExpression operator&&(QnResourceCriterionExpression &le, QnResourceCriterionExpression &re) {
+    inline QnResourceCriterionExpression operator&&(const QnResourceCriterionExpression &le, const QnResourceCriterionExpression &re) {
         QnResourceCriterion l = le, r = re;
 
         QnResourceCriterionGroup result;
