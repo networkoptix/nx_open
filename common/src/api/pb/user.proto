@@ -1,44 +1,10 @@
 package proto.pb;
 
-message Layout {
-    message Item {
-        message Resource {
-            // Mutually exclusive. path is used only for local resources.
-            optional int32 id    = 1;
-            optional string path = 2;
-        };
-
-        required string uuid       = 1;
-        required int32 flags       = 2;
-        required double left       = 3;
-        required double top        = 4;
-        required double right      = 5;
-        required double bottom     = 6;
-        required double rotation   = 7;
-        required Resource resource = 8;
-    }
-
-    optional int32  id                = 1;
-    optional string guid              = 2;
-    required string name              = 3;
-    required int32  parentId          = 4;
-    required double cellAspectRatio   = 5;
-    required double cellSpacingWidth  = 6;
-    required double cellSpacingHeight = 7;
-
-    repeated Item   item              = 8;
-}
-
-message Layouts {
-    repeated Layout layout = 1;
-}
-
 message User {
     optional int32  id       = 1;
     required string name     = 2;
     optional string password = 3;
     required bool isAdmin    = 4;
-    repeated Layout layout   = 5;
 }
 
 message Users {

@@ -44,7 +44,7 @@ void QnBlueBackgroundPainter::drawLayer(QPainter * painter, const QRectF & rect)
 {
     qreal pos = position();
 
-    QColor color(10, 10, 110 + 50 * pos, 255);
+    QColor color(5, 5, 50 + 25 * pos, 255);
 
     QPointF center1(rect.center().x() - pos * rect.width() / 2, rect.center().y());
     QPointF center2(rect.center().x() + pos * rect.width() / 2, rect.center().y());

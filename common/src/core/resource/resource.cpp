@@ -17,11 +17,12 @@
 #include <limits.h>
 #include "utils/common/synctime.h"
 
-QnResource::QnResource()
-    : QObject(),
-      m_mutex(QMutex::Recursive),
-      m_flags(0),
-      m_status(Offline)
+QnResource::QnResource(): 
+    QObject(),
+    m_mutex(QMutex::Recursive),
+    m_flags(0),
+    m_status(Offline),
+    m_resourcePool(NULL)
 {
     static volatile bool metaTypesInitialized = false;
     if (!metaTypesInitialized) {
@@ -38,13 +39,31 @@ QnResource::~QnResource()
     disconnectAllConsumers();
 }
 
+QnResourcePool *QnResource::resourcePool() const 
+{
+    QMutexLocker mutexLocker(&m_mutex);
+
+    return m_resourcePool;
+}
+
+void QnResource::setResourcePool(QnResourcePool *resourcePool) 
+{
+    QMutexLocker mutexLocker(&m_mutex);
+
+    m_resourcePool = resourcePool;
+}
+
 void QnResource::setGuid(const QString& guid)
 {
+    QMutexLocker mutexLocker(&m_mutex);
+
     m_guid = guid;
 }
 
 QString QnResource::getGuid() const
 {
+    QMutexLocker mutexLocker(&m_mutex);
+
     return m_guid;
 }
 
