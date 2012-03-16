@@ -9,67 +9,6 @@ QnUserResource::QnUserResource()
     addFlags(QnResource::user | QnResource::remote);
 }
 
-void QnUserResource::setLayouts(const QnLayoutResourceList &layouts)
-{
-    QMutexLocker locker(&m_mutex);
-
-    while(!m_layouts.empty())
-        removeLayout(m_layouts.front()); /* Removing an item from QList's front is constant time. */
-
-    foreach(const QnLayoutResourcePtr &layout, layouts)
-        addLayout(layout);
-}
-
-QnLayoutResourceList QnUserResource::getLayouts() const
-{
-    QMutexLocker locker(&m_mutex);
-
-    return m_layouts;
-}
-
-void QnUserResource::addLayout(const QnLayoutResourcePtr &layout) 
-{
-    {
-        QMutexLocker locker(&m_mutex);
-
-        if(m_layouts.contains(layout)) {
-            qnWarning("Given layout '%1' is already in %2's layouts list.", layout->getName(), getName());
-            return;
-        }
-
-        if(layout->getParentId() != QnId() && layout->getParentId() != getId()) {
-            qnWarning("Given layout '%1' is already in other user's layouts list.", layout->getName());
-            return;
-        }
-
-        m_layouts.push_back(layout);
-    }
-
-    layout->setParentId(getId());
-
-    emit resourceChanged();
-}
-
-void QnUserResource::removeLayout(const QnLayoutResourcePtr &layout) 
-{
-    /* We may get passed a reference into layouts array, so we need to make a local copy. */
-    QnLayoutResourcePtr local = layout;
-
-    bool removed;
-    {
-        QMutexLocker locker(&m_mutex);
-
-        removed = m_layouts.removeOne(local); /* Removing a layout that is not there is not an error. */
-    }
-
-    if(removed) {
-        local->setParentId(QnId());
-
-        emit resourceChanged();
-    }
-}
-
-
 QString QnUserResource::getUniqueId() const
 {
     return getName();
@@ -105,10 +44,6 @@ void QnUserResource::updateInner(QnResourcePtr other) {
     QnUserResourcePtr localOther = other.dynamicCast<QnUserResource>();
     if(localOther) {
         setPassword(localOther->getPassword());
-
-        // TODO: Doesn't work because other user's layouts are not in the pool. Ivan?
-        // It may be a good idea to replace ptr-list with id-list.
-        setLayouts(localOther->getLayouts());
 
         setAdmin(localOther->isAdmin());
     }

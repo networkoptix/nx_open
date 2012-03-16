@@ -103,7 +103,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     m_selectionScope(Qn::SceneScope)
 {
     connect(context(),                                      SIGNAL(aboutToBeDestroyed()),                   this, SLOT(at_context_aboutToBeDestroyed()));
-    connect(context(),                                      SIGNAL(userChanged(const QnUserResourcePtr &)), this, SLOT(at_context_userChanged(const QnUserResourcePtr &)));
+    connect(context(),                                      SIGNAL(userChanged(const QnUserResourcePtr &)), this, SLOT(at_context_userChanged(const QnUserResourcePtr &)), Qt::QueuedConnection);
     connect(context(),                                      SIGNAL(userChanged(const QnUserResourcePtr &)), this, SLOT(submitDelayedDrops()), Qt::QueuedConnection);
     connect(context(),                                      SIGNAL(userChanged(const QnUserResourcePtr &)), this, SLOT(updateCameraSettingsEditibility()));
 
@@ -461,11 +461,20 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
     if(!user)
         return;
 
-    /* Move all orphaned local layouts to the new user. */
-    foreach(const QnResourcePtr &resource, context()->resourcePool()->getResourcesWithParentId(QnId()))
-        if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
-            if(snapshotManager()->isLocal(layout))
-                user->addLayout(layout);
+    menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, QnResourceList(user->getLayouts()));
+
+    /* Delete empty orphaned layouts, move non-empty to the new user. */
+    foreach(const QnResourcePtr &resource, context()->resourcePool()->getResourcesWithParentId(QnId())) {
+        if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
+            if(snapshotManager()->isLocal(layout)) {
+                if(layout->getItems().empty()) {
+                    resourcePool()->removeResource(layout);
+                } else {
+                    user->addLayout(layout);
+                }
+            }
+        }
+    }
 }
 
 void QnWorkbenchActionHandler::at_workbench_layoutsChanged() {

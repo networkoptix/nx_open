@@ -55,6 +55,10 @@ void QnResourcePool::addResources(const QnResourceList &resources)
             QnSharedResourcePointer<QnResource>::initialize(resource);
         }
 
+        if(resource->resourcePool() != NULL)
+            qnWarning("Given resource '%1' is already in the pool.", resource->metaObject()->className());
+            
+
         // if resources are local assign localserver as parent
         if (!resource->getParentId().isValid())
         {
@@ -68,7 +72,7 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 
             if (QnResourcePtr existing = getResourceByUniqId(resource->getUniqueId()))
             {
-                qnWarning("Resource with UID '%1' is already in the pool. Expect troubles.", resource->getUniqueId());
+                // qnWarning("Resource with UID '%1' is already in the pool. Expect troubles.", resource->getUniqueId()); // TODO
 
                 resource->setId(existing->getId());
             }
@@ -78,6 +82,7 @@ void QnResourcePool::addResources(const QnResourceList &resources)
             }
         }
 
+        resource->setResourcePool(this);
     }
 
     QMap<QnId, QnResourcePtr> newResources; // sort by id
@@ -98,7 +103,6 @@ void QnResourcePool::addResources(const QnResourceList &resources)
             m_resources[uniqueId] = resource;
             newResources.insert(resId, resource);
         }
-
     }
 
     foreach (const QnResourcePtr &resource, newResources.values())
@@ -110,12 +114,6 @@ void QnResourcePool::addResources(const QnResourceList &resources)
         TRACE("RESOURCE ADDED" << resource->metaObject()->className() << resource->getName());
         emit resourceAdded(resource);
     }
-
-    /* Add layouts for users. */
-    foreach (const QnResourcePtr &resource, resources)
-        if(QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
-            foreach(const QnLayoutResourcePtr &layout, user->getLayouts())
-                addResource(layout);
 }
 
 void QnResourcePool::removeResources(const QnResourceList &resources)
@@ -132,26 +130,26 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
         if (resource == localServer) // special case
             continue;
 
+        if(resource->resourcePool() != this)
+            qnWarning("Given resource '%1' is not in the pool", resource->metaObject()->className());
+
         QString uniqueId = resource->getUniqueId();
 
         if (m_resources.remove(uniqueId) != 0)
         {
             removedResources.append(resource);
         }
+
+        resource->setResourcePool(NULL);
     }
 
+    /* Remove resources. */
     foreach (const QnResourcePtr &resource, removedResources) {
         disconnect(resource.data(), NULL, this, NULL);
 
         TRACE("RESOURCE REMOVED" << resource->metaObject()->className() << resource->getName());
         emit resourceRemoved(resource);
     }
-
-    /* Remove layouts from their users. */
-    foreach (const QnResourcePtr &resource, removedResources)
-        if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
-            if(QnUserResourcePtr user = getResourceById(layout->getParentId()).dynamicCast<QnUserResource>())
-                user->removeLayout(layout);
 }
 
 void QnResourcePool::handleStatusChange()

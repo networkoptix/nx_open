@@ -11,6 +11,7 @@
 #include "core/resource/user_resource.h"
 #include "licensing/license.h"
 
+
 void parseRegion(QRegion& region, const QString& regionString);
 QString serializeRegion(const QRegion& region);
 
