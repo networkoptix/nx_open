@@ -17,7 +17,7 @@ INCLUDEPATH += $$PWD $$PWD/../build/generated
 PRECOMPILED_HEADER = $$PWD/StdAfx.h
 PRECOMPILED_SOURCE = $$PWD/StdAfx.cpp
 
-INCLUDEPATH += ../contrib/qt
+INCLUDEPATH += $$PWD/../../common/contrib/qt
 SOURCES += ../contrib/qt/QtCore/private/qsimd.cpp
 
 CONFIG(debug, debug|release) {
