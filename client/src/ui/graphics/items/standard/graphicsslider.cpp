@@ -370,7 +370,7 @@ QSizeF GraphicsSlider::sizeHint(Qt::SizeHint which, const QSizeF &constraint) co
         QStyleOptionSlider opt;
         initStyleOption(&opt);
 
-        const int SliderLength = 84, TickSpace = 5;
+        const int SliderLength = 60, TickSpace = 5;
         int thick = style()->pixelMetric(QStyle::PM_SliderThickness, &opt);
         if (d->tickPosition & TicksAbove)
             thick += TickSpace;
