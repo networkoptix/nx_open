@@ -129,7 +129,7 @@ protected:
         bool leftLocal = left.data(Qn::NodeTypeRole).toInt() == Qn::LocalNode;
         bool rightLocal = right.data(Qn::NodeTypeRole).toInt() == Qn::LocalNode;
         if(leftLocal ^ rightLocal) /* One of the nodes is a local node, but not both. */
-            return leftLocal;
+            return rightLocal;
 
         return QSortFilterProxyModel::lessThan(left, right);
     }
