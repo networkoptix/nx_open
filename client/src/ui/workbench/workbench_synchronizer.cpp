@@ -61,7 +61,7 @@ void QnWorkbenchSynchronizer::submit() {
             synchronizer->submit();
 
             if(context()->user())
-                resource->setParentId(context()->user()->getParentId());
+                resource->setParentId(context()->user()->getId());
 
             resourcePool()->addResource(resource);
         }
