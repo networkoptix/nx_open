@@ -723,6 +723,13 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
 			oldDisabledFlags.push_back(network->isDisabled());
             modifiedResources.push_back(network);
 			network->setDisabled(true);
+
+            QnResourcePtr newServer = resourcePool()->getResourceById(network->getParentId());
+
+            if (newServer->getStatus() == QnResource::Offline)
+                network->setStatus(QnResource::Offline);
+            else
+                network->setStatus(replacedNetwork->getStatus());
         }
     }
 
