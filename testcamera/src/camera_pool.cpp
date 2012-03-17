@@ -49,7 +49,7 @@ QnCameraPool* QnCameraPool::instance()
 }
 
 QnCameraPool::QnCameraPool():
-    QnTcpListener(QHostAddress(), MEDIA_PORT),
+    QnTcpListener(QHostAddress::Any, MEDIA_PORT),
     m_cameraNum(0)
 {
     m_discoveryListener = new QnCameraDiscoveryListener();
@@ -88,10 +88,13 @@ QByteArray QnCameraPool::getDiscoveryResponse()
 
     result.append(QByteArray::number(MEDIA_PORT));
 
-    foreach(const QString& mac, m_cameras.keys())
+    //foreach(const QString& mac, m_cameras.keys())
+    for (QMap<QString, QnTestCamera*>::iterator itr = m_cameras.begin(); itr != m_cameras.end(); ++itr)
     {
-        result.append(';');
-        result.append(mac);
+        if (itr.value()->isEnabled()) {
+            result.append(';');
+            result.append(itr.key());
+        }
     }
     return result;
 }

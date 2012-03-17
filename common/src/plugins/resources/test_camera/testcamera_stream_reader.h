@@ -26,6 +26,7 @@ protected:
     int receiveData(quint8* buffer, int size);
 private:
     TCPSocket m_tcpSock;
+    QnMediaContextPtr m_context;
 };
 
 #endif // __TEST_CAMERA_STREAM_READER_H__

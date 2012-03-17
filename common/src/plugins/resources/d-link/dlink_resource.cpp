@@ -186,7 +186,7 @@ void QnPlDlinkResource::init()
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
-        setStatusIfNotDisabled(Unauthorized);
+		setStatus(Unauthorized);
         return;
     }
 
@@ -402,7 +402,7 @@ void QnPlDlinkResource::setMotionMaskPhysical(int channel)
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
-        setStatusIfNotDisabled(Unauthorized);
+		setStatus(Unauthorized);
         return;
     }
 

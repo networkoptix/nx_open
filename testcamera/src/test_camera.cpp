@@ -1,36 +1,58 @@
+#include <qDebug>
+
 #include "test_camera.h"
 #include "utils/media/nalUnits.h"
 #include "plugins/resources/test_camera/testcamera_const.h"
 #include "utils/common/sleep.h"
+#include "core/datapacket/mediadatapacket.h"
+#include "plugins/resources/archive/avi_files/avi_resource.h"
+#include "plugins/resources/archive/avi_files/avi_archive_delegate.h"
+#include "utils/media/ffmpeg_helper.h"
 
 class QnFileCache
 {
 public:
     static QnFileCache* instance();
 
-    QByteArray getMediaData(const QString& fileName)
+    QList<QnCompressedVideoDataPtr> getMediaData(const QString& fileName)
     {
         QMutexLocker lock(&m_mutex);
+        QList<QnCompressedVideoDataPtr> rez;
 
         MediaCache::iterator itr = m_cache.find(fileName);
         if (itr != m_cache.end())
             return *itr;
 
-        QFile mediaFile(fileName);
-        if (!mediaFile.open(QFile::ReadOnly))
-            return QByteArray();
-        if (mediaFile.size() > 1024*1024*200)
+        QnAviResourcePtr file(new QnAviResource(fileName));
+        QnAviArchiveDelegate aviDelegate;
+        if (!aviDelegate.open(file))
         {
-            qWarning() << "Too large test file. Maximum allowed size is 200Mb";
-            return QByteArray();
+            qDebug() << "Can't open file" << fileName;
+            return rez;
         }
-        QByteArray data = mediaFile.readAll();
-        m_cache.insert(fileName, data);
-        return data;
+
+        QnAbstractMediaDataPtr media;
+        qint64 totalSize = 0;
+        while (media = aviDelegate.getNextData())
+        {
+            QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(media);
+            if (!video)
+                continue;
+            rez << video;
+            totalSize += video->data.size();
+            if (totalSize > 1024*1024*200)
+            {
+                qDebug() << "File" << fileName << "too large. Using first 200M.";
+                break;
+            }
+        }
+
+        m_cache.insert(fileName, rez);
+        return rez;
     }
     
 private:
-    typedef QMap<QString, QByteArray> MediaCache;
+    typedef QMap<QString, QList<QnCompressedVideoDataPtr> > MediaCache;
     MediaCache m_cache;
     QMutex m_mutex;
 };
@@ -58,6 +80,10 @@ QnTestCamera::QnTestCamera(quint32 num): m_num(num)
     }
     m_fps = 30.0;
     m_offlineFreq = 0;
+    m_isEnabled = true;
+    m_offlineDuration = 0;
+    m_checkTimer.restart();
+    srand(QDateTime::currentMSecsSinceEpoch());
 }
 
 QByteArray QnTestCamera::getMac() const
@@ -80,62 +106,54 @@ void QnTestCamera::setOfflineFreq(double offlineFreq)
     m_offlineFreq = offlineFreq;
 }
 
-
-const quint8* QnTestCamera::findH264FrameEnd(const quint8* curNal, const quint8* end, bool* isKeyData)
+bool QnTestCamera::doStreamingFile(QList<QnCompressedVideoDataPtr> data, TCPSocket* socket)
 {
-    *isKeyData = false;
-
-    const quint8* next = curNal;
-    while (next < end)
-    {
-        if (next < end-m_prefixLen)
-        {
-            quint8 nalType = next[m_prefixLen] & 0x1f;
-            if (nalType == nuSliceIDR)
-                *isKeyData = true;
-            if (nalType <= nuSliceIDR && next > curNal) 
-                return NALUnit::findNALWithStartCode(next+4, end, true);
-        }
-        next = NALUnit::findNALWithStartCode(next+4, end, true);
-    }
-    return next;
-}
-
-bool QnTestCamera::streamingH264(const QByteArray data, TCPSocket* socket)
-{
-    const quint8* curNal = (const quint8*) data.data();
-    const quint8* end = curNal + data.size();
-
-    m_prefixLen = 3;
-    if (curNal < end-4 && curNal[2] == 0)
-        m_prefixLen = 4;
-
-    bool isKeyData = false;
-    const quint8* nextNal = findH264FrameEnd(curNal, end, &isKeyData);
     double streamingTime = 0;
     QTime timer;
     timer.restart();
 
-    while (curNal < end)
+    for (int i = 0; i < data.size(); ++i)
     {
-        int sendLen = nextNal-curNal;
-        quint32 tmp = htonl(sendLen);
-        quint8 codec = TestCamConst::MediaType_H264;
 
-        if (isKeyData)
-            codec |= 0x80;
-
-        socket->send(&codec, 1);
-        socket->send(&tmp, 4);
-
-        int sended = socket->send(curNal, sendLen);
-        if (sended != sendLen)
-        {
-            qWarning() << "TCP socket write error for camera " << m_mac << "send" << sended << "of" << sendLen;
+        makeOfflineFlood();
+        if (!m_isEnabled) {
+            QnSleep::msleep(100);
             return false;
         }
-        curNal = nextNal;
-        nextNal = findH264FrameEnd(curNal, end, &isKeyData);
+
+        QnCompressedVideoDataPtr video = data[i];
+        if (i == 0)
+        {
+            //m_context = QnMediaContextPtr( new QnMediaContext(video->context));
+            QByteArray byteArray;
+            QnFfmpegHelper::serializeCodecContext(video->context->ctx(), &byteArray);
+
+            quint32 packetLen = htonl(byteArray.size());
+            quint16 codec = video->compressionType;
+            codec |= 0xc000;
+            codec = htons(codec);
+
+            socket->send(&codec, 2);
+            socket->send(&packetLen, 4);
+
+            int sended = socket->send(byteArray.data(), byteArray.size());
+        }
+
+        quint32 packetLen = htonl(video->data.size());
+        quint16 codec = video->compressionType;
+        if (video->flags & AV_PKT_FLAG_KEY)
+            codec |= 0x8000;
+        codec = htons(codec);
+
+        socket->send(&codec, 2);
+        socket->send(&packetLen, 4);
+
+        int sended = socket->send(video->data.data(), video->data.size());
+        if (sended != video->data.size())
+        {
+            qWarning() << "TCP socket write error for camera " << m_mac << "send" << sended << "of" << video->data.size();
+            return false;
+        }
 
         streamingTime += 1000.0 / m_fps;
         int waitingTime = streamingTime - timer.elapsed();
@@ -143,31 +161,7 @@ bool QnTestCamera::streamingH264(const QByteArray data, TCPSocket* socket)
             QnSleep::msleep(waitingTime);
 
     }
-    return true;
-}
 
-bool QnTestCamera::streamingMJPEG(const QByteArray data, TCPSocket* socket)
-{
-    // todo: implement me
-    return false;
-}
-
-bool QnTestCamera::doStreamingFile(const QByteArray data, TCPSocket* socket)
-{
-    if (data.size() < 4)
-        return false;
-    TestCamConst::MediaType mediaType = TestCamConst::MediaType_MJPEG;
-    if (data[0] == 0 && data[1] == 0 && (data[2] == 1 || data[2] == 0 && data[3] == 1))
-        mediaType = TestCamConst::MediaType_H264;
-
-    if (mediaType == TestCamConst::MediaType_H264)
-        return streamingH264(data, socket);
-    else if (mediaType == TestCamConst::MediaType_MJPEG)
-        return streamingMJPEG(data, socket);
-    else {
-        qWarning() << "Unknown media type. Streaming aborted";
-        return false;
-    }
 }
 
 void QnTestCamera::startStreaming(TCPSocket* socket)
@@ -176,7 +170,7 @@ void QnTestCamera::startStreaming(TCPSocket* socket)
     while (1)
     {
         QString fileName = m_files[fileIndex];
-        QByteArray data = QnFileCache::instance()->getMediaData(fileName);
+        QList<QnCompressedVideoDataPtr> data = QnFileCache::instance()->getMediaData(fileName);
         if (data.isEmpty())
         {
             qWarning() << "File" << fileName << "not found. Stop streaming for camera" << getMac();
@@ -187,4 +181,33 @@ void QnTestCamera::startStreaming(TCPSocket* socket)
             break;
         fileIndex = (fileIndex+1) % m_files.size();
     }
+}
+
+void QnTestCamera::makeOfflineFlood()
+{
+    if (m_checkTimer.elapsed() < 1000)
+        return;
+    m_checkTimer.restart();
+
+    if (!m_isEnabled)
+    {
+        if (m_offlineTimer.elapsed() > m_offlineDuration) {
+            m_isEnabled = true;
+            return;
+        }
+    }
+
+    if (m_isEnabled && (rand() % 100 < m_offlineFreq))
+    {
+        m_isEnabled = false;
+        m_offlineTimer.restart();
+        m_offlineDuration = 2000 + (rand() % 2000);
+    }
+
+}
+
+bool QnTestCamera::isEnabled()
+{
+    makeOfflineFlood();
+    return m_isEnabled;
 }

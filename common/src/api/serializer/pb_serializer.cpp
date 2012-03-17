@@ -54,6 +54,7 @@ void parseCameras(QList<T>& cameras, const PbCameraList& pb_cameras, QnResourceF
         if (pb_camera.has_status())
             parameters["status"] = QString::number((int)pb_camera.status());
 
+		parameters["disabled"] = QString::number((int)pb_camera.disabled());
         parameters["parentId"] = QString::number(pb_camera.parentid());
 
         QnResourcePtr cameraBase = resourceFactory.createResource(pb_camera.typeid_(), parameters);
@@ -361,6 +362,7 @@ void serializeCamera_i(proto::pb::Camera& pb_camera, const QnVirtualCameraResour
     pb_camera.set_mac(cameraPtr->getMAC().toString().toUtf8().constData());
     pb_camera.set_login(cameraPtr->getAuth().user().toUtf8().constData());
     pb_camera.set_password(cameraPtr->getAuth().password().toUtf8().constData());
+	pb_camera.set_disabled(cameraPtr->isDisabled());
     pb_camera.set_status(static_cast<proto::pb::Camera_Status>(cameraPtr->getStatus()));
     pb_camera.set_region(serializeRegionList(cameraPtr->getMotionMaskList()).toUtf8().constData());
     pb_camera.set_scheduledisabled(cameraPtr->isScheduleDisabled());

@@ -2,7 +2,7 @@
 #include "testcamera_resource.h"
 #include "utils/common/synctime.h"
 
-static const int TESTCAM_TIMEOUT = 3 * 1000;
+static const int TESTCAM_TIMEOUT = 1 * 1000;
 
 QnTestCameraStreamReader::QnTestCameraStreamReader(QnResourcePtr res):
     CLServerPushStreamreader(res)
@@ -35,17 +35,18 @@ QnAbstractMediaDataPtr QnTestCameraStreamReader::getNextData()
             return QnAbstractMediaDataPtr(0);
     }
 
-    quint8 header[5];
+    quint8 header[6];
 
     int readed = receiveData(header, sizeof(header));
-    if (readed != 5) {
+    if (readed != sizeof(header)) {
         closeStream();
         return QnAbstractMediaDataPtr();
     }
 
-    int codec = header[0] & 0x7f;
-    quint32 size = (header[1] << 24) + (header[2] << 16) + (header[3] << 8) + header[4];
     bool isKeyData = header[0] & 0x80;
+    bool isCodecContext = header[0] & 0x40;
+    quint16 codec = ((header[0]&0x3f) << 8) + header[1];
+    quint32 size = (header[2] << 24) + (header[3] << 16) + (header[4] << 8) + header[5];
 
     if (size <= 0 || size > 1024*1024*8)
     {
@@ -54,21 +55,24 @@ QnAbstractMediaDataPtr QnTestCameraStreamReader::getNextData()
         return QnAbstractMediaDataPtr();
     }
 
-    QnAbstractMediaDataPtr rez(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, size));
-    switch(codec)
+    if (isCodecContext)
     {
-        case 0:
-            rez->compressionType = CODEC_ID_H264;
-            break;
-        case 1:
-            rez->compressionType = CODEC_ID_MJPEG;
-            break;
-        default:
-            qWarning() << "Unknown codec type" << codec << "for test camera" << m_resource->getUrl();
-            return QnAbstractMediaDataPtr();
+        quint8* ctxData = new quint8[size];
+        int readed = receiveData(ctxData, size);
+
+        if (readed == size)
+        {
+            m_context = QnMediaContextPtr(new QnMediaContext(ctxData, size));
+        }    
+        delete [] ctxData;
+        return getNextData();
     }
+
+    QnAbstractMediaDataPtr rez(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, size, m_context));
+    rez->compressionType = (CodecID) codec;
+
     rez->data.done(size);
-    rez->timestamp = qnSyncTime->currentMSecsSinceEpoch();
+    rez->timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;
     if (isKeyData)
         rez->flags |= AV_PKT_FLAG_KEY;
 
@@ -77,6 +81,17 @@ QnAbstractMediaDataPtr QnTestCameraStreamReader::getNextData()
         closeStream();
         return QnAbstractMediaDataPtr();
     }
+
+    /*
+    static QFile* gggFile = 0;
+    if (gggFile == 0)
+    {
+        gggFile = new QFile("c:/dest.264");
+        gggFile->open(QFile::WriteOnly);
+    }
+    gggFile->write(rez->data.data(), rez->data.size());
+    gggFile->flush();
+    */
 
     return rez;
 }

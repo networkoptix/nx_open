@@ -18,7 +18,7 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
 {
 
     QSet<QHostAddress> foundDevSet; // to avoid duplicates
-    QnResourceList result;
+    QMap<QString, QnResourcePtr> resources;
 
     QList<QHostAddress> ipaddrs = getAllIPv4Addresses();
     for (int i = 0; i < ipaddrs.size();++i)
@@ -54,15 +54,18 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
 
                 resource->setTypeId(rt);
                 resource->setName(resName);
-                resource->setMAC(QString(params[j]));
+                QString mac(params[j]);
+                resource->setMAC(mac);
                 resource->setDiscoveryAddr(ipaddrs.at(i));
                 resource->setUrl(QString("tcp://") + sender.toString() + QString(':') + QString::number(videoPort) + QString("/") + QString(params[j]));
-                result.push_back(resource);
+                resources.insert(mac, resource);
             }
         }
     }
-
-    return result;
+    QnResourceList rez;
+    foreach(QnResourcePtr res, resources.values())
+        rez << res;
+    return rez;
 }
 
 QnResourcePtr QnTestCameraResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)

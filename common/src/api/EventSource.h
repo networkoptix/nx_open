@@ -15,6 +15,7 @@
 
 static const char* QN_EVENT_RES_CHANGE        = "RC";
 static const char* QN_EVENT_RES_STATUS_CHANGE = "RSC";
+static const char* QN_EVENT_RES_DISABLED_CHANGE = "RDC";
 static const char* QN_EVENT_RES_DELETE        = "RD";
 static const char* QN_EVENT_RES_SETPARAM      = "RSP";
 static const char* QN_EVENT_LICENSE_CHANGE    = "LC";

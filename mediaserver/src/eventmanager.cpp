@@ -124,9 +124,15 @@ void QnEventManager::eventReceived(QnEvent event)
             QnResource::Status status = (QnResource::Status)event.data.toInt();
             resource->setStatus(status);
         }
-    }
+	} else if (event.eventType == QN_EVENT_RES_DISABLED_CHANGE)
+	{
+		QnResourcePtr resource = qnResPool->getResourceById(event.objectId);
 
-
+		if (resource)
+		{
+			resource->setDisabled(event.data.toInt());
+		}
+	}
 }
 
 void QnEventManager::connectionClosed(QString errorString)

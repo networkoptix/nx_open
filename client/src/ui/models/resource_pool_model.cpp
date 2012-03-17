@@ -776,7 +776,8 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     connect(resource.data(), SIGNAL(parentIdChanged()),                                     this, SLOT(at_resource_parentIdChanged()));
     connect(resource.data(), SIGNAL(nameChanged()),                                         this, SLOT(at_resource_resourceChanged()));
     connect(resource.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(at_resource_resourceChanged()));
-    connect(resource.data(), SIGNAL(resourceChanged()),                                     this, SLOT(at_resource_resourceChanged()));
+	connect(resource.data(), SIGNAL(disabledChanged()),                                     this, SLOT(at_resource_resourceChanged()));
+	connect(resource.data(), SIGNAL(resourceChanged()),                                     this, SLOT(at_resource_resourceChanged()));
 
     QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>();
     if(layout) {
@@ -841,10 +842,8 @@ void QnResourcePoolModel::at_resource_parentIdChanged() {
 }
 
 void QnResourcePoolModel::at_resource_resourceChanged(const QnResourcePtr &resource) {
-    QnResource::Status status = resource->getStatus();
-
     node(resource)->update();
-    node(resource)->setBastard(status == QnResource::Disabled);
+	node(resource)->setBastard(resource->isDisabled());
     foreach(Node *node, m_itemNodesByResource[resource.data()])
         node->update();
 }

@@ -47,8 +47,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnResour
     if(!resource)
         return 0;
 
-    QnResource::Status status = resource->getStatus();
-    if(status == QnResource::Disabled)
+	if(resource->isDisabled())
         return 0;
 
     if(QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
@@ -168,6 +167,7 @@ void QnWorkbenchAccessController::at_context_userChanged(const QnUserResourcePtr
 void QnWorkbenchAccessController::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
     connect(resource.data(), SIGNAL(parentIdChanged()), this, SLOT(updateSenderPermissions()));
     connect(resource.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(updateSenderPermissions()));
+	connect(resource.data(), SIGNAL(disabledChanged()), this, SLOT(updateSenderPermissions()));
     
     updatePermissions(resource);
 }

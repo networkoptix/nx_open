@@ -61,7 +61,10 @@ QHostAddress QnTestCameraResource::getHostAddress() const
 
 bool QnTestCameraResource::setHostAddress(const QHostAddress &ip, QnDomain domain)
 {
-    return false;
+    QUrl url(getUrl());
+    url.setHost(ip.toString());
+    setUrl(url.toString());
+    return true;
 }
 
 bool QnTestCameraResource::shoudResolveConflicts() const

@@ -854,11 +854,11 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate) {
 QRectF QnWorkbenchUi::updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry) {
     QPointF pos(
         treeGeometry.x(),
-        ((!m_titleVisible || !m_titleUsed) && m_treeVisible) ? 0.0 : qMax(titleGeometry.bottom(), 0.0)
+        ((!m_titleVisible || !m_titleUsed) && m_treeVisible) ? 0.0 : qMax(titleGeometry.bottom() + 30.0, 0.0)
     );
     QSizeF size(
         treeGeometry.width(),
-        ((!m_sliderVisible && m_treeVisible) ? m_controlsWidgetRect.bottom() : qMin(sliderGeometry.y(), m_controlsWidgetRect.bottom())) - pos.y()
+        ((!m_sliderVisible && m_treeVisible) ? m_controlsWidgetRect.bottom() : qMin(sliderGeometry.y() - 30.0, m_controlsWidgetRect.bottom() - 30.0)) - pos.y()
     );
     return QRectF(pos, size);
 }
@@ -911,11 +911,11 @@ void QnWorkbenchUi::updateTreeGeometry() {
 QRectF QnWorkbenchUi::updatedHelpGeometry(const QRectF &helpGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry) {
     QPointF pos(
         helpGeometry.x(),
-        ((!m_titleVisible || !m_titleUsed) && m_helpVisible) ? 0.0 : qMax(titleGeometry.bottom(), 0.0)
+        ((!m_titleVisible || !m_titleUsed) && m_helpVisible) ? 0.0 : qMax(titleGeometry.bottom() + 30.0, 0.0)
     );
     QSizeF size(
         helpGeometry.width(),
-        ((!m_sliderVisible && m_helpVisible) ? m_controlsWidgetRect.bottom() : qMin(sliderGeometry.y(), m_controlsWidgetRect.bottom())) - pos.y()
+        ((!m_sliderVisible && m_helpVisible) ? m_controlsWidgetRect.bottom() : qMin(sliderGeometry.y() - 30.0, m_controlsWidgetRect.bottom() - 30.0)) - pos.y()
     );
     return QRectF(pos, size);
 }

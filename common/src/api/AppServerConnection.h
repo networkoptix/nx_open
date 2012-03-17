@@ -90,7 +90,9 @@ public:
     int getResourcesAsync(const QString& args, const QString& objectName, QObject *target, const char *slot);
     int getLicensesAsync(QObject *target, const char *slot);
     int setResourceStatusAsync(const QnId& resourceId, QnResource::Status status , QObject *target, const char *slot);
-    int setResourcesStatusAsync(const QnResourceList& resources, QObject *target, const char *slot);
+	int setResourceDisabledAsync(const QnId& resourceId, bool disabled, QObject *target, const char *slot);
+	int setResourcesStatusAsync(const QnResourceList& resources, QObject *target, const char *slot);
+	int setResourcesDisabledAsync(const QnResourceList& resources, QObject *target, const char *slot);
 
     int registerServer(const QnVideoServerResourcePtr&, QnVideoServerResourceList& servers, QByteArray& errorString);
     int addCamera(const QnVirtualCameraResourcePtr&, QnVirtualCameraResourceList& cameras, QByteArray& errorString);

@@ -19,7 +19,7 @@ private:
 
 private slots:
     void onResourceStatusChanged(const QnResourcePtr& resource);
-    void requestFinished(int status, const QByteArray &data, const QByteArray& errorString, int handle);
+	void requestFinished(int status, const QByteArray &data, const QByteArray& errorString, int handle);
 };
 
 #endif //_server_appserver_processor_h_

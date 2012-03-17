@@ -1,28 +1,35 @@
-QT = core gui network
-CONFIG += precompile_header
+INCLUDEPATH += ../../common/src
+
+INCLUDEPATH += ../../common/contrib/qjson/include
+
+win* {
+    INCLUDEPATH += $$PWD/../../common/contrib/openssl/include
+    INCLUDEPATH += ../../common/contrib/ffmpeg-misc-headers-win32
+    LIBS += -L$$PWD/../../common/contrib/openssl/bin -llibeay32
+}
+
+QT = core gui network xml opengl multimedia webkit
+CONFIG += console precompile_header
 CONFIG -= flat app_bundle
 
 win32 {
   CONFIG += x86
-  LIBS += -lws2_32
-
 }
 
 TEMPLATE = app
-VERSION = 1.0.0
+VERSION = 0.0.1
+ICON = eve_logo.icns
+QMAKE_INFO_PLIST = Info.plist
+
+BUILDLIB = %BUILDLIB
+FFMPEG = %FFMPEG
+EVETOOLS_DIR = %EVETOOLS_DIR
 
 TARGET = testCamera
 
-BUILDLIB = %BUILDLIB
-
-INCLUDEPATH += ../../common/src
-
-INCLUDEPATH += $$PWD
-PRECOMPILED_HEADER = $$PWD/StdAfx.h
-PRECOMPILED_SOURCE = $$PWD/StdAfx.cpp
+win32: RC_FILE = testCamera.rc
 
 CONFIG(debug, debug|release) {
-  CONFIG += console
   DESTDIR = ../bin/debug
   OBJECTS_DIR  = ../build/debug
   MOC_DIR = ../build/debug/generated
@@ -56,50 +63,89 @@ CONFIG(release, debug|release) {
   }
 }
 
-win32: RC_FILE = testCamera.rc
+CONFIG(debug, debug|release) {
+  INCLUDEPATH += $$FFMPEG-debug/include
+  LIBS += -L$$FFMPEG-debug/bin -L$$FFMPEG-debug/lib -L$$PWD/../../common/bin/debug -lcommon -L../../common/contrib/qjson/lib/win32/debug -L$$EVETOOLS_DIR/lib/debug
+}
+CONFIG(release, debug|release) {
+  INCLUDEPATH += $$FFMPEG-release/include
+  LIBS += -L$$FFMPEG-release/bin -L$$FFMPEG-release/lib -L$$PWD/../../common/bin/release -lcommon -L../../common/contrib/qjson/lib/win32/release -L$$EVETOOLS_DIR/lib/release
+}
+
+QMAKE_CXXFLAGS += -I$$EVETOOLS_DIR/include
 
 win32 {
+    QMAKE_CXXFLAGS += -Zc:wchar_t
+    QMAKE_CXXFLAGS -= -Zc:wchar_t-
+
+    LIBS += -lxerces-c_3 -llibprotobuf
+
     # Define QN_EXPORT only if common build is not static
     isEmpty(BUILDLIB) { DEFINES += QN_EXPORT=Q_DECL_IMPORT }
     !isEmpty(BUILDLIB) { DEFINES += QN_EXPORT= }
 }
 
-unix {
-  LIBS += -lcrypto -lz
-  QMAKE_CXXFLAGS += -msse4.1
-  DEFINES += QN_EXPORT=
+mac {
+    LIBS += -L../../common/contrib/qjson/lib/mac -lxerces-c-3.1 -lprotobuf
+    DEFINES += QN_EXPORT=
+}
+
+unix:!mac {
+    LIBS += -L../../common/contrib/qjson/lib/linux -lxerces-c -lprotobuf
+}
+
+LIBS += -L$$EVETOOLS_DIR/lib
+
+LIBS += -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lqjson
+
+win32 {
+  win32-msvc* {
+    QMAKE_CXXFLAGS += -MP /Fd$$OBJECTS_DIR
+
+    # Don't warn for deprecated 'unsecure' CRT functions.
+    DEFINES += _CRT_SECURE_NO_WARNINGS
+
+    # Don't warn for deprecated POSIX functions.
+    DEFINES += _CRT_NONSTDC_NO_DEPRECATE 
+
+    INCLUDEPATH += ../contrib/ffmpeg-misc-headers-win32
+  }
+
+  LIBS += -lws2_32 -lIphlpapi -lOle32
+
+  LIBS += -lwinmm
+
+  SOURCES += 
+
+  # Define QN_EXPORT only if common build is not static
+  isEmpty(BUILDLIB) { DEFINES += QN_EXPORT=Q_DECL_IMPORT }
+  !isEmpty(BUILDLIB) { DEFINES += QN_EXPORT= }
 }
 
 DEFINES += __STDC_CONSTANT_MACROS
 
+unix {
+  LIBS += -lz -lcrypto
+  QMAKE_CXXFLAGS += -msse4.1
+  DEFINES += QN_EXPORT=
+}
+
 mac {
-  LIBS += -framework IOKit -framework CoreServices
-  LIBS += -lbz2
-
-  PRIVATE_FRAMEWORKS.files = ../resource/arecontvision
-  PRIVATE_FRAMEWORKS.path = Contents/MacOS
-  QMAKE_BUNDLE_DATA += PRIVATE_FRAMEWORKS
-
-  QMAKE_POST_LINK += mkdir -p `dirname $(TARGET)`/arecontvision; cp -f $$PWD/../resource/arecontvision/devices.xml `dirname $(TARGET)`/arecontvision
-
-#  QMAKE_CXXFLAGS += -DAPI_TEST_MAIN
-#  TARGET = consoleapp
-#  CONFIG   += console
-#  CONFIG   -= app_bundle
+  LIBS += -lbz2 -framework IOKit -framework
 }
 
 INCLUDEPATH += $$PWD
 PRECOMPILED_HEADER = $$PWD/StdAfx.h
 PRECOMPILED_SOURCE = $$PWD/StdAfx.cpp
 
+RESOURCES += 
+FORMS += 
+
+DEFINES += CL_TRIAL_MODE CL_FORCE_LOGO
+#DEFINES += CL_DEFAULT_SKIN_PREFIX=\\\"./trinity\\\"
+
+
 # Define override specifier.
 OVERRIDE_DEFINITION = "override="
 win32-msvc*:OVERRIDE_DEFINITION = "override=override"
 DEFINES += $$OVERRIDE_DEFINITION
-
-CONFIG(debug, debug|release) {
-  LIBS += -L$$PWD/../../common/bin/debug -lcommon
-}
-CONFIG(release, debug|release) {
-  LIBS += -L$$PWD/../../common/bin/release -lcommon
-}

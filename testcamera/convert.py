@@ -6,18 +6,18 @@ import glob
 import string
 
 from version import *
-import os, sys, posixpath
-import stat
+import os, sys
+import stat, time
 from StringIO import StringIO
 from string import Template
 
-import re
+sys.path.insert(0, '../common')
 
-# os.path = posixpath
-sys.path.insert(0, os.path.join('..', 'common'))
-
-from convert import index_dirs, rmtree, instantiate_pro, copy_files, BUILDLIB, platform
+from convert import index_dirs, rmtree, setup_ffmpeg, instantiate_pro, copy_files, BUILDLIB, setup_tools, platform
 from convert import gen_env_sh
+from convert import convert as convert_common
+
+FFMPEG_VERSION = '2011-08-29'
 
 EXCLUDE_DIRS = ('.svn', 'dxva')
 EXCLUDE_FILES = ('dxva', 'moc_', 'qrc_', 'StdAfx')
@@ -54,6 +54,9 @@ def gen_version_h():
     print >> version_h, '#endif // UNIVERSAL_CLIENT_VERSION_H_'
 
 
+ffmpeg_path, ffmpeg_path_debug, ffmpeg_path_release = setup_ffmpeg()
+tools_path = setup_tools()
+
 if os.path.exists('bin'):
     rmtree('bin')
 
@@ -72,6 +75,25 @@ if platform() == 'mac':
     ldpath_debug = ''
     ldpath_release = ''
 
+if platform() == 'win32':
+    copy_files(ffmpeg_path_debug + '/bin/*-[0-9].dll', 'bin/debug')
+    copy_files(ffmpeg_path_debug + '/bin/*-[0-9][0-9].dll', 'bin/debug')
+    copy_files(ffmpeg_path_release + '/bin/*-[0-9].dll', 'bin/release')
+    copy_files(ffmpeg_path_release + '/bin/*-[0-9][0-9].dll', 'bin/release')
+elif platform() == 'mac':
+    ldpath_debug += ffmpeg_path_debug + '/lib'
+    ldpath_release += ffmpeg_path_release + '/lib'
+
+if platform() == 'win32':
+    copy_files(tools_path + '/bin/*.dll', 'bin/release')
+    copy_files(tools_path + '/bin/*.dll', 'bin/debug')
+elif platform() == 'mac':
+    ldpath_debug += ':' + tools_path + '/lib'
+    ldpath_release += ':' + tools_path + '/lib'
+
+if platform() == 'mac':
+    ldpath_debug += ':' + os.path.abspath('../common/bin/debug')
+    ldpath_release += ':' + os.path.abspath('../common/bin/release')
 
 if platform() == 'mac':
     gen_env_sh('bin/debug/env.sh', ldpath_debug)
@@ -80,7 +102,7 @@ if platform() == 'mac':
 gen_version_h()
 
 index_dirs(('src',), 'src/const.pro', 'src/testCamera.pro', exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
-instantiate_pro('src/testCamera.pro', {'BUILDLIB' : BUILDLIB})
+instantiate_pro('src/testCamera.pro', {'BUILDLIB' : BUILDLIB, 'FFMPEG' : ffmpeg_path, 'EVETOOLS_DIR' : tools_path})
 
 if platform() == 'win32':
     os.system('qmake -tp vc -o src/testCamera.vcproj src/testCamera.pro')
