@@ -108,6 +108,8 @@
         <CustomAction Id="SetMoviesFolder" BinaryKey="PropsCA.dll" DllEntry="SetMoviesFolder" />
         <CustomAction Id="MissingFeature"  Error="At least one component should be selected"/>
         
+        <CustomAction Id="GetFreeDriveSpace" BinaryKey="PropsCA.dll" DllEntry="GetFreeDriveSpace"/>
+        
         <CustomAction Id="FindFreePorts" BinaryKey="NetworkCA.dll" DllEntry="FindFreePorts" />
         <CustomAction Id="CheckPorts" BinaryKey="NetworkCA.dll" DllEntry="CheckPorts"/>
         <CustomAction Id="CheckPorts2" BinaryKey="NetworkCA.dll" DllEntry="CheckPorts"/>
@@ -121,10 +123,10 @@
         <CustomAction Id="AssignServerRtspPort" Property="SERVER_RTSP_PORT" Value="[FREEPORT2]"/>
         <CustomAction Id="AssignServerApiPort" Property="SERVER_API_PORT" Value="[FREEPORT3]"/>
         
-    	<!-- Assign default values for Quick installation -->
-    	<CustomAction Id="AssignServerAppServerPort" Property="SERVER_APPSERVER_PORT" Value="[APPSERVER_PORT]"/>
-    	<CustomAction Id="AssignClientAppServerPort" Property="CLIENT_APPSERVER_PORT" Value="[APPSERVER_PORT]"/>
-    	
+        <!-- Assign default values for Quick installation -->
+        <CustomAction Id="AssignServerAppServerPort" Property="SERVER_APPSERVER_PORT" Value="[APPSERVER_PORT]"/>
+        <CustomAction Id="AssignClientAppServerPort" Property="CLIENT_APPSERVER_PORT" Value="[APPSERVER_PORT]"/>
+        
         <CustomAction Id="AssignServerFolder" Property="SERVER_DIRECTORY" Value="[ROOTDRIVE]\HDWitness" />
         <CustomAction Id="AssignClientFolder" Property="CLIENT_DIRECTORY" Value="[MOVIESFOLDER]\HD Witness Client Media" />
         
@@ -156,8 +158,8 @@
             <Custom Action="AssignAppServerPort" Before="AssignServerRtspPort">NOT APPSERVER_PORT</Custom>
             <Custom Action="AssignServerRtspPort" Before="AssignServerApiPort">NOT SERVER_RTSP_PORT</Custom>
             <Custom Action="AssignServerApiPort" Before="AssignServerAppServerPort">NOT SERVER_API_PORT</Custom>
-        	<Custom Action="AssignServerAppServerPort" Before="AssignClientAppServerPort">1</Custom>
-        	<Custom Action="AssignClientAppServerPort" Before="SetMoviesFolder">1</Custom>
+            <Custom Action="AssignServerAppServerPort" Before="AssignClientAppServerPort">1</Custom>
+            <Custom Action="AssignClientAppServerPort" Before="SetMoviesFolder">1</Custom>
             <Custom Action="SetMoviesFolder" Before="AssignClientFolder" />
             
             <Custom Action="ResetClientFolder" Before="CostInitialize"/>
@@ -568,6 +570,7 @@
             <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="ClientDlg" Order="4"><![CDATA[(&AppServerFeature <> 3 AND &ServerFeature <>3 AND &ClientFeature=3)]]></Publish>
             <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Property="_BrowseProperty" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
             <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Event="SpawnDialog" Value="BrowseDlg" Order="2">1</Publish>
+            <Publish Dialog="InstallDirDlg" Control="Next" Event="DoAction" Value="GetFreeDriveSpace">1</Publish>
             
             <Publish Dialog="AppServerDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg">1</Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Property="BUSYPORT" Value="{}">1</Publish>
@@ -591,7 +594,7 @@
             <Publish Dialog="AppServerDlg" Control="Next" Property="PORT_DIALOG_BACK" Value="AppServerDlg">1</Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Property="PORT_DIALOG_NEXT" Value="MediaServerDlg"><![CDATA[(NOT BUSYPORT AND &ServerFeature=3)]]></Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Property="PORT_DIALOG_BACK"  Value="VerifyReadyDlg"><![CDATA[(NOT BUSYPORT AND &ServerFeature <> 3)]]></Publish>
-
+            
             <Publish Dialog="PortIsBusyDlg" Control="Back" Event="NewDialog" Value="[PORT_DIALOG_BACK]">1</Publish>
             <Publish Dialog="PortIsBusyDlg" Control="Next" Event="NewDialog" Value="[PORT_DIALOG_NEXT]">1</Publish>
             
@@ -608,7 +611,9 @@
             <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="3"><![CDATA[(&ClientFeature<>3 OR &AppServerFeature=3)]]></Publish>
             <Publish Dialog="MediaServerDlg" Control="ChangeServerMediaDir" Property="_BrowseProperty" Value="[WIXUI_SERVER_DIRECTORY]" Order="1">1</Publish>
             <Publish Dialog="MediaServerDlg" Control="ChangeServerMediaDir" Event="SpawnDialog" Value="BrowseDlg" Order="2">1</Publish>
-                        
+
+            <Publish Dialog="BrowseDlg" Control="OK" Event="DoAction" Value="GetFreeDriveSpace" Order="4">1</Publish>
+
             <Publish Dialog="MediaServerDlg" Control="Next" Property="CLIENT_APPSERVER_HOST" Value="[SERVER_APPSERVER_HOST]" Order="4">1</Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Property="CLIENT_APPSERVER_PORT" Value="[SERVER_APPSERVER_PORT]" Order="4">1</Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Property="CLIENT_APPSERVER_LOGIN" Value="[SERVER_APPSERVER_LOGIN]" Order="4">1</Publish>
