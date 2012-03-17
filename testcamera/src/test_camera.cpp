@@ -83,6 +83,7 @@ QnTestCamera::QnTestCamera(quint32 num): m_num(num)
     m_isEnabled = true;
     m_offlineDuration = 0;
     m_checkTimer.restart();
+    srand(QDateTime::currentMSecsSinceEpoch());
 }
 
 QByteArray QnTestCamera::getMac() const
