@@ -560,7 +560,7 @@
             <Publish Dialog="InstallDirDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
             <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="AppServerDlg" Order="2"><![CDATA[(&AppServerFeature=3)]]></Publish>
             <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg" Order="3"><![CDATA[(&AppServerFeature <> 3 AND &ServerFeature=3)]]></Publish>
-            <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="ClientDlg" Order="4"><![CDATA[(&AppServerFeature <> 3 AND &ServerFeature <>3 AND &ClientFeature=3)]]></Publish>
+            <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="4"><![CDATA[(&AppServerFeature <> 3 AND &ServerFeature <>3 AND &ClientFeature=3)]]></Publish>
             <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Property="_BrowseProperty" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
             <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Event="SpawnDialog" Value="BrowseDlg" Order="2">1</Publish>
             <Publish Dialog="InstallDirDlg" Control="Next" Event="DoAction" Value="CheckServerDriveLowSpace">1</Publish>
@@ -573,7 +573,7 @@
             <Publish Dialog="AppServerDlg" Control="Next" Event="DoAction" Value="CheckPorts" Order="2"><![CDATA[ APPSERVER_PORT <> OLD_APPSERVER_PORT]]></Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Event="NewDialog" Value="PortIsBusyDlg" Order="3">BUSYPORT</Publish>
             
-        	<?define IsAsSettingsFilled="(APPSERVER_HOST AND APPSERVER_PORT AND APPSERVER_LOGIN AND APPSERVER_PASSWORD)" ?>
+        	<?define IsAsSettingsFilled="(APPSERVER_PORT AND APPSERVER_LOGIN AND APPSERVER_PASSWORD)" ?>
         	
             <Publish Dialog="AppServerDlg" Control="Next" Event="SpawnDialog" Value="AllFieldsAreMandatoryDlg"><![CDATA[ NOT $(var.IsAsSettingsFilled) ]]></Publish>
             
@@ -607,8 +607,7 @@
             <Publish Dialog="MediaServerDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_SERVER_DIRECTORY]" Order="1">1</Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Event="SpawnDialog" Value="AllFieldsAreMandatoryDlg"><![CDATA[ NOT $(var.IsSettingsFilled) ]]></Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Event="SpawnDialog" Value="PortDuplicateDlg"><![CDATA[ NOT $(var.IsPortsValid) AND $(var.IsSettingsFilled) ]]></Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="ClientDlg" Order="2"><![CDATA[$(var.IsSettingsValid) AND (&ClientFeature=3 AND &AppServerFeature<>3)]]></Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="3"><![CDATA[$(var.IsSettingsValid) AND (&ClientFeature<>3 OR &AppServerFeature=3)]]></Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="2"><![CDATA[$(var.IsSettingsValid)]]></Publish>
             <Publish Dialog="MediaServerDlg" Control="ChangeServerMediaDir" Property="_BrowseProperty" Value="[WIXUI_SERVER_DIRECTORY]" Order="1">1</Publish>
             <Publish Dialog="MediaServerDlg" Control="ChangeServerMediaDir" Event="SpawnDialog" Value="BrowseDlg" Order="2">1</Publish>
             
@@ -629,21 +628,11 @@
             <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="PortIsBusyDlg" Order="3">BUSYPORT</Publish>
             
             <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_BACK" Value="MediaServerDlg">1</Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_NEXT" Value="ClientDlg"><![CDATA[(&ClientFeature=3 AND &AppServerFeature<>3)]]></Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_NEXT" Value="VerifyReadyDlg"><![CDATA[(&ClientFeature<>3 OR &AppServerFeature=3)]]></Publish>
-            
-            <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg"><![CDATA[(&ServerFeature=3)]]></Publish>
-            <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="AppServerDlg"><![CDATA[(&AppServerFeature = 3 AND &ServerFeature<>3)]]></Publish>
-            <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg"><![CDATA[(&AppServerFeature <> 3 AND &ServerFeature<>3)]]></Publish>
-            <Publish Dialog="ClientDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_CLIENT_DIRECTORY]" Order="1">1</Publish>
-            <Publish Dialog="ClientDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="2">1</Publish>
-            <Publish Dialog="ClientDlg" Control="ChangeClientMediaDir" Property="_BrowseProperty" Value="[WIXUI_CLIENT_DIRECTORY]" Order="1">1</Publish>
-            <Publish Dialog="ClientDlg" Control="ChangeClientMediaDir" Event="SpawnDialog" Value="BrowseDlg" Order="2">1</Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_NEXT" Value="VerifyReadyDlg">1</Publish>
             
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg" Order="1">INSTALLTYPE=0</Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="ClientDlg" Order="1"><![CDATA[(INSTALLTYPE<>0 AND NOT Installed AND &ClientFeature = 3 AND &AppServerFeature<>3)]]></Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg" Order="1"><![CDATA[(INSTALLTYPE<>0 AND NOT Installed AND (&ClientFeature <> 3 OR &AppServerFeature = 3) AND &ServerFeature=3)]]></Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="AppServerDlg" Order="1"><![CDATA[(INSTALLTYPE<>0 AND NOT Installed AND (&ClientFeature <> 3 OR &AppServerFeature = 3) AND &ServerFeature<>3 AND &AppServerFeature = 3)]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg" Order="1"><![CDATA[(INSTALLTYPE<>0 AND NOT Installed AND &AppServerFeature=3 AND &ServerFeature=3)]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="AppServerDlg" Order="1"><![CDATA[(INSTALLTYPE<>0 AND NOT Installed AND &AppServerFeature=3 AND &ServerFeature<>3 AND &AppServerFeature = 3)]]></Publish>
             
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2">Installed</Publish>
             
