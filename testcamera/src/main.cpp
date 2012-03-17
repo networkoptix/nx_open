@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
         qDebug() << "count=N";
         qDebug() << "files=\"<fileName>[,<fileName>...]\"";
         qDebug() << "[fps=N] (optional, default value 30)";
-        qDebug() << "[offlineFrequence=0.100] (optional, default value 0 - no offline)";
+        qDebug() << "[offline=0.100] (optional, default value 0 - no offline)";
         qDebug() << "";
         qDebug() << "example:";
         QString str = QFileInfo(argv[0]).baseName() + QString(" files=\"c:/test.264\";count=20;fps=30");
@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
                 data[0] = data[0].mid(1);
             if (data[0] == "fps")
                 fps = data[1].toInt();
-            else if (data[0] == "offlinefreq")
+            else if (data[0] == "offline")
                 offlineFreq = data[1].toInt();
             else if (data[0] == "count")
                 count = data[1].toInt();

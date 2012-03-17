@@ -80,6 +80,9 @@ QnTestCamera::QnTestCamera(quint32 num): m_num(num)
     }
     m_fps = 30.0;
     m_offlineFreq = 0;
+    m_isEnabled = true;
+    m_offlineDuration = 0;
+    m_checkTimer.restart();
 }
 
 QByteArray QnTestCamera::getMac() const
@@ -110,6 +113,13 @@ bool QnTestCamera::doStreamingFile(QList<QnCompressedVideoDataPtr> data, TCPSock
 
     for (int i = 0; i < data.size(); ++i)
     {
+
+        makeOfflineFlood();
+        if (!m_isEnabled) {
+            QnSleep::msleep(100);
+            return false;
+        }
+
         QnCompressedVideoDataPtr video = data[i];
         if (i == 0)
         {
@@ -127,7 +137,6 @@ bool QnTestCamera::doStreamingFile(QList<QnCompressedVideoDataPtr> data, TCPSock
 
             int sended = socket->send(byteArray.data(), byteArray.size());
         }
-
 
         quint32 packetLen = htonl(video->data.size());
         quint16 codec = video->compressionType;
@@ -171,4 +180,33 @@ void QnTestCamera::startStreaming(TCPSocket* socket)
             break;
         fileIndex = (fileIndex+1) % m_files.size();
     }
+}
+
+void QnTestCamera::makeOfflineFlood()
+{
+    if (m_checkTimer.elapsed() < 1000)
+        return;
+    m_checkTimer.restart();
+
+    if (!m_isEnabled)
+    {
+        if (m_offlineTimer.elapsed() > m_offlineDuration) {
+            m_isEnabled = true;
+            return;
+        }
+    }
+
+    if (m_isEnabled && (rand() % 100 < m_offlineFreq))
+    {
+        m_isEnabled = false;
+        m_offlineTimer.restart();
+        m_offlineDuration = 2000 + (rand() % 2000);
+    }
+
+}
+
+bool QnTestCamera::isEnabled()
+{
+    makeOfflineFlood();
+    return m_isEnabled;
 }
