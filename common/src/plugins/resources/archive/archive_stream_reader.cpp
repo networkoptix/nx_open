@@ -204,9 +204,9 @@ qint64 QnArchiveStreamReader::determineDisplayTime(bool reverseMode)
 {
     QnlTimeSource* timeSource = 0;
     qint64 rez = AV_NOPTS_VALUE;
-    QMutexLocker mutex(&m_mutex);
     for (int i = 0; i < m_dataprocessors.size(); ++i)
     {
+        QMutexLocker mutex(&m_mutex);
          QnAbstractDataConsumer* dp = m_dataprocessors.at(i);
          if (dp->isRealTimeSource())
              return DATETIME_NOW;
