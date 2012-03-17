@@ -14,12 +14,24 @@ QString doUnquote(const QString& fileName)
     return rez;
 }
 
+void ffmpegInit()
+{
+    avcodec_init();
+    av_register_all();
+
+    extern URLProtocol ufile_protocol;
+    av_register_protocol2(&ufile_protocol, sizeof(ufile_protocol));
+}
+
+
 int main(int argc, char *argv[])
 {
     QApplication::setOrganizationName(QLatin1String(ORGANIZATION_NAME));
     QApplication::setApplicationName(QLatin1String(APPLICATION_NAME));
     QApplication::setApplicationVersion(QLatin1String(APPLICATION_VERSION));
 
+    ffmpegInit();  
+    
     // Each user may have it's own traytool running.
     QApplication app(argc, argv);
     QApplication::setQuitOnLastWindowClosed(false);
@@ -34,7 +46,7 @@ int main(int argc, char *argv[])
         qDebug() << "testCamera <cameraSet1> <cameraSet2> ... <cameraSetN>";
         qDebug() << "where <cameraSetN> is camera(s) param with ';' delimiter";
         qDebug() << "count=N";
-        qDebug() << "files=\"<fileName>[,<fileName>...]\". ONLY H264 RAW DATA NOW SUPPORTED!";
+        qDebug() << "files=\"<fileName>[,<fileName>...]\"";
         qDebug() << "[fps=N] (optional, default value 30)";
         qDebug() << "[offlineFrequence=0.100] (optional, default value 0 - no offline)";
         qDebug() << "";

@@ -1,9 +1,11 @@
 #ifndef __TEST_CAMERA_H__
 #define __TEST_CAMERA_H__
 
+#include <QStringList>
 #include <QMap>
 #include <QFile>
 #include "utils/network/socket.h"
+#include "core/datapacket/mediadatapacket.h"
 
 class QnTestCamera
 {
@@ -18,12 +20,8 @@ public:
 
     void startStreaming(TCPSocket* socket);
 private:
-    bool doStreamingFile(const QByteArray data, TCPSocket* socket);
+    bool doStreamingFile(QList<QnCompressedVideoDataPtr> data, TCPSocket* socket);
     
-    bool streamingH264(const QByteArray data, TCPSocket* socket);
-    bool streamingMJPEG(const QByteArray data, TCPSocket* socket);
-
-    const quint8* findH264FrameEnd(const quint8* curPtr, const quint8* end, bool* isKeyData);
 private:
     quint32 m_num;
     QByteArray m_mac;
@@ -31,6 +29,7 @@ private:
     int m_prefixLen;
     int m_offlineFreq;
     double m_fps;
+    QnMediaContextPtr m_context;
 };
 
 #endif // __TEST_CAMERA_H__
