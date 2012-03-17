@@ -12,12 +12,20 @@
 #include <windows.h>
 
 #include <tchar.h>
+#include <atlstr.h>
 #include <strsafe.h>
 #include <msiquery.h>
 
 // WiX Header Files:
 #include <wcautil.h>
 
+#include <comutil.h>
+#include <objbase.h>
+#include <shobjidl.h>
+#include <shlobj.h>
+#include <msxml2.h>
+
+#include <sys/stat.h>
 
 
 // TODO: reference additional headers your program requires here

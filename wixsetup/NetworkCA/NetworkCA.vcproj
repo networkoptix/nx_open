@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="NetworkCA"
-	ProjectGUID="{E947DC18-6A1D-4EEF-BD14-E27944BFB023}"
+	ProjectGUID="{224A053E-46A9-4224-9CC6-927050F4D210}"
 	RootNamespace="NetworkCA"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"

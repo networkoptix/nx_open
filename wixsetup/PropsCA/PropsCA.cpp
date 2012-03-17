@@ -2,14 +2,6 @@
 //
 
 #include "stdafx.h"
-#include <comutil.h>
-#include <objbase.h>
-#include <shobjidl.h>
-#include <atlstr.h>
-#include <shlobj.h>
-#include <msxml2.h>
-
-#include <sys/stat.h>
 
 TCHAR* GetProperty(MSIHANDLE hInstall, LPCWSTR name)
 {
@@ -33,6 +25,42 @@ TCHAR* GetProperty(MSIHANDLE hInstall, LPCWSTR name)
     }
 
     return szValueBuf;
+}
+
+UINT __stdcall GetFreeDriveSpace(MSIHANDLE hInstall)
+{
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+
+    hr = WcaInitialize(hInstall, "GetFreeDriveSpace");
+    ExitOnFailure(hr, "Failed to initialize");
+
+    WcaLog(LOGMSG_STANDARD, "Initialized.");
+
+    TCHAR* folderToCheck = GetProperty(hInstall, L"SERVER_DIRECTORY");
+    ULARGE_INTEGER freeBytes;
+
+    wchar_t volumePathName[20];
+    GetVolumePathName(folderToCheck, volumePathName, 20);
+    GetDiskFreeSpaceEx(volumePathName, &freeBytes, 0, 0);
+
+    wchar_t freeGBString[10];
+    int freeGB = freeBytes.HighPart * 4 + (freeBytes.LowPart>> 30);
+
+    _ultow_s(freeGB, freeGBString, 10, 10);
+
+    if (freeGB < 10)
+        MsiSetProperty(hInstall, L"LOWDISKSPACE", freeGBString);
+    else
+        MsiSetProperty(hInstall, L"LOWDISKSPACE", L"");
+
+LExit:
+    
+    if (folderToCheck)
+        delete[] folderToCheck;
+
+    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    return WcaFinalize(er);
 }
 
 UINT __stdcall SetMoviesFolder(MSIHANDLE hInstall)
