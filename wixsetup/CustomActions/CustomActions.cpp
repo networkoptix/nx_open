@@ -11,8 +11,6 @@
   */
 UINT __stdcall CheckServerDirectoryWritable(MSIHANDLE hInstall)
 {
-    MessageBox(0, L"", L"", 0);
-
     HRESULT hr = S_OK;
     UINT er = ERROR_SUCCESS;
 

@@ -100,7 +100,7 @@
                             Win64="no"/>
         </Property>
         
-        <Binary Id="CustomActions.dll" SourceFile="CustomActions\Debug\CustomActions.dll" />
+        <Binary Id="CustomActions.dll" SourceFile="CustomActions\Release\CustomActions.dll" />
         
         <!-- Custom actions -->
         <CustomAction Id="SetMoviesFolder" BinaryKey="CustomActions.dll" DllEntry="SetMoviesFolder" />
