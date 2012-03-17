@@ -10,13 +10,13 @@
 #define EVEASSOCCA_API __declspec(dllimport)
 #endif
 
-// This class is exported from the NetworkCA.dll
-class EVEASSOCCA_API CNetworkCA {
+// This class is exported from the CustomActions.dll
+class EVEASSOCCA_API CCustomActions {
 public:
-    CNetworkCA(void);
+    CCustomActions(void);
     // TODO: add your methods here.
 };
 
-extern EVEASSOCCA_API int nNetworkCA;
+extern EVEASSOCCA_API int nCustomActions;
 
-EVEASSOCCA_API int fnNetworkCA(void);
+EVEASSOCCA_API int fnCustomActions(void);

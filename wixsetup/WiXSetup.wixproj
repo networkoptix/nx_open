@@ -35,8 +35,10 @@
     <Compile Include="DowngradeWarningDlg.wxs" />
     <Compile Include="FileAssociations.wxs" />
     <Compile Include="InstallTypeDlg.wxs" />
+    <Compile Include="InvalidPasswordDlg.wxs" />
     <Compile Include="MyFeaturesDlg.wxs" />
     <Compile Include="MediaServerDlg.wxs" />
+    <Compile Include="PortDuplicateDlg.wxs" />
     <Compile Include="Product.wxs" />
     <Compile Include="SelectionWarning.wxs" />
   </ItemGroup>
