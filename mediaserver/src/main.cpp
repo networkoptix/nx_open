@@ -44,6 +44,7 @@
 #include "plugins/resources/droid/droid_resource_searcher.h"
 #include "plugins/resources/isd/isd_resource_searcher.h"
 #include "plugins/resources/test_camera/testcamera_resource_searcher.h"
+#include "plugins/resources/onvif/onvif_ws_searcher.h"
 
 
 static const char SERVICE_NAME[] = "Network Optix VMS Media Server";
@@ -699,6 +700,7 @@ int main(int argc, char* argv[])
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlArecontResourceSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlAxisResourceSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDlinkResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlOnvifWsSearcher::instance());
 
     QnResourceTypeList resourceTypes;
     QByteArray errorString;

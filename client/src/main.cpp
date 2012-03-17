@@ -48,6 +48,7 @@
 #include "plugins/resources/iqinvision/iqinvision_resource_searcher.h"
 #include "plugins/resources/droid_ipwebcam/ipwebcam_droid_resource_searcher.h"
 #include "plugins/resources/isd/isd_resource_searcher.h"
+#include "plugins/resources/onvif/onvif_ws_searcher.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -400,6 +401,8 @@ int main(int argc, char *argv[])
     QnPlISDResourceSearcher::instance().setLocal(true);
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlISDResourceSearcher::instance());
 
+    QnPlOnvifWsSearcher::instance().setLocal(true);
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlOnvifWsSearcher::instance());
 
 
 

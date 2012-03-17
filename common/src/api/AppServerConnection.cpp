@@ -224,6 +224,8 @@ int QnAppServerConnection::addCamera(const QnVirtualCameraResourcePtr& cameraPtr
             m_serializer.deserializeCameras(cameras, replyData, m_resourceFactory);
         } catch (const QnSerializeException& e) {
             errorString += e.errorString();
+            cl_log.log(cl_logERROR, "AHTUNG! the client and app server version must be unsynched!");
+            return 1;
         }
 
         return 0;
