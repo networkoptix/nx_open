@@ -2,7 +2,7 @@
 #include "testcamera_resource.h"
 #include "utils/common/synctime.h"
 
-static const int TESTCAM_TIMEOUT = 3 * 1000;
+static const int TESTCAM_TIMEOUT = 1 * 1000;
 
 QnTestCameraStreamReader::QnTestCameraStreamReader(QnResourcePtr res):
     CLServerPushStreamreader(res)
