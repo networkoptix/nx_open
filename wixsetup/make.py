@@ -35,7 +35,7 @@ def gen_strings():
 # Generate CustomStrings.wxl
 gen_strings()
 
-WXS_FILES = "InstallTypeDlg.wxs AdvancedTypeDlg.wxs PortDuplicateDlg.wxs PortIsBusyDlg.wxs InvalidPasswordDlg.wxs MediaDirDlg.wxs MediaServerDlg.wxs MyFeaturesDlg.wxs SelectionWarning.wxs DowngradeWarningDlg.wxs  ClientDlg.wxs  Product.wxs AppServerFiles.wxs AppServerDlg.wxs"
+WXS_FILES = "AllFieldsAreMandatoryDlg.wxs InstallTypeDlg.wxs AdvancedTypeDlg.wxs PortDuplicateDlg.wxs PortIsBusyDlg.wxs InvalidPasswordDlg.wxs MediaDirDlg.wxs MediaServerDlg.wxs MyFeaturesDlg.wxs SelectionWarning.wxs DowngradeWarningDlg.wxs  ClientDlg.wxs  Product.wxs AppServerFiles.wxs AppServerDlg.wxs"
 os.system(r'heat dir ..\appserver\setup\build\exe.win32-2.7 -wixvar -nologo -sfrag -suid -sreg -ag -srd -dir WebHelp -out AppServerFiles.wxs -cg AppServerFilesComponent -dr VmsAppServerDir -var var.AppServerSourceDir -wixvar')
 fixasfiles()
 

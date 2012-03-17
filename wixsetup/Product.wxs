@@ -573,11 +573,12 @@
             <Publish Dialog="AppServerDlg" Control="Next" Event="DoAction" Value="CheckPorts" Order="2"><![CDATA[ APPSERVER_PORT <> OLD_APPSERVER_PORT]]></Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Event="NewDialog" Value="PortIsBusyDlg" Order="3">BUSYPORT</Publish>
             
-            <?define IsPasswordValid="(APPSERVER_PASSWORD)" ?>
-            <Publish Dialog="AppServerDlg" Control="Next" Event="SpawnDialog" Value="InvalidPasswordDlg"><![CDATA[ NOT $(var.IsPasswordValid) ]]></Publish>
+        	<?define IsAsSettingsFilled="(APPSERVER_HOST AND APPSERVER_PORT AND APPSERVER_LOGIN AND APPSERVER_PASSWORD)" ?>
+        	
+            <Publish Dialog="AppServerDlg" Control="Next" Event="SpawnDialog" Value="AllFieldsAreMandatoryDlg"><![CDATA[ NOT $(var.IsAsSettingsFilled) ]]></Publish>
             
-            <Publish Dialog="AppServerDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg" Order="2"><![CDATA[($(var.IsPasswordValid) AND NOT BUSYPORT AND &ServerFeature=3)]]></Publish>
-            <Publish Dialog="AppServerDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="4"><![CDATA[($(var.IsPasswordValid) AND NOT BUSYPORT AND &ServerFeature <> 3)]]></Publish>
+            <Publish Dialog="AppServerDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg" Order="2"><![CDATA[($(var.IsAsSettingsFilled) AND NOT BUSYPORT AND &ServerFeature=3)]]></Publish>
+            <Publish Dialog="AppServerDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="4"><![CDATA[($(var.IsAsSettingsFilled) AND NOT BUSYPORT AND &ServerFeature <> 3)]]></Publish>
             
             <Publish Dialog="AppServerDlg" Control="Next" Property="SERVER_APPSERVER_HOST" Value="localhost" Order="4">1</Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Property="SERVER_APPSERVER_PORT" Value="[APPSERVER_PORT]" Order="4">1</Publish>
@@ -600,11 +601,14 @@
             <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg"><![CDATA[(&AppServerFeature<>3)]]></Publish>
             
             <?define IsPortsValid="((&AppServerFeature=3 AND SERVER_RTSP_PORT<>APPSERVER_PORT AND SERVER_API_PORT<>APPSERVER_PORT AND SERVER_API_PORT<>SERVER_RTSP_PORT) OR (&AppServerFeature<>3 AND SERVER_API_PORT<>SERVER_RTSP_PORT))" ?>
-            
+        	<?define IsSettingsFilled="(SERVER_RTSP_PORT AND SERVER_API_PORT AND SERVER_APPSERVER_HOST AND SERVER_APPSERVER_PORT AND SERVER_APPSERVER_LOGIN AND SERVER_APPSERVER_PASSWORD)"?>
+            <?define IsSettingsValid="($(var.IsPortsValid) AND $(var.IsSettingsFilled))"?>
+        	
             <Publish Dialog="MediaServerDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_SERVER_DIRECTORY]" Order="1">1</Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Event="SpawnDialog" Value="PortDuplicateDlg"><![CDATA[ NOT $(var.IsPortsValid) ]]></Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="ClientDlg" Order="2"><![CDATA[$(var.IsPortsValid) AND (&ClientFeature=3 AND &AppServerFeature<>3)]]></Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="3"><![CDATA[$(var.IsPortsValid) AND (&ClientFeature<>3 OR &AppServerFeature=3)]]></Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Event="SpawnDialog" Value="AllFieldsAreMandatoryDlg"><![CDATA[ NOT $(var.IsSettingsFilled) ]]></Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Event="SpawnDialog" Value="PortDuplicateDlg"><![CDATA[ NOT $(var.IsPortsValid) AND $(var.IsSettingsFilled) ]]></Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="ClientDlg" Order="2"><![CDATA[$(var.IsSettingsValid) AND (&ClientFeature=3 AND &AppServerFeature<>3)]]></Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="3"><![CDATA[$(var.IsSettingsValid) AND (&ClientFeature<>3 OR &AppServerFeature=3)]]></Publish>
             <Publish Dialog="MediaServerDlg" Control="ChangeServerMediaDir" Property="_BrowseProperty" Value="[WIXUI_SERVER_DIRECTORY]" Order="1">1</Publish>
             <Publish Dialog="MediaServerDlg" Control="ChangeServerMediaDir" Event="SpawnDialog" Value="BrowseDlg" Order="2">1</Publish>
             
