@@ -49,7 +49,7 @@ QnCameraPool* QnCameraPool::instance()
 }
 
 QnCameraPool::QnCameraPool():
-    QnTcpListener(QHostAddress(), MEDIA_PORT),
+    QnTcpListener(QHostAddress::Any, MEDIA_PORT),
     m_cameraNum(0)
 {
     m_discoveryListener = new QnCameraDiscoveryListener();
