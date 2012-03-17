@@ -186,7 +186,7 @@
      </widget>
      <widget class="QWidget" name="tabAppServer">
       <attribute name="title">
-       <string>Application Server settings</string>
+       <string>Enterprise Control System (ECS) settings</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>

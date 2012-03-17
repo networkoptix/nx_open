@@ -8,7 +8,7 @@
 
 
 static const QString MEDIA_SERVER_NAME ("VMS Media Server");
-static const QString APP_SERVER_NAME("VMS Application Server");
+static const QString APP_SERVER_NAME("ECS");
 static const int DEFAULT_APP_SERVER_PORT = 8000;
 static const int MESSAGE_DURATION = 3 * 1000;
 
@@ -240,7 +240,6 @@ void QnSystrayWindow::onDelayedMessage()
 
 void QnSystrayWindow::messageClicked()
 {
-    //QMessageBox::information(0, qApp->applicationName(), m_detailedErrorText);
       
 }
 
@@ -403,7 +402,7 @@ void QnSystrayWindow::at_appServerStopAction()
     SERVICE_STATUS serviceStatus;
     if (m_appServerHandle) 
     {
-        if (QMessageBox::question(0, tr("Systray"), "Application server is going to be stopped. Are you sure?", QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+        if (QMessageBox::question(0, tr("Systray"), APP_SERVER_NAME + QString(" is going to be stopped. Are you sure?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
         {
             ControlService(m_appServerHandle, SERVICE_CONTROL_STOP, &serviceStatus);
             updateServiceInfo();
@@ -481,7 +480,7 @@ void QnSystrayWindow::createActions()
     m_actionList.append(NameAndAction("showMediaServerLog", m_showMediaServerLogAction));
     connectElevatedAction(m_showMediaServerLogAction, SIGNAL(triggered()), this, SLOT(onShowMediaServerLogAction()));
 
-    m_showAppLogAction = new QAction(tr("&Show Application server log"), this);
+    m_showAppLogAction = new QAction(tr("&Show ECS log"), this);
     m_actionList.append(NameAndAction("showAppServerLog", m_showAppLogAction));
     connectElevatedAction(m_showAppLogAction, SIGNAL(triggered()), this, SLOT(onShowAppServerLogAction()));
 
@@ -580,7 +579,7 @@ void QnSystrayWindow::onShowAppServerLogAction()
     QString logFileName = m_mServerSettings.value("logFile").toString();
     logFileName = logFileName.left(logFileName.lastIndexOf(MEDIA_SERVER_NAME));
     logFileName += APP_SERVER_NAME;
-    logFileName += "\\appserver.log";
+    logFileName += "\\ecs.log";
     QProcess::startDetached(QString("notepad ") + logFileName);
 }
 
@@ -696,7 +695,7 @@ bool QnSystrayWindow::checkPort(const QString& text, const QString& message)
 
 bool QnSystrayWindow::validateData()
 {
-    if (!checkPort(ui->appServerPortLineEdit->text(), "Invalid application server port specified."))
+    if (!checkPort(ui->appServerPortLineEdit->text(), QString("Invalid ") + APP_SERVER_NAME + QString(" port specified.")))
         return false;
     if (!checkPort(ui->rtspPortLineEdit->text(), "Invalid media server RTSP port specified."))
         return false;
