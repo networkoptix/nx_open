@@ -423,6 +423,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
                         updateResourceStatus(rpNetRes);
 
                     //Q_ASSERT(false);
+                    ++it;
                     continue;
                 }
             }
