@@ -465,9 +465,9 @@ int main(int argc, char *argv[])
 
     /* Open connection settings dialog. */
     if(!authentication.isValid()) {
-        mainWindow->context()->menu()->trigger(Qn::ConnectionSettingsAction);
+        context->menu()->trigger(Qn::ConnectionSettingsAction);
     } else {
-        mainWindow->context()->menu()->trigger(Qn::ReconnectAction);
+        context->menu()->trigger(Qn::ReconnectAction);
     }
 
     /* Drop resources if needed. */
@@ -476,8 +476,13 @@ int main(int argc, char *argv[])
         QByteArray data = QByteArray::fromBase64(droppedResources.toLatin1());
         QVariantMap params;
         params.insert(Qn::SerializedResourcesParameter, data);
-        mainWindow->context()->menu()->trigger(Qn::DelayedDropResourcesAction, params);
+        context->menu()->trigger(Qn::DelayedDropResourcesAction, params);
     }
+
+#ifdef _DEBUG
+    /* Show FPS in debug. */
+    context->menu()->trigger(Qn::ShowFpsAction);
+#endif
 
     int result = application->exec();
 
