@@ -122,8 +122,6 @@ void LoginDialog::accept()
     setEnabled(false);
     setCursor(Qt::BusyCursor);
 
-    SessionManager::instance()->start();
-
     QnAppServerConnectionPtr connection = QnAppServerConnectionFactory::createConnection(url);
     connection->testConnectionAsync(this, SLOT(at_testFinished(int, const QByteArray &, const QByteArray &, int)));
 }

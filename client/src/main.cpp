@@ -355,10 +355,7 @@ int main(int argc, char *argv[])
     QObject::connect(sm, SIGNAL(destroyed()), thread, SLOT(quit()));
     QObject::connect(thread , SIGNAL(finished()), thread, SLOT(deleteLater()));
     thread->start();
-    //sm->start(); // T_T
-    //
-
-    //QnResource::startCommandProc(); // T_T
+    sm->start();
 
     QnResourcePool::instance(); // to initialize net state;
     ffmpegInit();
@@ -408,9 +405,6 @@ int main(int argc, char *argv[])
 
 #endif
 
-    //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
-    //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
-
 #ifdef Q_OS_WIN
 //    QnResourceDiscoveryManager::instance().addDeviceServer(&DesktopDeviceServer::instance());
 #endif // Q_OS_WIN
@@ -418,8 +412,6 @@ int main(int argc, char *argv[])
 #ifndef STANDALONE_MODE
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnAppServerResourceSearcher::instance());
 #endif
-
-    QnResourceDiscoveryManager::instance().start(); // T_T
 
     CLDeviceSettingsDlgFactory::initialize();
 
@@ -452,8 +444,6 @@ int main(int argc, char *argv[])
 #ifdef TEST_RTSP_SERVER
     addTestData();
 #endif
-
-    //QnEventManager::instance()->run(); // T_T
 
     if(autoTester.tests() != 0 && autoTester.state() == QnAutoTester::INITIAL) {
         QObject::connect(&autoTester, SIGNAL(finished()), application.data(), SLOT(quit()));
