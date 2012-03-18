@@ -276,6 +276,8 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveReader* reader,
     if (d->enabled && currentTime != DATETIME_NOW) {
         reader->jumpToPreviousFrame(currentTime);
         reader->setSpeed(d->speed, currentTime);
+        if (d->speed == 0)
+            reader->pauseMedia();
     }
 
     if (d->enabled)
