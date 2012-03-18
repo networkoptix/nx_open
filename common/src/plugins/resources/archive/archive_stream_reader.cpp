@@ -333,7 +333,7 @@ begin_label:
             beforeJumpInternal(displayTime);
             if (displayTime != AV_NOPTS_VALUE) {
 				if (!exactJumpToSpecifiedFrame && channelCount > 1)
-                	needKeyData();
+                	setNeedKeyData();
                 internalJumpTo(displayTime);
                 setSkipFramesToTime(displayTime, false);
 

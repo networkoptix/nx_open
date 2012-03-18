@@ -773,6 +773,8 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
         //    return true; // jump finished, but old data received
         if (media->flags & QnAbstractMediaData::MediaFlags_BOF)
             m_bofReceived = true;
+        else if (m_jumpTime == DATETIME_NOW && (media->flags & QnAbstractMediaData::MediaFlags_LIVE) && (media->flags & AV_PKT_FLAG_KEY))
+            m_bofReceived = true;
 
         if (!m_bofReceived)
             return true; // jump finished, but old data received
