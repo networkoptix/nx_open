@@ -287,6 +287,11 @@ namespace Qn {
         HideMotionAction,
 
         /**
+         * Hides motion search grid on an item.
+         */
+        ToggleMotionAction,
+
+        /**
          * Takes screenshot of an item.
          */
         TakeScreenshotAction,
@@ -426,6 +431,9 @@ namespace Qn {
         /** Action can be pulled into enclosing menu if it is the only one in
          * its submenu. It may have another text in this case. */
         Pullable                = 0x400000,
+
+        /** Action is not present in its corresponding menu. */
+        HotkeyOnly              = 0x800000,
 
 
         /** Action can appear in main menu. */

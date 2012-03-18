@@ -79,8 +79,12 @@ Qn::ActionVisibility QnMotionGridDisplayActionCondition::check(const QnResourceW
         if(!isCamera)
             continue;
 
-        if(widget->isMotionGridDisplayed() == m_requiredGridDisplayValue)
+        if(m_hasRequiredGridDisplayValue) {
+            if(widget->isMotionGridDisplayed() == m_requiredGridDisplayValue)
+                return Qn::EnabledAction;
+        } else {
             return Qn::EnabledAction;
+        }
     }
 
     return Qn::InvisibleAction;

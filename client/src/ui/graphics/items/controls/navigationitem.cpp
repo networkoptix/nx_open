@@ -1020,6 +1020,18 @@ void NavigationItem::onSpeedChanged(float newSpeed)
             m_speedSlider->resetSpeed();
         }
     }
+
+    if(qFuzzyCompare(newSpeed, 1.0f)) {
+       m_stepForwardButton->setPressed(false);
+       m_stepBackwardButton->setPressed(false);
+    } else if(newSpeed > 1.0) {
+        m_stepForwardButton->setPressed(true);
+        m_stepBackwardButton->setPressed(false);
+    } else /*if(newSpeed < 1.0)*/ {
+        m_stepForwardButton->setPressed(false);
+        m_stepBackwardButton->setPressed(true);
+    }
+
 }
 
 void NavigationItem::onVolumeLevelChanged(int newVolumeLevel)

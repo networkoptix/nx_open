@@ -117,12 +117,12 @@ void QnImageButtonWidget::setIcon(const QIcon &icon) {
     setPixmap(0,                            bestPixmap(icon, QIcon::Normal, QIcon::Off));
     setPixmap(HOVERED,                      bestPixmap(icon, QIcon::Active, QIcon::Off));
     setPixmap(DISABLED,                     bestPixmap(icon, QIcon::Disabled, QIcon::Off));
-    setPixmap(HOVERED | PRESSED,            bestPixmap(icon, QnSkin::Pressed, QIcon::Off));
+    setPixmap(PRESSED,                      bestPixmap(icon, QnSkin::Pressed, QIcon::Off));
 
     setPixmap(CHECKED,                      bestPixmap(icon, QIcon::Normal, QIcon::On));
     setPixmap(CHECKED | HOVERED,            bestPixmap(icon, QIcon::Active, QIcon::On));
     setPixmap(CHECKED | DISABLED,           bestPixmap(icon, QIcon::Disabled, QIcon::On));
-    setPixmap(CHECKED | HOVERED | PRESSED,  bestPixmap(icon, QnSkin::Pressed, QIcon::On));
+    setPixmap(CHECKED | PRESSED,            bestPixmap(icon, QnSkin::Pressed, QIcon::On));
 }
 
 void QnImageButtonWidget::setCheckable(bool checkable) {
@@ -150,7 +150,6 @@ void QnImageButtonWidget::setDisabled(bool disabled) {
 void QnImageButtonWidget::setPressed(bool pressed) {
     if(pressed) {
         updateState(m_state | PRESSED);
-        //updateState(m_state & ~HOVERED);
     } else {
         updateState(m_state & ~PRESSED);
     }
@@ -193,7 +192,9 @@ void QnImageButtonWidget::clickInternal(QGraphicsSceneMouseEvent *event) {
         QMenu *menu = m_action->menu();
         QPoint pos = view->mapToGlobal(view->mapFromScene(mapToScene(rect().bottomLeft())));
 
+        updateState(m_state | PRESSED);
         menu->exec(pos);
+        updateState(m_state & ~PRESSED);
 
         /* Cannot use QMenu::setNoReplayFor, as it will block click events for the whole scene. 
          * This is why we resort to nasty hacks with mouse position comparisons. */
@@ -434,9 +435,6 @@ QnImageButtonWidget::StateFlags QnImageButtonWidget::displayState(StateFlags fla
         TRY(CHECKED | DISABLED);
         TRY(CHECKED);
         return 0;
-    case CHECKED_HOVERED_PRESSED:
-        TRY(CHECKED | HOVERED | PRESSED);
-        /* Fall through. */
     case CHECKED_HOVERED:
         TRY(CHECKED | HOVERED);
         TRY(CHECKED);
@@ -455,15 +453,15 @@ QnImageButtonWidget::StateFlags QnImageButtonWidget::displayState(StateFlags fla
         TRY(HOVERED | DISABLED);
         TRY(DISABLED);
         return 0;
+    case CHECKED_HOVERED_PRESSED:
+        TRY(CHECKED | HOVERED | PRESSED);
+        /* Fall through. */
     case CHECKED_PRESSED:
         TRY(CHECKED | PRESSED);
         /* Fall through. */
     case CHECKED:
         TRY(CHECKED);
         return 0;
-    case HOVERED_PRESSED:
-        TRY(HOVERED | PRESSED);
-        /* Fall through. */
     case HOVERED:
         TRY(HOVERED);
         return 0;
@@ -473,6 +471,9 @@ QnImageButtonWidget::StateFlags QnImageButtonWidget::displayState(StateFlags fla
     case DISABLED:
         TRY(DISABLED);
         return 0;
+    case HOVERED_PRESSED:
+        TRY(HOVERED | PRESSED);
+        /* Fall through. */
     case PRESSED:
         TRY(PRESSED);
         return 0;
