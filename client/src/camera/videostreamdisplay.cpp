@@ -36,7 +36,8 @@ CLVideoStreamDisplay::CLVideoStreamDisplay(bool canDownscale) :
     m_speed(1.0),
     m_queueWasFilled(false),
     m_canUseBufferedFrameDisplayer(true),
-    m_needResetDecoder(false)
+    m_needResetDecoder(false),
+    m_lastDisplayedFrame(0)
 {
     for (int i = 0; i < MAX_FRAME_QUEUE_SIZE; ++i)
         m_frameQueue[i] = new CLVideoDecoderOutput();
@@ -467,7 +468,8 @@ bool CLVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, CLVi
 {
     if (outFrame->pkt_dts != AV_NOPTS_VALUE)
         setLastDisplayedTime(outFrame->pkt_dts);
-    if (outFrame->data[0]) {
+    if (outFrame->data[0]) 
+    {
         if (enableFrameQueue) 
         {
             Q_ASSERT(!outFrame->isExternalData());
@@ -487,6 +489,7 @@ bool CLVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, CLVi
             }
             else
                 m_drawer->draw(outFrame);
+            m_lastDisplayedFrame = outFrame;
             m_frameQueueIndex = (m_frameQueueIndex + 1) % MAX_FRAME_QUEUE_SIZE; // allow frame queue for selected video
             m_queueUsed = true;
         }
@@ -498,6 +501,7 @@ bool CLVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, CLVi
         if (m_prevFrameToDelete) {
             Q_ASSERT(outFrame != m_prevFrameToDelete);
             Q_ASSERT(!m_prevFrameToDelete->isExternalData());
+            QMutexLocker lock(&m_mtx);
             delete m_prevFrameToDelete;
             m_prevFrameToDelete = 0;
         }
@@ -635,10 +639,12 @@ void CLVideoStreamDisplay::onNoVideo()
 void CLVideoStreamDisplay::clearReverseQueue()
 {
     m_drawer->waitForFrameDisplayed(0);
+    QMutexLocker lock(&m_mtx);
     for (int i = 0; i < m_reverseQueue.size(); ++i)
         delete m_reverseQueue[i];
     m_reverseQueue.clear();
     m_realReverseSize = 0;
+    m_lastDisplayedFrame = 0;
 }
 
 QImage CLVideoStreamDisplay::getScreenshot()
@@ -648,43 +654,32 @@ QImage CLVideoStreamDisplay::getScreenshot()
     QnAbstractVideoDecoder* dec = m_decoder.begin().value();
     QMutexLocker mutex(&m_mtx);
     const AVFrame* lastFrame = dec->lastFrame();
-    AVFrame deinterlacedFrame;
-
-    // deinterlace if need
-    if (lastFrame->interlaced_frame)
-    {
-        int numBytes = avpicture_get_size(dec->getFormat(), dec->getWidth(), dec->getHeight());
-        avpicture_fill((AVPicture*)&deinterlacedFrame, (quint8*) av_malloc(numBytes), dec->getFormat(), dec->getWidth(), dec->getHeight());
-        if (avpicture_deinterlace((AVPicture*)&deinterlacedFrame, (AVPicture*) lastFrame, dec->getFormat(), dec->getWidth(), dec->getHeight()) == 0)
-            lastFrame = &deinterlacedFrame;
-    }
-
+    if (m_reverseMode && m_lastDisplayedFrame && m_lastDisplayedFrame->data[0])
+        lastFrame = m_lastDisplayedFrame;
+    
     // convert colorSpace
     SwsContext *convertor;
-    convertor = sws_getContext(dec->getWidth(), dec->getHeight(), dec->getFormat(),
-        dec->getWidth(), dec->getHeight(), PIX_FMT_BGRA,
+    
+    convertor = sws_getContext(lastFrame->width, lastFrame->height, (PixelFormat) lastFrame->format,
+        lastFrame->width, lastFrame->height, PIX_FMT_BGRA,
         SWS_POINT, NULL, NULL, NULL);
     if (!convertor) {
-        if (lastFrame->interlaced_frame)
-            av_free(deinterlacedFrame.data[0]);
         return QImage();
     }
 
-    int numBytes = avpicture_get_size(PIX_FMT_RGBA, dec->getWidth(), dec->getHeight());
+    int numBytes = avpicture_get_size(PIX_FMT_RGBA, lastFrame->width, lastFrame->height);
     AVPicture outPicture; 
-    avpicture_fill( (AVPicture*) &outPicture, (quint8*) av_malloc(numBytes), PIX_FMT_BGRA, dec->getWidth(), dec->getHeight());
+    avpicture_fill( (AVPicture*) &outPicture, (quint8*) av_malloc(numBytes), PIX_FMT_BGRA, lastFrame->width, lastFrame->height);
 
     sws_scale(convertor, lastFrame->data, lastFrame->linesize, 
-              0, dec->getHeight(), 
+              0, lastFrame->height, 
               outPicture.data, outPicture.linesize);
     sws_freeContext(convertor);
     // convert to QImage
-    QImage tmp(outPicture.data[0], dec->getWidth(), dec->getHeight(), outPicture.linesize[0], QImage::Format_ARGB32);
-    QImage rez( dec->getWidth(), dec->getHeight(), QImage::Format_ARGB32);
-    rez = tmp.copy(0,0, dec->getWidth(), dec->getHeight());
+    QImage tmp(outPicture.data[0], lastFrame->width, lastFrame->height, outPicture.linesize[0], QImage::Format_ARGB32);
+    QImage rez( lastFrame->width, lastFrame->height, QImage::Format_ARGB32);
+    rez = tmp.copy(0,0, lastFrame->width, lastFrame->height);
     avpicture_free(&outPicture);
-    if (lastFrame->interlaced_frame)
-        av_free(deinterlacedFrame.data[0]);
     return rez;
 }
 
