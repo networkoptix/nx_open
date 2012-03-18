@@ -11,8 +11,6 @@ cd ..\appserver\setup
 cd %~dp0
 )
 
-MSBuild PropsCA\PropsCA.vcproj /t:Build /p:Configuration=Release
-MSBuild NetworkCA\NetworkCA.vcproj /t:Build /p:Configuration=Release
-MSBuild EveAssocCA\EveAssocCA.vcproj /t:Build /p:Configuration=Release
+MSBuild CustomActions\CustomActions.vcproj /t:Build /p:Configuration=Release
 
 @start /B /WAIT make.py %CONFIG%

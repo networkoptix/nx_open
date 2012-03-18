@@ -1,5 +1,5 @@
 // stdafx.cpp : source file that includes just the standard includes
-// PropsCA.pch will be the pre-compiled header
+// CustomActions.pch will be the pre-compiled header
 // stdafx.obj will contain the pre-compiled type information
 
 #include "stdafx.h"

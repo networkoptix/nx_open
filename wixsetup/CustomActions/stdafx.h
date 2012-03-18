@@ -8,26 +8,27 @@
 #include "targetver.h"
 
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
-
-
 // Windows Header Files:
 #include <windows.h>
 
 #include <tchar.h>
 #include <atlstr.h>
-
-#include <stdexcept>
-#include <sstream>
-
 #include <strsafe.h>
 #include <msiquery.h>
 
 // WiX Header Files:
 #include <wcautil.h>
 
+#include <comutil.h>
 #include <objbase.h>
 #include <shobjidl.h>
-#include <atlsimpcoll.h>
-#include <atlcoll.h>
+#include <shlobj.h>
+#include <msxml2.h>
+
+#include <sys/stat.h>
+
+#include <winsock2.h>
+#include <Ws2tcpip.h>
+#include <Aclapi.h>
 
 // TODO: reference additional headers your program requires here

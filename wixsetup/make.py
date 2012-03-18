@@ -5,7 +5,6 @@ import os, sys
 sys.path.append('..')
 
 from version import *
-# from genassoc import gen_assoc, gen_file_exts
 from string import Template
 from fixasfiles import fixasfiles
 
@@ -33,16 +32,10 @@ def gen_strings():
     strings_template = Template(xin)
     print >> xout, strings_template.substitute(APPLICATION_VERSION=APPLICATION_VERSION)
 
-# Generate Associations.wxs
-# gen_assoc()
-
-# Generate FileExtensions.wxs
-# gen_file_exts()
-
 # Generate CustomStrings.wxl
 gen_strings()
 
-WXS_FILES = "InstallTypeDlg.wxs AdvancedTypeDlg.wxs PortDuplicateDlg.wxs PortIsBusyDlg.wxs MediaDirDlg.wxs MediaServerDlg.wxs MyFeaturesDlg.wxs SelectionWarning.wxs DowngradeWarningDlg.wxs  ClientDlg.wxs  Product.wxs AppServerFiles.wxs AppServerDlg.wxs FileAssociations.wxs"
+WXS_FILES = "AllFieldsAreMandatoryDlg.wxs InstallTypeDlg.wxs AdvancedTypeDlg.wxs PortDuplicateDlg.wxs PortIsBusyDlg.wxs InvalidPasswordDlg.wxs MediaDirDlg.wxs MediaServerDlg.wxs MyFeaturesDlg.wxs SelectionWarning.wxs DowngradeWarningDlg.wxs Product.wxs AppServerFiles.wxs AppServerDlg.wxs"
 os.system(r'heat dir ..\appserver\setup\build\exe.win32-2.7 -wixvar -nologo -sfrag -suid -sreg -ag -srd -dir WebHelp -out AppServerFiles.wxs -cg AppServerFilesComponent -dr VmsAppServerDir -var var.AppServerSourceDir -wixvar')
 fixasfiles()
 
