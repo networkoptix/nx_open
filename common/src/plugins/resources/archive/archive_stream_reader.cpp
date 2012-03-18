@@ -116,9 +116,12 @@ void QnArchiveStreamReader::resumeMedia()
         m_navDelegate->resumeMedia();
         return;
     }
-    emit streamResumed();
-    setSingleShotMode(false);
-    resumeDataProcessors();
+    if (m_singleShot)
+    {
+        emit streamResumed();
+        setSingleShotMode(false);
+        resumeDataProcessors();
+    }
 }
 
 void QnArchiveStreamReader::pauseMedia()

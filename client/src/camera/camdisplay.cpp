@@ -280,6 +280,13 @@ int CLCamDisplay::getBufferingMask()
     return channelMask;
 };
 
+float sign(float value)
+{
+    if (value == 0)
+        return 0;
+    return value > 0 ? 1 : -1;
+}
+
 void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 {
 //    cl_log.log("queueSize=", m_dataQueue.size(), cl_logALWAYS);
@@ -359,18 +366,18 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 Q_ASSERT(!(vd->flags & QnAbstractMediaData::MediaFlags_Ignore));
                 //QTime t;
                 //t.start();
-                int sign = speed >= 0 ? 1 : -1;
+                int speedSign = speed >= 0 ? 1 : -1;
                 bool firstWait = true;
                 QTime sleepTimer;
                 sleepTimer.start();
-                while (!m_afterJump && !m_buffering && !m_needStop && m_speed == speed && useSync(vd))
+                while (!m_afterJump && !m_buffering && !m_needStop && sign(m_speed) == sign(speed) && useSync(vd)) 
                 {
                     qint64 ct = m_extTimeSrc->getCurrentTime();
-                    if (ct != DATETIME_NOW && sign *(displayedTime - ct) > 0)
+                    if (ct != DATETIME_NOW && speedSign *(displayedTime - ct) > 0)
                     {
 					    if (firstWait)
                         {
-                            m_isLongWaiting = sign*(displayedTime - ct) > MAX_FRAME_DURATION*1000 && sign*(displayedTime - m_jumpTime)  > MAX_FRAME_DURATION*1000;
+                            m_isLongWaiting = speedSign*(displayedTime - ct) > MAX_FRAME_DURATION*1000 && speedSign*(displayedTime - m_jumpTime)  > MAX_FRAME_DURATION*1000;
                             
 							/*
                             qDebug() << "displayedTime=" << QDateTime::fromMSecsSinceEpoch(displayedTime/1000).toString("hh:mm:ss.zzz")
@@ -393,7 +400,7 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 else 
                     realSleepTime = sign * (displayedTime - m_extTimeSrc->expectedTime());
                 */
-                realSleepTime = sign * (displayedTime - m_extTimeSrc->expectedTime());
+                realSleepTime = speedSign * (displayedTime - m_extTimeSrc->expectedTime());
                 //qDebug() << "sleepTimer=" << sleepTimer.elapsed() << "extSleep=" << realSleepTime;
             }
         }
