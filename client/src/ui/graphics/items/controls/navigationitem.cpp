@@ -1021,17 +1021,16 @@ void NavigationItem::onSpeedChanged(float newSpeed)
         }
     }
 
-    if(qFuzzyCompare(newSpeed, 1.0f)) {
-       m_stepForwardButton->setPressed(false);
-       m_stepBackwardButton->setPressed(false);
+    if(qFuzzyCompare(newSpeed, 1.0f) || qFuzzyIsNull(newSpeed) || (newSpeed > 0.0f && newSpeed < 1.0f)) {
+        m_stepForwardButton->setPressed(false);
+        m_stepBackwardButton->setPressed(false);
     } else if(newSpeed > 1.0) {
         m_stepForwardButton->setPressed(true);
         m_stepBackwardButton->setPressed(false);
-    } else /*if(newSpeed < 1.0)*/ {
+    } else if(newSpeed < 0.0f) {
         m_stepForwardButton->setPressed(false);
         m_stepBackwardButton->setPressed(true);
     }
-
 }
 
 void NavigationItem::onVolumeLevelChanged(int newVolumeLevel)
