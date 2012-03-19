@@ -33,7 +33,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Connect to Application Server Instance</string>
+      <string>Connect to Enterprise Controller</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
