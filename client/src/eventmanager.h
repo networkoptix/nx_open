@@ -16,7 +16,6 @@ public:
 
     QnEventManager();
 
-    void init(const QUrl& url, int reconnectTimeout);
     void stop();
 
 public slots:
@@ -30,6 +29,12 @@ private slots:
     void connectionClosed(QString errorString);
 
 private:
+    void init();
+    void init(const QUrl& url, int reconnectTimeout);
+
+private:
+    static const int EVENT_RECONNECT_TIMEOUT = 3000;
+
     QSharedPointer<QnEventSource> m_source;
 };
 
