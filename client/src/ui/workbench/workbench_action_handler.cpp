@@ -17,6 +17,7 @@
 #include <utils/common/event_processors.h>
 
 #include <core/resourcemanagment/resource_discovery_manager.h>
+#include <core/resourcemanagment/resource_pool_user_watcher.h>
 #include <core/resourcemanagment/resource_pool.h>
 
 #include <api/SessionManager.h>
@@ -854,6 +855,8 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
 
     QnResourceDiscoveryManager::instance().start();
     QnResource::startCommandProc();
+
+    context()->setUserName(connection.url.userName());
 }
 
 void QnWorkbenchActionHandler::at_editTagsAction_triggered() {
