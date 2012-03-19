@@ -370,7 +370,7 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 bool firstWait = true;
                 QTime sleepTimer;
                 sleepTimer.start();
-                while (!m_afterJump && !m_buffering && !m_needStop && sign(m_speed) == sign(speed) && useSync(vd)) 
+                while (!m_afterJump && !m_buffering && !m_needStop && sign(m_speed) == sign(speed) && useSync(vd) && !m_singleShotMode)
                 {
                     qint64 ct = m_extTimeSrc->getCurrentTime();
                     if (ct != DATETIME_NOW && speedSign *(displayedTime - ct) > 0)
