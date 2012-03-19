@@ -45,6 +45,7 @@ public:
         processingJump = false;
         enabled = true;
         bufferingTime = AV_NOPTS_VALUE;
+        paused = false;
     }
 
 
@@ -66,6 +67,7 @@ public:
     bool processingJump;
     bool enabled;
     qint64 bufferingTime;
+    bool paused;
     //QnPlaybackMaskHelper playbackMaskHelper;
 };
 
@@ -87,6 +89,7 @@ void QnArchiveSyncPlayWrapper::resumeMedia()
 {
     Q_D(QnArchiveSyncPlayWrapper);
     QMutexLocker lock(&d->timeMutex);
+    d->paused = false;
     qint64 time = getDisplayedTime();
     bool resumed = false;
     foreach(const ReaderInfo& info, d->readers)
@@ -147,6 +150,7 @@ void QnArchiveSyncPlayWrapper::pauseMedia()
 {
     Q_D(QnArchiveSyncPlayWrapper);
     QMutexLocker lock(&d->timeMutex);
+    d->paused = true;
     foreach(const ReaderInfo& info, d->readers)
     {
         info.reader->setNavDelegate(0);
@@ -354,7 +358,7 @@ qint64 QnArchiveSyncPlayWrapper::getDisplayedTime() const
     Q_D(const QnArchiveSyncPlayWrapper);
     QMutexLocker lock(&d->timeMutex);
 
-    if (d->lastJumpTime == DATETIME_NOW)
+    if (d->lastJumpTime == DATETIME_NOW && !d->paused)
         return DATETIME_NOW;
 
     return getDisplayedTimeInternal();

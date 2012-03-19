@@ -838,6 +838,9 @@ void QnArchiveStreamReader::channeljumpToUnsync(qint64 mksec, int /*channel*/, q
 
 void QnArchiveStreamReader::directJumpToNonKeyFrame(qint64 mksec)
 {
+    if (mksec == AV_NOPTS_VALUE)
+        return;
+
     if (m_navDelegate) {
         return m_navDelegate->directJumpToNonKeyFrame(mksec);
     }
