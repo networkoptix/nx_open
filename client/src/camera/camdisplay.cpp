@@ -280,6 +280,13 @@ int CLCamDisplay::getBufferingMask()
     return channelMask;
 };
 
+float sign(float value)
+{
+    if (value == 0)
+        return 0;
+    return value > 0 ? 1 : -1;
+}
+
 void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 {
 //    cl_log.log("queueSize=", m_dataQueue.size(), cl_logALWAYS);
@@ -359,18 +366,18 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 Q_ASSERT(!(vd->flags & QnAbstractMediaData::MediaFlags_Ignore));
                 //QTime t;
                 //t.start();
-                int sign = speed >= 0 ? 1 : -1;
+                int speedSign = speed >= 0 ? 1 : -1;
                 bool firstWait = true;
                 QTime sleepTimer;
                 sleepTimer.start();
-                while (!m_afterJump && !m_buffering && !m_needStop && m_speed == speed && useSync(vd))
+                while (!m_afterJump && !m_buffering && !m_needStop && sign(m_speed) == sign(speed) && useSync(vd) && !m_singleShotMode)
                 {
                     qint64 ct = m_extTimeSrc->getCurrentTime();
-                    if (ct != DATETIME_NOW && sign *(displayedTime - ct) > 0)
+                    if (ct != DATETIME_NOW && speedSign *(displayedTime - ct) > 0)
                     {
 					    if (firstWait)
                         {
-                            m_isLongWaiting = sign*(displayedTime - ct) > MAX_FRAME_DURATION*1000 && sign*(displayedTime - m_jumpTime)  > MAX_FRAME_DURATION*1000;
+                            m_isLongWaiting = speedSign*(displayedTime - ct) > MAX_FRAME_DURATION*1000 && speedSign*(displayedTime - m_jumpTime)  > MAX_FRAME_DURATION*1000;
                             
 							/*
                             qDebug() << "displayedTime=" << QDateTime::fromMSecsSinceEpoch(displayedTime/1000).toString("hh:mm:ss.zzz")
@@ -393,7 +400,7 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 else 
                     realSleepTime = sign * (displayedTime - m_extTimeSrc->expectedTime());
                 */
-                realSleepTime = sign * (displayedTime - m_extTimeSrc->expectedTime());
+                realSleepTime = speedSign * (displayedTime - m_extTimeSrc->expectedTime());
                 //qDebug() << "sleepTimer=" << sleepTimer.elapsed() << "extSleep=" << realSleepTime;
             }
         }
@@ -577,6 +584,7 @@ void CLCamDisplay::afterJump(QnAbstractMediaDataPtr media)
     m_lastAudioPacketTime = media->timestamp;
     m_lastVideoPacketTime = media->timestamp;
     m_previousVideoTime = media->timestamp;
+    m_lastFrameDisplayed = CLVideoStreamDisplay::Status_Skipped;
     //m_previousVideoDisplayedTime = 0;
     m_totalFrames = 0;
     m_iFrames = 0;
@@ -620,6 +628,9 @@ void CLCamDisplay::setSingleShotMode(bool single)
 
 void CLCamDisplay::setSpeed(float speed)
 {
+    if (speed == 0)
+        return;
+
     QMutexLocker lock(&m_timeMutex);
     if (qAbs(speed-m_speed) > FPS_EPS)
     {
@@ -749,11 +760,6 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
     
     m_isStillImage = media->flags & QnAbstractMediaData::MediaFlags_StillImage;
 
-    bool isReversePacket = media->flags & QnAbstractMediaData::MediaFlags_Reverse;
-    bool isReverseMode = speed < 0.0;
-    if (isReverseMode != isReversePacket)
-        return true;
-
     if (m_needChangePriority)
     {
         setPriority(m_playAudio ? QThread::HighestPriority : QThread::NormalPriority);
@@ -765,6 +771,8 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
         //if (!(media->flags & QnAbstractMediaData::MediaFlags_BOF)) // jump finished, but old data received)
         //    return true; // jump finished, but old data received
         if (media->flags & QnAbstractMediaData::MediaFlags_BOF)
+            m_bofReceived = true;
+        else if (m_jumpTime == DATETIME_NOW && (media->flags & QnAbstractMediaData::MediaFlags_LIVE) && (media->flags & AV_PKT_FLAG_KEY))
             m_bofReceived = true;
 
         if (!m_bofReceived)
@@ -917,8 +925,9 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
 
             if (m_singleShotMode && m_singleShotQuantProcessed)
             {
-                enqueueVideo(vd);
-                return result;
+                //enqueueVideo(vd);
+                //return result;
+                return false;
             }
         }
         // three are 3 possible scenarios:

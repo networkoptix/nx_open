@@ -86,6 +86,7 @@ private:
     BufferedFrameDisplayer* m_bufferedFrameDisplayer;
     bool m_canUseBufferedFrameDisplayer;
 private:
+    CLVideoDecoderOutput* m_lastDisplayedFrame;
     bool m_queueWasFilled;
     float m_speed;
     void reorderPrevFrames();

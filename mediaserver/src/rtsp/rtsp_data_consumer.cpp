@@ -331,10 +331,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
 
     if (m_owner->isLiveDP(media->dataProvider)) {
         flags |= QnAbstractMediaData::MediaFlags_LIVE;
-        if (!m_gotLivePacket)
-            flags |= QnAbstractMediaData::MediaFlags_BOF;
         cseq = m_liveMarker;
-        m_gotLivePacket = true;
     }
 
     int rtspChannelNum = media->channelNumber;
@@ -346,14 +343,17 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     if (flags & QnAbstractMediaData::MediaFlags_AfterEOF)
         m_ctxSended.clear();
 
-    //if (m_waitBOF && !(flags & QnAbstractMediaData::MediaFlags_BOF))
     if (m_waitSCeq && cseq != m_waitSCeq)
     {
         m_mutex.unlock();
         return true; // ignore data
     }
     m_waitSCeq = 0;
-
+    if (m_owner->isLiveDP(media->dataProvider)) {
+        if (!m_gotLivePacket)
+            flags |= QnAbstractMediaData::MediaFlags_BOF;
+        m_gotLivePacket = true;
+    }
 
     // one video channel may has several subchannels (video combined with frames from difference codecContext)
     // max amount of subchannels is MAX_CONTEXTS_AT_VIDEO. Each channel used 2 ssrc: for data and for CodecContext

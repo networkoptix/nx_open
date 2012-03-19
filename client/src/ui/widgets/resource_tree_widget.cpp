@@ -29,6 +29,7 @@
 #include <ui/workbench/workbench_context.h>
 
 #include "ui_resource_tree_widget.h"
+#include "ui/style/proxy_style.h"
 
 Q_DECLARE_METATYPE(QnResourceSearchProxyModel *);
 Q_DECLARE_METATYPE(QnResourceSearchSynchronizer *);
@@ -62,6 +63,9 @@ protected:
     virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
         QStyleOptionViewItemV4 optionV4 = option;
         initStyleOption(&optionV4, index);
+
+        if(optionV4.widget && optionV4.widget->rect().bottom() < optionV4.rect.bottom())
+            return;
 
         QStyle *style = optionV4.widget ? optionV4.widget->style() : QApplication::style();
         style->drawControl(QStyle::CE_ItemViewItem, &optionV4, painter, optionV4.widget);
@@ -120,6 +124,27 @@ private:
     QIcon m_recIcon;
 };
 
+class QnResourceTreeStyle: public QnProxyStyle {
+public:
+    explicit QnResourceTreeStyle(QStyle *baseStyle, QObject *parent = NULL): QnProxyStyle(baseStyle, parent) {}
+
+    virtual void drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const override {
+        switch(element) {
+        case PE_PanelItemViewItem:
+        case PE_PanelItemViewRow:
+            /* Don't draw elements that are only partially visible.
+             * Note that this won't work with partial updates of tree widget's viewport. */
+            if(widget && widget->rect().bottom() < option->rect.bottom())
+                return;
+            break;
+        default:
+            break;
+        }
+
+        QnProxyStyle::drawPrimitive(element, option, painter, widget);
+    }
+};
+
 class QnResourceTreeSortProxyModel: public QSortFilterProxyModel {
 public:
     QnResourceTreeSortProxyModel(QObject *parent = NULL): QSortFilterProxyModel(parent) {}
@@ -168,6 +193,10 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent, QnWorkbenchContext *
 
     m_searchDelegate = new QnResourceTreeItemDelegate(this);
     ui->searchTreeView->setItemDelegate(m_searchDelegate);
+
+    QnResourceTreeStyle *treeStyle = new QnResourceTreeStyle(style(), this);
+    ui->resourceTreeView->setStyle(treeStyle);
+    ui->searchTreeView->setStyle(treeStyle);
 
     m_renameAction = new QAction(this);
 

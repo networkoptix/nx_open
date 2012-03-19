@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="PropsCA"
+	Name="CustomActions"
 	ProjectGUID="{E6130CF0-1682-42B6-A2D1-E3CF237B0BC4}"
-	RootNamespace="PropsCA"
+	RootNamespace="CustomActions"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -62,10 +62,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="comsuppw.lib msi.lib dutil_2008.lib wcautil_2008.lib Version.lib"
+				AdditionalDependencies="Ws2_32.lib comsuppw.lib msi.lib dutil_2008.lib wcautil_2008.lib Version.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="$(WIX)sdk\lib"
-				ModuleDefinitionFile="PropsCA.def"
+				ModuleDefinitionFile="CustomActions.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -139,10 +139,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="comsuppw.lib msi.lib dutil_2008.lib wcautil_2008.lib Version.lib"
+				AdditionalDependencies="Ws2_32.lib comsuppw.lib msi.lib dutil_2008.lib wcautil_2008.lib Version.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="$(WIX)sdk\lib"
-				ModuleDefinitionFile="PropsCA.def"
+				ModuleDefinitionFile="CustomActions.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -181,6 +181,14 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\CustomActions.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CustomActions.def"
+				>
+			</File>
+			<File
 				RelativePath=".\dllmain.cpp"
 				>
 				<FileConfiguration
@@ -203,14 +211,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\PropsCA.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\PropsCA.def"
-				>
-			</File>
-			<File
 				RelativePath=".\stdafx.cpp"
 				>
 				<FileConfiguration
@@ -230,6 +230,10 @@
 					/>
 				</FileConfiguration>
 			</File>
+			<File
+				RelativePath=".\Utils.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -242,6 +246,10 @@
 			</File>
 			<File
 				RelativePath=".\targetver.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Utils.h"
 				>
 			</File>
 		</Filter>

@@ -67,7 +67,7 @@ RTPSession::RTPSession():
     m_startTime(AV_NOPTS_VALUE),
     m_endTime(AV_NOPTS_VALUE),
     m_scale(1.0),
-    m_tcpTimeout(5 * 1000 * 1000)
+    m_tcpTimeout(50 * 1000 * 1000)
 {
     m_udpSock.setReadTimeOut(500);
     m_responseBuffer = new quint8[RTSP_BUFFER_LEN];

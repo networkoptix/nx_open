@@ -11,11 +11,11 @@
         <?else?>
         <?define commonProgramFiles = "c:\Program Files\Common Files\" ?>
         <?endif?>
-
+        
         <?if $(env.CONFIG) = Debug ?>
-            <?define suffix = "d" ?>
+        <?define suffix = "d" ?>
         <?else?>
-            <?define suffix = "" ?>
+        <?define suffix = "" ?>
         <?endif?>
         
         <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
@@ -36,7 +36,7 @@
         <Property Id="ADVANCEDTYPE" Value="0"/>
         
         <Property Id="NEWERFOUND" Secure="yes"/>
-<!--        <Property Id="ALLUSERS" Secure="yes"/> -->
+        <!--        <Property Id="ALLUSERS" Secure="yes"/> -->
         <Property Id="PREVIOUSVERSIONSINSTALLED" Secure="yes" />
         
         <Property Id="BUSYPORT" Secure="yes"/>
@@ -44,11 +44,11 @@
         <!-- AppServer properties-->
         <Property Id="APPSERVER_PORT" Secure="yes">
             <RegistrySearch Id="AppServerPortReg"
-                    Root="HKLM"
-                    Key="Software\Network Optix\VMS Application Server"
-                    Name="port"
-                    Type="raw" 
-                    Win64="no"/>
+                            Root="HKLM"
+                            Key="Software\Network Optix\VMS Application Server"
+                            Name="port"
+                            Type="raw"
+                            Win64="no"/>
         </Property>
         
         <Property Id="APPSERVER_LOGIN" Secure="yes" Value="admin"/>
@@ -61,29 +61,29 @@
         <Property Id="SERVER_APPSERVER_PASSWORD" Secure="yes" Value="123"/>
         <Property Id="SERVER_RTSP_PORT" Secure="yes">
             <RegistrySearch Id="ServerRtspPortReg"
-                    Root="HKLM"
-                    Key="Software\Network Optix\VMS Media Server"
-                    Name="rtspPort"
-                    Type="raw" 
-                    Win64="no"/>
+                            Root="HKLM"
+                            Key="Software\Network Optix\VMS Media Server"
+                            Name="rtspPort"
+                            Type="raw"
+                            Win64="no"/>
         </Property>
         <Property Id="SERVER_API_PORT" Secure="yes">
             <RegistrySearch Id="ServerApiPortReg"
-                    Root="HKLM"
-                    Key="Software\Network Optix\VMS Media Server"
-                    Name="apiPort"
-                    Type="raw" 
-                    Win64="no"/>
+                            Root="HKLM"
+                            Key="Software\Network Optix\VMS Media Server"
+                            Name="apiPort"
+                            Type="raw"
+                            Win64="no"/>
         </Property>
         <Property Id="SERVER_DIRECTORY_REG" Secure="yes">
             <RegistrySearch Id="ServerDirectoryReg"
-                    Root="HKLM"
-                    Key="Software\Network Optix\VMS Media Server"
-                    Name="mediaDir"
-                    Type="raw" 
-                    Win64="no"/>
+                            Root="HKLM"
+                            Key="Software\Network Optix\VMS Media Server"
+                            Name="mediaDir"
+                            Type="raw"
+                            Win64="no"/>
         </Property>
-                
+        
         
         <!-- Client properties-->
         <Property Id="CLIENT_APPSERVER_HOST" Secure="yes" Value="localhost"/>
@@ -93,26 +93,25 @@
         <Property Id="CLIENT_VMS_MODE" Value="1"/>
         <Property Id="CLIENT_DIRECTORY_REG" Secure="yes">
             <RegistrySearch Id="ClientDirectoryReg"
-                    Root="HKCU"
-                    Key="Software\Network Optix\VMS Client"
-                    Name="mediaRoot"
-                    Type="raw"
-                    Win64="no"/>
+                            Root="HKCU"
+                            Key="Software\Network Optix\VMS Client"
+                            Name="mediaRoot"
+                            Type="raw"
+                            Win64="no"/>
         </Property>
         
-        <Binary Id="PropsCA.dll" SourceFile="PropsCA\Release\PropsCA.dll" />
-        <Binary Id="NetworkCA.dll" SourceFile="NetworkCA\Release\NetworkCA.dll" />
-        <Binary Id="EveAssocCA.dll" SourceFile="EveAssocCA\Release\EveAssocCA.dll" />
+        <Binary Id="CustomActions.dll" SourceFile="CustomActions\Release\CustomActions.dll" />
         
         <!-- Custom actions -->
-        <CustomAction Id="SetMoviesFolder" BinaryKey="PropsCA.dll" DllEntry="SetMoviesFolder" />
+        <CustomAction Id="SetMoviesFolder" BinaryKey="CustomActions.dll" DllEntry="SetMoviesFolder" />
         <CustomAction Id="MissingFeature"  Error="At least one component should be selected"/>
         
-        <CustomAction Id="GetFreeDriveSpace" BinaryKey="PropsCA.dll" DllEntry="GetFreeDriveSpace"/>
+        <CustomAction Id="CheckServerDriveLowSpace" BinaryKey="CustomActions.dll" DllEntry="CheckServerDriveLowSpace"/>
+        <CustomAction Id="CheckServerDirectoryWritable" BinaryKey="CustomActions.dll" DllEntry="CheckServerDirectoryWritable"/>
         
-        <CustomAction Id="FindFreePorts" BinaryKey="NetworkCA.dll" DllEntry="FindFreePorts" />
-        <CustomAction Id="CheckPorts" BinaryKey="NetworkCA.dll" DllEntry="CheckPorts"/>
-        <CustomAction Id="CheckPorts2" BinaryKey="NetworkCA.dll" DllEntry="CheckPorts"/>
+        <CustomAction Id="FindFreePorts" BinaryKey="CustomActions.dll" DllEntry="FindFreePorts" />
+        <CustomAction Id="CheckPorts" BinaryKey="CustomActions.dll" DllEntry="CheckPorts"/>
+        <CustomAction Id="CheckPorts2" BinaryKey="CustomActions.dll" DllEntry="CheckPorts"/>
         
         
         <CustomAction Id="AssignOldAppServerPort" Property="OLD_APPSERVER_PORT" Value="[APPSERVER_PORT]"/>
@@ -134,12 +133,12 @@
         <CustomAction Id="ResetClientFolder" Property="CLIENT_DIRECTORY" Value="[CLIENT_DIRECTORY_REG]" />
         
         <CustomAction Id="InitDatabaseAction_Cmd" Property="InitDatabaseAction"
-              Value="&quot;[#dbconfig.exe]&quot; &quot;[APPSERVER_LOGIN]&quot;  &quot;[APPSERVER_PASSWORD]&quot;" Execute="immediate"/>
+                      Value="&quot;[#dbconfig.exe]&quot; &quot;[APPSERVER_LOGIN]&quot;  &quot;[APPSERVER_PASSWORD]&quot;" Execute="immediate"/>
         <CustomAction Id="InitDatabaseAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
-              Execute="deferred" Return="check" Impersonate="no" />
-
-        <CustomAction Id="LaunchApplication" FileKey="TrayToolExe" ExeCommand="" Execute="immediate" Impersonate="yes" Return="asyncNoWait"/> 
-
+                      Execute="deferred" Return="check" Impersonate="no" />
+        
+        <CustomAction Id="LaunchApplication" FileKey="TrayToolExe" ExeCommand="" Execute="immediate" Impersonate="yes" Return="asyncNoWait"/>
+        
         <!--        <CustomAction Id="StartAppOnExit" FileKey="ClientExe" ExeCommand="" Execute="immediate" Impersonate="yes" Return="asyncNoWait"/>-->
         
         <Upgrade Id="CE572797-45BF-4f1c-A783-369EA79C597E">
@@ -168,7 +167,7 @@
             <Custom Action="AssignClientFolder" After="CostInitialize">CLIENT_DIRECTORY=""</Custom>
             <Custom Action="AssignServerFolder" After="CostInitialize">SERVER_DIRECTORY=""</Custom>
             
-  <!--          <Custom Action="ResetClientFolder" Before="CostFinalize">Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
+            <!--          <Custom Action="ResetClientFolder" Before="CostFinalize">Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
             <Custom Action="ResetServerFolder" Before="CostFinalize">Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
   -->      </InstallUISequence>
         
@@ -203,7 +202,7 @@
                         <Directory Id="VmsAppServerDir" Name="AppServer">
                             <Component Id="AppServerExecutable" Guid="{5FB5A627-BB1F-4d82-A06C-7672903DA4C7}">
                                 <File Id="appserverexe" Name="appserver.exe" Source="../appserver/setup/build/exe.win32-2.7/appserver.exe" KeyPath="yes">
-                                    <fire:FirewallException Id="FirewallExceptionAppServer" Name="Network Optix Application Server" Scope="any" IgnoreFailure="yes"/>                                                                        
+                                    <fire:FirewallException Id="FirewallExceptionAppServer" Name="Network Optix Application Server" Scope="any" IgnoreFailure="yes"/>
                                 </File>
                                 
                                 <ServiceInstall Id="VmsAppServerService"
@@ -230,16 +229,16 @@
                                 </RegistryKey>
                             </Component>
                         </Directory>
-
+                        
                         <Directory Id="VmsTrayToolDir" Name="TrayTool">
                             <Component Id="TrayToolExecutable" Guid="{11772981-5229-4D14-B126-66906570AD57}">
                                 <File Id="TrayToolExe" Name="traytool.exe" Source="../traytool/bin/$(env.CONFIG)/traytool.exe" KeyPath="yes">
-                                    <fire:FirewallException Id="FirewallExceptionVmsTrayTool" Name="VMS Tray Tool" Scope="any" IgnoreFailure="yes"/>                                    
-
+                                    <fire:FirewallException Id="FirewallExceptionVmsTrayTool" Name="VMS Tray Tool" Scope="any" IgnoreFailure="yes"/>
+                                    
                                     <Shortcut Id="StartmenuTrayTool" Directory="ProgramMenuDir" Name="$(env.APPLICATION_NAME) Tray Assistant"
                                               WorkingDirectory='VmsTrayToolDir' Advertise="yes" Icon="icon_menu.exe" >
                                     </Shortcut>
- 
+                                    
                                     <Shortcut Id="StartmenuStartupTrayTool" Directory="StartupFolder" Name="$(env.APPLICATION_NAME) Tray Assistant"
                                               WorkingDirectory='VmsTrayToolDir' Advertise="yes" Icon="icon_menu.exe" >
                                     </Shortcut>
@@ -249,13 +248,13 @@
                                 <File Id="TrayToolQtCore$(var.suffix)4.dll" Name="QtCore$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtCore$(var.suffix)4.dll"/>
                                 <File Id="TrayToolQtGui$(var.suffix)4.dll" Name="QtGui$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtGui$(var.suffix)4.dll"/>
                                 <File Id="TrayToolQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtNetwork$(var.suffix)4.dll"/>
-                            </Component>                            
+                            </Component>
                         </Directory>
-
+                        
                         <Directory Id="VmsMediaServerDir" Name="MediaServer">
                             <Component Id="ServerExecutable" Guid="06DFA703-0266-4970-BAC1-3730BF7D1C66">
                                 <File Id="ServerExe" Name="mediaserver.exe" Source="../mediaserver/bin/$(env.CONFIG)/mediaserver.exe" KeyPath="yes">
-                                    <fire:FirewallException Id="FirewallExceptionMediaServer" Name="Network Optix Media Server" Scope="any" IgnoreFailure="yes"/>                                    
+                                    <fire:FirewallException Id="FirewallExceptionMediaServer" Name="Network Optix Media Server" Scope="any" IgnoreFailure="yes"/>
                                 </File>
                                 
                                 <ServiceInstall Id="VmsMediaServerService"
@@ -306,7 +305,7 @@
                                 <File Id="ServerQtXml$(var.suffix)4.dll" Name="QtXml$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtXml$(var.suffix)4.dll"/>
                                 <File Id="ServerQtXmlPatterns$(var.suffix)4.dll" Name="QtXmlPatterns$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtXmlPatterns$(var.suffix)4.dll"/>
                             </Component>
-
+                            
                             <Component Id="ServerOpenSSL" Guid="{DC94094B-CA8C-4be0-9A8A-6DA35FCC77E6}">
                                 <File Id="Serverlibeay32.dll" Name="libeay32.dll" Source="..\common\contrib\openssl\bin\libeay32.dll"/>
                                 <File Id="Serverssleay32.dll" Name="ssleay32.dll" Source="..\common\contrib\openssl\bin\ssleay32.dll"/>
@@ -315,7 +314,7 @@
                             <Component Id="ServerXerces" Guid="{B81B02A6-9CC1-4b16-9E03-A4AD91624B5E}">
                                 <File Id="ServerXercescDll" Name="xerces-c_3_1.dll" Source="../mediaserver/bin/$(env.CONFIG)/xerces-c_3_1.dll"/>
                             </Component>
-
+                            
                             <Component Id="ServerQjson" Guid="{809F73F7-A313-4190-8DF5-389D6B57064B}">
                                 <File Id="ServerQjsonDll" Name="qjson.dll" Source="../mediaserver/bin/$(env.CONFIG)/qjson.dll"/>
                             </Component>
@@ -394,7 +393,7 @@
                             <Component Id="ClientQjson" Guid="{E22DFDE7-0917-4feb-971D-74457D2DAD71}">
                                 <File Id="ClientQjsonDll" Name="qjson.dll" Source="../client/bin/$(env.CONFIG)/qjson.dll"/>
                             </Component>
-
+                            
                             <Directory Id="styles" Name="styles">
                                 <Component Id="bespin" Guid="{BF20F7AC-A34C-481a-84E3-731C80050D51}">
                                     <File Id="bespin$(var.suffix).dll" Name="bespin$(var.suffix).dll" Source="..\client\contrib\bespin\bin\msvc-x86\$(env.CONFIG)\styles\bespin$(var.suffix).dll"/>
@@ -426,19 +425,19 @@
         <DirectoryRef Id="TARGETDIR">
             <Merge Id="VCRedist1" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC90_CRT_x86.msm" DiskId="1" Language="0"/>
             <Merge Id="VCRedist2" SourceFile="$(var.commonProgramFiles)Merge Modules\policy_9_0_Microsoft_VC90_CRT_x86.msm" DiskId="1" Language="0"/>
-        <?if $(env.CONFIG) = Debug ?>
+            <?if $(env.CONFIG) = Debug ?>
             <Merge Id="VCRedist3" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC90_DebugCRT_x86.msm" DiskId="1" Language="0"/>
             <Merge Id="VCRedist4" SourceFile="$(var.commonProgramFiles)Merge Modules\policy_9_0_Microsoft_VC90_DebugCRT_x86.msm" DiskId="1" Language="0"/>
-        <?endif?>
+            <?endif?>
         </DirectoryRef>
         
         <Feature Id="VCRedist" Title="Visual C++ 9.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
             <MergeRef Id="VCRedist1"/>
             <MergeRef Id="VCRedist2"/>
-        <?if $(env.CONFIG) = Debug ?>
+            <?if $(env.CONFIG) = Debug ?>
             <MergeRef Id="VCRedist3"/>
             <MergeRef Id="VCRedist4"/>
-        <?endif?>
+            <?endif?>
         </Feature>
         
         <Feature Id="AppServerFeature" Title="$(env.APPLICATION_NAME) Application Server" Level="1"
@@ -447,13 +446,13 @@
             <ComponentRef Id="AppServerExecutable" />
             <ComponentRef Id="AppServerConfiguration" />
         </Feature>
-
+        
         <Feature Id="TrayToolFeature" Title="Tray Tool" AllowAdvertise="no" Display="hidden" Level="1">
             <ComponentRef Id="TrayToolExecutable"/>
             <ComponentRef Id="TrayToolQTLibraries"/>
-            <ComponentRef Id="UninstallProgramMenuFolder"/>            
+            <ComponentRef Id="UninstallProgramMenuFolder"/>
         </Feature>
-         
+        
         <Feature Id="ServerFeature" Title="$(env.APPLICATION_NAME) Media Server" Level="1"
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
             <ComponentRef Id='ServerDirectoryComponent'/>
@@ -484,12 +483,6 @@
             <ComponentRef Id='arecontvision'/>
             
             <ComponentRef Id='ClientDirectoryComponent'/>
-            
-            <!-- <ComponentRef Id='EveDirectoryPlayWithMenuItem'/>
-            <ComponentRef Id='EveDVDMovieAssociation'/>
-            <ComponentRef Id='EveMovieFilesAssociation'/>
-            
-            <ComponentRef Id='EveApplicationAssociation' /> -->
         </Feature>
         
         <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
@@ -567,19 +560,25 @@
             <Publish Dialog="InstallDirDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
             <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="AppServerDlg" Order="2"><![CDATA[(&AppServerFeature=3)]]></Publish>
             <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg" Order="3"><![CDATA[(&AppServerFeature <> 3 AND &ServerFeature=3)]]></Publish>
-            <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="ClientDlg" Order="4"><![CDATA[(&AppServerFeature <> 3 AND &ServerFeature <>3 AND &ClientFeature=3)]]></Publish>
+            <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="4"><![CDATA[(&AppServerFeature <> 3 AND &ServerFeature <>3 AND &ClientFeature=3)]]></Publish>
             <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Property="_BrowseProperty" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
             <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Event="SpawnDialog" Value="BrowseDlg" Order="2">1</Publish>
-            <Publish Dialog="InstallDirDlg" Control="Next" Event="DoAction" Value="GetFreeDriveSpace">1</Publish>
+            <Publish Dialog="InstallDirDlg" Control="Next" Event="DoAction" Value="CheckServerDriveLowSpace">1</Publish>
+            <Publish Dialog="InstallDirDlg" Control="Next" Event="DoAction" Value="CheckServerDirectoryWritable">1</Publish>
             
             <Publish Dialog="AppServerDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg">1</Publish>
+            
             <Publish Dialog="AppServerDlg" Control="Next" Property="BUSYPORT" Value="{}">1</Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Property="PORTSTOTEST" Value="[APPSERVER_PORT]" Order="1">1</Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Event="DoAction" Value="CheckPorts" Order="2"><![CDATA[ APPSERVER_PORT <> OLD_APPSERVER_PORT]]></Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Event="NewDialog" Value="PortIsBusyDlg" Order="3">BUSYPORT</Publish>
             
-            <Publish Dialog="AppServerDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg" Order="2"><![CDATA[(NOT BUSYPORT AND &ServerFeature=3)]]></Publish>
-            <Publish Dialog="AppServerDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="4"><![CDATA[(NOT BUSYPORT AND &ServerFeature <> 3)]]></Publish>
+        	<?define IsAsSettingsFilled="(APPSERVER_PORT AND APPSERVER_LOGIN AND APPSERVER_PASSWORD)" ?>
+        	
+            <Publish Dialog="AppServerDlg" Control="Next" Event="SpawnDialog" Value="AllFieldsAreMandatoryDlg"><![CDATA[ NOT $(var.IsAsSettingsFilled) ]]></Publish>
+            
+            <Publish Dialog="AppServerDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg" Order="2"><![CDATA[($(var.IsAsSettingsFilled) AND NOT BUSYPORT AND &ServerFeature=3)]]></Publish>
+            <Publish Dialog="AppServerDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="4"><![CDATA[($(var.IsAsSettingsFilled) AND NOT BUSYPORT AND &ServerFeature <> 3)]]></Publish>
             
             <Publish Dialog="AppServerDlg" Control="Next" Property="SERVER_APPSERVER_HOST" Value="localhost" Order="4">1</Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Property="SERVER_APPSERVER_PORT" Value="[APPSERVER_PORT]" Order="4">1</Publish>
@@ -601,19 +600,20 @@
             <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="AppServerDlg"><![CDATA[(&AppServerFeature=3)]]></Publish>
             <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg"><![CDATA[(&AppServerFeature<>3)]]></Publish>
             
-            <!--  OR (&AppServerFeature=3 AND (SERVER_RTSP_PORT=APPSERVER_PORT OR SERVER_API_PORT=APPSERVER_PORT)) -->
-<!--            <Publish Dialog="MediaServerDlg" Control="Next" Event="SpawnDialog" Value="PortDuplicateDlg" Order="1">
-                <![CDATA[SERVER_RTSP_PORT=SERVER_API_PORT]]>
-            </Publish> -->
-
+            <?define IsPortsValid="((&AppServerFeature=3 AND SERVER_RTSP_PORT<>APPSERVER_PORT AND SERVER_API_PORT<>APPSERVER_PORT AND SERVER_API_PORT<>SERVER_RTSP_PORT) OR (&AppServerFeature<>3 AND SERVER_API_PORT<>SERVER_RTSP_PORT))" ?>
+        	<?define IsSettingsFilled="(SERVER_RTSP_PORT AND SERVER_API_PORT AND SERVER_APPSERVER_HOST AND SERVER_APPSERVER_PORT AND SERVER_APPSERVER_LOGIN AND SERVER_APPSERVER_PASSWORD)"?>
+            <?define IsSettingsValid="($(var.IsPortsValid) AND $(var.IsSettingsFilled))"?>
+        	
             <Publish Dialog="MediaServerDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_SERVER_DIRECTORY]" Order="1">1</Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="ClientDlg" Order="2"><![CDATA[(&ClientFeature=3 AND &AppServerFeature<>3)]]></Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="3"><![CDATA[(&ClientFeature<>3 OR &AppServerFeature=3)]]></Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Event="SpawnDialog" Value="AllFieldsAreMandatoryDlg"><![CDATA[ NOT $(var.IsSettingsFilled) ]]></Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Event="SpawnDialog" Value="PortDuplicateDlg"><![CDATA[ NOT $(var.IsPortsValid) AND $(var.IsSettingsFilled) ]]></Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="2"><![CDATA[$(var.IsSettingsValid)]]></Publish>
             <Publish Dialog="MediaServerDlg" Control="ChangeServerMediaDir" Property="_BrowseProperty" Value="[WIXUI_SERVER_DIRECTORY]" Order="1">1</Publish>
             <Publish Dialog="MediaServerDlg" Control="ChangeServerMediaDir" Event="SpawnDialog" Value="BrowseDlg" Order="2">1</Publish>
-
-            <Publish Dialog="BrowseDlg" Control="OK" Event="DoAction" Value="GetFreeDriveSpace" Order="4">1</Publish>
-
+            
+            <Publish Dialog="BrowseDlg" Control="OK" Event="DoAction" Value="CheckServerDriveLowSpace" Order="4">1</Publish>
+            <Publish Dialog="BrowseDlg" Control="OK" Event="DoAction" Value="CheckServerDirectoryWritable" Order="4">1</Publish>
+            
             <Publish Dialog="MediaServerDlg" Control="Next" Property="CLIENT_APPSERVER_HOST" Value="[SERVER_APPSERVER_HOST]" Order="4">1</Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Property="CLIENT_APPSERVER_PORT" Value="[SERVER_APPSERVER_PORT]" Order="4">1</Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Property="CLIENT_APPSERVER_LOGIN" Value="[SERVER_APPSERVER_LOGIN]" Order="4">1</Publish>
@@ -628,21 +628,11 @@
             <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="PortIsBusyDlg" Order="3">BUSYPORT</Publish>
             
             <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_BACK" Value="MediaServerDlg">1</Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_NEXT" Value="ClientDlg"><![CDATA[(&ClientFeature=3 AND &AppServerFeature<>3)]]></Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_NEXT" Value="VerifyReadyDlg"><![CDATA[(&ClientFeature<>3 OR &AppServerFeature=3)]]></Publish>
-            
-            <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg"><![CDATA[(&ServerFeature=3)]]></Publish>
-            <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="AppServerDlg"><![CDATA[(&AppServerFeature = 3 AND &ServerFeature<>3)]]></Publish>
-            <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg"><![CDATA[(&AppServerFeature <> 3 AND &ServerFeature<>3)]]></Publish>
-            <Publish Dialog="ClientDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_CLIENT_DIRECTORY]" Order="1">1</Publish>
-            <Publish Dialog="ClientDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="2">1</Publish>
-            <Publish Dialog="ClientDlg" Control="ChangeClientMediaDir" Property="_BrowseProperty" Value="[WIXUI_CLIENT_DIRECTORY]" Order="1">1</Publish>
-            <Publish Dialog="ClientDlg" Control="ChangeClientMediaDir" Event="SpawnDialog" Value="BrowseDlg" Order="2">1</Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_NEXT" Value="VerifyReadyDlg">1</Publish>
             
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg" Order="1">INSTALLTYPE=0</Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="ClientDlg" Order="1"><![CDATA[(INSTALLTYPE<>0 AND NOT Installed AND &ClientFeature = 3 AND &AppServerFeature<>3)]]></Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg" Order="1"><![CDATA[(INSTALLTYPE<>0 AND NOT Installed AND (&ClientFeature <> 3 OR &AppServerFeature = 3) AND &ServerFeature=3)]]></Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="AppServerDlg" Order="1"><![CDATA[(INSTALLTYPE<>0 AND NOT Installed AND (&ClientFeature <> 3 OR &AppServerFeature = 3) AND &ServerFeature<>3 AND &AppServerFeature = 3)]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg" Order="1"><![CDATA[(INSTALLTYPE<>0 AND NOT Installed AND &AppServerFeature=3 AND &ServerFeature=3)]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="AppServerDlg" Order="1"><![CDATA[(INSTALLTYPE<>0 AND NOT Installed AND &AppServerFeature=3 AND &ServerFeature<>3 AND &AppServerFeature = 3)]]></Publish>
             
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2">Installed</Publish>
             

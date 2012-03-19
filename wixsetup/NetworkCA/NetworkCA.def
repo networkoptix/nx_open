@@ -1,6 +1,0 @@
-LIBRARY "NetworkCA"
-
-EXPORTS
-
-CheckPorts
-FindFreePorts

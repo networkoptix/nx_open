@@ -1,7 +1,0 @@
-LIBRARY	"PropsCA"
-
-EXPORTS
-
-GetFreeDriveSpace
-SetMoviesFolder
-SetProperties

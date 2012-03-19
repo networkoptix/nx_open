@@ -579,12 +579,20 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::ShowMotionAction).
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
         text(tr("Show Motion Grid")).
+        shortcut(tr("Alt+G")).
         condition(new QnMotionGridDisplayActionCondition(false, this));
 
     factory(Qn::HideMotionAction).
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
         text(tr("Hide Motion Grid")).
+        shortcut(tr("Alt+G")).
         condition(new QnMotionGridDisplayActionCondition(true, this));
+
+    factory(Qn::ToggleMotionAction).
+        flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::HotkeyOnly).
+        text(tr("Toggle Motion Grid Display")).
+        shortcut(tr("Alt+G")).
+        condition(new QnMotionGridDisplayActionCondition(this));
 
     factory(Qn::TakeScreenshotAction).
         flags(Qn::Scene | Qn::SingleTarget).
@@ -812,7 +820,12 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
     QMenu *result = new QMenu();
 
     foreach(QnAction *action, parent->children()) {
-        Qn::ActionVisibility visibility = action->checkCondition(scope, items, QVariantMap());
+        Qn::ActionVisibility visibility;
+        if(action->flags() & Qn::HotkeyOnly) {
+            visibility = Qn::InvisibleAction;
+        } else {
+            visibility = action->checkCondition(scope, items, QVariantMap());
+        }
         if(visibility == Qn::InvisibleAction)
             continue;
 

@@ -116,9 +116,12 @@ void QnArchiveStreamReader::resumeMedia()
         m_navDelegate->resumeMedia();
         return;
     }
-    emit streamResumed();
-    setSingleShotMode(false);
-    resumeDataProcessors();
+    if (m_singleShot)
+    {
+        emit streamResumed();
+        setSingleShotMode(false);
+        resumeDataProcessors();
+    }
 }
 
 void QnArchiveStreamReader::pauseMedia()
@@ -127,11 +130,14 @@ void QnArchiveStreamReader::pauseMedia()
         m_navDelegate->pauseMedia();
         return;
     }
-    emit streamPaused();
-    QMutexLocker lock(&m_jumpMtx);
-    m_singleShot = true;
-    m_singleQuantProcessed = true;
-    m_lastJumpTime = AV_NOPTS_VALUE;
+    if (!m_singleShot)
+    {
+        emit streamPaused();
+        QMutexLocker lock(&m_jumpMtx);
+        m_singleShot = true;
+        m_singleQuantProcessed = true;
+        m_lastJumpTime = AV_NOPTS_VALUE;
+    }
 }
 
 bool QnArchiveStreamReader::isMediaPaused() const
@@ -200,33 +206,37 @@ bool QnArchiveStreamReader::init()
     return true;
 }
 
- qint64 QnArchiveStreamReader::determineDisplayTime(bool reverseMode)
- {
-     qint64 rez = AV_NOPTS_VALUE;
-     QMutexLocker mutex(&m_mutex);
-     for (int i = 0; i < m_dataprocessors.size(); ++i)
-     {
+qint64 QnArchiveStreamReader::determineDisplayTime(bool reverseMode)
+{
+    QnlTimeSource* timeSource = 0;
+    qint64 rez = AV_NOPTS_VALUE;
+    for (int i = 0; i < m_dataprocessors.size(); ++i)
+    {
+        QMutexLocker mutex(&m_mutex);
          QnAbstractDataConsumer* dp = m_dataprocessors.at(i);
          if (dp->isRealTimeSource())
              return DATETIME_NOW;
-         QnlTimeSource* timeSource = dynamic_cast<QnlTimeSource*>(dp);
-         if (timeSource) {
-             if (rez != AV_NOPTS_VALUE)
-                rez = qMax(rez, timeSource->getExternalTime());
-             else
-                 rez = timeSource->getExternalTime();
-         }
-     }
-	 if(rez == AV_NOPTS_VALUE) 
-     {
-		//rez = m_currentTime;
-         if (reverseMode)
-             return m_delegate->endTime();
-         else
-             return m_delegate->startTime();
-	 }
-     return rez;
- }
+         timeSource = dynamic_cast<QnlTimeSource*>(dp);
+         if (timeSource) 
+             break;
+    }
+
+    if (timeSource) {
+        if (rez != AV_NOPTS_VALUE)
+            rez = qMax(rez, timeSource->getExternalTime());
+        else
+            rez = timeSource->getExternalTime();
+    }
+
+    if(rez == AV_NOPTS_VALUE) 
+    {
+        if (reverseMode)
+            return m_delegate->endTime();
+        else
+            return m_delegate->startTime();
+    }
+    return rez;
+}
 
 bool QnArchiveStreamReader::getNextVideoPacket()
 {
@@ -323,10 +333,10 @@ begin_label:
         if (needSeek && jumpTime == AV_NOPTS_VALUE && reverseMode == m_prevReverseMode)
         {
             qint64 displayTime = determineDisplayTime(reverseMode);
-            beforeJumpInternal(displayTime);
             if (displayTime != AV_NOPTS_VALUE) {
+                beforeJumpInternal(displayTime);
 				if (!exactJumpToSpecifiedFrame && channelCount > 1)
-                	needKeyData();
+                	setNeedKeyData();
                 internalJumpTo(displayTime);
                 setSkipFramesToTime(displayTime, false);
 
@@ -828,6 +838,9 @@ void QnArchiveStreamReader::channeljumpToUnsync(qint64 mksec, int /*channel*/, q
 
 void QnArchiveStreamReader::directJumpToNonKeyFrame(qint64 mksec)
 {
+    if (mksec == AV_NOPTS_VALUE)
+        return;
+
     if (m_navDelegate) {
         return m_navDelegate->directJumpToNonKeyFrame(mksec);
     }
@@ -995,7 +1008,8 @@ void QnArchiveStreamReader::setSpeed(double value, qint64 currentTimeHint)
         QnAbstractDataConsumer* dp = m_dataprocessors.at(i);
         dp->setSpeed(value);
     }
-    setReverseMode(value < 0, currentTimeHint);
+    if (value != 0)
+        setReverseMode(value < 0, currentTimeHint);
 }
 
 double QnArchiveStreamReader::getSpeed() const
