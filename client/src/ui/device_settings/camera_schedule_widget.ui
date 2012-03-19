@@ -192,6 +192,9 @@
           </item>
           <item>
            <widget class="QComboBox" name="comboBoxQuality">
+            <property name="currentIndex">
+             <number>1</number>
+            </property>
             <item>
              <property name="text">
               <string>Low</string>

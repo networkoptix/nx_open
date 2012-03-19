@@ -546,5 +546,11 @@ void QnRtspClientArchiveDelegate::beforeSeek(qint64 time)
 
 void QnRtspClientArchiveDelegate::beforeChangeReverseMode(bool reverseMode)
 {
-    beforeSeek(AV_NOPTS_VALUE);
+    // Reconnect If camera is offline and it is switch from live to archive
+    if (m_position == DATETIME_NOW) {
+        if (reverseMode)
+            beforeSeek(AV_NOPTS_VALUE);
+        else
+            m_blockReopening = false;
+    }
 }
