@@ -2,6 +2,8 @@
 #include "nettools.h"
 
 
+
+
 QnMacAddress::QnMacAddress()
 {
     memset(m_data, 0, 6);
@@ -14,7 +16,11 @@ QnMacAddress::QnMacAddress(unsigned char* mac)
 
 QnMacAddress::QnMacAddress(const QString& mac)
 {
-    MACsToByte(mac, m_data);
+    if (mac.contains("-"))
+        MACsToByte(mac, m_data);
+    else
+        MACsToByte2(mac, m_data);
+
 }
 
 QnMacAddress::~QnMacAddress()

@@ -49,6 +49,7 @@
 #include "plugins/resources/droid_ipwebcam/ipwebcam_droid_resource_searcher.h"
 #include "plugins/resources/isd/isd_resource_searcher.h"
 #include "plugins/resources/onvif/onvif_ws_searcher.h"
+#include "utils/network/socket.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -270,8 +271,11 @@ int main(int argc, char *argv[])
     commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::Integer, "--screen", NULL, NULL));
     commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::String, "--delayed-drop", NULL, NULL));
     commandLinePreParser.parse(argc, argv);
-    
 
+    //===============
+
+   
+    //===============
     /* Set authentication parameters from command line. */
     QUrl authentication = QUrl::fromUserInput(commandLinePreParser.value("--auth").toString());
     if(authentication.isValid()) {
@@ -395,8 +399,8 @@ int main(int argc, char *argv[])
     QnPlIqResourceSearcher::instance().setLocal(true);
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIqResourceSearcher::instance());
 
-    QnPlIpWebCamResourceSearcher::instance().setLocal(true);
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIpWebCamResourceSearcher::instance());
+    //QnPlIpWebCamResourceSearcher::instance().setLocal(true);
+    //QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIpWebCamResourceSearcher::instance());
 
     QnPlISDResourceSearcher::instance().setLocal(true);
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlISDResourceSearcher::instance());
