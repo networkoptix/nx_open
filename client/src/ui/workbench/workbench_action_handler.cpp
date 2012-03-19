@@ -54,6 +54,7 @@
 #include "workbench_layout_snapshot_manager.h"
 #include "workbench_resource.h"
 #include "workbench_access_controller.h"
+#include "device_plugins/server_camera/appserver.h"
 
 // -------------------------------------------------------------------------- //
 // QnResourceStatusReplyProcessor
@@ -833,6 +834,14 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     // repopulate the resource pool
     QnResource::stopCommandProc();
     QnResourceDiscoveryManager::instance().stop();
+
+#ifndef STANDALONE_MODE
+    static const char *appserverAddedPropertyName = "_qn_appserverAdded";
+    if(!QnResourceDiscoveryManager::instance().property(appserverAddedPropertyName).toBool()) {
+        QnResourceDiscoveryManager::instance().addDeviceServer(&QnAppServerResourceSearcher::instance());
+        QnResourceDiscoveryManager::instance().setProperty(appserverAddedPropertyName, true);
+    }
+#endif
 
     // don't remove local resources
     const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
