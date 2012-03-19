@@ -551,6 +551,7 @@ public:
         QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlISDResourceSearcher::instance());
 
         QnResourceDiscoveryManager::instance().addDeviceServer(&QnTestCameraResourceSearcher::instance());
+        QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlOnvifWsSearcher::instance());
 
         //
 
@@ -697,10 +698,19 @@ int main(int argc, char* argv[])
 
     QnResourceDiscoveryManager::instance().setServer(true);
     // QnResourceDiscoveryManager::instance().setResourceProcessor(m_processor);
+    QnResourceDiscoveryManager::instance().setResourceProcessor(m_processor);
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlArecontResourceSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlAxisResourceSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDlinkResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIqResourceSearcher::instance());
+
+    //QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIpWebCamResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDroidResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlISDResourceSearcher::instance());
+
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnTestCameraResourceSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlOnvifWsSearcher::instance());
+    
 
     QnResourceTypeList resourceTypes;
     QByteArray errorString;

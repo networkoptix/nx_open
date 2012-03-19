@@ -139,6 +139,20 @@ unsigned char* MACsToByte(const QString& macs, unsigned char* pbyAddress)
     return pbyAddress;
 }
 
+unsigned char* MACsToByte2(const QString& macs, unsigned char* pbyAddress)
+{
+    QString lmac = macs.toUpper();
+
+    for (int i = 0; i  < 6; ++i)
+    {
+        QString hexS = lmac.mid(i*2, 2);
+        pbyAddress[i] = hexS.toUInt(0, 16);
+    }
+
+    return pbyAddress;
+}
+
+
 QList<QNetworkAddressEntry> getAllIPv4AddressEntries()
 {
     QList<QNetworkInterface> inter_list = QNetworkInterface::allInterfaces(); // all interfaces

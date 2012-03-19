@@ -11,7 +11,9 @@ struct CLSubNetState;
 typedef QList<quint32> CLIPList;
 
 QN_EXPORT QString MACToString (const unsigned char* mac);
+
 QN_EXPORT unsigned char* MACsToByte(const QString& macs, unsigned char* pbyAddress);
+QN_EXPORT unsigned char* MACsToByte2(const QString& macs, unsigned char* pbyAddress);
 
 // returns list of IPv4 addresses of current machine
 QN_EXPORT QList<QHostAddress> getAllIPv4Addresses();

@@ -11,6 +11,7 @@ public:
     struct WSResult
     {
         QString ip;
+        QString disc_ip;
         QString mac;
         QString name;
         QString manufacture;
@@ -22,7 +23,7 @@ public:
     QList<WSResult> findResources();
 
 private:
-
+    WSResult parseReply(QByteArray& datagram);
 };
 
 #endif // onvif_ws_searcher_helper_h1338
