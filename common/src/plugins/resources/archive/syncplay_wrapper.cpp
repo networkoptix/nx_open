@@ -87,13 +87,20 @@ void QnArchiveSyncPlayWrapper::resumeMedia()
 {
     Q_D(QnArchiveSyncPlayWrapper);
     QMutexLocker lock(&d->timeMutex);
-    reinitTime(getDisplayedTime());
+    qint64 time = getDisplayedTime();
+    bool resumed = false;
     foreach(const ReaderInfo& info, d->readers)
     {
-        info.reader->setNavDelegate(0);
-        info.reader->resumeMedia();
-        info.reader->setNavDelegate(this);
+        if (info.reader->isMediaPaused())
+        {
+            info.reader->setNavDelegate(0);
+            info.reader->resumeMedia();
+            info.reader->setNavDelegate(this);
+            resumed = true;
+        }
     }
+    if (resumed)
+        reinitTime(time);
 }
 
 /*
@@ -296,6 +303,9 @@ void QnArchiveSyncPlayWrapper::setSpeed(double value, qint64 /*currentTimeHint*/
 
     QMutexLocker lock(&d->timeMutex);
 
+    if (value == d->speed)
+        return;
+
     qint64 displayedTime = getDisplayedTimeInternal();
     qDebug() << "Speed changed. CurrentTime" << QDateTime::fromMSecsSinceEpoch(displayedTime/1000).toString();
     foreach(const ReaderInfo& info, d->readers)
@@ -308,7 +318,10 @@ void QnArchiveSyncPlayWrapper::setSpeed(double value, qint64 /*currentTimeHint*/
     }
     if (d->lastJumpTime == DATETIME_NOW || displayedTime == DATETIME_NOW)
         displayedTime = qnSyncTime->currentMSecsSinceEpoch()*1000;
-    reinitTime(displayedTime);
+    qint64 et = expectedTime();
+    int sign = d->speed >= 0 ? 1 : -1;
+    if (d->speed != 0 && value != 0 && sign*(et - displayedTime) > SYNC_EPS) 
+        reinitTime(displayedTime);
     d->speed = value;
 }
 
@@ -600,7 +613,7 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTime() const
         /*
         qDebug() << "nextTime=" << QDateTime::fromMSecsSinceEpoch(nextTime/1000).toString("hh:mm:ss.zzz") << 
             "expectTime=" << QDateTime::fromMSecsSinceEpoch(expectTime/1000).toString("hh:mm:ss.zzz")
-            << "d->lastJumpTime=" << QDateTime::fromMSecsSinceEpoch(d->lastJumpTime/1000).toString();
+            << "currentTime=" << QDateTime::fromMSecsSinceEpoch(getDisplayedTimeInternal()/1000).toString("hh:mm:ss.zzz");
         */
         QnArchiveSyncPlayWrapper* nonConstThis = const_cast<QnArchiveSyncPlayWrapper*>(this);
         nonConstThis->reinitTime(nextTime);
