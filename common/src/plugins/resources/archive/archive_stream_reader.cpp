@@ -1002,7 +1002,8 @@ void QnArchiveStreamReader::setSpeed(double value, qint64 currentTimeHint)
         QnAbstractDataConsumer* dp = m_dataprocessors.at(i);
         dp->setSpeed(value);
     }
-    setReverseMode(value < 0, currentTimeHint);
+    if (value != 0)
+        setReverseMode(value < 0, currentTimeHint);
 }
 
 double QnArchiveStreamReader::getSpeed() const
