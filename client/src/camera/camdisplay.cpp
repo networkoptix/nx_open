@@ -584,6 +584,7 @@ void CLCamDisplay::afterJump(QnAbstractMediaDataPtr media)
     m_lastAudioPacketTime = media->timestamp;
     m_lastVideoPacketTime = media->timestamp;
     m_previousVideoTime = media->timestamp;
+    m_lastFrameDisplayed = CLVideoStreamDisplay::Status_Skipped;
     //m_previousVideoDisplayedTime = 0;
     m_totalFrames = 0;
     m_iFrames = 0;
@@ -926,8 +927,9 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
 
             if (m_singleShotMode && m_singleShotQuantProcessed)
             {
-                enqueueVideo(vd);
-                return result;
+                //enqueueVideo(vd);
+                //return result;
+                return false;
             }
         }
         // three are 3 possible scenarios:
