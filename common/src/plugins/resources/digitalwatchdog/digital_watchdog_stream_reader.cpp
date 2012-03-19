@@ -18,7 +18,7 @@ void QnPlDWDStreamReader::openStream()
     
     QnPlWatchDogResourcePtr res = getResource().dynamicCast<QnPlWatchDogResource>();
     int fps = qMin((int)getFps(), res->getMaxFps());
-    int kbps = bestBitrateKbps(getQuality(), QSize(1920,180), fps);
+    int kbps = bestBitrateKbps(getQuality(), QSize(1920,1080), fps);
 
     kbps = qMin(kbps, 8000);
     kbps = qMax(kbps, 2000);
@@ -26,9 +26,9 @@ void QnPlDWDStreamReader::openStream()
     QString requst;
     QTextStream ts(&requst);
 
-    //ts << "cameraname1=1CH&cameraname2=2CH&resolution1=1920:1080&resolution2=960:544&codec1=h264&codec2=mjpeg&bitrate1=" << kbps << "&bitrate2=4000&framerate1=" << fps << "&framerate2=30&quality1=2&quality2=2";
+    ts << "cameraname1=1CH&cameraname2=2CH&resolution1=1920:1080&resolution2=960:544&codec1=h264&codec2=mjpeg&bitrate1=" << kbps << "&bitrate2=4000&framerate1=" << fps << "&framerate2=30&quality1=2&quality2=2";
 
-    ts << "cameraname1=1CH&cameraname2=2CH&resolution1=1920:1080&resolution2=960:544&codec1=h264&codec2=mjpeg&bitrate1=4000&bitrate2=4000&framerate1=30&framerate2=30&quality1=2&quality2=2";
+    //ts << "cameraname1=1CH&cameraname2=2CH&resolution1=1920:1080&resolution2=960:544&codec1=h264&codec2=mjpeg&bitrate1=4000&bitrate2=4000&framerate1=30&framerate2=30&quality1=2&quality2=2";
 
     
     CLHttpStatus status;
