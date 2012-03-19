@@ -152,6 +152,8 @@ void QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceAdded(const QnRes
 
     Qn::LayoutFlags flags = layoutResource->getId().isSpecial() ? Qn::LayoutIsLocal : static_cast<Qn::LayoutFlags>(0);
     setFlags(layoutResource, flags);
+
+    layoutResource->setFlags(flags & Qn::LayoutIsLocal ? layoutResource->flags() & ~QnResource::remote : layoutResource->flags() | QnResource::remote); // TODO: this code does not belong here.
     
     /* Subscribe to changes to track changed status. */
     connectTo(layoutResource);

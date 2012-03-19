@@ -56,6 +56,8 @@ public:
 
     QnUserResourcePtr user() const;
 
+    void setUserName(const QString &userName);
+
     static QnWorkbenchContext *instance(QnWorkbench *workbench);
 
 signals:
@@ -63,7 +65,6 @@ signals:
     void aboutToBeDestroyed();
 
 protected slots:
-    void at_settings_lastUsedConnectionChanged();
     void at_resourcePool_aboutToBeDestroyed();
 
 private:

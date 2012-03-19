@@ -17,6 +17,7 @@
 #include <utils/common/event_processors.h>
 
 #include <core/resourcemanagment/resource_discovery_manager.h>
+#include <core/resourcemanagment/resource_pool_user_watcher.h>
 #include <core/resourcemanagment/resource_pool.h>
 
 #include <api/SessionManager.h>
@@ -54,6 +55,7 @@
 #include "workbench_layout_snapshot_manager.h"
 #include "workbench_resource.h"
 #include "workbench_access_controller.h"
+#include "device_plugins/server_camera/appserver.h"
 
 // -------------------------------------------------------------------------- //
 // QnResourceStatusReplyProcessor
@@ -834,6 +836,14 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     QnResource::stopCommandProc();
     QnResourceDiscoveryManager::instance().stop();
 
+#ifndef STANDALONE_MODE
+    static const char *appserverAddedPropertyName = "_qn_appserverAdded";
+    if(!QnResourceDiscoveryManager::instance().property(appserverAddedPropertyName).toBool()) {
+        QnResourceDiscoveryManager::instance().addDeviceServer(&QnAppServerResourceSearcher::instance());
+        QnResourceDiscoveryManager::instance().setProperty(appserverAddedPropertyName, true);
+    }
+#endif
+
     // don't remove local resources
     const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
     resourcePool()->removeResources(remoteResources);
@@ -845,6 +855,8 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
 
     QnResourceDiscoveryManager::instance().start();
     QnResource::startCommandProc();
+
+    context()->setUserName(connection.url.userName());
 }
 
 void QnWorkbenchActionHandler::at_editTagsAction_triggered() {
