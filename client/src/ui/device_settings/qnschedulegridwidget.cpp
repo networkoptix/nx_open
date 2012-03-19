@@ -24,7 +24,7 @@ QnScheduleGridWidget::QnScheduleGridWidget(QWidget *parent)
     m_enabled = true;
     m_readOnly = false;
     m_defaultParams[FirstParam] = 10;
-    m_defaultParams[SecondParam] = QLatin1String("Lo");
+    m_defaultParams[SecondParam] = QLatin1String("Md");
     m_defaultParams[ColorParam] = qnGlobals->recordAlwaysColor().rgba();
     resetCellValues();
 

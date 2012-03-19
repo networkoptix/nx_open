@@ -404,18 +404,12 @@ int main(int argc, char *argv[])
 
     QnPlOnvifWsSearcher::instance().setLocal(true);
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlOnvifWsSearcher::instance());
-
-
-
 #endif
 
 #ifdef Q_OS_WIN
 //    QnResourceDiscoveryManager::instance().addDeviceServer(&DesktopDeviceServer::instance());
 #endif // Q_OS_WIN
-
-#ifndef STANDALONE_MODE
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnAppServerResourceSearcher::instance());
-#endif
+    QnResourceDiscoveryManager::instance().start();
 
     CLDeviceSettingsDlgFactory::initialize();
 

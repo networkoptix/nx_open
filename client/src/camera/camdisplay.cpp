@@ -287,7 +287,7 @@ float sign(float value)
     return value > 0 ? 1 : -1;
 }
 
-void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
+bool CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 {
 //    cl_log.log("queueSize=", m_dataQueue.size(), cl_logALWAYS);
 //    cl_log.log(QDateTime::fromMSecsSinceEpoch(vd->timestamp/1000).toString("hh.mm.ss.zzz"), cl_logALWAYS);
@@ -413,6 +413,9 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
     }
     int channel = vd->channelNumber;
 
+    if (m_singleShotMode && m_singleShotQuantProcessed)
+        return false;
+
     CLVideoDecoderOutput::downscale_factor scaleFactor = CLVideoDecoderOutput::factor_any;
     if (channel > 0 && m_display[0]) // if device has more than one channel
     {
@@ -496,7 +499,7 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         //m_display[channel]->dispay(vd, sleep, scale_factor);
         //cl_log.log(" video queue size = ", m_videoQueue[0].size(),  cl_logALWAYS);
     }
-
+    return true;
 }
 
 void CLCamDisplay::onBeforeJump(qint64 time)
@@ -613,17 +616,18 @@ void CLCamDisplay::onReaderResumed()
 void CLCamDisplay::onPrevFrameOccured()
 {
     setSingleShotMode(false);
+    m_singleShotQuantProcessed = false;
 }
 
 void CLCamDisplay::onNextFrameOccured()
 {
     setSingleShotMode(true);
+    m_singleShotQuantProcessed = false;
 }
 
 void CLCamDisplay::setSingleShotMode(bool single)
 {
     m_singleShotMode = single;
-    m_singleShotQuantProcessed = false;
 }
 
 void CLCamDisplay::setSpeed(float speed)
@@ -949,7 +953,8 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
             if(m_display[channel] != NULL)
                 m_display[channel]->setCurrentTime(AV_NOPTS_VALUE);
 
-            display(vd, !(vd->flags & QnAbstractMediaData::MediaFlags_Ignore), speed);
+            if (!display(vd, !(vd->flags & QnAbstractMediaData::MediaFlags_Ignore), speed))
+                return false; // keep frame
             m_singleShotQuantProcessed = true;
             return result;
         }
