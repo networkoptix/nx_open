@@ -19,8 +19,9 @@
  */
 Q_GLOBAL_STATIC(QObject, styleStorage);
 
-QnProxyStyle::QnProxyStyle(QStyle *baseStyle)
+QnProxyStyle::QnProxyStyle(QStyle *baseStyle, QObject *parent)
 {
+    setParent(parent);
     setBaseStyle(baseStyle);
 }
 

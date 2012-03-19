@@ -11,6 +11,7 @@
 
 #include <ui/common/read_only.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_access_controller.h>
 
 namespace {
     QColor redText = QColor(255, 64, 64);
@@ -37,7 +38,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QnWorkbenchContext *context, QWidget 
     ui->setupUi(this);
 
     ui->accessRightsComboBox->addItem(tr("Viewer"), false);
-    ui->accessRightsComboBox->addItem(tr("Administrator"), true);
+    ui->accessRightsComboBox->addItem(tr("Administrator"), true); 
 
     connect(ui->loginEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(updateLogin()));
     connect(ui->currentPasswordEdit,    SIGNAL(textChanged(const QString &)),   this,   SLOT(updateCurrentPassword()));

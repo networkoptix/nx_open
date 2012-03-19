@@ -22,6 +22,7 @@ public:
 
 public slots:
     virtual void accept() override;
+    virtual void reject() override;
     void reset();
 
 protected:
@@ -34,6 +35,7 @@ protected:
 private slots:
     void updateAcceptibility();
     void updateFocus();
+    void updateUsability();
 
     void at_configureConnectionsButton_clicked();
     void at_testButton_clicked();
@@ -47,6 +49,7 @@ private:
     QWeakPointer<QnWorkbenchContext> m_context;
     QStandardItemModel *m_connectionsModel;
     QDataWidgetMapper *m_dataWidgetMapper;
+    int m_requestHandle;
 };
 
 #endif // LOGINDIALOG_H

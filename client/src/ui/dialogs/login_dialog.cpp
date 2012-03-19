@@ -16,10 +16,21 @@
 
 #include "settings.h"
 
+namespace {
+    void setEnabled(const QObjectList &objects, QObject *exclude, bool enabled) {
+        foreach(QObject *object, objects)
+            if(object != exclude)
+                if(QWidget *widget = qobject_cast<QWidget *>(object))
+                    widget->setEnabled(enabled);
+    }
+
+} // anonymous namespace
+
 LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::LoginDialog),
-    m_context(context)
+    m_context(context),
+    m_requestHandle(-1)
 {
     if(!context)
         qnNullWarning(context);
@@ -45,6 +56,8 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
     connect(ui->loginLineEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(updateAcceptibility()));
     connect(ui->hostnameLineEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(updateAcceptibility()));
     connect(ui->portSpinBox,                SIGNAL(valueChanged(int)),              this,   SLOT(updateAcceptibility()));
+    connect(ui->buttonBox,                  SIGNAL(accepted()),                     this,   SLOT(accept()));
+    connect(ui->buttonBox,                  SIGNAL(rejected()),                     this,   SLOT(reject()));
     connect(resetButton,                    SIGNAL(clicked()),                      this,   SLOT(reset()));
 
     m_dataWidgetMapper = new QDataWidgetMapper(this);
@@ -119,13 +132,21 @@ void LoginDialog::accept()
         return;
     }
 
-    setEnabled(false);
-    setCursor(Qt::BusyCursor);
-
-    SessionManager::instance()->start();
-
     QnAppServerConnectionPtr connection = QnAppServerConnectionFactory::createConnection(url);
-    connection->testConnectionAsync(this, SLOT(at_testFinished(int, const QByteArray &, const QByteArray &, int)));
+    m_requestHandle = connection->testConnectionAsync(this, SLOT(at_testFinished(int, const QByteArray &, const QByteArray &, int)));
+
+    updateUsability();
+}
+
+void LoginDialog::reject() 
+{
+    if(m_requestHandle == -1) {
+        QDialog::reject();
+        return;
+    }
+
+    m_requestHandle = -1;
+    updateUsability();
 }
 
 void LoginDialog::reset()
@@ -205,14 +226,33 @@ void LoginDialog::updateAcceptibility()
     ui->testButton->setEnabled(acceptable);
 }
 
+void LoginDialog::updateUsability() {
+    if(m_requestHandle == -1) {
+        ::setEnabled(children(), ui->buttonBox, true);
+        ::setEnabled(ui->buttonBox->children(), ui->buttonBox->button(QDialogButtonBox::Cancel), true);
+        unsetCursor();
+        ui->buttonBox->button(QDialogButtonBox::Cancel)->unsetCursor();
+
+        updateAcceptibility();
+    } else {
+        ::setEnabled(children(), ui->buttonBox, false);
+        ::setEnabled(ui->buttonBox->children(), ui->buttonBox->button(QDialogButtonBox::Cancel), false);
+        setCursor(Qt::BusyCursor);
+        ui->buttonBox->button(QDialogButtonBox::Cancel)->setCursor(Qt::ArrowCursor);
+    }
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
 void LoginDialog::at_testFinished(int status, const QByteArray &data, const QByteArray &errorString, int requestHandle)
 {
-    setEnabled(true);
-    unsetCursor();
+    if(m_requestHandle != requestHandle) 
+        return;
+    m_requestHandle = -1;
+
+    updateUsability();
 
     if(status != 0) {
         QMessageBox::warning(

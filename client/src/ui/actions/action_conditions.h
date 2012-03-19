@@ -65,12 +65,20 @@ class QnMotionGridDisplayActionCondition: public QnActionCondition {
 public:
     QnMotionGridDisplayActionCondition(bool requiredGridDisplayValue, QObject *parent = NULL): 
         QnActionCondition(parent),
+        m_hasRequiredGridDisplayValue(true),
         m_requiredGridDisplayValue(requiredGridDisplayValue)
+    {}
+
+    QnMotionGridDisplayActionCondition(QObject *parent = NULL):
+        QnActionCondition(parent),
+        m_hasRequiredGridDisplayValue(false),
+        m_requiredGridDisplayValue(false)
     {}
 
     virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;
 
 private:
+    bool m_hasRequiredGridDisplayValue;
     bool m_requiredGridDisplayValue;
 };
 

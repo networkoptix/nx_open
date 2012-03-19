@@ -19,8 +19,8 @@ class QnProxyStyle : public QStyle
     Q_OBJECT
 
 public:
-    explicit QnProxyStyle(QStyle *baseStyle);
-    explicit QnProxyStyle(const QString &baseStyle, QObject *parent = 0);
+    explicit QnProxyStyle(QStyle *baseStyle, QObject *parent = NULL);
+    explicit QnProxyStyle(const QString &baseStyle, QObject *parent = NULL);
 
     QStyle *baseStyle() const;
     void setBaseStyle(QStyle *style);

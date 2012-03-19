@@ -308,10 +308,12 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     /* Set up context menu. */
     QWidget *window = m_display->view()->window();
     window->addAction(action(Qn::ScreenRecordingAction));
+    window->addAction(action(Qn::ToggleMotionAction));
 
     connect(action(Qn::SelectAllAction), SIGNAL(triggered()),                                                                       this,                           SLOT(at_selectAllAction_triggered()));
     connect(action(Qn::ShowMotionAction), SIGNAL(triggered()),                                                                      this,                           SLOT(at_showMotionAction_triggered()));
     connect(action(Qn::HideMotionAction), SIGNAL(triggered()),                                                                      this,                           SLOT(at_hideMotionAction_triggered()));
+    connect(action(Qn::ToggleMotionAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_toggleMotionAction_triggered()));
     connect(action(Qn::MaximizeItemAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_maximizeItemAction_triggered()));
     connect(action(Qn::UnmaximizeItemAction), SIGNAL(triggered()),                                                                  this,                           SLOT(at_unmaximizeItemAction_triggered()));
     connect(action(Qn::ScreenRecordingAction), SIGNAL(triggered(bool)),                                                             this,                           SLOT(at_recordingAction_triggered(bool)));
@@ -1006,6 +1008,21 @@ void QnWorkbenchController::at_hideMotionAction_triggered() {
 
 void QnWorkbenchController::at_showMotionAction_triggered() {
     displayMotionGrid(menu()->currentWidgetsTarget(sender()), true);
+}
+
+void QnWorkbenchController::at_toggleMotionAction_triggered() {
+    QnResourceWidgetList widgets = menu()->currentWidgetsTarget(sender());
+
+    bool hidden = false;
+    foreach(QnResourceWidget *widget, widgets)
+        if((widget->resource()->flags() & QnResource::network) && !(widget->displayFlags() & QnResourceWidget::DISPLAY_MOTION_GRID))
+            hidden = true;
+
+    if(hidden) {
+        at_showMotionAction_triggered();
+    } else {
+        at_hideMotionAction_triggered();
+    }
 }
 
 void QnWorkbenchController::at_maximizeItemAction_triggered() {
