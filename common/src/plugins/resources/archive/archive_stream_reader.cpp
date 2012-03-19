@@ -130,11 +130,14 @@ void QnArchiveStreamReader::pauseMedia()
         m_navDelegate->pauseMedia();
         return;
     }
-    emit streamPaused();
-    QMutexLocker lock(&m_jumpMtx);
-    m_singleShot = true;
-    m_singleQuantProcessed = true;
-    m_lastJumpTime = AV_NOPTS_VALUE;
+    if (!m_singleShot)
+    {
+        emit streamPaused();
+        QMutexLocker lock(&m_jumpMtx);
+        m_singleShot = true;
+        m_singleQuantProcessed = true;
+        m_lastJumpTime = AV_NOPTS_VALUE;
+    }
 }
 
 bool QnArchiveStreamReader::isMediaPaused() const
