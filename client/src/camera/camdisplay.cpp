@@ -613,17 +613,18 @@ void CLCamDisplay::onReaderResumed()
 void CLCamDisplay::onPrevFrameOccured()
 {
     setSingleShotMode(false);
+    m_singleShotQuantProcessed = false;
 }
 
 void CLCamDisplay::onNextFrameOccured()
 {
     setSingleShotMode(true);
+    m_singleShotQuantProcessed = false;
 }
 
 void CLCamDisplay::setSingleShotMode(bool single)
 {
     m_singleShotMode = single;
-    m_singleShotQuantProcessed = false;
 }
 
 void CLCamDisplay::setSpeed(float speed)
