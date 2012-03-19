@@ -23,10 +23,6 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
     
     connect(m_resourcePool,                 SIGNAL(aboutToBeDestroyed()),                   this,                                   SLOT(at_resourcePool_aboutToBeDestroyed()));
     connect(m_userWatcher.data(),           SIGNAL(userChanged(const QnUserResourcePtr &)), this,                                   SIGNAL(userChanged(const QnUserResourcePtr &)));
-    connect(qnSettings,                     SIGNAL(lastUsedConnectionChanged()),            this,                                   SLOT(at_settings_lastUsedConnectionChanged()));
-
-    /* Update state. */
-    at_settings_lastUsedConnectionChanged();
 
     /* Create dependent objects. */
     m_menu.reset(new QnActionManager(this));
@@ -49,6 +45,10 @@ QnUserResourcePtr QnWorkbenchContext::user() const {
     return m_userWatcher->user();
 }
 
+void QnWorkbenchContext::setUserName(const QString &userName) {
+    m_userWatcher->setUserName(userName);
+}
+
 QnWorkbenchContext *QnWorkbenchContext::instance(QnWorkbench *workbench) {
     return dynamic_cast<QnWorkbenchContext *>(workbench->parent());
 }
@@ -57,10 +57,6 @@ QnWorkbenchContext *QnWorkbenchContext::instance(QnWorkbench *workbench) {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnWorkbenchContext::at_settings_lastUsedConnectionChanged() {
-    m_userWatcher->setUserName(qnSettings->lastUsedConnection().url.userName());
-}
-
 void QnWorkbenchContext::at_resourcePool_aboutToBeDestroyed() {
     m_resourcePool = NULL;
     delete this;
