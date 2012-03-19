@@ -628,6 +628,9 @@ void CLCamDisplay::setSingleShotMode(bool single)
 
 void CLCamDisplay::setSpeed(float speed)
 {
+    if (speed == 0)
+        return;
+
     QMutexLocker lock(&m_timeMutex);
     if (qAbs(speed-m_speed) > FPS_EPS)
     {
@@ -756,11 +759,6 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
     //    return true;
     
     m_isStillImage = media->flags & QnAbstractMediaData::MediaFlags_StillImage;
-
-    bool isReversePacket = media->flags & QnAbstractMediaData::MediaFlags_Reverse;
-    bool isReverseMode = speed < 0.0;
-    if (isReverseMode != isReversePacket)
-        return true;
 
     if (m_needChangePriority)
     {
