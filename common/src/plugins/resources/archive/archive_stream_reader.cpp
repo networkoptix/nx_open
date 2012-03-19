@@ -330,8 +330,8 @@ begin_label:
         if (needSeek && jumpTime == AV_NOPTS_VALUE && reverseMode == m_prevReverseMode)
         {
             qint64 displayTime = determineDisplayTime(reverseMode);
-            beforeJumpInternal(displayTime);
             if (displayTime != AV_NOPTS_VALUE) {
+                beforeJumpInternal(displayTime);
 				if (!exactJumpToSpecifiedFrame && channelCount > 1)
                 	setNeedKeyData();
                 internalJumpTo(displayTime);
