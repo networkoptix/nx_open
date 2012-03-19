@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Connect to Application Server Instance</string>
+   <string>Connect to Enterprise Controller</string>
   </property>
   <property name="modal">
    <bool>false</bool>
