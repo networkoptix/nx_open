@@ -21,7 +21,7 @@ void QnPlDWDStreamReader::openStream()
     int kbps = bestBitrateKbps(getQuality(), QSize(1920,1080), fps);
 
     kbps = qMin(kbps, 8000);
-    kbps = qMax(kbps, 2000);
+    //kbps = qMax(kbps, 2000);
 
     QString requst;
     QTextStream ts(&requst);
