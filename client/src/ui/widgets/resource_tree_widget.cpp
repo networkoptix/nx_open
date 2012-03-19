@@ -156,7 +156,19 @@ protected:
         if(leftLocal ^ rightLocal) /* One of the nodes is a local node, but not both. */
             return rightLocal;
 
-        return QSortFilterProxyModel::lessThan(left, right);
+        QString leftDisplay = left.data(Qt::DisplayRole).toString();
+        QString rightDisplay = right.data(Qt::DisplayRole).toString();
+        int result = leftDisplay.compare(rightDisplay);
+        if(result < 0) {
+            return true;
+        } else if(result > 0) {
+            return false;
+        }
+
+        /* We want the order to be defined even for items with the same name. */
+        QnResourcePtr leftResource = left.data(Qn::ResourceRole).value<QnResourcePtr>();
+        QnResourcePtr rightResource = right.data(Qn::ResourceRole).value<QnResourcePtr>();
+        return leftResource < rightResource;
     }
 };
 
