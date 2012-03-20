@@ -19,7 +19,7 @@
 #include "ui/graphics/items/controls/speedslider.h"
 #include "ui/graphics/items/controls/volumeslider.h"
 #include "ui/graphics/items/image_button_widget.h"
-#include "ui/graphics/items/tooltipitem.h"
+#include "ui/graphics/items/tool_tip_item.h"
 
 #include "timeslider.h"
 #include "utils/common/synctime.h"
@@ -28,11 +28,11 @@
 static const int SLIDER_NOW_AREA_WIDTH = 30;
 static const int TIME_PERIOD_UPDATE_INTERVAL = 1000 * 10;
 
-class SliderToolTipItem : public StyledToolTipItem
+class SliderToolTipItem : public QnStyledToolTipItem
 {
 public:
     SliderToolTipItem(AbstractGraphicsSlider *slider, QGraphicsItem *parent = 0)
-        : StyledToolTipItem(parent), m_slider(slider)
+        : QnStyledToolTipItem(parent), m_slider(slider)
     {
         setAcceptHoverEvents(true);
         setOpacity(0.75);
@@ -44,11 +44,11 @@ private:
 };
 
 
-class TimeSliderToolTipItem : public StyledToolTipItem
+class TimeSliderToolTipItem : public QnStyledToolTipItem
 {
 public:
     TimeSliderToolTipItem(TimeSlider *slider, QGraphicsItem *parent = 0)
-        : StyledToolTipItem(parent), m_slider(slider)
+        : QnStyledToolTipItem(parent), m_slider(slider)
     {
         setAcceptHoverEvents(true);
         setOpacity(0.75);
@@ -156,7 +156,7 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     m_timeSlider->setFlag(QGraphicsItem::ItemIsFocusable, true);
     m_timeSlider->setFocusProxy(this);
     
-    ToolTipItem *timeSliderToolTip = new TimeSliderToolTipItem(m_timeSlider);
+    QnToolTipItem *timeSliderToolTip = new TimeSliderToolTipItem(m_timeSlider);
     timeSliderToolTip->setFlag(QGraphicsItem::ItemIsFocusable, true);
     m_timeSlider->setToolTipItem(timeSliderToolTip);
     timeSliderToolTip->setFocusProxy(m_timeSlider);

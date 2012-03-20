@@ -5,7 +5,7 @@
 
 class QPropertyAnimation;
 
-class ToolTipItem;
+class QnToolTipItem;
 
 class SpeedSlider : public GraphicsSlider
 {
@@ -20,7 +20,7 @@ public:
     Precision precision() const;
     void setPrecision(Precision precision);
 
-    void setToolTipItem(ToolTipItem *toolTip);
+    void setToolTipItem(QnToolTipItem *toolTip);
 
 public Q_SLOTS:
     void resetSpeed();
@@ -52,7 +52,7 @@ private:
 
     Precision m_precision;
     QPropertyAnimation *m_animation;
-    ToolTipItem *m_toolTip;
+    QnToolTipItem *m_toolTip;
     int m_toolTipTimerId;
     int m_wheelStuckedTimerId;
     bool m_wheelStucked;

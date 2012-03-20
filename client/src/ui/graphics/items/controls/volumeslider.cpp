@@ -2,7 +2,7 @@
 
 #include "ui/style/proxy_style.h"
 
-#include "ui/graphics/items/tooltipitem.h"
+#include "ui/graphics/items/tool_tip_item.h"
 
 #include "openal/qtvaudiodevice.h"
 
@@ -37,7 +37,7 @@ VolumeSlider::VolumeSlider(Qt::Orientation orientation, QGraphicsItem *parent)
     : GraphicsSlider(orientation, parent),
       m_toolTipTimerId(0)
 {
-    m_toolTip = new StyledToolTipItem(this);
+    m_toolTip = new QnStyledToolTipItem(this);
     m_toolTip->setVisible(false);
 
     setStyle(new VolumeSliderProxyStyle(this));
@@ -68,7 +68,7 @@ void VolumeSlider::setMute(bool mute)
     setSliderPosition(QtvAudioDevice::instance()->volume() * 100);
 }
 
-void VolumeSlider::setToolTipItem(ToolTipItem *toolTip)
+void VolumeSlider::setToolTipItem(QnToolTipItem *toolTip)
 {
     if (m_toolTip == toolTip)
         return;
