@@ -2,12 +2,17 @@
 #define LOGINDIALOG_H
 
 #include <QtGui/QDialog>
+#include "plugins/resources/archive/avi_files/avi_resource.h"
 
 class QDataWidgetMapper;
 class QStandardItemModel;
 class QUrl;
 
 class QnWorkbenchContext;
+class QnAbstractArchiveReader;
+class CLVideoCamera;
+class QnResourceWidgetRenderer;
+class QnMyGLWidget;
 
 namespace Ui {
     class LoginDialog;
@@ -50,6 +55,13 @@ private:
     QStandardItemModel *m_connectionsModel;
     QDataWidgetMapper *m_dataWidgetMapper;
     int m_requestHandle;
+
+    QnAviResourcePtr aviRes;
+    QnMyGLWidget* glWindow;
+    QnAbstractArchiveReader* dataProvider;
+    CLVideoCamera* camera;
+    QnResourceWidgetRenderer* renderer;
+
 };
 
 #endif // LOGINDIALOG_H

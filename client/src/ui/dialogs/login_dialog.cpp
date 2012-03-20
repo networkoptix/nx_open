@@ -1,6 +1,7 @@
 #include "login_dialog.h"
 #include "ui_login_dialog.h"
 
+#include <QEvent>
 #include <QtGui/QDataWidgetMapper>
 #include <QtGui/QMessageBox>
 #include <QtGui/QStandardItemModel>
@@ -15,6 +16,11 @@
 #include "api/SessionManager.h"
 
 #include "settings.h"
+#include "plugins/resources/archive/avi_files/avi_resource.h"
+#include "plugins/resources/archive/abstract_archive_stream_reader.h"
+#include "camera/camera.h"
+#include "camera/gl_renderer.h"
+#include "ui/graphics/items/resource_widget_renderer.h"
 
 namespace {
     void setEnabled(const QObjectList &objects, QObject *exclude, bool enabled) {
@@ -26,12 +32,103 @@ namespace {
 
 } // anonymous namespace
 
+class QnMyGLWidget: public QGLWidget
+{
+public:
+    QnMyGLWidget(const QGLFormat & format, QWidget * parent = 0): QGLWidget(format, parent)
+    {
+        m_renderer = 0;
+        connect(&m_timer, SIGNAL(timeout()), this, SLOT(update()));
+        m_timer.start(16);
+    }
+
+    virtual void  resizeEvent ( QResizeEvent * event ) override
+    {
+        /*
+        // keep aspect ratio 16:9
+        int width = event->size().width();
+        int height = width * 9.0 / 16.0 + 0.5;
+        int hOffset = (event->size().height() - height)/2;
+
+        if (m_renderer)
+            m_renderer->setChannelScreenSize(QRect(0, hOffset, width, height));
+        */
+        static double sar = 1.0;
+        int windowHeight = event->size().height();
+        int windowWidth = event->size().width();
+        int textureWidth = 1920;
+        int textureHeight = 1080;
+        int newTextureWidth = static_cast<uint>(textureWidth * sar);
+
+        double windowAspect = (double) windowWidth / windowHeight;
+        double textureAspect = (double) textureWidth / textureHeight;
+        if (windowAspect > textureAspect)
+        {
+            // black bars at left and right
+            m_videoRect.setTop(0);
+            m_videoRect.setHeight(windowHeight);
+            double scale = windowHeight / static_cast<float>(textureHeight);
+            double scaledWidth = newTextureWidth * scale;
+            m_videoRect.setLeft(static_cast<int>(windowWidth - scaledWidth) / 2);
+            m_videoRect.setWidth(static_cast<int>(scaledWidth + 0.5));
+        }
+        else {
+            // black bars at the top and bottom
+            m_videoRect.setLeft(0);
+            m_videoRect.setWidth(static_cast<int>(windowWidth));
+            if (newTextureWidth < windowWidth) {
+                double scale = windowWidth / (float) newTextureWidth;
+                double scaledHeight = textureHeight * scale;
+                m_videoRect.setTop(static_cast<int>((windowHeight - scaledHeight) / 2));
+                m_videoRect.setHeight(static_cast<int>(scaledHeight + 0.5));
+            }
+            else {
+                int newTextureHeight = static_cast<int>(windowWidth / textureAspect + 0.5);
+                m_videoRect.setTop(static_cast<int>((windowHeight - newTextureHeight) / 2));
+                m_videoRect.setHeight(newTextureHeight);
+            }
+        }
+
+        
+        if (m_renderer)
+            m_renderer->setChannelScreenSize(m_videoRect.size());
+    }
+
+    void setRenderer(QnResourceWidgetRenderer* renderer)
+    {
+        m_renderer = renderer;
+    }
+
+    
+    virtual void paintEvent( QPaintEvent * event ) override
+    {
+        QPainter painter(this);
+        painter.beginNativePainting();
+        if (m_renderer)
+            m_renderer->paint(0, m_videoRect, 1.0);
+        painter.endNativePainting();
+    }
+    
+private:
+    QRect m_videoRect;
+    QnResourceWidgetRenderer* m_renderer;
+    QTimer m_timer;
+};
+
+// ------------------------------------
+
 LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::LoginDialog),
     m_context(context),
     m_requestHandle(-1)
 {
+    dataProvider = 0;
+    camera = 0;
+    renderer = 0;
+    glWindow = 0;
+
+
     if(!context)
         qnNullWarning(context);
 
@@ -39,10 +136,32 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
     QPushButton *resetButton = ui->buttonBox->button(QDialogButtonBox::Reset);
 
     /* Don't allow to save passwords, at least for now. */
-    ui->savePasswordCheckBox->hide();
+    //ui->savePasswordCheckBox->hide();
 
-    ui->titleLabel->setAlignment(Qt::AlignCenter);
-    ui->titleLabel->setPixmap(qnSkin->pixmap("logo_1920_1080.png", QSize(250, 1000), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    //ui->titleLabel->setAlignment(Qt::AlignCenter);
+    //ui->titleLabel->setPixmap(qnSkin->pixmap("logo_1920_1080.png", QSize(250, 1000), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+
+    QVBoxLayout* layout = new QVBoxLayout(ui->videoSpacer);
+    layout->setSpacing(0);
+
+    QGLFormat glFormat;
+    glFormat.setOption(QGL::SampleBuffers); /* Multisampling. */
+    glFormat.setSwapInterval(1); /* Turn vsync on. */
+    glWindow = new QnMyGLWidget(glFormat);
+    layout->addWidget(glWindow);
+
+    
+    aviRes = QnAviResourcePtr(new QnAviResource("e:/Users/roman76r/blake/SEXUAL PROFLIGATE Ursala Moore & Frank Gunn.flv"));
+    dataProvider = static_cast<QnAbstractArchiveReader*> (aviRes->createDataProvider(QnResource::Role_Default));
+    camera = new CLVideoCamera(aviRes, false, dataProvider);
+    
+    renderer = new QnResourceWidgetRenderer(1, 0, glWindow->context());
+    glWindow->setRenderer(renderer);
+    camera->getCamDisplay()->addVideoChannel(0, renderer, true);
+    dataProvider->start();
+    camera->getCamDisplay()->start();
+
+
 
     resetButton->setText(tr("&Reset"));
 
