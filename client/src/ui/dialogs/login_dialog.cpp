@@ -152,13 +152,15 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
     layout->addWidget(glWindow);
 
     
-    aviRes = QnAviResourcePtr(new QnAviResource("e:/Users/roman76r/blake/FILMS_TEASERS 2_Open for Business Pt 1_kimberely Kane & Dahlia Grey.wmv"));
+    //aviRes = QnAviResourcePtr(new QnAviResource("e:/Users/roman76r/blake/FILMS_TEASERS 2_Open for Business Pt 1_kimberely Kane & Dahlia Grey.wmv"));
+    aviRes = QnAviResourcePtr(new QnAviResource(":/skin/intro.ts"));
     dataProvider = static_cast<QnAbstractArchiveReader*> (aviRes->createDataProvider(QnResource::Role_Default));
     camera = new CLVideoCamera(aviRes, false, dataProvider);
     
     renderer = new QnResourceWidgetRenderer(1, 0, glWindow->context());
     glWindow->setRenderer(renderer);
     camera->getCamDisplay()->addVideoChannel(0, renderer, true);
+    camera->getCamDisplay()->setMTDecoding(true);
     dataProvider->start();
     camera->getCamDisplay()->start();
 
@@ -195,6 +197,13 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
 
 LoginDialog::~LoginDialog()
 {
+    renderer->beforeDestroy();
+    camera->beforeStopDisplay();
+    camera->stopDisplay();
+    
+    delete camera;
+    delete renderer;
+    delete glWindow;
 }
 
 void LoginDialog::updateFocus() 

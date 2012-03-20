@@ -82,6 +82,9 @@ void ffmpegInit()
 
     extern URLProtocol ufile_protocol;
     av_register_protocol2(&ufile_protocol, sizeof(ufile_protocol));
+
+    extern URLProtocol qtufile_protocol;
+    av_register_protocol2(&qtufile_protocol, sizeof(qtufile_protocol));
 }
 
 #ifdef TEST_RTSP_SERVER

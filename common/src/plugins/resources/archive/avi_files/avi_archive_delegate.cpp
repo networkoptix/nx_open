@@ -238,7 +238,11 @@ bool QnAviArchiveDelegate::open(QnResourcePtr resource)
     m_resource = resource;
     if (m_formatContext == 0)
     {
-        QString url = QLatin1String("ufile:") + m_resource->getUrl();
+        QString url;
+        if (m_resource->getUrl().startsWith(":/"))
+            url = QLatin1String("qtufile:") + m_resource->getUrl();
+        else
+            url = QLatin1String("ufile:") + m_resource->getUrl();
         m_initialized = av_open_input_file(&m_formatContext, url.toUtf8().constData(), NULL, 0, NULL) >= 0;
         if (!m_initialized )
             close();
