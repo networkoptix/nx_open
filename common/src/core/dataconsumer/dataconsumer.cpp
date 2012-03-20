@@ -29,7 +29,7 @@ void QnAbstractDataConsumer::endOfRun()
 
 void QnAbstractDataConsumer::run()
 {
-	CL_LOG(cl_logINFO) cl_log.log(QLatin1String("data processor started."), cl_logINFO);
+	qDebug() << "data processor started.";
 
 //	const int timeoutMs = 100;
 	while(!needToStop())
@@ -57,7 +57,7 @@ void QnAbstractDataConsumer::run()
 
 	endOfRun();
 
-	CL_LOG(cl_logINFO) cl_log.log(QLatin1String("data processor stopped."), cl_logINFO);
+	qDebug() << "data processor stopped.";
 }
 
 int QnAbstractDataConsumer::queueSize() const

@@ -293,7 +293,8 @@ void qnLogMsgHandler(QtMsgType type, const char *msg)
         logLevel = cl_logWARNING;
         break;
     case QtDebugMsg:
-        // fall through
+        logLevel = cl_logDEBUG1;
+        break;
     default:
         logLevel = cl_logINFO;
         break;

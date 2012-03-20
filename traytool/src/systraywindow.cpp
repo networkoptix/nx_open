@@ -726,12 +726,20 @@ void QnSystrayWindow::saveData()
         }
     }
     m_settings.setValue("appserverUrlHistory", rez);
-    setAppServerURL(ui->appServerUrlComboBox->currentText());
+
+    QString text = ui->appServerUrlComboBox->currentText();
+    if (text.indexOf("://") == -1)
+        text = QString("http://") + text;
+    setAppServerURL(text);
 }
 
 void QnSystrayWindow::onTestButtonClicked()
 {
-    QUrl url = ui->appServerUrlComboBox->currentText();
+    QString text = ui->appServerUrlComboBox->currentText();
+    if (text.indexOf("://") == -1)
+        text = QString("http://") + text;
+
+    QUrl url(text);
     url.setUserName(ui->appServerLogin->text());
     url.setPassword(ui->appServerPassword->text());
 

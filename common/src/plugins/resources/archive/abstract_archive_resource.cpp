@@ -4,7 +4,7 @@
 QnAbstractArchiveResource::QnAbstractArchiveResource()
 {
 	addFlags(QnResource::ARCHIVE);
-    setStatus(Online, false);
+    setStatus(Online, true);
 }
 
 QnAbstractArchiveResource::~QnAbstractArchiveResource()
@@ -18,8 +18,8 @@ QString QnAbstractArchiveResource::getUniqueId() const
 }
 
 
-void QnAbstractArchiveResource::setStatus(QnResource::Status /*newStatus*/, bool /*silenceMode*/)
+void QnAbstractArchiveResource::setStatus(QnResource::Status /*newStatus*/, bool silenceMode)
 {
-    QnResource::setStatus(Online);
+    QnResource::setStatus(Online, silenceMode);
     return;
 }

@@ -112,7 +112,7 @@ void LicenseManagerWidget::updateControls()
         useRedLabel = usingCameras > totalCameras;
     } else {
         if (m_licenses.hardwareId().isEmpty()) {
-            ui->infoLabel->setText(tr("Obtaining licenses from application server..."));
+            ui->infoLabel->setText(tr("Obtaining licenses from Enterprise Controller..."));
             useRedLabel = false;
         } else {
             ui->infoLabel->setText(tr("You do not have a valid License installed. Please activate your commercial or free license."));

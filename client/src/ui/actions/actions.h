@@ -45,7 +45,7 @@ namespace Qn {
         GetMoreLicensesAction,
 
         /**
-         * Reconnects to the application server.
+         * Reconnects to the Enterprise Controller.
          */
         ReconnectAction,
 
@@ -67,7 +67,7 @@ namespace Qn {
 
         /**
          * Drops provided serialized resources on the current layout after 
-         * connection to application server was established.
+         * connection to Enterprise Controller was established.
          * 
          * Parameters:
          * 
@@ -351,7 +351,7 @@ namespace Qn {
         RemoveLayoutItemAction,
 
         /**
-         * Removes a resource from application server.
+         * Removes a resource from Enterprise Controller.
          */
         RemoveFromServerAction,
 
