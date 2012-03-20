@@ -20,6 +20,8 @@ def genskin():
     for f in files:
       if f.endswith('.png'):
         print >> skin_qrc, '<file alias="%s">%s</file>' % (os.path.join(parent, f).lower(), os.path.join('..', root, f).lower())
+      if f.endswith('.ts'):
+        print >> skin_qrc, '<file alias="%s">%s</file>' % (os.path.join(parent, f).lower(), os.path.join('..', root, f).lower())
       
 
   print >> skin_qrc, """

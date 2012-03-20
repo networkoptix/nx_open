@@ -125,6 +125,7 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
 
     QMutexLocker lock(&m_qualityMutex);
     m_allCamDisplay << this;
+    m_ignoreTime = AV_NOPTS_VALUE;
 }
 
 CLCamDisplay::~CLCamDisplay()
@@ -528,7 +529,7 @@ void CLCamDisplay::onBeforeJump(qint64 time)
         skipPrevJumpSignal--;
         return;
     }
-    setSingleShotMode(false);
+    //setSingleShotMode(false);
 
     
     m_executingJump++;
@@ -561,7 +562,7 @@ void CLCamDisplay::onJumpOccured(qint64 time)
         m_nextReverseTime[i] = AV_NOPTS_VALUE;
         m_display[i]->blockTimeValue(time);
     }
-    m_singleShotMode = false;
+    m_singleShotQuantProcessed = false;
     m_jumpTime = time;
 
     m_executingJump--;
@@ -615,13 +616,12 @@ void CLCamDisplay::onReaderResumed()
 
 void CLCamDisplay::onPrevFrameOccured()
 {
-    setSingleShotMode(false);
+    m_ignoreTime = m_lastVideoPacketTime; // prevent 2 frames displaying if direction changed from forward to backward
     m_singleShotQuantProcessed = false;
 }
 
 void CLCamDisplay::onNextFrameOccured()
 {
-    setSingleShotMode(true);
     m_singleShotQuantProcessed = false;
 }
 
@@ -953,9 +953,17 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
             if(m_display[channel] != NULL)
                 m_display[channel]->setCurrentTime(AV_NOPTS_VALUE);
 
+
+            // Skip one frame in forensic mode. If forward direction changed to backward direction. This condition got true only once.
+            bool needSkipFrame = vd->timestamp == m_ignoreTime;
+            m_ignoreTime = AV_NOPTS_VALUE;
+            if (needSkipFrame)
+                return true;
+
             if (!display(vd, !(vd->flags & QnAbstractMediaData::MediaFlags_Ignore), speed))
                 return false; // keep frame
-            m_singleShotQuantProcessed = true;
+            if (m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed)
+                m_singleShotQuantProcessed = true;
             return result;
         }
 
@@ -1000,7 +1008,8 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
                     m_syncAudioTime = m_lastAudioPacketTime; // sync audio time prevent stopping video, if audio track is disapearred
                 }                
                 display(vd, !ignoreVideo, speed);
-                m_singleShotQuantProcessed = true;
+                if (m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed)
+                    m_singleShotQuantProcessed = true;
             }
 
         }

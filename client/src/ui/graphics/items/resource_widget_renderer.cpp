@@ -4,11 +4,11 @@
 #include <utils/common/warnings.h>
 #include <utils/common/performance.h>
 
-QnResourceWidgetRenderer::QnResourceWidgetRenderer(int channelCount, QObject *parent):
+QnResourceWidgetRenderer::QnResourceWidgetRenderer(int channelCount, QObject *parent, const QGLContext *context):
     QObject(parent)
 {
     for(int i = 0; i < channelCount; i++)
-        m_channelRenderers.push_back(new QnGLRenderer());
+        m_channelRenderers.push_back(new QnGLRenderer(context));
 }
 
 void QnResourceWidgetRenderer::beforeDestroy() {

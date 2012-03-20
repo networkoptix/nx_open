@@ -82,6 +82,9 @@ void ffmpegInit()
 
     extern URLProtocol ufile_protocol;
     av_register_protocol2(&ufile_protocol, sizeof(ufile_protocol));
+
+    extern URLProtocol qtufile_protocol;
+    av_register_protocol2(&qtufile_protocol, sizeof(qtufile_protocol));
 }
 
 #ifdef TEST_RTSP_SERVER
@@ -215,18 +218,6 @@ void initAppServerConnection()
     QnAppServerConnectionFactory::setDefaultFactory(&QnServerCameraFactory::instance());
 }
 
-void initAppServerEventConnection()
-{
-    QUrl appServerEventsUrl = QnAppServerConnectionFactory::defaultUrl();
-
-    appServerEventsUrl.setPath("/events");
-
-    static const int EVENT_RECONNECT_TIMEOUT = 3000;
-
-    QnEventManager* eventManager = QnEventManager::instance();
-    eventManager->init(appServerEventsUrl, EVENT_RECONNECT_TIMEOUT);
-}
-
 static QtMsgHandler defaultMsgHandler = 0;
 
 static void myMsgHandler(QtMsgType type, const char *msg)
@@ -314,7 +305,6 @@ int main(int argc, char *argv[])
 
     /* Initialize connections. */
     initAppServerConnection();
-    initAppServerEventConnection();
     if (!qnSettings->isAfterFirstRun() && !getMoviesDirectory().isEmpty())
         qnSettings->addAuxMediaRoot(getMoviesDirectory());
     qnSettings->save();

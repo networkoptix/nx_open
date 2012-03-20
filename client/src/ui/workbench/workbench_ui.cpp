@@ -216,7 +216,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
         palette.setBrush(QPalette::Window, QBrush(gradient));
         m_treeBackgroundItem->setPalette(palette);
     }
-    m_treeBackgroundItem->setFrameColor(QColor(0, 0, 0));
+    m_treeBackgroundItem->setFrameColor(QColor(110, 110, 110, 255));
     m_treeBackgroundItem->setFrameWidth(0.5);
 
     m_treeItem = new QnMaskedProxyWidget(m_controlsWidget);
@@ -289,7 +289,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
         palette.setBrush(QPalette::Window, QBrush(gradient));
         m_titleBackgroundItem->setPalette(palette);
     }
-    m_titleBackgroundItem->setFrameColor(QColor(0, 0, 0));
+    m_titleBackgroundItem->setFrameColor(QColor(110, 110, 110, 255));
     m_titleBackgroundItem->setFrameWidth(0.5);
 
     m_titleItem = new QnClickableWidget(m_controlsWidget);
@@ -385,7 +385,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
         palette.setBrush(QPalette::Window, QBrush(gradient));
         m_helpBackgroundItem->setPalette(palette);
     }
-    m_helpBackgroundItem->setFrameColor(QColor(0, 0, 0));
+    m_helpBackgroundItem->setFrameColor(QColor(110, 110, 110, 255));
     m_helpBackgroundItem->setFrameWidth(0.5);
 
     m_helpWidget = new QnHelpWidget(qnHelp);

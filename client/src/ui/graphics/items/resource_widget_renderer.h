@@ -13,7 +13,7 @@ class QnGLRenderer;
 class QnResourceWidgetRenderer: public QObject, public QnAbstractRenderer {
     Q_OBJECT;
 public:
-    QnResourceWidgetRenderer(int channelCount, QObject *parent = NULL);
+    QnResourceWidgetRenderer(int channelCount, QObject *parent = NULL, const QGLContext *context = NULL);
 
     void update();
 

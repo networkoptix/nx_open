@@ -30,11 +30,24 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleTasksChanged()),         this,   SLOT(at_cameraScheduleWidget_scheduleTasksChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleEnabledChanged()),       this,   SLOT(at_dataChanged()));
 
+    connect(ui->webPageLabel, SIGNAL(linkActivated(const QString&)), this, SLOT(at_linkActivated(const QString&)));
+
+
     updateFromResource();
 }
 
 QnSingleCameraSettingsWidget::~QnSingleCameraSettingsWidget() {
     return;
+}
+
+void QnSingleCameraSettingsWidget::at_linkActivated(const QString& urlStr)
+{
+    QUrl url(urlStr);
+    if (!ui->passwordEdit->isReadOnly()) {
+        url.setUserName(ui->loginEdit->text());
+        url.setPassword(ui->passwordEdit->text());
+    }
+    QDesktopServices::openUrl(url);
 }
 
 const QnVirtualCameraResourcePtr &QnSingleCameraSettingsWidget::camera() const {

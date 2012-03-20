@@ -14,6 +14,13 @@ QnEventManager* QnEventManager::instance()
     return static_instance();
 }
 
+void QnEventManager::init()
+{
+    QUrl appServerEventsUrl = QnAppServerConnectionFactory::defaultUrl();
+    appServerEventsUrl.setPath("/events");
+    init(appServerEventsUrl, EVENT_RECONNECT_TIMEOUT);
+}
+
 void QnEventManager::init(const QUrl& url, int timeout)
 {
     m_source = QSharedPointer<QnEventSource>(new QnEventSource(url, timeout));
@@ -28,12 +35,15 @@ QnEventManager::QnEventManager()
 
 void QnEventManager::run()
 {
+    init();
+
     m_source->startRequest();
 }
 
 void QnEventManager::stop()
 {
-    m_source->stop();
+    if (m_source)
+        m_source->stop();
 }
 
 void QnEventManager::resourcesReceived(int status, const QByteArray& errorString, QnResourceList resources, int handle)

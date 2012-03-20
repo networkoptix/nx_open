@@ -1,6 +1,6 @@
 #include "onvif_ws_searcher.h"
 #include "onvif_ws_searcher_helper.h"
-#include "..\digitalwatchdog\digital_watchdog_resource.h"
+#include "../digitalwatchdog/digital_watchdog_resource.h"
 
 
 QnPlOnvifWsSearcher::QnPlOnvifWsSearcher()
