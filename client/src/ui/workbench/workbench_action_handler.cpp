@@ -889,7 +889,7 @@ void QnWorkbenchActionHandler::at_editTagsAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
-    QnResourceList resources = menu()->currentResourcesTarget(sender());
+    QnResourceList resources = QnResourceCriterion::filter<QnVirtualCameraResource, QnResourceList>(menu()->currentResourcesTarget(sender()));
 
     if(!cameraSettingsDialog()) {
         m_cameraSettingsDialog = new QnCameraSettingsDialog(widget());
@@ -940,11 +940,11 @@ void QnWorkbenchActionHandler::at_selectionChangeAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
-    QnResourcePtr resource = menu()->currentResourceTarget(sender());
-    if(resource.isNull())
+    QnVideoServerResourceList resources = QnResourceCriterion::filter<QnVideoServerResource>(menu()->currentResourcesTarget(sender()));
+    if(resources.size() != 1)
         return;
 
-    QScopedPointer<ServerSettingsDialog> dialog(new ServerSettingsDialog(resource.dynamicCast<QnVideoServerResource>(), widget()));
+    QScopedPointer<ServerSettingsDialog> dialog(new ServerSettingsDialog(resources[0], widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }
