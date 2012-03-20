@@ -22,8 +22,12 @@
 
 #include <api/SessionManager.h>
 
+#include <device_plugins/server_camera/appserver.h>
+
 #include <camera/resource_display.h>
 #include <camera/camdisplay.h>
+
+#include <ui/style/skin.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
@@ -55,7 +59,7 @@
 #include "workbench_layout_snapshot_manager.h"
 #include "workbench_resource.h"
 #include "workbench_access_controller.h"
-#include "device_plugins/server_camera/appserver.h"
+
 
 // -------------------------------------------------------------------------- //
 // QnResourceStatusReplyProcessor
@@ -104,10 +108,12 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     m_selectionUpdatePending(false),
     m_selectionScope(Qn::SceneScope)
 {
-    connect(context(),                                      SIGNAL(aboutToBeDestroyed()),                   this, SLOT(at_context_aboutToBeDestroyed()));
-    connect(context(),                                      SIGNAL(userChanged(const QnUserResourcePtr &)), this, SLOT(at_context_userChanged(const QnUserResourcePtr &)));
-    connect(context(),                                      SIGNAL(userChanged(const QnUserResourcePtr &)), this, SLOT(submitDelayedDrops()), Qt::QueuedConnection);
-    connect(context(),                                      SIGNAL(userChanged(const QnUserResourcePtr &)), this, SLOT(updateCameraSettingsEditibility()));
+    connect(context(),                                      SIGNAL(aboutToBeDestroyed()),                   this,   SLOT(at_context_aboutToBeDestroyed()));
+    connect(context(),                                      SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(at_context_userChanged(const QnUserResourcePtr &)));
+    connect(context(),                                      SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(submitDelayedDrops()), Qt::QueuedConnection);
+    connect(context(),                                      SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(updateCameraSettingsEditibility()));
+    connect(QnEventManager::instance(),                     SIGNAL(connectionClosed()),                     this,   SLOT(at_eventManager_connectionClosed()));
+    connect(QnEventManager::instance(),                     SIGNAL(connectionOpened()),                     this,   SLOT(at_eventManager_connectionOpened()));
 
     /* We're using queued connection here as modifying a field in its change notification handler may lead to problems. */
     connect(workbench(),                                    SIGNAL(layoutsChanged()), this, SLOT(at_workbench_layoutsChanged()), Qt::QueuedConnection);
@@ -118,7 +124,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::SystemSettingsAction),               SIGNAL(triggered()),    this,   SLOT(at_systemSettingsAction_triggered()));
     connect(action(Qn::OpenFileAction),                     SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
     connect(action(Qn::OpenFolderAction),                   SIGNAL(triggered()),    this,   SLOT(at_openFolderAction_triggered()));
-    connect(action(Qn::ConnectionSettingsAction),           SIGNAL(triggered()),    this,   SLOT(at_connectionSettingsAction_triggered()));
+    connect(action(Qn::ConnectToServerAction),              SIGNAL(triggered()),    this,   SLOT(at_connectToServerAction_triggered()));
     connect(action(Qn::ReconnectAction),                    SIGNAL(triggered()),    this,   SLOT(at_reconnectAction_triggered()));
     connect(action(Qn::NextLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_nextLayoutAction_triggered()));
     connect(action(Qn::PreviousLayoutAction),               SIGNAL(triggered()),    this,   SLOT(at_previousLayoutAction_triggered()));
@@ -158,6 +164,9 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::MoveCameraAction),                   SIGNAL(triggered()),    this,   SLOT(at_moveCameraAction_triggered()));
     connect(action(Qn::TakeScreenshotAction),               SIGNAL(triggered()),    this,   SLOT(at_takeScreenshotAction_triggered()));
     connect(action(Qn::ExitAction),                         SIGNAL(triggered()),    this,   SLOT(at_exitAction_triggered()));
+
+    /* Run handlers that update state. */
+    at_eventManager_connectionClosed();
 }
 
 QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
@@ -495,6 +504,14 @@ void QnWorkbenchActionHandler::at_workbench_layoutsChanged() {
     menu()->trigger(Qn::OpenNewTabAction);
 }
 
+void QnWorkbenchActionHandler::at_eventManager_connectionClosed() {
+    action(Qn::ConnectToServerAction)->setIcon(qnSkin->icon("disconnected.png"));
+}
+
+void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
+    action(Qn::ConnectToServerAction)->setIcon(qnSkin->icon("connected.png"));
+}
+
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
     m_mainMenu = menu()->newMenu(Qn::MainScope);
 
@@ -809,7 +826,7 @@ void QnWorkbenchActionHandler::at_systemSettingsAction_triggered() {
     dialog->exec();
 }
 
-void QnWorkbenchActionHandler::at_connectionSettingsAction_triggered() {
+void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     const QUrl lastUsedUrl = qnSettings->lastUsedConnection().url;
     if (lastUsedUrl.isValid() && lastUsedUrl != QnAppServerConnectionFactory::defaultUrl())
         return;
@@ -857,6 +874,8 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     QnResource::startCommandProc();
 
     context()->setUserName(connection.url.userName());
+
+    at_eventManager_connectionOpened();
 }
 
 void QnWorkbenchActionHandler::at_editTagsAction_triggered() {

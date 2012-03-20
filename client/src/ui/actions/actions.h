@@ -37,7 +37,7 @@ namespace Qn {
         /**
          * Opens connection setting dialog.
          */
-        ConnectionSettingsAction,
+        ConnectToServerAction,
 
         /**
          * Reconnects to the application server.

@@ -323,11 +323,11 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Main Menu")).
         icon(qnSkin->icon("main_menu_windowed.png"));
 
-    factory(Qn::ConnectionSettingsAction).
+    factory(Qn::ConnectToServerAction).
         flags(Qn::Main).
         text(tr("Connect to Server...")).
         autoRepeat(false).
-        icon(qnSkin->icon("connect.png"));
+        icon(qnSkin->icon("connected.png"));
 
     factory().
         flags(Qn::Main | Qn::Tree).

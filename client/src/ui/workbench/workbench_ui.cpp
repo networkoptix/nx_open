@@ -325,6 +325,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     titleRightButtonsLayout->setContentsMargins(0, 4, 0, 0);
     titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenNewTabAction)));
     titleRightButtonsLayout->addStretch(0x1000);
+    titleRightButtonsLayout->addItem(newActionButton(action(Qn::ConnectToServerAction)));
     titleRightButtonsLayout->addItem(newActionButton(action(Qn::MinimizeAction)));
     titleRightButtonsLayout->addItem(newActionButton(action(Qn::FullscreenAction)));
     titleRightButtonsLayout->addItem(newActionButton(action(Qn::ExitAction)));

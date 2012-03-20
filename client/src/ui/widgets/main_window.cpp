@@ -163,7 +163,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::AboutAction));
     addAction(action(Qn::SystemSettingsAction));
     addAction(action(Qn::OpenFileAction));
-    addAction(action(Qn::ConnectionSettingsAction));
+    addAction(action(Qn::ConnectToServerAction));
     addAction(action(Qn::OpenNewTabAction));
     addAction(action(Qn::OpenNewWindowAction));
     addAction(action(Qn::CloseLayoutAction));
@@ -220,6 +220,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_titleLayout->addLayout(tabBarLayout);
     m_titleLayout->addWidget(newActionButton(action(Qn::OpenNewTabAction)));
     m_titleLayout->addStretch(0x1000);
+    m_titleLayout->addWidget(newActionButton(action(Qn::ConnectToServerAction)));
     m_titleLayout->addWidget(newActionButton(action(Qn::MinimizeAction)));
     m_titleLayout->addWidget(newActionButton(action(Qn::FullscreenAction)));
     m_titleLayout->addWidget(newActionButton(action(Qn::ExitAction)));
