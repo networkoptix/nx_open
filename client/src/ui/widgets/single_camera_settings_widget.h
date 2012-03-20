@@ -45,7 +45,7 @@ private slots:
     void at_tabWidget_currentChanged();
     void at_dataChanged();
     void at_cameraScheduleWidget_scheduleTasksChanged();
-
+    void at_linkActivated(const QString& urlStr);
 private:
     void setHasChanges(bool hasChanges);
 
