@@ -250,7 +250,7 @@
                                     </Shortcut>
                                 </File>
                             </Component>
-                            <Component Id="TrayToolQTLibraries" Guid="">
+                            <Component Id="TrayToolQTLibraries" Guid="b3bbeb5b-310a-4b10-b0bb-0e1193de80f5">
                                 <File Id="TrayToolQtCore$(var.suffix)4.dll" Name="QtCore$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtCore$(var.suffix)4.dll"/>
                                 <File Id="TrayToolQtGui$(var.suffix)4.dll" Name="QtGui$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtGui$(var.suffix)4.dll"/>
                                 <File Id="TrayToolQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtNetwork$(var.suffix)4.dll"/>
