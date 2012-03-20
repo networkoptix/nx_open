@@ -5,7 +5,7 @@ set CONFIG=%1
 
 if [%1] == [] set CONFIG=Release
 
-if not exist ..\appserver\setup\build\exe.win32-2.7\appserver.exe (
+if not exist ..\appserver\setup\build\exe.win32-2.7\ec.exe (
 cd ..\appserver\setup
 @start /B /WAIT setup.py build
 cd %~dp0

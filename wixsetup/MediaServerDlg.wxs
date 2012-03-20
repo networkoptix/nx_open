@@ -46,7 +46,7 @@
                 <Control Id="textBox2" Type="Edit" Height="15" Width="80" X="273" Y="128" Property="SERVER_API_PORT" />
                 <Control Id="label3" Type="Text" Height="17" Width="70" X="25" Y="161" Text="Recording Folder" />
                 <Control Id="ServerMediaDir" Type="PathEdit" Height="15" Width="197" X="93" Y="158" Property="WIXUI_SERVER_DIRECTORY" Indirect="yes" />
-                <Control Id="groupBox1" Type="GroupBox" Height="66" Width="345" X="15" Y="49" Text="Application Server" />
+                <Control Id="groupBox1" Type="GroupBox" Height="66" Width="345" X="15" Y="49" Text="Enterprise Controller" />
                 <Control Id="ChangeServerMediaDir" Type="PushButton" Height="17" Width="56" X="296" Y="158" Text="Browse" />
                 <Control Id="Host" Type="Edit" Height="15" Width="182" X="75" Y="65" Property="SERVER_APPSERVER_HOST">
                     <Condition Action="disable"><![CDATA[(&AppServerFeature=3)]]></Condition>
@@ -61,7 +61,7 @@
                     <Condition Action="hide">NOT SERVERDIR_CANT_WRITE</Condition>
                     <Condition Action="show">SERVERDIR_CANT_WRITE</Condition>
                 </Control>
-        	
+            
             </Dialog>
         </UI>
     </Fragment>

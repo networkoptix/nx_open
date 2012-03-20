@@ -23,8 +23,8 @@ syntax: glob
 Debug
 Release
 
-appserver/db/appserver.db
-appserver/setup/db/appserver.db
+appserver/db/ec.db
+appserver/setup/db/ec.db
 appserver/proto/xml/gen
 appserver/proto/pb/gen
 appserver/test/executions

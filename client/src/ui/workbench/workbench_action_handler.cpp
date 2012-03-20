@@ -67,14 +67,14 @@
 detail::QnResourceStatusReplyProcessor::QnResourceStatusReplyProcessor(QnWorkbenchActionHandler *handler, const QnResourceList &resources, const QList<int> &oldDisabledFlags):
     m_handler(handler),
     m_resources(resources),
-	m_oldDisabledFlags(oldDisabledFlags)
+    m_oldDisabledFlags(oldDisabledFlags)
 {
-	assert(oldDisabledFlags.size() == resources.size());
+    assert(oldDisabledFlags.size() == resources.size());
 }
 
 void detail::QnResourceStatusReplyProcessor::at_replyReceived(int status, const QByteArray& data, const QByteArray& errorString, int handle) {
     if(m_handler)
-		m_handler.data()->at_resources_statusSaved(status, errorString, m_resources, m_oldDisabledFlags);
+        m_handler.data()->at_resources_statusSaved(status, errorString, m_resources, m_oldDisabledFlags);
     
     deleteLater();
 }
@@ -712,7 +712,7 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
         return;
 
     QnResourceList modifiedResources;
-	QList<int> oldDisabledFlags;
+    QList<int> oldDisabledFlags;
 
     foreach(const QnResourcePtr &resource, resources) {
         if(resource->getParentId() == server->getId())
@@ -735,13 +735,13 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
         }
 
         if(replacedNetwork) {
-			oldDisabledFlags.push_back(replacedNetwork->isDisabled());
+            oldDisabledFlags.push_back(replacedNetwork->isDisabled());
             modifiedResources.push_back(replacedNetwork);
-			replacedNetwork->setDisabled(false);
+            replacedNetwork->setDisabled(false);
 
-			oldDisabledFlags.push_back(network->isDisabled());
+            oldDisabledFlags.push_back(network->isDisabled());
             modifiedResources.push_back(network);
-			network->setDisabled(true);
+            network->setDisabled(true);
 
             QnResourcePtr newServer = resourcePool()->getResourceById(network->getParentId());
 
@@ -753,8 +753,8 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
     }
 
     if(!modifiedResources.empty()) {
-		detail::QnResourceStatusReplyProcessor *processor = new detail::QnResourceStatusReplyProcessor(this, modifiedResources, oldDisabledFlags);
-		connection()->setResourcesDisabledAsync(modifiedResources, processor, SLOT(at_replyReceived(int, const QByteArray &, const QByteArray &, int)));
+        detail::QnResourceStatusReplyProcessor *processor = new detail::QnResourceStatusReplyProcessor(this, modifiedResources, oldDisabledFlags);
+        connection()->setResourcesDisabledAsync(modifiedResources, processor, SLOT(at_replyReceived(int, const QByteArray &, const QByteArray &, int)));
     }
 }
 
@@ -1292,7 +1292,7 @@ void QnWorkbenchActionHandler::at_resources_saved(int status, const QByteArray& 
             widget(),
             resources,
             tr("Error"),
-            tr("Could not save the following %n layout(s) to application server.", NULL, reopeningLayoutResources.size()),
+            tr("Could not save the following %n layout(s) to Enterprise Controller.", NULL, reopeningLayoutResources.size()),
             tr("Do you want to restore these %n layout(s)?", NULL, reopeningLayoutResources.size()),
             QDialogButtonBox::Yes | QDialogButtonBox::No
         );
@@ -1309,7 +1309,7 @@ void QnWorkbenchActionHandler::at_resources_saved(int status, const QByteArray& 
             widget(),
             resources,
             tr("Error"),
-            tr("Could not save the following %n items to application server.", NULL, resources.size()),
+            tr("Could not save the following %n items to Enterprise Controller.", NULL, resources.size()),
             tr("Error description: \n%1").arg(QLatin1String(errorString.data())),
             QDialogButtonBox::Ok
         );
@@ -1320,7 +1320,7 @@ void QnWorkbenchActionHandler::at_resource_deleted(int status, const QByteArray 
     if(status == 0)   
         return;
 
-    QMessageBox::critical(widget(), tr(""), tr("Could not delete resource from application server. \n\nError description: '%2'").arg(QLatin1String(errorString.data())));
+    QMessageBox::critical(widget(), tr(""), tr("Could not delete resource from Enterprise Controller. \n\nError description: '%2'").arg(QLatin1String(errorString.data())));
 }
 
 void QnWorkbenchActionHandler::at_resources_statusSaved(int status, const QByteArray &errorString, const QnResourceList &resources, const QList<int> &oldDisabledFlags) {
@@ -1337,6 +1337,6 @@ void QnWorkbenchActionHandler::at_resources_statusSaved(int status, const QByteA
     );
 
     for(int i = 0; i < resources.size(); i++)
-		resources[i]->setDisabled(oldDisabledFlags[i]);
+        resources[i]->setDisabled(oldDisabledFlags[i]);
 }
 

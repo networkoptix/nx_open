@@ -45,7 +45,7 @@
         <Property Id="APPSERVER_PORT" Secure="yes">
             <RegistrySearch Id="AppServerPortReg"
                             Root="HKLM"
-                            Key="Software\Network Optix\VMS Application Server"
+                            Key="Software\Network Optix\Enterprise Controller"
                             Name="port"
                             Type="raw"
                             Win64="no"/>
@@ -75,13 +75,19 @@
                             Type="raw"
                             Win64="no"/>
         </Property>
+
         <Property Id="SERVER_DIRECTORY_REG" Secure="yes">
             <RegistrySearch Id="ServerDirectoryReg"
                             Root="HKLM"
                             Key="Software\Network Optix\VMS Media Server"
                             Name="mediaDir"
                             Type="raw"
-                            Win64="no"/>
+                            Win64="no">
+            </RegistrySearch>
+        </Property>
+
+        <Property Id="IS_SERVER_DIRECTORY_REG" Secure="yes">
+            <DirectorySearch Id='DirectorySearch1' Path='[SERVER_DIRECTORY_REG]'/>
         </Property>
         
         
@@ -162,7 +168,7 @@
             <Custom Action="SetMoviesFolder" Before="AssignClientFolder" />
             
             <Custom Action="ResetClientFolder" Before="CostInitialize"/>
-            <Custom Action="ResetServerFolder" Before="CostInitialize"/>
+            <Custom Action="ResetServerFolder" Before="CostInitialize">IS_SERVER_DIRECTORY_REG</Custom>
             
             <Custom Action="AssignClientFolder" After="CostInitialize">CLIENT_DIRECTORY=""</Custom>
             <Custom Action="AssignServerFolder" After="CostInitialize">SERVER_DIRECTORY=""</Custom>
@@ -199,19 +205,19 @@
             <Directory Id="ProgramFilesFolder">
                 <Directory Id="NetworkOptix" Name="$(env.ORGANIZATION_NAME)">
                     <Directory Id="INSTALLDIR" Name="$(env.APPLICATION_NAME)">
-                        <Directory Id="VmsAppServerDir" Name="AppServer">
+                        <Directory Id="VmsAppServerDir" Name="Enterprise Controller">
                             <Component Id="AppServerExecutable" Guid="{5FB5A627-BB1F-4d82-A06C-7672903DA4C7}">
-                                <File Id="appserverexe" Name="appserver.exe" Source="../appserver/setup/build/exe.win32-2.7/appserver.exe" KeyPath="yes">
-                                    <fire:FirewallException Id="FirewallExceptionAppServer" Name="Network Optix Application Server" Scope="any" IgnoreFailure="yes"/>
+                                <File Id="ecexe" Name="ec.exe" Source="../appserver/setup/build/exe.win32-2.7/ec.exe" KeyPath="yes">
+                                    <fire:FirewallException Id="FirewallExceptionAppServer" Name="Network Optix Enterprise Controller" Scope="any" IgnoreFailure="yes"/>
                                 </File>
                                 
                                 <ServiceInstall Id="VmsAppServerService"
                                                 Name="VmsAppServer"
-                                                DisplayName="Network Optix Application Server"
+                                                DisplayName="Network Optix Enterprise Controller"
                                                 Type="ownProcess"
                                                 Start="auto"
                                                 ErrorControl="normal"
-                                                Description="Network Optix Application Server">
+                                                Description="Network Optix Enterprise Controller">
                                     <util:ServiceConfig FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart"/>
                                 </ServiceInstall>
                                 
@@ -221,7 +227,7 @@
                             </Component>
                             <Component Id="AppServerConfiguration" Guid="{46C18E7E-D25C-4250-AF5F-0237EEFAA80E}" Permanent="yes">
                                 <RegistryKey Root="HKLM"
-                                             Key="Software\[Manufacturer]\VMS Application Server"
+                                             Key="Software\[Manufacturer]\Enterprise Controller"
                                              Action="createAndRemoveOnUninstall">
                                     <RegistryValue Type="string" Name="port" Value="[APPSERVER_PORT]"/>
                                     <RegistryValue Type="string" Name="login" Value="[APPSERVER_LOGIN]"/>
@@ -440,7 +446,7 @@
             <?endif?>
         </Feature>
         
-        <Feature Id="AppServerFeature" Title="$(env.APPLICATION_NAME) Application Server" Level="1"
+        <Feature Id="AppServerFeature" Title="$(env.APPLICATION_NAME) Enterprise Controller" Level="1"
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="hidden" >
             <ComponentGroupRef Id="AppServerFilesComponent" />
             <ComponentRef Id="AppServerExecutable" />
@@ -573,8 +579,8 @@
             <Publish Dialog="AppServerDlg" Control="Next" Event="DoAction" Value="CheckPorts" Order="2"><![CDATA[ APPSERVER_PORT <> OLD_APPSERVER_PORT]]></Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Event="NewDialog" Value="PortIsBusyDlg" Order="3">BUSYPORT</Publish>
             
-        	<?define IsAsSettingsFilled="(APPSERVER_PORT AND APPSERVER_LOGIN AND APPSERVER_PASSWORD)" ?>
-        	
+            <?define IsAsSettingsFilled="(APPSERVER_PORT AND APPSERVER_LOGIN AND APPSERVER_PASSWORD)" ?>
+            
             <Publish Dialog="AppServerDlg" Control="Next" Event="SpawnDialog" Value="AllFieldsAreMandatoryDlg"><![CDATA[ NOT $(var.IsAsSettingsFilled) ]]></Publish>
             
             <Publish Dialog="AppServerDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg" Order="2"><![CDATA[($(var.IsAsSettingsFilled) AND NOT BUSYPORT AND &ServerFeature=3)]]></Publish>
@@ -601,9 +607,9 @@
             <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg"><![CDATA[(&AppServerFeature<>3)]]></Publish>
             
             <?define IsPortsValid="((&AppServerFeature=3 AND SERVER_RTSP_PORT<>APPSERVER_PORT AND SERVER_API_PORT<>APPSERVER_PORT AND SERVER_API_PORT<>SERVER_RTSP_PORT) OR (&AppServerFeature<>3 AND SERVER_API_PORT<>SERVER_RTSP_PORT))" ?>
-        	<?define IsSettingsFilled="(SERVER_RTSP_PORT AND SERVER_API_PORT AND SERVER_APPSERVER_HOST AND SERVER_APPSERVER_PORT AND SERVER_APPSERVER_LOGIN AND SERVER_APPSERVER_PASSWORD)"?>
+            <?define IsSettingsFilled="(SERVER_RTSP_PORT AND SERVER_API_PORT AND SERVER_APPSERVER_HOST AND SERVER_APPSERVER_PORT AND SERVER_APPSERVER_LOGIN AND SERVER_APPSERVER_PASSWORD)"?>
             <?define IsSettingsValid="($(var.IsPortsValid) AND $(var.IsSettingsFilled))"?>
-        	
+            
             <Publish Dialog="MediaServerDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_SERVER_DIRECTORY]" Order="1">1</Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Event="SpawnDialog" Value="AllFieldsAreMandatoryDlg"><![CDATA[ NOT $(var.IsSettingsFilled) ]]></Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Event="SpawnDialog" Value="PortDuplicateDlg"><![CDATA[ NOT $(var.IsPortsValid) AND $(var.IsSettingsFilled) ]]></Publish>
