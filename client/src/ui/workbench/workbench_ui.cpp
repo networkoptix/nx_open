@@ -319,7 +319,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     titleLeftButtonsLayout->addItem(m_mainMenuButton);
     titleLayout->addItem(titleLeftButtonsLayout);
     titleLayout->addItem(m_tabBarItem);
-    titleLayout->setAlignment(m_tabBarItem, Qt::AlignCenter);
+    titleLayout->setAlignment(m_tabBarItem, Qt::AlignBottom);
     QGraphicsLinearLayout *titleRightButtonsLayout = new QGraphicsLinearLayout();
     titleRightButtonsLayout->setSpacing(2);
     titleRightButtonsLayout->setContentsMargins(0, 4, 0, 0);
