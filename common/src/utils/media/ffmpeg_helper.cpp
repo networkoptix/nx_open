@@ -605,7 +605,7 @@ AVCodecContext *QnFfmpegHelper::deserializeCodecContext(const char *data, int da
         goto error_label;
     codec = avcodec_find_decoder(codecId);
 
-    if (codec == 0 || avcodec_open(ctx, codec) < 0)
+    if (codec == 0)
         goto error_label;
     
     char objectType;
@@ -648,6 +648,9 @@ AVCodecContext *QnFfmpegHelper::deserializeCodecContext(const char *data, int da
                 break;
         }
     }
+
+    if (avcodec_open(ctx, codec) < 0)
+        goto error_label;
 
     return ctx;
 
