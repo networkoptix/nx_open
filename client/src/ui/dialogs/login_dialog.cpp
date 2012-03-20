@@ -421,8 +421,8 @@ void LoginDialog::at_testButton_clicked()
 
 void LoginDialog::at_configureConnectionsButton_clicked()
 {
-    QScopedPointer<PreferencesDialog> dialog(new PreferencesDialog(m_context.data(), this));
-    dialog->setCurrentPage(PreferencesDialog::PageConnections);
+    QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(m_context.data(), this));
+    dialog->setCurrentPage(QnPreferencesDialog::PageConnections);
 
     if (dialog->exec() == QDialog::Accepted)
         updateStoredConnections();

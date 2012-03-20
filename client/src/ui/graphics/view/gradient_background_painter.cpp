@@ -1,21 +1,25 @@
-#include "blue_background_painter.h"
+#include "gradient_background_painter.h"
 #include <cmath> /* For std::fmod. */
 #include <QRect>
 #include <QRadialGradient>
+#include <ui/common/linear_combination.h>
 #include <ui/graphics/painters/radial_gradient_painter.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
+#include <settings.h>
 
 Q_GLOBAL_STATIC_WITH_ARGS(QnRadialGradientPainter, radialGradientPainter, (32, QColor(255, 255, 255, 255), QColor(255, 255, 255, 0)));
 
-QnBlueBackgroundPainter::QnBlueBackgroundPainter(qreal cycleIntervalSecs):
-    m_cycleIntervalSecs(cycleIntervalSecs)
+QnGradientBackgroundPainter::QnGradientBackgroundPainter(qreal cycleIntervalSecs):
+    m_cycleIntervalSecs(cycleIntervalSecs),
+    m_colorCombinator(LinearCombinator::forType(qMetaTypeId<QColor>())),
+    m_settings(qnSettings)
 {
     m_timer.start();
 }
 
-QnBlueBackgroundPainter::~QnBlueBackgroundPainter() {}
+QnGradientBackgroundPainter::~QnGradientBackgroundPainter() {}
 
-qreal QnBlueBackgroundPainter::position()
+qreal QnGradientBackgroundPainter::position()
 {
     qreal t = std::fmod(m_timer.elapsed() / 1000.0, m_cycleIntervalSecs) / m_cycleIntervalSecs;
 
@@ -34,17 +38,20 @@ qreal QnBlueBackgroundPainter::position()
     return -4 + t * 4;
 }
 
-void QnBlueBackgroundPainter::installedNotify() {
+void QnGradientBackgroundPainter::installedNotify() {
     view()->setBackgroundBrush(Qt::black);
 
     QnLayerPainter::installedNotify();
 }
 
-void QnBlueBackgroundPainter::drawLayer(QPainter * painter, const QRectF & rect)
+void QnGradientBackgroundPainter::drawLayer(QPainter * painter, const QRectF & rect)
 {
+    if(!m_settings->isBackgroundAnimated())
+        return;
+
     qreal pos = position();
 
-    QColor color(5, 5, 50 + 25 * pos, 255);
+    QColor color = m_colorCombinator->combine(1.0 + 0.5 * pos, m_settings->backgroundColor()).value<QColor>();
 
     QPointF center1(rect.center().x() - pos * rect.width() / 2, rect.center().y());
     QPointF center2(rect.center().x() + pos * rect.width() / 2, rect.center().y());

@@ -6,6 +6,8 @@
 #include <QtCore/QStringList>
 #include <QtCore/QMutex>
 
+#include <QtGui/QColor>
+
 class QSettings;
 
 class QnSettings: public QObject {
@@ -24,6 +26,8 @@ public:
         bool afterFirstRun;
         QString mediaRoot;
         QStringList auxMediaRoots;
+        bool animateBackground;
+        QColor backgroundColor;
     };
 
     void update(const Data &data);
@@ -38,6 +42,9 @@ public:
     bool isAfterFirstRun() const;
     QString mediaRoot() const;
     QStringList auxMediaRoots() const;
+    bool isBackgroundAnimated() const;
+    QColor backgroundColor() const;
+
     void addAuxMediaRoot(const QString &root);
 
     struct ConnectionData {

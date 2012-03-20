@@ -14,7 +14,7 @@ class QToolButton;
 
 class QnActionManager;
 class QnResourcePoolUserWatcher;
-class QnBlueBackgroundPainter;
+class QnGradientBackgroundPainter;
 class QnLayoutTabBar;
 class QnGraphicsView;
 class QnDwm;
@@ -79,7 +79,7 @@ protected slots:
     void at_mainMenuAction_triggered();
 
 private:
-    QScopedPointer<QnBlueBackgroundPainter> m_backgroundPainter;
+    QScopedPointer<QnGradientBackgroundPainter> m_backgroundPainter;
     QnWorkbenchController *m_controller;
     QnWorkbenchUi *m_ui;
     QnWorkbenchDisplay *m_display;

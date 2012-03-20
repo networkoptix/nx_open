@@ -821,7 +821,7 @@ void QnWorkbenchActionHandler::at_aboutAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_systemSettingsAction_triggered() {
-    QScopedPointer<PreferencesDialog> dialog(new PreferencesDialog(context(), widget()));
+    QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }

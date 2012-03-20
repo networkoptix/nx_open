@@ -1,19 +1,24 @@
-#ifndef QN_BLUE_BACKROUND_PAINTER_H
-#define QN_BLUE_BACKROUND_PAINTER_H
+#ifndef QN_GRADIENT_BACKROUND_PAINTER_H
+#define QN_GRADIENT_BACKROUND_PAINTER_H
 
 #include <QElapsedTimer>
 #include <QScopedPointer>
 #include "graphics_view.h" /* For QnLayerPainter. */
 
-class QnBlueBackgroundPainter : public QnLayerPainter
+class QnSettings;
+
+class LinearCombinator;
+
+
+class QnGradientBackgroundPainter : public QnLayerPainter
 {
 public:
     /**
      * \param cycleIntervalSecs         Background animation cycle, in seconds.
      */
-    QnBlueBackgroundPainter(qreal cycleIntervalSecs);
+    QnGradientBackgroundPainter(qreal cycleIntervalSecs);
 
-    virtual ~QnBlueBackgroundPainter();
+    virtual ~QnGradientBackgroundPainter();
 
     virtual void drawLayer(QPainter *painter, const QRectF &rect) override;
 
@@ -27,8 +32,10 @@ protected:
     qreal position();
 
 private:
+    LinearCombinator *m_colorCombinator;
+    QnSettings *m_settings;
     QElapsedTimer m_timer;
     qreal m_cycleIntervalSecs;
 };
 
-#endif // QN_BLUE_BACKROUND_PAINTER_H
+#endif // QN_GRADIENT_BACKROUND_PAINTER_H

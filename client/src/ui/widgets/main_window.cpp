@@ -24,7 +24,7 @@
 #include "ui/actions/action_manager.h"
 
 #include "ui/graphics/view/graphics_view.h"
-#include "ui/graphics/view/blue_background_painter.h"
+#include "ui/graphics/view/gradient_background_painter.h"
 
 #include "ui/workbench/workbench_controller.h"
 #include "ui/workbench/workbench_grid_mapper.h"
@@ -135,7 +135,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
         m_view->setPalette(palette);
     }
 
-    m_backgroundPainter.reset(new QnBlueBackgroundPainter(120.0));
+    m_backgroundPainter.reset(new QnGradientBackgroundPainter(120.0));
     m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
 
 
