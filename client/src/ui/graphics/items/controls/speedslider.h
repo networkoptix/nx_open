@@ -22,14 +22,14 @@ public:
 
     void setToolTipItem(QnToolTipItem *toolTip);
 
-public Q_SLOTS:
+public slots:
     void resetSpeed();
     void setSpeed(int value);
 
     void stepBackward();
     void stepForward();
 
-Q_SIGNALS:
+signals:
     void speedChanged(float newSpeed);
 
     void frameBackward();
