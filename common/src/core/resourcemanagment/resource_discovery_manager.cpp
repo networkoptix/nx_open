@@ -140,7 +140,7 @@ void printInLogNetResources(const QnResourceList& resources)
         if (!netRes)
             continue;
 
-        cl_log.log(netRes->getHostAddress().toString() + QString(" "), netRes->getName(), cl_logALWAYS);
+        cl_log.log(netRes->getHostAddress().toString() + QString(" "), netRes->getName(), cl_logINFO);
     }
 
 }
@@ -156,7 +156,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
     time.start();
 
     if (m_foundSmth)
-        cl_log.log("looking for resources ===========...", cl_logALWAYS);
+        cl_log.log("looking for resources ===========...", cl_logINFO);
 
     QnResourceList resources;
     QnResourceList::iterator it;
@@ -244,7 +244,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
 
     if (resources.size())
     {
-        cl_log.log("Discovery----: after excluding existing resources we've got ", resources.size(), " new resources:", cl_logALWAYS);
+        cl_log.log("Discovery----: after excluding existing resources we've got ", resources.size(), " new resources:", cl_logINFO);
         m_foundSmth = true;
     }
     else
@@ -272,7 +272,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
             if (ipsList.count(ips) > 0 && ipsList[ips] > 1)
             {
                 netRes->setNetworkStatus(QnNetworkResource::BadHostAddr);
-                cl_log.log(netRes->getHostAddress().toString() , " conflicting. Has same IP as someone else.", cl_logALWAYS);
+                cl_log.log(netRes->getHostAddress().toString() , " conflicting. Has same IP as someone else.", cl_logINFO);
             }
         }
     }
@@ -282,7 +282,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
     }
 
     //marks all new network resources as badip if: 1) not in the same subnet and not accesible or 2) same subnet and conflicting
-    cl_log.log("Discovery---- Checking if resources are accessible...", cl_logALWAYS);
+    cl_log.log("Discovery---- Checking if resources are accessible...", cl_logINFO);
     check_if_accessible(resources, threads);
 
 
@@ -301,7 +301,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
         else
         {
             if (netRes)
-                cl_log.log("Ready to go resource: ", netRes->getHostAddress().toString(), cl_logALWAYS);
+                cl_log.log("Ready to go resource: ", netRes->getHostAddress().toString(), cl_logINFO);
 
             readyToGo.push_back(*it);
             it = resources.erase(it);
@@ -313,10 +313,10 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
     // resources contains only new network conflicting resources
     // now resources list has only network resources
 
-    cl_log.log("Discovery---- After check_if_accessible readyToGo List: ", cl_logALWAYS);
+    cl_log.log("Discovery---- After check_if_accessible readyToGo List: ", cl_logINFO);
     printInLogNetResources(readyToGo);
 
-    cl_log.log("Discovery---- After check_if_accessible conflicting List: ", cl_logALWAYS);
+    cl_log.log("Discovery---- After check_if_accessible conflicting List: ", cl_logINFO);
     printInLogNetResources(resources);
     
 
@@ -353,7 +353,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
         resources.push_back(res);
 
 
-    cl_log.log("Discovery---- After resovle_conflicts - list of non conflicting resource: ", cl_logALWAYS);
+    cl_log.log("Discovery---- After resovle_conflicts - list of non conflicting resource: ", cl_logINFO);
     printInLogNetResources(resources);
 
 
@@ -375,7 +375,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
 
     resources = swapList;
 
-    cl_log.log("Discovery---- After update unknown - list of non conflicting resource: ", cl_logALWAYS);
+    cl_log.log("Discovery---- After update unknown - list of non conflicting resource: ", cl_logINFO);
     printInLogNetResources(resources);
 
 
@@ -438,7 +438,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
 
     if (resources.size())
     {
-        cl_log.log("Discovery---- Final result: ", cl_logALWAYS);
+        cl_log.log("Discovery---- Final result: ", cl_logINFO);
         printInLogNetResources(resources);
     }
     
@@ -476,9 +476,9 @@ struct check_if_accessible_STRUCT
             resourceNet->addNetworkStatus(QnNetworkResource::BadHostAddr);
 
             if (m_isSameSubnet)
-                cl_log.log(resourceNet->getHostAddress().toString() + QString("  name = ") +  resourceNet->getName(), " has bad IP(same subnet)", cl_logALWAYS);
+                cl_log.log(resourceNet->getHostAddress().toString() + QString("  name = ") +  resourceNet->getName(), " has bad IP(same subnet)", cl_logWARNING);
             else
-                cl_log.log(resourceNet->getHostAddress().toString() + QString("  name = ") +  resourceNet->getName(), " has bad IP(diff subnet)", cl_logALWAYS);
+                cl_log.log(resourceNet->getHostAddress().toString() + QString("  name = ") +  resourceNet->getName(), " has bad IP(diff subnet)", cl_logWARNING);
         }
 
     }
@@ -576,7 +576,7 @@ void QnResourceDiscoveryManager::resovle_conflicts(QnResourceList& resourceList,
 
         CLSubNetState& subnet = m_netState.getSubNetState(resource->getDiscoveryAddr());
 
-        cl_log.log("Looking for next addr...", cl_logALWAYS);
+        cl_log.log("Looking for next addr...", cl_logINFO);
 
         if (!getNextAvailableAddr(subnet, busy_list))
         {

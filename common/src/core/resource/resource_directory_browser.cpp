@@ -61,7 +61,7 @@ QnResourceList QnResourceDirectoryBrowser::findResources()
     QThread::Priority old_priority = QThread::currentThread()->priority();
     QThread::currentThread()->setPriority(QThread::IdlePriority);
 
-    cl_log.log("Browsing directories....", cl_logALWAYS);
+    qDebug() << "Browsing directories....";
 
     QTime time;
     time.restart();
@@ -74,7 +74,7 @@ QnResourceList QnResourceDirectoryBrowser::findResources()
     {
         QnResourceList dev_lst = findResources(dir);
 
-        cl_log.log("found ", dev_lst.count(), " devices", cl_logALWAYS);
+        qDebug() << "found " << dev_lst.count() << " devices";
 
         result.append(dev_lst);
 
@@ -82,7 +82,7 @@ QnResourceList QnResourceDirectoryBrowser::findResources()
             return result;
     }
 
-    cl_log.log("Done(Browsing directories). Time elapsed = ", time.elapsed(), cl_logALWAYS);
+    qDebug() << "Done(Browsing directories). Time elapsed = " << time.elapsed();
 
     QThread::currentThread()->setPriority(old_priority);
 
@@ -101,7 +101,7 @@ QnResourcePtr QnResourceDirectoryBrowser::checkFile(const QString &filename) con
 //=============================================================================================
 QnResourceList QnResourceDirectoryBrowser::findResources(const QString& directory)
 {
-    cl_log.log("Checking ", directory, cl_logALWAYS);
+    qDebug() << "Checking " << directory;
 
     QnResourceList result;
 
@@ -126,7 +126,6 @@ QnResourceList QnResourceDirectoryBrowser::findResources(const QString& director
             QnResourcePtr res = createArchiveResource(absoluteFilePath);
             if (res)
             {
-                //cl_log.log("created local resource: ", absoluteFilePath, cl_logALWAYS);
                 result.append(res);
             }
         }

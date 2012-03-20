@@ -478,7 +478,7 @@ bool initResourceTypes(QnAppServerConnectionPtr appServerConnection)
     QByteArray errorString;
     if (appServerConnection->getResourceTypes(resourceTypeList, errorString) != 0)
     {
-        qDebug() << "Can't get resource types: " << errorString;
+        qWarning() << "Can't get resource types: " << errorString;
         return false;
     }
 

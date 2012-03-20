@@ -58,8 +58,8 @@ void CLNetState::updateNetState()
 
 	if (net_state_changed)
 	{
-		cl_log.log(QLatin1String("Current Net state:"), cl_logALWAYS);
-		cl_log.log(toString(), cl_logALWAYS);
+		cl_log.log(QLatin1String("Current Net state:"), cl_logINFO);
+		cl_log.log(toString(), cl_logINFO);
 	}
 
 }
