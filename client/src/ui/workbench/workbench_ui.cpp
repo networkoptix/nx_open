@@ -210,7 +210,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
         gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
         gradient.setColorAt(0.0,  QColor(0, 0, 0, 255));
         gradient.setColorAt(0.995, QColor(0, 0, 0, 64));
-        gradient.setColorAt(1.0,  QColor(0, 0, 0, 255));
+        gradient.setColorAt(1.0,  QColor(110, 110, 110, 255));
         gradient.setSpread(QGradient::RepeatSpread);
 
         palette.setBrush(QPalette::Window, QBrush(gradient));
@@ -282,7 +282,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
         gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
         gradient.setColorAt(0.0,  QColor(0, 0, 0, 255));
         gradient.setColorAt(0.95, QColor(0, 0, 0, 64));
-        gradient.setColorAt(1.0,  QColor(0, 0, 0, 255));
+        gradient.setColorAt(1.0,  QColor(110, 110, 110, 255));
         gradient.setSpread(QGradient::RepeatSpread);
 
         palette.setBrush(QPalette::Window, QBrush(gradient));
@@ -377,7 +377,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
         gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
         gradient.setColorAt(1.0,  QColor(0, 0, 0, 255));
         gradient.setColorAt(0.005, QColor(0, 0, 0, 64));
-        gradient.setColorAt(0.0,  QColor(0, 0, 0, 255));
+        gradient.setColorAt(0.0,  QColor(110, 110, 110, 255));
         gradient.setSpread(QGradient::RepeatSpread);
 
         palette.setBrush(QPalette::Window, QBrush(gradient));
