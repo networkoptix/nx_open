@@ -81,9 +81,11 @@ private:
 };
 
 
-NavigationItem::NavigationItem(QGraphicsItem *parent)
-    : QGraphicsWidget(parent),
-    m_camera(0), m_forcedCamera(0), m_currentTime(0),
+NavigationItem::NavigationItem(QGraphicsItem *parent): 
+    base_type(parent),
+    m_camera(0), 
+    m_forcedCamera(0), 
+    m_currentTime(0),
     m_playing(false)
 {
     setFlag(QGraphicsItem::ItemIsMovable, false);
@@ -160,14 +162,6 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     timeSliderToolTip->setFlag(QGraphicsItem::ItemIsFocusable, true);
     m_timeSlider->setToolTipItem(timeSliderToolTip);
     timeSliderToolTip->setFocusProxy(m_timeSlider);
-
-    m_timeSlider->setAutoFillBackground(true);
-    {
-        QPalette pal = m_timeSlider->palette();
-        pal.setColor(QPalette::Window, QColor(15, 15, 15, 128));
-        pal.setColor(QPalette::WindowText, QColor(63, 159, 216));
-        m_timeSlider->setPalette(pal);
-    }
 
     connect(m_timeSlider, SIGNAL(currentValueChanged(qint64)), this, SLOT(onValueChanged(qint64)));
     connect(m_timeSlider, SIGNAL(sliderPressed()), this, SLOT(onSliderPressed()));
@@ -432,7 +426,7 @@ void NavigationItem::timerEvent(QTimerEvent *event)
     if (event->timerId() == m_timerId)
         updateSlider();
 
-    QGraphicsWidget::timerEvent(event);
+    base_type::timerEvent(event);
 }
 
 void NavigationItem::updateSlider()
