@@ -1,5 +1,5 @@
-#ifndef _server_event_manager_h
-#define _server_event_manager_h
+#ifndef _client_event_manager_h
+#define _client_event_manager_h
 
 #include <QSharedPointer>
 
@@ -12,11 +12,15 @@ class QnEventManager : public QObject
     Q_OBJECT
 
 public:
-    static QnEventManager* instance();
+    static QnEventManager *instance();
 
     QnEventManager();
 
     void stop();
+
+signals:
+    void connectionOpened();
+    void connectionClosed();
 
 public slots:
     void run();
@@ -38,4 +42,4 @@ private:
     QSharedPointer<QnEventSource> m_source;
 };
 
-#endif // _server_event_manager_h
+#endif // _client_event_manager_h

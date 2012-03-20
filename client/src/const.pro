@@ -27,6 +27,7 @@ FFMPEG = %FFMPEG
 EVETOOLS_DIR = %EVETOOLS_DIR
 
 include(../../common/contrib/qtsingleapplication/src/qtsingleapplication.pri)
+include(../contrib/qtcolorpicker/src/qtcolorpicker.pri)
 
 TRANSLATIONS += help/context_help_en.ts
 RESOURCES += help/context_help.qrc

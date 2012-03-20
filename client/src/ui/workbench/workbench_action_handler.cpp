@@ -22,8 +22,12 @@
 
 #include <api/SessionManager.h>
 
+#include <device_plugins/server_camera/appserver.h>
+
 #include <camera/resource_display.h>
 #include <camera/camdisplay.h>
+
+#include <ui/style/skin.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
@@ -55,7 +59,7 @@
 #include "workbench_layout_snapshot_manager.h"
 #include "workbench_resource.h"
 #include "workbench_access_controller.h"
-#include "device_plugins/server_camera/appserver.h"
+
 
 // -------------------------------------------------------------------------- //
 // QnResourceStatusReplyProcessor
@@ -63,14 +67,14 @@
 detail::QnResourceStatusReplyProcessor::QnResourceStatusReplyProcessor(QnWorkbenchActionHandler *handler, const QnResourceList &resources, const QList<int> &oldDisabledFlags):
     m_handler(handler),
     m_resources(resources),
-	m_oldDisabledFlags(oldDisabledFlags)
+    m_oldDisabledFlags(oldDisabledFlags)
 {
-	assert(oldDisabledFlags.size() == resources.size());
+    assert(oldDisabledFlags.size() == resources.size());
 }
 
 void detail::QnResourceStatusReplyProcessor::at_replyReceived(int status, const QByteArray& data, const QByteArray& errorString, int handle) {
     if(m_handler)
-		m_handler.data()->at_resources_statusSaved(status, errorString, m_resources, m_oldDisabledFlags);
+        m_handler.data()->at_resources_statusSaved(status, errorString, m_resources, m_oldDisabledFlags);
     
     deleteLater();
 }
@@ -104,10 +108,12 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     m_selectionUpdatePending(false),
     m_selectionScope(Qn::SceneScope)
 {
-    connect(context(),                                      SIGNAL(aboutToBeDestroyed()),                   this, SLOT(at_context_aboutToBeDestroyed()));
-    connect(context(),                                      SIGNAL(userChanged(const QnUserResourcePtr &)), this, SLOT(at_context_userChanged(const QnUserResourcePtr &)));
-    connect(context(),                                      SIGNAL(userChanged(const QnUserResourcePtr &)), this, SLOT(submitDelayedDrops()), Qt::QueuedConnection);
-    connect(context(),                                      SIGNAL(userChanged(const QnUserResourcePtr &)), this, SLOT(updateCameraSettingsEditibility()));
+    connect(context(),                                      SIGNAL(aboutToBeDestroyed()),                   this,   SLOT(at_context_aboutToBeDestroyed()));
+    connect(context(),                                      SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(at_context_userChanged(const QnUserResourcePtr &)));
+    connect(context(),                                      SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(submitDelayedDrops()), Qt::QueuedConnection);
+    connect(context(),                                      SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(updateCameraSettingsEditibility()));
+    connect(QnEventManager::instance(),                     SIGNAL(connectionClosed()),                     this,   SLOT(at_eventManager_connectionClosed()));
+    connect(QnEventManager::instance(),                     SIGNAL(connectionOpened()),                     this,   SLOT(at_eventManager_connectionOpened()));
 
     /* We're using queued connection here as modifying a field in its change notification handler may lead to problems. */
     connect(workbench(),                                    SIGNAL(layoutsChanged()), this, SLOT(at_workbench_layoutsChanged()), Qt::QueuedConnection);
@@ -118,7 +124,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::SystemSettingsAction),               SIGNAL(triggered()),    this,   SLOT(at_systemSettingsAction_triggered()));
     connect(action(Qn::OpenFileAction),                     SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
     connect(action(Qn::OpenFolderAction),                   SIGNAL(triggered()),    this,   SLOT(at_openFolderAction_triggered()));
-    connect(action(Qn::ConnectionSettingsAction),           SIGNAL(triggered()),    this,   SLOT(at_connectionSettingsAction_triggered()));
+    connect(action(Qn::ConnectToServerAction),              SIGNAL(triggered()),    this,   SLOT(at_connectToServerAction_triggered()));
     connect(action(Qn::ReconnectAction),                    SIGNAL(triggered()),    this,   SLOT(at_reconnectAction_triggered()));
     connect(action(Qn::NextLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_nextLayoutAction_triggered()));
     connect(action(Qn::PreviousLayoutAction),               SIGNAL(triggered()),    this,   SLOT(at_previousLayoutAction_triggered()));
@@ -158,6 +164,9 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::MoveCameraAction),                   SIGNAL(triggered()),    this,   SLOT(at_moveCameraAction_triggered()));
     connect(action(Qn::TakeScreenshotAction),               SIGNAL(triggered()),    this,   SLOT(at_takeScreenshotAction_triggered()));
     connect(action(Qn::ExitAction),                         SIGNAL(triggered()),    this,   SLOT(at_exitAction_triggered()));
+
+    /* Run handlers that update state. */
+    at_eventManager_connectionClosed();
 }
 
 QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
@@ -495,6 +504,14 @@ void QnWorkbenchActionHandler::at_workbench_layoutsChanged() {
     menu()->trigger(Qn::OpenNewTabAction);
 }
 
+void QnWorkbenchActionHandler::at_eventManager_connectionClosed() {
+    action(Qn::ConnectToServerAction)->setIcon(qnSkin->icon("disconnected.png"));
+}
+
+void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
+    action(Qn::ConnectToServerAction)->setIcon(qnSkin->icon("connected.png"));
+}
+
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
     m_mainMenu = menu()->newMenu(Qn::MainScope);
 
@@ -695,7 +712,7 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
         return;
 
     QnResourceList modifiedResources;
-	QList<int> oldDisabledFlags;
+    QList<int> oldDisabledFlags;
 
     foreach(const QnResourcePtr &resource, resources) {
         if(resource->getParentId() == server->getId())
@@ -718,13 +735,13 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
         }
 
         if(replacedNetwork) {
-			oldDisabledFlags.push_back(replacedNetwork->isDisabled());
+            oldDisabledFlags.push_back(replacedNetwork->isDisabled());
             modifiedResources.push_back(replacedNetwork);
-			replacedNetwork->setDisabled(false);
+            replacedNetwork->setDisabled(false);
 
-			oldDisabledFlags.push_back(network->isDisabled());
+            oldDisabledFlags.push_back(network->isDisabled());
             modifiedResources.push_back(network);
-			network->setDisabled(true);
+            network->setDisabled(true);
 
             QnResourcePtr newServer = resourcePool()->getResourceById(network->getParentId());
 
@@ -736,8 +753,8 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
     }
 
     if(!modifiedResources.empty()) {
-		detail::QnResourceStatusReplyProcessor *processor = new detail::QnResourceStatusReplyProcessor(this, modifiedResources, oldDisabledFlags);
-		connection()->setResourcesDisabledAsync(modifiedResources, processor, SLOT(at_replyReceived(int, const QByteArray &, const QByteArray &, int)));
+        detail::QnResourceStatusReplyProcessor *processor = new detail::QnResourceStatusReplyProcessor(this, modifiedResources, oldDisabledFlags);
+        connection()->setResourcesDisabledAsync(modifiedResources, processor, SLOT(at_replyReceived(int, const QByteArray &, const QByteArray &, int)));
     }
 }
 
@@ -804,12 +821,12 @@ void QnWorkbenchActionHandler::at_aboutAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_systemSettingsAction_triggered() {
-    QScopedPointer<PreferencesDialog> dialog(new PreferencesDialog(context(), widget()));
+    QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }
 
-void QnWorkbenchActionHandler::at_connectionSettingsAction_triggered() {
+void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     const QUrl lastUsedUrl = qnSettings->lastUsedConnection().url;
     if (lastUsedUrl.isValid() && lastUsedUrl != QnAppServerConnectionFactory::defaultUrl())
         return;
@@ -857,6 +874,8 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     QnResource::startCommandProc();
 
     context()->setUserName(connection.url.userName());
+
+    at_eventManager_connectionOpened();
 }
 
 void QnWorkbenchActionHandler::at_editTagsAction_triggered() {
@@ -870,7 +889,7 @@ void QnWorkbenchActionHandler::at_editTagsAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
-    QnResourceList resources = menu()->currentResourcesTarget(sender());
+    QnResourceList resources = QnResourceCriterion::filter<QnVirtualCameraResource, QnResourceList>(menu()->currentResourcesTarget(sender()));
 
     if(!cameraSettingsDialog()) {
         m_cameraSettingsDialog = new QnCameraSettingsDialog(widget());
@@ -921,11 +940,11 @@ void QnWorkbenchActionHandler::at_selectionChangeAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
-    QnResourcePtr resource = menu()->currentResourceTarget(sender());
-    if(resource.isNull())
+    QnVideoServerResourceList resources = QnResourceCriterion::filter<QnVideoServerResource>(menu()->currentResourcesTarget(sender()));
+    if(resources.size() != 1)
         return;
 
-    QScopedPointer<ServerSettingsDialog> dialog(new ServerSettingsDialog(resource.dynamicCast<QnVideoServerResource>(), widget()));
+    QScopedPointer<ServerSettingsDialog> dialog(new ServerSettingsDialog(resources[0], widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }
@@ -1273,7 +1292,7 @@ void QnWorkbenchActionHandler::at_resources_saved(int status, const QByteArray& 
             widget(),
             resources,
             tr("Error"),
-            tr("Could not save the following %n layout(s) to application server.", NULL, reopeningLayoutResources.size()),
+            tr("Could not save the following %n layout(s) to Enterprise Controller.", NULL, reopeningLayoutResources.size()),
             tr("Do you want to restore these %n layout(s)?", NULL, reopeningLayoutResources.size()),
             QDialogButtonBox::Yes | QDialogButtonBox::No
         );
@@ -1290,7 +1309,7 @@ void QnWorkbenchActionHandler::at_resources_saved(int status, const QByteArray& 
             widget(),
             resources,
             tr("Error"),
-            tr("Could not save the following %n items to application server.", NULL, resources.size()),
+            tr("Could not save the following %n items to Enterprise Controller.", NULL, resources.size()),
             tr("Error description: \n%1").arg(QLatin1String(errorString.data())),
             QDialogButtonBox::Ok
         );
@@ -1301,7 +1320,7 @@ void QnWorkbenchActionHandler::at_resource_deleted(int status, const QByteArray 
     if(status == 0)   
         return;
 
-    QMessageBox::critical(widget(), tr(""), tr("Could not delete resource from application server. \n\nError description: '%2'").arg(QLatin1String(errorString.data())));
+    QMessageBox::critical(widget(), tr(""), tr("Could not delete resource from Enterprise Controller. \n\nError description: '%2'").arg(QLatin1String(errorString.data())));
 }
 
 void QnWorkbenchActionHandler::at_resources_statusSaved(int status, const QByteArray &errorString, const QnResourceList &resources, const QList<int> &oldDisabledFlags) {
@@ -1318,6 +1337,6 @@ void QnWorkbenchActionHandler::at_resources_statusSaved(int status, const QByteA
     );
 
     for(int i = 0; i < resources.size(); i++)
-		resources[i]->setDisabled(oldDisabledFlags[i]);
+        resources[i]->setDisabled(oldDisabledFlags[i]);
 }
 

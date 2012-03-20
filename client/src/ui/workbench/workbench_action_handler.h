@@ -124,6 +124,8 @@ protected slots:
 protected slots:
     void at_context_userChanged(const QnUserResourcePtr &user);
     void at_workbench_layoutsChanged();
+    void at_eventManager_connectionClosed();
+    void at_eventManager_connectionOpened();
 
     void at_mainMenuAction_triggered();
 
@@ -154,7 +156,7 @@ protected slots:
     void at_openFolderAction_triggered();
     void at_aboutAction_triggered();
     void at_systemSettingsAction_triggered();
-    void at_connectionSettingsAction_triggered();
+    void at_connectToServerAction_triggered();
     void at_reconnectAction_triggered();
     void at_userSettingsAction_triggered();
     void at_cameraSettingsAction_triggered();

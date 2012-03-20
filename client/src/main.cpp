@@ -443,7 +443,7 @@ int main(int argc, char *argv[])
 
     /* Open connection settings dialog. */
     if(!authentication.isValid()) {
-        context->menu()->trigger(Qn::ConnectionSettingsAction);
+        context->menu()->trigger(Qn::ConnectToServerAction);
     } else {
         context->menu()->trigger(Qn::ReconnectAction);
     }

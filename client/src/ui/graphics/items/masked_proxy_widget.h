@@ -3,6 +3,11 @@
 
 #include <QGraphicsProxyWidget>
 
+/**
+ * A proxy widget that can be forced to draw only part of the source widget.
+ * This is useful when animating source widget's size, as constantly re-rendering
+ * it into cache may be very slow.
+ */
 class QnMaskedProxyWidget: public QGraphicsProxyWidget {
     Q_OBJECT;
 

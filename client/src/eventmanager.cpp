@@ -132,9 +132,13 @@ void QnEventManager::eventReceived(QnEvent event)
         QnResourcePtr ownResource = qnResPool->getResourceById(event.objectId);
         qnResPool->removeResource(ownResource);
     }
+
+    emit connectionOpened();
 }
 
 void QnEventManager::connectionClosed(QString errorString)
 {
     qDebug() << "Connection aborted:" << errorString;
+
+    emit connectionClosed();
 }

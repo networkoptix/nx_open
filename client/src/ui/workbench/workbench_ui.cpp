@@ -41,6 +41,7 @@
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/graphics/items/masked_proxy_widget.h>
 #include <ui/graphics/items/clickable_widget.h>
+#include <ui/graphics/items/simple_frame_widget.h>
 #include <ui/graphics/items/standard/graphicslabel.h>
 #include <ui/graphics/items/controls/navigationitem.h>
 
@@ -201,21 +202,22 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     }
     m_treeWidget->resize(250, 0);
 
-    m_treeBackgroundItem = new QGraphicsWidget(m_controlsWidget);
+    m_treeBackgroundItem = new QnSimpleFrameWidget(m_controlsWidget);
     m_treeBackgroundItem->setAutoFillBackground(true);
     {
         QPalette palette = m_treeBackgroundItem->palette();
 
         QLinearGradient gradient(0, 0, 1, 0);
         gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
-        gradient.setColorAt(0.0,  QColor(0, 0, 0, 255));
-        gradient.setColorAt(0.995, QColor(0, 0, 0, 64));
-        gradient.setColorAt(1.0,  QColor(110, 110, 110, 255));
+        gradient.setColorAt(0.0, QColor(0, 0, 0, 255));
+        gradient.setColorAt(1.0, QColor(0, 0, 0, 64));
         gradient.setSpread(QGradient::RepeatSpread);
 
         palette.setBrush(QPalette::Window, QBrush(gradient));
         m_treeBackgroundItem->setPalette(palette);
     }
+    m_treeBackgroundItem->setFrameColor(QColor(110, 110, 110, 255));
+    m_treeBackgroundItem->setFrameWidth(0.5);
 
     m_treeItem = new QnMaskedProxyWidget(m_controlsWidget);
     m_treeItem->setWidget(m_treeWidget);
@@ -273,21 +275,22 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
 
 
     /* Title bar. */
-    m_titleBackgroundItem = new QGraphicsWidget(m_controlsWidget);
+    m_titleBackgroundItem = new QnSimpleFrameWidget(m_controlsWidget);
     m_titleBackgroundItem->setAutoFillBackground(true);
     {
         QPalette palette = m_titleBackgroundItem->palette();
 
         QLinearGradient gradient(0, 0, 0, 1);
         gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
-        gradient.setColorAt(0.0,  QColor(0, 0, 0, 255));
-        gradient.setColorAt(0.95, QColor(0, 0, 0, 64));
-        gradient.setColorAt(1.0,  QColor(110, 110, 110, 255));
+        gradient.setColorAt(0.0, QColor(0, 0, 0, 255));
+        gradient.setColorAt(1.0, QColor(0, 0, 0, 64));
         gradient.setSpread(QGradient::RepeatSpread);
 
         palette.setBrush(QPalette::Window, QBrush(gradient));
         m_titleBackgroundItem->setPalette(palette);
     }
+    m_titleBackgroundItem->setFrameColor(QColor(110, 110, 110, 255));
+    m_titleBackgroundItem->setFrameWidth(0.5);
 
     m_titleItem = new QnClickableWidget(m_controlsWidget);
     m_titleItem->setPos(0.0, 0.0);
@@ -322,6 +325,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     titleRightButtonsLayout->setContentsMargins(0, 4, 0, 0);
     titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenNewTabAction)));
     titleRightButtonsLayout->addStretch(0x1000);
+    titleRightButtonsLayout->addItem(newActionButton(action(Qn::ConnectToServerAction)));
     titleRightButtonsLayout->addItem(newActionButton(action(Qn::MinimizeAction)));
     titleRightButtonsLayout->addItem(newActionButton(action(Qn::FullscreenAction)));
     titleRightButtonsLayout->addItem(newActionButton(action(Qn::ExitAction)));
@@ -368,21 +372,22 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
 
 
     /* Help window. */
-    m_helpBackgroundItem = new QGraphicsWidget(m_controlsWidget);
+    m_helpBackgroundItem = new QnSimpleFrameWidget(m_controlsWidget);
     m_helpBackgroundItem->setAutoFillBackground(true);
     {
         QPalette palette = m_helpBackgroundItem->palette();
 
         QLinearGradient gradient(0, 0, 1, 0);
         gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
-        gradient.setColorAt(1.0,  QColor(0, 0, 0, 255));
-        gradient.setColorAt(0.005, QColor(0, 0, 0, 64));
-        gradient.setColorAt(0.0,  QColor(110, 110, 110, 255));
+        gradient.setColorAt(1.0, QColor(0, 0, 0, 255));
+        gradient.setColorAt(0.0, QColor(0, 0, 0, 64));
         gradient.setSpread(QGradient::RepeatSpread);
 
         palette.setBrush(QPalette::Window, QBrush(gradient));
         m_helpBackgroundItem->setPalette(palette);
     }
+    m_helpBackgroundItem->setFrameColor(QColor(110, 110, 110, 255));
+    m_helpBackgroundItem->setFrameWidth(0.5);
 
     m_helpWidget = new QnHelpWidget(qnHelp);
     m_helpWidget->setAttribute(Qt::WA_TranslucentBackground);
@@ -458,6 +463,9 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     }
 
     m_sliderItem = new NavigationItem(m_controlsWidget);
+    m_sliderItem->setFrameColor(QColor(110, 110, 110, 255));
+    m_sliderItem->setFrameWidth(0.5);
+
     m_sliderShowButton->setFocusProxy(m_sliderItem);
 
     m_sliderOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
@@ -858,7 +866,7 @@ QRectF QnWorkbenchUi::updatedTreeGeometry(const QRectF &treeGeometry, const QRec
     );
     QSizeF size(
         treeGeometry.width(),
-        ((!m_sliderVisible && m_treeVisible) ? m_controlsWidgetRect.bottom() : qMin(sliderGeometry.y() - 30.0, m_controlsWidgetRect.bottom() - 30.0)) - pos.y()
+        ((!m_sliderVisible && m_treeVisible) ? m_controlsWidgetRect.bottom() - 30.0 : qMin(sliderGeometry.y() - 30.0, m_controlsWidgetRect.bottom() - 30.0)) - pos.y()
     );
     return QRectF(pos, size);
 }
@@ -915,7 +923,7 @@ QRectF QnWorkbenchUi::updatedHelpGeometry(const QRectF &helpGeometry, const QRec
     );
     QSizeF size(
         helpGeometry.width(),
-        ((!m_sliderVisible && m_helpVisible) ? m_controlsWidgetRect.bottom() : qMin(sliderGeometry.y() - 30.0, m_controlsWidgetRect.bottom() - 30.0)) - pos.y()
+        ((!m_sliderVisible && m_helpVisible) ? m_controlsWidgetRect.bottom() - 30.0 : qMin(sliderGeometry.y() - 30.0, m_controlsWidgetRect.bottom() - 30.0)) - pos.y()
     );
     return QRectF(pos, size);
 }

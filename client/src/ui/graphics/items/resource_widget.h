@@ -26,6 +26,7 @@ class QnAbstractArchiveReader;
 class QnLoadingProgressPainter;
 class QnPausedPainter;
 
+/* Get rid of stupid win32 defines. */
 #ifdef NO_DATA
 #   undef NO_DATA
 #endif

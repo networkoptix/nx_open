@@ -5,6 +5,8 @@
 
 #include <QtGui/QGraphicsWidget>
 
+#include <ui/graphics/items/simple_frame_widget.h>
+
 #include "recording/time_period.h"
 #include "camera/time_period_reader_helper.h"
 
@@ -20,9 +22,11 @@ class QnAbstractRenderer;
 class QnAbstractArchiveReader;
 class QnImageButtonWidget;
 
-class NavigationItem : public QGraphicsWidget
+class NavigationItem : public QnSimpleFrameWidget
 {
-    Q_OBJECT
+    Q_OBJECT;
+
+    typedef QnSimpleFrameWidget base_type;
 
 public:
     explicit NavigationItem(QGraphicsItem *parent = 0);

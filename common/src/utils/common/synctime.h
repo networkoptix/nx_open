@@ -4,7 +4,7 @@
 #include <QDateTime>
 
 /** 
-* Time synchronized with Application Server
+* Time synchronized with Enterprise Controller
 */
 
 class QnSyncTimeTask;

@@ -111,6 +111,8 @@ Qn::ActionVisibility QnResourceActionCondition::check(const QnResourceWidgetList
 
 template<class Item, class ItemSequence>
 bool QnResourceActionCondition::checkInternal(const ItemSequence &sequence) {
+    int count = 0;
+
     foreach(const Item &item, sequence) {
         bool matches = checkOne(item);
 
@@ -119,12 +121,17 @@ bool QnResourceActionCondition::checkInternal(const ItemSequence &sequence) {
 
         if(!matches && m_matchMode == Qn::All)
             return false;
+
+        if(matches)
+            count++;
     }
 
     if(m_matchMode == Qn::Any) {
         return false;
-    } else /* if(m_matchMode == Qn::All) */ {
+    } else if(m_matchMode == Qn::All) {
         return true;
+    } else if(m_matchMode == Qn::ExactlyOne) {
+        return count == 1;
     }
 }
 

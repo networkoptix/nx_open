@@ -148,7 +148,13 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
     foreach (const QnResourcePtr &resource, removedResources) {
         disconnect(resource.data(), NULL, this, NULL);
 
+        foreach (const QnLayoutResourcePtr &layoutResource, QnResourceCriterion::filter<QnLayoutResource>(getResources())) // TODO: this is way beyond what one may call 'not optimal'.
+            foreach(const QnLayoutItemData &data, layoutResource->getItems())
+                if(data.resource.id == resource->getId() || data.resource.path == resource->getUniqueId())
+                    layoutResource->removeItem(data);
+
         TRACE("RESOURCE REMOVED" << resource->metaObject()->className() << resource->getName());
+
         emit resourceRemoved(resource);
     }
 }

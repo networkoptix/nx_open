@@ -386,8 +386,8 @@ void LoginDialog::at_testFinished(int status, const QByteArray &data, const QByt
     if(status != 0) {
         QMessageBox::warning(
             this, 
-            tr("Could not connect to application server"), 
-            tr("Connection to the application server could not be established.\nConnection details that you have entered are incorrect, please try again.\n\nIf this error persists, please contact your VMS administrator.")
+            tr("Could not connect to Enterprise Controller"), 
+            tr("Connection to the Enterprise Controller could not be established.\nConnection details that you have entered are incorrect, please try again.\n\nIf this error persists, please contact your VMS administrator.")
         );
         return;
     }
@@ -421,8 +421,8 @@ void LoginDialog::at_testButton_clicked()
 
 void LoginDialog::at_configureConnectionsButton_clicked()
 {
-    QScopedPointer<PreferencesDialog> dialog(new PreferencesDialog(m_context.data(), this));
-    dialog->setCurrentPage(PreferencesDialog::PageConnections);
+    QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(m_context.data(), this));
+    dialog->setCurrentPage(QnPreferencesDialog::PageConnections);
 
     if (dialog->exec() == QDialog::Accepted)
         updateStoredConnections();

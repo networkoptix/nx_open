@@ -66,6 +66,8 @@ void QnSettings::update(const QnSettings::Data &data)
     setAllowChangeIP(data.allowChangeIP);
     m_data.maxVideoItems = data.maxVideoItems;
     m_data.downmixAudio = data.downmixAudio;
+    m_data.animateBackground = data.animateBackground;
+    m_data.backgroundColor = data.backgroundColor;
 }
 
 void QnSettings::load()
@@ -85,6 +87,9 @@ void QnSettings::load()
     m_settings->endArray();
 
     m_data.afterFirstRun = (m_settings->value("afterFirstRun").toString() == "true");
+
+    m_data.animateBackground = m_settings->value("animateBackground", true).toBool();
+    m_data.backgroundColor = m_settings->value("backgroundColor", QColor(5, 5, 50)).value<QColor>();
     m_data.maxVideoItems = m_settings->value("maxVideoItems", 32).toInt();
     m_data.downmixAudio = (m_settings->value("downmixAudio") == "true");
 
@@ -113,6 +118,8 @@ void QnSettings::save()
     }
     m_settings->endArray();
 
+    m_settings->setValue("animateBackground", m_data.animateBackground);
+    m_settings->setValue("backgroundColor", m_data.backgroundColor);
     m_settings->setValue("afterFirstRun", "true");
     m_settings->setValue("maxVideoItems", QString::number(m_data.maxVideoItems));
     m_settings->setValue("downmixAudio", m_data.downmixAudio ? "true" : "false");
@@ -176,6 +183,18 @@ QnSettings::ConnectionData QnSettings::lastUsedConnection()
     QMutexLocker locker(&m_lock);
 
     return m_lastUsed;
+}
+
+bool QnSettings::isBackgroundAnimated() const {
+    QMutexLocker locker(&m_lock);
+
+    return m_data.animateBackground;
+}
+
+QColor QnSettings::backgroundColor() const {
+    QMutexLocker locker(&m_lock);
+
+    return m_data.backgroundColor;
 }
 
 void QnSettings::setLastUsedConnection(const QnSettings::ConnectionData &connection)

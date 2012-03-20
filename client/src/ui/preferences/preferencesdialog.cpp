@@ -23,22 +23,25 @@
 #include "recordingsettingswidget.h"
 #include "youtube/youtubesettingswidget.h"
 
-static inline QString cameraInfoString(QnResourcePtr resource)
-{
-    QnNetworkResourcePtr networkResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
-    if (networkResource) {
-        return PreferencesDialog::tr("Name: %1\nCamera MAC Address: %2\nCamera IP Address: %3\nLocal IP Address: %4")
-            .arg(networkResource->getName())
-            .arg(networkResource->getMAC().toString())
-            .arg(networkResource->getHostAddress().toString())
-            .arg(networkResource->getDiscoveryAddr().toString());
+namespace {
+    QString cameraInfoString(QnResourcePtr resource)
+    {
+        QnNetworkResourcePtr networkResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
+        if (networkResource) {
+            return QnPreferencesDialog::tr("Name: %1\nCamera MAC Address: %2\nCamera IP Address: %3\nLocal IP Address: %4")
+                .arg(networkResource->getName())
+                .arg(networkResource->getMAC().toString())
+                .arg(networkResource->getHostAddress().toString())
+                .arg(networkResource->getDiscoveryAddr().toString());
+        }
+
+        return resource->getName();
     }
 
-    return resource->getName();
-}
+} // anonymous namespace
 
 
-PreferencesDialog::PreferencesDialog(QnWorkbenchContext *context, QWidget *parent): 
+QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *parent): 
     QDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint),
     ui(new Ui::PreferencesDialog()),
     connectionsSettingsWidget(0), 
@@ -51,29 +54,33 @@ PreferencesDialog::PreferencesDialog(QnWorkbenchContext *context, QWidget *paren
 
     ui->setupUi(this);
 
-    ui->lookAndFeelGroupBox->hide(); // TODO: Cannot edit max number of items on the scene.
+    ui->tabWidget->removeTab(1); /* Hide camera settings tab. */ // TODO: is it needed?
 
-    connect(ui->auxMediaRootsList->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
-            this, SLOT(auxMediaFolderSelectionChanged()));
+    ui->maxVideoItemsLabel->hide();
+    ui->maxVideoItemsSpinBox->hide(); // TODO: Cannot edit max number of items on the scene.
 
+    ui->backgroundColorPicker->setAutoFillBackground(false);
+    initColorPicker();
 
     connectionsSettingsWidget = new ConnectionsSettingsWidget(this);
-    ui->tabWidget->insertTab(1, connectionsSettingsWidget, tr("Connections"));
-
-    ui->tabWidget->removeTab(2); // ###
+    ui->tabWidget->insertTab(PageConnections, connectionsSettingsWidget, tr("Connections"));
 
     videoRecorderWidget = new RecordingSettingsWidget(this);
-    ui->tabWidget->insertTab(2, videoRecorderWidget, tr("Screen Recorder"));
+    ui->tabWidget->insertTab(PageRecordingSettings, videoRecorderWidget, tr("Screen Recorder"));
 
 #if 0
     youTubeSettingsWidget = new YouTubeSettingsWidget(this);
-    tabWidget->insertTab(3, youTubeSettingsWidget, tr("YouTube"));
+    tabWidget->insertTab(PageYouTubeSettings, youTubeSettingsWidget, tr("YouTube"));
 #endif
 
 #ifndef CL_TRIAL_MODE
     licenseManagerWidget = new LicenseManagerWidget(this);
-    ui->tabWidget->insertTab(4, licenseManagerWidget, tr("Licenses"));
+    ui->tabWidget->insertTab(PageLicense, licenseManagerWidget, tr("Licenses"));
 #endif
+
+    connect(ui->auxMediaRootsList->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(auxMediaFolderSelectionChanged()));
+    connect(ui->animateBackgroundCheckBox, SIGNAL(stateChanged(int)), this, SLOT(at_animateBackgroundCheckBox_stateChanged(int)));
+    connect(ui->backgroundColorPicker, SIGNAL(colorChanged(const QColor &)), this, SLOT(at_backgroundColorPicker_colorChanged(const QColor &)));
 
     QToolButton *aboutButton = new QToolButton();
     aboutButton->setDefaultAction(context ? context->action(Qn::AboutAction) : NULL);
@@ -85,16 +92,40 @@ PreferencesDialog::PreferencesDialog(QnWorkbenchContext *context, QWidget *paren
     updateView();
     updateCameras();
     updateStoredConnections();
-
-    //connect(CLDeviceSearcher::instance(), SIGNAL(newNetworkDevices()), this, SLOT(updateCameras())); todo
 }
 
-PreferencesDialog::~PreferencesDialog()
+QnPreferencesDialog::~QnPreferencesDialog()
 {
 }
 
-void PreferencesDialog::accept()
+void QnPreferencesDialog::initColorPicker() 
 {
+    QtColorPicker *w = ui->backgroundColorPicker;
+
+    /* No black here. */
+    w->insertColor(Qt::white,         tr("White"));
+    w->insertColor(Qt::red,           tr("Red"));
+    w->insertColor(Qt::darkRed,       tr("Dark red"));
+    w->insertColor(Qt::green,         tr("Green"));
+    w->insertColor(Qt::darkGreen,     tr("Dark green"));
+    w->insertColor(Qt::blue,          tr("Blue"));
+    w->insertColor(Qt::darkBlue,      tr("Dark blue"));
+    w->insertColor(Qt::cyan,          tr("Cyan"));
+    w->insertColor(Qt::darkCyan,      tr("Dark cyan"));
+    w->insertColor(Qt::magenta,       tr("Magenta"));
+    w->insertColor(Qt::darkMagenta,   tr("Dark magenta"));
+    w->insertColor(Qt::yellow,        tr("Yellow"));
+    w->insertColor(Qt::darkYellow,    tr("Dark yellow"));
+    w->insertColor(Qt::gray,          tr("Gray"));
+    w->insertColor(Qt::darkGray,      tr("Dark gray"));
+    w->insertColor(Qt::lightGray,     tr("Light gray"));
+}
+
+void QnPreferencesDialog::accept()
+{
+    m_settingsData.animateBackground = ui->animateBackgroundCheckBox->isChecked();
+    m_settingsData.backgroundColor = ui->backgroundColorPicker->currentColor();
+
     m_settingsData.maxVideoItems = ui->maxVideoItemsSpinBox->value();
     m_settingsData.downmixAudio = ui->downmixAudioCheckBox->isChecked();
 
@@ -125,8 +156,11 @@ void PreferencesDialog::accept()
     QDialog::accept();
 }
 
-void PreferencesDialog::updateView()
+void QnPreferencesDialog::updateView()
 {
+    ui->animateBackgroundCheckBox->setChecked(m_settingsData.animateBackground);
+    ui->backgroundColorPicker->setCurrentColor(m_settingsData.backgroundColor);
+
     ui->mediaRootLabel->setText(QDir::toNativeSeparators(m_settingsData.mediaRoot));
 
     ui->auxMediaRootsList->clear();
@@ -157,7 +191,7 @@ void PreferencesDialog::updateView()
     ui->downmixAudioCheckBox->setChecked(m_settingsData.downmixAudio);
 }
 
-void PreferencesDialog::updateStoredConnections()
+void QnPreferencesDialog::updateStoredConnections()
 {
     QList<QnSettings::ConnectionData> connections;
     foreach (const QnSettings::ConnectionData &conn, qnSettings->connections()) {
@@ -169,7 +203,7 @@ void PreferencesDialog::updateStoredConnections()
     connectionsSettingsWidget->setConnections(connections);
 }
 
-void PreferencesDialog::updateCameras()
+void QnPreferencesDialog::updateCameras()
 {
     cl_log.log("Updating camera list", cl_logALWAYS);
 
@@ -180,7 +214,7 @@ void PreferencesDialog::updateCameras()
     updateView();
 }
 
-void PreferencesDialog::mainMediaFolderBrowse()
+void QnPreferencesDialog::mainMediaFolderBrowse()
 {
     QFileDialog fileDialog(this);
     fileDialog.setFileMode(QFileDialog::DirectoryOnly);
@@ -196,12 +230,12 @@ void PreferencesDialog::mainMediaFolderBrowse()
     updateView();
 }
 
-void PreferencesDialog::auxMediaFolderSelectionChanged()
+void QnPreferencesDialog::auxMediaFolderSelectionChanged()
 {
     ui->auxRemovePushButton->setEnabled(!ui->auxMediaRootsList->selectedItems().isEmpty());
 }
 
-void PreferencesDialog::auxMediaFolderBrowse()
+void QnPreferencesDialog::auxMediaFolderBrowse()
 {
     QFileDialog fileDialog(this);
     fileDialog.setFileMode(QFileDialog::DirectoryOnly);
@@ -224,7 +258,7 @@ void PreferencesDialog::auxMediaFolderBrowse()
     updateView();
 }
 
-void PreferencesDialog::auxMediaFolderRemove()
+void QnPreferencesDialog::auxMediaFolderRemove()
 {
     foreach (QListWidgetItem *item, ui->auxMediaRootsList->selectedItems())
         m_settingsData.auxMediaRoots.removeAll(fromNativePath(item->text()));
@@ -232,13 +266,32 @@ void PreferencesDialog::auxMediaFolderRemove()
     updateView();
 }
 
-void PreferencesDialog::cameraSelected(int row)
+void QnPreferencesDialog::cameraSelected(int row)
 {
     if (row >= 0 && row < m_cameras.size())
         ui->cameraInfoLabel->setText(m_cameras[row].second);
 }
 
-void PreferencesDialog::setCurrentPage(PreferencesDialog::SettingsPage page)
+void QnPreferencesDialog::setCurrentPage(QnPreferencesDialog::SettingsPage page)
 {
     ui->tabWidget->setCurrentIndex(int(page));
+}
+
+// -------------------------------------------------------------------------- //
+// Handlers
+// -------------------------------------------------------------------------- //
+void QnPreferencesDialog::at_animateBackgroundCheckBox_stateChanged(int state) 
+{
+    bool enabled = state == Qt::Checked;
+
+    ui->backgroundColorLabel->setEnabled(enabled);
+    ui->backgroundColorPicker->setEnabled(enabled);
+}
+
+void QnPreferencesDialog::at_backgroundColorPicker_colorChanged(const QColor &color) 
+{
+    if(color == Qt::black) {
+        ui->backgroundColorPicker->setCurrentColor(Qt::white);
+        ui->animateBackgroundCheckBox->setChecked(false);
+    }
 }

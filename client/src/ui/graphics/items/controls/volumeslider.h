@@ -3,7 +3,7 @@
 
 #include "ui/graphics/items/standard/graphicsslider.h"
 
-class ToolTipItem;
+class QnToolTipItem;
 
 class VolumeSlider : public GraphicsSlider
 {
@@ -16,7 +16,7 @@ public:
 
     bool isMute() const;
 
-    void setToolTipItem(ToolTipItem *toolTip);
+    void setToolTipItem(QnToolTipItem *toolTip);
 
 #if 0
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
@@ -34,7 +34,7 @@ private Q_SLOTS:
 private:
     Q_DISABLE_COPY(VolumeSlider)
 
-    ToolTipItem *m_toolTip;
+    QnToolTipItem *m_toolTip;
     int m_toolTipTimerId;
 };
 

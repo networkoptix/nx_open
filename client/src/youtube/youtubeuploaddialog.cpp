@@ -165,8 +165,8 @@ void YouTubeUploadDialog::authFailed()
     dialogLayout->addWidget(buttonBox);
     dialog.setLayout(dialogLayout);
 #else
-    PreferencesDialog dialog(m_context.data(), this);
-    dialog.setCurrentPage(PreferencesDialog::PageYouTubeSettings);
+    QnPreferencesDialog dialog(m_context.data(), this);
+    dialog.setCurrentPage(QnPreferencesDialog::PageYouTubeSettings);
     dialog.exec();
 #endif
 

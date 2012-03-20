@@ -1,12 +1,14 @@
-#ifndef TOOLTIPITEM_H
-#define TOOLTIPITEM_H
+#ifndef QN_TOOL_TIP_ITEM_H
+#define QN_TOOL_TIP_ITEM_H
 
 #include <QtGui/QGraphicsItem>
+#include <QtGui/QPen>
+#include <QtGui/QBrush>
+#include <QtGui/QFont>
 
-class ToolTipItem: public QGraphicsItem
-{
+class QnToolTipItem: public QGraphicsItem {
 public:
-    ToolTipItem(QGraphicsItem *parent = 0);
+    QnToolTipItem(QGraphicsItem *parent = 0);
 
     const QString &text() const;
     void setText(const QString &text);
@@ -50,10 +52,9 @@ private:
 };
 
 
-class StyledToolTipItem: public ToolTipItem
-{
+class QnStyledToolTipItem: public QnToolTipItem {
 public:
-    StyledToolTipItem(QGraphicsItem *parent = 0) : ToolTipItem(parent)
+    QnStyledToolTipItem(QGraphicsItem *parent = 0) : QnToolTipItem(parent)
     {
         setFont(QFont()); /* Default application font. */
         setTextPen(QColor(63, 159, 216));

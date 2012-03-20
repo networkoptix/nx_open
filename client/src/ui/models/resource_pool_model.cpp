@@ -153,22 +153,53 @@ public:
     }
 
     void update() {
-        assert(m_type == Qn::ItemNode || m_type == Qn::ResourceNode);
-
-        if(m_resource.isNull()) {
-            m_name = QString();
-            m_flags = 0;
-            m_status = QnResource::Online;
-            m_searchString = QString();
-            m_icon = QIcon();
-        } else {
-            m_name = m_resource->getName();
-            m_flags = m_resource->flags();
-            m_status = m_resource->getStatus();
-            m_searchString = m_resource->toSearchString();
-            m_icon = qnResIconCache->icon(m_flags, m_status);
+        /* Update stored fields. */
+        if(m_type == Qn::ResourceNode || m_type == Qn::ItemNode) {
+            if(m_resource.isNull()) {
+                m_name = QString();
+                m_flags = 0;
+                m_status = QnResource::Online;
+                m_searchString = QString();
+                m_icon = QIcon();
+            } else {
+                m_name = m_resource->getName();
+                m_flags = m_resource->flags();
+                m_status = m_resource->getStatus();
+                m_searchString = m_resource->toSearchString();
+                m_icon = qnResIconCache->icon(m_flags, m_status);
+            }
         }
 
+        /* Update bastard state. */
+        bool bastard = false;
+        switch(m_type) {
+        case Qn::ItemNode:
+            /* Well, this is an ugly hack, as this case must be handled at different level, 
+             * but we want to feel safe even when it gets fixed. */
+            bastard = m_resource.isNull(); 
+            break;
+        case Qn::ResourceNode: 
+            bastard = !(m_model->accessController()->permissions(m_resource) & Qn::ReadPermission); /* Hide non-readable resources. */
+            if(!bastard) {
+                QnLayoutResourcePtr layout = m_resource.dynamicCast<QnLayoutResource>();
+                if(layout)
+                    bastard = m_model->snapshotManager()->isLocal(layout); /* Hide local layouts. */
+                if(!bastard)
+                    bastard = (m_flags & QnResource::local_server) == QnResource::local_server; /* Hide local server resource. */
+            }
+            break;
+        case Qn::UsersNode:
+            bastard = m_model->accessController()->isViewer();
+            break;
+        case Qn::ServersNode:
+            bastard = m_model->accessController()->isViewer();
+            break;
+        default:
+            break;
+        }
+        setBastard(bastard);
+
+        /* Notify views. */
         changeInternal();
     }
 
@@ -569,34 +600,6 @@ QnResourcePoolModel::Node *QnResourcePoolModel::expectedParent(Node *node) {
     return this->node(resourcePool()->getResourceById(node->resource()->getParentId()));
 }
 
-void QnResourcePoolModel::updateBastard(Node *node) {
-    QnResourcePtr resource = node->resource();
-
-    bool bastard = false;
-    switch(node->type()) {
-    case Qn::ResourceNode: 
-        bastard = !(accessController()->permissions(resource) & Qn::ReadPermission); /* Hide non-readable resources. */
-        if(!bastard) {
-            QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>();
-            if(layout)
-                bastard = snapshotManager()->isLocal(layout); /* Hide local layouts. */
-            if(!bastard)
-                bastard = (node->resourceFlags() & QnResource::local_server) == QnResource::local_server; /* Hide local server resource. */
-        }
-        break;
-    case Qn::UsersNode:
-        bastard = accessController()->isViewer();
-        break;
-    case Qn::ServersNode:
-        bastard = accessController()->isViewer();
-        break;
-    default:
-        break;
-    }
-
-    node->setBastard(bastard);
-}
-
 
 // -------------------------------------------------------------------------- //
 // QnResourcePoolModel :: QAbstractItemModel implementation
@@ -794,8 +797,6 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     if(layout)
         foreach(const QnLayoutItemData &item, layout->getItems())
             at_resource_itemAdded(layout, item);
-
-    updateBastard(node);
 }
 
 void QnResourcePoolModel::at_resPool_resourceRemoved(const QnResourcePtr &resource) {
@@ -808,9 +809,9 @@ void QnResourcePoolModel::at_resPool_resourceRemoved(const QnResourcePtr &resour
 }
 
 void QnResourcePoolModel::at_context_userChanged() {
-    updateBastard(m_localNode);
-    updateBastard(m_serversNode);
-    updateBastard(m_usersNode);
+    m_localNode->update();
+    m_serversNode->update();
+    m_usersNode->update();
 
     foreach(Node *node, m_resourceNodeByResource)
         node->setParent(expectedParent(node));
@@ -820,11 +821,11 @@ void QnResourcePoolModel::at_snapshotManager_flagsChanged(const QnLayoutResource
     Node *node = this->node(resource);
 
     node->setModified(snapshotManager()->isModified(resource));
-    updateBastard(node);
+    node->update();
 }
 
 void QnResourcePoolModel::at_accessController_permissionsChanged(const QnResourcePtr &resource) {
-    updateBastard(this->node(resource));
+    node(resource)->update();
 }
 
 void QnResourcePoolModel::at_resource_parentIdChanged(const QnResourcePtr &resource) {
@@ -843,7 +844,7 @@ void QnResourcePoolModel::at_resource_parentIdChanged() {
 
 void QnResourcePoolModel::at_resource_resourceChanged(const QnResourcePtr &resource) {
     node(resource)->update();
-	node(resource)->setBastard(resource->isDisabled());
+
     foreach(Node *node, m_itemNodesByResource[resource.data()])
         node->update();
 }

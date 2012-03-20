@@ -53,8 +53,6 @@ private:
     Node *expectedParent(Node *node);
     bool isIgnored(const QnResourcePtr &resource) const;
 
-    void updateBastard(Node *node);
-
 private slots:
     void at_resPool_resourceAdded(const QnResourcePtr &resource);
     void at_resPool_resourceRemoved(const QnResourcePtr &resource);

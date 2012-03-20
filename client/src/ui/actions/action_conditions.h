@@ -11,8 +11,9 @@
 
 namespace Qn {
     enum MatchMode {
-        Any, /**< Match if at least one resource satisfies the criterion. */
-        All, /**< Match only if all resources satisfy the criterion. */
+        Any,        /**< Match if at least one resource satisfies the criterion. */
+        All,        /**< Match only if all resources satisfy the criterion. */
+        ExactlyOne  /**< Match only if exactly one resource satisfies condition. */
     };
 
 } // namespace Qn

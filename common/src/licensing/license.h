@@ -62,7 +62,7 @@ private:
 };
 
 /**
-  * License storage which is associated with instance of application server (i.e. should be reloaded when switching appserver).
+  * License storage which is associated with instance of Enterprise Controller (i.e. should be reloaded when switching appserver).
   *
   */
 class QnLicensePool : public QObject

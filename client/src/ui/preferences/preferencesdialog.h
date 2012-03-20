@@ -1,8 +1,8 @@
-#ifndef PREFERENCESDIALOG_H
-#define PREFERENCESDIALOG_H
+#ifndef QN_PREFERENCES_DIALOG_H
+#define QN_PREFERENCES_DIALOG_H
 
+#include <QtCore/QScopedPointer>
 #include <QtGui/QDialog>
-
 #include "settings.h"
 
 
@@ -17,7 +17,7 @@ namespace Ui {
     class PreferencesDialog;
 }
 
-class PreferencesDialog : public QDialog
+class QnPreferencesDialog : public QDialog
 {
     Q_OBJECT
 
@@ -30,16 +30,20 @@ public:
         PageLicense = 4
     };
 
-    PreferencesDialog(QnWorkbenchContext *context, QWidget *parent = 0);
-    ~PreferencesDialog();
+    QnPreferencesDialog(QnWorkbenchContext *context, QWidget *parent = 0);
+    ~QnPreferencesDialog();
 
     void setCurrentPage(SettingsPage page);
 
 private:
     void updateView();
     void updateStoredConnections();
+    void initColorPicker();
 
-private Q_SLOTS:
+private slots:
+    void at_animateBackgroundCheckBox_stateChanged(int state);
+    void at_backgroundColorPicker_colorChanged(const QColor &color);
+
     void updateCameras();
 
     void accept();
@@ -50,7 +54,7 @@ private Q_SLOTS:
     void auxMediaFolderSelectionChanged();
 
 private:
-    Q_DISABLE_COPY(PreferencesDialog)
+    Q_DISABLE_COPY(QnPreferencesDialog)
 
     QScopedPointer<Ui::PreferencesDialog> ui;
     QnSettings::Data m_settingsData;
@@ -64,4 +68,4 @@ private:
     QList<CameraNameAndInfo> m_cameras;
 };
 
-#endif // PREFERENCESDIALOG_H
+#endif // QN_PREFERENCES_DIALOG_H

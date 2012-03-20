@@ -19,7 +19,7 @@
 #include "ui/graphics/items/controls/speedslider.h"
 #include "ui/graphics/items/controls/volumeslider.h"
 #include "ui/graphics/items/image_button_widget.h"
-#include "ui/graphics/items/tooltipitem.h"
+#include "ui/graphics/items/tool_tip_item.h"
 
 #include "timeslider.h"
 #include "utils/common/synctime.h"
@@ -28,11 +28,11 @@
 static const int SLIDER_NOW_AREA_WIDTH = 30;
 static const int TIME_PERIOD_UPDATE_INTERVAL = 1000 * 10;
 
-class SliderToolTipItem : public StyledToolTipItem
+class SliderToolTipItem : public QnStyledToolTipItem
 {
 public:
     SliderToolTipItem(AbstractGraphicsSlider *slider, QGraphicsItem *parent = 0)
-        : StyledToolTipItem(parent), m_slider(slider)
+        : QnStyledToolTipItem(parent), m_slider(slider)
     {
         setAcceptHoverEvents(true);
         setOpacity(0.75);
@@ -44,11 +44,11 @@ private:
 };
 
 
-class TimeSliderToolTipItem : public StyledToolTipItem
+class TimeSliderToolTipItem : public QnStyledToolTipItem
 {
 public:
     TimeSliderToolTipItem(TimeSlider *slider, QGraphicsItem *parent = 0)
-        : StyledToolTipItem(parent), m_slider(slider)
+        : QnStyledToolTipItem(parent), m_slider(slider)
     {
         setAcceptHoverEvents(true);
         setOpacity(0.75);
@@ -81,9 +81,11 @@ private:
 };
 
 
-NavigationItem::NavigationItem(QGraphicsItem *parent)
-    : QGraphicsWidget(parent),
-    m_camera(0), m_forcedCamera(0), m_currentTime(0),
+NavigationItem::NavigationItem(QGraphicsItem *parent): 
+    base_type(parent),
+    m_camera(0), 
+    m_forcedCamera(0), 
+    m_currentTime(0),
     m_playing(false)
 {
     setFlag(QGraphicsItem::ItemIsMovable, false);
@@ -156,18 +158,10 @@ NavigationItem::NavigationItem(QGraphicsItem *parent)
     m_timeSlider->setFlag(QGraphicsItem::ItemIsFocusable, true);
     m_timeSlider->setFocusProxy(this);
     
-    ToolTipItem *timeSliderToolTip = new TimeSliderToolTipItem(m_timeSlider);
+    QnToolTipItem *timeSliderToolTip = new TimeSliderToolTipItem(m_timeSlider);
     timeSliderToolTip->setFlag(QGraphicsItem::ItemIsFocusable, true);
     m_timeSlider->setToolTipItem(timeSliderToolTip);
     timeSliderToolTip->setFocusProxy(m_timeSlider);
-
-    m_timeSlider->setAutoFillBackground(true);
-    {
-        QPalette pal = m_timeSlider->palette();
-        pal.setColor(QPalette::Window, QColor(15, 15, 15, 128));
-        pal.setColor(QPalette::WindowText, QColor(63, 159, 216));
-        m_timeSlider->setPalette(pal);
-    }
 
     connect(m_timeSlider, SIGNAL(currentValueChanged(qint64)), this, SLOT(onValueChanged(qint64)));
     connect(m_timeSlider, SIGNAL(sliderPressed()), this, SLOT(onSliderPressed()));
@@ -432,7 +426,7 @@ void NavigationItem::timerEvent(QTimerEvent *event)
     if (event->timerId() == m_timerId)
         updateSlider();
 
-    QGraphicsWidget::timerEvent(event);
+    base_type::timerEvent(event);
 }
 
 void NavigationItem::updateSlider()

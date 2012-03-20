@@ -8,7 +8,7 @@ class QPropertyAnimation;
 
 class MySlider;
 class TimeLine;
-class ToolTipItem;
+class QnToolTipItem;
 
 class TimeSlider : public GraphicsWidget
 {
@@ -22,8 +22,8 @@ public:
     explicit TimeSlider(QGraphicsItem *parent = 0);
     ~TimeSlider();
 
-    ToolTipItem *toolTipItem() const;
-    void setToolTipItem(ToolTipItem *toolTip);
+    QnToolTipItem *toolTipItem() const;
+    void setToolTipItem(QnToolTipItem *toolTip);
 
     qreal getMsInPixel() const;
 

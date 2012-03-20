@@ -20,7 +20,7 @@
 
 #include "ui/graphics/items/standard/graphicsframe.h"
 #include "ui/graphics/items/standard/graphicsslider.h"
-#include "ui/graphics/items/tooltipitem.h"
+#include "ui/graphics/items/tool_tip_item.h"
 
 #include <qmath.h>
 #include "utils/common/synctime.h"
@@ -86,8 +86,8 @@ class MySlider : public GraphicsSlider
 public:
     MySlider(TimeSlider *parent);
 
-    ToolTipItem *toolTipItem() const;
-    void setToolTipItem(ToolTipItem *toolTip);
+    QnToolTipItem *toolTipItem() const;
+    void setToolTipItem(QnToolTipItem *toolTip);
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
@@ -115,7 +115,7 @@ private:
     void createEndPixmap();
 private:
     TimeSlider *m_parent;
-    ToolTipItem *m_toolTip;
+    QnToolTipItem *m_toolTip;
     mutable QRectF m_handleRect;
     int m_endSize;
     QPixmap m_pixmap;
@@ -130,7 +130,7 @@ MySlider::MySlider(TimeSlider *parent)
       m_toolTip(0),
       m_endSize(0)
 {
-    setToolTipItem(new StyledToolTipItem);
+    setToolTipItem(new QnStyledToolTipItem);
 }
 
 void MySlider::updateToolTipPos()
@@ -165,12 +165,12 @@ void MySlider::setEndSize(int size)
     m_endSize = size;
 }
 
-ToolTipItem *MySlider::toolTipItem() const
+QnToolTipItem *MySlider::toolTipItem() const
 {
     return m_toolTip;
 }
 
-void MySlider::setToolTipItem(ToolTipItem *toolTip)
+void MySlider::setToolTipItem(QnToolTipItem *toolTip)
 {
     if (m_toolTip == toolTip)
         return;
@@ -1030,12 +1030,12 @@ void TimeSlider::setLiveMode(bool value)
     updateSlider();
 }
 
-ToolTipItem *TimeSlider::toolTipItem() const
+QnToolTipItem *TimeSlider::toolTipItem() const
 {
     return m_slider->toolTipItem();
 }
 
-void TimeSlider::setToolTipItem(ToolTipItem *toolTip)
+void TimeSlider::setToolTipItem(QnToolTipItem *toolTip)
 {
     m_slider->setToolTipItem(toolTip);
 }
