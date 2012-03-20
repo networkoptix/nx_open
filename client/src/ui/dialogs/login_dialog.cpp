@@ -54,37 +54,37 @@ public:
             m_renderer->setChannelScreenSize(QRect(0, hOffset, width, height));
         */
         static double sar = 1.0;
-        int windowHeight = event->size().height();
-        int windowWidth = event->size().width();
-        int textureWidth = 1920;
-        int textureHeight = 1080;
-        int newTextureWidth = static_cast<uint>(textureWidth * sar);
+        double windowHeight = event->size().height();
+        double windowWidth = event->size().width();
+        double textureWidth = 1920;
+        double textureHeight = 1080;
+        double newTextureWidth = static_cast<uint>(textureWidth * sar);
 
-        double windowAspect = (double) windowWidth / windowHeight;
-        double textureAspect = (double) textureWidth / textureHeight;
+        double windowAspect = windowWidth / windowHeight;
+        double textureAspect = textureWidth / textureHeight;
         if (windowAspect > textureAspect)
         {
             // black bars at left and right
             m_videoRect.setTop(0);
             m_videoRect.setHeight(windowHeight);
-            double scale = windowHeight / static_cast<float>(textureHeight);
+            double scale = windowHeight / textureHeight;
             double scaledWidth = newTextureWidth * scale;
-            m_videoRect.setLeft(static_cast<int>(windowWidth - scaledWidth) / 2);
-            m_videoRect.setWidth(static_cast<int>(scaledWidth + 0.5));
+            m_videoRect.setLeft((windowWidth - scaledWidth) / 2);
+            m_videoRect.setWidth(scaledWidth + 0.5);
         }
         else {
             // black bars at the top and bottom
             m_videoRect.setLeft(0);
-            m_videoRect.setWidth(static_cast<int>(windowWidth));
+            m_videoRect.setWidth(windowWidth);
             if (newTextureWidth < windowWidth) {
-                double scale = windowWidth / (float) newTextureWidth;
+                double scale = windowWidth / newTextureWidth;
                 double scaledHeight = textureHeight * scale;
-                m_videoRect.setTop(static_cast<int>((windowHeight - scaledHeight) / 2));
-                m_videoRect.setHeight(static_cast<int>(scaledHeight + 0.5));
+                m_videoRect.setTop((windowHeight - scaledHeight) / 2);
+                m_videoRect.setHeight(scaledHeight + 0.5);
             }
             else {
-                int newTextureHeight = static_cast<int>(windowWidth / textureAspect + 0.5);
-                m_videoRect.setTop(static_cast<int>((windowHeight - newTextureHeight) / 2));
+                double newTextureHeight = windowWidth / textureAspect + 0.5;
+                m_videoRect.setTop((windowHeight - newTextureHeight) / 2);
                 m_videoRect.setHeight(newTextureHeight);
             }
         }
@@ -143,6 +143,7 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
 
     QVBoxLayout* layout = new QVBoxLayout(ui->videoSpacer);
     layout->setSpacing(0);
+    layout->setContentsMargins(0,0,0,0);
 
     QGLFormat glFormat;
     glFormat.setOption(QGL::SampleBuffers); /* Multisampling. */
@@ -151,7 +152,7 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
     layout->addWidget(glWindow);
 
     
-    aviRes = QnAviResourcePtr(new QnAviResource("e:/Users/roman76r/blake/SEXUAL PROFLIGATE Ursala Moore & Frank Gunn.flv"));
+    aviRes = QnAviResourcePtr(new QnAviResource("e:/Users/roman76r/blake/FILMS_TEASERS 2_Open for Business Pt 1_kimberely Kane & Dahlia Grey.wmv"));
     dataProvider = static_cast<QnAbstractArchiveReader*> (aviRes->createDataProvider(QnResource::Role_Default));
     camera = new CLVideoCamera(aviRes, false, dataProvider);
     
