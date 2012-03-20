@@ -370,6 +370,17 @@ bool QnImageButtonWidget::event(QEvent *event) {
     QActionEvent *actionEvent = static_cast<QActionEvent *>(event);
 
     switch (event->type()) {
+        /* We process hover events here because they don't get forwarded to event 
+         * handlers for graphics widgets without decorations. */
+    case QEvent::GraphicsSceneHoverEnter:
+        hoverEnterEvent(static_cast<QGraphicsSceneHoverEvent *>(event));
+        return event->isAccepted();
+    case QEvent::GraphicsSceneHoverMove:
+        hoverMoveEvent(static_cast<QGraphicsSceneHoverEvent *>(event));
+        return event->isAccepted();
+    case QEvent::GraphicsSceneHoverLeave:
+        hoverLeaveEvent(static_cast<QGraphicsSceneHoverEvent *>(event));
+        return event->isAccepted();
     case QEvent::ActionChanged:
         if (actionEvent->action() == m_action)
             setDefaultAction(actionEvent->action()); /** Update button state. */
