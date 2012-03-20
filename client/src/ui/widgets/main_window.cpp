@@ -221,6 +221,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_titleLayout->addWidget(newActionButton(action(Qn::OpenNewTabAction)));
     m_titleLayout->addStretch(0x1000);
     m_titleLayout->addWidget(newActionButton(action(Qn::ConnectToServerAction)));
+    m_titleLayout->addSpacing(6);
     m_titleLayout->addWidget(newActionButton(action(Qn::MinimizeAction)));
     m_titleLayout->addWidget(newActionButton(action(Qn::FullscreenAction)));
     m_titleLayout->addWidget(newActionButton(action(Qn::ExitAction)));
