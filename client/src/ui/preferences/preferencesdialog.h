@@ -26,8 +26,8 @@ public:
         PageGeneral = 0,
         PageConnections = 1,
         PageRecordingSettings = 2,
-        PageYouTubeSettings = 3,
-        PageLicense = 4
+        PageLicense = 3,
+        PageYouTubeSettings = 10,
     };
 
     QnPreferencesDialog(QnWorkbenchContext *context, QWidget *parent = 0);

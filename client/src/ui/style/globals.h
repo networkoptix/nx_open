@@ -30,6 +30,8 @@ public:
         SELECTION_OPACITY_DELTA,
         SELECTION_BORDER_DELTA,
 
+        ERROR_TEXT_COLOR,
+
         /** Size of a single unit of workbench grid coordinates, in scene coordinates.
          * This basically is the width of a single video item in scene coordinates. */
         WORKBENCH_UNIT_SIZE,
@@ -68,6 +70,7 @@ public:
 	QN_DECLARE_GLOBAL_ACCESSOR(QColor,  frameColor,                     FRAME_COLOR);
     QN_DECLARE_GLOBAL_ACCESSOR(QColor,  selectedFrameColor,             SELECTED_FRAME_COLOR);
     QN_DECLARE_GLOBAL_ACCESSOR(int,     opacityChangePeriod,            OPACITY_CHANGE_PERIOD);
+    QN_DECLARE_GLOBAL_ACCESSOR(QColor,  errorTextColor,                 ERROR_TEXT_COLOR);
     QN_DECLARE_GLOBAL_ACCESSOR(qreal,   workbenchUnitSize,              WORKBENCH_UNIT_SIZE);
     QN_DECLARE_GLOBAL_ACCESSOR(qreal,   defaultLayoutCellAspectRatio,   DEFAULT_LAYOUT_CELL_ASPECT_RATIO);
     QN_DECLARE_GLOBAL_ACCESSOR(QSizeF,  defaultLayoutCellSpacing,       DEFAULT_LAYOUT_CELL_SPACING);

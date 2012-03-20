@@ -125,6 +125,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::OpenFileAction),                     SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
     connect(action(Qn::OpenFolderAction),                   SIGNAL(triggered()),    this,   SLOT(at_openFolderAction_triggered()));
     connect(action(Qn::ConnectToServerAction),              SIGNAL(triggered()),    this,   SLOT(at_connectToServerAction_triggered()));
+    connect(action(Qn::GetMoreLicensesAction),              SIGNAL(triggered()),    this,   SLOT(at_getMoreLicensesAction_triggered()));
     connect(action(Qn::ReconnectAction),                    SIGNAL(triggered()),    this,   SLOT(at_reconnectAction_triggered()));
     connect(action(Qn::NextLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_nextLayoutAction_triggered()));
     connect(action(Qn::PreviousLayoutAction),               SIGNAL(triggered()),    this,   SLOT(at_previousLayoutAction_triggered()));
@@ -820,6 +821,13 @@ void QnWorkbenchActionHandler::at_aboutAction_triggered() {
     dialog->exec();
 }
 
+void QnWorkbenchActionHandler::at_getMoreLicensesAction_triggered() {
+    QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), widget()));
+    dialog->setCurrentPage(QnPreferencesDialog::PageLicense);
+    dialog->setWindowModality(Qt::ApplicationModal);
+    dialog->exec();
+}
+
 void QnWorkbenchActionHandler::at_systemSettingsAction_triggered() {
     QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
@@ -871,6 +879,7 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     QnEventManager::instance()->run();
 
     QnResourceDiscoveryManager::instance().start();
+    QnResourceDiscoveryManager::instance().setReady(true);
     QnResource::startCommandProc();
 
     context()->setUserName(connection.url.userName());

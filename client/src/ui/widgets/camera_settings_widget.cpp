@@ -7,11 +7,14 @@
 #include <core/resource/camera_resource.h>
 #include <core/resourcemanagment/resource_criterion.h>
 
+#include <ui/actions/action_manager.h>
+
 #include "multiple_camera_settings_widget.h"
 #include "single_camera_settings_widget.h"
 
 QnCameraSettingsWidget::QnCameraSettingsWidget(QWidget *parent): 
     QWidget(parent),
+    QnWorkbenchContextAware(parent),
     m_emptyTab(Qn::GeneralSettingsTab)
 {
     /* Create per-mode widgets. */
@@ -26,6 +29,9 @@ QnCameraSettingsWidget::QnCameraSettingsWidget(QWidget *parent):
     m_multiWidget = new QnMultipleCameraSettingsWidget(this);
 
     m_singleWidget = new QnSingleCameraSettingsWidget(this);
+
+    connect(m_multiWidget, SIGNAL(moreLicensesRequested()), this, SLOT(at_moreLicensesRequested()));
+    connect(m_singleWidget, SIGNAL(moreLicensesRequested()), this, SLOT(at_moreLicensesRequested()));
 
     /* Stack per-mode widgets. */
     m_stackedWidget = new QStackedWidget(this);
@@ -212,3 +218,6 @@ void QnCameraSettingsWidget::setMode(Mode mode) {
     emit modeChanged();
 }
 
+void QnCameraSettingsWidget::at_moreLicensesRequested() {
+    menu()->trigger(Qn::GetMoreLicensesAction);
+}

@@ -41,6 +41,8 @@ public:
         return m_netState;
     }
 
+    void setReady(bool ready);
+
 protected:
     QnResourceDiscoveryManager();
 
@@ -65,8 +67,8 @@ private:
 
     CLNetState m_netState;
 
+    volatile bool m_ready;
     bool m_server;
-
     bool m_foundSmth; // minor just to minimize lof output
 };
 
