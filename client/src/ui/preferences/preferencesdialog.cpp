@@ -60,7 +60,7 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     ui->maxVideoItemsSpinBox->hide(); // TODO: Cannot edit max number of items on the scene.
 
     ui->backgroundColorPicker->setAutoFillBackground(false);
-    ui->backgroundColorPicker->setStandardColors();
+    initColorPicker();
 
     connectionsSettingsWidget = new ConnectionsSettingsWidget(this);
     ui->tabWidget->insertTab(PageConnections, connectionsSettingsWidget, tr("Connections"));
@@ -80,6 +80,7 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
 
     connect(ui->auxMediaRootsList->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(auxMediaFolderSelectionChanged()));
     connect(ui->animateBackgroundCheckBox, SIGNAL(stateChanged(int)), this, SLOT(at_animateBackgroundCheckBox_stateChanged(int)));
+    connect(ui->backgroundColorPicker, SIGNAL(colorChanged(const QColor &)), this, SLOT(at_backgroundColorPicker_colorChanged(const QColor &)));
 
     QToolButton *aboutButton = new QToolButton();
     aboutButton->setDefaultAction(context ? context->action(Qn::AboutAction) : NULL);
@@ -95,6 +96,29 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
 
 QnPreferencesDialog::~QnPreferencesDialog()
 {
+}
+
+void QnPreferencesDialog::initColorPicker() 
+{
+    QtColorPicker *w = ui->backgroundColorPicker;
+
+    /* No black here. */
+    w->insertColor(Qt::white,         tr("White"));
+    w->insertColor(Qt::red,           tr("Red"));
+    w->insertColor(Qt::darkRed,       tr("Dark red"));
+    w->insertColor(Qt::green,         tr("Green"));
+    w->insertColor(Qt::darkGreen,     tr("Dark green"));
+    w->insertColor(Qt::blue,          tr("Blue"));
+    w->insertColor(Qt::darkBlue,      tr("Dark blue"));
+    w->insertColor(Qt::cyan,          tr("Cyan"));
+    w->insertColor(Qt::darkCyan,      tr("Dark cyan"));
+    w->insertColor(Qt::magenta,       tr("Magenta"));
+    w->insertColor(Qt::darkMagenta,   tr("Dark magenta"));
+    w->insertColor(Qt::yellow,        tr("Yellow"));
+    w->insertColor(Qt::darkYellow,    tr("Dark yellow"));
+    w->insertColor(Qt::gray,          tr("Gray"));
+    w->insertColor(Qt::darkGray,      tr("Dark gray"));
+    w->insertColor(Qt::lightGray,     tr("Light gray"));
 }
 
 void QnPreferencesDialog::accept()
@@ -264,4 +288,10 @@ void QnPreferencesDialog::at_animateBackgroundCheckBox_stateChanged(int state)
     ui->backgroundColorPicker->setEnabled(enabled);
 }
 
-
+void QnPreferencesDialog::at_backgroundColorPicker_colorChanged(const QColor &color) 
+{
+    if(color == Qt::black) {
+        ui->backgroundColorPicker->setCurrentColor(Qt::white);
+        ui->animateBackgroundCheckBox->setChecked(false);
+    }
+}

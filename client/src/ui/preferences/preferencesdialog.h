@@ -38,9 +38,11 @@ public:
 private:
     void updateView();
     void updateStoredConnections();
+    void initColorPicker();
 
 private slots:
     void at_animateBackgroundCheckBox_stateChanged(int state);
+    void at_backgroundColorPicker_colorChanged(const QColor &color);
 
     void updateCameras();
 
