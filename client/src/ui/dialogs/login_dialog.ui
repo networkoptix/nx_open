@@ -312,7 +312,11 @@
   <tabstop>hostnameLineEdit</tabstop>
   <tabstop>portSpinBox</tabstop>
   <tabstop>loginLineEdit</tabstop>
+  <tabstop>passwordLineEdit</tabstop>
+  <tabstop>testButton</tabstop>
   <tabstop>buttonBox</tabstop>
+  <tabstop>connectionsComboBox</tabstop>
+  <tabstop>configureConnectionsButton</tabstop>
  </tabstops>
  <resources/>
  <connections/>
