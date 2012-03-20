@@ -71,7 +71,7 @@ void QnApiSerializer::serialize(const QnResourcePtr& resource, QByteArray& data)
             serializeLayout(resource.dynamicCast<QnLayoutResource>(), data);
         }
     } catch (const std::exception& e) {
-        qWarning() << "QnApiSerializer::serialize(): Exception caught. Message: "  << e.what();
+        qCritical() << "QnApiSerializer::serialize(): Exception caught. Message: "  << e.what();
         Q_ASSERT(0);
     }
 }

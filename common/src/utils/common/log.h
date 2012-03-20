@@ -6,7 +6,7 @@
 
 #include "base.h"
 
-enum QnLogLevel {cl_logALWAYS = 1, cl_logERROR, cl_logWARNING, cl_logINFO, cl_logDEBUG1, cl_logDEBUG2 };
+enum QnLogLevel {cl_logALWAYS, cl_logERROR, cl_logWARNING, cl_logINFO, cl_logDEBUG1, cl_logDEBUG2 };
 
 class QnLogPrivate;
 
