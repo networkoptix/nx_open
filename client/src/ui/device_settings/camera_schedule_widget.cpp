@@ -38,7 +38,9 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     connect(ui->displayQualityCheckBox, SIGNAL(stateChanged(int)),          this,   SLOT(at_displayQualiteCheckBox_stateChanged(int)));
     connect(ui->displayFpsCheckBox,     SIGNAL(stateChanged(int)),          this,   SLOT(at_displayFpsCheckBox_stateChanged(int)));
     connect(ui->enableRecordingCheckBox,SIGNAL(clicked()),                  this,   SLOT(at_enableRecordingCheckBox_clicked()));
-    connect(ui->enableRecordingCheckBox,SIGNAL(stateChanged(int)),          this,   SLOT(at_enableRecordingCheckBox_stateChanged()));
+    connect(ui->enableRecordingCheckBox,SIGNAL(stateChanged(int)),          this,   SLOT(updateGridEnabledState()));
+    connect(ui->enableRecordingCheckBox,SIGNAL(stateChanged(int)),          this,   SIGNAL(scheduleEnabledChanged()));
+    connect(ui->enableRecordingCheckBox,SIGNAL(stateChanged(int)),          this,   SLOT(updateLicensesLabelText()), Qt::QueuedConnection);
 
     connect(ui->gridWidget,             SIGNAL(cellActivated(QPoint)),      this,   SLOT(at_gridWidget_cellActivated(QPoint)));
     
@@ -432,13 +434,6 @@ void QnCameraScheduleWidget::at_enableRecordingCheckBox_clicked()
     ui->enableRecordingCheckBox->setTristate(false);
     if (state == Qt::PartiallyChecked)
         ui->enableRecordingCheckBox->setCheckState(Qt::Checked);
-}
-
-void QnCameraScheduleWidget::at_enableRecordingCheckBox_stateChanged() {
-    updateGridEnabledState();
-    updateLicensesLabelText();
-
-    emit scheduleEnabledChanged();
 }
 
 void QnCameraScheduleWidget::at_displayQualiteCheckBox_stateChanged(int state)
