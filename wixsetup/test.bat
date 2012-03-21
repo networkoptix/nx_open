@@ -1,6 +1,6 @@
 @echo off
 
-call version.py
+call test.py
 call version.bat
 SET VERSION=%APPLICATION_VERSION%.%BUILD_NUMBER%
 SET "CURRENTDIR=%cd%"
