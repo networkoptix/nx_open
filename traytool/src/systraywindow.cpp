@@ -8,7 +8,7 @@
 
 
 static const QString MEDIA_SERVER_NAME ("VMS Media Server");
-static const QString APP_SERVER_NAME("ECS");
+static const QString APP_SERVER_NAME("Enterprise Controller");
 static const int DEFAULT_APP_SERVER_PORT = 8000;
 static const int MESSAGE_DURATION = 3 * 1000;
 
@@ -382,7 +382,7 @@ void QnSystrayWindow::at_mediaServerStopAction()
     SERVICE_STATUS serviceStatus;
     if (m_mediaServerHandle) 
     {
-        if (QMessageBox::question(0, tr("Systray"), "Media server is going to be stopped. Are you sure?", QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+        if (QMessageBox::question(0, tr("Systray"), MEDIA_SERVER_NAME + " is going to be stopped. Are you sure?", QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
         {
             ControlService(m_mediaServerHandle, SERVICE_CONTROL_STOP, &serviceStatus);
             updateServiceInfo();
@@ -476,11 +476,11 @@ void QnSystrayWindow::createActions()
     connectElevatedAction(settingsAction, SIGNAL(triggered()), this, SLOT(onSettingsAction()));
     settingsAction->setVisible(m_mediaServerHandle || m_appServerHandle);
 
-    m_showMediaServerLogAction = new QAction(tr("&Show Media server log"), this);
+    m_showMediaServerLogAction = new QAction(tr("&Show %1 log").arg(MEDIA_SERVER_NAME), this);
     m_actionList.append(NameAndAction("showMediaServerLog", m_showMediaServerLogAction));
     connectElevatedAction(m_showMediaServerLogAction, SIGNAL(triggered()), this, SLOT(onShowMediaServerLogAction()));
 
-    m_showAppLogAction = new QAction(tr("&Show ECS log"), this);
+    m_showAppLogAction = new QAction(tr("&Show %1 log").arg(APP_SERVER_NAME), this);
     m_actionList.append(NameAndAction("showAppServerLog", m_showAppLogAction));
     connectElevatedAction(m_showAppLogAction, SIGNAL(triggered()), this, SLOT(onShowAppServerLogAction()));
 
