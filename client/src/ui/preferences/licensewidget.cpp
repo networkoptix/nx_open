@@ -118,7 +118,6 @@ void LicenseWidget::at_activationTypeComboBox_currentIndexChanged() {
     bool isOnline = this->isOnline();
 
     ui->manualActivationInfoLabel->setVisible(!isOnline);
-    ui->serialKeyEdit->setReadOnly(!isOnline);
     ui->hardwareIdLabel->setVisible(!isOnline);
     ui->hardwareIdEdit->setVisible(!isOnline);
     ui->activationKeyLabel->setVisible(!isOnline);
