@@ -383,7 +383,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
 
     resources = swapList;
 
-    cl_log.log("Discovery---- After update unknown - list of non conflicting resource: ", cl_logINFO);
+    cl_log.log("Discovery---- After requesting additional info from cam... - list of non conflicting resource: ", cl_logINFO);
     printInLogNetResources(resources);
 
 

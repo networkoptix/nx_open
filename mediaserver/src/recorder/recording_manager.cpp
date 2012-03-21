@@ -173,11 +173,6 @@ void QnRecordingManager::updateCamera(QnSecurityCamResourcePtr res)
         {
             QnServerStreamRecorder* recorderHiRes = createRecorder(res, camera, QnResource::Role_LiveVideo);
             QnServerStreamRecorder* recorderLowRes = createRecorder(res, camera, QnResource::Role_SecondaryLiveVideo);
-            //if (recorderHiRes)
-            //    connect(recorderHiRes, SIGNAL(fpsChanged(QnServerStreamRecorder*, float)), this, SLOT(onFpsChanged(QnServerStreamRecorder*, float)));
-            if (recorderLowRes) 
-                connect(camera->getLiveReader(QnResource::Role_SecondaryLiveVideo), SIGNAL(threadPaused()), recorderLowRes, SLOT(closeOnEOF()), Qt::DirectConnection);
-            //connect(res.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(onResourceStatusChanged(QnResource::Status, QnResource::Status)), Qt::QueuedConnection);
 
             m_recordMap.insert(res, Recorders(recorderHiRes, recorderLowRes));
 

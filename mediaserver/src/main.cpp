@@ -566,12 +566,7 @@ public:
 
         foreach(const QnSecurityCamResourcePtr &camera, cameras)
         {
-            qDebug() << "Connecting resource: " << camera->getName();
-            QObject::connect(camera.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)),
-                             m_processor, SLOT(onResourceStatusChanged(QnResource::Status,QnResource::Status)));
-
             qnResPool->addResource(camera);
-
             //QnRecordingManager::instance()->updateCamera(camera);
         }
 
