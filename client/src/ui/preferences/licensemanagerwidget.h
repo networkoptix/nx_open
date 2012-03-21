@@ -4,6 +4,9 @@
 #include <QtGui/QWidget>
 
 #include "licensing/license.h"
+#include "api/AppServerConnection.h"
+
+class QNetworkAccessManager;
 
 namespace Ui {
     class LicenseManagerWidget;
@@ -15,21 +18,29 @@ class LicenseManagerWidget : public QWidget
 
 public:
     explicit LicenseManagerWidget(QWidget *parent = 0);
-    ~LicenseManagerWidget();
+    virtual ~LicenseManagerWidget();
 
 private slots:
-    void licensesChanged();
-    void licenseDetailsButtonClicked();
-    void licensesReceived(int status, const QByteArray& errorString, QnLicenseList licenses, int handle);
-    void gridSelectionChanged();
+    void updateLicenses();
+
+    void at_downloadError();
+    void at_downloadFinished();
+    void at_licensesReceived(int status, const QByteArray& errorString, QnLicenseList licenses, int handle);
+
+    void at_licenseDetailsButton_clicked();
+    void at_gridLicenses_currentChanged();
+    void at_licenseWidget_stateChanged();
+
 
 private:
-    void updateControls();
+    void updateFromServer(const QString &licenseKey, const QString &hardwareId);
+    void validateLicense(const QnLicensePtr &license);
 
 private:
     Q_DISABLE_COPY(LicenseManagerWidget)
 
     QScopedPointer<Ui::LicenseManagerWidget> ui;
+    QNetworkAccessManager *m_httpClient;
     QnLicenseList m_licenses;
 };
 

@@ -19,7 +19,6 @@
 
 #include "connectionssettingswidget.h"
 #include "licensemanagerwidget.h"
-#include "licensewidget.h"
 #include "recordingsettingswidget.h"
 #include "youtube/youtubesettingswidget.h"
 
