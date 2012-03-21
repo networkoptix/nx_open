@@ -4,13 +4,29 @@ import os, sys
 
 sys.path.append('..')
 
-from version import *
 from string import Template
 from fixasfiles import fixasfiles
 
 from common.convert import rmtree
+from common.common_version import *
+from test import *
 
-set_env()
+APPLICATION_NAME = 'HD Witness'
+
+if __name__ == '__main__':
+    ORGANIZATION_NAME, APPLICATION_VERSION, BUILD_NUMBER, REVISION, FFMPEG_VERSION = set_env()
+    f = open('version.bat', 'w')
+    print >> f, 'SET "ORGANIZATION_NAME=%s"' % ORGANIZATION_NAME
+    print >> f, 'SET "APPLICATION_NAME=%s"' % APPLICATION_NAME
+    print >> f, 'SET "APPLICATION_VERSION=%s"' % APPLICATION_VERSION
+    print >> f, 'SET "BUILD_NUMBER=%s"'% BUILD_NUMBER
+    os.putenv('ORGANIZATION_NAME', ORGANIZATION_NAME)
+    os.putenv('APPLICATION_VERSION', APPLICATION_VERSION)
+    os.putenv('BUILD_NUMBER', BUILD_NUMBER)
+    os.putenv('REVISION', REVISION)
+    os.putenv('FFMPEG_VERSION', FFMPEG_VERSION)
+    os.putenv('APPLICATION_NAME', APPLICATION_NAME)
+
 
 if len(sys.argv) == 2 and sys.argv[1].lower() == 'debug':
     CONFIG = 'Debug'

@@ -1,3 +1,0 @@
-ORGANIZATION_NAME    = 'Network Optix'
-APPLICATION_NAME     = 'VMS tray tool'
-APPLICATION_VERSION  = '1.0.0'

@@ -5,7 +5,6 @@ import shutil
 import glob
 import string
 
-from version import *
 from genskin import genskin
 import os, sys, posixpath
 import stat
@@ -20,8 +19,11 @@ sys.path.insert(0, os.path.join('..', 'common'))
 from convert import index_dirs, setup_ffmpeg, gen_filetypes_h, rmtree, instantiate_pro, BUILDLIB
 from convert import qt_path, copy_files, setup_tools, setup_qjson, setup_openssl, platform, gen_env_sh
 from convert import convert as convert_common
+from common_version import *
 
 from filetypes import all_filetypes, video_filetypes, image_filetypes
+
+APPLICATION_NAME = 'Network Optix HD Witness Client'
 
 EXCLUDE_DIRS = ('.svn', 'dxva')
 EXCLUDE_FILES = ('dxva', 'moc_', 'qrc_', 'StdAfx')
@@ -77,26 +79,10 @@ def generate_info_plist():
     strings_template = Template(xin)
     print >> xout, strings_template.substitute(associations=associations.getvalue(), version=APPLICATION_VERSION)
 
-def get_library_path():
-    if platform() == 'mac':
-        return os.getenv('DYLD_LIBRARY_PATH')
-    
-    return None
-
-def set_library_path(value):
-    if platform() == 'mac':
-        os.putenv('DYLD_LIBRARY_PATH', value)
-
 def gen_version_h():
-    revision = os.popen('hg id -i').read().strip()
-
-    library_path = get_library_path()
-    set_library_path(os.path.join(ffmpeg_path_release, 'lib'))
-    ffmpeg_output = os.popen(ffmpeg_path_release + '/bin/ffmpeg -version').read()
-    if library_path:
-        set_library_path(library_path)
-    
-    ffmpeg_version = re.search(r'(N-[^\s]*)', ffmpeg_output).groups()[0]
+    ORGANIZATION_NAME, APPLICATION_VERSION, BUILD_NUMBER, REVISION, FFMPEG_VERSION = set_env()
+    print >> sys.stderr, 'Revision is %s' % REVISION
+    print >> sys.stderr, 'FFMPEG version is %s' % FFMPEG_VERSION
 
     version_h = open('src/version.h', 'w')
     print >> version_h, '#ifndef UNIVERSAL_CLIENT_VERSION_H_'
@@ -104,28 +90,28 @@ def gen_version_h():
     print >> version_h, '// This file is generated. Go to version.py'
     print >> version_h, 'const char* const ORGANIZATION_NAME="%s";' % ORGANIZATION_NAME
     print >> version_h, 'const char* const APPLICATION_NAME="%s";' % APPLICATION_NAME
-    print >> version_h, 'const char* const APPLICATION_VERSION="%s";' % APPLICATION_VERSION
-    print >> version_h, 'const char* const APPLICATION_REVISION="%s";' % revision
-    print >> version_h, 'const char* const FFMPEG_VERSION="%s";' % ffmpeg_version
+    print >> version_h, 'const char* const APPLICATION_VERSION="%s.%s";' % (APPLICATION_VERSION, BUILD_NUMBER)
+    print >> version_h, 'const char* const APPLICATION_REVISION="%s";' % REVISION
+    print >> version_h, 'const char* const FFMPEG_VERSION="%s";' % FFMPEG_VERSION
     print >> version_h, ''
 
     print >> version_h, '// There constans are here for windows resouce file.'
 
     app_version_commas = APPLICATION_VERSION.replace('.', ',')
-    print >> version_h, '#define VER_FILEVERSION             %s,0' % app_version_commas
-    print >> version_h, '#define VER_FILEVERSION_STR         "%s.0"' % APPLICATION_VERSION
+    print >> version_h, '#define VER_FILEVERSION             %s,%s' % (app_version_commas, BUILD_NUMBER)
+    print >> version_h, '#define VER_FILEVERSION_STR         "%s.%s"' % (APPLICATION_VERSION, BUILD_NUMBER)
 
-    print >> version_h, '#define VER_PRODUCTVERSION          %s' % app_version_commas
-    print >> version_h, '#define VER_PRODUCTVERSION_STR      "%s"' % APPLICATION_VERSION
+    print >> version_h, '#define VER_PRODUCTVERSION          %s.%s' % (app_version_commas, BUILD_NUMBER)
+    print >> version_h, '#define VER_PRODUCTVERSION_STR      "%s.%s"' % (APPLICATION_VERSION, BUILD_NUMBER)
 
     print >> version_h, '#define VER_COMPANYNAME_STR         "%s"' % ORGANIZATION_NAME
     print >> version_h, '#define VER_FILEDESCRIPTION_STR     "%s"' % APPLICATION_NAME
     print >> version_h, '#define VER_INTERNALNAME_STR        "%s"' % APPLICATION_NAME
-    print >> version_h, '#define VER_LEGALCOPYRIGHT_STR      "Copyright © 2011 %s"' % ORGANIZATION_NAME
+    print >> version_h, '#define VER_LEGALCOPYRIGHT_STR      "Copyright © 2012 %s"' % ORGANIZATION_NAME
     print >> version_h, '#define VER_LEGALTRADEMARKS1_STR    "All Rights Reserved"'
     print >> version_h, '#define VER_LEGALTRADEMARKS2_STR    VER_LEGALTRADEMARKS1_STR'
-    print >> version_h, '#define VER_ORIGINALFILENAME_STR    "EvePlayer-Beta.exe"'
-    print >> version_h, '#define VER_PRODUCTNAME_STR         "EvePlayer"'
+    print >> version_h, '#define VER_ORIGINALFILENAME_STR    "client.exe"'
+    print >> version_h, '#define VER_PRODUCTNAME_STR         "HD Witness"'
 
     print >> version_h, '#define VER_COMPANYDOMAIN_STR       "networkoptix.com"'
     print >> version_h, '#endif // UNIVERSAL_CLIENT_VERSION_H_'

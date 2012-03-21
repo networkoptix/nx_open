@@ -1,3 +1,0 @@
-ORGANIZATION_NAME    = 'Network Optix'
-APPLICATION_NAME     = 'VMS Media Server'
-APPLICATION_VERSION  = '1.2.6'

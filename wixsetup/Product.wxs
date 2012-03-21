@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
      xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
-    <Product Id="*" Name="$(env.APPLICATION_NAME)" Language="1033" Version="$(env.APPLICATION_VERSION)" Manufacturer="$(env.ORGANIZATION_NAME)" UpgradeCode="CE572797-45BF-4f1c-A783-369EA79C597E">
+    <Product Id="*" Name="$(env.APPLICATION_NAME)" Language="1033" Version="$(env.APPLICATION_VERSION).$(env.BUILD_NUMBER)" Manufacturer="$(env.ORGANIZATION_NAME)" UpgradeCode="CE572797-45BF-4f1c-A783-369EA79C597E">
         <Package Id="*" InstallerVersion="300" Compressed="yes" Keywords="Installer" Comments="$(env.ORGANIZATION_NAME) $(env.APPLICATION_NAME)(beta) Installer" Manufacturer="$(env.ORGANIZATION_NAME)" InstallPrivileges="elevated" InstallScope="perMachine"/>
         
         <!-- Wix Variables -->
@@ -149,7 +149,7 @@
         
         <Upgrade Id="CE572797-45BF-4f1c-A783-369EA79C597E">
             <UpgradeVersion
-                Minimum="0.1.0" Maximum="$(env.APPLICATION_VERSION)"
+                Minimum="$(env.APPLICATION_VERSION)" Maximum="$(env.APPLICATION_VERSION).$(env.BUILD_NUMBER)"
                 Property="PREVIOUSVERSIONSINSTALLED"
                 IncludeMinimum="yes" IncludeMaximum="yes" />
             <UpgradeVersion OnlyDetect='no' Property='NEWERFOUND' Minimum='$(env.APPLICATION_VERSION)' IncludeMinimum='no' />
