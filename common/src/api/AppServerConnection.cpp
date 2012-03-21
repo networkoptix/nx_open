@@ -11,23 +11,23 @@ void conn_detail::ReplyProcessor::finished(int status, const QByteArray &result,
 {
     QByteArray errorString = errorStringIn;
 
-	if (status != 0)
-	{
-		errorString += "\n" + result;
-		QnResourceList resources;
-		emit finished(status, errorString, resources, handle);
-		return;
-	}
+    if (status != 0)
+    {
+        errorString += "\n" + result;
+        QnResourceList resources;
+        emit finished(status, errorString, resources, handle);
+        return;
+    }
 
-	if (m_objectName == "server")
+    if (m_objectName == "server")
     {
         QnVideoServerResourceList servers;
 
-		try {
-			m_serializer.deserializeServers(servers, result);
-		} catch (const QnSerializeException& e) {
-			errorString += e.errorString();
-		}
+        try {
+            m_serializer.deserializeServers(servers, result);
+        } catch (const QnSerializeException& e) {
+            errorString += e.errorString();
+        }
 
         QnResourceList resources;
         qCopy(servers.begin(), servers.end(), std::back_inserter(resources));
@@ -36,11 +36,11 @@ void conn_detail::ReplyProcessor::finished(int status, const QByteArray &result,
     {
         QnVirtualCameraResourceList cameras;
 
-		try {
-			m_serializer.deserializeCameras(cameras, result, m_resourceFactory);
-		} catch (const QnSerializeException& e) {
-			errorString += e.errorString();
-		}
+        try {
+            m_serializer.deserializeCameras(cameras, result, m_resourceFactory);
+        } catch (const QnSerializeException& e) {
+            errorString += e.errorString();
+        }
 
         QnResourceList resources;
         qCopy(cameras.begin(), cameras.end(), std::back_inserter(resources));
@@ -49,11 +49,11 @@ void conn_detail::ReplyProcessor::finished(int status, const QByteArray &result,
     {
         QnUserResourceList users;
 
-		try {
-			m_serializer.deserializeUsers(users, result);
-		} catch (const QnSerializeException& e) {
-			errorString += e.errorString();
-		}
+        try {
+            m_serializer.deserializeUsers(users, result);
+        } catch (const QnSerializeException& e) {
+            errorString += e.errorString();
+        }
 
         QnResourceList resources;
         qCopy(users.begin(), users.end(), std::back_inserter(resources));
@@ -62,11 +62,11 @@ void conn_detail::ReplyProcessor::finished(int status, const QByteArray &result,
     {
         QnLayoutResourceList layouts;
 
-		try {
-			m_serializer.deserializeLayouts(layouts, result);
-		} catch (const QnSerializeException& e) {
-			errorString += e.errorString();
-		}
+        try {
+            m_serializer.deserializeLayouts(layouts, result);
+        } catch (const QnSerializeException& e) {
+            errorString += e.errorString();
+        }
 
         QnResourceList resources;
         qCopy(layouts.begin(), layouts.end(), std::back_inserter(resources));
@@ -456,7 +456,7 @@ void QnAppServerConnectionFactory::setDefaultFactory(QnResourceFactory* resource
 
 QnAppServerConnectionPtr QnAppServerConnectionFactory::createConnection(const QUrl& url)
 {
-    cl_log.log(QLatin1String("Creating connection to the application server ") + url.toString(), cl_logDEBUG2);
+    cl_log.log(QLatin1String("Creating connection to the Enterprise Controller ") + url.toString(), cl_logDEBUG2);
 
     return QnAppServerConnectionPtr(new QnAppServerConnection(url,
                                                               *(theAppServerConnectionFactory()->m_resourceFactory),
@@ -478,7 +478,7 @@ bool initResourceTypes(QnAppServerConnectionPtr appServerConnection)
     QByteArray errorString;
     if (appServerConnection->getResourceTypes(resourceTypeList, errorString) != 0)
     {
-        qDebug() << "Can't get resource types: " << errorString;
+        qWarning() << "Can't get resource types: " << errorString;
         return false;
     }
 
@@ -575,7 +575,7 @@ qint64 QnAppServerConnection::getCurrentTime()
 
     int rez = SessionManager::instance()->sendGetRequest(m_url, "time", data, errorString);
     if (rez != 0) {
-        qWarning() << "Can't read time from Application server" << errorString;
+        qWarning() << "Can't read time from Enterprise Controller" << errorString;
         return QDateTime::currentMSecsSinceEpoch();
     }
 
@@ -593,11 +593,11 @@ int QnAppServerConnection::setResourceStatusAsync(const QnId &resourceId, QnReso
 
 int QnAppServerConnection::setResourceDisabledAsync(const QnId &resourceId, bool disabled, QObject *target, const char *slot)
 {
-	QnRequestParamList requestParams;
-	requestParams.append(QnRequestParam("id", resourceId.toString()));
-	requestParams.append(QnRequestParam("disabled", QString::number((int)disabled)));
+    QnRequestParamList requestParams;
+    requestParams.append(QnRequestParam("id", resourceId.toString()));
+    requestParams.append(QnRequestParam("disabled", QString::number((int)disabled)));
 
-	return SessionManager::instance()->sendAsyncPostRequest(m_url, "disabled", requestParams, "", target, slot);
+    return SessionManager::instance()->sendAsyncPostRequest(m_url, "disabled", requestParams, "", target, slot);
 }
 
 int QnAppServerConnection::setResourcesStatusAsync(const QnResourceList &resources, QObject *target, const char *slot)
@@ -613,22 +613,22 @@ int QnAppServerConnection::setResourcesStatusAsync(const QnResourceList &resourc
         n++;
     }
 
-	return SessionManager::instance()->sendAsyncPostRequest(m_url, "status", requestParams, "", target, slot);
+    return SessionManager::instance()->sendAsyncPostRequest(m_url, "status", requestParams, "", target, slot);
 }
 
 int QnAppServerConnection::setResourcesDisabledAsync(const QnResourceList &resources, QObject *target, const char *slot)
 {
-	QnRequestParamList requestParams;
+    QnRequestParamList requestParams;
 
-	int n = 1;
-	foreach (const QnResourcePtr resource, resources)
-	{
-		requestParams.append(QnRequestParam(QString("id%1").arg(n), resource->getId().toString()));
-		requestParams.append(QnRequestParam(QString("disabled%1").arg(n), QString::number((int)resource->isDisabled())));
+    int n = 1;
+    foreach (const QnResourcePtr resource, resources)
+    {
+        requestParams.append(QnRequestParam(QString("id%1").arg(n), resource->getId().toString()));
+        requestParams.append(QnRequestParam(QString("disabled%1").arg(n), QString::number((int)resource->isDisabled())));
 
-		n++;
-	}
+        n++;
+    }
 
-	return SessionManager::instance()->sendAsyncPostRequest(m_url, "disabled", requestParams, "", target, slot);
+    return SessionManager::instance()->sendAsyncPostRequest(m_url, "disabled", requestParams, "", target, slot);
 }
 

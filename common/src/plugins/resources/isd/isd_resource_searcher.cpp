@@ -28,15 +28,14 @@ QnResourcePtr QnPlISDResourceSearcher::createResource(QnId resourceTypeId, const
 
     if (resourceType->getManufacture() != manufacture())
     {
-        qDebug() << "Manufature " << resourceType->getManufacture() << " != " << manufacture();
-
+        //qDebug() << "Manufature " << resourceType->getManufacture() << " != " << manufacture();
         return result;
     }
 
     result = QnVirtualCameraResourcePtr( new QnPlIsdResource() );
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "RTID" << resourceTypeId.toString() << ", Parameters: " << parameters;
+    qDebug() << "Create ISD camera resource. typeID:" << resourceTypeId.toString() << ", Parameters: " << parameters;
     result->deserialize(parameters);
 
     return result;

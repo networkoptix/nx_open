@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>957</width>
-    <height>500</height>
+    <height>528</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,17 +15,48 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_5">
    <item>
-    <widget class="QCheckBox" name="chkBoxEnableSchedule">
-     <property name="text">
-      <string>Enable recording</string>
-     </property>
-     <property name="tristate">
-      <bool>true</bool>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QCheckBox" name="enableRecordingCheckBox">
+       <property name="text">
+        <string>Enable recording</string>
+       </property>
+       <property name="tristate">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="licensesLabel">
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="licensesButton">
+       <property name="text">
+        <string>Get More Licenses...</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
-    <widget class="QGroupBox" name="ScheduleGridGroupBox">
+    <widget class="QGroupBox" name="scheduleGridGroupBox">
      <property name="title">
       <string>Schedule grid</string>
      </property>
@@ -42,7 +73,7 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="QCheckBox" name="chkBoxDisplayQuality">
+         <widget class="QCheckBox" name="displayQualityCheckBox">
           <property name="text">
            <string>Display quality on grid</string>
           </property>
@@ -68,7 +99,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="QCheckBox" name="chkBoxDisplayFPS">
+         <widget class="QCheckBox" name="displayFpsCheckBox">
           <property name="text">
            <string>Display fps on grid</string>
           </property>
@@ -111,7 +142,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QGroupBox" name="groupBoxSettings">
+      <widget class="QGroupBox" name="settingsGroupBox">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -129,28 +160,15 @@
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_4">
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_2">
-          <item>
-           <spacer name="horizontalSpacer">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
+         <layout class="QFormLayout" name="formLayout">
+          <item row="0" column="0">
            <widget class="QLabel" name="label">
             <property name="text">
              <string>fps</string>
             </property>
            </widget>
           </item>
-          <item>
+          <item row="0" column="1">
            <widget class="QDoubleSpinBox" name="fpsSpinBox">
             <property name="decimals">
              <number>0</number>
@@ -166,32 +184,15 @@
             </property>
            </widget>
           </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_3">
-          <item>
-           <spacer name="horizontalSpacer_2">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
+          <item row="1" column="0">
            <widget class="QLabel" name="label_2">
             <property name="text">
              <string>quality</string>
             </property>
            </widget>
           </item>
-          <item>
-           <widget class="QComboBox" name="comboBoxQuality">
+          <item row="1" column="1">
+           <widget class="QComboBox" name="qualityComboBox">
             <property name="currentIndex">
              <number>1</number>
             </property>
@@ -224,7 +225,7 @@
           <item>
            <layout class="QVBoxLayout" name="verticalLayout">
             <item>
-             <widget class="QnCheckedButton" name="btnRecordAlways">
+             <widget class="QnCheckedButton" name="recordAlwaysButton">
               <property name="minimumSize">
                <size>
                 <width>48</width>
@@ -290,7 +291,7 @@
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_2">
             <item>
-             <widget class="QnCheckedButton" name="btnRecordMotion">
+             <widget class="QnCheckedButton" name="recordMotionButton">
               <property name="minimumSize">
                <size>
                 <width>48</width>
@@ -341,7 +342,7 @@
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_3">
             <item>
-             <widget class="QnCheckedButton" name="btnNoRecord">
+             <widget class="QnCheckedButton" name="noRecordButton">
               <property name="minimumSize">
                <size>
                 <width>48</width>
@@ -395,14 +396,14 @@
       </widget>
      </item>
      <item>
-      <widget class="QGroupBox" name="groupBoxMotion">
+      <widget class="QGroupBox" name="motionGroupBox">
        <property name="title">
         <string>Motion recording</string>
        </property>
        <property name="flat">
         <bool>false</bool>
        </property>
-       <layout class="QGridLayout" name="gridLayout_2">
+       <layout class="QVBoxLayout" name="verticalLayout_6">
         <property name="leftMargin">
          <number>9</number>
         </property>
@@ -412,54 +413,55 @@
         <property name="rightMargin">
          <number>9</number>
         </property>
-        <item row="0" column="0">
-         <widget class="QLabel" name="label_9">
-          <property name="text">
-           <string>Record before motion</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_10">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Record after motion</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <layout class="QVBoxLayout" name="verticalLayout_8"/>
-        </item>
-        <item row="0" column="1">
-         <widget class="QSpinBox" name="spinBoxRecordBefore">
-          <property name="suffix">
-           <string> s</string>
-          </property>
-          <property name="maximum">
-           <number>45</number>
-          </property>
-          <property name="value">
-           <number>10</number>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QSpinBox" name="spinBoxRecordAfter">
-          <property name="suffix">
-           <string> s</string>
-          </property>
-          <property name="maximum">
-           <number>45</number>
-          </property>
-          <property name="value">
-           <number>10</number>
-          </property>
-         </widget>
+        <item>
+         <layout class="QFormLayout" name="formLayout_2">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_9">
+            <property name="text">
+             <string>Record before motion</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QSpinBox" name="recordBeforeSpinBox">
+            <property name="suffix">
+             <string> s</string>
+            </property>
+            <property name="maximum">
+             <number>45</number>
+            </property>
+            <property name="value">
+             <number>10</number>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_10">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Record after motion</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QSpinBox" name="recordAfterSpinBox">
+            <property name="suffix">
+             <string> s</string>
+            </property>
+            <property name="maximum">
+             <number>45</number>
+            </property>
+            <property name="value">
+             <number>10</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </widget>
@@ -478,22 +480,6 @@
       </spacer>
      </item>
     </layout>
-   </item>
-   <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Preferred</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
    </item>
   </layout>
  </widget>

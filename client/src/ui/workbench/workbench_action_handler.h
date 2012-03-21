@@ -156,6 +156,7 @@ protected slots:
     void at_openFolderAction_triggered();
     void at_aboutAction_triggered();
     void at_systemSettingsAction_triggered();
+    void at_getMoreLicensesAction_triggered();
     void at_connectToServerAction_triggered();
     void at_reconnectAction_triggered();
     void at_userSettingsAction_triggered();

@@ -3,6 +3,7 @@
 
 #include <QSharedPointer>
 #include <QList>
+#include <QTextStream>
 
 #include "core/resource/media_resource.h"
 #include "utils/common/qnid.h"
@@ -116,6 +117,47 @@ inline uint qHash(const QnScheduleTask::Data &key)
 {
     return qHash(key.m_dayOfWeek ^ key.m_startTime ^ key.m_endTime);
 }
+
+inline QTextStream& operator<<(QTextStream& stream, const QnScheduleTask& data)
+{
+    QString recTypeStr;
+    if (data.getRecordingType() == QnScheduleTask::RecordingType_Run)
+        recTypeStr = "Always";
+    if (data.getRecordingType() == QnScheduleTask::RecordingType_MotionOnly)
+        recTypeStr = "Motion";
+    if (data.getRecordingType() == QnScheduleTask::RecordingType_Never)
+        recTypeStr = "Never";
+
+    QString qualityStr;
+    switch (data.getStreamQuality())
+    {
+    case QnQualityLowest:
+        qualityStr = "lowest";
+        break;
+    case QnQualityLow:
+        qualityStr = "low";
+        break;
+    case QnQualityNormal:
+        qualityStr = "normal";
+        break;
+    case QnQualityHigh:
+        qualityStr = "high";
+        break;
+    case QnQualityHighest:
+        qualityStr = "highest";
+        break;
+    case QnQualityPreSeted:
+        qualityStr = "presetted";
+        break;
+    }
+
+    stream << "type=" << recTypeStr << " fps=" << data.getFps() << " quality=" << qualityStr;
+    if (data.getRecordingType() == QnScheduleTask::RecordingType_MotionOnly)
+        stream << " pre-motion=" << data.getBeforeThreshold() << "post-motion=" << data.getAfterThreshold();
+    return stream;
+}
+
+
 
 typedef QList<QnScheduleTask> QnScheduleTaskList;
 

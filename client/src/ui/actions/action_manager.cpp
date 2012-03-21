@@ -295,6 +295,9 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Selection Changed"));
 
+    factory(Qn::GetMoreLicensesAction).
+        flags(Qn::NoTarget).
+        text(tr("Get More Licenses..."));
 
 
     /* Context menu actions. */

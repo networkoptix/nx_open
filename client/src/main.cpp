@@ -261,6 +261,7 @@ int main(int argc, char *argv[])
     commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::String, "--auth", NULL, NULL));
     commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::Integer, "--screen", NULL, NULL));
     commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::String, "--delayed-drop", NULL, NULL));
+    commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::String, "--log-level", NULL, NULL));
     commandLinePreParser.parse(argc, argv);
 
     //===============
@@ -325,19 +326,11 @@ int main(int argc, char *argv[])
     if (!cl_log.create(dataLocation + QLatin1String("/log/log_file"), 1024*1024*10, 5, cl_logDEBUG1))
         return 0;
 
-#ifdef _DEBUG
-    cl_log.setLogLevel(cl_logDEBUG1);
-    //cl_log.setLogLevel(cl_logWARNING);
-#else
-    cl_log.setLogLevel(cl_logWARNING);
-#endif
 
-    CL_LOG(cl_logALWAYS)
-    {
-        cl_log.log(QLatin1String("\n\n========================================"), cl_logALWAYS);
-        cl_log.log(cl_logALWAYS, "Software version %s", APPLICATION_VERSION);
-        cl_log.log(QFile::decodeName(argv[0]), cl_logALWAYS);
-    }
+    QnLog::initLog(commandLinePreParser.value("--log-level").toString());
+    cl_log.log(APPLICATION_NAME, " started", cl_logALWAYS);
+    cl_log.log("Software version: ", APPLICATION_VERSION, cl_logALWAYS);
+    cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
 
     defaultMsgHandler = qInstallMsgHandler(myMsgHandler);
 

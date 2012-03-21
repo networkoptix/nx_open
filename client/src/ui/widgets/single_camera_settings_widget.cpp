@@ -29,9 +29,8 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->passwordEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dataChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleTasksChanged()),         this,   SLOT(at_cameraScheduleWidget_scheduleTasksChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleEnabledChanged()),       this,   SLOT(at_dataChanged()));
-
-    connect(ui->webPageLabel, SIGNAL(linkActivated(const QString&)), this, SLOT(at_linkActivated(const QString&)));
-
+    connect(ui->cameraScheduleWidget,   SIGNAL(moreLicensesRequested()),        this,   SIGNAL(moreLicensesRequested()));
+    connect(ui->webPageLabel,           SIGNAL(linkActivated(const QString &)), this,   SLOT(at_linkActivated(const QString &)));
 
     updateFromResource();
 }
@@ -40,13 +39,15 @@ QnSingleCameraSettingsWidget::~QnSingleCameraSettingsWidget() {
     return;
 }
 
-void QnSingleCameraSettingsWidget::at_linkActivated(const QString& urlStr)
+void QnSingleCameraSettingsWidget::at_linkActivated(const QString &urlString)
 {
-    QUrl url(urlStr);
-    if (!ui->passwordEdit->isReadOnly()) {
+    QUrl url(urlString);
+
+    if (!m_readOnly) {
         url.setUserName(ui->loginEdit->text());
         url.setPassword(ui->passwordEdit->text());
     }
+
     QDesktopServices::openUrl(url);
 }
 
@@ -108,11 +109,11 @@ void QnSingleCameraSettingsWidget::setCurrentTab(Qn::CameraSettingsTab tab) {
 }
 
 bool QnSingleCameraSettingsWidget::isCameraActive() const {
-    return ui->cameraScheduleWidget->getScheduleEnabled() != Qt::Unchecked;
+    return ui->cameraScheduleWidget->activeCameraCount() != 0;
 }
 
 void QnSingleCameraSettingsWidget::setCameraActive(bool active) {
-    ui->cameraScheduleWidget->setScheduleEnabled(active ? Qt::Checked : Qt::Unchecked);
+    ui->cameraScheduleWidget->setScheduleEnabled(active);
 }
 
 void QnSingleCameraSettingsWidget::submitToResource() {
@@ -123,7 +124,7 @@ void QnSingleCameraSettingsWidget::submitToResource() {
     m_camera->setUrl(ui->ipAddressEdit->text());
     m_camera->setAuth(ui->loginEdit->text(), ui->passwordEdit->text());
 
-    m_camera->setScheduleDisabled(ui->cameraScheduleWidget->getScheduleEnabled() == Qt::Unchecked);
+    m_camera->setScheduleDisabled(ui->cameraScheduleWidget->activeCameraCount() == 0);
 
     if (m_hasScheduleChanges) {
         QnScheduleTaskList scheduleTasks;
@@ -148,10 +149,12 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         ui->passwordEdit->setText(QString());
 
         ui->cameraScheduleWidget->setScheduleTasks(QnScheduleTaskList());
-        ui->cameraScheduleWidget->setScheduleEnabled(Qt::Unchecked);
+        ui->cameraScheduleWidget->setScheduleEnabled(false);
         
         /* Do not block editing by default if schedule task list is empty. */
         ui->cameraScheduleWidget->setChangesDisabled(false);
+
+        ui->cameraScheduleWidget->setCameras(QnVirtualCameraResourceList());
     } else {
         QString webPageAddress = QString(QLatin1String("http://%1")).arg(m_camera->getHostAddress().toString());
 
@@ -169,7 +172,11 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
             scheduleTasks.append(scheduleTaskData.getData());
         ui->cameraScheduleWidget->setScheduleTasks(scheduleTasks);
 
-        ui->cameraScheduleWidget->setScheduleEnabled(m_camera->isScheduleDisabled() ? Qt::Unchecked : Qt::Checked);
+        ui->cameraScheduleWidget->setScheduleEnabled(!m_camera->isScheduleDisabled());
+
+        QnVirtualCameraResourceList cameras;
+        cameras.push_back(m_camera);
+        ui->cameraScheduleWidget->setCameras(cameras);
     }
 
     setHasChanges(false);

@@ -17,31 +17,6 @@ QnPlArecontResourceSearcher::QnPlArecontResourceSearcher()
 {
     // everything related to Arecont must be initialized here
     AVJpeg::Header::Initialize("ArecontVision", "CamLabs", "ArecontVision");
-
-    QString error;
-    //if (QnResource::loadDevicesParam(QCoreApplication::applicationDirPath() + "/arecontvision/devices.xml"))
-    if (0) //todo
-    {
-        CL_LOG(cl_logINFO)
-        {
-            QString msg;
-            QTextStream str(&msg) ;
-            QStringList lst;// = QnResource::supportedSuchResourceTypeId(manufacture());
-            str << "Ssupported devices loaded; size = " << lst.size() << ": " << endl << lst.join("\n");
-            cl_log.log(msg, cl_logINFO);
-        }
-    }
-    else
-    {
-        CL_LOG(cl_logERROR)
-        {
-            QString log  = "Cannot load devices list. Error:";
-            log+=error;
-            cl_log.log(log, cl_logERROR);
-        }
-
-    }
-
 }
 
 
@@ -210,15 +185,14 @@ QnResourcePtr QnPlArecontResourceSearcher::createResource(QnId resourceTypeId, c
 
     if (resourceType->getManufacture() != manufacture())
     {
-        qDebug() << "Manufature " << resourceType->getManufacture() << " != " << manufacture();
-
+        //qDebug() << "Manufature " << resourceType->getManufacture() << " != " << manufacture();
         return result;
     }
 
     result = QnVirtualCameraResourcePtr(QnPlAreconVisionResource::createResourceByTypeId(resourceTypeId));
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "RTID" << resourceTypeId.toString() << ", Parameters: " << parameters;
+    qDebug() << "Create arecontVision camera resource. typeID:" << resourceTypeId.toString() << ", Parameters: " << parameters;
     result->deserialize(parameters);
 
     return result;

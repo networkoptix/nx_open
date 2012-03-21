@@ -27,15 +27,14 @@ QnResourcePtr QnPlAxisResourceSearcher::createResource(QnId resourceTypeId, cons
 
     if (resourceType->getManufacture() != manufacture())
     {
-        qDebug() << "Manufature " << resourceType->getManufacture() << " != " << manufacture();
-
+        //qDebug() << "Manufature " << resourceType->getManufacture() << " != " << manufacture();
         return result;
     }
 
     result = QnVirtualCameraResourcePtr( new QnPlAxisResource() );
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "RTID" << resourceTypeId.toString() << ", Parameters: " << parameters;
+    qDebug() << "Create Axis camera resource. TypeID" << resourceTypeId.toString() << ", Parameters: " << parameters;
     result->deserialize(parameters);
 
     return result;

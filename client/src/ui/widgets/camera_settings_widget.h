@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <core/resource/resource_fwd.h>
+#include <ui/workbench/workbench_context_aware.h>
 #include "camera_settings_tab.h"
 
 class QStackedWidget;
@@ -10,7 +11,7 @@ class QStackedWidget;
 class QnSingleCameraSettingsWidget;
 class QnMultipleCameraSettingsWidget;
 
-class QnCameraSettingsWidget: public QWidget {
+class QnCameraSettingsWidget: public QWidget, public QnWorkbenchContextAware {
     Q_OBJECT;
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly);
 
@@ -48,6 +49,10 @@ public:
 signals:
     void hasChangesChanged();
     void modeChanged();
+    void moreLicensesRequested();
+
+protected slots:
+    void at_moreLicensesRequested();
 
 private:
     void setMode(Mode mode);

@@ -6,7 +6,7 @@
 
 #include "base.h"
 
-enum QnLogLevel {cl_logALWAYS = 1, cl_logERROR, cl_logWARNING, cl_logINFO, cl_logDEBUG1, cl_logDEBUG2 };
+enum QnLogLevel {cl_logUNKNOWN, cl_logALWAYS, cl_logERROR, cl_logWARNING, cl_logINFO, cl_logDEBUG1, cl_logDEBUG2 };
 
 class QnLogPrivate;
 
@@ -27,7 +27,10 @@ public:
     void log(const QString& msg1, int val, const QString& msg2, int val2, QnLogLevel loglevel);
     void log(QnLogLevel loglevel, const char* format, ...);
 
+    static void initLog(const QString& logLevelStr);
     static QnLog instance();
+    static QnLogLevel logLevelFromString(const QString& value);
+    static QString logLevelToString(QnLogLevel value);
 
 protected:
     QnLog(QnLogPrivate *d);

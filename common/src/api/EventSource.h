@@ -13,6 +13,7 @@
 
 #include "utils/common/qnid.h"
 
+static const char* QN_EVENT_EMPTY             = "EE";
 static const char* QN_EVENT_RES_CHANGE        = "RC";
 static const char* QN_EVENT_RES_STATUS_CHANGE = "RSC";
 static const char* QN_EVENT_RES_DISABLED_CHANGE = "RDC";

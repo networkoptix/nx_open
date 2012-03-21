@@ -10,13 +10,9 @@
 #include <utils/common/warnings.h>
 
 #include <ui/common/read_only.h>
+#include <ui/style/globals.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
-
-namespace {
-    QColor redText = QColor(255, 64, 64);
-
-} // anonymous namespace
 
 QnUserSettingsDialog::QnUserSettingsDialog(QnWorkbenchContext *context, QWidget *parent): 
     QDialog(parent),
@@ -55,7 +51,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QnWorkbenchContext *context, QWidget 
 
     {
         QPalette palette = ui->hintLabel->palette();
-        palette.setColor(QPalette::WindowText, redText);
+        palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
         ui->hintLabel->setPalette(palette);
     }
 
@@ -215,7 +211,7 @@ void QnUserSettingsDialog::setValid(Element element, bool valid) {
 
     QPalette palette = this->palette();
     if(!valid)
-        palette.setColor(QPalette::WindowText, redText);
+        palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
 
     switch(element) {
     case Login:

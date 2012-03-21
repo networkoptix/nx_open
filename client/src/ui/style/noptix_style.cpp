@@ -146,6 +146,12 @@ void QnNoptixStyle::polish(QWidget *widget) {
         QFont font = itemView->font();
         font.setPointSize(10);
         itemView->setFont(font);
+    } else if(QTabBar *tabBar = qobject_cast<QTabBar *>(widget)) {
+        if(tabBar->inherits("QnLayoutTabBar")) {
+            QFont font = tabBar->font();
+            font.setPointSize(10);
+            tabBar->setFont(font);
+        }
     }
 }
 

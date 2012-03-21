@@ -148,6 +148,12 @@ bool QnServerStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
 
 void QnServerStreamRecorder::updateRecordingType(const QnScheduleTask& scheduleTask)
 {
+    QString msg;
+    QTextStream str(&msg);
+    str << "Update recording params for camera " << m_device->getUniqueId() << "  " << scheduleTask;
+    str.flush();
+    cl_log.log(msg, cl_logINFO);
+
     if (scheduleTask.getRecordingType() != QnScheduleTask::RecordingType_MotionOnly)
     {
         flushPrebuffer();

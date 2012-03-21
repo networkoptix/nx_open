@@ -92,6 +92,10 @@ void QnEventManager::eventReceived(QnEvent event)
 {
     qDebug() << "Got event: " << event.eventType << " " << event.objectName << " " << event.objectId << event.resourceGuid;
 
+    if (event.eventType == QN_EVENT_EMPTY)
+    {
+        emit connectionOpened();
+    }
     if (event.eventType == QN_EVENT_LICENSE_CHANGE)
     {
         QnAppServerConnectionFactory::createConnection()->getLicensesAsync(this, SLOT(licensesReceived(int,QByteArray,QnLicenseList,int)));

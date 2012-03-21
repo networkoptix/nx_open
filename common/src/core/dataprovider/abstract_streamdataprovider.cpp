@@ -34,11 +34,7 @@ void QnAbstractStreamDataProvider::addDataProcessor(QnAbstractDataConsumer* dp)
     if (!m_dataprocessors.contains(dp))
     {
         m_dataprocessors.push_back(dp);
-        connect(this, SIGNAL(slowSourceHint()), dp, SLOT(onSlowSourceHint()), Qt::DirectConnection);
 
-        connect(this, SIGNAL(beforeJump(qint64)), dp, SLOT(onBeforeJump(qint64)), Qt::DirectConnection);
-        connect(this, SIGNAL(jumpOccured(qint64)), dp, SLOT(onJumpOccured(qint64)), Qt::DirectConnection);
-        connect(this, SIGNAL(jumpCanceled(qint64)), dp, SLOT(onJumpCanceled(qint64)), Qt::DirectConnection);
 
     }
 }

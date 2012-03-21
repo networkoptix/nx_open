@@ -14,6 +14,7 @@
 #include <AL/al.h>
 #include <AL/alc.h>
 #endif
+#include "utils/common/log.h"
 
 //#define OPENAL_STATIC
 
@@ -70,11 +71,11 @@ QtvAudioDevice::QtvAudioDevice()
             alcGetIntegerv(m_device, ALC_MINOR_VERSION, 1, &minorVersion);
             // Check what device and version we are using
             const char *name = alcGetString(m_device, ALC_DEVICE_SPECIFIER);
-            qDebug("%s%s%s%d%s%d", "Opened, ", name ? name : "", " spec version ", majorVersion, ".", minorVersion);
-            qDebug("%s%s", "Company: ", static_cast<const char *>(alGetString(AL_VENDOR)));
-            qDebug("%s%s", "Device type: ", static_cast<const char *>(alGetString(AL_RENDERER)));
-            qDebug("%s%s", "OpenAL extensions: ", static_cast<const char *>(alGetString(AL_EXTENSIONS)));
-            qDebug("%s", "OpenAL init ok");
+            cl_log.log("OpenAL info: ", cl_logINFO);
+            cl_log.log("version: ", QString::number(majorVersion)+QString('.')+QString::number(minorVersion), cl_logINFO);
+            cl_log.log("company: ", static_cast<const char *>(alGetString(AL_VENDOR)), cl_logINFO);
+            cl_log.log("Device type: ", static_cast<const char *>(alGetString(AL_RENDERER)), cl_logINFO);
+            cl_log.log("OpenAL extensions: ", static_cast<const char *>(alGetString(AL_EXTENSIONS)), cl_logINFO);
         }
     }
 }
