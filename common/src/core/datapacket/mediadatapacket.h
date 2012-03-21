@@ -119,7 +119,7 @@ typedef QSharedPointer<QnCompressedVideoData> QnCompressedVideoDataPtr;
 enum {MD_WIDTH = 44, MD_HEIGHT = 32};
 struct QnMetaDataV1 : public QnAbstractMediaData
 {
-    QnMetaDataV1();
+    QnMetaDataV1(int initialValue = 0);
 
     /** 
     * Merge existing motion image with new motion image. Matrix is allowed col to col 

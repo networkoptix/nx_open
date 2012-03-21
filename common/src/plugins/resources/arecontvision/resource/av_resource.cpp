@@ -171,6 +171,11 @@ QString QnPlAreconVisionResource::toSearchString() const
     return result;
 }
 
+bool QnPlAreconVisionResource::unknownResource() const
+{
+    return (getName() == "ArecontVision_Abstract");
+}
+
 QnResourcePtr QnPlAreconVisionResource::updateResource()
 {
     QVariant model;

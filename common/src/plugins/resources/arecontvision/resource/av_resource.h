@@ -34,6 +34,7 @@ public:
     virtual bool getDescription() {return true;};
 
     //========
+    bool unknownResource() const;
     virtual QnResourcePtr updateResource();
     //========
 

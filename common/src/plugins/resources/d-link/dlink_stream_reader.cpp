@@ -444,15 +444,14 @@ QnMetaDataV1Ptr PlDlinkStreamReader::getMetaData()
         return QnMetaDataV1Ptr(0);
     }
 
-    QnMetaDataV1Ptr motion(new QnMetaDataV1());
 
     if (cam_info_file.size()==0)
-        return motion;
+        return QnMetaDataV1Ptr(new QnMetaDataV1());
 
     QString file_s(cam_info_file);
     QStringList lines = file_s.split("\r\n", QString::SkipEmptyParts);
 
-    
+    bool empty = true;
 
     foreach(QString line, lines)
     {
@@ -462,18 +461,18 @@ QnMetaDataV1Ptr PlDlinkStreamReader::getMetaData()
         {
 
             if (line_low.contains("on"))
-                for (int x = 0; x < MD_WIDTH; ++x)
-                {
-                    for (int y = 0; y < MD_HEIGHT; ++y)
-                    {
-                        motion->setMotionAt(x,y);
-                    }
-                }
-
-
+                empty = false;
         }
     }
    
+
+    QnMetaDataV1Ptr motion;
+
+    if (empty)
+        motion = QnMetaDataV1Ptr(new QnMetaDataV1());
+    else
+        motion = QnMetaDataV1Ptr(new QnMetaDataV1(1));
+
 
     //motion->m_duration = META_DATA_DURATION_MS * 1000 ;
     motion->m_duration = 1000*1000*1000; // 1000 sec 

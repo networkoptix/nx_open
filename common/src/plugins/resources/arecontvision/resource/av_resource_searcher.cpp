@@ -134,6 +134,7 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
                 resource->setHostAddress(sender, QnDomainMemory);
                 resource->setMAC(mac);
                 resource->setDiscoveryAddr( ipaddrs.at(i) );
+                resource->setName("ArecontVision_Abstract");
 
 
                 bool need_to_continue = false;
