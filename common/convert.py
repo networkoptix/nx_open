@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+#!/usr/bin/env python
 
 import shutil, glob, string
 import os, sys, posixpath
