@@ -27,7 +27,6 @@ FFMPEG = %FFMPEG
 EVETOOLS_DIR = %EVETOOLS_DIR
 
 include(../../common/contrib/qtsingleapplication/src/qtsingleapplication.pri)
-include(../contrib/qtcolorpicker/src/qtcolorpicker.pri)
 
 TRANSLATIONS += help/context_help_en.ts
 RESOURCES += help/context_help.qrc
@@ -120,13 +119,19 @@ DEFINES += __STDC_CONSTANT_MACROS
 
 LIBS += -L$$EVETOOLS_DIR/lib
 
+INCLUDEPATH += ../contrib/qtcolorpicker/src
+LIBS += -L../contrib/qtcolorpicker/lib
+DEFINES += QT_QTCOLORPICKER_IMPORT
+
 CONFIG(debug, debug|release) {
   INCLUDEPATH += $$FFMPEG-debug/include
   LIBS = -L$$FFMPEG-debug/bin -L$$FFMPEG-debug/lib -L$$PWD/../../common/bin/debug -lcommon -L../../common/contrib/qjson/lib/win32/debug -L$$EVETOOLS_DIR/lib/debug $$LIBS
+  LIBS += -lQtSolutions_ColorPicker-2.6d
 }
 CONFIG(release, debug|release) {
   INCLUDEPATH += $$FFMPEG-release/include
   LIBS = -L$$FFMPEG-release/bin -L$$FFMPEG-release/lib -L$$PWD/../../common/bin/release -lcommon -L../../common/contrib/qjson/lib/win32/release -L$$EVETOOLS_DIR/lib/release $$LIBS
+  LIBS += -lQtSolutions_ColorPicker-2.6
 }
 
 LIBS += -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lqjson

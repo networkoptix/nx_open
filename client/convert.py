@@ -156,6 +156,10 @@ copy_files(openal_path + '/*.dll', 'bin/release')
 copy_files(openal_path + '/*.dll', 'bin/debug')
 
 if platform() == 'win32':
+    copy_files('contrib/qtcolorpicker/lib/QtSolutions_ColorPicker-2.6.dll', 'bin/release')
+    copy_files('contrib/qtcolorpicker/lib/QtSolutions_ColorPicker-2.6d.dll', 'bin/debug')
+
+if platform() == 'win32':
     copy_files(openssl_path + '/bin/*.dll', 'bin/debug')
     copy_files(openssl_path + '/bin/*.dll', 'bin/release')
 

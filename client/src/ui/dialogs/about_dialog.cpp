@@ -70,15 +70,16 @@ void AboutDialog::retranslateUi()
                       .arg(QString::fromLatin1(APPLICATION_REVISION));
     QString credits = tr("<b>%1 %2</b> uses the following external libraries:<br />\n"
                          "<br />\n"
-                         "<b>Qt v.%3</b> - Copyright (c) 2012 the Nokia Corporation<br />\n"
-                         "<b>FFMpeg %4</b> - Copyright (c) 2000-2012 the FFmpeg developers")
+                         "<b>Qt v.%3</b> - Copyright (c) 2012 Nokia Corporation.<br />\n"
+                         "<b>FFMpeg %4</b> - Copyright (c) 2000-2012 the FFmpeg developers.<br />\n"
+                         "<b>Color Picker v2.6 Qt Solution</b> - Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).")
                       .arg(QString::fromLatin1(ORGANIZATION_NAME) + QLatin1String("(tm)"))
                       .arg(QString::fromLatin1(APPLICATION_NAME))
                       .arg(QString::fromLatin1(QT_VERSION_STR))
                       .arg(QString::fromLatin1(FFMPEG_VERSION));
 #ifndef Q_OS_DARWIN
     //if (QApplication::style()->objectName() == QLatin1String("Bespin"))
-    credits += tr("<br /><br /><b>Bespin style</b> - Copyright (C) 2007-2010 Thomas Luebking");
+    credits += tr("<br /><b>Bespin style</b> - Copyright (C) 2007-2010 Thomas Luebking.");
 #endif
 
     m_versionLabel->setText(version);
