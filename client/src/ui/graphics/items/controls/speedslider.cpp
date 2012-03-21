@@ -139,7 +139,7 @@ void SpeedSlider::sliderChange(SliderChange change)
 {
     GraphicsSlider::sliderChange(change);
 
-    if (change == SliderValueChange) {
+    if (change == SliderValueChange || change == SliderRangeChange) {
         const Preset &preset = presets[int(m_precision)];
 
         int idx = pos2idx(value());

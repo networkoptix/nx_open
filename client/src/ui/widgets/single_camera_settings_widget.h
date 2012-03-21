@@ -40,12 +40,14 @@ public:
 
 signals:
     void hasChangesChanged();
+    void moreLicensesRequested();
 
 private slots:
     void at_tabWidget_currentChanged();
     void at_dataChanged();
     void at_cameraScheduleWidget_scheduleTasksChanged();
-    void at_linkActivated(const QString& urlStr);
+    void at_linkActivated(const QString &urlString);
+
 private:
     void setHasChanges(bool hasChanges);
 

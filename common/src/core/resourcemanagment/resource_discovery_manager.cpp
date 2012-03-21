@@ -17,14 +17,20 @@ namespace {
 }
 
 QnResourceDiscoveryManager::QnResourceDiscoveryManager():
-m_server(false),
-m_foundSmth(true)
+    m_server(false),
+    m_foundSmth(true),
+    m_ready(false)
 {
 }
 
 QnResourceDiscoveryManager::~QnResourceDiscoveryManager()
 {
     stop();
+}
+
+void QnResourceDiscoveryManager::setReady(bool ready) 
+{
+    m_ready = ready;
 }
 
 QnResourceDiscoveryManager& QnResourceDiscoveryManager::instance()
@@ -101,8 +107,10 @@ void QnResourceDiscoveryManager::run()
             QnResourceList lst = searcher->search();
             m_resourceProcessor->processResources(lst);
         }
-
     }
+
+    while (!needToStop() && !m_ready)
+        QnSleep::msleep(1);
 
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
     while (!needToStop() && !initResourceTypes(appServerConnection))

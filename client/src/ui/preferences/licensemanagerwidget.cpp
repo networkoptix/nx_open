@@ -11,11 +11,10 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
 
-#include "core/resourcemanagment/resource_pool.h"
+#include <core/resourcemanagment/resource_pool.h>
 
-namespace {
-    QColor redText = QColor(255, 64, 64);
-}
+#include <ui/style/globals.h>
+
 
 LicenseManagerWidget::LicenseManagerWidget(QWidget *parent) :
     QWidget(parent),
@@ -123,7 +122,7 @@ void LicenseManagerWidget::updateControls()
 
     if(useRedLabel) {
         QPalette palette = ui->infoLabel->palette();
-        palette.setColor(QPalette::WindowText, redText);
+        palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
         ui->infoLabel->setPalette(palette);
     } else {
         ui->infoLabel->setPalette(palette());

@@ -21,6 +21,8 @@ QnGlobals::QnGlobals(QObject *parent):
     setValue(SELECTED_FRAME_COLOR,                  QColor(64, 130, 180, 128));
     setValue(OPACITY_CHANGE_PERIOD,                 250);
 
+    setValue(ERROR_TEXT_COLOR,                      QColor(255, 64, 64));
+
     /* Graphics scene has problems with handling mouse events on small scales, so the larger this number, the better. */
     setValue(WORKBENCH_UNIT_SIZE,                   10000.0);
 

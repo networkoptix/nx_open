@@ -596,6 +596,7 @@ public:
         }
         */
 
+        QnResourceDiscoveryManager::instance().setReady(true);
         QnResourceDiscoveryManager::instance().start();
 
         m_rtspListener = new QnRtspListener(QHostAddress::Any, rtspUrl.port());

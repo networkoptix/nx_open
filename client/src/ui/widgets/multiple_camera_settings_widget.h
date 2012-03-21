@@ -38,10 +38,12 @@ public:
 
 signals:
     void hasChangesChanged();
+    void moreLicensesRequested();
 
 private slots:
     void at_dataChanged();
     void at_cameraScheduleWidget_scheduleTasksChanged();
+    void at_cameraScheduleWidget_scheduleEnabledChanged();
 
 private:
     void setHasChanges(bool hasChanges);
@@ -53,6 +55,7 @@ private:
     QnVirtualCameraResourceList m_cameras;
     bool m_hasChanges;
     bool m_hasScheduleChanges;
+    bool m_hasScheduleEnabledChanges;
     bool m_readOnly;
 };
 

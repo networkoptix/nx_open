@@ -40,6 +40,11 @@ namespace Qn {
         ConnectToServerAction,
 
         /**
+         * Opens licenses preferences tab.
+         */
+        GetMoreLicensesAction,
+
+        /**
          * Reconnects to the Enterprise Controller.
          */
         ReconnectAction,

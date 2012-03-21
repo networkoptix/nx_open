@@ -206,6 +206,9 @@ void MySlider::drawTimePeriods(QPainter *painter, const QnTimePeriodList& timePe
     QnTimePeriodList::const_iterator beginItr = timePeriods.findNearestPeriod(pos, false);
     QnTimePeriodList::const_iterator endItr = timePeriods.findNearestPeriod(pos+m_parent->sliderRange(), false);
 
+    int center = m_handleRect.center().x();
+    QColor dark = color.darker();
+
     //foreach(const QnTimePeriod &period, timePeriods)
     for (QnTimePeriodList::const_iterator itr = beginItr; itr <= endItr; ++itr)
     {
@@ -224,7 +227,14 @@ void MySlider::drawTimePeriods(QPainter *painter, const QnTimePeriodList& timePe
         //if (left > right)
         //    continue;
 
-        painter->fillRect(left, contentsRect.top(), qMax(1.0,right - left), contentsRect.height(), color);
+        if(right < center) {
+            painter->fillRect(left, contentsRect.top(), qMax(1.0, right - left), contentsRect.height(), color);
+        } else if(left > center) {
+            painter->fillRect(left, contentsRect.top(), qMax(1.0, right - left), contentsRect.height(), dark);
+        } else {
+            painter->fillRect(left, contentsRect.top(), center - left, contentsRect.height(), color);
+            painter->fillRect(center, contentsRect.top(), qMax(1.0, right - center), contentsRect.height(), dark);
+        }
     }
 }
 

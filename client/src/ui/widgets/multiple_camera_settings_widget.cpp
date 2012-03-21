@@ -25,7 +25,8 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
     connect(ui->loginEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dataChanged()));
     connect(ui->passwordEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dataChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleTasksChanged()),         this,   SLOT(at_cameraScheduleWidget_scheduleTasksChanged()));
-    connect(ui->cameraScheduleWidget,   SIGNAL(scheduleEnabledChanged()),       this,   SLOT(at_dataChanged()));
+    connect(ui->cameraScheduleWidget,   SIGNAL(scheduleEnabledChanged()),       this,   SLOT(at_cameraScheduleWidget_scheduleEnabledChanged()));
+    connect(ui->cameraScheduleWidget,   SIGNAL(moreLicensesRequested()),        this,   SIGNAL(moreLicensesRequested()));
 
     updateFromResources();
 }
@@ -81,25 +82,11 @@ void QnMultipleCameraSettingsWidget::setCurrentTab(Qn::CameraSettingsTab tab) {
 }
 
 int QnMultipleCameraSettingsWidget::activeCameraCount() const {
-    switch(ui->cameraScheduleWidget->getScheduleEnabled()) {
-    case Qt::Checked:
-        return m_cameras.size();
-    case Qt::Unchecked:
-        return 0;
-    case Qt::PartiallyChecked: {
-        int result;
-        foreach (const QnVirtualCameraResourcePtr &camera, m_cameras)
-            if (!camera->isScheduleDisabled())
-                result++;
-        return result;
-    }
-    default:
-        return 0;
-    }
+    return ui->cameraScheduleWidget->activeCameraCount();
 }
 
 void QnMultipleCameraSettingsWidget::setCamerasActive(bool active) {
-    ui->cameraScheduleWidget->setScheduleEnabled(active ? Qt::Checked : Qt::Unchecked);
+    ui->cameraScheduleWidget->setScheduleEnabled(active);
 }
 
 void QnMultipleCameraSettingsWidget::submitToResources() {
@@ -122,8 +109,8 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
 
         camera->setAuth(cameraLogin, cameraPassword);
 
-        if (ui->cameraScheduleWidget->getScheduleEnabled() != Qt::PartiallyChecked)
-            camera->setScheduleDisabled(ui->cameraScheduleWidget->getScheduleEnabled() == Qt::Unchecked);
+        if (m_hasScheduleEnabledChanges)
+            camera->setScheduleDisabled(ui->cameraScheduleWidget->activeCameraCount() == 0);
 
         if (m_hasScheduleChanges)
             camera->setScheduleTasks(scheduleTasks);
@@ -144,22 +131,12 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
     } else {
         /* Aggregate camera parameters first. */
 
-        /* -1 for uninitialized, 0  - schedule enabled for all cameras,
-         * 1 - flag is not equal for all cameras, 2 - schedule disabled for all cameras */
-        int scheduleEnabled = -1;
         QSet<QString> logins, passwords;
         int maxFps = std::numeric_limits<int>::max();
     
         foreach (QnVirtualCameraResourcePtr camera, m_cameras) {
-            if (scheduleEnabled == -1) {
-                scheduleEnabled = camera->isScheduleDisabled() ? Qt::Unchecked : Qt::Checked;
-            } else if (scheduleEnabled != (camera->isScheduleDisabled() ? Qt::Unchecked : Qt::Checked)) {
-                scheduleEnabled = Qt::PartiallyChecked;
-            }
-
             logins.insert(camera->getAuth().user());
             passwords.insert(camera->getAuth().password());
-
             maxFps = qMin(maxFps, camera->getMaxFps());
         }
 
@@ -197,7 +174,6 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
             ui->passwordEdit->setPlaceholderText(tr("<multiple values>", "PasswordEdit"));
         }
 
-        ui->cameraScheduleWidget->setScheduleEnabled(static_cast<Qt::CheckState>(scheduleEnabled));
         ui->cameraScheduleWidget->setMaxFps(maxFps);
 
         ui->cameraScheduleWidget->setChangesDisabled(!isScheduleEqual);
@@ -207,6 +183,8 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
             ui->cameraScheduleWidget->setScheduleTasks(QnScheduleTaskList());
         }
     }
+
+    ui->cameraScheduleWidget->setCameras(m_cameras);
 
     setHasChanges(false);
 }
@@ -231,8 +209,10 @@ void QnMultipleCameraSettingsWidget::setHasChanges(bool hasChanges) {
         return;
 
     m_hasChanges = hasChanges;
-    if(!m_hasChanges)
+    if(!m_hasChanges) {
         m_hasScheduleChanges = false;
+        m_hasScheduleEnabledChanges = false;
+    }
 
     emit hasChangesChanged();
 }
@@ -249,4 +229,10 @@ void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_scheduleTasksChange
     at_dataChanged();
 
     m_hasScheduleChanges = true;
+}
+
+void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChanged() {
+    at_dataChanged();
+
+    m_hasScheduleEnabledChanges = true;
 }
