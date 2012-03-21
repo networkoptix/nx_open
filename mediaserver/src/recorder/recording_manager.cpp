@@ -102,7 +102,10 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
     if (!isResourceDisabled(res) && res->getStatus() != QnResource::Offline && 
         recorderHiRes->currentScheduleTask().getRecordingType() != QnScheduleTask::RecordingType_Never)
     {
-        if (providerHi) {
+        if (providerHi)
+        {
+            if (!recorderHiRes->isRunning())
+                cl_log.log("Recording started for camera ", res->getUniqueId(), cl_logINFO);
             recorderHiRes->start();
             providerHi->start();
         }
@@ -112,8 +115,11 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
             float currentFps = recorderHiRes->currentScheduleTask().getFps();
             if (cameraRes->getMaxFps() - currentFps >= MIN_SECONDARY_FPS)
             {
-                if (recorderLowRes)
+                if (recorderLowRes) {
+                    if (!recorderLowRes->isRunning())
+                        cl_log.log("Recording started (secondary stream) for camera ", res->getUniqueId(), cl_logINFO);
                     recorderLowRes->start();
+                }
                 providerLow->start();
             }
             else {
@@ -144,6 +150,9 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
             recorderHiRes->clearUnprocessedData();
         if (needStopLow)
             recorderLowRes->clearUnprocessedData();
+
+        if (needStopHi)
+            cl_log.log("Recording stopped for camera ", res->getUniqueId(), cl_logINFO);
     }
 }
 

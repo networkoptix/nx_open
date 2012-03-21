@@ -368,7 +368,7 @@ void initAppServerConnection(const QSettings &settings)
     appServerUrl.setUserName(settings.value("appserverLogin", QLatin1String("admin")).toString());
     appServerUrl.setPassword(settings.value("appserverPassword", QLatin1String("123")).toString());
 
-    cl_log.log("Connect to application server", appServerUrl.toString(), cl_logINFO);
+    cl_log.log("Connect to enterprise controller server ", appServerUrl.toString(), cl_logINFO);
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(&QnResourceDiscoveryManager::instance());
 }

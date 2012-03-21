@@ -37,7 +37,7 @@ void QnClientPullMediaStreamProvider::setExtSync(QMutex* extSyncMutex)
 void QnClientPullMediaStreamProvider::run()
 {
     setPriority(QThread::HighPriority);
-	CL_LOG(cl_logINFO) cl_log.log(QLatin1String("stream reader started."), cl_logINFO);
+	qDebug() << "stream reader started.";
 
     int numberOfChnnels = 1;
 

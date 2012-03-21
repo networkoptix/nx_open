@@ -58,7 +58,7 @@ void CLNetState::updateNetState()
 
 	if (net_state_changed)
 	{
-		cl_log.log(QLatin1String("Current Net state:"), cl_logINFO);
+		cl_log.log(QLatin1String("Network interface list:"), cl_logINFO);
 		cl_log.log(toString(), cl_logINFO);
 	}
 

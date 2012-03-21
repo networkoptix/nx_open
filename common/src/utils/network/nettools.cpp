@@ -51,7 +51,7 @@ QList<QHostAddress> getAllIPv4Addresses()
                     }
                 }
                 if (!allowedInterfaces.isEmpty())
-                    qDebug() << "Using net IF filter:" << allowedInterfaces;
+                    qWarning() << "Using net IF filter:" << allowedInterfaces;
                 allowedInterfaceReady = true;
             }
             if (allowedInterfaces.isEmpty() || allowedInterfaces.contains(ipaddrs.at(i)))
