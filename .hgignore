@@ -54,6 +54,15 @@ client/contrib/bespin/debug
 client/contrib/bespin/release
 client/contrib/bespin/Makefile* 
 
+client/contrib/qtcolorpicker/Makefile*
+client/contrib/qtcolorpicker/buildlib
+client/contrib/qtcolorpicker/examples/Makefile*
+client/contrib/qtcolorpicker/examples/draw/Makefile*
+client/contrib/qtcolorpicker/examples/draw/debug
+client/contrib/qtcolorpicker/examples/simple/Makefile*
+client/contrib/qtcolorpicker/examples/simple/debug
+client/contrib/qtcolorpicker/lib/*.ilk
+
 mediaserver/src/server.pro
 mediaserver/src/version.h
 mediaserver/src/Makefile
@@ -64,6 +73,7 @@ winbuild/msvc2010/setup.bat
 
 wixsetup/CustomStrings.wxl
 wixsetup/AppServerFiles.wxs
+wixsetup/version.bat
 
 My Amplifier XE Results*
 

@@ -40,7 +40,9 @@
         <Property Id="PREVIOUSVERSIONSINSTALLED" Secure="yes" />
         
         <Property Id="BUSYPORT" Secure="yes"/>
-        
+
+        <Property Id="DUMMY_APPSERVER_LOGIN" Value="admin"/>
+    	
         <!-- AppServer properties-->
         <Property Id="APPSERVER_PORT" Secure="yes">
             <RegistrySearch Id="AppServerPortReg"
@@ -62,7 +64,7 @@
         <Property Id="SERVER_RTSP_PORT" Secure="yes">
             <RegistrySearch Id="ServerRtspPortReg"
                             Root="HKLM"
-                            Key="Software\Network Optix\VMS Media Server"
+                            Key="Software\Network Optix\Network Optix Media Server"
                             Name="rtspPort"
                             Type="raw"
                             Win64="no"/>
@@ -70,7 +72,7 @@
         <Property Id="SERVER_API_PORT" Secure="yes">
             <RegistrySearch Id="ServerApiPortReg"
                             Root="HKLM"
-                            Key="Software\Network Optix\VMS Media Server"
+                            Key="Software\Network Optix\Network Optix Media Server"
                             Name="apiPort"
                             Type="raw"
                             Win64="no"/>
@@ -79,7 +81,7 @@
         <Property Id="SERVER_DIRECTORY_REG" Secure="yes">
             <RegistrySearch Id="ServerDirectoryReg"
                             Root="HKLM"
-                            Key="Software\Network Optix\VMS Media Server"
+                            Key="Software\Network Optix\Network Optix Media Server"
                             Name="mediaDir"
                             Type="raw"
                             Win64="no">
@@ -100,7 +102,7 @@
         <Property Id="CLIENT_DIRECTORY_REG" Secure="yes">
             <RegistrySearch Id="ClientDirectoryReg"
                             Root="HKCU"
-                            Key="Software\Network Optix\VMS Client"
+                            Key="Software\Network Optix\Network Optix HD Witness Client"
                             Name="mediaRoot"
                             Type="raw"
                             Win64="no"/>
@@ -191,14 +193,14 @@
             <Directory Id="SERVER_DIRECTORY" Name="Server Media">
                 <Component Id="ServerDirectoryComponent" Guid="{C259A76D-4CAA-489f-A18F-28AED0232853}" Permanent="yes">
                     <CreateFolder Directory="SERVER_DIRECTORY"/>
-                    <RegistryValue Root='HKLM' Key='Software\[Manufacturer]\VMS Media Server' Type='string' Value='' KeyPath='yes' />
+                    <RegistryValue Root='HKLM' Key='Software\[Manufacturer]\Network Optix Media Server' Type='string' Value='' KeyPath='yes' />
                 </Component>
             </Directory>
             
             <Directory Id="CLIENT_DIRECTORY" Name="Client Media">
                 <Component Id="ClientDirectoryComponent" Guid="{953EF7FD-01CF-432f-936C-43F07BC918DE}" Permanent="yes">
                     <CreateFolder Directory="CLIENT_DIRECTORY"/>
-                    <RegistryValue Root='HKCU' Key='Software\[Manufacturer]\VMS Client' Type='string' Value='' KeyPath='yes' />
+                    <RegistryValue Root='HKCU' Key='Software\[Manufacturer]\Network Optix HD Witness Client' Type='string' Value='' KeyPath='yes' />
                 </Component>
             </Directory>
             
@@ -279,7 +281,7 @@
                             
                             <Component Id="ServerConfiguration" Guid="{C3BA240A-2D18-4723-B084-D2774F51D1B0}" Permanent="yes">
                                 <RegistryKey Root="HKLM"
-                                             Key="Software\[Manufacturer]\VMS Media Server"
+                                             Key="Software\[Manufacturer]\Network Optix Media Server"
                                              Action="createAndRemoveOnUninstall">
                                     <RegistryValue Type="string" Name="appserverHost" Value="[SERVER_APPSERVER_HOST]"/>
                                     <RegistryValue Type="string" Name="appserverPort" Value="[SERVER_APPSERVER_PORT]"/>
@@ -343,7 +345,7 @@
                             
                             <Component Id="ClientConfiguration" Guid="{8AC01524-8F3A-46ba-8A85-24B3709CEDDE}" Permanent="yes">
                                 <RegistryKey Root="HKCU"
-                                             Key="Software\[Manufacturer]\VMS Client"
+                                             Key="Software\[Manufacturer]\Network Optix HD Witness Client"
                                              Action="createAndRemoveOnUninstall">
                                     <RegistryValue Type="string" Name="afterFirstRun" Value="false"/>
                                     <RegistryValue Type="string" Name="appserverHost" Value="[CLIENT_APPSERVER_HOST]"/>
@@ -400,6 +402,10 @@
                                 <File Id="ClientQjsonDll" Name="qjson.dll" Source="../client/bin/$(env.CONFIG)/qjson.dll"/>
                             </Component>
                             
+                        	<Component Id="ClientQtColorPicker" Guid="{A8E0F358-198A-4D79-A6F0-607D60F524EE}">
+                        		<File Id="ColorPicker26dll" Name="QtSolutions_ColorPicker-2.6.dll " Source="..\client\contrib\qtcolorpicker\lib\QtSolutions_ColorPicker-2.6$(var.suffix).dll"/>
+                        	</Component>
+                        	
                             <Directory Id="styles" Name="styles">
                                 <Component Id="bespin" Guid="{BF20F7AC-A34C-481a-84E3-731C80050D51}">
                                     <File Id="bespin$(var.suffix).dll" Name="bespin$(var.suffix).dll" Source="..\client\contrib\bespin\bin\msvc-x86\$(env.CONFIG)\styles\bespin$(var.suffix).dll"/>
@@ -485,6 +491,7 @@
             <ComponentRef Id="ClientOpenSSL" />
             <ComponentRef Id="ClientXerces"/>
             <ComponentRef Id="ClientQjson"/>
+        	<ComponentRef Id="ClientQtColorPicker"/>
             <ComponentRef Id="bespin" />
             <ComponentRef Id='arecontvision'/>
             
@@ -540,8 +547,14 @@
             <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="InstallTypeDlg">LicenseAccepted = "1"</Publish>
             
             <Publish Dialog="InstallTypeDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg">1</Publish>
-            <Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">INSTALLTYPE=0</Publish>
+            <Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="PasswordDlg">INSTALLTYPE=0</Publish>
             <Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="AdvancedTypeDlg">INSTALLTYPE=1</Publish>
+            
+            <Publish Dialog="PasswordDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg">1</Publish>
+            <Publish Dialog="PasswordDlg" Control="Next" Event="SpawnDialog" Value="EmptyPasswordDlg">NOT APPSERVER_PASSWORD</Publish>
+        	<Publish Dialog="PasswordDlg" Control="Next" Property="SERVER_APPSERVER_PASSWORD" Value="[APPSERVER_PASSWORD]">APPSERVER_PASSWORD</Publish>
+        	<Publish Dialog="PasswordDlg" Control="Next" Property="CLIENT_APPSERVER_PASSWORD" Value="[APPSERVER_PASSWORD]">APPSERVER_PASSWORD</Publish>
+            <Publish Dialog="PasswordDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">APPSERVER_PASSWORD</Publish>
             
             <Publish Dialog="AdvancedTypeDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg">1</Publish>
             <Publish Dialog="AdvancedTypeDlg" Control="Next" Event="NewDialog" Value="MyFeaturesDlg">1</Publish>
