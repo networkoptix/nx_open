@@ -11,7 +11,7 @@ QnAppserverResourceProcessor::QnAppserverResourceProcessor(QnId serverId)
 
 void QnAppserverResourceProcessor::processResources(const QnResourceList &resources)
 {
-    QnVirtualCameraResourceList cameras;
+    
 
     foreach (QnResourcePtr resource, resources)
     {
@@ -39,6 +39,7 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
         resource->setStatus(QnResource::Online, true); // set status in silence mode. Do not send any signals e.t.c
 
         QByteArray errorString;
+        QnVirtualCameraResourceList cameras;
         if (m_appServer->addCamera(cameraResource, cameras, errorString) != 0)
         {
             qDebug() << "QnAppserverResourceProcessor::processResources(): Call to addCamera failed. Reason: " << errorString;
