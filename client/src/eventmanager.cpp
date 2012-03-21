@@ -94,7 +94,7 @@ void QnEventManager::eventReceived(QnEvent event)
 
     if (event.eventType == QN_EVENT_EMPTY)
     {
-        emit connectionOpened();
+        /* Do nothing =). */
     }
     if (event.eventType == QN_EVENT_LICENSE_CHANGE)
     {
