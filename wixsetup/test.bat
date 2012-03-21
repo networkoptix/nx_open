@@ -29,7 +29,7 @@ sc stop vmsappserver
 taskkill /F /IM traytool.exe
 taskkill /F /IM client.exe
 taskkill /F /IM mediaserver.exe
-taskkill /F /IM ec.exe
+taskkill /F /IM ecs.exe
 
 CD %CURRENTDIR%
 
