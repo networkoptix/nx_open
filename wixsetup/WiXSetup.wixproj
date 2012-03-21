@@ -38,6 +38,7 @@
     <Compile Include="InvalidPasswordDlg.wxs" />
     <Compile Include="MyFeaturesDlg.wxs" />
     <Compile Include="MediaServerDlg.wxs" />
+    <Compile Include="PasswordDlg.wxs" />
     <Compile Include="PortDuplicateDlg.wxs" />
     <Compile Include="PortIsBusyDlg.wxs" />
     <Compile Include="Product.wxs" />
