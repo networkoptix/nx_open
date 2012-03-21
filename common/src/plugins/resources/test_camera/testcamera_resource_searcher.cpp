@@ -83,15 +83,14 @@ QnResourcePtr QnTestCameraResourceSearcher::createResource(QnId resourceTypeId, 
 
     if (resourceType->getManufacture() != manufacture())
     {
-        qDebug() << "Manufature " << resourceType->getManufacture() << " != " << manufacture();
-
+        //qDebug() << "Manufature " << resourceType->getManufacture() << " != " << manufacture();
         return result;
     }
 
     result = QnVirtualCameraResourcePtr( new QnTestCameraResource() );
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "RTID" << resourceTypeId.toString() << ", Parameters: " << parameters;
+    qDebug() << "Create test camera resource. typeID:" << resourceTypeId.toString() << ", Parameters: " << parameters;
     result->deserialize(parameters);
 
     return result;
