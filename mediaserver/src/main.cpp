@@ -45,6 +45,7 @@
 #include "plugins/resources/isd/isd_resource_searcher.h"
 #include "plugins/resources/test_camera/testcamera_resource_searcher.h"
 #include "plugins/resources/onvif/onvif_ws_searcher.h"
+#include "utils/common/command_line_parser.h"
 
 
 static const char SERVICE_NAME[] = "Network Optix VMS Media Server";
@@ -331,19 +332,14 @@ int serverMain(int argc, char *argv[])
         return 0;
     }
 
-#ifdef _DEBUG
-     //cl_log.setLogLevel(cl_logDEBUG1);
-    cl_log.setLogLevel(cl_logDEBUG1);
-#else
-    cl_log.setLogLevel(cl_logWARNING);
-#endif
+    QnCommandLineParser commandLinePreParser;
+    commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::String, "--log-level", NULL, NULL));
+    commandLinePreParser.parse(argc, argv);
 
-    CL_LOG(cl_logALWAYS)
-    {
-        cl_log.log(QLatin1String("\n\n========================================"), cl_logALWAYS);
-        cl_log.log(cl_logALWAYS, "Software version %s", APPLICATION_VERSION);
-        cl_log.log(QFile::decodeName(qApp->argv()[0]), cl_logALWAYS);
-    }
+    QnLog::initLog(commandLinePreParser.value("--log-level").toString());
+    cl_log.log(APPLICATION_NAME, " started", cl_logALWAYS);
+    cl_log.log("Software version: ", APPLICATION_VERSION, cl_logALWAYS);
+    cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
 
     defaultMsgHandler = qInstallMsgHandler(myMsgHandler);
 
@@ -372,7 +368,7 @@ void initAppServerConnection(const QSettings &settings)
     appServerUrl.setUserName(settings.value("appserverLogin", QLatin1String("admin")).toString());
     appServerUrl.setPassword(settings.value("appserverPassword", QLatin1String("123")).toString());
 
-    qDebug() << appServerUrl;
+    cl_log.log("Connect to application server", appServerUrl.toString(), cl_logINFO);
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(&QnResourceDiscoveryManager::instance());
 }

@@ -3,8 +3,23 @@
 #include <QThread>
 #include <QDateTime>
 
-char *cl_log_msg[] = { "ALWAYS", "ERROR", "WARNING", "INFO", "DEBUG1", "DEBUG2" };
+char *cl_log_msg[] = {"UNKNOWN", "ALWAYS", "ERROR", "WARNING", "INFO", "DEBUG", "DEBUG2" };
 
+QnLogLevel QnLog::logLevelFromString(const QString& value)
+{
+    QString str = value.toUpper().trimmed();
+    for (int i = 0; i < sizeof(cl_log_msg)/sizeof(char*); ++i)
+    {
+        if (str == cl_log_msg[i])
+            return QnLogLevel(i);
+    }
+    return cl_logUNKNOWN;
+}
+
+QString QnLog::logLevelToString(QnLogLevel value)
+{
+    return cl_log_msg[value];
+}
 
 // -------------------------------------------------------------------------- //
 // QnLogPrivate
@@ -301,4 +316,31 @@ void qnLogMsgHandler(QtMsgType type, const char *msg)
     }
 
     cl_log.log(QString::fromLocal8Bit(msg), logLevel);
+}
+
+
+void QnLog::initLog(const QString& logLevelStr)
+{
+    bool needWarnLogLevel = false;
+    QnLogLevel logLevel = cl_logDEBUG1;
+#ifndef _DEBUG
+    logLevel = cl_logINFO;
+#endif
+    if (!logLevelStr.isEmpty())
+    {
+        QnLogLevel newLogLevel = QnLog::logLevelFromString(logLevelStr);
+        if (newLogLevel != cl_logUNKNOWN)
+            logLevel = newLogLevel;
+        else
+            needWarnLogLevel = true;
+    }
+    cl_log.setLogLevel(logLevel);
+
+    CL_LOG(cl_logALWAYS)
+    {
+        cl_log.log(QLatin1String("================================================================================="), cl_logALWAYS);
+        if (needWarnLogLevel) 
+            cl_log.log("Unknown log level specified. Using level ", QnLog::logLevelToString(logLevel), cl_logALWAYS);
+    }
+
 }

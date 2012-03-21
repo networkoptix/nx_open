@@ -63,7 +63,8 @@ QnResourcePtr QnPlOnvifWsSearcher::createResource(QnId resourceTypeId, const QnR
     
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "RTID" << resourceTypeId.toString() << ", Parameters: " << parameters;
+    qDebug() << "Create onwif camera resource. typeID:" << resourceTypeId.toString() << ", Parameters: " << parameters;
+
     result->deserialize(parameters);
 
     return result;

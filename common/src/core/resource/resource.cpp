@@ -332,7 +332,7 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
     getResourceParamList();
     if (!m_resourceParamList.contains(name))
     {
-        cl_log.log("QnResource::getParam(): requested param does not exist!", cl_logWARNING);
+        qWarning() << "Can't get parameter. Parameter" << name << "does not exists for resource" << getName();
         return false;
     }
 
@@ -381,7 +381,7 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
     getResourceParamList(); // paramList loaded once. No more changes, instead of param value. So, use mutex for value only
     if (!m_resourceParamList.contains(name))
     {
-        cl_log.log("QnResource::setParam(): requested param does not exist!", cl_logWARNING);
+        qWarning() << "Can't set parameter. Parameter" << name << "does not exists for resource" << getName();
         return false;
     }
 

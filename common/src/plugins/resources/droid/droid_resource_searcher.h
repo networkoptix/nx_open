@@ -19,10 +19,6 @@ public:
 protected:
     // return the manufacture of the server
     virtual QString manufacture() const;
-
-private:
-    QUdpSocket m_recvSocket;
-
 };
 
 #endif // droid_device_server_h_1755
