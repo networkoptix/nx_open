@@ -304,7 +304,8 @@ bool QnWorkbenchActionHandler::closeLayouts(const QnLayoutResourceList &resource
             QnResourceList(saveableResources),
             tr("Close Layouts"),
             tr("The following %n layout(s) are not saved. Do you want to save them?", NULL, saveableResources.size()),
-            QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel
+            QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
+            false
         );
 
         if(button == QDialogButtonBox::Cancel) {
