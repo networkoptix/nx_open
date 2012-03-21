@@ -216,3 +216,10 @@ void QnLiveStreamProvider::onPrimaryFpsUpdated(int newFps)
 
     setFps(qMax(1,newSecFps));
 }
+
+QnMetaDataV1Ptr QnLiveStreamProvider::getMetaData()
+{
+    QnMetaDataV1Ptr result(new QnMetaDataV1(1));
+    result->m_duration = 1000*1000*1000; // 1000 sec 
+    return result;
+}

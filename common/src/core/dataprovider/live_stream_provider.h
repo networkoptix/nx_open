@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include "../resource/media_resource.h"
+#include "core/datapacket/mediadatapacket.h"
 
 #define META_DATA_DURATION_MS 300
 
@@ -38,9 +39,7 @@ protected:
     virtual void updateStreamParamsBasedOnQuality() = 0;
     virtual void updateStreamParamsBasedOnFps() = 0;
     
-
-
-
+    virtual QnMetaDataV1Ptr getMetaData();
     
 protected:
     mutable QMutex m_livemutex;

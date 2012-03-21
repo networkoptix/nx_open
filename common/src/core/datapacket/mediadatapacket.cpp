@@ -55,7 +55,7 @@ bool QnMediaContext::equalTo(QnMediaContext* other) const
 
 // ----------------------------------- QnMetaDataV1 -----------------------------------------
 
-QnMetaDataV1::QnMetaDataV1():
+QnMetaDataV1::QnMetaDataV1(int initialValue):
     QnAbstractMediaData(CL_MEDIA_ALIGNMENT, MD_WIDTH*MD_HEIGHT/8)
 {
     dataType = META_V1;
@@ -67,7 +67,10 @@ QnMetaDataV1::QnMetaDataV1():
     m_duration = 0;
     m_firstTimestamp = AV_NOPTS_VALUE;
     timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;
-    data.fill(0, data.capacity());
+    if (initialValue)
+        data.fill(0xff, data.capacity());
+    else
+        data.fill(0, data.capacity());
 }
 
 void QnMetaDataV1::addMotion(QnMetaDataV1Ptr data)
