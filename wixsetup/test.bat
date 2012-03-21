@@ -12,7 +12,7 @@ rmdir /s /q "c:\records"
 
 CD %CURRENTDIR%
 
-start /B /WAIT msiexec /I "bin\%ARTIFACTID%-%VERSION%.msi" /qb- /Lv* "install.log" SERVER_HOST="localhost" SERVER_PORT="8000" SERVER_LOGIN="admin" SERVER_PASSWORD="123" CLIENT_APPSERVER_HOST="localhost" CLIENT_APPSERVER_PORT="8000" CLIENT_APPSERVER_LOGIN="admin" CLIENT_APPSERVER_PASSWORD="123" SERVER_DIRECTORY="c:\records"
+start /B /WAIT msiexec /I "bin\%ARTIFACTID%-%VERSION%.msi" /qb- /Lv* "install.log" SERVER_HOST="localhost" SERVER_PORT="7001" SERVER_LOGIN="admin" SERVER_PASSWORD="123" CLIENT_APPSERVER_HOST="localhost" CLIENT_APPSERVER_PORT="7001" CLIENT_APPSERVER_LOGIN="admin" CLIENT_APPSERVER_PASSWORD="123" SERVER_DIRECTORY="c:\records"
 echo installer errorlevel is %ERRORLEVEL%
 
 cd "%VS90COMNTOOLS%\..\..\..\Network Optix\HD Witness\Client\"
@@ -29,7 +29,7 @@ sc stop vmsappserver
 taskkill /F /IM traytool.exe
 taskkill /F /IM client.exe
 taskkill /F /IM mediaserver.exe
-taskkill /F /IM appserver.exe
+taskkill /F /IM ec.exe
 
 CD %CURRENTDIR%
 
