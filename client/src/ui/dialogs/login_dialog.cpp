@@ -143,7 +143,7 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
 
     QVBoxLayout* layout = new QVBoxLayout(ui->videoSpacer);
     layout->setSpacing(0);
-    layout->setContentsMargins(0,0,0,0);
+    layout->setContentsMargins(0,0,0,10);
 
     QGLFormat glFormat;
     glFormat.setOption(QGL::SampleBuffers); /* Multisampling. */
@@ -153,8 +153,9 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
 
     
     //aviRes = QnAviResourcePtr(new QnAviResource("e:/Users/roman76r/blake/FILMS_TEASERS 2_Open for Business Pt 1_kimberely Kane & Dahlia Grey.wmv"));
-    aviRes = QnAviResourcePtr(new QnAviResource(":/skin/intro.ts"));
+    aviRes = QnAviResourcePtr(new QnAviResource(":/skin/intro.mkv"));
     dataProvider = static_cast<QnAbstractArchiveReader*> (aviRes->createDataProvider(QnResource::Role_Default));
+    dataProvider->setCycleMode(false);
     camera = new CLVideoCamera(aviRes, false, dataProvider);
     
     renderer = new QnResourceWidgetRenderer(1, 0, glWindow->context());

@@ -92,6 +92,8 @@ void QnSettings::load()
     m_data.backgroundColor = m_settings->value("backgroundColor", QColor(5, 5, 50)).value<QColor>();
     m_data.maxVideoItems = m_settings->value("maxVideoItems", 32).toInt();
     m_data.downmixAudio = (m_settings->value("downmixAudio") == "true");
+    m_data.openLayoutsOnLogin = true;
+
 
     if (m_data.mediaRoot.isEmpty())
         m_data.mediaRoot = getMoviesDirectory() + QLatin1String("/EVE Media/");
@@ -123,6 +125,14 @@ void QnSettings::save()
     m_settings->setValue("afterFirstRun", "true");
     m_settings->setValue("maxVideoItems", QString::number(m_data.maxVideoItems));
     m_settings->setValue("downmixAudio", m_data.downmixAudio ? "true" : "false");
+}
+
+bool QnSettings::layoutsOpenedOnLogin() const {
+    return m_data.openLayoutsOnLogin;
+}
+
+void QnSettings::setLayoutsOpenedOnLogin(bool openLayoutsOnLogin) {
+    m_data.openLayoutsOnLogin = openLayoutsOnLogin;
 }
 
 int QnSettings::maxVideoItems() const

@@ -18,7 +18,8 @@
 Q_GLOBAL_STATIC(QnResourcePool, globalResourcePool)
 
 QnResourcePool::QnResourcePool() : QObject(),
-    m_resourcesMtx(QMutex::Recursive)
+    m_resourcesMtx(QMutex::Recursive),
+    m_updateLayouts(true)
 {
     qRegisterMetaType<QnResourcePtr>("QnResourcePtr");
     qRegisterMetaType<QnResourceList>("QnResourceList");
@@ -41,6 +42,18 @@ QnResourcePool::~QnResourcePool()
 QnResourcePool *QnResourcePool::instance()
 {
     return globalResourcePool();
+}
+
+bool QnResourcePool::isLayoutsUpdated() const {
+    QMutexLocker locker(&m_resourcesMtx);
+
+    return m_updateLayouts;
+}
+
+void QnResourcePool::setLayoutsUpdated(bool updateLayouts) {
+    QMutexLocker locker(&m_resourcesMtx);
+
+    m_updateLayouts = updateLayouts;
 }
 
 void QnResourcePool::addResources(const QnResourceList &resources)
@@ -148,10 +161,11 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
     foreach (const QnResourcePtr &resource, removedResources) {
         disconnect(resource.data(), NULL, this, NULL);
 
-        foreach (const QnLayoutResourcePtr &layoutResource, QnResourceCriterion::filter<QnLayoutResource>(getResources())) // TODO: this is way beyond what one may call 'not optimal'.
-            foreach(const QnLayoutItemData &data, layoutResource->getItems())
-                if(data.resource.id == resource->getId() || data.resource.path == resource->getUniqueId())
-                    layoutResource->removeItem(data);
+        if(m_updateLayouts)
+            foreach (const QnLayoutResourcePtr &layoutResource, QnResourceCriterion::filter<QnLayoutResource>(getResources())) // TODO: this is way beyond what one may call 'not optimal'.
+                foreach(const QnLayoutItemData &data, layoutResource->getItems())
+                    if(data.resource.id == resource->getId() || data.resource.path == resource->getUniqueId())
+                        layoutResource->removeItem(data);
 
         TRACE("RESOURCE REMOVED" << resource->metaObject()->className() << resource->getName());
 

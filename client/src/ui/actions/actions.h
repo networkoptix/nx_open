@@ -30,11 +30,6 @@ namespace Qn {
         /* Actions that are not assigned to any menu. */
 
         /**
-         * Opens about dialog.
-         */
-        AboutAction,
-
-        /**
          * Opens connection setting dialog.
          */
         ConnectToServerAction,
@@ -173,6 +168,11 @@ namespace Qn {
          * Opens system settings dialog.
          */
         SystemSettingsAction,
+
+        /**
+         * Opens about dialog.
+         */
+        AboutAction,
 
         /**
          * Closes the client.

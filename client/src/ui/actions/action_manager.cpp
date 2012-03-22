@@ -241,13 +241,6 @@ QnActionManager::QnActionManager(QObject *parent):
 
     /* Actions that are not assigned to any menu. */
 
-    factory(Qn::AboutAction).
-        flags(Qn::NoTarget).
-        text(tr("About...")).
-        role(QAction::AboutRole).
-        autoRepeat(false).
-        icon(qnSkin->icon("info.png"));
-
     factory(Qn::ShowFpsAction).
         flags(Qn::NoTarget).
         text(tr("Show FPS")).
@@ -298,6 +291,10 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::GetMoreLicensesAction).
         flags(Qn::NoTarget).
         text(tr("Get More Licenses..."));
+
+    factory(Qn::ReconnectAction).
+        flags(Qn::NoTarget).
+        text(tr("Reconnect to Server"));
 
 
     /* Context menu actions. */
@@ -451,14 +448,21 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         icon(qnSkin->icon("decorations/settings.png"));
 
-    factory(Qn::ReconnectAction).
-        flags(Qn::NoTarget).
-        text(tr("Reconnect to Server"));
-
     factory().
         flags(Qn::Main).
         separator();
     
+    factory(Qn::AboutAction).
+        flags(Qn::Main).
+        text(tr("About...")).
+        role(QAction::AboutRole).
+        autoRepeat(false).
+        icon(qnSkin->icon("info.png"));
+
+    factory().
+        flags(Qn::Main).
+        separator();
+
     factory(Qn::ExitAction).
         flags(Qn::Main).
         text(tr("Exit")).

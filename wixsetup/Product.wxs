@@ -42,7 +42,7 @@
         <Property Id="BUSYPORT" Secure="yes"/>
 
         <Property Id="DUMMY_APPSERVER_LOGIN" Value="admin"/>
-    	
+        
         <!-- AppServer properties-->
         <Property Id="APPSERVER_PORT" Secure="yes">
             <RegistrySearch Id="AppServerPortReg"
@@ -54,13 +54,13 @@
         </Property>
         
         <Property Id="APPSERVER_LOGIN" Secure="yes" Value="admin"/>
-        <Property Id="APPSERVER_PASSWORD" Secure="yes" Value="123"/>
+        <Property Id="APPSERVER_PASSWORD" Secure="yes"/>
         
         <!-- MediaServer properties-->
         <Property Id="SERVER_APPSERVER_HOST" Secure="yes" Value="localhost"/>
         <Property Id="SERVER_APPSERVER_PORT" Secure="yes" Value="8000"/>
         <Property Id="SERVER_APPSERVER_LOGIN" Secure="yes" Value="admin"/>
-        <Property Id="SERVER_APPSERVER_PASSWORD" Secure="yes" Value="123"/>
+        <Property Id="SERVER_APPSERVER_PASSWORD" Secure="yes"/>
         <Property Id="SERVER_RTSP_PORT" Secure="yes">
             <RegistrySearch Id="ServerRtspPortReg"
                             Root="HKLM"
@@ -97,7 +97,7 @@
         <Property Id="CLIENT_APPSERVER_HOST" Secure="yes" Value="localhost"/>
         <Property Id="CLIENT_APPSERVER_PORT" Secure="yes" Value="7001"/>
         <Property Id="CLIENT_APPSERVER_LOGIN" Secure="yes" Value="admin"/>
-        <Property Id="CLIENT_APPSERVER_PASSWORD" Secure="yes" Value="123"/>
+        <Property Id="CLIENT_APPSERVER_PASSWORD" Secure="yes"/>
         <Property Id="CLIENT_VMS_MODE" Value="1"/>
         <Property Id="CLIENT_DIRECTORY_REG" Secure="yes">
             <RegistrySearch Id="ClientDirectoryReg"
@@ -209,7 +209,7 @@
                     <Directory Id="INSTALLDIR" Name="$(env.APPLICATION_NAME)">
                         <Directory Id="VmsAppServerDir" Name="Enterprise Controller">
                             <Component Id="AppServerExecutable" Guid="{5FB5A627-BB1F-4d82-A06C-7672903DA4C7}">
-                                <File Id="ecexe" Name="ec.exe" Source="../appserver/setup/build/exe.win32-2.7/ec.exe" KeyPath="yes">
+                                <File Id="ecexe" Name="ecs.exe" Source="../appserver/setup/build/exe.win32-2.7/ecs.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionAppServer" Name="Network Optix Enterprise Controller" Scope="any" IgnoreFailure="yes"/>
                                 </File>
                                 
@@ -402,10 +402,10 @@
                                 <File Id="ClientQjsonDll" Name="qjson.dll" Source="../client/bin/$(env.CONFIG)/qjson.dll"/>
                             </Component>
                             
-                        	<Component Id="ClientQtColorPicker" Guid="{A8E0F358-198A-4D79-A6F0-607D60F524EE}">
-                        		<File Id="ColorPicker26dll" Name="QtSolutions_ColorPicker-2.6.dll " Source="..\client\contrib\qtcolorpicker\lib\QtSolutions_ColorPicker-2.6$(var.suffix).dll"/>
-                        	</Component>
-                        	
+                            <Component Id="ClientQtColorPicker" Guid="{A8E0F358-198A-4D79-A6F0-607D60F524EE}">
+                                <File Id="ColorPicker26dll" Name="QtSolutions_ColorPicker-2.6.dll " Source="..\client\contrib\qtcolorpicker\lib\QtSolutions_ColorPicker-2.6$(var.suffix).dll"/>
+                            </Component>
+                            
                             <Directory Id="styles" Name="styles">
                                 <Component Id="bespin" Guid="{BF20F7AC-A34C-481a-84E3-731C80050D51}">
                                     <File Id="bespin$(var.suffix).dll" Name="bespin$(var.suffix).dll" Source="..\client\contrib\bespin\bin\msvc-x86\$(env.CONFIG)\styles\bespin$(var.suffix).dll"/>
@@ -491,7 +491,7 @@
             <ComponentRef Id="ClientOpenSSL" />
             <ComponentRef Id="ClientXerces"/>
             <ComponentRef Id="ClientQjson"/>
-        	<ComponentRef Id="ClientQtColorPicker"/>
+            <ComponentRef Id="ClientQtColorPicker"/>
             <ComponentRef Id="bespin" />
             <ComponentRef Id='arecontvision'/>
             
@@ -552,8 +552,8 @@
             
             <Publish Dialog="PasswordDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg">1</Publish>
             <Publish Dialog="PasswordDlg" Control="Next" Event="SpawnDialog" Value="EmptyPasswordDlg">NOT APPSERVER_PASSWORD</Publish>
-        	<Publish Dialog="PasswordDlg" Control="Next" Property="SERVER_APPSERVER_PASSWORD" Value="[APPSERVER_PASSWORD]">APPSERVER_PASSWORD</Publish>
-        	<Publish Dialog="PasswordDlg" Control="Next" Property="CLIENT_APPSERVER_PASSWORD" Value="[APPSERVER_PASSWORD]">APPSERVER_PASSWORD</Publish>
+            <Publish Dialog="PasswordDlg" Control="Next" Property="SERVER_APPSERVER_PASSWORD" Value="[APPSERVER_PASSWORD]">APPSERVER_PASSWORD</Publish>
+            <Publish Dialog="PasswordDlg" Control="Next" Property="CLIENT_APPSERVER_PASSWORD" Value="[APPSERVER_PASSWORD]">APPSERVER_PASSWORD</Publish>
             <Publish Dialog="PasswordDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">APPSERVER_PASSWORD</Publish>
             
             <Publish Dialog="AdvancedTypeDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg">1</Publish>
