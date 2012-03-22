@@ -91,6 +91,9 @@ namespace {
     /** Viewport lower size boundary, in scene coordinates. */
     const QSizeF viewportLowerSizeBound = QSizeF(qnGlobals->workbenchUnitSize() * 0.05, qnGlobals->workbenchUnitSize() * 0.05);
 
+    const qreal defaultFrameWidth = qnGlobals->workbenchUnitSize() * 0.005;
+    const qreal selectedFrameWidth = defaultFrameWidth * 2;
+
     const int widgetAnimationDurationMsec = 500;
     const int zoomAnimationDurationMsec = 500;
 
@@ -121,7 +124,8 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_frontZ(0.0),
     m_dummyScene(new QGraphicsScene(this)),
 	m_renderWatcher(NULL),
-    m_frameOpacity(1.0)
+    m_frameOpacity(1.0),
+    m_frameWidthsDirty(false)
 {
     std::memset(m_itemByRole, 0, sizeof(m_itemByRole));
 
@@ -129,16 +133,18 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     Instrument::EventTypeSet paintEventTypes = Instrument::makeSet(QEvent::Paint);
 
     SignalingInstrument *resizeSignalingInstrument = new SignalingInstrument(Instrument::VIEWPORT, Instrument::makeSet(QEvent::Resize), this);
+    SignalingInstrument *paintSignalingInstrument = new SignalingInstrument(Instrument::VIEWPORT, Instrument::makeSet(QEvent::Paint), this);
     m_animationInstrument = new AnimationInstrument(this);
     m_boundingInstrument = new BoundingInstrument(this);
     m_transformListenerInstrument = new TransformListenerInstrument(this);
     m_curtainActivityInstrument = new ActivityListenerInstrument(1000, this);
-    m_widgetActivityInstrument = new ActivityListenerInstrument(1000*10, this);
+    m_widgetActivityInstrument = new ActivityListenerInstrument(1000 * 10, this);
     m_paintForwardingInstrument = new ForwardingInstrument(Instrument::VIEWPORT, paintEventTypes, this);
     m_selectionOverlayHackInstrument = new SelectionOverlayHackInstrument(this);
 
     m_instrumentManager->installInstrument(new StopInstrument(Instrument::VIEWPORT, paintEventTypes, this));
     m_instrumentManager->installInstrument(m_paintForwardingInstrument);
+    m_instrumentManager->installInstrument(paintSignalingInstrument);
     m_instrumentManager->installInstrument(m_transformListenerInstrument);
     m_instrumentManager->installInstrument(resizeSignalingInstrument);
     m_instrumentManager->installInstrument(m_boundingInstrument);
@@ -149,12 +155,13 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
 
     m_curtainActivityInstrument->recursiveDisable();
 
-    connect(m_transformListenerInstrument, SIGNAL(transformChanged(QGraphicsView *)),                   this,                   SLOT(synchronizeRaisedGeometry()));
-    connect(resizeSignalingInstrument,     SIGNAL(activated(QWidget *, QEvent *)),                      this,                   SLOT(synchronizeRaisedGeometry()));
-    connect(resizeSignalingInstrument,     SIGNAL(activated(QWidget *, QEvent *)),                      this,                   SLOT(synchronizeSceneBoundsExtension()));
-    connect(resizeSignalingInstrument,     SIGNAL(activated(QWidget *, QEvent *)),                      this,                   SLOT(fitInView()));
-    connect(m_curtainActivityInstrument,   SIGNAL(activityStopped()),                                   this,                   SLOT(at_activityStopped()));
-    connect(m_curtainActivityInstrument,   SIGNAL(activityResumed()),                                   this,                   SLOT(at_activityStarted()));
+    connect(m_transformListenerInstrument,  SIGNAL(transformChanged(QGraphicsView *)),                  this,                   SLOT(synchronizeRaisedGeometry()));
+    connect(resizeSignalingInstrument,      SIGNAL(activated(QWidget *, QEvent *)),                     this,                   SLOT(synchronizeRaisedGeometry()));
+    connect(resizeSignalingInstrument,      SIGNAL(activated(QWidget *, QEvent *)),                     this,                   SLOT(synchronizeSceneBoundsExtension()));
+    connect(resizeSignalingInstrument,      SIGNAL(activated(QWidget *, QEvent *)),                     this,                   SLOT(fitInView()));
+    connect(paintSignalingInstrument,       SIGNAL(activated(QWidget *, QEvent *)),                     this,                   SLOT(updateFrameWidths()));
+    connect(m_curtainActivityInstrument,    SIGNAL(activityStopped()),                                  this,                   SLOT(at_activityStopped()));
+    connect(m_curtainActivityInstrument,    SIGNAL(activityResumed()),                                  this,                   SLOT(at_activityStarted()));
 
     /* Configure viewport updates. */
     setTimer(new QAnimationTimer(this));
@@ -272,6 +279,7 @@ void QnWorkbenchDisplay::initSceneContext() {
 
     connect(m_scene,                SIGNAL(destroyed()),                            this,                   SLOT(at_scene_destroyed()));
     connect(m_scene,                SIGNAL(selectionChanged()),                     context()->action(Qn::SelectionChangeAction), SLOT(trigger()));
+    connect(m_scene,                SIGNAL(selectionChanged()),                     this,                   SLOT(at_scene_selectionChanged()));
 
     /* Scene indexing will only slow everything down. */
     m_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
@@ -569,6 +577,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
     widget->setParent(this); /* Just to feel totally safe and not to leak memory no matter what happens. */
     widget->setAttribute(Qt::WA_DeleteOnClose);
     widget->setFrameOpacity(m_frameOpacity);
+    widget->setFrameWidth(defaultFrameWidth);
 
     widget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true); /* Optimization. */
     widget->setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -1052,6 +1061,14 @@ void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate) {
     synchronizeGeometry(item, animate);
 }
 
+void QnWorkbenchDisplay::updateFrameWidths() {
+    if(!m_frameWidthsDirty)
+        return;
+
+    foreach(QnResourceWidget *widget, m_widgetByRenderer)
+        widget->setFrameWidth(widget->isSelected() ? selectedFrameWidth : defaultFrameWidth);
+}
+
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDisplay :: handlers
@@ -1132,9 +1149,8 @@ void QnWorkbenchDisplay::at_workbench_itemChanged(QnWorkbench::ItemRole role, Qn
     switch(role) {
     case QnWorkbench::RAISED: {
         /* Sync new & old items. */
-        if(oldItem != NULL) {
+        if(oldItem != NULL)
             synchronize(oldItem);
-        }
 
         if(item != NULL) {
             bringToFront(item);
@@ -1285,6 +1301,10 @@ void QnWorkbenchDisplay::at_widget_aboutToBeDestroyed() {
 
 void QnWorkbenchDisplay::at_scene_destroyed() {
     setScene(NULL);
+}
+
+void QnWorkbenchDisplay::at_scene_selectionChanged() {
+    m_frameWidthsDirty = true;
 }
 
 void QnWorkbenchDisplay::at_view_destroyed() {

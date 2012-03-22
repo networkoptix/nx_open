@@ -31,9 +31,6 @@ namespace {
     /** Flashing text flash interval */
     static const int TEXT_FLASHING_PERIOD = 1000;
 
-    /** Default frame width. */
-    const qreal defaultFrameWidth = 50.0;
-
     /** Frame extension multiplier determines the width of frame extension relative
      * to frame width.
      *
@@ -42,7 +39,7 @@ namespace {
     const qreal frameExtensionMultiplier = 1.0;
 
     /** Default shadow displacement, in scene coordinates. */
-    const QPointF defaultShadowDisplacement = QPointF(500.0, 500.0);
+    const QPointF defaultShadowDisplacement = QPointF(qnGlobals->workbenchUnitSize(), qnGlobals->workbenchUnitSize()) * 0.05;
 
     /** Default timeout before the video is displayed as "loading", in milliseconds. */
     const qint64 defaultLoadingTimeoutMSec = MAX_FRAME_DURATION;
@@ -53,7 +50,6 @@ namespace {
     /** Default duration of "fade-in" effect for overlay icons. */
     const qint64 defaultOverlayFadeInDurationMSec = 500;
 
-    /** Progress painter storage. */
     class QnLoadingProgressPainterFactory {
     public:
         QnLoadingProgressPainter *operator()(const QGLContext *) {
@@ -80,7 +76,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     m_renderer(NULL),
     m_aspectRatio(-1.0),
     m_enclosingAspectRatio(1.0),
-    m_frameWidth(0.0),
+    m_frameWidth(-1.0),
     m_frameOpacity(1.0),
     m_aboutToBeDestroyedEmitted(false),
     m_displayFlags(DISPLAY_SELECTION_OVERLAY | DISPLAY_BUTTONS),
@@ -98,7 +94,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     invalidateShadowShape();
 
     /* Set up frame. */
-    setFrameWidth(defaultFrameWidth);
+    setFrameWidth(0.0);
 
     /* Set up buttons layout. */
     m_buttonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
@@ -170,6 +166,9 @@ const QnResourcePtr &QnResourceWidget::resource() const {
 }
 
 void QnResourceWidget::setFrameWidth(qreal frameWidth) {
+    if(qFuzzyCompare(m_frameWidth, frameWidth))
+        return;
+
     prepareGeometryChange();
 
     m_frameWidth = frameWidth;
