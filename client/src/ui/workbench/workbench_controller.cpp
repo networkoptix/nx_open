@@ -375,16 +375,27 @@ bool QnWorkbenchController::eventFilter(QObject *watched, QEvent *event)
             return true;
         }
         case Qt::Key_Up:
-            moveCursor(QPoint(0, -1));
+            if(e->modifiers() == 0)
+                moveCursor(QPoint(0, -1));
             return true;
         case Qt::Key_Down:
-            moveCursor(QPoint(0, 1));
+            if(e->modifiers() == 0)
+                moveCursor(QPoint(0, 1));
             return true;
         case Qt::Key_Left:
-            moveCursor(QPoint(-1, 0));
+            if(e->modifiers() == 0)
+                moveCursor(QPoint(-1, 0));
             return true;
         case Qt::Key_Right:
-            moveCursor(QPoint(1, 0));
+            if(e->modifiers() == 0)
+                moveCursor(QPoint(1, 0));
+            return true;
+        case Qt::Key_Plus:
+        case Qt::Key_Equal:
+            m_wheelZoomInstrument->emulate(30);
+            return true;
+        case Qt::Key_Minus:
+            m_wheelZoomInstrument->emulate(-30);
             return true;
         default:
             break;
