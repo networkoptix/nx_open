@@ -48,6 +48,9 @@ public:
         return m_contentLen;
     }
 
+    static QByteArray basicAuth(const QAuthenticator& auth);
+
+
     QString mRealm;
     QString mNonce;
     QString mQop;

@@ -23,11 +23,18 @@ public:
 
     bool hasDualStreaming() const override {return false;}
 
+    void init() override; 
+
 protected:
-
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
-
     virtual void setCropingPhysical(QRect croping);
+
+    CLHttpStatus readOID(const QString& oid, QString& result);
+    CLHttpStatus readOID(const QString& oid, int& result);
+
+    CLHttpStatus setOID(const QString& oid, const QString& val);
+
+    QSize getMaxResolution() const;
 };
 
 #endif //iq_resource_h_1547

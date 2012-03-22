@@ -4,6 +4,8 @@
 #include "h264_rtp_reader.h"
 
 
+static const int RTSP_RETRY_COUNT = 3;
+
 RTPH264StreamreaderDelegate::RTPH264StreamreaderDelegate(QnResourcePtr res):
 QnResourceConsumer(res),
 m_streamParser(0)
@@ -31,10 +33,14 @@ QnAbstractMediaDataPtr RTPH264StreamreaderDelegate::getNextData()
     if (!isStreamOpened())
         return QnAbstractMediaDataPtr(0);
 
-    if(m_streamParser) {
-        QnAbstractMediaDataPtr rez = m_streamParser->getNextData();
-        if (rez)
-            return rez;
+    if(m_streamParser) 
+    {
+        for (int i = 0; i < RTSP_RETRY_COUNT; ++i)
+        {
+            QnAbstractMediaDataPtr rez = m_streamParser->getNextData();
+            if (rez)
+                return rez;
+        }
     }
     closeStream();
     return QnAbstractMediaDataPtr(0);
@@ -56,6 +62,7 @@ void RTPH264StreamreaderDelegate::openStream()
     else
         QTextStream(&url) << "rtsp://" << nres->getHostAddress().toString();
 
+    m_RtpSession.setAuth(nres->getAuth());
 
     if (m_RtpSession.open(url))
     {
@@ -71,6 +78,7 @@ void RTPH264StreamreaderDelegate::openStream()
 
 void RTPH264StreamreaderDelegate::closeStream()
 {
+    m_RtpSession.sendTeardown();
     m_RtpSession.stop();
     delete m_streamParser;
     m_streamParser = 0;

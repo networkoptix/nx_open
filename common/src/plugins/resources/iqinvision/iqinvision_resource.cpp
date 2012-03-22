@@ -51,6 +51,7 @@ QnAbstractStreamDataProvider* QnPlIqResource::createLiveDataProvider()
         name == QLatin1String("IQM30S") ||
         name == QLatin1String("IQM31S") ||
         name == QLatin1String("IQM32N") ||
+        //name == QLatin1String("IQ765N") ||
         name == QLatin1String("IQM32S"))
         return new RTP264StreamReader(toSharedPointer());
         /**/
@@ -62,3 +63,59 @@ void QnPlIqResource::setCropingPhysical(QRect /*croping*/)
 {
 
 }
+
+void QnPlIqResource::init() 
+{
+    setOID("1.2.6.5", "1"); // Reset crop to maximum size
+}
+
+CLHttpStatus QnPlIqResource::readOID(const QString& oid, QString& result)
+{
+    QString request = QString("get.oid?") + oid;
+
+    CLHttpStatus status;
+    
+    result = QString(downloadFile(status, request,  getHostAddress(), 80, 1000, getAuth()));
+
+    if (status == CL_HTTP_AUTH_REQUIRED)
+    {
+        setStatus(Unauthorized);
+    }
+    
+    return status;
+}
+
+
+
+CLHttpStatus QnPlIqResource::readOID(const QString& oid, int& result)
+{
+    QString sresult;
+    CLHttpStatus status = readOID(oid, sresult);
+
+    result = sresult.toInt();
+
+    return status;
+}
+
+CLHttpStatus QnPlIqResource::setOID(const QString& oid, const QString& val)
+{
+    QString request = QString("set.oid?OidTR") + oid + QString("=") + val;
+    CLHttpStatus status;
+
+    downloadFile(status, request,  getHostAddress(), 80, 1000, getAuth());
+
+    if (status == CL_HTTP_AUTH_REQUIRED)
+    {
+        setStatus(Unauthorized);
+    }
+
+    return status;
+
+}
+
+QSize QnPlIqResource::getMaxResolution() const
+{
+    QSize s;
+    return s;
+}
+
