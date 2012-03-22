@@ -333,6 +333,7 @@ QnAbstractMediaDataPtr CLH264RtpParser::getNextData()
         //videoData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
         videoData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
     }
+
     return videoData;
 }
 

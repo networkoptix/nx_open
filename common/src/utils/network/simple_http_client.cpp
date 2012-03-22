@@ -332,16 +332,21 @@ void CLSimpleHTTPClient::getAuthInfo()
     mQop = m_header.value("qop");
 }
 
-QByteArray CLSimpleHTTPClient::basicAuth() const
+QByteArray CLSimpleHTTPClient::basicAuth(const QAuthenticator& auth) 
 {
     QByteArray lp;
-    lp.append(m_auth.user().toUtf8());
+    lp.append(auth.user().toUtf8());
     lp.append(':');
-    lp.append(m_auth.password().toUtf8());
+    lp.append(auth.password().toUtf8());
 
     QByteArray base64("Authorization: Basic ");
     base64.append(lp.toBase64());
     return base64;
+}
+
+QByteArray CLSimpleHTTPClient::basicAuth() const
+{
+    return basicAuth(m_auth);
 }
 
 QString CLSimpleHTTPClient::digestAccess(const QString& request) const

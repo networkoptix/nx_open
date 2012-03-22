@@ -56,6 +56,7 @@ void RTPH264StreamreaderDelegate::openStream()
     else
         QTextStream(&url) << "rtsp://" << nres->getHostAddress().toString();
 
+    m_RtpSession.setAuth(nres->getAuth());
 
     if (m_RtpSession.open(url))
     {

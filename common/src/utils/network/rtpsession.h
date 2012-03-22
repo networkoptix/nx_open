@@ -1,6 +1,7 @@
 #ifndef rtp_session_h_1935_h
 #define rtp_session_h_1935_h
 
+#include <QAuthenticator>
 #include "socket.h"
 
 #include <QtCore/QDateTime>
@@ -94,6 +95,9 @@ public:
     void setTCPTimeout(int timeout);
 
     void parseRangeHeader(const QString& rangeStr);
+
+    void setAuth(const QAuthenticator& auth);
+    QAuthenticator getAuth() const;
 signals:
     void gotTextResponse(QByteArray text);
 private:
@@ -108,6 +112,7 @@ private:
 
     bool readTextResponce(QByteArray &responce);
     int readBinaryResponce(quint8 *data, int maxDataSize);
+    void addAuth(QByteArray& request);
 
 
     QString extractRTSPParam(const QString &buffer, const QString &paramName);
@@ -149,6 +154,7 @@ private:
     QMap<QByteArray, QByteArray> m_additionAttrs;
     int m_tcpTimeout;
     QByteArray m_tracksPrefix;
+    QAuthenticator m_auth;
 };
 
 #endif //rtp_session_h_1935_h
