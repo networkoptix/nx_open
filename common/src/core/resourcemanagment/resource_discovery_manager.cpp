@@ -9,6 +9,7 @@
 #include "api/AppServerConnection.h"
 #include "core/resource/resource_directory_browser.h"
 #include "utils/common/synctime.h"
+#include "utils/network/ping.h"
 
 namespace {
     class QnResourceDiscoveryManagerInstance: public QnResourceDiscoveryManager {};
@@ -123,6 +124,8 @@ void QnResourceDiscoveryManager::run()
         QnSleep::msleep(1000);
     }
 
+    m_runNumber = 0;
+
     while (!needToStop())
     {
         bool ip_finished;
@@ -137,6 +140,7 @@ void QnResourceDiscoveryManager::run()
 
         int global_delay_between_search = 1000;
         smartSleep(global_delay_between_search);
+        ++m_runNumber;
     }
 }
 
@@ -237,6 +241,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
 
             // seems like resource is in the pool and has OK ip
             updateResourceStatus(rpNetRes);
+            pingResources(rpNetRes);
 
             it = resources.erase(it); // do not need to investigate OK resources
 
@@ -535,6 +540,23 @@ void QnResourceDiscoveryManager::updateResourceStatus(QnResourcePtr res)
         rpNetRes->setLastDiscoveredTime(qnSyncTime->currentDateTime());
     }
 
+}
+
+void QnResourceDiscoveryManager::pingResources(QnResourcePtr res)
+{
+    if (m_runNumber%50 != 0)
+        return;
+
+    QnNetworkResourcePtr rpNetRes = res.dynamicCast<QnNetworkResource>();
+
+    if (rpNetRes)
+    {
+        if (!rpNetRes->hasRunningLiveProvider())
+        {
+            CLPing ping;
+            ping.ping(rpNetRes->getHostAddress().toString(), 1, 300);
+        }
+    }
 }
 
 void QnResourceDiscoveryManager::check_if_accessible(QnResourceList& justfoundList, int threads)

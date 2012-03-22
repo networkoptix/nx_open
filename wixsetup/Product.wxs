@@ -54,13 +54,13 @@
         </Property>
         
         <Property Id="APPSERVER_LOGIN" Secure="yes" Value="admin"/>
-        <Property Id="APPSERVER_PASSWORD" Secure="yes" Value="123"/>
+        <Property Id="APPSERVER_PASSWORD" Secure="yes"/>
         
         <!-- MediaServer properties-->
         <Property Id="SERVER_APPSERVER_HOST" Secure="yes" Value="localhost"/>
         <Property Id="SERVER_APPSERVER_PORT" Secure="yes" Value="8000"/>
         <Property Id="SERVER_APPSERVER_LOGIN" Secure="yes" Value="admin"/>
-        <Property Id="SERVER_APPSERVER_PASSWORD" Secure="yes" Value="123"/>
+        <Property Id="SERVER_APPSERVER_PASSWORD" Secure="yes"/>
         <Property Id="SERVER_RTSP_PORT" Secure="yes">
             <RegistrySearch Id="ServerRtspPortReg"
                             Root="HKLM"
@@ -97,7 +97,7 @@
         <Property Id="CLIENT_APPSERVER_HOST" Secure="yes" Value="localhost"/>
         <Property Id="CLIENT_APPSERVER_PORT" Secure="yes" Value="7001"/>
         <Property Id="CLIENT_APPSERVER_LOGIN" Secure="yes" Value="admin"/>
-        <Property Id="CLIENT_APPSERVER_PASSWORD" Secure="yes" Value="123"/>
+        <Property Id="CLIENT_APPSERVER_PASSWORD" Secure="yes"/>
         <Property Id="CLIENT_VMS_MODE" Value="1"/>
         <Property Id="CLIENT_DIRECTORY_REG" Secure="yes">
             <RegistrySearch Id="ClientDirectoryReg"

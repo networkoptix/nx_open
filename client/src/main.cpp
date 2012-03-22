@@ -306,8 +306,6 @@ int main(int argc, char *argv[])
 
     /* Initialize connections. */
     initAppServerConnection();
-    if (!qnSettings->isAfterFirstRun() && !getMoviesDirectory().isEmpty())
-        qnSettings->addAuxMediaRoot(getMoviesDirectory());
     qnSettings->save();
     cl_log.log(QLatin1String("Using ") + qnSettings->mediaRoot() + QLatin1String(" as media root directory"), cl_logALWAYS);
 

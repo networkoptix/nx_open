@@ -15,7 +15,7 @@ from common_version import *
 
 import re
 
-APPLICATION_NAME = 'Network Optix Tray Assistant'
+APPLICATION_NAME = 'HD Witness Tray Assistant'
 
 # os.path = posixpath
 sys.path.insert(0, os.path.join('..', 'common'))
