@@ -83,7 +83,8 @@ void QnAxisStreamReader::openStream()
     }
     // ------------------- determine stream parameters ----------------------------
     float fps = getFps();
-    QString resolution = res->getMaxResolution();
+    float ar = res->getResolutionAspectRatio(res->getMaxResolution());
+    QString resolution = (role == QnResource::Role_LiveVideo) ? res->getMaxResolution() : res->getNearestResolution("320x240", ar);
     if (resolution.isEmpty()) 
         qWarning() << "Can't determine max resolution for axis camera " << res->getName() << "use default resolution";
     QnStreamQuality quality = getQuality();

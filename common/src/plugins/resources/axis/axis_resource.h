@@ -22,12 +22,13 @@ public:
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
 
+    virtual bool hasDualStreaming() const override { return true; }
+
     bool isInitialized() const;
 
-    virtual bool hasDualStreaming() const override { return false; }
-
-    QString getMaxResolution() const;
-
+    QByteArray getMaxResolution() const;
+    QString getNearestResolution(const QByteArray& resolution, float aspectRatio) const;
+    float getResolutionAspectRatio(const QByteArray& resolution) const;
 protected:
     void init();
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
@@ -36,7 +37,7 @@ protected:
 private:
     void clear();
 private:
-    QString m_maxResolution;
+    QList<QByteArray> m_resolutionList;
 };
 
 typedef QSharedPointer<QnPlAxisResource> QnPlAxisResourcePtr;
