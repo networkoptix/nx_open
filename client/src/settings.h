@@ -27,6 +27,7 @@ public:
         QString mediaRoot;
         QStringList auxMediaRoots;
         bool animateBackground;
+        bool openLayoutsOnLogin;
         QColor backgroundColor;
     };
 
@@ -44,6 +45,9 @@ public:
     QStringList auxMediaRoots() const;
     bool isBackgroundAnimated() const;
     QColor backgroundColor() const;
+
+    bool layoutsOpenedOnLogin() const;
+    void setLayoutsOpenedOnLogin(bool openLayoutsOnLogin);
 
     void addAuxMediaRoot(const QString &root);
 

@@ -108,7 +108,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     m_selectionUpdatePending(false),
     m_selectionScope(Qn::SceneScope)
 {
-    connect(context(),                                      SIGNAL(aboutToBeDestroyed()),                   this,   SLOT(at_context_aboutToBeDestroyed()));
     connect(context(),                                      SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(at_context_userChanged(const QnUserResourcePtr &)));
     connect(context(),                                      SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(submitDelayedDrops()), Qt::QueuedConnection);
     connect(context(),                                      SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(updateCameraSettingsEditibility()));
@@ -475,9 +474,11 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
         return;
 
     /* Open all user's layouts. */
-    QnResourceList layouts = QnResourceCriterion::filter<QnLayoutResource, QnResourceList>(context()->resourcePool()->getResourcesWithParentId(user->getId()));
-    menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
-
+    if(qnSettings->layoutsOpenedOnLogin()) {
+        QnResourceList layouts = QnResourceCriterion::filter<QnLayoutResource, QnResourceList>(context()->resourcePool()->getResourcesWithParentId(user->getId()));
+        menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
+    }
+    
     /* Delete empty orphaned layouts, move non-empty to the new user. */
     foreach(const QnResourcePtr &resource, context()->resourcePool()->getResourcesWithParentId(QnId())) {
         if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
@@ -817,7 +818,7 @@ void QnWorkbenchActionHandler::at_openFolderAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_aboutAction_triggered() {
-    QScopedPointer<AboutDialog> dialog(new AboutDialog(widget()));
+    QScopedPointer<QnAboutDialog> dialog(new QnAboutDialog(widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }
@@ -872,7 +873,9 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
 
     // don't remove local resources
     const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
+    resourcePool()->setLayoutsUpdated(false);
     resourcePool()->removeResources(remoteResources);
+    resourcePool()->setLayoutsUpdated(true);
 
     qnLicensePool->reset();
 

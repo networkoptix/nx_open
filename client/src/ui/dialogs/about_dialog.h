@@ -1,18 +1,20 @@
 #ifndef ABOUTDIALOG_H
 #define ABOUTDIALOG_H
 
+#include <QtCore/QScopedPointer>
+
 #include <QtGui/QDialog>
 
-class QGroupBox;
-class QLabel;
+namespace Ui {
+    class AboutDialog;
+}
 
-class AboutDialog : public QDialog
-{
-    Q_OBJECT
+class QnAboutDialog : public QDialog {
+    Q_OBJECT;
 
 public:
-    explicit AboutDialog(QWidget *parent = 0);
-    virtual ~AboutDialog();
+    explicit QnAboutDialog(QWidget *parent = 0);
+    virtual ~QnAboutDialog();
 
 protected:
     virtual void changeEvent(QEvent *event) override;
@@ -21,13 +23,7 @@ private:
     void retranslateUi();
 
 private:
-    Q_DISABLE_COPY(AboutDialog)
-
-    QGroupBox *m_informationGroupBox;
-    QLabel *m_versionLabel;
-
-    QGroupBox *m_creditsGroupBox;
-    QLabel *m_creditsLabel;
+    QScopedPointer<Ui::AboutDialog> ui;
 };
 
 #endif // ABOUTDIALOG_H

@@ -52,6 +52,11 @@ protected:
     virtual void updateInner(QnResourcePtr other) override;
 
 private:
+    void addItemUnderLock(const QnLayoutItemData &item);
+    void updateItemUnderLock(const QUuid &itemUuid, const QnLayoutItemData &item);
+    void removeItemUnderLock(const QUuid &itemUuid);
+
+private:
     QnLayoutItemDataMap m_itemByUuid;
     qreal m_cellAspectRatio;
     QSizeF m_cellSpacing;

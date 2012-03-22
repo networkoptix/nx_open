@@ -144,6 +144,7 @@ int CLSimpleHTTPClient::readHeaders()
     int left = sizeof(m_headerBuffer)-1;
     m_header.clear();
     m_responseLine.clear();
+    int eofLen = 4;
     
     char* eofPos = 0;
     while (eofPos == 0)
@@ -155,6 +156,11 @@ int CLSimpleHTTPClient::readHeaders()
         left -= readed;
         *curPtr = 0; // end of text
         eofPos = strstr(m_headerBuffer, "\r\n\r\n");
+        if (eofPos == 0) {
+            eofPos = strstr(m_headerBuffer, "\n\n");
+            if (eofPos)
+                eofLen = 2;
+        }
     }
     QList<QByteArray> lines = QByteArray(m_headerBuffer, eofPos-m_headerBuffer).split('\n');
     m_responseLine = lines[0];
@@ -173,8 +179,8 @@ int CLSimpleHTTPClient::readHeaders()
                 m_contentLen = paramValue.toInt();
         }
     }
-    if (eofPos+4 < curPtr) {
-        m_dataRestPtr = eofPos+4;
+    if (eofPos+eofLen < curPtr) {
+        m_dataRestPtr = eofPos+eofLen;
         m_dataRestLen = curPtr - m_dataRestPtr;
     }
 
@@ -326,16 +332,21 @@ void CLSimpleHTTPClient::getAuthInfo()
     mQop = m_header.value("qop");
 }
 
-QByteArray CLSimpleHTTPClient::basicAuth() const
+QByteArray CLSimpleHTTPClient::basicAuth(const QAuthenticator& auth) 
 {
     QByteArray lp;
-    lp.append(m_auth.user().toUtf8());
+    lp.append(auth.user().toUtf8());
     lp.append(':');
-    lp.append(m_auth.password().toUtf8());
+    lp.append(auth.password().toUtf8());
 
     QByteArray base64("Authorization: Basic ");
     base64.append(lp.toBase64());
     return base64;
+}
+
+QByteArray CLSimpleHTTPClient::basicAuth() const
+{
+    return basicAuth(m_auth);
 }
 
 QString CLSimpleHTTPClient::digestAccess(const QString& request) const

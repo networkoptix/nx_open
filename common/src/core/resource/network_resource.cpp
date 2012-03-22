@@ -69,12 +69,12 @@ QHostAddress QnNetworkResource::getHostAddress() const
     return QHostAddress(getUrl());
 }
 
-bool QnNetworkResource::setHostAddress(const QHostAddress &ip, QnDomain /*domain*/)
+bool QnNetworkResource::setHostAddress(const QHostAddress &ip, QnDomain domain)
 {
     //QMutexLocker mutex(&m_mutex);
     //m_hostAddr = ip;
     setUrl(ip.toString());
-    return true;
+    return (domain == QnDomainMemory);
 }
 
 QnMacAddress QnNetworkResource::getMAC() const

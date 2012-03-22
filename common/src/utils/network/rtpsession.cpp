@@ -8,6 +8,7 @@
 #include "utils/common/util.h"
 #include "../common/sleep.h"
 #include "tcp_connection_processor.h"
+#include "simple_http_client.h"
 
 #define DEFAULT_RTP_PORT 554
 #define RESERVED_TIMEOUT_TIME (5*1000)
@@ -88,6 +89,8 @@ void RTPSession::parseSDP()
     QString codecName;
     QString codecType;
     int trackNum = -1;
+    QByteArray setupURL;
+
     foreach(QByteArray line, lines)
     {
         line = line.trimmed();
@@ -95,8 +98,9 @@ void RTPSession::parseSDP()
         if (lineLower.startsWith("m="))
         {
             if (trackNum >= 0) {
-                m_sdpTracks.insert(trackNum, SDPTrackInfo(codecName, codecType));
+                m_sdpTracks.insert(trackNum, SDPTrackInfo(codecName, codecType, setupURL));
                 trackNum = -1;
+                setupURL.clear();
             }
             codecType = lineLower.mid(2).split(' ')[0];
         }
@@ -112,17 +116,34 @@ void RTPSession::parseSDP()
             mapNum = trackInfo[1].toUInt();
             codecName = codecInfo[0];
         }
-        else if (lineLower.startsWith("a=control:track"))
+        //else if (lineLower.startsWith("a=control:track"))
+        else if (lineLower.startsWith("a=control:"))
         {
             QByteArray lineRest = line.mid(QByteArray("a=control:").length());
-            int i = 0;
-            for (; i < lineRest.size() && !(lineRest[i] >= '0' && lineRest[i] <= '9'); ++i);
-            m_tracksPrefix = lineRest.left(i);
-            trackNum = lineRest.mid(i).toUInt();
+            if (lineLower.startsWith("a=control:track"))
+            {
+                int i = 0;
+                for (; i < lineRest.size() && !(lineRest[i] >= '0' && lineRest[i] <= '9'); ++i);
+                setupURL = lineRest.left(i);
+                trackNum = lineRest.mid(i).toUInt();
+            }
+            else if (lineLower.startsWith("a=control:rtsp"))
+            {
+                int trackStart = lineRest.lastIndexOf('/')+1;
+                if (trackStart > 0 && lineRest.mid(trackStart).toLower().startsWith("trackid"))
+                {
+                    int i = trackStart;
+                    for (; i < lineRest.size() && !(lineRest[i] >= '0' && lineRest[i] <= '9'); ++i);
+                    setupURL = lineRest; //lineRest.mid(trackStart, i - trackStart);
+                    if (lineRest.indexOf('?') != -1)
+                        lineRest = lineRest.left(lineRest.indexOf('?'));
+                    trackNum = lineRest.mid(i).toUInt();
+                }
+            }
         }
     }
     if (trackNum >= 0)
-        m_sdpTracks.insert(trackNum, SDPTrackInfo(codecName, codecType));
+        m_sdpTracks.insert(trackNum, SDPTrackInfo(codecName, codecType, setupURL));
 }
 
 void RTPSession::parseRangeHeader(const QString& rangeStr)
@@ -246,6 +267,15 @@ const QByteArray& RTPSession::getSdp() const
 
 //===================================================================
 
+void RTPSession::addAuth(QByteArray& request)
+{
+    if (m_auth.isNull())
+        return;
+    request.append(CLSimpleHTTPClient::basicAuth(m_auth));
+    request.append("\r\n");
+}   
+
+
 bool RTPSession::sendDescribe()
 {
     QByteArray request;
@@ -255,6 +285,7 @@ bool RTPSession::sendDescribe()
     request += "CSeq: ";
     request += QByteArray::number(m_csec++);
     request += "\r\n";
+    addAuth(request);
     request += "User-Agent: Network Optix\r\n";
     request += "Accept: application/sdp\r\n\r\n";
 
@@ -276,7 +307,9 @@ bool RTPSession::sendOptions()
     request += " RTSP/1.0\r\n";
     request += "CSeq: ";
     request += QByteArray::number(m_csec++);
-    request += "\r\n\r\n";
+    request += "\r\n";
+    addAuth(request);
+    request += "\r\n";
 
 
     if (!m_tcpSock.send(request.data(), request.size()))
@@ -309,14 +342,19 @@ RTPIODevice*  RTPSession::sendSetup()
 
         QByteArray request;
         request += "SETUP ";
-        request += mUrl.toString();
 
-        if (!m_sdpTracks.isEmpty()) {
+        if (itr.value().setupURL.startsWith("rtsp://"))
+        {
+            // full track url in a prefix
+            request += itr.value().setupURL;
+        }   
+        else {
+            request += mUrl.toString();
             request += '/';
-            if (m_tracksPrefix.isEmpty())
+            if (itr.value().setupURL.isEmpty())
                 request += QString("trackID=");
             else
-                request += m_tracksPrefix;
+                request += itr.value().setupURL;
             request += QByteArray::number(itr.key());
         }
 
@@ -324,6 +362,7 @@ RTPIODevice*  RTPSession::sendSetup()
         request += "CSeq: ";
         request += QByteArray::number(m_csec++);
         request += "\r\n";
+        addAuth(request);
         request += "User-Agent: Network Optix\r\n";
         request += QString("Transport: RTP/AVP/") + m_transport + QString(";unicast;");
 
@@ -367,11 +406,15 @@ RTPIODevice*  RTPSession::sendSetup()
 
             for (int i = 0; i < tmpList.size(); ++i)
             {
+                tmpList[i] = tmpList[i].trimmed().toLower();
                 if (tmpList[i].startsWith("timeout"))
                 {
                     QStringList tmpParams = tmpList[i].split('=');
-                    if (tmpParams.size() > 1)
+                    if (tmpParams.size() > 1) {
                         m_TimeOut = tmpParams[1].toInt();
+                        if (m_TimeOut > 0 && m_TimeOut < 5000)
+                            m_TimeOut *= 1000; // convert seconds to ms
+                    }
                 }
             }
         }
@@ -410,6 +453,7 @@ bool RTPSession::sendSetParameter(const QByteArray& paramName, const QByteArray&
     request += "CSeq: ";
     request += QByteArray::number(m_csec++);
     request += "\r\n";
+    addAuth(request);
     request += "Session: ";
     request += m_SessionId;
     request += "\r\n";
@@ -458,6 +502,7 @@ bool RTPSession::sendPlay(qint64 startPos, qint64 endPos, double scale)
     request += "CSeq: ";
     request += QByteArray::number(m_csec++);
     request += "\r\n";
+    addAuth(request);
     request += "Session: ";
     request += m_SessionId;
     request += "\r\n";
@@ -519,6 +564,7 @@ bool RTPSession::sendPause()
     request += "CSeq: ";
     request += QByteArray::number(m_csec++);
     request += "\r\n";
+    addAuth(request);
     request += "Session: ";
     request += m_SessionId;
     request += "\r\n";
@@ -553,6 +599,7 @@ bool RTPSession::sendTeardown()
     request += "CSeq: ";
     request += QByteArray::number(m_csec++);
     request += "\r\n";
+    addAuth(request);
     request += "Session: ";
     request += m_SessionId;
     request += "\r\n\r\n";
@@ -679,6 +726,7 @@ bool RTPSession::sendKeepAlive()
     //if (!d->sessionId.isEmpty())
     {
         request += "\r\n";
+        addAuth(request);
         request += "Session: ";
         request += m_SessionId;
     }
@@ -934,4 +982,14 @@ void RTPSession::removeAdditionAttribute(const QByteArray& name)
 void RTPSession::setTCPTimeout(int timeout)
 {
     m_tcpTimeout = timeout;
+}
+
+void RTPSession::setAuth(const QAuthenticator& auth)
+{
+    m_auth = auth;
+}
+
+QAuthenticator RTPSession::getAuth() const
+{
+    return m_auth;
 }

@@ -81,11 +81,6 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     connect(ui->animateBackgroundCheckBox, SIGNAL(stateChanged(int)), this, SLOT(at_animateBackgroundCheckBox_stateChanged(int)));
     connect(ui->backgroundColorPicker, SIGNAL(colorChanged(const QColor &)), this, SLOT(at_backgroundColorPicker_colorChanged(const QColor &)));
 
-    QToolButton *aboutButton = new QToolButton();
-    aboutButton->setDefaultAction(context ? context->action(Qn::AboutAction) : NULL);
-    aboutButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-    ui->buttonBox->addButton(aboutButton, QDialogButtonBox::HelpRole);
-
     qnSettings->fillData(m_settingsData);
 
     updateView();
