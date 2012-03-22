@@ -60,6 +60,10 @@ private:
 
     void updateResourceStatus(QnResourcePtr res);
 
+
+    // ping resources from time to time to keep OS ARP table updated; speeds up resource start time in case if not recorded 
+    void pingResources(QnResourcePtr res);
+
 private:
     QMutex m_searchersListMutex;
     ResourceSearcherList m_searchersList;
@@ -70,6 +74,8 @@ private:
     volatile bool m_ready;
     bool m_server;
     bool m_foundSmth; // minor just to minimize lof output
+
+    unsigned int m_runNumber;
 };
 
 #endif //QN_RESOURCE_DISCOVERY_MANAGER_H
