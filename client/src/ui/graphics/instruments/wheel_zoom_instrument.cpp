@@ -31,6 +31,24 @@ WheelZoomInstrument::WheelZoomInstrument(QObject *parent):
     animationTimer()->addListener(processor);
 }
 
+WheelZoomInstrument::~WheelZoomInstrument() {
+    ensureUninstalled();
+}
+
+void WheelZoomInstrument::emulate(qreal degrees) {
+    if(!m_currentViewport) {
+        if(scene()->views().empty()) {
+            return;
+        } else {
+            m_currentViewport = scene()->views()[0]->viewport();
+        }
+    }
+
+    m_viewportAnchor = m_currentViewport.data()->rect().center();
+    kineticProcessor()->shift(degrees);
+    kineticProcessor()->start();
+}
+
 void WheelZoomInstrument::aboutToBeDisabledNotify() {
     kineticProcessor()->reset();
 }

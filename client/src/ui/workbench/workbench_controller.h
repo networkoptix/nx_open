@@ -106,6 +106,8 @@ protected:
     void updateGeometryDelta(QnResourceWidget *widget);
     void displayMotionGrid(const QList<QnResourceWidget *> &widgets, bool display);
 
+    void moveCursor(const QPoint &direction);
+
 protected slots:
     void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
     void at_resizing(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
@@ -202,6 +204,12 @@ private:
 
     /** Instrument that tracks left clicks on items. */
     ClickInstrument *m_itemLeftClickInstrument;
+
+
+    /* Keyboard control-related state. */
+
+    /** Last keyboard cursor position. */
+    QPoint m_cursorPos;
 
 
     /* Resizing-related state. */

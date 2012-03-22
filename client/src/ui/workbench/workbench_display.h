@@ -312,8 +312,10 @@ protected:
 protected slots:
     void synchronizeSceneBoundsExtension();
     void synchronizeRaisedGeometry();
+    void updateFrameWidths();
 
     void at_scene_destroyed();
+    void at_scene_selectionChanged();
 
     void at_viewportAnimator_finished();
 
@@ -381,6 +383,9 @@ private:
 
     /** Current frame opacity for widgets. */
     qreal m_frameOpacity;
+
+    /** Whether frame widths need updating. */
+    bool m_frameWidthsDirty;
 
 
     /* Instruments. */
