@@ -140,7 +140,8 @@ bool QnAxisStreamReader::isStreamOpened() const
 QnMetaDataV1Ptr QnAxisStreamReader::getMetaData()
 {
     // todo: implement me
-    return QnMetaDataV1Ptr();
+    QnMetaDataV1Ptr rez(new QnMetaDataV1());
+    return rez;
 }
 
 QnAbstractMediaDataPtr QnAxisStreamReader::getNextData()

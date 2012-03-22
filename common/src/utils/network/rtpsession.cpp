@@ -399,11 +399,15 @@ RTPIODevice*  RTPSession::sendSetup()
 
             for (int i = 0; i < tmpList.size(); ++i)
             {
+                tmpList[i] = tmpList[i].trimmed().toLower();
                 if (tmpList[i].startsWith("timeout"))
                 {
                     QStringList tmpParams = tmpList[i].split('=');
-                    if (tmpParams.size() > 1)
+                    if (tmpParams.size() > 1) {
                         m_TimeOut = tmpParams[1].toInt();
+                        if (m_TimeOut > 0 && m_TimeOut < 5000)
+                            m_TimeOut *= 1000; // convert seconds to ms
+                    }
                 }
             }
         }
