@@ -152,7 +152,7 @@ bool QnPlAreconVisionResource::setHostAddress(const QHostAddress& ip, QnDomain d
 
     }
 
-    return QnNetworkResource::setHostAddress(ip, domain);
+    return QnNetworkResource::setHostAddress(ip, QnDomainMemory);
 }
 
 QString QnPlAreconVisionResource::toSearchString() const
