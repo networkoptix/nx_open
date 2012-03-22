@@ -28,13 +28,13 @@ void QnLayoutResource::setItems(const QnLayoutItemDataMap &items) {
 
     foreach(const QnLayoutItemData &item, m_itemByUuid)
         if(!items.contains(item.uuid))
-            removeItem(item);
+            removeItemUnderLock(item.uuid);
 
     foreach(const QnLayoutItemData &item, items) {
         if(m_itemByUuid.contains(item.uuid)) {
-            updateItem(item.uuid, item);
+            updateItemUnderLock(item.uuid, item);
         } else {
-            addItem(item);
+            addItemUnderLock(item);
         }
     }
 }
@@ -65,18 +65,8 @@ void QnLayoutResource::updateInner(QnResourcePtr other) {
 }
 
 void QnLayoutResource::addItem(const QnLayoutItemData &item) {
-    {
-        QMutexLocker locker(&m_mutex);
-        
-        if(m_itemByUuid.contains(item.uuid)) {
-            qnWarning("Item with UUID %1 is already in this layout resource.", item.uuid.toString());
-            return;
-        }
-
-        m_itemByUuid[item.uuid] = item;
-    }
-
-    emit itemAdded(item);
+    QMutexLocker locker(&m_mutex);
+    addItemUnderLock(item);
 }
 
 void QnLayoutResource::removeItem(const QnLayoutItemData &item) {
@@ -84,38 +74,13 @@ void QnLayoutResource::removeItem(const QnLayoutItemData &item) {
 }
 
 void QnLayoutResource::removeItem(const QUuid &itemUuid) {
-    QnLayoutItemData item;
-    {
-        QMutexLocker locker(&m_mutex);
-
-        QnLayoutItemDataMap::iterator pos = m_itemByUuid.find(itemUuid);
-        if(pos == m_itemByUuid.end())
-            return;
-
-        item = *pos;
-        m_itemByUuid.erase(pos);
-    }
-
-    emit itemRemoved(item);
+    QMutexLocker locker(&m_mutex);
+    removeItemUnderLock(itemUuid);
 }
 
 void QnLayoutResource::updateItem(const QUuid &itemUuid, const QnLayoutItemData &item) {
-    {
-        QMutexLocker locker(&m_mutex);
-
-        QnLayoutItemDataMap::iterator pos = m_itemByUuid.find(itemUuid);
-        if(pos == m_itemByUuid.end()) {
-            qnWarning("There is no item with UUID %1 in this layout.", itemUuid.toString());
-            return;
-        }
-
-        if(*pos == item)
-            return;
-
-        *pos = item;
-    }
-
-    emit itemChanged(item);
+    QMutexLocker locker(&m_mutex);
+    updateItemUnderLock(itemUuid, item);
 }
 
 qreal QnLayoutResource::cellAspectRatio() const {
@@ -154,5 +119,48 @@ void QnLayoutResource::setCellSpacing(const QSizeF &cellSpacing) {
     }
 
     emit cellSpacingChanged();
+}
+
+void QnLayoutResource::addItemUnderLock(const QnLayoutItemData &item) {
+    if(m_itemByUuid.contains(item.uuid)) {
+        qnWarning("Item with UUID %1 is already in this layout resource.", item.uuid.toString());
+        return;
+    }
+
+    m_itemByUuid[item.uuid] = item;
+
+    m_mutex.unlock();
+    emit itemAdded(item);
+    m_mutex.lock();
+}
+
+void QnLayoutResource::updateItemUnderLock(const QUuid &itemUuid, const QnLayoutItemData &item) {
+    QnLayoutItemDataMap::iterator pos = m_itemByUuid.find(itemUuid);
+    if(pos == m_itemByUuid.end()) {
+        qnWarning("There is no item with UUID %1 in this layout.", itemUuid.toString());
+        return;
+    }
+
+    if(*pos == item)
+        return;
+
+    *pos = item;
+
+    m_mutex.unlock();
+    emit itemChanged(item);
+    m_mutex.lock();
+}
+
+void QnLayoutResource::removeItemUnderLock(const QUuid &itemUuid) {
+    QnLayoutItemDataMap::iterator pos = m_itemByUuid.find(itemUuid);
+    if(pos == m_itemByUuid.end())
+        return;
+
+    QnLayoutItemData item = *pos;
+    m_itemByUuid.erase(pos);
+
+    m_mutex.lock();
+    emit itemRemoved(item);
+    m_mutex.unlock();
 }
 

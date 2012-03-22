@@ -182,8 +182,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     menu()->setTargetProvider(m_ui);
 
-    connect(SessionManager::instance(),     SIGNAL(error(int)),                             this,                                   SLOT(at_sessionManager_error(int)));
-
 
     /* Tab bar. */
     m_tabBar = new QnLayoutTabBar(this);

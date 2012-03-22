@@ -108,7 +108,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     m_selectionUpdatePending(false),
     m_selectionScope(Qn::SceneScope)
 {
-    connect(context(),                                      SIGNAL(aboutToBeDestroyed()),                   this,   SLOT(at_context_aboutToBeDestroyed()));
     connect(context(),                                      SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(at_context_userChanged(const QnUserResourcePtr &)));
     connect(context(),                                      SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(submitDelayedDrops()), Qt::QueuedConnection);
     connect(context(),                                      SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(updateCameraSettingsEditibility()));
