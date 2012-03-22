@@ -19,6 +19,9 @@ public:
     QnResourceListDialog(QWidget *parent = NULL);
     virtual ~QnResourceListDialog();
 
+    bool isReadOnly() const;
+    void setReadOnly(bool readOnly);
+
     void setText(const QString &text);
     QString text() const;
 
@@ -33,8 +36,11 @@ public:
 
     using QnButtonBoxDialog::exec;
 
-    static QDialogButtonBox::StandardButton exec(QWidget *parent, const QnResourceList &resources, const QString &title, const QString &text, const QString &bottomText, QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    static QDialogButtonBox::StandardButton exec(QWidget *parent, const QnResourceList &resources, const QString &title, const QString &text, QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    static QDialogButtonBox::StandardButton exec(QWidget *parent, const QnResourceList &resources, const QString &title, const QString &text, const QString &bottomText, QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok | QDialogButtonBox::Cancel, bool readOnly = true);
+    static QDialogButtonBox::StandardButton exec(QWidget *parent, const QnResourceList &resources, const QString &title, const QString &text, QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok | QDialogButtonBox::Cancel, bool readOnly = true);
+
+protected:
+    virtual void accept() override;
 
 private:
     QScopedPointer<Ui::ResourceListDialog> ui;
