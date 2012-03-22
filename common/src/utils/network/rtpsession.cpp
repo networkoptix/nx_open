@@ -126,15 +126,14 @@ void RTPSession::parseSDP()
             }
             else if (lineLower.startsWith("a=control:rtsp"))
             {
-                if (lineRest.indexOf('?') != -1)
-                    lineRest = lineRest.left(lineRest.indexOf('?'));
                 int trackStart = lineRest.lastIndexOf('/')+1;
-                QByteArray ggg = lineRest.mid(trackStart).toLower();
                 if (trackStart > 0 && lineRest.mid(trackStart).toLower().startsWith("trackid"))
                 {
                     int i = trackStart;
                     for (; i < lineRest.size() && !(lineRest[i] >= '0' && lineRest[i] <= '9'); ++i);
-                    m_tracksPrefix = lineRest.mid(trackStart, i - trackStart);
+                    m_tracksPrefix = lineRest; //lineRest.mid(trackStart, i - trackStart);
+                    if (lineRest.indexOf('?') != -1)
+                        lineRest = lineRest.left(lineRest.indexOf('?'));
                     trackNum = lineRest.mid(i).toUInt();
                 }
             }
@@ -340,15 +339,23 @@ RTPIODevice*  RTPSession::sendSetup()
 
         QByteArray request;
         request += "SETUP ";
-        request += mUrl.toString();
 
-        if (!m_sdpTracks.isEmpty()) {
-            request += '/';
-            if (m_tracksPrefix.isEmpty())
-                request += QString("trackID=");
-            else
-                request += m_tracksPrefix;
-            request += QByteArray::number(itr.key());
+        if (m_tracksPrefix.startsWith("rtsp://"))
+        {
+            // full track url in a prefix
+            request += m_tracksPrefix;
+        }   
+        else {
+            request += mUrl.toString();
+
+            if (!m_sdpTracks.isEmpty()) {
+                request += '/';
+                if (m_tracksPrefix.isEmpty())
+                    request += QString("trackID=");
+                else
+                    request += m_tracksPrefix;
+                request += QByteArray::number(itr.key());
+            }
         }
 
         request += " RTSP/1.0\r\n";

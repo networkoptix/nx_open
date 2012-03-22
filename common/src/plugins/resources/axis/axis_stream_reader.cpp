@@ -49,6 +49,7 @@ void QnAxisStreamReader::openStream()
     QnResource::ConnectionRole role = getRole();
     QnPlAxisResourcePtr res = getResource().dynamicCast<QnPlAxisResource>();
 
+    QByteArray profileNumber("S");
     QByteArray profileName;
     QByteArray profileDescription;
     QByteArray action = "add";
@@ -67,19 +68,21 @@ void QnAxisStreamReader::openStream()
     
     // -------------- check if profile already exists
     {
-        QString streamProfile;
-        QTextStream str(&streamProfile);
-
-        str << "/axis-cgi/param.cgi?action=list";
-        str << "&group=StreamProfile";
-        str.flush();
-
         CLSimpleHTTPClient http (res->getHostAddress(), QUrl(res->getUrl()).port(80), res->getNetworkTimeout(), res->getAuth());
-        CLHttpStatus status = http.doGET(streamProfile);
+        CLHttpStatus status = http.doGET(QByteArray("/axis-cgi/param.cgi?action=list&group=StreamProfile"));
         QByteArray body;
         http.readAll(body);
-        if (body.contains(QByteArray("Name=") +profileName))
-            action = "update"; // profile already exists, so update instead of add
+        QList<QByteArray> lines = body.split('\n');
+        for (int i = 0; i < lines.size(); ++i)
+        {
+            if (lines[i].endsWith(QByteArray("Name=") +profileName))
+            {
+                action = "update"; // profile already exists, so update instead of add
+                QList<QByteArray> params = lines[i].split('.');
+                if (params.size() >= 2)
+                    profileNumber = params[params.size()-2];
+            }
+        }
     }
     // ------------------- determine stream parameters ----------------------------
     float fps = getFps();
@@ -106,9 +109,9 @@ void QnAxisStreamReader::openStream()
     str << "/axis-cgi/param.cgi?action=" << action;
     str << "&template=streamprofile";
     str << "&group=StreamProfile";
-    str << "&StreamProfile.S.Name=" << profileName;
-    str << "&StreamProfile.S.Description=" << QUrl::toPercentEncoding(profileDescription);
-    str << "&StreamProfile.S.Parameters=" << QUrl::toPercentEncoding(paramsStr);
+    str << "&StreamProfile." << profileNumber << ".Name=" << profileName;
+    str << "&StreamProfile." << profileNumber << ".Description=" << QUrl::toPercentEncoding(profileDescription);
+    str << "&StreamProfile." << profileNumber << ".Parameters=" << QUrl::toPercentEncoding(paramsStr);
     str.flush();
 
     CLSimpleHTTPClient http (res->getHostAddress(), QUrl(res->getUrl()).port(80), res->getNetworkTimeout(), res->getAuth());
