@@ -26,10 +26,14 @@ echo test errorlevel is %TESTRESULT%
 
 sc stop vmsmediaserver
 sc stop vmsappserver
+
 taskkill /F /IM traytool.exe
 taskkill /F /IM client.exe
 taskkill /F /IM mediaserver.exe
-taskkill /F /IM ecs.exe
+taskkill /F /IM ec.exe
+
+sc delete vmsappserver
+sc delete vmsmediaserver
 
 CD %CURRENTDIR%
 
