@@ -817,7 +817,7 @@ void QnWorkbenchActionHandler::at_openFolderAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_aboutAction_triggered() {
-    QScopedPointer<AboutDialog> dialog(new AboutDialog(widget()));
+    QScopedPointer<QnAboutDialog> dialog(new QnAboutDialog(widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }
