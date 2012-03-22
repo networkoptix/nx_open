@@ -18,6 +18,7 @@ from convert import gen_env_sh
 from convert import convert as convert_common
 from common_version import *
 
+APPLICATION_NAME = 'NetworkOptix virtual camera'
 FFMPEG_VERSION = '2011-08-29'
 
 EXCLUDE_DIRS = ('.svn', 'dxva')
