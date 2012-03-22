@@ -12,7 +12,7 @@ class VolumeSlider : public GraphicsSlider
 
 public:
     explicit VolumeSlider(Qt::Orientation orientation = Qt::Horizontal, QGraphicsItem *parent = 0);
-    ~VolumeSlider();
+    virtual ~VolumeSlider();
 
     bool isMute() const;
 
@@ -24,6 +24,9 @@ public:
 
 public Q_SLOTS:
     void setMute(bool mute);
+
+    void stepBackward();
+    void stepForward();
 
 protected:
     void timerEvent(QTimerEvent *);

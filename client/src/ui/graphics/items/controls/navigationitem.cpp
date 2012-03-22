@@ -289,6 +289,73 @@ NavigationItem::NavigationItem(QGraphicsItem *parent):
     connect(playAction, SIGNAL(triggered()), m_playButton, SLOT(click()));
     addAction(playAction);
 
+    QAction *speedDownAction = new QAction(tr("Speed Down"), m_speedSlider);
+    speedDownAction->setShortcut(tr("Ctrl+-"));
+    speedDownAction->setShortcutContext(Qt::ApplicationShortcut);
+    connect(speedDownAction, SIGNAL(triggered()), m_speedSlider, SLOT(stepBackward()));
+    addAction(speedDownAction);
+
+    QAction *speedUpAction = new QAction(tr("Speed Up"), m_speedSlider);
+    speedUpAction->setShortcut(tr("Ctrl++"));
+    speedUpAction->setShortcutContext(Qt::ApplicationShortcut);
+    connect(speedUpAction, SIGNAL(triggered()), m_speedSlider, SLOT(stepForward()));
+    addAction(speedUpAction);
+
+    QAction *prevFrameAction = new QAction(tr("Previous Frame"), m_stepBackwardButton);
+    prevFrameAction->setShortcut(tr("Ctrl+Left"));
+    prevFrameAction->setShortcutContext(Qt::ApplicationShortcut);
+    connect(prevFrameAction, SIGNAL(triggered()), m_stepBackwardButton, SLOT(click()));
+    addAction(prevFrameAction);
+
+    QAction *nextFrameAction = new QAction(tr("Next Frame"), m_stepForwardButton);
+    nextFrameAction->setShortcut(tr("Ctrl+Right"));
+    nextFrameAction->setShortcutContext(Qt::ApplicationShortcut);
+    connect(nextFrameAction, SIGNAL(triggered()), m_stepForwardButton, SLOT(click()));
+    addAction(nextFrameAction);
+
+    QAction *toStartAction = new QAction(tr("To Start"), m_backwardButton);
+    toStartAction->setShortcut(tr("Z"));
+    toStartAction->setShortcutContext(Qt::ApplicationShortcut);
+    connect(toStartAction, SIGNAL(triggered()), m_backwardButton, SLOT(click()));
+    addAction(toStartAction);
+
+    QAction *toEndAction = new QAction(tr("To End"), m_forwardButton);
+    toEndAction->setShortcut(tr("X"));
+    toEndAction->setShortcutContext(Qt::ApplicationShortcut);
+    connect(toEndAction, SIGNAL(triggered()), m_forwardButton, SLOT(click()));
+    addAction(toEndAction);
+
+    QAction *volumeDownAction = new QAction(tr("Volume Down"), m_volumeSlider);
+    volumeDownAction->setShortcut(tr("Ctrl+Down"));
+    volumeDownAction->setShortcutContext(Qt::ApplicationShortcut);
+    connect(volumeDownAction, SIGNAL(triggered()), m_volumeSlider, SLOT(stepBackward()));
+    addAction(volumeDownAction);
+
+    QAction *volumeUpAction = new QAction(tr("Volume Up"), m_volumeSlider);
+    volumeUpAction->setShortcut(tr("Ctrl+Up"));
+    volumeUpAction->setShortcutContext(Qt::ApplicationShortcut);
+    connect(volumeUpAction, SIGNAL(triggered()), m_volumeSlider, SLOT(stepForward()));
+    addAction(volumeUpAction);
+
+    QAction *toggleMuteAction = new QAction(tr("Toggle Mute"), m_muteButton);
+    toggleMuteAction->setShortcut(tr("M"));
+    toggleMuteAction->setShortcutContext(Qt::ApplicationShortcut);
+    connect(toggleMuteAction, SIGNAL(triggered()), m_muteButton, SLOT(click()));
+    addAction(toggleMuteAction);
+
+    QAction *liveAction = new QAction(tr("Go To Live"), m_liveButton);
+    liveAction->setShortcut(tr("L"));
+    liveAction->setShortcutContext(Qt::ApplicationShortcut);
+    connect(liveAction, SIGNAL(triggered()), m_liveButton, SLOT(click()));
+    addAction(liveAction);
+
+    QAction *toggleSyncAction = new QAction(tr("Toggle Sync"), m_syncButton);
+    toggleSyncAction->setShortcut(tr("S"));
+    toggleSyncAction->setShortcutContext(Qt::ApplicationShortcut);
+    connect(toggleSyncAction, SIGNAL(triggered()), m_syncButton, SLOT(click()));
+    addAction(toggleSyncAction);
+
+
     setVideoCamera(0);
     m_fullTimePeriodHandle = 0;
     m_timePeriodUpdateTime = 0;
