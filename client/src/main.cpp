@@ -442,6 +442,8 @@ int main(int argc, char *argv[])
     /* Drop resources if needed. */
     QString droppedResources = commandLinePreParser.value("--delayed-drop").toString();
     if(!droppedResources.isEmpty()) {
+        qnSettings->setLayoutsOpenedOnLogin(false);
+
         QByteArray data = QByteArray::fromBase64(droppedResources.toLatin1());
         QVariantMap params;
         params.insert(Qn::SerializedResourcesParameter, data);

@@ -474,9 +474,11 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
         return;
 
     /* Open all user's layouts. */
-    QnResourceList layouts = QnResourceCriterion::filter<QnLayoutResource, QnResourceList>(context()->resourcePool()->getResourcesWithParentId(user->getId()));
-    menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
-
+    if(qnSettings->layoutsOpenedOnLogin()) {
+        QnResourceList layouts = QnResourceCriterion::filter<QnLayoutResource, QnResourceList>(context()->resourcePool()->getResourcesWithParentId(user->getId()));
+        menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
+    }
+    
     /* Delete empty orphaned layouts, move non-empty to the new user. */
     foreach(const QnResourcePtr &resource, context()->resourcePool()->getResourcesWithParentId(QnId())) {
         if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
