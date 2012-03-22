@@ -78,6 +78,7 @@ void RTPH264StreamreaderDelegate::openStream()
 
 void RTPH264StreamreaderDelegate::closeStream()
 {
+    m_RtpSession.sendTeardown();
     m_RtpSession.stop();
     delete m_streamParser;
     m_streamParser = 0;

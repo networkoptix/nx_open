@@ -89,6 +89,8 @@ void RTPSession::parseSDP()
     QString codecName;
     QString codecType;
     int trackNum = -1;
+    QByteArray setupURL;
+
     foreach(QByteArray line, lines)
     {
         line = line.trimmed();
@@ -96,8 +98,9 @@ void RTPSession::parseSDP()
         if (lineLower.startsWith("m="))
         {
             if (trackNum >= 0) {
-                m_sdpTracks.insert(trackNum, SDPTrackInfo(codecName, codecType));
+                m_sdpTracks.insert(trackNum, SDPTrackInfo(codecName, codecType, setupURL));
                 trackNum = -1;
+                setupURL.clear();
             }
             codecType = lineLower.mid(2).split(' ')[0];
         }
@@ -121,7 +124,7 @@ void RTPSession::parseSDP()
             {
                 int i = 0;
                 for (; i < lineRest.size() && !(lineRest[i] >= '0' && lineRest[i] <= '9'); ++i);
-                m_tracksPrefix = lineRest.left(i);
+                setupURL = lineRest.left(i);
                 trackNum = lineRest.mid(i).toUInt();
             }
             else if (lineLower.startsWith("a=control:rtsp"))
@@ -131,7 +134,7 @@ void RTPSession::parseSDP()
                 {
                     int i = trackStart;
                     for (; i < lineRest.size() && !(lineRest[i] >= '0' && lineRest[i] <= '9'); ++i);
-                    m_tracksPrefix = lineRest; //lineRest.mid(trackStart, i - trackStart);
+                    setupURL = lineRest; //lineRest.mid(trackStart, i - trackStart);
                     if (lineRest.indexOf('?') != -1)
                         lineRest = lineRest.left(lineRest.indexOf('?'));
                     trackNum = lineRest.mid(i).toUInt();
@@ -140,7 +143,7 @@ void RTPSession::parseSDP()
         }
     }
     if (trackNum >= 0)
-        m_sdpTracks.insert(trackNum, SDPTrackInfo(codecName, codecType));
+        m_sdpTracks.insert(trackNum, SDPTrackInfo(codecName, codecType, setupURL));
 }
 
 void RTPSession::parseRangeHeader(const QString& rangeStr)
@@ -340,22 +343,19 @@ RTPIODevice*  RTPSession::sendSetup()
         QByteArray request;
         request += "SETUP ";
 
-        if (m_tracksPrefix.startsWith("rtsp://"))
+        if (itr.value().setupURL.startsWith("rtsp://"))
         {
             // full track url in a prefix
-            request += m_tracksPrefix;
+            request += itr.value().setupURL;
         }   
         else {
             request += mUrl.toString();
-
-            if (!m_sdpTracks.isEmpty()) {
-                request += '/';
-                if (m_tracksPrefix.isEmpty())
-                    request += QString("trackID=");
-                else
-                    request += m_tracksPrefix;
-                request += QByteArray::number(itr.key());
-            }
+            request += '/';
+            if (itr.value().setupURL.isEmpty())
+                request += QString("trackID=");
+            else
+                request += itr.value().setupURL;
+            request += QByteArray::number(itr.key());
         }
 
         request += " RTSP/1.0\r\n";

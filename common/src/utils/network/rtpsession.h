@@ -45,9 +45,10 @@ public:
     struct SDPTrackInfo
     {
         SDPTrackInfo() {}
-        SDPTrackInfo(const QString& _codecName, const QString& _codecType): codecName(_codecName), codecType(_codecType) {}
+        SDPTrackInfo(const QString& _codecName, const QString& _codecType, const QString& _setupURL): codecName(_codecName), codecType(_codecType), setupURL(_setupURL) {}
         QString codecName;
         QString codecType;
+        QString setupURL;
     };
 
     RTPSession();
@@ -86,6 +87,7 @@ public:
     bool sendPlay(qint64 startPos, qint64 endPos, double scale);
     bool sendPause();
     bool sendSetParameter(const QByteArray& paramName, const QByteArray& paramValue);
+    bool sendTeardown();
 
     int lastSendedCSeq() const { return m_csec-1; }
 
@@ -107,7 +109,6 @@ private:
     bool sendDescribe();
     bool sendOptions();
     RTPIODevice *sendSetup();
-    bool sendTeardown();
     bool sendKeepAlive();
 
     bool readTextResponce(QByteArray &responce);
@@ -153,7 +154,6 @@ private:
     friend class RTPIODevice;
     QMap<QByteArray, QByteArray> m_additionAttrs;
     int m_tcpTimeout;
-    QByteArray m_tracksPrefix;
     QAuthenticator m_auth;
 };
 
