@@ -68,6 +68,9 @@ public:
 
     int activeCameras() const;
 
+    bool isLayoutsUpdated() const;
+    void setLayoutsUpdated(bool updateLayouts);
+
 signals:
     void resourceAdded(const QnResourcePtr &resource);
     void resourceRemoved(const QnResourcePtr &resource);
@@ -82,6 +85,7 @@ private slots:
 
 private:
     mutable QMutex m_resourcesMtx;
+    bool m_updateLayouts;
     QnResourcePtr localServer;
     QHash<QString, QnResourcePtr> m_resources;
 };

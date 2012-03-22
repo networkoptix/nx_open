@@ -871,7 +871,9 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
 
     // don't remove local resources
     const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
+    resourcePool()->setLayoutsUpdated(false);
     resourcePool()->removeResources(remoteResources);
+    resourcePool()->setLayoutsUpdated(true);
 
     qnLicensePool->reset();
 
