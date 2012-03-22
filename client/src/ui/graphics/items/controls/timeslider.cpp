@@ -207,7 +207,8 @@ void MySlider::drawTimePeriods(QPainter *painter, const QnTimePeriodList& timePe
     QnTimePeriodList::const_iterator endItr = timePeriods.findNearestPeriod(pos+m_parent->sliderRange(), false);
 
     int center = m_handleRect.center().x();
-    QColor dark = color.darker();
+    QColor light = color.lighter();
+    QColor dark = color;
 
     //foreach(const QnTimePeriod &period, timePeriods)
     for (QnTimePeriodList::const_iterator itr = beginItr; itr <= endItr; ++itr)
@@ -228,11 +229,11 @@ void MySlider::drawTimePeriods(QPainter *painter, const QnTimePeriodList& timePe
         //    continue;
 
         if(right < center) {
-            painter->fillRect(left, contentsRect.top(), qMax(1.0, right - left), contentsRect.height(), color);
+            painter->fillRect(left, contentsRect.top(), qMax(1.0, right - left), contentsRect.height(), light);
         } else if(left > center) {
             painter->fillRect(left, contentsRect.top(), qMax(1.0, right - left), contentsRect.height(), dark);
         } else {
-            painter->fillRect(left, contentsRect.top(), center - left, contentsRect.height(), color);
+            painter->fillRect(left, contentsRect.top(), center - left, contentsRect.height(), light);
             painter->fillRect(center, contentsRect.top(), qMax(1.0, right - center), contentsRect.height(), dark);
         }
     }
@@ -276,8 +277,9 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     QLinearGradient linearGrad(r.topLeft(), r.bottomRight());
     if (!recPeriods.isEmpty() && m_parent->viewPortPos() + m_parent->sliderRange() >= recPeriods[0].startTimeMs)
     {
-        linearGrad.setColorAt(0, QColor(0, 0, 0));
-        linearGrad.setColorAt(1, QColor(0, 0, 0));
+        QColor color = QColor(64, 64, 64);
+        linearGrad.setColorAt(0, color);
+        linearGrad.setColorAt(1, color);
     }
     else {
         linearGrad.setColorAt(0, QColor(0, 43, 130));
@@ -291,8 +293,8 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
 
     // Draw time periods
-    drawTimePeriods(painter, recPeriods, QColor(0x238E23));
-    drawTimePeriods(painter, motionPeriods, QColor(0xff0000));
+    drawTimePeriods(painter, recPeriods, QColor(24, 128, 24));
+    drawTimePeriods(painter, motionPeriods, QColor(128, 0, 0));
 
     r = contentsRect();
 #if 1
