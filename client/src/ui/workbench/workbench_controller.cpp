@@ -126,6 +126,17 @@ namespace {
         return QPoint(std::numeric_limits<int>::max(), std::numeric_limits<int>::max());
     }
 
+    QPoint invalidCursorPos() {
+        return invalidDragDelta();
+    }
+
+    QPoint modulo(const QPoint &pos, const QRect &rect) {
+        return QPoint(
+            rect.left() + (pos.x() - rect.left() + rect.width())  % rect.width(),
+            rect.top()  + (pos.y() - rect.top()  + rect.height()) % rect.height()
+        );
+    }
+
     /** Opacity of video items when they are dragged / resized. */
     const qreal widgetManipulationOpacity = 0.3;
 
@@ -137,7 +148,8 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_display(display),
     m_manager(display->instrumentManager()),
     m_resizedWidget(NULL),
-    m_dragDelta(invalidDragDelta())
+    m_dragDelta(invalidDragDelta()),
+    m_cursorPos(invalidCursorPos())
 {
     ::memset(m_widgetByRole, 0, sizeof(m_widgetByRole));
 
@@ -348,7 +360,9 @@ bool QnWorkbenchController::eventFilter(QObject *watched, QEvent *event)
 {
     if(watched == display()->scene() && event->type() == QEvent::KeyPress) {
         QKeyEvent *e = static_cast<QKeyEvent *>(event);
-        if(e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return) {
+        switch(e->key()) {
+        case Qt::Key_Enter:
+        case Qt::Key_Return: {
             QList<QGraphicsItem *> items = display()->scene()->selectedItems();
             QGraphicsItem *focusedItem = display()->scene()->focusItem();
             if(items.size() == 1 && (items[0] == focusedItem || !focusedItem)) {
@@ -358,6 +372,22 @@ bool QnWorkbenchController::eventFilter(QObject *watched, QEvent *event)
                     menu()->trigger(Qn::MaximizeItemAction, items);
                 }
             }
+            return true;
+        }
+        case Qt::Key_Up:
+            moveCursor(QPoint(0, -1));
+            return true;
+        case Qt::Key_Down:
+            moveCursor(QPoint(0, 1));
+            return true;
+        case Qt::Key_Left:
+            moveCursor(QPoint(-1, 0));
+            return true;
+        case Qt::Key_Right:
+            moveCursor(QPoint(1, 0));
+            return true;
+        default:
+            break;
         }
     } else if (event->type() == QEvent::Close) {
         if (QnResourceWidget *widget = qobject_cast<QnResourceWidget *>(watched)) {
@@ -404,6 +434,46 @@ void QnWorkbenchController::displayMotionGrid(const QList<QnResourceWidget *> &w
         widget->setDisplayFlag(QnResourceWidget::DISPLAY_MOTION_GRID, display);
     }
 }
+
+void QnWorkbenchController::moveCursor(const QPoint &direction) {
+    QPoint upos = m_cursorPos;
+    QnWorkbenchItem *item = workbench()->currentLayout()->item(upos);
+
+    if(item && !item->geometry().contains(upos))
+        upos = item->geometry().topLeft();
+
+    QPoint vpos = upos;
+    QRect boundingRect = workbench()->currentLayout()->boundingRect();
+    QnWorkbenchItem *newItem = NULL;
+    while(true) {
+        upos = modulo(upos + direction, boundingRect);
+
+        newItem = workbench()->currentLayout()->item(upos);
+        if(newItem != NULL && newItem != item)
+            break;
+
+        if(upos == vpos) {
+            if(!item)
+                break;
+
+            vpos += QPoint(qAbs(direction.y()), qAbs(direction.x()));
+            if(!item->geometry().contains(vpos))
+                break;
+
+            upos = vpos;
+        }
+    }
+    
+    if(newItem != NULL && (newItem != item || item != workbench()->item(QnWorkbench::RAISED))) {
+        workbench()->setItem(QnWorkbench::RAISED, newItem);
+
+        display()->scene()->clearSelection();
+        display()->widget(newItem)->setSelected(true);
+
+        m_cursorPos = upos;
+    }
+}
+
 
 
 // -------------------------------------------------------------------------- //
@@ -970,6 +1040,10 @@ void QnWorkbenchController::at_display_widgetChanged(QnWorkbench::ItemRole role)
             workbench()->setItem(QnWorkbench::RAISED, NULL);
         break;
     }
+    case QnWorkbench::RAISED:
+        if(widget != NULL)
+            m_cursorPos = widget->item()->geometry().topLeft();
+        break;
     default:
         break;
     }
