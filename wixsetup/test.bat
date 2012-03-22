@@ -1,6 +1,6 @@
 @echo off
 
-call version.py
+call test.py
 call version.bat
 SET VERSION=%APPLICATION_VERSION%.%BUILD_NUMBER%
 SET "CURRENTDIR=%cd%"
@@ -18,9 +18,9 @@ echo installer errorlevel is %ERRORLEVEL%
 cd "%VS90COMNTOOLS%\..\..\..\Network Optix\HD Witness\Client\"
 
 rem ugly hack! --auth parameter is applied only in second launch!
-call client.exe --test-timeout 5000 --auth "http://admin:admin@127.0.0.1:8000" --test-resource-substring Server
+call client.exe --test-timeout 5000 --auth "http://admin:admin@127.0.0.1:7001" --test-resource-substring Server
 
-call client.exe --test-timeout 180000 --auth "http://admin:admin@127.0.0.1:8000" --test-resource-substring Server > test.txt
+call client.exe --test-timeout 180000 --auth "http://admin:admin@127.0.0.1:7001" --test-resource-substring Server > test.txt
 SET TESTRESULT=%ERRORLEVEL%
 echo test errorlevel is %TESTRESULT%
 
@@ -29,7 +29,7 @@ sc stop vmsappserver
 taskkill /F /IM traytool.exe
 taskkill /F /IM client.exe
 taskkill /F /IM mediaserver.exe
-taskkill /F /IM ec.exe
+taskkill /F /IM ecs.exe
 
 CD %CURRENTDIR%
 
