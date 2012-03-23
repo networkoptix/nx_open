@@ -272,22 +272,23 @@ QnAbstractMediaDataPtr QnAxisStreamReader::getNextData()
     if (needMetaData()) 
         return getMetaData();
 
-
-    QnAbstractMediaDataPtr rez = m_RTP264.getNextData();
-    if (rez) 
+    QnAbstractMediaDataPtr rez;
+    for (int i = 0; i < 10; ++i)
     {
-        for (int i = 0; i < 10; ++i)
+        rez = m_RTP264.getNextData();
+        if (rez) 
         {
             QnCompressedVideoDataPtr videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(rez);
-            if (videoData) {
+            if (videoData) 
                 parseMotionInfo(videoData);
-            }
+            
             if (isGotFrame(videoData))
                 break;
         }
-    }
-    else {
-        closeStream();
+        else {
+            closeStream();
+            break;
+        }
     }
     
     return rez;
