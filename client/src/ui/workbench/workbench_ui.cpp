@@ -500,6 +500,8 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
 
 
     /* Connect to display. */
+    display->view()->addAction(action(Qn::FreespaceAction));
+    connect(action(Qn::FreespaceAction),SIGNAL(triggered()),                                                                        this,                           SLOT(at_freespaceAction_triggered()));
     connect(m_display,                  SIGNAL(widgetChanged(QnWorkbench::ItemRole)),                                               this,                           SLOT(at_display_widgetChanged(QnWorkbench::ItemRole)));
     connect(m_display,                  SIGNAL(widgetAdded(QnResourceWidget *)),                                                    this,                           SLOT(at_display_widgetAdded(QnResourceWidget *)));
     connect(m_display,                  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),                                         this,                           SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
@@ -1131,6 +1133,33 @@ void QnWorkbenchUi::updateHelpContextInternal() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+void QnWorkbenchUi::at_freespaceAction_triggered() {
+    bool inFreespace = true;
+    if(inFreespace && !action(Qn::FullscreenAction)->isChecked())
+        inFreespace = false;
+    if(inFreespace && (isTreeOpened() || isTitleOpened()) || isHelpOpened() || isSliderOpened())
+        inFreespace = false;
+
+    if(!inFreespace) {
+        m_wasFullscreen = action(Qn::FullscreenAction)->isChecked();
+        action(Qn::FullscreenAction)->setChecked(true);
+        
+        bool animate = m_wasFullscreen;
+        setTreeOpened(false, animate);
+        setTitleOpened(false, animate);
+        setHelpOpened(false, animate);
+        setSliderOpened(false, animate);
+    } else {
+        action(Qn::FullscreenAction)->setChecked(m_wasFullscreen);
+
+        bool animate = m_wasFullscreen;
+        setTreeOpened(true, animate);
+        setTitleOpened(true, animate);
+        setHelpOpened(false, animate);
+        setSliderOpened(true, animate);
+    }
+}
+
 void QnWorkbenchUi::at_mainMenuAction_triggered() {
     if(!m_mainMenuButton->isVisible())
         return;
