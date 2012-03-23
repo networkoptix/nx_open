@@ -63,7 +63,8 @@ void QnAboutDialog::retranslateUi()
             "<br />\n"
             "<b>Qt v.%3</b> - Copyright (c) 2012 Nokia Corporation.<br />\n"
             "<b>FFMpeg %4</b> - Copyright (c) 2000-2012 the FFmpeg developers.<br />\n"
-            "<b>Color Picker v2.6 Qt Solution</b> - Copyright (c) 2009 Nokia Corporation."
+            "<b>Color Picker v2.6 Qt Solution</b> - Copyright (c) 2009 Nokia Corporation.<br />"
+            "<b>LAME</b> - Copyright (c) 1998-2012 the LAME developers.<br />"
         ).
         arg(QString::fromLatin1(ORGANIZATION_NAME) + QLatin1String("(tm)")).
         arg(QString::fromLatin1(APPLICATION_NAME)).
@@ -71,7 +72,7 @@ void QnAboutDialog::retranslateUi()
         arg(QString::fromLatin1(FFMPEG_VERSION));
 
 #ifndef Q_OS_DARWIN
-    credits += tr("<br /><b>Bespin style</b> - Copyright (c) 2007-2010 Thomas Luebking.");
+    credits += tr("<b>Bespin style</b> - Copyright (c) 2007-2010 Thomas Luebking.<br />");
 #endif
 
     int maxTextureSize = 0;
