@@ -8,6 +8,9 @@
 #include <QtGui/QGroupBox>
 #include <QtGui/QLabel>
 #include <QtGui/QPushButton>
+#include <QtGui/QApplication>
+#include <QtGui/QClipboard>
+#include <QtGui/QTextDocumentFragment>
 
 #include <ui/graphics/opengl/gl_functions.h>
 
@@ -19,7 +22,11 @@ QnAboutDialog::QnAboutDialog(QWidget *parent):
 {
     ui->setupUi(this);
 
+    m_copyButton = new QPushButton(this);
+    ui->buttonBox->addButton(m_copyButton, QDialogButtonBox::HelpRole);
+
     connect(ui->buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+    connect(m_copyButton, SIGNAL(clicked()), this, SLOT(at_copyButton_clicked()));
 
     retranslateUi();
 }
@@ -39,6 +46,8 @@ void QnAboutDialog::changeEvent(QEvent *event)
 void QnAboutDialog::retranslateUi()
 {
     ui->retranslateUi(this);
+
+    m_copyButton->setText(tr("Copy to Clipboard"));
 
     setWindowTitle(tr("About %1").arg(QString::fromLatin1(APPLICATION_NAME)));
 
@@ -85,3 +94,21 @@ void QnAboutDialog::retranslateUi()
     ui->creditsLabel->setText(credits);
     ui->gpuLabel->setText(gpu);
 }
+
+// -------------------------------------------------------------------------- //
+// Handlers
+// -------------------------------------------------------------------------- //
+void QnAboutDialog::at_copyButton_clicked() {
+    QClipboard *clipboard = QApplication::clipboard();
+
+    clipboard->setText(
+         QTextDocumentFragment::fromHtml(ui->versionLabel->text()).toPlainText() + 
+         QLatin1String("\n") +
+         QTextDocumentFragment::fromHtml(ui->gpuLabel->text()).toPlainText()
+    );
+}
+
+
+
+
+
