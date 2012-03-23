@@ -133,6 +133,7 @@ protected slots:
     void at_scene_leftClicked(QGraphicsView *view, const ClickInfo &info);
     void at_scene_rightClicked(QGraphicsView *view, const ClickInfo &info);
     void at_scene_doubleClicked(QGraphicsView *view, const ClickInfo &info);
+    void at_scene_keyPressed(QGraphicsScene *scene, QEvent *event);
 
     void at_display_widgetAdded(QnResourceWidget *widget);
     void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
