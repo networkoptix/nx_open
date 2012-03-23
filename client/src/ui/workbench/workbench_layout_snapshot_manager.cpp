@@ -11,7 +11,7 @@
 // -------------------------------------------------------------------------- //
 // QnWorkbenchLayoutReplyProcessor
 // -------------------------------------------------------------------------- //
-void detail::QnWorkbenchLayoutReplyProcessor::at_finished(int status, const QByteArray &errorString, const QnResourceList &resources, int handle) {
+void detail::QnWorkbenchLayoutReplyProcessor::at_finished(int status, const QByteArray &errorString, const QnResourceList &, int handle) {
     /* Note that we may get reply of size 0 if appserver is down.
      * This is why we use stored list of layouts. */
     if(m_manager) {
@@ -61,8 +61,13 @@ QnAppServerConnectionPtr QnWorkbenchLayoutSnapshotManager::connection() const {
 Qn::LayoutFlags QnWorkbenchLayoutSnapshotManager::flags(const QnLayoutResourcePtr &resource) const {
     QHash<QnLayoutResourcePtr, Qn::LayoutFlags>::const_iterator pos = m_flagsByLayout.find(resource);
     if(pos == m_flagsByLayout.end()) {
-        qnWarning("Layout '%1' is not managed by this layout snapshot manager.", resource ? resource->getName() : QLatin1String("null"));
-        return Qn::LayoutIsLocal;
+        if(resource->resourcePool() == resourcePool()) {
+            /* We didn't get the notification from resource pool yet. */
+            return defaultFlags(resource);
+        } else {
+            qnWarning("Layout '%1' is not managed by this layout snapshot manager.", resource ? resource->getName() : QLatin1String("null"));
+            return 0;
+        }
     }
 
     return *pos;
@@ -138,6 +143,10 @@ void QnWorkbenchLayoutSnapshotManager::disconnectFrom(const QnLayoutResourcePtr 
     disconnect(resource.data(), NULL, this, NULL);
 }
 
+Qn::LayoutFlags QnWorkbenchLayoutSnapshotManager::defaultFlags(const QnLayoutResourcePtr &resource) const {
+    return resource->getId().isSpecial() ? Qn::LayoutIsLocal : static_cast<Qn::LayoutFlags>(0);
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -149,8 +158,8 @@ void QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceAdded(const QnRes
 
     /* Consider it saved by default. */
     m_storage->store(layoutResource);
-
-    Qn::LayoutFlags flags = layoutResource->getId().isSpecial() ? Qn::LayoutIsLocal : static_cast<Qn::LayoutFlags>(0);
+    
+    Qn::LayoutFlags flags = defaultFlags(layoutResource);
     setFlags(layoutResource, flags);
 
     layoutResource->setFlags(flags & Qn::LayoutIsLocal ? layoutResource->flags() & ~QnResource::remote : layoutResource->flags() | QnResource::remote); // TODO: this code does not belong here.
