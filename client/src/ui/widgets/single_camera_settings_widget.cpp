@@ -31,6 +31,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleEnabledChanged()),       this,   SLOT(at_dataChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(moreLicensesRequested()),        this,   SIGNAL(moreLicensesRequested()));
     connect(ui->webPageLabel,           SIGNAL(linkActivated(const QString &)), this,   SLOT(at_linkActivated(const QString &)));
+    connect(ui->motionWEBPageLink,      SIGNAL(linkActivated(const QString &)), this,   SLOT(at_linkActivated(const QString &)));
 
     updateFromResource();
 }
@@ -61,9 +62,28 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
 
     m_camera = camera;
     
-    if(m_motionWidget)
-        m_motionWidget->setCamera(m_camera);
+    QVariant val;
+    if (m_camera->getParam("motionEditURL", val, QnDomainMemory))
+    {
+        // motion editing is not supported. Place only reference to WEB page
+        if(m_motionWidget) {
+            m_motionWidget->hide();
+            QString webPageAddress = QString("http://%1/%2").arg(m_camera->getHostAddress().toString()).arg(val.toString());
+            ui->motionWEBPageLink->setText(tr("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
+            ui->motionWEBPageLink->show();
+            ui->motionWebPageLabel->show();
+            m_motionWidget->setCamera(QnResourcePtr());
+        }
 
+    }
+    else {
+        if(m_motionWidget) {
+            m_motionWidget->setCamera(m_camera);
+            m_motionWidget->show();
+            ui->motionWEBPageLink->hide();
+            ui->motionWebPageLabel->hide();
+        }
+    }
     updateFromResource();
 }
 

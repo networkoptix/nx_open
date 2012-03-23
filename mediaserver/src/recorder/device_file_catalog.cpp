@@ -233,12 +233,19 @@ void DeviceFileCatalog::deserializeTitleFile()
         if (fields[3].trimmed().isEmpty()) 
         {
             // duration unknown. server restart occured. Duration for chunk is unknown
-            needRewriteCatalog = true;
-            chunk.durationMs = recreateFile(fullFileName(chunk), chunk.startTimeMs);
+            if (qnStorageMan->isStorageAvailable(chunk.storageIndex))
+            {
+                needRewriteCatalog = true;
+                chunk.durationMs = recreateFile(fullFileName(chunk), chunk.startTimeMs);
+            }
+            else {
+                chunk.durationMs = 0;
+            }
         }
 
         if (!qnStorageMan->isStorageAvailable(chunk.storageIndex)) 
         {
+            ;
             // Skip chunks for unavaileble storage
              //addChunk(chunk, lastStartTime);
         }

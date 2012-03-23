@@ -67,7 +67,7 @@ namespace {
 Q_GLOBAL_STATIC(QnSkin, qn_skinInstance);
 
 QnSkin::QnSkin() {
-    QPixmapCache::setCacheLimit(256 * 1024); // 32 MB
+    QPixmapCache::setCacheLimit(32 * 1024); // 32 MB
 }
 
 QnSkin *QnSkin::instance() {
