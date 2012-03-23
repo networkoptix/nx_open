@@ -7,7 +7,7 @@
 #include <shlobj.h>
 
 
-static const QString MEDIA_SERVER_NAME ("VMS Media Server");
+static const QString MEDIA_SERVER_NAME ("Network Optix Media Server");
 static const QString APP_SERVER_NAME("Enterprise Controller");
 static const int DEFAULT_APP_SERVER_PORT = 8000;
 static const int MESSAGE_DURATION = 3 * 1000;
