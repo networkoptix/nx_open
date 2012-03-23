@@ -68,6 +68,7 @@ public:
 
     int activeCameras() const;
 
+    // TODO: this is a hack. Fix.
     bool isLayoutsUpdated() const;
     void setLayoutsUpdated(bool updateLayouts);
 

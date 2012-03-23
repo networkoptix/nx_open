@@ -108,6 +108,11 @@ void QnNoptixStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *
         if(drawBranchPrimitive(option, painter, widget))
             return;
         break;
+    case PE_PanelItemViewItem:
+    case PE_PanelItemViewRow:
+        if(drawPanelItemViewPrimitive(element, option, painter, widget))
+            return;
+        break;
     default:
         break;
     }
@@ -273,6 +278,21 @@ bool QnNoptixStyle::drawBranchPrimitive(const QStyleOption *option, QPainter *pa
         icon.paint(painter, option->rect);
     }
 
+    return true;
+}
+
+bool QnNoptixStyle::drawPanelItemViewPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const {
+    if(!widget)
+        return false;
+
+    QVariant value = widget->property(itemViewItemBackgroundOpacity);
+    if(!value.isValid())
+        return false;
+
+    qreal opacity = painter->opacity();
+    painter->setOpacity(opacity * value.toReal());
+    base_type::drawPrimitive(element, option, painter, widget);
+    painter->setOpacity(opacity);
     return true;
 }
 

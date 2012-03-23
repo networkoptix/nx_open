@@ -108,6 +108,8 @@ protected:
     void connectTo(const QnLayoutResourcePtr &resource);
     void disconnectFrom(const QnLayoutResourcePtr &resource);
 
+    Qn::LayoutFlags defaultFlags(const QnLayoutResourcePtr &resource) const;
+
     QnAppServerConnectionPtr connection() const;
 
 protected slots:

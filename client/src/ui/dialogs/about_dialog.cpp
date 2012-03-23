@@ -8,6 +8,9 @@
 #include <QtGui/QGroupBox>
 #include <QtGui/QLabel>
 #include <QtGui/QPushButton>
+#include <QtGui/QApplication>
+#include <QtGui/QClipboard>
+#include <QtGui/QTextDocumentFragment>
 
 #include <ui/graphics/opengl/gl_functions.h>
 
@@ -19,7 +22,11 @@ QnAboutDialog::QnAboutDialog(QWidget *parent):
 {
     ui->setupUi(this);
 
+    m_copyButton = new QPushButton(this);
+    ui->buttonBox->addButton(m_copyButton, QDialogButtonBox::HelpRole);
+
     connect(ui->buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+    connect(m_copyButton, SIGNAL(clicked()), this, SLOT(at_copyButton_clicked()));
 
     retranslateUi();
 }
@@ -40,6 +47,8 @@ void QnAboutDialog::retranslateUi()
 {
     ui->retranslateUi(this);
 
+    m_copyButton->setText(tr("Copy to Clipboard"));
+
     setWindowTitle(tr("About %1").arg(QString::fromLatin1(APPLICATION_NAME)));
 
     QString version = 
@@ -54,7 +63,9 @@ void QnAboutDialog::retranslateUi()
             "<br />\n"
             "<b>Qt v.%3</b> - Copyright (c) 2012 Nokia Corporation.<br />\n"
             "<b>FFMpeg %4</b> - Copyright (c) 2000-2012 the FFmpeg developers.<br />\n"
-            "<b>Color Picker v2.6 Qt Solution</b> - Copyright (c) 2009 Nokia Corporation."
+            "<b>Color Picker v2.6 Qt Solution</b> - Copyright (c) 2009 Nokia Corporation.<br />"
+            "<b>LAME</b> - Copyright (c) 1998-2012 the LAME developers.<br />"
+            "<b>OpenAL 1.1</b> - Copyright (c) 2000-2006 Creative Labs.<br />"
         ).
         arg(QString::fromLatin1(ORGANIZATION_NAME) + QLatin1String("(tm)")).
         arg(QString::fromLatin1(APPLICATION_NAME)).
@@ -62,7 +73,7 @@ void QnAboutDialog::retranslateUi()
         arg(QString::fromLatin1(FFMPEG_VERSION));
 
 #ifndef Q_OS_DARWIN
-    credits += tr("<br /><b>Bespin style</b> - Copyright (c) 2007-2010 Thomas Luebking.");
+    credits += tr("<b>Bespin style</b> - Copyright (c) 2007-2010 Thomas Luebking.<br />");
 #endif
 
     int maxTextureSize = 0;
@@ -85,3 +96,21 @@ void QnAboutDialog::retranslateUi()
     ui->creditsLabel->setText(credits);
     ui->gpuLabel->setText(gpu);
 }
+
+// -------------------------------------------------------------------------- //
+// Handlers
+// -------------------------------------------------------------------------- //
+void QnAboutDialog::at_copyButton_clicked() {
+    QClipboard *clipboard = QApplication::clipboard();
+
+    clipboard->setText(
+         QTextDocumentFragment::fromHtml(ui->versionLabel->text()).toPlainText() + 
+         QLatin1String("\n") +
+         QTextDocumentFragment::fromHtml(ui->gpuLabel->text()).toPlainText()
+    );
+}
+
+
+
+
+

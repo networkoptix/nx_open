@@ -1,16 +1,22 @@
+#include <QTextStream>
 #include "axis_resource.h"
 #include "axis_stream_reader.h"
-#include <QTextStream>
 #include "axis_resource.h"
 #include "utils/common/sleep.h"
 #include "utils/common/synctime.h"
+#include "utils/media/nalUnits.h"
+
+static const char AXIS_SEI_UUID[] = "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa";
+static const int AXIS_SEI_PRODUCT_INFO = 0x0a00;
+static const int AXIS_SEI_TIMESTAMP = 0x0a01;
+static const int AXIS_SEI_TRIGGER_DATA = 0x0a03;
 
 
 QnAxisStreamReader::QnAxisStreamReader(QnResourcePtr res):
     CLServerPushStreamreader(res),
     m_RTP264(res)
 {
-
+    m_axisRes = getResource().dynamicCast<QnPlAxisResource>();
 }
 
 QnAxisStreamReader::~QnAxisStreamReader()
@@ -143,9 +149,116 @@ bool QnAxisStreamReader::isStreamOpened() const
 
 QnMetaDataV1Ptr QnAxisStreamReader::getMetaData()
 {
-    // todo: implement me
-    QnMetaDataV1Ptr rez(new QnMetaDataV1());
+    if (m_lastMetadata && !m_lastMetadata->isEmpty())
+    {
+        int gg = 4;
+    }
+    QnMetaDataV1Ptr rez = m_lastMetadata != 0 ? m_lastMetadata : QnMetaDataV1Ptr(new QnMetaDataV1());
+    m_lastMetadata.clear();
     return rez;
+}
+
+void QnAxisStreamReader::fillMotionInfo(const QRect& rect)
+{
+    if (m_lastMetadata == 0) {
+        m_lastMetadata = QnMetaDataV1Ptr(new QnMetaDataV1());
+        m_lastMetadata->m_duration = 1000*1000*10; // 10 sec 
+    }
+    for (int x = rect.left(); x <= rect.right(); ++x)
+    {
+        for (int y = rect.top(); y <= rect.bottom(); ++y)
+            m_lastMetadata->setMotionAt(x, y);
+    }
+}
+
+void QnAxisStreamReader::processTriggerData(const quint8* payload, int len)
+{
+    if (len < 1)
+        return;
+    QList<QByteArray> params = QByteArray((const char*)payload,len).split(';');
+    for (int i = 0; i < params.size(); ++i)
+    {
+        const QByteArray& param = params.at(i);
+        if (param.length() > 2 && param[0] == 'M' && param[1] >= '0' && param[1] <= '9')
+        {
+            int motionWindowNum = param[1] - '0';
+            bool isMotionExists = param.endsWith('1');
+            if (isMotionExists)
+                fillMotionInfo(m_axisRes->getMotionWindow(motionWindowNum));
+        }
+    }
+}
+
+void QnAxisStreamReader::parseMotionInfo(QnCompressedVideoDataPtr videoData)
+{
+    const quint8* curNal = (const quint8*) videoData->data.data();
+    const quint8* end = curNal + videoData->data.size();
+    curNal = NALUnit::findNextNAL(curNal, end);
+    //int prefixSize = 3;
+    //if (end - curNal >= 4 && curNal[2] == 0)
+    //    prefixSize = 4;
+
+    const quint8* nextNal = curNal;
+    for (;curNal < end; curNal = nextNal)
+    {
+        nextNal = NALUnit::findNextNAL(curNal, end);
+        quint8 nalUnitType = *curNal & 0x1f;
+        if (nalUnitType != nuSEI)
+            continue;
+        // parse SEI message
+        SPSUnit sps;
+        SEIUnit sei;
+        sei.decodeBuffer(curNal, nextNal);
+        sei.deserialize(sps, 0);
+        for (int i = 0; i < sei.m_userDataPayload.size(); ++i)
+        {
+            const quint8* payload = sei.m_userDataPayload[i].first;
+            int len = sei.m_userDataPayload[i].second;
+            const quint8* payloadEnd = payload + len;
+            if (len >= 16 && strncmp((const char*)payload, AXIS_SEI_UUID, 16) == 0)
+            {
+                // AXIS SEI message detected
+                payload += 16;
+                len -= 16;
+                while (len >= 4)
+                {
+                    int msgLen = (payload[0] << 8) + payload[1];
+                    int msgType = (payload[2] << 8) + payload[3];
+                    switch(msgType)
+                    {
+                    case AXIS_SEI_PRODUCT_INFO:
+                        break;
+                    case AXIS_SEI_TIMESTAMP:
+                        break;
+                    case AXIS_SEI_TRIGGER_DATA:
+                        processTriggerData(payload+4, msgLen-4);
+                        break;
+                    default:
+                        break;
+                    }
+                    payload += msgLen+2;
+                    len -= msgLen+2;
+                }
+            }
+        }
+    }
+}
+
+bool QnAxisStreamReader::isGotFrame(QnCompressedVideoDataPtr videoData)
+{
+    const quint8* curNal = (const quint8*) videoData->data.data();
+    const quint8* end = curNal + videoData->data.size();
+    curNal = NALUnit::findNextNAL(curNal, end);
+
+    const quint8* nextNal = curNal;
+    for (;curNal < end; curNal = nextNal)
+    {
+        nextNal = NALUnit::findNextNAL(curNal, end);
+        quint8 nalUnitType = *curNal & 0x1f;
+        if (nalUnitType >= nuSliceNonIDR && nalUnitType <= nuSliceIDR)
+            return true;
+    }
+    return false;
 }
 
 QnAbstractMediaDataPtr QnAxisStreamReader::getNextData()
@@ -156,13 +269,27 @@ QnAbstractMediaDataPtr QnAxisStreamReader::getNextData()
             return QnAbstractMediaDataPtr(0);
     }
 
-    if (needMetaData())
+    if (needMetaData()) 
         return getMetaData();
 
-
-    QnAbstractMediaDataPtr rez = m_RTP264.getNextData();
-    if (!rez) 
-        closeStream();
+    QnAbstractMediaDataPtr rez;
+    for (int i = 0; i < 10; ++i)
+    {
+        rez = m_RTP264.getNextData();
+        if (rez) 
+        {
+            QnCompressedVideoDataPtr videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(rez);
+            if (videoData) 
+                parseMotionInfo(videoData);
+            
+            if (isGotFrame(videoData))
+                break;
+        }
+        else {
+            closeStream();
+            break;
+        }
+    }
     
     return rez;
 }

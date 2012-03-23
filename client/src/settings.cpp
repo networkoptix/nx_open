@@ -89,7 +89,12 @@ void QnSettings::load()
     m_data.afterFirstRun = (m_settings->value("afterFirstRun").toString() == "true");
 
     m_data.animateBackground = m_settings->value("animateBackground", true).toBool();
+
+#ifdef QN_NO_BACKGROUND_COLOR_ADJUSTMENT
+    m_data.backgroundColor = QColor(5, 5, 50);
+#else
     m_data.backgroundColor = m_settings->value("backgroundColor", QColor(5, 5, 50)).value<QColor>();
+#endif
     m_data.maxVideoItems = m_settings->value("maxVideoItems", 32).toInt();
     m_data.downmixAudio = (m_settings->value("downmixAudio") == "true");
     m_data.openLayoutsOnLogin = true;
@@ -121,7 +126,11 @@ void QnSettings::save()
     m_settings->endArray();
 
     m_settings->setValue("animateBackground", m_data.animateBackground);
+
+#ifndef QN_NO_BACKGROUND_COLOR_ADJUSTMENT
     m_settings->setValue("backgroundColor", m_data.backgroundColor);
+#endif
+
     m_settings->setValue("afterFirstRun", "true");
     m_settings->setValue("maxVideoItems", QString::number(m_data.maxVideoItems));
     m_settings->setValue("downmixAudio", m_data.downmixAudio ? "true" : "false");

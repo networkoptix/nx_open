@@ -68,6 +68,14 @@ void VolumeSlider::setMute(bool mute)
     setSliderPosition(QtvAudioDevice::instance()->volume() * 100);
 }
 
+void VolumeSlider::stepBackward() {
+    triggerAction(SliderPageStepSub);
+}
+
+void VolumeSlider::stepForward() {
+    triggerAction(SliderPageStepAdd);
+}
+
 void VolumeSlider::setToolTipItem(QnToolTipItem *toolTip)
 {
     if (m_toolTip == toolTip)

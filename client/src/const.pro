@@ -223,3 +223,5 @@ DEFINES += $$OVERRIDE_DEFINITION
 
 
 
+# Uncomment to disable background color adjustment
+# DEFINES += QN_NO_BACKGROUND_COLOR_ADJUSTMENT

@@ -126,6 +126,17 @@ namespace {
         return QPoint(std::numeric_limits<int>::max(), std::numeric_limits<int>::max());
     }
 
+    QPoint invalidCursorPos() {
+        return invalidDragDelta();
+    }
+
+    QPoint modulo(const QPoint &pos, const QRect &rect) {
+        return QPoint(
+            rect.left() + (pos.x() - rect.left() + rect.width())  % rect.width(),
+            rect.top()  + (pos.y() - rect.top()  + rect.height()) % rect.height()
+        );
+    }
+
     /** Opacity of video items when they are dragged / resized. */
     const qreal widgetManipulationOpacity = 0.3;
 
@@ -137,7 +148,8 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_display(display),
     m_manager(display->instrumentManager()),
     m_resizedWidget(NULL),
-    m_dragDelta(invalidDragDelta())
+    m_dragDelta(invalidDragDelta()),
+    m_cursorPos(invalidCursorPos())
 {
     ::memset(m_widgetByRole, 0, sizeof(m_widgetByRole));
 
@@ -154,6 +166,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     Instrument::EventTypeSet mouseEventTypes = Instrument::makeSet(mouseEventTypeArray);
     Instrument::EventTypeSet wheelEventTypes = Instrument::makeSet(QEvent::GraphicsSceneWheel);
     Instrument::EventTypeSet dndEventTypes = Instrument::makeSet(QEvent::GraphicsSceneDragEnter, QEvent::GraphicsSceneDragMove, QEvent::GraphicsSceneDragLeave, QEvent::GraphicsSceneDrop);
+    Instrument::EventTypeSet keyEventTypes = Instrument::makeSet(QEvent::KeyPress, QEvent::KeyRelease);
 
     /* Install and configure instruments. */
     m_itemLeftClickInstrument = new ClickInstrument(Qt::LeftButton, 300, Instrument::ITEM, this);
@@ -174,6 +187,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     SelectionFixupInstrument *selectionFixupInstrument = new SelectionFixupInstrument(this);
     m_motionSelectionInstrument = new MotionSelectionInstrument(this);
     GridAdjustmentInstrument *gridAdjustmentInstrument = new GridAdjustmentInstrument(workbench(), this);
+    SignalingInstrument *sceneKeySignalingInstrument = new SignalingInstrument(Instrument::SCENE, Instrument::makeSet(QEvent::KeyPress), this);
 
     gridAdjustmentInstrument->setSpeed(QSizeF(0.25 / 360.0, 0.25 / 360.0));
     gridAdjustmentInstrument->setMaxSpacing(QSizeF(0.5, 0.5));
@@ -214,6 +228,11 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_manager->installInstrument(new StopAcceptedInstrument(Instrument::SCENE, mouseEventTypes, this));
     m_manager->installInstrument(new ForwardingInstrument(Instrument::SCENE, mouseEventTypes, this));
 
+    m_manager->installInstrument(new StopInstrument(Instrument::SCENE, keyEventTypes, this));
+    m_manager->installInstrument(sceneKeySignalingInstrument);
+    m_manager->installInstrument(new StopAcceptedInstrument(Instrument::SCENE, keyEventTypes, this));
+    m_manager->installInstrument(new ForwardingInstrument(Instrument::SCENE, keyEventTypes, this));
+
     /* View/viewport instruments. */
     m_manager->installInstrument(m_rotationInstrument, InstallationMode::INSTALL_AFTER, m_display->transformationListenerInstrument());
     m_manager->installInstrument(m_resizingInstrument);
@@ -242,6 +261,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),                      this,                           SLOT(at_motionSelectionProcessStarted(QGraphicsView *, QnResourceWidget *)));
     connect(m_motionSelectionInstrument, SIGNAL(motionRegionSelected(QGraphicsView *, QnResourceWidget *, const QRect &)),          this,                           SLOT(at_motionRegionSelected(QGraphicsView *, QnResourceWidget *, const QRect &)));
     connect(m_motionSelectionInstrument, SIGNAL(motionRegionCleared(QGraphicsView *, QnResourceWidget *)),                          this,                           SLOT(at_motionRegionCleared(QGraphicsView *, QnResourceWidget *)));
+    connect(sceneKeySignalingInstrument, SIGNAL(activated(QGraphicsScene *, QEvent *)),                                             this,                           SLOT(at_scene_keyPressed(QGraphicsScene *, QEvent *)));
 
     connect(m_handScrollInstrument,     SIGNAL(scrollStarted(QGraphicsView *)),                                                     boundingInstrument,             SLOT(dontEnforcePosition(QGraphicsView *)));
     connect(m_handScrollInstrument,     SIGNAL(scrollFinished(QGraphicsView *)),                                                    boundingInstrument,             SLOT(enforcePosition(QGraphicsView *)));
@@ -291,6 +311,8 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_rotationInstrument,       SIGNAL(rotationProcessFinished(QGraphicsView *, QnResourceWidget *)),                       m_rubberBandInstrument,         SLOT(recursiveEnable()));
     connect(m_rotationInstrument,       SIGNAL(rotationProcessStarted(QGraphicsView *, QnResourceWidget *)),                        m_resizingInstrument,           SLOT(recursiveDisable()));
     connect(m_rotationInstrument,       SIGNAL(rotationProcessFinished(QGraphicsView *, QnResourceWidget *)),                       m_resizingInstrument,           SLOT(recursiveEnable()));
+    connect(m_rotationInstrument,       SIGNAL(rotationStarted(QGraphicsView *, QnResourceWidget *)),                               boundingInstrument,             SLOT(recursiveDisable()));
+    connect(m_rotationInstrument,       SIGNAL(rotationFinished(QGraphicsView *, QnResourceWidget *)),                              boundingInstrument,             SLOT(recursiveEnable()));
 
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),                      m_moveInstrument,               SLOT(recursiveDisable()));
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                     m_moveInstrument,               SLOT(recursiveEnable()));
@@ -300,7 +322,6 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                     m_resizingInstrument,           SLOT(recursiveEnable()));
 
     /* Connect to display. */
-    m_display->scene()->installEventFilter(this);
     connect(m_display,                  SIGNAL(widgetChanged(QnWorkbench::ItemRole)),                                               this,                           SLOT(at_display_widgetChanged(QnWorkbench::ItemRole)));
     connect(m_display,                  SIGNAL(widgetAdded(QnResourceWidget *)),                                                    this,                           SLOT(at_display_widgetAdded(QnResourceWidget *)));
     connect(m_display,                  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),                                         this,                           SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
@@ -346,20 +367,7 @@ QnWorkbenchGridMapper *QnWorkbenchController::mapper() const {
 
 bool QnWorkbenchController::eventFilter(QObject *watched, QEvent *event)
 {
-    if(watched == display()->scene() && event->type() == QEvent::KeyPress) {
-        QKeyEvent *e = static_cast<QKeyEvent *>(event);
-        if(e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return) {
-            QList<QGraphicsItem *> items = display()->scene()->selectedItems();
-            QGraphicsItem *focusedItem = display()->scene()->focusItem();
-            if(items.size() == 1 && (items[0] == focusedItem || !focusedItem)) {
-                if(items[0] == display()->widget(QnWorkbench::ZOOMED)) {
-                    menu()->trigger(Qn::UnmaximizeItemAction, items);
-                } else {
-                    menu()->trigger(Qn::MaximizeItemAction, items);
-                }
-            }
-        }
-    } else if (event->type() == QEvent::Close) {
+    if (event->type() == QEvent::Close) {
         if (QnResourceWidget *widget = qobject_cast<QnResourceWidget *>(watched)) {
             /* Clicking on close button of a widget that is not selected should select it,
              * thus clearing the existing selection. */
@@ -404,6 +412,49 @@ void QnWorkbenchController::displayMotionGrid(const QList<QnResourceWidget *> &w
         widget->setDisplayFlag(QnResourceWidget::DISPLAY_MOTION_GRID, display);
     }
 }
+
+void QnWorkbenchController::moveCursor(const QPoint &direction) {
+    QPoint upos = m_cursorPos;
+    QnWorkbenchItem *item = workbench()->currentLayout()->item(upos);
+
+    if(item && !item->geometry().contains(upos))
+        upos = item->geometry().topLeft();
+
+    QRect boundingRect = workbench()->currentLayout()->boundingRect();
+    if(boundingRect.isEmpty())
+        return;
+
+    QPoint vpos = upos;
+    QnWorkbenchItem *newItem = NULL;
+    while(true) {
+        upos = modulo(upos + direction, boundingRect);
+
+        newItem = workbench()->currentLayout()->item(upos);
+        if(newItem != NULL && newItem != item)
+            break;
+
+        if(upos == vpos) {
+            if(!item)
+                break;
+
+            vpos += QPoint(qAbs(direction.y()), qAbs(direction.x()));
+            if(!item->geometry().contains(vpos))
+                break;
+
+            upos = vpos;
+        }
+    }
+    
+    if(newItem != NULL && (newItem != item || item != workbench()->item(QnWorkbench::RAISED))) {
+        workbench()->setItem(QnWorkbench::RAISED, newItem);
+
+        display()->scene()->clearSelection();
+        display()->widget(newItem)->setSelected(true);
+
+        m_cursorPos = upos;
+    }
+}
+
 
 
 // -------------------------------------------------------------------------- //
@@ -565,6 +616,67 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event) {
+    if(event->type() != QEvent::KeyPress)
+        return;
+
+    event->accept(); /* Accept by default. */
+
+    QKeyEvent *e = static_cast<QKeyEvent *>(event);
+    switch(e->key()) {
+    case Qt::Key_Enter:
+    case Qt::Key_Return: {
+        QList<QGraphicsItem *> items = display()->scene()->selectedItems();
+        QGraphicsItem *focusedItem = display()->scene()->focusItem();
+        if(items.size() == 1 && (items[0] == focusedItem || !focusedItem || items[0] == display()->widget(QnWorkbench::RAISED))) {
+            if(items[0] == display()->widget(QnWorkbench::ZOOMED)) {
+                menu()->trigger(Qn::UnmaximizeItemAction, items);
+            } else {
+                menu()->trigger(Qn::MaximizeItemAction, items);
+            }
+        }
+        return;
+    }
+    case Qt::Key_Up:
+        if(e->modifiers() == 0)
+            moveCursor(QPoint(0, -1));
+        if(e->modifiers() & Qt::AltModifier)
+            m_handScrollInstrument->emulate(QPoint(0, -15));
+        return;
+    case Qt::Key_Down:
+        if(e->modifiers() == 0)
+            moveCursor(QPoint(0, 1));
+        if(e->modifiers() & Qt::AltModifier)
+            m_handScrollInstrument->emulate(QPoint(0, 15));
+        return;
+    case Qt::Key_Left:
+        if(e->modifiers() == 0)
+            moveCursor(QPoint(-1, 0));
+        if(e->modifiers() & Qt::AltModifier)
+            m_handScrollInstrument->emulate(QPoint(-15, 0));
+        return;
+    case Qt::Key_Right:
+        if(e->modifiers() == 0)
+            moveCursor(QPoint(1, 0));
+        if(e->modifiers() & Qt::AltModifier)
+            m_handScrollInstrument->emulate(QPoint(15, 0));
+        return;
+    case Qt::Key_Plus:
+    case Qt::Key_Equal:
+        m_wheelZoomInstrument->emulate(30);
+        return;
+    case Qt::Key_Minus:
+        m_wheelZoomInstrument->emulate(-30);
+        return;
+    case Qt::Key_PageUp:
+    case Qt::Key_PageDown:
+        break; /* Don't let the view handle these and scroll. */
+    default:
+        event->ignore(); /* Wasn't recognized? Ignore. */
+        break;
+    }
+}
+
 void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget *item, const ResizingInfo &) {
     TRACE("RESIZING STARTED");
 
@@ -970,6 +1082,10 @@ void QnWorkbenchController::at_display_widgetChanged(QnWorkbench::ItemRole role)
             workbench()->setItem(QnWorkbench::RAISED, NULL);
         break;
     }
+    case QnWorkbench::RAISED:
+        if(widget != NULL)
+            m_cursorPos = widget->item()->geometry().topLeft();
+        break;
     default:
         break;
     }

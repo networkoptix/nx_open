@@ -25,11 +25,14 @@
 #include <ui/models/resource_search_synchronizer.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
 
 #include "ui_resource_tree_widget.h"
 #include "ui/style/proxy_style.h"
+#include "ui/style/noptix_style.h"
+#include "ui/style/globals.h"
 
 Q_DECLARE_METATYPE(QnResourceSearchProxyModel *);
 Q_DECLARE_METATYPE(QnResourceSearchSynchronizer *);
@@ -49,6 +52,7 @@ public:
         base_type(parent)
     {
         m_recIcon = qnSkin->icon("decorations/recording.png");
+        m_raisedIcon = qnSkin->icon("decorations/raised.png");
     }
 
     QnWorkbench *workbench() const {
@@ -67,11 +71,52 @@ protected:
         if(optionV4.widget && optionV4.widget->rect().bottom() < optionV4.rect.bottom())
             return;
 
+        QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+        QnResourcePtr currentLayoutResource = workbench() ? workbench()->currentLayout()->resource() : QnLayoutResourcePtr();
+        QnResourcePtr parentResource = index.parent().data(Qn::ResourceRole).value<QnResourcePtr>();
+        QUuid uuid = index.data(Qn::UuidRole).value<QUuid>();
+
+        /* Bold items of current layout in tree. */
+        if(!resource.isNull() && !currentLayoutResource.isNull()) {
+            bool bold = false;
+            if(resource == currentLayoutResource) {
+                bold = true; /* Bold current layout. */
+            } else if(parentResource == currentLayoutResource) {
+                bold = true; /* Bold items of the current layout. */
+            } else if(uuid.isNull() && !workbench()->currentLayout()->items(resource->getUniqueId()).isEmpty()) {
+                bold = true; /* Bold items of the current layout in servers. */
+            }
+
+            optionV4.font.setBold(bold);
+        }
+
         QStyle *style = optionV4.widget ? optionV4.widget->style() : QApplication::style();
+
+        /* Highlight currently raised item. */
+        QnWorkbenchItem *raisedItem = workbench() ? workbench()->item(QnWorkbench::RAISED) : NULL;
+        if(raisedItem && (raisedItem->uuid() == uuid || (resource && uuid.isNull() && raisedItem->resourceUid() == resource->getUniqueId()))) {
+            QRect decorationRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &optionV4, optionV4.widget);
+            m_raisedIcon.paint(painter, decorationRect);
+
+            QRect rect = optionV4.rect;
+            QRect skipRect(
+                rect.topLeft(),
+                QPoint(
+                    decorationRect.right() + decorationRect.left() - rect.left(),
+                    rect.bottom()
+                )
+            );
+            rect.setLeft(skipRect.right() + 1);
+
+            optionV4.rect = skipRect;
+            style->drawPrimitive(QStyle::PE_PanelItemViewItem, &optionV4, painter, optionV4.widget);
+            optionV4.rect = rect;
+        }
+
+        /* Draw item. */
         style->drawControl(QStyle::CE_ItemViewItem, &optionV4, painter, optionV4.widget);
 
-        QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-
+        /* Draw 'recording' icon. */
         if(resource && resource->getStatus() == QnResource::Recording) {
             QRect textRect = style->subElementRect(QStyle::SE_ItemViewItemText, &optionV4, optionV4.widget);
             int textMargin = style->pixelMetric(QStyle::PM_FocusFrameHMargin, 0, optionV4.widget) + 1;
@@ -94,34 +139,11 @@ protected:
     virtual void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override {
         base_type::initStyleOption(option, index);
 
-        if(workbench() == NULL)
-            return;
-
-        QnResourcePtr currentLayoutResource = workbench()->currentLayout()->resource();
-        if(!currentLayoutResource)
-            return;
-
-        QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-        if(resource.isNull())
-            return;
-        QnResourcePtr parentResource = index.parent().data(Qn::ResourceRole).value<QnResourcePtr>();
-        QUuid uuid = index.data(Qn::UuidRole).value<QUuid>();
-
-        bool bold = false;
-        if(resource == currentLayoutResource) {
-            bold = true; /* Bold current layout. */
-        } else if(parentResource == currentLayoutResource) {
-            bold = true; /* Bold items of the current layout. */
-        } else if(uuid.isNull() && !workbench()->currentLayout()->items(resource->getUniqueId()).isEmpty()) {
-            bold = true; /* Bold items of the current layout in servers. */
-        }
-
-        option->font.setBold(bold);
     }
 
 private:
     QWeakPointer<QnWorkbench> m_workbench;
-    QIcon m_recIcon;
+    QIcon m_recIcon, m_raisedIcon;
 };
 
 class QnResourceTreeStyle: public QnProxyStyle {
@@ -210,6 +232,9 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent, QnWorkbenchContext *
     ui->resourceTreeView->setStyle(treeStyle);
     ui->searchTreeView->setStyle(treeStyle);
 
+    ui->resourceTreeView->setProperty(itemViewItemBackgroundOpacity, 0.5);
+    ui->searchTreeView->setProperty(itemViewItemBackgroundOpacity, 0.5);
+
     m_renameAction = new QAction(this);
 
     connect(ui->typeComboBox,       SIGNAL(currentIndexChanged(int)),   this,               SLOT(updateFilter()));
@@ -235,6 +260,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent, QnWorkbenchContext *
 
     connect(workbench(),        SIGNAL(currentLayoutAboutToBeChanged()),            this, SLOT(at_workbench_currentLayoutAboutToBeChanged()));
     connect(workbench(),        SIGNAL(currentLayoutChanged()),                     this, SLOT(at_workbench_currentLayoutChanged()));
+    connect(workbench(),        SIGNAL(itemChanged(QnWorkbench::ItemRole)),         this, SLOT(at_workbench_itemChanged(QnWorkbench::ItemRole)));
     connect(workbench(),        SIGNAL(itemAdded(QnWorkbenchItem *)),               this, SLOT(at_workbench_itemAdded(QnWorkbenchItem *)));
     connect(workbench(),        SIGNAL(itemRemoved(QnWorkbenchItem *)),             this, SLOT(at_workbench_itemRemoved(QnWorkbenchItem *)));
 }
@@ -452,6 +478,14 @@ void QnResourceTreeWidget::mousePressEvent(QMouseEvent *event) {
     event->accept(); /* Prevent surprising click-through scenarios. */
 }
 
+void QnResourceTreeWidget::keyPressEvent(QKeyEvent *event) {
+    event->accept();
+}
+
+void QnResourceTreeWidget::keyReleaseEvent(QKeyEvent *event) {
+    event->accept();
+}
+
 void QnResourceTreeWidget::timerEvent(QTimerEvent *event) {
     if (event->timerId() == m_filterTimerId) {
         killTimer(m_filterTimerId);
@@ -503,6 +537,11 @@ void QnResourceTreeWidget::at_workbench_currentLayoutChanged() {
 
     /* Bold state has changed. */
     currentItemView()->update();
+}
+
+void QnResourceTreeWidget::at_workbench_itemChanged(QnWorkbench::ItemRole role) {
+    /* Raised state has changed. */
+    ui->resourceTreeView->update();
 }
 
 void QnResourceTreeWidget::at_workbench_itemAdded(QnWorkbenchItem *) {

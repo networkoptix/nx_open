@@ -30,10 +30,15 @@ private:
 
     QStringList getRTPurls() const;
     int toAxisQuality(QnStreamQuality quality);
+    void parseMotionInfo(QnCompressedVideoDataPtr videoData);
+    void processTriggerData(const quint8* payload, int len);
 
+    void fillMotionInfo(const QRect& rect);
+    bool isGotFrame(QnCompressedVideoDataPtr videoData);
 private:
-
+    QnMetaDataV1Ptr m_lastMetadata;
     RTPH264StreamreaderDelegate m_RTP264;
+    QnPlAxisResourcePtr m_axisRes;
 };
 
 #endif // AXIS_STREAM_REDER_H__
