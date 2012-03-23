@@ -185,7 +185,7 @@ public:
     }
 
     /**
-     * \returns                         Rotation angle of this item.
+     * \returns                         Rotation angle of this item, in degrees.
      */
     qreal rotation() const {
         return m_rotation;

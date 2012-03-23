@@ -14,6 +14,8 @@ public:
     HandScrollInstrument(QObject *parent);
     virtual ~HandScrollInstrument();
 
+    void emulate(QPoint viewportDelta);
+
 signals:
     void scrollProcessStarted(QGraphicsView *view);
     void scrollStarted(QGraphicsView *view);

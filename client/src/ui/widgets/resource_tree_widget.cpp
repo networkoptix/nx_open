@@ -452,6 +452,14 @@ void QnResourceTreeWidget::mousePressEvent(QMouseEvent *event) {
     event->accept(); /* Prevent surprising click-through scenarios. */
 }
 
+void QnResourceTreeWidget::keyPressEvent(QKeyEvent *event) {
+    event->accept();
+}
+
+void QnResourceTreeWidget::keyReleaseEvent(QKeyEvent *event) {
+    event->accept();
+}
+
 void QnResourceTreeWidget::timerEvent(QTimerEvent *event) {
     if (event->timerId() == m_filterTimerId) {
         killTimer(m_filterTimerId);

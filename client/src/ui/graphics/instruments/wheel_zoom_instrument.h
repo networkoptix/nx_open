@@ -14,6 +14,9 @@ class WheelZoomInstrument: public Instrument, protected KineticProcessHandler {
     Q_OBJECT;
 public:
     WheelZoomInstrument(QObject *parent);
+    virtual ~WheelZoomInstrument();
+
+    void emulate(qreal degrees);
 
 protected:
     virtual void aboutToBeDisabledNotify() override;

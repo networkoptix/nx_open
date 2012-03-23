@@ -19,11 +19,15 @@ public:
 protected:
     virtual void changeEvent(QEvent *event) override;
 
+protected slots:
+    void at_copyButton_clicked();
+
 private:
     void retranslateUi();
 
 private:
     QScopedPointer<Ui::AboutDialog> ui;
+    QPushButton *m_copyButton;
 };
 
 #endif // ABOUTDIALOG_H

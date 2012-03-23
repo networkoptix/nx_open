@@ -22,6 +22,19 @@ HandScrollInstrument::~HandScrollInstrument() {
     ensureUninstalled();
 }
 
+void HandScrollInstrument::emulate(QPoint viewportDelta) {
+    if(!m_currentView) {
+        if(scene()->views().empty()) {
+            return;
+        } else {
+            m_currentView = scene()->views()[0];
+        }
+    }
+
+    kineticProcessor()->shift(QPointF(viewportDelta));
+    kineticProcessor()->start();
+}
+
 void HandScrollInstrument::aboutToBeDisabledNotify() {
     base_type::aboutToBeDisabledNotify();
 
