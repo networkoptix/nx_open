@@ -58,7 +58,7 @@ def gen_version_h():
     print >> version_h, '#define VER_LEGALTRADEMARKS1_STR    "All Rights Reserved"'
     print >> version_h, '#define VER_LEGALTRADEMARKS2_STR    VER_LEGALTRADEMARKS1_STR'
     print >> version_h, '#define VER_ORIGINALFILENAME_STR    "traytool.exe"'
-    print >> version_h, '#define VER_PRODUCTNAME_STR         "HS Witness"'
+    print >> version_h, '#define VER_PRODUCTNAME_STR         "HD Witness"'
 
     print >> version_h, '#define VER_COMPANYDOMAIN_STR       "networkoptix.com"'
     print >> version_h, '#endif // UNIVERSAL_CLIENT_VERSION_H_'
