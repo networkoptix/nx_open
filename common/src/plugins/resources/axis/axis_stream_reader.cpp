@@ -263,6 +263,9 @@ bool QnAxisStreamReader::isGotFrame(QnCompressedVideoDataPtr videoData)
 
 QnAbstractMediaDataPtr QnAxisStreamReader::getNextData()
 {
+    if (getRole() == QnResource::Role_LiveVideo) 
+        m_axisRes->readMotionInfo();
+
     if (!isStreamOpened()) {
         openStream();
         if (!isStreamOpened())

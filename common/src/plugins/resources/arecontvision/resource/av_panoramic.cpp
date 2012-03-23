@@ -3,6 +3,7 @@
 #include "../dataprovider/panoramic_cpul_tftp_dataprovider.h"
 #include "core/resource/resource_media_layout.h"
 
+#define MAX_RESPONSE_LEN (4*1024)
 
 
 QnArecontPanoramicResource::QnArecontPanoramicResource(const QString& name)
@@ -27,6 +28,55 @@ QnAbstractStreamDataProvider* QnArecontPanoramicResource::createLiveDataProvider
     return new AVPanoramicClientPullSSTFTPStreamreader(toSharedPointer());
 }
 
+
+bool QnArecontPanoramicResource::getParamPhysical(int channel, const QString& name, QVariant &val)
+{
+    m_mutex.lock();
+    if (!m_resourceParamList.contains(name))
+    {
+        m_mutex.unlock();
+        return false;
+    }
+
+    QnParam param = m_resourceParamList[name];
+    m_mutex.unlock();
+
+    if (param.netHelper().isEmpty()) // check if we have paramNetHelper command for this param
+        return false;
+
+    CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
+
+    
+
+    QString request = QString("get") + QString::number(channel) + QString("?") + param.netHelper();
+
+    CLHttpStatus status = connection.doGET(request);
+    if (status == CL_HTTP_AUTH_REQUIRED)
+        setStatus(QnResource::Unauthorized);
+
+    if (status != CL_HTTP_SUCCESS)
+        return false;
+
+
+    char c_response[MAX_RESPONSE_LEN];
+
+    int result_size =  connection.read(c_response,sizeof(c_response));
+
+    if (result_size <0)
+        return false;
+
+    QByteArray response = QByteArray::fromRawData(c_response, result_size); // QByteArray  will not copy data
+
+    int index = response.indexOf('=');
+    if (index==-1)
+        return false;
+
+    QByteArray rarray = response.mid(index+1);
+
+    val = QString(rarray.data());
+
+    return true;
+}
 
 bool QnArecontPanoramicResource::setParamPhysical(const QnParam &param, const QVariant& val )
 {
