@@ -303,6 +303,8 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_rotationInstrument,       SIGNAL(rotationProcessFinished(QGraphicsView *, QnResourceWidget *)),                       m_rubberBandInstrument,         SLOT(recursiveEnable()));
     connect(m_rotationInstrument,       SIGNAL(rotationProcessStarted(QGraphicsView *, QnResourceWidget *)),                        m_resizingInstrument,           SLOT(recursiveDisable()));
     connect(m_rotationInstrument,       SIGNAL(rotationProcessFinished(QGraphicsView *, QnResourceWidget *)),                       m_resizingInstrument,           SLOT(recursiveEnable()));
+    connect(m_rotationInstrument,       SIGNAL(rotationStarted(QGraphicsView *, QnResourceWidget *)),                               boundingInstrument,             SLOT(recursiveDisable()));
+    connect(m_rotationInstrument,       SIGNAL(rotationFinished(QGraphicsView *, QnResourceWidget *)),                              boundingInstrument,             SLOT(recursiveEnable()));
 
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),                      m_moveInstrument,               SLOT(recursiveDisable()));
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                     m_moveInstrument,               SLOT(recursiveEnable()));
@@ -461,8 +463,11 @@ void QnWorkbenchController::moveCursor(const QPoint &direction) {
     if(item && !item->geometry().contains(upos))
         upos = item->geometry().topLeft();
 
-    QPoint vpos = upos;
     QRect boundingRect = workbench()->currentLayout()->boundingRect();
+    if(boundingRect.isEmpty())
+        return;
+
+    QPoint vpos = upos;
     QnWorkbenchItem *newItem = NULL;
     while(true) {
         upos = modulo(upos + direction, boundingRect);

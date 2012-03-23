@@ -355,7 +355,6 @@ NavigationItem::NavigationItem(QGraphicsItem *parent):
     connect(toggleSyncAction, SIGNAL(triggered()), m_syncButton, SLOT(click()));
     addAction(toggleSyncAction);
 
-
     setVideoCamera(0);
     m_fullTimePeriodHandle = 0;
     m_timePeriodUpdateTime = 0;
