@@ -58,19 +58,29 @@ fixasfiles()
 os.system(r'candle -dAppServerSourceDir="../appserver/setup/build/exe.win32-2.7" -out obj\%s\ -ext WixFirewallExtension.dll -ext WixUIExtension.dll -ext WixUtilExtension.dll %s' % (CONFIG, WXS_FILES))
 
 if CONFIG == 'Debug':
-    output_file = 'bin/HDWitness-%s.%s-Debug.msi' % (APPLICATION_VERSION, BUILD_NUMBER)
+    output_file_base = 'bin/HDWitness-%s.%s-Debug' % (APPLICATION_VERSION, BUILD_NUMBER)
 else:
-    output_file = 'bin/HDWitness-%s.%s.msi' % (APPLICATION_VERSION, BUILD_NUMBER)
+    output_file_base = 'bin/HDWitness-%s.%s' % (APPLICATION_VERSION, BUILD_NUMBER)
+
+output_file_msi = output_file_base + '.msi'
+output_file_exe = output_file_base + '.exe'
+
 try:
-    os.unlink(output_file)
+    os.unlink(output_file_msi)
 except OSError:
     pass
 
-os.system(r'light -cultures:en-US -loc CustomStrings.wxl -ext WixFirewallExtension.dll -ext WixUIExtension.dll -ext WixUtilExtension.dll -out %s -pdbout bin\%s\EVEMediaPlayerSetup.wixpdb obj\%s\*.wixobj' % (output_file, CONFIG, CONFIG))
+try:
+    os.unlink(output_file_exe)
+except OSError:
+    pass
 
-os.system(r'cscript FixExitDialog.js %s' % output_file)
+os.system(r'light -cultures:en-US -loc CustomStrings.wxl -ext WixFirewallExtension.dll -ext WixUIExtension.dll -ext WixUtilExtension.dll -out %s -pdbout bin\%s\EVEMediaPlayerSetup.wixpdb obj\%s\*.wixobj' % (output_file_msi, CONFIG, CONFIG))
 
+os.system(r'cscript FixExitDialog.js %s' % output_file_msi)
+os.system(r'setupbld -out %s -ms %s -setup setup.exe' % (output_file_exe, output_file_msi))
+os.unlink(output_file_msi)
 
-if not os.path.exists(output_file):
+if not os.path.exists(output_file_exe):
     print >> sys.stderr, 'Output file is not created. Build failed'
     sys.exit(1)

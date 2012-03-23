@@ -5,6 +5,7 @@
 #include "../tools/AVJpegHeader.h"
 #include "core/resource/resource_media_layout.h"
 #include "utils/common/synctime.h"
+#include "../resource/av_panoramic.h"
 
 //======================================================
 
@@ -33,6 +34,8 @@ QnPlAVClinetPullStreamReader(res)
     m_dualsensor = avRes->isDualSensor();
     m_name = avRes->getName();
     m_tftp_client = 0;
+
+    m_motionData = 0;
 }
 
 AVPanoramicClientPullSSTFTPStreamreader::~AVPanoramicClientPullSSTFTPStreamreader()
@@ -45,43 +48,80 @@ AVPanoramicClientPullSSTFTPStreamreader::~AVPanoramicClientPullSSTFTPStreamreade
 QnMetaDataV1Ptr AVPanoramicClientPullSSTFTPStreamreader::getMetaData()
 {
     QnMetaDataV1Ptr motion(new QnMetaDataV1());
-    int part = QDateTime::currentDateTime().time().second() / 15;
-    motion->channelNumber = part;
-    int xOffs = 0;
-    int yOffs = 0;
-    switch(part)
+    //Andy Tau & Touch Enable feat. Louisa Allen - Sorry (Sean Truby Remix)
+    QVariant mdresult;
+
+    QnArecontPanoramicResourcePtr res = getResource().dynamicCast<QnArecontPanoramicResource>();
+
+    if (!res->getParamPhysical(m_motionData + 1, "MdResult", mdresult))
+        return QnMetaDataV1Ptr(0);
+
+    if (mdresult.toString() == QLatin1String("no motion"))
+        return motion; // no motion detected
+
+
+    QnPlAreconVisionResourcePtr avRes = getResource().dynamicCast<QnPlAreconVisionResource>();
+    int zones = avRes->totalMdZones() == 1024 ? 32 : 8;
+
+    QStringList md = mdresult.toString().split(QLatin1Char(' '), QString::SkipEmptyParts);
+    if (md.size() < zones*zones)
+        return QnMetaDataV1Ptr(0);
+
+
+    QVariant zone_size;
+    if (!getResource()->getParam("Zone size", zone_size, QnDomainMemory))
+        return QnMetaDataV1Ptr(0);
+
+    int pixelZoneSize = zone_size.toInt() * 32;
+
+
+    QVariant maxSensorWidth;
+    QVariant maxSensorHight;
+    getResource()->getParam("MaxSensorWidth", maxSensorWidth, QnDomainMemory);
+    getResource()->getParam("MaxSensorHeight", maxSensorHight, QnDomainMemory);
+
+
+    QRect imageRect(0, 0, maxSensorWidth.toInt(), maxSensorHight.toInt());
+    QRect zeroZoneRect(0, 0, pixelZoneSize, pixelZoneSize);
+
+    for (int x = 0; x < zones; ++x)
     {
-    case 0:
-        xOffs = 0;
-        yOffs = 0;
-        break;
-    case 1:
-        xOffs = MD_WIDTH/2;
-        yOffs = 0;
-        break;
-    case 2:
-        xOffs = MD_WIDTH/2;
-        yOffs = MD_HEIGHT/2;
-        break;
-    case 3:
-        xOffs = 0;
-        yOffs = MD_HEIGHT/2;
-        break;
+        for (int y = 0; y < zones; ++y)
+        {
+            int index = y*zones + x;
+            QString m = md.at(index) ;
+
+
+            if (m == "00" || m == "0")
+                continue;
+
+            QRect currZoneRect = zeroZoneRect.translated(x*pixelZoneSize, y*pixelZoneSize);
+
+            motion->mapMotion(imageRect, currZoneRect);
+
+        }
     }
 
-    for (int x = 0; x < MD_WIDTH/2; ++x)
-    {
-        for (int y = 0; y < MD_HEIGHT/2; ++y)
-            motion->setMotionAt(x + xOffs, y + yOffs);
-    }
-    motion->m_duration = 1000000ll * 1000;
+    //motion->m_duration = META_DATA_DURATION_MS * 1000 ;
+    motion->m_duration = 1000*1000*1000; // 1000 sec 
+    motion->channelNumber = m_motionData;
+
     return motion;
 }
 
 QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 {
-    if (needMetaData())
+
+    if (m_motionData > 0)
+    {
+        --m_motionData;
         return getMetaData();
+    }
+
+    if (needMetaData())
+    {
+        m_motionData = 4;
+    }
 
 
     QByteArray request;

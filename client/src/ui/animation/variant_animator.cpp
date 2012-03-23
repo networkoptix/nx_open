@@ -212,8 +212,13 @@ void VariantAnimator::updateState(State newState) {
         if(targetObject() == NULL)
             return; /* This is a normal use case, don't emit warnings. */
     } if(oldState == RUNNING) {
-        if(currentTime() < duration())
+        if(currentTime() < duration()) {
             m_easingCurveCorrection = this->easingCurveProgress(currentTime());
+
+            /* Floating point error may accumulate here, resulting in correction 
+             * values dangerously close to 1.0. We don't allow that. */
+            m_easingCurveCorrection = qMin(m_easingCurveCorrection, 0.99);
+        }
     }
 
     if(newState == RUNNING) {

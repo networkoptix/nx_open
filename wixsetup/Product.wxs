@@ -2,7 +2,7 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
      xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
     <Product Id="*" Name="$(env.APPLICATION_NAME)" Language="1033" Version="$(env.APPLICATION_VERSION).$(env.BUILD_NUMBER)" Manufacturer="$(env.ORGANIZATION_NAME)" UpgradeCode="CE572797-45BF-4f1c-A783-369EA79C597E">
-        <Package Id="*" InstallerVersion="300" Compressed="yes" Keywords="Installer" Comments="$(env.ORGANIZATION_NAME) $(env.APPLICATION_NAME)(beta) Installer" Manufacturer="$(env.ORGANIZATION_NAME)" InstallPrivileges="elevated" InstallScope="perMachine"/>
+        <Package Id="*" InstallerVersion="300" Compressed="yes" Keywords="Installer" Comments="$(env.ORGANIZATION_NAME) $(env.APPLICATION_NAME)(beta) Installer" Manufacturer="$(env.ORGANIZATION_NAME)" InstallPrivileges="elevated" InstallScope="perMachine" />
         
         <!-- Wix Variables -->
         
@@ -27,6 +27,8 @@
         <Icon Id="icon_desktop.exe" SourceFile="Binary\eve\eve_logo.ico"/>
         <Icon Id="eve_logo.ico" SourceFile="Binary\eve\eve_logo.ico"/>
         
+        <Property Id="MSIRESTARTMANAGERCONTROL" Value="Disable" Secure="yes"/>
+        
         <!-- Properties -->
         <Property Id="WelcomeDlg_Title" Value="$(env.APPLICATION_NAME)(beta) Setup" />
         
@@ -36,6 +38,8 @@
         <Property Id="ADVANCEDTYPE" Value="0"/>
         
         <Property Id="NEWERFOUND" Secure="yes"/>
+    	<Property Id="SAMEFOUND" Secure="yes"/>
+    	
         <!--        <Property Id="ALLUSERS" Secure="yes"/> -->
         <Property Id="PREVIOUSVERSIONSINSTALLED" Secure="yes" />
         
@@ -141,23 +145,34 @@
         <CustomAction Id="ResetClientFolder" Property="CLIENT_DIRECTORY" Value="[CLIENT_DIRECTORY_REG]" />
         
         <CustomAction Id="InitDatabaseAction_Cmd" Property="InitDatabaseAction"
-                      Value="&quot;[#dbconfig.exe]&quot; &quot;[APPSERVER_LOGIN]&quot;  &quot;[APPSERVER_PASSWORD]&quot;" Execute="immediate"/>
+                      Value="&quot;[#dbconfig.exe]&quot; &quot;[APPSERVER_LOGIN]&quot;  &quot;[APPSERVER_PASSWORD]&quot;" Execute="immediate" Impersonate="yes"/>
         <CustomAction Id="InitDatabaseAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="check" Impersonate="no" />
         
-        <CustomAction Id="LaunchApplication" FileKey="TrayToolExe" ExeCommand="" Execute="immediate" Impersonate="yes" Return="asyncNoWait"/>
+        <CustomAction Id="CloseTrayToolAction_Cmd" Property="CloseTrayToolAction"
+                      Value="&quot;[#traytool.exe]&quot; &quot;quit&quot;" Execute="immediate" Impersonate="yes"/>
+        <CustomAction Id="CloseTrayToolAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
+                      Execute="deferred" Return="check" Impersonate="no" />
+        
+        <CustomAction Id="LaunchApplication" FileKey="traytool.exe" ExeCommand="" Execute="immediate" Impersonate="yes" Return="asyncNoWait"/>
         
         <!--        <CustomAction Id="StartAppOnExit" FileKey="ClientExe" ExeCommand="" Execute="immediate" Impersonate="yes" Return="asyncNoWait"/>-->
         
+        <util:CloseApplication Id="CloseTrayTool" ElevatedCloseMessage="yes" CloseMessage="yes" Target="traytool.exe" RebootPrompt="no"/>
+        
         <Upgrade Id="CE572797-45BF-4f1c-A783-369EA79C597E">
             <UpgradeVersion
-                Minimum="$(env.APPLICATION_VERSION)" Maximum="$(env.APPLICATION_VERSION).$(env.BUILD_NUMBER)"
+                Minimum="0.0.0" Maximum="$(env.APPLICATION_VERSION)"
                 Property="PREVIOUSVERSIONSINSTALLED"
                 IncludeMinimum="yes" IncludeMaximum="yes" />
-            <UpgradeVersion OnlyDetect='no' Property='NEWERFOUND' Minimum='$(env.APPLICATION_VERSION)' IncludeMinimum='no' />
+            <UpgradeVersion OnlyDetect='no' Property='NEWERFOUND' Minimum='$(env.APPLICATION_VERSION).$(env.BUILD_NUMBER)' IncludeMinimum='no' />
+<!--    		<UpgradeVersion OnlyDetect='no' Property='SAMEFOUND' Minimum='$(env.APPLICATION_VERSION).$(env.BUILD_NUMBER)' Maximum="$(env.APPLICATION_VERSION).$(env.BUILD_NUMBER)" IncludeMinimum='yes' IncludeMaximum="yes" />-->
         </Upgrade>
         
         <InstallUISequence>
+            <FindRelatedProducts Before="AppSearch" />
+            <AppSearch Before="LaunchConditions" />
+            
             <Custom Action="FindFreePorts" Before="AssignOldAppServerPort"/>
             <Custom Action="AssignOldAppServerPort" Before="AssignOldServerRtspPort">1</Custom>
             <Custom Action="AssignOldServerRtspPort" Before="AssignOldServerApiPort">1</Custom>
@@ -180,14 +195,22 @@
   -->      </InstallUISequence>
         
         <InstallExecuteSequence>
+<!--            <FindRelatedProducts Before="AppSearch" />
+            <AppSearch Before="LaunchConditions" />
+-->
+        	<RemoveExistingProducts After="InstallInitialize"/>
+        	
+<!--            <Custom Action="CloseTrayToolAction" Before="RemoveExistingProducts" />-->
+<!--            <RemoveExistingProducts After="InstallInitialize" />-->
+            <Custom Action="CloseTrayToolAction_Cmd" Before="CloseTrayToolAction">Installed</Custom>
+            <Custom Action="CloseTrayToolAction" Before="RemoveExistingProducts">Installed</Custom>
             <Custom Action="InitDatabaseAction_Cmd" After="InstallFiles"><![CDATA[NOT Installed AND &AppServerFeature=3]]></Custom>
             <Custom Action="InitDatabaseAction" After="InitDatabaseAction_Cmd"><![CDATA[NOT Installed AND &AppServerFeature=3]]></Custom>
             <Custom Action="LaunchApplication" After="InstallFinalize"><![CDATA[&ServerFeature=3]]></Custom>
-            <RemoveExistingProducts Before="InstallInitialize" />
         </InstallExecuteSequence>
         
         <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
-        
+
         <Directory Id="TARGETDIR" Name="SourceDir">
             
             <Directory Id="SERVER_DIRECTORY" Name="Server Media">
@@ -239,8 +262,8 @@
                         </Directory>
                         
                         <Directory Id="VmsTrayToolDir" Name="TrayTool">
-                            <Component Id="TrayToolExecutable" Guid="{11772981-5229-4D14-B126-66906570AD57}">
-                                <File Id="TrayToolExe" Name="traytool.exe" Source="../traytool/bin/$(env.CONFIG)/traytool.exe" KeyPath="yes">
+                            <Component Id="traytool.exe" Guid="{11772981-5229-4D14-B126-66906570AD57}">
+                                <File Id="traytool.exe" Name="traytool.exe" Source="../traytool/bin/$(env.CONFIG)/traytool.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionVmsTrayTool" Name="VMS Tray Tool" Scope="any" IgnoreFailure="yes"/>
                                     
                                     <Shortcut Id="StartmenuTrayTool" Directory="ProgramMenuDir" Name="$(env.APPLICATION_NAME) Tray Assistant"
@@ -253,9 +276,9 @@
                                 </File>
                             </Component>
                             <Component Id="TrayToolQTLibraries" Guid="b3bbeb5b-310a-4b10-b0bb-0e1193de80f5">
-                                <File Id="TrayToolQtCore$(var.suffix)4.dll" Name="QtCore$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtCore$(var.suffix)4.dll"/>
-                                <File Id="TrayToolQtGui$(var.suffix)4.dll" Name="QtGui$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtGui$(var.suffix)4.dll"/>
-                                <File Id="TrayToolQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtNetwork$(var.suffix)4.dll"/>
+                                <File Id="TrayToolQtCore$(var.suffix)4.dll" Name="QtCore$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtCore$(var.suffix)4.dll"  />
+                                <File Id="TrayToolQtGui$(var.suffix)4.dll" Name="QtGui$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtGui$(var.suffix)4.dll"  />
+                                <File Id="TrayToolQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtNetwork$(var.suffix)4.dll"  />
                             </Component>
                         </Directory>
                         
@@ -304,14 +327,14 @@
                             </Component>
                             
                             <Component Id="ServerQTLibraries" Guid="{97B2E8C3-274A-4e3e-8FBD-F60355A75A8A}">
-                                <File Id="ServerQtCore$(var.suffix)4.dll" Name="QtCore$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtCore$(var.suffix)4.dll"/>
-                                <File Id="ServerQtGui$(var.suffix)4.dll" Name="QtGui$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtGui$(var.suffix)4.dll"/>
-                                <File Id="ServerQtMultimedia$(var.suffix)4.dll" Name="QtMultimedia$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtMultimedia$(var.suffix)4.dll"/>
-                                <File Id="ServerQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtNetwork$(var.suffix)4.dll"/>
-                                <File Id="ServerQtOpenGL$(var.suffix)4.dll" Name="QtOpenGL$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtOpenGL$(var.suffix)4.dll"/>
-                                <File Id="ServerQtWebKit$(var.suffix)4.dll" Name="QtWebKit$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtWebKit$(var.suffix)4.dll"/>
-                                <File Id="ServerQtXml$(var.suffix)4.dll" Name="QtXml$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtXml$(var.suffix)4.dll"/>
-                                <File Id="ServerQtXmlPatterns$(var.suffix)4.dll" Name="QtXmlPatterns$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtXmlPatterns$(var.suffix)4.dll"/>
+                                <File Id="ServerQtCore$(var.suffix)4.dll" Name="QtCore$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtCore$(var.suffix)4.dll" />
+                                <File Id="ServerQtGui$(var.suffix)4.dll" Name="QtGui$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtGui$(var.suffix)4.dll" />
+                                <File Id="ServerQtMultimedia$(var.suffix)4.dll" Name="QtMultimedia$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtMultimedia$(var.suffix)4.dll" />
+                                <File Id="ServerQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtNetwork$(var.suffix)4.dll" />
+                                <File Id="ServerQtOpenGL$(var.suffix)4.dll" Name="QtOpenGL$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtOpenGL$(var.suffix)4.dll" />
+                                <File Id="ServerQtWebKit$(var.suffix)4.dll" Name="QtWebKit$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtWebKit$(var.suffix)4.dll" />
+                                <File Id="ServerQtXml$(var.suffix)4.dll" Name="QtXml$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtXml$(var.suffix)4.dll" />
+                                <File Id="ServerQtXmlPatterns$(var.suffix)4.dll" Name="QtXmlPatterns$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtXmlPatterns$(var.suffix)4.dll" />
                             </Component>
                             
                             <Component Id="ServerOpenSSL" Guid="{DC94094B-CA8C-4be0-9A8A-6DA35FCC77E6}">
@@ -357,9 +380,9 @@
                             
                             <Directory Id="ImageFormats" Name="imageformats">
                                 <Component Id="ImageFormats" Guid="{74793EF7-61C1-4e9c-81D6-A120E85D984F}">
-                                    <File Id="qgif4.dll" Name="qgif4.dll" Source="$(env.QTDIR)\plugins\imageformats\qgif4.dll"/>
-                                    <File Id="qjpeg4.dll" Name="qjpeg4.dll" Source="$(env.QTDIR)\plugins\imageformats\qjpeg4.dll"/>
-                                    <File Id="qtiff4.dll" Name="qtiff4.dll" Source="$(env.QTDIR)\plugins\imageformats\qtiff4.dll"/>
+                                    <File Id="qgif4.dll" Name="qgif4.dll" Source="$(env.QTDIR)\plugins\imageformats\qgif4.dll" />
+                                    <File Id="qjpeg4.dll" Name="qjpeg4.dll" Source="$(env.QTDIR)\plugins\imageformats\qjpeg4.dll" />
+                                    <File Id="qtiff4.dll" Name="qtiff4.dll" Source="$(env.QTDIR)\plugins\imageformats\qtiff4.dll" />
                                 </Component>
                             </Directory>
                             
@@ -374,14 +397,14 @@
                             </Component>
                             
                             <Component Id="ClientQTLibraries" Guid="{6BDC7AB9-6230-4cf3-9C1C-634C636D90BC}">
-                                <File Id="ClientQtCore$(var.suffix)4.dll" Name="QtCore$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtCore$(var.suffix)4.dll"/>
-                                <File Id="ClientQtGui$(var.suffix)4.dll" Name="QtGui$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtGui$(var.suffix)4.dll"/>
-                                <File Id="ClientQtMultimedia$(var.suffix)4.dll" Name="QtMultimedia$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtMultimedia$(var.suffix)4.dll"/>
-                                <File Id="ClientQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtNetwork$(var.suffix)4.dll"/>
-                                <File Id="ClientQtOpenGL$(var.suffix)4.dll" Name="QtOpenGL$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtOpenGL$(var.suffix)4.dll"/>
-                                <File Id="ClientQtWebKit$(var.suffix)4.dll" Name="QtWebKit$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtWebKit$(var.suffix)4.dll"/>
-                                <File Id="ClientQtXml$(var.suffix)4.dll" Name="QtXml$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtXml$(var.suffix)4.dll"/>
-                                <File Id="ClientQtXmlPatterns$(var.suffix)4.dll" Name="QtXmlPatterns$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtXmlPatterns$(var.suffix)4.dll"/>
+                                <File Id="ClientQtCore$(var.suffix)4.dll" Name="QtCore$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtCore$(var.suffix)4.dll" />
+                                <File Id="ClientQtGui$(var.suffix)4.dll" Name="QtGui$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtGui$(var.suffix)4.dll" />
+                                <File Id="ClientQtMultimedia$(var.suffix)4.dll" Name="QtMultimedia$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtMultimedia$(var.suffix)4.dll" />
+                                <File Id="ClientQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtNetwork$(var.suffix)4.dll" />
+                                <File Id="ClientQtOpenGL$(var.suffix)4.dll" Name="QtOpenGL$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtOpenGL$(var.suffix)4.dll" />
+                                <File Id="ClientQtWebKit$(var.suffix)4.dll" Name="QtWebKit$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtWebKit$(var.suffix)4.dll" />
+                                <File Id="ClientQtXml$(var.suffix)4.dll" Name="QtXml$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtXml$(var.suffix)4.dll" />
+                                <File Id="ClientQtXmlPatterns$(var.suffix)4.dll" Name="QtXmlPatterns$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtXmlPatterns$(var.suffix)4.dll" />
                             </Component>
                             
                             <Component Id="ClientOpenAL" Guid="{FA1A8B92-3BEF-4779-90E9-2F76CC9D79D3}">
@@ -408,7 +431,7 @@
                             
                             <Directory Id="styles" Name="styles">
                                 <Component Id="bespin" Guid="{BF20F7AC-A34C-481a-84E3-731C80050D51}">
-                                    <File Id="bespin$(var.suffix).dll" Name="bespin$(var.suffix).dll" Source="..\client\contrib\bespin\bin\msvc-x86\$(env.CONFIG)\styles\bespin$(var.suffix).dll"/>
+                                    <File Id="bespin$(var.suffix).dll" Name="bespin$(var.suffix).dll" Source="..\client\contrib\bespin\bin\msvc-x86\$(env.CONFIG)\styles\bespin$(var.suffix).dll" />
                                 </Component>
                             </Directory>
                             
@@ -460,7 +483,7 @@
         </Feature>
         
         <Feature Id="TrayToolFeature" Title="Tray Tool" AllowAdvertise="no" Display="hidden" Level="1">
-            <ComponentRef Id="TrayToolExecutable"/>
+            <ComponentRef Id="traytool.exe"/>
             <ComponentRef Id="TrayToolQTLibraries"/>
             <ComponentRef Id="UninstallProgramMenuFolder"/>
         </Feature>
@@ -508,6 +531,10 @@
         <UIRef Id="WixUI_ErrorProgressText" />
         
         <UI>
+            <!-- These dialog references are needed for CloseApplication above to work correctly -->
+            <DialogRef Id="FilesInUse" />
+            <DialogRef Id="MsiRMFilesInUse" />      
+            
             <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
             <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
             <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="12" />
@@ -535,12 +562,15 @@
             <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
             <!--            <Publish Dialog="ExitDialog" Control="Finish" Order="1" Event="DoAction" Value="StartAppOnExit">WIXUI_EXITDIALOGOPTIONALCHECKBOX</Publish>-->
             
-            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg">NOT NEWERFOUND</Publish>
-            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="DowngradeWarningDlg">NEWERFOUND</Publish>
+            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg">NOT NEWERFOUND AND NOT SAMEFOUND</Publish>
+            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="DowngradeWarningDlg">NEWERFOUND AND NOT SAMEFOUND</Publish>
+            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="AlreadyInstalledErrorDlg">SAMEFOUND</Publish>
             
             <Publish Dialog="DowngradeWarningDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg">1</Publish>
             <Publish Dialog="DowngradeWarningDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
             
+            <Publish Dialog="AlreadyInstalledErrorDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
+        	
             <Publish Dialog="LicenseAgreementDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">NOT NEWERFOUND</Publish>
             <Publish Dialog="LicenseAgreementDlg" Control="Back" Event="NewDialog" Value="DowngradeWarningDlg">NEWERFOUND</Publish>
             

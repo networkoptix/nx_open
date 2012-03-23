@@ -23,7 +23,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tabMediaServer">
       <attribute name="title">
@@ -205,7 +205,7 @@
      </widget>
      <widget class="QWidget" name="tabAppServer">
       <attribute name="title">
-       <string>Enterprise Control System (ECS) settings</string>
+       <string>Enterprise Controller (EC) settings</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>

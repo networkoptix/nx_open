@@ -13,7 +13,7 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <Fragment>
         <UI>
-            <Dialog Id="AllFieldsAreMandatoryDlg" Width="280" Height="70" Title="Invalid ports specified">
+            <Dialog Id="AllFieldsAreMandatoryDlg" Width="280" Height="70" Title="Configuration error">
                                                     <Control Id="Ok" Type="PushButton" X="220" Y="44" Width="56" Height="17" Text="Ok">
                                                         <Publish Event="EndDialog" Value="Return">1</Publish>
                                                     </Control>
