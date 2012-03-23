@@ -34,6 +34,11 @@ QnResourcePtr QnPlIpWebCamResourceSearcher::createResource(QnId resourceTypeId, 
         return result;
     }
 
+    if (parameters.value("url").contains("raw://"))
+    {
+        return result; // it is new droid resource
+    }
+
     result = QnVirtualCameraResourcePtr( new QnPlDriodIpWebCamResource() );
     result->setTypeId(resourceTypeId);
 
