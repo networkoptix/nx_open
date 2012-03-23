@@ -1448,7 +1448,7 @@ int SEIUnit::updateSeiParam(SPSUnit& sps, bool removePulldown, int orig_hrd_para
 	return tmpBufferLen;
 }
 
-void SEIUnit::sei_payload(SPSUnit& sps, int payloadType, quint8* curBuff, int payloadSize, int orig_hrd_parameters_present_flag)
+void SEIUnit::sei_payload(SPSUnit& sps, int payloadType, const quint8* curBuff, int payloadSize, int orig_hrd_parameters_present_flag)
 {
 	if( payloadType  ==  0 )
 		buffering_period( payloadSize );
@@ -1461,7 +1461,7 @@ void SEIUnit::sei_payload(SPSUnit& sps, int payloadType, quint8* curBuff, int pa
 	else if( payloadType  ==  4 )
 		user_data_registered_itu_t_t35( payloadSize );
 	else if( payloadType  ==  5 )
-		user_data_unregistered( payloadSize );
+		user_data_unregistered(curBuff, payloadSize );
 	else if( payloadType  ==  6 )
 		recovery_point( payloadSize );
 	else if( payloadType  ==  7 )
@@ -1592,7 +1592,7 @@ void SEIUnit::serialize_buffering_period_message(const SPSUnit& sps, BitStreamWr
 	writer.flushBits();
 }
 
-void SEIUnit::pic_timing(SPSUnit& sps, quint8* curBuff, int payloadSize, 
+void SEIUnit::pic_timing(SPSUnit& sps, const quint8* curBuff, int payloadSize, 
 						 bool orig_hrd_parameters_present_flag) 
 {
 	/*
@@ -1663,7 +1663,12 @@ int getNumClockTS()
 void SEIUnit::pan_scan_rect(int /*payloadSize*/) {}
 void SEIUnit::filler_payload(int /*payloadSize*/) {}
 void SEIUnit::user_data_registered_itu_t_t35(int /*payloadSize*/) {}
-void SEIUnit::user_data_unregistered(int /*payloadSize*/) {}
+
+void SEIUnit::user_data_unregistered(const quint8* data, int payloadSize) 
+{
+    m_userDataPayload << QPair<const quint8*, int>(data, payloadSize);
+}
+
 void SEIUnit::recovery_point(int /*payloadSize*/) {}
 void SEIUnit::dec_ref_pic_marking_repetition(int /*payloadSize*/) {}
 void SEIUnit::spare_pic(int /*payloadSize*/) {}
