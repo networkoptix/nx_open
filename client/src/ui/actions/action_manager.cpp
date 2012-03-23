@@ -296,6 +296,12 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Reconnect to Server"));
 
+    factory(Qn::FreespaceAction).
+        flags(Qn::NoTarget).
+        text(tr("Go to Freespace Mode")).
+        shortcut(tr("F11")).
+        autoRepeat(false);
+
 
     /* Context menu actions. */
 

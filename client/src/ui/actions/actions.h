@@ -155,6 +155,11 @@ namespace Qn {
         FullscreenAction,
 
         /**
+         * Goes to fullscreen and slides out all panels.
+         */
+        FreespaceAction,
+
+        /**
          * Minimizes client's main window.
          */ 
         MinimizeAction,

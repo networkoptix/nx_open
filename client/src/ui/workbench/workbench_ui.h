@@ -164,6 +164,7 @@ protected slots:
     void setHelpShowButtonUsed(bool used = true);
 
     void at_mainMenuAction_triggered();
+    void at_freespaceAction_triggered();
     void at_activityStopped();
     void at_activityStarted();
     void at_fpsChanged(qreal fps);
@@ -203,7 +204,6 @@ protected slots:
     void at_fpsItem_geometryChanged();
 
     void at_exportMediaRange(CLVideoCamera* camera, qint64 startTimeMs, qint64 endTimeMs);
-
     void at_exportFailed(QString errMessage);
     void at_exportFinished(QString fileName);
 
@@ -365,6 +365,9 @@ private:
 
     bool m_helpPinned;
 
+
+    /* Freespace-related state. */
+    bool m_wasFullscreen;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchUi::Flags);
