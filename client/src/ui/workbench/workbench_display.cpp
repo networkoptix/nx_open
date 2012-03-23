@@ -82,6 +82,17 @@ namespace {
         *deltaEnd = newEnd - end;
     }
 
+    QRectF rotated(const QRectF &rect, qreal degrees) {
+        QPointF c = rect.center();
+
+        QTransform transform;
+        transform.translate(c.x(), c.y());
+        transform.rotate(degrees);
+        transform.translate(-c.x(), -c.y());
+
+        return transform.mapRect(rect);
+    }
+
     /** Size multiplier for raised widgets. */
     const qreal focusExpansion = 100.0;
 
@@ -795,13 +806,13 @@ QRectF QnWorkbenchDisplay::itemGeometry(QnWorkbenchItem *item, QRectF *enclosing
 
     QRectF result = itemEnclosingGeometry(item);
     if(enclosingGeometry != NULL)
-        *enclosingGeometry = result;
+        *enclosingGeometry = rotated(result, item->rotation());
 
     QnResourceWidget *widget = this->widget(item);
     if(!widget->hasAspectRatio())
-        return result;
+        return rotated(result, item->rotation());
 
-    return expanded(widget->aspectRatio(), result, Qt::KeepAspectRatio);
+    return rotated(expanded(widget->aspectRatio(), result, Qt::KeepAspectRatio), item->rotation());
 }
 
 QRectF QnWorkbenchDisplay::layoutBoundingGeometry() const {
@@ -1245,7 +1256,11 @@ void QnWorkbenchDisplay::at_item_geometryDeltaChanged() {
 }
 
 void QnWorkbenchDisplay::at_item_rotationChanged() {
-    synchronizeGeometry(static_cast<QnWorkbenchItem *>(sender()), true);
+    QnWorkbenchItem *item = static_cast<QnWorkbenchItem *>(sender());
+
+    synchronizeGeometry(item, true);
+    if(item == m_itemByRole[QnWorkbench::ZOOMED])
+        synchronizeSceneBounds();
 }
 
 void QnWorkbenchDisplay::at_item_flagChanged(QnWorkbenchItem::ItemFlag flag, bool value) {
