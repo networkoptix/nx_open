@@ -6,6 +6,7 @@
 #include <core/resource/layout_item_index.h>
 #include <ui/actions/action_target_provider.h>
 #include <ui/workbench/workbench_context_aware.h>
+#include <ui/workbench/workbench.h>
 
 class QLineEdit;
 class QTabWidget;
@@ -94,6 +95,7 @@ private slots:
     void at_workbench_currentLayoutAboutToBeChanged();
     void at_workbench_currentLayoutChanged();
     
+    void at_workbench_itemChanged(QnWorkbench::ItemRole role);
     void at_workbench_itemAdded(QnWorkbenchItem *item);
     void at_workbench_itemRemoved(QnWorkbenchItem *item);
 

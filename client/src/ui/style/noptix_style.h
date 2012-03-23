@@ -33,6 +33,7 @@ protected:
     bool drawToolButtonComplexControl(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const;
     bool drawTabClosePrimitive(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
     bool drawBranchPrimitive(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
+    bool drawPanelItemViewPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
 
 private:
     void setHoverProgress(const QWidget *widget, qreal value) const;
@@ -49,6 +50,7 @@ private:
 
 namespace {
     const char *hideCheckBoxInMenuPropertyName = "_qn_hideCheckBoxInMenu";
+    const char *itemViewItemBackgroundOpacity = "_qn_itemViewItemBackgroundOpacity";
 }
 
 #endif // QN_NOPTIX_STYLE_H

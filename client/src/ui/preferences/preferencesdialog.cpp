@@ -61,6 +61,11 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     ui->backgroundColorPicker->setAutoFillBackground(false);
     initColorPicker();
 
+#ifdef QN_NO_BACKGROUND_COLOR_ADJUSTMENT
+    ui->backgroundColorLabel->hide();
+    ui->backgroundColorWidget->hide();
+#endif
+
     connectionsSettingsWidget = new ConnectionsSettingsWidget(this);
     ui->tabWidget->insertTab(PageConnections, connectionsSettingsWidget, tr("Connections"));
 
