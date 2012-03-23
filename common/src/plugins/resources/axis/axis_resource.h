@@ -32,6 +32,7 @@ public:
     float getResolutionAspectRatio(const QByteArray& resolution) const;
 
     QRect getMotionWindow(int num) const;
+    void readMotionInfo();
 protected:
     void init();
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
@@ -44,6 +45,7 @@ private:
     QList<QByteArray> m_resolutionList;
     QMap<int, QRect> m_motionWindows;
     QMap<int, QRect> m_motionMask;
+    qint64 m_lastMotionReadTime;
 };
 
 typedef QSharedPointer<QnPlAxisResource> QnPlAxisResourcePtr;
