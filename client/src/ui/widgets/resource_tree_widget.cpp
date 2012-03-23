@@ -93,7 +93,8 @@ protected:
         QStyle *style = optionV4.widget ? optionV4.widget->style() : QApplication::style();
 
         /* Highlight currently raised item. */
-        if(parentResource == currentLayoutResource && workbench() && workbench()->item(QnWorkbench::RAISED) && workbench()->item(QnWorkbench::RAISED)->uuid() == uuid) {
+        QnWorkbenchItem *raisedItem = workbench() ? workbench()->item(QnWorkbench::RAISED) : NULL;
+        if(raisedItem && (raisedItem->uuid() == uuid || (resource && uuid.isNull() && raisedItem->resourceUid() == resource->getUniqueId()))) {
             QRect decorationRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &optionV4, optionV4.widget);
             m_raisedIcon.paint(painter, decorationRect);
 
