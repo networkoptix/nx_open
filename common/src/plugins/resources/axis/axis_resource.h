@@ -1,6 +1,7 @@
 #ifndef axis_resource_h_2215
 #define axis_resource_h_2215
 
+#include <QMap>
 #include <QSharedPointer>
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
@@ -29,6 +30,8 @@ public:
     QByteArray getMaxResolution() const;
     QString getNearestResolution(const QByteArray& resolution, float aspectRatio) const;
     float getResolutionAspectRatio(const QByteArray& resolution) const;
+
+    QRect getMotionWindow(int num) const;
 protected:
     void init();
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
@@ -36,8 +39,11 @@ protected:
     virtual void setCropingPhysical(QRect croping);
 private:
     void clear();
+    QRect axisRectToGridRect(const QRect& axisRect);
 private:
     QList<QByteArray> m_resolutionList;
+    QMap<int, QRect> m_motionWindows;
+    QMap<int, QRect> m_motionMask;
 };
 
 typedef QSharedPointer<QnPlAxisResource> QnPlAxisResourcePtr;

@@ -297,14 +297,15 @@ QnAbstractMediaDataPtr CLH264RtpParser::getNextData()
                     //return QnAbstractMediaDataPtr();
                     break;
                 default:
-                    //if (packetType >= nuSliceNonIDR && packetType  <= nuSliceIDR)
-                    {
-                        videoData->data.write(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
-                        videoData->data.write((const char*) curPtr-1, bytesLeft+1);
+                    isKeyFrame = (packetType & 0x1f) == nuSliceIDR;
+                    if (isKeyFrame)
+                        serializeSpsPps(videoData->data);
 
-                        bytesLeft = 0;
-                        lastPacketReceived = true;
-                    }
+                    videoData->data.write(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
+                    videoData->data.write((const char*) curPtr-1, bytesLeft+1);
+
+                    bytesLeft = 0;
+                    lastPacketReceived = true;
                     break; // ignore unknown data
             }
         }

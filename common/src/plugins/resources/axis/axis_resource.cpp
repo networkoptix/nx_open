@@ -43,6 +43,7 @@ void QnPlAxisResource::setCropingPhysical(QRect /*croping*/)
 
 bool QnPlAxisResource::isInitialized() const
 {
+    QMutexLocker lock(&m_mutex);
     return !m_resolutionList.isEmpty();
 }
 
@@ -51,15 +52,112 @@ void QnPlAxisResource::clear()
     m_resolutionList.clear();
 }
 
+struct WindowInfo
+{
+    enum RectType {Unknown, Motion, MotionMask};
+    WindowInfo(): left(-1), right(-1), top(-1), bottom(-1), rectType(Unknown) {};
+    bool isValid() const 
+    { 
+        return left >= 0 && right >= 0 && top >= 0 && bottom >= 0 && rectType != Unknown;
+    }
+    QRect toRect() const
+    {
+        return QRect(QPoint(left, top), QPoint(right, bottom));
+    }
+
+    int left;
+    int right;
+    int top;
+    int bottom;
+    RectType rectType;
+};
+
+QRect QnPlAxisResource::axisRectToGridRect(const QRect& axisRect)
+{
+    qreal xCoeff = 9999.0 / (MD_WIDTH-1);
+    qreal yCoeff = 9999.0 / (MD_HEIGHT-1);
+    QPoint topLeft(axisRect.left()/xCoeff + 0.5, axisRect.top()/yCoeff + 0.5);
+    QPoint bottomRight(axisRect.right()/xCoeff + 0.5, axisRect.bottom()/yCoeff + 0.5);
+    return QRect(topLeft, bottomRight);
+}
+
 void QnPlAxisResource::init()
 {
     QMutexLocker lock(&m_mutex);
-    m_resolutionList.clear();
+
+    {
+        // enable send motion into H.264 stream
+        CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth());
+        CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=update&Image.I0.MPEG.UserDataEnabled=yes")); // &Image.TriggerDataEnabled=yes
+        //CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=update&Image.I0.MPEG.UserDataEnabled=yes&Image.I1.MPEG.UserDataEnabled=yes&Image.I2.MPEG.UserDataEnabled=yes&Image.I3.MPEG.UserDataEnabled=yes"));
+        if (status != CL_HTTP_SUCCESS) {
+            if (status == CL_HTTP_AUTH_REQUIRED)
+                setStatus(QnResource::Unauthorized);
+            return;
+        }
+    }
+
+    {
+        // read motion windows coordinates
+        CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth());
+        CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=list&group=Motion"));
+        if (status != CL_HTTP_SUCCESS) {
+            if (status == CL_HTTP_AUTH_REQUIRED)
+                setStatus(QnResource::Unauthorized);
+            return;
+        }
+        QByteArray body;
+        http.readAll(body);
+        QList<QByteArray> lines = body.split('\n');
+        QMap<int,WindowInfo> windows;
+
+        for (int i = 0; i < lines.size(); ++i)
+        {
+            QList<QByteArray> params = lines[i].split('.');
+            if (params.size() < 2)
+                continue;
+            int windowNum = params[params.size()-2].mid(1).toInt();
+            QList<QByteArray> values = params[params.size()-1].split('=');
+            if (values.size() < 2)
+                continue;
+            if (values[0] == "Left")
+                windows[windowNum].left = values[1].toInt();
+            else if (values[0] == "Right")
+                windows[windowNum].right = values[1].toInt();
+            else if (values[0] == "Top")
+                windows[windowNum].top = values[1].toInt();
+            else if (values[0] == "Bottom")
+                windows[windowNum].bottom = values[1].toInt();
+            if (values[0] == "WindowType")
+            {
+                if (values[1] == "include")
+                    windows[windowNum].rectType = WindowInfo::Motion;
+                else
+                    windows[windowNum].rectType = WindowInfo::MotionMask;
+            }
+        }
+        for (QMap<int,WindowInfo>::const_iterator itr = windows.begin(); itr != windows.end(); ++itr)
+        {
+            if (itr.value().isValid())
+            {
+                if (itr.value().rectType == WindowInfo::Motion)
+                    m_motionWindows[itr.key()] = axisRectToGridRect(itr.value().toRect());
+                else
+                    m_motionMask[itr.key()] = axisRectToGridRect(itr.value().toRect());
+            }
+        }
+    }
+
     // determin camera max resolution
     CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth());
     CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=list&group=Properties.Image.Resolution"));
-    if (status != CL_HTTP_SUCCESS)
+    if (status != CL_HTTP_SUCCESS) {
+        if (status == CL_HTTP_AUTH_REQUIRED)
+            setStatus(QnResource::Unauthorized);
         return;
+    }
+
+    m_resolutionList.clear();
         
     QByteArray body;
     http.readAll(body);
@@ -73,6 +171,13 @@ void QnPlAxisResource::init()
     m_resolutionList = body.mid(paramValuePos+1).split(',');
     for (int i = 0; i < m_resolutionList.size(); ++i)
         m_resolutionList[i] = m_resolutionList[i].toLower().trimmed();
+
+
+
+    //root.Image.MotionDetection=no
+    //root.Image.I0.TriggerData.MotionDetectionEnabled=yes
+    //root.Image.I1.TriggerData.MotionDetectionEnabled=yes
+    //root.Properties.Motion.MaxNbrOfWindows=10
 }
 
 QByteArray QnPlAxisResource::getMaxResolution() const
@@ -122,4 +227,10 @@ QString QnPlAxisResource::getNearestResolution(const QByteArray& resolution, flo
         }
     }
     return bestIndex >= 0 ? m_resolutionList[bestIndex] : resolution;
+}
+
+QRect QnPlAxisResource::getMotionWindow(int num) const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_motionWindows.value(num);
 }
