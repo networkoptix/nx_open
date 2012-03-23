@@ -29,6 +29,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="AdvancedTypeDlg.wxs" />
+    <Compile Include="AlreadyInstalledErrorDlg.wxs" />
     <Compile Include="AppServerDlg.wxs" />
     <Compile Include="AppServerFiles.wxs" />
     <Compile Include="ClientDlg.wxs" />

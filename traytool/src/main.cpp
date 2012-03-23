@@ -26,6 +26,12 @@ int main(int argc, char *argv[])
 
     QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
 
+    if (argc > 1 && QString(argv[1]) == "quit")
+    {
+        app.sendMessage("quit");
+        return 0;
+    }
+
     if (app.isRunning())
     {
         if (MyIsUserAnAdmin())

@@ -1,10 +1,10 @@
 def fixasfiles():
-    fragment1 = r"""            <Component Id="appserver.exe" Guid="*">
-                <File Id="appserver.exe" KeyPath="yes" Source="$(var.AppServerSourceDir)\appserver.exe" />
+    fragment1 = r"""            <Component Id="ecs.exe" Guid="*">
+                <File Id="ecs.exe" KeyPath="yes" Source="$(var.AppServerSourceDir)\ecs.exe" />
             </Component>
 """
 
-    fragment2 = """            <ComponentRef Id="appserver.exe" />
+    fragment2 = """            <ComponentRef Id="ecs.exe" />
 """
 
     text = open('AppServerFiles.wxs', 'r').read()
