@@ -34,6 +34,8 @@ protected:
     QString m_name;
 
     CLSimpleTFTPClient* m_tftp_client;
+
+    int m_motionData;
 };
 
 #endif //cpull_httpreader_1119

@@ -258,6 +258,8 @@ protected:
     /** Mutex that is to be used when accessing resource fields. */
     mutable QMutex m_mutex;
 
+    mutable QnParamList m_resourceParamList;
+
 private:
     /** Resource pool this this resource belongs to. */
     QnResourcePool *m_resourcePool;
@@ -297,7 +299,7 @@ private:
 
     QStringList m_tags;
 
-    mutable QnParamList m_resourceParamList;
+    
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResource::Flags);
