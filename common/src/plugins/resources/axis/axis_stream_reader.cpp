@@ -76,6 +76,14 @@ void QnAxisStreamReader::openStream()
     {
         CLSimpleHTTPClient http (res->getHostAddress(), QUrl(res->getUrl()).port(80), res->getNetworkTimeout(), res->getAuth());
         CLHttpStatus status = http.doGET(QByteArray("/axis-cgi/param.cgi?action=list&group=StreamProfile"));
+
+        if (status != CL_HTTP_SUCCESS)
+        {
+            if (status == CL_HTTP_AUTH_REQUIRED)
+                getResource()->setStatus(QnResource::Unauthorized);
+            return;
+        }
+
         QByteArray body;
         http.readAll(body);
         QList<QByteArray> lines = body.split('\n');
