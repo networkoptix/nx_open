@@ -18,6 +18,10 @@
         <?define suffix = "" ?>
         <?endif?>
         
+        <SetProperty Id="REINSTALLMODE" Value="vomus" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
+        <SetProperty Id="REINSTALL" Value="ALL" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
+    	<SetProperty Id="REBOOT" Value="reallysuppress" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
+
         <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
         <WixVariable Id="WixUIBannerBmp" Value="Binary\eve\eve_logo-493x58.bmp" />
         <WixVariable Id="WixUIDialogBmp" Value="Binary\eve\eve_logo-493x312.bmp" />
@@ -27,7 +31,7 @@
         <Icon Id="icon_desktop.exe" SourceFile="Binary\eve\eve_logo.ico"/>
         <Icon Id="eve_logo.ico" SourceFile="Binary\eve\eve_logo.ico"/>
         
-        <Property Id="MSIRESTARTMANAGERCONTROL" Value="Disable" Secure="yes"/>
+<!--        <Property Id="MSIRESTARTMANAGERCONTROL" Value="Disable" Secure="yes"/> -->
         
         <!-- Properties -->
         <Property Id="WelcomeDlg_Title" Value="$(env.APPLICATION_NAME)(beta) Setup" />
@@ -36,10 +40,10 @@
         
         <Property Id="INSTALLTYPE" Value="0"/>
         <Property Id="ADVANCEDTYPE" Value="0"/>
+        <Property Id="UPGRADETYPE" Value="0"/>
         
         <Property Id="NEWERFOUND" Secure="yes"/>
-    	<Property Id="SAMEFOUND" Secure="yes"/>
-    	
+        
         <!--        <Property Id="ALLUSERS" Secure="yes"/> -->
         <Property Id="PREVIOUSVERSIONSINSTALLED" Secure="yes" />
         
@@ -115,6 +119,7 @@
         <Binary Id="CustomActions.dll" SourceFile="CustomActions\Release\CustomActions.dll" />
         
         <!-- Custom actions -->
+        <CustomAction Id="ResetPreselected" Property="Preselected" Value="" />
         <CustomAction Id="SetMoviesFolder" BinaryKey="CustomActions.dll" DllEntry="SetMoviesFolder" />
         <CustomAction Id="MissingFeature"  Error="At least one component should be selected"/>
         
@@ -166,10 +171,11 @@
                 Property="PREVIOUSVERSIONSINSTALLED"
                 IncludeMinimum="yes" IncludeMaximum="yes" />
             <UpgradeVersion OnlyDetect='no' Property='NEWERFOUND' Minimum='$(env.APPLICATION_VERSION).$(env.BUILD_NUMBER)' IncludeMinimum='no' />
-<!--    		<UpgradeVersion OnlyDetect='no' Property='SAMEFOUND' Minimum='$(env.APPLICATION_VERSION).$(env.BUILD_NUMBER)' Maximum="$(env.APPLICATION_VERSION).$(env.BUILD_NUMBER)" IncludeMinimum='yes' IncludeMaximum="yes" />-->
+<!--            <UpgradeVersion OnlyDetect='no' Property='SAMEFOUND' Minimum='$(env.APPLICATION_VERSION).$(env.BUILD_NUMBER)' Maximum="$(env.APPLICATION_VERSION).$(env.BUILD_NUMBER)" IncludeMinimum='yes' IncludeMaximum="yes" />-->
         </Upgrade>
         
         <InstallUISequence>
+             <Custom Action="ResetPreselected" After="CostFinalize">Installed AND Preselected</Custom>
             <FindRelatedProducts Before="AppSearch" />
             <AppSearch Before="LaunchConditions" />
             
@@ -195,18 +201,18 @@
   -->      </InstallUISequence>
         
         <InstallExecuteSequence>
-<!--            <FindRelatedProducts Before="AppSearch" />
+            <FindRelatedProducts Before="AppSearch" />
             <AppSearch Before="LaunchConditions" />
--->
-        	<RemoveExistingProducts After="InstallInitialize"/>
-        	
+
+            <RemoveExistingProducts After="InstallFinalize"/>
+            
 <!--            <Custom Action="CloseTrayToolAction" Before="RemoveExistingProducts" />-->
 <!--            <RemoveExistingProducts After="InstallInitialize" />-->
             <Custom Action="CloseTrayToolAction_Cmd" Before="CloseTrayToolAction">Installed</Custom>
-            <Custom Action="CloseTrayToolAction" Before="RemoveExistingProducts">Installed</Custom>
+            <Custom Action="CloseTrayToolAction" Before="StopServices">Installed</Custom>
             <Custom Action="InitDatabaseAction_Cmd" After="InstallFiles"><![CDATA[NOT Installed AND &AppServerFeature=3]]></Custom>
             <Custom Action="InitDatabaseAction" After="InitDatabaseAction_Cmd"><![CDATA[NOT Installed AND &AppServerFeature=3]]></Custom>
-            <Custom Action="LaunchApplication" After="InstallFinalize"><![CDATA[&ServerFeature=3]]></Custom>
+            <Custom Action="LaunchApplication" After="RemoveExistingProducts"><![CDATA[!ServerFeature=3 OR &ServerFeature=3]]></Custom>
         </InstallExecuteSequence>
         
         <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
@@ -232,8 +238,9 @@
                     <Directory Id="INSTALLDIR" Name="$(env.APPLICATION_NAME)">
                         <Directory Id="VmsAppServerDir" Name="Enterprise Controller">
                             <Component Id="AppServerExecutable" Guid="{5FB5A627-BB1F-4d82-A06C-7672903DA4C7}">
+                                <Condition>NOT REINSTALL</Condition>
                                 <File Id="ecexe" Name="ecs.exe" Source="../appserver/setup/build/exe.win32-2.7/ecs.exe" KeyPath="yes">
-                                    <fire:FirewallException Id="FirewallExceptionAppServer" Name="Network Optix Enterprise Controller" Scope="any" IgnoreFailure="yes"/>
+                                    <fire:FirewallException Id="FirewallExceptionAppServer" Name="Network Optix Enterprise Controller" Scope="any" IgnoreFailure="yes" />
                                 </File>
                                 
                                 <ServiceInstall Id="VmsAppServerService"
@@ -251,6 +258,10 @@
                             
                             </Component>
                             <Component Id="AppServerConfiguration" Guid="{46C18E7E-D25C-4250-AF5F-0237EEFAA80E}" Permanent="yes">
+                                <Condition>
+                                    NOT PREVIOUSVERSIONSINSTALLED OR UPGRADETYPE=0
+                                </Condition>
+                                
                                 <RegistryKey Root="HKLM"
                                              Key="Software\[Manufacturer]\Enterprise Controller"
                                              Action="createAndRemoveOnUninstall">
@@ -263,6 +274,7 @@
                         
                         <Directory Id="VmsTrayToolDir" Name="TrayTool">
                             <Component Id="traytool.exe" Guid="{11772981-5229-4D14-B126-66906570AD57}">
+                                <Condition>NOT REINSTALL</Condition>
                                 <File Id="traytool.exe" Name="traytool.exe" Source="../traytool/bin/$(env.CONFIG)/traytool.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionVmsTrayTool" Name="VMS Tray Tool" Scope="any" IgnoreFailure="yes"/>
                                     
@@ -284,6 +296,7 @@
                         
                         <Directory Id="VmsMediaServerDir" Name="MediaServer">
                             <Component Id="ServerExecutable" Guid="06DFA703-0266-4970-BAC1-3730BF7D1C66">
+                                <Condition>NOT REINSTALL</Condition>
                                 <File Id="ServerExe" Name="mediaserver.exe" Source="../mediaserver/bin/$(env.CONFIG)/mediaserver.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionMediaServer" Name="Network Optix Media Server" Scope="any" IgnoreFailure="yes"/>
                                 </File>
@@ -303,6 +316,10 @@
                             </Component>
                             
                             <Component Id="ServerConfiguration" Guid="{C3BA240A-2D18-4723-B084-D2774F51D1B0}" Permanent="yes">
+                                <Condition>
+                                    NOT PREVIOUSVERSIONSINSTALLED OR UPGRADETYPE=0
+                                </Condition>
+
                                 <RegistryKey Root="HKLM"
                                              Key="Software\[Manufacturer]\Network Optix Media Server"
                                              Action="createAndRemoveOnUninstall">
@@ -353,6 +370,7 @@
                         
                         <Directory Id="VmsClientDir" Name="Client">
                             <Component Id="ClientExecutable" Guid="{7AAC7815-50A6-4dc9-ADD2-BDD9B7EE8FEF}">
+                                <Condition>NOT REINSTALL</Condition>
                                 <File Id="ClientExe" Name="client.exe" Source="../client/bin/$(env.CONFIG)/client.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionClient" Name="HD Witness" Scope="any" IgnoreFailure="yes"/>
                                     
@@ -367,6 +385,10 @@
                             </Component>
                             
                             <Component Id="ClientConfiguration" Guid="{8AC01524-8F3A-46ba-8A85-24B3709CEDDE}" Permanent="yes">
+                                <Condition>
+                                    NOT PREVIOUSVERSIONSINSTALLED OR UPGRADETYPE=0
+                                </Condition>
+
                                 <RegistryKey Root="HKCU"
                                              Key="Software\[Manufacturer]\Network Optix HD Witness Client"
                                              Action="createAndRemoveOnUninstall">
@@ -479,7 +501,7 @@
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="hidden" >
             <ComponentGroupRef Id="AppServerFilesComponent" />
             <ComponentRef Id="AppServerExecutable" />
-            <ComponentRef Id="AppServerConfiguration" />
+            <ComponentRef Id="AppServerConfiguration"/>
         </Feature>
         
         <Feature Id="TrayToolFeature" Title="Tray Tool" AllowAdvertise="no" Display="hidden" Level="1">
@@ -540,7 +562,7 @@
             <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="12" />
             <TextStyle Id="WixUI_Font_Title" FaceName="Tahoma" Size="9" Bold="yes" />
             
-            <Property Id="ARPNOMODIFY" Value="1" />
+<!--            <Property Id="ARPNOMODIFY" Value="1" />-->
             
             <DialogRef Id="MyFeaturesDlg" />
             <DialogRef Id="SelectionWarningDlg" />
@@ -562,21 +584,26 @@
             <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
             <!--            <Publish Dialog="ExitDialog" Control="Finish" Order="1" Event="DoAction" Value="StartAppOnExit">WIXUI_EXITDIALOGOPTIONALCHECKBOX</Publish>-->
             
-            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg">NOT NEWERFOUND AND NOT SAMEFOUND</Publish>
-            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="DowngradeWarningDlg">NEWERFOUND AND NOT SAMEFOUND</Publish>
-            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="AlreadyInstalledErrorDlg">SAMEFOUND</Publish>
+            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg">NOT NEWERFOUND</Publish>          
+            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="UpgradeDlg">PREVIOUSVERSIONSINSTALLED</Publish>
+            
+            <Publish Dialog="UpgradeDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
+            <Publish Dialog="UpgradeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">UPGRADETYPE=0</Publish>
+            <Publish Dialog="UpgradeDlg" Control="Next" Event="NewDialog" Value="InstallTypeDlg">UPGRADETYPE=1</Publish>
+            
+            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="DowngradeWarningDlg">NEWERFOUND</Publish>
             
             <Publish Dialog="DowngradeWarningDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg">1</Publish>
             <Publish Dialog="DowngradeWarningDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
             
-            <Publish Dialog="AlreadyInstalledErrorDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
-        	
             <Publish Dialog="LicenseAgreementDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">NOT NEWERFOUND</Publish>
             <Publish Dialog="LicenseAgreementDlg" Control="Back" Event="NewDialog" Value="DowngradeWarningDlg">NEWERFOUND</Publish>
             
             <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="InstallTypeDlg">LicenseAccepted = "1"</Publish>
             
-            <Publish Dialog="InstallTypeDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg">1</Publish>
+            <Publish Dialog="InstallTypeDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg">NOT UPGRADETYPE</Publish>
+            <Publish Dialog="InstallTypeDlg" Control="Back" Event="NewDialog" Value="UpgradeDlg">UPGRADETYPE</Publish>
+            
             <Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="PasswordDlg">INSTALLTYPE=0</Publish>
             <Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="AdvancedTypeDlg">INSTALLTYPE=1</Publish>
             
@@ -679,14 +706,20 @@
             <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_BACK" Value="MediaServerDlg">1</Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_NEXT" Value="VerifyReadyDlg">1</Publish>
             
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg" Order="1">INSTALLTYPE=0</Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg" Order="1"><![CDATA[(INSTALLTYPE<>0 AND NOT Installed AND &AppServerFeature=3 AND &ServerFeature=3)]]></Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="AppServerDlg" Order="1"><![CDATA[(INSTALLTYPE<>0 AND NOT Installed AND &AppServerFeature=3 AND &ServerFeature<>3 AND &AppServerFeature = 3)]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg" Order="1"><![CDATA[UPGRADETYPE <> 0 AND INSTALLTYPE=0]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg" Order="1"><![CDATA[UPGRADETYPE <> 0 AND (INSTALLTYPE<>0 AND NOT Installed AND &AppServerFeature=3 AND &ServerFeature=3)]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="AppServerDlg" Order="1"><![CDATA[UPGRADETYPE <> 0 AND (INSTALLTYPE<>0 AND NOT Installed AND &AppServerFeature=3 AND &ServerFeature<>3 AND &AppServerFeature = 3)]]></Publish>
             
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2">Installed</Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="UpgradeDlg">UPGRADETYPE=0</Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2">Installed AND UPGRADETYPE&lt;&gt;0</Publish>
+            
+            <Publish Dialog="VerifyReadyDlg" Control="Next" Event="ReinstallMode" Value="m" Order="1">WixUI_InstallMode = Change</Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Next" Event="Reinstall" Value="Registry" Order="2">WixUI_InstallMode = Change</Publish>
             
             <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
+            <Publish Dialog="MaintenanceTypeDlg" Control="ChangeButton" Event="NewDialog" Value="InstallTypeDlg">1</Publish>
             <Publish Dialog="MaintenanceTypeDlg" Control="RepairButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+            <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Property="REMOVE" Value="ALL">1</Publish>
             <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
             <Publish Dialog="MaintenanceTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg">1</Publish>
         </UI>
