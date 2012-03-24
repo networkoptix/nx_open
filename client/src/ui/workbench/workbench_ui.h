@@ -104,6 +104,10 @@ public:
     }
 
 public slots:
+    void setProxyUpdatesEnabled(bool updatesEnabled);
+    void enableProxyUpdates() { setProxyUpdatesEnabled(true); }
+    void disableProxyUpdates() { setProxyUpdatesEnabled(false); }
+
     void setTitleUsed(bool titleUsed = true);
     void setFpsVisible(bool fpsVisible = true);
 

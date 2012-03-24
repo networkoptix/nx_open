@@ -504,6 +504,8 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     display->view()->addAction(action(Qn::FreespaceAction));
     connect(action(Qn::FreespaceAction),SIGNAL(triggered()),                                                                        this,                           SLOT(at_freespaceAction_triggered()));
     connect(action(Qn::FullscreenAction),SIGNAL(triggered()),                                                                       this,                           SLOT(at_fullscreenAction_triggered()));
+    connect(m_display,                  SIGNAL(viewportGrabbed()),                                                                  this,                           SLOT(disableProxyUpdates()));
+    connect(m_display,                  SIGNAL(viewportUngrabbed()),                                                                this,                           SLOT(enableProxyUpdates()));
     connect(m_display,                  SIGNAL(widgetChanged(QnWorkbench::ItemRole)),                                               this,                           SLOT(at_display_widgetChanged(QnWorkbench::ItemRole)));
     connect(m_display,                  SIGNAL(widgetAdded(QnResourceWidget *)),                                                    this,                           SLOT(at_display_widgetAdded(QnResourceWidget *)));
     connect(m_display,                  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),                                         this,                           SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
@@ -714,6 +716,11 @@ void QnWorkbenchUi::setHelpVisible(bool visible, bool animate) {
 }
 
 
+void QnWorkbenchUi::setProxyUpdatesEnabled(bool updatesEnabled) {
+    m_helpItem->setUpdatesEnabled(updatesEnabled);
+    m_treeItem->setUpdatesEnabled(updatesEnabled);
+}
+
 void QnWorkbenchUi::setTitleUsed(bool used) {
     m_titleItem->setVisible(used);
     m_titleBackgroundItem->setVisible(used);
@@ -876,7 +883,7 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate) {
 QRectF QnWorkbenchUi::updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry) {
     QPointF pos(
         treeGeometry.x(),
-        ((!m_titleVisible || !m_titleUsed) && m_treeVisible) ? 0.0 : qMax(titleGeometry.bottom() + 30.0, 0.0)
+        ((!m_titleVisible || !m_titleUsed) && m_treeVisible) ? 30.0 : qMax(titleGeometry.bottom() + 30.0, 30.0)
     );
     QSizeF size(
         treeGeometry.width(),
@@ -933,7 +940,7 @@ void QnWorkbenchUi::updateTreeGeometry() {
 QRectF QnWorkbenchUi::updatedHelpGeometry(const QRectF &helpGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry) {
     QPointF pos(
         helpGeometry.x(),
-        ((!m_titleVisible || !m_titleUsed) && m_helpVisible) ? 0.0 : qMax(titleGeometry.bottom() + 30.0, 0.0)
+        ((!m_titleVisible || !m_titleUsed) && m_helpVisible) ? 30.0 : qMax(titleGeometry.bottom() + 30.0, 30.0)
     );
     QSizeF size(
         helpGeometry.width(),
@@ -1204,7 +1211,7 @@ void QnWorkbenchUi::at_activityStopped() {
     updateControlsVisibility(true);
 
     foreach(QnResourceWidget *widget, m_display->widgets())
-        widget->fadeOutButtons();
+        widget->fadeOutOverlay();
 }
 
 void QnWorkbenchUi::at_activityStarted() {

@@ -36,6 +36,9 @@ public:
     bool isMute() const;
     void setMute(bool mute);
 
+    QString versionString() const;
+    QString company() const;
+
 private:
     ALCdevice *m_device;
     ALCcontext *m_context;

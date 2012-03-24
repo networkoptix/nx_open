@@ -134,11 +134,6 @@ public:
      */
     void addRenderer(QnAbstractRenderer *renderer);
 
-    virtual void afterUpdate();
-
-signals:
-    void resourceUpdated();
-
 protected:
     virtual void beforeDisconnectFromResource() override;
 

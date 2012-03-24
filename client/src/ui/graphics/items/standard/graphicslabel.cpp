@@ -1,80 +1,99 @@
 #include "graphicslabel.h"
 #include "graphicslabel_p.h"
 
-void GraphicsLabelPrivate::init()
-{
+#include <QtGui/QFontMetricsF>
+
+#include <utils/common/fuzzy.h>
+#include <utils/common/scoped_painter_rollback.h>
+
+void GraphicsLabelPrivate::init() {
     Q_Q(GraphicsLabel);
 
-    textItem = new QGraphicsSimpleTextItem(q);
-    updateTextBrush();
-    updateTextFont();
-    textItem->setAcceptedMouseButtons(0);
-    textItem->setAcceptsHoverEvents(false);
-    textItem->setFlags(0);
+    performanceHint = GraphicsLabel::NoCaching;
 
     q->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred, QSizePolicy::Label));
 }
 
-void GraphicsLabelPrivate::updateTextFont()
-{
+void GraphicsLabelPrivate::updateCachedData() {
     Q_Q(GraphicsLabel);
+    
+    QRectF newRect;
+    if (text.isEmpty()) {
+        newRect = QRectF();
+    } else if(performanceHint != GraphicsLabel::NoCaching) {
+        staticText.setText(text);
+        staticText.prepare(QTransform(), q->font());
+        newRect = QRectF(QPointF(0.0, 0.0), staticText.size());
+    } else {
+        QFontMetricsF metrics(q->font());
 
-    textItem->setFont(q->font());
+        newRect = metrics.boundingRect(QRectF(0.0, 0.0, 0.0, 0.0), Qt::AlignLeft | Qt::AlignTop, text);
+        newRect.setTopLeft(QPointF(0.0, 0.0)); /* Italicized fonts may result in negative left border. */
+    }
+    
+    if (!qFuzzyCompare(newRect, rect)) {
+        rect = newRect;
+
+        q->updateGeometry();
+    }
 }
 
-void GraphicsLabelPrivate::updateTextBrush()
-{
-    Q_Q(GraphicsLabel);
 
-    textItem->setBrush(q->palette().color(q->isEnabled() ? QPalette::Active : QPalette::Disabled, QPalette::WindowText));
-}
-
-
-GraphicsLabel::GraphicsLabel(QGraphicsItem *parent, Qt::WindowFlags f)
-    : GraphicsFrame(*new GraphicsLabelPrivate, parent, f)
+GraphicsLabel::GraphicsLabel(QGraphicsItem *parent, Qt::WindowFlags f): 
+    GraphicsFrame(*new GraphicsLabelPrivate, parent, f)
 {
     Q_D(GraphicsLabel);
     d->init();
 }
 
-GraphicsLabel::GraphicsLabel(const QString &text, QGraphicsItem *parent, Qt::WindowFlags f)
-    : GraphicsFrame(*new GraphicsLabelPrivate, parent, f)
+GraphicsLabel::GraphicsLabel(const QString &text, QGraphicsItem *parent, Qt::WindowFlags f): 
+    GraphicsFrame(*new GraphicsLabelPrivate, parent, f)
 {
     Q_D(GraphicsLabel);
     d->init();
     setText(text);
 }
 
-GraphicsLabel::~GraphicsLabel()
-{
+GraphicsLabel::~GraphicsLabel() {
+    return;
 }
 
-QString GraphicsLabel::text() const
-{
+QString GraphicsLabel::text() const {
     Q_D(const GraphicsLabel);
 
-    return d->textItem->text();
+    return d->text;
 }
 
-void GraphicsLabel::setText(const QString &text)
-{
+void GraphicsLabel::setText(const QString &text) {
     Q_D(GraphicsLabel);
-    if (d->textItem->text() == text)
+    if (d->text == text)
         return;
 
-    d->textItem->setText(text);
-
-    updateGeometry();
+    d->text = text;
+    d->updateCachedData();
 }
 
-void GraphicsLabel::clear()
-{
+void GraphicsLabel::clear() {
     setText(QString());
+}
+
+QStaticText::PerformanceHint GraphicsLabel::performanceHint() const { 
+    return d_func()->performanceHint;
+}
+
+void GraphicsLabel::setPerformanceHint(QStaticText::PerformanceHint performanceHint) {
+    Q_D(GraphicsLabel);
+
+    d->performanceHint = performanceHint;
+    if(performanceHint != NoCaching) {
+        d->staticText.setPerformanceHint(performanceHint);
+        d->updateCachedData();
+    }
 }
 
 QSizeF GraphicsLabel::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const {
     if(which == Qt::MinimumSize || which == Qt::PreferredSize)
-        return d_func()->textItem->boundingRect().size();
+        return d_func()->rect.size();
 
     return base_type::sizeHint(which, constraint);
 }
@@ -84,11 +103,7 @@ void GraphicsLabel::changeEvent(QEvent *event) {
 
     switch(event->type()) {
     case QEvent::FontChange:
-        d->updateTextFont();
-        break;
-    case QEvent::PaletteChange:
-    case QEvent::EnabledChange:
-        d->updateTextBrush();
+        d->updateCachedData();
         break;
     default:
         break;
@@ -97,3 +112,17 @@ void GraphicsLabel::changeEvent(QEvent *event) {
     base_type::changeEvent(event);
 }
 
+void GraphicsLabel::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+    Q_D(GraphicsLabel);
+
+    base_type::paint(painter, option, widget);
+
+    QnScopedPainterPenRollback penRollback(painter, palette().color(isEnabled() ? QPalette::Normal : QPalette::Disabled, QPalette::WindowText));
+    QnScopedPainterFontRollback fontRollback(painter, font());
+
+    if(d->performanceHint == NoCaching) {
+        painter->drawText(QRectF(0.0, 0.0, 0.0, 0.0), Qt::AlignLeft | Qt::AlignTop | Qt::TextDontClip, d->text);
+    } else {
+        painter->drawStaticText(0.0, 0.0, d->staticText);
+    }
+}
