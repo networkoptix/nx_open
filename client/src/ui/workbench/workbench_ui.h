@@ -165,6 +165,7 @@ protected slots:
 
     void at_mainMenuAction_triggered();
     void at_freespaceAction_triggered();
+    void at_fullscreenAction_triggered();
     void at_activityStopped();
     void at_activityStarted();
     void at_fpsChanged(qreal fps);
@@ -367,7 +368,7 @@ private:
 
 
     /* Freespace-related state. */
-    bool m_wasFullscreen;
+    bool m_inFreespace;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchUi::Flags);

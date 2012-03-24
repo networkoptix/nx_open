@@ -26,6 +26,8 @@ class QnAbstractArchiveReader;
 class QnLoadingProgressPainter;
 class QnPausedPainter;
 
+class Instrument;
+
 /* Get rid of stupid win32 defines. */
 #ifdef NO_DATA
 #   undef NO_DATA
@@ -312,6 +314,8 @@ protected:
     int motionGridHeight() const;
 
 private slots:
+    void updateOverlayGeometry(QGraphicsView *view);
+
     void at_sourceSizeChanged(const QSize &size);
     void at_display_resourceUpdated();
 
@@ -420,6 +424,9 @@ private:
     /** Layout for buttons. */
     QGraphicsLinearLayout *m_buttonsLayout;
 
+    /** Widget for overlaid stuff. */
+    QGraphicsWidget *m_overlayWidget;
+
     /** Widget for buttons. */
     QGraphicsWidget *m_buttonsWidget;
 
@@ -444,6 +451,10 @@ private:
     /** Status of the last painting operation. */
     Qn::RenderStatus m_renderStatus;
 
+    /** Transform listener instrument that this widget is currently connected to. */
+    QWeakPointer<Instrument> m_transformListenerInstrument;
+
+    QWeakPointer<QGraphicsView> m_lastView;
 
     QStaticText m_noDataStaticText;
     QStaticText m_offlineStaticText;

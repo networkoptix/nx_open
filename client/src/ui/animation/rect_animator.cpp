@@ -27,8 +27,21 @@ int RectAnimator::estimatedDuration(const QVariant &from, const QVariant &to) co
     QRectF startRect = from.toRectF();
     QRectF targetRect = to.toRectF();
 
+    static const qreal eps = 1.0e-6;
+
     qreal startDiagonal = SceneUtility::length(startRect.size());
     qreal targetDiagonal = SceneUtility::length(targetRect.size());
+
+    /* Formulas below don't do well with zero diagonals, so we adjust them. */
+    if(qFuzzyIsNull(startDiagonal)) {
+        if(qFuzzyIsNull(targetDiagonal)) {
+            startDiagonal = targetDiagonal = eps;
+        } else {
+            startDiagonal = targetDiagonal * eps;
+        }
+    } else if(qFuzzyIsNull(targetDiagonal)) {
+        targetDiagonal = startDiagonal * eps;
+    }
 
     qreal movementSpeed = absoluteMovementSpeed() + relativeMovementSpeed() * (startDiagonal + targetDiagonal) / 2;
     qreal movementTime = SceneUtility::length(targetRect.center() - startRect.center()) / movementSpeed;
