@@ -19,6 +19,7 @@ namespace {
 
 QnResourceDirectoryBrowser::QnResourceDirectoryBrowser()
 {
+    m_resourceReady = false;
 }
 
 QnResourcePtr QnResourceDirectoryBrowser::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
@@ -53,8 +54,17 @@ QnResourceDirectoryBrowser &QnResourceDirectoryBrowser::instance()
     return inst;
 }
 
+void QnResourceDirectoryBrowser::cleanup()
+{
+    m_resourceReady = false;
+}
+
 QnResourceList QnResourceDirectoryBrowser::findResources()
 {
+    if (m_resourceReady)
+    {
+        return QnResourceList();
+    }
 
     setShouldBeUsed(false);
 
@@ -85,6 +95,8 @@ QnResourceList QnResourceDirectoryBrowser::findResources()
     qDebug() << "Done(Browsing directories). Time elapsed = " << time.elapsed();
 
     QThread::currentThread()->setPriority(old_priority);
+
+    m_resourceReady = true;
 
     return result;
 }
