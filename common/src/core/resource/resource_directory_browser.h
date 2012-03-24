@@ -15,7 +15,11 @@ public:
 
     virtual QnResourcePtr checkFile(const QString &filename) const override;
 
+    // Lical files search only once. Use cleanup before search to re-search files again
+    void cleanup();
 protected:
+    bool m_resourceReady;
+
     QnResourceDirectoryBrowser();
 
     static QnResourcePtr createArchiveResource(const QString& xfile);
