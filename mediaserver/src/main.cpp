@@ -179,17 +179,6 @@ QString defaultLocalAddress(const QHostAddress& target)
 
 }
 
-QString localMac(const QString& myAddress)
-{
-    foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
-    {
-        if (interface.allAddresses().contains(QHostAddress(myAddress)))
-            return interface.hardwareAddress();
-    }
-
-    return "";
-}
-
 void ffmpegInit()
 {
     avcodec_init();
@@ -542,7 +531,7 @@ public:
         QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDlinkResourceSearcher::instance());
         QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIqResourceSearcher::instance());
 
-        //QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIpWebCamResourceSearcher::instance());
+        QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIpWebCamResourceSearcher::instance());
         QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDroidResourceSearcher::instance());
         QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlISDResourceSearcher::instance());
 
@@ -696,7 +685,7 @@ int main(int argc, char* argv[])
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDlinkResourceSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIqResourceSearcher::instance());
 
-    //QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIpWebCamResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIpWebCamResourceSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDroidResourceSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlISDResourceSearcher::instance());
 
