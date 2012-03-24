@@ -25,7 +25,8 @@ namespace {
 
 QnMaskedProxyWidget::QnMaskedProxyWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
     QGraphicsProxyWidget(parent, windowFlags),
-    m_pixmapDirty(true)
+    m_pixmapDirty(true),
+    m_updatesEnabled(true)
 {}
 
 QnMaskedProxyWidget::~QnMaskedProxyWidget() {
@@ -50,7 +51,7 @@ void QnMaskedProxyWidget::paint(QPainter *painter, const QStyleOptionGraphicsIte
     if (renderRect.isEmpty())
         return;
 
-    if(m_pixmapDirty) {
+    if(m_pixmapDirty && m_updatesEnabled) {
         m_pixmap = QPixmap::grabWidget(this->widget(), this->widget()->rect());
         m_pixmapDirty = false;
     }
@@ -99,3 +100,13 @@ void QnMaskedProxyWidget::setPaintGeometry(const QRectF &paintGeometry) {
     ));
 }
 
+bool QnMaskedProxyWidget::isUpdatesEnabled() const {
+    return m_updatesEnabled;
+}
+
+void QnMaskedProxyWidget::setUpdatesEnabled(bool updatesEnabled) {
+    m_updatesEnabled = updatesEnabled;
+
+    if(updatesEnabled && m_pixmapDirty)
+        update();
+}

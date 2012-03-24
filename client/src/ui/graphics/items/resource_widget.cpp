@@ -347,8 +347,6 @@ void QnResourceWidget::setGeometry(const QRectF &geometry) {
 
     if(!qFuzzyCompare(oldSize, size()))
         updateOverlayGeometry();
-
-    qDebug() << "SET GEOMETRY" << geometry;
 }
 
 QSizeF QnResourceWidget::constrainedSize(const QSizeF constraint) const {
