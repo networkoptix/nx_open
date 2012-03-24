@@ -106,7 +106,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     m_buttonsLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
     m_buttonsLayout->insertStretch(0, 0x1000); /* Set large enough stretch for the buttons to be placed in right end of the layout. */
 
-    m_buttonsWidget = new QGraphicsWidget(this);
+    m_buttonsWidget = new QGraphicsWidget(m_overlayWidget);
     m_buttonsWidget->setLayout(m_buttonsLayout);
     m_buttonsWidget->setAcceptedMouseButtons(0);
     m_buttonsWidget->setOpacity(0.0); /* Buttons are transparent by default. */
@@ -242,10 +242,15 @@ void QnResourceWidget::setGeometry(const QRectF &geometry) {
     base_type::setGeometry(QRectF(QPointF(newLeft, newTop), newSize));
 #endif
 
+    QSizeF oldSize = size();
+
     base_type::setGeometry(geometry);
     setTransformOriginPoint(rect().center());
 
-    updateOverlayGeometry(NULL);
+    if(!qFuzzyCompare(oldSize, size()))
+        updateOverlayGeometry(NULL);
+
+    qDebug() << "SET GEOMETRY" << geometry;
 }
 
 QSizeF QnResourceWidget::constrainedSize(const QSizeF constraint) const {

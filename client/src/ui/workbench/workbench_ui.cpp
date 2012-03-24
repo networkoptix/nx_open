@@ -1143,6 +1143,7 @@ void QnWorkbenchUi::at_freespaceAction_triggered() {
     if(!inFreespace) {
         m_wasFullscreen = action(Qn::FullscreenAction)->isChecked();
         action(Qn::FullscreenAction)->setChecked(true);
+        action(Qn::FitInViewAction)->trigger();
         
         bool animate = m_wasFullscreen;
         setTreeOpened(false, animate);
