@@ -63,6 +63,7 @@ public:
     bool canAcceptData() const;
     bool isNoData() const;
     bool isStillImage() const;
+
 public slots:
     void onBeforeJump(qint64 time);
     void onJumpOccured(qint64 time);
@@ -73,9 +74,12 @@ public slots:
     void onReaderResumed();
     void onPrevFrameOccured();
     void onNextFrameOccured();
+
 signals:
     void reachedTheEnd();
     void liveMode(bool value);
+    void stillImageChanged();
+
 private:
 	bool haveAudio(float speed) const;
 

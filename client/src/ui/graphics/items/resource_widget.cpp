@@ -2,31 +2,41 @@
 #include <cassert>
 #include <QPainter>
 #include <QGraphicsLinearLayout>
+
+#include <utils/common/warnings.h>
+#include <utils/common/scoped_painter_rollback.h>
+#include <utils/common/util.h>
+#include <utils/common/synctime.h>
+
 #include <core/resource/resource_media_layout.h>
 #include <core/resource/security_cam_resource.h>
+#include <core/resource/layout_resource.h>
 #include <core/resourcemanagment/resource_pool.h>
+
+#include <ui/common/color_transform.h>
 #include <ui/animation/widget_opacity_animator.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_context_data.h>
-#include <ui/workbench/workbench_item.h>
 #include <ui/graphics/painters/loading_progress_painter.h>
 #include <ui/graphics/painters/paused_painter.h>
 #include <ui/graphics/instruments/transform_listener_instrument.h>
 #include <ui/graphics/instruments/instrument_manager.h>
+#include <ui/graphics/items/standard/graphicslabel.h>
+#include <ui/workbench/workbench_item.h>
+#include <ui/workbench/workbench_layout.h>
+#include <ui/workbench/workbench_access_controller.h>
 #include <ui/style/globals.h>
+#include <ui/style/skin.h>
+
 #include <camera/resource_display.h>
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
-#include <utils/common/warnings.h>
-#include <utils/common/scoped_painter_rollback.h>
 
+#include "camera/camdisplay.h"
 #include "polygonal_shadow_item.h"
 #include "resource_widget_renderer.h"
 #include "settings.h"
-#include "camera/camdisplay.h"
 #include "math.h"
-#include "utils/common/util.h"
-#include "utils/common/synctime.h"
-#include "ui/common/color_transform.h"
+#include "image_button_widget.h"
 
 namespace {
 
@@ -52,6 +62,11 @@ namespace {
     /** Default duration of "fade-in" effect for overlay icons. */
     const qint64 defaultOverlayFadeInDurationMSec = 500;
 
+    /** Background color for overlay panels. */
+    const QColor overlayBackgroundColor = QColor(0, 0, 0, 96);
+
+    const QColor overlayTextColor = QColor(255, 255, 255, 160);
+
     class QnLoadingProgressPainterFactory {
     public:
         QnLoadingProgressPainter *operator()(const QGLContext *) {
@@ -70,8 +85,9 @@ namespace {
 // -------------------------------------------------------------------------- //
 // Logic
 // -------------------------------------------------------------------------- //
-QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent):
+QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent):
     base_type(parent),
+    QnWorkbenchContextAware(context),
     m_item(item),
     m_videoLayout(NULL),
     m_channelCount(0),
@@ -83,7 +99,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     m_aboutToBeDestroyedEmitted(false),
     m_displayFlags(DISPLAY_SELECTION_OVERLAY | DISPLAY_BUTTONS),
     m_motionMaskValid(false),
-    m_motionMaskBinDataValid(false)
+    m_motionMaskBinDataValid(false),
+    m_inOverlayGeometryUpdate(false)
 {
     /* Set up shadow. */
     m_shadow = new QnPolygonalShadowItem();
@@ -95,27 +112,103 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     setShadowDisplacement(defaultShadowDisplacement);
     invalidateShadowShape();
 
+
     /* Set up frame. */
     setFrameWidth(0.0);
 
+
     /* Set up overlay widget. */
+    QFont font = this->font();
+    font.setPixelSize(20);
+    setFont(font);
+
+    {
+        QPalette palette = this->palette();
+        palette.setColor(QPalette::WindowText, overlayTextColor);
+        setPalette(palette);
+    }
+
     m_overlayWidget = new QGraphicsWidget(this);
     m_overlayWidget->setAcceptedMouseButtons(0);
+    m_overlayWidget->setOpacity(0.0); /* Overlay is hidden by default. */
 
-    m_buttonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-    m_buttonsLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-    m_buttonsLayout->insertStretch(0, 0x1000); /* Set large enough stretch for the buttons to be placed in right end of the layout. */
+    m_headerTitleLabel = new GraphicsLabel();
+    m_headerTitleLabel->setPerformanceHint(QStaticText::AggressiveCaching);
 
-    m_buttonsWidget = new QGraphicsWidget(m_overlayWidget);
-    m_buttonsWidget->setLayout(m_buttonsLayout);
-    m_buttonsWidget->setAcceptedMouseButtons(0);
-    m_buttonsWidget->setOpacity(0.0); /* Buttons are transparent by default. */
+    m_headerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+    m_headerLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    m_headerLayout->addItem(m_headerTitleLabel);
+    m_headerLayout->addStretch(0x1000); /* Set large enough stretch for the buttons to be placed at the right end of the layout. */
+
+    qreal buttonSize = 24; /* In pixels. */
+
+#if 0
+    QnImageButtonWidget *togglePinButton = new QnImageButtonWidget();
+    togglePinButton->setIcon(Skin::icon("decorations/pin.png", "decorations/unpin.png"));
+    togglePinButton->setCheckable(true);
+    togglePinButton->setChecked(item->isPinned());
+    togglePinButton->setPreferredSize(QSizeF(buttonSize, buttonSize));
+    connect(togglePinButton, SIGNAL(clicked()), item, SLOT(togglePinned()));
+    widget->addButton(togglePinButton);
+#endif
+
+    m_infoButton = new QnImageButtonWidget();
+    m_infoButton->setIcon(qnSkin->icon("decorations/info.png"));
+    m_infoButton->setPreferredSize(QSizeF(buttonSize, buttonSize));
+    m_infoButton->setCheckable(true);
+    connect(m_infoButton, SIGNAL(toggled(bool)), this, SLOT(fadeInfo(bool)));
+    m_headerLayout->addItem(m_infoButton);
+
+    if(accessController()->permissions(item->layout()->resource()) & Qn::WritePermission) { // TODO: should autoupdate on permission changes
+        QnImageButtonWidget *closeButton = new QnImageButtonWidget();
+        closeButton->setIcon(qnSkin->icon("decorations/close_item.png"));
+        closeButton->setPreferredSize(QSizeF(buttonSize, buttonSize));
+        connect(closeButton, SIGNAL(clicked()), this, SLOT(close()));
+        m_headerLayout->addItem(closeButton);
+    }
+
+    m_headerWidget = new QGraphicsWidget(m_overlayWidget);
+    m_headerWidget->setLayout(m_headerLayout);
+    m_headerWidget->setAcceptedMouseButtons(0);
+    m_headerWidget->setAutoFillBackground(true);
+    {
+        QPalette palette = m_headerWidget->palette();
+        palette.setColor(QPalette::Window, overlayBackgroundColor);
+        m_headerWidget->setPalette(palette);
+    }
+
+    m_footerStatusLabel = new GraphicsLabel();
+    m_footerStatusLabel->setPerformanceHint(QStaticText::AggressiveCaching);
+
+    m_footerTimeLabel = new GraphicsLabel();
+
+    QGraphicsLinearLayout *footerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+    footerLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    footerLayout->addItem(m_footerStatusLabel);
+    footerLayout->addStretch(0x1000);
+    footerLayout->addItem(m_footerTimeLabel);
+
+    m_footerWidget = new QGraphicsWidget(m_overlayWidget);
+    m_footerWidget->setLayout(footerLayout);
+    m_footerWidget->setAcceptedMouseButtons(0);
+    m_footerWidget->setAutoFillBackground(true);
+    {
+        QPalette palette = m_footerWidget->palette();
+        palette.setColor(QPalette::Window, overlayBackgroundColor);
+        m_footerWidget->setPalette(palette);
+    }
+    m_footerWidget->setOpacity(0.0);
 
     QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical);
     layout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-    layout->addItem(m_buttonsWidget);
+    layout->addItem(m_headerWidget);
     layout->addStretch(0x1000);
+    layout->addItem(m_footerWidget);
     m_overlayWidget->setLayout(layout);
+
+    connect(m_overlayWidget, SIGNAL(geometryChanged()), this, SLOT(updateOverlayGeometry()));
+    connect(this, SIGNAL(updateOverlayTextLater()), this, SLOT(updateOverlayText()), Qt::QueuedConnection);
+
 
     /* Set up motion-related stuff. */
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
@@ -126,7 +219,9 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     /* Set up video rendering. */
     m_resource = qnResPool->getResourceByUniqId(item->resourceUid());
     m_display = new QnResourceDisplay(m_resource, this);
-    connect(m_display, SIGNAL(resourceUpdated()), this, SLOT(at_display_resourceUpdated()));
+    connect(m_resource.data(), SIGNAL(resourceChanged()), this, SLOT(at_resource_resourceChanged()));
+    connect(m_resource.data(), SIGNAL(nameChanged()), this, SLOT(at_resource_nameChanged()));
+    connect(m_display->camDisplay(), SIGNAL(stillImageChanged()), this, SLOT(at_camDisplay_stillImageChanged()));
 
     Q_ASSERT(m_display);
     m_videoLayout = m_display->videoLayout();
@@ -138,17 +233,20 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     m_display->addRenderer(m_renderer);
 
     /* Init static text. */
-    m_noDataStaticText.setText(tr("No data"));
+    m_noDataStaticText.setText(tr("NO DATA"));
     m_noDataStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
-    m_offlineStaticText.setText(tr("No signal"));
+    m_offlineStaticText.setText(tr("NO SIGNAL"));
     m_offlineStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
-    m_unauthorizedStaticText.setText(tr("Unauthorized"));
+    m_unauthorizedStaticText.setText(tr("UNAUTHORIZED"));
     m_unauthorizedStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
-    m_unauthorizedStaticText2.setText(tr("Please check authentication information in the camera settings"));
+    m_unauthorizedStaticText2.setText(tr("Please check authentication information in camera settings"));
     m_unauthorizedStaticText2.setPerformanceHint(QStaticText::AggressiveCaching);
     
     /* Set up overlay icons. */
     m_channelState.resize(m_channelCount);
+
+    at_resource_nameChanged();
+    at_camDisplay_stillImageChanged();
 }
 
 
@@ -248,7 +346,7 @@ void QnResourceWidget::setGeometry(const QRectF &geometry) {
     setTransformOriginPoint(rect().center());
 
     if(!qFuzzyCompare(oldSize, size()))
-        updateOverlayGeometry(NULL);
+        updateOverlayGeometry();
 
     qDebug() << "SET GEOMETRY" << geometry;
 }
@@ -296,12 +394,31 @@ void QnResourceWidget::hideActivityDecorations() {
     setDisplayFlag(DISPLAY_ACTIVITY_OVERLAY, false);
 }
 
-void QnResourceWidget::fadeOutButtons() {
-    opacityAnimator(m_buttonsWidget, 1.0)->animateTo(0.0);
+void QnResourceWidget::fadeOutOverlay() {
+    opacityAnimator(m_overlayWidget, 1.0)->animateTo(0.0);
 }
 
-void QnResourceWidget::fadeInButtons() {
-    opacityAnimator(m_buttonsWidget, 1.0)->animateTo(1.0);
+void QnResourceWidget::fadeInOverlay() {
+    opacityAnimator(m_overlayWidget, 1.0)->animateTo(1.0);
+}
+
+void QnResourceWidget::fadeOutInfo() {
+    opacityAnimator(m_footerWidget, 1.0)->animateTo(0.0);
+}
+
+void QnResourceWidget::fadeInInfo() {
+    updateOverlayText();
+    m_overlayWidget->layout()->activate();
+
+    opacityAnimator(m_footerWidget, 1.0)->animateTo(1.0);
+}
+
+void QnResourceWidget::fadeInfo(bool fadeIn) {
+    if(fadeIn) {
+        fadeInInfo();
+    } else {
+        fadeOutInfo();
+    }
 }
 
 void QnResourceWidget::invalidateMotionMask() {
@@ -377,11 +494,11 @@ Qn::WindowFrameSections QnResourceWidget::windowFrameSectionsAt(const QRectF &re
 }
 
 void QnResourceWidget::addButton(QGraphicsLayoutItem *button) {
-    m_buttonsLayout->addItem(button);
+    m_headerLayout->addItem(button);
 }
 
 void QnResourceWidget::removeButton(QGraphicsLayoutItem *button) {
-    m_buttonsLayout->removeItem(button);
+    m_headerLayout->removeItem(button);
 }
 
 void QnResourceWidget::ensureAboutToBeDestroyedEmitted() {
@@ -474,12 +591,17 @@ void QnResourceWidget::setDisplayFlags(DisplayFlags flags) {
     }
 
     if(changedFlags & DISPLAY_BUTTONS)
-        m_buttonsWidget->setVisible(flags & DISPLAY_BUTTONS);
+        m_headerWidget->setVisible(flags & DISPLAY_BUTTONS);
 
     emit displayFlagsChanged();
 }
 
 void QnResourceWidget::updateOverlayGeometry(QGraphicsView *view) {
+    if(m_inOverlayGeometryUpdate)
+        return;
+
+    QnScopedValueRollback<bool> guard(&m_inOverlayGeometryUpdate, true);
+
     if(view) {
         m_lastView = view;
     } else {
@@ -512,6 +634,22 @@ void QnResourceWidget::updateOverlayGeometry(QGraphicsView *view) {
         m_overlayWidget->setGeometry(geometry);
         m_overlayWidget->setTransform(QTransform::fromScale(scale, scale));
     }
+}
+
+void QnResourceWidget::updateOverlayText() {
+    qint64 time = m_renderer->lastDisplayedTime(0);
+    if (time > 1000000ll * 3600 * 24) /* Do not show time for regular media files. */
+        m_footerTimeLabel->setText(QDateTime::fromMSecsSinceEpoch(time/1000).toString(tr("hh:mm:ss.zzz")));
+
+    qreal fps = 0.0;
+    qreal mbps = 0.0;
+    for(int i = 0; i < m_channelCount; i++) {
+        const QnStatistics *statistics = m_display->mediaProvider()->getStatistics(i);
+        fps = qMax(fps, static_cast<qreal>(statistics->getFrameRate()));
+        mbps += statistics->getBitrate();
+    }
+
+    m_footerStatusLabel->setText(tr("%1fps @ %2Mbps").arg(fps, 0, 'g', 2).arg(mbps, 0, 'g', 2));
 }
 
 
@@ -637,20 +775,20 @@ bool QnResourceWidget::windowFrameEvent(QEvent *event) {
 }
 
 void QnResourceWidget::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
-    fadeInButtons();
+    fadeInOverlay();
 
     base_type::hoverEnterEvent(event);
 }
 
 void QnResourceWidget::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
-    if(qFuzzyIsNull(m_buttonsWidget->opacity()))
-        fadeInButtons();
+    if(qFuzzyIsNull(m_overlayWidget->opacity()))
+        fadeInOverlay();
 
     base_type::hoverMoveEvent(event);
 }
 
 void QnResourceWidget::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
-    fadeOutButtons();
+    fadeOutOverlay();
 
     base_type::hoverLeaveEvent(event);
 }
@@ -670,30 +808,35 @@ void QnResourceWidget::at_sourceSizeChanged(const QSize &size) {
     emit aspectRatioChanged(oldAspectRatio, newAspectRatio);
 }
 
-void QnResourceWidget::at_display_resourceUpdated() {
+void QnResourceWidget::at_resource_resourceChanged() {
     invalidateMotionMask();
+}
+
+void QnResourceWidget::at_resource_nameChanged() {
+    m_headerTitleLabel->setText(m_resource->getName());
+}
+
+void QnResourceWidget::at_camDisplay_stillImageChanged() {
+    m_infoButton->setVisible(!display()->camDisplay()->isStillImage());
 }
 
 
 // -------------------------------------------------------------------------- //
 // Painting
 // -------------------------------------------------------------------------- //
+void QnResourceWidget::drawFlashingText(QPainter *painter, const QStaticText &text, qreal textSize, const QPointF &offset) {
+    qreal unit = qnGlobals->workbenchUnitSize();
 
-void QnResourceWidget::drawFlashingText(QPainter *painter, const QStaticText& text, int textSize, int xOffs, int yOffs)
-{
     QFont font;
-    font.setPointSizeF(textSize);
+    font.setPointSizeF(textSize * unit);
     font.setStyleHint(QFont::SansSerif, QFont::ForceOutline);
     QnScopedPainterFontRollback fontRollback(painter, font);
+    QnScopedPainterPenRollback penRollback(painter, QPen(QColor(255, 208, 208, 196)));
     
-    QnScopedPainterPenRollback penRollback(painter, QPen(QColor(255, 208, 208)));
-    qreal prevOpacity = painter->opacity();
-    qreal opacityF = qAbs(sin(qnSyncTime->currentMSecsSinceEpoch()/qreal(TEXT_FLASHING_PERIOD*2) * M_PI)*1.0 + 0.0);
-    painter->setOpacity(opacityF);
-    painter->setRenderHint(QPainter::TextAntialiasing);
-    painter->setRenderHint(QPainter::Antialiasing);
-    painter->drawStaticText(xOffs, yOffs, text);
-    painter->setOpacity(prevOpacity);
+    qreal opacity = painter->opacity();
+    painter->setOpacity(opacity * qAbs(sin(qnSyncTime->currentMSecsSinceEpoch() / qreal(TEXT_FLASHING_PERIOD * 2) * M_PI)));
+    painter->drawStaticText(rect().center() - toPoint(text.size() / 2) + offset * unit, text);
+    painter->setOpacity(opacity);
 }
 
 void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/) {
@@ -723,8 +866,6 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     if(channelScreenSize != m_channelScreenSize) {
         m_channelScreenSize = channelScreenSize;
         m_renderer->setChannelScreenSize(m_channelScreenSize);
-
-
     }
 
     qint64 currentTimeMSec = qnSyncTime->currentMSecsSinceEpoch();
@@ -780,12 +921,12 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     for(int i = 0; i < m_channelCount; i++) 
     {
         if (m_channelState[i].icon == NO_DATA) {
-            drawFlashingText(painter, m_noDataStaticText);
+            drawFlashingText(painter, m_noDataStaticText, 0.1);
         } else if (m_channelState[i].icon == OFFLINE) {
-            drawFlashingText(painter, m_offlineStaticText);
+            drawFlashingText(painter, m_offlineStaticText, 0.1);
         } else if (m_channelState[i].icon == UNAUTHORIZED) {
-            drawFlashingText(painter, m_unauthorizedStaticText);
-            drawFlashingText(painter, m_unauthorizedStaticText2, 250, 16, 800);
+            drawFlashingText(painter, m_unauthorizedStaticText, 0.1);
+            drawFlashingText(painter, m_unauthorizedStaticText2, 0.025, QPointF(0.0, 0.1));
         }
     }
 
@@ -806,15 +947,8 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
         }
     }
 
-    /* Draw current time. */
-    qint64 time = m_renderer->lastDisplayedTime(0);
-    if (time > 1000000ll * 3600 * 24) 
-    {
-#ifdef _DEBUG
-        drawCurrentTime(painter, rect(), time); /* Do not show time for regular media files. */
-        drawQualityText(painter, rect(), m_renderer->isLowQualityImage(0) ? "Low" : "Hi");
-#endif
-    }
+    if(m_footerWidget->isVisible() && !qFuzzyIsNull(m_footerWidget->opacity())) 
+        emit updateOverlayTextLater();
 }
 
 void QnResourceWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
@@ -948,46 +1082,10 @@ void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, con
         for (int x = 0; x < MD_WIDTH; ++x)
             if(motion->isMotionAt(x, y))
                 motionPath.addRect(QRectF(QPointF(x*xStep, y*yStep), QPointF((x+1)*xStep, (y+1)*yStep)));
-    //QPen pen(QColor(0xCD, 0x7F, 0x32, 255));
     QPen pen(QColor(0xff, 0, 0, 128));
     pen.setWidth(9);
     painter->setPen(pen);
     painter->drawPath(motionPath);
-}
-
-void QnResourceWidget::drawCurrentTime(QPainter *painter, const QRectF &rect, qint64 time)
-{
-    QString text = QDateTime::fromMSecsSinceEpoch(time/1000).toString("hh:mm:ss.zzz");
-    if (!text.isEmpty())
-    {
-        QFont font;
-        //font.setPixelSize(6);
-        font.setPointSizeF(550);
-        font.setStyleHint(QFont::SansSerif, QFont::ForceOutline);
-        QFontMetrics metric(font);
-        QSize size = metric.size(Qt::TextSingleLine, text);
-
-        QnScopedPainterFontRollback fontRollback(painter, font);
-        QnScopedPainterPenRollback penRollback(painter, QPen(QColor(255, 255, 255, 128)));
-        painter->drawText(rect.width() - size.width()-4, rect.height() - size.height()+metric.ascent(), text);
-    }
-}
-
-void QnResourceWidget::drawQualityText(QPainter *painter, const QRectF &rect, const QString& text)
-{
-    if (!text.isEmpty())
-    {
-        QFont font;
-        //font.setPixelSize(6);
-        font.setPointSizeF(550);
-        font.setStyleHint(QFont::SansSerif, QFont::ForceOutline);
-        QFontMetrics metric(font);
-        QSize size = metric.size(Qt::TextSingleLine, text);
-
-        QnScopedPainterFontRollback fontRollback(painter, font);
-        QnScopedPainterPenRollback penRollback(painter, QPen(QColor(255, 255, 255, 128)));
-        painter->drawText(4, rect.height() - size.height()+metric.ascent(), text);
-    }
 }
 
 void QnResourceWidget::drawFilledRegion(QPainter *painter, const QRectF &rect, const QRegion &selection, const QColor &color) {

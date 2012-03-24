@@ -1204,7 +1204,7 @@ void QnWorkbenchUi::at_activityStopped() {
     updateControlsVisibility(true);
 
     foreach(QnResourceWidget *widget, m_display->widgets())
-        widget->fadeOutButtons();
+        widget->fadeOutOverlay();
 }
 
 void QnWorkbenchUi::at_activityStarted() {

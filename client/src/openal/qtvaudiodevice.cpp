@@ -64,16 +64,9 @@ QtvAudioDevice::QtvAudioDevice()
             alcMakeContextCurrent(m_context);
             QtvSound::checkOpenALError(m_device);
 
-            // get version
-            int majorVersion = 0;
-            int minorVersion = 0;
-            alcGetIntegerv(m_device, ALC_MAJOR_VERSION, 1, &majorVersion);
-            alcGetIntegerv(m_device, ALC_MINOR_VERSION, 1, &minorVersion);
-            // Check what device and version we are using
-            const char *name = alcGetString(m_device, ALC_DEVICE_SPECIFIER);
             cl_log.log("OpenAL info: ", cl_logINFO);
-            cl_log.log("version: ", QString::number(majorVersion)+QString('.')+QString::number(minorVersion), cl_logINFO);
-            cl_log.log("company: ", static_cast<const char *>(alGetString(AL_VENDOR)), cl_logINFO);
+            cl_log.log("version: ", versionString(), cl_logINFO);
+            cl_log.log("company: ", company(), cl_logINFO);
             cl_log.log("Device type: ", static_cast<const char *>(alGetString(AL_RENDERER)), cl_logINFO);
             cl_log.log("OpenAL extensions: ", static_cast<const char *>(alGetString(AL_EXTENSIONS)), cl_logINFO);
         }
@@ -106,6 +99,19 @@ QtvAudioDevice::~QtvAudioDevice()
     alc_deinit();
     qDebug("OpenAL deinit");
 #endif
+}
+
+QString QtvAudioDevice::versionString() const {
+    int majorVersion = 0;
+    int minorVersion = 0;
+    alcGetIntegerv(m_device, ALC_MAJOR_VERSION, 1, &majorVersion);
+    alcGetIntegerv(m_device, ALC_MINOR_VERSION, 1, &minorVersion);
+
+    return QString::number(majorVersion) + QLatin1String(".") + QString::number(minorVersion);
+}
+
+QString QtvAudioDevice::company() const {
+    return QLatin1String(static_cast<const char *>(alGetString(AL_VENDOR)));
 }
 
 float QtvAudioDevice::volume() const

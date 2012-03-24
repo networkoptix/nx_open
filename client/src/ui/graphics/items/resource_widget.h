@@ -9,6 +9,7 @@
 #include <ui/common/constrained_resizable.h>
 #include <ui/common/scene_utility.h>
 #include <ui/common/frame_section_queryable.h>
+#include <ui/workbench/workbench_context_aware.h>
 #include <core/resource/resource_consumer.h>
 #include <core/datapacket/mediadatapacket.h> /* For QnMetaDataV1Ptr. */
 #include "polygonal_shadow_item.h"
@@ -25,7 +26,9 @@ class QnAbstractArchiveReader;
 
 class QnLoadingProgressPainter;
 class QnPausedPainter;
+class QnImageButtonWidget;
 
+class GraphicsLabel;
 class Instrument;
 
 /* Get rid of stupid win32 defines. */
@@ -33,7 +36,7 @@ class Instrument;
 #   undef NO_DATA
 #endif
 
-class QnResourceWidget: public GraphicsWidget, public QnPolygonalShapeProvider, public ConstrainedResizable, public FrameSectionQuearyable, protected SceneUtility {
+class QnResourceWidget: public GraphicsWidget, public QnWorkbenchContextAware, public QnPolygonalShapeProvider, public ConstrainedResizable, public FrameSectionQuearyable, protected SceneUtility {
     Q_OBJECT;
     Q_PROPERTY(qreal frameOpacity READ frameOpacity WRITE setFrameOpacity);
     Q_PROPERTY(qreal frameWidth READ frameWidth WRITE setFrameWidth);
@@ -59,7 +62,7 @@ public:
      * \param item                      Workbench item that this resource widget will represent.
      * \param parent                    Parent item.
      */
-    QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent = NULL);
+    QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent = NULL);
 
     /**
      * Virtual destructor.
@@ -266,8 +269,11 @@ public:
 public slots:
     void showActivityDecorations();
     void hideActivityDecorations();
-    void fadeOutButtons();
-    void fadeInButtons();
+    void fadeOutOverlay();
+    void fadeInOverlay();
+    void fadeOutInfo();
+    void fadeInInfo();
+    void fadeInfo(bool fadeIn);
 
     /**
      * Clears this widget's motion selection region.
@@ -313,11 +319,17 @@ protected:
     int motionGridWidth() const;
     int motionGridHeight() const;
 
+signals:
+    void updateOverlayTextLater();
+
 private slots:
-    void updateOverlayGeometry(QGraphicsView *view);
+    void updateOverlayGeometry(QGraphicsView *view = NULL);
+    void updateOverlayText();
 
     void at_sourceSizeChanged(const QSize &size);
-    void at_display_resourceUpdated();
+    void at_resource_resourceChanged();
+    void at_resource_nameChanged();
+    void at_camDisplay_stillImageChanged();
 
 private:
     /**
@@ -360,17 +372,13 @@ private:
 
     void drawOverlayIcon(int channel, const QRectF &rect);
 
-    void drawCurrentTime(QPainter *painter, const QRectF &rect, qint64 time);
-
-    void drawQualityText(QPainter *painter, const QRectF &rect, const QString& text);
-
     void drawMotionGrid(QPainter *painter, const QRectF &rect, const QnMetaDataV1Ptr &motion, int channel);
 
     void drawMotionMask(QPainter *painter, const QRectF& rect, int channel);
 
     void drawFilledRegion(QPainter *painter, const QRectF &rect, const QRegion &selection, const QColor& color);
 
-    void drawFlashingText(QPainter *painter, const QStaticText& text, int textSize = 550, int xOffs = 4, int yOffs = 16);
+    void drawFlashingText(QPainter *painter, const QStaticText &text, qreal textSize, const QPointF &offset = QPointF());
 
 private:
     /** Layout item. */
@@ -421,14 +429,24 @@ private:
     /** Frame width. */
     qreal m_frameWidth;
 
-    /** Layout for buttons. */
-    QGraphicsLinearLayout *m_buttonsLayout;
-
     /** Widget for overlaid stuff. */
     QGraphicsWidget *m_overlayWidget;
 
-    /** Widget for buttons. */
-    QGraphicsWidget *m_buttonsWidget;
+    QGraphicsLinearLayout *m_headerLayout;
+
+    QGraphicsWidget *m_headerWidget;
+
+    QGraphicsWidget *m_footerWidget;
+
+    GraphicsLabel *m_headerTitleLabel;
+
+    GraphicsLabel *m_footerStatusLabel;
+
+    GraphicsLabel *m_footerTimeLabel;
+
+    QnImageButtonWidget *m_infoButton;
+
+    bool m_inOverlayGeometryUpdate;
 
     /** Whether aboutToBeDestroyed signal has already been emitted. */
     bool m_aboutToBeDestroyedEmitted;

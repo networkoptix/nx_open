@@ -584,7 +584,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
         return false;
     }
 
-    QnResourceWidget *widget = new QnResourceWidget(item);
+    QnResourceWidget *widget = new QnResourceWidget(context(), item);
     widget->setParent(this); /* Just to feel totally safe and not to leak memory no matter what happens. */
     widget->setAttribute(Qt::WA_DeleteOnClose);
     widget->setFrameOpacity(m_frameOpacity);
@@ -611,27 +611,6 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
         palette.setColor(QPalette::Active, QPalette::Shadow, qnGlobals->selectedFrameColor());
         palette.setColor(QPalette::Inactive, QPalette::Shadow, qnGlobals->frameColor());
         widget->setPalette(palette);
-    }
-
-    qreal buttonSize = 32; /* In pixels. */
-
-#if 0
-    QnImageButtonWidget *togglePinButton = new QnImageButtonWidget();
-    togglePinButton->setIcon(Skin::icon("decorations/pin.png", "decorations/unpin.png"));
-    togglePinButton->setCheckable(true);
-    togglePinButton->setChecked(item->isPinned());
-    togglePinButton->setPreferredSize(QSizeF(buttonSize, buttonSize));
-    connect(togglePinButton, SIGNAL(clicked()), item, SLOT(togglePinned()));
-    widget->addButton(togglePinButton);
-#endif
-
-    if(accessController()->permissions(workbench()->currentLayout()->resource()) & Qn::WritePermission) { // TODO: should autoupdate on permission changes
-        QnImageButtonWidget *closeButton = new QnImageButtonWidget();
-        closeButton->setIcon(qnSkin->icon("decorations/close_item.png"));
-        closeButton->setPreferredSize(QSizeF(buttonSize, buttonSize));
-        closeButton->setAnimationSpeed(4.0);
-        connect(closeButton, SIGNAL(clicked()), widget, SLOT(close()));
-        widget->addButton(closeButton);
     }
 
     m_scene->addItem(widget);

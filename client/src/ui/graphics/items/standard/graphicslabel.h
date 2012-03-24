@@ -3,6 +3,8 @@
 
 #include "graphicsframe.h"
 
+#include <QtGui/QStaticText>
+
 class GraphicsLabelPrivate;
 
 class GraphicsLabel : public GraphicsFrame
@@ -13,11 +15,19 @@ class GraphicsLabel : public GraphicsFrame
     typedef GraphicsFrame base_type;
 
 public:
+    /** Don't use text-level caching when drawing graphics label. */
+    static const QStaticText::PerformanceHint NoCaching = static_cast<QStaticText::PerformanceHint>(-1);
+
     explicit GraphicsLabel(QGraphicsItem *parent = 0, Qt::WindowFlags f = 0);
     explicit GraphicsLabel(const QString &text, QGraphicsItem *parent = 0, Qt::WindowFlags f = 0);
     ~GraphicsLabel();
 
     QString text() const;
+
+    QStaticText::PerformanceHint performanceHint() const;
+    void setPerformanceHint(QStaticText::PerformanceHint performanceHint);
+
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
 public Q_SLOTS:
     void setText(const QString &text);
