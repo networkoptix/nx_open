@@ -5,6 +5,7 @@
 #include "connectiontestingdialog.h"
 
 #include <shlobj.h>
+#include "version.h"
 
 
 static const QString MEDIA_SERVER_NAME ("Network Optix Media Server");
@@ -84,12 +85,17 @@ QnSystrayWindow::QnSystrayWindow():
     trayIcon->show();
 
     setWindowTitle(tr("VMS settings"));
-    resize(400, 300);
+    //resize(440, 300);
 
     connect (&m_findServices, SIGNAL(timeout()), this, SLOT(findServiceInfo()));
     connect (&m_updateServiceStatus, SIGNAL(timeout()), this, SLOT(updateServiceInfo()));
     m_findServices.start(10000);
     m_updateServiceStatus.start(500);
+
+    ui->labelProductName->setText(APPLICATION_NAME);
+    ui->labelProductRevision->setText(APPLICATION_REVISION);
+    ui->labelProductVersion->setText(APPLICATION_VERSION);
+    ui->labelFfmpegRevision->setText(FFMPEG_VERSION);
 }
 
 void QnSystrayWindow::handleMessage(const QString& message)

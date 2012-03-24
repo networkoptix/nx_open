@@ -63,7 +63,7 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
     m_camera = camera;
     
     QVariant val;
-    if (m_camera->getParam("motionEditURL", val, QnDomainMemory))
+    if (m_camera && m_camera->getParam("motionEditURL", val, QnDomainMemory))
     {
         // motion editing is not supported. Place only reference to WEB page
         if(m_motionWidget) {

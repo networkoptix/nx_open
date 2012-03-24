@@ -221,7 +221,5 @@ OVERRIDE_DEFINITION = "override="
 win32-msvc*:OVERRIDE_DEFINITION = "override=override"
 DEFINES += $$OVERRIDE_DEFINITION
 
-
-
 # Uncomment to disable background color adjustment
-# DEFINES += QN_NO_BACKGROUND_COLOR_ADJUSTMENT
+DEFINES += QN_NO_BACKGROUND_COLOR_ADJUSTMENT

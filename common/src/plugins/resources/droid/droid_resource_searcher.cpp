@@ -1,11 +1,16 @@
 #include "droid_resource_searcher.h"
 #include "droid_resource.h"
 #include "utils/network/nettools.h"
+#include "utils/common/synctime.h"
 
 const int androidRecvPort = 5559;
+static const int READ_IF_TIMEOUT = 1000000ll * 30;
 
-QnPlDroidResourceSearcher::QnPlDroidResourceSearcher()
+QnPlDroidResourceSearcher::QnPlDroidResourceSearcher():
+    m_controlPortListener(QHostAddress::Any, DROID_CONTROL_TCP_SERVER_PORT)
 {
+    m_lastReadSocketTime = 0;
+    m_controlPortListener.start();
 }
 
 QnPlDroidResourceSearcher& QnPlDroidResourceSearcher::instance()
@@ -18,19 +23,33 @@ QnResourceList QnPlDroidResourceSearcher::findResources(void)
 {
 
     QSet<QHostAddress> foundDevSet; // to avoid duplicates
-    QnResourceList result;
-    QUdpSocket recvSocket;
-    if (recvSocket.bind(androidRecvPort))
+    QMap<QString, QnResourcePtr> result;
+
+    qint64 time = qnSyncTime->currentMSecsSinceEpoch();
+    if (time - m_lastReadSocketTime > READ_IF_TIMEOUT)
     {
-        while (recvSocket.hasPendingDatagrams())
+        m_socketList.clear();
+        QList<QHostAddress> ipaddrs = getAllIPv4Addresses();
+        for (int i = 0; i < ipaddrs.size();++i)
+        {
+            QSharedPointer<QUdpSocket> sock(new QUdpSocket());
+            if (sock->bind(ipaddrs.at(i), androidRecvPort))
+                m_socketList << sock;
+            m_lastReadSocketTime = time;
+        }
+    }
+
+    for (int i = 0; i < m_socketList.size(); ++i)
+    {
+        while (m_socketList[i]->hasPendingDatagrams())
         {
             QByteArray responseData;
-            responseData.resize(recvSocket.pendingDatagramSize());
+            responseData.resize(m_socketList[i]->pendingDatagramSize());
 
             QHostAddress sender;
             quint16 senderPort;
 
-            recvSocket.readDatagram(responseData.data(), responseData.size(),	&sender, &senderPort);
+            m_socketList[i]->readDatagram(responseData.data(), responseData.size(),	&sender, &senderPort);
 
             QString response(responseData);
 
@@ -42,7 +61,7 @@ QnResourceList QnPlDroidResourceSearcher::findResources(void)
                 continue;
 
             QStringList ports = data[1].split(',');
-            if (ports.size() < 4) {
+            if (ports.size() < 2) {
                 qWarning() << "Invalid droid response. Expected at least 4 ports";
                 continue;
             }
@@ -74,18 +93,18 @@ QnResourceList QnPlDroidResourceSearcher::findResources(void)
             resource->setName("DroidLive");
             resource->setMAC(data[2].replace(':', '-').toUpper());
             //resource->setHostAddress(hostAddr, QnDomainMemory);
-            resource->setDiscoveryAddr(recvSocket.localAddress());
+            resource->setDiscoveryAddr(m_socketList[i]->localAddress());
 
             resource->setUrl(QString("raw://") + data[1]);
 
-            result.push_back(resource);
+            result.insert(resource->getUrl(), resource);
         }
     }
-    else {
-        qWarning() << "Can't open droid device search port " << androidRecvPort;
-    }
 
-    return result;
+    QnResourceList resList;
+    foreach(QnResourcePtr resPtr, result)
+        resList << resPtr;
+    return resList;
 }
 
 QnResourcePtr QnPlDroidResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
@@ -106,6 +125,12 @@ QnResourcePtr QnPlDroidResourceSearcher::createResource(QnId resourceTypeId, con
         //qDebug() << "Manufature " << resourceType->getManufacture() << " != " << manufacture();
         return result;
     }
+
+    if (!parameters.value("url").contains("raw://"))
+    {
+        return result; // it is not a new droid resource
+    }
+
 
     result = QnVirtualCameraResourcePtr( new QnDroidResource() );
     result->setTypeId(resourceTypeId);

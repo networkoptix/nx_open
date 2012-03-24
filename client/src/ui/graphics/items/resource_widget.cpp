@@ -11,6 +11,8 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/graphics/painters/loading_progress_painter.h>
 #include <ui/graphics/painters/paused_painter.h>
+#include <ui/graphics/instruments/transform_listener_instrument.h>
+#include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/style/globals.h>
 #include <camera/resource_display.h>
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
@@ -96,12 +98,15 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     /* Set up frame. */
     setFrameWidth(0.0);
 
-    /* Set up buttons layout. */
+    /* Set up overlay widget. */
+    m_overlayWidget = new QGraphicsWidget(this);
+    m_overlayWidget->setAcceptedMouseButtons(0);
+
     m_buttonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     m_buttonsLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
     m_buttonsLayout->insertStretch(0, 0x1000); /* Set large enough stretch for the buttons to be placed in right end of the layout. */
 
-    m_buttonsWidget = new QGraphicsWidget(this);
+    m_buttonsWidget = new QGraphicsWidget(m_overlayWidget);
     m_buttonsWidget->setLayout(m_buttonsLayout);
     m_buttonsWidget->setAcceptedMouseButtons(0);
     m_buttonsWidget->setOpacity(0.0); /* Buttons are transparent by default. */
@@ -110,7 +115,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     layout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
     layout->addItem(m_buttonsWidget);
     layout->addStretch(0x1000);
-    setLayout(layout);
+    m_overlayWidget->setLayout(layout);
 
     /* Set up motion-related stuff. */
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
@@ -237,8 +242,15 @@ void QnResourceWidget::setGeometry(const QRectF &geometry) {
     base_type::setGeometry(QRectF(QPointF(newLeft, newTop), newSize));
 #endif
 
+    QSizeF oldSize = size();
+
     base_type::setGeometry(geometry);
     setTransformOriginPoint(rect().center());
+
+    if(!qFuzzyCompare(oldSize, size()))
+        updateOverlayGeometry(NULL);
+
+    qDebug() << "SET GEOMETRY" << geometry;
 }
 
 QSizeF QnResourceWidget::constrainedSize(const QSizeF constraint) const {
@@ -467,6 +479,41 @@ void QnResourceWidget::setDisplayFlags(DisplayFlags flags) {
     emit displayFlagsChanged();
 }
 
+void QnResourceWidget::updateOverlayGeometry(QGraphicsView *view) {
+    if(view) {
+        m_lastView = view;
+    } else {
+        view = m_lastView.data();
+    }
+
+    if(!view) {
+        if(!scene() || scene()->views().empty())
+            return;
+
+        view = scene()->views()[0];
+    }
+
+    QTransform viewportToScene = view->viewportTransform();
+
+    /* Assume affine transform that does not change x/y scale separately. */
+    qreal scale = 1.0 / std::sqrt(viewportToScene.m11() * viewportToScene.m11() + viewportToScene.m12() * viewportToScene.m12());
+
+    QRectF geometry = QRectF(QPointF(0, 0), size() / scale);
+    m_overlayWidget->setGeometry(geometry);
+    m_overlayWidget->setTransform(QTransform::fromScale(scale, scale));
+
+    QSizeF resultingSize = m_overlayWidget->size();
+    if(resultingSize.width() > geometry.width() || resultingSize.height() > geometry.height()) {
+        qreal k = qMax(resultingSize.width() / geometry.width(), resultingSize.height() / geometry.height());
+
+        geometry.setSize(geometry.size() * k);
+        scale /= k;
+
+        m_overlayWidget->setGeometry(geometry);
+        m_overlayWidget->setTransform(QTransform::fromScale(scale, scale));
+    }
+}
+
 
 // -------------------------------------------------------------------------- //
 // Shadow
@@ -533,7 +580,17 @@ QVariant QnResourceWidget::itemChange(GraphicsItemChange change, const QVariant 
         updateShadowPos();
         break;
     case ItemSceneHasChanged:
-        if(scene() != NULL && !m_shadow.isNull()) {
+        if(m_transformListenerInstrument)
+            disconnect(m_transformListenerInstrument.data(), NULL, this, NULL);
+        if(scene()) {
+            QList<InstrumentManager *> managers = InstrumentManager::managersOf(scene());
+            if(!managers.empty()) {
+                m_transformListenerInstrument = managers[0]->instrument<TransformListenerInstrument>();
+                if(m_transformListenerInstrument)
+                    connect(m_transformListenerInstrument.data(), SIGNAL(transformChanged(QGraphicsView *)), this, SLOT(updateOverlayGeometry(QGraphicsView *)));
+            }
+        }
+        if(scene() && !m_shadow.isNull()) {
             scene()->addItem(m_shadow.data());
             updateShadowZ();
             updateShadowPos();

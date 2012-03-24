@@ -12,6 +12,8 @@
 class PlDroidStreamReader: public CLServerPushStreamreader , public QnLiveStreamProvider
 {
 public:
+    static void setSDPInfo(quint32 ipv4, QByteArray sdpInfo);
+
     PlDroidStreamReader(QnResourcePtr res);
     virtual ~PlDroidStreamReader();
 
@@ -25,14 +27,15 @@ protected:
     virtual void updateStreamParamsBasedOnFps() override;
 
 private:
-
-
+    static QMutex m_allReadersMutex;
+    static QMap<quint32, PlDroidStreamReader*> m_allReaders;
+    void setSDPInfo(QByteArray sdpInfo);
 private:
-
+    QMutex m_controlPortSync;
     TCPSocket m_tcpSock;
     UDPSocket* m_videoSock;
     UDPSocket* m_audioSock;
-    UDPSocket* m_dataSock;
+
     QnDroidResourcePtr m_droidRes;
 
     int m_connectionPort;
@@ -42,6 +45,7 @@ private:
     RTPSession m_rtpSession;
     RTPIODevice m_ioDevice;
     CLH264RtpParser m_h264Parser;
+    bool m_gotSDP;
 };
 
 #endif //dlink_stream_reader_h_0251

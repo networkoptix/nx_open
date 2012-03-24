@@ -613,7 +613,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
         widget->setPalette(palette);
     }
 
-    qreal buttonSize = qnGlobals->workbenchUnitSize() * 0.05;
+    qreal buttonSize = 32; /* In pixels. */
 
 #if 0
     QnImageButtonWidget *togglePinButton = new QnImageButtonWidget();
