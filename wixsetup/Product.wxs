@@ -740,7 +740,7 @@
             <Publish Dialog="MediaServerDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_SERVER_DIRECTORY]" Order="1">1</Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Event="SpawnDialog" Value="AllFieldsAreMandatoryDlg"><![CDATA[ NOT $(var.IsSettingsFilled) ]]></Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Event="SpawnDialog" Value="PortDuplicateDlg"><![CDATA[ NOT $(var.IsPortsValid) AND $(var.IsSettingsFilled) ]]></Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="2"><![CDATA[$(var.IsSettingsValid)]]></Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="2"><![CDATA[$(var.IsSettingsValid) AND $(var.IsPortsValid)]]></Publish>
             <Publish Dialog="MediaServerDlg" Control="ChangeServerMediaDir" Property="_BrowseProperty" Value="[WIXUI_SERVER_DIRECTORY]" Order="1">1</Publish>
             <Publish Dialog="MediaServerDlg" Control="ChangeServerMediaDir" Event="SpawnDialog" Value="BrowseDlg" Order="2">1</Publish>
             
