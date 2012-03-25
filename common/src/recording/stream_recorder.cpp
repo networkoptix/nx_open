@@ -182,6 +182,7 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
         m_gotKeyFrame[channel] = true;
         if (m_truncateInterval > 0 && md->timestamp - m_startDateTime > m_truncateInterval)
         {
+            m_endDateTime = md->timestamp;
             close();
             m_endDateTime = m_startDateTime = md->timestamp;
 
