@@ -79,12 +79,10 @@ public:
     }
 
     /**
-     * \param index                     Index of the layout to get. Index must be valid.
+     * \param index                     Index of the layout to get.
      * \returns                         Layout for the given index. 
      */
-    QnWorkbenchLayout *layout(int index) const {
-        return m_layouts[index];
-    }
+    QnWorkbenchLayout *layout(int index) const;
 
     /**
      * \returns                         All layouts of this workbench. May be empty. 
@@ -108,6 +106,11 @@ public:
      * \param layout                    Layout to remove from the list of this workbench's layouts.
      */
     void removeLayout(QnWorkbenchLayout *layout);
+
+    /**
+     * \param index                     Index of the layout to remove from the list of this workbench's layouts.
+     */
+    void removeLayout(int index);
 
     /**
      * \param layout                    Layout to move to a new position in the list of this workbench's layouts.
