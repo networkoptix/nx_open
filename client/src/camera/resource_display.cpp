@@ -190,7 +190,3 @@ void QnResourceDisplay::addRenderer(QnAbstractRenderer *renderer) {
     connect(m_camera->getCamDisplay(), SIGNAL(destroyed()), m_guards.back(), SLOT(deleteLater()));
 }
 
-void QnResourceDisplay::afterUpdate()
-{
-    emit resourceUpdated();
-}

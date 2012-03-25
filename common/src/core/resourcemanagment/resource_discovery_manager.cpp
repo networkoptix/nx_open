@@ -231,7 +231,11 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
                 
                 bool diffAddr = rpNetRes && rpNetRes->getHostAddress() != newNetRes->getHostAddress(); //if such network resource is in pool and has diff IP 
                 bool diffNet = !m_netState.isResourceInMachineSubnet(newNetRes->getHostAddress(), newNetRes->getDiscoveryAddr()); // or is diff subnet NET
-                if ( diffAddr || diffNet)
+
+                // sometimes camera could be found with 2 different nics; sometimes just on one nic. so, diffNet will be detected - but camera is still ok,
+                // so status needs to be checked. hasRunningLiveProvider here to avoid situation where there is no recording and live view, but user is about to view the cam. fuck
+                bool shouldInvesigate = (diffAddr || diffNet) && ( rpNetRes->getStatus() == QnResource::Offline || !rpNetRes->hasRunningLiveProvider());
+                if (shouldInvesigate)
                 {
                     // should keep it into resources to investigate it further 
                     ++it;
@@ -433,7 +437,19 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
                 else
                 {
                     if (rpNetRes)
+                    {
+                        // if we here it means we've got 2 resources with same ip adress.
+                        // still could be a different sub_net
+                        bool inSameSubnet = m_netState.isResourceInMachineSubnet(rpNetRes->getHostAddress(), rpNetRes->getDiscoveryAddr());
+                        if (!inSameSubnet)
+                        {
+                            it = resources.erase(it);
+                            qWarning() << "Found resource " << rpNetRes->getName() << " id=" << rpNetRes->getId().toString() << " in diff subnet but ip address was not changed.";
+                            continue;
+                        }
+
                         updateResourceStatus(rpNetRes);
+                    }
 
                     //Q_ASSERT(false);
                     ++it;

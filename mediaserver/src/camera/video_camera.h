@@ -3,8 +3,8 @@
 
 #include <core/dataconsumer/dataconsumer.h>
 #include <core/resource/resource_consumer.h>
+#include "core/dataprovider/media_streamdataprovider.h"
 
-class QnAbstractMediaStreamDataProvider;
 class QnVideoCameraGopKeeper;
 
 class QnVideoCamera: public QObject
@@ -13,7 +13,7 @@ class QnVideoCamera: public QObject
 public:
     QnVideoCamera(QnResourcePtr resource);
     virtual ~QnVideoCamera();
-    QnAbstractMediaStreamDataProvider* getLiveReader(QnResource::ConnectionRole role);
+    QnAbstractMediaStreamDataProviderPtr getLiveReader(QnResource::ConnectionRole role);
     int copyLastGop(bool primaryLiveStream, qint64 skipTime, CLDataQueue& dstQueue);
 
     void beforeStop();
@@ -35,8 +35,8 @@ private:
     QMutex m_readersMutex;
     QMutex m_getReaderMutex;
     QnResourcePtr m_resource;
-    QnAbstractMediaStreamDataProvider* m_primaryReader;
-    QnAbstractMediaStreamDataProvider* m_secondaryReader;
+    QnAbstractMediaStreamDataProviderPtr m_primaryReader;
+    QnAbstractMediaStreamDataProviderPtr m_secondaryReader;
 
     QnVideoCameraGopKeeper* m_primaryGopKeeper;
     QnVideoCameraGopKeeper* m_secondaryGopKeeper;

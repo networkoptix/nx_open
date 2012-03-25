@@ -1078,8 +1078,11 @@ void QnWorkbenchController::at_display_widgetChanged(QnWorkbench::ItemRole role)
         m_resizingInstrument->resizeHoverInstrument()->setEffective(effective);
         m_moveInstrument->setEffective(effective);
 
-        if(widget == NULL) /* Un-raise on un-zoom. */
+        if(widget == NULL) { /* Un-raise on un-zoom. */
             workbench()->setItem(QnWorkbench::RAISED, NULL);
+        } else {
+            m_cursorPos = widget->item()->geometry().topLeft();
+        }
         break;
     }
     case QnWorkbench::RAISED:

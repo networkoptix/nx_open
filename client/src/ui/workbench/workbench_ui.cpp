@@ -138,7 +138,8 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_helpVisible(false),
     m_helpOpened(false),
     m_flags(0),
-    m_ignoreClickEvent(false)
+    m_ignoreClickEvent(false),
+    m_inFreespace(false)
 {
     memset(m_widgetByRole, 0, sizeof(m_widgetByRole));
 
@@ -500,6 +501,11 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
 
 
     /* Connect to display. */
+    display->view()->addAction(action(Qn::FreespaceAction));
+    connect(action(Qn::FreespaceAction),SIGNAL(triggered()),                                                                        this,                           SLOT(at_freespaceAction_triggered()));
+    connect(action(Qn::FullscreenAction),SIGNAL(triggered()),                                                                       this,                           SLOT(at_fullscreenAction_triggered()));
+    connect(m_display,                  SIGNAL(viewportGrabbed()),                                                                  this,                           SLOT(disableProxyUpdates()));
+    connect(m_display,                  SIGNAL(viewportUngrabbed()),                                                                this,                           SLOT(enableProxyUpdates()));
     connect(m_display,                  SIGNAL(widgetChanged(QnWorkbench::ItemRole)),                                               this,                           SLOT(at_display_widgetChanged(QnWorkbench::ItemRole)));
     connect(m_display,                  SIGNAL(widgetAdded(QnResourceWidget *)),                                                    this,                           SLOT(at_display_widgetAdded(QnResourceWidget *)));
     connect(m_display,                  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),                                         this,                           SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
@@ -590,8 +596,9 @@ QnWorkbenchDisplay *QnWorkbenchUi::display() const {
     return m_display;
 }
 
-void QnWorkbenchUi::setTreeOpened(bool opened, bool animate)
-{
+void QnWorkbenchUi::setTreeOpened(bool opened, bool animate) {
+    m_inFreespace = false;
+
     m_treeShowingProcessor->forceHoverLeave(); /* So that it don't bring it back. */
 
     m_treeOpened = opened;
@@ -609,6 +616,8 @@ void QnWorkbenchUi::setTreeOpened(bool opened, bool animate)
 }
 
 void QnWorkbenchUi::setSliderOpened(bool opened, bool animate) {
+    m_inFreespace = false;
+
     m_sliderOpened = opened;
 
     qreal newY = m_controlsWidgetRect.bottom() + (opened ? -m_sliderItem->size().height() : 48.0 /* So that tooltips are not opened. */);
@@ -624,6 +633,8 @@ void QnWorkbenchUi::setSliderOpened(bool opened, bool animate) {
 }
 
 void QnWorkbenchUi::setTitleOpened(bool opened, bool animate) {
+    m_inFreespace = false;
+
     m_titleOpened = opened;
 
     if(!m_titleUsed)
@@ -641,8 +652,9 @@ void QnWorkbenchUi::setTitleOpened(bool opened, bool animate) {
     m_titleShowButton->setChecked(opened);
 }
 
-void QnWorkbenchUi::setHelpOpened(bool opened, bool animate)
-{
+void QnWorkbenchUi::setHelpOpened(bool opened, bool animate) {
+    m_inFreespace = false;
+
     m_helpShowingProcessor->forceHoverLeave(); /* So that it don't bring it back. */
 
     m_helpOpened = opened;
@@ -703,6 +715,11 @@ void QnWorkbenchUi::setHelpVisible(bool visible, bool animate) {
         updateHelpGeometry();
 }
 
+
+void QnWorkbenchUi::setProxyUpdatesEnabled(bool updatesEnabled) {
+    m_helpItem->setUpdatesEnabled(updatesEnabled);
+    m_treeItem->setUpdatesEnabled(updatesEnabled);
+}
 
 void QnWorkbenchUi::setTitleUsed(bool used) {
     m_titleItem->setVisible(used);
@@ -866,7 +883,7 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate) {
 QRectF QnWorkbenchUi::updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry) {
     QPointF pos(
         treeGeometry.x(),
-        ((!m_titleVisible || !m_titleUsed) && m_treeVisible) ? 0.0 : qMax(titleGeometry.bottom() + 30.0, 0.0)
+        ((!m_titleVisible || !m_titleUsed) && m_treeVisible) ? 30.0 : qMax(titleGeometry.bottom() + 30.0, 30.0)
     );
     QSizeF size(
         treeGeometry.width(),
@@ -923,7 +940,7 @@ void QnWorkbenchUi::updateTreeGeometry() {
 QRectF QnWorkbenchUi::updatedHelpGeometry(const QRectF &helpGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry) {
     QPointF pos(
         helpGeometry.x(),
-        ((!m_titleVisible || !m_titleUsed) && m_helpVisible) ? 0.0 : qMax(titleGeometry.bottom() + 30.0, 0.0)
+        ((!m_titleVisible || !m_titleUsed) && m_helpVisible) ? 30.0 : qMax(titleGeometry.bottom() + 30.0, 30.0)
     );
     QSizeF size(
         helpGeometry.width(),
@@ -1131,6 +1148,40 @@ void QnWorkbenchUi::updateHelpContextInternal() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+void QnWorkbenchUi::at_freespaceAction_triggered() {
+    bool isFullscreen = action(Qn::FullscreenAction)->isChecked();
+
+    if(!m_inFreespace)
+        m_inFreespace = isFullscreen && !isTreeOpened() && !isTitleOpened() && !isHelpOpened() && !isSliderOpened();
+
+    if(!m_inFreespace) {
+        if(!isFullscreen)
+            action(Qn::FullscreenAction)->setChecked(true);
+        
+        setTreeOpened(false, isFullscreen);
+        setTitleOpened(false, isFullscreen);
+        setHelpOpened(false, isFullscreen);
+        setSliderOpened(false, isFullscreen);
+
+        updateViewportMargins(); /* This one is needed here so that fit-in-view operates on correct margins. */ // TODO: change code so that this call is not needed.
+        action(Qn::FitInViewAction)->trigger();
+
+        m_inFreespace = true;
+    } else {
+        setTreeOpened(true, isFullscreen);
+        setTitleOpened(true, isFullscreen);
+        setHelpOpened(false, isFullscreen);
+        setSliderOpened(true, isFullscreen);
+
+        m_inFreespace = false;
+    }
+}
+
+void QnWorkbenchUi::at_fullscreenAction_triggered() {
+    if(m_inFreespace)
+        at_freespaceAction_triggered();
+}
+
 void QnWorkbenchUi::at_mainMenuAction_triggered() {
     if(!m_mainMenuButton->isVisible())
         return;
@@ -1160,7 +1211,7 @@ void QnWorkbenchUi::at_activityStopped() {
     updateControlsVisibility(true);
 
     foreach(QnResourceWidget *widget, m_display->widgets())
-        widget->fadeOutButtons();
+        widget->fadeOutOverlay();
 }
 
 void QnWorkbenchUi::at_activityStarted() {

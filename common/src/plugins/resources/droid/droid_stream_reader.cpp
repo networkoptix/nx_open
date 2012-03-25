@@ -1,7 +1,21 @@
 #include "droid_stream_reader.h"
 #include "droid_resource.h"
+#include "droid_controlport_listener.h"
 
 static const int DROID_TIMEOUT = 3 * 1000;
+
+
+QMutex PlDroidStreamReader::m_allReadersMutex;
+QMap<quint32, PlDroidStreamReader*> PlDroidStreamReader::m_allReaders;
+
+
+void PlDroidStreamReader::setSDPInfo(quint32 ipv4, QByteArray sdpInfo)
+{
+    QMutexLocker lock(&m_allReadersMutex);
+    PlDroidStreamReader* reader = m_allReaders.value(ipv4);
+    if (reader)
+        reader->setSDPInfo(sdpInfo);
+}
 
 PlDroidStreamReader::PlDroidStreamReader(QnResourcePtr res):
     CLServerPushStreamreader(res),
@@ -10,7 +24,7 @@ PlDroidStreamReader::PlDroidStreamReader(QnResourcePtr res):
     m_h264Parser(&m_ioDevice),
     m_videoSock(0),
     m_audioSock(0),
-    m_dataSock(0)
+    m_gotSDP(0)
 {
     m_droidRes = qSharedPointerDynamicCast<QnDroidResource>(res);
 
@@ -32,84 +46,23 @@ QnAbstractMediaDataPtr PlDroidStreamReader::getNextData()
     if (!isStreamOpened())
         return QnAbstractMediaDataPtr(0);
 
-    QnAbstractMediaDataPtr rez = m_h264Parser.getNextData();
-    if (!rez)
-        closeStream();
-    return rez;
-
-    /*
-    char buff[1024*8];
-
-    int readed = m_videoSock.recv(buff, sizeof(buff));
-    
-    int gg = 4;
-
-    return QnAbstractMediaDataPtr(0);
-    */
-    /*
-    while (1)
+    QnAbstractMediaDataPtr rez;
+    while (!m_needStop && rez == 0)
     {
-        int readed = m_sock->recv(buff, 1460);
-
-        fwrite(buff, readed, 1, f);
-
-        if (readed < 1)
-        {
-            fclose(f);
-            return QnAbstractMediaDataPtr(0);
+        if (!m_gotSDP) {
+            msleep(10);
+            continue;
         }
+
+        QMutexLocker lock(&m_controlPortSync);
+        rez = m_h264Parser.getNextData();
     }
-
-    fclose(f);
-    */
-
-    /*
-
-    quint16 chunkSize = 0;
-    int readed = m_sock->recv((char*)&chunkSize, 2);
-    if (readed < 2)
-        return QnAbstractMediaDataPtr(0);
-
-
-    QnCompressedVideoDataPtr videoData(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, chunkSize+FF_INPUT_BUFFER_PADDING_SIZE));
-    char* curPtr = videoData->data.data();
-    videoData->data.prepareToWrite(chunkSize); // this call does nothing 
-    videoData->data.done(chunkSize);
-
-    int dataLeft = chunkSize;
-
-    while (dataLeft > 0)
-    {
-        int readed = m_sock->recv(curPtr, dataLeft);
-        if (readed < 1)
-            return QnAbstractMediaDataPtr(0);
-        curPtr += readed;
-        dataLeft -= readed;
-    }
-
-    FILE* f = fopen("c:/droid.mp4", "ab");
-    fwrite(videoData->data.data(), chunkSize, 1, f);
-    fclose(f);
-
-
-    videoData->compressionType = CODEC_ID_H264;
-    videoData->width = 320;
-    videoData->height = 240;
-
-    
-    videoData->flags |= AV_PKT_FLAG_KEY;
-
-    videoData->channelNumber = 0;
-    videoData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
-
-    return videoData;
-
-    /**/
-
+    return rez;
 }
 
 void PlDroidStreamReader::openStream()
 {
+    m_gotSDP =  false;
     if (isStreamOpened())
         return;
     
@@ -119,16 +72,17 @@ void PlDroidStreamReader::openStream()
     portStr = portStr.mid(QString("raw://").length());
 
     QStringList ports = portStr.split(',');
-    if (ports.size() < 4) {
+    if (ports.size() < 2) {
         qWarning() << "Invalid droid URL format. Expected at least 4 ports";
         return;
     }
 
     if (ports[0].contains(':'))
         m_connectionPort = ports[0].mid(ports[0].indexOf(':')+1).toInt();
-    m_videoPort = ports[1].toInt();
-    m_audioPort = ports[2].toInt();
-    m_dataPort = ports[3].toInt();
+    
+    //m_videoPort = ports[1].toInt();
+    //m_audioPort = ports[2].toInt();
+    m_dataPort = ports[1].toInt();
 
     m_tcpSock.setReadTimeOut(DROID_TIMEOUT);
     m_tcpSock.setWriteTimeOut(DROID_TIMEOUT);
@@ -145,55 +99,58 @@ void PlDroidStreamReader::openStream()
     }
 
     m_videoSock = new UDPSocket();
+    m_videoSock->setLocalPort(0);
     m_audioSock = new UDPSocket();
-    m_dataSock = new UDPSocket();
-
-    m_ioDevice.setSocket(m_videoSock);
+    m_audioSock->setLocalPort(0);
 
     m_videoSock->setReadTimeOut(DROID_TIMEOUT);
     m_audioSock->setReadTimeOut(DROID_TIMEOUT);
-    m_dataSock->setReadTimeOut(DROID_TIMEOUT);
 
-    if (!m_videoSock->setLocalPort(m_videoPort))
     {
-        qWarning() << "Can't open video port for droid device. Port already in use";
+        QMutexLocker lock(&m_allReadersMutex);
+        quint32 ip = res->getHostAddress().toIPv4Address();
+        m_allReaders.insert(ip, this);
+    }
+
+    QByteArray request = QString("v:%1,a:%2,f:%3").arg(m_videoSock->getLocalPort()).arg(m_audioSock->getLocalPort()).arg(DROID_CONTROL_TCP_SERVER_PORT).toAscii();
+    
+    int sendLen = m_tcpSock.send(request.data(), request.size());
+    if (sendLen != request.size())
+    {
+        qWarning() << "Can't send request to droid device.";
         closeStream();
         return;
     }
 
     /*
-    if (!m_audioSock.setLocalPort(m_audioPort))
+    m_incomeTCPData = m_dataSock->accept();
+    if (m_incomeTCPData)
     {
-        qWarning() << "Can't open audio port for droid device. Port already in use";
-        closeStream();
-        return;
+        quint8 recvBuffer[1024];
+        int readed = m_incomeTCPData->recv(recvBuffer, sizeof(recvBuffer));
+        if (readed > 0)
+        {
+            m_h264Parser.setSDPInfo(QByteArray((const char*)recvBuffer, readed));
+        }
     }
     */
 
-    m_h264Parser.setSDPInfo("a=rtpmap:96 H264/90000\na=fmtp:96 packetization-mode=1;profile-level-id=42001e;sprop-parameter-sets=Z0IAHukBQHsg,aM4BDyA=;");
-
-    if (!m_dataSock->setLocalPort(m_dataPort))
-    {
-        qWarning() << "Can't open audio port for droid device. Port already in use";
-        closeStream();
-        return;
-    }
-
-    // todo: extract resolution here from control port
-    // current version of droid software does not send data to control port
-    //quint8 dataBuff[1024];
-    //int readed = m_dataSock.recv(dataBuff, sizeof(dataBuff));
+    m_ioDevice.setSocket(m_videoSock);
 }
 
 void PlDroidStreamReader::closeStream()
 {
+    {
+        QMutexLocker lock(&m_allReadersMutex);
+        quint32 ip = m_droidRes->getHostAddress().toIPv4Address();
+        m_allReaders.remove(ip);
+    }
+
     delete m_videoSock;
     delete m_audioSock;
-    delete m_dataSock;
 
     m_videoSock = 0;
     m_audioSock = 0;
-    m_dataSock = 0;
 
     m_tcpSock.close();
 }
@@ -211,4 +168,11 @@ void PlDroidStreamReader::updateStreamParamsBasedOnQuality()
 void PlDroidStreamReader::updateStreamParamsBasedOnFps()
 {
 
+}
+
+void PlDroidStreamReader::setSDPInfo(QByteArray sdpInfo)
+{
+    QMutexLocker lock(&m_controlPortSync);
+    m_h264Parser.setSDPInfo(sdpInfo);
+    m_gotSDP = true;
 }

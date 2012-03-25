@@ -762,7 +762,10 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
     //else
     //    return true;
     
+    bool oldIsStillImage = m_isStillImage;
     m_isStillImage = media->flags & QnAbstractMediaData::MediaFlags_StillImage;
+    if(oldIsStillImage != m_isStillImage)
+        emit stillImageChanged();
 
     if (m_needChangePriority)
     {

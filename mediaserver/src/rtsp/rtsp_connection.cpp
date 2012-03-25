@@ -40,9 +40,6 @@ public:
 
     QnRtspConnectionProcessorPrivate():
         QnTCPConnectionProcessor::QnTCPConnectionProcessorPrivate(),
-        liveDpHi(0),
-        liveDpLow(0),
-        archiveDP(0),
         dataProcessor(0),
         startTime(0),
         endTime(0),
@@ -70,9 +67,8 @@ public:
             liveDpLow->removeDataProcessor(dataProcessor);
         if (archiveDP)
             archiveDP->removeDataProcessor(dataProcessor);
-        delete archiveDP;
+		archiveDP.clear();
         delete dataProcessor;
-        archiveDP = 0;
         dataProcessor = 0;
 
         QnVideoCamera* camera = qnCameraPool->getVideoCamera(mediaRes);
@@ -85,9 +81,9 @@ public:
         deleteDP();
     }
 
-    QnAbstractMediaStreamDataProvider* liveDpHi;
-    QnAbstractMediaStreamDataProvider* liveDpLow;
-    QnArchiveStreamReader* archiveDP;
+    QnAbstractMediaStreamDataProviderPtr liveDpHi;
+    QnAbstractMediaStreamDataProviderPtr liveDpLow;
+    QSharedPointer<QnArchiveStreamReader> archiveDP;
     bool liveMode;
 
     QnRtspDataConsumer* dataProcessor;
@@ -238,8 +234,8 @@ int QnRtspConnectionProcessor::numOfVideoChannels()
     Q_D(QnRtspConnectionProcessor);
     if (!d->mediaRes)
         return -1;
-    QnAbstractMediaStreamDataProvider* currentDP = d->liveMode ? d->liveDpHi : d->archiveDP;
-    const QnVideoResourceLayout* layout = d->mediaRes->getVideoLayout(currentDP);
+    QnAbstractMediaStreamDataProviderPtr currentDP = d->liveMode ? d->liveDpHi : d->archiveDP;
+    const QnVideoResourceLayout* layout = d->mediaRes->getVideoLayout(currentDP.data());
     return layout ? layout->numberOfChannels() : -1;
 }
 
@@ -296,8 +292,8 @@ int QnRtspConnectionProcessor::composeDescribe()
     QTextStream sdp(&d->responseBody);
 
     
-    const QnVideoResourceLayout* videoLayout = d->mediaRes->getVideoLayout(d->liveDpHi);
-    const QnResourceAudioLayout* audioLayout = d->mediaRes->getAudioLayout(d->liveDpHi);
+    const QnVideoResourceLayout* videoLayout = d->mediaRes->getVideoLayout(d->liveDpHi.data());
+    const QnResourceAudioLayout* audioLayout = d->mediaRes->getAudioLayout(d->liveDpHi.data());
     int numVideo = videoLayout ? videoLayout->numberOfChannels() : 1;
     int numAudio = audioLayout ? audioLayout->numberOfChannels() : 0;
 
@@ -360,8 +356,8 @@ int QnRtspConnectionProcessor::composeSetup()
         return CODE_NOT_IMPLEMETED;
     int trackId = extractTrackId(d->requestHeaders.path());
 
-    QnAbstractMediaStreamDataProvider* currentDP = d->liveMode ? d->liveDpHi : d->archiveDP;
-    const QnVideoResourceLayout* videoLayout = d->mediaRes->getVideoLayout(currentDP);
+    QnAbstractMediaStreamDataProviderPtr currentDP = d->liveMode ? d->liveDpHi : d->archiveDP;
+    const QnVideoResourceLayout* videoLayout = d->mediaRes->getVideoLayout(currentDP.data());
     if (trackId >= videoLayout->numberOfChannels()) {
         //QnAbstractMediaStreamDataProvider* dataProvider;
         if (d->archiveDP)
@@ -469,7 +465,7 @@ void QnRtspConnectionProcessor::createDataProvider()
 		if (!d->liveDpLow && d->liveDpHi)
         {
             QnVirtualCameraResourcePtr cameraRes = qSharedPointerDynamicCast<QnVirtualCameraResource> (d->mediaRes);
-            QnLiveStreamProvider* liveHiProvider = dynamic_cast<QnLiveStreamProvider*> (d->liveDpHi);
+            QSharedPointer<QnLiveStreamProvider> liveHiProvider = qSharedPointerDynamicCast<QnLiveStreamProvider> (d->liveDpHi);
             if (cameraRes && liveHiProvider && cameraRes->getMaxFps() - liveHiProvider->getFps() >= QnRecordingManager::MIN_SECONDARY_FPS)
             {
 			    d->liveDpLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
@@ -479,7 +475,7 @@ void QnRtspConnectionProcessor::createDataProvider()
 		}
 	}
 	if (!d->archiveDP) 
-		d->archiveDP = dynamic_cast<QnArchiveStreamReader*> (d->mediaRes->createDataProvider(QnResource::Role_Archive));
+		d->archiveDP = QSharedPointer<QnArchiveStreamReader> (dynamic_cast<QnArchiveStreamReader*> (d->mediaRes->createDataProvider(QnResource::Role_Archive)));
 }
 
 void QnRtspConnectionProcessor::connectToLiveDataProviders()
@@ -539,7 +535,7 @@ int QnRtspConnectionProcessor::composePlay()
             d->liveDpLow->removeDataProcessor(d->dataProcessor);
     }
 
-    QnAbstractMediaStreamDataProvider* currentDP = d->liveMode ? d->liveDpHi : d->archiveDP;
+    QnAbstractMediaStreamDataProviderPtr currentDP = d->liveMode ? d->liveDpHi : d->archiveDP;
     if (!currentDP)
         return CODE_NOT_FOUND;
 

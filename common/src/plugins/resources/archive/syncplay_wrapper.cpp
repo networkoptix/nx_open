@@ -655,7 +655,7 @@ void QnArchiveSyncPlayWrapper::onConsumerBlocksReader(QnAbstractStreamDataProvid
                     }
                 }
                 if (d->readers[i].paused)
-                    d->readers[i].reader->resumeMedia();
+                    d->readers[i].reader->resume();
                 if (d->enabled)
                     d->readers[i].reader->setNavDelegate(this);
                 d->readers[i].paused = false;
@@ -665,7 +665,8 @@ void QnArchiveSyncPlayWrapper::onConsumerBlocksReader(QnAbstractStreamDataProvid
                 if (!d->readers[i].reader->isSingleShotMode())
                 {
                     d->readers[i].reader->setNavDelegate(0);
-                    d->readers[i].reader->pauseMedia();
+                    // use pause instead of pauseMedia. Prevent isMediaPaused=true value. So, pause thread physically but not change any playback logic 
+                    d->readers[i].reader->pause(); 
                     if (d->enabled)
                         d->readers[i].reader->setNavDelegate(this);
                     d->readers[i].paused = true;

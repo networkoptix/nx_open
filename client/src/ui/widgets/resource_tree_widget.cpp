@@ -92,8 +92,14 @@ protected:
 
         QStyle *style = optionV4.widget ? optionV4.widget->style() : QApplication::style();
 
-        /* Highlight currently raised item. */
-        QnWorkbenchItem *raisedItem = workbench() ? workbench()->item(QnWorkbench::RAISED) : NULL;
+        /* Highlight currently raised/zoomed item. */
+        QnWorkbenchItem *raisedItem = NULL;
+        if(workbench()) {
+            raisedItem = workbench()->item(QnWorkbench::RAISED);
+            if(!raisedItem)
+                raisedItem = workbench()->item(QnWorkbench::ZOOMED);
+        }
+        
         if(raisedItem && (raisedItem->uuid() == uuid || (resource && uuid.isNull() && raisedItem->resourceUid() == resource->getUniqueId()))) {
             QRect decorationRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &optionV4, optionV4.widget);
             m_raisedIcon.paint(painter, decorationRect);

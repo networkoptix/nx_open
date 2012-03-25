@@ -57,13 +57,10 @@ const QnVirtualCameraResourcePtr &QnSingleCameraSettingsWidget::camera() const {
 }
 
 void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &camera) {
-    if(m_camera == camera)
-        return;
-
     m_camera = camera;
     
     QVariant val;
-    if (m_camera->getParam("motionEditURL", val, QnDomainMemory))
+    if (m_camera && m_camera->getParam("motionEditURL", val, QnDomainMemory))
     {
         // motion editing is not supported. Place only reference to WEB page
         if(m_motionWidget) {
@@ -244,7 +241,7 @@ void QnSingleCameraSettingsWidget::at_tabWidget_currentChanged() {
         return;
 
     m_motionWidget = new QnCameraMotionMaskWidget(this);
-    m_motionWidget->setCamera(m_camera);
+    setCamera(m_camera);
     
     using ::setReadOnly;
     setReadOnly(m_motionWidget, m_readOnly);
