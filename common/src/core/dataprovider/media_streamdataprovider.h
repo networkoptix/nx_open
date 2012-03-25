@@ -1,6 +1,7 @@
 #ifndef QnMediaStreamDataProvider_514
 #define QnMediaStreamDataProvider_514
 
+#include <QSharedPointer>
 #include "core/dataprovider/statistics.h"
 #include "../resource/media_resource.h"
 #include "abstract_streamdataprovider.h"
@@ -29,6 +30,7 @@ public:
 	virtual bool needKeyData(int channel) const;
 	virtual bool needKeyData() const;
 
+    virtual QnMediaContextPtr getCodecContext() const;
 
 protected:
     virtual QnAbstractMediaDataPtr getNextData() = 0;
@@ -54,6 +56,8 @@ private:
     mutable int m_numberOfchannels;
     qint64 m_lastVideoTime[CL_MAX_CHANNELS];
 };
+
+typedef QSharedPointer<QnAbstractMediaStreamDataProvider> QnAbstractMediaStreamDataProviderPtr;
 
 
 #endif //QnMediaStreamDataProvider_514

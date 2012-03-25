@@ -5,7 +5,7 @@ import shutil
 import glob
 import string
 
-from version import *
+# from version import *
 import os, sys
 import stat, time
 from StringIO import StringIO
@@ -37,7 +37,7 @@ def gen_version_h():
     print >> version_h, 'static const char* APPLICATION_NAME="%s";' % APPLICATION_NAME
     print >> version_h, 'static const char* APPLICATION_VERSION="%s.%s";' % (APPLICATION_VERSION, BUILD_NUMBER)
     print >> version_h, 'const char* const APPLICATION_REVISION="%s";' % REVISION
-    print >> version_h, 'const char* const FFMPEG_VERSION="%s";' % FFMPEG_VERSION	
+    print >> version_h, 'const char* const FFMPEG_VERSION="%s";' % FFMPEG_VERSION   
     print >> version_h, ''
 
     print >> version_h, '// There constans are here for windows resouce file.'

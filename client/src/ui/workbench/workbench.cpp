@@ -39,6 +39,15 @@ void QnWorkbench::clear() {
         removeLayout(m_layouts.back());
 }
 
+QnWorkbenchLayout *QnWorkbench::layout(int index) const {
+    if(index < 0 || index >= m_layouts.size()) {
+        qnWarning("Invalid layout index '%1'.", index);
+        return NULL;
+    }
+
+    return m_layouts[index];
+}
+
 void QnWorkbench::addLayout(QnWorkbenchLayout *layout) {
     insertLayout(layout, m_layouts.size());
 }
@@ -61,6 +70,10 @@ void QnWorkbench::insertLayout(QnWorkbenchLayout *layout, int index) {
     connect(layout, SIGNAL(aboutToBeDestroyed()), this, SLOT(at_layout_aboutToBeDestroyed()));
 
     emit layoutsChanged();
+}
+
+void QnWorkbench::removeLayout(int index) {
+    removeLayout(layout(index));
 }
 
 void QnWorkbench::removeLayout(QnWorkbenchLayout *layout) {

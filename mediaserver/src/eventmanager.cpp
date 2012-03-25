@@ -124,7 +124,7 @@ void QnEventManager::eventReceived(QnEvent event)
             QnResource::Status status = (QnResource::Status)event.data.toInt();
             resource->setStatus(status);
         }
-	} else if (event.eventType == QN_EVENT_RES_DISABLED_CHANGE)
+    } else if (event.eventType == QN_EVENT_RES_DISABLED_CHANGE)
 	{
 		QnResourcePtr resource = qnResPool->getResourceById(event.objectId);
 
@@ -132,7 +132,15 @@ void QnEventManager::eventReceived(QnEvent event)
 		{
 			resource->setDisabled(event.data.toInt());
 		}
-	}
+    } else if (event.eventType == QN_EVENT_RES_DELETE)
+    {
+        QnResourcePtr resource = qnResPool->getResourceById(event.objectId);
+
+        if (resource)
+        {
+            qnResPool->removeResource(resource);
+        }
+    }
 }
 
 void QnEventManager::connectionClosed(QString errorString)

@@ -94,7 +94,7 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_videoBufferOverflow(false),
       m_singleShotMode(false),
       m_singleShotQuantProcessed(false),
-      m_jumpTime(0),
+      m_jumpTime(DATETIME_NOW),
       m_playingCompress(0),
       m_playingBitrate(0),
       m_tooSlowCounter(0),
@@ -378,7 +378,9 @@ bool CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                     {
 					    if (firstWait)
                         {
-                            m_isLongWaiting = speedSign*(displayedTime - ct) > MAX_FRAME_DURATION*1000 && speedSign*(displayedTime - m_jumpTime)  > MAX_FRAME_DURATION*1000;
+                            m_isLongWaiting = speedSign*(displayedTime - ct) > MAX_FRAME_DURATION*1000;
+                            if (m_jumpTime != DATETIME_NOW)
+                                m_isLongWaiting &= speedSign*(displayedTime - m_jumpTime)  > MAX_FRAME_DURATION*1000;
                             
 							/*
                             qDebug() << "displayedTime=" << QDateTime::fromMSecsSinceEpoch(displayedTime/1000).toString("hh:mm:ss.zzz")
@@ -638,7 +640,8 @@ void CLCamDisplay::setSpeed(float speed)
     QMutexLocker lock(&m_timeMutex);
     if (qAbs(speed-m_speed) > FPS_EPS)
     {
-        m_executingChangeSpeed = true;
+        if (sign(m_speed) != sign(speed))
+            m_executingChangeSpeed = true; // do not show "No data" while display preparing for new speed. 
         if (speed < 0 && m_speed >= 0) {
             for (int i = 0; i < CL_MAX_CHANNELS; ++i)
                 m_nextReverseTime[i] = AV_NOPTS_VALUE;
@@ -1240,7 +1243,7 @@ bool CLCamDisplay::isNoData() const
         return false;
 
     qint64 ct = m_extTimeSrc->getCurrentTime();
-    bool useSync = m_extTimeSrc && m_extTimeSrc->isEnabled() && m_jumpTime != DATETIME_NOW;
+    bool useSync = m_extTimeSrc && m_extTimeSrc->isEnabled() && (m_jumpTime != DATETIME_NOW || m_speed < 0);
     if (!useSync || ct == DATETIME_NOW)
         return false;
 

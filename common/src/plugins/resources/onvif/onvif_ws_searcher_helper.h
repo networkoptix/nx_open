@@ -24,6 +24,9 @@ public:
 
 private:
     WSResult parseReply(QByteArray& datagram);
+
+    WSResult parseDigitalWachdog(QByteArray& datagram);
+    WSResult parseBrickCom(QByteArray& datagram);
 };
 
 #endif // onvif_ws_searcher_helper_h1338

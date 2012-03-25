@@ -637,6 +637,8 @@ begin_label:
         */
 
     }
+    if (videoData && videoData->context) 
+        m_codecContext = videoData->context;
 
     if (m_currentData && singleShotMode && m_skipFramesToTime == 0) {
         m_singleQuantProcessed = true;
@@ -1018,3 +1020,7 @@ double QnArchiveStreamReader::getSpeed() const
     return m_speed;
 }
 
+QnMediaContextPtr QnArchiveStreamReader::getCodecContext() const
+{
+    return m_codecContext;
+}

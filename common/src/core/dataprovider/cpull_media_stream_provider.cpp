@@ -6,8 +6,7 @@
 QnClientPullMediaStreamProvider::QnClientPullMediaStreamProvider(QnResourcePtr dev ):
     QnAbstractMediaStreamDataProvider(dev),
     m_fpsSleep(100*1000),
-    m_fps(MAX_LIVE_FPS),
-    m_extSyncMutex(0)
+    m_fps(MAX_LIVE_FPS)
 {
 }
 
@@ -27,11 +26,6 @@ bool QnClientPullMediaStreamProvider::isMaxFps() const
 {
     QMutexLocker mtx(&m_mutex);
     return abs( m_fps - MAX_LIVE_FPS)< .1;
-}
-
-void QnClientPullMediaStreamProvider::setExtSync(QMutex* extSyncMutex)
-{
-    m_extSyncMutex = extSyncMutex;
 }
 
 void QnClientPullMediaStreamProvider::run()
@@ -69,12 +63,7 @@ void QnClientPullMediaStreamProvider::run()
 			continue;
 		}
 
-        //if (m_extSyncMutex)
-        //    m_extSyncMutex->lock();
 		QnAbstractMediaDataPtr data = getNextData();
-        //if (m_extSyncMutex)
-        //    m_extSyncMutex->unlock();
-		//continue;
 
 		if (data==0)
 		{

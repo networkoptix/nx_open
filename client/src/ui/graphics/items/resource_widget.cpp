@@ -37,6 +37,7 @@
 #include "settings.h"
 #include "math.h"
 #include "image_button_widget.h"
+#include "utils/media/ffmpeg_helper.h"
 
 namespace {
 
@@ -137,6 +138,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 
     m_headerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     m_headerLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    m_headerLayout->setSpacing(2.0);
     m_headerLayout->addItem(m_headerTitleLabel);
     m_headerLayout->addStretch(0x1000); /* Set large enough stretch for the buttons to be placed at the right end of the layout. */
 
@@ -178,7 +180,6 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     }
 
     m_footerStatusLabel = new GraphicsLabel();
-    m_footerStatusLabel->setPerformanceHint(QStaticText::AggressiveCaching);
 
     m_footerTimeLabel = new GraphicsLabel();
 
@@ -647,7 +648,12 @@ void QnResourceWidget::updateOverlayText() {
         mbps += statistics->getBitrate();
     }
 
-    m_footerStatusLabel->setText(tr("%1fps @ %2Mbps").arg(fps, 0, 'g', 2).arg(mbps, 0, 'g', 2));
+    QString codecName;
+    QnMediaContextPtr codec = m_display->mediaProvider()->getCodecContext();
+    if (codec && codec->ctx()) 
+        codecName = codecIDToString(codec->ctx()->codec_id);
+
+    m_footerStatusLabel->setText(tr("%1fps @ %2Mbps (%3)").arg(fps, 0, 'g', 2).arg(mbps, 0, 'g', 2).arg(codecName));
 }
 
 

@@ -34,34 +34,46 @@ void QnRecordingManager::start()
     QThread::start();
 }
 
+void QnRecordingManager::beforeDeleteRecorder(const Recorders& recorders)
+{
+    recorders.recorderHiRes->pleaseStop();
+    if (recorders.recorderLowRes)
+        recorders.recorderLowRes->pleaseStop();
+}
+
+void QnRecordingManager::deleteRecorder(const Recorders& recorders)
+{
+    recorders.recorderHiRes->stop();
+    if (recorders.recorderLowRes)
+        recorders.recorderLowRes->stop();
+    QnVideoCamera* camera = qnCameraPool->getVideoCamera(recorders.recorderHiRes->getResource());
+    if (camera)
+    {
+        QnAbstractMediaStreamDataProviderPtr reader = camera->getLiveReader(QnResource::Role_LiveVideo);
+        if (reader)
+            reader->removeDataProcessor(recorders.recorderHiRes);
+
+        if (recorders.recorderLowRes) {
+            reader = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
+            if (reader)
+                reader->removeDataProcessor(recorders.recorderLowRes);
+        }
+    }
+    delete recorders.recorderHiRes;
+    delete recorders.recorderLowRes;
+}
+
 void QnRecordingManager::stop()
 {
+    QMutexLocker lock(&m_mutex);
+
     foreach(const Recorders& recorders, m_recordMap.values())
     {
-        recorders.recorderHiRes->pleaseStop();
-        if (recorders.recorderLowRes)
-            recorders.recorderLowRes->pleaseStop();
+        beforeDeleteRecorder(recorders);
     }
     foreach(const Recorders& recorders, m_recordMap.values()) 
     {
-        recorders.recorderHiRes->stop();
-        if (recorders.recorderLowRes)
-            recorders.recorderLowRes->stop();
-        QnVideoCamera* camera = qnCameraPool->getVideoCamera(recorders.recorderHiRes->getResource());
-        if (camera)
-        {
-            QnAbstractMediaStreamDataProvider* reader = camera->getLiveReader(QnResource::Role_LiveVideo);
-            if (reader)
-                reader->removeDataProcessor(recorders.recorderHiRes);
-
-            if (recorders.recorderLowRes) {
-                reader = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
-                if (reader)
-                    reader->removeDataProcessor(recorders.recorderLowRes);
-            }
-        }
-        delete recorders.recorderHiRes;
-        delete recorders.recorderLowRes;
+        deleteRecorder(recorders);
     }
     m_recordMap.clear();
 }
@@ -74,10 +86,10 @@ Recorders QnRecordingManager::findRecorders(QnResourcePtr res) const
 
 QnServerStreamRecorder* QnRecordingManager::createRecorder(QnResourcePtr res, QnVideoCamera* camera, QnResource::ConnectionRole role)
 {
-    QnAbstractMediaStreamDataProvider* reader = camera->getLiveReader(role);
+    QnAbstractMediaStreamDataProviderPtr reader = camera->getLiveReader(role);
     if (reader == 0)
         return 0;
-    QnServerStreamRecorder* recorder = new QnServerStreamRecorder(res, role, reader);
+    QnServerStreamRecorder* recorder = new QnServerStreamRecorder(res, role, reader.data());
     recorder->setTruncateInterval(RECORDING_CHUNK_LEN);
     reader->addDataProcessor(recorder);
     reader->setNeedKeyData();
@@ -96,8 +108,8 @@ bool QnRecordingManager::isResourceDisabled(QnResourcePtr res) const
 
 void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* camera, QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes)
 {
-    QnAbstractMediaStreamDataProvider* providerHi = camera->getLiveReader(QnResource::Role_LiveVideo);
-    QnAbstractMediaStreamDataProvider* providerLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
+    QnAbstractMediaStreamDataProviderPtr providerHi = camera->getLiveReader(QnResource::Role_LiveVideo);
+    QnAbstractMediaStreamDataProviderPtr providerLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
 
     if (!isResourceDisabled(res) && res->getStatus() != QnResource::Offline && 
         recorderHiRes->currentScheduleTask().getRecordingType() != QnScheduleTask::RecordingType_Never)
@@ -160,8 +172,8 @@ void QnRecordingManager::updateCamera(QnSecurityCamResourcePtr res)
 {
     QMutexLocker lock(&m_mutex);
     QnVideoCamera* camera = qnCameraPool->getVideoCamera(res);
-    QnAbstractMediaStreamDataProvider* providerHi = camera->getLiveReader(QnResource::Role_LiveVideo);
-    QnAbstractMediaStreamDataProvider* providerLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
+    QnAbstractMediaStreamDataProviderPtr providerHi = camera->getLiveReader(QnResource::Role_LiveVideo);
+    QnAbstractMediaStreamDataProviderPtr providerLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
 
     if (camera)
     {
@@ -217,14 +229,16 @@ void QnRecordingManager::at_updateStorage()
 
 void QnRecordingManager::onRemoveResource(QnResourcePtr res)
 {
+    QMutexLocker lock(&m_mutex);
+
     QMap<QnResourcePtr, Recorders>::iterator itr = m_recordMap.find(res);
     if (itr == m_recordMap.end())
         return;
 
     qnCameraPool->removeVideoCamera(itr.key());
-    const Recorders& recorders = itr.value();
-    delete recorders.recorderHiRes;
-    delete recorders.recorderLowRes;
+
+    beforeDeleteRecorder(itr.value());
+    deleteRecorder(itr.value());
     m_recordMap.erase(itr);
 }
 

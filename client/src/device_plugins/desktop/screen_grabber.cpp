@@ -423,7 +423,7 @@ void CLScreenGrabber::drawLogo(quint8* data, int width, int height)
     if (m_logo.width() == 0)
         return;
     int left = width - m_logo.width() - LOGO_CORNER_OFFSET;
-    int top = m_mode == CaptureMode_Application ? height - m_logo.height() - LOGO_CORNER_OFFSET : LOGO_CORNER_OFFSET;
+    int top = m_mode == CaptureMode_Application ? LOGO_CORNER_OFFSET : height - m_logo.height() - LOGO_CORNER_OFFSET;
     
     QImage buffer(data, width, height, QImage::Format_ARGB32_Premultiplied);
     QPainter painter(&buffer);
@@ -755,7 +755,7 @@ void CLScreenGrabber::setLogo(const QPixmap& logo)
         m_logo = QPixmap::fromImage(logo.toImage().mirrored(false, true));
     else
         m_logo = logo;
-    m_logo = m_logo.scaledToWidth(screenWidth() * 0.2140, Qt::SmoothTransformation);
+    m_logo = m_logo.scaledToWidth(screenWidth() * 0.085, Qt::SmoothTransformation);
 }
 
 int CLScreenGrabber::screenWidth() const
