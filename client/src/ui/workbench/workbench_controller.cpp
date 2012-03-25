@@ -485,7 +485,7 @@ void QnWorkbenchController::startRecording()
     if (m_recordingLabel == 0)
         m_recordingLabel = new QLabel(view);
     m_recordingLabel->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool);
-    m_recordingLabel->resize(200, 200);
+    m_recordingLabel->resize(220, 165);
     m_recordingLabel->move(view->mapToGlobal(QPoint(0, 0)) + toPoint(view->size() - m_recordingLabel->size()) / 2);
 
     m_recordingLabel->setMask(createRoundRegion(18, 18, m_recordingLabel->rect()));

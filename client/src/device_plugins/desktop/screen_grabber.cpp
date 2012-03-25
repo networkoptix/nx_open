@@ -755,7 +755,7 @@ void CLScreenGrabber::setLogo(const QPixmap& logo)
         m_logo = QPixmap::fromImage(logo.toImage().mirrored(false, true));
     else
         m_logo = logo;
-    m_logo = m_logo.scaledToWidth(screenWidth() * 0.2140, Qt::SmoothTransformation);
+    m_logo = m_logo.scaledToWidth(screenWidth() * 0.1, Qt::SmoothTransformation);
 }
 
 int CLScreenGrabber::screenWidth() const
