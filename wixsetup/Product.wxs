@@ -20,7 +20,7 @@
         
         <SetProperty Id="REINSTALLMODE" Value="vomus" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
         <SetProperty Id="REINSTALL" Value="ALL" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
-    	<SetProperty Id="REBOOT" Value="reallysuppress" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
+        <SetProperty Id="REBOOT" Value="reallysuppress" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
 
         <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
         <WixVariable Id="WixUIBannerBmp" Value="Binary\eve\eve_logo-493x58.bmp" />
@@ -210,8 +210,8 @@
 <!--            <RemoveExistingProducts After="InstallInitialize" />-->
             <Custom Action="CloseTrayToolAction_Cmd" Before="CloseTrayToolAction">Installed</Custom>
             <Custom Action="CloseTrayToolAction" Before="StopServices">Installed</Custom>
-            <Custom Action="InitDatabaseAction_Cmd" After="InstallFiles"><![CDATA[NOT Installed AND &AppServerFeature=3]]></Custom>
-            <Custom Action="InitDatabaseAction" After="InitDatabaseAction_Cmd"><![CDATA[NOT Installed AND &AppServerFeature=3]]></Custom>
+            <Custom Action="InitDatabaseAction_Cmd" After="InstallFiles"><![CDATA[(NOT Installed AND &AppServerFeature=3) OR (REINSTALL AND !AppServerFeature)]]></Custom>
+            <Custom Action="InitDatabaseAction" After="InitDatabaseAction_Cmd"><![CDATA[NOT Installed AND &AppServerFeature=3 OR (REINSTALL AND !AppServerFeature)]]></Custom>
             <Custom Action="LaunchApplication" After="RemoveExistingProducts"><![CDATA[!ServerFeature=3 OR &ServerFeature=3]]></Custom>
         </InstallExecuteSequence>
         
@@ -231,8 +231,29 @@
                     <CreateFolder Directory="CLIENT_DIRECTORY"/>
                     <RegistryValue Root='HKCU' Key='Software\[Manufacturer]\Network Optix HD Witness Client' Type='string' Value='' KeyPath='yes' />
                 </Component>
-            </Directory>
-            
+        	</Directory>
+
+
+        	<Directory Id="SystemFolder">
+        		<Directory Id="VmsSystemFolderConfig" Name="config">
+        			<Directory Id="VmsConfigSystemProfile" Name="systemprofile">
+	        			<Directory Id="VmsSystemProfileAppData" Name="AppData">
+		        			<Directory Id="VmsAppDataLocal" Name="Local">
+				        		<Directory Id="VmsNetworkOptixAppData" Name="$(env.ORGANIZATION_NAME)">
+				        			<Directory Id="VmsAppServerAppDataDir" Name="Enterprise Controller">
+							            <Directory Id="VmsAppServerDirDb" Name="db">
+							                <Component Id="ecs.db" Guid="{4ECA39F8-FA7F-4489-8AC5-FAE68C486666}" Permanent="yes" NeverOverwrite="yes">
+							                    <File Id="ecs.db" Name="ecs.db" Source="../appserver/setup/build/exe.win32-2.7/db/ecs.db" KeyPath="yes"/>
+							                </Component>
+							            </Directory>
+				        			</Directory>
+				        		</Directory>
+		        			</Directory>
+	        			</Directory>
+        			</Directory>
+        		</Directory>
+        	</Directory>
+        	
             <Directory Id="ProgramFilesFolder">
                 <Directory Id="NetworkOptix" Name="$(env.ORGANIZATION_NAME)">
                     <Directory Id="INSTALLDIR" Name="$(env.APPLICATION_NAME)">
@@ -257,6 +278,12 @@
                                 <ServiceControl Id="StopVmsAppServerService" Name="VmsAppServer" Stop="both" Wait="yes" Remove="uninstall" />
                             
                             </Component>
+                        	
+                        	<!-- Dummy file. To remove on uninstall.  -->
+                            <Component Id="ecs.log" Guid="{9F34E3B1-9682-47C7-BE56-3165EA127E40}">
+                                <File Id="ecs.log" Name="ecs.log" Source="files/ecs.log" KeyPath="yes"/>
+                            </Component>
+                        	
                             <Component Id="AppServerConfiguration" Guid="{46C18E7E-D25C-4250-AF5F-0237EEFAA80E}" Permanent="yes">
                                 <Condition>
                                     NOT PREVIOUSVERSIONSINSTALLED OR UPGRADETYPE=0
@@ -501,6 +528,8 @@
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="hidden" >
             <ComponentGroupRef Id="AppServerFilesComponent" />
             <ComponentRef Id="AppServerExecutable" />
+            <ComponentRef Id="ecs.db" />
+        	<ComponentRef Id="ecs.log" />        	
             <ComponentRef Id="AppServerConfiguration"/>
         </Feature>
         
@@ -601,8 +630,9 @@
             
             <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="InstallTypeDlg">LicenseAccepted = "1"</Publish>
             
-            <Publish Dialog="InstallTypeDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg">NOT UPGRADETYPE</Publish>
-            <Publish Dialog="InstallTypeDlg" Control="Back" Event="NewDialog" Value="UpgradeDlg">UPGRADETYPE</Publish>
+            <Publish Dialog="InstallTypeDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg">NOT REINSTALL AND NOT PREVIOUSVERSIONSINSTALLED</Publish>
+            <Publish Dialog="InstallTypeDlg" Control="Back" Event="NewDialog" Value="UpgradeDlg">NOT REINSTALL AND PREVIOUSVERSIONSINSTALLED</Publish>
+        	<Publish Dialog="InstallTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg">REINSTALL</Publish>
             
             <Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="PasswordDlg">INSTALLTYPE=0</Publish>
             <Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="AdvancedTypeDlg">INSTALLTYPE=1</Publish>
@@ -706,12 +736,16 @@
             <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_BACK" Value="MediaServerDlg">1</Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_NEXT" Value="VerifyReadyDlg">1</Publish>
             
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg" Order="1"><![CDATA[UPGRADETYPE <> 0 AND INSTALLTYPE=0]]></Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg" Order="1"><![CDATA[UPGRADETYPE <> 0 AND (INSTALLTYPE<>0 AND NOT Installed AND &AppServerFeature=3 AND &ServerFeature=3)]]></Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="AppServerDlg" Order="1"><![CDATA[UPGRADETYPE <> 0 AND (INSTALLTYPE<>0 AND NOT Installed AND &AppServerFeature=3 AND &ServerFeature<>3 AND &AppServerFeature = 3)]]></Publish>
+        	<?define CustomInstallOrUpgrade="(NOT PREVIOUSVERSIONSINSTALLED OR UPGRADETYPE=1)"?>
+        	<?define EditingAppServer="INSTALLTYPE=1 AND ((NOT Installed AND &AppServerFeature=3) OR (Installed AND !AppServerFeature))"?>
+        	<?define EditingMediaServer="INSTALLTYPE=1 AND ((NOT Installed AND &ServerFeature=3) OR (Installed AND !ServerFeature))"?>
+        	
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg" Order="1"><![CDATA[CustomInstallOrUpgrade AND INSTALLTYPE=0]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg" Order="1"><![CDATA[CustomInstallOrUpgrade AND EditingMediaServer]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="AppServerDlg" Order="1"><![CDATA[CustomInstallOrUpgrade AND EditingAppServer AND NOT EditingMediaServer]]></Publish>
             
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="UpgradeDlg">UPGRADETYPE=0</Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2">Installed AND UPGRADETYPE&lt;&gt;0</Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="UpgradeDlg">NOT CustomInstallOrUpgrade AND NOT REINSTALL</Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2">NOT CustomInstallOrUpgrade AND REINSTALL</Publish>
             
             <Publish Dialog="VerifyReadyDlg" Control="Next" Event="ReinstallMode" Value="m" Order="1">WixUI_InstallMode = Change</Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Next" Event="Reinstall" Value="Registry" Order="2">WixUI_InstallMode = Change</Publish>

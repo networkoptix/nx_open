@@ -57,6 +57,9 @@ const QnVirtualCameraResourcePtr &QnSingleCameraSettingsWidget::camera() const {
 }
 
 void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &camera) {
+    // TODO: re-introduce camera equality check (if (camera == m_camera) return; ), 
+    // move out motionwidget-related code.
+
     m_camera = camera;
     
     QVariant val;
