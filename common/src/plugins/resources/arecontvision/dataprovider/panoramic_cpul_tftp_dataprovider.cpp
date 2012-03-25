@@ -57,7 +57,10 @@ QnMetaDataV1Ptr AVPanoramicClientPullSSTFTPStreamreader::getMetaData()
         return QnMetaDataV1Ptr(0);
 
     if (mdresult.toString() == QLatin1String("no motion"))
+    {
+        motion->channelNumber = m_motionData;
         return motion; // no motion detected
+    }
 
 
     QnPlAreconVisionResourcePtr avRes = getResource().dynamicCast<QnPlAreconVisionResource>();
