@@ -67,6 +67,8 @@ public:
     void unlock();
 
     virtual void setArchiveDelegate(QnAbstractArchiveDelegate* contextDelegate) override;
+
+    virtual QnMediaContextPtr getCodecContext() const override;
 protected:
     virtual bool init();
 
@@ -137,6 +139,7 @@ private:
     QnAbstractMediaDataPtr m_currentData;
     QnAbstractMediaDataPtr m_nextData;
     QQueue<QnAbstractMediaDataPtr> m_skippedMetadata;
+    QnMediaContextPtr m_codecContext;
 
     QMutex m_playbackMaskSync;
     QnPlaybackMaskHelper m_playbackMaskHelper;
