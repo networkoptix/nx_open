@@ -49,7 +49,7 @@ void QnRecordingManager::deleteRecorder(const Recorders& recorders)
     QnVideoCamera* camera = qnCameraPool->getVideoCamera(recorders.recorderHiRes->getResource());
     if (camera)
     {
-        QnAbstractMediaStreamDataProvider* reader = camera->getLiveReader(QnResource::Role_LiveVideo);
+        QnAbstractMediaStreamDataProviderPtr reader = camera->getLiveReader(QnResource::Role_LiveVideo);
         if (reader)
             reader->removeDataProcessor(recorders.recorderHiRes);
 
@@ -86,10 +86,10 @@ Recorders QnRecordingManager::findRecorders(QnResourcePtr res) const
 
 QnServerStreamRecorder* QnRecordingManager::createRecorder(QnResourcePtr res, QnVideoCamera* camera, QnResource::ConnectionRole role)
 {
-    QnAbstractMediaStreamDataProvider* reader = camera->getLiveReader(role);
+    QnAbstractMediaStreamDataProviderPtr reader = camera->getLiveReader(role);
     if (reader == 0)
         return 0;
-    QnServerStreamRecorder* recorder = new QnServerStreamRecorder(res, role, reader);
+    QnServerStreamRecorder* recorder = new QnServerStreamRecorder(res, role, reader.data());
     recorder->setTruncateInterval(RECORDING_CHUNK_LEN);
     reader->addDataProcessor(recorder);
     reader->setNeedKeyData();
@@ -108,8 +108,8 @@ bool QnRecordingManager::isResourceDisabled(QnResourcePtr res) const
 
 void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* camera, QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes)
 {
-    QnAbstractMediaStreamDataProvider* providerHi = camera->getLiveReader(QnResource::Role_LiveVideo);
-    QnAbstractMediaStreamDataProvider* providerLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
+    QnAbstractMediaStreamDataProviderPtr providerHi = camera->getLiveReader(QnResource::Role_LiveVideo);
+    QnAbstractMediaStreamDataProviderPtr providerLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
 
     if (!isResourceDisabled(res) && res->getStatus() != QnResource::Offline && 
         recorderHiRes->currentScheduleTask().getRecordingType() != QnScheduleTask::RecordingType_Never)
@@ -172,8 +172,8 @@ void QnRecordingManager::updateCamera(QnSecurityCamResourcePtr res)
 {
     QMutexLocker lock(&m_mutex);
     QnVideoCamera* camera = qnCameraPool->getVideoCamera(res);
-    QnAbstractMediaStreamDataProvider* providerHi = camera->getLiveReader(QnResource::Role_LiveVideo);
-    QnAbstractMediaStreamDataProvider* providerLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
+    QnAbstractMediaStreamDataProviderPtr providerHi = camera->getLiveReader(QnResource::Role_LiveVideo);
+    QnAbstractMediaStreamDataProviderPtr providerLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
 
     if (camera)
     {

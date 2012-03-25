@@ -666,6 +666,16 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
         for(int i = 0; i < items.size(); i++)
             items[i].uuid = QUuid::createUuid();
         newLayout->setItems(items);
+
+        /* If it is current layout, then roll it back and open the new one instead. */
+        if(layout == workbench()->currentLayout()->resource()) {
+            int index = workbench()->currentLayoutIndex();
+            workbench()->insertLayout(new QnWorkbenchLayout(newLayout, this), index);
+            workbench()->setCurrentLayoutIndex(index);
+            workbench()->removeLayout(index + 1);
+
+            snapshotManager()->restore(layout);
+        }
     }
 
     snapshotManager()->save(newLayout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));

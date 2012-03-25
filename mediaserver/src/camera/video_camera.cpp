@@ -99,8 +99,6 @@ int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, CLDataQueue& dstQueue)
 
 QnVideoCamera::QnVideoCamera(QnResourcePtr resource): m_resource(resource)
 {
-    m_primaryReader = 0;
-    m_secondaryReader = 0;
     m_primaryGopKeeper = 0;
     m_secondaryGopKeeper = 0;
 }
@@ -122,29 +120,19 @@ void QnVideoCamera::beforeStop()
 QnVideoCamera::~QnVideoCamera()
 {
     beforeStop();
-
     delete m_primaryGopKeeper;
     delete m_secondaryGopKeeper;
-
-    delete m_primaryReader;
-    delete m_secondaryReader;
 }
 
 void QnVideoCamera::createReader(QnResource::ConnectionRole role)
 {
     bool primaryLiveStream = role ==  QnResource::Role_LiveVideo;
-    QnAbstractMediaStreamDataProvider* &reader = primaryLiveStream ? m_primaryReader : m_secondaryReader;
-    if (!reader) 
+    QnAbstractMediaStreamDataProviderPtr &reader = primaryLiveStream ? m_primaryReader : m_secondaryReader;
+    if (reader == 0)
     {
-        QnAbstractStreamDataProvider* p = m_resource->createDataProvider(role);
-
-        if (!p)
+        reader = QnAbstractMediaStreamDataProviderPtr(dynamic_cast<QnAbstractMediaStreamDataProvider*> (m_resource->createDataProvider(role)));
+        if (reader == 0)
             return;
-
-        reader = dynamic_cast<QnAbstractMediaStreamDataProvider*> (p);
-        QnClientPullMediaStreamProvider* clientPullReader = dynamic_cast<QnClientPullMediaStreamProvider*> (p);
-        if (clientPullReader)
-            clientPullReader->setExtSync(&m_readersMutex);
 
         QnVideoCameraGopKeeper* gopKeeper = new QnVideoCameraGopKeeper(m_resource);
         if (primaryLiveStream)
@@ -156,7 +144,7 @@ void QnVideoCamera::createReader(QnResource::ConnectionRole role)
     }
 }
 
-QnAbstractMediaStreamDataProvider* QnVideoCamera::getLiveReader(QnResource::ConnectionRole role)
+QnAbstractMediaStreamDataProviderPtr QnVideoCamera::getLiveReader(QnResource::ConnectionRole role)
 {
     QMutexLocker lock(&m_getReaderMutex);
 	if (m_primaryReader == 0 && !m_resource->isDisabled())
