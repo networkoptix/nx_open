@@ -42,7 +42,7 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
         QnVirtualCameraResourceList cameras;
         if (m_appServer->addCamera(cameraResource, cameras, errorString) != 0)
         {
-            qDebug() << "QnAppserverResourceProcessor::processResources(): Call to addCamera failed. Reason: " << errorString;
+            qCritical() << "QnAppserverResourceProcessor::processResources(): Call to addCamera failed. Reason: " << errorString;
             continue;
         }
 
@@ -59,7 +59,7 @@ void QnAppserverResourceProcessor::requestFinished(int status, const QByteArray 
         qDebug() << "Successfully updated resource status" << data;
     } else
     {
-        qDebug() << "Failed to update resource";
+        qCritical() << "Failed to update resource status";
     }
 
 }
