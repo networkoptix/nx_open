@@ -28,6 +28,8 @@
 -->    	
         <SetProperty Id="REBOOT" Value="reallysuppress" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
 
+    	<Property Id="ARPNOREPAIR" Value="1" Secure="yes"/>
+    	
         <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
         <WixVariable Id="WixUIBannerBmp" Value="Binary\eve\eve_logo-493x58.bmp" />
         <WixVariable Id="WixUIDialogBmp" Value="Binary\eve\eve_logo-493x312.bmp" />
@@ -160,7 +162,7 @@
                       Execute="deferred" Return="check" Impersonate="no" />
         
         <CustomAction Id="CloseTrayToolAction_Cmd" Property="CloseTrayToolAction"
-                      Value="&quot;[#traytool.exe]&quot; &quot;quit&quot;" Execute="immediate" Impersonate="yes"/>
+                      Value="&quot;[#traytool.exe]&quot; &quot;quit&quot;" Execute="immediate" Impersonate="no"/>
         <CustomAction Id="CloseTrayToolAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="check" Impersonate="no" />
         
