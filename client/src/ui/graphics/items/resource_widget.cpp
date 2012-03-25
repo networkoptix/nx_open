@@ -178,7 +178,6 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     }
 
     m_footerStatusLabel = new GraphicsLabel();
-    m_footerStatusLabel->setPerformanceHint(QStaticText::AggressiveCaching);
 
     m_footerTimeLabel = new GraphicsLabel();
 
