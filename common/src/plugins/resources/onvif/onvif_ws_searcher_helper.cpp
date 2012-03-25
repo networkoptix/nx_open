@@ -4,6 +4,7 @@
 #include "utils/qtsoap/qtsoap.h"
 #include "utils/network/mac_address.h"
 #include "../digitalwatchdog/digital_watchdog_resource.h"
+#include "../brickcom/brickcom_resource.h"
 
 extern bool multicastJoinGroup(QUdpSocket& udpSocket, QHostAddress groupAddress, QHostAddress localAddress);
 extern bool multicastLeaveGroup(QUdpSocket& udpSocket, QHostAddress groupAddress);
@@ -20,7 +21,7 @@ QnPlOnvifWsSearcherHelper::~QnPlOnvifWsSearcherHelper()
 
 QList<QnPlOnvifWsSearcherHelper::WSResult> QnPlOnvifWsSearcherHelper::findResources()
 {
-    QList<WSResult> result;
+    QMap<QString, WSResult> result;
 
     QList<QHostAddress> localAddresses = getAllIPv4Addresses();
 
@@ -66,7 +67,7 @@ QList<QnPlOnvifWsSearcherHelper::WSResult> QnPlOnvifWsSearcherHelper::findResour
             {
                 res.ip = sender.toString();
                 res.disc_ip = localAddress.toString();
-                result.push_back(res);
+                result[res.mac] = res;
             }
 
         }
@@ -76,24 +77,31 @@ QList<QnPlOnvifWsSearcherHelper::WSResult> QnPlOnvifWsSearcherHelper::findResour
     
     
 
-    return result;
+    return result.values();
 }
 
 
 //=========================================================================
 QnPlOnvifWsSearcherHelper::WSResult QnPlOnvifWsSearcherHelper::parseReply(QByteArray& datagram)
 {
-
-    WSResult result;
     QString reply = QString(datagram);
-    if (!reply.contains("Digital") || !reply.contains("Watchdog"))
+    if (reply.contains("Digital") && reply.contains("Watchdog"))
     {
-        return result;
+        return parseDigitalWachdog(datagram);
+    }
+    else if (reply.contains("WFB"))
+    {
+        return parseBrickCom(datagram);
     }
 
 
+    return WSResult();
 
+}
 
+QnPlOnvifWsSearcherHelper::WSResult QnPlOnvifWsSearcherHelper::parseDigitalWachdog(QByteArray& datagram)
+{
+    WSResult result;
     QDomDocument doc;
     if (!doc.setContent(datagram))
         return result;
@@ -122,6 +130,8 @@ QnPlOnvifWsSearcherHelper::WSResult QnPlOnvifWsSearcherHelper::parseReply(QByteA
 
         mac = lst.back().toUpper();
 
+
+
         if (mac.length()!=12)
             continue;
 
@@ -143,4 +153,66 @@ QnPlOnvifWsSearcherHelper::WSResult QnPlOnvifWsSearcherHelper::parseReply(QByteA
 
 
     return result;
+}
+
+
+QnPlOnvifWsSearcherHelper::WSResult QnPlOnvifWsSearcherHelper::parseBrickCom(QByteArray& datagram)
+{
+    QString reply = QString(datagram);
+
+    WSResult result;
+    QDomDocument doc;
+    if (!doc.setContent(datagram))
+        return result;
+
+    QDomElement root = doc.documentElement();
+
+    QDomNodeList lst = doc.elementsByTagName(QLatin1String("wsa:EndpointReference")); 
+    if (lst.size()<1)
+    {
+        return result;
+    }
+
+
+    QString mac;
+    for (int i = 0; i < lst.size(); ++i)
+    {
+        QDomNode node = lst.at(i);
+        QDomElement addr = node.firstChildElement(QLatin1String("wsa:Address"));
+        if (addr.isNull())
+            continue;
+
+        QString addrText = addr.text();
+        QStringList lst = addrText.split("-", QString::SkipEmptyParts);
+        if (lst.size()<5)
+            continue;
+
+        mac = lst.at(1) + lst.at(2) + lst.at(3);
+
+        if (mac.length()!=12)
+            continue;
+
+        mac = QnMacAddress(mac).toString();
+
+        break;
+    }
+
+
+
+    int index = reply.indexOf("WFB");
+    if (index<0)
+        return result;
+
+    int index2 = reply.indexOf(" ", index);
+    if (index2<0)
+        return result;
+
+
+    result.name = reply.mid(index, index2 - index);
+    result.manufacture = QnPlBrickcomResource::MANUFACTURE;
+    result.mac = mac;
+
+
+    return result;
+
 }

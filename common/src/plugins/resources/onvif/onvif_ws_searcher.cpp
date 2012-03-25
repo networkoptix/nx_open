@@ -1,6 +1,7 @@
 #include "onvif_ws_searcher.h"
 #include "onvif_ws_searcher_helper.h"
 #include "../digitalwatchdog/digital_watchdog_resource.h"
+#include "../brickcom/brickcom_resource.h"
 
 
 QnPlOnvifWsSearcher::QnPlOnvifWsSearcher()
@@ -55,15 +56,18 @@ QnResourcePtr QnPlOnvifWsSearcher::createResource(QnId resourceTypeId, const QnR
 
     if (resourceType->getManufacture() == QnPlWatchDogResource::MANUFACTURE)
     {
-        result = QnVirtualCameraResourcePtr( new QnPlWatchDogResource() );
+        result = QnNetworkResourcePtr( new QnPlWatchDogResource() );
     }
-    else
-        return result;
+    else if (resourceType->getManufacture() == QnPlBrickcomResource::MANUFACTURE)
+    {
+        result = QnNetworkResourcePtr( new QnPlBrickcomResource() );
+    }
+        
 
     
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create onwif camera resource. typeID:" << resourceTypeId.toString() << ", Parameters: " << parameters;
+    qDebug() << "Create onvif camera resource. typeID:" << resourceTypeId.toString() << ", Parameters: " << parameters;
 
     result->deserialize(parameters);
 
@@ -94,6 +98,11 @@ QnNetworkResourcePtr QnPlOnvifWsSearcher::createResource(const QString& manufact
     {
         result = QnNetworkResourcePtr(new QnPlWatchDogResource());
     }
+    else if (manufacture == QnPlBrickcomResource::MANUFACTURE)
+    {
+        result = QnNetworkResourcePtr(new QnPlBrickcomResource());
+    }
+
         
     if (result)
         result->setTypeId(rt);
