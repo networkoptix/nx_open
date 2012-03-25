@@ -18,8 +18,14 @@
         <?define suffix = "" ?>
         <?endif?>
         
-        <SetProperty Id="REINSTALLMODE" Value="vomus" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
+    	<?define VmsInstalling=" (NOT Installed AND NOT PREVIOUSVERSIONSINSTALLED) "?>
+    	<?define VmsUpgrading=" (NOT Installed AND PREVIOUSVERSIONSINSTALLED)" ?>
+    	<?define VmsChanging=" (Installed AND REMOVE <> "ALL") "?>
+    	<?define VmsRemoving=" (Installed AND REMOVE = "ALL") "?>
+    	
+<!--        <SetProperty Id="REINSTALLMODE" Value="vomus" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
         <SetProperty Id="REINSTALL" Value="ALL" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
+-->    	
         <SetProperty Id="REBOOT" Value="reallysuppress" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
 
         <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
@@ -40,7 +46,6 @@
         
         <Property Id="INSTALLTYPE" Value="0"/>
         <Property Id="ADVANCEDTYPE" Value="0"/>
-        <Property Id="UPGRADETYPE" Value="0"/>
         
         <Property Id="NEWERFOUND" Secure="yes"/>
         
@@ -208,11 +213,11 @@
             
 <!--            <Custom Action="CloseTrayToolAction" Before="RemoveExistingProducts" />-->
 <!--            <RemoveExistingProducts After="InstallInitialize" />-->
-            <Custom Action="CloseTrayToolAction_Cmd" Before="CloseTrayToolAction">Installed</Custom>
-            <Custom Action="CloseTrayToolAction" Before="StopServices">Installed</Custom>
-            <Custom Action="InitDatabaseAction_Cmd" After="InstallFiles"><![CDATA[(NOT Installed AND &AppServerFeature=3) OR (REINSTALL AND !AppServerFeature)]]></Custom>
-            <Custom Action="InitDatabaseAction" After="InitDatabaseAction_Cmd"><![CDATA[NOT Installed AND &AppServerFeature=3 OR (REINSTALL AND !AppServerFeature)]]></Custom>
-            <Custom Action="LaunchApplication" After="RemoveExistingProducts"><![CDATA[!ServerFeature=3 OR &ServerFeature=3]]></Custom>
+            <Custom Action="CloseTrayToolAction_Cmd" Before="CloseTrayToolAction"><![CDATA[ NOT $(var.VmsInstalling) ]]></Custom>
+            <Custom Action="CloseTrayToolAction" Before="StopServices"><![CDATA[ NOT $(var.VmsInstalling) ]]></Custom>
+            <Custom Action="InitDatabaseAction_Cmd" After="InstallFiles"><![CDATA[ ($(var.VmsInstalling) AND &AppServerFeature=3) ]]></Custom>
+            <Custom Action="InitDatabaseAction" After="InitDatabaseAction_Cmd"><![CDATA[ $(var.VmsInstalling) AND &AppServerFeature=3 ]]></Custom>
+            <Custom Action="LaunchApplication" After="RemoveExistingProducts"><![CDATA[ !ServerFeature=3 OR &ServerFeature=3 OR !AppServerFeature=3 OR &AppServerFeature=3 ]]></Custom>
         </InstallExecuteSequence>
         
         <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
@@ -259,7 +264,6 @@
                     <Directory Id="INSTALLDIR" Name="$(env.APPLICATION_NAME)">
                         <Directory Id="VmsAppServerDir" Name="Enterprise Controller">
                             <Component Id="AppServerExecutable" Guid="{5FB5A627-BB1F-4d82-A06C-7672903DA4C7}">
-                                <Condition>NOT REINSTALL</Condition>
                                 <File Id="ecexe" Name="ecs.exe" Source="../appserver/setup/build/exe.win32-2.7/ecs.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionAppServer" Name="Network Optix Enterprise Controller" Scope="any" IgnoreFailure="yes" />
                                 </File>
@@ -286,7 +290,7 @@
                         	
                             <Component Id="AppServerConfiguration" Guid="{46C18E7E-D25C-4250-AF5F-0237EEFAA80E}" Permanent="yes">
                                 <Condition>
-                                    NOT PREVIOUSVERSIONSINSTALLED OR UPGRADETYPE=0
+                                    NOT PREVIOUSVERSIONSINSTALLED
                                 </Condition>
                                 
                                 <RegistryKey Root="HKLM"
@@ -301,7 +305,6 @@
                         
                         <Directory Id="VmsTrayToolDir" Name="TrayTool">
                             <Component Id="traytool.exe" Guid="{11772981-5229-4D14-B126-66906570AD57}">
-                                <Condition>NOT REINSTALL</Condition>
                                 <File Id="traytool.exe" Name="traytool.exe" Source="../traytool/bin/$(env.CONFIG)/traytool.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionVmsTrayTool" Name="VMS Tray Tool" Scope="any" IgnoreFailure="yes"/>
                                     
@@ -323,7 +326,6 @@
                         
                         <Directory Id="VmsMediaServerDir" Name="MediaServer">
                             <Component Id="ServerExecutable" Guid="06DFA703-0266-4970-BAC1-3730BF7D1C66">
-                                <Condition>NOT REINSTALL</Condition>
                                 <File Id="ServerExe" Name="mediaserver.exe" Source="../mediaserver/bin/$(env.CONFIG)/mediaserver.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionMediaServer" Name="Network Optix Media Server" Scope="any" IgnoreFailure="yes"/>
                                 </File>
@@ -344,7 +346,7 @@
                             
                             <Component Id="ServerConfiguration" Guid="{C3BA240A-2D18-4723-B084-D2774F51D1B0}" Permanent="yes">
                                 <Condition>
-                                    NOT PREVIOUSVERSIONSINSTALLED OR UPGRADETYPE=0
+                                    NOT PREVIOUSVERSIONSINSTALLED
                                 </Condition>
 
                                 <RegistryKey Root="HKLM"
@@ -397,7 +399,6 @@
                         
                         <Directory Id="VmsClientDir" Name="Client">
                             <Component Id="ClientExecutable" Guid="{7AAC7815-50A6-4dc9-ADD2-BDD9B7EE8FEF}">
-                                <Condition>NOT REINSTALL</Condition>
                                 <File Id="ClientExe" Name="client.exe" Source="../client/bin/$(env.CONFIG)/client.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionClient" Name="HD Witness" Scope="any" IgnoreFailure="yes"/>
                                     
@@ -413,7 +414,7 @@
                             
                             <Component Id="ClientConfiguration" Guid="{8AC01524-8F3A-46ba-8A85-24B3709CEDDE}" Permanent="yes">
                                 <Condition>
-                                    NOT PREVIOUSVERSIONSINSTALLED OR UPGRADETYPE=0
+                                    NOT PREVIOUSVERSIONSINSTALLED
                                 </Condition>
 
                                 <RegistryKey Root="HKCU"
@@ -526,6 +527,8 @@
         
         <Feature Id="AppServerFeature" Title="$(env.APPLICATION_NAME) Enterprise Controller" Level="1"
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="hidden" >
+        	<Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !AppServerFeature <> 3 ]]> </Condition>
+        	
             <ComponentGroupRef Id="AppServerFilesComponent" />
             <ComponentRef Id="AppServerExecutable" />
             <ComponentRef Id="ecs.db" />
@@ -534,6 +537,8 @@
         </Feature>
         
         <Feature Id="TrayToolFeature" Title="Tray Tool" AllowAdvertise="no" Display="hidden" Level="1">
+        	<Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !TrayToolFeature <> 3 ]]> </Condition>
+        	
             <ComponentRef Id="traytool.exe"/>
             <ComponentRef Id="TrayToolQTLibraries"/>
             <ComponentRef Id="UninstallProgramMenuFolder"/>
@@ -541,6 +546,8 @@
         
         <Feature Id="ServerFeature" Title="$(env.APPLICATION_NAME) Media Server" Level="1"
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
+        	<Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !ServerFeature <> 3 ]]> </Condition>
+        	
             <ComponentRef Id='ServerDirectoryComponent'/>
             <ComponentRef Id='ServerConfiguration'/>
             
@@ -554,7 +561,7 @@
         
         <Feature Id="ClientFeature" Title="$(env.APPLICATION_NAME) Client" Level="1"
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
-            <!--            <FeatureRef Id='EveMediaPlayerFileAssociations' />-->
+            <Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !ClientFeature <> 3 ]]> </Condition>
             
             <ComponentRef Id="ClientExecutable" />
             <ComponentRef Id="ClientConfiguration" />
@@ -617,8 +624,7 @@
             <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="UpgradeDlg">PREVIOUSVERSIONSINSTALLED</Publish>
             
             <Publish Dialog="UpgradeDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
-            <Publish Dialog="UpgradeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">UPGRADETYPE=0</Publish>
-            <Publish Dialog="UpgradeDlg" Control="Next" Event="NewDialog" Value="InstallTypeDlg">UPGRADETYPE=1</Publish>
+            <Publish Dialog="UpgradeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
             
             <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="DowngradeWarningDlg">NEWERFOUND</Publish>
             
@@ -630,9 +636,7 @@
             
             <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="InstallTypeDlg">LicenseAccepted = "1"</Publish>
             
-            <Publish Dialog="InstallTypeDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg">NOT REINSTALL AND NOT PREVIOUSVERSIONSINSTALLED</Publish>
-            <Publish Dialog="InstallTypeDlg" Control="Back" Event="NewDialog" Value="UpgradeDlg">NOT REINSTALL AND PREVIOUSVERSIONSINSTALLED</Publish>
-        	<Publish Dialog="InstallTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg">REINSTALL</Publish>
+            <Publish Dialog="InstallTypeDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg">1</Publish>
             
             <Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="PasswordDlg">INSTALLTYPE=0</Publish>
             <Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="AdvancedTypeDlg">INSTALLTYPE=1</Publish>
@@ -646,21 +650,40 @@
             <Publish Dialog="AdvancedTypeDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg">1</Publish>
             <Publish Dialog="AdvancedTypeDlg" Control="Next" Event="NewDialog" Value="MyFeaturesDlg">1</Publish>
             
-            <Publish Dialog="MyFeaturesDlg" Control="Back" Event="NewDialog" Value="AdvancedTypeDlg">1</Publish>
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="InstallDirDlg">1</Publish>
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="SpawnDialog" Value="SelectionWarningDlg" Order="10">
-                <![CDATA[(NOT(&AppServerFeature=3) AND NOT(&ServerFeature=3) AND NOT(&ClientFeature=3))]]>
-            </Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Back" Event="NewDialog" Value="AdvancedTypeDlg"><![CDATA[ NOT $(var.VmsChanging) ]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg"><![CDATA[ $(var.VmsChanging) ]]></Publish>
+        	
+        	<?define SomeFeaturesSelected="(!ServerFeature=3 OR &ServerFeature=3 OR !ClientFeature=3 OR &ClientFeature=3)"?>
+        	
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="SpawnDialog" Value="SelectionWarningDlg"><![CDATA[NOT $(var.SomeFeaturesSelected)]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="InstallDirDlg"><![CDATA[$(var.SomeFeaturesSelected) AND $(var.VmsInstalling)]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg"><![CDATA[$(var.SomeFeaturesSelected) AND NOT $(var.VmsInstalling) AND &ServerFeature=3]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg"><![CDATA[$(var.SomeFeaturesSelected) AND NOT $(var.VmsInstalling) AND &ServerFeature<>3]]></Publish>
             
             <!-- Reset values in case when user returns to this dialog after AppServerDlg -->
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="SERVER_APPSERVER_HOST" Value="{}" Order="4">1</Publish>
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="SERVER_APPSERVER_PORT" Value="{}" Order="4">1</Publish>
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="SERVER_APPSERVER_LOGIN" Value="{}" Order="4">1</Publish>
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="SERVER_APPSERVER_PASSWORD" Value="{}" Order="4" >1</Publish>
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="CLIENT_APPSERVER_HOST" Value="{}" Order="4">1</Publish>
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="CLIENT_APPSERVER_PORT" Value="{}" Order="4">1</Publish>
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="CLIENT_APPSERVER_LOGIN" Value="{}" Order="4">1</Publish>
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="CLIENT_APPSERVER_PASSWORD" Value="{}" Order="4" >1</Publish>
+
+			<?define AppServerInstallingMediaServer="($(var.VmsChanging) AND !AppServerFeature=3 AND &ServerFeature=3)"?>
+			<?define AppServerInstallingClient="($(var.VmsChanging) AND !AppServerFeature=3 AND &ClientFeature=3)"?>
+        	
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="SERVER_APPSERVER_HOST" Value="localhost" Order="4"><![CDATA[ $(var.AppServerInstallingMediaServer) ]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="SERVER_APPSERVER_PORT" Value="[APPSERVER_PORT]" Order="4"><![CDATA[ $(var.AppServerInstallingMediaServer) ]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="SERVER_APPSERVER_LOGIN" Value="[APPSERVER_LOGIN]" Order="4"><![CDATA[ $(var.AppServerInstallingMediaServer) ]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="SERVER_APPSERVER_PASSWORD" Value="[APPSERVER_PASSWORD]" Order="4" ><![CDATA[ $(var.AppServerInstallingMediaServer) ]]></Publish>
+        	
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="SERVER_APPSERVER_HOST" Value="{}" Order="4"><![CDATA[ NOT $(var.AppServerInstallingMediaServer) ]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="SERVER_APPSERVER_PORT" Value="{}" Order="4"><![CDATA[ NOT $(var.AppServerInstallingMediaServer) ]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="SERVER_APPSERVER_LOGIN" Value="{}" Order="4"><![CDATA[ NOT $(var.AppServerInstallingMediaServer) ]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="SERVER_APPSERVER_PASSWORD" Value="{}" Order="4" ><![CDATA[ NOT $(var.AppServerInstallingMediaServer) ]]></Publish>
+        	
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="CLIENT_APPSERVER_HOST" Value="localhost" Order="4"><![CDATA[ $(var.AppServerInstallingClient) ]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="CLIENT_APPSERVER_PORT" Value="[APPSERVER_PORT]" Order="4"><![CDATA[ $(var.AppServerInstallingClient) ]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="CLIENT_APPSERVER_LOGIN" Value="[APPSERVER_LOGIN]" Order="4"><![CDATA[ $(var.AppServerInstallingClient) ]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="CLIENT_APPSERVER_PASSWORD" Value="[APPSERVER_PASSWORD]" Order="4" ><![CDATA[ $(var.AppServerInstallingClient) ]]></Publish>
+        	
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="CLIENT_APPSERVER_HOST" Value="{}" Order="4"><![CDATA[ NOT $(var.AppServerInstallingClient) ]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="CLIENT_APPSERVER_PORT" Value="{}" Order="4"><![CDATA[ NOT $(var.AppServerInstallingClient) ]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="CLIENT_APPSERVER_LOGIN" Value="{}" Order="4"><![CDATA[ NOT $(var.AppServerInstallingClient) ]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="CLIENT_APPSERVER_PASSWORD" Value="{}" Order="4" ><![CDATA[ NOT $(var.AppServerInstallingClient) ]]></Publish>
             
             <Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg">1</Publish>
             <Publish Dialog="InstallDirDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
@@ -703,8 +726,10 @@
             <Publish Dialog="PortIsBusyDlg" Control="Back" Event="NewDialog" Value="[PORT_DIALOG_BACK]">1</Publish>
             <Publish Dialog="PortIsBusyDlg" Control="Next" Event="NewDialog" Value="[PORT_DIALOG_NEXT]">1</Publish>
             
-            <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="AppServerDlg"><![CDATA[(&AppServerFeature=3)]]></Publish>
-            <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg"><![CDATA[(&AppServerFeature<>3)]]></Publish>
+            <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="AppServerDlg"><![CDATA[$(var.VmsInstalling) AND &AppServerFeature=3]]></Publish>
+            <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg"><![CDATA[$(var.VmsInstalling) AND &AppServerFeature<>3]]></Publish>
+        	<Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg"><![CDATA[NOT $(var.VmsInstalling)]]></Publish>
+
             
             <?define IsPortsValid="((&AppServerFeature=3 AND SERVER_RTSP_PORT<>APPSERVER_PORT AND SERVER_API_PORT<>APPSERVER_PORT AND SERVER_API_PORT<>SERVER_RTSP_PORT) OR (&AppServerFeature<>3 AND SERVER_API_PORT<>SERVER_RTSP_PORT))" ?>
             <?define IsSettingsFilled="(SERVER_RTSP_PORT AND SERVER_API_PORT AND SERVER_APPSERVER_HOST AND SERVER_APPSERVER_PORT AND SERVER_APPSERVER_LOGIN AND SERVER_APPSERVER_PASSWORD)"?>
@@ -736,22 +761,23 @@
             <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_BACK" Value="MediaServerDlg">1</Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_NEXT" Value="VerifyReadyDlg">1</Publish>
             
-        	<?define CustomInstallOrUpgrade="(NOT PREVIOUSVERSIONSINSTALLED OR UPGRADETYPE=1)"?>
-        	<?define EditingAppServer="INSTALLTYPE=1 AND ((NOT Installed AND &AppServerFeature=3) OR (Installed AND !AppServerFeature))"?>
-        	<?define EditingMediaServer="INSTALLTYPE=1 AND ((NOT Installed AND &ServerFeature=3) OR (Installed AND !ServerFeature))"?>
+        	<?define EditingAppServer="(INSTALLTYPE=1 AND &AppServerFeature=3)"?>
+        	<?define EditingMediaServer="(INSTALLTYPE=1 AND &ServerFeature=3)"?>
         	
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg" Order="1"><![CDATA[CustomInstallOrUpgrade AND INSTALLTYPE=0]]></Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg" Order="1"><![CDATA[CustomInstallOrUpgrade AND EditingMediaServer]]></Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="AppServerDlg" Order="1"><![CDATA[CustomInstallOrUpgrade AND EditingAppServer AND NOT EditingMediaServer]]></Publish>
+        	<Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg"><![CDATA[ NOT $(var.VmsInstalling) AND &ServerFeature<>3 ]]></Publish>        	
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="PasswordDlg"><![CDATA[ $(var.VmsInstalling) AND INSTALLTYPE=0 ]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg"><![CDATA[ $(var.VmsInstalling) AND $(var.EditingMediaServer) ]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="AppServerDlg" ><![CDATA[ $(var.VmsInstalling) AND $(var.EditingAppServer) AND NOT $(var.EditingMediaServer) ]]></Publish>
+        	<Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg"><![CDATA[ $(var.VmsInstalling) AND NOT $(var.EditingAppServer) AND NOT $(var.EditingMediaServer) ]]></Publish>
             
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="UpgradeDlg">NOT CustomInstallOrUpgrade AND NOT REINSTALL</Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2">NOT CustomInstallOrUpgrade AND REINSTALL</Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="UpgradeDlg"><![CDATA[$(var.VmsUpgrading)]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2"><![CDATA[$(var.VmsChanging)]]></Publish>
             
-            <Publish Dialog="VerifyReadyDlg" Control="Next" Event="ReinstallMode" Value="m" Order="1">WixUI_InstallMode = Change</Publish>
+<!--            <Publish Dialog="VerifyReadyDlg" Control="Next" Event="ReinstallMode" Value="m" Order="1">WixUI_InstallMode = Change</Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Next" Event="Reinstall" Value="Registry" Order="2">WixUI_InstallMode = Change</Publish>
-            
+-->            
             <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
-            <Publish Dialog="MaintenanceTypeDlg" Control="ChangeButton" Event="NewDialog" Value="InstallTypeDlg">1</Publish>
+            <Publish Dialog="MaintenanceTypeDlg" Control="ChangeButton" Event="NewDialog" Value="MyFeaturesDlg">1</Publish>
             <Publish Dialog="MaintenanceTypeDlg" Control="RepairButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
             <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Property="REMOVE" Value="ALL">1</Publish>
             <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
