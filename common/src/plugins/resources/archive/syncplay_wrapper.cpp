@@ -554,7 +554,7 @@ void QnArchiveSyncPlayWrapper::onEofReached(QnlTimeSource* source, bool value)
     for (QList<ReaderInfo>::iterator i = d->readers.begin(); i < d->readers.end(); ++i)
     {
         if (i->enabled)
-            allReady &= i->isEOF;
+            allReady &= (i->isEOF || i->reader->isRealTimeSource());
     }
 
     if (allReady)

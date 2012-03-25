@@ -171,3 +171,8 @@ void QnAbstractMediaStreamDataProvider::checkTime(QnAbstractMediaDataPtr data)
         }
     }
 }
+
+QnMediaContextPtr QnAbstractMediaStreamDataProvider::getCodecContext() const
+{
+    return QnMediaContextPtr();
+}

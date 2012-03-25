@@ -30,6 +30,7 @@ public:
 	virtual bool needKeyData(int channel) const;
 	virtual bool needKeyData() const;
 
+    virtual QnMediaContextPtr getCodecContext() const;
 
 protected:
     virtual QnAbstractMediaDataPtr getNextData() = 0;

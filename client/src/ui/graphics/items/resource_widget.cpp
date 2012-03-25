@@ -37,6 +37,7 @@
 #include "settings.h"
 #include "math.h"
 #include "image_button_widget.h"
+#include "utils/media/ffmpeg_helper.h"
 
 namespace {
 
@@ -647,7 +648,12 @@ void QnResourceWidget::updateOverlayText() {
         mbps += statistics->getBitrate();
     }
 
-    m_footerStatusLabel->setText(tr("%1fps @ %2Mbps").arg(fps, 0, 'g', 2).arg(mbps, 0, 'g', 2));
+    QString codecName;
+    QnMediaContextPtr codec = m_display->mediaProvider()->getCodecContext();
+    if (codec && codec->ctx()) 
+        codecName = codecIDToString(codec->ctx()->codec_id);
+
+    m_footerStatusLabel->setText(tr("%1fps @ %2Mbps (%3)").arg(fps, 0, 'g', 2).arg(mbps, 0, 'g', 2).arg(codecName));
 }
 
 

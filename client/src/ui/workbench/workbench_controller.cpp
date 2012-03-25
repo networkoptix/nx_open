@@ -485,11 +485,11 @@ void QnWorkbenchController::startRecording()
     if (m_recordingLabel == 0)
         m_recordingLabel = new QLabel(view);
     m_recordingLabel->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool);
-    m_recordingLabel->resize(200, 200);
+    m_recordingLabel->resize(220, 165);
     m_recordingLabel->move(view->mapToGlobal(QPoint(0, 0)) + toPoint(view->size() - m_recordingLabel->size()) / 2);
 
     m_recordingLabel->setMask(createRoundRegion(18, 18, m_recordingLabel->rect()));
-    m_recordingLabel->setText(tr("Recording start in..."));
+    m_recordingLabel->setText(tr("Recording in..."));
     m_recordingLabel->setAlignment(Qt::AlignCenter);
     m_recordingLabel->setStyleSheet(QLatin1String("QLabel { font-size:22px; border-width: 2px; border-style: inset; border-color: #535353; border-radius: 18px; background: #212150; color: #a6a6a6; selection-background-color: lightblue }"));
     m_recordingLabel->setFocusPolicy(Qt::NoFocus);
@@ -555,7 +555,7 @@ void QnWorkbenchController::at_recordingAnimation_valueChanged(const QVariant &)
     double d = normValue * (TICKS+1);
     if (d < TICKS) {
         const int n = int (d) + 1;
-        label->setText(tr("Recording start in...") + QString::number(n));
+        label->setText(tr("Recording in...") + QString::number(n));
     }
 }
 
