@@ -42,7 +42,7 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
         QnVirtualCameraResourceList cameras;
         if (m_appServer->addCamera(cameraResource, cameras, errorString) != 0)
         {
-            qDebug() << "QnAppserverResourceProcessor::processResources(): Call to addCamera failed. Reason: " << errorString;
+            qCritical() << "QnAppserverResourceProcessor::processResources(): Call to addCamera failed. Reason: " << errorString;
             continue;
         }
 
