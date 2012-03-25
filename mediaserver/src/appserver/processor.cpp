@@ -59,7 +59,7 @@ void QnAppserverResourceProcessor::requestFinished(int status, const QByteArray 
         qDebug() << "Successfully updated resource status" << data;
     } else
     {
-        qDebug() << "Failed to update resource";
+        qCritical() << "Failed to update resource status";
     }
 
 }
