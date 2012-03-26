@@ -74,17 +74,15 @@ struct AnDroidDev
         android = false;
         QString request;
 
-        QString t = QHostAddress(ip).toString();
-        if (t=="192.168.1.135")
-            t = t;
+        TCPSocket sock;
+        sock.setReadTimeOut(500);
+        sock.setWriteTimeOut(500);
 
-        CLSimpleHTTPClient httpClient(QHostAddress(ip), 8080, 2000, QAuthenticator());
-        httpClient.doGET(request);
-
-        if (httpClient.isOpened())
+        if (sock.connect(QHostAddress(ip).toString().toLatin1().data(), 8080))
         {
             android = true;
-            localAddr = httpClient.getLocalHost().toString();
+            
+            localAddr = sock.getLocalAddress();
         }
 
     }

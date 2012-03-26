@@ -444,9 +444,13 @@ void QnWorkbenchController::moveCursor(const QPoint &direction) {
             upos = vpos;
         }
     }
+
+    QnWorkbench::ItemRole role = QnWorkbench::ZOOMED;
+    if(!workbench()->item(role))
+        role = QnWorkbench::RAISED;
     
-    if(newItem != NULL && (newItem != item || item != workbench()->item(QnWorkbench::RAISED))) {
-        workbench()->setItem(QnWorkbench::RAISED, newItem);
+    if(newItem != NULL && (newItem != item || item != workbench()->item(role))) {
+        workbench()->setItem(role, newItem);
 
         display()->scene()->clearSelection();
         display()->widget(newItem)->setSelected(true);
@@ -627,8 +631,7 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
     case Qt::Key_Enter:
     case Qt::Key_Return: {
         QList<QGraphicsItem *> items = display()->scene()->selectedItems();
-        QGraphicsItem *focusedItem = display()->scene()->focusItem();
-        if(items.size() == 1 && (items[0] == focusedItem || !focusedItem || items[0] == display()->widget(QnWorkbench::RAISED))) {
+        if(items.size() == 1 && dynamic_cast<QnResourceWidget *>(items[0])) {
             if(items[0] == display()->widget(QnWorkbench::ZOOMED)) {
                 menu()->trigger(Qn::UnmaximizeItemAction, items);
             } else {
@@ -1070,6 +1073,9 @@ void QnWorkbenchController::at_display_widgetChanged(QnWorkbench::ItemRole role)
         return;
 
     m_widgetByRole[role] = widget;
+
+    if(widget)
+        widget->setFocus();
 
     switch(role) {
     case QnWorkbench::ZOOMED: {
