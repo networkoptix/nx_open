@@ -23,9 +23,6 @@
     	<?define VmsChanging=" (Installed AND REMOVE <> "ALL") "?>
     	<?define VmsRemoving=" (Installed AND REMOVE = "ALL") "?>
     	
-<!--        <SetProperty Id="REINSTALLMODE" Value="vomus" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
-        <SetProperty Id="REINSTALL" Value="ALL" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
--->    	
         <SetProperty Id="REBOOT" Value="reallysuppress" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
     	<SetProperty Id="PREVIOUSVERSIONSINSTALLED" Value="[MIGRATE]" After="FindRelatedProducts"/>
 
@@ -40,7 +37,7 @@
         <Icon Id="icon_desktop.exe" SourceFile="Binary\eve\eve_logo.ico"/>
         <Icon Id="eve_logo.ico" SourceFile="Binary\eve\eve_logo.ico"/>
         
-<!--        <Property Id="MSIRESTARTMANAGERCONTROL" Value="Disable" Secure="yes"/> -->
+        <Property Id="MSIRESTARTMANAGERCONTROL" Value="Disable" Secure="yes"/>
         
         <!-- Properties -->
         <Property Id="WelcomeDlg_Title" Value="$(env.APPLICATION_NAME)(beta) Setup" />
@@ -50,13 +47,7 @@
         <Property Id="INSTALLTYPE" Value="0"/>
         <Property Id="ADVANCEDTYPE" Value="0"/>
         
-        <Property Id="NEWERFOUND" Secure="yes"/>
-        
-        <!--        <Property Id="ALLUSERS" Secure="yes"/> -->
-        <Property Id="PREVIOUSVERSIONSINSTALLED" Secure="yes" />
-        
         <Property Id="BUSYPORT" Secure="yes"/>
-
         <Property Id="DUMMY_APPSERVER_LOGIN" Value="admin"/>
         
         <!-- AppServer properties-->
@@ -104,6 +95,15 @@
             </RegistrySearch>
         </Property>
 
+        <Property Id="SERVER_GUID" Secure="yes">
+            <RegistrySearch Id="ServerGuidReg"
+                            Root="HKLM"
+                            Key="Software\Network Optix\Network Optix Media Server"
+                            Name="serverGuid"
+                            Type="raw"
+                            Win64="no"/>
+        </Property>
+    	
         <Property Id="IS_SERVER_DIRECTORY_REG" Secure="yes">
             <DirectorySearch Id='DirectorySearch1' Path='[SERVER_DIRECTORY_REG]'/>
         </Property>
@@ -129,6 +129,7 @@
         <!-- Custom actions -->
         <CustomAction Id="ResetPreselected" Property="Preselected" Value="" />
         <CustomAction Id="SetMoviesFolder" BinaryKey="CustomActions.dll" DllEntry="SetMoviesFolder" />
+    	<CustomAction Id="SetNewGuidForServer" BinaryKey="CustomActions.dll" DllEntry="SetNewGuidForServer"/>
         <CustomAction Id="MissingFeature"  Error="At least one component should be selected"/>
         
         <CustomAction Id="CheckServerDriveLowSpace" BinaryKey="CustomActions.dll" DllEntry="CheckServerDriveLowSpace"/>
@@ -168,6 +169,7 @@
                       Execute="deferred" Return="ignore" Impersonate="no" />
         
         <CustomAction Id="LaunchApplication" FileKey="traytool.exe" ExeCommand="" Execute="immediate" Impersonate="yes" Return="asyncNoWait"/>
+    	<CustomAction Id="NoDowngrade" Error="NoDowngrade" /> 
         
         <!--        <CustomAction Id="StartAppOnExit" FileKey="ClientExe" ExeCommand="" Execute="immediate" Impersonate="yes" Return="asyncNoWait"/>-->
         
@@ -183,7 +185,7 @@
                 Minimum="0.0.0.0" Maximum="$(env.APPLICATION_VERSION).$(env.BUILD_NUMBER)"
                 Property="PREVIOUSVERSIONSINSTALLED"
                 IncludeMinimum="yes" IncludeMaximum="yes" />
-            <UpgradeVersion OnlyDetect='no' Property='NEWERFOUND' Minimum='$(env.APPLICATION_VERSION).$(env.BUILD_NUMBER)' IncludeMinimum='no' />
+            <UpgradeVersion OnlyDetect='no' Property='NEWERVERSIONINSTALLED' Minimum='$(env.APPLICATION_VERSION).$(env.BUILD_NUMBER)' IncludeMinimum='no' />
         </Upgrade>
 -->
         <InstallUISequence>
@@ -200,7 +202,8 @@
             <Custom Action="AssignServerApiPort" Before="AssignServerAppServerPort">NOT SERVER_API_PORT</Custom>
             <Custom Action="AssignServerAppServerPort" Before="AssignClientAppServerPort">1</Custom>
             <Custom Action="AssignClientAppServerPort" Before="SetMoviesFolder">1</Custom>
-            <Custom Action="SetMoviesFolder" Before="AssignClientFolder" />
+            <Custom Action="SetMoviesFolder" Before="SetNewGuidForServer" />
+        	<Custom Action="SetNewGuidForServer" Before="AssignClientFolder">NOT SERVER_GUID</Custom>
             
             <Custom Action="ResetClientFolder" Before="CostInitialize"/>
             <Custom Action="ResetServerFolder" Before="CostInitialize">IS_SERVER_DIRECTORY_REG</Custom>
@@ -351,6 +354,14 @@
                                 <ServiceControl Id="StopVmsServerService" Name="VmsMediaServer" Stop="both" Wait="yes" Remove="uninstall" />
                             </Component>
                             
+                            <Component Id="ServerConfigurationGuid" Guid="{A2F8AEC6-3050-4262-BEAF-3645943D932F}" Permanent="yes" NeverOverwrite="yes">
+                                <RegistryKey Root="HKLM"
+                                             Key="Software\[Manufacturer]\Network Optix Media Server"
+                                             Action="create">
+                            		<RegistryValue Type="string" Name="serverGuid" Value="[SERVER_GUID]" KeyPath="yes"/>
+                                </RegistryKey>
+                           	</Component>
+                        	
                             <Component Id="ServerConfiguration" Guid="{C3BA240A-2D18-4723-B084-D2774F51D1B0}" Permanent="yes">
                                 <Condition>
                                     NOT PREVIOUSVERSIONSINSTALLED
@@ -358,7 +369,7 @@
 
                                 <RegistryKey Root="HKLM"
                                              Key="Software\[Manufacturer]\Network Optix Media Server"
-                                             Action="createAndRemoveOnUninstall">
+                                             Action="create">
                                     <RegistryValue Type="string" Name="appserverHost" Value="[SERVER_APPSERVER_HOST]"/>
                                     <RegistryValue Type="string" Name="appserverPort" Value="[SERVER_APPSERVER_PORT]"/>
                                     <RegistryValue Type="string" Name="appserverLogin" Value="[SERVER_APPSERVER_LOGIN]"/>
@@ -366,6 +377,7 @@
                                     <RegistryValue Type="string" Name="rtspPort" Value="[SERVER_RTSP_PORT]"/>
                                     <RegistryValue Type="string" Name="apiPort" Value="[SERVER_API_PORT]"/>
                                     <RegistryValue Type="string" Name="mediaDir" Value="[SERVER_DIRECTORY]"/>
+                            		<RegistryValue Type="string" Name="serverGuid" Value="[SERVER_GUID]"/>
                                 </RegistryKey>
                             </Component>
                             
@@ -557,6 +569,7 @@
         	
             <ComponentRef Id='ServerDirectoryComponent'/>
             <ComponentRef Id='ServerConfiguration'/>
+            <ComponentRef Id='ServerConfigurationGuid'/>
             
             <ComponentRef Id="ServerExecutable" />
             <ComponentRef Id="ServerFFmpegLibraries"/>
@@ -627,20 +640,16 @@
             <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
             <!--            <Publish Dialog="ExitDialog" Control="Finish" Order="1" Event="DoAction" Value="StartAppOnExit">WIXUI_EXITDIALOGOPTIONALCHECKBOX</Publish>-->
             
-            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg">NOT NEWERFOUND</Publish>          
+            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg">NOT PREVIOUSVERSIONSINSTALLED</Publish>          
             <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="UpgradeDlg">PREVIOUSVERSIONSINSTALLED</Publish>
             
             <Publish Dialog="UpgradeDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
             <Publish Dialog="UpgradeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
             
-            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="DowngradeWarningDlg">NEWERFOUND</Publish>
-            
             <Publish Dialog="DowngradeWarningDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg">1</Publish>
             <Publish Dialog="DowngradeWarningDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
             
-            <Publish Dialog="LicenseAgreementDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">NOT NEWERFOUND</Publish>
-            <Publish Dialog="LicenseAgreementDlg" Control="Back" Event="NewDialog" Value="DowngradeWarningDlg">NEWERFOUND</Publish>
-            
+            <Publish Dialog="LicenseAgreementDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
             <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="InstallTypeDlg">LicenseAccepted = "1"</Publish>
             
             <Publish Dialog="InstallTypeDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg">1</Publish>

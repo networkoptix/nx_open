@@ -6,6 +6,36 @@
 #include "Utils.h"
 
 /**
+  * Create new GUID for server
+  */
+UINT __stdcall SetNewGuidForServer(MSIHANDLE hInstall)
+{
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+
+    hr = WcaInitialize(hInstall, "SetNewGuidForServer");
+    ExitOnFailure(hr, "Failed to initialize");
+
+    WcaLog(LOGMSG_STANDARD, "Initialized.");
+
+
+    GUID guid;
+    CoCreateGuid(&guid);
+
+    LPWSTR guidString; 
+    UuidToString(&guid, (RPC_WSTR*)&guidString);
+
+    MsiSetProperty(hInstall, L"SERVER_GUID", guidString);
+
+    RpcStringFree((RPC_WSTR*) &guidString);
+
+LExit:
+
+    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    return WcaFinalize(er);
+}
+
+/**
   * Check if directory specified in SERVER_DIRECTORY is writable by LocalSystem User
   * Set SERVER_DIR_CANT_WRITE property if so. Otherwize set it to empty string.
   */
