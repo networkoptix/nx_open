@@ -238,6 +238,7 @@ static void myMsgHandler(QtMsgType type, const char *msg)
 int main(int argc, char *argv[])
 {
     QTextStream out(stdout);
+    QThread::currentThread()->setPriority(QThread::HighestPriority);
 
     if (QDateTime::currentDateTime().date().month() >= 4) // will remove this code later 
         exit(0);
