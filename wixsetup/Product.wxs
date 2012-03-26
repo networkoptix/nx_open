@@ -27,7 +27,7 @@
         <SetProperty Id="REINSTALL" Value="ALL" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
 -->    	
         <SetProperty Id="REBOOT" Value="reallysuppress" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
-<!--    	<SetProperty Id="PREVIOUSVERSIONSINSTALLED" Value="[MIGRATE]" After="FindRelatedProducts"/>-->
+    	<SetProperty Id="PREVIOUSVERSIONSINSTALLED" Value="[MIGRATE]" After="FindRelatedProducts"/>
 
     	<Property Id="ARPNOREPAIR" Value="1" Secure="yes"/>
     	
@@ -178,7 +178,7 @@
   			DowngradeErrorMessage="A later version of [ProductName] is already installed. Setup will now exit."
  			MigrateFeatures="yes" />
  	
-<!--        <Upgrade Id="{CE572797-45BF-4F1C-A783-369EA79C597E}">
+<!--        <Upgrade Id="{CE572797-45BF-4f1c-A783-369EA79C597E}">
             <UpgradeVersion
                 Minimum="0.0.0.0" Maximum="$(env.APPLICATION_VERSION).$(env.BUILD_NUMBER)"
                 Property="PREVIOUSVERSIONSINSTALLED"
