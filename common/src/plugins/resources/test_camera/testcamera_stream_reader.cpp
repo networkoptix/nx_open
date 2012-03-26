@@ -105,13 +105,14 @@ void QnTestCameraStreamReader::openStream()
 
     QUrl url(m_resource->getUrl());
 
-    m_tcpSock.setReadTimeOut(TESTCAM_TIMEOUT);
-    m_tcpSock.setWriteTimeOut(TESTCAM_TIMEOUT);
-
     QnNetworkResourcePtr res = qSharedPointerDynamicCast<QnNetworkResource>(m_resource);
 
     if (m_tcpSock.isClosed())
         m_tcpSock.reopen();
+
+    m_tcpSock.setReadTimeOut(TESTCAM_TIMEOUT);
+    m_tcpSock.setWriteTimeOut(TESTCAM_TIMEOUT);
+
     if (!m_tcpSock.connect(url.host().toLatin1().data(), url.port()))
     {
         closeStream();

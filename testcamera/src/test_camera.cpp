@@ -161,7 +161,7 @@ bool QnTestCamera::doStreamingFile(QList<QnCompressedVideoDataPtr> data, TCPSock
             QnSleep::msleep(waitingTime);
 
     }
-
+    return true;
 }
 
 void QnTestCamera::startStreaming(TCPSocket* socket)

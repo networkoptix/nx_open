@@ -760,8 +760,8 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
 
             if (newServer->getStatus() == QnResource::Offline)
                 network->setStatus(QnResource::Offline);
-            else
-                network->setStatus(replacedNetwork->getStatus());
+//            else
+//                network->setStatus(replacedNetwork->getStatus());
         }
     }
 
