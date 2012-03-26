@@ -724,7 +724,7 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
     if(!server)
         return;
 
-    QnResourceList modifiedResources;
+    QnResourceList modifiedResources, errorResources;
     QList<int> oldDisabledFlags;
 
     foreach(const QnResourcePtr &resource, resources) {
@@ -762,7 +762,19 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
                 network->setStatus(QnResource::Offline);
 //            else
 //                network->setStatus(replacedNetwork->getStatus());
+        } else {
+            errorResources.push_back(resource);
         }
+    }
+
+    if(!errorResources.empty()) {
+        QnResourceListDialog::exec(
+            widget(),
+            errorResources,
+            tr("Error"),
+            tr("Processing of the following cameras cannot be moved to server '%1' because they weren't detected by this server.").arg(server->getName()),
+            QDialogButtonBox::Ok
+        );
     }
 
     if(!modifiedResources.empty()) {
