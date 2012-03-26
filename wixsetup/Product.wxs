@@ -51,6 +51,15 @@
         <Property Id="DUMMY_APPSERVER_LOGIN" Value="admin"/>
         
         <!-- AppServer properties-->
+        <Property Id="APPSERVER_GUID" Secure="yes">
+            <RegistrySearch Id="EcsGuidReg"
+                            Root="HKLM"
+                            Key="Software\Network Optix\Enterprise Controller"
+                            Name="ecsGuid"
+                            Type="raw"
+                            Win64="no"/>
+        </Property>
+    	
         <Property Id="APPSERVER_PORT" Secure="yes">
             <RegistrySearch Id="AppServerPortReg"
                             Root="HKLM"
@@ -129,7 +138,7 @@
         <!-- Custom actions -->
         <CustomAction Id="ResetPreselected" Property="Preselected" Value="" />
         <CustomAction Id="SetMoviesFolder" BinaryKey="CustomActions.dll" DllEntry="SetMoviesFolder" />
-    	<CustomAction Id="SetNewGuidForServer" BinaryKey="CustomActions.dll" DllEntry="SetNewGuidForServer"/>
+    	<CustomAction Id="GenerateGuidsForServers" BinaryKey="CustomActions.dll" DllEntry="GenerateGuidsForServers"/>
         <CustomAction Id="MissingFeature"  Error="At least one component should be selected"/>
         
         <CustomAction Id="CheckServerDriveLowSpace" BinaryKey="CustomActions.dll" DllEntry="CheckServerDriveLowSpace"/>
@@ -140,6 +149,9 @@
         <CustomAction Id="CheckPorts2" BinaryKey="CustomActions.dll" DllEntry="CheckPorts"/>
         
         
+    	<CustomAction Id="SetNewGuidForEcs" Property="APPSERVER_GUID" Value="[APPSERVER_GUID_NEW]"/>
+    	<CustomAction Id="SetNewGuidForServer" Property="SERVER_GUID" Value="[SERVER_GUID_NEW]"/>
+    	
         <CustomAction Id="AssignOldAppServerPort" Property="OLD_APPSERVER_PORT" Value="[APPSERVER_PORT]"/>
         <CustomAction Id="AssignOldServerRtspPort" Property="OLD_SERVER_RTSP_PORT" Value="[SERVER_RTSP_PORT]"/>
         <CustomAction Id="AssignOldServerApiPort" Property="OLD_SERVER_API_PORT" Value="[SERVER_API_PORT]"/>
@@ -188,8 +200,10 @@
             <UpgradeVersion OnlyDetect='no' Property='NEWERVERSIONINSTALLED' Minimum='$(env.APPLICATION_VERSION).$(env.BUILD_NUMBER)' IncludeMinimum='no' />
         </Upgrade>
 -->
+    	<?define EcsNeedsGuid="(&AppServerFeature AND NOT APPSERVER_GUID)"?>
+    	<?define ServerNeedsGuid="&ServerFeature AND NOT SERVER_GUID"?>
         <InstallUISequence>
-             <Custom Action="ResetPreselected" After="CostFinalize">Installed AND Preselected</Custom>
+            <Custom Action="ResetPreselected" After="CostFinalize">Installed AND Preselected</Custom>
             <FindRelatedProducts Before="AppSearch" />
             <AppSearch Before="LaunchConditions" />
             
@@ -202,8 +216,11 @@
             <Custom Action="AssignServerApiPort" Before="AssignServerAppServerPort">NOT SERVER_API_PORT</Custom>
             <Custom Action="AssignServerAppServerPort" Before="AssignClientAppServerPort">1</Custom>
             <Custom Action="AssignClientAppServerPort" Before="SetMoviesFolder">1</Custom>
-            <Custom Action="SetMoviesFolder" Before="SetNewGuidForServer" />
-        	<Custom Action="SetNewGuidForServer" Before="AssignClientFolder">NOT SERVER_GUID</Custom>
+            <Custom Action="SetMoviesFolder" Before="GenerateGuidsForServers">1</Custom>
+        	<Custom Action="GenerateGuidsForServers" Before="SetNewGuidForEcs"><![CDATA[ $(var.EcsNeedsGuid) OR $(var.ServerNeedsGuid) ]]></Custom>
+        	<Custom Action="SetNewGuidForEcs" Before="SetNewGuidForServer"><![CDATA[ $(var.EcsNeedsGuid) ]]></Custom>
+        	<Custom Action="SetNewGuidForServer" Before="AssignClientFolder"><![CDATA[ $(var.ServerNeedsGuid)  ]]></Custom>
+        	
             
             <Custom Action="ResetClientFolder" Before="CostInitialize"/>
             <Custom Action="ResetServerFolder" Before="CostInitialize">IS_SERVER_DIRECTORY_REG</Custom>
@@ -297,6 +314,14 @@
                             <Component Id="ecs.log" Guid="{9F34E3B1-9682-47C7-BE56-3165EA127E40}">
                                 <File Id="ecs.log" Name="ecs.log" Source="files/ecs.log" KeyPath="yes"/>
                             </Component>
+                        	
+                            <Component Id="AppServerConfigurationGuid" Guid="{2936DFE8-0645-4573-993F-D009EDFB1732}" Permanent="yes" NeverOverwrite="yes">
+                                <RegistryKey Root="HKLM"
+                                             Key="Software\[Manufacturer]\Enterprise Controller"
+                                             Action="create">
+                            		<RegistryValue Type="string" Name="ecsGuid" Value="[APPSERVER_GUID]" KeyPath="yes"/>
+                                </RegistryKey>
+                           	</Component>
                         	
                             <Component Id="AppServerConfiguration" Guid="{46C18E7E-D25C-4250-AF5F-0237EEFAA80E}" Permanent="yes">
                                 <Condition>
@@ -553,6 +578,7 @@
             <ComponentRef Id="ecs.db" />
         	<ComponentRef Id="ecs.log" />        	
             <ComponentRef Id="AppServerConfiguration"/>
+    		<ComponentRef Id="AppServerConfigurationGuid"/>
         </Feature>
         
         <Feature Id="TrayToolFeature" Title="Tray Tool" AllowAdvertise="no" Display="hidden" Level="1">
