@@ -772,7 +772,7 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
             widget(),
             errorResources,
             tr("Error"),
-            tr("Processing of the following cameras cannot be moved to server '%1' because they weren't detected by this server.").arg(server->getName()),
+            tr("Camera(s) cannot be moved to server '%1'. It might have been offline since the server is up.").arg(server->getName()),
             QDialogButtonBox::Ok
         );
     }
