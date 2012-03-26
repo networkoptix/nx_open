@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
      xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
-    <Product Id="*" Name="$(env.APPLICATION_NAME)" Language="1033" Version="$(env.APPLICATION_VERSION).$(env.BUILD_NUMBER)" Manufacturer="$(env.ORGANIZATION_NAME)" UpgradeCode="CE572797-45BF-4f1c-A783-369EA79C597E">
+    <Product Id="*" Name="$(env.APPLICATION_NAME)" Language="1033" Version="$(env.APPLICATION_VERSION).$(env.BUILD_NUMBER)" Manufacturer="$(env.ORGANIZATION_NAME)" UpgradeCode="{CE572797-45BF-4f1c-A783-369EA79C597E}">
         <Package Id="*" InstallerVersion="300" Compressed="yes" Keywords="Installer" Comments="$(env.ORGANIZATION_NAME) $(env.APPLICATION_NAME)(beta) Installer" Manufacturer="$(env.ORGANIZATION_NAME)" InstallPrivileges="elevated" InstallScope="perMachine" />
         
         <!-- Wix Variables -->
@@ -27,6 +27,7 @@
         <SetProperty Id="REINSTALL" Value="ALL" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
 -->    	
         <SetProperty Id="REBOOT" Value="reallysuppress" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
+<!--    	<SetProperty Id="PREVIOUSVERSIONSINSTALLED" Value="[MIGRATE]" After="FindRelatedProducts"/>-->
 
     	<Property Id="ARPNOREPAIR" Value="1" Secure="yes"/>
     	
@@ -162,25 +163,29 @@
                       Execute="deferred" Return="check" Impersonate="no" />
         
         <CustomAction Id="CloseTrayToolAction_Cmd" Property="CloseTrayToolAction"
-                      Value="&quot;[#traytool.exe]&quot; &quot;quit&quot;" Execute="immediate" Impersonate="no"/>
+                      Value="&quot;[VmsTrayToolDir]traytool.exe&quot; &quot;quit&quot;" Execute="immediate" />
         <CustomAction Id="CloseTrayToolAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
-                      Execute="deferred" Return="check" Impersonate="no" />
+                      Execute="deferred" Return="ignore" Impersonate="no" />
         
         <CustomAction Id="LaunchApplication" FileKey="traytool.exe" ExeCommand="" Execute="immediate" Impersonate="yes" Return="asyncNoWait"/>
         
         <!--        <CustomAction Id="StartAppOnExit" FileKey="ClientExe" ExeCommand="" Execute="immediate" Impersonate="yes" Return="asyncNoWait"/>-->
         
-        <util:CloseApplication Id="CloseTrayTool" ElevatedCloseMessage="yes" CloseMessage="yes" Target="traytool.exe" RebootPrompt="no"/>
-        
-        <Upgrade Id="CE572797-45BF-4f1c-A783-369EA79C597E">
+<!--        <util:CloseApplication Id="CloseTrayTool" ElevatedCloseMessage="yes" CloseMessage="yes" Target="traytool.exe" RebootPrompt="no"/>-->
+    
+ 		<MajorUpgrade AllowSameVersionUpgrades="yes"
+  			Schedule="afterInstallFinalize"
+  			DowngradeErrorMessage="A later version of [ProductName] is already installed. Setup will now exit."
+ 			MigrateFeatures="yes" />
+ 	
+<!--        <Upgrade Id="{CE572797-45BF-4F1C-A783-369EA79C597E}">
             <UpgradeVersion
-                Minimum="0.0.0" Maximum="$(env.APPLICATION_VERSION)"
+                Minimum="0.0.0.0" Maximum="$(env.APPLICATION_VERSION).$(env.BUILD_NUMBER)"
                 Property="PREVIOUSVERSIONSINSTALLED"
                 IncludeMinimum="yes" IncludeMaximum="yes" />
             <UpgradeVersion OnlyDetect='no' Property='NEWERFOUND' Minimum='$(env.APPLICATION_VERSION).$(env.BUILD_NUMBER)' IncludeMinimum='no' />
-<!--            <UpgradeVersion OnlyDetect='no' Property='SAMEFOUND' Minimum='$(env.APPLICATION_VERSION).$(env.BUILD_NUMBER)' Maximum="$(env.APPLICATION_VERSION).$(env.BUILD_NUMBER)" IncludeMinimum='yes' IncludeMaximum="yes" />-->
         </Upgrade>
-        
+-->
         <InstallUISequence>
              <Custom Action="ResetPreselected" After="CostFinalize">Installed AND Preselected</Custom>
             <FindRelatedProducts Before="AppSearch" />
@@ -211,7 +216,7 @@
             <FindRelatedProducts Before="AppSearch" />
             <AppSearch Before="LaunchConditions" />
 
-            <RemoveExistingProducts After="InstallFinalize"/>
+<!--            <RemoveExistingProducts After="InstallFinalize"/>-->
             
 <!--            <Custom Action="CloseTrayToolAction" Before="RemoveExistingProducts" />-->
 <!--            <RemoveExistingProducts After="InstallInitialize" />-->
@@ -529,7 +534,7 @@
         
         <Feature Id="AppServerFeature" Title="$(env.APPLICATION_NAME) Enterprise Controller" Level="1"
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="hidden" >
-        	<Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !AppServerFeature <> 3 ]]> </Condition>
+<!--        	<Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !AppServerFeature <> 3 ]]> </Condition>-->
         	
             <ComponentGroupRef Id="AppServerFilesComponent" />
             <ComponentRef Id="AppServerExecutable" />
@@ -539,7 +544,7 @@
         </Feature>
         
         <Feature Id="TrayToolFeature" Title="Tray Tool" AllowAdvertise="no" Display="hidden" Level="1">
-        	<Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !TrayToolFeature <> 3 ]]> </Condition>
+<!--        	<Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !TrayToolFeature <> 3 ]]> </Condition>-->
         	
             <ComponentRef Id="traytool.exe"/>
             <ComponentRef Id="TrayToolQTLibraries"/>
@@ -548,7 +553,7 @@
         
         <Feature Id="ServerFeature" Title="$(env.APPLICATION_NAME) Media Server" Level="1"
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
-        	<Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !ServerFeature <> 3 ]]> </Condition>
+<!--        	<Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !ServerFeature <> 3 ]]> </Condition>-->
         	
             <ComponentRef Id='ServerDirectoryComponent'/>
             <ComponentRef Id='ServerConfiguration'/>
@@ -563,7 +568,7 @@
         
         <Feature Id="ClientFeature" Title="$(env.APPLICATION_NAME) Client" Level="1"
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
-            <Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !ClientFeature <> 3 ]]> </Condition>
+<!--            <Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !ClientFeature <> 3 ]]> </Condition>-->
             
             <ComponentRef Id="ClientExecutable" />
             <ComponentRef Id="ClientConfiguration" />
