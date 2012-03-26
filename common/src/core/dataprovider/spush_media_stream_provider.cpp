@@ -39,7 +39,7 @@ void CLServerPushStreamreader::run()
                 m_stat[0].onData(0);
                 m_stat[0].onEvent(CL_STAT_FRAME_LOST);
 
-                if (mFramesLost == MAX_LOST_FRAME) // if we lost 2 frames => connection is lost for sure (2)
+                if (mFramesLost >= MAX_LOST_FRAME) // if we lost 2 frames => connection is lost for sure (2)
                 {
                     if (getResource().dynamicCast<QnPhysicalCameraResource>())
 						getResource()->setStatus(QnResource::Offline);
