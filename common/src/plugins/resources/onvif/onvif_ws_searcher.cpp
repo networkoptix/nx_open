@@ -62,6 +62,8 @@ QnResourcePtr QnPlOnvifWsSearcher::createResource(QnId resourceTypeId, const QnR
     {
         result = QnNetworkResourcePtr( new QnPlBrickcomResource() );
     }
+    else
+        return QnResourcePtr(0);
         
 
     
