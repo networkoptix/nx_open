@@ -8,8 +8,7 @@ const char* QnPlPulseResource::MANUFACTURE = "Pulse";
 
 QnPlPulseResource::QnPlPulseResource()
 {
-    setAuth("root", "system");
-    
+    setAuth("admin", "admin");
 }
 
 bool QnPlPulseResource::isResourceAccessible()
@@ -34,7 +33,7 @@ void QnPlPulseResource::setIframeDistance(int frames, int timems)
 
 QnAbstractStreamDataProvider* QnPlPulseResource::createLiveDataProvider()
 {
-    QString request = "stream1";
+    QString request = "0";
     return new RTP264StreamReader(toSharedPointer(), request);
 }
 

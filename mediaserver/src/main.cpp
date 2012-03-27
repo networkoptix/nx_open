@@ -46,6 +46,7 @@
 #include "plugins/resources/test_camera/testcamera_resource_searcher.h"
 #include "plugins/resources/onvif/onvif_ws_searcher.h"
 #include "utils/common/command_line_parser.h"
+#include "plugins/resources/pulse/pulse_resource_searcher.h"
 
 
 static const char SERVICE_NAME[] = "Network Optix VMS Media Server";
@@ -537,7 +538,8 @@ public:
 
         QnResourceDiscoveryManager::instance().addDeviceServer(&QnTestCameraResourceSearcher::instance());
         QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlOnvifWsSearcher::instance());
-
+        QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlPulseSearcher::instance());
+        
         //
 
         connect(qnResPool, SIGNAL(statusChanged(QnResourcePtr)), m_processor, SLOT(onResourceStatusChanged(QnResourcePtr)));
@@ -691,6 +693,7 @@ int main(int argc, char* argv[])
 
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnTestCameraResourceSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlOnvifWsSearcher::instance());
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlPulseSearcher::instance());
     
 
     QnResourceTypeList resourceTypes;

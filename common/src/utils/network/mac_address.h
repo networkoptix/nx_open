@@ -8,7 +8,7 @@ class QnMacAddress
 {
 public:
     QnMacAddress();
-    QnMacAddress(unsigned char* mac);
+    QnMacAddress(const unsigned char* mac);
     QnMacAddress(const QString& mac);
     ~QnMacAddress();
 

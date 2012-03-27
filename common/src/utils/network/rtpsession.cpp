@@ -370,7 +370,7 @@ RTPIODevice*  RTPSession::sendSetup()
         {
             request += "client_port=";
             request += QString::number(m_udpSock.getLocalPort());
-            request += ',';
+            request += '-';
             request += QString::number(m_rtcpUdpSock.getLocalPort());
         }
         else
