@@ -731,7 +731,7 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &r)
 {
     ensureGlInitialized();
 
-    glPushAttrib(GL_ALL_ATTRIB_BITS);
+    //glPushAttrib(GL_ALL_ATTRIB_BITS);
 
     if (m_painterOpacity < 1.0) {
         glEnable(GL_BLEND);
@@ -771,7 +771,9 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &r)
         m_waitCon.wakeAll();
     }
 
-    glPopAttrib();
+    if (m_painterOpacity < 1.0) 
+        glDisable(GL_BLEND);
+    //glPopAttrib();
 
     return result;
 }

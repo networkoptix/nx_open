@@ -220,7 +220,7 @@ void QnImageButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsIte
 
 void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget) {
     painter->beginNativePainting();
-    glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
+    //glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -255,6 +255,7 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
         glDisable(GL_TEXTURE_2D);
     }
     else {
+
         m_gl->glActiveTexture(GL_TEXTURE1);
         widget->bindTexture(pixmap(endState));
         m_gl->glActiveTexture(GL_TEXTURE0);
@@ -279,7 +280,8 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
         m_shader->release();
     }
 
-    glPopAttrib();
+    glDisable(GL_BLEND);
+
     painter->endNativePainting();
 }
 
