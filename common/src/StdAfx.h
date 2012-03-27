@@ -37,9 +37,13 @@ extern "C" {
 
 // QT headers
 #include <QAction>
+
+#ifdef Q_OS_WIN
 #include <QAudio>
 #include <QAudioFormat>
 #include <QAudioOutput>
+#endif
+
 #include <QAuthenticator>
 #include <QBuffer>
 #include <QCheckBox>

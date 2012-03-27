@@ -1,11 +1,11 @@
 TEMPLATE = lib
-QT *= multimedia network xml
+QT *= network xml
 CONFIG += precompile_header %BUILDLIB
 CONFIG -= flat
 
 win32 {
   CONFIG += x86
-
+  QT *= multimedia
   INCLUDEPATH += $$PWD/../../common/contrib/openssl/include
   LIBS += -L$$PWD/../../common/contrib/openssl/bin -llibeay32
 }

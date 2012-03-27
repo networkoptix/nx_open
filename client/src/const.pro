@@ -7,11 +7,12 @@ win* {
   INCLUDEPATH += ../../common/contrib/ffmpeg-misc-headers-win32
 }
 
-QT = core gui network xml opengl multimedia webkit
+QT = core gui network xml opengl webkit
 CONFIG += precompile_header
 CONFIG -= flat app_bundle
 
 win32 {
+  QT += multimedia 
   CONFIG += x86
 }
 
@@ -116,7 +117,13 @@ mac {
 }
 
 unix:!mac {
-    LIBS += -L../../common/contrib/qjson/lib/linux -lxerces-c -lprotobuf -lopenal
+    LIBS += -lxerces-c -lprotobuf -lopenal
+
+    contains( HARDWARE_PLATFORM, x86_64 ) {
+        LIBS += -L../../common/contrib/qjson/lib/linux-64 
+    } else {
+        LIBS += -L../../common/contrib/qjson/lib/linux-32
+    }
 }
 
 DEFINES += __STDC_CONSTANT_MACROS
@@ -129,18 +136,18 @@ DEFINES += QT_QTCOLORPICKER_IMPORT
 
 CONFIG(debug, debug|release) {
   INCLUDEPATH += $$FFMPEG-debug/include
-  LIBS = -L$$FFMPEG-debug/bin -L$$FFMPEG-debug/lib -L$$PWD/../../common/bin/debug -lcommon -L../../common/contrib/qjson/lib/win32/debug -L$$EVETOOLS_DIR/lib/debug $$LIBS
+  LIBS = -L$$FFMPEG-debug/bin -L$$FFMPEG-debug/lib -L$$PWD/../../common/bin/debug -lcommon -L$$EVETOOLS_DIR/lib/debug $$LIBS
 
   win32 {
-  LIBS += -lQtSolutions_ColorPicker-2.6d
+      LIBS += -lQtSolutions_ColorPicker-2.6d -L../../common/contrib/qjson/lib/win32/debug
   }
 }
 CONFIG(release, debug|release) {
   INCLUDEPATH += $$FFMPEG-release/include
-  LIBS = -L$$FFMPEG-release/bin -L$$FFMPEG-release/lib -L$$PWD/../../common/bin/release -lcommon -L../../common/contrib/qjson/lib/win32/release -L$$EVETOOLS_DIR/lib/release $$LIBS
+  LIBS = -L$$FFMPEG-release/bin -L$$FFMPEG-release/lib -L$$PWD/../../common/bin/release -lcommon -L$$EVETOOLS_DIR/lib/release $$LIBS
 
   win32 {
-  LIBS += -lQtSolutions_ColorPicker-2.6
+      LIBS += -lQtSolutions_ColorPicker-2.6 -L../../common/contrib/qjson/lib/win32/release
   }
 }
 

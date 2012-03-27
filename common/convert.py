@@ -3,6 +3,7 @@
 
 import shutil, glob, string
 import os, sys, posixpath
+from platform import architecture
 
 import time
 
@@ -36,8 +37,13 @@ def platform():
         return 'linux'
 
 def gen_env_sh(path, ldpath):
+    if platform() == 'mac':
+        ldvar = 'DYLD_LIBRARY_PATH'
+    elif platform() == 'linux':
+        ldvar = 'LD_LIBRARY_PATH'
+
     f = open(path, 'w')
-    print >> f, 'export DYLD_LIBRARY_PATH=%s' % ldpath
+    print >> f, 'export %s=%s' % (ldvar, ldpath)
     f.close()
 
 def link_or_copy(src, dst):
@@ -99,10 +105,17 @@ def gen_filetypes_h():
     print >> filetypes_h, 'static const char* IMAGE_FILETYPES[] = {%s};' % string.join(['"' + x[0] + '"' for x in image_filetypes], ', ')
     print >> filetypes_h, '#endif // UNICLIENT_FILETYPES_H_'
 
+def host_platform_bits():
+    return architecture()[0][0:2]
+
 def setup_qjson():
     qjson_path = '../common/contrib/qjson'
 
-    return qjson_path + '/lib/' + platform()
+    arch_suffix = ''
+    if platform() == 'linux':
+        arch_suffix = '-' + host_platform_bits()
+
+    return qjson_path + '/lib/' + platform() + arch_suffix
 
 def setup_openssl():
     openssl_path = '../common/contrib/openssl'
@@ -143,7 +156,7 @@ def setup_ffmpeg():
     elif platform() == 'mac':
         ffmpeg += '-mac'
     elif platform() == 'linux':
-        ffmpeg += '-linux'
+        ffmpeg += '-linux' + '-' + host_platform_bits()
 
 
     ffmpeg_path = qt_path(os.path.join(ffmpeg_path, ffmpeg))
