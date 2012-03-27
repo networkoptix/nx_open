@@ -2,6 +2,18 @@
 
 #include "Utils.h"
 
+CString GenerateGuid()
+{
+    static const int MAX_GUID_SIZE = 50;
+
+    GUID guid;
+    WCHAR guidBuffer[MAX_GUID_SIZE]; 
+    CoCreateGuid(&guid);
+    StringFromGUID2(guid, guidBuffer, MAX_GUID_SIZE);
+
+    return CString(guidBuffer).MakeLower();
+}
+
 LPCWSTR GetProperty(MSIHANDLE hInstall, LPCWSTR name)
 {
     LPWSTR szValueBuf = NULL;

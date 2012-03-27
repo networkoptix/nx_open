@@ -6,28 +6,21 @@
 #include "Utils.h"
 
 /**
-  * Create new GUID for server
+  * Create new GUIDs for MediaServer and ECS
   */
-UINT __stdcall SetNewGuidForServer(MSIHANDLE hInstall)
+UINT __stdcall GenerateGuidsForServers(MSIHANDLE hInstall)
 {
     HRESULT hr = S_OK;
     UINT er = ERROR_SUCCESS;
 
-    hr = WcaInitialize(hInstall, "SetNewGuidForServer");
+    hr = WcaInitialize(hInstall, "GenerateGuidsForServers");
     ExitOnFailure(hr, "Failed to initialize");
 
     WcaLog(LOGMSG_STANDARD, "Initialized.");
 
 
-    GUID guid;
-    CoCreateGuid(&guid);
-
-    LPWSTR guidString; 
-    UuidToString(&guid, (RPC_WSTR*)&guidString);
-
-    MsiSetProperty(hInstall, L"SERVER_GUID", guidString);
-
-    RpcStringFree((RPC_WSTR*) &guidString);
+    MsiSetProperty(hInstall, L"SERVER_GUID_NEW", GenerateGuid());
+    MsiSetProperty(hInstall, L"APPSERVER_GUID_NEW", GenerateGuid());
 
 LExit:
 
