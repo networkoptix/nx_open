@@ -240,9 +240,6 @@ int main(int argc, char *argv[])
     QTextStream out(stdout);
     QThread::currentThread()->setPriority(QThread::HighestPriority);
 
-    if (QDateTime::currentDateTime().date().month() >= 4) // will remove this code later 
-        exit(0);
-
 #ifdef Q_OS_WIN
     AllowSetForegroundWindow(ASFW_ANY);
 #endif
@@ -386,6 +383,10 @@ int main(int argc, char *argv[])
 
     QnPlOnvifWsSearcher::instance().setLocal(true);
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlOnvifWsSearcher::instance());
+
+    QnPlPulseSearcher::instance().setLocal(true);
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlPulseSearcher::instance());
+    
 #endif
 
 #ifdef Q_OS_WIN
