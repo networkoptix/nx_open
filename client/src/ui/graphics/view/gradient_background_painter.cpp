@@ -77,7 +77,7 @@ void QnGradientBackgroundPainter::drawLayer(QPainter * painter, const QRectF & r
     {
         QnRadialGradientPainter *gradientPainter = radialGradientPainter();
 
-        glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
+        //glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -93,7 +93,8 @@ void QnGradientBackgroundPainter::drawLayer(QPainter * painter, const QRectF & r
         gradientPainter->paint(color);
         glPopMatrix();
 
-        glPopAttrib();
+        glDisable(GL_BLEND);
+        //glPopAttrib();
     }
     painter->endNativePainting();
 #endif

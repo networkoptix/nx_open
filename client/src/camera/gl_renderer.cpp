@@ -731,12 +731,13 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &r)
 {
     ensureGlInitialized();
 
-    glPushAttrib(GL_ALL_ATTRIB_BITS);
-
+    //glPushAttrib(GL_ALL_ATTRIB_BITS);
+    /*
     if (m_painterOpacity < 1.0) {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
+    */
 
     Qn::RenderStatus result;
 
@@ -771,7 +772,7 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &r)
         m_waitCon.wakeAll();
     }
 
-    glPopAttrib();
+    //glPopAttrib();
 
     return result;
 }
