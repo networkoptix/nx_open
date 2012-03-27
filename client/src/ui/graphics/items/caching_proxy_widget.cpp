@@ -72,7 +72,7 @@ void CachingProxyWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem
         return;
 
     painter->beginNativePainting();
-    glPushAttrib(GL_COLOR_BUFFER_BIT | GL_TEXTURE_BIT);
+    //glPushAttrib(GL_COLOR_BUFFER_BIT | GL_TEXTURE_BIT);
 
     ensureTextureSynchronized();
 
@@ -100,7 +100,10 @@ void CachingProxyWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem
     glVertex(vertexRect.bottomLeft());
     glEnd();
 
-    glPopAttrib();
+    glDisable(GL_BLEND);
+    glDisable(GL_TEXTURE_2D);
+
+    //glPopAttrib();
     painter->endNativePainting();
 }
 

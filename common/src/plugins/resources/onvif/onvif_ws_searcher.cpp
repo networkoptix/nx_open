@@ -64,6 +64,7 @@ QnResourcePtr QnPlOnvifWsSearcher::createResource(QnId resourceTypeId, const QnR
     }
     else
         return QnResourcePtr(0);
+
         
 
     
