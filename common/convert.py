@@ -8,7 +8,6 @@ from platform import architecture
 import time
 
 from filetypes import all_filetypes, video_filetypes, image_filetypes
-from genproto import generate_xsd, generate_pb
 
 # os.path = posixpath
 
@@ -218,40 +217,6 @@ def index_dirs(xdirs, template_file, output_file, exclude_dirs=(), exclude_files
 
     uniclient_pro.close()
 
-def gen_api_qrc(xdir, files):
-    f = open(os.path.join(xdir, 'api.qrc'), 'w')
-    print >> f, """<RCC>
-    <qresource prefix="/xsd/api/">"""
-
-    for xfile in files:
-        print >> f, '        <file alias="%s">../../../%s</file>' % (os.path.basename(xfile), xfile.replace('\\', '/'))
-
-    print >> f, """        
-    </qresource>
-</RCC>
-"""
-
-def generate_xsd_res(xpath):
-    xsd_dir = os.path.join('src', 'api', 'xsd')
-    
-    all_xsd_files = []
-    for root, dirs, files in os.walk(xsd_dir):
-        new_dir = os.path.join(xpath, root[len(xsd_dir) + 1:])
-        if not os.path.exists(new_dir):
-            os.mkdir(new_dir)
-
-        for xfile in files:
-            if not xfile.endswith('.xsd'):
-                continue
-
-            new_name = os.path.splitext(xfile)[0]
-            new_path = os.path.join(new_dir, new_name)
-
-            shutil.copy(os.path.join(root, xfile), new_path)
-            all_xsd_files.append(new_path)
-
-    gen_api_qrc(xpath, all_xsd_files)
-
 def convert():
     oldpwd = os.getcwd()
     os.chdir(os.path.dirname(os.path.realpath(__file__)))
@@ -264,28 +229,12 @@ def convert():
             rmtree('build')
         os.mkdir('build')
 
-        os.makedirs('build/debug/generated')
-        os.makedirs('build/release/generated')
-        
-        generate_xsd_res(os.path.join('build', 'debug', 'generated'))
-        generate_xsd_res(os.path.join('build', 'release', 'generated'))
-
         ffmpeg_path, ffmpeg_path_debug, ffmpeg_path_release = setup_ffmpeg()
         gen_filetypes_h()
         tools_path = setup_tools()
         
-        os.mkdir('build/generated')
-        generated_files = []
-        generated_files += generate_xsd(tools_path, 'build/generated')
-        generated_files += generate_pb(tools_path, 'build/generated')
-
         index_dirs(('src',), 'src/const.pro', 'src/common.pro', exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
         instantiate_pro('src/common.pro', {'BUILDLIB': BUILDLIB, 'FFMPEG' : ffmpeg_path, 'EVETOOLS_DIR' : tools_path})
-
-        f = open('src/common.pro', 'a')
-        for xfile in generated_files:
-            print >> f, 'SOURCES += $$PWD/../' + xfile
-        f.close()
 
         if platform() == 'win32':
             os.system('qmake -tp vc -o src/common.vcproj src/common.pro')

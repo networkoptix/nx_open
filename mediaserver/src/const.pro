@@ -91,7 +91,7 @@ win32 {
     QMAKE_CXXFLAGS += -Zc:wchar_t
     QMAKE_CXXFLAGS -= -Zc:wchar_t-
 
-    LIBS += -lxerces-c_3 -llibprotobuf
+    LIBS += -llibprotobuf
 
     # Define QN_EXPORT only if common build is not static
     isEmpty(BUILDLIB) { DEFINES += QN_EXPORT=Q_DECL_IMPORT }
@@ -99,12 +99,12 @@ win32 {
 }
 
 mac {
-    LIBS += -L../../common/contrib/qjson/lib/mac -lxerces-c-3.1 -lprotobuf
+    LIBS += -L../../common/contrib/qjson/lib/mac -lprotobuf
     DEFINES += QN_EXPORT=
 }
 
 unix:!mac {
-    LIBS += -lxerces-c -lprotobuf
+    LIBS += -lprotobuf
     HARDWARE_PLATFORM = $$system(uname -i)
     contains( HARDWARE_PLATFORM, x86_64 ) {
         LIBS += -L../../common/contrib/qjson/lib/linux-64 
