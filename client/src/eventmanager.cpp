@@ -90,7 +90,15 @@ void QnEventManager::licensesReceived(int status, const QByteArray &errorString,
 
 void QnEventManager::eventReceived(QnEvent event)
 {
-    qDebug() << "Got event: " << event.eventType << " " << event.objectName << " " << event.objectId << event.resourceGuid;
+    QByteArray debugStr;
+    QTextStream stream(&debugStr);
+
+    stream << "Got event: " << event.eventType << " " << event.objectName << " " << event.objectId << event.resourceGuid;
+
+    if (event.eventType == QN_EVENT_RES_DISABLED_CHANGE || event.eventType == QN_EVENT_RES_STATUS_CHANGE)
+        stream << "data: " << event.data.toInt();
+
+    qDebug() << debugStr;
 
     if (event.eventType == QN_EVENT_EMPTY)
     {

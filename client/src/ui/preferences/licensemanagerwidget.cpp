@@ -91,7 +91,7 @@ void LicenseManagerWidget::updateFromServer(const QString &serialKey, const QStr
     if (!m_httpClient)
         m_httpClient = new QNetworkAccessManager(this);
 
-    QUrl url(QLatin1String("http://noptix.enk.me/~ivan_vigasin/nolicensed/activate.php"));
+    QUrl url(QLatin1String("http://networkoptix.com/nolicensed_vms/activate.php"));
 
     QNetworkRequest request;
     request.setUrl(url);

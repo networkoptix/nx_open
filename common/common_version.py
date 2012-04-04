@@ -2,7 +2,7 @@ import os, sys, re
 from convert import platform, setup_ffmpeg
 
 ORGANIZATION_NAME    = 'Network Optix'
-APPLICATION_VERSION  = '0.9.3'
+APPLICATION_VERSION  = '1.0.0'
 BUILD_NUMBER = os.getenv('BUILD_NUMBER', '0')
 
 def get_library_path():
@@ -14,6 +14,8 @@ def get_library_path():
 def set_library_path(value):
     if platform() == 'mac':
         os.putenv('DYLD_LIBRARY_PATH', value)
+    elif platform() == 'linux':
+        os.putenv('LD_LIBRARY_PATH', value)
 
 def set_env():
     REVISION = os.popen('hg id -i').read().strip()

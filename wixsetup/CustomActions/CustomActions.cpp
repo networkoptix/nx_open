@@ -6,6 +6,29 @@
 #include "Utils.h"
 
 /**
+  * Create new GUIDs for MediaServer and ECS
+  */
+UINT __stdcall GenerateGuidsForServers(MSIHANDLE hInstall)
+{
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+
+    hr = WcaInitialize(hInstall, "GenerateGuidsForServers");
+    ExitOnFailure(hr, "Failed to initialize");
+
+    WcaLog(LOGMSG_STANDARD, "Initialized.");
+
+
+    MsiSetProperty(hInstall, L"SERVER_GUID_NEW", GenerateGuid());
+    MsiSetProperty(hInstall, L"APPSERVER_GUID_NEW", GenerateGuid());
+
+LExit:
+
+    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    return WcaFinalize(er);
+}
+
+/**
   * Check if directory specified in SERVER_DIRECTORY is writable by LocalSystem User
   * Set SERVER_DIR_CANT_WRITE property if so. Otherwize set it to empty string.
   */

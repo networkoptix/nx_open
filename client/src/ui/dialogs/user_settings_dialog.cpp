@@ -242,7 +242,7 @@ void QnUserSettingsDialog::updateElement(Element element) {
     switch(element) {
     case Login:
         if(ui->loginEdit->text().isEmpty()) {
-            hint = tr("Login can not be empty.");
+            hint = tr("Login cannot be empty.");
             valid = false;
         }
         if(m_userByLogin.contains(ui->loginEdit->text()) && m_userByLogin.value(ui->loginEdit->text()) != m_user) {
@@ -263,7 +263,7 @@ void QnUserSettingsDialog::updateElement(Element element) {
         break;
     case Password:
         if(ui->passwordEdit->text().isEmpty() && ui->confirmPasswordEdit->text().isEmpty() && ui->passwordEdit->placeholderText().isEmpty()) {
-            hint = tr("Password can not be empty.");
+            hint = tr("Password cannot be empty.");
             valid = false;
         } else if(ui->passwordEdit->text() != ui->confirmPasswordEdit->text()) {
             hint = tr("Passwords do not match.");

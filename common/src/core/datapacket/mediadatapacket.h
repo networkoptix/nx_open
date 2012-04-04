@@ -2,12 +2,18 @@
 #define abstract_media_data_h_112
 
 #include <QVector>
-#include <QAudioFormat>
 #include <QRect>
 #include "libavcodec/avcodec.h"
 #include "datapacket.h"
 #include "utils/common/bytearray.h"
 #include "utils/media/sse_helper.h"
+
+#ifndef Q_OS_WIN
+#include "utils/media/audioformat.h"
+#else
+#include <QAudioFormat>
+#define QnAudioFormat QAudioFormat
+#endif
 
 struct AVCodecContext;
 
@@ -171,11 +177,11 @@ private:
 };
 
 
-class QnCodecAudioFormat: public QAudioFormat
+class QnCodecAudioFormat: public QnAudioFormat
 {
 public:
     QnCodecAudioFormat():
-            QAudioFormat(),
+            QnAudioFormat(),
             bitrate(0),
             channel_layout(0),
             block_align(0)
@@ -191,28 +197,28 @@ public:
             setChannels(c->channels);
 
         //setCodec("audio/pcm");
-        setByteOrder(QAudioFormat::LittleEndian);
+        setByteOrder(QnAudioFormat::LittleEndian);
 
         switch(c->sample_fmt)
         {
         case SAMPLE_FMT_U8: ///< unsigned 8 bits
             setSampleSize(8);
-            setSampleType(QAudioFormat::UnSignedInt);
+            setSampleType(QnAudioFormat::UnSignedInt);
             break;
 
         case SAMPLE_FMT_S16: ///< signed 16 bits
             setSampleSize(16);
-            setSampleType(QAudioFormat::SignedInt);
+            setSampleType(QnAudioFormat::SignedInt);
             break;
 
         case SAMPLE_FMT_S32:///< signed 32 bits
             setSampleSize(32);
-            setSampleType(QAudioFormat::SignedInt);
+            setSampleType(QnAudioFormat::SignedInt);
             break;
 
         case AV_SAMPLE_FMT_FLT:
             setSampleSize(32);
-            setSampleType(QAudioFormat::Float);
+            setSampleType(QnAudioFormat::Float);
             break;
 
         default:

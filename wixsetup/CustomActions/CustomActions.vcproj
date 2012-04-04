@@ -62,7 +62,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Ws2_32.lib comsuppw.lib msi.lib dutil_2008.lib wcautil_2008.lib Version.lib"
+				AdditionalDependencies="Rpcrt4.lib Ws2_32.lib comsuppw.lib msi.lib dutil_2008.lib wcautil_2008.lib Version.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="$(WIX)sdk\lib"
 				ModuleDefinitionFile="CustomActions.def"
@@ -139,7 +139,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Ws2_32.lib comsuppw.lib msi.lib dutil_2008.lib wcautil_2008.lib Version.lib"
+				AdditionalDependencies="Rpcrt4.lib Ws2_32.lib comsuppw.lib msi.lib dutil_2008.lib wcautil_2008.lib Version.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="$(WIX)sdk\lib"
 				ModuleDefinitionFile="CustomActions.def"

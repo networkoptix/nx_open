@@ -118,7 +118,9 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
     if (m_motionData > 0)
     {
         --m_motionData;
-        return getMetaData();
+        QnAbstractMediaDataPtr metadata = getMetaData();
+        if (metadata)
+            return metadata;
     }
 
     if (needMetaData())

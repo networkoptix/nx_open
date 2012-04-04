@@ -42,7 +42,6 @@ public:
         lastJumpTime = DATETIME_NOW;
         inJumpCount = 0;
         speed = 1.0;
-        processingJump = false;
         enabled = true;
         bufferingTime = AV_NOPTS_VALUE;
         paused = false;
@@ -64,7 +63,6 @@ public:
     QTime timer;
     double speed;
     
-    bool processingJump;
     bool enabled;
     qint64 bufferingTime;
     bool paused;
@@ -186,7 +184,6 @@ void QnArchiveSyncPlayWrapper::directJumpToNonKeyFrame(qint64 mksec)
             info.reader->setNavDelegate(0);
             info.reader->directJumpToNonKeyFrame(mksec);
             info.reader->setNavDelegate(this);
-            d->processingJump = true;
         }
     }
 }
@@ -217,7 +214,6 @@ bool QnArchiveSyncPlayWrapper::jumpTo(qint64 mksec,  qint64 skipTime)
             info.reader->setNavDelegate(this);
         }
     }
-    d->processingJump = rez;
     return rez;
 }
 
@@ -410,10 +406,6 @@ void QnArchiveSyncPlayWrapper::onJumpCanceled(qint64 /*time*/)
     QMutexLocker lock(&d->timeMutex);
     d->inJumpCount--;
     Q_ASSERT(d->inJumpCount >= 0);
-    if (d->inJumpCount == 0) 
-    {
-        d->processingJump = false;
-    }
 }
 
 void QnArchiveSyncPlayWrapper::onJumpOccured(qint64 mksec)
@@ -425,7 +417,6 @@ void QnArchiveSyncPlayWrapper::onJumpOccured(qint64 mksec)
     Q_ASSERT(d->inJumpCount >= 0);
     if (d->inJumpCount == 0) 
     {
-        d->processingJump = false;
         setJumpTime(mksec);
     }
 }
@@ -647,6 +638,7 @@ void QnArchiveSyncPlayWrapper::onConsumerBlocksReader(QnAbstractStreamDataProvid
                 if (d->enabled) {
                     qint64 currentTime = getCurrentTime();
                     if (currentTime != AV_NOPTS_VALUE) {
+                        setJumpTime(currentTime);
                         d->readers[i].reader->jumpToPreviousFrame(currentTime);
                         d->readers[i].reader->setSpeed(d->speed, currentTime);
                     }

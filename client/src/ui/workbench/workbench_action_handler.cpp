@@ -724,7 +724,7 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
     if(!server)
         return;
 
-    QnResourceList modifiedResources;
+    QnResourceList modifiedResources, errorResources;
     QList<int> oldDisabledFlags;
 
     foreach(const QnResourcePtr &resource, resources) {
@@ -760,9 +760,21 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
 
             if (newServer->getStatus() == QnResource::Offline)
                 network->setStatus(QnResource::Offline);
-            else
-                network->setStatus(replacedNetwork->getStatus());
+//            else
+//                network->setStatus(replacedNetwork->getStatus());
+        } else {
+            errorResources.push_back(resource);
         }
+    }
+
+    if(!errorResources.empty()) {
+        QnResourceListDialog::exec(
+            widget(),
+            errorResources,
+            tr("Error"),
+            tr("Camera(s) cannot be moved to server '%1'. It might have been offline since the server is up.").arg(server->getName()),
+            QDialogButtonBox::Ok
+        );
     }
 
     if(!modifiedResources.empty()) {

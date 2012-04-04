@@ -1,11 +1,11 @@
 TEMPLATE = lib
-QT *= multimedia network xml
+QT *= network xml
 CONFIG += precompile_header %BUILDLIB
 CONFIG -= flat
 
 win32 {
   CONFIG += x86
-
+  QT *= multimedia
   INCLUDEPATH += $$PWD/../../common/contrib/openssl/include
   LIBS += -L$$PWD/../../common/contrib/openssl/bin -llibeay32
 }
@@ -100,40 +100,31 @@ unix:!mac {
 DEFINES += __STDC_CONSTANT_MACROS
 
 
-# Clone ssh://hg@vigasin.com/evetools to the same diectory netoptix_vms is located
-win32 {
-    QMAKE_CXXFLAGS += -Zc:wchar_t
-    QMAKE_CXXFLAGS -= -Zc:wchar_t-
-    LIBS += -lxerces-c_3
-}
-
-mac {
-    LIBS += -lxerces-c-3.1 -lprotobuf
-}
-
-uniq:!mac {
-    LIBS += -lxerces-c
+unix {
+    LIBS += -lprotobuf
 }
 
 QMAKE_CXXFLAGS += -I$$EVETOOLS_DIR/include 
 LIBS += -L$$EVETOOLS_DIR/lib
 
-XSD_FILES = $$PWD/api/xsd/cameras.xsd \
-            $$PWD/api/xsd/layouts.xsd \
-            $$PWD/api/xsd/users.xsd \
-            $$PWD/api/xsd/resourceTypes.xsd \
-            $$PWD/api/xsd/resources.xsd \
-            $$PWD/api/xsd/resourcesEx.xsd \
-            $$PWD/api/xsd/servers.xsd \
-            $$PWD/api/xsd/storages.xsd \
-            $$PWD/api/xsd/scheduleTasks.xsd \
-            $$PWD/api/xsd/events.xsd \
-            $$PWD/api/xsd/videoserver/recordedTimePeriods.xsd
-
-#RESOURCES += api/xsd/api.qrc
-RESOURCES += $${MOC_DIR}/api.qrc
-
 # Define override specifier.
 OVERRIDE_DEFINITION = "override="
 win32-msvc*:OVERRIDE_DEFINITION = "override=override"
 DEFINES += $$OVERRIDE_DEFINITION
+
+PB_FILES = $$PWD/api/pb/camera.proto \
+           $$PWD/api/pb/layout.proto \
+           $$PWD/api/pb/license.proto \
+           $$PWD/api/pb/user.proto \
+           $$PWD/api/pb/resourceType.proto \
+           $$PWD/api/pb/resource.proto \
+           $$PWD/api/pb/server.proto \
+           $$PWD/api/pb/ms_recordedTimePeriod.proto
+
+pb.name = Generating code from ${QMAKE_FILE_IN}
+pb.input = PB_FILES
+pb.output = $${MOC_DIR}/${QMAKE_FILE_BASE}.pb.cc
+pb.commands = $$EVETOOLS_DIR/bin/protoc --proto_path=../src/api/pb --cpp_out=$${MOC_DIR} ../src/${QMAKE_FILE_NAME}
+pb.CONFIG += target_predeps
+pb.variable_out = GENERATED_SOURCES
+QMAKE_EXTRA_COMPILERS += pb

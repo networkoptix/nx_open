@@ -62,8 +62,7 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     initColorPicker();
 
 #ifdef QN_NO_BACKGROUND_COLOR_ADJUSTMENT
-    ui->backgroundColorLabel->hide();
-    ui->backgroundColorWidget->hide();
+    ui->lookAndFeelGroupBox->hide();
 #endif
 
     connectionsSettingsWidget = new ConnectionsSettingsWidget(this);

@@ -28,7 +28,6 @@
 #include "core/resource/video_server.h"
 #include "api/SessionManager.h"
 #include <signal.h>
-#include <xercesc/util/PlatformUtils.hpp>
 #include "core/misc/scheduleTask.h"
 #include "qtservice.h"
 #include "eventmanager.h"
@@ -46,6 +45,7 @@
 #include "plugins/resources/test_camera/testcamera_resource_searcher.h"
 #include "plugins/resources/onvif/onvif_ws_searcher.h"
 #include "utils/common/command_line_parser.h"
+#include "plugins/resources/pulse/pulse_resource_searcher.h"
 
 
 static const char SERVICE_NAME[] = "Network Optix VMS Media Server";
@@ -287,16 +287,12 @@ int serverMain(int argc, char *argv[])
     Q_UNUSED(argc)
     Q_UNUSED(argv)
 
-    xercesc::XMLPlatformUtils::Initialize();
-
 #ifdef Q_OS_WIN
     SetConsoleCtrlHandler(stopServer_WIN, true);
 #endif
     signal(SIGINT, stopServer);
     signal(SIGABRT, stopServer);
     signal(SIGTERM, stopServer);
-
-    Q_INIT_RESOURCE(api);
 
 //    av_log_set_callback(decoderLogCallback);
 
@@ -503,7 +499,6 @@ public:
 
         m_restServer = new QnRestServer(QHostAddress::Any, apiUrl.port());
         m_restServer->registerHandler("api/RecordedTimePeriods", new QnRecordedChunkListHandler());
-        m_restServer->registerHandler("xsd/*", new QnXsdHelperHandler());
 
         QByteArray errorString;
 
@@ -537,7 +532,8 @@ public:
 
         QnResourceDiscoveryManager::instance().addDeviceServer(&QnTestCameraResourceSearcher::instance());
         QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlOnvifWsSearcher::instance());
-
+        QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlPulseSearcher::instance());
+        
         //
 
         connect(qnResPool, SIGNAL(statusChanged(QnResourcePtr)), m_processor, SLOT(onResourceStatusChanged(QnResourcePtr)));
@@ -651,8 +647,6 @@ void stopServer(int signal)
 int main(int argc, char* argv[])
 {
 #if 0 // http refactoring test code. Remove it if things is stable.
-    xercesc::XMLPlatformUtils::Initialize();
-
     QCoreApplication::setOrganizationName(QLatin1String(ORGANIZATION_NAME));
     QCoreApplication::setApplicationName(QLatin1String(APPLICATION_NAME));
     QCoreApplication::setApplicationVersion(QLatin1String(APPLICATION_VERSION));
@@ -691,6 +685,7 @@ int main(int argc, char* argv[])
 
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnTestCameraResourceSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlOnvifWsSearcher::instance());
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlPulseSearcher::instance());
     
 
     QnResourceTypeList resourceTypes;
@@ -745,6 +740,5 @@ int main(int argc, char* argv[])
         serviceMainInstance = 0;
     }
 
-    xercesc::XMLPlatformUtils::Terminate ();
     return result;
 }

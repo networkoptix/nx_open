@@ -59,7 +59,11 @@ AVClientPullSSTFTPStreamreader::~AVClientPullSSTFTPStreamreader()
 QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 {
     if (needMetaData())
-        return getMetaData();
+    {
+        QnAbstractMediaDataPtr metadata = getMetaData();
+        if (metadata)
+            return metadata;
+    }
 
     QString request;
 

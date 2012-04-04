@@ -21,7 +21,7 @@ void QnCurtainItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, Q
     glPushMatrix();
     glLoadIdentity();
 
-    glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
+    //glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
     glEnable(GL_BLEND); 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
 
@@ -30,7 +30,9 @@ void QnCurtainItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, Q
     glVertices(widget->geometry());
     glEnd();
 
-    glPopAttrib();
+    //glPopAttrib();
+    glDisable(GL_BLEND); 
+
     glPopMatrix();
     painter->endNativePainting();
 }

@@ -233,12 +233,13 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
         if (CL_TRANSPORT_ERROR==readHeaders())
             return CL_TRANSPORT_ERROR;
 
+        m_responseLine = m_responseLine.toLower();
 
-        if (!m_responseLine.contains("200 OK"))// not ok
+        if (!m_responseLine.contains("200 ok"))// not ok
         {
             close();
 
-            if (m_responseLine.contains("401 Unauthorized"))
+            if (m_responseLine.contains("401 unauthorized"))
             {
                 getAuthInfo();
 

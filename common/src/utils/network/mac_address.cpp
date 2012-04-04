@@ -9,7 +9,7 @@ QnMacAddress::QnMacAddress()
     memset(m_data, 0, 6);
 }
 
-QnMacAddress::QnMacAddress(unsigned char* mac)
+QnMacAddress::QnMacAddress(const unsigned char* mac)
 {
     memcpy(m_data, mac, 6);
 }

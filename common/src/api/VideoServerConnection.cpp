@@ -7,20 +7,13 @@
 #include "QStdIStream.h"
 #include "utils/common/util.h"
 
-#include "xsd_recordedTimePeriods.h"
-
 #include "VideoServerConnection.h"
 #include "VideoServerConnection_p.h"
-#include "xsd_recordedTimePeriods.h"
 #include "SessionManager.h"
 #include "api/serializer/serializer.h"
 
 namespace {
-    const unsigned long XSD_FLAGS = xml_schema::flags::dont_initialize | xml_schema::flags::dont_validate;
-
     // for video server methods
-    typedef QSharedPointer<xsd::api::recordedTimePeriods::RecordedTimePeriods>           QnApiRecordedTimePeriodsResponsePtr;
-
     QnTimePeriodList parseBinaryTimePeriods(const QByteArray &reply)
     {
         QnTimePeriodList result;
@@ -50,37 +43,6 @@ namespace {
 #endif
             result << QnTimePeriod(ntohll(startTimeMs), ntohll(durationMs));
         }
-
-        return result;
-    }
-
-    int parseRecordedTimePeriods(const QByteArray &reply, QnApiRecordedTimePeriodsResponsePtr *result)
-    {
-        using xsd::api::recordedTimePeriods::recordedTimePeriods;
-
-        try {
-            QByteArray localReply = reply;
-            QBuffer buffer(&localReply);
-            buffer.open(QIODevice::ReadOnly);
-
-            QStdIStream is(&buffer);
-
-            *result = QnApiRecordedTimePeriodsResponsePtr(recordedTimePeriods(is, XSD_FLAGS).release());
-
-            return 0;
-        } catch (const xml_schema::exception& e) {
-            qDebug(e.what());
-
-            return 1;
-        }
-    }
-
-    QnTimePeriodList parseRecordedTimePeriods(const QnApiRecordedTimePeriodsResponsePtr &reply) {
-        using namespace xsd::api::recordedTimePeriods;
-
-        QnTimePeriodList result;
-        for (RecordedTimePeriods::timePeriod_const_iterator i = reply->timePeriod().begin(); i != reply->timePeriod().end(); ++i)
-            result << QnTimePeriod(i->startTime(), i->duration());
 
         return result;
     }
@@ -148,10 +110,8 @@ void detail::VideoServerSessionManagerReplyProcessor::at_replyReceived(int statu
             QnTimePeriod::decode((const quint8*) reply.constData()+3, reply.size()-3, result);
         }
         else {
-            QnApiRecordedTimePeriodsResponsePtr xmlResponse;
-            status = parseRecordedTimePeriods(reply, &xmlResponse);
-            if (status == 0)
-                result = parseRecordedTimePeriods(xmlResponse);
+            qWarning() << "VideoServerConnection: unexpected message received.";
+            status = -1;
         }
     }
 
@@ -171,11 +131,8 @@ int QnVideoServerConnection::recordedTimePeriods(const QnRequestParamList& param
     {
         QnTimePeriod::decode((const quint8*) reply.constData()+3, reply.size()-3, result);
     } else {
-        QnApiRecordedTimePeriodsResponsePtr timePeriodList;
-        int status = parseRecordedTimePeriods(reply, &timePeriodList);
-        if (status == 0)
-            result = parseRecordedTimePeriods(timePeriodList);
-        return status;
+        qWarning() << "VideoServerConnection: unexpected message received.";
+        return -1;
     }
 
     return 0;

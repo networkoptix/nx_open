@@ -67,8 +67,12 @@ SessionManager::SessionManager()
 
 SessionManager::~SessionManager()
 {
-    if(QThread::currentThread() != this->thread())
+    doStop();
+    /*
+    if(QThread::currentThread() != this->thread()) {
         qnWarning("Deleting session manager from another thread is dangerous and may lead to unexpected crashes.");
+    }
+    */
 }
 
 SessionManager *SessionManager::instance()

@@ -34,7 +34,6 @@
 #include "core/resource/video_server.h"
 #include "core/resource/storage_resource.h"
 
-#include <xercesc/util/PlatformUtils.hpp>
 #include "plugins/resources/axis/axis_resource_searcher.h"
 #include "eventmanager.h"
 #include "core/resource/resource_directory_browser.h"
@@ -238,14 +237,11 @@ static void myMsgHandler(QtMsgType type, const char *msg)
 int main(int argc, char *argv[])
 {
     QTextStream out(stdout);
-
-    if (QDateTime::currentDateTime().date().month() >= 4) // will remove this code later 
-        exit(0);
+    QThread::currentThread()->setPriority(QThread::HighestPriority);
 
 #ifdef Q_OS_WIN
     AllowSetForegroundWindow(ASFW_ANY);
 #endif
-    xercesc::XMLPlatformUtils::Initialize ();
 
     /* Set up application parameters so that QSettings know where to look for settings. */
     QApplication::setOrganizationName(QLatin1String(ORGANIZATION_NAME));
@@ -385,6 +381,10 @@ int main(int argc, char *argv[])
 
     QnPlOnvifWsSearcher::instance().setLocal(true);
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlOnvifWsSearcher::instance());
+
+    QnPlPulseSearcher::instance().setLocal(true);
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlPulseSearcher::instance());
+    
 #endif
 
 #ifdef Q_OS_WIN
@@ -469,8 +469,6 @@ int main(int argc, char *argv[])
 
     QnResource::stopCommandProc();
     QnResourceDiscoveryManager::instance().stop();
-
-    xercesc::XMLPlatformUtils::Terminate();
 
     return result;
 }
