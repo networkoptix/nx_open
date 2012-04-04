@@ -234,7 +234,13 @@ int QnRtspConnectionProcessor::numOfVideoChannels()
     Q_D(QnRtspConnectionProcessor);
     if (!d->mediaRes)
         return -1;
-    QnAbstractMediaStreamDataProviderPtr currentDP = d->liveMode ? d->liveDpHi : d->archiveDP;
+    QnAbstractMediaStreamDataProviderPtr currentDP;
+    
+    if (d->liveMode)
+        currentDP = d->liveDpHi;
+    else
+        currentDP = d->archiveDP;
+
     const QnVideoResourceLayout* layout = d->mediaRes->getVideoLayout(currentDP.data());
     return layout ? layout->numberOfChannels() : -1;
 }
@@ -356,7 +362,13 @@ int QnRtspConnectionProcessor::composeSetup()
         return CODE_NOT_IMPLEMETED;
     int trackId = extractTrackId(d->requestHeaders.path());
 
-    QnAbstractMediaStreamDataProviderPtr currentDP = d->liveMode ? d->liveDpHi : d->archiveDP;
+    QnAbstractMediaStreamDataProviderPtr currentDP;
+    
+    if (d->liveMode)
+        currentDP = d->liveDpHi;
+    else
+        currentDP = d->archiveDP;
+
     const QnVideoResourceLayout* videoLayout = d->mediaRes->getVideoLayout(currentDP.data());
     if (trackId >= videoLayout->numberOfChannels()) {
         //QnAbstractMediaStreamDataProvider* dataProvider;
@@ -535,7 +547,12 @@ int QnRtspConnectionProcessor::composePlay()
             d->liveDpLow->removeDataProcessor(d->dataProcessor);
     }
 
-    QnAbstractMediaStreamDataProviderPtr currentDP = d->liveMode ? d->liveDpHi : d->archiveDP;
+    QnAbstractMediaStreamDataProviderPtr currentDP;
+    if (d->liveMode)
+        currentDP = d->liveDpHi;
+    else
+        currentDP = d->archiveDP;
+
     if (!currentDP)
         return CODE_NOT_FOUND;
 
