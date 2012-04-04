@@ -43,7 +43,7 @@ public:
      * \param reference                Reference instrument for the given installation mode.
      * \returns                        Whether the instrument was successfully installed.
      */
-    bool installInstrument(Instrument *instrument, InstallationMode::Mode mode = INSTALL_FIRST, Instrument *reference = NULL);
+    bool installInstrument(Instrument *instrument, InstallationMode::Mode mode = InstallFirst, Instrument *reference = NULL);
 
     /**
      * Uninstalls the given instrument from the associated graphics view.

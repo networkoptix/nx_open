@@ -136,7 +136,9 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_dummyScene(new QGraphicsScene(this)),
 	m_renderWatcher(NULL),
     m_frameOpacity(1.0),
-    m_frameWidthsDirty(false)
+    m_frameWidthsDirty(false),
+    m_zoomedMarginFlags(0),
+    m_normalMarginFlags(0)
 {
     std::memset(m_itemByRole, 0, sizeof(m_itemByRole));
 
@@ -298,14 +300,14 @@ void QnWorkbenchDisplay::initSceneContext() {
     /* Set up curtain. */
     m_curtainItem = new QnCurtainItem();
     m_scene->addItem(m_curtainItem.data());
-    setLayer(m_curtainItem.data(), CURTAIN_LAYER);
+    setLayer(m_curtainItem.data(), CurtainLayer);
     m_curtainItem.data()->setColor(QColor(0, 0, 0, 255));
     m_curtainAnimator->setCurtainItem(m_curtainItem.data());
 
     /* Set up grid. */
     m_gridItem = new QnGridItem();
     m_scene->addItem(m_gridItem.data());
-    setLayer(m_gridItem.data(), BACK_LAYER);
+    setLayer(m_gridItem.data(), BackLayer);
     m_gridItem.data()->setAnimationSpeed(2.0);
     m_gridItem.data()->setAnimationTimeLimit(300);
     m_gridItem.data()->setColor(QColor(0, 240, 240, 128));
@@ -432,7 +434,7 @@ QnWorkbenchRenderWatcher *QnWorkbenchDisplay::renderWatcher() const {
 QnWorkbenchDisplay::Layer QnWorkbenchDisplay::layer(QGraphicsItem *item) const {
     bool ok;
     Layer layer = static_cast<Layer>(item->data(ITEM_LAYER).toInt(&ok));
-    return ok ? layer : BACK_LAYER;
+    return ok ? layer : BackLayer;
 }
 
 void QnWorkbenchDisplay::setLayer(QGraphicsItem *item, Layer layer) {
@@ -687,12 +689,44 @@ void QnWorkbenchDisplay::setViewportMargins(const QMargins &margins) {
     synchronizeSceneBoundsExtension();
 }
 
-Qn::MarginFlags QnWorkbenchDisplay::marginFlags() const {
+Qn::MarginFlags QnWorkbenchDisplay::currentMarginFlags() const {
     return m_viewportAnimator->marginFlags();
 }
 
-void QnWorkbenchDisplay::setMarginFlags(Qn::MarginFlags flags) {
-    if(marginFlags() == flags)
+Qn::MarginFlags QnWorkbenchDisplay::zoomedMarginFlags() const {
+    return m_zoomedMarginFlags;
+}
+
+Qn::MarginFlags QnWorkbenchDisplay::normalMarginFlags() const {
+    return m_normalMarginFlags;
+}
+
+void QnWorkbenchDisplay::setZoomedMarginFlags(Qn::MarginFlags flags) {
+    if(m_zoomedMarginFlags == flags)
+        return;
+
+    m_zoomedMarginFlags = flags;
+
+    updateCurrentMarginFlags();
+}
+
+void QnWorkbenchDisplay::setNormalMarginFlags(Qn::MarginFlags flags) {
+    if(m_normalMarginFlags == flags)
+        return;
+
+    m_normalMarginFlags = flags;
+
+    updateCurrentMarginFlags();
+}
+
+void QnWorkbenchDisplay::updateCurrentMarginFlags() {
+    Qn::MarginFlags flags;
+    if(m_itemByRole[QnWorkbench::ZOOMED] == NULL) {
+        flags = m_normalMarginFlags;
+    } else {
+        flags = m_zoomedMarginFlags;
+    }
+    if(flags == currentMarginFlags())
         return;
 
     m_viewportAnimator->setMarginFlags(flags);
@@ -728,10 +762,10 @@ qreal QnWorkbenchDisplay::layerZValue(Layer layer) const {
 
 QnWorkbenchDisplay::Layer QnWorkbenchDisplay::shadowLayer(Layer itemLayer) const {
     switch(itemLayer) {
-    case PINNED_RAISED_LAYER:
-        return PINNED_LAYER;
-    case UNPINNED_RAISED_LAYER:
-        return UNPINNED_LAYER;
+    case PinnedRaisedLayer:
+        return PinnedLayer;
+    case UnpinnedRaisedLayer:
+        return UnpinnedLayer;
     default:
         return itemLayer;
     }
@@ -741,18 +775,18 @@ QnWorkbenchDisplay::Layer QnWorkbenchDisplay::synchronizedLayer(QnWorkbenchItem 
     assert(item != NULL);
 
     if(item == m_itemByRole[QnWorkbench::ZOOMED]) {
-        return ZOOMED_LAYER;
+        return ZoomedLayer;
     } else if(item->isPinned()) {
         if(item == m_itemByRole[QnWorkbench::RAISED]) {
-            return PINNED_RAISED_LAYER;
+            return PinnedRaisedLayer;
         } else {
-            return PINNED_LAYER;
+            return PinnedLayer;
         }
     } else {
         if(item == m_itemByRole[QnWorkbench::RAISED]) {
-            return UNPINNED_RAISED_LAYER;
+            return UnpinnedRaisedLayer;
         } else {
-            return UNPINNED_LAYER;
+            return UnpinnedLayer;
         }
     }
 }
@@ -967,14 +1001,17 @@ void QnWorkbenchDisplay::synchronizeSceneBounds() {
 }
 
 void QnWorkbenchDisplay::synchronizeSceneBoundsExtension() {
+    bool isZoomed = m_itemByRole[QnWorkbench::ZOOMED] != NULL;
+    //bool affectPosition = isZoomed ? currentMarginFlags() &
+
     MarginsF marginsExtension(0.0, 0.0, 0.0, 0.0);
-    if(marginFlags() != 0)
+    if(currentMarginFlags() != 0)
         marginsExtension = cwiseDiv(m_viewportAnimator->viewportMargins(), m_view->viewport()->size());
 
     /* Sync position extension. */
     {
         MarginsF positionExtension(0.0, 0.0, 0.0, 0.0);
-        if(marginFlags() & Qn::MARGINS_AFFECT_POSITION)
+        if(currentMarginFlags() & Qn::MarginsAffectPosition)
             positionExtension = marginsExtension;
 
         QnWorkbenchItem *zoomedItem = m_itemByRole[QnWorkbench::ZOOMED];
@@ -986,7 +1023,7 @@ void QnWorkbenchDisplay::synchronizeSceneBoundsExtension() {
     }
 
     /* Sync size extension. */
-    if(marginFlags() & Qn::MARGINS_AFFECT_SIZE) {
+    if(currentMarginFlags() & Qn::MarginsAffectSize) {
         QSizeF sizeExtension = sizeDelta(marginsExtension);
         sizeExtension = cwiseDiv(sizeExtension, QSizeF(1.0, 1.0) - sizeExtension);
 
@@ -1212,6 +1249,8 @@ void QnWorkbenchDisplay::at_workbench_itemChanged(QnWorkbench::ItemRole role, Qn
                 opacityAnimator(widget)->animateTo(opacity);
     }
 
+    /* Update margin flags. */
+    updateCurrentMarginFlags();
 
     emit widgetChanged(role);
 }

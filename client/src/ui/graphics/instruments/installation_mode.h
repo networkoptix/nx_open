@@ -9,20 +9,20 @@ class InstallationMode {
 public:
     enum Mode {
         /** Installed instrument will be the first in event processing queue. */
-        INSTALL_FIRST,  
+        InstallFirst,  
 
         /** Installed instrument will be the last in event processing queue. */
-        INSTALL_LAST,   
+        InstallLast,   
 
         /** Installed instrument will be placed before the given instrument in event processing queue. 
          * If NULL is given or given reference not found, it will be placed first in the queue. */
-        INSTALL_BEFORE, 
+        InstallBefore, 
 
         /** Installed instrument will be placed after the given instrument in event processing queue. 
          * If NULL is given or given reference not found, it will be placed last in the queue. */
-        INSTALL_AFTER,  
+        InstallAfter,  
 
-        INSTALL_MODE_COUNT
+        InstallationModeCount
     };
 
 protected:

@@ -26,8 +26,8 @@ QnWorkbenchRenderWatcher::QnWorkbenchRenderWatcher(QnWorkbenchDisplay *display, 
     SignalingInstrument *afterDisplayInstrument = new SignalingInstrument(Instrument::VIEWPORT, paintEventTypes, this);
 
     InstrumentManager *manager = display->instrumentManager();
-    manager->installInstrument(beforeDisplayInstrument, InstrumentManager::INSTALL_BEFORE, display->paintForwardingInstrument());
-    manager->installInstrument(afterDisplayInstrument,  InstrumentManager::INSTALL_AFTER, display->paintForwardingInstrument());
+    manager->installInstrument(beforeDisplayInstrument, InstrumentManager::InstallBefore, display->paintForwardingInstrument());
+    manager->installInstrument(afterDisplayInstrument,  InstrumentManager::InstallAfter, display->paintForwardingInstrument());
 
     connect(beforeDisplayInstrument, SIGNAL(activated(QWidget *, QEvent *)), this, SLOT(startDisplay()));
     connect(afterDisplayInstrument,  SIGNAL(activated(QWidget *, QEvent *)), this, SLOT(finishDisplay()));

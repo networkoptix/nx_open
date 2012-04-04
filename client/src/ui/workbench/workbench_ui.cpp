@@ -148,8 +148,8 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_uiElementsInstrument = new UiElementsInstrument(this);
     m_controlsActivityInstrument = new ActivityListenerInstrument(hideConstrolsTimeoutMSec, this);
 
-    m_manager->installInstrument(m_uiElementsInstrument, InstallationMode::INSTALL_BEFORE, m_display->paintForwardingInstrument());
-    m_manager->installInstrument(m_fpsCountingInstrument, InstallationMode::INSTALL_BEFORE, m_display->paintForwardingInstrument());
+    m_manager->installInstrument(m_uiElementsInstrument, InstallationMode::InstallBefore, m_display->paintForwardingInstrument());
+    m_manager->installInstrument(m_fpsCountingInstrument, InstallationMode::InstallBefore, m_display->paintForwardingInstrument());
     m_manager->installInstrument(m_controlsActivityInstrument);
 
     connect(m_controlsActivityInstrument, SIGNAL(activityStopped()),                                                                this,                           SLOT(at_activityStopped()));
@@ -158,7 +158,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
 
     /* Create controls. */
     m_controlsWidget = m_uiElementsInstrument->widget(); /* Setting an ItemIsPanel flag on this item prevents focusing on graphics widgets. Don't set it. */
-    m_display->setLayer(m_controlsWidget, QnWorkbenchDisplay::UI_ELEMENTS_LAYER);
+    m_display->setLayer(m_controlsWidget, QnWorkbenchDisplay::UiLayer);
 
     QnSingleEventSignalizer *deactivationSignalizer = new QnSingleEventSignalizer(this);
     deactivationSignalizer->setEventType(QEvent::WindowDeactivate);
@@ -513,7 +513,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
 
 
     /* Init fields. */
-    setFlags(HIDE_WHEN_NORMAL | HIDE_WHEN_ZOOMED | AFFECT_MARGINS_WHEN_ZOOMED | AFFECT_MARGINS_WHEN_NORMAL);
+    setFlags(HideWhenNormal | HideWhenZoomed | AdjustMargins);
 
     setSliderOpened(true, false);
     setSliderVisible(false, false);
@@ -1062,14 +1062,7 @@ void QnWorkbenchUi::setFlags(Flags flags) {
 }
 
 void QnWorkbenchUi::updateViewportMargins() {
-    bool affectMargins;
-    if(m_widgetByRole[QnWorkbench::ZOOMED] != NULL) {
-        affectMargins = m_flags & AFFECT_MARGINS_WHEN_ZOOMED;
-    } else {
-        affectMargins = m_flags & AFFECT_MARGINS_WHEN_NORMAL;
-    }
-
-    if(!affectMargins) {
+    if(!(m_flags & AdjustMargins)) {
         m_display->setViewportMargins(QMargins(0, 0, 0, 0));
     } else {
         m_display->setViewportMargins(calculateViewportMargins(
@@ -1087,9 +1080,9 @@ void QnWorkbenchUi::updateActivityInstrumentState() {
     bool zoomed = m_widgetByRole[QnWorkbench::ZOOMED] != NULL;
 
     if(zoomed) {
-        m_controlsActivityInstrument->setEnabled(m_flags & HIDE_WHEN_ZOOMED);
+        m_controlsActivityInstrument->setEnabled(m_flags & HideWhenZoomed);
     } else {
-        m_controlsActivityInstrument->setEnabled(m_flags & HIDE_WHEN_NORMAL);
+        m_controlsActivityInstrument->setEnabled(m_flags & HideWhenNormal);
     }
 }
 

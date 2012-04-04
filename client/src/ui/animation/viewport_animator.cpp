@@ -111,12 +111,12 @@ QRectF ViewportAnimator::realToAdjusted(const QGraphicsView *view, const QRectF 
 
     /* Calculate resulting size. */
     QSizeF adjustedSize = fixedRealSize;
-    if(m_marginFlags & Qn::MARGINS_AFFECT_SIZE)
+    if(m_marginFlags & Qn::MarginsAffectSize)
         adjustedSize = SceneUtility::cwiseMul(adjustedSize, QSizeF(1.0, 1.0) - SceneUtility::sizeDelta(relativeMargins));
 
     /* Calculate resulting position. */
     QPointF adjustedCenter = realRect.center();
-    if(m_marginFlags & Qn::MARGINS_AFFECT_POSITION) {
+    if(m_marginFlags & Qn::MarginsAffectPosition) {
         QRectF fixedRealRect = QRectF(adjustedCenter - SceneUtility::toPoint(fixedRealSize) / 2, fixedRealSize);
 
         adjustedCenter = SceneUtility::eroded(fixedRealRect, SceneUtility::cwiseMul(fixedRealRect.size(), relativeMargins)).center();
@@ -143,7 +143,7 @@ QRectF ViewportAnimator::adjustedToReal(const QGraphicsView *view, const QRectF 
     QSizeF fixedAdjustedSize;
     {
         QSize adjustedViewportSize = view->viewport()->size();
-        if(m_marginFlags & Qn::MARGINS_AFFECT_SIZE)
+        if(m_marginFlags & Qn::MarginsAffectSize)
             adjustedViewportSize = SceneUtility::eroded(adjustedViewportSize, m_margins);
 
         fixedAdjustedSize = SceneUtility::expanded(SceneUtility::aspectRatio(adjustedViewportSize), adjustedRect.size(), Qt::KeepAspectRatioByExpanding);
@@ -151,12 +151,12 @@ QRectF ViewportAnimator::adjustedToReal(const QGraphicsView *view, const QRectF 
 
     /* Calculate resulting size. */
     QSizeF realSize = fixedAdjustedSize;
-    if(m_marginFlags & Qn::MARGINS_AFFECT_SIZE)
+    if(m_marginFlags & Qn::MarginsAffectSize)
         realSize = SceneUtility::cwiseMul(realSize, QSizeF(1.0, 1.0) + SceneUtility::sizeDelta(inverseRelativeMargins));
 
     /* Calculate resulting position. */
     QPointF realCenter = adjustedRect.center();
-    if(m_marginFlags & Qn::MARGINS_AFFECT_POSITION) {
+    if(m_marginFlags & Qn::MarginsAffectPosition) {
         QRectF fixedAdjustedRect = QRectF(realCenter - SceneUtility::toPoint(fixedAdjustedSize) / 2, fixedAdjustedSize);
 
         realCenter = SceneUtility::dilated(fixedAdjustedRect, SceneUtility::cwiseMul(fixedAdjustedRect.size(), inverseRelativeMargins)).center();

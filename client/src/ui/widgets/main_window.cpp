@@ -144,11 +144,11 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 	m_display->initSyncPlay();
     m_display->setScene(scene);
     m_display->setView(m_view);
-    m_display->setMarginFlags(Qn::MARGINS_AFFECT_POSITION);
+    m_display->setNormalMarginFlags(Qn::MarginsAffectSize | Qn::MarginsAffectPosition);
 
     m_controller = new QnWorkbenchController(m_display, this);
     m_ui = new QnWorkbenchUi(m_display, this);
-    m_ui->setFlags(QnWorkbenchUi::HIDE_WHEN_ZOOMED | QnWorkbenchUi::AFFECT_MARGINS_WHEN_NORMAL);
+    m_ui->setFlags(QnWorkbenchUi::HideWhenZoomed | QnWorkbenchUi::AdjustMargins);
 
     m_actionHandler = new QnWorkbenchActionHandler(this);
     m_actionHandler->setWidget(this);

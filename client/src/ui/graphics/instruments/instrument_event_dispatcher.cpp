@@ -107,7 +107,7 @@ void InstrumentEventDispatcher<T>::registerTarget(T *target) {
     m_targets.insert(target);
 
     foreach(Instrument *instrument, m_instruments)
-        installInstrumentInternal(instrument, target, INSTALL_FIRST, NULL);
+        installInstrumentInternal(instrument, target, InstallFirst, NULL);
 }
 
 template<class T>

@@ -42,10 +42,14 @@ class QnWorkbenchUi: public QObject, public QnWorkbenchContextAware, public QnAc
 
 public:
     enum Flag {
-        HIDE_WHEN_ZOOMED = 0x1, /**< Whether controls should be hidden after a period without activity in zoomed mode. */
-        HIDE_WHEN_NORMAL = 0x2, /**< Whether controls should be hidden after a period without activity in normal mode. */
-        AFFECT_MARGINS_WHEN_ZOOMED = 0x4,
-        AFFECT_MARGINS_WHEN_NORMAL = 0x8
+        /** Whether controls should be hidden after a period without activity in zoomed mode. */
+        HideWhenZoomed = 0x1, 
+
+        /** Whether controls should be hidden after a period without activity in normal mode. */
+        HideWhenNormal = 0x2, 
+
+        /** Whether controls affect viewport margins. */
+        AdjustMargins = 0x4,
     };
     Q_DECLARE_FLAGS(Flags, Flag)
 
