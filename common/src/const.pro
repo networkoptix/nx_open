@@ -124,7 +124,7 @@ PB_FILES = $$PWD/api/pb/camera.proto \
 pb.name = Generating code from ${QMAKE_FILE_IN}
 pb.input = PB_FILES
 pb.output = $${MOC_DIR}/${QMAKE_FILE_BASE}.pb.cc
-pb.commands = $$EVETOOLS_DIR/bin/protoc --proto_path=../src/api/pb --cpp_out=$${MOC_DIR} ../src/${QMAKE_FILE_NAME}
+pb.commands = $$EVETOOLS_DIR/bin/protoc --proto_path=../src/api/pb --cpp_out=$${MOC_DIR} ../src/api/pb/${QMAKE_FILE_BASE}.proto
 pb.CONFIG += target_predeps
 pb.variable_out = GENERATED_SOURCES
 QMAKE_EXTRA_COMPILERS += pb

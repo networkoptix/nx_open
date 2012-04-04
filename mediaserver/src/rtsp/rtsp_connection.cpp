@@ -235,6 +235,7 @@ int QnRtspConnectionProcessor::numOfVideoChannels()
     if (!d->mediaRes)
         return -1;
     QnAbstractMediaStreamDataProviderPtr currentDP;
+    
     if (d->liveMode)
         currentDP = d->liveDpHi;
     else
@@ -362,6 +363,7 @@ int QnRtspConnectionProcessor::composeSetup()
     int trackId = extractTrackId(d->requestHeaders.path());
 
     QnAbstractMediaStreamDataProviderPtr currentDP;
+    
     if (d->liveMode)
         currentDP = d->liveDpHi;
     else

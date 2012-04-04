@@ -60,7 +60,7 @@ CONFIG(release, debug|release) {
   PRE_TARGETDEPS += ../../common/bin/release/common.lib
   }
   unix:!mac {
-  PRE_TARGETDEPS += ../../common/bin/release/libcommon.so
+  PRE_TARGETDEPS += ../../common/bin/release/libcommon.a
   }
   mac {
   PRE_TARGETDEPS += ../../common/bin/release/libcommon.dylib
