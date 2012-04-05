@@ -22,12 +22,13 @@
         <?define VmsUpgrading=" (NOT Installed AND PREVIOUSVERSIONSINSTALLED)" ?>
         <?define VmsChanging=" (Installed AND REMOVE <> "ALL") "?>
         <?define VmsRemoving=" (Installed AND REMOVE = "ALL") "?>
+        <?define VmsRepairing=" (REINSTALLMODE) " ?>
         
         <SetProperty Id="REBOOT" Value="reallysuppress" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
         <SetProperty Id="PREVIOUSVERSIONSINSTALLED" Value="[MIGRATE]" After="FindRelatedProducts"/>
+        <SetProperty Id="APPSERVER_PASSWORD" Value="[APPSERVER_PASSWORD_REG]" After="FindRelatedProducts">$(var.VmsRepairing)</SetProperty>
+        <SetProperty Id="SERVER_APPSERVER_PASSWORD" Value="[APPSERVER_PASSWORD_REG]" After="FindRelatedProducts">$(var.VmsRepairing)</SetProperty>
 
-        <Property Id="ARPNOREPAIR" Value="1" Secure="yes"/>
-        
         <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
         <WixVariable Id="WixUIBannerBmp" Value="Binary\eve\eve_logo-493x58.bmp" />
         <WixVariable Id="WixUIDialogBmp" Value="Binary\eve\eve_logo-493x312.bmp" />
@@ -65,6 +66,16 @@
                             Root="HKLM"
                             Key="Software\Network Optix\Enterprise Controller"
                             Name="port"
+                            Type="raw"
+                            Win64="no"/>
+        </Property>
+        
+        <!-- We use ecs password only when doing repair -->
+        <Property Id="APPSERVER_PASSWORD_REG" Secure="yes">
+            <RegistrySearch Id="AppServerPasswordReg"
+                            Root="HKLM"
+                            Key="Software\Network Optix\Enterprise Controller"
+                            Name="password"
                             Type="raw"
                             Win64="no"/>
         </Property>
@@ -333,8 +344,7 @@
                                 </Condition>
                                 
                                 <RegistryKey Root="HKLM"
-                                             Key="Software\[Manufacturer]\Enterprise Controller"
-                                             Action="createAndRemoveOnUninstall">
+                                             Key="Software\[Manufacturer]\Enterprise Controller" Action="create">
                                     <RegistryValue Type="string" Name="port" Value="[APPSERVER_PORT]"/>
                                     <RegistryValue Type="string" Name="login" Value="[APPSERVER_LOGIN]"/>
                                     <RegistryValue Type="string" Name="password" Value="[APPSERVER_PASSWORD]"/>
@@ -463,7 +473,7 @@
 
                                 <RegistryKey Root="HKCU"
                                              Key="Software\[Manufacturer]\Network Optix HD Witness Client"
-                                             Action="createAndRemoveOnUninstall">
+                                             Action="create">
                                     <RegistryValue Type="string" Name="afterFirstRun" Value="false"/>
                                     <RegistryValue Type="string" Name="appserverHost" Value="[CLIENT_APPSERVER_HOST]"/>
                                     <RegistryValue Type="string" Name="appserverPort" Value="[CLIENT_APPSERVER_PORT]"/>
