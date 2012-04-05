@@ -93,7 +93,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             continue;
         }
 
-#elif Q_OS_WIN
+#elif defined Q_OS_WIN
     for (int i = 0; i < ipaddrs.size();++i)
     {
         QUdpSocket sock;
@@ -187,7 +187,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
                 cl_log.log(cl_logWARNING, "QnPlDlinkResourceSearcher::findResources(): getnameinfo() failed: %s", strerror(errno));
             }
             resource->setDiscoveryAddr(QHostAddress(host));
-#elif Q_OS_WIN
+#elif defined Q_OS_WIN
             resource->setDiscoveryAddr(ipaddrs.at(i));
 #endif
 
