@@ -1,4 +1,5 @@
 #include "viewport_bound_widget.h"
+#include <cmath> /* For std::sqrt. */
 #include <QGraphicsView>
 
 QnViewportBoundWidget::QnViewportBoundWidget(QGraphicsItem *parent):
