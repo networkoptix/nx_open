@@ -8,6 +8,7 @@
 #    pragma warning(disable: 4101) /* C4101: '?' : unreferenced local variable. */
 #endif
 
+static const int NAL_RESERVED_SPACE = 16;
 static const double FRAME_RATE_EPS = 3e-5;
 
 void NALUnit::write_rbsp_trailing_bits(BitStreamWriter& writer)
@@ -219,7 +220,7 @@ int NALUnit::deserialize(quint8* buffer, quint8* end)
 void NALUnit::decodeBuffer(const quint8* buffer, const quint8* end)
 {
 	delete [] m_nalBuffer;
-	m_nalBuffer = new quint8[end - buffer];
+	m_nalBuffer = new quint8[end - buffer + NAL_RESERVED_SPACE];
 	m_nalBufferLen = decodeNAL(buffer, end, m_nalBuffer, end - buffer);
 }
 
@@ -770,6 +771,7 @@ SliceUnit::SliceUnit():NALUnit() {
 	m_shortDeserializeMode = true;
 #endif
 	memory_management_control_operation = 0;
+    m_fullHeaderLen = 0;
 }
 
 int SliceUnit::deserialize(quint8* buffer, quint8* end, 
@@ -787,10 +789,19 @@ int SliceUnit::deserialize(quint8* buffer, quint8* end,
 	bitReader.setBuffer(buffer + 1, end);
 	//m_getbitContextBuffer = buffer+1;
 	rez = deserializeSliceHeader(spsMap, ppsMap);
-	//if (rez != 0 || m_shortDeserializeMode)
-	return rez;
-	//return rez;
-	//return deserializeSliceData();
+    if (rez != 0 || m_shortDeserializeMode)
+        return rez;
+
+    if (nal_unit_type == nuSliceA ||  nal_unit_type == nuSliceB || nal_unit_type == nuSliceC)
+    {
+        int slice_id = extractUEGolombCode();
+        if (nal_unit_type == nuSliceB || nal_unit_type == nuSliceC)
+            if( pps->redundant_pic_cnt_present_flag )
+                int redundant_pic_cnt = extractUEGolombCode();
+    }
+    m_fullHeaderLen = bitReader.getBitsCount() + 8;
+    return 0;
+    //return deserializeSliceData();
 }
 
 /*
@@ -798,7 +809,95 @@ int SliceUnit::extractCABAC()
 {
 }
 */
+int SliceUnit::calc_rbsp_trailing_bits_cnt(uint8_t val)
+{
+    int cnt = 1;
+    while (val & 1 == 0) {
+        cnt++;
+        val >>= 1;
+        assert(val != 0);
+        if (val == 0)
+            return 0;
+    }
+    return cnt;
+}
 
+
+bool SliceUnit::correctPicOrderFieldLen(int newLen, int oldLen)
+{
+	int bitDiff = newLen - oldLen;
+	if (bitDiff > NAL_RESERVED_SPACE*8)
+		return false;
+
+	assert(bitDiff >= 0);
+	if (bitDiff > 0)
+	{
+		if (pps->entropy_coding_mode_flag)
+		{
+			int oldHeaderLenInBytes = m_fullHeaderLen / 8;
+			if (m_fullHeaderLen % 8 != 0)
+				oldHeaderLenInBytes++;
+			int newHeaderLenInBits = m_fullHeaderLen + bitDiff;
+			int newHeaderLenInBytes = newHeaderLenInBits / 8;
+			if (newHeaderLenInBits %8 != 0)
+				newHeaderLenInBytes++;
+			if (newHeaderLenInBytes > oldHeaderLenInBytes)
+			{
+				uint8_t* sliceData = m_nalBuffer + oldHeaderLenInBytes;
+				memmove(sliceData + newHeaderLenInBytes - oldHeaderLenInBytes, 
+						sliceData, m_nalBufferLen - oldHeaderLenInBytes);
+				moveBits(m_nalBuffer, 8, 8 + bitDiff, m_fullHeaderLen-8);
+				m_nalBufferLen += newHeaderLenInBytes - oldHeaderLenInBytes;
+				if (newHeaderLenInBits % 8 != 0)
+				{
+					int bitRest = 8 - (newHeaderLenInBits % 8);
+					int mask = 0;
+					for (int i = 0; i < bitRest; ++i) 
+						mask = (mask << 1) + 1;
+					m_nalBuffer[newHeaderLenInBytes-1] |= mask; // add padding cabac_alignment_one_bit 
+				}
+			}
+		}
+		else 
+		{
+			int oldLenInBits = m_nalBufferLen * 8;
+			oldLenInBits -= calc_rbsp_trailing_bits_cnt(m_nalBuffer[m_nalBufferLen-1]);
+			int newLenInBits = oldLenInBits + bitDiff;
+			moveBits(m_nalBuffer, 0, bitDiff, oldLenInBits);
+			m_nalBufferLen = newLenInBits / 8;
+			if (newLenInBits % 8 == 0) 
+				m_nalBuffer[m_nalBufferLen] = 0x80; // trailing bits
+			else {
+				int mask = 1;
+				int bitRest = 8 - (newLenInBits % 8);
+				mask <<= bitRest - 1;
+				m_nalBuffer[m_nalBufferLen] &= mask;
+				m_nalBuffer[m_nalBufferLen] |= mask;
+			}
+			m_nalBufferLen++;
+			BitStreamWriter writer;
+			uint8_t* dst = m_nalBuffer + newLenInBits / 8;
+			writer.setBuffer(dst, dst + 1);
+			writer.skipBits(newLenInBits % 8);
+			write_rbsp_trailing_bits(writer);
+			writer.flushBits();
+		}
+	}
+	BitStreamWriter writer;
+	writer.setBuffer(m_nalBuffer + 1, m_nalBuffer + m_nalBufferLen + 4);
+	writeUEGolombCode(writer, first_mb_in_slice);
+	writer.flushBits();
+
+	m_fullHeaderLen += bitDiff; 
+	
+	/*
+	updateBits(
+
+	updateBits(0, m_frameNumBits, frameNum);
+	if (m_picOrderBitPos > 0)
+		updateBits(m_picOrderBitPos, m_picOrderNumBits, frameNum*2 + bottom_field_flag);
+	*/
+}
 
 void NALUnit::updateBits(int bitOffset, int bitLen, int value)
 {

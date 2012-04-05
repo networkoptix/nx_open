@@ -356,6 +356,10 @@ public:
 
 	const SPSUnit* getSPS() const {return sps;}
 	const PPSUnit* getPPS() const {return pps;}
+
+    int calc_rbsp_trailing_bits_cnt(uint8_t val);
+    bool correctPicOrderFieldLen(int newLen, int oldLen);
+
 #ifndef __TS_MUXER_COMPILE_MODE
 
 	int slice_qp_delta;
@@ -479,6 +483,7 @@ private:
 	const SPSUnit* sps;
 	int m_frameNumBitPos;
 	int m_frameNumBits;
+    int m_fullHeaderLen;
 	int deserializeSliceHeader(const QMap<quint32, SPSUnit*>& spsMap,const QMap<quint32, PPSUnit*>& ppsMap);
 };
 
