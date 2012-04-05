@@ -4,6 +4,14 @@
 #include "utils/network/nettools.h"
 #include "utils/common/sleep.h"
 
+#ifdef Q_OS_LINUX
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <ifaddrs.h>
+#include <unistd.h>
+#endif
+
 unsigned char request[] = {0xfd, 0xfd, 0x06, 0x00, 0xa1, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00};
 QByteArray barequest(reinterpret_cast<char *>(request), sizeof(request));
 
@@ -57,11 +65,42 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
 
     QList<QHostAddress> ipaddrs = getAllIPv4Addresses();
 
+#ifdef Q_OS_LINUX
+    struct ifaddrs *ifaddr, *ifa;
+    int family, s;
+    char host[NI_MAXHOST];
+
+    if (getifaddrs(&ifaddr) == -1)
+    {
+        cl_log.log(cl_logWARNING, "QnPlDlinkResourceSearcher::findResources(): Can't get interfaces list: %s", strerror(errno));
+        return result;
+    }
+
+    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
+    {
+        family = ifa->ifa_addr->sa_family;
+
+        if (family != AF_INET)
+            continue;
+
+        QUdpSocket sock;
+        sock.bind(0);
+
+        int res = setsockopt(sock.socketDescriptor(), SOL_SOCKET, SO_BINDTODEVICE, ifa->ifa_name, strlen(ifa->ifa_name));
+        if (res != 0)
+        {
+            cl_log.log(cl_logWARNING, "QnPlDlinkResourceSearcher::findResources(): Can't bind to interface %s: %s", ifa->ifa_name, strerror(errno));
+            continue;
+        }
+
+#elif Q_OS_WIN
     for (int i = 0; i < ipaddrs.size();++i)
     {
         QUdpSocket sock;
+
         if (!sock.bind(ipaddrs.at(i), 0))
-            continue;
+           continue;
+#endif
 
         // sending broadcast
 
@@ -141,7 +180,16 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             resource->setMAC(smac);
             resource->setHostAddress(sender, QnDomainMemory);
             QString s = sender.toString();
+
+#ifdef Q_OS_LINUX
+            s = getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in), host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
+            if (s != 0) {
+                cl_log.log(cl_logWARNING, "QnPlDlinkResourceSearcher::findResources(): getnameinfo() failed: %s", strerror(errno));
+            }
+            resource->setDiscoveryAddr(QHostAddress(host));
+#elif Q_OS_WIN
             resource->setDiscoveryAddr(ipaddrs.at(i));
+#endif
 
             result.push_back(resource);
 
