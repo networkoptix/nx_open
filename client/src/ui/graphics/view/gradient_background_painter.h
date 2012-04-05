@@ -10,8 +10,7 @@ class QnSettings;
 class LinearCombinator;
 
 
-class QnGradientBackgroundPainter : public QnLayerPainter
-{
+class QnGradientBackgroundPainter: public QnLayerPainter {
 public:
     /**
      * \param cycleIntervalSecs         Background animation cycle, in seconds.

@@ -251,3 +251,4 @@ void QnResourceSearchSynchronizer::at_model_criteriaChanged() {
 
     updateLater();
 }
+
