@@ -310,22 +310,19 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
                 return false;
             }
 
-            AVCodecContext* srcContext = mediaData->context->ctx();
             AVCodecContext* videoCodecCtx = videoStream->codec;
-
 
             // m_forceDefaultCtx: for server archive, if file is recreated - we need to use default context.
             // for exporting AVI files we must use original context, so need to reset "force" for exporting purpose
-            /*
-            if (mediaData->context && !m_forceDefaultCtx && srcContext->width > 0)
+            
+            if (!m_forceDefaultCtx && mediaData->context && mediaData->context->ctx()->width > 0)
             {
+                AVCodecContext* srcContext = mediaData->context->ctx();
                 avcodec_copy_context(videoCodecCtx, srcContext);
                 videoStream->stream_copy = 1;
                 m_srcCodecExtraData = QByteArray((const char*)mediaData->context->ctx()->extradata, mediaData->context->ctx()->extradata_size);
             }
-            else
-                */
-                if (m_role == Role_FileExport)
+            else if (m_role == Role_FileExport)
             {
                 // determine real width and height
                 CLVideoDecoderOutput outFrame;
@@ -338,8 +335,8 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
             else {
                 videoCodecCtx->codec_id = mediaData->compressionType;
                 videoCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
-                videoCodecCtx->width = qMax(8,srcContext->width);
-                videoCodecCtx->height = qMax(8,srcContext->height);
+                videoCodecCtx->width = qMax(8,mediaData->width);
+                videoCodecCtx->height = qMax(8,mediaData->height);
                 
                 if (mediaData->compressionType == CODEC_ID_MJPEG)
                     videoCodecCtx->pix_fmt = PIX_FMT_YUVJ420P;
