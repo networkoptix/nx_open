@@ -538,3 +538,8 @@ void CLFFmpegVideoDecoder::setMTDecoding(bool value)
         m_needRecreate = true;
     m_mtDecoding = value;
 }
+
+AVCodecContext* CLFFmpegVideoDecoder::getContext() const
+{
+    return m_context;
+}

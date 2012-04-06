@@ -5,6 +5,8 @@
 #include "core/datapacket/mediadatapacket.h"
 #include "core/resource/resource.h"
 #include "core/resource/resource_media_layout.h"
+#include <openssl/evp.h>
+#include <QPixmap>
 
 class QnAbstractMediaStreamDataProvider;
 
@@ -13,6 +15,8 @@ class QnStreamRecorder : public QnAbstractDataConsumer
     Q_OBJECT
 
 public:
+    enum Role {Role_ServerRecording, Role_FileExport};
+
     QnStreamRecorder(QnResourcePtr dev);
     virtual ~QnStreamRecorder();
 
@@ -34,6 +38,22 @@ public:
 
     QString fixedFileName() const;
     void setEofDateTime(qint64 value);
+
+    /*
+    * Calc hash for writing file
+    */
+    void setNeedCalcSignature(bool value);
+
+    void setSignLogo(QPixmap logo);
+
+    /*
+    * Return hash value 
+    */
+    QByteArray getSignature() const;
+
+    void setRole(Role role);
+
+
 signals:
     void recordingFailed(QString errMessage);
     void recordingStarted();
@@ -50,11 +70,19 @@ protected:
     virtual bool needSaveData(QnAbstractMediaDataPtr media);
 
     virtual bool saveMotion(QnAbstractMediaDataPtr media);
-    bool saveData(QnAbstractMediaDataPtr md);
 
     virtual void fileFinished(qint64 /*durationMs*/, const QString& /*fileName*/, QnAbstractMediaStreamDataProvider*) {}
     virtual void fileStarted(qint64 /*startTimeMs*/, const QString& /*fileName*/, QnAbstractMediaStreamDataProvider*) {}
     virtual QString fillFileName(QnAbstractMediaStreamDataProvider*);
+
+    bool addSignatureFrame(QString& errorString);
+private:
+    int correctX264Bitstream(AVCodecContext* videoCodecCtx, quint8* videoBuf, int out_size, int videoBufSize);
+    int correctNalPrefix(quint8* videoBuf, int out_size, int videoBufSize);
+
+    void fillH264EncoderParams(AVCodecContext* avctx, AVDictionary* &options);
+    void drawOnSignFrame(AVFrame* frame);
+    bool saveData(QnAbstractMediaDataPtr md);
 private:
     void markNeedKeyData();
 protected:
@@ -83,7 +111,13 @@ private:
     qint64 m_EofDateTime;
     bool m_endOfData;
     int m_lastProgress;
+    bool m_needCalcSignature;
     QnAbstractMediaStreamDataProvider* m_mediaProvider;
+    
+    Role m_role;
+    EVP_MD_CTX* m_mdctx;
+    QPixmap m_logo;
+    QByteArray m_srcCodecExtraData;
 };
 
 #endif // _STREAM_RECORDER_H__
