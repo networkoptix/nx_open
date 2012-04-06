@@ -73,16 +73,21 @@ bool QnFile::open(QIODevice::OpenMode& mode, unsigned int systemDependentFlags)
 
 	int sysFlags = 0;
     makeUnixOpenFlags( mode, &sysFlags );
-    m_impl = (void*)::open( m_fileName.toUtf8(), sysFlags | O_LARGEFILE | systemDependentFlags, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP );
+    int handle = ::open( m_fileName.toUtf8(), sysFlags | O_LARGEFILE | systemDependentFlags, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP );
 
-	return (long)m_impl != -1;
+    if (handle == -1)
+        m_impl = 0;
+    else
+        m_impl = (void*) handle;
+
+    return m_impl != 0;
 }
 
 void QnFile::close()
 {
-	if( ::close( (long)m_impl ) == 0 )
+    if( ::close( (long)m_impl ) == 0 )
 	{
-		m_impl = (void*)0xffffffff;
+        m_impl = 0;
 	}
 }
 
@@ -102,7 +107,7 @@ qint64 QnFile::write( const char* buffer, qint64 count )
 
 bool QnFile::isOpen() const
 {
-	return m_impl != (void*)0xffffffff;
+    return m_impl != 0;
 }
 
 qint64 QnFile::size() const
