@@ -33,6 +33,8 @@ public:
         return codecId == CODEC_ID_H264 && width <= 1920 && height <= 1088;
     }
 
+    AVCodecContext* getContext() const;
+
     PixelFormat GetPixelFormat();
     int getWidth() const  { return m_context->width;  }
     int getHeight() const { return m_context->height; }

@@ -144,12 +144,18 @@ bool CLPing::ping(const QString& ip, int retry, int timeoutPerRetry, int packetS
 
     unsigned short id  = (unsigned short) (rnd >> 15);
 
+#ifdef Q_OS_MAC
     int fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_ICMP);
+#else
+    int fd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
+#endif
     if (fd == -1)
-    {
-        // cl_log.
-        printf("\tUnable to open handle.\n");
+    {        
+        cl_log.log(cl_logWARNING, "CLPing::ping(): Unable to open raw socket: %s", strerror(errno));
         return false;
+    } else
+    {
+        cl_log.log(cl_logWARNING, "CLPing::ping(): SUCCESS");
     }
 
     struct

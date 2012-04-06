@@ -8,7 +8,22 @@
 #    pragma warning(disable: 4101) /* C4101: '?' : unreferenced local variable. */
 #endif
 
+static const int NAL_RESERVED_SPACE = 16;
 static const double FRAME_RATE_EPS = 3e-5;
+
+int NALUnit::calc_rbsp_trailing_bits_cnt(uint8_t val)
+{
+    int cnt = 1;
+    while ((val & 1) == 0) {
+        cnt++;
+        val >>= 1;
+        assert(val != 0);
+        if (val == 0)
+            return 0;
+    }
+    return cnt;
+}
+
 
 void NALUnit::write_rbsp_trailing_bits(BitStreamWriter& writer)
 {
@@ -75,6 +90,11 @@ const quint8* NALUnit::findNALWithStartCode(const quint8* buffer, const quint8* 
 			buffer+=3;
 	}
 	return end;
+}
+
+int NALUnit::encodeNAL(quint8* dstBuffer, size_t dstBufferSize)
+{
+    return encodeNAL(m_nalBuffer, m_nalBuffer+m_nalBufferLen, dstBuffer, dstBufferSize);
 }
 
 int NALUnit::encodeNAL(quint8* srcBuffer, quint8* srcEnd, quint8* dstBuffer, size_t dstBufferSize)
@@ -219,7 +239,7 @@ int NALUnit::deserialize(quint8* buffer, quint8* end)
 void NALUnit::decodeBuffer(const quint8* buffer, const quint8* end)
 {
 	delete [] m_nalBuffer;
-	m_nalBuffer = new quint8[end - buffer];
+	m_nalBuffer = new quint8[end - buffer + NAL_RESERVED_SPACE];
 	m_nalBufferLen = decodeNAL(buffer, end, m_nalBuffer, end - buffer);
 }
 
@@ -371,6 +391,14 @@ int PPSUnit::deserialize()
 		constrained_intra_pred_flag = bitReader.getBit();
 		redundant_pic_cnt_present_flag = bitReader.getBit();
 		m_ppsLenInMbit = bitReader.getBitsCount() + 8;
+
+        int trailingBits = calc_rbsp_trailing_bits_cnt(nalEnd[-1]);
+        int nalLenInBits = m_nalBufferLen*8 - trailingBits;
+        if (m_ppsLenInMbit < nalLenInBits)
+        {
+            transform_8x8_mode_flag = bitReader.getBit();
+            pic_scaling_matrix_present_flag = bitReader.getBit();
+        }
 		m_ready = true;
 		return 0;
 	} catch (BitStreamException) {
@@ -770,11 +798,22 @@ SliceUnit::SliceUnit():NALUnit() {
 	m_shortDeserializeMode = true;
 #endif
 	memory_management_control_operation = 0;
+    m_fullHeaderLen = 0;
 }
 
+int SliceUnit::deserialize(const SPSUnit* sps,const PPSUnit* pps)
+{
+    QMap<quint32, const SPSUnit*> spsMap;
+    QMap<quint32, const PPSUnit*> ppsMap;
+    spsMap.insert(0, sps);
+    ppsMap.insert(0, pps);
+    return deserialize(m_nalBuffer, m_nalBuffer + m_nalBufferLen, spsMap, ppsMap);
+}
+
+
 int SliceUnit::deserialize(quint8* buffer, quint8* end, 
-							const QMap<quint32, SPSUnit*>& spsMap,
-							const QMap<quint32, PPSUnit*>& ppsMap)
+							const QMap<quint32, const SPSUnit*>& spsMap,
+							const QMap<quint32, const PPSUnit*>& ppsMap)
 {
 	if (end - buffer < 2)
 		return NOT_ENOUGHT_BUFFER;
@@ -787,10 +826,19 @@ int SliceUnit::deserialize(quint8* buffer, quint8* end,
 	bitReader.setBuffer(buffer + 1, end);
 	//m_getbitContextBuffer = buffer+1;
 	rez = deserializeSliceHeader(spsMap, ppsMap);
-	//if (rez != 0 || m_shortDeserializeMode)
-	return rez;
-	//return rez;
-	//return deserializeSliceData();
+    if (rez != 0 || m_shortDeserializeMode)
+        return rez;
+
+    if (nal_unit_type == nuSliceA ||  nal_unit_type == nuSliceB || nal_unit_type == nuSliceC)
+    {
+        int slice_id = extractUEGolombCode();
+        if (nal_unit_type == nuSliceB || nal_unit_type == nuSliceC)
+            if( pps->redundant_pic_cnt_present_flag )
+                int redundant_pic_cnt = extractUEGolombCode();
+    }
+    m_fullHeaderLen = bitReader.getBitsCount() + 8;
+    return 0;
+    //return deserializeSliceData();
 }
 
 /*
@@ -798,7 +846,138 @@ int SliceUnit::extractCABAC()
 {
 }
 */
+bool SliceUnit::moveHeaderField(int fieldOffset, int newLen, int oldLen)
+{
+    int bitDiff = newLen - oldLen;
+    if (bitDiff > NAL_RESERVED_SPACE*8)
+        return false;
 
+
+    assert(bitDiff >= 0);
+    if (bitDiff > 0)
+    {
+        if (pps->entropy_coding_mode_flag)
+        {
+            int oldHeaderLenInBytes = m_fullHeaderLen / 8;
+            if (m_fullHeaderLen % 8 != 0)
+                oldHeaderLenInBytes++;
+            int newHeaderLenInBits = m_fullHeaderLen + bitDiff;
+            int newHeaderLenInBytes = newHeaderLenInBits / 8;
+            if (newHeaderLenInBits %8 != 0)
+                newHeaderLenInBytes++;
+            if (newHeaderLenInBytes > oldHeaderLenInBytes)
+            {
+                uint8_t* sliceData = m_nalBuffer + oldHeaderLenInBytes;
+                memmove(sliceData + newHeaderLenInBytes - oldHeaderLenInBytes, 
+                    sliceData, m_nalBufferLen - oldHeaderLenInBytes);
+            }
+            moveBits(m_nalBuffer, fieldOffset, fieldOffset + bitDiff, m_fullHeaderLen-fieldOffset);
+
+            m_nalBufferLen += newHeaderLenInBytes - oldHeaderLenInBytes;
+            if (newHeaderLenInBits % 8 != 0)
+            {
+                int bitRest = 8 - (newHeaderLenInBits % 8);
+                int mask = 0;
+                for (int i = 0; i < bitRest; ++i) 
+                    mask = (mask << 1) + 1;
+                m_nalBuffer[newHeaderLenInBytes-1] |= mask; // add padding cabac_alignment_one_bit 
+            }
+        }
+        else 
+        {
+            int oldLenInBits = m_nalBufferLen * 8;
+            int trailingBits = calc_rbsp_trailing_bits_cnt(m_nalBuffer[m_nalBufferLen-1]);
+            oldLenInBits -= trailingBits;
+            int newLenInBits = oldLenInBits + bitDiff;
+            moveBits(m_nalBuffer, fieldOffset, fieldOffset+bitDiff, oldLenInBits);
+            m_nalBufferLen = newLenInBits / 8;
+            if (newLenInBits % 8 == 0) 
+                m_nalBuffer[m_nalBufferLen] = 0x80; // trailing bits
+            else {
+                quint8 mask = 1;
+                int bitRest = 8 - (newLenInBits % 8);
+                mask <<= bitRest - 1;
+                m_nalBuffer[m_nalBufferLen] &= ~(mask-1);
+                m_nalBuffer[m_nalBufferLen] |= mask;
+            }
+            m_nalBufferLen++;
+        }
+    }
+    updateBits(fieldOffset-8, bitDiff, 0); // reader does not include first NAL bytes, so -8 bits
+    m_fullHeaderLen += bitDiff; 
+}
+
+/*
+bool SliceUnit::increasePicOrderFieldLen(int newLen, int oldLen)
+{
+	int bitDiff = newLen - oldLen;
+	if (bitDiff > NAL_RESERVED_SPACE*8)
+		return false;
+
+    quint8* sliceHeaderBuf = m_nalBuffer+1;
+
+    int picOrderBitPos = m_picOrderBitPos + 8; // original field does not inculde nal code byte
+
+	assert(bitDiff >= 0);
+	if (bitDiff > 0)
+	{
+		if (pps->entropy_coding_mode_flag)
+		{
+			int oldHeaderLenInBytes = m_fullHeaderLen / 8;
+			if (m_fullHeaderLen % 8 != 0)
+				oldHeaderLenInBytes++;
+			int newHeaderLenInBits = m_fullHeaderLen + bitDiff;
+			int newHeaderLenInBytes = newHeaderLenInBits / 8;
+			if (newHeaderLenInBits %8 != 0)
+				newHeaderLenInBytes++;
+			if (newHeaderLenInBytes > oldHeaderLenInBytes)
+			{
+				uint8_t* sliceData = m_nalBuffer + oldHeaderLenInBytes;
+				memmove(sliceData + newHeaderLenInBytes - oldHeaderLenInBytes, 
+						sliceData, m_nalBufferLen - oldHeaderLenInBytes);
+            }
+			moveBits(m_nalBuffer, picOrderBitPos, picOrderBitPos + bitDiff, m_fullHeaderLen-picOrderBitPos);
+
+			m_nalBufferLen += newHeaderLenInBytes - oldHeaderLenInBytes;
+			if (newHeaderLenInBits % 8 != 0)
+			{
+				int bitRest = 8 - (newHeaderLenInBits % 8);
+				int mask = 0;
+				for (int i = 0; i < bitRest; ++i) 
+					mask = (mask << 1) + 1;
+				m_nalBuffer[newHeaderLenInBytes-1] |= mask; // add padding cabac_alignment_one_bit 
+			}
+		}
+		else 
+		{
+			int oldLenInBits = m_nalBufferLen * 8;
+            int trailingBits = calc_rbsp_trailing_bits_cnt(m_nalBuffer[m_nalBufferLen-1]);
+			oldLenInBits -= trailingBits;
+			int newLenInBits = oldLenInBits + bitDiff;
+			moveBits(m_nalBuffer, picOrderBitPos, picOrderBitPos+bitDiff, oldLenInBits);
+			m_nalBufferLen = newLenInBits / 8;
+			if (newLenInBits % 8 == 0) 
+				m_nalBuffer[m_nalBufferLen] = 0x80; // trailing bits
+			else {
+				int mask = 1;
+				int bitRest = 8 - (newLenInBits % 8);
+				mask <<= bitRest - 1;
+				m_nalBuffer[m_nalBufferLen] &= mask;
+				m_nalBuffer[m_nalBufferLen] |= mask;
+			}
+			m_nalBufferLen++;
+			BitStreamWriter writer;
+			uint8_t* dst = m_nalBuffer + newLenInBits / 8;
+			writer.setBuffer(dst, dst + 1);
+			writer.skipBits(newLenInBits % 8);
+			write_rbsp_trailing_bits(writer);
+			writer.flushBits();
+		}
+	}
+    updateBits(m_picOrderBitPos, bitDiff, 0);
+	m_fullHeaderLen += bitDiff; 
+}
+*/
 
 void NALUnit::updateBits(int bitOffset, int bitLen, int value)
 {
@@ -825,8 +1004,8 @@ void NALUnit::updateBits(int bitOffset, int bitLen, int value)
 }
 
 
-int SliceUnit::deserializeSliceHeader(const QMap<quint32, SPSUnit*>& spsMap,
-						              const QMap<quint32, PPSUnit*>& ppsMap)
+int SliceUnit::deserializeSliceHeader(const QMap<quint32, const SPSUnit*>& spsMap,
+						              const QMap<quint32, const PPSUnit*>& ppsMap)
 {
 	try {
 		first_mb_in_slice = extractUEGolombCode();
@@ -834,12 +1013,12 @@ int SliceUnit::deserializeSliceHeader(const QMap<quint32, SPSUnit*>& spsMap,
 		if (slice_type >= 5)
 			slice_type -= 5; // +5 flag is: all other slice at this picture must be same type
 		pic_parameter_set_id = extractUEGolombCode();
-		QMap<quint32, PPSUnit*>::const_iterator itr = ppsMap.find(pic_parameter_set_id);
+		QMap<quint32, const PPSUnit*>::const_iterator itr = ppsMap.find(pic_parameter_set_id);
 		if (itr == ppsMap.end())
 			return SPS_OR_PPS_NOT_READY;
 		pps = itr.value();
 
-		QMap<quint32, SPSUnit*>::const_iterator itr2 = spsMap.find(pps->seq_parameter_set_id);
+		QMap<quint32, const SPSUnit*>::const_iterator itr2 = spsMap.find(pps->seq_parameter_set_id);
 		if (itr2 == spsMap.end())
 			return SPS_OR_PPS_NOT_READY;
 		sps = itr2.value();

@@ -17,6 +17,7 @@
 
 class QGraphicsLinearLayout;
 
+class QnViewportBoundWidget;
 class QnResourceWidgetRenderer;
 class QnVideoResourceLayout;
 class QnWorkbenchItem;
@@ -188,26 +189,6 @@ public:
     void setEnclosingGeometry(const QRectF &enclosingGeometry);
 
     /**
-     * Adds a button to this widget.
-     *
-     * Widget decides where to place buttons and creates an appropriate layout for them.
-     * Deciding which buttons to add, assigning actions to them, and actually adding them is
-     * up to the user.
-     *
-     * \param button                    Button to add. Ownership of the button is
-     *                                  transferred to this widget.
-     */
-    void addButton(QGraphicsLayoutItem *button);
-
-    /**
-     * Removes a button from this widget.
-     *
-     * \param button                    Button to add. Ownership of the button is
-     *                                  transferred to the caller.
-     */
-    void removeButton(QGraphicsLayoutItem *button);
-
-    /**
      * \returns                         Display flags for this widget.
      */
     DisplayFlags displayFlags() const {
@@ -323,7 +304,6 @@ signals:
     void updateOverlayTextLater();
 
 private slots:
-    void updateOverlayGeometry(QGraphicsView *view = NULL);
     void updateOverlayText();
 
     void at_sourceSizeChanged(const QSize &size);
@@ -429,12 +409,10 @@ private:
     /** Frame width. */
     qreal m_frameWidth;
 
-    /** Widget for overlaid stuff. */
-    QGraphicsWidget *m_overlayWidget;
+    /* Widgets for overlaid stuff. */
+    QnViewportBoundWidget *m_headerOverlayWidget;
 
-    QGraphicsLinearLayout *m_headerLayout;
-
-    QGraphicsWidget *m_headerWidget;
+    QnViewportBoundWidget *m_footerOverlayWidget;
 
     QGraphicsWidget *m_footerWidget;
 
@@ -445,8 +423,6 @@ private:
     GraphicsLabel *m_footerTimeLabel;
 
     QnImageButtonWidget *m_infoButton;
-
-    bool m_inOverlayGeometryUpdate;
 
     /** Whether aboutToBeDestroyed signal has already been emitted. */
     bool m_aboutToBeDestroyedEmitted;
@@ -468,11 +444,6 @@ private:
 
     /** Status of the last painting operation. */
     Qn::RenderStatus m_renderStatus;
-
-    /** Transform listener instrument that this widget is currently connected to. */
-    QWeakPointer<Instrument> m_transformListenerInstrument;
-
-    QWeakPointer<QGraphicsView> m_lastView;
 
     QStaticText m_noDataStaticText;
     QStaticText m_offlineStaticText;

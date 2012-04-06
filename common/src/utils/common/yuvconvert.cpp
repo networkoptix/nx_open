@@ -268,3 +268,124 @@ void yuv420_argb32_sse2_intr(unsigned char * dst, const unsigned char * py,
         dst += dst_stride*2;
     }
 }
+
+void bgra_to_yv12_sse2_intr(quint8* rgba, int xStride, quint8* y, quint8* u, quint8* v, int yStride, int uvStride, int width, int height, bool flip)
+{
+    static const __m128i sse_2000         = _mm_setr_epi16( 0x2020, 0x2020, 0x2020, 0x2020, 0x2020, 0x2020, 0x2020, 0x2020 ); /* SSE2. */
+    static const __m128i sse_00a0         = _mm_setr_epi16( 0x0210, 0x0210, 0x0210, 0x0210, 0x0210, 0x0210, 0x0210, 0x0210 ); /* SSE2. */
+    static const __m128i sse_mask_color   = _mm_setr_epi32( 0x00003fc0, 0x00003fc0, 0x00003fc0, 0x00003fc0); /* SSE2. */
+    static const __m128i sse_01           = _mm_setr_epi16(0x0001, 0x0001, 0x0001, 0x0001, 0x0001, 0x0001, 0x0001, 0x0001); /* SSE2. */
+
+    static const int K = 32768;
+    static const __m128i y_r_coeff =  _mm_setr_epi16( 0.257*K, 0.257*K, 0.257*K, 0.257*K, 0.257*K, 0.257*K, 0.257*K, 0.257*K ); /* SSE2. */
+    static const __m128i y_g_coeff =  _mm_setr_epi16( 0.504*K, 0.504*K, 0.504*K, 0.504*K, 0.504*K, 0.504*K, 0.504*K, 0.504*K ); /* SSE2. */
+    static const __m128i y_b_coeff =  _mm_setr_epi16( 0.098*K, 0.098*K, 0.098*K, 0.098*K, 0.098*K, 0.098*K, 0.098*K, 0.098*K ); /* SSE2. */
+
+    static const __m128i uv_r_coeff = _mm_setr_epi16( 0.439*K,  0.439*K,  0.439*K,  0.439*K,    -0.148*K, -0.148*K, -0.148*K, -0.148*K ); /* SSE2. */
+    static const __m128i uv_g_coeff = _mm_setr_epi16(-0.368*K, -0.368*K, -0.368*K, -0.368*K,    -0.291*K, -0.291*K, -0.291*K, -0.291*K ); /* SSE2. */
+    static const __m128i uv_b_coeff = _mm_setr_epi16(-0.071*K, -0.071*K, -0.071*K, -0.071*K,     0.439*K,  0.439*K,  0.439*K,  0.439*K ); /* SSE2. */
+
+    int xSteps = width / 8;
+    if (flip)
+    {
+        y += yStride*(height-1);
+        u += uvStride*(height/2-1);
+        v += uvStride*(height/2-1);
+        yStride = -yStride;
+        uvStride = -uvStride;
+    }
+
+    for (int yLine = 0; yLine < height/2; ++yLine)
+    {
+        const __m128i *srcLine1 = (const __m128i*) rgba;
+        const __m128i *srcLine2 = (const __m128i*) (rgba + xStride);
+        quint8* dstY = y;
+        quint32* dstU = (quint32*) u;
+        quint32* dstV = (quint32*) v;
+
+        for (int x = xSteps; x > 0; --x)
+        {
+            // prepare first line
+            __m128i rgbaB0 = _mm_and_si128(_mm_slli_epi32(_mm_loadu_si128(srcLine1),6), sse_mask_color); /* SSE2. */
+            rgbaB0 = _mm_packs_epi32(rgbaB0, _mm_and_si128(_mm_slli_epi32(_mm_loadu_si128(srcLine1+1),6), sse_mask_color)); /* SSE2. */
+            __m128i rgbaG0 = _mm_and_si128(_mm_srli_epi32(_mm_loadu_si128(srcLine1),2), sse_mask_color); /* SSE2. */
+            rgbaG0 = _mm_packs_epi32(rgbaG0, _mm_and_si128(_mm_srli_epi32(_mm_loadu_si128(srcLine1+1),2), sse_mask_color)); /* SSE2. */
+            __m128i rgbaR0 = _mm_and_si128(_mm_srli_epi32(_mm_loadu_si128(srcLine1),10), sse_mask_color); /* SSE2. */
+            rgbaR0 = _mm_packs_epi32(rgbaR0, _mm_and_si128(_mm_srli_epi32(_mm_loadu_si128(srcLine1+1),10), sse_mask_color)); /* SSE2. */
+            // prepare second line
+            __m128i rgbaB1 = _mm_and_si128(_mm_slli_epi32(_mm_loadu_si128(srcLine2),6), sse_mask_color); /* SSE2. */
+            rgbaB1 = _mm_packs_epi32(rgbaB1, _mm_and_si128(_mm_slli_epi32(_mm_loadu_si128(srcLine2+1),6), sse_mask_color)); /* SSE2. */
+            __m128i rgbaG1 = _mm_and_si128(_mm_srli_epi32(_mm_loadu_si128(srcLine2),2), sse_mask_color); /* SSE2. */
+            rgbaG1 = _mm_packs_epi32(rgbaG1, _mm_and_si128(_mm_srli_epi32(_mm_loadu_si128(srcLine2+1),2), sse_mask_color)); /* SSE2. */
+            __m128i rgbaR1 = _mm_and_si128(_mm_srli_epi32(_mm_loadu_si128(srcLine2),10), sse_mask_color); /* SSE2. */
+            rgbaR1 = _mm_packs_epi32(rgbaR1, _mm_and_si128(_mm_srli_epi32(_mm_loadu_si128(srcLine2+1),10), sse_mask_color)); /* SSE2. */
+            // calc Y vector
+            __m128i yData = _mm_add_epi16(_mm_mulhi_epi16(rgbaB0, y_b_coeff), _mm_add_epi16(_mm_mulhi_epi16(rgbaG0, y_g_coeff), _mm_mulhi_epi16(rgbaR0, y_r_coeff))); /* SSE2. */
+            yData = _mm_srli_epi16(_mm_add_epi16(yData, sse_00a0), 5); /* SSE2. */
+            _mm_storel_epi64((__m128i*) dstY, _mm_packus_epi16(yData, yData)); /* SSE2. */
+            yData = _mm_add_epi16(_mm_mulhi_epi16(rgbaB1, y_b_coeff), _mm_add_epi16(_mm_mulhi_epi16(rgbaG1, y_g_coeff), _mm_mulhi_epi16(rgbaR1, y_r_coeff))); /* SSE2. */
+            yData = _mm_srli_epi16(_mm_add_epi16(yData, sse_00a0), 5); /* SSE2. */
+            _mm_storel_epi64((__m128i*) (dstY+yStride), _mm_packus_epi16(yData, yData));
+            // calc avarage for UV
+            __m128i bAvg = _mm_madd_epi16(_mm_avg_epu16(rgbaB0, rgbaB1), sse_01); /* SSE2. */ // use madd instead of "horizontal add" to prevent SSSE3 requirement
+            __m128i gAvg = _mm_madd_epi16(_mm_avg_epu16(rgbaG0, rgbaG1), sse_01); /* SSE2. */
+            __m128i rAvg = _mm_madd_epi16(_mm_avg_epu16(rgbaR0, rgbaR1), sse_01); /* SSE2. */
+            // calc UV vector
+            __m128i uv = sse_2000;
+            uv = _mm_add_epi16(uv, _mm_mulhi_epi16(_mm_packs_epi32(rAvg, rAvg), uv_r_coeff)); /* SSE2. */
+            uv = _mm_add_epi16(uv, _mm_mulhi_epi16(_mm_packs_epi32(gAvg, gAvg), uv_g_coeff)); /* SSE2. */
+            uv = _mm_add_epi16(uv, _mm_mulhi_epi16(_mm_packs_epi32(bAvg, bAvg), uv_b_coeff)); /* SSE2. */
+            uv = _mm_srli_epi16(uv, 6); /* SSE2. */
+            uv = _mm_packus_epi16(uv, uv); /* SSE2. */
+            *dstV++ = _mm_cvtsi128_si32(uv); /* SSE2. */
+            *dstU++ = _mm_cvtsi128_si32(_mm_srli_epi64(uv, 32)); /* SSE2. */
+
+            dstY += 8;
+            srcLine1 += 2;
+            srcLine2 += 2;
+        }
+        u += uvStride;
+        v += uvStride;
+        y += yStride*2;
+        rgba += xStride*2;
+    }
+}
+
+void bgra_yuv420(quint8* rgba, quint8* yptr, quint8* uptr, quint8* vptr, int width, int height, bool /*flip*/)
+{
+    int xStride = width*4;
+    quint8* yptr2 = yptr + width;
+    quint8* rgba2 = rgba + xStride;
+    for (int y = height/2; y > 0; --y)
+    {
+        for (int x = width/2; x > 0; --x)
+        {
+            // process 4 Y pixels
+            quint8 y1 = rgba[0]*0.098f + rgba[1]*0.504f + rgba[2]*0.257f + 16.5f;
+            *yptr++ = y1;
+            quint8 y2 = rgba[4]*0.098f + rgba[5]*0.504f + rgba[6]*0.257f + 16.5f;
+            *yptr++ = y2;
+
+            quint8 y3 = rgba2[0]*0.098 + rgba2[1]*0.504 + rgba2[2]*0.257 + 16.5f;
+            *yptr2++ = y3;
+            quint8 y4 = rgba2[4]*0.098 + rgba2[5]*0.504 + rgba2[6]*0.257 + 16.5f;
+            *yptr2++ = y4;
+
+            // calculate avarage RGB values for UV pixels
+            quint8 avgB = (rgba[0]+rgba[4]+rgba2[0]+rgba2[4]+2) >> 2;
+            quint8 avgG = (rgba[1]+rgba[5]+rgba2[1]+rgba2[5]+2) >> 2;
+            quint8 avgR = (rgba[2]+rgba[6]+rgba2[2]+rgba2[6]+2) >> 2;
+
+            // write UV pixels
+            *vptr++ = 0.439f*avgR  - 0.368f*avgG - 0.071f*avgB + 128.5f;
+            *uptr++ = -0.148f*avgR - 0.291f*avgG + 0.439f*avgB + 128.5f;
+
+            rgba += 8;
+            rgba2 += 8;
+        }
+        rgba   += xStride;
+        rgba2  += xStride;
+        yptr  += width;
+        yptr2 += width;
+    }
+}
