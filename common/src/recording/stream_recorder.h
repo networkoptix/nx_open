@@ -77,11 +77,6 @@ protected:
 
     bool addSignatureFrame(QString& errorString);
 private:
-    int correctX264Bitstream(AVCodecContext* videoCodecCtx, quint8* videoBuf, int out_size, int videoBufSize);
-    int correctNalPrefix(quint8* videoBuf, int out_size, int videoBufSize);
-
-    void fillH264EncoderParams(AVCodecContext* avctx, AVDictionary* &options);
-    void drawOnSignFrame(AVFrame* frame);
     bool saveData(QnAbstractMediaDataPtr md);
 private:
     void markNeedKeyData();
@@ -117,7 +112,6 @@ private:
     Role m_role;
     EVP_MD_CTX* m_mdctx;
     QPixmap m_logo;
-    QByteArray m_srcCodecExtraData;
 };
 
 #endif // _STREAM_RECORDER_H__
