@@ -5,7 +5,6 @@
 #include <QWeakPointer>
 #include <QVector>
 #include <camera/render_status.h>
-#include <ui/graphics/items/standard/graphicswidget.h>
 #include <ui/common/constrained_resizable.h>
 #include <ui/common/scene_utility.h>
 #include <ui/common/frame_section_queryable.h>
@@ -37,7 +36,7 @@ class Instrument;
 #   undef NO_DATA
 #endif
 
-class QnResourceWidget: public GraphicsWidget, public QnWorkbenchContextAware, public QnPolygonalShapeProvider, public ConstrainedResizable, public FrameSectionQuearyable, protected SceneUtility {
+class QnResourceWidget: public QGraphicsWidget, public QnWorkbenchContextAware, public QnPolygonalShapeProvider, public ConstrainedResizable, public FrameSectionQuearyable, protected SceneUtility {
     Q_OBJECT;
     Q_PROPERTY(qreal frameOpacity READ frameOpacity WRITE setFrameOpacity);
     Q_PROPERTY(qreal frameWidth READ frameWidth WRITE setFrameWidth);
@@ -46,7 +45,7 @@ class QnResourceWidget: public GraphicsWidget, public QnWorkbenchContextAware, p
     Q_PROPERTY(qreal enclosingAspectRatio READ enclosingAspectRatio WRITE setEnclosingAspectRatio);
     Q_FLAGS(DisplayFlags DisplayFlag);
 
-    typedef GraphicsWidget base_type;
+    typedef QGraphicsWidget base_type;
 
 public:
     enum DisplayFlag {

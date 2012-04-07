@@ -114,8 +114,7 @@
     \sa GraphicsButtonGroup
 */
 
-AbstractGraphicsButtonPrivate::AbstractGraphicsButtonPrivate(QSizePolicy::ControlType type)
-    : GraphicsWidgetPrivate(),
+AbstractGraphicsButtonPrivate::AbstractGraphicsButtonPrivate(QSizePolicy::ControlType type):
 #ifndef QT_NO_SHORTCUT
       shortcutId(0),
 #endif
@@ -535,7 +534,7 @@ void AbstractGraphicsButtonPrivate::emitReleased()
     Constructs an abstract button with a \a parent.
 */
 AbstractGraphicsButton::AbstractGraphicsButton(QGraphicsItem *parent)
-    : GraphicsWidget(*new AbstractGraphicsButtonPrivate, parent)
+    : QGraphicsWidget(*new AbstractGraphicsButtonPrivate, parent)
 {
     Q_D(AbstractGraphicsButton);
     d->init();
@@ -545,7 +544,7 @@ AbstractGraphicsButton::AbstractGraphicsButton(QGraphicsItem *parent)
     \internal
 */
 AbstractGraphicsButton::AbstractGraphicsButton(AbstractGraphicsButtonPrivate &dd, QGraphicsItem *parent)
-    : GraphicsWidget(dd, parent)
+    : QGraphicsWidget(dd, parent)
 {
     Q_D(AbstractGraphicsButton);
     d->init();

@@ -2,9 +2,8 @@
 #define GRAPHICSFRAME_P_H
 
 #include "graphicsframe.h"
-#include "graphicswidget_p.h"
 
-class GraphicsFramePrivate : public GraphicsWidgetPrivate
+class GraphicsFramePrivate
 {
     Q_DECLARE_PUBLIC(GraphicsFrame)
 

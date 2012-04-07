@@ -1,10 +1,10 @@
 #ifndef GRAPHICSFRAME_H
 #define GRAPHICSFRAME_H
 
-#include "graphicswidget.h"
+#include <QtGui/QGraphicsWidget>
 
 class GraphicsFramePrivate;
-class GraphicsFrame : public GraphicsWidget
+class GraphicsFrame : public QGraphicsWidget
 {
     Q_OBJECT
     Q_ENUMS(Shape Shadow)
@@ -74,6 +74,8 @@ protected:
     GraphicsFrame(GraphicsFramePrivate &dd, QGraphicsItem *parent, Qt::WindowFlags f = 0);
 
 private:
+    QScopedPointer<GraphicsFramePrivate> d_ptr;
+
     Q_DISABLE_COPY(GraphicsFrame)
     Q_DECLARE_PRIVATE(GraphicsFrame)
 };

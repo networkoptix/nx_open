@@ -41,6 +41,8 @@ protected:
     virtual void changeEvent(QEvent *event) override;
 
 private:
+    QScopedPointer<GraphicsLabelPrivate> d_ptr;
+
     Q_DISABLE_COPY(GraphicsLabel)
     Q_DECLARE_PRIVATE(GraphicsLabel)
 };

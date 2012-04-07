@@ -145,16 +145,18 @@ void GraphicsFramePrivate::updateFrameWidth()
 /*!
     Constructs a frame widget with frame style \l NoFrame and a 1-pixel frame width.
 */
-GraphicsFrame::GraphicsFrame(QGraphicsItem *parent, Qt::WindowFlags f)
-    : GraphicsWidget(*new GraphicsFramePrivate, parent, f)
+GraphicsFrame::GraphicsFrame(QGraphicsItem *parent, Qt::WindowFlags f): 
+    QGraphicsWidget(parent, f),
+    d_ptr(*new GraphicsFramePrivate())
 {
 }
 
 /*!
     \internal
 */
-GraphicsFrame::GraphicsFrame(GraphicsFramePrivate &dd, QGraphicsItem *parent, Qt::WindowFlags f)
-    : GraphicsWidget(dd, parent, f)
+GraphicsFrame::GraphicsFrame(GraphicsFramePrivate &dd, QGraphicsItem *parent, Qt::WindowFlags f): 
+    QGraphicsWidget(parent, f),
+    d_ptr(&dd)
 {
 }
 

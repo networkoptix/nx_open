@@ -1,10 +1,9 @@
 #ifndef ABSTRACTGRAPHICSBUTTON_H
 #define ABSTRACTGRAPHICSBUTTON_H
 
-#include "graphicswidget.h"
-
 #include <QtGui/QIcon>
 #include <QtGui/QKeySequence>
+#include <QtGui/QGraphicsWidget>
 
 #ifdef QT_NO_BUTTONGROUP
 #  define QT_NO_GRAPHICSBUTTONGROUP
@@ -15,7 +14,7 @@ class GraphicsButtonGroup;
 #endif
 
 class AbstractGraphicsButtonPrivate;
-class AbstractGraphicsButton : public GraphicsWidget
+class AbstractGraphicsButton : public QGraphicsWidget
 {
     Q_OBJECT
     Q_PROPERTY(QString text READ text WRITE setText)

@@ -2,7 +2,6 @@
 #define ABSTRACTGRAPHICSSLIDER_P_H
 
 #include "abstractgraphicsslider.h"
-#include "graphicswidget_p.h"
 
 #include <QtCore/QBasicTimer>
 #ifdef QT_KEYPAD_NAVIGATION
@@ -11,12 +10,12 @@
 
 #include <QtGui/QStyle>
 
-class AbstractGraphicsSliderPrivate : public GraphicsWidgetPrivate
+class AbstractGraphicsSliderPrivate
 {
     Q_DECLARE_PUBLIC(AbstractGraphicsSlider)
 
 public:
-    AbstractGraphicsSliderPrivate() : GraphicsWidgetPrivate(),
+    AbstractGraphicsSliderPrivate():
         orientation(Qt::Horizontal),
         minimum(0), maximum(99), pageStep(10), value(0), position(0), pressValue(-1),
         singleStep(1), offset_accumulated(0), tracking(true),
@@ -34,9 +33,9 @@ public:
 #endif
     }
 
-    Qt::Orientation orientation;
-
     void setSteps(int single, int page);
+
+    Qt::Orientation orientation;
 
     int minimum, maximum, pageStep, value, position, pressValue;
 
@@ -86,6 +85,7 @@ public:
             newValue = minimum;
         return newValue;
     }
+
     inline void setAdjustedSliderPosition(int position)
     {
         Q_Q(AbstractGraphicsSlider);
@@ -98,6 +98,7 @@ public:
         }
         q->triggerAction(repeatAction);
     }
+
     bool scrollByDelta(Qt::Orientation orientation, Qt::KeyboardModifiers modifiers, int delta);
 };
 
