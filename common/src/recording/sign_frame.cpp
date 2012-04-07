@@ -3,6 +3,65 @@
 #include "licensing/license.h"
 #include "utils/common/yuvconvert.h"
 
+int getSquareSize(AVFrame* frame, int signBits)
+{
+    int rowCnt = signBits / 16;
+    int colCnt = signBits / rowCnt;
+    int SQUARE_SIZE = qMin((frame->height/2-16)/rowCnt, (frame->width-16)/colCnt);
+    SQUARE_SIZE = roundDown(SQUARE_SIZE, 4);
+    return SQUARE_SIZE;
+}
+
+float getAvgY(AVFrame* frame, const QRect& rect)
+{
+    quint8* curPtr = frame->data[0] + rect.top()*frame->linesize[0] + rect.left();
+    float sum = 0;
+    for (int y = 0; y < rect.height(); ++y)
+    {
+        for (int x = 0; x < rect.width(); ++x)
+        {
+            sum += curPtr[x];
+        }
+        curPtr += frame->linesize[0];
+    }
+    return sum / (rect.width() * rect.height());
+}
+
+QByteArray QnSignHelper::getSign(AVFrame* frame, int signLen)
+{
+    static const int COLOR_THRESHOLD = 32;
+
+    int signBits = signLen*8;
+    int rowCnt = signBits / 16;
+    int colCnt = signBits / rowCnt;
+    int SQUARE_SIZE = getSquareSize(frame, signBits);
+    int drawWidth = SQUARE_SIZE * colCnt;
+    int drawheight = SQUARE_SIZE * rowCnt;
+
+    int drawLeft = (frame->width - drawWidth)/2;
+    int drawTop = frame->height/2 + (frame->height/2-drawheight)/2;
+
+    int cOffs = SQUARE_SIZE/8;
+    quint8 signArray[256/8];
+    BitStreamWriter writer;
+    writer.setBuffer(signArray, signArray + sizeof(signArray));
+    for (int y = 0; y < rowCnt; ++y)
+    {
+        for (int x = 0; x < colCnt; ++x)
+        {
+            QRect checkRect(x*SQUARE_SIZE+cOffs, y*SQUARE_SIZE+cOffs, SQUARE_SIZE-cOffs*2, SQUARE_SIZE-cOffs*2);
+            float avgColor = getAvgY(frame, checkRect);
+            if (avgColor <= COLOR_THRESHOLD)
+                writer.putBit(1);
+            else if (avgColor >= (255-COLOR_THRESHOLD))
+                writer.putBit(0);
+            else 
+                return QByteArray(); // invalid data
+        }
+    }
+    return QByteArray((const char*)signArray, signLen/8);
+}
+
 void QnSignHelper::drawOnSignFrame(AVFrame* frame, const QByteArray& sign)
 {
     quint8* imgBuffer = (quint8*) qMallocAligned(frame->linesize[0]*frame->height*4, 32);
@@ -54,8 +113,7 @@ void QnSignHelper::drawOnSignFrame(AVFrame* frame, const QByteArray& sign)
     int rowCnt = signBits / 16;
     int colCnt = signBits / rowCnt;
 
-    int SQUARE_SIZE = qMin(frame->height/2/rowCnt, frame->width/colCnt);
-    SQUARE_SIZE = roundDown(SQUARE_SIZE, 8) - 8;
+    int SQUARE_SIZE = getSquareSize(frame, signBits);
 
     int drawWidth = SQUARE_SIZE * colCnt;
     int drawheight = SQUARE_SIZE * rowCnt;

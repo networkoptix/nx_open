@@ -10,6 +10,7 @@ class QnSignHelper
 public:
     void setLogo(QPixmap logo);
     QnCompressedVideoDataPtr createSgnatureFrame(AVCodecContext* srcCodec, const QByteArray& hash);
+    QByteArray getSign(AVFrame* frame, int signLen);
 private:
     void drawOnSignFrame(AVFrame* frame, const QByteArray& sign);
     void extractSpsPpsFromPrivData(const QByteArray& data, SPSUnit& sps, PPSUnit& pps, bool& spsReady, bool& ppsReady);
