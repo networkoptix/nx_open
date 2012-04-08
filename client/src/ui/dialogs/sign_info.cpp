@@ -1,6 +1,7 @@
 #include "sign_info.h"
 #include "ui/style/skin.h"
 #include "sign_dialog.h"
+#include "utils/common/synctime.h"
 
 QnSignInfo::QnSignInfo(QWidget* parent): QLabel(parent)
 {
@@ -9,6 +10,8 @@ QnSignInfo::QnSignInfo(QWidget* parent): QLabel(parent)
     m_textureHeight = 1080.0; // default aspect ratio 16:9 (exact size is not important here)
     m_progress = 0;
     m_signHelper.setLogo(qnSkin->pixmap("logo_1920_1080.png"));
+    connect(&m_timer, SIGNAL(timeout()), this, SLOT(update()));
+    m_timer.start(16);
 }
 
 void QnSignInfo::at_gotSignature(QByteArray calculatedSign, QByteArray signFromFrame)
@@ -37,37 +40,49 @@ void QnSignInfo::resizeEvent ( QResizeEvent * event )
 
 void QnSignInfo::paintEvent(QPaintEvent* event)
 {
+    static const int TEXT_FLASHING_PERIOD = 1000;
+
     {
         QMutexLocker lock(&m_mutex);
         if (m_sign.isEmpty())
             return;
         m_signHelper.setSign(m_sign);
     }
-    QPainter p(this);
-    p.translate(m_videoRect.left(), m_videoRect.top());
+    QPixmap pixmap(m_textureWidth, m_textureHeight);
+    QPainter p(&pixmap);
 
-    m_signHelper.draw(p, m_videoRect.size(), false);
+    m_signHelper.draw(p, QSize(m_textureWidth, m_textureHeight), false);
     QString text;
     text = QString("Analizing: %1%").arg(m_progress);
     //int dots = (QDateTime::currentDateTime().time().second() % 3) + 1;
     //text += QString("..........").left(dots);
 
-    p.setPen(Qt::black);
+    //m_signHelper.drawTextLine(p, QSize(m_textureWidth, m_textureHeight), 1, text);
+    p.end();
+
+    QPainter p2(this);
+    p2.setPen(Qt::black);
     if (m_finished)
     {
         if (m_signFromFrame.isEmpty()) {
-            p.setPen(Qt::red);
+            p2.setPen(QColor(128,0,0));
             text = "Signature not found";
         }
         else if (m_sign == m_signFromFrame) {
+            p2.setPen(QColor(0,128,0));
             text = "Signature mached";
         }
         else {
-            p.setPen(Qt::red);
+            p2.setPen(QColor(128,0,0));
             text = "Invalid signature";
         }
+        p2.setOpacity(qAbs(sin(qnSyncTime->currentMSecsSinceEpoch() / qreal(TEXT_FLASHING_PERIOD * 2) * M_PI))*0.5 + 0.5);
     }
-    m_signHelper.drawTextLine(p, m_videoRect.size(), 0, text);
+
+    p2.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
+    p2.drawPixmap(m_videoRect, pixmap);
+    QFontMetrics metric = m_signHelper.updateFontSize(p2, QSize(width()*2, height()*2));
+    p2.drawText(m_videoRect.left() + 16, m_videoRect.top() + metric.height() + 16, text);
     
 }
 

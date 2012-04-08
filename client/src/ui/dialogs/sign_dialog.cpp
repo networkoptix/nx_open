@@ -90,6 +90,10 @@ SignDialog::SignDialog(const QString& fileName, QWidget *parent) :
     renderer = 0;
     glWindow = 0;
 
+    Qt::WindowFlags flags = 0;
+    flags |= Qt::WindowMaximizeButtonHint;
+    flags |= Qt::WindowCloseButtonHint;
+    setWindowFlags( flags );
 
     ui->setupUi(this);
 

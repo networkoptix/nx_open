@@ -27,6 +27,7 @@ private:
     double m_textureHeight;
     bool m_finished;
     int m_progress;
+    QTimer m_timer;
 };
 
 #endif // __SIGN_INGO_H__
