@@ -53,7 +53,7 @@ void QnSignInfo::paintEvent(QPaintEvent* event)
 
     m_signHelper.draw(p, QSize(m_textureWidth, m_textureHeight), false);
     QString text;
-    text = QString("Analizing: %1%").arg(m_progress);
+    text = QString("Analyzing: %1%").arg(m_progress);
     //int dots = (QDateTime::currentDateTime().time().second() % 3) + 1;
     //text += QString("..........").left(dots);
 
