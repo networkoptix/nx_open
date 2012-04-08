@@ -201,7 +201,7 @@ void SignDialog::changeEvent(QEvent *event)
 
 void SignDialog::at_calcSignInProgress(QByteArray sign, int progress)
 {
-
+    ui->progressBar->setValue(progress);
 }
 
 void SignDialog::at_gotImageSize(int width, int height)

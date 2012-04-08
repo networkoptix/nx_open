@@ -60,6 +60,7 @@ bool QnSignDialogDisplay::processData(QnAbstractDataPacketPtr data)
 
             QnSignHelper signHelper;
             QByteArray signFromPicture = signHelper.getSign(lastFrame.data(), md_len);
+            emit calcSignInProgress(calculatedSign, 100);
             emit gotSignature(calculatedSign, signFromPicture);
         }
     }
