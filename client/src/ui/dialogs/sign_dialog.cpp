@@ -141,6 +141,7 @@ SignDialog::~SignDialog()
     m_camDispay->clearUnprocessedData();
     
     delete m_camDispay;
+    delete m_reader;
     delete renderer;
     delete glWindow;
 }
