@@ -1,12 +1,13 @@
 #ifndef ABSTRACTGRAPHICSBUTTON_P_H
 #define ABSTRACTGRAPHICSBUTTON_P_H
 
+#include "graphicswidget_p.h"
 #include "abstractgraphicsbutton.h"
 
 #include <QtCore/QBasicTimer>
 #include <QtCore/QList>
 
-class AbstractGraphicsButtonPrivate
+class AbstractGraphicsButtonPrivate: public GraphicsWidgetPrivate
 {
     Q_DECLARE_PUBLIC(AbstractGraphicsButton)
 

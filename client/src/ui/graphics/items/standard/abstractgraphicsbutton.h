@@ -3,7 +3,8 @@
 
 #include <QtGui/QIcon>
 #include <QtGui/QKeySequence>
-#include <QtGui/QGraphicsWidget>
+
+#include "graphicswidget.h"
 
 #ifdef QT_NO_BUTTONGROUP
 #  define QT_NO_GRAPHICSBUTTONGROUP
@@ -14,7 +15,7 @@ class GraphicsButtonGroup;
 #endif
 
 class AbstractGraphicsButtonPrivate;
-class AbstractGraphicsButton : public QGraphicsWidget
+class AbstractGraphicsButton : public GraphicsWidget
 {
     Q_OBJECT
     Q_PROPERTY(QString text READ text WRITE setText)

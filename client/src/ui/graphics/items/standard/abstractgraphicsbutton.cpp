@@ -534,7 +534,7 @@ void AbstractGraphicsButtonPrivate::emitReleased()
     Constructs an abstract button with a \a parent.
 */
 AbstractGraphicsButton::AbstractGraphicsButton(QGraphicsItem *parent)
-    : QGraphicsWidget(*new AbstractGraphicsButtonPrivate, parent)
+    : GraphicsWidget(*new AbstractGraphicsButtonPrivate, parent)
 {
     Q_D(AbstractGraphicsButton);
     d->init();
@@ -544,7 +544,7 @@ AbstractGraphicsButton::AbstractGraphicsButton(QGraphicsItem *parent)
     \internal
 */
 AbstractGraphicsButton::AbstractGraphicsButton(AbstractGraphicsButtonPrivate &dd, QGraphicsItem *parent)
-    : QGraphicsWidget(dd, parent)
+    : GraphicsWidget(dd, parent)
 {
     Q_D(AbstractGraphicsButton);
     d->init();

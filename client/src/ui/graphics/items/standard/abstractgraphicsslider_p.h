@@ -1,6 +1,7 @@
 #ifndef ABSTRACTGRAPHICSSLIDER_P_H
 #define ABSTRACTGRAPHICSSLIDER_P_H
 
+#include "graphicswidget_p.h"
 #include "abstractgraphicsslider.h"
 
 #include <QtCore/QBasicTimer>
@@ -10,7 +11,7 @@
 
 #include <QtGui/QStyle>
 
-class AbstractGraphicsSliderPrivate
+class AbstractGraphicsSliderPrivate: public GraphicsWidgetPrivate
 {
     Q_DECLARE_PUBLIC(AbstractGraphicsSlider)
 

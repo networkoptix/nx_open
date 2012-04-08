@@ -4,7 +4,7 @@
 #include "graphicswidget.h"
 
 class AbstractGraphicsSliderPrivate;
-class AbstractGraphicsSlider : public QGraphicsWidget
+class AbstractGraphicsSlider : public GraphicsWidget
 {
     Q_OBJECT
     Q_PROPERTY(Qt::Orientation orientation READ orientation WRITE setOrientation)
