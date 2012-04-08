@@ -64,6 +64,10 @@ bool QnSignDialogDisplay::processData(QnAbstractDataPacketPtr data)
             emit calcSignInProgress(calculatedSign, 100);
             emit gotSignature(calculatedSign, signFromPicture);
         }
+        else {
+            emit calcSignInProgress(QByteArray(), 100);
+            emit gotSignature(QByteArray(), QByteArray());
+        }
     }
     else if (video) 
     {
