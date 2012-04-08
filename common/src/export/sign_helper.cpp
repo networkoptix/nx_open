@@ -42,6 +42,12 @@ float getAvgColor(const AVFrame* frame, int plane, const QRect& rect)
     return sum / (rect.width() * rect.height());
 }
 
+QnSignHelper::QnSignHelper()
+{
+    m_opacity = 1.0;
+    m_signBackground = Qt::white;
+}
+
 void QnSignHelper::updateDigest(AVCodecContext* srcCodec, EVP_MD_CTX* mdctx, const quint8* data, int size)
 {
     if (srcCodec == 0 || srcCodec->codec_id != CODEC_ID_H264) {
@@ -155,6 +161,14 @@ void QnSignHelper::drawTextLine(QPainter& painter, const QSize& paintSize,int li
     painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*lineNum), text);
 }
 
+void QnSignHelper::setSignOpacity(float opacity, QColor color)
+{
+    m_opacity = opacity;
+    //if (m_signBackground != color)
+    //    m_roundRectPixmap = QPixmap();
+    m_signBackground = color;
+}
+
 void QnSignHelper::draw(QPainter& painter, const QSize& paintSize, bool drawText)
 {
     QnScopedPainterTransformRollback rollback(&painter);
@@ -204,14 +218,21 @@ void QnSignHelper::draw(QPainter& painter, const QSize& paintSize, bool drawText
     int drawheight = SQUARE_SIZE * rowCnt;
     painter.translate((paintSize.width() - drawWidth)/2, paintSize.height()/2 + (paintSize.height()/2-drawheight)/2);
 
-    painter.fillRect(0, 0, SQUARE_SIZE*colCnt, SQUARE_SIZE*rowCnt, Qt::white);
 
-    if (m_roundRectPixmap.width() != SQUARE_SIZE)
+    //painter.fillRect(0, 0, SQUARE_SIZE*colCnt, SQUARE_SIZE*rowCnt, Qt::white);
+    painter.setOpacity(m_opacity);
+    painter.fillRect(0, 0, SQUARE_SIZE*colCnt, SQUARE_SIZE*rowCnt, m_signBackground);
+
+    //if (m_roundRectPixmap.width() != SQUARE_SIZE)
     {
         int cOffs = SQUARE_SIZE/16;
         m_roundRectPixmap = QPixmap(SQUARE_SIZE, SQUARE_SIZE);
         QPainter tmpPainter(&m_roundRectPixmap);
-        tmpPainter.fillRect(0,0, SQUARE_SIZE, SQUARE_SIZE, QColor(255,255,255));
+            tmpPainter.fillRect(0,0, SQUARE_SIZE, SQUARE_SIZE, Qt::blue);
+            tmpPainter.setOpacity(m_opacity);
+        tmpPainter.fillRect(0,0, SQUARE_SIZE, SQUARE_SIZE, m_signBackground);
+        
+        tmpPainter.setOpacity(1.0);
         tmpPainter.setBrush(QColor(0,0,0));
         tmpPainter.setPen(QColor(128,128,128));
         tmpPainter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);

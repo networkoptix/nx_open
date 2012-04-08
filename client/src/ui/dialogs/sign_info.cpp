@@ -41,6 +41,7 @@ void QnSignInfo::resizeEvent ( QResizeEvent * event )
 void QnSignInfo::paintEvent(QPaintEvent* event)
 {
     static const int TEXT_FLASHING_PERIOD = 1000;
+    float opacity = qAbs(sin(qnSyncTime->currentMSecsSinceEpoch() / qreal(TEXT_FLASHING_PERIOD * 2) * M_PI))*0.5 + 0.5;
 
     {
         QMutexLocker lock(&m_mutex);
@@ -51,6 +52,8 @@ void QnSignInfo::paintEvent(QPaintEvent* event)
     QPixmap pixmap(m_textureWidth, m_textureHeight);
     QPainter p(&pixmap);
 
+    if (m_finished)
+        m_signHelper.setSignOpacity(opacity, m_sign == m_signFromFrame ? QColor(0,128,0) : QColor(128,0,0));
     m_signHelper.draw(p, QSize(m_textureWidth, m_textureHeight), false);
     QString text;
     text = QString("Analyzing: %1%").arg(m_progress);
@@ -76,12 +79,13 @@ void QnSignInfo::paintEvent(QPaintEvent* event)
             p2.setPen(QColor(128,0,0));
             text = "Invalid signature";
         }
-        p2.setOpacity(qAbs(sin(qnSyncTime->currentMSecsSinceEpoch() / qreal(TEXT_FLASHING_PERIOD * 2) * M_PI))*0.5 + 0.5);
     }
 
     p2.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
     p2.drawPixmap(m_videoRect, pixmap);
     QFontMetrics metric = m_signHelper.updateFontSize(p2, QSize(width()*2, height()*2));
+    if (m_finished)
+        p2.setOpacity(opacity);
     p2.drawText(m_videoRect.left() + 16, m_videoRect.top() + metric.height() + 16, text);
     
 }

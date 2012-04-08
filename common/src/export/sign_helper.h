@@ -12,6 +12,7 @@ static const char EXPORT_SIGN_MAGIC[] = "RhjrjLbkMxTujHI!";
 class QnSignHelper
 {
 public:
+    QnSignHelper();
     void setLogo(QPixmap logo);
     QnCompressedVideoDataPtr createSgnatureFrame(AVCodecContext* srcCodec);
     QByteArray getSign(const AVFrame* frame, int signLen);
@@ -21,6 +22,7 @@ public:
     void drawTextLine(QPainter& painter, const QSize& paintSize,int lineNum, const QString& text);
     QFontMetrics updateFontSize(QPainter& painter, const QSize& paintSize);
     static void updateDigest(AVCodecContext* srcCodec, EVP_MD_CTX* mdctx, const quint8* data, int size);
+    void setSignOpacity(float opacity, QColor color);
 private:
     void drawOnSignFrame(AVFrame* frame);
     void extractSpsPpsFromPrivData(const QByteArray& data, SPSUnit& sps, PPSUnit& pps, bool& spsReady, bool& ppsReady);
@@ -31,6 +33,9 @@ private:
     QPixmap m_logo;
     QPixmap m_roundRectPixmap;
     QByteArray m_sign;
+
+    float m_opacity;
+    QColor m_signBackground;
 };
 
 #endif // __SIGN_FRAME_HELPER__
