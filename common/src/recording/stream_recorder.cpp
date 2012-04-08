@@ -106,7 +106,7 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
         if (!m_endOfData) 
         {
             bool isOK = true;
-            if (m_needCalcSignature) 
+            if (m_needCalcSignature && !m_firstTime)
                 isOK = addSignatureFrame(m_lastErrMessage);
 
             if (isOK)
@@ -231,8 +231,7 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
         if (m_needCalcSignature) 
         {
             AVCodecContext* srcCodec = m_formatCtx->streams[0]->codec;
-            if (srcCodec->codec_id == CODEC_ID_H264)
-                QnSignHelper::updateDigest(srcCodec, m_mdctx, avPkt.data, avPkt.size);
+            QnSignHelper::updateDigest(srcCodec, m_mdctx, avPkt.data, avPkt.size);
             //EVP_DigestUpdate(m_mdctx, (const char*)avPkt.data, avPkt.size);
         }
     }
