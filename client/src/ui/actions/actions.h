@@ -302,6 +302,11 @@ namespace Qn {
         ToggleMotionAction,
 
         /**
+         * Check file signature (for local files only)
+         */
+        CheckFileSignatureAction,
+
+        /**
          * Takes screenshot of an item.
          */
         TakeScreenshotAction,

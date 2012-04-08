@@ -79,6 +79,7 @@
 #include "workbench_display.h"
 #include "help/qncontext_help.h"
 #include "ui/common/color_transform.h"
+#include "ui/dialogs/sign_dialog.h"
 
 //#define QN_WORKBENCH_CONTROLLER_DEBUG
 
@@ -335,6 +336,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(action(Qn::ShowMotionAction), SIGNAL(triggered()),                                                                      this,                           SLOT(at_showMotionAction_triggered()));
     connect(action(Qn::HideMotionAction), SIGNAL(triggered()),                                                                      this,                           SLOT(at_hideMotionAction_triggered()));
     connect(action(Qn::ToggleMotionAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_toggleMotionAction_triggered()));
+    connect(action(Qn::CheckFileSignatureAction), SIGNAL(triggered()),                                                              this,                           SLOT(at_checkFileSignatureAction_triggered()));
     connect(action(Qn::MaximizeItemAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_maximizeItemAction_triggered()));
     connect(action(Qn::UnmaximizeItemAction), SIGNAL(triggered()),                                                                  this,                           SLOT(at_unmaximizeItemAction_triggered()));
     connect(action(Qn::ScreenRecordingAction), SIGNAL(triggered(bool)),                                                             this,                           SLOT(at_recordingAction_triggered(bool)));
@@ -1133,6 +1135,19 @@ void QnWorkbenchController::at_hideMotionAction_triggered() {
 
 void QnWorkbenchController::at_showMotionAction_triggered() {
     displayMotionGrid(menu()->currentWidgetsTarget(sender()), true);
+}
+
+void QnWorkbenchController::at_checkFileSignatureAction_triggered() 
+{
+    QnResourceWidgetList widgets = menu()->currentWidgetsTarget(sender());
+    if (widgets.isEmpty())
+        return;
+    QnResourceWidget *widget = widgets.at(0);
+    if(widget->resource()->flags() & QnResource::network)
+        return;
+    QScopedPointer<SignDialog> dialog(new SignDialog(widget->resource()->getUrl()));
+    dialog->setModal(true);
+    dialog->exec();
 }
 
 void QnWorkbenchController::at_toggleMotionAction_triggered() {

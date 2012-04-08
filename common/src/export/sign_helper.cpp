@@ -1,20 +1,32 @@
-#include "sign_frame.h"
+#include "sign_helper.h"
 #include "utils/common/util.h"
 #include "licensing/license.h"
 #include "utils/common/yuvconvert.h"
 
-int getSquareSize(AVFrame* frame, int signBits)
+extern "C" {
+#ifdef WIN32
+#define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
+#endif
+#include "libavutil/pixdesc.h"
+#ifdef WIN32
+#undef AVPixFmtDescriptor
+#endif
+
+};
+
+
+int getSquareSize(int width, int height, int signBits)
 {
     int rowCnt = signBits / 16;
     int colCnt = signBits / rowCnt;
-    int SQUARE_SIZE = qMin((frame->height/2-16)/rowCnt, (frame->width-16)/colCnt);
-    SQUARE_SIZE = roundDown(SQUARE_SIZE, 4);
+    int SQUARE_SIZE = qMin((height/2-height/32)/rowCnt, (width-width/32)/colCnt);
+    SQUARE_SIZE = roundDown(SQUARE_SIZE, 2);
     return SQUARE_SIZE;
 }
 
-float getAvgY(AVFrame* frame, const QRect& rect)
+float getAvgColor(const AVFrame* frame, int plane, const QRect& rect)
 {
-    quint8* curPtr = frame->data[0] + rect.top()*frame->linesize[0] + rect.left();
+    quint8* curPtr = frame->data[plane] + rect.top()*frame->linesize[plane] + rect.left();
     float sum = 0;
     for (int y = 0; y < rect.height(); ++y)
     {
@@ -22,19 +34,58 @@ float getAvgY(AVFrame* frame, const QRect& rect)
         {
             sum += curPtr[x];
         }
-        curPtr += frame->linesize[0];
+        curPtr += frame->linesize[plane];
     }
     return sum / (rect.width() * rect.height());
 }
 
-QByteArray QnSignHelper::getSign(AVFrame* frame, int signLen)
+void QnSignHelper::updateDigest(AVCodecContext* srcCodec, EVP_MD_CTX* mdctx, const quint8* data, int size)
+{
+    if (srcCodec == 0 || srcCodec->codec_id != CODEC_ID_H264) {
+        EVP_DigestUpdate(mdctx, (const char*) data, size);
+        return;
+    }
+
+    // skip nal prefixes (sometimes it is 00 00 01 code, sometimes unitLen)
+    const quint8* dataEnd = data + size;
+
+    if (srcCodec->extradata_size >= 7 && srcCodec->extradata[0] == 1)
+    {
+        // prefix is unit len
+        int reqUnitSize = (srcCodec->extradata[4] & 0x03) + 1;
+
+        const quint8* curNal = data;
+        while (curNal < dataEnd - reqUnitSize)
+        {
+            int curSize = 0;
+            for (int i = 0; i < reqUnitSize; ++i) 
+                curSize = (curSize << 8) + curNal[i];
+            curNal += reqUnitSize;
+            curSize = qMin(curSize, dataEnd - curNal);
+            EVP_DigestUpdate(mdctx, (const char*) curNal, curSize);
+            curNal += curSize;
+        }
+    }
+    else {
+        // prefix is 00 00 01 code
+        const quint8* curNal = NALUnit::findNextNAL(data, dataEnd);
+        while(curNal < dataEnd)
+        {
+            const quint8* nextNal = NALUnit::findNALWithStartCode(curNal, dataEnd, true);
+            EVP_DigestUpdate(mdctx, (const char*) curNal, nextNal - curNal);
+            curNal = NALUnit::findNextNAL(nextNal, dataEnd);
+        }
+    }
+}
+
+QByteArray QnSignHelper::getSign(const AVFrame* frame, int signLen)
 {
     static const int COLOR_THRESHOLD = 32;
 
     int signBits = signLen*8;
     int rowCnt = signBits / 16;
     int colCnt = signBits / rowCnt;
-    int SQUARE_SIZE = getSquareSize(frame, signBits);
+    int SQUARE_SIZE = getSquareSize(frame->width, frame->height, signBits);
     int drawWidth = SQUARE_SIZE * colCnt;
     int drawheight = SQUARE_SIZE * rowCnt;
 
@@ -50,29 +101,42 @@ QByteArray QnSignHelper::getSign(AVFrame* frame, int signLen)
         for (int x = 0; x < colCnt; ++x)
         {
             QRect checkRect(x*SQUARE_SIZE+cOffs, y*SQUARE_SIZE+cOffs, SQUARE_SIZE-cOffs*2, SQUARE_SIZE-cOffs*2);
-            float avgColor = getAvgY(frame, checkRect);
+            checkRect.translate(drawLeft, drawTop);
+
+            float avgColor = getAvgColor(frame, 0, checkRect);
             if (avgColor <= COLOR_THRESHOLD)
                 writer.putBit(1);
             else if (avgColor >= (255-COLOR_THRESHOLD))
                 writer.putBit(0);
             else 
                 return QByteArray(); // invalid data
+
+            // check colors plane
+            const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[frame->format];
+            for (int i = 0; i < descr->log2_chroma_w; ++i)
+                checkRect = QRect(checkRect.left()/2, checkRect.top(), checkRect.width()/2, checkRect.height());
+            for (int i = 0; i < descr->log2_chroma_h; ++i)
+                checkRect = QRect(checkRect.left(), checkRect.top()/2, checkRect.width(), checkRect.height()/2);
+            for (int i = 1; i < descr->nb_components; ++i) {
+                float avgColor = getAvgColor(frame, i, checkRect);
+                if (qAbs(avgColor - 0x80) > COLOR_THRESHOLD/2)
+                    return QByteArray(); // invalid data
+            }
         }
     }
-    return QByteArray((const char*)signArray, signLen/8);
+    return QByteArray((const char*)signArray, signLen);
 }
 
-void QnSignHelper::drawOnSignFrame(AVFrame* frame, const QByteArray& sign)
+void QnSignHelper::draw(QImage& img, bool drawText)
 {
-    quint8* imgBuffer = (quint8*) qMallocAligned(frame->linesize[0]*frame->height*4, 32);
-    QImage img(imgBuffer, frame->width, frame->height, frame->linesize[0]*4, QImage::Format_ARGB32);
     QPainter painter(&img);
     painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
-
     painter.fillRect(0,0, img.width(), img.height()/2, QColor(255,255,255));
     painter.fillRect(0,img.height()/2, img.width(), img.height()/2, QColor(0,0,255));
 
-    QString hIDStr = QString("Hardware ID: ").append(qnLicensePool->getLicenses().hardwareId());
+    QString versionStr = qApp->applicationName().append(" v").append(qApp->applicationVersion());
+    int text_x_offs = 16;
+    int text_y_offs = 16;
 
     QFont font;
     QFontMetrics metric(font);
@@ -80,17 +144,19 @@ void QnSignHelper::drawOnSignFrame(AVFrame* frame, const QByteArray& sign)
     {
         font.setPointSize(font.pointSize() + 1);
         metric = QFontMetrics(font);
-        int width = metric.width(hIDStr);
-        if (width >= img.width()/2)
+        int width = metric.width(versionStr);
+        int height = metric.height();
+        if (width >= img.width()/2 || height >= (img.height()/2-text_y_offs) / 4)
             break;
     }
     painter.setFont(font);
 
-    int text_x_offs = 16;
-    int text_y_offs = 16;
     //painter.drawText(QPoint(text_x_offs, text_y_offs), qApp->organizationName());
-    painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()), qApp->applicationName().append(" v").append(qApp->applicationVersion()));
-    painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*2), hIDStr);
+    painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()), versionStr);
+    QString hid = qnLicensePool->getLicenses().hardwareId();
+    if (hid.isEmpty())
+        hid = "Unknown";
+    painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*2), QString("Hardware ID: ").append(hid));
     QList<QnLicensePtr> list = qnLicensePool->getLicenses().licenses();
     QString licenseName("FREE license");
     foreach (QnLicensePtr license, list)
@@ -100,7 +166,7 @@ void QnSignHelper::drawOnSignFrame(AVFrame* frame, const QByteArray& sign)
     }
 
     painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*3), QString("Licensed to: ").append(licenseName));
-    painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*4), QString("Checksum: ").append(sign.toHex()));
+    painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*4), QString("Checksum: ").append(m_sign.toHex()));
 
 
     if (m_logo.width() > 0) {
@@ -109,33 +175,49 @@ void QnSignHelper::drawOnSignFrame(AVFrame* frame, const QByteArray& sign)
     }
 
     // draw Hash
-    int signBits = sign.length()*8;
+    int signBits = m_sign.length()*8;
     int rowCnt = signBits / 16;
     int colCnt = signBits / rowCnt;
 
-    int SQUARE_SIZE = getSquareSize(frame, signBits);
+    int SQUARE_SIZE = getSquareSize(img.width(), img.height(), signBits);
 
     int drawWidth = SQUARE_SIZE * colCnt;
     int drawheight = SQUARE_SIZE * rowCnt;
-    painter.translate((frame->width - drawWidth)/2, frame->height/2 + (frame->height/2-drawheight)/2);
-    painter.setBrush(QColor(0,0,0));
-    painter.setPen(QColor(128,128,128));
+    painter.translate((img.width() - drawWidth)/2, img.height()/2 + (img.height()/2-drawheight)/2);
+    painter.fillRect(0, 0, SQUARE_SIZE*colCnt, SQUARE_SIZE*rowCnt, QColor(255,255,255));
+
+    if (m_roundRectPixmap.width() != SQUARE_SIZE)
+    {
+        int cOffs = SQUARE_SIZE/16;
+        m_roundRectPixmap = QPixmap(SQUARE_SIZE, SQUARE_SIZE);
+        QPainter tmpPainter(&m_roundRectPixmap);
+        tmpPainter.fillRect(0,0, SQUARE_SIZE, SQUARE_SIZE, QColor(255,255,255));
+        tmpPainter.setBrush(QColor(0,0,0));
+        tmpPainter.setPen(QColor(128,128,128));
+        tmpPainter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
+        tmpPainter.drawRoundedRect(QRect(cOffs, cOffs, SQUARE_SIZE-cOffs*2, SQUARE_SIZE-cOffs*2), SQUARE_SIZE/4, SQUARE_SIZE/4);
+    }
+
     for (int y = 0; y < rowCnt; ++y)
     {
         for (int x = 0; x < colCnt; ++x)
         {
             int bitNum = y*colCnt + x;
-            unsigned char b = *((unsigned char*)sign.data() + bitNum/8 );
+            unsigned char b = *((unsigned char*)m_sign.data() + bitNum/8 );
             bool isBit = b & (128 >> (bitNum&7));
-            int cOffs = SQUARE_SIZE/16;
-            painter.fillRect(x*SQUARE_SIZE, y*SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE, QColor(255,255,255));
             if (isBit)
-                painter.drawRoundedRect(QRect(x*SQUARE_SIZE+cOffs, y*SQUARE_SIZE+cOffs, SQUARE_SIZE-cOffs*2, SQUARE_SIZE-cOffs*2), SQUARE_SIZE/4, SQUARE_SIZE/4);
+                painter.drawPixmap(x*SQUARE_SIZE, y*SQUARE_SIZE, m_roundRectPixmap);
         }
     }
     painter.end();
     //img.save("c:/test.bmp");
+}
 
+void QnSignHelper::drawOnSignFrame(AVFrame* frame)
+{
+    quint8* imgBuffer = (quint8*) qMallocAligned(frame->linesize[0]*frame->height*4, 32);
+    QImage img(imgBuffer, frame->width, frame->height, frame->linesize[0]*4, QImage::Format_ARGB32);
+    draw(img, true);
 
     if (useSSE3() && frame->format == PIX_FMT_YUV420P)
     {
@@ -316,7 +398,7 @@ int QnSignHelper::correctNalPrefix(const QByteArray& srcCodecExtraData, quint8* 
     return out_size;
 }
 
-QnCompressedVideoDataPtr QnSignHelper::createSgnatureFrame(AVCodecContext* srcCodec, const QByteArray& hash)
+QnCompressedVideoDataPtr QnSignHelper::createSgnatureFrame(AVCodecContext* srcCodec)
 {
     QByteArray srcCodecExtraData((const char*) srcCodec->extradata, srcCodec->extradata_size);
 
@@ -357,7 +439,7 @@ QnCompressedVideoDataPtr QnSignHelper::createSgnatureFrame(AVCodecContext* srcCo
     int videoBufSize = 1024*1024*4;
     quint8* videoBuf = new quint8[videoBufSize];
 
-    drawOnSignFrame(frame, hash);
+    drawOnSignFrame(frame);
 
     int out_size = avcodec_encode_video(videoCodecCtx, videoBuf, videoBufSize, frame);
     if (out_size == 0)
@@ -394,4 +476,9 @@ QnCompressedVideoDataPtr QnSignHelper::createSgnatureFrame(AVCodecContext* srcCo
 void QnSignHelper::setLogo(QPixmap logo)
 {
     m_logo = logo;
+}
+
+void QnSignHelper::setSign(const QByteArray& sign)
+{
+    m_sign = sign;
 }

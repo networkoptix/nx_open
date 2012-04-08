@@ -6,15 +6,12 @@
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "utils/common/util.h"
 #include "decoders/video/ffmpeg.h"
-#include "sign_frame.h"
+#include "export/sign_helper.h"
 
 static const int DEFAULT_VIDEO_STREAM_ID = 4113;
 static const int DEFAULT_AUDIO_STREAM_ID = 4352;
 
 static const int STORE_QUEUE_SIZE = 50;
-
-static const char hashMethod[] = "md5";
-static const char HASH_MAGIC[] = "RhjrjLbkMxTujHI!";
 
 extern QMutex global_ffmpeg_mutex;
 
@@ -231,8 +228,13 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
         cl_log.log(QLatin1String("AV packet write error"), cl_logWARNING);
     else {
         m_packetWrited = true;
-        if (m_needCalcSignature)
-            EVP_DigestUpdate(m_mdctx, (const char*)avPkt.data, avPkt.size);
+        if (m_needCalcSignature) 
+        {
+            AVCodecContext* srcCodec = m_formatCtx->streams[0]->codec;
+            if (srcCodec->codec_id == CODEC_ID_H264)
+                QnSignHelper::updateDigest(srcCodec, m_mdctx, avPkt.data, avPkt.size);
+            //EVP_DigestUpdate(m_mdctx, (const char*)avPkt.data, avPkt.size);
+        }
     }
 
     return true;
@@ -323,7 +325,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
             {
                 // determine real width and height
                 CLVideoDecoderOutput outFrame;
-                CLFFmpegVideoDecoder decoder(mediaData->compressionType, mediaData);
+                CLFFmpegVideoDecoder decoder(mediaData->compressionType, mediaData, false);
                 decoder.decode(mediaData, &outFrame);
                 avcodec_copy_context(videoStream->codec, decoder.getContext());
                 videoStream->stream_copy = 1;
@@ -453,16 +455,18 @@ void QnStreamRecorder::setNeedCalcSignature(bool value)
         return;
     if (value)
     {
-        const EVP_MD *md = EVP_get_digestbyname(hashMethod);
+        const EVP_MD *md = EVP_get_digestbyname(EXPORT_SIGN_METHOD);
         if (md)
         {
             m_needCalcSignature = value;
             m_mdctx = new EVP_MD_CTX;
             EVP_MD_CTX_init(m_mdctx);
             EVP_DigestInit_ex(m_mdctx, md, NULL);
+
+            EVP_DigestUpdate(m_mdctx, EXPORT_SIGN_MAGIC, sizeof(EXPORT_SIGN_MAGIC));
         }
         else {
-            qCritical() << "Can't sign file because of '" << hashMethod << "' not found";
+            qCritical() << "Can't sign file because of '" << EXPORT_SIGN_METHOD << "' not found";
         }
     }
     else {
@@ -481,12 +485,12 @@ QByteArray QnStreamRecorder::getSignature() const
 
 bool QnStreamRecorder::addSignatureFrame(QString& errorString)
 {
-    EVP_DigestUpdate(m_mdctx, HASH_MAGIC, sizeof(HASH_MAGIC));
 
     AVCodecContext* srcCodec = m_formatCtx->streams[0]->codec;
     QnSignHelper signHelper;
     signHelper.setLogo(m_logo);
-    QnCompressedVideoDataPtr generatedFrame = signHelper.createSgnatureFrame(srcCodec, getSignature());
+    signHelper.setSign(getSignature());
+    QnCompressedVideoDataPtr generatedFrame = signHelper.createSgnatureFrame(srcCodec);
 
     if (generatedFrame == 0)
     {
@@ -496,7 +500,7 @@ bool QnStreamRecorder::addSignatureFrame(QString& errorString)
 
     generatedFrame->timestamp = m_endDateTime + 100 * 1000ll;
     m_needCalcSignature = false; // prevent recursive calls
-    for (int i = 0; i < 100; ++i) // 2 - work, 1 - work at VLC
+    //for (int i = 0; i < 2; ++i) // 2 - work, 1 - work at VLC
     {
         saveData(generatedFrame);
         generatedFrame->timestamp += 100 * 1000ll;

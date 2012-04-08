@@ -36,7 +36,7 @@ struct FffmpegLog
 };
 
 
-CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CodecID codec_id, const QnCompressedVideoDataPtr data):
+CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CodecID codec_id, const QnCompressedVideoDataPtr data, bool mtDecoding):
 m_passedContext(0),
 m_width(0),
 m_height(0),
@@ -54,6 +54,8 @@ m_checkH264ResolutionChange(false),
 m_context(0),
 m_forceSliceDecoding(-1)
 {
+    m_mtDecoding = mtDecoding;
+
     QMutexLocker mutex(&global_ffmpeg_mutex);
 	if (data->context)
 	{
@@ -542,4 +544,37 @@ void CLFFmpegVideoDecoder::setMTDecoding(bool value)
 AVCodecContext* CLFFmpegVideoDecoder::getContext() const
 {
     return m_context;
+}
+
+bool CLFFmpegVideoDecoder::getLastDecodedFrame(CLVideoDecoderOutput* outFrame)
+{
+    if (m_codec==0 || m_context->pix_fmt == -1 || m_context->width == 0)
+        return false;
+
+    outFrame->setUseExternalData(false);
+    AVFrame* copyFromFrame = m_frame;
+    outFrame->reallocate(m_context->width, m_context->height, m_context->pix_fmt, m_frame->linesize[0]);
+
+    if (m_frame->interlaced_frame && m_mtDecoding)
+    {
+        avpicture_deinterlace((AVPicture*) outFrame, (AVPicture*) m_frame, m_context->pix_fmt, m_context->width, m_context->height);
+        outFrame->pkt_dts = m_frame->pkt_dts;
+    }
+    else {
+        if (outFrame->format == PIX_FMT_YUV420P) 
+        {
+            // optimization
+            for (int i = 0; i < 3; ++ i) 
+            {
+                int h = m_frame->height >> (i > 0 ? 1 : 0);
+                memcpy(outFrame->data[i], m_frame->data[i], m_frame->linesize[i]* h);
+            }
+        }
+        else {
+            av_picture_copy((AVPicture*) outFrame, (AVPicture*) (m_frame), m_context->pix_fmt, m_context->width, m_context->height);
+        }
+        outFrame->pkt_dts = m_frame->pkt_dts;
+    }
+    outFrame->format = GetPixelFormat();
+    return true;
 }

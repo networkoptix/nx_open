@@ -20,7 +20,7 @@ struct MpegEncContext;
 class CLFFmpegVideoDecoder : public QnAbstractVideoDecoder
 {
 public:
-	CLFFmpegVideoDecoder(CodecID codec, const QnCompressedVideoDataPtr data);
+	CLFFmpegVideoDecoder(CodecID codec, const QnCompressedVideoDataPtr data, bool mtDecoding);
     bool decode(const QnCompressedVideoDataPtr data, CLVideoDecoderOutput* outFrame);
 	~CLFFmpegVideoDecoder();
 
@@ -34,6 +34,7 @@ public:
     }
 
     AVCodecContext* getContext() const;
+    bool getLastDecodedFrame(CLVideoDecoderOutput* outFrame);
 
     PixelFormat GetPixelFormat();
     int getWidth() const  { return m_context->width;  }
