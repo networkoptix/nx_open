@@ -4,6 +4,7 @@
 
 QnSignDialogDisplay::QnSignDialogDisplay(): CLCamDisplay(false) 
 {
+    m_firstFrameDisplayed = false;
     m_mdctx = 0;
     m_lastDisplayTime = 0;
     m_eofProcessed = false;
@@ -69,9 +70,19 @@ bool QnSignDialogDisplay::processData(QnAbstractDataPacketPtr data)
             QnSignHelper::updateDigest(m_prevFrame->context->ctx(), m_mdctx, data, m_prevFrame->data.size());
         }
 
-        if ((video->flags & AV_PKT_FLAG_KEY) && qnSyncTime->currentMSecsSinceEpoch() - m_lastDisplayTime > 100) // max display rate 10 fps
+        if (!m_firstFrameDisplayed || (video->flags & AV_PKT_FLAG_KEY) && qnSyncTime->currentMSecsSinceEpoch() - m_lastDisplayTime > 100) // max display rate 10 fps
         {
-            m_display[0]->dispay(video, true, CLVideoDecoderOutput::factor_any);
+            CLVideoStreamDisplay::FrameDisplayStatus status = m_display[0]->dispay(video, true, CLVideoDecoderOutput::factor_any);
+            if (!m_firstFrameDisplayed)
+                m_firstFrameDisplayed = status == CLVideoStreamDisplay::Status_Displayed;
+            QSize imageSize = m_display[0]->getImageSize();
+            if (imageSize != m_prevImageSize)
+            {
+                m_prevImageSize = imageSize;
+                emit gotImageSize(imageSize.width(), imageSize.height());
+            }
+
+
             m_lastDisplayTime = qnSyncTime->currentMSecsSinceEpoch();
 
             quint8 md_value[EVP_MAX_MD_SIZE];

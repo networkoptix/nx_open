@@ -35,58 +35,23 @@ public:
         m_renderer = 0;
         connect(&m_timer, SIGNAL(timeout()), this, SLOT(update()));
         m_timer.start(16);
+        m_textureWidth = 1920;
+        m_textureHeight = 1080;
+    }
+
+    void setImageSize(int width, int height)
+    {
+        m_textureWidth = width;
+        m_textureHeight = height;
+        resizeEvent(0);
     }
 
     virtual void  resizeEvent ( QResizeEvent * event ) override
     {
-        /*
-        // keep aspect ratio 16:9
-        int width = event->size().width();
-        int height = width * 9.0 / 16.0 + 0.5;
-        int hOffset = (event->size().height() - height)/2;
-
-        if (m_renderer)
-            m_renderer->setChannelScreenSize(QRect(0, hOffset, width, height));
-        */
-        static double sar = 1.0;
-        double windowHeight = event->size().height();
-        double windowWidth = event->size().width();
-        double textureWidth = 1920;
-        double textureHeight = 1080;
-        double newTextureWidth = static_cast<uint>(textureWidth * sar);
-
-        double windowAspect = windowWidth / windowHeight;
-        double textureAspect = textureWidth / textureHeight;
-        if (windowAspect > textureAspect)
-        {
-            // black bars at left and right
-            m_videoRect.setTop(0);
-            m_videoRect.setHeight(windowHeight);
-            double scale = windowHeight / textureHeight;
-            double scaledWidth = newTextureWidth * scale;
-            m_videoRect.setLeft((windowWidth - scaledWidth) / 2);
-            m_videoRect.setWidth(scaledWidth + 0.5);
-        }
-        else {
-            // black bars at the top and bottom
-            m_videoRect.setLeft(0);
-            m_videoRect.setWidth(windowWidth);
-            if (newTextureWidth < windowWidth) {
-                double scale = windowWidth / newTextureWidth;
-                double scaledHeight = textureHeight * scale;
-                m_videoRect.setTop((windowHeight - scaledHeight) / 2);
-                m_videoRect.setHeight(scaledHeight + 0.5);
-            }
-            else {
-                double newTextureHeight = windowWidth / textureAspect + 0.5;
-                m_videoRect.setTop((windowHeight - newTextureHeight) / 2);
-                m_videoRect.setHeight(newTextureHeight);
-            }
-        }
-
-        
+        m_videoRect = SignDialog::calcVideoRect(width(), height(), m_textureWidth, m_textureHeight);
         if (m_renderer)
             m_renderer->setChannelScreenSize(m_videoRect.size());
+        update();
     }
 
     void setRenderer(QnResourceWidgetRenderer* renderer)
@@ -108,6 +73,8 @@ private:
     QRect m_videoRect;
     QnResourceWidgetRenderer* m_renderer;
     QTimer m_timer;
+    double m_textureWidth;
+    double m_textureHeight;
 };
 
 // ------------------------------------
@@ -147,6 +114,8 @@ SignDialog::SignDialog(const QString& fileName, QWidget *parent) :
     connect(m_camDispay, SIGNAL(calcSignInProgress(QByteArray, int)), ui->signInfoLabel, SLOT(at_calcSignInProgress(QByteArray, int)));
     connect(m_camDispay, SIGNAL(calcSignInProgress(QByteArray, int)), this, SLOT(at_calcSignInProgress(QByteArray, int)));
 
+    connect(m_camDispay, SIGNAL(gotImageSize(int, int)), this, SLOT(at_gotImageSize(int, int)));
+
     renderer = new QnResourceWidgetRenderer(1, 0, glWindow->context());
     glWindow->setRenderer(renderer);
     m_camDispay->addVideoChannel(0, renderer, true);
@@ -176,6 +145,42 @@ SignDialog::~SignDialog()
     delete glWindow;
 }
 
+QRect SignDialog::calcVideoRect(double windowWidth, double windowHeight, double textureWidth, double textureHeight)
+{
+    QRect videoRect;
+    double newTextureWidth = static_cast<uint>(textureWidth);
+
+    double windowAspect = windowWidth / windowHeight;
+    double textureAspect = textureWidth / textureHeight;
+    if (windowAspect > textureAspect)
+    {
+        // black bars at left and right
+        videoRect.setTop(0);
+        videoRect.setHeight(windowHeight);
+        double scale = windowHeight / textureHeight;
+        double scaledWidth = newTextureWidth * scale;
+        videoRect.setLeft((windowWidth - scaledWidth) / 2);
+        videoRect.setWidth(scaledWidth + 0.5);
+    }
+    else {
+        // black bars at the top and bottom
+        videoRect.setLeft(0);
+        videoRect.setWidth(windowWidth);
+        if (newTextureWidth < windowWidth) {
+            double scale = windowWidth / newTextureWidth;
+            double scaledHeight = textureHeight * scale;
+            videoRect.setTop((windowHeight - scaledHeight) / 2);
+            videoRect.setHeight(scaledHeight + 0.5);
+        }
+        else {
+            double newTextureHeight = windowWidth / textureAspect + 0.5;
+            videoRect.setTop((windowHeight - newTextureHeight) / 2);
+            videoRect.setHeight(newTextureHeight);
+        }
+    }
+    return videoRect;
+}
+
 void SignDialog::accept()
 {
     done(0);
@@ -197,4 +202,11 @@ void SignDialog::changeEvent(QEvent *event)
 void SignDialog::at_calcSignInProgress(QByteArray sign, int progress)
 {
 
+}
+
+void SignDialog::at_gotImageSize(int width, int height)
+{
+    if (glWindow) 
+        glWindow->setImageSize(width, height);
+    ui->signInfoLabel->setImageSize(width, height);
 }

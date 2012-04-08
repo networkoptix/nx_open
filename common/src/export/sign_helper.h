@@ -17,6 +17,7 @@ public:
     QByteArray getSign(const AVFrame* frame, int signLen);
     void setSign(const QByteArray& sign);
     void draw(QImage& img, bool drawText);
+    void draw(QPainter& painter, const QSize& paintSize, bool drawText);
 
     static void updateDigest(AVCodecContext* srcCodec, EVP_MD_CTX* mdctx, const quint8* data, int size);
 private:

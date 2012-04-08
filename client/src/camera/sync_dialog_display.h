@@ -13,6 +13,7 @@ public:
 signals:
     void gotSignature(QByteArray calculatedSign, QByteArray signFromPicture);
     void calcSignInProgress(QByteArray calculatedSign, int progress);
+    void gotImageSize(int width, int height);
 protected:
     virtual bool canAcceptData() const override;
     virtual bool processData(QnAbstractDataPacketPtr data) override;
@@ -22,6 +23,8 @@ private:
     QnCompressedVideoDataPtr m_prevFrame;
     bool m_eofProcessed;
     qint64 m_lastDisplayTime;
+    QSize m_prevImageSize;
+    bool m_firstFrameDisplayed;
 };
 
 #endif //  __SIGN_DIALOG_DISPLAY_H__

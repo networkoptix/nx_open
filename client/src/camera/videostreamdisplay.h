@@ -46,6 +46,7 @@ public:
     void onNoVideo();
     void canUseBufferedFrameDisplayer(bool value);
     qint64 nextReverseTime() const;
+    QSize getImageSize() const;
 
     /**
       * Return last decoded frame
@@ -91,6 +92,7 @@ private:
     BufferedFrameDisplayer* m_bufferedFrameDisplayer;
     bool m_canUseBufferedFrameDisplayer;
 private:
+    QSize m_imageSize;
     CLVideoDecoderOutput* m_lastDisplayedFrame;
     bool m_queueWasFilled;
     float m_speed;

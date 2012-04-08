@@ -448,6 +448,7 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompress
 		    return Status_Skipped;
 	}
     m_mtx.unlock();
+    m_imageSize = QSize(decodeToFrame->width*dec->getSampleAspectRatio(), decodeToFrame->height);
 
     if (qAbs(decodeToFrame->pkt_dts-data->timestamp) > 200*1000) {
         // prevent large difference after seek or EOF
@@ -737,4 +738,9 @@ void CLVideoStreamDisplay::setCurrentTime(qint64 time)
 void CLVideoStreamDisplay::canUseBufferedFrameDisplayer(bool value)
 {
     m_canUseBufferedFrameDisplayer = value;
+}
+
+QSize CLVideoStreamDisplay::getImageSize() const
+{
+    return m_imageSize;
 }

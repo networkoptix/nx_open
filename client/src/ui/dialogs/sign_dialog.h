@@ -25,10 +25,12 @@ public:
     explicit SignDialog(const QString& fileName, QWidget *parent = 0);
     virtual ~SignDialog();
 
+    static QRect calcVideoRect(double windowWidth, double windowHeight, double textureWidth, double textureHeight);
 public slots:
     virtual void accept() override;
 private slots:
     void at_calcSignInProgress(QByteArray sign, int progress);
+    void at_gotImageSize(int width, int height);
 protected:
     virtual void changeEvent(QEvent *event) override;
 

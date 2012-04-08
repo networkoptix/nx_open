@@ -127,51 +127,52 @@ QByteArray QnSignHelper::getSign(const AVFrame* frame, int signLen)
     return QByteArray((const char*)signArray, signLen);
 }
 
-void QnSignHelper::draw(QImage& img, bool drawText)
+void QnSignHelper::draw(QPainter& painter, const QSize& paintSize, bool drawText)
 {
-    QPainter painter(&img);
     painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
-    painter.fillRect(0,0, img.width(), img.height()/2, QColor(255,255,255));
-    painter.fillRect(0,img.height()/2, img.width(), img.height()/2, QColor(0,0,255));
+    painter.fillRect(0,0, paintSize.width(), paintSize.height()/2, QColor(255,255,255));
+    painter.fillRect(0,paintSize.height()/2, paintSize.width(), paintSize.height()/2, QColor(0,0,255));
 
     QString versionStr = qApp->applicationName().append(" v").append(qApp->applicationVersion());
     int text_x_offs = 16;
     int text_y_offs = 16;
 
-    QFont font;
-    QFontMetrics metric(font);
-    for (int i = 0; i < 100; ++i)
+    if (drawText)
     {
-        font.setPointSize(font.pointSize() + 1);
-        metric = QFontMetrics(font);
-        int width = metric.width(versionStr);
-        int height = metric.height();
-        if (width >= img.width()/2 || height >= (img.height()/2-text_y_offs) / 4)
-            break;
+        QFont font;
+        QFontMetrics metric(font);
+        for (int i = 0; i < 100; ++i)
+        {
+            font.setPointSize(font.pointSize() + 1);
+            metric = QFontMetrics(font);
+            int width = metric.width(versionStr);
+            int height = metric.height();
+            if (width >= paintSize.width()/2 || height >= (paintSize.height()/2-text_y_offs) / 4)
+                break;
+        }
+        painter.setFont(font);
+
+        //painter.drawText(QPoint(text_x_offs, text_y_offs), qApp->organizationName());
+        painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()), versionStr);
+        QString hid = qnLicensePool->getLicenses().hardwareId();
+        if (hid.isEmpty())
+            hid = "Unknown";
+        painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*2), QString("Hardware ID: ").append(hid));
+        QList<QnLicensePtr> list = qnLicensePool->getLicenses().licenses();
+        QString licenseName("FREE license");
+        foreach (QnLicensePtr license, list)
+        {
+            if (license->name() != "FREE")
+                licenseName = license->name();
+        }
+
+        painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*3), QString("Licensed to: ").append(licenseName));
+        painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*4), QString("Checksum: ").append(m_sign.toHex()));
     }
-    painter.setFont(font);
-
-    //painter.drawText(QPoint(text_x_offs, text_y_offs), qApp->organizationName());
-    painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()), versionStr);
-    QString hid = qnLicensePool->getLicenses().hardwareId();
-    if (hid.isEmpty())
-        hid = "Unknown";
-    painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*2), QString("Hardware ID: ").append(hid));
-    QList<QnLicensePtr> list = qnLicensePool->getLicenses().licenses();
-    QString licenseName("FREE license");
-    foreach (QnLicensePtr license, list)
-    {
-        if (license->name() != "FREE")
-            licenseName = license->name();
-    }
-
-    painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*3), QString("Licensed to: ").append(licenseName));
-    painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*4), QString("Checksum: ").append(m_sign.toHex()));
-
 
     if (m_logo.width() > 0) {
-        QPixmap logo = m_logo.scaledToWidth(img.width()/8, Qt::SmoothTransformation);
-        painter.drawPixmap(QPoint(img.width() - logo.width() - text_x_offs, img.height()/2 - logo.height() - text_y_offs), logo);
+        QPixmap logo = m_logo.scaledToWidth(paintSize.width()/8, Qt::SmoothTransformation);
+        painter.drawPixmap(QPoint(paintSize.width() - logo.width() - text_x_offs, paintSize.height()/2 - logo.height() - text_y_offs), logo);
     }
 
     // draw Hash
@@ -179,11 +180,11 @@ void QnSignHelper::draw(QImage& img, bool drawText)
     int rowCnt = signBits / 16;
     int colCnt = signBits / rowCnt;
 
-    int SQUARE_SIZE = getSquareSize(img.width(), img.height(), signBits);
+    int SQUARE_SIZE = getSquareSize(paintSize.width(), paintSize.height(), signBits);
 
     int drawWidth = SQUARE_SIZE * colCnt;
     int drawheight = SQUARE_SIZE * rowCnt;
-    painter.translate((img.width() - drawWidth)/2, img.height()/2 + (img.height()/2-drawheight)/2);
+    painter.translate((paintSize.width() - drawWidth)/2, paintSize.height()/2 + (paintSize.height()/2-drawheight)/2);
     painter.fillRect(0, 0, SQUARE_SIZE*colCnt, SQUARE_SIZE*rowCnt, QColor(255,255,255));
 
     if (m_roundRectPixmap.width() != SQUARE_SIZE)
@@ -210,6 +211,12 @@ void QnSignHelper::draw(QImage& img, bool drawText)
         }
     }
     painter.end();
+}
+
+void QnSignHelper::draw(QImage& img, bool drawText)
+{
+    QPainter painter(&img);
+    draw(painter, img.size(), drawText);
     //img.save("c:/test.bmp");
 }
 
