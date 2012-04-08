@@ -23,6 +23,7 @@ private:
     QnCompressedVideoDataPtr m_prevFrame;
     bool m_eofProcessed;
     qint64 m_lastDisplayTime;
+    qint64 m_lastDisplayTime2;
     QSize m_prevImageSize;
     bool m_firstFrameDisplayed;
 };

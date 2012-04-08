@@ -8,6 +8,7 @@ QnSignDialogDisplay::QnSignDialogDisplay(): CLCamDisplay(false)
     m_firstFrameDisplayed = false;
     m_mdctx = 0;
     m_lastDisplayTime = 0;
+    m_lastDisplayTime2 = 0;
     m_eofProcessed = false;
     const EVP_MD *md = EVP_get_digestbyname(EXPORT_SIGN_METHOD);
     if (md)
@@ -83,10 +84,10 @@ bool QnSignDialogDisplay::processData(QnAbstractDataPacketPtr data)
                 m_prevImageSize = imageSize;
                 emit gotImageSize(imageSize.width(), imageSize.height());
             }
-
-
             m_lastDisplayTime = qnSyncTime->currentMSecsSinceEpoch();
-
+        }
+        if (qnSyncTime->currentMSecsSinceEpoch() - m_lastDisplayTime2 > 100) // max display rate 10 fps
+        {
             quint8 md_value[EVP_MAX_MD_SIZE];
             quint32 md_len = 0;
             EVP_MD_CTX_copy_ex(m_tmpMdCtx, m_mdctx);
@@ -95,6 +96,7 @@ bool QnSignDialogDisplay::processData(QnAbstractDataPacketPtr data)
             QByteArray calculatedSign((const char*)md_value, md_len);
             QnArchiveStreamReader* reader = dynamic_cast<QnArchiveStreamReader*> (video->dataProvider);
             int progress =  (video->timestamp - reader->startTime()) / (double) (reader->endTime() - reader->startTime()) * 100;
+            m_lastDisplayTime2 = qnSyncTime->currentMSecsSinceEpoch();
 
             emit calcSignInProgress(calculatedSign, progress);
         }
