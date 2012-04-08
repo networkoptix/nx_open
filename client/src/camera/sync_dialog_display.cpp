@@ -1,6 +1,7 @@
 #include "sync_dialog_display.h"
 #include "export/sign_helper.h"
 #include "utils/common/synctime.h"
+#include "plugins/resources/archive/archive_stream_reader.h"
 
 QnSignDialogDisplay::QnSignDialogDisplay(): CLCamDisplay(false) 
 {
@@ -91,7 +92,9 @@ bool QnSignDialogDisplay::processData(QnAbstractDataPacketPtr data)
             EVP_DigestFinal_ex(m_tmpMdCtx, md_value, &md_len);
 
             QByteArray calculatedSign((const char*)md_value, md_len);
-            int progress = 0;
+            QnArchiveStreamReader* reader = dynamic_cast<QnArchiveStreamReader*> (video->dataProvider);
+            int progress =  (video->timestamp - reader->startTime()) / (double) (reader->endTime() - reader->startTime()) * 100;
+
             emit calcSignInProgress(calculatedSign, progress);
         }
         m_prevFrame = video;

@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Connect to Enterprise Controller</string>
+   <string>Checking file signature</string>
   </property>
   <property name="modal">
    <bool>false</bool>

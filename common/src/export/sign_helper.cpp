@@ -2,6 +2,7 @@
 #include "utils/common/util.h"
 #include "licensing/license.h"
 #include "utils/common/yuvconvert.h"
+#include "utils/common/scoped_painter_rollback.h"
 
 extern "C" {
 #ifdef WIN32
@@ -11,9 +12,11 @@ extern "C" {
 #ifdef WIN32
 #undef AVPixFmtDescriptor
 #endif
-
 };
 
+
+static const int text_x_offs = 16;
+static const int text_y_offs = 16;
 
 int getSquareSize(int width, int height, int signBits)
 {
@@ -127,30 +130,44 @@ QByteArray QnSignHelper::getSign(const AVFrame* frame, int signLen)
     return QByteArray((const char*)signArray, signLen);
 }
 
+QFontMetrics QnSignHelper::updateFontSize(QPainter& painter, const QSize& paintSize)
+{
+    QString versionStr = qApp->applicationName().append(" v").append(qApp->applicationVersion());
+
+    QFont font;
+    QFontMetrics metric(font);
+    for (int i = 0; i < 100; ++i)
+    {
+        font.setPointSize(font.pointSize() + 1);
+        metric = QFontMetrics(font);
+        int width = metric.width(versionStr);
+        int height = metric.height();
+        if (width >= paintSize.width()/2 || height >= (paintSize.height()/2-text_y_offs) / 4)
+            break;
+    }
+    painter.setFont(font);
+    return metric;
+}
+
+void QnSignHelper::drawTextLine(QPainter& painter, const QSize& paintSize,int lineNum, const QString& text)
+{
+    QFontMetrics metric = updateFontSize(painter, paintSize);
+    painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*lineNum), text);
+}
+
 void QnSignHelper::draw(QPainter& painter, const QSize& paintSize, bool drawText)
 {
+    QnScopedPainterTransformRollback rollback(&painter);
+
     painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
-    painter.fillRect(0,0, paintSize.width(), paintSize.height()/2, QColor(255,255,255));
-    painter.fillRect(0,paintSize.height()/2, paintSize.width(), paintSize.height()/2, QColor(0,0,255));
+    painter.fillRect(0,0, paintSize.width(), paintSize.height()/2, Qt::white);
+    painter.fillRect(0,paintSize.height()/2, paintSize.width(), paintSize.height()/2, Qt::blue);
 
     QString versionStr = qApp->applicationName().append(" v").append(qApp->applicationVersion());
-    int text_x_offs = 16;
-    int text_y_offs = 16;
 
     if (drawText)
     {
-        QFont font;
-        QFontMetrics metric(font);
-        for (int i = 0; i < 100; ++i)
-        {
-            font.setPointSize(font.pointSize() + 1);
-            metric = QFontMetrics(font);
-            int width = metric.width(versionStr);
-            int height = metric.height();
-            if (width >= paintSize.width()/2 || height >= (paintSize.height()/2-text_y_offs) / 4)
-                break;
-        }
-        painter.setFont(font);
+        QFontMetrics metric = updateFontSize(painter, paintSize);
 
         //painter.drawText(QPoint(text_x_offs, text_y_offs), qApp->organizationName());
         painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()), versionStr);
@@ -182,10 +199,12 @@ void QnSignHelper::draw(QPainter& painter, const QSize& paintSize, bool drawText
 
     int SQUARE_SIZE = getSquareSize(paintSize.width(), paintSize.height(), signBits);
 
+
     int drawWidth = SQUARE_SIZE * colCnt;
     int drawheight = SQUARE_SIZE * rowCnt;
     painter.translate((paintSize.width() - drawWidth)/2, paintSize.height()/2 + (paintSize.height()/2-drawheight)/2);
-    painter.fillRect(0, 0, SQUARE_SIZE*colCnt, SQUARE_SIZE*rowCnt, QColor(255,255,255));
+
+    painter.fillRect(0, 0, SQUARE_SIZE*colCnt, SQUARE_SIZE*rowCnt, Qt::white);
 
     if (m_roundRectPixmap.width() != SQUARE_SIZE)
     {
@@ -210,7 +229,6 @@ void QnSignHelper::draw(QPainter& painter, const QSize& paintSize, bool drawText
                 painter.drawPixmap(x*SQUARE_SIZE, y*SQUARE_SIZE, m_roundRectPixmap);
         }
     }
-    painter.end();
 }
 
 void QnSignHelper::draw(QImage& img, bool drawText)

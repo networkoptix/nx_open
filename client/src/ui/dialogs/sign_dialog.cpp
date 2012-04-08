@@ -95,7 +95,7 @@ SignDialog::SignDialog(const QString& fileName, QWidget *parent) :
 
     QVBoxLayout* layout = new QVBoxLayout(ui->videoSpacer);
     layout->setSpacing(0);
-    layout->setContentsMargins(0,0,0,10);
+    layout->setContentsMargins(0,0,0,0);
 
     QGLFormat glFormat;
     glFormat.setOption(QGL::SampleBuffers); /* Multisampling. */

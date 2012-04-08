@@ -290,8 +290,10 @@ QSharedPointer<CLVideoDecoderOutput> CLVideoStreamDisplay::flush(CLVideoDecoderO
         m_drawer->waitForFrameDisplayed(channelNum);
     }
 
-    if (tmpFrame->width == 0)
+    if (tmpFrame->width == 0) {
         dec->getLastDecodedFrame(tmpFrame.data());
+        m_drawer->draw(tmpFrame.data());
+    }
 
     m_mtx.unlock();
 

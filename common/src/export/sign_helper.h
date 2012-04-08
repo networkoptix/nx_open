@@ -18,6 +18,7 @@ public:
     void setSign(const QByteArray& sign);
     void draw(QImage& img, bool drawText);
     void draw(QPainter& painter, const QSize& paintSize, bool drawText);
+    void drawTextLine(QPainter& painter, const QSize& paintSize,int lineNum, const QString& text);
 
     static void updateDigest(AVCodecContext* srcCodec, EVP_MD_CTX* mdctx, const quint8* data, int size);
 private:
@@ -26,6 +27,7 @@ private:
     void fillH264EncoderParams(const QByteArray& srcCodecExtraData, AVCodecContext* avctx, AVDictionary* &options);
     int correctX264Bitstream(const QByteArray& srcCodecExtraData, AVCodecContext* videoCodecCtx, quint8* videoBuf, int out_size, int videoBufSize);
     int correctNalPrefix(const QByteArray& srcCodecExtraData, quint8* videoBuf, int out_size, int videoBufSize);
+    QFontMetrics updateFontSize(QPainter& painter, const QSize& paintSize);
 private:
     QPixmap m_logo;
     QPixmap m_roundRectPixmap;

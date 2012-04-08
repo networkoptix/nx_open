@@ -20,10 +20,13 @@ public slots:
 private:
     QnSignHelper m_signHelper;
     QByteArray m_sign;
+    QByteArray m_signFromFrame;
     QMutex m_mutex;
     QRect m_videoRect;
     double m_textureWidth;
     double m_textureHeight;
+    bool m_finished;
+    int m_progress;
 };
 
 #endif // __SIGN_INGO_H__
