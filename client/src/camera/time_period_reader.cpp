@@ -1,35 +1,38 @@
 #include "time_period_reader.h"
 
-int QnTimePeriodReader::m_fakeHandle(INT_MAX/2);
+QAtomicInt QnTimePeriodReader::s_fakeHandle(INT_MAX / 2);
 
 QnTimePeriodReader::QnTimePeriodReader(const QnVideoServerConnectionPtr &connection, QnNetworkResourcePtr resource, QObject *parent):
     QObject(parent), 
     m_connection(connection), 
     m_resource(resource)
 {
-    m_fakeHandle = INT_MAX/2;
     qRegisterMetaType<QnTimePeriodList>("QnTimePeriodList");
-    connect(this, SIGNAL(delayedReady(const QnTimePeriodList&, int)), this, SIGNAL(ready(const QnTimePeriodList&, int)), Qt::QueuedConnection);
+
+    connect(this, SIGNAL(delayedReady(const QnTimePeriodList &, int)), this, SIGNAL(ready(const QnTimePeriodList &, int)), Qt::QueuedConnection);
 }
 
-int QnTimePeriodReader::load(const QnTimePeriod &timePeriod, const QList<QRegion>& regions)
+int QnTimePeriodReader::load(const QnTimePeriod &timePeriod, const QList<QRegion> &motionRegions)
 {
     QMutexLocker lock(&m_mutex);
-    if (regions != m_regions) {
+    if (motionRegions != m_motionRegions) {
         m_loadedPeriods.clear();
         m_loadedData.clear();
     }
-    m_regions = regions;
+    m_motionRegions = motionRegions;
 
     foreach(const QnTimePeriod& loadedPeriod, m_loadedPeriods) 
     {
         if (loadedPeriod.containPeriod(timePeriod)) 
         {
-            // data already loaded
-            m_fakeHandle++;
-            //emit ready(m_loadedData, m_fakeHandle);
-            emit delayedReady(m_loadedData, m_fakeHandle);
-            return m_fakeHandle; 
+            /* Data already loaded. */
+            int handle = s_fakeHandle.fetchAndAddAcquire(1);
+
+            /* Must pass the ready signal through the event queue here as
+             * the caller doesn't know request handle yet, and therefore 
+             * cannot handle the signal. */
+            emit delayedReady(m_loadedData, handle);
+            return handle; 
         }
     }
 
@@ -37,14 +40,16 @@ int QnTimePeriodReader::load(const QnTimePeriod &timePeriod, const QList<QRegion
     {
         if (m_loading[i].period.containPeriod(timePeriod)) 
         {
-            // Same data already in loading
-            m_loading[i].awaitingHandle << m_fakeHandle++;
-            return m_loading[i].awaitingHandle.last();
+            /* Same data is currently being loaded. */
+            int handle = s_fakeHandle.fetchAndAddAcquire(1);
+
+            m_loading[i].waitingHandles << handle;
+            return handle;
         }
     }
 
     QnTimePeriod periodToLoad = timePeriod;
-    // try to reduce duration of loading period
+    /* Try to reduce duration of loading period. */
     if (!m_loadedPeriods.isEmpty())
     {
         QnTimePeriodList::iterator itr = qUpperBound(m_loadedPeriods.begin(), m_loadedPeriods.end(), periodToLoad.startTimeMs);
@@ -108,12 +113,12 @@ void QnTimePeriodReader::at_replyReceived(int status, const QnTimePeriodList &ti
                     }
                 }
 
-                foreach(int handle, m_loading[i].awaitingHandle)
+                foreach(int handle, m_loading[i].waitingHandles)
                     emit ready(m_loadedData, handle);
                 emit ready(m_loadedData, requstHandle);
             }
             else {
-                foreach(int handle, m_loading[i].awaitingHandle)
+                foreach(int handle, m_loading[i].waitingHandles)
                     emit failed(status, handle);
                 emit failed(status, requstHandle);
             }
@@ -123,15 +128,16 @@ void QnTimePeriodReader::at_replyReceived(int status, const QnTimePeriodList &ti
     }
 }
 
-int QnTimePeriodReader::sendRequest(const QnTimePeriod& periodToLoad)
+int QnTimePeriodReader::sendRequest(const QnTimePeriod &periodToLoad)
 {
     return m_connection->asyncRecordedTimePeriods(
         QnNetworkResourceList() << m_resource, 
         periodToLoad.startTimeMs, 
         periodToLoad.startTimeMs + periodToLoad.durationMs, 
         1, 
-        m_regions,
+        m_motionRegions,
         this, 
-        SLOT(at_replyReceived(int, const QnTimePeriodList &, int)));
+        SLOT(at_replyReceived(int, const QnTimePeriodList &, int))
+    );
 }
 

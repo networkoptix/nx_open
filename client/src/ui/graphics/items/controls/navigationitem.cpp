@@ -699,7 +699,7 @@ bool NavigationItem::updateRecPeriodList(bool force)
     m_timePeriod.durationMs = qMin(currentTime+1000 - m_timePeriod.startTimeMs, w * 3);
     // round time
     qint64 endTimeMs = m_timePeriod.startTimeMs + m_timePeriod.durationMs;
-    endTimeMs = roundUp((quint64)endTimeMs, TIME_PERIOD_UPDATE_INTERVAL);
+    endTimeMs = roundUp((quint64) endTimeMs, TIME_PERIOD_UPDATE_INTERVAL);
     m_timePeriod.durationMs = endTimeMs - m_timePeriod.startTimeMs;
 
     if (!resources.isEmpty())

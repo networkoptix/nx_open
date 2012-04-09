@@ -1,5 +1,5 @@
-#ifndef __TIME_PERIOD_READER_H__
-#define __TIME_PERIOD_READER_H__
+#ifndef QN_TIME_PERIOD_READER_H
+#define QN_TIME_PERIOD_READER_H
 
 #include <QObject>
 #include <QRegion>
@@ -7,34 +7,61 @@
 #include "recording/time_period.h"
 #include "core/resource/network_resource.h"
 
+/**
+ * Per-camera motion period loader that caches loaded time periods. 
+ */
 class QnTimePeriodReader: public QObject
 {
     Q_OBJECT
 public:
     QnTimePeriodReader(const QnVideoServerConnectionPtr &connection, QnNetworkResourcePtr resource, QObject *parent = NULL);
-    int load(const QnTimePeriod &timePeriod, const QList<QRegion>& regions);
+    
+    /**
+     * \param timePeriod                Time period to get motion periods for.
+     * \param motionRegions             List of regions to look for motion, one region per video channel.
+     *                                  If empty list is provided, then recorded time periods will be returned.
+     * \returns                         Request handle.
+     * 
+     * \note                            This function is thread-safe.
+     */
+    int load(const QnTimePeriod &timePeriod, const QList<QRegion> &motionRegions = QList<QRegion>());
 
 signals:
+    /**
+     * This signal is emitted whenever motion periods were successfully loaded from server.
+     *
+     * \param timePeriods               Loaded motion periods.
+     * \param handle                    Request handle.
+     */
     void ready(const QnTimePeriodList &timePeriods, int handle);
+
+    /**
+     * This signal is emitted whenever the reader was unable to load motion periods from server.
+     * 
+     * \param status                    Error code.
+     * \param handle                    Request handle.
+     */
     void failed(int status, int handle);
 
-    void delayedReady(const QnTimePeriodList &timePeriods, int handle);
 private slots:
     void at_replyReceived(int status, const QnTimePeriodList &timePeriods, int requstHandle);
 
+signals:
+    void delayedReady(const QnTimePeriodList &timePeriods, int handle);
+
 private:
-    int sendRequest(const QnTimePeriod& periodToLoad);
+    int sendRequest(const QnTimePeriod &periodToLoad);
 
 private:
     struct LoadingInfo 
     {
-        LoadingInfo(const QnTimePeriod& _period, int _handle): period(_period), handle(_handle) {}
+        LoadingInfo(const QnTimePeriod &period, int handle): period(period), handle(handle) {}
         QnTimePeriod period;
         int handle;
-        QList<int> awaitingHandle;
+        QList<int> waitingHandles;
     };
 
-    static int m_fakeHandle;
+    static QAtomicInt s_fakeHandle;
     QMutex m_mutex;
     QnVideoServerConnectionPtr m_connection;
     QnNetworkResourcePtr m_resource;
@@ -45,9 +72,9 @@ private:
 
     QnTimePeriodList m_loadedData;
 
-    QList<QRegion> m_regions; // math only motion by specified region
+    QList<QRegion> m_motionRegions;
 };
 
-typedef QSharedPointer<QnTimePeriodReader> QnTimePeriodUpdaterPtr;
+typedef QSharedPointer<QnTimePeriodReader> QnTimePeriodReaderPtr;
 
-#endif // __TIME_PERIOD_READER_H__
+#endif // QN_TIME_PERIOD_READER_H
