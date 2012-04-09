@@ -36,6 +36,10 @@ private:
 
     float m_opacity;
     QColor m_signBackground;
+
+    QSize m_lastPaintSize;
+    QFont m_cachedFont;
+    QFontMetrics m_cachedMetric;
 };
 
 #endif // __SIGN_FRAME_HELPER__

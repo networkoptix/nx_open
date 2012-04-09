@@ -42,7 +42,8 @@ float getAvgColor(const AVFrame* frame, int plane, const QRect& rect)
     return sum / (rect.width() * rect.height());
 }
 
-QnSignHelper::QnSignHelper()
+QnSignHelper::QnSignHelper():
+    m_cachedMetric(QFont())
 {
     m_opacity = 1.0;
     m_signBackground = Qt::white;
@@ -140,6 +141,12 @@ QFontMetrics QnSignHelper::updateFontSize(QPainter& painter, const QSize& paintS
 {
     QString versionStr = qApp->applicationName().append(" v").append(qApp->applicationVersion());
 
+    if (m_lastPaintSize == paintSize)
+    {
+        painter.setFont(m_cachedFont);
+        return m_cachedMetric;
+    }
+
     QFont font;
     QFontMetrics metric(font);
     for (int i = 0; i < 100; ++i)
@@ -152,6 +159,10 @@ QFontMetrics QnSignHelper::updateFontSize(QPainter& painter, const QSize& paintS
             break;
     }
     painter.setFont(font);
+
+    m_lastPaintSize = paintSize;
+    m_cachedFont = font;
+    m_cachedMetric = metric;
     return metric;
 }
 
