@@ -56,7 +56,11 @@ public:
 	}
 	static const quint8* findNextNAL(const quint8* buffer, const quint8* end);
 	static const quint8* findNALWithStartCode(const quint8* buffer, const quint8* end, bool longCodesAllowed);
-	static int encodeNAL(quint8* srcBuffer, quint8* srcEnd, quint8* dstBuffer, size_t dstBufferSize);
+	
+    static int encodeNAL(quint8* srcBuffer, quint8* srcEnd, quint8* dstBuffer, size_t dstBufferSize);
+    int encodeNAL(quint8* dstBuffer, size_t dstBufferSize);
+
+
 	static int decodeNAL(const quint8* srcBuffer, const quint8* srcEnd, quint8* dstBuffer, size_t dstBufferSize);
 	virtual int deserialize(quint8* buffer, quint8* end);
 	virtual int serializeBuffer(quint8* dstBuffer, quint8* dstEnd, bool writeStartCode) const;
@@ -71,6 +75,8 @@ public:
 	const BitStreamReader& getBitReader() const {return bitReader;}
 	void write_rbsp_trailing_bits(BitStreamWriter& writer);
 	void write_byte_align_bits(BitStreamWriter& writer);
+
+    int calc_rbsp_trailing_bits_cnt(uint8_t val);
 protected:
 	//GetBitContext getBitContext;
 	BitStreamReader bitReader;
@@ -108,6 +114,8 @@ public:
 	int weighted_bipred_idc;
 	int pic_init_qp_minus26;
 	int pic_init_qs_minus26;
+    int transform_8x8_mode_flag;
+    int pic_scaling_matrix_present_flag;
 	int chroma_qp_index_offset;
 	int deblocking_filter_control_present_flag;
 	int constrained_intra_pred_flag;
@@ -121,7 +129,7 @@ public:
 	int num_slice_groups_minus1;
 	int slice_group_map_type;
 
-	PPSUnit(): NALUnit(), m_ready(false){}
+    PPSUnit(): NALUnit(), m_ready(false), transform_8x8_mode_flag(0) {}
 	virtual ~PPSUnit() {}
 	bool isReady() {return m_ready;}
 	int deserialize();
@@ -351,14 +359,14 @@ public:
 		;
 	}
 	int deserialize(quint8* buffer, quint8* end, 
-							const QMap<quint32, SPSUnit*>& spsMap,
-							const QMap<quint32, PPSUnit*>& ppsMap);
+							const QMap<quint32, const SPSUnit*>& spsMap,
+							const QMap<quint32, const PPSUnit*>& ppsMap);
 
 	const SPSUnit* getSPS() const {return sps;}
 	const PPSUnit* getPPS() const {return pps;}
 
-    int calc_rbsp_trailing_bits_cnt(uint8_t val);
-    bool correctPicOrderFieldLen(int newLen, int oldLen);
+    //bool increasePicOrderFieldLen(int newLen, int oldLen);
+    bool moveHeaderField(int fieldOffset, int newLen, int oldLen);
 
 #ifndef __TS_MUXER_COMPILE_MODE
 
@@ -400,6 +408,7 @@ public:
 	QVector<int> chroma_offset_l1;
 
 	bool m_shortDeserializeMode;
+    int m_frameNumBitPos;
 
 	void copyFrom(const SliceUnit& other) {
 		delete m_nalBuffer;
@@ -468,6 +477,8 @@ public:
 	int deserializeSliceData();
 	int serializeSliceHeader(BitStreamWriter& bitWriter, const QMap<quint32, SPSUnit*>& spsMap,
                                     const QMap<quint32, PPSUnit*>& ppsMap, quint8* dstBuffer, int dstBufferLen);
+
+    int deserialize(const SPSUnit* sps,const PPSUnit* pps);
 private:
 	void write_pred_weight_table(BitStreamWriter& bitWriter);
 	void write_dec_ref_pic_marking(BitStreamWriter& bitWriter);
@@ -481,10 +492,9 @@ private:
 private:
 	const PPSUnit* pps;
 	const SPSUnit* sps;
-	int m_frameNumBitPos;
 	int m_frameNumBits;
     int m_fullHeaderLen;
-	int deserializeSliceHeader(const QMap<quint32, SPSUnit*>& spsMap,const QMap<quint32, PPSUnit*>& ppsMap);
+	int deserializeSliceHeader(const QMap<quint32, const SPSUnit*>& spsMap,const QMap<quint32, const PPSUnit*>& ppsMap);
 };
 
 #endif

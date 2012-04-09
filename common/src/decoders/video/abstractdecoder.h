@@ -35,6 +35,10 @@ public:
         m_mtDecoding = value;
     }
 
+    virtual bool getLastDecodedFrame(CLVideoDecoderOutput* outFrame)
+    {
+        return false;
+    }
 
     void setTryHardwareAcceleration(bool tryHardwareAcceleration);
     bool isHardwareAccelerationEnabled() const;
@@ -61,7 +65,7 @@ class CLVideoDecoderFactory
 {
 public:
 	enum CLCodecManufacture{FFMPEG, INTELIPP};
-	static QnAbstractVideoDecoder* createDecoder(const QnCompressedVideoDataPtr data);
+	static QnAbstractVideoDecoder* createDecoder(const QnCompressedVideoDataPtr data, bool mtDecoding);
 	static void setCodecManufacture(CLCodecManufacture codecman)
 	{
 		m_codecManufacture = codecman;

@@ -607,6 +607,13 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Alt+G")).
         condition(new QnMotionGridDisplayActionCondition(this));
 
+    factory(Qn::CheckFileSignatureAction).
+        flags(Qn::Scene | Qn::SingleTarget).
+        text(tr("Check file signature")).
+        shortcut(tr("Alt+C")).
+        autoRepeat(false).
+        condition(new QnCheckFileSignatureActionCondition(this));
+
     factory(Qn::TakeScreenshotAction).
         flags(Qn::Scene | Qn::SingleTarget).
         text(tr("Take Screenshot")).

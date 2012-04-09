@@ -80,7 +80,7 @@ signals:
     void liveMode(bool value);
     void stillImageChanged();
 
-private:
+protected:
 	bool haveAudio(float speed) const;
 
 	// puts in in queue and returns first in queue
@@ -107,10 +107,10 @@ private:
 
     qint64 getDisplayedMax() const;
     qint64 getDisplayedMin() const;
-
+protected:
+    CLVideoStreamDisplay* m_display[CL_MAX_CHANNELS];
 	QQueue<QnCompressedVideoDataPtr> m_videoQueue[CL_MAX_CHANNELS];
 
-	CLVideoStreamDisplay* m_display[CL_MAX_CHANNELS];
 	CLAudioStreamDisplay* m_audioDisplay;
 
 	CLAdaptiveSleep m_delay;

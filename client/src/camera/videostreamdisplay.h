@@ -46,6 +46,12 @@ public:
     void onNoVideo();
     void canUseBufferedFrameDisplayer(bool value);
     qint64 nextReverseTime() const;
+    QSize getImageSize() const;
+
+    /**
+      * Return last decoded frame
+      */
+    QSharedPointer<CLVideoDecoderOutput> flush(CLVideoDecoderOutput::downscale_factor force_factor, int channelNum);
 private:
     bool m_needResetDecoder;
     QMutex m_mtx;
@@ -86,6 +92,7 @@ private:
     BufferedFrameDisplayer* m_bufferedFrameDisplayer;
     bool m_canUseBufferedFrameDisplayer;
 private:
+    QSize m_imageSize;
     CLVideoDecoderOutput* m_lastDisplayedFrame;
     bool m_queueWasFilled;
     float m_speed;
@@ -96,7 +103,7 @@ private:
 
     CLVideoDecoderOutput::downscale_factor findScaleFactor(int width, int height, int fitWidth, int fitHeight);
     CLVideoDecoderOutput::downscale_factor determineScaleFactor(
-        QnCompressedVideoDataPtr data, 
+        int channelNumber, 
         int srcWidth, 
         int srcHeight, 
         CLVideoDecoderOutput::downscale_factor force_factor);

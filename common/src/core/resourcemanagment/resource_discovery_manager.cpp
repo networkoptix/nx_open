@@ -529,7 +529,7 @@ void QnResourceDiscoveryManager::markOfflineIfNeeded()
         QDateTime ldt = netRes->getLastDiscoveredTime();
         QDateTime currentT = qnSyncTime->currentDateTime();
 
-        if (ldt.secsTo(currentT) > 30 && !netRes->hasRunningLiveProvider()) // if resource is not discovered last 30 sec
+        if (ldt.secsTo(currentT) > 120 && !netRes->hasRunningLiveProvider()) // if resource is not discovered last 30 sec
         {
 			res->setStatus(QnResource::Offline);
         }
