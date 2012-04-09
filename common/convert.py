@@ -35,7 +35,7 @@ def platform():
     elif sys.platform == 'linux2':
         return 'linux'
 
-def gen_env_sh(path, ldpath):
+def gen_env_sh(path, ldpath, env):
     if platform() == 'mac':
         ldvar = 'DYLD_LIBRARY_PATH'
     elif platform() == 'linux':
@@ -43,6 +43,10 @@ def gen_env_sh(path, ldpath):
 
     f = open(path, 'w')
     print >> f, 'export %s=%s' % (ldvar, ldpath)
+
+    for key, value in env.items():
+        print >> f, 'export %s=%s' % (key, value)
+
     f.close()
 
 def link_or_copy(src, dst):
