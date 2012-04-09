@@ -70,7 +70,7 @@ void QnSignHelper::updateDigest(AVCodecContext* srcCodec, EVP_MD_CTX* mdctx, con
             for (int i = 0; i < reqUnitSize; ++i) 
                 curSize = (curSize << 8) + curNal[i];
             curNal += reqUnitSize;
-            curSize = qMin(curSize, dataEnd - curNal);
+            curSize = qMin(curSize, (int)(dataEnd - curNal));
             EVP_DigestUpdate(mdctx, (const char*) curNal, curSize);
             curNal += curSize;
         }

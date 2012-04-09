@@ -13,7 +13,7 @@ public:
 	bool decode(CLAudioData& data);
 	~CLFFmpegAudioDecoder();
 
-    static AVSampleFormat audioFormatQtToFfmpeg(const QAudioFormat& fmt);
+    static AVSampleFormat audioFormatQtToFfmpeg(const QnAudioFormat& fmt);
 private:
 	AVCodec *codec;
 	AVCodecContext *c;

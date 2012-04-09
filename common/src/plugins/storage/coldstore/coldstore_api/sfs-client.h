@@ -12,7 +12,7 @@
 
 #if defined Q_OS_WIN
 #include <winsock2.h>
-#elif defined Q_OS_MAC
+#else
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
