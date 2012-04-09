@@ -40,6 +40,7 @@ private:
     QSize m_lastPaintSize;
     QFont m_cachedFont;
     QFontMetrics m_cachedMetric;
+    QPixmap m_backgroundPixmap;
 };
 
 #endif // __SIGN_FRAME_HELPER__

@@ -609,7 +609,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::CheckFileSignatureAction).
         flags(Qn::Scene | Qn::SingleTarget).
-        text(tr("Check file signature")).
+        text(tr("Check file watermark")).
         shortcut(tr("Alt+C")).
         autoRepeat(false).
         condition(new QnCheckFileSignatureActionCondition(this));
