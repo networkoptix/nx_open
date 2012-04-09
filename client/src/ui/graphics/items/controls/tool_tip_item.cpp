@@ -2,6 +2,8 @@
 #include <cmath>
 #include <QtGui/QPainter>
 #include <QtGui/QGraphicsSceneEvent>
+#include <QtGui/QApplication>
+#include <QtGui/QStyle>
 #include <utils/common/scoped_painter_rollback.h>
 
 namespace  {
@@ -12,13 +14,24 @@ namespace  {
 }
 
 QnToolTipItem::QnToolTipItem(QGraphicsItem *parent):
-    QGraphicsItem(parent),
+    base_type(parent),
     m_shapeValid(false)
 {
-    setFlag(QGraphicsItem::ItemIsMovable, false);
-    setFlag(QGraphicsItem::ItemIsSelectable, false);
+    setFlag(ItemIsMovable, false);
+    setFlag(ItemIsSelectable, false);
 
-    setCacheMode(QGraphicsItem::ItemCoordinateCache);
+    setCacheMode(ItemCoordinateCache);
+
+    /* Set up default colors. */
+    QStyle *style = QApplication::style();
+    setTextPen(QPen(style->standardPalette().windowText(), 0));
+    setBorderPen(QPen(style->standardPalette().windowText(), 0));
+    setBrush(style->standardPalette().window());
+    setFont(QApplication::font());
+}
+
+QnToolTipItem::~QnToolTipItem() {
+    return;
 }
 
 const QString &QnToolTipItem::text() const
@@ -130,7 +143,7 @@ void QnToolTipItem::wheelEvent(QGraphicsSceneWheelEvent *event)
 {
     event->ignore();
 
-    QGraphicsItem::wheelEvent(event);
+    base_type::wheelEvent(event);
 }
 
 void QnToolTipItem::invalidateShape() 

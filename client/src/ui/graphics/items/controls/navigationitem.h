@@ -16,7 +16,7 @@ class QTimerEvent;
 class CLVideoCamera;
 class SpeedSlider;
 class TimeSlider;
-class VolumeSlider;
+class QnVolumeSlider;
 class GraphicsLabel;
 class QnAbstractRenderer;
 class QnAbstractArchiveReader;
@@ -133,7 +133,7 @@ private:
     QnImageButtonWidget *m_syncButton;
     SpeedSlider *m_speedSlider;
     QnImageButtonWidget *m_muteButton;
-    VolumeSlider *m_volumeSlider;
+    QnVolumeSlider *m_volumeSlider;
     GraphicsLabel *m_timeLabel;
 
     QHash<CLVideoCamera *, qreal> m_zoomByCamera;

@@ -20,7 +20,7 @@
 
 #include "ui/graphics/items/standard/graphicsframe.h"
 #include "ui/graphics/items/standard/graphicsslider.h"
-#include "ui/graphics/items/tool_tip_item.h"
+#include "ui/graphics/items/controls/tool_tip_item.h"
 
 #include <qmath.h>
 #include "utils/common/synctime.h"
@@ -130,7 +130,7 @@ MySlider::MySlider(TimeSlider *parent)
       m_toolTip(0),
       m_endSize(0)
 {
-    setToolTipItem(new QnStyledToolTipItem);
+    setToolTipItem(new QnToolTipItem);
 }
 
 void MySlider::updateToolTipPos()

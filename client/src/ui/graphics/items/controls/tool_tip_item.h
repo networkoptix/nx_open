@@ -6,9 +6,14 @@
 #include <QtGui/QBrush>
 #include <QtGui/QFont>
 
-class QnToolTipItem: public QGraphicsItem {
+class QnToolTipItem: public QGraphicsObject {
+    Q_OBJECT;
+
+    typedef QGraphicsObject base_type;
+
 public:
     QnToolTipItem(QGraphicsItem *parent = 0);
+    virtual ~QnToolTipItem();
 
     const QString &text() const;
     void setText(const QString &text);
@@ -52,15 +57,4 @@ private:
 };
 
 
-class QnStyledToolTipItem: public QnToolTipItem {
-public:
-    QnStyledToolTipItem(QGraphicsItem *parent = 0) : QnToolTipItem(parent)
-    {
-        setFont(QFont()); /* Default application font. */
-        setTextPen(QColor(63, 159, 216));
-        setBrush(QColor(0, 0, 0, 255));
-        setBorderPen(QPen(QColor(203, 210, 233, 128), 0.7));
-    }
-};
-
-#endif // TOOLTIPITEM_H
+#endif // QN_TOOL_TIP_ITEM_H

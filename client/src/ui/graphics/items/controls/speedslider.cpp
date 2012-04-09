@@ -4,7 +4,7 @@
 
 #include "ui/style/proxy_style.h"
 
-#include "ui/graphics/items/tool_tip_item.h"
+#include "ui/graphics/items/controls/tool_tip_item.h"
 
 class SpeedSliderProxyStyle : public QnProxyStyle
 {
@@ -52,7 +52,7 @@ SpeedSlider::SpeedSlider(Qt::Orientation orientation, QGraphicsItem *parent)
       m_wheelStuckedTimerId(0),
       m_wheelStucked(false)
 {
-    m_toolTip = new QnStyledToolTipItem(this);
+    m_toolTip = new QnToolTipItem(this);
     m_toolTip->setVisible(false);
 
     setStyle(new SpeedSliderProxyStyle(this));

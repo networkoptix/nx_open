@@ -18,8 +18,8 @@
 #include "ui/graphics/items/standard/graphicslabel.h"
 #include "ui/graphics/items/controls/speedslider.h"
 #include "ui/graphics/items/controls/volumeslider.h"
+#include "ui/graphics/items/controls/tool_tip_item.h"
 #include "ui/graphics/items/image_button_widget.h"
-#include "ui/graphics/items/tool_tip_item.h"
 
 #include "timeslider.h"
 #include "utils/common/synctime.h"
@@ -28,11 +28,11 @@
 static const int SLIDER_NOW_AREA_WIDTH = 30;
 static const int TIME_PERIOD_UPDATE_INTERVAL = 1000 * 10;
 
-class SliderToolTipItem : public QnStyledToolTipItem
+class SliderToolTipItem : public QnToolTipItem
 {
 public:
     SliderToolTipItem(AbstractGraphicsSlider *slider, QGraphicsItem *parent = 0)
-        : QnStyledToolTipItem(parent), m_slider(slider)
+        : QnToolTipItem(parent), m_slider(slider)
     {
         setAcceptHoverEvents(true);
         setOpacity(0.75);
@@ -44,11 +44,11 @@ private:
 };
 
 
-class TimeSliderToolTipItem : public QnStyledToolTipItem
+class TimeSliderToolTipItem : public QnToolTipItem
 {
 public:
     TimeSliderToolTipItem(TimeSlider *slider, QGraphicsItem *parent = 0)
-        : QnStyledToolTipItem(parent), m_slider(slider)
+        : QnToolTipItem(parent), m_slider(slider)
     {
         setAcceptHoverEvents(true);
         setOpacity(0.75);
@@ -214,9 +214,8 @@ NavigationItem::NavigationItem(QGraphicsItem *parent):
     //connect(m_syncButton, SIGNAL(toggled(bool)), this, SIGNAL(enableItemSync(bool)));
     connect(m_syncButton, SIGNAL(toggled(bool)), this, SLOT(onSyncButtonToggled(bool)));
 
-    m_volumeSlider = new VolumeSlider(Qt::Horizontal, this);
-    m_volumeSlider->setObjectName("VolumeSlider");
-    m_volumeSlider->setToolTipItem(new SliderToolTipItem(m_volumeSlider));
+    m_volumeSlider = new QnVolumeSlider(Qt::Horizontal, this);
+    m_volumeSlider->setObjectName("QnVolumeSlider");
     m_volumeSlider->setCacheMode(QGraphicsItem::ItemCoordinateCache);
     m_volumeSlider->setFocusProxy(this);
 

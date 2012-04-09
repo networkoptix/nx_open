@@ -1,44 +1,31 @@
-#ifndef VOLUMESLIDER_H
-#define VOLUMESLIDER_H
+#ifndef QN_VOLUME_SLIDER_H
+#define QN_VOLUME_SLIDER_H
 
-#include "ui/graphics/items/standard/graphicsslider.h"
+#include "tool_tip_slider.h"
 
 class QnToolTipItem;
 
-class VolumeSlider : public GraphicsSlider
+class QnVolumeSlider : public QnToolTipSlider
 {
     Q_OBJECT
     Q_PROPERTY(bool muted READ isMute WRITE setMute)
 
+    typedef QnToolTipSlider base_type;
+
 public:
-    explicit VolumeSlider(Qt::Orientation orientation = Qt::Horizontal, QGraphicsItem *parent = 0);
-    virtual ~VolumeSlider();
+    explicit QnVolumeSlider(Qt::Orientation orientation = Qt::Horizontal, QGraphicsItem *parent = 0);
+    virtual ~QnVolumeSlider();
 
     bool isMute() const;
 
-    void setToolTipItem(QnToolTipItem *toolTip);
-
-#if 0
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-#endif
-
-public Q_SLOTS:
+public slots:
     void setMute(bool mute);
 
     void stepBackward();
     void stepForward();
 
 protected:
-    void timerEvent(QTimerEvent *);
-
-private Q_SLOTS:
-    void onValueChanged(int);
-
-private:
-    Q_DISABLE_COPY(VolumeSlider)
-
-    QnToolTipItem *m_toolTip;
-    int m_toolTipTimerId;
+    virtual void sliderChange(SliderChange change) override;
 };
 
-#endif // VOLUMESLIDER_H
+#endif // QN_VOLUME_SLIDER_H
