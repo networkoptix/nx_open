@@ -90,6 +90,18 @@ Qn::ActionVisibility QnMotionGridDisplayActionCondition::check(const QnResourceW
     return Qn::InvisibleAction;
 }
 
+Qn::ActionVisibility QnCheckFileSignatureActionCondition::check(const QnResourceWidgetList &widgets) {
+    foreach(QGraphicsItem *item, widgets) {
+        QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
+        if(widget == NULL)
+            continue;
+
+        bool isCamera = widget->resource()->flags() & QnResource::network;
+        if(isCamera)
+            return Qn::InvisibleAction;
+    }
+    return Qn::EnabledAction;
+}
 
 QnResourceActionCondition::QnResourceActionCondition(const QnResourceCriterion &criterion, Qn::MatchMode matchMode, QObject *parent): 
     QnActionCondition(parent),

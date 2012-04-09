@@ -37,6 +37,7 @@
 #include "settings.h"
 #include "math.h"
 #include "image_button_widget.h"
+#include "viewport_bound_widget.h"
 #include "utils/media/ffmpeg_helper.h"
 
 namespace {
@@ -62,6 +63,9 @@ namespace {
 
     /** Default duration of "fade-in" effect for overlay icons. */
     const qint64 defaultOverlayFadeInDurationMSec = 500;
+
+    /** Default size of widget header buttons, in pixels. */
+    const QSizeF headerButtonSize = QSizeF(24, 24);
 
     /** Background color for overlay panels. */
     const QColor overlayBackgroundColor = QColor(0, 0, 0, 96);
@@ -100,8 +104,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_aboutToBeDestroyedEmitted(false),
     m_displayFlags(DISPLAY_SELECTION_OVERLAY | DISPLAY_BUTTONS),
     m_motionMaskValid(false),
-    m_motionMaskBinDataValid(false),
-    m_inOverlayGeometryUpdate(false)
+    m_motionMaskBinDataValid(false)
 {
     /* Set up shadow. */
     m_shadow = new QnPolygonalShadowItem();
@@ -118,7 +121,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     setFrameWidth(0.0);
 
 
-    /* Set up overlay widget. */
+    /* Set up overlay widgets. */
     QFont font = this->font();
     font.setPixelSize(20);
     setFont(font);
@@ -129,18 +132,9 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
         setPalette(palette);
     }
 
-    m_overlayWidget = new QGraphicsWidget(this);
-    m_overlayWidget->setAcceptedMouseButtons(0);
-    m_overlayWidget->setOpacity(0.0); /* Overlay is hidden by default. */
-
+    /* Header overlay. */
     m_headerTitleLabel = new GraphicsLabel();
     m_headerTitleLabel->setPerformanceHint(QStaticText::AggressiveCaching);
-
-    m_headerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-    m_headerLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-    m_headerLayout->setSpacing(2.0);
-    m_headerLayout->addItem(m_headerTitleLabel);
-    m_headerLayout->addStretch(0x1000); /* Set large enough stretch for the buttons to be placed at the right end of the layout. */
 
     qreal buttonSize = 24; /* In pixels. */
 
@@ -149,36 +143,55 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     togglePinButton->setIcon(Skin::icon("decorations/pin.png", "decorations/unpin.png"));
     togglePinButton->setCheckable(true);
     togglePinButton->setChecked(item->isPinned());
-    togglePinButton->setPreferredSize(QSizeF(buttonSize, buttonSize));
+    togglePinButton->setPreferredSize(headerButtonSize);
     connect(togglePinButton, SIGNAL(clicked()), item, SLOT(togglePinned()));
-    widget->addButton(togglePinButton);
+    headerLayout->addItem(togglePinButton);
 #endif
 
     m_infoButton = new QnImageButtonWidget();
     m_infoButton->setIcon(qnSkin->icon("decorations/info.png"));
-    m_infoButton->setPreferredSize(QSizeF(buttonSize, buttonSize));
+    m_infoButton->setPreferredSize(headerButtonSize);
     m_infoButton->setCheckable(true);
     connect(m_infoButton, SIGNAL(toggled(bool)), this, SLOT(fadeInfo(bool)));
-    m_headerLayout->addItem(m_infoButton);
 
+    QnImageButtonWidget *closeButton = NULL;
     if(accessController()->permissions(item->layout()->resource()) & Qn::WritePermission) { // TODO: should autoupdate on permission changes
-        QnImageButtonWidget *closeButton = new QnImageButtonWidget();
+        closeButton = new QnImageButtonWidget();
         closeButton->setIcon(qnSkin->icon("decorations/close_item.png"));
-        closeButton->setPreferredSize(QSizeF(buttonSize, buttonSize));
+        closeButton->setPreferredSize(headerButtonSize);
         connect(closeButton, SIGNAL(clicked()), this, SLOT(close()));
-        m_headerLayout->addItem(closeButton);
     }
 
-    m_headerWidget = new QGraphicsWidget(m_overlayWidget);
-    m_headerWidget->setLayout(m_headerLayout);
-    m_headerWidget->setAcceptedMouseButtons(0);
-    m_headerWidget->setAutoFillBackground(true);
+    QGraphicsLinearLayout *headerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+    headerLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    headerLayout->setSpacing(2.0);
+    headerLayout->addItem(m_headerTitleLabel);
+    headerLayout->addStretch(0x1000); /* Set large enough stretch for the buttons to be placed at the right end of the layout. */
+    headerLayout->addItem(m_infoButton);
+    if(closeButton)
+        headerLayout->addItem(closeButton);
+
+    QGraphicsWidget *headerWidget = new QGraphicsWidget();
+    headerWidget->setLayout(headerLayout);
+    headerWidget->setAcceptedMouseButtons(0);
+    headerWidget->setAutoFillBackground(true);
     {
-        QPalette palette = m_headerWidget->palette();
+        QPalette palette = headerWidget->palette();
         palette.setColor(QPalette::Window, overlayBackgroundColor);
-        m_headerWidget->setPalette(palette);
+        headerWidget->setPalette(palette);
     }
 
+    QGraphicsLinearLayout *headerOverlayLayout = new QGraphicsLinearLayout(Qt::Vertical);
+    headerOverlayLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    headerOverlayLayout->addItem(headerWidget);
+    headerOverlayLayout->addStretch(0x1000);
+
+    m_headerOverlayWidget = new QnViewportBoundWidget(this);
+    m_headerOverlayWidget->setLayout(headerOverlayLayout);
+    m_headerOverlayWidget->setAcceptedMouseButtons(0);
+    m_headerOverlayWidget->setOpacity(0.0);
+
+    /* Footer overlay. */
     m_footerStatusLabel = new GraphicsLabel();
 
     m_footerTimeLabel = new GraphicsLabel();
@@ -189,7 +202,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     footerLayout->addStretch(0x1000);
     footerLayout->addItem(m_footerTimeLabel);
 
-    m_footerWidget = new QGraphicsWidget(m_overlayWidget);
+    m_footerWidget = new QGraphicsWidget();
     m_footerWidget->setLayout(footerLayout);
     m_footerWidget->setAcceptedMouseButtons(0);
     m_footerWidget->setAutoFillBackground(true);
@@ -200,14 +213,16 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     }
     m_footerWidget->setOpacity(0.0);
 
-    QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical);
-    layout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-    layout->addItem(m_headerWidget);
-    layout->addStretch(0x1000);
-    layout->addItem(m_footerWidget);
-    m_overlayWidget->setLayout(layout);
+    QGraphicsLinearLayout *footerOverlayLayout = new QGraphicsLinearLayout(Qt::Vertical);
+    footerOverlayLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    footerOverlayLayout->addStretch(0x1000);
+    footerOverlayLayout->addItem(m_footerWidget);
 
-    connect(m_overlayWidget, SIGNAL(geometryChanged()), this, SLOT(updateOverlayGeometry()));
+    m_footerOverlayWidget = new QnViewportBoundWidget(this);
+    m_footerOverlayWidget->setLayout(footerOverlayLayout);
+    m_footerOverlayWidget->setAcceptedMouseButtons(0);
+    m_footerOverlayWidget->setOpacity(0.0);
+
     connect(this, SIGNAL(updateOverlayTextLater()), this, SLOT(updateOverlayText()), Qt::QueuedConnection);
 
 
@@ -346,8 +361,8 @@ void QnResourceWidget::setGeometry(const QRectF &geometry) {
     base_type::setGeometry(geometry);
     setTransformOriginPoint(rect().center());
 
-    if(!qFuzzyCompare(oldSize, size()))
-        updateOverlayGeometry();
+    m_headerOverlayWidget->setDesiredSize(size());
+    m_footerOverlayWidget->setDesiredSize(size());
 }
 
 QSizeF QnResourceWidget::constrainedSize(const QSizeF constraint) const {
@@ -394,11 +409,13 @@ void QnResourceWidget::hideActivityDecorations() {
 }
 
 void QnResourceWidget::fadeOutOverlay() {
-    opacityAnimator(m_overlayWidget, 1.0)->animateTo(0.0);
+    opacityAnimator(m_footerOverlayWidget, 1.0)->animateTo(0.0);
+    opacityAnimator(m_headerOverlayWidget, 1.0)->animateTo(0.0);
 }
 
 void QnResourceWidget::fadeInOverlay() {
-    opacityAnimator(m_overlayWidget, 1.0)->animateTo(1.0);
+    opacityAnimator(m_footerOverlayWidget, 1.0)->animateTo(1.0);
+    opacityAnimator(m_headerOverlayWidget, 1.0)->animateTo(1.0);
 }
 
 void QnResourceWidget::fadeOutInfo() {
@@ -407,8 +424,7 @@ void QnResourceWidget::fadeOutInfo() {
 
 void QnResourceWidget::fadeInInfo() {
     updateOverlayText();
-    m_overlayWidget->layout()->activate();
-
+    
     opacityAnimator(m_footerWidget, 1.0)->animateTo(1.0);
 }
 
@@ -490,14 +506,6 @@ Qn::WindowFrameSections QnResourceWidget::windowFrameSectionsAt(const QRectF &re
         result = result & ~(Qn::LeftSection | Qn::RightSection | Qn::TopSection | Qn::BottomSection);
 
     return result;
-}
-
-void QnResourceWidget::addButton(QGraphicsLayoutItem *button) {
-    m_headerLayout->addItem(button);
-}
-
-void QnResourceWidget::removeButton(QGraphicsLayoutItem *button) {
-    m_headerLayout->removeItem(button);
 }
 
 void QnResourceWidget::ensureAboutToBeDestroyedEmitted() {
@@ -590,49 +598,9 @@ void QnResourceWidget::setDisplayFlags(DisplayFlags flags) {
     }
 
     if(changedFlags & DISPLAY_BUTTONS)
-        m_headerWidget->setVisible(flags & DISPLAY_BUTTONS);
+        m_headerOverlayWidget->setVisible(flags & DISPLAY_BUTTONS);
 
     emit displayFlagsChanged();
-}
-
-void QnResourceWidget::updateOverlayGeometry(QGraphicsView *view) {
-    if(m_inOverlayGeometryUpdate)
-        return;
-
-    QnScopedValueRollback<bool> guard(&m_inOverlayGeometryUpdate, true);
-
-    if(view) {
-        m_lastView = view;
-    } else {
-        view = m_lastView.data();
-    }
-
-    if(!view) {
-        if(!scene() || scene()->views().empty())
-            return;
-
-        view = scene()->views()[0];
-    }
-
-    QTransform viewportToScene = view->viewportTransform();
-
-    /* Assume affine transform that does not change x/y scale separately. */
-    qreal scale = 1.0 / std::sqrt(viewportToScene.m11() * viewportToScene.m11() + viewportToScene.m12() * viewportToScene.m12());
-
-    QRectF geometry = QRectF(QPointF(0, 0), size() / scale);
-    m_overlayWidget->setGeometry(geometry);
-    m_overlayWidget->setTransform(QTransform::fromScale(scale, scale));
-
-    QSizeF resultingSize = m_overlayWidget->size();
-    if(resultingSize.width() > geometry.width() || resultingSize.height() > geometry.height()) {
-        qreal k = qMax(resultingSize.width() / geometry.width(), resultingSize.height() / geometry.height());
-
-        geometry.setSize(geometry.size() * k);
-        scale /= k;
-
-        m_overlayWidget->setGeometry(geometry);
-        m_overlayWidget->setTransform(QTransform::fromScale(scale, scale));
-    }
 }
 
 void QnResourceWidget::updateOverlayText() {
@@ -722,16 +690,6 @@ QVariant QnResourceWidget::itemChange(GraphicsItemChange change, const QVariant 
         updateShadowPos();
         break;
     case ItemSceneHasChanged:
-        if(m_transformListenerInstrument)
-            disconnect(m_transformListenerInstrument.data(), NULL, this, NULL);
-        if(scene()) {
-            QList<InstrumentManager *> managers = InstrumentManager::managersOf(scene());
-            if(!managers.empty()) {
-                m_transformListenerInstrument = managers[0]->instrument<TransformListenerInstrument>();
-                if(m_transformListenerInstrument)
-                    connect(m_transformListenerInstrument.data(), SIGNAL(transformChanged(QGraphicsView *)), this, SLOT(updateOverlayGeometry(QGraphicsView *)));
-            }
-        }
         if(scene() && !m_shadow.isNull()) {
             scene()->addItem(m_shadow.data());
             updateShadowZ();
@@ -785,7 +743,7 @@ void QnResourceWidget::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
 }
 
 void QnResourceWidget::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
-    if(qFuzzyIsNull(m_overlayWidget->opacity()))
+    if(qFuzzyIsNull(m_headerOverlayWidget->opacity()))
         fadeInOverlay();
 
     base_type::hoverMoveEvent(event);
@@ -952,7 +910,7 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
         }
     }
 
-    if(m_footerWidget->isVisible() && !qFuzzyIsNull(m_footerWidget->opacity())) 
+    if(m_footerOverlayWidget->isVisible() && !qFuzzyIsNull(m_footerOverlayWidget->opacity())) 
         emit updateOverlayTextLater();
 }
 

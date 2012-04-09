@@ -3,8 +3,11 @@
 
 namespace Qn {
     enum MarginFlag {
-        MARGINS_AFFECT_SIZE = 0x1,      /**< Viewport margins affect how viewport size is bounded. */
-        MARGINS_AFFECT_POSITION = 0x2   /**< Viewport margins affect how viewport position is bounded. */
+        /** Viewport margins affect how viewport size is bounded. */
+        MarginsAffectSize = 0x1,        
+
+        /** Viewport margins affect how viewport position is bounded. */
+        MarginsAffectPosition = 0x2,
     };
 
     Q_DECLARE_FLAGS(MarginFlags, MarginFlag);

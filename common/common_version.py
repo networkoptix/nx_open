@@ -14,6 +14,8 @@ def get_library_path():
 def set_library_path(value):
     if platform() == 'mac':
         os.putenv('DYLD_LIBRARY_PATH', value)
+    elif platform() == 'linux':
+        os.putenv('LD_LIBRARY_PATH', value)
 
 def set_env():
     REVISION = os.popen('hg id -i').read().strip()

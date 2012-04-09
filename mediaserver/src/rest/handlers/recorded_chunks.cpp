@@ -8,17 +8,6 @@
 #include "motion/motion_helper.h"
 #include "api/serializer/serializer.h"
 
-QString QnRestXsdHelpHandler::getXsdUrl(TCPSocket* tcpSocket) const
-{
-    QString rez;
-    rez += QString("http://") + tcpSocket->getLocalAddress() + QString(":") + QString::number(tcpSocket->getLocalPort());
-    rez += "/xsd";
-    rez += m_path.mid(m_path.lastIndexOf('/'));
-    rez += ".xsd";
-    rez += "\"> XSD scheme </a>";
-    return rez;
-}
-
 qint64 QnRecordedChunkListHandler::parseDateTime(const QString& dateTime)
 {
     if (dateTime.contains('T') || dateTime.contains('-'))
@@ -135,7 +124,7 @@ QString QnRecordedChunkListHandler::description(TCPSocket* tcpSocket) const
     rez += "<BR>Param <b>detail</b> - Chunk detail level, in microseconds. Time periods/chunks that are shorter than the detail level are discarded. You can use detail level as amount of microseconds per screen pixel.";
 
     rez += "<BR><b>Return</b> XML</b> - with chunks merged for all cameras. Returned time and duration in microseconds. <a href=\"";
-    rez += getXsdUrl(tcpSocket);
+    // rez += getXsdUrl(tcpSocket);
     return rez;
 }
 

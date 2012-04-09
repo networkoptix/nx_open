@@ -34,7 +34,6 @@
 #include "core/resource/video_server.h"
 #include "core/resource/storage_resource.h"
 
-#include <xercesc/util/PlatformUtils.hpp>
 #include "plugins/resources/axis/axis_resource_searcher.h"
 #include "eventmanager.h"
 #include "core/resource/resource_directory_browser.h"
@@ -50,6 +49,7 @@
 #include "plugins/resources/isd/isd_resource_searcher.h"
 #include "plugins/resources/onvif/onvif_ws_searcher.h"
 #include "utils/network/socket.h"
+#include <openssl/evp.h>
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -243,7 +243,6 @@ int main(int argc, char *argv[])
 #ifdef Q_OS_WIN
     AllowSetForegroundWindow(ASFW_ANY);
 #endif
-    xercesc::XMLPlatformUtils::Initialize ();
 
     /* Set up application parameters so that QSettings know where to look for settings. */
     QApplication::setOrganizationName(QLatin1String(ORGANIZATION_NAME));
@@ -342,6 +341,7 @@ int main(int argc, char *argv[])
 
     QnResourcePool::instance(); // to initialize net state;
     ffmpegInit();
+    OpenSSL_add_all_digests(); // open SSL init
 
     //===========================================================================
 
@@ -471,8 +471,6 @@ int main(int argc, char *argv[])
 
     QnResource::stopCommandProc();
     QnResourceDiscoveryManager::instance().stop();
-
-    xercesc::XMLPlatformUtils::Terminate();
 
     return result;
 }

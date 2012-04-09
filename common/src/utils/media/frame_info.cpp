@@ -19,7 +19,6 @@ extern "C" {
 };
 
 
-
 const __m128i  sse_00ffw_intrs = _mm_setr_epi32(0x00ff00ff, 0x00ff00ff, 0x00ff00ff, 0x00ff00ff);
 const __m128i  sse_000000ffw_intrs = _mm_setr_epi32(0x000000ff, 0x000000ff, 0x000000ff, 0x000000ff);
 

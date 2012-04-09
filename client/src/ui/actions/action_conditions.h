@@ -83,6 +83,12 @@ private:
     bool m_requiredGridDisplayValue;
 };
 
+class QnCheckFileSignatureActionCondition: public QnActionCondition {
+public:
+    QnCheckFileSignatureActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+    virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;
+};
+
 
 class QnResourceActionCondition: public QnActionCondition {
 public:

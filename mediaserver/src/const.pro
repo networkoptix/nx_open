@@ -1,19 +1,9 @@
-INCLUDEPATH += ../../common/src
-
-INCLUDEPATH += ../../common/contrib/qjson/include
-INCLUDEPATH += ../../common/contrib/qt
-
-win* {
-    INCLUDEPATH += $$PWD/../../common/contrib/openssl/include
-    INCLUDEPATH += ../../common/contrib/ffmpeg-misc-headers-win32
-    LIBS += -L$$PWD/../../common/contrib/openssl/bin -llibeay32
-}
-
-QT = core gui network xml opengl multimedia webkit
+QT = core gui network xml opengl webkit
 CONFIG += console precompile_header
 CONFIG -= flat app_bundle
 
 win32 {
+  QT += multimedia 
   CONFIG += x86
 }
 
@@ -30,6 +20,16 @@ TARGET = mediaserver
 
 include(../contrib/qtservice/src/qtservice.pri)
 include(../../common/contrib/qtsingleapplication/src/qtsinglecoreapplication.pri)
+
+win* {
+    INCLUDEPATH += $$PWD/../../common/contrib/openssl/include
+    INCLUDEPATH += ../../common/contrib/ffmpeg-misc-headers-win32
+    LIBS += -L$$PWD/../../common/contrib/openssl/bin -llibeay32
+}
+
+INCLUDEPATH += ../../common/src
+INCLUDEPATH += ../../common/contrib/qjson/include
+INCLUDEPATH += ../../common/contrib/qt
 
 win32: RC_FILE = server.rc
 
@@ -60,7 +60,7 @@ CONFIG(release, debug|release) {
   PRE_TARGETDEPS += ../../common/bin/release/common.lib
   }
   unix:!mac {
-  PRE_TARGETDEPS += ../../common/bin/release/libcommon.so
+  PRE_TARGETDEPS += ../../common/bin/release/libcommon.a
   }
   mac {
   PRE_TARGETDEPS += ../../common/bin/release/libcommon.dylib
@@ -69,11 +69,20 @@ CONFIG(release, debug|release) {
 
 CONFIG(debug, debug|release) {
   INCLUDEPATH += $$FFMPEG-debug/include
-  LIBS += -L$$FFMPEG-debug/bin -L$$FFMPEG-debug/lib -L$$PWD/../../common/bin/debug -lcommon -L../../common/contrib/qjson/lib/win32/debug -L$$EVETOOLS_DIR/lib/debug
+  LIBS += -L$$FFMPEG-debug/bin -L$$FFMPEG-debug/lib -L$$PWD/../../common/bin/debug -lcommon -L$$EVETOOLS_DIR/lib/debug
+
+  win32 {
+    LIBS += -L../../common/contrib/qjson/lib/win32/debug 
+  }
+
 }
 CONFIG(release, debug|release) {
   INCLUDEPATH += $$FFMPEG-release/include
-  LIBS += -L$$FFMPEG-release/bin -L$$FFMPEG-release/lib -L$$PWD/../../common/bin/release -lcommon -L../../common/contrib/qjson/lib/win32/release -L$$EVETOOLS_DIR/lib/release
+  LIBS += -L$$FFMPEG-release/bin -L$$FFMPEG-release/lib -L$$PWD/../../common/bin/release -lcommon -L$$EVETOOLS_DIR/lib/release
+
+  win32 {
+    LIBS += -L../../common/contrib/qjson/lib/win32/release 
+  }
 }
 
 QMAKE_CXXFLAGS += -I$$EVETOOLS_DIR/include
@@ -82,7 +91,7 @@ win32 {
     QMAKE_CXXFLAGS += -Zc:wchar_t
     QMAKE_CXXFLAGS -= -Zc:wchar_t-
 
-    LIBS += -lxerces-c_3 -llibprotobuf
+    LIBS += -llibprotobuf
 
     # Define QN_EXPORT only if common build is not static
     isEmpty(BUILDLIB) { DEFINES += QN_EXPORT=Q_DECL_IMPORT }
@@ -90,12 +99,18 @@ win32 {
 }
 
 mac {
-    LIBS += -L../../common/contrib/qjson/lib/mac -lxerces-c-3.1 -lprotobuf
+    LIBS += -L../../common/contrib/qjson/lib/mac -lprotobuf
     DEFINES += QN_EXPORT=
 }
 
 unix:!mac {
-    LIBS += -L../../common/contrib/qjson/lib/linux -lxerces-c -lprotobuf
+    LIBS += -lprotobuf
+    HARDWARE_PLATFORM = $$system(uname -i)
+    contains( HARDWARE_PLATFORM, x86_64 ) {
+        LIBS += -L../../common/contrib/qjson/lib/linux-64 
+    } else {
+        LIBS += -L../../common/contrib/qjson/lib/linux-32
+    }
 }
 
 LIBS += -L$$EVETOOLS_DIR/lib

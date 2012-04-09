@@ -79,6 +79,7 @@
 #include "workbench_display.h"
 #include "help/qncontext_help.h"
 #include "ui/common/color_transform.h"
+#include "ui/dialogs/sign_dialog.h"
 
 //#define QN_WORKBENCH_CONTROLLER_DEBUG
 
@@ -196,8 +197,8 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Border, subColor(qnGlobals->mrsColor(), qnGlobals->selectionBorderDelta()));
     m_motionSelectionInstrument->setSelectionModifiers(Qt::ShiftModifier);
 
-    m_rubberBandInstrument->setRubberBandZValue(m_display->layerZValue(QnWorkbenchDisplay::EFFECTS_LAYER));
-    m_rotationInstrument->setRotationItemZValue(m_display->layerZValue(QnWorkbenchDisplay::EFFECTS_LAYER));
+    m_rubberBandInstrument->setRubberBandZValue(m_display->layerZValue(QnWorkbenchDisplay::EffectsLayer));
+    m_rotationInstrument->setRotationItemZValue(m_display->layerZValue(QnWorkbenchDisplay::EffectsLayer));
     m_resizingInstrument->setEffectiveDistance(8);
 
     /* Item instruments. */
@@ -234,7 +235,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_manager->installInstrument(new ForwardingInstrument(Instrument::SCENE, keyEventTypes, this));
 
     /* View/viewport instruments. */
-    m_manager->installInstrument(m_rotationInstrument, InstallationMode::INSTALL_AFTER, m_display->transformationListenerInstrument());
+    m_manager->installInstrument(m_rotationInstrument, InstallationMode::InstallAfter, m_display->transformationListenerInstrument());
     m_manager->installInstrument(m_resizingInstrument);
     m_manager->installInstrument(m_moveInstrument);
     m_manager->installInstrument(m_dragInstrument);
@@ -242,7 +243,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_manager->installInstrument(m_handScrollInstrument);
     m_manager->installInstrument(m_motionSelectionInstrument);
 
-    display->setLayer(m_dropInstrument->surface(), QnWorkbenchDisplay::UI_ELEMENTS_LAYER);
+    display->setLayer(m_dropInstrument->surface(), QnWorkbenchDisplay::UiLayer);
 
     connect(m_itemLeftClickInstrument,  SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_leftClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(m_itemLeftClickInstrument,  SIGNAL(doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                 this,                           SLOT(at_item_doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
@@ -335,6 +336,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(action(Qn::ShowMotionAction), SIGNAL(triggered()),                                                                      this,                           SLOT(at_showMotionAction_triggered()));
     connect(action(Qn::HideMotionAction), SIGNAL(triggered()),                                                                      this,                           SLOT(at_hideMotionAction_triggered()));
     connect(action(Qn::ToggleMotionAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_toggleMotionAction_triggered()));
+    connect(action(Qn::CheckFileSignatureAction), SIGNAL(triggered()),                                                              this,                           SLOT(at_checkFileSignatureAction_triggered()));
     connect(action(Qn::MaximizeItemAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_maximizeItemAction_triggered()));
     connect(action(Qn::UnmaximizeItemAction), SIGNAL(triggered()),                                                                  this,                           SLOT(at_unmaximizeItemAction_triggered()));
     connect(action(Qn::ScreenRecordingAction), SIGNAL(triggered(bool)),                                                             this,                           SLOT(at_recordingAction_triggered(bool)));
@@ -768,7 +770,7 @@ void QnWorkbenchController::at_moveStarted(QGraphicsView *, const QList<QGraphic
 
     /* Bring to front preserving relative order. */
     m_display->bringToFront(items);
-    m_display->setLayer(items, QnWorkbenchDisplay::FRONT_LAYER);
+    m_display->setLayer(items, QnWorkbenchDisplay::FrontLayer);
 
     /* Show grid. */
     m_display->gridItem()->animatedShow();
@@ -1133,6 +1135,19 @@ void QnWorkbenchController::at_hideMotionAction_triggered() {
 
 void QnWorkbenchController::at_showMotionAction_triggered() {
     displayMotionGrid(menu()->currentWidgetsTarget(sender()), true);
+}
+
+void QnWorkbenchController::at_checkFileSignatureAction_triggered() 
+{
+    QnResourceWidgetList widgets = menu()->currentWidgetsTarget(sender());
+    if (widgets.isEmpty())
+        return;
+    QnResourceWidget *widget = widgets.at(0);
+    if(widget->resource()->flags() & QnResource::network)
+        return;
+    QScopedPointer<SignDialog> dialog(new SignDialog(widget->resource()->getUrl()));
+    dialog->setModal(true);
+    dialog->exec();
 }
 
 void QnWorkbenchController::at_toggleMotionAction_triggered() {

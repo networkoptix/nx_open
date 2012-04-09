@@ -36,6 +36,19 @@ namespace {
         return qnSkin->pixmap(icon, QSize(1024, 1024), mode, state);
     }
 
+    void glDrawTexturedRect(const QRectF &rect) {
+        glBegin(GL_QUADS);
+        glTexCoord(0.0, 1.0);
+        glVertex(rect.topLeft());
+        glTexCoord(1.0, 1.0);
+        glVertex(rect.topRight());
+        glTexCoord(1.0, 0.0);
+        glVertex(rect.bottomRight());
+        glTexCoord(0.0, 0.0);
+        glVertex(rect.bottomLeft());
+        glEnd();
+    }
+
     typedef QnGlContextData<QnTextureTransitionShaderProgram> QnTextureTransitionShaderProgramStorage;
     Q_GLOBAL_STATIC(QnTextureTransitionShaderProgramStorage, qn_textureTransitionShaderProgramStorage);
 
@@ -222,40 +235,23 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
     painter->beginNativePainting();
     //glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
     glEnable(GL_BLEND);
+    glEnable(GL_TEXTURE_2D);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glColor(1.0, 1.0, 1.0, painter->opacity());
 
     QRectF rect = this->rect();
 
-    if (progress == 0 || progress == 1)
-    {
-        m_gl->glActiveTexture(GL_TEXTURE0);
-        if (progress == 0)
+    bool isZero = qFuzzyIsNull(progress);
+    bool isOne = qFuzzyCompare(progress, 1.0);
+    if (isOne || isZero) {
+        if (isZero) {
             widget->bindTexture(pixmap(endState));
-        else
+        } else {
             widget->bindTexture(pixmap(startState));
+        }
 
-        const float v_array[] = { rect.left(), rect.bottom(), rect.right(), rect.bottom(), rect.right(), rect.top(), rect.left(), rect.top() };
-        static float tx_array[8] = {
-            0.0f, 0.0f,
-            1.0, 0.0f,
-            1.0, 1.0,
-            0.0f, 1.0
-        };
-
-        glEnable(GL_TEXTURE_2D);
-
-        glVertexPointer(2, GL_FLOAT, 0, v_array);
-        glTexCoordPointer(2, GL_FLOAT, 0, tx_array);
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-        glDrawArrays(GL_QUADS, 0, 4);
-        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-        glDisableClientState(GL_VERTEX_ARRAY);
-
-        glDisable(GL_TEXTURE_2D);
-    }
-    else {
-
+        glDrawTexturedRect(rect);
+    } else {
         m_gl->glActiveTexture(GL_TEXTURE1);
         widget->bindTexture(pixmap(endState));
         m_gl->glActiveTexture(GL_TEXTURE0);
@@ -265,23 +261,13 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
         m_shader->setTexture0(0);
         m_shader->setTexture1(1);
 
-        glBegin(GL_QUADS);
-        glColor(1.0, 1.0, 1.0, painter->opacity());
-        glTexCoord(0.0, 1.0);
-        glVertex(rect.topLeft());
-        glTexCoord(1.0, 1.0);
-        glVertex(rect.topRight());
-        glTexCoord(1.0, 0.0);
-        glVertex(rect.bottomRight());
-        glTexCoord(0.0, 0.0);
-        glVertex(rect.bottomLeft());
-        glEnd();
+        glDrawTexturedRect(rect);
 
         m_shader->release();
     }
 
     glDisable(GL_BLEND);
-
+    glDisable(GL_TEXTURE_2D);
     painter->endNativePainting();
 }
 

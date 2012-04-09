@@ -58,16 +58,16 @@ public:
      * Layer of an item.
      */
     enum Layer {
-        BACK_LAYER,                 /**< Back layer. */
-        PINNED_LAYER,               /**< Layer for pinned items. */
-        PINNED_RAISED_LAYER,        /**< Layer for pinned items that are raised. */
-        UNPINNED_LAYER,             /**< Layer for unpinned items. */
-        UNPINNED_RAISED_LAYER,      /**< Layer for unpinned items that are raised. */
-        CURTAIN_LAYER,              /**< Layer for curtain that blacks out the background when an item is zoomed. */
-        ZOOMED_LAYER,               /**< Layer for zoomed items. */
-        FRONT_LAYER,                /**< Topmost layer for items. Items that are being dragged, resized or manipulated in any other way are to be placed here. */
-        EFFECTS_LAYER,              /**< Layer for top-level effects. */
-        UI_ELEMENTS_LAYER,          /**< Layer for ui elements, i.e. close button, navigation bar, etc... */
+        BackLayer,                  /**< Back layer. */
+        PinnedLayer,                /**< Layer for pinned items. */
+        PinnedRaisedLayer,          /**< Layer for pinned items that are raised. */
+        UnpinnedLayer,              /**< Layer for unpinned items. */
+        UnpinnedRaisedLayer,        /**< Layer for unpinned items that are raised. */
+        CurtainLayer,               /**< Layer for curtain that blacks out the background when an item is zoomed. */
+        ZoomedLayer,                /**< Layer for zoomed items. */
+        FrontLayer,                 /**< Topmost layer for items. Items that are being dragged, resized or manipulated in any other way are to be placed here. */
+        EffectsLayer,               /**< Layer for top-level effects. */
+        UiLayer,                    /**< Layer for ui elements, i.e. close button, navigation bar, etc... */
     };
 
     /**
@@ -232,9 +232,15 @@ public:
 
     QMargins viewportMargins() const;
 
-    Qn::MarginFlags marginFlags() const;
+    Qn::MarginFlags currentMarginFlags() const;
 
-    void setMarginFlags(Qn::MarginFlags flags);
+    Qn::MarginFlags zoomedMarginFlags() const;
+
+    Qn::MarginFlags normalMarginFlags() const;
+
+    void setZoomedMarginFlags(Qn::MarginFlags flags);
+
+    void setNormalMarginFlags(Qn::MarginFlags flags);
 
 
     void bringToFront(const QList<QGraphicsItem *> &items);
@@ -291,6 +297,8 @@ protected:
     void synchronizeLayer(QnWorkbenchItem *item);
     void synchronizeLayer(QnResourceWidget *widget);
     void synchronizeSceneBounds();
+
+    void updateCurrentMarginFlags();
 
     void adjustGeometry(QnWorkbenchItem *item, bool animate = true);
 
@@ -386,6 +394,9 @@ private:
 
     /** Whether frame widths need updating. */
     bool m_frameWidthsDirty;
+
+    Qn::MarginFlags m_zoomedMarginFlags, m_normalMarginFlags;
+
 
 
     /* Instruments. */

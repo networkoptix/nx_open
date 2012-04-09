@@ -3,11 +3,11 @@
 
 import shutil, glob, string
 import os, sys, posixpath
+from platform import architecture
 
 import time
 
 from filetypes import all_filetypes, video_filetypes, image_filetypes
-from genproto import generate_xsd, generate_pb
 
 # os.path = posixpath
 
@@ -36,8 +36,13 @@ def platform():
         return 'linux'
 
 def gen_env_sh(path, ldpath):
+    if platform() == 'mac':
+        ldvar = 'DYLD_LIBRARY_PATH'
+    elif platform() == 'linux':
+        ldvar = 'LD_LIBRARY_PATH'
+
     f = open(path, 'w')
-    print >> f, 'export DYLD_LIBRARY_PATH=%s' % ldpath
+    print >> f, 'export %s=%s' % (ldvar, ldpath)
     f.close()
 
 def link_or_copy(src, dst):
@@ -99,10 +104,17 @@ def gen_filetypes_h():
     print >> filetypes_h, 'static const char* IMAGE_FILETYPES[] = {%s};' % string.join(['"' + x[0] + '"' for x in image_filetypes], ', ')
     print >> filetypes_h, '#endif // UNICLIENT_FILETYPES_H_'
 
+def host_platform_bits():
+    return architecture()[0][0:2]
+
 def setup_qjson():
     qjson_path = '../common/contrib/qjson'
 
-    return qjson_path + '/lib/' + platform()
+    arch_suffix = ''
+    if platform() == 'linux':
+        arch_suffix = '-' + host_platform_bits()
+
+    return qjson_path + '/lib/' + platform() + arch_suffix
 
 def setup_openssl():
     openssl_path = '../common/contrib/openssl'
@@ -143,7 +155,7 @@ def setup_ffmpeg():
     elif platform() == 'mac':
         ffmpeg += '-mac'
     elif platform() == 'linux':
-        ffmpeg += '-linux'
+        ffmpeg += '-linux' + '-' + host_platform_bits()
 
 
     ffmpeg_path = qt_path(os.path.join(ffmpeg_path, ffmpeg))
@@ -205,40 +217,6 @@ def index_dirs(xdirs, template_file, output_file, exclude_dirs=(), exclude_files
 
     uniclient_pro.close()
 
-def gen_api_qrc(xdir, files):
-    f = open(os.path.join(xdir, 'api.qrc'), 'w')
-    print >> f, """<RCC>
-    <qresource prefix="/xsd/api/">"""
-
-    for xfile in files:
-        print >> f, '        <file alias="%s">../../../%s</file>' % (os.path.basename(xfile), xfile.replace('\\', '/'))
-
-    print >> f, """        
-    </qresource>
-</RCC>
-"""
-
-def generate_xsd_res(xpath):
-    xsd_dir = os.path.join('src', 'api', 'xsd')
-    
-    all_xsd_files = []
-    for root, dirs, files in os.walk(xsd_dir):
-        new_dir = os.path.join(xpath, root[len(xsd_dir) + 1:])
-        if not os.path.exists(new_dir):
-            os.mkdir(new_dir)
-
-        for xfile in files:
-            if not xfile.endswith('.xsd'):
-                continue
-
-            new_name = os.path.splitext(xfile)[0]
-            new_path = os.path.join(new_dir, new_name)
-
-            shutil.copy(os.path.join(root, xfile), new_path)
-            all_xsd_files.append(new_path)
-
-    gen_api_qrc(xpath, all_xsd_files)
-
 def convert():
     oldpwd = os.getcwd()
     os.chdir(os.path.dirname(os.path.realpath(__file__)))
@@ -251,28 +229,12 @@ def convert():
             rmtree('build')
         os.mkdir('build')
 
-        os.makedirs('build/debug/generated')
-        os.makedirs('build/release/generated')
-        
-        generate_xsd_res(os.path.join('build', 'debug', 'generated'))
-        generate_xsd_res(os.path.join('build', 'release', 'generated'))
-
         ffmpeg_path, ffmpeg_path_debug, ffmpeg_path_release = setup_ffmpeg()
         gen_filetypes_h()
         tools_path = setup_tools()
         
-        os.mkdir('build/generated')
-        generated_files = []
-        generated_files += generate_xsd(tools_path, 'build/generated')
-        generated_files += generate_pb(tools_path, 'build/generated')
-
         index_dirs(('src',), 'src/const.pro', 'src/common.pro', exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
         instantiate_pro('src/common.pro', {'BUILDLIB': BUILDLIB, 'FFMPEG' : ffmpeg_path, 'EVETOOLS_DIR' : tools_path})
-
-        f = open('src/common.pro', 'a')
-        for xfile in generated_files:
-            print >> f, 'SOURCES += $$PWD/../' + xfile
-        f.close()
 
         if platform() == 'win32':
             os.system('qmake -tp vc -o src/common.vcproj src/common.pro')

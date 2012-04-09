@@ -65,7 +65,6 @@ void QnCameraMotionMaskWidget::init()
     m_display.reset(new QnWorkbenchDisplay(m_context.data()));
     m_display->setScene(m_scene.data());
     m_display->setView(m_view.data());
-    m_display->setMarginFlags(0);
 
     m_controller.reset(new QnWorkbenchController(m_display.data(), this));
 
