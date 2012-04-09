@@ -105,8 +105,8 @@ NavigationItem::NavigationItem(QGraphicsItem *parent):
     }
 
 
-    connect(QnTimePeriodReaderHelper::instance(), SIGNAL(ready(const QnTimePeriodList&, int)), this, SLOT(onTimePeriodLoaded(const QnTimePeriodList&, int)));
-    connect(QnTimePeriodReaderHelper::instance(), SIGNAL(failed(int, int)), this, SLOT(onTimePeriodLoadFailed(int, int)));
+    connect(QnMultiCameraTimePeriodLoader::instance(), SIGNAL(ready(const QnTimePeriodList&, int)), this, SLOT(onTimePeriodLoaded(const QnTimePeriodList&, int)));
+    connect(QnMultiCameraTimePeriodLoader::instance(), SIGNAL(failed(int, int)), this, SLOT(onTimePeriodLoadFailed(int, int)));
 
     m_backwardButton = new QnImageButtonWidget(this);
     m_backwardButton->setIcon(qnSkin->icon("rewind_backward.png"));
@@ -565,7 +565,7 @@ NavigationItem::MotionPeriodLoader* NavigationItem::getMotionLoader(QnAbstractAr
     {
         MotionPeriodLoader p;
         p.reader = reader;
-        p.loader = QnTimePeriodReaderHelper::instance()->createUpdater(resource);
+        p.loader = QnTimePeriodLoader::newInstance(resource);
 #ifndef DEBUG_MOTION
         if (!p.loader) {
             qWarning() << "Connection to a video server lost. Can't load motion info";
@@ -706,7 +706,7 @@ bool NavigationItem::updateRecPeriodList(bool force)
     {
         bool timePeriodAlreadyLoaded = !force && m_timePeriod.startTimeMs <= t && t + w <= m_timePeriod.startTimeMs + m_timePeriod.durationMs;
         if (!timePeriodAlreadyLoaded)
-            m_fullTimePeriodHandle = QnTimePeriodReaderHelper::instance()->load(resources, m_timePeriod);
+            m_fullTimePeriodHandle = QnMultiCameraTimePeriodLoader::instance()->load(resources, m_timePeriod);
         bool motionPeriodAlreadyLoaded = m_motionPeriod.startTimeMs <= t && t + w <= m_motionPeriod.startTimeMs + m_motionPeriod.durationMs;
         if (!motionPeriodAlreadyLoaded)
             updateMotionPeriods(m_timePeriod);

@@ -1,23 +1,23 @@
-#ifndef QN_TIME_PERIOD_READER_HELPER_H
-#define QN_TIME_PERIOD_READER_HELPER_H
+#ifndef QN_MULTI_CAMERA_TIME_PERIOD_LOADER_H
+#define QN_MULTI_CAMERA_TIME_PERIOD_LOADER_H
 
 #include <QMap>
 #include <QMutex>
-#include "time_period_reader.h"
+#include "time_period_loader.h"
 
 /**
- *  
+ * Time period loader that can be used to load recorded time periods for several
+ * cameras.
  */
-class QnTimePeriodReaderHelper: public QObject
+class QnMultiCameraTimePeriodLoader: public QObject
 {
     Q_OBJECT
 public:
-    QnTimePeriodReaderHelper();
+    QnMultiCameraTimePeriodLoader();
 
-    static QnTimePeriodReaderHelper *instance();
+    static QnMultiCameraTimePeriodLoader *instance();
 
-    QnTimePeriodReaderPtr createUpdater(QnResourcePtr resource);
-    int load(const QnNetworkResourceList &netResList, const QnTimePeriod &period);
+    int load(const QnNetworkResourceList &networkResources, const QnTimePeriod &period);
 
 signals:
     void ready(const QnTimePeriodList &timePeriods, int handle);
@@ -32,7 +32,7 @@ private:
 
 private:
     QMutex m_mutex;
-    typedef QMap<QnNetworkResourcePtr, QnTimePeriodReaderPtr> NetResCache;
+    typedef QMap<QnNetworkResourcePtr, QnTimePeriodLoaderPtr> NetResCache;
     NetResCache m_cache;
 
     QMap<int, QList<int> > m_multiLoadProgress;
@@ -40,4 +40,4 @@ private:
     int m_multiRequestCount;
 };
 
-#endif // QN_TIME_PERIOD_READER_HELPER_H
+#endif // QN_MULTI_CAMERA_TIME_PERIOD_LOADER_H

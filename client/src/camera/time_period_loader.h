@@ -1,20 +1,40 @@
-#ifndef QN_TIME_PERIOD_READER_H
-#define QN_TIME_PERIOD_READER_H
+#ifndef QN_TIME_PERIOD_LOADER_H
+#define QN_TIME_PERIOD_LOADER_H
 
-#include <QObject>
-#include <QRegion>
+#include <QtCore/QObject>
+#include <QtGui/QRegion>
+
 #include "api/VideoServerConnection.h"
 #include "recording/time_period.h"
 #include "core/resource/network_resource.h"
 
+class QnTimePeriodLoader;
+typedef QSharedPointer<QnTimePeriodLoader> QnTimePeriodLoaderPtr;
+
+
 /**
- * Per-camera motion period loader that caches loaded time periods. 
+ * Per-camera time period loader that caches loaded time periods. 
  */
-class QnTimePeriodReader: public QObject
+class QnTimePeriodLoader: public QObject
 {
     Q_OBJECT
 public:
-    QnTimePeriodReader(const QnVideoServerConnectionPtr &connection, QnNetworkResourcePtr resource, QObject *parent = NULL);
+    /**
+     * Constructor.
+     * 
+     * \param connection                Video server connection to use.
+     * \param resource                  Network resource representing the camera to work with.
+     * \param parent                    Parent object.
+     */
+    QnTimePeriodLoader(const QnVideoServerConnectionPtr &connection, QnNetworkResourcePtr resource, QObject *parent = NULL);
+
+    /**
+     * Creates a new time period loader for the given camera resource. Returns null
+     * pointer in case loader cannot be created.
+     * 
+     * \param resource                  Camera resource to create time period loader for.
+     */
+    static QnTimePeriodLoaderPtr newInstance(QnResourcePtr resource);
     
     /**
      * \param timePeriod                Time period to get motion periods for.
@@ -75,6 +95,4 @@ private:
     QList<QRegion> m_motionRegions;
 };
 
-typedef QSharedPointer<QnTimePeriodReader> QnTimePeriodReaderPtr;
-
-#endif // QN_TIME_PERIOD_READER_H
+#endif // QN_TIME_PERIOD_LOADER_H

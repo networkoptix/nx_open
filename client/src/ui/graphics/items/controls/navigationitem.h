@@ -8,7 +8,7 @@
 #include <ui/graphics/items/simple_frame_widget.h>
 
 #include "recording/time_period.h"
-#include "camera/time_period_reader_helper.h"
+#include "camera/multi_camera_time_period_loader.h"
 
 
 class QTimerEvent;
@@ -112,7 +112,7 @@ protected:
 private:
     struct MotionPeriodLoader {
         MotionPeriodLoader(): loadingHandle(0), reader(0) {}
-        QnTimePeriodReaderPtr loader;
+        QnTimePeriodLoaderPtr loader;
         int loadingHandle;
         QnTimePeriodList periods;
         QList<QRegion> regions;

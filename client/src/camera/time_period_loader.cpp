@@ -1,18 +1,43 @@
-#include "time_period_reader.h"
+#include "time_period_loader.h"
+#include <utils/common/warnings.h>
+#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource/video_server.h>
 
-QAtomicInt QnTimePeriodReader::s_fakeHandle(INT_MAX / 2);
+QAtomicInt QnTimePeriodLoader::s_fakeHandle(INT_MAX / 2);
 
-QnTimePeriodReader::QnTimePeriodReader(const QnVideoServerConnectionPtr &connection, QnNetworkResourcePtr resource, QObject *parent):
+QnTimePeriodLoader::QnTimePeriodLoader(const QnVideoServerConnectionPtr &connection, QnNetworkResourcePtr resource, QObject *parent):
     QObject(parent), 
     m_connection(connection), 
     m_resource(resource)
 {
+    if(!connection)
+        qnNullWarning(connection);
+
+    if(!resource)
+        qnNullWarning(resource);
+
     qRegisterMetaType<QnTimePeriodList>("QnTimePeriodList");
 
     connect(this, SIGNAL(delayedReady(const QnTimePeriodList &, int)), this, SIGNAL(ready(const QnTimePeriodList &, int)), Qt::QueuedConnection);
 }
 
-int QnTimePeriodReader::load(const QnTimePeriod &timePeriod, const QList<QRegion> &motionRegions)
+QnTimePeriodLoaderPtr QnTimePeriodLoader::newInstance(QnResourcePtr resource) {
+    QnNetworkResourcePtr networkResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
+    if (!networkResource)
+        return QnTimePeriodLoaderPtr();
+
+    QnVideoServerResourcePtr serverResource = qSharedPointerDynamicCast<QnVideoServerResource>(qnResPool->getResourceById(resource->getParentId()));
+    if (!serverResource)
+        return QnTimePeriodLoaderPtr();
+
+    QnVideoServerConnectionPtr serverConnection = serverResource->apiConnection();
+    if (!serverConnection)
+        return QnTimePeriodLoaderPtr();
+
+    return QnTimePeriodLoaderPtr(new QnTimePeriodLoader(serverConnection, networkResource));
+}
+
+int QnTimePeriodLoader::load(const QnTimePeriod &timePeriod, const QList<QRegion> &motionRegions)
 {
     QMutexLocker lock(&m_mutex);
     if (motionRegions != m_motionRegions) {
@@ -79,7 +104,7 @@ int QnTimePeriodReader::load(const QnTimePeriod &timePeriod, const QList<QRegion
     return handle;
 }
 
-void QnTimePeriodReader::at_replyReceived(int status, const QnTimePeriodList &timePeriods, int requstHandle)
+void QnTimePeriodLoader::at_replyReceived(int status, const QnTimePeriodList &timePeriods, int requstHandle)
 {
     for (int i = 0; i < m_loading.size(); ++i)
     {
@@ -128,7 +153,7 @@ void QnTimePeriodReader::at_replyReceived(int status, const QnTimePeriodList &ti
     }
 }
 
-int QnTimePeriodReader::sendRequest(const QnTimePeriod &periodToLoad)
+int QnTimePeriodLoader::sendRequest(const QnTimePeriod &periodToLoad)
 {
     return m_connection->asyncRecordedTimePeriods(
         QnNetworkResourceList() << m_resource, 

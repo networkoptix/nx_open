@@ -131,7 +131,7 @@ const QList<QRegion>& QnCameraMotionMaskWidget::motionMaskList() const
 }
 
 const QnResourcePtr &QnCameraMotionMaskWidget::camera() const {
-    return m_camera;
+    return m_camera; // TODO: returning temporary here.
 }
 
 void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
