@@ -71,7 +71,7 @@ MJPEGtreamreader::~MJPEGtreamreader()
     stop();
 }
 
-inline int getIntParam(const char* pos)
+int getIntParam(const char* pos)
 {
     int rez = 0;
     for (; *pos >= '0' && *pos <= '9'; pos++)

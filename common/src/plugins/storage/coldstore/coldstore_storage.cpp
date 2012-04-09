@@ -2,11 +2,11 @@
 
 QnPlColdStoreStorage::QnPlColdStoreStorage(const QString& storageLink, int minFreeSpace)
 {
-
+#ifdef Q_OS_WIN
     WSADATA wsaData;
     WORD wVersionRequested = MAKEWORD(1, 1);
     WSAStartup(wVersionRequested, &wsaData);
-
+#endif
     const char* ip = "192.168.1.30";
 
 

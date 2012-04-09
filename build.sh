@@ -40,13 +40,13 @@ fi
 
 sed $SED_ARGS "1,/debug\/generated\/qtservice.moc\ \\\\/{/debug\/generated\/qtservice.moc\\ \\\\/d;}" mediaserver/build/Makefile.debug
 sed $SED_ARGS "1,/debug\/generated\/qtservice_unix.moc\ \\\\/{/debug\/generated\/qtservice_unix.moc\\ \\\\/d;}" mediaserver/build/Makefile.debug
-sed $SED_ARGS "1,/debug\/generated\/qtservice.moc\ \\\\/{/debug\/generated\/qtservice.moc\\ \\\\/d;}" mediaserver/build/Makefile.release
-sed $SED_ARGS "1,/debug\/generated\/qtservice_unix.moc\ \\\\/{/debug\/generated\/qtservice_unix.moc\\ \\\\/d;}" mediaserver/build/Makefile.release
+sed $SED_ARGS "1,/release\/generated\/qtservice.moc\ \\\\/{/release\/generated\/qtservice.moc\\ \\\\/d;}" mediaserver/build/Makefile.release
+sed $SED_ARGS "1,/release\/generated\/qtservice_unix.moc\ \\\\/{/release\/generated\/qtservice_unix.moc\\ \\\\/d;}" mediaserver/build/Makefile.release
 
 sed $SED_ARGS "s%^\.\.\/build\/\(debug\/generated\/qtservice.moc\)%\1%" mediaserver/build/Makefile.debug
 sed $SED_ARGS "s%^\.\.\/build\/\(debug\/generated\/qtservice_unix.moc\)%\1%" mediaserver/build/Makefile.debug
-sed $SED_ARGS "s%^\.\.\/build\/\(debug\/generated\/qtservice.moc\)%\1%" mediaserver/build/Makefile.release
-sed $SED_ARGS "s%^\.\.\/build\/\(debug\/generated\/qtservice_unix.moc\)%\1%" mediaserver/build/Makefile.release
+sed $SED_ARGS "s%^\.\.\/build\/\(release\/generated\/qtservice.moc\)%\1%" mediaserver/build/Makefile.release
+sed $SED_ARGS "s%^\.\.\/build\/\(release\/generated\/qtservice_unix.moc\)%\1%" mediaserver/build/Makefile.release
 
 sed $SED_ARGS "s%\.\.\/build\/debug%debug%g" client/build/Makefile.debug
 sed $SED_ARGS "s%\.\.\/build\/release%release%g" client/build/Makefile.release
