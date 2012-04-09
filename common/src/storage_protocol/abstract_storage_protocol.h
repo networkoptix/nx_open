@@ -21,12 +21,10 @@ public:
     virtual int close() = 0;
     */
 
-    virtual bool isNeedControlFreeSpace(const QString& url) = 0;
+    virtual bool isNeedControlFreeSpace() = 0;
+    virtual qint64 getFreeSpace(const QString& url) = 0;
     virtual bool removeFile(const QString& url) = 0;
     virtual bool removeDir(const QString& url) = 0;
-    virtual qint64 getFreeSpace(const QString& url) = 0;
-
-
     virtual bool isStorageAvailable(const QString& url) = 0;
     virtual QFileInfoList getFileList(const QString& dirName) = 0;
     virtual bool isFileExists(const QString& url) = 0;

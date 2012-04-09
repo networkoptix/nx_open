@@ -164,6 +164,10 @@ void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
 
     QString dir = storage->getUrl();
     QnAbstractStorageProtocolPtr storageProtocol = qnStorageProtocolManager->getProtocol(dir);
+
+    if (!storageProtocol->isNeedControlFreeSpace())
+        return;
+
     qint64 freeSpace = storageProtocol->getFreeSpace(dir);
     while (freeSpace != -1 && freeSpace < storage->getSpaceLimit())
     {

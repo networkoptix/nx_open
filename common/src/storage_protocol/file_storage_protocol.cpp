@@ -14,7 +14,7 @@ URLProtocol QnFileStorageProtocol::getURLProtocol() const
     return ufile_protocol;
 }
 
-bool QnFileStorageProtocol::isNeedControlFreeSpace(const QString& url)
+bool QnFileStorageProtocol::isNeedControlFreeSpace()
 {
     return true;
 }

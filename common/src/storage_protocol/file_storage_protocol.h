@@ -13,7 +13,7 @@ public:
 
     virtual bool isStorageAvailable(const QString& value) override;
     virtual QFileInfoList getFileList(const QString& dirName) override;
-    virtual bool isNeedControlFreeSpace(const QString& url) override;
+    virtual bool isNeedControlFreeSpace() override;
     virtual bool removeFile(const QString& url) override;
     virtual bool removeDir(const QString& url) override;
     virtual bool isFileExists(const QString& url) override;
