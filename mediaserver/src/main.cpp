@@ -46,6 +46,7 @@
 #include "plugins/resources/onvif/onvif_ws_searcher.h"
 #include "utils/common/command_line_parser.h"
 #include "plugins/resources/pulse/pulse_resource_searcher.h"
+#include "storage_protocol/file_storage_protocol.h"
 
 
 static const char SERVICE_NAME[] = "Network Optix VMS Media Server";
@@ -184,8 +185,7 @@ void ffmpegInit()
     avcodec_init();
     av_register_all();
 
-    extern URLProtocol ufile_protocol;
-    av_register_protocol2(&ufile_protocol, sizeof(ufile_protocol));
+    qnStorageProtocolManager->registerProtocol(QnAbstractStorageProtocolPtr(new QnFileStorageProtocol()), true);
 }
 
 QnStorageResourcePtr createDefaultStorage()

@@ -163,7 +163,8 @@ void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
 
 
     QString dir = storage->getUrl();
-    qint64 freeSpace = getDiskFreeSpace(dir);
+    QnAbstractStorageProtocolPtr storageProtocol = qnStorageProtocolManager->getProtocol(dir);
+    qint64 freeSpace = storageProtocol->getFreeSpace(dir);
     while (freeSpace != -1 && freeSpace < storage->getSpaceLimit())
     {
         qint64 minTime = 0x7fffffffffffffffll;
@@ -202,7 +203,7 @@ void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
         }
         else
             break; // nothing to delete
-        freeSpace = getDiskFreeSpace(dir);
+        freeSpace = storageProtocol->getFreeSpace(dir);
     }
 }
 
@@ -223,7 +224,8 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
         //for (int i = 0; i < m_storageRoots.size(); ++i)
         for (StorageMap::const_iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
         {
-            qint64 freeSpace = getDiskFreeSpace(itr.value()->getUrl());
+            QnAbstractStorageProtocolPtr storageProtocol = qnStorageProtocolManager->getProtocol(itr.value()->getUrl());
+            qint64 freeSpace = storageProtocol->getFreeSpace(itr.value()->getUrl());
             maxSpace = qMax(maxSpace, freeSpace);
             minSpace = qMin(minSpace, freeSpace);
         }
@@ -250,7 +252,8 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
         // select storage with maximum free space
         for (StorageMap::const_iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
         {
-            qint64 freeSpace = getDiskFreeSpace(itr.value()->getUrl());
+            QnAbstractStorageProtocolPtr storageProtocol = qnStorageProtocolManager->getProtocol(itr.value()->getUrl());
+            qint64 freeSpace = storageProtocol->getFreeSpace(itr.value()->getUrl());
             if (freeSpace > maxFreeSpace)
             {
                 maxFreeSpace = freeSpace;

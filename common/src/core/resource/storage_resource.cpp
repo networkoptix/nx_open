@@ -54,22 +54,13 @@ quint16 QnStorageResource::getIndex() const
 void QnStorageResource::setUrl(const QString& value)
 {
     QnResource::setUrl(value);
-    QString tmpDir = closeDirPath(value) + QString("tmp") + QString::number(rand());
-    QDir dir(tmpDir);
-    if (dir.exists()) {
+
+    QnAbstractStorageProtocolPtr storageProtocol = qnStorageProtocolManager->getProtocol(value);
+    if (storageProtocol == 0)
+        return;
+
+    if (storageProtocol->isStorageAvailable(value))
         setStatus(Online);
-        dir.remove(tmpDir);
-    }
-    else {
-        if (dir.mkpath(tmpDir))
-        {
-            dir.rmdir(tmpDir);
-            setStatus(Online);
-        }
-        else {
-            setStatus(Offline);
-        }
-    }
 }
 
 float QnStorageResource::bitrate() const
