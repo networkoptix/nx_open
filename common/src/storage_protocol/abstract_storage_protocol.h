@@ -21,6 +21,11 @@ public:
     virtual int close() = 0;
     */
 
+    /*
+    * Returns recommend file duration in seconds
+    */
+    virtual int getChunkLen() const = 0;
+
     virtual bool isNeedControlFreeSpace() = 0;
     virtual qint64 getFreeSpace(const QString& url) = 0;
     virtual bool removeFile(const QString& url) = 0;

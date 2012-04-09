@@ -75,3 +75,8 @@ bool QnFileStorageProtocol::isStorageAvailable(const QString& value)
 
     return false;
 }
+
+int QnFileStorageProtocol::getChunkLen() const 
+{
+    return 60;
+}

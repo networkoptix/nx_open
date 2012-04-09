@@ -11,6 +11,7 @@ public:
 
     virtual URLProtocol getURLProtocol() const override;
 
+    virtual int getChunkLen() const override;
     virtual bool isStorageAvailable(const QString& value) override;
     virtual QFileInfoList getFileList(const QString& dirName) override;
     virtual bool isNeedControlFreeSpace() override;
