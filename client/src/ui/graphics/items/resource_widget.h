@@ -1,18 +1,23 @@
 #ifndef QN_RESOURCE_WIDGET_H
 #define QN_RESOURCE_WIDGET_H
 
-#include <QStaticText>
-#include <QWeakPointer>
-#include <QVector>
+#include <QtCore/QWeakPointer>
+#include <QtCore/QVector>
+
+#include <QtGui/QStaticText>
+#include <QtGui/QGraphicsWidget>
+
 #include <camera/render_status.h>
+#include <core/resource/resource_consumer.h>
+#include <core/datapacket/mediadatapacket.h> /* For QnMetaDataV1Ptr. */
+
 #include <ui/common/constrained_resizable.h>
 #include <ui/common/scene_utility.h>
 #include <ui/common/frame_section_queryable.h>
+#include <ui/graphics/instruments/instrumented.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include <core/resource/resource_consumer.h>
-#include <core/datapacket/mediadatapacket.h> /* For QnMetaDataV1Ptr. */
+
 #include "polygonal_shadow_item.h"
-#include "core/resource/resource_media_layout.h"
 
 class QGraphicsLinearLayout;
 
@@ -36,7 +41,7 @@ class Instrument;
 #   undef NO_DATA
 #endif
 
-class QnResourceWidget: public QGraphicsWidget, public QnWorkbenchContextAware, public QnPolygonalShapeProvider, public ConstrainedResizable, public FrameSectionQuearyable, protected SceneUtility {
+class QnResourceWidget: public Instrumented<QGraphicsWidget>, public QnWorkbenchContextAware, public QnPolygonalShapeProvider, public ConstrainedResizable, public FrameSectionQuearyable, protected SceneUtility {
     Q_OBJECT;
     Q_PROPERTY(qreal frameOpacity READ frameOpacity WRITE setFrameOpacity);
     Q_PROPERTY(qreal frameWidth READ frameWidth WRITE setFrameWidth);
@@ -45,7 +50,7 @@ class QnResourceWidget: public QGraphicsWidget, public QnWorkbenchContextAware, 
     Q_PROPERTY(qreal enclosingAspectRatio READ enclosingAspectRatio WRITE setEnclosingAspectRatio);
     Q_FLAGS(DisplayFlags DisplayFlag);
 
-    typedef QGraphicsWidget base_type;
+    typedef Instrumented<QGraphicsWidget> base_type;
 
 public:
     enum DisplayFlag {
@@ -327,7 +332,16 @@ private:
     };
 
     struct ChannelState {
-        ChannelState(): icon(NO_ICON), iconChangeTimeMSec(0), iconFadeInNeeded(false), lastNewFrameTimeMSec(0) {}
+        ChannelState();
+
+        ~ChannelState();
+
+        ChannelState(const ChannelState &other);
+
+        ChannelState &operator=(const ChannelState &other) {
+            this->~ChannelState();
+            new (this) ChannelState(other);
+        }
 
         /** Current overlay icon. */
         OverlayIcon icon;
@@ -343,6 +357,12 @@ private:
 
         /** Selected region for search-by-motion, in parrots. */
         QRegion motionSelection;
+
+        /** Image region where motion is currently present, in parrots. */
+        QRegion motionMask;
+
+        /** Binary mask for the current motion region. */
+        __m128i *motionMaskBinData;
     };
 
     void setOverlayIcon(int channel, OverlayIcon icon);
@@ -429,14 +449,8 @@ private:
     /** Additional per-channel state. */
     QVector<ChannelState> m_channelState;
 
-    /** Image region where motion is currently present, in parrots. */
-    QList<QRegion> m_motionMaskList;
-
     /** Whether the motion mask is valid. */
     bool m_motionMaskValid;
-
-    /** Binary mask for the current motion region. */
-    __m128i *m_motionMaskBinData[CL_MAX_CHANNELS];
 
     /** Whether motion mask binary data is valid. */
     bool m_motionMaskBinDataValid;

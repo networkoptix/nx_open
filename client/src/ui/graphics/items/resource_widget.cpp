@@ -42,8 +42,10 @@
 
 namespace {
 
+    const int motionMaskSize = MD_WIDTH * MD_HEIGHT / 8;
+
     /** Flashing text flash interval */
-    static const int TEXT_FLASHING_PERIOD = 1000;
+    const int TEXT_FLASHING_PERIOD = 1000;
 
     /** Frame extension multiplier determines the width of frame extension relative
      * to frame width.
@@ -88,6 +90,24 @@ namespace {
 
 
 // -------------------------------------------------------------------------- //
+// ChannelState
+// -------------------------------------------------------------------------- //
+QnResourceWidget::ChannelState::ChannelState(): icon(NO_ICON), iconChangeTimeMSec(0), iconFadeInNeeded(false), lastNewFrameTimeMSec(0) {
+    motionMaskBinData = (__m128i *) qMallocAligned(motionMaskSize, 32);
+    memset(motionMaskBinData, 0, motionMaskSize);
+}
+
+QnResourceWidget::ChannelState::~ChannelState() {
+    qFreeAligned(motionMaskBinData);
+}
+
+QnResourceWidget::ChannelState::ChannelState(const ChannelState &other) {
+    motionMaskBinData = (__m128i *) qMallocAligned(motionMaskSize, 32);
+    memcpy(motionMaskBinData, other.motionMaskBinData, motionMaskSize);
+}
+
+
+// -------------------------------------------------------------------------- //
 // Logic
 // -------------------------------------------------------------------------- //
 QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent):
@@ -106,6 +126,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_motionMaskValid(false),
     m_motionMaskBinDataValid(false)
 {
+    setAcceptsHoverEvents(true);
+
     /* Set up shadow. */
     m_shadow = new QnPolygonalShadowItem();
     QnPolygonalShadowItem *shadow = m_shadow.data();
@@ -125,18 +147,16 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     QFont font = this->font();
     font.setPixelSize(20);
     setFont(font);
-
     {
         QPalette palette = this->palette();
         palette.setColor(QPalette::WindowText, overlayTextColor);
         setPalette(palette);
     }
 
+
     /* Header overlay. */
     m_headerTitleLabel = new GraphicsLabel();
     m_headerTitleLabel->setPerformanceHint(QStaticText::AggressiveCaching);
-
-    qreal buttonSize = 24; /* In pixels. */
 
 #if 0
     QnImageButtonWidget *togglePinButton = new QnImageButtonWidget();
@@ -191,6 +211,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_headerOverlayWidget->setAcceptedMouseButtons(0);
     m_headerOverlayWidget->setOpacity(0.0);
 
+
     /* Footer overlay. */
     m_footerStatusLabel = new GraphicsLabel();
 
@@ -226,12 +247,6 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     connect(this, SIGNAL(updateOverlayTextLater()), this, SLOT(updateOverlayText()), Qt::QueuedConnection);
 
 
-    /* Set up motion-related stuff. */
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
-        m_motionMaskBinData[i] = (__m128i*) qMallocAligned(MD_WIDTH * MD_HEIGHT/8, 32);
-        memset(m_motionMaskBinData[i], 0, MD_WIDTH * MD_HEIGHT/8);
-    }
-
     /* Set up video rendering. */
     m_resource = qnResPool->getResourceByUniqId(item->resourceUid());
     m_display = new QnResourceDisplay(m_resource, this);
@@ -248,6 +263,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     connect(m_renderer, SIGNAL(sourceSizeChanged(const QSize &)), this, SLOT(at_sourceSizeChanged(const QSize &)));
     m_display->addRenderer(m_renderer);
 
+
     /* Init static text. */
     m_noDataStaticText.setText(tr("NO DATA"));
     m_noDataStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
@@ -258,6 +274,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_unauthorizedStaticText2.setText(tr("Please check authentication information in camera settings"));
     m_unauthorizedStaticText2.setPerformanceHint(QStaticText::AggressiveCaching);
     
+
     /* Set up overlay icons. */
     m_channelState.resize(m_channelCount);
 
@@ -275,9 +292,6 @@ QnResourceWidget::~QnResourceWidget() {
         m_shadow.data()->setShapeProvider(NULL);
         delete m_shadow.data();
     }
-
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-        qFreeAligned(m_motionMaskBinData[i]);
 }
 
 const QnResourcePtr &QnResourceWidget::resource() const {
@@ -320,41 +334,6 @@ void QnResourceWidget::setEnclosingGeometry(const QRectF &enclosingGeometry) {
 void QnResourceWidget::setGeometry(const QRectF &geometry) {
     /* Unfortunately, widgets with constant aspect ratio cannot be implemented
      * using size hints. So here is one of the workarounds. */
-
-#if 0
-    if(!hasAspectRatio()) {
-        base_type::setGeometry(geometry);
-        return;
-    }
-
-    qreal aspectRatio = geometry.width() / geometry.height();
-    if(qFuzzyCompare(m_aspectRatio, aspectRatio)) {
-        base_type::setGeometry(geometry);
-        return;
-    }
-
-    /* Calculate actual new size. */
-    QSizeF newSize = constrainedSize(geometry.size());
-
-    /* Find anchor point and calculate new position. */
-    QRectF oldGeometry = this->geometry();
-
-    qreal newLeft;
-    if(qFuzzyCompare(oldGeometry.right(), geometry.right())) {
-        newLeft = oldGeometry.right() - newSize.width();
-    } else {
-        newLeft = geometry.left();
-    }
-
-    qreal newTop;
-    if(qFuzzyCompare(oldGeometry.bottom(), geometry.bottom())) {
-        newTop = oldGeometry.bottom() - newSize.height();
-    } else {
-        newTop = geometry.top();
-    }
-
-    base_type::setGeometry(QRectF(QPointF(newLeft, newTop), newSize));
-#endif
 
     QSizeF oldSize = size();
 
@@ -443,14 +422,14 @@ void QnResourceWidget::invalidateMotionMask() {
 void QnResourceWidget::addToMotionMask(const QRect &gridRect, int channel) {
     ensureMotionMask();
 
-    m_motionMaskList[channel] += gridRect;
+    m_channelState[channel].motionMask += gridRect;
 
     invalidateMotionMaskBinData();
 }
 
 void QnResourceWidget::clearMotionMask() {
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-        m_motionMaskList[i] = QRegion();
+    for(int i = 0; i < m_channelState.size(); i++)
+        m_channelState[i].motionMask = QRegion();
     m_motionMaskValid = true;
 
     invalidateMotionMaskBinData();
@@ -462,10 +441,10 @@ void QnResourceWidget::ensureMotionMask()
         return;
 
     QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource>(m_resource);
-    if (camera)
-    {
-        m_motionMaskList = camera->getMotionMaskList();
-
+    if (camera) {
+        QList<QRegion> motionMaskList = camera->getMotionMaskList();
+        for(int i = 0; i < m_channelState.size(); i++)
+            m_channelState[i].motionMask = motionMaskList[i];
     }
     m_motionMaskValid = true;
 }
@@ -475,9 +454,8 @@ void QnResourceWidget::ensureMotionMaskBinData() {
         return;
 
     ensureMotionMask();
-    Q_ASSERT(((unsigned long)m_motionMaskBinData[0])%16 == 0);
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-        QnMetaDataV1::createMask(m_motionMaskList[i], (char*)m_motionMaskBinData[i]);
+    for(int i = 0; i < m_channelState.size(); i++)
+        QnMetaDataV1::createMask(m_channelState[i].motionMask, (char*) m_channelState[i].motionMaskBinData);
 }
 
 void QnResourceWidget::invalidateMotionMaskBinData() {
@@ -555,7 +533,7 @@ void QnResourceWidget::addToMotionSelection(const QRect &gridRect)
         {
             QRegion r1(r);
             r1.translate(-m_videoLayout->h_position(i)*MD_WIDTH, -m_videoLayout->v_position(i)*MD_HEIGHT);
-            r1 -= m_motionMaskList[i];
+            r1 -= m_channelState[i].motionMask;
 
             m_channelState[i].motionSelection += r1;
         }
@@ -815,7 +793,6 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     if(m_pausedPainter.isNull()) {
         m_pausedPainter = qn_pausedPainterStorage()->get();
         m_loadingProgressPainter = qn_loadingProgressPainterStorage()->get();
-        //m_noDataPainter = qn_noDataPainterStorage()->get();
     }
 
     QnScopedPainterPenRollback penRollback(painter);
@@ -1001,13 +978,13 @@ void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, con
 
     for (int x = 0; x < MD_WIDTH; ++x)
     {
-        if (m_motionMaskList[channel].isEmpty())
+        if (m_channelState[channel].motionMask.isEmpty())
         {
             gridLines << QPointF(x*xStep, 0.0) << QPointF(x*xStep, rect.height());
         }
         else {
             QRegion lineRect(x, 0, 1, MD_HEIGHT+1);
-            QRegion drawRegion = lineRect - m_motionMaskList[channel].intersect(lineRect);
+            QRegion drawRegion = lineRect - m_channelState[channel].motionMask.intersect(lineRect);
             foreach(const QRect& r, drawRegion.rects())
             {
                 gridLines << QPointF(x*xStep, r.top()*yStep) << QPointF(x*xStep, qMin(rect.height(),(r.top()+r.height())*yStep));
@@ -1016,12 +993,12 @@ void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, con
     }
 
     for (int y = 0; y < MD_HEIGHT; ++y) {
-        if (m_motionMaskList[channel].isEmpty()) {
+        if (m_channelState[channel].motionMask.isEmpty()) {
             gridLines << QPointF(0.0, y*yStep) << QPointF(rect.width(), y*yStep);
         }
         else {
             QRegion lineRect(0, y, MD_WIDTH+1, 1);
-            QRegion drawRegion = lineRect - m_motionMaskList[channel].intersect(lineRect);
+            QRegion drawRegion = lineRect - m_channelState[channel].motionMask.intersect(lineRect);
             foreach(const QRect& r, drawRegion.rects())
             {
                 gridLines << QPointF(r.left()*xStep, y*yStep) << QPointF(qMin(rect.width(), (r.left()+r.width())*xStep), y*yStep);
@@ -1040,7 +1017,7 @@ void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, con
     ensureMotionMaskBinData();
 
     QPainterPath motionPath;
-    motion->removeMotion(m_motionMaskBinData[motion->channelNumber]);
+    motion->removeMotion(m_channelState[motion->channelNumber].motionMaskBinData);
     for (int y = 0; y < MD_HEIGHT; ++y)
         for (int x = 0; x < MD_WIDTH; ++x)
             if(motion->isMotionAt(x, y))
@@ -1067,5 +1044,5 @@ void QnResourceWidget::drawFilledRegion(QPainter *painter, const QRectF &rect, c
 void QnResourceWidget::drawMotionMask(QPainter *painter, const QRectF &rect, int channel)
 {
     ensureMotionMask();
-    drawFilledRegion(painter, rect, m_motionMaskList[channel], qnGlobals->motionMaskColor());
+    drawFilledRegion(painter, rect, m_channelState[channel].motionMask, qnGlobals->motionMaskColor());
 }
