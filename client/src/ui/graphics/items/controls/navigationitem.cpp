@@ -214,7 +214,7 @@ NavigationItem::NavigationItem(QGraphicsItem *parent):
     //connect(m_syncButton, SIGNAL(toggled(bool)), this, SIGNAL(enableItemSync(bool)));
     connect(m_syncButton, SIGNAL(toggled(bool)), this, SLOT(onSyncButtonToggled(bool)));
 
-    m_volumeSlider = new QnVolumeSlider(Qt::Horizontal, this);
+    m_volumeSlider = new QnVolumeSlider(this);
     m_volumeSlider->setObjectName("QnVolumeSlider");
     m_volumeSlider->setCacheMode(QGraphicsItem::ItemCoordinateCache);
     m_volumeSlider->setFocusProxy(this);

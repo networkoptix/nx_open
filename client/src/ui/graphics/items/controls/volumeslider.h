@@ -13,7 +13,7 @@ class QnVolumeSlider : public QnToolTipSlider
     typedef QnToolTipSlider base_type;
 
 public:
-    explicit QnVolumeSlider(Qt::Orientation orientation = Qt::Horizontal, QGraphicsItem *parent = 0);
+    explicit QnVolumeSlider(QGraphicsItem *parent = 0);
     virtual ~QnVolumeSlider();
 
     bool isMute() const;

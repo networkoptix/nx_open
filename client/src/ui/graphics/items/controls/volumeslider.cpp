@@ -31,8 +31,8 @@ public:
 };
 
 
-QnVolumeSlider::QnVolumeSlider(Qt::Orientation orientation, QGraphicsItem *parent): 
-    base_type(orientation, parent)
+QnVolumeSlider::QnVolumeSlider(QGraphicsItem *parent): 
+    base_type(parent)
 {
     setStyle(new VolumeSliderProxyStyle(this));
 
@@ -40,6 +40,8 @@ QnVolumeSlider::QnVolumeSlider(Qt::Orientation orientation, QGraphicsItem *paren
     setSliderPosition(QtvAudioDevice::instance()->volume() * 100);
 
     connect(this, SIGNAL(valueChanged(int)), this, SLOT(onValueChanged(int)));
+
+    sliderChange(SliderValueChange);
 }
 
 QnVolumeSlider::~QnVolumeSlider() {
