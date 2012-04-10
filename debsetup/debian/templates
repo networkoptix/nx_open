@@ -1,0 +1,39 @@
+
+Template: networkoptix-mediaserver/ecs_host
+Type: string
+Default: localhost
+Description: Enterprise Controller host:
+
+Template: networkoptix-mediaserver/ecs_port
+Type: string
+Default: 7001
+Description: Enterprise Controller port:
+
+Template: networkoptix-mediaserver/ecs_login
+Type: string
+Default: admin
+Description: Enterprise Controller login:
+
+Template: networkoptix-mediaserver/ecs_password
+Type: string
+Default: 
+Description: Enterprise Controller password:
+ If empty the old password (if exists) will be used.
+
+Template: networkoptix-mediaserver/storage
+Type: string
+Default: /opt/networkoptix/mediaserver/var/data
+Description: Storage folder
+
+Template: networkoptix-mediaserver/ecs_port_invalid
+Type: error
+Description: The port is invalid. Please try again.
+
+Template: networkoptix-mediaserver/storage_abspath
+Type: error
+Description: Please specify an absolute path (starting with /)
+
+Template: networkoptix-mediaserver/storage_cant_create
+Type: error
+Description: Can't create directory. Please check it's correct
+ and you have appropriate permissions.

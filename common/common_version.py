@@ -35,3 +35,6 @@ def set_env():
     os.putenv('REVISION', REVISION)
     os.putenv('FFMPEG_VERSION', FFMPEG_VERSION)
     return ORGANIZATION_NAME, APPLICATION_VERSION, BUILD_NUMBER, REVISION, FFMPEG_VERSION
+
+if __name__ == '__main__':
+    print APPLICATION_VERSION

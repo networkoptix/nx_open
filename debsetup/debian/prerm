@@ -1,0 +1,13 @@
+#!/bin/bash -e
+
+. /usr/share/debconf/confmodule
+
+if [ -n "$DEBIAN_SCRIPT_DEBUG" ]; then set -v -x; DEBIAN_SCRIPT_TRACE=1; fi
+${DEBIAN_SCRIPT_TRACE:+ echo "#42#DEBUG# RUNNING $0 $*" 1>&2 }
+
+# Automatically added by dh_installinit
+if [ -e "/etc/init/networkoptix-mediaserver.conf" ]; then
+	invoke-rc.d networkoptix-mediaserver stop || exit $?
+fi
+# End automatically added section
+

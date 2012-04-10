@@ -1,26 +1,33 @@
 #include <QString>
-#include <QSettings>
 #include <QUuid>
 
 #include "serverutil.h"
-#include "version.h"
+#include "settings.h"
 
 QString serverGuid()
 {
-    QSettings settings(QSettings::SystemScope, ORGANIZATION_NAME, APPLICATION_NAME);
-    QString guid = settings.value("serverGuid").toString();
+    QString guid = qSettings.value("serverGuid").toString();
 
     if (guid.isEmpty())
     {
-        if (!settings.isWritable())
+        if (!qSettings.isWritable())
         {
             return guid;
         }
 
         guid = QUuid::createUuid().toString();
-        settings.setValue("serverGuid", guid);
+        qSettings.setValue("serverGuid", guid);
     }
 
     return guid;
+}
+
+QString getDataDirectory()
+{
+#ifdef Q_OS_LINUX
+    return "/opt/networkoptix/mediaserver/var";
+#else
+    return QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+#endif
 }
 

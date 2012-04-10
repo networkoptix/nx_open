@@ -5,6 +5,7 @@
 #include <QFileInfo>
 #include <QDir>
 #include "recording/file_deletor.h"
+#include "serverutil.h"
 
 QnMotionHelper::QnMotionHelper()
 {

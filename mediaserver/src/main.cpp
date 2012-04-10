@@ -1,7 +1,6 @@
 #include <qtsinglecoreapplication.h>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDir>
-#include <QtCore/QSettings>
 #include <QtCore/QUrl>
 #include <QtCore/QUuid>
 
@@ -46,6 +45,7 @@
 #include "plugins/resources/onvif/onvif_ws_searcher.h"
 #include "utils/common/command_line_parser.h"
 #include "plugins/resources/pulse/pulse_resource_searcher.h"
+#include "settings.h"
 
 
 static const char SERVICE_NAME[] = "Network Optix VMS Media Server";
@@ -190,14 +190,12 @@ void ffmpegInit()
 
 QnStorageResourcePtr createDefaultStorage()
 {
-    QSettings settings(QSettings::SystemScope, ORGANIZATION_NAME, APPLICATION_NAME);
-
     QnStorageResourcePtr storage(new QnStorageResource());
     storage->setName("Initial");
 #ifdef Q_OS_WIN
-    storage->setUrl(QDir::fromNativeSeparators(settings.value("mediaDir", "c:/records").toString()));
+    storage->setUrl(QDir::fromNativeSeparators(qSettings.value("mediaDir", "c:/records").toString()));
 #else
-    storage->setUrl(QDir::fromNativeSeparators(settings.value("mediaDir", "/tmp/vmsrecords").toString()));
+    storage->setUrl(QDir::fromNativeSeparators(qSettings.value("mediaDir", "/tmp/vmsrecords").toString()));
 #endif
     storage->setSpaceLimit(5ll * 1000000000);
 
@@ -208,11 +206,9 @@ QnStorageResourcePtr createDefaultStorage()
 
 void setServerNameAndUrls(QnVideoServerResourcePtr server, const QString& myAddress)
 {
-    QSettings settings(QSettings::SystemScope, ORGANIZATION_NAME, APPLICATION_NAME);
-
     server->setName(QString("Server ") + myAddress);
-    server->setUrl(QString("rtsp://") + myAddress + QString(':') + settings.value("rtspPort", DEFAUT_RTSP_PORT).toString());
-    server->setApiUrl(QString("http://") + myAddress + QString(':') + settings.value("apiPort", DEFAULT_REST_PORT).toString());
+    server->setUrl(QString("rtsp://") + myAddress + QString(':') + qSettings.value("rtspPort", DEFAUT_RTSP_PORT).toString());
+    server->setApiUrl(QString("http://") + myAddress + QString(':') + qSettings.value("apiPort", DEFAULT_REST_PORT).toString());
 }
 
 QnVideoServerResourcePtr createServer()
@@ -307,8 +303,7 @@ int serverMain(int argc, char *argv[])
     dataDirectory.mkpath(dataLocation + QLatin1String("/log"));
 
     QString logFileName = dataLocation + QLatin1String("/log/log_file");
-    QSettings settings(QSettings::SystemScope, ORGANIZATION_NAME, APPLICATION_NAME);
-    settings.setValue("logFile", logFileName);
+    qSettings.setValue("logFile", logFileName);
 
     if (!cl_log.create(logFileName, 1024*1024*10, 5, cl_logDEBUG1))
     {
@@ -420,9 +415,6 @@ public:
 
     void run()
     {
-        // Use system scope
-        QSettings settings(QSettings::SystemScope, ORGANIZATION_NAME, APPLICATION_NAME);
-
         // Create SessionManager
         SessionManager* sm = SessionManager::instance();
 
@@ -435,7 +427,7 @@ public:
         thread->start();
         sm->start();
 
-        initAppServerConnection(settings);
+        initAppServerConnection(qSettings);
 
         QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
@@ -457,7 +449,7 @@ public:
 
         QnResourcePool::instance(); // to initialize net state;
 
-        QString appserverHostString = settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
+        QString appserverHostString = qSettings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
 
         QHostAddress appserverHost;
         do
@@ -486,7 +478,7 @@ public:
                 QnSleep::msleep(1000);
         }
 
-        initAppServerEventConnection(settings, videoServer);
+        initAppServerEventConnection(qSettings, videoServer);
         QnEventManager* eventManager = QnEventManager::instance();
         eventManager->run();
 
@@ -652,9 +644,6 @@ int main(int argc, char* argv[])
     QCoreApplication::setApplicationVersion(QLatin1String(APPLICATION_VERSION));
 
     QCoreApplication app(argc, argv);
-
-    // Use system scope
-    QSettings settings(QSettings::SystemScope, ORGANIZATION_NAME, APPLICATION_NAME);
 
     // Create SessionManager
     SessionManager* sm = SessionManager::instance();

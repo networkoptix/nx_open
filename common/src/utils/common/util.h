@@ -24,11 +24,6 @@ QN_EXPORT bool removeDir(const QString &dirName);
 QN_EXPORT QString fromNativePath(QString path);
 
 /**
- * \returns                             User data directory. Directory should be available for writing.
- */
-QN_EXPORT QString getDataDirectory();
-
-/**
  * \returns                             User movies directory.
  */
 QN_EXPORT QString getMoviesDirectory();
