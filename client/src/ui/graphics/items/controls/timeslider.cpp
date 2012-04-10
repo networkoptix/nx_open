@@ -19,12 +19,11 @@
 #include "ui/style/proxy_style.h"
 
 #include "ui/graphics/items/standard/graphicsframe.h"
-#include "ui/graphics/items/standard/graphicsslider.h"
-#include "ui/graphics/items/controls/tool_tip_item.h"
 
 #include <qmath.h>
 #include "utils/common/synctime.h"
 #include "ui/style/globals.h"
+#include "tool_tip_slider.h"
 
 //#define TIMESLIDER_ANIMATED_DRAG
 
@@ -81,13 +80,12 @@ public:
 // -------------------------------------------------------------------------- //
 // MySlider
 // -------------------------------------------------------------------------- //
-class MySlider : public GraphicsSlider
+class MySlider : public QnToolTipSlider
 {
+    typedef QnToolTipSlider base_type;
+
 public:
     MySlider(TimeSlider *parent);
-
-    QnToolTipItem *toolTipItem() const;
-    void setToolTipItem(QnToolTipItem *toolTip);
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
@@ -106,8 +104,6 @@ protected:
 
     void resizeEvent(QGraphicsSceneResizeEvent *event);
 
-    void updateToolTipPos();
-
 private:
     void invalidateHandleRect();
     void ensureHandleRect() const;
@@ -115,7 +111,6 @@ private:
     void createEndPixmap();
 private:
     TimeSlider *m_parent;
-    QnToolTipItem *m_toolTip;
     mutable QRectF m_handleRect;
     int m_endSize;
     QPixmap m_pixmap;
@@ -125,18 +120,11 @@ private:
 };
 
 MySlider::MySlider(TimeSlider *parent)
-    : GraphicsSlider(parent),
+    : base_type(parent),
       m_parent(parent),
-      m_toolTip(0),
       m_endSize(0)
 {
-    setToolTipItem(new QnToolTipItem);
-}
-
-void MySlider::updateToolTipPos()
-{
-    ensureHandleRect();
-    m_toolTip->setPos(m_handleRect.center().x(), m_handleRect.top());
+    setAutoHideToolTip(false);
 }
 
 void MySlider::createEndPixmap()
@@ -163,25 +151,6 @@ bool MySlider::isAtEnd() const
 void MySlider::setEndSize(int size)
 {
     m_endSize = size;
-}
-
-QnToolTipItem *MySlider::toolTipItem() const
-{
-    return m_toolTip;
-}
-
-void MySlider::setToolTipItem(QnToolTipItem *toolTip)
-{
-    if (m_toolTip == toolTip)
-        return;
-
-    delete m_toolTip;
-
-    m_toolTip = toolTip;
-    //m_toolTip->setCacheMode(QGraphicsItem::ItemCoordinateCache);
-
-    if (m_toolTip)
-        m_toolTip->setParentItem(this);
 }
 
 qreal MySlider::getMsInPixel() const
@@ -321,30 +290,21 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
 void MySlider::sliderChange(SliderChange change)
 {
-    GraphicsSlider::sliderChange(change);
+    base_type::sliderChange(change);
 
-    if (change == SliderValueChange && m_toolTip) {
-        invalidateHandleRect();
-        updateToolTipPos();
-    }
+    invalidateHandleRect();
 }
 
 QVariant MySlider::itemChange(GraphicsItemChange change, const QVariant &value)
 {
-    if (change == ItemToolTipHasChanged && m_toolTip) {
-        m_toolTip->setText(value.toString());
-        m_toolTip->setVisible(!m_toolTip->text().isEmpty());
-    }
-
-    return GraphicsSlider::itemChange(change, value);
+    return base_type::itemChange(change, value);
 }
 
 void MySlider::resizeEvent(QGraphicsSceneResizeEvent *event)
 {
-    GraphicsSlider::resizeEvent(event);
+    base_type::resizeEvent(event);
 
     invalidateHandleRect();
-    updateToolTipPos();
 }
 
 void MySlider::invalidateHandleRect()

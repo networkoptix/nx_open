@@ -28,59 +28,6 @@
 static const int SLIDER_NOW_AREA_WIDTH = 30;
 static const int TIME_PERIOD_UPDATE_INTERVAL = 1000 * 10;
 
-class SliderToolTipItem : public QnToolTipItem
-{
-public:
-    SliderToolTipItem(AbstractGraphicsSlider *slider, QGraphicsItem *parent = 0)
-        : QnToolTipItem(parent), m_slider(slider)
-    {
-        setAcceptHoverEvents(true);
-        setOpacity(0.75);
-    }
-
-private:
-    AbstractGraphicsSlider *const m_slider;
-    QPointF m_pos;
-};
-
-
-class TimeSliderToolTipItem : public QnToolTipItem
-{
-public:
-    TimeSliderToolTipItem(TimeSlider *slider, QGraphicsItem *parent = 0)
-        : QnToolTipItem(parent), m_slider(slider)
-    {
-        setAcceptHoverEvents(true);
-        setOpacity(0.75);
-    }
-
-protected:
-    void mousePressEvent(QGraphicsSceneMouseEvent *event)
-    {
-        m_pos = mapToItem(m_slider, event->pos());
-        m_slider->setMoving(true);
-    }
-
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *event)
-    {
-        QPointF pos = mapToItem(m_slider, event->pos());
-        qint64 shift = qreal(m_slider->sliderRange()) / m_slider->rect().width() * (pos - m_pos).x();
-        m_slider->setCurrentValue(m_slider->currentValue() + shift);
-        m_pos = pos;
-    }
-
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
-    {
-        Q_UNUSED(event)
-        m_slider->setMoving(false);
-    }
-
-private:
-    TimeSlider *const m_slider;
-    QPointF m_pos;
-};
-
-
 NavigationItem::NavigationItem(QGraphicsItem *parent): 
     base_type(parent),
     m_camera(0), 

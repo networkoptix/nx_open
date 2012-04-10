@@ -30,12 +30,12 @@ protected:
     virtual void timerEvent(QTimerEvent *event) override;
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
+    virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override;
 
 private:
     void hideToolTip();
     void showToolTip();
     
-private slots:
     void updateToolTipVisibility();
     void updateToolTipPosition();
 

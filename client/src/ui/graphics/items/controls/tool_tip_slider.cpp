@@ -40,8 +40,6 @@ QnToolTipSlider::QnToolTipSlider(QGraphicsItem *parent):
     setToolTipItem(new QnSliderToolTipItem());
     setAcceptHoverEvents(true);
 
-    connect(this, SIGNAL(geometryChanged()), this, SLOT(updateToolTipPosition()));
-
     updateToolTipPosition();
     updateToolTipVisibility();
 }
@@ -228,4 +226,8 @@ void QnToolTipSlider::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
     updateToolTipVisibility();
 }
 
+void QnToolTipSlider::resizeEvent(QGraphicsSceneResizeEvent *event) {
+    base_type::resizeEvent(event);
 
+    updateToolTipPosition();
+}
