@@ -11,11 +11,11 @@ class GraphicsSliderPrivate : public AbstractGraphicsSliderPrivate
 public:
     QStyle::SubControl pressedControl;
     GraphicsSlider::TickPosition tickPosition;
-    int tickInterval;
+    qint64 tickInterval;
     int clickOffset;
 
     void init();
-    int pixelPosToRangeValue(int pos) const;
+    qint64 pixelPosToRangeValue(int pos) const;
     inline int pick(const QPoint &pt) const
     { return orientation == Qt::Horizontal ? pt.x() : pt.y(); }
 

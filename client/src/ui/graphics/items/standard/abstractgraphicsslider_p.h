@@ -34,14 +34,14 @@ public:
 #endif
     }
 
-    void setSteps(int single, int page);
+    void setSteps(qint64 single, qint64 page);
 
     Qt::Orientation orientation;
 
-    int minimum, maximum, pageStep, value, position, pressValue;
+    qint64 minimum, maximum, pageStep, value, position, pressValue;
 
     // Call effectiveSingleStep() when changing the slider value.
-    int singleStep;
+    qint64 singleStep;
 
     float offset_accumulated;
     uint tracking            : 1;
@@ -56,7 +56,7 @@ public:
     AbstractGraphicsSlider::SliderAction repeatAction;
 
 #ifdef QT_KEYPAD_NAVIGATION
-    int origValue;
+    qint64 origValue;
 
     bool isAutoRepeating;
 
@@ -68,7 +68,7 @@ public:
     QElapsedTimer firstRepeat;
 #endif
 
-    inline int effectiveSingleStep() const
+    inline qint64 effectiveSingleStep() const
     {
         return singleStep
 #ifdef QT_KEYPAD_NAVIGATION
@@ -77,17 +77,7 @@ public:
         ;
     }
 
-    inline int overflowSafeAdd(int add) const
-    {
-        int newValue = value + add;
-        if (add > 0 && newValue < value)
-            newValue = maximum;
-        else if (add < 0 && newValue > value)
-            newValue = minimum;
-        return newValue;
-    }
-
-    inline void setAdjustedSliderPosition(int position)
+    inline void setAdjustedSliderPosition(qint64 position)
     {
         Q_Q(AbstractGraphicsSlider);
         if (q->style()->styleHint(QStyle::SH_Slider_StopMouseOverSlider)) {

@@ -43,7 +43,7 @@ void QnVolumeSlider::sliderChange(SliderChange change) {
     base_type::sliderChange(change);
     
     if(change == SliderValueChange) {
-        int value = this->value();
+        qint64 value = this->value();
 
         QtvAudioDevice::instance()->setVolume(value / 100.0);
         setToolTip(QtvAudioDevice::instance()->isMute() ? tr("Muted") : tr("%1%").arg(value));

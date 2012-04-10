@@ -8,6 +8,13 @@
 #include <QtGui/QGraphicsSceneEvent>
 #include <QtGui/QStyleOption>
 
+namespace {
+    bool isInt(qint64 value) {
+        return value >= std::numeric_limits<int>::min() && value <= std::numeric_limits<int>::max();
+    }
+
+} // anonymous namespace
+
 /*!
     \class AbstractGraphicsSlider
     \brief The AbstractGraphicsSlider class provides an integer value within a range.
@@ -160,7 +167,7 @@
     \value SliderValueChange
 */
 
-void AbstractGraphicsSliderPrivate::setSteps(int single, int page)
+void AbstractGraphicsSliderPrivate::setSteps(qint64 single, qint64 page)
 {
     Q_Q(AbstractGraphicsSlider);
     singleStep = qAbs(single);
@@ -232,12 +239,12 @@ void AbstractGraphicsSlider::setOrientation(Qt::Orientation orientation)
     necessary to ensure that the range remains valid. Also the
     slider's current value is adjusted to be within the new range.
 */
-int AbstractGraphicsSlider::minimum() const
+qint64 AbstractGraphicsSlider::minimum() const
 {
     return d_func()->minimum;
 }
 
-void AbstractGraphicsSlider::setMinimum(int min)
+void AbstractGraphicsSlider::setMinimum(qint64 min)
 {
     setRange(min, qMax(d_func()->maximum, min));
 }
@@ -250,12 +257,12 @@ void AbstractGraphicsSlider::setMinimum(int min)
     necessary to ensure that the range remains valid.  Also the
     slider's current value is adjusted to be within the new range.
 */
-int AbstractGraphicsSlider::maximum() const
+qint64 AbstractGraphicsSlider::maximum() const
 {
     return d_func()->maximum;
 }
 
-void AbstractGraphicsSlider::setMaximum(int max)
+void AbstractGraphicsSlider::setMaximum(qint64 max)
 {
     setRange(qMin(d_func()->minimum, max), max);
 }
@@ -267,11 +274,11 @@ void AbstractGraphicsSlider::setMaximum(int max)
 
     \sa minimum, maximum
 */
-void AbstractGraphicsSlider::setRange(int min, int max)
+void AbstractGraphicsSlider::setRange(qint64 min, qint64 max)
 {
     Q_D(AbstractGraphicsSlider);
-    int oldMin = d->minimum;
-    int oldMax = d->maximum;
+    qint64 oldMin = d->minimum;
+    qint64 oldMax = d->maximum;
     d->minimum = min;
     d->maximum = qMax(min, max);
     if (oldMin != d->minimum || oldMax != d->maximum) {
@@ -294,12 +301,12 @@ void AbstractGraphicsSlider::setRange(int min, int max)
 
     \sa pageStep
 */
-int AbstractGraphicsSlider::singleStep() const
+qint64 AbstractGraphicsSlider::singleStep() const
 {
     return d_func()->singleStep;
 }
 
-void AbstractGraphicsSlider::setSingleStep(int step)
+void AbstractGraphicsSlider::setSingleStep(qint64 step)
 {
     Q_D(AbstractGraphicsSlider);
     if (step != d->singleStep)
@@ -315,12 +322,12 @@ void AbstractGraphicsSlider::setSingleStep(int step)
 
     \sa singleStep
 */
-int AbstractGraphicsSlider::pageStep() const
+qint64 AbstractGraphicsSlider::pageStep() const
 {
     return d_func()->pageStep;
 }
 
-void AbstractGraphicsSlider::setPageStep(int step)
+void AbstractGraphicsSlider::setPageStep(qint64 step)
 {
     Q_D(AbstractGraphicsSlider);
     if (step != d->pageStep)
@@ -387,12 +394,12 @@ void AbstractGraphicsSlider::setSliderDown(bool down)
 
     If \l tracking is enabled (the default), this is identical to \l value.
 */
-int AbstractGraphicsSlider::sliderPosition() const
+qint64 AbstractGraphicsSlider::sliderPosition() const
 {
     return d_func()->position;
 }
 
-void AbstractGraphicsSlider::setSliderPosition(int position)
+void AbstractGraphicsSlider::setSliderPosition(qint64 position)
 {
     Q_D(AbstractGraphicsSlider);
     position = qBound(d->minimum, position, d->maximum);
@@ -416,12 +423,12 @@ void AbstractGraphicsSlider::setSliderPosition(int position)
 
     Changing the value also changes the \l sliderPosition.
 */
-int AbstractGraphicsSlider::value() const
+qint64 AbstractGraphicsSlider::value() const
 {
     return d_func()->value;
 }
 
-void AbstractGraphicsSlider::setValue(int value)
+void AbstractGraphicsSlider::setValue(qint64 value)
 {
     Q_D(AbstractGraphicsSlider);
     value = qBound(d->minimum, value, d->maximum);
@@ -511,16 +518,16 @@ void AbstractGraphicsSlider::triggerAction(SliderAction action)
     d->blockTracking = true;
     switch (action) {
     case SliderSingleStepAdd:
-        setSliderPosition(d->overflowSafeAdd(d->effectiveSingleStep()));
+        setSliderPosition(d->value + d->effectiveSingleStep());
         break;
     case SliderSingleStepSub:
-        setSliderPosition(d->overflowSafeAdd(-d->effectiveSingleStep()));
+        setSliderPosition(d->value - d->effectiveSingleStep());
         break;
     case SliderPageStepAdd:
-        setSliderPosition(d->overflowSafeAdd(d->pageStep));
+        setSliderPosition(d->value + d->pageStep);
         break;
     case SliderPageStepSub:
-        setSliderPosition(d->overflowSafeAdd(-d->pageStep));
+        setSliderPosition(d->value - d->pageStep);
         break;
     case SliderToMinimum:
         setSliderPosition(d->minimum);
@@ -578,7 +585,7 @@ void AbstractGraphicsSlider::sliderChange(SliderChange)
 bool AbstractGraphicsSliderPrivate::scrollByDelta(Qt::Orientation orientation, Qt::KeyboardModifiers modifiers, int delta)
 {
     Q_Q(AbstractGraphicsSlider);
-    int stepsToScroll = 0;
+    qint64 stepsToScroll = 0;
     // in Qt scrolling to the right gives negative values.
     if (orientation == Qt::Horizontal)
         delta = -delta;
@@ -586,7 +593,7 @@ bool AbstractGraphicsSliderPrivate::scrollByDelta(Qt::Orientation orientation, Q
 
     if (modifiers & (Qt::ControlModifier | Qt::ShiftModifier)) {
         // Scroll one page regardless of delta:
-        stepsToScroll = qBound(-pageStep, int(offset * pageStep), pageStep);
+        stepsToScroll = qBound(-pageStep, qint64(offset * pageStep), pageStep);
         offset_accumulated = 0;
     } else {
         // Calculate how many lines to scroll. Depending on what delta is (and
@@ -604,12 +611,12 @@ bool AbstractGraphicsSliderPrivate::scrollByDelta(Qt::Orientation orientation, Q
         offset_accumulated += stepsToScrollF;
         if (!acceleratedWheeling) {
             // Don't scroll more than one page in any case
-            stepsToScroll = qBound(-pageStep, int(offset_accumulated), pageStep);
+            stepsToScroll = qBound(-pageStep, qint64(offset_accumulated), pageStep);
         } else {
             // Make it able scroll hundreds of lines at a time as a result of acceleration
-            stepsToScroll = int(offset_accumulated);
+            stepsToScroll = qint64(offset_accumulated);
         }
-        offset_accumulated -= int(offset_accumulated);
+        offset_accumulated -= qint64(offset_accumulated);
         if (stepsToScroll == 0)
             return false;
     }
@@ -617,9 +624,9 @@ bool AbstractGraphicsSliderPrivate::scrollByDelta(Qt::Orientation orientation, Q
     if (invertedControls)
         stepsToScroll = -stepsToScroll;
 
-    int prevPosition = position;
+    qint64 prevPosition = position;
 
-    q->setSliderPosition(overflowSafeAdd(stepsToScroll));
+    q->setSliderPosition(value + stepsToScroll);
 
     if (prevPosition == position) {
         offset_accumulated = 0;
@@ -785,16 +792,28 @@ void AbstractGraphicsSlider::initStyleOption(QStyleOption *option) const
         sliderOption->subControls = QStyle::SC_None;
         sliderOption->activeSubControls = QStyle::SC_None;
         sliderOption->orientation = d->orientation;
-        sliderOption->maximum = d->maximum;
-        sliderOption->minimum = d->minimum;
         sliderOption->upsideDown = d->orientation == Qt::Horizontal
                                    ? d->invertedAppearance != (option->direction == Qt::RightToLeft)
                                    : !d->invertedAppearance;
         sliderOption->direction = Qt::LeftToRight; // we use the upsideDown option instead
-        sliderOption->sliderPosition = d->position;
-        sliderOption->sliderValue = d->value;
-        sliderOption->singleStep = d->singleStep;
-        sliderOption->pageStep = d->pageStep;
+        
+        if(isInt(d->maximum) && isInt(d->minimum)) {
+            sliderOption->maximum = d->maximum;
+            sliderOption->minimum = d->minimum;
+            sliderOption->sliderPosition = d->position;
+            sliderOption->sliderValue = d->value;
+            sliderOption->singleStep = d->singleStep;
+            sliderOption->pageStep = d->pageStep;
+        } else {
+            qint64 k = qMax(qAbs(d->maximum), qAbs(d->minimum)) / (std::numeric_limits<int>::max() / 2) + 1;
+
+            sliderOption->maximum           = d->maximum / k;
+            sliderOption->minimum           = d->minimum / k;
+            sliderOption->sliderPosition    = d->position / k;
+            sliderOption->sliderValue       = d->value / k;
+            sliderOption->singleStep        = d->singleStep / k;
+            sliderOption->pageStep          = d->pageStep / k;
+        }
     }
 }
 
@@ -844,9 +863,9 @@ void AbstractGraphicsSlider::timerEvent(QTimerEvent *event)
             d->repeatActionTime = 0;
         }
         if (d->repeatAction == SliderPageStepAdd)
-            d->setAdjustedSliderPosition(d->overflowSafeAdd(d->pageStep));
+            d->setAdjustedSliderPosition(d->value + d->pageStep);
         else if (d->repeatAction == SliderPageStepSub)
-            d->setAdjustedSliderPosition(d->overflowSafeAdd(-d->pageStep));
+            d->setAdjustedSliderPosition(d->value - d->pageStep);
         else
             triggerAction(d->repeatAction);
     }
@@ -862,3 +881,29 @@ void AbstractGraphicsSlider::wheelEvent(QGraphicsSceneWheelEvent *event)
     d_func()->scrollByDelta(event->orientation(), event->modifiers(), event->delta());
 }
 #endif
+
+
+qreal AbstractGraphicsSlider::sliderPositionFromValue(qint64 min, qint64 max, qint64 logicalValue, qreal span, bool upsideDown) {
+    if (span <= 0 || logicalValue < min || max <= min)
+        return 0;
+
+    if (logicalValue > max)
+        return upsideDown ? span : min;
+
+    qint64 range = max - min;
+    qint64 p = upsideDown ? max - logicalValue : logicalValue - min;
+
+    return p / (range / span);
+}
+
+qint64 AbstractGraphicsSlider::sliderValueFromPosition(qint64 min, qint64 max, qreal pos, qreal span, bool upsideDown) {
+    if (span <= 0 || pos <= 0)
+        return upsideDown ? max : min;
+
+    if (pos >= span)
+        return upsideDown ? min : max;
+
+    qreal tmp = qRound64((max - min) * (pos / span));
+    return upsideDown ? max - tmp : tmp + min;
+}
+

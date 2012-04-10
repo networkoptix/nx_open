@@ -27,9 +27,6 @@ public:
     virtual void polish(QWidget *widget) override;
     virtual void unpolish(QWidget *widget) override;
 
-    static qreal sliderPositionFromValue(qint64 min, qint64 max, qint64 logicalValue, qreal span, bool upsideDown);
-    static qint64 sliderValueFromPosition(qint64 min, qint64 max, qreal pos, qreal span, bool upsideDown);
-
 protected:
     bool drawMenuItemControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
     bool drawItemViewItemControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;

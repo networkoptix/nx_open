@@ -10,7 +10,7 @@ class GraphicsSlider : public AbstractGraphicsSlider
 
     Q_ENUMS(TickPosition)
     Q_PROPERTY(TickPosition tickPosition READ tickPosition WRITE setTickPosition)
-    Q_PROPERTY(int tickInterval READ tickInterval WRITE setTickInterval)
+    Q_PROPERTY(qint64 tickInterval READ tickInterval WRITE setTickInterval)
 
 public:
     enum TickPosition {
@@ -29,8 +29,8 @@ public:
     void setTickPosition(TickPosition position);
     TickPosition tickPosition() const;
 
-    void setTickInterval(int ti);
-    int tickInterval() const;
+    void setTickInterval(qint64 tickInterval);
+    qint64 tickInterval() const;
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 

@@ -27,7 +27,7 @@ void GraphicsSliderPrivate::init()
     q->setSizePolicy(sp);
 }
 
-int GraphicsSliderPrivate::pixelPosToRangeValue(int pos) const
+qint64 GraphicsSliderPrivate::pixelPosToRangeValue(int pos) const
 {
     Q_Q(const GraphicsSlider);
 
@@ -45,7 +45,7 @@ int GraphicsSliderPrivate::pixelPosToRangeValue(int pos) const
         sliderMax = grooveRect.bottom() - handleRect.height() + 1;
     }
 
-    return QStyle::sliderValueFromPosition(minimum, maximum, pos - sliderMin, sliderMax - sliderMin, opt.upsideDown);
+    return q->sliderValueFromPosition(minimum, maximum, pos - sliderMin, sliderMax - sliderMin, opt.upsideDown);
 }
 
 void GraphicsSliderPrivate::updateHoverControl(const QPoint &pos)
@@ -266,7 +266,7 @@ void GraphicsSlider::mousePressEvent(QGraphicsSceneMouseEvent *ev)
     const QRect sliderRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle);
     // to take half of the slider off for the setSliderPosition call we use the center - topLeft
     const QPoint center = sliderRect.center() - sliderRect.topLeft();
-    const int pressValue = d->pixelPosToRangeValue(d->pick(ev->pos().toPoint() - center));
+    const qint64 pressValue = d->pixelPosToRangeValue(d->pick(ev->pos().toPoint() - center));
 
     ev->accept();
     if ((ev->button() & style()->styleHint(QStyle::SH_Slider_AbsoluteSetButtons)) != 0) {
@@ -432,13 +432,13 @@ GraphicsSlider::TickPosition GraphicsSlider::tickPosition() const
 
     \sa tickPosition, lineStep(), pageStep()
 */
-int GraphicsSlider::tickInterval() const
+qint64 GraphicsSlider::tickInterval() const
 {
     return d_func()->tickInterval;
 }
 
-void GraphicsSlider::setTickInterval(int ts)
+void GraphicsSlider::setTickInterval(qint64 tickInterval)
 {
-    d_func()->tickInterval = qMax(0, ts);
+    d_func()->tickInterval = qMax(0ll, tickInterval);
     update();
 }

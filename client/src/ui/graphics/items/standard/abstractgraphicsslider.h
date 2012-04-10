@@ -8,12 +8,12 @@ class AbstractGraphicsSlider : public GraphicsWidget
 {
     Q_OBJECT
     Q_PROPERTY(Qt::Orientation orientation READ orientation WRITE setOrientation)
-    Q_PROPERTY(int minimum READ minimum WRITE setMinimum)
-    Q_PROPERTY(int maximum READ maximum WRITE setMaximum)
-    Q_PROPERTY(int singleStep READ singleStep WRITE setSingleStep)
-    Q_PROPERTY(int pageStep READ pageStep WRITE setPageStep)
-    Q_PROPERTY(int sliderPosition READ sliderPosition WRITE setSliderPosition NOTIFY sliderMoved)
-    Q_PROPERTY(int value READ value WRITE setValue NOTIFY valueChanged USER true)
+    Q_PROPERTY(qint64 minimum READ minimum WRITE setMinimum)
+    Q_PROPERTY(qint64 maximum READ maximum WRITE setMaximum)
+    Q_PROPERTY(qint64 singleStep READ singleStep WRITE setSingleStep)
+    Q_PROPERTY(qint64 pageStep READ pageStep WRITE setPageStep)
+    Q_PROPERTY(qint64 sliderPosition READ sliderPosition WRITE setSliderPosition NOTIFY sliderMoved)
+    Q_PROPERTY(qint64 value READ value WRITE setValue NOTIFY valueChanged USER true)
     Q_PROPERTY(bool tracking READ hasTracking WRITE setTracking)
     Q_PROPERTY(bool invertedAppearance READ invertedAppearance WRITE setInvertedAppearance)
     Q_PROPERTY(bool invertedControls READ invertedControls WRITE setInvertedControls)
@@ -27,19 +27,19 @@ public:
     Qt::Orientation orientation() const;
     void setOrientation(Qt::Orientation);
 
-    int minimum() const;
-    void setMinimum(int);
+    qint64 minimum() const;
+    void setMinimum(qint64);
 
-    int maximum() const;
-    void setMaximum(int);
+    qint64 maximum() const;
+    void setMaximum(qint64);
 
-    void setRange(int min, int max);
+    void setRange(qint64 min, qint64 max);
 
-    int singleStep() const;
-    void setSingleStep(int);
+    qint64 singleStep() const;
+    void setSingleStep(qint64);
 
-    int pageStep() const;
-    void setPageStep(int);
+    qint64 pageStep() const;
+    void setPageStep(qint64);
 
     bool hasTracking() const;
     void setTracking(bool enable);
@@ -47,10 +47,10 @@ public:
     bool isSliderDown() const;
     void setSliderDown(bool);
 
-    int sliderPosition() const;
-    void setSliderPosition(int);
+    qint64 sliderPosition() const;
+    void setSliderPosition(qint64);
 
-    int value() const;
+    qint64 value() const;
 
     bool invertedAppearance() const;
     void setInvertedAppearance(bool);
@@ -75,16 +75,16 @@ public:
     void triggerAction(SliderAction action);
 
 public Q_SLOTS:
-    void setValue(int);
+    void setValue(qint64);
 
 Q_SIGNALS:
-    void valueChanged(int value);
+    void valueChanged(qint64 value);
 
     void sliderPressed();
-    void sliderMoved(int position);
+    void sliderMoved(qint64 position);
     void sliderReleased();
 
-    void rangeChanged(int min, int max);
+    void rangeChanged(qint64 min, qint64 max);
 
     void actionTriggered(int action);
 
@@ -112,6 +112,9 @@ protected:
 
 protected:
     AbstractGraphicsSlider(AbstractGraphicsSliderPrivate &dd, QGraphicsItem *parent);
+
+    static qreal sliderPositionFromValue(qint64 min, qint64 max, qint64 logicalValue, qreal span, bool upsideDown);
+    static qint64 sliderValueFromPosition(qint64 min, qint64 max, qreal pos, qreal span, bool upsideDown);
 
 private:
     Q_DISABLE_COPY(AbstractGraphicsSlider)

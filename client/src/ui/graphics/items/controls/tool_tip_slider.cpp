@@ -4,7 +4,6 @@
 #include <QtGui/QGraphicsSceneMouseEvent>
 
 #include <ui/animation/widget_opacity_animator.h>
-#include <ui/style/noptix_style.h>
 
 #include "tool_tip_item.h"
 
@@ -144,7 +143,7 @@ bool QnToolTipSlider::sceneEventFilter(QGraphicsItem *target, QEvent *event) {
                 int sliderMin = grooveRect.x();
                 int sliderMax = grooveRect.right() - handleRect.width() + 1;
 
-                qint64 pos = QnNoptixStyle::sliderValueFromPosition(minimum(), maximum(), target->mapToItem(this, e->pos()).x() + m_dragOffset - sliderMin, sliderMax - sliderMin, opt.upsideDown);
+                qint64 pos = sliderValueFromPosition(minimum(), maximum(), target->mapToItem(this, e->pos()).x() + m_dragOffset - sliderMin, sliderMax - sliderMin, opt.upsideDown);
                 setSliderPosition(pos);
 
                 e->accept();
