@@ -242,7 +242,10 @@ QString QnServerStreamRecorder::fillFileName(QnAbstractMediaStreamDataProvider* 
     {
         QnNetworkResourcePtr netResource = qSharedPointerDynamicCast<QnNetworkResource>(m_device);
         Q_ASSERT_X(netResource != 0, Q_FUNC_INFO, "Only network resources can be used with storage manager!");
-        return qnStorageMan->getFileName(m_startDateTime/1000, netResource, DeviceFileCatalog::prefixForRole(m_role), provider);
+        QnStorageResourcePtr storage = qnStorageMan->getOptimalStorageRoot(provider);
+        if (storage)
+            setTruncateInterval(storage->getChunkLen());
+        return qnStorageMan->getFileName(m_startDateTime/1000, netResource, DeviceFileCatalog::prefixForRole(m_role), storage);
     }
     else {
         return m_fixedFileName;

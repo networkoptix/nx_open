@@ -19,7 +19,7 @@ public:
     void addStorage(QnStorageResourcePtr storage);
 
 
-    QString getFileName(const qint64& fileDate, const QnNetworkResourcePtr netResource, const QString& prefix, QnAbstractMediaStreamDataProvider* provider);
+    QString getFileName(const qint64& fileDate, const QnNetworkResourcePtr netResource, const QString& prefix, QnStorageResourcePtr& storage);
     bool fileStarted(const qint64& startDateMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider);
     bool fileFinished(int durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider);
 
@@ -36,8 +36,8 @@ public:
 
     QnTimePeriodList getRecordedPeriods(QnResourceList resList, qint64 startTime, qint64 endTime, qint64 detailLevel);
     void loadFullFileCatalog();
-private:
     QnStorageResourcePtr getOptimalStorageRoot(QnAbstractMediaStreamDataProvider* provider);
+private:
     void clearSpace(QnStorageResourcePtr storage);
     int detectStorageIndex(const QString& path);
     bool deserializeStorageFile();
