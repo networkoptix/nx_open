@@ -1,63 +1,56 @@
 #include "coldstore_storage.h"
 
-QnPlColdStoreStorage::QnPlColdStoreStorage(const QString& storageLink, int minFreeSpace)
-{
-#ifdef Q_OS_WIN
-    WSADATA wsaData;
-    WORD wVersionRequested = MAKEWORD(1, 1);
-    WSAStartup(wVersionRequested, &wsaData);
-#endif
-    const char* ip = "192.168.1.30";
-
-
-    m_csConnection = new Veracity::SFSClient();
-
-    if (m_csConnection->Connect(ip) != Veracity::ISFS::STATUS_SUCCESS)
-        return ;
-
-    int n = 0;
-
-}
-
-QnPlColdStoreStorage::~QnPlColdStoreStorage()
+QnPlColdStoreStorage::QnPlColdStoreStorage()
 {
 
 }
 
-QString QnPlColdStoreStorage::getName() const
+URLProtocol QnPlColdStoreStorage::getURLProtocol() const
 {
-    return "coldstore";
+    return URLProtocol();
 }
 
-STORAGE_FILE_HANDLER QnPlColdStoreStorage::open(const QString& fname)
+int QnPlColdStoreStorage::getChunkLen() const 
 {
-    if (!m_csConnection)
-        return 0;
-
-    
+    return 60*60;
 }
 
-void QnPlColdStoreStorage::close(STORAGE_FILE_HANDLER)
+bool QnPlColdStoreStorage::isStorageAvailable(const QString& value) 
 {
-
+    return true;
 }
 
-void QnPlColdStoreStorage::flush(STORAGE_FILE_HANDLER)
+QFileInfoList QnPlColdStoreStorage::getFileList(const QString& dirName) 
 {
-
+    return QFileInfoList();
 }
 
-int QnPlColdStoreStorage::write(const char* data, int size)
+bool QnPlColdStoreStorage::isNeedControlFreeSpace() 
 {
-    return 0;
+    return true;
 }
 
-int QnPlColdStoreStorage::read(char* data, int size)
+bool QnPlColdStoreStorage::removeFile(const QString& url) 
 {
-    return 0;
+    return false;
 }
 
-int QnPlColdStoreStorage::seek(int shift)
+bool QnPlColdStoreStorage::removeDir(const QString& url) 
 {
-    return 0;
+    return false;
+}
+
+bool QnPlColdStoreStorage::isFileExists(const QString& url) 
+{
+    return false;
+}
+
+bool QnPlColdStoreStorage::isDirExists(const QString& url) 
+{
+    return false;
+}
+
+qint64 QnPlColdStoreStorage::getFreeSpace(const QString& url) 
+{
+    return 10*1024*1024*1024;
 }

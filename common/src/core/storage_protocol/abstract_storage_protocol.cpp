@@ -1,5 +1,11 @@
 #include "abstract_storage_protocol.h"
 
+QnAbstractStorageProtocol::QnAbstractStorageProtocol(const QString& baseUrl):
+m_baseUrl(baseUrl)
+{
+
+}
+
 QString QnAbstractStorageProtocol::removePrefix(const QString& url)
 {
     int prefix = url.indexOf("://");

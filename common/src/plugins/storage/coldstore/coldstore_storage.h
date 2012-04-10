@@ -2,24 +2,27 @@
 #define cold_store_storage_h_1800
 
 #include "coldstore_api/sfs-client.h"
+#include "core/storage_protocol/abstract_storage_protocol.h"
+#include "libavformat/avio.h"
 
 typedef qint64 STORAGE_FILE_HANDLER;
 
-class QnPlColdStoreStorage //: public SomeStorageInterface
+class QnPlColdStoreStorage : public QnAbstractStorageProtocol
 {
 public:
-    QnPlColdStoreStorage(const QString& storageLink, int minFreeSpace = 10);
-    virtual ~QnPlColdStoreStorage();
-    QString getName() const;
-    
-    // returns file handler 
-    STORAGE_FILE_HANDLER create(const QString& fname); // something to think about may be should be a structure with y m d h m channel_id, low/h stream and so on
-    STORAGE_FILE_HANDLER open(const QString& fname); // something to think about may be should be a structure with y m d h m channel_id, low/h stream and so on
-    void close(STORAGE_FILE_HANDLER);
-    void flush(STORAGE_FILE_HANDLER);
-    int write(const char* data, int size);
-    int read(char* data, int size);
-    int seek(int shift);
+    QnPlColdStoreStorage();
+
+    virtual URLProtocol getURLProtocol() const override;
+
+    virtual int getChunkLen() const override;
+    virtual bool isStorageAvailable(const QString& value) override;
+    virtual QFileInfoList getFileList(const QString& dirName) override;
+    virtual bool isNeedControlFreeSpace() override;
+    virtual bool removeFile(const QString& url) override;
+    virtual bool removeDir(const QString& url) override;
+    virtual bool isFileExists(const QString& url) override;
+    virtual bool isDirExists(const QString& url) override;
+    virtual qint64 getFreeSpace(const QString& url) override;
 
 private:
 

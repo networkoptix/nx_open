@@ -9,6 +9,9 @@
 class QnAbstractStorageProtocol
 {
 public:
+
+    QnAbstractStorageProtocol(const QString& baseUrl = "");
+
     virtual URLProtocol getURLProtocol() const = 0;
 
     
@@ -38,6 +41,10 @@ public:
     QString getUrlPrefix() const;
 protected:
     QString removePrefix(const QString& url);
+
+private:
+    QString m_baseUrl;
+
 };
 
 typedef QSharedPointer<QnAbstractStorageProtocol> QnAbstractStorageProtocolPtr;
