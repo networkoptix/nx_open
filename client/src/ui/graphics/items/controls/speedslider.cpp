@@ -6,33 +6,6 @@
 
 #include "ui/style/proxy_style.h"
 
-class SpeedSliderProxyStyle : public QnProxyStyle
-{
-public:
-    SpeedSliderProxyStyle(QObject *parent = 0) : QnProxyStyle(0, parent) {}
-
-    int styleHint(StyleHint hint, const QStyleOption *option = 0, const QWidget *widget = 0, QStyleHintReturn *returnData = 0) const
-    {
-        if (hint == QStyle::SH_Slider_AbsoluteSetButtons)
-            return Qt::LeftButton;
-        return QnProxyStyle::styleHint(hint, option, widget, returnData);
-    }
-
-    QRect subControlRect(ComplexControl cc, const QStyleOptionComplex *opt, SubControl sc, const QWidget *widget = 0) const
-    {
-        QRect r = QnProxyStyle::subControlRect(cc, opt, sc, widget);
-        if (cc == CC_Slider && sc == SC_SliderHandle) {
-            int side = qMin(r.width(), r.height());
-            if (qstyleoption_cast<const QStyleOptionSlider *>(opt)->orientation == Qt::Horizontal)
-                r.setWidth(side);
-            else
-                r.setHeight(side);
-        }
-        return r;
-    }
-};
-
-
 static const struct Preset {
     int size;
     int defaultIndex;
@@ -51,8 +24,6 @@ QnSpeedSlider::QnSpeedSlider(QGraphicsItem *parent):
     m_wheelStuckedTimerId(0),
     m_wheelStucked(false)
 {
-    setStyle(new SpeedSliderProxyStyle(this));
-
     setSingleStep(5);
     setPageStep(10);
     setTickInterval(10);

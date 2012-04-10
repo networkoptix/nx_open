@@ -48,6 +48,10 @@ QnNoptixStyle::QnNoptixStyle(QStyle *style):
     m_sliderHandle = m_skin->pixmap("slider_handle.png");
 }
 
+QnNoptixStyle::~QnNoptixStyle() {
+    return;
+}
+
 int QnNoptixStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const {
     if(metric == PM_ToolBarIconSize)
         return 18;
@@ -121,10 +125,14 @@ void QnNoptixStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *
 }
 
 int QnNoptixStyle::styleHint(StyleHint hint, const QStyleOption *option, const QWidget *widget, QStyleHintReturn *returnData) const {
-    if (hint == QStyle::SH_ToolTipLabel_Opacity)
+    switch(hint) {
+    case SH_ToolTipLabel_Opacity:
         return 255;
-
-    return base_type::styleHint(hint, option, widget, returnData);
+    case SH_Slider_AbsoluteSetButtons:
+        return Qt::LeftButton;
+    default:
+        return base_type::styleHint(hint, option, widget, returnData);
+    }
 }
 
 void QnNoptixStyle::polish(QApplication *application) {

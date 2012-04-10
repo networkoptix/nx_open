@@ -48,36 +48,6 @@ typedef QHash<unsigned, QPixmap*> TextCache;
 
 
 // -------------------------------------------------------------------------- //
-// SliderProxyStyle
-// -------------------------------------------------------------------------- //
-class SliderProxyStyle : public QnProxyStyle
-{
-public:
-    SliderProxyStyle(QObject *parent = 0) : QnProxyStyle(0, parent) {}
-
-    int styleHint(StyleHint hint, const QStyleOption *option = 0, const QWidget *widget = 0, QStyleHintReturn *returnData = 0) const
-    {
-        if (hint == QStyle::SH_Slider_AbsoluteSetButtons)
-            return Qt::LeftButton;
-        return QnProxyStyle::styleHint(hint, option, widget, returnData);
-    }
-
-    QRect subControlRect(ComplexControl cc, const QStyleOptionComplex *opt, SubControl sc, const QWidget *widget = 0) const
-    {
-        QRect r = QnProxyStyle::subControlRect(cc, opt, sc, widget);
-        if (cc == CC_Slider && sc == SC_SliderHandle) {
-            int side = qMin(r.width(), r.height());
-            if (qstyleoption_cast<const QStyleOptionSlider *>(opt)->orientation == Qt::Horizontal)
-                r.setWidth(side);
-            else
-                r.setHeight(side);
-        }
-        return r;
-    }
-};
-
-
-// -------------------------------------------------------------------------- //
 // MySlider
 // -------------------------------------------------------------------------- //
 class MySlider : public QnToolTipSlider
@@ -966,9 +936,6 @@ TimeSlider::TimeSlider(QGraphicsItem *parent) :
     m_slider->setMaximum(10000);
     m_slider->installEventFilter(this);
     m_slider->setFocusProxy(this);
-
-    m_slider->setStyle(new SliderProxyStyle(m_slider));
-
 
     m_timeLine = new TimeLine(this);
     m_timeLine->setLineWidth(0);

@@ -4,38 +4,9 @@
 
 #include "openal/qtvaudiodevice.h"
 
-class VolumeSliderProxyStyle : public QnProxyStyle
-{
-public:
-    VolumeSliderProxyStyle(QObject *parent = 0) : QnProxyStyle(0, parent) {}
-
-    int styleHint(StyleHint hint, const QStyleOption *option = 0, const QWidget *widget = 0, QStyleHintReturn *returnData = 0) const
-    {
-        if (hint == QStyle::SH_Slider_AbsoluteSetButtons)
-            return Qt::LeftButton;
-        return QnProxyStyle::styleHint(hint, option, widget, returnData);
-    }
-
-    QRect subControlRect(ComplexControl cc, const QStyleOptionComplex *opt, SubControl sc, const QWidget *widget = 0) const
-    {
-        QRect r = QnProxyStyle::subControlRect(cc, opt, sc, widget);
-        if (cc == CC_Slider && sc == SC_SliderHandle) {
-            int side = qMin(r.width(), r.height());//3;
-            if (qstyleoption_cast<const QStyleOptionSlider *>(opt)->orientation == Qt::Horizontal)
-                r.setWidth(side);
-            else
-                r.setHeight(side);
-        }
-        return r;
-    }
-};
-
-
 QnVolumeSlider::QnVolumeSlider(QGraphicsItem *parent): 
     base_type(parent)
 {
-    setStyle(new VolumeSliderProxyStyle(this));
-
     setRange(0, 100);
     setSliderPosition(QtvAudioDevice::instance()->volume() * 100);
 
