@@ -1,6 +1,7 @@
 #include "storage_resource.h"
 #include "utils/common/util.h"
 #include "../dataprovider/media_streamdataprovider.h"
+#include "../storage_protocol/abstract_storage_protocol.h"
 
 QnStorageResource::QnStorageResource():
     QnResource(),

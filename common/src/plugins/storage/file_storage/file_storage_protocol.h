@@ -1,8 +1,9 @@
 #ifndef _FILE_STORAGE_PROTOCOL_H__
 #define _FILE_STORAGE_PROTOCOL_H__
 
-#include "abstract_storage_protocol.h"
+
 #include <libavformat/avio.h>
+#include "core/storage_protocol/abstract_storage_protocol.h"
 
 class QnFileStorageProtocol: public QnAbstractStorageProtocol
 {

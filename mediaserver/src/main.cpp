@@ -46,7 +46,9 @@
 #include "plugins/resources/onvif/onvif_ws_searcher.h"
 #include "utils/common/command_line_parser.h"
 #include "plugins/resources/pulse/pulse_resource_searcher.h"
-#include "storage_protocol/file_storage_protocol.h"
+#include "core/storage_protocol/abstract_storage_protocol.h"
+#include "plugins/storage/file_storage/file_storage_protocol.h"
+
 
 
 static const char SERVICE_NAME[] = "Network Optix VMS Media Server";

@@ -3,7 +3,7 @@
 
 #include <QSet>
 #include "resource.h"
-#include "storage_protocol/abstract_storage_protocol.h"
+
 
 class QnAbstractMediaStreamDataProvider;
 
