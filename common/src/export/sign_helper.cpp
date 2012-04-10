@@ -42,7 +42,8 @@ float getAvgColor(const AVFrame* frame, int plane, const QRect& rect)
     return sum / (rect.width() * rect.height());
 }
 
-QnSignHelper::QnSignHelper()
+QnSignHelper::QnSignHelper():
+    m_cachedMetric(QFont())
 {
     m_opacity = 1.0;
     m_signBackground = Qt::white;
@@ -140,6 +141,12 @@ QFontMetrics QnSignHelper::updateFontSize(QPainter& painter, const QSize& paintS
 {
     QString versionStr = qApp->applicationName().append(" v").append(qApp->applicationVersion());
 
+    if (m_lastPaintSize == paintSize)
+    {
+        painter.setFont(m_cachedFont);
+        return m_cachedMetric;
+    }
+
     QFont font;
     QFontMetrics metric(font);
     for (int i = 0; i < 100; ++i)
@@ -152,6 +159,10 @@ QFontMetrics QnSignHelper::updateFontSize(QPainter& painter, const QSize& paintS
             break;
     }
     painter.setFont(font);
+
+    m_lastPaintSize = paintSize;
+    m_cachedFont = font;
+    m_cachedMetric = metric;
     return metric;
 }
 
@@ -169,18 +180,39 @@ void QnSignHelper::setSignOpacity(float opacity, QColor color)
     m_signBackground = color;
 }
 
+QColor blendColor(QColor color, float opacity, QColor backgroundColor)
+{
+    int r = backgroundColor.red()*(1-opacity) + color.red()*opacity;
+    int g = backgroundColor.green()*(1-opacity) + color.green()*opacity;
+    int b = backgroundColor.blue()*(1-opacity) + color.blue()*opacity;
+    return QColor(r,g,b);
+}
+
 void QnSignHelper::draw(QPainter& painter, const QSize& paintSize, bool drawText)
 {
     QnScopedPainterTransformRollback rollback(&painter);
 
     painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
-    painter.fillRect(0,0, paintSize.width(), paintSize.height()/2, Qt::white);
-    painter.fillRect(0,paintSize.height()/2, paintSize.width(), paintSize.height()/2, Qt::blue);
+    painter.setCompositionMode(QPainter::CompositionMode_Source);
 
-    QString versionStr = qApp->applicationName().append(" v").append(qApp->applicationVersion());
+    if (m_backgroundPixmap.size() != paintSize)
+    {
+        m_backgroundPixmap = QPixmap(paintSize);
+        QPainter p3(&m_backgroundPixmap);
+        p3.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
+        p3.fillRect(0,0, paintSize.width(), paintSize.height()/2, Qt::white);
+        p3.fillRect(0,paintSize.height()/2, paintSize.width(), paintSize.height()/2, Qt::blue);
+
+        if (m_logo.width() > 0) {
+            QPixmap logo = m_logo.scaledToWidth(paintSize.width()/8, Qt::SmoothTransformation);
+            p3.drawPixmap(QPoint(paintSize.width() - logo.width() - text_x_offs, paintSize.height()/2 - logo.height() - text_y_offs), logo);
+        }
+    }
+    painter.drawPixmap(0,0, m_backgroundPixmap);
 
     if (drawText)
     {
+        QString versionStr = qApp->applicationName().append(" v").append(qApp->applicationVersion());
         QFontMetrics metric = updateFontSize(painter, paintSize);
 
         //painter.drawText(QPoint(text_x_offs, text_y_offs), qApp->organizationName());
@@ -198,12 +230,7 @@ void QnSignHelper::draw(QPainter& painter, const QSize& paintSize, bool drawText
         }
 
         painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*3), QString("Licensed to: ").append(licenseName));
-        painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*4), QString("Checksum: ").append(m_sign.toHex()));
-    }
-
-    if (m_logo.width() > 0) {
-        QPixmap logo = m_logo.scaledToWidth(paintSize.width()/8, Qt::SmoothTransformation);
-        painter.drawPixmap(QPoint(paintSize.width() - logo.width() - text_x_offs, paintSize.height()/2 - logo.height() - text_y_offs), logo);
+        painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*4), QString("Watermark: ").append(m_sign.toHex()));
     }
 
     // draw Hash
@@ -219,25 +246,18 @@ void QnSignHelper::draw(QPainter& painter, const QSize& paintSize, bool drawText
     painter.translate((paintSize.width() - drawWidth)/2, paintSize.height()/2 + (paintSize.height()/2-drawheight)/2);
 
 
-    //painter.fillRect(0, 0, SQUARE_SIZE*colCnt, SQUARE_SIZE*rowCnt, Qt::white);
-    painter.setOpacity(m_opacity);
-    painter.fillRect(0, 0, SQUARE_SIZE*colCnt, SQUARE_SIZE*rowCnt, m_signBackground);
+    QColor signBkColor = blendColor(m_signBackground, m_opacity, Qt::blue);
+    painter.fillRect(0, 0, SQUARE_SIZE*colCnt, SQUARE_SIZE*rowCnt, signBkColor);
 
-    //if (m_roundRectPixmap.width() != SQUARE_SIZE)
-    {
-        int cOffs = SQUARE_SIZE/16;
-        m_roundRectPixmap = QPixmap(SQUARE_SIZE, SQUARE_SIZE);
-        QPainter tmpPainter(&m_roundRectPixmap);
-            tmpPainter.fillRect(0,0, SQUARE_SIZE, SQUARE_SIZE, Qt::blue);
-            tmpPainter.setOpacity(m_opacity);
-        tmpPainter.fillRect(0,0, SQUARE_SIZE, SQUARE_SIZE, m_signBackground);
-        
-        tmpPainter.setOpacity(1.0);
-        tmpPainter.setBrush(QColor(0,0,0));
-        tmpPainter.setPen(QColor(128,128,128));
-        tmpPainter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
-        tmpPainter.drawRoundedRect(QRect(cOffs, cOffs, SQUARE_SIZE-cOffs*2, SQUARE_SIZE-cOffs*2), SQUARE_SIZE/4, SQUARE_SIZE/4);
-    }
+    int cOffs = SQUARE_SIZE/16;
+    m_roundRectPixmap = QPixmap(SQUARE_SIZE, SQUARE_SIZE);
+    QPainter tmpPainter(&m_roundRectPixmap);
+    tmpPainter.fillRect(0,0, SQUARE_SIZE, SQUARE_SIZE, signBkColor);
+    
+    tmpPainter.setBrush(Qt::black);
+    tmpPainter.setPen(QColor(signBkColor.red()/2,signBkColor.green()/2,signBkColor.blue()/2));
+    tmpPainter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
+    tmpPainter.drawRoundedRect(QRect(cOffs, cOffs, SQUARE_SIZE-cOffs*2, SQUARE_SIZE-cOffs*2), SQUARE_SIZE/4, SQUARE_SIZE/4);
 
     for (int y = 0; y < rowCnt; ++y)
     {

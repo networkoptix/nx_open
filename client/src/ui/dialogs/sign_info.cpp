@@ -40,6 +40,9 @@ void QnSignInfo::resizeEvent ( QResizeEvent * event )
 
 void QnSignInfo::paintEvent(QPaintEvent* event)
 {
+    //QTime t;
+    //t.restart();
+
     static const int TEXT_FLASHING_PERIOD = 1000;
     float opacity = qAbs(sin(qnSyncTime->currentMSecsSinceEpoch() / qreal(TEXT_FLASHING_PERIOD * 2) * M_PI))*0.5 + 0.5;
 
@@ -57,28 +60,28 @@ void QnSignInfo::paintEvent(QPaintEvent* event)
     m_signHelper.draw(p, QSize(m_textureWidth, m_textureHeight), false);
     QString text;
     text = QString("Analyzing: %1%").arg(m_progress);
-    //int dots = (QDateTime::currentDateTime().time().second() % 3) + 1;
-    //text += QString("..........").left(dots);
-
-    //m_signHelper.drawTextLine(p, QSize(m_textureWidth, m_textureHeight), 1, text);
     p.end();
 
+    //qDebug() << "t1=" << t.elapsed();
+
     QPainter p2(this);
-    p2.setPen(Qt::black);
     if (m_finished)
     {
         if (m_signFromFrame.isEmpty()) {
             p2.setPen(QColor(128,0,0));
-            text = "Signature not found";
+            text = "Watermark not found";
         }
         else if (m_sign == m_signFromFrame) {
             p2.setPen(QColor(0,128,0));
-            text = "Signature mached";
+            text = "Watermark matched";
         }
         else {
             p2.setPen(QColor(128,0,0));
-            text = "Invalid signature";
+            text = "Invalid watermark";
         }
+    }
+    else {
+        p2.setPen(Qt::black);
     }
 
     p2.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
@@ -87,7 +90,8 @@ void QnSignInfo::paintEvent(QPaintEvent* event)
     if (m_finished)
         p2.setOpacity(opacity);
     p2.drawText(m_videoRect.left() + 16, m_videoRect.top() + metric.height() + 16, text);
-    
+
+    //qDebug() << "t2=" << t.elapsed();
 }
 
 void QnSignInfo::setImageSize(int textureWidth, int textureHeight)
