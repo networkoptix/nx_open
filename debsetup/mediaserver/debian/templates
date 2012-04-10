@@ -18,7 +18,6 @@ Template: networkoptix-mediaserver/ecs_password
 Type: string
 Default: 
 Description: Enterprise Controller password:
- If empty the old password (if exists) will be used.
 
 Template: networkoptix-mediaserver/storage
 Type: string

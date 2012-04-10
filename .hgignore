@@ -84,4 +84,5 @@ traytool/src/traytool.pro
 traytool/src/version.h
 traytool/src/traytool.vcproj
 
-debsetup/package
+debsetup/mediaserver/package
+debsetup/appserver/package

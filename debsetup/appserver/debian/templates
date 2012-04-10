@@ -1,0 +1,15 @@
+
+Template: networkoptix-entcontroller/ecs_port
+Type: string
+Default: 7001
+Description: Enterprise Controller port:
+
+Template: networkoptix-entcontroller/ecs_password
+Type: string
+Default: 
+Description: Enterprise Controller password:
+
+Template: networkoptix-entcontroller/ecs_port_invalid
+Type: error
+Description: The port is invalid. Please try again.
+

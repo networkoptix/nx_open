@@ -8,7 +8,7 @@ INITTARGET=/etc/init
 INITDTARGET=/etc/init.d
 
 PACKAGENAME=networkoptix-mediaserver
-VERSION=`python ../common/common_version.py`
+VERSION=`python ../../common/common_version.py`
 ARCHITECTURE=amd64
 
 STAGEBASE=package
@@ -19,7 +19,7 @@ ETCSTAGE=$STAGE$ETCTARGET
 INITSTAGE=$STAGE$INITTARGET
 INITDSTAGE=$STAGE$INITDTARGET
 
-SERVER_BIN_PATH=../mediaserver/bin/release
+SERVER_BIN_PATH=../../mediaserver/bin/release
 
 . $SERVER_BIN_PATH/env.sh
 
@@ -37,7 +37,7 @@ mkdir -p $INITSTAGE
 mkdir -p $INITDSTAGE
 
 # Copy mediaserver binary
-install -m 755 ../mediaserver/bin/release/mediaserver $BINSTAGE/mediaserver-bin
+install -m 755 $SERVER_BIN_PATH/mediaserver $BINSTAGE/mediaserver-bin
 
 # Copy mediaserver startup script
 install -m 755 bin/mediaserver $BINSTAGE
@@ -75,6 +75,5 @@ cp debian/prerm $STAGE/DEBIAN
 cp debian/templates $STAGE/DEBIAN
 
 (cd $STAGE; md5sum `find * -type f | grep -v '^DEBIAN/'` > DEBIAN/md5sums)
-# tar czvf ../mediaserver_orig.1.0.tar.gz *
 
 (cd $STAGEBASE; dpkg-deb -b networkoptix-mediaserver_${VERSION}_amd64)
