@@ -119,6 +119,8 @@ void QnSpeedSlider::sliderChange(SliderChange change) {
             newSpeed = preset.preset[defaultIndex]; // make a gap around the default value
         }
 
+        setToolTip(!qFuzzyIsNull(newSpeed) ? tr("%1x").arg(newSpeed) : tr("Paused"));
+
         emit speedChanged(newSpeed);
     }
 }
