@@ -65,14 +65,14 @@ void ServerSettingsDialog::reject()
 
 bool ServerSettingsDialog::saveToModel()
 {
-    QnStorageResourceList storages;
+    QnAbstractStorageResourceList storages;
     int rowCount = ui->storagesTable->rowCount();
     for (int row = 0; row < rowCount; ++row)
     {
         QString path = ui->storagesTable->item(row, 0) ? ui->storagesTable->item(row, 0)->text() : "";
         int spaceLimit = static_cast<QSpinBox*>(ui->storagesTable->cellWidget(row, 1))->value();
 
-        QnStorageResourcePtr storage(new QnStorageResource());
+        QnAbstractStorageResourcePtr storage(new QnAbstractStorageResource());
         storage->setName(QUuid::createUuid().toString());
         storage->setParentId(m_server->getId());
         storage->setUrl(path.trimmed());
@@ -121,7 +121,7 @@ void ServerSettingsDialog::initView()
     ui->apiPortEdit->setText(QString::number(QUrl(m_server->getApiUrl()).port()));
     ui->rtspPortEdit->setText(QString::number(QUrl(m_server->getUrl()).port()));
 
-    foreach (const QnStorageResourcePtr& storage, m_server->getStorages())
+    foreach (const QnAbstractStorageResourcePtr& storage, m_server->getStorages())
     {
         int row = ui->storagesTable->rowCount();
         ui->storagesTable->insertRow(row);
@@ -155,9 +155,9 @@ void ServerSettingsDialog::removeClicked()
         ui->storagesTable->removeRow(*ci);
 }
 
-bool ServerSettingsDialog::validateStorages(const QnStorageResourceList& storages, QString& errorString)
+bool ServerSettingsDialog::validateStorages(const QnAbstractStorageResourceList& storages, QString& errorString)
 {
-    foreach (const QnStorageResourcePtr& storage, storages)
+    foreach (const QnAbstractStorageResourcePtr& storage, storages)
     {
         if (storage->getUrl().isEmpty())
         {

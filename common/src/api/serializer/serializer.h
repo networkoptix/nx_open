@@ -44,7 +44,7 @@ public:
 
     virtual const char* format() const = 0;
     virtual void deserializeCameras(QnVirtualCameraResourceList& cameras, const QByteArray& data, QnResourceFactory& resourceFactory) = 0;
-    virtual void deserializeServers(QnVideoServerResourceList& servers, const QByteArray& data) = 0;
+    virtual void deserializeServers(QnVideoServerResourceList& servers, const QByteArray& data, QnResourceFactory& resourceFactory) = 0;
     virtual void deserializeLayouts(QnLayoutResourceList& layouts, const QByteArray& data) = 0;
     virtual void deserializeUsers(QnUserResourceList& users, const QByteArray& data) = 0;
     virtual void deserializeResources(QnResourceList& resources, const QByteArray& data, QnResourceFactory& resourceFactory) = 0;

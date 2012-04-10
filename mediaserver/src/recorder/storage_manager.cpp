@@ -5,7 +5,6 @@
 #include "core/resource/resource.h"
 #include "server_stream_recorder.h"
 #include "recording_manager.h"
-#include "core/storage_protocol/abstract_storage_protocol.h"
 
 static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 
@@ -164,12 +163,11 @@ void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
 
 
     QString dir = storage->getUrl();
-    QnAbstractStorageProtocolPtr storageProtocol = qnStorageProtocolManager->getProtocol(dir);
 
-    if (!storageProtocol->isNeedControlFreeSpace())
+    if (!storage->isNeedControlFreeSpace())
         return;
 
-    qint64 freeSpace = storageProtocol->getFreeSpace(dir);
+    qint64 freeSpace = storage->getFreeSpace();
     while (freeSpace != -1 && freeSpace < storage->getSpaceLimit())
     {
         qint64 minTime = 0x7fffffffffffffffll;
@@ -208,7 +206,7 @@ void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
         }
         else
             break; // nothing to delete
-        freeSpace = storageProtocol->getFreeSpace(dir);
+        freeSpace = storage->getFreeSpace();
     }
 }
 
@@ -229,8 +227,11 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
         //for (int i = 0; i < m_storageRoots.size(); ++i)
         for (StorageMap::const_iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
         {
-            QnAbstractStorageProtocolPtr storageProtocol = qnStorageProtocolManager->getProtocol(itr.value()->getUrl());
-            qint64 freeSpace = storageProtocol->getFreeSpace(itr.value()->getUrl());
+            if (!itr.value()->isNeedControlFreeSpace()) {
+                maxSpace = minSpace = 0; // do not count free space, balance by bitrate
+                break;
+            }
+            qint64 freeSpace = itr.value()->getFreeSpace();
             maxSpace = qMax(maxSpace, freeSpace);
             minSpace = qMin(minSpace, freeSpace);
         }
@@ -257,8 +258,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
         // select storage with maximum free space
         for (StorageMap::const_iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
         {
-            QnAbstractStorageProtocolPtr storageProtocol = qnStorageProtocolManager->getProtocol(itr.value()->getUrl());
-            qint64 freeSpace = storageProtocol->getFreeSpace(itr.value()->getUrl());
+            qint64 freeSpace = itr.value()->getFreeSpace();
             if (freeSpace > maxFreeSpace)
             {
                 maxFreeSpace = freeSpace;

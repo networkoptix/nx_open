@@ -46,7 +46,6 @@
 #include "plugins/resources/onvif/onvif_ws_searcher.h"
 #include "utils/common/command_line_parser.h"
 #include "plugins/resources/pulse/pulse_resource_searcher.h"
-#include "core/storage_protocol/abstract_storage_protocol.h"
 #include "plugins/storage/file_storage/file_storage_protocol.h"
 
 
@@ -187,14 +186,15 @@ void ffmpegInit()
     avcodec_init();
     av_register_all();
 
-    qnStorageProtocolManager->registerProtocol(QnAbstractStorageProtocolPtr(new QnFileStorageProtocol()), true);
+    QnStoragePluginFactory::instance()->registerStoragePlugin("ufile", QnFileStorageResource::instance, true); // true means use it plugin if no <protocol>:// prefix
 }
 
-QnStorageResourcePtr createDefaultStorage()
+QnAbstractStorageResourcePtr createDefaultStorage()
 {
     QSettings settings(QSettings::SystemScope, ORGANIZATION_NAME, APPLICATION_NAME);
 
-    QnStorageResourcePtr storage(new QnStorageResource());
+    //QnStorageResourcePtr storage(new QnStorageResource());
+    QnAbstractStorageResourcePtr storage(QnStoragePluginFactory::instance()->createStorage("ufile"));
     storage->setName("Initial");
 #ifdef Q_OS_WIN
     storage->setUrl(QDir::fromNativeSeparators(settings.value("mediaDir", "c:/records").toString()));
@@ -222,7 +222,7 @@ QnVideoServerResourcePtr createServer()
     QnVideoServerResourcePtr serverPtr(new QnVideoServerResource());
     serverPtr->setGuid(serverGuid());
 
-    serverPtr->setStorages(QnStorageResourceList() << createDefaultStorage());
+    serverPtr->setStorages(QnAbstractStorageResourceList() << createDefaultStorage());
 
     return serverPtr;
 }
@@ -481,7 +481,7 @@ public:
             server->setNetAddrList(allLocalAddresses());
 
             if (server->getStorages().isEmpty())
-                server->setStorages(QnStorageResourceList() << createDefaultStorage());
+                server->setStorages(QnAbstractStorageResourceList() << createDefaultStorage());
 
             videoServer = registerServer(appServerConnection, server);
             if (videoServer.isNull())
@@ -504,10 +504,12 @@ public:
 
         QByteArray errorString;
 
-        foreach (QnStorageResourcePtr storage, videoServer->getStorages())
+        foreach (QnAbstractStorageResourcePtr storage, videoServer->getStorages())
         {
             qnResPool->addResource(storage);
-            qnStorageMan->addStorage(storage);
+            QnStorageResourcePtr physicalStorage = qSharedPointerDynamicCast<QnStorageResource>(storage);
+            if (physicalStorage)
+                qnStorageMan->addStorage(physicalStorage);
         }
         qnStorageMan->loadFullFileCatalog();
 

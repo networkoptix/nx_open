@@ -4,50 +4,49 @@
 
 extern URLProtocol ufile_protocol;
 
-QnFileStorageProtocol::QnFileStorageProtocol()
+void QnFileStorageResource::registerFfmpegProtocol() const
 {
     av_register_protocol2(&ufile_protocol, sizeof(ufile_protocol));
+}
+
+QnFileStorageResource::QnFileStorageResource()
+{
 };
 
-URLProtocol QnFileStorageProtocol::getURLProtocol() const
-{
-    return ufile_protocol;
-}
-
-bool QnFileStorageProtocol::isNeedControlFreeSpace()
+bool QnFileStorageResource::isNeedControlFreeSpace()
 {
     return true;
 }
 
-bool QnFileStorageProtocol::removeFile(const QString& url)
+bool QnFileStorageResource::removeFile(const QString& url)
 {
-    qnFileDeletor->deleteFile(removePrefix(url));
+    qnFileDeletor->deleteFile(removeProtocolPrefix(url));
     return true;
 }
 
-bool QnFileStorageProtocol::removeDir(const QString& url)
+bool QnFileStorageResource::removeDir(const QString& url)
 {
-    qnFileDeletor->deleteDir(removePrefix(url));
+    qnFileDeletor->deleteDir(removeProtocolPrefix(url));
     return true;
 }
 
-bool QnFileStorageProtocol::isDirExists(const QString& url)
+bool QnFileStorageResource::isDirExists(const QString& url)
 {
     QDir d(url);
-    return d.exists(removePrefix(url));
+    return d.exists(removeProtocolPrefix(url));
 }
 
-bool QnFileStorageProtocol::isFileExists(const QString& url)
+bool QnFileStorageResource::isFileExists(const QString& url)
 {
-    return QFile::exists(removePrefix(url));
+    return QFile::exists(removeProtocolPrefix(url));
 }
 
-qint64 QnFileStorageProtocol::getFreeSpace(const QString& url)
+qint64 QnFileStorageResource::getFreeSpace()
 {
-    return getDiskFreeSpace(removePrefix(url));
+    return getDiskFreeSpace(removeProtocolPrefix(getUrl()));
 }
 
-QFileInfoList QnFileStorageProtocol::getFileList(const QString& dirName)
+QFileInfoList QnFileStorageResource::getFileList(const QString& dirName)
 {
     QDir dir;
     dir.cd(dirName);
@@ -55,9 +54,9 @@ QFileInfoList QnFileStorageProtocol::getFileList(const QString& dirName)
 }
 
 
-bool QnFileStorageProtocol::isStorageAvailable(const QString& value)
+bool QnFileStorageResource::isStorageAvailable()
 {
-    QString tmpDir = closeDirPath(value) + QString("tmp") + QString::number(rand());
+    QString tmpDir = closeDirPath(getUrl()) + QString("tmp") + QString::number(rand());
     QDir dir(tmpDir);
     if (dir.exists()) {
         dir.remove(tmpDir);
@@ -76,7 +75,18 @@ bool QnFileStorageProtocol::isStorageAvailable(const QString& value)
     return false;
 }
 
-int QnFileStorageProtocol::getChunkLen() const 
+int QnFileStorageResource::getChunkLen() const 
 {
     return 60;
+}
+
+QString QnFileStorageResource::removeProtocolPrefix(const QString& url)
+{
+    int prefix = url.indexOf("://");
+    return prefix == -1 ? url : url.mid(prefix + 3);
+}
+
+QnStorageResource* QnFileStorageResource::instance()
+{
+    return new QnFileStorageResource();
 }

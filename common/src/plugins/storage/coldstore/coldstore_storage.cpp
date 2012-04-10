@@ -5,9 +5,9 @@ QnPlColdStoreStorage::QnPlColdStoreStorage()
 
 }
 
-URLProtocol QnPlColdStoreStorage::getURLProtocol() const
+void QnPlColdStoreStorage::registerFfmpegProtocol() const
 {
-    return URLProtocol();
+    // todo: rigeseter ffmpeg protocol here
 }
 
 int QnPlColdStoreStorage::getChunkLen() const 
@@ -15,7 +15,7 @@ int QnPlColdStoreStorage::getChunkLen() const
     return 60*60;
 }
 
-bool QnPlColdStoreStorage::isStorageAvailable(const QString& value) 
+bool QnPlColdStoreStorage::isStorageAvailable() 
 {
     return true;
 }
@@ -50,7 +50,7 @@ bool QnPlColdStoreStorage::isDirExists(const QString& url)
     return false;
 }
 
-qint64 QnPlColdStoreStorage::getFreeSpace(const QString& url) 
+qint64 QnPlColdStoreStorage::getFreeSpace() 
 {
-    return 10*1024*1024*1024;
+    return 10*1024*1024*1024ll;
 }

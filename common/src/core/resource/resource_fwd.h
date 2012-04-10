@@ -50,7 +50,10 @@ typedef QnList<QnSecurityCamResourcePtr> QnSecurityCamResourceList;
 
 class QnStorageResource;
 typedef QnSharedResourcePointer<QnStorageResource> QnStorageResourcePtr;
-typedef QnList<QnStorageResourcePtr> QnStorageResourceList;
+
+class QnAbstractStorageResource;
+typedef QnSharedResourcePointer<QnAbstractStorageResource> QnAbstractStorageResourcePtr;
+typedef QnList<QnAbstractStorageResourcePtr> QnAbstractStorageResourceList;
 
 class QnUserResource;
 typedef QnSharedResourcePointer<QnUserResource> QnUserResourcePtr;

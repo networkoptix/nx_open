@@ -35,8 +35,8 @@ public:
 
     QnVideoServerConnectionPtr apiConnection();
 
-    QnStorageResourceList getStorages() const;
-    void setStorages(const QnStorageResourceList& storages);
+    QnAbstractStorageResourceList getStorages() const;
+    void setStorages(const QnAbstractStorageResourceList& storages);
 
     virtual void updateInner(QnResourcePtr other) override;
 
@@ -47,7 +47,7 @@ private:
     QString m_apiUrl;
     QList<QHostAddress> m_netAddrList;
     QList<QHostAddress> m_prevNetAddrList;
-    QnStorageResourceList m_storages;
+    QnAbstractStorageResourceList m_storages;
     bool m_primaryIFSelected;
 };
 

@@ -12,7 +12,7 @@ public:
     const char* format() const { return "pb"; }
 
     void deserializeCameras(QnVirtualCameraResourceList& cameras, const QByteArray& data, QnResourceFactory& resourceFactory);
-    void deserializeServers(QnVideoServerResourceList& servers, const QByteArray& data);
+    void deserializeServers(QnVideoServerResourceList& servers, const QByteArray& data, QnResourceFactory& resourceFactory);
     void deserializeLayouts(QnLayoutResourceList& layouts, const QByteArray& data);
     void deserializeUsers(QnUserResourceList& users, const QByteArray& data);
     void deserializeResources(QnResourceList& resources, const QByteArray& data, QnResourceFactory& resourceFactory);

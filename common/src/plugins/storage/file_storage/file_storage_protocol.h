@@ -1,26 +1,28 @@
 #ifndef _FILE_STORAGE_PROTOCOL_H__
 #define _FILE_STORAGE_PROTOCOL_H__
 
-
 #include <libavformat/avio.h>
-#include "core/storage_protocol/abstract_storage_protocol.h"
+#include "core/resource/storage_resource.h"
 
-class QnFileStorageProtocol: public QnAbstractStorageProtocol
+class QnFileStorageResource: public QnStorageResource
 {
 public:
-    QnFileStorageProtocol();
+    QnFileStorageResource();
 
-    virtual URLProtocol getURLProtocol() const override;
+    static QnStorageResource* instance();
 
+    void registerFfmpegProtocol() const override;
     virtual int getChunkLen() const override;
-    virtual bool isStorageAvailable(const QString& value) override;
+    virtual bool isStorageAvailable() override;
     virtual QFileInfoList getFileList(const QString& dirName) override;
     virtual bool isNeedControlFreeSpace() override;
     virtual bool removeFile(const QString& url) override;
     virtual bool removeDir(const QString& url) override;
     virtual bool isFileExists(const QString& url) override;
     virtual bool isDirExists(const QString& url) override;
-    virtual qint64 getFreeSpace(const QString& url) override;
+    virtual qint64 getFreeSpace() override;
+private:
+    QString removeProtocolPrefix(const QString& url);
 };
 
 #endif // _FILE_STORAGE_PROTOCOL_H__

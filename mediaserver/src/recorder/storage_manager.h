@@ -30,6 +30,7 @@ public:
         QnStorageResourcePtr storage = storageRoot(storage_index);
         return storage && storage->getStatus() == QnResource::Online; 
     }
+
     DeviceFileCatalogPtr getFileCatalog(const QString& mac, QnResource::ConnectionRole role);
     DeviceFileCatalogPtr getFileCatalog(const QString& mac, const QString& qualityPrefix);
 
