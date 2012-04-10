@@ -37,7 +37,13 @@ QnAbstractStorageProtocolPtr QnStorageProtocolManager::getProtocol(const QString
     if (protocol == -1)
         return m_defaultProtocol;
     else
-        return m_protocols.value(url.left(protocol));
+    {
+        QnAbstractStorageProtocolPtr result = m_protocols.value(url.left(protocol));
+        if (result)
+            return result;
+    }
+
+    return m_defaultProtocol;
 }
 
 void QnStorageProtocolManager::registerProtocol(QnAbstractStorageProtocolPtr protocol, bool isDefaultProtocol)
