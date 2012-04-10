@@ -1,5 +1,6 @@
 #include <QString>
 #include <QUuid>
+#include <QDesktopServices>
 
 #include "serverutil.h"
 #include "settings.h"
