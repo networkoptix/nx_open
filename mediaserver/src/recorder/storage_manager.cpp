@@ -285,12 +285,14 @@ QString QnStorageManager::getFileName(const qint64& dateTime, const QnNetworkRes
     QString text = base + camera->getMAC().toString();
     Q_ASSERT(!camera->getMAC().toString().isEmpty());
     text += QString("/") + dateTimeStr(dateTime);
-    QDir dir(text);
-    QList<QFileInfo> list = dir.entryInfoList(QDir::Files, QDir::Name);
+    QList<QFileInfo> list = storage->getFileList(text);
+    QList<QString> baseNameList;
+    foreach(const QFileInfo& info, list)
+        baseNameList << info.baseName();
+    qSort(baseNameList.begin(), baseNameList.end());
     int fileNum = 0;
-    if (!list.isEmpty()) {
-        fileNum = list.last().baseName().toInt() + 1;
-    }
+    if (!baseNameList.isEmpty()) 
+        fileNum = baseNameList.last().toInt() + 1;
     clearSpace(storage);
     return text + strPadLeft(QString::number(fileNum), 3, '0');
 }
