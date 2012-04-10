@@ -14,7 +14,7 @@
 class QTimerEvent;
 
 class CLVideoCamera;
-class SpeedSlider;
+class QnSpeedSlider;
 class TimeSlider;
 class QnVolumeSlider;
 class GraphicsLabel;
@@ -131,7 +131,7 @@ private:
     QnImageButtonWidget *m_liveButton;
     QnImageButtonWidget *m_mrsButton;
     QnImageButtonWidget *m_syncButton;
-    SpeedSlider *m_speedSlider;
+    QnSpeedSlider *m_speedSlider;
     QnImageButtonWidget *m_muteButton;
     QnVolumeSlider *m_volumeSlider;
     GraphicsLabel *m_timeLabel;

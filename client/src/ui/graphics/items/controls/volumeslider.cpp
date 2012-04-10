@@ -39,8 +39,7 @@ QnVolumeSlider::QnVolumeSlider(QGraphicsItem *parent):
     setRange(0, 100);
     setSliderPosition(QtvAudioDevice::instance()->volume() * 100);
 
-    connect(this, SIGNAL(valueChanged(int)), this, SLOT(onValueChanged(int)));
-
+    /* Update tooltip text. */
     sliderChange(SliderValueChange);
 }
 

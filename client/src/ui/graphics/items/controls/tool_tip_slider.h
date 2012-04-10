@@ -35,7 +35,9 @@ private:
     void hideToolTip();
     void showToolTip();
     
+private slots:
     void updateToolTipVisibility();
+    void updateToolTipPosition();
 
 private:
     QnToolTipItem *m_toolTipItem;

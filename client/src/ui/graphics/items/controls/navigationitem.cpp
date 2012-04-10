@@ -140,9 +140,8 @@ NavigationItem::NavigationItem(QGraphicsItem *parent):
     connect(m_forwardButton, SIGNAL(clicked()), this, SLOT(rewindForward()));
 
 
-    m_speedSlider = new SpeedSlider(Qt::Horizontal, this);
-    m_speedSlider->setObjectName("SpeedSlider");
-    m_speedSlider->setToolTipItem(new SliderToolTipItem(m_speedSlider));
+    m_speedSlider = new QnSpeedSlider(this);
+    m_speedSlider->setObjectName("QnSpeedSlider");
     m_speedSlider->setCacheMode(QGraphicsItem::ItemCoordinateCache);
     m_speedSlider->setFocusProxy(this);
 
@@ -153,15 +152,10 @@ NavigationItem::NavigationItem(QGraphicsItem *parent):
 
     m_timeSlider = new TimeSlider(this);
     m_timeSlider->setObjectName("TimeSlider");
-    m_timeSlider->toolTipItem()->setVisible(false);
     m_timeSlider->setEndSize(SLIDER_NOW_AREA_WIDTH);
     m_timeSlider->setFlag(QGraphicsItem::ItemIsFocusable, true);
     m_timeSlider->setFocusProxy(this);
-    
-    QnToolTipItem *timeSliderToolTip = new TimeSliderToolTipItem(m_timeSlider);
-    timeSliderToolTip->setFlag(QGraphicsItem::ItemIsFocusable, true);
-    m_timeSlider->setToolTipItem(timeSliderToolTip);
-    timeSliderToolTip->setFocusProxy(m_timeSlider);
+    m_timeSlider->toolTipItem()->setFlag(QGraphicsItem::ItemIsFocusable);
 
     connect(m_timeSlider, SIGNAL(currentValueChanged(qint64)), this, SLOT(onValueChanged(qint64)));
     connect(m_timeSlider, SIGNAL(sliderPressed()), this, SLOT(onSliderPressed()));
@@ -1121,7 +1115,7 @@ void NavigationItem::setPlaying(bool playing)
 
         m_stepForwardButton->setIcon(qnSkin->icon("forward.png"));
 
-        m_speedSlider->setPrecision(SpeedSlider::LowPrecision);
+        m_speedSlider->setPrecision(QnSpeedSlider::LowPrecision);
 
         play();
     } else {
@@ -1131,7 +1125,7 @@ void NavigationItem::setPlaying(bool playing)
 
         m_stepForwardButton->setIcon(qnSkin->icon("step_forward.png"));
 
-        m_speedSlider->setPrecision(SpeedSlider::HighPrecision);
+        m_speedSlider->setPrecision(QnSpeedSlider::HighPrecision);
 
         pause();
         m_timeSlider->setLiveMode(false);

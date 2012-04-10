@@ -39,6 +39,11 @@ QnToolTipSlider::QnToolTipSlider(QGraphicsItem *parent):
 {
     setToolTipItem(new QnSliderToolTipItem());
     setAcceptHoverEvents(true);
+
+    connect(this, SIGNAL(geometryChanged()), this, SLOT(updateToolTipPosition()));
+
+    updateToolTipPosition();
+    updateToolTipVisibility();
 }
 
 QnToolTipSlider::~QnToolTipSlider() {
@@ -59,6 +64,7 @@ void QnToolTipSlider::setToolTipItem(QnToolTipItem *toolTipItem) {
     m_toolTipItem = toolTipItem;
     if(m_toolTipItem) {
         m_toolTipItem->setParentItem(this);
+        m_toolTipItem->setFocusProxy(this);
         m_toolTipItem->setOpacity(opacity);
         m_toolTipItem->setText(toolTip());
         m_toolTipItem->setAcceptHoverEvents(true);
@@ -97,6 +103,14 @@ void QnToolTipSlider::updateToolTipVisibility() {
     } else {
         showToolTip();
     }
+}
+
+void QnToolTipSlider::updateToolTipPosition() {
+    QStyleOptionSlider opt;
+    initStyleOption(&opt);
+
+    const QRect handleRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle);
+    m_toolTipItem->setPos(horizontalCenter(handleRect), handleRect.top());
 }
 
 
@@ -168,17 +182,15 @@ bool QnToolTipSlider::sceneEventFilter(QGraphicsItem *target, QEvent *event) {
 void QnToolTipSlider::sliderChange(SliderChange change) {
     base_type::sliderChange(change);
 
-    if(change == SliderValueChange && m_toolTipItem) {
-        if(m_autoHideToolTip)
-            m_hideTimer.start(toolTipHideDelay, this);
-
-        QStyleOptionSlider opt;
-        initStyleOption(&opt);
-        
-        const QRect handleRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle);
-        m_toolTipItem->setPos(horizontalCenter(handleRect), handleRect.top());
-
-        updateToolTipVisibility();
+    if(m_toolTipItem) {
+        if(change == SliderValueChange) {
+            if(m_autoHideToolTip)
+                m_hideTimer.start(toolTipHideDelay, this);
+            updateToolTipVisibility();
+            updateToolTipPosition();
+        } else if(change == SliderRangeChange) {
+            updateToolTipPosition();
+        }
     }
 }
 
