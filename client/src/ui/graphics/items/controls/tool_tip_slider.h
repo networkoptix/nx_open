@@ -35,8 +35,7 @@ private:
     void hideToolTip();
     void showToolTip();
     
-    void hoverEntered();
-    void hoverLeft();
+    void updateToolTipVisibility();
 
 private:
     QnToolTipItem *m_toolTipItem;

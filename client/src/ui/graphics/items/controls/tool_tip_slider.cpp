@@ -73,12 +73,7 @@ bool QnToolTipSlider::isToolTipAutoHidden() const {
 void QnToolTipSlider::setAutoHideToolTip(bool autoHideToolTip) {
     m_autoHideToolTip = autoHideToolTip;
 
-    if(autoHideToolTip) {
-        if(!m_sliderUnderMouse && !m_toolTipUnderMouse)
-            hideToolTip();
-    } else {
-        showToolTip();
-    }
+    updateToolTipVisibility();
 }
 
 void QnToolTipSlider::hideToolTip() {
@@ -87,6 +82,21 @@ void QnToolTipSlider::hideToolTip() {
 
 void QnToolTipSlider::showToolTip() {
     opacityAnimator(m_toolTipItem, 1.0)->animateTo(1.0);
+}
+
+void QnToolTipSlider::updateToolTipVisibility() {
+    if(!m_toolTipItem)
+        return;
+
+    if(m_autoHideToolTip) {
+        if(m_sliderUnderMouse || m_toolTipUnderMouse || m_hideTimer.isActive()) {
+            showToolTip();
+        } else {
+            hideToolTip();
+        }
+    } else {
+        showToolTip();
+    }
 }
 
 
@@ -139,11 +149,12 @@ bool QnToolTipSlider::sceneEventFilter(QGraphicsItem *target, QEvent *event) {
             break;
         case QEvent::GraphicsSceneHoverEnter:
             m_toolTipUnderMouse = true;
-            hoverEntered();
+            updateToolTipVisibility();
             break;
         case QEvent::GraphicsSceneHoverLeave:
             m_toolTipUnderMouse = false;
-            hoverLeft();
+            m_hideTimer.start(toolTipHideDelay, this);
+            updateToolTipVisibility();
             break;
         default:
             break;
@@ -167,8 +178,7 @@ void QnToolTipSlider::sliderChange(SliderChange change) {
         const QRect handleRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle);
         m_toolTipItem->setPos(horizontalCenter(handleRect), handleRect.top());
 
-        if(m_autoHideToolTip)
-            showToolTip();
+        updateToolTipVisibility();
     }
 }
 
@@ -187,8 +197,7 @@ void QnToolTipSlider::timerEvent(QTimerEvent *event) {
     if(event->timerId() == m_hideTimer.timerId()) {
         m_hideTimer.stop();
 
-        if(m_toolTipItem && m_autoHideToolTip)
-            hideToolTip();
+        updateToolTipVisibility();
     }
 }
 
@@ -196,23 +205,15 @@ void QnToolTipSlider::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
     base_type::hoverEnterEvent(event);
     m_sliderUnderMouse = true;
     
-    hoverEntered();
+    updateToolTipVisibility();
 }
 
 void QnToolTipSlider::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
     base_type::hoverLeaveEvent(event);
     m_sliderUnderMouse = false;
+    m_hideTimer.start(toolTipHideDelay, this);
 
-    hoverLeft();
+    updateToolTipVisibility();
 }
 
-void QnToolTipSlider::hoverEntered() {
-    if((m_sliderUnderMouse || m_toolTipUnderMouse) && m_autoHideToolTip)
-        showToolTip();
-}
-
-void QnToolTipSlider::hoverLeft() {
-    if(!m_sliderUnderMouse && !m_toolTipUnderMouse && m_autoHideToolTip)
-        m_hideTimer.start(toolTipHideDelay, this);
-}
 
