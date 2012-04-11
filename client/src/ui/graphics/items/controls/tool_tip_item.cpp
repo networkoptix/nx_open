@@ -28,6 +28,9 @@ QnToolTipItem::QnToolTipItem(QGraphicsItem *parent):
     setBorderPen(QPen(style->standardPalette().windowText(), 0));
     setBrush(style->standardPalette().window());
     setFont(QApplication::font());
+
+    /* Update. */
+    updateTextSize();
 }
 
 QnToolTipItem::~QnToolTipItem() {
@@ -201,6 +204,9 @@ void QnToolTipItem::updateTextSize()
 {
     QFontMetrics metrics(m_font);
     QSize textSize = metrics.size(0, m_text);
+    if(textSize.width() < arrowWidth)
+        textSize.setWidth(arrowWidth);
+
     if(textSize == m_textSize)
         return;
 

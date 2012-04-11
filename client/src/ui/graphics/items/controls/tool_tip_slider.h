@@ -22,7 +22,7 @@ public:
     bool isToolTipAutoHidden() const;
     void setAutoHideToolTip(bool autoHideToolTip);
 
-    virtual bool sceneEventFilter(QGraphicsItem *target, QEvent *event) override;
+    virtual bool eventFilter(QObject *target, QEvent *event) override;
 
 protected:
     virtual void sliderChange(SliderChange change) override;

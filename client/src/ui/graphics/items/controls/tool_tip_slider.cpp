@@ -65,7 +65,7 @@ void QnToolTipSlider::setToolTipItem(QnToolTipItem *toolTipItem) {
         m_toolTipItem->setOpacity(opacity);
         m_toolTipItem->setText(toolTip());
         m_toolTipItem->setAcceptHoverEvents(true);
-        m_toolTipItem->installSceneEventFilter(this);
+        m_toolTipItem->installEventFilter(this);
     }
 }
 
@@ -114,7 +114,7 @@ void QnToolTipSlider::updateToolTipPosition() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-bool QnToolTipSlider::sceneEventFilter(QGraphicsItem *target, QEvent *event) {
+bool QnToolTipSlider::eventFilter(QObject *target, QEvent *event) {
     if(target == m_toolTipItem) {
         QGraphicsSceneMouseEvent *e = static_cast<QGraphicsSceneMouseEvent *>(event);
 
@@ -127,7 +127,7 @@ bool QnToolTipSlider::sceneEventFilter(QGraphicsItem *target, QEvent *event) {
                 initStyleOption(&opt);
                 const QRect handleRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle, this);
 
-                m_dragOffset = handleRect.left() - target->mapToItem(this, e->pos()).x();
+                m_dragOffset = handleRect.left() - m_toolTipItem->mapToItem(this, e->pos()).x();
 
                 e->accept();
                 return true;
@@ -143,7 +143,7 @@ bool QnToolTipSlider::sceneEventFilter(QGraphicsItem *target, QEvent *event) {
                 int sliderMin = grooveRect.x();
                 int sliderMax = grooveRect.right() - handleRect.width() + 1;
 
-                qint64 pos = sliderValueFromPosition(minimum(), maximum(), target->mapToItem(this, e->pos()).x() + m_dragOffset - sliderMin, sliderMax - sliderMin, opt.upsideDown);
+                qint64 pos = sliderValueFromPosition(minimum(), maximum(), m_toolTipItem->mapToItem(this, e->pos()).x() + m_dragOffset - sliderMin, sliderMax - sliderMin, opt.upsideDown);
                 setSliderPosition(pos);
 
                 e->accept();
@@ -172,7 +172,7 @@ bool QnToolTipSlider::sceneEventFilter(QGraphicsItem *target, QEvent *event) {
         }
         return false;
     } else {
-        return base_type::sceneEventFilter(target, event);
+        return base_type::eventFilter(target, event);
     }
 }
 
