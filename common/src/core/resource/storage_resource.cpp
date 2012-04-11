@@ -83,6 +83,50 @@ void QnAbstractStorageResource::deserialize(const QnResourceParameters& paramete
 
 // ------------------------------ QnStorageResource -------------------------------
 
+QnStorageResource::QnStorageResource()
+{
+}
+QnStorageResource::~QnStorageResource()
+{
+}
+
+static qint32 ffmpegReadPacket(void *opaque, quint8* buf, int size)
+{
+    QIODevice* reader = reinterpret_cast<QIODevice*> (opaque);
+    return reader->read((char*) buf, size);
+}
+
+static qint32 ffmpegWritePacket(void *opaque, quint8* buf, int size)
+{
+    QIODevice* reader = reinterpret_cast<QIODevice*> (opaque);
+    return reader->write((char*) buf, size);
+}
+
+static int64_t ffmpegSeek(void* opaque, qint64 pos, qint32 whence)
+{
+    QIODevice* reader = reinterpret_cast<QIODevice*> (opaque);
+
+    qint64 absolutePos = pos;
+    switch (whence)
+    {
+    case SEEK_SET: 
+        break;
+    case SEEK_CUR: 
+        absolutePos = reader->pos() + pos;
+        break;
+    case SEEK_END: 
+        absolutePos = reader->size() + pos;
+        break;
+    case 65536:
+        return reader->size();
+    default:
+        return AVERROR(ENOENT);
+    }
+
+    return reader->seek(absolutePos);
+}
+
+
 void QnStorageResource::setUrl(const QString& value)
 {
     QnResource::setUrl(value);
@@ -91,6 +135,42 @@ void QnStorageResource::setUrl(const QString& value)
         setStatus(Online);
 }
 
+AVIOContext* QnStorageResource::createFfmpegIOContext(const QString& url, QIODevice::OpenMode openMode, int IO_BLOCK_SIZE)
+{
+    int prefix = url.indexOf("://");
+    QString path = prefix == -1 ? url : url.mid(prefix+3);
+
+    quint8* ioBuffer;
+    AVIOContext* ffmpegIOContext;
+
+    QIODevice* ioDevice = open(path, openMode);
+    if (ioDevice == 0)
+        return 0;
+
+    ioBuffer = (quint8*) av_malloc(IO_BLOCK_SIZE);
+    ffmpegIOContext = avio_alloc_context(
+        ioBuffer,
+        IO_BLOCK_SIZE,
+        (openMode & QIODevice::WriteOnly) ? 1 : 0,
+        ioDevice,
+        &ffmpegReadPacket,
+        &ffmpegWritePacket,
+        &ffmpegSeek);
+    
+    return ffmpegIOContext;
+}
+
+void QnStorageResource::closeFfmpegIOContext(AVIOContext* ioContext)
+{
+    if (ioContext)
+    {
+        QIODevice* ioDevice = (QIODevice*) ioContext->opaque;
+        ioDevice->close();
+        delete ioDevice;
+        ioContext->opaque = 0;
+        avio_close(ioContext);
+    }
+}
 
 // ---------------------------- QnStoragePluginFactory ------------------------------
 
@@ -116,10 +196,6 @@ void QnStoragePluginFactory::registerStoragePlugin(const QString& name, StorageT
     m_storageTypes.insert(name, pluginInst);
     if (isDefaultProtocol)
         m_defaultStoragePlugin = pluginInst;
-
-    QnStorageResource* tmpInstance = pluginInst();
-    tmpInstance->registerFfmpegProtocol();
-    delete tmpInstance;
 }
 
 QnStorageResource* QnStoragePluginFactory::createStorage(const QString& storageType)

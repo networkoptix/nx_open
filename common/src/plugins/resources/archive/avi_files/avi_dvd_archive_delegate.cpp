@@ -360,13 +360,13 @@ struct CLAVIDvdStreamReaderPriv
     }
 };
 
-ByteIOContext* QnAVIDvdArchiveDelegate::getIOContext()
+AVIOContext* QnAVIDvdArchiveDelegate::getIOContext()
 {
     //QMutexLocker global_ffmpeg_locker(&global_ffmpeg_mutex);
     if (m_ffmpegIOContext == 0)
     {
         m_ioBuffer = (quint8*) av_malloc(32*1024);
-        m_ffmpegIOContext = av_alloc_put_byte(
+        m_ffmpegIOContext = avio_alloc_context(
             m_ioBuffer,
             32*1024,
             0,
@@ -724,7 +724,7 @@ void QnAVIDvdArchiveDelegate::fillAdditionalInfo(CLFileInfo* fi)
         {
             QString lang = findLangByCode(info->m_audioLang[avStream->id - 128]);
             if (!lang.isEmpty())
-            av_metadata_set2(&avStream->metadata, "language", lang.toAscii().constData(), 0);
+            av_dict_set(&avStream->metadata, "language", lang.toAscii().constData(), 0);
         }
     }
 }

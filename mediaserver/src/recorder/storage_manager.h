@@ -24,6 +24,7 @@ public:
     bool fileFinished(int durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider);
 
     static QString dateTimeStr(qint64 dateTimeMs);
+    QnStorageResourcePtr getStorageByUrl(QString& fileName);
     QnStorageResourcePtr storageRoot(int storage_index) const { return m_storageRoots.value(storage_index); }
     bool isStorageAvailable(int storage_index) const 
     {

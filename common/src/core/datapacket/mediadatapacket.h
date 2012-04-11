@@ -201,17 +201,17 @@ public:
 
         switch(c->sample_fmt)
         {
-        case SAMPLE_FMT_U8: ///< unsigned 8 bits
+        case AV_SAMPLE_FMT_U8: ///< unsigned 8 bits
             setSampleSize(8);
             setSampleType(QnAudioFormat::UnSignedInt);
             break;
 
-        case SAMPLE_FMT_S16: ///< signed 16 bits
+        case AV_SAMPLE_FMT_S16: ///< signed 16 bits
             setSampleSize(16);
             setSampleType(QnAudioFormat::SignedInt);
             break;
 
-        case SAMPLE_FMT_S32:///< signed 32 bits
+        case AV_SAMPLE_FMT_S32:///< signed 32 bits
             setSampleSize(32);
             setSampleType(QnAudioFormat::SignedInt);
             break;

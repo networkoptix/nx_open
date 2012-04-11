@@ -5,7 +5,8 @@
 
 QnAviResource::QnAviResource(const QString& file)
 {
-    setUrl(QDir::cleanPath(file));
+    //setUrl(QDir::cleanPath(file));
+    setUrl(file);
     setName(QFileInfo(file).fileName());
 }
 

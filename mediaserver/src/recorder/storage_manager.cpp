@@ -336,6 +336,17 @@ QnStorageResourcePtr QnStorageManager::extractStorageFromFileName(int& storageIn
     return QnStorageResourcePtr();
 }
 
+QnStorageResourcePtr QnStorageManager::getStorageByUrl(QString& fileName)
+{
+    for(StorageMap::iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
+    {
+        QString root = itr.value()->getUrl();
+        if (fileName.startsWith(root))
+            return itr.value();
+    }
+    return QnStorageResourcePtr();
+}
+
 bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider)
 {
     QMutexLocker lock(&m_mutex);

@@ -5,9 +5,9 @@ QnPlColdStoreStorage::QnPlColdStoreStorage()
 
 }
 
-void QnPlColdStoreStorage::registerFfmpegProtocol() const
+QIODevice* QnPlColdStoreStorage::open(const QString& fileName, QIODevice::OpenMode openMode)
 {
-    // todo: rigeseter ffmpeg protocol here
+    return 0;
 }
 
 int QnPlColdStoreStorage::getChunkLen() const 
@@ -36,6 +36,11 @@ bool QnPlColdStoreStorage::removeFile(const QString& url)
 }
 
 bool QnPlColdStoreStorage::removeDir(const QString& url) 
+{
+    return false;
+}
+
+bool QnPlColdStoreStorage::renameFile(const QString& oldName, const QString& newName)
 {
     return false;
 }

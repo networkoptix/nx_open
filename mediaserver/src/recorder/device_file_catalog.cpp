@@ -148,11 +148,12 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk)
     return true;
 }
 
-qint64 DeviceFileCatalog::recreateFile(const QString& fileName, qint64 startTimeMs)
+qint64 DeviceFileCatalog::recreateFile(const QString& fileName, qint64 startTimeMs, QnStorageResourcePtr storage)
 {
     cl_log.log("recreate broken file ", fileName, cl_logWARNING);
     QnAviResourcePtr res(new QnAviResource(fileName));
     QnAviArchiveDelegate* avi = new QnAviArchiveDelegate();
+    avi->setStorage(storage);
     if (!avi->open(res)) {
         delete avi;
         return 0;
@@ -161,6 +162,7 @@ qint64 DeviceFileCatalog::recreateFile(const QString& fileName, qint64 startTime
     reader->setArchiveDelegate(avi);
     QnStreamRecorder recorder(res);
     recorder.setFileName(fileName + ".new");
+    recorder.setStorage(storage);
     recorder.setStartOffset(startTimeMs*1000);
 
     QnAbstractMediaDataPtr packet;
@@ -173,8 +175,8 @@ qint64 DeviceFileCatalog::recreateFile(const QString& fileName, qint64 startTime
     recorder.close();
     delete reader;
 
-    if (QFile::remove(fileName)) {
-        QFile::rename(fileName+".new.mkv", fileName);
+    if (storage->removeFile(fileName)) {
+        storage->renameFile(fileName+".new.mkv", fileName);
     }
     return rez;
 }
@@ -238,7 +240,7 @@ void DeviceFileCatalog::deserializeTitleFile()
             if (qnStorageMan->isStorageAvailable(chunk.storageIndex))
             {
                 needRewriteCatalog = true;
-                chunk.durationMs = recreateFile(fullFileName(chunk), chunk.startTimeMs);
+                chunk.durationMs = recreateFile(fullFileName(chunk), chunk.startTimeMs, storage);
             }
             else {
                 chunk.durationMs = 0;

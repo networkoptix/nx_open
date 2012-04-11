@@ -12,7 +12,7 @@ class QnPlColdStoreStorage : public QnStorageResource
 public:
     QnPlColdStoreStorage();
 
-    virtual void  registerFfmpegProtocol() const override;
+    virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
 
     virtual int getChunkLen() const override;
     virtual bool isStorageAvailable() override;
@@ -21,6 +21,7 @@ public:
 
     virtual QFileInfoList getFileList(const QString& dirName) override;
     virtual bool removeFile(const QString& url) override;
+    virtual bool renameFile(const QString& oldName, const QString& newName) override;
     virtual bool removeDir(const QString& url) override;
     virtual bool isFileExists(const QString& url) override;
     virtual bool isDirExists(const QString& url) override;

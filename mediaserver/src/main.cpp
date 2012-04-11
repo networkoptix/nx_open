@@ -183,10 +183,10 @@ QString defaultLocalAddress(const QHostAddress& target)
 
 void ffmpegInit()
 {
-    avcodec_init();
+    //avcodec_init();
     av_register_all();
 
-    QnStoragePluginFactory::instance()->registerStoragePlugin("ufile", QnFileStorageResource::instance, true); // true means use it plugin if no <protocol>:// prefix
+    QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true); // true means use it plugin if no <protocol>:// prefix
 }
 
 QnAbstractStorageResourcePtr createDefaultStorage()

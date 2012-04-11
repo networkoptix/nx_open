@@ -121,7 +121,7 @@ int DesktopFileEncoder::initIOContext()
         }
     };
     m_buffer.resize(MAX_READ_SIZE);
-    m_iocontext = av_alloc_put_byte(&m_buffer[0], MAX_READ_SIZE, 1, this, &IO_ffmpeg::readPacket, &IO_ffmpeg::writePacket, &IO_ffmpeg::seek);
+    m_iocontext = avio_alloc_context(&m_buffer[0], MAX_READ_SIZE, 1, this, &IO_ffmpeg::readPacket, &IO_ffmpeg::writePacket, &IO_ffmpeg::seek);
     return m_iocontext != 0;
 }
 qint32 DesktopFileEncoder::writePacketImpl(quint8* buf, qint32 bufSize)
@@ -491,10 +491,12 @@ bool DesktopFileEncoder::init()
 
     m_formatCtx->oformat = m_outputCtx;
 
+    /*
     if (av_set_parameters(m_formatCtx, NULL) < 0) {
         m_lastErrorStr = QLatin1String("Can't initialize output format parameters");
         return false;
     }
+    */
 
     m_videoOutStream = NULL;
     m_videoOutStream = av_new_stream(m_formatCtx, DEFAULT_VIDEO_STREAM_ID);
@@ -637,7 +639,7 @@ bool DesktopFileEncoder::init()
         }
     }
 
-    av_write_header(m_formatCtx);
+    avformat_write_header(m_formatCtx, 0);
 
     m_grabber->start(QThread::HighestPriority);
     foreach(EncodedAudioInfo* info, m_audioInfo)

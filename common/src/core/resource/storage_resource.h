@@ -4,6 +4,7 @@
 #include <QSet>
 #include "resource.h"
 #include <QFileInfoList>
+#include <QIODevice>
 
 class QnAbstractMediaStreamDataProvider;
 
@@ -47,7 +48,14 @@ private:
 class QnStorageResource : public QnAbstractStorageResource
 {
 public:
-    virtual void registerFfmpegProtocol() const = 0;
+    QnStorageResource();
+    virtual ~QnStorageResource();
+
+    AVIOContext* createFfmpegIOContext(const QString& url, QIODevice::OpenMode openMode, int IO_BLOCK_SIZE = 32768);
+    void closeFfmpegIOContext(AVIOContext* ioContext);
+public:
+    //virtual void registerFfmpegProtocol() const = 0;
+    virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) = 0;
 
 
     virtual int getChunkLen() const = 0;
@@ -76,6 +84,11 @@ public:
     *   Remove dir from storage
     */
     virtual bool removeDir(const QString& url) = 0;
+
+    /*
+    *   This function is used when server restarts. Unfinished files re-readed, writed again (under a new name), then renamed.
+    */
+    virtual bool renameFile(const QString& oldName, const QString& newName) = 0;
 
     /*
     *   Returns file list in current directory, only files (but not subdirs) requires.

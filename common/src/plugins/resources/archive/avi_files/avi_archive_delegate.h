@@ -31,6 +31,7 @@ public:
     void doNotFindStreamInfo();
     bool isStreamsFound() const;
     void setUseAbsolutePos(bool value);
+    void setStorage(QnStorageResourcePtr storage);
 protected:
     virtual qint64 packetTimestamp(const AVPacket& packet);
     virtual bool findStreams();
@@ -59,6 +60,7 @@ private:
     qint64 m_duration;
 
     friend class QnAviAudioLayout;
+    QnStorageResourcePtr m_storage;
 };
 
 typedef QSharedPointer<QnAviArchiveDelegate> QnAviArchiveDelegatePtr;

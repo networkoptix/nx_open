@@ -153,7 +153,7 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
 
     
     //aviRes = QnAviResourcePtr(new QnAviResource("e:/Users/roman76r/blake/FILMS_TEASERS 2_Open for Business Pt 1_kimberely Kane & Dahlia Grey.wmv"));
-    aviRes = QnAviResourcePtr(new QnAviResource(":/skin/intro.mkv"));
+    aviRes = QnAviResourcePtr(new QnAviResource("qtfile://:/skin/intro.mkv"));
     dataProvider = static_cast<QnAbstractArchiveReader*> (aviRes->createDataProvider(QnResource::Role_Default));
     dataProvider->setCycleMode(false);
     camera = new CLVideoCamera(aviRes, false, dataProvider);

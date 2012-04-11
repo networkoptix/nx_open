@@ -38,7 +38,7 @@ protected:
 
     virtual QStringList getPlaylist(const QString& url) = 0;
     virtual bool switchToFile(int newFileIndex);
-    virtual ByteIOContext* getIOContext();
+    virtual AVIOContext* getIOContext();
     virtual qint32 readPacket(quint8* buf, int size);
     
     // seek to specified position. If functionis not implemeted, ffmpeg seek method is used (may be more slow)
@@ -48,7 +48,7 @@ protected:
     virtual void deleteFileInfo(CLFileInfo* fi);
 protected:
     quint8* m_ioBuffer;
-    ByteIOContext* m_ffmpegIOContext;
+    AVIOContext* m_ffmpegIOContext;
     int m_currentFileIndex;
     QVector<CLFileInfo*> m_fileList;   
     bool m_inSeek;
