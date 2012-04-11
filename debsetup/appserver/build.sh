@@ -15,6 +15,7 @@ ARCHITECTURE=amd64
 
 STAGEBASE=package
 STAGE=$STAGEBASE/${PACKAGENAME}_${VERSION}_${ARCHITECTURE}
+PKGSTAGE=$STAGE$TARGET
 BINSTAGE=$STAGE$BINTARGET
 LIBSTAGE=$STAGE$LIBTARGET
 ETCSTAGE=$STAGE$ETCTARGET
@@ -23,24 +24,25 @@ SHARESTAGE=$STAGE$SHARETARGET
 INITSTAGE=$STAGE$INITTARGET
 INITDSTAGE=$STAGE$INITDTARGET
 
-SERVER_BIN_PATH=../../appserver/setup/build/exe.linux-x86_64-2.7
+ECS_PRESTAGE_PATH=../../appserver/setup/build/stage
+
+function build_ecs {
+    pushd ../../appserver/setup
+    python setup.py build
+    popd
+}
+
+build_ecs
 
 # Prepare stage dir
 sudo rm -rf $STAGEBASE
-mkdir -p $BINSTAGE
-mkdir -p $LIBSTAGE
+mkdir -p $PKGSTAGE
+rmdir $PKGSTAGE
+cp -r $ECS_PRESTAGE_PATH $PKGSTAGE
+
 mkdir -p $ETCSTAGE
-mkdir -p $VARSTAGE
-mkdir -p $SHARESTAGE
 mkdir -p $INITSTAGE
 mkdir -p $INITDSTAGE
-
-# Copy entcontroller binary
-cp -a $SERVER_BIN_PATH $STAGEBASE/tmp
-mv $STAGEBASE/tmp/*.so $STAGEBASE/tmp/libpython2.7.so.1.0 $LIBSTAGE
-mv $STAGEBASE/tmp/entcontroller $STAGEBASE/tmp/dbconfig  $STAGEBASE/tmp/library.zip $BINSTAGE
-mv $STAGEBASE/tmp/db $VARSTAGE
-mv $STAGEBASE/tmp/static $STAGEBASE/tmp $SHARESTAGE
 
 # Copy upstart and sysv script
 install -m 755 init/networkoptix-entcontroller.conf $INITSTAGE
@@ -59,4 +61,4 @@ cp debian/templates $STAGE/DEBIAN
 (cd $STAGE; md5sum `find * -type f | grep -v '^DEBIAN/'` > DEBIAN/md5sums)
 
 sudo chown -R root:root $STAGEBASE
-# (cd $STAGEBASE; dpkg-deb -b networkoptix-entcontroller_${VERSION}_amd64)
+(cd $STAGEBASE; sudo dpkg-deb -b networkoptix-entcontroller_${VERSION}_amd64)

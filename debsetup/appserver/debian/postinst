@@ -16,7 +16,7 @@ if status networkoptix-entcontroller | grep "start/running" > /dev/null; then
 fi
     
 function read_config {
-    [ -f $CONFIG_FILE ] || return
+    [ -f $CONFIG_FILE ] || { true; return; }
 
     ECS_GUID=$(cat $CONFIG_FILE | grep ecsGuid | head -1 | sed 's/ecsGuid=\(.*\)/\1/g')
     LOG_FILE=$(cat $CONFIG_FILE | grep logFile | head -1 | sed 's/logFile=\(.*\)/\1/g')
@@ -82,6 +82,8 @@ case "$1" in
       db_get networkoptix-entcontroller/ecs_password && ECS_PASSWORD=$RET
 
       write_config
+
+      /opt/networkoptix/entcontroller/bin/dbconfig admin "$ECS_PASSWORD"
   ;;
 
   abort-upgrade|abort-remove|abort-configure)
