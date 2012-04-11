@@ -468,7 +468,7 @@ bool DesktopFileEncoder::init()
     m_frame = avcodec_alloc_frame();
     avpicture_alloc((AVPicture*) m_frame, m_grabber->format(), m_grabber->width(), m_grabber->height() );
 
-    QString videoCodecName = QLatin1String("libx264");
+    QString videoCodecName = QLatin1String("mpeg4"); // "libx264"
     if (m_encodeQualuty <= 0.5)
         videoCodecName = QLatin1String("mpeg2video");
     AVCodec* videoCodec = avcodec_find_encoder_by_name(videoCodecName.toAscii().constData());
@@ -524,21 +524,29 @@ bool DesktopFileEncoder::init()
     
     QString codec_prop;
 
-    if (videoCodecName != QLatin1String("libx264"))
+    //if (videoCodecName != QLatin1String("libx264"))
+    if (m_encodeQualuty == 1)
     {
-        m_videoCodecCtx->gop_size = 12;
-        m_videoCodecCtx->has_b_frames = 0;
-        m_videoCodecCtx->max_b_frames = 0;
-        m_videoCodecCtx->me_threshold = 0;
-        m_videoCodecCtx->intra_dc_precision = 0;
-        m_videoCodecCtx->strict_std_compliance = 0;
+        m_videoCodecCtx->has_b_frames = 1;
+        m_videoCodecCtx->max_b_frames = 2;
+        m_videoCodecCtx->level = 50;
+        //m_videoCodecCtx->me_threshold = 0;
+        //m_videoCodecCtx->intra_dc_precision = 0;
+        //m_videoCodecCtx->strict_std_compliance = 0;
         m_videoCodecCtx->me_method = ME_EPZS;
+        m_videoCodecCtx->gop_size = 25;
+        m_videoCodecCtx->trellis = 2;
+        m_videoCodecCtx->flags |= CODEC_FLAG_AC_PRED;
+        m_videoCodecCtx->flags |= CODEC_FLAG_4MV;
+        //"mv4=1:aic=1";
     }
+    /*
     else {
         if (m_encodeQualuty <= 0.75)
             codec_prop = QLatin1String("refs=2;me_method=dia;subq=3;me_range=16;g=50;keyint_min=25;sc_threshold=40;i_qfactor=0.71;b_strategy=1;qcomp=0.6;qmin=10;qmax=51;qdiff=4;bf=3");
         m_videoCodecCtx->gop_size = 50;
     }
+    */
 
     QStringList prop_list = codec_prop.split(QLatin1Char(';'), QString::SkipEmptyParts);
     for (int i=0; i<prop_list.size();i++)
@@ -596,7 +604,7 @@ bool DesktopFileEncoder::init()
             return false;
         }
 
-        QString audioCodecName = QLatin1String("aac"); // "libmp3lame"
+        QString audioCodecName = QLatin1String("libmp3lame"); // ""aac
         AVCodec* audioCodec = avcodec_find_encoder_by_name(audioCodecName.toAscii().constData());
         if(audioCodec == 0)
         {
