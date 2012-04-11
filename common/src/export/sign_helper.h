@@ -26,9 +26,11 @@ public:
 private:
     void drawOnSignFrame(AVFrame* frame);
     void extractSpsPpsFromPrivData(const QByteArray& data, SPSUnit& sps, PPSUnit& pps, bool& spsReady, bool& ppsReady);
-    void fillH264EncoderParams(const QByteArray& srcCodecExtraData, AVCodecContext* avctx, AVDictionary* &options);
+    QString fillH264EncoderParams(const QByteArray& srcCodecExtraData, AVCodecContext* avctx);
     int correctX264Bitstream(const QByteArray& srcCodecExtraData, AVCodecContext* videoCodecCtx, quint8* videoBuf, int out_size, int videoBufSize);
     int correctNalPrefix(const QByteArray& srcCodecExtraData, quint8* videoBuf, int out_size, int videoBufSize);
+    int runX264Process(AVFrame* frame, QString optionStr, quint8* rezBuffer);
+    int removeH264SeiMessage(quint8* buffer, int size);
 private:
     QPixmap m_logo;
     QPixmap m_roundRectPixmap;
