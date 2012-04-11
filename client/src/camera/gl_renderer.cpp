@@ -13,7 +13,7 @@
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/shaders/yuy2_to_rgb_shader_program.h>
 #include <ui/graphics/shaders/yv12_to_rgb_shader_program.h>
-#include "yuvconvert.h"
+#include "utils/common/yuvconvert.h"
 #include "camera.h"
 
 #ifdef QN_GL_RENDERER_DEBUG_PERFORMANCE

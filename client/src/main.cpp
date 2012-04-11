@@ -27,6 +27,7 @@
 #include "api/AppServerConnection.h"
 #include "device_plugins/server_camera/server_camera.h"
 #include "device_plugins/server_camera/appserver.h"
+#include "util.h"
 
 #define TEST_RTSP_SERVER
 //#define STANDALONE_MODE
@@ -49,6 +50,7 @@
 #include "plugins/resources/isd/isd_resource_searcher.h"
 #include "plugins/resources/onvif/onvif_ws_searcher.h"
 #include "utils/network/socket.h"
+#include <openssl/evp.h>
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -340,6 +342,7 @@ int main(int argc, char *argv[])
 
     QnResourcePool::instance(); // to initialize net state;
     ffmpegInit();
+    OpenSSL_add_all_digests(); // open SSL init
 
     //===========================================================================
 

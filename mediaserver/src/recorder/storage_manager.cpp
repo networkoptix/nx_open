@@ -5,6 +5,7 @@
 #include "core/resource/resource.h"
 #include "server_stream_recorder.h"
 #include "recording_manager.h"
+#include "serverutil.h"
 
 static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 

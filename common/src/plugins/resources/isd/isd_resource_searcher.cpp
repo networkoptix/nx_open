@@ -65,32 +65,36 @@ QnNetworkResourcePtr QnPlISDResourceSearcher::processPacket(QnResourceList& resu
     if (iqpos<0)
         return QnNetworkResourcePtr(0);
 
-    int macpos = responseData.indexOf("00", iqpos);
+    int macpos = responseData.indexOf("macaddress=");
     if (macpos < 0)
         return QnNetworkResourcePtr(0);
 
+    macpos += QString("macaddress=").length();
+    if (macpos + 12 > responseData.size())
+        return QnNetworkResourcePtr(0);
+
+
+    //name = responseData.mid();
+    name = "ISDcam";
+/*
     for (int i = iqpos; i < macpos; i++)
     {
         name += QLatin1Char(responseData[i]);
     }
-
+*/
     name.replace(QString(" "), QString()); // remove spaces
     name.replace(QString("-"), QString()); // remove spaces
     name.replace(QString("\t"), QString()); // remove tabs
 
-    if (macpos+12 > responseData.size())
-        return QnNetworkResourcePtr(0);
-
-
     //macpos++; // -
-
+/*
     while(responseData.at(macpos)==' ')
         ++macpos;
 
 
     if (macpos+12 > responseData.size())
         return QnNetworkResourcePtr(0);
-
+*/
 
 
     for (int i = 0; i < 12; i++)

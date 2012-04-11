@@ -1,0 +1,101 @@
+#!/bin/bash -e
+
+. /usr/share/debconf/confmodule
+
+if [ -n "$DEBIAN_SCRIPT_DEBUG" ]; then set -v -x; DEBIAN_SCRIPT_TRACE=1; fi
+${DEBIAN_SCRIPT_TRACE:+ echo "#42#DEBUG# RUNNING $0 $*" 1>&2 }
+ 
+export PATH=$PATH:/sbin:/usr/sbin:/bin:/usr/bin
+
+CONFIG_FILE="/opt/networkoptix/entcontroller/etc/entcontroller.conf"
+
+# This is necessary because changed configuration options should take effect 
+# immediately.
+if status networkoptix-entcontroller | grep "start/running" > /dev/null; then
+  stop networkoptix-entcontroller
+fi
+    
+function read_config {
+    [ -f $CONFIG_FILE ] || return
+
+    ECS_GUID=$(cat $CONFIG_FILE | grep ecsGuid | head -1 | sed 's/ecsGuid=\(.*\)/\1/g')
+    LOG_FILE=$(cat $CONFIG_FILE | grep logFile | head -1 | sed 's/logFile=\(.*\)/\1/g')
+    ECS_PORT=$(cat $CONFIG_FILE | grep port | head -1 | sed 's/port=\(.*\)/\1/g')
+    ECS_PASSWORD=$(cat $CONFIG_FILE | grep password | head -1 | sed 's/password=\(.*\)/\1/g')
+}
+
+function write_config {
+    echo "[General]" > $CONFIG_FILE
+    [ -z "$ECS_GUID" ] || echo "ecsGuid=$ECS_GUID" >> $CONFIG_FILE
+    [ -z "$LOG_FILE" ] || echo "logFile=$LOG_FILE" >> $CONFIG_FILE
+    [ -z "$ECS_PORT" ] || echo "port=$ECS_PORT" >> $CONFIG_FILE
+    [ -z "$ECS_PASSWORD" ] || echo "password=$ECS_PASSWORD" >> $CONFIG_FILE
+}
+
+function to_int {
+    local -i num="10#${1}"
+    echo "${num}"
+}
+ 
+function port_is_ok {
+    local port="$1"
+    local -i port_num=$(to_int "${port}" 2>/dev/null)
+ 
+    if (( $port_num < 1 || $port_num > 65535 )) ; then
+        return 1
+    fi
+ 
+    return 0
+}
+
+function create_dir {
+    local dir="$1";
+
+    mkdir -p "$dir"
+}
+
+case "$1" in
+  configure)
+      read_config
+
+      # Simple port validation
+      db_input high networkoptix-entcontroller/ecs_port || true
+      db_go
+      db_get networkoptix-entcontroller/ecs_port
+      until port_is_ok "$RET"
+      do
+        db_input high networkoptix-entcontroller/ecs_port_invalid || true
+        db_go
+
+        { db_input high networkoptix-entcontroller/ecs_port; STATUS=$?; } || true
+        [ $STATUS -eq 30 ] && break
+
+        db_go
+        db_get networkoptix-entcontroller/ecs_port
+      done
+
+      # Password is up to user
+      db_input high networkoptix-entcontroller/ecs_password || true
+      db_go
+
+      db_get networkoptix-entcontroller/ecs_port && ECS_PORT=$RET
+      db_get networkoptix-entcontroller/ecs_password && ECS_PASSWORD=$RET
+
+      write_config
+  ;;
+
+  abort-upgrade|abort-remove|abort-configure)
+  ;;
+
+  *)
+    echo "postinst called with unknown argument '$1'" 1>&2
+    exit 1
+  ;;
+esac
+
+if [ -e "/etc/init/networkoptix-entcontroller.conf" ]; then
+	invoke-rc.d networkoptix-entcontroller start || exit $?
+fi
+update-rc.d -f networkoptix-entcontroller remove >/dev/null || exit $?
+
+exit 0

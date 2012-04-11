@@ -92,8 +92,6 @@ public:
             ++itr;
         return itr;
     }
-
-    QnTimePeriod 
 };
 
 bool operator < (const QnTimePeriod& first, const QnTimePeriod& other);

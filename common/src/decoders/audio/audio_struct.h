@@ -1,7 +1,12 @@
 #ifndef audio_struct_h1530
 #define audio_struct_h1530
 
-
+#ifndef Q_OS_WIN
+#include "utils/media/audioformat.h"
+#else
+#include <QAudioFormat>
+#define QnAudioFormat QAudioFormat
+#endif
 
 class CLAlignedData;
 
@@ -16,7 +21,7 @@ struct CLAudioData
 	CLAlignedData* outbuf; // pointer where decoder puts decompressed data;
 	unsigned long outbuf_len;
 
-	QAudioFormat format;
+	QnAudioFormat format;
 };
 
 #endif //audio_struct_h1530

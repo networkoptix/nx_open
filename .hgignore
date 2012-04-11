@@ -83,3 +83,6 @@ My Amplifier XE Results*
 traytool/src/traytool.pro
 traytool/src/version.h
 traytool/src/traytool.vcproj
+
+debsetup/mediaserver/package
+debsetup/appserver/package

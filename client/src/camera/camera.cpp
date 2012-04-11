@@ -2,6 +2,8 @@
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "client_util.h"
+#include "ui/style/skin.h"
+#include "core/resource/security_cam_resource.h"
 
 CLVideoCamera::CLVideoCamera(QnMediaResourcePtr resource, bool generateEndOfStreamSignal, QnAbstractMediaStreamDataProvider* reader) :
     m_resource(resource),
@@ -201,6 +203,13 @@ void CLVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, co
     m_exportRecorder->clearUnprocessedData();
     m_exportRecorder->setEofDateTime(endTime);
     m_exportRecorder->setFileName(fileName);
+    m_exportRecorder->setRole(QnStreamRecorder::Role_FileExport);
+    if (qSharedPointerDynamicCast<QnSecurityCamResource>(m_resource))
+    {
+        m_exportRecorder->setNeedCalcSignature(true);
+        m_exportRecorder->setSignLogo(qnSkin->pixmap("logo_1920_1080.png"));
+    }
+
     m_exportReader->addDataProcessor(m_exportRecorder);
     m_exportReader->jumpTo(startTime, startTime);
 

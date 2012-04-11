@@ -34,12 +34,14 @@ void updateBits(const quint8* buffer, int bitOffset, int bitLen, int value)
 
 void moveBits(quint8* buffer, int oldBitOffset, int newBitOffset, int len)
 {
+    int increaseInBytes = qMax(0, (newBitOffset - oldBitOffset)/8+1);
+
 	quint8* src = (quint8*) buffer + (oldBitOffset >> 3);
 	BitStreamReader reader;
 	reader.setBuffer(src, src + len/8 + 1);
 	quint8* dst = (quint8*) buffer + (newBitOffset >> 3);
 	BitStreamWriter writer;
-	writer.setBuffer(dst, dst + len/8 + 1);
+	writer.setBuffer(dst, dst + len/8 + 1 + increaseInBytes);
 	writer.skipBits(newBitOffset % 8);
 	if (oldBitOffset % 8) 
 	{
@@ -55,7 +57,7 @@ void moveBits(quint8* buffer, int oldBitOffset, int newBitOffset, int len)
 	}
 
 	for (; len >= INT_BIT; len -= INT_BIT) {
-		writer.putBits(INT_BIT, *((unsigned*)src));
+		writer.putBits(INT_BIT, ntohl(*((unsigned*)src)));
 		src += sizeof(unsigned);
 	}
 	reader.setBuffer(src, src + sizeof(unsigned));

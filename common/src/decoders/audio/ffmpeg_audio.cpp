@@ -13,18 +13,18 @@ extern int MAX_AUDIO_FRAME_SIZE;
 
 bool CLFFmpegAudioDecoder::m_first_instance = true;
 
-AVSampleFormat CLFFmpegAudioDecoder::audioFormatQtToFfmpeg(const QAudioFormat& fmt)
+AVSampleFormat CLFFmpegAudioDecoder::audioFormatQtToFfmpeg(const QnAudioFormat& fmt)
 {
 
     //int s = fmt.sampleSize();
     //QAudioFormat::SampleType st = fmt.sampleType();
     if (fmt.sampleSize() == 8)
         return AV_SAMPLE_FMT_U8;
-    else if(fmt.sampleSize() == 16 && fmt.sampleType() == QAudioFormat::SignedInt)
+    else if(fmt.sampleSize() == 16 && fmt.sampleType() == QnAudioFormat::SignedInt)
         return AV_SAMPLE_FMT_S16;
-    else if(fmt.sampleSize() == 32 && fmt.sampleType() == QAudioFormat::SignedInt)
+    else if(fmt.sampleSize() == 32 && fmt.sampleType() == QnAudioFormat::SignedInt)
         return AV_SAMPLE_FMT_S32;
-    else if(fmt.sampleSize() == 32 && fmt.sampleType() == QAudioFormat::Float)
+    else if(fmt.sampleSize() == 32 && fmt.sampleType() == QnAudioFormat::Float)
         return AV_SAMPLE_FMT_FLT;
     else
         return AV_SAMPLE_FMT_NONE;

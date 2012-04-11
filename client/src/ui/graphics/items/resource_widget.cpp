@@ -728,7 +728,8 @@ void QnResourceWidget::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
 }
 
 void QnResourceWidget::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
-    fadeOutOverlay();
+    if(!m_infoButton->isChecked())
+        fadeOutOverlay();
 
     base_type::hoverLeaveEvent(event);
 }

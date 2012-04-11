@@ -6,6 +6,8 @@
 #include "utils/network/simple_http_client.h"
 #include "core/datapacket/mediadatapacket.h"
 
+static const int DROID_WEB_CAM_PORT = 8089;
+
 class QnPlDriodIpWebCamResource : public QnPhysicalCameraResource
 {
 public:
@@ -24,6 +26,12 @@ public:
     int httpPort() const override;
 
     bool hasDualStreaming() const override {return false;}
+
+    bool shoudResolveConflicts() const override
+    {
+        return false;
+    }
+
 
 protected:
 
