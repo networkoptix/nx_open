@@ -1,5 +1,5 @@
-#include "graphicslabel.h"
-#include "graphicslabel_p.h"
+#include "graphics_label.h"
+#include "graphics_label_p.h"
 
 #include <QtGui/QFontMetricsF>
 

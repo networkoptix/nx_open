@@ -106,7 +106,7 @@ void QnToolTipSlider::updateToolTipPosition() {
     QStyleOptionSlider opt;
     initStyleOption(&opt);
 
-    const QRect handleRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle);
+    const QRect handleRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle, this);
     m_toolTipItem->setPos(horizontalCenter(handleRect), handleRect.top());
 }
 
@@ -125,7 +125,7 @@ bool QnToolTipSlider::sceneEventFilter(QGraphicsItem *target, QEvent *event) {
 
                 QStyleOptionSlider opt;
                 initStyleOption(&opt);
-                const QRect handleRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle);
+                const QRect handleRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle, this);
 
                 m_dragOffset = handleRect.left() - target->mapToItem(this, e->pos()).x();
 
@@ -137,8 +137,8 @@ bool QnToolTipSlider::sceneEventFilter(QGraphicsItem *target, QEvent *event) {
             if(isSliderDown()) {
                 QStyleOptionSlider opt;
                 initStyleOption(&opt);
-                QRect grooveRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderGroove);
-                QRect handleRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle);
+                QRect grooveRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderGroove, this);
+                QRect handleRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle, this);
 
                 int sliderMin = grooveRect.x();
                 int sliderMax = grooveRect.right() - handleRect.width() + 1;

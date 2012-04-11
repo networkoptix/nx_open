@@ -1,7 +1,7 @@
 #ifndef TIMESLIDER_H
 #define TIMESLIDER_H
 
-#include "ui/graphics/items/standard/graphicswidget.h"
+#include "ui/graphics/items/standard/graphics_widget.h"
 #include "recording/time_period.h"
 
 class QPropertyAnimation;

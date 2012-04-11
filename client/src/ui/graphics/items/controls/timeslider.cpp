@@ -1,11 +1,11 @@
 #include "timeslider.h"
 
-#include <QPainterPath>
-#include <QGradient>
 #include <QtCore/QDateTime>
 #include <QtCore/QPair>
 #include <QtCore/QPropertyAnimation>
 
+#include <QtGui/QPainterPath>
+#include <QtGui/QGradient>
 #include <QtGui/QAction>
 #include <QtGui/QApplication>
 #include <QtGui/QGraphicsLinearLayout>
@@ -18,7 +18,7 @@
 #include "ui/style/skin.h"
 #include "ui/style/proxy_style.h"
 
-#include "ui/graphics/items/standard/graphicsframe.h"
+#include "ui/graphics/items/standard/graphics_frame.h"
 
 #include <qmath.h>
 #include "utils/common/synctime.h"

@@ -1,7 +1,7 @@
 #ifndef GRAPHICSFRAME_H
 #define GRAPHICSFRAME_H
 
-#include "graphicswidget.h"
+#include "graphics_widget.h"
 
 class GraphicsFramePrivate;
 class GraphicsFrame : public GraphicsWidget

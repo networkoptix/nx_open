@@ -1,8 +1,8 @@
 #ifndef GRAPHICSFRAME_P_H
 #define GRAPHICSFRAME_P_H
 
-#include "graphicswidget_p.h"
-#include "graphicsframe.h"
+#include "graphics_widget_p.h"
+#include "graphics_frame.h"
 
 class GraphicsFramePrivate: public GraphicsWidgetPrivate
 {

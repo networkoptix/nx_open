@@ -1,7 +1,8 @@
 #ifndef QN_SCOPED_VALUE_ROLLBACK_H
 #define QN_SCOPED_VALUE_ROLLBACK_H
 
-#include <QtGlobal>
+#include <QtCore/QtGlobal>
+#include <QtCore/QObject>
 
 template<class T, class Object, class Setter, class Getter>
 class QnGenericScopedValueRollback {
@@ -59,6 +60,21 @@ namespace detail {
         }
     };
 
+    struct PropertySetterGetter {
+        PropertySetterGetter(const char *name): m_name(name) {}
+
+        void operator()(QObject *object, const QVariant &value) const {
+            object->setProperty(m_name, value);
+        }
+
+        QVariant operator()(const QObject *object) const {
+            return object->property(m_name);
+        }
+
+    private:
+        const char *m_name;
+    };
+
 } // namespace detail
 
 template<class T>
@@ -75,5 +91,21 @@ public:
         base_type(variable, sg_type(), sg_type(), newValue)
     {}
 };
+
+
+class QnScopedPropertyRollback: public QnGenericScopedValueRollback<QVariant, QObject, detail::PropertySetterGetter, detail::PropertySetterGetter> {
+    typedef detail::PropertySetterGetter sg_type;
+    typedef QnGenericScopedValueRollback<QVariant, QObject, sg_type, sg_type> base_type;
+
+public:
+    QnScopedPropertyRollback(QObject *object, const char *name):
+        base_type(object, sg_type(name), sg_type(name))
+    {}
+
+    QnScopedPropertyRollback(QObject *object, const char *name, const QVariant &newValue):
+        base_type(object, sg_type(name), sg_type(name), newValue)
+    {}
+};
+
 
 #endif // QN_SCOPED_VALUE_ROLLBACK_H

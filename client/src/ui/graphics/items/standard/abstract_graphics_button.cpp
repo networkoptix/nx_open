@@ -1,5 +1,5 @@
-#include "abstractgraphicsbutton.h"
-#include "abstractgraphicsbutton_p.h"
+#include "abstract_graphics_button.h"
+#include "abstract_graphics_button_p.h"
 
 #include <QtCore/QEvent>
 #include <QtCore/QPointer>
@@ -436,7 +436,7 @@ void AbstractGraphicsButtonPrivate::init()
     Q_Q(AbstractGraphicsButton);
 
     q->setAcceptHoverEvents(true);
-    q->setFocusPolicy(Qt::FocusPolicy(q->style()->styleHint(QStyle::SH_Button_FocusPolicy)));
+    q->setFocusPolicy(Qt::FocusPolicy(q->style()->styleHint(QStyle::SH_Button_FocusPolicy, NULL, q)));
     q->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed, controlType));
 //    q->setForegroundRole(QPalette::ButtonText);
 //    q->setBackgroundRole(QPalette::Button);
@@ -633,7 +633,7 @@ QSize AbstractGraphicsButton::iconSize() const
     Q_D(const AbstractGraphicsButton);
     if (d->iconSize.isValid())
         return d->iconSize;
-    const int e = style()->pixelMetric(QStyle::PM_ButtonIconSize, 0, 0);
+    const int e = style()->pixelMetric(QStyle::PM_ButtonIconSize, 0, this);
     return QSize(e, e);
 }
 

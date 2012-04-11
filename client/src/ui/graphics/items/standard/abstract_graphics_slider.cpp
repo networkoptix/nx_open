@@ -1,5 +1,5 @@
-#include "abstractgraphicsslider.h"
-#include "abstractgraphicsslider_p.h"
+#include "abstract_graphics_slider.h"
+#include "abstract_graphics_slider_p.h"
 
 #ifndef QT_NO_ACCESSIBILITY
 #  include <QtGui/QAccessible>

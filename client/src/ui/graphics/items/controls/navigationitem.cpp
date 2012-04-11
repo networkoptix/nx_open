@@ -15,7 +15,7 @@
 #include "camera/camera.h"
 
 #include "ui/style/skin.h"
-#include "ui/graphics/items/standard/graphicslabel.h"
+#include "ui/graphics/items/standard/graphics_label.h"
 #include "ui/graphics/items/controls/speedslider.h"
 #include "ui/graphics/items/controls/volumeslider.h"
 #include "ui/graphics/items/controls/tool_tip_item.h"
@@ -24,6 +24,7 @@
 #include "timeslider.h"
 #include "utils/common/synctime.h"
 #include "core/resource/security_cam_resource.h"
+#include "time_slider.h"
 
 static const int SLIDER_NOW_AREA_WIDTH = 30;
 static const int TIME_PERIOD_UPDATE_INTERVAL = 1000 * 10;
@@ -215,13 +216,17 @@ NavigationItem::NavigationItem(QGraphicsItem *parent):
     rightLayoutV->setAlignment(rightLayoutHU, Qt::AlignRight | Qt::AlignVCenter);
     rightLayoutV->addItem(m_timeLabel);
 
+    QnTimeSlider *slider = new QnTimeSlider();
+
     QGraphicsLinearLayout *mainLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     mainLayout->setContentsMargins(5, 0, 5, 0);
     mainLayout->setSpacing(10);
     mainLayout->addItem(leftLayoutV);
-    mainLayout->addItem(m_timeSlider);
+    mainLayout->addItem(slider);
+    //mainLayout->addItem(m_timeSlider);
     mainLayout->addItem(rightLayoutV);
     setLayout(mainLayout);
+
 
     QAction *playAction = new QAction(tr("Play / Pause"), m_playButton);
     playAction->setShortcut(tr("Space"));

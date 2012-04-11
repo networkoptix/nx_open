@@ -1,7 +1,7 @@
 #ifndef GRAPHICSLABEL_H
 #define GRAPHICSLABEL_H
 
-#include "graphicsframe.h"
+#include "graphics_frame.h"
 
 #include <QtGui/QStaticText>
 

@@ -1,8 +1,8 @@
 #ifndef ABSTRACTGRAPHICSSLIDER_P_H
 #define ABSTRACTGRAPHICSSLIDER_P_H
 
-#include "graphicswidget_p.h"
-#include "abstractgraphicsslider.h"
+#include "graphics_widget_p.h"
+#include "abstract_graphics_slider.h"
 
 #include <QtCore/QBasicTimer>
 #ifdef QT_KEYPAD_NAVIGATION
@@ -80,7 +80,7 @@ public:
     inline void setAdjustedSliderPosition(qint64 position)
     {
         Q_Q(AbstractGraphicsSlider);
-        if (q->style()->styleHint(QStyle::SH_Slider_StopMouseOverSlider)) {
+        if (q->style()->styleHint(QStyle::SH_Slider_StopMouseOverSlider, NULL, q)) {
             if ((position > pressValue - 2 * pageStep) && (position < pressValue + 2 * pageStep)) {
                 repeatAction = AbstractGraphicsSlider::SliderNoAction;
                 q->setSliderPosition(pressValue);

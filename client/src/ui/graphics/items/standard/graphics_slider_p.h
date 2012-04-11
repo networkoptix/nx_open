@@ -1,8 +1,8 @@
 #ifndef GRAPHICSSLIDER_P_H
 #define GRAPHICSSLIDER_P_H
 
-#include "abstractgraphicsslider_p.h"
-#include "graphicsslider.h"
+#include "abstract_graphics_slider_p.h"
+#include "graphics_slider.h"
 
 class GraphicsSliderPrivate : public AbstractGraphicsSliderPrivate
 {

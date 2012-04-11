@@ -4,7 +4,7 @@
 #include <QtGui/QIcon>
 #include <QtGui/QKeySequence>
 
-#include "graphicswidget.h"
+#include "graphics_widget.h"
 
 #ifdef QT_NO_BUTTONGROUP
 #  define QT_NO_GRAPHICSBUTTONGROUP

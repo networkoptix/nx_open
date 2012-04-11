@@ -238,8 +238,8 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent, QnWorkbenchContext *
     ui->resourceTreeView->setStyle(treeStyle);
     ui->searchTreeView->setStyle(treeStyle);
 
-    ui->resourceTreeView->setProperty(itemViewItemBackgroundOpacity, 0.5);
-    ui->searchTreeView->setProperty(itemViewItemBackgroundOpacity, 0.5);
+    ui->resourceTreeView->setProperty(Qn::ItemViewItemBackgroundOpacity, 0.5);
+    ui->searchTreeView->setProperty(Qn::ItemViewItemBackgroundOpacity, 0.5);
 
     m_renameAction = new QAction(this);
 

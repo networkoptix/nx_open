@@ -21,7 +21,7 @@
 #include <ui/graphics/painters/paused_painter.h>
 #include <ui/graphics/instruments/transform_listener_instrument.h>
 #include <ui/graphics/instruments/instrument_manager.h>
-#include <ui/graphics/items/standard/graphicslabel.h>
+#include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_access_controller.h>

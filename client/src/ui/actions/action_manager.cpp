@@ -129,7 +129,7 @@ public:
     }
 
     void showCheckBoxInMenu(bool show) {
-        m_action->setProperty(hideCheckBoxInMenuPropertyName, !show);
+        m_action->setProperty(Qn::HideCheckBoxInMenu, !show);
     }
 
     void condition(QnActionCondition *condition) {

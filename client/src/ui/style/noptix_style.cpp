@@ -38,6 +38,8 @@ QnNoptixStyle::QnNoptixStyle(QStyle *style):
     m_skin(qnSkin),
     m_animator(new QnNoptixStyleAnimator(this))
 {
+    GraphicsStyle::setBaseStyle(this);
+
     m_branchClosed = m_skin->icon("branch_closed.png");
     m_branchOpen = m_skin->icon("branch_open.png");
     m_closeTab = m_skin->icon("decorations/close_tab.png");
@@ -53,8 +55,23 @@ QnNoptixStyle::~QnNoptixStyle() {
 }
 
 int QnNoptixStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const {
-    if(metric == PM_ToolBarIconSize)
+    const QObject *target = currentTarget(widget);
+
+    switch(metric) {
+    case PM_ToolBarIconSize:
         return 18;
+    case PM_SliderLength:
+        if(target) {
+            bool ok;
+            int result = target->property(Qn::SliderLength).toInt(&ok);
+            if(ok)
+                return result;
+        }
+        break;
+    default:
+        break;
+    }
+
     return base_type::pixelMetric(metric, option, widget);
 }
 
@@ -185,7 +202,7 @@ bool QnNoptixStyle::drawMenuItemControl(const QStyleOption *option, QPainter *pa
     /* There are cases when we want an action to be checkable, but do not want the checkbox displayed in the menu. 
      * So we introduce an internal property for this. */
     QAction *action = menu->actionAt(option->rect.center());
-    if(!action || !action->property(hideCheckBoxInMenuPropertyName).value<bool>()) 
+    if(!action || !action->property(Qn::HideCheckBoxInMenu).value<bool>()) 
         return false;
     
     QStyleOptionMenuItem::CheckType checkType = itemOption->checkType;
@@ -221,7 +238,7 @@ bool QnNoptixStyle::drawItemViewItemControl(const QStyleOption *option, QPainter
 }
 
 bool QnNoptixStyle::drawSliderComplexControl(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const {
-    /* Bespin's slider painting is way to slow, so we do it our way. */
+    /* Bespin's slider painting is way too slow, so we do it our way. */
     const QStyleOptionSlider *sliderOption = qstyleoption_cast<const QStyleOptionSlider *>(option);
     if (!sliderOption) 
         return false;
@@ -231,8 +248,6 @@ bool QnNoptixStyle::drawSliderComplexControl(const QStyleOptionComplex *option, 
     
     const QRect grooveRect = subControlRect(CC_Slider, option, SC_SliderGroove, widget);
     QRect handleRect = subControlRect(CC_Slider, option, SC_SliderHandle, widget);
-    //handleRect.setSize(handleRect.size() * 2);
-    //handleRect.moveTopLeft(handleRect.topLeft() - QPoint(handleRect.width(), handleRect.height()) / 4);
 
     const bool hovered = (option->state & State_Enabled) && (option->activeSubControls & SC_SliderHandle);
 
@@ -293,7 +308,7 @@ bool QnNoptixStyle::drawPanelItemViewPrimitive(PrimitiveElement element, const Q
     if(!widget)
         return false;
 
-    QVariant value = widget->property(itemViewItemBackgroundOpacity);
+    QVariant value = widget->property(Qn::ItemViewItemBackgroundOpacity);
     if(!value.isValid())
         return false;
 

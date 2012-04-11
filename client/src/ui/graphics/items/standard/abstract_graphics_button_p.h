@@ -1,8 +1,8 @@
 #ifndef ABSTRACTGRAPHICSBUTTON_P_H
 #define ABSTRACTGRAPHICSBUTTON_P_H
 
-#include "graphicswidget_p.h"
-#include "abstractgraphicsbutton.h"
+#include "graphics_widget_p.h"
+#include "abstract_graphics_button.h"
 
 #include <QtCore/QBasicTimer>
 #include <QtCore/QList>

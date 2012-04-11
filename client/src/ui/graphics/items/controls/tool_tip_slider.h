@@ -3,7 +3,7 @@
 
 #include <QtCore/QBasicTimer>
 
-#include <ui/graphics/items/standard/graphicsslider.h>
+#include <ui/graphics/items/standard/graphics_slider.h>
 
 class QnToolTipItem;
 

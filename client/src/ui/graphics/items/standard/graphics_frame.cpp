@@ -1,5 +1,5 @@
-#include "graphicsframe.h"
-#include "graphicsframe_p.h"
+#include "graphics_frame.h"
+#include "graphics_frame_p.h"
 
 #include <QtGui/QApplication>
 #include <QtGui/QGraphicsSceneEvent>
@@ -15,7 +15,7 @@ void GraphicsFramePrivate::updateStyledFrameWidths()
     opt.lineWidth = lineWidth;
     opt.midLineWidth = midLineWidth;
 
-    const QRect cr = q->style()->subElementRect(QStyle::SE_ShapedFrameContents, &opt, 0);
+    const QRect cr = q->style()->subElementRect(QStyle::SE_ShapedFrameContents, &opt, q);
     leftFrameWidth = cr.left() - opt.rect.left();
     topFrameWidth = cr.top() - opt.rect.top();
     rightFrameWidth = opt.rect.right() - cr.right(),
@@ -343,7 +343,7 @@ void GraphicsFrame::setFrameRect(const QRectF &r)
 /*!
     \reimp
 */
-void GraphicsFrame::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void GraphicsFrame::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *)
 {
     Q_UNUSED(option)
 
@@ -378,7 +378,7 @@ void GraphicsFrame::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
         break;
     }
 
-    style()->drawControl(QStyle::CE_ShapedFrame, &opt, painter, widget);
+    style()->drawControl(QStyle::CE_ShapedFrame, &opt, painter, this);
 }
 
 void GraphicsFrame::initStyleOption(QStyleOption *option) const

@@ -1,8 +1,8 @@
 #ifndef GRAPHICSLABEL_P_H
 #define GRAPHICSLABEL_P_H
 
-#include "graphicsframe_p.h"
-#include "graphicslabel.h"
+#include "graphics_frame_p.h"
+#include "graphics_label.h"
 
 class QGraphicsSimpleTextItem;
 
