@@ -410,7 +410,7 @@ int QnSignHelper::correctX264Bitstream(const QByteArray& srcCodecExtraData, AVCo
     int oldLen = oldSps.log2_max_pic_order_cnt_lsb;
     extractSpsPpsFromPrivData(QByteArray((const char*)videoBuf,out_size), newSps, newPps, spsReady, ppsReady);
     if (!spsReady || !ppsReady)
-        return out_size;
+        return -1;
 
     quint8* bufEnd = videoBuf + out_size;
     quint8* curNal = (quint8*) NALUnit::findNextNAL(videoBuf, bufEnd);
@@ -436,7 +436,8 @@ int QnSignHelper::correctX264Bitstream(const QByteArray& srcCodecExtraData, AVCo
     int nalCodeLen = nalData - videoBuf;
     frame.decodeBuffer(nalData, bufEnd);
     frame.m_shortDeserializeMode = false;
-    frame.deserialize(&newSps, &newPps);
+    if (frame.deserialize(&newSps, &newPps) != 0)
+        return -1;
     if (!frame.moveHeaderField(frame.m_picOrderBitPos+8, oldLen, newLen)) 
         return out_size;
 
@@ -508,6 +509,9 @@ int QnSignHelper::runX264Process(AVFrame* frame, QString optionStr, quint8* rezB
     if (!rezFile.open(QIODevice::ReadOnly))
         return -1;
     QByteArray rezData = rezFile.readAll();
+    rezFile.close();
+    QFile::remove(tempName);
+    QFile::remove(outFileName);
     memcpy(rezBuffer, rezData.data(), rezData.size());
     return rezData.size();
 }
@@ -537,6 +541,7 @@ int QnSignHelper::removeH264SeiMessage(quint8* buffer, int size)
 
 QnCompressedVideoDataPtr QnSignHelper::createSgnatureFrame(AVCodecContext* srcCodec)
 {
+    QnCompressedVideoDataPtr generatedFrame;
     QByteArray srcCodecExtraData((const char*) srcCodec->extradata, srcCodec->extradata_size);
 
     AVCodecContext* videoCodecCtx = avcodec_alloc_context(); //m_formatCtx->streams[0]->codec;
@@ -575,12 +580,14 @@ QnCompressedVideoDataPtr QnSignHelper::createSgnatureFrame(AVCodecContext* srcCo
         // To avoid X.264 GPL restriction run x264 as separate process
         QString optionStr = fillH264EncoderParams(srcCodecExtraData, videoCodecCtx); // make X264 frame compatible with existing stream
         out_size = runX264Process(frame, optionStr, videoBuf);
+        if (out_size == -1)
+            goto error_label;
     }
     else {
         if (avcodec_open2(videoCodecCtx, videoCodec, 0) < 0)
         {
-            qCritical() << "Can't initialize video encoder";
-            return QnCompressedVideoDataPtr();
+            qWarning() << "Can't initialize video encoder";
+            goto error_label;
         }
 
         out_size = avcodec_encode_video(videoCodecCtx, videoBuf, videoBufSize, frame);
@@ -595,17 +602,18 @@ QnCompressedVideoDataPtr QnSignHelper::createSgnatureFrame(AVCodecContext* srcCo
 
         // make X264 frame compatible with existing stream
         out_size = correctX264Bitstream(srcCodecExtraData, videoCodecCtx, videoBuf, out_size, videoBufSize); 
-
-        // change nal prefix if need
+        if (out_size == -1)
+            goto error_label;
+            // change nal prefix if need
         out_size = correctNalPrefix(srcCodecExtraData, videoBuf, out_size, videoBufSize); 
     }
 
-    QnCompressedVideoDataPtr generatedFrame(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, 0));
+    generatedFrame = QnCompressedVideoDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, 0));
     generatedFrame->compressionType = videoCodecCtx->codec_id;
     generatedFrame->data.write((const char*) videoBuf, out_size);
     generatedFrame->flags = AV_PKT_FLAG_KEY;
     generatedFrame->channelNumber = 0; 
-
+error_label:
     delete [] videoBuf;
     avcodec_close(videoCodecCtx);
     av_free(frame);

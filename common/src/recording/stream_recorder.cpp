@@ -490,7 +490,8 @@ bool QnStreamRecorder::addSignatureFrame(QString& errorString)
 
     if (generatedFrame == 0)
     {
-        qWarning() << "Can't sign file" << m_fileName;
+        m_lastErrMessage = QString("Error during generate watermark for file ") + m_fileName;
+        qWarning() << m_lastErrMessage;
         return false;
     }
 
