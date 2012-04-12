@@ -12,6 +12,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     base_type(parent)
 {
     setProperty(Qn::SliderLength, 0);
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding, QSizePolicy::Slider);
 
     QnTimePeriodList l;
     
@@ -96,5 +97,3 @@ void QnTimeSlider::drawPeriods(QPainter *painter, QnTimePeriodList &periods, qre
         }
     }
 }
-
-

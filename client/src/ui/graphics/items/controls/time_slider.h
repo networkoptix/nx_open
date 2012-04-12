@@ -36,8 +36,6 @@ private:
     void drawPeriodsBar(QPainter *painter, QnTimePeriodList &recorded, QnTimePeriodList &motion, qreal top, qreal height);
     void drawPeriods(QPainter *painter, QnTimePeriodList &periods, qreal top, qreal height, const QColor &preColor, const QColor &pastColor);
 
-
-
 private:
     QnTimePeriodList m_timePeriods[LineCount][PeriodTypeCount];
     PositionValueConverter m_converter;
