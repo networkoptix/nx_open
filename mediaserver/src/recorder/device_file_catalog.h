@@ -62,7 +62,7 @@ public:
 private:
     bool fileExists(const Chunk& chunk);
     void addChunk(const Chunk& chunk, qint64 lastStartTime);
-    qint64 recreateFile(const QString& fileName, qint64 startTimeMs);
+    qint64 recreateFile(const QString& fileName, qint64 startTimeMs, QnStorageResourcePtr storage);
     QList<QDate> recordedMonthList();
 private:
     mutable QMutex m_mutex;

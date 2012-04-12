@@ -160,7 +160,7 @@ qint64 QnArchiveStreamReader::currentTime() const
         return m_currentTime;
 }
 
-ByteIOContext* QnArchiveStreamReader::getIOContext()
+AVIOContext* QnArchiveStreamReader::getIOContext()
 {
     return 0;
 }

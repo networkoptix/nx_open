@@ -164,8 +164,7 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
     if (!introList.isEmpty())
         resourceName = QString(":/skin/") + introList.first();
 
-    aviRes = QnAviResourcePtr(new QnAviResource(resourceName));
-
+    aviRes = QnAviResourcePtr(new QnAviResource(QString("qtfile://") + resourceName));
     QString pictExt("jpg png gif bmp tiff");
     QStringList extList = pictExt.split(' ');
     for (int i = 0; i < extList.size(); ++i)

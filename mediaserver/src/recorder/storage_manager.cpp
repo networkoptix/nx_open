@@ -164,7 +164,11 @@ void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
 
 
     QString dir = storage->getUrl();
-    qint64 freeSpace = getDiskFreeSpace(dir);
+
+    if (!storage->isNeedControlFreeSpace())
+        return;
+
+    qint64 freeSpace = storage->getFreeSpace();
     while (freeSpace != -1 && freeSpace < storage->getSpaceLimit())
     {
         qint64 minTime = 0x7fffffffffffffffll;
@@ -203,7 +207,7 @@ void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
         }
         else
             break; // nothing to delete
-        freeSpace = getDiskFreeSpace(dir);
+        freeSpace = storage->getFreeSpace();
     }
 }
 
@@ -224,7 +228,11 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
         //for (int i = 0; i < m_storageRoots.size(); ++i)
         for (StorageMap::const_iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
         {
-            qint64 freeSpace = getDiskFreeSpace(itr.value()->getUrl());
+            if (!itr.value()->isNeedControlFreeSpace()) {
+                maxSpace = minSpace = 0; // do not count free space, balance by bitrate
+                break;
+            }
+            qint64 freeSpace = itr.value()->getFreeSpace();
             maxSpace = qMax(maxSpace, freeSpace);
             minSpace = qMin(minSpace, freeSpace);
         }
@@ -251,7 +259,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
         // select storage with maximum free space
         for (StorageMap::const_iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
         {
-            qint64 freeSpace = getDiskFreeSpace(itr.value()->getUrl());
+            qint64 freeSpace = itr.value()->getFreeSpace();
             if (freeSpace > maxFreeSpace)
             {
                 maxFreeSpace = freeSpace;
@@ -263,9 +271,8 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
     return result;
 }
 
-QString QnStorageManager::getFileName(const qint64& dateTime, const QnNetworkResourcePtr camera, const QString& prefix, QnAbstractMediaStreamDataProvider* provider)
+QString QnStorageManager::getFileName(const qint64& dateTime, const QnNetworkResourcePtr camera, const QString& prefix, QnStorageResourcePtr& storage)
 {
-    QnStorageResourcePtr storage = getOptimalStorageRoot(provider);
     if (!storage) {
         qWarning() << "No disk storages";
         return QString();
@@ -279,12 +286,14 @@ QString QnStorageManager::getFileName(const qint64& dateTime, const QnNetworkRes
     QString text = base + camera->getMAC().toString();
     Q_ASSERT(!camera->getMAC().toString().isEmpty());
     text += QString("/") + dateTimeStr(dateTime);
-    QDir dir(text);
-    QList<QFileInfo> list = dir.entryInfoList(QDir::Files, QDir::Name);
+    QList<QFileInfo> list = storage->getFileList(text);
+    QList<QString> baseNameList;
+    foreach(const QFileInfo& info, list)
+        baseNameList << info.baseName();
+    qSort(baseNameList.begin(), baseNameList.end());
     int fileNum = 0;
-    if (!list.isEmpty()) {
-        fileNum = list.last().baseName().toInt() + 1;
-    }
+    if (!baseNameList.isEmpty()) 
+        fileNum = baseNameList.last().toInt() + 1;
     clearSpace(storage);
     return text + strPadLeft(QString::number(fileNum), 3, '0');
 }
@@ -324,6 +333,17 @@ QnStorageResourcePtr QnStorageManager::extractStorageFromFileName(int& storageIn
             storageIndex = itr.value()->getIndex();
             return *itr;
         }
+    }
+    return QnStorageResourcePtr();
+}
+
+QnStorageResourcePtr QnStorageManager::getStorageByUrl(QString& fileName)
+{
+    for(StorageMap::iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
+    {
+        QString root = itr.value()->getUrl();
+        if (fileName.startsWith(root))
+            return itr.value();
     }
     return QnStorageResourcePtr();
 }

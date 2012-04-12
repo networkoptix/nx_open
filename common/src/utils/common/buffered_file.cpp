@@ -4,9 +4,6 @@
 
 static const int SECTOR_SIZE = 32768;
 
-//QueueFileWriter QBufferedFile::m_queueWriter;
-
-
 // -------------- QueueFileWriter ------------
 
 QueueFileWriter::QueueFileWriter()
@@ -104,11 +101,12 @@ static WriterPool m_writerPool;
 // -------------- QBufferedFile -------------
 
 QBufferedFile::QBufferedFile(const QString& fileName, int fileBlockSize, int minBufferSize): 
-    QnFile(fileName), 
+    m_fileEngine(fileName), 
     m_bufferSize(fileBlockSize+minBufferSize),
     m_buffer(0),
     m_queueWriter(0)
 {
+    m_systemDependentFlags = 0;
     m_minBufferSize = minBufferSize;
     if (m_bufferSize > 0)
         m_buffer = (quint8*) qMallocAligned(m_bufferSize, SECTOR_SIZE);
@@ -119,6 +117,7 @@ QBufferedFile::QBufferedFile(const QString& fileName, int fileBlockSize, int min
 }
 QBufferedFile::~QBufferedFile()
 {
+    close();
     qFreeAligned(m_buffer);
 }
 qint64	QBufferedFile::size () const
@@ -126,7 +125,7 @@ qint64	QBufferedFile::size () const
     if (isWritable() && m_bufferSize > 0)
         return m_totalWrited + m_bufferLen;
     else
-        return QnFile::size(); 
+        return m_fileEngine.size(); 
 }
 
 void QBufferedFile::disableDirectIO()
@@ -134,9 +133,9 @@ void QBufferedFile::disableDirectIO()
 #ifdef Q_OS_WIN
     if (m_isDirectIO)
     {
-        QnFile::close();
-        QnFile::open(m_openMode, 0);
-        QnFile::seek(m_filePos);
+        m_fileEngine.close();
+        m_fileEngine.open(m_openMode, 0);
+        m_fileEngine.seek(m_filePos);
     }
 #endif
     m_isDirectIO = false;
@@ -144,7 +143,7 @@ void QBufferedFile::disableDirectIO()
 
 qint64 QBufferedFile::writeUnbuffered(const char * data, qint64 len )
 {
-    return QnFile::write(data, len);
+    return m_fileEngine.write(data, len);
 }
 
 void QBufferedFile::flushBuffer()
@@ -153,7 +152,6 @@ void QBufferedFile::flushBuffer()
     if (m_isDirectIO) 
     {
         int toWrite = (m_bufferLen/SECTOR_SIZE)*SECTOR_SIZE;
-        //qint64 writed = QnFile::write((char*) m_buffer, toWrite);
         qint64 writed = m_queueWriter->write(this, (const char*) m_buffer, toWrite);
         if (writed == toWrite)
         {
@@ -164,7 +162,7 @@ void QBufferedFile::flushBuffer()
         }
     }
     disableDirectIO();
-    qint64 writed = QnFile::write((char*) bufferToWrite, m_bufferLen);
+    qint64 writed = m_fileEngine.write((char*) bufferToWrite, m_bufferLen);
     if (writed > 0)
     {
         m_totalWrited += writed;
@@ -180,22 +178,25 @@ void QBufferedFile::flushBuffer()
 
 void QBufferedFile::close()
 {
-    flushBuffer();
-    QnFile::close();
+    if (m_fileEngine.isOpen())
+    {
+        flushBuffer();
+        m_fileEngine.close();
+    }
 }
 
-qint64	QBufferedFile::read (char * data, qint64 len )
+qint64	QBufferedFile::readData (char * data, qint64 len )
 {
-    qint64 rez = QnFile::read(data, len);
+    qint64 rez = m_fileEngine.read(data, len);
     if (rez > 0)
         m_filePos += rez;
     return rez;
 }
 
-qint64	QBufferedFile::write ( const char * data, qint64 len )
+qint64	QBufferedFile::writeData ( const char * data, qint64 len )
 {
     if (m_bufferSize == 0)
-        return QnFile::write((char*) data, len);
+        return m_fileEngine.write((char*) data, len);
 
     int rez = len;
     while (len > 0)
@@ -210,7 +211,7 @@ qint64	QBufferedFile::write ( const char * data, qint64 len )
             if (m_isDirectIO)
                 writed = m_queueWriter->write(this, (const char*) m_buffer, m_bufferSize - m_minBufferSize);
             else
-                writed = QnFile::write((char*) m_buffer, m_bufferSize - m_minBufferSize);
+                writed = m_fileEngine.write((char*) m_buffer, m_bufferSize - m_minBufferSize);
             m_totalWrited += writed;
             if (writed !=  m_bufferSize - m_minBufferSize)
                 return writed;
@@ -229,7 +230,7 @@ bool QBufferedFile::seek(qint64 pos)
 {
     if (m_bufferSize == 0) {
         m_filePos = pos;
-        return QnFile::seek(pos);
+        return m_fileEngine.seek(pos);
     }
     else 
     {
@@ -238,7 +239,7 @@ bool QBufferedFile::seek(qint64 pos)
         {
             flushBuffer();
             m_filePos = pos;
-            return QnFile::seek(pos);
+            return m_fileEngine.seek(pos);
         }
         else {
             m_bufferPos = bufferOffset;
@@ -247,22 +248,24 @@ bool QBufferedFile::seek(qint64 pos)
     }
 }
 
-bool QBufferedFile::open(QIODevice::OpenMode& mode, unsigned int systemDependentFlags)
+bool QBufferedFile::open(QIODevice::OpenMode mode)
 {
     m_openMode = mode;
     QDir dir;
-    dir.mkpath(QFileInfo(m_fileName).absoluteDir().absolutePath());
+    dir.mkpath(QFileInfo(m_fileEngine.getFileName()).absoluteDir().absolutePath());
     m_isDirectIO = false;
 #ifdef Q_OS_WIN
-    m_isDirectIO = systemDependentFlags & FILE_FLAG_NO_BUFFERING;
+    m_isDirectIO = m_systemDependentFlags & FILE_FLAG_NO_BUFFERING;
 #endif
-    bool rez = QnFile::open(mode, systemDependentFlags);
+    bool rez = m_fileEngine.open(mode, m_systemDependentFlags);
+    if (!rez)
+        return false;
     m_filePos = 0;
 
     if (m_isDirectIO)
-        m_queueWriter = m_writerPool.getWriter(m_fileName);
+        m_queueWriter = m_writerPool.getWriter(m_fileEngine.getFileName());
 
-    return rez;
+    return QIODevice::open(mode | QIODevice::Unbuffered);
 }
 
 bool QBufferedFile::isWritable() const
@@ -273,4 +276,9 @@ bool QBufferedFile::isWritable() const
 qint64	QBufferedFile::pos() const
 {
     return m_filePos + m_bufferPos;
+}
+
+void QBufferedFile::setSystemFlags(int systemFlags)
+{
+    m_systemDependentFlags = systemFlags;
 }

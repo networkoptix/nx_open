@@ -7,9 +7,6 @@
 #include "utils/media/dvd_reader/ifo_types.h"
 
 
-
-
-
 struct dvd_reader_t;
 
 class QnAVIDvdArchiveDelegate : public QnAVIPlaylistArchiveDelegate
@@ -24,7 +21,7 @@ public:
 
     virtual void close();
 protected:
-    virtual ByteIOContext* getIOContext();
+    virtual AVIOContext* getIOContext();
     virtual bool switchToFile(int newFileIndex);
     virtual qint32 readPacket(quint8* buf, int size);
     virtual void fillAdditionalInfo(CLFileInfo* fi);

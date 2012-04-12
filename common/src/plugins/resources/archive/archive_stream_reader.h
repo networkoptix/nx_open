@@ -72,7 +72,7 @@ public:
 protected:
     virtual bool init();
 
-    virtual ByteIOContext* getIOContext();
+    virtual AVIOContext* getIOContext();
 
     virtual qint64 contentLength() const { return m_delegate->endTime() - m_delegate->startTime(); }
     bool initCodecs();

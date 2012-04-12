@@ -223,8 +223,12 @@ void QnRecordingManager::onNewResource(QnResourcePtr res)
 void QnRecordingManager::at_updateStorage()
 {
     QnVideoServerResource* videoServer = dynamic_cast<QnVideoServerResource*> (sender());
-    foreach(QnStorageResourcePtr storage, videoServer->getStorages())
-        qnStorageMan->addStorage(storage);
+    foreach(QnAbstractStorageResourcePtr storage, videoServer->getStorages())
+    {
+        QnStorageResourcePtr physicalStorage = qSharedPointerDynamicCast<QnStorageResource>(storage);
+        if (physicalStorage)
+            qnStorageMan->addStorage(physicalStorage);
+    }
 }
 
 void QnRecordingManager::onRemoveResource(QnResourcePtr res)

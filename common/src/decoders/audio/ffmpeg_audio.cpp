@@ -43,12 +43,6 @@ CLFFmpegAudioDecoder::CLFFmpegAudioDecoder(QnCompressedAudioDataPtr data):
 	{
 		m_first_instance = false;
 
-		// must be called before using avcodec 
-		avcodec_init();
-
-		// register all the codecs (you can also register only the codec you wish to have smaller code
-		avcodec_register_all();
-
 	}
 
 //    CodecID codecId = internalCodecIdToFfmpeg(m_codec);

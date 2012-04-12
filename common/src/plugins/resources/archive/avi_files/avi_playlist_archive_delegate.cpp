@@ -1,12 +1,65 @@
 #include <QMutex>
 
 #include "avi_playlist_archive_delegate.h"
+#include "utils/common/util.h"
 
+/*
 extern "C"
 {
     // this function placed at <libavformat/internal.h> header
     void ff_read_frame_flush(AVFormatContext *s);
 };
+*/
+
+static void free_packet_buffer(AVPacketList **pkt_buf, AVPacketList **pkt_buf_end)
+{
+    while (*pkt_buf) {
+        AVPacketList *pktl = *pkt_buf;
+        *pkt_buf = pktl->next;
+        av_free_packet(&pktl->pkt);
+        av_freep(&pktl);
+    }
+    *pkt_buf_end = NULL;
+}
+
+static void flush_packet_queue(AVFormatContext *s)
+{
+    free_packet_buffer(&s->parse_queue,       &s->parse_queue_end);
+    free_packet_buffer(&s->packet_buffer,     &s->packet_buffer_end);
+    free_packet_buffer(&s->raw_packet_buffer, &s->raw_packet_buffer_end);
+
+    s->raw_packet_buffer_remaining_size = RAW_PACKET_BUFFER_SIZE;
+}
+
+void ff_read_frame_flush(AVFormatContext *s)
+{
+#define RELATIVE_TS_BASE (INT64_MAX - (1LL<<48))
+
+    AVStream *st;
+    int i, j;
+
+    flush_packet_queue(s);
+
+    /* for each stream, reset read state */
+    for(i = 0; i < s->nb_streams; i++) {
+        st = s->streams[i];
+
+        //if (st->parser) {
+        //    av_parser_close(st->parser);
+        //    st->parser = NULL;
+        // }
+        st->last_IP_pts = AV_NOPTS_VALUE;
+        if(st->first_dts == AV_NOPTS_VALUE) st->cur_dts = RELATIVE_TS_BASE;
+        else                                st->cur_dts = AV_NOPTS_VALUE; /* we set the current DTS to an unspecified origin */
+        st->reference_dts = AV_NOPTS_VALUE;
+
+        st->probe_packets = MAX_PROBE_PACKETS;
+
+        for(j=0; j<MAX_REORDER_DELAY+1; j++)
+            st->pts_buffer[j]= AV_NOPTS_VALUE;
+    }
+}
+
 
 extern QMutex global_ffmpeg_mutex;
 static const int IO_BLOCK_SIZE = 1024 * 32;
@@ -99,7 +152,11 @@ bool QnAVIPlaylistArchiveDelegate::findStreams()
             continue;
         }
 
-        if (!inCtx || av_open_input_stream(&fi->m_formatContext, getIOContext(), "", inCtx, 0) < 0 ||
+        //if (!inCtx || av_open_input_stream(&fi->m_formatContext, getIOContext(), "", inCtx, 0) < 0 ||
+        //    av_find_stream_info(fi->m_formatContext) < 0)
+
+        fi->m_formatContext->pb = getIOContext();
+        if (!inCtx || avformat_open_input(&fi->m_formatContext, "", 0, 0) < 0 ||
             av_find_stream_info(fi->m_formatContext) < 0)
         {
             deleteFileInfo(fi);
@@ -162,10 +219,7 @@ qint64 QnAVIPlaylistArchiveDelegate::seek(qint64 mksec)
     m_inSeek = true;
     if (directSeekToPosition(relativeMksec))
     {
-        // Testing on linux with newer ffmpeg. Need to fix it later.
-#ifndef Q_OS_LINUX
         ff_read_frame_flush(m_formatContext);
-#endif
     } else
     {
         rez = avformat_seek_file(m_formatContext, -1, 0, relativeMksec, LLONG_MAX, AVSEEK_FLAG_BACKWARD);
@@ -190,7 +244,7 @@ qint64 QnAVIPlaylistArchiveDelegate::packetTimestamp(const AVPacket& packet)
 void QnAVIPlaylistArchiveDelegate::deleteFileInfo(CLFileInfo* fi)
 {
     if (fi->m_formatContext)
-        av_close_input_stream(fi->m_formatContext);
+        avformat_close_input(&fi->m_formatContext);
     delete fi;
 }
 
@@ -239,13 +293,13 @@ struct CLAVIPlaylistStreamReaderPriv
     }
 };
 
-ByteIOContext* QnAVIPlaylistArchiveDelegate::getIOContext()
+AVIOContext* QnAVIPlaylistArchiveDelegate::getIOContext()
 {
     //QMutexLocker global_ffmpeg_locker(&global_ffmpeg_mutex);
     if (m_ffmpegIOContext == 0)
     {
         m_ioBuffer = (quint8*) av_malloc(IO_BLOCK_SIZE);
-        m_ffmpegIOContext = av_alloc_put_byte(
+        m_ffmpegIOContext = avio_alloc_context(
             m_ioBuffer,
             IO_BLOCK_SIZE,
             0,

@@ -110,7 +110,7 @@ void parseCameras(QList<T>& cameras, const PbCameraList& pb_cameras, QnResourceF
 }
 
 template<class T>
-void parseServers(QList<T> &servers, const PbServerList& pb_servers)
+void parseServers(QList<T> &servers, const PbServerList& pb_servers, QnResourceFactory& resourceFactory)
 {
     for (PbServerList::const_iterator ci = pb_servers.begin(); ci != pb_servers.end(); ++ci)
     {
@@ -135,19 +135,31 @@ void parseServers(QList<T> &servers, const PbServerList& pb_servers)
 
         if (pb_server.storage_size() > 0)
         {
-            QnStorageResourceList storages;
+            QnAbstractStorageResourceList storages;
 
             for (int j = 0; j < pb_server.storage_size(); j++)
             {
                 const proto::pb::Server_Storage& pb_storage = pb_server.storage(j);
 
-                QnStorageResourcePtr storage(new QnStorageResource());
-                storage->setId(pb_storage.id());
-                storage->setParentId(pb_server.id());
-                storage->setName(QString::fromUtf8(pb_storage.name().c_str()));
+                //QnAbstractStorageResourcePtr storage(new QnStorageResource());
+                QnAbstractStorageResourcePtr storage;
 
-                storage->setUrl(QString::fromUtf8(pb_storage.url().c_str()));
-                storage->setSpaceLimit(pb_storage.spacelimit());
+                QnResourceParameters parameters;
+                parameters["id"] = QString::number(pb_storage.id());
+                parameters["parentId"] = QString::number(pb_server.id());
+                parameters["name"] = QString::fromUtf8(pb_storage.name().c_str());
+                parameters["url"] = QString::fromUtf8(pb_storage.url().c_str());
+                parameters["spaceLimit"] = QString::number(pb_storage.spacelimit());
+
+                QnResourcePtr st = resourceFactory.createResource(qnResTypePool->getResourceTypeByName("Storage")->getId(), parameters);
+                storage = qSharedPointerDynamicCast<QnAbstractStorageResource> (st);
+
+                //storage->setId(pb_storage.id());
+                //storage->setParentId(pb_server.id());
+                //storage->setName(QString::fromUtf8(pb_storage.name().c_str()));
+
+                //storage->setUrl(QString::fromUtf8(pb_storage.url().c_str()));
+                //storage->setSpaceLimit(pb_storage.spacelimit());
 
                 storages.append(storage);
             }
@@ -427,7 +439,7 @@ void QnApiPbSerializer::deserializeCameras(QnVirtualCameraResourceList& cameras,
     parseCameras(cameras, pb_cameras.camera(), resourceFactory);
 }
 
-void QnApiPbSerializer::deserializeServers(QnVideoServerResourceList& servers, const QByteArray& data)
+void QnApiPbSerializer::deserializeServers(QnVideoServerResourceList& servers, const QByteArray& data, QnResourceFactory& resourceFactory)
 {
     proto::pb::Servers pb_servers;
     if (!pb_servers.ParseFromArray(data.data(), data.size())) {
@@ -436,7 +448,7 @@ void QnApiPbSerializer::deserializeServers(QnVideoServerResourceList& servers, c
         throw QnSerializeException(errorString);
     }
 
-    parseServers(servers, pb_servers.server());
+    parseServers(servers, pb_servers.server(), resourceFactory);
 }
 
 void QnApiPbSerializer::deserializeLayouts(QnLayoutResourceList& layouts, const QByteArray& data)
@@ -473,7 +485,7 @@ void QnApiPbSerializer::deserializeResources(QnResourceList& resources, const QB
     }
 
     parseCameras(resources, pb_resources.camera(), resourceFactory);
-    parseServers(resources, pb_resources.server());
+    parseServers(resources, pb_resources.server(), resourceFactory);
 	parseUsers(resources, pb_resources.user());
 	parseLayouts(resources, pb_resources.layout());
 }
@@ -547,7 +559,7 @@ void QnApiPbSerializer::serializeServer(const QnVideoServerResourcePtr& serverPt
         pb_server.set_netaddrlist(serializeNetAddrList(serverPtr->getNetAddrList()).toUtf8().constData());
 
     if (!serverPtr->getStorages().isEmpty()) {
-        foreach (const QnStorageResourcePtr& storagePtr, serverPtr->getStorages()) {
+        foreach (const QnAbstractStorageResourcePtr& storagePtr, serverPtr->getStorages()) {
             proto::pb::Server_Storage& pb_storage = *pb_server.add_storage();
 
             pb_storage.set_id(storagePtr->getId().toInt());

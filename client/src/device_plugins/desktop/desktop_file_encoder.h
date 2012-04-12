@@ -110,7 +110,7 @@ private:
     QString m_fileName;
 
     QVector<quint8> m_buffer;
-    ByteIOContext* m_iocontext;
+    AVIOContext* m_iocontext;
     QIODevice * m_device;
 
     // single audio objects
