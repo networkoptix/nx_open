@@ -29,7 +29,7 @@ FFMPEG_FILES="libavcodec.so.53 libavdevice.so.53 libavfilter.so.2 libavformat.so
 QT_PATH=$(dirname $(dirname $(which qmake)))
 
 # Prepare stage dir
-rm -rf $STAGEBASE
+sudo rm -rf $STAGEBASE
 mkdir -p $BINSTAGE
 mkdir -p $LIBSTAGE
 mkdir -p $ETCSTAGE
@@ -76,4 +76,6 @@ cp debian/templates $STAGE/DEBIAN
 
 (cd $STAGE; md5sum `find * -type f | grep -v '^DEBIAN/'` > DEBIAN/md5sums)
 
-(cd $STAGEBASE; dpkg-deb -b networkoptix-mediaserver_${VERSION}_amd64)
+sudo chown -R root:root $STAGEBASE
+
+(cd $STAGEBASE; sudo dpkg-deb -b networkoptix-mediaserver_${VERSION}_amd64)
