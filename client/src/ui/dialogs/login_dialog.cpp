@@ -40,19 +40,11 @@ public:
         m_renderer = 0;
         connect(&m_timer, SIGNAL(timeout()), this, SLOT(update()));
         m_timer.start(16);
+        m_firstTime = true;
     }
 
     virtual void  resizeEvent ( QResizeEvent * event ) override
     {
-        /*
-        // keep aspect ratio 16:9
-        int width = event->size().width();
-        int height = width * 9.0 / 16.0 + 0.5;
-        int hOffset = (event->size().height() - height)/2;
-
-        if (m_renderer)
-            m_renderer->setChannelScreenSize(QRect(0, hOffset, width, height));
-        */
         static double sar = 1.0;
         double windowHeight = event->size().height();
         double windowWidth = event->size().width();
@@ -107,12 +99,25 @@ public:
         if (m_renderer)
             m_renderer->paint(0, m_videoRect, 1.0);
         painter.endNativePainting();
+        if (m_firstTime)
+        {
+            if (m_camDisplay)
+                m_camDisplay->start();
+            m_firstTime = false;
+        }
+    }
+
+    void setCamDisplay(CLCamDisplay* camDisplay)
+    {
+        m_camDisplay = camDisplay;
     }
     
 private:
     QRect m_videoRect;
     QnResourceWidgetRenderer* m_renderer;
     QTimer m_timer;
+    CLCamDisplay* m_camDisplay;
+    bool m_firstTime;
 };
 
 // ------------------------------------
@@ -153,7 +158,21 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
 
     
     //aviRes = QnAviResourcePtr(new QnAviResource("e:/Users/roman76r/blake/FILMS_TEASERS 2_Open for Business Pt 1_kimberely Kane & Dahlia Grey.wmv"));
-    aviRes = QnAviResourcePtr(new QnAviResource("qtfile://:/skin/intro.mkv"));
+    QDir dir(":/skin");
+    QStringList	introList = dir.entryList(QStringList() << "intro.*");
+    QString resourceName = ":/skin/intro";
+    if (!introList.isEmpty())
+        resourceName = QString(":/skin/") + introList.first();
+
+    aviRes = QnAviResourcePtr(new QnAviResource(QString("qtfile://") + resourceName));
+    QString pictExt("jpg png gif bmp tiff");
+    QStringList extList = pictExt.split(' ');
+    for (int i = 0; i < extList.size(); ++i)
+    {
+        if (resourceName.toLower().endsWith(extList[i]))
+            aviRes->addFlags(QnResource::still_image);
+    }
+
     dataProvider = static_cast<QnAbstractArchiveReader*> (aviRes->createDataProvider(QnResource::Role_Default));
     dataProvider->setCycleMode(false);
     camera = new CLVideoCamera(aviRes, false, dataProvider);
@@ -163,7 +182,8 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
     camera->getCamDisplay()->addVideoChannel(0, renderer, true);
     camera->getCamDisplay()->setMTDecoding(true);
     dataProvider->start();
-    camera->getCamDisplay()->start();
+
+    glWindow->setCamDisplay(camera->getCamDisplay());
 
 
 

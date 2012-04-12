@@ -10,6 +10,7 @@
 #include "motion/motion_helper.h"
 #include <QDebug>
 #include "recording_manager.h"
+#include "serverutil.h"
 
 QString DeviceFileCatalog::prefixForRole(QnResource::ConnectionRole role)
 {
