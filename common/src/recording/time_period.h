@@ -81,14 +81,26 @@ public:
     {
     }
 
+    /**
+     * \param timeMs                    Time value to search for, in milliseconds.
+     * \param searchForward             How to behave when there is no interval containing the given time value.
+     *                                  If false, position of an interval preceding the value is returned. 
+     *                                  Otherwise, position of an interval that follows the value is returned. 
+     *                                  Note that this position may equal <tt>end</tt>.
+     * \returns                         Position of a time period that is the closest to the given time value.
+     */
     const_iterator findNearestPeriod(qint64 timeMs, bool searchForward) const
     {
         if (isEmpty())
             return end();
+
         const_iterator itr = qUpperBound(begin(), end(), timeMs);
         if (itr != begin())
             --itr;
-        if (searchForward && !itr->containTime(timeMs))
+
+        /* Note that there is no need to check for itr != end() here as
+         * the container is not empty. */
+        if (searchForward && !itr->containTime(timeMs)) 
             ++itr;
         return itr;
     }

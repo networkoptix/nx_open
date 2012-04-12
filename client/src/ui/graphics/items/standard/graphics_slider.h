@@ -49,6 +49,7 @@ protected:
 
     class PositionValueConverter {
     public:
+        PositionValueConverter() {}
         PositionValueConverter(const GraphicsSlider *slider);
 
         qreal positionFromValue(qint64 logicalValue) const;

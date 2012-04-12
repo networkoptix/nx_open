@@ -33,13 +33,14 @@ public:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
 private:
-    void drawPeriodsBar(QPainter *painter, QnTimePeriodList &recorded, QnTimePeriodList &motion);
-    void drawPeriods(QPainter *painter, QnTimePeriodList &periods, const QColor &preColor, const QColor &pastColor);
+    void drawPeriodsBar(QPainter *painter, QnTimePeriodList &recorded, QnTimePeriodList &motion, qreal top, qreal height);
+    void drawPeriods(QPainter *painter, QnTimePeriodList &periods, qreal top, qreal height, const QColor &preColor, const QColor &pastColor);
 
 
 
 private:
     QnTimePeriodList m_timePeriods[LineCount][PeriodTypeCount];
+    PositionValueConverter m_converter;
 };
 
 

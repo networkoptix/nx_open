@@ -1,16 +1,28 @@
 #include "time_slider.h"
+
+#include <QtGui/QPainter>
+
 #include <utils/common/warnings.h>
+#include <utils/common/scoped_painter_rollback.h>
 #include <ui/style/noptix_style.h>
 
-namespace {
-
-}
 
 
 QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     base_type(parent)
 {
     setProperty(Qn::SliderLength, 0);
+
+    QnTimePeriodList l;
+    
+    l << QnTimePeriod(10, 10);
+    l << QnTimePeriod(30, 10);
+    setTimePeriods(SelectionLine, RecordingPeriod, l);
+    l.clear();
+    
+    l << QnTimePeriod(15, 3);
+    setTimePeriods(SelectionLine, MotionPeriod, l);
+
 }
 
 QnTimeSlider::~QnTimeSlider() {
@@ -30,62 +42,59 @@ void QnTimeSlider::setTimePeriods(DisplayLine line, PeriodType type, const QnTim
 // Painting
 // -------------------------------------------------------------------------- //
 void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
-    
+    /* Initialize converter. It will be used a lot. */
+    m_converter = PositionValueConverter(this);
+
+    QRectF rect = this->rect();
+
+    QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
+
+
+    drawPeriodsBar(painter, m_timePeriods[SelectionLine][RecordingPeriod],  m_timePeriods[SelectionLine][MotionPeriod], rect.top() + rect.height() * 0.5,   rect.height() * 0.25);
+    drawPeriodsBar(painter, m_timePeriods[LayoutLine][RecordingPeriod],     m_timePeriods[LayoutLine][MotionPeriod],    rect.top() + rect.height() * 0.75,  rect.height() * 0.25);
 }
 
-void QnTimeSlider::drawPeriodsBar(QPainter *painter, QnTimePeriodList &recorded, QnTimePeriodList &motion) {
-    
+void QnTimeSlider::drawPeriodsBar(QPainter *painter, QnTimePeriodList &recorded, QnTimePeriodList &motion, qreal top, qreal height) {
+    qreal leftPos = m_converter.positionFromValue(minimum());
+    qreal rightPos = m_converter.positionFromValue(maximum());
+    qreal centralPos = m_converter.positionFromValue(sliderPosition());
+
+    if(!qFuzzyCompare(leftPos, centralPos))
+        painter->fillRect(QRectF(leftPos, top, centralPos - leftPos, height), QColor(64, 64, 64));
+    if(!qFuzzyCompare(rightPos, centralPos))
+        painter->fillRect(QRectF(centralPos, top, rightPos - centralPos, height), QColor(0, 0, 0));
+
+    drawPeriods(painter, recorded, top, height, QColor(24, 128, 24), QColor(12, 64, 12));
+    drawPeriods(painter, motion, top, height, QColor(128, 0, 0), QColor(64, 0, 0));
 }
 
-void QnTimeSlider::drawPeriods(QPainter *painter, QnTimePeriodList &periods, const QColor &preColor, const QColor &pastColor) {
+void QnTimeSlider::drawPeriods(QPainter *painter, QnTimePeriodList &periods, qreal top, qreal height, const QColor &preColor, const QColor &pastColor) {
     if (periods.isEmpty())
         return;
 
-    /*
-    bool upsideDown = 
+    // TODO: rewrite this so that there is no drawing motion periods over recorded ones.
 
-    const qint64 pos = this->sliderPosition();
+    qint64 minimumValue = this->minimum();
+    qint64 maximumValue = this->maximum();
+    qreal centralPos = m_converter.positionFromValue(this->sliderPosition());
 
+    QnTimePeriodList::const_iterator begin = periods.findNearestPeriod(minimumValue, false);
+    QnTimePeriodList::const_iterator end = periods.findNearestPeriod(maximumValue, true);
 
-    QRectF contentsRect = this->contentsRect();
-    qreal x = contentsRect.left() + m_handleRect.width() / 2;
-
-    qreal msInPixel = getMsInPixel();
-
-    QnTimePeriodList::const_iterator beginItr = timePeriods.findNearestPeriod(pos, false);
-    QnTimePeriodList::const_iterator endItr = timePeriods.findNearestPeriod(pos+m_parent->sliderRange(), false);
-
-    int center = m_handleRect.center().x();
-    QColor light = color.lighter();
-    QColor dark = color;
-
-    //foreach(const QnTimePeriod &period, timePeriods)
-    for (QnTimePeriodList::const_iterator itr = beginItr; itr <= endItr; ++itr)
+    for (QnTimePeriodList::const_iterator pos = begin; pos < end; ++pos)
     {
-        const QnTimePeriod& period = *itr;
-        qreal left = x + static_cast<qreal>(period.startTimeMs - pos) / msInPixel;
-        left = qMax(left, contentsRect.left());
-
-        qreal right;
-        if (period.durationMs == -1) {
-            right = contentsRect.right();
+        qreal leftPos = m_converter.positionFromValue(qMax(pos->startTimeMs, minimumValue));
+        qreal rightPos = m_converter.positionFromValue(pos->durationMs == -1 ? maximumValue : qMin(pos->startTimeMs + pos->durationMs, maximumValue));
+            
+        if(rightPos <= centralPos) {
+            painter->fillRect(QRectF(leftPos, top, rightPos - leftPos, height), preColor);
+        } else if(leftPos >= centralPos) {
+            painter->fillRect(QRectF(leftPos, top, rightPos - leftPos, height), pastColor);
         } else {
-            right = x + static_cast<qreal>((period.startTimeMs + period.durationMs) - pos) / msInPixel;
-            right = qMin(right, contentsRect.right());
+            painter->fillRect(QRectF(leftPos, top, centralPos - leftPos, height), preColor);
+            painter->fillRect(QRectF(centralPos, top, rightPos - centralPos, height), pastColor);
         }
-
-        //if (left > right)
-        //    continue;
-
-        if(right < center) {
-            painter->fillRect(left, contentsRect.top(), qMax(1.0, right - left), contentsRect.height(), light);
-        } else if(left > center) {
-            painter->fillRect(left, contentsRect.top(), qMax(1.0, right - left), contentsRect.height(), dark);
-        } else {
-            painter->fillRect(left, contentsRect.top(), center - left, contentsRect.height(), light);
-            painter->fillRect(center, contentsRect.top(), qMax(1.0, right - center), contentsRect.height(), dark);
-        }
-    }*/
+    }
 }
 
 
