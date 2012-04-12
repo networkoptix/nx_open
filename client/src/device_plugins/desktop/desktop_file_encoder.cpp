@@ -11,7 +11,7 @@ static const int DEFAULT_VIDEO_STREAM_ID = 4113;
 static const int DEFAULT_AUDIO_STREAM_ID = 4351;
 static const int AUDIO_QUEUE_MAX_SIZE = 256;
 static const int AUDIO_CAUPTURE_FREQUENCY = 44100;
-static const int BASE_BITRATE = 1000 * 1000 * 8; // bitrate for best quality for fullHD mode;
+static const int BASE_BITRATE = 1000 * 1000 * 10; // bitrate for best quality for fullHD mode;
 
 static const int MAX_VIDEO_JITTER = 2;
 
