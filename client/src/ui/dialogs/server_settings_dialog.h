@@ -31,7 +31,7 @@ private:
     QSpinBox* createSpinCellWidget(QWidget* parent);
     void initView();
     bool saveToModel();
-    bool validateStorages(const QnStorageResourceList& storages, QString& errorString);
+    bool validateStorages(const QnAbstractStorageResourceList& storages, QString& errorString);
     void save();
 
 private:

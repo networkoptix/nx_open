@@ -65,16 +65,28 @@ QnResourcePtr QnResourceDiscoveryManager::createResource(QnId resourceTypeId, co
 {
     QnResourcePtr result;
 
-    ResourceSearcherList searchersList;
+    QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
+
+    if (resourceType.isNull())
+        return result;
+    if (resourceType->getName() == "Storage")
     {
-        QMutexLocker locker(&m_searchersListMutex);
-        searchersList = m_searchersList;
+
+        result = QnResourcePtr(QnStoragePluginFactory::instance()->createStorage(parameters["url"]));
+        result->deserialize(parameters);
     }
-    foreach (QnAbstractResourceSearcher *searcher, searchersList)
-    {
-        result = searcher->createResource(resourceTypeId, parameters);
-        if (!result.isNull())
-            break;
+    else {
+        ResourceSearcherList searchersList;
+        {
+            QMutexLocker locker(&m_searchersListMutex);
+            searchersList = m_searchersList;
+        }
+        foreach (QnAbstractResourceSearcher *searcher, searchersList)
+        {
+            result = searcher->createResource(resourceTypeId, parameters);
+            if (!result.isNull())
+                break;
+        }
     }
 
     return result;

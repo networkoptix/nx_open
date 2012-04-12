@@ -23,6 +23,7 @@ public:
     QnFile(const QString& fName);
     virtual ~QnFile();
     void setFileName(const QString& fName) { m_fileName = fName; }
+    QString getFileName() const { return m_fileName; }
 
 	virtual bool open(QIODevice::OpenMode& mode, unsigned int systemDependentFlags = 0);
 	virtual void close();

@@ -1,63 +1,61 @@
 #include "coldstore_storage.h"
 
-QnPlColdStoreStorage::QnPlColdStoreStorage(const QString& storageLink, int minFreeSpace)
-{
-#ifdef Q_OS_WIN
-    WSADATA wsaData;
-    WORD wVersionRequested = MAKEWORD(1, 1);
-    WSAStartup(wVersionRequested, &wsaData);
-#endif
-    const char* ip = "192.168.1.30";
-
-
-    m_csConnection = new Veracity::SFSClient();
-
-    if (m_csConnection->Connect(ip) != Veracity::ISFS::STATUS_SUCCESS)
-        return ;
-
-    int n = 0;
-
-}
-
-QnPlColdStoreStorage::~QnPlColdStoreStorage()
+QnPlColdStoreStorage::QnPlColdStoreStorage()
 {
 
 }
 
-QString QnPlColdStoreStorage::getName() const
-{
-    return "coldstore";
-}
-
-STORAGE_FILE_HANDLER QnPlColdStoreStorage::open(const QString& fname)
-{
-    if (!m_csConnection)
-        return 0;
-
-    
-}
-
-void QnPlColdStoreStorage::close(STORAGE_FILE_HANDLER)
-{
-
-}
-
-void QnPlColdStoreStorage::flush(STORAGE_FILE_HANDLER)
-{
-
-}
-
-int QnPlColdStoreStorage::write(const char* data, int size)
+QIODevice* QnPlColdStoreStorage::open(const QString& fileName, QIODevice::OpenMode openMode)
 {
     return 0;
 }
 
-int QnPlColdStoreStorage::read(char* data, int size)
+int QnPlColdStoreStorage::getChunkLen() const 
 {
-    return 0;
+    return 60*60;
 }
 
-int QnPlColdStoreStorage::seek(int shift)
+bool QnPlColdStoreStorage::isStorageAvailable() 
 {
-    return 0;
+    return true;
+}
+
+QFileInfoList QnPlColdStoreStorage::getFileList(const QString& dirName) 
+{
+    return QFileInfoList();
+}
+
+bool QnPlColdStoreStorage::isNeedControlFreeSpace() 
+{
+    return true;
+}
+
+bool QnPlColdStoreStorage::removeFile(const QString& url) 
+{
+    return false;
+}
+
+bool QnPlColdStoreStorage::removeDir(const QString& url) 
+{
+    return false;
+}
+
+bool QnPlColdStoreStorage::renameFile(const QString& oldName, const QString& newName)
+{
+    return false;
+}
+
+bool QnPlColdStoreStorage::isFileExists(const QString& url) 
+{
+    return false;
+}
+
+bool QnPlColdStoreStorage::isDirExists(const QString& url) 
+{
+    return false;
+}
+
+qint64 QnPlColdStoreStorage::getFreeSpace() 
+{
+    return 10*1024*1024*1024ll;
 }

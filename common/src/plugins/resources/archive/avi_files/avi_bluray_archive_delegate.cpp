@@ -599,7 +599,7 @@ void QnAVIBlurayArchiveDelegate::fillAdditionalInfo(CLFileInfo* fi)
                 }
             }
 
-            av_metadata_set2(&avStream->metadata, "language", langName.constData(), 0);
+            av_dict_set(&avStream->metadata, "language", langName.constData(), 0);
         }
     }
 }

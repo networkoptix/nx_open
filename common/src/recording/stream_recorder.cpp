@@ -65,7 +65,7 @@ void QnStreamRecorder::close()
                 avcodec_close(m_formatCtx->streams[i]->codec);
         }
         if (m_formatCtx->pb)
-            avio_close(m_formatCtx->pb);
+            m_storage->closeFfmpegIOContext(m_formatCtx->pb);
         avformat_free_context(m_formatCtx);
         m_formatCtx = 0;
 
@@ -267,7 +267,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
         return false;
 
     m_fileName += QString(".") + fileExt;
-    QString url = QString("ufile:") + m_fileName;
+    QString url = m_fileName; 
 
     global_ffmpeg_mutex.lock();
     int err = avformat_alloc_output_context2(&m_formatCtx, outputCtx, 0, url.toUtf8().constData());
@@ -287,13 +287,9 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
     {
         QMutexLocker mutex(&global_ffmpeg_mutex);
         
-        if (av_set_parameters(m_formatCtx, NULL) < 0) {
-            m_lastErrMessage = "Can't initialize output format parameters for recording video camera";
-            cl_log.log(m_lastErrMessage, cl_logERROR);
-            return false;
-        }
-        av_metadata_set2(&m_formatCtx->metadata, "video_layout", layoutStr.toAscii().data(), 0);
-        av_metadata_set2(&m_formatCtx->metadata, "start_time", QString::number(m_startOffset+mediaData->timestamp/1000).toAscii().data(), 0);
+
+        av_dict_set(&m_formatCtx->metadata, "video_layout", layoutStr.toAscii().data(), 0);
+        av_dict_set(&m_formatCtx->metadata, "start_time", QString::number(m_startOffset+mediaData->timestamp/1000).toAscii().data(), 0);
 
         m_formatCtx->start_time = mediaData->timestamp;
 
@@ -318,7 +314,6 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
             {
                 AVCodecContext* srcContext = mediaData->context->ctx();
                 avcodec_copy_context(videoCodecCtx, srcContext);
-                videoStream->stream_copy = 1;
             }
             else if (m_role == Role_FileExport)
             {
@@ -327,7 +322,6 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
                 CLFFmpegVideoDecoder decoder(mediaData->compressionType, mediaData, false);
                 decoder.decode(mediaData, &outFrame);
                 avcodec_copy_context(videoStream->codec, decoder.getContext());
-                videoStream->stream_copy = 1;
             }
             else {
                 videoCodecCtx->codec_id = mediaData->compressionType;
@@ -355,7 +349,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
             //videoStream->first_dts = av_rescale_q(mediaData->timestamp, srcRate, stream->time_base);
 
             QString layoutData = QString::number(layout->v_position(i)) + QString(",") + QString(layout->h_position(i));
-            av_metadata_set2(&videoStream->metadata, "layout_channel", QString::number(i).toAscii().data(), 0);
+            av_dict_set(&m_formatCtx->metadata, "layout_channel", QString::number(i).toAscii().data(), 0);
         }
 
         /*
@@ -380,14 +374,15 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
         }
         */
 
-        if ((avio_open(&m_formatCtx->pb, url.toUtf8().constData(), AVIO_FLAG_WRITE)) < 0) 
+        m_formatCtx->pb = m_storage->createFfmpegIOContext(url, QIODevice::WriteOnly);
+        if (m_formatCtx->pb == 0) 
         {
             m_lastErrMessage = "Can't allocate output stream for video recording.";
             cl_log.log(m_lastErrMessage, cl_logERROR);
             return false;
         }
 
-        av_write_header(m_formatCtx);
+        avformat_write_header(m_formatCtx, 0);
     }
     fileStarted(m_startDateTime/1000, m_fileName, m_mediaProvider);
 
@@ -433,6 +428,8 @@ bool QnStreamRecorder::saveMotion(QnAbstractMediaDataPtr media)
 QString QnStreamRecorder::fillFileName(QnAbstractMediaStreamDataProvider* provider)
 {
     Q_UNUSED(provider);
+    if (m_storage == 0)
+        m_storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(m_fixedFileName));
     return m_fixedFileName;
 }
 
@@ -493,7 +490,8 @@ bool QnStreamRecorder::addSignatureFrame(QString& errorString)
 
     if (generatedFrame == 0)
     {
-        qWarning() << "Can't sign file" << m_fileName;
+        m_lastErrMessage = QString("Error during generate watermark for file ") + m_fileName;
+        qWarning() << m_lastErrMessage;
         return false;
     }
 
@@ -519,4 +517,9 @@ void QnStreamRecorder::setRole(Role role)
 void QnStreamRecorder::setSignLogo(QPixmap logo)
 {
     m_logo = logo;
+}
+
+void QnStreamRecorder::setStorage(QnStorageResourcePtr storage)
+{
+    m_storage = storage;
 }

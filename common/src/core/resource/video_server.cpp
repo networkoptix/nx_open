@@ -88,12 +88,12 @@ QnResourcePtr QnVideoServerResourceFactory::createResource(QnId resourceTypeId, 
     return result;
 }
 
-QnStorageResourceList QnVideoServerResource::getStorages() const
+QnAbstractStorageResourceList QnVideoServerResource::getStorages() const
 {
     return m_storages;
 }
 
-void QnVideoServerResource::setStorages(const QnStorageResourceList &storages)
+void QnVideoServerResource::setStorages(const QnAbstractStorageResourceList &storages)
 {
     m_storages = storages;
 }
@@ -166,10 +166,10 @@ void QnVideoServerResource::updateInner(QnResourcePtr other)
         m_netAddrList = localOther->m_netAddrList;
         setApiUrl(localOther->m_apiUrl);
 
-        QnStorageResourceList otherStorages = localOther->getStorages();
+        QnAbstractStorageResourceList otherStorages = localOther->getStorages();
         
         // keep index uhcnaged (app server does not provide such info
-        foreach(QnStorageResourcePtr storage, m_storages)
+        foreach(QnAbstractStorageResourcePtr storage, m_storages)
         {
             for (int i = 0; i < otherStorages.size(); ++i)
             {

@@ -403,6 +403,7 @@ bool QnServerArchiveDelegate::switchToChunk(const DeviceFileCatalog::Chunk newCh
     QString url = m_currentChunkCatalog->fullFileName(m_currentChunk);
     m_fileRes = QnAviResourcePtr(new QnAviResource(url));
     m_aviDelegate->close();
+    m_aviDelegate->setStorage(qnStorageMan->getStorageByUrl(url));
     bool rez = m_aviDelegate->open(m_fileRes);
     //if (rez)
     //    m_aviDelegate->setAudioChannel(m_selectedAudioChannel);
@@ -438,6 +439,7 @@ bool QnServerArchiveDelegate::setQualityInternal(MediaQuality quality, bool fast
         m_newQualityAviDelegate = QnAviArchiveDelegatePtr(new QnAviArchiveDelegate());
         m_newQualityAviDelegate->setUseAbsolutePos(false);
 
+        m_newQualityAviDelegate->setStorage(qnStorageMan->getStorageByUrl(m_newQualityFileRes->getUrl()));
         if (!m_newQualityAviDelegate->open(m_newQualityFileRes))
             return false;
         qint64 chunkOffset = (timeMs - m_newQualityChunk.startTimeMs)*1000;

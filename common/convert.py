@@ -11,10 +11,7 @@ from filetypes import all_filetypes, video_filetypes, image_filetypes
 
 # os.path = posixpath
 
-FFMPEG_VERSION = '2011-08-29'
-
-if sys.platform == 'win32':
-    FFMPEG_VERSION = '2011-08-29-patched'
+FFMPEG_VERSION = '2012-04-10'
 
 EXCLUDE_DIRS = ('.svn', 'dxva')
 EXCLUDE_FILES = ('dxva', 'moc_', 'qrc_', 'StdAfx')

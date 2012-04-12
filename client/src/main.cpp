@@ -52,6 +52,9 @@
 #include "utils/network/socket.h"
 #include <openssl/evp.h>
 
+#include "plugins/storage/file_storage/file_storage_resource.h"
+#include "plugins/storage/file_storage/qtfile_storage_resource.h"
+
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
     //USES_CONVERSION;
@@ -78,14 +81,19 @@ void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args
 
 void ffmpegInit()
 {
-    avcodec_init();
+    //avcodec_init();
     av_register_all();
 
+    QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true); // true means use it plugin if no <protocol>:// prefix
+    QnStoragePluginFactory::instance()->registerStoragePlugin("qtfile", QnQtFileStorageResource::instance);
+
+    /*
     extern URLProtocol ufile_protocol;
     av_register_protocol2(&ufile_protocol, sizeof(ufile_protocol));
 
     extern URLProtocol qtufile_protocol;
     av_register_protocol2(&qtufile_protocol, sizeof(qtufile_protocol));
+    */
 }
 
 #ifdef TEST_RTSP_SERVER
