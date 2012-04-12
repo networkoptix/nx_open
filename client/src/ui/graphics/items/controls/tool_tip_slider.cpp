@@ -135,15 +135,7 @@ bool QnToolTipSlider::eventFilter(QObject *target, QEvent *event) {
             break;
         case QEvent::GraphicsSceneMouseMove:
             if(isSliderDown()) {
-                QStyleOptionSlider opt;
-                initStyleOption(&opt);
-                QRect grooveRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderGroove, this);
-                QRect handleRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle, this);
-
-                int sliderMin = grooveRect.x();
-                int sliderMax = grooveRect.right() - handleRect.width() + 1;
-
-                qint64 pos = sliderValueFromPosition(minimum(), maximum(), m_toolTipItem->mapToItem(this, e->pos()).x() + m_dragOffset - sliderMin, sliderMax - sliderMin, opt.upsideDown);
+                qint64 pos = PositionValueConverter(this).valueFromPosition(m_toolTipItem->mapToItem(this, e->pos()).x() + m_dragOffset);
                 setSliderPosition(pos);
 
                 e->accept();

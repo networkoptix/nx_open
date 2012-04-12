@@ -47,6 +47,21 @@ protected:
 protected:
     GraphicsSlider(GraphicsSliderPrivate &dd, QGraphicsItem *parent);
 
+    class PositionValueConverter {
+    public:
+        PositionValueConverter(const GraphicsSlider *slider);
+
+        qreal positionFromValue(qint64 logicalValue) const;
+        qint64 valueFromPosition(qreal pos) const;
+
+    private:
+        qreal m_posMin, m_posMax;
+        qint64 m_valMin, m_valMax;
+        bool m_upsideDown;
+    };
+
+    friend class PositionValueConverter;
+
 private:
     Q_DISABLE_COPY(GraphicsSlider)
     Q_DECLARE_PRIVATE(GraphicsSlider)

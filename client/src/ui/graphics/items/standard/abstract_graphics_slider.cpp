@@ -883,27 +883,3 @@ void AbstractGraphicsSlider::wheelEvent(QGraphicsSceneWheelEvent *event)
 #endif
 
 
-qreal AbstractGraphicsSlider::sliderPositionFromValue(qint64 min, qint64 max, qint64 logicalValue, qreal span, bool upsideDown) {
-    if (span <= 0 || logicalValue < min || max <= min)
-        return 0;
-
-    if (logicalValue > max)
-        return upsideDown ? span : min;
-
-    qint64 range = max - min;
-    qint64 p = upsideDown ? max - logicalValue : logicalValue - min;
-
-    return p / (range / span);
-}
-
-qint64 AbstractGraphicsSlider::sliderValueFromPosition(qint64 min, qint64 max, qreal pos, qreal span, bool upsideDown) {
-    if (span <= 0 || pos <= 0)
-        return upsideDown ? max : min;
-
-    if (pos >= span)
-        return upsideDown ? min : max;
-
-    qreal tmp = qRound64((max - min) * (pos / span));
-    return upsideDown ? max - tmp : tmp + min;
-}
-

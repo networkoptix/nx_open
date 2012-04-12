@@ -113,9 +113,6 @@ protected:
 protected:
     AbstractGraphicsSlider(AbstractGraphicsSliderPrivate &dd, QGraphicsItem *parent);
 
-    static qreal sliderPositionFromValue(qint64 min, qint64 max, qint64 logicalValue, qreal span, bool upsideDown);
-    static qint64 sliderValueFromPosition(qint64 min, qint64 max, qreal pos, qreal span, bool upsideDown);
-
 private:
     Q_DISABLE_COPY(AbstractGraphicsSlider)
     Q_DECLARE_PRIVATE(AbstractGraphicsSlider)

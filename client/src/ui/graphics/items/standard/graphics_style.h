@@ -57,6 +57,9 @@ public:
     QRect subControlRect(QStyle::ComplexControl control, const QStyleOptionComplex *option, QStyle::SubControl subControl, const QGraphicsWidget *widget = 0) const;
     QRect subElementRect(QStyle::SubElement element, const QStyleOption *option, const QGraphicsWidget *widget = 0) const;
 
+    static qreal sliderPositionFromValue(qint64 min, qint64 max, qint64 logicalValue, qreal span, bool upsideDown);
+    static qint64 sliderValueFromPosition(qint64 min, qint64 max, qreal pos, qreal span, bool upsideDown);
+
 private:
     QWeakPointer<QStyle> m_baseStyle;
     mutable const QGraphicsWidget *m_graphicsWidget;

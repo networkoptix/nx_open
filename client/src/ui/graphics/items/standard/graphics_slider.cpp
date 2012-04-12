@@ -29,23 +29,7 @@ void GraphicsSliderPrivate::init()
 
 qint64 GraphicsSliderPrivate::pixelPosToRangeValue(int pos) const
 {
-    Q_Q(const GraphicsSlider);
-
-    QStyleOptionSlider opt;
-    q->initStyleOption(&opt);
-    QRect grooveRect = q->style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderGroove, q);
-    QRect handleRect = q->style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle, q);
-
-    int sliderMin, sliderMax;
-    if (orientation == Qt::Horizontal) {
-        sliderMin = grooveRect.x();
-        sliderMax = grooveRect.right() - handleRect.width() + 1;
-    } else {
-        sliderMin = grooveRect.y();
-        sliderMax = grooveRect.bottom() - handleRect.height() + 1;
-    }
-
-    return q->sliderValueFromPosition(minimum, maximum, pos - sliderMin, sliderMax - sliderMin, opt.upsideDown);
+    return GraphicsSlider::PositionValueConverter(q_func()).valueFromPosition(pos);
 }
 
 void GraphicsSliderPrivate::updateHoverControl(const QPoint &pos)
@@ -442,3 +426,34 @@ void GraphicsSlider::setTickInterval(qint64 tickInterval)
     d_func()->tickInterval = qMax(0ll, tickInterval);
     update();
 }
+
+
+
+GraphicsSlider::PositionValueConverter::PositionValueConverter(const GraphicsSlider *slider) {
+    QStyleOptionSlider opt;
+    slider->initStyleOption(&opt);
+    m_upsideDown = opt.upsideDown;
+
+    QRect grooveRect = slider->style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderGroove, slider);
+    QRect handleRect = slider->style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle, slider);
+
+    if (slider->orientation() == Qt::Horizontal) {
+        m_posMin = grooveRect.x();
+        m_posMax = grooveRect.right() - handleRect.width() + 1;
+    } else {
+        m_posMin = grooveRect.y();
+        m_posMax = grooveRect.bottom() - handleRect.height() + 1;
+    }
+
+    m_valMin = slider->minimum();
+    m_valMax = slider->maximum();
+}
+
+qreal GraphicsSlider::PositionValueConverter::positionFromValue(qint64 logicalValue) const {
+    return m_posMin + GraphicsStyle::sliderPositionFromValue(m_valMin, m_valMax, logicalValue, m_posMax - m_posMin, m_upsideDown);
+}
+
+qint64 GraphicsSlider::PositionValueConverter::valueFromPosition(qreal pos) const {
+    return GraphicsStyle::sliderValueFromPosition(m_valMin, m_valMax, pos - m_posMin, m_posMax - m_posMin, m_upsideDown);
+}
+
