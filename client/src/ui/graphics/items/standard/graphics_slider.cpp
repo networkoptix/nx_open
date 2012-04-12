@@ -17,7 +17,7 @@ void GraphicsSliderPrivate::init()
     pressedControl = QStyle::SC_None;
     tickPosition = GraphicsSlider::NoTicks;
     tickInterval = 0;
-    clickOffset = 0;
+    clickOffset = QPoint(0, 0);
     hoverControl = QStyle::SC_None;
 
     q->setFocusPolicy(Qt::FocusPolicy(q->style()->styleHint(QStyle::SH_Button_FocusPolicy, NULL, q)));
@@ -25,11 +25,32 @@ void GraphicsSliderPrivate::init()
     if (orientation == Qt::Vertical)
         sp.transpose();
     q->setSizePolicy(sp);
+
+    mapperDirty = true;
 }
 
-qint64 GraphicsSliderPrivate::pixelPosToRangeValue(int pos) const
-{
-    return GraphicsSlider::PositionValueConverter(q_func()).valueFromPosition(pos);
+void GraphicsSliderPrivate::ensureMapper() const {
+    if(!mapperDirty)
+        return;
+
+    Q_Q(const GraphicsSlider);
+
+    QStyleOptionSlider opt;
+    q->initStyleOption(&opt);
+    upsideDown = opt.upsideDown;
+
+    QRect grooveRect = q->style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderGroove, q);
+    QRect handleRect = q->style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle, q);
+
+    if (q->orientation() == Qt::Horizontal) {
+        pixelPosMin = grooveRect.x();
+        pixelPosMax = grooveRect.right() - handleRect.width() + 1;
+    } else {
+        pixelPosMin = grooveRect.y();
+        pixelPosMax = grooveRect.bottom() - handleRect.height() + 1;
+    }
+
+    mapperDirty = false;
 }
 
 void GraphicsSliderPrivate::updateHoverControl(const QPoint &pos)
@@ -204,6 +225,27 @@ void GraphicsSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     }
 
     style()->drawComplexControl(QStyle::CC_Slider, &opt, painter, this);
+
+    d->mapperDirty = true;
+}
+
+void GraphicsSlider::updateGeometry() {
+    d_func()->mapperDirty = true;    
+
+    base_type::updateGeometry();
+}
+
+void GraphicsSlider::resizeEvent(QGraphicsSceneResizeEvent *event) {
+    d_func()->mapperDirty = true;    
+
+    base_type::resizeEvent(event);
+}
+
+void GraphicsSlider::sliderChange(SliderChange change) {
+    if(change != SliderValueChange)
+        d_func()->mapperDirty = true;
+
+    base_type::sliderChange(change);
 }
 
 /*!
@@ -220,7 +262,9 @@ bool GraphicsSlider::event(QEvent *event)
     case QEvent::GraphicsSceneHoverLeave:
         d->updateHoverControl(static_cast<QGraphicsSceneHoverEvent *>(event)->pos().toPoint());
         break;
-
+    case QEvent::StyleChange:
+        d->mapperDirty = true;
+        break;
     default:
         break;
     }
@@ -250,7 +294,7 @@ void GraphicsSlider::mousePressEvent(QGraphicsSceneMouseEvent *ev)
     const QRect sliderRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle, this);
     // to take half of the slider off for the setSliderPosition call we use the center - topLeft
     const QPoint center = sliderRect.center() - sliderRect.topLeft();
-    const qint64 pressValue = d->pixelPosToRangeValue(d->pick(ev->pos().toPoint() - center));
+    const qint64 pressValue = valueFromPosition(ev->pos().toPoint() - center);
 
     ev->accept();
     if ((ev->button() & style()->styleHint(QStyle::SH_Slider_AbsoluteSetButtons, &opt, this)) != 0) {
@@ -276,7 +320,7 @@ void GraphicsSlider::mousePressEvent(QGraphicsSceneMouseEvent *ev)
 
     if (d->pressedControl == QStyle::SC_SliderHandle) {
         setRepeatAction(SliderNoAction);
-        d->clickOffset = d->pick(center);
+        d->clickOffset = center;
         setSliderDown(true);
         update();
     }
@@ -295,7 +339,7 @@ void GraphicsSlider::mouseMoveEvent(QGraphicsSceneMouseEvent *ev)
     }
 
     ev->accept();
-    setSliderPosition(d->pixelPosToRangeValue(d->pick(ev->pos().toPoint()) - d->clickOffset));
+    setSliderPosition(valueFromPosition(ev->pos().toPoint() - d->clickOffset));
 }
 
 /*!
@@ -427,33 +471,25 @@ void GraphicsSlider::setTickInterval(qint64 tickInterval)
     update();
 }
 
+QPointF GraphicsSlider::positionFromValue(qint64 logicalValue) const {
+    Q_D(const GraphicsSlider);
 
+    d->ensureMapper();
 
-GraphicsSlider::PositionValueConverter::PositionValueConverter(const GraphicsSlider *slider) {
-    QStyleOptionSlider opt;
-    slider->initStyleOption(&opt);
-    m_upsideDown = opt.upsideDown;
-
-    QRect grooveRect = slider->style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderGroove, slider);
-    QRect handleRect = slider->style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle, slider);
-
-    if (slider->orientation() == Qt::Horizontal) {
-        m_posMin = grooveRect.x();
-        m_posMax = grooveRect.right() - handleRect.width() + 1;
+    qreal result = d->pixelPosMin + GraphicsStyle::sliderPositionFromValue(d->minimum, d->maximum, logicalValue, d->pixelPosMax - d->pixelPosMin, d->upsideDown);
+    if(d->orientation == Qt::Horizontal) {
+        return QPointF(result, 0.0);
     } else {
-        m_posMin = grooveRect.y();
-        m_posMax = grooveRect.bottom() - handleRect.height() + 1;
+        return QPointF(0.0, result);
     }
-
-    m_valMin = slider->minimum();
-    m_valMax = slider->maximum();
 }
 
-qreal GraphicsSlider::PositionValueConverter::positionFromValue(qint64 logicalValue) const {
-    return m_posMin + GraphicsStyle::sliderPositionFromValue(m_valMin, m_valMax, logicalValue, m_posMax - m_posMin, m_upsideDown);
-}
+qint64 GraphicsSlider::valueFromPosition(const QPointF &position) const {
+    Q_D(const GraphicsSlider);
 
-qint64 GraphicsSlider::PositionValueConverter::valueFromPosition(qreal pos) const {
-    return GraphicsStyle::sliderValueFromPosition(m_valMin, m_valMax, pos - m_posMin, m_posMax - m_posMin, m_upsideDown);
+    d->ensureMapper();
+
+    qreal pixelPos = d->orientation == Qt::Horizontal ? position.x() : position.y();
+    return GraphicsStyle::sliderValueFromPosition(d->minimum, d->maximum, pixelPos - d->pixelPosMin, d->pixelPosMax - d->pixelPosMin, d->upsideDown);
 }
 

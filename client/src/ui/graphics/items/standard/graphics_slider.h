@@ -4,6 +4,8 @@
 #include "abstract_graphics_slider.h"
 
 class GraphicsSliderPrivate;
+class GraphicsSliderPositionConverter;
+
 class GraphicsSlider : public AbstractGraphicsSlider
 {
     Q_OBJECT
@@ -11,6 +13,8 @@ class GraphicsSlider : public AbstractGraphicsSlider
     Q_ENUMS(TickPosition)
     Q_PROPERTY(TickPosition tickPosition READ tickPosition WRITE setTickPosition)
     Q_PROPERTY(qint64 tickInterval READ tickInterval WRITE setTickInterval)
+
+    typedef AbstractGraphicsSlider base_type;
 
 public:
     enum TickPosition {
@@ -32,34 +36,28 @@ public:
     void setTickInterval(qint64 tickInterval);
     qint64 tickInterval() const;
 
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+
+    virtual void updateGeometry() override;
+
+    virtual QPointF positionFromValue(qint64 logicalValue) const override;
+    virtual qint64 valueFromPosition(const QPointF &position) const override;
 
 protected:
     void initStyleOption(QStyleOption *option) const;
 
-    QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
+    virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const override;
 
-    bool event(QEvent *event);
-    void mousePressEvent(QGraphicsSceneMouseEvent *event);
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+    virtual bool event(QEvent *event) override;
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
+    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
+    virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override;
+
+    virtual void sliderChange(SliderChange change) override;
 
 protected:
     GraphicsSlider(GraphicsSliderPrivate &dd, QGraphicsItem *parent);
-
-    class PositionValueConverter {
-    public:
-        PositionValueConverter() {}
-        PositionValueConverter(const GraphicsSlider *slider);
-
-        qreal positionFromValue(qint64 logicalValue) const;
-        qint64 valueFromPosition(qreal pos) const;
-
-    private:
-        qreal m_posMin, m_posMax;
-        qint64 m_valMin, m_valMax;
-        bool m_upsideDown;
-    };
 
     friend class PositionValueConverter;
 
@@ -67,5 +65,6 @@ private:
     Q_DISABLE_COPY(GraphicsSlider)
     Q_DECLARE_PRIVATE(GraphicsSlider)
 };
+
 
 #endif // GRAPHICSSLIDER_H

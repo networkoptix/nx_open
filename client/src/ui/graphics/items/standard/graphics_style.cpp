@@ -98,7 +98,7 @@ qreal GraphicsStyle::sliderPositionFromValue(qint64 min, qint64 max, qint64 logi
         return 0;
 
     if (logicalValue > max)
-        return upsideDown ? span : min;
+        return upsideDown ? 0.0 : span;
 
     qint64 range = max - min;
     qint64 p = upsideDown ? max - logicalValue : logicalValue - min;

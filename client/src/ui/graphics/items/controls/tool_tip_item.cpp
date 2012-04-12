@@ -37,13 +37,11 @@ QnToolTipItem::~QnToolTipItem() {
     return;
 }
 
-const QString &QnToolTipItem::text() const
-{
+const QString &QnToolTipItem::text() const {
     return m_text;
 }
 
-void QnToolTipItem::setText(const QString &text)
-{
+void QnToolTipItem::setText(const QString &text) {
     if (m_text == text)
         return;
 
@@ -52,13 +50,11 @@ void QnToolTipItem::setText(const QString &text)
     update();
 }
 
-const QFont &QnToolTipItem::font() const
-{
+const QFont &QnToolTipItem::font() const {
     return m_font;
 }
 
-void QnToolTipItem::setFont(const QFont &font)
-{
+void QnToolTipItem::setFont(const QFont &font) {
     if(m_font == font)
         return;
 
@@ -67,13 +63,11 @@ void QnToolTipItem::setFont(const QFont &font)
     update();
 }
 
-const QPen &QnToolTipItem::textPen() const
-{
+const QPen &QnToolTipItem::textPen() const {
     return m_textPen;
 }
 
-void QnToolTipItem::setTextPen(const QPen &textPen)
-{
+void QnToolTipItem::setTextPen(const QPen &textPen) {
     if(m_textPen == textPen)
         return;
 
@@ -81,13 +75,11 @@ void QnToolTipItem::setTextPen(const QPen &textPen)
     update();
 }
 
-const QPen &QnToolTipItem::borderPen() const
-{
+const QPen &QnToolTipItem::borderPen() const {
     return m_borderPen;
 }
 
-void QnToolTipItem::setBorderPen(const QPen &borderPen)
-{
+void QnToolTipItem::setBorderPen(const QPen &borderPen) {
     if (m_borderPen == borderPen)
         return;
 
@@ -96,13 +88,11 @@ void QnToolTipItem::setBorderPen(const QPen &borderPen)
     update();
 }
 
-const QBrush &QnToolTipItem::brush() const
-{
+const QBrush &QnToolTipItem::brush() const {
     return m_brush;
 }
 
-void QnToolTipItem::setBrush(const QBrush &brush)
-{
+void QnToolTipItem::setBrush(const QBrush &brush) {
     if(m_brush == brush)
         return;
 
@@ -111,22 +101,19 @@ void QnToolTipItem::setBrush(const QBrush &brush)
     update();
 }
 
-QRectF QnToolTipItem::boundingRect() const
-{
+QRectF QnToolTipItem::boundingRect() const {
     ensureShape();
 
     return m_boundingRect;
 }
 
-QPainterPath QnToolTipItem::shape() const
-{
+QPainterPath QnToolTipItem::shape() const {
     ensureShape();
 
     return m_itemShape;
 }
 
-void QnToolTipItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
+void QnToolTipItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
     Q_UNUSED(option)
     Q_UNUSED(widget)
 
@@ -142,22 +129,19 @@ void QnToolTipItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
     painter->drawText(QRectF(-m_textSize.width() / 2, -arrowHeight - roundingRadius - padding - m_textSize.height(), m_textSize.width(), m_textSize.height()), Qt::AlignCenter, m_text);
 }
 
-void QnToolTipItem::wheelEvent(QGraphicsSceneWheelEvent *event)
-{
+void QnToolTipItem::wheelEvent(QGraphicsSceneWheelEvent *event) {
     event->ignore();
 
     base_type::wheelEvent(event);
 }
 
-void QnToolTipItem::invalidateShape() 
-{
+void QnToolTipItem::invalidateShape() {
     m_shapeValid = false;
 
     prepareGeometryChange();
 }
 
-void QnToolTipItem::ensureShape() const 
-{
+void QnToolTipItem::ensureShape() const {
     if(m_shapeValid)
         return;
 
@@ -200,8 +184,7 @@ void QnToolTipItem::ensureShape() const
     m_shapeValid = true;
 }
 
-void QnToolTipItem::updateTextSize() 
-{
+void QnToolTipItem::updateTextSize() {
     QFontMetrics metrics(m_font);
     QSize textSize = metrics.size(0, m_text);
     if(textSize.width() < arrowWidth)

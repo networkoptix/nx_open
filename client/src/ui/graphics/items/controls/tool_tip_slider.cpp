@@ -19,23 +19,31 @@ namespace {
         }
     };
 
-    qreal horizontalCenter(const QRect &rect) {
-        /* Note that QRect::right != QRect::left + QRect::width. */
-        return (2 * rect.left() + rect.width()) / 2.0;
-    }
-
     const int toolTipHideDelay = 2500;
 
 } // anonymous namespace
 
 
 QnToolTipSlider::QnToolTipSlider(QGraphicsItem *parent):
-    base_type(Qt::Horizontal, parent),
-    m_toolTipItem(NULL),
-    m_autoHideToolTip(true),
-    m_sliderUnderMouse(false),
-    m_toolTipUnderMouse(false)
+    base_type(Qt::Horizontal, parent)
 {
+    init();
+}
+
+QnToolTipSlider::QnToolTipSlider(GraphicsSliderPrivate &dd, QGraphicsItem *parent):
+    base_type(dd, parent)
+{
+    init();
+}
+
+void QnToolTipSlider::init() {
+    setOrientation(Qt::Horizontal);
+
+    m_toolTipItem = NULL;
+    m_autoHideToolTip = true;
+    m_sliderUnderMouse = false;
+    m_toolTipUnderMouse = false;
+
     setToolTipItem(new QnSliderToolTipItem());
     setAcceptHoverEvents(true);
 
@@ -103,11 +111,17 @@ void QnToolTipSlider::updateToolTipVisibility() {
 }
 
 void QnToolTipSlider::updateToolTipPosition() {
+    if(!m_toolTipItem)
+        return;
+
     QStyleOptionSlider opt;
     initStyleOption(&opt);
+    QRect handleRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle, this);
 
-    const QRect handleRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle, this);
-    m_toolTipItem->setPos(horizontalCenter(handleRect), handleRect.top());
+    qreal x = positionFromValue(sliderPosition()).x() + handleRect.width() / 2.0;
+    qreal y = handleRect.top();
+    
+    m_toolTipItem->setPos(x, y);
 }
 
 
@@ -127,7 +141,7 @@ bool QnToolTipSlider::eventFilter(QObject *target, QEvent *event) {
                 initStyleOption(&opt);
                 const QRect handleRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle, this);
 
-                m_dragOffset = handleRect.left() - m_toolTipItem->mapToItem(this, e->pos()).x();
+                m_dragOffset = handleRect.topLeft() - m_toolTipItem->mapToItem(this, e->pos());
 
                 e->accept();
                 return true;
@@ -135,7 +149,7 @@ bool QnToolTipSlider::eventFilter(QObject *target, QEvent *event) {
             break;
         case QEvent::GraphicsSceneMouseMove:
             if(isSliderDown()) {
-                qint64 pos = PositionValueConverter(this).valueFromPosition(m_toolTipItem->mapToItem(this, e->pos()).x() + m_dragOffset);
+                qint64 pos = valueFromPosition(m_toolTipItem->mapToItem(this, e->pos()) + m_dragOffset);
                 setSliderPosition(pos);
 
                 e->accept();

@@ -104,6 +104,7 @@ NavigationItem::NavigationItem(QGraphicsItem *parent):
     m_timeSlider->setFlag(QGraphicsItem::ItemIsFocusable, true);
     m_timeSlider->setFocusProxy(this);
     m_timeSlider->toolTipItem()->setFlag(QGraphicsItem::ItemIsFocusable);
+    m_timeSlider->setToolTipItem(0);
 
     connect(m_timeSlider, SIGNAL(currentValueChanged(qint64)), this, SLOT(onValueChanged(qint64)));
     connect(m_timeSlider, SIGNAL(sliderPressed()), this, SLOT(onSliderPressed()));

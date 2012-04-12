@@ -12,10 +12,9 @@ public:
     QStyle::SubControl pressedControl;
     GraphicsSlider::TickPosition tickPosition;
     qint64 tickInterval;
-    int clickOffset;
+    QPoint clickOffset;
 
     void init();
-    qint64 pixelPosToRangeValue(int pos) const;
     inline int pick(const QPoint &pt) const
     { return orientation == Qt::Horizontal ? pt.x() : pt.y(); }
 
@@ -23,6 +22,11 @@ public:
     void updateHoverControl(const QPoint &pos);
     QStyle::SubControl hoverControl;
     QRect hoverRect;
+
+    mutable bool mapperDirty;
+    mutable bool upsideDown;
+    mutable qreal pixelPosMin, pixelPosMax;
+    void ensureMapper() const;
 };
 
 #endif // GRAPHICSSLIDER_P_H

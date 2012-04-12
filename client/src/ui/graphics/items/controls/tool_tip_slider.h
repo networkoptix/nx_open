@@ -25,6 +25,8 @@ public:
     virtual bool eventFilter(QObject *target, QEvent *event) override;
 
 protected:
+    QnToolTipSlider(GraphicsSliderPrivate &dd, QGraphicsItem *parent);
+
     virtual void sliderChange(SliderChange change) override;
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
     virtual void timerEvent(QTimerEvent *event) override;
@@ -33,6 +35,8 @@ protected:
     virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override;
 
 private:
+    void init();
+
     void hideToolTip();
     void showToolTip();
     
@@ -45,7 +49,7 @@ private:
     bool m_autoHideToolTip;
     bool m_sliderUnderMouse;
     bool m_toolTipUnderMouse;
-    qreal m_dragOffset;
+    QPointF m_dragOffset;
 };
 
 #endif // QN_TOOL_TIP_SLIDER_H

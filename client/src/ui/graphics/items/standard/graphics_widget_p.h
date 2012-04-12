@@ -8,6 +8,7 @@ class GraphicsStyle;
 class GraphicsWidgetPrivate {
 public:
     GraphicsWidgetPrivate(): q_ptr(NULL), style(NULL) {};
+    virtual ~GraphicsWidgetPrivate() {}
 
 protected:
     GraphicsWidget *q_ptr;

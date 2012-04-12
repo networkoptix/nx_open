@@ -74,6 +74,9 @@ public:
 
     void triggerAction(SliderAction action);
 
+    virtual QPointF positionFromValue(qint64 logicalValue) const = 0;
+    virtual qint64 valueFromPosition(const QPointF &position) const = 0;
+
 public Q_SLOTS:
     void setValue(qint64);
 
