@@ -46,7 +46,8 @@
 #include "plugins/resources/onvif/onvif_ws_searcher.h"
 #include "utils/common/command_line_parser.h"
 #include "plugins/resources/pulse/pulse_resource_searcher.h"
-#include "plugins/storage/file_storage/file_storage_protocol.h"
+//#include "plugins/storage/file_storage/file_storage_protocol.h"
+#include "plugins/storage/file_storage/file_storage_resource.h"
 
 
 
