@@ -64,11 +64,6 @@ case "$1" in
   configure)
       read_config
 
-#      db_reset networkoptix-mediaserver/ecs_host
-#      db_reset networkoptix-mediaserver/ecs_port
-#      db_reset networkoptix-mediaserver/ecs_login
-#      db_reset networkoptix-mediaserver/storage
-
       # Do we need to validate host?
       db_input high networkoptix-mediaserver/ecs_host || true
       db_go
