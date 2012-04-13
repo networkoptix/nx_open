@@ -3,7 +3,7 @@ package proto.pb;
 message CameraServerItem {
     required string  mac         = 1;
     required string  serverGuid  = 2;
-    required int32   timestamp   = 3;
+    required int64   timestamp   = 3;
 }
 
 message CameraServerItems {
