@@ -39,6 +39,8 @@ sudo rm -rf $STAGEBASE
 mkdir -p $PKGSTAGE
 rmdir $PKGSTAGE
 cp -r $ECS_PRESTAGE_PATH $PKGSTAGE
+cp /lib/x86_64-linux-gnu/libssl.so.1.0.0 $LIBSTAGE
+cp /lib/x86_64-linux-gnu/libcrypto.so.1.0.0 $LIBSTAGE
 
 mkdir -p $ETCSTAGE
 mkdir -p $INITSTAGE
