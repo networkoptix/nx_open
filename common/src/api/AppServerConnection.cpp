@@ -512,6 +512,20 @@ bool initResourceTypes(QnAppServerConnectionPtr appServerConnection)
     return true;
 }
 
+bool initCameraHistory(QnAppServerConnectionPtr appServerConnection)
+{
+    QnCameraHistoryList cameraHistoryList;
+    QByteArray errorString;
+    if (appServerConnection->getCameraHistoryList(cameraHistoryList, errorString) != 0)
+    {
+        qDebug() << "QnMain::run(): Can't get cameras history. Reason: " << errorString;
+        return false;
+    }
+    foreach(QnCameraHistoryPtr history, cameraHistoryList)
+        QnCameraHistoryPool::instance()->addCameraHistory(history);
+    return true;
+}
+
 bool initLicenses(QnAppServerConnectionPtr appServerConnection)
 {
     if (!qnLicensePool->isEmpty())

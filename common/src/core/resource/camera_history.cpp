@@ -98,7 +98,7 @@ void QnCameraHistory::addTimePeriod(const QnCameraTimePeriod& period)
     }
 
     m_timePeriods << period;
-    qSort(m_timePeriods.begin(), m_timePeriods.end());
+    //qSort(m_timePeriods.begin(), m_timePeriods.end());
 }
 
 qint64 QnCameraHistory::getMinTime() const

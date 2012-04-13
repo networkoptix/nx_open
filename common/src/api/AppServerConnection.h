@@ -178,5 +178,6 @@ private:
 
 bool initResourceTypes(QnAppServerConnectionPtr appServerConnection);
 bool initLicenses(QnAppServerConnectionPtr appServerConnection);
+bool initCameraHistory(QnAppServerConnectionPtr appServerConnection);
 
 #endif // APPSERVERCONNECTIONIMPL_H

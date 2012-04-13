@@ -367,7 +367,7 @@ void parseLicenses(QnLicenseList& licenses, const PbLicenseList& pb_licenses)
 
 void parserCameraServerItems(QnCameraHistoryList& cameraServerItems, const PbCameraServerItemList& pb_cameraServerItems)
 {
-    typedef QMap<qint32, QString> TimestampGuid;
+    typedef QMap<qint64, QString> TimestampGuid;
     typedef QMap<QString, TimestampGuid> HistoryType;
 
     // CameraMAC -> (Timestamp -> ServerGuid)
@@ -388,15 +388,21 @@ void parserCameraServerItems(QnCameraHistoryList& cameraServerItems, const PbCam
         if (ci.value().isEmpty())
             continue;
 
-        QMapIterator<qint32, QString> camit(ci.value());
-        camit.toBack();
+        QMapIterator<qint64, QString> camit(ci.value());
+        camit.toFront();
 
-        qint64 previousTs = -1;
-        while (camit.hasPrevious())
+        qint64 duration;
+        cameraHistory->setMacAddress(ci.key());
+        while (camit.hasNext())
         {
-            camit.previous();
-            cameraHistory->addTimePeriod(QnCameraTimePeriod(camit.key(), previousTs != -1 ? previousTs - camit.key() : -1, camit.value()));
-            previousTs = camit.key();
+            camit.next();
+
+            if (camit.hasNext())
+                duration = camit.peekNext().key() - camit.key();
+            else
+                duration = -1;
+
+            cameraHistory->addTimePeriod(QnCameraTimePeriod(camit.key(), duration, camit.value()));
         }
 
         cameraServerItems.append(cameraHistory);

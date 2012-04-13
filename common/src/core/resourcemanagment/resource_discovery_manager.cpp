@@ -136,6 +136,12 @@ void QnResourceDiscoveryManager::run()
         QnSleep::msleep(1000);
     }
 
+    while (!needToStop() && !initCameraHistory(appServerConnection))
+    {
+        QnSleep::msleep(1000);
+    }
+
+
     m_runNumber = 0;
 
     while (!needToStop())
