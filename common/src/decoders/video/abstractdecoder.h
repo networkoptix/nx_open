@@ -35,8 +35,10 @@ public:
         m_mtDecoding = value;
     }
 
-    virtual bool getLastDecodedFrame(CLVideoDecoderOutput* outFrame)
+    virtual bool getLastDecodedFrame(CLVideoDecoderOutput *outFrame)
     {
+        Q_UNUSED(outFrame);
+
         return false;
     }
 

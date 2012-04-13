@@ -65,7 +65,7 @@ Qn::ActionVisibility QnItemZoomedActionCondition::check(const QnResourceWidgetLi
     if(widgets.size() != 1 || !widgets[0])
         return Qn::InvisibleAction;
 
-    return ((widgets[0]->item() == workbench()->item(QnWorkbench::ZOOMED)) == m_requiredZoomedState) ? Qn::EnabledAction : Qn::InvisibleAction;
+    return ((widgets[0]->item() == workbench()->item(Qn::ZoomedRole)) == m_requiredZoomedState) ? Qn::EnabledAction : Qn::InvisibleAction;
 }
 
 
@@ -210,7 +210,7 @@ Qn::ActionVisibility QnSaveLayoutActionCondition::check(const QnResourceList &re
 }
 
 
-Qn::ActionVisibility QnLayoutCountActionCondition::check(const QnWorkbenchLayoutList &layouts) {
+Qn::ActionVisibility QnLayoutCountActionCondition::check(const QnWorkbenchLayoutList &) {
     if(workbench()->layouts().size() < m_requiredCount)
         return Qn::DisabledAction;
 

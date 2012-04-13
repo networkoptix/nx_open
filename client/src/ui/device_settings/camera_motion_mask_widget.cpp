@@ -154,7 +154,7 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
         item->setPinned(true);
         item->setGeometry(QRect(0, 0, 1, 1));
         m_context->workbench()->currentLayout()->addItem(item);
-        m_context->workbench()->setItem(QnWorkbench::ZOOMED, item);
+        m_context->workbench()->setItem(Qn::ZoomedRole, item);
 
         /* Set up the corresponding widget. */
         QnResourceWidget *widget = m_display->widget(item);
@@ -174,7 +174,7 @@ void QnCameraMotionMaskWidget::at_viewport_resized() {
     m_display->fitInView(false);
 }
 
-void QnCameraMotionMaskWidget::at_motionRegionSelected(QGraphicsView *view, QnResourceWidget *widget, const QRect &gridRect)
+void QnCameraMotionMaskWidget::at_motionRegionSelected(QGraphicsView *, QnResourceWidget *widget, const QRect &gridRect)
 {
     const QnVideoResourceLayout* layout = m_camera->getVideoLayout();
     bool changed = false;
@@ -202,7 +202,7 @@ void QnCameraMotionMaskWidget::at_motionRegionSelected(QGraphicsView *view, QnRe
         emit motionMaskListChanged();
 }
 
-void QnCameraMotionMaskWidget::at_motionRegionCleared(QGraphicsView *view, QnResourceWidget *widget)
+void QnCameraMotionMaskWidget::at_motionRegionCleared(QGraphicsView *, QnResourceWidget *widget)
 {
     bool changed = false;
 

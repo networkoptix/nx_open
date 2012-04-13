@@ -271,7 +271,7 @@ void QnWorkbenchLayoutSynchronizer::at_layout_itemAdded(QnWorkbenchItem *item) {
     connect(item, SIGNAL(geometryChanged()),                            this, SLOT(at_item_changed()));
     connect(item, SIGNAL(geometryDeltaChanged()),                       this, SLOT(at_item_changed()));
     connect(item, SIGNAL(rotationChanged()),                            this, SLOT(at_item_changed()));
-    connect(item, SIGNAL(flagChanged(QnWorkbenchItem::ItemFlag, bool)), this, SLOT(at_item_flagChanged(QnWorkbenchItem::ItemFlag, bool)));
+    connect(item, SIGNAL(flagChanged(Qn::ItemFlag, bool)),              this, SLOT(at_item_flagChanged(Qn::ItemFlag, bool)));
 
     if(!m_submit)
         return;
@@ -337,7 +337,7 @@ void QnWorkbenchLayoutSynchronizer::at_item_changed() {
     submitPendingItemsLater();
 }
 
-void QnWorkbenchLayoutSynchronizer::at_item_flagChanged(QnWorkbenchItem::ItemFlag flag, bool value) {
+void QnWorkbenchLayoutSynchronizer::at_item_flagChanged(Qn::ItemFlag flag, bool value) {
     if(!m_submit)
         return;
 

@@ -72,7 +72,10 @@ detail::QnResourceStatusReplyProcessor::QnResourceStatusReplyProcessor(QnWorkben
     assert(oldDisabledFlags.size() == resources.size());
 }
 
-void detail::QnResourceStatusReplyProcessor::at_replyReceived(int status, const QByteArray& data, const QByteArray& errorString, int handle) {
+void detail::QnResourceStatusReplyProcessor::at_replyReceived(int status, const QByteArray &data, const QByteArray &errorString, int handle) {
+    Q_UNUSED(data);
+    Q_UNUSED(handle);
+
     if(m_handler)
         m_handler.data()->at_resources_statusSaved(status, errorString, m_resources, m_oldDisabledFlags);
     
@@ -229,7 +232,7 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
     data.resource.id = resource->getId();
     data.resource.path = resource->getUniqueId();
     data.uuid = QUuid::createUuid();
-    data.flags = QnWorkbenchItem::PendingGeometryAdjustment;
+    data.flags = Qn::PendingGeometryAdjustment;
     if(usePosition) {
         data.combinedGeometry = QRectF(position, position); /* Desired position is encoded into a valid rect. */
     } else {

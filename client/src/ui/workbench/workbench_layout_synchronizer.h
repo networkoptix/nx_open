@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QSet>
 #include <core/resource/resource_fwd.h>
-#include <ui/workbench/workbench_item.h>
+#include <ui/workbench/workbench_globals.h>
 
 class QnWorkbench;
 class QnWorkbenchItem;
@@ -74,7 +74,7 @@ protected slots:
     void at_layout_aboutToBeDestroyed();
 
     void at_item_changed();
-    void at_item_flagChanged(QnWorkbenchItem::ItemFlag flag, bool value);
+    void at_item_flagChanged(Qn::ItemFlag flag, bool value);
 
 private:
     /** Whether this synchronizer is functional. */

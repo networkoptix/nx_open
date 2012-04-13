@@ -506,7 +506,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(action(Qn::FullscreenAction),SIGNAL(triggered()),                                                                       this,                           SLOT(at_fullscreenAction_triggered()));
     connect(m_display,                  SIGNAL(viewportGrabbed()),                                                                  this,                           SLOT(disableProxyUpdates()));
     connect(m_display,                  SIGNAL(viewportUngrabbed()),                                                                this,                           SLOT(enableProxyUpdates()));
-    connect(m_display,                  SIGNAL(widgetChanged(QnWorkbench::ItemRole)),                                               this,                           SLOT(at_display_widgetChanged(QnWorkbench::ItemRole)));
+    connect(m_display,                  SIGNAL(widgetChanged(Qn::ItemRole)),                                                        this,                           SLOT(at_display_widgetChanged(Qn::ItemRole)));
     connect(m_display,                  SIGNAL(widgetAdded(QnResourceWidget *)),                                                    this,                           SLOT(at_display_widgetAdded(QnResourceWidget *)));
     connect(m_display,                  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),                                         this,                           SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
     connect(m_display->renderWatcher(), SIGNAL(displayingStateChanged(QnAbstractRenderer *, bool)),                                 this,                           SLOT(at_renderWatcher_displayingStateChanged(QnAbstractRenderer *, bool)));
@@ -1077,7 +1077,7 @@ void QnWorkbenchUi::updateViewportMargins() {
 }
 
 void QnWorkbenchUi::updateActivityInstrumentState() {
-    bool zoomed = m_widgetByRole[QnWorkbench::ZOOMED] != NULL;
+    bool zoomed = m_widgetByRole[Qn::ZoomedRole] != NULL;
 
     if(zoomed) {
         m_controlsActivityInstrument->setEnabled(m_flags & HideWhenZoomed);
@@ -1219,21 +1219,21 @@ void QnWorkbenchUi::at_renderWatcher_displayingStateChanged(QnAbstractRenderer *
         m_sliderItem->onDisplayingStateChanged(widget->display()->dataProvider()->getResource(), displaying);
 }
 
-void QnWorkbenchUi::at_display_widgetChanged(QnWorkbench::ItemRole role) {
+void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role) {
     QnResourceWidget *oldWidget = m_widgetByRole[role];
     QnResourceWidget *newWidget = m_display->widget(role);
     m_widgetByRole[role] = newWidget;
 
     /* Tune activity listener instrument. */
-    if(role == QnWorkbench::ZOOMED) {
+    if(role == Qn::ZoomedRole) {
         updateActivityInstrumentState();
         updateViewportMargins();
     }
 
     /* Update navigation item's target. */
-    QnResourceWidget *targetWidget = m_widgetByRole[QnWorkbench::ZOOMED];
+    QnResourceWidget *targetWidget = m_widgetByRole[Qn::ZoomedRole];
     if(targetWidget == NULL)
-        targetWidget = m_widgetByRole[QnWorkbench::RAISED];
+        targetWidget = m_widgetByRole[Qn::RaisedRole];
     m_sliderItem->setVideoCamera(targetWidget == NULL ? NULL : targetWidget->display()->camera());
 }
 
@@ -1243,7 +1243,7 @@ void QnWorkbenchUi::at_display_widgetAdded(QnResourceWidget *widget) {
 
     QnSecurityCamResourcePtr cameraResource = widget->resource().dynamicCast<QnSecurityCamResource>();
 #ifndef DEBUG_MOTION
-    if(cameraResource != NULL)
+    if(cameraResource)
 #endif
     {
         connect(widget, SIGNAL(motionRegionSelected(QnResourcePtr, QnAbstractArchiveReader*, QList<QRegion>)), m_sliderItem, SLOT(loadMotionPeriods(QnResourcePtr, QnAbstractArchiveReader*, QList<QRegion>)));

@@ -1,5 +1,6 @@
 #include "time_slider.h"
 
+#include <cassert>
 
 #include <QtGui/QPainter>
 
@@ -40,15 +41,17 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     setWindowStart(1000);
     setWindowEnd(5000);
 
+    setLineCount(2);
+
     QnTimePeriodList l;
     
     l << QnTimePeriod(1000, 1000);
     l << QnTimePeriod(3000, 1000);
-    setTimePeriods(SelectionLine, RecordingPeriod, l);
+    setTimePeriods(0, Qn::RecordingTimePeriod, l);
     l.clear();
     
     l << QnTimePeriod(1500, 300);
-    setTimePeriods(SelectionLine, MotionPeriod, l);
+    setTimePeriods(0, Qn::MotionTimePeriod, l);
 
 }
 
@@ -56,12 +59,24 @@ QnTimeSlider::~QnTimeSlider() {
     return;
 }
 
-QnTimePeriodList QnTimeSlider::timePeriods(DisplayLine line, PeriodType type) const {
-    return m_timePeriods[line][type];
+int QnTimeSlider::lineCount() const {
+    return m_timePeriods.size();
 }
 
-void QnTimeSlider::setTimePeriods(DisplayLine line, PeriodType type, const QnTimePeriodList &timePeriods) {
-    m_timePeriods[line][type] = timePeriods;
+void QnTimeSlider::setLineCount(int lineCount) {
+    m_timePeriods.resize(lineCount);
+}
+
+QnTimePeriodList QnTimeSlider::timePeriods(int line, Qn::TimePeriodType type) const {
+    assert(type >= 0 && type < Qn::TimePeriodTypeCount);
+    
+    return m_timePeriods[line].forType[type];
+}
+
+void QnTimeSlider::setTimePeriods(int line, Qn::TimePeriodType type, const QnTimePeriodList &timePeriods) {
+    assert(type >= 0 && type < Qn::TimePeriodTypeCount);
+
+    m_timePeriods[line].forType[type] = timePeriods;
 }
 
 QnTimeSlider::Options QnTimeSlider::options() const {
@@ -82,6 +97,8 @@ void QnTimeSlider::setWindowStart(qint64 windowStart) {
         return;
 
     m_windowStart = windowStart;
+
+    emit windowChanged(m_windowStart, m_windowEnd);
 }
 
 qint64 QnTimeSlider::windowEnd() const {
@@ -94,6 +111,8 @@ void QnTimeSlider::setWindowEnd(qint64 windowEnd) {
         return;
 
     m_windowEnd = windowEnd;
+
+    emit windowChanged(m_windowStart, m_windowEnd);
 }
 
 QPointF QnTimeSlider::positionFromValue(qint64 logicalValue) const {
@@ -153,8 +172,15 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     /* Initialize converter. It will be used a lot. */
     QRectF rect = this->rect();
 
-    drawPeriodsBar(painter, m_timePeriods[SelectionLine][RecordingPeriod],  m_timePeriods[SelectionLine][MotionPeriod], rect.top() + rect.height() * 0.5,   rect.height() * 0.25);
-    drawPeriodsBar(painter, m_timePeriods[LayoutLine][RecordingPeriod],     m_timePeriods[LayoutLine][MotionPeriod],    rect.top() + rect.height() * 0.75,  rect.height() * 0.25);
+    for(int i = 0; i < m_timePeriods.size(); i++) {
+        drawPeriodsBar(
+            painter, 
+            m_timePeriods[i].forType[Qn::RecordingTimePeriod],  
+            m_timePeriods[i].forType[Qn::MotionTimePeriod], 
+            rect.top() + rect.height() * (0.5 + 0.5 * i / m_timePeriods.size()),   
+            rect.height() * 0.5 / m_timePeriods.size()
+        );
+    }
 
     qint64 pos = sliderPosition();
     if(pos >= m_windowStart && pos <= m_windowEnd) {

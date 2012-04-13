@@ -6,7 +6,7 @@
 #include <ui/common/scene_utility.h>
 #include <ui/actions/actions.h>
 #include <core/resource/resource_fwd.h>
-#include "workbench.h"
+#include "workbench_globals.h"
 #include "workbench_context_aware.h"
 
 class QGraphicsScene;
@@ -137,7 +137,7 @@ protected slots:
 
     void at_display_widgetAdded(QnResourceWidget *widget);
     void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
-    void at_display_widgetChanged(QnWorkbench::ItemRole role);
+    void at_display_widgetChanged(Qn::ItemRole role);
 
     void at_selectAllAction_triggered();
     void at_showMotionAction_triggered();
@@ -166,7 +166,7 @@ private:
     InstrumentManager *m_manager;
 
     /** Widgets by role. */
-    QnResourceWidget *m_widgetByRole[QnWorkbench::ITEM_ROLE_COUNT];
+    QnResourceWidget *m_widgetByRole[Qn::ItemRoleCount];
 
 
     /* Instruments. */

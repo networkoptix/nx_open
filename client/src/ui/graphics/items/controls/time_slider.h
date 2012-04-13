@@ -8,22 +8,12 @@ class QnNoptixStyle;
 
 class QnTimeSlider: public QnToolTipSlider {
     Q_OBJECT;
+    Q_PROPERTY(qint64 windowStart READ windowStart WRITE setWindowStart);
+    Q_PROPERTY(qint64 windowEnd READ windowEnd WRITE setWindowEnd);
 
     typedef QnToolTipSlider base_type;
 
 public:
-    enum DisplayLine {
-        SelectionLine,
-        LayoutLine,
-        LineCount
-    };
-
-    enum PeriodType {
-        RecordingPeriod,
-        MotionPeriod,
-        PeriodTypeCount
-    };
-
     enum Option {
         StickToMinimum = 0x1,
         StickToMaximum = 0x2
@@ -33,8 +23,11 @@ public:
     explicit QnTimeSlider(QGraphicsItem *parent = NULL);
     virtual ~QnTimeSlider();
 
-    QnTimePeriodList timePeriods(DisplayLine line, PeriodType type) const;
-    void setTimePeriods(DisplayLine line, PeriodType type, const QnTimePeriodList &timePeriods);
+    int lineCount() const;
+    void setLineCount(int lineCount);
+
+    QnTimePeriodList timePeriods(int line, Qn::TimePeriodType type) const;
+    void setTimePeriods(int line, Qn::TimePeriodType type, const QnTimePeriodList &timePeriods);
 
     Options options() const;
     void setOptions(Options options);
@@ -49,6 +42,9 @@ public:
 
     virtual QPointF positionFromValue(qint64 logicalValue) const override;
     virtual qint64 valueFromPosition(const QPointF &position) const override;
+
+signals:
+    void windowChanged(qint64 windowStart, qint64 windowEnd);
 
 protected:
     virtual void sliderChange(SliderChange change) override;
@@ -65,7 +61,11 @@ private:
 private:
     Q_DECLARE_PRIVATE(GraphicsSlider);
 
-    QnTimePeriodList m_timePeriods[LineCount][PeriodTypeCount];
+    struct TypedPeriods {
+        QnTimePeriodList forType[Qn::TimePeriodTypeCount];
+    };
+
+    QVector<TypedPeriods> m_timePeriods;
     qint64 m_windowStart, m_windowEnd;
     qint64 m_oldMinimum, m_oldMaximum;
     Options m_options;

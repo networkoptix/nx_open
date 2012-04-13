@@ -9,12 +9,16 @@
 
 QnWorkbench::QnWorkbench(QObject *parent):
     QObject(parent),
-    m_mode(VIEWING),
     m_currentLayout(NULL)
 {
-    qRegisterMetaType<QnWorkbench::ItemRole>("QnWorkbench::ItemRole");
+    static volatile bool metaTypesInitialized = false;
+    if (!metaTypesInitialized) {
+        qRegisterMetaType<Qn::ItemRole>("Qn::ItemRole");
+        metaTypesInitialized = true;
+    }
 
-    m_itemByRole[RAISED] = m_itemByRole[ZOOMED] = 0;
+    for(int i = 0; i < Qn::ItemRoleCount; i++)
+        m_itemByRole[i] = NULL;
 
     m_mapper = new QnWorkbenchGridMapper(this);
 
@@ -32,7 +36,6 @@ QnWorkbench::~QnWorkbench() {
 }
 
 void QnWorkbench::clear() {
-    setMode(VIEWING);
     setCurrentLayout(NULL);
     
     while(!m_layouts.empty())
@@ -210,23 +213,14 @@ void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout) {
     }
 }
 
-void QnWorkbench::setMode(Mode mode) {
-    if(m_mode == mode)
-        return;
-
-    m_mode = mode;
-
-    emit modeChanged();
-}
-
-QnWorkbenchItem *QnWorkbench::item(ItemRole role) {
-    Q_ASSERT(role >= 0 && role < ITEM_ROLE_COUNT);
+QnWorkbenchItem *QnWorkbench::item(Qn::ItemRole role) {
+    Q_ASSERT(role >= 0 && role < Qn::ItemRoleCount);
 
     return m_itemByRole[role];
 }
 
-void QnWorkbench::setItem(ItemRole role, QnWorkbenchItem *item) {
-    Q_ASSERT(role >= 0 && role < ITEM_ROLE_COUNT);
+void QnWorkbench::setItem(Qn::ItemRole role, QnWorkbenchItem *item) {
+    Q_ASSERT(role >= 0 && role < Qn::ItemRoleCount);
 
     if(m_itemByRole[role] == item)
         return;
@@ -246,9 +240,9 @@ void QnWorkbench::at_layout_itemAdded(QnWorkbenchItem *item) {
 }
 
 void QnWorkbench::at_layout_itemRemoved(QnWorkbenchItem *item) {
-    for(int i = 0; i < ITEM_ROLE_COUNT; i++)
+    for(int i = 0; i < Qn::ItemRoleCount; i++)
         if(item == m_itemByRole[i])
-            setItem(static_cast<ItemRole>(i), NULL);
+            setItem(static_cast<Qn::ItemRole>(i), NULL);
 
     emit itemRemoved(item);
 }

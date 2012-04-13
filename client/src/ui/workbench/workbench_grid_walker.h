@@ -3,22 +3,13 @@
 
 #include <QRect>
 #include <QPoint>
+#include "workbench_globals.h"
 
 /**
  * This is a helper class for guided iteration over workbench layout grid.
  */
 class QnWorkbenchGridWalker {
 public:
-    enum Border {
-        NoBorders = 0,
-        LeftBorder = 0x1,
-        RightBorder = 0x2,
-        TopBorder = 0x4,
-        BottomBorder = 0x8,
-        AllBorders = LeftBorder | RightBorder | TopBorder | BottomBorder
-    };
-    Q_DECLARE_FLAGS(Borders, Border)
-
     /**
      * Constructor. 
      */
@@ -58,26 +49,26 @@ public:
      * 
      * \param border                    Border to expand iteration region into.
      */
-    void expand(Border border) {
+    void expand(Qn::Border border) {
         Q_ASSERT(!hasNext());
 
         switch(border) {
-        case LeftBorder:
+        case Qn::LeftBorder:
             m_rect.setLeft(m_rect.left() - 1);
             m_pos = m_rect.topLeft();
             m_delta = QPoint(0, 1);
             break;
-        case RightBorder:
+        case Qn::RightBorder:
             m_rect.setRight(m_rect.right() + 1);
             m_pos = m_rect.topRight();
             m_delta = QPoint(0, 1);
             break;
-        case TopBorder:
+        case Qn::TopBorder:
             m_rect.setTop(m_rect.top() - 1);
             m_pos = m_rect.topLeft();
             m_delta = QPoint(1, 0);
             break;
-        case BottomBorder:
+        case Qn::BottomBorder:
             m_rect.setBottom(m_rect.bottom() + 1);
             m_pos = m_rect.bottomLeft();
             m_delta = QPoint(1, 0);
@@ -99,7 +90,5 @@ private:
     QPoint m_pos;
     QPoint m_delta;
 };
-
-Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchGridWalker::Borders)
 
 #endif // QN_WORKBENCH_GRID_WALKER_H

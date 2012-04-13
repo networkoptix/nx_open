@@ -323,7 +323,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                     m_resizingInstrument,           SLOT(recursiveEnable()));
 
     /* Connect to display. */
-    connect(m_display,                  SIGNAL(widgetChanged(QnWorkbench::ItemRole)),                                               this,                           SLOT(at_display_widgetChanged(QnWorkbench::ItemRole)));
+    connect(m_display,                  SIGNAL(widgetChanged(Qn::ItemRole)),                                                        this,                           SLOT(at_display_widgetChanged(Qn::ItemRole)));
     connect(m_display,                  SIGNAL(widgetAdded(QnResourceWidget *)),                                                    this,                           SLOT(at_display_widgetAdded(QnResourceWidget *)));
     connect(m_display,                  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),                                         this,                           SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
 
@@ -447,9 +447,9 @@ void QnWorkbenchController::moveCursor(const QPoint &direction) {
         }
     }
 
-    QnWorkbench::ItemRole role = QnWorkbench::ZOOMED;
+    Qn::ItemRole role = Qn::ZoomedRole;
     if(!workbench()->item(role))
-        role = QnWorkbench::RAISED;
+        role = Qn::RaisedRole;
     
     if(newItem != NULL && (newItem != item || item != workbench()->item(role))) {
         workbench()->setItem(role, newItem);
@@ -634,7 +634,7 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
     case Qt::Key_Return: {
         QList<QGraphicsItem *> items = display()->scene()->selectedItems();
         if(items.size() == 1 && dynamic_cast<QnResourceWidget *>(items[0])) {
-            if(items[0] == display()->widget(QnWorkbench::ZOOMED)) {
+            if(items[0] == display()->widget(Qn::ZoomedRole)) {
                 menu()->trigger(Qn::UnmaximizeItemAction, items);
             } else {
                 menu()->trigger(Qn::MaximizeItemAction, items);
@@ -689,7 +689,7 @@ void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget 
     if(m_resizedWidget == NULL)
         return;
 
-    workbench()->setItem(QnWorkbench::RAISED, NULL); /* Un-raise currently raised item so that it doesn't interfere with resizing. */
+    workbench()->setItem(Qn::RaisedRole, NULL); /* Un-raise currently raised item so that it doesn't interfere with resizing. */
 
     m_display->bringToFront(m_resizedWidget);
     m_display->gridItem()->animatedShow();
@@ -754,9 +754,9 @@ void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget
         m_display->synchronize(widget->item());
 
         /* Un-raise the raised item if it was the one being resized. */
-        QnWorkbenchItem *raisedItem = workbench()->item(QnWorkbench::RAISED);
+        QnWorkbenchItem *raisedItem = workbench()->item(Qn::RaisedRole);
         if(raisedItem == widget->item())
-            workbench()->setItem(QnWorkbench::RAISED, NULL);
+            workbench()->setItem(Qn::RaisedRole, NULL);
     }
 
     /* Clean up resizing state. */
@@ -902,9 +902,9 @@ void QnWorkbenchController::at_moveFinished(QGraphicsView *, const QList<QGraphi
             m_display->synchronize(workbenchItem);
 
         /* Un-raise the raised item if it was among the dragged ones. */
-        QnWorkbenchItem *raisedItem = workbench()->item(QnWorkbench::RAISED);
+        QnWorkbenchItem *raisedItem = workbench()->item(Qn::RaisedRole);
         if(raisedItem != NULL && workbenchItems.contains(raisedItem))
-            workbench()->setItem(QnWorkbench::RAISED, NULL);
+            workbench()->setItem(Qn::RaisedRole, NULL);
     }
 
     /* Clean up dragging state. */
@@ -958,7 +958,7 @@ void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *
     if(info.modifiers() != 0)
         return;
 
-    if(workbench()->item(QnWorkbench::ZOOMED) != NULL)
+    if(workbench()->item(Qn::ZoomedRole) != NULL)
         return; /* Don't change currently raised item if we're zoomed. It is surprising for the user. */
 
     QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
@@ -967,7 +967,7 @@ void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *
 
     QnWorkbenchItem *workbenchItem = widget->item();
 
-    workbench()->setItem(QnWorkbench::RAISED, workbench()->item(QnWorkbench::RAISED) == workbenchItem ? NULL : workbenchItem);
+    workbench()->setItem(Qn::RaisedRole, workbench()->item(Qn::RaisedRole) == workbenchItem ? NULL : workbenchItem);
 }
 
 void QnWorkbenchController::at_item_rightClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &info) {
@@ -1012,7 +1012,7 @@ void QnWorkbenchController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem
     widget->setSelected(true);
 
     QnWorkbenchItem *workbenchItem = widget->item();
-    QnWorkbenchItem *zoomedItem = workbench()->item(QnWorkbench::ZOOMED);
+    QnWorkbenchItem *zoomedItem = workbench()->item(Qn::ZoomedRole);
     if(zoomedItem == workbenchItem) {
         QRectF viewportGeometry = m_display->viewportGeometry();
         QRectF zoomedItemGeometry = m_display->itemGeometry(zoomedItem);
@@ -1021,13 +1021,13 @@ void QnWorkbenchController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem
             (viewportGeometry.width() < zoomedItemGeometry.width() && !qFuzzyCompare(viewportGeometry.width(), zoomedItemGeometry.width())) ||
             (viewportGeometry.height() < zoomedItemGeometry.height() && !qFuzzyCompare(viewportGeometry.height(), zoomedItemGeometry.height()))
         ) {
-            workbench()->setItem(QnWorkbench::ZOOMED, NULL);
-            workbench()->setItem(QnWorkbench::ZOOMED, workbenchItem);
+            workbench()->setItem(Qn::ZoomedRole, NULL);
+            workbench()->setItem(Qn::ZoomedRole, workbenchItem);
         } else {
-            workbench()->setItem(QnWorkbench::ZOOMED, NULL);
+            workbench()->setItem(Qn::ZoomedRole, NULL);
         }
     } else {
-        workbench()->setItem(QnWorkbench::ZOOMED, workbenchItem);
+        workbench()->setItem(Qn::ZoomedRole, workbenchItem);
     }
 }
 
@@ -1045,7 +1045,7 @@ void QnWorkbenchController::at_scene_leftClicked(QGraphicsView *, const ClickInf
     if(workbench() == NULL)
         return;
 
-    workbench()->setItem(QnWorkbench::RAISED, NULL);
+    workbench()->setItem(Qn::RaisedRole, NULL);
 }
 
 void QnWorkbenchController::at_scene_rightClicked(QGraphicsView *, const ClickInfo &info) {
@@ -1064,11 +1064,11 @@ void QnWorkbenchController::at_scene_doubleClicked(QGraphicsView *, const ClickI
     if(workbench() == NULL)
         return;
 
-    workbench()->setItem(QnWorkbench::ZOOMED, NULL);
+    workbench()->setItem(Qn::ZoomedRole, NULL);
     m_display->fitInView();
 }
 
-void QnWorkbenchController::at_display_widgetChanged(QnWorkbench::ItemRole role) {
+void QnWorkbenchController::at_display_widgetChanged(Qn::ItemRole role) {
     QnResourceWidget *widget = m_display->widget(role);
     QnResourceWidget *oldWidget = m_widgetByRole[role];
     if(widget == oldWidget)
@@ -1080,20 +1080,20 @@ void QnWorkbenchController::at_display_widgetChanged(QnWorkbench::ItemRole role)
         widget->setFocus();
 
     switch(role) {
-    case QnWorkbench::ZOOMED: {
+    case Qn::ZoomedRole: {
         bool effective = widget == NULL;
         m_resizingInstrument->setEffective(effective);
         m_resizingInstrument->resizeHoverInstrument()->setEffective(effective);
         m_moveInstrument->setEffective(effective);
 
         if(widget == NULL) { /* Un-raise on un-zoom. */
-            workbench()->setItem(QnWorkbench::RAISED, NULL);
+            workbench()->setItem(Qn::RaisedRole, NULL);
         } else {
             m_cursorPos = widget->item()->geometry().topLeft();
         }
         break;
     }
-    case QnWorkbench::RAISED:
+    case Qn::RaisedRole:
         if(widget != NULL)
             m_cursorPos = widget->item()->geometry().topLeft();
         break;
@@ -1170,11 +1170,11 @@ void QnWorkbenchController::at_maximizeItemAction_triggered() {
     if(widgets.empty())
         return;
 
-    workbench()->setItem(QnWorkbench::ZOOMED, widgets[0]->item());
+    workbench()->setItem(Qn::ZoomedRole, widgets[0]->item());
 }
 
 void QnWorkbenchController::at_unmaximizeItemAction_triggered() {
-    workbench()->setItem(QnWorkbench::ZOOMED, NULL);
+    workbench()->setItem(Qn::ZoomedRole, NULL);
 }
 
 

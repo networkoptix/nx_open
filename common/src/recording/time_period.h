@@ -110,4 +110,15 @@ bool operator < (const QnTimePeriod& first, const QnTimePeriod& other);
 bool operator < (qint64 first, const QnTimePeriod& other);
 bool operator < (const QnTimePeriod& other, qint64 first);
 
+
+namespace Qn {
+    enum TimePeriodType {
+        RecordingTimePeriod,
+        MotionTimePeriod,
+        TimePeriodTypeCount
+    };
+
+} // namespace Qn
+
+
 #endif // QN_TIME_PERIOD_H
