@@ -102,7 +102,7 @@ static qint32 ffmpegWritePacket(void *opaque, quint8* buf, int size)
     return reader->write((char*) buf, size);
 }
 
-static int64_t ffmpegSeek(void* opaque, qint64 pos, qint32 whence)
+static int64_t ffmpegSeek(void* opaque, int64_t pos, int whence)
 {
     QIODevice* reader = reinterpret_cast<QIODevice*> (opaque);
 
