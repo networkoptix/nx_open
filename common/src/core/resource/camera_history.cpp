@@ -2,6 +2,17 @@
 #include "core/resourcemanagment/resource_pool.h"
 #include "video_server.h"
 
+QnId QnCameraTimePeriod::getServerId() const
+{
+    QnId id;
+
+    QnResourcePtr resource = qnResPool->getResourceByGuid(videoServerGuid);
+    if (resource)
+        id = resource->getId();
+
+    return id;
+}
+
 QString QnCameraHistory::getMacAddress() const
 {
     return m_macAddress;
@@ -40,7 +51,7 @@ QnVideoServerResourcePtr QnCameraHistory::getVideoServerOnTime(qint64 timestamp,
     if (itr == m_timePeriods.end())
         return QnVideoServerResourcePtr();
     currentPeriod = *itr;
-    return qSharedPointerDynamicCast<QnVideoServerResource> (qnResPool->getResourceById(itr->videoServerId));
+    return qSharedPointerDynamicCast<QnVideoServerResource> (qnResPool->getResourceById(itr->getServerId()));
 }
 
 QnVideoServerResourcePtr QnCameraHistory::getNextVideoServerFromTime(qint64 timestamp, QnTimePeriod& currentPeriod)
@@ -53,7 +64,7 @@ QnVideoServerResourcePtr QnCameraHistory::getNextVideoServerFromTime(qint64 time
     if (itr == m_timePeriods.end())
         return QnVideoServerResourcePtr();
     currentPeriod = *itr;
-    return qSharedPointerDynamicCast<QnVideoServerResource> (qnResPool->getResourceById(itr->videoServerId));
+    return qSharedPointerDynamicCast<QnVideoServerResource> (qnResPool->getResourceById(itr->getServerId()));
 }
 
 QnVideoServerResourcePtr QnCameraHistory::getPrevVideoServerFromTime(qint64 timestamp, QnTimePeriod& currentPeriod)
@@ -64,7 +75,7 @@ QnVideoServerResourcePtr QnCameraHistory::getPrevVideoServerFromTime(qint64 time
         return QnVideoServerResourcePtr();
     --itr;
     currentPeriod = *itr;
-    return qSharedPointerDynamicCast<QnVideoServerResource> (qnResPool->getResourceById(itr->videoServerId));
+    return qSharedPointerDynamicCast<QnVideoServerResource> (qnResPool->getResourceById(itr->getServerId()));
 }
 
 QnVideoServerResourcePtr QnCameraHistory::getNextVideoServerOnTime(qint64 timestamp, bool searchForward, QnTimePeriod& currentPeriod)
@@ -100,7 +111,7 @@ QList<QnNetworkResourcePtr> QnCameraHistory::getAllCamerasWithSameMac(const QnTi
 
     for (QnCameraTimePeriodList::const_iterator itr = itrStart; itr < itrEnd; ++itr)
     {
-        QString vServerId = itr->videoServerId.toString();
+        QString vServerId = itr->getServerId().toString();
         QnNetworkResourcePtr camera = qSharedPointerDynamicCast<QnNetworkResource> (qnResPool->getResourceByUniqId(m_macAddress + vServerId));
         if (camera)
             rez.insert(camera);
