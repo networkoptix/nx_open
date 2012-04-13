@@ -130,9 +130,6 @@ static int64_t ffmpegSeek(void* opaque, int64_t pos, int whence)
 void QnStorageResource::setUrl(const QString& value)
 {
     QnResource::setUrl(value);
-
-    if (isStorageAvailable())
-        setStatus(Online);
 }
 
 AVIOContext* QnStorageResource::createFfmpegIOContext(const QString& url, QIODevice::OpenMode openMode, int IO_BLOCK_SIZE)

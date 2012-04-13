@@ -101,6 +101,8 @@ void QnStorageManager::addStorage(QnStorageResourcePtr storage)
     storage->setIndex(detectStorageIndex(storage->getUrl()));
     QMutexLocker lock(&m_mutex);
     m_storageRoots.insert(storage->getIndex(), storage);
+    if (storage->isStorageAvailable())
+        storage->setStatus(QnResource::Online);
 }
 
 QnStorageManager::~QnStorageManager()
