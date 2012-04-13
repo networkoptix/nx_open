@@ -2,11 +2,16 @@
 #define QN_WORKBENCH_NAVIGATOR_H
 
 #include <QtCore/QObject>
-#include "workbench.h"
+
+#include <core/resource/resource_fwd.h>
+
+#include "workbench_context_aware.h"
+#include "workbench_globals.h"
 
 class QnWorkbenchDisplay;
 class QnTimeSlider;
 class QnResourceWidget;
+class QnAbstractArchiveReader;
 
 class QnWorkbenchNavigator: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT;
@@ -23,7 +28,7 @@ protected:
     void deinitialize();
 
 private slots:
-    void at_display_widgetChanged(QnWorkbench::ItemRole role);
+    void at_display_widgetChanged(Qn::ItemRole role);
     void at_display_widgetAdded(QnResourceWidget *widget);
     void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
 
