@@ -13,7 +13,8 @@
 #include "core/resource/video_server.h"
 #include "core/resource/resource_fwd.h"
 #include "core/resource/camera_resource.h"
-
+#include "core/resource/camera_history.h"
+#include "api/AppServerConnection.h"
 
 QnRecordingManager::QnRecordingManager()
 {
@@ -106,6 +107,31 @@ bool QnRecordingManager::isResourceDisabled(QnResourcePtr res) const
     return  cameraRes && cameraRes->isScheduleDisabled();
 }
 
+bool QnRecordingManager::updateCameraHistory(QnResourcePtr res)
+{
+    QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(res);
+    QString macAddress = netRes->getMAC().toString();
+    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
+    if (QnCameraHistoryPool::instance()->getMinTime(netRes) == AV_NOPTS_VALUE)
+    {
+        // it is first record for camera
+        DeviceFileCatalogPtr catalogHi = qnStorageMan->getFileCatalog(macAddress, QnResource::Role_LiveVideo);
+        qint64 archiveMinTime = catalogHi->minTime();
+        if (archiveMinTime != AV_NOPTS_VALUE)
+            currentTime = qMin(currentTime,  archiveMinTime);
+    }
+
+    QnVideoServerResourcePtr server = qSharedPointerDynamicCast<QnVideoServerResource>(qnResPool->getResourceById(res->getParentId()));
+    QnCameraHistoryItem cameraHistoryItem(netRes->getMAC().toString(), currentTime, server->getGuid());
+    QByteArray errStr;
+    QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
+    if (appServerConnection->addCameraHistoryItem(cameraHistoryItem, errStr) != 0) {
+        qCritical() << "ECS server error during execute method addCameraHistoryItem: " << errStr;
+        return false;
+    }
+    return true;
+}
+
 void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* camera, QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes)
 {
     QnAbstractMediaStreamDataProviderPtr providerHi = camera->getLiveReader(QnResource::Role_LiveVideo);
@@ -116,8 +142,11 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
     {
         if (providerHi)
         {
-            if (!recorderHiRes->isRunning())
+            if (!recorderHiRes->isRunning()) {
                 cl_log.log("Recording started for camera ", res->getUniqueId(), cl_logINFO);
+                if (!updateCameraHistory(res))
+                    return;
+            }
             recorderHiRes->start();
             providerHi->start();
         }

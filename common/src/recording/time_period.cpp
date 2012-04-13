@@ -41,7 +41,7 @@ bool QnTimePeriod::containPeriod(const QnTimePeriod& timePeriod) const
 
 bool QnTimePeriod::containTime(qint64 timeMs) const
 {
-    return qBetween(timeMs, startTimeMs, startTimeMs+durationMs);
+    return qBetween(timeMs, startTimeMs, durationMs != -1 ? startTimeMs+durationMs : DATETIME_NOW);
 }
 
 

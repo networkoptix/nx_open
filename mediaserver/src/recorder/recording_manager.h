@@ -51,7 +51,7 @@ private:
 
     void beforeDeleteRecorder(const Recorders& recorders);
     void deleteRecorder(const Recorders& recorders);
-
+    bool updateCameraHistory(QnResourcePtr res);
 private:
     mutable QMutex m_mutex;
     QMap<QnResourcePtr, Recorders> m_recordMap;

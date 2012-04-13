@@ -71,9 +71,9 @@ void QnEventManager::eventReceived(QnEvent event)
     {
         QString mac = event.dict["mac"].toString();
         QString serverGuid = event.dict["server_guid"].toString();
-        qint64 timestamp_ms = event.dict["timestamp"].toInt() * 1000;
+        qint64 timestamp_ms = event.dict["timestamp"].toLongLong();
 
-        QnCameraHistoryItem historyItem(mac, serverGuid, timestamp_ms);
+        QnCameraHistoryItem historyItem(mac, timestamp_ms, serverGuid);
 
         QnCameraHistoryPool::instance()->addCameraHistoryItem(historyItem);
     }

@@ -553,12 +553,23 @@ public:
             qDebug() << "QnMain::run(): Can't get cameras. Reason: " << errorString;
             QnSleep::msleep(1000);
         }
-
         foreach(const QnSecurityCamResourcePtr &camera, cameras)
         {
             qnResPool->addResource(camera);
             //QnRecordingManager::instance()->updateCamera(camera);
         }
+
+        QnCameraHistoryList cameraHistoryList;
+        while (appServerConnection->getCameraHistoryList(cameraHistoryList, errorString) != 0)
+        {
+            qDebug() << "QnMain::run(): Can't get cameras history. Reason: " << errorString;
+            QnSleep::msleep(1000);
+        }
+        foreach(QnCameraHistoryPtr history, cameraHistoryList)
+        {
+            QnCameraHistoryPool::instance()->addCameraHistory(history);
+        }
+
 
         /*
         QnScheduleTaskList scheduleTasks;
