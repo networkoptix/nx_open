@@ -260,7 +260,13 @@ bool QnAviArchiveDelegate::open(QnResourcePtr resource)
 
 void QnAviArchiveDelegate::doNotFindStreamInfo()
 {
+    // this call used for optimization. Avoid av_find_stream_info_call for server's chunks to increase speed
     m_streamsFound=true;
+    if (m_formatContext)
+    {
+        for (int i = 0; i < m_formatContext->nb_streams; ++i)
+            m_formatContext->streams[i]->first_dts = 0; // reset first_dts. If don't do it, av_seek will seek to begin of file always
+    }
 }
 
 void QnAviArchiveDelegate::close()
