@@ -60,7 +60,7 @@ QString QnEvent::objectNameLower() const
 
 bool QnEvent::load(const QVariant& parsed)
 {   
-    QMap<QString, QVariant> dict = parsed.toMap();
+    dict = parsed.toMap();
 
     if (!dict.contains("type"))
         return false;
@@ -74,7 +74,8 @@ bool QnEvent::load(const QVariant& parsed)
 			&& eventType != QN_EVENT_RES_SETPARAM
 			&& eventType != QN_EVENT_RES_STATUS_CHANGE
 			&& eventType != QN_EVENT_RES_DISABLED_CHANGE
-			&& eventType != QN_EVENT_LICENSE_CHANGE)
+            && eventType != QN_EVENT_LICENSE_CHANGE
+            && eventType != QN_CAMERA_SERVER_ITEM)
     {
         return false;
     }
@@ -82,6 +83,13 @@ bool QnEvent::load(const QVariant& parsed)
     if (eventType == QN_EVENT_LICENSE_CHANGE)
     {
         objectId = dict["id"].toString();
+        return true;
+    }
+
+    if (eventType == QN_CAMERA_SERVER_ITEM)
+    {
+        // will use dict
+        // need to refactor a bit
         return true;
     }
 

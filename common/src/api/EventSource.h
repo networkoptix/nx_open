@@ -13,13 +13,14 @@
 
 #include "utils/common/qnid.h"
 
-static const char* QN_EVENT_EMPTY             = "EE";
-static const char* QN_EVENT_RES_CHANGE        = "RC";
-static const char* QN_EVENT_RES_STATUS_CHANGE = "RSC";
+static const char* QN_EVENT_EMPTY               = "EE";
+static const char* QN_EVENT_RES_CHANGE          = "RC";
+static const char* QN_EVENT_RES_STATUS_CHANGE   = "RSC";
 static const char* QN_EVENT_RES_DISABLED_CHANGE = "RDC";
-static const char* QN_EVENT_RES_DELETE        = "RD";
-static const char* QN_EVENT_RES_SETPARAM      = "RSP";
-static const char* QN_EVENT_LICENSE_CHANGE    = "LC";
+static const char* QN_EVENT_RES_DELETE          = "RD";
+static const char* QN_EVENT_RES_SETPARAM        = "RSP";
+static const char* QN_EVENT_LICENSE_CHANGE      = "LC";
+static const char* QN_CAMERA_SERVER_ITEM           = "CSI";
 
 struct QnEvent
 {
@@ -32,6 +33,8 @@ struct QnEvent
     // for RSP event
     QString paramName;
     QString paramValue;
+
+    QMap<QString, QVariant> dict;
 
     bool load(const QVariant& parsed);
 	QString objectNameLower() const;

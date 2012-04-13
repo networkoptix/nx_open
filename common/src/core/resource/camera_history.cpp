@@ -86,6 +86,17 @@ QnVideoServerResourcePtr QnCameraHistory::getNextVideoServerOnTime(qint64 timest
 void QnCameraHistory::addTimePeriod(const QnCameraTimePeriod& period)
 {
     QMutexLocker lock (&m_mutex);
+
+    // Works only if "period" startTimeMs is > the last item startTimeMs
+    if (!m_timePeriods.isEmpty())
+    {
+        QnTimePeriod& lastItem = m_timePeriods.last();
+
+        if (lastItem.durationMs == -1)
+            lastItem.durationMs = period.startTimeMs - lastItem.startTimeMs;
+
+    }
+
     m_timePeriods << period;
     qSort(m_timePeriods.begin(), m_timePeriods.end());
 }
@@ -157,4 +168,22 @@ qint64 QnCameraHistoryPool::getMinTime(QnNetworkResourcePtr camera)
         return AV_NOPTS_VALUE;
 
     return history->getMinTime();
+}
+
+void QnCameraHistoryPool::addCameraHistoryItem(const QnCameraHistoryItem &historyItem)
+{
+    QMutexLocker lock (&m_mutex);
+
+    CameraHistoryMap::const_iterator iter = m_cameraHistory.find(historyItem.mac);
+
+    QnCameraHistoryPtr cameraHistory;
+    if (iter != m_cameraHistory.end())
+        cameraHistory = iter.value();
+    else
+        cameraHistory = QnCameraHistoryPtr(new QnCameraHistory());
+
+    QnCameraTimePeriod timePeriod(historyItem.timestamp, -1, historyItem.videoServerGuid);
+    cameraHistory->addTimePeriod(timePeriod);
+
+    m_cameraHistory[historyItem.mac] = cameraHistory;
 }

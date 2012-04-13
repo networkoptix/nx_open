@@ -67,6 +67,16 @@ void QnEventManager::eventReceived(QnEvent event)
         }
 
     }
+    else if (event.eventType == QN_CAMERA_SERVER_ITEM)
+    {
+        QString mac = event.dict["mac"].toString();
+        QString serverGuid = event.dict["server_guid"].toString();
+        qint64 timestamp_ms = event.dict["timestamp"].toInt() * 1000;
+
+        QnCameraHistoryItem historyItem(mac, serverGuid, timestamp_ms);
+
+        QnCameraHistoryPool::instance()->addCameraHistoryItem(historyItem);
+    }
     else if (event.eventType == QN_EVENT_RES_CHANGE)
     {
         if (event.objectName != "Camera" && event.objectName != "Server")

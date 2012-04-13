@@ -62,6 +62,7 @@ public:
     static QnCameraHistoryPool* instance();
     QnCameraHistoryPtr getCameraHistory(const QString& mac);
     void addCameraHistory(QnCameraHistoryPtr history);
+    void addCameraHistoryItem(const QnCameraHistoryItem& historyItem);
 
     QList<QnNetworkResourcePtr> getAllCamerasWithSameMac(QnNetworkResourcePtr camera, const QnTimePeriod& timePeriod);
     qint64 getMinTime(QnNetworkResourcePtr camera);
