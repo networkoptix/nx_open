@@ -26,7 +26,7 @@ namespace {
 } // anonymous namespace 
 
 ResizeHoverInstrument::ResizeHoverInstrument(QObject *parent):
-    Instrument(ITEM, makeSet(QEvent::GraphicsSceneHoverMove, QEvent::GraphicsSceneHoverLeave), parent),
+    Instrument(Item, makeSet(QEvent::GraphicsSceneHoverMove, QEvent::GraphicsSceneHoverLeave), parent),
     m_effectiveDistance(0.0),
     m_effective(true)
 {}

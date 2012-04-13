@@ -4,7 +4,7 @@
 #include <QObject>
 #include <core/resource/resource_fwd.h>
 #include "workbench_context_aware.h"
-#include "workbench_permissions.h"
+#include "workbench_globals.h"
 
 class QnWorkbenchContext;
 class QnResourcePool;

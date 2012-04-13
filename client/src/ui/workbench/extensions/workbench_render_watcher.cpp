@@ -22,8 +22,8 @@ QnWorkbenchRenderWatcher::QnWorkbenchRenderWatcher(QnWorkbenchDisplay *display, 
 
     /* Set up instruments. */
     Instrument::EventTypeSet paintEventTypes = Instrument::makeSet(QEvent::Paint);
-    SignalingInstrument *beforeDisplayInstrument = new SignalingInstrument(Instrument::VIEWPORT, paintEventTypes, this);
-    SignalingInstrument *afterDisplayInstrument = new SignalingInstrument(Instrument::VIEWPORT, paintEventTypes, this);
+    SignalingInstrument *beforeDisplayInstrument = new SignalingInstrument(Instrument::Viewport, paintEventTypes, this);
+    SignalingInstrument *afterDisplayInstrument = new SignalingInstrument(Instrument::Viewport, paintEventTypes, this);
 
     InstrumentManager *manager = display->instrumentManager();
     manager->installInstrument(beforeDisplayInstrument, InstrumentManager::InstallBefore, display->paintForwardingInstrument());

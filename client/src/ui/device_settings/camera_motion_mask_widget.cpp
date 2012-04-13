@@ -77,7 +77,7 @@ void QnCameraMotionMaskWidget::init()
     m_controller->itemLeftClickInstrument()->disable();
 
     /* We need to listen to viewport resize events to make sure that our widget is always positioned at viewport's center. */
-    SignalingInstrument *resizeSignalingInstrument = new SignalingInstrument(Instrument::VIEWPORT, Instrument::makeSet(QEvent::Resize), this);
+    SignalingInstrument *resizeSignalingInstrument = new SignalingInstrument(Instrument::Viewport, Instrument::makeSet(QEvent::Resize), this);
     m_display->instrumentManager()->installInstrument(resizeSignalingInstrument);
     connect(resizeSignalingInstrument, SIGNAL(activated(QWidget *, QEvent *)), this, SLOT(at_viewport_resized()));
 
@@ -158,8 +158,8 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
 
         /* Set up the corresponding widget. */
         QnResourceWidget *widget = m_display->widget(item);
-        widget->setDisplayFlag(QnResourceWidget::DISPLAY_BUTTONS, false);
-        widget->setDisplayFlag(QnResourceWidget::DISPLAY_MOTION_GRID, true);
+        widget->setDisplayFlag(QnResourceWidget::DisplayButtons, false);
+        widget->setDisplayFlag(QnResourceWidget::DisplayMotionGrid, true);
     }
 
     /* Consider motion mask list changed. */

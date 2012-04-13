@@ -4,8 +4,8 @@
 #include <QAction>
 #include <QWeakPointer>
 #include <core/resource/resource_fwd.h>
-#include <ui/workbench/workbench_permissions.h>
 #include <ui/workbench/workbench_context_aware.h>
+#include <ui/workbench/workbench_globals.h>
 #include "action_fwd.h"
 #include "actions.h"
 

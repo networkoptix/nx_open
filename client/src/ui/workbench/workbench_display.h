@@ -50,25 +50,9 @@ class CLCamDisplay;
 class QnWorkbenchDisplay: public QObject, public QnWorkbenchContextAware, protected AnimationTimerListener, protected SceneUtility {
     Q_OBJECT;
     Q_PROPERTY(qreal widgetsFrameOpacity READ widgetsFrameOpacity WRITE setWidgetsFrameOpacity);
-    Q_ENUMS(Layer);
+    Q_ENUMS(Qn::ItemLayer);
 
 public:
-    /**
-     * Layer of an item.
-     */
-    enum Layer {
-        BackLayer,                  /**< Back layer. */
-        PinnedLayer,                /**< Layer for pinned items. */
-        PinnedRaisedLayer,          /**< Layer for pinned items that are raised. */
-        UnpinnedLayer,              /**< Layer for unpinned items. */
-        UnpinnedRaisedLayer,        /**< Layer for unpinned items that are raised. */
-        CurtainLayer,               /**< Layer for curtain that blacks out the background when an item is zoomed. */
-        ZoomedLayer,                /**< Layer for zoomed items. */
-        FrontLayer,                 /**< Topmost layer for items. Items that are being dragged, resized or manipulated in any other way are to be placed here. */
-        EffectsLayer,               /**< Layer for top-level effects. */
-        UiLayer,                    /**< Layer for ui elements, i.e. close button, navigation bar, etc... */
-    };
-
     /**
      * Constructor.
      * 
@@ -249,13 +233,13 @@ public:
     void bringToFront(QnWorkbenchItem *item);
 
 
-    Layer layer(QGraphicsItem *item) const;
+    Qn::ItemLayer layer(QGraphicsItem *item) const;
 
-    void setLayer(QGraphicsItem *item, Layer layer);
+    void setLayer(QGraphicsItem *item, Qn::ItemLayer layer);
 
-    void setLayer(const QList<QGraphicsItem *> &items, Layer layer);
+    void setLayer(const QList<QGraphicsItem *> &items, Qn::ItemLayer layer);
 
-    qreal layerZValue(Layer layer) const;
+    qreal layerZValue(Qn::ItemLayer layer) const;
 
     void synchronize(QnWorkbenchItem *item, bool animate = true);
     
@@ -301,9 +285,9 @@ protected:
 
     void adjustGeometry(QnWorkbenchItem *item, bool animate = true);
 
-    qreal layerFrontZValue(Layer layer) const;
-    Layer synchronizedLayer(QnWorkbenchItem *item) const;
-    Layer shadowLayer(Layer itemLayer) const;
+    qreal layerFrontZValue(Qn::ItemLayer layer) const;
+    Qn::ItemLayer synchronizedLayer(QnWorkbenchItem *item) const;
+    Qn::ItemLayer shadowLayer(Qn::ItemLayer itemLayer) const;
 
     bool addItemInternal(QnWorkbenchItem *item, bool animate = true);
     bool removeItemInternal(QnWorkbenchItem *item, bool destroyWidget, bool destroyItem);

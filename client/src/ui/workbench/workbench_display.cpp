@@ -116,8 +116,8 @@ namespace {
     const qreal zStep = 1.0;
 
     enum {
-        ITEM_LAYER = 0x93A7FA71,    /**< Key for item layer. */
-        ITEM_ANIMATOR = 0x81AFD591  /**< Key for item animator. */
+        ITEM_LAYER_KEY = 0x93A7FA71,    /**< Key for item layer. */
+        ITEM_ANIMATOR_KEY = 0x81AFD591  /**< Key for item animator. */
     };
 
 } // anonymous namespace
@@ -144,17 +144,17 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     /* Create and configure instruments. */
     Instrument::EventTypeSet paintEventTypes = Instrument::makeSet(QEvent::Paint);
 
-    SignalingInstrument *resizeSignalingInstrument = new SignalingInstrument(Instrument::VIEWPORT, Instrument::makeSet(QEvent::Resize), this);
-    SignalingInstrument *paintSignalingInstrument = new SignalingInstrument(Instrument::VIEWPORT, Instrument::makeSet(QEvent::Paint), this);
+    SignalingInstrument *resizeSignalingInstrument = new SignalingInstrument(Instrument::Viewport, Instrument::makeSet(QEvent::Resize), this);
+    SignalingInstrument *paintSignalingInstrument = new SignalingInstrument(Instrument::Viewport, Instrument::makeSet(QEvent::Paint), this);
     m_animationInstrument = new AnimationInstrument(this);
     m_boundingInstrument = new BoundingInstrument(this);
     m_transformListenerInstrument = new TransformListenerInstrument(this);
     m_curtainActivityInstrument = new ActivityListenerInstrument(1000, this);
     m_widgetActivityInstrument = new ActivityListenerInstrument(1000 * 10, this);
-    m_paintForwardingInstrument = new ForwardingInstrument(Instrument::VIEWPORT, paintEventTypes, this);
+    m_paintForwardingInstrument = new ForwardingInstrument(Instrument::Viewport, paintEventTypes, this);
     m_selectionOverlayHackInstrument = new SelectionOverlayHackInstrument(this);
 
-    m_instrumentManager->installInstrument(new StopInstrument(Instrument::VIEWPORT, paintEventTypes, this));
+    m_instrumentManager->installInstrument(new StopInstrument(Instrument::Viewport, paintEventTypes, this));
     m_instrumentManager->installInstrument(m_paintForwardingInstrument);
     m_instrumentManager->installInstrument(paintSignalingInstrument);
     m_instrumentManager->installInstrument(m_transformListenerInstrument);
@@ -297,14 +297,14 @@ void QnWorkbenchDisplay::initSceneContext() {
     /* Set up curtain. */
     m_curtainItem = new QnCurtainItem();
     m_scene->addItem(m_curtainItem.data());
-    setLayer(m_curtainItem.data(), CurtainLayer);
+    setLayer(m_curtainItem.data(), Qn::CurtainLayer);
     m_curtainItem.data()->setColor(QColor(0, 0, 0, 255));
     m_curtainAnimator->setCurtainItem(m_curtainItem.data());
 
     /* Set up grid. */
     m_gridItem = new QnGridItem();
     m_scene->addItem(m_gridItem.data());
-    setLayer(m_gridItem.data(), BackLayer);
+    setLayer(m_gridItem.data(), Qn::BackLayer);
     m_gridItem.data()->setAnimationSpeed(2.0);
     m_gridItem.data()->setAnimationTimeLimit(300);
     m_gridItem.data()->setColor(QColor(0, 240, 240, 128));
@@ -424,13 +424,13 @@ QnWorkbenchRenderWatcher *QnWorkbenchDisplay::renderWatcher() const {
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDisplay :: item properties
 // -------------------------------------------------------------------------- //
-QnWorkbenchDisplay::Layer QnWorkbenchDisplay::layer(QGraphicsItem *item) const {
+Qn::ItemLayer QnWorkbenchDisplay::layer(QGraphicsItem *item) const {
     bool ok;
-    Layer layer = static_cast<Layer>(item->data(ITEM_LAYER).toInt(&ok));
-    return ok ? layer : BackLayer;
+    Qn::ItemLayer layer = static_cast<Qn::ItemLayer>(item->data(ITEM_LAYER_KEY).toInt(&ok));
+    return ok ? layer : Qn::BackLayer;
 }
 
-void QnWorkbenchDisplay::setLayer(QGraphicsItem *item, Layer layer) {
+void QnWorkbenchDisplay::setLayer(QGraphicsItem *item, Qn::ItemLayer layer) {
     if(item == NULL) {
         qnNullWarning(item);
         return;
@@ -438,7 +438,7 @@ void QnWorkbenchDisplay::setLayer(QGraphicsItem *item, Layer layer) {
 
     /* Moving items back and forth between layers should preserve their relative
      * z order. Hence the fmod. */
-    item->setData(ITEM_LAYER, static_cast<int>(layer));
+    item->setData(ITEM_LAYER_KEY, static_cast<int>(layer));
     item->setZValue(layer * layerZSize + std::fmod(item->zValue(), layerZSize));
 
     QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
@@ -446,13 +446,13 @@ void QnWorkbenchDisplay::setLayer(QGraphicsItem *item, Layer layer) {
         widget->shadow()->setZValue(shadowLayer(layer) * layerZSize);
 }
 
-void QnWorkbenchDisplay::setLayer(const QList<QGraphicsItem *> &items, Layer layer) {
+void QnWorkbenchDisplay::setLayer(const QList<QGraphicsItem *> &items, Qn::ItemLayer layer) {
     foreach(QGraphicsItem *item, items)
         setLayer(item, layer);
 }
 
 WidgetAnimator *QnWorkbenchDisplay::animator(QnResourceWidget *widget) {
-    WidgetAnimator *animator = widget->data(ITEM_ANIMATOR).value<WidgetAnimator *>();
+    WidgetAnimator *animator = widget->data(ITEM_ANIMATOR_KEY).value<WidgetAnimator *>();
     if(animator != NULL)
         return animator;
 
@@ -466,7 +466,7 @@ WidgetAnimator *QnWorkbenchDisplay::animator(QnResourceWidget *widget) {
     animator->setRotationSpeed(270.0);
     animator->setTimer(m_animationInstrument->animationTimer());
     animator->setTimeLimit(widgetAnimationDurationMsec);
-    widget->setData(ITEM_ANIMATOR, QVariant::fromValue<WidgetAnimator *>(animator));
+    widget->setData(ITEM_ANIMATOR_KEY, QVariant::fromValue<WidgetAnimator *>(animator));
     return animator;
 }
 
@@ -745,41 +745,41 @@ void QnWorkbenchDisplay::setWidgetsFrameOpacity(qreal opacity) {
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDisplay :: calculators
 // -------------------------------------------------------------------------- //
-qreal QnWorkbenchDisplay::layerFrontZValue(Layer layer) const {
+qreal QnWorkbenchDisplay::layerFrontZValue(Qn::ItemLayer layer) const {
     return layerZValue(layer) + m_frontZ;
 }
 
-qreal QnWorkbenchDisplay::layerZValue(Layer layer) const {
+qreal QnWorkbenchDisplay::layerZValue(Qn::ItemLayer layer) const {
     return layer * layerZSize;
 }
 
-QnWorkbenchDisplay::Layer QnWorkbenchDisplay::shadowLayer(Layer itemLayer) const {
+Qn::ItemLayer QnWorkbenchDisplay::shadowLayer(Qn::ItemLayer itemLayer) const {
     switch(itemLayer) {
-    case PinnedRaisedLayer:
-        return PinnedLayer;
-    case UnpinnedRaisedLayer:
-        return UnpinnedLayer;
+    case Qn::PinnedRaisedLayer:
+        return Qn::PinnedLayer;
+    case Qn::UnpinnedRaisedLayer:
+        return Qn::UnpinnedLayer;
     default:
         return itemLayer;
     }
 }
 
-QnWorkbenchDisplay::Layer QnWorkbenchDisplay::synchronizedLayer(QnWorkbenchItem *item) const {
+Qn::ItemLayer QnWorkbenchDisplay::synchronizedLayer(QnWorkbenchItem *item) const {
     assert(item != NULL);
 
     if(item == m_itemByRole[Qn::ZoomedRole]) {
-        return ZoomedLayer;
+        return Qn::ZoomedLayer;
     } else if(item->isPinned()) {
         if(item == m_itemByRole[Qn::RaisedRole]) {
-            return PinnedRaisedLayer;
+            return Qn::PinnedRaisedLayer;
         } else {
-            return PinnedLayer;
+            return Qn::PinnedLayer;
         }
     } else {
         if(item == m_itemByRole[Qn::RaisedRole]) {
-            return UnpinnedRaisedLayer;
+            return Qn::UnpinnedRaisedLayer;
         } else {
-            return UnpinnedLayer;
+            return Qn::UnpinnedLayer;
         }
     }
 }

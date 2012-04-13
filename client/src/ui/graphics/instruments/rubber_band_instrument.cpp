@@ -183,7 +183,7 @@ private:
 };
 
 RubberBandInstrument::RubberBandInstrument(QObject *parent):
-    base_type(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent),
+    base_type(Viewport, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent),
     m_rubberBandZValue(std::numeric_limits<qreal>::max())
 {}
 

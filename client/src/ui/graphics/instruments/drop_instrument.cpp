@@ -39,7 +39,7 @@ private:
 
 
 DropInstrument::DropInstrument(bool intoNewLayout, QnWorkbenchContext *context, QObject *parent):
-    Instrument(ITEM, makeSet(/* No events here, we'll receive them from the surface item. */), parent),
+    Instrument(Item, makeSet(/* No events here, we'll receive them from the surface item. */), parent),
     m_context(context),
     m_intoNewLayout(intoNewLayout)
 {

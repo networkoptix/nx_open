@@ -2,7 +2,7 @@
 #include <ui/graphics/items/resource_widget.h>
 
 SelectionOverlayHackInstrument::SelectionOverlayHackInstrument(QObject *parent):
-    Instrument(Instrument::SCENE, makeSet(), parent)
+    Instrument(Instrument::Scene, makeSet(), parent)
 {}
 
 SelectionOverlayHackInstrument::~SelectionOverlayHackInstrument() {
@@ -52,6 +52,6 @@ void SelectionOverlayHackInstrument::showSelectedOverlay(QnResourceWidget *widge
     if(widget == NULL)
         return;
 
-    widget->setDisplayFlag(QnResourceWidget::DISPLAY_SELECTION_OVERLAY, show);
+    widget->setDisplayFlag(QnResourceWidget::DisplaySelectionOverlay, show);
 }
 

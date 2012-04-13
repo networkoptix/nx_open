@@ -158,7 +158,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
 
     /* Create controls. */
     m_controlsWidget = m_uiElementsInstrument->widget(); /* Setting an ItemIsPanel flag on this item prevents focusing on graphics widgets. Don't set it. */
-    m_display->setLayer(m_controlsWidget, QnWorkbenchDisplay::UiLayer);
+    m_display->setLayer(m_controlsWidget, Qn::UiLayer);
 
     QnSingleEventSignalizer *deactivationSignalizer = new QnSingleEventSignalizer(this);
     deactivationSignalizer->setEventType(QEvent::WindowDeactivate);
@@ -1123,7 +1123,7 @@ void QnWorkbenchUi::updateHelpContextInternal() {
     case Qn::SceneScope:
         context = QnContextHelp::ContextId_Scene;
         foreach(QnResourceWidget *widget, display()->widgets()) {
-            if(widget->displayFlags() & QnResourceWidget::DISPLAY_MOTION_GRID) {
+            if(widget->displayFlags() & QnResourceWidget::DisplayMotionGrid) {
                 context = QnContextHelp::ContextId_MotionGrid;
                 break;
             }

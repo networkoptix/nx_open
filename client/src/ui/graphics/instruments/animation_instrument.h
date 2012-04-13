@@ -8,7 +8,7 @@ class AnimationInstrument: public Instrument {
     Q_OBJECT;
 public:
     AnimationInstrument(QObject *parent = NULL):
-        Instrument(VIEWPORT, makeSet(AnimationEvent::Animation), parent)
+        Instrument(Viewport, makeSet(AnimationEvent::Animation), parent)
     {}
 
     AnimationTimer *animationTimer() {

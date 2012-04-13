@@ -14,7 +14,7 @@ namespace {
 } // anonymous namespace
 
 MoveInstrument::MoveInstrument(QObject *parent): 
-    DragProcessingInstrument(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent),
+    DragProcessingInstrument(Viewport, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent),
     m_effective(true)
 {}
 

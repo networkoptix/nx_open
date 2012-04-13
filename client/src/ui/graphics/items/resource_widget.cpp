@@ -122,7 +122,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_frameWidth(-1.0),
     m_frameOpacity(1.0),
     m_aboutToBeDestroyedEmitted(false),
-    m_displayFlags(DISPLAY_SELECTION_OVERLAY | DISPLAY_BUTTONS),
+    m_displayFlags(DisplaySelectionOverlay | DisplayButtons),
     m_motionMaskValid(false),
     m_motionMaskBinDataValid(false)
 {
@@ -380,11 +380,11 @@ QRectF QnResourceWidget::channelRect(int channel) const {
 }
 
 void QnResourceWidget::showActivityDecorations() {
-    setDisplayFlag(DISPLAY_ACTIVITY_OVERLAY, true);
+    setDisplayFlag(DisplayActivityOverlay, true);
 }
 
 void QnResourceWidget::hideActivityDecorations() {
-    setDisplayFlag(DISPLAY_ACTIVITY_OVERLAY, false);
+    setDisplayFlag(DisplayActivityOverlay, false);
 }
 
 void QnResourceWidget::fadeOutOverlay() {
@@ -569,14 +569,14 @@ void QnResourceWidget::setDisplayFlags(DisplayFlags flags) {
     DisplayFlags changedFlags = m_displayFlags ^ flags;
     m_displayFlags = flags;
 
-    if(changedFlags & DISPLAY_MOTION_GRID) {
+    if(changedFlags & DisplayMotionGrid) {
         QnAbstractArchiveReader *reader = m_display->archiveReader();
         if (reader)
-            reader->setSendMotion(flags & DISPLAY_MOTION_GRID);
+            reader->setSendMotion(flags & DisplayMotionGrid);
     }
 
-    if(changedFlags & DISPLAY_BUTTONS)
-        m_headerOverlayWidget->setVisible(flags & DISPLAY_BUTTONS);
+    if(changedFlags & DisplayButtons)
+        m_headerOverlayWidget->setVisible(flags & DisplayButtons);
 
     emit displayFlagsChanged();
 }
@@ -834,7 +834,7 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
         /* Set overlay icon. */
         if (m_display->camDisplay()->isStillImage()) {
             setOverlayIcon(i, NO_ICON);
-        } else if(m_display->isPaused() && (m_displayFlags & DISPLAY_ACTIVITY_OVERLAY)) {
+        } else if(m_display->isPaused() && (m_displayFlags & DisplayActivityOverlay)) {
             setOverlayIcon(i, PAUSED);
         } else if (m_display->camDisplay()->isRealTimeSource() && m_display->resource()->getStatus() == QnResource::Offline) {
             setOverlayIcon(i, OFFLINE);
@@ -872,7 +872,7 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     }
 
     /* Draw motion grid. */
-    if (m_displayFlags & DISPLAY_MOTION_GRID) {
+    if (m_displayFlags & DisplayMotionGrid) {
         for(int i = 0; i < m_channelCount; i++) 
         {
             QRectF rect = channelRect(i);
@@ -914,7 +914,7 @@ void QnResourceWidget::drawSelection(const QRectF &rect) {
     if(!isSelected())
         return;
 
-    if(!(m_displayFlags & DISPLAY_SELECTION_OVERLAY))
+    if(!(m_displayFlags & DisplaySelectionOverlay))
         return;
 
     QColor color = qnGlobals->selectionColor();

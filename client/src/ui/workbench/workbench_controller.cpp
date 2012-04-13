@@ -170,10 +170,10 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     Instrument::EventTypeSet keyEventTypes = Instrument::makeSet(QEvent::KeyPress, QEvent::KeyRelease);
 
     /* Install and configure instruments. */
-    m_itemLeftClickInstrument = new ClickInstrument(Qt::LeftButton, 300, Instrument::ITEM, this);
-    m_itemRightClickInstrument = new ClickInstrument(Qt::RightButton, 0, Instrument::ITEM, this);
-    ClickInstrument *itemMiddleClickInstrument = new ClickInstrument(Qt::MiddleButton, 0, Instrument::ITEM, this);
-    ClickInstrument *sceneClickInstrument = new ClickInstrument(Qt::LeftButton | Qt::RightButton, 0, Instrument::SCENE, this);
+    m_itemLeftClickInstrument = new ClickInstrument(Qt::LeftButton, 300, Instrument::Item, this);
+    m_itemRightClickInstrument = new ClickInstrument(Qt::RightButton, 0, Instrument::Item, this);
+    ClickInstrument *itemMiddleClickInstrument = new ClickInstrument(Qt::MiddleButton, 0, Instrument::Item, this);
+    ClickInstrument *sceneClickInstrument = new ClickInstrument(Qt::LeftButton | Qt::RightButton, 0, Instrument::Scene, this);
     m_handScrollInstrument = new HandScrollInstrument(this);
     m_wheelZoomInstrument = new WheelZoomInstrument(this);
     m_rubberBandInstrument = new RubberBandInstrument(this);
@@ -184,11 +184,11 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     BoundingInstrument *boundingInstrument = m_display->boundingInstrument();
     SelectionOverlayHackInstrument *selectionOverlayHackInstrument = m_display->selectionOverlayHackInstrument();
     m_moveInstrument = new MoveInstrument(this);
-    m_itemMouseForwardingInstrument = new ForwardingInstrument(Instrument::ITEM, mouseEventTypes, this);
+    m_itemMouseForwardingInstrument = new ForwardingInstrument(Instrument::Item, mouseEventTypes, this);
     SelectionFixupInstrument *selectionFixupInstrument = new SelectionFixupInstrument(this);
     m_motionSelectionInstrument = new MotionSelectionInstrument(this);
     GridAdjustmentInstrument *gridAdjustmentInstrument = new GridAdjustmentInstrument(workbench(), this);
-    SignalingInstrument *sceneKeySignalingInstrument = new SignalingInstrument(Instrument::SCENE, Instrument::makeSet(QEvent::KeyPress), this);
+    SignalingInstrument *sceneKeySignalingInstrument = new SignalingInstrument(Instrument::Scene, Instrument::makeSet(QEvent::KeyPress), this);
 
     gridAdjustmentInstrument->setSpeed(QSizeF(0.25 / 360.0, 0.25 / 360.0));
     gridAdjustmentInstrument->setMaxSpacing(QSizeF(0.5, 0.5));
@@ -197,12 +197,12 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Border, subColor(qnGlobals->mrsColor(), qnGlobals->selectionBorderDelta()));
     m_motionSelectionInstrument->setSelectionModifiers(Qt::ShiftModifier);
 
-    m_rubberBandInstrument->setRubberBandZValue(m_display->layerZValue(QnWorkbenchDisplay::EffectsLayer));
-    m_rotationInstrument->setRotationItemZValue(m_display->layerZValue(QnWorkbenchDisplay::EffectsLayer));
+    m_rubberBandInstrument->setRubberBandZValue(m_display->layerZValue(Qn::EffectsLayer));
+    m_rotationInstrument->setRotationItemZValue(m_display->layerZValue(Qn::EffectsLayer));
     m_resizingInstrument->setEffectiveDistance(8);
 
     /* Item instruments. */
-    m_manager->installInstrument(new StopInstrument(Instrument::ITEM, mouseEventTypes, this));
+    m_manager->installInstrument(new StopInstrument(Instrument::Item, mouseEventTypes, this));
     m_manager->installInstrument(m_resizingInstrument->resizeHoverInstrument());
     m_manager->installInstrument(selectionFixupInstrument);
     m_manager->installInstrument(m_itemMouseForwardingInstrument);
@@ -212,27 +212,27 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_manager->installInstrument(itemMiddleClickInstrument);
 
     /* Scene instruments. */
-    m_manager->installInstrument(new StopInstrument(Instrument::SCENE, dndEventTypes, this));
+    m_manager->installInstrument(new StopInstrument(Instrument::Scene, dndEventTypes, this));
     m_manager->installInstrument(m_dropInstrument);
-    m_manager->installInstrument(new StopAcceptedInstrument(Instrument::SCENE, dndEventTypes, this));
-    m_manager->installInstrument(new ForwardingInstrument(Instrument::SCENE, dndEventTypes, this));
+    m_manager->installInstrument(new StopAcceptedInstrument(Instrument::Scene, dndEventTypes, this));
+    m_manager->installInstrument(new ForwardingInstrument(Instrument::Scene, dndEventTypes, this));
 
-    m_manager->installInstrument(new StopInstrument(Instrument::SCENE, wheelEventTypes, this));
+    m_manager->installInstrument(new StopInstrument(Instrument::Scene, wheelEventTypes, this));
     m_manager->installInstrument(m_wheelZoomInstrument);
     m_manager->installInstrument(gridAdjustmentInstrument);
 
-    m_manager->installInstrument(new StopAcceptedInstrument(Instrument::SCENE, wheelEventTypes, this));
-    m_manager->installInstrument(new ForwardingInstrument(Instrument::SCENE, wheelEventTypes, this));
+    m_manager->installInstrument(new StopAcceptedInstrument(Instrument::Scene, wheelEventTypes, this));
+    m_manager->installInstrument(new ForwardingInstrument(Instrument::Scene, wheelEventTypes, this));
 
-    m_manager->installInstrument(new StopInstrument(Instrument::SCENE, mouseEventTypes, this));
+    m_manager->installInstrument(new StopInstrument(Instrument::Scene, mouseEventTypes, this));
     m_manager->installInstrument(sceneClickInstrument);
-    m_manager->installInstrument(new StopAcceptedInstrument(Instrument::SCENE, mouseEventTypes, this));
-    m_manager->installInstrument(new ForwardingInstrument(Instrument::SCENE, mouseEventTypes, this));
+    m_manager->installInstrument(new StopAcceptedInstrument(Instrument::Scene, mouseEventTypes, this));
+    m_manager->installInstrument(new ForwardingInstrument(Instrument::Scene, mouseEventTypes, this));
 
-    m_manager->installInstrument(new StopInstrument(Instrument::SCENE, keyEventTypes, this));
+    m_manager->installInstrument(new StopInstrument(Instrument::Scene, keyEventTypes, this));
     m_manager->installInstrument(sceneKeySignalingInstrument);
-    m_manager->installInstrument(new StopAcceptedInstrument(Instrument::SCENE, keyEventTypes, this));
-    m_manager->installInstrument(new ForwardingInstrument(Instrument::SCENE, keyEventTypes, this));
+    m_manager->installInstrument(new StopAcceptedInstrument(Instrument::Scene, keyEventTypes, this));
+    m_manager->installInstrument(new ForwardingInstrument(Instrument::Scene, keyEventTypes, this));
 
     /* View/viewport instruments. */
     m_manager->installInstrument(m_rotationInstrument, InstallationMode::InstallAfter, m_display->transformationListenerInstrument());
@@ -243,7 +243,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_manager->installInstrument(m_handScrollInstrument);
     m_manager->installInstrument(m_motionSelectionInstrument);
 
-    display->setLayer(m_dropInstrument->surface(), QnWorkbenchDisplay::UiLayer);
+    display->setLayer(m_dropInstrument->surface(), Qn::UiLayer);
 
     connect(m_itemLeftClickInstrument,  SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_leftClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(m_itemLeftClickInstrument,  SIGNAL(doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                 this,                           SLOT(at_item_doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
@@ -411,7 +411,7 @@ void QnWorkbenchController::displayMotionGrid(const QList<QnResourceWidget *> &w
         if(!(widget->resource()->flags() & QnResource::network))
             continue;
 
-        widget->setDisplayFlag(QnResourceWidget::DISPLAY_MOTION_GRID, display);
+        widget->setDisplayFlag(QnResourceWidget::DisplayMotionGrid, display);
     }
 }
 
@@ -770,7 +770,7 @@ void QnWorkbenchController::at_moveStarted(QGraphicsView *, const QList<QGraphic
 
     /* Bring to front preserving relative order. */
     m_display->bringToFront(items);
-    m_display->setLayer(items, QnWorkbenchDisplay::FrontLayer);
+    m_display->setLayer(items, Qn::FrontLayer);
 
     /* Show grid. */
     m_display->gridItem()->animatedShow();
@@ -936,7 +936,7 @@ void QnWorkbenchController::at_motionSelectionProcessStarted(QGraphicsView *, Qn
         return;
     }
 
-    widget->setDisplayFlag(QnResourceWidget::DISPLAY_MOTION_GRID, true);
+    widget->setDisplayFlag(QnResourceWidget::DisplayMotionGrid, true);
     foreach(QnResourceWidget *otherWidget, display()->widgets())
         if(otherWidget != widget)
             otherWidget->clearMotionSelection();
@@ -1155,7 +1155,7 @@ void QnWorkbenchController::at_toggleMotionAction_triggered() {
 
     bool hidden = false;
     foreach(QnResourceWidget *widget, widgets)
-        if((widget->resource()->flags() & QnResource::network) && !(widget->displayFlags() & QnResourceWidget::DISPLAY_MOTION_GRID))
+        if((widget->resource()->flags() & QnResource::network) && !(widget->displayFlags() & QnResourceWidget::DisplayMotionGrid))
             hidden = true;
 
     if(hidden) {

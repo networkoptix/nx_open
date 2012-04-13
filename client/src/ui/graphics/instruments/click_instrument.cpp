@@ -70,7 +70,7 @@ void ClickInstrument::timerEvent(QTimerEvent *) {
     }
     killClickTimer();
 
-    if(watches(ITEM)) {
+    if(watches(Item)) {
         emitSignals(m_clickData->view.data(), m_clickData->item.data(), &m_clickData->event);
     } else {
         emitSignals(m_clickData->view.data(), m_clickData->scene.data(), &m_clickData->event);
