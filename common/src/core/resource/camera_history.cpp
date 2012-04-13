@@ -31,7 +31,12 @@ QnCameraTimePeriodList::const_iterator QnCameraHistory::getVideoServerOnTimeItr(
 
 QnVideoServerResourcePtr QnCameraHistory::getVideoServerOnTime(qint64 timestamp, bool searchForward, QnTimePeriod& currentPeriod)
 {
-    QnCameraTimePeriodList::const_iterator itr = getVideoServerOnTimeItr(timestamp, searchForward);
+    QMutexLocker lock (&m_mutex);
+    QnCameraTimePeriodList::const_iterator itr;
+    if (timestamp == DATETIME_NOW && !m_timePeriods.isEmpty())
+        itr = m_timePeriods.end()-1;
+    else
+        itr = getVideoServerOnTimeItr(timestamp, searchForward);
     if (itr == m_timePeriods.end())
         return QnVideoServerResourcePtr();
     currentPeriod = *itr;
@@ -40,6 +45,7 @@ QnVideoServerResourcePtr QnCameraHistory::getVideoServerOnTime(qint64 timestamp,
 
 QnVideoServerResourcePtr QnCameraHistory::getNextVideoServerFromTime(qint64 timestamp, QnTimePeriod& currentPeriod)
 {
+    QMutexLocker lock (&m_mutex);
     QnCameraTimePeriodList::const_iterator itr = getVideoServerOnTimeItr(timestamp, true);
     if (itr == m_timePeriods.end())
         return QnVideoServerResourcePtr();
@@ -52,6 +58,7 @@ QnVideoServerResourcePtr QnCameraHistory::getNextVideoServerFromTime(qint64 time
 
 QnVideoServerResourcePtr QnCameraHistory::getPrevVideoServerFromTime(qint64 timestamp, QnTimePeriod& currentPeriod)
 {
+    QMutexLocker lock (&m_mutex);
     QnCameraTimePeriodList::const_iterator itr = getVideoServerOnTimeItr(timestamp, false);
     if (itr == m_timePeriods.end() || itr == m_timePeriods.begin())
         return QnVideoServerResourcePtr();
@@ -65,7 +72,42 @@ QnVideoServerResourcePtr QnCameraHistory::getNextVideoServerOnTime(qint64 timest
     return searchForward ? getNextVideoServerFromTime(timestamp, currentPeriod) : getPrevVideoServerFromTime(timestamp, currentPeriod);
 }
 
+void QnCameraHistory::addTimePeriod(const QnCameraTimePeriod& period)
+{
+    QMutexLocker lock (&m_mutex);
+    m_timePeriods << period;
+    qSort(m_timePeriods.begin(), m_timePeriods.end());
+}
 
+qint64 QnCameraHistory::getMinTime() const
+{
+    QMutexLocker lock (&m_mutex);
+    if (m_timePeriods.isEmpty())
+        return AV_NOPTS_VALUE;
+    return m_timePeriods.first().startTimeMs;
+}
+
+QList<QnNetworkResourcePtr> QnCameraHistory::getAllCamerasWithSameMac(const QnTimePeriod& timePeriod)
+{
+    QSet<QnNetworkResourcePtr> rez;
+
+    QMutexLocker lock (&m_mutex);
+
+    QnCameraTimePeriodList::const_iterator itrStart = getVideoServerOnTimeItr(timePeriod.startTimeMs, true);
+    QnCameraTimePeriodList::const_iterator itrEnd = getVideoServerOnTimeItr(timePeriod.endTimeMs(), false);
+    if (itrEnd != m_timePeriods.end())
+        itrEnd++;
+
+    for (QnCameraTimePeriodList::const_iterator itr = itrStart; itr < itrEnd; ++itr)
+    {
+        QString vServerId = itr->videoServerId.toString();
+        QnNetworkResourcePtr camera = qSharedPointerDynamicCast<QnNetworkResource> (qnResPool->getResourceByUniqId(m_macAddress + vServerId));
+        if (camera)
+            rez.insert(camera);
+    }
+
+    return rez.toList();
+}
 // ------------------- CameraHistory Pool ------------------------
 
 Q_GLOBAL_STATIC(QnCameraHistoryPool, inst);
@@ -77,10 +119,31 @@ QnCameraHistoryPool* QnCameraHistoryPool::instance()
 
 QnCameraHistoryPtr QnCameraHistoryPool::getCameraHistory(const QString& mac)
 {
+    QMutexLocker lock (&m_mutex);
     return m_cameraHistory.value(mac);
 }
 
-void QnCameraHistoryPool::addCameraHistory(const QString& mac, QnCameraHistoryPtr history)
+void QnCameraHistoryPool::addCameraHistory(QnCameraHistoryPtr history)
 {
-    m_cameraHistory.insert(mac, history);
+    QMutexLocker lock (&m_mutex);
+    m_cameraHistory.insert(history->getMacAddress(), history);
+}
+
+QList<QnNetworkResourcePtr> QnCameraHistoryPool::getAllCamerasWithSameMac(QnNetworkResourcePtr camera, const QnTimePeriod& timePeriod)
+{
+    QnCameraHistoryPtr history = getCameraHistory(camera->getMAC().toString());
+    if (!history)
+        return QList<QnNetworkResourcePtr>() << camera;
+    return history->getAllCamerasWithSameMac(timePeriod);
+}
+
+qint64 QnCameraHistoryPool::getMinTime(QnNetworkResourcePtr camera)
+{
+    if (!camera)
+        return AV_NOPTS_VALUE;
+    QnCameraHistoryPtr history = getCameraHistory(camera->getMAC().toString());
+    if (!history)
+        return AV_NOPTS_VALUE;
+
+    return history->getMinTime();
 }

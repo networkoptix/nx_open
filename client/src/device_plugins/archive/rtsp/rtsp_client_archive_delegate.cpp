@@ -27,7 +27,8 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate():
     m_blockReopening(false),
     m_quality(MEDIA_Quality_High),
     m_qualityFastSwitch(true),
-    m_lastSeekTime(AV_NOPTS_VALUE)
+    m_lastSeekTime(AV_NOPTS_VALUE),
+    m_sendedCSec(0)
 {
     m_rtpDataBuffer = new quint8[MAX_RTP_BUFFER_SIZE];
     m_flags |= Flag_SlowSource;
@@ -42,7 +43,10 @@ QnRtspClientArchiveDelegate::~QnRtspClientArchiveDelegate()
 
 QnResourcePtr QnRtspClientArchiveDelegate::getNextVideoServerFromTime(QnResourcePtr resource, qint64 time)
 {
-    QString mac = resource->getUrl();
+    QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(resource);
+    if (!netRes)
+        return QnResourcePtr();
+    QString mac = netRes->getMAC().toString();
     QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(mac);
     if (!history)
         return QnResourcePtr();
@@ -50,19 +54,25 @@ QnResourcePtr QnRtspClientArchiveDelegate::getNextVideoServerFromTime(QnResource
     if (!videoServer)
         return QnResourcePtr();
     // get camera resource from other server. Unique id is mac + serverID
-    QnResourcePtr newResource = qnResPool->getResourceByUniqId(mac + videoServer->getId());
+    QnResourcePtr newResource = qnResPool->getResourceByUniqId(mac + videoServer->getId().toString());
     return newResource;
 }
 
 QnResourcePtr QnRtspClientArchiveDelegate::getResourceOnTime(QnResourcePtr resource, qint64 time)
 {
-    QString mac = resource->getUrl();
+    QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(resource);
+    if (!netRes)
+        return resource;
+    QString mac = netRes->getMAC().toString();
     QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(mac);
     if (!history)
         return resource;
     QnVideoServerResourcePtr videoServer = history->getVideoServerOnTime(time, m_rtspSession.getScale() >= 0, m_serverTimePeriod);
+    if (!videoServer)
+        return resource;
+
     // get camera resource from other server. Unique id is mac + serverID
-    QnResourcePtr newResource = qnResPool->getResourceByUniqId(mac + videoServer->getId());
+    QnResourcePtr newResource = qnResPool->getResourceByUniqId(mac + videoServer->getId().toString());
     return newResource ? newResource : resource;
 }
 
@@ -71,7 +81,7 @@ bool QnRtspClientArchiveDelegate::open(QnResourcePtr resource)
     if (m_opened)
         return true;
 
-    resource = getResourceOnTime(resource, m_position);
+    resource = getResourceOnTime(resource, m_position != DATETIME_NOW ? m_position/1000 : m_position);
 
     m_closing = false;
     m_resource = resource;
@@ -130,9 +140,16 @@ void QnRtspClientArchiveDelegate::close()
 
 qint64 QnRtspClientArchiveDelegate::startTime()
 {
-    // uncoment it for large interval test:
-    //return m_rtspSession.startTime()- 1000000ll * 3600 * 24 * 400; // 400 days
-    return m_rtspSession.startTime();
+    qint64 minTime = QnCameraHistoryPool::instance()->getMinTime(qSharedPointerDynamicCast<QnNetworkResource> (m_resource));
+    if (minTime != AV_NOPTS_VALUE)
+        return minTime*1000;
+
+    qint64 rez = m_rtspSession.startTime();
+    if (rez == 0 || rez == AV_NOPTS_VALUE || rez == DATETIME_NOW)
+        return rez;
+
+
+    return rez;
 }
 
 qint64 QnRtspClientArchiveDelegate::endTime()
@@ -162,14 +179,15 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
         return result;
     
     // Check if archive moved to other video server
-    bool outOfRange = m_rtspSession.getScale() >= 0 && result->timestamp >= m_serverTimePeriod.endTimeMs() || 
-                      m_rtspSession.getScale() <  0 && result->timestamp < m_serverTimePeriod.startTimeMs;
-    if (outOfRange || result->dataType == QnAbstractMediaData::EMPTY_DATA)
+    qint64 timeMs = result ? result->timestamp/1000 : 0;
+    bool outOfRange = m_rtspSession.getScale() >= 0 && timeMs >= m_serverTimePeriod.endTimeMs() || 
+                      m_rtspSession.getScale() <  0 && timeMs < m_serverTimePeriod.startTimeMs;
+    if (result == 0 || outOfRange || result->dataType == QnAbstractMediaData::EMPTY_DATA)
     {
-        QnResourcePtr newResource = getNextVideoServerFromTime(m_resource, m_lastSeekTime);
+        QnResourcePtr newResource = getNextVideoServerFromTime(m_resource, m_lastSeekTime/1000);
         if (newResource) {
             m_resource = m_resource;
-            m_position = m_serverTimePeriod.endTimeMs();
+            m_lastSeekTime = m_position = m_serverTimePeriod.startTimeMs*1000;
             close();
             open(m_resource);
             return getNextData();
@@ -311,7 +329,7 @@ qint64 QnRtspClientArchiveDelegate::seek(qint64 time, bool findIFrame)
     //deleteContexts(); // context is going to create again on first data after SEEK, so ignore rest of data before seek
     m_lastSeekTime = m_position = time;
     
-    QnResourcePtr newResource = getResourceOnTime(m_resource, m_position);
+    QnResourcePtr newResource = getResourceOnTime(m_resource, m_position/1000);
     if (newResource)
     {
         if (newResource != m_resource)
