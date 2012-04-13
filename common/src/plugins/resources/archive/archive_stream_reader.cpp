@@ -193,6 +193,11 @@ bool QnArchiveStreamReader::init()
 {
     setCurrentTime(0);
 
+    if (m_requiredJumpTime != AV_NOPTS_VALUE) {
+        if (m_delegate->seek(m_requiredJumpTime, false) > 0)
+            m_requiredJumpTime = AV_NOPTS_VALUE;
+    }
+
     if (!m_delegate->open(m_resource))
         return false;
     m_delegate->setAudioChannel(m_selectedAudioChannel);
