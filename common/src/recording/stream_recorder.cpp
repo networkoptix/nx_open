@@ -33,7 +33,8 @@ m_endOfData(false),
 m_lastProgress(-1),
 m_EofDateTime(AV_NOPTS_VALUE),
 m_needCalcSignature(false),
-m_mdctx(0)
+m_mdctx(0),
+m_container("matroska")
 {
 	memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
 }
@@ -253,10 +254,10 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
 
     //QnResourcePtr resource = mediaData->dataProvider->getResource();
     // allocate container
-    AVOutputFormat * outputCtx = av_guess_format("matroska",NULL,NULL);
+    AVOutputFormat * outputCtx = av_guess_format(m_container.latin1() , NULL, NULL);
     if (outputCtx == 0)
     {
-        m_lastErrMessage = "No MKV container in FFMPEG library";
+        m_lastErrMessage = QString("No %1 container in FFMPEG library").arg(m_container);
         cl_log.log(m_lastErrMessage, cl_logERROR);
         return false;
     }
@@ -522,4 +523,9 @@ void QnStreamRecorder::setSignLogo(QPixmap logo)
 void QnStreamRecorder::setStorage(QnStorageResourcePtr storage)
 {
     m_storage = storage;
+}
+
+void QnStreamRecorder::setContainer(QLatin1String container)
+{
+    m_container = container;
 }
