@@ -115,6 +115,7 @@ DEFINES += $$OVERRIDE_DEFINITION
 PB_FILES = $$PWD/api/pb/camera.proto \
            $$PWD/api/pb/layout.proto \
            $$PWD/api/pb/license.proto \
+           $$PWD/api/pb/cameraServerItem.proto \
            $$PWD/api/pb/user.proto \
            $$PWD/api/pb/resourceType.proto \
            $$PWD/api/pb/resource.proto \

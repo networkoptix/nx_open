@@ -5,11 +5,27 @@
 #include "resource.h"
 #include "resource_fwd.h"
 
+struct QN_EXPORT QnCameraHistoryItem
+{
+    QnCameraHistoryItem(const QString& mac_, qint64 timestamp_, const QString& videoServerGuid_)
+        : mac(mac_),
+          timestamp(timestamp_),
+          videoServerGuid(videoServerGuid_)
+    {
+    }
+
+    QString mac;
+    qint64 timestamp;
+    QString videoServerGuid;
+};
+
 struct QN_EXPORT QnCameraTimePeriod: QnTimePeriod
 {
-    QnCameraTimePeriod(qint64 startTimeMs, qint64 durationMs, QnId serverId): QnTimePeriod(startTimeMs, durationMs), videoServerId(serverId) {}
+    QnCameraTimePeriod(qint64 startTimeMs, qint64 durationMs, QString serverGuid): QnTimePeriod(startTimeMs, durationMs), videoServerGuid(serverGuid) {}
 
-    QnId videoServerId;
+    QnId getServerId() const;
+
+    QString videoServerGuid;
 };
 
 typedef QList<QnCameraTimePeriod> QnCameraTimePeriodList;
@@ -38,6 +54,7 @@ private:
 };
 
 typedef QSharedPointer<QnCameraHistory> QnCameraHistoryPtr;
+typedef QList<QnCameraHistoryPtr> QnCameraHistoryList;
 
 class QnCameraHistoryPool
 {

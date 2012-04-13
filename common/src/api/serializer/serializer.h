@@ -9,6 +9,7 @@
 #include "core/resource/layout_resource.h"
 #include "core/resource/storage_resource.h"
 #include "core/resource/user_resource.h"
+#include "core/resource/camera_history.h"
 #include "licensing/license.h"
 
 
@@ -50,10 +51,12 @@ public:
     virtual void deserializeResources(QnResourceList& resources, const QByteArray& data, QnResourceFactory& resourceFactory) = 0;
     virtual void deserializeResourceTypes(QnResourceTypeList& resourceTypes, const QByteArray& data) = 0;
     virtual void deserializeLicenses(QnLicenseList& licenses, const QByteArray& data) = 0;
+    virtual void deserializeCameraHistoryList(QnCameraHistoryList& cameraServerItems, const QByteArray& data) = 0;
 
     virtual void serializeLayouts(const QnLayoutResourceList& layouts, QByteArray& data) = 0;
     virtual void serializeCameras(const QnVirtualCameraResourceList& cameras, QByteArray& data) = 0;
     virtual void serializeLicense(const QnLicensePtr& license, QByteArray& data) = 0;
+    virtual void serializeCameraServerItem(const QnCameraHistoryItem& cameraHistory, QByteArray& data) = 0;
 
 protected:
     virtual void serializeCamera(const QnVirtualCameraResourcePtr& resource, QByteArray& data) = 0;
