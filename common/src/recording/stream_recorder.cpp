@@ -268,7 +268,9 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
     if (m_fileName.isEmpty()) 
         return false;
 
-    m_fileName += QString(".") + fileExt;
+    QString dFileExt = QString(".") + fileExt;
+    if (!m_fileName.endsWith(dFileExt, Qt::CaseInsensitive))
+        m_fileName += dFileExt;
     QString url = m_fileName; 
 
     global_ffmpeg_mutex.lock();
