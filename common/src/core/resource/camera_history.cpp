@@ -179,8 +179,10 @@ void QnCameraHistoryPool::addCameraHistoryItem(const QnCameraHistoryItem &histor
     QnCameraHistoryPtr cameraHistory;
     if (iter != m_cameraHistory.end())
         cameraHistory = iter.value();
-    else
+    else {
         cameraHistory = QnCameraHistoryPtr(new QnCameraHistory());
+        cameraHistory->setMacAddress(historyItem.mac);
+    }
 
     QnCameraTimePeriod timePeriod(historyItem.timestamp, -1, historyItem.videoServerGuid);
     cameraHistory->addTimePeriod(timePeriod);
