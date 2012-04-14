@@ -17,20 +17,10 @@ QnWorkbenchRenderWatcher::QnWorkbenchRenderWatcher(QnWorkbenchDisplay *display, 
     }
 
     /* Connect to display. */
-    connect(display,    SIGNAL(widgetAdded(QnResourceWidget *)),            this,   SLOT(at_display_widgetAdded(QnResourceWidget *)));
-    connect(display,    SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)), this,   SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
-
-    /* Set up instruments. */
-    Instrument::EventTypeSet paintEventTypes = Instrument::makeSet(QEvent::Paint);
-    SignalingInstrument *beforeDisplayInstrument = new SignalingInstrument(Instrument::Viewport, paintEventTypes, this);
-    SignalingInstrument *afterDisplayInstrument = new SignalingInstrument(Instrument::Viewport, paintEventTypes, this);
-
-    InstrumentManager *manager = display->instrumentManager();
-    manager->installInstrument(beforeDisplayInstrument, InstrumentManager::InstallBefore, display->paintForwardingInstrument());
-    manager->installInstrument(afterDisplayInstrument,  InstrumentManager::InstallAfter, display->paintForwardingInstrument());
-
-    connect(beforeDisplayInstrument, SIGNAL(activated(QWidget *, QEvent *)), this, SLOT(startDisplay()));
-    connect(afterDisplayInstrument,  SIGNAL(activated(QWidget *, QEvent *)), this, SLOT(finishDisplay()));
+    connect(display,                            SIGNAL(widgetAdded(QnResourceWidget *)),            this,   SLOT(at_display_widgetAdded(QnResourceWidget *)));
+    connect(display,                            SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)), this,   SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
+    connect(display->beforePaintInstrument(),   SIGNAL(activated(QWidget *, QEvent *)),             this, SLOT(startDisplay()));
+    connect(display->afterPaintInstrument(),    SIGNAL(activated(QWidget *, QEvent *)),             this, SLOT(finishDisplay()));
 }
 
 QnWorkbenchRenderWatcher::QnWorkbenchRenderWatcher(QObject *parent): 

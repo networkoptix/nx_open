@@ -233,6 +233,19 @@ void QnWorkbench::setItem(Qn::ItemRole role, QnWorkbenchItem *item) {
     m_itemByRole[role] = item;
 
     emit itemChanged(role);
+
+    /* Update central item. */
+    switch(role) {
+    case Qn::ZoomedRole:
+        setItem(Qn::CentralRole, item);
+        break;
+    case Qn::RaisedRole:
+        if(!m_itemByRole[Qn::ZoomedRole])
+            setItem(Qn::CentralRole, item);
+        break;
+    default:
+        break;
+    }
 }
 
 void QnWorkbench::at_layout_itemAdded(QnWorkbenchItem *item) {

@@ -178,8 +178,6 @@ protected slots:
     void at_activityStarted();
     void at_fpsChanged(qreal fps);
 
-    void at_renderWatcher_displayingStateChanged(QnAbstractRenderer *renderer, bool displaying);
-
     void at_display_widgetChanged(Qn::ItemRole role);
     void at_display_widgetAdded(QnResourceWidget *widget);
     void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);

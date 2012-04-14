@@ -5,8 +5,9 @@
 
 namespace Qn {
     enum ItemRole {
-        RaisedRole,  /**< The item is raised. */
-        ZoomedRole,  /**< The item is zoomed. */
+        RaisedRole,     /**< The item is raised. */
+        ZoomedRole,     /**< The item is zoomed. */
+        CentralRole,    /**< The item is 'central' --- it is either zoomed, or raised and there are no zoomed item. */
         ItemRoleCount
     };
     

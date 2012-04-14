@@ -26,8 +26,6 @@ QnWorkbenchStreamSynchronizer::QnWorkbenchStreamSynchronizer(QnWorkbenchDisplay 
     /* Connect to display. */
     connect(display,    SIGNAL(widgetAdded(QnResourceWidget *)),              this,   SLOT(at_display_widgetAdded(QnResourceWidget *)));
     connect(display,    SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),   this,   SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
-    //connect(display,    SIGNAL(playbackMaskChanged(const QnTimePeriodList&)), this,   SLOT(at_playback_mask_changed(const QnTimePeriodList&)));
-    connect(display,    SIGNAL(enableItemSync(bool)),                         this,   SLOT(at_enable_sync(bool)));
     
     /* Prepare counter. */
     m_counter = new QnCounter(1);
@@ -39,9 +37,15 @@ QnWorkbenchStreamSynchronizer::QnWorkbenchStreamSynchronizer(QnWorkbenchDisplay 
     connect(renderWatcher, SIGNAL(displayingStateChanged(QnAbstractRenderer *, bool)), this, SLOT(at_renderWatcher_displayingStateChanged(QnAbstractRenderer *, bool)));
 }
 
-void QnWorkbenchStreamSynchronizer::at_enable_sync(bool value) 
-{
-    m_syncPlay->setEnabled(value);
+void QnWorkbenchStreamSynchronizer::setEnabled(bool enabled) {
+    if(m_syncPlay->isEnabled() == enabled)
+        return;
+
+    m_syncPlay->setEnabled(enabled);
+}
+
+bool QnWorkbenchStreamSynchronizer::isEnabled() const {
+    return m_syncPlay->isEnabled();
 }
 
 void QnWorkbenchStreamSynchronizer::at_display_widgetAdded(QnResourceWidget *widget) {
@@ -85,9 +89,3 @@ void QnWorkbenchStreamSynchronizer::at_renderWatcher_displayingStateChanged(QnAb
     m_syncPlay->onConsumerBlocksReader(widget->display()->dataProvider(), !displaying);
 }
 
-/*
-void QnWorkbenchStreamSynchronizer::at_playback_mask_changed(const QnTimePeriodList& playbackMask)
-{
-    m_syncPlay->setPlaybackMask(playbackMask);
-}
-*/

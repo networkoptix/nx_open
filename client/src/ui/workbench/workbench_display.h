@@ -21,6 +21,7 @@ class TransformListenerInstrument;
 class ActivityListenerInstrument;
 class ForwardingInstrument;
 class AnimationInstrument;
+class SignalingInstrument;
 class SelectionOverlayHackInstrument;
 
 class QnAbstractRenderer;
@@ -38,6 +39,7 @@ class QnCurtainItem;
 class QnGridItem;
 class QnWorkbenchRenderWatcher;
 class QnWorkbenchContext;
+class QnWorkbenchStreamSynchronizer;
 
 class CLVideoCamera;
 class CLCamDisplay;
@@ -60,15 +62,18 @@ public:
      */
     QnWorkbenchDisplay(QObject *parent = NULL);
 
-	/**
-	  * This is method initSyncPlay. Should be called for only main display.
-	*/
-	void initSyncPlay();
-
     /**
      * Virtual destructor.
      */
     virtual ~QnWorkbenchDisplay();
+
+    /**
+     * \param synchronized              Whether camera streams on the scene should
+     *                                  be synchronized.
+     */
+    void setStreamsSynchronized(bool synchronized);
+
+    bool isStreamsSynchronized() const;
 
     /**
      * \returns                         Instrument manager owned by this workbench display. 
@@ -115,6 +120,15 @@ public:
     SelectionOverlayHackInstrument *selectionOverlayHackInstrument() const {
         return m_selectionOverlayHackInstrument;
     }
+
+    SignalingInstrument *beforePaintInstrument() const {
+        return m_beforePaintInstrument;
+    }
+
+    SignalingInstrument *afterPaintInstrument() const {
+        return m_afterPaintInstrument;
+    }
+
 
     /**
      * Note that this function never returns NULL.
@@ -254,8 +268,6 @@ public:
 
     QPointF mapGlobalToGridF(const QPoint &globalPoint) const;
 
-    QnWorkbenchRenderWatcher *renderWatcher() const;
-
 public slots:
     void fitInView(bool animate = true);
 
@@ -266,8 +278,8 @@ signals:
     void widgetAdded(QnResourceWidget *widget);
     void widgetAboutToBeRemoved(QnResourceWidget *widget);
     void widgetChanged(Qn::ItemRole role);
-    
-    void enableItemSync(bool value);
+
+    void streamsSynchronizedChanged(bool synchronized);
 
 protected:
     virtual void tick(int deltaTime) override;
@@ -347,8 +359,8 @@ private:
     /** Current view. */
     QGraphicsView *m_view;
 
-    /** Render watcher. */
-    QnWorkbenchRenderWatcher *m_renderWatcher;
+    /** Stream synchronizer. */
+    QnWorkbenchStreamSynchronizer *m_streamSynchronizer;
 
 
     /* Internal state. */
@@ -403,6 +415,10 @@ private:
 
     /** Selection overlay hack instrument. */
     SelectionOverlayHackInstrument *m_selectionOverlayHackInstrument;
+
+    SignalingInstrument *m_beforePaintInstrument;
+
+    SignalingInstrument *m_afterPaintInstrument;
 
 
     /* Animation-related stuff. */

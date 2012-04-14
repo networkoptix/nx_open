@@ -509,7 +509,6 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(m_display,                  SIGNAL(widgetChanged(Qn::ItemRole)),                                                        this,                           SLOT(at_display_widgetChanged(Qn::ItemRole)));
     connect(m_display,                  SIGNAL(widgetAdded(QnResourceWidget *)),                                                    this,                           SLOT(at_display_widgetAdded(QnResourceWidget *)));
     connect(m_display,                  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),                                         this,                           SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
-    connect(m_display->renderWatcher(), SIGNAL(displayingStateChanged(QnAbstractRenderer *, bool)),                                 this,                           SLOT(at_renderWatcher_displayingStateChanged(QnAbstractRenderer *, bool)));
 
 
     /* Init fields. */
@@ -1213,12 +1212,6 @@ void QnWorkbenchUi::at_activityStarted() {
     updateControlsVisibility(true);
 }
 
-void QnWorkbenchUi::at_renderWatcher_displayingStateChanged(QnAbstractRenderer *renderer, bool displaying) {
-    QnResourceWidget *widget = m_display->widget(renderer);
-    if(widget != NULL)
-        m_sliderItem->onDisplayingStateChanged(widget->display()->dataProvider()->getResource(), displaying);
-}
-
 void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role) {
     QnResourceWidget *oldWidget = m_widgetByRole[role];
     QnResourceWidget *newWidget = m_display->widget(role);
@@ -1231,10 +1224,10 @@ void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role) {
     }
 
     /* Update navigation item's target. */
-    QnResourceWidget *targetWidget = m_widgetByRole[Qn::ZoomedRole];
-    if(targetWidget == NULL)
-        targetWidget = m_widgetByRole[Qn::RaisedRole];
-    m_sliderItem->setVideoCamera(targetWidget == NULL ? NULL : targetWidget->display()->camera());
+    if(role == Qn::CentralRole) {
+        QnResourceWidget *targetWidget = m_widgetByRole[Qn::CentralRole];
+        m_sliderItem->setVideoCamera(targetWidget == NULL ? NULL : targetWidget->display()->camera());
+    }
 }
 
 void QnWorkbenchUi::at_display_widgetAdded(QnResourceWidget *widget) {
