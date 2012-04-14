@@ -8,6 +8,7 @@
 #include <core/resource/camera_resource.h>
 
 #include <camera/resource_display.h>
+#include <camera/camera.h>
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/graphics/instruments/signaling_instrument.h>
@@ -203,28 +204,24 @@ void QnWorkbenchNavigator::updateSlider() {
     if (!reader)
         return;
 
-    qint64 startTime = reader->startTime();
-    qint64 endTime = reader->endTime();
-#if 0
-    if (startTime != AV_NOPTS_VALUE && endTime != AV_NOPTS_VALUE) {// TODO: rename AV_NOPTS_VALUE to something more sane.
+    qint64 startTimeUsec = reader->startTime();
+    qint64 endTimeUsec = reader->endTime();
+    if (startTimeUsec != AV_NOPTS_VALUE && endTimeUsec != AV_NOPTS_VALUE) {// TODO: rename AV_NOPTS_VALUE to something more sane.
         qint64 currentMSecsSinceEpoch = 0;
-        if(startTime == DATETIME_NOW || endTime == DATETIME_NOW)
+        if(startTimeUsec == DATETIME_NOW || endTimeUsec == DATETIME_NOW)
             currentMSecsSinceEpoch = qnSyncTime->currentMSecsSinceEpoch();
 
-        m_timeSlider->setMinimum(startTime != DATETIME_NOW ? startTime / 1000 : currentMSecsSinceEpoch - 10000); /* If nothing is recorded, set minimum to live - 10s. */
-        m_timeSlider->setMaximum(endTime != DATETIME_NOW ? endTime / 1000 : currentMSecsSinceEpoch);
+        m_timeSlider->setMinimum(startTimeUsec != DATETIME_NOW ? startTimeUsec / 1000 : currentMSecsSinceEpoch - 10000); /* If nothing is recorded, set minimum to live - 10s. */
+        m_timeSlider->setMaximum(endTimeUsec != DATETIME_NOW ? endTimeUsec / 1000 : currentMSecsSinceEpoch);
 
-        quint64 time = m_camera->getCurrentTime();
-        if (time != AV_NOPTS_VALUE)
-        {
-            m_currentTime = time != DATETIME_NOW ? time/1000 : time;
-            m_timeSlider->setCurrentValue(m_currentTime, true);
-        }
+        qint64 timeUsec = m_currentWidget->display()->camera()->getCurrentTime();
+        if (timeUsec != AV_NOPTS_VALUE)
+            m_timeSlider->setValue(timeUsec != DATETIME_NOW ? timeUsec / 1000 : currentMSecsSinceEpoch);
 
-        m_forceTimePeriodLoading = !updateRecPeriodList(m_forceTimePeriodLoading); // if period does not loaded yet, force loading
+        //m_forceTimePeriodLoading = !updateRecPeriodList(m_forceTimePeriodLoading); // if period does not loaded yet, force loading
     }
 
-    if(!reader->isMediaPaused() && (m_camera->getCamDisplay()->isRealTimeSource() || m_timeSlider->currentValue() == DATETIME_NOW)) {
+    /*if(!reader->isMediaPaused() && (m_camera->getCamDisplay()->isRealTimeSource() || m_timeSlider->currentValue() == DATETIME_NOW)) {
         m_liveButton->setChecked(true);
         m_forwardButton->setEnabled(false);
         m_stepForwardButton->setEnabled(false);
@@ -232,8 +229,7 @@ void QnWorkbenchNavigator::updateSlider() {
         m_liveButton->setChecked(false);
         m_forwardButton->setEnabled(true);
         m_stepForwardButton->setEnabled(true);
-    }
-#endif
+    }*/
 }
 
 
