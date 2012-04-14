@@ -7,6 +7,7 @@
 #include <libavformat/avformat.h>
 #include "core/resource/resource_media_layout.h"
 #include "utils/media/ffmpeg_helper.h"
+#include "core/resource/storage_resource.h"
 
 extern QMutex global_ffmpeg_mutex;
 
@@ -72,7 +73,7 @@ public:
                 result.description = QString::number(++audioNumber);
                 result.description += QLatin1String(". ");
 
-                AVMetadataTag* lang = av_metadata_get(strm->metadata, "language", 0, 0);
+                AVDictionaryEntry * lang = av_dict_get(strm->metadata, "language", 0, 0);
                 if (lang && lang->value && lang->value[0])
                 {
                     QString langName = QString::fromLatin1(lang->value);
@@ -238,12 +239,19 @@ bool QnAviArchiveDelegate::open(QnResourcePtr resource)
     m_resource = resource;
     if (m_formatContext == 0)
     {
-        QString url;
-        if (m_resource->getUrl().startsWith(":/"))
-            url = QLatin1String("qtufile:") + m_resource->getUrl();
-        else
-            url = QLatin1String("ufile:") + m_resource->getUrl();
-        m_initialized = av_open_input_file(&m_formatContext, url.toUtf8().constData(), NULL, 0, NULL) >= 0;
+        QString url = m_resource->getUrl(); // "c:/00-1A-07-03-BD-09.mkv"; //
+        if (m_storage == 0)
+            m_storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(url));
+
+
+        m_formatContext = avformat_alloc_context();
+        m_formatContext->pb = m_storage->createFfmpegIOContext(url, QIODevice::ReadOnly);
+        if (!m_formatContext->pb) {
+            close();
+            return false;
+        }
+        m_initialized = avformat_open_input(&m_formatContext, "", 0, 0) >= 0;
+
         if (!m_initialized )
             close();
     }
@@ -252,18 +260,29 @@ bool QnAviArchiveDelegate::open(QnResourcePtr resource)
 
 void QnAviArchiveDelegate::doNotFindStreamInfo()
 {
+    // this call used for optimization. Avoid av_find_stream_info_call for server's chunks to increase speed
     m_streamsFound=true;
+    if (m_formatContext)
+    {
+        for (int i = 0; i < m_formatContext->nb_streams; ++i)
+            m_formatContext->streams[i]->first_dts = 0; // reset first_dts. If don't do it, av_seek will seek to begin of file always
+    }
 }
 
 void QnAviArchiveDelegate::close()
 {
-    if (m_formatContext)
-        av_close_input_file(m_formatContext);
+    if (m_formatContext) {
+        //avformat_close_input(&m_formatContext);
+        m_storage->closeFfmpegIOContext(m_formatContext->pb);
+        m_formatContext->pb = 0;
+        avformat_free_context(m_formatContext);
+    }
     m_contexts.clear();
     m_formatContext = 0;
     m_initialized = false;
     m_streamsFound = false;
     m_startMksec = 0;
+    m_storage.clear();
 }
 
 static QnDefaultDeviceVideoLayout defaultVideoLayout;
@@ -277,13 +296,13 @@ QnVideoResourceLayout* QnAviArchiveDelegate::getVideoLayout()
     if (m_videoLayout == 0)
     {
         m_videoLayout = new QnCustomDeviceVideoLayout(1, 1);
-        AVMetadataTag* layoutInfo = av_metadata_get(m_formatContext->metadata,"video_layout", 0, 0);
+        AVDictionaryEntry* layoutInfo = av_dict_get(m_formatContext->metadata,"video_layout", 0, 0);
         if (layoutInfo)
             deserializeLayout(m_videoLayout, layoutInfo->value);
 
         if (m_useAbsolutePos)
         {
-            AVMetadataTag* start_time = av_metadata_get(m_formatContext->metadata,"start_time", 0, 0);
+            AVDictionaryEntry* start_time = av_dict_get(m_formatContext->metadata,"start_time", 0, 0);
             if (start_time)
                 m_startTime = QString(start_time->value).toLongLong()*1000ll;
         }
@@ -303,6 +322,7 @@ bool QnAviArchiveDelegate::findStreams()
     if (!m_streamsFound)
     {
         global_ffmpeg_mutex.lock();
+        //m_streamsFound = m_formatContext->nb_streams > 0 || av_find_stream_info(m_formatContext) >= 0;
         m_streamsFound = av_find_stream_info(m_formatContext) >= 0;
         global_ffmpeg_mutex.unlock();
         if (m_streamsFound) 
@@ -350,7 +370,7 @@ void QnAviArchiveDelegate::initLayoutStreams()
         case AVMEDIA_TYPE_VIDEO:
             if (m_firstVideoIndex == -1)
                 m_firstVideoIndex = i;
-            entry = av_metadata_get(m_formatContext->streams[i]->metadata, "layout_channel", 0, 0);
+            entry = av_dict_get(m_formatContext->streams[i]->metadata, "layout_channel", 0, 0);
             while (m_indexToChannel.size() <= i)
                 m_indexToChannel << -1;
             if (entry) {
@@ -455,4 +475,41 @@ AVFormatContext* QnAviArchiveDelegate::getFormatContext()
 bool QnAviArchiveDelegate::isStreamsFound() const
 {
     return m_streamsFound;
+}
+
+void QnAviArchiveDelegate::setStorage(QnStorageResourcePtr storage)
+{
+    m_storage = storage;
+}
+
+QLatin1String QnAviArchiveDelegate::getTagName(Tag tag, const QLatin1String& formatName)
+{
+    if (formatName == QString("avi"))
+    {
+        switch(tag)
+        {
+        case Tag_startTime:
+            return QLatin1String("TCOD"); // StartTimecode
+        case Tag_endTime:
+            return QLatin1String("TCDO"); // EndTimecode
+        case Tag_LayoutInfo:
+            return QLatin1String("TRCK"); // TrackNumber
+        case Tag_Software:
+            return QLatin1String("SFT");
+        }
+    }
+    else {
+        switch(tag)
+        {
+        case Tag_startTime:
+            return QLatin1String("start_time"); // StartTimecode
+        case Tag_endTime:
+            return QLatin1String("end_time"); // EndTimecode
+        case Tag_LayoutInfo:
+            return QLatin1String("video_layout"); // TrackNumber
+        case Tag_Software:
+            return QLatin1String("software");
+        }
+    }
+    return QLatin1String("");
 }

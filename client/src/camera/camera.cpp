@@ -204,6 +204,8 @@ void CLVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, co
     m_exportRecorder->setEofDateTime(endTime);
     m_exportRecorder->setFileName(fileName);
     m_exportRecorder->setRole(QnStreamRecorder::Role_FileExport);
+
+    //m_exportRecorder->setContainer(QLatin1String("matroska")); // avi
     if (qSharedPointerDynamicCast<QnSecurityCamResource>(m_resource))
     {
         m_exportRecorder->setNeedCalcSignature(true);

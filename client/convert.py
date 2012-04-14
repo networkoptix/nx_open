@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+﻿#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import shutil
@@ -245,3 +245,6 @@ if platform() == 'win32':
         os.mkdir('bin/debug/styles')
         copy_files(bespin_path + '/release/styles/*', 'bin/release/styles')
         copy_files(bespin_path + '/debug/styles/*', 'bin/debug/styles')
+
+    copy_files('contrib/x264/bin/x264.exe', 'bin/release/')
+    copy_files('contrib/x264/bin/x264.exe', 'bin/debug/')

@@ -1,33 +1,29 @@
-#include "multi_camera_time_period_loader.h"
-#include "utils/common/warnings.h"
+#include "time_period_reader_helper.h"
 #include "core/resource/video_server.h"
 #include "core/resourcemanagment/resource_pool.h"
 #include "core/resource/camera_history.h"
 
-QnMultiCameraTimePeriodLoader::QnMultiCameraTimePeriodLoader():
+QnTimePeriodReaderHelper::QnTimePeriodReaderHelper():
     m_mutex(QMutex::Recursive),
     m_multiRequestCount(0)
 {
 }
 
-Q_GLOBAL_STATIC(QnMultiCameraTimePeriodLoader, inst);
-QnMultiCameraTimePeriodLoader *QnMultiCameraTimePeriodLoader::instance()
+Q_GLOBAL_STATIC(QnTimePeriodReaderHelper, inst);
+QnTimePeriodReaderHelper* QnTimePeriodReaderHelper::instance()
 {
     return inst();
 }
 
-int QnMultiCameraTimePeriodLoader::load(const QnNetworkResourceList &networkResources, const QnTimePeriod &period)
+int QnTimePeriodReaderHelper::load(const QnNetworkResourceList& netResList, const QnTimePeriod& period)
 {
-    if (period.isNull()) {
-        qnNullWarning(period);
-        return -1;
-    }
-
+    if (period.startTimeMs == 0)
+        return 0; // it is incorrect periods
     QMutexLocker lock(&m_mutex);
     QList<int> hList;
-    foreach(const QnNetworkResourcePtr& netRes, networkResources)
+    foreach(const QnNetworkResourcePtr& netRes, netResList)
     {
-        // sometime camera moved between media server. Get all servers for requested time period
+        // sometime camera moved between media server. Got all servers by requested time period
         QList<QnNetworkResourcePtr> cameraList = QnCameraHistoryPool::instance()->getAllCamerasWithSameMac(netRes, period);
         foreach(const QnNetworkResourcePtr& camera, cameraList)
         {
@@ -43,26 +39,28 @@ int QnMultiCameraTimePeriodLoader::load(const QnNetworkResourceList &networkReso
     return multiHandle;
 }
 
-int QnMultiCameraTimePeriodLoader::load(QnNetworkResourcePtr networkResource, const QnTimePeriod &period)
+int QnTimePeriodReaderHelper::load(QnNetworkResourcePtr netRes, const QnTimePeriod& period)
 {
     QMutexLocker lock(&m_mutex);
-    QnTimePeriodLoaderPtr loader;
-    NetResCache::iterator itr = m_cache.find(networkResource);
+    QnTimePeriodUpdaterPtr updater;
+    NetResCache::iterator itr = m_cache.find(netRes);
     if (itr != m_cache.end()) {
-        loader = itr.value();
-    } else {
-        loader = QnTimePeriodLoader::newInstance(networkResource);
-        if (!loader)
-            return -1;
-        connect(loader.data(), SIGNAL(ready(const QnTimePeriodList &, int)), this, SLOT(onDataLoaded(const QnTimePeriodList &, int)));
-        connect(loader.data(), SIGNAL(failed(int, int)), this, SLOT(onLoadingFailed(int, int)));
-
-        m_cache.insert(networkResource, loader);
+        updater = itr.value();
     }
-    return loader->load(period, QList<QRegion>());
+    else 
+    {
+        updater = createUpdater(netRes);
+        if (!updater)
+            return -1;
+        connect(updater.data(), SIGNAL(ready(const QnTimePeriodList &, int)), this, SLOT(onDataLoaded(const QnTimePeriodList &, int)));
+        connect(updater.data(), SIGNAL(failed(int, int)), this, SLOT(onLoadingFailed(int, int)));
+
+        m_cache.insert(netRes, updater);
+    }
+    return updater->load(period, QList<QRegion>());
 }
 
-void QnMultiCameraTimePeriodLoader::onDataLoaded(const QnTimePeriodList &periods, int handle)
+void QnTimePeriodReaderHelper::onDataLoaded(const QnTimePeriodList& periods, int handle)
 {
     QnTimePeriodList result;
     int multiHandle = 0;
@@ -88,7 +86,7 @@ void QnMultiCameraTimePeriodLoader::onDataLoaded(const QnTimePeriodList &periods
     }
 }
 
-void QnMultiCameraTimePeriodLoader::onLoadingFailed(int status, int handle)
+void QnTimePeriodReaderHelper::onLoadingFailed(int status, int handle)
 {
     int multiHandle = 0;
     {
@@ -107,3 +105,16 @@ void QnMultiCameraTimePeriodLoader::onLoadingFailed(int status, int handle)
     }
 }
 
+QnTimePeriodUpdaterPtr QnTimePeriodReaderHelper::createUpdater(QnResourcePtr resource)
+{
+    QnVideoServerResourcePtr serverResource = qSharedPointerDynamicCast<QnVideoServerResource>(qnResPool->getResourceById(resource->getParentId()));
+    if (!serverResource)
+        return QnTimePeriodUpdaterPtr();
+    QnVideoServerConnectionPtr serverConnection = serverResource->apiConnection();
+    if (!serverConnection)
+        return QnTimePeriodUpdaterPtr();
+    QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(resource);
+    if (!netRes)
+        return QnTimePeriodUpdaterPtr();
+    return QnTimePeriodUpdaterPtr(new QnTimePeriodReader(serverConnection, netRes));
+}

@@ -28,14 +28,14 @@ namespace detail {
     class QnResourceStatusReplyProcessor: public QObject {
         Q_OBJECT;
     public:
-		QnResourceStatusReplyProcessor(QnWorkbenchActionHandler *handler, const QnResourceList &resources, const QList<int> &oldDisabledFlags);
+		QnResourceStatusReplyProcessor(QnWorkbenchActionHandler *handler, const QnVirtualCameraResourceList &resources, const QList<int> &oldDisabledFlags);
 
     public slots:
-        void at_replyReceived(int status, const QByteArray& data, const QByteArray& errorString, int handle);
-
+        //void at_replyReceived(int status, const QByteArray& data, const QByteArray& errorString, int handle);
+        void at_replyReceived2(int status, const QByteArray& errorString, const QnResourceList &resources, int handle);
     private:
         QWeakPointer<QnWorkbenchActionHandler> m_handler;
-        QnResourceList m_resources;
+        QnVirtualCameraResourceList m_resources;
 		QList<int> m_oldDisabledFlags;
     };
 

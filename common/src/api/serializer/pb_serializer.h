@@ -12,16 +12,19 @@ public:
     const char* format() const { return "pb"; }
 
     void deserializeCameras(QnVirtualCameraResourceList& cameras, const QByteArray& data, QnResourceFactory& resourceFactory);
-    void deserializeServers(QnVideoServerResourceList& servers, const QByteArray& data);
+    void deserializeServers(QnVideoServerResourceList& servers, const QByteArray& data, QnResourceFactory& resourceFactory);
     void deserializeLayouts(QnLayoutResourceList& layouts, const QByteArray& data);
     void deserializeUsers(QnUserResourceList& users, const QByteArray& data);
     void deserializeResources(QnResourceList& resources, const QByteArray& data, QnResourceFactory& resourceFactory);
     void deserializeResourceTypes(QnResourceTypeList& resourceTypes, const QByteArray& data);
     void deserializeLicenses(QnLicenseList& licenses, const QByteArray& data);
+    void deserializeCameraHistoryList(QnCameraHistoryList& cameraServerItems, const QByteArray& data);
 
     void serializeLayouts(const QnLayoutResourceList& layouts, QByteArray& data);
     void serializeCameras(const QnVirtualCameraResourceList& cameras, QByteArray& data);
     void serializeLicense(const QnLicensePtr& license, QByteArray& data);
+    void serializeCameraServerItem(const QnCameraHistoryItem& cameraHistory, QByteArray& data);
+
 private:
     void serializeCamera(const QnVirtualCameraResourcePtr& resource, QByteArray& data);
     void serializeServer(const QnVideoServerResourcePtr& resource, QByteArray& data);

@@ -109,7 +109,7 @@ static inline QByteArray codecIDToByteArray(CodecID codecID)
     case CODEC_ID_TIERTEXSEQVIDEO: return "TIERTEXSEQVIDEO";
     case CODEC_ID_TIFF: return "TIFF";
     case CODEC_ID_GIF: return "GIF";
-    case CODEC_ID_FFH264: return "FFH264";
+    //case CODEC_ID_FFH264: return "FFH264";
     case CODEC_ID_DXA: return "DXA";
     case CODEC_ID_DNXHD: return "DNXHD";
     case CODEC_ID_THP: return "THP";

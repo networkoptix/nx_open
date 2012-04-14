@@ -36,7 +36,7 @@ private:
     CLThreadQueue<FileBlockInfo*> m_dataQueue;
 };
 
-class QN_EXPORT QBufferedFile: public QnFile
+class QN_EXPORT QBufferedFile: public QIODevice
 {
 public:
     /*
@@ -47,31 +47,42 @@ public:
     QBufferedFile(const QString& fileName, int ioBlockSize, int minBufferSize);
     virtual ~QBufferedFile();
 
-    virtual bool open(QIODevice::OpenMode& mode, unsigned int systemDependentFlags);
-    virtual qint64	size () const;
-    virtual qint64	pos() const;
-    virtual void close();
-    virtual bool seek(qint64 pos);
+    /*
+    * Addition system depended io flags
+    */
+    void setSystemFlags(int setSystemFlags);
 
+    virtual bool open(QIODevice::OpenMode mode) override;
+    virtual qint64	size () const override;
+    virtual qint64	pos() const override;
+    virtual void close() override;
+    virtual bool seek(qint64 pos) override;
+
+    virtual qint64 writeData (const char * data, qint64 len ) override;
+    virtual qint64 readData (char * data, qint64 len ) override;
+    
+protected:
     qint64 writeUnbuffered(const char * data, qint64 len );
-    virtual qint64 write (const char * data, qint64 len );
-    virtual qint64 read (char * data, qint64 len );
 private:
     bool isWritable() const;
     void flushBuffer();
     void disableDirectIO();
 private:
+    QnFile m_fileEngine;
     int m_bufferSize;
     int m_minBufferSize;
     quint8* m_buffer;
     QueueFileWriter* m_queueWriter;
-public:
+    unsigned int m_systemDependentFlags;
+private:
     bool m_isDirectIO;
     int m_bufferLen;
     int m_bufferPos;
     qint64 m_totalWrited;
     qint64 m_filePos;
     QIODevice::OpenMode m_openMode;
+
+    friend class QueueFileWriter;
 };
 
 #endif // __BUFFERED_FILE_H__

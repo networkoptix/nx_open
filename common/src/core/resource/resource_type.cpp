@@ -120,6 +120,17 @@ QnResourceTypePool *QnResourceTypePool::instance()
     return theResourceTypePool();
 }
 
+QnResourceTypePtr QnResourceTypePool::getResourceTypeByName(const QString& name) const
+{
+    QMutexLocker lock(&m_mutex);
+    for(QnResourceTypeMap::const_iterator itr = m_resourceTypeMap.begin(); itr != m_resourceTypeMap.end(); ++itr)
+    {
+        if (itr.value()->getName() == name)
+            return itr.value();
+    }
+    return QnResourceTypePtr();
+}
+
 QnResourceTypePtr QnResourceTypePool::getResourceType(QnId id) const
 {
     QMutexLocker lock(&m_mutex);

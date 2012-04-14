@@ -24,7 +24,7 @@ void conn_detail::ReplyProcessor::finished(int status, const QByteArray &result,
         QnVideoServerResourceList servers;
 
         try {
-            m_serializer.deserializeServers(servers, result);
+            m_serializer.deserializeServers(servers, result, m_resourceFactory);
         } catch (const QnSerializeException& e) {
             errorString += e.errorString();
         }
@@ -198,7 +198,7 @@ int QnAppServerConnection::registerServer(const QnVideoServerResourcePtr& server
         if (status == 0)
         {
             try {
-                m_serializer.deserializeServers(servers, replyData);
+                m_serializer.deserializeServers(servers, replyData, m_resourceFactory);
             } catch (const QnSerializeException& e) {
                 errorString += e.errorString();
             }
@@ -350,13 +350,23 @@ int QnAppServerConnection::addStorage(const QnStorageResourcePtr& storagePtr, QB
     return addObject("storage", data, reply, errorString);
 }
 
+int QnAppServerConnection::addCameraHistoryItem(const QnCameraHistoryItem &cameraHistoryItem, QByteArray &errorString)
+{
+    QByteArray data;
+    m_serializer.serializeCameraServerItem(cameraHistoryItem, data);
+
+    QByteArray reply;
+    return addObject("cameraServerItem", data, reply, errorString);
+}
+
+
 int QnAppServerConnection::getServers(QnVideoServerResourceList &servers, QByteArray &errorString)
 {
     QByteArray data;
     int status = getObjects("server", "", data, errorString);
 
     try {
-        m_serializer.deserializeServers(servers, data);
+        m_serializer.deserializeServers(servers, data, m_resourceFactory);
     } catch (const QnSerializeException& e) {
         errorString += e.errorString();
     }
@@ -416,6 +426,21 @@ int QnAppServerConnection::getLicenses(QnLicenseList &licenses, QByteArray &erro
 
     try {
         m_serializer.deserializeLicenses(licenses, data);
+    } catch (const QnSerializeException& e) {
+        errorString += e.errorString();
+    }
+
+    return status;
+}
+
+int QnAppServerConnection::getCameraHistoryList(QnCameraHistoryList &cameraHistoryList, QByteArray &errorString)
+{
+    QByteArray data;
+
+    int status = getObjects("cameraServerItem", "", data, errorString);
+
+    try {
+        m_serializer.deserializeCameraHistoryList(cameraHistoryList, data);
     } catch (const QnSerializeException& e) {
         errorString += e.errorString();
     }
@@ -484,6 +509,20 @@ bool initResourceTypes(QnAppServerConnectionPtr appServerConnection)
 
     qnResTypePool->addResourceTypeList(resourceTypeList);
 
+    return true;
+}
+
+bool initCameraHistory(QnAppServerConnectionPtr appServerConnection)
+{
+    QnCameraHistoryList cameraHistoryList;
+    QByteArray errorString;
+    if (appServerConnection->getCameraHistoryList(cameraHistoryList, errorString) != 0)
+    {
+        qDebug() << "QnMain::run(): Can't get cameras history. Reason: " << errorString;
+        return false;
+    }
+    foreach(QnCameraHistoryPtr history, cameraHistoryList)
+        QnCameraHistoryPool::instance()->addCameraHistory(history);
     return true;
 }
 
@@ -631,4 +670,5 @@ int QnAppServerConnection::setResourcesDisabledAsync(const QnResourceList &resou
 
     return SessionManager::instance()->sendAsyncPostRequest(m_url, "disabled", requestParams, "", target, slot);
 }
+
 

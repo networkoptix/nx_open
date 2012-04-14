@@ -1,6 +1,7 @@
 #include <qtsinglecoreapplication.h>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDir>
+#include <QtCore/QSettings>
 #include <QtCore/QUrl>
 #include <QtCore/QUuid>
 
@@ -45,7 +46,9 @@
 #include "plugins/resources/onvif/onvif_ws_searcher.h"
 #include "utils/common/command_line_parser.h"
 #include "plugins/resources/pulse/pulse_resource_searcher.h"
-#include "settings.h"
+//#include "plugins/storage/file_storage/file_storage_protocol.h"
+#include "plugins/storage/file_storage/file_storage_resource.h"
+
 
 
 static const char SERVICE_NAME[] = "Network Optix VMS Media Server";
@@ -181,21 +184,23 @@ QString defaultLocalAddress(const QHostAddress& target)
 
 void ffmpegInit()
 {
-    avcodec_init();
+    //avcodec_init();
     av_register_all();
 
-    extern URLProtocol ufile_protocol;
-    av_register_protocol2(&ufile_protocol, sizeof(ufile_protocol));
+    QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true); // true means use it plugin if no <protocol>:// prefix
 }
 
-QnStorageResourcePtr createDefaultStorage()
+QnAbstractStorageResourcePtr createDefaultStorage()
 {
-    QnStorageResourcePtr storage(new QnStorageResource());
+    QSettings settings(QSettings::SystemScope, ORGANIZATION_NAME, APPLICATION_NAME);
+
+    //QnStorageResourcePtr storage(new QnStorageResource());
+    QnAbstractStorageResourcePtr storage(QnStoragePluginFactory::instance()->createStorage("ufile"));
     storage->setName("Initial");
 #ifdef Q_OS_WIN
-    storage->setUrl(QDir::fromNativeSeparators(qSettings.value("mediaDir", "c:/records").toString()));
+    storage->setUrl(QDir::fromNativeSeparators(settings.value("mediaDir", "c:/records").toString()));
 #else
-    storage->setUrl(QDir::fromNativeSeparators(qSettings.value("mediaDir", "/tmp/vmsrecords").toString()));
+    storage->setUrl(QDir::fromNativeSeparators(settings.value("mediaDir", "/tmp/vmsrecords").toString()));
 #endif
     storage->setSpaceLimit(5ll * 1000000000);
 
@@ -206,9 +211,11 @@ QnStorageResourcePtr createDefaultStorage()
 
 void setServerNameAndUrls(QnVideoServerResourcePtr server, const QString& myAddress)
 {
+    QSettings settings(QSettings::SystemScope, ORGANIZATION_NAME, APPLICATION_NAME);
+
     server->setName(QString("Server ") + myAddress);
-    server->setUrl(QString("rtsp://") + myAddress + QString(':') + qSettings.value("rtspPort", DEFAUT_RTSP_PORT).toString());
-    server->setApiUrl(QString("http://") + myAddress + QString(':') + qSettings.value("apiPort", DEFAULT_REST_PORT).toString());
+    server->setUrl(QString("rtsp://") + myAddress + QString(':') + settings.value("rtspPort", DEFAUT_RTSP_PORT).toString());
+    server->setApiUrl(QString("http://") + myAddress + QString(':') + settings.value("apiPort", DEFAULT_REST_PORT).toString());
 }
 
 QnVideoServerResourcePtr createServer()
@@ -216,7 +223,7 @@ QnVideoServerResourcePtr createServer()
     QnVideoServerResourcePtr serverPtr(new QnVideoServerResource());
     serverPtr->setGuid(serverGuid());
 
-    serverPtr->setStorages(QnStorageResourceList() << createDefaultStorage());
+    serverPtr->setStorages(QnAbstractStorageResourceList() << createDefaultStorage());
 
     return serverPtr;
 }
@@ -303,7 +310,8 @@ int serverMain(int argc, char *argv[])
     dataDirectory.mkpath(dataLocation + QLatin1String("/log"));
 
     QString logFileName = dataLocation + QLatin1String("/log/log_file");
-    qSettings.setValue("logFile", logFileName);
+    QSettings settings(QSettings::SystemScope, ORGANIZATION_NAME, APPLICATION_NAME);
+    settings.setValue("logFile", logFileName);
 
     if (!cl_log.create(logFileName, 1024*1024*10, 5, cl_logDEBUG1))
     {
@@ -415,6 +423,9 @@ public:
 
     void run()
     {
+        // Use system scope
+        QSettings settings(QSettings::SystemScope, ORGANIZATION_NAME, APPLICATION_NAME);
+
         // Create SessionManager
         SessionManager* sm = SessionManager::instance();
 
@@ -427,7 +438,7 @@ public:
         thread->start();
         sm->start();
 
-        initAppServerConnection(qSettings);
+        initAppServerConnection(settings);
 
         QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
@@ -449,7 +460,7 @@ public:
 
         QnResourcePool::instance(); // to initialize net state;
 
-        QString appserverHostString = qSettings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
+        QString appserverHostString = settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
 
         QHostAddress appserverHost;
         do
@@ -471,14 +482,14 @@ public:
             server->setNetAddrList(allLocalAddresses());
 
             if (server->getStorages().isEmpty())
-                server->setStorages(QnStorageResourceList() << createDefaultStorage());
+                server->setStorages(QnAbstractStorageResourceList() << createDefaultStorage());
 
             videoServer = registerServer(appServerConnection, server);
             if (videoServer.isNull())
                 QnSleep::msleep(1000);
         }
 
-        initAppServerEventConnection(qSettings, videoServer);
+        initAppServerEventConnection(settings, videoServer);
         QnEventManager* eventManager = QnEventManager::instance();
         eventManager->run();
 
@@ -494,10 +505,12 @@ public:
 
         QByteArray errorString;
 
-        foreach (QnStorageResourcePtr storage, videoServer->getStorages())
+        foreach (QnAbstractStorageResourcePtr storage, videoServer->getStorages())
         {
             qnResPool->addResource(storage);
-            qnStorageMan->addStorage(storage);
+            QnStorageResourcePtr physicalStorage = qSharedPointerDynamicCast<QnStorageResource>(storage);
+            if (physicalStorage)
+                qnStorageMan->addStorage(physicalStorage);
         }
         qnStorageMan->loadFullFileCatalog();
 
@@ -540,12 +553,23 @@ public:
             qDebug() << "QnMain::run(): Can't get cameras. Reason: " << errorString;
             QnSleep::msleep(1000);
         }
-
         foreach(const QnSecurityCamResourcePtr &camera, cameras)
         {
             qnResPool->addResource(camera);
             //QnRecordingManager::instance()->updateCamera(camera);
         }
+
+        QnCameraHistoryList cameraHistoryList;
+        while (appServerConnection->getCameraHistoryList(cameraHistoryList, errorString) != 0)
+        {
+            qDebug() << "QnMain::run(): Can't get cameras history. Reason: " << errorString;
+            QnSleep::msleep(1000);
+        }
+        foreach(QnCameraHistoryPtr history, cameraHistoryList)
+        {
+            QnCameraHistoryPool::instance()->addCameraHistory(history);
+        }
+
 
         /*
         QnScheduleTaskList scheduleTasks;
@@ -644,6 +668,9 @@ int main(int argc, char* argv[])
     QCoreApplication::setApplicationVersion(QLatin1String(APPLICATION_VERSION));
 
     QCoreApplication app(argc, argv);
+
+    // Use system scope
+    QSettings settings(QSettings::SystemScope, ORGANIZATION_NAME, APPLICATION_NAME);
 
     // Create SessionManager
     SessionManager* sm = SessionManager::instance();

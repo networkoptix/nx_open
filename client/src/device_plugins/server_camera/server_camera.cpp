@@ -83,14 +83,20 @@ QnResourcePtr QnServerCameraFactory::createResource(QnId resourceTypeId, const Q
     if (resourceType.isNull())
         return resource;
 
-    // Currently we support only cameras.
-    if (!resourceType->isCamera())
-        return resource;
+    if (resourceType->getName() == "Storage")
+    {
+        //  storage = QnAbstractStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(pb_storage.url().c_str()));
+        resource =  QnAbstractStorageResourcePtr(new QnAbstractStorageResource());
+    }
+    else {
+        // Currently we support only cameras.
+        if (!resourceType->isCamera())
+            return resource;
 
-    resource = QnResourcePtr(new QnServerCamera());
-    resource->setTypeId(resourceTypeId);
+        resource = QnResourcePtr(new QnServerCamera());
+        resource->setTypeId(resourceTypeId);
+    }
     resource->deserialize(parameters);
-
     return resource;
 }
 

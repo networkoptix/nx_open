@@ -64,6 +64,7 @@ class QN_EXPORT QnResourceTypePool
 public:
     static QnResourceTypePool *instance();
 
+    QnResourceTypePtr getResourceTypeByName(const QString& name) const;
     QnResourceTypePtr getResourceType(QnId id) const;
     void addResourceType(QnResourceTypePtr resourceType);
     void addResourceTypeList(const QList<QnResourceTypePtr>& resourceType);

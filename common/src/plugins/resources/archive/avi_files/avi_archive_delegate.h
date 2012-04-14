@@ -13,6 +13,13 @@ class QnAviArchiveDelegate: public QnAbstractArchiveDelegate
     Q_OBJECT;
 
 public:
+    enum Tag {Tag_startTime, Tag_endTime, Tag_LayoutInfo, Tag_Software};
+
+    /*
+    * Some containers supports only predefined tag names. So, I've introduce this function
+    */
+    QLatin1String getTagName(Tag tag, const QLatin1String& formatName);
+
     QnAviArchiveDelegate();
     virtual ~QnAviArchiveDelegate();
 
@@ -31,6 +38,7 @@ public:
     void doNotFindStreamInfo();
     bool isStreamsFound() const;
     void setUseAbsolutePos(bool value);
+    void setStorage(QnStorageResourcePtr storage);
 protected:
     virtual qint64 packetTimestamp(const AVPacket& packet);
     virtual bool findStreams();
@@ -59,6 +67,7 @@ private:
     qint64 m_duration;
 
     friend class QnAviAudioLayout;
+    QnStorageResourcePtr m_storage;
 };
 
 typedef QSharedPointer<QnAviArchiveDelegate> QnAviArchiveDelegatePtr;

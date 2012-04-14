@@ -421,7 +421,7 @@
                             </Component>
                             
                             <Component Id="ServerFFmpegLibraries" Guid="{692DCCAD-138B-4763-822E-8BC8712F5007}">
-                                <File Id="ServerAvcodecDll" Name="avcodec-53.dll" Source="../mediaserver/bin/$(env.CONFIG)/avcodec-53.dll"/>
+                                <File Id="ServerAvcodecDll" Name="avcodec-54.dll" Source="../mediaserver/bin/$(env.CONFIG)/avcodec-54.dll"/>
                                 <File Id="ServerAvdeviceDll" Name="avdevice-53.dll" Source="../mediaserver/bin/$(env.CONFIG)/avdevice-53.dll"/>
                                 <File Id="ServerAvfilterDll" Name="avfilter-2.dll" Source="../mediaserver/bin/$(env.CONFIG)/avfilter-2.dll"/>
                                 <File Id="ServerAvformatDll" Name="avformat-53.dll" Source="../mediaserver/bin/$(env.CONFIG)/avformat-53.dll"/>

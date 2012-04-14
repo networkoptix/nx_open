@@ -56,6 +56,9 @@ struct QN_EXPORT QnTimePeriod
     void addPeriod(const QnTimePeriod &timePeriod);
     QnTimePeriod intersect(const QnTimePeriod &other) const;
     void clear();
+    bool isEmpty() const;
+
+    qint64 endTimeMs() const;
 
     /**
      * \returns                         Whether this is a null time period. 

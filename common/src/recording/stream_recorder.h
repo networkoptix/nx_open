@@ -8,6 +8,8 @@
 #include <openssl/evp.h>
 #include <QPixmap>
 
+#include "core/resource/storage_resource.h"
+
 class QnAbstractMediaStreamDataProvider;
 
 class QnStreamRecorder : public QnAbstractDataConsumer
@@ -53,7 +55,9 @@ public:
 
     void setRole(Role role);
 
+    void setStorage(QnStorageResourcePtr storage);
 
+    void setContainer(QLatin1String container);
 signals:
     void recordingFailed(QString errMessage);
     void recordingStarted();
@@ -89,6 +93,7 @@ protected:
     qint64 m_endDateTime;
     qint64 m_startDateTime;
     bool m_stopOnWriteError;
+    QnStorageResourcePtr m_storage;
 private:
     bool m_waitEOF;
 
@@ -112,6 +117,7 @@ private:
     Role m_role;
     EVP_MD_CTX* m_mdctx;
     QPixmap m_logo;
+    QLatin1String m_container;
 };
 
 #endif // _STREAM_RECORDER_H__

@@ -2,24 +2,29 @@
 #define cold_store_storage_h_1800
 
 #include "coldstore_api/sfs-client.h"
+#include "libavformat/avio.h"
+#include "core/resource/storage_resource.h"
 
 typedef qint64 STORAGE_FILE_HANDLER;
 
-class QnPlColdStoreStorage //: public SomeStorageInterface
+class QnPlColdStoreStorage : public QnStorageResource
 {
 public:
-    QnPlColdStoreStorage(const QString& storageLink, int minFreeSpace = 10);
-    virtual ~QnPlColdStoreStorage();
-    QString getName() const;
-    
-    // returns file handler 
-    STORAGE_FILE_HANDLER create(const QString& fname); // something to think about may be should be a structure with y m d h m channel_id, low/h stream and so on
-    STORAGE_FILE_HANDLER open(const QString& fname); // something to think about may be should be a structure with y m d h m channel_id, low/h stream and so on
-    void close(STORAGE_FILE_HANDLER);
-    void flush(STORAGE_FILE_HANDLER);
-    int write(const char* data, int size);
-    int read(char* data, int size);
-    int seek(int shift);
+    QnPlColdStoreStorage();
+
+    virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
+
+    virtual int getChunkLen() const override;
+    virtual bool isStorageAvailable() override;
+    virtual qint64 getFreeSpace() override;
+    virtual bool isNeedControlFreeSpace() override;
+
+    virtual QFileInfoList getFileList(const QString& dirName) override;
+    virtual bool removeFile(const QString& url) override;
+    virtual bool renameFile(const QString& oldName, const QString& newName) override;
+    virtual bool removeDir(const QString& url) override;
+    virtual bool isFileExists(const QString& url) override;
+    virtual bool isDirExists(const QString& url) override;
 
 private:
 

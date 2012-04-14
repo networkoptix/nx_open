@@ -24,12 +24,12 @@ SERVER_BIN_PATH=../../mediaserver/bin/release
 . $SERVER_BIN_PATH/env.sh
 
 QT_FILES="libQtXml.so.4 libQtGui.so.4 libQtNetwork.so.4 libQtCore.so.4"
-FFMPEG_FILES="libavcodec.so.53 libavdevice.so.53 libavfilter.so.2 libavformat.so.53 libavutil.so.51 libpostproc.so.51 libswscale.so.2"
+FFMPEG_FILES="libavcodec.so.54 libavdevice.so.53 libavfilter.so.2 libavformat.so.54 libavutil.so.51 libswscale.so.2"
 
 QT_PATH=$(dirname $(dirname $(which qmake)))
 
 # Prepare stage dir
-rm -rf $STAGEBASE
+sudo rm -rf $STAGEBASE
 mkdir -p $BINSTAGE
 mkdir -p $LIBSTAGE
 mkdir -p $ETCSTAGE
@@ -64,6 +64,9 @@ install -m 644 $QJSON_PATH/libqjson.so.0 $LIBSTAGE
 # Copy system libraries which may be absent on target platform
 install -m 644 /usr/lib/libprotobuf.so.7 $LIBSTAGE
 
+# Copy libcrypto
+install -m 644 /lib/x86_64-linux-gnu/libcrypto.so.1.0.0 $LIBSTAGE
+
 # Prepare DEBIAN dir
 mkdir -p $STAGE/DEBIAN
 
@@ -76,4 +79,6 @@ cp debian/templates $STAGE/DEBIAN
 
 (cd $STAGE; md5sum `find * -type f | grep -v '^DEBIAN/'` > DEBIAN/md5sums)
 
-(cd $STAGEBASE; dpkg-deb -b networkoptix-mediaserver_${VERSION}_amd64)
+sudo chown -R root:root $STAGEBASE
+
+(cd $STAGEBASE; sudo dpkg-deb -b networkoptix-mediaserver_${VERSION}_amd64)
