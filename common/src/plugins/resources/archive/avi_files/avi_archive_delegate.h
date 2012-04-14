@@ -18,7 +18,7 @@ public:
     /*
     * Some containers supports only predefined tag names. So, I've introduce this function
     */
-    QLatin1String getTagName(Tag tag, const QLatin1String& formatName);
+    static const char* getTagName(Tag tag, const QString& formatName);
 
     QnAviArchiveDelegate();
     virtual ~QnAviArchiveDelegate();

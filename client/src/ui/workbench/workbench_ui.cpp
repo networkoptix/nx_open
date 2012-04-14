@@ -1274,18 +1274,20 @@ void QnWorkbenchUi::at_exportMediaRange(CLVideoCamera* camera, qint64 startTimeM
         suggetion = netRes->getMAC().toString();
 
     QString fileName;
+    QString selectedFilter;
     while (1)
     {
         fileName = QFileDialog::getSaveFileName(m_display->view(), tr("Export Video As..."),
             previousDir + QLatin1Char('/') + suggetion,
-            tr("Matroska(*.mkv)"),
-            0,
+            tr("Matroska (*.mkv);; AVI (Audio/Video Interleaved)(*.avi)"),
+            &selectedFilter,
             QFileDialog::DontUseNativeDialog);
         if (fileName.isEmpty())
             return;
         QString fullName = fileName;
-        if (!fullName.toLower().endsWith(QLatin1String(".mkv")))
-            fullName += QLatin1String(".mkv");
+        if (!fullName.toLower().endsWith(QLatin1String(".mkv")) && !fullName.toLower().endsWith(QLatin1String(".avi")))
+            fullName += selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
+
         if (QFile::exists(fullName))
         {
             QString shortName = QFileInfo(fullName).baseName();
@@ -1327,7 +1329,7 @@ void QnWorkbenchUi::at_exportMediaRange(CLVideoCamera* camera, qint64 startTimeM
     connect(camera, SIGNAL(exportFailed(QString)), this, SLOT(at_exportFailed(QString)));
     connect(camera, SIGNAL(exportFinished(QString)), this, SLOT(at_exportFinished(QString)));
 
-    camera->exportMediaPeriodToFile(startTimeMs*1000ll, endTimeMs*1000ll, fileName);
+    camera->exportMediaPeriodToFile(startTimeMs*1000ll, endTimeMs*1000ll, fileName, selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.'))+1, 3));
 }
 
 void QnWorkbenchUi::at_exportFinished(QString fileName)

@@ -293,18 +293,29 @@ QnVideoResourceLayout* QnAviArchiveDelegate::getVideoLayout()
     {
         return &defaultVideoLayout;
     }
+
     if (m_videoLayout == 0)
     {
         m_videoLayout = new QnCustomDeviceVideoLayout(1, 1);
-        AVDictionaryEntry* layoutInfo = av_dict_get(m_formatContext->metadata,"video_layout", 0, 0);
-        if (layoutInfo)
-            deserializeLayout(m_videoLayout, layoutInfo->value);
 
-        if (m_useAbsolutePos)
+        // prevent standart tag name parsing in 'avi' format
+        QString format = QString(m_formatContext->iformat->name).split(',')[0];
+
+        AVDictionaryEntry* software = av_dict_get(m_formatContext->metadata, getTagName(Tag_Software, format), 0, 0);
+        bool allowTags = format != QString("avi") || (software && QString(software->value) == QString("Network Optix"));
+
+        if (allowTags)
         {
-            AVDictionaryEntry* start_time = av_dict_get(m_formatContext->metadata,"start_time", 0, 0);
-            if (start_time)
-                m_startTime = QString(start_time->value).toLongLong()*1000ll;
+            AVDictionaryEntry* layoutInfo = av_dict_get(m_formatContext->metadata,getTagName(Tag_LayoutInfo, format), 0, 0);
+            if (layoutInfo)
+                deserializeLayout(m_videoLayout, layoutInfo->value);
+
+            if (m_useAbsolutePos)
+            {
+                AVDictionaryEntry* start_time = av_dict_get(m_formatContext->metadata,getTagName(Tag_startTime, format), 0, 0);
+                if (start_time)
+                    m_startTime = QString(start_time->value).toLongLong()*1000ll;
+            }
         }
     }
     return m_videoLayout;
@@ -370,16 +381,9 @@ void QnAviArchiveDelegate::initLayoutStreams()
         case AVMEDIA_TYPE_VIDEO:
             if (m_firstVideoIndex == -1)
                 m_firstVideoIndex = i;
-            entry = av_dict_get(m_formatContext->streams[i]->metadata, "layout_channel", 0, 0);
             while (m_indexToChannel.size() <= i)
                 m_indexToChannel << -1;
-            if (entry) {
-                int channel = QString(entry->value).toInt();
-                m_indexToChannel[i] = channel;
-            }
-            else if (videoNum == 0) {
-                m_indexToChannel[i] = 0;
-            }
+            m_indexToChannel[i] = videoNum;
             videoNum++;
             break;
 
@@ -482,34 +486,34 @@ void QnAviArchiveDelegate::setStorage(QnStorageResourcePtr storage)
     m_storage = storage;
 }
 
-QLatin1String QnAviArchiveDelegate::getTagName(Tag tag, const QLatin1String& formatName)
+const char* QnAviArchiveDelegate::getTagName(Tag tag, const QString& formatName)
 {
     if (formatName == QString("avi"))
     {
         switch(tag)
         {
         case Tag_startTime:
-            return QLatin1String("TCOD"); // StartTimecode
+            return "date"; // "ICRD";
         case Tag_endTime:
-            return QLatin1String("TCDO"); // EndTimecode
+            return "ISRC"; // not used
         case Tag_LayoutInfo:
-            return QLatin1String("TRCK"); // TrackNumber
+            return "comment"; // "ICMT";
         case Tag_Software:
-            return QLatin1String("SFT");
+            return "encoded_by"; // "ITCH";
         }
     }
     else {
         switch(tag)
         {
         case Tag_startTime:
-            return QLatin1String("start_time"); // StartTimecode
+            return "start_time"; // StartTimecode
         case Tag_endTime:
-            return QLatin1String("end_time"); // EndTimecode
+            return "end_time"; // EndTimecode
         case Tag_LayoutInfo:
-            return QLatin1String("video_layout"); // TrackNumber
+            return "video_layout"; // TrackNumber
         case Tag_Software:
-            return QLatin1String("software");
+            return "software";
         }
     }
-    return QLatin1String("");
+    return "";
 }
