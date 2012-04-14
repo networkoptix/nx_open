@@ -349,8 +349,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
             //AVRational srcRate = {1, 1000000};
             //videoStream->first_dts = av_rescale_q(mediaData->timestamp, srcRate, stream->time_base);
 
-            QString layoutData = QString::number(layout->v_position(i)) + QString(",") + QString(layout->h_position(i));
-            av_dict_set(&m_formatCtx->metadata, "layout_channel", QString::number(i).toAscii().data(), 0);
+            av_dict_set(&videoStream->metadata, "layout_channel", QString::number(i).toAscii().data(), 0);
         }
 
         /*

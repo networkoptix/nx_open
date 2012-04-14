@@ -13,6 +13,13 @@ class QnAviArchiveDelegate: public QnAbstractArchiveDelegate
     Q_OBJECT;
 
 public:
+    enum Tag {Tag_startTime, Tag_endTime, Tag_LayoutInfo, Tag_Software};
+
+    /*
+    * Some containers supports only predefined tag names. So, I've introduce this function
+    */
+    QLatin1String getTagName(Tag tag, const QLatin1String& formatName);
+
     QnAviArchiveDelegate();
     virtual ~QnAviArchiveDelegate();
 

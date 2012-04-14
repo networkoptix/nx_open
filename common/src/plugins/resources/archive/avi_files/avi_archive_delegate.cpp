@@ -481,3 +481,35 @@ void QnAviArchiveDelegate::setStorage(QnStorageResourcePtr storage)
 {
     m_storage = storage;
 }
+
+QLatin1String QnAviArchiveDelegate::getTagName(Tag tag, const QLatin1String& formatName)
+{
+    if (formatName == QString("avi"))
+    {
+        switch(tag)
+        {
+        case Tag_startTime:
+            return QLatin1String("TCOD"); // StartTimecode
+        case Tag_endTime:
+            return QLatin1String("TCDO"); // EndTimecode
+        case Tag_LayoutInfo:
+            return QLatin1String("TRCK"); // TrackNumber
+        case Tag_Software:
+            return QLatin1String("SFT");
+        }
+    }
+    else {
+        switch(tag)
+        {
+        case Tag_startTime:
+            return QLatin1String("start_time"); // StartTimecode
+        case Tag_endTime:
+            return QLatin1String("end_time"); // EndTimecode
+        case Tag_LayoutInfo:
+            return QLatin1String("video_layout"); // TrackNumber
+        case Tag_Software:
+            return QLatin1String("software");
+        }
+    }
+    return QLatin1String("");
+}

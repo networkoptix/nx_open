@@ -21,6 +21,8 @@
 #include "camera/camera.h"
 #include "camera/gl_renderer.h"
 #include "ui/graphics/items/resource_widget_renderer.h"
+#include "plugins/resources/archive/filetypes.h"
+#include "plugins/resources/archive/filetypesupport.h"
 
 namespace {
     void setEnabled(const QObjectList &objects, QObject *exclude, bool enabled) {
@@ -165,13 +167,8 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
         resourceName = QString(":/skin/") + introList.first();
 
     aviRes = QnAviResourcePtr(new QnAviResource(QString("qtfile://") + resourceName));
-    QString pictExt("jpg png gif bmp tiff");
-    QStringList extList = pictExt.split(' ');
-    for (int i = 0; i < extList.size(); ++i)
-    {
-        if (resourceName.toLower().endsWith(extList[i]))
-            aviRes->addFlags(QnResource::still_image);
-    }
+    if (FileTypeSupport::isImageFileExt(resourceName))
+        aviRes->addFlags(QnResource::still_image);
 
     dataProvider = static_cast<QnAbstractArchiveReader*> (aviRes->createDataProvider(QnResource::Role_Default));
     dataProvider->setCycleMode(false);
