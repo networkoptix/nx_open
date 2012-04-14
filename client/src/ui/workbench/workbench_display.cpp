@@ -155,9 +155,6 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_paintForwardingInstrument = new ForwardingInstrument(Instrument::Viewport, paintEventTypes, this);
     m_selectionOverlayHackInstrument = new SelectionOverlayHackInstrument(this);
 
-    InstrumentManager *manager = display->instrumentManager();
-
-
     m_instrumentManager->installInstrument(new StopInstrument(Instrument::Viewport, paintEventTypes, this));
     m_instrumentManager->installInstrument(m_afterPaintInstrument);
     m_instrumentManager->installInstrument(m_paintForwardingInstrument);
@@ -227,7 +224,7 @@ void QnWorkbenchDisplay::setStreamsSynchronized(bool synchronized) {
     if(synchronized == isStreamsSynchronized())
         return;
 
-    if(m_streamSynchronizer) {
+    if(!m_streamSynchronizer) {
         QnWorkbenchRenderWatcher *renderWatcher = new QnWorkbenchRenderWatcher(this, this);
         m_streamSynchronizer = new QnWorkbenchStreamSynchronizer(this, renderWatcher, this);
     }

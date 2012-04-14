@@ -72,7 +72,7 @@ detail::QnResourceStatusReplyProcessor::QnResourceStatusReplyProcessor(QnWorkben
     assert(oldDisabledFlags.size() == resources.size());
 }
 
-void detail::QnResourceStatusReplyProcessor::at_replyReceived2(int status, const QByteArray& errorString, const QnResourceList &resources, int handle)
+void detail::QnResourceStatusReplyProcessor::at_replyReceived(int status, const QByteArray& errorString, const QnResourceList &resources, int handle) {
     Q_UNUSED(handle);
 
     if(m_handler)
@@ -759,7 +759,7 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
             replacedCamera->setScheduleDisabled(srcCamera->isScheduleDisabled());
             replacedCamera->setScheduleTasks(srcCamera->getScheduleTasks());
             replacedCamera->setAuth(srcCamera->getAuth());
-            replacedCamera->setMotionMaskList(srcCamera->getMotionMaskList(), QnDomain::QnDomainMemory);
+            replacedCamera->setMotionMaskList(srcCamera->getMotionMaskList(), QnDomainMemory);
             replacedCamera->setDisabled(false);
 
 
@@ -792,8 +792,7 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
 
     if(!modifiedResources.empty()) {
         detail::QnResourceStatusReplyProcessor *processor = new detail::QnResourceStatusReplyProcessor(this, modifiedResources, oldDisabledFlags);
-        //connection()->setResourcesDisabledAsync(modifiedResources, processor, SLOT(at_replyReceived(int, const QByteArray &, const QByteArray &, int)));
-        connection()->saveAsync(modifiedResources, processor, SLOT(at_replyReceived2(int, const QByteArray &, const QnResourceList &, int)));
+        connection()->saveAsync(modifiedResources, processor, SLOT(at_replyReceived(int, const QByteArray &, const QnResourceList &, int)));
     }
 }
 
@@ -1327,6 +1326,8 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle) {
+    Q_UNUSED(handle);
+
     if(status == 0)
         return;
 
@@ -1366,6 +1367,9 @@ void QnWorkbenchActionHandler::at_resources_saved(int status, const QByteArray& 
 }
 
 void QnWorkbenchActionHandler::at_resource_deleted(int status, const QByteArray &data, const QByteArray &errorString, int handle) {
+    Q_UNUSED(handle);
+    Q_UNUSED(data);
+
     if(status == 0)   
         return;
 

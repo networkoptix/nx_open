@@ -31,8 +31,8 @@ namespace detail {
 		QnResourceStatusReplyProcessor(QnWorkbenchActionHandler *handler, const QnVirtualCameraResourceList &resources, const QList<int> &oldDisabledFlags);
 
     public slots:
-        //void at_replyReceived(int status, const QByteArray& data, const QByteArray& errorString, int handle);
-        void at_replyReceived2(int status, const QByteArray& errorString, const QnResourceList &resources, int handle);
+        void at_replyReceived(int status, const QByteArray& errorString, const QnResourceList &resources, int handle);
+
     private:
         QWeakPointer<QnWorkbenchActionHandler> m_handler;
         QnVirtualCameraResourceList m_resources;

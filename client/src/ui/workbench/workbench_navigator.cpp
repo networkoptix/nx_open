@@ -205,6 +205,7 @@ void QnWorkbenchNavigator::updateSlider() {
 
     qint64 startTime = reader->startTime();
     qint64 endTime = reader->endTime();
+#if 0
     if (startTime != AV_NOPTS_VALUE && endTime != AV_NOPTS_VALUE) {// TODO: rename AV_NOPTS_VALUE to something more sane.
         qint64 currentMSecsSinceEpoch = 0;
         if(startTime == DATETIME_NOW || endTime == DATETIME_NOW)
@@ -232,6 +233,7 @@ void QnWorkbenchNavigator::updateSlider() {
         m_forwardButton->setEnabled(true);
         m_stepForwardButton->setEnabled(true);
     }
+#endif
 }
 
 
