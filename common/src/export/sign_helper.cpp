@@ -390,6 +390,8 @@ QString QnSignHelper::fillH264EncoderParams(const QByteArray& srcCodecExtraData,
             profile = "baseline";
 
         int bframes = 1;
+        if (sps.pic_order_cnt_type == 2)
+            bframes = 0;
         int gopLen = 16;
         QString x264Params("--bitrate 20000 --profile %1 --level %2 --ref %3 --%4 --keyint %5 --subme 5 --b-pyramid none --bframes %6 --%7");
         result = x264Params.arg(profile).arg(51).arg(sps.num_ref_frames).arg(pps.entropy_coding_mode_flag ? "cabac" : "no-cabac").
