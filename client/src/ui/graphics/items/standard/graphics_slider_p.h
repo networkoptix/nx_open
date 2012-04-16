@@ -23,6 +23,8 @@ public:
     QStyle::SubControl hoverControl;
     QRect hoverRect;
 
+    void invalidateMapper();
+
     mutable bool mapperDirty;
     mutable bool upsideDown;
     mutable qreal pixelPosMin, pixelPosMax;

@@ -191,7 +191,7 @@ void QnToolTipSlider::sliderChange(SliderChange change) {
                 m_hideTimer.start(toolTipHideDelay, this);
             updateToolTipVisibility();
             updateToolTipPosition();
-        } else if(change == SliderRangeChange) {
+        } else if(change == SliderMappingChange) {
             updateToolTipPosition();
         }
     }

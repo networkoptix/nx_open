@@ -99,7 +99,8 @@ protected:
         SliderRangeChange,
         SliderOrientationChange,
         SliderStepsChange,
-        SliderValueChange
+        SliderValueChange,
+        SliderMappingChange
     };
     virtual void sliderChange(SliderChange change);
 

@@ -4,11 +4,14 @@
 
 #include <QtCore/QDateTime>
 #include <QtGui/QPainter>
+#include <QtGui/QGraphicsSceneWheelEvent>
 
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <ui/style/noptix_style.h>
 #include <ui/graphics/items/standard/graphics_slider_p.h>
+#include <ui/graphics/instruments/instrument_manager.h>
+#include <ui/processors/kinetic_cutting_processor.h>
 
 #include "tool_tip_item.h"
 
@@ -33,6 +36,8 @@ namespace {
         return false;
     }
 
+    const qreal degreesFor2x = 180.0;
+
 } // anonymous namespace
 
 
@@ -47,6 +52,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     m_toolTipFormat(),
     m_dateLikeToolTipFormat(false)
 {
+    /* Set default property values. */
     setProperty(Qn::SliderLength, 0);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding, QSizePolicy::Slider);
 
@@ -56,7 +62,16 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
 
     setToolTipFormat(tr("hh:mm:ss", "DEFAULT_TOOL_TIP_FORMAT"));
     
+    /* Prepare kinetic zoom processors. */
+    KineticCuttingProcessor *processor = new KineticCuttingProcessor(QMetaType::QReal, this);
+    processor->setHandler(this);
+    processor->setMaxShiftInterval(0.4);
+    processor->setFriction(degreesFor2x / 2);
+    processor->setMaxSpeedMagnitude(degreesFor2x * 8);
+    processor->setSpeedCuttingThreshold(degreesFor2x / 3);
+    processor->setFlags(KineticProcessor::IGNORE_DELTA_TIME);
 
+    /* Run handlers. */
     sliderChange(SliderRangeChange);
 
     setMaximum(10000);
@@ -112,6 +127,8 @@ qint64 QnTimeSlider::windowStart() const {
 }
 
 void QnTimeSlider::setWindowStart(qint64 windowStart) {
+    setWindow(windowStart, qMax(windowStart, m_windowEnd));
+
     windowStart = qBound(minimum(), windowStart, maximum());
     if(windowStart == m_windowStart)
         return;
@@ -128,6 +145,8 @@ qint64 QnTimeSlider::windowEnd() const {
 }
 
 void QnTimeSlider::setWindowEnd(qint64 windowEnd) {
+    setWindow(qMin(m_windowStart, windowEnd), windowEnd);
+
     windowEnd = qBound(minimum(), windowEnd, maximum());
     if(windowEnd == m_windowEnd)
         return;
@@ -137,6 +156,21 @@ void QnTimeSlider::setWindowEnd(qint64 windowEnd) {
     emit windowChanged(m_windowStart, m_windowEnd);
 
     updateToolTipVisibility();
+}
+
+void QnTimeSlider::setWindow(qint64 start, qint64 end) {
+    start = qBound(minimum(), start, maximum());
+    end = qMax(start, qBound(minimum(), end, maximum()));
+
+    if (m_windowStart != start || m_windowEnd != end) {
+        m_windowStart = start;
+        m_windowEnd = end;
+
+        sliderChange(SliderMappingChange);
+        emit windowChanged(m_windowStart, m_windowEnd);
+
+        updateToolTipVisibility();
+    }
 }
 
 const QString &QnTimeSlider::toolTipFormat() const {
@@ -193,32 +227,14 @@ void QnTimeSlider::updateToolTipText() {
     setToolTip(toolTip);
 }
 
+void QnTimeSlider::scaleWindow(qreal factor, qint64 anchor) {
+    qint64 start = anchor + (m_windowStart - anchor) * factor;
+    qint64 end = anchor + (m_windowEnd - anchor) * factor;
 
-// -------------------------------------------------------------------------- //
-// Handlers
-// -------------------------------------------------------------------------- //
-void QnTimeSlider::sliderChange(SliderChange change) {
-    base_type::sliderChange(change);
-
-    switch(change) {
-    case SliderRangeChange:
-        if((m_options & StickToMinimum) && m_oldMinimum == m_windowStart)
-            setWindowStart(minimum());
-
-        if((m_options & StickToMaximum) && m_oldMaximum == m_windowEnd)
-            setWindowEnd(maximum());
-
-        m_oldMinimum = minimum();
-        m_oldMaximum = maximum();
-        break;
-    case SliderValueChange:
-        updateToolTipVisibility();
-        updateToolTipText();
-        break;
-    default:
-        break;
-    }
+    setWindowStart(start);
+    setWindowEnd(end);
 }
+
 
 
 // -------------------------------------------------------------------------- //
@@ -290,3 +306,60 @@ void QnTimeSlider::drawPeriods(QPainter *painter, QnTimePeriodList &periods, qre
         }
     }
 }
+
+void QnTimeSlider::drawScale(QPainter *painter, qreal top, qreal height) {
+    
+}
+
+
+// -------------------------------------------------------------------------- //
+// Handlers
+// -------------------------------------------------------------------------- //
+void QnTimeSlider::sliderChange(SliderChange change) {
+    base_type::sliderChange(change);
+
+    switch(change) {
+    case SliderRangeChange:
+        if((m_options & StickToMinimum) && m_oldMinimum == m_windowStart)
+            setWindowStart(minimum());
+
+        if((m_options & StickToMaximum) && m_oldMaximum == m_windowEnd)
+            setWindowEnd(maximum());
+
+        m_oldMinimum = minimum();
+        m_oldMaximum = maximum();
+        break;
+    case SliderValueChange:
+        updateToolTipVisibility();
+        updateToolTipText();
+        break;
+    default:
+        break;
+    }
+}
+
+QVariant QnTimeSlider::itemChange(GraphicsItemChange change, const QVariant &value) {
+    if(change == ItemSceneHasChanged)
+        kineticProcessor()->setTimer(InstrumentManager::animationTimerOf(scene()));
+    
+    return base_type::itemChange(change, value);
+}
+
+void QnTimeSlider::wheelEvent(QGraphicsSceneWheelEvent *event) {
+    /* delta() returns the distance that the wheel is rotated 
+     * in eighths (1/8s) of a degree. */
+    qreal degrees = event->delta() / 8.0;
+
+    m_zoomAnchor = valueFromPosition(event->pos());
+    kineticProcessor()->shift(degrees);
+    kineticProcessor()->start();
+
+    event->accept();
+}
+
+void QnTimeSlider::kineticMove(const QVariant &degrees) {
+    qreal factor = std::pow(2.0, -degrees.toReal() / degreesFor2x);
+    
+    scaleWindow(factor, m_zoomAnchor);
+}
+

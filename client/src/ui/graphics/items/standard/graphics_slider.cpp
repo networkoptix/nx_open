@@ -29,6 +29,14 @@ void GraphicsSliderPrivate::init()
     mapperDirty = true;
 }
 
+void GraphicsSliderPrivate::invalidateMapper() {
+    if(mapperDirty)
+        return;
+
+    mapperDirty = true;
+    q_func()->sliderChange(GraphicsSlider::SliderMappingChange);
+}
+
 void GraphicsSliderPrivate::ensureMapper() const {
     if(!mapperDirty)
         return;
@@ -225,25 +233,23 @@ void GraphicsSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     }
 
     style()->drawComplexControl(QStyle::CC_Slider, &opt, painter, this);
-
-    d->mapperDirty = true;
 }
 
 void GraphicsSlider::updateGeometry() {
-    d_func()->mapperDirty = true;    
+    d_func()->invalidateMapper();
 
     base_type::updateGeometry();
 }
 
 void GraphicsSlider::resizeEvent(QGraphicsSceneResizeEvent *event) {
-    d_func()->mapperDirty = true;    
+    d_func()->invalidateMapper();    
 
     base_type::resizeEvent(event);
 }
 
 void GraphicsSlider::sliderChange(SliderChange change) {
-    if(change != SliderValueChange)
-        d_func()->mapperDirty = true;
+    if(change != SliderValueChange && change != SliderMappingChange)
+        d_func()->invalidateMapper();
 
     base_type::sliderChange(change);
 }
@@ -263,7 +269,7 @@ bool GraphicsSlider::event(QEvent *event)
         d->updateHoverControl(static_cast<QGraphicsSceneHoverEvent *>(event)->pos().toPoint());
         break;
     case QEvent::StyleChange:
-        d->mapperDirty = true;
+        d_func()->invalidateMapper();
         break;
     default:
         break;
