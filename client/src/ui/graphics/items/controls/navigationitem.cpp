@@ -25,11 +25,12 @@
 #include "utils/common/synctime.h"
 #include "core/resource/security_cam_resource.h"
 #include "time_slider.h"
+#include "ui/workbench/workbench_navigator.h"
 
 static const int SLIDER_NOW_AREA_WIDTH = 30;
 static const int TIME_PERIOD_UPDATE_INTERVAL = 1000 * 10;
 
-NavigationItem::NavigationItem(QGraphicsItem *parent): 
+NavigationItem::NavigationItem(QnWorkbenchDisplay *display, QGraphicsItem *parent): 
     base_type(parent),
     m_camera(0), 
     m_forcedCamera(0), 
@@ -218,6 +219,8 @@ NavigationItem::NavigationItem(QGraphicsItem *parent):
     rightLayoutV->addItem(m_timeLabel);
 
     QnTimeSlider *slider = new QnTimeSlider();
+    QnWorkbenchNavigator *navigator = new QnWorkbenchNavigator(display, this);
+    navigator->setTimeSlider(slider);
 
     QGraphicsLinearLayout *mainLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     mainLayout->setContentsMargins(5, 0, 5, 0);

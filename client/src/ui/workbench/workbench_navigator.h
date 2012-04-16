@@ -51,6 +51,10 @@ private slots:
 
     void at_widget_motionRegionSelected(const QnResourcePtr &resource, QnAbstractArchiveReader *reader, const QList<QRegion> &selection);
 
+    void at_timeSlider_valueChanged(qint64 value);
+    void at_timeSlider_sliderPressed();
+    void at_timeSlider_sliderReleased();
+
     void at_timeSlider_destroyed();
 
 private:
@@ -60,6 +64,9 @@ private:
     QSet<QnResourceWidget *> m_syncedWidgets;
     QnResourceWidget *m_centralWidget;
     QnResourceWidget *m_currentWidget;
+
+    bool m_wasPlaying;
+    bool m_inUpdate;
 };
 
 #endif // QN_WORKBENCH_NAVIGATOR_H

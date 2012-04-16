@@ -467,7 +467,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
         m_sliderShowButton->setTransform(transform);
     }
 
-    m_sliderItem = new NavigationItem(m_controlsWidget);
+    m_sliderItem = new NavigationItem(display, m_controlsWidget);
     m_sliderItem->setFrameColor(QColor(110, 110, 110, 255));
     m_sliderItem->setFrameWidth(0.5);
 

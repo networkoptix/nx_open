@@ -21,6 +21,7 @@ class GraphicsLabel;
 class QnAbstractRenderer;
 class QnAbstractArchiveReader;
 class QnImageButtonWidget;
+class QnWorkbenchDisplay;
 
 class NavigationItem : public QnSimpleFrameWidget
 {
@@ -29,7 +30,7 @@ class NavigationItem : public QnSimpleFrameWidget
     typedef QnSimpleFrameWidget base_type;
 
 public:
-    explicit NavigationItem(QGraphicsItem *parent = 0);
+    explicit NavigationItem(QnWorkbenchDisplay *display, QGraphicsItem *parent = 0);
     ~NavigationItem();
 
     void setVideoCamera(CLVideoCamera* camera);

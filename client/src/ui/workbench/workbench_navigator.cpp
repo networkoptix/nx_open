@@ -4,6 +4,7 @@
 
 #include <utils/common/util.h>
 #include <utils/common/synctime.h>
+#include <utils/common/scoped_value_rollback.h>
 
 #include <core/resource/camera_resource.h>
 
@@ -28,7 +29,8 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QnWorkbenchDisplay *display, QObject 
     m_timeSlider(NULL),
     m_display(display),
     m_centralWidget(NULL),
-    m_currentWidget(NULL)
+    m_currentWidget(NULL),
+    m_inUpdate(false)
 {
     assert(display != NULL);
 
@@ -69,6 +71,7 @@ void QnWorkbenchNavigator::initialize() {
     connect(m_display,                          SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)), this,   SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
     connect(m_display,                          SIGNAL(streamsSynchronizedChanged()),               this,   SLOT(updateCurrentWidget()));
     connect(m_display->beforePaintInstrument(), SIGNAL(activated(QWidget *, QEvent *)),             this,   SLOT(updateSlider()));
+    connect(m_timeSlider,                       SIGNAL(valueChanged(qint64)),                       this,   SLOT(at_timeSlider_valueChanged(qint64)));
 } 
 
 void QnWorkbenchNavigator::deinitialize() {
@@ -139,6 +142,8 @@ void QnWorkbenchNavigator::setCurrentWidget(QnResourceWidget *widget) {
     if (m_currentWidget == widget)
         return;
 
+    m_currentWidget = widget;
+
 #if 0
     m_timeSlider->resetSelectionRange();
 
@@ -204,6 +209,8 @@ void QnWorkbenchNavigator::updateSlider() {
     if (!reader)
         return;
 
+    QnScopedValueRollback<bool> guard(&m_inUpdate, true);
+
     qint64 startTimeUsec = reader->startTime();
     qint64 endTimeUsec = reader->endTime();
     if (startTimeUsec != AV_NOPTS_VALUE && endTimeUsec != AV_NOPTS_VALUE) {// TODO: rename AV_NOPTS_VALUE to something more sane.
@@ -236,6 +243,59 @@ void QnWorkbenchNavigator::updateSlider() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value) {
+    if(m_inUpdate)
+        return;
+
+    if (!m_currentWidget)
+        return;
+
+    QnResourceDisplay *display = m_currentWidget->display();
+    if (display->archiveReader()->getSpeed() > 0 && display->camera()->getCurrentTime() == DATETIME_NOW && !display->camDisplay()->isRealTimeSource())
+        value = DATETIME_NOW;
+
+    if(value == m_timeSlider->maximum() && m_timeSlider->minimum() > 0)
+        value = DATETIME_NOW;
+
+    QnAbstractArchiveReader *reader = display->archiveReader();
+    if (value == DATETIME_NOW) {
+        reader->jumpToPreviousFrame(DATETIME_NOW);
+    } else {
+        if (m_timeSlider->isSliderDown()) {
+            reader->jumpTo(value * 1000, 0);
+        } else {
+            reader->jumpToPreviousFrame(value * 1000);
+        }
+    }
+    
+    //updateRecPeriodList(false);
+}
+
+void QnWorkbenchNavigator::at_timeSlider_sliderPressed() {
+    if (!m_currentWidget)
+        return;
+
+    m_currentWidget->display()->archiveReader()->setSingleShotMode(true);
+    m_currentWidget->display()->camDisplay()->playAudio(false);
+
+    m_wasPlaying = !m_currentWidget->display()->archiveReader()->isMediaPaused();
+}
+
+void QnWorkbenchNavigator::at_timeSlider_sliderReleased() {
+    if (!m_currentWidget)
+        return;
+
+    /*bool isCamera = m_currentWidget->resource().dynamicCast<QnSecurityCamResource>();
+    if (!isCamera) {
+        // Disable precise seek via network to reduce network flood. 
+        //smartSeek(m_timeSlider->currentValue());
+    }*/
+    if (m_wasPlaying) {
+        m_currentWidget->display()->archiveReader()->setSingleShotMode(false);
+        m_currentWidget->display()->camDisplay()->playAudio(true);
+    }
+}
+
 void QnWorkbenchNavigator::at_display_widgetChanged(Qn::ItemRole role) {
     if(role == Qn::CentralRole)
         setCentralWidget(m_display->widget(role));

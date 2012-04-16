@@ -27,11 +27,9 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     setWindowEnd(maximum());
     setOptions(StickToMinimum | StickToMaximum);
 
-    connect(this, SIGNAL(actionTriggered(int)), this, SLOT(at_actionTriggered(int)));
+    
 
     sliderChange(SliderRangeChange);
-
-    
 
 
 
@@ -99,6 +97,8 @@ void QnTimeSlider::setWindowStart(qint64 windowStart) {
     m_windowStart = windowStart;
 
     emit windowChanged(m_windowStart, m_windowEnd);
+
+    updateToolTipVisibility();
 }
 
 qint64 QnTimeSlider::windowEnd() const {
@@ -113,6 +113,8 @@ void QnTimeSlider::setWindowEnd(qint64 windowEnd) {
     m_windowEnd = windowEnd;
 
     emit windowChanged(m_windowStart, m_windowEnd);
+
+    updateToolTipVisibility();
 }
 
 QPointF QnTimeSlider::positionFromValue(qint64 logicalValue) const {
@@ -147,7 +149,8 @@ void QnTimeSlider::updateToolTipVisibility() {
 void QnTimeSlider::sliderChange(SliderChange change) {
     base_type::sliderChange(change);
 
-    if(change == SliderRangeChange) {
+    switch(change) {
+    case SliderRangeChange:
         if((m_options & StickToMinimum) && m_oldMinimum == m_windowStart)
             setWindowStart(minimum());
 
@@ -156,12 +159,13 @@ void QnTimeSlider::sliderChange(SliderChange change) {
 
         m_oldMinimum = minimum();
         m_oldMaximum = maximum();
-    }
-}
-
-void QnTimeSlider::at_actionTriggered(int action) {
-    if(action == SliderMove)
+        break;
+    case SliderValueChange:
         updateToolTipVisibility();
+        break;
+    default:
+        break;
+    }
 }
 
 
