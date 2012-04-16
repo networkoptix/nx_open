@@ -424,10 +424,10 @@
                                 <File Id="ServerAvcodecDll" Name="avcodec-54.dll" Source="../mediaserver/bin/$(env.CONFIG)/avcodec-54.dll"/>
                                 <File Id="ServerAvdeviceDll" Name="avdevice-53.dll" Source="../mediaserver/bin/$(env.CONFIG)/avdevice-53.dll"/>
                                 <File Id="ServerAvfilterDll" Name="avfilter-2.dll" Source="../mediaserver/bin/$(env.CONFIG)/avfilter-2.dll"/>
-                                <File Id="ServerAvformatDll" Name="avformat-53.dll" Source="../mediaserver/bin/$(env.CONFIG)/avformat-53.dll"/>
+                                <File Id="ServerAvformatDll" Name="avformat-54.dll" Source="../mediaserver/bin/$(env.CONFIG)/avformat-54.dll"/>
                                 <File Id="ServerAvutilDll" Name="avutil-51.dll" Source="../mediaserver/bin/$(env.CONFIG)/avutil-51.dll"/>
                                 <File Id="ServerSwscaleDll" Name="swscale-2.dll" Source="../mediaserver/bin/$(env.CONFIG)/swscale-2.dll"/>
-                                <File Id="ServerMp3lameDll" Name="libmp3lame-0.dll" Source="../mediaserver/bin/$(env.CONFIG)/libmp3lame-0.dll"/>
+<!--                                <File Id="ServerMp3lameDll" Name="libmp3lame-0.dll" Source="../mediaserver/bin/$(env.CONFIG)/libmp3lame-0.dll"/> -->
                             </Component>
                             
                             <Component Id="ServerQTLibraries" Guid="{97B2E8C3-274A-4e3e-8FBD-F60355A75A8A}">
@@ -491,13 +491,13 @@
                             </Directory>
                             
                             <Component Id="ClientFFmpegLibraries" Guid="{5D256521-DE39-4264-A44F-69728AA650EF}">
-                                <File Id="ClientAvcodecDll" Name="avcodec-53.dll" Source="../client/bin/$(env.CONFIG)/avcodec-53.dll"/>
+                                <File Id="ClientAvcodecDll" Name="avcodec-54.dll" Source="../client/bin/$(env.CONFIG)/avcodec-54.dll"/>
                                 <File Id="ClientAvdeviceDll" Name="avdevice-53.dll" Source="../client/bin/$(env.CONFIG)/avdevice-53.dll"/>
                                 <File Id="ClientAvfilterDll" Name="avfilter-2.dll" Source="../client/bin/$(env.CONFIG)/avfilter-2.dll"/>
-                                <File Id="ClientAvformatDll" Name="avformat-53.dll" Source="../client/bin/$(env.CONFIG)/avformat-53.dll"/>
+                                <File Id="ClientAvformatDll" Name="avformat-54.dll" Source="../client/bin/$(env.CONFIG)/avformat-54.dll"/>
                                 <File Id="ClientAvutilDll" Name="avutil-51.dll" Source="../client/bin/$(env.CONFIG)/avutil-51.dll"/>
                                 <File Id="ClientSwscaleDll" Name="swscale-2.dll" Source="../client/bin/$(env.CONFIG)/swscale-2.dll"/>
-                                <File Id="ClientMp3lameDll" Name="libmp3lame-0.dll" Source="../client/bin/$(env.CONFIG)/libmp3lame-0.dll"/>
+<!--                                <File Id="ClientMp3lameDll" Name="libmp3lame-0.dll" Source="../client/bin/$(env.CONFIG)/libmp3lame-0.dll"/> -->
                             </Component>
                             
                             <Component Id="ClientQTLibraries" Guid="{6BDC7AB9-6230-4cf3-9C1C-634C636D90BC}">
