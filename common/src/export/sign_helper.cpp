@@ -393,9 +393,12 @@ QString QnSignHelper::fillH264EncoderParams(const QByteArray& srcCodecExtraData,
         if (sps.pic_order_cnt_type == 2)
             bframes = 0;
         int gopLen = 16;
-        QString x264Params("--bitrate 20000 --profile %1 --level %2 --ref %3 --%4 --keyint %5 --subme 5 --b-pyramid none --bframes %6 --%7");
+        QString deblockFilter("");
+        if (pps.deblocking_filter_control_present_flag == 0)
+            deblockFilter = "--no-deblock";
+        QString x264Params("--bitrate 20000 --profile %1 --level %2 --ref %3 --%4 --keyint %5 --subme 5 --b-pyramid none --bframes %6 --%7 --weightp %8 %9");
         result = x264Params.arg(profile).arg(51).arg(sps.num_ref_frames).arg(pps.entropy_coding_mode_flag ? "cabac" : "no-cabac").
-                                arg(gopLen).arg(bframes).arg(pps.transform_8x8_mode_flag ? "8x8dct" : "no-8x8dct");
+                                arg(gopLen).arg(bframes).arg(pps.transform_8x8_mode_flag ? "8x8dct" : "no-8x8dct").arg(pps.weighted_pred_flag).arg(deblockFilter);
     }
     return result;
 }
