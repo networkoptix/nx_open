@@ -385,8 +385,11 @@ void QnArchiveSyncPlayWrapper::reinitTime(qint64 newTime)
 
     if (newTime != AV_NOPTS_VALUE)
         d->lastJumpTime = newTime;
-    else
-        d->lastJumpTime = getCurrentTime();
+    else {
+        //d->lastJumpTime = getCurrentTime();
+        if (d->lastJumpTime != DATETIME_NOW)
+            d->lastJumpTime = getDisplayedTimeInternal();
+    }
 		
     qDebug() << "reinitTime=" << QDateTime::fromMSecsSinceEpoch(d->lastJumpTime/1000).toString("hh:mm:ss.zzz");
 

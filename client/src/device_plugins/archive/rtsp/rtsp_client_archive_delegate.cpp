@@ -28,7 +28,9 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate():
     m_quality(MEDIA_Quality_High),
     m_qualityFastSwitch(true),
     m_lastSeekTime(AV_NOPTS_VALUE),
-    m_sendedCSec(0)
+    m_sendedCSec(0),
+    m_globalMinArchiveTime(AV_NOPTS_VALUE),
+    m_lastMinTimeTime(0)
 {
     m_rtpDataBuffer = new quint8[MAX_RTP_BUFFER_SIZE];
     m_flags |= Flag_SlowSource;
@@ -58,6 +60,61 @@ QnResourcePtr QnRtspClientArchiveDelegate::getNextVideoServerFromTime(QnResource
     return newResource;
 }
 
+QString QnRtspClientArchiveDelegate::getUrl(QnResourcePtr resource)
+{
+    QnResourcePtr server = qnResPool->getResourceById(resource->getParentId());
+    if (!server)
+        return QString();
+    QString url = server->getUrl() + QString('/');
+    QnNetworkResourcePtr netResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
+    if (netResource != 0)
+        url += netResource->getMAC().toString();
+    else
+        url += server->getUrl();
+    return url;
+}
+
+void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(QnResourcePtr resource)
+{
+    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
+    if (currentTime - m_lastMinTimeTime < 5*60*1000ll)
+        return;
+    m_lastMinTimeTime = currentTime;
+
+    QnVideoServerResourcePtr currentVideoServer = qSharedPointerDynamicCast<QnVideoServerResource> (qnResPool->getResourceById(resource->getParentId()));
+    if (!currentVideoServer)
+        return;
+
+    QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(resource);
+    if (!netRes)
+        return;
+    QString mac = netRes->getMAC().toString();
+    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(mac);
+    if (!history)
+        return;
+    QnCameraTimePeriodList videoServerList = history->getTimePeriods();
+    for (int i = 0; i < videoServerList.size(); ++i)
+    {
+        QnVideoServerResourcePtr otherVideoServer = qSharedPointerDynamicCast<QnVideoServerResource> (qnResPool->getResourceById(videoServerList[i].getServerId()));
+        if (otherVideoServer == currentVideoServer && m_rtspSession.startTime() != AV_NOPTS_VALUE)
+        {
+            // first server equal current server, so archive start point already found
+            break; 
+        }
+        QnResourcePtr otherCamera = qnResPool->getResourceByUniqId(mac + otherVideoServer->getId().toString());
+        RTPSession otherRtspSession;
+        if (otherRtspSession.open(getUrl(otherCamera)))
+        {
+            if (otherRtspSession.startTime() != AV_NOPTS_VALUE)
+            {
+                m_globalMinArchiveTime = otherRtspSession.startTime();
+                break;
+            }
+        }
+    }
+}
+
+
 QnResourcePtr QnRtspClientArchiveDelegate::getResourceOnTime(QnResourcePtr resource, qint64 time)
 {
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(resource);
@@ -73,6 +130,8 @@ QnResourcePtr QnRtspClientArchiveDelegate::getResourceOnTime(QnResourcePtr resou
 
     // get camera resource from other server. Unique id is mac + serverID
     QnResourcePtr newResource = qnResPool->getResourceByUniqId(mac + videoServer->getId().toString());
+    if (newResource && newResource != resource)
+        qDebug() << "switch to media server " << resource->getParentId();
     return newResource ? newResource : resource;
 }
 
@@ -93,15 +152,11 @@ bool QnRtspClientArchiveDelegate::open(QnResourcePtr resource)
 
     m_rtspSession.setTransport("TCP");
 
-    QString url = server->getUrl() + QString('/');
-    QnNetworkResourcePtr netResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
-    if (netResource != 0)
-        url += netResource->getMAC().toString();
-    else
-        url += resource->getUrl();
-
-    if (m_rtspSession.open(url)) 
+    if (m_rtspSession.open(getUrl(resource))) 
     {
+        checkMinTimeFromOtherServer(resource);
+
+
         m_rtpData = m_rtspSession.play(m_position, m_position, m_rtspSession.getScale());
         if (!m_rtpData)
             m_rtspSession.stop();
@@ -140,16 +195,13 @@ void QnRtspClientArchiveDelegate::close()
 
 qint64 QnRtspClientArchiveDelegate::startTime()
 {
-    qint64 minTime = QnCameraHistoryPool::instance()->getMinTime(qSharedPointerDynamicCast<QnNetworkResource> (m_resource));
-    if (minTime != AV_NOPTS_VALUE)
-        return minTime*1000;
-
-    qint64 rez = m_rtspSession.startTime();
-    if (rez == 0 || rez == AV_NOPTS_VALUE || rez == DATETIME_NOW)
-        return rez;
-
-
-    return rez;
+    //qint64 minTime = QnCameraHistoryPool::instance()->getMinTime(qSharedPointerDynamicCast<QnNetworkResource> (m_resource));
+    //if (minTime != AV_NOPTS_VALUE)
+    //    return minTime*1000;
+    if (m_globalMinArchiveTime != AV_NOPTS_VALUE)
+        return m_globalMinArchiveTime;
+    else
+        return m_rtspSession.startTime();
 }
 
 qint64 QnRtspClientArchiveDelegate::endTime()
