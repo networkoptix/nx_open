@@ -16,7 +16,8 @@ class QnTimeSlider: public QnToolTipSlider {
 public:
     enum Option {
         StickToMinimum = 0x1,
-        StickToMaximum = 0x2
+        StickToMaximum = 0x2,
+        UpdateToolTip = 0x4,
     };
     Q_DECLARE_FLAGS(Options, Option);
 
@@ -38,6 +39,9 @@ public:
     qint64 windowEnd() const;
     void setWindowEnd(qint64 windowEnd);
 
+    const QString &toolTipFormat() const;
+    void setToolTipFormat(const QString &format);
+
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     virtual QPointF positionFromValue(qint64 logicalValue) const override;
@@ -54,6 +58,7 @@ private:
     void drawPeriods(QPainter *painter, QnTimePeriodList &periods, qreal top, qreal height, const QColor &preColor, const QColor &pastColor);
 
     void updateToolTipVisibility();
+    void updateToolTipText();
 
 private:
     Q_DECLARE_PRIVATE(GraphicsSlider);
@@ -62,10 +67,13 @@ private:
         QnTimePeriodList forType[Qn::TimePeriodTypeCount];
     };
 
-    QVector<TypedPeriods> m_timePeriods;
     qint64 m_windowStart, m_windowEnd;
     qint64 m_oldMinimum, m_oldMaximum;
     Options m_options;
+    QString m_toolTipFormat;
+    bool m_dateLikeToolTipFormat;
+
+    QVector<TypedPeriods> m_timePeriods;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnTimeSlider::Options);

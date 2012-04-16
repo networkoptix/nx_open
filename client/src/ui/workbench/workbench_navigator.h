@@ -43,6 +43,7 @@ protected:
 
     Q_SLOT void updateCurrentWidget();
     Q_SLOT void updateSlider();
+    void updateToolTipFormat();
 
 private slots:
     void at_display_widgetChanged(Qn::ItemRole role);

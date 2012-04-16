@@ -239,32 +239,42 @@ void QnWorkbenchNavigator::updateSlider() {
     }*/
 }
 
-
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value) {
-    if(m_inUpdate)
+    if(!m_currentWidget)
         return;
-
-    if (!m_currentWidget)
-        return;
-
-    QnResourceDisplay *display = m_currentWidget->display();
-    if (display->archiveReader()->getSpeed() > 0 && display->camera()->getCurrentTime() == DATETIME_NOW && !display->camDisplay()->isRealTimeSource())
-        value = DATETIME_NOW;
 
     if(value == m_timeSlider->maximum() && m_timeSlider->minimum() > 0)
         value = DATETIME_NOW;
 
-    QnAbstractArchiveReader *reader = display->archiveReader();
+    /* Update tool tip format. */
     if (value == DATETIME_NOW) {
-        reader->jumpToPreviousFrame(DATETIME_NOW);
+        m_timeSlider->setToolTipFormat(tr("'Live'", "LIVE_TOOL_TIP_FORMAT"));
     } else {
-        if (m_timeSlider->isSliderDown()) {
-            reader->jumpTo(value * 1000, 0);
+        if (m_timeSlider->minimum() == 0) {
+            if(m_timeSlider->maximum() >= 60ll * 60ll * 1000ll) { /* Longer than 1 hour. */
+                m_timeSlider->setToolTipFormat(tr("hh:mm:ss", "LONG_TOOL_TIP_FORMAT"));
+            } else {
+                m_timeSlider->setToolTipFormat(tr("mm:ss", "SHORT_TOOL_TIP_FORMAT"));
+            }
         } else {
-            reader->jumpToPreviousFrame(value * 1000);
+            m_timeSlider->setToolTipFormat(tr("yyyy MMM dd\nhh:mm:ss", "CAMERA_TOOL_TIP_FORMAT"));
+        }
+    }
+
+    /* Update reader position. */
+    if(!m_inUpdate) {
+        QnAbstractArchiveReader *reader = m_currentWidget->display()->archiveReader();
+        if (value == DATETIME_NOW) {
+            reader->jumpToPreviousFrame(DATETIME_NOW);
+        } else {
+            if (m_timeSlider->isSliderDown()) {
+                reader->jumpTo(value * 1000, 0);
+            } else {
+                reader->jumpToPreviousFrame(value * 1000);
+            }
         }
     }
     

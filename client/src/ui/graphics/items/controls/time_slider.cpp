@@ -2,6 +2,7 @@
 
 #include <cassert>
 
+#include <QtCore/QDateTime>
 #include <QtGui/QPainter>
 
 #include <utils/common/warnings.h>
@@ -11,6 +12,30 @@
 
 #include "tool_tip_item.h"
 
+namespace {
+    bool isDateLikeFormat(const QString &format) {
+        bool inQuote = false;
+        foreach(const QChar &c, format) {
+            switch(c.unicode()) {
+            case '\'':
+                inQuote = !inQuote;
+                break;
+            case 'd':
+            case 'M':
+            case 'y':
+                if(!inQuote)
+                    return true;
+                break;
+            default:
+                break;
+            }
+        }
+        return false;
+    }
+
+} // anonymous namespace
+
+
 
 QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     base_type(parent),
@@ -18,26 +43,23 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     m_windowEnd(0),
     m_options(0),
     m_oldMinimum(0),
-    m_oldMaximum(0)
+    m_oldMaximum(0),
+    m_toolTipFormat(),
+    m_dateLikeToolTipFormat(false)
 {
     setProperty(Qn::SliderLength, 0);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding, QSizePolicy::Slider);
 
     setWindowStart(minimum());
     setWindowEnd(maximum());
-    setOptions(StickToMinimum | StickToMaximum);
+    setOptions(StickToMinimum | StickToMaximum | UpdateToolTip);
 
+    setToolTipFormat(tr("hh:mm:ss", "DEFAULT_TOOL_TIP_FORMAT"));
     
 
     sliderChange(SliderRangeChange);
 
-
-
-
     setMaximum(10000);
-
-    setWindowStart(1000);
-    setWindowEnd(5000);
 
     setLineCount(2);
 
@@ -117,6 +139,20 @@ void QnTimeSlider::setWindowEnd(qint64 windowEnd) {
     updateToolTipVisibility();
 }
 
+const QString &QnTimeSlider::toolTipFormat() const {
+    return m_toolTipFormat;
+}
+
+void QnTimeSlider::setToolTipFormat(const QString &format) {
+    if(m_toolTipFormat == format)
+        return;
+
+    m_toolTipFormat = format;
+    m_dateLikeToolTipFormat = isDateLikeFormat(format);
+
+    updateToolTipText();
+}
+
 QPointF QnTimeSlider::positionFromValue(qint64 logicalValue) const {
     Q_D(const GraphicsSlider);
 
@@ -142,6 +178,21 @@ void QnTimeSlider::updateToolTipVisibility() {
     toolTipItem()->setVisible(pos >= m_windowStart && pos <= m_windowEnd);
 }
 
+void QnTimeSlider::updateToolTipText() {
+    if(!(m_options & UpdateToolTip))
+        return;
+
+    qint64 pos = sliderPosition();
+
+    QString toolTip;
+    if(m_dateLikeToolTipFormat) {
+        toolTip = QDateTime::fromMSecsSinceEpoch(pos).toString(m_toolTipFormat);
+    } else {
+        toolTip = QTime(pos / (1000ll * 60ll * 60ll), pos / (1000ll * 60ll) % 60ll, pos / 1000ll % 60ll, pos % 1000ll).toString(m_toolTipFormat);
+    }
+    setToolTip(toolTip);
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -162,6 +213,7 @@ void QnTimeSlider::sliderChange(SliderChange change) {
         break;
     case SliderValueChange:
         updateToolTipVisibility();
+        updateToolTipText();
         break;
     default:
         break;
