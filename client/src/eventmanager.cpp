@@ -148,7 +148,7 @@ void QnEventManager::eventReceived(QnEvent event)
     else if (event.eventType == QN_EVENT_RES_CHANGE)
     {
         QnAppServerConnectionFactory::createConnection()->
-            getResourcesAsync(QString::number(event.objectId), event.objectNameLower(), this, SLOT(resourcesReceived(int,QByteArray,QnResourceList,int)));
+                getResourcesAsync(QString("id=%1").arg(event.objectId), event.objectNameLower(), this, SLOT(resourcesReceived(int,QByteArray,QnResourceList,int)));
     } else if (event.eventType == QN_EVENT_RES_DELETE)
     {
         QnResourcePtr ownResource = qnResPool->getResourceById(event.objectId);
