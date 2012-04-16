@@ -85,8 +85,16 @@ public:
     QnWorkbenchActionHandler(QObject *parent = NULL);
     virtual ~QnWorkbenchActionHandler();
 
+    /**
+     * \returns                         Widget that this action handler operates on.
+     */
     QWidget *widget() const;
 
+    /**
+     * \param widget                    Widget for this action handler to operate on.
+     *                                  All dialogs and message boxes will be displayed
+     *                                  to the user relative to this widget.
+     */
     void setWidget(QWidget *widget) {
         m_widget = widget;
     }
@@ -187,13 +195,19 @@ private:
     friend class detail::QnResourceStatusReplyProcessor;
 
     QWeakPointer<QWidget> m_widget;
-
     QWeakPointer<QMenu> m_mainMenu;
     
     QWeakPointer<QnCameraSettingsDialog> m_cameraSettingsDialog;
+
+    /** Whether the set of selected resources was changed and settings
+     * dialog is waiting to be updated. */
     bool m_selectionUpdatePending;
+
+    /** Scope of the last selection change. */
     Qn::ActionScope m_selectionScope;
 
+    /** List of serialized resources that are to be dropped on the scene once
+     * the user logs in. */
     QList<QnMimeData> m_delayedDrops;
 };
 

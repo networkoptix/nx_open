@@ -11,8 +11,6 @@ class QnResourcePool;
 
 /**
  * This class implements access control.
- * 
- * It hides resources that cannot be viewed by the user that is currently logged in.
  */
 class QnWorkbenchAccessController: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT;

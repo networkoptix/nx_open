@@ -124,6 +124,12 @@ public:
      */
     void setCurrentLayout(QnWorkbenchLayout *layout);
 
+    /**
+     * Sets the index of the current layout. Note that index does not need
+     * to be valid as it will be bounded to the closest valid value.
+     *
+     * \param index                     New current layout index. 
+     */
     void setCurrentLayoutIndex(int index);
 
     /**

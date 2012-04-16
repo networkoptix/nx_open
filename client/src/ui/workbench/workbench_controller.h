@@ -44,8 +44,6 @@ class QnScreenRecorder;
 
 /**
  * This class implements default scene manipulation logic.
- *
- * It also presents some functions for high-level scene content manipulation.
  */
 class QnWorkbenchController: public QObject, public QnWorkbenchContextAware, protected SceneUtility {
     Q_OBJECT;

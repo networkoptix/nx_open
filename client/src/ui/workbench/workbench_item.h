@@ -196,8 +196,19 @@ public:
         return setPinned(!isPinned()); 
     }
 
+    /**
+     * Marks this item as waiting for geometry adjustment. It will be placed
+     * at the best slot available when its layout becomes active.
+     */
     void adjustGeometry();
 
+    /**
+     * Marks this item as waiting for geometry adjustment. It will be placed 
+     * at the best slot that is close to given position when its layout becomes active.
+     * 
+     * \param desiredPosition           Position in grid coordinates. This item
+     *                                  will be placed as close to this position as possible.
+     */
     void adjustGeometry(const QPointF &desiredPosition);
 
 signals:

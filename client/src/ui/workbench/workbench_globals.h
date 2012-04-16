@@ -4,6 +4,11 @@
 #include <QtCore/QtGlobal>
 
 namespace Qn {
+    /**
+     * Role of an item on the scene. 
+     * 
+     * Note that at any time there may exist no more than a single item for each role.
+     */
     enum ItemRole {
         RaisedRole,     /**< The item is raised. */
         ZoomedRole,     /**< The item is zoomed. */
@@ -12,6 +17,9 @@ namespace Qn {
     };
     
 
+    /**
+     * Item-specific flags. Are part of item's serializable state.
+     */
     enum ItemFlag {
         Pinned = 0x1,                       /**< Item is pinned to the grid. Items are not pinned by default. */
         PendingGeometryAdjustment = 0x2     /**< Geometry adjustment is pending. 
@@ -22,7 +30,11 @@ namespace Qn {
 
 
     /**
-     * Layer of an item.
+     * Layer of a graphics item on the scene.
+     * 
+     * Workbench display presents convenience functions for moving items between layers
+     * and guarantees that items from the layers with higher numbers are always
+     * displayed on top of those from the layers with lower numbers.
      */
     enum ItemLayer {
         BackLayer,                  /**< Back layer. */
@@ -38,6 +50,9 @@ namespace Qn {
     };
 
 
+    /**
+     * Generic enumeration describing borders of a rectangle.
+     */
     enum Border {
         NoBorders = 0,
         LeftBorder = 0x1,
@@ -49,6 +64,9 @@ namespace Qn {
     Q_DECLARE_FLAGS(Borders, Border);
 
 
+    /**
+     * Flags describing state of a layout in the context of client-server interaction.
+     */
     enum LayoutFlag {
         /** Layout is local and was never saved to appserver. */
         LayoutIsLocal = 0x1,
@@ -56,12 +74,15 @@ namespace Qn {
         /** Layout is currently being saved to appserver. */
         LayoutIsBeingSaved = 0x2,
 
-        /** LayoutIsLocal unsaved changes are present in the layout. */
+        /** Unsaved changes are present in the layout. */
         LayoutIsChanged = 0x4,
     };
     Q_DECLARE_FLAGS(LayoutFlags, LayoutFlag);
 
 
+    /**
+     * Flags describing the actions permitted for the user. 
+     */
     enum Permission {
         /* Generic permissions. */
 
