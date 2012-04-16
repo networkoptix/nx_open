@@ -18,6 +18,8 @@ public:
     virtual void onBufferingFinished(QnlTimeSource* src) { Q_UNUSED(src); }
     virtual void onEofReached(QnlTimeSource* src, bool value) { Q_UNUSED(src); Q_UNUSED(value); }
     virtual bool isEnabled() const { return true; }
+
+    virtual void reinitTime(qint64 newTime) {}
     //virtual void onAvailableTime(QnlTimeSource* src, qint64 time) {}
 };
 

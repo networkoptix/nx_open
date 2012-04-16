@@ -43,8 +43,11 @@ DeviceFileCatalog::DeviceFileCatalog(const QString& macAddress, QnResource::Conn
     m_duplicateName(false),
     m_role(role)
 {
-
+#ifdef _TEST_TWO_SERVERS
+    QString devTitleFile = closeDirPath(getDataDirectory()) + QString("test/record_catalog/media/");
+#else
     QString devTitleFile = closeDirPath(getDataDirectory()) + QString("record_catalog/media/");
+#endif
     devTitleFile += prefixForRole(role) + "/";
     devTitleFile += m_macAddress + "/";
     devTitleFile += QString("title.csv");

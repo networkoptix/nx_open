@@ -19,7 +19,9 @@ QString serverGuid()
         guid = QUuid::createUuid().toString();
         qSettings.setValue("serverGuid", guid);
     }
-
+#ifdef _TEST_TWO_SERVERS
+    return guid + "test";
+#endif
     return guid;
 }
 
