@@ -6,7 +6,6 @@
 #include <core/resource/resource_fwd.h>
 #include <ui/animation/animation_timer_listener.h>
 #include <ui/common/scene_utility.h>
-#include <ui/common/margin_flags.h>
 #include <utils/common/rect_set.h>
 #include "recording/time_period.h"
 #include "workbench_globals.h"

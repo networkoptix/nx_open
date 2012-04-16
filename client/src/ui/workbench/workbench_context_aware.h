@@ -32,6 +32,8 @@ public:
      */
     QnWorkbenchContextAware(QObject *parent);
 
+    QnWorkbenchContextAware(QnWorkbenchContext *context);
+
     /**
      * \returns                         Context associated with this context-aware object.
      */

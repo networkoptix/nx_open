@@ -31,6 +31,14 @@ QnWorkbenchContextAware::QnWorkbenchContextAware(QObject *parent) {
     }
 }
 
+QnWorkbenchContextAware::QnWorkbenchContextAware(QnWorkbenchContext *context): m_context(context) {
+    if(!context) {
+        qnNullCritical(context);
+        m_context = qn_staticContext();
+        return;
+    }
+}
+
 QAction *QnWorkbenchContextAware::action(const Qn::ActionId id) const {
     return menu()->action(id);
 }

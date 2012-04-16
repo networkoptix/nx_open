@@ -65,6 +65,19 @@ namespace Qn {
 
 
     /**
+     * Flags describing how viewport margins affect viewport geometry.
+     */
+    enum MarginFlag {
+        /** Viewport margins affect how viewport size is bounded. */
+        MarginsAffectSize = 0x1,        
+
+        /** Viewport margins affect how viewport position is bounded. */
+        MarginsAffectPosition = 0x2,
+    };
+    Q_DECLARE_FLAGS(MarginFlags, MarginFlag);
+
+
+    /**
      * Flags describing state of a layout in the context of client-server interaction.
      */
     enum LayoutFlag {
@@ -134,6 +147,7 @@ namespace Qn {
 Q_DECLARE_TYPEINFO(Qn::ItemRole, Q_PRIMITIVE_TYPE);
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ItemFlags);
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::Borders);
+Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::MarginFlags);
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::LayoutFlags);
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::Permissions);
 

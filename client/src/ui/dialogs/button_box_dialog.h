@@ -6,6 +6,9 @@
 #include <QtGui/QDialog>
 #include <QtGui/QDialogButtonBox>
 
+/**
+ * Button box dialog that can be queried for the button that was clicked to close it.
+ */
 class QnButtonBoxDialog: public QDialog {
     Q_OBJECT;
 public:
