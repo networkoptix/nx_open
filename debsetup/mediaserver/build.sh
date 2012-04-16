@@ -1,5 +1,7 @@
 #!/bin/bash
 
+. ../common.sh
+
 TARGET=/opt/networkoptix/mediaserver
 BINTARGET=$TARGET/bin
 LIBTARGET=$TARGET/lib
@@ -8,20 +10,6 @@ INITTARGET=/etc/init
 INITDTARGET=/etc/init.d
 
 PACKAGENAME=networkoptix-mediaserver
-VERSION=`python ../../common/common_version.py`
-ARCH=`uname -i`
-
-QT_PATH=$(dirname $(dirname $(which qmake)))
-case $ARCH in
-    "i386")
-        QT_LIB_PATH="$QT_PATH/lib/i386-linux-gnu"
-        ARCHITECTURE=i386
-        ;;
-    "x86_64")
-        QT_LIB_PATH="$QT_PATH/lib"
-        ARCHITECTURE=amd64
-        ;;
-esac
 
 STAGEBASE=package
 STAGE=$STAGEBASE/${PACKAGENAME}_${VERSION}_${ARCHITECTURE}
