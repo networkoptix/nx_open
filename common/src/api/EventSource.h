@@ -27,6 +27,7 @@ struct QnEvent
     QString eventType;
     QString objectName;
     QnId objectId;
+    QnId parentId;
     QString resourceGuid;
     QString data;
 

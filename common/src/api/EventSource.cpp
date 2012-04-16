@@ -97,6 +97,9 @@ bool QnEvent::load(const QVariant& parsed)
         return false;
 
     objectId = dict["resourceId"].toString();
+    if (dict.contains("parentId"))
+        parentId = dict["parentId"].toString();
+
     objectName = dict["objectName"].toString();
 
     if (dict.contains("resourceGuid"))
