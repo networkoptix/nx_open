@@ -107,7 +107,6 @@ public:
 	int seq_parameter_set_id;
 	int entropy_coding_mode_flag;
 	int pic_order_present_flag;
-	int num_slice_groups;
 	int num_ref_idx_l0_active_minus1;
 	int num_ref_idx_l1_active_minus1;
 	int weighted_pred_flag;
@@ -129,7 +128,7 @@ public:
 	int num_slice_groups_minus1;
 	int slice_group_map_type;
 
-    PPSUnit(): NALUnit(), m_ready(false), transform_8x8_mode_flag(0) {}
+    PPSUnit(): NALUnit(), m_ready(false), transform_8x8_mode_flag(0), pic_scaling_matrix_present_flag(0) {}
 	virtual ~PPSUnit() {}
 	bool isReady() {return m_ready;}
 	int deserialize();
@@ -263,6 +262,11 @@ public:
 		full_sps_bit_len = 0;
 		low_delay_hrd_flag = 0;
 		bit_rate_scale = 0;
+        residual_colour_transform_flag = 0;
+        bit_depth_luma = 0;
+        bit_depth_chroma = 0;
+        qpprime_y_zero_transform_bypass_flag = 0;
+        seq_scaling_matrix_present_flag = 0;
 		//m_pulldown = false;
 	}
 	virtual ~SPSUnit() {

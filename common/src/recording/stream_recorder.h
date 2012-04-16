@@ -57,7 +57,7 @@ public:
 
     void setStorage(QnStorageResourcePtr storage);
 
-    void setContainer(QLatin1String container);
+    void setContainer(const QString& container);
 signals:
     void recordingFailed(QString errMessage);
     void recordingStarted();
@@ -117,7 +117,7 @@ private:
     Role m_role;
     EVP_MD_CTX* m_mdctx;
     QPixmap m_logo;
-    QLatin1String m_container;
+    QString m_container;
 };
 
 #endif // _STREAM_RECORDER_H__
