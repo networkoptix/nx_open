@@ -199,10 +199,10 @@ int QnAppServerConnection::getResources(QnResourceList& resources, QByteArray& e
     return status;
 }
 
-int QnAppServerConnection::getResources(const QString& args, const QString& objectName, QnResourceList& resources, QByteArray& errorString)
+int QnAppServerConnection::getResources(const QString& args, QnResourceList& resources, QByteArray& errorString)
 {
     QByteArray data;
-    int status = getObjects("resourceEx", "", data, errorString);
+    int status = getObjects("resourceEx", args, data, errorString);
 
     if (status == 0)
     {
