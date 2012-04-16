@@ -188,7 +188,7 @@ void QnTimeSlider::updateToolTipText() {
     if(m_dateLikeToolTipFormat) {
         toolTip = QDateTime::fromMSecsSinceEpoch(pos).toString(m_toolTipFormat);
     } else {
-        toolTip = QTime(pos / (1000ll * 60ll * 60ll), pos / (1000ll * 60ll) % 60ll, pos / 1000ll % 60ll, pos % 1000ll).toString(m_toolTipFormat);
+        toolTip = QTime(pos / (1000ll * 60ll * 60ll) % 24ll, pos / (1000ll * 60ll) % 60ll, pos / 1000ll % 60ll, pos % 1000ll).toString(m_toolTipFormat);
     }
     setToolTip(toolTip);
 }
