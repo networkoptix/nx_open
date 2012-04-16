@@ -25,58 +25,58 @@ public:
     QStyle *baseStyle() const;
     void setBaseStyle(QStyle *style);
 
-    virtual void drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget = 0) const
+    virtual void drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget = 0) const override
     { baseStyle()->drawPrimitive(element, option, painter, widget); }
-    virtual void drawControl(ControlElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget = 0) const
+    virtual void drawControl(ControlElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget = 0) const override
     { baseStyle()->drawControl(element, option, painter, widget); }
-    virtual void drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget = 0) const
+    virtual void drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget = 0) const override
     { baseStyle()->drawComplexControl(control, option, painter, widget); }
-    virtual void drawItemText(QPainter *painter, const QRect &rectangle, int alignment, const QPalette &palette, bool enabled, const QString &text, QPalette::ColorRole textRole = QPalette::NoRole) const
+    virtual void drawItemText(QPainter *painter, const QRect &rectangle, int alignment, const QPalette &palette, bool enabled, const QString &text, QPalette::ColorRole textRole = QPalette::NoRole) const override
     { baseStyle()->drawItemText(painter, rectangle, alignment, palette, enabled, text, textRole); }
-    virtual void drawItemPixmap(QPainter *painter, const QRect &rectangle, int alignment, const QPixmap &pixmap) const
+    virtual void drawItemPixmap(QPainter *painter, const QRect &rectangle, int alignment, const QPixmap &pixmap) const override
     { baseStyle()->drawItemPixmap(painter, rectangle, alignment, pixmap); }
 
-    virtual QSize sizeFromContents(ContentsType type, const QStyleOption *option, const QSize &contentsSize, const QWidget *widget = 0) const
+    virtual QSize sizeFromContents(ContentsType type, const QStyleOption *option, const QSize &contentsSize, const QWidget *widget = 0) const override
     { return baseStyle()->sizeFromContents(type, option, contentsSize, widget); }
 
-    virtual QRect subElementRect(SubElement element, const QStyleOption *option, const QWidget *widget = 0) const
+    virtual QRect subElementRect(SubElement element, const QStyleOption *option, const QWidget *widget = 0) const override
     { return baseStyle()->subElementRect(element, option, widget); }
-    virtual QRect subControlRect(ComplexControl control, const QStyleOptionComplex *option, SubControl subControl, const QWidget *widget = 0) const
+    virtual QRect subControlRect(ComplexControl control, const QStyleOptionComplex *option, SubControl subControl, const QWidget *widget = 0) const override
     { return baseStyle()->subControlRect(control, option, subControl, widget); }
-    virtual QRect itemTextRect(const QFontMetrics &metrics, const QRect &rectangle, int alignment, bool enabled, const QString &text) const
+    virtual QRect itemTextRect(const QFontMetrics &metrics, const QRect &rectangle, int alignment, bool enabled, const QString &text) const override
     { return baseStyle()->itemTextRect(metrics, rectangle, alignment, enabled, text); }
-    virtual QRect itemPixmapRect(const QRect &rectangle, int alignment, const QPixmap &pixmap) const
+    virtual QRect itemPixmapRect(const QRect &rectangle, int alignment, const QPixmap &pixmap) const override
     { return baseStyle()->itemPixmapRect(rectangle, alignment, pixmap); }
 
-    virtual SubControl hitTestComplexControl(ComplexControl control, const QStyleOptionComplex *option, const QPoint &position, const QWidget *widget = 0) const
+    virtual SubControl hitTestComplexControl(ComplexControl control, const QStyleOptionComplex *option, const QPoint &position, const QWidget *widget = 0) const override
     { return baseStyle()->hitTestComplexControl(control, option, position, widget); }
-    virtual int styleHint(StyleHint hint, const QStyleOption *option = 0, const QWidget *widget = 0, QStyleHintReturn *returnData = 0) const
+    virtual int styleHint(StyleHint hint, const QStyleOption *option = 0, const QWidget *widget = 0, QStyleHintReturn *returnData = 0) const override
     { return baseStyle()->styleHint(hint, option, widget, returnData); }
-    virtual int pixelMetric(PixelMetric metric, const QStyleOption *option = 0, const QWidget *widget = 0) const
+    virtual int pixelMetric(PixelMetric metric, const QStyleOption *option = 0, const QWidget *widget = 0) const override
     { return baseStyle()->pixelMetric(metric, option, widget); }
 
-    virtual QPixmap standardPixmap(StandardPixmap standardPixmap, const QStyleOption *option = 0, const QWidget *widget = 0) const
+    virtual QPixmap standardPixmap(StandardPixmap standardPixmap, const QStyleOption *option = 0, const QWidget *widget = 0) const override
     { return baseStyle()->standardPixmap(standardPixmap, option, widget); }
-    virtual QPixmap generatedIconPixmap(QIcon::Mode iconMode, const QPixmap &pixmap, const QStyleOption *option) const
+    virtual QPixmap generatedIconPixmap(QIcon::Mode iconMode, const QPixmap &pixmap, const QStyleOption *option) const override
     { return baseStyle()->generatedIconPixmap(iconMode, pixmap, option); }
-    virtual QPalette standardPalette() const
+    virtual QPalette standardPalette() const override
     { return baseStyle()->standardPalette(); }
 
-    virtual void polish(QApplication *application)
+    virtual void polish(QApplication *application) override
     { baseStyle()->polish(application); }
-    virtual void unpolish(QApplication *application)
+    virtual void unpolish(QApplication *application) override
     { baseStyle()->unpolish(application); }
-    virtual void polish(QWidget *widget)
+    virtual void polish(QWidget *widget) override
     { baseStyle()->polish(widget); }
-    virtual void unpolish(QWidget *widget)
+    virtual void unpolish(QWidget *widget) override
     { baseStyle()->unpolish(widget); }
-    virtual void polish(QPalette &palette)
+    virtual void polish(QPalette &palette) override
     { baseStyle()->polish(palette); }
 
 protected:
-    virtual bool event(QEvent *e)
+    virtual bool event(QEvent *e) override
     { return baseStyle()->event(e); }
-    virtual bool eventFilter(QObject *o, QEvent *e)
+    virtual bool eventFilter(QObject *o, QEvent *e) override
     { return baseStyle()->eventFilter(o, e); }
 
 protected slots:

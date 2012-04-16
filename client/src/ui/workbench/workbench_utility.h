@@ -11,6 +11,9 @@
  */
 class QnDistanceMagnitudeCalculator: public TypedMagnitudeCalculator<QPoint> {
 public:
+    /**
+     * \param origin                    Desired position for an item. 
+     */
     QnDistanceMagnitudeCalculator(const QPointF &origin):
         m_origin(origin),
         m_calculator(MagnitudeCalculator::forType<QPointF>())
@@ -36,6 +39,14 @@ private:
  */
 class QnAspectRatioMagnitudeCalculator: public TypedMagnitudeCalculator<QPoint> {
 public:
+    /**
+     * \param origin                    Desired position for an item.
+     * \param size                      Item size.
+     * \param boundary                  Scene bounding rect. Magnitude calculator
+     *                                  will assign higher weights for positions outside
+     *                                  the bounding rect.
+     * \param aspectRatio               Aspect ratio of the viewport, in item coordinate system.
+     */
     QnAspectRatioMagnitudeCalculator(const QPointF &origin, const QSize &size, const QRect &boundary, qreal aspectRatio):
         m_origin(origin),
         m_size(SceneUtility::toPoint(size)),

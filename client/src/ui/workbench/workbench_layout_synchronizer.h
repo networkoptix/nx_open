@@ -31,14 +31,30 @@ public:
         return m_resource;
     }
 
+    /**
+     * \returns                         Whether this synchronizer should delete itself
+     *                                  once one of the associated objects is destroyed.
+     */
     bool isAutoDeleting() const {
         return m_autoDeleting;
     }
 
+    /**
+     * \param autoDeleting              Whether this synchronizer should delete itself
+     *                                  once one of the associated objects is destroyed.
+     */
     void setAutoDeleting(bool autoDeleting);
 
+    /**
+     * \param layout                    Workbench layout.
+     * \returns                         Synchronizer associated with the given layout, or NULL if none.
+     */
     static QnWorkbenchLayoutSynchronizer *instance(QnWorkbenchLayout *layout);
 
+    /**
+     * \param resource                  Layout resource.
+     * \returns                         Synchronizer associated with the given resource, or NULL if none.
+     */
     static QnWorkbenchLayoutSynchronizer *instance(const QnLayoutResourcePtr &resource);
 
 public slots:
@@ -46,7 +62,6 @@ public slots:
     void submit();
     void submitPendingItems();
     void submitPendingItemsLater();
-    void autoDeleteLater();
 
 protected:
     void clearLayout();
@@ -57,6 +72,7 @@ protected:
 
 protected slots:
     void autoDelete();
+    void autoDeleteLater();
 
     void at_resource_resourceChanged();
     void at_resource_nameChanged();
@@ -92,13 +108,17 @@ private:
     /** Whether changes should be propagated from layout to resource. */
     bool m_submit;
 
-    /** Whether this layout synchronizer should delete itself once it is not functional anymore. */
+    /** Whether this layout synchronizer should delete itself once 
+     * one of the objects it manages is destroyed. */
     bool m_autoDeleting;
 
     /** Whether queued submit is in progress. */
     bool m_submitting;
 
-    /** Deferred submit queue. */
+    /** Queue of item UUIDs that are to be submitted in deferred mode. 
+     *
+     * It is needed to prevent races when two concurrent changes to the same
+     * item are synchronized there-and-back many times until finally converging. */
     QSet<QUuid> m_pendingItems;
 };
 

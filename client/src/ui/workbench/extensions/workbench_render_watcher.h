@@ -22,7 +22,7 @@ public:
     QnWorkbenchRenderWatcher(QnWorkbenchDisplay *display, QObject *parent = NULL);
 
     /**
-     * Manual constructor. User will have to call registering and notification 
+     * Manual constructor. User will have to call registration and notification 
      * functions manually.
      * 
      * \param parent                    Parent object.
