@@ -82,43 +82,32 @@ void QnEventManager::eventReceived(QnEvent event)
         if (event.objectName != "Camera" && event.objectName != "Server")
             return;
 
+        QnVideoServerResourcePtr ownVideoServer = qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnVideoServerResource>();
+        if (event.objectName == "Server" && event.resourceGuid != serverGuid())
+            return;
+        else if (event.objectName == "Camera" && event.parentId != ownVideoServer->getId())
+            return;
+
         QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
         QByteArray errorString;
-
-        QnResourceList resources;
-        if (appServerConnection->getResources(resources, errorString) == 0)
+        QnResourcePtr resource;
+        if (appServerConnection->getResource(event.objectId, resource, errorString) == 0)
         {
-            foreach(const QnResourcePtr& resource, resources)
+            QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId());
+            if (ownResource)
             {
-                if (resource->getId() == event.objectId)
-                {
-                    QnVideoServerResourcePtr ownVideoServer = qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnVideoServerResource>();
-
-                    QnSecurityCamResourcePtr securityCamera = resource.dynamicCast<QnSecurityCamResource>();
-                    if (securityCamera && securityCamera->getParentId() != ownVideoServer->getId())
-                        continue;
-
-                    QnVideoServerResourcePtr videoServer = resource.dynamicCast<QnVideoServerResource>();
-                    if (videoServer && videoServer->getId() != ownVideoServer->getId())
-                        continue;
-
-                    QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId());
-                    if (ownResource)
-                    {
-                        ownResource->update(resource);
-                    }
-                    else
-                    {
-                        qnResPool->addResource(resource);
-                        ownResource = resource;
-                    }
-
-                    QnSecurityCamResourcePtr ownSecurityCamera = ownResource.dynamicCast<QnSecurityCamResource>();
-                    if (ownSecurityCamera)
-                        QnRecordingManager::instance()->updateCamera(ownSecurityCamera);
-                }
+                ownResource->update(resource);
             }
+            else
+            {
+                qnResPool->addResource(resource);
+                ownResource = resource;
+            }
+
+            QnSecurityCamResourcePtr ownSecurityCamera = ownResource.dynamicCast<QnSecurityCamResource>();
+            if (ownSecurityCamera)
+                QnRecordingManager::instance()->updateCamera(ownSecurityCamera);
         } else
         {
             qDebug()  << "QnEventManager::eventReceived(): Can't get resource from appserver. Reason: "

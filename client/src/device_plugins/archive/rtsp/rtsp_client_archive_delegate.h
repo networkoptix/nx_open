@@ -53,7 +53,7 @@ private:
     QnResourcePtr getNextVideoServerFromTime(QnResourcePtr resource, qint64 time);
     QnAbstractMediaDataPtr getNextDataInternal();
     QString getUrl(QnResourcePtr server);
-    void checkMinTimeFromOtherServer(QnResourcePtr resource);
+    qint64 checkMinTimeFromOtherServer(QnResourcePtr resource);
 private:
     QMutex m_mutex;
     RTPSession m_rtspSession;

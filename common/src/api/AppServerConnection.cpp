@@ -124,7 +124,7 @@ int QnAppServerConnection::getObjectsAsync(const QString& objectName, const QStr
         QStringList argsKvList = args.split("=");
 
         if (argsKvList.length() == 2)
-            requestParams.append(argsKvList[0], argsKvList[1]);
+            requestParams.append(QnRequestParam(argsKvList[0], argsKvList[1]));
     }
 
     return SessionManager::instance()->sendAsyncGetRequest(m_url, objectName, requestParams, target, slot);
@@ -149,7 +149,7 @@ int QnAppServerConnection::getObjects(const QString& objectName, const QString& 
         QStringList argsKvList = args.split("=");
 
         if (argsKvList.length() == 2)
-            requestParams.append(argsKvList[0], argsKvList[1]);
+            requestParams.append(QnRequestParam(argsKvList[0], argsKvList[1]));
     }
 
     return SessionManager::instance()->sendGetRequest(m_url, objectName, requestParams, data, errorString);
@@ -196,6 +196,15 @@ int QnAppServerConnection::getResources(QnResourceList& resources, QByteArray& e
         }
     }
 
+    return status;
+}
+
+int QnAppServerConnection::getResource(const QnId& id, QnResourcePtr& resource, QByteArray& errorString)
+{
+    QnResourceList resources;
+    int status = getResources(QString("id=%1").arg(id.toString()), resources, errorString);
+    if (status == 0) 
+        resource = resources[0];
     return status;
 }
 
