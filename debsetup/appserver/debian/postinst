@@ -29,7 +29,6 @@ function write_config {
     [ -z "$ECS_GUID" ] || echo "ecsGuid=$ECS_GUID" >> $CONFIG_FILE
     [ -z "$LOG_FILE" ] || echo "logFile=$LOG_FILE" >> $CONFIG_FILE
     [ -z "$ECS_PORT" ] || echo "port=$ECS_PORT" >> $CONFIG_FILE
-    [ -z "$ECS_PASSWORD" ] || echo "password=$ECS_PASSWORD" >> $CONFIG_FILE
 }
 
 function to_int {
@@ -83,7 +82,13 @@ case "$1" in
 
       write_config
 
-      /opt/networkoptix/entcontroller/bin/dbconfig admin "$ECS_PASSWORD"
+      if [ ! -z "$ECS_PASSWORD" ]
+      then
+        /opt/networkoptix/entcontroller/bin/dbconfig admin "$ECS_PASSWORD"
+        db_set networkoptix-entcontroller/ecs_password ""
+      fi
+
+      chmod 600 /opt/networkoptix/entcontroller/var/db/ecs.db
   ;;
 
   abort-upgrade|abort-remove|abort-configure)
