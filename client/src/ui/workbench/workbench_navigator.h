@@ -65,6 +65,7 @@ private:
     QSet<QnResourceWidget *> m_syncedWidgets;
     QnResourceWidget *m_centralWidget;
     QnResourceWidget *m_currentWidget;
+    bool m_currentWidgetIsCamera;
 
     bool m_wasPlaying;
     bool m_inUpdate;

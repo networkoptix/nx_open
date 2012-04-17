@@ -143,6 +143,13 @@ void QnWorkbenchNavigator::setCurrentWidget(QnResourceWidget *widget) {
         return;
 
     m_currentWidget = widget;
+    if(m_currentWidget) {
+        m_currentWidgetIsCamera = m_currentWidget->resource().dynamicCast<QnSecurityCamResource>();
+    } else {
+        m_currentWidgetIsCamera = false;
+    }
+    
+    m_timeSlider->setOption(QnTimeSlider::UseUTC, m_currentWidgetIsCamera);
 
 #if 0
     m_timeSlider->resetSelectionRange();
@@ -253,14 +260,14 @@ void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value) {
     if (value == DATETIME_NOW) {
         m_timeSlider->setToolTipFormat(tr("'Live'", "LIVE_TOOL_TIP_FORMAT"));
     } else {
-        if (m_timeSlider->minimum() == 0) {
+        if (m_currentWidgetIsCamera) {
+            m_timeSlider->setToolTipFormat(tr("yyyy MMM dd\nhh:mm:ss", "CAMERA_TOOL_TIP_FORMAT"));
+        } else {
             if(m_timeSlider->maximum() >= 60ll * 60ll * 1000ll) { /* Longer than 1 hour. */
                 m_timeSlider->setToolTipFormat(tr("hh:mm:ss", "LONG_TOOL_TIP_FORMAT"));
             } else {
                 m_timeSlider->setToolTipFormat(tr("mm:ss", "SHORT_TOOL_TIP_FORMAT"));
             }
-        } else {
-            m_timeSlider->setToolTipFormat(tr("yyyy MMM dd\nhh:mm:ss", "CAMERA_TOOL_TIP_FORMAT"));
         }
     }
 

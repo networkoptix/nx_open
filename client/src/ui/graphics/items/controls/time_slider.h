@@ -16,18 +16,32 @@ class QnTimeSlider: public QnToolTipSlider, protected KineticProcessHandler {
 
 public:
     enum Option {
-        /** Whether window start should stick to slider's minimum value. 
+        /** 
+         * Whether window start should stick to slider's minimum value. 
          * If this flag is set and window starts at slider's minimum,
-         * window start will change when minimum is changed. */
+         * window start will change when minimum is changed. 
+         */
         StickToMinimum = 0x1,
 
-        /** Whether window end should stick to slider's maximum value. */
+        /** 
+         * Whether window end should stick to slider's maximum value. 
+         */
         StickToMaximum = 0x2,
 
-        /** Whether slider's tooltip is to be autoupdated using the provided
-         * tool tip format. If this flag is set, slider's position is considered 
-         * to be a time in milliseconds. */
+        /** 
+         * Whether slider's tooltip is to be autoupdated using the provided
+         * tool tip format. 
+         */
         UpdateToolTip = 0x4,
+
+        /**
+         * Whether slider's value is considered to be a number milliseconds that 
+         * have passed since 1970-01-01 00:00:00.000, Coordinated Universal Time.
+         * 
+         * If this flag is not set, slider's value is simply a number of 
+         * milliseconds, with no connection to real dates.
+         */
+        UseUTC = 0x8
     };
     Q_DECLARE_FLAGS(Options, Option);
 
@@ -42,6 +56,7 @@ public:
 
     Options options() const;
     void setOptions(Options options);
+    void setOption(Option option, bool value);
 
     qint64 windowStart() const;
     void setWindowStart(qint64 windowStart);
@@ -74,7 +89,7 @@ private:
 
     void drawPeriodsBar(QPainter *painter, QnTimePeriodList &recorded, QnTimePeriodList &motion, qreal top, qreal height);
     void drawPeriods(QPainter *painter, QnTimePeriodList &periods, qreal top, qreal height, const QColor &preColor, const QColor &pastColor);
-    void drawScale(QPainter *painter, qreal top, qreal height);
+    void drawTickmarks(QPainter *painter, qreal top, qreal height);
 
     void updateToolTipVisibility();
     void updateToolTipText();
@@ -89,8 +104,10 @@ private:
     qint64 m_windowStart, m_windowEnd;
     qint64 m_oldMinimum, m_oldMaximum;
     Options m_options;
+    
+    qint64 m_utcOffsetMSec;
     QString m_toolTipFormat;
-    bool m_dateLikeToolTipFormat;
+
 
     qint64 m_zoomAnchor;
 
