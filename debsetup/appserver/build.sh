@@ -42,6 +42,8 @@ cp /lib/$ARCH-linux-gnu/libssl.so.1.0.0 $LIBSTAGE
 cp /lib/$ARCH-linux-gnu/libcrypto.so.1.0.0 $LIBSTAGE
 
 mkdir -p $ETCSTAGE
+touch $ETCSTAGE/entcontroller.conf
+
 mkdir -p $INITSTAGE
 mkdir -p $INITDSTAGE
 
@@ -58,6 +60,7 @@ cat debian/control.template | sed "s/INSTALLED_SIZE/$INSTALLED_SIZE/g" | sed "s/
 cp debian/postinst $STAGE/DEBIAN
 cp debian/prerm $STAGE/DEBIAN
 cp debian/templates $STAGE/DEBIAN
+cp debian/conffiles $STAGE/DEBIAN
 
 (cd $STAGE; md5sum `find * -type f | grep -v '^DEBIAN/'` > DEBIAN/md5sums)
 
