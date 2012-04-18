@@ -74,6 +74,8 @@ public:
     const QString &toolTipFormat() const;
     void setToolTipFormat(const QString &format);
 
+    void finishAnimations();
+
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     virtual QPointF positionFromValue(qint64 logicalValue) const override;
@@ -86,6 +88,7 @@ protected:
     virtual void sliderChange(SliderChange change) override;
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
     virtual void wheelEvent(QGraphicsSceneWheelEvent *event) override;
+    virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override;
 
     virtual void tick(int deltaMSecs) override;
 
@@ -106,6 +109,9 @@ private:
     void updateToolTipVisibility();
     void updateToolTipText();
     void updateSteps();
+    void updateStepTargets();
+    
+    void animateStepValues(int deltaMSecs);
 
     const QPixmap &cachedPixmap(qint64 position, int height, const QnTimeStep &step);
 

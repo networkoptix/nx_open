@@ -53,7 +53,7 @@ namespace {
     const qreal minTickmarkSeparationPixels = 5.0;
     const qreal criticalTickmarkSeparationPixels = 2.0;
     const qreal minTextSeparationPixels = 30.0;
-    const qreal criticalTextSeparationPixels = 15.0;
+    const qreal criticalTextSeparationPixels = 20.0;
     
     const qreal tickmarkHeightRelativeAnimationSpeed = 1.0;
     const qreal tickmarkHeightAbsoluteAnimationSpeed = 0.1;
@@ -293,6 +293,7 @@ void QnTimeSlider::setWindow(qint64 start, qint64 end) {
         emit windowChanged(m_windowStart, m_windowEnd);
 
         updateToolTipVisibility();
+        updateStepTargets();
     }
 }
 
@@ -328,33 +329,8 @@ qint64 QnTimeSlider::valueFromPosition(const QPointF &position) const {
     return GraphicsStyle::sliderValueFromPosition(m_windowStart, m_windowEnd, position.x(), d->pixelPosMax - d->pixelPosMin, d->upsideDown);
 }
 
-void QnTimeSlider::updateToolTipVisibility() {
-    qint64 pos = sliderPosition();
-
-    toolTipItem()->setVisible(pos >= m_windowStart && pos <= m_windowEnd);
-}
-
-void QnTimeSlider::updateToolTipText() {
-    if(!(m_options & UpdateToolTip))
-        return;
-
-    qint64 pos = sliderPosition();
-
-    QString toolTip;
-    if(m_options & UseUTC) {
-        toolTip = QDateTime::fromMSecsSinceEpoch(pos).toString(m_toolTipFormat);
-    } else {
-        toolTip = msecsToTime(pos).toString(m_toolTipFormat);
-    }
-    setToolTip(toolTip);
-}
-
-void QnTimeSlider::updateSteps() {
-    m_steps = (m_options & UseUTC) ? *absoluteTimeSteps() : *relativeTimeSteps();
-
-    m_nextTickmarkPos.resize(m_steps.size());
-    m_tickmarkLines.resize(m_steps.size());
-    m_stepData.resize(m_steps.size());
+void QnTimeSlider::finishAnimations() {
+    animateStepValues(10 * 1000);
 }
 
 bool QnTimeSlider::scaleWindow(qreal factor, qint64 anchor) {
@@ -417,61 +393,101 @@ const QPixmap &QnTimeSlider::cachedPixmap(qint64 position, int height, const QnT
     return m_labelPixmaps[key] = pixmap;
 }
 
+void QnTimeSlider::updateToolTipVisibility() {
+    qint64 pos = sliderPosition();
 
-// -------------------------------------------------------------------------- //
-// Animation & Painting
-// -------------------------------------------------------------------------- //
-void QnTimeSlider::tick(int deltaMSecs) {
+    toolTipItem()->setVisible(pos >= m_windowStart && pos <= m_windowEnd);
+}
+
+void QnTimeSlider::updateToolTipText() {
+    if(!(m_options & UpdateToolTip))
+        return;
+
+    qint64 pos = sliderPosition();
+
+    QString toolTip;
+    if(m_options & UseUTC) {
+        toolTip = QDateTime::fromMSecsSinceEpoch(pos).toString(m_toolTipFormat);
+    } else {
+        toolTip = msecsToTime(pos).toString(m_toolTipFormat);
+    }
+    setToolTip(toolTip);
+}
+
+void QnTimeSlider::updateSteps() {
+    m_steps = (m_options & UseUTC) ? *absoluteTimeSteps() : *relativeTimeSteps();
+
+    m_nextTickmarkPos.resize(m_steps.size());
+    m_tickmarkLines.resize(m_steps.size());
+    m_stepData.resize(m_steps.size());
+}
+
+void QnTimeSlider::updateStepTargets() {
     int stepCount = m_steps.size();
 
     qreal msecsPerPixel = (m_windowEnd - m_windowStart) / size().width();
     if(qFuzzyIsNull(msecsPerPixel))
         msecsPerPixel = 1.0; /* Technically, we should never get here, but we want to feel safe. */
     bool msecsPerPixelChanged = qAbs(msecsPerPixel - m_lastMSecsPerPixel) / qMin(msecsPerPixel, m_lastMSecsPerPixel) > msecsPerPixelChangeThreshold;
+    if(!msecsPerPixelChanged)
+        return;
 
     /* Find maximal index of the time step to use. */
-    int maxStepIndex = m_lastMaxStepIndex;
-    if(msecsPerPixelChanged) {
-        maxStepIndex = stepCount - 1;
-        qreal tickmarkSpanPixels = size().width() * maxTickmarkSpanFraction;
-        for(; maxStepIndex >= 0; maxStepIndex--)
-            if(m_steps[maxStepIndex].stepMSecs / msecsPerPixel <= tickmarkSpanPixels)
-                break;
-        maxStepIndex = qMax(maxStepIndex, 1); /* Display at least two tickmark levels. */
-
-        int i = 0;
-    }
+    int maxStepIndex = stepCount - 1;
+    qreal tickmarkSpanPixels = size().width() * maxTickmarkSpanFraction;
+    for(; maxStepIndex >= 0; maxStepIndex--)
+        if(m_steps[maxStepIndex].stepMSecs / msecsPerPixel <= tickmarkSpanPixels)
+            break;
+    maxStepIndex = qMax(maxStepIndex, 1); /* Display at least two tickmark levels. */
 
     /* Adjust target tickmark heights and opacities. */
-    qreal dt = deltaMSecs / 1000.0;
     for(int i = 0; i < stepCount; i++) {
         TimeStepData &data = m_stepData[i];
         qreal separationPixels = m_steps[i].stepMSecs / msecsPerPixel;
 
         /* Target height & opacity. */
-        if(msecsPerPixelChanged) {
-            qreal targetHeight;
-            if (separationPixels < minTickmarkSeparationPixels) {
-                targetHeight = 0.0;
-            } else if(i >= maxStepIndex) {
-                targetHeight = 1.0;
-            } else  {
-                targetHeight = pow(tickmarkStepScale, maxStepIndex - i);
-            }
-            if(!qFuzzyCompare(data.targetHeight, targetHeight)) {
-                data.lastTargetHeight = data.targetHeight;
-                data.targetHeight = targetHeight;
-                data.targetLineOpacity = minTickmarkOpacity + (1.0 - minTickmarkOpacity) * data.targetHeight;
-            }
-
-            if(separationPixels < minTextSeparationPixels) {
-                data.targetTextOpacity = 0.0;
-            } else {
-                data.targetTextOpacity = qMax(minTextOpacity, data.targetLineOpacity);
-            }
+        qreal targetHeight;
+        if (separationPixels < minTickmarkSeparationPixels) {
+            targetHeight = 0.0;
+        } else if(i >= maxStepIndex) {
+            targetHeight = 1.0;
+        } else  {
+            targetHeight = pow(tickmarkStepScale, maxStepIndex - i);
+        }
+        
+        if(!qFuzzyCompare(data.targetHeight, targetHeight)) {
+            data.lastTargetHeight = data.targetHeight;
+            data.targetHeight = targetHeight;
+            data.targetLineOpacity = minTickmarkOpacity + (1.0 - minTickmarkOpacity) * data.targetHeight;
         }
 
-        /* Current height & opacity. */
+        if(separationPixels < minTextSeparationPixels) {
+            data.targetTextOpacity = 0.0;
+        } else {
+            data.targetTextOpacity = qMax(minTextOpacity, data.targetLineOpacity);
+        }
+
+        /* Adjust for max height & opacity. */
+        qreal maxHeight = qMax(0.0, (separationPixels - criticalTickmarkSeparationPixels) / criticalTickmarkSeparationPixels);
+        qreal maxLineOpacity = minTickmarkOpacity + (1.0 - minTickmarkOpacity) * maxHeight;
+        qreal maxTextOpacity = qMin(maxLineOpacity, qMax(0.0, (separationPixels - criticalTextSeparationPixels) / criticalTextSeparationPixels));
+        data.currentHeight      = qMin(data.currentHeight,      maxHeight);
+        data.currentLineOpacity = qMin(data.currentLineOpacity, maxLineOpacity);
+        data.currentTextOpacity = qMin(data.currentTextOpacity, maxTextOpacity);
+    }
+
+    m_lastMSecsPerPixel = msecsPerPixel;
+    m_lastMaxStepIndex = maxStepIndex;
+}
+
+void QnTimeSlider::animateStepValues(int deltaMSecs) {
+    int stepCount = m_steps.size();
+    qreal dt = deltaMSecs / 1000.0;
+
+    for(int i = 0; i < stepCount; i++) {
+        TimeStepData &data = m_stepData[i];
+        qreal separationPixels = m_steps[i].stepMSecs / m_lastMSecsPerPixel;
+
         qreal heightSpeed;
         qreal opacitySpeed;
         if(qFuzzyIsNull(data.targetHeight) || qFuzzyIsNull(data.lastTargetHeight)) {
@@ -481,26 +497,18 @@ void QnTimeSlider::tick(int deltaMSecs) {
             heightSpeed  = qMax(tickmarkHeightAbsoluteAnimationSpeed,  data.currentHeight      * tickmarkHeightRelativeAnimationSpeed);
             opacitySpeed = qMax(tickmarkOpacityAbsoluteAnimationSpeed, data.currentLineOpacity * tickmarkOpacityRelativeAnimationSpeed);
         }
-        
+
         data.currentHeight      = adjust(data.currentHeight,        data.targetHeight,      heightSpeed * dt);
         data.currentLineOpacity = adjust(data.currentLineOpacity,   data.targetLineOpacity, opacitySpeed * dt);
         data.currentTextOpacity = adjust(data.currentTextOpacity,   data.targetTextOpacity, opacitySpeed * dt);
-
-        /* Adjust for max height & opacity. */
-        if(msecsPerPixelChanged) {
-            qreal maxHeight = qMax(0.0, (separationPixels - criticalTickmarkSeparationPixels) / criticalTickmarkSeparationPixels);
-            qreal maxLineOpacity = minTickmarkOpacity + (1.0 - minTickmarkOpacity) * maxHeight;
-            qreal maxTextOpacity = qMin(maxLineOpacity, qMax(0.0, (separationPixels - criticalTextSeparationPixels) / criticalTextSeparationPixels));
-            data.currentHeight      = qMin(data.currentHeight,      maxHeight);
-            data.currentLineOpacity = qMin(data.currentLineOpacity, maxLineOpacity);
-            data.currentTextOpacity = qMin(data.currentTextOpacity, maxTextOpacity);
-        }
     }
-
-    m_lastMSecsPerPixel = msecsPerPixel;
-    m_lastMaxStepIndex = maxStepIndex;
 }
 
+
+
+// -------------------------------------------------------------------------- //
+// Painting
+// -------------------------------------------------------------------------- //
 void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
     /* Initialize converter. It will be used a lot. */
     QRectF rect = this->rect();
@@ -649,10 +657,13 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, qreal top, qreal height) {
             QPixmap pixmap = cachedPixmap(pos, textHeight, m_steps[index]);
 
             QRectF textRect(x - pixmap.width() / 2.0, top + tickmarkHeight, pixmap.width(), pixmap.height());
-            if(textRect.left() >= rect.left() && textRect.right() <= rect.right()) {
-                QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * m_stepData[index].currentTextOpacity);
-                painter->drawPixmap(textRect, pixmap, pixmap.rect());
-            }
+            if(textRect.left() < rect.left())
+                textRect.moveLeft(rect.left());
+            if(textRect.right() > rect.right())
+                textRect.moveRight(rect.right());
+
+            QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * m_stepData[index].currentTextOpacity);
+            painter->drawPixmap(textRect, pixmap, pixmap.rect());
         }
 
         /* Calculate line ends. */
@@ -675,6 +686,11 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, qreal top, qreal height) {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+void QnTimeSlider::tick(int deltaMSecs) {
+    updateStepTargets();
+    animateStepValues(deltaMSecs);
+}
+
 void QnTimeSlider::sliderChange(SliderChange change) {
     base_type::sliderChange(change);
 
@@ -719,6 +735,12 @@ void QnTimeSlider::wheelEvent(QGraphicsSceneWheelEvent *event) {
     kineticProcessor()->start();
 
     event->accept();
+}
+
+void QnTimeSlider::resizeEvent(QGraphicsSceneResizeEvent *event) {
+    base_type::resizeEvent(event);
+
+    updateStepTargets();
 }
 
 void QnTimeSlider::kineticMove(const QVariant &degrees) {

@@ -150,6 +150,8 @@ void QnWorkbenchNavigator::setCurrentWidget(QnResourceWidget *widget) {
     }
     
     m_timeSlider->setOption(QnTimeSlider::UseUTC, m_currentWidgetIsCamera);
+    updateSlider();
+    m_timeSlider->finishAnimations();
 
 #if 0
     m_timeSlider->resetSelectionRange();
