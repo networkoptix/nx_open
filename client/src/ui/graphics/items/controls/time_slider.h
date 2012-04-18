@@ -2,9 +2,13 @@
 #define QN_TIME_SLIDER_H
 
 #include "tool_tip_slider.h"
+
 #include <recording/time_period.h>
+
 #include <ui/processors/kinetic_process_handler.h>
 #include <ui/animation/animation_timer_listener.h>
+
+#include "time_step.h"
 
 class QnNoptixStyle;
 
@@ -36,7 +40,7 @@ public:
         UpdateToolTip = 0x4,
 
         /**
-         * Whether slider's value is considered to be a number milliseconds that 
+         * Whether slider's value is considered to be a number of milliseconds that 
          * have passed since 1970-01-01 00:00:00.000, Coordinated Universal Time.
          * 
          * If this flag is not set, slider's value is simply a number of 
@@ -87,6 +91,11 @@ protected:
 
     virtual void kineticMove(const QVariant &degrees) override;
 
+    static QVector<QnTimeStep> createRelativeSteps();
+    static QVector<QnTimeStep> createAbsoluteSteps();
+    static QVector<QnTimeStep> createStandardSteps(bool isRelative);
+    static QVector<QnTimeStep> enumerateSteps(const QVector<QnTimeStep> &steps);
+
 private:
     bool scaleWindow(qreal factor, qint64 anchor);
 
@@ -96,6 +105,9 @@ private:
 
     void updateToolTipVisibility();
     void updateToolTipText();
+    void updateSteps();
+
+    const QPixmap &cachedPixmap(qint64 position, int height, const QnTimeStep &step);
 
 private:
     Q_DECLARE_PRIVATE(GraphicsSlider);
@@ -125,11 +137,13 @@ private:
 
     QVector<TypedPeriods> m_timePeriods;
     
-    QVector<TimeStepData> m_timeStepData;
+    QVector<QnTimeStep> m_steps;
+    QVector<TimeStepData> m_stepData;
     qreal m_lastMSecsPerPixel;
     int m_lastMaxStepIndex;
     QVector<qint64> m_nextTickmarkPos;
     QVector<QVector<QPointF> > m_tickmarkLines;
+    QHash<qint32, QPixmap> m_labelPixmaps;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnTimeSlider::Options);

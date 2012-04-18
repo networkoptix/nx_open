@@ -20,205 +20,8 @@
 #include "tool_tip_item.h"
 
 namespace {
-    class TimeStep {
-        Q_DECLARE_TR_FUNCTIONS(TimeStep);
-    public:
-        enum Type {
-            Milliseconds,
-            Days,
-            Months,
-            Years
-        };
-
-        TimeStep(): type(Milliseconds), unitMSecs(0), stepMSecs(0), stepUnits(0), wrapUnits(0) {}
-
-        TimeStep(Type type, qint64 unitMSecs, int stepUnits, int wrapUnits, const QString &format, const QString &longestString, bool isRelative = true):
-            type(type),
-            unitMSecs(unitMSecs),
-            stepMSecs(unitMSecs * stepUnits),
-            stepUnits(stepUnits),
-            wrapUnits(wrapUnits),
-            format(format),
-            longestString(longestString)
-        {}
-
-        /** Type of the time step. */
-        Type type;
-
-        /** Size of the unit in which step value is measured, in milliseconds. */
-        qint64 unitMSecs;
-
-        /** Time step, in milliseconds */
-        qint64 stepMSecs;
-
-        /** Time step, in units. */
-        int stepUnits;
-
-        /** Number of units for a wrap-around. */
-        int wrapUnits;
-        
-        /** Format string for the step value. */
-        QString format;
-
-        /** Longest possible string representation of the step value. */
-        QString longestString;
-
-        /** Whether this time step is to be used for relative times (e.g. time intervals), 
-         * or for absolute times (i.e. obtained via <tt>QDateTime::toMSecsSinceEpoch</tt>). */
-        bool isRelative;
-
-    public:
-        static QVector<TimeStep> createAbsoluteSteps() {
-            QVector<TimeStep> result;
-            result <<
-                createStandardSteps(false) <<
-                TimeStep(Days,          1000ll * 60 * 60 * 24,              1,      31,     tr("dd MMM"),   tr("29 Mar"),       false) <<
-                TimeStep(Months,        1000ll * 60 * 60 * 24 * 31,         1,      12,     tr("MMMM"),     tr("September"),    false) <<
-                TimeStep(Years,         1000ll * 60 * 60 * 24 * 365,        1,      50000,  tr("yyyy"),     tr("2000"),         false);
-            return result;
-        }
-
-        static QVector<TimeStep> createRelativeSteps() {
-            QVector<TimeStep> result;
-            result <<
-                createStandardSteps(true) <<
-                TimeStep(Milliseconds,  1000ll * 60 * 60 * 24,              1,      31,     tr("d"),        tr("29d"),          false) <<
-                TimeStep(Milliseconds,  1000ll * 60 * 60 * 24 * 30,         1,      12,     tr("M"),        tr("11M"),          false) <<
-                TimeStep(Milliseconds,  1000ll * 60 * 60 * 24 * 30 * 12,    1,      50000,  tr("y"),        tr("2000y"),        false);
-            return result;
-        }
-
-
-
-    private:
-        static QVector<TimeStep> createStandardSteps(bool isRelative) {
-            QVector<TimeStep> result;
-            result <<
-                TimeStep(Milliseconds,  1ll,                                100,    1000,   tr("ms"),       tr("100ms"),        isRelative) <<
-                TimeStep(Milliseconds,  1ll,                                500,    1000,   tr("ms"),       tr("500ms"),        isRelative) <<
-                TimeStep(Milliseconds,  1000ll,                             1,      60,     tr("s"),        tr("59s"),          isRelative) <<
-                TimeStep(Milliseconds,  1000ll,                             5,      60,     tr("s"),        tr("59s"),          isRelative) <<
-                TimeStep(Milliseconds,  1000ll,                             10,     60,     tr("s"),        tr("59s"),          isRelative) <<
-                TimeStep(Milliseconds,  1000ll,                             30,     60,     tr("s"),        tr("59s"),          isRelative) <<
-                TimeStep(Milliseconds,  1000ll * 60,                        1,      60,     tr("m"),        tr("59m"),          isRelative) <<
-                TimeStep(Milliseconds,  1000ll * 60,                        5,      60,     tr("m"),        tr("59m"),          isRelative) <<
-                TimeStep(Milliseconds,  1000ll * 60,                        10,     60,     tr("m"),        tr("59m"),          isRelative) <<
-                TimeStep(Milliseconds,  1000ll * 60,                        30,     60,     tr("m"),        tr("59m"),          isRelative) <<
-                TimeStep(Milliseconds,  1000ll * 60 * 60,                   1,      24,     tr("h"),        tr("23h"),          isRelative) <<
-                TimeStep(Milliseconds,  1000ll * 60 * 60,                   3,      24,     tr("h"),        tr("23h"),          isRelative) <<
-                TimeStep(Milliseconds,  1000ll * 60 * 60,                   12,     24,     tr("h"),        tr("23h"),          isRelative);
-            return result;
-        }
-
-    };
-
-    const QVector<TimeStep> absoluteTimeSteps = TimeStep::createAbsoluteSteps();
-    const QVector<TimeStep> relativeTimeSteps = TimeStep::createRelativeSteps();
-
-    qint64 timeToMSecs(const QTime &time) {
-        return QTime(0, 0, 0, 0).msecsTo(time);
-    }
-
     QTime msecsToTime(qint64 msecs) {
         return QTime(0, 0, 0, 0).addMSecs(msecs); 
-    }
-
-    template<class T>
-    T roundUp(T value, T step) {
-        value = value + step - 1;
-        return value - value % step;
-    }
-
-    qint64 roundUp(qint64 msecs, const TimeStep &step) {
-        if(step.isRelative) 
-            return roundUp(msecs, step.stepMSecs);
-        
-        QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(msecs);
-        switch(step.type) {
-        case TimeStep::Milliseconds:
-            dateTime.setTime(msecsToTime(roundUp(timeToMSecs(dateTime.time()), step.stepMSecs)));
-            break;
-        case TimeStep::Days:
-            if(dateTime.time() != QTime(0, 0, 0, 0) || (dateTime.date().day() != 1 && dateTime.date().day() % step.stepUnits != 0)) {
-                dateTime.setTime(QTime(0, 0, 0, 0));
-
-                int oldDay = dateTime.date().day();
-                int newDay = qMin(roundUp(oldDay + 1, step.stepUnits), dateTime.date().daysInMonth() + 1);
-                dateTime = dateTime.addDays(newDay - oldDay);
-            }
-            break;
-        case TimeStep::Months:
-            if(dateTime.time() != QTime(0, 0, 0, 0) || dateTime.date().day() != 1 || ((dateTime.date().month() - 1) % step.stepUnits != 0)) {
-                dateTime.setTime(QTime(0, 0, 0, 0));
-                dateTime.setDate(QDate(dateTime.date().year(), dateTime.date().month(), 1));
-                
-                int oldMonth = dateTime.date().month();
-                /* We should have added 1 to month() here we don't want to end
-                 * up with the same month number, but months are numbered from 1,
-                 * so the addition is not needed. */
-                int newMonth = roundUp(oldMonth, step.stepUnits) + 1;
-                dateTime = dateTime.addMonths(newMonth - oldMonth);
-            }
-            break;
-        case TimeStep::Years:
-            if(dateTime.time() != QTime(0, 0, 0, 0) || dateTime.date().day() != 1 || dateTime.date().month() != 1 || dateTime.date().year() % step.stepUnits != 0) {
-                dateTime.setTime(QTime(0, 0, 0, 0));
-                dateTime.setDate(QDate(dateTime.date().year(), 1, 1));
-                
-                int oldYear = dateTime.date().year();
-                int newYear = roundUp(oldYear + 1, step.stepUnits);
-                dateTime = dateTime.addYears(newYear - oldYear);
-            }
-            break;
-        default:
-            qnWarning("Invalid time step type '%1'.", static_cast<int>(step.type));
-            break;
-        }
-
-        return dateTime.toMSecsSinceEpoch();
-    }
-
-    qint64 add(qint64 msecs, const TimeStep &step) {
-        if(step.isRelative)
-            return msecs + step.stepMSecs;
-
-        switch(step.type) {
-        case TimeStep::Milliseconds:
-        case TimeStep::Days:
-            return msecs + step.stepMSecs;
-        case TimeStep::Months:
-            return QDateTime::fromMSecsSinceEpoch(msecs).addMonths(step.stepUnits).toMSecsSinceEpoch();
-        case TimeStep::Years:
-            return QDateTime::fromMSecsSinceEpoch(msecs).addYears(step.stepUnits).toMSecsSinceEpoch();
-        default:
-            qnWarning("Invalid time step type '%1'.", static_cast<int>(step.type));
-            return msecs;
-        }
-    }
-
-    const QDateTime baseDateTime = QDateTime::fromMSecsSinceEpoch(0);
-
-    qint64 absoluteNumber(qint64 msecs, const TimeStep &step) {
-        if(!step.isRelative)
-            return msecs / step.stepMSecs;
-
-        QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(msecs);
-        switch(step.type) {
-        case TimeStep::Milliseconds:
-        case TimeStep::Days:
-            return baseDateTime.msecsTo(dateTime) / step.stepMSecs;
-        case TimeStep::Months: {
-            int year, month;
-            dateTime.date().getDate(&year, &month, NULL);
-
-            return (year * 12 + month) / step.stepUnits;
-        }
-        case TimeStep::Years:
-            return dateTime.date().year() / step.stepUnits;
-        default:
-            qnWarning("Invalid time step type '%1'.", static_cast<int>(step.type));
-            return 0;
-        }
     }
 
     inline qreal adjust(qreal value, qreal target, qreal delta) {
@@ -237,8 +40,16 @@ namespace {
         }
     }
 
+    class TimeStepFactory: public QnTimeSlider {
+    public:
+        using QnTimeSlider::createAbsoluteSteps;
+        using QnTimeSlider::createRelativeSteps;
+    };
+    Q_GLOBAL_STATIC_WITH_ARGS(const QVector<QnTimeStep>, absoluteTimeSteps, (TimeStepFactory::createAbsoluteSteps()));
+    Q_GLOBAL_STATIC_WITH_ARGS(const QVector<QnTimeStep>, relativeTimeSteps, (TimeStepFactory::createRelativeSteps()));
+
     const qreal minTickmarkSpanPixels = 1.0;
-    const qreal maxTickmarkSpanFraction = 0.25;
+    const qreal maxTickmarkSpanFraction = 0.75;
     const qreal minTickmarkSeparationPixels = 5.0;
     const qreal criticalTickmarkSeparationPixels = 2.0;
     const qreal minTextSeparationPixels = 30.0;
@@ -252,11 +63,16 @@ namespace {
     const qreal tickmarkOpacityAbsoluteAnimationSpeed = 0.1;
     const qreal tickmarkOpacityStartingAnimationSpeed = 2.0;
     
-    const qreal minTickmarkOpacity = 0.15;
+    const qreal minTickmarkOpacity = 0.05;
+    const qreal minTextOpacity = 0.5;
     
     const qreal tickmarkStepScale = 2.0 / 3.0;
 
+    const qreal tickmarkTextScale = 1.0 / 3.0;
+
     const qreal minHighlightSpanFraction = 0.5;
+
+    const qreal msecsPerPixelChangeThreshold = 1.0e-4;
 
     /** Lower zoom limit. */
     const qreal minMSecsPerPixel = 2.0;
@@ -304,9 +120,9 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     startListening();
 
     /* Run handlers. */
+    updateSteps();
     sliderChange(SliderRangeChange);
     itemChange(ItemSceneHasChanged, QVariant::fromValue<QGraphicsScene *>(scene()));
-
 
 
 
@@ -338,6 +154,54 @@ QnTimeSlider::~QnTimeSlider() {
     return;
 }
 
+QVector<QnTimeStep> QnTimeSlider::createAbsoluteSteps() {
+    QVector<QnTimeStep> result;
+    result <<
+        createStandardSteps(false) <<
+        QnTimeStep(QnTimeStep::Days,            1000ll * 60 * 60 * 24,              1,      31,     tr("dd MMM"),   tr("29 Mar"),       false) <<
+        QnTimeStep(QnTimeStep::Months,          1000ll * 60 * 60 * 24 * 31,         1,      12,     tr("MMMM"),     tr("September"),    false) <<
+        QnTimeStep(QnTimeStep::Years,           1000ll * 60 * 60 * 24 * 365,        1,      50000,  tr("yyyy"),     tr("2000"),         false);
+    return enumerateSteps(result);
+}
+
+QVector<QnTimeStep> QnTimeSlider::createRelativeSteps() {
+    QVector<QnTimeStep> result;
+    result <<
+        createStandardSteps(true) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60 * 24,              1,      31,     tr("d"),        tr("29d"),          false) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60 * 24 * 30,         1,      12,     tr("M"),        tr("11M"),          false) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60 * 24 * 30 * 12,    1,      50000,  tr("y"),        tr("2000y"),        false);
+    return enumerateSteps(result);
+}
+
+QVector<QnTimeStep> QnTimeSlider::createStandardSteps(bool isRelative) {
+    QVector<QnTimeStep> result;
+    result <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1ll,                                10,     1000,   tr("ms"),       tr("10ms"),         isRelative) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1ll,                                50,     1000,   tr("ms"),       tr("50ms"),         isRelative) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1ll,                                100,    1000,   tr("ms"),       tr("100ms"),        isRelative) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1ll,                                500,    1000,   tr("ms"),       tr("500ms"),        isRelative) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1000ll,                             1,      60,     tr("s"),        tr("59s"),          isRelative) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1000ll,                             5,      60,     tr("s"),        tr("59s"),          isRelative) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1000ll,                             10,     60,     tr("s"),        tr("59s"),          isRelative) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1000ll,                             30,     60,     tr("s"),        tr("59s"),          isRelative) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60,                        1,      60,     tr("m"),        tr("59m"),          isRelative) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60,                        5,      60,     tr("m"),        tr("59m"),          isRelative) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60,                        10,     60,     tr("m"),        tr("59m"),          isRelative) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60,                        30,     60,     tr("m"),        tr("59m"),          isRelative) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60,                   1,      24,     tr("h"),        tr("23h"),          isRelative) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60,                   3,      24,     tr("h"),        tr("23h"),          isRelative) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60,                   12,     24,     tr("h"),        tr("23h"),          isRelative);
+    return enumerateSteps(result);
+}
+
+QVector<QnTimeStep> QnTimeSlider::enumerateSteps(const QVector<QnTimeStep> &steps) {
+    QVector<QnTimeStep> result = steps;
+    for(int i = 0; i < steps.size(); i++)
+        result[i].index = i;
+    return result;
+}
+
 int QnTimeSlider::lineCount() const {
     return m_timePeriods.size();
 }
@@ -363,7 +227,14 @@ QnTimeSlider::Options QnTimeSlider::options() const {
 }
 
 void QnTimeSlider::setOptions(Options options) {
+    if(m_options == options)
+        return;
+
+    Options difference = m_options ^ options;
     m_options = options;
+
+    if(difference & UseUTC)
+        updateSteps();
 }
 
 void QnTimeSlider::setOption(Option option, bool value) {
@@ -478,6 +349,14 @@ void QnTimeSlider::updateToolTipText() {
     setToolTip(toolTip);
 }
 
+void QnTimeSlider::updateSteps() {
+    m_steps = (m_options & UseUTC) ? *absoluteTimeSteps() : *relativeTimeSteps();
+
+    m_nextTickmarkPos.resize(m_steps.size());
+    m_tickmarkLines.resize(m_steps.size());
+    m_stepData.resize(m_steps.size());
+}
+
 bool QnTimeSlider::scaleWindow(qreal factor, qint64 anchor) {
     qreal msecsPerPixel = (m_windowEnd - m_windowStart) / size().width();
     qreal targetMSecsPerPixel = msecsPerPixel * factor;
@@ -506,18 +385,49 @@ bool QnTimeSlider::scaleWindow(qreal factor, qint64 anchor) {
     return end <= maximum();
 }
 
+const QPixmap &QnTimeSlider::cachedPixmap(qint64 position, int height, const QnTimeStep &step) {
+    if(position == 600000) {
+        int a = 10;
+    }
+
+    qint32 key = cacheKey(position, height, step);
+
+    QHash<qint32, QPixmap>::const_iterator itr = m_labelPixmaps.find(key);
+    if(itr != m_labelPixmaps.end())
+        return *itr;
+
+    QFont font = this->font();
+    font.setPixelSize(height);
+
+    QString text = toString(position, step);
+
+    QFontMetrics metrics(font);
+    QSize textSize = metrics.size(Qt::TextSingleLine, text);
+
+    QPixmap pixmap(textSize.width(), textSize.height());
+    pixmap.fill(QColor(0,0,0,0));
+
+    QPainter painter(&pixmap);
+    painter.setCompositionMode(QPainter::CompositionMode_Source);
+    painter.setPen(palette().color(QPalette::Text));
+    painter.setFont(font);
+    painter.drawText(pixmap.rect(), Qt::AlignCenter | Qt::TextSingleLine, text);
+    painter.end();
+
+    return m_labelPixmaps[key] = pixmap;
+}
+
 
 // -------------------------------------------------------------------------- //
 // Animation & Painting
 // -------------------------------------------------------------------------- //
 void QnTimeSlider::tick(int deltaMSecs) {
-    const QVector<TimeStep> &steps = m_options & UseUTC ? absoluteTimeSteps : relativeTimeSteps;
-    int stepCount = steps.size();
+    int stepCount = m_steps.size();
 
     qreal msecsPerPixel = (m_windowEnd - m_windowStart) / size().width();
     if(qFuzzyIsNull(msecsPerPixel))
         msecsPerPixel = 1.0; /* Technically, we should never get here, but we want to feel safe. */
-    bool msecsPerPixelChanged = !qFuzzyCompare(msecsPerPixel, m_lastMSecsPerPixel);
+    bool msecsPerPixelChanged = qAbs(msecsPerPixel - m_lastMSecsPerPixel) / qMin(msecsPerPixel, m_lastMSecsPerPixel) > msecsPerPixelChangeThreshold;
 
     /* Find maximal index of the time step to use. */
     int maxStepIndex = m_lastMaxStepIndex;
@@ -525,19 +435,18 @@ void QnTimeSlider::tick(int deltaMSecs) {
         maxStepIndex = stepCount - 1;
         qreal tickmarkSpanPixels = size().width() * maxTickmarkSpanFraction;
         for(; maxStepIndex >= 0; maxStepIndex--)
-            if(steps[maxStepIndex].stepMSecs / msecsPerPixel <= tickmarkSpanPixels)
+            if(m_steps[maxStepIndex].stepMSecs / msecsPerPixel <= tickmarkSpanPixels)
                 break;
-        maxStepIndex = qMax(maxStepIndex, 0);
+        maxStepIndex = qMax(maxStepIndex, 1); /* Display at least two tickmark levels. */
 
         int i = 0;
     }
 
     /* Adjust target tickmark heights and opacities. */
     qreal dt = deltaMSecs / 1000.0;
-    m_timeStepData.resize(stepCount);
     for(int i = 0; i < stepCount; i++) {
-        TimeStepData &data = m_timeStepData[i];
-        qreal separationPixels = steps[i].stepMSecs / msecsPerPixel;
+        TimeStepData &data = m_stepData[i];
+        qreal separationPixels = m_steps[i].stepMSecs / msecsPerPixel;
 
         /* Target height & opacity. */
         if(msecsPerPixelChanged) {
@@ -558,7 +467,7 @@ void QnTimeSlider::tick(int deltaMSecs) {
             if(separationPixels < minTextSeparationPixels) {
                 data.targetTextOpacity = 0.0;
             } else {
-                data.targetTextOpacity = data.targetLineOpacity;
+                data.targetTextOpacity = qMax(minTextOpacity, data.targetLineOpacity);
             }
         }
 
@@ -662,8 +571,8 @@ void QnTimeSlider::drawPeriods(QPainter *painter, QnTimePeriodList &periods, qre
 }
 
 void QnTimeSlider::drawTickmarks(QPainter *painter, qreal top, qreal height) {
-    const QVector<TimeStep> &steps = m_options & UseUTC ? absoluteTimeSteps : relativeTimeSteps;
-    int stepCount = steps.size();
+    int stepCount = m_steps.size();
+    QRectF rect = this->rect();
 
 #if 0
     /* Find index of the highlight time step. */
@@ -700,20 +609,18 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, qreal top, qreal height) {
 
     /* Find minimal tickmark step index. */
     int minStepIndex = 0;
-    for(; minStepIndex < m_timeStepData.size(); minStepIndex++)
-        if(!qFuzzyIsNull(m_timeStepData[minStepIndex].currentHeight))
+    for(; minStepIndex < stepCount; minStepIndex++)
+        if(!qFuzzyIsNull(m_stepData[minStepIndex].currentHeight))
             break;
 
     /* Initialize next positions for tickmark steps. */
-    m_nextTickmarkPos.resize(m_timeStepData.size());
     for(int i = minStepIndex; i < stepCount; i++)
-        m_nextTickmarkPos[i] = roundUp(m_windowStart, steps[i]);
+        m_nextTickmarkPos[i] = roundUp(m_windowStart, m_steps[i]);
 
 
     /* Draw tickmarks. */
     qreal bottom = top + height;
     
-    m_tickmarkLines.resize(stepCount);
     for(int i = 0; i < m_tickmarkLines.size(); i++)
         m_tickmarkLines[i].clear();
 
@@ -726,23 +633,41 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, qreal top, qreal height) {
         int index = minStepIndex;
         for(; index < stepCount; index++) {
             if(m_nextTickmarkPos[index] == pos) {
-                m_nextTickmarkPos[index] = add(pos, steps[index]);
+                m_nextTickmarkPos[index] = add(pos, m_steps[index]);
             } else {
                 break;
             }
         }
         index--;
 
-        /* Save line. */
         qreal x = positionFromValue(pos).x();
+
+        /* Draw label if needed. */
+        qreal tickmarkHeight = height * m_stepData[index].currentHeight;
+        if(!qFuzzyIsNull(m_stepData[index].currentTextOpacity)) {
+            int textHeight = qRound(height * tickmarkTextScale);
+            QPixmap pixmap = cachedPixmap(pos, textHeight, m_steps[index]);
+
+            QRectF textRect(x - pixmap.width() / 2.0, top + tickmarkHeight, pixmap.width(), pixmap.height());
+            if(textRect.left() >= rect.left() && textRect.right() <= rect.right()) {
+                QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * m_stepData[index].currentTextOpacity);
+                painter->drawPixmap(textRect, pixmap, pixmap.rect());
+            }
+        }
+
+        /* Calculate line ends. */
         m_tickmarkLines[index] << 
             QPointF(x, top) <<
-            QPointF(x, top + height * m_timeStepData[index].currentHeight);
+            QPointF(x, top + tickmarkHeight);
     }
 
-    for(int i = minStepIndex; i < stepCount; i++) {
-        painter->setPen(QColor(255, 255, 255, 255 * m_timeStepData[i].currentLineOpacity));
-        painter->drawLines(m_tickmarkLines[i]);
+    /* Draw tickmarks. */
+    {
+        QnScopedPainterAntialiasingRollback antialiasingRollback(painter, false);
+        for(int i = minStepIndex; i < stepCount; i++) {
+            painter->setPen(QColor(255, 255, 255, 255 * m_stepData[i].currentLineOpacity));
+            painter->drawLines(m_tickmarkLines[i]);
+        }
     }
 }
 
