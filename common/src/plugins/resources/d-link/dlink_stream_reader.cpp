@@ -429,7 +429,7 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMJPEG()
 }
 
 
-QnMetaDataV1Ptr PlDlinkStreamReader::getMetaData()
+QnMetaDataV1Ptr PlDlinkStreamReader::getCameraMetadata()
 {
 
     QnPlDlinkResourcePtr res = getResource().dynamicCast<QnPlDlinkResource>();

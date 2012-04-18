@@ -44,9 +44,15 @@ m_quality(QnQualityNormal),
 m_fps(-1.0),
 m_framesSinceLastMetaData(0),
 m_livemutex(QMutex::Recursive),
-m_role(QnResource::Role_LiveVideo)
+m_role(QnResource::Role_LiveVideo),
+//m_softwareMotion(true)
+m_softwareMotion(false)
 {
     m_timeSinceLastMetaData.restart();
+
+    char mask[MD_WIDTH * MD_HEIGHT];
+    memset(mask, 0x10, sizeof(mask));
+    m_motionEstimation.setMotionMask(QByteArray(mask, sizeof(mask))); // default mask
 }
 
 QnLiveStreamProvider::~QnLiveStreamProvider()
@@ -175,7 +181,9 @@ bool QnLiveStreamProvider::isMaxFps() const
 bool QnLiveStreamProvider::needMetaData() 
 {
     // I assume this function is called once per video frame 
-    if (getRole() == QnResource::Role_SecondaryLiveVideo)
+    if (!m_softwareMotion && getRole() == QnResource::Role_SecondaryLiveVideo)
+        return false;
+    else if (m_softwareMotion && getRole() == QnResource::Role_LiveVideo)
         return false;
 
     bool result = (m_framesSinceLastMetaData > 10 || m_timeSinceLastMetaData.elapsed() > META_DATA_DURATION_MS) &&
@@ -189,11 +197,13 @@ bool QnLiveStreamProvider::needMetaData()
     return result;
 }
 
-void QnLiveStreamProvider::onGotVideoFrame()
+void QnLiveStreamProvider::onGotVideoFrame(QnCompressedVideoDataPtr videoData)
 {
     m_framesSinceLastMetaData++;
-}
 
+    if (m_role == QnResource::Role_SecondaryLiveVideo && m_softwareMotion)
+        m_motionEstimation.analizeFrame(videoData);
+}
 
 void QnLiveStreamProvider::onPrimaryFpsUpdated(int newFps)
 {
@@ -219,7 +229,25 @@ void QnLiveStreamProvider::onPrimaryFpsUpdated(int newFps)
 
 QnMetaDataV1Ptr QnLiveStreamProvider::getMetaData()
 {
+    if (m_softwareMotion)
+        return m_motionEstimation.getMotion();
+    else
+        return getCameraMetadata();
+}
+
+QnMetaDataV1Ptr QnLiveStreamProvider::getCameraMetadata()
+{
     QnMetaDataV1Ptr result(new QnMetaDataV1(1));
     result->m_duration = 1000*1000*1000; // 1000 sec 
     return result;
+}
+
+bool QnLiveStreamProvider::isSoftwareMotion() const
+{
+    return m_softwareMotion;
+}
+
+void QnLiveStreamProvider::setUseSoftwareMotion(bool value)
+{
+    m_softwareMotion = value;
 }

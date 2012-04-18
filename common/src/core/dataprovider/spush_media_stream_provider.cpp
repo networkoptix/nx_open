@@ -129,7 +129,7 @@ void CLServerPushStreamreader::run()
             m_stat[videoData->channelNumber].onData(data->data.size());
 
             if (QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(this))
-                lp->onGotVideoFrame();
+                lp->onGotVideoFrame(videoData);
 
         }
 
