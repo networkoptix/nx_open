@@ -28,6 +28,7 @@ static const unsigned char BitReverseTable256[] =
     0x07, 0x87, 0x47, 0xC7, 0x27, 0xA7, 0x67, 0xE7, 0x17, 0x97, 0x57, 0xD7, 0x37, 0xB7, 0x77, 0xF7, 
     0x0F, 0x8F, 0x4F, 0xCF, 0x2F, 0xAF, 0x6F, 0xEF, 0x1F, 0x9F, 0x5F, 0xDF, 0x3F, 0xBF, 0x7F, 0xFF
 };
+static const __m128i sse_0x80_const = _mm_setr_epi32(0x80808080, 0x80808080, 0x80808080, 0x80808080);
 
 quint32 reverseBits(quint32 v)
 {
@@ -35,6 +36,18 @@ quint32 reverseBits(quint32 v)
         (BitReverseTable256[(v >> 8) & 0xff] << 8) | 
         (BitReverseTable256[(v >> 16) & 0xff] << 16) |
         (BitReverseTable256[(v >> 24) & 0xff] << 24);
+}
+
+// for tesintg
+void fillFrameRect(CLVideoDecoderOutput& frame, const QRect& rect, quint8 value)
+{
+    for (int y = rect.top(); y <= rect.bottom(); ++y)
+    {
+        for (int x = rect.left(); x <= rect.right(); ++x)
+        {
+            frame.data[0][y*frame.linesize[0] + x] = value;
+        }
+    }
 }
 
 /* 
@@ -271,6 +284,10 @@ void QnMotionEstimation::scaleMask()
         prevILineNum = iLineNum;
         scaledLineNum += lineStep;
     }
+    
+    __m128i* mask = (__m128i*) m_scaledMask;
+     for (int i = 0; i < m_scaledWidth; ++i)
+        mask[i] = _mm_sub_epi8(mask[i], sse_0x80_const);
 }
 
 void QnMotionEstimation::reallocateMask(int width, int height)
@@ -316,6 +333,12 @@ void QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
     if (m_firstFrameTime == AV_NOPTS_VALUE)
         m_firstFrameTime = m_outFrame.pkt_dts;
 
+#if 0
+    // test
+    fillFrameRect(m_outFrame, QRect(0,0,m_outFrame.width, m_outFrame.height), 130);
+    if ((m_totalFrames/8) % 2 == 1)
+        fillFrameRect(m_outFrame, QRect(QPoint(m_outFrame.width/4, m_outFrame.height/20), QPoint(m_outFrame.width/2, m_outFrame.height/2)), 110);
+#endif
 
     if (m_decoder->getWidth() != m_lastImgWidth || m_decoder->getHeight() != m_lastImgHeight)
         reallocateMask(m_decoder->getWidth(), m_decoder->getHeight());
@@ -339,14 +362,16 @@ void QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
         __m128i* mask = (__m128i*) m_scaledMask;
         for (int i = 0; i < m_scaledWidth; ++i)
         {
-            __m128i rez1 = _mm_sub_epi8(_mm_max_epu8(*cur,*prev), _mm_min_epu8(*cur,*prev));
-            __m128i rez2 = _mm_sub_epi8(_mm_max_epu8(cur[1],prev[1]), _mm_min_epu8(cur[1],prev[1]));
+
+            __m128i rez1 = _mm_sub_epi8(_mm_sub_epi8(_mm_max_epu8(*cur,*prev), _mm_min_epu8(*cur,*prev)), sse_0x80_const);
             rez1 = _mm_cmpgt_epi8(rez1, mask[0]);
+
+            __m128i rez2 = _mm_sub_epi8(_mm_sub_epi8(_mm_max_epu8(cur[1],prev[1]), _mm_min_epu8(cur[1],prev[1])), sse_0x80_const);
             rez2 = _mm_cmpgt_epi8(rez2, mask[1]);
-            //m_resultMotion[i] |= htonl( (_mm_movemask_epi8(rez1) << 16) + _mm_movemask_epi8(rez2));
-            quint32 gg = reverseBits( (_mm_movemask_epi8(rez2) << 16) + _mm_movemask_epi8(rez1));
-            if (gg)
-                gg = gg;
+
+            //__m128i rez2 = _mm_sub_epi8(_mm_max_epu8(cur[1],prev[1]), _mm_min_epu8(cur[1],prev[1]));
+            //rez2 = _mm_cmpgt_epi8(rez2, mask[1]);
+
             m_resultMotion[i] |= reverseBits( (_mm_movemask_epi8(rez2) << 16) + _mm_movemask_epi8(rez1));
             cur += 2;
             prev += 2;
@@ -358,8 +383,8 @@ void QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
 QnMetaDataV1Ptr QnMotionEstimation::getMotion()
 {
     QnMetaDataV1Ptr rez(new QnMetaDataV1());
-    rez->timestamp = m_firstFrameTime == AV_NOPTS_VALUE ? qnSyncTime->currentMSecsSinceEpoch()*1000 : m_firstFrameTime;
-    //rez->timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;
+    //rez->timestamp = m_firstFrameTime == AV_NOPTS_VALUE ? qnSyncTime->currentMSecsSinceEpoch()*1000 : m_firstFrameTime;
+    rez->timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;
     rez->m_duration = 1000*1000*1000; // 1000 sec ;
     if (m_decoder == 0)
         return rez;

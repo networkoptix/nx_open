@@ -45,8 +45,8 @@ m_fps(-1.0),
 m_framesSinceLastMetaData(0),
 m_livemutex(QMutex::Recursive),
 m_role(QnResource::Role_LiveVideo),
-//m_softwareMotion(true)
-m_softwareMotion(false)
+m_softwareMotion(true)
+//m_softwareMotion(false)
 {
     m_timeSinceLastMetaData.restart();
 
