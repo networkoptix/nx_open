@@ -35,6 +35,8 @@ QnWorkbenchContext::~QnWorkbenchContext() {
     bool signalsBlocked = blockSignals(false);
     emit aboutToBeDestroyed();
     blockSignals(signalsBlocked);
+
+    m_resourcePool = NULL;
 }
 
 QAction *QnWorkbenchContext::action(const Qn::ActionId id) const {
@@ -58,7 +60,6 @@ QnWorkbenchContext *QnWorkbenchContext::instance(QnWorkbench *workbench) {
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnWorkbenchContext::at_resourcePool_aboutToBeDestroyed() {
-    m_resourcePool = NULL;
     delete this;
 }
 

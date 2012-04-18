@@ -83,15 +83,15 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(QnResourcePtr re
 
     QnVideoServerResourcePtr currentVideoServer = qSharedPointerDynamicCast<QnVideoServerResource> (qnResPool->getResourceById(resource->getParentId()));
     if (!currentVideoServer) 
-        return AV_NOPTS_VALUE;
+        return 0;
 
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(resource);
     if (!netRes)
-        return AV_NOPTS_VALUE;
+        return 0;
     QString mac = netRes->getMAC().toString();
     QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(mac);
     if (!history)
-        return AV_NOPTS_VALUE;
+        return 0;
     QnCameraTimePeriodList videoServerList = history->getTimePeriods();
     for (int i = 0; i < videoServerList.size(); ++i)
     {
