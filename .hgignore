@@ -23,14 +23,18 @@ syntax: glob
 Debug
 Release
 
+common/bin
+client/bin
+mediaserver/bin
+
 appserver/db/ecs.db
 appserver/setup/db/ecs.db
 appserver/proto/xml/gen
 appserver/proto/pb/gen
 appserver/test/executions
 appserver/static
+appserver/setup/static
 
-bin
 build
 client/src/version.h
 common/src/common.pri
@@ -83,3 +87,6 @@ My Amplifier XE Results*
 traytool/src/traytool.pro
 traytool/src/version.h
 traytool/src/traytool.vcproj
+
+debsetup/mediaserver/package
+debsetup/appserver/package
