@@ -4,10 +4,11 @@
 #include "tool_tip_slider.h"
 #include <recording/time_period.h>
 #include <ui/processors/kinetic_process_handler.h>
+#include <ui/animation/animation_timer_listener.h>
 
 class QnNoptixStyle;
 
-class QnTimeSlider: public QnToolTipSlider, protected KineticProcessHandler {
+class QnTimeSlider: public QnToolTipSlider, protected KineticProcessHandler, protected AnimationTimerListener {
     Q_OBJECT;
     Q_PROPERTY(qint64 windowStart READ windowStart WRITE setWindowStart);
     Q_PROPERTY(qint64 windowEnd READ windowEnd WRITE setWindowEnd);
@@ -82,6 +83,8 @@ protected:
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
     virtual void wheelEvent(QGraphicsSceneWheelEvent *event) override;
 
+    virtual void tick(int deltaMSecs) override;
+
     virtual void kineticMove(const QVariant &degrees) override;
 
 private:
@@ -101,17 +104,32 @@ private:
         QnTimePeriodList forType[Qn::TimePeriodTypeCount];
     };
 
+    struct TimeStepData {
+        TimeStepData(): currentHeight(0.0), targetHeight(0.0), lastTargetHeight(0.0), currentLineOpacity(0.0), targetLineOpacity(0.0), currentTextOpacity(0.0), targetTextOpacity(0.0) {}
+
+        qreal currentHeight;
+        qreal targetHeight;
+        qreal lastTargetHeight;
+        qreal currentLineOpacity;
+        qreal targetLineOpacity;
+        qreal currentTextOpacity;
+        qreal targetTextOpacity;
+    };
+
     qint64 m_windowStart, m_windowEnd;
     qint64 m_oldMinimum, m_oldMaximum;
     Options m_options;
-    
-    qint64 m_utcOffsetMSec;
     QString m_toolTipFormat;
-
 
     qint64 m_zoomAnchor;
 
     QVector<TypedPeriods> m_timePeriods;
+    
+    QVector<TimeStepData> m_timeStepData;
+    qreal m_lastMSecsPerPixel;
+    int m_lastMaxStepIndex;
+    QVector<qint64> m_nextTickmarkPos;
+    QVector<QVector<QPointF> > m_tickmarkLines;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnTimeSlider::Options);

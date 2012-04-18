@@ -95,11 +95,12 @@ namespace {
             QVector<TimeStep> result;
             result <<
                 TimeStep(Milliseconds,  1ll,                                100,    1000,   tr("ms"),       tr("100ms"),        isRelative) <<
+                TimeStep(Milliseconds,  1ll,                                500,    1000,   tr("ms"),       tr("500ms"),        isRelative) <<
                 TimeStep(Milliseconds,  1000ll,                             1,      60,     tr("s"),        tr("59s"),          isRelative) <<
                 TimeStep(Milliseconds,  1000ll,                             5,      60,     tr("s"),        tr("59s"),          isRelative) <<
                 TimeStep(Milliseconds,  1000ll,                             10,     60,     tr("s"),        tr("59s"),          isRelative) <<
                 TimeStep(Milliseconds,  1000ll,                             30,     60,     tr("s"),        tr("59s"),          isRelative) <<
-                TimeStep(Milliseconds,  1000ll,                             1,      60,     tr("m"),        tr("59m"),          isRelative) <<
+                TimeStep(Milliseconds,  1000ll * 60,                        1,      60,     tr("m"),        tr("59m"),          isRelative) <<
                 TimeStep(Milliseconds,  1000ll * 60,                        5,      60,     tr("m"),        tr("59m"),          isRelative) <<
                 TimeStep(Milliseconds,  1000ll * 60,                        10,     60,     tr("m"),        tr("59m"),          isRelative) <<
                 TimeStep(Milliseconds,  1000ll * 60,                        30,     60,     tr("m"),        tr("59m"),          isRelative) <<
@@ -220,7 +221,41 @@ namespace {
         }
     }
 
-    const qreal minTickmarkSpanPixels = 5;
+    inline qreal adjust(qreal value, qreal target, qreal delta) {
+        if(value < target) {
+            if(target - value < delta) {
+                return target;
+            } else {
+                return value + delta;
+            }
+        } else {
+            if(value - target < delta) {
+                return target;
+            } else {
+                return value - delta;
+            }
+        }
+    }
+
+    const qreal minTickmarkSpanPixels = 1.0;
+    const qreal maxTickmarkSpanFraction = 0.25;
+    const qreal minTickmarkSeparationPixels = 5.0;
+    const qreal criticalTickmarkSeparationPixels = 2.0;
+    const qreal minTextSeparationPixels = 30.0;
+    const qreal criticalTextSeparationPixels = 15.0;
+    
+    const qreal tickmarkHeightRelativeAnimationSpeed = 1.0;
+    const qreal tickmarkHeightAbsoluteAnimationSpeed = 0.1;
+    const qreal tickmarkHeightStartingAnimationSpeed = 2.0;
+    
+    const qreal tickmarkOpacityRelativeAnimationSpeed = 1.0;
+    const qreal tickmarkOpacityAbsoluteAnimationSpeed = 0.1;
+    const qreal tickmarkOpacityStartingAnimationSpeed = 2.0;
+    
+    const qreal minTickmarkOpacity = 0.15;
+    
+    const qreal tickmarkStepScale = 2.0 / 3.0;
+
     const qreal minHighlightSpanFraction = 0.5;
 
     /** Lower zoom limit. */
@@ -239,7 +274,8 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     m_options(0),
     m_oldMinimum(0),
     m_oldMaximum(0),
-    m_toolTipFormat()
+    m_lastMSecsPerPixel(1.0),
+    m_lastMaxStepIndex(0)
 {
     /* Set default property values. */
     setProperty(Qn::SliderLength, 0);
@@ -254,7 +290,6 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     QDateTime currentDateTime = QDateTime::currentDateTime();
     QDateTime utcDateTime = currentDateTime.toUTC();
     currentDateTime.setTimeSpec(Qt::UTC);
-    m_utcOffsetMSec = utcDateTime.msecsTo(currentDateTime);
 
     /* Prepare kinetic zoom processors. */
     KineticCuttingProcessor *processor = new KineticCuttingProcessor(QMetaType::QReal, this);
@@ -265,8 +300,12 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     processor->setSpeedCuttingThreshold(degreesFor2x / 3);
     processor->setFlags(KineticProcessor::IGNORE_DELTA_TIME);
 
+    /* Prepare animation timer listener. */
+    startListening();
+
     /* Run handlers. */
     sliderChange(SliderRangeChange);
+    itemChange(ItemSceneHasChanged, QVariant::fromValue<QGraphicsScene *>(scene()));
 
 
 
@@ -469,8 +508,90 @@ bool QnTimeSlider::scaleWindow(qreal factor, qint64 anchor) {
 
 
 // -------------------------------------------------------------------------- //
-// Painting
+// Animation & Painting
 // -------------------------------------------------------------------------- //
+void QnTimeSlider::tick(int deltaMSecs) {
+    const QVector<TimeStep> &steps = m_options & UseUTC ? absoluteTimeSteps : relativeTimeSteps;
+    int stepCount = steps.size();
+
+    qreal msecsPerPixel = (m_windowEnd - m_windowStart) / size().width();
+    if(qFuzzyIsNull(msecsPerPixel))
+        msecsPerPixel = 1.0; /* Technically, we should never get here, but we want to feel safe. */
+    bool msecsPerPixelChanged = !qFuzzyCompare(msecsPerPixel, m_lastMSecsPerPixel);
+
+    /* Find maximal index of the time step to use. */
+    int maxStepIndex = m_lastMaxStepIndex;
+    if(msecsPerPixelChanged) {
+        maxStepIndex = stepCount - 1;
+        qreal tickmarkSpanPixels = size().width() * maxTickmarkSpanFraction;
+        for(; maxStepIndex >= 0; maxStepIndex--)
+            if(steps[maxStepIndex].stepMSecs / msecsPerPixel <= tickmarkSpanPixels)
+                break;
+        maxStepIndex = qMax(maxStepIndex, 0);
+
+        int i = 0;
+    }
+
+    /* Adjust target tickmark heights and opacities. */
+    qreal dt = deltaMSecs / 1000.0;
+    m_timeStepData.resize(stepCount);
+    for(int i = 0; i < stepCount; i++) {
+        TimeStepData &data = m_timeStepData[i];
+        qreal separationPixels = steps[i].stepMSecs / msecsPerPixel;
+
+        /* Target height & opacity. */
+        if(msecsPerPixelChanged) {
+            qreal targetHeight;
+            if (separationPixels < minTickmarkSeparationPixels) {
+                targetHeight = 0.0;
+            } else if(i >= maxStepIndex) {
+                targetHeight = 1.0;
+            } else  {
+                targetHeight = pow(tickmarkStepScale, maxStepIndex - i);
+            }
+            if(!qFuzzyCompare(data.targetHeight, targetHeight)) {
+                data.lastTargetHeight = data.targetHeight;
+                data.targetHeight = targetHeight;
+                data.targetLineOpacity = minTickmarkOpacity + (1.0 - minTickmarkOpacity) * data.targetHeight;
+            }
+
+            if(separationPixels < minTextSeparationPixels) {
+                data.targetTextOpacity = 0.0;
+            } else {
+                data.targetTextOpacity = data.targetLineOpacity;
+            }
+        }
+
+        /* Current height & opacity. */
+        qreal heightSpeed;
+        qreal opacitySpeed;
+        if(qFuzzyIsNull(data.targetHeight) || qFuzzyIsNull(data.lastTargetHeight)) {
+            heightSpeed = tickmarkHeightStartingAnimationSpeed;
+            opacitySpeed = tickmarkHeightStartingAnimationSpeed;
+        } else {
+            heightSpeed  = qMax(tickmarkHeightAbsoluteAnimationSpeed,  data.currentHeight      * tickmarkHeightRelativeAnimationSpeed);
+            opacitySpeed = qMax(tickmarkOpacityAbsoluteAnimationSpeed, data.currentLineOpacity * tickmarkOpacityRelativeAnimationSpeed);
+        }
+        
+        data.currentHeight      = adjust(data.currentHeight,        data.targetHeight,      heightSpeed * dt);
+        data.currentLineOpacity = adjust(data.currentLineOpacity,   data.targetLineOpacity, opacitySpeed * dt);
+        data.currentTextOpacity = adjust(data.currentTextOpacity,   data.targetTextOpacity, opacitySpeed * dt);
+
+        /* Adjust for max height & opacity. */
+        if(msecsPerPixelChanged) {
+            qreal maxHeight = qMax(0.0, (separationPixels - criticalTickmarkSeparationPixels) / criticalTickmarkSeparationPixels);
+            qreal maxLineOpacity = minTickmarkOpacity + (1.0 - minTickmarkOpacity) * maxHeight;
+            qreal maxTextOpacity = qMin(maxLineOpacity, qMax(0.0, (separationPixels - criticalTextSeparationPixels) / criticalTextSeparationPixels));
+            data.currentHeight      = qMin(data.currentHeight,      maxHeight);
+            data.currentLineOpacity = qMin(data.currentLineOpacity, maxLineOpacity);
+            data.currentTextOpacity = qMin(data.currentTextOpacity, maxTextOpacity);
+        }
+    }
+
+    m_lastMSecsPerPixel = msecsPerPixel;
+    m_lastMaxStepIndex = maxStepIndex;
+}
+
 void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
     /* Initialize converter. It will be used a lot. */
     QRectF rect = this->rect();
@@ -541,22 +662,10 @@ void QnTimeSlider::drawPeriods(QPainter *painter, QnTimePeriodList &periods, qre
 }
 
 void QnTimeSlider::drawTickmarks(QPainter *painter, qreal top, qreal height) {
-    qDebug() << m_windowEnd << m_windowStart;
-
-    qreal msecsPerPixel = (m_windowEnd - m_windowStart) / size().width();
-    if(qFuzzyIsNull(msecsPerPixel))
-        msecsPerPixel = 1.0; /* Technically, we should never get here, but we want to feel safe. */
-
     const QVector<TimeStep> &steps = m_options & UseUTC ? absoluteTimeSteps : relativeTimeSteps;
+    int stepCount = steps.size();
 
-    /* Find minimal index of the time step to use. */
-    int minTickmarkIndex = 0;
-    for(; minTickmarkIndex < steps.size(); minTickmarkIndex++)
-        if(steps[minTickmarkIndex].stepMSecs / msecsPerPixel >= minTickmarkSpanPixels)
-            break;
-    minTickmarkIndex = qMin(minTickmarkIndex, steps.size() - 1);
-    const TimeStep &minTickmarkStep = steps[minTickmarkIndex];
-
+#if 0
     /* Find index of the highlight time step. */
     int highlightIndex = minTickmarkIndex;
     qreal highlightSpanPixels = size().width() * minHighlightSpanFraction;
@@ -587,23 +696,53 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, qreal top, qreal height) {
             x0 = x1;
         }
     }
+#endif
+
+    /* Find minimal tickmark step index. */
+    int minStepIndex = 0;
+    for(; minStepIndex < m_timeStepData.size(); minStepIndex++)
+        if(!qFuzzyIsNull(m_timeStepData[minStepIndex].currentHeight))
+            break;
+
+    /* Initialize next positions for tickmark steps. */
+    m_nextTickmarkPos.resize(m_timeStepData.size());
+    for(int i = minStepIndex; i < stepCount; i++)
+        m_nextTickmarkPos[i] = roundUp(m_windowStart, steps[i]);
+
 
     /* Draw tickmarks. */
-    {
-        painter->setPen(QColor(255, 255, 255));
+    qreal bottom = top + height;
+    
+    m_tickmarkLines.resize(stepCount);
+    for(int i = 0; i < m_tickmarkLines.size(); i++)
+        m_tickmarkLines[i].clear();
 
-        qreal bottom = top + height;
+    while(true) {
+        qint64 pos = m_nextTickmarkPos[minStepIndex];
+        if(pos > m_windowEnd)
+            break;
 
-        qint64 pos = roundUp(m_windowStart, minTickmarkStep);
-
-        while(true) {
-            qreal x = positionFromValue(pos).x();
-            painter->drawLine(QPointF(x, top), QPointF(x, bottom));
-            
-            pos = add(pos, minTickmarkStep);
-            if(pos >= m_windowEnd)
+        /* Find index of the step to use. */
+        int index = minStepIndex;
+        for(; index < stepCount; index++) {
+            if(m_nextTickmarkPos[index] == pos) {
+                m_nextTickmarkPos[index] = add(pos, steps[index]);
+            } else {
                 break;
+            }
         }
+        index--;
+
+        /* Save line. */
+        qreal x = positionFromValue(pos).x();
+        m_tickmarkLines[index] << 
+            QPointF(x, top) <<
+            QPointF(x, top + height * m_timeStepData[index].currentHeight);
+    }
+
+    for(int i = minStepIndex; i < stepCount; i++) {
+        painter->setPen(QColor(255, 255, 255, 255 * m_timeStepData[i].currentLineOpacity));
+        painter->drawLines(m_tickmarkLines[i]);
     }
 }
 
@@ -635,8 +774,12 @@ void QnTimeSlider::sliderChange(SliderChange change) {
 }
 
 QVariant QnTimeSlider::itemChange(GraphicsItemChange change, const QVariant &value) {
-    if(change == ItemSceneHasChanged)
-        kineticProcessor()->setTimer(InstrumentManager::animationTimerOf(scene()));
+    if(change == ItemSceneHasChanged) {
+        AnimationTimer *timer = InstrumentManager::animationTimerOf(scene());
+
+        setTimer(timer);
+        kineticProcessor()->setTimer(timer);
+    }
     
     return base_type::itemChange(change, value);
 }
