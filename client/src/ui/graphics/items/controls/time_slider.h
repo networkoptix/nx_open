@@ -85,7 +85,7 @@ protected:
     virtual void kineticMove(const QVariant &degrees) override;
 
 private:
-    void scaleWindow(qreal factor, qint64 anchor);
+    bool scaleWindow(qreal factor, qint64 anchor);
 
     void drawPeriodsBar(QPainter *painter, QnTimePeriodList &recorded, QnTimePeriodList &motion, qreal top, qreal height);
     void drawPeriods(QPainter *painter, QnTimePeriodList &periods, qreal top, qreal height, const QColor &preColor, const QColor &pastColor);

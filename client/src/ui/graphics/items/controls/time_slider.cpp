@@ -20,8 +20,8 @@
 #include "tool_tip_item.h"
 
 namespace {
-    class TickmarkType {
-        Q_DECLARE_TR_FUNCTIONS(TickmarkType);
+    class TimeStep {
+        Q_DECLARE_TR_FUNCTIONS(TimeStep);
     public:
         enum Type {
             Milliseconds,
@@ -30,9 +30,9 @@ namespace {
             Years
         };
 
-        TickmarkType(): type(Milliseconds), unitMSecs(0), stepMSecs(0), stepUnits(0), wrapUnits(0) {}
+        TimeStep(): type(Milliseconds), unitMSecs(0), stepMSecs(0), stepUnits(0), wrapUnits(0) {}
 
-        TickmarkType(Type type, qint64 unitMSecs, int stepUnits, int wrapUnits, const QString &format, const QString &longestString):
+        TimeStep(Type type, qint64 unitMSecs, int stepUnits, int wrapUnits, const QString &format, const QString &longestString, bool isRelative = true):
             type(type),
             unitMSecs(unitMSecs),
             stepMSecs(unitMSecs * stepUnits),
@@ -42,155 +42,189 @@ namespace {
             longestString(longestString)
         {}
 
-        /** Type of the tickmark. */
+        /** Type of the time step. */
         Type type;
 
-        /** Size of the unit in which tickmark value is measured, in milliseconds. */
+        /** Size of the unit in which step value is measured, in milliseconds. */
         qint64 unitMSecs;
 
-        /** Tickmark step, in milliseconds */
+        /** Time step, in milliseconds */
         qint64 stepMSecs;
 
-        /** Tickmark step, in units. */
+        /** Time step, in units. */
         int stepUnits;
 
         /** Number of units for a wrap-around. */
         int wrapUnits;
         
-        /** Format string for the tickmark value. */
+        /** Format string for the step value. */
         QString format;
 
-        /** Longest possible string representation of the tickmark value. */
+        /** Longest possible string representation of the step value. */
         QString longestString;
 
-        static const QVector<TickmarkType> utc;
-        static const QVector<TickmarkType> nonUtc;
+        /** Whether this time step is to be used for relative times (e.g. time intervals), 
+         * or for absolute times (i.e. obtained via <tt>QDateTime::toMSecsSinceEpoch</tt>). */
+        bool isRelative;
+
+    public:
+        static QVector<TimeStep> createAbsoluteSteps() {
+            QVector<TimeStep> result;
+            result <<
+                createStandardSteps(false) <<
+                TimeStep(Days,          1000ll * 60 * 60 * 24,              1,      31,     tr("dd MMM"),   tr("29 Mar"),       false) <<
+                TimeStep(Months,        1000ll * 60 * 60 * 24 * 31,         1,      12,     tr("MMMM"),     tr("September"),    false) <<
+                TimeStep(Years,         1000ll * 60 * 60 * 24 * 365,        1,      50000,  tr("yyyy"),     tr("2000"),         false);
+            return result;
+        }
+
+        static QVector<TimeStep> createRelativeSteps() {
+            QVector<TimeStep> result;
+            result <<
+                createStandardSteps(true) <<
+                TimeStep(Milliseconds,  1000ll * 60 * 60 * 24,              1,      31,     tr("d"),        tr("29d"),          false) <<
+                TimeStep(Milliseconds,  1000ll * 60 * 60 * 24 * 30,         1,      12,     tr("M"),        tr("11M"),          false) <<
+                TimeStep(Milliseconds,  1000ll * 60 * 60 * 24 * 30 * 12,    1,      50000,  tr("y"),        tr("2000y"),        false);
+            return result;
+        }
+
+
 
     private:
-        static QVector<TickmarkType> createStandardTypes() {
-            QVector<TickmarkType> result;
+        static QVector<TimeStep> createStandardSteps(bool isRelative) {
+            QVector<TimeStep> result;
             result <<
-                TickmarkType(Milliseconds,  1ll,                                100,    1000,   tr("ms"),       tr("100ms")) <<
-                TickmarkType(Milliseconds,  1000ll,                             1,      60,     tr("s"),        tr("59s")) <<
-                TickmarkType(Milliseconds,  1000ll,                             5,      60,     tr("s"),        tr("59s")) <<
-                TickmarkType(Milliseconds,  1000ll,                             10,     60,     tr("s"),        tr("59s")) <<
-                TickmarkType(Milliseconds,  1000ll,                             30,     60,     tr("s"),        tr("59s")) <<
-                TickmarkType(Milliseconds,  1000ll,                             1,      60,     tr("m"),        tr("59m")) <<
-                TickmarkType(Milliseconds,  1000ll * 60,                        5,      60,     tr("m"),        tr("59m")) <<
-                TickmarkType(Milliseconds,  1000ll * 60,                        10,     60,     tr("m"),        tr("59m")) <<
-                TickmarkType(Milliseconds,  1000ll * 60,                        30,     60,     tr("m"),        tr("59m")) <<
-                TickmarkType(Milliseconds,  1000ll * 60 * 60,                   1,      24,     tr("h"),        tr("23h")) <<
-                TickmarkType(Milliseconds,  1000ll * 60 * 60,                   3,      24,     tr("h"),        tr("23h")) <<
-                TickmarkType(Milliseconds,  1000ll * 60 * 60,                   12,     24,     tr("h"),        tr("23h"));
-            return result;
-        }
-
-        static QVector<TickmarkType> createUtcTypes() {
-            QVector<TickmarkType> result;
-            result <<
-                createStandardTypes() <<
-                TickmarkType(Days,          1000ll * 60 * 60 * 24,              1,      31,     tr("dd MMM"),   tr("29 Mar")) <<
-                TickmarkType(Months,        1000ll * 60 * 60 * 24 * 31,         1,      12,     tr("MMMM"),     tr("September")) <<
-                TickmarkType(Years,         1000ll * 60 * 60 * 24 * 365,        1,      50000,  tr("yyyy"),     tr("2000"));
-            return result;
-        }
-
-        static QVector<TickmarkType> createNonUtcTypes() {
-            QVector<TickmarkType> result;
-            result <<
-                createStandardTypes() <<
-                TickmarkType(Milliseconds,  1000ll * 60 * 60 * 24,              1,      31,     tr("d"),        tr("29d")) <<
-                TickmarkType(Milliseconds,  1000ll * 60 * 60 * 24 * 30,         1,      12,     tr("M"),        tr("11M")) <<
-                TickmarkType(Milliseconds,  1000ll * 60 * 60 * 24 * 30 * 12,    1,      50000,  tr("y"),        tr("2000y"));
+                TimeStep(Milliseconds,  1ll,                                100,    1000,   tr("ms"),       tr("100ms"),        isRelative) <<
+                TimeStep(Milliseconds,  1000ll,                             1,      60,     tr("s"),        tr("59s"),          isRelative) <<
+                TimeStep(Milliseconds,  1000ll,                             5,      60,     tr("s"),        tr("59s"),          isRelative) <<
+                TimeStep(Milliseconds,  1000ll,                             10,     60,     tr("s"),        tr("59s"),          isRelative) <<
+                TimeStep(Milliseconds,  1000ll,                             30,     60,     tr("s"),        tr("59s"),          isRelative) <<
+                TimeStep(Milliseconds,  1000ll,                             1,      60,     tr("m"),        tr("59m"),          isRelative) <<
+                TimeStep(Milliseconds,  1000ll * 60,                        5,      60,     tr("m"),        tr("59m"),          isRelative) <<
+                TimeStep(Milliseconds,  1000ll * 60,                        10,     60,     tr("m"),        tr("59m"),          isRelative) <<
+                TimeStep(Milliseconds,  1000ll * 60,                        30,     60,     tr("m"),        tr("59m"),          isRelative) <<
+                TimeStep(Milliseconds,  1000ll * 60 * 60,                   1,      24,     tr("h"),        tr("23h"),          isRelative) <<
+                TimeStep(Milliseconds,  1000ll * 60 * 60,                   3,      24,     tr("h"),        tr("23h"),          isRelative) <<
+                TimeStep(Milliseconds,  1000ll * 60 * 60,                   12,     24,     tr("h"),        tr("23h"),          isRelative);
             return result;
         }
 
     };
 
-    const QVector<TickmarkType> TickmarkType::utc = TickmarkType::createUtcTypes();
-    const QVector<TickmarkType> TickmarkType::nonUtc = TickmarkType::createNonUtcTypes();
+    const QVector<TimeStep> absoluteTimeSteps = TimeStep::createAbsoluteSteps();
+    const QVector<TimeStep> relativeTimeSteps = TimeStep::createRelativeSteps();
 
     qint64 timeToMSecs(const QTime &time) {
         return QTime(0, 0, 0, 0).msecsTo(time);
     }
 
     QTime msecsToTime(qint64 msecs) {
-        int msecsPart = msecs % 1000;
-        msecs /= 1000;
-        int secs = msecs % 60;
-        msecs /= 60;
-        int mins = msecs % 60;
-        msecs /= 60;
-        int hours = msecs % 24;
-
-        return QTime(hours, mins, secs, msecsPart);
+        return QTime(0, 0, 0, 0).addMSecs(msecs); 
     }
 
-    qint64 roundUp(qint64 value, qint64 step) {
+    template<class T>
+    T roundUp(T value, T step) {
         value = value + step - 1;
         return value - value % step;
     }
 
-    qint64 roundUp(qint64 msecs, const TickmarkType &tickmarkType, bool useUtc) {
-        if(!useUtc) 
-            return roundUp(msecs, tickmarkType.stepMSecs);
+    qint64 roundUp(qint64 msecs, const TimeStep &step) {
+        if(step.isRelative) 
+            return roundUp(msecs, step.stepMSecs);
         
         QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(msecs);
-        switch(tickmarkType.type) {
-        case TickmarkType::Milliseconds:
-            dateTime.setTime(msecsToTime(roundUp(timeToMSecs(dateTime.time()), tickmarkType.stepMSecs)));
+        switch(step.type) {
+        case TimeStep::Milliseconds:
+            dateTime.setTime(msecsToTime(roundUp(timeToMSecs(dateTime.time()), step.stepMSecs)));
             break;
-        case TickmarkType::Days:
-            if(dateTime.time() != QTime(0, 0, 0, 0)) {
+        case TimeStep::Days:
+            if(dateTime.time() != QTime(0, 0, 0, 0) || (dateTime.date().day() != 1 && dateTime.date().day() % step.stepUnits != 0)) {
                 dateTime.setTime(QTime(0, 0, 0, 0));
-                dateTime.addDays(1);
+
+                int oldDay = dateTime.date().day();
+                int newDay = qMin(roundUp(oldDay + 1, step.stepUnits), dateTime.date().daysInMonth() + 1);
+                dateTime = dateTime.addDays(newDay - oldDay);
             }
             break;
-        case TickmarkType::Months:
-            if(dateTime.time() != QTime(0, 0, 0, 0) || dateTime.date().day() != 1) {
+        case TimeStep::Months:
+            if(dateTime.time() != QTime(0, 0, 0, 0) || dateTime.date().day() != 1 || ((dateTime.date().month() - 1) % step.stepUnits != 0)) {
                 dateTime.setTime(QTime(0, 0, 0, 0));
                 dateTime.setDate(QDate(dateTime.date().year(), dateTime.date().month(), 1));
-                dateTime.addMonths(1);
+                
+                int oldMonth = dateTime.date().month();
+                /* We should have added 1 to month() here we don't want to end
+                 * up with the same month number, but months are numbered from 1,
+                 * so the addition is not needed. */
+                int newMonth = roundUp(oldMonth, step.stepUnits) + 1;
+                dateTime = dateTime.addMonths(newMonth - oldMonth);
             }
             break;
-        case TickmarkType::Years:
-            if(dateTime.time() != QTime(0, 0, 0, 0) || dateTime.date().day() != 1 || dateTime.date().month() != 1) {
+        case TimeStep::Years:
+            if(dateTime.time() != QTime(0, 0, 0, 0) || dateTime.date().day() != 1 || dateTime.date().month() != 1 || dateTime.date().year() % step.stepUnits != 0) {
                 dateTime.setTime(QTime(0, 0, 0, 0));
                 dateTime.setDate(QDate(dateTime.date().year(), 1, 1));
-                dateTime.addYears(1);
+                
+                int oldYear = dateTime.date().year();
+                int newYear = roundUp(oldYear + 1, step.stepUnits);
+                dateTime = dateTime.addYears(newYear - oldYear);
             }
             break;
         default:
-            qnWarning("Invalid tickmark type '%1'.", static_cast<int>(tickmarkType.type));
+            qnWarning("Invalid time step type '%1'.", static_cast<int>(step.type));
             break;
         }
 
         return dateTime.toMSecsSinceEpoch();
     }
 
-    qint64 absoluteNumber(qint64 msecs, const TickmarkType &tickmarkType, bool useUtc) {
-        if(!useUtc)
-            return msecs / tickmarkType.stepMSecs;
+    qint64 add(qint64 msecs, const TimeStep &step) {
+        if(step.isRelative)
+            return msecs + step.stepMSecs;
 
-        QDateTime baseDateTime = QDateTime::fromMSecsSinceEpoch(0);
-        QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(msecs);
-        switch(tickmarkType.type) {
-        case TickmarkType::Milliseconds:
-            return baseDateTime.msecsTo(dateTime) / tickmarkType.stepMSecs;
-        case TickmarkType::Days:
-            return baseDateTime.daysTo(dateTime);
-        case TickmarkType::Months:
-            return baseDateTime.date().year() * 12 + baseDateTime.date().month();
-        case TickmarkType::Years:
-            return baseDateTime.date().year();
+        switch(step.type) {
+        case TimeStep::Milliseconds:
+        case TimeStep::Days:
+            return msecs + step.stepMSecs;
+        case TimeStep::Months:
+            return QDateTime::fromMSecsSinceEpoch(msecs).addMonths(step.stepUnits).toMSecsSinceEpoch();
+        case TimeStep::Years:
+            return QDateTime::fromMSecsSinceEpoch(msecs).addYears(step.stepUnits).toMSecsSinceEpoch();
         default:
-            qnWarning("Invalid tickmark type '%1'.", static_cast<int>(tickmarkType.type));
+            qnWarning("Invalid time step type '%1'.", static_cast<int>(step.type));
+            return msecs;
+        }
+    }
+
+    const QDateTime baseDateTime = QDateTime::fromMSecsSinceEpoch(0);
+
+    qint64 absoluteNumber(qint64 msecs, const TimeStep &step) {
+        if(!step.isRelative)
+            return msecs / step.stepMSecs;
+
+        QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(msecs);
+        switch(step.type) {
+        case TimeStep::Milliseconds:
+        case TimeStep::Days:
+            return baseDateTime.msecsTo(dateTime) / step.stepMSecs;
+        case TimeStep::Months: {
+            int year, month;
+            dateTime.date().getDate(&year, &month, NULL);
+
+            return (year * 12 + month) / step.stepUnits;
+        }
+        case TimeStep::Years:
+            return dateTime.date().year() / step.stepUnits;
+        default:
+            qnWarning("Invalid time step type '%1'.", static_cast<int>(step.type));
             return 0;
         }
     }
 
-    const int minTickmarkSpanPixels = 5;
+    const qreal minTickmarkSpanPixels = 5;
     const qreal minHighlightSpanFraction = 0.5;
+
+    /** Lower zoom limit. */
+    const qreal minMSecsPerPixel = 2.0;
 
     const qreal degreesFor2x = 180.0;
 
@@ -405,14 +439,33 @@ void QnTimeSlider::updateToolTipText() {
     setToolTip(toolTip);
 }
 
-void QnTimeSlider::scaleWindow(qreal factor, qint64 anchor) {
+bool QnTimeSlider::scaleWindow(qreal factor, qint64 anchor) {
+    qreal msecsPerPixel = (m_windowEnd - m_windowStart) / size().width();
+    qreal targetMSecsPerPixel = msecsPerPixel * factor;
+    if(targetMSecsPerPixel < minMSecsPerPixel) {
+        factor = minMSecsPerPixel / msecsPerPixel;
+        if(qFuzzyCompare(factor, 1.0))
+            return false; /* We've reached the min scale. */
+    }
+
     qint64 start = anchor + (m_windowStart - anchor) * factor;
     qint64 end = anchor + (m_windowEnd - anchor) * factor;
 
-    setWindowStart(start);
-    setWindowEnd(end);
-}
+    if(end > maximum()) {
+        start = maximum() - (end - start);
+        end = maximum();
+    }
+    if(start < minimum()) {
+        end = minimum() + (end - start);
+        start = minimum();
+    }
 
+    setWindow(start, end);
+
+    /* If after two adjustments desired window end still lies outside the 
+     * slider range, then we've reached the max scale. */
+    return end <= maximum();
+}
 
 
 // -------------------------------------------------------------------------- //
@@ -490,39 +543,37 @@ void QnTimeSlider::drawPeriods(QPainter *painter, QnTimePeriodList &periods, qre
 void QnTimeSlider::drawTickmarks(QPainter *painter, qreal top, qreal height) {
     qDebug() << m_windowEnd << m_windowStart;
 
-    qint64 msecsPerPixel = (m_windowEnd - m_windowStart) / size().width();
-    if(msecsPerPixel == 0)
-        msecsPerPixel = 1; /* Technically, we should never get here, but we want to feel safe. */
+    qreal msecsPerPixel = (m_windowEnd - m_windowStart) / size().width();
+    if(qFuzzyIsNull(msecsPerPixel))
+        msecsPerPixel = 1.0; /* Technically, we should never get here, but we want to feel safe. */
 
-    bool useUtc = m_options & UseUTC;
+    const QVector<TimeStep> &steps = m_options & UseUTC ? absoluteTimeSteps : relativeTimeSteps;
 
-    const QVector<TickmarkType> &types = useUtc ? TickmarkType::utc : TickmarkType::nonUtc;
-
-    /* Find minimal index of the interval type to use. */
+    /* Find minimal index of the time step to use. */
     int minTickmarkIndex = 0;
-    for(; minTickmarkIndex < types.size(); minTickmarkIndex++)
-        if(types[minTickmarkIndex].stepMSecs / msecsPerPixel >= minTickmarkSpanPixels)
+    for(; minTickmarkIndex < steps.size(); minTickmarkIndex++)
+        if(steps[minTickmarkIndex].stepMSecs / msecsPerPixel >= minTickmarkSpanPixels)
             break;
-    minTickmarkIndex = qMin(minTickmarkIndex, types.size() - 1);
-    const TickmarkType &minTickmarkType = types[minTickmarkIndex];
+    minTickmarkIndex = qMin(minTickmarkIndex, steps.size() - 1);
+    const TimeStep &minTickmarkStep = steps[minTickmarkIndex];
 
-    /* Find maximal index of the interval type to use. */
+    /* Find index of the highlight time step. */
     int highlightIndex = minTickmarkIndex;
-    int highlightSpanPixels = size().width() * minHighlightSpanFraction;
-    for(; highlightIndex < types.size(); highlightIndex++)
-        if(types[highlightIndex].stepMSecs / msecsPerPixel >= highlightSpanPixels && types[highlightIndex].stepUnits == 1)
+    qreal highlightSpanPixels = size().width() * minHighlightSpanFraction;
+    for(; highlightIndex < steps.size(); highlightIndex++)
+        if(steps[highlightIndex].stepUnits == 1 && steps[highlightIndex].stepMSecs / msecsPerPixel >= highlightSpanPixels)
             break;
-    highlightIndex = qMin(highlightIndex, types.size() - 1); // TODO: remove this line.
-    const TickmarkType &highlightType = types[highlightIndex];
+    highlightIndex = qMin(highlightIndex, steps.size() - 1); // TODO: remove this line.
+    const TimeStep &highlightStep = steps[highlightIndex];
 
 
     /* Draw highlight. */
     {
         painter->setPen(Qt::NoPen);
 
-        qint64 pos = roundUp(m_windowStart, highlightType, useUtc);
+        qint64 pos = roundUp(m_windowStart, highlightStep);
         qreal x0 = positionFromValue(m_windowStart).x();
-        qint64 number = absoluteNumber(pos, highlightType, useUtc);
+        qint64 number = absoluteNumber(pos, highlightStep);
         while(true) {
             qreal x1 = positionFromValue(pos).x();
             painter->setBrush(number % 2 ? QColor(0, 0, 0) : QColor(32, 32, 32));
@@ -531,15 +582,29 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, qreal top, qreal height) {
             if(pos >= m_windowEnd)
                 break;
 
-            pos += highlightType.stepMSecs;
+            pos = add(pos, highlightStep);
             number++;
             x0 = x1;
         }
     }
 
-    /* Round position to the closest tickmark that will be displayed. */
-    //qint64 pos = roundUp(m_windowStart, minTickmarkType, useUtc);
+    /* Draw tickmarks. */
+    {
+        painter->setPen(QColor(255, 255, 255));
 
+        qreal bottom = top + height;
+
+        qint64 pos = roundUp(m_windowStart, minTickmarkStep);
+
+        while(true) {
+            qreal x = positionFromValue(pos).x();
+            painter->drawLine(QPointF(x, top), QPointF(x, bottom));
+            
+            pos = add(pos, minTickmarkStep);
+            if(pos >= m_windowEnd)
+                break;
+        }
+    }
 }
 
 
@@ -591,6 +656,7 @@ void QnTimeSlider::wheelEvent(QGraphicsSceneWheelEvent *event) {
 void QnTimeSlider::kineticMove(const QVariant &degrees) {
     qreal factor = std::pow(2.0, -degrees.toReal() / degreesFor2x);
     
-    scaleWindow(factor, m_zoomAnchor);
+    if(!scaleWindow(factor, m_zoomAnchor))
+        kineticProcessor()->reset();
 }
 
