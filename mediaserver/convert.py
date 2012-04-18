@@ -82,7 +82,7 @@ os.mkdir('bin/release-test')
 
 os.mkdir('build')
 
-if platform() == 'mac':
+if platform() != 'win32':
     ldpath_debug = ''
     ldpath_release = ''
 
@@ -91,38 +91,35 @@ if platform() == 'win32':
     copy_files(ffmpeg_path_debug + '/bin/*-[0-9][0-9].dll', 'bin/debug')
     copy_files(ffmpeg_path_release + '/bin/*-[0-9].dll', 'bin/release')
     copy_files(ffmpeg_path_release + '/bin/*-[0-9][0-9].dll', 'bin/release')
-elif platform() == 'mac':
+else:
     ldpath_debug += ffmpeg_path_debug + '/lib'
     ldpath_release += ffmpeg_path_release + '/lib'
 
 if platform() == 'win32':
     copy_files(tools_path + '/bin/*.dll', 'bin/release')
     copy_files(tools_path + '/bin/*.dll', 'bin/debug')
-elif platform() == 'mac':
+else:
     ldpath_debug += ':' + tools_path + '/lib'
     ldpath_release += ':' + tools_path + '/lib'
 
 if platform() == 'win32':
     copy_files(qjson_path + '/release/qjson.dll', 'bin/release')
     copy_files(qjson_path + '/debug/qjson.dll', 'bin/debug')
-elif platform() == 'mac':
+else:
     ldpath_debug += ':' + os.path.abspath(qjson_path)
     ldpath_release += ':' + os.path.abspath(qjson_path)
-elif platform() == 'linux':
-    copy_files(qjson_path + '/libqjson.so.0', 'bin/release')
-    copy_files(qjson_path + '/libqjson.so.0', 'bin/debug')
 
 if platform() == 'win32':
     copy_files(openssl_path + '/bin/*.dll', 'bin/debug')
     copy_files(openssl_path + '/bin/*.dll', 'bin/release')
 
-if platform() == 'mac':
+if platform() != 'win32':
     ldpath_debug += ':' + os.path.abspath('../common/bin/debug')
     ldpath_release += ':' + os.path.abspath('../common/bin/release')
 
-if platform() == 'mac':
-    gen_env_sh('bin/debug/env.sh', ldpath_debug)
-    gen_env_sh('bin/release/env.sh', ldpath_release)
+if platform() != 'win32':
+    gen_env_sh('bin/debug/env.sh', ldpath_debug, {'FFMPEG_PATH' : ffmpeg_path_debug, 'QJSON_PATH' : os.path.abspath(qjson_path)})
+    gen_env_sh('bin/release/env.sh', ldpath_release, {'FFMPEG_PATH' : ffmpeg_path_release, 'QJSON_PATH' : os.path.abspath(qjson_path)})
 
 gen_version_h()
 

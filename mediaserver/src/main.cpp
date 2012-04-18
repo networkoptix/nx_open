@@ -28,10 +28,10 @@
 #include "core/resource/video_server.h"
 #include "api/SessionManager.h"
 #include <signal.h>
-#include <xercesc/util/PlatformUtils.hpp>
 #include "core/misc/scheduleTask.h"
 #include "qtservice.h"
 #include "eventmanager.h"
+#include "settings.h"
 
 #include <fstream>
 #include "plugins/resources/axis/axis_resource_searcher.h"
@@ -288,16 +288,12 @@ int serverMain(int argc, char *argv[])
     Q_UNUSED(argc)
     Q_UNUSED(argv)
 
-    xercesc::XMLPlatformUtils::Initialize();
-
 #ifdef Q_OS_WIN
     SetConsoleCtrlHandler(stopServer_WIN, true);
 #endif
     signal(SIGINT, stopServer);
     signal(SIGABRT, stopServer);
     signal(SIGTERM, stopServer);
-
-    Q_INIT_RESOURCE(api);
 
 //    av_log_set_callback(decoderLogCallback);
 
@@ -312,8 +308,7 @@ int serverMain(int argc, char *argv[])
     dataDirectory.mkpath(dataLocation + QLatin1String("/log"));
 
     QString logFileName = dataLocation + QLatin1String("/log/log_file");
-    QSettings settings(QSettings::SystemScope, ORGANIZATION_NAME, APPLICATION_NAME);
-    settings.setValue("logFile", logFileName);
+    qSettings.setValue("logFile", logFileName);
 
     if (!cl_log.create(logFileName, 1024*1024*10, 5, cl_logDEBUG1))
     {
@@ -425,9 +420,6 @@ public:
 
     void run()
     {
-        // Use system scope
-        QSettings settings(QSettings::SystemScope, ORGANIZATION_NAME, APPLICATION_NAME);
-
         // Create SessionManager
         SessionManager* sm = SessionManager::instance();
 
@@ -440,7 +432,7 @@ public:
         thread->start();
         sm->start();
 
-        initAppServerConnection(settings);
+        initAppServerConnection(qSettings);
 
         QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
@@ -462,7 +454,7 @@ public:
 
         QnResourcePool::instance(); // to initialize net state;
 
-        QString appserverHostString = settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
+        QString appserverHostString = qSettings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
 
         QHostAddress appserverHost;
         do
@@ -491,7 +483,7 @@ public:
                 QnSleep::msleep(1000);
         }
 
-        initAppServerEventConnection(settings, videoServer);
+        initAppServerEventConnection(qSettings, videoServer);
         QnEventManager* eventManager = QnEventManager::instance();
         eventManager->run();
 
@@ -504,7 +496,6 @@ public:
 
         m_restServer = new QnRestServer(QHostAddress::Any, apiUrl.port());
         m_restServer->registerHandler("api/RecordedTimePeriods", new QnRecordedChunkListHandler());
-        m_restServer->registerHandler("xsd/*", new QnXsdHelperHandler());
 
         QByteArray errorString;
 
@@ -653,8 +644,6 @@ void stopServer(int signal)
 int main(int argc, char* argv[])
 {
 #if 0 // http refactoring test code. Remove it if things is stable.
-    xercesc::XMLPlatformUtils::Initialize();
-
     QCoreApplication::setOrganizationName(QLatin1String(ORGANIZATION_NAME));
     QCoreApplication::setApplicationName(QLatin1String(APPLICATION_NAME));
     QCoreApplication::setApplicationVersion(QLatin1String(APPLICATION_VERSION));
@@ -748,6 +737,5 @@ int main(int argc, char* argv[])
         serviceMainInstance = 0;
     }
 
-    xercesc::XMLPlatformUtils::Terminate ();
     return result;
 }
