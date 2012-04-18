@@ -24,7 +24,7 @@ void conn_detail::ReplyProcessor::finished(int status, const QByteArray &result,
         QnVideoServerResourceList servers;
 
         try {
-            m_serializer.deserializeServers(servers, result, m_resourceFactory);
+            m_serializer.deserializeServers(servers, result);
         } catch (const QnSerializeException& e) {
             errorString += e.errorString();
         }
@@ -238,7 +238,7 @@ int QnAppServerConnection::registerServer(const QnVideoServerResourcePtr& server
         if (status == 0)
         {
             try {
-                m_serializer.deserializeServers(servers, replyData, m_resourceFactory);
+                m_serializer.deserializeServers(servers, replyData);
             } catch (const QnSerializeException& e) {
                 errorString += e.errorString();
             }
@@ -396,7 +396,7 @@ int QnAppServerConnection::getServers(QnVideoServerResourceList &servers, QByteA
     int status = getObjects("server", "", data, errorString);
 
     try {
-        m_serializer.deserializeServers(servers, data, m_resourceFactory);
+        m_serializer.deserializeServers(servers, data);
     } catch (const QnSerializeException& e) {
         errorString += e.errorString();
     }
