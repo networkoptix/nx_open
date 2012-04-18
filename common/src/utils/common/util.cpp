@@ -39,11 +39,6 @@ QString fromNativePath(QString path)
     return path;
 }
 
-QString getDataDirectory()
-{
-    return QDesktopServices::storageLocation(QDesktopServices::DataLocation);
-}
-
 QString getMoviesDirectory()
 {
     return QDesktopServices::storageLocation(QDesktopServices::MoviesLocation);

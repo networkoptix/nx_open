@@ -6,7 +6,7 @@
 
 
 extern int bestBitrateKbps(QnStreamQuality q, QSize resolution, int fps);
-extern inline int getIntParam(const char* pos);
+extern int getIntParam(const char* pos);
 extern QString getValueFromString(const QString& line);
 
 #pragma pack(push,1)

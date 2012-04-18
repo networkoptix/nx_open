@@ -24,11 +24,6 @@ QN_EXPORT bool removeDir(const QString &dirName);
 QN_EXPORT QString fromNativePath(QString path);
 
 /**
- * \returns                             User data directory. Directory should be available for writing.
- */
-QN_EXPORT QString getDataDirectory();
-
-/**
  * \returns                             User movies directory.
  */
 QN_EXPORT QString getMoviesDirectory();
@@ -62,6 +57,15 @@ QN_EXPORT QString getParamFromString(const QString& str, const QString& param);
  */
 inline unsigned int roundUp(unsigned int value, int step) {
     return ((value-1) & ~(step-1)) + step;
+}
+
+/**
+ * \param value                         Value to round down.
+ * \param step                          Rounding step, must be power of 2.
+ * \returns                             Rounded value.
+ */
+inline unsigned int roundDown(unsigned int value, int step) {
+    return value & ~(step-1);
 }
 
 inline quint64 roundUp(quint64 value, int step) {

@@ -11,12 +11,12 @@
 
 namespace {
 
-typedef google::protobuf::RepeatedPtrField<proto::pb::Camera> PbCameraList;
-typedef google::protobuf::RepeatedPtrField<proto::pb::Server>         PbServerList;
-typedef google::protobuf::RepeatedPtrField<proto::pb::Layout>         PbLayoutList;
-typedef google::protobuf::RepeatedPtrField<proto::pb::User>           PbUserList;
-typedef google::protobuf::RepeatedPtrField<proto::pb::ResourceType>   PbResourceTypeList;
-typedef google::protobuf::RepeatedPtrField<proto::pb::License>        PbLicenseList;
+typedef google::protobuf::RepeatedPtrField<proto::pb::Camera>           PbCameraList;
+typedef google::protobuf::RepeatedPtrField<proto::pb::Server>           PbServerList;
+typedef google::protobuf::RepeatedPtrField<proto::pb::Layout>           PbLayoutList;
+typedef google::protobuf::RepeatedPtrField<proto::pb::User>             PbUserList;
+typedef google::protobuf::RepeatedPtrField<proto::pb::ResourceType>     PbResourceTypeList;
+typedef google::protobuf::RepeatedPtrField<proto::pb::License>          PbLicenseList;
 
 QString serializeNetAddrList(const QList<QHostAddress>& netAddrList)
 {

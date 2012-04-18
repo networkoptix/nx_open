@@ -24,7 +24,7 @@ void conn_detail::ReplyProcessor::finished(int status, const QByteArray &result,
         QnVideoServerResourceList servers;
 
         try {
-            m_serializer.deserializeServers(servers, result);
+            m_serializer.deserializeServers(servers, result, m_resourceFactory);
         } catch (const QnSerializeException& e) {
             errorString += e.errorString();
         }
@@ -120,7 +120,12 @@ int QnAppServerConnection::getObjectsAsync(const QString& objectName, const QStr
     QnRequestParamList requestParams(m_requestParams);
 
     if (!args.isEmpty())
-        requestParams.append(QnRequestParam("id", args));
+    {
+        QStringList argsKvList = args.split("=");
+
+        if (argsKvList.length() == 2)
+            requestParams.append(QnRequestParam(argsKvList[0], argsKvList[1]));
+    }
 
     return SessionManager::instance()->sendAsyncGetRequest(m_url, objectName, requestParams, target, slot);
 }
@@ -137,9 +142,17 @@ int QnAppServerConnection::deleteObjectAsync(const QString& objectName, int id, 
 
 int QnAppServerConnection::getObjects(const QString& objectName, const QString& args, QByteArray& data, QByteArray& errorString)
 {
-    QString request = args.isEmpty() ? objectName : QString("%1/%2").arg(objectName).arg(args);
+    QnRequestParamList requestParams(m_requestParams);
 
-    return SessionManager::instance()->sendGetRequest(m_url, request, m_requestParams, data, errorString);
+    if (!args.isEmpty())
+    {
+        QStringList argsKvList = args.split("=");
+
+        if (argsKvList.length() == 2)
+            requestParams.append(QnRequestParam(argsKvList[0], argsKvList[1]));
+    }
+
+    return SessionManager::instance()->sendGetRequest(m_url, objectName, requestParams, data, errorString);
 }
 
 int QnAppServerConnection::testConnectionAsync(QObject* target, const char *slot)
@@ -186,6 +199,33 @@ int QnAppServerConnection::getResources(QnResourceList& resources, QByteArray& e
     return status;
 }
 
+int QnAppServerConnection::getResource(const QnId& id, QnResourcePtr& resource, QByteArray& errorString)
+{
+    QnResourceList resources;
+    int status = getResources(QString("id=%1").arg(id.toString()), resources, errorString);
+    if (status == 0) 
+        resource = resources[0];
+    return status;
+}
+
+int QnAppServerConnection::getResources(const QString& args, QnResourceList& resources, QByteArray& errorString)
+{
+    QByteArray data;
+    int status = getObjects("resourceEx", args, data, errorString);
+
+    if (status == 0)
+    {
+        errorString.clear();
+        try {
+            m_serializer.deserializeResources(resources, data, m_resourceFactory);
+        } catch (const QnSerializeException& e) {
+            errorString += e.errorString();
+        }
+    }
+
+    return status;
+}
+
 int QnAppServerConnection::registerServer(const QnVideoServerResourcePtr& serverPtr, QnVideoServerResourceList& servers, QByteArray& errorString)
 {
     QByteArray data;
@@ -198,7 +238,7 @@ int QnAppServerConnection::registerServer(const QnVideoServerResourcePtr& server
         if (status == 0)
         {
             try {
-                m_serializer.deserializeServers(servers, replyData);
+                m_serializer.deserializeServers(servers, replyData, m_resourceFactory);
             } catch (const QnSerializeException& e) {
                 errorString += e.errorString();
             }
@@ -356,7 +396,7 @@ int QnAppServerConnection::getServers(QnVideoServerResourceList &servers, QByteA
     int status = getObjects("server", "", data, errorString);
 
     try {
-        m_serializer.deserializeServers(servers, data);
+        m_serializer.deserializeServers(servers, data, m_resourceFactory);
     } catch (const QnSerializeException& e) {
         errorString += e.errorString();
     }
@@ -367,7 +407,7 @@ int QnAppServerConnection::getServers(QnVideoServerResourceList &servers, QByteA
 int QnAppServerConnection::getCameras(QnVirtualCameraResourceList& cameras, QnId mediaServerId, QByteArray& errorString)
 {
     QByteArray data;
-    int status = getObjects("camera", mediaServerId.toString(), data, errorString);
+    int status = getObjects("camera", QString("parent_id=%1").arg(mediaServerId.toString()), data, errorString);
 
     try {
         m_serializer.deserializeCameras(cameras, data, m_resourceFactory);

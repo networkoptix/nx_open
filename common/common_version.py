@@ -14,6 +14,8 @@ def get_library_path():
 def set_library_path(value):
     if platform() == 'mac':
         os.putenv('DYLD_LIBRARY_PATH', value)
+    elif platform() == 'linux':
+        os.putenv('LD_LIBRARY_PATH', value)
 
 def set_env():
     REVISION = os.popen('hg id -i').read().strip()
@@ -33,3 +35,6 @@ def set_env():
     os.putenv('REVISION', REVISION)
     os.putenv('FFMPEG_VERSION', FFMPEG_VERSION)
     return ORGANIZATION_NAME, APPLICATION_VERSION, BUILD_NUMBER, REVISION, FFMPEG_VERSION
+
+if __name__ == '__main__':
+    print APPLICATION_VERSION
