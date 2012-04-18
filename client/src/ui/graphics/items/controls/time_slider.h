@@ -128,6 +128,7 @@ private:
         qreal currentHeight;
         qreal targetHeight;
         qreal lastTargetHeight;
+        int currentTextHeight;
         qreal currentLineOpacity;
         qreal targetLineOpacity;
         qreal currentTextOpacity;

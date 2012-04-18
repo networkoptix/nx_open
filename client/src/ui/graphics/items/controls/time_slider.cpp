@@ -68,11 +68,15 @@ namespace {
     
     const qreal tickmarkStepScale = 2.0 / 3.0;
 
-    const qreal tickmarkTextScale = 1.0 / 3.0;
+    const qreal tickmarkTextScale = 0.75;
+    const int minTextHeight = 9;
+    const qreal maxTickmarkHeight = 1.0 / (1.0 + tickmarkTextScale);
 
     const qreal minHighlightSpanFraction = 0.5;
 
     const qreal msecsPerPixelChangeThreshold = 1.0e-4;
+
+    const qreal tickmarkBarRelativeHeight = 0.5;
 
     /** Lower zoom limit. */
     const qreal minMSecsPerPixel = 2.0;
@@ -362,10 +366,6 @@ bool QnTimeSlider::scaleWindow(qreal factor, qint64 anchor) {
 }
 
 const QPixmap &QnTimeSlider::cachedPixmap(qint64 position, int height, const QnTimeStep &step) {
-    if(position == 600000) {
-        int a = 10;
-    }
-
     qint32 key = cacheKey(position, height, step);
 
     QHash<qint32, QPixmap>::const_iterator itr = m_labelPixmaps.find(key);
@@ -450,15 +450,15 @@ void QnTimeSlider::updateStepTargets() {
         if (separationPixels < minTickmarkSeparationPixels) {
             targetHeight = 0.0;
         } else if(i >= maxStepIndex) {
-            targetHeight = 1.0;
+            targetHeight = maxTickmarkHeight;
         } else  {
-            targetHeight = pow(tickmarkStepScale, maxStepIndex - i);
+            targetHeight = maxTickmarkHeight * pow(tickmarkStepScale, maxStepIndex - i);
         }
         
         if(!qFuzzyCompare(data.targetHeight, targetHeight)) {
             data.lastTargetHeight = data.targetHeight;
             data.targetHeight = targetHeight;
-            data.targetLineOpacity = minTickmarkOpacity + (1.0 - minTickmarkOpacity) * data.targetHeight;
+            data.targetLineOpacity = minTickmarkOpacity + (1.0 - minTickmarkOpacity) * data.targetHeight / maxTickmarkHeight;
         }
 
         if(separationPixels < minTextSeparationPixels) {
@@ -484,6 +484,9 @@ void QnTimeSlider::animateStepValues(int deltaMSecs) {
     int stepCount = m_steps.size();
     qreal dt = deltaMSecs / 1000.0;
 
+    const qreal maxTextHeight = size().height() * tickmarkBarRelativeHeight * (1.0 - maxTickmarkHeight);
+    const qreal relativeTextHeightGap = (maxTextHeight - minTextHeight) / maxTickmarkHeight;
+
     for(int i = 0; i < stepCount; i++) {
         TimeStepData &data = m_stepData[i];
         qreal separationPixels = m_steps[i].stepMSecs / m_lastMSecsPerPixel;
@@ -501,6 +504,8 @@ void QnTimeSlider::animateStepValues(int deltaMSecs) {
         data.currentHeight      = adjust(data.currentHeight,        data.targetHeight,      heightSpeed * dt);
         data.currentLineOpacity = adjust(data.currentLineOpacity,   data.targetLineOpacity, opacitySpeed * dt);
         data.currentTextOpacity = adjust(data.currentTextOpacity,   data.targetTextOpacity, opacitySpeed * dt);
+
+        data.currentTextHeight  = minTextHeight + qMax(0, qRound(data.currentHeight * relativeTextHeightGap));
     }
 }
 
@@ -518,12 +523,12 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
             painter, 
             m_timePeriods[i].forType[Qn::RecordingTimePeriod],  
             m_timePeriods[i].forType[Qn::MotionTimePeriod], 
-            rect.top() + rect.height() * (0.5 + 0.5 * i / m_timePeriods.size()),   
-            rect.height() * 0.5 / m_timePeriods.size()
+            rect.top() + rect.height() * (tickmarkBarRelativeHeight + (1.0 - tickmarkBarRelativeHeight) * i / m_timePeriods.size()),   
+            rect.height() * (1.0 - tickmarkBarRelativeHeight) / m_timePeriods.size()
         );
     }
 
-    drawTickmarks(painter, rect.top(), rect.height() * 0.5);
+    drawTickmarks(painter, rect.top(), rect.height() * tickmarkBarRelativeHeight);
 
     qint64 pos = sliderPosition();
     if(pos >= m_windowStart && pos <= m_windowEnd) {
@@ -653,8 +658,7 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, qreal top, qreal height) {
         /* Draw label if needed. */
         qreal tickmarkHeight = height * m_stepData[index].currentHeight;
         if(!qFuzzyIsNull(m_stepData[index].currentTextOpacity)) {
-            int textHeight = qRound(height * tickmarkTextScale);
-            QPixmap pixmap = cachedPixmap(pos, textHeight, m_steps[index]);
+            QPixmap pixmap = cachedPixmap(pos, m_stepData[index].currentTextHeight, m_steps[index]);
 
             QRectF textRect(x - pixmap.width() / 2.0, top + tickmarkHeight, pixmap.width(), pixmap.height());
             if(textRect.left() < rect.left())
