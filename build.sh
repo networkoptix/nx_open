@@ -1,5 +1,14 @@
 set -e
 
+if [ -z "$1" ]
+then
+    CONFIG=debug
+else
+    CONFIG=$1
+fi
+
+[ "$CONFIG" != "debug" -a "$CONFIG" != "release" ] && (echo "Usage: build.sh <debug|release>"; exit -1)
+
 case `uname -s` in
     "Linux")
         PLATFORM=linux
@@ -13,7 +22,7 @@ case `uname -s` in
         ;;
 esac
 
-for i in common mediaserver appserver
+for i in common mediaserver client appserver
 do
   pushd $i
   python convert.py
@@ -39,15 +48,14 @@ sed $SED_ARGS "s%^\.\.\/build\/\(debug\/generated\/qtservice_unix.moc\)%\1%" med
 sed $SED_ARGS "s%^\.\.\/build\/\(release\/generated\/qtservice.moc\)%\1%" mediaserver/build/Makefile.release
 sed $SED_ARGS "s%^\.\.\/build\/\(release\/generated\/qtservice_unix.moc\)%\1%" mediaserver/build/Makefile.release
 
-# sed $SED_ARGS "s%\.\.\/build\/debug%debug%g" client/build/Makefile.debug
-# sed $SED_ARGS "s%\.\.\/build\/release%release%g" client/build/Makefile.release
+sed $SED_ARGS "s%\.\.\/build\/debug%debug%g" client/build/Makefile.debug
+sed $SED_ARGS "s%\.\.\/build\/release%release%g" client/build/Makefile.release
 
-rm mediaserver/build/Makefile.debug.bak mediaserver/build/Makefile.release.bak 
-# rm client/build/Makefile.debug.bak client/build/Makefile.release.bak
+rm mediaserver/build/Makefile.debug.bak mediaserver/build/Makefile.release.bak client/build/Makefile.debug.bak client/build/Makefile.release.bak
 
 for i in common mediaserver
 do
   pushd $i/build
-  make -f Makefile.debug -j $[NPROCESSORS+1]
+  make -f Makefile.$CONFIG -j $[NPROCESSORS+1]
   popd
 done
