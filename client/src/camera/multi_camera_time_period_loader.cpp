@@ -7,13 +7,12 @@
 QnMultiCameraTimePeriodLoader::QnMultiCameraTimePeriodLoader():
     m_mutex(QMutex::Recursive),
     m_multiRequestCount(0)
-{
-}
+{}
 
-Q_GLOBAL_STATIC(QnMultiCameraTimePeriodLoader, inst);
+Q_GLOBAL_STATIC(QnMultiCameraTimePeriodLoader, qn_multiCameraTimePeriodLoaderInstance);
 QnMultiCameraTimePeriodLoader *QnMultiCameraTimePeriodLoader::instance()
 {
-    return inst();
+    return qn_multiCameraTimePeriodLoaderInstance();
 }
 
 int QnMultiCameraTimePeriodLoader::load(const QnNetworkResourceList &networkResources, const QnTimePeriod &period)
@@ -46,16 +45,16 @@ int QnMultiCameraTimePeriodLoader::load(const QnNetworkResourceList &networkReso
 int QnMultiCameraTimePeriodLoader::load(QnNetworkResourcePtr networkResource, const QnTimePeriod &period)
 {
     QMutexLocker lock(&m_mutex);
-    QnTimePeriodLoaderPtr loader;
-    NetResCache::iterator itr = m_cache.find(networkResource);
+    QnTimePeriodLoader *loader;
+    QMap<QnNetworkResourcePtr, QnTimePeriodLoader *>::iterator itr = m_cache.find(networkResource);
     if (itr != m_cache.end()) {
         loader = itr.value();
     } else {
         loader = QnTimePeriodLoader::newInstance(networkResource);
         if (!loader)
             return -1;
-        connect(loader.data(), SIGNAL(ready(const QnTimePeriodList &, int)), this, SLOT(onDataLoaded(const QnTimePeriodList &, int)));
-        connect(loader.data(), SIGNAL(failed(int, int)), this, SLOT(onLoadingFailed(int, int)));
+        connect(loader, SIGNAL(ready(const QnTimePeriodList &, int)), this, SLOT(onDataLoaded(const QnTimePeriodList &, int)));
+        connect(loader, SIGNAL(failed(int, int)), this, SLOT(onLoadingFailed(int, int)));
 
         m_cache.insert(networkResource, loader);
     }

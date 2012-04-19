@@ -29,12 +29,13 @@ public:
     QnTimePeriodLoader(const QnVideoServerConnectionPtr &connection, QnNetworkResourcePtr resource, QObject *parent = NULL);
 
     /**
-     * Creates a new time period loader for the given camera resource. Returns null
+     * Creates a new time period loader for the given camera resource. Returns NULL
      * pointer in case loader cannot be created.
      * 
      * \param resource                  Camera resource to create time period loader for.
+     * \returns                         Newly created time period loader.
      */
-    static QnTimePeriodLoaderPtr newInstance(QnResourcePtr resource);
+    static QnTimePeriodLoader *newInstance(QnResourcePtr resource);
     
     /**
      * \param timePeriod                Time period to get motion periods for.

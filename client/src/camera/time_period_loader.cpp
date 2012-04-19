@@ -21,20 +21,20 @@ QnTimePeriodLoader::QnTimePeriodLoader(const QnVideoServerConnectionPtr &connect
     connect(this, SIGNAL(delayedReady(const QnTimePeriodList &, int)), this, SIGNAL(ready(const QnTimePeriodList &, int)), Qt::QueuedConnection);
 }
 
-QnTimePeriodLoaderPtr QnTimePeriodLoader::newInstance(QnResourcePtr resource) {
+QnTimePeriodLoader *QnTimePeriodLoader::newInstance(QnResourcePtr resource) {
     QnNetworkResourcePtr networkResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
     if (!networkResource)
-        return QnTimePeriodLoaderPtr();
+        return NULL;
 
     QnVideoServerResourcePtr serverResource = qSharedPointerDynamicCast<QnVideoServerResource>(qnResPool->getResourceById(resource->getParentId()));
     if (!serverResource)
-        return QnTimePeriodLoaderPtr();
+        return NULL;
 
     QnVideoServerConnectionPtr serverConnection = serverResource->apiConnection();
     if (!serverConnection)
-        return QnTimePeriodLoaderPtr();
+        return NULL;
 
-    return QnTimePeriodLoaderPtr(new QnTimePeriodLoader(serverConnection, networkResource));
+    return new QnTimePeriodLoader(serverConnection, networkResource);
 }
 
 int QnTimePeriodLoader::load(const QnTimePeriod &timePeriod, const QList<QRegion> &motionRegions)

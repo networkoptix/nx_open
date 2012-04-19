@@ -32,8 +32,7 @@ private:
 
 private:
     QMutex m_mutex;
-    typedef QMap<QnNetworkResourcePtr, QnTimePeriodLoaderPtr> NetResCache;
-    NetResCache m_cache;
+    QMap<QnNetworkResourcePtr, QnTimePeriodLoader *> m_cache;
 
     QMap<int, QList<int> > m_multiLoadProgress;
     QMap<int, QVector<QnTimePeriodList> > m_multiLoadPeriod;
