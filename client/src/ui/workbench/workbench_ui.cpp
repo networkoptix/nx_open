@@ -1274,32 +1274,38 @@ void QnWorkbenchUi::at_exportMediaRange(CLVideoCamera* camera, qint64 startTimeM
         suggetion = netRes->getMAC().toString();
 
     QString fileName;
+    QString selectedFilter;
     while (1)
     {
         fileName = QFileDialog::getSaveFileName(m_display->view(), tr("Export Video As..."),
             previousDir + QLatin1Char('/') + suggetion,
-            tr("Matroska(*.mkv)"),
-            0,
+            tr("Matroska (*.mkv);; AVI (Audio/Video Interleaved)(*.avi)"),
+            &selectedFilter,
             QFileDialog::DontUseNativeDialog);
         if (fileName.isEmpty())
             return;
         QString fullName = fileName;
-        if (!fullName.toLower().endsWith(QLatin1String(".mkv")))
-            fullName += QLatin1String(".mkv");
-        if (QFile::exists(fullName))
+        if (!fullName.toLower().endsWith(QLatin1String(".mkv")) && !fullName.toLower().endsWith(QLatin1String(".avi")))
         {
-            QString shortName = QFileInfo(fullName).baseName();
-            QMessageBox msgBox(QMessageBox::Information, tr("Confirm Save As"), tr("File '%1' already exists. Overwrite?").arg(shortName),
-                               QMessageBox::Yes | QMessageBox::No, m_display->view());
-            if (msgBox.exec() == QMessageBox::Yes)
+            fullName += selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
+
+            if (QFile::exists(fullName))
             {
-                if (!QFile::remove(fullName))
+                QString shortName = QFileInfo(fullName).baseName();
+                QMessageBox msgBox(QMessageBox::Information, tr("Confirm Save As"), tr("File '%1' already exists. Overwrite?").arg(shortName),
+                                   QMessageBox::Yes | QMessageBox::No, m_display->view());
+                if (msgBox.exec() == QMessageBox::Yes)
                 {
-                    QMessageBox::information(m_display->view(), tr("Can't overwrite file"), tr("File '%1' is used by another process. Try another name.").arg(shortName), QMessageBox::Ok);
-                    continue;
+                    if (!QFile::remove(fullName))
+                    {
+                        QMessageBox::information(m_display->view(), tr("Can't overwrite file"), tr("File '%1' is used by another process. Try another name.").arg(shortName), QMessageBox::Ok);
+                        continue;
+                    }
+                    break;
                 }
-                break;
             }
+            else 
+                break;
         }
         else 
             break;
@@ -1316,18 +1322,18 @@ void QnWorkbenchUi::at_exportMediaRange(CLVideoCamera* camera, qint64 startTimeM
     exportProgressDialog->setRange(0, 100);
     exportProgressDialog->setMinimumDuration(1000);
     connect(exportProgressDialog, SIGNAL(canceled()), camera, SLOT(stopExport()));
-    connect(exportProgressDialog, SIGNAL(canceled()), exportProgressDialog, SLOT(reject()));
-    connect(exportProgressDialog, SIGNAL(finished(int)), exportProgressDialog, SLOT(deleteLater()));
+    connect(exportProgressDialog, SIGNAL(canceled()), exportProgressDialog, SLOT(deleteLater()));
 
     connect(camera, SIGNAL(exportProgress(int)), exportProgressDialog, SLOT(setValue(int)));
-    connect(camera, SIGNAL(exportFailed(QString)), exportProgressDialog, SLOT(reject()));
-    connect(camera, SIGNAL(exportFinished(QString)), exportProgressDialog, SLOT(accept()));
+    connect(camera, SIGNAL(exportFailed(QString)), exportProgressDialog, SLOT(deleteLater()));
+    connect(camera, SIGNAL(exportFinished(QString)), exportProgressDialog, SLOT(deleteLater()));
 
     camera->disconnect(this);
     connect(camera, SIGNAL(exportFailed(QString)), this, SLOT(at_exportFailed(QString)));
     connect(camera, SIGNAL(exportFinished(QString)), this, SLOT(at_exportFinished(QString)));
 
-    camera->exportMediaPeriodToFile(startTimeMs*1000ll, endTimeMs*1000ll, fileName);
+
+    camera->exportMediaPeriodToFile(startTimeMs*1000ll, endTimeMs*1000ll, fileName, selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.'))+1, 3));
 }
 
 void QnWorkbenchUi::at_exportFinished(QString fileName)

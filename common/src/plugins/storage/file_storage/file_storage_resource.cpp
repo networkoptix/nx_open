@@ -25,7 +25,7 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
     if (!rez->open(openMode))
     {
         delete rez;
-        return false;
+        return 0;
     }
     return rez;
 }

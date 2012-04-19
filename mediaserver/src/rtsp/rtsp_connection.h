@@ -12,6 +12,7 @@ class QnAbstractStreamDataProvider;
 
 class QnRtspConnectionProcessor: public QnTCPConnectionProcessor
 {
+    Q_OBJECT
 public:
     QnRtspConnectionProcessor(TCPSocket* socket, QnTcpListener* owner);
     virtual ~QnRtspConnectionProcessor();
@@ -32,6 +33,8 @@ protected:
     virtual void run();
     void addResponseRangeHeader();
     QString getRangeStr();
+private slots:
+    void at_cameraDisabledChanged(bool oldValue, bool newValue);
 private:
     void checkQuality();
     void processRequest();

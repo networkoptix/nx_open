@@ -135,10 +135,20 @@ void QnEventManager::eventReceived(QnEvent event)
             resource->setStatus(status);
         }
     }
+    else if (event.eventType == QN_CAMERA_SERVER_ITEM)
+    {
+        QString mac = event.dict["mac"].toString();
+        QString serverGuid = event.dict["server_guid"].toString();
+        qint64 timestamp_ms = event.dict["timestamp"].toLongLong();
+
+        QnCameraHistoryItem historyItem(mac, timestamp_ms, serverGuid);
+
+        QnCameraHistoryPool::instance()->addCameraHistoryItem(historyItem);
+    }
     else if (event.eventType == QN_EVENT_RES_CHANGE)
     {
         QnAppServerConnectionFactory::createConnection()->
-            getResourcesAsync(QString::number(event.objectId), event.objectNameLower(), this, SLOT(resourcesReceived(int,QByteArray,QnResourceList,int)));
+                getResourcesAsync(QString("id=%1").arg(event.objectId), event.objectNameLower(), this, SLOT(resourcesReceived(int,QByteArray,QnResourceList,int)));
     } else if (event.eventType == QN_EVENT_RES_DELETE)
     {
         QnResourcePtr ownResource = qnResPool->getResourceById(event.objectId);

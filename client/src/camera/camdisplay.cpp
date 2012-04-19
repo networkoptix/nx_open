@@ -799,6 +799,13 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
             m_afterJump = false;
         //cl_log.log("ProcessData 2", QDateTime::fromMSecsSinceEpoch(vd->timestamp/1000).toString("hh:mm:ss.zzz"), cl_logALWAYS);
     }
+    else if (media->flags & QnAbstractMediaData::MediaFlags_BOF)
+    {
+        afterJump(media);
+        if (m_extTimeSrc)
+            m_extTimeSrc->reinitTime(AV_NOPTS_VALUE);
+    }
+
 
     QnEmptyMediaDataPtr emptyData = qSharedPointerDynamicCast<QnEmptyMediaData>(data);
 

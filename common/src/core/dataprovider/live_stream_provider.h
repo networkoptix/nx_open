@@ -4,6 +4,7 @@
 #include <QObject>
 #include "../resource/media_resource.h"
 #include "core/datapacket/mediadatapacket.h"
+#include "motion/motion_estimation.h"
 
 #define META_DATA_DURATION_MS 300
 
@@ -32,14 +33,19 @@ public:
     // I assume this function is called once per video frame 
     bool needMetaData(); 
 
-    void onGotVideoFrame();
+    void onGotVideoFrame(QnCompressedVideoDataPtr videoData);
+
+    bool isSoftwareMotion() const;
+    void setUseSoftwareMotion(bool value);
 
 protected:
 
     virtual void updateStreamParamsBasedOnQuality() = 0;
     virtual void updateStreamParamsBasedOnFps() = 0;
-    
-    virtual QnMetaDataV1Ptr getMetaData();
+
+    QnMetaDataV1Ptr getMetaData();
+
+    virtual QnMetaDataV1Ptr getCameraMetadata();
     
 protected:
     mutable QMutex m_livemutex;
@@ -54,7 +60,8 @@ private:
     QTime m_timeSinceLastMetaData; //used only for live providers
 
     QnResource::ConnectionRole m_role;
-
+    QnMotionEstimation m_motionEstimation;
+    bool m_softwareMotion;
 };
 
 #endif //live_strem_provider_h_1508

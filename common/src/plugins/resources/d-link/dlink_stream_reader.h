@@ -31,7 +31,7 @@ private:
 
     QnAbstractMediaDataPtr getNextDataMPEG(CodecID ci);
     QnAbstractMediaDataPtr getNextDataMJPEG();
-    QnMetaDataV1Ptr getMetaData() override;
+    virtual QnMetaDataV1Ptr getCameraMetadata() override;
 
     QStringList getRTPurls() const;
 

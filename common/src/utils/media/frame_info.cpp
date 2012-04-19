@@ -595,4 +595,3 @@ bool CLVideoDecoderOutput::isPixelFormatSupported(PixelFormat format)
 {
     return format == PIX_FMT_YUV422P || format == PIX_FMT_YUV420P || format == PIX_FMT_YUV444P;
 }
-

@@ -7,6 +7,7 @@
 #include "utils/common/util.h"
 #include "decoders/video/ffmpeg.h"
 #include "export/sign_helper.h"
+#include "plugins/resources/archive/avi_files/avi_archive_delegate.h"
 
 static const int DEFAULT_VIDEO_STREAM_ID = 4113;
 static const int DEFAULT_AUDIO_STREAM_ID = 4352;
@@ -33,7 +34,8 @@ m_endOfData(false),
 m_lastProgress(-1),
 m_EofDateTime(AV_NOPTS_VALUE),
 m_needCalcSignature(false),
-m_mdctx(0)
+m_mdctx(0),
+m_container("matroska")
 {
 	memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
 }
@@ -253,10 +255,10 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
 
     //QnResourcePtr resource = mediaData->dataProvider->getResource();
     // allocate container
-    AVOutputFormat * outputCtx = av_guess_format("matroska",NULL,NULL);
+    AVOutputFormat * outputCtx = av_guess_format(m_container.toLatin1().data(), NULL, NULL);
     if (outputCtx == 0)
     {
-        m_lastErrMessage = "No MKV container in FFMPEG library";
+        m_lastErrMessage = QString("No %1 container in FFMPEG library").arg(m_container);
         cl_log.log(m_lastErrMessage, cl_logERROR);
         return false;
     }
@@ -266,7 +268,9 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
     if (m_fileName.isEmpty()) 
         return false;
 
-    m_fileName += QString(".") + fileExt;
+    QString dFileExt = QString(".") + fileExt;
+    if (!m_fileName.endsWith(dFileExt, Qt::CaseInsensitive))
+        m_fileName += dFileExt;
     QString url = m_fileName; 
 
     global_ffmpeg_mutex.lock();
@@ -287,9 +291,10 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
     {
         QMutexLocker mutex(&global_ffmpeg_mutex);
         
-
-        av_dict_set(&m_formatCtx->metadata, "video_layout", layoutStr.toAscii().data(), 0);
-        av_dict_set(&m_formatCtx->metadata, "start_time", QString::number(m_startOffset+mediaData->timestamp/1000).toAscii().data(), 0);
+        av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_LayoutInfo, fileExt), layoutStr.toAscii().data(), 0);
+        qint64 startTime = m_startOffset+mediaData->timestamp/1000;
+        av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_startTime, fileExt), QString::number(startTime).toAscii().data(), 0);
+        av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_Software, fileExt), "Network Optix", 0);
 
         m_formatCtx->start_time = mediaData->timestamp;
 
@@ -344,12 +349,6 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
 
             videoStream->sample_aspect_ratio = videoCodecCtx->sample_aspect_ratio;
             videoStream->first_dts = 0;
-
-            //AVRational srcRate = {1, 1000000};
-            //videoStream->first_dts = av_rescale_q(mediaData->timestamp, srcRate, stream->time_base);
-
-            QString layoutData = QString::number(layout->v_position(i)) + QString(",") + QString(layout->h_position(i));
-            av_dict_set(&m_formatCtx->metadata, "layout_channel", QString::number(i).toAscii().data(), 0);
         }
 
         /*
@@ -522,4 +521,12 @@ void QnStreamRecorder::setSignLogo(QPixmap logo)
 void QnStreamRecorder::setStorage(QnStorageResourcePtr storage)
 {
     m_storage = storage;
+}
+
+void QnStreamRecorder::setContainer(const QString& container)
+{
+    m_container = container;
+    // convert short file ext to ffmpeg container name
+    if (m_container == QString("mkv"))
+        m_container = "matroska";
 }

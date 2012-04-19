@@ -49,6 +49,7 @@ public:
     virtual void onBufferingStarted(QnlTimeSource* source, qint64 bufferingTime) override;
     virtual void setSpeed(double value, qint64 currentTimeHint) override;
 
+    virtual void reinitTime(qint64 newTime) override;
 public slots:
     void onEofReached(QnlTimeSource* src, bool value);
     void onConsumerBlocksReader(QnAbstractStreamDataProvider* reader, bool value);
@@ -62,7 +63,6 @@ private:
     qint64 secondTime() const;
     //void waitIfNeed(QnAbstractArchiveReader* reader, qint64 timestamp);
     void erase(QnAbstractArchiveDelegate* value);
-    void reinitTime(qint64 newTime);
     qint64 getDisplayedTimeInternal() const;
     qint64 findTimeAtPlaybackMask(qint64 timeUsec);
     void setJumpTime(qint64 mksec);

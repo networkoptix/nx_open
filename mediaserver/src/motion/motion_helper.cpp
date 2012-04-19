@@ -85,7 +85,11 @@ QnMotionHelper* QnMotionHelper::instance()
 
 QString QnMotionHelper::getBaseDir(const QString& macAddress)
 {
+#ifdef _TEST_TWO_SERVERS
+    return closeDirPath(getDataDirectory()) + QString("test/record_catalog/metadata/") + macAddress + QString("/");
+#else
     return closeDirPath(getDataDirectory()) + QString("record_catalog/metadata/") + macAddress + QString("/");
+#endif
 }
 
 QString QnMotionHelper::getMotionDir(const QDate& date, const QString& macAddress)

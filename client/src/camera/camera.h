@@ -45,7 +45,7 @@ public:
     bool isVisible() const { return m_isVisible; }
     void setVisible(bool value) { m_isVisible = value; }
 
-    void exportMediaPeriodToFile(qint64 startTime, qint64 endTime, const QString& fileName);
+    void exportMediaPeriodToFile(qint64 startTime, qint64 endTime, const QString& fileName, const QString& format);
 
 signals:
     void reachedTheEnd();

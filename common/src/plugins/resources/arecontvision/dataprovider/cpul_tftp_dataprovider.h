@@ -19,11 +19,7 @@ public:
 protected:
 
     virtual QnAbstractMediaDataPtr getNextData();
-
-	
-private:
-
-    QnMetaDataV1Ptr getMetaData();
+    virtual QnMetaDataV1Ptr getCameraMetadata() override;
 
 protected:
 

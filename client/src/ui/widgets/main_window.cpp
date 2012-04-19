@@ -55,8 +55,7 @@ Q_DECLARE_METATYPE(QnWorkbenchLayout *);
 
 namespace {
 
-    QToolButton *newActionButton(QAction *action, qreal sizeMultiplier = 1.0)
-    {
+    QToolButton *newActionButton(QAction *action, qreal sizeMultiplier = 1.0) {
         QToolButton *button = new QToolButton();
         button->setDefaultAction(action);
 
@@ -68,8 +67,7 @@ namespace {
         return button;
     }
 
-    void setVisibleRecursively(QLayout *layout, bool visible)
-    {
+    void setVisibleRecursively(QLayout *layout, bool visible) {
         for(int i = 0, count = layout->count(); i < count; i++) {
             QLayoutItem *item = layout->itemAt(i);
             if(item->widget()) {
@@ -245,15 +243,11 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     action(Qn::OpenNewTabAction)->trigger();
 }
 
-QnMainWindow::~QnMainWindow()
-{
+QnMainWindow::~QnMainWindow() {
     m_dwm = NULL;
-    /*while(!children().empty())
-        delete children().front();*/
 }
 
-void QnMainWindow::setTitleVisible(bool visible) 
-{
+void QnMainWindow::setTitleVisible(bool visible) {
     if(m_titleVisible == visible)
         return;
 
@@ -270,8 +264,7 @@ void QnMainWindow::setTitleVisible(bool visible)
     updateDwmState();
 }
 
-void QnMainWindow::setFullScreen(bool fullScreen) 
-{
+void QnMainWindow::setFullScreen(bool fullScreen) {
     if(fullScreen == isFullScreen())
         return;
 
@@ -282,30 +275,25 @@ void QnMainWindow::setFullScreen(bool fullScreen)
     }
 }
 
-void QnMainWindow::toggleFullScreen() 
-{
+void QnMainWindow::toggleFullScreen() {
     setFullScreen(!isFullScreen());
 }
 
-void QnMainWindow::minimize() 
-{
+void QnMainWindow::minimize() {
     setWindowState(Qt::WindowMinimized | windowState());
 }
 
-void QnMainWindow::toggleTitleVisibility() 
-{
+void QnMainWindow::toggleTitleVisibility() {
     setTitleVisible(!isTitleVisible());
 }
 
-void QnMainWindow::handleMessage(const QString &message)
-{
+void QnMainWindow::handleMessage(const QString &message) {
     const QStringList files = message.split(QLatin1Char('\n'), QString::SkipEmptyParts);
     
     menu()->trigger(Qn::DropResourcesAction, QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(files)));
 }
 
-void QnMainWindow::updateFullScreenState() 
-{
+void QnMainWindow::updateFullScreenState() {
     bool fullScreen = isFullScreen();
 
     action(Qn::FullscreenAction)->setChecked(fullScreen);
@@ -317,8 +305,7 @@ void QnMainWindow::updateFullScreenState()
     updateDwmState();
 }
 
-void QnMainWindow::updateDwmState()
-{
+void QnMainWindow::updateDwmState() {
     if(!m_dwm->isSupported()) {
         m_drawCustomFrame = false;
 
@@ -467,8 +454,7 @@ void QnMainWindow::changeEvent(QEvent *event) {
     base_type::changeEvent(event);
 }
 
-void QnMainWindow::paintEvent(QPaintEvent *event) 
-{
+void QnMainWindow::paintEvent(QPaintEvent *event) {
     base_type::paintEvent(event);
 
     if(m_drawCustomFrame) {
@@ -533,8 +519,7 @@ bool QnMainWindow::winEvent(MSG *message, long *result)
 }
 #endif
 
-void QnMainWindow::at_fileOpenSignalizer_activated(QObject *, QEvent *event)
-{
+void QnMainWindow::at_fileOpenSignalizer_activated(QObject *, QEvent *event) {
     if(event->type() != QEvent::FileOpen) {
         qnWarning("Expected event of type %1, received an event of type %2.", static_cast<int>(QEvent::FileOpen), static_cast<int>(event->type()));
         return;
@@ -543,8 +528,7 @@ void QnMainWindow::at_fileOpenSignalizer_activated(QObject *, QEvent *event)
     handleMessage(static_cast<QFileOpenEvent *>(event)->file());
 }
 
-void QnMainWindow::at_sessionManager_error(int error)
-{
+void QnMainWindow::at_sessionManager_error(int error) {
     switch (error) {
     case QNetworkReply::ConnectionRefusedError:
     case QNetworkReply::HostNotFoundError:

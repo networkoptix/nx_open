@@ -16,7 +16,7 @@ if status networkoptix-mediaserver | grep "start/running" > /dev/null; then
 fi
     
 function read_config {
-    [ -f $CONFIG_FILE ] || return
+    [ -f $CONFIG_FILE ] || { true; return; }
 
     SERVER_GUID=$(cat $CONFIG_FILE | grep serverGuid | head -1 | sed 's/serverGuid=\(.*\)/\1/g')
     LOG_FILE=$(cat $CONFIG_FILE | grep logFile | head -1 | sed 's/logFile=\(.*\)/\1/g')

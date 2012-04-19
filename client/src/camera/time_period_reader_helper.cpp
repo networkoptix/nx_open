@@ -1,6 +1,7 @@
 #include "time_period_reader_helper.h"
 #include "core/resource/video_server.h"
 #include "core/resourcemanagment/resource_pool.h"
+#include "core/resource/camera_history.h"
 
 QnTimePeriodReaderHelper::QnTimePeriodReaderHelper():
     m_mutex(QMutex::Recursive),
@@ -22,9 +23,14 @@ int QnTimePeriodReaderHelper::load(const QnNetworkResourceList& netResList, cons
     QList<int> hList;
     foreach(const QnNetworkResourcePtr& netRes, netResList)
     {
-        int handle = load(netRes, period);
-        if (handle > 0)
-            hList << handle;
+        // sometime camera moved between media server. Got all servers by requested time period
+        QList<QnNetworkResourcePtr> cameraList = QnCameraHistoryPool::instance()->getAllCamerasWithSameMac(netRes, period);
+        foreach(const QnNetworkResourcePtr& camera, cameraList)
+        {
+            int handle = load(camera, period);
+            if (handle > 0)
+                hList << handle;
+        }
     }
     if (hList.isEmpty())
         return -1;

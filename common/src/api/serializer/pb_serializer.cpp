@@ -4,19 +4,20 @@
 #include "resource.pb.h"
 #include "resourceType.pb.h"
 #include "license.pb.h"
-
+#include "cameraServerItem.pb.h"
 #include "api/QStdIStream.h"
 
 #include "pb_serializer.h"
 
 namespace {
 
-typedef google::protobuf::RepeatedPtrField<proto::pb::Camera> PbCameraList;
-typedef google::protobuf::RepeatedPtrField<proto::pb::Server>         PbServerList;
-typedef google::protobuf::RepeatedPtrField<proto::pb::Layout>         PbLayoutList;
-typedef google::protobuf::RepeatedPtrField<proto::pb::User>           PbUserList;
-typedef google::protobuf::RepeatedPtrField<proto::pb::ResourceType>   PbResourceTypeList;
-typedef google::protobuf::RepeatedPtrField<proto::pb::License>        PbLicenseList;
+typedef google::protobuf::RepeatedPtrField<proto::pb::Camera>           PbCameraList;
+typedef google::protobuf::RepeatedPtrField<proto::pb::Server>           PbServerList;
+typedef google::protobuf::RepeatedPtrField<proto::pb::Layout>           PbLayoutList;
+typedef google::protobuf::RepeatedPtrField<proto::pb::User>             PbUserList;
+typedef google::protobuf::RepeatedPtrField<proto::pb::ResourceType>     PbResourceTypeList;
+typedef google::protobuf::RepeatedPtrField<proto::pb::License>          PbLicenseList;
+typedef google::protobuf::RepeatedPtrField<proto::pb::CameraServerItem> PbCameraServerItemList;
 
 QString serializeNetAddrList(const QList<QHostAddress>& netAddrList)
 {
@@ -364,6 +365,50 @@ void parseLicenses(QnLicenseList& licenses, const PbLicenseList& pb_licenses)
     }
 }
 
+void parserCameraServerItems(QnCameraHistoryList& cameraServerItems, const PbCameraServerItemList& pb_cameraServerItems)
+{
+    typedef QMap<qint64, QString> TimestampGuid;
+    typedef QMap<QString, TimestampGuid> HistoryType;
+
+    // CameraMAC -> (Timestamp -> ServerGuid)
+    HistoryType history;
+
+    // Fill temporary history map
+    for (PbCameraServerItemList::const_iterator ci = pb_cameraServerItems.begin(); ci != pb_cameraServerItems.end(); ++ci)
+    {
+        const proto::pb::CameraServerItem& pb_item = *ci;
+
+        history[pb_item.mac().c_str()][pb_item.timestamp()] = pb_item.serverguid().c_str();
+    }
+
+    for(HistoryType::const_iterator ci = history.begin(); ci != history.end(); ++ci)
+    {
+        QnCameraHistoryPtr cameraHistory = QnCameraHistoryPtr(new QnCameraHistory());
+
+        if (ci.value().isEmpty())
+            continue;
+
+        QMapIterator<qint64, QString> camit(ci.value());
+        camit.toFront();
+
+        qint64 duration;
+        cameraHistory->setMacAddress(ci.key());
+        while (camit.hasNext())
+        {
+            camit.next();
+
+            if (camit.hasNext())
+                duration = camit.peekNext().key() - camit.key();
+            else
+                duration = -1;
+
+            cameraHistory->addTimePeriod(QnCameraTimePeriod(camit.key(), duration, camit.value()));
+        }
+
+        cameraServerItems.append(cameraHistory);
+    }
+}
+
 void serializeCamera_i(proto::pb::Camera& pb_camera, const QnVirtualCameraResourcePtr& cameraPtr)
 {
     pb_camera.set_id(cameraPtr->getId().toInt());
@@ -394,6 +439,13 @@ void serializeCamera_i(proto::pb::Camera& pb_camera, const QnVirtualCameraResour
         pb_scheduleTask.set_streamquality((proto::pb::Camera_Quality)scheduleTaskIn.getStreamQuality());
         pb_scheduleTask.set_fps(scheduleTaskIn.getFps());
     }
+}
+
+void serializeCameraServerItem_i(proto::pb::CameraServerItem& pb_cameraServerItem, const QnCameraHistoryItem& cameraServerItem)
+{
+    pb_cameraServerItem.set_mac(cameraServerItem.mac.toStdString());
+    pb_cameraServerItem.set_timestamp(cameraServerItem.timestamp);
+    pb_cameraServerItem.set_serverguid(cameraServerItem.videoServerGuid.toStdString());
 }
 
 void serializeLayout_i(proto::pb::Layout& pb_layout, const QnLayoutResourcePtr& layoutIn)
@@ -515,6 +567,19 @@ void QnApiPbSerializer::deserializeLicenses(QnLicenseList &licenses, const QByte
     parseLicenses(licenses, pb_licenses.license());
 }
 
+void QnApiPbSerializer::deserializeCameraHistoryList(QnCameraHistoryList &cameraHistoryList, const QByteArray &data)
+{
+    proto::pb::CameraServerItems pb_csis;
+
+    if (!pb_csis.ParseFromArray(data.data(), data.size())) {
+        QByteArray errorString;
+        errorString = "QnApiPbSerializer::deserializeLicenses(): Can't parse message";
+        throw QnSerializeException(errorString);
+    }
+
+    parserCameraServerItems(cameraHistoryList, pb_csis.cameraserveritem());
+}
+
 void QnApiPbSerializer::serializeCameras(const QnVirtualCameraResourceList& cameras, QByteArray& data)
 {
     proto::pb::Cameras pb_cameras;
@@ -623,3 +688,14 @@ void QnApiPbSerializer::serializeLayouts(const QnLayoutResourceList& layouts, QB
     pb_layouts.SerializeToString(&str);
     data = QByteArray(str.data(), str.length());
 }
+
+void QnApiPbSerializer::serializeCameraServerItem(const QnCameraHistoryItem& cameraServerItem, QByteArray &data)
+{
+    proto::pb::CameraServerItems pb_cameraServerItems;
+    serializeCameraServerItem_i(*pb_cameraServerItems.add_cameraserveritem(), cameraServerItem);
+
+    std::string str;
+    pb_cameraServerItems.SerializeToString(&str);
+    data = QByteArray(str.data(), str.length());
+}
+

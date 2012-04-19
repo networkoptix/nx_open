@@ -6,7 +6,7 @@
 #include "core/resource/resource_media_layout.h"
 #include "plugins/resources/archive/abstract_archive_delegate.h"
 #include "utils/common/util.h"
-
+#include "recording/time_period.h"
 
 
 struct AVFormatContext;
@@ -47,6 +47,13 @@ private:
     QnAbstractDataPacketPtr processFFmpegRtpPayload(const quint8* data, int dataSize);
     void processMetadata(const quint8* data, int dataSize);
     void reopen();
+
+    // determine camera's video server on specified time
+    QnResourcePtr getResourceOnTime(QnResourcePtr resource, qint64 time);
+    QnResourcePtr getNextVideoServerFromTime(QnResourcePtr resource, qint64 time);
+    QnAbstractMediaDataPtr getNextDataInternal();
+    QString getUrl(QnResourcePtr server);
+    qint64 checkMinTimeFromOtherServer(QnResourcePtr resource);
 private:
     QMutex m_mutex;
     RTPSession m_rtspSession;
@@ -72,6 +79,10 @@ private:
     bool m_blockReopening;
     MediaQuality m_quality;
     bool m_qualityFastSwitch;
+    qint64 m_lastMinTimeTime;
+
+    QnTimePeriod m_serverTimePeriod;
+    qint64 m_globalMinArchiveTime; // min archive time between all servers
 };
 
 #endif

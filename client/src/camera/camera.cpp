@@ -177,7 +177,7 @@ void CLVideoCamera::onReachedTheEnd()
         emit reachedTheEnd();
 }
 
-void CLVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, const QString& fileName)
+void CLVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, const QString& fileName, const QString& format)
 {
     if (startTime > endTime)
         qSwap(startTime, endTime);
@@ -204,7 +204,11 @@ void CLVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, co
     m_exportRecorder->setEofDateTime(endTime);
     m_exportRecorder->setFileName(fileName);
     m_exportRecorder->setRole(QnStreamRecorder::Role_FileExport);
+    m_exportRecorder->setContainer(format);
+
+#ifndef _DEBUG
     if (qSharedPointerDynamicCast<QnSecurityCamResource>(m_resource))
+#endif
     {
         m_exportRecorder->setNeedCalcSignature(true);
         m_exportRecorder->setSignLogo(qnSkin->pixmap("logo_1920_1080.png"));

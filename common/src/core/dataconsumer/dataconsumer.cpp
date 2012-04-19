@@ -29,8 +29,6 @@ void QnAbstractDataConsumer::endOfRun()
 
 void QnAbstractDataConsumer::run()
 {
-	qDebug() << "data processor started.";
-
 //	const int timeoutMs = 100;
 	while(!needToStop())
 	{
@@ -56,8 +54,6 @@ void QnAbstractDataConsumer::run()
 	}
 
 	endOfRun();
-
-	qDebug() << "data processor stopped.";
 }
 
 int QnAbstractDataConsumer::queueSize() const

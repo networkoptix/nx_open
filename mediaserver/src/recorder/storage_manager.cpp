@@ -28,7 +28,11 @@ void QnStorageManager::loadFullFileCatalog()
 
 void QnStorageManager::loadFullFileCatalogInternal(QnResource::ConnectionRole role)
 {
+#ifdef _TEST_TWO_SERVERS
+    QDir dir(closeDirPath(getDataDirectory()) + QString("test/record_catalog/media/") + DeviceFileCatalog::prefixForRole(role));
+#else
     QDir dir(closeDirPath(getDataDirectory()) + QString("record_catalog/media/") + DeviceFileCatalog::prefixForRole(role));
+#endif
     QFileInfoList list = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
     foreach(QFileInfo fi, list)
     {
@@ -38,7 +42,11 @@ void QnStorageManager::loadFullFileCatalogInternal(QnResource::ConnectionRole ro
 
 bool QnStorageManager::deserializeStorageFile()
 {
+#ifdef _TEST_TWO_SERVERS
+    QFile storageFile(closeDirPath(getDataDirectory()) + QString("test/record_catalog/media/storage_index.csv"));
+#else
     QFile storageFile(closeDirPath(getDataDirectory()) + QString("record_catalog/media/storage_index.csv"));
+#endif
     if (!storageFile.exists())
         return true;
     if (!storageFile.open(QFile::ReadOnly))
@@ -57,7 +65,11 @@ bool QnStorageManager::deserializeStorageFile()
 
 bool QnStorageManager::serializeStorageFile()
 {
+#ifdef _TEST_TWO_SERVERS
+    QString baseName = closeDirPath(getDataDirectory()) + QString("test/record_catalog/media/storage_index.csv");
+#else
     QString baseName = closeDirPath(getDataDirectory()) + QString("record_catalog/media/storage_index.csv");
+#endif
     QFile storageFile(baseName + ".new");
     if (!storageFile.open(QFile::WriteOnly | QFile::Truncate))
         return false;
@@ -101,6 +113,8 @@ void QnStorageManager::addStorage(QnStorageResourcePtr storage)
     storage->setIndex(detectStorageIndex(storage->getUrl()));
     QMutexLocker lock(&m_mutex);
     m_storageRoots.insert(storage->getIndex(), storage);
+    if (storage->isStorageAvailable())
+        storage->setStatus(QnResource::Online);
 }
 
 QnStorageManager::~QnStorageManager()
@@ -337,7 +351,7 @@ QnStorageResourcePtr QnStorageManager::extractStorageFromFileName(int& storageIn
     return QnStorageResourcePtr();
 }
 
-QnStorageResourcePtr QnStorageManager::getStorageByUrl(QString& fileName)
+QnStorageResourcePtr QnStorageManager::getStorageByUrl(const QString& fileName)
 {
     for(StorageMap::iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
     {

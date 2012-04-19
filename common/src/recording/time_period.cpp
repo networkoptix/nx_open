@@ -23,6 +23,20 @@ void QnTimePeriod::clear()
     durationMs = 0;
 }
 
+bool QnTimePeriod::isEmpty() const
+{
+    return startTimeMs == 0 && durationMs == 0;
+}
+
+qint64 QnTimePeriod::endTimeMs() const
+{
+    if (durationMs == -1)
+        return DATETIME_NOW;
+    else
+        return startTimeMs + durationMs;
+}
+
+
 bool QnTimePeriod::containPeriod(const QnTimePeriod& timePeriod) const
 {
     return startTimeMs <= timePeriod.startTimeMs && (startTimeMs + durationMs >= timePeriod.startTimeMs + timePeriod.durationMs);
@@ -30,7 +44,7 @@ bool QnTimePeriod::containPeriod(const QnTimePeriod& timePeriod) const
 
 bool QnTimePeriod::containTime(qint64 timeMs) const
 {
-    return qBetween(timeMs, startTimeMs, startTimeMs+durationMs);
+    return qBetween(timeMs, startTimeMs, durationMs != -1 ? startTimeMs+durationMs : DATETIME_NOW);
 }
 
 

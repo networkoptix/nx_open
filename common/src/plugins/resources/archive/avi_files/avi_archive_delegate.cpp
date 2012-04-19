@@ -260,7 +260,13 @@ bool QnAviArchiveDelegate::open(QnResourcePtr resource)
 
 void QnAviArchiveDelegate::doNotFindStreamInfo()
 {
+    // this call used for optimization. Avoid av_find_stream_info_call for server's chunks to increase speed
     m_streamsFound=true;
+    if (m_formatContext)
+    {
+        for (int i = 0; i < m_formatContext->nb_streams; ++i)
+            m_formatContext->streams[i]->first_dts = 0; // reset first_dts. If don't do it, av_seek will seek to begin of file always
+    }
 }
 
 void QnAviArchiveDelegate::close()
@@ -287,18 +293,29 @@ QnVideoResourceLayout* QnAviArchiveDelegate::getVideoLayout()
     {
         return &defaultVideoLayout;
     }
+
     if (m_videoLayout == 0)
     {
         m_videoLayout = new QnCustomDeviceVideoLayout(1, 1);
-        AVDictionaryEntry* layoutInfo = av_dict_get(m_formatContext->metadata,"video_layout", 0, 0);
-        if (layoutInfo)
-            deserializeLayout(m_videoLayout, layoutInfo->value);
 
-        if (m_useAbsolutePos)
+        // prevent standart tag name parsing in 'avi' format
+        QString format = QString(m_formatContext->iformat->name).split(',')[0];
+
+        AVDictionaryEntry* software = av_dict_get(m_formatContext->metadata, getTagName(Tag_Software, format), 0, 0);
+        bool allowTags = format != QString("avi") || (software && QString(software->value) == QString("Network Optix"));
+
+        if (allowTags)
         {
-            AVDictionaryEntry* start_time = av_dict_get(m_formatContext->metadata,"start_time", 0, 0);
-            if (start_time)
-                m_startTime = QString(start_time->value).toLongLong()*1000ll;
+            AVDictionaryEntry* layoutInfo = av_dict_get(m_formatContext->metadata,getTagName(Tag_LayoutInfo, format), 0, 0);
+            if (layoutInfo)
+                deserializeLayout(m_videoLayout, layoutInfo->value);
+
+            if (m_useAbsolutePos)
+            {
+                AVDictionaryEntry* start_time = av_dict_get(m_formatContext->metadata,getTagName(Tag_startTime, format), 0, 0);
+                if (start_time)
+                    m_startTime = QString(start_time->value).toLongLong()*1000ll;
+            }
         }
     }
     return m_videoLayout;
@@ -364,16 +381,9 @@ void QnAviArchiveDelegate::initLayoutStreams()
         case AVMEDIA_TYPE_VIDEO:
             if (m_firstVideoIndex == -1)
                 m_firstVideoIndex = i;
-            entry = av_dict_get(m_formatContext->streams[i]->metadata, "layout_channel", 0, 0);
             while (m_indexToChannel.size() <= i)
                 m_indexToChannel << -1;
-            if (entry) {
-                int channel = QString(entry->value).toInt();
-                m_indexToChannel[i] = channel;
-            }
-            else if (videoNum == 0) {
-                m_indexToChannel[i] = 0;
-            }
+            m_indexToChannel[i] = videoNum;
             videoNum++;
             break;
 
@@ -474,4 +484,36 @@ bool QnAviArchiveDelegate::isStreamsFound() const
 void QnAviArchiveDelegate::setStorage(QnStorageResourcePtr storage)
 {
     m_storage = storage;
+}
+
+const char* QnAviArchiveDelegate::getTagName(Tag tag, const QString& formatName)
+{
+    if (formatName == QString("avi"))
+    {
+        switch(tag)
+        {
+        case Tag_startTime:
+            return "date"; // "ICRD";
+        case Tag_endTime:
+            return "ISRC"; // not used
+        case Tag_LayoutInfo:
+            return "comment"; // "ICMT";
+        case Tag_Software:
+            return "encoded_by"; // "ITCH";
+        }
+    }
+    else {
+        switch(tag)
+        {
+        case Tag_startTime:
+            return "start_time"; // StartTimecode
+        case Tag_endTime:
+            return "end_time"; // EndTimecode
+        case Tag_LayoutInfo:
+            return "video_layout"; // TrackNumber
+        case Tag_Software:
+            return "software";
+        }
+    }
+    return "";
 }
