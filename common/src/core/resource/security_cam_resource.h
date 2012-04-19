@@ -13,11 +13,17 @@ public:
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(QnResourcePtr res, QnResource::ConnectionRole role) = 0;
 };
 
+enum MotionType {MT_NoMotion = 0, MT_HardwareGrid = 1, MT_SoftwareGrid = 2, MT_MotionWindow = 4};
+Q_DECLARE_FLAGS(MotionTypeFlags, MotionType);
+
 class QnSecurityCamResource : virtual public QnMediaResource
 {
     Q_OBJECT
 
 public:
+
+    MotionTypeFlags supportedMotionType();
+
     QnSecurityCamResource();
     virtual ~QnSecurityCamResource();
 

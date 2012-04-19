@@ -47,7 +47,7 @@ m_livemutex(QMutex::Recursive),
 m_role(QnResource::Role_LiveVideo),
 m_softwareMotion(false)
 {
-    //m_softwareMotion = true;
+    m_softwareMotion = true;
 
     m_timeSinceLastMetaData.restart();
 

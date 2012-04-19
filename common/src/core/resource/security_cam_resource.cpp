@@ -175,3 +175,27 @@ bool QnSecurityCamResource::hasDualStreaming() const
 {
     return true;
 }
+
+MotionTypeFlags QnSecurityCamResource::supportedMotionType()
+{
+    QVariant val;
+    MotionTypeFlags result = MT_NoMotion;
+    if (getParam("supportedMotion", val, QnDomainMemory))
+    {
+        QStringList vals = val.toString().split(',');
+        foreach(const QString& str, vals)
+        {
+            QString s1 = str.toLower();
+            if (s1 == QString("hardwaregrid"))
+                result |= MT_HardwareGrid;
+            else if (s1 == QString("softwaregrid"))
+                result |= MT_SoftwareGrid;
+            else if (s1 == QString("motionwindow"))
+                result |= MT_MotionWindow;
+        }
+    }
+    else {
+        result |= MT_MotionWindow;
+    }
+    return result;
+}
