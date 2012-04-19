@@ -68,7 +68,7 @@ void parseCameras(QList<T>& cameras, const PbCameraList& pb_cameras, QnResourceF
 
         camera->setScheduleDisabled(pb_camera.scheduledisabled());
         camera->setAuth(QString::fromUtf8(pb_camera.login().c_str()), QString::fromUtf8(pb_camera.password().c_str()));
-        camera->setMotionType((int)pb_camera.motionType());
+        camera->setMotionType(static_cast<MotionType>(pb_camera.motiontype()));
 
         if (pb_camera.has_region())
         {

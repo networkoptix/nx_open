@@ -3,7 +3,7 @@
 
 #include <QImage>
 #include <QTime>
-#include <qDebug>
+#include <QDebug>
 #include "utils/network/socket.h"
 #include "utils/common/synctime.h"
 
