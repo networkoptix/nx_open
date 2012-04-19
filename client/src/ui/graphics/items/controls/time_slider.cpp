@@ -48,6 +48,27 @@ namespace {
     Q_GLOBAL_STATIC_WITH_ARGS(const QVector<QnTimeStep>, absoluteTimeSteps, (TimeStepFactory::createAbsoluteSteps()));
     Q_GLOBAL_STATIC_WITH_ARGS(const QVector<QnTimeStep>, relativeTimeSteps, (TimeStepFactory::createRelativeSteps()));
 
+    QPixmap renderText(const QString &text, const QPen &pen, const QFont &font, int fontPixelSize = -1) {
+        QFont actualFont = font;
+        if(fontPixelSize != -1)
+            actualFont.setPixelSize(fontPixelSize);
+
+        QFontMetrics metrics(actualFont);
+        QSize textSize = metrics.size(Qt::TextSingleLine, text);
+
+        QPixmap pixmap(textSize.width(), textSize.height());
+        pixmap.fill(QColor(0, 0, 0, 0));
+
+        QPainter painter(&pixmap);
+        painter.setCompositionMode(QPainter::CompositionMode_Source);
+        painter.setPen(pen);
+        painter.setFont(actualFont);
+        painter.drawText(pixmap.rect(), Qt::AlignCenter | Qt::TextSingleLine, text);
+        painter.end();
+
+        return pixmap;
+    }
+
     const qreal minTickmarkSpanPixels = 1.0;
     const qreal maxTickmarkSpanFraction = 0.75;
     const qreal minTickmarkSeparationPixels = 5.0;
@@ -184,11 +205,33 @@ QVector<QnTimeStep> QnTimeSlider::enumerateSteps(const QVector<QnTimeStep> &step
 }
 
 int QnTimeSlider::lineCount() const {
-    return m_timePeriods.size();
+    return m_lineCount;
 }
 
 void QnTimeSlider::setLineCount(int lineCount) {
+    if(m_lineCount == lineCount)
+        return;
+
+    m_lineCount = lineCount;
+
     m_timePeriods.resize(lineCount);
+    m_lineComments.resize(lineCount);
+    m_lineCommentPixmaps.resize(lineCount);
+
+    updateLineCommentPixmaps();
+}
+
+void QnTimeSlider::setLineComment(int line, const QString &comment) {
+    if(m_lineComments[line] == comment)
+        return;
+
+    m_lineComments[line] = comment;
+
+    updateLineCommentPixmap(line);
+}
+
+QString QnTimeSlider::lineComment(int line) {
+    return m_lineComments[line];
 }
 
 QnTimePeriodList QnTimeSlider::timePeriods(int line, Qn::TimePeriodType type) const {
@@ -274,7 +317,7 @@ void QnTimeSlider::setWindow(qint64 start, qint64 end) {
         emit windowChanged(m_windowStart, m_windowEnd);
 
         updateToolTipVisibility();
-        updateStepTargets();
+        updateStepAnimationTargets();
     }
 }
 
@@ -349,25 +392,14 @@ const QPixmap &QnTimeSlider::cachedPixmap(qint64 position, int height, const QnT
     if(itr != m_labelPixmaps.end())
         return *itr;
 
-    QFont font = this->font();
-    font.setPixelSize(height);
+    QPixmap result = renderText(
+        toString(position, step), 
+        QPen(palette().brush(QPalette::Text), 0), 
+        font(), 
+        height
+    );
 
-    QString text = toString(position, step);
-
-    QFontMetrics metrics(font);
-    QSize textSize = metrics.size(Qt::TextSingleLine, text);
-
-    QPixmap pixmap(textSize.width(), textSize.height());
-    pixmap.fill(QColor(0,0,0,0));
-
-    QPainter painter(&pixmap);
-    painter.setCompositionMode(QPainter::CompositionMode_Source);
-    painter.setPen(palette().color(QPalette::Text));
-    painter.setFont(font);
-    painter.drawText(pixmap.rect(), Qt::AlignCenter | Qt::TextSingleLine, text);
-    painter.end();
-
-    return m_labelPixmaps[key] = pixmap;
+    return m_labelPixmaps[key] = result;
 }
 
 void QnTimeSlider::updateToolTipVisibility() {
@@ -391,6 +423,20 @@ void QnTimeSlider::updateToolTipText() {
     setToolTip(toolTip);
 }
 
+void QnTimeSlider::updateLineCommentPixmap(int line) {
+    m_lineCommentPixmaps[line] = renderText(
+        m_lineComments[line],
+        QPen(palette().brush(QPalette::Text), 0),
+        font(),
+        qRound(size().height() * (1.0 - tickmarkBarRelativeHeight) / m_lineCount)
+    );
+}
+
+void QnTimeSlider::updateLineCommentPixmaps() {
+    for(int i = 0; i < m_lineCount; i++)
+        updateLineCommentPixmap(i);
+}
+
 void QnTimeSlider::updateSteps() {
     m_steps = (m_options & UseUTC) ? *absoluteTimeSteps() : *relativeTimeSteps();
 
@@ -399,7 +445,7 @@ void QnTimeSlider::updateSteps() {
     m_stepData.resize(m_steps.size());
 }
 
-void QnTimeSlider::updateStepTargets() {
+void QnTimeSlider::updateStepAnimationTargets() {
     int stepCount = m_steps.size();
 
     qreal msecsPerPixel = (m_windowEnd - m_windowStart) / size().width();
@@ -495,13 +541,13 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     /* Initialize converter. It will be used a lot. */
     QRectF rect = this->rect();
 
-    for(int i = 0; i < m_timePeriods.size(); i++) {
+    for(int line = 0; line < m_lineCount; line++) {
         drawPeriodsBar(
             painter, 
-            m_timePeriods[i].forType[Qn::RecordingTimePeriod],  
-            m_timePeriods[i].forType[Qn::MotionTimePeriod], 
-            rect.top() + rect.height() * (tickmarkBarRelativeHeight + (1.0 - tickmarkBarRelativeHeight) * i / m_timePeriods.size()),   
-            rect.height() * (1.0 - tickmarkBarRelativeHeight) / m_timePeriods.size()
+            m_timePeriods[line].forType[Qn::RecordingTimePeriod],  
+            m_timePeriods[line].forType[Qn::MotionTimePeriod], 
+            rect.top() + rect.height() * (tickmarkBarRelativeHeight + (1.0 - tickmarkBarRelativeHeight) * line / m_lineCount),   
+            rect.height() * (1.0 - tickmarkBarRelativeHeight) / m_lineCount
         );
     }
 
@@ -669,7 +715,7 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, qreal top, qreal height) {
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnTimeSlider::tick(int deltaMSecs) {
-    updateStepTargets();
+    updateStepAnimationTargets();
     animateStepValues(deltaMSecs);
 }
 
@@ -722,7 +768,8 @@ void QnTimeSlider::wheelEvent(QGraphicsSceneWheelEvent *event) {
 void QnTimeSlider::resizeEvent(QGraphicsSceneResizeEvent *event) {
     base_type::resizeEvent(event);
 
-    updateStepTargets();
+    updateStepAnimationTargets();
+    updateLineCommentPixmaps();
 }
 
 void QnTimeSlider::kineticMove(const QVariant &degrees) {

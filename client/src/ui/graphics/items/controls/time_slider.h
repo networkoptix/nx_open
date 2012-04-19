@@ -56,6 +56,9 @@ public:
     int lineCount() const;
     void setLineCount(int lineCount);
 
+    void setLineComment(int line, const QString &comment);
+    QString lineComment(int line);
+
     QnTimePeriodList timePeriods(int line, Qn::TimePeriodType type) const;
     void setTimePeriods(int line, Qn::TimePeriodType type, const QnTimePeriodList &timePeriods);
 
@@ -109,7 +112,9 @@ private:
     void updateToolTipVisibility();
     void updateToolTipText();
     void updateSteps();
-    void updateStepTargets();
+    void updateStepAnimationTargets();
+    void updateLineCommentPixmap(int line);
+    void updateLineCommentPixmaps();
     
     void animateStepValues(int deltaMSecs);
 
@@ -142,7 +147,10 @@ private:
 
     qint64 m_zoomAnchor;
 
+    int m_lineCount;
     QVector<TypedPeriods> m_timePeriods;
+    QVector<QString> m_lineComments;
+    QVector<QPixmap> m_lineCommentPixmaps;
     
     QVector<QnTimeStep> m_steps;
     QVector<TimeStepData> m_stepData;
