@@ -108,6 +108,7 @@ private:
     void drawPeriodsBar(QPainter *painter, QnTimePeriodList &recorded, QnTimePeriodList &motion, qreal top, qreal height);
     void drawPeriods(QPainter *painter, QnTimePeriodList &periods, qreal top, qreal height, const QColor &preColor, const QColor &pastColor);
     void drawTickmarks(QPainter *painter, qreal top, qreal height);
+    void drawSolidBackground(QPainter *painter, qreal top, qreal height);
 
     void updateToolTipVisibility();
     void updateToolTipText();
