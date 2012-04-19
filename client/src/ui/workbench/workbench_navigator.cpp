@@ -8,6 +8,8 @@
 
 #include <core/resource/camera_resource.h>
 
+#include <camera/caching_time_period_loader.h>
+#include <camera/time_period_loader.h>
 #include <camera/resource_display.h>
 #include <camera/camera.h>
 #include <ui/graphics/items/resource_widget.h>
@@ -208,6 +210,18 @@ void QnWorkbenchNavigator::setCurrentWidget(QnResourceWidget *widget) {
     emit currentWidgetChanged();
 }
 
+QnCachingTimePeriodLoader *QnWorkbenchNavigator::loader(const QnResourcePtr &resource) {
+    QHash<QnResourcePtr, QnCachingTimePeriodLoader *>::const_iterator pos = m_loaderByResource.find(resource);
+    if(pos != m_loaderByResource.end())
+        return *pos;
+
+    QnCachingTimePeriodLoader *loader = QnCachingTimePeriodLoader::newInstance(resource, this);
+    if(loader)
+        connect(loader, SIGNAL(periodsChanged(Qn::TimePeriodType)), this, SLOT(at_loader_periodsChanged(Qn::TimePeriodType)));
+
+    m_loaderByResource[resource] = loader;
+    return loader;
+}
 
 void QnWorkbenchNavigator::updateSlider() {
     if (!m_currentWidget)
@@ -253,6 +267,10 @@ void QnWorkbenchNavigator::updateSlider() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+void QnWorkbenchNavigator::at_loader_periodsChanged(Qn::TimePeriodType type) {
+
+}
+
 void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value) {
     if(!m_currentWidget)
         return;

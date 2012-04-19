@@ -3,6 +3,8 @@
 
 #include <QtCore/QObject>
 
+#include <core/resource/resource_fwd.h>
+
 #include <recording/time_period.h>
 
 class QnTimePeriodLoader;
@@ -15,15 +17,24 @@ public:
     QnCachingTimePeriodLoader(QObject *parent = NULL);
     virtual ~QnCachingTimePeriodLoader();
 
+    static QnCachingTimePeriodLoader *newInstance(const QnResourcePtr &resouce, QObject *parent = NULL);
+
     QnTimePeriodLoader *loader();
     void setLoader(QnTimePeriodLoader *loader);
 
     qreal loadingMargin() const;
     void setLoadingMargin(qreal loadingMargin);
 
-    const QnTimePeriod &loadedPeriod() const;
+    qint64 updateInterval() const;
+    void setUpdateInterval(qint64 msecs);
 
-    QnTimePeriodList periods(const QnTimePeriod &targetPeriod, const QList<QRegion> &motionRegions = QList<QRegion>());
+    const QnTimePeriod &loadedPeriod() const;
+    void setTargetPeriod(const QnTimePeriod &targetPeriod);
+    
+    const QList<QRegion> &motionRegions() const;
+    void setMotionRegions(const QList<QRegion> &motionRegions);
+
+    QnTimePeriodList periods(Qn::TimePeriodType type);
 
 signals:
     void periodsChanged(Qn::TimePeriodType type);
@@ -36,6 +47,7 @@ private slots:
 
 protected:
     void load(Qn::TimePeriodType type);
+    void trim(Qn::TimePeriodType type, qint64 trimTime);
 
     QnTimePeriod addLoadingMargins(const QnTimePeriod &targetPeriod) const;
 
@@ -46,6 +58,7 @@ private:
     QList<QRegion> m_motionRegions;
     QnTimePeriodList m_periods[Qn::TimePeriodTypeCount];
     qreal m_loadingMargin;
+    qint64 m_updateInterval;
 };
 
 

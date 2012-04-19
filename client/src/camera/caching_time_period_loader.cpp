@@ -1,21 +1,47 @@
 #include "caching_time_period_loader.h"
 
+#include <QtCore/QMetaType>
+
 #include <utils/common/warnings.h>
+#include <utils/common/synctime.h>
 
 #include "time_period_loader.h"
+
+namespace {
+    qint64 minLoadingMargin = 60 * 60 * 1000; /* 1 hour. */
+    qint64 defaultUpdateInterval = 10 * 1000;
+}
 
 
 QnCachingTimePeriodLoader::QnCachingTimePeriodLoader(QObject *parent):
     QObject(parent),
     m_loader(NULL),
-    m_loadingMargin(1.0)
+    m_loadingMargin(1.0),
+    m_updateInterval(defaultUpdateInterval)
 {
+    static volatile bool metaTypesInitialized = false;
+    if (!metaTypesInitialized) {
+        qRegisterMetaType<Qn::TimePeriodType>();
+        metaTypesInitialized = true;
+    }
+
     for(int i = 0; i < Qn::TimePeriodTypeCount; i++)
         m_handles[i] = -1;
 }
 
 QnCachingTimePeriodLoader::~QnCachingTimePeriodLoader() {
     return;
+}
+
+QnCachingTimePeriodLoader *QnCachingTimePeriodLoader::newInstance(const QnResourcePtr &resouce, QObject *parent) {
+    QnTimePeriodLoader *loader = QnTimePeriodLoader::newInstance(resouce);
+    if(!loader)
+        return NULL;
+
+    QnCachingTimePeriodLoader *result = new QnCachingTimePeriodLoader(parent);
+    result->setLoader(loader);
+    loader->setParent(result);
+    return result;
 }
 
 QnTimePeriodLoader *QnCachingTimePeriodLoader::loader() {
@@ -46,22 +72,58 @@ void QnCachingTimePeriodLoader::setLoadingMargin(qreal loadingMargin) {
     m_loadingMargin = loadingMargin;
 }
 
+qint64 QnCachingTimePeriodLoader::updateInterval() const {
+    return m_updateInterval;
+}
+
+void QnCachingTimePeriodLoader::setUpdateInterval(qint64 msecs) {
+    m_updateInterval = msecs;
+}
+
 const QnTimePeriod &QnCachingTimePeriodLoader::loadedPeriod() const {
     return m_loadedPeriod;
 }
 
-QnTimePeriod QnCachingTimePeriodLoader::addLoadingMargins(const QnTimePeriod &targetPeriod) const {
-    qint64 margin;
-    if(targetPeriod.durationMs == -1) {
-        margin = 0;
-    } else {
-        margin = targetPeriod.durationMs * m_loadingMargin;
-    }
+void QnCachingTimePeriodLoader::setTargetPeriod(const QnTimePeriod &targetPeriod) {
+    if(m_loadedPeriod.containPeriod(targetPeriod)) 
+        return;
+    
+    m_loadedPeriod = addLoadingMargins(targetPeriod);
+    for(int i = 0; i < Qn::TimePeriodTypeCount; i++)
+        load(static_cast<Qn::TimePeriodType>(i));
+}
 
-    return QnTimePeriod(
-        targetPeriod.startTimeMs - margin,
-        targetPeriod.durationMs + 2 * margin
-    );
+const QList<QRegion> &QnCachingTimePeriodLoader::motionRegions() const {
+    return m_motionRegions;
+}
+
+void QnCachingTimePeriodLoader::setMotionRegions(const QList<QRegion> &motionRegions) {
+    if(m_motionRegions == motionRegions)
+        return;
+
+    m_motionRegions = motionRegions;
+    load(Qn::MotionTimePeriod);
+}
+
+QnTimePeriodList QnCachingTimePeriodLoader::periods(Qn::TimePeriodType type) {
+    return m_periods[type];
+}
+
+QnTimePeriod QnCachingTimePeriodLoader::addLoadingMargins(const QnTimePeriod &targetPeriod) const {
+    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
+
+    qint64 startTime = targetPeriod.startTimeMs;
+    qint64 endTime = targetPeriod.durationMs == -1 ? currentTime : targetPeriod.startTimeMs + targetPeriod.durationMs;
+
+    /* Adjust for margin. */
+    qint64 margin = qMax(minLoadingMargin, static_cast<qint64>((endTime - startTime) * m_loadingMargin));
+    startTime -= margin;
+    endTime += margin;
+
+    /* Adjust for update interval. */
+    endTime = qMin(endTime, currentTime + m_updateInterval);
+
+    return QnTimePeriod(startTime, endTime - startTime);
 }
 
 void QnCachingTimePeriodLoader::load(Qn::TimePeriodType type) {
@@ -72,34 +134,34 @@ void QnCachingTimePeriodLoader::load(Qn::TimePeriodType type) {
     } else {
         if(type == Qn::RecordingTimePeriod) {
             m_handles[type] = loader->load(m_loadedPeriod);
-        } else {
-            m_handles[type] = loader->load(m_loadedPeriod, m_motionRegions);
+        } else { /* type == Qn::MotionTimePeriod */
+            if(!m_motionRegions.empty()) {
+                m_handles[type] = loader->load(m_loadedPeriod, m_motionRegions);
+            } else if(!m_periods[type].isEmpty()) {
+                m_periods[type].clear();
+                emit periodsChanged(type);
+            }
         }
     }
 }
 
-QnTimePeriodList QnCachingTimePeriodLoader::periods(const QnTimePeriod &targetPeriod, const QList<QRegion> &motionRegions) {
-    if(!m_loadedPeriod.containPeriod(targetPeriod)) {
-        m_loadedPeriod = addLoadingMargins(targetPeriod);
-        if(!motionRegions.isEmpty()) {
-            m_motionRegions = motionRegions;
-            m_periods[Qn::MotionTimePeriod].clear();
-        }
+void QnCachingTimePeriodLoader::trim(Qn::TimePeriodType type, qint64 trimTime) {
+    if(m_periods[type].isEmpty())
+        return;
 
-        load(Qn::RecordingTimePeriod);
-        load(Qn::MotionTimePeriod);
-    } else if(!motionRegions.isEmpty() && m_motionRegions != motionRegions) {
-        m_motionRegions = motionRegions;
-        m_periods[Qn::MotionTimePeriod].clear();
+    QnTimePeriod period = m_periods[type].back();
+    qint64 trimmedDurationMs = qMax(0ll, trimTime - period.startTimeMs);
+    if(period.durationMs != -1 && period.durationMs <= trimmedDurationMs)
+        return;
 
-        load(Qn::MotionTimePeriod);
-    }
-
-    if(motionRegions.isEmpty()) {
-        return m_periods[Qn::RecordingTimePeriod];
+    period.durationMs = trimmedDurationMs;
+    if(period.durationMs == 0) {
+        m_periods[type].pop_back();
     } else {
-        return m_periods[Qn::MotionTimePeriod];
+        m_periods[type].back() = period;
     }
+
+    emit periodsChanged(type);
 }
 
 
@@ -108,7 +170,7 @@ QnTimePeriodList QnCachingTimePeriodLoader::periods(const QnTimePeriod &targetPe
 // -------------------------------------------------------------------------- //
 void QnCachingTimePeriodLoader::at_loader_ready(const QnTimePeriodList &timePeriods, int handle) {
     for(int i = 0; i < Qn::TimePeriodTypeCount; i++) {
-        if(handle == m_handles[i]) {
+        if(handle == m_handles[i] && m_periods[i] != timePeriods) {
             m_periods[i] = timePeriods;
             emit periodsChanged(static_cast<Qn::TimePeriodType>(i));
         }
@@ -120,6 +182,10 @@ void QnCachingTimePeriodLoader::at_loader_failed(int status, int handle) {
         if(handle == m_handles[i]) {
             m_handles[i] = -1;
             emit loadingFailed();
+
+            qint64 trimTime = qnSyncTime->currentMSecsSinceEpoch();
+            for(int j = 0; j < Qn::TimePeriodTypeCount; j++)
+                trim(static_cast<Qn::TimePeriodType>(j), trimTime);
         }
     }
 }

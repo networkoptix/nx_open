@@ -5,6 +5,7 @@
 
 #include <core/resource/resource_fwd.h>
 
+#include "recording/time_period.h"
 #include "workbench_context_aware.h"
 #include "workbench_globals.h"
 
@@ -14,8 +15,7 @@ class QnWorkbenchDisplay;
 class QnTimeSlider;
 class QnResourceWidget;
 class QnAbstractArchiveReader;
-
-class CLVideoCamera;
+class QnCachingTimePeriodLoader;
 
 class QnWorkbenchNavigator: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT;
@@ -41,6 +41,8 @@ protected:
     
     void setCurrentWidget(QnResourceWidget *camera);
 
+    QnCachingTimePeriodLoader *loader(const QnResourcePtr &resource);
+
     Q_SLOT void updateCurrentWidget();
     Q_SLOT void updateSlider();
     void updateToolTipFormat();
@@ -52,10 +54,11 @@ private slots:
 
     void at_widget_motionRegionSelected(const QnResourcePtr &resource, QnAbstractArchiveReader *reader, const QList<QRegion> &selection);
 
+    void at_loader_periodsChanged(Qn::TimePeriodType type);
+
     void at_timeSlider_valueChanged(qint64 value);
     void at_timeSlider_sliderPressed();
     void at_timeSlider_sliderReleased();
-
     void at_timeSlider_destroyed();
 
 private:
@@ -70,8 +73,7 @@ private:
     bool m_wasPlaying;
     bool m_inUpdate;
 
-
-
+    QHash<QnResourcePtr, QnCachingTimePeriodLoader *> m_loaderByResource;
 };
 
 #endif // QN_WORKBENCH_NAVIGATOR_H
