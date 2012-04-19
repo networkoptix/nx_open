@@ -5,6 +5,7 @@
 #include <utils/common/util.h>
 #include <utils/common/synctime.h>
 #include <utils/common/scoped_value_rollback.h>
+#include <utils/common/checked_cast.h>
 
 #include <core/resource/camera_resource.h>
 
@@ -22,7 +23,6 @@
 
 #include <cstdint> // TODO: remove
 #include "libavutil/avutil.h" // TODO: remove
-
 
 
 QnWorkbenchNavigator::QnWorkbenchNavigator(QnWorkbenchDisplay *display, QObject *parent):
@@ -68,6 +68,8 @@ void QnWorkbenchNavigator::setTimeSlider(QnTimeSlider *timeSlider) {
 void QnWorkbenchNavigator::initialize() {
     assert(m_display && m_timeSlider);
 
+    m_timeSlider->setLineCount(SliderLineCount);
+
     connect(m_display,                          SIGNAL(widgetChanged(Qn::ItemRole)),                this,   SLOT(at_display_widgetChanged(Qn::ItemRole)));
     connect(m_display,                          SIGNAL(widgetAdded(QnResourceWidget *)),            this,   SLOT(at_display_widgetAdded(QnResourceWidget *)));
     connect(m_display,                          SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)), this,   SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
@@ -101,6 +103,7 @@ void QnWorkbenchNavigator::addSyncedWidget(QnResourceWidget *widget) {
     }
 
     m_syncedWidgets.insert(widget);
+    m_syncedResources.insert(widget->resource(), QHashDummyValue());
 
     updateCurrentWidget();
     //m_forceTimePeriodLoading = !updateRecPeriodList(true);
@@ -109,6 +112,10 @@ void QnWorkbenchNavigator::addSyncedWidget(QnResourceWidget *widget) {
 void QnWorkbenchNavigator::removeSyncedWidget(QnResourceWidget *widget) {
     if(!m_syncedWidgets.remove(widget))
         return;
+
+    /* QHash::erase does nothing when called for container's end, 
+     * and is therefore perfectly safe. */
+    m_syncedResources.erase(m_syncedResources.find(widget->resource()));
 
     updateCurrentWidget();
 
@@ -152,10 +159,12 @@ void QnWorkbenchNavigator::setCurrentWidget(QnResourceWidget *widget) {
     } else {
         m_currentWidgetIsCamera = false;
     }
-    
+
     m_timeSlider->setOption(QnTimeSlider::UseUTC, m_currentWidgetIsCamera);
     updateSlider();
     m_timeSlider->finishAnimations();
+
+    updateCurrentPeriods();
 
 #if 0
     m_timeSlider->resetSelectionRange();
@@ -254,9 +263,6 @@ void QnWorkbenchNavigator::updateSlider() {
             m_timeSlider->setValue(timeUSec != DATETIME_NOW ? timeUSec / 1000 : currentMSecsSinceEpoch);
 
         QnTimePeriod period(startTimeMSec, endTimeMSec - startTimeMSec);
-        if(m_currentWidgetIsCamera)
-            loader(m_currentWidget->resource())->setTargetPeriod(period);
-
         foreach(QnResourceWidget *widget, m_syncedWidgets)
             loader(widget->resource())->setTargetPeriod(period);
 
@@ -275,11 +281,44 @@ void QnWorkbenchNavigator::updateSlider() {
     }*/
 }
 
+void QnWorkbenchNavigator::updateCurrentPeriods() {
+    for(int i = 0; i < Qn::TimePeriodTypeCount; i++)
+        updateCurrentPeriods(static_cast<Qn::TimePeriodType>(i));
+}
+
+void QnWorkbenchNavigator::updateCurrentPeriods(Qn::TimePeriodType type) {
+    QnCachingTimePeriodLoader *loader = !m_currentWidget ? NULL : this->loader(m_currentWidget->resource());
+    if(loader) {
+        m_timeSlider->setTimePeriods(CurrentLine, type, loader->periods(type));
+    } else {
+        m_timeSlider->setTimePeriods(CurrentLine, type, QnTimePeriodList());
+    }
+}
+
+void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodType type) {
+    QVector<QnTimePeriodList> periods;
+    foreach(const QnResourcePtr &resource, m_syncedResources.uniqueKeys())
+        periods.push_back(loader(resource)->periods(type));
+
+    m_timeSlider->setTimePeriods(SyncedLine, type, QnTimePeriod::mergeTimePeriods(periods));
+}
+
+
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnWorkbenchNavigator::at_loader_periodsChanged(Qn::TimePeriodType type) {
+    at_loader_periodsChanged(checked_cast<QnCachingTimePeriodLoader *>(sender()), type);
+}
 
+void QnWorkbenchNavigator::at_loader_periodsChanged(QnCachingTimePeriodLoader *loader, Qn::TimePeriodType type) {
+    QnResourcePtr resource = loader->resource();
+
+    if(m_currentWidget && m_currentWidget->resource() == resource)
+        updateCurrentPeriods(type);
+    
+    if(m_syncedResources.contains(resource))
+        updateSyncedPeriods(type);
 }
 
 void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value) {
@@ -355,7 +394,7 @@ void QnWorkbenchNavigator::at_display_widgetAdded(QnResourceWidget *widget) {
     if(QnSecurityCamResourcePtr cameraResource = widget->resource().dynamicCast<QnSecurityCamResource>()) {
         addSyncedWidget(widget);
 
-        connect(widget, SIGNAL(motionRegionSelected(QnResourcePtr, QnAbstractArchiveReader *, QList<QRegion>)), this, SLOT(at_widget_motionRegionSelected(QnResourcePtr, QnAbstractArchiveReader*, QList<QRegion>)));
+        connect(widget, SIGNAL(motionSelectionChanged()), this, SLOT(at_widget_motionSelectionChanged()));
     }
 }
 
@@ -367,8 +406,15 @@ void QnWorkbenchNavigator::at_display_widgetAboutToBeRemoved(QnResourceWidget *w
     }
 }
 
-void QnWorkbenchNavigator::at_widget_motionRegionSelected(const QnResourcePtr &resource, QnAbstractArchiveReader *reader, const QList<QRegion> &selection) {
-    return;
+void QnWorkbenchNavigator::at_widget_motionSelectionChanged() {
+    at_widget_motionSelectionChanged(checked_cast<QnResourceWidget *>(sender()));
+}
+
+void QnWorkbenchNavigator::at_widget_motionSelectionChanged(QnResourceWidget *widget) {
+    /* We check that the loader can be created (i.e. that the resource is camera) 
+     * just to feel safe. */
+    if(QnCachingTimePeriodLoader *loader = this->loader(widget->resource()))
+        loader->setMotionRegions(widget->motionSelection());
 }
 
 void QnWorkbenchNavigator::at_timeSlider_destroyed() {

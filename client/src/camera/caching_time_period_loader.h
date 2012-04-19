@@ -14,13 +14,12 @@ class QnCachingTimePeriodLoader: public QObject {
     Q_PROPERTY(qreal loadingMargin READ loadingMargin WRITE setLoadingMargin);
 
 public:
-    QnCachingTimePeriodLoader(QObject *parent = NULL);
+    QnCachingTimePeriodLoader(const QnNetworkResourcePtr &networkResource, QObject *parent = NULL);
     virtual ~QnCachingTimePeriodLoader();
 
-    static QnCachingTimePeriodLoader *newInstance(const QnResourcePtr &resouce, QObject *parent = NULL);
+    static QnCachingTimePeriodLoader *newInstance(const QnResourcePtr &resource, QObject *parent = NULL);
 
-    QnTimePeriodLoader *loader();
-    void setLoader(QnTimePeriodLoader *loader);
+    QnNetworkResourcePtr resource();
 
     qreal loadingMargin() const;
     void setLoadingMargin(qreal loadingMargin);
@@ -33,6 +32,7 @@ public:
     
     const QList<QRegion> &motionRegions() const;
     void setMotionRegions(const QList<QRegion> &motionRegions);
+    bool isMotionRegionsEmpty() const;
 
     QnTimePeriodList periods(Qn::TimePeriodType type);
 
@@ -43,7 +43,6 @@ signals:
 private slots:
     void at_loader_ready(const QnTimePeriodList &timePeriods, int handle);
     void at_loader_failed(int status, int handle);
-    void at_loader_destroyed();
 
 protected:
     void load(Qn::TimePeriodType type);
@@ -52,8 +51,16 @@ protected:
     QnTimePeriod addLoadingMargins(const QnTimePeriod &targetPeriod) const;
 
 private:
-    QnTimePeriodLoader *m_loader;
+    QnCachingTimePeriodLoader(QnTimePeriodLoader **loaders, QObject *parent);
+
+    void init();
+    void initLoaders(QnTimePeriodLoader **loaders);
+    static bool createLoaders(const QnResourcePtr &resource, QnTimePeriodLoader **loaders);
+
+private:
+    QnNetworkResourcePtr m_resource;
     QnTimePeriod m_loadedPeriod;
+    QnTimePeriodLoader *m_loaders[Qn::TimePeriodTypeCount];
     int m_handles[Qn::TimePeriodTypeCount];
     QList<QRegion> m_motionRegions;
     QnTimePeriodList m_periods[Qn::TimePeriodTypeCount];

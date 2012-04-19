@@ -34,18 +34,18 @@ T linearCombine(qreal a, const T &x, qreal b, const T &y) {
 class LinearCombinator {
 public:
     /**
-     * This function is thread-safe.
-     *
      * \param type                      <tt>QMetaType::Type</tt> to get linear combinator for. 
      *                                  Pass zero to get a no-op combinator.
      * \returns                         Linear combinator for the given type, or NULL if none.
+     * 
+     * \note                            This function is thread-safe.
      */
     static LinearCombinator *forType(int type);
 
     /**
-     * This function is thread-safe.
-     *
      * \param combinator                Linear combinator to register.
+     * 
+     * \note                            This function is thread-safe.
      */
     static void registerCombinator(LinearCombinator *combinator);
 

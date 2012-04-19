@@ -566,9 +566,10 @@ void QnTimeSlider::drawPeriods(QPainter *painter, QnTimePeriodList &periods, qre
 
     QnTimePeriodList::const_iterator begin = periods.findNearestPeriod(minimumValue, false);
     QnTimePeriodList::const_iterator end = periods.findNearestPeriod(maximumValue, true);
+    if(end != periods.end() && end->containTime(maximumValue))
+        end++;
 
-    for (QnTimePeriodList::const_iterator pos = begin; pos < end; ++pos)
-    {
+    for (QnTimePeriodList::const_iterator pos = begin; pos < end; ++pos) {
         qreal leftPos = positionFromValue(qMax(pos->startTimeMs, minimumValue)).x();
         qreal rightPos = positionFromValue(pos->durationMs == -1 ? maximumValue : qMin(pos->startTimeMs + pos->durationMs, maximumValue)).x();
             

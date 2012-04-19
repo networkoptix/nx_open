@@ -33,6 +33,12 @@ signals:
     void currentWidgetChanged();
 
 protected:
+    enum SliderLine {
+        CurrentLine,
+        SyncedLine,
+        SliderLineCount
+    };
+
     void initialize();
     void deinitialize();
 
@@ -48,13 +54,19 @@ protected:
     Q_SLOT void updateSlider();
     void updateToolTipFormat();
 
-private slots:
+    void updateCurrentPeriods();
+    void updateCurrentPeriods(Qn::TimePeriodType type);
+    void updateSyncedPeriods(Qn::TimePeriodType type);
+
+protected slots:
     void at_display_widgetChanged(Qn::ItemRole role);
     void at_display_widgetAdded(QnResourceWidget *widget);
     void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
 
-    void at_widget_motionRegionSelected(const QnResourcePtr &resource, QnAbstractArchiveReader *reader, const QList<QRegion> &selection);
+    void at_widget_motionSelectionChanged(QnResourceWidget *widget);
+    void at_widget_motionSelectionChanged();
 
+    void at_loader_periodsChanged(QnCachingTimePeriodLoader *loader, Qn::TimePeriodType type);
     void at_loader_periodsChanged(Qn::TimePeriodType type);
 
     void at_timeSlider_valueChanged(qint64 value);
@@ -67,6 +79,8 @@ private:
     QnWorkbenchDisplay *m_display;
 
     QSet<QnResourceWidget *> m_syncedWidgets;
+    QMultiHash<QnResourcePtr, QHashDummyValue> m_syncedResources;
+
     QnResourceWidget *m_centralWidget;
     QnResourceWidget *m_currentWidget;
     bool m_currentWidgetIsCamera;

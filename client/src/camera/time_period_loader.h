@@ -44,6 +44,14 @@ public:
      */
     int load(const QnTimePeriod &timePeriod, const QList<QRegion> &motionRegions = QList<QRegion>());
 
+    /**
+     * \returns                         Network resource representing the camera that this
+     *                                  loader works with.
+     * 
+     * \note                            This function is thread-safe.
+     */
+    QnNetworkResourcePtr resource() const;
+
 signals:
     /**
      * This signal is emitted whenever motion periods were successfully loaded from server.
@@ -80,7 +88,8 @@ private:
     };
 
     static QAtomicInt s_fakeHandle;
-    QMutex m_mutex;
+
+    mutable QMutex m_mutex;
     QnVideoServerConnectionPtr m_connection;
     QnNetworkResourcePtr m_resource;
 

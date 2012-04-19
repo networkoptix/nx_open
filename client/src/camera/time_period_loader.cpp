@@ -37,6 +37,13 @@ QnTimePeriodLoader *QnTimePeriodLoader::newInstance(QnResourcePtr resource, QObj
     return new QnTimePeriodLoader(serverConnection, networkResource, parent);
 }
 
+QnNetworkResourcePtr QnTimePeriodLoader::resource() const 
+{
+    QMutexLocker lock(&m_mutex);
+
+    return m_resource;
+}
+
 int QnTimePeriodLoader::load(const QnTimePeriod &timePeriod, const QList<QRegion> &motionRegions)
 {
     QMutexLocker lock(&m_mutex);
