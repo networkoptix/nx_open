@@ -214,7 +214,7 @@ void QnGridItem::setCellState(const QPoint &cell, int cellState) {
     
     QColor targetColor = stateColor(cellState);
     if(data.item->color().alpha() == 0)
-        data.item->setColor(SceneUtility::transparent(targetColor));
+        data.item->setColor(toTransparent(targetColor));
     animator->setTargetValue(targetColor);
     
     animator->start();

@@ -78,6 +78,8 @@ namespace {
 
     const qreal tickmarkBarRelativeHeight = 0.5;
 
+    const QColor tickmarkBaseColor(255, 255, 255, 255);
+
     /** Lower zoom limit. */
     const qreal minMSecsPerPixel = 2.0;
 
@@ -127,31 +129,6 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     updateSteps();
     sliderChange(SliderRangeChange);
     itemChange(ItemSceneHasChanged, QVariant::fromValue<QGraphicsScene *>(scene()));
-
-
-
-
-
-
-
-
-
-
-    // testing code
-    setMaximum(10000);
-
-    setLineCount(2);
-
-    QnTimePeriodList l;
-    
-    l << QnTimePeriod(1000, 1000);
-    l << QnTimePeriod(3000, 1000);
-    setTimePeriods(0, Qn::RecordingTimePeriod, l);
-    l.clear();
-    
-    l << QnTimePeriod(1500, 300);
-    setTimePeriods(0, Qn::MotionTimePeriod, l);
-
 }
 
 QnTimeSlider::~QnTimeSlider() {
@@ -681,7 +658,7 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, qreal top, qreal height) {
     {
         QnScopedPainterAntialiasingRollback antialiasingRollback(painter, false);
         for(int i = minStepIndex; i < stepCount; i++) {
-            painter->setPen(QColor(255, 255, 255, 255 * m_stepData[i].currentLineOpacity));
+            painter->setPen(toTransparent(tickmarkBaseColor, m_stepData[i].currentLineOpacity));
             painter->drawLines(m_tickmarkLines[i]);
         }
     }

@@ -78,7 +78,6 @@
 #include "workbench.h"
 #include "workbench_display.h"
 #include "help/qncontext_help.h"
-#include "ui/common/color_transform.h"
 #include "ui/dialogs/sign_dialog.h"
 
 //#define QN_WORKBENCH_CONTROLLER_DEBUG
