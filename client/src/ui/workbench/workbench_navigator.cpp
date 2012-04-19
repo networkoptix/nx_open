@@ -236,22 +236,33 @@ void QnWorkbenchNavigator::updateSlider() {
 
     QnScopedValueRollback<bool> guard(&m_inUpdate, true);
 
-    qint64 startTimeUsec = reader->startTime();
-    qint64 endTimeUsec = reader->endTime();
-    if (startTimeUsec != AV_NOPTS_VALUE && endTimeUsec != AV_NOPTS_VALUE) {// TODO: rename AV_NOPTS_VALUE to something more sane.
+    qint64 startTimeUSec = reader->startTime();
+    qint64 endTimeUSec = reader->endTime();
+    if (startTimeUSec != AV_NOPTS_VALUE && endTimeUSec != AV_NOPTS_VALUE) {// TODO: rename AV_NOPTS_VALUE to something more sane.
         qint64 currentMSecsSinceEpoch = 0;
-        if(startTimeUsec == DATETIME_NOW || endTimeUsec == DATETIME_NOW)
+        if(startTimeUSec == DATETIME_NOW || endTimeUSec == DATETIME_NOW)
             currentMSecsSinceEpoch = qnSyncTime->currentMSecsSinceEpoch();
 
-        m_timeSlider->setMinimum(startTimeUsec != DATETIME_NOW ? startTimeUsec / 1000 : currentMSecsSinceEpoch - 10000); /* If nothing is recorded, set minimum to live - 10s. */
-        m_timeSlider->setMaximum(endTimeUsec != DATETIME_NOW ? endTimeUsec / 1000 : currentMSecsSinceEpoch);
+        qint64 startTimeMSec = startTimeUSec != DATETIME_NOW ? startTimeUSec / 1000 : currentMSecsSinceEpoch - 10000; /* If nothing is recorded, set minimum to live - 10s. */
+        qint64 endTimeMSec = endTimeUSec != DATETIME_NOW ? endTimeUSec / 1000 : currentMSecsSinceEpoch;
 
-        qint64 timeUsec = m_currentWidget->display()->camera()->getCurrentTime();
-        if (timeUsec != AV_NOPTS_VALUE)
-            m_timeSlider->setValue(timeUsec != DATETIME_NOW ? timeUsec / 1000 : currentMSecsSinceEpoch);
+        m_timeSlider->setMinimum(startTimeMSec);
+        m_timeSlider->setMaximum(endTimeMSec);
+
+        qint64 timeUSec = m_currentWidget->display()->camera()->getCurrentTime();
+        if (timeUSec != AV_NOPTS_VALUE)
+            m_timeSlider->setValue(timeUSec != DATETIME_NOW ? timeUSec / 1000 : currentMSecsSinceEpoch);
+
+        QnTimePeriod period(startTimeMSec, endTimeMSec - startTimeMSec);
+        if(m_currentWidgetIsCamera)
+            loader(m_currentWidget->resource())->setTargetPeriod(period);
+
+        foreach(QnResourceWidget *widget, m_syncedWidgets)
+            loader(widget->resource())->setTargetPeriod(period);
 
         //m_forceTimePeriodLoading = !updateRecPeriodList(m_forceTimePeriodLoading); // if period does not loaded yet, force loading
     }
+
 
     /*if(!reader->isMediaPaused() && (m_camera->getCamDisplay()->isRealTimeSource() || m_timeSlider->currentValue() == DATETIME_NOW)) {
         m_liveButton->setChecked(true);
