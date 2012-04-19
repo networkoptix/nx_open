@@ -32,7 +32,8 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QnWorkbenchDisplay *display, QObject 
     m_display(display),
     m_centralWidget(NULL),
     m_currentWidget(NULL),
-    m_inUpdate(false)
+    m_inUpdate(false),
+    m_currentWidgetIsCamera(false)
 {
     assert(display != NULL);
 
@@ -68,8 +69,6 @@ void QnWorkbenchNavigator::setTimeSlider(QnTimeSlider *timeSlider) {
 void QnWorkbenchNavigator::initialize() {
     assert(m_display && m_timeSlider);
 
-    m_timeSlider->setLineCount(SliderLineCount);
-
     connect(m_display,                          SIGNAL(widgetChanged(Qn::ItemRole)),                this,   SLOT(at_display_widgetChanged(Qn::ItemRole)));
     connect(m_display,                          SIGNAL(widgetAdded(QnResourceWidget *)),            this,   SLOT(at_display_widgetAdded(QnResourceWidget *)));
     connect(m_display,                          SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)), this,   SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
@@ -78,6 +77,9 @@ void QnWorkbenchNavigator::initialize() {
     connect(m_timeSlider,                       SIGNAL(valueChanged(qint64)),                       this,   SLOT(at_timeSlider_valueChanged(qint64)));
     connect(m_timeSlider,                       SIGNAL(sliderPressed()),                            this,   SLOT(at_timeSlider_sliderPressed()));
     connect(m_timeSlider,                       SIGNAL(sliderReleased()),                           this,   SLOT(at_timeSlider_sliderReleased()));
+
+    m_timeSlider->setLineCount(SliderLineCount);
+    updateLineComments();
 } 
 
 void QnWorkbenchNavigator::deinitialize() {
@@ -85,6 +87,9 @@ void QnWorkbenchNavigator::deinitialize() {
 
     disconnect(m_display,                           NULL, this, NULL);
     disconnect(m_display->beforePaintInstrument(),  NULL, this, NULL);
+
+    m_currentWidget = NULL;
+    m_currentWidgetIsCamera = false;
 }
 
 void QnWorkbenchNavigator::setCentralWidget(QnResourceWidget *widget) {
@@ -106,6 +111,7 @@ void QnWorkbenchNavigator::addSyncedWidget(QnResourceWidget *widget) {
     m_syncedResources.insert(widget->resource(), QHashDummyValue());
 
     updateCurrentWidget();
+
     //m_forceTimePeriodLoading = !updateRecPeriodList(true);
 }
 
@@ -160,7 +166,9 @@ void QnWorkbenchNavigator::setCurrentWidget(QnResourceWidget *widget) {
         m_currentWidgetIsCamera = false;
     }
 
+    updateLineComments();
     m_timeSlider->setOption(QnTimeSlider::UseUTC, m_currentWidgetIsCamera);
+
     updateSlider();
     m_timeSlider->finishAnimations();
 
@@ -301,6 +309,16 @@ void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodType type) {
         periods.push_back(loader(resource)->periods(type));
 
     m_timeSlider->setTimePeriods(SyncedLine, type, QnTimePeriod::mergeTimePeriods(periods));
+}
+
+void QnWorkbenchNavigator::updateLineComments() {
+    if(m_currentWidgetIsCamera) {
+        m_timeSlider->setLineComment(CurrentLine, m_currentWidget->resource()->getName());
+        m_timeSlider->setLineComment(SyncedLine, tr("All Cameras"));
+    } else {
+        m_timeSlider->setLineComment(CurrentLine, QString());
+        m_timeSlider->setLineComment(SyncedLine, QString());
+    }
 }
 
 

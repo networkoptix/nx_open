@@ -118,7 +118,11 @@ private:
     
     void animateStepValues(int deltaMSecs);
 
-    const QPixmap &cachedPixmap(qint64 position, int height, const QnTimeStep &step);
+    const QPixmap &positionPixmap(qint64 position, int height, const QnTimeStep &step);
+    const QPixmap &textPixmap(const QString &text, int height);
+    
+    qreal lineTop(int line);
+    qreal lineHeight();
 
 private:
     Q_DECLARE_PRIVATE(GraphicsSlider);
@@ -158,7 +162,8 @@ private:
     int m_lastMaxStepIndex;
     QVector<qint64> m_nextTickmarkPos;
     QVector<QVector<QPointF> > m_tickmarkLines;
-    QHash<qint32, QPixmap> m_labelPixmaps;
+    QHash<qint32, QPixmap> m_pixmapByPositionKey;
+    QHash<QPair<QString, int>, QPixmap> m_pixmapBySizedText;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnTimeSlider::Options);

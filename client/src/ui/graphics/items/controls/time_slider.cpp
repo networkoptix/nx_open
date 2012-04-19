@@ -56,7 +56,7 @@ namespace {
         QFontMetrics metrics(actualFont);
         QSize textSize = metrics.size(Qt::TextSingleLine, text);
 
-        QPixmap pixmap(textSize.width(), textSize.height());
+        QPixmap pixmap(textSize.width(), metrics.height());
         pixmap.fill(QColor(0, 0, 0, 0));
 
         QPainter painter(&pixmap);
@@ -100,6 +100,8 @@ namespace {
     const qreal tickmarkBarRelativeHeight = 0.5;
 
     const QColor tickmarkBaseColor(255, 255, 255, 255);
+
+    const qreal lineCommentRelativeHeight = 0.75;
 
     /** Lower zoom limit. */
     const qreal minMSecsPerPixel = 2.0;
@@ -385,21 +387,31 @@ bool QnTimeSlider::scaleWindow(qreal factor, qint64 anchor) {
     return end <= maximum();
 }
 
-const QPixmap &QnTimeSlider::cachedPixmap(qint64 position, int height, const QnTimeStep &step) {
-    qint32 key = cacheKey(position, height, step);
+const QPixmap &QnTimeSlider::textPixmap(const QString &text, int height) {
+    QPair<QString, int> key(text, height);
 
-    QHash<qint32, QPixmap>::const_iterator itr = m_labelPixmaps.find(key);
-    if(itr != m_labelPixmaps.end())
+    QHash<QPair<QString, int>, QPixmap>::const_iterator itr = m_pixmapBySizedText.find(key);
+    if(itr != m_pixmapBySizedText.end())
         return *itr;
 
     QPixmap result = renderText(
-        toString(position, step), 
+        text,
         QPen(palette().brush(QPalette::Text), 0), 
         font(), 
         height
     );
 
-    return m_labelPixmaps[key] = result;
+    return m_pixmapBySizedText[key] = result;
+}
+
+const QPixmap &QnTimeSlider::positionPixmap(qint64 position, int height, const QnTimeStep &step) {
+    qint32 key = cacheKey(position, height, step);
+
+    QHash<qint32, QPixmap>::const_iterator itr = m_pixmapByPositionKey.find(key);
+    if(itr != m_pixmapByPositionKey.end())
+        return *itr;
+
+    return m_pixmapByPositionKey[key] = textPixmap(toString(position, step), height);
 }
 
 void QnTimeSlider::updateToolTipVisibility() {
@@ -424,11 +436,9 @@ void QnTimeSlider::updateToolTipText() {
 }
 
 void QnTimeSlider::updateLineCommentPixmap(int line) {
-    m_lineCommentPixmaps[line] = renderText(
+    m_lineCommentPixmaps[line] = textPixmap(
         m_lineComments[line],
-        QPen(palette().brush(QPalette::Text), 0),
-        font(),
-        qRound(size().height() * (1.0 - tickmarkBarRelativeHeight) / m_lineCount)
+        qRound(lineHeight() * lineCommentRelativeHeight)
     );
 }
 
@@ -532,23 +542,46 @@ void QnTimeSlider::animateStepValues(int deltaMSecs) {
     }
 }
 
+qreal QnTimeSlider::lineTop(int line) {
+    QRectF rect = this->rect();
+    return rect.top() + rect.height() * (tickmarkBarRelativeHeight + (1.0 - tickmarkBarRelativeHeight) * line / m_lineCount);
+}
+
+qreal QnTimeSlider::lineHeight() {
+    return size().height() * (1.0 - tickmarkBarRelativeHeight) / m_lineCount;
+}
 
 
 // -------------------------------------------------------------------------- //
 // Painting
 // -------------------------------------------------------------------------- //
 void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
-    /* Initialize converter. It will be used a lot. */
     QRectF rect = this->rect();
+    qreal lineHeight = this->lineHeight();
 
+    /* Draw lines. */
     for(int line = 0; line < m_lineCount; line++) {
         drawPeriodsBar(
             painter, 
             m_timePeriods[line].forType[Qn::RecordingTimePeriod],  
             m_timePeriods[line].forType[Qn::MotionTimePeriod], 
-            rect.top() + rect.height() * (tickmarkBarRelativeHeight + (1.0 - tickmarkBarRelativeHeight) * line / m_lineCount),   
-            rect.height() * (1.0 - tickmarkBarRelativeHeight) / m_lineCount
+            lineTop(line),   
+            lineHeight
         );
+
+    }
+
+    /* Draw line comments. */
+    for(int line = 0; line < m_lineCount; line++) {
+        QPixmap pixmap = m_lineCommentPixmaps[line];
+        QRectF textRect(
+            rect.left(),
+            lineTop(line) + 0.5 * lineHeight * (1.0 - lineCommentRelativeHeight),
+            pixmap.width(),
+            pixmap.height()
+        );
+
+        painter->drawPixmap(textRect, pixmap, pixmap.rect());
     }
 
     drawTickmarks(painter, rect.top(), rect.height() * tickmarkBarRelativeHeight);
@@ -682,7 +715,7 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, qreal top, qreal height) {
         /* Draw label if needed. */
         qreal tickmarkHeight = height * m_stepData[index].currentHeight;
         if(!qFuzzyIsNull(m_stepData[index].currentTextOpacity)) {
-            QPixmap pixmap = cachedPixmap(pos, m_stepData[index].currentTextHeight, m_steps[index]);
+            QPixmap pixmap = positionPixmap(pos, m_stepData[index].currentTextHeight, m_steps[index]);
 
             QRectF textRect(x - pixmap.width() / 2.0, top + tickmarkHeight, pixmap.width(), pixmap.height());
             if(textRect.left() < rect.left())
