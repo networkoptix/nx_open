@@ -68,6 +68,7 @@ void parseCameras(QList<T>& cameras, const PbCameraList& pb_cameras, QnResourceF
 
         camera->setScheduleDisabled(pb_camera.scheduledisabled());
         camera->setAuth(QString::fromUtf8(pb_camera.login().c_str()), QString::fromUtf8(pb_camera.password().c_str()));
+        camera->setMotionType((int)pb_camera.motionType());
 
         if (pb_camera.has_region())
         {
@@ -423,6 +424,7 @@ void serializeCamera_i(proto::pb::Camera& pb_camera, const QnVirtualCameraResour
     pb_camera.set_status(static_cast<proto::pb::Camera_Status>(cameraPtr->getStatus()));
     pb_camera.set_region(serializeRegionList(cameraPtr->getMotionMaskList()).toUtf8().constData());
     pb_camera.set_scheduledisabled(cameraPtr->isScheduleDisabled());
+    pb_camera.set_motiontype(static_cast<proto::pb::Camera_MotionType>(cameraPtr->getMotionType()));
 
     foreach(const QnScheduleTask& scheduleTaskIn, cameraPtr->getScheduleTasks()) {
         proto::pb::Camera_ScheduleTask& pb_scheduleTask = *pb_camera.add_scheduletask();

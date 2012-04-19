@@ -9,6 +9,14 @@ message Camera {
        Recording    = 4;
     }
 
+    enum MotionType {
+       Default      = 0;
+       HardwareGrid = 1;
+       SoftwareGrid = 2;
+       MotionGrid   = 3;
+       NoMotion     = 4;
+    }
+
     enum Quality {
         Lowest  = 0;
         Low     = 1;
@@ -46,12 +54,13 @@ message Camera {
     required Status       status           = 6;
     required bool         disabled         = 7;
     required bool         scheduleDisabled = 8;
-    optional string       region           = 9;
-    optional string       mac              = 10;
-    optional string       login            = 11;
-    optional string       password         = 12;
-    repeated Property     property         = 13;
-    repeated ScheduleTask scheduleTask     = 14;
+    optional MotionType   motionType       = 9;
+    optional string       region           = 10;
+    optional string       mac              = 11;
+    optional string       login            = 12;
+    optional string       password         = 13;
+    repeated Property     property         = 14;
+    repeated ScheduleTask scheduleTask     = 15;
 }
 
 message Cameras {
