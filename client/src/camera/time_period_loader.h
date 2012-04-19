@@ -8,10 +8,6 @@
 #include "recording/time_period.h"
 #include "core/resource/network_resource.h"
 
-class QnTimePeriodLoader;
-typedef QSharedPointer<QnTimePeriodLoader> QnTimePeriodLoaderPtr;
-
-
 /**
  * Per-camera time period loader that caches loaded time periods. 
  */
@@ -33,9 +29,10 @@ public:
      * pointer in case loader cannot be created.
      * 
      * \param resource                  Camera resource to create time period loader for.
+     * \param parent                    Parent object for the loader to create.
      * \returns                         Newly created time period loader.
      */
-    static QnTimePeriodLoader *newInstance(QnResourcePtr resource);
+    static QnTimePeriodLoader *newInstance(QnResourcePtr resource, QObject *parent = NULL);
     
     /**
      * \param timePeriod                Time period to get motion periods for.

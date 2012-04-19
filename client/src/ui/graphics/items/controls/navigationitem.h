@@ -113,7 +113,7 @@ protected:
 private:
     struct MotionPeriodLoader {
         MotionPeriodLoader(): loadingHandle(0), reader(0) {}
-        QnTimePeriodLoaderPtr loader;
+        QnTimePeriodLoader *loader;
         int loadingHandle;
         QnTimePeriodList periods;
         QList<QRegion> regions;

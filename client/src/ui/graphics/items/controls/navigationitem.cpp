@@ -514,15 +514,15 @@ NavigationItem::MotionPeriodLoader* NavigationItem::getMotionLoader(QnAbstractAr
     {
         MotionPeriodLoader p;
         p.reader = reader;
-        p.loader = QnTimePeriodLoader::newInstance(resource);
+        p.loader = QnTimePeriodLoader::newInstance(resource, this);
 #ifndef DEBUG_MOTION
         if (!p.loader) {
             qWarning() << "Connection to a video server lost. Can't load motion info";
             return 0;
         }
 #endif
-        connect(p.loader.data(), SIGNAL(ready(const QnTimePeriodList&, int)), this, SLOT(onMotionPeriodLoaded(const QnTimePeriodList&, int)));
-        connect(p.loader.data(), SIGNAL(failed(int, int)), this, SLOT(onMotionPeriodLoadFailed(int, int)));
+        connect(p.loader, SIGNAL(ready(const QnTimePeriodList&, int)), this, SLOT(onMotionPeriodLoaded(const QnTimePeriodList&, int)));
+        connect(p.loader, SIGNAL(failed(int, int)), this, SLOT(onMotionPeriodLoadFailed(int, int)));
         m_motionPeriodLoader.insert(resource, p);
     }
     return &m_motionPeriodLoader[resource];

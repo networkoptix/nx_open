@@ -69,6 +69,9 @@ private:
 
     bool m_wasPlaying;
     bool m_inUpdate;
+
+
+
 };
 
 #endif // QN_WORKBENCH_NAVIGATOR_H

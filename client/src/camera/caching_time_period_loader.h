@@ -8,6 +8,9 @@
 class QnTimePeriodLoader;
 
 class QnCachingTimePeriodLoader: public QObject {
+    Q_OBJECT;
+    Q_PROPERTY(qreal loadingMargin READ loadingMargin WRITE setLoadingMargin);
+
 public:
     QnCachingTimePeriodLoader(QObject *parent = NULL);
     virtual ~QnCachingTimePeriodLoader();
