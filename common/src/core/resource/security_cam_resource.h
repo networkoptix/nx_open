@@ -13,7 +13,7 @@ public:
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(QnResourcePtr res, QnResource::ConnectionRole role) = 0;
 };
 
-enum MotionType {MT_NoMotion = 0, MT_HardwareGrid = 1, MT_SoftwareGrid = 2, MT_MotionWindow = 4};
+enum MotionType {MT_Default = 0, MT_HardwareGrid = 1, MT_SoftwareGrid = 2, MT_MotionWindow = 4, MT_NoMotion = 8};
 Q_DECLARE_FLAGS(MotionTypeFlags, MotionType);
 
 class QnSecurityCamResource : virtual public QnMediaResource
@@ -22,7 +22,11 @@ class QnSecurityCamResource : virtual public QnMediaResource
 
 public:
 
-    MotionTypeFlags supportedMotionType();
+    MotionTypeFlags supportedMotionType() const;
+    MotionType getDefaultMotionType() const;
+
+    MotionType getMotionType();
+    void setMotionType(MotionType value);
 
     QnSecurityCamResource();
     virtual ~QnSecurityCamResource();
@@ -68,6 +72,7 @@ private:
     QnDataProviderFactory* m_dpFactory;
     
     QnScheduleTaskList m_scheduleTasks;
+    MotionType m_motionType;
 };
 
 Q_DECLARE_METATYPE(QRegion)

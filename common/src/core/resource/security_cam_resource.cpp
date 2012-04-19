@@ -6,7 +6,8 @@
 
 QnSecurityCamResource::QnSecurityCamResource()
     : QnMediaResource(),
-      m_dpFactory(0)
+      m_dpFactory(0),
+      m_motionType(MT_Default)
 {
     static volatile bool metaTypesInitialized = false;
     if (!metaTypesInitialized) {
@@ -176,11 +177,32 @@ bool QnSecurityCamResource::hasDualStreaming() const
     return true;
 }
 
-MotionTypeFlags QnSecurityCamResource::supportedMotionType()
+MotionType QnSecurityCamResource::getDefaultMotionType() const
 {
     QVariant val;
-    MotionTypeFlags result = MT_NoMotion;
-    if (getParam("supportedMotion", val, QnDomainMemory))
+    QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
+    if (this_casted->getParam("supportedMotion", val, QnDomainMemory))
+    {
+        QStringList vals = val.toString().split(',');
+        QString s1 = vals[0].toLower();
+        if (s1 == QString("hardwaregrid"))
+            return MT_HardwareGrid;
+        else if (s1 == QString("softwaregrid"))
+            return MT_SoftwareGrid;
+        else if (s1 == QString("motionwindow"))
+            return MT_MotionWindow;
+    }
+    else {
+        return MT_MotionWindow;
+    }
+}
+
+MotionTypeFlags QnSecurityCamResource::supportedMotionType() const
+{
+    QVariant val;
+    MotionTypeFlags result = MT_Default;
+    QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
+    if (this_casted->getParam("supportedMotion", val, QnDomainMemory))
     {
         QStringList vals = val.toString().split(',');
         foreach(const QString& str, vals)
@@ -198,4 +220,16 @@ MotionTypeFlags QnSecurityCamResource::supportedMotionType()
         result |= MT_MotionWindow;
     }
     return result;
+}
+
+MotionType QnSecurityCamResource::getMotionType()
+{
+    if (m_motionType == MT_Default)
+        m_motionType = getDefaultMotionType();
+    return m_motionType;
+}
+
+void QnSecurityCamResource::setMotionType(MotionType value)
+{
+    m_motionType = value;
 }
