@@ -48,6 +48,7 @@
 #include "plugins/resources/pulse/pulse_resource_searcher.h"
 //#include "plugins/storage/file_storage/file_storage_protocol.h"
 #include "plugins/storage/file_storage/file_storage_resource.h"
+#include "plugins/storage/coldstore/coldstore_storage.h"
 
 
 
@@ -188,6 +189,7 @@ void ffmpegInit()
     av_register_all();
 
     QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true); // true means use it plugin if no <protocol>:// prefix
+    QnStoragePluginFactory::instance()->registerStoragePlugin("coldstore", QnPlColdStoreStorage::instance, false); // true means use it plugin if no <protocol>:// prefix
 }
 
 QnAbstractStorageResourcePtr createDefaultStorage()
@@ -526,6 +528,7 @@ public:
         //============================
         QnResourceDiscoveryManager::instance().setServer(true);
         QnResourceDiscoveryManager::instance().setResourceProcessor(m_processor);
+        
         QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlArecontResourceSearcher::instance());
         QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlAxisResourceSearcher::instance());
         QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDlinkResourceSearcher::instance());
@@ -536,6 +539,7 @@ public:
         QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlISDResourceSearcher::instance());
 
         QnResourceDiscoveryManager::instance().addDeviceServer(&QnTestCameraResourceSearcher::instance());
+        /**/
         QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlOnvifWsSearcher::instance());
         QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlPulseSearcher::instance());
         
