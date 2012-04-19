@@ -235,6 +235,10 @@ public:
      */
     QPointF mapFromMotionGrid(const QPoint &gridPos);
 
+    QList<QRegion> motionSelection() const;
+
+    QList<QRegion> motionMask() const;
+
     /**
      * \param gridRect                  Rectangle in grid coordinates to add to
      *                                  selected motion region of this widget.
@@ -242,8 +246,6 @@ public:
     void addToMotionSelection(const QRect &gridRect);
 
     void addToMotionMask(const QRect &gridRect, int channel);
-
-    void clearMotionMask();
 
     using base_type::mapRectToScene;
 
@@ -265,11 +267,15 @@ public slots:
      */
     void clearMotionSelection();
 
+    void clearMotionMask();
+
 signals:
     void aspectRatioChanged(qreal oldAspectRatio, qreal newAspectRatio);
     void aboutToBeDestroyed();
-    void motionRegionSelected(QnResourcePtr resource, QnAbstractArchiveReader* reader, QList<QRegion> region);
     void displayFlagsChanged();
+    void motionSelectionChanged();
+
+    void motionRegionSelected(QnResourcePtr resource, QnAbstractArchiveReader* reader, QList<QRegion> region); // TODO: remove
 
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;

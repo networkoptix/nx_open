@@ -1,7 +1,8 @@
 #ifndef QN_TIME_PERIOD_H
 #define QN_TIME_PERIOD_H
 
-#include <QVector>
+#include <QtCore/QVector>
+#include <QtCore/QMetaType>
 
 struct QnTimePeriod;
 class QnTimePeriodList;
@@ -123,5 +124,7 @@ namespace Qn {
 
 } // namespace Qn
 
+Q_DECLARE_TYPEINFO(QnTimePeriod, Q_MOVABLE_TYPE);
+Q_DECLARE_METATYPE(Qn::TimePeriodType);
 
 #endif // QN_TIME_PERIOD_H

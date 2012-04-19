@@ -516,6 +516,20 @@ QPointF QnResourceWidget::mapFromMotionGrid(const QPoint &gridPos) {
     return cwiseMul(gridPos, toPoint(cwiseDiv(size(), QSizeF(motionGridWidth(), motionGridHeight()))));
 }
 
+QList<QRegion> QnResourceWidget::motionSelection() const {
+    QList<QRegion> result;
+    foreach(const ChannelState &state, m_channelState)
+        result.push_back(state.motionSelection);
+    return result;
+}
+
+QList<QRegion> QnResourceWidget::motionMask() const {
+    QList<QRegion> result;
+    foreach(const ChannelState &state, m_channelState)
+        result.push_back(state.motionMask);
+    return result;
+}
+
 void QnResourceWidget::addToMotionSelection(const QRect &gridRect) 
 {
     QList<QRegion> prevSelection;
@@ -541,8 +555,11 @@ void QnResourceWidget::addToMotionSelection(const QRect &gridRect)
         newSelection << m_channelState[i].motionSelection;
     }
 
-    if(prevSelection != newSelection && display()->archiveReader())
-        emit motionRegionSelected(m_resource, display()->archiveReader(), newSelection);
+    if(prevSelection != newSelection) {
+        if(display()->archiveReader())
+            emit motionRegionSelected(m_resource, display()->archiveReader(), newSelection);
+        emit motionSelectionChanged();
+    }
 }
 
 void QnResourceWidget::clearMotionSelection() 
@@ -553,13 +570,14 @@ void QnResourceWidget::clearMotionSelection()
     if (allEmpty)
         return;
 
-    QList<QRegion> rez;
+    QList<QRegion> newSelection;
     for (int i = 0; i < m_channelState.size(); ++i) {
         m_channelState[i].motionSelection = QRegion();
-        rez << QRegion();
+        newSelection << QRegion();
     }
     if (display()->archiveReader())
-        emit motionRegionSelected(m_resource, display()->archiveReader(), rez);
+        emit motionRegionSelected(m_resource, display()->archiveReader(), newSelection);
+    emit motionSelectionChanged();
 }
 
 void QnResourceWidget::setDisplayFlags(DisplayFlags flags) {
