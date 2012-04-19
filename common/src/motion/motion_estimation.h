@@ -18,12 +18,14 @@ public:
     //void analizeFrame(const CLVideoDecoderOutput* frame);
     void analizeFrame(QnCompressedVideoDataPtr frame);
     QnMetaDataV1Ptr getMotion();
+    bool existsMetadata() const;
 private:
     void scaleMask();
     void reallocateMask(int width, int height);
+    void postFiltering();
 private:
     CLFFmpegVideoDecoder* m_decoder;
-    CLVideoDecoderOutput m_outFrame;
+    CLVideoDecoderOutput* m_frames[2];
     
     quint8* m_motionMask;
     quint8* m_scaledMask; // mask scaled to x * MD_HEIGHT. for internal use
@@ -34,6 +36,7 @@ private:
     quint8* m_frameBuffer[2];
     quint32* m_resultMotion;
     qint64 m_firstFrameTime;
+    qint64 m_lastFrameTime;
     int m_totalFrames;
 };
 

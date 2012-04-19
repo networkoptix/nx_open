@@ -45,13 +45,14 @@ m_fps(-1.0),
 m_framesSinceLastMetaData(0),
 m_livemutex(QMutex::Recursive),
 m_role(QnResource::Role_LiveVideo),
-m_softwareMotion(true)
-//m_softwareMotion(false)
+m_softwareMotion(false)
 {
+    //m_softwareMotion = true;
+
     m_timeSinceLastMetaData.restart();
 
     char mask[MD_WIDTH * MD_HEIGHT];
-    memset(mask, 0x10, sizeof(mask));
+    memset(mask, 10, sizeof(mask));
     m_motionEstimation.setMotionMask(QByteArray(mask, sizeof(mask))); // default mask
 }
 
@@ -181,13 +182,17 @@ bool QnLiveStreamProvider::isMaxFps() const
 bool QnLiveStreamProvider::needMetaData() 
 {
     // I assume this function is called once per video frame 
-    if (!m_softwareMotion && getRole() == QnResource::Role_SecondaryLiveVideo)
-        return false;
-    else if (m_softwareMotion && getRole() == QnResource::Role_LiveVideo)
+    if (getRole() == QnResource::Role_SecondaryLiveVideo) {
+        if (m_softwareMotion)
+            return m_motionEstimation.existsMetadata();
+        else
+            return false;
+    }
+
+    if (m_framesSinceLastMetaData == 0)
         return false;
 
-    bool result = (m_framesSinceLastMetaData > 10 || m_timeSinceLastMetaData.elapsed() > META_DATA_DURATION_MS) &&
-        m_framesSinceLastMetaData > 0; // got at least one frame
+    bool result = (m_framesSinceLastMetaData > 10 || m_timeSinceLastMetaData.elapsed() > META_DATA_DURATION_MS);
 
     if (result)
     {
