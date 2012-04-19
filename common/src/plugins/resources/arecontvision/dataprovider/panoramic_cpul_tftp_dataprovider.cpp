@@ -45,7 +45,7 @@ AVPanoramicClientPullSSTFTPStreamreader::~AVPanoramicClientPullSSTFTPStreamreade
 }
 
 
-QnMetaDataV1Ptr AVPanoramicClientPullSSTFTPStreamreader::getMetaData()
+QnMetaDataV1Ptr AVPanoramicClientPullSSTFTPStreamreader::getCameraMetadata()
 {
     QnMetaDataV1Ptr motion(new QnMetaDataV1());
     //Andy Tau & Touch Enable feat. Louisa Allen - Sorry (Sean Truby Remix)
