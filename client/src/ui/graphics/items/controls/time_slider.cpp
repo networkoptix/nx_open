@@ -108,11 +108,11 @@ namespace {
     const QColor pastBackgroundColor(255, 255, 255, 24);
     const QColor futureBackgroundColor(0, 0, 0, 0);
 
-    const QColor pastRecordingColor(24, 128, 24);
-    const QColor futureRecordingColor(12, 64, 12);
+    const QColor pastRecordingColor(64, 255, 64, 128);
+    const QColor futureRecordingColor(64, 255, 64, 64);
 
-    const QColor pastMotionColor(128, 0, 0);
-    const QColor futureMotionColor(64, 0, 0);
+    const QColor pastMotionColor(255, 0, 0, 128);
+    const QColor futureMotionColor(255, 0, 0, 64);
 
 
     /** Lower zoom limit. */
@@ -610,7 +610,94 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
 }
 
 void QnTimeSlider::drawPeriodsBar(QPainter *painter, QnTimePeriodList &recorded, QnTimePeriodList &motion, qreal top, qreal height) {
-    qreal leftPos = positionFromValue(windowStart()).x();
+    qint64 minimumValue = this->windowStart();
+    qint64 maximumValue = this->windowEnd();
+    qreal centralPos = positionFromValue(this->sliderPosition()).x();
+
+    QnTimePeriodList periods[Qn::TimePeriodTypeCount] = {recorded, motion};
+    QColor pastColor[Qn::TimePeriodTypeCount + 1] = {pastRecordingColor, pastMotionColor, pastBackgroundColor};
+    QColor futureColor[Qn::TimePeriodTypeCount + 1] = {futureRecordingColor, futureMotionColor, futureBackgroundColor};
+
+    QnTimePeriodList::const_iterator pos[Qn::TimePeriodTypeCount];
+    QnTimePeriodList::const_iterator end[Qn::TimePeriodTypeCount];
+    for(int i = 0; i < Qn::TimePeriodTypeCount; i++) {
+         pos[i] = periods[i].findNearestPeriod(minimumValue, false);
+         end[i] = periods[i].findNearestPeriod(maximumValue, true);
+         if(end[i] != periods[i].end() && end[i]->containTime(maximumValue))
+             end[i]++;
+    }
+
+    qint64 value = minimumValue;
+
+    bool inside[Qn::TimePeriodTypeCount];
+    for(int i = 0; i < Qn::TimePeriodTypeCount; i++)
+        inside[i] = pos[i] == end[i] ? false : pos[i]->containTime(value);
+
+    while(value != maximumValue) {
+        qint64 nextValue[Qn::TimePeriodTypeCount] = {maximumValue, maximumValue};
+        for(int i = 0; i < Qn::TimePeriodTypeCount; i++) {
+            if(pos[i] == end[i]) 
+                continue;
+            
+            if(!inside[i]) {
+                nextValue[i] = pos[i]->startTimeMs;
+                continue;
+            }
+            
+            if(pos[i]->durationMs != -1)
+                nextValue[i] = pos[i]->startTimeMs + pos[i]->durationMs;
+        }
+
+        qint64 bestValue = qMin(nextValue[0], nextValue[1]);
+        
+        int bestIndex;
+        if(inside[Qn::MotionTimePeriod]) {
+            bestIndex = Qn::MotionTimePeriod;
+        } else if(inside[Qn::RecordingTimePeriod]) {
+            bestIndex = Qn::RecordingTimePeriod;
+        } else {
+            bestIndex = Qn::TimePeriodTypeCount;
+        }
+
+        qreal leftPos = positionFromValue(value).x();
+        qreal rightPos = positionFromValue(bestValue).x();
+        if(rightPos <= centralPos) {
+            painter->fillRect(QRectF(leftPos, top, rightPos - leftPos, height), pastColor[bestIndex]);
+        } else if(leftPos >= centralPos) {
+            painter->fillRect(QRectF(leftPos, top, rightPos - leftPos, height), futureColor[bestIndex]);
+        } else {
+            painter->fillRect(QRectF(leftPos, top, centralPos - leftPos, height), pastColor[bestIndex]);
+            painter->fillRect(QRectF(centralPos, top, rightPos - centralPos, height), futureColor[bestIndex]);
+        }
+        
+        for(int i = 0; i < Qn::TimePeriodTypeCount; i++) {
+            if(bestValue != nextValue[i])
+                continue;
+
+            if(inside[i])
+                pos[i]++;
+            inside[i] = !inside[i];
+        }
+
+        value = bestValue;
+    }
+
+    /*for (QnTimePeriodList::const_iterator pos = begin; pos < end; ++pos) {
+        qreal leftPos = positionFromValue(qMax(pos->startTimeMs, minimumValue)).x();
+        qreal rightPos = positionFromValue(pos->durationMs == -1 ? maximumValue : qMin(pos->startTimeMs + pos->durationMs, maximumValue)).x();
+
+        if(rightPos <= centralPos) {
+            painter->fillRect(QRectF(leftPos, top, rightPos - leftPos, height), preColor);
+        } else if(leftPos >= centralPos) {
+            painter->fillRect(QRectF(leftPos, top, rightPos - leftPos, height), pastColor);
+        } else {
+            painter->fillRect(QRectF(leftPos, top, centralPos - leftPos, height), preColor);
+            painter->fillRect(QRectF(centralPos, top, rightPos - centralPos, height), pastColor);
+        }
+    }
+    */
+    
+    /*qreal leftPos = positionFromValue(windowStart()).x();
     qreal rightPos = positionFromValue(windowEnd()).x();
     qreal centralPos = positionFromValue(sliderPosition()).x();
 
@@ -620,7 +707,7 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, QnTimePeriodList &recorded,
         painter->fillRect(QRectF(centralPos, top, rightPos - centralPos, height), futureBackgroundColor);
 
     drawPeriods(painter, recorded, top, height, pastRecordingColor, futureRecordingColor);
-    drawPeriods(painter, motion, top, height, pastMotionColor, futureMotionColor);
+    drawPeriods(painter, motion, top, height, pastMotionColor, futureMotionColor);*/
 }
 
 void QnTimeSlider::drawPeriods(QPainter *painter, QnTimePeriodList &periods, qreal top, qreal height, const QColor &preColor, const QColor &pastColor) {
