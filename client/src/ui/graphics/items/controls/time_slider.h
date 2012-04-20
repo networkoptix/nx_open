@@ -49,14 +49,9 @@ public:
         UseUTC = 0x8,
 
         /**
-         * Whether selection should be displayed on slider. 
-         */
-        SelectionVisible = 0x10,
-
-        /**
          * Whether the user can edit current selection with '[' and ']' buttons.
          */
-        SelectionEditable = 0x20,
+        SelectionEditable = 0x10,
     };
     Q_DECLARE_FLAGS(Options, Option);
 
@@ -91,6 +86,9 @@ public:
     void setSelectionEnd(qint64 selectionEnd);
 
     void setSelection(qint64 start, qint64 end);
+
+    bool isSelectionValid() const;
+    void setSelectionValid(bool valid);
 
     const QString &toolTipFormat() const;
     void setToolTipFormat(const QString &format);
@@ -176,6 +174,8 @@ private:
     qint64 m_minimalWindow;
 
     qint64 m_selectionStart, m_selectionEnd;
+    bool m_selectionValid;
+
     qint64 m_oldMinimum, m_oldMaximum;
     Options m_options;
     QString m_toolTipFormat;

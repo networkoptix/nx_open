@@ -138,7 +138,8 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     m_animationUpdateMSecsPerPixel(1.0),
     m_msecsPerPixel(1.0),
     m_aggregationMSecs(0.0),
-    m_minimalWindow(0)
+    m_minimalWindow(0),
+    m_selectionValid(false)
 {
     /* Set default property values. */
     setProperty(Qn::SliderLength, 0);
@@ -146,7 +147,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
 
     setWindowStart(minimum());
     setWindowEnd(maximum());
-    setOptions(StickToMinimum | StickToMaximum | UpdateToolTip | SelectionVisible | SelectionEditable);
+    setOptions(StickToMinimum | StickToMaximum | UpdateToolTip | SelectionEditable);
 
     setToolTipFormat(tr("hh:mm:ss", "DEFAULT_TOOL_TIP_FORMAT"));
     
@@ -370,6 +371,14 @@ void QnTimeSlider::setSelection(qint64 start, qint64 end) {
 
         emit selectionChanged(m_windowStart, m_windowEnd);
     }
+}
+
+bool QnTimeSlider::isSelectionValid() const {
+    return m_selectionValid;
+}
+
+void QnTimeSlider::setSelectionValid(bool valid) {
+    m_selectionValid = valid;
 }
 
 const QString &QnTimeSlider::toolTipFormat() const {
@@ -683,7 +692,7 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
 }
 
 void QnTimeSlider::drawSelection(QPainter *painter) {
-    if(!(m_options & SelectionVisible))
+    if(!m_selectionValid)
         return;
 
     if(m_selectionStart == m_selectionEnd) {
@@ -1019,10 +1028,15 @@ void QnTimeSlider::keyPressEvent(QKeyEvent *event) {
         if(!(m_options & SelectionEditable)) {
             base_type::keyPressEvent(event);
         } else {
-            if(event->key() == Qt::Key_BracketLeft) {
-                setSelectionStart(sliderPosition());
+            if(!isSelectionValid()) {
+                setSelection(sliderPosition(), sliderPosition());
+                setSelectionValid(true);
             } else {
-                setSelectionEnd(sliderPosition());
+                if(event->key() == Qt::Key_BracketLeft) {
+                    setSelectionStart(sliderPosition());
+                } else {
+                    setSelectionEnd(sliderPosition());
+                }
             }
         }
     default:
