@@ -187,6 +187,11 @@ protected slots:
     void at_takeScreenshotAction_triggered();
     void at_exitAction_triggered();
 
+    void at_exportTimeSelectionAction_triggered();
+    void at_camera_exportFinished(QString fileName);
+    void at_camera_exportFailed(QString errorMessage);
+
+
     void at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle);
     void at_resource_deleted(int status, const QByteArray &data, const QByteArray &errorString, int handle);
 	void at_resources_statusSaved(int status, const QByteArray &errorString, const QnResourceList &resources, const QList<int> &oldDisabledFlags);

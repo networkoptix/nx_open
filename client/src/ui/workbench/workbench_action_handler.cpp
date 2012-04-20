@@ -10,6 +10,7 @@
 #include <QtGui/QFileDialog>
 #include <QtGui/QMessageBox>
 #include <QtGui/QImage>
+#include <QtGui/QProgressDialog>
 
 #include <utils/common/environment.h>
 #include <utils/common/delete_later.h>
@@ -26,6 +27,7 @@
 
 #include <camera/resource_display.h>
 #include <camera/camdisplay.h>
+#include <camera/camera.h>
 
 #include <ui/style/skin.h>
 
@@ -166,6 +168,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::MoveCameraAction),                   SIGNAL(triggered()),    this,   SLOT(at_moveCameraAction_triggered()));
     connect(action(Qn::TakeScreenshotAction),               SIGNAL(triggered()),    this,   SLOT(at_takeScreenshotAction_triggered()));
     connect(action(Qn::ExitAction),                         SIGNAL(triggered()),    this,   SLOT(at_exitAction_triggered()));
+    connect(action(Qn::ExportTimeSelectionAction),          SIGNAL(triggered()),    this,   SLOT(at_exportTimeSelectionAction_triggered()));
 
     /* Run handlers that update state. */
     at_eventManager_connectionClosed();
@@ -1335,6 +1338,111 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
             QnAppServerConnectionFactory::setDefaultUrl(data.url);
         }
     }
+}
+
+void QnWorkbenchActionHandler::at_exportTimeSelectionAction_triggered() {
+    QnActionParameters parameters = menu()->currentParameters(sender());
+
+    QnResourceWidget *widget = parameters.widget();
+    if(!widget)
+        return;
+
+    QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodParameter);
+
+    QnNetworkResourcePtr networkResource = widget->resource().dynamicCast<QnNetworkResource>();
+    QnSecurityCamResourcePtr cameraResource = widget->resource().dynamicCast<QnSecurityCamResource>();
+
+    QSettings settings;
+    settings.beginGroup(QLatin1String("export"));
+    QString previousDir = settings.value(QLatin1String("previousDir")).toString();
+    QString dateFormat = cameraResource ? tr("dd-mmm-yyyy hh-mm-ss") : tr("hh-mm-ss");
+    QString suggestion = networkResource ? networkResource->getMAC().toString() : QString();
+
+    QString fileName;
+    QString selectedExtension;
+    while (true) {
+        QString selectedFilter;
+        fileName = QFileDialog::getSaveFileName(
+            this->widget(), 
+            tr("Export Video As..."),
+            previousDir + QDir::separator() + suggestion,
+            tr("Matroska (*.mkv);; AVI (Audio/Video Interleaved)(*.avi)"),
+            &selectedFilter,
+            QFileDialog::DontUseNativeDialog
+        );
+        selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')) + 1, 3);
+
+        if (fileName.isEmpty())
+            return;
+
+        if (!fileName.toLower().endsWith(QLatin1String(".mkv")) && !fileName.toLower().endsWith(QLatin1String(".avi"))) {
+            fileName += QChar('.') + selectedExtension;
+
+            if (QFile::exists(fileName)) {
+                QMessageBox::StandardButton button = QMessageBox::information(
+                    this->widget(), 
+                    tr("Save As"), 
+                    tr("File '%1' already exists. Overwrite?").arg(QFileInfo(fileName).baseName()),
+                    QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
+                );
+
+                if(button == QMessageBox::Cancel || button == QMessageBox::No)
+                    return;
+            }
+        }
+
+        if (QFile::exists(fileName) && !QFile::remove(fileName)) {
+            QMessageBox::critical(
+                this->widget(), 
+                tr("Can't overwrite file"), 
+                tr("File '%1' is used by another process. Try another name.").arg(QFileInfo(fileName).baseName()), 
+                QMessageBox::Ok
+            );
+            continue;
+        } 
+
+        break;
+    }
+    settings.setValue(QLatin1String("previousDir"), QFileInfo(fileName).absolutePath());
+
+    QProgressDialog *exportProgressDialog = new QProgressDialog(this->widget());
+    exportProgressDialog->setWindowFlags(Qt::WindowStaysOnTopHint);
+    exportProgressDialog->setWindowTitle(tr("Exporting Video"));
+    exportProgressDialog->setLabelText(tr("Exporting to \"%1\"...").arg(fileName));
+    exportProgressDialog->setRange(0, 100);
+    exportProgressDialog->setMinimumDuration(1000);
+
+    CLVideoCamera *camera = widget->display()->camera();
+
+    connect(exportProgressDialog,   SIGNAL(canceled()),                 camera,                 SLOT(stopExport()));
+    connect(exportProgressDialog,   SIGNAL(canceled()),                 exportProgressDialog,   SLOT(deleteLater()));
+    connect(camera,                 SIGNAL(exportProgress(int)),        exportProgressDialog,   SLOT(setValue(int)));
+    connect(camera,                 SIGNAL(exportFailed(QString)),      exportProgressDialog,   SLOT(deleteLater()));
+    connect(camera,                 SIGNAL(exportFinished(QString)),    exportProgressDialog,   SLOT(deleteLater()));
+    connect(camera,                 SIGNAL(exportFailed(QString)),      this,                   SLOT(at_camera_exportFailed(QString)));
+    connect(camera,                 SIGNAL(exportFinished(QString)),    this,                   SLOT(at_camera_exportFinished(QString)));
+
+    camera->exportMediaPeriodToFile(period.startTimeMs * 1000ll, (period.startTimeMs + period.durationMs) * 1000ll, fileName, selectedExtension);
+}
+
+
+void QnWorkbenchActionHandler::at_camera_exportFinished(QString fileName) {
+    disconnect(sender(), NULL, this, NULL);
+
+    QnAviResourcePtr file(new QnAviResource(fileName));
+    file->setStatus(QnResource::Online);
+    resourcePool()->addResource(file);
+
+    QMessageBox::information(widget(), tr("Export finished"), tr("Export successfully finished"), QMessageBox::Ok);
+}
+
+void QnWorkbenchActionHandler::at_camera_exportFailed(QString errorMessage) {
+    disconnect(sender(), NULL, this, NULL);
+
+    if(CLVideoCamera *camera = dynamic_cast<CLVideoCamera *>(sender()))
+        camera->stopExport();
+
+    QMessageBox::warning(widget(), tr("Could not export video"), errorMessage, QMessageBox::Ok);
 }
 
 void QnWorkbenchActionHandler::at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle) {

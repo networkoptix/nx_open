@@ -149,5 +149,19 @@ public:
 };
 
 
+class QnTimePeriodActionCondition: public QnActionCondition {
+public:
+    QnTimePeriodActionCondition(bool requiredPeriodEmptyValue, QObject *parent = NULL):
+        QnActionCondition(parent),
+        m_requiredPeriodEmptyValue(requiredPeriodEmptyValue)
+    {}
+
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+
+private:
+    bool m_requiredPeriodEmptyValue;
+};
+
+
 
 #endif // QN_ACTION_CONDITIONS_H

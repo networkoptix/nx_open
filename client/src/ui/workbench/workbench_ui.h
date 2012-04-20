@@ -210,10 +210,6 @@ protected slots:
 
     void at_fpsItem_geometryChanged();
 
-    void at_exportMediaRange(CLVideoCamera* camera, qint64 startTimeMs, qint64 endTimeMs);
-    void at_exportFailed(QString errMessage);
-    void at_exportFinished(QString fileName);
-
 private:
     /* Global state. */
 

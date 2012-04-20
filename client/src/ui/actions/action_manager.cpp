@@ -695,13 +695,15 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnResourceActionCondition(hasFlags(QnResource::remote_server), Qn::ExactlyOne, this));
 
 
-    factory(Qn::ClearSliderSelectionAction).
+    factory(Qn::ClearTimeSelectionAction).
         flags(Qn::Slider | Qn::SingleTarget | Qn::NoTarget).
-        text(tr("Clear Selection"));
+        text(tr("Clear Selection")).
+        condition(new QnTimePeriodActionCondition(false, this));
 
-    factory(Qn::ExportSliderSelectionAction).
+    factory(Qn::ExportTimeSelectionAction).
         flags(Qn::Slider | Qn::SingleTarget).
-        text(tr("Export Selection"));
+        text(tr("Export Selection")).
+        condition(new QnTimePeriodActionCondition(false, this));
 }
 
 QnActionManager::~QnActionManager() {
@@ -865,6 +867,7 @@ bool QnActionManager::redirectActionRecursive(QMenu *menu, Qn::ActionId targetId
             menu->removeAction(action);
             if(targetAction != NULL) {
                 copyAction(targetAction, storedAction, false);
+                targetAction->setEnabled(action->isEnabled());
                 menu->insertAction(before, targetAction);
             }
 

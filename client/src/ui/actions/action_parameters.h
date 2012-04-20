@@ -42,6 +42,8 @@ public:
 
     QnWorkbenchLayoutList layouts() const;
 
+    QnResourceWidget *widget() const;
+
     QnResourceWidgetList widgets() const;
 
     void setItems(const QVariant &items);

@@ -13,6 +13,7 @@ namespace Qn {
     inline QLatin1String qn_currentLayoutParameter()        { return QLatin1String("_qn_currentLayoutParameter"); }
     inline QLatin1String qn_currentUserParameter()          { return QLatin1String("_qn_currentUserParameter"); }
     inline QLatin1String qn_serializedResourcesParameter()  { return QLatin1String("_qn_serializedResourcesParameter"); }
+    inline QLatin1String qn_timePeriodParameter()           { return QLatin1String("_qn_timePeriodParameter"); }
 
 #define GridPositionParameter qn_gridPositionParameter()
 #define UserParameter qn_userParameter()
@@ -22,6 +23,7 @@ namespace Qn {
 #define CurrentLayoutParameter qn_currentLayoutParameter()
 #define CurrentUserParameter qn_currentUserParameter()
 #define SerializedResourcesParameter qn_serializedResourcesParameter()
+#define TimePeriodParameter qn_timePeriodParameter()
 
     /**
      * Enum of all menu actions.
@@ -391,12 +393,12 @@ namespace Qn {
         /**
          * Clears selection.
          */
-        ClearSliderSelectionAction,
+        ClearTimeSelectionAction,
 
         /**
          * Exports selected range.
          */
-        ExportSliderSelectionAction,
+        ExportTimeSelectionAction,
 
 
         ActionCount,

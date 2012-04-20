@@ -13,6 +13,7 @@
 #include "workbench_globals.h"
 
 class QRegion;
+class QAction;
 class QGraphicsSceneContextMenuEvent;
 
 class QnWorkbenchDisplay;
@@ -100,6 +101,8 @@ private:
 
     bool m_wasPlaying;
     bool m_inUpdate;
+
+    QAction *m_clearSelectionAction;
 
     QHash<QnResourcePtr, QnCachingTimePeriodLoader *> m_loaderByResource;
 };

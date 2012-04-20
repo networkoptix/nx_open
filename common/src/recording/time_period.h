@@ -126,5 +126,6 @@ namespace Qn {
 
 Q_DECLARE_TYPEINFO(QnTimePeriod, Q_MOVABLE_TYPE);
 Q_DECLARE_METATYPE(Qn::TimePeriodType);
+Q_DECLARE_METATYPE(QnTimePeriod);
 
 #endif // QN_TIME_PERIOD_H

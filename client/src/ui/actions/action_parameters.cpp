@@ -94,6 +94,15 @@ QnWorkbenchLayoutList QnActionParameters::layouts() const {
     return QnActionTargetTypes::layouts(m_items);
 }
 
+QnResourceWidget *QnActionParameters::widget() const {
+    QnResourceWidgetList widgets = this->widgets();
+
+    if(widgets.size() != 1)
+        qnWarning("Invalid number of target widgets: expected %2, got %3.", 1, widgets.size());
+
+    return widgets.isEmpty() ? NULL : widgets.front();
+}
+
 QnResourceWidgetList QnActionParameters::widgets() const {
     return QnActionTargetTypes::widgets(m_items);
 }

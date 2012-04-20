@@ -2,6 +2,7 @@
 
 #include <utils/common/warnings.h>
 #include <core/resourcemanagment/resource_criterion.h>
+#include <recording/time_period.h>
 
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/workbench/workbench.h>
@@ -218,5 +219,15 @@ Qn::ActionVisibility QnTakeScreenshotActionCondition::check(const QnResourceWidg
         return Qn::DisabledAction;
 
     return Qn::EnabledAction;
+}
+
+Qn::ActionVisibility QnTimePeriodActionCondition::check(const QnActionParameters &parameters) {
+    if(!parameters.hasArgument(Qn::TimePeriodParameter))
+        return Qn::InvisibleAction;
+
+    QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodParameter);
+    bool isEmpty = period.durationMs == 0;
+
+    return isEmpty == m_requiredPeriodEmptyValue ? Qn::EnabledAction : Qn::DisabledAction;
 }
 

@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+#include <QtGui/QAction>
+#include <QtGui/QMenu>
 #include <QtGui/QGraphicsSceneContextMenuEvent>
 
 #include <utils/common/util.h>
@@ -38,7 +40,8 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QnWorkbenchDisplay *display, QObject 
     m_centralWidget(NULL),
     m_currentWidget(NULL),
     m_inUpdate(false),
-    m_currentWidgetIsCamera(false)
+    m_currentWidgetIsCamera(false),
+    m_clearSelectionAction(new QAction(this))
 {
     assert(display != NULL);
 
@@ -58,6 +61,8 @@ void QnWorkbenchNavigator::setTimeSlider(QnTimeSlider *timeSlider) {
 
     if(m_timeSlider) {
         disconnect(m_timeSlider, NULL, this, NULL);
+        
+        m_timeSlider->removeEventFilter(this);
 
         deinitialize();
     }
@@ -66,6 +71,8 @@ void QnWorkbenchNavigator::setTimeSlider(QnTimeSlider *timeSlider) {
 
     if(m_timeSlider) {
         connect(m_timeSlider, SIGNAL(destroyed()), this, SLOT(at_timeSlider_destroyed()));
+
+        m_timeSlider->installEventFilter(this);
 
         initialize();
     }
@@ -357,13 +364,17 @@ void QnWorkbenchNavigator::at_timeSlider_contextMenuEvent(QGraphicsSceneContextM
     }
     QnActionManager *manager = context()->menu();
 
-#if 0
-    QScopedPointer<QMenu> menu(manager->newMenu(Qn::SliderScope, currentTarget(Qn::SliderScope)));
+    QnTimePeriod selection;
+    if(m_timeSlider->isSelectionValid())
+        selection = QnTimePeriod(m_timeSlider->selectionStart(), m_timeSlider->selectionEnd() - m_timeSlider->selectionStart());
 
-    /* Add tree-local actions to the menu. */
-    manager->redirectAction(menu.data(), Qn::RenameAction, m_renameAction);
-    if(currentSelectionModel()->currentIndex().data(Qn::NodeTypeRole) != Qn::UsersNode || !currentSelectionModel()->selection().contains(currentSelectionModel()->currentIndex()))
-        manager->redirectAction(menu.data(), Qn::NewUserAction, NULL); /* Show 'New User' item only when clicking on 'Users' node. */
+    QScopedPointer<QMenu> menu(manager->newMenu(
+        Qn::SliderScope, 
+        QnActionParameters(currentTarget(Qn::SliderScope)).withArgument(Qn::TimePeriodParameter, selection)
+    ));
+
+    /* Add slider-local actions to the menu. */
+    manager->redirectAction(menu.data(), Qn::ClearTimeSelectionAction, m_clearSelectionAction);
 
     if(menu->isEmpty())
         return;
@@ -372,10 +383,8 @@ void QnWorkbenchNavigator::at_timeSlider_contextMenuEvent(QGraphicsSceneContextM
     QAction *action = menu->exec(QCursor::pos());
 
     /* Process tree-local actions. */
-    if(action == m_renameAction)
-        currentItemView()->edit(currentSelectionModel()->currentIndex());
-#endif
-
+    if(action == m_clearSelectionAction)
+        m_timeSlider->setSelectionValid(false);
 }
 
 void QnWorkbenchNavigator::at_loader_periodsChanged(Qn::TimePeriodType type) {
