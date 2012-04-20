@@ -17,7 +17,7 @@ public:
 
 protected:
 	virtual QnAbstractMediaDataPtr getNextData();
-    QnMetaDataV1Ptr getMetaData();
+    virtual QnMetaDataV1Ptr getCameraMetadata() override;
 
 	virtual bool needKeyData() const;
 

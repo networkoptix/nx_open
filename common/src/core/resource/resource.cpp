@@ -732,7 +732,7 @@ void QnResource::setDisabled(bool disabled)
     }
 
     if (oldDisabled != disabled)
-		emit disabledChanged();
+		emit disabledChanged(oldDisabled, disabled);
 
 }
 

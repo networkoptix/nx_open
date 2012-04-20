@@ -5,6 +5,8 @@
 #include "core/misc/scheduleTask.h"
 #include "recorder/device_file_catalog.h"
 #include "recording/time_period.h"
+#include "motion/motion_estimation.h"
+#include "core/dataprovider/media_streamdataprovider.h"
 
 class QnServerStreamRecorder: public QnStreamRecorder
 {

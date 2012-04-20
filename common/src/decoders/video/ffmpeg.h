@@ -1,6 +1,7 @@
 #ifndef cl_ffmpeg_h2026
 #define cl_ffmpeg_h2026
 
+#include <QImage>
 #include "abstractdecoder.h"
 
 #ifdef _USE_DXVA

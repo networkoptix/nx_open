@@ -30,7 +30,10 @@ bool QnTimePeriod::isEmpty() const
 
 qint64 QnTimePeriod::endTimeMs() const
 {
-    return startTimeMs + durationMs;
+    if (durationMs == -1)
+        return DATETIME_NOW;
+    else
+        return startTimeMs + durationMs;
 }
 
 

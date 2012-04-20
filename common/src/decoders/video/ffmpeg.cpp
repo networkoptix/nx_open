@@ -113,6 +113,9 @@ void CLFFmpegVideoDecoder::determineOptimalThreadType(const QnCompressedVideoDat
     if (m_context->thread_count == 1) {
         m_context->thread_count = qMin(MAX_DECODE_THREAD, QThread::idealThreadCount() + 1);
     }
+    if (!m_mtDecoding)
+        m_context->thread_count = 1;
+
     if (m_forceSliceDecoding == -1 && data && data->data.data() && m_context->codec_id == CODEC_ID_H264) 
     {
         m_forceSliceDecoding = 0;
@@ -148,6 +151,7 @@ void CLFFmpegVideoDecoder::determineOptimalThreadType(const QnCompressedVideoDat
         // ignoring deblocking filter type 1 for better perfomace between H264 slices.
         m_context->flags2 |= CODEC_FLAG2_FAST;
     }
+    //m_context->flags |= CODEC_FLAG_GRAY;
 }
 
 void CLFFmpegVideoDecoder::openDecoder(const QnCompressedVideoDataPtr data)

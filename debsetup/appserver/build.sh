@@ -1,5 +1,7 @@
 #!/bin/bash
 
+. ../common.sh
+
 TARGET=/opt/networkoptix/entcontroller
 BINTARGET=$TARGET/bin
 LIBTARGET=$TARGET/lib
@@ -10,9 +12,6 @@ INITTARGET=/etc/init
 INITDTARGET=/etc/init.d
 
 PACKAGENAME=networkoptix-entcontroller
-VERSION=`python ../../common/common_version.py`
-ARCHITECTURE=amd64
-
 STAGEBASE=package
 STAGE=$STAGEBASE/${PACKAGENAME}_${VERSION}_${ARCHITECTURE}
 PKGSTAGE=$STAGE$TARGET
@@ -39,10 +38,12 @@ sudo rm -rf $STAGEBASE
 mkdir -p $PKGSTAGE
 rmdir $PKGSTAGE
 cp -r $ECS_PRESTAGE_PATH $PKGSTAGE
-cp /lib/x86_64-linux-gnu/libssl.so.1.0.0 $LIBSTAGE
-cp /lib/x86_64-linux-gnu/libcrypto.so.1.0.0 $LIBSTAGE
+cp /lib/$ARCH-linux-gnu/libssl.so.1.0.0 $LIBSTAGE
+cp /lib/$ARCH-linux-gnu/libcrypto.so.1.0.0 $LIBSTAGE
 
 mkdir -p $ETCSTAGE
+touch $ETCSTAGE/entcontroller.conf
+
 mkdir -p $INITSTAGE
 mkdir -p $INITDSTAGE
 
@@ -55,12 +56,13 @@ mkdir -p $STAGE/DEBIAN
 
 INSTALLED_SIZE=`du -s $STAGE | awk '{print $1;}'`
 
-cat debian/control.template | sed "s/INSTALLED_SIZE/$INSTALLED_SIZE/g" | sed "s/VERSION/$VERSION/g" > $STAGE/DEBIAN/control
+cat debian/control.template | sed "s/INSTALLED_SIZE/$INSTALLED_SIZE/g" | sed "s/VERSION/$VERSION/g" | sed "s/ARCHITECTURE/$ARCHITECTURE/g" > $STAGE/DEBIAN/control
 cp debian/postinst $STAGE/DEBIAN
 cp debian/prerm $STAGE/DEBIAN
 cp debian/templates $STAGE/DEBIAN
+cp debian/conffiles $STAGE/DEBIAN
 
 (cd $STAGE; md5sum `find * -type f | grep -v '^DEBIAN/'` > DEBIAN/md5sums)
 
 sudo chown -R root:root $STAGEBASE
-(cd $STAGEBASE; sudo dpkg-deb -b networkoptix-entcontroller_${VERSION}_amd64)
+(cd $STAGEBASE; sudo dpkg-deb -b networkoptix-entcontroller_${VERSION}_${ARCHITECTURE})

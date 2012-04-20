@@ -155,12 +155,8 @@ bool QnAxisStreamReader::isStreamOpened() const
     return m_RTP264.isStreamOpened();
 }
 
-QnMetaDataV1Ptr QnAxisStreamReader::getMetaData()
+QnMetaDataV1Ptr QnAxisStreamReader::getCameraMetadata()
 {
-    if (m_lastMetadata && !m_lastMetadata->isEmpty())
-    {
-        int gg = 4;
-    }
     QnMetaDataV1Ptr rez = m_lastMetadata != 0 ? m_lastMetadata : QnMetaDataV1Ptr(new QnMetaDataV1());
     m_lastMetadata.clear();
     return rez;

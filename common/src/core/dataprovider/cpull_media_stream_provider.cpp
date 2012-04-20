@@ -152,7 +152,7 @@ void QnClientPullMediaStreamProvider::run()
         {
             m_stat[videoData->channelNumber].onData(videoData->data.size());
             if (QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(this))
-                lp->onGotVideoFrame();
+                lp->onGotVideoFrame(videoData);
         }
 
 

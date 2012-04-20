@@ -81,6 +81,8 @@ public:
     int getResourceTypes(QnResourceTypeList& resourceTypes, QByteArray& errorString);
 
     int getResources(QnResourceList& resources, QByteArray& errorString);
+    int getResources(const QString& args, QnResourceList& resources, QByteArray& errorString);
+    int getResource(const QnId& id, QnResourcePtr& resource, QByteArray& errorString);
 
     /**
       get resources synchronously

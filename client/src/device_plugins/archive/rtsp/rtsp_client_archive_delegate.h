@@ -52,6 +52,8 @@ private:
     QnResourcePtr getResourceOnTime(QnResourcePtr resource, qint64 time);
     QnResourcePtr getNextVideoServerFromTime(QnResourcePtr resource, qint64 time);
     QnAbstractMediaDataPtr getNextDataInternal();
+    QString getUrl(QnResourcePtr server);
+    qint64 checkMinTimeFromOtherServer(QnResourcePtr resource);
 private:
     QMutex m_mutex;
     RTPSession m_rtspSession;
@@ -77,8 +79,10 @@ private:
     bool m_blockReopening;
     MediaQuality m_quality;
     bool m_qualityFastSwitch;
+    qint64 m_lastMinTimeTime;
 
     QnTimePeriod m_serverTimePeriod;
+    qint64 m_globalMinArchiveTime; // min archive time between all servers
 };
 
 #endif

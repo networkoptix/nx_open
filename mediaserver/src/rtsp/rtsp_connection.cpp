@@ -462,6 +462,17 @@ void QnRtspConnectionProcessor::parseRangeHeader(const QString& rangeStr, qint64
     }
 }
 
+void QnRtspConnectionProcessor::at_cameraDisabledChanged(bool oldValue, bool newValue)
+{
+    Q_D(QnRtspConnectionProcessor);
+    if (newValue) {
+        if (getRtspTime() == DATETIME_NOW) {
+            m_needStop = true;
+            d->socket->close();
+        }
+    }
+}
+
 void QnRtspConnectionProcessor::createDataProvider()
 {
     Q_D(QnRtspConnectionProcessor);
@@ -471,8 +482,10 @@ void QnRtspConnectionProcessor::createDataProvider()
 		camera->inUse(d);
 		if (!d->liveDpHi) {
 			d->liveDpHi = camera->getLiveReader(QnResource::Role_LiveVideo);
-			if (d->liveDpHi)
+            if (d->liveDpHi) {
+                connect(d->liveDpHi->getResource().data(), SIGNAL(disabledChanged(bool, bool)), this, SLOT(at_cameraDisabledChanged(bool, bool)), Qt::DirectConnection);
 				d->liveDpHi->start();
+            }
 		}
 		if (!d->liveDpLow && d->liveDpHi)
         {
