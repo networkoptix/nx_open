@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+#include <QtGui/QGraphicsSceneContextMenuEvent>
+
 #include <utils/common/util.h>
 #include <utils/common/synctime.h>
 #include <utils/common/scoped_value_rollback.h>
@@ -13,14 +15,17 @@
 #include <camera/time_period_loader.h>
 #include <camera/resource_display.h>
 #include <camera/camera.h>
+
+#include <ui/actions/action_manager.h>
+#include <ui/actions/action_target_types.h>
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/graphics/instruments/signaling_instrument.h>
 
 #include "workbench_display.h"
+#include "workbench_context.h"
+
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
-
-
 #include <cstdint> // TODO: remove
 #include "libavutil/avutil.h" // TODO: remove
 
@@ -90,6 +95,17 @@ void QnWorkbenchNavigator::deinitialize() {
 
     m_currentWidget = NULL;
     m_currentWidgetIsCamera = false;
+}
+
+Qn::ActionScope QnWorkbenchNavigator::currentScope() const {
+    return Qn::SliderScope;
+}
+
+QVariant QnWorkbenchNavigator::currentTarget(Qn::ActionScope scope) const {
+    QnResourceWidgetList result;
+    if(m_currentWidget)
+        result.push_back(m_currentWidget);
+    return QVariant::fromValue<QnResourceWidgetList>(result);
 }
 
 void QnWorkbenchNavigator::setCentralWidget(QnResourceWidget *widget) {
@@ -325,6 +341,43 @@ void QnWorkbenchNavigator::updateLineComments() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+bool QnWorkbenchNavigator::eventFilter(QObject *watched, QEvent *event) {
+    if(watched == m_timeSlider && event->type() == QEvent::GraphicsSceneContextMenu) {
+        at_timeSlider_contextMenuEvent(static_cast<QGraphicsSceneContextMenuEvent *>(event));
+        return true;
+    }
+
+    return base_type::eventFilter(watched, event);
+}
+
+void QnWorkbenchNavigator::at_timeSlider_contextMenuEvent(QGraphicsSceneContextMenuEvent *event) {
+    if(!context() || !context()->menu()) {
+        qnWarning("Requesting context menu for a time slider while no menu manager instance is available.");
+        return;
+    }
+    QnActionManager *manager = context()->menu();
+
+#if 0
+    QScopedPointer<QMenu> menu(manager->newMenu(Qn::SliderScope, currentTarget(Qn::SliderScope)));
+
+    /* Add tree-local actions to the menu. */
+    manager->redirectAction(menu.data(), Qn::RenameAction, m_renameAction);
+    if(currentSelectionModel()->currentIndex().data(Qn::NodeTypeRole) != Qn::UsersNode || !currentSelectionModel()->selection().contains(currentSelectionModel()->currentIndex()))
+        manager->redirectAction(menu.data(), Qn::NewUserAction, NULL); /* Show 'New User' item only when clicking on 'Users' node. */
+
+    if(menu->isEmpty())
+        return;
+
+    /* Run menu. */
+    QAction *action = menu->exec(QCursor::pos());
+
+    /* Process tree-local actions. */
+    if(action == m_renameAction)
+        currentItemView()->edit(currentSelectionModel()->currentIndex());
+#endif
+
+}
+
 void QnWorkbenchNavigator::at_loader_periodsChanged(Qn::TimePeriodType type) {
     at_loader_periodsChanged(checked_cast<QnCachingTimePeriodLoader *>(sender()), type);
 }

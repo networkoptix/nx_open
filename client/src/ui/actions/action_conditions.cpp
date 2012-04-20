@@ -36,30 +36,21 @@ Qn::ActionVisibility QnActionCondition::check(const QnWorkbenchLayoutList &layou
     return check(QnActionTargetTypes::resources(layouts));
 };
 
-Qn::ActionVisibility QnActionCondition::check(const QVariant &items) {
-    switch(QnActionTargetTypes::type(items)) {
+Qn::ActionVisibility QnActionCondition::check(const QnActionParameters &parameters) {
+    switch(parameters.itemsType()) {
     case Qn::ResourceType:
-        return check(QnActionTargetTypes::resources(items));
+        return check(parameters.resources());
     case Qn::WidgetType:
-        return check(QnActionTargetTypes::widgets(items));
+        return check(parameters.widgets());
     case Qn::LayoutType:
-        return check(QnActionTargetTypes::layouts(items));
+        return check(parameters.layouts());
     case Qn::LayoutItemType:
-        return check(QnActionTargetTypes::layoutItems(items));
+        return check(parameters.layoutItems());
     default:
-        qnWarning("Invalid action condition parameter type '%1'.", items.typeName());
+        qnWarning("Invalid action condition parameter type '%1'.", parameters.items().typeName());
         return Qn::InvisibleAction;
     }
 }
-
-Qn::ActionVisibility QnTargetlessActionCondition::check(const QVariant &items) {
-    if(!items.isValid()) {
-        return check(QnResourceList());
-    } else {
-        return base_type::check(items);
-    }
-}
-
 
 Qn::ActionVisibility QnItemZoomedActionCondition::check(const QnResourceWidgetList &widgets) {
     if(widgets.size() != 1 || !widgets[0])

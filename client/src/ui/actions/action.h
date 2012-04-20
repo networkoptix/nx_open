@@ -14,6 +14,7 @@ class QGraphicsItem;
 class QnWorkbenchContext;
 class QnActionCondition;
 class QnActionManager;
+class QnActionParameters;
 
 class QnAction: public QAction, public QnWorkbenchContextAware {
     Q_OBJECT;
@@ -80,7 +81,7 @@ public:
 
     void removeChild(QnAction *action);
 
-    Qn::ActionVisibility checkCondition(Qn::ActionScopes scope, const QVariant &items, const QVariantMap &params) const;
+    Qn::ActionVisibility checkCondition(Qn::ActionScopes scope, const QnActionParameters &parameters) const;
 
 protected:
     virtual bool event(QEvent *event) override;

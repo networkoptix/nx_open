@@ -386,6 +386,19 @@ namespace Qn {
 
 
 
+        /* Slider actions. */
+
+        /**
+         * Clears selection.
+         */
+        ClearSliderSelectionAction,
+
+        /**
+         * Exports selected range.
+         */
+        ExportSliderSelectionAction,
+
+
         ActionCount,
 
         NoAction = -1
@@ -461,7 +474,7 @@ namespace Qn {
         Tree                    = Qn::TreeScope,                                
 
         /** Action can appear in slider context menu. */
-        Slider                  = Qn::SliderScope | SingleTarget | ResourceTarget,    
+        Slider                  = Qn::SliderScope | WidgetTarget,    
 
         /** Action can appear in tab bar context menu. */
         TabBar                  = Qn::TabBarScope | SingleTarget | LayoutTarget,      

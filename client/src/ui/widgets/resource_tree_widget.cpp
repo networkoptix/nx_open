@@ -458,7 +458,7 @@ void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *) {
     }
     QnActionManager *manager = context()->menu();
 
-    QScopedPointer<QMenu> menu(manager->newMenu(Qn::TreeScope, currentTarget(Qn::TreeScope)));
+    QScopedPointer<QMenu> menu(manager->newMenu(Qn::TreeScope, QnActionParameters(currentTarget(Qn::TreeScope))));
 
     /* Add tree-local actions to the menu. */
     manager->redirectAction(menu.data(), Qn::RenameAction, m_renameAction);

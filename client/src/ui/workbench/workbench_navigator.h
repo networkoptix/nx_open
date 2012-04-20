@@ -6,11 +6,14 @@
 
 #include <core/resource/resource_fwd.h>
 
+#include <ui/actions/action_target_provider.h>
+
 #include "recording/time_period.h"
 #include "workbench_context_aware.h"
 #include "workbench_globals.h"
 
 class QRegion;
+class QGraphicsSceneContextMenuEvent;
 
 class QnWorkbenchDisplay;
 class QnTimeSlider;
@@ -18,8 +21,11 @@ class QnResourceWidget;
 class QnAbstractArchiveReader;
 class QnCachingTimePeriodLoader;
 
-class QnWorkbenchNavigator: public QObject, public QnWorkbenchContextAware {
+class QnWorkbenchNavigator: public QObject, public QnWorkbenchContextAware, public QnActionTargetProvider {
     Q_OBJECT;
+
+    typedef QObject base_type;
+
 public:
     QnWorkbenchNavigator(QnWorkbenchDisplay *display, QObject *parent = NULL);
     virtual ~QnWorkbenchNavigator();
@@ -28,6 +34,11 @@ public:
     void setTimeSlider(QnTimeSlider *timeSlider);
 
     QnResourceWidget *currentWidget();
+
+    virtual Qn::ActionScope currentScope() const override;
+    virtual QVariant currentTarget(Qn::ActionScope scope) const override;
+
+    virtual bool eventFilter(QObject *watched, QEvent *event) override;
 
 signals:
     void currentWidgetChanged();
@@ -74,6 +85,7 @@ protected slots:
     void at_timeSlider_sliderPressed();
     void at_timeSlider_sliderReleased();
     void at_timeSlider_destroyed();
+    void at_timeSlider_contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
 private:
     QnTimeSlider *m_timeSlider;

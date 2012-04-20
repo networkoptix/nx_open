@@ -1129,16 +1129,16 @@ void QnWorkbenchController::at_selectAllAction_triggered() {
 }
 
 void QnWorkbenchController::at_hideMotionAction_triggered() {
-    displayMotionGrid(menu()->currentWidgetsTarget(sender()), false);
+    displayMotionGrid(menu()->currentParameters(sender()).widgets(), false);
 }
 
 void QnWorkbenchController::at_showMotionAction_triggered() {
-    displayMotionGrid(menu()->currentWidgetsTarget(sender()), true);
+    displayMotionGrid(menu()->currentParameters(sender()).widgets(), true);
 }
 
 void QnWorkbenchController::at_checkFileSignatureAction_triggered() 
 {
-    QnResourceWidgetList widgets = menu()->currentWidgetsTarget(sender());
+    QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
     if (widgets.isEmpty())
         return;
     QnResourceWidget *widget = widgets.at(0);
@@ -1150,7 +1150,7 @@ void QnWorkbenchController::at_checkFileSignatureAction_triggered()
 }
 
 void QnWorkbenchController::at_toggleMotionAction_triggered() {
-    QnResourceWidgetList widgets = menu()->currentWidgetsTarget(sender());
+    QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
 
     bool hidden = false;
     foreach(QnResourceWidget *widget, widgets)
@@ -1165,7 +1165,7 @@ void QnWorkbenchController::at_toggleMotionAction_triggered() {
 }
 
 void QnWorkbenchController::at_maximizeItemAction_triggered() {
-    QnResourceWidgetList widgets = menu()->currentWidgetsTarget(sender());
+    QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
     if(widgets.empty())
         return;
 

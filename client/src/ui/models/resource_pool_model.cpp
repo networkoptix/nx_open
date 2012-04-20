@@ -313,7 +313,7 @@ public:
         
         switch(m_type) {
         case Qn::ResourceNode:
-            if(m_model->context()->menu()->canTrigger(Qn::RenameAction, m_resource))
+            if(m_model->context()->menu()->canTrigger(Qn::RenameAction, QnActionParameters(m_resource)))
                 result |= Qt::ItemIsEditable;
             /* Fall through. */
         case Qn::ItemNode:
@@ -373,10 +373,7 @@ public:
         if(role != Qt::EditRole)
             return false;
 
-        QVariantMap params;
-        params[Qn::NameParameter] = value.toString();
-
-        m_model->context()->menu()->trigger(Qn::RenameAction, m_resource, params);
+        m_model->context()->menu()->trigger(Qn::RenameAction, QnActionParameters(m_resource).withArgument(Qn::NameParameter, value.toString()));
         return true;
     }
 
@@ -724,12 +721,9 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
         node = node->parent(); /* Dropping into a server item is the same as dropping into a server */
 
     if(QnLayoutResourcePtr layout = node->resource().dynamicCast<QnLayoutResource>()) {
-        QVariantMap params;
-        params[Qn::LayoutParameter] = QVariant::fromValue(layout);
-
         QnResourceList medias = QnResourceCriterion::filter<QnMediaResource, QnResourceList>(resources);
 
-        menu()->trigger(Qn::OpenInLayoutAction, medias, params);
+        menu()->trigger(Qn::OpenInLayoutAction, QnActionParameters(medias).withArgument(Qn::LayoutParameter, layout));
     } else if(QnUserResourcePtr user = node->resource().dynamicCast<QnUserResource>()) {
         foreach(const QnResourcePtr &resource, resources) {
             if(resource->getParentId() == user->getId())
@@ -739,26 +733,20 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
             if(!layout)
                 continue; /* Can drop only layout resources on user. */
             
-            QVariantMap params;
-            params[Qn::UserParameter] = QVariant::fromValue(user);
-            params[Qn::NameParameter] = layout->getName();
-
-            QnResourceList layouts;
-            layouts.push_back(layout);
-
-            menu()->trigger(Qn::SaveLayoutAsAction, layouts, params);
+            menu()->trigger(
+                Qn::SaveLayoutAsAction, 
+                QnActionParameters(layout).
+                    withArgument(Qn::UserParameter, user).
+                    withArgument(Qn::NameParameter, layout->getName())
+            );
         }
     } else if(QnVideoServerResourcePtr server = node->resource().dynamicCast<QnVideoServerResource>()) {
         if(mimeData->data(QLatin1String(pureTreeResourcesOnlyMimeType)) == QByteArray("1")) {
             /* Allow drop of non-layout item data, from tree only. */
 
             QnResourceList cameras = QnResourceCriterion::filter<QnNetworkResource, QnResourceList>(resources);
-            if(!cameras.empty()) {
-                QVariantMap params;
-                params[Qn::ServerParameter] = QVariant::fromValue(server);
-
-                menu()->trigger(Qn::MoveCameraAction, cameras, params);
-            }
+            if(!cameras.empty())
+                menu()->trigger(Qn::MoveCameraAction, QnActionParameters(cameras).withArgument(Qn::ServerParameter, server));
         }
     }
     

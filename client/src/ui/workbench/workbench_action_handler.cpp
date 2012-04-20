@@ -449,7 +449,7 @@ void QnWorkbenchActionHandler::updateCameraSettingsFromSelection() {
         m_selectionScope = scope;
     }
 
-    menu()->trigger(Qn::OpenInCameraSettingsDialogAction, provider->currentTarget(scope));
+    menu()->trigger(Qn::OpenInCameraSettingsDialogAction, QnActionParameters(provider->currentTarget(scope)));
 }
 
 void QnWorkbenchActionHandler::submitDelayedDrops() {
@@ -533,22 +533,24 @@ void QnWorkbenchActionHandler::at_previousLayoutAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
-    QnLayoutResourcePtr layout = menu()->currentParameter(sender(), Qn::LayoutParameter).value<QnLayoutResourcePtr>();
+    QnActionParameters parameters = menu()->currentParameters(sender());
+
+    QnLayoutResourcePtr layout = parameters.argument<QnLayoutResourcePtr>(Qn::LayoutParameter);
     if(!layout) {
         qnWarning("No layout provided.");
         return;
     }
 
-    QPointF position = menu()->currentParameter(sender(), Qn::GridPositionParameter).toPointF();
+    QPointF position = parameters.argument<QPointF>(Qn::GridPositionParameter);
 
-    QnResourceWidgetList widgets = menu()->currentWidgetsTarget(sender());
+    QnResourceWidgetList widgets = parameters.widgets();
     if(!widgets.empty() && position.isNull() && layout->getItems().empty()) {
         foreach(const QnResourceWidget *widget, widgets)
             layout->addItem(widget->item()->data());
         return;
     }
 
-    QnMediaResourceList resources = QnResourceCriterion::filter<QnMediaResource>(menu()->currentResourcesTarget(sender()));
+    QnMediaResourceList resources = QnResourceCriterion::filter<QnMediaResource>(parameters.resources());
     if(!resources.isEmpty()) {
         addToLayout(layout, resources, !position.isNull(), position);
         return;
@@ -556,19 +558,19 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_openInCurrentLayoutAction_triggered() {
-    QVariantMap params = menu()->currentParameters(sender());
-    params[Qn::LayoutParameter] = QVariant::fromValue(workbench()->currentLayout()->resource());
+    QnActionParameters parameters = menu()->currentParameters(sender());
+    parameters.setArgument(Qn::LayoutParameter, workbench()->currentLayout()->resource());
 
-    menu()->trigger(Qn::OpenInLayoutAction, menu()->currentTarget(sender()), params);
+    menu()->trigger(Qn::OpenInLayoutAction, parameters);
 };
 
 void QnWorkbenchActionHandler::at_openInNewLayoutAction_triggered() {
     menu()->trigger(Qn::OpenNewTabAction);
-    menu()->trigger(Qn::OpenInCurrentLayoutAction, menu()->currentTarget(sender()), menu()->currentParameters(sender()));
+    menu()->trigger(Qn::OpenInCurrentLayoutAction, menu()->currentParameters(sender()));
 }
 
 void QnWorkbenchActionHandler::at_openInNewWindowAction_triggered() {
-    QnResourceList medias = QnResourceCriterion::filter<QnMediaResource, QnResourceList>(menu()->currentResourcesTarget(sender()));
+    QnResourceList medias = QnResourceCriterion::filter<QnMediaResource, QnResourceList>(menu()->currentParameters(sender()).resources());
     if(medias.isEmpty()) 
         return;
     
@@ -587,7 +589,7 @@ void QnWorkbenchActionHandler::at_openInNewWindowAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_openLayoutsAction_triggered() {
-    foreach(const QnResourcePtr &resource, menu()->currentResourcesTarget(sender())) {
+    foreach(const QnResourcePtr &resource, menu()->currentParameters(sender()).resources()) {
         QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>();
 
         QnWorkbenchLayout *layout = QnWorkbenchLayout::instance(layoutResource);
@@ -626,7 +628,7 @@ void QnWorkbenchActionHandler::at_saveLayoutAction_triggered(const QnLayoutResou
 }
 
 void QnWorkbenchActionHandler::at_saveLayoutAction_triggered() {
-    at_saveLayoutAction_triggered(menu()->currentResourceTarget(sender()).dynamicCast<QnLayoutResource>());
+    at_saveLayoutAction_triggered(menu()->currentParameters(sender()).resource().dynamicCast<QnLayoutResource>());
 }
 
 void QnWorkbenchActionHandler::at_saveCurrentLayoutAction_triggered() {
@@ -640,7 +642,7 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
     if(!user)
         return;
 
-    QString name = menu()->currentParameter(sender(), Qn::NameParameter).toString();
+    QString name = menu()->currentParameters(sender()).argument(Qn::NameParameter).toString();
     if(name.isEmpty()) {
         QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Save | QDialogButtonBox::Cancel, widget()));
         dialog->setWindowTitle(tr("Save Layout As"));
@@ -685,15 +687,17 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
 
 void QnWorkbenchActionHandler::at_saveLayoutForCurrentUserAsAction_triggered() {
     at_saveLayoutAsAction_triggered(
-        menu()->currentResourceTarget(sender()).dynamicCast<QnLayoutResource>(), 
+        menu()->currentParameters(sender()).resource().dynamicCast<QnLayoutResource>(), 
         context()->user()
     );
 }
 
 void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered() {
+    QnActionParameters parameters = menu()->currentParameters(sender());
+
     at_saveLayoutAsAction_triggered(
-        menu()->currentResourceTarget(sender()).dynamicCast<QnLayoutResource>(), 
-        menu()->currentParameter(sender(), Qn::UserParameter).value<QnUserResourcePtr>()
+        parameters.resource().dynamicCast<QnLayoutResource>(), 
+        parameters.argument<QnUserResourcePtr>(Qn::UserParameter)
     );
 }
 
@@ -705,11 +709,11 @@ void QnWorkbenchActionHandler::at_saveCurrentLayoutAsAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_closeLayoutAction_triggered() {
-    closeLayouts(menu()->currentLayoutsTarget(sender()));
+    closeLayouts(menu()->currentParameters(sender()).layouts());
 }
 
 void QnWorkbenchActionHandler::at_closeAllButThisLayoutAction_triggered() {
-    QnWorkbenchLayoutList layouts = menu()->currentLayoutsTarget(sender());
+    QnWorkbenchLayoutList layouts = menu()->currentParameters(sender()).layouts();
     if(layouts.empty())
         return;
     
@@ -721,8 +725,10 @@ void QnWorkbenchActionHandler::at_closeAllButThisLayoutAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
-    QnResourceList resources = menu()->currentResourcesTarget(sender());
-    QnVideoServerResourcePtr server = menu()->currentParameter(sender(), Qn::ServerParameter).value<QnVideoServerResourcePtr>();
+    QnActionParameters parameters = menu()->currentParameters(sender());
+
+    QnResourceList resources = parameters.resources();
+    QnVideoServerResourcePtr server = parameters.argument<QnVideoServerResourcePtr>(Qn::ServerParameter);
     if(!server)
         return;
 
@@ -797,25 +803,29 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
-    QnResourceList layouts = QnResourceCriterion::filter<QnLayoutResource, QnResourceList>(menu()->currentResourcesTarget(sender()));
+    QnActionParameters parameters = menu()->currentParameters(sender());
+
+    QnResourceList layouts = QnResourceCriterion::filter<QnLayoutResource, QnResourceList>(parameters.resources());
     if(!layouts.empty()) {
         menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
     } else {
         /* No layouts? Just open dropped media. */
-        menu()->trigger(Qn::OpenInCurrentLayoutAction, menu()->currentTarget(sender()), menu()->currentParameters(sender()));
+        menu()->trigger(Qn::OpenInCurrentLayoutAction, parameters);
     }
 }
 
 void QnWorkbenchActionHandler::at_dropResourcesIntoNewLayoutAction_triggered() {
-    QnResourceList layouts = QnResourceCriterion::filter<QnLayoutResource, QnResourceList>(menu()->currentResourcesTarget(sender()));
+    QnActionParameters parameters = menu()->currentParameters(sender());
+
+    QnResourceList layouts = QnResourceCriterion::filter<QnLayoutResource, QnResourceList>(parameters.resources());
     if(layouts.empty()) /* That's media drop, open new layout. */
         menu()->trigger(Qn::OpenNewTabAction);
 
-    menu()->trigger(Qn::DropResourcesAction, menu()->currentTarget(sender()), menu()->currentParameters(sender()));
+    menu()->trigger(Qn::DropResourcesAction, parameters);
 }
 
 void QnWorkbenchActionHandler::at_delayedDropResourcesAction_triggered() {
-    QByteArray data = menu()->currentParameter(sender(), Qn::SerializedResourcesParameter).toByteArray();
+    QByteArray data = menu()->currentParameters(sender()).argument<QByteArray>(Qn::SerializedResourcesParameter);
     QDataStream stream(&data, QIODevice::ReadOnly);
     QnMimeData mimeData;
     stream >> mimeData;
@@ -927,7 +937,7 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_editTagsAction_triggered() {
-    QnResourcePtr resource = menu()->currentResourceTarget(sender());
+    QnResourcePtr resource = menu()->currentParameters(sender()).resource();
     if(resource.isNull())
         return;
 
@@ -937,7 +947,7 @@ void QnWorkbenchActionHandler::at_editTagsAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
-    QnResourceList resources = QnResourceCriterion::filter<QnVirtualCameraResource, QnResourceList>(menu()->currentResourcesTarget(sender()));
+    QnResourceList resources = QnResourceCriterion::filter<QnVirtualCameraResource, QnResourceList>(menu()->currentParameters(sender()).resources());
 
     if(!cameraSettingsDialog()) {
         m_cameraSettingsDialog = new QnCameraSettingsDialog(widget());
@@ -988,7 +998,7 @@ void QnWorkbenchActionHandler::at_selectionChangeAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
-    QnVideoServerResourceList resources = QnResourceCriterion::filter<QnVideoServerResource>(menu()->currentResourcesTarget(sender()));
+    QnVideoServerResourceList resources = QnResourceCriterion::filter<QnVideoServerResource>(menu()->currentParameters(sender()).resources());
     if(resources.size() != 1)
         return;
 
@@ -998,7 +1008,7 @@ void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_youtubeUploadAction_triggered() {
-    QnResourcePtr resource = menu()->currentResourceTarget(sender());
+    QnResourcePtr resource = menu()->currentParameters(sender()).resource();
     if(resource.isNull())
         return;
 
@@ -1008,7 +1018,7 @@ void QnWorkbenchActionHandler::at_youtubeUploadAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_openInFolderAction_triggered() {
-    QnResourcePtr resource = menu()->currentResourceTarget(sender());
+    QnResourcePtr resource = menu()->currentParameters(sender()).resource();
     if(resource.isNull())
         return;
 
@@ -1016,7 +1026,7 @@ void QnWorkbenchActionHandler::at_openInFolderAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_deleteFromDiskAction_triggered() {
-    QSet<QnResourcePtr> resources = menu()->currentResourcesTarget(sender()).toSet();
+    QSet<QnResourcePtr> resources = menu()->currentParameters(sender()).resources().toSet();
 
     QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
         widget(), 
@@ -1032,7 +1042,7 @@ void QnWorkbenchActionHandler::at_deleteFromDiskAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_removeLayoutItemAction_triggered() {
-    QnLayoutItemIndexList items = menu()->currentLayoutItemsTarget(sender());
+    QnLayoutItemIndexList items = menu()->currentParameters(sender()).layoutItems();
 
     if(items.size() > 1) {
         QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
@@ -1071,11 +1081,13 @@ void QnWorkbenchActionHandler::at_removeLayoutItemAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_renameAction_triggered() {
-    QnResourcePtr resource = menu()->currentResourceTarget(sender());
+    QnActionParameters parameters = menu()->currentParameters(sender());
+
+    QnResourcePtr resource = parameters.resource();
     if(!resource)
         return;
 
-    QString name = menu()->currentParameter(sender(), Qn::NameParameter).toString();
+    QString name = parameters.argument(Qn::NameParameter).toString();
     if(name.isEmpty()) {
         QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, widget()));
         dialog->setWindowTitle(tr("Rename"));
@@ -1102,7 +1114,7 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
-    QnResourceList resources = menu()->currentResourcesTarget(sender());
+    QnResourceList resources = menu()->currentParameters(sender()).resources();
     
     /* User cannot delete himself. */
     resources.removeOne(context()->user());
@@ -1165,7 +1177,7 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_newUserLayoutAction_triggered() {
-    QnUserResourcePtr user = menu()->currentResourceTarget(sender()).dynamicCast<QnUserResource>();
+    QnUserResourcePtr user = menu()->currentParameters(sender()).resource().dynamicCast<QnUserResource>();
     if(user.isNull())
         return;
 
@@ -1185,7 +1197,7 @@ void QnWorkbenchActionHandler::at_newUserLayoutAction_triggered() {
 
     snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
 
-    menu()->trigger(Qn::OpenSingleLayoutAction, layout);
+    menu()->trigger(Qn::OpenSingleLayoutAction, QnActionParameters(layout));
 }
 
 void QnWorkbenchActionHandler::at_exitAction_triggered() {
@@ -1197,7 +1209,7 @@ void QnWorkbenchActionHandler::at_exitAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
-    QnResourceWidgetList widgets = menu()->currentWidgetsTarget(sender());
+    QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
     if(widgets.size() != 1)
         return;
     QnResourceWidget *widget = widgets[0];
@@ -1254,7 +1266,7 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
-    QnUserResourcePtr user = menu()->currentResourceTarget(sender()).dynamicCast<QnUserResource>();
+    QnUserResourcePtr user = menu()->currentParameters(sender()).resource().dynamicCast<QnUserResource>();
     if(!user)
         return;
 

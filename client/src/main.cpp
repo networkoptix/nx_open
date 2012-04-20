@@ -469,9 +469,7 @@ int main(int argc, char *argv[])
         qnSettings->setLayoutsOpenedOnLogin(false);
 
         QByteArray data = QByteArray::fromBase64(droppedResources.toLatin1());
-        QVariantMap params;
-        params.insert(Qn::SerializedResourcesParameter, data);
-        context->menu()->trigger(Qn::DelayedDropResourcesAction, params);
+        context->menu()->trigger(Qn::DelayedDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedResourcesParameter, data));
     }
 
 #ifdef _DEBUG
