@@ -13,6 +13,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <ui/style/noptix_style.h>
+#include <ui/style/globals.h>
 #include <ui/graphics/items/standard/graphics_slider_p.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/processors/kinetic_cutting_processor.h>
@@ -102,8 +103,11 @@ namespace {
     const qreal lineCommentRelativeHeight = 0.75;
 
     
-    const QColor tickmarkBaseColor(255, 255, 255, 255);
+    const QColor tickmarkColor(255, 255, 255, 255);
     const QColor positionMarkerColor(255, 255, 255, 196);
+
+    const QColor selectionColor = qnGlobals->selectionColor();
+    const QColor selectionMarkerColor = selectionColor.lighter();
 
     const QColor pastBackgroundColor(255, 255, 255, 24);
     const QColor futureBackgroundColor(0, 0, 0, 0);
@@ -131,9 +135,10 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     m_options(0),
     m_oldMinimum(0),
     m_oldMaximum(0),
-    m_lastMSecsPerPixel(1.0),
-    m_lastMaxStepIndex(0),
-    m_aggregationMSecs(0.0)
+    m_animationUpdateMSecsPerPixel(1.0),
+    m_msecsPerPixel(1.0),
+    m_aggregationMSecs(0.0),
+    m_minimalWindow(0)
 {
     /* Set default property values. */
     setProperty(Qn::SliderLength, 0);
@@ -141,7 +146,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
 
     setWindowStart(minimum());
     setWindowEnd(maximum());
-    setOptions(StickToMinimum | StickToMaximum | UpdateToolTip);
+    setOptions(StickToMinimum | StickToMaximum | UpdateToolTip | SelectionVisible | SelectionEditable);
 
     setToolTipFormat(tr("hh:mm:ss", "DEFAULT_TOOL_TIP_FORMAT"));
     
@@ -163,6 +168,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
 
     /* Run handlers. */
     updateSteps();
+    updateMinimalWindow();
     sliderChange(SliderRangeChange);
     itemChange(ItemSceneHasChanged, QVariant::fromValue<QGraphicsScene *>(scene()));
 }
@@ -291,17 +297,7 @@ qint64 QnTimeSlider::windowStart() const {
 }
 
 void QnTimeSlider::setWindowStart(qint64 windowStart) {
-    setWindow(windowStart, qMax(windowStart, m_windowEnd));
-
-    windowStart = qBound(minimum(), windowStart, maximum());
-    if(windowStart == m_windowStart)
-        return;
-
-    m_windowStart = windowStart;
-
-    emit windowChanged(m_windowStart, m_windowEnd);
-
-    updateToolTipVisibility();
+    setWindow(windowStart, qMax(windowStart + m_minimalWindow, m_windowEnd));
 }
 
 qint64 QnTimeSlider::windowEnd() const {
@@ -309,22 +305,32 @@ qint64 QnTimeSlider::windowEnd() const {
 }
 
 void QnTimeSlider::setWindowEnd(qint64 windowEnd) {
-    setWindow(qMin(m_windowStart, windowEnd), windowEnd);
-
-    windowEnd = qBound(minimum(), windowEnd, maximum());
-    if(windowEnd == m_windowEnd)
-        return;
-
-    m_windowEnd = windowEnd;
-
-    emit windowChanged(m_windowStart, m_windowEnd);
-
-    updateToolTipVisibility();
+    setWindow(qMin(m_windowStart, windowEnd - m_minimalWindow), windowEnd);
 }
 
 void QnTimeSlider::setWindow(qint64 start, qint64 end) {
     start = qBound(minimum(), start, maximum());
     end = qMax(start, qBound(minimum(), end, maximum()));
+
+    if(end - start < m_minimalWindow) {
+        qint64 d0 = m_minimalWindow / 2;
+        qint64 d1 = m_minimalWindow - d0;
+
+        end -= d0;
+        start -= d1;
+
+        if(start < minimum()) {
+            end += minimum() - start;
+            start = minimum();
+        }
+        if(end > maximum()) {
+            start += maximum() - end;
+            end = maximum();
+        }
+
+        start = qBound(minimum(), start, maximum());
+        end = qBound(minimum(), end, maximum());
+    }
 
     if (m_windowStart != start || m_windowEnd != end) {
         m_windowStart = start;
@@ -334,8 +340,35 @@ void QnTimeSlider::setWindow(qint64 start, qint64 end) {
         emit windowChanged(m_windowStart, m_windowEnd);
 
         updateToolTipVisibility();
-        updateStepAnimationTargets();
-        updateAggregationValue();
+        updateMSecsPerPixel();
+    }
+}
+
+qint64 QnTimeSlider::selectionStart() const {
+    return m_selectionStart;
+}
+
+void QnTimeSlider::setSelectionStart(qint64 selectionStart) {
+    setSelection(selectionStart, qMax(selectionStart, m_selectionEnd));
+}
+
+qint64 QnTimeSlider::selectionEnd() const {
+    return m_selectionEnd;
+}
+
+void QnTimeSlider::setSelectionEnd(qint64 selectionEnd) {
+    setSelection(qMin(m_selectionStart, selectionEnd), selectionEnd);
+}
+
+void QnTimeSlider::setSelection(qint64 start, qint64 end) {
+    start = qBound(minimum(), start, maximum());
+    end = qMax(start, qBound(minimum(), end, maximum()));
+
+    if (m_selectionStart != start || m_selectionEnd != end) {
+        m_selectionStart = start;
+        m_selectionEnd = end;
+
+        emit selectionChanged(m_windowStart, m_windowEnd);
     }
 }
 
@@ -376,10 +409,9 @@ void QnTimeSlider::finishAnimations() {
 }
 
 bool QnTimeSlider::scaleWindow(qreal factor, qint64 anchor) {
-    qreal msecsPerPixel = (m_windowEnd - m_windowStart) / size().width();
-    qreal targetMSecsPerPixel = msecsPerPixel * factor;
+    qreal targetMSecsPerPixel = m_msecsPerPixel * factor;
     if(targetMSecsPerPixel < minMSecsPerPixel) {
-        factor = minMSecsPerPixel / msecsPerPixel;
+        factor = minMSecsPerPixel / m_msecsPerPixel;
         if(qFuzzyCompare(factor, 1.0))
             return false; /* We've reached the min scale. */
     }
@@ -471,28 +503,50 @@ void QnTimeSlider::updateSteps() {
     m_stepData.resize(m_steps.size());
 }
 
-void QnTimeSlider::updateStepAnimationTargets() {
-    int stepCount = m_steps.size();
-
+void QnTimeSlider::updateMSecsPerPixel() {
     qreal msecsPerPixel = (m_windowEnd - m_windowStart) / size().width();
     if(qFuzzyIsNull(msecsPerPixel))
         msecsPerPixel = 1.0; /* Technically, we should never get here, but we want to feel safe. */
-    bool msecsPerPixelChanged = qAbs(msecsPerPixel - m_lastMSecsPerPixel) / qMin(msecsPerPixel, m_lastMSecsPerPixel) > msecsPerPixelChangeThreshold;
-    if(!msecsPerPixelChanged)
+
+    if(qFuzzyCompare(m_msecsPerPixel, msecsPerPixel))
         return;
+
+    m_msecsPerPixel = msecsPerPixel;
+
+    updateStepAnimationTargets();
+    updateAggregationValue();
+}
+
+void QnTimeSlider::updateMinimalWindow() {
+    qint64 minimalWindow = size().width() * minMSecsPerPixel;
+    if(minimalWindow == m_minimalWindow)
+        return;
+
+    m_minimalWindow = minimalWindow;
+
+    /* Re-bound. */
+    setWindowStart(m_windowStart);
+}
+
+void QnTimeSlider::updateStepAnimationTargets() {
+    bool updateNeeded = qAbs(m_msecsPerPixel - m_animationUpdateMSecsPerPixel) / qMin(m_msecsPerPixel, m_animationUpdateMSecsPerPixel) > msecsPerPixelChangeThreshold;
+    if(!updateNeeded)
+        return;
+
+    int stepCount = m_steps.size();
 
     /* Find maximal index of the time step to use. */
     int maxStepIndex = stepCount - 1;
     qreal tickmarkSpanPixels = size().width() * maxTickmarkSpanFraction;
     for(; maxStepIndex >= 0; maxStepIndex--)
-        if(m_steps[maxStepIndex].stepMSecs / msecsPerPixel <= tickmarkSpanPixels)
+        if(m_steps[maxStepIndex].stepMSecs / m_msecsPerPixel <= tickmarkSpanPixels)
             break;
     maxStepIndex = qMax(maxStepIndex, 1); /* Display at least two tickmark levels. */
 
     /* Adjust target tickmark heights and opacities. */
     for(int i = 0; i < stepCount; i++) {
         TimeStepData &data = m_stepData[i];
-        qreal separationPixels = m_steps[i].stepMSecs / msecsPerPixel;
+        qreal separationPixels = m_steps[i].stepMSecs / m_msecsPerPixel;
 
         /* Target height & opacity. */
         qreal targetHeight;
@@ -525,8 +579,7 @@ void QnTimeSlider::updateStepAnimationTargets() {
         data.currentTextOpacity = qMin(data.currentTextOpacity, maxTextOpacity);
     }
 
-    m_lastMSecsPerPixel = msecsPerPixel;
-    m_lastMaxStepIndex = maxStepIndex;
+    m_animationUpdateMSecsPerPixel = m_msecsPerPixel;
 }
 
 void QnTimeSlider::animateStepValues(int deltaMSecs) {
@@ -568,7 +621,7 @@ qreal QnTimeSlider::lineHeight() {
 
 void QnTimeSlider::updateAggregationValue() {
     /* Aggregate to half-pixels. */
-    qreal aggregationMSecs = (m_windowEnd - m_windowStart) / size().width() / 2.0;
+    qreal aggregationMSecs = m_msecsPerPixel / 2.0;
     if(m_aggregationMSecs / 2.0 < aggregationMSecs && aggregationMSecs < m_aggregationMSecs * 2.0)
         return;
 
@@ -591,7 +644,7 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     QRectF rect = this->rect();
     qreal lineHeight = this->lineHeight();
 
-    /* Draw lines. */
+    /* Draw time periods. */
     for(int line = 0; line < m_lineCount; line++) {
         drawPeriodsBar(
             painter, 
@@ -602,6 +655,12 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
         );
 
     }
+
+    /* Draw tickmark background. */
+    drawSolidBackground(painter, rect.top(), rect.height() * tickmarkBarRelativeHeight);
+
+    /* Draw selection. */
+    drawSelection(painter);
 
     /* Draw line comments. */
     for(int line = 0; line < m_lineCount; line++) {
@@ -616,17 +675,50 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
         painter->drawPixmap(textRect, pixmap, pixmap.rect());
     }
 
-    drawSolidBackground(painter, rect.top(), rect.height() * tickmarkBarRelativeHeight);
+    /* Draw tickmarks. */
     drawTickmarks(painter, rect.top(), rect.height() * tickmarkBarRelativeHeight);
 
-    qint64 pos = sliderPosition();
-    if(pos >= m_windowStart && pos <= m_windowEnd) {
-        QnScopedPainterAntialiasingRollback antialiasingRollback(painter, false);
-        QnScopedPainterPenRollback penRollback(painter, QPen(positionMarkerColor, 0));
-        
-        qreal x = positionFromValue(pos).x();
-        painter->drawLine(QPointF(x, rect.top()), QPointF(x, rect.bottom()));
+    /* Draw position marker. */
+    drawMarker(painter, sliderPosition(), positionMarkerColor);
+}
+
+void QnTimeSlider::drawSelection(QPainter *painter) {
+    if(!(m_options & SelectionVisible))
+        return;
+
+    if(m_selectionStart == m_selectionEnd) {
+        drawMarker(painter, m_selectionStart, selectionMarkerColor);
+        return;
     }
+
+    qint64 selectionStart = qMax(m_selectionStart, m_windowStart);
+    qint64 selectionEnd = qMin(m_selectionEnd, m_windowEnd);
+    if(selectionStart < selectionEnd) {
+        QRectF rect = this->rect();
+        QRectF selectionRect(
+            QPointF(positionFromValue(selectionStart).x(), rect.top()),
+            QPointF(positionFromValue(selectionEnd).x(), rect.bottom())
+        );
+
+        QnScopedPainterAntialiasingRollback antialiasingRollback(painter, false);
+        painter->fillRect(selectionRect, selectionColor);
+    }
+
+    drawMarker(painter, m_selectionStart, selectionMarkerColor);
+    drawMarker(painter, m_selectionEnd, selectionMarkerColor);
+}
+
+void QnTimeSlider::drawMarker(QPainter *painter, qint64 pos, const QColor &color) {
+    if(pos < m_windowStart || pos > m_windowEnd) 
+        return;
+    
+    QnScopedPainterAntialiasingRollback antialiasingRollback(painter, false);
+    QnScopedPainterPenRollback penRollback(painter, QPen(color, 0));
+
+    qreal x = positionFromValue(pos).x();
+    QRectF rect = this->rect();
+
+    painter->drawLine(QPointF(x, rect.top()), QPointF(x, rect.bottom()));
 }
 
 void QnTimeSlider::drawPeriodsBar(QPainter *painter, QnTimePeriodList &recorded, QnTimePeriodList &motion, qreal top, qreal height) {
@@ -701,33 +793,6 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, QnTimePeriodList &recorded,
 
         value = bestValue;
     }
-
-    /*for (QnTimePeriodList::const_iterator pos = begin; pos < end; ++pos) {
-        qreal leftPos = positionFromValue(qMax(pos->startTimeMs, minimumValue)).x();
-        qreal rightPos = positionFromValue(pos->durationMs == -1 ? maximumValue : qMin(pos->startTimeMs + pos->durationMs, maximumValue)).x();
-
-        if(rightPos <= centralPos) {
-            painter->fillRect(QRectF(leftPos, top, rightPos - leftPos, height), preColor);
-        } else if(leftPos >= centralPos) {
-            painter->fillRect(QRectF(leftPos, top, rightPos - leftPos, height), pastColor);
-        } else {
-            painter->fillRect(QRectF(leftPos, top, centralPos - leftPos, height), preColor);
-            painter->fillRect(QRectF(centralPos, top, rightPos - centralPos, height), pastColor);
-        }
-    }
-    */
-    
-    /*qreal leftPos = positionFromValue(windowStart()).x();
-    qreal rightPos = positionFromValue(windowEnd()).x();
-    qreal centralPos = positionFromValue(sliderPosition()).x();
-
-    if(!qFuzzyCompare(leftPos, centralPos))
-        painter->fillRect(QRectF(leftPos, top, centralPos - leftPos, height), pastBackgroundColor);
-    if(!qFuzzyCompare(rightPos, centralPos))
-        painter->fillRect(QRectF(centralPos, top, rightPos - centralPos, height), futureBackgroundColor);
-
-    drawPeriods(painter, recorded, top, height, pastRecordingColor, futureRecordingColor);
-    drawPeriods(painter, motion, top, height, pastMotionColor, futureMotionColor);*/
 }
 
 void QnTimeSlider::drawPeriods(QPainter *painter, QnTimePeriodList &periods, qreal top, qreal height, const QColor &preColor, const QColor &pastColor) {
@@ -868,7 +933,7 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, qreal top, qreal height) {
     {
         QnScopedPainterAntialiasingRollback antialiasingRollback(painter, false);
         for(int i = minStepIndex; i < stepCount; i++) {
-            painter->setPen(toTransparent(tickmarkBaseColor, m_stepData[i].currentLineOpacity));
+            painter->setPen(toTransparent(tickmarkColor, m_stepData[i].currentLineOpacity));
             painter->drawLines(m_tickmarkLines[i]);
         }
     }
@@ -879,7 +944,6 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, qreal top, qreal height) {
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnTimeSlider::tick(int deltaMSecs) {
-    updateStepAnimationTargets();
     animateStepValues(deltaMSecs);
 }
 
@@ -896,6 +960,10 @@ void QnTimeSlider::sliderChange(SliderChange change) {
 
         m_oldMinimum = minimum();
         m_oldMaximum = maximum();
+
+        /* Re-bound. */
+        setWindow(m_windowStart, m_windowEnd);
+        setSelection(m_selectionStart, m_selectionEnd);
         break;
     case SliderValueChange:
         updateToolTipVisibility();
@@ -932,9 +1000,9 @@ void QnTimeSlider::wheelEvent(QGraphicsSceneWheelEvent *event) {
 void QnTimeSlider::resizeEvent(QGraphicsSceneResizeEvent *event) {
     base_type::resizeEvent(event);
 
-    updateStepAnimationTargets();
+    updateMSecsPerPixel();
     updateLineCommentPixmaps();
-    updateAggregationValue();
+    updateMinimalWindow();
 }
 
 void QnTimeSlider::kineticMove(const QVariant &degrees) {
@@ -944,3 +1012,21 @@ void QnTimeSlider::kineticMove(const QVariant &degrees) {
         kineticProcessor()->reset();
 }
 
+void QnTimeSlider::keyPressEvent(QKeyEvent *event) {
+    switch(event->key()) {
+    case Qt::Key_BracketLeft:
+    case Qt::Key_BracketRight:
+        if(!(m_options & SelectionEditable)) {
+            base_type::keyPressEvent(event);
+        } else {
+            if(event->key() == Qt::Key_BracketLeft) {
+                setSelectionStart(sliderPosition());
+            } else {
+                setSelectionEnd(sliderPosition());
+            }
+        }
+    default:
+        base_type::keyPressEvent(event);
+        break;
+    }
+}

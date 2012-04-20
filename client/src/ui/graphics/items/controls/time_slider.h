@@ -46,7 +46,17 @@ public:
          * If this flag is not set, slider's value is simply a number of 
          * milliseconds, with no connection to real dates.
          */
-        UseUTC = 0x8
+        UseUTC = 0x8,
+
+        /**
+         * Whether selection should be displayed on slider. 
+         */
+        SelectionVisible = 0x10,
+
+        /**
+         * Whether the user can edit current selection with '[' and ']' buttons.
+         */
+        SelectionEditable = 0x20,
     };
     Q_DECLARE_FLAGS(Options, Option);
 
@@ -74,6 +84,14 @@ public:
 
     void setWindow(qint64 start, qint64 end);
 
+    qint64 selectionStart() const;
+    void setSelectionStart(qint64 selectionStart);
+
+    qint64 selectionEnd() const;
+    void setSelectionEnd(qint64 selectionEnd);
+
+    void setSelection(qint64 start, qint64 end);
+
     const QString &toolTipFormat() const;
     void setToolTipFormat(const QString &format);
 
@@ -86,12 +104,14 @@ public:
 
 signals:
     void windowChanged(qint64 windowStart, qint64 windowEnd);
+    void selectionChanged(qint64 selectionStart, qint64 selectionEnd);
 
 protected:
     virtual void sliderChange(SliderChange change) override;
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
     virtual void wheelEvent(QGraphicsSceneWheelEvent *event) override;
     virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override;
+    virtual void keyPressEvent(QKeyEvent *event) override;
 
     virtual void tick(int deltaMSecs) override;
 
@@ -109,10 +129,14 @@ private:
     void drawPeriods(QPainter *painter, QnTimePeriodList &periods, qreal top, qreal height, const QColor &preColor, const QColor &pastColor);
     void drawTickmarks(QPainter *painter, qreal top, qreal height);
     void drawSolidBackground(QPainter *painter, qreal top, qreal height);
+    void drawMarker(QPainter *painter, qint64 pos, const QColor &color);
+    void drawSelection(QPainter *painter);
 
     void updateToolTipVisibility();
     void updateToolTipText();
     void updateSteps();
+    void updateMSecsPerPixel();
+    void updateMinimalWindow();
     void updateStepAnimationTargets();
     void updateLineCommentPixmap(int line);
     void updateLineCommentPixmaps();
@@ -149,6 +173,9 @@ private:
     };
 
     qint64 m_windowStart, m_windowEnd;
+    qint64 m_minimalWindow;
+
+    qint64 m_selectionStart, m_selectionEnd;
     qint64 m_oldMinimum, m_oldMaximum;
     Options m_options;
     QString m_toolTipFormat;
@@ -163,8 +190,8 @@ private:
 
     QVector<QnTimeStep> m_steps;
     QVector<TimeStepData> m_stepData;
-    qreal m_lastMSecsPerPixel;
-    int m_lastMaxStepIndex;
+    qreal m_msecsPerPixel;
+    qreal m_animationUpdateMSecsPerPixel;
     QVector<qint64> m_nextTickmarkPos;
     QVector<QVector<QPointF> > m_tickmarkLines;
     QHash<qint32, QPixmap> m_pixmapByPositionKey;
