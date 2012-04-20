@@ -116,6 +116,8 @@ private:
     void updateStepAnimationTargets();
     void updateLineCommentPixmap(int line);
     void updateLineCommentPixmaps();
+    void updateAggregationValue();
+    void updateAggregatedPeriods(int line, Qn::TimePeriodType type);
     
     void animateStepValues(int deltaMSecs);
 
@@ -129,7 +131,8 @@ private:
     Q_DECLARE_PRIVATE(GraphicsSlider);
 
     struct TypedPeriods {
-        QnTimePeriodList forType[Qn::TimePeriodTypeCount];
+        QnTimePeriodList normal[Qn::TimePeriodTypeCount];
+        QnTimePeriodList aggregated[Qn::TimePeriodTypeCount];
     };
 
     struct TimeStepData {
@@ -156,7 +159,8 @@ private:
     QVector<TypedPeriods> m_timePeriods;
     QVector<QString> m_lineComments;
     QVector<QPixmap> m_lineCommentPixmaps;
-    
+    qreal m_aggregationMSecs;
+
     QVector<QnTimeStep> m_steps;
     QVector<TimeStepData> m_stepData;
     qreal m_lastMSecsPerPixel;

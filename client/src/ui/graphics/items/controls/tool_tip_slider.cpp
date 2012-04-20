@@ -136,13 +136,7 @@ bool QnToolTipSlider::eventFilter(QObject *target, QEvent *event) {
         case QEvent::GraphicsSceneMousePress:
             if(e->button() == Qt::LeftButton) {
                 setSliderDown(true);
-
-                QStyleOptionSlider opt;
-                initStyleOption(&opt);
-                const QRect handleRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle, this);
-
-                m_dragOffset = handleRect.topLeft() - m_toolTipItem->mapToItem(this, e->pos());
-
+                m_dragOffset = positionFromValue(sliderPosition()) - m_toolTipItem->mapToItem(this, e->pos());
                 e->accept();
                 return true;
             }

@@ -132,7 +132,8 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     m_oldMinimum(0),
     m_oldMaximum(0),
     m_lastMSecsPerPixel(1.0),
-    m_lastMaxStepIndex(0)
+    m_lastMaxStepIndex(0),
+    m_aggregationMSecs(0.0)
 {
     /* Set default property values. */
     setProperty(Qn::SliderLength, 0);
@@ -251,13 +252,15 @@ QString QnTimeSlider::lineComment(int line) {
 QnTimePeriodList QnTimeSlider::timePeriods(int line, Qn::TimePeriodType type) const {
     assert(type >= 0 && type < Qn::TimePeriodTypeCount);
     
-    return m_timePeriods[line].forType[type];
+    return m_timePeriods[line].normal[type];
 }
 
 void QnTimeSlider::setTimePeriods(int line, Qn::TimePeriodType type, const QnTimePeriodList &timePeriods) {
     assert(type >= 0 && type < Qn::TimePeriodTypeCount);
 
-    m_timePeriods[line].forType[type] = timePeriods;
+    m_timePeriods[line].normal[type] = timePeriods;
+    
+    updateAggregatedPeriods(line, type);
 }
 
 QnTimeSlider::Options QnTimeSlider::options() const {
@@ -332,6 +335,7 @@ void QnTimeSlider::setWindow(qint64 start, qint64 end) {
 
         updateToolTipVisibility();
         updateStepAnimationTargets();
+        updateAggregationValue();
     }
 }
 
@@ -534,7 +538,6 @@ void QnTimeSlider::animateStepValues(int deltaMSecs) {
 
     for(int i = 0; i < stepCount; i++) {
         TimeStepData &data = m_stepData[i];
-        qreal separationPixels = m_steps[i].stepMSecs / m_lastMSecsPerPixel;
 
         qreal heightSpeed;
         qreal opacitySpeed;
@@ -563,6 +566,23 @@ qreal QnTimeSlider::lineHeight() {
     return size().height() * (1.0 - tickmarkBarRelativeHeight) / m_lineCount;
 }
 
+void QnTimeSlider::updateAggregationValue() {
+    /* Aggregate to half-pixels. */
+    qreal aggregationMSecs = (m_windowEnd - m_windowStart) / size().width() / 2.0;
+    if(m_aggregationMSecs / 2.0 < aggregationMSecs && aggregationMSecs < m_aggregationMSecs * 2.0)
+        return;
+
+    m_aggregationMSecs = aggregationMSecs;
+    
+    for(int line = 0; line < m_lineCount; line++)
+        for(int type = 0; type < Qn::TimePeriodTypeCount; type++)
+            updateAggregatedPeriods(line, static_cast<Qn::TimePeriodType>(type));
+}
+
+void QnTimeSlider::updateAggregatedPeriods(int line, Qn::TimePeriodType type) {
+    m_timePeriods[line].aggregated[type] = QnTimePeriod::aggregateTimePeriods(m_timePeriods[line].normal[type], m_aggregationMSecs);
+}
+
 
 // -------------------------------------------------------------------------- //
 // Painting
@@ -575,8 +595,8 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     for(int line = 0; line < m_lineCount; line++) {
         drawPeriodsBar(
             painter, 
-            m_timePeriods[line].forType[Qn::RecordingTimePeriod],  
-            m_timePeriods[line].forType[Qn::MotionTimePeriod], 
+            m_timePeriods[line].aggregated[Qn::RecordingTimePeriod],  
+            m_timePeriods[line].aggregated[Qn::MotionTimePeriod], 
             lineTop(line),   
             lineHeight
         );
@@ -914,6 +934,7 @@ void QnTimeSlider::resizeEvent(QGraphicsSceneResizeEvent *event) {
 
     updateStepAnimationTargets();
     updateLineCommentPixmaps();
+    updateAggregationValue();
 }
 
 void QnTimeSlider::kineticMove(const QVariant &degrees) {
