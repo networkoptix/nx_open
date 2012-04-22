@@ -433,13 +433,13 @@ public:
 
       virtual void beforeDisconnectFromResource(){}
 
-      void execute()
+      bool execute()
       {
             if (!isConnectedToTheResource())
-                return;
+                return false;
 
             QVariant val;
-            m_resource->getParam(m_name, val, m_domain);
+            return m_resource->getParam(m_name, val, m_domain);
       }
 
 private:
@@ -467,12 +467,12 @@ public:
 
       virtual void beforeDisconnectFromResource(){}
 
-      void execute()
+      bool execute()
       {
           if (!isConnectedToTheResource())
-              return;
+              return false;
 
-          m_resource->setParam(m_name, m_val, m_domain);
+          return m_resource->setParam(m_name, m_val, m_domain);
       }
 
 private:
