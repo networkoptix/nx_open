@@ -12,6 +12,8 @@ class QnPlColdStoreStorage : public QnStorageResource
 public:
     QnPlColdStoreStorage();
 
+    static QnStorageResource* instance();
+
     virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
 
     virtual int getChunkLen() const override;
@@ -26,6 +28,10 @@ public:
     virtual bool isFileExists(const QString& url) override;
     virtual bool isDirExists(const QString& url) override;
 
+private:
+    QString coldstoreAddr() const;
+
+    QString csURL(const QnStorageURL& url) const;
 private:
 
     Veracity::ISFS* m_csConnection;

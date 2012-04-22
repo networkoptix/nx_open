@@ -5,6 +5,7 @@
 
 static const int MAX_RTP_PACKET_SIZE = 1024 * 8;
 static const char H264_NAL_PREFIX[4] = {0x00, 0x00, 0x00, 0x01};
+static const char H264_NAL_SHORT_PREFIX[3] = {0x00, 0x00, 0x01};
 static const int DEFAULT_SLICE_SIZE = 1024 * 1024;
 
 CLH264RtpParser::CLH264RtpParser(RTPIODevice* input):
@@ -75,6 +76,25 @@ void CLH264RtpParser::setSDPInfo(const QByteArray& data)
                         foreach(QByteArray nal, nalUnits)
                         {
                             nal = QByteArray::fromBase64(nal);
+
+                            {
+                                // some cameras( Digitalwatchdog sends extra start code in SPSPSS sdp string );
+                                QByteArray startCode(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
+                                QByteArray startCodeShort(H264_NAL_SHORT_PREFIX, sizeof(H264_NAL_SHORT_PREFIX));
+
+                                if (nal.endsWith(startCode))
+                                    nal.remove(nal.size()-4,4);
+                                else if (nal.endsWith(startCodeShort))
+                                    nal.remove(nal.size()-3,3);
+
+
+                                if (nal.startsWith(startCode))
+                                    nal.remove(0,4);
+                                else if (nal.startsWith(startCodeShort))
+                                    nal.remove(0,3);
+                            }
+
+                            
                             m_sdpSpsPps << QByteArray(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX)).append(nal);
                         }
                     }
