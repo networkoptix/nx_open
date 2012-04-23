@@ -191,14 +191,12 @@ void ffmpegInit()
 
 QnStorageResourcePtr createDefaultStorage()
 {
-    QSettings settings(QSettings::SystemScope, ORGANIZATION_NAME, APPLICATION_NAME);
-
     QnStorageResourcePtr storage(new QnStorageResource());
     storage->setName("Initial");
 #ifdef Q_OS_WIN
-    storage->setUrl(QDir::fromNativeSeparators(settings.value("mediaDir", "c:/records").toString()));
+    storage->setUrl(QDir::fromNativeSeparators(qSettings.value("mediaDir", "c:/records").toString()));
 #else
-    storage->setUrl(QDir::fromNativeSeparators(settings.value("mediaDir", "/tmp/vmsrecords").toString()));
+    storage->setUrl(QDir::fromNativeSeparators(qSettings.value("mediaDir", "/tmp/vmsrecords").toString()));
 #endif
     storage->setSpaceLimit(5ll * 1000000000);
 
@@ -209,11 +207,9 @@ QnStorageResourcePtr createDefaultStorage()
 
 void setServerNameAndUrls(QnVideoServerResourcePtr server, const QString& myAddress)
 {
-    QSettings settings(QSettings::SystemScope, ORGANIZATION_NAME, APPLICATION_NAME);
-
     server->setName(QString("Server ") + myAddress);
-    server->setUrl(QString("rtsp://") + myAddress + QString(':') + settings.value("rtspPort", DEFAUT_RTSP_PORT).toString());
-    server->setApiUrl(QString("http://") + myAddress + QString(':') + settings.value("apiPort", DEFAULT_REST_PORT).toString());
+    server->setUrl(QString("rtsp://") + myAddress + QString(':') + qSettings.value("rtspPort", DEFAUT_RTSP_PORT).toString());
+    server->setApiUrl(QString("http://") + myAddress + QString(':') + qSettings.value("apiPort", DEFAULT_REST_PORT).toString());
 }
 
 QnVideoServerResourcePtr createServer()
@@ -643,84 +639,6 @@ void stopServer(int signal)
 
 int main(int argc, char* argv[])
 {
-#if 0 // http refactoring test code. Remove it if things is stable.
-    QCoreApplication::setOrganizationName(QLatin1String(ORGANIZATION_NAME));
-    QCoreApplication::setApplicationName(QLatin1String(APPLICATION_NAME));
-    QCoreApplication::setApplicationVersion(QLatin1String(APPLICATION_VERSION));
-
-    QCoreApplication app(argc, argv);
-
-    // Use system scope
-    QSettings settings(QSettings::SystemScope, ORGANIZATION_NAME, APPLICATION_NAME);
-
-    // Create SessionManager
-    SessionManager* sm = SessionManager::instance();
-
-    QThread *thread = new QThread();
-    sm->moveToThread(thread);
-
-    QObject::connect(sm, SIGNAL(destroyed()), thread, SLOT(quit()));
-    QObject::connect(thread , SIGNAL(finished()), thread, SLOT(deleteLater()));
-
-    thread->start();
-
-    initAppServerConnection(settings);
-
-    QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection(QUrl("http://admin:123@127.0.0.1:8000"));
-
-    QnResourceDiscoveryManager::instance().setServer(true);
-    // QnResourceDiscoveryManager::instance().setResourceProcessor(m_processor);
-    QnResourceDiscoveryManager::instance().setResourceProcessor(m_processor);
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlArecontResourceSearcher::instance());
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlAxisResourceSearcher::instance());
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDlinkResourceSearcher::instance());
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIqResourceSearcher::instance());
-
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIpWebCamResourceSearcher::instance());
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDroidResourceSearcher::instance());
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlISDResourceSearcher::instance());
-
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnTestCameraResourceSearcher::instance());
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlOnvifWsSearcher::instance());
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlPulseSearcher::instance());
-    
-
-    QnResourceTypeList resourceTypes;
-    QByteArray errorString;
-    initResourceTypes(conn);
-
-        QnVideoServerResourcePtr videoServer;
-
-        while (videoServer.isNull())
-        {
-            QnVideoServerResourcePtr server = findServer(conn);
-
-            if (!server)
-                server = createServer();
-
-            setServerNameAndUrls(server, defaultLocalAddress(QHostAddress("127.0.0.1")));
-
-            if (server->getStorages().isEmpty())
-                server->setStorages(QnStorageResourceList() << createDefaultStorage());
-
-            videoServer = registerServer(conn, server);
-            if (videoServer.isNull())
-                QnSleep::msleep(1000);
-        }
-
-    /*
-    QnVideoServerConnection vc(QUrl("http://physic:8080")); // /api/RecordedTimePeriods?mac=00-40-8C-BF-92-CE&startTime=123&detail=12);
-    QnCameraResourceList cameras;
-    conn->getCameras(cameras, QnId(2), errorString);
-    qDebug() << errorString;
-
-    QnNetworkResourceList nrl;
-    nrl.append(cameras[1]);
-    QnTimePeriodList tpl = vc.recordedTimePeriods(nrl); */
-    app.exec();
-    return 0;
- #endif
-
     QnVideoService service(argc, argv);
 
     int result = service.exec();
