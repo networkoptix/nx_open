@@ -275,7 +275,7 @@ void QnSingleCameraSettingsWidget::at_tabWidget_currentChanged() {
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_motionWidget);
 
-    connect(m_motionWidget, SIGNAL(motionMaskListChanged()), this, SLOT(at_dataChanged()));
+    connect(m_motionWidget, SIGNAL(motionRegionListChanged()), this, SLOT(at_dataChanged()));
 }
 
 void QnSingleCameraSettingsWidget::at_dataChanged() {

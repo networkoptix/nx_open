@@ -450,8 +450,7 @@ void QnResourceWidget::invalidateMotionMask() {
 void QnResourceWidget::addToMotionRegion(const QnMotionWindow& motionWindow, int channel) {
     ensureMotionMask();
 
-    m_motionRegionList[channel] = m_motionRegionList[channel].removeRect(motionWindow.rect);
-    m_motionRegionList[channel].append(motionWindow);
+    m_motionRegionList[channel].addRect(motionWindow);
 
     invalidateMotionMaskBinData();
 }
@@ -1112,7 +1111,7 @@ void QnResourceWidget::drawMotionMask(QPainter *painter, const QRectF &rect, int
         QRegion reg;
         for (int i = 0; i < 10; ++i) 
         {
-            QColor clr = i > 0 ? QColor(180, 0, 0, 96) : qnGlobals->motionMaskColor();
+            QColor clr = i > 0 ? QColor(150 +  i*10, 10*(9-i), 10*(9-i), 96) : qnGlobals->motionMaskColor();
             drawFilledRegion(painter, rect, m_motionRegionList[channel].getRegionBySens(i), clr, Qt::black);
         }
 
