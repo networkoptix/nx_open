@@ -22,11 +22,11 @@
 #include "ui/workbench/workbench_context.h"
 
 namespace {
-    QList<QRegion> emptyMotionMaskList() {
-        QList<QRegion> result;
+    QList<QnMotionRegion> emptyMotionRegionList() {
+        QList<QnMotionRegion> result;
 
         for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-            result.push_back(QRegion());
+            result.push_back(QnMotionRegion());
 
         return result;
     }
@@ -43,7 +43,8 @@ QnCameraMotionMaskWidget::QnCameraMotionMaskWidget(QWidget *parent):
 
 void QnCameraMotionMaskWidget::init()
 {
-    m_motionMaskList = emptyMotionMaskList();
+    m_motionSensitivity = 0;
+    m_motionRegionList = emptyMotionRegionList();
 
     /* Set up scene & view. */
     m_scene.reset(new QGraphicsScene(this));
@@ -125,9 +126,9 @@ void QnCameraMotionMaskWidget::setReadOnly(bool readOnly)
     m_readOnly = readOnly;
 }
 
-const QList<QRegion>& QnCameraMotionMaskWidget::motionMaskList() const
+const QList<QnMotionRegion>& QnCameraMotionMaskWidget::motionRegionList() const
 {
-    return m_motionMaskList;
+    return m_motionRegionList;
 }
 
 const QnResourcePtr &QnCameraMotionMaskWidget::camera() const {
@@ -145,9 +146,9 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
     m_context->workbench()->currentLayout()->clear();
 
     if(!m_camera) {
-        m_motionMaskList = emptyMotionMaskList();
+        m_motionRegionList = emptyMotionRegionList();
     } else {
-        m_motionMaskList = m_camera->getMotionMaskList();
+        m_motionRegionList = m_camera->getMotionRegionList();
 
         /* Add single item to the layout. */
         QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid(), this);
@@ -158,18 +159,20 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
 
         /* Set up the corresponding widget. */
         QnResourceWidget *widget = m_display->widget(item);
+        widget->setDrawMotionWindows(QnResourceWidget::DrawAllMotionInfo);
         widget->setDisplayFlag(QnResourceWidget::DISPLAY_BUTTONS, false);
         widget->setDisplayFlag(QnResourceWidget::DISPLAY_MOTION_GRID, true);
     }
 
     /* Consider motion mask list changed. */
-    emit motionMaskListChanged();
+    emit motionRegionListChanged();
 }
 
 
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+
 void QnCameraMotionMaskWidget::at_viewport_resized() {
     m_display->fitInView(false);
 }
@@ -180,6 +183,7 @@ void QnCameraMotionMaskWidget::at_motionRegionSelected(QGraphicsView *view, QnRe
     bool changed = false;
 
     int numChannels = layout->numberOfChannels();
+    
     for (int i = 0; i < numChannels; ++i)
     {
         QRect r(0, 0, MD_WIDTH, MD_HEIGHT);
@@ -189,31 +193,37 @@ void QnCameraMotionMaskWidget::at_motionRegionSelected(QGraphicsView *view, QnRe
 
         if (!r.isEmpty()) 
         {
-            QRegion oldRegion = m_motionMaskList[i];
-            m_motionMaskList[i] += r;
-            if(oldRegion != m_motionMaskList[i]) { /* Note: we cannot use QRegion::contains here as it checks for overlap, not for containment. */
-                widget->addToMotionMask(r, i);
+            QnMotionRegion oldRegion = m_motionRegionList[i];
+            m_motionRegionList[i].append(QnMotionWindow(m_motionSensitivity, r));
+            if(oldRegion != m_motionRegionList[i]) { // Note: we cannot use QRegion::contains here as it checks for overlap, not for containment. 
+                widget->addToMotionRegion(QnMotionWindow(m_motionSensitivity, r), i);
                 changed = true;
             }
         }
     }
-
+    
     if(changed)
-        emit motionMaskListChanged();
+        emit motionRegionListChanged();
 }
+
 
 void QnCameraMotionMaskWidget::at_motionRegionCleared(QGraphicsView *view, QnResourceWidget *widget)
 {
     bool changed = false;
 
-    widget->clearMotionMask();
+    widget->clearMotionRegions();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
-        if(!m_motionMaskList[i].isEmpty()) {
-	        m_motionMaskList[i] = QRegion();
+        if(!m_motionRegionList[i].isEmpty()) {
+	        m_motionRegionList[i] = QnMotionRegion();
             changed = true;
         }
     }
 
     if(changed)
-        emit motionMaskListChanged();
+        emit motionRegionListChanged();
+}
+
+void QnCameraMotionMaskWidget::setMotionSensitivity(int value)
+{
+    m_motionSensitivity = value;
 }

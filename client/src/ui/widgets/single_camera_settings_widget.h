@@ -47,7 +47,8 @@ private slots:
     void at_dataChanged();
     void at_cameraScheduleWidget_scheduleTasksChanged();
     void at_linkActivated(const QString &urlString);
-
+    void at_motionTypeChanged();
+    void at_motionSensitivityChanged(int value);
 private:
     void setHasChanges(bool hasChanges);
 

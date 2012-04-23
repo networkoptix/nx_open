@@ -28,13 +28,14 @@ public:
     const QnResourcePtr &camera() const;
 	void setCamera(const QnResourcePtr &resource);
 
-    const QList<QRegion> &motionMaskList() const;
+    const QList<QnMotionRegion> &motionRegionList() const;
 
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
 
+    void setMotionSensitivity(int value);
 signals:
-    void motionMaskListChanged();
+    void motionRegionListChanged();
 
 protected slots:
     void at_viewport_resized();
@@ -46,7 +47,7 @@ private:
 
 private:
     QnVirtualCameraResourcePtr m_camera;
-    QList<QRegion> m_motionMaskList;
+    QList<QnMotionRegion> m_motionRegionList;
 
     /* Destruction order is important here, hence the scoped pointers. */
 
@@ -61,6 +62,7 @@ private:
     MotionSelectionInstrument *m_motionSelectionInstrument;
 
     bool m_readOnly;
+    int m_motionSensitivity;
 };
 
 #endif // QN_CAMERA_MOTION_MASK_WIDGET_H

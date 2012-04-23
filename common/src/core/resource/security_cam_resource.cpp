@@ -11,14 +11,14 @@ QnSecurityCamResource::QnSecurityCamResource()
 {
     static volatile bool metaTypesInitialized = false;
     if (!metaTypesInitialized) {
-        qRegisterMetaType<QRegion>();
+        qRegisterMetaType<QnMotionRegion>();
         qRegisterMetaType<QnScheduleTask>();
         qRegisterMetaType<QnScheduleTaskList>();
         metaTypesInitialized = true;
     }
 
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-        m_motionMaskList << QRegion();
+        m_motionMaskList << QnMotionRegion();
 
     addFlags(live_cam);
 }
@@ -39,7 +39,7 @@ void QnSecurityCamResource::updateInner(QnResourcePtr other)
         int numChannels = layout->numberOfChannels();
 
         for (int i = 0; i < numChannels; ++i)
-            setMotionMask(other_casted->m_motionMaskList[i], QnDomainPhysical, i);
+            setMotionRegion(other_casted->m_motionMaskList[i], QnDomainPhysical, i);
         m_scheduleTasks = other_casted->m_scheduleTasks;
     }
 }
@@ -115,7 +115,7 @@ void QnSecurityCamResource::setDataProviderFactory(QnDataProviderFactory* dpFact
     m_dpFactory = dpFactory;
 }
 
-QList<QRegion> QnSecurityCamResource::getMotionMaskList() const
+QList<QnMotionRegion> QnSecurityCamResource::getMotionRegionList() const
 {
     QMutexLocker mutexLocker(&m_mutex);
     return m_motionMaskList;
@@ -124,10 +124,16 @@ QList<QRegion> QnSecurityCamResource::getMotionMaskList() const
 QRegion QnSecurityCamResource::getMotionMask(int channel) const
 {
     QMutexLocker mutexLocker(&m_mutex);
+    return m_motionMaskList[channel].getMotionMask();
+}
+
+QnMotionRegion QnSecurityCamResource::getMotionRegion(int channel) const
+{
+    QMutexLocker mutexLocker(&m_mutex);
     return m_motionMaskList[channel];
 }
 
-void QnSecurityCamResource::setMotionMask(const QRegion& mask, QnDomain domain, int channel)
+void QnSecurityCamResource::setMotionRegion(const QnMotionRegion& mask, QnDomain domain, int channel)
 {
     {
         QMutexLocker mutexLocker(&m_mutex);
@@ -140,7 +146,7 @@ void QnSecurityCamResource::setMotionMask(const QRegion& mask, QnDomain domain, 
         setMotionMaskPhysical(channel);
 }
 
-void QnSecurityCamResource::setMotionMaskList(const QList<QRegion>& maskList, QnDomain domain)
+void QnSecurityCamResource::setMotionRegionList(const QList<QnMotionRegion>& maskList, QnDomain domain)
 {
     {
         QMutexLocker mutexLocker(&m_mutex);

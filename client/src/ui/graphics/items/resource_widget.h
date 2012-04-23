@@ -14,6 +14,7 @@
 #include <core/datapacket/mediadatapacket.h> /* For QnMetaDataV1Ptr. */
 #include "polygonal_shadow_item.h"
 #include "core/resource/resource_media_layout.h"
+#include "core/resource/motion_window.h"
 
 class QGraphicsLinearLayout;
 
@@ -237,15 +238,20 @@ public:
      */
     void addToMotionSelection(const QRect &gridRect);
 
-    void addToMotionMask(const QRect &gridRect, int channel);
+    void addToMotionRegion(const QnMotionWindow& motionWindow, int channel);
 
-    void clearMotionMask();
+    void clearMotionRegions();
 
     using base_type::mapRectToScene;
 
     Qn::RenderStatus currentRenderStatus() const {
         return m_renderStatus;
     }
+
+    enum MotionDrawType {
+        DrawMaskOnly,
+        DrawAllMotionInfo
+    };
 
 public slots:
     void showActivityDecorations();
@@ -260,7 +266,7 @@ public slots:
      * Clears this widget's motion selection region.
      */
     void clearMotionSelection();
-
+    void setDrawMotionWindows(MotionDrawType value);
 signals:
     void aspectRatioChanged(qreal oldAspectRatio, qreal newAspectRatio);
     void aboutToBeDestroyed();
@@ -299,7 +305,7 @@ protected:
 
     int motionGridWidth() const;
     int motionGridHeight() const;
-
+    void drawMotionSensitivity(QPainter *painter, const QRectF &rect, const QnMotionRegion& region, int channel);
 signals:
     void updateOverlayTextLater();
 
@@ -356,7 +362,7 @@ private:
 
     void drawMotionMask(QPainter *painter, const QRectF& rect, int channel);
 
-    void drawFilledRegion(QPainter *painter, const QRectF &rect, const QRegion &selection, const QColor& color);
+    void drawFilledRegion(QPainter *painter, const QRectF &rect, const QRegion &selection, const QColor& color, const QColor& penColor);
 
     void drawFlashingText(QPainter *painter, const QStaticText &text, qreal textSize, const QPointF &offset = QPointF());
 
@@ -431,7 +437,7 @@ private:
     QVector<ChannelState> m_channelState;
 
     /** Image region where motion is currently present, in parrots. */
-    QList<QRegion> m_motionMaskList;
+    QList<QnMotionRegion> m_motionRegionList;
 
     /** Whether the motion mask is valid. */
     bool m_motionMaskValid;
@@ -449,6 +455,8 @@ private:
     QStaticText m_offlineStaticText;
     QStaticText m_unauthorizedStaticText;
     QStaticText m_unauthorizedStaticText2;
+    MotionDrawType m_motionDrawType;
+    QStaticText m_sensStaticText[10];
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::DisplayFlags);

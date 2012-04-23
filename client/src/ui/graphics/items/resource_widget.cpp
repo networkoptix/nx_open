@@ -104,7 +104,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_aboutToBeDestroyedEmitted(false),
     m_displayFlags(DISPLAY_SELECTION_OVERLAY | DISPLAY_BUTTONS),
     m_motionMaskValid(false),
-    m_motionMaskBinDataValid(false)
+    m_motionMaskBinDataValid(false),
+    m_motionDrawType(DrawMaskOnly)
 {
     /* Set up shadow. */
     m_shadow = new QnPolygonalShadowItem();
@@ -257,12 +258,18 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_unauthorizedStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
     m_unauthorizedStaticText2.setText(tr("Please check authentication information in camera settings"));
     m_unauthorizedStaticText2.setPerformanceHint(QStaticText::AggressiveCaching);
-    
+
+    for (int i = 0; i < 10; ++i) {
+        m_sensStaticText[i].setText(QString::number(i));
+        m_sensStaticText[i].setPerformanceHint(QStaticText::AggressiveCaching);
+    }
+
     /* Set up overlay icons. */
     m_channelState.resize(m_channelCount);
 
     at_resource_nameChanged();
     at_camDisplay_stillImageChanged();
+
 }
 
 
@@ -440,17 +447,18 @@ void QnResourceWidget::invalidateMotionMask() {
     m_motionMaskValid = false;
 }
 
-void QnResourceWidget::addToMotionMask(const QRect &gridRect, int channel) {
+void QnResourceWidget::addToMotionRegion(const QnMotionWindow& motionWindow, int channel) {
     ensureMotionMask();
 
-    m_motionMaskList[channel] += gridRect;
+    m_motionRegionList[channel] = m_motionRegionList[channel].removeRect(motionWindow.rect);
+    m_motionRegionList[channel].append(motionWindow);
 
     invalidateMotionMaskBinData();
 }
 
-void QnResourceWidget::clearMotionMask() {
+void QnResourceWidget::clearMotionRegions() {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-        m_motionMaskList[i] = QRegion();
+        m_motionRegionList[i] = QnMotionRegion();
     m_motionMaskValid = true;
 
     invalidateMotionMaskBinData();
@@ -464,7 +472,7 @@ void QnResourceWidget::ensureMotionMask()
     QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource>(m_resource);
     if (camera)
     {
-        m_motionMaskList = camera->getMotionMaskList();
+        m_motionRegionList = camera->getMotionRegionList();
 
     }
     m_motionMaskValid = true;
@@ -477,7 +485,7 @@ void QnResourceWidget::ensureMotionMaskBinData() {
     ensureMotionMask();
     Q_ASSERT(((unsigned long)m_motionMaskBinData[0])%16 == 0);
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-        QnMetaDataV1::createMask(m_motionMaskList[i], (char*)m_motionMaskBinData[i]);
+        QnMetaDataV1::createMask(m_motionRegionList[i].getMotionMask(), (char*)m_motionMaskBinData[i]);
 }
 
 void QnResourceWidget::invalidateMotionMaskBinData() {
@@ -555,7 +563,7 @@ void QnResourceWidget::addToMotionSelection(const QRect &gridRect)
         {
             QRegion r1(r);
             r1.translate(-m_videoLayout->h_position(i)*MD_WIDTH, -m_videoLayout->v_position(i)*MD_HEIGHT);
-            r1 -= m_motionMaskList[i];
+            r1 -= m_motionRegionList[i].getMotionMask();
 
             m_channelState[i].motionSelection += r1;
         }
@@ -905,9 +913,11 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
             drawMotionMask(painter, rect, i);
 
             /* Selection. */
-            if(!m_channelState[i].motionSelection.isEmpty()) 
+            if(!m_channelState[i].motionSelection.isEmpty()) {
 				//drawFilledRegion(painter, rect, m_channelState[i].motionSelection, subColor(qnGlobals->mrsColor(), qnGlobals->selectionOpacityDelta()));
-                drawFilledRegion(painter, rect, m_channelState[i].motionSelection, subColor(qnGlobals->mrsColor(), QColor(0,0,0, 0xa0)));
+                QColor clr = subColor(qnGlobals->mrsColor(), QColor(0,0,0, 0xa0));
+                drawFilledRegion(painter, rect, m_channelState[i].motionSelection, clr, clr);
+            }
         }
     }
 
@@ -1002,13 +1012,13 @@ void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, con
 
     for (int x = 0; x < MD_WIDTH; ++x)
     {
-        if (m_motionMaskList[channel].isEmpty())
+        if (m_motionRegionList[channel].isEmpty())
         {
             gridLines << QPointF(x*xStep, 0.0) << QPointF(x*xStep, rect.height());
         }
         else {
             QRegion lineRect(x, 0, 1, MD_HEIGHT+1);
-            QRegion drawRegion = lineRect - m_motionMaskList[channel].intersect(lineRect);
+            QRegion drawRegion = lineRect - m_motionRegionList[channel].getMotionMask().intersect(lineRect);
             foreach(const QRect& r, drawRegion.rects())
             {
                 gridLines << QPointF(x*xStep, r.top()*yStep) << QPointF(x*xStep, qMin(rect.height(),(r.top()+r.height())*yStep));
@@ -1017,12 +1027,12 @@ void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, con
     }
 
     for (int y = 0; y < MD_HEIGHT; ++y) {
-        if (m_motionMaskList[channel].isEmpty()) {
+        if (m_motionRegionList[channel].isEmpty()) {
             gridLines << QPointF(0.0, y*yStep) << QPointF(rect.width(), y*yStep);
         }
         else {
             QRegion lineRect(0, y, MD_WIDTH+1, 1);
-            QRegion drawRegion = lineRect - m_motionMaskList[channel].intersect(lineRect);
+            QRegion drawRegion = lineRect - m_motionRegionList[channel].getMotionMask().intersect(lineRect);
             foreach(const QRect& r, drawRegion.rects())
             {
                 gridLines << QPointF(r.left()*xStep, y*yStep) << QPointF(qMin(rect.width(), (r.left()+r.width())*xStep), y*yStep);
@@ -1052,7 +1062,7 @@ void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, con
     painter->drawPath(motionPath);
 }
 
-void QnResourceWidget::drawFilledRegion(QPainter *painter, const QRectF &rect, const QRegion &selection, const QColor &color) {
+void QnResourceWidget::drawFilledRegion(QPainter *painter, const QRectF &rect, const QRegion &selection, const QColor &color, const QColor &penColor) {
     QPainterPath path;
     path.addRegion(selection);
     path = path.simplified(); // TODO: this is slow.
@@ -1061,12 +1071,59 @@ void QnResourceWidget::drawFilledRegion(QPainter *painter, const QRectF &rect, c
     QnScopedPainterBrushRollback brushRollback(painter, color);
     painter->translate(rect.topLeft());
     painter->scale(rect.width() / MD_WIDTH, rect.height() / MD_HEIGHT);
-    painter->setPen(QPen(color));
+    painter->setPen(QPen(penColor));
     painter->drawPath(path);
+}
+
+void QnResourceWidget::drawMotionSensitivity(QPainter *painter, const QRectF &rect, const QnMotionRegion& region, int channel)
+{
+    double xStep = rect.width() / (double) MD_WIDTH;
+    double yStep = rect.height() / (double) MD_HEIGHT;
+
+    painter->setPen(Qt::black);
+    QFont font;
+    qreal unit = qnGlobals->workbenchUnitSize();
+    font.setPointSizeF(0.03 * unit);
+    painter->setFont(font);
+
+    for (int i = 0; i < region.size(); ++i)
+    {
+        if (region.at(i).sensitivity == 0)
+            continue;
+        const QRect& rect = region.at(i).rect;
+        for (int x = rect.left(); x <= rect.right(); ++x)
+        {
+            for (int y = rect.top(); y <= rect.bottom(); ++y)
+            {
+                painter->drawStaticText(x*xStep + xStep*0.1, y*yStep + yStep*0.1, m_sensStaticText[region.at(i).sensitivity]);
+                break;
+            }
+            break;
+        }
+    }
 }
 
 void QnResourceWidget::drawMotionMask(QPainter *painter, const QRectF &rect, int channel)
 {
     ensureMotionMask();
-    drawFilledRegion(painter, rect, m_motionMaskList[channel], qnGlobals->motionMaskColor());
+    if (m_motionDrawType == DrawAllMotionInfo) 
+    {
+        QnMotionRegion& r = m_motionRegionList[channel];
+        QRegion reg;
+        for (int i = 0; i < 10; ++i) 
+        {
+            QColor clr = i > 0 ? QColor(180, 0, 0, 96) : qnGlobals->motionMaskColor();
+            drawFilledRegion(painter, rect, m_motionRegionList[channel].getRegionBySens(i), clr, Qt::black);
+        }
+
+        drawMotionSensitivity(painter, rect, m_motionRegionList[channel], channel);
+    }
+    else {
+        drawFilledRegion(painter, rect, m_motionRegionList[channel].getMotionMask(), qnGlobals->motionMaskColor(), qnGlobals->motionMaskColor());
+    }
+}
+
+void QnResourceWidget::setDrawMotionWindows(MotionDrawType value)
+{
+    m_motionDrawType = value;   
 }
