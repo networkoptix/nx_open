@@ -13,3 +13,7 @@ Template: networkoptix-entcontroller/ecs_port_invalid
 Type: error
 Description: The port is invalid. Please try again.
 
+Template: networkoptix-entcontroller/ecs_pass_empty
+Type: error
+Description: The password should not be empty
+
