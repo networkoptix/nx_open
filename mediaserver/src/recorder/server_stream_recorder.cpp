@@ -76,6 +76,7 @@ void QnServerStreamRecorder::updateStreamParams()
     if (m_mediaProvider && m_role == QnResource::Role_LiveVideo)
     {
         QnLiveStreamProvider* liveProvider = dynamic_cast<QnLiveStreamProvider*>(m_mediaProvider);
+
         if (m_currentScheduleTask.getRecordingType() != QnScheduleTask::RecordingType_Never) {
             liveProvider->setFps(m_currentScheduleTask.getFps());
             liveProvider->setQuality(m_currentScheduleTask.getStreamQuality());
@@ -234,6 +235,12 @@ void QnServerStreamRecorder::updateCamera(QnSecurityCamResourcePtr cameraRes)
         QnMetaDataV1::createMask(cameraRes->getMotionMask(i), (char*)m_motionMaskBinData[i]);
     m_lastSchedulePeriod.clear();
     updateScheduleInfo(qnSyncTime->currentMSecsSinceEpoch());
+
+    if (m_mediaProvider && m_role == QnResource::Role_LiveVideo)
+    {
+        QnLiveStreamProvider* liveProvider = dynamic_cast<QnLiveStreamProvider*>(m_mediaProvider);
+        liveProvider->updateMotion();
+    }
 }
 
 QString QnServerStreamRecorder::fillFileName(QnAbstractMediaStreamDataProvider* provider)

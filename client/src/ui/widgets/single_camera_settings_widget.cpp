@@ -33,8 +33,8 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->webPageLabel,           SIGNAL(linkActivated(const QString &)), this,   SLOT(at_linkActivated(const QString &)));
     connect(ui->motionWEBPageLink,      SIGNAL(linkActivated(const QString &)), this,   SLOT(at_linkActivated(const QString &)));
 
-    connect(ui->motionGridButton, SIGNAL(clicked(bool)), SLOT(at_motionTypeChanged()));
-    connect(ui->motionWindowButton, SIGNAL(clicked(bool)), SLOT(at_motionTypeChanged()));
+    connect(ui->cameraMotionButton, SIGNAL(clicked(bool)), SLOT(at_motionTypeChanged()));
+    connect(ui->softwareMotionButton, SIGNAL(clicked(bool)), SLOT(at_motionTypeChanged()));
     connect(ui->comboBoxSensetivity, SIGNAL(currentIndexChanged(int)), this, SLOT(at_motionSensitivityChanged(int)));
 
     updateFromResource();
@@ -51,10 +51,11 @@ void QnSingleCameraSettingsWidget::at_motionSensitivityChanged(int value)
 
 void QnSingleCameraSettingsWidget::at_motionTypeChanged()
 {
-    ui->sensetivityLabel->setEnabled(ui->motionGridButton->isChecked());
-    ui->comboBoxSensetivity->setEnabled(ui->motionGridButton->isChecked());
-    ui->motionWebPageLabel->setEnabled(!ui->motionGridButton->isChecked());
-    ui->motionWEBPageLink->setEnabled(!ui->motionGridButton->isChecked());
+    //ui->sensetivityLabel->setEnabled(ui->motionGridButton->isChecked());
+    //ui->comboBoxSensetivity->setEnabled(ui->motionGridButton->isChecked());
+    //ui->motionWebPageLabel->setEnabled(!ui->motionGridButton->isChecked());
+    //ui->motionWEBPageLink->setEnabled(!ui->motionGridButton->isChecked());
+    at_dataChanged();
 }
 
 void QnSingleCameraSettingsWidget::at_linkActivated(const QString &urlString)
@@ -81,10 +82,16 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
     
     if (m_camera)
     {
+        ui->softwareMotionButton->setEnabled(camera->supportedMotionType() & MT_SoftwareGrid);
+
         QVariant val;
         QString webPageAddress = QString("http://%1/%2").arg(m_camera->getHostAddress().toString()).arg(val.toString());
-        //if (m_camera->getParam("motionEditURL", val, QnDomainMemory))
-        if (0)
+        ui->motionWEBPageLink->setText(tr("%1").arg(webPageAddress));
+        if(m_motionWidget) 
+            m_motionWidget->setCamera(m_camera);
+
+        /*
+        if (m_camera->getParam("motionEditURL", val, QnDomainMemory))
         {
             // motion editing is not supported. Place only reference to WEB page
             ui->motionWEBPageLink->setText(tr("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
@@ -96,7 +103,8 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
             }
 
         }
-        else {
+        else 
+        {
             ui->motionWEBPageLink->setText(tr("%1").arg(webPageAddress));
             if(m_motionWidget) {
                 m_motionWidget->setCamera(m_camera);
@@ -105,6 +113,7 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
                 //ui->motionWebPageLabel->hide();
             }
         }
+        */
     }
     updateFromResource();
 }
@@ -177,6 +186,10 @@ void QnSingleCameraSettingsWidget::submitToResource() {
 
     if(m_motionWidget)
 	    m_camera->setMotionRegionList(m_motionWidget->motionRegionList(), QnDomainMemory);
+    if (ui->cameraMotionButton->isChecked())
+        m_camera->setMotionType(m_camera->getDefaultMotionType());
+    else
+        m_camera->setMotionType(MT_SoftwareGrid);
 
     setHasChanges(false);
 }

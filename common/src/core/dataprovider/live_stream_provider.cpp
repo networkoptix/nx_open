@@ -45,7 +45,8 @@ m_fps(-1.0),
 m_framesSinceLastMetaData(0),
 m_livemutex(QMutex::Recursive),
 m_role(QnResource::Role_LiveVideo),
-m_softwareMotion(false)
+m_softwareMotion(false),
+m_softMotionLastChannel(0)
 {
     //m_softwareMotion = true;
 
@@ -53,7 +54,8 @@ m_softwareMotion(false)
 
     char mask[MD_WIDTH * MD_HEIGHT];
     memset(mask, 10, sizeof(mask));
-    m_motionEstimation.setMotionMask(QByteArray(mask, sizeof(mask))); // default mask
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
+        m_motionEstimation[i].setMotionMask(QByteArray(mask, sizeof(mask))); // default mask
 }
 
 QnLiveStreamProvider::~QnLiveStreamProvider()
@@ -114,6 +116,67 @@ QnStreamQuality QnLiveStreamProvider::getQuality() const
     QMutexLocker mtx(&m_livemutex);
     return m_quality;
 }
+
+QByteArray QnLiveStreamProvider::createSoftwareMotionMask(const QnMotionRegion& region)
+{
+    static int sensitivityToMask[10] = 
+    {
+        255, //  0
+        64,
+        48,
+        32,
+        24,
+        16,
+        10,
+        8,
+        6,
+        5, // 9
+    };
+
+    QByteArray rez;
+    rez.resize(MD_WIDTH * MD_HEIGHT);
+    memset(rez.data(), 255, MD_WIDTH * MD_HEIGHT);
+    for (int i = 0; i < region.size(); ++i)
+    {
+        const QRect& rect = region.at(i).rect;
+        for (int y = rect.top(); y <= rect.bottom(); ++y)
+        {
+            for (int x = rect.left(); x <= rect.right(); ++x)
+            {
+                rez.data()[x * MD_HEIGHT + y] = sensitivityToMask[region.at(i).sensitivity];
+
+            }
+
+        }
+    }
+    return rez;
+}
+
+void QnLiveStreamProvider::updateMotion()
+{
+    if (getRole() != QnResource::Role_LiveVideo)
+        return;
+
+    QnAbstractMediaStreamDataProvider* ap = dynamic_cast<QnAbstractMediaStreamDataProvider*>(this);
+    Q_ASSERT(ap);
+
+    QnPhysicalCameraResourcePtr res = ap->getResource().dynamicCast<QnPhysicalCameraResource>();
+    Q_ASSERT(res);
+    const QnVideoResourceLayout* layout = res->getVideoLayout();
+    setUseSoftwareMotion(res->getMotionType() == MT_SoftwareGrid);
+    if (res->getMotionType() == MT_SoftwareGrid)
+    {
+        for (int i = 0; i < layout->numberOfChannels(); ++i)
+        {
+            QnMotionRegion region = res->getMotionRegion(i);
+            m_motionEstimation[i].setMotionMask(createSoftwareMotionMask(region));
+        }
+    }
+    else {
+        updateCameraMotion(res->getMotionRegion(0));
+    }
+}
+
 
 // for live providers only
 void QnLiveStreamProvider::setFps(float f)
@@ -182,9 +245,24 @@ bool QnLiveStreamProvider::isMaxFps() const
 bool QnLiveStreamProvider::needMetaData() 
 {
     // I assume this function is called once per video frame 
-    if (getRole() == QnResource::Role_SecondaryLiveVideo) {
-        if (m_softwareMotion)
-            return m_motionEstimation.existsMetadata();
+    if (getRole() == QnResource::Role_SecondaryLiveVideo) 
+    {
+        if (m_softwareMotion) 
+        {
+            QnAbstractMediaStreamDataProvider* ap = dynamic_cast<QnAbstractMediaStreamDataProvider*>(this);
+            QnPhysicalCameraResourcePtr res = ap->getResource().dynamicCast<QnPhysicalCameraResource>();
+            const QnVideoResourceLayout* layout = res->getVideoLayout();
+
+            for (int i = 0; i < layout->numberOfChannels(); ++i)
+            {
+                bool rez = m_motionEstimation[i].existsMetadata();
+                if (rez) {
+                    m_softMotionLastChannel = i;
+                    return rez;
+                }
+            }
+            return false;
+        }
         else
             return false;
     }
@@ -207,7 +285,7 @@ void QnLiveStreamProvider::onGotVideoFrame(QnCompressedVideoDataPtr videoData)
     m_framesSinceLastMetaData++;
 
     if (m_role == QnResource::Role_SecondaryLiveVideo && m_softwareMotion)
-        m_motionEstimation.analizeFrame(videoData);
+        m_motionEstimation[videoData->channelNumber].analizeFrame(videoData);
 }
 
 void QnLiveStreamProvider::onPrimaryFpsUpdated(int newFps)
@@ -235,7 +313,7 @@ void QnLiveStreamProvider::onPrimaryFpsUpdated(int newFps)
 QnMetaDataV1Ptr QnLiveStreamProvider::getMetaData()
 {
     if (m_softwareMotion)
-        return m_motionEstimation.getMotion();
+        return m_motionEstimation[m_softMotionLastChannel].getMotion();
     else
         return getCameraMetadata();
 }
