@@ -1,6 +1,8 @@
 #include "coldstore_storage.h"
+#include "coldstore_io_buffer.h"
 
-QnPlColdStoreStorage::QnPlColdStoreStorage()
+QnPlColdStoreStorage::QnPlColdStoreStorage():
+m_mutex(QMutex::Recursive)
 {
 
 }
@@ -12,12 +14,15 @@ QnStorageResource* QnPlColdStoreStorage::instance()
 
 QIODevice* QnPlColdStoreStorage::open(const QString& fileName, QIODevice::OpenMode openMode)
 {
-    return 0;
+    QnColdStoreIOBuffer* buff = new QnColdStoreIOBuffer(toSharedPointer(), fileName);
+    buff->open(openMode);
+
+    return buff;
 }
 
 int QnPlColdStoreStorage::getChunkLen() const 
 {
-    return 15*60;
+    return 10*60; // 10 sec
 }
 
 bool QnPlColdStoreStorage::isStorageAvailable() 
@@ -39,7 +44,7 @@ bool QnPlColdStoreStorage::isStorageAvailable()
 QFileInfoList QnPlColdStoreStorage::getFileList(const QString& dirName) 
 {
     QnStorageURL sUrl = url2StorageURL(dirName);
-    QString csUrl = csURL(sUrl);
+    QString csUrl = csDataFileName(sUrl);
 
     return QFileInfoList();
 }
@@ -90,7 +95,7 @@ QString QnPlColdStoreStorage::coldstoreAddr() const
     return prefix == -1 ? "" : url.mid(prefix + 3);
 }
 
-QString QnPlColdStoreStorage::csURL(const QnStorageURL& url) const
+QString QnPlColdStoreStorage::csDataFileName(const QnStorageURL& url) const
 {
     QString serverID = getParentId().toString();
 
@@ -99,10 +104,6 @@ QString QnPlColdStoreStorage::csURL(const QnStorageURL& url) const
     QTextStream s(&result);
     
     s << serverID;
-
-    if (url.resourceId=="")
-        return result;
-    s << "/" << url.resourceId;
 
     if (url.y=="")
         return result;

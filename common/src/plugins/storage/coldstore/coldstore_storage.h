@@ -5,7 +5,6 @@
 #include "libavformat/avio.h"
 #include "core/resource/storage_resource.h"
 
-typedef qint64 STORAGE_FILE_HANDLER;
 
 class QnPlColdStoreStorage : public QnStorageResource
 {
@@ -31,8 +30,9 @@ public:
 private:
     QString coldstoreAddr() const;
 
-    QString csURL(const QnStorageURL& url) const;
+    QString csDataFileName(const QnStorageURL& url) const;
 private:
+    mutable QMutex m_mutex;
 
     Veracity::ISFS* m_csConnection;
     Veracity::u32 m_stream;
