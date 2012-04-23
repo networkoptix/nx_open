@@ -209,7 +209,6 @@ FORMS += \
     ui/preferences/preferences.ui \
     ui/preferences/recordingsettingswidget.ui \
     ui/dialogs/login_dialog.ui \
-    ui/dialogs/sign_dialog.ui \
     ui/dialogs/tags_edit_dialog.ui \
     ui/dialogs/server_settings_dialog.ui \
     ui/dialogs/layout_name_dialog.ui \

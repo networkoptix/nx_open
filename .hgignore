@@ -26,6 +26,7 @@ Release
 common/bin
 client/bin
 mediaserver/bin
+traytool/bin
 
 appserver/db/ecs.db
 appserver/setup/db/ecs.db

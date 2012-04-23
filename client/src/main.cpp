@@ -49,6 +49,7 @@
 #include "plugins/resources/isd/isd_resource_searcher.h"
 #include "plugins/resources/onvif/onvif_ws_searcher.h"
 #include "utils/network/socket.h"
+#include "util.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
