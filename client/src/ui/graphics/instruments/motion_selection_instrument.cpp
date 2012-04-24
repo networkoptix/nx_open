@@ -91,7 +91,7 @@ private:
 };
 
 MotionSelectionInstrument::MotionSelectionInstrument(QObject *parent):
-    base_type(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent),
+    base_type(Viewport, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent),
     m_emptyDrag(false),
     m_selectionModifiers(0),
     m_multiSelectionModifiers(Qt::ControlModifier)

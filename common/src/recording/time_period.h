@@ -1,39 +1,72 @@
-#ifndef __TIME_PERIOD_H__
-#define __TIME_PERIOD_H__
+#ifndef QN_TIME_PERIOD_H
+#define QN_TIME_PERIOD_H
 
-#include <QVector>
+#include <QtCore/QVector>
+#include <QtCore/QMetaType>
 
 struct QnTimePeriod;
 class QnTimePeriodList;
-//typedef QVector<QnTimePeriod> QnTimePeriodList;
 
 struct QN_EXPORT QnTimePeriod
 {
+    /**
+     * Constructs a null time period.
+     */
     QnTimePeriod(): startTimeMs(0), durationMs(0) {}
-    QnTimePeriod(qint64 _startTimeMs, qint64 _durationMs): startTimeMs(_startTimeMs), durationMs(_durationMs) {}
+
+    /**
+     * \param startTimeMs               Period's start time, normally in milliseconds since epoch.
+     * \param durationMs                Period's duration, in milliseconds.
+     */
+    QnTimePeriod(qint64 startTimeMs, qint64 durationMs): startTimeMs(startTimeMs), durationMs(durationMs) {}
 
     bool operator==(const QnTimePeriod& other) const;
 
     static QnTimePeriodList mergeTimePeriods(QVector<QnTimePeriodList> periods);
     static QnTimePeriodList aggregateTimePeriods(const QnTimePeriodList& periods, int detailLevelMs);
     
-    /** Encode(compress) data to a byteArray. 
-    * TimePeriods must be arranged by time and does not intersects. If condition is not meet, function returns false
-    * Average compressed QnTimePeriod size near 6 bytes */
-    static bool encode(QByteArray& stream, const QnTimePeriodList& periods);
+    /** 
+     * Encode (compress) data to a byte array. 
+     * TimePeriods must be arranged by time and must not intersect. If this condition is not met, the function returns false. 
+     * Average compressed QnTimePeriod size is close to 6 bytes.
+     * 
+     * \param stream                    Byte array to compress time periods to. 
+     * \param periods                   List of time periods to compress. 
+     */
+    static bool encode(QByteArray &stream, const QnTimePeriodList &periods);
     
-    /** Decode(decompress) data from a byteArray. */
-    static bool decode(QByteArray& stream, QnTimePeriodList& periods);
-    static bool decode(const quint8* data, int dataSize, QnTimePeriodList& periods);
+    /** 
+     * Decode (decompress) data from a byte array. 
+     * 
+     * \param[in] stream                Byte array to decompress time periods from.
+     * \param[out] periods              Decompressed time periods.
+     */
+    static bool decode(QByteArray &stream, QnTimePeriodList &periods);
+
+    /**
+     * Decode (decompress) data from a byte array. 
+     * 
+     * \param[in] data                  Compressed data pointer.
+     * \param[in] dataSize              Size of the compressed data.
+     * \param[out] periods              Decompressed time periods.
+     */
+    static bool decode(const quint8 *data, int dataSize, QnTimePeriodList &periods);
 
     bool containTime(qint64 timeMs) const;
-    bool containPeriod(const QnTimePeriod& timePeriod) const;
-    void addPeriod(const QnTimePeriod& timePeriod);
-    QnTimePeriod intersect(const QnTimePeriod& other) const;
+    bool containPeriod(const QnTimePeriod &timePeriod) const;
+    void addPeriod(const QnTimePeriod &timePeriod);
+    QnTimePeriod intersect(const QnTimePeriod &other) const;
     void clear();
     bool isEmpty() const;
 
     qint64 endTimeMs() const;
+
+    /**
+     * \returns                         Whether this is a null time period. 
+     */
+    bool isNull() const {
+        return startTimeMs == 0 && durationMs == 0;
+    }
 
     /** Start time in milliseconds. */
     qint64 startTimeMs;
@@ -43,7 +76,6 @@ struct QN_EXPORT QnTimePeriod
      * -1 if duration is infinite or unknown. It may be the case if this time period 
      * represents a video chunk that is being recorded at the moment. */
     qint64 durationMs;
-
 };
 
 class QnTimePeriodList: public QVector<QnTimePeriod>
@@ -51,17 +83,28 @@ class QnTimePeriodList: public QVector<QnTimePeriod>
 public:
     QnTimePeriodList(): QVector<QnTimePeriod>() 
     {
-
     }
 
-    QnTimePeriodList::const_iterator findNearestPeriod(qint64 timeMs, bool searchForward) const
+    /**
+     * \param timeMs                    Time value to search for, in milliseconds.
+     * \param searchForward             How to behave when there is no interval containing the given time value.
+     *                                  If false, position of an interval preceding the value is returned. 
+     *                                  Otherwise, position of an interval that follows the value is returned. 
+     *                                  Note that this position may equal <tt>end</tt>.
+     * \returns                         Position of a time period that is the closest to the given time value.
+     */
+    const_iterator findNearestPeriod(qint64 timeMs, bool searchForward) const
     {
         if (isEmpty())
             return end();
-        QnTimePeriodList::const_iterator itr = qUpperBound(begin(), end(), timeMs);
+
+        const_iterator itr = qUpperBound(begin(), end(), timeMs);
         if (itr != begin())
             --itr;
-        if (searchForward && !itr->containTime(timeMs))
+
+        /* Note that there is no need to check for itr != end() here as
+         * the container is not empty. */
+        if (searchForward && !itr->containTime(timeMs)) 
             ++itr;
         return itr;
     }
@@ -71,4 +114,18 @@ bool operator < (const QnTimePeriod& first, const QnTimePeriod& other);
 bool operator < (qint64 first, const QnTimePeriod& other);
 bool operator < (const QnTimePeriod& other, qint64 first);
 
-#endif // __TIME_PERIOD_H__
+
+namespace Qn {
+    enum TimePeriodType {
+        RecordingTimePeriod,
+        MotionTimePeriod,
+        TimePeriodTypeCount
+    };
+
+} // namespace Qn
+
+Q_DECLARE_TYPEINFO(QnTimePeriod, Q_MOVABLE_TYPE);
+Q_DECLARE_METATYPE(Qn::TimePeriodType);
+Q_DECLARE_METATYPE(QnTimePeriod);
+
+#endif // QN_TIME_PERIOD_H

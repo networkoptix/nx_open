@@ -73,15 +73,15 @@ bool QnAbstractArchiveReader::isRealTimeSource() const
     return m_delegate && m_delegate->isRealTimeSource();
 }
 
-void QnAbstractArchiveReader::jumpToPreviousFrame(qint64 mksec)
+void QnAbstractArchiveReader::jumpToPreviousFrame(qint64 usec)
 {
-    if (mksec != DATETIME_NOW)
-        jumpTo(qMax(0ll, mksec - 200 * 1000), mksec);
+    if (usec != DATETIME_NOW)
+        jumpTo(qMax(0ll, usec - 200 * 1000), usec);
     else
-        jumpTo(mksec, 0);
+        jumpTo(usec, 0);
 }
 
-quint64 QnAbstractArchiveReader::lengthMksec() const
+quint64 QnAbstractArchiveReader::lengthUsec() const
 {
     if (m_delegate)
         return m_delegate->endTime() - m_delegate->startTime();

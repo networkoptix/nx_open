@@ -6,7 +6,7 @@
 class SelectionPreFixupInstrument: public Instrument {
 public:
     SelectionPreFixupInstrument(QObject *parent):
-        Instrument(ITEM, makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease), parent)
+        Instrument(Item, makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease), parent)
     {
         m_nan = std::numeric_limits<qreal>::quiet_NaN();
         m_intMin = std::numeric_limits<int>::min();
@@ -56,7 +56,7 @@ private:
 
 
 SelectionFixupInstrument::SelectionFixupInstrument(QObject *parent):
-    DragProcessingInstrument(ITEM, makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease), parent)
+    DragProcessingInstrument(Item, makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease), parent)
 {
     m_preForwardingInstrument = new SelectionPreFixupInstrument(this);
 }

@@ -3,6 +3,11 @@
 
 #include <QtGui/QGraphicsWidget>
 
+/**
+ * A graphics frame widget that does not use style for painting.
+ * 
+ * Frame width and color are configurable.
+ */
 class QnSimpleFrameWidget: public QGraphicsWidget {
     Q_OBJECT;
 public:

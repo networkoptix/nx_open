@@ -31,8 +31,8 @@ namespace detail {
 		QnResourceStatusReplyProcessor(QnWorkbenchActionHandler *handler, const QnVirtualCameraResourceList &resources, const QList<int> &oldDisabledFlags);
 
     public slots:
-        //void at_replyReceived(int status, const QByteArray& data, const QByteArray& errorString, int handle);
-        void at_replyReceived2(int status, const QByteArray& errorString, const QnResourceList &resources, int handle);
+        void at_replyReceived(int status, const QByteArray& errorString, const QnResourceList &resources, int handle);
+
     private:
         QWeakPointer<QnWorkbenchActionHandler> m_handler;
         QnVirtualCameraResourceList m_resources;
@@ -85,8 +85,16 @@ public:
     QnWorkbenchActionHandler(QObject *parent = NULL);
     virtual ~QnWorkbenchActionHandler();
 
+    /**
+     * \returns                         Widget that this action handler operates on.
+     */
     QWidget *widget() const;
 
+    /**
+     * \param widget                    Widget for this action handler to operate on.
+     *                                  All dialogs and message boxes will be displayed
+     *                                  to the user relative to this widget.
+     */
     void setWidget(QWidget *widget) {
         m_widget = widget;
     }
@@ -179,6 +187,11 @@ protected slots:
     void at_takeScreenshotAction_triggered();
     void at_exitAction_triggered();
 
+    void at_exportTimeSelectionAction_triggered();
+    void at_camera_exportFinished(QString fileName);
+    void at_camera_exportFailed(QString errorMessage);
+
+
     void at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle);
     void at_resource_deleted(int status, const QByteArray &data, const QByteArray &errorString, int handle);
 	void at_resources_statusSaved(int status, const QByteArray &errorString, const QnResourceList &resources, const QList<int> &oldDisabledFlags);
@@ -187,13 +200,19 @@ private:
     friend class detail::QnResourceStatusReplyProcessor;
 
     QWeakPointer<QWidget> m_widget;
-
     QWeakPointer<QMenu> m_mainMenu;
     
     QWeakPointer<QnCameraSettingsDialog> m_cameraSettingsDialog;
+
+    /** Whether the set of selected resources was changed and settings
+     * dialog is waiting to be updated. */
     bool m_selectionUpdatePending;
+
+    /** Scope of the last selection change. */
     Qn::ActionScope m_selectionScope;
 
+    /** List of serialized resources that are to be dropped on the scene once
+     * the user logs in. */
     QList<QnMimeData> m_delayedDrops;
 };
 

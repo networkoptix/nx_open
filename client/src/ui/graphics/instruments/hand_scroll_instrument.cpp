@@ -8,7 +8,7 @@
 #include <ui/animation/animation_event.h>
 
 HandScrollInstrument::HandScrollInstrument(QObject *parent):
-    base_type(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, AnimationEvent::Animation), parent)
+    base_type(Viewport, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, AnimationEvent::Animation), parent)
 {
     KineticCuttingProcessor *processor = new KineticCuttingProcessor(QMetaType::QPointF, this);
     processor->setHandler(this);

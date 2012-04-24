@@ -42,6 +42,8 @@ void QnTreeView::timerEvent(QTimerEvent *event) {
     if (event->timerId() == m_openTimer.timerId()) {
         QPoint pos = m_dragMovePos;
         if (state() == QAbstractItemView::DraggingState && viewport()->rect().contains(pos)) {
+            /* Open the node that the mouse is hovered over. 
+             * Don't close it if it's already opened as the default implementation does. */
             QModelIndex index = indexAt(pos);
             setExpanded(index, true);
         }

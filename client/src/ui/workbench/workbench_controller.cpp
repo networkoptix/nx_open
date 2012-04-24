@@ -78,7 +78,6 @@
 #include "workbench.h"
 #include "workbench_display.h"
 #include "help/qncontext_help.h"
-#include "ui/common/color_transform.h"
 #include "ui/dialogs/sign_dialog.h"
 
 //#define QN_WORKBENCH_CONTROLLER_DEBUG
@@ -170,10 +169,10 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     Instrument::EventTypeSet keyEventTypes = Instrument::makeSet(QEvent::KeyPress, QEvent::KeyRelease);
 
     /* Install and configure instruments. */
-    m_itemLeftClickInstrument = new ClickInstrument(Qt::LeftButton, 300, Instrument::ITEM, this);
-    m_itemRightClickInstrument = new ClickInstrument(Qt::RightButton, 0, Instrument::ITEM, this);
-    ClickInstrument *itemMiddleClickInstrument = new ClickInstrument(Qt::MiddleButton, 0, Instrument::ITEM, this);
-    ClickInstrument *sceneClickInstrument = new ClickInstrument(Qt::LeftButton | Qt::RightButton, 0, Instrument::SCENE, this);
+    m_itemLeftClickInstrument = new ClickInstrument(Qt::LeftButton, 300, Instrument::Item, this);
+    m_itemRightClickInstrument = new ClickInstrument(Qt::RightButton, 0, Instrument::Item, this);
+    ClickInstrument *itemMiddleClickInstrument = new ClickInstrument(Qt::MiddleButton, 0, Instrument::Item, this);
+    ClickInstrument *sceneClickInstrument = new ClickInstrument(Qt::LeftButton | Qt::RightButton, 0, Instrument::Scene, this);
     m_handScrollInstrument = new HandScrollInstrument(this);
     m_wheelZoomInstrument = new WheelZoomInstrument(this);
     m_rubberBandInstrument = new RubberBandInstrument(this);
@@ -184,11 +183,11 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     BoundingInstrument *boundingInstrument = m_display->boundingInstrument();
     SelectionOverlayHackInstrument *selectionOverlayHackInstrument = m_display->selectionOverlayHackInstrument();
     m_moveInstrument = new MoveInstrument(this);
-    m_itemMouseForwardingInstrument = new ForwardingInstrument(Instrument::ITEM, mouseEventTypes, this);
+    m_itemMouseForwardingInstrument = new ForwardingInstrument(Instrument::Item, mouseEventTypes, this);
     SelectionFixupInstrument *selectionFixupInstrument = new SelectionFixupInstrument(this);
     m_motionSelectionInstrument = new MotionSelectionInstrument(this);
     GridAdjustmentInstrument *gridAdjustmentInstrument = new GridAdjustmentInstrument(workbench(), this);
-    SignalingInstrument *sceneKeySignalingInstrument = new SignalingInstrument(Instrument::SCENE, Instrument::makeSet(QEvent::KeyPress), this);
+    SignalingInstrument *sceneKeySignalingInstrument = new SignalingInstrument(Instrument::Scene, Instrument::makeSet(QEvent::KeyPress), this);
 
     gridAdjustmentInstrument->setSpeed(QSizeF(0.25 / 360.0, 0.25 / 360.0));
     gridAdjustmentInstrument->setMaxSpacing(QSizeF(0.5, 0.5));
@@ -197,12 +196,12 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Border, subColor(qnGlobals->mrsColor(), qnGlobals->selectionBorderDelta()));
     m_motionSelectionInstrument->setSelectionModifiers(Qt::ShiftModifier);
 
-    m_rubberBandInstrument->setRubberBandZValue(m_display->layerZValue(QnWorkbenchDisplay::EffectsLayer));
-    m_rotationInstrument->setRotationItemZValue(m_display->layerZValue(QnWorkbenchDisplay::EffectsLayer));
+    m_rubberBandInstrument->setRubberBandZValue(m_display->layerZValue(Qn::EffectsLayer));
+    m_rotationInstrument->setRotationItemZValue(m_display->layerZValue(Qn::EffectsLayer));
     m_resizingInstrument->setEffectiveDistance(8);
 
     /* Item instruments. */
-    m_manager->installInstrument(new StopInstrument(Instrument::ITEM, mouseEventTypes, this));
+    m_manager->installInstrument(new StopInstrument(Instrument::Item, mouseEventTypes, this));
     m_manager->installInstrument(m_resizingInstrument->resizeHoverInstrument());
     m_manager->installInstrument(selectionFixupInstrument);
     m_manager->installInstrument(m_itemMouseForwardingInstrument);
@@ -212,27 +211,27 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_manager->installInstrument(itemMiddleClickInstrument);
 
     /* Scene instruments. */
-    m_manager->installInstrument(new StopInstrument(Instrument::SCENE, dndEventTypes, this));
+    m_manager->installInstrument(new StopInstrument(Instrument::Scene, dndEventTypes, this));
     m_manager->installInstrument(m_dropInstrument);
-    m_manager->installInstrument(new StopAcceptedInstrument(Instrument::SCENE, dndEventTypes, this));
-    m_manager->installInstrument(new ForwardingInstrument(Instrument::SCENE, dndEventTypes, this));
+    m_manager->installInstrument(new StopAcceptedInstrument(Instrument::Scene, dndEventTypes, this));
+    m_manager->installInstrument(new ForwardingInstrument(Instrument::Scene, dndEventTypes, this));
 
-    m_manager->installInstrument(new StopInstrument(Instrument::SCENE, wheelEventTypes, this));
+    m_manager->installInstrument(new StopInstrument(Instrument::Scene, wheelEventTypes, this));
     m_manager->installInstrument(m_wheelZoomInstrument);
     m_manager->installInstrument(gridAdjustmentInstrument);
 
-    m_manager->installInstrument(new StopAcceptedInstrument(Instrument::SCENE, wheelEventTypes, this));
-    m_manager->installInstrument(new ForwardingInstrument(Instrument::SCENE, wheelEventTypes, this));
+    m_manager->installInstrument(new StopAcceptedInstrument(Instrument::Scene, wheelEventTypes, this));
+    m_manager->installInstrument(new ForwardingInstrument(Instrument::Scene, wheelEventTypes, this));
 
-    m_manager->installInstrument(new StopInstrument(Instrument::SCENE, mouseEventTypes, this));
+    m_manager->installInstrument(new StopInstrument(Instrument::Scene, mouseEventTypes, this));
     m_manager->installInstrument(sceneClickInstrument);
-    m_manager->installInstrument(new StopAcceptedInstrument(Instrument::SCENE, mouseEventTypes, this));
-    m_manager->installInstrument(new ForwardingInstrument(Instrument::SCENE, mouseEventTypes, this));
+    m_manager->installInstrument(new StopAcceptedInstrument(Instrument::Scene, mouseEventTypes, this));
+    m_manager->installInstrument(new ForwardingInstrument(Instrument::Scene, mouseEventTypes, this));
 
-    m_manager->installInstrument(new StopInstrument(Instrument::SCENE, keyEventTypes, this));
+    m_manager->installInstrument(new StopInstrument(Instrument::Scene, keyEventTypes, this));
     m_manager->installInstrument(sceneKeySignalingInstrument);
-    m_manager->installInstrument(new StopAcceptedInstrument(Instrument::SCENE, keyEventTypes, this));
-    m_manager->installInstrument(new ForwardingInstrument(Instrument::SCENE, keyEventTypes, this));
+    m_manager->installInstrument(new StopAcceptedInstrument(Instrument::Scene, keyEventTypes, this));
+    m_manager->installInstrument(new ForwardingInstrument(Instrument::Scene, keyEventTypes, this));
 
     /* View/viewport instruments. */
     m_manager->installInstrument(m_rotationInstrument, InstallationMode::InstallAfter, m_display->transformationListenerInstrument());
@@ -243,7 +242,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_manager->installInstrument(m_handScrollInstrument);
     m_manager->installInstrument(m_motionSelectionInstrument);
 
-    display->setLayer(m_dropInstrument->surface(), QnWorkbenchDisplay::UiLayer);
+    display->setLayer(m_dropInstrument->surface(), Qn::UiLayer);
 
     connect(m_itemLeftClickInstrument,  SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_leftClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(m_itemLeftClickInstrument,  SIGNAL(doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                 this,                           SLOT(at_item_doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
@@ -323,7 +322,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                     m_resizingInstrument,           SLOT(recursiveEnable()));
 
     /* Connect to display. */
-    connect(m_display,                  SIGNAL(widgetChanged(QnWorkbench::ItemRole)),                                               this,                           SLOT(at_display_widgetChanged(QnWorkbench::ItemRole)));
+    connect(m_display,                  SIGNAL(widgetChanged(Qn::ItemRole)),                                                        this,                           SLOT(at_display_widgetChanged(Qn::ItemRole)));
     connect(m_display,                  SIGNAL(widgetAdded(QnResourceWidget *)),                                                    this,                           SLOT(at_display_widgetAdded(QnResourceWidget *)));
     connect(m_display,                  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),                                         this,                           SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
 
@@ -411,7 +410,7 @@ void QnWorkbenchController::displayMotionGrid(const QList<QnResourceWidget *> &w
         if(!(widget->resource()->flags() & QnResource::network))
             continue;
 
-        widget->setDisplayFlag(QnResourceWidget::DISPLAY_MOTION_GRID, display);
+        widget->setDisplayFlag(QnResourceWidget::DisplayMotionGrid, display);
     }
 }
 
@@ -447,9 +446,9 @@ void QnWorkbenchController::moveCursor(const QPoint &direction) {
         }
     }
 
-    QnWorkbench::ItemRole role = QnWorkbench::ZOOMED;
+    Qn::ItemRole role = Qn::ZoomedRole;
     if(!workbench()->item(role))
-        role = QnWorkbench::RAISED;
+        role = Qn::RaisedRole;
     
     if(newItem != NULL && (newItem != item || item != workbench()->item(role))) {
         workbench()->setItem(role, newItem);
@@ -634,7 +633,7 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
     case Qt::Key_Return: {
         QList<QGraphicsItem *> items = display()->scene()->selectedItems();
         if(items.size() == 1 && dynamic_cast<QnResourceWidget *>(items[0])) {
-            if(items[0] == display()->widget(QnWorkbench::ZOOMED)) {
+            if(items[0] == display()->widget(Qn::ZoomedRole)) {
                 menu()->trigger(Qn::UnmaximizeItemAction, items);
             } else {
                 menu()->trigger(Qn::MaximizeItemAction, items);
@@ -689,7 +688,7 @@ void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget 
     if(m_resizedWidget == NULL)
         return;
 
-    workbench()->setItem(QnWorkbench::RAISED, NULL); /* Un-raise currently raised item so that it doesn't interfere with resizing. */
+    workbench()->setItem(Qn::RaisedRole, NULL); /* Un-raise currently raised item so that it doesn't interfere with resizing. */
 
     m_display->bringToFront(m_resizedWidget);
     m_display->gridItem()->animatedShow();
@@ -754,9 +753,9 @@ void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget
         m_display->synchronize(widget->item());
 
         /* Un-raise the raised item if it was the one being resized. */
-        QnWorkbenchItem *raisedItem = workbench()->item(QnWorkbench::RAISED);
+        QnWorkbenchItem *raisedItem = workbench()->item(Qn::RaisedRole);
         if(raisedItem == widget->item())
-            workbench()->setItem(QnWorkbench::RAISED, NULL);
+            workbench()->setItem(Qn::RaisedRole, NULL);
     }
 
     /* Clean up resizing state. */
@@ -770,7 +769,7 @@ void QnWorkbenchController::at_moveStarted(QGraphicsView *, const QList<QGraphic
 
     /* Bring to front preserving relative order. */
     m_display->bringToFront(items);
-    m_display->setLayer(items, QnWorkbenchDisplay::FrontLayer);
+    m_display->setLayer(items, Qn::FrontLayer);
 
     /* Show grid. */
     m_display->gridItem()->animatedShow();
@@ -902,9 +901,9 @@ void QnWorkbenchController::at_moveFinished(QGraphicsView *, const QList<QGraphi
             m_display->synchronize(workbenchItem);
 
         /* Un-raise the raised item if it was among the dragged ones. */
-        QnWorkbenchItem *raisedItem = workbench()->item(QnWorkbench::RAISED);
+        QnWorkbenchItem *raisedItem = workbench()->item(Qn::RaisedRole);
         if(raisedItem != NULL && workbenchItems.contains(raisedItem))
-            workbench()->setItem(QnWorkbench::RAISED, NULL);
+            workbench()->setItem(Qn::RaisedRole, NULL);
     }
 
     /* Clean up dragging state. */
@@ -936,7 +935,7 @@ void QnWorkbenchController::at_motionSelectionProcessStarted(QGraphicsView *, Qn
         return;
     }
 
-    widget->setDisplayFlag(QnResourceWidget::DISPLAY_MOTION_GRID, true);
+    widget->setDisplayFlag(QnResourceWidget::DisplayMotionGrid, true);
     foreach(QnResourceWidget *otherWidget, display()->widgets())
         if(otherWidget != widget)
             otherWidget->clearMotionSelection();
@@ -958,7 +957,7 @@ void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *
     if(info.modifiers() != 0)
         return;
 
-    if(workbench()->item(QnWorkbench::ZOOMED) != NULL)
+    if(workbench()->item(Qn::ZoomedRole) != NULL)
         return; /* Don't change currently raised item if we're zoomed. It is surprising for the user. */
 
     QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
@@ -967,7 +966,7 @@ void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *
 
     QnWorkbenchItem *workbenchItem = widget->item();
 
-    workbench()->setItem(QnWorkbench::RAISED, workbench()->item(QnWorkbench::RAISED) == workbenchItem ? NULL : workbenchItem);
+    workbench()->setItem(Qn::RaisedRole, workbench()->item(Qn::RaisedRole) == workbenchItem ? NULL : workbenchItem);
 }
 
 void QnWorkbenchController::at_item_rightClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &info) {
@@ -1012,7 +1011,7 @@ void QnWorkbenchController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem
     widget->setSelected(true);
 
     QnWorkbenchItem *workbenchItem = widget->item();
-    QnWorkbenchItem *zoomedItem = workbench()->item(QnWorkbench::ZOOMED);
+    QnWorkbenchItem *zoomedItem = workbench()->item(Qn::ZoomedRole);
     if(zoomedItem == workbenchItem) {
         QRectF viewportGeometry = m_display->viewportGeometry();
         QRectF zoomedItemGeometry = m_display->itemGeometry(zoomedItem);
@@ -1021,13 +1020,13 @@ void QnWorkbenchController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem
             (viewportGeometry.width() < zoomedItemGeometry.width() && !qFuzzyCompare(viewportGeometry.width(), zoomedItemGeometry.width())) ||
             (viewportGeometry.height() < zoomedItemGeometry.height() && !qFuzzyCompare(viewportGeometry.height(), zoomedItemGeometry.height()))
         ) {
-            workbench()->setItem(QnWorkbench::ZOOMED, NULL);
-            workbench()->setItem(QnWorkbench::ZOOMED, workbenchItem);
+            workbench()->setItem(Qn::ZoomedRole, NULL);
+            workbench()->setItem(Qn::ZoomedRole, workbenchItem);
         } else {
-            workbench()->setItem(QnWorkbench::ZOOMED, NULL);
+            workbench()->setItem(Qn::ZoomedRole, NULL);
         }
     } else {
-        workbench()->setItem(QnWorkbench::ZOOMED, workbenchItem);
+        workbench()->setItem(Qn::ZoomedRole, workbenchItem);
     }
 }
 
@@ -1045,7 +1044,7 @@ void QnWorkbenchController::at_scene_leftClicked(QGraphicsView *, const ClickInf
     if(workbench() == NULL)
         return;
 
-    workbench()->setItem(QnWorkbench::RAISED, NULL);
+    workbench()->setItem(Qn::RaisedRole, NULL);
 }
 
 void QnWorkbenchController::at_scene_rightClicked(QGraphicsView *, const ClickInfo &info) {
@@ -1064,11 +1063,11 @@ void QnWorkbenchController::at_scene_doubleClicked(QGraphicsView *, const ClickI
     if(workbench() == NULL)
         return;
 
-    workbench()->setItem(QnWorkbench::ZOOMED, NULL);
+    workbench()->setItem(Qn::ZoomedRole, NULL);
     m_display->fitInView();
 }
 
-void QnWorkbenchController::at_display_widgetChanged(QnWorkbench::ItemRole role) {
+void QnWorkbenchController::at_display_widgetChanged(Qn::ItemRole role) {
     QnResourceWidget *widget = m_display->widget(role);
     QnResourceWidget *oldWidget = m_widgetByRole[role];
     if(widget == oldWidget)
@@ -1080,20 +1079,20 @@ void QnWorkbenchController::at_display_widgetChanged(QnWorkbench::ItemRole role)
         widget->setFocus();
 
     switch(role) {
-    case QnWorkbench::ZOOMED: {
+    case Qn::ZoomedRole: {
         bool effective = widget == NULL;
         m_resizingInstrument->setEffective(effective);
         m_resizingInstrument->resizeHoverInstrument()->setEffective(effective);
         m_moveInstrument->setEffective(effective);
 
         if(widget == NULL) { /* Un-raise on un-zoom. */
-            workbench()->setItem(QnWorkbench::RAISED, NULL);
+            workbench()->setItem(Qn::RaisedRole, NULL);
         } else {
             m_cursorPos = widget->item()->geometry().topLeft();
         }
         break;
     }
-    case QnWorkbench::RAISED:
+    case Qn::RaisedRole:
         if(widget != NULL)
             m_cursorPos = widget->item()->geometry().topLeft();
         break;
@@ -1130,16 +1129,16 @@ void QnWorkbenchController::at_selectAllAction_triggered() {
 }
 
 void QnWorkbenchController::at_hideMotionAction_triggered() {
-    displayMotionGrid(menu()->currentWidgetsTarget(sender()), false);
+    displayMotionGrid(menu()->currentParameters(sender()).widgets(), false);
 }
 
 void QnWorkbenchController::at_showMotionAction_triggered() {
-    displayMotionGrid(menu()->currentWidgetsTarget(sender()), true);
+    displayMotionGrid(menu()->currentParameters(sender()).widgets(), true);
 }
 
 void QnWorkbenchController::at_checkFileSignatureAction_triggered() 
 {
-    QnResourceWidgetList widgets = menu()->currentWidgetsTarget(sender());
+    QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
     if (widgets.isEmpty())
         return;
     QnResourceWidget *widget = widgets.at(0);
@@ -1151,11 +1150,11 @@ void QnWorkbenchController::at_checkFileSignatureAction_triggered()
 }
 
 void QnWorkbenchController::at_toggleMotionAction_triggered() {
-    QnResourceWidgetList widgets = menu()->currentWidgetsTarget(sender());
+    QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
 
     bool hidden = false;
     foreach(QnResourceWidget *widget, widgets)
-        if((widget->resource()->flags() & QnResource::network) && !(widget->displayFlags() & QnResourceWidget::DISPLAY_MOTION_GRID))
+        if((widget->resource()->flags() & QnResource::network) && !(widget->displayFlags() & QnResourceWidget::DisplayMotionGrid))
             hidden = true;
 
     if(hidden) {
@@ -1166,15 +1165,15 @@ void QnWorkbenchController::at_toggleMotionAction_triggered() {
 }
 
 void QnWorkbenchController::at_maximizeItemAction_triggered() {
-    QnResourceWidgetList widgets = menu()->currentWidgetsTarget(sender());
+    QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
     if(widgets.empty())
         return;
 
-    workbench()->setItem(QnWorkbench::ZOOMED, widgets[0]->item());
+    workbench()->setItem(Qn::ZoomedRole, widgets[0]->item());
 }
 
 void QnWorkbenchController::at_unmaximizeItemAction_triggered() {
-    workbench()->setItem(QnWorkbench::ZOOMED, NULL);
+    workbench()->setItem(Qn::ZoomedRole, NULL);
 }
 
 

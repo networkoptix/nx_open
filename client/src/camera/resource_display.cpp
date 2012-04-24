@@ -123,7 +123,7 @@ const QnVideoResourceLayout *QnResourceDisplay::videoLayout() const {
 }
 
 qint64 QnResourceDisplay::lengthUSec() const {
-    return m_archiveReader == NULL ? -1 : m_archiveReader->lengthMksec();
+    return m_archiveReader == NULL ? -1 : m_archiveReader->lengthUsec();
 }
 
 qint64 QnResourceDisplay::currentTimeUSec() const {

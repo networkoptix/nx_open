@@ -39,7 +39,7 @@ private:
 
 
 DropInstrument::DropInstrument(bool intoNewLayout, QnWorkbenchContext *context, QObject *parent):
-    Instrument(ITEM, makeSet(/* No events here, we'll receive them from the surface item. */), parent),
+    Instrument(Item, makeSet(/* No events here, we'll receive them from the surface item. */), parent),
     m_context(context),
     m_intoNewLayout(intoNewLayout)
 {
@@ -127,12 +127,15 @@ bool DropInstrument::dropEvent(QGraphicsItem *item, QGraphicsSceneDragDropEvent 
         return true;
 
     if(!m_intoNewLayout) {
-        QVariantMap params;
-        params[Qn::GridPositionParameter] = context->workbench()->mapper()->mapToGridF(event->scenePos());
-
-        context->menu()->trigger(Qn::DropResourcesAction, m_resources, params);
+        context->menu()->trigger(
+            Qn::DropResourcesAction, 
+            QnActionParameters(m_resources).withArgument(Qn::GridPositionParameter, context->workbench()->mapper()->mapToGridF(event->scenePos()))
+        );
     } else {
-        context->menu()->trigger(Qn::DropResourcesIntoNewLayoutAction, m_resources);
+        context->menu()->trigger(
+            Qn::DropResourcesIntoNewLayoutAction, 
+            QnActionParameters(m_resources)
+        );
     }
 
     event->acceptProposedAction();

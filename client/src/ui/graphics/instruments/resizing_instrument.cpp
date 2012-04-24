@@ -39,7 +39,7 @@ Qt::WindowFrameSection ResizingInfo::frameSection() const {
 }
 
 ResizingInstrument::ResizingInstrument(QObject *parent):
-    base_type(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent),
+    base_type(Viewport, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent),
     m_resizeHoverInstrument(new ResizeHoverInstrument(this)),
     m_effectiveDistance(0),
     m_effective(true)

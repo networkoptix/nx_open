@@ -118,6 +118,10 @@ public:
      */
     QSize mapToGrid(const QSizeF &size) const;
 
+    /**
+     * \param size                      Size in scene coordinates.
+     * \returns                         Corresponding size in grid cells.
+     */
     QSizeF mapToGridF(const QSizeF &size) const;
 
     /**
@@ -168,7 +172,10 @@ public:
      */
     QRectF mapFromGridF(const QRectF &gridRect) const;
 
-
+    /**
+     * \param delta                     Directed vector, in scene coordinates.
+     * \returns                         Corresponding directed vector in grid coordinates.
+     */
     QPointF mapDeltaToGridF(const QPointF &delta) const;
 
 signals:

@@ -24,7 +24,16 @@ public:
     }
 
 signals:
+    /**
+     * This signal is emitted whenever motion grid becomes displayed on at least
+     * one item on the scene.
+     */
     void motionGridShown();
+
+    /**
+     * This signal is emitted whenever motion grid becomes no longer displayed on
+     * any of the items on the scene.
+     */
     void motionGridHidden();
 
 protected slots:

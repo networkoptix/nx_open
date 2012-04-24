@@ -8,8 +8,7 @@
 
 class QStyle;
 
-class QnSkin
-{
+class QnSkin {
 public:
     static const QIcon::Mode Normal = QIcon::Normal;
     static const QIcon::Mode Disabled = QIcon::Disabled;

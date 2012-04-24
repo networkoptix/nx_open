@@ -1,11 +1,11 @@
 #include "timeslider.h"
 
-#include <QPainterPath>
-#include <QGradient>
 #include <QtCore/QDateTime>
 #include <QtCore/QPair>
 #include <QtCore/QPropertyAnimation>
 
+#include <QtGui/QPainterPath>
+#include <QtGui/QGradient>
 #include <QtGui/QAction>
 #include <QtGui/QApplication>
 #include <QtGui/QGraphicsLinearLayout>
@@ -18,13 +18,12 @@
 #include "ui/style/skin.h"
 #include "ui/style/proxy_style.h"
 
-#include "ui/graphics/items/standard/graphicsframe.h"
-#include "ui/graphics/items/standard/graphicsslider.h"
-#include "ui/graphics/items/tool_tip_item.h"
+#include "ui/graphics/items/standard/graphics_frame.h"
 
 #include <qmath.h>
 #include "utils/common/synctime.h"
 #include "ui/style/globals.h"
+#include "tool_tip_slider.h"
 
 //#define TIMESLIDER_ANIMATED_DRAG
 
@@ -49,45 +48,14 @@ typedef QHash<unsigned, QPixmap*> TextCache;
 
 
 // -------------------------------------------------------------------------- //
-// SliderProxyStyle
-// -------------------------------------------------------------------------- //
-class SliderProxyStyle : public QnProxyStyle
-{
-public:
-    SliderProxyStyle(QObject *parent = 0) : QnProxyStyle(0, parent) {}
-
-    int styleHint(StyleHint hint, const QStyleOption *option = 0, const QWidget *widget = 0, QStyleHintReturn *returnData = 0) const
-    {
-        if (hint == QStyle::SH_Slider_AbsoluteSetButtons)
-            return Qt::LeftButton;
-        return QnProxyStyle::styleHint(hint, option, widget, returnData);
-    }
-
-    QRect subControlRect(ComplexControl cc, const QStyleOptionComplex *opt, SubControl sc, const QWidget *widget = 0) const
-    {
-        QRect r = QnProxyStyle::subControlRect(cc, opt, sc, widget);
-        if (cc == CC_Slider && sc == SC_SliderHandle) {
-            int side = qMin(r.width(), r.height());
-            if (qstyleoption_cast<const QStyleOptionSlider *>(opt)->orientation == Qt::Horizontal)
-                r.setWidth(side);
-            else
-                r.setHeight(side);
-        }
-        return r;
-    }
-};
-
-
-// -------------------------------------------------------------------------- //
 // MySlider
 // -------------------------------------------------------------------------- //
-class MySlider : public GraphicsSlider
+class MySlider : public QnToolTipSlider
 {
+    typedef QnToolTipSlider base_type;
+
 public:
     MySlider(TimeSlider *parent);
-
-    QnToolTipItem *toolTipItem() const;
-    void setToolTipItem(QnToolTipItem *toolTip);
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
@@ -106,8 +74,6 @@ protected:
 
     void resizeEvent(QGraphicsSceneResizeEvent *event);
 
-    void updateToolTipPos();
-
 private:
     void invalidateHandleRect();
     void ensureHandleRect() const;
@@ -115,7 +81,6 @@ private:
     void createEndPixmap();
 private:
     TimeSlider *m_parent;
-    QnToolTipItem *m_toolTip;
     mutable QRectF m_handleRect;
     int m_endSize;
     QPixmap m_pixmap;
@@ -125,18 +90,11 @@ private:
 };
 
 MySlider::MySlider(TimeSlider *parent)
-    : GraphicsSlider(parent),
+    : base_type(parent),
       m_parent(parent),
-      m_toolTip(0),
       m_endSize(0)
 {
-    setToolTipItem(new QnStyledToolTipItem);
-}
-
-void MySlider::updateToolTipPos()
-{
-    ensureHandleRect();
-    m_toolTip->setPos(m_handleRect.center().x(), m_handleRect.top());
+    setAutoHideToolTip(false);
 }
 
 void MySlider::createEndPixmap()
@@ -163,25 +121,6 @@ bool MySlider::isAtEnd() const
 void MySlider::setEndSize(int size)
 {
     m_endSize = size;
-}
-
-QnToolTipItem *MySlider::toolTipItem() const
-{
-    return m_toolTip;
-}
-
-void MySlider::setToolTipItem(QnToolTipItem *toolTip)
-{
-    if (m_toolTip == toolTip)
-        return;
-
-    delete m_toolTip;
-
-    m_toolTip = toolTip;
-    //m_toolTip->setCacheMode(QGraphicsItem::ItemCoordinateCache);
-
-    if (m_toolTip)
-        m_toolTip->setParentItem(this);
 }
 
 qreal MySlider::getMsInPixel() const
@@ -321,30 +260,21 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
 void MySlider::sliderChange(SliderChange change)
 {
-    GraphicsSlider::sliderChange(change);
+    base_type::sliderChange(change);
 
-    if (change == SliderValueChange && m_toolTip) {
-        invalidateHandleRect();
-        updateToolTipPos();
-    }
+    invalidateHandleRect();
 }
 
 QVariant MySlider::itemChange(GraphicsItemChange change, const QVariant &value)
 {
-    if (change == ItemToolTipHasChanged && m_toolTip) {
-        m_toolTip->setText(value.toString());
-        m_toolTip->setVisible(!m_toolTip->text().isEmpty());
-    }
-
-    return GraphicsSlider::itemChange(change, value);
+    return base_type::itemChange(change, value);
 }
 
 void MySlider::resizeEvent(QGraphicsSceneResizeEvent *event)
 {
-    GraphicsSlider::resizeEvent(event);
+    base_type::resizeEvent(event);
 
     invalidateHandleRect();
-    updateToolTipPos();
 }
 
 void MySlider::invalidateHandleRect()
@@ -1006,9 +936,6 @@ TimeSlider::TimeSlider(QGraphicsItem *parent) :
     m_slider->setMaximum(10000);
     m_slider->installEventFilter(this);
     m_slider->setFocusProxy(this);
-
-    m_slider->setStyle(new SliderProxyStyle(m_slider));
-
 
     m_timeLine = new TimeLine(this);
     m_timeLine->setLineWidth(0);

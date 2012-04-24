@@ -28,10 +28,6 @@ public:
 public slots:
     void submit();
 
-protected:
-    void start();
-    void stop();
-
 protected slots:
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
     void at_workbench_layoutsChanged();

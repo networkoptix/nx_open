@@ -13,6 +13,7 @@ namespace Qn {
     inline QLatin1String qn_currentLayoutParameter()        { return QLatin1String("_qn_currentLayoutParameter"); }
     inline QLatin1String qn_currentUserParameter()          { return QLatin1String("_qn_currentUserParameter"); }
     inline QLatin1String qn_serializedResourcesParameter()  { return QLatin1String("_qn_serializedResourcesParameter"); }
+    inline QLatin1String qn_timePeriodParameter()           { return QLatin1String("_qn_timePeriodParameter"); }
 
 #define GridPositionParameter qn_gridPositionParameter()
 #define UserParameter qn_userParameter()
@@ -22,6 +23,7 @@ namespace Qn {
 #define CurrentLayoutParameter qn_currentLayoutParameter()
 #define CurrentUserParameter qn_currentUserParameter()
 #define SerializedResourcesParameter qn_serializedResourcesParameter()
+#define TimePeriodParameter qn_timePeriodParameter()
 
     /**
      * Enum of all menu actions.
@@ -386,6 +388,19 @@ namespace Qn {
 
 
 
+        /* Slider actions. */
+
+        /**
+         * Clears selection.
+         */
+        ClearTimeSelectionAction,
+
+        /**
+         * Exports selected range.
+         */
+        ExportTimeSelectionAction,
+
+
         ActionCount,
 
         NoAction = -1
@@ -461,7 +476,7 @@ namespace Qn {
         Tree                    = Qn::TreeScope,                                
 
         /** Action can appear in slider context menu. */
-        Slider                  = Qn::SliderScope | SingleTarget | ResourceTarget,    
+        Slider                  = Qn::SliderScope | WidgetTarget,    
 
         /** Action can appear in tab bar context menu. */
         TabBar                  = Qn::TabBarScope | SingleTarget | LayoutTarget,      

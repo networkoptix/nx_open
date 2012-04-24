@@ -10,6 +10,7 @@
 #include <QtGui/QFileDialog>
 #include <QtGui/QMessageBox>
 #include <QtGui/QImage>
+#include <QtGui/QProgressDialog>
 
 #include <utils/common/environment.h>
 #include <utils/common/delete_later.h>
@@ -26,6 +27,7 @@
 
 #include <camera/resource_display.h>
 #include <camera/camdisplay.h>
+#include <camera/camera.h>
 
 #include <ui/style/skin.h>
 
@@ -72,8 +74,9 @@ detail::QnResourceStatusReplyProcessor::QnResourceStatusReplyProcessor(QnWorkben
     assert(oldDisabledFlags.size() == resources.size());
 }
 
-void detail::QnResourceStatusReplyProcessor::at_replyReceived2(int status, const QByteArray& errorString, const QnResourceList &resources, int handle)
-{
+void detail::QnResourceStatusReplyProcessor::at_replyReceived(int status, const QByteArray& errorString, const QnResourceList &resources, int handle) {
+    Q_UNUSED(handle);
+
     if(m_handler)
         m_handler.data()->at_resources_statusSaved(status, errorString, resources, m_oldDisabledFlags);
     
@@ -165,6 +168,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::MoveCameraAction),                   SIGNAL(triggered()),    this,   SLOT(at_moveCameraAction_triggered()));
     connect(action(Qn::TakeScreenshotAction),               SIGNAL(triggered()),    this,   SLOT(at_takeScreenshotAction_triggered()));
     connect(action(Qn::ExitAction),                         SIGNAL(triggered()),    this,   SLOT(at_exitAction_triggered()));
+    connect(action(Qn::ExportTimeSelectionAction),          SIGNAL(triggered()),    this,   SLOT(at_exportTimeSelectionAction_triggered()));
 
     /* Run handlers that update state. */
     at_eventManager_connectionClosed();
@@ -230,7 +234,7 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
     data.resource.id = resource->getId();
     data.resource.path = resource->getUniqueId();
     data.uuid = QUuid::createUuid();
-    data.flags = QnWorkbenchItem::PendingGeometryAdjustment;
+    data.flags = Qn::PendingGeometryAdjustment;
     if(usePosition) {
         data.combinedGeometry = QRectF(position, position); /* Desired position is encoded into a valid rect. */
     } else {
@@ -448,7 +452,7 @@ void QnWorkbenchActionHandler::updateCameraSettingsFromSelection() {
         m_selectionScope = scope;
     }
 
-    menu()->trigger(Qn::OpenInCameraSettingsDialogAction, provider->currentTarget(scope));
+    menu()->trigger(Qn::OpenInCameraSettingsDialogAction, QnActionParameters(provider->currentTarget(scope)));
 }
 
 void QnWorkbenchActionHandler::submitDelayedDrops() {
@@ -532,22 +536,24 @@ void QnWorkbenchActionHandler::at_previousLayoutAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
-    QnLayoutResourcePtr layout = menu()->currentParameter(sender(), Qn::LayoutParameter).value<QnLayoutResourcePtr>();
+    QnActionParameters parameters = menu()->currentParameters(sender());
+
+    QnLayoutResourcePtr layout = parameters.argument<QnLayoutResourcePtr>(Qn::LayoutParameter);
     if(!layout) {
         qnWarning("No layout provided.");
         return;
     }
 
-    QPointF position = menu()->currentParameter(sender(), Qn::GridPositionParameter).toPointF();
+    QPointF position = parameters.argument<QPointF>(Qn::GridPositionParameter);
 
-    QnResourceWidgetList widgets = menu()->currentWidgetsTarget(sender());
+    QnResourceWidgetList widgets = parameters.widgets();
     if(!widgets.empty() && position.isNull() && layout->getItems().empty()) {
         foreach(const QnResourceWidget *widget, widgets)
             layout->addItem(widget->item()->data());
         return;
     }
 
-    QnMediaResourceList resources = QnResourceCriterion::filter<QnMediaResource>(menu()->currentResourcesTarget(sender()));
+    QnMediaResourceList resources = QnResourceCriterion::filter<QnMediaResource>(parameters.resources());
     if(!resources.isEmpty()) {
         addToLayout(layout, resources, !position.isNull(), position);
         return;
@@ -555,19 +561,19 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_openInCurrentLayoutAction_triggered() {
-    QVariantMap params = menu()->currentParameters(sender());
-    params[Qn::LayoutParameter] = QVariant::fromValue(workbench()->currentLayout()->resource());
+    QnActionParameters parameters = menu()->currentParameters(sender());
+    parameters.setArgument(Qn::LayoutParameter, workbench()->currentLayout()->resource());
 
-    menu()->trigger(Qn::OpenInLayoutAction, menu()->currentTarget(sender()), params);
+    menu()->trigger(Qn::OpenInLayoutAction, parameters);
 };
 
 void QnWorkbenchActionHandler::at_openInNewLayoutAction_triggered() {
     menu()->trigger(Qn::OpenNewTabAction);
-    menu()->trigger(Qn::OpenInCurrentLayoutAction, menu()->currentTarget(sender()), menu()->currentParameters(sender()));
+    menu()->trigger(Qn::OpenInCurrentLayoutAction, menu()->currentParameters(sender()));
 }
 
 void QnWorkbenchActionHandler::at_openInNewWindowAction_triggered() {
-    QnResourceList medias = QnResourceCriterion::filter<QnMediaResource, QnResourceList>(menu()->currentResourcesTarget(sender()));
+    QnResourceList medias = QnResourceCriterion::filter<QnMediaResource, QnResourceList>(menu()->currentParameters(sender()).resources());
     if(medias.isEmpty()) 
         return;
     
@@ -586,7 +592,7 @@ void QnWorkbenchActionHandler::at_openInNewWindowAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_openLayoutsAction_triggered() {
-    foreach(const QnResourcePtr &resource, menu()->currentResourcesTarget(sender())) {
+    foreach(const QnResourcePtr &resource, menu()->currentParameters(sender()).resources()) {
         QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>();
 
         QnWorkbenchLayout *layout = QnWorkbenchLayout::instance(layoutResource);
@@ -625,7 +631,7 @@ void QnWorkbenchActionHandler::at_saveLayoutAction_triggered(const QnLayoutResou
 }
 
 void QnWorkbenchActionHandler::at_saveLayoutAction_triggered() {
-    at_saveLayoutAction_triggered(menu()->currentResourceTarget(sender()).dynamicCast<QnLayoutResource>());
+    at_saveLayoutAction_triggered(menu()->currentParameters(sender()).resource().dynamicCast<QnLayoutResource>());
 }
 
 void QnWorkbenchActionHandler::at_saveCurrentLayoutAction_triggered() {
@@ -639,7 +645,7 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
     if(!user)
         return;
 
-    QString name = menu()->currentParameter(sender(), Qn::NameParameter).toString();
+    QString name = menu()->currentParameters(sender()).argument(Qn::NameParameter).toString();
     if(name.isEmpty()) {
         QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Save | QDialogButtonBox::Cancel, widget()));
         dialog->setWindowTitle(tr("Save Layout As"));
@@ -684,15 +690,17 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
 
 void QnWorkbenchActionHandler::at_saveLayoutForCurrentUserAsAction_triggered() {
     at_saveLayoutAsAction_triggered(
-        menu()->currentResourceTarget(sender()).dynamicCast<QnLayoutResource>(), 
+        menu()->currentParameters(sender()).resource().dynamicCast<QnLayoutResource>(), 
         context()->user()
     );
 }
 
 void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered() {
+    QnActionParameters parameters = menu()->currentParameters(sender());
+
     at_saveLayoutAsAction_triggered(
-        menu()->currentResourceTarget(sender()).dynamicCast<QnLayoutResource>(), 
-        menu()->currentParameter(sender(), Qn::UserParameter).value<QnUserResourcePtr>()
+        parameters.resource().dynamicCast<QnLayoutResource>(), 
+        parameters.argument<QnUserResourcePtr>(Qn::UserParameter)
     );
 }
 
@@ -704,11 +712,11 @@ void QnWorkbenchActionHandler::at_saveCurrentLayoutAsAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_closeLayoutAction_triggered() {
-    closeLayouts(menu()->currentLayoutsTarget(sender()));
+    closeLayouts(menu()->currentParameters(sender()).layouts());
 }
 
 void QnWorkbenchActionHandler::at_closeAllButThisLayoutAction_triggered() {
-    QnWorkbenchLayoutList layouts = menu()->currentLayoutsTarget(sender());
+    QnWorkbenchLayoutList layouts = menu()->currentParameters(sender()).layouts();
     if(layouts.empty())
         return;
     
@@ -720,8 +728,10 @@ void QnWorkbenchActionHandler::at_closeAllButThisLayoutAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
-    QnResourceList resources = menu()->currentResourcesTarget(sender());
-    QnVideoServerResourcePtr server = menu()->currentParameter(sender(), Qn::ServerParameter).value<QnVideoServerResourcePtr>();
+    QnActionParameters parameters = menu()->currentParameters(sender());
+
+    QnResourceList resources = parameters.resources();
+    QnVideoServerResourcePtr server = parameters.argument<QnVideoServerResourcePtr>(Qn::ServerParameter);
     if(!server)
         return;
 
@@ -758,7 +768,7 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
             replacedCamera->setScheduleDisabled(srcCamera->isScheduleDisabled());
             replacedCamera->setScheduleTasks(srcCamera->getScheduleTasks());
             replacedCamera->setAuth(srcCamera->getAuth());
-            replacedCamera->setMotionRegionList(srcCamera->getMotionRegionList(), QnDomain::QnDomainMemory);
+            replacedCamera->setMotionRegionList(srcCamera->getMotionRegionList(), QnDomainMemory);
             replacedCamera->setDisabled(false);
 
 
@@ -791,31 +801,34 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
 
     if(!modifiedResources.empty()) {
         detail::QnResourceStatusReplyProcessor *processor = new detail::QnResourceStatusReplyProcessor(this, modifiedResources, oldDisabledFlags);
-        //connection()->setResourcesDisabledAsync(modifiedResources, processor, SLOT(at_replyReceived(int, const QByteArray &, const QByteArray &, int)));
-        connection()->saveAsync(modifiedResources, processor, SLOT(at_replyReceived2(int, const QByteArray &, const QnResourceList &, int)));
+        connection()->saveAsync(modifiedResources, processor, SLOT(at_replyReceived(int, const QByteArray &, const QnResourceList &, int)));
     }
 }
 
 void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
-    QnResourceList layouts = QnResourceCriterion::filter<QnLayoutResource, QnResourceList>(menu()->currentResourcesTarget(sender()));
+    QnActionParameters parameters = menu()->currentParameters(sender());
+
+    QnResourceList layouts = QnResourceCriterion::filter<QnLayoutResource, QnResourceList>(parameters.resources());
     if(!layouts.empty()) {
         menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
     } else {
         /* No layouts? Just open dropped media. */
-        menu()->trigger(Qn::OpenInCurrentLayoutAction, menu()->currentTarget(sender()), menu()->currentParameters(sender()));
+        menu()->trigger(Qn::OpenInCurrentLayoutAction, parameters);
     }
 }
 
 void QnWorkbenchActionHandler::at_dropResourcesIntoNewLayoutAction_triggered() {
-    QnResourceList layouts = QnResourceCriterion::filter<QnLayoutResource, QnResourceList>(menu()->currentResourcesTarget(sender()));
+    QnActionParameters parameters = menu()->currentParameters(sender());
+
+    QnResourceList layouts = QnResourceCriterion::filter<QnLayoutResource, QnResourceList>(parameters.resources());
     if(layouts.empty()) /* That's media drop, open new layout. */
         menu()->trigger(Qn::OpenNewTabAction);
 
-    menu()->trigger(Qn::DropResourcesAction, menu()->currentTarget(sender()), menu()->currentParameters(sender()));
+    menu()->trigger(Qn::DropResourcesAction, parameters);
 }
 
 void QnWorkbenchActionHandler::at_delayedDropResourcesAction_triggered() {
-    QByteArray data = menu()->currentParameter(sender(), Qn::SerializedResourcesParameter).toByteArray();
+    QByteArray data = menu()->currentParameters(sender()).argument<QByteArray>(Qn::SerializedResourcesParameter);
     QDataStream stream(&data, QIODevice::ReadOnly);
     QnMimeData mimeData;
     stream >> mimeData;
@@ -927,7 +940,7 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_editTagsAction_triggered() {
-    QnResourcePtr resource = menu()->currentResourceTarget(sender());
+    QnResourcePtr resource = menu()->currentParameters(sender()).resource();
     if(resource.isNull())
         return;
 
@@ -937,7 +950,7 @@ void QnWorkbenchActionHandler::at_editTagsAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
-    QnResourceList resources = QnResourceCriterion::filter<QnVirtualCameraResource, QnResourceList>(menu()->currentResourcesTarget(sender()));
+    QnResourceList resources = QnResourceCriterion::filter<QnVirtualCameraResource, QnResourceList>(menu()->currentParameters(sender()).resources());
 
     if(!cameraSettingsDialog()) {
         m_cameraSettingsDialog = new QnCameraSettingsDialog(widget());
@@ -988,7 +1001,7 @@ void QnWorkbenchActionHandler::at_selectionChangeAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
-    QnVideoServerResourceList resources = QnResourceCriterion::filter<QnVideoServerResource>(menu()->currentResourcesTarget(sender()));
+    QnVideoServerResourceList resources = QnResourceCriterion::filter<QnVideoServerResource>(menu()->currentParameters(sender()).resources());
     if(resources.size() != 1)
         return;
 
@@ -998,7 +1011,7 @@ void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_youtubeUploadAction_triggered() {
-    QnResourcePtr resource = menu()->currentResourceTarget(sender());
+    QnResourcePtr resource = menu()->currentParameters(sender()).resource();
     if(resource.isNull())
         return;
 
@@ -1008,7 +1021,7 @@ void QnWorkbenchActionHandler::at_youtubeUploadAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_openInFolderAction_triggered() {
-    QnResourcePtr resource = menu()->currentResourceTarget(sender());
+    QnResourcePtr resource = menu()->currentParameters(sender()).resource();
     if(resource.isNull())
         return;
 
@@ -1016,7 +1029,7 @@ void QnWorkbenchActionHandler::at_openInFolderAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_deleteFromDiskAction_triggered() {
-    QSet<QnResourcePtr> resources = menu()->currentResourcesTarget(sender()).toSet();
+    QSet<QnResourcePtr> resources = menu()->currentParameters(sender()).resources().toSet();
 
     QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
         widget(), 
@@ -1032,7 +1045,7 @@ void QnWorkbenchActionHandler::at_deleteFromDiskAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_removeLayoutItemAction_triggered() {
-    QnLayoutItemIndexList items = menu()->currentLayoutItemsTarget(sender());
+    QnLayoutItemIndexList items = menu()->currentParameters(sender()).layoutItems();
 
     if(items.size() > 1) {
         QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
@@ -1071,11 +1084,13 @@ void QnWorkbenchActionHandler::at_removeLayoutItemAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_renameAction_triggered() {
-    QnResourcePtr resource = menu()->currentResourceTarget(sender());
+    QnActionParameters parameters = menu()->currentParameters(sender());
+
+    QnResourcePtr resource = parameters.resource();
     if(!resource)
         return;
 
-    QString name = menu()->currentParameter(sender(), Qn::NameParameter).toString();
+    QString name = parameters.argument(Qn::NameParameter).toString();
     if(name.isEmpty()) {
         QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, widget()));
         dialog->setWindowTitle(tr("Rename"));
@@ -1102,7 +1117,7 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
-    QnResourceList resources = menu()->currentResourcesTarget(sender());
+    QnResourceList resources = menu()->currentParameters(sender()).resources();
     
     /* User cannot delete himself. */
     resources.removeOne(context()->user());
@@ -1165,7 +1180,7 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_newUserLayoutAction_triggered() {
-    QnUserResourcePtr user = menu()->currentResourceTarget(sender()).dynamicCast<QnUserResource>();
+    QnUserResourcePtr user = menu()->currentParameters(sender()).resource().dynamicCast<QnUserResource>();
     if(user.isNull())
         return;
 
@@ -1185,7 +1200,7 @@ void QnWorkbenchActionHandler::at_newUserLayoutAction_triggered() {
 
     snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
 
-    menu()->trigger(Qn::OpenSingleLayoutAction, layout);
+    menu()->trigger(Qn::OpenSingleLayoutAction, QnActionParameters(layout));
 }
 
 void QnWorkbenchActionHandler::at_exitAction_triggered() {
@@ -1197,7 +1212,7 @@ void QnWorkbenchActionHandler::at_exitAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
-    QnResourceWidgetList widgets = menu()->currentWidgetsTarget(sender());
+    QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
     if(widgets.size() != 1)
         return;
     QnResourceWidget *widget = widgets[0];
@@ -1254,7 +1269,7 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
-    QnUserResourcePtr user = menu()->currentResourceTarget(sender()).dynamicCast<QnUserResource>();
+    QnUserResourcePtr user = menu()->currentParameters(sender()).resource().dynamicCast<QnUserResource>();
     if(!user)
         return;
 
@@ -1325,7 +1340,114 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     }
 }
 
+void QnWorkbenchActionHandler::at_exportTimeSelectionAction_triggered() {
+    QnActionParameters parameters = menu()->currentParameters(sender());
+
+    QnResourceWidget *widget = parameters.widget();
+    if(!widget)
+        return;
+
+    QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodParameter);
+
+    QnNetworkResourcePtr networkResource = widget->resource().dynamicCast<QnNetworkResource>();
+    QnSecurityCamResourcePtr cameraResource = widget->resource().dynamicCast<QnSecurityCamResource>();
+
+    QSettings settings;
+    settings.beginGroup(QLatin1String("export"));
+    QString previousDir = settings.value(QLatin1String("previousDir")).toString();
+    QString dateFormat = cameraResource ? tr("dd-mmm-yyyy hh-mm-ss") : tr("hh-mm-ss");
+    QString suggestion = networkResource ? networkResource->getMAC().toString() : QString();
+
+    QString fileName;
+    QString selectedExtension;
+    while (true) {
+        QString selectedFilter;
+        fileName = QFileDialog::getSaveFileName(
+            this->widget(), 
+            tr("Export Video As..."),
+            previousDir + QDir::separator() + suggestion,
+            tr("Matroska (*.mkv);; AVI (Audio/Video Interleaved)(*.avi)"),
+            &selectedFilter,
+            QFileDialog::DontUseNativeDialog
+        );
+        selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')) + 1, 3);
+
+        if (fileName.isEmpty())
+            return;
+
+        if (!fileName.toLower().endsWith(QLatin1String(".mkv")) && !fileName.toLower().endsWith(QLatin1String(".avi"))) {
+            fileName += QChar('.') + selectedExtension;
+
+            if (QFile::exists(fileName)) {
+                QMessageBox::StandardButton button = QMessageBox::information(
+                    this->widget(), 
+                    tr("Save As"), 
+                    tr("File '%1' already exists. Overwrite?").arg(QFileInfo(fileName).baseName()),
+                    QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
+                );
+
+                if(button == QMessageBox::Cancel || button == QMessageBox::No)
+                    return;
+            }
+        }
+
+        if (QFile::exists(fileName) && !QFile::remove(fileName)) {
+            QMessageBox::critical(
+                this->widget(), 
+                tr("Can't overwrite file"), 
+                tr("File '%1' is used by another process. Try another name.").arg(QFileInfo(fileName).baseName()), 
+                QMessageBox::Ok
+            );
+            continue;
+        } 
+
+        break;
+    }
+    settings.setValue(QLatin1String("previousDir"), QFileInfo(fileName).absolutePath());
+
+    QProgressDialog *exportProgressDialog = new QProgressDialog(this->widget());
+    exportProgressDialog->setWindowFlags(Qt::WindowStaysOnTopHint);
+    exportProgressDialog->setWindowTitle(tr("Exporting Video"));
+    exportProgressDialog->setLabelText(tr("Exporting to \"%1\"...").arg(fileName));
+    exportProgressDialog->setRange(0, 100);
+    exportProgressDialog->setMinimumDuration(1000);
+
+    CLVideoCamera *camera = widget->display()->camera();
+
+    connect(exportProgressDialog,   SIGNAL(canceled()),                 camera,                 SLOT(stopExport()));
+    connect(exportProgressDialog,   SIGNAL(canceled()),                 exportProgressDialog,   SLOT(deleteLater()));
+    connect(camera,                 SIGNAL(exportProgress(int)),        exportProgressDialog,   SLOT(setValue(int)));
+    connect(camera,                 SIGNAL(exportFailed(QString)),      exportProgressDialog,   SLOT(deleteLater()));
+    connect(camera,                 SIGNAL(exportFinished(QString)),    exportProgressDialog,   SLOT(deleteLater()));
+    connect(camera,                 SIGNAL(exportFailed(QString)),      this,                   SLOT(at_camera_exportFailed(QString)));
+    connect(camera,                 SIGNAL(exportFinished(QString)),    this,                   SLOT(at_camera_exportFinished(QString)));
+
+    camera->exportMediaPeriodToFile(period.startTimeMs * 1000ll, (period.startTimeMs + period.durationMs) * 1000ll, fileName, selectedExtension);
+}
+
+
+void QnWorkbenchActionHandler::at_camera_exportFinished(QString fileName) {
+    disconnect(sender(), NULL, this, NULL);
+
+    QnAviResourcePtr file(new QnAviResource(fileName));
+    file->setStatus(QnResource::Online);
+    resourcePool()->addResource(file);
+
+    QMessageBox::information(widget(), tr("Export finished"), tr("Export successfully finished"), QMessageBox::Ok);
+}
+
+void QnWorkbenchActionHandler::at_camera_exportFailed(QString errorMessage) {
+    disconnect(sender(), NULL, this, NULL);
+
+    if(CLVideoCamera *camera = dynamic_cast<CLVideoCamera *>(sender()))
+        camera->stopExport();
+
+    QMessageBox::warning(widget(), tr("Could not export video"), errorMessage, QMessageBox::Ok);
+}
+
 void QnWorkbenchActionHandler::at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle) {
+    Q_UNUSED(handle);
+
     if(status == 0)
         return;
 
@@ -1365,6 +1487,9 @@ void QnWorkbenchActionHandler::at_resources_saved(int status, const QByteArray& 
 }
 
 void QnWorkbenchActionHandler::at_resource_deleted(int status, const QByteArray &data, const QByteArray &errorString, int handle) {
+    Q_UNUSED(handle);
+    Q_UNUSED(data);
+
     if(status == 0)   
         return;
 

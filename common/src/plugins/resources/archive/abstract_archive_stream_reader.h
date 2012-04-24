@@ -47,16 +47,20 @@ public:
     // Manual open. Open will be called automatically on first data access
     bool open();
 
+    /**
+     * \returns                         Current position of this reader, in
+     *                                  microseconds.
+     */
     virtual qint64 currentTime() const = 0;
 	virtual bool isSkippingFrames() const = 0;
 
     /**
-      * @return length of archive in mksec
-      */
-    quint64 lengthMksec() const;
+     * \returns                         Length of archive, in microseconds.
+     */
+    quint64 lengthUsec() const;
 
-    virtual void directJumpToNonKeyFrame(qint64 mksec) = 0;
-    void jumpToPreviousFrame(qint64 mksec);
+    virtual void directJumpToNonKeyFrame(qint64 usec) = 0;
+    void jumpToPreviousFrame(qint64 usec);
 
 
     // gives a list of audio tracks
@@ -71,8 +75,16 @@ public:
 
     void setCycleMode(bool value);
 
+    /**
+     * \returns                         Time of the archive's start, in microseconds.
+     */
     qint64 startTime() const;
+
+    /**
+     * \returns                         Time of the archive's end, in microseconds.
+     */
     qint64 endTime() const;
+
     bool isRealTimeSource() const;
 
     virtual bool setSendMotion(bool value) = 0;
@@ -88,6 +100,7 @@ public:
 
     virtual void setSpeed(double value, qint64 currentTimeHint = AV_NOPTS_VALUE) = 0;
     virtual double getSpeed() const = 0;
+
 Q_SIGNALS:
     void beforeJump(qint64 mksec);
     void jumpOccured(qint64 mksec);
@@ -96,12 +109,12 @@ Q_SIGNALS:
     void streamResumed();
     void nextFrameOccured();
     void prevFrameOccured();
+
 protected:
     bool m_cycleMode;
     qint64 m_needToSleep;
     QnAbstractArchiveDelegate* m_delegate;
     QnAbstractNavigator* m_navDelegate;
-
 };
 
 #endif //abstract_archive_stream_reader_h1907

@@ -134,12 +134,11 @@ void QnLayoutTabBar::contextMenuEvent(QContextMenuEvent *event) {
     }
 
     QnWorkbenchLayoutList target;
-
     int index = tabAt(event->pos());
     if(index >= 0 && index < m_layouts.size())
         target.push_back(m_layouts[index]);
     
-    QScopedPointer<QMenu> menu(context()->menu()->newMenu(Qn::TabBarScope, QVariant::fromValue(target)));
+    QScopedPointer<QMenu> menu(context()->menu()->newMenu(Qn::TabBarScope, target));
     if(menu->isEmpty())
         return;
 

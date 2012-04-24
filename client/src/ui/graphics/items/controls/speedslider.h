@@ -1,26 +1,25 @@
-#ifndef SPEEDSLIDER_H
-#define SPEEDSLIDER_H
+#ifndef QN_SPEED_SLIDER_H
+#define QN_SPEED_SLIDER_H
 
-#include "ui/graphics/items/standard/graphicsslider.h"
+#include "tool_tip_slider.h"
 
 class QPropertyAnimation;
 
 class QnToolTipItem;
 
-class SpeedSlider : public GraphicsSlider
-{
-    Q_OBJECT
+class QnSpeedSlider: public QnToolTipSlider {
+    Q_OBJECT;
+
+    typedef QnToolTipSlider base_type;
 
 public:
-    explicit SpeedSlider(Qt::Orientation orientation = Qt::Horizontal, QGraphicsItem *parent = 0);
-    ~SpeedSlider();
+    explicit QnSpeedSlider(QGraphicsItem *parent = NULL);
+    virtual ~QnSpeedSlider();
 
     enum Precision { LowPrecision, HighPrecision };
 
     Precision precision() const;
     void setPrecision(Precision precision);
-
-    void setToolTipItem(QnToolTipItem *toolTip);
 
 public slots:
     void resetSpeed();
@@ -36,26 +35,18 @@ signals:
     void frameForward();
 
 protected:
-    void sliderChange(SliderChange change);
-
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
-#ifndef QT_NO_WHEELEVENT
-    void wheelEvent(QGraphicsSceneWheelEvent *e);
-#endif
-    void timerEvent(QTimerEvent *event);
-
-private Q_SLOTS:
-    void onSpeedChanged(float newSpeed);
+    virtual void sliderChange(SliderChange change) override;
+    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
+    virtual void timerEvent(QTimerEvent *event) override;
+    virtual void wheelEvent(QGraphicsSceneWheelEvent *e) override;
 
 private:
-    Q_DISABLE_COPY(SpeedSlider)
+    Q_DISABLE_COPY(QnSpeedSlider)
 
     Precision m_precision;
     QPropertyAnimation *m_animation;
-    QnToolTipItem *m_toolTip;
-    int m_toolTipTimerId;
     int m_wheelStuckedTimerId;
     bool m_wheelStucked;
 };
 
-#endif // SPEEDSLIDER_H
+#endif // QN_SPEED_SLIDER_H

@@ -19,6 +19,7 @@ namespace Qn {
 } // namespace Qn
 
 
+class QnActionParameters;
 class QnWorkbenchContext;
 
 class QnActionCondition: public QObject, public QnWorkbenchContextAware {
@@ -33,19 +34,7 @@ public:
 
     virtual Qn::ActionVisibility check(const QnWorkbenchLayoutList &layouts);
 
-    virtual Qn::ActionVisibility check(const QVariant &items);
-};
-
-
-class QnTargetlessActionCondition: public QnActionCondition {
-    typedef QnActionCondition base_type;
-
-public:
-    QnTargetlessActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
-
-    using base_type::check;
-
-    virtual Qn::ActionVisibility check(const QVariant &items) override;
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters);
 };
 
 
@@ -130,9 +119,9 @@ public:
 };
 
 
-class QnSaveLayoutActionCondition: public QnTargetlessActionCondition {
+class QnSaveLayoutActionCondition: public QnActionCondition {
 public:
-    QnSaveLayoutActionCondition(bool isCurrent, QObject *parent = NULL): QnTargetlessActionCondition(parent), m_current(isCurrent) {}
+    QnSaveLayoutActionCondition(bool isCurrent, QObject *parent = NULL): QnActionCondition(parent), m_current(isCurrent) {}
 
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
 
@@ -157,6 +146,20 @@ public:
     QnTakeScreenshotActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
 
     virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;
+};
+
+
+class QnTimePeriodActionCondition: public QnActionCondition {
+public:
+    QnTimePeriodActionCondition(bool requiredPeriodEmptyValue, QObject *parent = NULL):
+        QnActionCondition(parent),
+        m_requiredPeriodEmptyValue(requiredPeriodEmptyValue)
+    {}
+
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+
+private:
+    bool m_requiredPeriodEmptyValue;
 };
 
 

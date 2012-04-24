@@ -519,7 +519,7 @@ public:
 
 
 BoundingInstrument::BoundingInstrument(QObject *parent):
-    Instrument(VIEWPORT, makeSet(QEvent::Paint, AnimationEvent::Animation), parent)
+    Instrument(Viewport, makeSet(QEvent::Paint, AnimationEvent::Animation), parent)
 {
     m_data[NULL] = new ViewData(NULL);
 }

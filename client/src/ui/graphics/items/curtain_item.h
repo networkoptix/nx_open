@@ -3,6 +3,9 @@
 
 #include <QGraphicsObject>
 
+/**
+ * Item that fills the whole view with the given color. 
+ */
 class QnCurtainItem: public QGraphicsObject {
     Q_OBJECT;
     Q_PROPERTY(QColor color READ color WRITE setColor);

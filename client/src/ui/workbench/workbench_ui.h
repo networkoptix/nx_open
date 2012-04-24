@@ -5,7 +5,7 @@
 #include <core/resource/resource_fwd.h>
 #include <ui/common/scene_utility.h>
 #include <ui/actions/action_target_provider.h>
-#include "workbench.h" /* For QnWorkbench::ItemRole. */
+#include "workbench_globals.h"
 #include "workbench_context_aware.h"
 
 class QGraphicsProxyWidget;
@@ -178,9 +178,7 @@ protected slots:
     void at_activityStarted();
     void at_fpsChanged(qreal fps);
 
-    void at_renderWatcher_displayingStateChanged(QnAbstractRenderer *renderer, bool displaying);
-
-    void at_display_widgetChanged(QnWorkbench::ItemRole role);
+    void at_display_widgetChanged(Qn::ItemRole role);
     void at_display_widgetAdded(QnResourceWidget *widget);
     void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
 
@@ -212,10 +210,6 @@ protected slots:
 
     void at_fpsItem_geometryChanged();
 
-    void at_exportMediaRange(CLVideoCamera* camera, qint64 startTimeMs, qint64 endTimeMs);
-    void at_exportFailed(QString errMessage);
-    void at_exportFinished(QString fileName);
-
 private:
     /* Global state. */
 
@@ -238,7 +232,7 @@ private:
     Flags m_flags;
 
     /** Widgets by role. */
-    QnResourceWidget *m_widgetByRole[QnWorkbench::ITEM_ROLE_COUNT];
+    QnResourceWidget *m_widgetByRole[Qn::ItemRoleCount];
 
     /** Widget that ui controls are placed on. */
     QGraphicsWidget *m_controlsWidget;

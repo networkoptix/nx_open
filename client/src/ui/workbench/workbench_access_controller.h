@@ -4,15 +4,13 @@
 #include <QObject>
 #include <core/resource/resource_fwd.h>
 #include "workbench_context_aware.h"
-#include "workbench_permissions.h"
+#include "workbench_globals.h"
 
 class QnWorkbenchContext;
 class QnResourcePool;
 
 /**
  * This class implements access control.
- * 
- * It hides resources that cannot be viewed by the user that is currently logged in.
  */
 class QnWorkbenchAccessController: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT;

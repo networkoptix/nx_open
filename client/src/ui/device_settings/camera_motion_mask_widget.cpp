@@ -78,7 +78,7 @@ void QnCameraMotionMaskWidget::init()
     m_controller->itemLeftClickInstrument()->disable();
 
     /* We need to listen to viewport resize events to make sure that our widget is always positioned at viewport's center. */
-    SignalingInstrument *resizeSignalingInstrument = new SignalingInstrument(Instrument::VIEWPORT, Instrument::makeSet(QEvent::Resize), this);
+    SignalingInstrument *resizeSignalingInstrument = new SignalingInstrument(Instrument::Viewport, Instrument::makeSet(QEvent::Resize), this);
     m_display->instrumentManager()->installInstrument(resizeSignalingInstrument);
     connect(resizeSignalingInstrument, SIGNAL(activated(QWidget *, QEvent *)), this, SLOT(at_viewport_resized()));
 
@@ -90,7 +90,7 @@ void QnCameraMotionMaskWidget::init()
 	m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Border, qnGlobals->motionMaskRubberBandBorderColor());
     m_display->instrumentManager()->installInstrument(m_motionSelectionInstrument);
 
-    m_clickInstrument = new ClickInstrument(Qt::LeftButton, 0, Instrument::ITEM, this);
+    m_clickInstrument = new ClickInstrument(Qt::LeftButton, 0, Instrument::Item, this);
     connect(m_clickInstrument,  SIGNAL(clicked(QGraphicsView*, QGraphicsItem*, const ClickInfo&)),                                  this,                           SLOT(at_itemClicked(QGraphicsView*, QGraphicsItem*, const ClickInfo&)));
     m_display->instrumentManager()->installInstrument(m_clickInstrument);
 
@@ -140,7 +140,7 @@ const QList<QnMotionRegion>& QnCameraMotionMaskWidget::motionRegionList() const
 }
 
 const QnResourcePtr &QnCameraMotionMaskWidget::camera() const {
-    return m_camera;
+    return m_camera; // TODO: returning temporary here.
 }
 
 void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
@@ -162,13 +162,13 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
         item->setPinned(true);
         item->setGeometry(QRect(0, 0, 1, 1));
         m_context->workbench()->currentLayout()->addItem(item);
-        m_context->workbench()->setItem(QnWorkbench::ZOOMED, item);
+        m_context->workbench()->setItem(Qn::ZoomedRole, item);
 
         /* Set up the corresponding widget. */
         m_resourceWidget = m_display->widget(item);
         m_resourceWidget->setDrawMotionWindows(QnResourceWidget::DrawAllMotionInfo);
-        m_resourceWidget->setDisplayFlag(QnResourceWidget::DISPLAY_BUTTONS, false);
-        m_resourceWidget->setDisplayFlag(QnResourceWidget::DISPLAY_MOTION_GRID, true);
+        m_resourceWidget->setDisplayFlag(QnResourceWidget::DisplayButtons, false);
+        m_resourceWidget->setDisplayFlag(QnResourceWidget::DisplayMotionGrid, true);
         //m_resourceWidget->setMotionRegionList(m_camera->getMotionRegionList());
     }
 
@@ -185,7 +185,7 @@ void QnCameraMotionMaskWidget::at_viewport_resized() {
     m_display->fitInView(false);
 }
 
-void QnCameraMotionMaskWidget::at_motionRegionSelected(QGraphicsView *view, QnResourceWidget *widget, const QRect &gridRect)
+void QnCameraMotionMaskWidget::at_motionRegionSelected(QGraphicsView *, QnResourceWidget *widget, const QRect &gridRect)
 {
     if (!m_resourceWidget)
         return;

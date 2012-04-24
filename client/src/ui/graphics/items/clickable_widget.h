@@ -4,6 +4,11 @@
 #include <QGraphicsWidget>
 #include <ui/processors/clickable.h>
 
+/**
+ * Graphics widget that provides signals for mouse click and double click events.
+ * 
+ * Note that the signal is emitted when the mouse button is released.
+ */
 class QnClickableWidget: public Clickable<QGraphicsWidget> {
     Q_OBJECT;
 

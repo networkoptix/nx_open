@@ -2,17 +2,19 @@
 #define QN_NOPTIX_STYLE_H
 
 #include <QProxyStyle>
+#include <ui/graphics/items/standard/graphics_style.h>
 
 class QnNoptixStyleAnimator;
 class QnSkin;
 
-class QnNoptixStyle: public QProxyStyle { 
+class QnNoptixStyle: public QProxyStyle, public GraphicsStyle { 
     Q_OBJECT;
 
     typedef QProxyStyle base_type;
 
 public:
     QnNoptixStyle(QStyle *style = NULL);
+    virtual ~QnNoptixStyle();
 
     virtual void drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget = 0) const override;
     virtual void drawControl(ControlElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget = 0) const override;
@@ -25,6 +27,8 @@ public:
     virtual void unpolish(QApplication *application) override;
     virtual void polish(QWidget *widget) override;
     virtual void unpolish(QWidget *widget) override;
+
+    using base_type::subControlRect;
 
 protected:
     bool drawMenuItemControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
@@ -48,9 +52,14 @@ private:
 };
 
 
-namespace {
-    const char *hideCheckBoxInMenuPropertyName = "_qn_hideCheckBoxInMenu";
-    const char *itemViewItemBackgroundOpacity = "_qn_itemViewItemBackgroundOpacity";
-}
+namespace Qn { namespace {
+    const char *HideCheckBoxInMenu              = "_qn_hideCheckBoxInMenu";
+    const char *ItemViewItemBackgroundOpacity   = "_qn_itemViewItemBackgroundOpacity";
+    const char *SliderLength                    = "_qn_sliderLength";
+
+#define HideCheckBoxInMenu HideCheckBoxInMenu
+#define ItemViewItemBackgroundOpacity ItemViewItemBackgroundOpacity
+#define SliderLength SliderLength
+}}
 
 #endif // QN_NOPTIX_STYLE_H

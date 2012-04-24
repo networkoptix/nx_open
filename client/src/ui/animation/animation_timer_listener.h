@@ -27,10 +27,10 @@ protected:
      * shouldn't generally depend on absolute time. In case absolute time is 
      * needed, in can be computed as a sum of delta values.
      *
-     * \param deltaTime                 Time that has passed since the last tick,
+     * \param deltaMSecs                Time that has passed since the last tick,
      *                                  in milliseconds.
      */
-    virtual void tick(int deltaTime) = 0;
+    virtual void tick(int deltaMSecs) = 0;
 
     /**
      * Activates the link between this listener and its associated timer so 

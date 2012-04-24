@@ -84,6 +84,7 @@ static const qint64 INT64_MIN = 0x8000000000000000ll;
 #endif
 
 static const qint64 DATETIME_NOW = INT64_MAX;
+#define DATETIME_NOW DATETIME_NOW /* Get some syntax highlighting. */
 
 static const char *DEFAULT_APPSERVER_HOST = "127.0.0.1";
 static const int DEFAULT_APPSERVER_PORT = 8000;

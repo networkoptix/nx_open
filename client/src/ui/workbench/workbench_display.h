@@ -6,11 +6,9 @@
 #include <core/resource/resource_fwd.h>
 #include <ui/animation/animation_timer_listener.h>
 #include <ui/common/scene_utility.h>
-#include <ui/common/margin_flags.h>
 #include <utils/common/rect_set.h>
 #include "recording/time_period.h"
-#include "workbench.h"
-#include "workbench_item.h" /* For QnWorkbenchItem::ItemFlag. */
+#include "workbench_globals.h"
 #include "workbench_context_aware.h"
 
 class QGraphicsScene;
@@ -22,6 +20,7 @@ class TransformListenerInstrument;
 class ActivityListenerInstrument;
 class ForwardingInstrument;
 class AnimationInstrument;
+class SignalingInstrument;
 class SelectionOverlayHackInstrument;
 
 class QnAbstractRenderer;
@@ -39,6 +38,7 @@ class QnCurtainItem;
 class QnGridItem;
 class QnWorkbenchRenderWatcher;
 class QnWorkbenchContext;
+class QnWorkbenchStreamSynchronizer;
 
 class CLVideoCamera;
 class CLCamDisplay;
@@ -51,25 +51,9 @@ class CLCamDisplay;
 class QnWorkbenchDisplay: public QObject, public QnWorkbenchContextAware, protected AnimationTimerListener, protected SceneUtility {
     Q_OBJECT;
     Q_PROPERTY(qreal widgetsFrameOpacity READ widgetsFrameOpacity WRITE setWidgetsFrameOpacity);
-    Q_ENUMS(Layer);
+    Q_ENUMS(Qn::ItemLayer);
 
 public:
-    /**
-     * Layer of an item.
-     */
-    enum Layer {
-        BackLayer,                  /**< Back layer. */
-        PinnedLayer,                /**< Layer for pinned items. */
-        PinnedRaisedLayer,          /**< Layer for pinned items that are raised. */
-        UnpinnedLayer,              /**< Layer for unpinned items. */
-        UnpinnedRaisedLayer,        /**< Layer for unpinned items that are raised. */
-        CurtainLayer,               /**< Layer for curtain that blacks out the background when an item is zoomed. */
-        ZoomedLayer,                /**< Layer for zoomed items. */
-        FrontLayer,                 /**< Topmost layer for items. Items that are being dragged, resized or manipulated in any other way are to be placed here. */
-        EffectsLayer,               /**< Layer for top-level effects. */
-        UiLayer,                    /**< Layer for ui elements, i.e. close button, navigation bar, etc... */
-    };
-
     /**
      * Constructor.
      * 
@@ -77,15 +61,18 @@ public:
      */
     QnWorkbenchDisplay(QObject *parent = NULL);
 
-	/**
-	  * This is method initSyncPlay. Should be called for only main display.
-	*/
-	void initSyncPlay();
-
     /**
      * Virtual destructor.
      */
     virtual ~QnWorkbenchDisplay();
+
+    /**
+     * \param synchronized              Whether camera streams on the scene should
+     *                                  be synchronized.
+     */
+    void setStreamsSynchronized(bool synchronized);
+
+    bool isStreamsSynchronized() const;
 
     /**
      * \returns                         Instrument manager owned by this workbench display. 
@@ -132,6 +119,15 @@ public:
     SelectionOverlayHackInstrument *selectionOverlayHackInstrument() const {
         return m_selectionOverlayHackInstrument;
     }
+
+    SignalingInstrument *beforePaintInstrument() const {
+        return m_beforePaintInstrument;
+    }
+
+    SignalingInstrument *afterPaintInstrument() const {
+        return m_afterPaintInstrument;
+    }
+
 
     /**
      * Note that this function never returns NULL.
@@ -181,7 +177,7 @@ public:
      */
     QnResourceWidget *widget(QnAbstractRenderer *renderer) const;
 
-    QnResourceWidget *widget(QnWorkbench::ItemRole role) const;
+    QnResourceWidget *widget(Qn::ItemRole role) const;
 
     QList<QnResourceWidget *> widgets() const;
 
@@ -250,13 +246,13 @@ public:
     void bringToFront(QnWorkbenchItem *item);
 
 
-    Layer layer(QGraphicsItem *item) const;
+    Qn::ItemLayer layer(QGraphicsItem *item) const;
 
-    void setLayer(QGraphicsItem *item, Layer layer);
+    void setLayer(QGraphicsItem *item, Qn::ItemLayer layer);
 
-    void setLayer(const QList<QGraphicsItem *> &items, Layer layer);
+    void setLayer(const QList<QGraphicsItem *> &items, Qn::ItemLayer layer);
 
-    qreal layerZValue(Layer layer) const;
+    qreal layerZValue(Qn::ItemLayer layer) const;
 
     void synchronize(QnWorkbenchItem *item, bool animate = true);
     
@@ -271,8 +267,6 @@ public:
 
     QPointF mapGlobalToGridF(const QPoint &globalPoint) const;
 
-    QnWorkbenchRenderWatcher *renderWatcher() const;
-
 public slots:
     void fitInView(bool animate = true);
 
@@ -282,9 +276,9 @@ signals:
 
     void widgetAdded(QnResourceWidget *widget);
     void widgetAboutToBeRemoved(QnResourceWidget *widget);
-    void widgetChanged(QnWorkbench::ItemRole role);
-    
-    void enableItemSync(bool value);
+    void widgetChanged(Qn::ItemRole role);
+
+    void streamsSynchronizedChanged(bool synchronized);
 
 protected:
     virtual void tick(int deltaTime) override;
@@ -302,9 +296,9 @@ protected:
 
     void adjustGeometry(QnWorkbenchItem *item, bool animate = true);
 
-    qreal layerFrontZValue(Layer layer) const;
-    Layer synchronizedLayer(QnWorkbenchItem *item) const;
-    Layer shadowLayer(Layer itemLayer) const;
+    qreal layerFrontZValue(Qn::ItemLayer layer) const;
+    Qn::ItemLayer synchronizedLayer(QnWorkbenchItem *item) const;
+    Qn::ItemLayer shadowLayer(Qn::ItemLayer itemLayer) const;
 
     bool addItemInternal(QnWorkbenchItem *item, bool animate = true);
     bool removeItemInternal(QnWorkbenchItem *item, bool destroyWidget, bool destroyItem);
@@ -330,9 +324,8 @@ protected slots:
     void at_workbench_itemAdded(QnWorkbenchItem *item);
     void at_workbench_itemRemoved(QnWorkbenchItem *item);
 
-    void at_workbench_modeChanged();
-    void at_workbench_itemChanged(QnWorkbench::ItemRole role, QnWorkbenchItem *item);
-    void at_workbench_itemChanged(QnWorkbench::ItemRole role);
+    void at_workbench_itemChanged(Qn::ItemRole role, QnWorkbenchItem *item);
+    void at_workbench_itemChanged(Qn::ItemRole role);
     void at_workbench_currentLayoutChanged();
 
     void at_context_permissionsChanged(const QnResourcePtr &resource);
@@ -340,7 +333,7 @@ protected slots:
     void at_item_geometryChanged();
     void at_item_geometryDeltaChanged();
     void at_item_rotationChanged();
-    void at_item_flagChanged(QnWorkbenchItem::ItemFlag flag, bool value);
+    void at_item_flagChanged(Qn::ItemFlag flag, bool value);
 
     void at_activityStopped();
     void at_activityStarted();
@@ -365,8 +358,8 @@ private:
     /** Current view. */
     QGraphicsView *m_view;
 
-    /** Render watcher. */
-    QnWorkbenchRenderWatcher *m_renderWatcher;
+    /** Stream synchronizer. */
+    QnWorkbenchStreamSynchronizer *m_streamSynchronizer;
 
 
     /* Internal state. */
@@ -381,10 +374,7 @@ private:
     qreal m_frontZ;
 
     /** Current items by role. */
-    QnWorkbenchItem *m_itemByRole[QnWorkbench::ITEM_ROLE_COUNT];
-
-    /** Current workbench mode. */
-    QnWorkbench::Mode m_mode;
+    QnWorkbenchItem *m_itemByRole[Qn::ItemRoleCount];
 
     /** Grid item. */
     QWeakPointer<QnGridItem> m_gridItem;
@@ -424,6 +414,10 @@ private:
 
     /** Selection overlay hack instrument. */
     SelectionOverlayHackInstrument *m_selectionOverlayHackInstrument;
+
+    SignalingInstrument *m_beforePaintInstrument;
+
+    SignalingInstrument *m_afterPaintInstrument;
 
 
     /* Animation-related stuff. */
