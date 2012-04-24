@@ -39,14 +39,12 @@ void parseMotionRegionList(QList<QnMotionRegion>& regions, const QString& region
     for (int i = 0; i < regList.size(); ++i)
     {
         QnMotionRegion region;
-        region.addRect((QnMotionRegion::MAX_SENSITIVITY - QnMotionRegion::MIN_SENSITIVITY)/2, QRect(0,0,MD_WIDTH, MD_HEIGHT));
+        //region.addRect((QnMotionRegion::MAX_SENSITIVITY - QnMotionRegion::MIN_SENSITIVITY)/2, QRect(0,0,MD_WIDTH, MD_HEIGHT));
         regions << region;
     }
 
     for (int i = 0; i < regList.size(); ++i)
-    {
         parseMotionRegion(regions[i], regList[i]);
-    }
 }
 
 void parseMotionRegion(QnMotionRegion& region, const QString& regionString)

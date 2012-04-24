@@ -253,6 +253,7 @@ public:
         DrawMaskOnly,
         DrawAllMotionInfo
     };
+    QList<QnMotionRegion>& getMotionRegionList();
 
 public slots:
     void showActivityDecorations();

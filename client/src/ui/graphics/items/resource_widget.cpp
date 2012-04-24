@@ -1128,3 +1128,8 @@ void QnResourceWidget::setDrawMotionWindows(MotionDrawType value)
 {
     m_motionDrawType = value;   
 }
+
+QList<QnMotionRegion>& QnResourceWidget::getMotionRegionList()
+{
+    return m_motionRegionList;
+}

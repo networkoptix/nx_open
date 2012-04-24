@@ -5,6 +5,7 @@
 #include <QGraphicsView>
 #include "core/resource/resource.h"
 #include "core/resource/camera_resource.h"
+#include "ui/graphics/instruments/click_instrument.h"
 
 class MotionSelectionInstrument;
 
@@ -36,18 +37,19 @@ public:
     void setMotionSensitivity(int value);
 signals:
     void motionRegionListChanged();
-
+public slots:
+    void clearMotion();
 protected slots:
     void at_viewport_resized();
     void at_motionRegionSelected(QGraphicsView *, QnResourceWidget *, const QRect &);
-    void at_motionRegionCleared(QGraphicsView *, QnResourceWidget *);
-
+    void at_motionRegionCleared();
+    void at_itemClicked(QGraphicsView*, QGraphicsItem*, const ClickInfo&);
 private:
     void init();
-
+    int gridPosToChannelPos(QPoint& pos);
 private:
     QnVirtualCameraResourcePtr m_camera;
-    QList<QnMotionRegion> m_motionRegionList;
+    //QList<QnMotionRegion> m_motionRegionList;
 
     /* Destruction order is important here, hence the scoped pointers. */
 
@@ -60,6 +62,8 @@ private:
     QScopedPointer<QnWorkbenchController> m_controller;
 
     MotionSelectionInstrument *m_motionSelectionInstrument;
+    ClickInstrument* m_clickInstrument;
+    QnResourceWidget* m_resourceWidget;
 
     bool m_readOnly;
     int m_motionSensitivity;

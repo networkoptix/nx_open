@@ -49,6 +49,7 @@ private slots:
     void at_linkActivated(const QString &urlString);
     void at_motionTypeChanged();
     void at_motionSensitivityChanged(int value);
+    void at_motionSelectionCleared();
 private:
     void setHasChanges(bool hasChanges);
 

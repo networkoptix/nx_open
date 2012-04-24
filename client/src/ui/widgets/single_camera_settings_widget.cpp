@@ -36,6 +36,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->cameraMotionButton, SIGNAL(clicked(bool)), SLOT(at_motionTypeChanged()));
     connect(ui->softwareMotionButton, SIGNAL(clicked(bool)), SLOT(at_motionTypeChanged()));
     connect(ui->comboBoxSensetivity, SIGNAL(currentIndexChanged(int)), this, SLOT(at_motionSensitivityChanged(int)));
+    connect(ui->clearAllButton, SIGNAL(clicked()), this, SLOT(at_motionSelectionCleared()));
 
     updateFromResource();
 }
@@ -57,6 +58,13 @@ void QnSingleCameraSettingsWidget::at_motionTypeChanged()
     //ui->motionWEBPageLink->setEnabled(!ui->motionGridButton->isChecked());
     at_dataChanged();
 }
+
+void QnSingleCameraSettingsWidget::at_motionSelectionCleared()
+{
+    if (m_motionWidget)
+        m_motionWidget->clearMotion();
+}
+
 
 void QnSingleCameraSettingsWidget::at_linkActivated(const QString &urlString)
 {
