@@ -17,8 +17,9 @@ QnSecurityCamResource::QnSecurityCamResource()
         metaTypesInitialized = true;
     }
 
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
         m_motionMaskList << QnMotionRegion();
+    }
 
     addFlags(live_cam);
 }
@@ -38,7 +39,7 @@ void QnSecurityCamResource::updateInner(QnResourcePtr other)
         const QnVideoResourceLayout* layout = getVideoLayout();
         int numChannels = layout->numberOfChannels();
 
-        for (int i = 0; i < numChannels; ++i)
+        for (int i = 0; i < numChannels; ++i) 
             setMotionRegion(other_casted->m_motionMaskList[i], QnDomainPhysical, i);
         m_scheduleTasks = other_casted->m_scheduleTasks;
         m_motionType = other_casted->m_motionType;

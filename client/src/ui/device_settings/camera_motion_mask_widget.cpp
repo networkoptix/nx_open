@@ -204,8 +204,12 @@ void QnCameraMotionMaskWidget::at_motionRegionSelected(QGraphicsView *view, QnRe
 
         if (!r.isEmpty()) 
         {
-            widget->addToMotionRegion(m_motionSensitivity, r, i);
-            changed = true;
+            if (widget->addToMotionRegion(m_motionSensitivity, r, i)) {
+                changed = true;
+            }
+            else {
+                showToManyWindowsMessage();
+            }
         }
     }
     
@@ -230,6 +234,21 @@ void QnCameraMotionMaskWidget::at_motionRegionCleared()
 
     if(changed)
         emit motionRegionListChanged();
+}
+
+void QnCameraMotionMaskWidget::setMaxMotionRects(int value)
+{
+    bool needShowError = false;
+    if (m_resourceWidget) {
+        QList<QnMotionRegion>& regions = m_resourceWidget->getMotionRegionList();
+        for (int i = 0; i < regions.size(); ++i) {
+            regions[i].setMaxRectCount(value);
+            if (!regions[i].isValid())
+                needShowError = true;
+        }
+    }
+    if (needShowError)
+        showToManyWindowsMessage();
 }
 
 void QnCameraMotionMaskWidget::setMotionSensitivity(int value)
@@ -267,4 +286,13 @@ void QnCameraMotionMaskWidget::at_itemClicked(QGraphicsView* view, QGraphicsItem
     int channel = gridPosToChannelPos(gridPos);
     if (m_resourceWidget->getMotionRegionList()[channel].updateSensitivityAt(gridPos, m_motionSensitivity))
         emit motionRegionListChanged();
+}
+
+void QnCameraMotionMaskWidget::showToManyWindowsMessage()
+{
+    QList<QnMotionRegion>& regions = m_resourceWidget->getMotionRegionList();
+    int maxCnt = 0;
+    for (int i = 0; i < regions.size(); ++i)
+        maxCnt = qMax(maxCnt, regions[i].getCurrentRectCount());
+    QMessageBox::warning(this, tr("Too many motion windows"), tr("Maximum amount of motion windows for current camera is %1. Now selected %2 motion windows").arg(m_camera->motionWindowCnt()).arg(maxCnt));
 }

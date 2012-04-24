@@ -35,7 +35,8 @@ public:
     void setReadOnly(bool readOnly);
 
     void setMotionSensitivity(int value);
-
+    void setMaxMotionRects(int value);
+    
 signals:
     void motionRegionListChanged();
 
@@ -51,7 +52,8 @@ protected slots:
 private:
     void init();
     int gridPosToChannelPos(QPoint& pos);
-
+    void showToManyWindowsMessage();
+    
 private:
     QnVirtualCameraResourcePtr m_camera;
     //QList<QnMotionRegion> m_motionRegionList;

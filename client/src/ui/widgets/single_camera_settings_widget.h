@@ -52,7 +52,7 @@ private slots:
     void at_motionSelectionCleared();
 private:
     void setHasChanges(bool hasChanges);
-
+    void updateMaxMotionRect();
 private:
     Q_DISABLE_COPY(QnSingleCameraSettingsWidget);
 
