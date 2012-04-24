@@ -530,8 +530,10 @@ void QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
 #if 0
     // test
     fillFrameRect(m_frames[idx], QRect(0,0,m_frames[idx]->width, m_frames[idx]->height), 130);
-    if ((m_totalFrames/8) % 2 == 1)
+    if (m_totalFrames % 2 == 1)
         fillFrameRect(m_frames[idx], QRect(QPoint(0, m_frames[idx]->height/2), QPoint(m_frames[idx]->width, m_frames[idx]->height)), 110);
+    else
+        fillFrameRect(m_frames[idx], QRect(QPoint(0, 0), QPoint(m_frames[idx]->width, m_frames[idx]->height/2)), 110);
 #endif
 
     if (m_decoder->getWidth() != m_lastImgWidth || m_decoder->getHeight() != m_lastImgHeight || m_isNewMask)

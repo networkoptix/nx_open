@@ -163,9 +163,9 @@ void QnLiveStreamProvider::updateMotion()
     Q_ASSERT(res);
     const QnVideoResourceLayout* layout = res->getVideoLayout();
 
+    setUseSoftwareMotion(res->getMotionType() == MT_SoftwareGrid);
     if (getRole() == QnResource::Role_SecondaryLiveVideo && res->getMotionType() == MT_SoftwareGrid)
     {
-        setUseSoftwareMotion(true);
         for (int i = 0; i < layout->numberOfChannels(); ++i)
         {
             QnMotionRegion region = res->getMotionRegion(i);
@@ -267,7 +267,7 @@ bool QnLiveStreamProvider::needMetaData()
             return false;
     }
 
-    if (m_framesSinceLastMetaData == 0)
+    if (m_softwareMotion || m_framesSinceLastMetaData == 0)
         return false;
 
     bool result = (m_framesSinceLastMetaData > 10 || m_timeSinceLastMetaData.elapsed() > META_DATA_DURATION_MS);
