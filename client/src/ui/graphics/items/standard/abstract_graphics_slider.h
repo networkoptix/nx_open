@@ -104,14 +104,14 @@ protected:
     };
     virtual void sliderChange(SliderChange change);
 
-    void initStyleOption(QStyleOption *option) const;
+    virtual void initStyleOption(QStyleOption *option) const override;
 
-    bool event(QEvent *event);
-    void changeEvent(QEvent *event);
-    void keyPressEvent(QKeyEvent *event);
-    void timerEvent(QTimerEvent *event);
+    virtual bool event(QEvent *event) override;
+    virtual void changeEvent(QEvent *event) override;
+    virtual void keyPressEvent(QKeyEvent *event) override;
+    virtual void timerEvent(QTimerEvent *event) override;
 #ifndef QT_NO_WHEELEVENT
-    void wheelEvent(QGraphicsSceneWheelEvent *event);
+    virtual void wheelEvent(QGraphicsSceneWheelEvent *event) override;
 #endif
 
 protected:

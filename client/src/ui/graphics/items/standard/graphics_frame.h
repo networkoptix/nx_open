@@ -60,15 +60,15 @@ public:
     QRectF frameRect() const;
     void setFrameRect(const QRectF &rect);
 
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
 protected:
-    void initStyleOption(QStyleOption *option) const;
+    virtual void initStyleOption(QStyleOption *option) const override;
 
-    QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
+    virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const override;
 
-    bool event(QEvent *event);
-    void changeEvent(QEvent *event);
+    virtual bool event(QEvent *event) override;
+    virtual void changeEvent(QEvent *event) override;
 
 protected:
     GraphicsFrame(GraphicsFramePrivate &dd, QGraphicsItem *parent, Qt::WindowFlags f = 0);

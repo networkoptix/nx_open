@@ -25,40 +25,6 @@ void GraphicsSliderPrivate::init()
     if (orientation == Qt::Vertical)
         sp.transpose();
     q->setSizePolicy(sp);
-
-    mapperDirty = true;
-}
-
-void GraphicsSliderPrivate::invalidateMapper() {
-    if(mapperDirty)
-        return;
-
-    mapperDirty = true;
-    q_func()->sliderChange(GraphicsSlider::SliderMappingChange);
-}
-
-void GraphicsSliderPrivate::ensureMapper() const {
-    if(!mapperDirty)
-        return;
-
-    Q_Q(const GraphicsSlider);
-
-    QStyleOptionSlider opt;
-    q->initStyleOption(&opt);
-    upsideDown = opt.upsideDown;
-
-    QRect grooveRect = q->style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderGroove, q);
-    QRect handleRect = q->style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle, q);
-
-    if (q->orientation() == Qt::Horizontal) {
-        pixelPosMin = grooveRect.x();
-        pixelPosMax = grooveRect.right() - handleRect.width() + 1;
-    } else {
-        pixelPosMin = grooveRect.y();
-        pixelPosMax = grooveRect.bottom() - handleRect.height() + 1;
-    }
-
-    mapperDirty = false;
 }
 
 void GraphicsSliderPrivate::updateHoverControl(const QPoint &pos)
@@ -89,131 +55,31 @@ QStyle::SubControl GraphicsSliderPrivate::newHoverControl(const QPoint &pos)
     return hoverControl;
 }
 
-
-/*!
-    \class GraphicsSlider
-    \brief The GraphicsSlider widget provides a vertical or horizontal slider.
-
-    \ingroup basicwidgets
-
-
-    The slider is the classic widget for controlling a bounded value.
-    It lets the user move a slider handle along a horizontal or vertical
-    groove and translates the handle's position into an integer value
-    within the legal range.
-
-    GraphicsSlider has very few of its own functions; most of the functionality is in
-    AbstractGraphicsSlider. The most useful functions are setValue() to set
-    the slider directly to some value; triggerAction() to simulate
-    the effects of clicking (useful for shortcut keys);
-    setSingleStep(), setPageStep() to set the steps; and setMinimum()
-    and setMaximum() to define the range of the scroll bar.
-
-    GraphicsSlider provides methods for controlling tickmarks.  You can use
-    setTickPosition() to indicate where you want the tickmarks to be,
-    setTickInterval() to indicate how many of them you want. the
-    currently set tick position and interval can be queried using the
-    tickPosition() and tickInterval() functions, respectively.
-
-    GraphicsSlider inherits a comprehensive set of signals:
-    \table
-    \header \o Signal \o Description
-    \row \o \l valueChanged()
-    \o Emitted when the slider's value has changed. The tracking()
-       determines whether this signal is emitted during user
-       interaction.
-    \row \o \l sliderPressed()
-    \o Emitted when the user starts to drag the slider.
-    \row \o \l sliderMoved()
-    \o Emitted when the user drags the slider.
-    \row \o \l sliderReleased()
-    \o Emitted when the user releases the slider.
-    \endtable
-
-    GraphicsSlider only provides integer ranges. Note that although
-    GraphicsSlider handles very large numbers, it becomes difficult for users
-    to use a slider accurately for very large ranges.
-
-    A slider accepts focus on Tab and provides both a mouse wheel and a
-    keyboard interface. The keyboard interface is the following:
-
-    \list
-        \o Left/Right move a horizontal slider by one single step.
-        \o Up/Down move a vertical slider by one single step.
-        \o PageUp moves up one page.
-        \o PageDown moves down one page.
-        \o Home moves to the start (mininum).
-        \o End moves to the end (maximum).
-    \endlist
-
-    \table 100%
-    \row \o \inlineimage macintosh-slider.png Screenshot of a Macintosh slider
-         \o A slider shown in the \l{Macintosh Style Widget Gallery}{Macintosh widget style}.
-    \row \o \inlineimage windows-slider.png Screenshot of a Windows XP slider
-         \o A slider shown in the \l{Windows XP Style Widget Gallery}{Windows XP widget style}.
-    \row \o \inlineimage plastique-slider.png Screenshot of a Plastique slider
-         \o A slider shown in the \l{Plastique Style Widget Gallery}{Plastique widget style}.
-    \endtable
-
-    \sa QScrollBar, QSpinBox, QDial, {fowler}{GUI Design Handbook: Slider}, {Sliders Example}
-*/
-
-/*!
-    \enum GraphicsSlider::TickPosition
-
-    This enum specifies where the tick marks are to be drawn relative
-    to the slider's groove and the handle the user moves.
-
-    \value NoTicks Do not draw any tick marks.
-    \value TicksBothSides Draw tick marks on both sides of the groove.
-    \value TicksAbove Draw tick marks above the (horizontal) slider
-    \value TicksBelow Draw tick marks below the (horizontal) slider
-    \value TicksLeft Draw tick marks to the left of the (vertical) slider
-    \value TicksRight Draw tick marks to the right of the (vertical) slider
-*/
-
-/*!
-    Constructs a vertical slider with the given \a parent.
-*/
 GraphicsSlider::GraphicsSlider(QGraphicsItem *parent)
-    : AbstractGraphicsSlider(*new GraphicsSliderPrivate, parent)
+    : base_type(*new GraphicsSliderPrivate, parent)
 {
     Q_D(GraphicsSlider);
     d->orientation = Qt::Horizontal;
     d->init();
 }
 
-/*!
-    Constructs a slider with the given \a parent. The \a orientation
-    parameter determines whether the slider is horizontal or vertical;
-    the valid values are Qt::Vertical and Qt::Horizontal.
-*/
 GraphicsSlider::GraphicsSlider(Qt::Orientation orientation, QGraphicsItem *parent)
-    : AbstractGraphicsSlider(*new GraphicsSliderPrivate, parent)
+    : base_type(*new GraphicsSliderPrivate, parent)
 {
     Q_D(GraphicsSlider);
     d->orientation = orientation;
     d->init();
 }
 
-/*!
-    \internal
-*/
 GraphicsSlider::GraphicsSlider(GraphicsSliderPrivate &dd, QGraphicsItem *parent)
-    : AbstractGraphicsSlider(dd, parent)
+    : base_type(dd, parent)
 {
 }
 
-/*!
-    Destroys this slider.
-*/
 GraphicsSlider::~GraphicsSlider()
 {
 }
 
-/*!
-    \reimp
-*/
 void GraphicsSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *)
 {
     Q_UNUSED(option)
@@ -235,29 +101,6 @@ void GraphicsSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     style()->drawComplexControl(QStyle::CC_Slider, &opt, painter, this);
 }
 
-void GraphicsSlider::updateGeometry() {
-    d_func()->invalidateMapper();
-
-    base_type::updateGeometry();
-}
-
-void GraphicsSlider::resizeEvent(QGraphicsSceneResizeEvent *event) {
-    d_func()->invalidateMapper();    
-
-    base_type::resizeEvent(event);
-}
-
-void GraphicsSlider::sliderChange(SliderChange change) {
-    if(change != SliderValueChange && change != SliderMappingChange)
-        d_func()->invalidateMapper();
-
-    base_type::sliderChange(change);
-}
-
-/*!
-    \reimp
-*/
-
 bool GraphicsSlider::event(QEvent *event)
 {
     Q_D(GraphicsSlider);
@@ -268,19 +111,13 @@ bool GraphicsSlider::event(QEvent *event)
     case QEvent::GraphicsSceneHoverLeave:
         d->updateHoverControl(static_cast<QGraphicsSceneHoverEvent *>(event)->pos().toPoint());
         break;
-    case QEvent::StyleChange:
-        d_func()->invalidateMapper();
-        break;
     default:
         break;
     }
 
-    return AbstractGraphicsSlider::event(event);
+    return base_type::event(event);
 }
 
-/*!
-    \reimp
-*/
 void GraphicsSlider::mousePressEvent(QGraphicsSceneMouseEvent *ev)
 {
     Q_D(GraphicsSlider);
@@ -332,9 +169,6 @@ void GraphicsSlider::mousePressEvent(QGraphicsSceneMouseEvent *ev)
     }
 }
 
-/*!
-    \reimp
-*/
 void GraphicsSlider::mouseMoveEvent(QGraphicsSceneMouseEvent *ev)
 {
     Q_D(GraphicsSlider);
@@ -348,9 +182,6 @@ void GraphicsSlider::mouseMoveEvent(QGraphicsSceneMouseEvent *ev)
     setSliderPosition(valueFromPosition(ev->pos().toPoint() - d->clickOffset));
 }
 
-/*!
-    \reimp
-*/
 void GraphicsSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent *ev)
 {
     Q_D(GraphicsSlider);
@@ -373,16 +204,9 @@ void GraphicsSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent *ev)
     update(style()->subControlRect(QStyle::CC_Slider, &opt, oldPressed, this));
 }
 
-/*!
-    Initialize \a option with the values from this GraphicsSlider. This method
-    is useful for subclasses when they need a QStyleOptionSlider, but don't want
-    to fill in all the information themselves.
-
-    \sa QStyleOption::initFrom()
-*/
 void GraphicsSlider::initStyleOption(QStyleOption *option) const
 {
-    AbstractGraphicsSlider::initStyleOption(option);
+    base_type::initStyleOption(option);
 
     if (QStyleOptionSlider *sliderOption = qstyleoption_cast<QStyleOptionSlider *>(option)) {
         Q_D(const GraphicsSlider);
@@ -393,9 +217,6 @@ void GraphicsSlider::initStyleOption(QStyleOption *option) const
     }
 }
 
-/*!
-    \reimp
-*/
 QSizeF GraphicsSlider::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
 {
     if (which == Qt::MinimumSize || which == Qt::PreferredSize) {
@@ -429,19 +250,9 @@ QSizeF GraphicsSlider::sizeHint(Qt::SizeHint which, const QSizeF &constraint) co
         return sizeHint;
     }
 
-    return AbstractGraphicsSlider::sizeHint(which, constraint);
+    return base_type::sizeHint(which, constraint);
 }
 
-/*!
-    \property GraphicsSlider::tickPosition
-    \brief the tickmark position for this slider
-
-    The valid values are described by the GraphicsSlider::TickPosition enum.
-
-    The default value is \l GraphicsSlider::NoTicks.
-
-    \sa tickInterval
-*/
 void GraphicsSlider::setTickPosition(TickPosition position)
 {
     Q_D(GraphicsSlider);
@@ -455,17 +266,6 @@ GraphicsSlider::TickPosition GraphicsSlider::tickPosition() const
     return d_func()->tickPosition;
 }
 
-/*!
-    \property GraphicsSlider::tickInterval
-    \brief the interval between tickmarks
-
-    This is a value interval, not a pixel interval. If it is 0, the
-    slider will choose between singleStep() and pageStep().
-
-    The default value is 0.
-
-    \sa tickPosition, lineStep(), pageStep()
-*/
 qint64 GraphicsSlider::tickInterval() const
 {
     return d_func()->tickInterval;
@@ -475,27 +275,5 @@ void GraphicsSlider::setTickInterval(qint64 tickInterval)
 {
     d_func()->tickInterval = qMax(0ll, tickInterval);
     update();
-}
-
-QPointF GraphicsSlider::positionFromValue(qint64 logicalValue) const {
-    Q_D(const GraphicsSlider);
-
-    d->ensureMapper();
-
-    qreal result = d->pixelPosMin + GraphicsStyle::sliderPositionFromValue(d->minimum, d->maximum, logicalValue, d->pixelPosMax - d->pixelPosMin, d->upsideDown);
-    if(d->orientation == Qt::Horizontal) {
-        return QPointF(result, 0.0);
-    } else {
-        return QPointF(0.0, result);
-    }
-}
-
-qint64 GraphicsSlider::valueFromPosition(const QPointF &position) const {
-    Q_D(const GraphicsSlider);
-
-    d->ensureMapper();
-
-    qreal pixelPos = d->orientation == Qt::Horizontal ? position.x() : position.y();
-    return GraphicsStyle::sliderValueFromPosition(d->minimum, d->maximum, pixelPos - d->pixelPosMin, d->pixelPosMax - d->pixelPosMin, d->upsideDown);
 }
 

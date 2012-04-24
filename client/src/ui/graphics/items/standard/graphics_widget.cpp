@@ -37,6 +37,10 @@ GraphicsStyle *GraphicsWidget::style() const {
     return d->style;
 }
 
+void GraphicsWidget::initStyleOption(QStyleOption *option) const {
+    base_type::initStyleOption(option);
+}
+
 void GraphicsWidget::setStyle(GraphicsStyle *style) {
     setStyle(style->baseStyle());
 }

@@ -34,7 +34,7 @@ class AbstractGraphicsButton : public GraphicsWidget
 
 public:
     explicit AbstractGraphicsButton(QGraphicsItem *parent = 0);
-    ~AbstractGraphicsButton();
+    virtual ~AbstractGraphicsButton();
 
     QString text() const;
     void setText(const QString &text);
@@ -93,16 +93,16 @@ protected:
     virtual void checkStateSet();
     virtual void nextCheckState();
 
-    bool event(QEvent *e);
-    void keyPressEvent(QKeyEvent *e);
-    void keyReleaseEvent(QKeyEvent *e);
-    void mousePressEvent(QGraphicsSceneMouseEvent *e);
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *e);
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *e);
-    void focusInEvent(QFocusEvent *e);
-    void focusOutEvent(QFocusEvent *e);
-    void changeEvent(QEvent *e);
-    void timerEvent(QTimerEvent *e);
+    virtual bool event(QEvent *e) override;
+    virtual void keyPressEvent(QKeyEvent *e) override;
+    virtual void keyReleaseEvent(QKeyEvent *e) override;
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *e) override;
+    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *e) override;
+    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *e) override;
+    virtual void focusInEvent(QFocusEvent *e) override;
+    virtual void focusOutEvent(QFocusEvent *e) override;
+    virtual void changeEvent(QEvent *e) override;
+    virtual void timerEvent(QTimerEvent *e) override;
 
 protected:
     AbstractGraphicsButton(AbstractGraphicsButtonPrivate &dd, QGraphicsItem *parent);

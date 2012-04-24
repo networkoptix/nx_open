@@ -93,6 +93,10 @@ QRect GraphicsStyle::subElementRect(QStyle::SubElement element, const QStyleOpti
     return baseStyle()->subElementRect(element, option, NULL);
 }
 
+QStyle::SubControl GraphicsStyle::hitTestComplexControl(QStyle::ComplexControl control, const QStyleOptionComplex *option, const QPointF &position, const QGraphicsWidget *widget) const {
+    return hitTestComplexControl(control, option, position.toPoint(), widget);
+}
+
 qreal GraphicsStyle::sliderPositionFromValue(qint64 min, qint64 max, qint64 logicalValue, qreal span, bool upsideDown) {
     if (span <= 0 || logicalValue < min || max <= min)
         return 0;

@@ -1,12 +1,12 @@
 #ifndef GRAPHICSSLIDER_H
 #define GRAPHICSSLIDER_H
 
-#include "abstract_graphics_slider.h"
+#include "abstract_linear_graphics_slider.h"
 
 class GraphicsSliderPrivate;
 class GraphicsSliderPositionConverter;
 
-class GraphicsSlider : public AbstractGraphicsSlider
+class GraphicsSlider : public AbstractLinearGraphicsSlider
 {
     Q_OBJECT
 
@@ -14,7 +14,7 @@ class GraphicsSlider : public AbstractGraphicsSlider
     Q_PROPERTY(TickPosition tickPosition READ tickPosition WRITE setTickPosition)
     Q_PROPERTY(qint64 tickInterval READ tickInterval WRITE setTickInterval)
 
-    typedef AbstractGraphicsSlider base_type;
+    typedef AbstractLinearGraphicsSlider base_type;
 
 public:
     enum TickPosition {
@@ -38,13 +38,8 @@ public:
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
-    virtual void updateGeometry() override;
-
-    virtual QPointF positionFromValue(qint64 logicalValue) const override;
-    virtual qint64 valueFromPosition(const QPointF &position) const override;
-
 protected:
-    void initStyleOption(QStyleOption *option) const;
+    virtual void initStyleOption(QStyleOption *option) const override;
 
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const override;
 
@@ -52,9 +47,6 @@ protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
-    virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override;
-
-    virtual void sliderChange(SliderChange change) override;
 
 protected:
     GraphicsSlider(GraphicsSliderPrivate &dd, QGraphicsItem *parent);

@@ -24,6 +24,8 @@ protected:
     GraphicsWidget(GraphicsWidgetPrivate &dd, QGraphicsItem *parent, Qt::WindowFlags windowFlags = 0);
 
     virtual void changeEvent(QEvent *event) override;
+    
+    virtual void initStyleOption(QStyleOption *option) const;
 
 protected:
     QScopedPointer<GraphicsWidgetPrivate> d_ptr;
