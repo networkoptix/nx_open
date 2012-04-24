@@ -66,6 +66,7 @@ private:
     QnMotionEstimation m_motionEstimation[CL_MAX_CHANNELS];
     bool m_softwareMotion;
     int m_softMotionLastChannel;
+    const QnVideoResourceLayout* m_layout;
 };
 
 #endif //live_strem_provider_h_1508
