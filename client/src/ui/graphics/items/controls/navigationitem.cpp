@@ -221,16 +221,25 @@ NavigationItem::NavigationItem(QnWorkbenchDisplay *display, QGraphicsItem *paren
     rightLayoutV->addItem(m_timeLabel);
 
     QnTimeSlider *slider = new QnTimeSlider();
+    GraphicsScrollBar *scrollBar = new GraphicsScrollBar(Qt::Horizontal);
+
     QnWorkbenchNavigator *navigator = new QnWorkbenchNavigator(display, display);
     navigator->setTimeSlider(slider);
+    navigator->setScroolBar(scrollBar);
 
+    QGraphicsLinearLayout *sliderLayout = new QGraphicsLinearLayout(Qt::Vertical);
+    sliderLayout->setContentsMargins(0, 0, 0, 0);
+    sliderLayout->setSpacing(0);
+    sliderLayout->addItem(slider);
+    sliderLayout->setStretchFactor(slider, 0x1000);
+    sliderLayout->addItem(scrollBar);
 
     QGraphicsLinearLayout *mainLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     mainLayout->setContentsMargins(5, 0, 5, 0);
     mainLayout->setSpacing(10);
     mainLayout->addItem(leftLayoutV);
     mainLayout->addItem(m_timeSlider);
-    mainLayout->addItem(slider);
+    mainLayout->addItem(sliderLayout);
     mainLayout->addItem(rightLayoutV);
     setLayout(mainLayout);
 

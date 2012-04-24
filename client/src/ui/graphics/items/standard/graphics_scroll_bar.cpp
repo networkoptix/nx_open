@@ -205,7 +205,7 @@ void GraphicsScrollBar::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 
 /*! \reimp */
 QSizeF GraphicsScrollBar::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const {
-    if(which != Qt::MinimumSize)
+    if(which != Qt::MinimumSize && which != Qt::PreferredSize)
         return base_type::sizeHint(which, constraint);
 
     QStyleOptionSlider opt;

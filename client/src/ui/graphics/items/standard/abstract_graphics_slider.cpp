@@ -18,9 +18,21 @@ namespace {
 void AbstractGraphicsSliderPrivate::setSteps(qint64 single, qint64 page)
 {
     Q_Q(AbstractGraphicsSlider);
-    singleStep = qAbs(single);
-    pageStep = qAbs(page);
+    single = qAbs(single);
+    page = qAbs(page);
+
+    bool singleChanged = singleStep != single;
+    bool pageChanged = pageStep != page;
+
+    singleStep = single;
+    pageStep = page;
+    
     q->sliderChange(AbstractGraphicsSlider::SliderStepsChange);
+
+    if(singleChanged)
+        emit q->singleStepChanged(singleStep);
+    if(pageChanged)
+        emit q->pageStepChanged(pageStep);
 }
 
 

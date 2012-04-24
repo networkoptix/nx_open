@@ -5,6 +5,7 @@
 #include <QtGui/QAction>
 #include <QtGui/QMenu>
 #include <QtGui/QGraphicsSceneContextMenuEvent>
+#include <QtGui/QApplication>
 
 #include <utils/common/util.h>
 #include <utils/common/synctime.h>
@@ -30,12 +31,13 @@
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include <cstdint> // TODO: remove
 #include "libavutil/avutil.h" // TODO: remove
-
+#include <ui/graphics/items/standard/graphics_scroll_bar.h> // TODO: remove
 
 QnWorkbenchNavigator::QnWorkbenchNavigator(QnWorkbenchDisplay *display, QObject *parent):
     QObject(parent),
     QnWorkbenchContextAware(parent),
     m_timeSlider(NULL),
+    m_scrollBar(NULL),
     m_display(display),
     m_centralWidget(NULL),
     m_currentWidget(NULL),
@@ -62,9 +64,8 @@ void QnWorkbenchNavigator::setTimeSlider(QnTimeSlider *timeSlider) {
     if(m_timeSlider) {
         disconnect(m_timeSlider, NULL, this, NULL);
         
-        m_timeSlider->removeEventFilter(this);
-
-        deinitialize();
+        if(isValid())
+            deinitialize();
     }
 
     m_timeSlider = timeSlider;
@@ -72,10 +73,38 @@ void QnWorkbenchNavigator::setTimeSlider(QnTimeSlider *timeSlider) {
     if(m_timeSlider) {
         connect(m_timeSlider, SIGNAL(destroyed()), this, SLOT(at_timeSlider_destroyed()));
 
-        m_timeSlider->installEventFilter(this);
-
-        initialize();
+        if(isValid())
+            initialize();
     }
+}
+
+GraphicsScrollBar *QnWorkbenchNavigator::scrollBar() const {
+    return m_scrollBar;
+}
+
+void QnWorkbenchNavigator::setScroolBar(GraphicsScrollBar *scrollBar) {
+    if(m_scrollBar == scrollBar)
+        return;
+
+    if(m_scrollBar) {
+        disconnect(m_scrollBar, NULL, this, NULL);
+
+        if(isValid())
+            deinitialize();
+    }
+
+    m_scrollBar = scrollBar;
+
+    if(m_scrollBar) {
+        connect(m_scrollBar, SIGNAL(destroyed()), this, SLOT(at_scrollBar_destroyed()));
+
+        if(isValid())
+            initialize();
+    }
+}
+
+bool QnWorkbenchNavigator::isValid() {
+    return m_display && m_timeSlider && m_scrollBar;
 }
 
 void QnWorkbenchNavigator::initialize() {
@@ -85,12 +114,20 @@ void QnWorkbenchNavigator::initialize() {
     connect(m_display,                          SIGNAL(widgetAdded(QnResourceWidget *)),            this,   SLOT(at_display_widgetAdded(QnResourceWidget *)));
     connect(m_display,                          SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)), this,   SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
     connect(m_display,                          SIGNAL(streamsSynchronizedChanged()),               this,   SLOT(updateCurrentWidget()));
-    connect(m_display->beforePaintInstrument(), SIGNAL(activated(QWidget *, QEvent *)),             this,   SLOT(updateSlider()));
+    connect(m_display->beforePaintInstrument(), SIGNAL(activated(QWidget *, QEvent *)),             this,   SLOT(updateSliderFromReader()));
+    
     connect(m_timeSlider,                       SIGNAL(valueChanged(qint64)),                       this,   SLOT(at_timeSlider_valueChanged(qint64)));
     connect(m_timeSlider,                       SIGNAL(sliderPressed()),                            this,   SLOT(at_timeSlider_sliderPressed()));
     connect(m_timeSlider,                       SIGNAL(sliderReleased()),                           this,   SLOT(at_timeSlider_sliderReleased()));
-
+    connect(m_timeSlider,                       SIGNAL(rangeChanged(qint64, qint64)),               this,   SLOT(updateScrollBarFromSlider()));
+    connect(m_timeSlider,                       SIGNAL(windowChanged(qint64, qint64)),              this,   SLOT(updateScrollBarFromSlider()));
+    m_timeSlider->installEventFilter(this);
     m_timeSlider->setLineCount(SliderLineCount);
+
+    connect(m_scrollBar,                        SIGNAL(valueChanged(qint64)),                       this,   SLOT(updateSliderFromScrollBar()));
+    connect(m_scrollBar,                        SIGNAL(pageStepChanged(qint64)),                    this,   SLOT(updateSliderFromScrollBar()));
+    m_scrollBar->installEventFilter(this);
+
     updateLineComments();
 } 
 
@@ -99,6 +136,12 @@ void QnWorkbenchNavigator::deinitialize() {
 
     disconnect(m_display,                           NULL, this, NULL);
     disconnect(m_display->beforePaintInstrument(),  NULL, this, NULL);
+    
+    disconnect(m_timeSlider,                        NULL, this, NULL);
+    m_timeSlider->removeEventFilter(this);
+
+    disconnect(m_scrollBar,                         NULL, this, NULL);
+    m_scrollBar->removeEventFilter(this);
 
     m_currentWidget = NULL;
     m_currentWidgetIsCamera = false;
@@ -192,7 +235,7 @@ void QnWorkbenchNavigator::setCurrentWidget(QnResourceWidget *widget) {
     updateLineComments();
     m_timeSlider->setOption(QnTimeSlider::UseUTC, m_currentWidgetIsCamera);
 
-    updateSlider();
+    updateSliderFromReader();
     m_timeSlider->finishAnimations();
 
     updateCurrentPeriods();
@@ -263,7 +306,7 @@ QnCachingTimePeriodLoader *QnWorkbenchNavigator::loader(const QnResourcePtr &res
     return loader;
 }
 
-void QnWorkbenchNavigator::updateSlider() {
+void QnWorkbenchNavigator::updateSliderFromReader() {
     if (!m_currentWidget)
         return;
 
@@ -344,6 +387,18 @@ void QnWorkbenchNavigator::updateLineComments() {
     }
 }
 
+void QnWorkbenchNavigator::updateSliderFromScrollBar() {
+    m_timeSlider->setWindow(m_scrollBar->value(), m_scrollBar->value() + m_scrollBar->pageStep());
+}
+
+void QnWorkbenchNavigator::updateScrollBarFromSlider() {
+    qint64 windowSize = m_timeSlider->windowEnd() - m_timeSlider->windowStart();
+
+    m_scrollBar->setRange(m_timeSlider->minimum(), m_timeSlider->maximum() - windowSize);
+    m_scrollBar->setValue(m_timeSlider->windowStart());
+    m_scrollBar->setPageStep(windowSize);
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -352,6 +407,9 @@ bool QnWorkbenchNavigator::eventFilter(QObject *watched, QEvent *event) {
     if(watched == m_timeSlider && event->type() == QEvent::GraphicsSceneContextMenu) {
         at_timeSlider_contextMenuEvent(static_cast<QGraphicsSceneContextMenuEvent *>(event));
         return true;
+    } else if(watched == m_scrollBar && event->type() == QEvent::GraphicsSceneWheel) {
+        if(m_timeSlider->scene() && m_timeSlider->scene()->sendEvent(m_timeSlider, event))
+            return true;
     }
 
     return base_type::eventFilter(watched, event);
@@ -500,4 +558,12 @@ void QnWorkbenchNavigator::at_widget_motionSelectionChanged(QnResourceWidget *wi
 void QnWorkbenchNavigator::at_timeSlider_destroyed() {
     setTimeSlider(NULL);
 }
+
+void QnWorkbenchNavigator::at_scrollBar_destroyed() {
+    setScroolBar(NULL);
+}
+
+
+
+
 

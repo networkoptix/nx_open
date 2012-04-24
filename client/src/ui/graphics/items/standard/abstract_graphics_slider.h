@@ -82,6 +82,8 @@ public Q_SLOTS:
 
 Q_SIGNALS:
     void valueChanged(qint64 value);
+    void pageStepChanged(qint64 pageStep);
+    void singleStepChanged(qint64 singleStep);
 
     void sliderPressed();
     void sliderMoved(qint64 position);

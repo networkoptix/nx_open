@@ -16,6 +16,8 @@ class QRegion;
 class QAction;
 class QGraphicsSceneContextMenuEvent;
 
+class GraphicsScrollBar;
+
 class QnWorkbenchDisplay;
 class QnTimeSlider;
 class QnResourceWidget;
@@ -33,6 +35,9 @@ public:
 
     QnTimeSlider *timeSlider() const;
     void setTimeSlider(QnTimeSlider *timeSlider);
+
+    GraphicsScrollBar *scrollBar() const;
+    void setScroolBar(GraphicsScrollBar *scrollBar);
 
     QnResourceWidget *currentWidget();
 
@@ -53,6 +58,7 @@ protected:
 
     void initialize();
     void deinitialize();
+    bool isValid();
 
     void setCentralWidget(QnResourceWidget *widget);
     void addSyncedWidget(QnResourceWidget *widget);
@@ -63,7 +69,9 @@ protected:
     QnCachingTimePeriodLoader *loader(const QnResourcePtr &resource);
 
     Q_SLOT void updateCurrentWidget();
-    Q_SLOT void updateSlider();
+    Q_SLOT void updateSliderFromReader();
+    Q_SLOT void updateScrollBarFromSlider();
+    Q_SLOT void updateSliderFromScrollBar();
     void updateToolTipFormat();
 
     void updateCurrentPeriods();
@@ -88,8 +96,11 @@ protected slots:
     void at_timeSlider_destroyed();
     void at_timeSlider_contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
+    void at_scrollBar_destroyed();
+
 private:
     QnTimeSlider *m_timeSlider;
+    GraphicsScrollBar *m_scrollBar;
     QnWorkbenchDisplay *m_display;
 
     QSet<QnResourceWidget *> m_syncedWidgets;
