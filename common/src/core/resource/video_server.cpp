@@ -141,8 +141,8 @@ void QnVideoServerResource::setPrimaryIF(const QString& primaryIF)
 void QnVideoServerResource::determineOptimalNetIF()
 {
     QMutexLocker lock(&m_mutex);
-    if (m_prevNetAddrList == m_netAddrList)
-        return;
+    //if (m_prevNetAddrList == m_netAddrList)
+    //    return;
     m_prevNetAddrList = m_netAddrList;
     m_primaryIFSelected = false;
 
