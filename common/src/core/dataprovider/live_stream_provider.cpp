@@ -56,6 +56,8 @@ m_softMotionLastChannel(0)
     memset(mask, 10, sizeof(mask));
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
         m_motionEstimation[i].setMotionMask(QByteArray(mask, sizeof(mask))); // default mask
+
+    m_layout = 0;
 }
 
 QnLiveStreamProvider::~QnLiveStreamProvider()
@@ -161,12 +163,14 @@ void QnLiveStreamProvider::updateMotion()
 
     QnPhysicalCameraResourcePtr res = ap->getResource().dynamicCast<QnPhysicalCameraResource>();
     Q_ASSERT(res);
-    const QnVideoResourceLayout* layout = res->getVideoLayout();
+
+    if (m_layout == 0)
+        m_layout = res->getVideoLayout();
 
     setUseSoftwareMotion(res->getMotionType() == MT_SoftwareGrid);
     if (getRole() == QnResource::Role_SecondaryLiveVideo && res->getMotionType() == MT_SoftwareGrid)
     {
-        for (int i = 0; i < layout->numberOfChannels(); ++i)
+        for (int i = 0; i < m_layout->numberOfChannels(); ++i)
         {
             QnMotionRegion region = res->getMotionRegion(i);
             m_motionEstimation[i].setMotionMask(createSoftwareMotionMask(region));
@@ -245,15 +249,18 @@ bool QnLiveStreamProvider::isMaxFps() const
 bool QnLiveStreamProvider::needMetaData() 
 {
     // I assume this function is called once per video frame 
+    if (m_layout == 0)
+    {
+        QnAbstractMediaStreamDataProvider* ap = dynamic_cast<QnAbstractMediaStreamDataProvider*>(this);
+        QnPhysicalCameraResourcePtr res = ap->getResource().dynamicCast<QnPhysicalCameraResource>();
+        m_layout = res->getVideoLayout();
+    }
+
     if (getRole() == QnResource::Role_SecondaryLiveVideo) 
     {
         if (m_softwareMotion) 
         {
-            QnAbstractMediaStreamDataProvider* ap = dynamic_cast<QnAbstractMediaStreamDataProvider*>(this);
-            QnPhysicalCameraResourcePtr res = ap->getResource().dynamicCast<QnPhysicalCameraResource>();
-            const QnVideoResourceLayout* layout = res->getVideoLayout();
-
-            for (int i = 0; i < layout->numberOfChannels(); ++i)
+            for (int i = 0; i < m_layout->numberOfChannels(); ++i)
             {
                 bool rez = m_motionEstimation[i].existsMetadata();
                 if (rez) {
