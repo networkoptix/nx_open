@@ -64,6 +64,7 @@ QString QnVideoServerResource::getApiUrl() const
 void QnVideoServerResource::setNetAddrList(const QList<QHostAddress>& netAddrList)
 {
     QMutexLocker lock(&m_mutex);
+	qDebug() << netAddrList;
     m_netAddrList = netAddrList;
 }
 
@@ -109,6 +110,7 @@ public:
     {
         QByteArray reply;
         QByteArray errorString;
+		qWarning() << "TESTCONN" << m_url.toString();
         SessionManager::instance()->sendGetRequest(m_url.toString(), "RecordedTimePeriods", QnRequestParamList(), reply, errorString);
         if (reply.contains("Parameter startTime must be provided"))
         {
@@ -182,4 +184,5 @@ void QnVideoServerResource::updateInner(QnResourcePtr other)
 
         setStorages(otherStorages);
     }
+	determineOptimalNetIF();
 }
