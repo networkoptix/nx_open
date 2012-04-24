@@ -1056,7 +1056,8 @@ void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, con
             if(motion->isMotionAt(x, y))
                 motionPath.addRect(QRectF(QPointF(x*xStep, y*yStep), QPointF((x+1)*xStep, (y+1)*yStep)));
     QPen pen(QColor(0xff, 0, 0, 128));
-    pen.setWidth(9);
+    qreal unit = qnGlobals->workbenchUnitSize();
+    pen.setWidth(unit*0.002);
     painter->setPen(pen);
     painter->drawPath(motionPath);
 }
@@ -1134,5 +1135,6 @@ void QnResourceWidget::setDrawMotionWindows(MotionDrawType value)
 
 QList<QnMotionRegion>& QnResourceWidget::getMotionRegionList()
 {
+    ensureMotionMask();
     return m_motionRegionList;
 }
