@@ -23,7 +23,6 @@ void QnMotionRegion::addRect(int sensitivity, const QRect& rect)
             m_data[i] -= rect;
     }
     m_data[sensitivity] += rect;
-    qDebug() << m_data[sensitivity];
 }
 
 bool QnMotionRegion::operator==(const QnMotionRegion& other) const
