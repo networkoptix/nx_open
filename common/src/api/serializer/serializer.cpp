@@ -1,17 +1,5 @@
 #include "serializer.h"
 
-void parseRegionList(QList<QRegion>& regions, const QString& regionsString)
-{
-    QStringList regList = regionsString.split(':');
-    regions.clear();
-    foreach(const QString& regionStr, regList)
-    {
-        QRegion region;
-        parseRegion(region, regionStr);
-        regions << region;
-    }
-}
-
 void parseRegion(QRegion& region, const QString& regionString)
 {
     foreach (QString rectString, regionString.split(';'))
@@ -26,9 +14,95 @@ void parseRegion(QRegion& region, const QString& regionString)
             rect.setWidth(rectList[2].toInt());
             rect.setHeight(rectList[3].toInt());
         }
-
         region += rect;
     }
+}
+
+void parseRegionList(QList<QRegion>& regions, const QString& regionsString)
+{
+    QStringList regList = regionsString.split(':');
+    regions.clear();
+    foreach(const QString& regionStr, regList)
+    {
+        QRegion region;
+        parseRegion(region, regionStr);
+        regions << region;
+    }
+}
+
+
+void parseMotionRegionList(QList<QnMotionRegion>& regions, const QString& regionsString)
+{
+    QStringList regList = regionsString.split(':');
+    regions.clear();
+    // for compatibiliti with previous version. By default screen filled medium sensitivity motion window
+    for (int i = 0; i < regList.size(); ++i)
+    {
+        QnMotionRegion region;
+        //region.addRect((QnMotionRegion::MAX_SENSITIVITY - QnMotionRegion::MIN_SENSITIVITY)/2, QRect(0,0,MD_WIDTH, MD_HEIGHT));
+        regions << region;
+    }
+
+    for (int i = 0; i < regList.size(); ++i)
+        parseMotionRegion(regions[i], regList[i]);
+}
+
+void parseMotionRegion(QnMotionRegion& region, const QString& regionString)
+{
+    QList<QRect> motionMask;
+    bool needAddDefaultMotion = false;
+    foreach (QString rectString, regionString.split(';'))
+    {
+        QStringList rectList = rectString.split(',');
+        QRect r;
+        int sensitivity = 0;
+        if (rectList.size() == 4)
+        {
+            // for compatibility with version 1.0. Version 1.1 uses 5 parameters (sensitivity is added)
+            r.setLeft(rectList[0].toInt());
+            r.setTop(rectList[1].toInt());
+            r.setWidth(rectList[2].toInt());
+            r.setHeight(rectList[3].toInt());
+            needAddDefaultMotion = true;
+        }
+        else if (rectList.size() == 5)
+        {
+            sensitivity = rectList[0].toInt();
+            r.setLeft(rectList[1].toInt());
+            r.setTop(rectList[2].toInt());
+            r.setWidth(rectList[3].toInt());
+            r.setHeight(rectList[4].toInt());
+        }
+        if (sensitivity > 0)
+            region.addRect(sensitivity, r);
+        else
+            motionMask << r;
+    }
+    for (int i = 0; i < motionMask.size(); ++i)
+        region.addRect(0, motionMask[i]);
+    if (needAddDefaultMotion)
+        region.addRect((QnMotionRegion::MAX_SENSITIVITY - QnMotionRegion::MIN_SENSITIVITY)/2, QRect(0,0,MD_WIDTH, MD_HEIGHT));
+}
+
+QString serializeMotionRegion(const QnMotionRegion& region)
+{
+    QStringList regionList;
+
+    //foreach (const QnMotionWindow& window, region)
+    for (int i = QnMotionRegion::MIN_SENSITIVITY; i <= QnMotionRegion::MAX_SENSITIVITY; ++i)
+    {
+        if (!region.getRegionBySens(i).isEmpty())
+        {
+            foreach(const QRect& rect, region.getRectsBySens(i))
+            {
+                QStringList rectList;
+                rectList << QString::number(i) << QString::number(rect.left()) << QString::number(rect.top()) << QString::number(rect.width()) << QString::number(rect.height());
+                regionList << rectList.join(",");
+            }
+        }            
+    }
+
+    return regionList.join(";");
 }
 
 QString serializeRegion(const QRegion& region)
@@ -51,6 +125,19 @@ QString serializeRegionList(const QList<QRegion>& regions)
     for (int i = 0; i < regions.size(); ++i)
     {
         QString regStr = serializeRegion(regions[i]);
+        if (i > 0)
+            result += ':';
+        result += regStr;
+    }
+    return result;
+}
+
+QString serializeMotionRegionList(const QList<QnMotionRegion>& regions)
+{
+    QString result;
+    for (int i = 0; i < regions.size(); ++i)
+    {
+        QString regStr = serializeMotionRegion(regions[i]);
         if (i > 0)
             result += ':';
         result += regStr;
