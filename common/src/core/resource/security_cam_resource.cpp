@@ -213,7 +213,7 @@ MotionTypeFlags QnSecurityCamResource::supportedMotionType() const
         QStringList vals = val.toString().split(',');
         foreach(const QString& str, vals)
         {
-            QString s1 = str.toLower();
+            QString s1 = str.toLower().trimmed();
             if (s1 == QString("hardwaregrid"))
                 result |= MT_HardwareGrid;
             else if (s1 == QString("softwaregrid"))

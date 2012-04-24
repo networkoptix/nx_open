@@ -35,11 +35,17 @@ void parseMotionRegionList(QList<QnMotionRegion>& regions, const QString& region
 {
     QStringList regList = regionsString.split(':');
     regions.clear();
-    foreach(const QString& regionStr, regList)
+    // for compatibiliti with previous version. By default screen filled medium sensitivity motion window
+    for (int i = 0; i < regList.size(); ++i)
     {
         QnMotionRegion region;
-        parseMotionRegion(region, regionStr);
+        region.addRect((QnMotionRegion::MAX_SENSITIVITY - QnMotionRegion::MIN_SENSITIVITY)/2, QRect(0,0,MD_WIDTH, MD_HEIGHT));
         regions << region;
+    }
+
+    for (int i = 0; i < regList.size(); ++i)
+    {
+        parseMotionRegion(regions[i], regList[i]);
     }
 }
 
