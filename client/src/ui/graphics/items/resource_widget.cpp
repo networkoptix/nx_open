@@ -447,10 +447,10 @@ void QnResourceWidget::invalidateMotionMask() {
     m_motionMaskValid = false;
 }
 
-void QnResourceWidget::addToMotionRegion(const QnMotionWindow& motionWindow, int channel) {
+void QnResourceWidget::addToMotionRegion(int sens, const QRect& rect, int channel) {
     ensureMotionMask();
 
-    m_motionRegionList[channel].addRect(motionWindow);
+    m_motionRegionList[channel].addRect(sens, rect);
 
     invalidateMotionMaskBinData();
 }
@@ -1085,19 +1085,21 @@ void QnResourceWidget::drawMotionSensitivity(QPainter *painter, const QRectF &re
     font.setPointSizeF(0.03 * unit);
     painter->setFont(font);
 
-    for (int i = 0; i < region.size(); ++i)
+    for (int sens = QnMotionRegion::MIN_SENSITIVITY+1; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens)
     {
-        if (region.at(i).sensitivity == 0)
-            continue;
-        const QRect& rect = region.at(i).rect;
-        for (int x = rect.left(); x <= rect.right(); ++x)
+        foreach(const QRect& rect, region.getRegionBySens(sens).rects())
         {
-            for (int y = rect.top(); y <= rect.bottom(); ++y)
+            if (rect.width() < 2 || rect.height() < 2)
+                continue;
+            for (int x = rect.left(); x <= rect.right(); ++x)
             {
-                painter->drawStaticText(x*xStep + xStep*0.1, y*yStep + yStep*0.1, m_sensStaticText[region.at(i).sensitivity]);
+                for (int y = rect.top(); y <= rect.bottom(); ++y)
+                {
+                    painter->drawStaticText(x*xStep + xStep*0.1, y*yStep + yStep*0.1, m_sensStaticText[sens]);
+                    break;
+                }
                 break;
             }
-            break;
         }
     }
 }

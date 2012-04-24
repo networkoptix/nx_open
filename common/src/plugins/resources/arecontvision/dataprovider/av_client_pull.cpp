@@ -55,10 +55,9 @@ void QnPlAVClinetPullStreamReader::updateCameraMotion(const QnMotionRegion& regi
         2   // 9
     };
 
-    for (int i = 0; i < region.size(); ++i)
+    for (int sens = QnMotionRegion::MIN_SENSITIVITY; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens)
     {
-        int sens = region.at(i).sensitivity;
-        if (sens != 0)
+        if (sens != 0 && !region.getRegionBySens(sens).isEmpty())
         {
             QnPlAreconVisionResourcePtr avRes = getResource().dynamicCast<QnPlAreconVisionResource>();
             avRes->setParamAsync("mdlevelthreshold", sensToLevelThreshold[sens], QnDomainPhysical);

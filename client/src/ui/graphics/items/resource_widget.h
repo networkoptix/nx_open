@@ -239,7 +239,7 @@ public:
      */
     void addToMotionSelection(const QRect &gridRect);
 
-    void addToMotionRegion(const QnMotionWindow& motionWindow, int channel);
+    void addToMotionRegion(int sens, const QRect& rect, int channel);
 
     void clearMotionRegions();
 

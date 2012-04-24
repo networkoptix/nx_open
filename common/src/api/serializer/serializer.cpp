@@ -47,26 +47,25 @@ void parseMotionRegion(QnMotionRegion& region, const QString& regionString)
 {
     foreach (QString rectString, regionString.split(';'))
     {
-        QnMotionWindow window;
         QStringList rectList = rectString.split(',');
-
+        QRect r;
+        int sensitivity = 0;
         if (rectList.size() == 4)
         {
-            window.rect.setLeft(rectList[0].toInt());
-            window.rect.setTop(rectList[1].toInt());
-            window.rect.setWidth(rectList[2].toInt());
-            window.rect.setHeight(rectList[3].toInt());
+            r.setLeft(rectList[0].toInt());
+            r.setTop(rectList[1].toInt());
+            r.setWidth(rectList[2].toInt());
+            r.setHeight(rectList[3].toInt());
         }
         else if (rectList.size() == 5)
         {
-            window.sensitivity = rectList[0].toInt();
-            window.rect.setLeft(rectList[1].toInt());
-            window.rect.setTop(rectList[2].toInt());
-            window.rect.setWidth(rectList[3].toInt());
-            window.rect.setHeight(rectList[4].toInt());
+            sensitivity = rectList[0].toInt();
+            r.setLeft(rectList[1].toInt());
+            r.setTop(rectList[2].toInt());
+            r.setWidth(rectList[3].toInt());
+            r.setHeight(rectList[4].toInt());
         }
-
-        region += window;
+        region.addRect(sensitivity, r);
     }
 }
 
@@ -74,13 +73,20 @@ QString serializeMotionRegion(const QnMotionRegion& region)
 {
     QStringList regionList;
 
-    foreach (const QnMotionWindow& window, region)
+    //foreach (const QnMotionWindow& window, region)
+    for (int i = QnMotionRegion::MIN_SENSITIVITY; i <= QnMotionRegion::MAX_SENSITIVITY; ++i)
     {
-        QStringList rectList;
-        rectList << QString::number(window.rect.left()) << QString::number(window.rect.top()) << QString::number(window.rect.width()) << QString::number(window.rect.height());
-        regionList << rectList.join(",");
-        if (window.sensitivity != 0)
-            regionList.last() = QString::number(window.sensitivity) + QString(",") + regionList.last();
+        if (!region.getRegionBySens(i).isEmpty())
+        {
+            QStringList rectList;
+            foreach(const QRect& rect, region.getRegionBySens(i).rects())
+            {
+                rectList << QString::number(rect.left()) << QString::number(rect.top()) << QString::number(rect.width()) << QString::number(rect.height());
+                regionList << rectList.join(",");
+            }
+            if (i != QnMotionRegion::MIN_SENSITIVITY)
+                regionList.last() = QString::number(i) + QString(",") + regionList.last();
+        }            
     }
 
     return regionList.join(";");

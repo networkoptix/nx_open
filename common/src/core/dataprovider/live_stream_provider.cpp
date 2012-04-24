@@ -136,17 +136,19 @@ QByteArray QnLiveStreamProvider::createSoftwareMotionMask(const QnMotionRegion& 
     QByteArray rez;
     rez.resize(MD_WIDTH * MD_HEIGHT);
     memset(rez.data(), 255, MD_WIDTH * MD_HEIGHT);
-    for (int i = 0; i < region.size(); ++i)
+    for (int sens = QnMotionRegion::MIN_SENSITIVITY; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens)
     {
-        const QRect& rect = region.at(i).rect;
-        for (int y = rect.top(); y <= rect.bottom(); ++y)
+        foreach(const QRect& rect, region.getRegionBySens(sens).rects())
         {
-            for (int x = rect.left(); x <= rect.right(); ++x)
+            for (int y = rect.top(); y <= rect.bottom(); ++y)
             {
-                rez.data()[x * MD_HEIGHT + y] = sensitivityToMask[region.at(i).sensitivity];
+                for (int x = rect.left(); x <= rect.right(); ++x)
+                {
+                    rez.data()[x * MD_HEIGHT + y] = sensitivityToMask[sens];
+
+                }
 
             }
-
         }
     }
     return rez;

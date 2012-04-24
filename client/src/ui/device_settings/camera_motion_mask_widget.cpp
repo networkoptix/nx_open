@@ -194,9 +194,9 @@ void QnCameraMotionMaskWidget::at_motionRegionSelected(QGraphicsView *view, QnRe
         if (!r.isEmpty()) 
         {
             QnMotionRegion oldRegion = m_motionRegionList[i];
-            m_motionRegionList[i].addRect(QnMotionWindow(m_motionSensitivity, r));
+            m_motionRegionList[i].addRect(m_motionSensitivity, r);
             if(oldRegion != m_motionRegionList[i]) { // Note: we cannot use QRegion::contains here as it checks for overlap, not for containment. 
-                widget->addToMotionRegion(QnMotionWindow(m_motionSensitivity, r), i);
+                widget->addToMotionRegion(m_motionSensitivity, r, i);
                 changed = true;
             }
         }
