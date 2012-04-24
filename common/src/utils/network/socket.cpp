@@ -437,8 +437,9 @@ TCPServerSocket::TCPServerSocket(unsigned short localPort, int queueLen)
 }
 
 TCPServerSocket::TCPServerSocket(const QString &localAddress,
-    unsigned short localPort, int queueLen)
+    unsigned short localPort, int queueLen, bool reuseAddr)
      : Socket(SOCK_STREAM, IPPROTO_TCP) {
+  setReuseAddrFlag(reuseAddr);
   setLocalAddressAndPort(localAddress, localPort);
   setListen(queueLen);
 }

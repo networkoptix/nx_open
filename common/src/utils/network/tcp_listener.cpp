@@ -46,14 +46,13 @@ QnTcpListener::QnTcpListener(const QHostAddress& address, int port):
 {
     Q_D(QnTcpListener);
     try {
-        d->serverSocket = new TCPServerSocket(address.toString(), port);
-        d->serverSocket->setReuseAddrFlag();
+        d->serverSocket = new TCPServerSocket(address.toString(), port, 5, true);
 
         start();
         cl_log.log("RTSP server started at ", address.toString() + QString(":") + QString::number(port), cl_logINFO);
     }
-    catch(SocketException &) {
-        qCritical() << "Can't start TCP listener at address" << address << ":" << port;
+    catch(const SocketException &e) {
+        qCritical() << "Can't start TCP listener at address" << address << ":" << port << ": " << QString(e.what());
     }
 }
 
