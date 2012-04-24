@@ -47,7 +47,8 @@ QnSingleCameraSettingsWidget::~QnSingleCameraSettingsWidget() {
 
 void QnSingleCameraSettingsWidget::at_motionSensitivityChanged(int value)
 {
-    m_motionWidget->setMotionSensitivity(value);
+    if(m_motionWidget)
+        m_motionWidget->setMotionSensitivity(value);
 }
 
 void QnSingleCameraSettingsWidget::at_motionTypeChanged()
@@ -283,8 +284,7 @@ void QnSingleCameraSettingsWidget::at_tabWidget_currentChanged() {
     if(m_motionWidget != NULL)
         return;
 
-    QWidget *motionWidget = ui->tabWidget->currentWidget()->findChild<QWidget *>(QLatin1String("motionWidget"));
-    if(motionWidget == NULL)
+    if(currentTab() != Qn::MotionSettingsTab)
         return;
 
     m_motionWidget = new QnCameraMotionMaskWidget(this);
@@ -293,7 +293,7 @@ void QnSingleCameraSettingsWidget::at_tabWidget_currentChanged() {
     using ::setReadOnly;
     setReadOnly(m_motionWidget, m_readOnly);
     
-    QVBoxLayout *layout = new QVBoxLayout(motionWidget);
+    QVBoxLayout *layout = new QVBoxLayout(ui->motionWidget);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_motionWidget);
 
