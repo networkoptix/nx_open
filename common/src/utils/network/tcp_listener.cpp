@@ -47,6 +47,8 @@ QnTcpListener::QnTcpListener(const QHostAddress& address, int port):
     Q_D(QnTcpListener);
     try {
         d->serverSocket = new TCPServerSocket(address.toString(), port);
+        d->serverSocket->setReuseAddrFlag();
+
         start();
         cl_log.log("RTSP server started at ", address.toString() + QString(":") + QString::number(port), cl_logINFO);
     }
