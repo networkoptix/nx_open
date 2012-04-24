@@ -35,18 +35,23 @@ public:
     void setReadOnly(bool readOnly);
 
     void setMotionSensitivity(int value);
+
 signals:
     void motionRegionListChanged();
+
 public slots:
     void clearMotion();
+
 protected slots:
     void at_viewport_resized();
     void at_motionRegionSelected(QGraphicsView *, QnResourceWidget *, const QRect &);
     void at_motionRegionCleared();
     void at_itemClicked(QGraphicsView*, QGraphicsItem*, const ClickInfo&);
+
 private:
     void init();
     int gridPosToChannelPos(QPoint& pos);
+
 private:
     QnVirtualCameraResourcePtr m_camera;
     //QList<QnMotionRegion> m_motionRegionList;
