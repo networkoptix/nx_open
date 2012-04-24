@@ -203,6 +203,17 @@ MotionType QnSecurityCamResource::getDefaultMotionType() const
     }
 }
 
+int QnSecurityCamResource::motionWindowCnt() const
+{
+    QVariant val;
+    QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
+    if (this_casted->getParam("motionWindowCnt", val, QnDomainMemory))
+    {
+        return val.toInt();
+    }
+    return 0;
+}
+
 MotionTypeFlags QnSecurityCamResource::supportedMotionType() const
 {
     QVariant val;

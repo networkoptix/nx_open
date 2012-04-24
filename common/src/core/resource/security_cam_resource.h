@@ -25,6 +25,8 @@ public:
 
     MotionTypeFlags supportedMotionType() const;
     MotionType getDefaultMotionType() const;
+    int motionWindowCnt() const;
+
 
     MotionType getMotionType();
     void setMotionType(MotionType value);

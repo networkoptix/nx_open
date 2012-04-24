@@ -49,6 +49,7 @@ void parseMotionRegionList(QList<QnMotionRegion>& regions, const QString& region
 
 void parseMotionRegion(QnMotionRegion& region, const QString& regionString)
 {
+    QList<QRect> motionMask;
     foreach (QString rectString, regionString.split(';'))
     {
         QStringList rectList = rectString.split(',');
@@ -69,8 +70,13 @@ void parseMotionRegion(QnMotionRegion& region, const QString& regionString)
             r.setWidth(rectList[3].toInt());
             r.setHeight(rectList[4].toInt());
         }
-        region.addRect(sensitivity, r);
+        if (sensitivity > 0)
+            region.addRect(sensitivity, r);
+        else
+            motionMask << r;
     }
+    for (int i = 0; i < motionMask.size(); ++i)
+        region.addRect(0, motionMask[i]);
 }
 
 QString serializeMotionRegion(const QnMotionRegion& region)
@@ -82,9 +88,9 @@ QString serializeMotionRegion(const QnMotionRegion& region)
     {
         if (!region.getRegionBySens(i).isEmpty())
         {
-            QStringList rectList;
             foreach(const QRect& rect, region.getRegionBySens(i).rects())
             {
+                QStringList rectList;
                 rectList << QString::number(rect.left()) << QString::number(rect.top()) << QString::number(rect.width()) << QString::number(rect.height());
                 regionList << rectList.join(",");
             }

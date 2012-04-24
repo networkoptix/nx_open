@@ -1114,7 +1114,10 @@ void QnResourceWidget::drawMotionMask(QPainter *painter, const QRectF &rect, int
         for (int i = 0; i < 10; ++i) 
         {
             QColor clr = i > 0 ? QColor(150 +  i*10, 10*(9-i), 10*(9-i), 96) : qnGlobals->motionMaskColor();
-            drawFilledRegion(painter, rect, m_motionRegionList[channel].getRegionBySens(i), clr, Qt::black);
+            QRegion reg = m_motionRegionList[channel].getRegionBySens(i);
+            if (i > 0)
+                reg -= m_motionRegionList[channel].getRegionBySens(0);
+            drawFilledRegion(painter, rect, reg, clr, Qt::black);
         }
 
         drawMotionSensitivity(painter, rect, m_motionRegionList[channel], channel);
