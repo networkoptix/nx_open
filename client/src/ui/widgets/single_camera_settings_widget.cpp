@@ -97,6 +97,7 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
         ui->motionWEBPageLink->setText(tr("%1").arg(webPageAddress));
         if(m_motionWidget) 
             m_motionWidget->setCamera(m_camera);
+        ui->softwareMotionButton->setChecked(m_camera->getMotionType() == MT_SoftwareGrid);
 
         /*
         if (m_camera->getParam("motionEditURL", val, QnDomainMemory))

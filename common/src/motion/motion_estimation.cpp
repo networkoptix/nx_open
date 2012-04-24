@@ -433,6 +433,7 @@ QnMotionEstimation::QnMotionEstimation()
     m_resultMotion = 0;
     m_firstFrameTime = AV_NOPTS_VALUE;
     m_lastFrameTime = AV_NOPTS_VALUE;
+    m_isNewMask = false;
 }
 
 QnMotionEstimation::~QnMotionEstimation()
@@ -501,10 +502,13 @@ void QnMotionEstimation::reallocateMask(int width, int height)
         scaleMask();
     else
         memcpy(m_scaledMask, m_motionMask, MD_WIDTH * MD_HEIGHT);
+    m_isNewMask = false;
 }
 
 void QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
 {
+    QMutexLocker lock(&m_mutex);
+
     if (m_decoder == 0 && !(videoData->flags & AV_PKT_FLAG_KEY))
         return;
     if (m_decoder == 0 || m_decoder->getContext()->codec_id != videoData->compressionType)
@@ -530,7 +534,7 @@ void QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
         fillFrameRect(m_frames[idx], QRect(QPoint(0, m_frames[idx]->height/2), QPoint(m_frames[idx]->width, m_frames[idx]->height)), 110);
 #endif
 
-    if (m_decoder->getWidth() != m_lastImgWidth || m_decoder->getHeight() != m_lastImgHeight)
+    if (m_decoder->getWidth() != m_lastImgWidth || m_decoder->getHeight() != m_lastImgHeight || m_isNewMask)
         reallocateMask(m_decoder->getWidth(), m_decoder->getHeight());
 
 #define ANALIZE_PER_PIXEL_DIF
@@ -680,10 +684,12 @@ QnMetaDataV1Ptr QnMotionEstimation::getMotion()
 
 void QnMotionEstimation::setMotionMask(const QByteArray& mask)
 {
+    QMutexLocker lock(&m_mutex);
     Q_ASSERT(mask.size() == MD_WIDTH * MD_HEIGHT);
     qFreeAligned(m_motionMask);
     m_motionMask = (quint8*) qMallocAligned(MD_WIDTH * MD_HEIGHT, 32);
     memcpy(m_motionMask, mask.data(), MD_WIDTH * MD_HEIGHT);
+    m_isNewMask = true;
 }
 
 bool QnMotionEstimation::existsMetadata() const

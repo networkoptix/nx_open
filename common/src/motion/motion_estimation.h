@@ -24,6 +24,7 @@ private:
     void reallocateMask(int width, int height);
     void postFiltering();
 private:
+    QMutex m_mutex;
     CLFFmpegVideoDecoder* m_decoder;
     CLVideoDecoderOutput* m_frames[2];
     
@@ -38,6 +39,7 @@ private:
     qint64 m_firstFrameTime;
     qint64 m_lastFrameTime;
     int m_totalFrames;
+    bool m_isNewMask;
 };
 
 #endif // __MOTION_ESTIMATION_H__

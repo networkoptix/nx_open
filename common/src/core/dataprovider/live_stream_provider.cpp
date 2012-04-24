@@ -156,29 +156,27 @@ QByteArray QnLiveStreamProvider::createSoftwareMotionMask(const QnMotionRegion& 
 
 void QnLiveStreamProvider::updateMotion()
 {
-    if (getRole() != QnResource::Role_LiveVideo)
-        return;
-
     QnAbstractMediaStreamDataProvider* ap = dynamic_cast<QnAbstractMediaStreamDataProvider*>(this);
     Q_ASSERT(ap);
 
     QnPhysicalCameraResourcePtr res = ap->getResource().dynamicCast<QnPhysicalCameraResource>();
     Q_ASSERT(res);
     const QnVideoResourceLayout* layout = res->getVideoLayout();
-    setUseSoftwareMotion(res->getMotionType() == MT_SoftwareGrid);
-    if (res->getMotionType() == MT_SoftwareGrid)
+
+    if (getRole() == QnResource::Role_SecondaryLiveVideo && res->getMotionType() == MT_SoftwareGrid)
     {
+        setUseSoftwareMotion(true);
         for (int i = 0; i < layout->numberOfChannels(); ++i)
         {
             QnMotionRegion region = res->getMotionRegion(i);
             m_motionEstimation[i].setMotionMask(createSoftwareMotionMask(region));
         }
     }
-    else {
+    else if (getRole() == QnResource::Role_LiveVideo && res->getMotionType() != MT_SoftwareGrid)
+    {
         updateCameraMotion(res->getMotionRegion(0));
     }
 }
-
 
 // for live providers only
 void QnLiveStreamProvider::setFps(float f)

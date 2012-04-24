@@ -41,6 +41,7 @@ void QnSecurityCamResource::updateInner(QnResourcePtr other)
         for (int i = 0; i < numChannels; ++i)
             setMotionRegion(other_casted->m_motionMaskList[i], QnDomainPhysical, i);
         m_scheduleTasks = other_casted->m_scheduleTasks;
+        m_motionType = other_casted->m_motionType;
     }
 }
 
