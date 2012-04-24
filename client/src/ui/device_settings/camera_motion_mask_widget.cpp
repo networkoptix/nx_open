@@ -90,7 +90,7 @@ void QnCameraMotionMaskWidget::init()
 	m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Border, qnGlobals->motionMaskRubberBandBorderColor());
     m_display->instrumentManager()->installInstrument(m_motionSelectionInstrument);
 
-    m_clickInstrument = new ClickInstrument(Qt::LeftButton, 0, Instrument::ITEM, this);
+    m_clickInstrument = new ClickInstrument(Qt::LeftButton, 0, Instrument::Item, this);
     connect(m_clickInstrument,  SIGNAL(clicked(QGraphicsView*, QGraphicsItem*, const ClickInfo&)),                                  this,                           SLOT(at_itemClicked(QGraphicsView*, QGraphicsItem*, const ClickInfo&)));
     m_display->instrumentManager()->installInstrument(m_clickInstrument);
 
@@ -167,8 +167,8 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
         /* Set up the corresponding widget. */
         m_resourceWidget = m_display->widget(item);
         m_resourceWidget->setDrawMotionWindows(QnResourceWidget::DrawAllMotionInfo);
-        m_resourceWidget->setDisplayFlag(QnResourceWidget::DISPLAY_BUTTONS, false);
-        m_resourceWidget->setDisplayFlag(QnResourceWidget::DISPLAY_MOTION_GRID, true);
+        m_resourceWidget->setDisplayFlag(QnResourceWidget::DisplayButtons, false);
+        m_resourceWidget->setDisplayFlag(QnResourceWidget::DisplayMotionGrid, true);
         //m_resourceWidget->setMotionRegionList(m_camera->getMotionRegionList());
     }
 

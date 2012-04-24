@@ -768,7 +768,7 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
             replacedCamera->setScheduleDisabled(srcCamera->isScheduleDisabled());
             replacedCamera->setScheduleTasks(srcCamera->getScheduleTasks());
             replacedCamera->setAuth(srcCamera->getAuth());
-            replacedCamera->setMotionRegionList(srcCamera->getMotionRegionList(), QnDomain::QnDomainMemory);
+            replacedCamera->setMotionRegionList(srcCamera->getMotionRegionList(), QnDomainMemory);
             replacedCamera->setDisabled(false);
 
 

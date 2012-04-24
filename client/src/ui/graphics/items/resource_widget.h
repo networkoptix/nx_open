@@ -3,22 +3,21 @@
 
 #include <QtCore/QWeakPointer>
 #include <QtCore/QVector>
-
 #include <QtGui/QStaticText>
 #include <QtGui/QGraphicsWidget>
 
 #include <camera/render_status.h>
-#include <core/resource/resource_consumer.h>
-#include <core/datapacket/mediadatapacket.h> /* For QnMetaDataV1Ptr. */
+#include <core/resource/motion_window.h>
 
 #include <ui/common/constrained_resizable.h>
 #include <ui/common/scene_utility.h>
 #include <ui/common/frame_section_queryable.h>
-#include <ui/graphics/instruments/instrumented.h>
 #include <ui/workbench/workbench_context_aware.h>
+#include <ui/graphics/instruments/instrumented.h>
+#include <core/resource/resource_consumer.h>
+#include <core/datapacket/mediadatapacket.h> /* For QnMetaDataV1Ptr. */
 
 #include "polygonal_shadow_item.h"
-#include "core/resource/motion_window.h"
 
 class QGraphicsLinearLayout;
 
@@ -55,11 +54,11 @@ class QnResourceWidget: public Instrumented<QGraphicsWidget>, public QnWorkbench
 
 public:
     enum DisplayFlag {
-        DisplayActivityOverlay  = 0x1, /**< Whether the paused overlay icon should be displayed. */
-        DisplaySelectionOverlay = 0x2, /**< Whether selected / not selected state should be displayed. */
-        DisplayMotionGrid       = 0x4, /**< Whether a grid with motion detection is to be displayed. */
-        DisplayButtons          = 0x8, /**< Whether item buttons are to be displayed. */
-        DISPLAY_MOTION_SENSITIVITY = 0x10, /**< Whether a grid with motion region sensitivity is to be displayed. */
+        DisplayActivityOverlay      = 0x1, /**< Whether the paused overlay icon should be displayed. */
+        DisplaySelectionOverlay     = 0x2, /**< Whether selected / not selected state should be displayed. */
+        DisplayMotionGrid           = 0x4, /**< Whether a grid with motion detection is to be displayed. */
+        DisplayButtons              = 0x8, /**< Whether item buttons are to be displayed. */
+        DisplayMotionSensitivity    = 0x10, /**< Whether a grid with motion region sensitivity is to be displayed. */
     };
     Q_DECLARE_FLAGS(DisplayFlags, DisplayFlag)
 
@@ -237,15 +236,13 @@ public:
      */
     QPointF mapFromMotionGrid(const QPoint &gridPos);
 
-    QList<QRegion> motionSelection() const;
-
-    QList<QRegion> motionMask() const;
-
     /**
      * \param gridRect                  Rectangle in grid coordinates to add to
      *                                  selected motion region of this widget.
      */
     void addToMotionSelection(const QRect &gridRect);
+
+    QList<QRegion> motionSelection() const { return QList<QRegion>(); } // TODO
 
     bool addToMotionRegion(int sens, const QRect& rect, int channel);
 
@@ -277,15 +274,11 @@ public slots:
      */
     void clearMotionSelection();
     void setDrawMotionWindows(MotionDrawType value);
-    void clearMotionMask();
-
 signals:
     void aspectRatioChanged(qreal oldAspectRatio, qreal newAspectRatio);
     void aboutToBeDestroyed();
+    void motionRegionSelected(QnResourcePtr resource, QnAbstractArchiveReader* reader, QList<QRegion> region);
     void displayFlagsChanged();
-    void motionSelectionChanged();
-
-    void motionRegionSelected(QnResourcePtr resource, QnAbstractArchiveReader* reader, QList<QRegion> region); // TODO: remove
 
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -348,16 +341,7 @@ private:
     };
 
     struct ChannelState {
-        ChannelState();
-
-        ~ChannelState();
-
-        ChannelState(const ChannelState &other);
-
-        ChannelState &operator=(const ChannelState &other) {
-            this->~ChannelState();
-            new (this) ChannelState(other);
-        }
+        ChannelState(): icon(NO_ICON), iconChangeTimeMSec(0), iconFadeInNeeded(false), lastNewFrameTimeMSec(0) {}
 
         /** Current overlay icon. */
         OverlayIcon icon;
@@ -373,12 +357,6 @@ private:
 
         /** Selected region for search-by-motion, in parrots. */
         QRegion motionSelection;
-
-        /** Image region where motion is currently present, in parrots. */
-        QRegion motionMask;
-
-        /** Binary mask for the current motion region. */
-        __m128i *motionMaskBinData;
     };
 
     void setOverlayIcon(int channel, OverlayIcon icon);
@@ -465,9 +443,14 @@ private:
     /** Additional per-channel state. */
     QVector<ChannelState> m_channelState;
 
+    /** Image region where motion is currently present, in parrots. */
     QList<QnMotionRegion> m_motionRegionList;
+
     /** Whether the motion mask is valid. */
     bool m_motionMaskValid;
+
+    /** Binary mask for the current motion region. */
+    QVector<__m128i *> m_motionMaskBinData;
 
     /** Whether motion mask binary data is valid. */
     bool m_motionMaskBinDataValid;
