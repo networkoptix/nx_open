@@ -52,11 +52,8 @@ void QnSingleCameraSettingsWidget::at_motionSensitivityChanged(int value)
 
 void QnSingleCameraSettingsWidget::at_motionTypeChanged()
 {
-    //ui->sensetivityLabel->setEnabled(ui->motionGridButton->isChecked());
-    //ui->comboBoxSensetivity->setEnabled(ui->motionGridButton->isChecked());
-    //ui->motionWebPageLabel->setEnabled(!ui->motionGridButton->isChecked());
-    //ui->motionWEBPageLink->setEnabled(!ui->motionGridButton->isChecked());
     at_dataChanged();
+    updateMaxMotionRect();
 }
 
 void QnSingleCameraSettingsWidget::at_motionSelectionCleared()
@@ -98,6 +95,7 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
         if(m_motionWidget) 
             m_motionWidget->setCamera(m_camera);
         ui->softwareMotionButton->setChecked(m_camera->getMotionType() == MT_SoftwareGrid);
+        updateMaxMotionRect();
 
         /*
         if (m_camera->getParam("motionEditURL", val, QnDomainMemory))
@@ -308,4 +306,14 @@ void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleTasksChanged(
     at_dataChanged();
 
     m_hasScheduleChanges = true;
+}
+
+void QnSingleCameraSettingsWidget::updateMaxMotionRect()
+{
+    if (m_camera && m_motionWidget) {
+        if (ui->softwareMotionButton->isChecked())
+            m_motionWidget->setMaxMotionRects(INT_MAX);
+        else
+            m_motionWidget->setMaxMotionRects(m_camera->motionWindowCnt());
+    }
 }

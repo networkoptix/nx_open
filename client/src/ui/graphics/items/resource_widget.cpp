@@ -447,17 +447,25 @@ void QnResourceWidget::invalidateMotionMask() {
     m_motionMaskValid = false;
 }
 
-void QnResourceWidget::addToMotionRegion(int sens, const QRect& rect, int channel) {
+bool QnResourceWidget::addToMotionRegion(int sens, const QRect& rect, int channel) {
     ensureMotionMask();
 
-    m_motionRegionList[channel].addRect(sens, rect);
-
-    invalidateMotionMaskBinData();
+    QnMotionRegion newRegion = m_motionRegionList[channel];
+    newRegion.addRect(sens, rect);
+    if (newRegion.isValid()) 
+    {
+        m_motionRegionList[channel] = newRegion;
+        invalidateMotionMaskBinData();
+    }
+    return newRegion.isValid();
 }
 
 void QnResourceWidget::clearMotionRegions() {
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
+    int maxCnt = m_motionRegionList[0].getMaxRectCount();
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
         m_motionRegionList[i] = QnMotionRegion();
+        m_motionRegionList[i].setMaxRectCount(maxCnt);
+    }
     m_motionMaskValid = true;
 
     invalidateMotionMaskBinData();
@@ -1088,7 +1096,7 @@ void QnResourceWidget::drawMotionSensitivity(QPainter *painter, const QRectF &re
 
     for (int sens = QnMotionRegion::MIN_SENSITIVITY+1; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens)
     {
-        foreach(const QRect& rect, region.getRegionBySens(sens).rects())
+        foreach(const QRect& rect, region.getRectsBySens(sens))
         {
             if (rect.width() < 2 || rect.height() < 2)
                 continue;
