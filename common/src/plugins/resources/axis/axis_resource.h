@@ -32,7 +32,10 @@ public:
     float getResolutionAspectRatio(const QByteArray& resolution) const;
 
     QRect getMotionWindow(int num) const;
+    QMap<int, QRect>  getMotionWindows() const;
     void readMotionInfo();
+
+    void updateCameraMotion(const QnMotionRegion& region);
 protected:
     void init();
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
@@ -40,7 +43,13 @@ protected:
     virtual void setCropingPhysical(QRect croping);
 private:
     void clear();
-    QRect axisRectToGridRect(const QRect& axisRect);
+    static QRect axisRectToGridRect(const QRect& axisRect);
+    static QRect gridRectToAxisRect(const QRect& gridRect);
+
+    bool removeMotionWindow(int wndNum);
+    int addMotionWindow();
+    bool updateMotionWindow(int wndNum, int sensitivity, const QRect& rect);
+    int toAxisMotionSensitivity(int sensitivity);
 private:
     QList<QByteArray> m_resolutionList;
     QMap<int, QRect> m_motionWindows;

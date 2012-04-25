@@ -1,3 +1,4 @@
+
 #include "resource_widget.h"
 #include <cassert>
 #include <QPainter>

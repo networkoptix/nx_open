@@ -18,6 +18,19 @@ QRegion QnMotionRegion::getRegionBySens(int value) const
     return m_data[value];
 }
 
+QMap<int, QRect> QnMotionRegion::getAllMotionRects() const
+{
+    QMap<int, QRect> result;
+    for (int sens = MIN_SENSITIVITY+1; sens <= MAX_SENSITIVITY; ++sens)
+    {
+        QVector<QRect> rects = getRectsBySens(sens);
+        for (int i = 0; i < rects.size(); ++i)
+            result.insert(sens, rects[i]);
+    }
+    return result;
+}
+
+
 QVector<QRect> QnMotionRegion::getRectsBySens(int value) const
 {
     QVector<QRect> rects = m_data[value].rects();

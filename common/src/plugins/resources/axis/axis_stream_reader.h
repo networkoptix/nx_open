@@ -20,8 +20,7 @@ protected:
 
     virtual void updateStreamParamsBasedOnQuality() override;
     virtual void updateStreamParamsBasedOnFps() override;
-
-
+    virtual void updateCameraMotion(const QnMotionRegion& region) override;
 private:
 
     QnAbstractMediaDataPtr getNextDataMPEG(CodecID ci);

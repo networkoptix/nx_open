@@ -84,6 +84,15 @@ QRect QnPlAxisResource::axisRectToGridRect(const QRect& axisRect)
     return QRect(topLeft, bottomRight);
 }
 
+QRect QnPlAxisResource::gridRectToAxisRect(const QRect& gridRect)
+{
+    qreal xCoeff = 9999.0 / MD_WIDTH;
+    qreal yCoeff = 9999.0 / MD_HEIGHT;
+    QPoint topLeft(gridRect.left()*xCoeff + 0.5, gridRect.top()*yCoeff + 0.5);
+    QPoint bottomRight((gridRect.right()+1)*xCoeff + 0.5, (gridRect.bottom()+1)*yCoeff + 0.5);
+    return QRect(topLeft, bottomRight);
+}
+
 void QnPlAxisResource::readMotionInfo()
 {
     qint64 time = qnSyncTime->currentMSecsSinceEpoch();
@@ -149,7 +158,8 @@ void QnPlAxisResource::init()
     {
         // enable send motion into H.264 stream
         CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth());
-        CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=update&Image.I0.MPEG.UserDataEnabled=yes")); // &Image.TriggerDataEnabled=yes
+        //CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=update&Image.I0.MPEG.UserDataEnabled=yes")); 
+        CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=update&Image.TriggerDataEnabled=yes"));
         //CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=update&Image.I0.MPEG.UserDataEnabled=yes&Image.I1.MPEG.UserDataEnabled=yes&Image.I2.MPEG.UserDataEnabled=yes&Image.I3.MPEG.UserDataEnabled=yes"));
         if (status != CL_HTTP_SUCCESS) {
             if (status == CL_HTTP_AUTH_REQUIRED)
@@ -245,4 +255,99 @@ QRect QnPlAxisResource::getMotionWindow(int num) const
 {
     QMutexLocker lock(&m_mutex);
     return m_motionWindows.value(num);
+}
+
+QMap<int, QRect> QnPlAxisResource::getMotionWindows() const
+{
+    return m_motionWindows;
+}
+
+
+bool QnPlAxisResource::removeMotionWindow(int wndNum)
+{
+    QMutexLocker lock(&m_mutex);
+
+    CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth());
+    CLHttpStatus status = http.doGET(QString("axis-cgi/param.cgi?action=remove&group=Motion.M%1").arg(wndNum));
+    return status == CL_HTTP_SUCCESS;
+}
+
+int QnPlAxisResource::addMotionWindow()
+{
+    QMutexLocker lock(&m_mutex);
+
+    CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth());
+    CLHttpStatus status = http.doGET(QString("axis-cgi/param.cgi?action=add&group=Motion&template=motion&Motion.M.WindowType=include&Motion.M.ImageSource=0"));
+    if (status != CL_HTTP_SUCCESS)
+        return -1;
+    QByteArray data;
+    http.readAll(data);
+    data = data.split(' ')[0].mid(1);
+    return data.toInt();
+}
+
+bool QnPlAxisResource::updateMotionWindow(int wndNum, int sensitivity, const QRect& rect)
+{
+    QMutexLocker lock(&m_mutex);
+
+    CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth());
+    CLHttpStatus status = http.doGET(QString("axis-cgi/param.cgi?action=update&group=Motion&\
+Motion.M%1.Name=HDWitnessWindow%1&Motion.M%1.ImageSource=0&Motion.M%1.WindowType=include&\
+Motion.M%1.Left=%2&Motion.M%1.Right=%3&Motion.M%1.Top=%4&Motion.M%1.Bottom=%5&Motion.M%1.Sensitivity=%6")
+.arg(wndNum).arg(rect.left()).arg(rect.right()).arg(rect.top()).arg(rect.bottom()).arg(sensitivity));
+return status == CL_HTTP_SUCCESS;
+}
+
+int QnPlAxisResource::toAxisMotionSensitivity(int sensitivity)
+{
+    static const int sens[10] =
+    {
+        0,
+        10,
+        25,
+        40,
+        50,
+        60,
+        70,
+        80,
+        90,
+        100,
+    };
+
+    return sens[sensitivity];
+}
+
+void QnPlAxisResource::updateCameraMotion(const QnMotionRegion& region)
+{
+    QMutexLocker lock(&m_mutex);
+
+    if (m_lastMotionReadTime == 0)
+        readMotionInfo();
+
+    QMap<int, QRect> existsWnd = m_motionWindows; // the key is window number
+    QMap<int, QRect> newWnd = region.getAllMotionRects(); // the key is motion sensitivity
+
+    while (existsWnd.size() > newWnd.size())
+    {
+        int key = (existsWnd.end()-1).key();
+        removeMotionWindow(key);
+        existsWnd.remove(key);
+    }
+    while (existsWnd.size() < newWnd.size()) {
+        int newNum = addMotionWindow();
+        existsWnd.insert(newNum, QRect());
+    }
+
+    QMap<int, QRect>::iterator cameraWndItr = existsWnd.begin();
+    QMap<int, QRect>::iterator motionWndItr = newWnd.begin();
+    m_motionWindows.clear();
+    while (cameraWndItr != existsWnd.end())
+    {
+        QRect axisRect = gridRectToAxisRect(motionWndItr.value());
+        updateMotionWindow(cameraWndItr.key(), toAxisMotionSensitivity(motionWndItr.key()), axisRect);
+        m_motionWindows.insert(cameraWndItr.key(), motionWndItr.value());
+        *cameraWndItr = axisRect;
+        ++cameraWndItr;
+        ++motionWndItr;
+    }
 }
