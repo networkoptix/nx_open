@@ -15,73 +15,25 @@
 #include "camera/camera.h"
 
 #include "ui/style/skin.h"
-#include "ui/graphics/items/standard/graphicslabel.h"
+#include "ui/graphics/items/standard/graphics_label.h"
 #include "ui/graphics/items/controls/speedslider.h"
 #include "ui/graphics/items/controls/volumeslider.h"
+#include "ui/graphics/items/controls/tool_tip_item.h"
 #include "ui/graphics/items/image_button_widget.h"
-#include "ui/graphics/items/tool_tip_item.h"
 
 #include "timeslider.h"
 #include "utils/common/synctime.h"
 #include "core/resource/security_cam_resource.h"
+#include "time_slider.h"
+#include "ui/workbench/workbench_navigator.h"
+#include "ui/workbench/workbench_display.h"
+#include "../standard/graphics_scroll_bar.h"
+#include "time_scroll_bar.h"
 
 static const int SLIDER_NOW_AREA_WIDTH = 30;
 static const int TIME_PERIOD_UPDATE_INTERVAL = 1000 * 10;
 
-class SliderToolTipItem : public QnStyledToolTipItem
-{
-public:
-    SliderToolTipItem(AbstractGraphicsSlider *slider, QGraphicsItem *parent = 0)
-        : QnStyledToolTipItem(parent), m_slider(slider)
-    {
-        setAcceptHoverEvents(true);
-        setOpacity(0.75);
-    }
-
-private:
-    AbstractGraphicsSlider *const m_slider;
-    QPointF m_pos;
-};
-
-
-class TimeSliderToolTipItem : public QnStyledToolTipItem
-{
-public:
-    TimeSliderToolTipItem(TimeSlider *slider, QGraphicsItem *parent = 0)
-        : QnStyledToolTipItem(parent), m_slider(slider)
-    {
-        setAcceptHoverEvents(true);
-        setOpacity(0.75);
-    }
-
-protected:
-    void mousePressEvent(QGraphicsSceneMouseEvent *event)
-    {
-        m_pos = mapToItem(m_slider, event->pos());
-        m_slider->setMoving(true);
-    }
-
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *event)
-    {
-        QPointF pos = mapToItem(m_slider, event->pos());
-        qint64 shift = qreal(m_slider->sliderRange()) / m_slider->rect().width() * (pos - m_pos).x();
-        m_slider->setCurrentValue(m_slider->currentValue() + shift);
-        m_pos = pos;
-    }
-
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
-    {
-        Q_UNUSED(event)
-        m_slider->setMoving(false);
-    }
-
-private:
-    TimeSlider *const m_slider;
-    QPointF m_pos;
-};
-
-
-NavigationItem::NavigationItem(QGraphicsItem *parent): 
+NavigationItem::NavigationItem(QnWorkbenchDisplay *display, QGraphicsItem *parent): 
     base_type(parent),
     m_camera(0), 
     m_forcedCamera(0), 
@@ -105,8 +57,8 @@ NavigationItem::NavigationItem(QGraphicsItem *parent):
     }
 
 
-    connect(QnTimePeriodReaderHelper::instance(), SIGNAL(ready(const QnTimePeriodList&, int)), this, SLOT(onTimePeriodLoaded(const QnTimePeriodList&, int)));
-    connect(QnTimePeriodReaderHelper::instance(), SIGNAL(failed(int, int)), this, SLOT(onTimePeriodLoadFailed(int, int)));
+    connect(QnMultiCameraTimePeriodLoader::instance(), SIGNAL(ready(const QnTimePeriodList&, int)), this, SLOT(onTimePeriodLoaded(const QnTimePeriodList&, int)));
+    connect(QnMultiCameraTimePeriodLoader::instance(), SIGNAL(failed(int, int)), this, SLOT(onTimePeriodLoadFailed(int, int)));
 
     m_backwardButton = new QnImageButtonWidget(this);
     m_backwardButton->setIcon(qnSkin->icon("rewind_backward.png"));
@@ -140,9 +92,8 @@ NavigationItem::NavigationItem(QGraphicsItem *parent):
     connect(m_forwardButton, SIGNAL(clicked()), this, SLOT(rewindForward()));
 
 
-    m_speedSlider = new SpeedSlider(Qt::Horizontal, this);
-    m_speedSlider->setObjectName("SpeedSlider");
-    m_speedSlider->setToolTipItem(new SliderToolTipItem(m_speedSlider));
+    m_speedSlider = new QnSpeedSlider(this);
+    m_speedSlider->setObjectName("QnSpeedSlider");
     m_speedSlider->setCacheMode(QGraphicsItem::ItemCoordinateCache);
     m_speedSlider->setFocusProxy(this);
 
@@ -153,15 +104,11 @@ NavigationItem::NavigationItem(QGraphicsItem *parent):
 
     m_timeSlider = new TimeSlider(this);
     m_timeSlider->setObjectName("TimeSlider");
-    m_timeSlider->toolTipItem()->setVisible(false);
     m_timeSlider->setEndSize(SLIDER_NOW_AREA_WIDTH);
     m_timeSlider->setFlag(QGraphicsItem::ItemIsFocusable, true);
     m_timeSlider->setFocusProxy(this);
-    
-    QnToolTipItem *timeSliderToolTip = new TimeSliderToolTipItem(m_timeSlider);
-    timeSliderToolTip->setFlag(QGraphicsItem::ItemIsFocusable, true);
-    m_timeSlider->setToolTipItem(timeSliderToolTip);
-    timeSliderToolTip->setFocusProxy(m_timeSlider);
+    m_timeSlider->toolTipItem()->setFlag(QGraphicsItem::ItemIsFocusable);
+    m_timeSlider->setToolTipItem(0);
 
     connect(m_timeSlider, SIGNAL(currentValueChanged(qint64)), this, SLOT(onValueChanged(qint64)));
     connect(m_timeSlider, SIGNAL(sliderPressed()), this, SLOT(onSliderPressed()));
@@ -214,9 +161,8 @@ NavigationItem::NavigationItem(QGraphicsItem *parent):
     //connect(m_syncButton, SIGNAL(toggled(bool)), this, SIGNAL(enableItemSync(bool)));
     connect(m_syncButton, SIGNAL(toggled(bool)), this, SLOT(onSyncButtonToggled(bool)));
 
-    m_volumeSlider = new VolumeSlider(Qt::Horizontal, this);
-    m_volumeSlider->setObjectName("VolumeSlider");
-    m_volumeSlider->setToolTipItem(new SliderToolTipItem(m_volumeSlider));
+    m_volumeSlider = new QnVolumeSlider(this);
+    m_volumeSlider->setObjectName("QnVolumeSlider");
     m_volumeSlider->setCacheMode(QGraphicsItem::ItemCoordinateCache);
     m_volumeSlider->setFocusProxy(this);
 
@@ -275,13 +221,29 @@ NavigationItem::NavigationItem(QGraphicsItem *parent):
     rightLayoutV->setAlignment(rightLayoutHU, Qt::AlignRight | Qt::AlignVCenter);
     rightLayoutV->addItem(m_timeLabel);
 
+    QnTimeSlider *slider = new QnTimeSlider();
+    GraphicsScrollBar *scrollBar = new QnTimeScrollBar();
+
+    QnWorkbenchNavigator *navigator = new QnWorkbenchNavigator(display, display);
+    navigator->setTimeSlider(slider);
+    navigator->setScroolBar(scrollBar);
+
+    QGraphicsLinearLayout *sliderLayout = new QGraphicsLinearLayout(Qt::Vertical);
+    sliderLayout->setContentsMargins(0, 0, 0, 0);
+    sliderLayout->setSpacing(0);
+    sliderLayout->addItem(slider);
+    sliderLayout->setStretchFactor(slider, 0x1000);
+    sliderLayout->addItem(scrollBar);
+
     QGraphicsLinearLayout *mainLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     mainLayout->setContentsMargins(5, 0, 5, 0);
     mainLayout->setSpacing(10);
     mainLayout->addItem(leftLayoutV);
-    mainLayout->addItem(m_timeSlider);
+    //mainLayout->addItem(m_timeSlider);
+    mainLayout->addItem(sliderLayout);
     mainLayout->addItem(rightLayoutV);
     setLayout(mainLayout);
+
 
     QAction *playAction = new QAction(tr("Play / Pause"), m_playButton);
     playAction->setShortcut(tr("Space"));
@@ -565,15 +527,15 @@ NavigationItem::MotionPeriodLoader* NavigationItem::getMotionLoader(QnAbstractAr
     {
         MotionPeriodLoader p;
         p.reader = reader;
-        p.loader = QnTimePeriodReaderHelper::instance()->createUpdater(resource);
+        p.loader = QnTimePeriodLoader::newInstance(resource, this);
 #ifndef DEBUG_MOTION
         if (!p.loader) {
             qWarning() << "Connection to a video server lost. Can't load motion info";
             return 0;
         }
 #endif
-        connect(p.loader.data(), SIGNAL(ready(const QnTimePeriodList&, int)), this, SLOT(onMotionPeriodLoaded(const QnTimePeriodList&, int)));
-        connect(p.loader.data(), SIGNAL(failed(int, int)), this, SLOT(onMotionPeriodLoadFailed(int, int)));
+        connect(p.loader, SIGNAL(ready(const QnTimePeriodList&, int)), this, SLOT(onMotionPeriodLoaded(const QnTimePeriodList&, int)));
+        connect(p.loader, SIGNAL(failed(int, int)), this, SLOT(onMotionPeriodLoadFailed(int, int)));
         m_motionPeriodLoader.insert(resource, p);
     }
     return &m_motionPeriodLoader[resource];
@@ -699,14 +661,14 @@ bool NavigationItem::updateRecPeriodList(bool force)
     m_timePeriod.durationMs = qMin(currentTime+1000 - m_timePeriod.startTimeMs, w * 3);
     // round time
     qint64 endTimeMs = m_timePeriod.startTimeMs + m_timePeriod.durationMs;
-    endTimeMs = roundUp((quint64)endTimeMs, TIME_PERIOD_UPDATE_INTERVAL);
+    endTimeMs = roundUp((quint64) endTimeMs, TIME_PERIOD_UPDATE_INTERVAL);
     m_timePeriod.durationMs = endTimeMs - m_timePeriod.startTimeMs;
 
     if (!resources.isEmpty())
     {
         bool timePeriodAlreadyLoaded = !force && m_timePeriod.startTimeMs <= t && t + w <= m_timePeriod.startTimeMs + m_timePeriod.durationMs;
         if (!timePeriodAlreadyLoaded)
-            m_fullTimePeriodHandle = QnTimePeriodReaderHelper::instance()->load(resources, m_timePeriod);
+            m_fullTimePeriodHandle = QnMultiCameraTimePeriodLoader::instance()->load(resources, m_timePeriod);
         bool motionPeriodAlreadyLoaded = m_motionPeriod.startTimeMs <= t && t + w <= m_motionPeriod.startTimeMs + m_motionPeriod.durationMs;
         if (!motionPeriodAlreadyLoaded)
             updateMotionPeriods(m_timePeriod);
@@ -1122,7 +1084,7 @@ void NavigationItem::setPlaying(bool playing)
 
         m_stepForwardButton->setIcon(qnSkin->icon("forward.png"));
 
-        m_speedSlider->setPrecision(SpeedSlider::LowPrecision);
+        m_speedSlider->setPrecision(QnSpeedSlider::LowPrecision);
 
         play();
     } else {
@@ -1132,7 +1094,7 @@ void NavigationItem::setPlaying(bool playing)
 
         m_stepForwardButton->setIcon(qnSkin->icon("step_forward.png"));
 
-        m_speedSlider->setPrecision(SpeedSlider::HighPrecision);
+        m_speedSlider->setPrecision(QnSpeedSlider::HighPrecision);
 
         pause();
         m_timeSlider->setLiveMode(false);

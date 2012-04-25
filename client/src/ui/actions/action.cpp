@@ -69,11 +69,11 @@ void QnAction::removeChild(QnAction *action) {
     m_children.removeOne(action);
 }
 
-Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QVariant &items, const QVariantMap &params) const {
+Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnActionParameters &parameters) const {
     if(!(this->scope() & scope) && scope != this->scope())
         return Qn::InvisibleAction;
 
-    int size = QnActionTargetTypes::size(items);
+    int size = parameters.itemsSize();
 
     if(size == 0 && !(m_flags & Qn::NoTarget))
         return Qn::InvisibleAction;
@@ -84,7 +84,7 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QVar
     if(size > 1 && !(m_flags & Qn::MultiTarget))
         return Qn::InvisibleAction;
 
-    Qn::ActionTargetType type = QnActionTargetTypes::type(items);
+    Qn::ActionTargetType type = parameters.itemsType();
     if(!(this->targetTypes() & type) && size != 0)
         return Qn::InvisibleAction;
 
@@ -95,9 +95,9 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QVar
 
             QnResourceList resources;
             if(key.isEmpty()) {
-                resources = QnActionTargetTypes::resources(items);
-            } else if(params.contains(key)) {
-                resources = QnActionTargetTypes::resources(params.value(key));
+                resources = parameters.resources();
+            } else if(parameters.hasArgument(key)) {
+                resources = QnActionTargetTypes::resources(parameters.argument(key));
             } else if(key == Qn::CurrentLayoutParameter) {
                 resources.push_back(context()->workbench()->currentLayout()->resource());
             } else if(key == Qn::CurrentUserParameter) {
@@ -115,7 +115,7 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QVar
     }
 
     if(m_condition)
-        return m_condition.data()->check(items);
+        return m_condition.data()->check(parameters);
 
     return Qn::EnabledAction;
 }
@@ -149,20 +149,20 @@ bool QnAction::event(QEvent *event) {
             }
         } 
 
-        QVariant target;
+        QnActionParameters parameters;
         QnActionTargetProvider *targetProvider = QnWorkbenchContextAware::menu()->targetProvider();
         if(targetProvider != NULL) {
             if(flags() & Qn::ScopelessHotkey) {
-                target = targetProvider->currentTarget(static_cast<Qn::ActionScope>(static_cast<int>(scope())));
+                parameters.setItems(targetProvider->currentTarget(static_cast<Qn::ActionScope>(static_cast<int>(scope()))));
             } else {
                 Qn::ActionScope scope = targetProvider->currentScope();
                 if(this->scope() & scope)
-                    target = targetProvider->currentTarget(scope);
+                    parameters.setItems(targetProvider->currentTarget(scope));
             }
         }
 
-        if(checkCondition(scope(), target, QVariantMap()) == Qn::EnabledAction)
-            QnWorkbenchContextAware::menu()->trigger(m_id, target);
+        if(checkCondition(scope(), parameters) == Qn::EnabledAction)
+            QnWorkbenchContextAware::menu()->trigger(m_id, parameters);
         return true;
     }
     

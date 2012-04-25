@@ -3,10 +3,11 @@
 #include <cassert>
 
 #include <QtGui/QApplication>
+#include <QtGui/QPainter>
 
 #include "ui/style/globals.h"
 #include "settings.h"
-#include "ui/common/color_transform.h"
+#include "ui/common/color_transformations.h"
 
 namespace {
 
@@ -129,10 +130,8 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *event)
             penClr = NORMAL_LABEL_COLOR;
         else
             penClr = WEEKEND_LABEL_COLOR;
-        if (!m_enabled) {
-            toGrayColor(penClr);
-            penClr = shiftColor(penClr, DISABLED_COLOR_SHIFT, DISABLED_COLOR_SHIFT, DISABLED_COLOR_SHIFT);
-        }
+        if (!m_enabled)
+            penClr = shiftColor(toGrayscale(penClr), DISABLED_COLOR_SHIFT, DISABLED_COLOR_SHIFT, DISABLED_COLOR_SHIFT);
         p.setPen(penClr);
         p.drawText(QRect(0, cellSize*y+m_gridTopOffset, m_gridLeftOffset-TEXT_SPACING, cellSize), Qt::AlignRight | Qt::AlignVCenter, m_weekDays[y]);
     }
@@ -143,10 +142,8 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *event)
             penClr = m_enabled ? SELECTED_LABEL_COLOR : NORMAL_LABEL_COLOR;
         else
             penClr = NORMAL_LABEL_COLOR;
-        if (!m_enabled) {
-            toGrayColor(penClr);
-            penClr = shiftColor(penClr, DISABLED_COLOR_SHIFT, DISABLED_COLOR_SHIFT, DISABLED_COLOR_SHIFT);
-        }
+        if (!m_enabled)
+            penClr = shiftColor(toGrayscale(penClr), DISABLED_COLOR_SHIFT, DISABLED_COLOR_SHIFT, DISABLED_COLOR_SHIFT);
         p.setPen(penClr);
         p.drawText(QRect(m_gridLeftOffset + cellSize*x, 0, cellSize, m_gridTopOffset), Qt::AlignCenter | Qt::AlignVCenter, QString::number(x));
     }
@@ -171,8 +168,7 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *event)
                 }
             }
             if (!m_enabled)
-                toGrayColor(color);
-
+                color = toGrayscale(color);
 
             QPointF leftTop(cellSize*x, cellSize*y);
             QPointF rightBottom(leftTop.x() + cellSize, leftTop.y() + cellSize);
@@ -181,9 +177,9 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *event)
             p.fillRect(QRectF(leftTop.x(), leftTop.y(), cellSize, cellSize), color);
 
             // draw text parameters
-            QColor penClr(255,255,255, 128);
+            QColor penClr(255, 255, 255, 128);
             if (!m_enabled)
-                toGrayColor(penClr);
+                penClr = toGrayscale(penClr);
 
             p.setPen(penClr);
             if (m_showFirstParam && m_showSecondParam)
@@ -198,7 +194,7 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *event)
                 p.drawText(QRectF(leftTop, leftTop+QPointF(cellSize, cellSize)), Qt::AlignCenter | Qt::AlignHCenter, m_gridParams[x][y][FirstParam].toString());
             else if (m_showSecondParam)
                 p.drawText(QRectF(leftTop, leftTop+QPointF(cellSize, cellSize)), Qt::AlignCenter | Qt::AlignHCenter, m_gridParams[x][y][SecondParam].toString());
-            p.setPen(QColor(255,255,255));
+            p.setPen(QColor(255, 255, 255));
 
         }
     }
@@ -206,7 +202,7 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *event)
     // draw grid lines
     QColor penClr(255, 255, 255);
     if (!m_enabled)
-        toGrayColor(penClr);
+        penClr = toGrayscale(penClr);
 
     p.setPen(penClr);
     for (int x = 0; x <= columnCount(); ++x)
@@ -216,9 +212,9 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *event)
 
     p.translate(-m_gridLeftOffset, -m_gridTopOffset);
 
-    penClr = QColor(255,255,255, 128);
+    penClr = QColor(255, 255, 255, 128);
     if (!m_enabled)
-        toGrayColor(penClr);
+        penClr = toGrayscale(penClr);
 
     p.setPen(penClr);
     p.drawLine(QPoint(4, m_gridTopOffset), QPoint(m_gridLeftOffset, m_gridTopOffset));
@@ -231,13 +227,13 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *event)
     //penClr = QColor(qnGlobals->motionRubberBandBorderColor());
     penClr = subColor(QColor(m_defaultParams[ColorParam].toUInt()), qnGlobals->selectionBorderDelta());
     if (!m_enabled)
-        toGrayColor(penClr);
+        penClr = toGrayscale(penClr);
 
     p.setPen(penClr);
     //QColor brushClr(qnGlobals->motionRubberBandColor());
     QColor brushClr = subColor(QColor(m_defaultParams[ColorParam].toUInt()), qnGlobals->selectionOpacityDelta());
     if (!m_enabled)
-        toGrayColor(brushClr);
+        brushClr = toGrayscale(brushClr);
 
     p.setBrush(brushClr);
     if (!m_selectedRect.isEmpty())

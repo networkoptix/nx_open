@@ -139,7 +139,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     /* Set up model & control machinery. */
     m_display = new QnWorkbenchDisplay(this);
-	m_display->initSyncPlay();
+	m_display->setStreamsSynchronized(true);
     m_display->setScene(scene);
     m_display->setView(m_view);
     m_display->setNormalMarginFlags(Qn::MarginsAffectSize | Qn::MarginsAffectPosition);

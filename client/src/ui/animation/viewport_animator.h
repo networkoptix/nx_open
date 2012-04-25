@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <ui/common/scene_utility.h>
-#include <ui/common/margin_flags.h>
+#include <ui/workbench/workbench_globals.h>
 #include "rect_animator.h"
 #include "viewport_geometry_accessor.h"
 
@@ -16,7 +16,6 @@ class ViewportAnimator: public RectAnimator {
     typedef RectAnimator base_type;
 
 public:
-
     /**
      * Constructor.
      * 

@@ -95,9 +95,9 @@ protected:
         /* Highlight currently raised/zoomed item. */
         QnWorkbenchItem *raisedItem = NULL;
         if(workbench()) {
-            raisedItem = workbench()->item(QnWorkbench::RAISED);
+            raisedItem = workbench()->item(Qn::RaisedRole);
             if(!raisedItem)
-                raisedItem = workbench()->item(QnWorkbench::ZOOMED);
+                raisedItem = workbench()->item(Qn::ZoomedRole);
         }
         
         if(raisedItem && (raisedItem->uuid() == uuid || (resource && uuid.isNull() && raisedItem->resourceUid() == resource->getUniqueId()))) {
@@ -238,8 +238,8 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent, QnWorkbenchContext *
     ui->resourceTreeView->setStyle(treeStyle);
     ui->searchTreeView->setStyle(treeStyle);
 
-    ui->resourceTreeView->setProperty(itemViewItemBackgroundOpacity, 0.5);
-    ui->searchTreeView->setProperty(itemViewItemBackgroundOpacity, 0.5);
+    ui->resourceTreeView->setProperty(Qn::ItemViewItemBackgroundOpacity, 0.5);
+    ui->searchTreeView->setProperty(Qn::ItemViewItemBackgroundOpacity, 0.5);
 
     m_renameAction = new QAction(this);
 
@@ -266,7 +266,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent, QnWorkbenchContext *
 
     connect(workbench(),        SIGNAL(currentLayoutAboutToBeChanged()),            this, SLOT(at_workbench_currentLayoutAboutToBeChanged()));
     connect(workbench(),        SIGNAL(currentLayoutChanged()),                     this, SLOT(at_workbench_currentLayoutChanged()));
-    connect(workbench(),        SIGNAL(itemChanged(QnWorkbench::ItemRole)),         this, SLOT(at_workbench_itemChanged(QnWorkbench::ItemRole)));
+    connect(workbench(),        SIGNAL(itemChanged(Qn::ItemRole)),                  this, SLOT(at_workbench_itemChanged(Qn::ItemRole)));
     connect(workbench(),        SIGNAL(itemAdded(QnWorkbenchItem *)),               this, SLOT(at_workbench_itemAdded(QnWorkbenchItem *)));
     connect(workbench(),        SIGNAL(itemRemoved(QnWorkbenchItem *)),             this, SLOT(at_workbench_itemRemoved(QnWorkbenchItem *)));
 }
@@ -458,7 +458,7 @@ void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *) {
     }
     QnActionManager *manager = context()->menu();
 
-    QScopedPointer<QMenu> menu(manager->newMenu(Qn::TreeScope, currentTarget(Qn::TreeScope)));
+    QScopedPointer<QMenu> menu(manager->newMenu(Qn::TreeScope, QnActionParameters(currentTarget(Qn::TreeScope))));
 
     /* Add tree-local actions to the menu. */
     manager->redirectAction(menu.data(), Qn::RenameAction, m_renameAction);
@@ -545,7 +545,7 @@ void QnResourceTreeWidget::at_workbench_currentLayoutChanged() {
     currentItemView()->update();
 }
 
-void QnResourceTreeWidget::at_workbench_itemChanged(QnWorkbench::ItemRole role) {
+void QnResourceTreeWidget::at_workbench_itemChanged(Qn::ItemRole role) {
     /* Raised state has changed. */
     ui->resourceTreeView->update();
 }

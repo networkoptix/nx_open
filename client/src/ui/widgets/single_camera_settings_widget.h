@@ -47,10 +47,12 @@ private slots:
     void at_dataChanged();
     void at_cameraScheduleWidget_scheduleTasksChanged();
     void at_linkActivated(const QString &urlString);
-
+    void at_motionTypeChanged();
+    void at_motionSensitivityChanged(int value);
+    void at_motionSelectionCleared();
 private:
     void setHasChanges(bool hasChanges);
-
+    void updateMaxMotionRect();
 private:
     Q_DISABLE_COPY(QnSingleCameraSettingsWidget);
 

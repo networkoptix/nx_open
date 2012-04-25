@@ -14,7 +14,7 @@ namespace {
 } // anonymous namespace
 
 DragInstrument::DragInstrument(QObject *parent):
-    DragProcessingInstrument(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent)
+    DragProcessingInstrument(Viewport, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent)
 {}
 
 DragInstrument::~DragInstrument() {
@@ -81,6 +81,7 @@ void DragInstrument::startDrag(DragInfo *info) {
     drag->setMimeData(mimeData);
 
     Qt::DropAction dropAction = drag->exec();
+    Q_UNUSED(dropAction);
 
     emit dragFinished(info->view());
 
@@ -91,7 +92,7 @@ void DragInstrument::dragMove(DragInfo *) {
     return;
 }
 
-void DragInstrument::finishDrag(DragInfo *info) {
+void DragInstrument::finishDrag(DragInfo *) {
     return;
 }
 

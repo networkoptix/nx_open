@@ -84,7 +84,6 @@ void WheelZoomInstrument::kineticMove(const QVariant &degrees) {
     if(viewport == NULL)
         return;
 
-    /* 180 degree turn makes a 2x scale. */
     qreal factor = std::pow(2.0, -degrees.toReal() / degreesFor2x);
     scaleViewport(this->view(viewport), factor, m_viewportAnchor);
 }

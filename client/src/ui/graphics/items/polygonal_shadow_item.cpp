@@ -59,7 +59,7 @@ void QnPolygonalShadowItem::paint(QPainter *painter, const QStyleOptionGraphicsI
     color.setAlpha(color.alpha() * effectiveOpacity());
 
     /* Color for drawing the soft corners. */
-    QColor transparent = SceneUtility::transparent(color);
+    QColor transparent = toTransparent(color);
     
     painter->beginNativePainting();
     //glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */

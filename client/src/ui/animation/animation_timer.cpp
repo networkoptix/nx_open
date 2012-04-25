@@ -33,6 +33,8 @@ void AnimationTimerListener::stopListening() {
 }
 
 void AnimationTimerListener::setTimer(AnimationTimer *timer) {
+    /* Note that m_timer field is changed in addListener/removeListener methods. */
+
     if(timer != NULL) {
         timer->addListener(this);
     } else if(m_timer != NULL) {

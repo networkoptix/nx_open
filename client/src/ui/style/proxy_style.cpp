@@ -47,9 +47,8 @@ void QnProxyStyle::setBaseStyle(QStyle *style)
 
     if(style) {
         m_style = style;
-        m_style.data()->setParent(this);
     } else {
         m_style = QApplication::style();
-        m_style.data()->setParent(styleStorage());
     }
+    m_style.data()->setParent(styleStorage());
 }

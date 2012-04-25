@@ -3,7 +3,7 @@
 #include "destruction_guard_item.h"
 
 UiElementsInstrument::UiElementsInstrument(QObject *parent):
-    Instrument(Instrument::VIEWPORT, makeSet(QEvent::Paint), parent) 
+    Instrument(Instrument::Viewport, makeSet(QEvent::Paint), parent) 
 {
     /* It is important NOT to use ItemIgnoresTransformations flag here as it 
      * messes up graphics scene framework's internals in a really awful way.

@@ -41,17 +41,19 @@ class TypedMagnitudeCalculator;
 class MagnitudeCalculator {
 public:
     /**
-     * This function is thread-safe.
-     *
      * \param type                      <tt>QMetaType::Type</tt> to get magnitude calculator for. 
      *                                  Pass zero to get no-op calculator.
      * \returns                         Magnitude calculator for the given type, or NULL if none.
+     * 
+     * \note                            This function is thread-safe.
      */
     static MagnitudeCalculator *forType(int type);
 
     /**
      * \tparam T                        Type to get magnitude calculator for.
      * \returns                         Magnitude calculator for the given type, or NULL if none.
+     * 
+     * \note                            This function is thread-safe.
      */
     template<class T>
     static TypedMagnitudeCalculator<T> *forType() {
@@ -59,9 +61,9 @@ public:
     }
 
     /**
-     * This function is thread-safe.
-     *
      * \param calculator                New magnitude calculator to register.
+     * 
+     * \note                            This function is thread-safe.
      */
     static void registerCalculator(MagnitudeCalculator *calculator);
 

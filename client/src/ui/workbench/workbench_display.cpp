@@ -116,8 +116,8 @@ namespace {
     const qreal zStep = 1.0;
 
     enum {
-        ITEM_LAYER = 0x93A7FA71,    /**< Key for item layer. */
-        ITEM_ANIMATOR = 0x81AFD591  /**< Key for item animator. */
+        ITEM_LAYER_KEY = 0x93A7FA71,    /**< Key for item layer. */
+        ITEM_ANIMATOR_KEY = 0x81AFD591  /**< Key for item animator. */
     };
 
 } // anonymous namespace
@@ -131,10 +131,9 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_viewportAnimator(NULL),
     m_frameOpacityAnimator(NULL),
     m_curtainAnimator(NULL),
-    m_mode(QnWorkbench::VIEWING),
     m_frontZ(0.0),
     m_dummyScene(new QGraphicsScene(this)),
-	m_renderWatcher(NULL),
+	m_streamSynchronizer(NULL),
     m_frameOpacity(1.0),
     m_frameWidthsDirty(false),
     m_zoomedMarginFlags(0),
@@ -145,19 +144,21 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     /* Create and configure instruments. */
     Instrument::EventTypeSet paintEventTypes = Instrument::makeSet(QEvent::Paint);
 
-    SignalingInstrument *resizeSignalingInstrument = new SignalingInstrument(Instrument::VIEWPORT, Instrument::makeSet(QEvent::Resize), this);
-    SignalingInstrument *paintSignalingInstrument = new SignalingInstrument(Instrument::VIEWPORT, Instrument::makeSet(QEvent::Paint), this);
+    SignalingInstrument *resizeSignalingInstrument = new SignalingInstrument(Instrument::Viewport, Instrument::makeSet(QEvent::Resize), this);
+    m_beforePaintInstrument = new SignalingInstrument(Instrument::Viewport, paintEventTypes, this);
+    m_afterPaintInstrument = new SignalingInstrument(Instrument::Viewport, paintEventTypes, this);
     m_animationInstrument = new AnimationInstrument(this);
     m_boundingInstrument = new BoundingInstrument(this);
     m_transformListenerInstrument = new TransformListenerInstrument(this);
     m_curtainActivityInstrument = new ActivityListenerInstrument(1000, this);
     m_widgetActivityInstrument = new ActivityListenerInstrument(1000 * 10, this);
-    m_paintForwardingInstrument = new ForwardingInstrument(Instrument::VIEWPORT, paintEventTypes, this);
+    m_paintForwardingInstrument = new ForwardingInstrument(Instrument::Viewport, paintEventTypes, this);
     m_selectionOverlayHackInstrument = new SelectionOverlayHackInstrument(this);
 
-    m_instrumentManager->installInstrument(new StopInstrument(Instrument::VIEWPORT, paintEventTypes, this));
+    m_instrumentManager->installInstrument(new StopInstrument(Instrument::Viewport, paintEventTypes, this));
+    m_instrumentManager->installInstrument(m_afterPaintInstrument);
     m_instrumentManager->installInstrument(m_paintForwardingInstrument);
-    m_instrumentManager->installInstrument(paintSignalingInstrument);
+    m_instrumentManager->installInstrument(m_beforePaintInstrument);
     m_instrumentManager->installInstrument(m_transformListenerInstrument);
     m_instrumentManager->installInstrument(resizeSignalingInstrument);
     m_instrumentManager->installInstrument(m_boundingInstrument);
@@ -172,7 +173,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     connect(resizeSignalingInstrument,      SIGNAL(activated(QWidget *, QEvent *)),                     this,                   SLOT(synchronizeRaisedGeometry()));
     connect(resizeSignalingInstrument,      SIGNAL(activated(QWidget *, QEvent *)),                     this,                   SLOT(synchronizeSceneBoundsExtension()));
     connect(resizeSignalingInstrument,      SIGNAL(activated(QWidget *, QEvent *)),                     this,                   SLOT(fitInView()));
-    connect(paintSignalingInstrument,       SIGNAL(activated(QWidget *, QEvent *)),                     this,                   SLOT(updateFrameWidths()));
+    connect(m_beforePaintInstrument,        SIGNAL(activated(QWidget *, QEvent *)),                     this,                   SLOT(updateFrameWidths()));
     connect(m_curtainActivityInstrument,    SIGNAL(activityStopped()),                                  this,                   SLOT(at_activityStopped()));
     connect(m_curtainActivityInstrument,    SIGNAL(activityResumed()),                                  this,                   SLOT(at_activityStarted()));
 
@@ -219,10 +220,25 @@ QnWorkbenchDisplay::~QnWorkbenchDisplay() {
     setScene(NULL);
 }
 
-void QnWorkbenchDisplay::initSyncPlay() {
-    /* Set up syncplay and render watcher. */
-    m_renderWatcher = new QnWorkbenchRenderWatcher(this, this);
-    new QnWorkbenchStreamSynchronizer(this, m_renderWatcher, this);
+void QnWorkbenchDisplay::setStreamsSynchronized(bool synchronized) {
+    if(synchronized == isStreamsSynchronized())
+        return;
+
+    if(!m_streamSynchronizer) {
+        QnWorkbenchRenderWatcher *renderWatcher = new QnWorkbenchRenderWatcher(this, this);
+        m_streamSynchronizer = new QnWorkbenchStreamSynchronizer(this, renderWatcher, this);
+    }
+
+    m_streamSynchronizer->setEnabled(synchronized);
+
+    emit streamsSynchronizedChanged(synchronized);
+}
+
+bool QnWorkbenchDisplay::isStreamsSynchronized() const {
+    if(!m_streamSynchronizer)
+        return false;
+
+    return m_streamSynchronizer->isEnabled();
 }
 
 void QnWorkbenchDisplay::setScene(QGraphicsScene *scene) {
@@ -269,13 +285,11 @@ void QnWorkbenchDisplay::deinitSceneContext() {
     disconnect(context(), NULL, this, NULL);
     disconnect(workbench(), NULL, this, NULL);
 
-    for(int i = 0; i < QnWorkbench::ITEM_ROLE_COUNT; i++)
-        at_workbench_itemChanged(static_cast<QnWorkbench::ItemRole>(i), NULL);
+    for(int i = 0; i < Qn::ItemRoleCount; i++)
+        at_workbench_itemChanged(static_cast<Qn::ItemRole>(i), NULL);
 
     foreach(QnWorkbenchItem *item, workbench()->currentLayout()->items())
         removeItemInternal(item, true, false);
-
-    m_mode = QnWorkbench::VIEWING;
 }
 
 void QnWorkbenchDisplay::initSceneContext() {
@@ -300,14 +314,14 @@ void QnWorkbenchDisplay::initSceneContext() {
     /* Set up curtain. */
     m_curtainItem = new QnCurtainItem();
     m_scene->addItem(m_curtainItem.data());
-    setLayer(m_curtainItem.data(), CurtainLayer);
+    setLayer(m_curtainItem.data(), Qn::CurtainLayer);
     m_curtainItem.data()->setColor(QColor(0, 0, 0, 255));
     m_curtainAnimator->setCurtainItem(m_curtainItem.data());
 
     /* Set up grid. */
     m_gridItem = new QnGridItem();
     m_scene->addItem(m_gridItem.data());
-    setLayer(m_gridItem.data(), BackLayer);
+    setLayer(m_gridItem.data(), Qn::BackLayer);
     m_gridItem.data()->setAnimationSpeed(2.0);
     m_gridItem.data()->setAnimationTimeLimit(300);
     m_gridItem.data()->setColor(QColor(0, 240, 240, 128));
@@ -317,8 +331,7 @@ void QnWorkbenchDisplay::initSceneContext() {
     m_gridItem.data()->setAnimationTimer(m_animationInstrument->animationTimer());
 
     /* Connect to workbench. */
-    connect(workbench(),            SIGNAL(modeChanged()),                          this,                   SLOT(at_workbench_modeChanged()));
-    connect(workbench(),            SIGNAL(itemChanged(QnWorkbench::ItemRole)),     this,                   SLOT(at_workbench_itemChanged(QnWorkbench::ItemRole)));
+    connect(workbench(),            SIGNAL(itemChanged(Qn::ItemRole)),              this,                   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
     connect(workbench(),            SIGNAL(itemAdded(QnWorkbenchItem *)),           this,                   SLOT(at_workbench_itemAdded(QnWorkbenchItem *)));
     connect(workbench(),            SIGNAL(itemRemoved(QnWorkbenchItem *)),         this,                   SLOT(at_workbench_itemRemoved(QnWorkbenchItem *)));
     connect(workbench(),            SIGNAL(boundingRectChanged()),                  this,                   SLOT(fitInView()));
@@ -334,12 +347,9 @@ void QnWorkbenchDisplay::initSceneContext() {
     foreach(QnWorkbenchItem *item, workbench()->currentLayout()->items())
         addItemInternal(item, false);
 
-    /* Fire signals if needed. */
-    if(workbench()->mode() != m_mode)
-        at_workbench_modeChanged();
-    for(int i = 0; i < QnWorkbench::ITEM_ROLE_COUNT; i++)
-        if(workbench()->item(static_cast<QnWorkbench::ItemRole>(i)) != m_itemByRole[i])
-            at_workbench_itemChanged(static_cast<QnWorkbench::ItemRole>(i));
+    for(int i = 0; i < Qn::ItemRoleCount; i++)
+        if(workbench()->item(static_cast<Qn::ItemRole>(i)) != m_itemByRole[i])
+            at_workbench_itemChanged(static_cast<Qn::ItemRole>(i));
 
     synchronizeSceneBounds();
 }
@@ -423,21 +433,17 @@ QnGridItem *QnWorkbenchDisplay::gridItem() {
     return m_gridItem.data();
 }
 
-QnWorkbenchRenderWatcher *QnWorkbenchDisplay::renderWatcher() const {
-    return m_renderWatcher;
-}
-
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDisplay :: item properties
 // -------------------------------------------------------------------------- //
-QnWorkbenchDisplay::Layer QnWorkbenchDisplay::layer(QGraphicsItem *item) const {
+Qn::ItemLayer QnWorkbenchDisplay::layer(QGraphicsItem *item) const {
     bool ok;
-    Layer layer = static_cast<Layer>(item->data(ITEM_LAYER).toInt(&ok));
-    return ok ? layer : BackLayer;
+    Qn::ItemLayer layer = static_cast<Qn::ItemLayer>(item->data(ITEM_LAYER_KEY).toInt(&ok));
+    return ok ? layer : Qn::BackLayer;
 }
 
-void QnWorkbenchDisplay::setLayer(QGraphicsItem *item, Layer layer) {
+void QnWorkbenchDisplay::setLayer(QGraphicsItem *item, Qn::ItemLayer layer) {
     if(item == NULL) {
         qnNullWarning(item);
         return;
@@ -445,7 +451,7 @@ void QnWorkbenchDisplay::setLayer(QGraphicsItem *item, Layer layer) {
 
     /* Moving items back and forth between layers should preserve their relative
      * z order. Hence the fmod. */
-    item->setData(ITEM_LAYER, static_cast<int>(layer));
+    item->setData(ITEM_LAYER_KEY, static_cast<int>(layer));
     item->setZValue(layer * layerZSize + std::fmod(item->zValue(), layerZSize));
 
     QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
@@ -453,13 +459,13 @@ void QnWorkbenchDisplay::setLayer(QGraphicsItem *item, Layer layer) {
         widget->shadow()->setZValue(shadowLayer(layer) * layerZSize);
 }
 
-void QnWorkbenchDisplay::setLayer(const QList<QGraphicsItem *> &items, Layer layer) {
+void QnWorkbenchDisplay::setLayer(const QList<QGraphicsItem *> &items, Qn::ItemLayer layer) {
     foreach(QGraphicsItem *item, items)
         setLayer(item, layer);
 }
 
 WidgetAnimator *QnWorkbenchDisplay::animator(QnResourceWidget *widget) {
-    WidgetAnimator *animator = widget->data(ITEM_ANIMATOR).value<WidgetAnimator *>();
+    WidgetAnimator *animator = widget->data(ITEM_ANIMATOR_KEY).value<WidgetAnimator *>();
     if(animator != NULL)
         return animator;
 
@@ -473,7 +479,7 @@ WidgetAnimator *QnWorkbenchDisplay::animator(QnResourceWidget *widget) {
     animator->setRotationSpeed(270.0);
     animator->setTimer(m_animationInstrument->animationTimer());
     animator->setTimeLimit(widgetAnimationDurationMsec);
-    widget->setData(ITEM_ANIMATOR, QVariant::fromValue<WidgetAnimator *>(animator));
+    widget->setData(ITEM_ANIMATOR_KEY, QVariant::fromValue<WidgetAnimator *>(animator));
     return animator;
 }
 
@@ -485,7 +491,7 @@ QnResourceWidget *QnWorkbenchDisplay::widget(QnAbstractRenderer *renderer) const
     return m_widgetByRenderer[renderer];
 }
 
-QnResourceWidget *QnWorkbenchDisplay::widget(QnWorkbench::ItemRole role) const {
+QnResourceWidget *QnWorkbenchDisplay::widget(Qn::ItemRole role) const {
     return widget(m_itemByRole[role]);
 }
 
@@ -524,7 +530,7 @@ CLCamDisplay *QnWorkbenchDisplay::camDisplay(QnWorkbenchItem *item) const {
 void QnWorkbenchDisplay::fitInView(bool animate) {
     QRectF targetGeometry;
 
-    QnWorkbenchItem *zoomedItem = m_itemByRole[QnWorkbench::ZOOMED];
+    QnWorkbenchItem *zoomedItem = m_itemByRole[Qn::ZoomedRole];
     if(zoomedItem != NULL) {
         targetGeometry = itemGeometry(zoomedItem);
     } else {
@@ -620,7 +626,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
     connect(item, SIGNAL(geometryChanged()),                            this, SLOT(at_item_geometryChanged()));
     connect(item, SIGNAL(geometryDeltaChanged()),                       this, SLOT(at_item_geometryDeltaChanged()));
     connect(item, SIGNAL(rotationChanged()),                            this, SLOT(at_item_rotationChanged()));
-    connect(item, SIGNAL(flagChanged(QnWorkbenchItem::ItemFlag, bool)), this, SLOT(at_item_flagChanged(QnWorkbenchItem::ItemFlag, bool)));
+    connect(item, SIGNAL(flagChanged(Qn::ItemFlag, bool)),              this, SLOT(at_item_flagChanged(Qn::ItemFlag, bool)));
 
     m_widgetByItem.insert(item, widget);
     if(widget->renderer() != NULL)
@@ -629,7 +635,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
     synchronize(widget, false);
     bringToFront(widget);
 
-    if(item->checkFlag(QnWorkbenchItem::PendingGeometryAdjustment))
+    if(item->checkFlag(Qn::PendingGeometryAdjustment))
         adjustGeometry(item, animate);
 
     connect(widget,                     SIGNAL(aboutToBeDestroyed()),   this,   SLOT(at_widget_aboutToBeDestroyed()));
@@ -661,9 +667,9 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
         m_widgetByRenderer.remove(widget->renderer());
 
     /* We better clear these as soon as possible. */
-    for(int i = 0; i < QnWorkbench::ITEM_ROLE_COUNT; i++)
-        if(item == workbench()->item(static_cast<QnWorkbench::ItemRole>(i)))
-            workbench()->setItem(static_cast<QnWorkbench::ItemRole>(i), NULL);
+    for(int i = 0; i < Qn::ItemRoleCount; i++)
+        if(item == workbench()->item(static_cast<Qn::ItemRole>(i)))
+            workbench()->setItem(static_cast<Qn::ItemRole>(i), NULL);
 
     if(destroyWidget) {
         widget->hide();
@@ -721,7 +727,7 @@ void QnWorkbenchDisplay::setNormalMarginFlags(Qn::MarginFlags flags) {
 
 void QnWorkbenchDisplay::updateCurrentMarginFlags() {
     Qn::MarginFlags flags;
-    if(m_itemByRole[QnWorkbench::ZOOMED] == NULL) {
+    if(m_itemByRole[Qn::ZoomedRole] == NULL) {
         flags = m_normalMarginFlags;
     } else {
         flags = m_zoomedMarginFlags;
@@ -752,41 +758,41 @@ void QnWorkbenchDisplay::setWidgetsFrameOpacity(qreal opacity) {
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDisplay :: calculators
 // -------------------------------------------------------------------------- //
-qreal QnWorkbenchDisplay::layerFrontZValue(Layer layer) const {
+qreal QnWorkbenchDisplay::layerFrontZValue(Qn::ItemLayer layer) const {
     return layerZValue(layer) + m_frontZ;
 }
 
-qreal QnWorkbenchDisplay::layerZValue(Layer layer) const {
+qreal QnWorkbenchDisplay::layerZValue(Qn::ItemLayer layer) const {
     return layer * layerZSize;
 }
 
-QnWorkbenchDisplay::Layer QnWorkbenchDisplay::shadowLayer(Layer itemLayer) const {
+Qn::ItemLayer QnWorkbenchDisplay::shadowLayer(Qn::ItemLayer itemLayer) const {
     switch(itemLayer) {
-    case PinnedRaisedLayer:
-        return PinnedLayer;
-    case UnpinnedRaisedLayer:
-        return UnpinnedLayer;
+    case Qn::PinnedRaisedLayer:
+        return Qn::PinnedLayer;
+    case Qn::UnpinnedRaisedLayer:
+        return Qn::UnpinnedLayer;
     default:
         return itemLayer;
     }
 }
 
-QnWorkbenchDisplay::Layer QnWorkbenchDisplay::synchronizedLayer(QnWorkbenchItem *item) const {
+Qn::ItemLayer QnWorkbenchDisplay::synchronizedLayer(QnWorkbenchItem *item) const {
     assert(item != NULL);
 
-    if(item == m_itemByRole[QnWorkbench::ZOOMED]) {
-        return ZoomedLayer;
+    if(item == m_itemByRole[Qn::ZoomedRole]) {
+        return Qn::ZoomedLayer;
     } else if(item->isPinned()) {
-        if(item == m_itemByRole[QnWorkbench::RAISED]) {
-            return PinnedRaisedLayer;
+        if(item == m_itemByRole[Qn::RaisedRole]) {
+            return Qn::PinnedRaisedLayer;
         } else {
-            return PinnedLayer;
+            return Qn::PinnedLayer;
         }
     } else {
-        if(item == m_itemByRole[QnWorkbench::RAISED]) {
-            return UnpinnedRaisedLayer;
+        if(item == m_itemByRole[Qn::RaisedRole]) {
+            return Qn::UnpinnedRaisedLayer;
         } else {
-            return UnpinnedLayer;
+            return Qn::UnpinnedLayer;
         }
     }
 }
@@ -909,8 +915,8 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
     assert(widget != NULL);
 
     QnWorkbenchItem *item = widget->item();
-    QnWorkbenchItem *zoomedItem = m_itemByRole[QnWorkbench::ZOOMED];
-    QnWorkbenchItem *raisedItem = m_itemByRole[QnWorkbench::RAISED];
+    QnWorkbenchItem *zoomedItem = m_itemByRole[Qn::ZoomedRole];
+    QnWorkbenchItem *raisedItem = m_itemByRole[Qn::RaisedRole];
 
     QRectF enclosingGeometry = itemEnclosingGeometry(item);
 
@@ -988,7 +994,7 @@ void QnWorkbenchDisplay::synchronizeSceneBounds() {
 
     QRectF sizeRect, moveRect;
 
-    QnWorkbenchItem *zoomedItem = m_itemByRole[QnWorkbench::ZOOMED];
+    QnWorkbenchItem *zoomedItem = m_itemByRole[Qn::ZoomedRole];
     if(zoomedItem != NULL) {
         sizeRect = moveRect = itemGeometry(zoomedItem);
     } else {
@@ -1001,9 +1007,6 @@ void QnWorkbenchDisplay::synchronizeSceneBounds() {
 }
 
 void QnWorkbenchDisplay::synchronizeSceneBoundsExtension() {
-    bool isZoomed = m_itemByRole[QnWorkbench::ZOOMED] != NULL;
-    //bool affectPosition = isZoomed ? currentMarginFlags() &
-
     MarginsF marginsExtension(0.0, 0.0, 0.0, 0.0);
     if(currentMarginFlags() != 0)
         marginsExtension = cwiseDiv(m_viewportAnimator->viewportMargins(), m_view->viewport()->size());
@@ -1014,7 +1017,7 @@ void QnWorkbenchDisplay::synchronizeSceneBoundsExtension() {
         if(currentMarginFlags() & Qn::MarginsAffectPosition)
             positionExtension = marginsExtension;
 
-        QnWorkbenchItem *zoomedItem = m_itemByRole[QnWorkbench::ZOOMED];
+        QnWorkbenchItem *zoomedItem = m_itemByRole[Qn::ZoomedRole];
         if(zoomedItem != NULL) {
             m_boundingInstrument->setPositionBoundsExtension(m_view, positionExtension);
         } else {
@@ -1028,13 +1031,13 @@ void QnWorkbenchDisplay::synchronizeSceneBoundsExtension() {
         sizeExtension = cwiseDiv(sizeExtension, QSizeF(1.0, 1.0) - sizeExtension);
 
         m_boundingInstrument->setSizeBoundsExtension(m_view, sizeExtension, sizeExtension);
-        if(m_itemByRole[QnWorkbench::ZOOMED] == NULL)
+        if(m_itemByRole[Qn::ZoomedRole] == NULL)
             m_boundingInstrument->stickScale(m_view);
     }
 }
 
 void QnWorkbenchDisplay::synchronizeRaisedGeometry() {
-    QnWorkbenchItem *raisedItem = m_itemByRole[QnWorkbench::RAISED];
+    QnWorkbenchItem *raisedItem = m_itemByRole[Qn::RaisedRole];
     if(raisedItem == NULL)
         return;
 
@@ -1043,7 +1046,7 @@ void QnWorkbenchDisplay::synchronizeRaisedGeometry() {
 }
 
 void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate) {
-    if(!item->checkFlag(QnWorkbenchItem::PendingGeometryAdjustment))
+    if(!item->checkFlag(Qn::PendingGeometryAdjustment))
         return; /* May have been unchecked already. */
 
     QnResourceWidget *widget = this->widget(item);
@@ -1054,7 +1057,7 @@ void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate) {
         newPos = mapViewportToGridF(m_view->viewport()->geometry().center());
 
         /* Initialize item's geometry with adequate values. */
-        item->setFlag(QnWorkbenchItem::Pinned, false);
+        item->setFlag(Qn::Pinned, false);
         item->setCombinedGeometry(QRectF(newPos, QSizeF(0.0, 0.0)));
         synchronizeGeometry(widget, false);
     } else {
@@ -1082,7 +1085,7 @@ void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate) {
     QnAspectRatioMagnitudeCalculator metric(newPos, size, item->layout()->boundingRect(), aspectRatio(m_view->viewport()->size()) / aspectRatio(workbench()->mapper()->step()));
     QRect geometry = item->layout()->closestFreeSlot(newPos, size, &metric);
     item->layout()->pinItem(item, geometry);
-    item->setFlag(QnWorkbenchItem::PendingGeometryAdjustment, false);
+    item->setFlag(Qn::PendingGeometryAdjustment, false);
 
     /* Synchronize. */
     synchronizeGeometry(item, animate);
@@ -1124,82 +1127,42 @@ void QnWorkbenchDisplay::at_workbench_itemRemoved(QnWorkbenchItem *item) {
     }
 }
 
-void QnWorkbenchDisplay::at_workbench_modeChanged() {
-    if(m_mode == workbench()->mode()) {
-        qnWarning("Mode change signal was received even though the mode didn't change.");
-        return;
-    }
-
-    m_mode = workbench()->mode();
-
-    if(workbench()->mode() == QnWorkbench::EDITING) {
-        m_boundingInstrument->recursiveDisable();
-    } else {
-        m_boundingInstrument->recursiveEnable();
-    }
-}
-
-namespace {
-    QnWorkbenchItem *audioItem(QnWorkbenchItem *(&itemByRole)[QnWorkbench::ITEM_ROLE_COUNT]) {
-        if(itemByRole[QnWorkbench::ZOOMED] != NULL) {
-            return itemByRole[QnWorkbench::ZOOMED];
-        } else if(itemByRole[QnWorkbench::RAISED] != NULL) {
-            return itemByRole[QnWorkbench::RAISED];
-        } else {
-            return NULL;
-        }
-    }
-
-}
-
-void QnWorkbenchDisplay::at_workbench_itemChanged(QnWorkbench::ItemRole role, QnWorkbenchItem *item) {
+void QnWorkbenchDisplay::at_workbench_itemChanged(Qn::ItemRole role, QnWorkbenchItem *item) {
     if(item == m_itemByRole[role])
         return;
 
-    QnWorkbenchItem *oldAudioItem = audioItem(m_itemByRole);
     QnWorkbenchItem *oldItem = m_itemByRole[role];
-    m_itemByRole[role] = item;
-    QnWorkbenchItem *newAudioItem = audioItem(m_itemByRole);
-
-    /* Update audio playback. */
-    if(oldAudioItem != newAudioItem) {
-        CLCamDisplay *oldCamDisplay = camDisplay(oldAudioItem);
-        if(oldCamDisplay != NULL)
-            oldCamDisplay->playAudio(false);
-
-        CLCamDisplay *newCamDisplay = camDisplay(newAudioItem);
-        if(newCamDisplay != NULL)
-            newCamDisplay->playAudio(true);
-    }
+    QnWorkbenchItem *newItem = item;
+    m_itemByRole[role] = newItem;
 
     /* Sync geometry. */
     switch(role) {
-    case QnWorkbench::RAISED: {
+    case Qn::RaisedRole: {
         /* Sync new & old items. */
         if(oldItem != NULL)
             synchronize(oldItem);
 
-        if(item != NULL) {
-            bringToFront(item);
-            synchronize(item, true);
+        if(newItem != NULL) {
+            bringToFront(newItem);
+            synchronize(newItem, true);
         }
 
         break;
     }
-    case QnWorkbench::ZOOMED: {
+    case Qn::ZoomedRole: {
         if(oldItem != NULL) {
             synchronize(oldItem, true);
 
             m_curtainActivityInstrument->recursiveDisable();
         }
 
-        if(item != NULL) {
-            bringToFront(item);
-            synchronize(item, true);
+        if(newItem != NULL) {
+            bringToFront(newItem);
+            synchronize(newItem, true);
 
             m_curtainActivityInstrument->recursiveEnable();
 
-            m_viewportAnimator->moveTo(itemGeometry(item));
+            m_viewportAnimator->moveTo(itemGeometry(newItem));
         } else {
             m_viewportAnimator->moveTo(fitInViewGeometry());
         }
@@ -1208,28 +1171,32 @@ void QnWorkbenchDisplay::at_workbench_itemChanged(QnWorkbench::ItemRole role, Qn
         synchronizeSceneBoundsExtension();
         break;
     }
+    case Qn::CentralRole: {
+        /* Update audio playback. */
+        CLCamDisplay *oldCamDisplay = camDisplay(oldItem);
+        if(oldCamDisplay != NULL)
+            oldCamDisplay->playAudio(false);
+
+        CLCamDisplay *newCamDisplay = camDisplay(newItem);
+        if(newCamDisplay != NULL)
+            newCamDisplay->playAudio(true);
+        break;
+    }
     default:
-        qnWarning("Unreachable code executed.");
+        qnWarning("Invalid item role %1.", static_cast<int>(role));
         return;
     }
 
     /* Update media quality. */
-    if(role == QnWorkbench::ZOOMED) 
-    {
-        QnResourceWidget *oldWidget = this->widget(oldItem);
-        if(oldWidget) 
-        {
-            if (oldWidget->display()->archiveReader()) 
-            {
+    if(role == Qn::ZoomedRole) {
+        if(QnResourceWidget *oldWidget = this->widget(oldItem)) {
+            if (oldWidget->display()->archiveReader()) {
                 //oldWidget->display()->archiveReader()->setQuality(MEDIA_Quality_Low);
             	oldWidget->display()->archiveReader()->enableQualityChange();
             }
         }
-        QnResourceWidget *newWidget = this->widget(item);
-        if(newWidget) 
-        {
-            if (newWidget->display()->archiveReader())
-			{
+        if(QnResourceWidget *newWidget = this->widget(newItem)) {
+            if (newWidget->display()->archiveReader()) {
             	newWidget->display()->archiveReader()->setQuality(MEDIA_Quality_High, true);
             	newWidget->display()->archiveReader()->disableQualityChange();
 			}
@@ -1237,9 +1204,8 @@ void QnWorkbenchDisplay::at_workbench_itemChanged(QnWorkbench::ItemRole role, Qn
     }
 
     /* Hide / show other items when zoomed. */
-    if(role == QnWorkbench::ZOOMED) 
-    {
-        QnWorkbenchItem *zoomedItem = m_itemByRole[QnWorkbench::ZOOMED];
+    if(role == Qn::ZoomedRole) {
+        QnWorkbenchItem *zoomedItem = m_itemByRole[Qn::ZoomedRole];
         if(zoomedItem)
             opacityAnimator(widget(zoomedItem))->animateTo(1.0);
         qreal opacity = zoomedItem ? 0.0 : 1.0;
@@ -1256,7 +1222,7 @@ void QnWorkbenchDisplay::at_workbench_itemChanged(QnWorkbench::ItemRole role, Qn
 }
 
 
-void QnWorkbenchDisplay::at_workbench_itemChanged(QnWorkbench::ItemRole role) {
+void QnWorkbenchDisplay::at_workbench_itemChanged(Qn::ItemRole role) {
     at_workbench_itemChanged(role, workbench()->item(role));
 }
 
@@ -1277,16 +1243,16 @@ void QnWorkbenchDisplay::at_item_rotationChanged() {
     QnWorkbenchItem *item = static_cast<QnWorkbenchItem *>(sender());
 
     synchronizeGeometry(item, true);
-    if(item == m_itemByRole[QnWorkbench::ZOOMED])
+    if(item == m_itemByRole[Qn::ZoomedRole])
         synchronizeSceneBounds();
 }
 
-void QnWorkbenchDisplay::at_item_flagChanged(QnWorkbenchItem::ItemFlag flag, bool value) {
+void QnWorkbenchDisplay::at_item_flagChanged(Qn::ItemFlag flag, bool value) {
     switch(flag) {
-    case QnWorkbenchItem::Pinned:
+    case Qn::Pinned:
         synchronizeLayer(static_cast<QnWorkbenchItem *>(sender()));
         break;
-    case QnWorkbenchItem::PendingGeometryAdjustment:
+    case Qn::PendingGeometryAdjustment:
         if(value)
             adjustGeometry(static_cast<QnWorkbenchItem *>(sender()));
         break;
@@ -1297,7 +1263,7 @@ void QnWorkbenchDisplay::at_item_flagChanged(QnWorkbenchItem::ItemFlag flag, boo
 }
 
 void QnWorkbenchDisplay::at_activityStopped() {
-    m_curtainAnimator->curtain(widget(m_itemByRole[QnWorkbench::ZOOMED]));
+    m_curtainAnimator->curtain(widget(m_itemByRole[Qn::ZoomedRole]));
 }
 
 void QnWorkbenchDisplay::at_activityStarted() {
@@ -1305,7 +1271,7 @@ void QnWorkbenchDisplay::at_activityStarted() {
 }
 
 void QnWorkbenchDisplay::at_curtained() {
-    QnWorkbenchItem *zoomedItem = m_itemByRole[QnWorkbench::ZOOMED];
+    QnWorkbenchItem *zoomedItem = m_itemByRole[Qn::ZoomedRole];
     foreach(QnResourceWidget *widget, m_widgetByItem)
         if(widget->item() != zoomedItem)
             widget->hide();

@@ -149,7 +149,7 @@ void QnWorkbenchLayout::addItem(QnWorkbenchItem *item) {
     }
 
     if(item->isPinned() && m_itemMap.isOccupied(item->geometry()))
-        item->setFlag(QnWorkbenchItem::Pinned, false);
+        item->setFlag(Qn::Pinned, false);
 
     item->m_layout = this;
     m_items.insert(item);
@@ -358,7 +358,7 @@ bool QnWorkbenchLayout::pinItem(QnWorkbenchItem *item, const QRect &geometry) {
 
     m_itemMap.fill(geometry, item);
     moveItemInternal(item, geometry);
-    item->setFlagInternal(QnWorkbenchItem::Pinned, true);
+    item->setFlagInternal(Qn::Pinned, true);
     return true;
 }
 
@@ -372,7 +372,7 @@ bool QnWorkbenchLayout::unpinItem(QnWorkbenchItem *item) {
         return true;
 
     m_itemMap.clear(item->geometry());
-    item->setFlagInternal(QnWorkbenchItem::Pinned, false);
+    item->setFlagInternal(Qn::Pinned, false);
     return true;
 }
 
@@ -412,10 +412,10 @@ QRect QnWorkbenchLayout::closestFreeSlot(const QPointF &gridPos, const QSize &si
     QPoint bestDelta = QPoint(std::numeric_limits<int>::max(), std::numeric_limits<int>::max());
 
     /* Border being walked. */
-    QnWorkbenchGridWalker::Border checkedBorder = QnWorkbenchGridWalker::NoBorders;
+    Qn::Border checkedBorder = Qn::NoBorders;
 
     /* Borders that are known not to contain positions closer to the target than current best. */
-    QnWorkbenchGridWalker::Borders checkedBorders = 0;
+    Qn::Borders checkedBorders = 0;
 
     QnWorkbenchGridWalker walker;
     while(true) {
@@ -425,7 +425,7 @@ QRect QnWorkbenchLayout::closestFreeSlot(const QPointF &gridPos, const QSize &si
             qreal distance = metric->calculate(gridCell + delta);
             if(distance > bestDistance || qFuzzyCompare(distance, bestDistance))
                 continue;
-            checkedBorder = QnWorkbenchGridWalker::NoBorders;
+            checkedBorder = Qn::NoBorders;
 
             if(m_itemMap.isOccupied(QRect(gridCell + delta, size)))
                 continue;
@@ -435,20 +435,20 @@ QRect QnWorkbenchLayout::closestFreeSlot(const QPointF &gridPos, const QSize &si
             bestDelta = delta;
         } else {
             checkedBorders |= checkedBorder;
-            if(checkedBorders == QnWorkbenchGridWalker::AllBorders && bestDistance < std::numeric_limits<qreal>::max())
+            if(checkedBorders == Qn::AllBorders && bestDistance < std::numeric_limits<qreal>::max())
                 return QRect(gridCell + bestDelta, size);
 
             struct {
-                QnWorkbenchGridWalker::Border border;
+                Qn::Border border;
                 QPoint delta;
             } expansion[4] = {
-                {QnWorkbenchGridWalker::RightBorder,   QPoint(walker.rect().right() + 1,   gridCell.y())},
-                {QnWorkbenchGridWalker::LeftBorder,    QPoint(walker.rect().left() - 1,    gridCell.y())},
-                {QnWorkbenchGridWalker::BottomBorder,  QPoint(gridCell.x(),                walker.rect().bottom() + 1)},
-                {QnWorkbenchGridWalker::TopBorder,     QPoint(gridCell.x(),                walker.rect().top() - 1)},
+                {Qn::RightBorder,   QPoint(walker.rect().right() + 1,   gridCell.y())},
+                {Qn::LeftBorder,    QPoint(walker.rect().left() - 1,    gridCell.y())},
+                {Qn::BottomBorder,  QPoint(gridCell.x(),                walker.rect().bottom() + 1)},
+                {Qn::TopBorder,     QPoint(gridCell.x(),                walker.rect().top() - 1)},
             };
 
-            QnWorkbenchGridWalker::Border bestBorder = QnWorkbenchGridWalker::NoBorders;
+            Qn::Border bestBorder = Qn::NoBorders;
             qreal bestBorderDistance = std::numeric_limits<qreal>::max();
             for(int i = 0; i < 4; i++) {
                 qreal distance = metric->calculate(gridCell + expansion[i].delta);

@@ -125,11 +125,11 @@ public:
      * Enumeration for different types of objects that can be watched by an instrument.
      */
     enum WatchedType {
-        VIEWPORT,      /**< Viewport. */
-        VIEW,          /**< Graphics view. */
-        SCENE,         /**< Graphics scene. */
-        ITEM,          /**< Graphics item. */
-        WATCHED_TYPE_COUNT
+        Viewport,      /**< Viewport. */
+        View,          /**< Graphics view. */
+        Scene,         /**< Graphics scene. */
+        Item,          /**< Graphics item. */
+        WatchedTypeCount
     };
 
     typedef QSet<QEvent::Type> EventTypeSet;
@@ -695,7 +695,7 @@ private:
     InstrumentManager *m_manager;
     QGraphicsScene *m_scene;
     QScopedPointer<AnimationTimer> m_animationTimer;
-    EventTypeSet m_watchedEventTypes[WATCHED_TYPE_COUNT];
+    EventTypeSet m_watchedEventTypes[WatchedTypeCount];
     int m_disabledCounter;
 };
 
@@ -712,10 +712,10 @@ struct instrument_watched_type<CLASS> {                                         
     static const Instrument::WatchedType value = Instrument::TYPE;              \
 };                                                                              \
 
-QN_DEFINE_INSTRUMENT_WATCHED_TYPE(QGraphicsScene, SCENE);
-QN_DEFINE_INSTRUMENT_WATCHED_TYPE(QGraphicsView,  VIEW);
-QN_DEFINE_INSTRUMENT_WATCHED_TYPE(QWidget,        VIEWPORT);
-QN_DEFINE_INSTRUMENT_WATCHED_TYPE(QGraphicsItem,  ITEM);
+QN_DEFINE_INSTRUMENT_WATCHED_TYPE(QGraphicsScene, Scene);
+QN_DEFINE_INSTRUMENT_WATCHED_TYPE(QGraphicsView,  View);
+QN_DEFINE_INSTRUMENT_WATCHED_TYPE(QWidget,        Viewport);
+QN_DEFINE_INSTRUMENT_WATCHED_TYPE(QGraphicsItem,  Item);
 
 #undef QN_DEFINE_INSTRUMENT_WATCHED_TYPE
 

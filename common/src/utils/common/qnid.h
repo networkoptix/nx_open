@@ -4,7 +4,6 @@
 #include <QString>
 #include <QMetaType>
 
-// This class is going to be exported from our common DLL. So 'QN_EXPORT' MUST be specified after 'class' identifier
 class QN_EXPORT QnId
 {
 public:
@@ -25,9 +24,9 @@ public:
     /**
      * Generates a new unassigned id.
      *
-     * This function is thread-safe.
-     *
      * \returns                         Newly generated id.
+     * 
+     * \note                            This function is thread-safe.
      */
     static QnId generateSpecialId();
 

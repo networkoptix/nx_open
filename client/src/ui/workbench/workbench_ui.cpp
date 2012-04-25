@@ -42,7 +42,7 @@
 #include <ui/graphics/items/masked_proxy_widget.h>
 #include <ui/graphics/items/clickable_widget.h>
 #include <ui/graphics/items/simple_frame_widget.h>
-#include <ui/graphics/items/standard/graphicslabel.h>
+#include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/graphics/items/controls/navigationitem.h>
 
 #include <ui/processors/hover_processor.h>
@@ -158,7 +158,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
 
     /* Create controls. */
     m_controlsWidget = m_uiElementsInstrument->widget(); /* Setting an ItemIsPanel flag on this item prevents focusing on graphics widgets. Don't set it. */
-    m_display->setLayer(m_controlsWidget, QnWorkbenchDisplay::UiLayer);
+    m_display->setLayer(m_controlsWidget, Qn::UiLayer);
 
     QnSingleEventSignalizer *deactivationSignalizer = new QnSingleEventSignalizer(this);
     deactivationSignalizer->setEventType(QEvent::WindowDeactivate);
@@ -467,7 +467,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
         m_sliderShowButton->setTransform(transform);
     }
 
-    m_sliderItem = new NavigationItem(m_controlsWidget);
+    m_sliderItem = new NavigationItem(display, m_controlsWidget);
     m_sliderItem->setFrameColor(QColor(110, 110, 110, 255));
     m_sliderItem->setFrameWidth(0.5);
 
@@ -497,7 +497,6 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(m_sliderItem,               SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_sliderItem_geometryChanged()));
     connect(m_sliderItem,               SIGNAL(actualCameraChanged(CLVideoCamera *)),                                               this,                           SLOT(updateControlsVisibility()));
     connect(m_sliderItem,               SIGNAL(enableItemSync(bool)),                                                               m_display,                      SIGNAL(enableItemSync(bool)));
-    connect(m_sliderItem,               SIGNAL(exportRange(CLVideoCamera*, qint64, qint64)),                                        this,                           SLOT(at_exportMediaRange(CLVideoCamera*, qint64, qint64)));
 
 
     /* Connect to display. */
@@ -506,10 +505,9 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(action(Qn::FullscreenAction),SIGNAL(triggered()),                                                                       this,                           SLOT(at_fullscreenAction_triggered()));
     connect(m_display,                  SIGNAL(viewportGrabbed()),                                                                  this,                           SLOT(disableProxyUpdates()));
     connect(m_display,                  SIGNAL(viewportUngrabbed()),                                                                this,                           SLOT(enableProxyUpdates()));
-    connect(m_display,                  SIGNAL(widgetChanged(QnWorkbench::ItemRole)),                                               this,                           SLOT(at_display_widgetChanged(QnWorkbench::ItemRole)));
+    connect(m_display,                  SIGNAL(widgetChanged(Qn::ItemRole)),                                                        this,                           SLOT(at_display_widgetChanged(Qn::ItemRole)));
     connect(m_display,                  SIGNAL(widgetAdded(QnResourceWidget *)),                                                    this,                           SLOT(at_display_widgetAdded(QnResourceWidget *)));
     connect(m_display,                  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),                                         this,                           SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
-    connect(m_display->renderWatcher(), SIGNAL(displayingStateChanged(QnAbstractRenderer *, bool)),                                 this,                           SLOT(at_renderWatcher_displayingStateChanged(QnAbstractRenderer *, bool)));
 
 
     /* Init fields. */
@@ -1077,7 +1075,7 @@ void QnWorkbenchUi::updateViewportMargins() {
 }
 
 void QnWorkbenchUi::updateActivityInstrumentState() {
-    bool zoomed = m_widgetByRole[QnWorkbench::ZOOMED] != NULL;
+    bool zoomed = m_widgetByRole[Qn::ZoomedRole] != NULL;
 
     if(zoomed) {
         m_controlsActivityInstrument->setEnabled(m_flags & HideWhenZoomed);
@@ -1123,7 +1121,7 @@ void QnWorkbenchUi::updateHelpContextInternal() {
     case Qn::SceneScope:
         context = QnContextHelp::ContextId_Scene;
         foreach(QnResourceWidget *widget, display()->widgets()) {
-            if(widget->displayFlags() & QnResourceWidget::DISPLAY_MOTION_GRID) {
+            if(widget->displayFlags() & QnResourceWidget::DisplayMotionGrid) {
                 context = QnContextHelp::ContextId_MotionGrid;
                 break;
             }
@@ -1213,28 +1211,22 @@ void QnWorkbenchUi::at_activityStarted() {
     updateControlsVisibility(true);
 }
 
-void QnWorkbenchUi::at_renderWatcher_displayingStateChanged(QnAbstractRenderer *renderer, bool displaying) {
-    QnResourceWidget *widget = m_display->widget(renderer);
-    if(widget != NULL)
-        m_sliderItem->onDisplayingStateChanged(widget->display()->dataProvider()->getResource(), displaying);
-}
-
-void QnWorkbenchUi::at_display_widgetChanged(QnWorkbench::ItemRole role) {
+void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role) {
     QnResourceWidget *oldWidget = m_widgetByRole[role];
     QnResourceWidget *newWidget = m_display->widget(role);
     m_widgetByRole[role] = newWidget;
 
     /* Tune activity listener instrument. */
-    if(role == QnWorkbench::ZOOMED) {
+    if(role == Qn::ZoomedRole) {
         updateActivityInstrumentState();
         updateViewportMargins();
     }
 
     /* Update navigation item's target. */
-    QnResourceWidget *targetWidget = m_widgetByRole[QnWorkbench::ZOOMED];
-    if(targetWidget == NULL)
-        targetWidget = m_widgetByRole[QnWorkbench::RAISED];
-    m_sliderItem->setVideoCamera(targetWidget == NULL ? NULL : targetWidget->display()->camera());
+    if(role == Qn::CentralRole) {
+        QnResourceWidget *targetWidget = m_widgetByRole[Qn::CentralRole];
+        m_sliderItem->setVideoCamera(targetWidget == NULL ? NULL : targetWidget->display()->camera());
+    }
 }
 
 void QnWorkbenchUi::at_display_widgetAdded(QnResourceWidget *widget) {
@@ -1243,7 +1235,7 @@ void QnWorkbenchUi::at_display_widgetAdded(QnResourceWidget *widget) {
 
     QnSecurityCamResourcePtr cameraResource = widget->resource().dynamicCast<QnSecurityCamResource>();
 #ifndef DEBUG_MOTION
-    if(cameraResource != NULL)
+    if(cameraResource)
 #endif
     {
         connect(widget, SIGNAL(motionRegionSelected(QnResourcePtr, QnAbstractArchiveReader*, QList<QRegion>)), m_sliderItem, SLOT(loadMotionPeriods(QnResourcePtr, QnAbstractArchiveReader*, QList<QRegion>)));
@@ -1259,99 +1251,6 @@ void QnWorkbenchUi::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) 
     QnSecurityCamResourcePtr cameraResource = widget->resource().dynamicCast<QnSecurityCamResource>();
     if(cameraResource != NULL)
         m_sliderItem->removeReserveCamera(widget->display()->camera());
-}
-
-void QnWorkbenchUi::at_exportMediaRange(CLVideoCamera* camera, qint64 startTimeMs, qint64 endTimeMs)
-{
-    QSettings settings;
-    settings.beginGroup(QLatin1String("export"));
-    QString previousDir = settings.value(QLatin1String("previousDir")).toString();
-    QString dateFormat = startTimeMs < 1000ll * 100000 ? QLatin1String("hh-mm-ss") : QLatin1String("dd-mmm-yyyy hh-mm-ss");
-    QString suggetion;
-
-    QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource> (camera->getDevice());
-    if (netRes)
-        suggetion = netRes->getMAC().toString();
-
-    QString fileName;
-    QString selectedFilter;
-    while (1)
-    {
-        fileName = QFileDialog::getSaveFileName(m_display->view(), tr("Export Video As..."),
-            previousDir + QLatin1Char('/') + suggetion,
-            tr("Matroska (*.mkv);; AVI (Audio/Video Interleaved)(*.avi)"),
-            &selectedFilter,
-            QFileDialog::DontUseNativeDialog);
-        if (fileName.isEmpty())
-            return;
-        QString fullName = fileName;
-        if (!fullName.toLower().endsWith(QLatin1String(".mkv")) && !fullName.toLower().endsWith(QLatin1String(".avi")))
-        {
-            fullName += selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
-
-            if (QFile::exists(fullName))
-            {
-                QString shortName = QFileInfo(fullName).baseName();
-                QMessageBox msgBox(QMessageBox::Information, tr("Confirm Save As"), tr("File '%1' already exists. Overwrite?").arg(shortName),
-                                   QMessageBox::Yes | QMessageBox::No, m_display->view());
-                if (msgBox.exec() == QMessageBox::Yes)
-                {
-                    if (!QFile::remove(fullName))
-                    {
-                        QMessageBox::information(m_display->view(), tr("Can't overwrite file"), tr("File '%1' is used by another process. Try another name.").arg(shortName), QMessageBox::Ok);
-                        continue;
-                    }
-                    break;
-                }
-            }
-            else 
-                break;
-        }
-        else 
-            break;
-    }
-
-    settings.setValue(QLatin1String("previousDir"), QFileInfo(fileName).absolutePath());
-
-    QProgressDialog *exportProgressDialog = new QProgressDialog(m_display->view());
-    exportProgressDialog->setAttribute(Qt::WA_DeleteOnClose);
-    exportProgressDialog->setAttribute(Qt::WA_QuitOnClose);
-    exportProgressDialog->setWindowFlags(Qt::WindowStaysOnTopHint);
-    exportProgressDialog->setWindowTitle(tr("Exporting Video"));
-    exportProgressDialog->setLabelText(tr("Exporting to \"%1\"...").arg(fileName));
-    exportProgressDialog->setRange(0, 100);
-    exportProgressDialog->setMinimumDuration(1000);
-    connect(exportProgressDialog, SIGNAL(canceled()), camera, SLOT(stopExport()));
-    connect(exportProgressDialog, SIGNAL(canceled()), exportProgressDialog, SLOT(deleteLater()));
-
-    connect(camera, SIGNAL(exportProgress(int)), exportProgressDialog, SLOT(setValue(int)));
-    connect(camera, SIGNAL(exportFailed(QString)), exportProgressDialog, SLOT(deleteLater()));
-    connect(camera, SIGNAL(exportFinished(QString)), exportProgressDialog, SLOT(deleteLater()));
-
-    camera->disconnect(this);
-    connect(camera, SIGNAL(exportFailed(QString)), this, SLOT(at_exportFailed(QString)));
-    connect(camera, SIGNAL(exportFinished(QString)), this, SLOT(at_exportFinished(QString)));
-
-
-    camera->exportMediaPeriodToFile(startTimeMs*1000ll, endTimeMs*1000ll, fileName, selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.'))+1, 3));
-}
-
-void QnWorkbenchUi::at_exportFinished(QString fileName)
-{
-    QnAviResourcePtr file(new QnAviResource(fileName));
-    file->setStatus(QnResource::Online);
-    qnResPool->addResource(file);
-
-    QMessageBox::information(0, tr("Export finished"), tr("Export successfully finished"));
-
-}
-
-void QnWorkbenchUi::at_exportFailed(QString errMessage)
-{
-    CLVideoCamera *cam = dynamic_cast<CLVideoCamera *>(sender()); // ### qobject_cast ?
-    if (cam)
-        cam->stopExport();
-    QMessageBox::warning(0, tr("Can not export video"), errMessage, QMessageBox::Ok, QMessageBox::NoButton);
 }
 
 void QnWorkbenchUi::at_controlsWidget_deactivated() {

@@ -19,7 +19,7 @@ class QnActionManager;
 
 /**
  * This is a class that ties together all objects comprising the global state 
- * and works as an application context.
+ * and serves as an application context.
  */
 class QnWorkbenchContext: public QObject {
     Q_OBJECT;
@@ -61,15 +61,23 @@ public:
     static QnWorkbenchContext *instance(QnWorkbench *workbench);
 
 signals:
+    /**
+     * This signal is emitted whenever the user that is currently logged in changes.
+     * 
+     * \param user                      New user that was logged in. May be null.
+     */
     void userChanged(const QnUserResourcePtr &user);
+
+    /**
+     * This signal is emitted when this workbench context is about to be destroyed,
+     * but before its state is altered in any way by the destructor.
+     */
     void aboutToBeDestroyed();
 
 protected slots:
     void at_resourcePool_aboutToBeDestroyed();
 
 private:
-    /* Note that we're using scoped pointers here as destruction order of these objects is important. */
-
     QnResourcePool *m_resourcePool;
     QScopedPointer<QnWorkbench> m_workbench;
     QScopedPointer<QnResourcePoolUserWatcher> m_userWatcher;

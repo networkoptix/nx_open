@@ -5,6 +5,7 @@
 #include "../resource/media_resource.h"
 #include "core/datapacket/mediadatapacket.h"
 #include "motion/motion_estimation.h"
+#include "../resource/motion_window.h"
 
 #define META_DATA_DURATION_MS 300
 
@@ -38,6 +39,7 @@ public:
     bool isSoftwareMotion() const;
     void setUseSoftwareMotion(bool value);
 
+    void updateSoftwareMotion();
 protected:
 
     virtual void updateStreamParamsBasedOnQuality() = 0;
@@ -46,7 +48,7 @@ protected:
     QnMetaDataV1Ptr getMetaData();
 
     virtual QnMetaDataV1Ptr getCameraMetadata();
-    
+    QByteArray createSoftwareMotionMask(const QnMotionRegion& region);
 protected:
     mutable QMutex m_livemutex;
 
@@ -60,8 +62,10 @@ private:
     QTime m_timeSinceLastMetaData; //used only for live providers
 
     QnResource::ConnectionRole m_role;
-    QnMotionEstimation m_motionEstimation;
+    QnMotionEstimation m_motionEstimation[CL_MAX_CHANNELS];
     bool m_softwareMotion;
+    int m_softMotionLastChannel;
+    const QnVideoResourceLayout* m_layout;
 };
 
 #endif //live_strem_provider_h_1508

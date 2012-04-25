@@ -129,7 +129,7 @@ public:
     }
 
     void showCheckBoxInMenu(bool show) {
-        m_action->setProperty(hideCheckBoxInMenuPropertyName, !show);
+        m_action->setProperty(Qn::HideCheckBoxInMenu, !show);
     }
 
     void condition(QnActionCondition *condition) {
@@ -693,6 +693,17 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Server Settings...")).
         condition(new QnResourceActionCondition(hasFlags(QnResource::remote_server), Qn::ExactlyOne, this));
+
+
+    factory(Qn::ClearTimeSelectionAction).
+        flags(Qn::Slider | Qn::SingleTarget | Qn::NoTarget).
+        text(tr("Clear Selection")).
+        condition(new QnTimePeriodActionCondition(false, this));
+
+    factory(Qn::ExportTimeSelectionAction).
+        flags(Qn::Slider | Qn::SingleTarget).
+        text(tr("Export Selection")).
+        condition(new QnTimePeriodActionCondition(false, this));
 }
 
 QnActionManager::~QnActionManager() {
@@ -714,82 +725,39 @@ QList<QnAction *> QnActionManager::actions() const {
     return m_actionById.values();
 }
 
-bool QnActionManager::canTrigger(Qn::ActionId id, const QnResourcePtr &resource, const QVariantMap &params) {
+bool QnActionManager::canTrigger(Qn::ActionId id, const QnActionParameters &parameters) {
     QnAction *action = m_actionById.value(id);
     if(!action)
         return false;
     
-    return action->checkCondition(action->scope(), QVariant::fromValue(resource), params);
+    return action->checkCondition(action->scope(), parameters);
 }
 
-void QnActionManager::trigger(Qn::ActionId id, const QVariantMap &params) {
-    triggerInternal(id, QVariant::fromValue(QnResourceList()), params);
-}
-
-void QnActionManager::trigger(Qn::ActionId id, const QVariant &items, const QVariantMap &params) {
-    if(checkType(items)) {
-        return triggerInternal(id, items, params);
-    } else {
-        return triggerInternal(id, QVariant::fromValue(QnResourceList()), params);
+void QnActionManager::trigger(Qn::ActionId id, const QnActionParameters &parameters) {
+    QnAction *action = m_actionById.value(id);
+    if(action == NULL) {
+        qnWarning("Invalid action id '%1'.", static_cast<int>(id));
+        return;
     }
-}
 
-void QnActionManager::trigger(Qn::ActionId id, const QnResourcePtr &resource, const QVariantMap &params) {
-    QnResourceList resources;
-    resources.push_back(resource);
-    trigger(id, resources, params);
-}
-
-void QnActionManager::trigger(Qn::ActionId id, const QnResourceList &resources, const QVariantMap &params) {
-    triggerInternal(id, QVariant::fromValue(resources), params);
-}
-
-void QnActionManager::trigger(Qn::ActionId id, const QList<QGraphicsItem *> &items, const QVariantMap &params) {
-    trigger(id, QnActionTargetTypes::widgets(items), params);
-}
-
-void QnActionManager::trigger(Qn::ActionId id, const QnResourceWidgetList &widgets, const QVariantMap &params) {
-    triggerInternal(id, QVariant::fromValue(widgets), params);
-}
-
-void QnActionManager::trigger(Qn::ActionId id, const QnWorkbenchLayoutList &layouts, const QVariantMap &params) {
-    triggerInternal(id, QVariant::fromValue(layouts), params);
-}
-
-void QnActionManager::trigger(Qn::ActionId id, const QnLayoutItemIndexList &layoutItems, const QVariantMap &params) {
-    triggerInternal(id, QVariant::fromValue(layoutItems), params);
-}
-
-QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QVariantMap &params) {
-    return newMenuInternal(m_root, scope, QVariant::fromValue(QnResourceList()), params);
-}
-
-QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QVariant &items, const QVariantMap &params) {
-    if(checkType(items)) {
-        return newMenuInternal(m_root, scope, items, params);
-    } else {
-        return newMenuInternal(m_root, scope, QVariant::fromValue(QnResourceList()), params);
+    if(action->checkCondition(action->scope(), parameters) != Qn::EnabledAction) {
+        qnWarning("Action '%1' was triggered with a parameter that does not meet the action's requirements.", action->text());
+        return;
     }
+
+    QnScopedValueRollback<QnActionParameters> paramsRollback(&m_parametersByMenu[NULL], parameters);
+    QnScopedValueRollback<QnAction *> actionRollback(&m_shortcutAction, action);
+    action->trigger();
 }
 
-QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QnResourceList &resources, const QVariantMap &params) {
-    return newMenuInternal(m_root, scope, QVariant::fromValue(resources), params);
-}
+QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QnActionParameters &parameters) {
+    QMenu *result = newMenuRecursive(m_root, scope, parameters);
+    m_parametersByMenu[result] = parameters;
 
-QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QList<QGraphicsItem *> &items, const QVariantMap &params) {
-    return newMenu(scope, QnActionTargetTypes::widgets(items), params);
-}
+    connect(result, SIGNAL(destroyed(QObject *)), this, SLOT(at_menu_destroyed(QObject *)));
+    connect(result, SIGNAL(aboutToShow()), this, SLOT(at_menu_aboutToShow()));
 
-QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QnResourceWidgetList &widgets, const QVariantMap &params) {
-    return newMenuInternal(m_root, scope, QVariant::fromValue(widgets), params);
-}
-
-QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QnWorkbenchLayoutList &layouts, const QVariantMap &params) {
-    return newMenuInternal(m_root, scope, QVariant::fromValue(layouts), params);
-}
-
-QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QnLayoutItemIndexList &layoutItems, const QVariantMap &params) {
-    return newMenuInternal(m_root, scope, QVariant::fromValue(layoutItems), params);
+    return result;
 }
 
 void QnActionManager::copyAction(QAction *dst, QnAction *src, bool forwardSignals) {
@@ -808,34 +776,7 @@ void QnActionManager::copyAction(QAction *dst, QnAction *src, bool forwardSignal
     }
 }
 
-void QnActionManager::triggerInternal(Qn::ActionId id, const QVariant &items, const QVariantMap &params) {
-    QnAction *action = m_actionById.value(id);
-    if(action == NULL) {
-        qnWarning("Invalid action id '%1'.", static_cast<int>(id));
-        return;
-    }
-
-    if(action->checkCondition(action->scope(), items, params) != Qn::EnabledAction) {
-        qnWarning("Action '%1' was triggered with a parameter that does not meet the action's requirements.", action->text());
-        return;
-    }
-
-    QnScopedValueRollback<ActionParameters> paramsRollback(&m_parametersByMenu[NULL], ActionParameters(items, params));
-    QnScopedValueRollback<QnAction *> actionRollback(&m_shortcutAction, action);
-    action->trigger();
-}
-
-QMenu *QnActionManager::newMenuInternal(const QnAction *parent, Qn::ActionScope scope, const QVariant &items, const QVariantMap &params) {
-    QMenu *result = newMenuRecursive(parent, scope, items);
-    m_parametersByMenu[result] = ActionParameters(items, params);
-
-    connect(result, SIGNAL(destroyed(QObject *)), this, SLOT(at_menu_destroyed(QObject *)));
-    connect(result, SIGNAL(aboutToShow()), this, SLOT(at_menu_aboutToShow()));
-    
-    return result;
-}
-
-QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope scope, const QVariant &items) {
+QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope scope, const QnActionParameters &parameters) {
     QMenu *result = new QMenu();
 
     foreach(QnAction *action, parent->children()) {
@@ -843,7 +784,7 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
         if(action->flags() & Qn::HotkeyOnly) {
             visibility = Qn::InvisibleAction;
         } else {
-            visibility = action->checkCondition(scope, items, QVariantMap());
+            visibility = action->checkCondition(scope, parameters);
         }
         if(visibility == Qn::InvisibleAction)
             continue;
@@ -851,7 +792,7 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
         QString replacedText;
         QMenu *menu = NULL;
         if(action->children().size() > 0) {
-            menu = newMenuRecursive(action, scope, items);
+            menu = newMenuRecursive(action, scope, parameters);
             if(menu->isEmpty()) {
                 delete menu;
                 menu = NULL;
@@ -863,7 +804,7 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
                     menu = NULL;
 
                     action = menuAction;
-                    visibility = action->checkCondition(scope, items, QVariantMap());
+                    visibility = action->checkCondition(scope, parameters);
                     replacedText = action->pulledText();
                 }
             }
@@ -892,7 +833,7 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
     return result;
 }
 
-QnActionManager::ActionParameters QnActionManager::currentParametersInternal(QnAction *action) const {
+QnActionParameters QnActionManager::currentParameters(QnAction *action) const {
     if(m_shortcutAction == action)
         return m_parametersByMenu.value(NULL);
 
@@ -902,112 +843,11 @@ QnActionManager::ActionParameters QnActionManager::currentParametersInternal(QnA
     return m_parametersByMenu.value(m_lastShownMenu);
 }
 
-Qn::ActionTargetType QnActionManager::currentTargetType(QnAction *action) const {
-    return QnActionTargetTypes::type(currentTarget(action));
-}
-
-QVariantMap QnActionManager::currentParameters(QnAction *action) const {
-    return currentParametersInternal(action).params;
-}
-
-QVariant QnActionManager::currentParameter(QnAction *action, const QString &name) const {
-    return currentParametersInternal(action).params.value(name);
-}
-
-QVariant QnActionManager::currentTarget(QnAction *action) const {
-    return currentParametersInternal(action).items;
-}
-
-QnResourceList QnActionManager::currentResourcesTarget(QnAction *action) const {
-    return QnActionTargetTypes::resources(currentTarget(action));
-}
-
-QnResourcePtr QnActionManager::currentResourceTarget(QnAction *action) const {
-    QnResourceList resources = currentResourcesTarget(action);
-
-    if(resources.size() != 1)
-        qnWarning("Invalid number of target resources for action '%1': expected %2, got %3.", action->text(), 1, resources.size());
-
-    return resources.isEmpty() ? QnResourcePtr() : resources.front();
-}
-
-QnWorkbenchLayoutList QnActionManager::currentLayoutsTarget(QnAction *action) const {
-    return QnActionTargetTypes::layouts(currentTarget(action));
-}
-
-QnLayoutItemIndexList QnActionManager::currentLayoutItemsTarget(QnAction *action) const {
-    return QnActionTargetTypes::layoutItems(currentTarget(action));
-}
-
-QnResourceWidgetList QnActionManager::currentWidgetsTarget(QnAction *action) const {
-    return QnActionTargetTypes::widgets(currentTarget(action));
-}
-
-Qn::ActionTargetType QnActionManager::currentTargetType(QObject *sender) const {
-    return QnActionTargetTypes::type(currentTarget(sender));
-}
-
-QVariantMap QnActionManager::currentParameters(QObject *sender) const {
+QnActionParameters QnActionManager::currentParameters(QObject *sender) const {
     if(QnAction *action = checkSender(sender)) {
         return currentParameters(action);
     } else {
-        return QVariantMap();
-    }
-}
-
-QVariant QnActionManager::currentParameter(QObject *sender, const QString &name) const {
-    if(QnAction *action = checkSender(sender)) {
-        return currentParameter(action, name);
-    } else {
-        return QVariant();
-    }
-}
-
-QVariant QnActionManager::currentTarget(QObject *sender) const {
-    if(QnAction *action = checkSender(sender)) {
-        return currentTarget(action);
-    } else {
-        return QVariant();
-    }
-}
-
-QnResourceList QnActionManager::currentResourcesTarget(QObject *sender) const {
-    if(QnAction *action = checkSender(sender)) {
-        return currentResourcesTarget(action);
-    } else {
-        return QnResourceList();
-    }
-}
-
-QnResourcePtr QnActionManager::currentResourceTarget(QObject *sender) const {
-    if(QnAction *action = checkSender(sender)) {
-        return currentResourceTarget(action);
-    } else {
-        return QnResourcePtr();
-    }
-}
-
-QnLayoutItemIndexList QnActionManager::currentLayoutItemsTarget(QObject *sender) const {
-    if(QnAction *action = checkSender(sender)) {
-        return currentLayoutItemsTarget(action);
-    } else {
-        return QnLayoutItemIndexList();
-    }
-}
-
-QnWorkbenchLayoutList QnActionManager::currentLayoutsTarget(QObject *sender) const {
-    if(QnAction *action = checkSender(sender)) {
-        return currentLayoutsTarget(action);
-    } else {
-        return QnWorkbenchLayoutList();
-    }
-}
-
-QnResourceWidgetList QnActionManager::currentWidgetsTarget(QObject *sender) const {
-    if(QnAction *action = checkSender(sender)) {
-        return currentWidgetsTarget(action);
-    } else {
-        return QnResourceWidgetList();
+        return QnActionParameters();
     }
 }
 
@@ -1027,6 +867,7 @@ bool QnActionManager::redirectActionRecursive(QMenu *menu, Qn::ActionId targetId
             menu->removeAction(action);
             if(targetAction != NULL) {
                 copyAction(targetAction, storedAction, false);
+                targetAction->setEnabled(action->isEnabled());
                 menu->insertAction(before, targetAction);
             }
 

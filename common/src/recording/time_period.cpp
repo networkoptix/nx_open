@@ -37,7 +37,7 @@ qint64 QnTimePeriod::endTimeMs() const
 }
 
 
-bool QnTimePeriod::containPeriod(const QnTimePeriod& timePeriod) const
+bool QnTimePeriod::containPeriod(const QnTimePeriod &timePeriod) const
 {
     return startTimeMs <= timePeriod.startTimeMs && (startTimeMs + durationMs >= timePeriod.startTimeMs + timePeriod.durationMs);
 }
@@ -48,7 +48,7 @@ bool QnTimePeriod::containTime(qint64 timeMs) const
 }
 
 
-void QnTimePeriod::addPeriod(const QnTimePeriod& timePeriod)
+void QnTimePeriod::addPeriod(const QnTimePeriod &timePeriod)
 {
     qint64 endPoint1 = startTimeMs + durationMs;
     qint64 endPoint2 = timePeriod.startTimeMs + timePeriod.durationMs;
@@ -56,7 +56,7 @@ void QnTimePeriod::addPeriod(const QnTimePeriod& timePeriod)
     durationMs = qMax(endPoint1, endPoint2) - startTimeMs;
 }
 
-QnTimePeriod QnTimePeriod::intersect(const QnTimePeriod& other) const
+QnTimePeriod QnTimePeriod::intersect(const QnTimePeriod &other) const
 {
     if (durationMs == -1 || other.startTimeMs == -1)
         return QnTimePeriod(qMax(startTimeMs, other.startTimeMs), -1);
@@ -69,7 +69,7 @@ QnTimePeriod QnTimePeriod::intersect(const QnTimePeriod& other) const
     return QnTimePeriod(start, end - start);
 }
 
-QnTimePeriodList QnTimePeriod::aggregateTimePeriods(const QnTimePeriodList& periods, int detailLevelMs)
+QnTimePeriodList QnTimePeriod::aggregateTimePeriods(const QnTimePeriodList &periods, int detailLevelMs)
 {
     QnTimePeriodList result;
     if (periods.isEmpty())
@@ -140,7 +140,7 @@ QnTimePeriodList QnTimePeriod::mergeTimePeriods(QVector<QnTimePeriodList> period
     return result;
 }
 
-void saveField(QByteArray& stream, qint64 field, quint8 header, int dataLen)
+void saveField(QByteArray &stream, qint64 field, quint8 header, int dataLen)
 {
     field = htonll(field << (64 - dataLen*8));
     quint8* data = (quint8*) &field;
@@ -154,7 +154,7 @@ void saveField(QByteArray& stream, qint64 field, quint8 header, int dataLen)
 // 10 - 30 bit to data
 // 11 - 38 bit to data
 // 11 and 0xffffffffff data - full 48 bit data
-void serializeField(QByteArray& stream, qint64 field)
+void serializeField(QByteArray &stream, qint64 field)
 {
     if (field < 0x4000ll)
         saveField(stream, field, 0, 2);
@@ -171,7 +171,7 @@ void serializeField(QByteArray& stream, qint64 field)
     }
 }
 
-bool QnTimePeriod::encode(QByteArray& stream, const QnTimePeriodList& periods)
+bool QnTimePeriod::encode(QByteArray &stream, const QnTimePeriodList &periods)
 {
     if (periods.isEmpty())
         return true;
@@ -193,7 +193,7 @@ bool QnTimePeriod::encode(QByteArray& stream, const QnTimePeriodList& periods)
     return true;
 };
 
-qint64 decodeValue(const quint8* &curPtr, const quint8* end)
+qint64 decodeValue(const quint8 *&curPtr, const quint8 *end)
 {
     if (curPtr >= end)
         return -1;
@@ -213,7 +213,7 @@ qint64 decodeValue(const quint8* &curPtr, const quint8* end)
     return value;
 };
 
-bool QnTimePeriod::decode(const quint8* data, int dataSize, QnTimePeriodList& periods)
+bool QnTimePeriod::decode(const quint8 *data, int dataSize, QnTimePeriodList &periods)
 {
     periods.clear();
 
@@ -247,12 +247,12 @@ bool QnTimePeriod::decode(const quint8* data, int dataSize, QnTimePeriodList& pe
     return true;
 }
 
-bool QnTimePeriod::decode(QByteArray& stream, QnTimePeriodList& periods)
+bool QnTimePeriod::decode(QByteArray &stream, QnTimePeriodList &periods)
 {
-    return decode((const quint8*) stream.constData(), stream.size(), periods);
+    return decode((const quint8 *) stream.constData(), stream.size(), periods);
 }
 
-bool QnTimePeriod::operator==(const QnTimePeriod& other) const
+bool QnTimePeriod::operator==(const QnTimePeriod &other) const
 {
     return startTimeMs == other.startTimeMs && durationMs == other.durationMs;
 }

@@ -20,8 +20,6 @@ protected:
 
     virtual void updateStreamParamsBasedOnQuality() override;
     virtual void updateStreamParamsBasedOnFps() override;
-
-
 private:
 
     QnAbstractMediaDataPtr getNextDataMPEG(CodecID ci);

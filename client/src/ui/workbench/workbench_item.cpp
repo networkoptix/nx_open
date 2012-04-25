@@ -31,7 +31,7 @@ QnWorkbenchItem::QnWorkbenchItem(const QnLayoutItemData &data, QObject *parent):
             m_resourceUid = resource->getUniqueId();
     }
 
-    setFlags(static_cast<ItemFlags>(data.flags));
+    setFlags(static_cast<Qn::ItemFlags>(data.flags));
     setRotation(data.rotation);
     setCombinedGeometry(data.combinedGeometry);
 }
@@ -70,10 +70,10 @@ bool QnWorkbenchItem::update(const QnLayoutItemData &data) {
     bool result = true;
 
     /* Note that the order of these calls is important. */
-    result &= setFlag(Pinned, false);
+    result &= setFlag(Qn::Pinned, false);
     result &= setCombinedGeometry(data.combinedGeometry);
     setRotation(data.rotation);
-    result &= setFlags(static_cast<ItemFlags>(data.flags));
+    result &= setFlags(static_cast<Qn::ItemFlags>(data.flags));
 
     return result;
 }
@@ -151,15 +151,15 @@ QRectF QnWorkbenchItem::combinedGeometry() const {
     );
 }
 
-bool QnWorkbenchItem::setFlag(ItemFlag flag, bool value) {
+bool QnWorkbenchItem::setFlag(Qn::ItemFlag flag, bool value) {
     if(checkFlag(flag) == value)
         return true;
 
     if(m_layout != NULL) {
-        if(flag == Pinned && value)
+        if(flag == Qn::Pinned && value)
             return m_layout->pinItem(this, m_geometry);
 
-        if(flag == Pinned && !value)
+        if(flag == Qn::Pinned && !value)
             return m_layout->unpinItem(this);
     }
 
@@ -167,25 +167,25 @@ bool QnWorkbenchItem::setFlag(ItemFlag flag, bool value) {
     return true;
 }
 
-bool QnWorkbenchItem::setFlags(ItemFlags flags) {
+bool QnWorkbenchItem::setFlags(Qn::ItemFlags flags) {
     if(m_flags == flags)
         return true;
 
     bool result = true;
-    if((m_flags ^ flags) & Pinned)
-        result &= setFlag(Pinned, flags & Pinned);
-    if((m_flags ^ flags) & PendingGeometryAdjustment)
-        result &= setFlag(PendingGeometryAdjustment, flags & PendingGeometryAdjustment);
+    if((m_flags ^ flags) & Qn::Pinned)
+        result &= setFlag(Qn::Pinned, flags & Qn::Pinned);
+    if((m_flags ^ flags) & Qn::PendingGeometryAdjustment)
+        result &= setFlag(Qn::PendingGeometryAdjustment, flags & Qn::PendingGeometryAdjustment);
 
 
     return result;
 }
 
-void QnWorkbenchItem::setFlagInternal(ItemFlag flag, bool value) {
+void QnWorkbenchItem::setFlagInternal(Qn::ItemFlag flag, bool value) {
     if(checkFlag(flag) == value)
         return;
 
-    if(flag == Pinned && value)
+    if(flag == Qn::Pinned && value)
         setGeometryDelta(QRectF()); /* Pinned items cannot have non-zero geometry delta. */
 
     m_flags = value ? (m_flags | flag) : (m_flags & ~flag);
@@ -209,7 +209,7 @@ void QnWorkbenchItem::adjustGeometry() {
     setGeometryDelta(QRectF());
 
     /* Set geometry adjustment flag. */
-    setFlag(PendingGeometryAdjustment, true);
+    setFlag(Qn::PendingGeometryAdjustment, true);
 }
 
 void QnWorkbenchItem::adjustGeometry(const QPointF &desiredPosition) {
@@ -223,5 +223,5 @@ void QnWorkbenchItem::adjustGeometry(const QPointF &desiredPosition) {
     setCombinedGeometry(combinedGeometry);
 
     /* Set geometry adjustment flag. */
-    setFlag(PendingGeometryAdjustment, true);
+    setFlag(Qn::PendingGeometryAdjustment, true);
 }

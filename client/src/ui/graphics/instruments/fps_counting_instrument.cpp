@@ -4,7 +4,7 @@
 #include "utils/common/synctime.h"
 
 FpsCountingInstrument::FpsCountingInstrument(int updateIntervalMSec, QObject *parent):
-    Instrument(VIEWPORT, makeSet(QEvent::Paint), parent),
+    Instrument(Viewport, makeSet(QEvent::Paint), parent),
     m_fps(0.0)
 {
     if(updateIntervalMSec <= 0) {

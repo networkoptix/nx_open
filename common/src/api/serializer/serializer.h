@@ -14,10 +14,17 @@
 
 
 void parseRegion(QRegion& region, const QString& regionString);
-QString serializeRegion(const QRegion& region);
-
 void parseRegionList(QList<QRegion>& regions, const QString& regionsString);
+
+void parseMotionRegion(QnMotionRegion& region, const QString& regionString);
+QString serializeMotionRegion(const QnMotionRegion& region);
+
+void parseMotionRegionList(QList<QnMotionRegion>& regions, const QString& regionsString);
+QString serializeMotionRegionList(const QList<QnMotionRegion>& regions);
+
+QString serializeRegion(const QRegion& region);
 QString serializeRegionList(const QList<QRegion>& regions);
+
 
 class QnSerializeException : public std::exception
 {

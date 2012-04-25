@@ -25,16 +25,24 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
     connect(m_userWatcher.data(),           SIGNAL(userChanged(const QnUserResourcePtr &)), this,                                   SIGNAL(userChanged(const QnUserResourcePtr &)));
 
     /* Create dependent objects. */
-    m_menu.reset(new QnActionManager(this));
     m_synchronizer.reset(new QnWorkbenchSynchronizer(this));
     m_snapshotManager.reset(new QnWorkbenchLayoutSnapshotManager(this));
     m_accessController.reset(new QnWorkbenchAccessController(this));
+    m_menu.reset(new QnActionManager(this));
 }
 
 QnWorkbenchContext::~QnWorkbenchContext() {
     bool signalsBlocked = blockSignals(false);
     emit aboutToBeDestroyed();
     blockSignals(signalsBlocked);
+
+    /* Destruction order of these objects is important. */
+    m_menu.reset();
+    m_accessController.reset();
+    m_snapshotManager.reset();
+    m_synchronizer.reset();
+    m_userWatcher.reset();
+    m_workbench.reset();
 
     m_resourcePool = NULL;
 }

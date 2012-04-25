@@ -21,8 +21,15 @@ class QnWorkbenchItem;
 class QnWorkbenchLayout: public QObject {
     Q_OBJECT
 public:
+    /**
+     * Helper struct for obtaining detailed information on move operations. 
+     */
     struct Disposition {
+        /** Set of free slots that the moved items will occupy. */
         QSet<QPoint> free;
+
+        /** Set of slots that are already occupied, thus blocking the items from
+         * being moved. */
         QSet<QPoint> occupied;
     };
 
@@ -168,16 +175,30 @@ public:
         return m_items.isEmpty();
     }
 
+    /**
+     * \returns                         Cell aspect ratio of this layout. 
+     */
     qreal cellAspectRatio() const {
         return m_cellAspectRatio;
     }
 
+    /**
+     * \param cellAspectRatio           New aspect ratio for cells of this layout.
+     */
     void setCellAspectRatio(qreal cellAspectRatio);
 
+    /**
+     * \returns                         Spacing between cells of this layout, 
+     *                                  relative to cell width.
+     */
     const QSizeF &cellSpacing() const {
         return m_cellSpacing;
     }
 
+    /**
+     * \param cellSpacing               New spacing between cells for this layout, 
+     *                                  relative to cell width.
+     */
     void setCellSpacing(const QSizeF &cellSpacing);
 
     /**

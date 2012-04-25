@@ -44,7 +44,7 @@ void QnCurtainAnimator::setCurtainItem(QnCurtainItem *curtain) {
         m_curtainColorAnimator->setTargetObject(curtain);
 
         m_curtainColor = curtain->color();
-        curtain->setColor(SceneUtility::transparent(m_curtainColor));
+        curtain->setColor(toTransparent(m_curtainColor));
         curtain->hide();
     }
 }
@@ -89,7 +89,7 @@ void QnCurtainAnimator::uncurtain() {
 
     stop();
     restoreFrameColor();
-    curtain->setColor(SceneUtility::transparent(m_curtainColor));
+    curtain->setColor(toTransparent(m_curtainColor));
     curtain->hide();
     setCurtained(false);
 }

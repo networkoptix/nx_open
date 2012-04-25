@@ -6,7 +6,7 @@
 #include <licensing/license.h>
 
 #include <ui/style/globals.h>
-#include <ui/common/color_transform.h>
+#include <ui/common/color_transformations.h>
 #include <ui/common/read_only.h>
 
 QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):

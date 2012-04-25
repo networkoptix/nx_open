@@ -2,6 +2,7 @@
 
 #include <utils/common/warnings.h>
 #include <core/resourcemanagment/resource_criterion.h>
+#include <recording/time_period.h>
 
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/workbench/workbench.h>
@@ -36,36 +37,27 @@ Qn::ActionVisibility QnActionCondition::check(const QnWorkbenchLayoutList &layou
     return check(QnActionTargetTypes::resources(layouts));
 };
 
-Qn::ActionVisibility QnActionCondition::check(const QVariant &items) {
-    switch(QnActionTargetTypes::type(items)) {
+Qn::ActionVisibility QnActionCondition::check(const QnActionParameters &parameters) {
+    switch(parameters.itemsType()) {
     case Qn::ResourceType:
-        return check(QnActionTargetTypes::resources(items));
+        return check(parameters.resources());
     case Qn::WidgetType:
-        return check(QnActionTargetTypes::widgets(items));
+        return check(parameters.widgets());
     case Qn::LayoutType:
-        return check(QnActionTargetTypes::layouts(items));
+        return check(parameters.layouts());
     case Qn::LayoutItemType:
-        return check(QnActionTargetTypes::layoutItems(items));
+        return check(parameters.layoutItems());
     default:
-        qnWarning("Invalid action condition parameter type '%1'.", items.typeName());
+        qnWarning("Invalid action condition parameter type '%1'.", parameters.items().typeName());
         return Qn::InvisibleAction;
     }
 }
-
-Qn::ActionVisibility QnTargetlessActionCondition::check(const QVariant &items) {
-    if(!items.isValid()) {
-        return check(QnResourceList());
-    } else {
-        return base_type::check(items);
-    }
-}
-
 
 Qn::ActionVisibility QnItemZoomedActionCondition::check(const QnResourceWidgetList &widgets) {
     if(widgets.size() != 1 || !widgets[0])
         return Qn::InvisibleAction;
 
-    return ((widgets[0]->item() == workbench()->item(QnWorkbench::ZOOMED)) == m_requiredZoomedState) ? Qn::EnabledAction : Qn::InvisibleAction;
+    return ((widgets[0]->item() == workbench()->item(Qn::ZoomedRole)) == m_requiredZoomedState) ? Qn::EnabledAction : Qn::InvisibleAction;
 }
 
 
@@ -210,7 +202,7 @@ Qn::ActionVisibility QnSaveLayoutActionCondition::check(const QnResourceList &re
 }
 
 
-Qn::ActionVisibility QnLayoutCountActionCondition::check(const QnWorkbenchLayoutList &layouts) {
+Qn::ActionVisibility QnLayoutCountActionCondition::check(const QnWorkbenchLayoutList &) {
     if(workbench()->layouts().size() < m_requiredCount)
         return Qn::DisabledAction;
 
@@ -227,5 +219,15 @@ Qn::ActionVisibility QnTakeScreenshotActionCondition::check(const QnResourceWidg
         return Qn::DisabledAction;
 
     return Qn::EnabledAction;
+}
+
+Qn::ActionVisibility QnTimePeriodActionCondition::check(const QnActionParameters &parameters) {
+    if(!parameters.hasArgument(Qn::TimePeriodParameter))
+        return Qn::InvisibleAction;
+
+    QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodParameter);
+    bool isEmpty = period.durationMs == 0;
+
+    return isEmpty == m_requiredPeriodEmptyValue ? Qn::EnabledAction : Qn::DisabledAction;
 }
 

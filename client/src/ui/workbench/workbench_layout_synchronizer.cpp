@@ -248,7 +248,23 @@ void QnWorkbenchLayoutSynchronizer::at_resource_itemChanged(const QnLayoutItemDa
         return;
 
     QnScopedValueRollback<bool> guard(&m_submit, false);
-    m_layout->item(itemData.uuid)->update(itemData);
+
+    QnWorkbenchItem *item = m_layout->item(itemData.uuid);
+    if(item == NULL) {
+        /* We can get here in the following situation:
+         * 
+         * An item is added to the layout resource, and its geometry is adjusted.
+         * Resource is synchronized with the layout, and a new layout item is 
+         * created. However, due to limit on the number of layout items, it
+         * is deleted right away.
+         * 
+         * Because of resource and layout residing in different threads,
+         * item change signal may get received when the layout item is 
+         * already destroyed. So, simply leaving is perfectly fine here. */
+        return;
+    }
+
+    item->update(itemData);
 }
 
 void QnWorkbenchLayoutSynchronizer::at_resource_cellAspectRatioChanged() {
@@ -271,7 +287,7 @@ void QnWorkbenchLayoutSynchronizer::at_layout_itemAdded(QnWorkbenchItem *item) {
     connect(item, SIGNAL(geometryChanged()),                            this, SLOT(at_item_changed()));
     connect(item, SIGNAL(geometryDeltaChanged()),                       this, SLOT(at_item_changed()));
     connect(item, SIGNAL(rotationChanged()),                            this, SLOT(at_item_changed()));
-    connect(item, SIGNAL(flagChanged(QnWorkbenchItem::ItemFlag, bool)), this, SLOT(at_item_flagChanged(QnWorkbenchItem::ItemFlag, bool)));
+    connect(item, SIGNAL(flagChanged(Qn::ItemFlag, bool)),              this, SLOT(at_item_flagChanged(Qn::ItemFlag, bool)));
 
     if(!m_submit)
         return;
@@ -337,7 +353,7 @@ void QnWorkbenchLayoutSynchronizer::at_item_changed() {
     submitPendingItemsLater();
 }
 
-void QnWorkbenchLayoutSynchronizer::at_item_flagChanged(QnWorkbenchItem::ItemFlag flag, bool value) {
+void QnWorkbenchLayoutSynchronizer::at_item_flagChanged(Qn::ItemFlag flag, bool value) {
     if(!m_submit)
         return;
 

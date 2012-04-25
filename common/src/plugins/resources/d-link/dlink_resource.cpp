@@ -342,6 +342,35 @@ void QnPlDlinkResource::setMotionMaskPhysical(int channel)
 {
     Q_UNUSED(channel);
 
+    if (channel != 0)
+        return; // motion info used always once even for multisensor cameras 
+
+    static int sensToLevelThreshold[10] = 
+    {
+        0, // 0 - aka mask really filtered by media server always
+        10, // 1
+        25, // 2
+        40, // 3
+        50, // 4
+        60, // 5
+        70,  // 6
+        80,  // 7
+        90,  // 8
+        100   // 9
+    };
+
+    int sensitivity = 50;
+    QnMotionRegion region = m_motionMaskList[0];
+    for (int sens = QnMotionRegion::MIN_SENSITIVITY+1; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens)
+    {
+
+        if (!region.getRegionBySens(sens).isEmpty())
+        {
+            sensitivity = sensToLevelThreshold[sens];
+            break; // only 1 sensitivity for all frame is supported
+        }
+    }
+
     unsigned char maskBit[MD_WIDTH * MD_HEIGHT / 8];
     QnMetaDataV1::createMask(getMotionMask(0),  (char*)maskBit);
 
@@ -383,8 +412,7 @@ void QnPlDlinkResource::setMotionMaskPhysical(int channel)
 
     QString str;
     QTextStream stream(&str);
-
-    stream << "config/motion.cgi?enable=yes&mbmask=";
+    stream << "config/motion.cgi?enable=yes&motioncvalue=" << sensitivity << "&mbmask=";
 
     for (int i = 0; i < sizeof(outData); ++i)
     {
@@ -398,7 +426,7 @@ void QnPlDlinkResource::setMotionMaskPhysical(int channel)
 
 
     CLHttpStatus status;
-    downloadFile(status, str,  getHostAddress(), 80, 1000, getAuth());
+    QByteArray result = downloadFile(status, str,  getHostAddress(), 80, 1000, getAuth());
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {

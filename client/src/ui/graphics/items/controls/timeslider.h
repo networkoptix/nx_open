@@ -1,7 +1,7 @@
 #ifndef TIMESLIDER_H
 #define TIMESLIDER_H
 
-#include "ui/graphics/items/standard/graphicswidget.h"
+#include "ui/graphics/items/standard/graphics_widget.h"
 #include "recording/time_period.h"
 
 class QPropertyAnimation;
@@ -53,9 +53,9 @@ public:
     { setSelectionRange(0, 0); }
 
     const QnTimePeriodList &recTimePeriodList(int msInPixel);
-    const QnTimePeriodList& fullRecTimePeriodList();
+    const QnTimePeriodList &fullRecTimePeriodList();
     const QnTimePeriodList &motionTimePeriodList(int msInPixel);
-    const QnTimePeriodList& fullMotionTimePeriodList();
+    const QnTimePeriodList &fullMotionTimePeriodList();
     void setRecTimePeriodList(const QnTimePeriodList &timePeriodList);
     void setMotionTimePeriodList(const QnTimePeriodList &timePeriodList);
     
@@ -63,6 +63,7 @@ public:
     void setLiveMode(bool value);
     void setEndSize(qreal size);
     bool isUserInput() const { return m_isUserInput; }
+
 public Q_SLOTS:
     void setMinimumValue(qint64 value);
     void setMaximumValue(qint64 value);

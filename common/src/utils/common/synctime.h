@@ -1,25 +1,26 @@
-#ifndef __SYNC_TIME_H__
-#define __SYNC_TIME_H__
+#ifndef QN_SYNC_TIME_H
+#define QN_SYNC_TIME_H
 
-#include <QDateTime>
-
-/** 
-* Time synchronized with Enterprise Controller
-*/
+#include <QtCore/QDateTime>
+#include <QtCore/QMutex>
 
 class QnSyncTimeTask;
 
-class QnSyncTime
-{
+/** 
+ * Time provider that is synchronized with Enterprise Controller.
+ */
+class QnSyncTime {
 public:
     QnSyncTime();
 
-    static QnSyncTime* instance();
+    static QnSyncTime *instance();
     qint64 currentMSecsSinceEpoch();
 
     QDateTime currentDateTime();
+    
 private:
     void updateTime(qint64 newTime);
+
 private:
     QTime m_timer;
     qint64 m_lastReceivedTime;
@@ -31,6 +32,6 @@ private:
     friend class QnSyncTimeTask;
 };
 
-#define qnSyncTime QnSyncTime::instance()
+#define qnSyncTime (QnSyncTime::instance())
 
-#endif // __SYNC_TIME_H__
+#endif // QN_SYNC_TIME_H

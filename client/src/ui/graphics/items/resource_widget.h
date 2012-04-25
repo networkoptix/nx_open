@@ -1,19 +1,23 @@
 #ifndef QN_RESOURCE_WIDGET_H
 #define QN_RESOURCE_WIDGET_H
 
-#include <QStaticText>
-#include <QWeakPointer>
-#include <QVector>
+#include <QtCore/QWeakPointer>
+#include <QtCore/QVector>
+#include <QtGui/QStaticText>
+#include <QtGui/QGraphicsWidget>
+
 #include <camera/render_status.h>
-#include <ui/graphics/items/standard/graphicswidget.h>
+#include <core/resource/motion_window.h>
+
 #include <ui/common/constrained_resizable.h>
 #include <ui/common/scene_utility.h>
 #include <ui/common/frame_section_queryable.h>
 #include <ui/workbench/workbench_context_aware.h>
+#include <ui/graphics/instruments/instrumented.h>
 #include <core/resource/resource_consumer.h>
 #include <core/datapacket/mediadatapacket.h> /* For QnMetaDataV1Ptr. */
+
 #include "polygonal_shadow_item.h"
-#include "core/resource/resource_media_layout.h"
 
 class QGraphicsLinearLayout;
 
@@ -37,7 +41,7 @@ class Instrument;
 #   undef NO_DATA
 #endif
 
-class QnResourceWidget: public GraphicsWidget, public QnWorkbenchContextAware, public QnPolygonalShapeProvider, public ConstrainedResizable, public FrameSectionQuearyable, protected SceneUtility {
+class QnResourceWidget: public Instrumented<QGraphicsWidget>, public QnWorkbenchContextAware, public QnPolygonalShapeProvider, public ConstrainedResizable, public FrameSectionQuearyable, protected SceneUtility {
     Q_OBJECT;
     Q_PROPERTY(qreal frameOpacity READ frameOpacity WRITE setFrameOpacity);
     Q_PROPERTY(qreal frameWidth READ frameWidth WRITE setFrameWidth);
@@ -46,14 +50,15 @@ class QnResourceWidget: public GraphicsWidget, public QnWorkbenchContextAware, p
     Q_PROPERTY(qreal enclosingAspectRatio READ enclosingAspectRatio WRITE setEnclosingAspectRatio);
     Q_FLAGS(DisplayFlags DisplayFlag);
 
-    typedef GraphicsWidget base_type;
+    typedef Instrumented<QGraphicsWidget> base_type;
 
 public:
     enum DisplayFlag {
-        DISPLAY_ACTIVITY_OVERLAY  = 0x1, /**< Whether the paused overlay icon should be displayed. */
-        DISPLAY_SELECTION_OVERLAY = 0x2, /**< Whether selected / not selected state should be displayed. */
-        DISPLAY_MOTION_GRID       = 0x4, /**< Whether a grid with motion detection is to be displayed. */
-        DISPLAY_BUTTONS           = 0x8, /**< Whether item buttons are to be displayed. */
+        DisplayActivityOverlay      = 0x1, /**< Whether the paused overlay icon should be displayed. */
+        DisplaySelectionOverlay     = 0x2, /**< Whether selected / not selected state should be displayed. */
+        DisplayMotionGrid           = 0x4, /**< Whether a grid with motion detection is to be displayed. */
+        DisplayButtons              = 0x8, /**< Whether item buttons are to be displayed. */
+        DisplayMotionSensitivity    = 0x10, /**< Whether a grid with motion region sensitivity is to be displayed. */
     };
     Q_DECLARE_FLAGS(DisplayFlags, DisplayFlag)
 
@@ -213,7 +218,7 @@ public:
      *                                  displayed over a video.
      */
     bool isMotionGridDisplayed() const {
-        return m_displayFlags & DISPLAY_MOTION_GRID;
+        return m_displayFlags & DisplayMotionGrid;
     }
 
     /**
@@ -237,15 +242,31 @@ public:
      */
     void addToMotionSelection(const QRect &gridRect);
 
-    void addToMotionMask(const QRect &gridRect, int channel);
+    /**
+     * Clears this widget's motion selection region.
+     */
+    void clearMotionSelection();
 
-    void clearMotionMask();
+    /**
+     * \returns                         Current motion selection regions.
+     */
+    QList<QRegion> motionSelection() const;
+
+    bool addToMotionRegion(int sens, const QRect& rect, int channel);
+
+    void clearMotionRegions();
 
     using base_type::mapRectToScene;
 
     Qn::RenderStatus currentRenderStatus() const {
         return m_renderStatus;
     }
+
+    enum MotionDrawType {
+        DrawMaskOnly,
+        DrawAllMotionInfo
+    };
+    QList<QnMotionRegion>& getMotionRegionList();
 
 public slots:
     void showActivityDecorations();
@@ -256,16 +277,13 @@ public slots:
     void fadeInInfo();
     void fadeInfo(bool fadeIn);
 
-    /**
-     * Clears this widget's motion selection region.
-     */
-    void clearMotionSelection();
+    void setDrawMotionWindows(MotionDrawType value);
 
 signals:
     void aspectRatioChanged(qreal oldAspectRatio, qreal newAspectRatio);
     void aboutToBeDestroyed();
-    void motionRegionSelected(QnResourcePtr resource, QnAbstractArchiveReader* reader, QList<QRegion> region);
     void displayFlagsChanged();
+    void motionSelectionChanged();
 
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -299,7 +317,7 @@ protected:
 
     int motionGridWidth() const;
     int motionGridHeight() const;
-
+    void drawMotionSensitivity(QPainter *painter, const QRectF &rect, const QnMotionRegion& region, int channel);
 signals:
     void updateOverlayTextLater();
 
@@ -356,7 +374,7 @@ private:
 
     void drawMotionMask(QPainter *painter, const QRectF& rect, int channel);
 
-    void drawFilledRegion(QPainter *painter, const QRectF &rect, const QRegion &selection, const QColor& color);
+    void drawFilledRegion(QPainter *painter, const QRectF &rect, const QRegion &selection, const QColor& color, const QColor& penColor);
 
     void drawFlashingText(QPainter *painter, const QStaticText &text, qreal textSize, const QPointF &offset = QPointF());
 
@@ -431,13 +449,13 @@ private:
     QVector<ChannelState> m_channelState;
 
     /** Image region where motion is currently present, in parrots. */
-    QList<QRegion> m_motionMaskList;
+    QList<QnMotionRegion> m_motionRegionList;
 
     /** Whether the motion mask is valid. */
     bool m_motionMaskValid;
 
     /** Binary mask for the current motion region. */
-    __m128i *m_motionMaskBinData[CL_MAX_CHANNELS];
+    QVector<__m128i *> m_motionMaskBinData;
 
     /** Whether motion mask binary data is valid. */
     bool m_motionMaskBinDataValid;
@@ -449,6 +467,8 @@ private:
     QStaticText m_offlineStaticText;
     QStaticText m_unauthorizedStaticText;
     QStaticText m_unauthorizedStaticText2;
+    MotionDrawType m_motionDrawType;
+    QStaticText m_sensStaticText[10];
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::DisplayFlags);

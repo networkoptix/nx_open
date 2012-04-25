@@ -4,6 +4,7 @@
 #include <QRegion>
 #include "media_resource.h"
 #include "core/misc/scheduleTask.h"
+#include "motion_window.h"
 
 class QnDataProviderFactory
 {
@@ -24,6 +25,8 @@ public:
 
     MotionTypeFlags supportedMotionType() const;
     MotionType getDefaultMotionType() const;
+    int motionWindowCnt() const;
+
 
     MotionType getMotionType();
     void setMotionType(MotionType value);
@@ -47,10 +50,12 @@ public:
 
     void setDataProviderFactory(QnDataProviderFactory* dpFactory);
 
-    void setMotionMaskList(const QList<QRegion>& maskList, QnDomain domain);
-    void setMotionMask(const QRegion& mask, QnDomain domain, int channel);
+    void setMotionRegionList(const QList<QnMotionRegion>& maskList, QnDomain domain);
+    void setMotionRegion(const QnMotionRegion& mask, QnDomain domain, int channel);
+    
     QRegion getMotionMask(int channel) const;
-    QList<QRegion> getMotionMaskList() const;
+    QnMotionRegion getMotionRegion(int channel) const;
+    QList<QnMotionRegion> getMotionRegionList() const;
 
     void setScheduleTasks(const QnScheduleTaskList &scheduleTasks);
     const QnScheduleTaskList &getScheduleTasks() const;
@@ -64,10 +69,10 @@ protected:
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() = 0;
     virtual void setCropingPhysical(QRect croping) = 0;
-    virtual void setMotionMaskPhysical(int channel){Q_UNUSED(channel);};
+    virtual void setMotionMaskPhysical(int channel) {}
 
 protected:
-    QList<QRegion> m_motionMaskList;
+    QList<QnMotionRegion> m_motionMaskList;
 private:
     QnDataProviderFactory* m_dpFactory;
     
@@ -75,6 +80,6 @@ private:
     MotionType m_motionType;
 };
 
-Q_DECLARE_METATYPE(QRegion)
+Q_DECLARE_METATYPE(QnMotionRegion)
 
 #endif //sequrity_cam_resource_h_1239

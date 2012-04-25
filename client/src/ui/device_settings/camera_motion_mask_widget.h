@@ -5,6 +5,7 @@
 #include <QGraphicsView>
 #include "core/resource/resource.h"
 #include "core/resource/camera_resource.h"
+#include "ui/graphics/instruments/click_instrument.h"
 
 class MotionSelectionInstrument;
 
@@ -28,25 +29,34 @@ public:
     const QnResourcePtr &camera() const;
 	void setCamera(const QnResourcePtr &resource);
 
-    const QList<QRegion> &motionMaskList() const;
+    const QList<QnMotionRegion> &motionRegionList() const;
 
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
 
+    void setMotionSensitivity(int value);
+    void setMaxMotionRects(int value);
+    
 signals:
-    void motionMaskListChanged();
+    void motionRegionListChanged();
+
+public slots:
+    void clearMotion();
 
 protected slots:
     void at_viewport_resized();
     void at_motionRegionSelected(QGraphicsView *, QnResourceWidget *, const QRect &);
-    void at_motionRegionCleared(QGraphicsView *, QnResourceWidget *);
+    void at_motionRegionCleared();
+    void at_itemClicked(QGraphicsView*, QGraphicsItem*, const ClickInfo&);
 
 private:
     void init();
-
+    int gridPosToChannelPos(QPoint& pos);
+    void showToManyWindowsMessage();
+    
 private:
     QnVirtualCameraResourcePtr m_camera;
-    QList<QRegion> m_motionMaskList;
+    //QList<QnMotionRegion> m_motionRegionList;
 
     /* Destruction order is important here, hence the scoped pointers. */
 
@@ -59,8 +69,11 @@ private:
     QScopedPointer<QnWorkbenchController> m_controller;
 
     MotionSelectionInstrument *m_motionSelectionInstrument;
+    ClickInstrument* m_clickInstrument;
+    QnResourceWidget* m_resourceWidget;
 
     bool m_readOnly;
+    int m_motionSensitivity;
 };
 
 #endif // QN_CAMERA_MOTION_MASK_WIDGET_H

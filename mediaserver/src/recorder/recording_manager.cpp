@@ -204,10 +204,14 @@ void QnRecordingManager::updateCamera(QnSecurityCamResourcePtr res)
     QnAbstractMediaStreamDataProviderPtr providerHi = camera->getLiveReader(QnResource::Role_LiveVideo);
     QnAbstractMediaStreamDataProviderPtr providerLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
 
+    //if (cameraRes->getMotionType() == MT_SoftwareGrid)
+
+
     if (camera)
     {
         QnSecurityCamResourcePtr cameraRes = qSharedPointerDynamicCast<QnSecurityCamResource>(res);
         cameraRes->setDataProviderFactory(QnServerDataProviderFactory::instance());
+
 
         QMap<QnResourcePtr, Recorders>::iterator itrRec = m_recordMap.find(res);
         if (itrRec != m_recordMap.end())

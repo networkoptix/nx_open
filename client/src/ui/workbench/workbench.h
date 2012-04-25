@@ -2,6 +2,7 @@
 #define QN_WORKBENCH_H
 
 #include <QObject>
+#include "workbench_globals.h"
 
 class QnWorkbenchLayout;
 class QnWorkbenchGridMapper;
@@ -19,7 +20,6 @@ class QnWorkbenchItem;
  *
  * Workbench state consists of:
  * <ul>
- * <li>Mode that determines which actions are allowed for workbench users.</>
  * <li>A list of layouts that are currently loaded.</li>
  * <li>Current layout that defines how items are placed.</li>
  * <li>A grid mapper that maps integer layout coordinates into floating-point
@@ -31,17 +31,6 @@ class QnWorkbenchItem;
 class QnWorkbench: public QObject {
     Q_OBJECT;
 public:
-    enum Mode {
-        VIEWING, /**< Viewing. This is the default mode. */
-        EDITING  /**< Layout editing. */
-    };
-
-    enum ItemRole {
-        RAISED,  /**< The item is raised. */
-        ZOOMED,  /**< The item is zoomed. */
-        ITEM_ROLE_COUNT
-    };
-
     /**
      * Constructor.
      *
@@ -135,6 +124,12 @@ public:
      */
     void setCurrentLayout(QnWorkbenchLayout *layout);
 
+    /**
+     * Sets the index of the current layout. Note that index does not need
+     * to be valid as it will be bounded to the closest valid value.
+     *
+     * \param index                     New current layout index. 
+     */
     void setCurrentLayoutIndex(int index);
 
     /**
@@ -145,28 +140,16 @@ public:
     }
 
     /**
-     * \returns                         Current mode.
-     */
-    Mode mode() const {
-        return m_mode;
-    }
-
-    /**
-     * \param mode                      New mode for this workbench.
-     */
-    void setMode(Mode mode);
-
-    /**
      * \param role                      Role to get item for.
      * \returns                         Item for the given item role.
      */
-    QnWorkbenchItem *item(ItemRole role);
+    QnWorkbenchItem *item(Qn::ItemRole role);
 
     /**
      * \param role                      Role to set an item for.
      * \param item                      New item for the given role.
      */
-    void setItem(ItemRole role, QnWorkbenchItem *item);
+    void setItem(Qn::ItemRole role, QnWorkbenchItem *item);
 
 signals:
     /**
@@ -221,7 +204,7 @@ signals:
      *
      * \param role                      Item role.
      */
-    void itemChanged(QnWorkbench::ItemRole role);
+    void itemChanged(Qn::ItemRole role);
 
     /**
      * This signal is emitted whenever the bounding rect of this workbench's 
@@ -246,16 +229,11 @@ private:
     /** Grid mapper of this workbench. */
     QnWorkbenchGridMapper *m_mapper;
 
-    /** Current mode. */
-    Mode m_mode;
-
     /** Items by role. */
-    QnWorkbenchItem *m_itemByRole[ITEM_ROLE_COUNT];
+    QnWorkbenchItem *m_itemByRole[Qn::ItemRoleCount];
 
     /** Stored dummy layout. It is used to ensure that current layout is never NULL. */
     QnWorkbenchLayout *m_dummyLayout;
 };
-
-Q_DECLARE_TYPEINFO(QnWorkbench::ItemRole, Q_PRIMITIVE_TYPE);
 
 #endif // QN_WORKBENCH_H

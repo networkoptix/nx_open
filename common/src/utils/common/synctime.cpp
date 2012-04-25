@@ -1,12 +1,13 @@
-#include <QRunnable>
+#include <QtCore/QRunnable>
+#include <QtCore/QThreadPool>
+
 #include "synctime.h"
 #include "api/AppServerConnection.h"
 #include "api/SessionManager.h"
 
 static const int SYNC_TIME_INTERVAL = 1000 * 60 * 5;
 
-class QnSyncTimeTask: public QRunnable
-{
+class QnSyncTimeTask: public QRunnable {
 public:
     QnSyncTimeTask(QnSyncTime* owner): m_owner(owner) {}
     void run()
@@ -16,10 +17,12 @@ public:
         if (rez > 0) 
             m_owner->updateTime(rez);
     }
+
 private:
     QnSyncTime* m_owner;
     QUrl m_url;
 };
+
 
 // ------------------------------ QnSyncTime ------------------------------
 

@@ -5,6 +5,7 @@
 #include <core/resource/resource_fwd.h>
 #include <api/AppServerConnection.h>
 #include "workbench_context_aware.h"
+#include "workbench_globals.h"
 
 class QnWorkbenchContext;
 class QnWorkbenchLayoutSnapshotStorage;
@@ -32,26 +33,6 @@ namespace detail {
     };
 
 } // namespace detail
-
-
-namespace Qn {
-
-    enum LayoutFlag {
-        /** Layout is local and was never saved to appserver. */
-        LayoutIsLocal = 0x1,
-
-        /** Layout is currently being saved to appserver. */
-        LayoutIsBeingSaved = 0x2,
-
-        /** LayoutIsLocal unsaved changes are present in the layout. */
-        LayoutIsChanged = 0x4,
-    };
-    Q_DECLARE_FLAGS(LayoutFlags, LayoutFlag);
-
-} // namespace Qn
-
-Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::LayoutFlags);
-
 
 /**
  * This class maintains a storage of layout snapshots and tracks the state of

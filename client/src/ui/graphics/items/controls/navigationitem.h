@@ -8,19 +8,20 @@
 #include <ui/graphics/items/simple_frame_widget.h>
 
 #include "recording/time_period.h"
-#include "camera/time_period_reader_helper.h"
+#include "camera/multi_camera_time_period_loader.h"
 
 
 class QTimerEvent;
 
 class CLVideoCamera;
-class SpeedSlider;
+class QnSpeedSlider;
 class TimeSlider;
-class VolumeSlider;
+class QnVolumeSlider;
 class GraphicsLabel;
 class QnAbstractRenderer;
 class QnAbstractArchiveReader;
 class QnImageButtonWidget;
+class QnWorkbenchDisplay;
 
 class NavigationItem : public QnSimpleFrameWidget
 {
@@ -29,7 +30,7 @@ class NavigationItem : public QnSimpleFrameWidget
     typedef QnSimpleFrameWidget base_type;
 
 public:
-    explicit NavigationItem(QGraphicsItem *parent = 0);
+    explicit NavigationItem(QnWorkbenchDisplay *display, QGraphicsItem *parent = 0);
     ~NavigationItem();
 
     void setVideoCamera(CLVideoCamera* camera);
@@ -112,7 +113,7 @@ protected:
 private:
     struct MotionPeriodLoader {
         MotionPeriodLoader(): loadingHandle(0), reader(0) {}
-        QnTimePeriodUpdaterPtr loader;
+        QnTimePeriodLoader *loader;
         int loadingHandle;
         QnTimePeriodList periods;
         QList<QRegion> regions;
@@ -131,9 +132,9 @@ private:
     QnImageButtonWidget *m_liveButton;
     QnImageButtonWidget *m_mrsButton;
     QnImageButtonWidget *m_syncButton;
-    SpeedSlider *m_speedSlider;
+    QnSpeedSlider *m_speedSlider;
     QnImageButtonWidget *m_muteButton;
-    VolumeSlider *m_volumeSlider;
+    QnVolumeSlider *m_volumeSlider;
     GraphicsLabel *m_timeLabel;
 
     QHash<CLVideoCamera *, qreal> m_zoomByCamera;
