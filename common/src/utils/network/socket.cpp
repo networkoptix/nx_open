@@ -636,7 +636,7 @@ void Socket::setReuseAddrFlag(bool reuseAddr)
 {
     int reuseAddrVal = reuseAddr;
 
-    if (::setsockopt(sockDesc, SOL_SOCKET, SO_REUSEADDR, (void*)&reuseAddrVal, sizeof(reuseAddrVal))) {
+    if (::setsockopt(sockDesc, SOL_SOCKET, SO_REUSEADDR, (const char*)&reuseAddrVal, sizeof(reuseAddrVal))) {
         QString message = QString("Can't set SO_REUSEADDR flag to socket: %1").arg(::strerror(errno));
         throw SocketException(message, true);
     }
