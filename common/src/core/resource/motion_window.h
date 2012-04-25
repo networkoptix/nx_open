@@ -42,6 +42,7 @@ public:
     void addRect(int sensitivity, const QRect& rect);
     QRegion getMotionMask() const; // return info with zerro sensitivity only
     QRegion getRegionBySens(int value) const;
+    QMultiMap<int, QRect> getAllMotionRects() const;
 
     /* 
     * Returns simplified version of region's rects

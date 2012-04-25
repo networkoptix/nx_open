@@ -156,7 +156,8 @@ QByteArray QnLiveStreamProvider::createSoftwareMotionMask(const QnMotionRegion& 
     return rez;
 }
 
-void QnLiveStreamProvider::updateMotion()
+
+void QnLiveStreamProvider::updateSoftwareMotion()
 {
     QnAbstractMediaStreamDataProvider* ap = dynamic_cast<QnAbstractMediaStreamDataProvider*>(this);
     Q_ASSERT(ap);
@@ -175,10 +176,6 @@ void QnLiveStreamProvider::updateMotion()
             QnMotionRegion region = res->getMotionRegion(i);
             m_motionEstimation[i].setMotionMask(createSoftwareMotionMask(region));
         }
-    }
-    else if (getRole() == QnResource::Role_LiveVideo && res->getMotionType() != MT_SoftwareGrid)
-    {
-        updateCameraMotion(res->getMotionRegion(0));
     }
 }
 

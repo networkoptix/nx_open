@@ -39,10 +39,11 @@ void QnSecurityCamResource::updateInner(QnResourcePtr other)
         const QnVideoResourceLayout* layout = getVideoLayout();
         int numChannels = layout->numberOfChannels();
 
+        m_motionType = other_casted->m_motionType;
+
         for (int i = 0; i < numChannels; ++i) 
             setMotionRegion(other_casted->m_motionMaskList[i], QnDomainPhysical, i);
         m_scheduleTasks = other_casted->m_scheduleTasks;
-        m_motionType = other_casted->m_motionType;
     }
 }
 
@@ -144,8 +145,16 @@ void QnSecurityCamResource::setMotionRegion(const QnMotionRegion& mask, QnDomain
         m_motionMaskList[channel] = mask;
     }
 
-    if (domain == QnDomainPhysical)
-        setMotionMaskPhysical(channel);
+    if (domain == QnDomainPhysical) 
+    {
+        if (m_motionType == MT_SoftwareGrid)
+        {
+            ;
+        }
+        else {
+            setMotionMaskPhysical(channel);
+        }
+    }
 }
 
 void QnSecurityCamResource::setMotionRegionList(const QList<QnMotionRegion>& maskList, QnDomain domain)
@@ -162,10 +171,17 @@ void QnSecurityCamResource::setMotionRegionList(const QList<QnMotionRegion>& mas
         m_motionMaskList = maskList;
     }
 
-    if (domain == QnDomainPhysical) 
+    if (domain == QnDomainPhysical)
     {
-        for (int i = 0; i < getVideoLayout()->numberOfChannels(); ++i)
-            setMotionMaskPhysical(i);
+        if (m_motionType == MT_SoftwareGrid)
+        {
+            ;
+        }
+        else 
+        {
+            for (int i = 0; i < getVideoLayout()->numberOfChannels(); ++i)
+                setMotionMaskPhysical(i);
+        }
     }
 }
 

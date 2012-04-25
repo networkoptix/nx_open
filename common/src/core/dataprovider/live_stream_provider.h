@@ -39,12 +39,11 @@ public:
     bool isSoftwareMotion() const;
     void setUseSoftwareMotion(bool value);
 
-    void updateMotion();
+    void updateSoftwareMotion();
 protected:
 
     virtual void updateStreamParamsBasedOnQuality() = 0;
     virtual void updateStreamParamsBasedOnFps() = 0;
-    virtual void updateCameraMotion(const QnMotionRegion& region) {}
 
     QnMetaDataV1Ptr getMetaData();
 
