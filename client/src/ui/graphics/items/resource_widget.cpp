@@ -579,25 +579,29 @@ void QnResourceWidget::addToMotionSelection(const QRect &gridRect)
         newSelection << m_channelState[i].motionSelection;
     }
 
-    if(prevSelection != newSelection && display()->archiveReader())
-        emit motionRegionSelected(m_resource, display()->archiveReader(), newSelection);
+    if(prevSelection != newSelection)
+        emit motionSelectionChanged();
 }
 
 void QnResourceWidget::clearMotionSelection() 
 {
     bool allEmpty = true;
-    for (int i = 0; i < m_channelState.size(); ++i) 
-        allEmpty &= m_channelState[i].motionSelection.isEmpty();
+    foreach(const ChannelState &state, m_channelState)
+        allEmpty &= state.motionSelection.isEmpty();
     if (allEmpty)
         return;
 
-    QList<QRegion> rez;
-    for (int i = 0; i < m_channelState.size(); ++i) {
+    for (int i = 0; i < m_channelState.size(); ++i)
         m_channelState[i].motionSelection = QRegion();
-        rez << QRegion();
-    }
-    if (display()->archiveReader())
-        emit motionRegionSelected(m_resource, display()->archiveReader(), rez);
+
+    emit motionSelectionChanged();
+}
+
+QList<QRegion> QnResourceWidget::motionSelection() const {
+    QList<QRegion> result;
+    foreach(const ChannelState &state, m_channelState)
+        result.push_back(state.motionSelection);
+    return result;
 }
 
 void QnResourceWidget::setDisplayFlags(DisplayFlags flags) {
