@@ -115,17 +115,6 @@ GraphicsScrollBar::GraphicsScrollBar(QGraphicsItem *parent)
     d_func()->init();
 }
 
-/*!
-    Constructs a scroll bar with the given \a orientation.
-
-    The \a parent argument is passed to the QWidget constructor.
-
-    The \l {QAbstractSlider::minimum} {minimum} defaults to 0, the
-    \l {QAbstractSlider::maximum} {maximum} to 99, with a
-    \l {QAbstractSlider::singleStep} {singleStep} size of 1 and a
-    \l {QAbstractSlider::pageStep} {pageStep} size of 10, and an
-    initial \l {QAbstractSlider::value} {value} of 0.
-*/
 GraphicsScrollBar::GraphicsScrollBar(Qt::Orientation orientation, QGraphicsItem *parent)
     : base_type(*new GraphicsScrollBarPrivate, parent)
 {
@@ -133,9 +122,6 @@ GraphicsScrollBar::GraphicsScrollBar(Qt::Orientation orientation, QGraphicsItem 
     d_func()->init();
 }
 
-/*!
-    Destroys the scroll bar.
-*/
 GraphicsScrollBar::~GraphicsScrollBar()
 {
 }
@@ -143,6 +129,9 @@ GraphicsScrollBar::~GraphicsScrollBar()
 void GraphicsScrollBarPrivate::init()
 {
     Q_Q(GraphicsScrollBar);
+
+    initControls(QStyle::CC_ScrollBar, QStyle::SC_ScrollBarGroove, QStyle::SC_ScrollBarSlider);
+
     invertedControls = true;
     pressedControl = hoverControl = QStyle::SC_None;
     pointerOutsidePressedControl = false;
@@ -154,7 +143,6 @@ void GraphicsScrollBarPrivate::init()
 }
 
 #ifndef QT_NO_CONTEXTMENU
-/*! \reimp */
 void GraphicsScrollBar::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
     if (!style()->styleHint(QStyle::SH_ScrollBar_ContextMenu, 0, this)) {
@@ -203,7 +191,6 @@ void GraphicsScrollBar::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 #endif // QT_NO_CONTEXTMENU
 
 
-/*! \reimp */
 QSizeF GraphicsScrollBar::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const {
     if(which != Qt::MinimumSize && which != Qt::PreferredSize)
         return base_type::sizeHint(which, constraint);
@@ -222,15 +209,16 @@ QSizeF GraphicsScrollBar::sizeHint(Qt::SizeHint which, const QSizeF &constraint)
     return style()->sizeFromContents(QStyle::CT_ScrollBar, &opt, size, this).expandedTo(QApplication::globalStrut());
  }
 
-/*!\reimp */
 void GraphicsScrollBar::sliderChange(SliderChange change)
 {
+    Q_D(GraphicsScrollBar);
+
     base_type::sliderChange(change);
+
+    if(change == SliderMappingChange)
+        d->clickOffsetDirty = true;
 }
 
-/*!
-    \reimp
-*/
 bool GraphicsScrollBar::event(QEvent *event)
 {
     switch(event->type()) {
@@ -265,9 +253,6 @@ bool GraphicsScrollBar::event(QEvent *event)
     return base_type::event(event);
 }
 
-/*!
-    \reimp
-*/
 void GraphicsScrollBar::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) 
 {
     Q_D(GraphicsScrollBar);
@@ -284,12 +269,11 @@ void GraphicsScrollBar::paint(QPainter *painter, const QStyleOptionGraphicsItem 
     style()->drawComplexControl(QStyle::CC_ScrollBar, &opt, painter, this);
 }
 
-/*!
-    \reimp
-*/
 void GraphicsScrollBar::mousePressEvent(QGraphicsSceneMouseEvent *e)
 {
     Q_D(GraphicsScrollBar);
+
+    d->mousePos = e->pos();
 
     if (d->repeatActionTimer.isActive())
         d->stopRepeatAction();
@@ -306,12 +290,13 @@ void GraphicsScrollBar::mousePressEvent(QGraphicsSceneMouseEvent *e)
     d->pressedControl = style()->hitTestComplexControl(QStyle::CC_ScrollBar, &opt, e->pos(), this);
     d->pointerOutsidePressedControl = false;
 
-    QRectF sr = style()->subControlRect(QStyle::CC_ScrollBar, &opt, QStyle::SC_ScrollBarSlider, this);
+    QRectF sliderRect = style()->subControlRect(QStyle::CC_ScrollBar, &opt, QStyle::SC_ScrollBarSlider, this);
     QPointF click = e->pos();
-    QPointF pressValue = click - sr.center() + sr.topLeft();
+    QPointF pressValue = click - sliderRect.center() + sliderRect.topLeft();
     d->pressValue = valueFromPosition(pressValue);
     if (d->pressedControl == QStyle::SC_ScrollBarSlider) {
-        d->clickOffset = click - sr.topLeft();;
+        d->clickOffset = click - sliderRect.topLeft();
+        d->clickOffsetDirty = false;
         d->snapBackPosition = d->position;
     }
 
@@ -321,7 +306,8 @@ void GraphicsScrollBar::mousePressEvent(QGraphicsSceneMouseEvent *e)
             || (style()->styleHint(QStyle::SH_ScrollBar_LeftClickAbsolutePosition, &opt, this)
                 && e->button() == Qt::LeftButton))) {
 
-        d->clickOffset = QPointF(sr.width(), sr.height()) / 2;
+        d->clickOffset = QPointF(sliderRect.width(), sliderRect.height()) / 2;
+        d->clickOffsetDirty = false;
         setSliderPosition(valueFromPosition(e->pos() - d->clickOffset));
         d->pressedControl = QStyle::SC_ScrollBarSlider;
     }
@@ -333,15 +319,13 @@ void GraphicsScrollBar::mousePressEvent(QGraphicsSceneMouseEvent *e)
         setSliderDown(true);
 }
 
-
-/*!
-    \reimp
-*/
 void GraphicsScrollBar::mouseReleaseEvent(QGraphicsSceneMouseEvent *e)
 {
     Q_D(GraphicsScrollBar);
     if (!d->pressedControl)
         return;
+
+    d->mousePos = e->pos();
 
     if (e->buttons() & (~e->button())) // some other button is still pressed
         return;
@@ -349,10 +333,6 @@ void GraphicsScrollBar::mouseReleaseEvent(QGraphicsSceneMouseEvent *e)
     d->stopRepeatAction();
 }
 
-
-/*!
-    \reimp
-*/
 void GraphicsScrollBar::mouseMoveEvent(QGraphicsSceneMouseEvent *e)
 {
     Q_D(GraphicsScrollBar);
@@ -361,6 +341,14 @@ void GraphicsScrollBar::mouseMoveEvent(QGraphicsSceneMouseEvent *e)
 
     QStyleOptionSlider opt;
     initStyleOption(&opt);
+
+    if(d->clickOffsetDirty) {
+        QRectF sliderRect = style()->subControlRect(QStyle::CC_ScrollBar, &opt, QStyle::SC_ScrollBarSlider, this);
+        d->clickOffset = d->mousePos - sliderRect.topLeft();
+        d->clickOffsetDirty = false;
+    }
+    d->mousePos = e->pos();
+
     if (!(e->buttons() & Qt::LeftButton
           ||  ((e->buttons() & Qt::MidButton)
                && style()->styleHint(QStyle::SH_ScrollBar_MiddleClickAbsolutePosition, &opt, this))))
@@ -383,7 +371,7 @@ void GraphicsScrollBar::mouseMoveEvent(QGraphicsSceneMouseEvent *e)
                 && d->pressedControl & (QStyle::SC_ScrollBarAddLine | QStyle::SC_ScrollBarSubLine)) {
             QStyle::SubControl newSc = style()->hitTestComplexControl(QStyle::CC_ScrollBar, &opt, e->pos(), this);
             if (newSc == d->pressedControl && !d->pointerOutsidePressedControl)
-                return; // nothing to do
+                return; /* Nothing to do. */
             if (newSc & (QStyle::SC_ScrollBarAddLine | QStyle::SC_ScrollBarSubLine)) {
                 d->pointerOutsidePressedControl = false;
                 QRect scRect = style()->subControlRect(QStyle::CC_ScrollBar, &opt, newSc, this);
@@ -395,14 +383,13 @@ void GraphicsScrollBar::mouseMoveEvent(QGraphicsSceneMouseEvent *e)
             }
         }
 
-        // stop scrolling when the mouse pointer leaves a control
-        // similar to push buttons
-        QRectF pr = style()->subControlRect(QStyle::CC_ScrollBar, &opt, d->pressedControl, this);
-        if (pr.contains(e->pos()) == d->pointerOutsidePressedControl) {
+        /* Stop scrolling when the mouse pointer leaves a control, similar to push buttons. */
+        QRectF pressedRect = style()->subControlRect(QStyle::CC_ScrollBar, &opt, d->pressedControl, this);
+        if (pressedRect.contains(e->pos()) == d->pointerOutsidePressedControl) {
             if ((d->pointerOutsidePressedControl = !d->pointerOutsidePressedControl)) {
                 d->pointerOutsidePressedControl = true;
                 setRepeatAction(SliderNoAction);
-                update(pr);
+                update(pressedRect);
             } else  {
                 d->activateControl(d->pressedControl);
             }
@@ -410,65 +397,6 @@ void GraphicsScrollBar::mouseMoveEvent(QGraphicsSceneMouseEvent *e)
     }
 }
 
-QPointF GraphicsScrollBar::positionFromValue(qint64 logicalValue) const {
-    Q_D(const GraphicsScrollBar);
-
-    QStyleOptionSlider opt;
-    initStyleOption(&opt);
-
-    QRectF gr = style()->subControlRect(QStyle::CC_ScrollBar, &opt, QStyle::SC_ScrollBarGroove, this);
-    QRectF sr = style()->subControlRect(QStyle::CC_ScrollBar, &opt, QStyle::SC_ScrollBarSlider, this);
-    qreal sliderMin, sliderMax, sliderLength;
-
-    if (d->orientation == Qt::Horizontal) {
-        sliderLength = sr.width();
-        sliderMin = gr.x();
-        sliderMax = gr.right() - sliderLength + 1;
-        if (layoutDirection() == Qt::RightToLeft)
-            opt.upsideDown = !opt.upsideDown;
-    } else {
-        sliderLength = sr.height();
-        sliderMin = gr.y();
-        sliderMax = gr.bottom() - sliderLength + 1;
-    }
-
-    qreal result = sliderMin + GraphicsStyle::sliderPositionFromValue(d->minimum, d->maximum, logicalValue, sliderMax - sliderMin, opt.upsideDown);
-    if(d->orientation == Qt::Horizontal) {
-        return QPointF(result, 0.0);
-    } else {
-        return QPointF(0.0, result);
-    }
-}
-
-qint64 GraphicsScrollBar::valueFromPosition(const QPointF &position) const {
-    Q_D(const GraphicsScrollBar);
-
-    QStyleOptionSlider opt;
-    initStyleOption(&opt);
-
-    QRectF gr = style()->subControlRect(QStyle::CC_ScrollBar, &opt, QStyle::SC_ScrollBarGroove, this);
-    QRectF sr = style()->subControlRect(QStyle::CC_ScrollBar, &opt, QStyle::SC_ScrollBarSlider, this);
-    qreal sliderMin, sliderMax, sliderLength, pixelPos;
-
-    if (d->orientation == Qt::Horizontal) {
-        sliderLength = sr.width();
-        sliderMin = gr.x();
-        sliderMax = gr.right() - sliderLength + 1;
-        if (layoutDirection() == Qt::RightToLeft)
-            opt.upsideDown = !opt.upsideDown;
-        pixelPos = position.x();
-    } else {
-        sliderLength = sr.height();
-        sliderMin = gr.y();
-        sliderMax = gr.bottom() - sliderLength + 1;
-        pixelPos = position.y();
-    }
-
-    return GraphicsStyle::sliderValueFromPosition(d->minimum, d->maximum, pixelPos - sliderMin, sliderMax - sliderMin, opt.upsideDown);
-}
-
-/*! \reimp
-*/
 void GraphicsScrollBar::hideEvent(QHideEvent *)
 {
     Q_D(GraphicsScrollBar);

@@ -12,8 +12,13 @@ public:
     QnTimeScrollBar(QGraphicsItem *parent = NULL);
     virtual ~QnTimeScrollBar();
 
+    qint64 indicatorPosition() const;
+    void setIndicatorPosition(qint64 indicatorPosition);
+
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
+private:
+    qint64 m_indicatorPosition;
 };
 
 

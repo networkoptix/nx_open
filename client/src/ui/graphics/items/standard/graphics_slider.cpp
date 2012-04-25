@@ -14,6 +14,8 @@ void GraphicsSliderPrivate::init()
 {
     Q_Q(GraphicsSlider);
 
+    initControls(QStyle::CC_Slider, QStyle::SC_SliderGroove, QStyle::SC_SliderHandle);
+
     pressedControl = QStyle::SC_None;
     tickPosition = GraphicsSlider::NoTicks;
     tickInterval = 0;

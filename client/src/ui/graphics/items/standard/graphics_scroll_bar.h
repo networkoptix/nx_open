@@ -17,9 +17,6 @@ public:
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0) override;
 
-    virtual QPointF positionFromValue(qint64 logicalValue) const override;
-    virtual qint64 valueFromPosition(const QPointF &position) const override;
-
 protected:
     virtual bool event(QEvent *event) override;
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *) override;
