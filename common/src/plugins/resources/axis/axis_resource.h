@@ -35,7 +35,7 @@ public:
     QMap<int, QRect>  getMotionWindows() const;
     void readMotionInfo();
 
-    void updateCameraMotion(const QnMotionRegion& region);
+    virtual void setMotionMaskPhysical(int channel) override;
 protected:
     void init();
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();

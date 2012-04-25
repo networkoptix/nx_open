@@ -62,6 +62,7 @@ protected:
     virtual bool getParamPhysical(const QnParam &param, QVariant &val);
     virtual bool setParamPhysical(const QnParam &param, const QVariant &val);
 
+    virtual void setMotionMaskPhysical(int channel) override;
 public:
     static QnPlAreconVisionResource* createResourceByName(const QString &name);
     static QnPlAreconVisionResource* createResourceByTypeId(QnId rt);

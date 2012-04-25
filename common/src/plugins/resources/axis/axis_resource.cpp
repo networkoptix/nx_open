@@ -317,12 +317,15 @@ int QnPlAxisResource::toAxisMotionSensitivity(int sensitivity)
     return sens[sensitivity];
 }
 
-void QnPlAxisResource::updateCameraMotion(const QnMotionRegion& region)
+void QnPlAxisResource::setMotionMaskPhysical(int channel)
 {
     QMutexLocker lock(&m_mutex);
 
     if (m_lastMotionReadTime == 0)
         readMotionInfo();
+
+
+    const QnMotionRegion region = m_motionMaskList[0];
 
     QMap<int, QRect> existsWnd = m_motionWindows; // the key is window number
     QMap<int, QRect> newWnd = region.getAllMotionRects(); // the key is motion sensitivity

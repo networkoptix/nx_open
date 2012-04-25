@@ -193,11 +193,6 @@ void QnAxisStreamReader::processTriggerData(const quint8* payload, int len)
     }
 }
 
-void QnAxisStreamReader::updateCameraMotion(const QnMotionRegion& region)
-{
-    m_axisRes->updateCameraMotion(region);
-}
-
 void QnAxisStreamReader::parseMotionInfo(QnCompressedVideoDataPtr videoData)
 {
     const quint8* curNal = (const quint8*) videoData->data.data();

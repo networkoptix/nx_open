@@ -39,33 +39,6 @@ QnPlAVClinetPullStreamReader::~QnPlAVClinetPullStreamReader()
     stop();
 }
 
-void QnPlAVClinetPullStreamReader::updateCameraMotion(const QnMotionRegion& region)
-{
-    static int sensToLevelThreshold[10] = 
-    {
-        31, // 0 - aka mask really filtered by media server always
-        31, // 1
-        25, // 2
-        19, // 3
-        14, // 4
-        10, // 5
-        7,  // 6
-        5,  // 7
-        3,  // 8
-        2   // 9
-    };
-
-    for (int sens = QnMotionRegion::MIN_SENSITIVITY; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens)
-    {
-        if (sens != 0 && !region.getRegionBySens(sens).isEmpty())
-        {
-            QnPlAreconVisionResourcePtr avRes = getResource().dynamicCast<QnPlAreconVisionResource>();
-            avRes->setParamAsync("mdlevelthreshold", sensToLevelThreshold[sens], QnDomainPhysical);
-            break; // only 1 sensitivity for all frame is supported
-        }
-    }
-}
-
 void QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnQuality()
 {
     QMutexLocker mtx(&m_mutex);

@@ -239,7 +239,7 @@ void QnServerStreamRecorder::updateCamera(QnSecurityCamResourcePtr cameraRes)
     if (m_mediaProvider)
     {
         QnLiveStreamProvider* liveProvider = dynamic_cast<QnLiveStreamProvider*>(m_mediaProvider);
-        liveProvider->updateMotion();
+        liveProvider->updateSoftwareMotion();
     }
 }
 

@@ -431,3 +431,35 @@ QnAbstractStreamDataProvider* QnPlAreconVisionResource::createLiveDataProvider()
     Q_ASSERT_X(false, Q_FUNC_INFO, "QnPlAreconVisionResource is abstract.");
     return 0;
 }
+
+void QnPlAreconVisionResource::setMotionMaskPhysical(int channel)
+{
+    if (channel != 0)
+        return; // motion info used always once even for multisensor cameras 
+
+    static int sensToLevelThreshold[10] = 
+    {
+        31, // 0 - aka mask really filtered by media server always
+        31, // 1
+        25, // 2
+        19, // 3
+        14, // 4
+        10, // 5
+        7,  // 6
+        5,  // 7
+        3,  // 8
+        2   // 9
+    };
+
+    QnMotionRegion region = m_motionMaskList[0];
+    for (int sens = QnMotionRegion::MIN_SENSITIVITY+1; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens)
+    {
+        
+        if (!region.getRegionBySens(sens).isEmpty())
+        {
+            setParamAsync("mdlevelthreshold", sensToLevelThreshold[sens], QnDomainPhysical);
+            break; // only 1 sensitivity for all frame is supported
+        }
+    }
+}
+
