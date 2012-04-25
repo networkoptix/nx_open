@@ -3,7 +3,7 @@
 #include <ui/style/noptix_style.h>
 
 QnTimeScrollBar::QnTimeScrollBar(QGraphicsItem *parent):
-    base_type(parent) 
+    base_type(Qt::Horizontal, parent) 
 {
     
 }
@@ -13,27 +13,13 @@ QnTimeScrollBar::~QnTimeScrollBar() {
 }
 
 void QnTimeScrollBar::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+    QStyleOptionSlider opt;
+    initStyleOption(&opt);
 
+    QRect sliderRect = style()->subControlRect(QStyle::CC_ScrollBar, &opt, QStyle::SC_ScrollBarSlider, this);
+
+    painter->setPen(QPen(Qt::green, 0));
+    painter->drawRect(sliderRect);
 }
 
-void QnTimeScrollBar::updateSliderLength() {
-
-}
-
-
-// -------------------------------------------------------------------------- //
-// Handlers
-// -------------------------------------------------------------------------- //
-void QnTimeScrollBar::resizeEvent(QGraphicsSceneResizeEvent *event) {
-    base_type::resizeEvent(event);
-
-    updateSliderLength();
-}
-
-void QnTimeScrollBar::sliderChange(SliderChange change) {
-    base_type::sliderChange(change);
-
-    if(change == SliderRangeChange || change == SliderStepsChange || change == SliderMappingChange)
-        updateSliderLength();
-}
 

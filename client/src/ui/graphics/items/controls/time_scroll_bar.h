@@ -14,13 +14,6 @@ public:
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
-protected:
-    virtual void sliderChange(SliderChange change) override;
-
-    virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override;
-
-private:
-    void updateSliderLength();
 };
 
 

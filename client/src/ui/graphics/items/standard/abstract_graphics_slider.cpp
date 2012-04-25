@@ -499,23 +499,31 @@ void AbstractGraphicsSlider::initStyleOption(QStyleOption *option) const
                                    ? d->invertedAppearance != (option->direction == Qt::RightToLeft)
                                    : !d->invertedAppearance;
         sliderOption->direction = Qt::LeftToRight; // we use the upsideDown option instead
-        
-        if(isInt(d->maximum) && isInt(d->minimum)) {
-            sliderOption->maximum = d->maximum;
-            sliderOption->minimum = d->minimum;
-            sliderOption->sliderPosition = d->position;
-            sliderOption->sliderValue = d->value;
-            sliderOption->singleStep = d->singleStep;
-            sliderOption->pageStep = d->pageStep;
-        } else {
-            qint64 k = qMax(qAbs(d->maximum), qAbs(d->minimum)) / (std::numeric_limits<int>::max() / 2) + 1;
 
-            sliderOption->maximum           = d->maximum / k;
-            sliderOption->minimum           = d->minimum / k;
-            sliderOption->sliderPosition    = d->position / k;
-            sliderOption->sliderValue       = d->value / k;
-            sliderOption->singleStep        = d->singleStep / k;
-            sliderOption->pageStep          = d->pageStep / k;
+        sliderOption->minimum = d->minimum;
+        sliderOption->maximum = d->maximum;
+        sliderOption->sliderPosition = d->position;
+        sliderOption->sliderValue = d->value;
+        sliderOption->singleStep = d->singleStep;
+        sliderOption->pageStep = d->pageStep;
+
+        if(!isInt(sliderOption->maximum) || !isInt(sliderOption->minimum)) {
+            qint64 d = sliderOption->minimum;
+            sliderOption->minimum            = 0;
+            sliderOption->maximum           -= d;
+            sliderOption->sliderPosition    -= d;
+            sliderOption->sliderValue       -= d;
+
+            if(!isInt(sliderOption->maximum)) {
+                qint64 k = sliderOption->maximum >> 16;
+
+                sliderOption->minimum           /= k;
+                sliderOption->maximum           /= k;
+                sliderOption->sliderPosition    /= k;
+                sliderOption->sliderValue       /= k;
+                sliderOption->singleStep        /= k;
+                sliderOption->pageStep          /= k;
+            }
         }
     }
 }
