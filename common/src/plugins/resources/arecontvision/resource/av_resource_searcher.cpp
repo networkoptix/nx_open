@@ -10,6 +10,13 @@
 #include "utils/common/sleep.h"
 #include "core/resource/camera_resource.h"
 
+#ifdef Q_OS_LINUX
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <ifaddrs.h>
+#include <unistd.h>
+#endif
 
 #define CL_BROAD_CAST_RETRY 1
 
@@ -46,11 +53,43 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
         }
     }
 #endif
+
+#ifdef Q_OS_LINUX
+    struct ifaddrs *ifaddr, *ifa;
+    int family, s;
+    char host[NI_MAXHOST];
+
+    if (getifaddrs(&ifaddr) == -1)
+    {
+        cl_log.log(cl_logWARNING, "QnPlArecontResourceSearcher::findResources(): Can't get interfaces list: %s", strerror(errno));
+        return result;
+    }
+
+    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
+    {
+        family = ifa->ifa_addr->sa_family;
+
+        if (family != AF_INET)
+            continue;
+
+        QUdpSocket sock;
+        sock.bind(0);
+
+        int res = setsockopt(sock.socketDescriptor(), SOL_SOCKET, SO_BINDTODEVICE, ifa->ifa_name, strlen(ifa->ifa_name));
+        if (res != 0)
+        {
+            cl_log.log(cl_logWARNING, "QnPlArecontResourceSearcher::findResources(): Can't bind to interface %s: %s", ifa->ifa_name, strerror(errno));
+            continue;
+        }
+
+#elif defined Q_OS_WIN
     for (int i = 0; i < ipaddrs.size();++i)
     {
         QUdpSocket sock;
+
         if (!sock.bind(ipaddrs.at(i), 0))
-            continue;
+           continue;
+#endif
 
 
         // sending broadcast
@@ -133,7 +172,17 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
 
                 resource->setHostAddress(sender, QnDomainMemory);
                 resource->setMAC(mac);
-                resource->setDiscoveryAddr( ipaddrs.at(i) );
+
+#ifdef Q_OS_LINUX
+                s = getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in), host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
+                if (s != 0) {
+                    cl_log.log(cl_logWARNING, "QnPlArecontResourceSearcher::findResources(): getnameinfo() failed: %s", strerror(errno));
+                }
+                resource->setDiscoveryAddr(QHostAddress(host));
+#elif defined Q_OS_WIN
+                resource->setDiscoveryAddr(ipaddrs.at(i));
+#endif
+
                 resource->setName("ArecontVision_Abstract");
 
 
