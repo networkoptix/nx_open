@@ -34,8 +34,6 @@ private:
 private:
     mutable QMutex m_mutex;
 
-    Veracity::ISFS* m_csConnection;
-    Veracity::u32 m_stream;
 
 };
 

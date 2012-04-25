@@ -19,6 +19,12 @@ struct QnCSFileInfo
     qint64 len;
 };
 
+struct QnCSFile
+{
+    QByteArray data;
+    QString fn;
+};
+
 class QnColdStoreMetaData
 {
 public:
@@ -41,5 +47,8 @@ private:
 
     bool m_needsToBesaved;
 };
+
+
+
 
 #endif //coldstore_helper_h_2137_h
