@@ -7,6 +7,7 @@
 #include <QtGui/QApplication>
 #include <QtGui/QGraphicsSceneEvent>
 #include <QtGui/QStyleOption>
+#include <limits>
 
 namespace {
     bool isInt(qint64 value) {

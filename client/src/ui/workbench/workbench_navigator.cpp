@@ -29,7 +29,6 @@
 #include "workbench_context.h"
 
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
-#include <cstdint> // TODO: remove
 #include "libavutil/avutil.h" // TODO: remove
 #include <ui/graphics/items/standard/graphics_scroll_bar.h> // TODO: remove
 
