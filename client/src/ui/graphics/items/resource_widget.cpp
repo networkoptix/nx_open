@@ -107,6 +107,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_motionMaskBinDataValid(false),
     m_motionDrawType(DrawMaskOnly)
 {
+    setAcceptHoverEvents(true);
+
     /* Set up shadow. */
     m_shadow = new QnPolygonalShadowItem();
     QnPolygonalShadowItem *shadow = m_shadow.data();
@@ -234,6 +236,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
         memset(m_motionMaskBinData[i], 0, MD_WIDTH * MD_HEIGHT/8);
     }
 
+
     /* Set up video rendering. */
     m_resource = qnResPool->getResourceByUniqId(item->resourceUid());
     m_display = new QnResourceDisplay(m_resource, this);
@@ -250,6 +253,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     connect(m_renderer, SIGNAL(sourceSizeChanged(const QSize &)), this, SLOT(at_sourceSizeChanged(const QSize &)));
     m_display->addRenderer(m_renderer);
 
+
     /* Init static text. */
     m_noDataStaticText.setText(tr("NO DATA"));
     m_noDataStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
@@ -265,12 +269,14 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
         m_sensStaticText[i].setPerformanceHint(QStaticText::AggressiveCaching);
     }
 
-    /* Set up overlay icons. */
+
+    /* Set up per-channel state. */
     m_channelState.resize(m_channelCount);
 
+
+    /* Run handlers. */
     at_resource_nameChanged();
     at_camDisplay_stillImageChanged();
-
 }
 
 
