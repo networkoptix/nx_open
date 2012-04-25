@@ -28,6 +28,7 @@
 #include "ui/workbench/workbench_navigator.h"
 #include "ui/workbench/workbench_display.h"
 #include "../standard/graphics_scroll_bar.h"
+#include "time_scroll_bar.h"
 
 static const int SLIDER_NOW_AREA_WIDTH = 30;
 static const int TIME_PERIOD_UPDATE_INTERVAL = 1000 * 10;
@@ -221,7 +222,7 @@ NavigationItem::NavigationItem(QnWorkbenchDisplay *display, QGraphicsItem *paren
     rightLayoutV->addItem(m_timeLabel);
 
     QnTimeSlider *slider = new QnTimeSlider();
-    GraphicsScrollBar *scrollBar = new GraphicsScrollBar(Qt::Horizontal);
+    GraphicsScrollBar *scrollBar = new QnTimeScrollBar();
 
     QnWorkbenchNavigator *navigator = new QnWorkbenchNavigator(display, display);
     navigator->setTimeSlider(slider);

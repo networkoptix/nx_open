@@ -75,6 +75,16 @@ int QnNoptixStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, c
     return base_type::pixelMetric(metric, option, widget);
 }
 
+QRect QnNoptixStyle::subControlRect(ComplexControl control, const QStyleOptionComplex *option, SubControl subControl, const QWidget *widget) const {
+    QRect result;
+
+    if(control == CC_ScrollBar)
+        if(scrollBarSubControlRect(option, subControl, widget, &result))
+            return result;
+
+    return base_type::subControlRect(control, option, subControl, widget);
+}
+
 void QnNoptixStyle::drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const {
     switch (control) {
     case CC_Slider:
@@ -189,7 +199,127 @@ void QnNoptixStyle::unpolish(QWidget *widget) {
     base_type::unpolish(widget);
 }
 
+bool QnNoptixStyle::scrollBarSubControlRect(const QStyleOptionComplex *option, SubControl subControl, const QWidget *widget, QRect *result) const {
+    const QStyleOptionSlider *scrollbar = qstyleoption_cast<const QStyleOptionSlider *>(option);
+    if(!scrollbar)
+        return false;
 
+    QRect &ret = *result;
+    const QRect &RECT = option->rect;
+
+    const int ScrollBarSliderMin = 0;
+
+    bool showButtons = false;
+    bool groove = false;
+#define F(x) x
+
+    int sbextent = proxy()->pixelMetric(PM_ScrollBarExtent, scrollbar, widget);
+    int buttonSpace = showButtons * sbextent * 2;
+    bool needSlider = false;
+
+    switch (subControl)
+    {
+    case SC_ScrollBarGroove:
+        {
+            ret = RECT;
+            int off = 0, d = 0;
+            if (scrollbar->orientation == Qt::Horizontal)
+            {
+                if (groove)
+                { off = F(2); d = RECT.height() / 3; }
+                ret.adjust(off, d, -(buttonSpace + off), -d);
+            }
+            else
+            {
+                if (groove)
+                { off = F(2); d = RECT.width() / 3; }
+                ret.adjust(d, off, -d, -(buttonSpace + off));
+            }
+            break;
+        }
+        // top/left button
+    case SC_ScrollBarSubLine:
+        // bottom/right button
+    case SC_ScrollBarAddLine:
+        {
+            const int f = 1 + (subControl == SC_ScrollBarSubLine);
+            if (!showButtons)
+                ret = QRect();
+            else if (scrollbar->orientation == Qt::Horizontal)
+            {
+                const int buttonWidth = qMin(RECT.width() / 2, sbextent);
+                ret.setRect(RECT.right() + 1 - f*buttonWidth, RECT.y(), buttonWidth, sbextent);
+            }
+            else
+            {
+                const int buttonHeight = qMin(scrollbar->rect.height() / 2, sbextent);
+                ret.setRect(RECT.x(), RECT.bottom() + 1 - f*buttonHeight, sbextent, buttonHeight);
+            }
+            break;
+        }
+    default:
+        needSlider = true; break;
+    }
+    if (needSlider)
+    {
+        const uint range = scrollbar->maximum - scrollbar->minimum;
+        const int maxlen = ((scrollbar->orientation == Qt::Horizontal) ? RECT.width() : RECT.height()) - buttonSpace;
+        int sliderlen = maxlen;
+        // calculate slider length
+        if (scrollbar->maximum != scrollbar->minimum)
+        {
+            sliderlen = (static_cast<qint64>(maxlen) * scrollbar->pageStep) / (range + scrollbar->pageStep);
+            if (sliderlen > maxlen)
+                sliderlen = maxlen;
+            else
+            {
+                const int slidermin = ScrollBarSliderMin;
+                if (sliderlen < slidermin || range > INT_MAX / 2)
+                    sliderlen = slidermin;
+            }
+        }
+
+        const int sliderstart = sliderPositionFromValue(scrollbar->minimum, scrollbar->maximum,
+            scrollbar->sliderPosition, maxlen - sliderlen,
+            scrollbar->upsideDown);
+        switch (subControl)
+        {
+            // between top/left button and slider
+        case SC_ScrollBarSubPage:
+            if (scrollbar->orientation == Qt::Horizontal)
+                ret.setRect(RECT.x() + F(2), RECT.y(), sliderstart, sbextent);
+            else
+                ret.setRect(RECT.x(), RECT.y() + F(2), sbextent, sliderstart);
+            break;
+            // between bottom/right button and slider
+        case SC_ScrollBarAddPage:
+            if (scrollbar->orientation == Qt::Horizontal)
+                ret.setRect(RECT.x() + sliderstart + sliderlen - F(2), RECT.y(),
+                maxlen - (sliderstart + sliderlen), sbextent);
+            else
+                ret.setRect(RECT.x(), RECT.y() + sliderstart + sliderlen - F(3),
+                sbextent, maxlen - (sliderstart + sliderlen));
+            break;
+        case SC_ScrollBarSlider:
+            if (scrollbar->orientation == Qt::Horizontal)
+                ret.setRect(RECT.x() + sliderstart, RECT.y(), sliderlen, sbextent);
+            else
+                ret.setRect(RECT.x(), RECT.y() + sliderstart, sbextent, sliderlen + F(1) );
+            break;
+        default:
+            break;
+        }
+    }
+
+    ret = visualRect(scrollbar->direction, RECT, ret);
+
+    return true;
+}
+
+
+// -------------------------------------------------------------------------- //
+// Painting
+// -------------------------------------------------------------------------- //
 bool QnNoptixStyle::drawMenuItemControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const {
     const QStyleOptionMenuItem *itemOption = qstyleoption_cast<const QStyleOptionMenuItem *>(option);
     if(!itemOption)
@@ -384,6 +514,10 @@ bool QnNoptixStyle::drawToolButtonComplexControl(const QStyleOptionComplex *opti
     return true;
 }
 
+
+// -------------------------------------------------------------------------- //
+// Hover animations
+// -------------------------------------------------------------------------- //
 void QnNoptixStyle::setHoverProgress(const QWidget *widget, qreal value) const {
     m_animator->setValue(widget, value);
 }
