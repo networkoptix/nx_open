@@ -20,6 +20,7 @@ public:
     virtual void drawControl(ControlElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget = 0) const override;
     virtual void drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget = 0) const override;
     virtual int pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const override;
+    virtual QRect subControlRect(ComplexControl control, const QStyleOptionComplex *option, SubControl subControl, const QWidget *widget) const override;
 
     virtual int styleHint(StyleHint hint, const QStyleOption *option = 0, const QWidget *widget = 0, QStyleHintReturn *returnData = 0) const override;
 
@@ -29,6 +30,8 @@ public:
     virtual void unpolish(QWidget *widget) override;
 
     using base_type::subControlRect;
+    using base_type::sliderPositionFromValue;
+    using base_type::sliderValueFromPosition;
 
 protected:
     bool drawMenuItemControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
@@ -38,6 +41,8 @@ protected:
     bool drawTabClosePrimitive(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
     bool drawBranchPrimitive(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
     bool drawPanelItemViewPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
+
+    bool scrollBarSubControlRect(const QStyleOptionComplex *option, SubControl subControl, const QWidget *widget, QRect *result) const;
 
 private:
     void setHoverProgress(const QWidget *widget, qreal value) const;

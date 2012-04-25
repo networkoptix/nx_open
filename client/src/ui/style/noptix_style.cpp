@@ -75,6 +75,16 @@ int QnNoptixStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, c
     return base_type::pixelMetric(metric, option, widget);
 }
 
+QRect QnNoptixStyle::subControlRect(ComplexControl control, const QStyleOptionComplex *option, SubControl subControl, const QWidget *widget) const {
+    QRect result;
+
+    if(control == CC_ScrollBar)
+        if(scrollBarSubControlRect(option, subControl, widget, &result))
+            return result;
+
+    return base_type::subControlRect(control, option, subControl, widget);
+}
+
 void QnNoptixStyle::drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const {
     switch (control) {
     case CC_Slider:
@@ -189,7 +199,14 @@ void QnNoptixStyle::unpolish(QWidget *widget) {
     base_type::unpolish(widget);
 }
 
+bool QnNoptixStyle::scrollBarSubControlRect(const QStyleOptionComplex *option, SubControl subControl, const QWidget *widget, QRect *result) const {
 
+}
+
+
+// -------------------------------------------------------------------------- //
+// Painting
+// -------------------------------------------------------------------------- //
 bool QnNoptixStyle::drawMenuItemControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const {
     const QStyleOptionMenuItem *itemOption = qstyleoption_cast<const QStyleOptionMenuItem *>(option);
     if(!itemOption)
@@ -384,6 +401,10 @@ bool QnNoptixStyle::drawToolButtonComplexControl(const QStyleOptionComplex *opti
     return true;
 }
 
+
+// -------------------------------------------------------------------------- //
+// Hover animations
+// -------------------------------------------------------------------------- //
 void QnNoptixStyle::setHoverProgress(const QWidget *widget, qreal value) const {
     m_animator->setValue(widget, value);
 }
