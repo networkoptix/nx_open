@@ -78,8 +78,6 @@ protected slots:
     void at_resourcePool_aboutToBeDestroyed();
 
 private:
-    /* Note that we're using scoped pointers here as destruction order of these objects is important. */
-
     QnResourcePool *m_resourcePool;
     QScopedPointer<QnWorkbench> m_workbench;
     QScopedPointer<QnResourcePoolUserWatcher> m_userWatcher;
