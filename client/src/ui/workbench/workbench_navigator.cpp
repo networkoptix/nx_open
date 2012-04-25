@@ -121,13 +121,12 @@ void QnWorkbenchNavigator::initialize() {
     connect(m_timeSlider,                       SIGNAL(rangeChanged(qint64, qint64)),               this,   SLOT(updateScrollBarFromSlider()));
     connect(m_timeSlider,                       SIGNAL(windowChanged(qint64, qint64)),              this,   SLOT(updateScrollBarFromSlider()));
     m_timeSlider->installEventFilter(this);
-    m_timeSlider->setLineCount(SliderLineCount);
 
     connect(m_scrollBar,                        SIGNAL(valueChanged(qint64)),                       this,   SLOT(updateSliderFromScrollBar()));
     connect(m_scrollBar,                        SIGNAL(pageStepChanged(qint64)),                    this,   SLOT(updateSliderFromScrollBar()));
     m_scrollBar->installEventFilter(this);
 
-    updateLineComments();
+    updateLines();
 } 
 
 void QnWorkbenchNavigator::deinitialize() {
@@ -176,8 +175,6 @@ void QnWorkbenchNavigator::addSyncedWidget(QnResourceWidget *widget) {
     m_syncedResources.insert(widget->resource(), QHashDummyValue());
 
     updateCurrentWidget();
-
-    //m_forceTimePeriodLoading = !updateRecPeriodList(true);
 }
 
 void QnWorkbenchNavigator::removeSyncedWidget(QnResourceWidget *widget) {
@@ -189,14 +186,6 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnResourceWidget *widget) {
     m_syncedResources.erase(m_syncedResources.find(widget->resource()));
 
     updateCurrentWidget();
-
-    //m_forceTimePeriodLoading = !updateRecPeriodList(true);
-
-    /*QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(widget->getDevice());
-    if (netRes)
-        m_motionPeriodLoader.remove(netRes);
-
-    repaintMotionPeriods();*/
 }
 
 void QnWorkbenchNavigator::updateCurrentWidget() {
@@ -231,7 +220,7 @@ void QnWorkbenchNavigator::setCurrentWidget(QnResourceWidget *widget) {
         m_currentWidgetIsCamera = false;
     }
 
-    updateLineComments();
+    updateLines();
     m_timeSlider->setOption(QnTimeSlider::UseUTC, m_currentWidgetIsCamera);
 
     updateSliderFromReader();
@@ -338,20 +327,7 @@ void QnWorkbenchNavigator::updateSliderFromReader() {
         QnTimePeriod period(startTimeMSec, endTimeMSec - startTimeMSec);
         foreach(QnResourceWidget *widget, m_syncedWidgets)
             loader(widget->resource())->setTargetPeriod(period);
-
-        //m_forceTimePeriodLoading = !updateRecPeriodList(m_forceTimePeriodLoading); // if period does not loaded yet, force loading
     }
-
-
-    /*if(!reader->isMediaPaused() && (m_camera->getCamDisplay()->isRealTimeSource() || m_timeSlider->currentValue() == DATETIME_NOW)) {
-        m_liveButton->setChecked(true);
-        m_forwardButton->setEnabled(false);
-        m_stepForwardButton->setEnabled(false);
-    } else {
-        m_liveButton->setChecked(false);
-        m_forwardButton->setEnabled(true);
-        m_stepForwardButton->setEnabled(true);
-    }*/
 }
 
 void QnWorkbenchNavigator::updateCurrentPeriods() {
@@ -376,13 +352,13 @@ void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodType type) {
     m_timeSlider->setTimePeriods(SyncedLine, type, QnTimePeriod::mergeTimePeriods(periods));
 }
 
-void QnWorkbenchNavigator::updateLineComments() {
+void QnWorkbenchNavigator::updateLines() {
     if(m_currentWidgetIsCamera) {
+        m_timeSlider->setLineCount(SliderLineCount);
         m_timeSlider->setLineComment(CurrentLine, m_currentWidget->resource()->getName());
         m_timeSlider->setLineComment(SyncedLine, tr("All Cameras"));
     } else {
-        m_timeSlider->setLineComment(CurrentLine, QString());
-        m_timeSlider->setLineComment(SyncedLine, QString());
+        m_timeSlider->setLineCount(0);
     }
 }
 
@@ -493,8 +469,6 @@ void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value) {
             }
         }
     }
-    
-    //updateRecPeriodList(false);
 }
 
 void QnWorkbenchNavigator::at_timeSlider_sliderPressed() {
@@ -511,11 +485,6 @@ void QnWorkbenchNavigator::at_timeSlider_sliderReleased() {
     if (!m_currentWidget)
         return;
 
-    /*bool isCamera = m_currentWidget->resource().dynamicCast<QnSecurityCamResource>();
-    if (!isCamera) {
-        // Disable precise seek via network to reduce network flood. 
-        //smartSeek(m_timeSlider->currentValue());
-    }*/
     if (m_wasPlaying) {
         m_currentWidget->display()->archiveReader()->setSingleShotMode(false);
         m_currentWidget->display()->camDisplay()->playAudio(true);

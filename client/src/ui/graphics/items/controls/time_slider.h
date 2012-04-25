@@ -183,7 +183,7 @@ private:
     qint64 m_zoomAnchor;
 
     int m_lineCount;
-    QVector<TypedPeriods> m_timePeriods;
+    QVector<TypedPeriods> m_lineTimePeriods;
     QVector<QString> m_lineComments;
     QVector<QPixmap> m_lineCommentPixmaps;
     qreal m_aggregationMSecs;

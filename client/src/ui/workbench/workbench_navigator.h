@@ -77,7 +77,7 @@ protected:
     void updateCurrentPeriods();
     void updateCurrentPeriods(Qn::TimePeriodType type);
     void updateSyncedPeriods(Qn::TimePeriodType type);
-    void updateLineComments();
+    void updateLines();
 
 protected slots:
     void at_display_widgetChanged(Qn::ItemRole role);

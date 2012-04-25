@@ -118,14 +118,38 @@ namespace {
     const QColor pastMotionColor(255, 0, 0, 128);
     const QColor futureMotionColor(255, 0, 0, 64);
 
+    const QColor separatorColor(255, 255, 255, 64);
 
     /** Lower zoom limit. */
     const qreal minMSecsPerPixel = 2.0;
 
     const qreal degreesFor2x = 180.0;
 
-} // anonymous namespace
+    const int maxLines = 16;
 
+
+    bool checkLine(int line) {
+        if(line < 0 || line >= maxLines) {
+            qnWarning("Invalid line number '%1'.", line);
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    bool checkLinePeriod(int line, Qn::TimePeriodType type) {
+        if(!checkLine(line))
+            return false;
+
+        if(type < 0 || type >= Qn::TimePeriodTypeCount) {
+            qnWarning("Invalid time period type '%1'.", static_cast<int>(type));
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+} // anonymous namespace
 
 
 QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
@@ -150,10 +174,11 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     setOptions(StickToMinimum | StickToMaximum | UpdateToolTip | SelectionEditable);
 
     setToolTipFormat(tr("hh:mm:ss", "DEFAULT_TOOL_TIP_FORMAT"));
-    
-    QDateTime currentDateTime = QDateTime::currentDateTime();
-    QDateTime utcDateTime = currentDateTime.toUTC();
-    currentDateTime.setTimeSpec(Qt::UTC);
+
+    /* Set default vector sizes. */
+    m_lineCommentPixmaps.resize(maxLines);
+    m_lineComments.resize(maxLines);
+    m_lineTimePeriods.resize(maxLines);
 
     /* Prepare kinetic zoom processors. */
     KineticCuttingProcessor *processor = new KineticCuttingProcessor(QMetaType::QReal, this);
@@ -234,16 +259,20 @@ void QnTimeSlider::setLineCount(int lineCount) {
     if(m_lineCount == lineCount)
         return;
 
-    m_lineCount = lineCount;
+    if(lineCount < 0 || lineCount > maxLines) {
+        qnWarning("Invalid line count '%1'.", lineCount);
+        return;
+    }
 
-    m_timePeriods.resize(lineCount);
-    m_lineComments.resize(lineCount);
-    m_lineCommentPixmaps.resize(lineCount);
+    m_lineCount = lineCount;
 
     updateLineCommentPixmaps();
 }
 
 void QnTimeSlider::setLineComment(int line, const QString &comment) {
+    if(!checkLine(line))
+        return;
+
     if(m_lineComments[line] == comment)
         return;
 
@@ -253,19 +282,24 @@ void QnTimeSlider::setLineComment(int line, const QString &comment) {
 }
 
 QString QnTimeSlider::lineComment(int line) {
+    if(!checkLine(line))
+        return QString();
+
     return m_lineComments[line];
 }
 
 QnTimePeriodList QnTimeSlider::timePeriods(int line, Qn::TimePeriodType type) const {
-    assert(type >= 0 && type < Qn::TimePeriodTypeCount);
+    if(!checkLinePeriod(line, type))
+        return QnTimePeriodList();
     
-    return m_timePeriods[line].normal[type];
+    return m_lineTimePeriods[line].normal[type];
 }
 
 void QnTimeSlider::setTimePeriods(int line, Qn::TimePeriodType type, const QnTimePeriodList &timePeriods) {
-    assert(type >= 0 && type < Qn::TimePeriodTypeCount);
+    if(!checkLinePeriod(line, type))
+        return;
 
-    m_timePeriods[line].normal[type] = timePeriods;
+    m_lineTimePeriods[line].normal[type] = timePeriods;
     
     updateAggregatedPeriods(line, type);
 }
@@ -642,7 +676,7 @@ void QnTimeSlider::updateAggregationValue() {
 }
 
 void QnTimeSlider::updateAggregatedPeriods(int line, Qn::TimePeriodType type) {
-    m_timePeriods[line].aggregated[type] = QnTimePeriod::aggregateTimePeriods(m_timePeriods[line].normal[type], m_aggregationMSecs);
+    m_lineTimePeriods[line].aggregated[type] = QnTimePeriod::aggregateTimePeriods(m_lineTimePeriods[line].normal[type], m_aggregationMSecs);
 }
 
 
@@ -653,20 +687,27 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     QRectF rect = this->rect();
     qreal lineHeight = this->lineHeight();
 
+    /* Draw border. */
+    {
+        QnScopedPainterAntialiasingRollback antialiasingRollback(painter, false);
+        QnScopedPainterPenRollback penRollback(painter, QPen(separatorColor, 0));
+        QnScopedPainterBrushRollback brushRollback(painter, Qt::NoBrush);
+        painter->drawRect(rect);
+    }
+
     /* Draw time periods. */
     for(int line = 0; line < m_lineCount; line++) {
         drawPeriodsBar(
             painter, 
-            m_timePeriods[line].aggregated[Qn::RecordingTimePeriod],  
-            m_timePeriods[line].aggregated[Qn::MotionTimePeriod], 
+            m_lineTimePeriods[line].aggregated[Qn::RecordingTimePeriod],  
+            m_lineTimePeriods[line].aggregated[Qn::MotionTimePeriod], 
             lineTop(line),   
             lineHeight
         );
-
     }
 
-    /* Draw tickmark background. */
-    drawSolidBackground(painter, rect.top(), rect.height() * tickmarkBarRelativeHeight);
+    /* Draw background. */
+    drawSolidBackground(painter, rect.top(), rect.height() * (m_lineCount == 0 ? 1.0 : tickmarkBarRelativeHeight));
 
     /* Draw selection. */
     drawSelection(painter);
@@ -735,6 +776,10 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, QnTimePeriodList &recorded,
     qint64 maximumValue = this->windowEnd();
     qreal centralPos = positionFromValue(this->sliderPosition()).x();
 
+    /* The code here may look complicated, but it takes care of not rendering
+     * different motion periods several times over the same location. 
+     * It makes transparent time slider look better. */
+
     QnTimePeriodList periods[Qn::TimePeriodTypeCount] = {recorded, motion};
     QColor pastColor[Qn::TimePeriodTypeCount + 1] = {pastRecordingColor, pastMotionColor, pastBackgroundColor};
     QColor futureColor[Qn::TimePeriodTypeCount + 1] = {futureRecordingColor, futureMotionColor, futureBackgroundColor};
@@ -802,36 +847,12 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, QnTimePeriodList &recorded,
 
         value = bestValue;
     }
-}
 
-void QnTimeSlider::drawPeriods(QPainter *painter, QnTimePeriodList &periods, qreal top, qreal height, const QColor &preColor, const QColor &pastColor) {
-    if (periods.isEmpty())
-        return;
-
-    // TODO: rewrite this so that there is no drawing motion periods over recorded ones.
-
-    qint64 minimumValue = this->windowStart();
-    qint64 maximumValue = this->windowEnd();
-    qreal centralPos = positionFromValue(this->sliderPosition()).x();
-
-    QnTimePeriodList::const_iterator begin = periods.findNearestPeriod(minimumValue, false);
-    QnTimePeriodList::const_iterator end = periods.findNearestPeriod(maximumValue, true);
-    if(end != periods.end() && end->containTime(maximumValue))
-        end++;
-
-    for (QnTimePeriodList::const_iterator pos = begin; pos < end; ++pos) {
-        qreal leftPos = positionFromValue(qMax(pos->startTimeMs, minimumValue)).x();
-        qreal rightPos = positionFromValue(pos->durationMs == -1 ? maximumValue : qMin(pos->startTimeMs + pos->durationMs, maximumValue)).x();
-            
-        if(rightPos <= centralPos) {
-            painter->fillRect(QRectF(leftPos, top, rightPos - leftPos, height), preColor);
-        } else if(leftPos >= centralPos) {
-            painter->fillRect(QRectF(leftPos, top, rightPos - leftPos, height), pastColor);
-        } else {
-            painter->fillRect(QRectF(leftPos, top, centralPos - leftPos, height), preColor);
-            painter->fillRect(QRectF(centralPos, top, rightPos - centralPos, height), pastColor);
-        }
-    }
+    /* Draw separator line. */
+    QnScopedPainterPenRollback penRollback(painter, QPen(separatorColor, 0));
+    QnScopedPainterAntialiasingRollback antialiasingRollback(painter, false);
+    QRectF rect = this->rect();
+    painter->drawLine(QPointF(rect.left(), top), QPointF(rect.right(), top));
 }
 
 void QnTimeSlider::drawSolidBackground(QPainter *painter, qreal top, qreal height) {
