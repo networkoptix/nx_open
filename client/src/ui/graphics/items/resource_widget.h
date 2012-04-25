@@ -242,7 +242,15 @@ public:
      */
     void addToMotionSelection(const QRect &gridRect);
 
-    QList<QRegion> motionSelection() const { return QList<QRegion>(); } // TODO
+    /**
+     * Clears this widget's motion selection region.
+     */
+    void clearMotionSelection();
+
+    /**
+     * \returns                         Current motion selection regions.
+     */
+    QList<QRegion> motionSelection() const;
 
     bool addToMotionRegion(int sens, const QRect& rect, int channel);
 
@@ -269,16 +277,13 @@ public slots:
     void fadeInInfo();
     void fadeInfo(bool fadeIn);
 
-    /**
-     * Clears this widget's motion selection region.
-     */
-    void clearMotionSelection();
     void setDrawMotionWindows(MotionDrawType value);
+
 signals:
     void aspectRatioChanged(qreal oldAspectRatio, qreal newAspectRatio);
     void aboutToBeDestroyed();
-    void motionRegionSelected(QnResourcePtr resource, QnAbstractArchiveReader* reader, QList<QRegion> region);
     void displayFlagsChanged();
+    void motionSelectionChanged();
 
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;

@@ -238,7 +238,7 @@ NavigationItem::NavigationItem(QnWorkbenchDisplay *display, QGraphicsItem *paren
     mainLayout->setContentsMargins(5, 0, 5, 0);
     mainLayout->setSpacing(10);
     mainLayout->addItem(leftLayoutV);
-    mainLayout->addItem(m_timeSlider);
+    //mainLayout->addItem(m_timeSlider);
     mainLayout->addItem(sliderLayout);
     mainLayout->addItem(rightLayoutV);
     setLayout(mainLayout);

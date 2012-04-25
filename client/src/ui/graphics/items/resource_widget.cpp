@@ -108,6 +108,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_motionMaskBinDataValid(false),
     m_motionDrawType(DrawMaskOnly)
 {
+    setAcceptHoverEvents(true);
+
     /* Set up shadow. */
     m_shadow = new QnPolygonalShadowItem();
     QnPolygonalShadowItem *shadow = m_shadow.data();
@@ -235,6 +237,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
         memset(m_motionMaskBinData[i], 0, MD_WIDTH * MD_HEIGHT/8);
     }
 
+
     /* Set up video rendering. */
     m_resource = qnResPool->getResourceByUniqId(item->resourceUid());
     m_display = new QnResourceDisplay(m_resource, this);
@@ -251,6 +254,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     connect(m_renderer, SIGNAL(sourceSizeChanged(const QSize &)), this, SLOT(at_sourceSizeChanged(const QSize &)));
     m_display->addRenderer(m_renderer);
 
+
     /* Init static text. */
     m_noDataStaticText.setText(tr("NO DATA"));
     m_noDataStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
@@ -266,12 +270,14 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
         m_sensStaticText[i].setPerformanceHint(QStaticText::AggressiveCaching);
     }
 
-    /* Set up overlay icons. */
+
+    /* Set up per-channel state. */
     m_channelState.resize(m_channelCount);
 
+
+    /* Run handlers. */
     at_resource_nameChanged();
     at_camDisplay_stillImageChanged();
-
 }
 
 
@@ -580,25 +586,29 @@ void QnResourceWidget::addToMotionSelection(const QRect &gridRect)
         newSelection << m_channelState[i].motionSelection;
     }
 
-    if(prevSelection != newSelection && display()->archiveReader())
-        emit motionRegionSelected(m_resource, display()->archiveReader(), newSelection);
+    if(prevSelection != newSelection)
+        emit motionSelectionChanged();
 }
 
 void QnResourceWidget::clearMotionSelection() 
 {
     bool allEmpty = true;
-    for (int i = 0; i < m_channelState.size(); ++i) 
-        allEmpty &= m_channelState[i].motionSelection.isEmpty();
+    foreach(const ChannelState &state, m_channelState)
+        allEmpty &= state.motionSelection.isEmpty();
     if (allEmpty)
         return;
 
-    QList<QRegion> rez;
-    for (int i = 0; i < m_channelState.size(); ++i) {
+    for (int i = 0; i < m_channelState.size(); ++i)
         m_channelState[i].motionSelection = QRegion();
-        rez << QRegion();
-    }
-    if (display()->archiveReader())
-        emit motionRegionSelected(m_resource, display()->archiveReader(), rez);
+
+    emit motionSelectionChanged();
+}
+
+QList<QRegion> QnResourceWidget::motionSelection() const {
+    QList<QRegion> result;
+    foreach(const ChannelState &state, m_channelState)
+        result.push_back(state.motionSelection);
+    return result;
 }
 
 void QnResourceWidget::setDisplayFlags(DisplayFlags flags) {
