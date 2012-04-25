@@ -79,18 +79,18 @@ QRect QnPlAxisResource::axisRectToGridRect(const QRect& axisRect)
 {
     qreal xCoeff = 9999.0 / (MD_WIDTH-1);
     qreal yCoeff = 9999.0 / (MD_HEIGHT-1);
-    QPoint topLeft(axisRect.left()/xCoeff + 0.5, axisRect.top()/yCoeff + 0.5);
-    QPoint bottomRight(axisRect.right()/xCoeff + 0.5, axisRect.bottom()/yCoeff + 0.5);
-    return QRect(topLeft, bottomRight);
+    QPoint topLeft(MD_WIDTH - (axisRect.left()/xCoeff + 0.5), MD_HEIGHT - (axisRect.top()/yCoeff + 0.5));
+    QPoint bottomRight(MD_WIDTH - (axisRect.right()/xCoeff + 0.5), MD_HEIGHT - (axisRect.bottom()/yCoeff + 0.5));
+    return QRect(topLeft, bottomRight).normalized();
 }
 
 QRect QnPlAxisResource::gridRectToAxisRect(const QRect& gridRect)
 {
     qreal xCoeff = 9999.0 / MD_WIDTH;
     qreal yCoeff = 9999.0 / MD_HEIGHT;
-    QPoint topLeft(gridRect.left()*xCoeff + 0.5, gridRect.top()*yCoeff + 0.5);
-    QPoint bottomRight((gridRect.right()+1)*xCoeff + 0.5, (gridRect.bottom()+1)*yCoeff + 0.5);
-    return QRect(topLeft, bottomRight);
+    QPoint topLeft(9999.0 - (gridRect.left()*xCoeff + 0.5), 9999.0 - (gridRect.top()*yCoeff + 0.5));
+    QPoint bottomRight(9999.0 - ((gridRect.right()+1)*xCoeff + 0.5), 9999.0 - ((gridRect.bottom()+1)*yCoeff + 0.5));
+    return QRect(topLeft, bottomRight).normalized();
 }
 
 void QnPlAxisResource::readMotionInfo()
@@ -328,7 +328,7 @@ void QnPlAxisResource::setMotionMaskPhysical(int channel)
     const QnMotionRegion region = m_motionMaskList[0];
 
     QMap<int, QRect> existsWnd = m_motionWindows; // the key is window number
-    QMap<int, QRect> newWnd = region.getAllMotionRects(); // the key is motion sensitivity
+    QMultiMap<int, QRect> newWnd = region.getAllMotionRects(); // the key is motion sensitivity
 
     while (existsWnd.size() > newWnd.size())
     {

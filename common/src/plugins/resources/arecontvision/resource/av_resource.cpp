@@ -265,7 +265,7 @@ void QnPlAreconVisionResource::init()
         zone_size = 1;
 
     setParam("Zone size", zone_size, QnDomainPhysical);
-
+    setMotionMaskPhysical(0);
 }
 
 QString QnPlAreconVisionResource::manufacture() const

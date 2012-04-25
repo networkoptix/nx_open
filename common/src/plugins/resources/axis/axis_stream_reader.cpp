@@ -139,6 +139,11 @@ void QnAxisStreamReader::openStream()
     else if (status != CL_HTTP_SUCCESS)
         return;
 
+    if (role != QnResource::Role_SecondaryLiveVideo && m_axisRes->getMotionType() != MT_SoftwareGrid)
+    {
+        res->setMotionMaskPhysical(0);
+    }
+
 
     // ============== requesting a video ==========================
     m_RTP264.setRequest(QString("axis-media/media.amp?streamprofile=") + profileName);
