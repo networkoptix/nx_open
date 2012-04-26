@@ -7,6 +7,9 @@
 #include "SessionManager.h"
 #include "utils/common/synctime.h"
 
+
+int QnAppServerConnection::m_mediaProxyPort = 7009; // default value
+
 void conn_detail::ReplyProcessor::finished(int status, const QByteArray &result, const QByteArray &errorStringIn, int handle)
 {
     QByteArray errorString = errorStringIn;
@@ -458,6 +461,17 @@ int QnAppServerConnection::getUsers(QnUserResourceList& users, QByteArray& error
     return status;
 }
 
+int QnAppServerConnection::updateMediaProxyPort(const QString& errorString)
+{
+    // todo: implement me
+    return 0;
+}
+
+int QnAppServerConnection::getMediaProxyPort()
+{
+    return m_mediaProxyPort;
+}
+
 int QnAppServerConnection::getLicenses(QnLicenseList &licenses, QByteArray &errorString)
 {
     QByteArray data;
@@ -710,5 +724,3 @@ int QnAppServerConnection::setResourcesDisabledAsync(const QnResourceList &resou
 
     return SessionManager::instance()->sendAsyncPostRequest(m_url, "disabled", requestParams, "", target, slot);
 }
-
-
