@@ -12,6 +12,7 @@ static const QString MEDIA_SERVER_NAME ("Network Optix Media Server");
 static const QString APP_SERVER_NAME("Enterprise Controller");
 static const int DEFAULT_APP_SERVER_PORT = 8000;
 static const int MESSAGE_DURATION = 3 * 1000;
+static const int DEFAUT_PROXY_PORT = 7009;
 
 bool MyIsUserAnAdmin()
 {
@@ -607,7 +608,7 @@ void QnSystrayWindow::onSettingsAction()
     ui->rtspPortLineEdit->setText(m_mServerSettings.value("rtspPort").toString());
     ui->apiPortLineEdit->setText(m_mServerSettings.value("apiPort").toString());
     ui->appServerPortLineEdit->setText(m_appServerSettings.value("port").toString());
-    ui->proxyPortLineEdit->setText(m_appServerSettings.value("proxy_port").toString());
+    ui->proxyPortLineEdit->setText(m_appServerSettings.value("proxy_port", DEFAUT_PROXY_PORT).toString());
 
     ui->tabAppServer->setEnabled(m_appServerHandle != 0);
     ui->tabMediaServer->setEnabled(m_mediaServerHandle != 0);
@@ -618,7 +619,7 @@ void QnSystrayWindow::onSettingsAction()
 bool QnSystrayWindow::isAppServerParamChanged() const
 {
     return ui->appServerPortLineEdit->text().toInt() != m_appServerSettings.value("port").toInt() ||
-           ui->proxyPortLineEdit->text().toInt() != m_appServerSettings.value("proxy_port").toInt();
+           ui->proxyPortLineEdit->text().toInt() != m_appServerSettings.value("proxy_port", DEFAUT_PROXY_PORT).toInt();
 }
 
 bool QnSystrayWindow::isMediaServerParamChanged() const
