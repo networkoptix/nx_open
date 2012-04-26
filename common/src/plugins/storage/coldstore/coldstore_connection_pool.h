@@ -18,9 +18,13 @@ public:
     bool write(const char* data, int len);
     int read(char *data, int len);
 
+    int age() const; // return the number of seconds then the connection was used last time 
+
 private:
     Veracity::SFSClient m_connection;
     Veracity::u32 m_stream;
+
+    QTime m_lastUsed;
 
     bool m_isConnected;
         
@@ -32,11 +36,17 @@ private:
 class QnColdStoreConnectionPool
 {
 public:
-    QnColdStoreConnectionPool();
-    virtual ~QnColdStoreConnectionPool(const QString& addr);
+    QnColdStoreConnectionPool(const QString& addr);
+    virtual ~QnColdStoreConnectionPool();
+
     int read(const QString& csFn,   char* data, quint64 shift, int len);
+
 private:
+    void checkIfSomeConnectionsNeedToBeClosed();
+private:
+
     QString m_csAddr;
+    QHash<QString, QnColdStoreConnection*>  m_pool;
 };
 
 #endif // coldstore_connection_pool_h1931

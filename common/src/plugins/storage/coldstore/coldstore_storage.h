@@ -4,6 +4,7 @@
 #include "coldstore_api/sfs-client.h"
 #include "libavformat/avio.h"
 #include "core/resource/storage_resource.h"
+#include "coldstore_connection_pool.h"
 
 
 class QnPlColdStoreStorage : public QnStorageResource
@@ -34,7 +35,7 @@ private:
 private:
     mutable QMutex m_mutex;
 
-
+    QnColdStoreConnectionPool m_connectionPool;
 };
 
 

@@ -2,6 +2,7 @@
 #include "coldstore_io_buffer.h"
 
 QnPlColdStoreStorage::QnPlColdStoreStorage():
+m_connectionPool(coldstoreAddr()),
 m_mutex(QMutex::Recursive)
 {
 
