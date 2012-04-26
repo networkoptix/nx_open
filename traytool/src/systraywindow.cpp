@@ -607,6 +607,7 @@ void QnSystrayWindow::onSettingsAction()
     ui->rtspPortLineEdit->setText(m_mServerSettings.value("rtspPort").toString());
     ui->apiPortLineEdit->setText(m_mServerSettings.value("apiPort").toString());
     ui->appServerPortLineEdit->setText(m_appServerSettings.value("port").toString());
+    ui->proxyPortLineEdit->setText(m_appServerSettings.value("proxy_port").toString());
 
     ui->tabAppServer->setEnabled(m_appServerHandle != 0);
     ui->tabMediaServer->setEnabled(m_mediaServerHandle != 0);
@@ -616,7 +617,8 @@ void QnSystrayWindow::onSettingsAction()
 
 bool QnSystrayWindow::isAppServerParamChanged() const
 {
-    return ui->appServerPortLineEdit->text().toInt() != m_appServerSettings.value("port").toInt();
+    return ui->appServerPortLineEdit->text().toInt() != m_appServerSettings.value("port").toInt() ||
+           ui->proxyPortLineEdit->text().toInt() != m_appServerSettings.value("proxy_port").toInt();
 }
 
 bool QnSystrayWindow::isMediaServerParamChanged() const
@@ -703,6 +705,8 @@ bool QnSystrayWindow::validateData()
 {
     if (!checkPort(ui->appServerPortLineEdit->text(), QString("Invalid ") + APP_SERVER_NAME + QString(" port specified.")))
         return false;
+    if (!checkPort(ui->proxyPortLineEdit->text(), QString("Invalid media proxy port specified.")))
+        return false;
     if (!checkPort(ui->rtspPortLineEdit->text(), "Invalid media server RTSP port specified."))
         return false;
     if (!checkPort(ui->apiPortLineEdit->text(), "Invalid media server API port specified."))
@@ -717,6 +721,7 @@ void QnSystrayWindow::saveData()
     m_mServerSettings.setValue("rtspPort", ui->rtspPortLineEdit->text());
     m_mServerSettings.setValue("apiPort", ui->apiPortLineEdit->text());
     m_appServerSettings.setValue("port", ui->appServerPortLineEdit->text());
+    m_appServerSettings.setValue("proxy_port", ui->proxyPortLineEdit->text());
 
     QStringList urlList = m_settings.value("appserverUrlHistory").toString().split(';');
     urlList.insert(0, getAppServerURL().toString());

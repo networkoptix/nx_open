@@ -29,32 +29,32 @@ public:
     //enum State {State_Stopped, State_Paused, State_Playing, State_Rewind};
 
     QnTCPConnectionProcessorPrivate():
-          socket(0),
-          sendBuffer(CL_MEDIA_ALIGNMENT, 1024*256)
-      {
-          tcpReadBuffer = new quint8[TCP_READ_BUFFER_SIZE];
-          socketTimeout = 5000 * 1000;
-      }
+        socket(0),
+        sendBuffer(CL_MEDIA_ALIGNMENT, 1024*256)
+    {
+        tcpReadBuffer = new quint8[TCP_READ_BUFFER_SIZE];
+        socketTimeout = 5000 * 1000;
+    }
 
-      ~QnTCPConnectionProcessorPrivate()
-      {
-          delete socket;
-          delete [] tcpReadBuffer;
-      }
+    virtual ~QnTCPConnectionProcessorPrivate()
+    {
+        delete socket;
+        delete [] tcpReadBuffer;
+    }
 
 public:
-      TCPSocket* socket;
-      QHttpRequestHeader requestHeaders;
-      QHttpResponseHeader responseHeaders;
+    TCPSocket* socket;
+    QHttpRequestHeader requestHeaders;
+    QHttpResponseHeader responseHeaders;
 
-      QByteArray protocol;
-      QByteArray requestBody;
-      QByteArray responseBody;
-      QByteArray clientRequest;
-      QByteArray receiveBuffer;
-      QMutex sockMutex;
-      quint8* tcpReadBuffer;
-      QnTcpListener* owner;
-      CLByteArray sendBuffer;
-      int socketTimeout;
+    QByteArray protocol;
+    QByteArray requestBody;
+    QByteArray responseBody;
+    QByteArray clientRequest;
+    QByteArray receiveBuffer;
+    QMutex sockMutex;
+    quint8* tcpReadBuffer;
+    QnTcpListener* owner;
+    CLByteArray sendBuffer;
+    int socketTimeout;
 };
