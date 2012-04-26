@@ -29,6 +29,7 @@ appserver/proto/xml/gen
 appserver/proto/pb/gen
 appserver/test/executions
 appserver/static
+appserver/entcontroller.conf 
 
 bin
 build
