@@ -16,10 +16,9 @@ class QRegion;
 class QAction;
 class QGraphicsSceneContextMenuEvent;
 
-class GraphicsScrollBar;
-
 class QnWorkbenchDisplay;
 class QnTimeSlider;
+class QnTimeScrollBar;
 class QnResourceWidget;
 class QnAbstractArchiveReader;
 class QnCachingTimePeriodLoader;
@@ -36,8 +35,8 @@ public:
     QnTimeSlider *timeSlider() const;
     void setTimeSlider(QnTimeSlider *timeSlider);
 
-    GraphicsScrollBar *scrollBar() const;
-    void setScroolBar(GraphicsScrollBar *scrollBar);
+    QnTimeScrollBar *timeScrollBar() const;
+    void setTimeScrollBar(QnTimeScrollBar *scrollBar);
 
     QnResourceWidget *currentWidget();
 
@@ -77,7 +76,7 @@ protected:
     void updateCurrentPeriods();
     void updateCurrentPeriods(Qn::TimePeriodType type);
     void updateSyncedPeriods(Qn::TimePeriodType type);
-    void updateLineComments();
+    void updateLines();
 
 protected slots:
     void at_display_widgetChanged(Qn::ItemRole role);
@@ -100,7 +99,7 @@ protected slots:
 
 private:
     QnTimeSlider *m_timeSlider;
-    GraphicsScrollBar *m_scrollBar;
+    QnTimeScrollBar *m_timeScrollBar;
     QnWorkbenchDisplay *m_display;
 
     QSet<QnResourceWidget *> m_syncedWidgets;

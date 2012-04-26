@@ -23,6 +23,7 @@
 #include <ui/actions/action_target_types.h>
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/graphics/items/controls/time_slider.h>
+#include <ui/graphics/items/controls/time_scroll_bar.h>
 #include <ui/graphics/instruments/signaling_instrument.h>
 
 #include "workbench_display.h"
@@ -30,13 +31,12 @@
 
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "libavutil/avutil.h" // TODO: remove
-#include <ui/graphics/items/standard/graphics_scroll_bar.h> // TODO: remove
 
 QnWorkbenchNavigator::QnWorkbenchNavigator(QnWorkbenchDisplay *display, QObject *parent):
     QObject(parent),
     QnWorkbenchContextAware(parent),
     m_timeSlider(NULL),
-    m_scrollBar(NULL),
+    m_timeScrollBar(NULL),
     m_display(display),
     m_centralWidget(NULL),
     m_currentWidget(NULL),
@@ -77,25 +77,25 @@ void QnWorkbenchNavigator::setTimeSlider(QnTimeSlider *timeSlider) {
     }
 }
 
-GraphicsScrollBar *QnWorkbenchNavigator::scrollBar() const {
-    return m_scrollBar;
+QnTimeScrollBar *QnWorkbenchNavigator::timeScrollBar() const {
+    return m_timeScrollBar;
 }
 
-void QnWorkbenchNavigator::setScroolBar(GraphicsScrollBar *scrollBar) {
-    if(m_scrollBar == scrollBar)
+void QnWorkbenchNavigator::setTimeScrollBar(QnTimeScrollBar *scrollBar) {
+    if(m_timeScrollBar == scrollBar)
         return;
 
-    if(m_scrollBar) {
-        disconnect(m_scrollBar, NULL, this, NULL);
+    if(m_timeScrollBar) {
+        disconnect(m_timeScrollBar, NULL, this, NULL);
 
         if(isValid())
             deinitialize();
     }
 
-    m_scrollBar = scrollBar;
+    m_timeScrollBar = scrollBar;
 
-    if(m_scrollBar) {
-        connect(m_scrollBar, SIGNAL(destroyed()), this, SLOT(at_scrollBar_destroyed()));
+    if(m_timeScrollBar) {
+        connect(m_timeScrollBar, SIGNAL(destroyed()), this, SLOT(at_scrollBar_destroyed()));
 
         if(isValid())
             initialize();
@@ -103,7 +103,7 @@ void QnWorkbenchNavigator::setScroolBar(GraphicsScrollBar *scrollBar) {
 }
 
 bool QnWorkbenchNavigator::isValid() {
-    return m_display && m_timeSlider && m_scrollBar;
+    return m_display && m_timeSlider && m_timeScrollBar;
 }
 
 void QnWorkbenchNavigator::initialize() {
@@ -118,16 +118,16 @@ void QnWorkbenchNavigator::initialize() {
     connect(m_timeSlider,                       SIGNAL(valueChanged(qint64)),                       this,   SLOT(at_timeSlider_valueChanged(qint64)));
     connect(m_timeSlider,                       SIGNAL(sliderPressed()),                            this,   SLOT(at_timeSlider_sliderPressed()));
     connect(m_timeSlider,                       SIGNAL(sliderReleased()),                           this,   SLOT(at_timeSlider_sliderReleased()));
+    connect(m_timeSlider,                       SIGNAL(valueChanged(qint64)),                       this,   SLOT(updateScrollBarFromSlider()));
     connect(m_timeSlider,                       SIGNAL(rangeChanged(qint64, qint64)),               this,   SLOT(updateScrollBarFromSlider()));
     connect(m_timeSlider,                       SIGNAL(windowChanged(qint64, qint64)),              this,   SLOT(updateScrollBarFromSlider()));
     m_timeSlider->installEventFilter(this);
-    m_timeSlider->setLineCount(SliderLineCount);
 
-    connect(m_scrollBar,                        SIGNAL(valueChanged(qint64)),                       this,   SLOT(updateSliderFromScrollBar()));
-    connect(m_scrollBar,                        SIGNAL(pageStepChanged(qint64)),                    this,   SLOT(updateSliderFromScrollBar()));
-    m_scrollBar->installEventFilter(this);
+    connect(m_timeScrollBar,                    SIGNAL(valueChanged(qint64)),                       this,   SLOT(updateSliderFromScrollBar()));
+    connect(m_timeScrollBar,                    SIGNAL(pageStepChanged(qint64)),                    this,   SLOT(updateSliderFromScrollBar()));
+    m_timeScrollBar->installEventFilter(this);
 
-    updateLineComments();
+    updateLines();
 } 
 
 void QnWorkbenchNavigator::deinitialize() {
@@ -139,8 +139,8 @@ void QnWorkbenchNavigator::deinitialize() {
     disconnect(m_timeSlider,                        NULL, this, NULL);
     m_timeSlider->removeEventFilter(this);
 
-    disconnect(m_scrollBar,                         NULL, this, NULL);
-    m_scrollBar->removeEventFilter(this);
+    disconnect(m_timeScrollBar,                         NULL, this, NULL);
+    m_timeScrollBar->removeEventFilter(this);
 
     m_currentWidget = NULL;
     m_currentWidgetIsCamera = false;
@@ -176,8 +176,6 @@ void QnWorkbenchNavigator::addSyncedWidget(QnResourceWidget *widget) {
     m_syncedResources.insert(widget->resource(), QHashDummyValue());
 
     updateCurrentWidget();
-
-    //m_forceTimePeriodLoading = !updateRecPeriodList(true);
 }
 
 void QnWorkbenchNavigator::removeSyncedWidget(QnResourceWidget *widget) {
@@ -189,14 +187,6 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnResourceWidget *widget) {
     m_syncedResources.erase(m_syncedResources.find(widget->resource()));
 
     updateCurrentWidget();
-
-    //m_forceTimePeriodLoading = !updateRecPeriodList(true);
-
-    /*QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(widget->getDevice());
-    if (netRes)
-        m_motionPeriodLoader.remove(netRes);
-
-    repaintMotionPeriods();*/
 }
 
 void QnWorkbenchNavigator::updateCurrentWidget() {
@@ -231,7 +221,7 @@ void QnWorkbenchNavigator::setCurrentWidget(QnResourceWidget *widget) {
         m_currentWidgetIsCamera = false;
     }
 
-    updateLineComments();
+    updateLines();
     m_timeSlider->setOption(QnTimeSlider::UseUTC, m_currentWidgetIsCamera);
 
     updateSliderFromReader();
@@ -338,20 +328,7 @@ void QnWorkbenchNavigator::updateSliderFromReader() {
         QnTimePeriod period(startTimeMSec, endTimeMSec - startTimeMSec);
         foreach(QnResourceWidget *widget, m_syncedWidgets)
             loader(widget->resource())->setTargetPeriod(period);
-
-        //m_forceTimePeriodLoading = !updateRecPeriodList(m_forceTimePeriodLoading); // if period does not loaded yet, force loading
     }
-
-
-    /*if(!reader->isMediaPaused() && (m_camera->getCamDisplay()->isRealTimeSource() || m_timeSlider->currentValue() == DATETIME_NOW)) {
-        m_liveButton->setChecked(true);
-        m_forwardButton->setEnabled(false);
-        m_stepForwardButton->setEnabled(false);
-    } else {
-        m_liveButton->setChecked(false);
-        m_forwardButton->setEnabled(true);
-        m_stepForwardButton->setEnabled(true);
-    }*/
 }
 
 void QnWorkbenchNavigator::updateCurrentPeriods() {
@@ -376,26 +353,27 @@ void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodType type) {
     m_timeSlider->setTimePeriods(SyncedLine, type, QnTimePeriod::mergeTimePeriods(periods));
 }
 
-void QnWorkbenchNavigator::updateLineComments() {
+void QnWorkbenchNavigator::updateLines() {
     if(m_currentWidgetIsCamera) {
+        m_timeSlider->setLineCount(SliderLineCount);
         m_timeSlider->setLineComment(CurrentLine, m_currentWidget->resource()->getName());
         m_timeSlider->setLineComment(SyncedLine, tr("All Cameras"));
     } else {
-        m_timeSlider->setLineComment(CurrentLine, QString());
-        m_timeSlider->setLineComment(SyncedLine, QString());
+        m_timeSlider->setLineCount(0);
     }
 }
 
 void QnWorkbenchNavigator::updateSliderFromScrollBar() {
-    m_timeSlider->setWindow(m_scrollBar->value(), m_scrollBar->value() + m_scrollBar->pageStep());
+    m_timeSlider->setWindow(m_timeScrollBar->value(), m_timeScrollBar->value() + m_timeScrollBar->pageStep());
 }
 
 void QnWorkbenchNavigator::updateScrollBarFromSlider() {
     qint64 windowSize = m_timeSlider->windowEnd() - m_timeSlider->windowStart();
 
-    m_scrollBar->setRange(m_timeSlider->minimum(), m_timeSlider->maximum() - windowSize);
-    m_scrollBar->setValue(m_timeSlider->windowStart());
-    m_scrollBar->setPageStep(windowSize);
+    m_timeScrollBar->setRange(m_timeSlider->minimum(), m_timeSlider->maximum() - windowSize);
+    m_timeScrollBar->setValue(m_timeSlider->windowStart());
+    m_timeScrollBar->setPageStep(windowSize);
+    m_timeScrollBar->setIndicatorPosition(m_timeSlider->sliderPosition());
 }
 
 
@@ -406,7 +384,7 @@ bool QnWorkbenchNavigator::eventFilter(QObject *watched, QEvent *event) {
     if(watched == m_timeSlider && event->type() == QEvent::GraphicsSceneContextMenu) {
         at_timeSlider_contextMenuEvent(static_cast<QGraphicsSceneContextMenuEvent *>(event));
         return true;
-    } else if(watched == m_scrollBar && event->type() == QEvent::GraphicsSceneWheel) {
+    } else if(watched == m_timeScrollBar && event->type() == QEvent::GraphicsSceneWheel) {
         if(m_timeSlider->scene() && m_timeSlider->scene()->sendEvent(m_timeSlider, event))
             return true;
     }
@@ -493,8 +471,6 @@ void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value) {
             }
         }
     }
-    
-    //updateRecPeriodList(false);
 }
 
 void QnWorkbenchNavigator::at_timeSlider_sliderPressed() {
@@ -511,11 +487,6 @@ void QnWorkbenchNavigator::at_timeSlider_sliderReleased() {
     if (!m_currentWidget)
         return;
 
-    /*bool isCamera = m_currentWidget->resource().dynamicCast<QnSecurityCamResource>();
-    if (!isCamera) {
-        // Disable precise seek via network to reduce network flood. 
-        //smartSeek(m_timeSlider->currentValue());
-    }*/
     if (m_wasPlaying) {
         m_currentWidget->display()->archiveReader()->setSingleShotMode(false);
         m_currentWidget->display()->camDisplay()->playAudio(true);
@@ -559,7 +530,7 @@ void QnWorkbenchNavigator::at_timeSlider_destroyed() {
 }
 
 void QnWorkbenchNavigator::at_scrollBar_destroyed() {
-    setScroolBar(NULL);
+    setTimeScrollBar(NULL);
 }
 
 

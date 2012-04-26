@@ -222,11 +222,11 @@ NavigationItem::NavigationItem(QnWorkbenchDisplay *display, QGraphicsItem *paren
     rightLayoutV->addItem(m_timeLabel);
 
     QnTimeSlider *slider = new QnTimeSlider();
-    GraphicsScrollBar *scrollBar = new QnTimeScrollBar();
+    QnTimeScrollBar *scrollBar = new QnTimeScrollBar();
 
     QnWorkbenchNavigator *navigator = new QnWorkbenchNavigator(display, display);
     navigator->setTimeSlider(slider);
-    navigator->setScroolBar(scrollBar);
+    navigator->setTimeScrollBar(scrollBar);
 
     QGraphicsLinearLayout *sliderLayout = new QGraphicsLinearLayout(Qt::Vertical);
     sliderLayout->setContentsMargins(0, 0, 0, 0);

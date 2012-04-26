@@ -10,7 +10,9 @@ public:
     QStyle::SubControl pressedControl;
     bool pointerOutsidePressedControl;
 
+    QPointF mousePos;
     QPointF clickOffset;
+    bool clickOffsetDirty;
     qint64 snapBackPosition;
 
     void activateControl(uint control, int threshold = 500);
