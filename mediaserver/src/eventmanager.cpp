@@ -25,6 +25,7 @@ void QnEventManager::init(const QUrl& url, int timeout)
 }
 
 QnEventManager::QnEventManager()
+    : m_seqNumber(0)
 {
 }
 
@@ -42,7 +43,21 @@ void QnEventManager::eventReceived(QnEvent event)
 {
     qDebug() << "Got event: " << event.eventType << " " << event.objectName << " " << event.objectId;
 
-    if (event.eventType == QN_EVENT_LICENSE_CHANGE)
+    if (event.eventType == QN_EVENT_EMPTY)
+    {
+        if (m_seqNumber == 0)
+        {
+            // No tracking yet. Just initialize seqNumber.
+            m_seqNumber = event.seqNumber;
+        }
+        else if (QnEvent::nextSeqNumber(m_seqNumber) != event.seqNumber)
+        {
+            // Tracking is on and some events are missed and/or reconnect occured
+            m_seqNumber = event.seqNumber;
+            emit connectionReset();
+        }
+    }
+    else if (event.eventType == QN_EVENT_LICENSE_CHANGE)
     {
         QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
@@ -65,7 +80,6 @@ void QnEventManager::eventReceived(QnEvent event)
 
             qnLicensePool->replaceLicenses(licenses);
         }
-
     }
     else if (event.eventType == QN_CAMERA_SERVER_ITEM)
     {

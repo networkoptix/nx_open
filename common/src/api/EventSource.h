@@ -25,6 +25,8 @@ static const char* QN_CAMERA_SERVER_ITEM           = "CSI";
 struct QnEvent
 {
     QString eventType;
+    quint32 seqNumber;
+
     QString objectName;
     QnId objectId;
     QnId parentId;
@@ -39,6 +41,8 @@ struct QnEvent
 
     bool load(const QVariant& parsed);
 	QString objectNameLower() const;
+
+    static quint32 nextSeqNumber(quint32 seqNumber);
 };
 
 class QnJsonStreamParser

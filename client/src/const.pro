@@ -7,12 +7,11 @@ win* {
   INCLUDEPATH += ../../common/contrib/ffmpeg-misc-headers-win32
 }
 
-QT = core gui network xml opengl webkit
+QT = core gui network xml opengl webkit multimedia
 CONFIG += precompile_header
 CONFIG -= flat app_bundle
 
 win32 {
-  QT += multimedia 
   CONFIG += x86
 }
 

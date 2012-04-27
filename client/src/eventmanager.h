@@ -21,6 +21,7 @@ public:
 signals:
     void connectionOpened();
     void connectionClosed();
+    void connectionReset();
 
 public slots:
     void run();
@@ -39,6 +40,7 @@ private:
 private:
     static const int EVENT_RECONNECT_TIMEOUT = 3000;
 
+    quint32 m_seqNumber;
     QSharedPointer<QnEventSource> m_source;
 };
 

@@ -53,7 +53,7 @@ sed $SED_ARGS "s%\.\.\/build\/release%release%g" client/build/Makefile.release
 
 rm mediaserver/build/Makefile.debug.bak mediaserver/build/Makefile.release.bak client/build/Makefile.debug.bak client/build/Makefile.release.bak
 
-for i in common mediaserver
+for i in common mediaserver client
 do
   pushd $i/build
   make -f Makefile.$CONFIG -j $[NPROCESSORS+1]

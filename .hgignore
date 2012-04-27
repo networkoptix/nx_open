@@ -29,6 +29,8 @@ appserver/proto/xml/gen
 appserver/proto/pb/gen
 appserver/test/executions
 appserver/static
+appserver/setup/static
+appserver/version.py
 
 bin
 build

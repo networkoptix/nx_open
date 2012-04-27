@@ -30,6 +30,7 @@ void QnEventManager::init(const QUrl& url, int timeout)
 }
 
 QnEventManager::QnEventManager()
+    : m_seqNumber(0)
 {
 }
 
@@ -102,9 +103,20 @@ void QnEventManager::eventReceived(QnEvent event)
 
     if (event.eventType == QN_EVENT_EMPTY)
     {
-        /* Do nothing =). */
-    }
-    if (event.eventType == QN_EVENT_LICENSE_CHANGE)
+        if (m_seqNumber == 0)
+        {
+            // No tracking yet. Just initialize seqNumber.
+            m_seqNumber = event.seqNumber;
+        }
+        else if (QnEvent::nextSeqNumber(m_seqNumber) != event.seqNumber)
+        {
+            // Tracking is on and some events are missed and/or reconnect occured
+            m_seqNumber = event.seqNumber;
+            emit connectionReset();
+        }
+
+        emit connectionOpened();
+    } else if (event.eventType == QN_EVENT_LICENSE_CHANGE)
     {
         QnAppServerConnectionFactory::createConnection()->getLicensesAsync(this, SLOT(licensesReceived(int,QByteArray,QnLicenseList,int)));
     }
@@ -154,8 +166,6 @@ void QnEventManager::eventReceived(QnEvent event)
         QnResourcePtr ownResource = qnResPool->getResourceById(event.objectId);
         qnResPool->removeResource(ownResource);
     }
-
-    emit connectionOpened();
 }
 
 void QnEventManager::connectionClosed(QString errorString)

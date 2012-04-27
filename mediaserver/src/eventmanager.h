@@ -17,6 +17,9 @@ public:
     void init(const QUrl& url, int reconnectTimeout);
     void stop();
 
+signals:
+    void connectionReset();
+
 public slots:
     void run();
 
@@ -25,6 +28,7 @@ private slots:
     void connectionClosed(QString errorString);
 
 private:
+    quint32 m_seqNumber;
     QSharedPointer<QnEventSource> m_source;
 };
 
