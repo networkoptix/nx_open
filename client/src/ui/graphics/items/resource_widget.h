@@ -3,6 +3,7 @@
 
 #include <QtCore/QWeakPointer>
 #include <QtCore/QVector>
+#include <QtCore/QMetaType>
 #include <QtGui/QStaticText>
 #include <QtGui/QGraphicsWidget>
 
@@ -472,5 +473,6 @@ private:
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::DisplayFlags);
+Q_DECLARE_METATYPE(QnResourceWidget *)
 
 #endif // QN_RESOURCE_WIDGET_H

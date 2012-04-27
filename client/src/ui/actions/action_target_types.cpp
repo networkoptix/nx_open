@@ -15,6 +15,7 @@ namespace {
     int qn_layout = 0;
     int qn_server = 0;
     int qn_resourceList = 0;
+    int qn_widget = 0;
     int qn_widgetList = 0;
     int qn_layoutItemList = 0;
     int qn_layoutList = 0;
@@ -25,10 +26,28 @@ namespace {
         qn_layout           = qMetaTypeId<QnLayoutResourcePtr>();
         qn_server           = qMetaTypeId<QnVideoServerResourcePtr>();
         qn_resourceList     = qMetaTypeId<QnResourceList>();
+        qn_widget           = qMetaTypeId<QnResourceWidget *>();
         qn_widgetList       = qMetaTypeId<QnResourceWidgetList>();
         qn_layoutItemList   = qMetaTypeId<QnLayoutItemIndexList>();
         qn_layoutList       = qMetaTypeId<QnWorkbenchLayoutList>();
     });
+
+    QnResourcePtr singleResource(const QVariant &items) {
+        int t = items.userType();
+
+        QnResourcePtr result;
+        if(t == qn_resource) {
+            result = items.value<QnResourcePtr>();
+        } else if(t == qn_user) {
+            result = items.value<QnUserResourcePtr>();
+        } else if(t == qn_layout) {
+            result = items.value<QnLayoutResourcePtr>();
+        } else /* if(t == qn_server) */ {
+            result = items.value<QnVideoServerResourcePtr>();
+        }
+
+        return result;
+    }
 
 } // anonymous namespace
 
@@ -48,7 +67,9 @@ int QnActionTargetTypes::size(const QVariant &items) {
     } else if(t == qn_layoutList) {
         return items.value<QnWorkbenchLayoutList>().size();
     } else if(t == qn_resource || t == qn_user || t == qn_layout || t == qn_server) {
-        return 1;
+        return singleResource(items) ? 1 : 0;
+    } else if(t == qn_widget) {
+        return items.value<QnResourceWidget *>() ? 1 : 0;
     } else {
         return 0;
     }
@@ -67,9 +88,20 @@ Qn::ActionTargetType QnActionTargetTypes::type(const QVariant &items) {
         return Qn::LayoutType;
     } else if(t == qn_resource || t == qn_user || t == qn_layout || t == qn_server) {
         return Qn::ResourceType;
+    } else if(t == qn_widget) {
+        return Qn::WidgetType;
     } else {
         return static_cast<Qn::ActionTargetType>(0);
     }
+}
+
+QnResourceList QnActionTargetTypes::resources(QnResourceWidget *widget) {
+    QnResourcePtr resource = QnActionTargetTypes::resource(widget);
+
+    QnResourceList result;
+    if(resource)
+        result.push_back(resource);
+    return result;
 }
 
 QnResourcePtr QnActionTargetTypes::resource(QnResourceWidget *widget) {
@@ -142,37 +174,51 @@ QnResourceList QnActionTargetTypes::resources(const QVariant &items) {
     } else if(t == qn_layoutList) {
         return resources(items.value<QnWorkbenchLayoutList>());
     } else if(t == qn_resource || t == qn_user || t == qn_layout || t == qn_server) {
+        QnResourcePtr resource = singleResource(items);
+
         QnResourceList result;
-        if(t == qn_resource) {
-            result.push_back(items.value<QnResourcePtr>());
-        } else if(t == qn_user) {
-            result.push_back(items.value<QnUserResourcePtr>());
-        } else if(t == qn_layout) {
-            result.push_back(items.value<QnLayoutResourcePtr>());
-        } else /* if(t == qn_server) */ {
-            result.push_back(items.value<QnVideoServerResourcePtr>());
-        }
+        if(resource)
+            result.push_back(resource);
         return result;
+    } else if(t == qn_widget) {
+        return resources(items.value<QnResourceWidget *>());
     } else {
         return QnResourceList();
     }
+}
+
+QnLayoutItemIndex QnActionTargetTypes::layoutItem(QnResourceWidget *widget) {
+    QnWorkbenchLayout *layout = widget->item()->layout();
+    if(layout == NULL)
+        return QnLayoutItemIndex();
+
+    QnLayoutResourcePtr resource = layout->resource();
+    if(!resource) {
+        qnWarning("Layout does not have an associated resource, item manipulation may not work as expected.");
+        return QnLayoutItemIndex();
+    }
+
+    return QnLayoutItemIndex(resource, widget->item()->uuid());
 }
 
 QnLayoutItemIndexList QnActionTargetTypes::layoutItems(const QnResourceWidgetList &widgets) {
     QnLayoutItemIndexList result;
     
     foreach(QnResourceWidget *widget, widgets) {
-        QnWorkbenchLayout *layout = widget->item()->layout();
-        if(layout == NULL)
-            continue;
-
-        QnLayoutResourcePtr resource = layout->resource();
-        if(!resource)
-            qnWarning("Appserver is down, layout item deletion may not work as expected.");
-
-        result.push_back(QnLayoutItemIndex(resource, widget->item()->uuid()));
+        QnLayoutItemIndex layoutItem = QnActionTargetTypes::layoutItem(widget);
+        if(!layoutItem.isNull())
+            result.push_back(layoutItem);
     }
     
+    return result;
+}
+
+QnLayoutItemIndexList QnActionTargetTypes::layoutItems(QnResourceWidget *widget) {
+    QnLayoutItemIndex layoutItem = QnActionTargetTypes::layoutItem(widget);
+
+    QnLayoutItemIndexList result;
+    if(!layoutItem.isNull())
+        result.push_back(layoutItem);
     return result;
 }
 
@@ -181,6 +227,8 @@ QnLayoutItemIndexList QnActionTargetTypes::layoutItems(const QVariant &items) {
         return items.value<QnLayoutItemIndexList>();
     } else if(items.userType() == qn_widgetList) {
         return layoutItems(items.value<QnResourceWidgetList>());
+    } else if(items.userType() == qn_widget) {
+        return layoutItems(items.value<QnResourceWidget *>());
     } else {
         return QnLayoutItemIndexList();
     }
@@ -197,6 +245,13 @@ QnWorkbenchLayoutList QnActionTargetTypes::layouts(const QVariant &items) {
 QnResourceWidgetList QnActionTargetTypes::widgets(const QVariant &items) {
     if(items.userType() == qn_widgetList) {
         return items.value<QnResourceWidgetList>();
+    } else if(items.userType() == qn_widget) {
+        QnResourceWidget *widget = items.value<QnResourceWidget *>();
+        
+        QnResourceWidgetList result;
+        if(widget)
+            result.push_back(widget);
+        return result;
     } else {
         return QnResourceWidgetList();
     }

@@ -68,6 +68,7 @@
 #include "workbench_display.h"
 #include "workbench_layout.h"
 #include "workbench_context.h"
+#include "workbench_navigator.h"
 
 
 Q_DECLARE_METATYPE(VariantAnimator *)
@@ -467,7 +468,9 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
         m_sliderShowButton->setTransform(transform);
     }
 
-    m_sliderItem = new NavigationItem(display, m_controlsWidget);
+    QnWorkbenchNavigator *navigator = new QnWorkbenchNavigator(display, this);
+
+    m_sliderItem = new QnNavigationItem(navigator, m_controlsWidget);
     m_sliderItem->setFrameColor(QColor(110, 110, 110, 255));
     m_sliderItem->setFrameWidth(0.5);
 
@@ -575,14 +578,8 @@ QVariant QnWorkbenchUi::currentTarget(Qn::ActionScope scope) const {
         return m_tabBarWidget->currentTarget(scope);
     case Qn::TreeScope:
         return m_treeWidget->currentTarget(scope);
-    case Qn::SliderScope: {
-        QnResourceList result;
-        CLVideoCamera *camera = m_sliderItem->videoCamera();
-        if(camera != NULL)
-            result.push_back(camera->resource());
-
-        return QVariant::fromValue(result);
-    }
+    case Qn::SliderScope:
+        return QVariant::fromValue(m_sliderItem->navigator()->currentWidget());
     case Qn::SceneScope:
         return QVariant::fromValue(QnActionTargetTypes::widgets(display()->scene()->selectedItems()));
     default:
@@ -862,7 +859,7 @@ void QnWorkbenchUi::updateHelpOpacity(bool animate) {
 }
 
 void QnWorkbenchUi::updateControlsVisibility(bool animate) {
-    bool sliderVisible = m_sliderItem->videoCamera() != NULL && !m_sliderItem->videoCamera()->getCamDisplay()->isStillImage();
+    bool sliderVisible = m_sliderItem->navigator()->currentWidget() != NULL && !m_sliderItem->navigator()->currentWidget()->display()->isStillImage();
 
     if(m_inactive) {
         bool hovered = m_sliderOpacityProcessor->isHovered() || m_treeOpacityProcessor->isHovered() || m_titleOpacityProcessor->isHovered() || m_helpOpacityProcessor->isHovered();
@@ -1221,36 +1218,6 @@ void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role) {
         updateActivityInstrumentState();
         updateViewportMargins();
     }
-
-    /* Update navigation item's target. */
-    if(role == Qn::CentralRole) {
-        QnResourceWidget *targetWidget = m_widgetByRole[Qn::CentralRole];
-        m_sliderItem->setVideoCamera(targetWidget == NULL ? NULL : targetWidget->display()->camera());
-    }
-}
-
-void QnWorkbenchUi::at_display_widgetAdded(QnResourceWidget *widget) {
-    if(widget->display() == NULL || widget->display()->camera() == NULL)
-        return;
-
-    QnSecurityCamResourcePtr cameraResource = widget->resource().dynamicCast<QnSecurityCamResource>();
-#ifndef DEBUG_MOTION
-    if(cameraResource)
-#endif
-    {
-        connect(widget, SIGNAL(motionRegionSelected(QnResourcePtr, QnAbstractArchiveReader*, QList<QRegion>)), m_sliderItem, SLOT(loadMotionPeriods(QnResourcePtr, QnAbstractArchiveReader*, QList<QRegion>)));
-        connect(m_sliderItem, SIGNAL(clearMotionSelection()), widget, SLOT(clearMotionSelection()));
-        m_sliderItem->addReserveCamera(widget->display()->camera());
-    }
-}
-
-void QnWorkbenchUi::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {
-    if(widget->display() == NULL || widget->display()->camera() == NULL)
-        return;
-
-    QnSecurityCamResourcePtr cameraResource = widget->resource().dynamicCast<QnSecurityCamResource>();
-    if(cameraResource != NULL)
-        m_sliderItem->removeReserveCamera(widget->display()->camera());
 }
 
 void QnWorkbenchUi::at_controlsWidget_deactivated() {

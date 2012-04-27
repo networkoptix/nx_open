@@ -129,6 +129,8 @@ public:
 
     void pause();
 
+    bool isStillImage() const;
+
     /**
      * \param renderer                  Renderer to assign to this display. Ownership of the renderer is transferred to this display. 
      */
