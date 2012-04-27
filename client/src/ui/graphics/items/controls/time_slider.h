@@ -129,6 +129,7 @@ private:
     void drawSolidBackground(QPainter *painter, qreal top, qreal height);
     void drawMarker(QPainter *painter, qint64 pos, const QColor &color);
     void drawSelection(QPainter *painter);
+    void drawHighlights(QPainter *painter, qreal fillTop, qreal fillHeight, qreal textTop, qreal textHeight);
 
     void updateToolTipVisibility();
     void updateToolTipText();
@@ -144,8 +145,9 @@ private:
     void animateStepValues(int deltaMSecs);
 
     const QPixmap &positionPixmap(qint64 position, int height, const QnTimeStep &step);
-    const QPixmap &textPixmap(const QString &text, int height);
-    
+    const QPixmap &highlightPixmap(qint64 position, int height, const QnTimeStep &step);
+    const QPixmap &textPixmap(const QString &text, int height, QPalette::ColorRole colorRole = QPalette::Text);
+
     qreal lineTop(int line);
     qreal lineHeight();
 
@@ -158,11 +160,10 @@ private:
     };
 
     struct TimeStepData {
-        TimeStepData(): currentHeight(0.0), targetHeight(0.0), lastTargetHeight(0.0), currentLineOpacity(0.0), targetLineOpacity(0.0), currentTextOpacity(0.0), targetTextOpacity(0.0) {}
+        TimeStepData(): currentHeight(0.0), targetHeight(0.0), currentLineOpacity(0.0), targetLineOpacity(0.0), currentTextOpacity(0.0), targetTextOpacity(0.0) {}
 
         qreal currentHeight;
         qreal targetHeight;
-        qreal lastTargetHeight;
         int currentTextHeight;
         qreal currentLineOpacity;
         qreal targetLineOpacity;
@@ -195,7 +196,8 @@ private:
     QVector<qint64> m_nextTickmarkPos;
     QVector<QVector<QPointF> > m_tickmarkLines;
     QHash<qint32, QPixmap> m_pixmapByPositionKey;
-    QHash<QPair<QString, int>, QPixmap> m_pixmapBySizedText;
+    QHash<qint32, QPixmap> m_pixmapByHighlightKey;
+    QHash<QPair<QString, int>, QPixmap> m_pixmapByTextKey;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnTimeSlider::Options);

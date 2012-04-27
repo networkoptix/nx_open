@@ -133,6 +133,8 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     m_volumeSlider->setFocusProxy(this);
 
     m_timeSlider = new QnTimeSlider(this);
+    m_timeSlider->setMinimumHeight(60.0);
+
     m_timeScrollBar = new QnTimeScrollBar(this);
     
     connect(m_speedSlider, SIGNAL(speedChanged(float)), this, SLOT(onSpeedChanged(float)));

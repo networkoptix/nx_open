@@ -157,3 +157,12 @@ QString toString(qint64 msecs, const QnTimeStep &step) {
         return QDateTime::fromMSecsSinceEpoch(msecs).toString(step.format);
     }
 }
+
+QString toLongString(qint64 msecs, const QnTimeStep &step) {
+    if(step.isRelative) {
+        return QString();
+    } else {
+        return QDateTime::fromMSecsSinceEpoch(msecs).toString(step.longFormat);
+    }
+}
+
