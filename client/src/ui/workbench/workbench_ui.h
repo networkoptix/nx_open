@@ -25,6 +25,7 @@ class QnResourceTreeWidget;
 class GraphicsLabel;
 
 class QnWorkbenchDisplay;
+class QnWorkbenchNavigator;
 class QnImageButtonWidget;
 class QnResourceWidget;
 class QnMaskedProxyWidget;
@@ -316,6 +317,9 @@ private:
 
     /** Animator for tree's position. */
     VariantAnimator *m_treeXAnimator;
+
+    /** Workbench navigator instance. */
+    QnWorkbenchNavigator *m_navigator;
 
 
     /* Title-related state. */

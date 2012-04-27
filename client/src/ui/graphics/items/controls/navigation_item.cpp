@@ -21,21 +21,14 @@
 #include "ui/graphics/items/controls/tool_tip_item.h"
 #include "ui/graphics/items/image_button_widget.h"
 
-#include "timeslider.h"
 #include "utils/common/synctime.h"
 #include "core/resource/security_cam_resource.h"
-#include "time_slider.h"
-#include "ui/workbench/workbench_navigator.h"
 #include "ui/workbench/workbench_display.h"
-#include "../standard/graphics_scroll_bar.h"
+#include "time_slider.h"
 #include "time_scroll_bar.h"
 
-static const int SLIDER_NOW_AREA_WIDTH = 30;
-static const int TIME_PERIOD_UPDATE_INTERVAL = 1000 * 10;
-
-QnNavigationItem::QnNavigationItem(QnWorkbenchNavigator *navigator, QGraphicsItem *parent): 
+QnNavigationItem::QnNavigationItem(QGraphicsItem *parent): 
     base_type(parent),
-    m_navigator(navigator),
     m_playing(false)
 {
     setFlag(QGraphicsItem::ItemIsMovable, false);
@@ -114,16 +107,6 @@ QnNavigationItem::QnNavigationItem(QnWorkbenchNavigator *navigator, QGraphicsIte
     m_syncButton->setFocusProxy(this);
     m_syncButton->setEnabled(false);
 
-    connect(m_backwardButton, SIGNAL(clicked()), this, SLOT(rewindBackward()));
-    connect(m_stepBackwardButton, SIGNAL(clicked()), this, SLOT(stepBackward()));
-    connect(m_playButton, SIGNAL(clicked()), this, SLOT(togglePlayPause()));
-    connect(m_stepForwardButton, SIGNAL(clicked()), this, SLOT(stepForward()));
-    connect(m_forwardButton, SIGNAL(clicked()), this, SLOT(rewindForward()));
-    connect(m_liveButton, SIGNAL(clicked(bool)), this, SLOT(at_liveButton_clicked(bool)));
-    connect(m_mrsButton, SIGNAL(clicked()), this, SIGNAL(clearMotionSelection()));
-    connect(m_syncButton, SIGNAL(toggled(bool)), this, SLOT(onSyncButtonToggled(bool)));
-    connect(m_muteButton, SIGNAL(clicked(bool)), m_volumeSlider, SLOT(setMute(bool)));
-
 
     /* Time label. */
     m_timeLabel = new GraphicsLabel(this);
@@ -151,9 +134,7 @@ QnNavigationItem::QnNavigationItem(QnWorkbenchNavigator *navigator, QGraphicsIte
 
     m_timeSlider = new QnTimeSlider(this);
     m_timeScrollBar = new QnTimeScrollBar(this);
-    navigator->setTimeSlider(m_timeSlider);
-    navigator->setTimeScrollBar(m_timeScrollBar);
-
+    
     connect(m_speedSlider, SIGNAL(speedChanged(float)), this, SLOT(onSpeedChanged(float)));
     connect(m_speedSlider, SIGNAL(frameBackward()), this, SLOT(stepBackward()));
     connect(m_speedSlider, SIGNAL(frameForward()), this, SLOT(stepForward()));
@@ -216,6 +197,18 @@ QnNavigationItem::QnNavigationItem(QnWorkbenchNavigator *navigator, QGraphicsIte
     mainLayout->addItem(sliderLayout);
     mainLayout->addItem(rightLayoutV);
     setLayout(mainLayout);
+
+
+    /* Set up handlers. */
+    connect(m_backwardButton,       SIGNAL(clicked()),      this,           SLOT(rewindBackward()));
+    connect(m_stepBackwardButton,   SIGNAL(clicked()),      this,           SLOT(stepBackward()));
+    connect(m_playButton,           SIGNAL(clicked()),      this,           SLOT(togglePlayPause()));
+    connect(m_stepForwardButton,    SIGNAL(clicked()),      this,           SLOT(stepForward()));
+    connect(m_forwardButton,        SIGNAL(clicked()),      this,           SLOT(rewindForward()));
+    connect(m_liveButton,           SIGNAL(clicked(bool)),  this,           SLOT(at_liveButton_clicked(bool)));
+    connect(m_mrsButton,            SIGNAL(clicked()),      this,           SIGNAL(clearMotionSelection()));
+    connect(m_syncButton,           SIGNAL(toggled(bool)),  this,           SLOT(onSyncButtonToggled(bool)));
+    connect(m_muteButton,           SIGNAL(clicked(bool)),  m_volumeSlider, SLOT(setMute(bool)));
 
 
     /* Create actions. */

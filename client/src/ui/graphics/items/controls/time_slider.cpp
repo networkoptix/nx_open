@@ -449,6 +449,8 @@ qint64 QnTimeSlider::valueFromPosition(const QPointF &position) const {
 
 void QnTimeSlider::finishAnimations() {
     animateStepValues(10 * 1000);
+
+    kineticProcessor()->reset();
 }
 
 bool QnTimeSlider::scaleWindow(qreal factor, qint64 anchor) {

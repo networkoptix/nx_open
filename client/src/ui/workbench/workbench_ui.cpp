@@ -468,9 +468,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
         m_sliderShowButton->setTransform(transform);
     }
 
-    QnWorkbenchNavigator *navigator = new QnWorkbenchNavigator(display, this);
-
-    m_sliderItem = new QnNavigationItem(navigator, m_controlsWidget);
+    m_sliderItem = new QnNavigationItem(m_controlsWidget);
     m_sliderItem->setFrameColor(QColor(110, 110, 110, 255));
     m_sliderItem->setFrameWidth(0.5);
 
@@ -492,14 +490,18 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_sliderOpacityAnimatorGroup->addAnimator(opacityAnimator(m_sliderItem));
     m_sliderOpacityAnimatorGroup->addAnimator(opacityAnimator(m_sliderShowButton)); /* Speed of 1.0 is OK here. */
 
+    m_navigator = new QnWorkbenchNavigator(this);
+    m_navigator->setDisplay(display);
+    m_navigator->setTimeSlider(m_sliderItem->timeSlider());
+    m_navigator->setTimeScrollBar(m_sliderItem->timeScrollBar());
+
     connect(m_sliderShowButton,         SIGNAL(toggled(bool)),                                                                      this,                           SLOT(at_sliderShowButton_toggled(bool)));
     connect(m_sliderOpacityProcessor,   SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateSliderOpacity()));
     connect(m_sliderOpacityProcessor,   SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateSliderOpacity()));
     connect(m_sliderOpacityProcessor,   SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateControlsVisibility()));
     connect(m_sliderOpacityProcessor,   SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateControlsVisibility()));
     connect(m_sliderItem,               SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_sliderItem_geometryChanged()));
-    connect(m_sliderItem,               SIGNAL(actualCameraChanged(CLVideoCamera *)),                                               this,                           SLOT(updateControlsVisibility()));
-    connect(m_sliderItem,               SIGNAL(enableItemSync(bool)),                                                               m_display,                      SIGNAL(enableItemSync(bool)));
+    connect(m_navigator,                SIGNAL(currentWidgetChanged()),                                                             this,                           SLOT(updateControlsVisibility()));
 
 
     /* Connect to display. */
@@ -579,7 +581,7 @@ QVariant QnWorkbenchUi::currentTarget(Qn::ActionScope scope) const {
     case Qn::TreeScope:
         return m_treeWidget->currentTarget(scope);
     case Qn::SliderScope:
-        return QVariant::fromValue(m_sliderItem->navigator()->currentWidget());
+        return QVariant::fromValue(m_navigator->currentWidget());
     case Qn::SceneScope:
         return QVariant::fromValue(QnActionTargetTypes::widgets(display()->scene()->selectedItems()));
     default:
@@ -859,7 +861,7 @@ void QnWorkbenchUi::updateHelpOpacity(bool animate) {
 }
 
 void QnWorkbenchUi::updateControlsVisibility(bool animate) {
-    bool sliderVisible = m_sliderItem->navigator()->currentWidget() != NULL && !m_sliderItem->navigator()->currentWidget()->display()->isStillImage();
+    bool sliderVisible = m_navigator->currentWidget() != NULL && !m_navigator->currentWidget()->display()->isStillImage();
 
     if(m_inactive) {
         bool hovered = m_sliderOpacityProcessor->isHovered() || m_treeOpacityProcessor->isHovered() || m_titleOpacityProcessor->isHovered() || m_helpOpacityProcessor->isHovered();

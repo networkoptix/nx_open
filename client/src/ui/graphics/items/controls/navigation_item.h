@@ -7,7 +7,6 @@ class QnSpeedSlider;
 class QnVolumeSlider;
 class GraphicsLabel;
 class QnImageButtonWidget;
-class QnWorkbenchNavigator;
 class QnTimeSlider;
 class QnTimeScrollBar;
 
@@ -17,14 +16,16 @@ class QnNavigationItem : public QnSimpleFrameWidget {
     typedef QnSimpleFrameWidget base_type;
 
 public:
-    explicit QnNavigationItem(QnWorkbenchNavigator *navigator, QGraphicsItem *parent = NULL);
+    explicit QnNavigationItem(QGraphicsItem *parent = NULL);
     ~QnNavigationItem();
 
-    QnWorkbenchNavigator *navigator() const {
-        return m_navigator;
+    QnTimeSlider *timeSlider() const {
+        return m_timeSlider;
     }
 
-    inline bool isPlaying() const { return m_playing; }
+    QnTimeScrollBar *timeScrollBar() const {
+        return m_timeScrollBar;
+    }
 
 public slots:
     void setMute(bool mute);
@@ -79,8 +80,6 @@ private:
     QnTimeScrollBar *m_timeScrollBar;
     QnSpeedSlider *m_speedSlider;
     QnVolumeSlider *m_volumeSlider;
-
-    QnWorkbenchNavigator *m_navigator;
 
     bool m_playing;
 };
