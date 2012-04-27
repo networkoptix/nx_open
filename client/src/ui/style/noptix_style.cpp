@@ -200,119 +200,68 @@ void QnNoptixStyle::unpolish(QWidget *widget) {
 }
 
 bool QnNoptixStyle::scrollBarSubControlRect(const QStyleOptionComplex *option, SubControl subControl, const QWidget *widget, QRect *result) const {
-    const QStyleOptionSlider *scrollbar = qstyleoption_cast<const QStyleOptionSlider *>(option);
-    if(!scrollbar)
+    const QStyleOptionSlider *sliderOption = qstyleoption_cast<const QStyleOptionSlider *>(option);
+    if(!sliderOption)
         return false;
 
-    QRect &ret = *result;
-    const QRect &RECT = option->rect;
+    int sliderWidth = proxy()->pixelMetric(PM_ScrollBarExtent, sliderOption, widget);
 
-    const int ScrollBarSliderMin = 0;
-
-    bool showButtons = false;
-    bool groove = false;
-#define F(x) x
-
-    int sbextent = proxy()->pixelMetric(PM_ScrollBarExtent, scrollbar, widget);
-    int buttonSpace = showButtons * sbextent * 2;
     bool needSlider = false;
-
-    switch (subControl)
-    {
-    case SC_ScrollBarGroove:
-        {
-            ret = RECT;
-            int off = 0, d = 0;
-            if (scrollbar->orientation == Qt::Horizontal)
-            {
-                if (groove)
-                { off = F(2); d = RECT.height() / 3; }
-                ret.adjust(off, d, -(buttonSpace + off), -d);
-            }
-            else
-            {
-                if (groove)
-                { off = F(2); d = RECT.width() / 3; }
-                ret.adjust(d, off, -d, -(buttonSpace + off));
-            }
-            break;
-        }
-        // top/left button
-    case SC_ScrollBarSubLine:
-        // bottom/right button
-    case SC_ScrollBarAddLine:
-        {
-            const int f = 1 + (subControl == SC_ScrollBarSubLine);
-            if (!showButtons)
-                ret = QRect();
-            else if (scrollbar->orientation == Qt::Horizontal)
-            {
-                const int buttonWidth = qMin(RECT.width() / 2, sbextent);
-                ret.setRect(RECT.right() + 1 - f*buttonWidth, RECT.y(), buttonWidth, sbextent);
-            }
-            else
-            {
-                const int buttonHeight = qMin(scrollbar->rect.height() / 2, sbextent);
-                ret.setRect(RECT.x(), RECT.bottom() + 1 - f*buttonHeight, sbextent, buttonHeight);
-            }
-            break;
-        }
+    switch (subControl) {
+    case SC_ScrollBarGroove: 
+        *result = option->rect;
+        break;
+    case SC_ScrollBarSubLine: /* Top / left button. */
+    case SC_ScrollBarAddLine: /* Bottom / right button. */
+        *result = QRect();
+        break;
     default:
-        needSlider = true; break;
+        needSlider = true; 
+        break;
     }
-    if (needSlider)
-    {
-        const uint range = scrollbar->maximum - scrollbar->minimum;
-        const int maxlen = ((scrollbar->orientation == Qt::Horizontal) ? RECT.width() : RECT.height()) - buttonSpace;
-        int sliderlen = maxlen;
-        // calculate slider length
-        if (scrollbar->maximum != scrollbar->minimum)
-        {
-            sliderlen = (static_cast<qint64>(maxlen) * scrollbar->pageStep) / (range + scrollbar->pageStep);
-            if (sliderlen > maxlen)
-                sliderlen = maxlen;
-            else
-            {
-                const int slidermin = ScrollBarSliderMin;
-                if (sliderlen < slidermin || range > INT_MAX / 2)
-                    sliderlen = slidermin;
+
+    if (needSlider) {
+        int range = sliderOption->maximum - sliderOption->minimum;
+        int grooveLength = (sliderOption->orientation == Qt::Horizontal) ? option->rect.width() : option->rect.height();
+        
+        int sliderLength = grooveLength;
+        if (sliderOption->maximum != sliderOption->minimum) {
+            sliderLength = (static_cast<qint64>(grooveLength) * sliderOption->pageStep) / (range + sliderOption->pageStep);
+            if (sliderLength > grooveLength) {
+                sliderLength = grooveLength;
+            } else {
+                int minimalLength = proxy()->pixelMetric(PM_ScrollBarSliderMin, sliderOption, widget);;
+                if (sliderLength < minimalLength)
+                    sliderLength = minimalLength;
             }
         }
 
-        const int sliderstart = sliderPositionFromValue(scrollbar->minimum, scrollbar->maximum,
-            scrollbar->sliderPosition, maxlen - sliderlen,
-            scrollbar->upsideDown);
-        switch (subControl)
-        {
-            // between top/left button and slider
-        case SC_ScrollBarSubPage:
-            if (scrollbar->orientation == Qt::Horizontal)
-                ret.setRect(RECT.x() + F(2), RECT.y(), sliderstart, sbextent);
+        int sliderStart = sliderPositionFromValue(sliderOption->minimum, sliderOption->maximum, sliderOption->sliderPosition, grooveLength - sliderLength, sliderOption->upsideDown);
+        switch (subControl) {
+        case SC_ScrollBarSubPage: /* Between top / left button and slider. */
+            if (sliderOption->orientation == Qt::Horizontal)
+                *result = QRect(option->rect.x() + 2, option->rect.y(), sliderStart, sliderWidth);
             else
-                ret.setRect(RECT.x(), RECT.y() + F(2), sbextent, sliderstart);
+                *result = QRect(option->rect.x(), option->rect.y() + 2, sliderWidth, sliderStart);
             break;
-            // between bottom/right button and slider
-        case SC_ScrollBarAddPage:
-            if (scrollbar->orientation == Qt::Horizontal)
-                ret.setRect(RECT.x() + sliderstart + sliderlen - F(2), RECT.y(),
-                maxlen - (sliderstart + sliderlen), sbextent);
+        case SC_ScrollBarAddPage: /* Between bottom / right button and slider. */
+            if (sliderOption->orientation == Qt::Horizontal)
+                *result = QRect(option->rect.x() + sliderStart + sliderLength - 2, option->rect.y(), grooveLength - (sliderStart + sliderLength), sliderWidth);
             else
-                ret.setRect(RECT.x(), RECT.y() + sliderstart + sliderlen - F(3),
-                sbextent, maxlen - (sliderstart + sliderlen));
+                *result = QRect(option->rect.x(), option->rect.y() + sliderStart + sliderLength - 3, sliderWidth, grooveLength - (sliderStart + sliderLength));
             break;
         case SC_ScrollBarSlider:
-            if (scrollbar->orientation == Qt::Horizontal)
-                ret.setRect(RECT.x() + sliderstart, RECT.y(), sliderlen, sbextent);
+            if (sliderOption->orientation == Qt::Horizontal)
+                *result = QRect(option->rect.x() + sliderStart, option->rect.y(), sliderLength, sliderWidth);
             else
-                ret.setRect(RECT.x(), RECT.y() + sliderstart, sbextent, sliderlen + F(1) );
+                *result = QRect(option->rect.x(), option->rect.y() + sliderStart, sliderWidth, sliderLength + 1);
             break;
         default:
             break;
         }
     }
 
-    ret = visualRect(scrollbar->direction, RECT, ret);
-
+    *result = visualRect(sliderOption->direction, option->rect, *result);
     return true;
 }
 
