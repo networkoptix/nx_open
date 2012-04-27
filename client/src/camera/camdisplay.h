@@ -189,6 +189,7 @@ protected:
     static qint64 m_lastQualitySwitchTime;
     bool m_executingChangeSpeed;
     bool m_eofSignalSended;
+    bool m_lastLiveIsLowQuality;
 };
 
 #endif //clcam_display_h_1211

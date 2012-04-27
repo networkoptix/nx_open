@@ -114,7 +114,8 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_isStillImage(false),
       m_isLongWaiting(false),
       m_executingChangeSpeed(false),
-      m_eofSignalSended(false)
+      m_eofSignalSended(false),
+      m_lastLiveIsLowQuality(false)
 {
     m_storedMaxQueueSize = m_dataQueue.maxSize();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
@@ -199,8 +200,18 @@ bool CLCamDisplay::canSwitchToHighQuality()
 }
 void CLCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime)
 {
-    if (vd->flags & QnAbstractMediaData::MediaFlags_LIVE)
+    if (vd->flags & QnAbstractMediaData::MediaFlags_LIVE) 
+    {
+        bool isLow = vd->flags & QnAbstractMediaData::MediaFlags_LowQuality;
+        if (m_lastLiveIsLowQuality && !isLow)
+            m_hiQualityRetryCounter++; 
+        m_lastLiveIsLowQuality = isLow;
         return;
+    }
+    else {
+        m_lastLiveIsLowQuality = false;
+    }
+
     if (vd->flags & QnAbstractMediaData::MediaFlags_Ignore)
         return;
 
