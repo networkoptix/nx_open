@@ -1,4 +1,4 @@
-#include "navigationitem.h"
+#include "navigation_item.h"
 
 #include <QEvent>
 #include <QCoreApplication>
@@ -16,8 +16,8 @@
 
 #include "ui/style/skin.h"
 #include "ui/graphics/items/standard/graphics_label.h"
-#include "ui/graphics/items/controls/speedslider.h"
-#include "ui/graphics/items/controls/volumeslider.h"
+#include "ui/graphics/items/controls/speed_slider.h"
+#include "ui/graphics/items/controls/volume_slider.h"
 #include "ui/graphics/items/controls/tool_tip_item.h"
 #include "ui/graphics/items/image_button_widget.h"
 

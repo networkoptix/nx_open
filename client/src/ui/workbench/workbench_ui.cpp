@@ -43,7 +43,7 @@
 #include <ui/graphics/items/clickable_widget.h>
 #include <ui/graphics/items/simple_frame_widget.h>
 #include <ui/graphics/items/standard/graphics_label.h>
-#include <ui/graphics/items/controls/navigationitem.h>
+#include <ui/graphics/items/controls/navigation_item.h>
 
 #include <ui/processors/hover_processor.h>
 
