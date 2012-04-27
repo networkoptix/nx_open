@@ -107,7 +107,7 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_executingJump(0),
       skipPrevJumpSignal(0),
       m_processedPackets(0),
-      m_toLowQSpeed(1000.0),
+      m_toLowQSpeed(1.0),
       m_delayedFrameCnt(0),
       m_emptyPacketCounter(0),
       m_hiQualityRetryCounter(0),
@@ -185,8 +185,11 @@ void CLCamDisplay::hurryUpCheck(QnCompressedVideoDataPtr vd, float speed, qint64
 }
 
 
-bool CLCamDisplay::canSwitchQuality()
+bool CLCamDisplay::canSwitchToHighQuality()
 {
+    if (m_hiQualityRetryCounter >= HIGH_QUALITY_RETRY_COUNTER)
+        return true;
+
     QMutexLocker lock(&m_qualityMutex);
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
     if (currentTime - m_lastQualitySwitchTime < QUALITY_SWITCH_INTERVAL)
@@ -227,13 +230,10 @@ void CLCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float spee
                 {
                     reader->setQuality(MEDIA_Quality_High, true); // speed decreased, try to Hi quality again
                 }
-                //else if(qAbs(speed) < 1.0 + FPS_EPS && m_toLowQTimer.elapsed() >= TRY_HIGH_QUALITY_INTERVAL)
-                else if(qAbs(speed) < 1.0 + FPS_EPS && m_hiQualityRetryCounter < HIGH_QUALITY_RETRY_COUNTER)
+                else if(qAbs(speed) < 1.0 + FPS_EPS && canSwitchToHighQuality())
                 {
-                    if (canSwitchQuality()) {
-                        reader->setQuality(MEDIA_Quality_High, false); // speed decreased, try to Hi quality now
-                        m_hiQualityRetryCounter++;
-                    }
+                    reader->setQuality(MEDIA_Quality_High, false); 
+                    m_hiQualityRetryCounter++;
                 }
             }
         }
