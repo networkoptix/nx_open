@@ -38,6 +38,10 @@ public:
 
     int asyncRecordedTimePeriods(const QnNetworkResourceList& list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, QList<QRegion> motionRegions, QObject *target, const char *slot);
 
+    static void setProxyAddr(const QString& addr, int port);
+    static int getProxyPort() { return m_proxyPort; }
+    static QString getProxyHost() { return m_proxyAddr; }
+
 private:
     int recordedTimePeriods(const QnRequestParamList& params, QnTimePeriodList& timePeriodList, QByteArray& errorString);
 
@@ -48,6 +52,8 @@ protected:
 
 private:
     QUrl m_url;
+    static QString m_proxyAddr;
+    static int m_proxyPort;
 };
 
 typedef QSharedPointer<QnVideoServerConnection> QnVideoServerConnectionPtr;

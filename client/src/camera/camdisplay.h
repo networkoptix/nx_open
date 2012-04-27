@@ -101,7 +101,7 @@ private:
     void hurryUpCheck(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime);
     void hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime);
     void hurryUpCheckForLocalFile(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime);
-    bool canSwitchQuality();
+    bool canSwitchToHighQuality();
     void resetQualityStatistics();
     qint64 getMinReverseTime() const;
 
@@ -189,6 +189,7 @@ protected:
     static qint64 m_lastQualitySwitchTime;
     bool m_executingChangeSpeed;
     bool m_eofSignalSended;
+    bool m_lastLiveIsLowQuality;
 };
 
 #endif //clcam_display_h_1211

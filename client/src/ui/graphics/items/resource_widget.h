@@ -253,7 +253,7 @@ public:
      */
     QList<QRegion> motionSelection() const;
 
-    bool addToMotionRegion(int sens, const QRect& rect, int channel);
+    void addToMotionRegion(int sens, const QRect& rect, int channel);
 
     void clearMotionRegions();
 

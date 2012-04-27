@@ -455,9 +455,12 @@ void QnResourceWidget::invalidateMotionMask() {
     m_motionMaskValid = false;
 }
 
-bool QnResourceWidget::addToMotionRegion(int sens, const QRect& rect, int channel) {
+void QnResourceWidget::addToMotionRegion(int sens, const QRect& rect, int channel) {
     ensureMotionMask();
 
+    m_motionRegionList[channel].addRect(sens, rect);
+
+    /*
     QnMotionRegion newRegion = m_motionRegionList[channel];
     newRegion.addRect(sens, rect);
     if (newRegion.isValid()) 
@@ -466,13 +469,12 @@ bool QnResourceWidget::addToMotionRegion(int sens, const QRect& rect, int channe
         invalidateMotionMaskBinData();
     }
     return newRegion.isValid();
+    */
 }
 
 void QnResourceWidget::clearMotionRegions() {
-    int maxCnt = m_motionRegionList[0].getMaxRectCount();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
         m_motionRegionList[i] = QnMotionRegion();
-        m_motionRegionList[i].setMaxRectCount(maxCnt);
     }
     m_motionMaskValid = true;
 

@@ -232,6 +232,18 @@ int QnSecurityCamResource::motionWindowCnt() const
     return 0;
 }
 
+int QnSecurityCamResource::motionMaskWindowCnt() const
+{
+    QVariant val;
+    QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
+    if (this_casted->getParam("motionMaskWindowCnt", val, QnDomainMemory))
+    {
+        return val.toInt();
+    }
+    return 0;
+}
+
+
 MotionTypeFlags QnSecurityCamResource::supportedMotionType() const
 {
     QVariant val;

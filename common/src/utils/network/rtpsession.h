@@ -102,7 +102,7 @@ public:
     void setAuth(const QAuthenticator& auth);
     QAuthenticator getAuth() const;
 
-    void setProxyAddr(const QHostAddress& addr, int port);
+    void setProxyAddr(const QString& addr, int port);
 
 signals:
     void gotTextResponse(QByteArray text);
@@ -159,7 +159,7 @@ private:
     QMap<QByteArray, QByteArray> m_additionAttrs;
     int m_tcpTimeout;
     QAuthenticator m_auth;
-    QHostAddress m_proxyAddr;
+    QString m_proxyAddr;
     int m_proxyPort;
 };
 

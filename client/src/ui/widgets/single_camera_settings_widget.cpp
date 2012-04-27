@@ -54,7 +54,22 @@ void QnSingleCameraSettingsWidget::at_motionSensitivityChanged(int value)
 void QnSingleCameraSettingsWidget::at_motionTypeChanged()
 {
     at_dataChanged();
-    updateMaxMotionRect();
+    if (m_camera && m_motionWidget)
+        m_motionWidget->setNeedControlMaxRects(!ui->softwareMotionButton->isChecked());
+    if (ui->softwareMotionButton->isChecked())
+    {
+        float maxFps = m_camera->getMaxFps()-2;
+        float currentMaxFps = ui->cameraScheduleWidget->getGridMaxFps();
+        if (currentMaxFps > maxFps)
+        {
+            QMessageBox::warning(this, tr("Too big fps"), 
+                tr("For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps dropped down to %2").arg(currentMaxFps).arg(maxFps));
+        }
+        ui->cameraScheduleWidget->setMaxFps(maxFps);
+    }
+    else {
+        ui->cameraScheduleWidget->setMaxFps(m_camera->getMaxFps());
+    }
 }
 
 void QnSingleCameraSettingsWidget::at_motionSelectionCleared()
@@ -96,7 +111,11 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
         if(m_motionWidget) 
             m_motionWidget->setCamera(m_camera);
         ui->cameraMotionButton->setChecked(m_camera->getMotionType() != MT_SoftwareGrid);
-        updateMaxMotionRect();
+        ui->softwareMotionButton->setChecked(m_camera->getMotionType() == MT_SoftwareGrid);
+        //updateMaxMotionRect();
+        if (m_camera && m_motionWidget)
+            m_motionWidget->setNeedControlMaxRects(!ui->softwareMotionButton->isChecked());
+
 
         /*
         if (m_camera->getParam("motionEditURL", val, QnDomainMemory))
@@ -228,7 +247,10 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         ui->loginEdit->setText(m_camera->getAuth().user());
         ui->passwordEdit->setText(m_camera->getAuth().password());
 
-        ui->cameraScheduleWidget->setMaxFps(m_camera->getMaxFps());
+        if (ui->softwareMotionButton->isChecked())
+            ui->cameraScheduleWidget->setMaxFps(m_camera->getMaxFps()-2);
+        else
+            ui->cameraScheduleWidget->setMaxFps(m_camera->getMaxFps());
 
         QList<QnScheduleTask::Data> scheduleTasks;
         foreach (const QnScheduleTask& scheduleTaskData, m_camera->getScheduleTasks())
@@ -306,14 +328,4 @@ void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleTasksChanged(
     at_dataChanged();
 
     m_hasScheduleChanges = true;
-}
-
-void QnSingleCameraSettingsWidget::updateMaxMotionRect()
-{
-    if (m_camera && m_motionWidget) {
-        if (ui->softwareMotionButton->isChecked())
-            m_motionWidget->setMaxMotionRects(INT_MAX);
-        else
-            m_motionWidget->setMaxMotionRects(m_camera->motionWindowCnt());
-    }
 }

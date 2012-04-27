@@ -36,7 +36,8 @@ namespace {
 
 QnCameraMotionMaskWidget::QnCameraMotionMaskWidget(QWidget *parent): 
     QWidget(parent),
-    m_readOnly(false)
+    m_readOnly(false),
+    m_needControlMaxRects(false)
 {
 	init();
 }
@@ -204,11 +205,15 @@ void QnCameraMotionMaskWidget::at_motionRegionSelected(QGraphicsView *, QnResour
 
         if (!r.isEmpty()) 
         {
-            if (widget->addToMotionRegion(m_motionSensitivity, r, i)) {
+            QnMotionRegion newRegion = widget->getMotionRegionList()[i];
+            newRegion.addRect(m_motionSensitivity, r);
+            if (!m_needControlMaxRects || newRegion.isValid(m_camera->motionWindowCnt(), m_camera->motionMaskWindowCnt())) 
+            {
+                widget->addToMotionRegion(m_motionSensitivity, r, i);
                 changed = true;
             }
             else {
-                showToManyWindowsMessage();
+                showToManyWindowsMessage(newRegion);
             }
         }
     }
@@ -236,20 +241,20 @@ void QnCameraMotionMaskWidget::at_motionRegionCleared()
         emit motionRegionListChanged();
 }
 
-void QnCameraMotionMaskWidget::setMaxMotionRects(int value)
+void QnCameraMotionMaskWidget::setNeedControlMaxRects(bool value)
 {
-    bool needShowError = false;
-    if (m_resourceWidget) {
+    m_needControlMaxRects = value;
+    if (m_resourceWidget && m_needControlMaxRects) 
+    {
         QList<QnMotionRegion>& regions = m_resourceWidget->getMotionRegionList();
         for (int i = 0; i < regions.size(); ++i) {
-            regions[i].setMaxRectCount(value);
-            if (!regions[i].isValid())
-                needShowError = true;
+            if (!regions[i].isValid(m_camera->motionWindowCnt(), m_camera->motionMaskWindowCnt())) {
+                showToManyWindowsMessage(regions[i]);
+                break;
+            }
         }
     }
-    if (needShowError)
-        showToManyWindowsMessage();
-}
+};
 
 void QnCameraMotionMaskWidget::setMotionSensitivity(int value)
 {
@@ -288,11 +293,19 @@ void QnCameraMotionMaskWidget::at_itemClicked(QGraphicsView* view, QGraphicsItem
         emit motionRegionListChanged();
 }
 
-void QnCameraMotionMaskWidget::showToManyWindowsMessage()
+void QnCameraMotionMaskWidget::showToManyWindowsMessage(const QnMotionRegion& region)
 {
     QList<QnMotionRegion>& regions = m_resourceWidget->getMotionRegionList();
-    int maxCnt = 0;
-    for (int i = 0; i < regions.size(); ++i)
-        maxCnt = qMax(maxCnt, regions[i].getCurrentRectCount());
-    QMessageBox::warning(this, tr("Too many motion windows"), tr("Maximum amount of motion windows for current camera is %1. Now selected %2 motion windows").arg(m_camera->motionWindowCnt()).arg(maxCnt));
+
+    int maxWndCnt = region.getMotionRectCount();
+    int maxMaskCnt = region.getMaskRectCount();
+    
+    if (maxWndCnt > m_camera->motionWindowCnt()) {
+        QMessageBox::warning(this, tr("Too many motion windows"), 
+            tr("Maximum amount of motion windows for current camera is %1. Now selected %2 motion windows").arg(m_camera->motionWindowCnt()).arg(maxWndCnt));
+    }
+    else if (maxMaskCnt > m_camera->motionMaskWindowCnt()) {
+        QMessageBox::warning(this, tr("Too many motion windows"), 
+            tr("Maximum amount of motion mask windows for current camera is %1. Now selected %2 motion windows").arg(m_camera->motionMaskWindowCnt()).arg(maxMaskCnt));
+    }
 }

@@ -462,3 +462,22 @@ bool QnScheduleGridWidget::isValidColumn(int column) const {
     return column >= 0 && column < columnCount();
 }
 
+void QnScheduleGridWidget::setMaxFps(int fps)
+{
+    for (int x = 0; x < columnCount(); ++x)
+    {
+        for (int y = 0; y < rowCount(); ++y)
+            m_gridParams[x][y][FirstParam] = qMin(fps, m_gridParams[x][y][FirstParam].toInt());
+    }
+}
+
+int QnScheduleGridWidget::getMaxFps()
+{
+    int fps = 0;
+    for (int x = 0; x < columnCount(); ++x)
+    {
+        for (int y = 0; y < rowCount(); ++y)
+            fps = qMax(fps, m_gridParams[x][y][FirstParam].toInt());
+    }
+    return fps;
+}

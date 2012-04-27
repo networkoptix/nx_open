@@ -198,7 +198,7 @@ bool RTPSession::open(const QString& url)
     if (m_proxyPort == 0)
         rez = m_tcpSock.connect(mUrl.host(), mUrl.port(DEFAULT_RTP_PORT));
     else
-        rez = m_tcpSock.connect(m_proxyAddr.toString(), m_proxyPort);
+        rez = m_tcpSock.connect(m_proxyAddr, m_proxyPort);
 
     if (!rez)
         return false;
@@ -1003,7 +1003,7 @@ QAuthenticator RTPSession::getAuth() const
     return m_auth;
 }
 
-void RTPSession::setProxyAddr(const QHostAddress& addr, int port)
+void RTPSession::setProxyAddr(const QString& addr, int port)
 {
     m_proxyAddr = addr;
     m_proxyPort = port;

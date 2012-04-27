@@ -42,6 +42,8 @@ public:
 
     void determineOptimalNetIF();
     void setPrimaryIF(const QString& primaryIF);
+signals:
+    void serverIFFound(QString);
 private:
     QnVideoServerConnectionPtr m_restConnection;
     QString m_apiUrl;

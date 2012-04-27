@@ -13,6 +13,10 @@
 
 static const int MAX_RTP_BUFFER_SIZE = 65535;
 
+QString QnRtspClientArchiveDelegate::m_proxyAddr;
+int QnRtspClientArchiveDelegate::m_proxyPort = 0;
+
+
 QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate():
     QnAbstractArchiveDelegate(),
     m_tcpMode(true),
@@ -35,6 +39,12 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate():
     m_rtpDataBuffer = new quint8[MAX_RTP_BUFFER_SIZE];
     m_flags |= Flag_SlowSource;
     m_flags |= Flag_CanProcessNegativeSpeed;
+}
+
+void QnRtspClientArchiveDelegate::setProxyAddr(const QString& addr, int port)
+{
+    m_proxyAddr = addr;
+    m_proxyPort = port;
 }
 
 QnRtspClientArchiveDelegate::~QnRtspClientArchiveDelegate()
@@ -103,6 +113,7 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(QnResourcePtr re
         }
         QnResourcePtr otherCamera = qnResPool->getResourceByUniqId(mac + otherVideoServer->getId().toString());
         RTPSession otherRtspSession;
+        otherRtspSession.setProxyAddr(m_proxyAddr, m_proxyPort);
         if (otherRtspSession.open(getUrl(otherCamera)))
         {
             if (otherRtspSession.startTime() != AV_NOPTS_VALUE)
@@ -152,6 +163,7 @@ bool QnRtspClientArchiveDelegate::open(QnResourcePtr resource)
 
     m_rtspSession.setTransport("TCP");
 
+    m_rtspSession.setProxyAddr(m_proxyAddr, m_proxyPort);
     if (m_rtspSession.open(getUrl(resource))) 
     {
         qint64 globalMinTime = checkMinTimeFromOtherServer(resource);
