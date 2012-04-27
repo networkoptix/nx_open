@@ -29,11 +29,7 @@ public:
     /* 
     * Returns false if any region in range [1..MAX] contain too many rects (> maxRectCount). For motionMask region (index 0) no any limits.
     */
-    bool isValid() const;
-
-    void setMaxRectCount(int value);
-    int getMaxRectCount() const;
-    int getCurrentRectCount() const;
+    bool isValid(int maxMotionRects, int maxMaskRects) const;
 
     bool operator==(const QnMotionRegion& other) const;
     bool operator!=(const QnMotionRegion& other) const;
@@ -50,9 +46,12 @@ public:
     QVector<QRect> getRectsBySens(int value) const;
 
     bool updateSensitivityAt(const QPoint& pos, int sens);
+
+    int getMotionRectCount() const;
+    int getMaskRectCount() const;
+
 private:
     QRegion m_data[MAX_SENSITIVITY - MIN_SENSITIVITY+1];
-    int m_maxRects;
 };
 
 
