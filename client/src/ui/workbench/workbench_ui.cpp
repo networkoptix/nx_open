@@ -2,18 +2,16 @@
 #include <cassert>
 #include <cmath> /* For std::floor. */
 
-#include <QGraphicsScene>
-#include <QGraphicsView>
-#include <QGraphicsProxyWidget>
-#include <QGraphicsLinearLayout>
-#include <QStyle>
-#include <QApplication>
-#include <QFileDialog>
-#include <QProgressDialog>
-#include <QMessageBox>
-#include <QSettings>
-#include <QMenu>
-#include <QLabel>
+#include <QtCore/QSettings>
+#include <QtCore/QTimer>
+
+#include <QtGui/QGraphicsScene>
+#include <QtGui/QGraphicsView>
+#include <QtGui/QGraphicsProxyWidget>
+#include <QtGui/QGraphicsLinearLayout>
+#include <QtGui/QStyle>
+#include <QtGui/QApplication>
+#include <QtGui/QMenu>
 
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
@@ -121,11 +119,10 @@ namespace {
 } // anonymous namespace
 
 
-QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
+QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     QObject(parent),
-    QnWorkbenchContextAware(display->context()),
-    m_display(display),
-    m_manager(display->instrumentManager()),
+    QnWorkbenchContextAware(parent),
+    m_manager(display()->instrumentManager()),
     m_treePinned(false),
     m_inactive(false),
     m_titleUsed(false),
@@ -149,8 +146,8 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_uiElementsInstrument = new UiElementsInstrument(this);
     m_controlsActivityInstrument = new ActivityListenerInstrument(hideConstrolsTimeoutMSec, this);
 
-    m_manager->installInstrument(m_uiElementsInstrument, InstallationMode::InstallBefore, m_display->paintForwardingInstrument());
-    m_manager->installInstrument(m_fpsCountingInstrument, InstallationMode::InstallBefore, m_display->paintForwardingInstrument());
+    m_manager->installInstrument(m_uiElementsInstrument, InstallationMode::InstallBefore, display()->paintForwardingInstrument());
+    m_manager->installInstrument(m_fpsCountingInstrument, InstallationMode::InstallBefore, display()->paintForwardingInstrument());
     m_manager->installInstrument(m_controlsActivityInstrument);
 
     connect(m_controlsActivityInstrument, SIGNAL(activityStopped()),                                                                this,                           SLOT(at_activityStopped()));
@@ -159,7 +156,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
 
     /* Create controls. */
     m_controlsWidget = m_uiElementsInstrument->widget(); /* Setting an ItemIsPanel flag on this item prevents focusing on graphics widgets. Don't set it. */
-    m_display->setLayer(m_controlsWidget, Qn::UiLayer);
+    display()->setLayer(m_controlsWidget, Qn::UiLayer);
 
     QnSingleEventSignalizer *deactivationSignalizer = new QnSingleEventSignalizer(this);
     deactivationSignalizer->setEventType(QEvent::WindowDeactivate);
@@ -181,7 +178,7 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
         m_fpsItem->setPalette(palette);
     }
 
-    m_display->view()->addAction(action(Qn::ShowFpsAction));
+    display()->view()->addAction(action(Qn::ShowFpsAction));
     connect(action(Qn::ShowFpsAction),  SIGNAL(toggled(bool)),                                                                      this,                           SLOT(setFpsVisible(bool)));
     connect(m_fpsItem,                  SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_fpsItem_geometryChanged()));
     setFpsVisible(false);
@@ -249,14 +246,14 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_treeShowingProcessor->setHoverEnterDelay(250);
 
     m_treeXAnimator = new VariantAnimator(this);
-    m_treeXAnimator->setTimer(display->animationInstrument()->animationTimer());
+    m_treeXAnimator->setTimer(display()->animationInstrument()->animationTimer());
     m_treeXAnimator->setTargetObject(m_treeItem);
     m_treeXAnimator->setAccessor(new PropertyAccessor("x"));
     m_treeXAnimator->setSpeed(m_treeItem->size().width() * 2.0);
     m_treeXAnimator->setTimeLimit(500);
 
     m_treeOpacityAnimatorGroup = new AnimatorGroup(this);
-    m_treeOpacityAnimatorGroup->setTimer(display->animationInstrument()->animationTimer());
+    m_treeOpacityAnimatorGroup->setTimer(display()->animationInstrument()->animationTimer());
     m_treeOpacityAnimatorGroup->addAnimator(opacityAnimator(m_treeItem));
     m_treeOpacityAnimatorGroup->addAnimator(opacityAnimator(m_treeBackgroundItem)); /* Speed of 1.0 is OK here. */
     m_treeOpacityAnimatorGroup->addAnimator(opacityAnimator(m_treeShowButton));
@@ -353,14 +350,14 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_titleOpacityProcessor->addTargetItem(m_titleShowButton);
 
     m_titleYAnimator = new VariantAnimator(this);
-    m_titleYAnimator->setTimer(display->animationInstrument()->animationTimer());
+    m_titleYAnimator->setTimer(display()->animationInstrument()->animationTimer());
     m_titleYAnimator->setTargetObject(m_titleItem);
     m_titleYAnimator->setAccessor(new PropertyAccessor("y"));
     m_titleYAnimator->setSpeed(m_titleItem->size().height() * 2.0);
     m_titleYAnimator->setTimeLimit(500);
 
     m_titleOpacityAnimatorGroup = new AnimatorGroup(this);
-    m_titleOpacityAnimatorGroup->setTimer(display->animationInstrument()->animationTimer());
+    m_titleOpacityAnimatorGroup->setTimer(display()->animationInstrument()->animationTimer());
     m_titleOpacityAnimatorGroup->addAnimator(opacityAnimator(m_titleItem));
     m_titleOpacityAnimatorGroup->addAnimator(opacityAnimator(m_titleBackgroundItem)); /* Speed of 1.0 is OK here. */
     m_titleOpacityAnimatorGroup->addAnimator(opacityAnimator(m_titleShowButton));
@@ -435,14 +432,14 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_helpShowingProcessor->setHoverEnterDelay(250);
 
     m_helpXAnimator = new VariantAnimator(this);
-    m_helpXAnimator->setTimer(display->animationInstrument()->animationTimer());
+    m_helpXAnimator->setTimer(display()->animationInstrument()->animationTimer());
     m_helpXAnimator->setTargetObject(m_helpItem);
     m_helpXAnimator->setAccessor(new PropertyAccessor("x"));
     m_helpXAnimator->setSpeed(m_helpItem->size().width() * 2.0);
     m_helpXAnimator->setTimeLimit(500);
 
     m_helpOpacityAnimatorGroup = new AnimatorGroup(this);
-    m_helpOpacityAnimatorGroup->setTimer(display->animationInstrument()->animationTimer());
+    m_helpOpacityAnimatorGroup->setTimer(display()->animationInstrument()->animationTimer());
     m_helpOpacityAnimatorGroup->addAnimator(opacityAnimator(m_helpItem));
     m_helpOpacityAnimatorGroup->addAnimator(opacityAnimator(m_helpBackgroundItem)); /* Speed of 1.0 is OK here. */
     m_helpOpacityAnimatorGroup->addAnimator(opacityAnimator(m_helpShowButton));
@@ -479,21 +476,16 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_sliderOpacityProcessor->addTargetItem(m_sliderShowButton);
 
     m_sliderYAnimator = new VariantAnimator(this);
-    m_sliderYAnimator->setTimer(display->animationInstrument()->animationTimer());
+    m_sliderYAnimator->setTimer(display()->animationInstrument()->animationTimer());
     m_sliderYAnimator->setTargetObject(m_sliderItem);
     m_sliderYAnimator->setAccessor(new PropertyAccessor("y"));
     m_sliderYAnimator->setSpeed(m_sliderItem->size().height() * 2.0);
     m_sliderYAnimator->setTimeLimit(500);
 
     m_sliderOpacityAnimatorGroup = new AnimatorGroup(this);
-    m_sliderOpacityAnimatorGroup->setTimer(display->animationInstrument()->animationTimer());
+    m_sliderOpacityAnimatorGroup->setTimer(display()->animationInstrument()->animationTimer());
     m_sliderOpacityAnimatorGroup->addAnimator(opacityAnimator(m_sliderItem));
     m_sliderOpacityAnimatorGroup->addAnimator(opacityAnimator(m_sliderShowButton)); /* Speed of 1.0 is OK here. */
-
-    m_navigator = new QnWorkbenchNavigator(this);
-    m_navigator->setDisplay(display);
-    m_navigator->setTimeSlider(m_sliderItem->timeSlider());
-    m_navigator->setTimeScrollBar(m_sliderItem->timeScrollBar());
 
     connect(m_sliderShowButton,         SIGNAL(toggled(bool)),                                                                      this,                           SLOT(at_sliderShowButton_toggled(bool)));
     connect(m_sliderOpacityProcessor,   SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateSliderOpacity()));
@@ -501,18 +493,18 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     connect(m_sliderOpacityProcessor,   SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateControlsVisibility()));
     connect(m_sliderOpacityProcessor,   SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateControlsVisibility()));
     connect(m_sliderItem,               SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_sliderItem_geometryChanged()));
-    connect(m_navigator,                SIGNAL(currentWidgetChanged()),                                                             this,                           SLOT(updateControlsVisibility()));
+    connect(m_sliderItem->navigator(),  SIGNAL(currentWidgetChanged()),                                                             this,                           SLOT(updateControlsVisibility()));
 
 
     /* Connect to display. */
-    display->view()->addAction(action(Qn::FreespaceAction));
+    display()->view()->addAction(action(Qn::FreespaceAction));
     connect(action(Qn::FreespaceAction),SIGNAL(triggered()),                                                                        this,                           SLOT(at_freespaceAction_triggered()));
     connect(action(Qn::FullscreenAction),SIGNAL(triggered()),                                                                       this,                           SLOT(at_fullscreenAction_triggered()));
-    connect(m_display,                  SIGNAL(viewportGrabbed()),                                                                  this,                           SLOT(disableProxyUpdates()));
-    connect(m_display,                  SIGNAL(viewportUngrabbed()),                                                                this,                           SLOT(enableProxyUpdates()));
-    connect(m_display,                  SIGNAL(widgetChanged(Qn::ItemRole)),                                                        this,                           SLOT(at_display_widgetChanged(Qn::ItemRole)));
-    connect(m_display,                  SIGNAL(widgetAdded(QnResourceWidget *)),                                                    this,                           SLOT(at_display_widgetAdded(QnResourceWidget *)));
-    connect(m_display,                  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),                                         this,                           SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
+    connect(display(),                  SIGNAL(viewportGrabbed()),                                                                  this,                           SLOT(disableProxyUpdates()));
+    connect(display(),                  SIGNAL(viewportUngrabbed()),                                                                this,                           SLOT(enableProxyUpdates()));
+    connect(display(),                  SIGNAL(widgetChanged(Qn::ItemRole)),                                                        this,                           SLOT(at_display_widgetChanged(Qn::ItemRole)));
+    connect(display(),                  SIGNAL(widgetAdded(QnResourceWidget *)),                                                    this,                           SLOT(at_display_widgetAdded(QnResourceWidget *)));
+    connect(display(),                  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),                                         this,                           SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
 
 
     /* Init fields. */
@@ -532,12 +524,12 @@ QnWorkbenchUi::QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent):
     m_treePinButton->setChecked(true);
 
     /* Set up title D&D. */
-    DropInstrument *dropInstrument = new DropInstrument(true, display->context(), this);
-    display->instrumentManager()->installInstrument(dropInstrument);
+    DropInstrument *dropInstrument = new DropInstrument(true, context(), this);
+    display()->instrumentManager()->installInstrument(dropInstrument);
     dropInstrument->setSurface(m_titleBackgroundItem);
 
     /* Set up help context processing. */
-    QnWorkbenchMotionDisplayWatcher *motionDisplayWatcher = new QnWorkbenchMotionDisplayWatcher(display, this);
+    QnWorkbenchMotionDisplayWatcher *motionDisplayWatcher = new QnWorkbenchMotionDisplayWatcher(display(), this);
     connect(m_sliderOpacityProcessor,   SIGNAL(focusEntered()),                                                                     this,                           SLOT(updateHelpContext()));
     connect(m_sliderOpacityProcessor,   SIGNAL(focusLeft()),                                                                        this,                           SLOT(updateHelpContext()));
     connect(m_treeOpacityProcessor,     SIGNAL(focusEntered()),                                                                     this,                           SLOT(updateHelpContext()));
@@ -581,16 +573,12 @@ QVariant QnWorkbenchUi::currentTarget(Qn::ActionScope scope) const {
     case Qn::TreeScope:
         return m_treeWidget->currentTarget(scope);
     case Qn::SliderScope:
-        return QVariant::fromValue(m_navigator->currentWidget());
+        return QVariant::fromValue(m_sliderItem->navigator()->currentWidget());
     case Qn::SceneScope:
         return QVariant::fromValue(QnActionTargetTypes::widgets(display()->scene()->selectedItems()));
     default:
         return QVariant();
     }
-}
-
-QnWorkbenchDisplay *QnWorkbenchUi::display() const {
-    return m_display;
 }
 
 void QnWorkbenchUi::setTreeOpened(bool opened, bool animate) {
@@ -861,7 +849,7 @@ void QnWorkbenchUi::updateHelpOpacity(bool animate) {
 }
 
 void QnWorkbenchUi::updateControlsVisibility(bool animate) {
-    bool sliderVisible = m_navigator->currentWidget() != NULL && !m_navigator->currentWidget()->display()->isStillImage();
+    bool sliderVisible = m_sliderItem->navigator()->currentWidget() != NULL && !m_sliderItem->navigator()->currentWidget()->display()->isStillImage();
 
     if(m_inactive) {
         bool hovered = m_sliderOpacityProcessor->isHovered() || m_treeOpacityProcessor->isHovered() || m_titleOpacityProcessor->isHovered() || m_helpOpacityProcessor->isHovered();
@@ -1200,7 +1188,7 @@ void QnWorkbenchUi::at_activityStopped() {
 
     updateControlsVisibility(true);
 
-    foreach(QnResourceWidget *widget, m_display->widgets())
+    foreach(QnResourceWidget *widget, display()->widgets())
         widget->fadeOutOverlay();
 }
 
@@ -1212,7 +1200,7 @@ void QnWorkbenchUi::at_activityStarted() {
 
 void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role) {
     QnResourceWidget *oldWidget = m_widgetByRole[role];
-    QnResourceWidget *newWidget = m_display->widget(role);
+    QnResourceWidget *newWidget = display()->widget(role);
     m_widgetByRole[role] = newWidget;
 
     /* Tune activity listener instrument. */

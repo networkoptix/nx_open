@@ -1,7 +1,11 @@
 #include "camera_motion_mask_widget.h"
-#include <QVBoxLayout>
-#include <QGLWidget>
+
+#include <QtGui/QVBoxLayout>
+#include <QtGui/QGLWidget>
+#include <QtGui/QMessageBox>
+
 #include "utils/common/checked_cast.h"
+
 #include "ui/graphics/view/graphics_view.h"
 #include "ui/graphics/instruments/signaling_instrument.h"
 #include "ui/graphics/instruments/instrument_manager.h"
@@ -18,20 +22,8 @@
 #include "ui/workbench/workbench_display.h"
 #include "ui/workbench/workbench_controller.h"
 #include "ui/workbench/workbench_layout.h"
-#include "ui/style/globals.h"
 #include "ui/workbench/workbench_context.h"
-
-namespace {
-    QList<QnMotionRegion> emptyMotionRegionList() {
-        QList<QnMotionRegion> result;
-
-        for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-            result.push_back(QnMotionRegion());
-
-        return result;
-    }
-
-} // anonymous namespace
+#include "ui/style/globals.h"
 
 
 QnCameraMotionMaskWidget::QnCameraMotionMaskWidget(QWidget *parent): 
@@ -45,7 +37,6 @@ QnCameraMotionMaskWidget::QnCameraMotionMaskWidget(QWidget *parent):
 void QnCameraMotionMaskWidget::init()
 {
     m_motionSensitivity = 0;
-    //m_motionRegionList = emptyMotionRegionList();
 
     /* Set up scene & view. */
     m_scene.reset(new QGraphicsScene(this));
@@ -63,12 +54,11 @@ void QnCameraMotionMaskWidget::init()
 
     /* Set up model & control machinery. */
     m_context.reset(new QnWorkbenchContext(NULL, this));
-
-    m_display.reset(new QnWorkbenchDisplay(m_context.data()));
-    m_display->setScene(m_scene.data());
-    m_display->setView(m_view.data());
-
-    m_controller.reset(new QnWorkbenchController(m_display.data(), this));
+    
+    QnWorkbenchDisplay *display = m_context->display();
+    display->setScene(m_scene.data());
+    display->setView(m_view.data());
+    m_controller.reset(new QnWorkbenchController(display, this));
 
     /* Disable unused instruments. */
     m_controller->motionSelectionInstrument()->disable();
@@ -80,7 +70,7 @@ void QnCameraMotionMaskWidget::init()
 
     /* We need to listen to viewport resize events to make sure that our widget is always positioned at viewport's center. */
     SignalingInstrument *resizeSignalingInstrument = new SignalingInstrument(Instrument::Viewport, Instrument::makeSet(QEvent::Resize), this);
-    m_display->instrumentManager()->installInstrument(resizeSignalingInstrument);
+    display->instrumentManager()->installInstrument(resizeSignalingInstrument);
     connect(resizeSignalingInstrument, SIGNAL(activated(QWidget *, QEvent *)), this, SLOT(at_viewport_resized()));
 
     /* Create motion mask selection instrument. */
@@ -89,11 +79,11 @@ void QnCameraMotionMaskWidget::init()
     m_motionSelectionInstrument->setMultiSelectionModifiers(Qt::NoModifier);
 	m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Base, qnGlobals->motionMaskRubberBandColor());
 	m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Border, qnGlobals->motionMaskRubberBandBorderColor());
-    m_display->instrumentManager()->installInstrument(m_motionSelectionInstrument);
+    display->instrumentManager()->installInstrument(m_motionSelectionInstrument);
 
     m_clickInstrument = new ClickInstrument(Qt::LeftButton, 0, Instrument::Item, this);
     connect(m_clickInstrument,  SIGNAL(clicked(QGraphicsView*, QGraphicsItem*, const ClickInfo&)),                                  this,                           SLOT(at_itemClicked(QGraphicsView*, QGraphicsItem*, const ClickInfo&)));
-    m_display->instrumentManager()->installInstrument(m_clickInstrument);
+    display->instrumentManager()->installInstrument(m_clickInstrument);
 
     ForwardingInstrument *itemMouseForwardingInstrument = m_controller->itemMouseForwardingInstrument();
 	connect(m_motionSelectionInstrument,  SIGNAL(motionRegionSelected(QGraphicsView *, QnResourceWidget *, const QRect &)),         this,                           SLOT(at_motionRegionSelected(QGraphicsView *, QnResourceWidget *, const QRect &)));
@@ -155,7 +145,6 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
     m_context->workbench()->currentLayout()->clear();
 
     if(!m_camera) {
-        //m_motionRegionList = emptyMotionRegionList();
         m_resourceWidget = 0;
     } else {
         /* Add single item to the layout. */
@@ -166,11 +155,10 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
         m_context->workbench()->setItem(Qn::ZoomedRole, item);
 
         /* Set up the corresponding widget. */
-        m_resourceWidget = m_display->widget(item);
+        m_resourceWidget = m_context->display()->widget(item);
         m_resourceWidget->setDrawMotionWindows(QnResourceWidget::DrawAllMotionInfo);
         m_resourceWidget->setDisplayFlag(QnResourceWidget::DisplayButtons, false);
         m_resourceWidget->setDisplayFlag(QnResourceWidget::DisplayMotionGrid, true);
-        //m_resourceWidget->setMotionRegionList(m_camera->getMotionRegionList());
     }
 
     /* Consider motion mask list changed. */
@@ -181,9 +169,8 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-
 void QnCameraMotionMaskWidget::at_viewport_resized() {
-    m_display->fitInView(false);
+    m_context->display()->fitInView(false);
 }
 
 void QnCameraMotionMaskWidget::at_motionRegionSelected(QGraphicsView *, QnResourceWidget *widget, const QRect &gridRect)
@@ -213,7 +200,7 @@ void QnCameraMotionMaskWidget::at_motionRegionSelected(QGraphicsView *, QnResour
                 changed = true;
             }
             else {
-                showToManyWindowsMessage(newRegion);
+                showTooManyWindowsMessage(newRegion);
             }
         }
     }
@@ -249,7 +236,7 @@ void QnCameraMotionMaskWidget::setNeedControlMaxRects(bool value)
         QList<QnMotionRegion>& regions = m_resourceWidget->getMotionRegionList();
         for (int i = 0; i < regions.size(); ++i) {
             if (!regions[i].isValid(m_camera->motionWindowCnt(), m_camera->motionMaskWindowCnt())) {
-                showToManyWindowsMessage(regions[i]);
+                showTooManyWindowsMessage(regions[i]);
                 break;
             }
         }
@@ -266,7 +253,7 @@ void QnCameraMotionMaskWidget::clearMotion()
     at_motionRegionCleared();
 }
 
-int QnCameraMotionMaskWidget::gridPosToChannelPos(QPoint& pos)
+int QnCameraMotionMaskWidget::gridPosToChannelPos(QPoint &pos)
 {
     const QnVideoResourceLayout* layout = m_camera->getVideoLayout();
     for (int i = 0; i < layout->numberOfChannels(); ++i)
@@ -281,7 +268,7 @@ int QnCameraMotionMaskWidget::gridPosToChannelPos(QPoint& pos)
     return 0;
 }
 
-void QnCameraMotionMaskWidget::at_itemClicked(QGraphicsView* view, QGraphicsItem* item, const ClickInfo& info)
+void QnCameraMotionMaskWidget::at_itemClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info)
 {
     if (!m_resourceWidget)
         return;
@@ -293,7 +280,7 @@ void QnCameraMotionMaskWidget::at_itemClicked(QGraphicsView* view, QGraphicsItem
         emit motionRegionListChanged();
 }
 
-void QnCameraMotionMaskWidget::showToManyWindowsMessage(const QnMotionRegion& region)
+void QnCameraMotionMaskWidget::showTooManyWindowsMessage(const QnMotionRegion &region)
 {
     QList<QnMotionRegion>& regions = m_resourceWidget->getMotionRegionList();
 

@@ -66,3 +66,7 @@ QnWorkbenchLayoutSnapshotManager *QnWorkbenchContextAware::snapshotManager() con
 QnWorkbenchAccessController *QnWorkbenchContextAware::accessController() const {
     return context()->accessController();
 }
+
+QnWorkbenchDisplay *QnWorkbenchContextAware::display() const {
+    return context()->display();
+}

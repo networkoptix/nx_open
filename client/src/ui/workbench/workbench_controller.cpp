@@ -142,11 +142,10 @@ namespace {
 
 } // anonymous namespace
 
-QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObject *parent):
+QnWorkbenchController::QnWorkbenchController(QObject *parent):
     QObject(parent),
-    QnWorkbenchContextAware(display->context()),
-    m_display(display),
-    m_manager(display->instrumentManager()),
+    QnWorkbenchContextAware(parent),
+    m_manager(display()->instrumentManager()),
     m_resizedWidget(NULL),
     m_dragDelta(invalidDragDelta()),
     m_cursorPos(invalidCursorPos())
@@ -180,8 +179,8 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_resizingInstrument = new ResizingInstrument(this);
     m_dropInstrument = new DropInstrument(false, display->context(), this);
     m_dragInstrument = new DragInstrument(this);
-    BoundingInstrument *boundingInstrument = m_display->boundingInstrument();
-    SelectionOverlayHackInstrument *selectionOverlayHackInstrument = m_display->selectionOverlayHackInstrument();
+    BoundingInstrument *boundingInstrument = display()->boundingInstrument();
+    SelectionOverlayHackInstrument *selectionOverlayHackInstrument = display()->selectionOverlayHackInstrument();
     m_moveInstrument = new MoveInstrument(this);
     m_itemMouseForwardingInstrument = new ForwardingInstrument(Instrument::Item, mouseEventTypes, this);
     SelectionFixupInstrument *selectionFixupInstrument = new SelectionFixupInstrument(this);
@@ -196,8 +195,8 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Border, subColor(qnGlobals->mrsColor(), qnGlobals->selectionBorderDelta()));
     m_motionSelectionInstrument->setSelectionModifiers(Qt::ShiftModifier);
 
-    m_rubberBandInstrument->setRubberBandZValue(m_display->layerZValue(Qn::EffectsLayer));
-    m_rotationInstrument->setRotationItemZValue(m_display->layerZValue(Qn::EffectsLayer));
+    m_rubberBandInstrument->setRubberBandZValue(display()->layerZValue(Qn::EffectsLayer));
+    m_rotationInstrument->setRotationItemZValue(display()->layerZValue(Qn::EffectsLayer));
     m_resizingInstrument->setEffectiveDistance(8);
 
     /* Item instruments. */
@@ -234,7 +233,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_manager->installInstrument(new ForwardingInstrument(Instrument::Scene, keyEventTypes, this));
 
     /* View/viewport instruments. */
-    m_manager->installInstrument(m_rotationInstrument, InstallationMode::InstallAfter, m_display->transformationListenerInstrument());
+    m_manager->installInstrument(m_rotationInstrument, InstallationMode::InstallAfter, display()->transformationListenerInstrument());
     m_manager->installInstrument(m_resizingInstrument);
     m_manager->installInstrument(m_moveInstrument);
     m_manager->installInstrument(m_dragInstrument);
@@ -266,10 +265,10 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_handScrollInstrument,     SIGNAL(scrollStarted(QGraphicsView *)),                                                     boundingInstrument,             SLOT(dontEnforcePosition(QGraphicsView *)));
     connect(m_handScrollInstrument,     SIGNAL(scrollFinished(QGraphicsView *)),                                                    boundingInstrument,             SLOT(enforcePosition(QGraphicsView *)));
 
-    connect(m_display,                  SIGNAL(viewportGrabbed()),                                                                  m_handScrollInstrument,         SLOT(recursiveDisable()));
-    connect(m_display,                  SIGNAL(viewportUngrabbed()),                                                                m_handScrollInstrument,         SLOT(recursiveEnable()));
-    connect(m_display,                  SIGNAL(viewportGrabbed()),                                                                  m_wheelZoomInstrument,          SLOT(recursiveDisable()));
-    connect(m_display,                  SIGNAL(viewportUngrabbed()),                                                                m_wheelZoomInstrument,          SLOT(recursiveEnable()));
+    connect(display(),                  SIGNAL(viewportGrabbed()),                                                                  m_handScrollInstrument,         SLOT(recursiveDisable()));
+    connect(display(),                  SIGNAL(viewportUngrabbed()),                                                                m_handScrollInstrument,         SLOT(recursiveEnable()));
+    connect(display(),                  SIGNAL(viewportGrabbed()),                                                                  m_wheelZoomInstrument,          SLOT(recursiveDisable()));
+    connect(display(),                  SIGNAL(viewportUngrabbed()),                                                                m_wheelZoomInstrument,          SLOT(recursiveEnable()));
 
     connect(m_resizingInstrument,       SIGNAL(resizingProcessStarted(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),   m_itemMouseForwardingInstrument, SLOT(recursiveDisable()));
     connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),  m_itemMouseForwardingInstrument, SLOT(recursiveEnable()));
@@ -322,12 +321,12 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                     m_resizingInstrument,           SLOT(recursiveEnable()));
 
     /* Connect to display. */
-    connect(m_display,                  SIGNAL(widgetChanged(Qn::ItemRole)),                                                        this,                           SLOT(at_display_widgetChanged(Qn::ItemRole)));
-    connect(m_display,                  SIGNAL(widgetAdded(QnResourceWidget *)),                                                    this,                           SLOT(at_display_widgetAdded(QnResourceWidget *)));
-    connect(m_display,                  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),                                         this,                           SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
+    connect(display(),                  SIGNAL(widgetChanged(Qn::ItemRole)),                                                        this,                           SLOT(at_display_widgetChanged(Qn::ItemRole)));
+    connect(display(),                  SIGNAL(widgetAdded(QnResourceWidget *)),                                                    this,                           SLOT(at_display_widgetAdded(QnResourceWidget *)));
+    connect(display(),                  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),                                         this,                           SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
 
     /* Set up context menu. */
-    QWidget *window = m_display->view()->window();
+    QWidget *window = display()->view()->window();
     window->addAction(action(Qn::ScreenRecordingAction));
     window->addAction(action(Qn::ToggleMotionAction));
 
@@ -356,10 +355,6 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
 QnWorkbenchController::~QnWorkbenchController() {
     disconnect(m_screenRecorder, NULL, this, NULL);
     m_screenRecorder->stopRecording();
-}
-
-QnWorkbenchDisplay *QnWorkbenchController::display() const {
-    return m_display;
 }
 
 QnWorkbenchGridMapper *QnWorkbenchController::mapper() const {
@@ -690,8 +685,8 @@ void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget 
 
     workbench()->setItem(Qn::RaisedRole, NULL); /* Un-raise currently raised item so that it doesn't interfere with resizing. */
 
-    m_display->bringToFront(m_resizedWidget);
-    m_display->gridItem()->animatedShow();
+    display()->bringToFront(m_resizedWidget);
+    display()->gridItem()->animatedShow();
     opacityAnimator(m_resizedWidget)->animateTo(widgetManipulationOpacity);
 }
 
@@ -725,9 +720,9 @@ void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, 
         QnWorkbenchLayout::Disposition disposition;
         widget->item()->layout()->canMoveItem(widget->item(), newResizingWidgetRect, &disposition);
 
-        m_display->gridItem()->setCellState(m_resizedWidgetRect, QnGridItem::INITIAL);
-        m_display->gridItem()->setCellState(disposition.free, QnGridItem::ALLOWED);
-        m_display->gridItem()->setCellState(disposition.occupied, QnGridItem::DISALLOWED);
+        display()->gridItem()->setCellState(m_resizedWidgetRect, QnGridItem::INITIAL);
+        display()->gridItem()->setCellState(disposition.free, QnGridItem::ALLOWED);
+        display()->gridItem()->setCellState(disposition.occupied, QnGridItem::DISALLOWED);
 
         m_resizedWidgetRect = newResizingWidgetRect;
     }
@@ -736,7 +731,7 @@ void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, 
 void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget *item, const ResizingInfo &) {
     TRACE("RESIZING FINISHED");
 
-    m_display->gridItem()->animatedHide();
+    display()->gridItem()->animatedHide();
     opacityAnimator(m_resizedWidget)->animateTo(1.0);
 
     if(m_resizedWidget == item && item != NULL) {
@@ -750,7 +745,7 @@ void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget
             updateGeometryDelta(widget);
         }
 
-        m_display->synchronize(widget->item());
+        display()->synchronize(widget->item());
 
         /* Un-raise the raised item if it was the one being resized. */
         QnWorkbenchItem *raisedItem = workbench()->item(Qn::RaisedRole);
@@ -759,7 +754,7 @@ void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget
     }
 
     /* Clean up resizing state. */
-    m_display->gridItem()->setCellState(m_resizedWidgetRect, QnGridItem::INITIAL);
+    display()->gridItem()->setCellState(m_resizedWidgetRect, QnGridItem::INITIAL);
     m_resizedWidgetRect = QRect();
     m_resizedWidget = NULL;
 }
@@ -768,11 +763,11 @@ void QnWorkbenchController::at_moveStarted(QGraphicsView *, const QList<QGraphic
     TRACE("MOVE STARTED");
 
     /* Bring to front preserving relative order. */
-    m_display->bringToFront(items);
-    m_display->setLayer(items, Qn::FrontLayer);
+    display()->bringToFront(items);
+    display()->setLayer(items, Qn::FrontLayer);
 
     /* Show grid. */
-    m_display->gridItem()->animatedShow();
+    display()->gridItem()->animatedShow();
 
     /* Build item lists. */
     foreach (QGraphicsItem *item, items) {
@@ -799,7 +794,7 @@ void QnWorkbenchController::at_move(QGraphicsView *, const QList<QGraphicsItem *
 
     QPoint newDragDelta = mapper()->mapDeltaToGridF(totalDelta).toPoint();
     if(newDragDelta != m_dragDelta) {
-        m_display->gridItem()->setCellState(m_dragGeometries, QnGridItem::INITIAL);
+        display()->gridItem()->setCellState(m_dragGeometries, QnGridItem::INITIAL);
 
         m_dragDelta = newDragDelta;
         m_replacedWorkbenchItems.clear();
@@ -867,8 +862,8 @@ void QnWorkbenchController::at_move(QGraphicsView *, const QList<QGraphicsItem *
         QnWorkbenchLayout::Disposition disposition;
         layout->canMoveItems(m_draggedWorkbenchItems + m_replacedWorkbenchItems, m_dragGeometries, &disposition);
 
-        m_display->gridItem()->setCellState(disposition.free, QnGridItem::ALLOWED);
-        m_display->gridItem()->setCellState(disposition.occupied, QnGridItem::DISALLOWED);
+        display()->gridItem()->setCellState(disposition.free, QnGridItem::ALLOWED);
+        display()->gridItem()->setCellState(disposition.occupied, QnGridItem::DISALLOWED);
     }
 }
 
@@ -876,7 +871,7 @@ void QnWorkbenchController::at_moveFinished(QGraphicsView *, const QList<QGraphi
     TRACE("MOVE FINISHED");
 
     /* Hide grid. */
-    m_display->gridItem()->animatedHide();
+    display()->gridItem()->animatedHide();
 
     if(!m_draggedWorkbenchItems.empty()) {
         QnWorkbenchLayout *layout = m_draggedWorkbenchItems[0]->layout();
@@ -898,7 +893,7 @@ void QnWorkbenchController::at_moveFinished(QGraphicsView *, const QList<QGraphi
 
         /* Re-sync everything. */
         foreach(QnWorkbenchItem *workbenchItem, workbenchItems)
-            m_display->synchronize(workbenchItem);
+            display()->synchronize(workbenchItem);
 
         /* Un-raise the raised item if it was among the dragged ones. */
         QnWorkbenchItem *raisedItem = workbench()->item(Qn::RaisedRole);
@@ -907,7 +902,7 @@ void QnWorkbenchController::at_moveFinished(QGraphicsView *, const QList<QGraphi
     }
 
     /* Clean up dragging state. */
-    m_display->gridItem()->setCellState(m_dragGeometries, QnGridItem::INITIAL);
+    display()->gridItem()->setCellState(m_dragGeometries, QnGridItem::INITIAL);
     m_dragDelta = invalidDragDelta();
     m_draggedWorkbenchItems.clear();
     m_replacedWorkbenchItems.clear();
@@ -917,7 +912,7 @@ void QnWorkbenchController::at_moveFinished(QGraphicsView *, const QList<QGraphi
 void QnWorkbenchController::at_rotationStarted(QGraphicsView *, QnResourceWidget *widget) {
     TRACE("ROTATION STARTED");
 
-    m_display->bringToFront(widget);
+    display()->bringToFront(widget);
 }
 
 void QnWorkbenchController::at_rotationFinished(QGraphicsView *, QnResourceWidget *widget) {
@@ -1007,14 +1002,14 @@ void QnWorkbenchController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem
     if(widget == NULL)
         return;
 
-    m_display->scene()->clearSelection();
+    display()->scene()->clearSelection();
     widget->setSelected(true);
 
     QnWorkbenchItem *workbenchItem = widget->item();
     QnWorkbenchItem *zoomedItem = workbench()->item(Qn::ZoomedRole);
     if(zoomedItem == workbenchItem) {
-        QRectF viewportGeometry = m_display->viewportGeometry();
-        QRectF zoomedItemGeometry = m_display->itemGeometry(zoomedItem);
+        QRectF viewportGeometry = display()->viewportGeometry();
+        QRectF zoomedItemGeometry = display()->itemGeometry(zoomedItem);
 
         if(
             (viewportGeometry.width() < zoomedItemGeometry.width() && !qFuzzyCompare(viewportGeometry.width(), zoomedItemGeometry.width())) ||
@@ -1064,11 +1059,11 @@ void QnWorkbenchController::at_scene_doubleClicked(QGraphicsView *, const ClickI
         return;
 
     workbench()->setItem(Qn::ZoomedRole, NULL);
-    m_display->fitInView();
+    display()->fitInView();
 }
 
 void QnWorkbenchController::at_display_widgetChanged(Qn::ItemRole role) {
-    QnResourceWidget *widget = m_display->widget(role);
+    QnResourceWidget *widget = display()->widget(role);
     QnResourceWidget *oldWidget = m_widgetByRole[role];
     if(widget == oldWidget)
         return;
@@ -1124,7 +1119,7 @@ void QnWorkbenchController::at_display_widgetAboutToBeRemoved(QnResourceWidget *
 }
 
 void QnWorkbenchController::at_selectAllAction_triggered() {
-    foreach(QnResourceWidget *widget, m_display->widgets())
+    foreach(QnResourceWidget *widget, display()->widgets())
         widget->setSelected(true);
 }
 

@@ -203,7 +203,7 @@ protected:
 
 QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent, QnWorkbenchContext *context): 
     QWidget(parent),
-    QnWorkbenchContextAware(parent ? static_cast<QObject *>(parent) : context),
+    QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent),
     ui(new Ui::ResourceTreeWidget()),
     m_filterTimerId(0),
     m_ignoreFilterChanges(false)

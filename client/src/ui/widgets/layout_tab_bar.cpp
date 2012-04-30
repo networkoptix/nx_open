@@ -21,7 +21,7 @@ Q_DECLARE_METATYPE(QnWorkbenchLayout *);
 
 QnLayoutTabBar::QnLayoutTabBar(QWidget *parent, QnWorkbenchContext *context):
     QTabBar(parent),
-    QnWorkbenchContextAware(parent ? static_cast<QObject *>(parent) : context),
+    QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent),
     m_submit(false),
     m_update(false)
 {

@@ -32,9 +32,6 @@ public:
     QnWorkbenchNavigator(QObject *parent = NULL);
     virtual ~QnWorkbenchNavigator();
 
-    QnWorkbenchDisplay *display() const;
-    void setDisplay(QnWorkbenchDisplay *display);
-
     QnTimeSlider *timeSlider() const;
     void setTimeSlider(QnTimeSlider *timeSlider);
 
@@ -42,6 +39,8 @@ public:
     void setTimeScrollBar(QnTimeScrollBar *scrollBar);
 
     bool isLive() const;
+    bool setLive(bool live);
+    bool isLiveSupported() const;
 
     QnResourceWidget *currentWidget();
 
@@ -52,6 +51,8 @@ public:
 
 signals:
     void currentWidgetChanged();
+    void liveChanged();
+    void liveSupportedChanged();
 
 protected:
     enum SliderLine {
@@ -76,8 +77,6 @@ protected:
     void addSyncedWidget(QnResourceWidget *widget);
     void removeSyncedWidget(QnResourceWidget *widget);
     
-    void setCurrentWidget(QnResourceWidget *camera);
-
     SliderUserData currentSliderData() const;
     void setCurrentSliderData(const SliderUserData &localData);
 
@@ -95,11 +94,13 @@ protected:
     void updateSyncedPeriods(Qn::TimePeriodType type);
     void updateLines();
 
+    void updateLive();
+    void updateLiveSupported();
+
 protected slots:
     void at_display_widgetChanged(Qn::ItemRole role);
     void at_display_widgetAdded(QnResourceWidget *widget);
     void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
-    void at_display_destroyed();
 
     void at_widget_motionSelectionChanged(QnResourceWidget *widget);
     void at_widget_motionSelectionChanged();
@@ -118,7 +119,6 @@ protected slots:
 private:
     QnTimeSlider *m_timeSlider;
     QnTimeScrollBar *m_timeScrollBar;
-    QnWorkbenchDisplay *m_display;
 
     QSet<QnResourceWidget *> m_syncedWidgets;
     QMultiHash<QnResourcePtr, QHashDummyValue> m_syncedResources;
@@ -131,6 +131,9 @@ private:
     bool m_updatingSliderFromReader;
     bool m_updatingSliderFromScrollBar;
     bool m_updatingScrollBarFromSlider;
+
+    bool m_lastLive;
+    bool m_lastLiveSupported;
 
     QAction *m_clearSelectionAction;
 

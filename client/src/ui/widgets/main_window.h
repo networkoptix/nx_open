@@ -82,7 +82,6 @@ private:
     QScopedPointer<QnGradientBackgroundPainter> m_backgroundPainter;
     QnWorkbenchController *m_controller;
     QnWorkbenchUi *m_ui;
-    QnWorkbenchDisplay *m_display;
     QnWorkbenchActionHandler *m_actionHandler;
 
     QnGraphicsView *m_view;
