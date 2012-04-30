@@ -39,6 +39,8 @@ public:
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
 
+    void setMaxFps(int value);
+    int getMaxFps();
 signals:
     void cellActivated(const QPoint &cell);
     void cellValueChanged(const QPoint &cell);

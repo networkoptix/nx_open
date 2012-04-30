@@ -31,6 +31,7 @@ appserver/test/executions
 appserver/static
 appserver/setup/static
 appserver/version.py
+appserver/entcontroller.conf 
 
 bin
 build

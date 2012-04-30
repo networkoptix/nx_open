@@ -3,14 +3,18 @@
 
 #include "core/resource/camera_resource.h"
 
-class QnServerCameraProcessor : public QnResourceProcessor
+class QnServerCameraProcessor : public QObject, public QnResourceProcessor
 {
+    Q_OBJECT
 public:
     void processResources(const QnResourceList &resources);
+private slots:
+    void at_serverIfFound(QString);
 };
 
 class QnServerCamera: public QnVirtualCameraResource
 {
+    Q_OBJECT
 public:
     QnServerCamera();
 

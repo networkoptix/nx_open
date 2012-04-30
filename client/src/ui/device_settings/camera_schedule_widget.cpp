@@ -339,6 +339,12 @@ void QnCameraScheduleWidget::setMaxFps(int value)
     if(value < ui->fpsSpinBox->minimum())
         value = ui->fpsSpinBox->minimum(); /* Silently ignoring invalid input is OK here. */
     ui->fpsSpinBox->setMaximum(value);
+    ui->gridWidget->setMaxFps(value);
+}
+
+int QnCameraScheduleWidget::getGridMaxFps()
+{
+    return ui->gridWidget->getMaxFps();
 }
 
 void QnCameraScheduleWidget::setScheduleEnabled(bool enabled)

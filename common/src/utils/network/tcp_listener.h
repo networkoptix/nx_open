@@ -20,11 +20,13 @@ public:
     explicit QnTcpListener(const QHostAddress& address, int port);
     virtual ~QnTcpListener();
 
+    void updatePort(int newPort);
 protected:
     virtual void run();
     virtual QnTCPConnectionProcessor* createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner) = 0;
 private:
     void removeDisconnectedConnections();
+    void removeAllConnections();
 private:
     QN_DECLARE_PRIVATE(QnTcpListener);
 };

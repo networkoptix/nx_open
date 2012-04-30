@@ -168,12 +168,15 @@ void QnResourceDisplay::pause() {
 }
 
 bool QnResourceDisplay::isPaused() {
-
     if(m_archiveReader == NULL)
         return false;
 
 
     return m_archiveReader->isMediaPaused();
+}
+
+bool QnResourceDisplay::isStillImage() const {
+    return m_camera->getCamDisplay()->isStillImage();
 }
 
 void QnResourceDisplay::addRenderer(QnAbstractRenderer *renderer) {

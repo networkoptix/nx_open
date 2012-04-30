@@ -43,6 +43,8 @@ public:
 
     virtual void beforeSeek(qint64 time);
     virtual void beforeChangeReverseMode(bool reverseMode);
+
+    static void setProxyAddr(const QString& addr, int port);
 private:
     QnAbstractDataPacketPtr processFFmpegRtpPayload(const quint8* data, int dataSize);
     void processMetadata(const quint8* data, int dataSize);
@@ -83,6 +85,9 @@ private:
 
     QnTimePeriod m_serverTimePeriod;
     qint64 m_globalMinArchiveTime; // min archive time between all servers
+
+    static QString m_proxyAddr;
+    static int m_proxyPort;
 };
 
 #endif

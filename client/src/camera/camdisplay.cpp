@@ -107,14 +107,15 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_executingJump(0),
       skipPrevJumpSignal(0),
       m_processedPackets(0),
-      m_toLowQSpeed(1000.0),
+      m_toLowQSpeed(1.0),
       m_delayedFrameCnt(0),
       m_emptyPacketCounter(0),
       m_hiQualityRetryCounter(0),
       m_isStillImage(false),
       m_isLongWaiting(false),
       m_executingChangeSpeed(false),
-      m_eofSignalSended(false)
+      m_eofSignalSended(false),
+      m_lastLiveIsLowQuality(false)
 {
     m_storedMaxQueueSize = m_dataQueue.maxSize();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
@@ -185,8 +186,11 @@ void CLCamDisplay::hurryUpCheck(QnCompressedVideoDataPtr vd, float speed, qint64
 }
 
 
-bool CLCamDisplay::canSwitchQuality()
+bool CLCamDisplay::canSwitchToHighQuality()
 {
+    if (m_hiQualityRetryCounter >= HIGH_QUALITY_RETRY_COUNTER)
+        return true;
+
     QMutexLocker lock(&m_qualityMutex);
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
     if (currentTime - m_lastQualitySwitchTime < QUALITY_SWITCH_INTERVAL)
@@ -196,8 +200,18 @@ bool CLCamDisplay::canSwitchQuality()
 }
 void CLCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime)
 {
-    if (vd->flags & QnAbstractMediaData::MediaFlags_LIVE)
+    if (vd->flags & QnAbstractMediaData::MediaFlags_LIVE) 
+    {
+        bool isLow = vd->flags & QnAbstractMediaData::MediaFlags_LowQuality;
+        if (m_lastLiveIsLowQuality && !isLow)
+            m_hiQualityRetryCounter++; 
+        m_lastLiveIsLowQuality = isLow;
         return;
+    }
+    else {
+        m_lastLiveIsLowQuality = false;
+    }
+
     if (vd->flags & QnAbstractMediaData::MediaFlags_Ignore)
         return;
 
@@ -227,13 +241,10 @@ void CLCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float spee
                 {
                     reader->setQuality(MEDIA_Quality_High, true); // speed decreased, try to Hi quality again
                 }
-                //else if(qAbs(speed) < 1.0 + FPS_EPS && m_toLowQTimer.elapsed() >= TRY_HIGH_QUALITY_INTERVAL)
-                else if(qAbs(speed) < 1.0 + FPS_EPS && m_hiQualityRetryCounter < HIGH_QUALITY_RETRY_COUNTER)
+                else if(qAbs(speed) < 1.0 + FPS_EPS && canSwitchToHighQuality())
                 {
-                    if (canSwitchQuality()) {
-                        reader->setQuality(MEDIA_Quality_High, false); // speed decreased, try to Hi quality now
-                        m_hiQualityRetryCounter++;
-                    }
+                    reader->setQuality(MEDIA_Quality_High, false); 
+                    m_hiQualityRetryCounter++;
                 }
             }
         }

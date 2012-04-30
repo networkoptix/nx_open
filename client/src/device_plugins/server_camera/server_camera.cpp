@@ -3,6 +3,13 @@
 #include "device_plugins/archive/rtsp/rtsp_client_archive_delegate.h"
 #include "core/resourcemanagment/resource_pool.h"
 #include "core/resource/video_server.h"
+#include "api/AppServerConnection.h"
+
+void QnServerCameraProcessor::at_serverIfFound(QString)
+{
+    QnRtspClientArchiveDelegate::setProxyAddr(QString(), 0);
+    QnVideoServerConnection::setProxyAddr(QString(), 0);
+}
 
 void QnServerCameraProcessor::processResources(const QnResourceList &resources)
 {
@@ -11,8 +18,18 @@ void QnServerCameraProcessor::processResources(const QnResourceList &resources)
     foreach(QnResourcePtr res, resources)
     {
         QnVideoServerResourcePtr videoServer = qSharedPointerDynamicCast<QnVideoServerResource>(res);
-        if (videoServer)
+        if (videoServer) 
+        {
+            // set proxy. If some media server IF will be found, proxy address will be cleared
+            QString url = QnAppServerConnectionFactory::defaultUrl().host();
+            if (url.isEmpty())
+                url = "127.0.0.1";
+            int port = QnAppServerConnection::getMediaProxyPort();
+            QnRtspClientArchiveDelegate::setProxyAddr(url, port);
+            QnVideoServerConnection::setProxyAddr(url, port);
+            connect(videoServer.data(), SIGNAL(serverIFFound(QString)), this, SLOT(at_serverIfFound(QString)));
             videoServer->determineOptimalNetIF();
+        }
     }
 }
 

@@ -3,6 +3,7 @@
 
 #include <QtCore/QWeakPointer>
 #include <QtCore/QVector>
+#include <QtCore/QMetaType>
 #include <QtGui/QStaticText>
 #include <QtGui/QGraphicsWidget>
 
@@ -252,7 +253,7 @@ public:
      */
     QList<QRegion> motionSelection() const;
 
-    bool addToMotionRegion(int sens, const QRect& rect, int channel);
+    void addToMotionRegion(int sens, const QRect& rect, int channel);
 
     void clearMotionRegions();
 
@@ -472,5 +473,6 @@ private:
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::DisplayFlags);
+Q_DECLARE_METATYPE(QnResourceWidget *)
 
 #endif // QN_RESOURCE_WIDGET_H

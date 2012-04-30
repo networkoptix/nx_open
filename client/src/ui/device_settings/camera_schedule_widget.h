@@ -35,7 +35,7 @@ public:
 
     const QnVirtualCameraResourceList &cameras() const;
     void setCameras(const QnVirtualCameraResourceList &cameras);
-
+    int getGridMaxFps();
 signals:
     void scheduleTasksChanged();
     void scheduleEnabledChanged();

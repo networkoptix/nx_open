@@ -107,6 +107,7 @@ public:
     int getLayouts(QnLayoutResourceList& layouts, QByteArray& errorString);
     int getUsers(QnUserResourceList& users, QByteArray& errorString);
     int getLicenses(QnLicenseList& licenses, QByteArray& errorString);
+    int updateMediaProxyPort(const QString& errorString);
     int getCameraHistoryList(QnCameraHistoryList& cameraHistoryList, QByteArray& errorString);
 
     int saveSync(const QnVideoServerResourcePtr&, QByteArray& errorString);
@@ -135,6 +136,8 @@ public:
 
     void stop();
 
+    static int getMediaProxyPort();
+
 private:
     QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory, QnApiSerializer& serializer);
 
@@ -155,6 +158,7 @@ private:
     QnVideoServerResourceFactory m_serverFactory;
 
     QnApiSerializer& m_serializer;
+    static int m_mediaProxyPort;
 
     friend class QnAppServerConnectionFactory;
 };

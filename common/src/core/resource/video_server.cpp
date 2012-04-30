@@ -136,13 +136,14 @@ void QnVideoServerResource::setPrimaryIF(const QString& primaryIF)
     url.setHost(primaryIF);
     setUrl(url.toString());
     setName(QString("Server ") + primaryIF);
+    emit serverIFFound(primaryIF);
 }
 
 void QnVideoServerResource::determineOptimalNetIF()
 {
     QMutexLocker lock(&m_mutex);
-    if (m_prevNetAddrList == m_netAddrList)
-        return;
+    //if (m_prevNetAddrList == m_netAddrList)
+    //    return;
     m_prevNetAddrList = m_netAddrList;
     m_primaryIFSelected = false;
 
@@ -181,5 +182,6 @@ void QnVideoServerResource::updateInner(QnResourcePtr other)
         }
 
         setStorages(otherStorages);
+        determineOptimalNetIF();
     }
 }

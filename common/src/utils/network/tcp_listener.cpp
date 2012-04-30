@@ -10,10 +10,14 @@ class QnTcpListener::QnTcpListenerPrivate
 public:
     QnTcpListenerPrivate() {
         serverSocket = 0;
+        newPort = 0;
     }
     TCPServerSocket* serverSocket;
     QMap<TCPSocket*, CLLongRunnable*> connections;
     QByteArray authDigest;
+    QMutex portMutex;
+    int newPort;
+    QHostAddress serverAddress;
 };
 
 // ------------------------ QnRtspListener ---------------------------
@@ -46,9 +50,10 @@ QnTcpListener::QnTcpListener(const QHostAddress& address, int port):
 {
     Q_D(QnTcpListener);
     try {
+        d->serverAddress = address;
         d->serverSocket = new TCPServerSocket(address.toString(), port);
         start();
-        cl_log.log("RTSP server started at ", address.toString() + QString(":") + QString::number(port), cl_logINFO);
+        cl_log.log("Server started at ", address.toString() + QString(":") + QString::number(port), cl_logINFO);
     }
     catch(SocketException &) {
         qCritical() << "Can't start TCP listener at address" << address << ":" << port;
@@ -80,6 +85,31 @@ void QnTcpListener::removeDisconnectedConnections()
     }
 }
 
+void QnTcpListener::removeAllConnections()
+{
+    Q_D(QnTcpListener);
+
+    for (QMap<TCPSocket*, CLLongRunnable*>::iterator itr = d->connections.begin(); itr != d->connections.end(); ++itr)
+    {
+        CLLongRunnable* processor = itr.value();
+        processor->pleaseStop();
+    }
+
+    for (QMap<TCPSocket*, CLLongRunnable*>::iterator itr = d->connections.begin(); itr != d->connections.end(); ++itr)
+    {
+        CLLongRunnable* processor = itr.value();
+        delete processor;
+    }
+    d->connections.clear();
+}
+
+void QnTcpListener::updatePort(int newPort)
+{
+    Q_D(QnTcpListener);
+    QMutexLocker lock(&d->portMutex);
+    d->newPort = newPort;
+}
+
 void QnTcpListener::run()
 {
     Q_D(QnTcpListener);
@@ -87,9 +117,18 @@ void QnTcpListener::run()
         m_needStop = true;
     while (!m_needStop)
     {
+        if (d->newPort)
+        {
+            QMutexLocker lock(&d->portMutex);
+            removeAllConnections();
+            delete d->serverSocket;
+            d->serverSocket = new TCPServerSocket(d->serverAddress.toString(), d->newPort);
+            d->newPort = 0;
+        }
+
         TCPSocket* clientSocket = d->serverSocket->accept();
         if (clientSocket) {
-            qDebug() << "New client connection from " << clientSocket->getPeerAddress();
+            qDebug() << "New client connection from " << clientSocket->getPeerAddress() << ':' << clientSocket->getForeignPort();
             QnTCPConnectionProcessor* processor = createRequestProcessor(clientSocket, this);
             clientSocket->setReadTimeOut(processor->getSocketTimeout());
             clientSocket->setWriteTimeOut(processor->getSocketTimeout());

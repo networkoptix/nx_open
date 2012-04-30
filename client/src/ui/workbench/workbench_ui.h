@@ -20,11 +20,12 @@ class VariantAnimator;
 class AnimatorGroup;
 class HoverFocusProcessor;
 
-class NavigationItem;
+class QnNavigationItem;
 class QnResourceTreeWidget;
 class GraphicsLabel;
 
 class QnWorkbenchDisplay;
+class QnWorkbenchNavigator;
 class QnImageButtonWidget;
 class QnResourceWidget;
 class QnMaskedProxyWidget;
@@ -179,8 +180,6 @@ protected slots:
     void at_fpsChanged(qreal fps);
 
     void at_display_widgetChanged(Qn::ItemRole role);
-    void at_display_widgetAdded(QnResourceWidget *widget);
-    void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
 
     void at_controlsWidget_deactivated();
     void at_controlsWidget_geometryChanged();
@@ -271,7 +270,7 @@ private:
     /* Slider-related state. */
 
     /** Navigation item. */
-    NavigationItem *m_sliderItem;
+    QnNavigationItem *m_sliderItem;
 
     /** Hover processor that is used to change slider opacity when mouse is hovered over it. */
     HoverFocusProcessor *m_sliderOpacityProcessor;
@@ -318,6 +317,9 @@ private:
 
     /** Animator for tree's position. */
     VariantAnimator *m_treeXAnimator;
+
+    /** Workbench navigator instance. */
+    QnWorkbenchNavigator *m_navigator;
 
 
     /* Title-related state. */

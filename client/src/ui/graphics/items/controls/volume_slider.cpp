@@ -1,4 +1,4 @@
-#include "volumeslider.h"
+#include "volume_slider.h"
 
 #include "ui/style/proxy_style.h"
 

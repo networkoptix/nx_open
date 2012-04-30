@@ -3,7 +3,6 @@
 
 QnMotionRegion::QnMotionRegion()
 {
-    m_maxRects = INT_MAX;
     //addRect((QnMotionRegion::MAX_SENSITIVITY - QnMotionRegion::MIN_SENSITIVITY)/2, QRect(0,0,MD_WIDTH, MD_HEIGHT));
     addRect(0, QRect(0,0,MD_WIDTH, MD_HEIGHT));
 }
@@ -145,22 +144,17 @@ bool QnMotionRegion::updateSensitivityAt(const QPoint& pos, int newSens)
     return false;
 }
 
-void QnMotionRegion::setMaxRectCount(int value)
-{
-    m_maxRects = value;
-}
-
-bool QnMotionRegion::isValid() const
+bool QnMotionRegion::isValid(int maxMotionRects, int maxMaskRects) const
 {
     for (int sens = QnMotionRegion::MIN_SENSITIVITY+1; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens)
     {
-        if (getRectsBySens(sens).size() > m_maxRects)
+        if (getRectsBySens(sens).size() > maxMotionRects)
             return false;
     }
-    return true;
+    return getRectsBySens(0).size() <= maxMaskRects;
 }
 
-int QnMotionRegion::getCurrentRectCount() const
+int QnMotionRegion::getMotionRectCount() const
 {
     int rez = 0;
     for (int sens = QnMotionRegion::MIN_SENSITIVITY+1; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens)
@@ -168,7 +162,7 @@ int QnMotionRegion::getCurrentRectCount() const
     return rez;
 }
 
-int QnMotionRegion::getMaxRectCount() const
+int QnMotionRegion::getMaskRectCount() const
 {
-    return m_maxRects;
+    return getRectsBySens(0).size();
 }

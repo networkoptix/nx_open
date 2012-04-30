@@ -68,11 +68,14 @@ RTPSession::RTPSession():
     m_startTime(AV_NOPTS_VALUE),
     m_endTime(AV_NOPTS_VALUE),
     m_scale(1.0),
-    m_tcpTimeout(50 * 1000 * 1000)
+    m_tcpTimeout(50 * 1000 * 1000),
+    m_proxyPort(0)
 {
     m_udpSock.setReadTimeOut(500);
     m_responseBuffer = new quint8[RTSP_BUFFER_LEN];
     m_responseBufferLen = 0;
+
+    // todo: debug only remove me
 }
 
 RTPSession::~RTPSession()
@@ -191,7 +194,13 @@ bool RTPSession::open(const QString& url)
         m_tcpSock.reopen();
 
     m_tcpSock.setReadTimeOut(TCP_CONNECT_TIMEOUT);
-    if (!m_tcpSock.connect(mUrl.host().toLatin1().data(), mUrl.port(DEFAULT_RTP_PORT)))
+    bool rez;
+    if (m_proxyPort == 0)
+        rez = m_tcpSock.connect(mUrl.host(), mUrl.port(DEFAULT_RTP_PORT));
+    else
+        rez = m_tcpSock.connect(m_proxyAddr, m_proxyPort);
+
+    if (!rez)
         return false;
 
     m_tcpSock.setReadTimeOut(m_tcpTimeout);
@@ -992,4 +1001,10 @@ void RTPSession::setAuth(const QAuthenticator& auth)
 QAuthenticator RTPSession::getAuth() const
 {
     return m_auth;
+}
+
+void RTPSession::setProxyAddr(const QString& addr, int port)
+{
+    m_proxyAddr = addr;
+    m_proxyPort = port;
 }
