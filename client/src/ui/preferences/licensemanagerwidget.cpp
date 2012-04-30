@@ -121,7 +121,7 @@ void LicenseManagerWidget::validateLicense(const QnLicensePtr &license) {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void LicenseManagerWidget::at_licensesReceived(int status, const QByteArray& errorString, QnLicenseList licenses, int handle)
+void LicenseManagerWidget::at_licensesReceived(int status, const QByteArray &/*errorString*/, QnLicenseList licenses, int /*handle*/)
 {
     if (status != 0 || licenses.isEmpty())
     {

@@ -5,7 +5,7 @@
 
 Q_GLOBAL_STATIC(QnResourceIconCache, qn_resourceIconCache);
 
-QnResourceIconCache::QnResourceIconCache(QObject *parent) {
+QnResourceIconCache::QnResourceIconCache(QObject *parent): QObject(parent) {
     m_cache.insert(Unknown,                 QIcon());
     m_cache.insert(Local,                   qnSkin->icon("home.png"));
     m_cache.insert(Server,                  qnSkin->icon("server.png"));

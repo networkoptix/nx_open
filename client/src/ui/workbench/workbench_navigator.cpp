@@ -37,7 +37,6 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     QnWorkbenchContextAware(parent),
     m_timeSlider(NULL),
     m_timeScrollBar(NULL),
-    m_display(NULL),
     m_centralWidget(NULL),
     m_currentWidget(NULL),
     m_updatingSliderFromReader(false),
@@ -112,12 +111,11 @@ bool QnWorkbenchNavigator::isValid() {
 void QnWorkbenchNavigator::initialize() {
     assert(isValid());
 
-    QnWorkbenchDisplay *display = context()->display();
-    connect(m_display,                          SIGNAL(widgetChanged(Qn::ItemRole)),                this,   SLOT(at_display_widgetChanged(Qn::ItemRole)));
-    connect(m_display,                          SIGNAL(widgetAdded(QnResourceWidget *)),            this,   SLOT(at_display_widgetAdded(QnResourceWidget *)));
-    connect(m_display,                          SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)), this,   SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
-    connect(m_display,                          SIGNAL(streamsSynchronizedChanged()),               this,   SLOT(updateCurrentWidget()));
-    connect(m_display->beforePaintInstrument(), SIGNAL(activated(QWidget *, QEvent *)),             this,   SLOT(updateSliderFromReader()));
+    connect(display(),                          SIGNAL(widgetChanged(Qn::ItemRole)),                this,   SLOT(at_display_widgetChanged(Qn::ItemRole)));
+    connect(display(),                          SIGNAL(widgetAdded(QnResourceWidget *)),            this,   SLOT(at_display_widgetAdded(QnResourceWidget *)));
+    connect(display(),                          SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)), this,   SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
+    connect(display(),                          SIGNAL(streamsSynchronizedChanged()),               this,   SLOT(updateCurrentWidget()));
+    connect(display()->beforePaintInstrument(), SIGNAL(activated(QWidget *, QEvent *)),             this,   SLOT(updateSliderFromReader()));
     
     connect(m_timeSlider,                       SIGNAL(valueChanged(qint64)),                       this,   SLOT(at_timeSlider_valueChanged(qint64)));
     connect(m_timeSlider,                       SIGNAL(sliderPressed()),                            this,   SLOT(at_timeSlider_sliderPressed()));
@@ -137,8 +135,8 @@ void QnWorkbenchNavigator::initialize() {
 void QnWorkbenchNavigator::deinitialize() {
     assert(isValid());
 
-    disconnect(m_display,                           NULL, this, NULL);
-    disconnect(m_display->beforePaintInstrument(),  NULL, this, NULL);
+    disconnect(display(),                           NULL, this, NULL);
+    disconnect(display()->beforePaintInstrument(),  NULL, this, NULL);
     
     disconnect(m_timeSlider,                        NULL, this, NULL);
     m_timeSlider->removeEventFilter(this);
@@ -155,6 +153,9 @@ Qn::ActionScope QnWorkbenchNavigator::currentScope() const {
 }
 
 QVariant QnWorkbenchNavigator::currentTarget(Qn::ActionScope scope) const {
+    if(scope != Qn::SliderScope)
+        return QVariant();
+
     QnResourceWidgetList result;
     if(m_currentWidget)
         result.push_back(m_currentWidget);
@@ -170,10 +171,14 @@ bool QnWorkbenchNavigator::isLiveSupported() const {
 }
 
 bool QnWorkbenchNavigator::setLive(bool live) {
-    if(!m_currentWidgetIsCamera)
+    if(!isLiveSupported())
         return false;
 
-    m_timeSlider->setValue(m_timeSlider->maximum());
+    if(live) {
+        m_timeSlider->setValue(m_timeSlider->maximum());
+    } else {
+        m_timeSlider->setValue(m_timeSlider->minimum()); // TODO: need to save position here.
+    }
     return true;
 }
 
@@ -263,7 +268,7 @@ QnCachingTimePeriodLoader *QnWorkbenchNavigator::loader(QnResourceWidget *widget
 // -------------------------------------------------------------------------- //
 void QnWorkbenchNavigator::updateCurrentWidget() {
     QnResourceWidget *widget = NULL;
-    if (m_centralWidget != NULL || !m_display->isStreamsSynchronized()) {
+    if (m_centralWidget != NULL || !display()->isStreamsSynchronized()) {
         widget = m_centralWidget;
     } else if(m_syncedWidgets.contains(m_currentWidget)) {
         return;
@@ -290,7 +295,7 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     m_timeSlider->setOption(QnTimeSlider::UseUTC, m_currentWidgetIsCamera);
 
     updateSliderFromReader();
-    if(!(m_currentWidgetIsCamera && previousWidgetWasCamera && m_display->isStreamsSynchronized()))
+    if(!(m_currentWidgetIsCamera && previousWidgetWasCamera && display()->isStreamsSynchronized()))
         setCurrentSliderData(m_localDataByWidget.value(m_currentWidget));
     m_timeSlider->finishAnimations();
 
@@ -333,7 +338,7 @@ void QnWorkbenchNavigator::updateSliderFromReader() {
         /* Update target time period for time period loaders. 
          * If playback is synchronized, do it for all cameras. */
         QnTimePeriod period(startTimeMSec, endTimeMSec - startTimeMSec);
-        if(m_display->isStreamsSynchronized() && m_currentWidgetIsCamera) {
+        if(display()->isStreamsSynchronized() && m_currentWidgetIsCamera) {
             foreach(QnResourceWidget *widget, m_syncedWidgets)
                 loader(widget)->setTargetPeriod(period);
         } else if(m_currentWidgetIsCamera) {
@@ -457,7 +462,7 @@ void QnWorkbenchNavigator::at_timeSlider_contextMenuEvent(QGraphicsSceneContextM
         return;
 
     /* Run menu. */
-    QAction *action = menu->exec(QCursor::pos());
+    QAction *action = menu->exec(event->screenPos());
 
     /* Process slider-local actions. */
     if(action == m_clearSelectionAction)
@@ -539,7 +544,7 @@ void QnWorkbenchNavigator::at_timeSlider_sliderReleased() {
 
 void QnWorkbenchNavigator::at_display_widgetChanged(Qn::ItemRole role) {
     if(role == Qn::CentralRole)
-        setCentralWidget(m_display->widget(role));
+        setCentralWidget(display()->widget(role));
 }
 
 void QnWorkbenchNavigator::at_display_widgetAdded(QnResourceWidget *widget) {
@@ -576,10 +581,5 @@ void QnWorkbenchNavigator::at_timeSlider_destroyed() {
 void QnWorkbenchNavigator::at_scrollBar_destroyed() {
     setTimeScrollBar(NULL);
 }
-
-void QnWorkbenchNavigator::at_display_destroyed() {
-    setDisplay(NULL);
-}
-
 
 

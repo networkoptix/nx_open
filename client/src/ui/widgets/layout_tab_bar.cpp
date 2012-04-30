@@ -4,6 +4,7 @@
 
 #include <QtGui/QContextMenuEvent>
 #include <QtGui/QStyle>
+#include <QtGui/QMenu>
 
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_value_rollback.h>
@@ -143,7 +144,7 @@ void QnLayoutTabBar::contextMenuEvent(QContextMenuEvent *event) {
         return;
 
     /* Run menu. */
-    menu->exec(QCursor::pos());
+    menu->exec(event->globalPos());
 }
 
 void QnLayoutTabBar::at_workbench_layoutsChanged() {

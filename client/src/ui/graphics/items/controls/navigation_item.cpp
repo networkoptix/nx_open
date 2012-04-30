@@ -25,6 +25,7 @@
 #include "core/resource/security_cam_resource.h"
 #include "ui/workbench/workbench_display.h"
 #include "ui/workbench/workbench_navigator.h"
+#include "ui/workbench/workbench_context.h"
 #include "time_slider.h"
 #include "time_scroll_bar.h"
 
@@ -147,7 +148,6 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
 
     /* Create navigator. */
     m_navigator = new QnWorkbenchNavigator(this);
-    m_navigator->setDisplay(context->display());
     m_navigator->setTimeSlider(m_timeSlider);
     m_navigator->setTimeScrollBar(m_timeScrollBar);
 
@@ -220,8 +220,8 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
     connect(m_mrsButton,            SIGNAL(clicked()),      this,           SIGNAL(clearMotionSelection()));
     connect(m_syncButton,           SIGNAL(toggled(bool)),  this,           SLOT(onSyncButtonToggled(bool)));
     connect(m_muteButton,           SIGNAL(clicked(bool)),  m_volumeSlider, SLOT(setMute(bool)));
-    connect(m_navigator,            SIGNAL(liveChanged())), this,           SLOT(updateLiveState());
-    connect(m_navigator,            SIGNAL(liveChanged())), this,           SLOT(updateLiveState());
+    connect(m_navigator,            SIGNAL(liveChanged()),  this,           SLOT(updateLiveState()));
+    connect(m_navigator,            SIGNAL(liveChanged()),  this,           SLOT(updateLiveState()));
 
     /* Create actions. */
     QAction *playAction = new QAction(tr("Play / Pause"), m_playButton);

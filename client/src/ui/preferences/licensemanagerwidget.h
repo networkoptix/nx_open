@@ -25,7 +25,7 @@ private slots:
 
     void at_downloadError();
     void at_downloadFinished();
-    void at_licensesReceived(int status, const QByteArray& errorString, QnLicenseList licenses, int handle);
+    void at_licensesReceived(int status, const QByteArray &errorString, QnLicenseList licenses, int handle);
 
     void at_licenseDetailsButton_clicked();
     void at_gridLicenses_currentChanged();

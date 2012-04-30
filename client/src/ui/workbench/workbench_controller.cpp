@@ -177,7 +177,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_rubberBandInstrument = new RubberBandInstrument(this);
     m_rotationInstrument = new RotationInstrument(this);
     m_resizingInstrument = new ResizingInstrument(this);
-    m_dropInstrument = new DropInstrument(false, display->context(), this);
+    m_dropInstrument = new DropInstrument(false, display()->context(), this);
     m_dragInstrument = new DragInstrument(this);
     BoundingInstrument *boundingInstrument = display()->boundingInstrument();
     SelectionOverlayHackInstrument *selectionOverlayHackInstrument = display()->selectionOverlayHackInstrument();
@@ -241,7 +241,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_manager->installInstrument(m_handScrollInstrument);
     m_manager->installInstrument(m_motionSelectionInstrument);
 
-    display->setLayer(m_dropInstrument->surface(), Qn::UiLayer);
+    display()->setLayer(m_dropInstrument->surface(), Qn::UiLayer);
 
     connect(m_itemLeftClickInstrument,  SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_leftClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(m_itemLeftClickInstrument,  SIGNAL(doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                 this,                           SLOT(at_item_doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));

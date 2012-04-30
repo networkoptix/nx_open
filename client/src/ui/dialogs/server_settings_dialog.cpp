@@ -37,7 +37,7 @@ ServerSettingsDialog::~ServerSettingsDialog()
 {
 }
 
-void ServerSettingsDialog::requestFinished(int status, const QByteArray& errorString, QnResourceList resources, int handle)
+void ServerSettingsDialog::requestFinished(int status, const QByteArray &/*errorString*/, QnResourceList /*resources*/, int /*handle*/)
 {
     if (status == 0) {
         QDialog::accept();

@@ -97,7 +97,7 @@ bool DropInstrument::sceneEventFilter(QGraphicsItem *watched, QEvent *event) {
     return this->sceneEvent(watched, event);
 }
 
-bool DropInstrument::dragEnterEvent(QGraphicsItem * /*item*/, QGraphicsSceneDragDropEvent *event) {
+bool DropInstrument::dragEnterEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *event) {
     m_resources = QnWorkbenchResource::deserializeResources(event->mimeData());
     if (m_resources.empty())
         return false;
@@ -106,7 +106,7 @@ bool DropInstrument::dragEnterEvent(QGraphicsItem * /*item*/, QGraphicsSceneDrag
     return true;
 }
 
-bool DropInstrument::dragMoveEvent(QGraphicsItem * /*item*/, QGraphicsSceneDragDropEvent *event) {
+bool DropInstrument::dragMoveEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *event) {
     if(m_resources.empty())
         return false;
 
@@ -114,14 +114,14 @@ bool DropInstrument::dragMoveEvent(QGraphicsItem * /*item*/, QGraphicsSceneDragD
     return true;
 }
 
-bool DropInstrument::dragLeaveEvent(QGraphicsItem * /*item*/, QGraphicsSceneDragDropEvent * /*event*/) {
+bool DropInstrument::dragLeaveEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *) {
     if(m_resources.empty())
         return false;
 
     return true;
 }
 
-bool DropInstrument::dropEvent(QGraphicsItem *item, QGraphicsSceneDragDropEvent *event) {
+bool DropInstrument::dropEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *event) {
     QnWorkbenchContext *context = m_context.data();
     if(context == NULL)
         return true;

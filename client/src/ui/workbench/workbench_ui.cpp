@@ -1048,9 +1048,9 @@ void QnWorkbenchUi::setFlags(Flags flags) {
 
 void QnWorkbenchUi::updateViewportMargins() {
     if(!(m_flags & AdjustMargins)) {
-        m_display->setViewportMargins(QMargins(0, 0, 0, 0));
+        display()->setViewportMargins(QMargins(0, 0, 0, 0));
     } else {
-        m_display->setViewportMargins(calculateViewportMargins(
+        display()->setViewportMargins(calculateViewportMargins(
             m_treeXAnimator->isRunning() ? m_treeXAnimator->targetValue().toReal() : m_treeItem->pos().x(),
             m_treeItem->size().width(),
             m_titleYAnimator->isRunning() ? m_titleYAnimator->targetValue().toReal() : m_titleItem->pos().y(),

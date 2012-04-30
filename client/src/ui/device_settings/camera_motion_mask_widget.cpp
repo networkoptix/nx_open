@@ -1,8 +1,9 @@
 #include "camera_motion_mask_widget.h"
 
 #include <QtGui/QVBoxLayout>
-#include <QtGui/QGLWidget>
 #include <QtGui/QMessageBox>
+
+#include <QtOpenGL/QGLWidget>
 
 #include "utils/common/checked_cast.h"
 
@@ -58,7 +59,7 @@ void QnCameraMotionMaskWidget::init()
     QnWorkbenchDisplay *display = m_context->display();
     display->setScene(m_scene.data());
     display->setView(m_view.data());
-    m_controller.reset(new QnWorkbenchController(display, this));
+    m_controller.reset(new QnWorkbenchController(this));
 
     /* Disable unused instruments. */
     m_controller->motionSelectionInstrument()->disable();

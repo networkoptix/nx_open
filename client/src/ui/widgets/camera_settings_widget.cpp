@@ -8,6 +8,7 @@
 #include <core/resourcemanagment/resource_criterion.h>
 
 #include <ui/actions/action_manager.h>
+#include <ui/workbench/workbench_context.h>
 
 #include "multiple_camera_settings_widget.h"
 #include "single_camera_settings_widget.h"

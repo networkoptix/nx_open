@@ -143,8 +143,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     display()->setView(m_view);
     display()->setNormalMarginFlags(Qn::MarginsAffectSize | Qn::MarginsAffectPosition);
 
-    m_controller = new QnWorkbenchController(display(), this);
-    m_ui = new QnWorkbenchUi(display(), this);
+    m_controller = new QnWorkbenchController(this);
+    m_ui = new QnWorkbenchUi(this);
     m_ui->setFlags(QnWorkbenchUi::HideWhenZoomed | QnWorkbenchUi::AdjustMargins);
 
     m_actionHandler = new QnWorkbenchActionHandler(this);
