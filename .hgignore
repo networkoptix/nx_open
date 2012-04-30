@@ -85,6 +85,7 @@ winbuild/msvc2010/setup.bat
 wixsetup/CustomStrings.wxl
 wixsetup/AppServerFiles.wxs
 wixsetup/version.bat
+wixsetup/bin
 
 My Amplifier XE Results*
 
