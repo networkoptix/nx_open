@@ -1,4 +1,4 @@
-#include "speedslider.h"
+#include "speed_slider.h"
 
 #include <QtCore/QPropertyAnimation>
 

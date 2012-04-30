@@ -1,5 +1,6 @@
 
 #include <QDebug>
+#include <QNetworkProxy>
 #include <QNetworkReply>
 #include <QDomDocument>
 #include <QXmlInputSource>
@@ -11,7 +12,6 @@
 #include "VideoServerConnection_p.h"
 #include "SessionManager.h"
 #include "api/serializer/serializer.h"
-#include "../src/network/kernel/qnetworkproxy.h"
 
 QString QnVideoServerConnection::m_proxyAddr;
 int QnVideoServerConnection::m_proxyPort = 0;

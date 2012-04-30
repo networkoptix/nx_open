@@ -23,7 +23,7 @@ SERVER_BIN_PATH=../../mediaserver/bin/release
 . $SERVER_BIN_PATH/env.sh
 
 QT_FILES="libQtXml.so.4 libQtGui.so.4 libQtNetwork.so.4 libQtCore.so.4"
-FFMPEG_FILES="libavcodec.so.54 libavdevice.so.53 libavfilter.so.2 libavformat.so.54 libavutil.so.51 libswscale.so.2"
+FFMPEG_FILES="libavcodec.so.[0-9][0-9] libavdevice.so.[0-9][0-9] libavfilter.so.2 libavformat.so.[0-9][0-9] libavutil.so.51 libswscale.so.2"
 
 
 # Prepare stage dir

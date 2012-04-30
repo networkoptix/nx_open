@@ -21,6 +21,8 @@ public:
 
     static QnResourcePtr resource(QnResourceWidget *widget);
 
+    static QnResourceList resources(QnResourceWidget *widget);
+
     static QnResourceList resources(const QnResourceWidgetList &widgets);
 
     static QnResourceList resources(const QnLayoutItemIndexList &layoutItems);
@@ -29,7 +31,11 @@ public:
 
     static QnResourceList resources(const QVariant &items);
 
+    static QnLayoutItemIndex layoutItem(QnResourceWidget *widget);
+
     static QnLayoutItemIndexList layoutItems(const QnResourceWidgetList &widgets);
+
+    static QnLayoutItemIndexList layoutItems(QnResourceWidget *widget);
 
     static QnLayoutItemIndexList layoutItems(const QVariant &items);
 

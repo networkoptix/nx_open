@@ -19,6 +19,7 @@
 #include <ui/processors/kinetic_cutting_processor.h>
 
 #include "tool_tip_item.h"
+#include "ui/common/image_processing.h"
 
 namespace {
     QTime msecsToTime(qint64 msecs) {
@@ -38,6 +39,14 @@ namespace {
             } else {
                 return value - delta;
             }
+        }
+    }
+
+    qreal speed(qreal progress, qreal center, qreal starting, qreal relative) {
+        if(progress > center) {
+            return progress * relative;
+        } else {
+            return (relative - starting / center) * progress + starting;
         }
     }
 
@@ -77,28 +86,32 @@ namespace {
     const qreal minTextSeparationPixels = 30.0;
     const qreal criticalTextSeparationPixels = 20.0;
     
-    const qreal tickmarkHeightRelativeAnimationSpeed = 1.0;
-    const qreal tickmarkHeightAbsoluteAnimationSpeed = 0.1;
-    const qreal tickmarkHeightStartingAnimationSpeed = 2.0;
-    
-    const qreal tickmarkOpacityRelativeAnimationSpeed = 1.0;
-    const qreal tickmarkOpacityAbsoluteAnimationSpeed = 0.1;
-    const qreal tickmarkOpacityStartingAnimationSpeed = 2.0;
-    
     const qreal minTickmarkOpacity = 0.05;
     const qreal minTextOpacity = 0.5;
     
     const qreal tickmarkStepScale = 2.0 / 3.0;
 
-    const qreal tickmarkTextScale = 0.75;
+    const qreal tickmarkTextScale = 1.0 / 3.0;
     const int minTextHeight = 9;
     const qreal maxTickmarkHeight = 1.0 / (1.0 + tickmarkTextScale);
+    const qreal minTickmarkHeight = maxTickmarkHeight / 3.0;
 
-    const qreal minHighlightSpanFraction = 0.5;
+    const qreal tickmarkHeightRelativeAnimationSpeed = 1.0;
+    const qreal tickmarkHeightCentralAnimationValue = minTickmarkHeight;
+    const qreal tickmarkHeightStartingAnimationSpeed = 0.5;
+
+    const qreal tickmarkOpacityRelativeAnimationSpeed = 1.0;
+    const qreal tickmarkOpacityCentralAnimationValue = 0.5;
+    const qreal tickmarkOpacityStartingAnimationSpeed = 1.0;
+
+    const qreal highlightTextHeight = minTickmarkHeight + (maxTickmarkHeight - minTickmarkHeight) * std::pow(tickmarkStepScale, 3.0);
+    const qreal highlightTextTopAdjustment = -0.15;
+
+    const qreal minHighlightSpanFraction = 0.25;
 
     const qreal msecsPerPixelChangeThreshold = 1.0e-4;
 
-    const qreal tickmarkBarRelativeHeight = 0.5;
+    const qreal tickmarkBarRelativeHeight = 0.6;
 
     const qreal lineCommentRelativeHeight = 0.75;
 
@@ -207,9 +220,9 @@ QVector<QnTimeStep> QnTimeSlider::createAbsoluteSteps() {
     QVector<QnTimeStep> result;
     result <<
         createStandardSteps(false) <<
-        QnTimeStep(QnTimeStep::Days,            1000ll * 60 * 60 * 24,              1,      31,     tr("dd MMM"),   tr("29 Mar"),       false) <<
-        QnTimeStep(QnTimeStep::Months,          1000ll * 60 * 60 * 24 * 31,         1,      12,     tr("MMMM"),     tr("September"),    false) <<
-        QnTimeStep(QnTimeStep::Years,           1000ll * 60 * 60 * 24 * 365,        1,      50000,  tr("yyyy"),     tr("2000"),         false);
+        QnTimeStep(QnTimeStep::Days,            1000ll * 60 * 60 * 24,              1,      31,     tr("dd MMM"),   tr("29 Mar"),       tr("dd MMMM yyyy"),       false) <<
+        QnTimeStep(QnTimeStep::Months,          1000ll * 60 * 60 * 24 * 31,         1,      12,     tr("MMMM"),     tr("September"),    tr("MMMM yyyy"),    false) <<
+        QnTimeStep(QnTimeStep::Years,           1000ll * 60 * 60 * 24 * 365,        1,      50000,  tr("yyyy"),     tr("2000"),         tr("yyyy"),         false);
     return enumerateSteps(result);
 }
 
@@ -217,30 +230,30 @@ QVector<QnTimeStep> QnTimeSlider::createRelativeSteps() {
     QVector<QnTimeStep> result;
     result <<
         createStandardSteps(true) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60 * 24,              1,      31,     tr("d"),        tr("29d"),          false) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60 * 24 * 30,         1,      12,     tr("M"),        tr("11M"),          false) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60 * 24 * 30 * 12,    1,      50000,  tr("y"),        tr("2000y"),        false);
+        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60 * 24,              1,      31,     tr("d"),        tr("29d"),          QString(),          false) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60 * 24 * 30,         1,      12,     tr("M"),        tr("11M"),          QString(),          false) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60 * 24 * 30 * 12,    1,      50000,  tr("y"),        tr("2000y"),        QString(),          false);
     return enumerateSteps(result);
 }
 
 QVector<QnTimeStep> QnTimeSlider::createStandardSteps(bool isRelative) {
     QVector<QnTimeStep> result;
     result <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1ll,                                10,     1000,   tr("ms"),       tr("10ms"),         isRelative) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1ll,                                50,     1000,   tr("ms"),       tr("50ms"),         isRelative) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1ll,                                100,    1000,   tr("ms"),       tr("100ms"),        isRelative) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1ll,                                500,    1000,   tr("ms"),       tr("500ms"),        isRelative) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll,                             1,      60,     tr("s"),        tr("59s"),          isRelative) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll,                             5,      60,     tr("s"),        tr("59s"),          isRelative) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll,                             10,     60,     tr("s"),        tr("59s"),          isRelative) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll,                             30,     60,     tr("s"),        tr("59s"),          isRelative) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60,                        1,      60,     tr("m"),        tr("59m"),          isRelative) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60,                        5,      60,     tr("m"),        tr("59m"),          isRelative) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60,                        10,     60,     tr("m"),        tr("59m"),          isRelative) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60,                        30,     60,     tr("m"),        tr("59m"),          isRelative) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60,                   1,      24,     tr("h"),        tr("23h"),          isRelative) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60,                   3,      24,     tr("h"),        tr("23h"),          isRelative) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60,                   12,     24,     tr("h"),        tr("23h"),          isRelative);
+        QnTimeStep(QnTimeStep::Milliseconds,    1ll,                                10,     1000,   tr("ms"),       tr("10ms"),         QString(),          isRelative) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1ll,                                50,     1000,   tr("ms"),       tr("50ms"),         QString(),          isRelative) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1ll,                                100,    1000,   tr("ms"),       tr("100ms"),        QString(),          isRelative) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1ll,                                500,    1000,   tr("ms"),       tr("500ms"),        QString(),          isRelative) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1000ll,                             1,      60,     tr("s"),        tr("59s"),          QString(),          isRelative) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1000ll,                             5,      60,     tr("s"),        tr("59s"),          QString(),          isRelative) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1000ll,                             10,     60,     tr("s"),        tr("59s"),          QString(),          isRelative) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1000ll,                             30,     60,     tr("s"),        tr("59s"),          QString(),          isRelative) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60,                        1,      60,     tr("m"),        tr("59m"),          QString(),          isRelative) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60,                        5,      60,     tr("m"),        tr("59m"),          QString(),          isRelative) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60,                        10,     60,     tr("m"),        tr("59m"),          QString(),          isRelative) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60,                        30,     60,     tr("m"),        tr("59m"),          QString(),          isRelative) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60,                   1,      24,     tr("h"),        tr("23h"),          QString(),          isRelative) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60,                   3,      24,     tr("h"),        tr("23h"),          QString(),          isRelative) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60,                   12,     24,     tr("h"),        tr("23h"),          QString(),          isRelative);
     return enumerateSteps(result);
 }
 
@@ -449,6 +462,8 @@ qint64 QnTimeSlider::valueFromPosition(const QPointF &position) const {
 
 void QnTimeSlider::finishAnimations() {
     animateStepValues(10 * 1000);
+
+    kineticProcessor()->reset();
 }
 
 bool QnTimeSlider::scaleWindow(qreal factor, qint64 anchor) {
@@ -478,21 +493,21 @@ bool QnTimeSlider::scaleWindow(qreal factor, qint64 anchor) {
     return end <= maximum();
 }
 
-const QPixmap &QnTimeSlider::textPixmap(const QString &text, int height) {
-    QPair<QString, int> key(text, height);
+const QPixmap &QnTimeSlider::textPixmap(const QString &text, int height, QPalette::ColorRole colorRole) {
+    QPair<QString, int> key(text, height + colorRole << 16);
 
-    QHash<QPair<QString, int>, QPixmap>::const_iterator itr = m_pixmapBySizedText.find(key);
-    if(itr != m_pixmapBySizedText.end())
+    QHash<QPair<QString, int>, QPixmap>::const_iterator itr = m_pixmapByTextKey.find(key);
+    if(itr != m_pixmapByTextKey.end())
         return *itr;
 
     QPixmap result = renderText(
         text,
-        QPen(palette().brush(QPalette::Text), 0), 
+        QPen(palette().brush(colorRole), 0), 
         font(), 
         height
     );
 
-    return m_pixmapBySizedText[key] = result;
+    return m_pixmapByTextKey[key] = result;
 }
 
 const QPixmap &QnTimeSlider::positionPixmap(qint64 position, int height, const QnTimeStep &step) {
@@ -503,6 +518,37 @@ const QPixmap &QnTimeSlider::positionPixmap(qint64 position, int height, const Q
         return *itr;
 
     return m_pixmapByPositionKey[key] = textPixmap(toString(position, step), height);
+}
+
+const QPixmap &QnTimeSlider::highlightPixmap(qint64 position, int height, const QnTimeStep &step) {
+    qint32 key = cacheKey(position, height, step);
+
+    QHash<qint32, QPixmap>::const_iterator itr = m_pixmapByPositionKey.find(key);
+    if(itr != m_pixmapByPositionKey.end())
+        return *itr;
+
+    QString text = toLongString(position, step);
+    QPixmap basePixmap = textPixmap(text, height, QPalette::Shadow);
+    QPixmap overPixmap = textPixmap(text, height, QPalette::Text);
+
+    QImage image(basePixmap.size() + QSize(6, 3), QImage::Format_ARGB32);
+    image.fill(qRgba(0, 0, 0, 0));
+    {
+        QPainter painter(&image);
+        painter.drawPixmap(3, 0, basePixmap);
+    }
+    image = gaussianBlur(image, 1.5);
+    QPixmap blurPixmap = QPixmap::fromImage(image);
+    {
+        QPainter painter(&image);
+        for(int i = 0; i < 8; i++)
+            painter.drawPixmap(0, 0, blurPixmap);
+        painter.drawPixmap(3, 0, overPixmap);
+    }
+
+    image.save("D:/1.bmp");
+
+    return m_pixmapByPositionKey[key] = QPixmap::fromImage(image);
 }
 
 void QnTimeSlider::updateToolTipVisibility() {
@@ -598,13 +644,12 @@ void QnTimeSlider::updateStepAnimationTargets() {
         } else if(i >= maxStepIndex) {
             targetHeight = maxTickmarkHeight;
         } else  {
-            targetHeight = maxTickmarkHeight * pow(tickmarkStepScale, maxStepIndex - i);
+            targetHeight = minTickmarkHeight + (maxTickmarkHeight - minTickmarkHeight) * pow(tickmarkStepScale, maxStepIndex - i);
         }
         
         if(!qFuzzyCompare(data.targetHeight, targetHeight)) {
-            data.lastTargetHeight = data.targetHeight;
             data.targetHeight = targetHeight;
-            data.targetLineOpacity = minTickmarkOpacity + (1.0 - minTickmarkOpacity) * data.targetHeight / maxTickmarkHeight;
+            data.targetLineOpacity = minTickmarkOpacity + (1.0 - minTickmarkOpacity) * (data.targetHeight - minTickmarkHeight) / (maxTickmarkHeight - minTickmarkHeight);
         }
 
         if(separationPixels < minTextSeparationPixels) {
@@ -630,26 +675,21 @@ void QnTimeSlider::animateStepValues(int deltaMSecs) {
     qreal dt = deltaMSecs / 1000.0;
 
     const qreal maxTextHeight = size().height() * tickmarkBarRelativeHeight * (1.0 - maxTickmarkHeight);
-    const qreal relativeTextHeightGap = (maxTextHeight - minTextHeight) / maxTickmarkHeight;
+
+    /* Range of valid text height values, relative to maximal tickmark height. */
+    const qreal textHeightRange = (maxTextHeight - minTextHeight) / maxTickmarkHeight;
 
     for(int i = 0; i < stepCount; i++) {
         TimeStepData &data = m_stepData[i];
 
-        qreal heightSpeed;
-        qreal opacitySpeed;
-        if(qFuzzyIsNull(data.targetHeight) || qFuzzyIsNull(data.lastTargetHeight)) {
-            heightSpeed = tickmarkHeightStartingAnimationSpeed;
-            opacitySpeed = tickmarkHeightStartingAnimationSpeed;
-        } else {
-            heightSpeed  = qMax(tickmarkHeightAbsoluteAnimationSpeed,  data.currentHeight      * tickmarkHeightRelativeAnimationSpeed);
-            opacitySpeed = qMax(tickmarkOpacityAbsoluteAnimationSpeed, data.currentLineOpacity * tickmarkOpacityRelativeAnimationSpeed);
-        }
+        qreal heightSpeed  = speed(data.currentHeight,      0.5, tickmarkHeightStartingAnimationSpeed,  tickmarkHeightRelativeAnimationSpeed);
+        qreal opacitySpeed = speed(data.currentLineOpacity, 0.5, tickmarkOpacityStartingAnimationSpeed, tickmarkOpacityRelativeAnimationSpeed);
 
         data.currentHeight      = adjust(data.currentHeight,        data.targetHeight,      heightSpeed * dt);
         data.currentLineOpacity = adjust(data.currentLineOpacity,   data.targetLineOpacity, opacitySpeed * dt);
         data.currentTextOpacity = adjust(data.currentTextOpacity,   data.targetTextOpacity, opacitySpeed * dt);
 
-        data.currentTextHeight  = minTextHeight + qMax(0, qRound(data.currentHeight * relativeTextHeightGap));
+        data.currentTextHeight  = minTextHeight + qMax(0, qRound(data.currentHeight * textHeightRange));
     }
 }
 
@@ -727,6 +767,10 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
 
     /* Draw tickmarks. */
     drawTickmarks(painter, rect.top(), rect.height() * tickmarkBarRelativeHeight);
+
+    /* Draw highlights. */
+    qreal hightlightTextPixelHeight = rect.height() * tickmarkBarRelativeHeight * highlightTextHeight;
+    drawHighlights(painter, rect.top(), rect.height() * tickmarkBarRelativeHeight, rect.top() + hightlightTextPixelHeight * highlightTextTopAdjustment, hightlightTextPixelHeight);
 
     /* Draw position marker. */
     drawMarker(painter, sliderPosition(), positionMarkerColor);
@@ -870,39 +914,6 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, qreal top, qreal height) {
     int stepCount = m_steps.size();
     QRectF rect = this->rect();
 
-#if 0
-    /* Find index of the highlight time step. */
-    int highlightIndex = minTickmarkIndex;
-    qreal highlightSpanPixels = size().width() * minHighlightSpanFraction;
-    for(; highlightIndex < steps.size(); highlightIndex++)
-        if(steps[highlightIndex].stepUnits == 1 && steps[highlightIndex].stepMSecs / msecsPerPixel >= highlightSpanPixels)
-            break;
-    highlightIndex = qMin(highlightIndex, steps.size() - 1); // TODO: remove this line.
-    const TimeStep &highlightStep = steps[highlightIndex];
-
-
-    /* Draw highlight. */
-    {
-        painter->setPen(Qt::NoPen);
-
-        qint64 pos = roundUp(m_windowStart, highlightStep);
-        qreal x0 = positionFromValue(m_windowStart).x();
-        qint64 number = absoluteNumber(pos, highlightStep);
-        while(true) {
-            qreal x1 = positionFromValue(pos).x();
-            painter->setBrush(number % 2 ? QColor(0, 0, 0) : QColor(32, 32, 32));
-            painter->drawRect(QRectF(x0, top, x1 - x0, height));
-
-            if(pos >= m_windowEnd)
-                break;
-
-            pos = add(pos, highlightStep);
-            number++;
-            x0 = x1;
-        }
-    }
-#endif
-
     /* Find minimal tickmark step index. */
     int minStepIndex = 0;
     for(; minStepIndex < stepCount; minStepIndex++)
@@ -968,6 +979,72 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, qreal top, qreal height) {
         }
     }
 }
+
+void QnTimeSlider::drawHighlights(QPainter *painter, qreal fillTop, qreal fillHeight, qreal textTop, qreal textHeight) {
+    int stepCount = m_steps.size();
+    QRectF rect = this->rect();
+    
+    /* Find index of the highlight time step. */
+    int highlightIndex = 0;
+    qreal highlightSpanPixels = size().width() * minHighlightSpanFraction;
+    for(; highlightIndex < stepCount; highlightIndex++)
+        if(!m_steps[highlightIndex].longFormat.isEmpty() && m_steps[highlightIndex].stepMSecs / m_msecsPerPixel >= highlightSpanPixels)
+            break;
+    highlightIndex = qMin(highlightIndex, stepCount - 1); // TODO: remove this line.
+    const QnTimeStep &highlightStep = m_steps[highlightIndex];
+
+    /* Draw highlight. */
+    {
+        painter->setPen(Qt::NoPen);
+
+        qint64 pos0 = m_windowStart;
+        qint64 pos1 = roundUp(m_windowStart, highlightStep);
+        qreal x0 = positionFromValue(m_windowStart).x();
+        qint64 number = absoluteNumber(pos1, highlightStep);
+        while(true) {
+            qreal x1 = positionFromValue(pos1).x();
+
+            if(number % 2) {
+                QLinearGradient gradient;
+                gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
+                gradient.setStart(0.0, 0.0);
+                gradient.setFinalStop(0.0, 1.0);
+                gradient.setColorAt(0.0, QColor(160, 160, 255, 80));
+                gradient.setColorAt(1.0, QColor(160, 160, 255, 0));
+
+                painter->setBrush(gradient);
+                painter->drawRect(QRectF(x0, fillTop, x1 - x0, fillHeight));
+            }
+
+            QPixmap pixmap = highlightPixmap(pos0, textHeight, highlightStep);
+
+            qreal x = (x0 + x1) / 2.0;
+            QRectF textRect(x - pixmap.width() / 2.0, textTop, pixmap.width(), pixmap.height());
+            QRectF pixmapRect(pixmap.rect());
+            if(textRect.left() < rect.left()) {
+                textRect.moveRight(x1);
+                pixmapRect.setLeft(pixmapRect.left() + rect.left() - textRect.left());
+                textRect.setLeft(rect.left());
+            }
+            if(textRect.right() > rect.right()) {
+                textRect.moveLeft(x0);
+                pixmapRect.setRight(pixmapRect.right() + rect.right() - textRect.right());
+                textRect.setRight(rect.right());
+            }
+
+            painter->drawPixmap(textRect, pixmap, pixmapRect);
+
+            if(pos1 >= m_windowEnd)
+                break;
+
+            pos0 = pos1;
+            pos1 = add(pos1, highlightStep);
+            number++;
+            x0 = x1;
+        }
+    }
+}
+
 
 
 // -------------------------------------------------------------------------- //

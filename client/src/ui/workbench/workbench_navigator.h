@@ -29,14 +29,19 @@ class QnWorkbenchNavigator: public QObject, public QnWorkbenchContextAware, publ
     typedef QObject base_type;
 
 public:
-    QnWorkbenchNavigator(QnWorkbenchDisplay *display, QObject *parent = NULL);
+    QnWorkbenchNavigator(QObject *parent = NULL);
     virtual ~QnWorkbenchNavigator();
+
+    QnWorkbenchDisplay *display() const;
+    void setDisplay(QnWorkbenchDisplay *display);
 
     QnTimeSlider *timeSlider() const;
     void setTimeSlider(QnTimeSlider *timeSlider);
 
     QnTimeScrollBar *timeScrollBar() const;
     void setTimeScrollBar(QnTimeScrollBar *scrollBar);
+
+    bool isLive() const;
 
     QnResourceWidget *currentWidget();
 
@@ -55,6 +60,14 @@ protected:
         SliderLineCount
     };
 
+    struct SliderUserData {
+        SliderUserData(): window(0, -1), selection(0, 0), selectionValid(false) {}
+
+        QnTimePeriod window;
+        QnTimePeriod selection;
+        bool selectionValid;
+    };
+
     void initialize();
     void deinitialize();
     bool isValid();
@@ -65,7 +78,11 @@ protected:
     
     void setCurrentWidget(QnResourceWidget *camera);
 
+    SliderUserData currentSliderData() const;
+    void setCurrentSliderData(const SliderUserData &localData);
+
     QnCachingTimePeriodLoader *loader(const QnResourcePtr &resource);
+    QnCachingTimePeriodLoader *loader(QnResourceWidget *widget);
 
     Q_SLOT void updateCurrentWidget();
     Q_SLOT void updateSliderFromReader();
@@ -82,6 +99,7 @@ protected slots:
     void at_display_widgetChanged(Qn::ItemRole role);
     void at_display_widgetAdded(QnResourceWidget *widget);
     void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
+    void at_display_destroyed();
 
     void at_widget_motionSelectionChanged(QnResourceWidget *widget);
     void at_widget_motionSelectionChanged();
@@ -92,8 +110,8 @@ protected slots:
     void at_timeSlider_valueChanged(qint64 value);
     void at_timeSlider_sliderPressed();
     void at_timeSlider_sliderReleased();
-    void at_timeSlider_destroyed();
     void at_timeSlider_contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
+    void at_timeSlider_destroyed();
 
     void at_scrollBar_destroyed();
 
@@ -110,9 +128,14 @@ private:
     bool m_currentWidgetIsCamera;
 
     bool m_wasPlaying;
-    bool m_inUpdate;
+    bool m_updatingSliderFromReader;
+    bool m_updatingSliderFromScrollBar;
+    bool m_updatingScrollBarFromSlider;
 
     QAction *m_clearSelectionAction;
+
+    /** Widget to per-widget slider data mapping. */
+    QHash<QnResourceWidget *, SliderUserData> m_localDataByWidget;
 
     QHash<QnResourcePtr, QnCachingTimePeriodLoader *> m_loaderByResource;
 };

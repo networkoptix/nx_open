@@ -19,7 +19,7 @@ public:
     virtual void onEofReached(QnlTimeSource* src, bool value) { Q_UNUSED(src); Q_UNUSED(value); }
     virtual bool isEnabled() const { return true; }
 
-    virtual void reinitTime(qint64 newTime) {}
+    virtual void reinitTime(qint64 newTime) { Q_UNUSED(newTime); }
     //virtual void onAvailableTime(QnlTimeSource* src, qint64 time) {}
 };
 

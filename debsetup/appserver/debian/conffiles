@@ -1,3 +1,2 @@
 /opt/networkoptix/entcontroller/etc/entcontroller.conf
-/opt/networkoptix/entcontroller/var/db/ecs.db
 /etc/init/networkoptix-entcontroller.conf

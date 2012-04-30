@@ -7,12 +7,11 @@ win* {
   INCLUDEPATH += ../../common/contrib/ffmpeg-misc-headers-win32
 }
 
-QT = core gui network xml opengl webkit
+QT = core gui network xml opengl webkit multimedia
 CONFIG += precompile_header
 CONFIG -= flat app_bundle
 
 win32 {
-  QT += multimedia 
   CONFIG += x86
 }
 
@@ -116,7 +115,7 @@ mac {
 
 unix:!mac {
     LIBS += -lprotobuf -lopenal
-
+    HARDWARE_PLATFORM = $$system(uname -i)
     contains( HARDWARE_PLATFORM, x86_64 ) {
         LIBS += -L../../common/contrib/qjson/lib/linux-64 
     } else {

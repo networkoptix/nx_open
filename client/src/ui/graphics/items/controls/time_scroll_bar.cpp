@@ -39,9 +39,8 @@ void QnTimeScrollBar::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, false);
 
     /* Draw scrollbar handle. */
+    QRect handleRect = style()->subControlRect(QStyle::CC_ScrollBar, &opt, QStyle::SC_ScrollBarSlider, this);
     {
-        QRect handleRect = style()->subControlRect(QStyle::CC_ScrollBar, &opt, QStyle::SC_ScrollBarSlider, this);
-
         QnScopedPainterPenRollback penRollback(painter, QPen(separatorColor, 0));
         QnScopedPainterBrushRollback brushRollback(painter, handleColor);
         painter->drawRect(handleRect);
@@ -49,12 +48,18 @@ void QnTimeScrollBar::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
 
     /* Draw indicator. */
     if(m_indicatorPosition >= minimum() && indicatorPosition() <= maximum() + pageStep()) {
-        QRect grooveRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderGroove, this);
-        qreal x = grooveRect.left() + GraphicsStyle::sliderPositionFromValue(minimum(), maximum() + pageStep(), m_indicatorPosition, grooveRect.width(), opt.upsideDown);
+        /* Calculate handle- and groove-relative indicator positions. */
+        qint64 handleValue = qBound(0ll, m_indicatorPosition - sliderPosition(), pageStep());
+        qint64 grooveValue = m_indicatorPosition - handleValue;
 
+        /* Calculate handle- and groove-relative indicator offsets. */
+        qreal grooveOffset = positionFromValue(grooveValue).x();
+        qreal handleOffset = GraphicsStyle::sliderPositionFromValue(0, pageStep(), handleValue, handleRect.width(), opt.upsideDown);
+
+        /* Paint it. */
+        qreal x = handleOffset + grooveOffset;
         QnScopedPainterPenRollback penRollback(painter, QPen(indicatorColor, 0));
-        QRectF rect = this->rect();
-        painter->drawLine(QPointF(x, rect.top()), QPointF(x, rect.bottom()));
+        painter->drawLine(QPointF(x, opt.rect.top()), QPointF(x, opt.rect.bottom()));
     }
 }
 

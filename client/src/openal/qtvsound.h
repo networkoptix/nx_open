@@ -11,7 +11,12 @@
 #include <QtCore/QMutex>
 #include <QtCore/QVector>
 
-#include <QtMultimedia/QAudioFormat>
+#ifndef Q_OS_WIN
+#include "utils/media/audioformat.h"
+#else
+#include <QAudioFormat>
+#define QnAudioFormat QAudioFormat
+#endif
 
 #define OPENAL_NEW_ALGORITHM
 
@@ -21,7 +26,7 @@ typedef struct ALCdevice_struct ALCdevice;
 class QtvSound
 {
 public:
-    QtvSound(ALCdevice *device, const QAudioFormat &audioFormat);
+    QtvSound(ALCdevice *device, const QnAudioFormat &audioFormat);
     ~QtvSound();
 
     bool isValid() const { return m_isValid; }
@@ -37,12 +42,12 @@ public:
     void resume();
     void clear();
 
-    static bool isFormatSupported(const QAudioFormat &format);
+    static bool isFormatSupported(const QnAudioFormat &format);
 
 private:
     uint bufferTime() const;
     bool setup();
-    static int getFormat(const QAudioFormat &audioFormat);
+    static int getFormat(const QnAudioFormat &audioFormat);
     uint bitRate() const;
     bool playImpl();
 
@@ -53,7 +58,7 @@ private:
 
 private:
     mutable QMutex m_mtx;
-    QAudioFormat m_audioFormat;
+    QnAudioFormat m_audioFormat;
 
 #ifdef OPENAL_NEW_ALGORITHM
     uint m_tmpBuffer[1024];

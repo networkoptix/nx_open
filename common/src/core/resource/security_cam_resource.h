@@ -70,7 +70,7 @@ protected:
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() = 0;
     virtual void setCropingPhysical(QRect croping) = 0;
-    virtual void setMotionMaskPhysical(int channel) {}
+    virtual void setMotionMaskPhysical(int channel) { Q_UNUSED(channel); }
 
 protected:
     QList<QnMotionRegion> m_motionMaskList;

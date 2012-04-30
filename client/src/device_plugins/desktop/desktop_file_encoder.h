@@ -68,7 +68,7 @@ private:
         ~EncodedAudioInfo();
         // doubled audio objects
         QAudioDeviceInfo m_audioDevice;
-        QAudioFormat m_audioFormat;
+        QnAudioFormat m_audioFormat;
         CLThreadQueue<QnAbstractMediaDataPtr>  m_audioQueue;
         QnAbstractMediaData m_tmpAudioBuffer;
         SpeexPreprocessState* m_speexPreprocess;

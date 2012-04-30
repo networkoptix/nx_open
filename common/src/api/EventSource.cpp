@@ -67,17 +67,25 @@ bool QnEvent::load(const QVariant& parsed)
 
     eventType = dict["type"].toString();
 
-    if (eventType == QN_EVENT_EMPTY)
-        return true;
-
-    if (eventType != QN_EVENT_RES_CHANGE && eventType != QN_EVENT_RES_DELETE
+    if (eventType != QN_EVENT_RES_CHANGE
+            && eventType != QN_EVENT_RES_DELETE
 			&& eventType != QN_EVENT_RES_SETPARAM
 			&& eventType != QN_EVENT_RES_STATUS_CHANGE
 			&& eventType != QN_EVENT_RES_DISABLED_CHANGE
             && eventType != QN_EVENT_LICENSE_CHANGE
-            && eventType != QN_CAMERA_SERVER_ITEM)
+            && eventType != QN_CAMERA_SERVER_ITEM
+            && eventType != QN_EVENT_EMPTY)
     {
         return false;
+    }
+
+    if (!dict.contains("seq_num"))
+    {
+        // version before 1.0.1
+        // Do not use seqNumber tracking
+        seqNumber = 0;
+    } else {
+        seqNumber = dict["seq_num"].toUInt();
     }
 
     if (eventType == QN_EVENT_LICENSE_CHANGE)
@@ -120,6 +128,16 @@ bool QnEvent::load(const QVariant& parsed)
     }
 
     return true;
+}
+
+quint32 QnEvent::nextSeqNumber(quint32 seqNumber)
+{
+    seqNumber++;
+
+    if (seqNumber == 0)
+        seqNumber++;
+
+    return seqNumber;
 }
 
 QnEventSource::QnEventSource(QUrl url, int retryTimeout): 
