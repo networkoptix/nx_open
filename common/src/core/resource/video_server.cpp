@@ -184,4 +184,5 @@ void QnVideoServerResource::updateInner(QnResourcePtr other)
         setStorages(otherStorages);
         determineOptimalNetIF();
     }
+	determineOptimalNetIF();
 }

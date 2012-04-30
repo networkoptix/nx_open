@@ -25,6 +25,8 @@ function read_config {
     ECS_LOGIN=$(cat $CONFIG_FILE | grep appserverLogin | head -1 | sed 's/appserverLogin=\(.*\)/\1/g')
     ECS_PASSWORD=$(cat $CONFIG_FILE | grep appserverPassword | head -1 | sed 's/appserverPassword=\(.*\)/\1/g')
     STORAGE=$(cat $CONFIG_FILE | grep mediaDir | head -1 | sed 's/mediaDir=\(.*\)/\1/g')
+    API_PORT=$(cat $CONFIG_FILE | grep apiPort | head -1 | sed 's/apiPort=\(.*\)/\1/g')
+    RTSP_PORT=$(cat $CONFIG_FILE | grep rtspPort | head -1 | sed 's/rtspPort=\(.*\)/\1/g')
 }
 
 function write_config {
@@ -36,6 +38,8 @@ function write_config {
     [ -z "$ECS_LOGIN" ] || echo "appserverLogin=$ECS_LOGIN" >> $CONFIG_FILE
     [ -z "$ECS_PASSWORD" ] || echo "appserverPassword=$ECS_PASSWORD" >> $CONFIG_FILE
     [ -z "$STORAGE" ] || echo "mediaDir=$STORAGE" >> $CONFIG_FILE
+    [ -z "$API_PORT" ] || echo "apiPort=$API_PORT" >> $CONFIG_FILE
+    [ -z "$RTSP_PORT" ] || echo "rtspPort=$RTSP_PORT" >> $CONFIG_FILE
 }
 
 function to_int {
@@ -118,11 +122,19 @@ case "$1" in
           break
       done
 
+      db_input high networkoptix-mediaserver/api_port || true
+      db_go
+
+      db_input high networkoptix-mediaserver/rtsp_port || true
+      db_go
+
       db_get networkoptix-mediaserver/ecs_host && ECS_HOST=$RET
       db_get networkoptix-mediaserver/ecs_port && ECS_PORT=$RET
       db_get networkoptix-mediaserver/ecs_login && ECS_LOGIN=$RET
       db_get networkoptix-mediaserver/ecs_password && ECS_PASSWORD=$RET
       db_get networkoptix-mediaserver/storage && STORAGE=$RET
+      db_get networkoptix-mediaserver/api_port && API_PORT=$RET
+      db_get networkoptix-mediaserver/rtsp_port && RTSP_PORT=$RET
 
       write_config
   ;;

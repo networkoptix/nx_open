@@ -122,6 +122,13 @@ public:
   int handle() const { return sockDesc; }
 protected:
     void createSocket(int type, int protocol);
+
+  /**
+    * Set SO_REUSEADDR flag to allow socket to start listening
+    * even if port is busy (in TIME_WAIT state).
+    */
+  void setReuseAddrFlag(bool reuseAddr = true);
+
 private:
   // Prevent the user from trying to use value semantics on this object
   Socket(const Socket &sock);
@@ -250,7 +257,7 @@ public:
    *   @exception SocketException thrown if unable to create TCP server socket
    */
   TCPServerSocket(const QString &localAddress, unsigned short localPort,
-      int queueLen = 5) ;
+      int queueLen = 5, bool reuseAddr = false) ;
 
   /**
    *   Blocks until a new connection is established on this socket or error

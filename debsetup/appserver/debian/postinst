@@ -73,9 +73,22 @@ case "$1" in
         db_get networkoptix-entcontroller/ecs_port
       done
 
-      # Password is up to user
+      # Password should not be empty
+      db_reset networkoptix-entcontroller/ecs_password
       db_input high networkoptix-entcontroller/ecs_password || true
       db_go
+      db_get networkoptix-entcontroller/ecs_password
+      until [ ! -z "$RET" ]
+      do
+        db_input high networkoptix-entcontroller/ecs_pass_empty || true
+        db_go
+
+        { db_input high networkoptix-entcontroller/ecs_password; STATUS=$?; } || true
+        [ $STATUS -eq 30 ] && break
+
+        db_go
+        db_get networkoptix-entcontroller/ecs_password 
+      done
 
       db_get networkoptix-entcontroller/ecs_port && ECS_PORT=$RET
       db_get networkoptix-entcontroller/ecs_password && ECS_PASSWORD=$RET

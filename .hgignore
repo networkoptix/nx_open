@@ -23,6 +23,11 @@ syntax: glob
 Debug
 Release
 
+common/bin
+client/bin
+mediaserver/bin
+traytool/bin
+
 appserver/db/ecs.db
 appserver/setup/db/ecs.db
 appserver/proto/xml/gen
@@ -33,7 +38,6 @@ appserver/setup/static
 appserver/version.py
 appserver/entcontroller.conf 
 
-bin
 build
 client/src/version.h
 common/src/common.pri
