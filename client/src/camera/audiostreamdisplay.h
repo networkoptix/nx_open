@@ -9,7 +9,6 @@
 
 class CLAbstractAudioDecoder;
 struct QnCompressedAudioData;
-class CLAudioDevice;
 
 class CLAudioStreamDisplay : public QObject
 {
@@ -54,7 +53,7 @@ private:
 	static void float2int16(CLAudioData& audio);
 	static void float2int32(CLAudioData& audio);
 	static void int32Toint16(CLAudioData& audio);
-	bool initFormatConvertRule(QAudioFormat format);
+	bool initFormatConvertRule(QnAudioFormat format);
 private:
 	enum SampleConvertMethod {SampleConvert_None, SampleConvert_Float2Int32, SampleConvert_Float2Int16, SampleConvert_Int32ToInt16};
 

@@ -13,7 +13,7 @@
 typedef struct ALCdevice_struct ALCdevice;
 typedef struct ALCcontext_struct ALCcontext;
 
-class QAudioFormat;
+class QnAudioFormat;
 class QSettings;
 
 class QtvSound;
@@ -26,7 +26,7 @@ public:
     QtvAudioDevice();
     ~QtvAudioDevice();
 
-    QtvSound *addSound(const QAudioFormat &format);
+    QtvSound *addSound(const QnAudioFormat &format);
     void removeSound(QtvSound *soundObject);
 
     // in range 0..1

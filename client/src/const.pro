@@ -115,7 +115,7 @@ mac {
 
 unix:!mac {
     LIBS += -lprotobuf -lopenal
-
+    HARDWARE_PLATFORM = $$system(uname -i)
     contains( HARDWARE_PLATFORM, x86_64 ) {
         LIBS += -L../../common/contrib/qjson/lib/linux-64 
     } else {

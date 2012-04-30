@@ -2,7 +2,6 @@
 #include "decoders/audio/audio_struct.h"
 #include "decoders/audio/abstractaudiodecoder.h"
 
-#include "audio_device.h"
 #include "settings.h"
 
 #define DEFAULT_AUDIO_FRAME_SIZE (AVCODEC_MAX_AUDIO_FRAME_SIZE*2)
@@ -153,7 +152,7 @@ void CLAudioStreamDisplay::enqueueData(QnCompressedAudioDataPtr data, qint64 min
     //    m_audioQueue.dequeue()->releaseRef();
 }
 
-bool CLAudioStreamDisplay::initFormatConvertRule(QAudioFormat format)
+bool CLAudioStreamDisplay::initFormatConvertRule(QnAudioFormat format)
 {
     if (m_forceDownmix && format.channelCount() > 2)
     {
@@ -167,9 +166,9 @@ bool CLAudioStreamDisplay::initFormatConvertRule(QAudioFormat format)
     if (QtvSound::isFormatSupported(format))
         return true;
 
-    if (format.sampleType() == QAudioFormat::Float)
+    if (format.sampleType() == QnAudioFormat::Float)
     {
-        format.setSampleType(QAudioFormat::SignedInt);
+        format.setSampleType(QnAudioFormat::SignedInt);
         if (QtvSound::isFormatSupported(format))
         {
             m_sampleConvertMethod = SampleConvert_Float2Int32;
@@ -352,7 +351,7 @@ void CLAudioStreamDisplay::float2int16(CLAudioData& audio)
     }
     audio.outbuf_len /= 2;
     audio.format.setSampleSize(16);
-    audio.format.setSampleType(QAudioFormat::SignedInt);
+    audio.format.setSampleType(QnAudioFormat::SignedInt);
 }
 
 void CLAudioStreamDisplay::int32Toint16(CLAudioData& audio)
@@ -371,7 +370,7 @@ void CLAudioStreamDisplay::int32Toint16(CLAudioData& audio)
     }
     audio.outbuf_len /= 2;
     audio.format.setSampleSize(16);
-    audio.format.setSampleType(QAudioFormat::SignedInt);
+    audio.format.setSampleType(QnAudioFormat::SignedInt);
 }
 
 void CLAudioStreamDisplay::float2int32(CLAudioData& audio)
@@ -386,7 +385,7 @@ void CLAudioStreamDisplay::float2int32(CLAudioData& audio)
         *inP = (qint32) (f * INT_MAX);
         ++inP;
     }
-    audio.format.setSampleType(QAudioFormat::SignedInt);
+    audio.format.setSampleType(QnAudioFormat::SignedInt);
 }
 
 int CLAudioStreamDisplay::playAfterMs() const

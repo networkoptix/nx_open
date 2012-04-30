@@ -149,7 +149,7 @@ protected:
     bool mGenerateEndOfStreamSignal;
 
     bool m_isRealTimeSource;
-	QAudioFormat m_expectedAudioFormat;
+	QnAudioFormat m_expectedAudioFormat;
 	QMutex m_audioChangeMutex;
     bool m_videoBufferOverflow;
     bool m_singleShotMode;

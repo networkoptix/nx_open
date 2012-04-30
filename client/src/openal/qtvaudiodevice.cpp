@@ -3,7 +3,12 @@
 #include <QtCore/QScopedPointer>
 #include <QtCore/QSettings>
 
-#include <QtMultimedia/QAudioFormat>
+#ifndef Q_OS_WIN
+#include "utils/media/audioformat.h"
+#else
+#include <QAudioFormat>
+#define QnAudioFormat QAudioFormat
+#endif
 
 #include "qtvsound.h"
 
@@ -159,7 +164,7 @@ void QtvAudioDevice::removeSound(QtvSound *soundObject)
     delete soundObject;
 }
 
-QtvSound *QtvAudioDevice::addSound(const QAudioFormat &format)
+QtvSound *QtvAudioDevice::addSound(const QnAudioFormat &format)
 {
     if (!m_device || !m_context)
         return 0;

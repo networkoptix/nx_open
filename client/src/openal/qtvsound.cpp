@@ -11,7 +11,7 @@
 #include "utils/common/sleep.h"
 #include "qtvaudiodevice.h"
 
-QtvSound::QtvSound(ALCdevice *device, const QAudioFormat &audioFormat)
+QtvSound::QtvSound(ALCdevice *device, const QnAudioFormat &audioFormat)
 {
     m_audioFormat = audioFormat;
     m_numChannels = audioFormat.channelCount();
@@ -77,9 +77,9 @@ void QtvSound::setVolumeLevel(float volumeLevel)
     alSourcef(m_source, AL_GAIN, volumeLevel);
 }
 
-int QtvSound::getFormat(const QAudioFormat &audioFormat)
+int QtvSound::getFormat(const QnAudioFormat &audioFormat)
 {
-    if (audioFormat.sampleType() == QAudioFormat::Float)
+    if (audioFormat.sampleType() == QnAudioFormat::Float)
         return false;
 
     QByteArray requestFormat;
@@ -206,7 +206,7 @@ bool QtvSound::playImpl()
     return true;
 }
 
-bool QtvSound::isFormatSupported(const QAudioFormat& format)
+bool QtvSound::isFormatSupported(const QnAudioFormat& format)
 {
     return getFormat(format) != 0;
 }
