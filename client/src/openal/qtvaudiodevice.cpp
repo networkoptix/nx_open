@@ -3,13 +3,6 @@
 #include <QtCore/QScopedPointer>
 #include <QtCore/QSettings>
 
-#ifndef Q_OS_WIN
-#include "utils/media/audioformat.h"
-#else
-#include <QAudioFormat>
-#define QnAudioFormat QAudioFormat
-#endif
-
 #include "qtvsound.h"
 
 #ifndef Q_OS_LINUX
