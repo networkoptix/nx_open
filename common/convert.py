@@ -133,9 +133,9 @@ def setup_tools():
 
     tools_path = os.path.abspath(tools_path)
     if not os.path.isdir(tools_path):
-        print 'Please clone ssh://hg@noptix.dyndns.biz/evetools to ../.. or to directory referenced by EVE_TOOLS env variable'
-        sys.exit(1)
-
+#        print 'Please clone ssh://hg@noptix.dyndns.biz/evetools to ../.. or to directory referenced by EVE_TOOLS env variable'
+#        sys.exit(1)
+        return qt_path(os.path.join('setup', 'build'))
     return qt_path(os.path.join(tools_path, platform()))
 
 

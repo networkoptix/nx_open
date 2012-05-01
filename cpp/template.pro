@@ -27,7 +27,7 @@ CONFIG(debug, debug|release) {
   MOC_DIR = ${project.build.directory}/build/debug/generated
   UI_DIR = ${project.build.directory}/build/debug/generated
   RCC_DIR = ${project.build.directory}/build/debug/generated
-  LIBS = -L${project.build.directory}/build/bin/debug -L${basedir}/../../environment/qt/bin/${arch}/debug -L${basedir}/../common/${arch}/bin/debug $$LIBS
+  LIBS = -L${project.build.directory}/build/bin/debug -L${environment.dir}/qt/bin/${arch}/debug -L${basedir}/../common/${arch}/bin/debug $$LIBS
 }
 
 CONFIG(release, debug|release) {
@@ -36,7 +36,7 @@ CONFIG(release, debug|release) {
   MOC_DIR = ${project.build.directory}/build/release/generated
   UI_DIR = ${project.build.directory}/build/release/generated
   RCC_DIR = ${project.build.directory}/build/release/generated
-  LIBS = -L${project.build.directory}/build/bin/release -L${basedir}/../../environment/qt/bin/${arch}/release -L${basedir}/../common/${arch}/bin/release $$LIBS
+  LIBS = -L${project.build.directory}/build/bin/release -L${environment.dir}/qt/bin/${arch}/release -L${basedir}/../common/${arch}/bin/release $$LIBS
 }
 
 win* {
