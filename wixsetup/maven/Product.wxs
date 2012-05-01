@@ -427,7 +427,7 @@
                                 <File Id="ServerAvformatDll" Name="avformat-54.dll" Source="mediaserver/avformat-54.dll"/>
                                 <File Id="ServerAvutilDll" Name="avutil-51.dll" Source="mediaserver/avutil-51.dll"/>
                                 <File Id="ServerSwscaleDll" Name="swscale-2.dll" Source="mediaserver/swscale-2.dll"/>
-<!--                                <File Id="ServerMp3lameDll" Name="libmp3lame-0.dll" Source="mediaserver/libmp3lame-0.dll"/> -->
+                                <File Id="ServerMp3lameDll" Name="libmp3lame-0.dll" Source="mediaserver/libmp3lame-0.dll"/> 
                             </Component>
                             
                             <Component Id="ServerQTLibraries" Guid="{97B2E8C3-274A-4e3e-8FBD-F60355A75A8A}">
@@ -494,7 +494,7 @@
                                 <File Id="ClientAvformatDll" Name="avformat-54.dll" Source="client/avformat-54.dll"/>
                                 <File Id="ClientAvutilDll" Name="avutil-51.dll" Source="client/avutil-51.dll"/>
                                 <File Id="ClientSwscaleDll" Name="swscale-2.dll" Source="client/swscale-2.dll"/>
-<!--                                <File Id="ClientMp3lameDll" Name="libmp3lame-0.dll" Source="client/libmp3lame-0.dll"/> -->
+                                <File Id="ClientMp3lameDll" Name="libmp3lame-0.dll" Source="client/libmp3lame-0.dll"/>
                             </Component>
                             
                             <Component Id="ClientQTLibraries" Guid="{6BDC7AB9-6230-4cf3-9C1C-634C636D90BC}">
