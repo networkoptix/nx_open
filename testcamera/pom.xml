@@ -16,102 +16,37 @@
 	<groupId>com.networkoptix.hdwitness</groupId>
 	<version>1.0</version>
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>traytool</artifactId>
+	<artifactId>testcamera</artifactId>
 	<packaging>pom</packaging>
-	<name>HD Witness Tray Assistant</name>	
+	<name>Test Camera</name>	
 
 	<properties>
-		<buildLib>staticlib</buildLib>	
-		<environment.dir>${basedir}/../../environment</environment.dir>
-		<donotrebuild>false</donotrebuild>
+		<!--QT libs used-->
 		<qtlib1>core</qtlib1>
-		<qtlib2>gui</qtlib2>
-		<qtlib3>network</qtlib3>
-		<qtlib4/>
+		<qtlib2>network</qtlib2>
+		<qtlib3>xml</qtlib3>
+		<qtlib4>gui</qtlib4>
 		<qtlib5/>
 		<qtlib6/>
 		<qtlib7/>
 		<qtlib8/>
 		<qtlib9/>
-		<!--QT plugins used-->		
-		<qtplugin1>enter its name here...</qtplugin1>
-		<qtplugin2>enter its name here...</qtplugin2>
-		<qtplugin3>enter its name here...</qtplugin3>
 		<!--Global libs-->
 		<global.libs>-lcommon</global.libs>
 		<!--Specific os libs used-->
 		<windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lwinmm</windows.oslibs>
-		<linux.oslibs>-lcrypto -lz</linux.oslibs>
+		<linux.oslibs>-lz</linux.oslibs>
 		<mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
 		<!--Global defines-->
 		<global.defines/>
 		<!--Specific os defines-->
 		<windows.defines/>
 		<linux.defines/>
-		<mac.defines/>			
+		<mac.defines/>		
 	</properties>
 
 	<build>
-		<directory>${arch}</directory>
-		<outputDirectory>${arch}</outputDirectory>
-		<sourceDirectory>${basedir}/src</sourceDirectory>
-
-		<plugins>
-			<plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<version>1.7</version>
-				<executions>
-					<execution>
-						<id>add-specifics-to-qt-project</id>
-						<phase>process-sources</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<target>
-								<fileset id="forms_path" dir="${project.build.sourceDirectory}">
-									<include name="**/*.ui" />
-								</fileset>
-								<pathconvert pathsep="${line.separator}" property="forms" refid="forms_path">
-									<map from="" to="FORMS += "/>
-								</pathconvert>								
-								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${forms}</echo>
-
-								<fileset id="pri_path" dir="${project.build.directory}/build/pri">
-									<include name="**/*.pri" />
-								</fileset>
-								<pathconvert pathsep=")${line.separator}" property="pri" refid="pri_path">
-									<map from="" to="include("/>
-								</pathconvert>								
-								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${pri})</echo>								
-
-								<dirset id="includes_pri_path" dir="${project.build.directory}/build/pri" includes="*"/>
-								<pathconvert pathsep="${line.separator}" property="includes_pri" refid="includes_pri_path">
-									<map from="" to="INCLUDEPATH += "/>
-								</pathconvert>								
-								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${includes_pri}</echo>	
-								
-								<fileset id="qrc_path" dir="${project.build.sourceDirectory}">
-									<include name="**/*.qrc" />
-								</fileset>
-								<pathconvert pathsep="${line.separator}" property="qrc" refid="qrc_path">
-									<map from="" to="RESOURCES += "/>
-								</pathconvert>								
-								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${qrc}</echo>
-
-								<fileset id="generated_qrc_path" dir="${project.build.directory}">
-									<include name="**/*.qrc" />
-								</fileset>
-								<pathconvert pathsep="${line.separator}" property="generated_qrc" refid="generated_qrc_path">
-									<map from="" to="RESOURCES += "/>
-								</pathconvert>								
-								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${generated_qrc}</echo>														
-							</target>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>		
-
+		<plugins>	
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<version>2.2.2</version>
@@ -129,7 +64,6 @@
 						</configuration>
 					</execution>
 				</executions>
-
 			</plugin>
 		</plugins>
 	</build>    
@@ -157,23 +91,15 @@
 								</goals>
 								<configuration>
 									<artifactItems>
-										<!--<artifactItem>
-											<groupId>com.nokia.qt</groupId>
-											<artifactId>qtservice</artifactId>
-											<version>4.7.4</version>
-											<type>zip</type>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}</outputDirectory>
-										</artifactItem>	-->
-
 										<artifactItem>
-											<groupId>com.nokia.qt</groupId>
-											<artifactId>qtsingleapplication</artifactId>
-											<version>4.7.4</version>
+											<groupId>org.ffmpeg</groupId>
+											<artifactId>ffmpeg</artifactId>
+											<version>${ffmpeg.version}</version>
 											<type>zip</type>
+											<classifier>${platform}-${arch}</classifier>
 											<overWrite>false</overWrite>
 											<outputDirectory>${project.build.directory}</outputDirectory>
-										</artifactItem>									
+										</artifactItem>																				
 									</artifactItems>
 								</configuration>
 							</execution>
@@ -191,7 +117,7 @@
 				</os>
 			</activation>				
 			<build>
-				<plugins>
+				<plugins>					
 					<plugin>
 						<groupId>com.goldin.plugins</groupId>
 						<artifactId>maven-copy-plugin</artifactId>
@@ -263,6 +189,17 @@
 					</plugin>					
 				</plugins>
 			</build>
-		</profile>	
+		</profile>		
+		<profile>
+			<id>windows</id>
+			<activation>
+				<os>
+					<family>Windows</family>
+				</os>
+			</activation>
+			<properties>
+				<qtlib9>multimedia</qtlib9>
+			</properties>						
+		</profile>
 	</profiles>
 </project>

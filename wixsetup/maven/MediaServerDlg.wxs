@@ -1,0 +1,73 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (c) Microsoft Corporation.  All rights reserved.
+    
+    The use and distribution terms for this software are covered by the
+    Common Public License 1.0 (http://opensource.org/licenses/cpl1.0.php)
+    which can be found in the file CPL.TXT at the root of this distribution.
+    By using this software in any fashion, you are agreeing to be bound by
+    the terms of this license.
+    
+    You must not remove this notice, or any other, from this software.
+-->
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <UI>
+            <Dialog Id="MediaServerDlg" Width="370" Height="270" Title="!(loc.InstallDirDlg_Title)">
+                <Control Id="HostLabel" Type="Text" Height="17" Width="32" X="25" Y="68" Text="Host" />
+                <Control Id="Host" Type="Edit" Height="15" Width="182" X="75" Y="65" Property="SERVER_APPSERVER_HOST">
+                    <Condition Action="disable"><![CDATA[(!AppServerFeature=3 OR &AppServerFeature=3)]]></Condition>
+                    <Condition Action="enable"><![CDATA[(!AppServerFeature<>3 AND &AppServerFeature<>3)]]></Condition>
+                </Control>
+            	
+                <Control Type="Text" Id="PortLabel" Width="21" Height="17" X="269" Y="68" Text="Port" />
+                <Control Type="Edit" Id="Port" Width="55" Height="15" X="296" Y="67" Property="SERVER_APPSERVER_PORT">
+                    <Condition Action="disable"><![CDATA[(!AppServerFeature=3 OR &AppServerFeature=3)]]></Condition>
+                    <Condition Action="enable"><![CDATA[(!AppServerFeature<>3 AND &AppServerFeature<>3)]]></Condition>
+                </Control>
+            	
+                <Control Type="Text" Id="LoginLabel" Width="32" Height="17" X="25" Y="92" Text="Login" />
+                <Control Type="Edit" Id="Login" X="75" Y="89" Width="101" Height="15" Property="SERVER_APPSERVER_LOGIN">
+                    <Condition Action="disable"><![CDATA[(!AppServerFeature=3 OR &AppServerFeature=3)]]></Condition>
+                    <Condition Action="enable"><![CDATA[(!AppServerFeature<>3 AND &AppServerFeature<>3)]]></Condition>
+                </Control>
+            	
+                <Control Type="Text" Id="PasswordLabel" Width="46" Height="15" X="190" Y="92" Text="Password" />
+                <Control Type="Edit" Id="Password" Width="111" Height="15" X="241" Y="89" Property="SERVER_APPSERVER_PASSWORD">
+                    <Condition Action="disable"><![CDATA[(&AppServerFeature=3)]]></Condition>
+                    <Condition Action="enable"><![CDATA[(&AppServerFeature<>3)]]></Condition>
+                </Control>
+            	
+                <Control Id="label1" Type="Text" Height="17" Width="70" X="25" Y="131" Text="RTSP Port" />
+                <Control Id="textBox1" Type="Edit" Height="15" Width="105" X="93" Y="129" Property="SERVER_RTSP_PORT" />
+                <Control Id="label2" Type="Text" Height="17" Width="34" X="233" Y="130" Text="API Port" />
+                <Control Id="textBox2" Type="Edit" Height="15" Width="80" X="273" Y="128" Property="SERVER_API_PORT" />
+                <Control Id="label3" Type="Text" Height="17" Width="70" X="25" Y="161" Text="Recording Folder" />
+                <Control Id="ServerMediaDir" Type="PathEdit" Height="15" Width="197" X="93" Y="158" Property="WIXUI_SERVER_DIRECTORY" Indirect="yes" />
+                <Control Id="groupBox1" Type="GroupBox" Height="66" Width="345" X="15" Y="49" Text="Enterprise Controller" />
+                <Control Id="ChangeServerMediaDir" Type="PushButton" Height="17" Width="56" X="296" Y="158" Text="Browse" />
+            	
+                <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="no" Text="!(loc.WixUINext)" />
+                <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)" />
+                <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="no" Text="!(loc.WixUICancel)">
+                    <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+                </Control>
+                <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes" />
+                <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes" Text="Media Server Configuration" />
+                <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="!(loc.InstallDirDlgBannerBitmap)" />
+                <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="2" />
+                <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="2" />
+                <Control Id="groupBox2" Type="GroupBox" Height="67" Width="345" X="15" Y="119" Text="Media Server" />
+                <Control Id="warning1label" Type="Text" Height="21" Width="304" X="56" Y="191" Text="Warning: The selected volume has less than 10 GB of free size">
+                    <Condition Action="hide">NOT SERVERDIR_LOWDISKSPACE</Condition>
+                    <Condition Action="show">SERVERDIR_LOWDISKSPACE AND NOT SERVERDIR_CANT_WRITE</Condition>
+                </Control>
+                <Control Id="warning2label" Type="Text" Height="21" Width="304" X="56" Y="191" Text="Warning: The selected volume has less than 10 GB of free size">
+                    <Condition Action="hide">NOT SERVERDIR_CANT_WRITE</Condition>
+                    <Condition Action="show">SERVERDIR_CANT_WRITE</Condition>
+                </Control>
+            
+            </Dialog>
+        </UI>
+    </Fragment>
+</Wix>

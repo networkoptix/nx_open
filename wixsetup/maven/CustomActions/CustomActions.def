@@ -1,0 +1,10 @@
+LIBRARY "CustomActions"
+
+EXPORTS
+
+CheckServerDriveLowSpace
+CheckServerDirectoryWritable
+GenerateGuidsForServers
+SetMoviesFolder
+CheckPorts
+FindFreePorts
