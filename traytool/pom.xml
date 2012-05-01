@@ -22,7 +22,6 @@
 
 	<properties>
 		<buildLib>staticlib</buildLib>	
-		<environment.dir>${basedir}/../../environment</environment.dir>
 		<donotrebuild>false</donotrebuild>
 		<qtlib1>core</qtlib1>
 		<qtlib2>gui</qtlib2>
