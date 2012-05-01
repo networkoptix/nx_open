@@ -273,7 +273,7 @@
 								</configuration>
 							</execution>
 
-							<execution>
+							<!--<execution>
 								<id>wix-pack-exe</id>
 								<phase>prepare-package</phase>
 								<goals>
@@ -291,7 +291,7 @@
 										<argument>setup.exe</argument>
 									</arguments>		
 								</configuration>					
-							</execution>					
+							</execution>	-->				
 
 							<execution>
 								<id>integration-test</id>
