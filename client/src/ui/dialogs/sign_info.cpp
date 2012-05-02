@@ -32,13 +32,13 @@ void QnSignInfo::at_calcSignInProgress(QByteArray sign, int progress)
     update();
 }
 
-void QnSignInfo::resizeEvent ( QResizeEvent * event )
+void QnSignInfo::resizeEvent(QResizeEvent *)
 {
     m_videoRect = SignDialog::calcVideoRect(width(), height(), m_textureWidth, m_textureHeight);
     update();
 }
 
-void QnSignInfo::paintEvent(QPaintEvent* event)
+void QnSignInfo::paintEvent(QPaintEvent *)
 {
     //QTime t;
     //t.restart();

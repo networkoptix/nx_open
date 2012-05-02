@@ -8,13 +8,14 @@
 #include <core/resourcemanagment/resource_criterion.h>
 
 #include <ui/actions/action_manager.h>
+#include <ui/workbench/workbench_context.h>
 
 #include "multiple_camera_settings_widget.h"
 #include "single_camera_settings_widget.h"
 
-QnCameraSettingsWidget::QnCameraSettingsWidget(QWidget *parent): 
+QnCameraSettingsWidget::QnCameraSettingsWidget(QWidget *parent, QnWorkbenchContext *context): 
     QWidget(parent),
-    QnWorkbenchContextAware(parent),
+    QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent),
     m_emptyTab(Qn::GeneralSettingsTab)
 {
     /* Create per-mode widgets. */

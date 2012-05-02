@@ -203,7 +203,7 @@ protected:
 
 QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent, QnWorkbenchContext *context): 
     QWidget(parent),
-    QnWorkbenchContextAware(parent ? static_cast<QObject *>(parent) : context),
+    QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent),
     ui(new Ui::ResourceTreeWidget()),
     m_filterTimerId(0),
     m_ignoreFilterChanges(false)
@@ -451,7 +451,7 @@ void QnResourceTreeWidget::updateFilter(bool force) {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *) {
+void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *event) {
     if(!context() || !context()->menu()) {
         qnWarning("Requesting context menu for a tree widget while no menu manager instance is available.");
         return;
@@ -469,7 +469,7 @@ void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *) {
         return;
 
     /* Run menu. */
-    QAction *action = menu->exec(QCursor::pos());
+    QAction *action = menu->exec(event->globalPos());
 
     /* Process tree-local actions. */
     if(action == m_renameAction)
@@ -545,7 +545,7 @@ void QnResourceTreeWidget::at_workbench_currentLayoutChanged() {
     currentItemView()->update();
 }
 
-void QnResourceTreeWidget::at_workbench_itemChanged(Qn::ItemRole role) {
+void QnResourceTreeWidget::at_workbench_itemChanged(Qn::ItemRole /*role*/) {
     /* Raised state has changed. */
     ui->resourceTreeView->update();
 }

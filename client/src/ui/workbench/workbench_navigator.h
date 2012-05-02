@@ -32,9 +32,6 @@ public:
     QnWorkbenchNavigator(QObject *parent = NULL);
     virtual ~QnWorkbenchNavigator();
 
-    QnWorkbenchDisplay *display() const;
-    void setDisplay(QnWorkbenchDisplay *display);
-
     QnTimeSlider *timeSlider() const;
     void setTimeSlider(QnTimeSlider *timeSlider);
 
@@ -42,6 +39,11 @@ public:
     void setTimeScrollBar(QnTimeScrollBar *scrollBar);
 
     bool isLive() const;
+    Q_SLOT bool setLive(bool live);
+    bool isLiveSupported() const;
+
+    bool isPlaying() const;
+    bool setPlaying(bool playing);
 
     QnResourceWidget *currentWidget();
 
@@ -52,6 +54,9 @@ public:
 
 signals:
     void currentWidgetChanged();
+    void liveChanged();
+    void liveSupportedChanged();
+    void playingChanged();
 
 protected:
     enum SliderLine {
@@ -76,30 +81,31 @@ protected:
     void addSyncedWidget(QnResourceWidget *widget);
     void removeSyncedWidget(QnResourceWidget *widget);
     
-    void setCurrentWidget(QnResourceWidget *camera);
-
     SliderUserData currentSliderData() const;
     void setCurrentSliderData(const SliderUserData &localData);
 
     QnCachingTimePeriodLoader *loader(const QnResourcePtr &resource);
     QnCachingTimePeriodLoader *loader(QnResourceWidget *widget);
 
-    Q_SLOT void updateCurrentWidget();
-    Q_SLOT void updateSliderFromReader();
-    Q_SLOT void updateScrollBarFromSlider();
-    Q_SLOT void updateSliderFromScrollBar();
-    void updateToolTipFormat();
+protected slots:
+    void updateCurrentWidget();
+    void updateSliderFromReader();
+    void updateScrollBarFromSlider();
+    void updateSliderFromScrollBar();
 
     void updateCurrentPeriods();
     void updateCurrentPeriods(Qn::TimePeriodType type);
     void updateSyncedPeriods(Qn::TimePeriodType type);
     void updateLines();
 
+    void updateLive();
+    void updateLiveSupported();
+    //void updatePlaying();
+
 protected slots:
     void at_display_widgetChanged(Qn::ItemRole role);
     void at_display_widgetAdded(QnResourceWidget *widget);
     void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
-    void at_display_destroyed();
 
     void at_widget_motionSelectionChanged(QnResourceWidget *widget);
     void at_widget_motionSelectionChanged();
@@ -118,7 +124,6 @@ protected slots:
 private:
     QnTimeSlider *m_timeSlider;
     QnTimeScrollBar *m_timeScrollBar;
-    QnWorkbenchDisplay *m_display;
 
     QSet<QnResourceWidget *> m_syncedWidgets;
     QMultiHash<QnResourcePtr, QHashDummyValue> m_syncedResources;
@@ -131,6 +136,10 @@ private:
     bool m_updatingSliderFromReader;
     bool m_updatingSliderFromScrollBar;
     bool m_updatingScrollBarFromSlider;
+
+    bool m_lastLive;
+    bool m_lastLiveSupported;
+    bool m_lastPlaying;
 
     QAction *m_clearSelectionAction;
 

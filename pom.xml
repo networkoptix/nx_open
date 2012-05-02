@@ -6,40 +6,178 @@
     It should also be possible to have one maven project per solution project, 
     and have a parent pom to deletegate the build.
   -->
-<!--test message-->
-	<groupId>com.networkoptix.hdwitness-vms</groupId>
-	<version>0.1-SNAPSHOT</version>
+	<!--test message-->
+	<groupId>com.networkoptix.hdwitness</groupId>
+	<version>1.0</version>
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>hdwitness-vms</artifactId>
+	<artifactId>hdwitness</artifactId>
 	<packaging>pom</packaging>
-	<name>VMS</name>
+	<name>HD Witness</name>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+				<checksumPolicy>warn</checksumPolicy>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+				<checksumPolicy>fail</checksumPolicy>
+			</snapshots>
+			<id>goldin</id>
+			<name>Evgeny Goldin</name>
+			<url>http://evgeny-goldin.org/artifactory/repo/</url>
+			<layout>default</layout>
+		</pluginRepository>
+	</pluginRepositories>	
+
+	<organization>
+		<name>Network Optix</name>
+		<url>networkoptix.com</url>
+	</organization>
+
 	<properties>
-		<msbuild.exe>C:\WINDOWS\Microsoft.NET\Framework\v3.5\msbuild.exe</msbuild.exe>
-		<msbuild.configuration>release</msbuild.configuration>
+		<build.configuration>release</build.configuration>
+		<buildNumber>0</buildNumber>
+		<environment.dir>${env.ENVIRONMENT}</environment.dir>
+		<customization>default</customization>
 	</properties>
-    <modules>
+	<modules>
 		<module>appserver</module>
 		<module>common</module>
 		<module>mediaserver</module>
-		<module>client</module>
-		<module>traytool</module>
-		<module>wixsetup</module>
-    </modules>
+	</modules>
 	<build>
 		<defaultGoal>package</defaultGoal>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>properties-maven-plugin</artifactId>
+				<version>1.0-alpha-2</version>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>read-project-properties</goal>
+						</goals>
+						<configuration>
+							<files>
+								<file>build-${customization}.properties</file>
+							</files>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>		
 	</build>
 	<profiles>
 		<profile>
 			<id>windows</id>
 			<activation>
-				<activeByDefault>true</activeByDefault>
 				<os>
 					<family>Windows</family>
 				</os>
 			</activation>
+			<modules>
+				<module>client</module>	
+				<module>mediaproxy</module>					
+				<module>traytool</module>
+				<module>wixsetup</module>
+			</modules>
 			<properties>
 				<platform>windows</platform>
 			</properties>
 		</profile>
+		<profile>
+			<id>linux</id>
+			<activation>
+				<os>
+					<family>unix</family>
+				</os> 
+			</activation>
+			<modules>
+				<!--<module>debsetup</module>-->
+			</modules>
+			<properties>
+				<platform>linux</platform>
+			</properties>
+		</profile>	
+		<profile>
+			<id>linux-x64</id>
+			<activation>
+				<os>
+					<arch>amd64</arch>
+				</os> 
+			</activation>
+			<properties>
+				<arch>x64</arch>
+			</properties>
+		</profile>
+		<profile>
+			<id>linux-x86</id>
+			<activation>
+				<os>
+					<arch>i386</arch>
+					<!--<arch>i586</arch>
+					<arch>i686</arch>-->
+				</os> 
+			</activation>
+			<properties>
+				<arch>x86</arch>
+			</properties>
+		</profile>
+		<profile>
+			<id>convert-clean</id>
+			<activation>				
+				<activeByDefault>true</activeByDefault>
+				<file>
+					<missing>${project.build.directory}/build/include</missing>
+				</file> 
+				<!-- <property>
+					<name>convert-only</name>
+					<value>false</value>
+				</property>	-->			
+			</activation>				
+			<build>
+				<plugins>    
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>build-helper-maven-plugin</artifactId>
+						<version>1.7</version>
+						<executions>
+							<execution>
+								<id>released-version</id>
+								<phase>validate</phase>
+								<goals>
+									<goal>released-version</goal>
+									<goal>parse-version</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>buildnumber-maven-plugin</artifactId>
+						<version>1.0-beta-4</version>
+						<executions>
+							<execution>
+								<phase>validate</phase>
+								<goals>
+									<goal>hgchangeset</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<doCheck>false</doCheck>
+							<doUpdate>update</doUpdate>
+						</configuration>
+					</plugin>
+				</plugins>
+
+			</build>
+		</profile>			
 	</profiles>	
 </project>

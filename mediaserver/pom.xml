@@ -7,120 +7,294 @@
     and have a parent pom to deletegate the build.
   -->
 	<parent>
-		<artifactId>hdwitness-vms</artifactId>
-		<groupId>com.networkoptix.hdwitness-vms</groupId>
-		<version>0.1-SNAPSHOT</version>
-		<relativePath>..</relativePath>
+		<artifactId>cpp</artifactId>
+		<groupId>com.networkoptix.hdwitness</groupId>
+		<version>1.0</version>
+		<relativePath>../cpp</relativePath>
 	</parent>
 
-	<groupId>${pom.parent.groupId}</groupId>
-	<version>${pom.parent.version}</version>
+	<groupId>com.networkoptix.hdwitness</groupId>
+	<version>1.0</version>
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>server</artifactId>
+	<artifactId>mediaserver</artifactId>
 	<packaging>pom</packaging>
-	<name>VMS Video Server</name>
+	<name>HD Witness Media Server</name>	
+
+	<properties>
+		<!--QT libs used-->
+		<qtlib1>core</qtlib1>
+		<qtlib2>network</qtlib2>
+		<qtlib3>xml</qtlib3>
+		<qtlib4>gui</qtlib4>
+		<qtlib5/>
+		<qtlib6/>
+		<qtlib7/>
+		<qtlib8/>
+		<qtlib9/>
+		<!--Global libs-->
+		<global.libs>-lcommon</global.libs>
+		<!--Specific os libs used-->
+		<windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lwinmm</windows.oslibs>
+		<linux.oslibs>-lz</linux.oslibs>
+		<mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
+		<!--Global defines-->
+		<global.defines/>
+		<!--Specific os defines-->
+		<windows.defines/>
+		<linux.defines/>
+		<mac.defines/>		
+	</properties>
 
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>1.1</version>
-				<configuration>
-
-				</configuration>
-
-			</plugin>		
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>1.1</version>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.7</version>
 				<executions>
 					<execution>
-						<id>initialize</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-							<executable>python</executable>
-							<workingDirectory>${baseDir}</workingDirectory>
-							<arguments>
-								<argument>convert.py</argument>
-							</arguments>							
-						</configuration>					
-					</execution>
-					<execution>
-						<id>package-with-msbuild</id>
-						<phase>package</phase>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-							<executable>${msbuild.exe}</executable>
-							<workingDirectory>${basedir}/src</workingDirectory>		
-							<arguments>
-								<argument>${artifactId}.vcproj</argument>
-								<argument>/t:Rebuild</argument>
-								<argument>/p:Configuration=${msbuild.configuration}</argument>
-							</arguments>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>1.3</version>
-				<executions>
-					<execution>
-						<id>attach</id>
-						<phase>package</phase>
-						<goals>
-							<goal>attach-artifact</goal>
-						</goals>
-						<configuration>
-							<artifacts>
-								<artifact>
-									<file>${basedir}/bin/${msbuild.configuration}/server.exe</file>
-									<type>exe</type>
-									<classifier>${platform}-x86-${msbuild.configuration}</classifier>
-								</artifact>
-							</artifacts>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-<!--			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.3</version>
-				<executions>
-					<execution>
-						<id>copy-libs</id>
+						<id>add-specifics-to-qt-project</id>
 						<phase>process-sources</phase>
 						<goals>
-							<goal>copy</goal>
+							<goal>run</goal>
 						</goals>
 						<configuration>
-							<artifactItems>
-								<artifactItem>
-									<groupId>${project.groupId}</groupId>
-									<artifactId>common</artifactId>
-									<version>${project.version}</version>
-									<classifier>${platform}-x86-${msbuild.configuration}</classifier>	
-									<type>lib</type>
-									<outputDirectory>${basedir}/bin/${msbuild.configuration}</outputDirectory>
-									<overWrite>true</overWrite>
-									<destFileName>common.lib</destFileName>																						
-								</artifactItem>
-							</artifactItems>
+							<target>
+								<fileset id="pri_path" dir="${project.build.directory}/build/pri">
+									<include name="**/*.pri" />
+								</fileset>
+								<pathconvert pathsep=")${line.separator}" property="pri" refid="pri_path">
+									<map from="" to="include("/>
+								</pathconvert>								
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${pri})</echo>
+							</target>
 						</configuration>
 					</execution>
 				</executions>
-			</plugin>-->			
+			</plugin>		
+
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2.2</version>
+				<executions>
+					<execution>
+						<id>pack-binaries</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<descriptors>
+								<descriptor>${project.build.directory}/binaries-${build.configuration}.xml</descriptor>
+							</descriptors>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
-	</build>
+	</build>    
 
+	<profiles>
+		<profile>
+			<id>convert-clean</id>
+			<activation>				
+				<file>
+					<missing>${project.build.directory}/build/include</missing>
+				</file>		
+			</activation>			
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<version>2.4</version>
+						<executions>
+							<execution>
+								<id>unpack-specific-libs</id>
+								<phase>validate</phase>
+								<goals>
+									<goal>unpack</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>org.ffmpeg</groupId>
+											<artifactId>ffmpeg</artifactId>
+											<version>${ffmpeg.version}</version>
+											<type>zip</type>
+											<classifier>${platform}-${arch}</classifier>
+											<overWrite>false</overWrite>
+											<outputDirectory>${project.build.directory}</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>org</groupId>
+											<artifactId>openssl</artifactId>
+											<version>1.0.0e</version>
+											<type>zip</type>
+											<classifier>${platform}-${arch}</classifier>
+											<overWrite>false</overWrite>
+											<outputDirectory>${project.build.directory}</outputDirectory>
+										</artifactItem>							
+										<artifactItem>
+											<groupId>com.google</groupId>
+											<artifactId>protobuf</artifactId>
+											<version>2.4.1</version>
+											<type>zip</type>
+											<classifier>${platform}-${arch}</classifier>
+											<overWrite>false</overWrite>
+											<outputDirectory>${project.build.directory}</outputDirectory>
+										</artifactItem>							
+										<artifactItem>
+											<groupId>org</groupId>
+											<artifactId>qjson</artifactId>
+											<version>0.7.1</version>
+											<type>zip</type>
+											<classifier>${platform}-${arch}</classifier>
+											<overWrite>false</overWrite>
+											<outputDirectory>${project.build.directory}</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>com.nokia.qt</groupId>
+											<artifactId>qtcore</artifactId>
+											<version>4.7.4</version>
+											<type>zip</type>
+											<overWrite>false</overWrite>
+											<outputDirectory>${project.build.directory}</outputDirectory>
+										</artifactItem>						
+										<artifactItem>
+											<groupId>com.nokia.qt</groupId>
+											<artifactId>qtsinglecoreapplication</artifactId>
+											<version>4.7.4</version>
+											<type>zip</type>
+											<overWrite>false</overWrite>
+											<outputDirectory>${project.build.directory}</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>com.nokia.qt</groupId>
+											<artifactId>qtservice</artifactId>
+											<version>4.7.4</version>
+											<type>zip</type>
+											<overWrite>false</overWrite>
+											<outputDirectory>${project.build.directory}</outputDirectory>
+										</artifactItem>									
+									</artifactItems>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>					
+				</plugins>
+			</build>
+		</profile>	
 
+		<profile>
+			<id>convert-clean-windows</id>
+			<activation>			
+				<os>
+					<family>Windows</family>
+				</os>
+			</activation>				
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<version>2.4</version>
+						<executions>
+							<execution>
+								<id>unpack-specific-libs</id>
+								<phase>validate</phase>
+								<goals>
+									<goal>unpack</goal>
+								</goals>
+								<configuration>
+									<artifactItems>						
+									
+									</artifactItems>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>					
+					<plugin>
+						<groupId>com.goldin.plugins</groupId>
+						<artifactId>maven-copy-plugin</artifactId>
+						<version>0.2.3.6</version>
+						<executions>
+							<execution>
+								<id>copy-qt-libraries</id>
+								<phase>process-resources</phase>
+								<goals>
+									<goal>copy</goal>
+								</goals>
+								<configuration>
+									<failIfNotFound>false</failIfNotFound>
+									<resources>
+										<resource>
+											<targetPath>${project.build.directory}/bin</targetPath>
+											<directory>${environment.dir}/qt/bin/${arch}</directory>
+											<preservePath>true</preservePath>
+											<includes>
+												<include>**/qt${qtlib1}4.*</include>
+												<include>**/qt${qtlib2}4.*</include>
+												<include>**/qt${qtlib3}4.*</include>
+												<include>**/qt${qtlib4}4.*</include>
+												<include>**/qt${qtlib5}4.*</include>
+												<include>**/qt${qtlib6}4.*</include>
+												<include>**/qt${qtlib7}4.*</include>
+												<include>**/qt${qtlib8}4.*</include>
+												<include>**/qt${qtlib9}4.*</include>
+												<include>**/qt${qtlib1}d4.*</include>
+												<include>**/qt${qtlib2}d4.*</include>
+												<include>**/qt${qtlib3}d4.*</include>
+												<include>**/qt${qtlib4}d4.*</include>
+												<include>**/qt${qtlib5}d4.*</include>
+												<include>**/qt${qtlib6}d4.*</include>
+												<include>**/qt${qtlib7}d4.*</include>
+												<include>**/qt${qtlib8}d4.*</include>
+												<include>**/qt${qtlib9}d4.*</include>												
+											</includes>
+											<excludes>
+												<exclude>**/*.lib</exclude>
+											</excludes>
+										</resource>
+										<resource>
+											<targetPath>${project.build.directory}/bin</targetPath>
+											<directory>${environment.dir}/qt/plugins/${arch}</directory>
+											<preservePath>true</preservePath>
+											<includes>
+												<include>*/${qtplugin1}/**</include>
+												<include>*/${qtplugin2}/**</include>
+												<include>*/${qtplugin3}/**</include>
+											</includes>										
+										</resource>	
+										<resource>
+											<targetPaths>
+												<targetPath>${project.build.directory}/bin/release</targetPath>
+												<targetPath>${project.build.directory}/bin/debug</targetPath>
+											</targetPaths>
+											<directory>${basedir}/resource</directory>
+											<preservePath>true</preservePath>
+											<includes>
+												<include>**/*.xml</include>
+											</includes>
+											<filtering>false</filtering>
+										</resource>										
+									</resources>								
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>					
+				</plugins>
+			</build>
+		</profile>		
+		<profile>
+			<id>windows</id>
+			<activation>
+				<os>
+					<family>Windows</family>
+				</os>
+			</activation>
+			<properties>
+				<qtlib9>multimedia</qtlib9>
+			</properties>						
+		</profile>
+	</profiles>
 </project>

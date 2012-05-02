@@ -138,14 +138,13 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
 
     /* Set up model & control machinery. */
-    m_display = new QnWorkbenchDisplay(this);
-	m_display->setStreamsSynchronized(true);
-    m_display->setScene(scene);
-    m_display->setView(m_view);
-    m_display->setNormalMarginFlags(Qn::MarginsAffectSize | Qn::MarginsAffectPosition);
+	display()->setStreamsSynchronized(true);
+    display()->setScene(scene);
+    display()->setView(m_view);
+    display()->setNormalMarginFlags(Qn::MarginsAffectSize | Qn::MarginsAffectPosition);
 
-    m_controller = new QnWorkbenchController(m_display, this);
-    m_ui = new QnWorkbenchUi(m_display, this);
+    m_controller = new QnWorkbenchController(this);
+    m_ui = new QnWorkbenchUi(this);
     m_ui->setFlags(QnWorkbenchUi::HideWhenZoomed | QnWorkbenchUi::AdjustMargins);
 
     m_actionHandler = new QnWorkbenchActionHandler(this);

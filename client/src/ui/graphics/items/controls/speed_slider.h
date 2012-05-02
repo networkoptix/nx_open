@@ -23,10 +23,10 @@ public:
 
 public slots:
     void resetSpeed();
-    void setSpeed(int value);
+    void setSpeed(float value);
 
-    void stepBackward();
-    void stepForward();
+    void speedDown();
+    void speedUp();
 
 signals:
     void speedChanged(float newSpeed);

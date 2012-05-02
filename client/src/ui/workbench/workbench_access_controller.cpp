@@ -116,7 +116,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnVirtua
     }
 }
 
-Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnAbstractArchiveResourcePtr &archive) {
+Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnAbstractArchiveResourcePtr &) {
     return Qn::ReadPermission;
 }
 

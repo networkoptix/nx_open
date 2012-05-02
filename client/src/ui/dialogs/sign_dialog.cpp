@@ -30,7 +30,7 @@
 class QnSignDialogGlWidget: public QGLWidget
 {
 public:
-    QnSignDialogGlWidget(const QGLFormat & format, QWidget * parent = 0): QGLWidget(format, parent)
+    QnSignDialogGlWidget(const QGLFormat &format, QWidget *parent = 0): QGLWidget(format, parent)
     {
         m_renderer = 0;
         connect(&m_timer, SIGNAL(timeout()), this, SLOT(update()));
@@ -46,7 +46,7 @@ public:
         resizeEvent(0);
     }
 
-    virtual void  resizeEvent ( QResizeEvent * event ) override
+    virtual void resizeEvent(QResizeEvent *) override
     {
         m_videoRect = SignDialog::calcVideoRect(width(), height(), m_textureWidth, m_textureHeight);
         if (m_renderer)
@@ -54,13 +54,13 @@ public:
         update();
     }
 
-    void setRenderer(QnResourceWidgetRenderer* renderer)
+    void setRenderer(QnResourceWidgetRenderer *renderer)
     {
         m_renderer = renderer;
     }
 
     
-    virtual void paintEvent( QPaintEvent * event ) override
+    virtual void paintEvent(QPaintEvent *) override
     {
         QPainter painter(this);
         painter.beginNativePainting();
@@ -71,7 +71,7 @@ public:
     
 private:
     QRect m_videoRect;
-    QnResourceWidgetRenderer* m_renderer;
+    QnResourceWidgetRenderer *m_renderer;
     QTimer m_timer;
     double m_textureWidth;
     double m_textureHeight;

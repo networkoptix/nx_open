@@ -8,6 +8,7 @@
 #include "workbench_synchronizer.h"
 #include "workbench_layout_snapshot_manager.h"
 #include "workbench_access_controller.h"
+#include "workbench_display.h"
 
 QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *parent):
     QObject(parent)
@@ -29,6 +30,9 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
     m_snapshotManager.reset(new QnWorkbenchLayoutSnapshotManager(this));
     m_accessController.reset(new QnWorkbenchAccessController(this));
     m_menu.reset(new QnActionManager(this));
+
+    /* Create display. */
+    m_display.reset(new QnWorkbenchDisplay(this));
 }
 
 QnWorkbenchContext::~QnWorkbenchContext() {
