@@ -41,6 +41,7 @@ QnWorkbenchContext::~QnWorkbenchContext() {
     blockSignals(signalsBlocked);
 
     /* Destruction order of these objects is important. */
+    m_display.reset();
     m_menu.reset();
     m_accessController.reset();
     m_snapshotManager.reset();

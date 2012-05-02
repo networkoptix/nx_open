@@ -211,17 +211,19 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
 
 
     /* Set up handlers. */
-    connect(m_backwardButton,       SIGNAL(clicked()),      this,           SLOT(rewindBackward()));
-    connect(m_stepBackwardButton,   SIGNAL(clicked()),      this,           SLOT(stepBackward()));
-    connect(m_playButton,           SIGNAL(clicked()),      this,           SLOT(togglePlayPause()));
-    connect(m_stepForwardButton,    SIGNAL(clicked()),      this,           SLOT(stepForward()));
-    connect(m_forwardButton,        SIGNAL(clicked()),      this,           SLOT(rewindForward()));
-    connect(m_liveButton,           SIGNAL(toggled(bool)),  m_navigator,    SLOT(setLive(bool)));
-    connect(m_mrsButton,            SIGNAL(clicked()),      this,           SIGNAL(clearMotionSelection()));
-    connect(m_syncButton,           SIGNAL(toggled(bool)),  this,           SLOT(onSyncButtonToggled(bool)));
-    connect(m_muteButton,           SIGNAL(clicked(bool)),  m_volumeSlider, SLOT(setMute(bool)));
-    connect(m_navigator,            SIGNAL(liveChanged()),  this,           SLOT(updateLiveState()));
-    connect(m_navigator,            SIGNAL(liveChanged()),  this,           SLOT(updateLiveState()));
+    connect(m_backwardButton,       SIGNAL(clicked()),                  this,           SLOT(rewindBackward()));
+    connect(m_stepBackwardButton,   SIGNAL(clicked()),                  this,           SLOT(stepBackward()));
+    connect(m_playButton,           SIGNAL(clicked()),                  this,           SLOT(at_playButton_clicked()));
+    connect(m_stepForwardButton,    SIGNAL(clicked()),                  this,           SLOT(stepForward()));
+    connect(m_forwardButton,        SIGNAL(clicked()),                  this,           SLOT(rewindForward()));
+    connect(m_liveButton,           SIGNAL(toggled(bool)),              m_navigator,    SLOT(setLive(bool)));
+    connect(m_mrsButton,            SIGNAL(clicked()),                  this,           SIGNAL(clearMotionSelection()));
+    connect(m_syncButton,           SIGNAL(toggled(bool)),              this,           SLOT(onSyncButtonToggled(bool)));
+    connect(m_muteButton,           SIGNAL(clicked(bool)),              m_volumeSlider, SLOT(setMute(bool)));
+    connect(m_navigator,            SIGNAL(liveChanged()),              this,           SLOT(updateLiveState()));
+    connect(m_navigator,            SIGNAL(liveSupportedChanged()),     this,           SLOT(updateLiveState()));
+    connect(m_navigator,            SIGNAL(playingChanged()),           this,           SLOT(updatePlayingState()));
+    connect(m_navigator,            SIGNAL(playingSupportedChanged()),  this,           SLOT(updatePlayingState()));
 
     /* Create actions. */
     QAction *playAction = new QAction(tr("Play / Pause"), m_playButton);
@@ -297,6 +299,8 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
     addAction(toggleSyncAction);
 
     updateGeometry();
+    updateLiveState();
+    updatePlayingState();
 }
 
 QnNavigationItem::~QnNavigationItem()
@@ -560,51 +564,14 @@ void QnNavigationItem::onSpeedChanged(float newSpeed)
 
 void QnNavigationItem::onVolumeLevelChanged(int newVolumeLevel)
 {
-    setMute(m_volumeSlider->isMute());
+    //setMute(m_volumeSlider->isMute());
 }
-
+/*
 void QnNavigationItem::setMute(bool mute)
 {
     m_muteButton->setChecked(mute);
 }
-
-void QnNavigationItem::setPlaying(bool playing)
-{
-    setActive(true);
-
-    if (m_playing == playing)
-        return;
-
-    m_playing = playing;
-
-    if (m_playing) {
-        m_stepBackwardButton->setIcon(qnSkin->icon("backward.png"));
-
-        m_playButton->setIcon(qnSkin->icon("pause.png"));
-
-        m_stepForwardButton->setIcon(qnSkin->icon("forward.png"));
-
-        m_speedSlider->setPrecision(QnSpeedSlider::LowPrecision);
-
-        play();
-    } else {
-        m_stepBackwardButton->setIcon(qnSkin->icon("step_backward.png"));
-
-        m_playButton->setIcon(qnSkin->icon("play.png"));
-
-        m_stepForwardButton->setIcon(qnSkin->icon("step_forward.png"));
-
-        m_speedSlider->setPrecision(QnSpeedSlider::HighPrecision);
-
-        pause();
-        //m_timeSlider->setLiveMode(false);
-    }
-}
-
-void QnNavigationItem::togglePlayPause()
-{
-    setPlaying(!m_playing);
-}
+*/
 
 void QnNavigationItem::onSyncButtonToggled(bool value)
 {
@@ -643,3 +610,25 @@ void QnNavigationItem::updateLiveState() {
     m_liveButton->setEnabled(m_navigator->isLiveSupported());
 }
 
+void QnNavigationItem::updatePlayingState() {
+    bool playing = m_navigator->isPlaying();
+    bool enabled = m_navigator->isPlayingSupported();
+
+    m_playButton->setIcon(qnSkin->icon(playing ? "pause.png" : "play.png"));
+    m_stepBackwardButton->setIcon(qnSkin->icon(playing ? "backward.png" : "step_backward.png"));
+    m_stepForwardButton->setIcon(qnSkin->icon(playing ? "forward.png" : "step_forward.png"));
+    m_speedSlider->setPrecision(playing ? QnSpeedSlider::LowPrecision : QnSpeedSlider::HighPrecision);
+
+    m_playButton->setEnabled(enabled);
+    m_stepBackwardButton->setEnabled(enabled);
+    m_stepForwardButton->setEnabled(enabled);
+    m_speedSlider->setEnabled(enabled);
+}
+
+
+// -------------------------------------------------------------------------- //
+// Handlers
+// -------------------------------------------------------------------------- //
+void QnNavigationItem::at_playButton_clicked() {
+    m_navigator->setPlaying(!m_navigator->isPlaying());
+}

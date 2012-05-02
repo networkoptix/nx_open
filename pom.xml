@@ -48,6 +48,7 @@
 		<module>appserver</module>
 		<module>common</module>
 		<module>mediaserver</module>
+		<module>testcamera</module>
 	</modules>
 	<build>
 		<defaultGoal>package</defaultGoal>
