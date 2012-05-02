@@ -4,12 +4,12 @@
 
 #include <QtGui/QGraphicsSceneMouseEvent>
 
-#include "ui/style/proxy_style.h"
+#include <utils/common/warnings.h>
 
 static const struct Preset {
     int size;
     int defaultIndex;
-    float preset[10];
+    qreal preset[10];
 } presets[] = {
     { 10, 5, { -16.0, -8.0, -4.0, -2.0, -1.0, 1.0, 2.0, 4.0, 8.0, 16.0 } },  // LowPrecision
     { 9, 4, { -2.0, -1.0, -0.5, -0.25, 0.0, 0.25, 0.5, 1.0, 2.0 } }          // HighPrecision
@@ -57,13 +57,19 @@ void QnSpeedSlider::setPrecision(QnSpeedSlider::Precision precision) {
 
     m_precision = precision;
 
-    // power of 10 in order to allow slider animation
-    setRange(idx2pos(0), idx2pos(presets[int(m_precision)].size - 1));
+    setRange(idx2pos(0), idx2pos(presets[m_precision].size - 1));
     resetSpeed();
 }
 
+qreal QnSpeedSlider::speed() const {
+    const Preset &preset = presets[m_precision];
+
+    int idx = qBound(0, pos2idx(value()), preset.size);
+    return preset.preset[idx];
+}
+
 void QnSpeedSlider::resetSpeed() {
-    setSliderPosition(idx2pos(presets[int(m_precision)].defaultIndex));
+    setSliderPosition(idx2pos(presets[m_precision].defaultIndex));
 }
 
 void QnSpeedSlider::speedDown() {
@@ -78,26 +84,14 @@ void QnSpeedSlider::sliderChange(SliderChange change) {
     base_type::sliderChange(change);
 
     if (change == SliderValueChange || change == SliderRangeChange) {
-        const Preset &preset = presets[int(m_precision)];
-
-        int idx = pos2idx(value());
-        Q_ASSERT(idx >= 0 && idx < preset.size);
-        float newSpeed = preset.preset[idx];
-
-        int defaultIndex = preset.defaultIndex;
-        if ((defaultIndex == 0 || newSpeed > preset.preset[defaultIndex - 1])
-            && (defaultIndex == preset.size - 1 || newSpeed < preset.preset[defaultIndex + 1])) {
-            newSpeed = preset.preset[defaultIndex]; // make a gap around the default value
-        }
-
-        setToolTip(!qFuzzyIsNull(newSpeed) ? tr("%1x").arg(newSpeed) : tr("Paused"));
-
-        emit speedChanged(newSpeed);
+        qreal speed = this->speed();
+        setToolTip(!qFuzzyIsNull(speed) ? tr("%1x").arg(speed) : tr("Paused"));
+        emit speedChanged(speed);
     }
 }
 
-void QnSpeedSlider::setSpeed(float value) {
-    const Preset &preset = presets[int(m_precision)];
+void QnSpeedSlider::setSpeed(qreal value) {
+    const Preset &preset = presets[m_precision];
     for (int i = 0; i < preset.size; i++) {
         if (qFuzzyCompare(preset.preset[i], value)) {
             int pos = idx2pos(i);
@@ -105,7 +99,7 @@ void QnSpeedSlider::setSpeed(float value) {
             return;
         }
     }
-    qWarning() << "Unsupported value" << value << "for speed slider";
+    qnWarning("Unsupported value '%1' for speed slider", value);
     return;
 }
 
@@ -119,7 +113,7 @@ void QnSpeedSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
         m_animation = new QPropertyAnimation(this, "value", this);
         m_animation->setEasingCurve(QEasingCurve::OutQuad);
         m_animation->setDuration(500);
-        m_animation->setEndValue(idx2pos(presets[int(m_precision)].defaultIndex));
+        m_animation->setEndValue(idx2pos(presets[m_precision].defaultIndex));
         m_animation->start();
     }
 }
@@ -147,7 +141,7 @@ void QnSpeedSlider::wheelEvent(QGraphicsSceneWheelEvent *e) {
     base_type::wheelEvent(e);
 
     const int newPosition = sliderPosition();
-    const int defaultPosition = idx2pos(presets[int(m_precision)].defaultIndex);
+    const int defaultPosition = idx2pos(presets[m_precision].defaultIndex);
     if ((oldPosition < defaultPosition && defaultPosition <= newPosition)
         || (oldPosition > defaultPosition && defaultPosition >= newPosition)) {
         setSliderPosition(defaultPosition);

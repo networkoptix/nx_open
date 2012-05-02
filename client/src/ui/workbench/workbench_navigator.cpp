@@ -47,7 +47,10 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_lastLive(false),
     m_lastLiveSupported(false),
     m_lastPlaying(false),
-    m_lastPlayingSupported(false)
+    m_lastPlayingSupported(false),
+    m_lastSpeed(0.0),
+    m_lastMinimalSpeed(0.0),
+    m_lastMaximalSpeed(0.0)
 {    
 }
     
@@ -218,13 +221,58 @@ bool QnWorkbenchNavigator::setPlaying(bool playing) {
         camDisplay->playAudio(true);
     } else {
         reader->pauseMedia();
-        //camDisplay->pauseAudio();
         camDisplay->playAudio(false);
         reader->setSingleShotMode(true);
     }
 
     updatePlaying();
     return true;
+}
+
+qreal QnWorkbenchNavigator::speed() const {
+    if(!m_currentWidget || m_currentWidget->display()->isStillImage())
+        return 0.0;
+
+    if(QnAbstractArchiveReader *reader = m_currentWidget->display()->archiveReader())
+        return reader->getSpeed();
+
+    return 1.0;
+}
+
+void QnWorkbenchNavigator::setSpeed(qreal speed) {
+    speed = qBound(minimalSpeed(), speed, maximalSpeed());
+    if(qFuzzyCompare(speed, m_lastSpeed))
+        return;
+
+    if(!m_currentWidget)
+        return;
+
+    if(QnAbstractArchiveReader *reader = m_currentWidget->display()->archiveReader()) {
+        reader->setSpeed(speed);
+        setPlaying(!qFuzzyIsNull(speed));
+
+        updateSpeed();
+    }
+}
+
+qreal QnWorkbenchNavigator::minimalSpeed() const {
+    if(!m_currentWidget || m_currentWidget->display()->isStillImage())
+        return 0.0;
+
+    if(QnAbstractArchiveReader *reader = m_currentWidget->display()->archiveReader())
+        return reader->isNegativeSpeedSupported() ? -16.0 : 0.0;
+
+    return 1.0;
+}
+
+qreal QnWorkbenchNavigator::maximalSpeed() const {
+    if(!m_currentWidget || m_currentWidget->display()->isStillImage())
+        return 0.0;
+
+    if(QnAbstractArchiveReader *reader = m_currentWidget->display()->archiveReader())
+        return 16.0;
+
+    return 1.0;
 }
 
 void QnWorkbenchNavigator::setCentralWidget(QnResourceWidget *widget) {
@@ -349,6 +397,8 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     updateLive();
     updatePlayingSupported();
     updatePlaying();
+    updateSpeed();
+    updateSpeedRange();
 
     emit currentWidgetChanged();
 }
@@ -489,6 +539,28 @@ void QnWorkbenchNavigator::updatePlayingSupported() {
     m_lastPlayingSupported = playingSupported;
 
     emit playingSupportedChanged();
+}
+
+void QnWorkbenchNavigator::updateSpeed() {
+    qreal speed = this->speed();
+    if(qFuzzyCompare(m_lastSpeed, speed))
+        return;
+
+    m_lastSpeed = speed;
+
+    emit speedChanged();
+}
+
+void QnWorkbenchNavigator::updateSpeedRange() {
+    qreal minimalSpeed = this->minimalSpeed();
+    qreal maximalSpeed = this->maximalSpeed();
+    if(qFuzzyCompare(minimalSpeed, m_lastMinimalSpeed) && qFuzzyCompare(maximalSpeed, m_lastMaximalSpeed))
+        return;
+
+    m_lastMinimalSpeed = minimalSpeed;
+    m_lastMaximalSpeed = maximalSpeed;
+    
+    emit speedRangeChanged();
 }
 
 

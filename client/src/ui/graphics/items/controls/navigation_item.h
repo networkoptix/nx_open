@@ -41,14 +41,17 @@ signals:
     void clearMotionSelection();
 
 private slots:
-    void updateLiveState();
-    void updatePlayingState();
+    void at_navigator_liveChanged();
+    void at_navigator_liveSupportedChanged();
+    void at_navigator_playingChanged();
+    void at_navigator_playingSupportedChanged();
+    void at_navigator_speedChanged();
 
     void at_playButton_clicked();
+    void at_volumeSlider_valueChanged();
+    void at_speedSlider_speedChanged();
 
-    void onLiveModeChanged(bool value);
-    void pause();
-    void play();
+    void updateButtonsSpeedState();
 
     void rewindBackward();
     void rewindForward();
@@ -56,9 +59,6 @@ private slots:
     void stepBackward();
     void stepForward();
 
-    void onSpeedChanged(float);
-
-    void onVolumeLevelChanged(int);
 
 protected:
     virtual void wheelEvent(QGraphicsSceneWheelEvent *) override {
@@ -82,14 +82,15 @@ private:
 
     GraphicsLabel *m_timeLabel;
 
+    bool m_updatingNavigatorFromSpeedSlider;
+    bool m_updatingSpeedSliderFromNavigator;
+
     QnTimeSlider *m_timeSlider;
     QnTimeScrollBar *m_timeScrollBar;
     QnSpeedSlider *m_speedSlider;
     QnVolumeSlider *m_volumeSlider;
 
     QnWorkbenchNavigator *m_navigator;
-
-    bool m_playing;
 };
 
 #endif // NAVIGATIONITEM_H

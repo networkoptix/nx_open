@@ -1,8 +1,6 @@
 #include "volume_slider.h"
 
-#include "ui/style/proxy_style.h"
-
-#include "openal/qtvaudiodevice.h"
+#include <openal/qtvaudiodevice.h>
 
 QnVolumeSlider::QnVolumeSlider(QGraphicsItem *parent): 
     base_type(parent)

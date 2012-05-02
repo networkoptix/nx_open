@@ -12,6 +12,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 
+#include <ui/common/image_processing.h>
 #include <ui/style/noptix_style.h>
 #include <ui/style/globals.h>
 #include <ui/graphics/items/standard/graphics_slider_p.h>
@@ -19,7 +20,6 @@
 #include <ui/processors/kinetic_cutting_processor.h>
 
 #include "tool_tip_item.h"
-#include "ui/common/image_processing.h"
 
 namespace {
     QTime msecsToTime(qint64 msecs) {
