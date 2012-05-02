@@ -30,6 +30,8 @@ protected:
     virtual void run() override;
     virtual void pleaseStop() override;
 private:
+    void allocateScaleContext(int linesize, int width, int height, PixelFormat format);
+private:
     QScopedPointer<QnRtspClientArchiveDelegate> m_rtspClient;
     QMap<qint64, QPixmap> m_images;
     QnResourcePtr m_resource;
@@ -39,6 +41,10 @@ private:
     qint64 m_endTime;
     int m_outWidth;
     int m_outHeight;
+    QQueue<QnTimePeriod> m_rangeToLoad;
+    QMutex m_mutex;
+    SwsContext* m_scaleContext;
+    quint8* m_rgbaBuffer;
 };
 
 #endif // __THUMBNAILS_LOADER_H__
