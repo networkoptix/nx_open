@@ -1,4 +1,4 @@
-#include <qDebug>
+#include <QDebug>
 
 #include "test_camera.h"
 #include "utils/media/nalUnits.h"
