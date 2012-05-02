@@ -774,6 +774,9 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
 
     /* Draw position marker. */
     drawMarker(painter, sliderPosition(), positionMarkerColor);
+
+    /* Draw thumbnails. */
+    drawThumbnails(painter, rect.top() - rect.height() * 0.5, rect.height() * 0.5);
 }
 
 void QnTimeSlider::drawSelection(QPainter *painter) {
@@ -1045,6 +1048,12 @@ void QnTimeSlider::drawHighlights(QPainter *painter, qreal fillTop, qreal fillHe
     }
 }
 
+void QnTimeSlider::drawThumbnails(QPainter *painter, qreal top, qreal height) {
+    QRectF rect = this->rect();
+
+    QnScopedPainterPenRollback penRollback(painter, QPen(Qt::green, 0));
+    painter->drawRect(QRectF(rect.left(), top, rect.width(), height));
+}
 
 
 // -------------------------------------------------------------------------- //
