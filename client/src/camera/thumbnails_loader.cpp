@@ -24,9 +24,11 @@ QnThumbnailsLoader::QnThumbnailsLoader(QnResourcePtr resource)
 
 QnThumbnailsLoader::~QnThumbnailsLoader()
 {
+    pleaseStop();
+    stop();
     if (m_scaleContext)
         sws_freeContext(m_scaleContext);
-    delete [] m_rgbaBuffer;
+    qFreeAligned(m_rgbaBuffer);
 }
 
 void QnThumbnailsLoader::setThumbnailsSize(int width, int height)
@@ -74,11 +76,13 @@ void QnThumbnailsLoader::removeRange(qint64 startTimeUsec, qint64 endTimeUsec)
         itr = m_images.erase(itr);
 }
 
-QPixmap QnThumbnailsLoader::getPixmapByTime(qint64 timeUsec)
+QPixmap QnThumbnailsLoader::getPixmapByTime(qint64 timeUsec, quint64* realPixmapTimeUsec)
 {
     QMutexLocker locker(&m_mutex);
     QMap<qint64, QPixmap>::iterator itr = m_images.lowerBound(timeUsec);
-    return itr != m_images.end() ? *itr : QPixmap();
+    if (realPixmapTimeUsec)
+        *realPixmapTimeUsec = itr != m_images.end() ? itr.key() : -1;
+    return itr != m_images.end() ? itr.value() : QPixmap();
 }
 
 void QnThumbnailsLoader::allocateScaleContext(int lineSize, int width, int height, PixelFormat format)
@@ -95,7 +99,7 @@ void QnThumbnailsLoader::allocateScaleContext(int lineSize, int width, int heigh
         m_srcHeight = height;
         m_srcFormat = format;
     }
-    delete [] m_rgbaBuffer;
+    qFreeAligned(m_rgbaBuffer);
 
     int numBytes = avpicture_get_size(PIX_FMT_RGBA, lineSize, height);
     m_rgbaBuffer = (quint8*) qMallocAligned(numBytes, 32);
@@ -152,8 +156,10 @@ void QnThumbnailsLoader::run()
                     outFrame.data, outFrame.linesize, 
                     0, outFrame.height, 
                     dstBuffer, dstLineSize);
-
-                m_images.insert(frame->timestamp, QPixmap::fromImage(image));
+                QMutexLocker lock(&m_mutex);
+                QPixmap pixmap = QPixmap::fromImage(image);
+                m_images.insert(frame->timestamp, pixmap);
+                emit gotNewPixmap(frame->timestamp, pixmap);
             }
 
             frame = qSharedPointerDynamicCast<QnCompressedVideoData> (m_rtspClient->getNextData());

@@ -20,12 +20,20 @@ public:
     /* Extent existing range to new range using previously defined step */
     void addRange(qint64 startTimeUsec, qint64 endTimeUsec);
 
-    /* Remove part of data or all data */
-    void removeRange(qint64 startTimeUsec = -1, qint64 endTimeUsec = -1);
+    /* 
+    * Remove part of data or all data 
+    */
+    void removeRange(qint64 startTimeUsec = -1, qint64 endTimeUsec = INT64_MAX);
 
-    QPixmap getPixmapByTime(qint64 timeUsec);
+    /* 
+    * Find pixmap by specified time. 
+    * @param timeUsec contain approximate time. 
+    * @param realPixmapTimeUsec Return exact pixmap time if found. Otherwise return -1
+    */
+    QPixmap getPixmapByTime(qint64 timeUsec, quint64* realPixmapTimeUsec = 0);
+
 signals:
-    void gotNewPixmap(qint64 time, QPixmap image);
+    void gotNewPixmap(qint64 timeUsec, QPixmap pixmap);
 protected:
     virtual void run() override;
     virtual void pleaseStop() override;
