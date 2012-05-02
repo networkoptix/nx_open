@@ -46,7 +46,8 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_clearSelectionAction(new QAction(this)),
     m_lastLive(false),
     m_lastLiveSupported(false),
-    m_lastPlaying(false)
+    m_lastPlaying(false),
+    m_lastPlayingSupported(false)
 {    
 }
     
@@ -162,15 +163,18 @@ QVariant QnWorkbenchNavigator::currentTarget(Qn::ActionScope scope) const {
     return QVariant::fromValue<QnResourceWidgetList>(result);
 }
 
-bool QnWorkbenchNavigator::isLive() const {
-    return isLiveSupported() && m_timeSlider->value() == m_timeSlider->maximum();
-}
-
 bool QnWorkbenchNavigator::isLiveSupported() const {
     return m_currentWidgetIsCamera;
 }
 
+bool QnWorkbenchNavigator::isLive() const {
+    return isLiveSupported() && m_timeSlider->value() == m_timeSlider->maximum();
+}
+
 bool QnWorkbenchNavigator::setLive(bool live) {
+    if(live == isLive())
+        return true;
+
     if(!isLiveSupported())
         return false;
 
@@ -182,38 +186,44 @@ bool QnWorkbenchNavigator::setLive(bool live) {
     return true;
 }
 
+bool QnWorkbenchNavigator::isPlayingSupported() const {
+    return m_currentWidget && m_currentWidget->display()->archiveReader();
+}
+
 bool QnWorkbenchNavigator::isPlaying() const {
-    if(!m_currentWidget)
+    if(!isPlayingSupported())
         return false;
 
-    QnAbstractArchiveReader *reader = m_currentWidget->display()->archiveReader();
-    if(!reader)
-        return false;
-
-    return !reader->isMediaPaused();
-
-    /*if (reader->isMediaPaused() && reader->isRealTimeSource()) {
-        qint64 time = m_camera->getCurrentTime();
-        reader->resumeMedia();
-        reader->directJumpToNonKeyFrame(time+1);
-    }
-    else {
-        reader->resumeMedia();
-    }
-
-    if (!m_playing)
-        m_camera->getCamDisplay()->playAudio(m_playing);*/
-
+    return !m_currentWidget->display()->archiveReader()->isMediaPaused();
 }
 
 bool QnWorkbenchNavigator::setPlaying(bool playing) {
-    if(!m_currentWidget)
+    if(playing == isPlaying())
+        return true;
+
+    if(!isPlayingSupported())
         return false;
 
     QnAbstractArchiveReader *reader = m_currentWidget->display()->archiveReader();
-    if(!reader)
-        return false;
+    CLCamDisplay *camDisplay = m_currentWidget->display()->camDisplay();
+    if(playing) {
+        if (reader->isRealTimeSource()) {
+            /* Media was paused while on live. Jump to archive when resumed. */
+            qint64 time = camDisplay->getCurrentTime();
+            reader->resumeMedia();
+            reader->directJumpToNonKeyFrame(time+1);
+        } else {
+            reader->resumeMedia();
+        }
+        camDisplay->playAudio(true);
+    } else {
+        reader->pauseMedia();
+        //camDisplay->pauseAudio();
+        camDisplay->playAudio(false);
+        reader->setSingleShotMode(true);
+    }
 
+    updatePlaying();
     return true;
 }
 
@@ -336,6 +346,9 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
 
     updateCurrentPeriods();
     updateLiveSupported();
+    updateLive();
+    updatePlayingSupported();
+    updatePlaying();
 
     emit currentWidgetChanged();
 }
@@ -458,6 +471,26 @@ void QnWorkbenchNavigator::updateLiveSupported() {
     emit liveSupportedChanged();
 }
 
+void QnWorkbenchNavigator::updatePlaying() {
+    bool playing = isPlaying();
+    if(playing == m_lastPlaying)
+        return;
+
+    m_lastPlaying = playing;
+
+    emit playingChanged();
+}
+
+void QnWorkbenchNavigator::updatePlayingSupported() {
+    bool playingSupported = isPlayingSupported();
+    if(playingSupported == m_lastPlayingSupported)
+        return;
+
+    m_lastPlayingSupported = playingSupported;
+
+    emit playingSupportedChanged();
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -561,17 +594,17 @@ void QnWorkbenchNavigator::at_timeSlider_sliderPressed() {
     if (!m_currentWidget)
         return;
 
-    m_currentWidget->display()->archiveReader()->setSingleShotMode(true);
-    m_currentWidget->display()->camDisplay()->playAudio(false);
-
-    m_wasPlaying = !m_currentWidget->display()->archiveReader()->isMediaPaused();
+    if(m_lastPlaying) {
+        m_currentWidget->display()->archiveReader()->setSingleShotMode(true);
+        m_currentWidget->display()->camDisplay()->playAudio(false);
+    }
 }
 
 void QnWorkbenchNavigator::at_timeSlider_sliderReleased() {
     if (!m_currentWidget)
         return;
 
-    if (m_wasPlaying) {
+    if (m_lastPlaying) {
         m_currentWidget->display()->archiveReader()->setSingleShotMode(false);
         m_currentWidget->display()->camDisplay()->playAudio(true);
     }

@@ -44,6 +44,7 @@ public:
 
     bool isPlaying() const;
     bool setPlaying(bool playing);
+    bool isPlayingSupported() const;
 
     QnResourceWidget *currentWidget();
 
@@ -57,6 +58,7 @@ signals:
     void liveChanged();
     void liveSupportedChanged();
     void playingChanged();
+    void playingSupportedChanged();
 
 protected:
     enum SliderLine {
@@ -100,7 +102,8 @@ protected slots:
 
     void updateLive();
     void updateLiveSupported();
-    //void updatePlaying();
+    void updatePlaying();
+    void updatePlayingSupported();
 
 protected slots:
     void at_display_widgetChanged(Qn::ItemRole role);
@@ -132,7 +135,6 @@ private:
     QnResourceWidget *m_currentWidget;
     bool m_currentWidgetIsCamera;
 
-    bool m_wasPlaying;
     bool m_updatingSliderFromReader;
     bool m_updatingSliderFromScrollBar;
     bool m_updatingScrollBarFromSlider;
@@ -140,6 +142,7 @@ private:
     bool m_lastLive;
     bool m_lastLiveSupported;
     bool m_lastPlaying;
+    bool m_lastPlayingSupported;
 
     QAction *m_clearSelectionAction;
 
