@@ -34,8 +34,6 @@ public:
     }
 
 public slots:
-    void setMute(bool mute);
-    void setPlaying(bool playing);
     void onSyncButtonToggled(bool value);
 
 signals:
@@ -44,11 +42,13 @@ signals:
 
 private slots:
     void updateLiveState();
+    void updatePlayingState();
+
+    void at_playButton_clicked();
 
     void onLiveModeChanged(bool value);
     void pause();
     void play();
-    void togglePlayPause();
 
     void rewindBackward();
     void rewindForward();

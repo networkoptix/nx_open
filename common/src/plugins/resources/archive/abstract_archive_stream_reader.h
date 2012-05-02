@@ -101,7 +101,7 @@ public:
     virtual void setSpeed(double value, qint64 currentTimeHint = AV_NOPTS_VALUE) = 0;
     virtual double getSpeed() const = 0;
 
-Q_SIGNALS:
+signals:
     void beforeJump(qint64 mksec);
     void jumpOccured(qint64 mksec);
     void jumpCanceled(qint64 mksec);
