@@ -48,6 +48,7 @@
 		<module>appserver</module>
 		<module>common</module>
 		<module>mediaserver</module>
+		<module>mediaproxy</module>
 	</modules>
 	<build>
 		<defaultGoal>package</defaultGoal>
@@ -84,6 +85,7 @@
 				<module>client</module>	
 				<module>mediaproxy</module>					
 				<module>traytool</module>
+				<module>testcamera</module>				
 				<module>wixsetup</module>
 			</modules>
 			<properties>
