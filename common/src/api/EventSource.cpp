@@ -5,6 +5,8 @@
 
 //#define QN_EVENT_SOURCE_DEBUG
 
+static const int PING_INTERVAL = 6000;
+
 void QnJsonStreamParser::addData(const QByteArray& data)
 {
     if (!incomplete.isEmpty())
@@ -149,7 +151,7 @@ QnEventSource::QnEventSource(QUrl url, int retryTimeout):
     connect(this, SIGNAL(stopped()), this, SLOT(doStop()));
     connect(&m_manager, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)),
             this, SLOT(slotAuthenticationRequired(QNetworkReply*,QAuthenticator*)));
-    connect(m_pingTimer, SIGNAL(timeout()), this, SLOT(onPingTimer()));
+    connect(&m_pingTimer, SIGNAL(timeout()), this, SLOT(onPingTimer()));
 
 #ifndef QT_NO_OPENSSL
     connect(&m_manager, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)),
@@ -165,6 +167,8 @@ void QnEventSource::stop()
 
 void QnEventSource::doStop()
 {
+    m_pingTimer.stop();
+
     if (m_reply)
         m_reply->abort();
 }
@@ -178,7 +182,7 @@ void QnEventSource::startRequest()
             this, SLOT(httpReadyRead()));
 
     // Check every minute
-    m_pingTimer.start(60000);
+    m_pingTimer.start(PING_INTERVAL);
 }
 
 void QnEventSource::httpFinished()
@@ -224,7 +228,7 @@ void QnEventSource::httpReadyRead()
         if (!event.load(parsed))
             continue;
 
-        // If it's ping event ->just update last event time
+        // If it's ping event -> just update last event time (m_eventWaitTimer)
         if (event.eventType != QN_EVENT_PING)
             emit eventReceived(event);
     }
@@ -239,7 +243,7 @@ void QnEventSource::slotAuthenticationRequired(QNetworkReply*,QAuthenticator *au
 
 void QnEventSource::onPingTimer()
 {
-    if (m_eventWaitTimer.elapsed() > m_eventWaitTimeout)
+    if (m_eventWaitTimer.elapsed() > PING_INTERVAL)
     {
         doStop();
 

@@ -95,7 +95,7 @@ private:
     QNetworkAccessManager m_manager;
     QNetworkReply *m_reply;
 
-    QTime m_lastEventTime;
+    QTime m_eventWaitTimer;
     QTimer m_pingTimer;
 
     QnJsonStreamParser m_streamParser;
