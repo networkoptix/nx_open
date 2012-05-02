@@ -60,8 +60,6 @@ private slots:
 
     void onVolumeLevelChanged(int);
 
-    void at_liveButton_clicked(bool checked);
-
 protected:
     virtual void wheelEvent(QGraphicsSceneWheelEvent *) override {
         /* Don't let wheel events escape into the scene. */

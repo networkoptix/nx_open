@@ -39,7 +39,7 @@ public:
     void setTimeScrollBar(QnTimeScrollBar *scrollBar);
 
     bool isLive() const;
-    bool setLive(bool live);
+    Q_SLOT bool setLive(bool live);
     bool isLiveSupported() const;
 
     QnResourceWidget *currentWidget();
@@ -83,10 +83,11 @@ protected:
     QnCachingTimePeriodLoader *loader(const QnResourcePtr &resource);
     QnCachingTimePeriodLoader *loader(QnResourceWidget *widget);
 
-    Q_SLOT void updateCurrentWidget();
-    Q_SLOT void updateSliderFromReader();
-    Q_SLOT void updateScrollBarFromSlider();
-    Q_SLOT void updateSliderFromScrollBar();
+protected slots:
+    void updateCurrentWidget();
+    void updateSliderFromReader();
+    void updateScrollBarFromSlider();
+    void updateSliderFromScrollBar();
     void updateToolTipFormat();
 
     void updateCurrentPeriods();

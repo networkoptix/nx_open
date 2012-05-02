@@ -66,11 +66,11 @@ void QnSpeedSlider::resetSpeed() {
     setSliderPosition(idx2pos(presets[int(m_precision)].defaultIndex));
 }
 
-void QnSpeedSlider::stepBackward() {
+void QnSpeedSlider::speedDown() {
     triggerAction(SliderPageStepSub);
 }
 
-void QnSpeedSlider::stepForward() {
+void QnSpeedSlider::speedUp() {
     triggerAction(SliderPageStepAdd);
 }
 
@@ -96,10 +96,10 @@ void QnSpeedSlider::sliderChange(SliderChange change) {
     }
 }
 
-void QnSpeedSlider::setSpeed(int value) {
+void QnSpeedSlider::setSpeed(float value) {
     const Preset &preset = presets[int(m_precision)];
     for (int i = 0; i < preset.size; i++) {
-        if (preset.preset[i] == value) {
+        if (qFuzzyCompare(preset.preset[i], value)) {
             int pos = idx2pos(i);
             setValue(pos);
             return;
@@ -133,7 +133,7 @@ void QnSpeedSlider::wheelEvent(QGraphicsSceneWheelEvent *e) {
         if (e->orientation() == Qt::Horizontal)
             delta = -delta;
         for (int i = qAbs(delta / 120); i > 0; --i)
-            QMetaObject::invokeMethod(this, delta < 0 ? "frameBackward" : "frameForward", Qt::QueuedConnection);
+            QMetaObject::invokeMethod(this, delta < 0 ? "frameBackward" : "frameForward", Qt::QueuedConnection); // TODO: wtf?
         return;
     }
 
