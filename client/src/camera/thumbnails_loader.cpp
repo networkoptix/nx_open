@@ -13,6 +13,13 @@ QnThumbnailsLoader::QnThumbnailsLoader(QnResourcePtr resource)
     m_outHeight = 128*3/4;
     m_scaleContext = 0;
     m_rgbaBuffer = 0;
+
+    m_srcLineSize = 0;
+    m_srcWidth = 0;
+    m_srcHeight = 0;
+    m_srcFormat = 0;
+
+    start();
 }
 
 QnThumbnailsLoader::~QnThumbnailsLoader()
@@ -28,50 +35,65 @@ void QnThumbnailsLoader::setThumbnailsSize(int width, int height)
     m_outHeight = height;
 }
 
-void QnThumbnailsLoader::loadRange(qint64 startTime, qint64 endTime, qint64 step)
+void QnThumbnailsLoader::loadRange(qint64 startTimeUsec, qint64 endTimeUsec, qint64 stepUsec)
 {
     //pleaseStop();
     //stop();
+    QMutexLocker locker(&m_mutex);
     m_images.clear();
-    m_startTime = startTime;
-    m_endTime = endTime;
-    m_step = step;
+    m_startTime = startTimeUsec;
+    m_endTime = endTimeUsec;
+    m_step = stepUsec;
 
     m_rangeToLoad.clear();
-    m_rangeToLoad << QnTimePeriod(startTime, endTime-startTime);
-    start();
+    m_rangeToLoad << QnTimePeriod(startTimeUsec, endTimeUsec-startTimeUsec);
 }
 
-void QnThumbnailsLoader::addRange(qint64 startTime, qint64 endTime)
+void QnThumbnailsLoader::addRange(qint64 startTimeUsec, qint64 endTimeUsec)
 {
-    if (startTime < m_startTime)
+    QMutexLocker locker(&m_mutex);
+    if (startTimeUsec < m_startTime)
     {
-        m_rangeToLoad << QnTimePeriod(startTime, m_startTime - startTime);
-        m_startTime = startTime;
+        m_rangeToLoad << QnTimePeriod(startTimeUsec, m_startTime - startTimeUsec);
+        m_startTime = startTimeUsec;
     }
-    if (endTime > m_endTime)
+    if (endTimeUsec > m_endTime)
     {
-        m_rangeToLoad << QnTimePeriod(endTime, endTime - m_endTime);
-        m_endTime = endTime;
+        m_rangeToLoad << QnTimePeriod(endTimeUsec, endTimeUsec - m_endTime);
+        m_endTime = endTimeUsec;
     }
 
 }
 
-void QnThumbnailsLoader::removeRange(qint64 startTime, qint64 endTime)
+void QnThumbnailsLoader::removeRange(qint64 startTimeUsec, qint64 endTimeUsec)
 {
-
+    QMutexLocker locker(&m_mutex);
+    QMap<qint64, QPixmap>::iterator itr = m_images.lowerBound(startTimeUsec);
+    QMap<qint64, QPixmap>::iterator endPos = m_images.upperBound(endTimeUsec);
+    while (itr != endPos)
+        itr = m_images.erase(itr);
 }
 
-QPixmap QnThumbnailsLoader::getPixmapByTime(qint64 time)
+QPixmap QnThumbnailsLoader::getPixmapByTime(qint64 timeUsec)
 {
-    return QPixmap();
+    QMutexLocker locker(&m_mutex);
+    QMap<qint64, QPixmap>::iterator itr = m_images.lowerBound(timeUsec);
+    return itr != m_images.end() ? *itr : QPixmap();
 }
 
 void QnThumbnailsLoader::allocateScaleContext(int lineSize, int width, int height, PixelFormat format)
 {
-    if (m_scaleContext) {
+    if (m_scaleContext) 
+    {
+        if (m_srcLineSize == lineSize && m_srcWidth == width && m_srcHeight == height && m_srcFormat == format)
+            return;
+
         sws_freeContext(m_scaleContext);
         m_scaleContext = 0;
+        m_srcLineSize = lineSize;
+        m_srcWidth = width;
+        m_srcHeight = height;
+        m_srcFormat = format;
     }
     delete [] m_rgbaBuffer;
 
@@ -92,7 +114,11 @@ void QnThumbnailsLoader::run()
             msleep(5);
             continue;
         }
-        m_rtspClient->open(m_resource);
+        if (!m_rtspClient->open(m_resource))
+        {
+            msleep(500);
+            continue;
+        }
 
         
         m_mutex.lock();
@@ -110,7 +136,6 @@ void QnThumbnailsLoader::run()
         outFrame.setUseExternalData(false);
 
         allocateScaleContext(outFrame.linesize[0], outFrame.width, outFrame.height, (PixelFormat) outFrame.format);
-
 
         int dstLineSize[4];
         quint8* dstBuffer[4];
