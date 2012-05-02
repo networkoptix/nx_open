@@ -1,0 +1,450 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<!--
+    Example pom for delegating maven goals to msbuild so it builds the "solution"
+ 
+    A solution can be a group of projects, but here we only have one.
+    It should also be possible to have one maven project per solution project, 
+    and have a parent pom to deletegate the build.
+  -->
+	<parent>
+		<artifactId>hdwitness</artifactId>
+		<groupId>com.networkoptix.hdwitness</groupId>
+		<version>1.0</version>
+		<relativePath>..</relativePath>
+	</parent>
+
+	<groupId>com.networkoptix.hdwitness</groupId>
+	<version>1.0</version>
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>cpp</artifactId>
+	<packaging>pom</packaging>
+	<name>Common POM for cpp projects</name>
+
+	<properties>
+		<convert-only>true</convert-only>
+		<ffmpeg.version>2012-04-18-N-39944-gfc882b6-patched</ffmpeg.version>
+		<buildLib/>
+	</properties>
+
+	<build>
+		<directory>${arch}</directory>
+		<outputDirectory>${arch}</outputDirectory>
+		<sourceDirectory>${basedir}/src</sourceDirectory> 	
+		<plugins>						
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.7</version>
+				<executions>
+					<execution>
+						<id>generate-qt-template</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<failOnError>false</failOnError>
+							<target>
+								<concat destfile="${project.build.directory}/maven/${project.artifactId}.pro" append="false">
+									<filelist dir="${basedir}/../cpp" files="template.pro"/>
+								</concat>
+								<echo file="${project.build.directory}/maven/${project.artifactId}.pro" append="true">${line.separator}</echo>
+								<concat destfile="${project.build.directory}/maven/${project.artifactId}.pro" append="true">
+									<filelist dir="${basedir}" files="${project.artifactId}-specifics.pro"/>
+								</concat>		
+							</target>								
+						</configuration>
+					</execution>				
+					<execution>
+						<id>add-basics-qt-project</id>
+						<phase>process-sources</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<failOnError>false</failOnError>
+							<target>							
+								<dirset id="includes_path" dir="${project.build.directory}/build/include" includes="*"/>
+								<pathconvert pathsep="${line.separator}" property="includes" refid="includes_path">
+									<map from="" to="INCLUDEPATH += "/>
+								</pathconvert>								
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${includes}</echo>
+
+								<fileset id="debug_libs_path" dir="${project.build.directory}/build/bin/debug">
+									<include name="**/*.lib" />
+								</fileset>
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}CONFIG(debug, debug|release) {</echo>
+								<pathconvert pathsep="${line.separator}" property="debug_libs" refid="debug_libs_path">
+									<map from="${project.build.directory}/build/bin/debug/" to="     LIBS += -l"/>									
+									<regexpmapper from="^(.*)\.lib$$" to="\1"/>
+								</pathconvert>								
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${debug_libs}${line.separator}}</echo>
+
+								<fileset id="release_libs_path" dir="${project.build.directory}/build/bin/release">
+									<include name="**/*.lib" />
+									<include name="**/*.lib" />
+								</fileset>
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}CONFIG(release, debug|release) {</echo>
+								<pathconvert pathsep="${line.separator}" property="release_libs" refid="release_libs_path">
+									<map from="${project.build.directory}/build/bin/release/" to="    LIBS += -l"/>									
+									<regexpmapper from="^(.*)\.lib$$" to="\1"/>
+								</pathconvert>								
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${release_libs}${line.separator}}</echo>
+
+								<fileset id="linux_debug_libs_path" dir="${project.build.directory}/build/bin/debug">
+									<include name="**/*.so" />
+								</fileset>
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}CONFIG(debug, debug|release) {</echo>
+								<pathconvert pathsep="${line.separator}" property="linux_debug_libs" refid="linux_debug_libs_path">
+									<map from="${project.build.directory}/build/bin/debug/lib" to="     LIBS += -l"/>									
+									<regexpmapper from="^(.*)\.so$$" to="\1"/>
+								</pathconvert>								
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${linux_debug_libs}${line.separator}}</echo>
+
+								<fileset id="linux_release_libs_path" dir="${project.build.directory}/build/bin/release">
+									<include name="**/*.so" />
+								</fileset>
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}CONFIG(release, debug|release) {</echo>
+								<pathconvert pathsep="${line.separator}" property="linux_release_libs" refid="linux_release_libs_path">
+									<map from="${project.build.directory}/build/bin/release/lib" to="    LIBS += -l"/>									
+									<regexpmapper from="^(.*)\.so$$" to="\1"/>
+								</pathconvert>								
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${linux_release_libs}${line.separator}}</echo>
+
+								<fileset id="headers_path" dir="${project.build.sourceDirectory}">
+									<include name="**/*.h" />
+									<exclude name="**/*dxva*/**" />
+								</fileset>
+								<pathconvert pathsep="${line.separator}" property="headers" refid="headers_path">
+									<map from="" to="HEADERS += "/>
+								</pathconvert>									
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${headers}</echo>
+
+								<!--<fileset id="version_headers_path" dir="${project.build.directory}/build/include">
+									<include name="version/version.h" />
+								</fileset>
+								<pathconvert pathsep="${line.separator}" property="version_headers" refid="version_headers_path">
+									<map from="" to="HEADERS += "/>
+								</pathconvert>									
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${version_headers}</echo> -->							
+
+								<fileset id="sources_path" dir="${project.build.sourceDirectory}">
+									<include name="**/*.cpp" />
+									<include name="**/*.cc" />
+									<include name="**/*.c" />
+									<exclude name="**/*dxva*/**" />
+									<exclude name="${project.build.sourceDirectory}/decoders/video/dxva/copy.h" />
+								</fileset>
+								<pathconvert pathsep="${line.separator}" property="sources" refid="sources_path">
+									<map from="" to="SOURCES += "/>
+								</pathconvert>
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${sources}</echo>
+
+								<fileset id="add_sources_path" dir="${project.build.directory}/build/include">
+									<include name="**/*.cpp" />
+									<include name="**/*.cc" />
+									<include name="**/*.c" />
+								</fileset>
+								<pathconvert pathsep="${line.separator}" property="add_sources" refid="add_sources_path">
+									<map from="" to="SOURCES += "/>
+								</pathconvert>
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${add_sources}</echo>							
+							</target>
+						</configuration>
+					</execution>				
+				</executions>
+			</plugin>					
+		</plugins>		
+	</build>
+	<profiles>
+		<profile>
+			<id>windows</id>
+			<activation>
+				<!--<activeByDefault>true</activeByDefault>-->
+				<os>
+					<family>Windows</family>
+				</os>
+			</activation>
+			<properties>
+				<arch>x86</arch>
+			</properties>			
+			<build>
+				<plugins>					
+					<plugin>
+						<groupId>com.google.code.maven-replacer-plugin</groupId>
+						<artifactId>maven-replacer-plugin</artifactId>
+						<version>1.4.0</version>
+						<executions>
+							<execution>
+								<phase>process-resources</phase>
+								<goals>
+									<goal>replace</goal>
+								</goals>
+								<configuration>
+									<includes>
+										<include>${arch}/${project.artifactId}-x64.vcproj</include>
+									</includes>
+									<replacements>
+										<replacement>
+											<token>Win32</token>
+											<value>${arch}</value>
+										</replacement>         
+									</replacements>
+								</configuration>								
+							</execution>
+							<execution>
+								<id>backslashes-replace</id>
+								<phase>generate-resources</phase>
+								<goals>
+									<goal>replace</goal>
+								</goals>    
+								<configuration>
+									<includes>
+										<include>${arch}/*.pro</include>
+									</includes>
+									<replacements>
+										<replacement>
+											<token>\\</token>
+											<value>/</value>
+										</replacement>         
+									</replacements>
+								</configuration>								
+							</execution>							
+						</executions>
+					</plugin>	
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>1.1.1</version>
+						<executions>
+							<execution>
+								<id>generate-vcproj</id>
+								<phase>generate-resources</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>qmake</executable>
+									<workingDirectory>${environment.dir}/qt/bin/</workingDirectory>		
+									<arguments>
+										<commandlineArgs>-tp</commandlineArgs>
+										<commandlineArgs>vc</commandlineArgs>
+										<commandlineArgs>-o</commandlineArgs>
+										<commandlineArgs>${project.build.directory}/${project.artifactId}-${arch}.vcproj</commandlineArgs>
+										<commandlineArgs>${project.build.directory}/${project.artifactId}.pro</commandlineArgs>
+									</arguments>
+								</configuration>
+							</execution>	
+							<execution>
+								<id>package-with-msbuild</id>
+								<phase>process-classes</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>build.bat</executable>
+									<workingDirectory>${project.build.directory}</workingDirectory>		
+									<arguments>
+										<commandlineArgs>${build.configuration}</commandlineArgs>
+									</arguments>
+								</configuration>
+							</execution>							
+						</executions>
+					</plugin>					
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<id>linux</id>
+			<activation>
+				<os>
+					<family>unix</family>
+					<name>linux</name>
+				</os>		
+			</activation>
+			<!--<properties>
+				<arch>${os.arch}</arch>
+			</properties>	-->
+			<build>	
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>1.1.1</version>
+						<executions>
+							<execution>
+								<id>generate-makefile</id>
+								<phase>generate-resources</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>qmake</executable>
+									<workingDirectory>${project.build.directory}</workingDirectory>		
+									<arguments>
+										<commandlineArgs>-spec</commandlineArgs>
+										<commandlineArgs>linux-g++</commandlineArgs>
+										<commandlineArgs>CONFIG+=${build.configuration}</commandlineArgs>
+										<commandlineArgs>-o</commandlineArgs>
+										<commandlineArgs>${project.build.directory}/Makefile.${build.configuration}</commandlineArgs>
+										<commandlineArgs>${project.build.directory}/${project.artifactId}.pro</commandlineArgs>
+									</arguments>
+								</configuration>
+							</execution>	
+							<execution>
+								<id>package-with-msbuild</id>
+								<phase>process-classes</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>make</executable>
+									<workingDirectory>${project.build.directory}</workingDirectory>		
+									<arguments>
+										<commandlineArgs>-f</commandlineArgs>
+										<commandlineArgs>Makefile.${build.configuration}</commandlineArgs>
+										<commandlineArgs>-j</commandlineArgs>
+										<commandlineArgs>2</commandlineArgs>
+										<!--<commandlineArgs>`cat /proc/cpuinfo | grep ^processor | wc -l`</commandlineArgs>-->
+									</arguments>
+								</configuration>
+							</execution>							
+						</executions>
+					</plugin>
+				</plugins>	
+			</build>			
+		</profile>	
+
+		<profile>
+			<id>convert-clean-windows</id>
+			<activation>
+				<os>
+					<family>Windows</family>
+				</os>
+			</activation>				
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<version>2.4</version>
+						<executions>
+							<execution>
+								<id>unpack-platform-libs</id>
+								<phase>validate</phase>
+								<goals>
+									<goal>unpack</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>org.ffmpeg</groupId>
+											<artifactId>ffmpeg-misc-headers-win32</artifactId>
+											<version>dev</version>
+											<type>zip</type>
+											<classifier>${platform}</classifier>
+											<overWrite>false</overWrite>
+											<outputDirectory>${project.build.directory}</outputDirectory>
+										</artifactItem>								
+									</artifactItems>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile> 
+
+		<profile>
+			<id>convert-clean</id>
+			<activation>				
+				<activeByDefault>true</activeByDefault>
+				<file>
+					<missing>${project.build.directory}/build/include</missing>
+				</file> 
+				<!--<property>
+					<name>convert-only</name>
+					<value>false</value>
+				</property>	-->		
+			</activation>			
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-resources-plugin</artifactId>
+						<version>2.5</version>
+						<executions>
+							<execution>
+								<id>prepare-qt-project</id>
+								<phase>initialize</phase>
+								<goals>
+									<goal>copy-resources</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${project.build.directory}</outputDirectory>
+									<resources>          
+										<resource>
+											<directory>${basedir}/maven</directory>
+											<filtering>true</filtering>
+										</resource>		
+										<resource>
+											<directory>${project.build.directory}/maven</directory>
+											<filtering>true</filtering>
+										</resource>		
+										<resource>
+											<directory>${basedir}/../cpp/shared-resources</directory>
+											<excludes>
+												<exclude>version.h</exclude>
+											</excludes>
+											<filtering>true</filtering>
+										</resource>										
+									</resources>              
+									<encoding>UTF-8</encoding>
+								</configuration>            
+							</execution>
+							<execution>
+								<id>generate-version</id>
+								<phase>initialize</phase>
+								<goals>
+									<goal>copy-resources</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${project.build.sourceDirectory}</outputDirectory>
+									<resources>          
+										<resource>
+											<directory>${basedir}/../cpp/shared-resources</directory>
+											<includes>
+												<include>version.h</include>
+											</includes>
+											<filtering>true</filtering>
+										</resource>	 						
+									</resources>              
+									<encoding>UTF-8</encoding>
+								</configuration>            
+							</execution>				
+						</executions>
+					</plugin>	
+					<!--<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<version>2.4</version>
+						<executions>
+							<execution>
+								<id>unpack-common-libs</id>
+								<phase>validate</phase>
+								<goals>
+									<goal>unpack</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+							
+									</artifactItems>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin> -->			
+				</plugins>
+			</build>
+		</profile>		
+	</profiles>	
+</project>

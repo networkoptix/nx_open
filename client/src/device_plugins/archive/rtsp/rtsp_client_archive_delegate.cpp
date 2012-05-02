@@ -34,7 +34,8 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate():
     m_lastSeekTime(AV_NOPTS_VALUE),
     m_sendedCSec(0),
     m_globalMinArchiveTime(AV_NOPTS_VALUE),
-    m_lastMinTimeTime(0)
+    m_lastMinTimeTime(0),
+    m_forcedEndTime(AV_NOPTS_VALUE)
 {
     m_rtpDataBuffer = new quint8[MAX_RTP_BUFFER_SIZE];
     m_flags |= Flag_SlowSource;
@@ -387,6 +388,18 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
     return result;
 }
 
+void QnRtspClientArchiveDelegate::setAdditionalAttribute(const QByteArray& name, const QByteArray& value)
+{
+    m_rtspSession.setAdditionAttribute(name, value);
+}
+
+qint64 QnRtspClientArchiveDelegate::seek(qint64 startTime, qint64 endTime)
+{
+    m_forcedEndTime = endTime;
+    return seek(startTime, true);
+}
+
+
 qint64 QnRtspClientArchiveDelegate::seek(qint64 time, bool findIFrame)
 {
     m_blockReopening = false;
@@ -411,20 +424,15 @@ qint64 QnRtspClientArchiveDelegate::seek(qint64 time, bool findIFrame)
     else {
         if (!findIFrame)
             m_rtspSession.setAdditionAttribute("x-no-find-iframe", "1");
-        m_rtspSession.sendPlay(time, m_singleShotMode ? time : AV_NOPTS_VALUE, m_rtspSession.getScale());
+        qint64 endTime = AV_NOPTS_VALUE;
+        if (m_forcedEndTime)
+            endTime = m_forcedEndTime;
+        else if (m_singleShotMode)
+            endTime = time;
+        m_rtspSession.sendPlay(time, endTime, m_rtspSession.getScale());
         m_rtspSession.removeAdditionAttribute("x-no-find-iframe");
     }
     m_sendedCSec = m_rtspSession.lastSendedCSeq();
-    //m_waitBOF = true;
-	/*
-    QString s;
-    QTextStream str(&s);
-    m_lastSeekTime = time/1000;
-    str << "seek to " << QDateTime::fromMSecsSinceEpoch(time/1000).toString("hh:mm:ss.zzz") << " ssrc= " << m_sendedCSec;
-    str.flush();
-  	cl_log.log(s, cl_logALWAYS);
-	*/
-	
     return time;
 }
 

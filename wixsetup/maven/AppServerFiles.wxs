@@ -1,0 +1,719 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <DirectoryRef Id="VmsAppServerDir">
+            <Component Id="bz2.pyd" Guid="*">
+                <File Id="bz2.pyd" KeyPath="yes" Source="$(var.AppServerSourceDir)\bz2.pyd" />
+            </Component>
+            <Component Id="cx_Logging.pyd" Guid="*">
+                <File Id="cx_Logging.pyd" KeyPath="yes" Source="$(var.AppServerSourceDir)\cx_Logging.pyd" />
+            </Component>
+            <Component Id="dbconfig.exe" Guid="*">
+                <File Id="dbconfig.exe" KeyPath="yes" Source="$(var.AppServerSourceDir)\dbconfig.exe" />
+            </Component>
+            <Component Id="ecs_console.exe" Guid="*">
+                <File Id="ecs_console.exe" KeyPath="yes" Source="$(var.AppServerSourceDir)\ecs-console.exe" />
+            </Component>
+            <Component Id="library.zip" Guid="*">
+                <File Id="library.zip" KeyPath="yes" Source="$(var.AppServerSourceDir)\library.zip" />
+            </Component>
+            <Component Id="pyexpat.pyd" Guid="*">
+                <File Id="pyexpat.pyd" KeyPath="yes" Source="$(var.AppServerSourceDir)\pyexpat.pyd" />
+            </Component>
+            <Component Id="python27.dll" Guid="*">
+                <File Id="python27.dll" KeyPath="yes" Source="$(var.AppServerSourceDir)\python27.dll" />
+            </Component>
+            <Component Id="select.pyd" Guid="*">
+                <File Id="select.pyd" KeyPath="yes" Source="$(var.AppServerSourceDir)\select.pyd" />
+            </Component>
+            <Component Id="sqlite3.dll" Guid="*">
+                <File Id="sqlite3.dll" KeyPath="yes" Source="$(var.AppServerSourceDir)\sqlite3.dll" />
+            </Component>
+            <Component Id="unicodedata.pyd" Guid="*">
+                <File Id="unicodedata.pyd" KeyPath="yes" Source="$(var.AppServerSourceDir)\unicodedata.pyd" />
+            </Component>
+            <Component Id="win32api.pyd" Guid="*">
+                <File Id="win32api.pyd" KeyPath="yes" Source="$(var.AppServerSourceDir)\win32api.pyd" />
+            </Component>
+            <Component Id="win32com.shell.shell.pyd" Guid="*">
+                <File Id="win32com.shell.shell.pyd" KeyPath="yes" Source="$(var.AppServerSourceDir)\win32com.shell.shell.pyd" />
+            </Component>
+            <Component Id="win32evtlog.pyd" Guid="*">
+                <File Id="win32evtlog.pyd" KeyPath="yes" Source="$(var.AppServerSourceDir)\win32evtlog.pyd" />
+            </Component>
+            <Component Id="win32file.pyd" Guid="*">
+                <File Id="win32file.pyd" KeyPath="yes" Source="$(var.AppServerSourceDir)\win32file.pyd" />
+            </Component>
+            <Component Id="win32pipe.pyd" Guid="*">
+                <File Id="win32pipe.pyd" KeyPath="yes" Source="$(var.AppServerSourceDir)\win32pipe.pyd" />
+            </Component>
+            <Component Id="win32wnet.pyd" Guid="*">
+                <File Id="win32wnet.pyd" KeyPath="yes" Source="$(var.AppServerSourceDir)\win32wnet.pyd" />
+            </Component>
+            <Component Id="_ctypes.pyd" Guid="*">
+                <File Id="_ctypes.pyd" KeyPath="yes" Source="$(var.AppServerSourceDir)\_ctypes.pyd" />
+            </Component>
+            <Component Id="_hashlib.pyd" Guid="*">
+                <File Id="_hashlib.pyd" KeyPath="yes" Source="$(var.AppServerSourceDir)\_hashlib.pyd" />
+            </Component>
+            <Component Id="_multiprocessing.pyd" Guid="*">
+                <File Id="_multiprocessing.pyd" KeyPath="yes" Source="$(var.AppServerSourceDir)\_multiprocessing.pyd" />
+            </Component>
+            <Component Id="_socket.pyd" Guid="*">
+                <File Id="_socket.pyd" KeyPath="yes" Source="$(var.AppServerSourceDir)\_socket.pyd" />
+            </Component>
+            <Component Id="_sqlite3.pyd" Guid="*">
+                <File Id="_sqlite3.pyd" KeyPath="yes" Source="$(var.AppServerSourceDir)\_sqlite3.pyd" />
+            </Component>
+            <Component Id="_ssl.pyd" Guid="*">
+                <File Id="_ssl.pyd" KeyPath="yes" Source="$(var.AppServerSourceDir)\_ssl.pyd" />
+            </Component>
+            <Directory Id="static" Name="static">
+                <Component Id="test.html" Guid="*">
+                    <File Id="test.html" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\test.html" />
+                </Component>
+                <Directory Id="admin" Name="admin">
+                    <Directory Id="css" Name="css">
+                        <Component Id="base.css" Guid="*">
+                            <File Id="base.css" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\css\base.css" />
+                        </Component>
+                        <Component Id="changelists.css" Guid="*">
+                            <File Id="changelists.css" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\css\changelists.css" />
+                        </Component>
+                        <Component Id="dashboard.css" Guid="*">
+                            <File Id="dashboard.css" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\css\dashboard.css" />
+                        </Component>
+                        <Component Id="forms.css" Guid="*">
+                            <File Id="forms.css" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\css\forms.css" />
+                        </Component>
+                        <Component Id="ie.css" Guid="*">
+                            <File Id="ie.css" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\css\ie.css" />
+                        </Component>
+                        <Component Id="login.css" Guid="*">
+                            <File Id="login.css" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\css\login.css" />
+                        </Component>
+                        <Component Id="rtl.css" Guid="*">
+                            <File Id="rtl.css" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\css\rtl.css" />
+                        </Component>
+                        <Component Id="widgets.css" Guid="*">
+                            <File Id="widgets.css" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\css\widgets.css" />
+                        </Component>
+                    </Directory>
+                    <Directory Id="img" Name="img">
+                        <Component Id="changelist_bg.gif" Guid="*">
+                            <File Id="changelist_bg.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\changelist-bg.gif" />
+                        </Component>
+                        <Component Id="changelist_bg_rtl.gif" Guid="*">
+                            <File Id="changelist_bg_rtl.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\changelist-bg_rtl.gif" />
+                        </Component>
+                        <Component Id="chooser_bg.gif" Guid="*">
+                            <File Id="chooser_bg.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\chooser-bg.gif" />
+                        </Component>
+                        <Component Id="chooser_stacked_bg.gif" Guid="*">
+                            <File Id="chooser_stacked_bg.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\chooser_stacked-bg.gif" />
+                        </Component>
+                        <Component Id="default_bg_reverse.gif" Guid="*">
+                            <File Id="default_bg_reverse.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\default-bg-reverse.gif" />
+                        </Component>
+                        <Component Id="default_bg.gif" Guid="*">
+                            <File Id="default_bg.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\default-bg.gif" />
+                        </Component>
+                        <Component Id="deleted_overlay.gif" Guid="*">
+                            <File Id="deleted_overlay.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\deleted-overlay.gif" />
+                        </Component>
+                        <Component Id="icon_no.gif" Guid="*">
+                            <File Id="icon_no.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\icon-no.gif" />
+                        </Component>
+                        <Component Id="icon_unknown.gif" Guid="*">
+                            <File Id="icon_unknown.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\icon-unknown.gif" />
+                        </Component>
+                        <Component Id="icon_yes.gif" Guid="*">
+                            <File Id="icon_yes.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\icon-yes.gif" />
+                        </Component>
+                        <Component Id="icon_addlink.gif" Guid="*">
+                            <File Id="icon_addlink.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\icon_addlink.gif" />
+                        </Component>
+                        <Component Id="icon_alert.gif" Guid="*">
+                            <File Id="icon_alert.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\icon_alert.gif" />
+                        </Component>
+                        <Component Id="icon_calendar.gif" Guid="*">
+                            <File Id="icon_calendar.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\icon_calendar.gif" />
+                        </Component>
+                        <Component Id="icon_changelink.gif" Guid="*">
+                            <File Id="icon_changelink.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\icon_changelink.gif" />
+                        </Component>
+                        <Component Id="icon_clock.gif" Guid="*">
+                            <File Id="icon_clock.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\icon_clock.gif" />
+                        </Component>
+                        <Component Id="icon_deletelink.gif" Guid="*">
+                            <File Id="icon_deletelink.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\icon_deletelink.gif" />
+                        </Component>
+                        <Component Id="icon_error.gif" Guid="*">
+                            <File Id="icon_error.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\icon_error.gif" />
+                        </Component>
+                        <Component Id="icon_searchbox.png" Guid="*">
+                            <File Id="icon_searchbox.png" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\icon_searchbox.png" />
+                        </Component>
+                        <Component Id="icon_success.gif" Guid="*">
+                            <File Id="icon_success.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\icon_success.gif" />
+                        </Component>
+                        <Component Id="inline_delete_8bit.png" Guid="*">
+                            <File Id="inline_delete_8bit.png" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\inline-delete-8bit.png" />
+                        </Component>
+                        <Component Id="inline_delete.png" Guid="*">
+                            <File Id="inline_delete.png" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\inline-delete.png" />
+                        </Component>
+                        <Component Id="inline_restore_8bit.png" Guid="*">
+                            <File Id="inline_restore_8bit.png" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\inline-restore-8bit.png" />
+                        </Component>
+                        <Component Id="inline_restore.png" Guid="*">
+                            <File Id="inline_restore.png" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\inline-restore.png" />
+                        </Component>
+                        <Component Id="inline_splitter_bg.gif" Guid="*">
+                            <File Id="inline_splitter_bg.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\inline-splitter-bg.gif" />
+                        </Component>
+                        <Component Id="nav_bg_grabber.gif" Guid="*">
+                            <File Id="nav_bg_grabber.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\nav-bg-grabber.gif" />
+                        </Component>
+                        <Component Id="nav_bg_reverse.gif" Guid="*">
+                            <File Id="nav_bg_reverse.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\nav-bg-reverse.gif" />
+                        </Component>
+                        <Component Id="nav_bg_selected.gif" Guid="*">
+                            <File Id="nav_bg_selected.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\nav-bg-selected.gif" />
+                        </Component>
+                        <Component Id="nav_bg.gif" Guid="*">
+                            <File Id="nav_bg.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\nav-bg.gif" />
+                        </Component>
+                        <Component Id="selector_icons.gif" Guid="*">
+                            <File Id="selector_icons.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\selector-icons.gif" />
+                        </Component>
+                        <Component Id="selector_search.gif" Guid="*">
+                            <File Id="selector_search.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\selector-search.gif" />
+                        </Component>
+                        <Component Id="sorting_icons.gif" Guid="*">
+                            <File Id="sorting_icons.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\sorting-icons.gif" />
+                        </Component>
+                        <Component Id="tool_left.gif" Guid="*">
+                            <File Id="tool_left.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\tool-left.gif" />
+                        </Component>
+                        <Component Id="tool_left_over.gif" Guid="*">
+                            <File Id="tool_left_over.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\tool-left_over.gif" />
+                        </Component>
+                        <Component Id="tool_right.gif" Guid="*">
+                            <File Id="tool_right.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\tool-right.gif" />
+                        </Component>
+                        <Component Id="tool_right_over.gif" Guid="*">
+                            <File Id="tool_right_over.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\tool-right_over.gif" />
+                        </Component>
+                        <Component Id="tooltag_add.gif" Guid="*">
+                            <File Id="tooltag_add.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\tooltag-add.gif" />
+                        </Component>
+                        <Component Id="tooltag_add_over.gif" Guid="*">
+                            <File Id="tooltag_add_over.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\tooltag-add_over.gif" />
+                        </Component>
+                        <Component Id="tooltag_arrowright.gif" Guid="*">
+                            <File Id="tooltag_arrowright.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\tooltag-arrowright.gif" />
+                        </Component>
+                        <Component Id="tooltag_arrowright_over.gif" Guid="*">
+                            <File Id="tooltag_arrowright_over.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\tooltag-arrowright_over.gif" />
+                        </Component>
+                        <Directory Id="admin_1" Name="admin">
+                            <Component Id="arrow_down.gif" Guid="*">
+                                <File Id="arrow_down.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\arrow-down.gif" />
+                            </Component>
+                            <Component Id="arrow_up.gif" Guid="*">
+                                <File Id="arrow_up.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\arrow-up.gif" />
+                            </Component>
+                            <Component Id="changelist_bg.gif_1" Guid="*">
+                                <File Id="changelist_bg.gif_1" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\changelist-bg.gif" />
+                            </Component>
+                            <Component Id="changelist_bg_rtl.gif_1" Guid="*">
+                                <File Id="changelist_bg_rtl.gif_1" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\changelist-bg_rtl.gif" />
+                            </Component>
+                            <Component Id="chooser_bg.gif_1" Guid="*">
+                                <File Id="chooser_bg.gif_1" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\chooser-bg.gif" />
+                            </Component>
+                            <Component Id="chooser_stacked_bg.gif_1" Guid="*">
+                                <File Id="chooser_stacked_bg.gif_1" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\chooser_stacked-bg.gif" />
+                            </Component>
+                            <Component Id="default_bg_reverse.gif_1" Guid="*">
+                                <File Id="default_bg_reverse.gif_1" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\default-bg-reverse.gif" />
+                            </Component>
+                            <Component Id="default_bg.gif_1" Guid="*">
+                                <File Id="default_bg.gif_1" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\default-bg.gif" />
+                            </Component>
+                            <Component Id="deleted_overlay.gif_1" Guid="*">
+                                <File Id="deleted_overlay.gif_1" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\deleted-overlay.gif" />
+                            </Component>
+                            <Component Id="icon_no.gif_1" Guid="*">
+                                <File Id="icon_no.gif_1" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\icon-no.gif" />
+                            </Component>
+                            <Component Id="icon_unknown.gif_1" Guid="*">
+                                <File Id="icon_unknown.gif_1" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\icon-unknown.gif" />
+                            </Component>
+                            <Component Id="icon_yes.gif_1" Guid="*">
+                                <File Id="icon_yes.gif_1" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\icon-yes.gif" />
+                            </Component>
+                            <Component Id="icon_addlink.gif_1" Guid="*">
+                                <File Id="icon_addlink.gif_1" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\icon_addlink.gif" />
+                            </Component>
+                            <Component Id="icon_alert.gif_1" Guid="*">
+                                <File Id="icon_alert.gif_1" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\icon_alert.gif" />
+                            </Component>
+                            <Component Id="icon_calendar.gif_1" Guid="*">
+                                <File Id="icon_calendar.gif_1" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\icon_calendar.gif" />
+                            </Component>
+                            <Component Id="icon_changelink.gif_1" Guid="*">
+                                <File Id="icon_changelink.gif_1" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\icon_changelink.gif" />
+                            </Component>
+                            <Component Id="icon_clock.gif_1" Guid="*">
+                                <File Id="icon_clock.gif_1" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\icon_clock.gif" />
+                            </Component>
+                            <Component Id="icon_deletelink.gif_1" Guid="*">
+                                <File Id="icon_deletelink.gif_1" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\icon_deletelink.gif" />
+                            </Component>
+                            <Component Id="icon_error.gif_1" Guid="*">
+                                <File Id="icon_error.gif_1" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\icon_error.gif" />
+                            </Component>
+                            <Component Id="icon_searchbox.png_1" Guid="*">
+                                <File Id="icon_searchbox.png_1" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\icon_searchbox.png" />
+                            </Component>
+                            <Component Id="icon_success.gif_1" Guid="*">
+                                <File Id="icon_success.gif_1" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\icon_success.gif" />
+                            </Component>
+                            <Component Id="inline_delete_8bit.png_1" Guid="*">
+                                <File Id="inline_delete_8bit.png_1" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\inline-delete-8bit.png" />
+                            </Component>
+                            <Component Id="inline_delete.png_1" Guid="*">
+                                <File Id="inline_delete.png_1" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\inline-delete.png" />
+                            </Component>
+                            <Component Id="inline_restore_8bit.png_1" Guid="*">
+                                <File Id="inline_restore_8bit.png_1" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\inline-restore-8bit.png" />
+                            </Component>
+                            <Component Id="inline_restore.png_1" Guid="*">
+                                <File Id="inline_restore.png_1" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\inline-restore.png" />
+                            </Component>
+                            <Component Id="inline_splitter_bg.gif_1" Guid="*">
+                                <File Id="inline_splitter_bg.gif_1" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\inline-splitter-bg.gif" />
+                            </Component>
+                            <Component Id="nav_bg_grabber.gif_1" Guid="*">
+                                <File Id="nav_bg_grabber.gif_1" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\nav-bg-grabber.gif" />
+                            </Component>
+                            <Component Id="nav_bg_reverse.gif_1" Guid="*">
+                                <File Id="nav_bg_reverse.gif_1" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\nav-bg-reverse.gif" />
+                            </Component>
+                            <Component Id="nav_bg.gif_1" Guid="*">
+                                <File Id="nav_bg.gif_1" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\nav-bg.gif" />
+                            </Component>
+                            <Component Id="selector_add.gif" Guid="*">
+                                <File Id="selector_add.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\selector-add.gif" />
+                            </Component>
+                            <Component Id="selector_addall.gif" Guid="*">
+                                <File Id="selector_addall.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\selector-addall.gif" />
+                            </Component>
+                            <Component Id="selector_remove.gif" Guid="*">
+                                <File Id="selector_remove.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\selector-remove.gif" />
+                            </Component>
+                            <Component Id="selector_removeall.gif" Guid="*">
+                                <File Id="selector_removeall.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\selector-removeall.gif" />
+                            </Component>
+                            <Component Id="selector_search.gif_1" Guid="*">
+                                <File Id="selector_search.gif_1" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\selector-search.gif" />
+                            </Component>
+                            <Component Id="selector_stacked_add.gif" Guid="*">
+                                <File Id="selector_stacked_add.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\selector_stacked-add.gif" />
+                            </Component>
+                            <Component Id="selector_stacked_remove.gif" Guid="*">
+                                <File Id="selector_stacked_remove.gif" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\selector_stacked-remove.gif" />
+                            </Component>
+                            <Component Id="tool_left.gif_1" Guid="*">
+                                <File Id="tool_left.gif_1" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\tool-left.gif" />
+                            </Component>
+                            <Component Id="tool_left_over.gif_1" Guid="*">
+                                <File Id="tool_left_over.gif_1" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\tool-left_over.gif" />
+                            </Component>
+                            <Component Id="tool_right.gif_1" Guid="*">
+                                <File Id="tool_right.gif_1" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\tool-right.gif" />
+                            </Component>
+                            <Component Id="tool_right_over.gif_1" Guid="*">
+                                <File Id="tool_right_over.gif_1" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\tool-right_over.gif" />
+                            </Component>
+                            <Component Id="tooltag_add.gif_1" Guid="*">
+                                <File Id="tooltag_add.gif_1" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\tooltag-add.gif" />
+                            </Component>
+                            <Component Id="tooltag_add_over.gif_1" Guid="*">
+                                <File Id="tooltag_add_over.gif_1" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\tooltag-add_over.gif" />
+                            </Component>
+                            <Component Id="tooltag_arrowright.gif_1" Guid="*">
+                                <File Id="tooltag_arrowright.gif_1" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\tooltag-arrowright.gif" />
+                            </Component>
+                            <Component Id="tooltag_arrowright_over.gif_1" Guid="*">
+                                <File Id="tooltag_arrowright_over.gif_1" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\admin\tooltag-arrowright_over.gif" />
+                            </Component>
+                        </Directory>
+                        <Directory Id="gis" Name="gis">
+                            <Component Id="move_vertex_off.png" Guid="*">
+                                <File Id="move_vertex_off.png" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\gis\move_vertex_off.png" />
+                            </Component>
+                            <Component Id="move_vertex_on.png" Guid="*">
+                                <File Id="move_vertex_on.png" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\img\gis\move_vertex_on.png" />
+                            </Component>
+                        </Directory>
+                    </Directory>
+                    <Directory Id="js" Name="js">
+                        <Component Id="actions.js" Guid="*">
+                            <File Id="actions.js" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\js\actions.js" />
+                        </Component>
+                        <Component Id="actions.min.js" Guid="*">
+                            <File Id="actions.min.js" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\js\actions.min.js" />
+                        </Component>
+                        <Component Id="calendar.js" Guid="*">
+                            <File Id="calendar.js" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\js\calendar.js" />
+                        </Component>
+                        <Component Id="collapse.js" Guid="*">
+                            <File Id="collapse.js" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\js\collapse.js" />
+                        </Component>
+                        <Component Id="collapse.min.js" Guid="*">
+                            <File Id="collapse.min.js" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\js\collapse.min.js" />
+                        </Component>
+                        <Component Id="compress.py" Guid="*">
+                            <File Id="compress.py" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\js\compress.py" />
+                        </Component>
+                        <Component Id="compress.pyc" Guid="*">
+                            <File Id="compress.pyc" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\js\compress.pyc" />
+                        </Component>
+                        <Component Id="core.js" Guid="*">
+                            <File Id="core.js" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\js\core.js" />
+                        </Component>
+                        <Component Id="dateparse.js" Guid="*">
+                            <File Id="dateparse.js" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\js\dateparse.js" />
+                        </Component>
+                        <Component Id="getElementsBySelector.js" Guid="*">
+                            <File Id="getElementsBySelector.js" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\js\getElementsBySelector.js" />
+                        </Component>
+                        <Component Id="inlines.js" Guid="*">
+                            <File Id="inlines.js" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\js\inlines.js" />
+                        </Component>
+                        <Component Id="inlines.min.js" Guid="*">
+                            <File Id="inlines.min.js" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\js\inlines.min.js" />
+                        </Component>
+                        <Component Id="jquery.init.js" Guid="*">
+                            <File Id="jquery.init.js" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\js\jquery.init.js" />
+                        </Component>
+                        <Component Id="jquery.js" Guid="*">
+                            <File Id="jquery.js" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\js\jquery.js" />
+                        </Component>
+                        <Component Id="jquery.min.js" Guid="*">
+                            <File Id="jquery.min.js" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\js\jquery.min.js" />
+                        </Component>
+                        <Component Id="LICENSE_JQUERY.txt" Guid="*">
+                            <File Id="LICENSE_JQUERY.txt" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\js\LICENSE-JQUERY.txt" />
+                        </Component>
+                        <Component Id="prepopulate.js" Guid="*">
+                            <File Id="prepopulate.js" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\js\prepopulate.js" />
+                        </Component>
+                        <Component Id="prepopulate.min.js" Guid="*">
+                            <File Id="prepopulate.min.js" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\js\prepopulate.min.js" />
+                        </Component>
+                        <Component Id="SelectBox.js" Guid="*">
+                            <File Id="SelectBox.js" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\js\SelectBox.js" />
+                        </Component>
+                        <Component Id="SelectFilter2.js" Guid="*">
+                            <File Id="SelectFilter2.js" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\js\SelectFilter2.js" />
+                        </Component>
+                        <Component Id="timeparse.js" Guid="*">
+                            <File Id="timeparse.js" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\js\timeparse.js" />
+                        </Component>
+                        <Component Id="urlify.js" Guid="*">
+                            <File Id="urlify.js" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\js\urlify.js" />
+                        </Component>
+                        <Directory Id="admin_2" Name="admin">
+                            <Component Id="DateTimeShortcuts.js" Guid="*">
+                                <File Id="DateTimeShortcuts.js" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\js\admin\DateTimeShortcuts.js" />
+                            </Component>
+                            <Component Id="ordering.js" Guid="*">
+                                <File Id="ordering.js" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\js\admin\ordering.js" />
+                            </Component>
+                            <Component Id="RelatedObjectLookups.js" Guid="*">
+                                <File Id="RelatedObjectLookups.js" KeyPath="yes" Source="$(var.AppServerSourceDir)\static\admin\js\admin\RelatedObjectLookups.js" />
+                            </Component>
+                        </Directory>
+                    </Directory>
+                </Directory>
+            </Directory>
+            <Directory Id="templates" Name="templates">
+                <Component Id="_404.html" Guid="*">
+                    <File Id="_404.html" KeyPath="yes" Source="$(var.AppServerSourceDir)\templates\404.html" />
+                </Component>
+                <Component Id="_500.html" Guid="*">
+                    <File Id="_500.html" KeyPath="yes" Source="$(var.AppServerSourceDir)\templates\500.html" />
+                </Component>
+                <Component Id="documentation.html" Guid="*">
+                    <File Id="documentation.html" KeyPath="yes" Source="$(var.AppServerSourceDir)\templates\documentation.html" />
+                </Component>
+                <Directory Id="admin_3" Name="admin">
+                    <Component Id="_404.html_1" Guid="*">
+                        <File Id="_404.html_1" KeyPath="yes" Source="$(var.AppServerSourceDir)\templates\admin\404.html" />
+                    </Component>
+                    <Component Id="_500.html_1" Guid="*">
+                        <File Id="_500.html_1" KeyPath="yes" Source="$(var.AppServerSourceDir)\templates\admin\500.html" />
+                    </Component>
+                    <Component Id="actions.html" Guid="*">
+                        <File Id="actions.html" KeyPath="yes" Source="$(var.AppServerSourceDir)\templates\admin\actions.html" />
+                    </Component>
+                    <Component Id="app_index.html" Guid="*">
+                        <File Id="app_index.html" KeyPath="yes" Source="$(var.AppServerSourceDir)\templates\admin\app_index.html" />
+                    </Component>
+                    <Component Id="base.html" Guid="*">
+                        <File Id="base.html" KeyPath="yes" Source="$(var.AppServerSourceDir)\templates\admin\base.html" />
+                    </Component>
+                    <Component Id="base_site.html" Guid="*">
+                        <File Id="base_site.html" KeyPath="yes" Source="$(var.AppServerSourceDir)\templates\admin\base_site.html" />
+                    </Component>
+                    <Component Id="change_form.html" Guid="*">
+                        <File Id="change_form.html" KeyPath="yes" Source="$(var.AppServerSourceDir)\templates\admin\change_form.html" />
+                    </Component>
+                    <Component Id="change_list.html" Guid="*">
+                        <File Id="change_list.html" KeyPath="yes" Source="$(var.AppServerSourceDir)\templates\admin\change_list.html" />
+                    </Component>
+                    <Component Id="change_list_results.html" Guid="*">
+                        <File Id="change_list_results.html" KeyPath="yes" Source="$(var.AppServerSourceDir)\templates\admin\change_list_results.html" />
+                    </Component>
+                    <Component Id="date_hierarchy.html" Guid="*">
+                        <File Id="date_hierarchy.html" KeyPath="yes" Source="$(var.AppServerSourceDir)\templates\admin\date_hierarchy.html" />
+                    </Component>
+                    <Component Id="delete_confirmation.html" Guid="*">
+                        <File Id="delete_confirmation.html" KeyPath="yes" Source="$(var.AppServerSourceDir)\templates\admin\delete_confirmation.html" />
+                    </Component>
+                    <Component Id="delete_selected_confirmation.html" Guid="*">
+                        <File Id="delete_selected_confirmation.html" KeyPath="yes" Source="$(var.AppServerSourceDir)\templates\admin\delete_selected_confirmation.html" />
+                    </Component>
+                    <Component Id="filter.html" Guid="*">
+                        <File Id="filter.html" KeyPath="yes" Source="$(var.AppServerSourceDir)\templates\admin\filter.html" />
+                    </Component>
+                    <Component Id="index.html" Guid="*">
+                        <File Id="index.html" KeyPath="yes" Source="$(var.AppServerSourceDir)\templates\admin\index.html" />
+                    </Component>
+                    <Component Id="invalid_setup.html" Guid="*">
+                        <File Id="invalid_setup.html" KeyPath="yes" Source="$(var.AppServerSourceDir)\templates\admin\invalid_setup.html" />
+                    </Component>
+                    <Component Id="login.html" Guid="*">
+                        <File Id="login.html" KeyPath="yes" Source="$(var.AppServerSourceDir)\templates\admin\login.html" />
+                    </Component>
+                    <Component Id="object_history.html" Guid="*">
+                        <File Id="object_history.html" KeyPath="yes" Source="$(var.AppServerSourceDir)\templates\admin\object_history.html" />
+                    </Component>
+                    <Component Id="pagination.html" Guid="*">
+                        <File Id="pagination.html" KeyPath="yes" Source="$(var.AppServerSourceDir)\templates\admin\pagination.html" />
+                    </Component>
+                    <Component Id="prepopulated_fields_js.html" Guid="*">
+                        <File Id="prepopulated_fields_js.html" KeyPath="yes" Source="$(var.AppServerSourceDir)\templates\admin\prepopulated_fields_js.html" />
+                    </Component>
+                    <Component Id="search_form.html" Guid="*">
+                        <File Id="search_form.html" KeyPath="yes" Source="$(var.AppServerSourceDir)\templates\admin\search_form.html" />
+                    </Component>
+                    <Component Id="submit_line.html" Guid="*">
+                        <File Id="submit_line.html" KeyPath="yes" Source="$(var.AppServerSourceDir)\templates\admin\submit_line.html" />
+                    </Component>
+                    <Directory Id="auth" Name="auth">
+                        <Directory Id="user" Name="user">
+                            <Component Id="add_form.html" Guid="*">
+                                <File Id="add_form.html" KeyPath="yes" Source="$(var.AppServerSourceDir)\templates\admin\auth\user\add_form.html" />
+                            </Component>
+                            <Component Id="change_password.html" Guid="*">
+                                <File Id="change_password.html" KeyPath="yes" Source="$(var.AppServerSourceDir)\templates\admin\auth\user\change_password.html" />
+                            </Component>
+                        </Directory>
+                    </Directory>
+                    <Directory Id="edit_inline" Name="edit_inline">
+                        <Component Id="stacked.html" Guid="*">
+                            <File Id="stacked.html" KeyPath="yes" Source="$(var.AppServerSourceDir)\templates\admin\edit_inline\stacked.html" />
+                        </Component>
+                        <Component Id="tabular.html" Guid="*">
+                            <File Id="tabular.html" KeyPath="yes" Source="$(var.AppServerSourceDir)\templates\admin\edit_inline\tabular.html" />
+                        </Component>
+                    </Directory>
+                    <Directory Id="includes" Name="includes">
+                        <Component Id="fieldset.html" Guid="*">
+                            <File Id="fieldset.html" KeyPath="yes" Source="$(var.AppServerSourceDir)\templates\admin\includes\fieldset.html" />
+                        </Component>
+                    </Directory>
+                </Directory>
+            </Directory>
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <ComponentGroup Id="AppServerFilesComponent">
+            <ComponentRef Id="bz2.pyd" />
+            <ComponentRef Id="cx_Logging.pyd" />
+            <ComponentRef Id="dbconfig.exe" />
+            <ComponentRef Id="ecs_console.exe" />
+            <ComponentRef Id="library.zip" />
+            <ComponentRef Id="pyexpat.pyd" />
+            <ComponentRef Id="python27.dll" />
+            <ComponentRef Id="select.pyd" />
+            <ComponentRef Id="sqlite3.dll" />
+            <ComponentRef Id="unicodedata.pyd" />
+            <ComponentRef Id="win32api.pyd" />
+            <ComponentRef Id="win32com.shell.shell.pyd" />
+            <ComponentRef Id="win32evtlog.pyd" />
+            <ComponentRef Id="win32file.pyd" />
+            <ComponentRef Id="win32pipe.pyd" />
+            <ComponentRef Id="win32wnet.pyd" />
+            <ComponentRef Id="_ctypes.pyd" />
+            <ComponentRef Id="_hashlib.pyd" />
+            <ComponentRef Id="_multiprocessing.pyd" />
+            <ComponentRef Id="_socket.pyd" />
+            <ComponentRef Id="_sqlite3.pyd" />
+            <ComponentRef Id="_ssl.pyd" />
+            <ComponentRef Id="test.html" />
+            <ComponentRef Id="base.css" />
+            <ComponentRef Id="changelists.css" />
+            <ComponentRef Id="dashboard.css" />
+            <ComponentRef Id="forms.css" />
+            <ComponentRef Id="ie.css" />
+            <ComponentRef Id="login.css" />
+            <ComponentRef Id="rtl.css" />
+            <ComponentRef Id="widgets.css" />
+            <ComponentRef Id="changelist_bg.gif" />
+            <ComponentRef Id="changelist_bg_rtl.gif" />
+            <ComponentRef Id="chooser_bg.gif" />
+            <ComponentRef Id="chooser_stacked_bg.gif" />
+            <ComponentRef Id="default_bg_reverse.gif" />
+            <ComponentRef Id="default_bg.gif" />
+            <ComponentRef Id="deleted_overlay.gif" />
+            <ComponentRef Id="icon_no.gif" />
+            <ComponentRef Id="icon_unknown.gif" />
+            <ComponentRef Id="icon_yes.gif" />
+            <ComponentRef Id="icon_addlink.gif" />
+            <ComponentRef Id="icon_alert.gif" />
+            <ComponentRef Id="icon_calendar.gif" />
+            <ComponentRef Id="icon_changelink.gif" />
+            <ComponentRef Id="icon_clock.gif" />
+            <ComponentRef Id="icon_deletelink.gif" />
+            <ComponentRef Id="icon_error.gif" />
+            <ComponentRef Id="icon_searchbox.png" />
+            <ComponentRef Id="icon_success.gif" />
+            <ComponentRef Id="inline_delete_8bit.png" />
+            <ComponentRef Id="inline_delete.png" />
+            <ComponentRef Id="inline_restore_8bit.png" />
+            <ComponentRef Id="inline_restore.png" />
+            <ComponentRef Id="inline_splitter_bg.gif" />
+            <ComponentRef Id="nav_bg_grabber.gif" />
+            <ComponentRef Id="nav_bg_reverse.gif" />
+            <ComponentRef Id="nav_bg_selected.gif" />
+            <ComponentRef Id="nav_bg.gif" />
+            <ComponentRef Id="selector_icons.gif" />
+            <ComponentRef Id="selector_search.gif" />
+            <ComponentRef Id="sorting_icons.gif" />
+            <ComponentRef Id="tool_left.gif" />
+            <ComponentRef Id="tool_left_over.gif" />
+            <ComponentRef Id="tool_right.gif" />
+            <ComponentRef Id="tool_right_over.gif" />
+            <ComponentRef Id="tooltag_add.gif" />
+            <ComponentRef Id="tooltag_add_over.gif" />
+            <ComponentRef Id="tooltag_arrowright.gif" />
+            <ComponentRef Id="tooltag_arrowright_over.gif" />
+            <ComponentRef Id="arrow_down.gif" />
+            <ComponentRef Id="arrow_up.gif" />
+            <ComponentRef Id="changelist_bg.gif_1" />
+            <ComponentRef Id="changelist_bg_rtl.gif_1" />
+            <ComponentRef Id="chooser_bg.gif_1" />
+            <ComponentRef Id="chooser_stacked_bg.gif_1" />
+            <ComponentRef Id="default_bg_reverse.gif_1" />
+            <ComponentRef Id="default_bg.gif_1" />
+            <ComponentRef Id="deleted_overlay.gif_1" />
+            <ComponentRef Id="icon_no.gif_1" />
+            <ComponentRef Id="icon_unknown.gif_1" />
+            <ComponentRef Id="icon_yes.gif_1" />
+            <ComponentRef Id="icon_addlink.gif_1" />
+            <ComponentRef Id="icon_alert.gif_1" />
+            <ComponentRef Id="icon_calendar.gif_1" />
+            <ComponentRef Id="icon_changelink.gif_1" />
+            <ComponentRef Id="icon_clock.gif_1" />
+            <ComponentRef Id="icon_deletelink.gif_1" />
+            <ComponentRef Id="icon_error.gif_1" />
+            <ComponentRef Id="icon_searchbox.png_1" />
+            <ComponentRef Id="icon_success.gif_1" />
+            <ComponentRef Id="inline_delete_8bit.png_1" />
+            <ComponentRef Id="inline_delete.png_1" />
+            <ComponentRef Id="inline_restore_8bit.png_1" />
+            <ComponentRef Id="inline_restore.png_1" />
+            <ComponentRef Id="inline_splitter_bg.gif_1" />
+            <ComponentRef Id="nav_bg_grabber.gif_1" />
+            <ComponentRef Id="nav_bg_reverse.gif_1" />
+            <ComponentRef Id="nav_bg.gif_1" />
+            <ComponentRef Id="selector_add.gif" />
+            <ComponentRef Id="selector_addall.gif" />
+            <ComponentRef Id="selector_remove.gif" />
+            <ComponentRef Id="selector_removeall.gif" />
+            <ComponentRef Id="selector_search.gif_1" />
+            <ComponentRef Id="selector_stacked_add.gif" />
+            <ComponentRef Id="selector_stacked_remove.gif" />
+            <ComponentRef Id="tool_left.gif_1" />
+            <ComponentRef Id="tool_left_over.gif_1" />
+            <ComponentRef Id="tool_right.gif_1" />
+            <ComponentRef Id="tool_right_over.gif_1" />
+            <ComponentRef Id="tooltag_add.gif_1" />
+            <ComponentRef Id="tooltag_add_over.gif_1" />
+            <ComponentRef Id="tooltag_arrowright.gif_1" />
+            <ComponentRef Id="tooltag_arrowright_over.gif_1" />
+            <ComponentRef Id="move_vertex_off.png" />
+            <ComponentRef Id="move_vertex_on.png" />
+            <ComponentRef Id="actions.js" />
+            <ComponentRef Id="actions.min.js" />
+            <ComponentRef Id="calendar.js" />
+            <ComponentRef Id="collapse.js" />
+            <ComponentRef Id="collapse.min.js" />
+            <ComponentRef Id="compress.py" />
+            <ComponentRef Id="compress.pyc" />
+            <ComponentRef Id="core.js" />
+            <ComponentRef Id="dateparse.js" />
+            <ComponentRef Id="getElementsBySelector.js" />
+            <ComponentRef Id="inlines.js" />
+            <ComponentRef Id="inlines.min.js" />
+            <ComponentRef Id="jquery.init.js" />
+            <ComponentRef Id="jquery.js" />
+            <ComponentRef Id="jquery.min.js" />
+            <ComponentRef Id="LICENSE_JQUERY.txt" />
+            <ComponentRef Id="prepopulate.js" />
+            <ComponentRef Id="prepopulate.min.js" />
+            <ComponentRef Id="SelectBox.js" />
+            <ComponentRef Id="SelectFilter2.js" />
+            <ComponentRef Id="timeparse.js" />
+            <ComponentRef Id="urlify.js" />
+            <ComponentRef Id="DateTimeShortcuts.js" />
+            <ComponentRef Id="ordering.js" />
+            <ComponentRef Id="RelatedObjectLookups.js" />
+            <ComponentRef Id="_404.html" />
+            <ComponentRef Id="_500.html" />
+            <ComponentRef Id="documentation.html" />
+            <ComponentRef Id="_404.html_1" />
+            <ComponentRef Id="_500.html_1" />
+            <ComponentRef Id="actions.html" />
+            <ComponentRef Id="app_index.html" />
+            <ComponentRef Id="base.html" />
+            <ComponentRef Id="base_site.html" />
+            <ComponentRef Id="change_form.html" />
+            <ComponentRef Id="change_list.html" />
+            <ComponentRef Id="change_list_results.html" />
+            <ComponentRef Id="date_hierarchy.html" />
+            <ComponentRef Id="delete_confirmation.html" />
+            <ComponentRef Id="delete_selected_confirmation.html" />
+            <ComponentRef Id="filter.html" />
+            <ComponentRef Id="index.html" />
+            <ComponentRef Id="invalid_setup.html" />
+            <ComponentRef Id="login.html" />
+            <ComponentRef Id="object_history.html" />
+            <ComponentRef Id="pagination.html" />
+            <ComponentRef Id="prepopulated_fields_js.html" />
+            <ComponentRef Id="search_form.html" />
+            <ComponentRef Id="submit_line.html" />
+            <ComponentRef Id="add_form.html" />
+            <ComponentRef Id="change_password.html" />
+            <ComponentRef Id="stacked.html" />
+            <ComponentRef Id="tabular.html" />
+            <ComponentRef Id="fieldset.html" />
+        </ComponentGroup>
+    </Fragment>
+</Wix>

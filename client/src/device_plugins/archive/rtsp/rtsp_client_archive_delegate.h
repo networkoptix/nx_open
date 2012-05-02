@@ -24,6 +24,7 @@ public:
     virtual qint64 endTime();
     virtual QnAbstractMediaDataPtr getNextData();
     virtual qint64 seek (qint64 time, bool findIFrame);
+    qint64 seek(qint64 startTime, qint64 endTime);
     virtual QnVideoResourceLayout* getVideoLayout();
     virtual QnResourceAudioLayout* getAudioLayout();
 
@@ -45,6 +46,9 @@ public:
     virtual void beforeChangeReverseMode(bool reverseMode);
 
     static void setProxyAddr(const QString& addr, int port);
+
+    void setAdditionalAttribute(const QByteArray& name, const QByteArray& value);
+
 private:
     QnAbstractDataPacketPtr processFFmpegRtpPayload(const quint8* data, int dataSize);
     void processMetadata(const quint8* data, int dataSize);
@@ -88,6 +92,7 @@ private:
 
     static QString m_proxyAddr;
     static int m_proxyPort;
+    qint64 m_forcedEndTime;
 };
 
 #endif
