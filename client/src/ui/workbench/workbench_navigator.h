@@ -46,6 +46,11 @@ public:
     bool setPlaying(bool playing);
     bool isPlayingSupported() const;
 
+    qreal speed() const;
+    void setSpeed(qreal speed);
+    qreal minimalSpeed() const;
+    qreal maximalSpeed() const;
+
     QnResourceWidget *currentWidget();
 
     virtual Qn::ActionScope currentScope() const override;
@@ -59,6 +64,8 @@ signals:
     void liveSupportedChanged();
     void playingChanged();
     void playingSupportedChanged();
+    void speedChanged();
+    void speedRangeChanged();
 
 protected:
     enum SliderLine {
@@ -104,6 +111,8 @@ protected slots:
     void updateLiveSupported();
     void updatePlaying();
     void updatePlayingSupported();
+    void updateSpeed();
+    void updateSpeedRange();
 
 protected slots:
     void at_display_widgetChanged(Qn::ItemRole role);
@@ -143,6 +152,10 @@ private:
     bool m_lastLiveSupported;
     bool m_lastPlaying;
     bool m_lastPlayingSupported;
+
+    qreal m_lastSpeed;
+    qreal m_lastMinimalSpeed;
+    qreal m_lastMaximalSpeed;
 
     QAction *m_clearSelectionAction;
 

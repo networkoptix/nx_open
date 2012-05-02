@@ -12,6 +12,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 
+#include <ui/common/image_processing.h>
 #include <ui/style/noptix_style.h>
 #include <ui/style/globals.h>
 #include <ui/graphics/items/standard/graphics_slider_p.h>
@@ -19,7 +20,6 @@
 #include <ui/processors/kinetic_cutting_processor.h>
 
 #include "tool_tip_item.h"
-#include "ui/common/image_processing.h"
 
 namespace {
     QTime msecsToTime(qint64 msecs) {
@@ -774,6 +774,9 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
 
     /* Draw position marker. */
     drawMarker(painter, sliderPosition(), positionMarkerColor);
+
+    /* Draw thumbnails. */
+    drawThumbnails(painter, rect.top() - rect.height() * 0.5, rect.height() * 0.5);
 }
 
 void QnTimeSlider::drawSelection(QPainter *painter) {
@@ -1045,6 +1048,12 @@ void QnTimeSlider::drawHighlights(QPainter *painter, qreal fillTop, qreal fillHe
     }
 }
 
+void QnTimeSlider::drawThumbnails(QPainter *painter, qreal top, qreal height) {
+    QRectF rect = this->rect();
+
+    QnScopedPainterPenRollback penRollback(painter, QPen(Qt::green, 0));
+    painter->drawRect(QRectF(rect.left(), top, rect.width(), height));
+}
 
 
 // -------------------------------------------------------------------------- //

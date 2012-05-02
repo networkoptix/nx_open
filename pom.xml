@@ -48,29 +48,12 @@
 		<module>appserver</module>
 		<module>common</module>
 		<module>mediaserver</module>
-		<module>testcamera</module>
+		<module>mediaproxy</module>
 	</modules>
 	<build>
 		<defaultGoal>package</defaultGoal>
 		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>properties-maven-plugin</artifactId>
-				<version>1.0-alpha-2</version>
-				<executions>
-					<execution>
-						<phase>validate</phase>
-						<goals>
-							<goal>read-project-properties</goal>
-						</goals>
-						<configuration>
-							<files>
-								<file>build-${customization}.properties</file>
-							</files>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+
 		</plugins>		
 	</build>
 	<profiles>
@@ -85,6 +68,7 @@
 				<module>client</module>	
 				<module>mediaproxy</module>					
 				<module>traytool</module>
+				<module>testcamera</module>				
 				<module>wixsetup</module>
 			</modules>
 			<properties>

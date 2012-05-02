@@ -3,12 +3,9 @@
 
 #include "tool_tip_slider.h"
 
-class QnToolTipItem;
-
-class QnVolumeSlider : public QnToolTipSlider
-{
-    Q_OBJECT
-    Q_PROPERTY(bool muted READ isMute WRITE setMute)
+class QnVolumeSlider : public QnToolTipSlider {
+    Q_OBJECT;
+    Q_PROPERTY(bool muted READ isMute WRITE setMute);
 
     typedef QnToolTipSlider base_type;
 

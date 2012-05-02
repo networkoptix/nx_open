@@ -5,31 +5,35 @@
 
 class QPropertyAnimation;
 
-class QnToolTipItem;
-
 class QnSpeedSlider: public QnToolTipSlider {
     Q_OBJECT;
+    Q_PROPERTY(qreal speed READ speed WRITE setSpeed);
 
     typedef QnToolTipSlider base_type;
 
 public:
+    enum Precision { 
+        LowPrecision, 
+        HighPrecision 
+    };
+
     explicit QnSpeedSlider(QGraphicsItem *parent = NULL);
     virtual ~QnSpeedSlider();
-
-    enum Precision { LowPrecision, HighPrecision };
 
     Precision precision() const;
     void setPrecision(Precision precision);
 
+    qreal speed() const;
+
 public slots:
     void resetSpeed();
-    void setSpeed(float value);
+    void setSpeed(qreal value);
 
     void speedDown();
     void speedUp();
 
 signals:
-    void speedChanged(float newSpeed);
+    void speedChanged(qreal newSpeed);
 
     void frameBackward();
     void frameForward();
@@ -41,8 +45,6 @@ protected:
     virtual void wheelEvent(QGraphicsSceneWheelEvent *e) override;
 
 private:
-    Q_DISABLE_COPY(QnSpeedSlider)
-
     Precision m_precision;
     QPropertyAnimation *m_animation;
     int m_wheelStuckedTimerId;

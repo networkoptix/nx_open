@@ -130,6 +130,7 @@ private:
     void drawMarker(QPainter *painter, qint64 pos, const QColor &color);
     void drawSelection(QPainter *painter);
     void drawHighlights(QPainter *painter, qreal fillTop, qreal fillHeight, qreal textTop, qreal textHeight);
+    void drawThumbnails(QPainter *painter, qreal top, qreal height);
 
     void updateToolTipVisibility();
     void updateToolTipText();
