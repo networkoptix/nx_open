@@ -61,7 +61,7 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     ui->backgroundColorPicker->setAutoFillBackground(false);
     initColorPicker();
 
-#ifdef QN_NO_BACKGROUND_COLOR_ADJUSTMENT
+#ifndef QN_HAS_BACKGROUND_COLOR_ADJUSTMENT
     ui->lookAndFeelGroupBox->hide();
 #endif
 
