@@ -11,12 +11,15 @@ public:
     QnSignInfo(QWidget* parent = 0);
 
     void setImageSize(int width, int height);
+
 protected:
-    virtual void resizeEvent ( QResizeEvent * event ) override;
-    virtual void paintEvent(QPaintEvent* event) override;
+    virtual void resizeEvent(QResizeEvent *event) override;
+    virtual void paintEvent(QPaintEvent *event) override;
+
 public slots:
     void at_gotSignature(QByteArray calculatedSign, QByteArray signFromFrame);
     void at_calcSignInProgress(QByteArray sign, int progress);
+
 private:
     QnSignHelper m_signHelper;
     QByteArray m_sign;

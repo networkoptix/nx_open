@@ -54,15 +54,13 @@ public:
     };
     Q_DECLARE_FLAGS(Flags, Flag)
 
-    QnWorkbenchUi(QnWorkbenchDisplay *display, QObject *parent = NULL);
+    QnWorkbenchUi(QObject *parent = NULL);
 
     virtual ~QnWorkbenchUi();
 
     virtual Qn::ActionScope currentScope() const override;
 
     virtual QVariant currentTarget(Qn::ActionScope scope) const override;
-
-    QnWorkbenchDisplay *display() const;
 
     Flags flags() const {
         return m_flags;
@@ -212,9 +210,6 @@ protected slots:
 private:
     /* Global state. */
 
-    /** Workbench display. */
-    QnWorkbenchDisplay *m_display;
-
     /** Instrument manager for the scene. */
     InstrumentManager *m_manager;
 
@@ -317,9 +312,6 @@ private:
 
     /** Animator for tree's position. */
     VariantAnimator *m_treeXAnimator;
-
-    /** Workbench navigator instance. */
-    QnWorkbenchNavigator *m_navigator;
 
 
     /* Title-related state. */

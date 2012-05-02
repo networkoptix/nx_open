@@ -52,17 +52,14 @@ public:
     /**
      * Constructor.
      * 
-     * \param display                   Display to be used by this controller. Must not be NULL.
      * \param parent                    Parent for this object.
      */
-    QnWorkbenchController(QnWorkbenchDisplay *display, QObject *parent = NULL);
+    QnWorkbenchController(QObject *parent = NULL);
 
     /**
      * Virtual destructor. 
      */
     virtual ~QnWorkbenchController();
-
-    QnWorkbenchDisplay *display() const;
 
     QnWorkbenchGridMapper *mapper() const;
 
@@ -156,9 +153,6 @@ protected slots:
 
 private:
     /* Global state. */
-
-    /** Workbench display. */
-    QnWorkbenchDisplay *m_display;
 
     /** Instrument manager for the scene. */
     InstrumentManager *m_manager;

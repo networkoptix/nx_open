@@ -372,6 +372,8 @@ bool QnNoptixStyle::drawTabClosePrimitive(const QStyleOption *option, QPainter *
 }
 
 bool QnNoptixStyle::drawBranchPrimitive(const QStyleOption *option, QPainter *painter, const QWidget *widget) const {
+    Q_UNUSED(widget);
+
     if(!option->rect.isValid())
         return false;
 

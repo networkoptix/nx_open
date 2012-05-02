@@ -24,11 +24,14 @@
 #include "utils/common/synctime.h"
 #include "core/resource/security_cam_resource.h"
 #include "ui/workbench/workbench_display.h"
+#include "ui/workbench/workbench_navigator.h"
+#include "ui/workbench/workbench_context.h"
 #include "time_slider.h"
 #include "time_scroll_bar.h"
 
-QnNavigationItem::QnNavigationItem(QGraphicsItem *parent): 
+QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *context): 
     base_type(parent),
+    QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent->toGraphicsObject()),
     m_playing(false)
 {
     setFlag(QGraphicsItem::ItemIsMovable, false);
@@ -143,6 +146,12 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     connect(m_volumeSlider, SIGNAL(valueChanged(int)), this, SLOT(onVolumeLevelChanged(int)));
 
 
+    /* Create navigator. */
+    m_navigator = new QnWorkbenchNavigator(this);
+    m_navigator->setTimeSlider(m_timeSlider);
+    m_navigator->setTimeScrollBar(m_timeScrollBar);
+
+
     /* Put it all into layouts. */
     QGraphicsLinearLayout *buttonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     buttonsLayout->setSpacing(2);
@@ -207,11 +216,12 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     connect(m_playButton,           SIGNAL(clicked()),      this,           SLOT(togglePlayPause()));
     connect(m_stepForwardButton,    SIGNAL(clicked()),      this,           SLOT(stepForward()));
     connect(m_forwardButton,        SIGNAL(clicked()),      this,           SLOT(rewindForward()));
-    connect(m_liveButton,           SIGNAL(clicked(bool)),  this,           SLOT(at_liveButton_clicked(bool)));
+    connect(m_liveButton,           SIGNAL(toggled(bool)),  m_navigator,    SLOT(setLive(bool)));
     connect(m_mrsButton,            SIGNAL(clicked()),      this,           SIGNAL(clearMotionSelection()));
     connect(m_syncButton,           SIGNAL(toggled(bool)),  this,           SLOT(onSyncButtonToggled(bool)));
     connect(m_muteButton,           SIGNAL(clicked(bool)),  m_volumeSlider, SLOT(setMute(bool)));
-
+    connect(m_navigator,            SIGNAL(liveChanged()),  this,           SLOT(updateLiveState()));
+    connect(m_navigator,            SIGNAL(liveChanged()),  this,           SLOT(updateLiveState()));
 
     /* Create actions. */
     QAction *playAction = new QAction(tr("Play / Pause"), m_playButton);
@@ -596,25 +606,6 @@ void QnNavigationItem::togglePlayPause()
     setPlaying(!m_playing);
 }
 
-void QnNavigationItem::at_liveButton_clicked(bool checked)
-{
-#if 0
-    if (m_camera && checked == m_camera->getCamDisplay()->isRealTimeSource()) {
-        qnWarning("Camera live state and live button state are not in sync, investigate.");
-        return;
-    }
-
-    if(!checked) {
-        m_liveButton->toggle(); /* Don't allow jumps back from live. */
-        return;
-    }
-#endif
-
-    //m_timeSlider->setLiveMode(true);
-    //m_timeSlider->setCurrentValue(m_timeSlider->maximumValue());
-    //smartSeek(DATETIME_NOW);
-}
-
 void QnNavigationItem::onSyncButtonToggled(bool value)
 {
 #if 0 
@@ -642,5 +633,13 @@ void QnNavigationItem::onSyncButtonToggled(bool value)
     if (!value)
         updateActualCamera();
 */
+}
+
+// -------------------------------------------------------------------------- //
+// Updaters
+// -------------------------------------------------------------------------- //
+void QnNavigationItem::updateLiveState() {
+    m_liveButton->setChecked(m_navigator->isLive());
+    m_liveButton->setEnabled(m_navigator->isLiveSupported());
 }
 

@@ -37,7 +37,7 @@ namespace {
 class QnMyGLWidget: public QGLWidget
 {
 public:
-    QnMyGLWidget(const QGLFormat & format, QWidget * parent = 0): QGLWidget(format, parent)
+    QnMyGLWidget(const QGLFormat &format, QWidget *parent = 0): QGLWidget(format, parent)
     {
         m_renderer = 0;
         connect(&m_timer, SIGNAL(timeout()), this, SLOT(update()));
@@ -45,7 +45,7 @@ public:
         m_firstTime = true;
     }
 
-    virtual void  resizeEvent ( QResizeEvent * event ) override
+    virtual void resizeEvent(QResizeEvent *event) override
     {
         static double sar = 1.0;
         double windowHeight = event->size().height();
@@ -66,7 +66,8 @@ public:
             m_videoRect.setLeft((windowWidth - scaledWidth) / 2);
             m_videoRect.setWidth(scaledWidth + 0.5);
         }
-        else {
+        else 
+        {
             // black bars at the top and bottom
             m_videoRect.setLeft(0);
             m_videoRect.setWidth(windowWidth);
@@ -88,13 +89,13 @@ public:
             m_renderer->setChannelScreenSize(m_videoRect.size());
     }
 
-    void setRenderer(QnResourceWidgetRenderer* renderer)
+    void setRenderer(QnResourceWidgetRenderer *renderer)
     {
         m_renderer = renderer;
     }
 
     
-    virtual void paintEvent( QPaintEvent * event ) override
+    virtual void paintEvent(QPaintEvent *) override
     {
         QPainter painter(this);
         painter.beginNativePainting();
@@ -116,9 +117,9 @@ public:
     
 private:
     QRect m_videoRect;
-    QnResourceWidgetRenderer* m_renderer;
+    QnResourceWidgetRenderer *m_renderer;
     QTimer m_timer;
-    CLCamDisplay* m_camDisplay;
+    CLCamDisplay *m_camDisplay;
     bool m_firstTime;
 };
 
@@ -158,8 +159,6 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
     glWindow = new QnMyGLWidget(glFormat);
     layout->addWidget(glWindow);
 
-    
-    //aviRes = QnAviResourcePtr(new QnAviResource("e:/Users/roman76r/blake/FILMS_TEASERS 2_Open for Business Pt 1_kimberely Kane & Dahlia Grey.wmv"));
     QDir dir(":/skin");
     QStringList	introList = dir.entryList(QStringList() << "intro.*");
     QString resourceName = ":/skin/intro";
@@ -170,7 +169,7 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
     if (FileTypeSupport::isImageFileExt(resourceName))
         aviRes->addFlags(QnResource::still_image);
 
-    dataProvider = static_cast<QnAbstractArchiveReader*> (aviRes->createDataProvider(QnResource::Role_Default));
+    dataProvider = static_cast<QnAbstractArchiveReader*>(aviRes->createDataProvider(QnResource::Role_Default));
     dataProvider->setCycleMode(false);
     camera = new CLVideoCamera(aviRes, false, dataProvider);
     
@@ -393,7 +392,7 @@ void LoginDialog::updateUsability() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void LoginDialog::at_testFinished(int status, const QByteArray &data, const QByteArray &errorString, int requestHandle)
+void LoginDialog::at_testFinished(int status, const QByteArray &/*data*/, const QByteArray &/*errorString*/, int requestHandle)
 {
     if(m_requestHandle != requestHandle) 
         return;

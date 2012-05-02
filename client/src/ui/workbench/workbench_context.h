@@ -15,6 +15,7 @@ class QnWorkbench;
 class QnWorkbenchSynchronizer;
 class QnWorkbenchLayoutSnapshotManager;
 class QnWorkbenchAccessController;
+class QnWorkbenchDisplay;
 class QnActionManager;
 
 /**
@@ -52,6 +53,10 @@ public:
         return m_accessController.data();
     }
 
+    QnWorkbenchDisplay *display() const {
+        return m_display.data();
+    }
+
     QAction *action(const Qn::ActionId id) const;
 
     QnUserResourcePtr user() const;
@@ -85,6 +90,7 @@ private:
     QScopedPointer<QnWorkbenchLayoutSnapshotManager> m_snapshotManager;
     QScopedPointer<QnWorkbenchAccessController> m_accessController;
     QScopedPointer<QnActionManager> m_menu;
+    QScopedPointer<QnWorkbenchDisplay> m_display;
 };
 
 

@@ -13,6 +13,7 @@ class QnResourcePool;
 class QnWorkbenchSynchronizer;
 class QnWorkbenchLayoutSnapshotManager;
 class QnWorkbenchAccessController;
+class QnWorkbenchDisplay;
 
 /**
  * This class simplifies access to workbench context. 
@@ -55,6 +56,8 @@ protected:
     QnWorkbenchLayoutSnapshotManager *snapshotManager() const;
 
     QnWorkbenchAccessController *accessController() const;
+
+    QnWorkbenchDisplay *display() const;
 
 private:
     QnWorkbenchContext *m_context;

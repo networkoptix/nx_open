@@ -23,7 +23,7 @@ public:
         MultiMode
     };
 
-    QnCameraSettingsWidget(QWidget *parent);
+    QnCameraSettingsWidget(QWidget *parent = NULL, QnWorkbenchContext *context = NULL);
     virtual ~QnCameraSettingsWidget();
 
     const QnResourceList &resources() const;

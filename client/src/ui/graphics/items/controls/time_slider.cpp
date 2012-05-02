@@ -107,7 +107,7 @@ namespace {
     const qreal highlightTextHeight = minTickmarkHeight + (maxTickmarkHeight - minTickmarkHeight) * std::pow(tickmarkStepScale, 3.0);
     const qreal highlightTextTopAdjustment = -0.15;
 
-    const qreal minHighlightSpanFraction = 0.25;
+    const qreal minHighlightSpanFraction = 0.15;
 
     const qreal msecsPerPixelChangeThreshold = 1.0e-4;
 

@@ -17,7 +17,7 @@ QnBookmarkWidget::~QnBookmarkWidget() {
     return;
 }
 
-void QnBookmarkWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+void QnBookmarkWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
     ensureShape();
 
     QPalette palette = this->palette();

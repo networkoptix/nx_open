@@ -47,15 +47,15 @@ protected slots:
     void at_viewport_resized();
     void at_motionRegionSelected(QGraphicsView *, QnResourceWidget *, const QRect &);
     void at_motionRegionCleared();
-    void at_itemClicked(QGraphicsView*, QGraphicsItem*, const ClickInfo&);
+    void at_itemClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &);
 
 private:
     void init();
-    int gridPosToChannelPos(QPoint& pos);
-    void showToManyWindowsMessage(const QnMotionRegion& region);
+    int gridPosToChannelPos(QPoint &pos);
+    void showTooManyWindowsMessage(const QnMotionRegion &region);
+
 private:
     QnVirtualCameraResourcePtr m_camera;
-    //QList<QnMotionRegion> m_motionRegionList;
 
     /* Destruction order is important here, hence the scoped pointers. */
 
@@ -64,7 +64,6 @@ private:
     QScopedPointer<QGraphicsScene> m_scene;
     QScopedPointer<QnGraphicsView> m_view;
 
-    QScopedPointer<QnWorkbenchDisplay> m_display;
     QScopedPointer<QnWorkbenchController> m_controller;
 
     MotionSelectionInstrument *m_motionSelectionInstrument;

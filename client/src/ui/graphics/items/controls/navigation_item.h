@@ -2,6 +2,7 @@
 #define NAVIGATIONITEM_H
 
 #include <ui/graphics/items/simple_frame_widget.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 class QnSpeedSlider;
 class QnVolumeSlider;
@@ -9,14 +10,15 @@ class GraphicsLabel;
 class QnImageButtonWidget;
 class QnTimeSlider;
 class QnTimeScrollBar;
+class QnWorkbenchNavigator;
 
-class QnNavigationItem : public QnSimpleFrameWidget {
+class QnNavigationItem : public QnSimpleFrameWidget, public QnWorkbenchContextAware {
     Q_OBJECT;
 
     typedef QnSimpleFrameWidget base_type;
 
 public:
-    explicit QnNavigationItem(QGraphicsItem *parent = NULL);
+    explicit QnNavigationItem(QGraphicsItem *parent = NULL, QnWorkbenchContext *context = NULL);
     ~QnNavigationItem();
 
     QnTimeSlider *timeSlider() const {
@@ -25,6 +27,10 @@ public:
 
     QnTimeScrollBar *timeScrollBar() const {
         return m_timeScrollBar;
+    }
+
+    QnWorkbenchNavigator *navigator() const {
+        return m_navigator;
     }
 
 public slots:
@@ -37,6 +43,8 @@ signals:
     void clearMotionSelection();
 
 private slots:
+    void updateLiveState();
+
     void onLiveModeChanged(bool value);
     void pause();
     void play();
@@ -51,8 +59,6 @@ private slots:
     void onSpeedChanged(float);
 
     void onVolumeLevelChanged(int);
-
-    void at_liveButton_clicked(bool checked);
 
 protected:
     virtual void wheelEvent(QGraphicsSceneWheelEvent *) override {
@@ -80,6 +86,8 @@ private:
     QnTimeScrollBar *m_timeScrollBar;
     QnSpeedSlider *m_speedSlider;
     QnVolumeSlider *m_volumeSlider;
+
+    QnWorkbenchNavigator *m_navigator;
 
     bool m_playing;
 };
