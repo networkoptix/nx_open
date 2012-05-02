@@ -3,7 +3,7 @@
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "device_plugins/archive/rtsp/rtsp_client_archive_delegate.h"
 
-class QnThumbnailsLoader: public QObject, CLLongRunnable
+class QnThumbnailsLoader: CLLongRunnable
 {
     Q_OBJECT
 public:
@@ -15,15 +15,15 @@ public:
     /*
     * Load video pixmaps by specified time
     */
-    void loadRange(qint64 startTime, qint64 endTime, qint64 step);
+    void loadRange(qint64 startTimeUsec, qint64 endTimeUsec, qint64 stepUsec);
 
     /* Extent existing range to new range using previously defined step */
-    void addRange(qint64 startTime, qint64 endTime);
+    void addRange(qint64 startTimeUsec, qint64 endTimeUsec);
 
     /* Remove part of data or all data */
-    void removeRange(qint64 startTime=-1, qint64 endTime=-1);
+    void removeRange(qint64 startTimeUsec = -1, qint64 endTimeUsec = -1);
 
-    QPixmap getPixmapByTime(qint64 time);
+    QPixmap getPixmapByTime(qint64 timeUsec);
 signals:
     void gotNewPixmap(qint64 time, QPixmap image);
 protected:
@@ -45,6 +45,10 @@ private:
     QMutex m_mutex;
     SwsContext* m_scaleContext;
     quint8* m_rgbaBuffer;
+    int m_srcLineSize;
+    int m_srcWidth;
+    int m_srcHeight;
+    int m_srcFormat;
 };
 
 #endif // __THUMBNAILS_LOADER_H__
