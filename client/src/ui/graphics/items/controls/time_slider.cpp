@@ -55,8 +55,8 @@ namespace {
         using QnTimeSlider::createAbsoluteSteps;
         using QnTimeSlider::createRelativeSteps;
     };
-    Q_GLOBAL_STATIC_WITH_ARGS(const QVector<QnTimeStep>, absoluteTimeSteps, (TimeStepFactory::createAbsoluteSteps()));
-    Q_GLOBAL_STATIC_WITH_ARGS(const QVector<QnTimeStep>, relativeTimeSteps, (TimeStepFactory::createRelativeSteps()));
+    Q_GLOBAL_STATIC_WITH_ARGS(QVector<QnTimeStep>, absoluteTimeSteps, (TimeStepFactory::createAbsoluteSteps()));
+    Q_GLOBAL_STATIC_WITH_ARGS(QVector<QnTimeStep>, relativeTimeSteps, (TimeStepFactory::createRelativeSteps()));
 
     QPixmap renderText(const QString &text, const QPen &pen, const QFont &font, int fontPixelSize = -1) {
         QFont actualFont = font;
