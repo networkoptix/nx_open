@@ -45,9 +45,9 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_currentWidgetIsCamera(false),
     m_clearSelectionAction(new QAction(this)),
     m_lastLive(false),
-    m_lastLiveSupported(false)
-{
-    
+    m_lastLiveSupported(false),
+    m_lastPlaying(false)
+{    
 }
     
 QnWorkbenchNavigator::~QnWorkbenchNavigator() {
@@ -179,6 +179,41 @@ bool QnWorkbenchNavigator::setLive(bool live) {
     } else {
         m_timeSlider->setValue(m_timeSlider->minimum()); // TODO: need to save position here.
     }
+    return true;
+}
+
+bool QnWorkbenchNavigator::isPlaying() const {
+    if(!m_currentWidget)
+        return false;
+
+    QnAbstractArchiveReader *reader = m_currentWidget->display()->archiveReader();
+    if(!reader)
+        return false;
+
+    return !reader->isMediaPaused();
+
+    /*if (reader->isMediaPaused() && reader->isRealTimeSource()) {
+        qint64 time = m_camera->getCurrentTime();
+        reader->resumeMedia();
+        reader->directJumpToNonKeyFrame(time+1);
+    }
+    else {
+        reader->resumeMedia();
+    }
+
+    if (!m_playing)
+        m_camera->getCamDisplay()->playAudio(m_playing);*/
+
+}
+
+bool QnWorkbenchNavigator::setPlaying(bool playing) {
+    if(!m_currentWidget)
+        return false;
+
+    QnAbstractArchiveReader *reader = m_currentWidget->display()->archiveReader();
+    if(!reader)
+        return false;
+
     return true;
 }
 

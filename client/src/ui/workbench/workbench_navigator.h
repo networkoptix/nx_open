@@ -42,6 +42,9 @@ public:
     Q_SLOT bool setLive(bool live);
     bool isLiveSupported() const;
 
+    bool isPlaying() const;
+    bool setPlaying(bool playing);
+
     QnResourceWidget *currentWidget();
 
     virtual Qn::ActionScope currentScope() const override;
@@ -53,6 +56,7 @@ signals:
     void currentWidgetChanged();
     void liveChanged();
     void liveSupportedChanged();
+    void playingChanged();
 
 protected:
     enum SliderLine {
@@ -88,7 +92,6 @@ protected slots:
     void updateSliderFromReader();
     void updateScrollBarFromSlider();
     void updateSliderFromScrollBar();
-    void updateToolTipFormat();
 
     void updateCurrentPeriods();
     void updateCurrentPeriods(Qn::TimePeriodType type);
@@ -97,6 +100,7 @@ protected slots:
 
     void updateLive();
     void updateLiveSupported();
+    //void updatePlaying();
 
 protected slots:
     void at_display_widgetChanged(Qn::ItemRole role);
@@ -135,6 +139,7 @@ private:
 
     bool m_lastLive;
     bool m_lastLiveSupported;
+    bool m_lastPlaying;
 
     QAction *m_clearSelectionAction;
 
