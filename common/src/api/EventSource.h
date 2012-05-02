@@ -9,6 +9,7 @@
 #include <QTextStream>
 #include <QVariant>
 #include <QQueue>
+#include <QTime>
 #include <QTimer>
 #include <qjson/parser.h>
 
@@ -72,7 +73,9 @@ public:
 signals:
     void stopped();
     void eventReceived(QnEvent event);
+    void connectionOpened();
     void connectionClosed(QString errorString);
+    void connectionReset();
 
 public slots:
     void doStop();
@@ -95,6 +98,7 @@ private:
     QNetworkAccessManager m_manager;
     QNetworkReply *m_reply;
 
+    quint32 m_seqNumber;
     QTime m_eventWaitTimer;
     QTimer m_pingTimer;
 

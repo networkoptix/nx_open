@@ -21,7 +21,9 @@ void QnEventManager::init(const QUrl& url, int timeout)
     m_source = QSharedPointer<QnEventSource>(new QnEventSource(url, timeout));
 
     connect(m_source.data(), SIGNAL(eventReceived(QnEvent)), this, SLOT(eventReceived(QnEvent)));
-    connect(m_source.data(), SIGNAL(connectionClosed(QString)), this, SLOT(connectionClosed(QString)));
+    connect(m_source.data(), SIGNAL(connectionOpened()), this, SLOT(connectionOpened()));
+    connect(m_source.data(), SIGNAL(connectionClosed(QString)), this, SLOT(at_connectionClose(QString)));
+    connect(m_source.data(), SIGNAL(connectionReset()), this, SLOT(at_connectionReset()));
 }
 
 QnEventManager::QnEventManager()
@@ -156,7 +158,7 @@ void QnEventManager::eventReceived(QnEvent event)
     }
 }
 
-void QnEventManager::connectionClosed(QString errorString)
+void QnEventManager::at_connectionClose(QString errorString)
 {
     qDebug() << "QnEventManager::connectionClosed(): Connection aborted:" << errorString;
 }

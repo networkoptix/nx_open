@@ -25,7 +25,7 @@ public slots:
 
 private slots:
     void eventReceived(QnEvent event);
-    void connectionClosed(QString errorString);
+    void at_connectionClose(QString errorString);
 
 private:
     quint32 m_seqNumber;

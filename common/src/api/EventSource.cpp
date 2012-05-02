@@ -3,7 +3,7 @@
 
 #include <utils/common/warnings.h>
 
-//#define QN_EVENT_SOURCE_DEBUG
+#define QN_EVENT_SOURCE_DEBUG
 
 static const int PING_INTERVAL = 6000;
 
@@ -104,6 +104,9 @@ bool QnEvent::load(const QVariant& parsed)
         return true;
     }
 
+    if (eventType == QN_EVENT_EMPTY || eventType == QN_EVENT_PING)
+        return true;
+
     if (!dict.contains("resourceId"))
         return false;
 
@@ -146,7 +149,8 @@ quint32 QnEvent::nextSeqNumber(quint32 seqNumber)
 QnEventSource::QnEventSource(QUrl url, int retryTimeout): 
     m_url(url),
     m_retryTimeout(retryTimeout),
-    m_reply(NULL)
+    m_reply(NULL),
+    m_seqNumber(0)
 {
     connect(this, SIGNAL(stopped()), this, SLOT(doStop()));
     connect(&m_manager, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)),
@@ -229,7 +233,22 @@ void QnEventSource::httpReadyRead()
             continue;
 
         // If it's ping event -> just update last event time (m_eventWaitTimer)
-        if (event.eventType != QN_EVENT_PING)
+        if (event.eventType == QN_EVENT_EMPTY)
+        {
+            if (m_seqNumber == 0)
+            {
+                // No tracking yet. Just initialize seqNumber.
+                m_seqNumber = event.seqNumber;
+            }
+            else if (QnEvent::nextSeqNumber(m_seqNumber) != event.seqNumber)
+            {
+                // Tracking is on and some events are missed and/or reconnect occured
+                m_seqNumber = event.seqNumber;
+                emit connectionReset();
+            }
+
+            emit connectionOpened();
+        } else if (event.eventType != QN_EVENT_PING)
             emit eventReceived(event);
     }
 }

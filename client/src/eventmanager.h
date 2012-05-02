@@ -31,7 +31,8 @@ private slots:
     void licensesReceived(int status, const QByteArray& errorString, QnLicenseList licenses, int handle);
 
     void eventReceived(QnEvent event);
-    void connectionClosed(QString errorString);
+    void at_connectionClose(QString errorString);
+    void at_connectionReset();
 
 private:
     void init();
