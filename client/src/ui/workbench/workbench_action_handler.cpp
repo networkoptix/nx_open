@@ -1343,11 +1343,28 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
 void QnWorkbenchActionHandler::at_exportTimeSelectionAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
 
+    QnActionTargetProvider *provider = menu()->targetProvider();
+    if(!provider)
+        return;
+    parameters.setItems(provider->currentTarget(Qn::SceneScope));
+
+    if(parameters.itemsSize() != 1)
+    {
+        QMessageBox::critical(
+            this->widget(), 
+            tr("Can't export file"), 
+            tr("You should select 1 item for export. Now selected '%1' item(s)").arg(parameters.itemsSize()), 
+            QMessageBox::Ok
+            );
+        return;
+    }
+
     QnResourceWidget *widget = parameters.widget();
     if(!widget)
         return;
 
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodParameter);
+
 
     QnNetworkResourcePtr networkResource = widget->resource().dynamicCast<QnNetworkResource>();
     QnSecurityCamResourcePtr cameraResource = widget->resource().dynamicCast<QnSecurityCamResource>();
