@@ -183,13 +183,3 @@ void CachingProxyWidget::ensureTextureSynchronized() {
 }
 
 
-/*
-
-glPixelStorei(GL_UNPACK_ROW_LENGTH, w[i]);
-glTexSubImage2D(GL_TEXTURE_2D, 0,
-    0, 0,
-    roundUp(r_w[i],ROUND_COEFF),
-    h[i],
-    GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels);
-
-*/

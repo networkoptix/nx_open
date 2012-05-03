@@ -1,8 +1,10 @@
-#include "widget_opacity_animator.h"
-#include <QGraphicsObject>
-#include <ui/graphics/instruments/instrument_manager.h>
-#include <ui/graphics/instruments/animation_instrument.h>
+#include "opacity_animator.h"
+
+#include <QtGui/QGraphicsObject>
+
 #include <utils/common/warnings.h>
+
+#include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/style/globals.h>
 
 namespace {

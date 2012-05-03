@@ -3,6 +3,7 @@
 #include "licensing/license.h"
 #include "utils/common/yuvconvert.h"
 #include "utils/common/scoped_painter_rollback.h"
+#include "utils/common/math.h"
 
 extern "C" {
 #ifdef WIN32
@@ -23,7 +24,7 @@ int getSquareSize(int width, int height, int signBits)
     int rowCnt = signBits / 16;
     int colCnt = signBits / rowCnt;
     int SQUARE_SIZE = qMin((height/2-height/32)/rowCnt, (width-width/32)/colCnt);
-    SQUARE_SIZE = roundDown(SQUARE_SIZE, 2);
+    SQUARE_SIZE = qPower2Floor(SQUARE_SIZE, 2);
     return SQUARE_SIZE;
 }
 
@@ -567,7 +568,7 @@ QnCompressedVideoDataPtr QnSignHelper::createSgnatureFrame(AVCodecContext* srcCo
     frame->width = videoCodecCtx->width;
     frame->height = videoCodecCtx->height;
     frame->format = videoCodecCtx->pix_fmt;
-    avpicture_alloc((AVPicture*) frame, videoCodecCtx->pix_fmt, roundUp((quint32)videoCodecCtx->width, 32), videoCodecCtx->height);
+    avpicture_alloc((AVPicture*) frame, videoCodecCtx->pix_fmt, qPower2Ceil((quint32)videoCodecCtx->width, 32), videoCodecCtx->height);
 
     AVCodec* videoCodec = avcodec_find_encoder(videoCodecCtx->codec_id);
 

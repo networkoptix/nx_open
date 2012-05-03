@@ -7,17 +7,18 @@
 
 #include <ui/processors/kinetic_process_handler.h>
 #include <ui/animation/animation_timer_listener.h>
+#include <ui/animation/animated.h>
 
 #include "time_step.h"
 
 class QnNoptixStyle;
 
-class QnTimeSlider: public QnToolTipSlider, protected KineticProcessHandler, protected AnimationTimerListener {
+class QnTimeSlider: public Animated<QnToolTipSlider>, protected KineticProcessHandler, protected AnimationTimerListener {
     Q_OBJECT;
     Q_PROPERTY(qint64 windowStart READ windowStart WRITE setWindowStart);
     Q_PROPERTY(qint64 windowEnd READ windowEnd WRITE setWindowEnd);
 
-    typedef QnToolTipSlider base_type;
+    typedef Animated<QnToolTipSlider> base_type;
 
 public:
     enum Option {
@@ -106,7 +107,6 @@ signals:
 
 protected:
     virtual void sliderChange(SliderChange change) override;
-    virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
     virtual void wheelEvent(QGraphicsSceneWheelEvent *event) override;
     virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override;
     virtual void keyPressEvent(QKeyEvent *event) override;

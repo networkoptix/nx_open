@@ -40,7 +40,6 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
     setFlag(QGraphicsItem::ItemIsSelectable, false);
     setFlag(QGraphicsItem::ItemIsFocusable, true);
     setFocusPolicy(Qt::ClickFocus);
-    //setCacheMode(QGraphicsItem::ItemCoordinateCache);
 
     setCursor(Qt::ArrowCursor);
 
@@ -227,6 +226,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
     connect(m_navigator,            SIGNAL(playingChanged()),           this,           SLOT(at_navigator_playingChanged()));
     connect(m_navigator,            SIGNAL(playingSupportedChanged()),  this,           SLOT(at_navigator_playingSupportedChanged()));
     connect(m_navigator,            SIGNAL(speedChanged()),             this,           SLOT(at_navigator_speedChanged()));
+
 
     /* Create actions. */
     QAction *playAction = new QAction(tr("Play / Pause"), m_playButton);
@@ -550,7 +550,7 @@ void QnNavigationItem::at_navigator_playingChanged() {
     m_playButton->setIcon(qnSkin->icon(playing ? "pause.png" : "play.png"));
     m_stepBackwardButton->setIcon(qnSkin->icon(playing ? "backward.png" : "step_backward.png"));
     m_stepForwardButton->setIcon(qnSkin->icon(playing ? "forward.png" : "step_forward.png"));
-    m_speedSlider->setPrecision(playing ? QnSpeedSlider::LowPrecision : QnSpeedSlider::HighPrecision);
+    //m_speedSlider->setPrecision(playing ? QnSpeedSlider::LowPrecision : QnSpeedSlider::HighPrecision);
 }
 
 void QnNavigationItem::at_navigator_playingSupportedChanged() {
