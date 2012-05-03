@@ -52,6 +52,7 @@ private slots:
 
     void at_navigator_currentWidgetAboutToBeChanged();
     void at_navigator_currentWidgetChanged();
+    void at_liveButton_clicked();
 
     void rewindBackward();
     void rewindForward();

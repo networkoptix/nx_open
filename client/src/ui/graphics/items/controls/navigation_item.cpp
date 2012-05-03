@@ -211,7 +211,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
     connect(m_playButton,           SIGNAL(toggled(bool)),                  this,           SLOT(updateSpeedSliderParametersFromNavigator()));
     connect(m_playButton,           SIGNAL(toggled(bool)),                  this,           SLOT(updateButtonsPlayingState()));
 
-    connect(m_liveButton,           SIGNAL(toggled(bool)),                  m_navigator,    SLOT(setLive(bool)));
+    connect(m_liveButton,           SIGNAL(clicked()),                      this,           SLOT(at_liveButton_clicked()));
     connect(m_syncButton,           SIGNAL(toggled(bool)),                  this,           SLOT(onSyncButtonToggled(bool)));
     connect(m_muteButton,           SIGNAL(clicked(bool)),                  m_volumeSlider, SLOT(setMute(bool)));
     
@@ -588,9 +588,6 @@ void QnNavigationItem::updateMuteButtonFromVolumeSlider() {
 
 void QnNavigationItem::updateButtonsLiveState() {
     m_liveButton->setChecked(m_navigator->isLive());
-
-    /*if(m_navigator->isLive())
-        m_speedSlider->resetSpeed();*/
 }
 
 void QnNavigationItem::updateButtonsLiveSupportedState() {
@@ -621,4 +618,10 @@ void QnNavigationItem::at_navigator_currentWidgetChanged() {
     m_playButton->setChecked(m_navigator->isPlaying());
 }
 
-
+void QnNavigationItem::at_liveButton_clicked() {
+    if(m_liveButton->isChecked()) {
+        m_navigator->setLive(true);
+    } else {
+        m_liveButton->setChecked(true); /* Cannot go out of live mode by pressing 'live' button. */
+    }
+}
