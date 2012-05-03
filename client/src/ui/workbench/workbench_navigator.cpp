@@ -204,10 +204,6 @@ bool QnWorkbenchNavigator::isPlaying() const {
     return !m_currentWidget->display()->archiveReader()->isMediaPaused();
 }
 
-bool QnWorkbenchNavigator::togglePlaying() {
-    return setPlaying(!isPlaying());
-}
-
 bool QnWorkbenchNavigator::setPlaying(bool playing) {
     if(playing == isPlaying())
         return true;
@@ -228,7 +224,8 @@ bool QnWorkbenchNavigator::setPlaying(bool playing) {
         }
         camDisplay->playAudio(true);
 
-        setSpeed(1.0);
+        if(qFuzzyIsNull(speed()))
+            setSpeed(1.0);
     } else {
         reader->pauseMedia();
         camDisplay->playAudio(false);
@@ -253,16 +250,15 @@ qreal QnWorkbenchNavigator::speed() const {
 
 void QnWorkbenchNavigator::setSpeed(qreal speed) {
     speed = qBound(minimalSpeed(), speed, maximalSpeed());
-    if(qFuzzyCompare(speed, m_lastSpeed))
+    if(qFuzzyCompare(speed, this->speed()))
         return;
 
     if(!m_currentWidget)
         return;
 
-    m_lastSpeed = speed;
-
     if(QnAbstractArchiveReader *reader = m_currentWidget->display()->archiveReader()) {
         reader->setSpeed(speed);
+
         setPlaying(!qFuzzyIsNull(speed));
 
         updateSpeed();

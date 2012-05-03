@@ -22,7 +22,11 @@ bool QnVolumeSlider::isMute() const {
 
 void QnVolumeSlider::setMute(bool mute) {
     QtvAudioDevice::instance()->setMute(mute);
-    setSliderPosition(QtvAudioDevice::instance()->volume() * 100);
+
+    setSliderPosition(qMax(
+        static_cast<int>(QtvAudioDevice::instance()->volume() * 100), 
+        mute ? 0 : 1 /* So that switching mute -> non-mute will result in non-zero volume. */
+    ));
 }
 
 void QnVolumeSlider::stepBackward() {

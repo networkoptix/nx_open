@@ -45,7 +45,6 @@ public:
 
     bool isPlaying() const;
     Q_SLOT bool setPlaying(bool playing);
-    Q_SLOT bool togglePlaying();
     bool isPlayingSupported() const;
 
     qreal speed() const;
