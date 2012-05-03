@@ -51,6 +51,9 @@ QnSpeedSlider::QnSpeedSlider(QGraphicsItem *parent):
     m_animator->setSpeed(5000.0);
     registerAnimation(m_animator);
 
+    /* Set up handlers. */
+    connect(this, SIGNAL(sliderReleased()), this, SLOT(restartSpeedAnimation()));
+
     /* Make sure that tooltip text is updated. */
     sliderChange(SliderValueChange);
 }
@@ -159,13 +162,6 @@ void QnSpeedSlider::sliderChange(SliderChange change) {
             emit roundedSpeedChanged(roundedSpeed);
         }
     }
-}
-
-void QnSpeedSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
-    base_type::mouseReleaseEvent(event);
-
-    if (event->isAccepted())
-        restartSpeedAnimation();
 }
 
 void QnSpeedSlider::wheelEvent(QGraphicsSceneWheelEvent *e) {

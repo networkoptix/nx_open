@@ -44,11 +44,10 @@ signals:
 
 protected:
     virtual void sliderChange(SliderChange change) override;
-    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
     virtual void timerEvent(QTimerEvent *event) override;
     virtual void wheelEvent(QGraphicsSceneWheelEvent *e) override;
 
-private:
+protected slots:
     void restartSpeedAnimation();
 
 private:
