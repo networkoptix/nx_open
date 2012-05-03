@@ -160,7 +160,7 @@ void QnThumbnailsLoader::allocateScaleContext(int lineSize, int width, int heigh
     }
     qFreeAligned(m_rgbaBuffer);
 
-    int numBytes = avpicture_get_size(PIX_FMT_RGBA, roundUp((quint32) m_outWidth,8), m_outHeight);
+    int numBytes = avpicture_get_size(PIX_FMT_RGBA, qPower2Ceil((quint32) m_outWidth,8), m_outHeight);
     m_rgbaBuffer = (quint8*) qMallocAligned(numBytes, 32);
     m_scaleContext = sws_getContext(width, height, format, 
         m_outWidth, m_outHeight, PIX_FMT_BGRA, SWS_POINT, NULL, NULL, NULL);
@@ -172,7 +172,7 @@ bool QnThumbnailsLoader::processFrame(const CLVideoDecoderOutput& outFrame)
     quint8* dstBuffer[4];
 
     allocateScaleContext(outFrame.linesize[0], outFrame.width, outFrame.height, (PixelFormat) outFrame.format);
-    dstLineSize[0] = roundUp((quint32) m_outWidth*4, 32);
+    dstLineSize[0] = qPower2Ceil((quint32) m_outWidth*4, 32);
     dstLineSize[1] = dstLineSize[2] = dstLineSize[3] = 0;
     QImage image(m_rgbaBuffer, m_outWidth, m_outHeight, dstLineSize[0], QImage::Format_ARGB32_Premultiplied);
     dstBuffer[0] = dstBuffer[1] = dstBuffer[2] = dstBuffer[3] = m_rgbaBuffer;
