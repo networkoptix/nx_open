@@ -63,7 +63,8 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
     m_stepBackwardButton->setFocusProxy(this);
 
     m_playButton = new QnImageButtonWidget(this);
-    m_playButton->setIcon(qnSkin->icon("play.png"));
+    m_playButton->setCheckable(true);
+    m_playButton->setIcon(qnSkin->icon("play.png", "pause.png"));
     m_playButton->setPreferredSize(32, 30);
     m_playButton->setFocusProxy(this);
 
@@ -92,15 +93,6 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
     m_liveButton->setCheckable(true);
     m_liveButton->setEnabled(false);
     m_liveButton->setFocusProxy(this);
-
-    m_mrsButton = new QnImageButtonWidget(this);
-    m_mrsButton->setObjectName("MRSButton");
-    m_mrsButton->setIcon(qnSkin->icon("mrs.png"));
-    m_mrsButton->setPreferredSize(48, 24);
-    m_mrsButton->setCheckable(true);
-    m_mrsButton->setChecked(true);
-    m_mrsButton->hide();
-    m_mrsButton->setFocusProxy(this);
 
     m_syncButton = new QnImageButtonWidget(this);
     m_syncButton->setObjectName("SyncButton");
@@ -207,26 +199,27 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
 
 
     /* Set up handlers. */
-    connect(m_speedSlider,          SIGNAL(roundedSpeedChanged(qreal)), this,           SLOT(at_speedSlider_roundedSpeedChanged()));
-    connect(m_volumeSlider,         SIGNAL(valueChanged(qint64)),       this,           SLOT(at_volumeSlider_valueChanged()));
+    connect(m_speedSlider,          SIGNAL(roundedSpeedChanged(qreal)), this,           SLOT(updateNavigatorSpeedFromSpeedSlider()));
+    connect(m_volumeSlider,         SIGNAL(valueChanged(qint64)),       this,           SLOT(updateMuteButtonFromVolumeSlider()));
 
-    connect(m_backwardButton,       SIGNAL(clicked()),                  this,           SLOT(rewindBackward()));
     connect(m_stepBackwardButton,   SIGNAL(clicked()),                  this,           SLOT(stepBackward()));
-    connect(m_playButton,           SIGNAL(clicked()),                  this,           SLOT(at_playButton_clicked()));
     connect(m_stepForwardButton,    SIGNAL(clicked()),                  this,           SLOT(stepForward()));
+    connect(m_backwardButton,       SIGNAL(clicked()),                  this,           SLOT(rewindBackward()));
     connect(m_forwardButton,        SIGNAL(clicked()),                  this,           SLOT(rewindForward()));
+    
+    connect(m_playButton,           SIGNAL(toggled(bool)),              m_navigator,    SLOT(setPlaying(bool)));
+    connect(m_playButton,           SIGNAL(toggled(bool)),              this,           SLOT(updateSpeedSliderParametersFromNavigator()));
+    connect(m_playButton,           SIGNAL(toggled(bool)),              this,           SLOT(updateButtonsPlayingState()));
+
     connect(m_liveButton,           SIGNAL(toggled(bool)),              m_navigator,    SLOT(setLive(bool)));
-    connect(m_mrsButton,            SIGNAL(clicked()),                  this,           SIGNAL(clearMotionSelection()));
     connect(m_syncButton,           SIGNAL(toggled(bool)),              this,           SLOT(onSyncButtonToggled(bool)));
     connect(m_muteButton,           SIGNAL(clicked(bool)),              m_volumeSlider, SLOT(setMute(bool)));
     
-    connect(m_navigator,            SIGNAL(liveChanged()),              this,           SLOT(at_navigator_liveChanged()));
-    connect(m_navigator,            SIGNAL(liveSupportedChanged()),     this,           SLOT(at_navigator_liveSupportedChanged()));
-    connect(m_navigator,            SIGNAL(playingChanged()),           this,           SLOT(at_navigator_playingChanged()));
-    connect(m_navigator,            SIGNAL(playingSupportedChanged()),  this,           SLOT(at_navigator_playingSupportedChanged()));
-    connect(m_navigator,            SIGNAL(speedChanged()),             this,           SLOT(at_navigator_speedChanged()));
-    connect(m_navigator,            SIGNAL(speedRangeChanged()),        this,           SLOT(at_navigator_speedRangeChanged()));
-
+    connect(m_navigator,            SIGNAL(liveChanged()),              this,           SLOT(updateButtonsLiveState()));
+    connect(m_navigator,            SIGNAL(liveSupportedChanged()),     this,           SLOT(updateButtonsLiveSupportedState()));
+    connect(m_navigator,            SIGNAL(playingSupportedChanged()),  this,           SLOT(updateButtonsPlayingSupportedState()));
+    connect(m_navigator,            SIGNAL(speedChanged()),             this,           SLOT(updateSpeedSliderSpeedFromNavigator()));
+    connect(m_navigator,            SIGNAL(speedRangeChanged()),        this,           SLOT(updateSpeedSliderParametersFromNavigator()));
 
     /* Create actions. */
     QAction *playAction = new QAction(tr("Play / Pause"), m_playButton);
@@ -238,13 +231,13 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
     QAction *speedDownAction = new QAction(tr("Speed Down"), m_speedSlider);
     speedDownAction->setShortcut(tr("Ctrl+-"));
     speedDownAction->setShortcutContext(Qt::ApplicationShortcut);
-    connect(speedDownAction, SIGNAL(triggered()), m_speedSlider, SLOT(stepBackward()));
+    //connect(speedDownAction, SIGNAL(triggered()), m_speedSlider, SLOT(stepBackward())); // TODO
     addAction(speedDownAction);
 
     QAction *speedUpAction = new QAction(tr("Speed Up"), m_speedSlider);
     speedUpAction->setShortcut(tr("Ctrl++"));
     speedUpAction->setShortcutContext(Qt::ApplicationShortcut);
-    connect(speedUpAction, SIGNAL(triggered()), m_speedSlider, SLOT(stepForward()));
+    //connect(speedUpAction, SIGNAL(triggered()), m_speedSlider, SLOT(stepForward())); // TODO
     addAction(speedUpAction);
 
     QAction *prevFrameAction = new QAction(tr("Previous Frame"), m_stepBackwardButton);
@@ -303,10 +296,12 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
 
 
     /* Run handlers */
-    at_navigator_liveChanged();
-    at_navigator_liveSupportedChanged();
-    at_navigator_playingChanged();
-    at_navigator_playingSupportedChanged();
+    updateButtonsLiveState();
+    updateButtonsLiveSupportedState();
+    updateButtonsPlayingSupportedState();
+    
+    updateButtonsPlayingState();
+    updateSpeedSliderParametersFromNavigator();
 
     updateGeometry();
 }
@@ -529,6 +524,75 @@ void QnNavigationItem::updateButtonsSpeedState() {
     }
 }
 
+void QnNavigationItem::updateSpeedSliderParametersFromNavigator() {
+    qreal minimalSpeed = m_navigator->minimalSpeed();
+    qreal maximalSpeed = m_navigator->maximalSpeed();
+    
+    qreal speedStep, defaultSpeed;
+    if(m_playButton->isChecked()) {
+        speedStep = 1.0;
+        defaultSpeed = 1.0;
+    } else {
+        speedStep = 0.25;
+        defaultSpeed = 0.0;
+        maximalSpeed = qMin(qMax(1.0, maximalSpeed * speedStep), maximalSpeed);
+        minimalSpeed = qMax(qMin(-1.0, minimalSpeed * speedStep), minimalSpeed);
+    }
+
+    m_speedSlider->setSpeedRange(minimalSpeed, maximalSpeed);
+    m_speedSlider->setMinimalSpeedStep(speedStep);
+    m_speedSlider->setDefaultSpeed(defaultSpeed);
+}
+
+void QnNavigationItem::updateSpeedSliderSpeedFromNavigator() {
+    if(m_updatingNavigatorFromSpeedSlider)
+        return;
+
+    QnScopedValueRollback<bool> guard(&m_updatingSpeedSliderFromNavigator, true);
+    m_speedSlider->setSpeed(m_navigator->speed());
+    updateButtonsSpeedState();
+}
+
+void QnNavigationItem::updateNavigatorSpeedFromSpeedSlider() {
+    if(m_updatingSpeedSliderFromNavigator)
+        return;
+
+    QnScopedValueRollback<bool> guard(&m_updatingNavigatorFromSpeedSlider, true);
+    m_navigator->setSpeed(m_speedSlider->roundedSpeed());
+    updateButtonsSpeedState();
+}
+
+void QnNavigationItem::updateButtonsPlayingState() {
+    bool playing = m_playButton->isChecked();
+
+    m_stepBackwardButton->setIcon(qnSkin->icon(playing ? "backward.png" : "step_backward.png"));
+    m_stepForwardButton->setIcon(qnSkin->icon(playing ? "forward.png" : "step_forward.png"));
+}
+
+void QnNavigationItem::updateButtonsPlayingSupportedState() {
+    bool enabled = m_navigator->isPlayingSupported();
+
+    m_playButton->setEnabled(enabled);
+    m_stepBackwardButton->setEnabled(enabled);
+    m_stepForwardButton->setEnabled(enabled);
+    m_speedSlider->setEnabled(enabled);
+}
+
+void QnNavigationItem::updateMuteButtonFromVolumeSlider() {
+    m_muteButton->setChecked(m_volumeSlider->isMute());
+}
+
+void QnNavigationItem::updateButtonsLiveState() {
+    m_liveButton->setChecked(m_navigator->isLive());
+
+    /*if(m_navigator->isLive())
+        m_speedSlider->resetSpeed();*/
+}
+
+void QnNavigationItem::updateButtonsLiveSupportedState() {
+    m_liveButton->setEnabled(m_navigator->isLiveSupported());
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -545,65 +609,7 @@ void QnNavigationItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     event->accept(); /* Prevent surprising click-through scenarios. */
 }
 
-void QnNavigationItem::at_navigator_liveChanged() {
-    m_liveButton->setChecked(m_navigator->isLive());
 
-    if(m_navigator->isLive())
-        m_speedSlider->resetSpeed();
-}
-
-void QnNavigationItem::at_navigator_liveSupportedChanged() {
-    m_liveButton->setEnabled(m_navigator->isLiveSupported());
-}
-
-void QnNavigationItem::at_navigator_playingChanged() {
-    bool playing = m_navigator->isPlaying();
-
-    m_playButton->setIcon(qnSkin->icon(playing ? "pause.png" : "play.png"));
-    m_stepBackwardButton->setIcon(qnSkin->icon(playing ? "backward.png" : "step_backward.png"));
-    m_stepForwardButton->setIcon(qnSkin->icon(playing ? "forward.png" : "step_forward.png"));
-    
-    //m_speedSlider->setPrecision(playing ? QnSpeedSlider::LowPrecision : QnSpeedSlider::HighPrecision);
-}
-
-void QnNavigationItem::at_navigator_playingSupportedChanged() {
-    bool enabled = m_navigator->isPlayingSupported();
-
-    m_playButton->setEnabled(enabled);
-    m_stepBackwardButton->setEnabled(enabled);
-    m_stepForwardButton->setEnabled(enabled);
-    m_speedSlider->setEnabled(enabled);
-}
-
-void QnNavigationItem::at_navigator_speedChanged() {
-    if(m_updatingNavigatorFromSpeedSlider)
-        return;
-
-    QnScopedValueRollback<bool> guard(&m_updatingSpeedSliderFromNavigator, true);
-    m_speedSlider->setSpeed(m_navigator->speed());
-    updateButtonsSpeedState();
-}
-
-void QnNavigationItem::at_speedSlider_roundedSpeedChanged() {
-    if(m_updatingSpeedSliderFromNavigator)
-        return;
-
-    QnScopedValueRollback<bool> guard(&m_updatingNavigatorFromSpeedSlider, true);
-    m_navigator->setSpeed(m_speedSlider->roundedSpeed());
-    updateButtonsSpeedState();
-}
-
-void QnNavigationItem::at_navigator_speedRangeChanged() {
-    m_speedSlider->setSpeedRange(m_navigator->minimalSpeed(), m_navigator->maximalSpeed());
-}
-
-void QnNavigationItem::at_playButton_clicked() {
-    m_navigator->setPlaying(!m_navigator->isPlaying());
-}
-
-void QnNavigationItem::at_volumeSlider_valueChanged() {
-    m_muteButton->setChecked(m_volumeSlider->isMute());
-}
 
 
 

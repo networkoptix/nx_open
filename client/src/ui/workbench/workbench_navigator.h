@@ -43,11 +43,12 @@ public:
     bool isLiveSupported() const;
 
     bool isPlaying() const;
-    bool setPlaying(bool playing);
+    Q_SLOT bool setPlaying(bool playing);
+    Q_SLOT bool togglePlaying();
     bool isPlayingSupported() const;
 
     qreal speed() const;
-    void setSpeed(qreal speed);
+    Q_SLOT void setSpeed(qreal speed);
     qreal minimalSpeed() const;
     qreal maximalSpeed() const;
 

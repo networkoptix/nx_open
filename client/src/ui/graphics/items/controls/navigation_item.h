@@ -38,20 +38,16 @@ public slots:
 
 signals:
     void enableItemSync(bool value);
-    void clearMotionSelection();
 
 private slots:
-    void at_navigator_liveChanged();
-    void at_navigator_liveSupportedChanged();
-    void at_navigator_playingChanged();
-    void at_navigator_playingSupportedChanged();
-    void at_navigator_speedChanged();
-    void at_navigator_speedRangeChanged();
-
-    void at_playButton_clicked();
-    void at_volumeSlider_valueChanged();
-    void at_speedSlider_roundedSpeedChanged();
-
+    void updateButtonsLiveState();
+    void updateButtonsLiveSupportedState();
+    void updateButtonsPlayingState();
+    void updateButtonsPlayingSupportedState();
+    void updateMuteButtonFromVolumeSlider();
+    void updateNavigatorSpeedFromSpeedSlider();
+    void updateSpeedSliderSpeedFromNavigator();
+    void updateSpeedSliderParametersFromNavigator();
     void updateButtonsSpeedState();
 
     void rewindBackward();
@@ -59,7 +55,6 @@ private slots:
 
     void stepBackward();
     void stepForward();
-
 
 protected:
     virtual void wheelEvent(QGraphicsSceneWheelEvent *) override;

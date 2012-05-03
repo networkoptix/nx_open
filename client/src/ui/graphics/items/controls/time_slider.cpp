@@ -650,7 +650,12 @@ void QnTimeSlider::updateStepAnimationTargets() {
         
         if(!qFuzzyCompare(data.targetHeight, targetHeight)) {
             data.targetHeight = targetHeight;
-            data.targetLineOpacity = minTickmarkOpacity + (1.0 - minTickmarkOpacity) * (data.targetHeight - minTickmarkHeight) / (maxTickmarkHeight - minTickmarkHeight);
+
+            if(qFuzzyIsNull(targetHeight)) {
+                data.targetLineOpacity = 0.0;
+            } else {
+                data.targetLineOpacity = minTickmarkOpacity + (1.0 - minTickmarkOpacity) * (data.targetHeight - minTickmarkHeight) / (maxTickmarkHeight - minTickmarkHeight);
+            }
         }
 
         if(separationPixels < minTextSeparationPixels) {

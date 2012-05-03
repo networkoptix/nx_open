@@ -19,7 +19,9 @@ QnResourceIconCache::QnResourceIconCache(QObject *parent): QObject(parent) {
 
     m_cache.insert(Server | Offline,        qnSkin->icon("server_offline.png"));
     m_cache.insert(Camera | Offline,        qnSkin->icon("camera_offline.png"));
+#if 0
     m_cache.insert(User | Offline,          qnSkin->icon("user_offline.png"));
+#endif
 
     m_cache.insert(Camera | Unauthorized,   qnSkin->icon("camera_unauthorized.png"));
 
