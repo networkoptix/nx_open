@@ -3,6 +3,7 @@
 #include <QtCore/QDateTime>
 
 #include <utils/common/warnings.h>
+#include <utils/common/math.h>
 
 namespace {
     qint64 timeToMSecs(const QTime &time) {
@@ -13,24 +14,18 @@ namespace {
         return QTime(0, 0, 0, 0).addMSecs(msecs); 
     }
 
-    template<class T>
-    T roundUp(T value, T step) {
-        value = value + step - 1;
-        return value - value % step;
-    }
-
 } // anonymous namespace
 
 
 qint64 roundUp(qint64 msecs, const QnTimeStep &step) {
     if(step.isRelative) 
-        return roundUp(msecs, step.stepMSecs);
+        return qCeil(msecs, step.stepMSecs);
         
     QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(msecs);
     switch(step.type) {
     case QnTimeStep::Milliseconds: {
         qint64 oldMSecs = timeToMSecs(dateTime.time());
-        qint64 newMSecs = roundUp(oldMSecs, step.stepMSecs);
+        qint64 newMSecs = qCeil(oldMSecs, step.stepMSecs);
         dateTime = dateTime.addMSecs(newMSecs - oldMSecs);
         break;
     }
@@ -39,7 +34,7 @@ qint64 roundUp(qint64 msecs, const QnTimeStep &step) {
             dateTime.setTime(QTime(0, 0, 0, 0));
 
             int oldDay = dateTime.date().day();
-            int newDay = qMin(roundUp(oldDay + 1, step.stepUnits), dateTime.date().daysInMonth() + 1);
+            int newDay = qMin(qCeil(oldDay + 1, step.stepUnits), dateTime.date().daysInMonth() + 1);
             dateTime = dateTime.addDays(newDay - oldDay);
         }
         break;
@@ -52,7 +47,7 @@ qint64 roundUp(qint64 msecs, const QnTimeStep &step) {
             /* We should have added 1 to month() here we don't want to end
              * up with the same month number, but months are numbered from 1,
              * so the addition is not needed. */
-            int newMonth = roundUp(oldMonth, step.stepUnits) + 1;
+            int newMonth = qCeil(oldMonth, step.stepUnits) + 1;
             dateTime = dateTime.addMonths(newMonth - oldMonth);
         }
         break;
@@ -62,7 +57,7 @@ qint64 roundUp(qint64 msecs, const QnTimeStep &step) {
             dateTime.setDate(QDate(dateTime.date().year(), 1, 1));
                 
             int oldYear = dateTime.date().year();
-            int newYear = roundUp(oldYear + 1, step.stepUnits);
+            int newYear = qCeil(oldYear + 1, step.stepUnits);
             dateTime = dateTime.addYears(newYear - oldYear);
         }
         break;

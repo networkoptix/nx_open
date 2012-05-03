@@ -219,10 +219,14 @@ bool QnWorkbenchNavigator::setPlaying(bool playing) {
             reader->resumeMedia();
         }
         camDisplay->playAudio(true);
+
+        setSpeed(1.0);
     } else {
         reader->pauseMedia();
         camDisplay->playAudio(false);
         reader->setSingleShotMode(true);
+
+        setSpeed(0.0);
     }
 
     updatePlaying();
@@ -246,6 +250,8 @@ void QnWorkbenchNavigator::setSpeed(qreal speed) {
 
     if(!m_currentWidget)
         return;
+
+    m_lastSpeed = speed;
 
     if(QnAbstractArchiveReader *reader = m_currentWidget->display()->archiveReader()) {
         reader->setSpeed(speed);

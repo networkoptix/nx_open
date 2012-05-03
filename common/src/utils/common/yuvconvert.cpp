@@ -1,10 +1,12 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <QtGlobal>
-
-
-#include "utils/common/util.h"
 #include <emmintrin.h>
+
+#include <cstdio>
+#include <cstdlib>
+
+#include <QtCore/QtGlobal>
+
+#include "utils/common/math.h"
+
 
 const __m128i  sse_00ffw_intrs = _mm_setr_epi32(0x00ff00ff, 0x00ff00ff, 0x00ff00ff, 0x00ff00ff);
 const __m128i  sse_0010_intrs  = _mm_setr_epi32(0x00100010, 0x00100010, 0x00100010, 0x00100010);
@@ -23,9 +25,9 @@ void yuv444_argb32_sse2_intr(unsigned char * dst, const unsigned char * py,
                             const unsigned int dst_stride, const unsigned int y_stride,
                             const unsigned int uv_stride, quint8 alpha)
 {
-    Q_ASSERT(roundUp(width, 16) <= y_stride && roundUp(width*4,64) <= dst_stride);
+    Q_ASSERT(qPower2Ceil(width, 16) <= y_stride && qPower2Ceil(width*4,64) <= dst_stride);
     __m128i sse_alpha_intrs = _mm_setr_epi8(alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha); /* SSE2. */
-    int xSteps = roundUp(width, 16) / 16;
+    int xSteps = qPower2Ceil(width, 16) / 16;
 
     for (int y = height; y > 0; --y)
     {
@@ -92,9 +94,9 @@ void yuv422_argb32_sse2_intr(unsigned char * dst, const unsigned char * py,
                             const unsigned int dst_stride, const unsigned int y_stride,
                             const unsigned int uv_stride, quint8 alpha)
 {
-    Q_ASSERT(roundUp(width, 16) <= y_stride && roundUp(width*4,64) <= dst_stride);
+    Q_ASSERT(qPower2Ceil(width, 16) <= y_stride && qPower2Ceil(width*4,64) <= dst_stride);
     __m128i sse_alpha_intrs = _mm_setr_epi8(alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha); /* SSE2. */
-    int xSteps = roundUp(width, 16) / 16;
+    int xSteps = qPower2Ceil(width, 16) / 16;
 
     for (int y = height; y > 0; --y)
     {
@@ -166,9 +168,9 @@ void yuv420_argb32_sse2_intr(unsigned char * dst, const unsigned char * py,
                             const unsigned int dst_stride, const unsigned int y_stride,
                             const unsigned int uv_stride, quint8 alpha)
 {
-    Q_ASSERT(roundUp(width, 16) <= y_stride && roundUp(width*4,64) <= dst_stride);
+    Q_ASSERT(qPower2Ceil(width, 16) <= y_stride && qPower2Ceil(width*4,64) <= dst_stride);
     __m128i sse_alpha_intrs = _mm_setr_epi8(alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha); /* SSE2. */
-    int xSteps = roundUp(width, 16) / 16;
+    int xSteps = qPower2Ceil(width, 16) / 16;
     __m128i u00, u01, bu0, bu1, v00, v01, rv0, rv1;
 
     for (unsigned int y = 0; y < height/2; ++y)

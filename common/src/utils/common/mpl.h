@@ -1,7 +1,6 @@
 #ifndef QN_MPL_H
 #define QN_MPL_H
 
-
 template<class T>
 struct remove_pointer {
     typedef T type;
