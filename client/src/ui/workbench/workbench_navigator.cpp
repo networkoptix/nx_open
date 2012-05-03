@@ -138,6 +138,7 @@ void QnWorkbenchNavigator::initialize() {
     m_timeScrollBar->installEventFilter(this);
 
     updateLines();
+    updateScrollBarFromSlider();
 } 
 
 void QnWorkbenchNavigator::deinitialize() {
@@ -429,23 +430,20 @@ void QnWorkbenchNavigator::updateSliderFromReader() {
 
     QnScopedValueRollback<bool> guard(&m_updatingSliderFromReader, true);
 
-    qint64 startTimeUSec = reader->startTime();
     qint64 endTimeUSec = reader->endTime();
-    if (startTimeUSec != AV_NOPTS_VALUE && endTimeUSec != AV_NOPTS_VALUE) {// TODO: rename AV_NOPTS_VALUE to something more sane.
-        qint64 currentMSecsSinceEpoch = 0;
-        if(startTimeUSec == DATETIME_NOW || endTimeUSec == DATETIME_NOW)
-            currentMSecsSinceEpoch = qnSyncTime->currentMSecsSinceEpoch();
+    qint64 endTimeMSec = (endTimeUSec != DATETIME_NOW && endTimeUSec != AV_NOPTS_VALUE) ? endTimeUSec / 1000 : qnSyncTime->currentMSecsSinceEpoch();
 
-        qint64 startTimeMSec = startTimeUSec != DATETIME_NOW ? startTimeUSec / 1000 : currentMSecsSinceEpoch - 10000; /* If nothing is recorded, set minimum to live - 10s. */
-        qint64 endTimeMSec = endTimeUSec != DATETIME_NOW ? endTimeUSec / 1000 : currentMSecsSinceEpoch;
+    qint64 startTimeUSec = reader->startTime();
+    qint64 startTimeMSec = (startTimeUSec != DATETIME_NOW && startTimeUSec != AV_NOPTS_VALUE) ? startTimeUSec / 1000 : endTimeMSec - 10000; /* If nothing is recorded, set minimum to end - 10s. */
 
-        m_timeSlider->setMinimum(startTimeMSec);
-        m_timeSlider->setMaximum(endTimeMSec);
+    qint64 timeUSec = m_currentWidget->display()->camera()->getCurrentTime();
+    qint64 timeMSec = (timeUSec != DATETIME_NOW && timeUSec != AV_NOPTS_VALUE) ? timeUSec / 1000 : endTimeMSec;
 
-        qint64 timeUSec = m_currentWidget->display()->camera()->getCurrentTime();
-        if (timeUSec != AV_NOPTS_VALUE)
-            m_timeSlider->setValue(timeUSec != DATETIME_NOW ? timeUSec / 1000 : currentMSecsSinceEpoch);
+    m_timeSlider->setMinimum(startTimeMSec);
+    m_timeSlider->setMaximum(endTimeMSec);
+    m_timeSlider->setValue(timeMSec);
 
+    if (timeUSec != AV_NOPTS_VALUE) {
         /* Update target time period for time period loaders. 
          * If playback is synchronized, do it for all cameras. */
         QnTimePeriod period(startTimeMSec, endTimeMSec - startTimeMSec);

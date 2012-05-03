@@ -1103,20 +1103,23 @@ void QnTimeSlider::sliderChange(SliderChange change) {
     base_type::sliderChange(change);
 
     switch(change) {
-    case SliderRangeChange:
-        if((m_options & StickToMinimum) && m_oldMinimum == m_windowStart)
-            setWindowStart(minimum());
+    case SliderRangeChange: {
+        qint64 windowStart = m_windowStart;
+        if((m_options & StickToMinimum) && windowStart == m_oldMinimum)
+            windowStart = minimum();
 
-        if((m_options & StickToMaximum) && m_oldMaximum == m_windowEnd)
-            setWindowEnd(maximum());
+        qint64 windowEnd = m_windowEnd;
+        if((m_options & StickToMaximum) && windowEnd == m_oldMaximum)
+            windowEnd = maximum();
 
         m_oldMinimum = minimum();
         m_oldMaximum = maximum();
 
         /* Re-bound. */
-        setWindow(m_windowStart, m_windowEnd);
+        setWindow(windowStart, windowEnd);
         setSelection(m_selectionStart, m_selectionEnd);
         break;
+    }
     case SliderValueChange:
         updateToolTipVisibility();
         updateToolTipText();
