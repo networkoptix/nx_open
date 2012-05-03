@@ -199,27 +199,31 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
 
 
     /* Set up handlers. */
-    connect(m_speedSlider,          SIGNAL(roundedSpeedChanged(qreal)), this,           SLOT(updateNavigatorSpeedFromSpeedSlider()));
-    connect(m_volumeSlider,         SIGNAL(valueChanged(qint64)),       this,           SLOT(updateMuteButtonFromVolumeSlider()));
+    connect(m_speedSlider,          SIGNAL(roundedSpeedChanged(qreal)),     this,           SLOT(updateNavigatorSpeedFromSpeedSlider()));
+    connect(m_volumeSlider,         SIGNAL(valueChanged(qint64)),           this,           SLOT(updateMuteButtonFromVolumeSlider()));
 
-    connect(m_stepBackwardButton,   SIGNAL(clicked()),                  this,           SLOT(stepBackward()));
-    connect(m_stepForwardButton,    SIGNAL(clicked()),                  this,           SLOT(stepForward()));
-    connect(m_backwardButton,       SIGNAL(clicked()),                  this,           SLOT(rewindBackward()));
-    connect(m_forwardButton,        SIGNAL(clicked()),                  this,           SLOT(rewindForward()));
+    connect(m_stepBackwardButton,   SIGNAL(clicked()),                      this,           SLOT(stepBackward()));
+    connect(m_stepForwardButton,    SIGNAL(clicked()),                      this,           SLOT(stepForward()));
+    connect(m_backwardButton,       SIGNAL(clicked()),                      this,           SLOT(rewindBackward()));
+    connect(m_forwardButton,        SIGNAL(clicked()),                      this,           SLOT(rewindForward()));
     
-    connect(m_playButton,           SIGNAL(toggled(bool)),              m_navigator,    SLOT(setPlaying(bool)));
-    connect(m_playButton,           SIGNAL(toggled(bool)),              this,           SLOT(updateSpeedSliderParametersFromNavigator()));
-    connect(m_playButton,           SIGNAL(toggled(bool)),              this,           SLOT(updateButtonsPlayingState()));
+    connect(m_playButton,           SIGNAL(toggled(bool)),                  m_navigator,    SLOT(setPlaying(bool)));
+    connect(m_playButton,           SIGNAL(toggled(bool)),                  this,           SLOT(updateSpeedSliderParametersFromNavigator()));
+    connect(m_playButton,           SIGNAL(toggled(bool)),                  this,           SLOT(updateButtonsPlayingState()));
 
-    connect(m_liveButton,           SIGNAL(toggled(bool)),              m_navigator,    SLOT(setLive(bool)));
-    connect(m_syncButton,           SIGNAL(toggled(bool)),              this,           SLOT(onSyncButtonToggled(bool)));
-    connect(m_muteButton,           SIGNAL(clicked(bool)),              m_volumeSlider, SLOT(setMute(bool)));
+    connect(m_liveButton,           SIGNAL(toggled(bool)),                  m_navigator,    SLOT(setLive(bool)));
+    connect(m_syncButton,           SIGNAL(toggled(bool)),                  this,           SLOT(onSyncButtonToggled(bool)));
+    connect(m_muteButton,           SIGNAL(clicked(bool)),                  m_volumeSlider, SLOT(setMute(bool)));
     
-    connect(m_navigator,            SIGNAL(liveChanged()),              this,           SLOT(updateButtonsLiveState()));
-    connect(m_navigator,            SIGNAL(liveSupportedChanged()),     this,           SLOT(updateButtonsLiveSupportedState()));
-    connect(m_navigator,            SIGNAL(playingSupportedChanged()),  this,           SLOT(updateButtonsPlayingSupportedState()));
-    connect(m_navigator,            SIGNAL(speedChanged()),             this,           SLOT(updateSpeedSliderSpeedFromNavigator()));
-    connect(m_navigator,            SIGNAL(speedRangeChanged()),        this,           SLOT(updateSpeedSliderParametersFromNavigator()));
+    connect(m_navigator,            SIGNAL(currentWidgetAboutToBeChanged()),this,           SLOT(at_navigator_currentWidgetAboutToBeChanged()));
+    connect(m_navigator,            SIGNAL(currentWidgetChanged()),         this,           SLOT(at_navigator_currentWidgetChanged()));
+    connect(m_navigator,            SIGNAL(speedRangeChanged()),            this,           SLOT(updateSpeedSliderParametersFromNavigator()));
+    connect(m_navigator,            SIGNAL(liveChanged()),                  this,           SLOT(updateButtonsLiveState()));
+    connect(m_navigator,            SIGNAL(liveSupportedChanged()),         this,           SLOT(updateButtonsLiveSupportedState()));
+    connect(m_navigator,            SIGNAL(playingSupportedChanged()),      this,           SLOT(updateButtonsPlayingSupportedState()));
+    connect(m_navigator,            SIGNAL(speedChanged()),                 this,           SLOT(updateSpeedSliderSpeedFromNavigator()));
+    connect(m_navigator,            SIGNAL(speedRangeChanged()),            this,           SLOT(updateSpeedSliderParametersFromNavigator()));
+
 
     /* Create actions. */
     QAction *playAction = new QAction(tr("Play / Pause"), m_playButton);
@@ -609,7 +613,12 @@ void QnNavigationItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     event->accept(); /* Prevent surprising click-through scenarios. */
 }
 
+void QnNavigationItem::at_navigator_currentWidgetAboutToBeChanged() {
+    m_speedSlider->finishAnimations();
+}
 
-
+void QnNavigationItem::at_navigator_currentWidgetChanged() {
+    m_playButton->setChecked(m_navigator->isPlaying());
+}
 
 

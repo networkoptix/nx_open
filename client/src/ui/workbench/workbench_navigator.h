@@ -60,6 +60,7 @@ public:
     virtual bool eventFilter(QObject *watched, QEvent *event) override;
 
 signals:
+    void currentWidgetAboutToBeChanged();
     void currentWidgetChanged();
     void liveChanged();
     void liveSupportedChanged();

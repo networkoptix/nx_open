@@ -38,6 +38,8 @@ public:
     qreal minimalSpeedStep() const;
     void setMinimalSpeedStep(qreal minimalSpeedStep);
 
+    void finishAnimations();
+
 signals:
     void speedChanged(qreal speed);
     void roundedSpeedChanged(qreal roundedSpeed);

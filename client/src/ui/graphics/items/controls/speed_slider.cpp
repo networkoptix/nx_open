@@ -143,6 +143,14 @@ void QnSpeedSlider::restartSpeedAnimation() {
     m_animator->animateTo(speedToPosition(m_defaultSpeed, m_minimalSpeedStep));
 }
 
+void QnSpeedSlider::finishAnimations() {
+    if(m_animator->isRunning()) {
+        m_animator->stop();
+        
+        setSpeed(m_defaultSpeed);
+    }
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers

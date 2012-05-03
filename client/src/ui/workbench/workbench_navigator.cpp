@@ -384,6 +384,8 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     if (m_currentWidget == widget)
         return;
 
+    emit currentWidgetAboutToBeChanged();
+
     bool previousWidgetWasCamera = m_currentWidgetIsCamera;
     m_localDataByWidget[m_currentWidget] = currentSliderData();
 

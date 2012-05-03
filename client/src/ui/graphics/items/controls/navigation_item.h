@@ -50,6 +50,9 @@ private slots:
     void updateSpeedSliderParametersFromNavigator();
     void updateButtonsSpeedState();
 
+    void at_navigator_currentWidgetAboutToBeChanged();
+    void at_navigator_currentWidgetChanged();
+
     void rewindBackward();
     void rewindForward();
 
