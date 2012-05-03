@@ -22,6 +22,7 @@ class QnTimeScrollBar;
 class QnResourceWidget;
 class QnAbstractArchiveReader;
 class QnCachingTimePeriodLoader;
+class QnThumbnailsLoader;
 
 class QnWorkbenchNavigator: public QObject, public QnWorkbenchContextAware, public QnActionTargetProvider {
     Q_OBJECT;
@@ -101,6 +102,8 @@ protected slots:
     void updateCurrentWidget();
     void updateSliderFromReader();
     void updateScrollBarFromSlider();
+    void delayedLoadThumbnails();
+    void loadThumbnails(qint64 startTimeMs, qint64 endTimeMs);
     void updateSliderFromScrollBar();
 
     void updateCurrentPeriods();
@@ -114,6 +117,7 @@ protected slots:
     void updatePlayingSupported();
     void updateSpeed();
     void updateSpeedRange();
+    void updateThumbnails();
 
 protected slots:
     void at_display_widgetChanged(Qn::ItemRole role);
@@ -164,6 +168,10 @@ private:
     QHash<QnResourceWidget *, SliderUserData> m_localDataByWidget;
 
     QHash<QnResourcePtr, QnCachingTimePeriodLoader *> m_loaderByResource;
+    
+    QScopedPointer<QnThumbnailsLoader> m_thumbnailsLoader;
+    qint64 m_thumbnailsStartTimeMs;
+    qint64 m_thumbnailsEndTimeMs;
 };
 
 #endif // QN_WORKBENCH_NAVIGATOR_H

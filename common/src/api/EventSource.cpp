@@ -3,7 +3,14 @@
 
 #include <utils/common/warnings.h>
 
-//#define QN_EVENT_SOURCE_DEBUG
+#define QN_EVENT_SOURCE_DEBUG
+
+/* This interval (2T) has the following semantic:
+    - Server sends us pings every T msecs
+    - We wake up every 2T msecs
+    - If T msecs passed sinse last received ping => emit connectionClosed.
+*/
+static const int PING_INTERVAL = 60000;
 
 void QnJsonStreamParser::addData(const QByteArray& data)
 {
@@ -74,7 +81,8 @@ bool QnEvent::load(const QVariant& parsed)
 			&& eventType != QN_EVENT_RES_DISABLED_CHANGE
             && eventType != QN_EVENT_LICENSE_CHANGE
             && eventType != QN_CAMERA_SERVER_ITEM
-            && eventType != QN_EVENT_EMPTY)
+            && eventType != QN_EVENT_EMPTY
+            && eventType != QN_EVENT_PING)
     {
         return false;
     }
@@ -100,6 +108,9 @@ bool QnEvent::load(const QVariant& parsed)
         // need to refactor a bit
         return true;
     }
+
+    if (eventType == QN_EVENT_EMPTY || eventType == QN_EVENT_PING)
+        return true;
 
     if (!dict.contains("resourceId"))
         return false;
@@ -143,11 +154,14 @@ quint32 QnEvent::nextSeqNumber(quint32 seqNumber)
 QnEventSource::QnEventSource(QUrl url, int retryTimeout): 
     m_url(url),
     m_retryTimeout(retryTimeout),
-    m_reply(NULL)
+    m_reply(NULL),
+    m_seqNumber(0)
 {
     connect(this, SIGNAL(stopped()), this, SLOT(doStop()));
     connect(&m_manager, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)),
             this, SLOT(slotAuthenticationRequired(QNetworkReply*,QAuthenticator*)));
+    connect(&m_pingTimer, SIGNAL(timeout()), this, SLOT(onPingTimer()));
+
 #ifndef QT_NO_OPENSSL
     connect(&m_manager, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)),
             this, SLOT(sslErrors(QNetworkReply*,QList<QSslError>)));
@@ -162,6 +176,8 @@ void QnEventSource::stop()
 
 void QnEventSource::doStop()
 {
+    m_pingTimer.stop();
+
     if (m_reply)
         m_reply->abort();
 }
@@ -173,17 +189,11 @@ void QnEventSource::startRequest()
             this, SLOT(httpFinished()));
     connect(m_reply, SIGNAL(readyRead()),
             this, SLOT(httpReadyRead()));
-//    connect(m_reply, SIGNAL(error(QNetworkReply::NetworkError)),
-//            this, SLOT(slotError(QNetworkReply::NetworkError)));
-}
-/*
-void QnEventSource::slotError(QNetworkReply::NetworkError code)
-{
-    m_reply->deleteLater();
 
-    emit connectionAborted(m_reply->errorString());
+    // Check every minute
+    m_pingTimer.start(PING_INTERVAL);
 }
-*/
+
 void QnEventSource::httpFinished()
 {
     if (!m_reply)
@@ -221,10 +231,31 @@ void QnEventSource::httpReadyRead()
     QVariant parsed;
     while (m_streamParser.nextMessage(parsed))
     {
-        QnEvent event;
-        event.load(parsed);
+        // Restart timer for any event
+        m_eventWaitTimer.restart();
 
-        emit eventReceived(event);
+        QnEvent event;
+        if (!event.load(parsed))
+            continue;
+
+        // If it's ping event -> just update last event time (m_eventWaitTimer)
+        if (event.eventType == QN_EVENT_EMPTY)
+        {
+            if (m_seqNumber == 0)
+            {
+                // No tracking yet. Just initialize seqNumber.
+                m_seqNumber = event.seqNumber;
+            }
+            else if (QnEvent::nextSeqNumber(m_seqNumber) != event.seqNumber)
+            {
+                // Tracking is on and some events are missed and/or reconnect occured
+                m_seqNumber = event.seqNumber;
+                emit connectionReset();
+            }
+
+            emit connectionOpened();
+        } else if (event.eventType != QN_EVENT_PING)
+            emit eventReceived(event);
     }
 }
 
@@ -233,6 +264,16 @@ void QnEventSource::slotAuthenticationRequired(QNetworkReply*,QAuthenticator *au
 {
     authenticator->setUser("xxxuser");
     authenticator->setPassword("xxxpassword");
+}
+
+void QnEventSource::onPingTimer()
+{
+    if (m_eventWaitTimer.elapsed() > PING_INTERVAL)
+    {
+        doStop();
+
+        emit connectionClosed("Timeout");
+    }
 }
 
 #ifndef QT_NO_OPENSSL

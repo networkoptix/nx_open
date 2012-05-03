@@ -97,11 +97,11 @@ QStyle::SubControl GraphicsStyle::hitTestComplexControl(QStyle::ComplexControl c
     return hitTestComplexControl(control, option, position.toPoint(), widget);
 }
 
-qreal GraphicsStyle::sliderPositionFromValue(qint64 min, qint64 max, qint64 logicalValue, qreal span, bool upsideDown) {
-    if (span <= 0 || logicalValue < min || max <= min)
+qreal GraphicsStyle::sliderPositionFromValue(qint64 min, qint64 max, qint64 logicalValue, qreal span, bool upsideDown, bool doBound) {
+    if (doBound && (span <= 0 || logicalValue < min || max <= min))
         return 0;
 
-    if (logicalValue > max)
+    if (doBound && logicalValue > max)
         return upsideDown ? 0.0 : span;
 
     qint64 range = max - min;

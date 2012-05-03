@@ -1,0 +1,35 @@
+#ifndef MAIN_H
+#define MAIN_H
+
+#include "utils/common/longrunnable.h"
+#include "core/resource/video_server.h"
+
+class QnAppserverResourceProcessor;
+class QnRtspListener;
+class QnRestServer;
+
+class QnMain : public CLLongRunnable
+{
+    Q_OBJECT
+
+public:
+    QnMain(int argc, char* argv[]);
+    ~QnMain();
+
+    void stopObjects();
+    void run();
+
+private slots:
+    void loadResourcesFromECS();
+
+private:
+    int m_argc;
+    char** m_argv;
+
+    QnAppserverResourceProcessor* m_processor;
+    QnRtspListener* m_rtspListener;
+    QnRestServer* m_restServer;
+    QnVideoServerResourcePtr m_videoServer;
+};
+
+#endif // MAIN_H

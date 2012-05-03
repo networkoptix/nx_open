@@ -74,6 +74,17 @@ void conn_detail::ReplyProcessor::finished(int status, const QByteArray &result,
         QnResourceList resources;
         qCopy(layouts.begin(), layouts.end(), std::back_inserter(resources));
         emit finished(status, errorString, resources, handle);
+    } else if (m_objectName == "resourceEx")
+    {
+        QnResourceList resources;
+
+        try {
+            m_serializer.deserializeResources(resources, result, m_resourceFactory);
+        } catch (const QnSerializeException& e) {
+            errorString += e.errorString();
+        }
+
+        emit finished(status, errorString, resources, handle);
     }
 }
 

@@ -77,7 +77,7 @@
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${forms}</echo>
 
 								<fileset id="pri_path" dir="${project.build.directory}/build/pri">
-									<include name="**/*.pri" />
+									<include name="**/src/*.pri" />
 								</fileset>
 								<pathconvert pathsep=")${line.separator}" property="pri" refid="pri_path">
 									<map from="" to="include("/>

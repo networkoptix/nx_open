@@ -21,17 +21,17 @@ public:
 signals:
     void connectionOpened();
     void connectionClosed();
-    void connectionReset();
 
 public slots:
     void run();
 
 private slots:
-    void resourcesReceived(int status, const QByteArray& errorString, QnResourceList resources, int handle);
-    void licensesReceived(int status, const QByteArray& errorString, QnLicenseList licenses, int handle);
+    void at_resourcesReceived(int status, const QByteArray& errorString, QnResourceList resources, int handle);
+    void at_licensesReceived(int status, const QByteArray& errorString, QnLicenseList licenses, int handle);
 
-    void eventReceived(QnEvent event);
-    void connectionClosed(QString errorString);
+    void at_eventReceived(QnEvent event);
+    void at_connectionClosed(QString errorString);
+    void at_connectionReset();
 
 private:
     void init();

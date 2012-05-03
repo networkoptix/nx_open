@@ -49,7 +49,7 @@
 #include "plugins/resources/pulse/pulse_resource_searcher.h"
 //#include "plugins/storage/file_storage/file_storage_protocol.h"
 #include "plugins/storage/file_storage/file_storage_resource.h"
-
+#include "main.h"
 
 
 static const char SERVICE_NAME[] = "Network Optix VMS Media Server";
@@ -381,232 +381,230 @@ void initAppServerEventConnection(const QSettings &settings, const QnVideoServer
     eventManager->init(appServerEventsUrl, EVENT_RECONNECT_TIMEOUT);
 }
 
-class QnMain : public CLLongRunnable
+QnMain::QnMain(int argc, char* argv[])
+    : m_argc(argc),
+    m_argv(argv),
+    m_processor(0),
+    m_rtspListener(0),
+    m_restServer(0)
 {
-public:
-    QnMain(int argc, char* argv[])
-        : m_argc(argc),
-        m_argv(argv),
-        m_processor(0),
-        m_rtspListener(0),
-        m_restServer(0)
+    serviceMainInstance = this;
+}
+
+QnMain::~QnMain()
+{
+    quit();
+    stop();
+    stopObjects();
+}
+
+void QnMain::stopObjects()
+{
+    if (m_restServer)
     {
-        serviceMainInstance = this;
+        delete m_restServer;
+        m_restServer = 0;
     }
 
-    ~QnMain()
+    if (m_rtspListener)
     {
-        quit();
-        stop();
-        stopObjects();
+        delete m_rtspListener;
+        m_rtspListener = 0;
     }
 
-    void stopObjects()
+    if (m_processor)
     {
-        if (m_restServer)
-        {
-            delete m_restServer;
-            m_restServer = 0;
-        }
-
-        if (m_rtspListener)
-        {
-            delete m_rtspListener;
-            m_rtspListener = 0;
-        }
-
-        if (m_processor)
-        {
-            delete m_processor;
-            m_processor = 0;
-        }
+        delete m_processor;
+        m_processor = 0;
     }
+}
 
-    void run()
+void QnMain::loadResourcesFromECS()
+{
+    QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
+
+    QByteArray errorString;
+
+    QnVirtualCameraResourceList cameras;
+    while (appServerConnection->getCameras(cameras, m_videoServer->getId(), errorString) != 0)
     {
-        // Create SessionManager
-        SessionManager* sm = SessionManager::instance();
-
-        QThread *thread = new QThread();
-        sm->moveToThread(thread);
-
-        QObject::connect(sm, SIGNAL(destroyed()), thread, SLOT(quit()));
-        QObject::connect(thread , SIGNAL(finished()), thread, SLOT(deleteLater()));
-
-        thread->start();
-        sm->start();
-
-        initAppServerConnection(qSettings);
-
-        QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
-
-        while (!needToStop() && !initResourceTypes(appServerConnection))
-        {
-            QnSleep::msleep(1000);
-        }
-
-
-        while (!needToStop() && !initLicenses(appServerConnection))
-        {
-            QnSleep::msleep(1000);
-        }
-
-        if (needToStop())
-            return;
-
-        QnResource::startCommandProc();
-
-        QnResourcePool::instance(); // to initialize net state;
-
-        QString appserverHostString = qSettings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
-
-        QHostAddress appserverHost;
-        do
-        {
-
-            appserverHost = resolveHost(appserverHostString);
-        } while (appserverHost.toIPv4Address() == 0);
-
-        QnVideoServerResourcePtr videoServer;
-
-        while (videoServer.isNull())
-        {
-            QnVideoServerResourcePtr server = findServer(appServerConnection);
-
-            if (!server)
-                server = createServer();
-
-            setServerNameAndUrls(server, defaultLocalAddress(appserverHost));
-            server->setNetAddrList(allLocalAddresses());
-
-            if (server->getStorages().isEmpty())
-                server->setStorages(QnAbstractStorageResourceList() << createDefaultStorage());
-
-            videoServer = registerServer(appServerConnection, server);
-            if (videoServer.isNull())
-                QnSleep::msleep(1000);
-        }
-
-        initAppServerEventConnection(qSettings, videoServer);
-        QnEventManager* eventManager = QnEventManager::instance();
-        eventManager->run();
-
-        qnResPool->addResource(videoServer);
-
-        m_processor = new QnAppserverResourceProcessor(videoServer->getId());
-
-        QUrl rtspUrl(videoServer->getUrl());
-        QUrl apiUrl(videoServer->getApiUrl());
-
-        m_restServer = new QnRestServer(QHostAddress::Any, apiUrl.port());
-        m_restServer->registerHandler("api/RecordedTimePeriods", new QnRecordedChunkListHandler());
-
-        QByteArray errorString;
-
-        foreach (QnAbstractStorageResourcePtr storage, videoServer->getStorages())
-        {
-            qnResPool->addResource(storage);
-            QnStorageResourcePtr physicalStorage = qSharedPointerDynamicCast<QnStorageResource>(storage);
-            if (physicalStorage)
-                qnStorageMan->addStorage(physicalStorage);
-        }
-        qnStorageMan->loadFullFileCatalog();
-
-        QnRecordingManager::instance()->start();
-        qnResPool->addResource(videoServer);
-
-        // ------------------------------------------
-
-
-        //===========================================================================
-        //IPPH264Decoder::dll.init();
-
-        //============================
-        QnResourceDiscoveryManager::instance().setServer(true);
-        QnResourceDiscoveryManager::instance().setResourceProcessor(m_processor);
-        QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlArecontResourceSearcher::instance());
-        QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlAxisResourceSearcher::instance());
-        QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDlinkResourceSearcher::instance());
-        QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIqResourceSearcher::instance());
-
-        QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIpWebCamResourceSearcher::instance());
-        QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDroidResourceSearcher::instance());
-        QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlISDResourceSearcher::instance());
-
-        QnResourceDiscoveryManager::instance().addDeviceServer(&QnTestCameraResourceSearcher::instance());
-        QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlOnvifWsSearcher::instance());
-        QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlPulseSearcher::instance());
-        
-        //
-
-        connect(qnResPool, SIGNAL(statusChanged(QnResourcePtr)), m_processor, SLOT(onResourceStatusChanged(QnResourcePtr)));
-
-        //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
-        //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
-
-        errorString.clear();
-        QnVirtualCameraResourceList cameras;
-        while (appServerConnection->getCameras(cameras, videoServer->getId(), errorString) != 0)
-        {
-            qDebug() << "QnMain::run(): Can't get cameras. Reason: " << errorString;
-            QnSleep::msleep(1000);
-        }
-        foreach(const QnSecurityCamResourcePtr &camera, cameras)
-        {
+        qDebug() << "QnMain::run(): Can't get cameras. Reason: " << errorString;
+        QnSleep::msleep(1000);
+    }
+    foreach(const QnSecurityCamResourcePtr &camera, cameras)
+    {
+        QnResourcePtr ownResource = qnResPool->getResourceById(camera->getId());
+        if (ownResource)
+            ownResource->update(camera);
+        else
             qnResPool->addResource(camera);
-            //QnRecordingManager::instance()->updateCamera(camera);
-        }
-
-        QnCameraHistoryList cameraHistoryList;
-        while (appServerConnection->getCameraHistoryList(cameraHistoryList, errorString) != 0)
-        {
-            qDebug() << "QnMain::run(): Can't get cameras history. Reason: " << errorString;
-            QnSleep::msleep(1000);
-        }
-        foreach(QnCameraHistoryPtr history, cameraHistoryList)
-        {
-            QnCameraHistoryPool::instance()->addCameraHistory(history);
-        }
-
-
-        /*
-        QnScheduleTaskList scheduleTasks;
-        foreach (const QnScheduleTask &scheduleTask, scheduleTasks)
-        {
-            QString str;
-            QTextStream stream(&str);
-
-            stream << "ScheduleTask "
-                   << scheduleTask.getId().toString()
-                   << scheduleTask.getAfterThreshold()
-                   << scheduleTask.getBeforeThreshold()
-                   << scheduleTask.getDayOfWeek()
-                   << scheduleTask.getDoRecordAudio()
-                   << scheduleTask.getStartTime()
-                   << scheduleTask.getEndTime()
-                   << scheduleTask.getRecordingType()
-                   << scheduleTask.getResourceId().toString();
-            cl_log.log(str, cl_logALWAYS);
-        }
-        */
-
-        QnResourceDiscoveryManager::instance().setReady(true);
-        QnResourceDiscoveryManager::instance().start();
-
-        m_rtspListener = new QnRtspListener(QHostAddress::Any, rtspUrl.port());
-        m_rtspListener->start();
-
-        exec();
     }
 
-private:
-    int m_argc;
-    char** m_argv;
+    QnCameraHistoryList cameraHistoryList;
+    while (appServerConnection->getCameraHistoryList(cameraHistoryList, errorString) != 0)
+    {
+        qDebug() << "QnMain::run(): Can't get cameras history. Reason: " << errorString;
+        QnSleep::msleep(1000);
+    }
 
-    QnAppserverResourceProcessor* m_processor;
-    QnRtspListener* m_rtspListener;
-    QnRestServer* m_restServer;
-};
+    foreach(QnCameraHistoryPtr history, cameraHistoryList)
+    {
+        QnCameraHistoryPool::instance()->addCameraHistory(history);
+    }
+}
+
+void QnMain::run()
+{
+    // Create SessionManager
+    SessionManager* sm = SessionManager::instance();
+
+    QThread *thread = new QThread();
+    sm->moveToThread(thread);
+
+    QObject::connect(sm, SIGNAL(destroyed()), thread, SLOT(quit()));
+    QObject::connect(thread , SIGNAL(finished()), thread, SLOT(deleteLater()));
+
+    thread->start();
+    sm->start();
+
+    initAppServerConnection(qSettings);
+
+    QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
+
+    while (!needToStop() && !initResourceTypes(appServerConnection))
+    {
+        QnSleep::msleep(1000);
+    }
+
+
+    while (!needToStop() && !initLicenses(appServerConnection))
+    {
+        QnSleep::msleep(1000);
+    }
+
+    if (needToStop())
+        return;
+
+    QnResource::startCommandProc();
+
+    QnResourcePool::instance(); // to initialize net state;
+
+    QString appserverHostString = qSettings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
+
+    QHostAddress appserverHost;
+    do
+    {
+        appserverHost = resolveHost(appserverHostString);
+    } while (appserverHost.toIPv4Address() == 0);
+
+    while (m_videoServer.isNull())
+    {
+        QnVideoServerResourcePtr server = findServer(appServerConnection);
+
+        if (!server)
+            server = createServer();
+
+        setServerNameAndUrls(server, defaultLocalAddress(appserverHost));
+        server->setNetAddrList(allLocalAddresses());
+
+        if (server->getStorages().isEmpty())
+            server->setStorages(QnAbstractStorageResourceList() << createDefaultStorage());
+
+        m_videoServer = registerServer(appServerConnection, server);
+        if (m_videoServer.isNull())
+            QnSleep::msleep(1000);
+    }
+
+    initAppServerEventConnection(qSettings, m_videoServer);
+    QnEventManager* eventManager = QnEventManager::instance();
+    eventManager->run();
+
+    qnResPool->addResource(m_videoServer);
+
+    m_processor = new QnAppserverResourceProcessor(m_videoServer->getId());
+
+    QUrl rtspUrl(m_videoServer->getUrl());
+    QUrl apiUrl(m_videoServer->getApiUrl());
+
+    m_restServer = new QnRestServer(QHostAddress::Any, apiUrl.port());
+    m_restServer->registerHandler("api/RecordedTimePeriods", new QnRecordedChunkListHandler());
+
+    QByteArray errorString;
+
+    foreach (QnAbstractStorageResourcePtr storage, m_videoServer->getStorages())
+    {
+        qnResPool->addResource(storage);
+        QnStorageResourcePtr physicalStorage = qSharedPointerDynamicCast<QnStorageResource>(storage);
+        if (physicalStorage)
+            qnStorageMan->addStorage(physicalStorage);
+    }
+    qnStorageMan->loadFullFileCatalog();
+
+    QnRecordingManager::instance()->start();
+    qnResPool->addResource(m_videoServer);
+
+    // ------------------------------------------
+
+
+    //===========================================================================
+    //IPPH264Decoder::dll.init();
+
+    //============================
+    QnResourceDiscoveryManager::instance().setServer(true);
+    QnResourceDiscoveryManager::instance().setResourceProcessor(m_processor);
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlArecontResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlAxisResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDlinkResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIqResourceSearcher::instance());
+
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIpWebCamResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDroidResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlISDResourceSearcher::instance());
+
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnTestCameraResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlOnvifWsSearcher::instance());
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlPulseSearcher::instance());
+
+    //
+
+    connect(qnResPool, SIGNAL(statusChanged(QnResourcePtr)), m_processor, SLOT(onResourceStatusChanged(QnResourcePtr)));
+
+    //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
+    //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
+
+    loadResourcesFromECS();
+
+    connect(eventManager, SIGNAL(connectionReset()), this, SLOT(loadResourcesFromECS()));
+
+    /*
+    QnScheduleTaskList scheduleTasks;
+    foreach (const QnScheduleTask &scheduleTask, scheduleTasks)
+    {
+        QString str;
+        QTextStream stream(&str);
+
+        stream << "ScheduleTask "
+               << scheduleTask.getId().toString()
+               << scheduleTask.getAfterThreshold()
+               << scheduleTask.getBeforeThreshold()
+               << scheduleTask.getDayOfWeek()
+               << scheduleTask.getDoRecordAudio()
+               << scheduleTask.getStartTime()
+               << scheduleTask.getEndTime()
+               << scheduleTask.getRecordingType()
+               << scheduleTask.getResourceId().toString();
+        cl_log.log(str, cl_logALWAYS);
+    }
+    */
+
+    QnResourceDiscoveryManager::instance().setReady(true);
+    QnResourceDiscoveryManager::instance().start();
+
+    m_rtspListener = new QnRtspListener(QHostAddress::Any, rtspUrl.port());
+    m_rtspListener->start();
+
+    exec();
+}
 
 class QnVideoService : public QtService<QtSingleCoreApplication>
 {
