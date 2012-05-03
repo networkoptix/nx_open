@@ -15,7 +15,7 @@
 #include <core/resourcemanagment/resource_pool.h>
 
 #include <ui/common/color_transformations.h>
-#include <ui/animation/widget_opacity_animator.h>
+#include <ui/animation/opacity_animator.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/painters/loading_progress_painter.h>

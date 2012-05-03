@@ -2,6 +2,7 @@
 #define _UNIVERSAL_CLIENT_UTIL_H
 
 #include <QString>
+#include "math.h" /* For INT64_MAX. */
 
 template <typename T, size_t N>
 char (&ArraySizeHelper(T (&array)[N]))[N];
@@ -50,38 +51,11 @@ QN_EXPORT QString formatDuration(unsigned position, unsigned total = 0);
  */
 QN_EXPORT QString getParamFromString(const QString& str, const QString& param);
 
-/**
- * \param value                         Value to round up.
- * \param step                          Rounding step, must be power of 2.
- * \returns                             Rounded value.
- */
-inline unsigned int roundUp(unsigned int value, int step) {
-    return ((value-1) & ~(step-1)) + step;
-}
-
-/**
- * \param value                         Value to round down.
- * \param step                          Rounding step, must be power of 2.
- * \returns                             Rounded value.
- */
-inline unsigned int roundDown(unsigned int value, int step) {
-    return value & ~(step-1);
-}
-
-inline quint64 roundUp(quint64 value, int step) {
-    return ((value-1) & ~(step-1)) + step;
-}
-
 QN_EXPORT QString strPadLeft(const QString &str, int len, char ch);
 
 QN_EXPORT QString closeDirPath(const QString& value);
 
 QN_EXPORT qint64 getDiskFreeSpace(const QString& root);
-
-#ifndef INT64_MAX
-static const qint64 INT64_MAX = 0x7fffffffffffffffll;
-static const qint64 INT64_MIN = 0x8000000000000000ll;
-#endif
 
 static const qint64 DATETIME_NOW = INT64_MAX;
 #define DATETIME_NOW DATETIME_NOW /* Get some syntax highlighting. */
@@ -102,37 +76,6 @@ static const qint64 MAX_FIRST_GOP_FRAMES = 250;
 
 static const qint64 MAX_FRAME_DURATION = 5 * 1000;
 static const qint64 MIN_FRAME_DURATION = 15;
-
-#if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
-inline static quint64 htonll(quint64 x)
-{
-    return
-    ((((x) & 0xff00000000000000ULL) >> 56) | 
-    (((x) & 0x00ff000000000000ULL) >> 40) | 
-    (((x) & 0x0000ff0000000000ULL) >> 24) | 
-    (((x) & 0x000000ff00000000ULL) >> 8) | 
-    (((x) & 0x00000000ff000000ULL) << 8) | 
-    (((x) & 0x0000000000ff0000ULL) << 24) | 
-    (((x) & 0x000000000000ff00ULL) << 40) | 
-    (((x) & 0x00000000000000ffULL) << 56));
-}
-inline static quint64 ntohll(quint64 x) { return htonll(x); }
-
-#else
-inline static quint64 htonll(quint64 x) { return x;}
-inline static quint64 ntohll(quint64 x)  { return x;}
-#endif
-
-/**
- * \param value                         Value to check.
- * \param min                           Interval's left border.
- * \param max                           Interval's right border.
- * \returns                             Whether the given value lies in [min, max) interval.
- */
-template<class T>
-bool qBetween(const T &value, const T &min, const T &max) {
-    return min <= value && value < max;
-}
 
 quint64 QN_EXPORT getUsecTimer();
 

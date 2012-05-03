@@ -3,7 +3,7 @@
 #include <QtGui/QStyleOptionSlider>
 #include <QtGui/QGraphicsSceneMouseEvent>
 
-#include <ui/animation/widget_opacity_animator.h>
+#include <ui/animation/opacity_animator.h>
 
 #include "tool_tip_item.h"
 

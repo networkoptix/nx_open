@@ -23,7 +23,7 @@
 #include <ui/animation/viewport_animator.h>
 #include <ui/animation/widget_animator.h>
 #include <ui/animation/curtain_animator.h>
-#include <ui/animation/widget_opacity_animator.h>
+#include <ui/animation/opacity_animator.h>
 
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/instruments/bounding_instrument.h>

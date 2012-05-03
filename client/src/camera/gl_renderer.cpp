@@ -226,7 +226,7 @@ public:
         QSharedPointer<QnGLRendererPrivate> d = m_renderer->d;
 
         QSize textureSize = QSize(
-            d->supportsNonPower2Textures ? roundUp((unsigned)stride / pixelSize, ROUND_COEFF) : minPow2(stride / pixelSize),
+            d->supportsNonPower2Textures ? qPower2Ceil((unsigned)stride / pixelSize, ROUND_COEFF) : minPow2(stride / pixelSize),
             d->supportsNonPower2Textures ? height                                   : minPow2(height)
         );
 
@@ -244,7 +244,7 @@ public:
             textureSize = m_textureSize;
         }
 
-        int roundedWidth = roundUp((unsigned) width, ROUND_COEFF);
+        int roundedWidth = qPower2Ceil((unsigned) width, ROUND_COEFF);
         m_texCoords = QVector2D(
             static_cast<float>(roundedWidth) / textureSize.width(),
             static_cast<float>(height) / textureSize.height()
@@ -536,7 +536,7 @@ void QnGLRenderer::updateTexture()
 
             glTexSubImage2D(GL_TEXTURE_2D, 0,
                             0, 0,
-                            roundUp(r_w[i],ROUND_COEFF),
+                            qPower2Ceil(r_w[i],ROUND_COEFF),
                             h[i],
                             GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels);
 
@@ -587,7 +587,7 @@ void QnGLRenderer::updateTexture()
             if (useSSE2())
             {
                 yuv420_argb32_sse2_intr(pixels, m_curImg->data[0], m_curImg->data[2], m_curImg->data[1],
-                    roundUp(r_w[0],ROUND_COEFF),
+                    qPower2Ceil(r_w[0],ROUND_COEFF),
                     h[0],
                     4 * m_curImg->linesize[0],
                     m_curImg->linesize[0], m_curImg->linesize[1], m_painterOpacity*255);
@@ -601,7 +601,7 @@ void QnGLRenderer::updateTexture()
             if (useSSE2())
             {
                 yuv422_argb32_sse2_intr(pixels, m_curImg->data[0], m_curImg->data[2], m_curImg->data[1],
-                    roundUp(r_w[0],ROUND_COEFF),
+                    qPower2Ceil(r_w[0],ROUND_COEFF),
                     h[0],
                     4 * m_curImg->linesize[0],
                     m_curImg->linesize[0], m_curImg->linesize[1], m_painterOpacity*255);
@@ -615,7 +615,7 @@ void QnGLRenderer::updateTexture()
             if (useSSE2())
             {
                 yuv444_argb32_sse2_intr(pixels, m_curImg->data[0], m_curImg->data[2], m_curImg->data[1],
-                    roundUp(r_w[0],ROUND_COEFF),
+                    qPower2Ceil(r_w[0],ROUND_COEFF),
                     h[0],
                     4 * m_curImg->linesize[0],
                     m_curImg->linesize[0], m_curImg->linesize[1], m_painterOpacity*255);
@@ -640,7 +640,7 @@ void QnGLRenderer::updateTexture()
 
         glTexSubImage2D(GL_TEXTURE_2D, 0,
             0, 0,
-            roundUp(r_w[0],ROUND_COEFF),
+            qPower2Ceil(r_w[0],ROUND_COEFF),
             h[0],
             glRGBFormat(), GL_UNSIGNED_BYTE, pixels);
         glCheckError("glTexSubImage2D");

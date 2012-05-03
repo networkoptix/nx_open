@@ -13,9 +13,7 @@ public:
 
     virtual ~AnimationTimer();
 
-    const QList<AnimationTimerListener *> &listeners() const {
-        return m_listeners;
-    }
+    QList<AnimationTimerListener *> listeners() const;
 
     void addListener(AnimationTimerListener *listener);
 
@@ -49,7 +47,7 @@ public:
      * Resets the stored last tick time of this animation timer.
      * 
      * This function should be called if the "current time" of the time source 
-     * for <tt>tick</tt> calls was forcibly changed.
+     * for <tt>updateCurrentTime</tt> calls was forcibly changed.
      */
     void reset();
 
