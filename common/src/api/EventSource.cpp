@@ -5,7 +5,12 @@
 
 #define QN_EVENT_SOURCE_DEBUG
 
-static const int PING_INTERVAL = 6000;
+/* This interval (2T) has the following semantic:
+    - Server sends us pings every T msecs
+    - We wake up every 2T msecs
+    - If T msecs passed sinse last received ping => emit connectionClosed.
+*/
+static const int PING_INTERVAL = 60000;
 
 void QnJsonStreamParser::addData(const QByteArray& data)
 {
@@ -226,6 +231,7 @@ void QnEventSource::httpReadyRead()
     QVariant parsed;
     while (m_streamParser.nextMessage(parsed))
     {
+        // Restart timer for any event
         m_eventWaitTimer.restart();
 
         QnEvent event;

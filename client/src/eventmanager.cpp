@@ -25,10 +25,10 @@ void QnEventManager::init(const QUrl& url, int timeout)
 {
     m_source = QSharedPointer<QnEventSource>(new QnEventSource(url, timeout));
 
-    connect(m_source.data(), SIGNAL(eventReceived(QnEvent)), this, SLOT(eventReceived(QnEvent)));
-    connect(m_source.data(), SIGNAL(connectionOpened()), this, SLOT(connectionOpened()));
-    connect(m_source.data(), SIGNAL(connectionClosed(QString)), this, SLOT(connectionClosed(QString)));
-    connect(m_source.data(), SIGNAL(connectionReset()), this, SLOT(connectionReset()));
+    connect(m_source.data(), SIGNAL(eventReceived(QnEvent)), this, SLOT(at_eventReceived(QnEvent)));
+    connect(m_source.data(), SIGNAL(connectionOpened()), this, SLOT(at_connectionOpened()));
+    connect(m_source.data(), SIGNAL(connectionClosed(QString)), this, SLOT(at_connectionClosed(QString)));
+    connect(m_source.data(), SIGNAL(connectionReset()), this, SLOT(at_connectionReset()));
 }
 
 QnEventManager::QnEventManager()
@@ -48,7 +48,7 @@ void QnEventManager::stop()
         m_source->stop();
 }
 
-void QnEventManager::resourcesReceived(int status, const QByteArray& errorString, QnResourceList resources, int handle)
+void QnEventManager::at_resourcesReceived(int status, const QByteArray& errorString, QnResourceList resources, int handle)
 {
 	if (status != 0)
 	{
@@ -73,7 +73,7 @@ void QnEventManager::resourcesReceived(int status, const QByteArray& errorString
 	}
 }
 
-void QnEventManager::licensesReceived(int status, const QByteArray &errorString, QnLicenseList licenses, int handle)
+void QnEventManager::at_licensesReceived(int status, const QByteArray &errorString, QnLicenseList licenses, int handle)
 {
     foreach (QnLicensePtr license, licenses.licenses())
     {
@@ -90,7 +90,7 @@ void QnEventManager::licensesReceived(int status, const QByteArray &errorString,
     qnLicensePool->replaceLicenses(licenses);
 }
 
-void QnEventManager::eventReceived(QnEvent event)
+void QnEventManager::at_eventReceived(QnEvent event)
 {
     QByteArray debugStr;
     QTextStream stream(&debugStr);
@@ -104,7 +104,7 @@ void QnEventManager::eventReceived(QnEvent event)
 
     if (event.eventType == QN_EVENT_LICENSE_CHANGE)
     {
-        QnAppServerConnectionFactory::createConnection()->getLicensesAsync(this, SLOT(licensesReceived(int,QByteArray,QnLicenseList,int)));
+        QnAppServerConnectionFactory::createConnection()->getLicensesAsync(this, SLOT(at_licensesReceived(int,QByteArray,QnLicenseList,int)));
     }
 	else if (event.eventType == QN_EVENT_RES_DISABLED_CHANGE)
 	{
@@ -146,7 +146,7 @@ void QnEventManager::eventReceived(QnEvent event)
     else if (event.eventType == QN_EVENT_RES_CHANGE)
     {
         QnAppServerConnectionFactory::createConnection()->
-                getResourcesAsync(QString("id=%1").arg(event.objectId), event.objectNameLower(), this, SLOT(resourcesReceived(int,QByteArray,QnResourceList,int)));
+                getResourcesAsync(QString("id=%1").arg(event.objectId), event.objectNameLower(), this, SLOT(at_resourcesReceived(int,QByteArray,QnResourceList,int)));
     } else if (event.eventType == QN_EVENT_RES_DELETE)
     {
         QnResourcePtr ownResource = qnResPool->getResourceById(event.objectId);
@@ -154,9 +154,15 @@ void QnEventManager::eventReceived(QnEvent event)
     }
 }
 
-void QnEventManager::at_connectionClose(QString errorString)
+void QnEventManager::at_connectionClosed(QString errorString)
 {
     qDebug() << "Connection aborted:" << errorString;
 
     emit connectionClosed();
+}
+
+void QnEventManager::at_connectionReset()
+{
+    QnAppServerConnectionFactory::createConnection()->
+            getResourcesAsync("", "resourceEx", this, SLOT(at_resourcesReceived(int,QByteArray,QnResourceList,int)));
 }

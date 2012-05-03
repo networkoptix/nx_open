@@ -7,7 +7,6 @@
 #include "version.h"
 
 QnAppServerResourceSearcher::QnAppServerResourceSearcher()
-    : m_isFirstTime(true)
 {
 }
 
