@@ -8,6 +8,7 @@
 #include <recording/time_period.h>
 
 class QnTimePeriodLoader;
+class QnMultiCameraTimePeriodLoader;
 
 class QnCachingTimePeriodLoader: public QObject {
     Q_OBJECT;
@@ -51,16 +52,16 @@ protected:
     QnTimePeriod addLoadingMargins(const QnTimePeriod &targetPeriod) const;
 
 private:
-    QnCachingTimePeriodLoader(QnTimePeriodLoader **loaders, QObject *parent);
+    QnCachingTimePeriodLoader(QnMultiCameraTimePeriodLoader **loaders, QObject *parent);
 
     void init();
-    void initLoaders(QnTimePeriodLoader **loaders);
-    static bool createLoaders(const QnResourcePtr &resource, QnTimePeriodLoader **loaders);
+    void initLoaders(QnMultiCameraTimePeriodLoader **loaders);
+    static bool createLoaders(const QnResourcePtr &resource, QnMultiCameraTimePeriodLoader **loaders);
 
 private:
     QnNetworkResourcePtr m_resource;
     QnTimePeriod m_loadedPeriod;
-    QnTimePeriodLoader *m_loaders[Qn::TimePeriodTypeCount];
+    QnMultiCameraTimePeriodLoader *m_loaders[Qn::TimePeriodTypeCount];
     int m_handles[Qn::TimePeriodTypeCount];
     QList<QRegion> m_motionRegions;
     QnTimePeriodList m_periods[Qn::TimePeriodTypeCount];

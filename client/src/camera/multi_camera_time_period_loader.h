@@ -13,12 +13,14 @@ class QnMultiCameraTimePeriodLoader: public QObject
 {
     Q_OBJECT
 public:
-    QnMultiCameraTimePeriodLoader();
+    QnMultiCameraTimePeriodLoader(QnNetworkResourcePtr resource, QObject *parent);
 
-    static QnMultiCameraTimePeriodLoader *instance();
+    //static QnMultiCameraTimePeriodLoader *instance();
+    static QnMultiCameraTimePeriodLoader* newInstance(QnResourcePtr resource, QObject *parent = 0);
 
-    int load(const QnNetworkResourceList &networkResources, const QnTimePeriod &period);
 
+    int load(const QnTimePeriod &period, const QList<QRegion> &motionRegions = QList<QRegion>());
+    QnNetworkResourcePtr resource() const;
 signals:
     void ready(const QnTimePeriodList &timePeriods, int handle);
     void failed(int, int handle);
@@ -26,10 +28,8 @@ signals:
 private slots:
     void onDataLoaded(const QnTimePeriodList &periods, int handle);
     void onLoadingFailed(int code, int handle);
-
 private:
-    int load(QnNetworkResourcePtr netRes, const QnTimePeriod &period);
-
+    int loadInternal(QnNetworkResourcePtr networkResource, const QnTimePeriod &period, const QList<QRegion> &motionRegions);
 private:
     QMutex m_mutex;
     QMap<QnNetworkResourcePtr, QnTimePeriodLoader *> m_cache;
@@ -37,6 +37,7 @@ private:
     QMap<int, QList<int> > m_multiLoadProgress;
     QMap<int, QVector<QnTimePeriodList> > m_multiLoadPeriod;
     int m_multiRequestCount;
+    QnNetworkResourcePtr m_resource;
 };
 
 #endif // QN_MULTI_CAMERA_TIME_PERIOD_LOADER_H

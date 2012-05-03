@@ -35,7 +35,7 @@ QnCameraTimePeriodList::const_iterator QnCameraHistory::getVideoServerOnTimeItr(
     QnCameraTimePeriodList::const_iterator itr = qUpperBound(m_timePeriods.begin(), m_timePeriods.end(), timestamp);
     if (itr != m_timePeriods.begin())
         --itr;
-    if (searchForward && !itr->containTime(timestamp))
+    if (searchForward && timestamp > itr->endTimeMs())
         ++itr;
     return itr;
 }

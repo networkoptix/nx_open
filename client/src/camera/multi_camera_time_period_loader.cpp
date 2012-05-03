@@ -4,18 +4,33 @@
 #include "core/resourcemanagment/resource_pool.h"
 #include "core/resource/camera_history.h"
 
-QnMultiCameraTimePeriodLoader::QnMultiCameraTimePeriodLoader():
+QnMultiCameraTimePeriodLoader::QnMultiCameraTimePeriodLoader(QnNetworkResourcePtr resource, QObject *parent):
+    QObject(parent),
     m_mutex(QMutex::Recursive),
     m_multiRequestCount(0)
-{}
 
+{
+    m_resource = resource;
+}
+
+/*
 Q_GLOBAL_STATIC(QnMultiCameraTimePeriodLoader, qn_multiCameraTimePeriodLoaderInstance);
 QnMultiCameraTimePeriodLoader *QnMultiCameraTimePeriodLoader::instance()
 {
     return qn_multiCameraTimePeriodLoaderInstance();
 }
+*/
 
-int QnMultiCameraTimePeriodLoader::load(const QnNetworkResourceList &networkResources, const QnTimePeriod &period)
+QnMultiCameraTimePeriodLoader* QnMultiCameraTimePeriodLoader::newInstance(QnResourcePtr resource, QObject *parent)
+{
+    QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource> (resource);
+    if (netRes == NULL)
+        return 0;
+    return new QnMultiCameraTimePeriodLoader(netRes, parent);
+}
+
+
+int QnMultiCameraTimePeriodLoader::load(const QnTimePeriod &period, const QList<QRegion> &motionRegions)
 {
     if (period.isNull()) {
         qnNullWarning(period);
@@ -24,17 +39,16 @@ int QnMultiCameraTimePeriodLoader::load(const QnNetworkResourceList &networkReso
 
     QMutexLocker lock(&m_mutex);
     QList<int> hList;
-    foreach(const QnNetworkResourcePtr& netRes, networkResources)
+    
+    // sometime camera moved between media server. Get all servers for requested time period
+    QList<QnNetworkResourcePtr> cameraList = QnCameraHistoryPool::instance()->getAllCamerasWithSameMac(m_resource, period);
+    foreach(const QnNetworkResourcePtr& camera, cameraList)
     {
-        // sometime camera moved between media server. Get all servers for requested time period
-        QList<QnNetworkResourcePtr> cameraList = QnCameraHistoryPool::instance()->getAllCamerasWithSameMac(netRes, period);
-        foreach(const QnNetworkResourcePtr& camera, cameraList)
-        {
-            int handle = load(camera, period);
-            if (handle > 0)
-                hList << handle;
-        }
+        int handle = loadInternal(camera, period, motionRegions);
+        if (handle > 0)
+            hList << handle;
     }
+
     if (hList.isEmpty())
         return -1;
     int multiHandle = ++m_multiRequestCount;
@@ -42,7 +56,7 @@ int QnMultiCameraTimePeriodLoader::load(const QnNetworkResourceList &networkReso
     return multiHandle;
 }
 
-int QnMultiCameraTimePeriodLoader::load(QnNetworkResourcePtr networkResource, const QnTimePeriod &period)
+int QnMultiCameraTimePeriodLoader::loadInternal(QnNetworkResourcePtr networkResource, const QnTimePeriod &period, const QList<QRegion> &motionRegions)
 {
     QMutexLocker lock(&m_mutex);
     QnTimePeriodLoader *loader;
@@ -58,7 +72,7 @@ int QnMultiCameraTimePeriodLoader::load(QnNetworkResourcePtr networkResource, co
 
         m_cache.insert(networkResource, loader);
     }
-    return loader->load(period, QList<QRegion>());
+    return loader->load(period, motionRegions);
 }
 
 void QnMultiCameraTimePeriodLoader::onDataLoaded(const QnTimePeriodList &periods, int handle)
@@ -106,3 +120,7 @@ void QnMultiCameraTimePeriodLoader::onLoadingFailed(int status, int handle)
     }
 }
 
+QnNetworkResourcePtr QnMultiCameraTimePeriodLoader::resource() const
+{
+    return m_resource;
+}

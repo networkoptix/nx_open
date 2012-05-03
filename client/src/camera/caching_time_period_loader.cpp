@@ -6,6 +6,7 @@
 #include <utils/common/synctime.h>
 
 #include "time_period_loader.h"
+#include "multi_camera_time_period_loader.h"
 
 namespace {
     qint64 minLoadingMargin = 60 * 60 * 1000; /* 1 hour. */
@@ -30,7 +31,7 @@ QnCachingTimePeriodLoader::QnCachingTimePeriodLoader(const QnNetworkResourcePtr 
     }
 }
 
-QnCachingTimePeriodLoader::QnCachingTimePeriodLoader(QnTimePeriodLoader **loaders, QObject *parent):
+QnCachingTimePeriodLoader::QnCachingTimePeriodLoader(QnMultiCameraTimePeriodLoader **loaders, QObject *parent):
     QObject(parent),
     m_resource(loaders[0]->resource())
 {
@@ -58,9 +59,9 @@ void QnCachingTimePeriodLoader::init() {
     }
 }
 
-void QnCachingTimePeriodLoader::initLoaders(QnTimePeriodLoader **loaders) {
+void QnCachingTimePeriodLoader::initLoaders(QnMultiCameraTimePeriodLoader **loaders) {
     for(int i = 0; i < Qn::TimePeriodTypeCount; i++) {
-        QnTimePeriodLoader *loader = loaders[i];
+        QnMultiCameraTimePeriodLoader *loader = loaders[i];
         m_loaders[i] = loader;
 
         if(loader) {
@@ -72,13 +73,13 @@ void QnCachingTimePeriodLoader::initLoaders(QnTimePeriodLoader **loaders) {
     }
 }
 
-bool QnCachingTimePeriodLoader::createLoaders(const QnResourcePtr &resource, QnTimePeriodLoader **loaders) {
+bool QnCachingTimePeriodLoader::createLoaders(const QnResourcePtr &resource, QnMultiCameraTimePeriodLoader **loaders) {
     for(int i = 0; i < Qn::TimePeriodTypeCount; i++)
         loaders[i] = NULL;
 
     bool success = true;
     for(int i = 0; i < Qn::TimePeriodTypeCount; i++) {
-        loaders[i] = QnTimePeriodLoader::newInstance(resource);
+        loaders[i] = QnMultiCameraTimePeriodLoader::newInstance(resource);
         if(!loaders[i]) {
             success = false;
             break;
@@ -94,7 +95,7 @@ bool QnCachingTimePeriodLoader::createLoaders(const QnResourcePtr &resource, QnT
 }
 
 QnCachingTimePeriodLoader *QnCachingTimePeriodLoader::newInstance(const QnResourcePtr &resource, QObject *parent) {
-    QnTimePeriodLoader *loaders[Qn::TimePeriodTypeCount];
+    QnMultiCameraTimePeriodLoader *loaders[Qn::TimePeriodTypeCount];
     if(createLoaders(resource, loaders))
         return new QnCachingTimePeriodLoader(loaders, parent);
 }
@@ -173,7 +174,7 @@ QnTimePeriod QnCachingTimePeriodLoader::addLoadingMargins(const QnTimePeriod &ta
 }
 
 void QnCachingTimePeriodLoader::load(Qn::TimePeriodType type) {
-    QnTimePeriodLoader *loader = m_loaders[type];
+    QnMultiCameraTimePeriodLoader *loader = m_loaders[type];
     if(!loader) {
         qnWarning("No valid loader in scope.");
         emit loadingFailed();
