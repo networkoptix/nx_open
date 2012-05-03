@@ -203,15 +203,16 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     processor->setMaxSpeedMagnitude(degreesFor2x * 8);
     processor->setSpeedCuttingThreshold(degreesFor2x / 3);
     processor->setFlags(KineticProcessor::IGNORE_DELTA_TIME);
+    registerAnimation(processor);
 
     /* Prepare animation timer listener. */
     startListening();
+    registerAnimation(this);
 
     /* Run handlers. */
     updateSteps();
     updateMinimalWindow();
     sliderChange(SliderRangeChange);
-    itemChange(ItemSceneHasChanged, QVariant::fromValue<QGraphicsScene *>(scene()));
 }
 
 QnTimeSlider::~QnTimeSlider() {
@@ -1115,17 +1116,6 @@ void QnTimeSlider::sliderChange(SliderChange change) {
     default:
         break;
     }
-}
-
-QVariant QnTimeSlider::itemChange(GraphicsItemChange change, const QVariant &value) {
-    if(change == ItemSceneHasChanged) {
-        AnimationTimer *timer = InstrumentManager::animationTimerOf(scene());
-
-        setTimer(timer);
-        kineticProcessor()->setTimer(timer);
-    }
-    
-    return base_type::itemChange(change, value);
 }
 
 void QnTimeSlider::wheelEvent(QGraphicsSceneWheelEvent *event) {

@@ -1,18 +1,21 @@
 #include "image_button_widget.h"
+
 #include <cassert>
-#include <QPainter>
-#include <QIcon>
-#include <QAction>
-#include <QStyle>
-#include <QGLContext>
+
+#include <QtGui/QPainter>
+#include <QtGui/QIcon>
+#include <QtGui/QAction>
+#include <QtGui/QStyle>
+#include <QtOpenGL/QGLContext>
+
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/checked_cast.h>
+
 #include <ui/animation/accessor.h>
 #include <ui/animation/variant_animator.h>
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
-#include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/shaders/texture_transition_shader_program.h>
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
@@ -88,12 +91,10 @@ QnImageButtonWidget::QnImageButtonWidget(QGraphicsItem *parent):
     m_animator->setTargetObject(this);
     m_animator->setAccessor(new QnImageButtonHoverProgressAccessor());
     m_animator->setSpeed(1000.0 / qnGlobals->opacityChangePeriod());
+    registerAnimation(m_animator);
 
     /* When hovering over a button, a cursor should always change to arrow pointer. */
     setCursor(Qt::ArrowCursor);
-
-    /* Perform handler-based initialization. */
-    itemChange(ItemSceneHasChanged, QVariant::fromValue<QGraphicsScene *>(scene()));
 
     QEvent styleChange(QEvent::StyleChange);
     event(&styleChange);
@@ -418,9 +419,6 @@ bool QnImageButtonWidget::event(QEvent *event) {
 
 QVariant QnImageButtonWidget::itemChange(GraphicsItemChange change, const QVariant &value) {
     switch(change) {
-    case ItemSceneHasChanged:
-        m_animator->setTimer(InstrumentManager::animationTimerOf(scene()));
-        break;
     case ItemEnabledHasChanged:
         updateState(isDisabled() ? (m_state | DISABLED) : (m_state & ~DISABLED));
         break;

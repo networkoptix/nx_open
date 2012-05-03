@@ -3,7 +3,9 @@
 #include <QAbstractAnimation>
 #include <utils/common/warnings.h>
 
-
+// -------------------------------------------------------------------------- //
+// AnimationTimerListener
+// -------------------------------------------------------------------------- //
 AnimationTimerListener::AnimationTimerListener():
     m_timer(NULL),
     m_listening(false)
@@ -42,6 +44,10 @@ void AnimationTimerListener::setTimer(AnimationTimer *timer) {
     } 
 }
 
+
+// -------------------------------------------------------------------------- //
+// AnimationTimer
+// -------------------------------------------------------------------------- //
 AnimationTimer::AnimationTimer():
     m_lastTickTime(-1),
     m_deactivated(false),
@@ -108,6 +114,17 @@ void AnimationTimer::updateCurrentTime(qint64 time) {
     }
 
     m_lastTickTime = time;
+}
+
+QList<AnimationTimerListener *> AnimationTimer::listeners() const {
+    QList<AnimationTimerListener *> result = m_listeners;
+
+    /* Remove manually so that list does not detach if there is nothing to remove. */
+    for(int i = result.size() - 1; i >= 0; i--)
+        if(result[i] == NULL)
+            result.removeAt(i);
+
+    return result;
 }
 
 void AnimationTimer::clearListeners() {

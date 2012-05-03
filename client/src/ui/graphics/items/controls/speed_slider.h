@@ -3,52 +3,60 @@
 
 #include "tool_tip_slider.h"
 
-class QPropertyAnimation;
+#include <QtCore/QBasicTimer>
 
-class QnSpeedSlider: public QnToolTipSlider {
+#include <ui/animation/animated.h>
+
+class VariantAnimator;
+
+class QnSpeedSlider: public Animated<QnToolTipSlider> {
     Q_OBJECT;
     Q_PROPERTY(qreal speed READ speed WRITE setSpeed);
 
-    typedef QnToolTipSlider base_type;
+    typedef Animated<QnToolTipSlider> base_type;
 
 public:
-    enum Precision { 
-        LowPrecision, 
-        HighPrecision 
-    };
-
     explicit QnSpeedSlider(QGraphicsItem *parent = NULL);
     virtual ~QnSpeedSlider();
 
-    Precision precision() const;
-    void setPrecision(Precision precision);
-
     qreal speed() const;
-
-public slots:
+    void setSpeed(qreal speed);
     void resetSpeed();
-    void setSpeed(qreal value);
+    qreal roundedSpeed() const;
 
-    void speedDown();
-    void speedUp();
+    qreal minimalSpeed() const;
+    void setMinimalSpeed(qreal minimalSpeed);
+
+    qreal maximalSpeed() const;
+    void setMaximalSpeed(qreal maximalSpeed);
+
+    void setSpeedRange(qreal minimalSpeed, qreal maximalSpeed);
+
+    qreal defaultSpeed() const;
+    void setDefaultSpeed(qreal defaultSpeed);
+
+    qreal minimalSpeedStep() const;
+    void setMinimalSpeedStep(qreal minimalSpeedStep);
 
 signals:
-    void speedChanged(qreal newSpeed);
-
-    void frameBackward();
-    void frameForward();
+    void speedChanged(qreal speed);
+    void roundedSpeedChanged(qreal roundedSpeed);
 
 protected:
     virtual void sliderChange(SliderChange change) override;
-    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
     virtual void timerEvent(QTimerEvent *event) override;
-    virtual void wheelEvent(QGraphicsSceneWheelEvent *e) override;
+    virtual void wheelEvent(QGraphicsSceneWheelEvent *event) override;
+
+protected slots:
+    void restartSpeedAnimation();
 
 private:
-    Precision m_precision;
-    QPropertyAnimation *m_animation;
-    int m_wheelStuckedTimerId;
-    bool m_wheelStucked;
+    qreal m_roundedSpeed;
+    qreal m_minimalSpeedStep;
+    qreal m_defaultSpeed;
+    VariantAnimator *m_animator;
+    QBasicTimer m_wheelStuckTimer;
+    bool m_wheelStuck;
 };
 
 #endif // QN_SPEED_SLIDER_H

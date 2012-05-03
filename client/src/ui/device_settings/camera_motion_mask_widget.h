@@ -37,6 +37,7 @@ public:
     void setMotionSensitivity(int value);
 
     void setNeedControlMaxRects(bool value);
+
 signals:
     void motionRegionListChanged();
 

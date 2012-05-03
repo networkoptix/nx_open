@@ -25,7 +25,7 @@
 
 #include <ui/animation/viewport_animator.h>
 #include <ui/animation/animator_group.h>
-#include <ui/animation/widget_opacity_animator.h>
+#include <ui/animation/opacity_animator.h>
 
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/instruments/ui_elements_instrument.h>

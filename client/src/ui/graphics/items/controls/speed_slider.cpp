@@ -1,163 +1,197 @@
 #include "speed_slider.h"
 
-#include <QtCore/QPropertyAnimation>
-
 #include <QtGui/QGraphicsSceneMouseEvent>
 
 #include <utils/common/warnings.h>
+#include <utils/common/math.h>
 
-static const struct Preset {
-    int size;
-    int defaultIndex;
-    qreal preset[10];
-} presets[] = {
-    { 10, 5, { -16.0, -8.0, -4.0, -2.0, -1.0, 1.0, 2.0, 4.0, 8.0, 16.0 } },  // LowPrecision
-    { 9, 4, { -2.0, -1.0, -0.5, -0.25, 0.0, 0.25, 0.5, 1.0, 2.0 } }          // HighPrecision
-};
-static inline int idx2pos(int idx) { return idx * 10 + 5; }
-static inline int pos2idx(int pos) { return pos / 10; }
+#include <ui/animation/variant_animator.h>
+
+namespace {
+    inline qint64 speedToPosition(qreal speed, qreal minimalStep) {
+        if(speed < -minimalStep) {
+            return static_cast<qint64>((std::log(speed / -minimalStep) / M_LN2  + 1.0) * -1000.0);
+        } else if(speed < 1.0) {
+            return static_cast<qint64>((speed / minimalStep) * 1000.0);
+        } else {
+            return static_cast<qint64>((std::log(speed /  minimalStep) / M_LN2 + 1.0) *  1000.0);
+        }
+    }
+
+    inline qreal positionToSpeed(qint64 position, qreal minimalStep) {
+        if(position < -1000) {
+            return std::exp(M_LN2 * (position / -1000.0 - 1.0)) * -minimalStep;
+        } else if(position < 1000) {
+            return position / 1000.0 * minimalStep;
+        } else {
+            return std::exp(M_LN2 * (position /  1000.0 - 1.0)) *  minimalStep;
+        }
+    }
+
+
+} // anonymous namespace
+
 
 QnSpeedSlider::QnSpeedSlider(QGraphicsItem *parent): 
     base_type(parent),
-    m_precision(HighPrecision),
-    m_animation(0),
-    m_wheelStuckedTimerId(0),
-    m_wheelStucked(false)
+    m_wheelStuck(false),
+    m_roundedSpeed(0.0),
+    m_minimalSpeedStep(1.0),
+    m_defaultSpeed(1.0),
+    m_animator(new VariantAnimator(this))
 {
-    setSingleStep(5);
-    setPageStep(10);
-    setTickInterval(10);
     setTickPosition(GraphicsSlider::NoTicks);
+    setSpeedRange(-16.0, 16.0);
+    setSpeed(1.0);
 
-    setPrecision(LowPrecision);
+    /* Set up animator. */
+    m_animator->setTargetObject(this);
+    m_animator->setAccessor(new PropertyAccessor("value"));
+    m_animator->setTimeLimit(500);
+    m_animator->setSpeed(5000.0);
+    registerAnimation(m_animator);
 
-    /* Update tooltip text. */
+    /* Set up handlers. */
+    connect(this, SIGNAL(sliderReleased()), this, SLOT(restartSpeedAnimation()));
+
+    /* Make sure that tooltip text is updated. */
     sliderChange(SliderValueChange);
 }
 
 QnSpeedSlider::~QnSpeedSlider() {
-    if (m_animation) {
-        m_animation->stop();
-        delete m_animation;
-    }
-
-    if (m_wheelStuckedTimerId) {
-        killTimer(m_wheelStuckedTimerId);
-        m_wheelStuckedTimerId = 0;
-    }
-}
-
-QnSpeedSlider::Precision QnSpeedSlider::precision() const {
-    return m_precision;
-}
-
-void QnSpeedSlider::setPrecision(QnSpeedSlider::Precision precision) {
-    if (m_precision == precision)
-        return;
-
-    m_precision = precision;
-
-    setRange(idx2pos(0), idx2pos(presets[m_precision].size - 1));
-    resetSpeed();
-}
-
-qreal QnSpeedSlider::speed() const {
-    const Preset &preset = presets[m_precision];
-
-    int idx = qBound(0, pos2idx(value()), preset.size);
-    return preset.preset[idx];
-}
-
-void QnSpeedSlider::resetSpeed() {
-    setSliderPosition(idx2pos(presets[m_precision].defaultIndex));
-}
-
-void QnSpeedSlider::speedDown() {
-    triggerAction(SliderPageStepSub);
-}
-
-void QnSpeedSlider::speedUp() {
-    triggerAction(SliderPageStepAdd);
-}
-
-void QnSpeedSlider::sliderChange(SliderChange change) {
-    base_type::sliderChange(change);
-
-    if (change == SliderValueChange || change == SliderRangeChange) {
-        qreal speed = this->speed();
-        setToolTip(!qFuzzyIsNull(speed) ? tr("%1x").arg(speed) : tr("Paused"));
-        emit speedChanged(speed);
-    }
-}
-
-void QnSpeedSlider::setSpeed(qreal value) {
-    const Preset &preset = presets[m_precision];
-    for (int i = 0; i < preset.size; i++) {
-        if (qFuzzyCompare(preset.preset[i], value)) {
-            int pos = idx2pos(i);
-            setValue(pos);
-            return;
-        }
-    }
-    qnWarning("Unsupported value '%1' for speed slider", value);
     return;
 }
 
-void QnSpeedSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
-    base_type::mouseReleaseEvent(event);
+qreal QnSpeedSlider::speed() const {
+    return positionToSpeed(value(), m_minimalSpeedStep);
+}
 
-    if (event->isAccepted() && value() != 10) {
-        if (m_animation)
-            delete m_animation;
+qreal QnSpeedSlider::roundedSpeed() const {
+    return positionToSpeed(qRound(value(), 1000ll), m_minimalSpeedStep);
+}
 
-        m_animation = new QPropertyAnimation(this, "value", this);
-        m_animation->setEasingCurve(QEasingCurve::OutQuad);
-        m_animation->setDuration(500);
-        m_animation->setEndValue(idx2pos(presets[m_precision].defaultIndex));
-        m_animation->start();
+void QnSpeedSlider::setSpeed(qreal speed) {
+    setValue(speedToPosition(speed, m_minimalSpeedStep));
+}
+
+void QnSpeedSlider::resetSpeed() {
+    setSpeed(m_defaultSpeed);
+}
+
+qreal QnSpeedSlider::minimalSpeed() const {
+    return positionToSpeed(minimum(), m_minimalSpeedStep);
+}
+
+void QnSpeedSlider::setMinimalSpeed(qreal minimalSpeed) {
+    setSpeedRange(minimalSpeed, qMax(maximalSpeed(), minimalSpeed));
+}
+
+qreal QnSpeedSlider::maximalSpeed() const {
+    return positionToSpeed(maximum(), m_minimalSpeedStep);
+}
+
+void QnSpeedSlider::setMaximalSpeed(qreal maximalSpeed) {
+    setSpeedRange(qMin(minimalSpeed(), maximalSpeed), maximalSpeed);
+}
+
+void QnSpeedSlider::setSpeedRange(qreal minimalSpeed, qreal maximalSpeed) {
+    maximalSpeed = qMax(minimalSpeed, maximalSpeed);
+
+    setRange(speedToPosition(minimalSpeed, m_minimalSpeedStep), speedToPosition(maximalSpeed, m_minimalSpeedStep));
+}
+
+qreal QnSpeedSlider::defaultSpeed() const {
+    return m_defaultSpeed;
+}
+
+void QnSpeedSlider::setDefaultSpeed(qreal defaultSpeed) {
+    defaultSpeed = qBound(minimalSpeed(), defaultSpeed, maximalSpeed());
+
+    m_defaultSpeed = defaultSpeed;
+
+    if(m_animator->isRunning())
+        restartSpeedAnimation();
+}
+
+qreal QnSpeedSlider::minimalSpeedStep() const {
+    return m_minimalSpeedStep;
+}
+
+void QnSpeedSlider::setMinimalSpeedStep(qreal minimalSpeedStep) {
+    if(minimalSpeedStep <= 0.0 || qFuzzyIsNull(minimalSpeedStep)) {
+        qnWarning("Invalid minimal speed step '%1'.", minimalSpeedStep);
+        return;
+    }
+    
+    if(qFuzzyCompare(m_minimalSpeedStep, minimalSpeedStep))
+        return;
+
+    qreal oldMinimalSpeed = minimalSpeed();
+    qreal oldMaximalSpeed = maximalSpeed();
+    qreal oldSpeed = speed();
+
+    m_minimalSpeedStep = minimalSpeedStep;
+
+    setSpeedRange(oldMinimalSpeed, oldMaximalSpeed);
+    setSpeed(oldSpeed);
+
+    if(m_animator->isRunning())
+        restartSpeedAnimation();
+}
+
+void QnSpeedSlider::restartSpeedAnimation() {
+    m_animator->animateTo(speedToPosition(m_defaultSpeed, m_minimalSpeedStep));
+}
+
+
+// -------------------------------------------------------------------------- //
+// Handlers
+// -------------------------------------------------------------------------- //
+void QnSpeedSlider::sliderChange(SliderChange change) {
+    base_type::sliderChange(change);
+
+    if (change == SliderValueChange) {
+        emit speedChanged(speed());
+
+        qreal roundedSpeed = this->roundedSpeed();
+        if(!qFuzzyCompare(roundedSpeed, m_roundedSpeed)) {
+            m_roundedSpeed = roundedSpeed;
+
+            setToolTip(!qFuzzyIsNull(roundedSpeed) ? tr("%1x").arg(roundedSpeed) : tr("Paused"));
+
+            emit roundedSpeedChanged(roundedSpeed);
+        }
     }
 }
 
-void QnSpeedSlider::wheelEvent(QGraphicsSceneWheelEvent *e) {
-    e->accept();
+void QnSpeedSlider::wheelEvent(QGraphicsSceneWheelEvent *event) {
+    event->accept();
 
-    if (m_precision == HighPrecision && (e->modifiers() & Qt::ControlModifier) == 0) {
-        int delta = e->delta();
-        // in Qt scrolling to the right gives negative values.
-        if (e->orientation() == Qt::Horizontal)
-            delta = -delta;
-        for (int i = qAbs(delta / 120); i > 0; --i)
-            QMetaObject::invokeMethod(this, delta < 0 ? "frameBackward" : "frameForward", Qt::QueuedConnection); // TODO: wtf?
-        return;
-    }
-
-    if (m_wheelStucked)
+    if (m_wheelStuck)
         return;
 
-    // make a gap around the default value
     setTracking(false);
-    const int oldPosition = sliderPosition();
 
-    base_type::wheelEvent(e);
+    /* Wheel should snap to default speed. */
+    const qint64 oldPosition = sliderPosition();
+    base_type::wheelEvent(event);
+    const qint64 newPosition = sliderPosition();
 
-    const int newPosition = sliderPosition();
-    const int defaultPosition = idx2pos(presets[m_precision].defaultIndex);
-    if ((oldPosition < defaultPosition && defaultPosition <= newPosition)
-        || (oldPosition > defaultPosition && defaultPosition >= newPosition)) {
+    const qint64 defaultPosition = speedToPosition(m_defaultSpeed, m_minimalSpeedStep);
+    if ((oldPosition < defaultPosition && defaultPosition <= newPosition) || (oldPosition > defaultPosition && defaultPosition >= newPosition)) {
         setSliderPosition(defaultPosition);
-        m_wheelStucked = true;
-        m_wheelStuckedTimerId = startTimer(500);
+        m_wheelStuck = true;
+        m_wheelStuckTimer.start(500, this);
     }
+
     setTracking(true);
     triggerAction(SliderMove);
 }
 
 void QnSpeedSlider::timerEvent(QTimerEvent *event) {
-    if (event->timerId() == m_wheelStuckedTimerId) {
-        killTimer(m_wheelStuckedTimerId);
-        m_wheelStuckedTimerId = 0;
-
-        m_wheelStucked = false;
+    if (event->timerId() == m_wheelStuckTimer.timerId()) {
+        m_wheelStuckTimer.stop();
+        m_wheelStuck = false;
     }
 
     base_type::timerEvent(event);

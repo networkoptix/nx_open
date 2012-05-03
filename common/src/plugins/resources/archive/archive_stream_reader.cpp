@@ -193,9 +193,29 @@ bool QnArchiveStreamReader::init()
 {
     setCurrentTime(0);
 
-    if (m_requiredJumpTime != AV_NOPTS_VALUE) {
-        if (m_delegate->seek(m_requiredJumpTime, false) > 0)
-            m_requiredJumpTime = AV_NOPTS_VALUE;
+	m_jumpMtx.lock();
+	qint64 requiredJumpTime = m_requiredJumpTime;
+	m_jumpMtx.unlock();
+    if (requiredJumpTime != AV_NOPTS_VALUE) 
+	{
+		while (1)
+		{
+			if (m_delegate->seek(requiredJumpTime, false) > 0) 
+			{
+				m_jumpMtx.lock();
+				if (m_requiredJumpTime == requiredJumpTime) {
+					m_requiredJumpTime = AV_NOPTS_VALUE;
+					m_jumpMtx.unlock();
+					emit jumpOccured(requiredJumpTime);
+				}
+				else {
+					requiredJumpTime = m_requiredJumpTime;
+					m_jumpMtx.unlock();
+					continue; // race condition, jump to new position again
+				}
+			}
+			break;
+		}
     }
 
     if (!m_delegate->open(m_resource))

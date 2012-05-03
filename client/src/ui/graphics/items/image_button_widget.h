@@ -1,9 +1,11 @@
 #ifndef QN_IMAGE_BUTTON_WIDGET_H
 #define QN_IMAGE_BUTTON_WIDGET_H
 
-#include <QGraphicsWidget>
-#include <QPixmap>
+#include <QtGui/QGraphicsWidget>
+#include <QtGui/QPixmap>
+
 #include <ui/processors/clickable.h>
+#include <ui/animation/animated.h>
 
 class QAction;
 class QMenu;
@@ -16,7 +18,7 @@ class QnGlFunctions;
 /**
  * A lightweight button widget that does not use style for painting. 
  */
-class QnImageButtonWidget: public Clickable<QGraphicsWidget> {
+class QnImageButtonWidget: public Animated<Clickable<QGraphicsWidget> > {
     Q_OBJECT;
     Q_FLAGS(StateFlags StateFlag);
     Q_PROPERTY(bool checkable READ isCheckable WRITE setCheckable);
@@ -24,7 +26,7 @@ class QnImageButtonWidget: public Clickable<QGraphicsWidget> {
     Q_PROPERTY(bool cached READ isCached WRITE setCached);
     Q_PROPERTY(qreal animationSpeed READ animationSpeed WRITE setAnimationSpeed);
 
-    typedef Clickable<QGraphicsWidget> base_type;
+    typedef Animated<Clickable<QGraphicsWidget> > base_type;
 
 public:
     enum StateFlag {

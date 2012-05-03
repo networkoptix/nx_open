@@ -14,6 +14,8 @@ class QVector4D;
 class QColor;
 
 int linearCombine(qreal a, int x, qreal b, int y);
+long linearCombine(qreal a, long x, qreal b, long y);
+long long linearCombine(qreal a, long long x, qreal b, long long y);
 float linearCombine(qreal a, float x, qreal b, float y);
 double linearCombine(qreal a, double x, qreal b, double y);
 QPointF linearCombine(qreal a, const QPointF &x, qreal b, const QPointF &y);

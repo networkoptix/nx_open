@@ -4,7 +4,7 @@
 #ifdef _MSC_VER
 #   include <cfloat>
 
-bool qnIsFinite(double value) {
+inline bool qnIsFinite(double value) {
     switch(_fpclass(value)) {
     case _FPCLASS_SNAN:
     case _FPCLASS_QNAN:
@@ -19,7 +19,7 @@ bool qnIsFinite(double value) {
 #else
 #   include <cmath>
 
-bool qnIsFinite(double value) {
+inline bool qnIsFinite(double value) {
     switch(std::fpclassify(value)) {
     case FP_NAN:
     case FP_INFINITE:

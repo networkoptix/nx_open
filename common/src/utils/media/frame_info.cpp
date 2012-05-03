@@ -25,10 +25,10 @@ const __m128i  sse_000000ffw_intrs = _mm_setr_epi32(0x000000ff, 0x000000ff, 0x00
 void downscalePlate_factor2_sse2_intr(unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
                                 const unsigned int width, const unsigned int src_stride, unsigned int height, int fillter)
 {
-    Q_ASSERT(roundUp(width, 16) <= src_stride && roundUp(width/2,16) <= dst_stride);
+    Q_ASSERT(qPower2Ceil(width, 16) <= src_stride && qPower2Ceil(width/2,16) <= dst_stride);
 
     const __m128i color_const_intrs = _mm_setr_epi16(fillter, fillter, fillter, fillter, fillter, fillter, fillter, fillter); /* SSE2. */
-    int xSteps = roundUp(width, 16) / 16;
+    int xSteps = qPower2Ceil(width, 16) / 16;
     const unsigned char* src_line1 = src;
     const unsigned char* src_line2 = src_line1 + src_stride;
 
@@ -78,10 +78,10 @@ void downscalePlate_factor2_sse2_intr(unsigned char * dst, const unsigned int ds
 void downscalePlate_factor4_ssse3_intr(unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
                                      const unsigned int width, const unsigned int src_stride, unsigned int height, int filler)
 {
-    Q_ASSERT(roundUp(width, 16) <= src_stride && roundUp(width/4,8) <= dst_stride);
+    Q_ASSERT(qPower2Ceil(width, 16) <= src_stride && qPower2Ceil(width/4,8) <= dst_stride);
 
     const __m128i color_const_intrs = _mm_setr_epi16(filler, filler, filler, filler, filler, filler, filler, filler); /* SSE2. */
-    int xSteps = roundUp(width, 16) / 16;
+    int xSteps = qPower2Ceil(width, 16) / 16;
     const unsigned char* src_line1 = src;
     const unsigned char* src_line2 = src_line1 + src_stride*3;
 
@@ -125,10 +125,10 @@ void downscalePlate_factor4_ssse3_intr(unsigned char * dst, const unsigned int d
 void downscalePlate_factor8_sse41_intr(unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
                                      const unsigned int width, const unsigned int src_stride, unsigned int height, int filler)
 {
-    Q_ASSERT(roundUp(width, 16) <= src_stride && roundUp(width/8,4) <= dst_stride);
+    Q_ASSERT(qPower2Ceil(width, 16) <= src_stride && qPower2Ceil(width/8,4) <= dst_stride);
 
     const __m128i color_const_intrs = _mm_setr_epi16(filler, filler, filler, filler, filler, filler, filler, filler); /* SSE2. */
-    int xSteps = roundUp(width, 16) / 16;
+    int xSteps = qPower2Ceil(width, 16) / 16;
     const unsigned char* src_line1 = src;
     const unsigned char* src_line2 = src_line1 + src_stride*7;
 
@@ -292,7 +292,7 @@ void CLVideoDecoderOutput::reallocate(int newWidth, int newHeight, int newFormat
     format = newFormat;
 
     int rc = 32 >> (newFormat == PIX_FMT_RGBA || newFormat == PIX_FMT_ABGR || newFormat == PIX_FMT_BGRA ? 2 : 0);
-    int roundWidth = roundUp((unsigned) width, rc);
+    int roundWidth = qPower2Ceil((unsigned) width, rc);
     int numBytes = avpicture_get_size((PixelFormat) format, roundWidth, height);
     if (numBytes > 0) {
         avpicture_fill((AVPicture*) this, (quint8*) av_malloc(numBytes), (PixelFormat) format, roundWidth, height);
