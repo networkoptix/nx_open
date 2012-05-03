@@ -41,6 +41,8 @@ namespace {
         Storage() {
             add(new NoopLinearCombinator());
             add(new StandardLinearCombinator<int>());
+            add(new StandardLinearCombinator<long>());
+            add(new StandardLinearCombinator<long long>());
             add(new StandardLinearCombinator<float>());
             add(new StandardLinearCombinator<double>());
             add(new StandardLinearCombinator<QPointF>());
@@ -103,6 +105,14 @@ void LinearCombinator::initZero() {
 }
 
 int linearCombine(qreal a, int x, qreal b, int y) {
+    return linearCombineInternal(a, x, b, y);
+}
+
+long linearCombine(qreal a, long x, qreal b, long y) {
+    return linearCombineInternal(a, x, b, y);
+}
+
+long long linearCombine(qreal a, long long x, qreal b, long long y) {
     return linearCombineInternal(a, x, b, y);
 }
 

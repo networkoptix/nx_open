@@ -17,6 +17,8 @@ class QColor;
 class QVariant;
 
 qreal calculateMagnitude(int value);
+qreal calculateMagnitude(long value);
+qreal calculateMagnitude(long long value);
 qreal calculateMagnitude(float value);
 qreal calculateMagnitude(double value);
 qreal calculateMagnitude(const QPoint &value);
