@@ -18,6 +18,7 @@
 #include <ui/graphics/items/standard/graphics_slider_p.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/processors/kinetic_cutting_processor.h>
+#include "camera/thumbnails_loader.h"
 
 #include "tool_tip_item.h"
 
@@ -176,7 +177,8 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     m_msecsPerPixel(1.0),
     m_aggregationMSecs(0.0),
     m_minimalWindow(0),
-    m_selectionValid(false)
+    m_selectionValid(false),
+    m_thumbnailsLoader(0)
 {
     /* Set default property values. */
     setProperty(Qn::SliderLength, 0);
@@ -441,13 +443,13 @@ void QnTimeSlider::setToolTipFormat(const QString &format) {
     updateToolTipText();
 }
 
-QPointF QnTimeSlider::positionFromValue(qint64 logicalValue) const {
+QPointF QnTimeSlider::positionFromValue(qint64 logicalValue, bool doBound) const {
     Q_D(const GraphicsSlider);
 
     d->ensureMapper();
 
     return QPointF(
-        d->pixelPosMin + GraphicsStyle::sliderPositionFromValue(m_windowStart, m_windowEnd, logicalValue, d->pixelPosMax - d->pixelPosMin, d->upsideDown), 
+        d->pixelPosMin + GraphicsStyle::sliderPositionFromValue(m_windowStart, m_windowEnd, logicalValue, d->pixelPosMax - d->pixelPosMin, d->upsideDown, doBound), 
         0.0
     );
 }
@@ -776,7 +778,12 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     drawMarker(painter, sliderPosition(), positionMarkerColor);
 
     /* Draw thumbnails. */
-    drawThumbnails(painter, rect.top() - rect.height() * 0.5, rect.height() * 0.5);
+    drawThumbnails(painter, QRectF(rect.left(), rect.top() - thumbnailsHeight(), rect.width(), thumbnailsHeight()));
+}
+
+int QnTimeSlider::thumbnailsHeight() const
+{
+    return rect().height();
 }
 
 void QnTimeSlider::drawSelection(QPainter *painter) {
@@ -1048,11 +1055,31 @@ void QnTimeSlider::drawHighlights(QPainter *painter, qreal fillTop, qreal fillHe
     }
 }
 
-void QnTimeSlider::drawThumbnails(QPainter *painter, qreal top, qreal height) {
-    QRectF rect = this->rect();
-
+void QnTimeSlider::drawThumbnails(QPainter *painter, const QRectF& rect) 
+{
     QnScopedPainterPenRollback penRollback(painter, QPen(Qt::green, 0));
-    painter->drawRect(QRectF(rect.left(), top, rect.width(), height));
+    painter->drawRect(rect);
+
+    if (m_thumbnailsLoader == 0 || m_thumbnailsLoader->step() == 0)
+        return;
+
+    qint64 currentTime = valueFromPosition(rect.topLeft());
+    qint64 endTime = valueFromPosition(rect.topRight());
+
+    currentTime = (currentTime/m_thumbnailsLoader->step()) * m_thumbnailsLoader->step(); // round position in "thumbnails" measure unit
+
+    for (; currentTime < endTime; currentTime += m_thumbnailsLoader->step())
+    {
+        m_thumbnailsLoader->lockPixmaps();
+        QPixmap* pixmap = m_thumbnailsLoader->getPixmapByTime(currentTime);
+        if (pixmap)
+        {
+            QPointF pos = positionFromValue(currentTime, false);
+            painter->drawRect(pos.x(), rect.top(), pixmap->size().width(), pixmap->size().height());
+            painter->drawPixmap(QPointF(pos.x(), rect.top()), *pixmap);
+        }
+        m_thumbnailsLoader->unlockPixmaps();
+    }
 }
 
 
@@ -1150,4 +1177,9 @@ void QnTimeSlider::keyPressEvent(QKeyEvent *event) {
         base_type::keyPressEvent(event);
         break;
     }
+}
+
+void QnTimeSlider::setThumbnailsLoader(QnThumbnailsLoader* value)
+{
+    m_thumbnailsLoader = value;
 }

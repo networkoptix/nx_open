@@ -93,7 +93,7 @@ bool AbstractLinearGraphicsSlider::event(QEvent *event) {
 }
 
 
-QPointF AbstractLinearGraphicsSlider::positionFromValue(qint64 logicalValue) const {
+QPointF AbstractLinearGraphicsSlider::positionFromValue(qint64 logicalValue, bool doBound) const {
     Q_D(const AbstractLinearGraphicsSlider);
 
     d->ensureMapper();
