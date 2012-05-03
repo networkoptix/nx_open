@@ -79,8 +79,6 @@ void getFrame_avgY_array_8_x(const CLVideoDecoderOutput* frame, const CLVideoDec
     Q_ASSERT(frame->width % 16 == 0);
     Q_ASSERT(frame->linesize[0] % 16 == 0);
 
-    int width = frame->width/8;
-
     const __m128i* curLinePtr = (const __m128i*) frame->data[0];
     const __m128i* curLinePtrPrev = (const __m128i*) prevFrame->data[0];
     int lineSize = frame->linesize[0] / 16;
@@ -117,7 +115,7 @@ void getFrame_avgY_array_8_x(const CLVideoDecoderOutput* frame, const CLVideoDec
             // get avg value
             int pixels = rowCnt * 8;
             *dstCurLine = _mm_cvtsi128_si32(blockSum) / pixels;
-            dstCurLine[MD_HEIGHT] = _mm_cvtsi128_si32(_mm_srli_epi64(blockSum, 64)) / pixels;
+            dstCurLine[MD_HEIGHT] = _mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)) / pixels;
             dstCurLine += MD_HEIGHT*2;
         }  
         curLineNum = nextLineNum;
@@ -135,8 +133,6 @@ void getFrame_avgY_array_8_x_mc(const CLVideoDecoderOutput* frame, quint8* dst)
 
     Q_ASSERT(frame->width % 16 == 0);
     Q_ASSERT(frame->linesize[0] % 16 == 0);
-
-    int width = frame->width/8;
 
     const __m128i* curLinePtr = (const __m128i*) frame->data[0];
     int lineSize = frame->linesize[0] / 16;
@@ -168,7 +164,7 @@ void getFrame_avgY_array_8_x_mc(const CLVideoDecoderOutput* frame, quint8* dst)
             // get avg value
             int pixels = rowCnt * 8;
             *dstCurLine = _mm_cvtsi128_si32(blockSum) / pixels;
-            dstCurLine[MD_HEIGHT] = _mm_cvtsi128_si32(_mm_srli_epi64(blockSum, 64)) / pixels;
+            dstCurLine[MD_HEIGHT] = _mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)) / pixels;
             dstCurLine += MD_HEIGHT*2;
         }  
         curLineNum = nextLineNum;
@@ -183,8 +179,6 @@ void getFrame_avgY_array_16_x(const CLVideoDecoderOutput* frame, const CLVideoDe
 {
     Q_ASSERT(frame->width % 16 == 0);
     Q_ASSERT(frame->linesize[0] % 16 == 0);
-
-    int width = frame->width/8;
 
     const __m128i* curLinePtr = (const __m128i*) frame->data[0];
     const __m128i* prevLinePtr = (const __m128i*) prevFrame->data[0];
@@ -221,7 +215,7 @@ void getFrame_avgY_array_16_x(const CLVideoDecoderOutput* frame, const CLVideoDe
 
             // get avg value
             int pixels = rowCnt * 16;
-            *dstCurLine = (_mm_cvtsi128_si32(_mm_srli_epi64(blockSum, 64)) + _mm_cvtsi128_si32(blockSum)) / pixels;
+            *dstCurLine = (_mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)) + _mm_cvtsi128_si32(blockSum)) / pixels;
             dstCurLine += MD_HEIGHT;
         }  
         curLineNum = nextLineNum;
@@ -235,8 +229,6 @@ void getFrame_avgY_array_16_x_mc(const CLVideoDecoderOutput* frame, quint8* dst)
 {
     Q_ASSERT(frame->width % 16 == 0);
     Q_ASSERT(frame->linesize[0] % 16 == 0);
-
-    int width = frame->width/8;
 
     const __m128i* curLinePtr = (const __m128i*) frame->data[0];
     int lineSize = frame->linesize[0] / 16;
@@ -268,7 +260,7 @@ void getFrame_avgY_array_16_x_mc(const CLVideoDecoderOutput* frame, quint8* dst)
 
             // get avg value
             int pixels = rowCnt * 16;
-            *dstCurLine = (_mm_cvtsi128_si32(_mm_srli_epi64(blockSum, 64)) + _mm_cvtsi128_si32(blockSum)) / pixels;
+            *dstCurLine = (_mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)) + _mm_cvtsi128_si32(blockSum)) / pixels;
             dstCurLine += MD_HEIGHT;
         }  
         curLineNum = nextLineNum;
@@ -291,8 +283,6 @@ void getFrame_avgY_array_x_x(const CLVideoDecoderOutput* frame, const CLVideoDec
     Q_ASSERT(frame->linesize[0] % 16 == 0);
     Q_ASSERT(sqWidth % 8 == 0);
     sqWidth /= 8;
-
-    int width = frame->width/8;
 
     const __m128i* curLinePtr = (const __m128i*) frame->data[0];
     const __m128i* prevLinePtr = (const __m128i*) prevFrame->data[0];
@@ -334,7 +324,7 @@ void getFrame_avgY_array_x_x(const CLVideoDecoderOutput* frame, const CLVideoDec
             squareStep++;
             if (squareStep == sqWidth)
                 flushData();
-            squareSum += _mm_cvtsi128_si32(_mm_srli_epi64(blockSum, 64));
+            squareSum += _mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8));
             if (squareStep == sqWidth)
                 flushData();
         }
@@ -362,8 +352,6 @@ void getFrame_avgY_array_x_x_mc(const CLVideoDecoderOutput* frame, quint8* dst, 
     Q_ASSERT(sqWidth % 8 == 0);
     sqWidth /= 8;
 
-    int width = frame->width/8;
-
     const __m128i* curLinePtr = (const __m128i*) frame->data[0];
     int lineSize = frame->linesize[0] / 16;
     int xSteps = frame->width/16;
@@ -399,7 +387,7 @@ void getFrame_avgY_array_x_x_mc(const CLVideoDecoderOutput* frame, quint8* dst, 
             squareStep++;
             if (squareStep == sqWidth)
                 flushData();
-            squareSum += _mm_cvtsi128_si32(_mm_srli_epi64(blockSum, 64));
+            squareSum += _mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8));
             if (squareStep == sqWidth)
                 flushData();
         }
@@ -677,7 +665,6 @@ QnMetaDataV1Ptr QnMotionEstimation::getMotion()
     }
 
     memset(m_resultMotion, 0, MD_HEIGHT * m_scaledWidth);
-    int idx = m_totalFrames % 2;
     m_firstFrameTime = m_lastFrameTime;
     m_totalFrames++;
 

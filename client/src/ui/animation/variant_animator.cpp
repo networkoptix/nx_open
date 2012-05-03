@@ -243,7 +243,7 @@ void VariantAnimator::updateInternalType(int newInternalType) {
     }
 
     m_magnitudeCalculator = MagnitudeCalculator::forType(internalType());
-    if(m_linearCombinator == NULL) {
+    if(m_magnitudeCalculator == NULL) {
         qnWarning("No magnitude calculator registered for type '%1'.", QMetaType::typeName(internalType()));
         m_magnitudeCalculator = MagnitudeCalculator::forType(0);
     }

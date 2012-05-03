@@ -12,6 +12,7 @@
 #include "time_step.h"
 
 class QnNoptixStyle;
+class QnThumbnailsLoader;
 
 class QnTimeSlider: public Animated<QnToolTipSlider>, protected KineticProcessHandler, protected AnimationTimerListener {
     Q_OBJECT;
@@ -98,9 +99,11 @@ public:
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
-    virtual QPointF positionFromValue(qint64 logicalValue) const override;
+    virtual QPointF positionFromValue(qint64 logicalValue, bool doBound = true) const override;
     virtual qint64 valueFromPosition(const QPointF &position) const override;
 
+    int thumbnailsHeight() const;
+    void setThumbnailsLoader(QnThumbnailsLoader* value);
 signals:
     void windowChanged(qint64 windowStart, qint64 windowEnd);
     void selectionChanged(qint64 selectionStart, qint64 selectionEnd);
@@ -130,7 +133,7 @@ private:
     void drawMarker(QPainter *painter, qint64 pos, const QColor &color);
     void drawSelection(QPainter *painter);
     void drawHighlights(QPainter *painter, qreal fillTop, qreal fillHeight, qreal textTop, qreal textHeight);
-    void drawThumbnails(QPainter *painter, qreal top, qreal height);
+    void drawThumbnails(QPainter *painter, const QRectF& rect);
 
     void updateToolTipVisibility();
     void updateToolTipText();
@@ -199,6 +202,8 @@ private:
     QHash<qint32, QPixmap> m_pixmapByPositionKey;
     QHash<qint32, QPixmap> m_pixmapByHighlightKey;
     QHash<QPair<QString, int>, QPixmap> m_pixmapByTextKey;
+
+    QnThumbnailsLoader* m_thumbnailsLoader;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnTimeSlider::Options);

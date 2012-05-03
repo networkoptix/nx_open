@@ -23,6 +23,7 @@ namespace detail {
     private:
         AnimationTimer *m_timer;
         QScopedPointer<AnimationTimer> m_guard;
+        QSet<AnimationTimerListener *> m_listeners;
     };
 
 } // namespace detail

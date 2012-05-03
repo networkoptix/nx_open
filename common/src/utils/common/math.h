@@ -3,18 +3,31 @@
 
 #include <QtCore/QtGlobal>
 
+#define _USE_MATH_DEFINES
 #include <cmath>
 
 #include "fuzzy.h"
 #include "float.h"
 
 
+#ifndef M_E
+#   define M_E 2.71828182845904523536
+#endif
+
+#ifndef M_LN2
+#   define M_LN2 0.693147180559945309417
+#endif
+
+#ifndef M_PI
+#   define M_PI 3.14159265358979323846
+#endif
+
 #ifndef INT64_MAX
-static const qint64 INT64_MAX = 0x7fffffffffffffffll;
+#   define INT64_MAX 0x7fffffffffffffffll
 #endif
 
 #ifndef INT64_MIN
-static const qint64 INT64_MIN = 0x8000000000000000ll;
+#   define INT64_MIN 0x8000000000000000ll
 #endif
 
 
@@ -111,12 +124,12 @@ T qCeil(T value, T step) {
 
 template<class T>
 T qFloor(T value, T step) {
-    return qCeil(value - step + 1);
+    return qCeil(value - step + 1, step);
 }
 
 template<class T>
 T qRound(T value, T step) {
-    return qCeil(value - step / 2);
+    return qCeil(value - step / 2, step);
 }
 
 

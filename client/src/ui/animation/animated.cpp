@@ -28,9 +28,12 @@ void detail::AnimatedBase::updateScene(QGraphicsScene *scene) {
             timer = m_guard.data();
         }
 
-        if(timer != m_timer)
-            while(!m_timer->listeners().empty())
-                timer->addListener(m_timer->listeners().front());
+        if(timer != m_timer) {
+            /* Move only those listeners that were registered with this item. */
+            foreach(AnimationTimerListener *listener, m_timer->listeners())
+                if(m_listeners.contains(listener))
+                    timer->addListener(listener);
+        }
     }
     
     m_timer = timer;
@@ -40,10 +43,12 @@ void detail::AnimatedBase::registerAnimation(AnimationTimerListener *listener) {
     ensureTimer();
 
     m_timer->addListener(listener);
+    m_listeners.insert(listener);
 }
 
 void detail::AnimatedBase::unregisterAnimation(AnimationTimerListener *listener) {
     ensureTimer();
 
+    m_listeners.remove(listener);
     m_timer->removeListener(listener);
 }

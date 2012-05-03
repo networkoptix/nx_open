@@ -3,13 +3,17 @@
 
 #include "tool_tip_slider.h"
 
-class QPropertyAnimation;
+#include <QtCore/QBasicTimer>
 
-class QnSpeedSlider: public QnToolTipSlider {
+#include <ui/animation/animated.h>
+
+class VariantAnimator;
+
+class QnSpeedSlider: public Animated<QnToolTipSlider> {
     Q_OBJECT;
     Q_PROPERTY(qreal speed READ speed WRITE setSpeed);
 
-    typedef QnToolTipSlider base_type;
+    typedef Animated<QnToolTipSlider> base_type;
 
 public:
     explicit QnSpeedSlider(QGraphicsItem *parent = NULL);
@@ -35,20 +39,24 @@ public:
     void setMinimalSpeedStep(qreal minimalSpeedStep);
 
 signals:
-    void speedChanged(qreal newSpeed);
+    void speedChanged(qreal speed);
+    void roundedSpeedChanged(qreal roundedSpeed);
 
 protected:
     virtual void sliderChange(SliderChange change) override;
-    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
     virtual void timerEvent(QTimerEvent *event) override;
-    virtual void wheelEvent(QGraphicsSceneWheelEvent *e) override;
+    virtual void wheelEvent(QGraphicsSceneWheelEvent *event) override;
+
+protected slots:
+    void restartSpeedAnimation();
 
 private:
+    qreal m_roundedSpeed;
     qreal m_minimalSpeedStep;
     qreal m_defaultSpeed;
-    QPropertyAnimation *m_animation;
-    int m_wheelStuckedTimerId;
-    bool m_wheelStucked;
+    VariantAnimator *m_animator;
+    QBasicTimer m_wheelStuckTimer;
+    bool m_wheelStuck;
 };
 
 #endif // QN_SPEED_SLIDER_H

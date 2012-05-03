@@ -46,10 +46,11 @@ private slots:
     void at_navigator_playingChanged();
     void at_navigator_playingSupportedChanged();
     void at_navigator_speedChanged();
+    void at_navigator_speedRangeChanged();
 
     void at_playButton_clicked();
     void at_volumeSlider_valueChanged();
-    void at_speedSlider_speedChanged();
+    void at_speedSlider_roundedSpeedChanged();
 
     void updateButtonsSpeedState();
 
@@ -61,13 +62,8 @@ private slots:
 
 
 protected:
-    virtual void wheelEvent(QGraphicsSceneWheelEvent *) override {
-        /* Don't let wheel events escape into the scene. */
-    }
-
-    virtual void mousePressEvent(QGraphicsSceneMouseEvent *) override {
-        /* Prevent surprising click-through scenarios. */
-    }
+    virtual void wheelEvent(QGraphicsSceneWheelEvent *) override;
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *) override;
 
 private:
     QnImageButtonWidget *m_backwardButton;
