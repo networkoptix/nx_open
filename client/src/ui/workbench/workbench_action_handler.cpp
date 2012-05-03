@@ -1352,10 +1352,10 @@ void QnWorkbenchActionHandler::at_exportTimeSelectionAction_triggered() {
     {
         QMessageBox::critical(
             this->widget(), 
-            tr("Can't export file"), 
-            tr("You should select 1 item for export. Now selected '%1' item(s)").arg(parameters.itemsSize()), 
+            tr("Cannot export file"), 
+            tr("Exactly one item must be selected for export, but %n item(s) are currently selected.", NULL, parameters.itemsSize()), 
             QMessageBox::Ok
-            );
+        );
         return;
     }
 
@@ -1412,7 +1412,7 @@ void QnWorkbenchActionHandler::at_exportTimeSelectionAction_triggered() {
             QMessageBox::critical(
                 this->widget(), 
                 tr("Can't overwrite file"), 
-                tr("File '%1' is used by another process. Try another name.").arg(QFileInfo(fileName).baseName()), 
+                tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).baseName()), 
                 QMessageBox::Ok
             );
             continue;
