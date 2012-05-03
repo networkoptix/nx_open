@@ -59,7 +59,7 @@ void QnCameraMotionMaskWidget::init()
     QnWorkbenchDisplay *display = m_context->display();
     display->setScene(m_scene.data());
     display->setView(m_view.data());
-    m_controller.reset(new QnWorkbenchController(this));
+    m_controller.reset(new QnWorkbenchController(display));
 
     /* Disable unused instruments. */
     m_controller->motionSelectionInstrument()->disable();
