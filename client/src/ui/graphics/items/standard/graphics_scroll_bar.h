@@ -23,7 +23,6 @@ protected:
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *) override;
     virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *) override;
     virtual void hideEvent(QHideEvent *) override;
-    virtual void sliderChange(SliderChange change) override;
 #ifndef QT_NO_CONTEXTMENU
     virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent *) override;
 #endif
