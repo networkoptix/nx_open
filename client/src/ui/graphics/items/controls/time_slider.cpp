@@ -549,8 +549,6 @@ const QPixmap &QnTimeSlider::highlightPixmap(qint64 position, int height, const 
         painter.drawPixmap(3, 0, overPixmap);
     }
 
-    image.save("D:/1.bmp");
-
     return m_pixmapByPositionKey[key] = QPixmap::fromImage(image);
 }
 
