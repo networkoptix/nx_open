@@ -624,7 +624,11 @@ void QnWorkbenchNavigator::updateSpeedRange() {
 
 void QnWorkbenchNavigator::updateThumbnails()
 {
+#ifdef ENABLE_SLIDER_THUMBNAILS
     if (m_currentWidget)
+#else
+    if (0)
+#endif
     {
         m_thumbnailsLoader.reset(new QnThumbnailsLoader(m_currentWidget->resource()));
     }

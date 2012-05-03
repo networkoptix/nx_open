@@ -1058,10 +1058,13 @@ void QnTimeSlider::drawHighlights(QPainter *painter, qreal fillTop, qreal fillHe
 
 void QnTimeSlider::drawThumbnails(QPainter *painter, const QRectF& rect) 
 {
+    if (m_thumbnailsLoader == 0)
+        return;
+
     QnScopedPainterPenRollback penRollback(painter, QPen(Qt::green, 0));
     painter->drawRect(rect);
 
-    if (m_thumbnailsLoader == 0 || m_thumbnailsLoader->step() == 0)
+    if (m_thumbnailsLoader->step() == 0)
         return;
 
     qint64 currentTime = valueFromPosition(rect.topLeft());
