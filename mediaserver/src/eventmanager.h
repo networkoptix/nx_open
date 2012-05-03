@@ -24,11 +24,10 @@ public slots:
     void run();
 
 private slots:
-    void eventReceived(QnEvent event);
-    void connectionClosed(QString errorString);
-
+    void at_eventReceived(QnEvent event);
+    void at_connectionClosed(QString errorString);
+    void at_connectionReset();
 private:
-    quint32 m_seqNumber;
     QSharedPointer<QnEventSource> m_source;
 };
 

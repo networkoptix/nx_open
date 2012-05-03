@@ -16,9 +16,6 @@ public:
 
     virtual bool isResourceTypeSupported(QnId resourceTypeId) const;
     virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
-
-private:
-    bool m_isFirstTime;
 };
 
 #endif // COMMON_APPSERVER_H

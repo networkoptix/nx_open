@@ -462,8 +462,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main).
         text(tr("About...")).
         role(QAction::AboutRole).
-        autoRepeat(false).
-        icon(qnSkin->icon("info.png"));
+        autoRepeat(false);
 
     factory().
         flags(Qn::Main).

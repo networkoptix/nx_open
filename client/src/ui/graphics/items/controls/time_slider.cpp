@@ -652,7 +652,12 @@ void QnTimeSlider::updateStepAnimationTargets() {
         
         if(!qFuzzyCompare(data.targetHeight, targetHeight)) {
             data.targetHeight = targetHeight;
-            data.targetLineOpacity = minTickmarkOpacity + (1.0 - minTickmarkOpacity) * (data.targetHeight - minTickmarkHeight) / (maxTickmarkHeight - minTickmarkHeight);
+
+            if(qFuzzyIsNull(targetHeight)) {
+                data.targetLineOpacity = 0.0;
+            } else {
+                data.targetLineOpacity = minTickmarkOpacity + (1.0 - minTickmarkOpacity) * (data.targetHeight - minTickmarkHeight) / (maxTickmarkHeight - minTickmarkHeight);
+            }
         }
 
         if(separationPixels < minTextSeparationPixels) {
@@ -977,13 +982,13 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, qreal top, qreal height) {
 
         /* Calculate line ends. */
         m_tickmarkLines[index] << 
-            QPointF(x, top) <<
+            QPointF(x, top + 1.0 /* To prevent antialiased lines being drawn outside provided rect. */) <<
             QPointF(x, top + tickmarkHeight);
     }
 
     /* Draw tickmarks. */
     {
-        QnScopedPainterAntialiasingRollback antialiasingRollback(painter, false);
+        QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
         for(int i = minStepIndex; i < stepCount; i++) {
             painter->setPen(toTransparent(tickmarkColor, m_stepData[i].currentLineOpacity));
             painter->drawLines(m_tickmarkLines[i]);

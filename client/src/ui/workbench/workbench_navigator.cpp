@@ -121,7 +121,7 @@ void QnWorkbenchNavigator::initialize() {
     connect(display(),                          SIGNAL(widgetChanged(Qn::ItemRole)),                this,   SLOT(at_display_widgetChanged(Qn::ItemRole)));
     connect(display(),                          SIGNAL(widgetAdded(QnResourceWidget *)),            this,   SLOT(at_display_widgetAdded(QnResourceWidget *)));
     connect(display(),                          SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)), this,   SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
-    connect(display(),                          SIGNAL(streamsSynchronizedChanged()),               this,   SLOT(updateCurrentWidget()));
+    connect(display(),                          SIGNAL(streamsSynchronizedChanged(bool)),           this,   SLOT(updateCurrentWidget()));
     connect(display()->beforePaintInstrument(), SIGNAL(activated(QWidget *, QEvent *)),             this,   SLOT(updateSliderFromReader()));
     
     connect(m_timeSlider,                       SIGNAL(valueChanged(qint64)),                       this,   SLOT(at_timeSlider_valueChanged(qint64)));
@@ -202,6 +202,10 @@ bool QnWorkbenchNavigator::isPlaying() const {
         return false;
 
     return !m_currentWidget->display()->archiveReader()->isMediaPaused();
+}
+
+bool QnWorkbenchNavigator::togglePlaying() {
+    return setPlaying(!isPlaying());
 }
 
 bool QnWorkbenchNavigator::setPlaying(bool playing) {

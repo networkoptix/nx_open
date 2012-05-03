@@ -9,18 +9,21 @@
 #include <QTextStream>
 #include <QVariant>
 #include <QQueue>
+#include <QTime>
+#include <QTimer>
 #include <qjson/parser.h>
 
 #include "utils/common/qnid.h"
 
 static const char* QN_EVENT_EMPTY               = "EE";
+static const char* QN_EVENT_PING                = "PE";
 static const char* QN_EVENT_RES_CHANGE          = "RC";
 static const char* QN_EVENT_RES_STATUS_CHANGE   = "RSC";
 static const char* QN_EVENT_RES_DISABLED_CHANGE = "RDC";
 static const char* QN_EVENT_RES_DELETE          = "RD";
 static const char* QN_EVENT_RES_SETPARAM        = "RSP";
 static const char* QN_EVENT_LICENSE_CHANGE      = "LC";
-static const char* QN_CAMERA_SERVER_ITEM           = "CSI";
+static const char* QN_CAMERA_SERVER_ITEM        = "CSI";
 
 struct QnEvent
 {
@@ -60,7 +63,7 @@ private:
 
 class QnEventSource : public QObject
 {
-    Q_OBJECT;
+    Q_OBJECT
 
 public:
     QnEventSource(QUrl url, int retryTimeout = 3000);
@@ -70,13 +73,17 @@ public:
 signals:
     void stopped();
     void eventReceived(QnEvent event);
+    void connectionOpened();
     void connectionClosed(QString errorString);
+    void connectionReset();
 
 public slots:
     void doStop();
     void startRequest();
 
 private slots:
+    void onPingTimer();
+
     // void slotError(QNetworkReply::NetworkError code);
     void httpFinished();
     void httpReadyRead();
@@ -90,6 +97,10 @@ private:
     int m_retryTimeout;
     QNetworkAccessManager m_manager;
     QNetworkReply *m_reply;
+
+    quint32 m_seqNumber;
+    QTime m_eventWaitTimer;
+    QTimer m_pingTimer;
 
     QnJsonStreamParser m_streamParser;
 };
