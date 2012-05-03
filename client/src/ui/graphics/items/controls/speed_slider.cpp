@@ -164,8 +164,8 @@ void QnSpeedSlider::sliderChange(SliderChange change) {
     }
 }
 
-void QnSpeedSlider::wheelEvent(QGraphicsSceneWheelEvent *e) {
-    e->accept();
+void QnSpeedSlider::wheelEvent(QGraphicsSceneWheelEvent *event) {
+    event->accept();
 
     if (m_wheelStuck)
         return;
@@ -174,7 +174,7 @@ void QnSpeedSlider::wheelEvent(QGraphicsSceneWheelEvent *e) {
 
     /* Wheel should snap to default speed. */
     const qint64 oldPosition = sliderPosition();
-    base_type::wheelEvent(e);
+    base_type::wheelEvent(event);
     const qint64 newPosition = sliderPosition();
 
     const qint64 defaultPosition = speedToPosition(m_defaultSpeed, m_minimalSpeedStep);

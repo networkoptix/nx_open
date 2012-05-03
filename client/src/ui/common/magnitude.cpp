@@ -91,7 +91,11 @@ qreal calculateMagnitude(long value) {
 }
 
 qreal calculateMagnitude(long long value) {
+#if defined(_MSC_VER) && _MSC_VER < 1600 /* VC++ 2008 and earlier */
+    return qAbs(value);
+#else
     return std::abs(value);
+#endif
 }
 
 qreal calculateMagnitude(float value) {

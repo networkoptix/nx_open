@@ -45,7 +45,7 @@ signals:
 protected:
     virtual void sliderChange(SliderChange change) override;
     virtual void timerEvent(QTimerEvent *event) override;
-    virtual void wheelEvent(QGraphicsSceneWheelEvent *e) override;
+    virtual void wheelEvent(QGraphicsSceneWheelEvent *event) override;
 
 protected slots:
     void restartSpeedAnimation();
