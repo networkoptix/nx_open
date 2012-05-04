@@ -3,7 +3,9 @@
 #include <core/resourcemanagment/resource_pool.h>
 #include <core/resource/video_server.h>
 
-QAtomicInt QnTimePeriodLoader::s_fakeHandle(INT_MAX / 2);
+namespace {
+    QAtomicInt qn_fakeHandle(INT_MAX / 2);
+}
 
 QnTimePeriodLoader::QnTimePeriodLoader(const QnVideoServerConnectionPtr &connection, QnNetworkResourcePtr resource, QObject *parent):
     QObject(parent), 
@@ -58,7 +60,7 @@ int QnTimePeriodLoader::load(const QnTimePeriod &timePeriod, const QList<QRegion
         if (loadedPeriod.containPeriod(timePeriod)) 
         {
             /* Data already loaded. */
-            int handle = s_fakeHandle.fetchAndAddAcquire(1);
+            int handle = qn_fakeHandle.fetchAndAddAcquire(1);
 
             /* Must pass the ready signal through the event queue here as
              * the caller doesn't know request handle yet, and therefore 
@@ -73,7 +75,7 @@ int QnTimePeriodLoader::load(const QnTimePeriod &timePeriod, const QList<QRegion
         if (m_loading[i].period.containPeriod(timePeriod)) 
         {
             /* Same data is currently being loaded. */
-            int handle = s_fakeHandle.fetchAndAddAcquire(1);
+            int handle = qn_fakeHandle.fetchAndAddAcquire(1);
 
             m_loading[i].waitingHandles << handle;
             return handle;

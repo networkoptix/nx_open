@@ -87,8 +87,6 @@ private:
         QList<int> waitingHandles;
     };
 
-    static QAtomicInt s_fakeHandle;
-
     mutable QMutex m_mutex;
     QnVideoServerConnectionPtr m_connection;
     QnNetworkResourcePtr m_resource;
