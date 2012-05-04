@@ -326,7 +326,7 @@ QnWorkbenchNavigator::SliderUserData QnWorkbenchNavigator::currentSliderData() c
     SliderUserData result;
 
     result.selectionValid = m_timeSlider->isSelectionValid();
-    result.selection = QnTimePeriod(m_timeSlider->selectionStart(), m_timeSlider->selectionEnd() - m_timeSlider->selectionEnd());
+    result.selection = QnTimePeriod(m_timeSlider->selectionStart(), m_timeSlider->selectionEnd() - m_timeSlider->selectionStart());
     
     result.window = QnTimePeriod(m_timeSlider->windowStart(), m_timeSlider->windowEnd() - m_timeSlider->windowStart());
     if(m_currentWidgetIsCamera && m_timeSlider->windowEnd() == m_timeSlider->maximum())
