@@ -3,6 +3,7 @@
 
 
 #include "decoders/video/abstractdecoder.h"
+#include "decoders/frame_scaler.h"
 
 class QnAbstractVideoDecoder;
 struct QnCompressedVideoData;
@@ -25,11 +26,11 @@ public:
     ~CLVideoStreamDisplay();
     void setDrawer(QnAbstractRenderer* draw);
     FrameDisplayStatus dispay(QnCompressedVideoDataPtr data, bool draw,
-                CLVideoDecoderOutput::downscale_factor force_factor = CLVideoDecoderOutput::factor_any);
+                QnFrameScaler::downscale_factor force_factor = QnFrameScaler::factor_any);
 
     void setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val);
 
-    CLVideoDecoderOutput::downscale_factor getCurrentDownscaleFactor() const;
+    QnFrameScaler::downscale_factor getCurrentDownscaleFactor() const;
 
     void setMTDecoding(bool value);
 
@@ -51,7 +52,7 @@ public:
     /**
       * Return last decoded frame
       */
-    QSharedPointer<CLVideoDecoderOutput> flush(CLVideoDecoderOutput::downscale_factor force_factor, int channelNum);
+    QSharedPointer<CLVideoDecoderOutput> flush(QnFrameScaler::downscale_factor force_factor, int channelNum);
 private:
     bool m_needResetDecoder;
     QMutex m_mtx;
@@ -71,8 +72,8 @@ private:
     QnAbstractVideoDecoder::DecodeMode m_lightCPUmode;
     bool m_canDownscale;
 
-    CLVideoDecoderOutput::downscale_factor m_prevFactor;
-    CLVideoDecoderOutput::downscale_factor m_scaleFactor;
+    QnFrameScaler::downscale_factor m_prevFactor;
+    QnFrameScaler::downscale_factor m_scaleFactor;
     QSize m_previousOnScreenSize;
 
     SwsContext *m_scaleContext;
@@ -101,12 +102,12 @@ private:
     void freeScaleContext();
     bool rescaleFrame(const CLVideoDecoderOutput& srcFrame, CLVideoDecoderOutput& outFrame, int newWidth, int newHeight);
 
-    CLVideoDecoderOutput::downscale_factor findScaleFactor(int width, int height, int fitWidth, int fitHeight);
-    CLVideoDecoderOutput::downscale_factor determineScaleFactor(
+    QnFrameScaler::downscale_factor findScaleFactor(int width, int height, int fitWidth, int fitHeight);
+    QnFrameScaler::downscale_factor determineScaleFactor(
         int channelNumber, 
         int srcWidth, 
         int srcHeight, 
-        CLVideoDecoderOutput::downscale_factor force_factor);
+        QnFrameScaler::downscale_factor force_factor);
     bool processDecodedFrame(QnAbstractVideoDecoder* dec, CLVideoDecoderOutput* outFrame, bool enableFrameQueue, bool reverseMode);
     void checkQueueOverflow(QnAbstractVideoDecoder* dec);
     void clearReverseQueue();

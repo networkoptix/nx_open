@@ -51,8 +51,8 @@ bool QnSignDialogDisplay::processData(QnAbstractDataPacketPtr data)
         if (m_prevFrame)
         {
             if (m_prevFrame->flags & AV_PKT_FLAG_KEY)
-                m_display[0]->dispay(m_prevFrame, true, CLVideoDecoderOutput::factor_any); // repeat last frame on the screen (may be skipped because of time check)
-            QSharedPointer<CLVideoDecoderOutput> lastFrame = m_display[0]->flush(CLVideoDecoderOutput::factor_any, 0);
+                m_display[0]->dispay(m_prevFrame, true, QnFrameScaler::factor_any); // repeat last frame on the screen (may be skipped because of time check)
+            QSharedPointer<CLVideoDecoderOutput> lastFrame = m_display[0]->flush(QnFrameScaler::factor_any, 0);
 
             quint8 md_value[EVP_MAX_MD_SIZE];
             quint32 md_len = 0;
@@ -79,7 +79,7 @@ bool QnSignDialogDisplay::processData(QnAbstractDataPacketPtr data)
 
         if (!m_firstFrameDisplayed || (video->flags & AV_PKT_FLAG_KEY) && qnSyncTime->currentMSecsSinceEpoch() - m_lastDisplayTime > 100) // max display rate 10 fps
         {
-            CLVideoStreamDisplay::FrameDisplayStatus status = m_display[0]->dispay(video, true, CLVideoDecoderOutput::factor_any);
+            CLVideoStreamDisplay::FrameDisplayStatus status = m_display[0]->dispay(video, true, QnFrameScaler::factor_any);
             if (!m_firstFrameDisplayed)
                 m_firstFrameDisplayed = status == CLVideoStreamDisplay::Status_Displayed;
             QSize imageSize = m_display[0]->getImageSize();
