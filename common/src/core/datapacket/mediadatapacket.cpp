@@ -102,10 +102,7 @@ inline bool metadataIsEmpty_sse2(__m128i* src)
     return true;
 }
 
-inline bool metadataIsEmpty_sse41(__m128i* src)
-#if defined(Q_CC_GNU)
-    __attribute__ ((__target__ ("sse4.1")))
-#endif
+inline bool sse4_attribute metadataIsEmpty_sse41(__m128i* src)
 {
     static const __m128i ff_mask = _mm_setr_epi32(0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff); /* SSE2. */
     for (int i = 0; i < MD_WIDTH*MD_HEIGHT/128; ++i)
