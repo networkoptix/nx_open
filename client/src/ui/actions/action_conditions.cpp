@@ -226,8 +226,20 @@ Qn::ActionVisibility QnTimePeriodActionCondition::check(const QnActionParameters
         return Qn::InvisibleAction;
 
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodParameter);
-    bool isEmpty = period.durationMs == 0;
+    
+    Qn::PeriodType periodType;
+    if(period.isNull()) {
+        periodType = Qn::NullPeriod;
+    } else if(period.isEmpty()) {
+        periodType = Qn::EmptyPeriod;
+    } else {
+        periodType = Qn::NormalPeriod;
+    }
 
-    return isEmpty == m_requiredPeriodEmptyValue ? Qn::EnabledAction : Qn::DisabledAction;
+    if(m_periodType != periodType) {
+        return m_nonMatchingVisibility;
+    } else {
+        return Qn::EnabledAction;
+    }
 }
 

@@ -23,11 +23,6 @@ void QnTimePeriod::clear()
     durationMs = 0;
 }
 
-bool QnTimePeriod::isEmpty() const
-{
-    return startTimeMs == 0 && durationMs == 0;
-}
-
 qint64 QnTimePeriod::endTimeMs() const
 {
     if (durationMs == -1)

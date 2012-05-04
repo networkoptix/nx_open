@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+#include <QtCore/QTimer>
+
 #include <QtGui/QAction>
 #include <QtGui/QMenu>
 #include <QtGui/QGraphicsSceneContextMenuEvent>
@@ -46,6 +48,8 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_updatingSliderFromScrollBar(false),
     m_updatingScrollBarFromSlider(false),
     m_currentWidgetIsCamera(false),
+    m_startSelectionAction(new QAction(this)),
+    m_endSelectionAction(new QAction(this)),
     m_clearSelectionAction(new QAction(this)),
     m_lastLive(false),
     m_lastLiveSupported(false),
@@ -531,7 +535,6 @@ void QnWorkbenchNavigator::loadThumbnails(qint64 startTimeMs, qint64 endTimeMs)
     }
     m_thumbnailsLoader->setThumbnailsSize(m_timeSlider->thumbnailsHeight() * m_currentWidget->aspectRatio(), m_timeSlider->thumbnailsHeight());
 
-
     // calculate thumbnail size
     qreal visualWidth = m_timeSlider->rect().width();
     qreal thumbnailsWidth = m_timeSlider->thumbnailsHeight() * m_currentWidget->aspectRatio();
@@ -638,6 +641,7 @@ void QnWorkbenchNavigator::updateThumbnails()
     m_timeSlider->setThumbnailsLoader(m_thumbnailsLoader.data());
 }
 
+
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
@@ -668,19 +672,29 @@ void QnWorkbenchNavigator::at_timeSlider_contextMenuEvent(QGraphicsSceneContextM
         Qn::SliderScope, 
         QnActionParameters(currentTarget(Qn::SliderScope)).withArgument(Qn::TimePeriodParameter, selection)
     ));
-
-    /* Add slider-local actions to the menu. */
-    manager->redirectAction(menu.data(), Qn::ClearTimeSelectionAction, m_clearSelectionAction);
-
     if(menu->isEmpty())
         return;
+
+    /* Add slider-local actions to the menu. */
+    manager->redirectAction(menu.data(), Qn::StartTimeSelectionAction,  m_startSelectionAction);
+    manager->redirectAction(menu.data(), Qn::EndTimeSelectionAction,    m_endSelectionAction);
+    manager->redirectAction(menu.data(), Qn::ClearTimeSelectionAction,  m_clearSelectionAction);
 
     /* Run menu. */
     QAction *action = menu->exec(event->screenPos());
 
     /* Process slider-local actions. */
-    if(action == m_clearSelectionAction)
+    if(action == m_startSelectionAction) {
+        qint64 position = m_timeSlider->valueFromPosition(event->pos());
+        m_timeSlider->setSelection(position, position);
+        m_timeSlider->setSelectionValid(true);
+    } else if(action == m_endSelectionAction) {
+        qint64 position = m_timeSlider->valueFromPosition(event->pos());
+        m_timeSlider->setSelection(qMin(position, m_timeSlider->selectionStart()), qMax(position, m_timeSlider->selectionEnd()));
+        m_timeSlider->setSelectionValid(true);
+    } else if(action == m_clearSelectionAction) {
         m_timeSlider->setSelectionValid(false);
+    }
 }
 
 void QnWorkbenchNavigator::at_loader_periodsChanged(Qn::TimePeriodType type) {
