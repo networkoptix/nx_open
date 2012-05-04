@@ -124,6 +124,7 @@
 											<classifier>${platform}-${arch}</classifier>
 											<overWrite>false</overWrite>
 											<outputDirectory>${project.build.directory}</outputDirectory>
+											<excludes>**/*.so.*</excludes>
 										</artifactItem>
 										<artifactItem>
 											<groupId>org</groupId>
@@ -133,6 +134,7 @@
 											<classifier>${platform}-${arch}</classifier>
 											<overWrite>false</overWrite>
 											<outputDirectory>${project.build.directory}</outputDirectory>
+											<excludes>**/*.so.*</excludes>
 										</artifactItem>							
 										<artifactItem>
 											<groupId>com.google</groupId>
@@ -142,6 +144,7 @@
 											<classifier>${platform}-${arch}</classifier>
 											<overWrite>false</overWrite>
 											<outputDirectory>${project.build.directory}</outputDirectory>
+											<excludes>**/*.so.*</excludes>
 										</artifactItem>							
 										<artifactItem>
 											<groupId>org</groupId>
@@ -151,6 +154,7 @@
 											<classifier>${platform}-${arch}</classifier>
 											<overWrite>false</overWrite>
 											<outputDirectory>${project.build.directory}</outputDirectory>
+											<excludes>**/*.so.*</excludes>
 										</artifactItem>
 										<artifactItem>
 											<groupId>com.nokia.qt</groupId>
@@ -180,7 +184,7 @@
 								</configuration>
 							</execution>
 						</executions>
-					</plugin>					
+					</plugin>										
 				</plugins>
 			</build>
 		</profile>	
@@ -207,7 +211,7 @@
 								</goals>
 								<configuration>
 									<artifactItems>						
-									
+
 									</artifactItems>
 								</configuration>
 							</execution>
@@ -264,19 +268,7 @@
 												<include>*/${qtplugin2}/**</include>
 												<include>*/${qtplugin3}/**</include>
 											</includes>										
-										</resource>	
-										<resource>
-											<targetPaths>
-												<targetPath>${project.build.directory}/bin/release</targetPath>
-												<targetPath>${project.build.directory}/bin/debug</targetPath>
-											</targetPaths>
-											<directory>${basedir}/resource</directory>
-											<preservePath>true</preservePath>
-											<includes>
-												<include>**/*.xml</include>
-											</includes>
-											<filtering>false</filtering>
-										</resource>										
+										</resource>											
 									</resources>								
 								</configuration>
 							</execution>
@@ -284,7 +276,59 @@
 					</plugin>					
 				</plugins>
 			</build>
-		</profile>		
+		</profile>	
+
+		<profile>
+			<id>linux</id>
+			<activation>
+				<os>
+					<family>unix</family>
+					<name>linux</name>
+				</os>		
+			</activation>
+			<!--<properties>
+				<arch>${os.arch}</arch>
+			</properties>	-->
+			<build>	
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>1.1.1</version>
+						<executions>
+							<execution>
+								<id>prepare-deb-contents</id>
+								<!--<id>default-cli</id>-->
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>./prepare-dist.sh</executable>
+									<workingDirectory>${project.build.directory}</workingDirectory>		
+									<!--<arguments>
+										<commandlineArgs>777</commandlineArgs>
+										<commandlineArgs>./copy-files.sh<&&>./copy-files.sh</commandlineArgs>
+									</arguments>-->
+								</configuration>
+							</execution>
+							<execution>
+								<id>build-deb</id>
+								<phase>package</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>./build-dist.sh</executable>
+									<workingDirectory>${project.build.directory}</workingDirectory>		
+								</configuration>
+							</execution>							
+						</executions>
+					</plugin>						
+				</plugins>	
+			</build>			
+		</profile>	
+
 		<profile>
 			<id>windows</id>
 			<activation>

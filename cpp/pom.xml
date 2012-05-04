@@ -80,7 +80,10 @@
 						</goals>
 						<configuration>
 							<failOnError>false</failOnError>
+
 							<target>							
+								<chmod file="${project.build.directory}/*.sh" perm="755"/>
+
 								<dirset id="includes_path" dir="${project.build.directory}/build/include" includes="*"/>
 								<pathconvert pathsep="${line.separator}" property="includes" refid="includes_path">
 									<map from="" to="INCLUDEPATH += "/>
@@ -310,7 +313,8 @@
 								</configuration>
 							</execution>	
 							<execution>
-								<id>package-with-msbuild</id>
+								<!--<id>default-cli</id>-->
+								<id>process-with-make</id>
 								<phase>process-classes</phase>
 								<goals>
 									<goal>exec</goal>
