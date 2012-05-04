@@ -1,7 +1,6 @@
 #include "sign_helper.h"
 #include "utils/common/util.h"
 #include "licensing/license.h"
-#include "utils/common/yuvconvert.h"
 #include "utils/common/scoped_painter_rollback.h"
 #include "utils/common/math.h"
 
@@ -286,29 +285,21 @@ void QnSignHelper::drawOnSignFrame(AVFrame* frame)
     QImage img(imgBuffer, frame->width, frame->height, frame->linesize[0]*4, QImage::Format_ARGB32);
     draw(img, true);
 
-    if (useSSE3() && frame->format == PIX_FMT_YUV420P)
+    SwsContext* scaleContext = sws_getContext(frame->width, frame->height, PIX_FMT_BGRA, frame->width, frame->height, (PixelFormat) frame->format, SWS_POINT, NULL, NULL, NULL);
+    if (scaleContext)
     {
-        bgra_to_yv12_sse2_intr(img.bits(), img.bytesPerLine(),
-            frame->data[0], frame->data[1], frame->data[2],
-            frame->linesize[0], frame->linesize[1], frame->width, frame->height, false);
-    }
-    else {
-        SwsContext* scaleContext = sws_getContext(frame->width, frame->height, PIX_FMT_BGRA, frame->width, frame->height, (PixelFormat) frame->format, SWS_POINT, NULL, NULL, NULL);
-        if (scaleContext)
-        {
-            quint8* srcData[4];
-            srcData[0] = img.bits();
-            srcData[1] = srcData[2] = srcData[3] = 0;
-            int srcLineSize[4];
-            srcLineSize[0] = img.bytesPerLine();
-            srcLineSize[1] = srcLineSize[2] = srcLineSize[3] = 0;
-            sws_scale(scaleContext,
-                srcData, srcLineSize, 
-                0, frame->height, 
-                frame->data, frame->linesize);
+        quint8* srcData[4];
+        srcData[0] = img.bits();
+        srcData[1] = srcData[2] = srcData[3] = 0;
+        int srcLineSize[4];
+        srcLineSize[0] = img.bytesPerLine();
+        srcLineSize[1] = srcLineSize[2] = srcLineSize[3] = 0;
+        sws_scale(scaleContext,
+            srcData, srcLineSize, 
+            0, frame->height, 
+            frame->data, frame->linesize);
 
-            sws_freeContext(scaleContext);
-        }
+        sws_freeContext(scaleContext);
     }
 
     qFreeAligned(imgBuffer);

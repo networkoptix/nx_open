@@ -161,26 +161,33 @@ void QnMotionArchive::fillFileNames(qint64 datetimeMs, QFile* motionFile, QFile*
     dir.mkpath(fileName);
 }
 
+inline bool sse4_attribute mathImage_sse41(const __m128i* data, const __m128i* mask, int maskStart, int maskEnd)
+{
+    for (int i = maskStart; i <= maskEnd; ++i)
+    {
+        if (_mm_testz_si128(mask[i], data[i]) == 0) /* SSE4. */
+            return true;
+    }
+    return false;
+}
+
+inline bool mathImage_sse2(const __m128i* data, const __m128i* mask, int maskStart, int maskEnd)
+{
+    static const __m128i zerroValue = _mm_setr_epi32(0, 0, 0, 0);
+    for (int i = maskStart; i <= maskEnd; ++i)
+    {
+        if (_mm_movemask_epi8(_mm_cmpeq_epi32(_mm_and_si128(mask[i], data[i]), zerroValue)) != 0xffff) /* SSE2. */
+            return true;
+    }
+    return false;
+}
+
 bool QnMotionArchive::mathImage(const __m128i* data, const __m128i* mask, int maskStart, int maskEnd)
 {
     if (useSSE41())
-    {
-        for (int i = maskStart; i <= maskEnd; ++i)
-        {
-            if (_mm_testz_si128(mask[i], data[i]) == 0) /* SSE4. */
-                return true;
-        }
-    }
+        return mathImage_sse41(data, mask, maskStart, maskEnd);
     else 
-    {
-        static const __m128i zerroValue = _mm_setr_epi32(0, 0, 0, 0);
-        for (int i = maskStart; i <= maskEnd; ++i)
-        {
-            if (_mm_movemask_epi8(_mm_cmpeq_epi32(_mm_and_si128(mask[i], data[i]), zerroValue)) != 0xffff) /* SSE2. */
-                return true;
-        }
-    }
-    return false;
+        return mathImage_sse2(data, mask, maskStart, maskEnd);
 }
 
 QnTimePeriodList QnMotionArchive::mathPeriod(const QRegion& region, qint64 msStartTime, qint64 msEndTime, int detailLevel)

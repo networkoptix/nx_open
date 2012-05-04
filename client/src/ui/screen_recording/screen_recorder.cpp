@@ -6,7 +6,7 @@
 #include <QtOpenGL/QGLWidget>
 
 #include <utils/common/warnings.h>
-#include <client_util.h>
+#include "utils/client_util.h"
 
 #include "ui/style/skin.h"
 #include "video_recorder_settings.h"

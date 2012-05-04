@@ -430,14 +430,14 @@ bool CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
     if (m_singleShotMode && m_singleShotQuantProcessed)
         return false;
 
-    CLVideoDecoderOutput::downscale_factor scaleFactor = CLVideoDecoderOutput::factor_any;
+    QnFrameScaler::downscale_factor scaleFactor = QnFrameScaler::factor_any;
     if (channel > 0 && m_display[0]) // if device has more than one channel
     {
         // this here to avoid situation where different channels have different down scale factor; it might lead to diffrent size
         scaleFactor = m_display[0]->getCurrentDownscaleFactor(); // [0] - master channel
     }
     if (vd->flags & QnAbstractMediaData::MediaFlags_StillImage)
-        scaleFactor = CLVideoDecoderOutput::factor_1; // do not downscale still images
+        scaleFactor = QnFrameScaler::factor_1; // do not downscale still images
 
 
     if (m_display[channel])

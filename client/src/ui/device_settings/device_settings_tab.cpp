@@ -5,7 +5,7 @@
 #include "ui/style/globals.h"
 
 #include "device_settings_dlg.h"
-#include "settings.h"
+#include "utils/settings.h"
 #include "widgets.h"
 
 CLDeviceSettingsTab::CLDeviceSettingsTab(CLAbstractDeviceSettingsDlg *dialog, const QnParamList &paramList, const QString &group)

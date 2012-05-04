@@ -4,7 +4,7 @@
 #include "utils/common/log.h"
 #include <emmintrin.h>
 #include "utils/media/sse_helper.h"
-#include "utils/common/yuvconvert.h"
+#include "utils/yuvconvert.h"
 
 extern "C" {
 #include <libavformat/avformat.h>

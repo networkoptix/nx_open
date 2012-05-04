@@ -3,7 +3,7 @@
 #include <core/resourcemanagment/resource_pool.h>
 #include <core/resourcemanagment/resource_pool_user_watcher.h>
 #include <ui/actions/action_manager.h>
-#include "settings.h"
+#include "utils/settings.h"
 #include "workbench.h"
 #include "workbench_synchronizer.h"
 #include "workbench_layout_snapshot_manager.h"

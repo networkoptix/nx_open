@@ -43,7 +43,7 @@
 #include "ui/events/system_menu_event.h"
 
 #include "file_processor.h"
-#include "settings.h"
+#include "utils/settings.h"
 
 #include "resource_tree_widget.h"
 #include "dwm.h"

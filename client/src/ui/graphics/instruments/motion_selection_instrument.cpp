@@ -7,7 +7,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/warnings.h>
 #include <ui/graphics/items/resource_widget.h>
-#include <settings.h>
+#include "utils/settings.h"
 
 class MotionSelectionItem: public QGraphicsObject {
 public:

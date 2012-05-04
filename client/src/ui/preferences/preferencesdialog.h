@@ -3,7 +3,7 @@
 
 #include <QtCore/QScopedPointer>
 #include <QtGui/QDialog>
-#include "settings.h"
+#include "utils/settings.h"
 
 
 class QnWorkbenchContext;

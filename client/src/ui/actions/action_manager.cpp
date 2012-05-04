@@ -694,15 +694,29 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnResourceActionCondition(hasFlags(QnResource::remote_server), Qn::ExactlyOne, this));
 
 
+    factory(Qn::StartTimeSelectionAction).
+        flags(Qn::Slider | Qn::SingleTarget).
+        text(tr("Mark Selection Start")).
+        shortcut(tr("[")).
+        shortcutContext(Qt::WidgetShortcut).
+        condition(new QnTimePeriodActionCondition(Qn::NullPeriod, Qn::InvisibleAction, this));
+
+    factory(Qn::EndTimeSelectionAction).
+        flags(Qn::Slider | Qn::SingleTarget).
+        text(tr("Mark Selection End")).
+        shortcut(tr("]")).
+        shortcutContext(Qt::WidgetShortcut).
+        condition(new QnTimePeriodActionCondition(Qn::EmptyPeriod, Qn::InvisibleAction, this));
+
     factory(Qn::ClearTimeSelectionAction).
-        flags(Qn::Slider | Qn::SingleTarget | Qn::NoTarget).
+        flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Clear Selection")).
-        condition(new QnTimePeriodActionCondition(false, this));
+        condition(new QnTimePeriodActionCondition(Qn::NormalPeriod, Qn::InvisibleAction, this));
 
     factory(Qn::ExportTimeSelectionAction).
         flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Export Selection")).
-        condition(new QnTimePeriodActionCondition(false, this));
+        condition(new QnTimePeriodActionCondition(Qn::NormalPeriod, Qn::DisabledAction, this));
 }
 
 QnActionManager::~QnActionManager() {

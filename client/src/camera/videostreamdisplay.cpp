@@ -14,8 +14,8 @@ static const double FPS_EPS = 1e-6;
 CLVideoStreamDisplay::CLVideoStreamDisplay(bool canDownscale) :
     m_lightCPUmode(QnAbstractVideoDecoder::DecodeMode_Full),
     m_canDownscale(canDownscale),
-    m_prevFactor(CLVideoDecoderOutput::factor_1),
-    m_scaleFactor(CLVideoDecoderOutput::factor_1),
+    m_prevFactor(QnFrameScaler::factor_1),
+    m_scaleFactor(QnFrameScaler::factor_1),
     m_previousOnScreenSize(0,0),
     m_scaleContext(0),
     m_outputWidth(0),
@@ -65,7 +65,7 @@ void CLVideoStreamDisplay::setDrawer(QnAbstractRenderer* draw)
     m_drawer = draw;
 }
 
-CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::getCurrentDownscaleFactor() const
+QnFrameScaler::downscale_factor CLVideoStreamDisplay::getCurrentDownscaleFactor() const
 {
     return m_scaleFactor;
 }
@@ -90,14 +90,14 @@ void CLVideoStreamDisplay::freeScaleContext()
 	}
 }
 
-CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::determineScaleFactor(int channelNumber, 
+QnFrameScaler::downscale_factor CLVideoStreamDisplay::determineScaleFactor(int channelNumber, 
                                                                                   int srcWidth, int srcHeight, 
-                                                                                  CLVideoDecoderOutput::downscale_factor force_factor)
+                                                                                  QnFrameScaler::downscale_factor force_factor)
 {
     if (m_drawer->constantDownscaleFactor())
-       force_factor = CLVideoDecoderOutput::factor_2;
+       force_factor = QnFrameScaler::factor_2;
 
-	if (force_factor==CLVideoDecoderOutput::factor_any) // if nobody pushing lets peek it
+	if (force_factor==QnFrameScaler::factor_any) // if nobody pushing lets peek it
 	{
 		QSize on_screen = m_drawer->sizeOnScreen(channelNumber);
 
@@ -126,14 +126,14 @@ CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::determineScaleFacto
 	else
 		m_scaleFactor = force_factor;
 
-    CLVideoDecoderOutput::downscale_factor rez = m_canDownscale ? qMax(m_scaleFactor, CLVideoDecoderOutput::factor_1) : CLVideoDecoderOutput::factor_1;
+    QnFrameScaler::downscale_factor rez = m_canDownscale ? qMax(m_scaleFactor, QnFrameScaler::factor_1) : QnFrameScaler::factor_1;
     // If there is no scaling needed check if size is greater than maximum allowed image size (maximum texture size for opengl).
     int newWidth = srcWidth / rez;
     int newHeight = srcHeight / rez;
     int maxTextureSize = QnGLRenderer::maxTextureSize();
     while (maxTextureSize > 0 && newWidth > maxTextureSize || newHeight > maxTextureSize)
     {
-        rez = CLVideoDecoderOutput::downscale_factor ((int)rez * 2);
+        rez = QnFrameScaler::downscale_factor ((int)rez * 2);
         newWidth /= 2;
         newHeight /= 2;
     }
@@ -246,7 +246,7 @@ qint64 CLVideoStreamDisplay::nextReverseTime() const
 }
 
 
-QSharedPointer<CLVideoDecoderOutput> CLVideoStreamDisplay::flush(CLVideoDecoderOutput::downscale_factor force_factor, int channelNum)
+QSharedPointer<CLVideoDecoderOutput> CLVideoStreamDisplay::flush(QnFrameScaler::downscale_factor force_factor, int channelNum)
 {
     bool enableFrameQueue = false;
     m_drawer->waitForFrameDisplayed(channelNum);
@@ -261,7 +261,7 @@ QSharedPointer<CLVideoDecoderOutput> CLVideoStreamDisplay::flush(CLVideoDecoderO
     if (dec == 0)
         return QSharedPointer<CLVideoDecoderOutput>();
 
-    CLVideoDecoderOutput::downscale_factor scaleFactor = determineScaleFactor(channelNum, dec->getWidth(), dec->getHeight(), force_factor);
+    QnFrameScaler::downscale_factor scaleFactor = determineScaleFactor(channelNum, dec->getWidth(), dec->getHeight(), force_factor);
     PixelFormat pixFmt = dec->GetPixelFormat();
 
     CLVideoDecoderOutput* outFrame = m_frameQueue[m_frameQueueIndex];
@@ -280,8 +280,8 @@ QSharedPointer<CLVideoDecoderOutput> CLVideoStreamDisplay::flush(CLVideoDecoderO
         outFrame->sample_aspect_ratio = dec->getSampleAspectRatio();
         pixFmt = dec->GetPixelFormat();
 
-        if (QnGLRenderer::isPixelFormatSupported(pixFmt) && CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) && scaleFactor <= CLVideoDecoderOutput::factor_8)
-            CLVideoDecoderOutput::downscale(tmpFrame.data(), outFrame, scaleFactor); // fast scaler
+        if (QnGLRenderer::isPixelFormatSupported(pixFmt) && CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) && scaleFactor <= QnFrameScaler::factor_8)
+            QnFrameScaler::downscale(tmpFrame.data(), outFrame, scaleFactor); // fast scaler
         else {
             if (!rescaleFrame(*(tmpFrame.data()), *outFrame, tmpFrame->width / scaleFactor, tmpFrame->height / scaleFactor)) // universal scaler
                 ; // TODO: wtf?
@@ -299,7 +299,7 @@ QSharedPointer<CLVideoDecoderOutput> CLVideoStreamDisplay::flush(CLVideoDecoderO
     return tmpFrame;
 }
 
-CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompressedVideoDataPtr data, bool draw, CLVideoDecoderOutput::downscale_factor force_factor)
+CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompressedVideoDataPtr data, bool draw, QnFrameScaler::downscale_factor force_factor)
 {
     // use only 1 frame for non selected video
     bool reverseMode = m_reverseMode;
@@ -374,11 +374,11 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompress
         m_prevReverseMode = reverseMode;
     }
 
-    CLVideoDecoderOutput::downscale_factor scaleFactor = determineScaleFactor(data->channelNumber, dec->getWidth(), dec->getHeight(), force_factor);
+    QnFrameScaler::downscale_factor scaleFactor = determineScaleFactor(data->channelNumber, dec->getWidth(), dec->getHeight(), force_factor);
     PixelFormat pixFmt = dec->GetPixelFormat();
     bool useTmpFrame =  !QnGLRenderer::isPixelFormatSupported(pixFmt) ||
         !CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) || 
-        scaleFactor > CLVideoDecoderOutput::factor_1;
+        scaleFactor > QnFrameScaler::factor_1;
 
     CLVideoDecoderOutput* outFrame = m_frameQueue[m_frameQueueIndex];
     outFrame->channel = data->channelNumber;
@@ -474,8 +474,8 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompress
 
     if (useTmpFrame)
     {
-        if (QnGLRenderer::isPixelFormatSupported(pixFmt) && CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) && scaleFactor <= CLVideoDecoderOutput::factor_8)
-            CLVideoDecoderOutput::downscale(&m_tmpFrame, outFrame, scaleFactor); // fast scaler
+        if (QnGLRenderer::isPixelFormatSupported(pixFmt) && CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) && scaleFactor <= QnFrameScaler::factor_8)
+            QnFrameScaler::downscale(&m_tmpFrame, outFrame, scaleFactor); // fast scaler
         else {
             if (!rescaleFrame(m_tmpFrame, *outFrame, m_tmpFrame.width / scaleFactor, m_tmpFrame.height / scaleFactor)) // universal scaler
                 return Status_Displayed;
@@ -600,16 +600,16 @@ void CLVideoStreamDisplay::setLightCPUMode(QnAbstractVideoDecoder::DecodeMode va
     }
 }
 
-CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::findScaleFactor(int width, int height, int fitWidth, int fitHeight)
+QnFrameScaler::downscale_factor CLVideoStreamDisplay::findScaleFactor(int width, int height, int fitWidth, int fitHeight)
 {
     if (fitWidth * 8 <= width  && fitHeight * 8 <= height)
-        return CLVideoDecoderOutput::factor_8;
+        return QnFrameScaler::factor_8;
     if (fitWidth * 4 <= width  && fitHeight * 4 <= height)
-        return CLVideoDecoderOutput::factor_4;
+        return QnFrameScaler::factor_4;
     else if (fitWidth * 2 <= width  && fitHeight * 2 <= height)
-        return CLVideoDecoderOutput::factor_2;
+        return QnFrameScaler::factor_2;
     else
-        return CLVideoDecoderOutput::factor_1;
+        return QnFrameScaler::factor_1;
 }
 
 void CLVideoStreamDisplay::setMTDecoding(bool value)
