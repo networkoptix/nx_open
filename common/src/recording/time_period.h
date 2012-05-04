@@ -57,7 +57,14 @@ struct QN_EXPORT QnTimePeriod
     void addPeriod(const QnTimePeriod &timePeriod);
     QnTimePeriod intersect(const QnTimePeriod &other) const;
     void clear();
-    bool isEmpty() const;
+
+    /**
+     * \returns                         Whether this is an empty period --- a 
+     *                                  period of zero length.
+     */
+    bool isEmpty() const {
+        return durationMs == 0;
+    }
 
     qint64 endTimeMs() const;
 

@@ -244,7 +244,7 @@ void QnRtspClientArchiveDelegate::reopen()
 QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
 {
     QnAbstractMediaDataPtr result = getNextDataInternal();
-    if (m_serverTimePeriod.isEmpty())
+    if (m_serverTimePeriod.isNull())
         return result;
     
     // Check if archive moved to other video server

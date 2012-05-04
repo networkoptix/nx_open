@@ -391,6 +391,16 @@ namespace Qn {
         /* Slider actions. */
 
         /**
+         * Starts selection.
+         */
+        StartTimeSelectionAction,
+
+        /**
+         * Ends selection.
+         */
+        EndTimeSelectionAction,
+
+        /**
          * Clears selection.
          */
         ClearTimeSelectionAction,

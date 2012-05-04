@@ -162,7 +162,7 @@ private:
     qreal m_lastMinimalSpeed;
     qreal m_lastMaximalSpeed;
 
-    QAction *m_clearSelectionAction;
+    QAction *m_startSelectionAction, *m_endSelectionAction, *m_clearSelectionAction;
 
     /** Widget to per-widget slider data mapping. */
     QHash<QnResourceWidget *, SliderUserData> m_localDataByWidget;

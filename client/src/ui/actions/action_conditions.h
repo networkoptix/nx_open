@@ -16,6 +16,12 @@ namespace Qn {
         ExactlyOne  /**< Match only if exactly one resource satisfies condition. */
     };
 
+    enum PeriodType {
+        NullPeriod,     /**< No period. */
+        EmptyPeriod,    /**< Period of zero length. */
+        NormalPeriod,   /**< Normal period with non-zero length. */
+    };
+
 } // namespace Qn
 
 
@@ -151,15 +157,17 @@ public:
 
 class QnTimePeriodActionCondition: public QnActionCondition {
 public:
-    QnTimePeriodActionCondition(bool requiredPeriodEmptyValue, QObject *parent = NULL):
+    QnTimePeriodActionCondition(Qn::PeriodType periodType, Qn::ActionVisibility nonMatchingVisibility, QObject *parent = NULL):
         QnActionCondition(parent),
-        m_requiredPeriodEmptyValue(requiredPeriodEmptyValue)
+        m_periodType(periodType),
+        m_nonMatchingVisibility(nonMatchingVisibility)
     {}
 
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 
 private:
-    bool m_requiredPeriodEmptyValue;
+    Qn::PeriodType m_periodType;
+    Qn::ActionVisibility m_nonMatchingVisibility;
 };
 
 
