@@ -5,7 +5,7 @@
 #include <ui/common/linear_combination.h>
 #include <ui/graphics/painters/radial_gradient_painter.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
-#include <settings.h>
+#include "utils/settings.h"
 
 Q_GLOBAL_STATIC_WITH_ARGS(QnRadialGradientPainter, radialGradientPainter, (32, QColor(255, 255, 255, 255), QColor(255, 255, 255, 0)));
 

@@ -35,7 +35,7 @@
 #include "camera/camdisplay.h"
 #include "polygonal_shadow_item.h"
 #include "resource_widget_renderer.h"
-#include "settings.h"
+#include "utils/settings.h"
 #include "math.h"
 #include "image_button_widget.h"
 #include "viewport_bound_widget.h"

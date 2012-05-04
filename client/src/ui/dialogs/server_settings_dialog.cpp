@@ -12,7 +12,7 @@
 #include "ui/style/skin.h"
 #include "server_settings_dialog.h"
 
-#include "settings.h"
+#include "utils/settings.h"
 
 #define BILLION 1000000000LL
 

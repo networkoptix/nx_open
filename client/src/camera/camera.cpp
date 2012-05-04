@@ -1,7 +1,7 @@
 #include "camera.h"
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
-#include "client_util.h"
+#include "utils/client_util.h"
 #include "ui/style/skin.h"
 #include "core/resource/security_cam_resource.h"
 

@@ -6,7 +6,7 @@
 
 #include <QtGui/QWidget>
 
-#include "settings.h"
+#include "utils/settings.h"
 
 class QDataWidgetMapper;
 class QModelIndex;

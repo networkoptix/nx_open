@@ -9,7 +9,7 @@
 #include "camera_motion_mask_widget.h"
 #include "camera_schedule_widget.h"
 
-#include "settings.h"
+#include "utils/settings.h"
 #include "ui/style/globals.h"
 
 SettingsSlider::SettingsSlider(Qt::Orientation orientation, QWidget *parent)

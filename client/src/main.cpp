@@ -1,6 +1,6 @@
 #include "version.h"
 #include "ui/widgets/main_window.h"
-#include "settings.h"
+#include "utils/settings.h"
 
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>
@@ -22,12 +22,12 @@
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "core/resourcemanagment/resource_discovery_manager.h"
 #include "core/resourcemanagment/resource_pool.h"
-#include "client_util.h"
+#include "utils/client_util.h"
 #include "plugins/resources/arecontvision/resource/av_resource_searcher.h"
 #include "api/AppServerConnection.h"
 #include "device_plugins/server_camera/server_camera.h"
 #include "device_plugins/server_camera/appserver.h"
-#include "util.h"
+#include "utils/util.h"
 
 #define TEST_RTSP_SERVER
 //#define STANDALONE_MODE

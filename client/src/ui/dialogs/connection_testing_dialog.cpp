@@ -12,7 +12,7 @@
 #include "ui/style/skin.h"
 #include "connection_testing_dialog.h"
 
-#include "settings.h"
+#include "utils/settings.h"
 
 ConnectionTestingDialog::ConnectionTestingDialog(QWidget *parent, QUrl url) :
     QDialog(parent),
