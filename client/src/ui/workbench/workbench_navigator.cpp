@@ -370,6 +370,92 @@ QnCachingTimePeriodLoader *QnWorkbenchNavigator::loader(QnResourceWidget *widget
     return widget ? loader(widget->resource()) : NULL;
 }
 
+void QnWorkbenchNavigator::jumpBackward() {
+    if(!m_currentWidget)
+        return;
+
+    QnAbstractArchiveReader *reader = m_currentWidget->display()->archiveReader();
+    if(!reader)
+        return;
+
+    qint64 pos = 0;
+    if(m_currentWidgetIsCamera) {
+        QnCachingTimePeriodLoader *loader = this->loader(m_currentWidget);
+        const QnTimePeriodList fullPeriods = loader->periods(loader->isMotionRegionsEmpty() ? Qn::RecordingTimePeriod : Qn::MotionTimePeriod);
+        const QnTimePeriodList periods = QnTimePeriod::aggregateTimePeriods(fullPeriods, MAX_FRAME_DURATION);
+        
+        if (!periods.isEmpty()) {
+            qint64 currentTime = m_currentWidget->display()->camera()->getCurrentTime();
+
+            if (currentTime == DATETIME_NOW) {
+                pos = periods.last().startTimeMs * 1000;
+            } else {
+                QnTimePeriodList::const_iterator itr = qUpperBound(periods.begin(), periods.end(), currentTime / 1000);
+                itr = qMax(itr - 2, periods.begin());
+                pos = itr->startTimeMs * 1000;
+                if (reader->isReverseMode() && itr->durationMs != -1)
+                    pos += itr->durationMs * 1000;
+            }
+        }
+    }
+    reader->jumpTo(pos, 0);
+
+}
+
+void QnWorkbenchNavigator::jumpForward() {
+    if (!m_currentWidget)
+        return;
+
+    QnAbstractArchiveReader *reader = m_currentWidget->display()->archiveReader();
+    if(!reader)
+        return;
+
+    qint64 pos = reader->endTime();
+    if(m_currentWidgetIsCamera) {
+        QnCachingTimePeriodLoader *loader = this->loader(m_currentWidget);
+        const QnTimePeriodList fullPeriods = loader->periods(loader->isMotionRegionsEmpty() ? Qn::RecordingTimePeriod : Qn::MotionTimePeriod);
+        const QnTimePeriodList periods = QnTimePeriod::aggregateTimePeriods(fullPeriods, MAX_FRAME_DURATION);
+
+        QnTimePeriodList::const_iterator itr = qUpperBound(periods.begin(), periods.end(), m_currentWidget->display()->camera()->getCurrentTime() / 1000);
+        if (itr == periods.end() || reader->isReverseMode() && itr->durationMs == -1) {
+            pos = DATETIME_NOW;
+        } else {
+            pos = (itr->startTimeMs + (reader->isReverseMode() ? itr->durationMs : 0)) * 1000;
+        }
+    }
+    reader->jumpTo(pos, 0);
+
+}
+
+void QnWorkbenchNavigator::stepBackward() {
+    if(!m_currentWidget)
+        return;
+
+    QnAbstractArchiveReader *reader = m_currentWidget->display()->archiveReader();
+    if(!reader)
+        return;
+
+    if (!reader->isSkippingFrames() && reader->currentTime() > reader->startTime()) {
+        quint64 currentTime = m_currentWidget->display()->camera()->getCurrentTime();
+
+        if (reader->isSingleShotMode())
+            m_currentWidget->display()->camDisplay()->playAudio(false); // TODO: wtf?
+
+        reader->previousFrame(currentTime);
+    }
+}
+
+void QnWorkbenchNavigator::stepForward() {
+    if(!m_currentWidget)
+        return;
+
+    QnAbstractArchiveReader *reader = m_currentWidget->display()->archiveReader();
+    if(!reader)
+        return;
+
+    reader->nextFrame();
+}
+
 
 // -------------------------------------------------------------------------- //
 // Updaters
@@ -414,8 +500,8 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     updateLive();
     updatePlayingSupported();
     updatePlaying();
-    updateSpeed();
     updateSpeedRange();
+    updateSpeed();
     updateThumbnails();
 
     emit currentWidgetChanged();
@@ -786,6 +872,10 @@ void QnWorkbenchNavigator::at_display_widgetAdded(QnResourceWidget *widget) {
 void QnWorkbenchNavigator::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {
     if(QnSecurityCamResourcePtr cameraResource = widget->resource().dynamicCast<QnSecurityCamResource>()) {
         disconnect(widget, NULL, this, NULL);
+
+        if(!widget->isMotionSelectionEmpty())
+            if(QnCachingTimePeriodLoader *loader = this->loader(widget->resource()))
+                loader->setMotionRegions(QList<QRegion>());
 
         removeSyncedWidget(widget);
     }

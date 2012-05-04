@@ -44,6 +44,10 @@ signals:
     void speedChanged(qreal speed);
     void roundedSpeedChanged(qreal roundedSpeed);
 
+public slots:
+    void speedUp();
+    void speedDown();
+
 protected:
     virtual void sliderChange(SliderChange change) override;
     virtual void timerEvent(QTimerEvent *event) override;

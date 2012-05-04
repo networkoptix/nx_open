@@ -248,6 +248,8 @@ public:
      */
     void clearMotionSelection();
 
+    bool isMotionSelectionEmpty() const;
+
     /**
      * \returns                         Current motion selection regions.
      */
@@ -271,6 +273,8 @@ public:
     };
 
     const QList<QnMotionRegion> &getMotionRegionList();
+
+    bool isMotionRegionsEmpty() const;
 
 public slots:
     void showActivityDecorations();

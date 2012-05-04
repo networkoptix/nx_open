@@ -43,6 +43,7 @@ QnSpeedSlider::QnSpeedSlider(QGraphicsItem *parent):
     setTickPosition(GraphicsSlider::NoTicks);
     setSpeedRange(-16.0, 16.0);
     setSpeed(1.0);
+    setPageStep(1000);
 
     /* Set up animator. */
     m_animator->setTargetObject(this);
@@ -149,6 +150,14 @@ void QnSpeedSlider::finishAnimations() {
         
         setSpeed(m_defaultSpeed);
     }
+}
+
+void QnSpeedSlider::speedUp() {
+    triggerAction(SliderPageStepAdd);
+}
+
+void QnSpeedSlider::speedDown() {
+    triggerAction(SliderPageStepSub);
 }
 
 

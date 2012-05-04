@@ -50,23 +50,19 @@ private slots:
     void at_navigator_currentWidgetChanged();
     void at_liveButton_clicked();
     void at_syncButton_clicked();
-
-    void rewindBackward();
-    void rewindForward();
-
-    void stepBackward();
-    void stepForward();
+    void at_stepBackwardButton_clicked();
+    void at_stepForwardButton_clicked();
 
 protected:
     virtual void wheelEvent(QGraphicsSceneWheelEvent *) override;
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *) override;
 
 private:
-    QnImageButtonWidget *m_backwardButton;
+    QnImageButtonWidget *m_jumpBackwardButton;
     QnImageButtonWidget *m_stepBackwardButton;
     QnImageButtonWidget *m_playButton;
     QnImageButtonWidget *m_stepForwardButton;
-    QnImageButtonWidget *m_forwardButton;
+    QnImageButtonWidget *m_jumpForwardButton;
     QnImageButtonWidget *m_liveButton;
     QnImageButtonWidget *m_mrsButton;
     QnImageButtonWidget *m_syncButton;

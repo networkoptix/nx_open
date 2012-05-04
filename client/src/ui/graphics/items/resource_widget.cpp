@@ -1166,3 +1166,10 @@ const QList<QnMotionRegion> &QnResourceWidget::getMotionRegionList()
     ensureMotionMask();
     return m_motionRegionList;
 }
+
+bool QnResourceWidget::isMotionSelectionEmpty() const { // TODO: create a separate class for a list of motion regions.
+    foreach(const QRegion &region, motionSelection())
+        if(!region.isEmpty())
+            return false;
+    return true;
+}

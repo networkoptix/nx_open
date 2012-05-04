@@ -52,10 +52,10 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
 
 
     /* Create buttons. */
-    m_backwardButton = new QnImageButtonWidget(this);
-    m_backwardButton->setIcon(qnSkin->icon("rewind_backward.png"));
-    m_backwardButton->setPreferredSize(32, 18);
-    m_backwardButton->setFocusProxy(this);
+    m_jumpBackwardButton = new QnImageButtonWidget(this);
+    m_jumpBackwardButton->setIcon(qnSkin->icon("rewind_backward.png"));
+    m_jumpBackwardButton->setPreferredSize(32, 18);
+    m_jumpBackwardButton->setFocusProxy(this);
 
     m_stepBackwardButton = new QnImageButtonWidget(this);
     m_stepBackwardButton->setIcon(qnSkin->icon("step_backward.png"));
@@ -73,10 +73,10 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
     m_stepForwardButton->setPreferredSize(32, 18);
     m_stepForwardButton->setFocusProxy(this);
 
-    m_forwardButton = new QnImageButtonWidget(this);
-    m_forwardButton->setIcon(qnSkin->icon("rewind_forward.png"));
-    m_forwardButton->setPreferredSize(32, 18);
-    m_forwardButton->setFocusProxy(this);
+    m_jumpForwardButton = new QnImageButtonWidget(this);
+    m_jumpForwardButton->setIcon(qnSkin->icon("rewind_forward.png"));
+    m_jumpForwardButton->setPreferredSize(32, 18);
+    m_jumpForwardButton->setFocusProxy(this);
 
     m_muteButton = new QnImageButtonWidget(this);
     m_muteButton->setIcon(qnSkin->icon("unmute.png", "mute.png"));
@@ -134,16 +134,16 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
     /* Put it all into layouts. */
     QGraphicsLinearLayout *buttonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     buttonsLayout->setSpacing(2);
-    buttonsLayout->addItem(m_backwardButton);
-    buttonsLayout->setAlignment(m_backwardButton, Qt::AlignCenter);
+    buttonsLayout->addItem(m_jumpBackwardButton);
+    buttonsLayout->setAlignment(m_jumpBackwardButton, Qt::AlignCenter);
     buttonsLayout->addItem(m_stepBackwardButton);
     buttonsLayout->setAlignment(m_stepBackwardButton, Qt::AlignCenter);
     buttonsLayout->addItem(m_playButton);
     buttonsLayout->setAlignment(m_playButton, Qt::AlignCenter);
     buttonsLayout->addItem(m_stepForwardButton);
     buttonsLayout->setAlignment(m_stepForwardButton, Qt::AlignCenter);
-    buttonsLayout->addItem(m_forwardButton);
-    buttonsLayout->setAlignment(m_forwardButton, Qt::AlignCenter);
+    buttonsLayout->addItem(m_jumpForwardButton);
+    buttonsLayout->setAlignment(m_jumpForwardButton, Qt::AlignCenter);
 
     QGraphicsLinearLayout *leftLayoutV = new QGraphicsLinearLayout(Qt::Vertical);
     leftLayoutV->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
@@ -196,10 +196,10 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
     connect(m_speedSlider,          SIGNAL(roundedSpeedChanged(qreal)),         this,           SLOT(updateNavigatorSpeedFromSpeedSlider()));
     connect(m_volumeSlider,         SIGNAL(valueChanged(qint64)),               this,           SLOT(updateButtonsMuteState()));
 
-    connect(m_stepBackwardButton,   SIGNAL(clicked()),                          this,           SLOT(stepBackward()));
-    connect(m_stepForwardButton,    SIGNAL(clicked()),                          this,           SLOT(stepForward()));
-    connect(m_backwardButton,       SIGNAL(clicked()),                          this,           SLOT(rewindBackward()));
-    connect(m_forwardButton,        SIGNAL(clicked()),                          this,           SLOT(rewindForward()));
+    connect(m_stepBackwardButton,   SIGNAL(clicked()),                          this,           SLOT(at_stepBackwardButton_clicked()));
+    connect(m_stepForwardButton,    SIGNAL(clicked()),                          this,           SLOT(at_stepForwardButton_clicked()));
+    connect(m_jumpBackwardButton,   SIGNAL(clicked()),                          m_navigator,    SLOT(jumpBackward()));
+    connect(m_jumpForwardButton,    SIGNAL(clicked()),                          m_navigator,    SLOT(jumpForward()));
     
     connect(m_playButton,           SIGNAL(toggled(bool)),                      m_navigator,    SLOT(setPlaying(bool)));
     connect(m_playButton,           SIGNAL(toggled(bool)),                      this,           SLOT(updateSpeedSliderParametersFromNavigator()));
@@ -250,16 +250,16 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
     connect(nextFrameAction, SIGNAL(triggered()), m_stepForwardButton, SLOT(click()));
     addAction(nextFrameAction);
 
-    QAction *toStartAction = new QAction(tr("To Start"), m_backwardButton);
+    QAction *toStartAction = new QAction(tr("To Start"), m_jumpBackwardButton);
     toStartAction->setShortcut(tr("Z"));
     toStartAction->setShortcutContext(Qt::ApplicationShortcut);
-    connect(toStartAction, SIGNAL(triggered()), m_backwardButton, SLOT(click()));
+    connect(toStartAction, SIGNAL(triggered()), m_jumpBackwardButton, SLOT(click()));
     addAction(toStartAction);
 
-    QAction *toEndAction = new QAction(tr("To End"), m_forwardButton);
+    QAction *toEndAction = new QAction(tr("To End"), m_jumpForwardButton);
     toEndAction->setShortcut(tr("X"));
     toEndAction->setShortcutContext(Qt::ApplicationShortcut);
-    connect(toEndAction, SIGNAL(triggered()), m_forwardButton, SLOT(click()));
+    connect(toEndAction, SIGNAL(triggered()), m_jumpForwardButton, SLOT(click()));
     addAction(toEndAction);
 
     QAction *volumeDownAction = new QAction(tr("Volume Down"), m_volumeSlider);
@@ -302,179 +302,13 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
     
     updateButtonsPlayingState();
     updateSpeedSliderParametersFromNavigator();
+    updateSpeedSliderSpeedFromNavigator();
 
     updateGeometry();
 }
 
 QnNavigationItem::~QnNavigationItem()
 {
-}
-
-#if 0
-void NavigationItem::setActualCamera(CLVideoCamera *camera)
-{
-    if (m_camera == camera)
-        return;
-
-    //m_timeSlider->resetSelectionRange();
-
-    bool zoomResetNeeded = !(m_reserveCameras.contains(camera) && m_reserveCameras.contains(m_camera) && m_syncButton->isChecked());
-
-    if (m_camera) {
-        disconnect(m_camera->getCamDisplay(), 0, this, 0);
-        
-        //m_zoomByCamera[m_camera] = m_timeSlider->scalingFactor();
-    }
-
-    m_camera = camera;
-
-    if (m_camera)
-    {
-        // Use QueuedConnection connection because of deadlock. Signal can came from before jump and speed changing can call pauseMedia (because of speed slider animation).
-        connect(m_camera->getCamDisplay(), SIGNAL(liveMode(bool)), this, SLOT(onLiveModeChanged(bool)), Qt::QueuedConnection);
-
-        QnAbstractArchiveReader *reader = dynamic_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
-
-
-        if (reader) {
-            setPlaying(!reader->isMediaPaused());
-            //m_timeSlider->setLiveMode(reader->isRealTimeSource());
-            m_speedSlider->setSpeed(reader->getSpeed());
-        }
-        else
-            setPlaying(true);
-        if (!m_syncButton->isChecked()) {
-            updateRecPeriodList(true);
-            repaintMotionPeriods();
-        }
-
-    }
-    else
-    {
-        //m_timeSlider->setScalingFactor(0);
-    }
-
-    if(zoomResetNeeded) {
-        updateSlider();
-
-        //m_timeSlider->setScalingFactor(m_zoomByCamera.value(m_camera, 0.0));
-    }
-
-    m_syncButton->setEnabled(m_reserveCameras.contains(camera));
-    m_liveButton->setEnabled(m_reserveCameras.contains(camera));
-
-    emit actualCameraChanged(m_camera);
-}
-#endif
-
-void QnNavigationItem::rewindBackward()
-{
-#if 0
-    if (m_camera == NULL)
-        return;
-
-    setActive(true);
-
-    QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
-
-    qint64 pos = 0;
-    if(m_reserveCameras.contains(m_camera))
-    {
-        const QnTimePeriodList &fullPeriods = m_timeSlider->fullMotionTimePeriodList().empty() ? m_timeSlider->fullRecTimePeriodList() : m_timeSlider->fullMotionTimePeriodList();
-        const QnTimePeriodList periods = QnTimePeriod::aggregateTimePeriods(fullPeriods, MAX_FRAME_DURATION);
-        if (!periods.isEmpty())
-        {
-            if (m_camera->getCurrentTime() == DATETIME_NOW) {
-                pos = periods.last().startTimeMs*1000;
-            }
-            else {
-                QnTimePeriodList::const_iterator itr = qUpperBound(periods.begin(), periods.end(), m_camera->getCurrentTime()/1000);
-                itr = qMax(itr-2, periods.begin());
-                pos = itr->startTimeMs*1000ll;
-                if (reader->isReverseMode() && itr->durationMs != -1)
-                    pos += itr->durationMs*1000ll;
-            }
-        }
-    }
-    reader->jumpTo(pos, 0);
-#endif
-}
-
-void QnNavigationItem::rewindForward()
-{
-#if 0
-    if (m_camera == NULL)
-        return;
-
-    setActive(true);
-    QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
-
-    qint64 pos = reader->endTime();
-    if(m_reserveCameras.contains(m_camera)) 
-    {
-        const QnTimePeriodList &fullPeriods = m_timeSlider->fullMotionTimePeriodList().empty() ? m_timeSlider->fullRecTimePeriodList() : m_timeSlider->fullMotionTimePeriodList();
-        const QnTimePeriodList periods = QnTimePeriod::aggregateTimePeriods(fullPeriods, MAX_FRAME_DURATION);
-        QnTimePeriodList::const_iterator itr = qUpperBound(periods.begin(), periods.end(), m_camera->getCurrentTime()/1000);
-        if (itr == periods.end() || reader->isReverseMode() && itr->durationMs == -1)
-            pos = DATETIME_NOW;
-        else
-            pos = (itr->startTimeMs + (reader->isReverseMode() ? itr->durationMs : 0)) * 1000ll;
-    }
-    reader->jumpTo(pos, 0);
-#endif
-}
-
-void QnNavigationItem::stepBackward()
-{
-#if 0
-    if (m_camera == NULL)
-        return;
-
-    setActive(true);
-
-    if (m_playing)
-    {
-        m_speedSlider->stepBackward();
-        return;
-    }
-
-    m_speedSlider->resetSpeed();
-
-    QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
-    if (!reader->isSkippingFrames() && m_camera->getCurrentTime() != 0)
-    {
-        quint64 curr_time = m_camera->getCurrentTime();
-
-        if (reader->isSingleShotMode())
-            m_camera->getCamDisplay()->playAudio(false);
-
-        reader->previousFrame(curr_time);
-        //m_camera->streamJump(curr_time);
-        //m_camera->getCamDisplay()->setSingleShotMode(false);
-    }
-#endif
-}
-
-void QnNavigationItem::stepForward()
-{
-#if 0
-    if (m_camera == NULL)
-        return;
-
-    setActive(true);
-
-    if (m_playing)
-    {
-        m_speedSlider->stepForward();
-        return;
-    }
-
-    m_speedSlider->resetSpeed();
-
-    QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
-    reader->nextFrame();
-    //m_camera->getCamDisplay()->setSingleShotMode(true);
-#endif
 }
 
 
@@ -606,4 +440,20 @@ void QnNavigationItem::at_liveButton_clicked() {
 
 void QnNavigationItem::at_syncButton_clicked() {
     display()->setStreamsSynchronized(m_syncButton->isChecked());
+}
+
+void QnNavigationItem::at_stepBackwardButton_clicked() {
+    if(m_playButton->isChecked()) {
+        m_speedSlider->speedDown();
+    } else {
+        m_navigator->stepBackward();
+    }
+}
+
+void QnNavigationItem::at_stepForwardButton_clicked() {
+    if(m_playButton->isChecked()) {
+        m_speedSlider->speedUp();
+    } else {
+        m_navigator->stepForward();
+    }
 }
