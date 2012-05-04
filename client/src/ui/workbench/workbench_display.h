@@ -74,6 +74,8 @@ public:
 
     bool isStreamsSynchronized() const;
 
+    bool isStreamsSynchronizationEffective() const;
+
     /**
      * \returns                         Instrument manager owned by this workbench display. 
      */
@@ -278,7 +280,8 @@ signals:
     void widgetAboutToBeRemoved(QnResourceWidget *widget);
     void widgetChanged(Qn::ItemRole role);
 
-    void streamsSynchronizedChanged(bool synchronized);
+    void streamsSynchronizedChanged();
+    void streamsSynchronizationEffectiveChanged();
 
 protected:
     virtual void tick(int deltaTime) override;

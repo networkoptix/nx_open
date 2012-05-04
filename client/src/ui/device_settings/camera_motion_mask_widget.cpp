@@ -210,7 +210,6 @@ void QnCameraMotionMaskWidget::at_motionRegionSelected(QGraphicsView *, QnResour
         emit motionRegionListChanged();
 }
 
-
 void QnCameraMotionMaskWidget::at_motionRegionCleared()
 {
     if (!m_resourceWidget)

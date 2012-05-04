@@ -190,7 +190,8 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
 
 
     /* Set up handlers. */
-    connect(display(),              SIGNAL(streamsSynchronizedChanged(bool)),   this,           SLOT(updateButtonsSyncState()));
+    connect(display(),              SIGNAL(streamsSynchronizedChanged()),       this,           SLOT(updateButtonsSyncState()));
+    connect(display(),              SIGNAL(streamsSynchronizationEffectiveChanged()), this,      SLOT(updateButtonsSyncEffectiveState()));
 
     connect(m_speedSlider,          SIGNAL(roundedSpeedChanged(qreal)),         this,           SLOT(updateNavigatorSpeedFromSpeedSlider()));
     connect(m_volumeSlider,         SIGNAL(valueChanged(qint64)),               this,           SLOT(updateButtonsMuteState()));
@@ -558,11 +559,17 @@ void QnNavigationItem::updateButtonsLiveState() {
 }
 
 void QnNavigationItem::updateButtonsLiveSupportedState() {
-    m_liveButton->setEnabled(m_navigator->isLiveSupported());
+    bool enabled = m_navigator->isLiveSupported();
+
+    m_liveButton->setEnabled(enabled);
 }
 
 void QnNavigationItem::updateButtonsSyncState() {
     m_syncButton->setChecked(display()->isStreamsSynchronized());
+}
+
+void QnNavigationItem::updateButtonsSyncEffectiveState() {
+    m_syncButton->setEnabled(display()->isStreamsSynchronizationEffective());
 }
 
 

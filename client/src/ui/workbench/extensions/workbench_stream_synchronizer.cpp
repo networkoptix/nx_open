@@ -11,6 +11,7 @@
 
 QnWorkbenchStreamSynchronizer::QnWorkbenchStreamSynchronizer(QnWorkbenchDisplay *display, QnWorkbenchRenderWatcher *renderWatcher, QObject *parent):
     QObject(parent),
+    m_widgetCount(0),
     m_syncPlay(NULL),
     m_display(display),
     m_counter(NULL)
@@ -35,6 +36,10 @@ QnWorkbenchStreamSynchronizer::QnWorkbenchStreamSynchronizer(QnWorkbenchDisplay 
 
     /* Prepare render watcher. */
     connect(renderWatcher, SIGNAL(displayingStateChanged(QnAbstractRenderer *, bool)), this, SLOT(at_renderWatcher_displayingStateChanged(QnAbstractRenderer *, bool)));
+
+    /* Run handlers for all widgets already on display. */
+    foreach(QnResourceWidget *widget, display->widgets())
+        at_display_widgetAdded(widget);
 }
 
 void QnWorkbenchStreamSynchronizer::setEnabled(bool enabled) {
@@ -46,6 +51,10 @@ void QnWorkbenchStreamSynchronizer::setEnabled(bool enabled) {
 
 bool QnWorkbenchStreamSynchronizer::isEnabled() const {
     return m_syncPlay->isEnabled();
+}
+
+bool QnWorkbenchStreamSynchronizer::isEffective() const {
+    return m_widgetCount > 0;
 }
 
 void QnWorkbenchStreamSynchronizer::at_display_widgetAdded(QnResourceWidget *widget) {
@@ -62,6 +71,10 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAdded(QnResourceWidget *wid
 
     m_counter->increment();
     connect(widget->display()->archiveReader(), SIGNAL(destroyed()), m_counter, SLOT(decrement()));
+
+    m_widgetCount++;
+    if(m_widgetCount == 1)
+        emit effectiveChanged();
 }
 
 void QnWorkbenchStreamSynchronizer::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {
@@ -72,6 +85,10 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAboutToBeRemoved(QnResource
         return;
 
     m_syncPlay->removeArchiveReader(widget->display()->archiveReader());
+
+    m_widgetCount--;
+    if(m_widgetCount == 0)
+        emit effectiveChanged();
 }
 
 void QnWorkbenchStreamSynchronizer::at_renderWatcher_displayingStateChanged(QnAbstractRenderer *renderer, bool displaying) {

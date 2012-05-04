@@ -35,6 +35,7 @@ public:
 
 private slots:
     void updateButtonsSyncState();
+    void updateButtonsSyncEffectiveState();
     void updateButtonsLiveState();
     void updateButtonsLiveSupportedState();
     void updateButtonsPlayingState();
