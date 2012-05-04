@@ -91,29 +91,37 @@ void QnMetaDataV1::removeMotion(const __m128i* image, int startIndex, int endInd
     }
 }
 
-bool QnMetaDataV1::isEmpty() const
+inline bool metadataIsEmpty_sse2(__m128i* src)
 {
-    static const __m128i ff_mask = _mm_setr_epi32(0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff); /* SSE2. */
     static const __m128i zerroValue = _mm_setr_epi32(0, 0, 0, 0); /* SSE2. */
-    __m128i* src = (__m128i*) data.data();
-
-    if (useSSE41())
+    for (int i = 0; i < MD_WIDTH*MD_HEIGHT/128; ++i)
     {
-        for (int i = 0; i < MD_WIDTH*MD_HEIGHT/128; ++i)
-        {
-            if (_mm_testz_si128(src[i], ff_mask) == 0) /* SSE4. */
-                return false;
-        }
-    }
-    else 
-    {
-        for (int i = 0; i < MD_WIDTH*MD_HEIGHT/128; ++i)
-        {
-            if (_mm_movemask_epi8(_mm_cmpeq_epi32(src[i], zerroValue)) != 0xffff) /* SSE2. */
-                return false;
-        }
+        if (_mm_movemask_epi8(_mm_cmpeq_epi32(src[i], zerroValue)) != 0xffff) /* SSE2. */
+            return false;
     }
     return true;
+}
+
+inline bool metadataIsEmpty_sse41(__m128i* src)
+#if defined(Q_CC_GNU)
+    __attribute__ ((__target__ ("sse4.1")))
+#endif
+{
+    static const __m128i ff_mask = _mm_setr_epi32(0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff); /* SSE2. */
+    for (int i = 0; i < MD_WIDTH*MD_HEIGHT/128; ++i)
+    {
+        if (_mm_testz_si128(src[i], ff_mask) == 0) /* SSE4. */
+            return false;
+    }
+    return true;
+}
+
+bool QnMetaDataV1::isEmpty() const
+{
+    if (useSSE41())
+        return metadataIsEmpty_sse41((__m128i*) data.data());
+    else 
+        return metadataIsEmpty_sse2((__m128i*) data.data());
 }
 
 void QnMetaDataV1::addMotion(const quint8* image, qint64 timestamp)
