@@ -6,6 +6,13 @@
 #include <emmintrin.h>
 #include <smmintrin.h>
 
+#if defined(Q_CC_GNU)
+#define sse4_attribute __attribute__ ((__target__ ("sse4.1")))
+#else
+#define sse4_attribute 
+#endif
+
+
 static inline bool useSSE2()
 {
 #ifdef Q_OS_MAC
