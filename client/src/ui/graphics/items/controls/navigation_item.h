@@ -33,18 +33,13 @@ public:
         return m_navigator;
     }
 
-public slots:
-    void onSyncButtonToggled(bool value);
-
-signals:
-    void enableItemSync(bool value);
-
 private slots:
+    void updateButtonsSyncState();
     void updateButtonsLiveState();
     void updateButtonsLiveSupportedState();
     void updateButtonsPlayingState();
     void updateButtonsPlayingSupportedState();
-    void updateMuteButtonFromVolumeSlider();
+    void updateButtonsMuteState();
     void updateNavigatorSpeedFromSpeedSlider();
     void updateSpeedSliderSpeedFromNavigator();
     void updateSpeedSliderParametersFromNavigator();
@@ -53,6 +48,7 @@ private slots:
     void at_navigator_currentWidgetAboutToBeChanged();
     void at_navigator_currentWidgetChanged();
     void at_liveButton_clicked();
+    void at_syncButton_clicked();
 
     void rewindBackward();
     void rewindForward();

@@ -455,10 +455,10 @@ void QnResourceWidget::invalidateMotionMask() {
     m_motionMaskValid = false;
 }
 
-void QnResourceWidget::addToMotionRegion(int sens, const QRect& rect, int channel) {
+void QnResourceWidget::addToMotionRegion(int sensitivity, const QRect& rect, int channel) {
     ensureMotionMask();
 
-    m_motionRegionList[channel].addRect(sens, rect);
+    m_motionRegionList[channel].addRect(sensitivity, rect);
 
     /*
     QnMotionRegion newRegion = m_motionRegionList[channel];
@@ -470,6 +470,12 @@ void QnResourceWidget::addToMotionRegion(int sens, const QRect& rect, int channe
     }
     return newRegion.isValid();
     */
+}
+
+bool QnResourceWidget::setMotionRegionSensitivity(int sensitivity, const QPoint &gridPos, int channel) {
+    ensureMotionMask();
+
+    return m_motionRegionList[channel].updateSensitivityAt(gridPos, sensitivity);
 }
 
 void QnResourceWidget::clearMotionRegions() {
@@ -1155,7 +1161,7 @@ void QnResourceWidget::setDrawMotionWindows(MotionDrawType value)
     m_motionDrawType = value;   
 }
 
-QList<QnMotionRegion>& QnResourceWidget::getMotionRegionList()
+const QList<QnMotionRegion> &QnResourceWidget::getMotionRegionList()
 {
     ensureMotionMask();
     return m_motionRegionList;

@@ -217,7 +217,7 @@ void QnCameraMotionMaskWidget::at_motionRegionCleared()
         return;
     bool changed = false;
 
-    QList<QnMotionRegion>& regions = m_resourceWidget->getMotionRegionList();
+    const QList<QnMotionRegion> &regions = m_resourceWidget->getMotionRegionList();
     for (int i = 0; i < regions.size(); ++i) {
         if(!regions[i].isEmpty()) {
             changed = true;
@@ -234,7 +234,7 @@ void QnCameraMotionMaskWidget::setNeedControlMaxRects(bool value)
     m_needControlMaxRects = value;
     if (m_resourceWidget && m_needControlMaxRects) 
     {
-        QList<QnMotionRegion>& regions = m_resourceWidget->getMotionRegionList();
+        const QList<QnMotionRegion> &regions = m_resourceWidget->getMotionRegionList();
         for (int i = 0; i < regions.size(); ++i) {
             if (!regions[i].isValid(m_camera->motionWindowCnt(), m_camera->motionMaskWindowCnt())) {
                 showTooManyWindowsMessage(regions[i]);
@@ -277,14 +277,12 @@ void QnCameraMotionMaskWidget::at_itemClicked(QGraphicsView *view, QGraphicsItem
     QPointF pos = info.scenePos() - item->pos();
     QPoint gridPos = m_resourceWidget->mapToMotionGrid(pos);
     int channel = gridPosToChannelPos(gridPos);
-    if (m_resourceWidget->getMotionRegionList()[channel].updateSensitivityAt(gridPos, m_motionSensitivity))
+    if (m_resourceWidget->setMotionRegionSensitivity(m_motionSensitivity, gridPos, channel))
         emit motionRegionListChanged();
 }
 
 void QnCameraMotionMaskWidget::showTooManyWindowsMessage(const QnMotionRegion &region)
 {
-    QList<QnMotionRegion>& regions = m_resourceWidget->getMotionRegionList();
-
     int maxWndCnt = region.getMotionRectCount();
     int maxMaskCnt = region.getMaskRectCount();
     
