@@ -51,10 +51,16 @@ void ServerSettingsDialog::accept()
 {
     ui->buttonBox->setEnabled(false);
 
-    if (saveToModel())
+    startSaveProcess();
+
+    /*
+    if (saveToModel()) 
+    {
         save();
+    }
     else
         ui->buttonBox->setEnabled(true);
+    */
 }
 
 
@@ -63,7 +69,7 @@ void ServerSettingsDialog::reject()
     QDialog::reject();
 }
 
-bool ServerSettingsDialog::saveToModel()
+void ServerSettingsDialog::startSaveProcess()
 {
     QnAbstractStorageResourceList storages;
     int rowCount = ui->storagesTable->rowCount();
@@ -84,12 +90,18 @@ bool ServerSettingsDialog::saveToModel()
     QString errorString;
     if (!validateStorages(storages, errorString))
     {
+        ui->buttonBox->setEnabled(true);
         QMessageBox mbox(QMessageBox::Warning, tr("Warning"), errorString, QMessageBox::Ok, this, Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
         mbox.exec();
-        return false;
+        return;
     }
+    m_tmpStorages = storages;
+    validateStoragesPathAsync();
+}
 
-    m_server->setStorages(storages);
+void ServerSettingsDialog::saveToModel()
+{
+    m_server->setStorages(m_tmpStorages);
     m_server->setName(ui->nameEdit->text());
 
     QUrl url(m_server->getUrl());
@@ -99,8 +111,6 @@ bool ServerSettingsDialog::saveToModel()
     QUrl apiUrl(m_server->getApiUrl());
     apiUrl.setPort(ui->apiPortEdit->text().toInt());
     m_server->setApiUrl(apiUrl.toString());
-
-    return true;
 }
 
 QSpinBox* ServerSettingsDialog::createSpinCellWidget(QWidget* parent)
@@ -170,6 +180,42 @@ bool ServerSettingsDialog::validateStorages(const QnAbstractStorageResourceList&
             errorString = "Space Limit should be non-negative integer";
             return false;
         }
+    }
+
+    return true;
+}
+
+void ServerSettingsDialog::at_checkPathReplyReceived(int status, bool result, int handle)
+{
+    QMap<int, QString>::iterator itr = m_checkingStorageHandle.find(handle);
+    if (itr != m_checkingStorageHandle.end())
+    {
+        if (result)
+        {
+            m_checkingStorageHandle.erase(itr);
+            if (m_checkingStorageHandle.isEmpty()) 
+            {
+                // validation finished
+                saveToModel();
+                save();
+            }
+        }
+        else {
+            QMessageBox::warning(this, "Invalid storage path", QString("Storage path '%1' is invalid or not accessible for writting").arg(itr.value()));
+            m_checkingStorageHandle.clear();
+            ui->buttonBox->setEnabled(true);
+        }
+    }
+}
+
+bool ServerSettingsDialog::validateStoragesPathAsync()
+{
+    m_checkingStorageHandle.clear();
+    foreach (const QnAbstractStorageResourcePtr& storage, m_tmpStorages)
+    {
+        QnVideoServerConnectionPtr serverConnection = m_server->apiConnection();
+        int handle = serverConnection->asyncCheckPath(storage->getUrl(), this,  SLOT(at_checkPathReplyReceived(int, bool, int)));
+        m_checkingStorageHandle.insert(handle, storage->getUrl());
     }
 
     return true;
