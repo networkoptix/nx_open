@@ -457,7 +457,7 @@ void QnPlAreconVisionResource::setMotionMaskPhysical(int channel)
         
         if (!region.getRegionBySens(sens).isEmpty())
         {
-            setParamAsync("mdlevelthreshold", sensToLevelThreshold[sens], QnDomainPhysical);
+            setParamAsync("Threshold", sensToLevelThreshold[sens], QnDomainPhysical);
             break; // only 1 sensitivity for all frame is supported
         }
     }

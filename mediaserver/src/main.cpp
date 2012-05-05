@@ -50,6 +50,7 @@
 //#include "plugins/storage/file_storage/file_storage_protocol.h"
 #include "plugins/storage/file_storage/file_storage_resource.h"
 #include "main.h"
+#include "rest/handlers/fs_checker.h"
 
 
 static const char SERVICE_NAME[] = "Network Optix VMS Media Server";
@@ -528,6 +529,7 @@ void QnMain::run()
 
     m_restServer = new QnRestServer(QHostAddress::Any, apiUrl.port());
     m_restServer->registerHandler("api/RecordedTimePeriods", new QnRecordedChunkListHandler());
+    m_restServer->registerHandler("api/CheckPath", new QnFsHelperHandler());
 
     QByteArray errorString;
 

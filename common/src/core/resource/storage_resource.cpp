@@ -195,7 +195,7 @@ void QnStoragePluginFactory::registerStoragePlugin(const QString& name, StorageT
         m_defaultStoragePlugin = pluginInst;
 }
 
-QnStorageResource* QnStoragePluginFactory::createStorage(const QString& storageType)
+QnStorageResource* QnStoragePluginFactory::createStorage(const QString& storageType, bool useDefaultForUnknownPrefix)
 {
     int prefix = storageType.indexOf("://");
     if (prefix == -1)
@@ -203,6 +203,10 @@ QnStorageResource* QnStoragePluginFactory::createStorage(const QString& storageT
     QString protocol = storageType.left(prefix);
     if (m_storageTypes.contains(protocol))
         return m_storageTypes.value(protocol)();
-    else
-        return m_defaultStoragePlugin();
+    else {
+        if (useDefaultForUnknownPrefix)
+            return m_defaultStoragePlugin();
+        else
+            return 0;
+    }
 }

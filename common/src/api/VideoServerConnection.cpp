@@ -172,11 +172,23 @@ QnTimePeriodList QnVideoServerConnection::recordedTimePeriods(const QnNetworkRes
     return result;
 }
 
-int QnVideoServerConnection::asyncRecordedTimePeriods(const QnNetworkResourceList& list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, QList<QRegion> motionRegions, QObject *target, const char *slot) {
+int QnVideoServerConnection::asyncRecordedTimePeriods(const QnNetworkResourceList& list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, QList<QRegion> motionRegions, QObject *target, const char *slot) 
+{
     detail::QnVideoServerConnectionReplyProcessor *processor = new detail::QnVideoServerConnectionReplyProcessor();
     connect(processor, SIGNAL(finished(int, const QnTimePeriodList &, int)), target, slot);
 
     return asyncRecordedTimePeriods(createParamList(list, startTimeMs, endTimeMs, detail, motionRegions), processor, SLOT(at_replyReceived(int, const QnTimePeriodList&, int)));
+}
+
+int QnVideoServerConnection::asyncCheckPath(const QString& path, QObject *target, const char *slot)
+{
+    detail::VideoServerSessionManagerPathRequestReplyProcessor *processor = new detail::VideoServerSessionManagerPathRequestReplyProcessor();
+    connect(processor, SIGNAL(finished(int, bool, int)), target, slot);
+
+    QnRequestParamList params;
+    params << QnRequestParam("path", path);
+    return SessionManager::instance()->sendAsyncGetRequest(m_url, "CheckPath", params, processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
+
 }
 
 void detail::VideoServerSessionManagerReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray& /*errorString*/, int handle)
@@ -192,6 +204,25 @@ void detail::VideoServerSessionManagerReplyProcessor::at_replyReceived(int statu
             qWarning() << "VideoServerConnection: unexpected message received.";
             status = -1;
         }
+    }
+
+    emit finished(status, result, handle);
+
+    deleteLater();
+}
+
+void detail::VideoServerSessionManagerPathRequestReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray& /*errorString*/, int handle)
+{
+    bool result = false;
+    if(status == 0)
+    {
+        int bodyStart = reply.indexOf("<root>");
+        if (bodyStart >= 0)
+            bodyStart += QString("<root>").length();
+        int bodyEnd = reply.indexOf("</root>");
+        QByteArray message = reply.mid(bodyStart, bodyEnd - bodyStart).trimmed();
+        if (message == "OK")
+            result = true;
     }
 
     emit finished(status, result, handle);

@@ -23,7 +23,9 @@ public:
         blockTracking(false), pressed(false),
         invertedAppearance(false), invertedControls(false),
         acceleratedWheeling(false),
-        repeatAction(AbstractGraphicsSlider::SliderNoAction)
+        repeatAction(AbstractGraphicsSlider::SliderNoAction),
+        mouseWidget(NULL),
+        mouseButtons(0)
 #ifdef QT_KEYPAD_NAVIGATION
       , isAutoRepeating(false)
       , repeatMultiplier(1)
@@ -67,6 +69,16 @@ public:
     // The time of when the first auto repeating key press event occurs.
     QElapsedTimer firstRepeat;
 #endif
+
+    QWidget *mouseWidget;
+    Qt::MouseButtons mouseButtons;
+    QPoint mouseScreenPos;
+
+    inline void mouseEvent(QGraphicsSceneMouseEvent *event) {
+        mouseWidget = event->widget();
+        mouseScreenPos = event->screenPos();
+        mouseButtons = event->buttons();
+    }
 
     inline qint64 effectiveSingleStep() const
     {

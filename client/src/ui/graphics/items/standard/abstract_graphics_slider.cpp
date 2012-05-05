@@ -7,6 +7,7 @@
 #include <QtGui/QApplication>
 #include <QtGui/QGraphicsSceneEvent>
 #include <QtGui/QStyleOption>
+#include <QtGui/QGraphicsView>
 #include <limits>
 
 namespace {
@@ -289,6 +290,37 @@ void AbstractGraphicsSlider::setRepeatAction(SliderAction action, int thresholdT
 void AbstractGraphicsSlider::sliderChange(SliderChange)
 {
     update();
+}
+
+void AbstractGraphicsSlider::sendPendingMouseMoves(QWidget *widget) {
+    Q_D(AbstractGraphicsSlider);
+
+    if(!widget || widget != d->mouseWidget)
+        return;
+
+    Qt::MouseButtons buttons = QApplication::mouseButtons();
+    if(buttons == 0 || buttons != d->mouseButtons) 
+        return;
+    
+    QPoint pos = QCursor::pos();
+    if(pos == d->mouseScreenPos)
+        return;
+
+    QGraphicsView *view = dynamic_cast<QGraphicsView *>(widget->parent());
+    if(!view) 
+        return;
+
+    QGraphicsSceneMouseEvent event(QEvent::GraphicsSceneMouseMove);
+    event.setButtons(buttons);
+    event.setScreenPos(QCursor::pos());
+    event.setScenePos(view->mapToScene(view->mapFromGlobal(event.screenPos())));
+    event.setPos(mapFromScene(event.scenePos()));
+    event.setModifiers(QApplication::keyboardModifiers());
+    event.setWidget(widget);
+
+    /* We don't set the last position & button down positions because we don't use them.
+     * Note that this may lead to problems if derived classes / filters use it. */
+    scene()->sendEvent(this, &event);
 }
 
 bool AbstractGraphicsSliderPrivate::scrollByDelta(Qt::Orientation orientation, Qt::KeyboardModifiers modifiers, int delta)
@@ -581,4 +613,14 @@ void AbstractGraphicsSlider::wheelEvent(QGraphicsSceneWheelEvent *event)
 }
 #endif
 
+void AbstractGraphicsSlider::mousePressEvent(QGraphicsSceneMouseEvent *event) {
+    d_func()->mouseEvent(event);
+}
 
+void AbstractGraphicsSlider::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
+    d_func()->mouseEvent(event);
+}
+
+void AbstractGraphicsSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
+    d_func()->mouseEvent(event);
+}

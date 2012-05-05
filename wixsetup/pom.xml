@@ -293,7 +293,7 @@
 								</configuration>					
 							</execution>	-->				
 
-							<execution>
+							<!--<execution>
 								<id>integration-test</id>
 								<phase>integration-test</phase>
 								<goals>
@@ -303,8 +303,8 @@
 									<executable>test.bat</executable>
 									<workingDirectory>${baseDir}</workingDirectory>						
 								</configuration>	
-							</execution>					
-						</executions>
+							</execution>	-->				
+						</executions> 
 					</plugin>
 					<!--<plugin>
 				<groupId>org.codehaus.mojo</groupId>

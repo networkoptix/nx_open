@@ -20,6 +20,8 @@ class AbstractGraphicsSlider : public GraphicsWidget
     Q_PROPERTY(bool sliderDown READ isSliderDown WRITE setSliderDown DESIGNABLE false)
     Q_PROPERTY(bool acceleratedWheeling READ isWheelingAccelerated WRITE setWheelingAccelerated)
 
+    typedef GraphicsWidget base_type;
+
 public:
     explicit AbstractGraphicsSlider(QGraphicsItem *parent = 0);
     virtual ~AbstractGraphicsSlider();
@@ -97,6 +99,8 @@ protected:
     SliderAction repeatAction() const;
     void setRepeatAction(SliderAction action, int thresholdTime = 500, int repeatTime = 50);
 
+    void sendPendingMouseMoves(QWidget *widget);
+
     enum SliderChange {
         SliderRangeChange,
         SliderOrientationChange,
@@ -115,6 +119,9 @@ protected:
 #ifndef QT_NO_WHEELEVENT
     virtual void wheelEvent(QGraphicsSceneWheelEvent *event) override;
 #endif
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
+    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 
 protected:
     AbstractGraphicsSlider(AbstractGraphicsSliderPrivate &dd, QGraphicsItem *parent);

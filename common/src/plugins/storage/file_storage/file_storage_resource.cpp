@@ -82,6 +82,31 @@ QFileInfoList QnFileStorageResource::getFileList(const QString& dirName)
     return dir.entryInfoList(QDir::Files);
 }
 
+bool QnFileStorageResource::isStorageAvailableForWriting()
+{
+    QDir dir(getUrl());
+
+    bool needRemoveDir = false;
+    if (!dir.exists())
+    {
+        if (!dir.mkpath(getUrl()))
+            return false;
+        needRemoveDir = true;
+    }
+
+    QFile file(closeDirPath(getUrl()) + QString("tmp") + QString::number((unsigned) ((rand() << 16) + rand())));
+    bool result = file.open(QFile::WriteOnly);
+    if (result)
+    {
+        file.close();
+        file.remove();
+    }
+
+    if (needRemoveDir)
+        dir.remove(getUrl());
+
+    return result;
+}
 
 bool QnFileStorageResource::isStorageAvailable()
 {

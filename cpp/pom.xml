@@ -22,7 +22,7 @@
 
 	<properties>
 		<convert-only>true</convert-only>
-		<ffmpeg.version>2012-04-18-N-39944-gfc882b6-patched</ffmpeg.version>
+		<ffmpeg.version>2012-04-10-N-39672-g40b7a27</ffmpeg.version>
 		<buildLib/>
 	</properties>
 
