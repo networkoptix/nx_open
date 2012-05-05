@@ -17,8 +17,16 @@ int QnPlColdStoreStorage::getChunkLen() const
 
 bool QnPlColdStoreStorage::isStorageAvailable() 
 {
+    // todo: implement me
     return true;
 }
+
+bool QnPlColdStoreStorage::isFolderAvailableForWriting(const QString& path)
+{
+    // todo: implement me
+    return true;
+}
+
 
 QFileInfoList QnPlColdStoreStorage::getFileList(const QString& dirName) 
 {
