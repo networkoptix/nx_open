@@ -89,7 +89,7 @@
 		<dependency>
 			<groupId>com.sourceforge.cloudcity</groupId>
 			<artifactId>bespin</artifactId>
-			<version>dev-SNAPSHOT</version>
+			<version>1.0</version>
 			<type>zip</type>
 			<classifier>${platform}-${arch}</classifier>
 		</dependency>								
