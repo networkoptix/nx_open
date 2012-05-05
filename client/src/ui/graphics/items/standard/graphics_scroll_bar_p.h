@@ -9,6 +9,7 @@ class GraphicsScrollBarPrivate : public AbstractLinearGraphicsSliderPrivate
 public:
     QStyle::SubControl pressedControl;
     bool pointerOutsidePressedControl;
+    bool adjustForPressedHandle;
 
     QPointF relativeClickOffset;
     qint64 snapBackPosition;
@@ -21,6 +22,8 @@ public:
 
     QStyle::SubControl hoverControl;
     QRect hoverRect;
+
+    void setSliderPositionIgnoringAdjustments(qint64 position);
 };
 
 #endif // GRAPHICSSCROLLBAR_P_H

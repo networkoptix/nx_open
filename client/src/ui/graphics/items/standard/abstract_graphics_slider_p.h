@@ -24,7 +24,6 @@ public:
         invertedAppearance(false), invertedControls(false),
         acceleratedWheeling(false),
         repeatAction(AbstractGraphicsSlider::SliderNoAction),
-        mouseWidget(NULL),
         mouseButtons(0)
 #ifdef QT_KEYPAD_NAVIGATION
       , isAutoRepeating(false)
@@ -70,7 +69,7 @@ public:
     QElapsedTimer firstRepeat;
 #endif
 
-    QWidget *mouseWidget;
+    QWeakPointer<QWidget> mouseWidget;
     Qt::MouseButtons mouseButtons;
     QPoint mouseScreenPos;
 
