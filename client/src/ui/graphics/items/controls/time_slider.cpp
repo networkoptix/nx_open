@@ -729,7 +729,9 @@ void QnTimeSlider::updateAggregatedPeriods(int line, Qn::TimePeriodType type) {
 // -------------------------------------------------------------------------- //
 // Painting
 // -------------------------------------------------------------------------- //
-void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *widget) {
+    sendPendingMouseMoves(widget);
+
     QRectF rect = this->rect();
     qreal lineHeight = this->lineHeight();
 
@@ -1172,6 +1174,7 @@ void QnTimeSlider::keyPressEvent(QKeyEvent *event) {
                 }
             }
         }
+        break;
     default:
         base_type::keyPressEvent(event);
         break;

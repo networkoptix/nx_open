@@ -82,11 +82,12 @@ GraphicsSlider::~GraphicsSlider()
 {
 }
 
-void GraphicsSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *)
+void GraphicsSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *widget)
 {
-    Q_UNUSED(option)
-
     Q_D(GraphicsSlider);
+
+    /* Synchronize current position with the actual mouse position before painting. */
+    sendPendingMouseMoves(widget);
 
     QStyleOptionSlider opt;
     initStyleOption(&opt);
@@ -110,9 +111,11 @@ bool GraphicsSlider::event(QEvent *event)
     switch(event->type()) {
     case QEvent::GraphicsSceneHoverEnter:
     case QEvent::GraphicsSceneHoverMove:
-    case QEvent::GraphicsSceneHoverLeave:
-        d->updateHoverControl(static_cast<QGraphicsSceneHoverEvent *>(event)->pos().toPoint());
+    case QEvent::GraphicsSceneHoverLeave: {
+        QGraphicsSceneHoverEvent *hoverEvent = static_cast<QGraphicsSceneHoverEvent *>(event);
+        d->updateHoverControl(hoverEvent->pos().toPoint());
         break;
+    }
     default:
         break;
     }
@@ -120,12 +123,14 @@ bool GraphicsSlider::event(QEvent *event)
     return base_type::event(event);
 }
 
-void GraphicsSlider::mousePressEvent(QGraphicsSceneMouseEvent *ev)
+void GraphicsSlider::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     Q_D(GraphicsSlider);
 
-    if (d->maximum == d->minimum || (ev->buttons() ^ ev->button())) {
-        ev->ignore();
+    base_type::mousePressEvent(event);
+
+    if (d->maximum == d->minimum || (event->buttons() ^ event->button())) {
+        event->ignore();
         return;
     }
 
@@ -139,15 +144,15 @@ void GraphicsSlider::mousePressEvent(QGraphicsSceneMouseEvent *ev)
     const QRect sliderRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle, this);
     // to take half of the slider off for the setSliderPosition call we use the center - topLeft
     const QPoint center = sliderRect.center() - sliderRect.topLeft();
-    const qint64 pressValue = valueFromPosition(ev->pos().toPoint() - center);
+    const qint64 pressValue = valueFromPosition(event->pos().toPoint() - center);
 
-    ev->accept();
-    if ((ev->button() & style()->styleHint(QStyle::SH_Slider_AbsoluteSetButtons, &opt, this)) != 0) {
+    event->accept();
+    if ((event->button() & style()->styleHint(QStyle::SH_Slider_AbsoluteSetButtons, &opt, this)) != 0) {
         d->pressedControl = QStyle::SC_SliderHandle;
         setSliderPosition(pressValue);
         triggerAction(SliderMove);
-    } else if ((ev->button() & style()->styleHint(QStyle::SH_Slider_PageSetButtons, &opt, this)) != 0) {
-        d->pressedControl = style()->hitTestComplexControl(QStyle::CC_Slider, &opt, ev->pos().toPoint(), this);
+    } else if ((event->button() & style()->styleHint(QStyle::SH_Slider_PageSetButtons, &opt, this)) != 0) {
+        d->pressedControl = style()->hitTestComplexControl(QStyle::CC_Slider, &opt, event->pos().toPoint(), this);
         if (d->pressedControl == QStyle::SC_SliderGroove) {
             d->pressValue = pressValue;
             if (d->pressValue > d->value) {
@@ -159,7 +164,7 @@ void GraphicsSlider::mousePressEvent(QGraphicsSceneMouseEvent *ev)
             }
         }
     } else {
-        ev->ignore();
+        event->ignore();
         return;
     }
 
@@ -171,29 +176,33 @@ void GraphicsSlider::mousePressEvent(QGraphicsSceneMouseEvent *ev)
     }
 }
 
-void GraphicsSlider::mouseMoveEvent(QGraphicsSceneMouseEvent *ev)
+void GraphicsSlider::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     Q_D(GraphicsSlider);
+
+    base_type::mouseMoveEvent(event);
 
     if (d->pressedControl != QStyle::SC_SliderHandle) {
-        ev->ignore();
+        event->ignore();
         return;
     }
 
-    ev->accept();
-    setSliderPosition(valueFromPosition(ev->pos().toPoint() - d->clickOffset));
+    event->accept();
+    setSliderPosition(valueFromPosition(event->pos().toPoint() - d->clickOffset));
 }
 
-void GraphicsSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent *ev)
+void GraphicsSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     Q_D(GraphicsSlider);
 
-    if (d->pressedControl == QStyle::SC_None || ev->buttons()) {
-        ev->ignore();
+    base_type::mouseReleaseEvent(event);
+
+    if (d->pressedControl == QStyle::SC_None || event->buttons()) {
+        event->ignore();
         return;
     }
 
-    ev->accept();
+    event->accept();
     QStyle::SubControl oldPressed = QStyle::SubControl(d->pressedControl);
     d->pressedControl = QStyle::SC_None;
     setRepeatAction(SliderNoAction);
