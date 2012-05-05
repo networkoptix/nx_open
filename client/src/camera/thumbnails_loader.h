@@ -40,7 +40,7 @@ public:
     * @param timeMs contain approximate time. 
     * @param realPixmapTimeMs Return exact pixmap time if found. Otherwise return -1
     */
-    QPixmap* getPixmapByTime(qint64 timeMs, quint64* realPixmapTimeMs = 0);
+    const QPixmap *getPixmapByTime(qint64 timeMs, quint64* realPixmapTimeMs = 0);
 
     void lockPixmaps();
     void unlockPixmaps();
