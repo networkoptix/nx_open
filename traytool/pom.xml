@@ -50,6 +50,15 @@
 		<mac.defines/>			
 	</properties>
 
+	<dependencies>
+		<dependency>
+			<groupId>com.nokia.qt</groupId>
+			<artifactId>qtsingleapplication</artifactId>
+			<version>4.7.4</version>
+			<type>zip</type>
+		</dependency>		
+	</dependencies>		
+
 	<build>
 		<directory>${arch}</directory>
 		<outputDirectory>${arch}</outputDirectory>
@@ -143,7 +152,7 @@
 			</activation>			
 			<build>
 				<plugins>
-					<plugin>
+					<!--	<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-dependency-plugin</artifactId>
 						<version>2.4</version>
@@ -157,14 +166,14 @@
 								<configuration>
 									<outputDirectory>${project.build.directory}</outputDirectory>
 									<artifactItems>
-										<!--<artifactItem>
+										<artifactItem>
 											<groupId>com.nokia.qt</groupId>
 											<artifactId>qtservice</artifactId>
 											<version>4.7.4</version>
 											<type>zip</type>
 											<overWrite>false</overWrite>
 											<outputDirectory>${project.build.directory}</outputDirectory>
-										</artifactItem>	-->
+										</artifactItem>
 
 										<artifactItem>
 											<groupId>com.nokia.qt</groupId>
@@ -177,7 +186,7 @@
 								</configuration>
 							</execution>
 						</executions>
-					</plugin>					
+					</plugin>	-->				
 				</plugins>
 			</build>
 		</profile>	

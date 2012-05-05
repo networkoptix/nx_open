@@ -45,6 +45,55 @@
 		<mac.defines/>		
 	</properties>
 
+	<dependencies>
+		<dependency>
+			<groupId>org.ffmpeg</groupId>
+			<artifactId>ffmpeg</artifactId>
+			<version>${ffmpeg.version}</version>
+			<type>zip</type>
+			<classifier>${platform}-${arch}</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org</groupId>
+			<artifactId>openssl</artifactId>
+			<version>1.0.0e</version>
+			<type>zip</type>
+			<classifier>${platform}-${arch}</classifier>
+		</dependency>							
+		<dependency>
+			<groupId>com.google</groupId>
+			<artifactId>protobuf</artifactId>
+			<version>2.4.1</version>
+			<type>zip</type>
+			<classifier>${platform}-${arch}</classifier>
+		</dependency>							
+		<dependency>
+			<groupId>org</groupId>
+			<artifactId>qjson</artifactId>
+			<version>0.7.1</version>
+			<type>zip</type>
+			<classifier>${platform}-${arch}</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.nokia.qt</groupId>
+			<artifactId>qtcore</artifactId>
+			<version>4.7.4</version>
+			<type>zip</type>
+		</dependency>						
+		<dependency>
+			<groupId>com.nokia.qt</groupId>
+			<artifactId>qtsinglecoreapplication</artifactId>
+			<version>4.7.4</version>
+			<type>zip</type>
+		</dependency>
+		<dependency>
+			<groupId>com.nokia.qt</groupId>
+			<artifactId>qtservice</artifactId>
+			<version>4.7.4</version>
+			<type>zip</type>
+		</dependency>		
+	</dependencies>		
+
 	<build>
 		<plugins>
 			<plugin>
@@ -103,7 +152,7 @@
 			</activation>			
 			<build>
 				<plugins>
-					<plugin>
+					<!--<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-dependency-plugin</artifactId>
 						<version>2.4</version>
@@ -167,7 +216,7 @@
 								</configuration>
 							</execution>
 						</executions>
-					</plugin>	
+					</plugin>	-->
 					<!-- <plugin>
 						<groupId>com.goldin.plugins</groupId>
 						<artifactId>maven-copy-plugin</artifactId>

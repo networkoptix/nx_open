@@ -26,6 +26,16 @@
 		<buildLib/>
 	</properties>
 
+	<dependencies>
+		<dependency>
+			<groupId>org.ffmpeg</groupId>
+			<artifactId>ffmpeg-misc-headers-win32</artifactId>
+			<version>dev</version>
+			<type>zip</type>
+			<classifier>${platform}</classifier>	
+		</dependency>		
+	</dependencies>	
+
 	<build>
 		<directory>${arch}</directory>
 		<outputDirectory>${arch}</outputDirectory>
@@ -173,30 +183,7 @@
 						</configuration>
 					</execution>				
 				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>1.1.1</version>
-				<executions>
-					<execution>
-						<id>unzip-dependencies</id>
-						<phase>validate</phase>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-							<executable>unzip</executable>
-							<workingDirectory>${project.build.directory}</workingDirectory>		
-							<arguments>
-								<commandlineArgs>-a</commandlineArgs>
-								<commandlineArgs>-u</commandlineArgs>							
-								<commandlineArgs>*.zip</commandlineArgs>
-							</arguments>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>						
+			</plugin>					
 		</plugins>		
 	</build>
 	<profiles>
@@ -312,6 +299,23 @@
 			<build>	
 				<plugins>
 					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<version>2.4</version>
+						<executions>
+							<execution>
+								<id>unpack-platform-libs</id>
+								<phase>validate</phase>
+								<goals>
+									<goal>copy-dependencies</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${project.build.directory}</outputDirectory>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>exec-maven-plugin</artifactId>
 						<version>1.1.1</version>
@@ -353,6 +357,23 @@
 										<!--<commandlineArgs>`cat /proc/cpuinfo | grep ^processor | wc -l`</commandlineArgs>-->
 									</arguments>
 								</configuration>
+							</execution>
+
+							<execution>
+								<id>unzip-dependencies</id>
+								<phase>generate-sources</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>unzip</executable>
+									<workingDirectory>${project.build.directory}</workingDirectory>		
+									<arguments>
+										<commandlineArgs>-a</commandlineArgs>
+										<commandlineArgs>-u</commandlineArgs>							
+										<commandlineArgs>*.zip</commandlineArgs>
+									</arguments>
+								</configuration>
 							</execution>							
 						</executions>
 					</plugin>
@@ -378,20 +399,10 @@
 								<id>unpack-platform-libs</id>
 								<phase>validate</phase>
 								<goals>
-									<goal>copy</goal>
+									<goal>unpack-dependencies</goal>
 								</goals>
 								<configuration>
 									<outputDirectory>${project.build.directory}</outputDirectory>
-									<artifactItems>
-										<artifactItem>
-											<groupId>org.ffmpeg</groupId>
-											<artifactId>ffmpeg-misc-headers-win32</artifactId>
-											<version>dev</version>
-											<type>zip</type>
-											<classifier>${platform}</classifier>
-											<overWrite>false</overWrite>
-										</artifactItem>								
-									</artifactItems>
 								</configuration>
 							</execution>
 						</executions>
