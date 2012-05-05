@@ -51,7 +51,7 @@ install -m 755 init/networkoptix-mediaserver.conf $INITSTAGE
 install -m 755 init.d/networkoptix-mediaserver $INITDSTAGE
 
 # Copy libraries
-copy -P $SERVER_LIB_PATH/*.so* $LIBSTAGE
+cp -P $SERVER_LIB_PATH/*.so* $LIBSTAGE
 # Copy required qt libraries
 #for file in $QT_FILES
 #do
