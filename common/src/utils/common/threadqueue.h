@@ -150,6 +150,18 @@ public:
             this->m_queue.dequeue();
         }
     }
+
+    void clearDelete()
+    {
+        QMutexLocker mutex(&this->m_cs);
+
+        while (!this->m_queue.empty()) 
+        {
+            this->m_sem.tryAcquire();
+            delete this->m_queue.dequeue();
+        }
+    }
+
 protected:
     QQueue<T> m_queue;
     quint32 m_maxSize;

@@ -1,6 +1,21 @@
 #include "resource_command_processor.h"
 #include "resource.h"
 
+bool sameResourceFunctor(const QnAbstractDataPacketPtr& data, QVariant resource)
+{
+    QnResourcePtr res = resource.value<QnResourcePtr>();
+    QnResourceCommandPtr command = data.dynamicCast<QnResourceCommand>();
+    if (!command)
+        return false;
+
+    if (command->getResource()->getUniqueId() == res->getUniqueId())
+        return true;
+
+    return false;
+}
+
+
+
 QnResourceCommand::QnResourceCommand(QnResourcePtr res):
 QnResourceConsumer(res)
 {
@@ -41,7 +56,14 @@ void QnResourceCommandProcessor::putData(QnAbstractDataPacketPtr data)
 bool QnResourceCommandProcessor::processData(QnAbstractDataPacketPtr data)
 {
 	QnResourceCommandPtr command = data.staticCast<QnResourceCommand>();
-    command->execute();
+
+    bool result = command->execute();
+
+    if (!result) // if command failed for this resource. => resource must be not available, lets remove everything related to the resouce from the queue
+        m_dataQueue.removeDataByCondition(sameResourceFunctor, QVariant::fromValue<QnResourcePtr>(command->getResource()) );
+        
+    
+
     return true;
 }
 

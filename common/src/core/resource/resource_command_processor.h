@@ -15,7 +15,7 @@ class QN_EXPORT QnResourceCommand : public QnAbstractDataPacket, public QnResour
 public:
     QnResourceCommand(QnResourcePtr res);
     virtual ~QnResourceCommand();
-    virtual void execute() = 0;
+    virtual bool execute() = 0;
     virtual void beforeDisconnectFromResource();
 };
 

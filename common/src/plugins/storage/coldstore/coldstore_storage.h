@@ -4,13 +4,15 @@
 #include "coldstore_api/sfs-client.h"
 #include "libavformat/avio.h"
 #include "core/resource/storage_resource.h"
+#include "coldstore_connection_pool.h"
 
-typedef qint64 STORAGE_FILE_HANDLER;
 
 class QnPlColdStoreStorage : public QnStorageResource
 {
 public:
     QnPlColdStoreStorage();
+
+    static QnStorageResource* instance();
 
     virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
 
@@ -28,10 +30,13 @@ public:
     virtual bool isDirExists(const QString& url) override;
 
 private:
+    QString coldstoreAddr() const;
 
-    Veracity::ISFS* m_csConnection;
-    Veracity::u32 m_stream;
+    QString csDataFileName(const QnStorageURL& url) const;
+private:
+    mutable QMutex m_mutex;
 
+    QnColdStoreConnectionPool m_connectionPool;
 };
 
 
