@@ -303,8 +303,8 @@
 									<executable>test.bat</executable>
 									<workingDirectory>${baseDir}</workingDirectory>						
 								</configuration>	
-							</execution>					
-						</executions> -->
+							</execution>	-->				
+						</executions> 
 					</plugin>
 					<!--<plugin>
 				<groupId>org.codehaus.mojo</groupId>
