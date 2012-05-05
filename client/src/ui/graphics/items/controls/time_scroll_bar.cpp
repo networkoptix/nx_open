@@ -32,7 +32,9 @@ void QnTimeScrollBar::setIndicatorPosition(qint64 indicatorPosition) {
     m_indicatorPosition = indicatorPosition;
 }
 
-void QnTimeScrollBar::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+void QnTimeScrollBar::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *widget) {
+    sendPendingMouseMoves(widget);
+
     QStyleOptionSlider opt;
     initStyleOption(&opt);
 
