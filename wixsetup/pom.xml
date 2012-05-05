@@ -293,7 +293,7 @@
 								</configuration>					
 							</execution>	-->				
 
-							<execution>
+							<!--<execution>
 								<id>integration-test</id>
 								<phase>integration-test</phase>
 								<goals>
@@ -304,7 +304,7 @@
 									<workingDirectory>${baseDir}</workingDirectory>						
 								</configuration>	
 							</execution>					
-						</executions>
+						</executions> -->
 					</plugin>
 					<!--<plugin>
 				<groupId>org.codehaus.mojo</groupId>
