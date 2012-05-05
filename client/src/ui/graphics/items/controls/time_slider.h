@@ -11,8 +11,8 @@
 
 #include "time_step.h"
 
-class QnNoptixStyle;
 class QnThumbnailsLoader;
+class QnTimeSliderPixmapCache;
 
 class QnTimeSlider: public Animated<QnToolTipSlider>, protected KineticProcessHandler, protected AnimationTimerListener {
     Q_OBJECT;
@@ -148,10 +148,6 @@ private:
     
     void animateStepValues(int deltaMSecs);
 
-    const QPixmap &positionPixmap(qint64 position, int height, const QnTimeStep &step);
-    const QPixmap &highlightPixmap(qint64 position, int height, const QnTimeStep &step);
-    const QPixmap &textPixmap(const QString &text, int height, QPalette::ColorRole colorRole = QPalette::Text);
-
     qreal lineTop(int line);
     qreal lineHeight();
 
@@ -190,7 +186,7 @@ private:
     int m_lineCount;
     QVector<TypedPeriods> m_lineTimePeriods;
     QVector<QString> m_lineComments;
-    QVector<QPixmap> m_lineCommentPixmaps;
+    QVector<const QPixmap *> m_lineCommentPixmaps;
     qreal m_aggregationMSecs;
 
     QVector<QnTimeStep> m_steps;
@@ -199,11 +195,12 @@ private:
     qreal m_animationUpdateMSecsPerPixel;
     QVector<qint64> m_nextTickmarkPos;
     QVector<QVector<QPointF> > m_tickmarkLines;
-    QHash<qint32, QPixmap> m_pixmapByPositionKey;
-    QHash<qint32, QPixmap> m_pixmapByHighlightKey;
-    QHash<QPair<QString, int>, QPixmap> m_pixmapByTextKey;
+    QHash<qint32, const QPixmap *> m_pixmapByPositionKey;
+    QHash<qint32, const QPixmap *> m_pixmapByHighlightKey;
+    QHash<QPair<QString, int>, const QPixmap *> m_pixmapByTextKey;
 
     QnThumbnailsLoader* m_thumbnailsLoader;
+    QnTimeSliderPixmapCache *m_pixmapCache;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnTimeSlider::Options);

@@ -21,6 +21,7 @@
 #include "camera/thumbnails_loader.h"
 
 #include "tool_tip_item.h"
+#include "time_slider_pixmap_cache.h"
 
 namespace {
     QTime msecsToTime(qint64 msecs) {
@@ -59,26 +60,6 @@ namespace {
     Q_GLOBAL_STATIC_WITH_ARGS(QVector<QnTimeStep>, absoluteTimeSteps, (TimeStepFactory::createAbsoluteSteps()));
     Q_GLOBAL_STATIC_WITH_ARGS(QVector<QnTimeStep>, relativeTimeSteps, (TimeStepFactory::createRelativeSteps()));
 
-    QPixmap renderText(const QString &text, const QPen &pen, const QFont &font, int fontPixelSize = -1) {
-        QFont actualFont = font;
-        if(fontPixelSize != -1)
-            actualFont.setPixelSize(fontPixelSize);
-
-        QFontMetrics metrics(actualFont);
-        QSize textSize = metrics.size(Qt::TextSingleLine, text);
-
-        QPixmap pixmap(textSize.width(), metrics.height());
-        pixmap.fill(QColor(0, 0, 0, 0));
-
-        QPainter painter(&pixmap);
-        painter.setCompositionMode(QPainter::CompositionMode_Source);
-        painter.setPen(pen);
-        painter.setFont(actualFont);
-        painter.drawText(pixmap.rect(), Qt::AlignCenter | Qt::TextSingleLine, text);
-        painter.end();
-
-        return pixmap;
-    }
 
     const qreal minTickmarkSpanPixels = 1.0;
     const qreal maxTickmarkSpanFraction = 0.75;
@@ -178,7 +159,8 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     m_aggregationMSecs(0.0),
     m_minimalWindow(0),
     m_selectionValid(false),
-    m_thumbnailsLoader(0)
+    m_thumbnailsLoader(0),
+    m_pixmapCache(QnTimeSliderPixmapCache::instance())
 {
     /* Set default property values. */
     setProperty(Qn::SliderLength, 0);
@@ -496,62 +478,6 @@ bool QnTimeSlider::scaleWindow(qreal factor, qint64 anchor) {
     return end <= maximum();
 }
 
-const QPixmap &QnTimeSlider::textPixmap(const QString &text, int height, QPalette::ColorRole colorRole) {
-    QPair<QString, int> key(text, height + colorRole << 16);
-
-    QHash<QPair<QString, int>, QPixmap>::const_iterator itr = m_pixmapByTextKey.find(key);
-    if(itr != m_pixmapByTextKey.end())
-        return *itr;
-
-    QPixmap result = renderText(
-        text,
-        QPen(palette().brush(colorRole), 0), 
-        font(), 
-        height
-    );
-
-    return m_pixmapByTextKey[key] = result;
-}
-
-const QPixmap &QnTimeSlider::positionPixmap(qint64 position, int height, const QnTimeStep &step) {
-    qint32 key = cacheKey(position, height, step);
-
-    QHash<qint32, QPixmap>::const_iterator itr = m_pixmapByPositionKey.find(key);
-    if(itr != m_pixmapByPositionKey.end())
-        return *itr;
-
-    return m_pixmapByPositionKey[key] = textPixmap(toString(position, step), height);
-}
-
-const QPixmap &QnTimeSlider::highlightPixmap(qint64 position, int height, const QnTimeStep &step) {
-    qint32 key = cacheKey(position, height, step);
-
-    QHash<qint32, QPixmap>::const_iterator itr = m_pixmapByPositionKey.find(key);
-    if(itr != m_pixmapByPositionKey.end())
-        return *itr;
-
-    QString text = toLongString(position, step);
-    QPixmap basePixmap = textPixmap(text, height, QPalette::Shadow);
-    QPixmap overPixmap = textPixmap(text, height, QPalette::Text);
-
-    QImage image(basePixmap.size() + QSize(6, 3), QImage::Format_ARGB32);
-    image.fill(qRgba(0, 0, 0, 0));
-    {
-        QPainter painter(&image);
-        painter.drawPixmap(3, 0, basePixmap);
-    }
-    image = gaussianBlur(image, 1.5);
-    QPixmap blurPixmap = QPixmap::fromImage(image);
-    {
-        QPainter painter(&image);
-        for(int i = 0; i < 8; i++)
-            painter.drawPixmap(0, 0, blurPixmap);
-        painter.drawPixmap(3, 0, overPixmap);
-    }
-
-    return m_pixmapByPositionKey[key] = QPixmap::fromImage(image);
-}
-
 void QnTimeSlider::updateToolTipVisibility() {
     qint64 pos = sliderPosition();
 
@@ -574,9 +500,10 @@ void QnTimeSlider::updateToolTipText() {
 }
 
 void QnTimeSlider::updateLineCommentPixmap(int line) {
-    m_lineCommentPixmaps[line] = textPixmap(
+    m_lineCommentPixmaps[line] = m_pixmapCache->textPixmap(
         m_lineComments[line],
-        qRound(lineHeight() * lineCommentRelativeHeight)
+        qRound(lineHeight() * lineCommentRelativeHeight),
+        palette().color(QPalette::WindowText)
     );
 }
 
@@ -762,15 +689,15 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
 
     /* Draw line comments. */
     for(int line = 0; line < m_lineCount; line++) {
-        QPixmap pixmap = m_lineCommentPixmaps[line];
+        const QPixmap *pixmap = m_lineCommentPixmaps[line];
         QRectF textRect(
             rect.left(),
             lineTop(line) + 0.5 * lineHeight * (1.0 - lineCommentRelativeHeight),
-            pixmap.width(),
-            pixmap.height()
+            pixmap->width(),
+            pixmap->height()
         );
 
-        painter->drawPixmap(textRect, pixmap, pixmap.rect());
+        painter->drawPixmap(textRect, *pixmap, pixmap->rect());
     }
 
     /* Draw tickmarks. */
@@ -968,16 +895,16 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, qreal top, qreal height) {
         /* Draw label if needed. */
         qreal tickmarkHeight = height * m_stepData[index].currentHeight;
         if(!qFuzzyIsNull(m_stepData[index].currentTextOpacity)) {
-            QPixmap pixmap = positionPixmap(pos, m_stepData[index].currentTextHeight, m_steps[index]);
+            const QPixmap *pixmap = m_pixmapCache->positionPixmap(pos, m_stepData[index].currentTextHeight, m_steps[index]);
 
-            QRectF textRect(x - pixmap.width() / 2.0, top + tickmarkHeight, pixmap.width(), pixmap.height());
+            QRectF textRect(x - pixmap->width() / 2.0, top + tickmarkHeight, pixmap->width(), pixmap->height());
             if(textRect.left() < rect.left())
                 textRect.moveLeft(rect.left());
             if(textRect.right() > rect.right())
                 textRect.moveRight(rect.right());
 
             QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * m_stepData[index].currentTextOpacity);
-            painter->drawPixmap(textRect, pixmap, pixmap.rect());
+            painter->drawPixmap(textRect, *pixmap, pixmap->rect());
         }
 
         /* Calculate line ends. */
@@ -1032,11 +959,11 @@ void QnTimeSlider::drawHighlights(QPainter *painter, qreal fillTop, qreal fillHe
                 painter->drawRect(QRectF(x0, fillTop, x1 - x0, fillHeight));
             }
 
-            QPixmap pixmap = highlightPixmap(pos0, textHeight, highlightStep);
+            const QPixmap *pixmap = m_pixmapCache->highlightPixmap(pos0, textHeight, highlightStep);
 
             qreal x = (x0 + x1) / 2.0;
-            QRectF textRect(x - pixmap.width() / 2.0, textTop, pixmap.width(), pixmap.height());
-            QRectF pixmapRect(pixmap.rect());
+            QRectF textRect(x - pixmap->width() / 2.0, textTop, pixmap->width(), pixmap->height());
+            QRectF pixmapRect(pixmap->rect());
             if(textRect.left() < rect.left()) {
                 textRect.moveRight(x1);
                 pixmapRect.setLeft(pixmapRect.left() + rect.left() - textRect.left());
@@ -1048,7 +975,7 @@ void QnTimeSlider::drawHighlights(QPainter *painter, qreal fillTop, qreal fillHe
                 textRect.setRight(rect.right());
             }
 
-            painter->drawPixmap(textRect, pixmap, pixmapRect);
+            painter->drawPixmap(textRect, *pixmap, pixmapRect);
 
             if(pos1 >= m_windowEnd)
                 break;
@@ -1080,7 +1007,7 @@ void QnTimeSlider::drawThumbnails(QPainter *painter, const QRectF& rect)
     for (; currentTime < endTime; currentTime += m_thumbnailsLoader->step())
     {
         m_thumbnailsLoader->lockPixmaps();
-        QPixmap* pixmap = m_thumbnailsLoader->getPixmapByTime(currentTime);
+        const QPixmap *pixmap = m_thumbnailsLoader->getPixmapByTime(currentTime);
         if (pixmap)
         {
             QPointF pos = positionFromValue(currentTime, false);
