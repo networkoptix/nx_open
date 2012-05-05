@@ -44,14 +44,14 @@ mkdir -p $INITDSTAGE
 install -m 755 $SERVER_BIN_PATH/mediaserver* $BINSTAGE
 
 # Copy mediaserver startup script
-install -m 755 bin/mediaserver $BINSTAGE
+cp -P 755 bin/mediaserver $BINSTAGE
 
 # Copy upstart and sysv script
 install -m 755 init/networkoptix-mediaserver.conf $INITSTAGE
 install -m 755 init.d/networkoptix-mediaserver $INITDSTAGE
 
 # Copy libraries
-install -m 644 $SERVER_LIB_PATH/*.so $LIBSTAGE
+install -m 644 $SERVER_LIB_PATH/*.so* $LIBSTAGE
 # Copy required qt libraries
 #for file in $QT_FILES
 #do

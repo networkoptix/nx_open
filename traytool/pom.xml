@@ -89,7 +89,7 @@
 									<map from="" to="INCLUDEPATH += "/>
 								</pathconvert>								
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${includes_pri}</echo>	
-								
+
 								<fileset id="qrc_path" dir="${project.build.sourceDirectory}">
 									<include name="**/*.qrc" />
 								</fileset>
@@ -152,9 +152,10 @@
 								<id>unpack-specific-libs</id>
 								<phase>validate</phase>
 								<goals>
-									<goal>unpack</goal>
+									<goal>copy</goal>
 								</goals>
 								<configuration>
+									<outputDirectory>${project.build.directory}</outputDirectory>
 									<artifactItems>
 										<!--<artifactItem>
 											<groupId>com.nokia.qt</groupId>
@@ -171,7 +172,6 @@
 											<version>4.7.4</version>
 											<type>zip</type>
 											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}</outputDirectory>
 										</artifactItem>									
 									</artifactItems>
 								</configuration>

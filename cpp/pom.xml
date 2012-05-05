@@ -173,7 +173,30 @@
 						</configuration>
 					</execution>				
 				</executions>
-			</plugin>					
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.1.1</version>
+				<executions>
+					<execution>
+						<id>unzip-dependencies</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>unzip</executable>
+							<workingDirectory>${project.build.directory}</workingDirectory>		
+							<arguments>
+								<commandlineArgs>-a</commandlineArgs>
+								<commandlineArgs>-u</commandlineArgs>							
+								<commandlineArgs>*.zip</commandlineArgs>
+							</arguments>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>						
 		</plugins>		
 	</build>
 	<profiles>
@@ -355,9 +378,10 @@
 								<id>unpack-platform-libs</id>
 								<phase>validate</phase>
 								<goals>
-									<goal>unpack</goal>
+									<goal>copy</goal>
 								</goals>
 								<configuration>
+									<outputDirectory>${project.build.directory}</outputDirectory>
 									<artifactItems>
 										<artifactItem>
 											<groupId>org.ffmpeg</groupId>
@@ -366,7 +390,6 @@
 											<type>zip</type>
 											<classifier>${platform}</classifier>
 											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}</outputDirectory>
 										</artifactItem>								
 									</artifactItems>
 								</configuration>

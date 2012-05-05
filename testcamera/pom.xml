@@ -87,9 +87,10 @@
 								<id>unpack-specific-libs</id>
 								<phase>validate</phase>
 								<goals>
-									<goal>unpack</goal>
+									<goal>copy</goal>
 								</goals>
 								<configuration>
+									<outputDirectory>${project.build.directory}</outputDirectory>
 									<artifactItems>
 										<artifactItem>
 											<groupId>org</groupId>
@@ -97,8 +98,6 @@
 											<version>1.0.0e</version>
 											<type>zip</type>
 											<classifier>${platform}-${arch}</classifier>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}</outputDirectory>
 										</artifactItem>	
 										<artifactItem>
 											<groupId>org.ffmpeg</groupId>
@@ -106,8 +105,6 @@
 											<version>${ffmpeg.version}</version>
 											<type>zip</type>
 											<classifier>${platform}-${arch}</classifier>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}</outputDirectory>
 										</artifactItem>	
 										<artifactItem>
 											<groupId>com.google</groupId>
@@ -115,16 +112,12 @@
 											<version>2.4.1</version>
 											<type>zip</type>
 											<classifier>${platform}-${arch}</classifier>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}</outputDirectory>
 										</artifactItem>	
 										<artifactItem>
 											<groupId>com.nokia.qt</groupId>
 											<artifactId>qtcore</artifactId>
 											<version>4.7.4</version>
 											<type>zip</type>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}</outputDirectory>
 										</artifactItem>												
 									</artifactItems>
 								</configuration>

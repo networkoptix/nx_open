@@ -195,7 +195,8 @@
 								<id>unpack-specific-libs</id>
 								<phase>validate</phase>
 								<goals>
-									<goal>unpack</goal>
+									<goal>copy</goal>
+									<outputDirectory>${project.build.directory}</outputDirectory>									
 								</goals>
 								<configuration>
 									<artifactItems>
@@ -205,8 +206,6 @@
 											<version>1.0.0e</version>
 											<type>zip</type>
 											<classifier>${platform}-${arch}</classifier>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}</outputDirectory>
 										</artifactItem>
 										<artifactItem>
 											<groupId>org.ffmpeg</groupId>
@@ -214,8 +213,6 @@
 											<version>${ffmpeg.version}</version>
 											<type>zip</type>
 											<classifier>${platform}-${arch}</classifier>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}</outputDirectory>
 										</artifactItem>						
 										<artifactItem>
 											<groupId>com.google</groupId>
@@ -223,8 +220,6 @@
 											<version>2.4.1</version>
 											<type>zip</type>
 											<classifier>${platform}-${arch}</classifier>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}</outputDirectory>
 										</artifactItem>							
 										<artifactItem>
 											<groupId>org</groupId>
@@ -232,8 +227,6 @@
 											<version>0.7.1</version>
 											<type>zip</type>
 											<classifier>${platform}-${arch}</classifier>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}</outputDirectory>
 										</artifactItem>
 										<artifactItem>
 											<groupId>com.nokia.qt.addons</groupId>
@@ -241,8 +234,6 @@
 											<version>2.6</version>
 											<type>zip</type>
 											<classifier>${platform}-${arch}</classifier>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}</outputDirectory>
 										</artifactItem>
 										<artifactItem>
 											<groupId>com.sourceforge.cloudcity</groupId>
@@ -250,8 +241,6 @@
 											<version>dev-SNAPSHOT</version>
 											<type>zip</type>
 											<classifier>${platform}-${arch}</classifier>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}</outputDirectory>
 										</artifactItem>								
 										<artifactItem>
 											<groupId>com.creativelabs</groupId>
@@ -259,8 +248,6 @@
 											<version>1.1</version>
 											<type>zip</type>
 											<classifier>${platform}-${arch}</classifier>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}</outputDirectory>
 										</artifactItem>
 										<artifactItem>
 											<groupId>com.microsoft.directx</groupId>
@@ -268,8 +255,6 @@
 											<version>JUN2010</version>
 											<type>zip</type>
 											<classifier>${platform}-${arch}</classifier>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}</outputDirectory>
 										</artifactItem>	
 										<artifactItem>
 											<groupId>com.microsoft.directx</groupId>
@@ -277,16 +262,12 @@
 											<version>JUN2010</version>
 											<type>zip</type>
 											<classifier>${platform}-${arch}</classifier>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}</outputDirectory>
 										</artifactItem>	
 										<artifactItem>
 											<groupId>com.nokia.qt</groupId>
 											<artifactId>qtsingleapplication</artifactId>
 											<version>4.7.4</version>
 											<type>zip</type>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}</outputDirectory>
 										</artifactItem>									
 									</artifactItems>
 								</configuration>

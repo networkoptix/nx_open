@@ -3,8 +3,8 @@ mkdir -p ${project.build.directory}/build/bin/release
 
 for i in ${qtlib1} ${qtlib2} ${qtlib3} ${qtlib4} ${qtlib5} ${qtlib6} ${qtlib7} ${qtlib8} ${qtlib9} 
 do
-  cp `find ${qt.dir} -iname 'libQt'"$i"'.so'` ${project.build.directory}/build/bin/debug 
-  cp `find ${qt.dir} -iname 'libQt'"$i"'.so'` ${project.build.directory}/build/bin/release
+  cp -P `find ${qt.dir} -iname 'libQt'"$i"'.so*'` ${project.build.directory}/build/bin/debug 
+  cp -P `find ${qt.dir} -iname 'libQt'"$i"'.so*'` ${project.build.directory}/build/bin/release
 done
 
 for f in ${project.build.directory}/bin/${build.configuration}/${project.artifactId}*; do mv "$f" "$f-bin"; done
