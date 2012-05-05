@@ -75,6 +75,9 @@ public:
     */
     virtual bool isStorageAvailable() = 0;
 
+    virtual bool isFolderAvailableForWriting(const QString& path) = 0;
+
+
     /*
     *   Remove file from storage
     */
@@ -120,7 +123,7 @@ public:
     static QnStoragePluginFactory* instance();
 
     void registerStoragePlugin(const QString& name, StorageTypeInstance pluginInst, bool isDefaultProtocol = false);
-    QnStorageResource* createStorage(const QString& storageType);
+    QnStorageResource* createStorage(const QString& storageType, bool useDefaultForUnknownPrefix = true);
 private:
     QMap<QString, StorageTypeInstance> m_storageTypes;
     StorageTypeInstance m_defaultStoragePlugin;
