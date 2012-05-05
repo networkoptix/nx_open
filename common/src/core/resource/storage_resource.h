@@ -71,11 +71,14 @@ public:
     virtual qint64 getFreeSpace() = 0;
 
     /*
-    *   Returns true if storage physically acccesible right now
+    *   Returns true if storage physically acccesible right now (ready only check)
     */
     virtual bool isStorageAvailable() = 0;
 
-    virtual bool isFolderAvailableForWriting(const QString& path) = 0;
+    /*
+    *   Returns true if storage physically acccesible and ready for writing
+    */
+    virtual bool isStorageAvailableForWriting() = 0;
 
 
     /*

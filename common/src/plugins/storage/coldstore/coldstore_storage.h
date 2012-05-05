@@ -16,7 +16,7 @@ public:
 
     virtual int getChunkLen() const override;
     virtual bool isStorageAvailable() override;
-    virtual bool isFolderAvailableForWriting(const QString& path) override;
+    virtual bool isStorageAvailableForWriting() override;
     virtual qint64 getFreeSpace() override;
     virtual bool isNeedControlFreeSpace() override;
 

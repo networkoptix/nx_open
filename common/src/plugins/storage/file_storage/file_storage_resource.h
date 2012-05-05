@@ -19,8 +19,9 @@ public:
     virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
 
     virtual int getChunkLen() const override;
+    
     virtual bool isStorageAvailable() override;
-    virtual bool isFolderAvailableForWriting(const QString& path) override;
+    virtual bool isStorageAvailableForWriting() override;
 
     virtual QFileInfoList getFileList(const QString& dirName) override;
     virtual bool isNeedControlFreeSpace() override;

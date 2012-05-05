@@ -45,7 +45,8 @@ int QnFsHelperHandler::executeGet(const QString& path, const QnRequestParamList&
     }
 
     pathStr = pathStr.mid(prefix.length());
-    QString rezStr = storage->isFolderAvailableForWriting(pathStr) ? "OK" : "FAIL";
+    storage->setUrl(pathStr);
+    QString rezStr = storage->isStorageAvailableForWriting() ? "OK" : "FAIL";
 
     result.append("<root>\n");
     result.append(rezStr);

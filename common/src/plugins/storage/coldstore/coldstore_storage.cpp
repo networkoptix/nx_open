@@ -21,7 +21,7 @@ bool QnPlColdStoreStorage::isStorageAvailable()
     return true;
 }
 
-bool QnPlColdStoreStorage::isFolderAvailableForWriting(const QString& path)
+bool QnPlColdStoreStorage::isStorageAvailableForWriting()
 {
     // todo: implement me
     return true;

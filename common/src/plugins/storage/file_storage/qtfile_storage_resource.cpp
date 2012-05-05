@@ -109,7 +109,7 @@ QnStorageResource* QnQtFileStorageResource::instance()
     return new QnQtFileStorageResource();
 }
 
-bool QnQtFileStorageResource::isFolderAvailableForWriting(const QString& path)
+bool QnQtFileStorageResource::isStorageAvailableForWriting()
 {
     return false; // it is read only file system
 }
