@@ -99,7 +99,7 @@
 	</build>    
 
 	<profiles>
-		<profile>
+		<!--<profile>
 			<id>convert-clean</id>
 			<activation>				
 				<file>
@@ -107,56 +107,10 @@
 				</file>		
 			</activation>			
 			<build>
-				<plugins>
-					<!--<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<version>2.4</version>
-						<executions>
-							<execution>
-								<id>unpack-specific-libs</id>
-								<phase>validate</phase>
-								<goals>
-									<goal>copy</goal>
-								</goals>
-								<configuration>
-									<outputDirectory>${project.build.directory}</outputDirectory>
-									<artifactItems>
-										<artifactItem>
-											<groupId>org</groupId>
-											<artifactId>openssl</artifactId>
-											<version>1.0.0e</version>
-											<type>zip</type>
-											<classifier>${platform}-${arch}</classifier>
-										</artifactItem>	
-										<artifactItem>
-											<groupId>org.ffmpeg</groupId>
-											<artifactId>ffmpeg</artifactId>
-											<version>${ffmpeg.version}</version>
-											<type>zip</type>
-											<classifier>${platform}-${arch}</classifier>
-										</artifactItem>	
-										<artifactItem>
-											<groupId>com.google</groupId>
-											<artifactId>protobuf</artifactId>
-											<version>2.4.1</version>
-											<type>zip</type>
-											<classifier>${platform}-${arch}</classifier>
-										</artifactItem>	
-										<artifactItem>
-											<groupId>com.nokia.qt</groupId>
-											<artifactId>qtcore</artifactId>
-											<version>4.7.4</version>
-											<type>zip</type>
-										</artifactItem>												
-									</artifactItems>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin> -->					
+				<plugins>			
 				</plugins>
 			</build>
-		</profile>	
+		</profile>	-->
 
 		<profile>
 			<id>convert-clean-windows</id>
