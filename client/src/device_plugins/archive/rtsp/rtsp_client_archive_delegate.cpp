@@ -271,7 +271,11 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
 				m_position = (m_serverTimePeriod.endTimeMs()-1)*1000;
 			close();
 			open(newResource);
-			return getNextData();
+
+            result = getNextData();
+            if (result)
+                result->flags |= QnAbstractMediaData::MediaFlags_NewServer;
+			return result;
 		}
 		else {
 			m_serverTimePeriod.clear();
