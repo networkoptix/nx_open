@@ -22,7 +22,7 @@ case `uname -s` in
         ;;
 esac
 
-for i in common mediaserver client appserver
+for i in common mediaserver client appserver mediaproxy
 do
   pushd $i
   python convert.py
@@ -48,12 +48,24 @@ sed $SED_ARGS "s%^\.\.\/build\/\(debug\/generated\/qtservice_unix.moc\)%\1%" med
 sed $SED_ARGS "s%^\.\.\/build\/\(release\/generated\/qtservice.moc\)%\1%" mediaserver/build/Makefile.release
 sed $SED_ARGS "s%^\.\.\/build\/\(release\/generated\/qtservice_unix.moc\)%\1%" mediaserver/build/Makefile.release
 
+
+sed $SED_ARGS "1,/debug\/generated\/qtservice.moc\ \\\\/{/debug\/generated\/qtservice.moc\\ \\\\/d;}" mediaproxy/build/Makefile.debug
+sed $SED_ARGS "1,/debug\/generated\/qtservice_unix.moc\ \\\\/{/debug\/generated\/qtservice_unix.moc\\ \\\\/d;}" mediaproxy/build/Makefile.debug
+sed $SED_ARGS "1,/release\/generated\/qtservice.moc\ \\\\/{/release\/generated\/qtservice.moc\\ \\\\/d;}" mediaproxy/build/Makefile.release
+sed $SED_ARGS "1,/release\/generated\/qtservice_unix.moc\ \\\\/{/release\/generated\/qtservice_unix.moc\\ \\\\/d;}" mediaproxy/build/Makefile.release
+
+sed $SED_ARGS "s%^\.\.\/build\/\(debug\/generated\/qtservice.moc\)%\1%" mediaproxy/build/Makefile.debug
+sed $SED_ARGS "s%^\.\.\/build\/\(debug\/generated\/qtservice_unix.moc\)%\1%" mediaproxy/build/Makefile.debug
+sed $SED_ARGS "s%^\.\.\/build\/\(release\/generated\/qtservice.moc\)%\1%" mediaproxy/build/Makefile.release
+sed $SED_ARGS "s%^\.\.\/build\/\(release\/generated\/qtservice_unix.moc\)%\1%" mediaproxy/build/Makefile.release
+
+
 sed $SED_ARGS "s%\.\.\/build\/debug%debug%g" client/build/Makefile.debug
 sed $SED_ARGS "s%\.\.\/build\/release%release%g" client/build/Makefile.release
 
 rm mediaserver/build/Makefile.debug.bak mediaserver/build/Makefile.release.bak client/build/Makefile.debug.bak client/build/Makefile.release.bak
 
-for i in common mediaserver
+for i in common mediaserver mediaproxy
 do
   pushd $i/build
   make -f Makefile.$CONFIG -j $[NPROCESSORS+1]
