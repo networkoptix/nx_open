@@ -253,7 +253,9 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
                       m_rtspSession.getScale() <  0 && timeMs < m_serverTimePeriod.startTimeMs;
     if (result == 0 || outOfRange || result->dataType == QnAbstractMediaData::EMPTY_DATA)
     {
-        QnResourcePtr newResource = getNextVideoServerFromTime(m_resource, m_lastSeekTime/1000);
+		if (m_lastSeekTime == AV_NOPTS_VALUE)
+			m_lastSeekTime = qnSyncTime->currentMSecsSinceEpoch()*1000;
+		QnResourcePtr newResource = getNextVideoServerFromTime(m_resource, m_lastSeekTime/1000);
         if (newResource) {
             m_resource = m_resource;
             m_lastSeekTime = m_position = m_serverTimePeriod.startTimeMs*1000;
