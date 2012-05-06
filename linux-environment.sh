@@ -12,10 +12,10 @@ echo 'export JAVA_HOME=/usr' >> ~/.profile
 . ~/.profile
 
 mkdir ~/projects
-cd ~/projects
-wget --no-check-certificate https://boris:pizdohuj@noptix.enk.me/jenkins/mercurial.sh
-chmod 755 mercurial.sh
-./mercurial.sh
+#cd ~/projects
+#wget --no-check-certificate https://boris:pizdohuj@noptix.enk.me/jenkins/mercurial.sh
+#chmod 755 mercurial.sh
+#./mercurial.sh
 cd ./netoptix_vms/appserver/
 
 python ./scripts/install_pip.py
