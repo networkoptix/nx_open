@@ -1,5 +1,6 @@
 #include "screen_grabber.h"
 
+#include <QScreen>
 #include <QtCore/QLibrary>
 #include "utils/common/log.h"
 #include <emmintrin.h>
@@ -176,8 +177,17 @@ HRESULT	CLScreenGrabber::InitD3D(HWND hWnd)
     }
     else
     {
+        QDesktopWidget *desktop = qApp->desktop();
+        int width = m_rect.right;
+        int height = m_rect.bottom;
+        for (int i = 0; i < desktop->screenCount(); i++) {
+            QRect geometry = desktop->screenGeometry(i);
+            width = qMax(width, geometry.width());
+            height = qMax(height, geometry.height());
+        }
+
         for (int i = 0; i < m_poolSize; ++i)
-            m_openGLData << new quint8[m_rect.right * m_rect.bottom * 4];
+            m_openGLData << new quint8[width * height * 4];
     }
 
     m_outWidth = m_ddm.Width;
