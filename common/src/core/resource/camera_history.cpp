@@ -75,6 +75,8 @@ QnVideoServerResourcePtr QnCameraHistory::getPrevVideoServerFromTime(qint64 time
         return QnVideoServerResourcePtr();
     --itr;
     currentPeriod = *itr;
+	qDebug() << "switch to previous video server. prevTime=" << QDateTime::fromMSecsSinceEpoch(timestamp).toString() << "newPeriod=" <<
+		QDateTime::fromMSecsSinceEpoch(currentPeriod.startTimeMs).toString() << "-" << QDateTime::fromMSecsSinceEpoch(currentPeriod.endTimeMs()).toString();
     return qSharedPointerDynamicCast<QnVideoServerResource> (qnResPool->getResourceById(itr->getServerId()));
 }
 

@@ -142,8 +142,11 @@ QnResourcePtr QnRtspClientArchiveDelegate::getResourceOnTime(QnResourcePtr resou
 
     // get camera resource from other server. Unique id is mac + serverID
     QnResourcePtr newResource = qnResPool->getResourceByUniqId(mac + videoServer->getId().toString());
-    if (newResource && newResource != resource)
-        qDebug() << "switch to media server " << resource->getParentId();
+	if (newResource && newResource != resource) {
+		QnVideoServerResourcePtr videoServer = qSharedPointerDynamicCast<QnVideoServerResource> (qnResPool->getResourceById(resource->getParentId()));
+		if (videoServer)
+			qDebug() << "switch to media server " << videoServer->getUrl();
+	}
     return newResource ? newResource : resource;
 }
 
@@ -253,19 +256,26 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
                       m_rtspSession.getScale() <  0 && timeMs < m_serverTimePeriod.startTimeMs;
     if (result == 0 || outOfRange || result->dataType == QnAbstractMediaData::EMPTY_DATA)
     {
+		qDebug() << "Reached the edge for archive in a current server. packetTime=" << QDateTime::fromMSecsSinceEpoch(timeMs).toString() <<
+			        "period: " << QDateTime::fromMSecsSinceEpoch(m_serverTimePeriod.startTimeMs).toString() << "-" << 
+					QDateTime::fromMSecsSinceEpoch(m_serverTimePeriod.endTimeMs()).toString();
+
 		if (m_lastSeekTime == AV_NOPTS_VALUE)
 			m_lastSeekTime = qnSyncTime->currentMSecsSinceEpoch()*1000;
 		QnResourcePtr newResource = getNextVideoServerFromTime(m_resource, m_lastSeekTime/1000);
-        if (newResource) {
-            m_resource = m_resource;
-            m_lastSeekTime = m_position = m_serverTimePeriod.startTimeMs*1000;
-            close();
-            open(m_resource);
-            return getNextData();
-        }
-        else {
-            m_serverTimePeriod.clear();
-        }
+		if (newResource) {
+			m_lastSeekTime = m_serverTimePeriod.startTimeMs*1000;
+			if (m_rtspSession.getScale() > 0)
+				m_position = m_serverTimePeriod.startTimeMs*1000;
+			else
+				m_position = (m_serverTimePeriod.endTimeMs()-1)*1000;
+			close();
+			open(newResource);
+			return getNextData();
+		}
+		else {
+			m_serverTimePeriod.clear();
+		}
     }
 
     return result;
