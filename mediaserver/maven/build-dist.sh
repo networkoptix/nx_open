@@ -33,7 +33,7 @@ SERVER_LIB_PATH=${project.build.directory}/build/bin/${build.configuration}
 #FFMPEG_FILES="libavcodec.so.[0-9][0-9] libavdevice.so.[0-9][0-9] libavfilter.so.2 libavformat.so.[0-9][0-9] libavutil.so.51 libswscale.so.2"
 
 # Prepare stage dir
-sudo rm -rf $STAGEBASE
+rm -rf $STAGEBASE
 mkdir -p $BINSTAGE
 mkdir -p $LIBSTAGE
 mkdir -p $ETCSTAGE

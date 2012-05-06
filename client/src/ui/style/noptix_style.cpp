@@ -157,6 +157,8 @@ int QnNoptixStyle::styleHint(StyleHint hint, const QStyleOption *option, const Q
         return 255;
     case SH_Slider_AbsoluteSetButtons:
         return Qt::LeftButton;
+    case SH_Slider_StopMouseOverSlider:
+        return true;
     default:
         return base_type::styleHint(hint, option, widget, returnData);
     }

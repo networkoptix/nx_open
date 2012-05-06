@@ -99,7 +99,8 @@ protected:
     SliderAction repeatAction() const;
     void setRepeatAction(SliderAction action, int thresholdTime = 500, int repeatTime = 50);
 
-    void sendPendingMouseMoves(QWidget *widget);
+    void sendPendingMouseMoves(bool checkPosition = true);
+    void sendPendingMouseMoves(QWidget *widget, bool checkPosition = true);
 
     enum SliderChange {
         SliderRangeChange,

@@ -15,10 +15,9 @@ namespace {
 } // anonymous namespace
 
 QnTimeScrollBar::QnTimeScrollBar(QGraphicsItem *parent):
-    base_type(Qt::Horizontal, parent) 
-{
-    
-}
+    base_type(Qt::Horizontal, parent),
+    m_indicatorPosition(0)
+{}
 
 QnTimeScrollBar::~QnTimeScrollBar() {
     return;
@@ -34,7 +33,7 @@ void QnTimeScrollBar::setIndicatorPosition(qint64 indicatorPosition) {
 
 void QnTimeScrollBar::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *widget) {
     sendPendingMouseMoves(widget);
-
+    
     QStyleOptionSlider opt;
     initStyleOption(&opt);
 
