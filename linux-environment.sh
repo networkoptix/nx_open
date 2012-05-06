@@ -1,4 +1,4 @@
-apt-get install -y mc openjdk-6-jre-headless protobuf-compiler build-essential unzip mercurial libqt4-dev libprotobuf-dev
+apt-get install -y openjdk-6-jre-headless protobuf-compiler build-essential unzip libqt4-dev
 
 mkdir -p ~/environment
 cd ~/environment
