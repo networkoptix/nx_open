@@ -566,7 +566,18 @@ void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodType type) {
     foreach(const QnResourcePtr &resource, m_syncedResources.uniqueKeys())
         periods.push_back(loader(resource)->periods(type));
 
-    m_timeSlider->setTimePeriods(SyncedLine, type, QnTimePeriod::mergeTimePeriods(periods));
+    QnTimePeriodList mergedPeriods = QnTimePeriod::mergeTimePeriods(periods);
+
+    if (type == Qn::MotionTimePeriod) 
+    {
+        foreach(QnResourceWidget* widget, m_syncedWidgets) {
+            QnAbstractArchiveReader* archiveReader = widget->display()->archiveReader();
+            if (archiveReader)
+                archiveReader->setPlaybackMask(mergedPeriods);
+        }
+    }
+
+    m_timeSlider->setTimePeriods(SyncedLine, type, mergedPeriods);
 }
 
 void QnWorkbenchNavigator::updateLines() {
