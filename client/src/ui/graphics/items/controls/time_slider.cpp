@@ -676,13 +676,12 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
             painter, 
             m_lineTimePeriods[line].aggregated[Qn::RecordingTimePeriod],  
             m_lineTimePeriods[line].aggregated[Qn::MotionTimePeriod], 
-            lineTop(line),   
-            lineHeight
+            QRectF(rect.left(), lineTop(line), rect.width(), lineHeight)
         );
     }
 
     /* Draw background. */
-    drawSolidBackground(painter, rect.top(), rect.height() * (m_lineCount == 0 ? 1.0 : tickmarkBarRelativeHeight));
+    drawSolidBackground(painter, QRectF(rect.left(), rect.top(), rect.width(), rect.height() * (m_lineCount == 0 ? 1.0 : tickmarkBarRelativeHeight)));
 
     /* Draw selection. */
     drawSelection(painter);
@@ -701,7 +700,7 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
     }
 
     /* Draw tickmarks. */
-    drawTickmarks(painter, rect.top(), rect.height() * tickmarkBarRelativeHeight);
+    drawTickmarks(painter, QRectF(rect.left(), rect.top(), rect.width(), rect.height() * tickmarkBarRelativeHeight));
 
     /* Draw highlights. */
     qreal hightlightTextPixelHeight = rect.height() * tickmarkBarRelativeHeight * highlightTextHeight;
@@ -758,7 +757,7 @@ void QnTimeSlider::drawMarker(QPainter *painter, qint64 pos, const QColor &color
     painter->drawLine(QPointF(x, rect.top()), QPointF(x, rect.bottom()));
 }
 
-void QnTimeSlider::drawPeriodsBar(QPainter *painter, QnTimePeriodList &recorded, QnTimePeriodList &motion, qreal top, qreal height) {
+void QnTimeSlider::drawPeriodsBar(QPainter *painter, QnTimePeriodList &recorded, QnTimePeriodList &motion, const QRectF &rect) {
     qint64 minimumValue = this->windowStart();
     qint64 maximumValue = this->windowEnd();
     qreal centralPos = positionFromValue(this->sliderPosition()).x();
@@ -815,12 +814,12 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, QnTimePeriodList &recorded,
         qreal leftPos = positionFromValue(value).x();
         qreal rightPos = positionFromValue(bestValue).x();
         if(rightPos <= centralPos) {
-            painter->fillRect(QRectF(leftPos, top, rightPos - leftPos, height), pastColor[bestIndex]);
+            painter->fillRect(QRectF(leftPos, rect.top(), rightPos - leftPos, rect.height()), pastColor[bestIndex]);
         } else if(leftPos >= centralPos) {
-            painter->fillRect(QRectF(leftPos, top, rightPos - leftPos, height), futureColor[bestIndex]);
+            painter->fillRect(QRectF(leftPos, rect.top(), rightPos - leftPos, rect.height()), futureColor[bestIndex]);
         } else {
-            painter->fillRect(QRectF(leftPos, top, centralPos - leftPos, height), pastColor[bestIndex]);
-            painter->fillRect(QRectF(centralPos, top, rightPos - centralPos, height), futureColor[bestIndex]);
+            painter->fillRect(QRectF(leftPos, rect.top(), centralPos - leftPos, rect.height()), pastColor[bestIndex]);
+            painter->fillRect(QRectF(centralPos, rect.top(), rightPos - centralPos, rect.height()), futureColor[bestIndex]);
         }
         
         for(int i = 0; i < Qn::TimePeriodTypeCount; i++) {
@@ -838,24 +837,22 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, QnTimePeriodList &recorded,
     /* Draw separator line. */
     QnScopedPainterPenRollback penRollback(painter, QPen(separatorColor, 0));
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, false);
-    QRectF rect = this->rect();
-    painter->drawLine(QPointF(rect.left(), top), QPointF(rect.right(), top));
+    painter->drawLine(rect.topLeft(), rect.topRight());
 }
 
-void QnTimeSlider::drawSolidBackground(QPainter *painter, qreal top, qreal height) {
+void QnTimeSlider::drawSolidBackground(QPainter *painter, const QRectF &rect) {
     qreal leftPos = positionFromValue(windowStart()).x();
     qreal rightPos = positionFromValue(windowEnd()).x();
     qreal centralPos = positionFromValue(sliderPosition()).x();
 
     if(!qFuzzyCompare(leftPos, centralPos))
-        painter->fillRect(QRectF(leftPos, top, centralPos - leftPos, height), pastBackgroundColor);
+        painter->fillRect(QRectF(leftPos, rect.top(), centralPos - leftPos, rect.height()), pastBackgroundColor);
     if(!qFuzzyCompare(rightPos, centralPos))
-        painter->fillRect(QRectF(centralPos, top, rightPos - centralPos, height), futureBackgroundColor);
+        painter->fillRect(QRectF(centralPos, rect.top(), rightPos - centralPos, rect.height()), futureBackgroundColor);
 }
 
-void QnTimeSlider::drawTickmarks(QPainter *painter, qreal top, qreal height) {
+void QnTimeSlider::drawTickmarks(QPainter *painter, const QRectF &rect) {
     int stepCount = m_steps.size();
-    QRectF rect = this->rect();
 
     /* Find minimal tickmark step index. */
     int minStepIndex = 0;
@@ -869,8 +866,6 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, qreal top, qreal height) {
 
 
     /* Draw tickmarks. */
-    qreal bottom = top + height;
-    
     for(int i = 0; i < m_tickmarkLines.size(); i++)
         m_tickmarkLines[i].clear();
 
@@ -893,11 +888,11 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, qreal top, qreal height) {
         qreal x = positionFromValue(pos).x();
 
         /* Draw label if needed. */
-        qreal tickmarkHeight = height * m_stepData[index].currentHeight;
+        qreal tickmarkHeight = rect.height() * m_stepData[index].currentHeight;
         if(!qFuzzyIsNull(m_stepData[index].currentTextOpacity)) {
             const QPixmap *pixmap = m_pixmapCache->positionPixmap(pos, m_stepData[index].currentTextHeight, m_steps[index]);
 
-            QRectF textRect(x - pixmap->width() / 2.0, top + tickmarkHeight, pixmap->width(), pixmap->height());
+            QRectF textRect(x - pixmap->width() / 2.0, rect.top() + tickmarkHeight, pixmap->width(), pixmap->height());
             if(textRect.left() < rect.left())
                 textRect.moveLeft(rect.left());
             if(textRect.right() > rect.right())
@@ -909,8 +904,8 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, qreal top, qreal height) {
 
         /* Calculate line ends. */
         m_tickmarkLines[index] << 
-            QPointF(x, top + 1.0 /* To prevent antialiased lines being drawn outside provided rect. */) <<
-            QPointF(x, top + tickmarkHeight);
+            QPointF(x, rect.top() + 1.0 /* To prevent antialiased lines being drawn outside provided rect. */) <<
+            QPointF(x, rect.top() + tickmarkHeight);
     }
 
     /* Draw tickmarks. */
@@ -988,7 +983,7 @@ void QnTimeSlider::drawHighlights(QPainter *painter, qreal fillTop, qreal fillHe
     }
 }
 
-void QnTimeSlider::drawThumbnails(QPainter *painter, const QRectF& rect) 
+void QnTimeSlider::drawThumbnails(QPainter *painter, const QRectF &rect) 
 {
     if (m_thumbnailsLoader == 0)
         return;
@@ -1002,14 +997,12 @@ void QnTimeSlider::drawThumbnails(QPainter *painter, const QRectF& rect)
     qint64 currentTime = valueFromPosition(rect.topLeft());
     qint64 endTime = valueFromPosition(rect.topRight());
 
-    currentTime = (currentTime/m_thumbnailsLoader->step()) * m_thumbnailsLoader->step(); // round position in "thumbnails" measure unit
+    currentTime = qFloor(currentTime, m_thumbnailsLoader->step());
 
-    for (; currentTime < endTime; currentTime += m_thumbnailsLoader->step())
-    {
+    for (; currentTime < endTime; currentTime += m_thumbnailsLoader->step()) {
         m_thumbnailsLoader->lockPixmaps();
         const QPixmap *pixmap = m_thumbnailsLoader->getPixmapByTime(currentTime);
-        if (pixmap)
-        {
+        if (pixmap) {
             QPointF pos = positionFromValue(currentTime, false);
             painter->drawRect(pos.x(), rect.top(), pixmap->size().width(), pixmap->size().height());
             painter->drawPixmap(QPointF(pos.x(), rect.top()), *pixmap);
