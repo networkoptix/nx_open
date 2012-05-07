@@ -39,6 +39,13 @@ void QnTimeScrollBar::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
 
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, false);
 
+    /* Draw frame. */
+    {
+        QnScopedPainterPenRollback penRollback(painter, QPen(separatorColor, 0));
+        QnScopedPainterBrushRollback brushRollback(painter, Qt::NoBrush);
+        painter->drawRect(rect());
+    }
+
     /* Draw scrollbar handle. */
     QRect handleRect = style()->subControlRect(QStyle::CC_ScrollBar, &opt, QStyle::SC_ScrollBarSlider, this);
     {

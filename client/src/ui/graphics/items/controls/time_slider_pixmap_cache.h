@@ -56,9 +56,6 @@ private:
         }
     };
 
-    struct 
-
-
     QHash<qint32, const QPixmap *> m_pixmapByShortPositionKey;
     QHash<QnTimeStepLongCacheKey, const QPixmap *> m_pixmapByLongPositionKey;
     QHash<TextCacheKey, const QPixmap *> m_pixmapByCacheKey;

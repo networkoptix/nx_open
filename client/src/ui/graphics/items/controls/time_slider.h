@@ -120,7 +120,6 @@ protected:
 
     static QVector<QnTimeStep> createRelativeSteps();
     static QVector<QnTimeStep> createAbsoluteSteps();
-    static QVector<QnTimeStep> createStandardSteps(bool isRelative);
     static QVector<QnTimeStep> enumerateSteps(const QVector<QnTimeStep> &steps);
 
 private:
