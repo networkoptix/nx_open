@@ -95,6 +95,8 @@ case "$1" in
 
       write_config
 
+      /opt/networkoptix/entcontroller/bin/dbsync
+
       if [ ! -z "$ECS_PASSWORD" ]
       then
         /opt/networkoptix/entcontroller/bin/dbconfig admin "$ECS_PASSWORD"
