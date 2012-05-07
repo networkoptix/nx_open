@@ -93,12 +93,12 @@ bool AbstractLinearGraphicsSlider::event(QEvent *event) {
 }
 
 
-QPointF AbstractLinearGraphicsSlider::positionFromValue(qint64 logicalValue, bool doBound) const {
+QPointF AbstractLinearGraphicsSlider::positionFromValue(qint64 logicalValue, bool bound) const {
     Q_D(const AbstractLinearGraphicsSlider);
 
     d->ensureMapper();
 
-    qreal result = d->pixelPosMin + GraphicsStyle::sliderPositionFromValue(d->minimum, d->maximum, logicalValue, d->pixelPosMax - d->pixelPosMin, d->upsideDown);
+    qreal result = d->pixelPosMin + GraphicsStyle::sliderPositionFromValue(d->minimum, d->maximum, logicalValue, d->pixelPosMax - d->pixelPosMin, d->upsideDown, bound);
     if(d->orientation == Qt::Horizontal) {
         return QPointF(result, 0.0);
     } else {
@@ -106,12 +106,12 @@ QPointF AbstractLinearGraphicsSlider::positionFromValue(qint64 logicalValue, boo
     }
 }
 
-qint64 AbstractLinearGraphicsSlider::valueFromPosition(const QPointF &position) const {
+qint64 AbstractLinearGraphicsSlider::valueFromPosition(const QPointF &position, bool bound) const {
     Q_D(const AbstractLinearGraphicsSlider);
 
     d->ensureMapper();
 
     qreal pixelPos = d->orientation == Qt::Horizontal ? position.x() : position.y();
-    return GraphicsStyle::sliderValueFromPosition(d->minimum, d->maximum, pixelPos - d->pixelPosMin, d->pixelPosMax - d->pixelPosMin, d->upsideDown);
+    return GraphicsStyle::sliderValueFromPosition(d->minimum, d->maximum, pixelPos - d->pixelPosMin, d->pixelPosMax - d->pixelPosMin, d->upsideDown, bound);
 }
 

@@ -55,7 +55,7 @@ void QnTimeScrollBar::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
 
         /* Calculate handle- and groove-relative indicator offsets. */
         qreal grooveOffset = positionFromValue(grooveValue).x();
-        qreal handleOffset = GraphicsStyle::sliderPositionFromValue(0, pageStep(), handleValue, handleRect.width(), opt.upsideDown);
+        qreal handleOffset = GraphicsStyle::sliderPositionFromValue(0, pageStep(), handleValue, handleRect.width(), opt.upsideDown, true);
 
         /* Paint it. */
         qreal x = handleOffset + grooveOffset;
