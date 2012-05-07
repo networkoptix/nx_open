@@ -414,9 +414,9 @@ bool QnNavigationItem::eventFilter(QObject *watched, QEvent *event) {
 }
 
 bool QnNavigationItem::at_speedSlider_wheelEvent(QGraphicsSceneWheelEvent *event) {
-    if(event->delta() < 0) {
+    if(event->delta() > 0) {
         m_stepForwardButton->click();
-    } else if(event->delta() > 0) {
+    } else if(event->delta() < 0) {
         m_stepBackwardButton->click();
     } else {
         return false;
