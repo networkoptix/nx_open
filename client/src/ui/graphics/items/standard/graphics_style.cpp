@@ -97,12 +97,17 @@ QStyle::SubControl GraphicsStyle::hitTestComplexControl(QStyle::ComplexControl c
     return hitTestComplexControl(control, option, position.toPoint(), widget);
 }
 
-qreal GraphicsStyle::sliderPositionFromValue(qint64 min, qint64 max, qint64 logicalValue, qreal span, bool upsideDown, bool doBound) {
-    if (doBound && (span <= 0 || logicalValue < min || max <= min))
+qreal GraphicsStyle::sliderPositionFromValue(qint64 min, qint64 max, qint64 logicalValue, qreal span, bool upsideDown, bool bound) {
+    if(span <= 0 || max <= min)
         return 0;
 
-    if (doBound && logicalValue > max)
-        return upsideDown ? 0.0 : span;
+    if(bound) {
+        if (logicalValue < min)
+            return 0;
+
+        if (logicalValue > max)
+            return upsideDown ? 0.0 : span;
+    }
 
     qint64 range = max - min;
     qint64 p = upsideDown ? max - logicalValue : logicalValue - min;
@@ -110,12 +115,17 @@ qreal GraphicsStyle::sliderPositionFromValue(qint64 min, qint64 max, qint64 logi
     return p / (range / span);
 }
 
-qint64 GraphicsStyle::sliderValueFromPosition(qint64 min, qint64 max, qreal pos, qreal span, bool upsideDown) {
-    if (span <= 0 || pos <= 0)
-        return upsideDown ? max : min;
+qint64 GraphicsStyle::sliderValueFromPosition(qint64 min, qint64 max, qreal pos, qreal span, bool upsideDown, bool bound) {
+    if(span <= 0)
+        return 0;
 
-    if (pos >= span)
-        return upsideDown ? min : max;
+    if(bound) {
+        if (pos <= 0)
+            return upsideDown ? max : min;
+
+        if (pos >= span)
+            return upsideDown ? min : max;
+    }
 
     qreal tmp = qRound64((max - min) * (pos / span));
     return upsideDown ? max - tmp : tmp + min;

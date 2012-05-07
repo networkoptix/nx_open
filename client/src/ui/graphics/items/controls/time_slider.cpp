@@ -426,23 +426,23 @@ void QnTimeSlider::setToolTipFormat(const QString &format) {
     updateToolTipText();
 }
 
-QPointF QnTimeSlider::positionFromValue(qint64 logicalValue, bool doBound) const {
+QPointF QnTimeSlider::positionFromValue(qint64 logicalValue, bool bound) const {
     Q_D(const GraphicsSlider);
 
     d->ensureMapper();
 
     return QPointF(
-        d->pixelPosMin + GraphicsStyle::sliderPositionFromValue(m_windowStart, m_windowEnd, logicalValue, d->pixelPosMax - d->pixelPosMin, d->upsideDown, doBound), 
+        d->pixelPosMin + GraphicsStyle::sliderPositionFromValue(m_windowStart, m_windowEnd, logicalValue, d->pixelPosMax - d->pixelPosMin, d->upsideDown, bound), 
         0.0
     );
 }
 
-qint64 QnTimeSlider::valueFromPosition(const QPointF &position) const {
+qint64 QnTimeSlider::valueFromPosition(const QPointF &position, bool bound) const {
     Q_D(const GraphicsSlider);
 
     d->ensureMapper();
 
-    return GraphicsStyle::sliderValueFromPosition(m_windowStart, m_windowEnd, position.x(), d->pixelPosMax - d->pixelPosMin, d->upsideDown);
+    return GraphicsStyle::sliderValueFromPosition(m_windowStart, m_windowEnd, position.x(), d->pixelPosMax - d->pixelPosMin, d->upsideDown, bound);
 }
 
 void QnTimeSlider::finishAnimations() {
