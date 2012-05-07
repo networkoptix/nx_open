@@ -13,6 +13,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <ui/common/image_processing.h>
+#include <ui/common/scene_utility.h>
 #include <ui/style/noptix_style.h>
 #include <ui/style/globals.h>
 #include <ui/graphics/items/standard/graphics_slider_p.h>
@@ -45,6 +46,11 @@ namespace {
     }
 
     qreal speed(qreal progress, qreal center, qreal starting, qreal relative) {
+        /* Speed of tickmark height animation depends on tickmark height.
+         * 
+         * The goal is for animation of different tickmark groups to start and
+         * end at the same moment, even if the height changes in these groups are 
+         * different. */
         if(progress > center) {
             return progress * relative;
         } else {
@@ -60,43 +66,103 @@ namespace {
     Q_GLOBAL_STATIC_WITH_ARGS(QVector<QnTimeStep>, absoluteTimeSteps, (TimeStepFactory::createAbsoluteSteps()));
     Q_GLOBAL_STATIC_WITH_ARGS(QVector<QnTimeStep>, relativeTimeSteps, (TimeStepFactory::createRelativeSteps()));
 
+    /* Note that most numbers below are given relative to time slider size. */
 
-    const qreal minTickmarkSpanPixels = 1.0;
-    const qreal maxTickmarkSpanFraction = 0.75;
-    const qreal minTickmarkSeparationPixels = 5.0;
-    const qreal criticalTickmarkSeparationPixels = 2.0;
-    const qreal minTextSeparationPixels = 30.0;
-    const qreal criticalTextSeparationPixels = 20.0;
+
+
+    /* Tickmark bar. */
+
+    /** Minimal distance between tickmarks from the same group for this group to be used as toplevel one. */
+    const qreal topLevelTickmarkStep = 0.75;
+
+    /** Minimal distance between tickmarks from the same group for this group to be visible. 
+     * Note that because of the fact that tickmarks do not disappear instantly, in some cases
+     * spep may become lower that this value. */
+    const qreal minTickmarkLineStepPixels = 5.0;
+
+    /** Critical distance between tickmarks from the same group. 
+     * Tickmarks that are closer to each other will never be displayed. */
+    const qreal criticalTickmarkLineStepPixels = 2.0;
+
+    /** Minimal distance between tickmarks from the same group for text labels to be visible for this group. */
+    const qreal minTickmarkTextStepPixels = 30.0;
+
+    /** Critical distance between tickmarks from the same group.
+     * Text labels will never be displayed for tickmarks that are closer to each other. */
+    const qreal criticalTickmarkTextStepPixels = 20.0;
     
-    const qreal minTickmarkOpacity = 0.05;
-    const qreal minTextOpacity = 0.5;
+    /** Minimal opacity for a tickmark that is visible. */
+    const qreal minTickmarkLineOpacity = 0.05;
+
+    /** Minimal opacity for a tickmark text label that is visible. */
+    const qreal minTickmarkTextOpacity = 0.5;
     
+    /** Ratio between the sizes of consequent tickmark groups. */
     const qreal tickmarkStepScale = 2.0 / 3.0;
 
-    const qreal tickmarkTextScale = 1.0 / 3.0;
-    const int minTextHeight = 9;
-    const qreal maxTickmarkHeight = 1.0 / (1.0 + tickmarkTextScale);
+    /** Minimal height of a tickmark text. */
+    const int minTickmarkTextHeightPixels = 9;
+    
+    /** Maximal tickmark height, relative to the height of the tickmark bar. */
+    const qreal maxTickmarkHeight = 1.0;
+
+    /** Minimal tickmark height, relative to the height of the tickmark bar. */
     const qreal minTickmarkHeight = maxTickmarkHeight / 3.0;
 
+    /** Height of a tickmark text, relative to tickmark height. */
+    const qreal tickmarkTextHeight = 1.0 / 3.0;
+
+    /** Height of a tickmark line, relative to tickmark height. */
+    const qreal tickmarkLineHeight = 2.0 / 3.0;
+
+    /* Tickmark height animation parameters. */
     const qreal tickmarkHeightRelativeAnimationSpeed = 1.0;
     const qreal tickmarkHeightCentralAnimationValue = minTickmarkHeight;
     const qreal tickmarkHeightStartingAnimationSpeed = 0.5;
 
+    /* Tickmark opacity animation parameters. */
     const qreal tickmarkOpacityRelativeAnimationSpeed = 1.0;
     const qreal tickmarkOpacityCentralAnimationValue = 0.5;
     const qreal tickmarkOpacityStartingAnimationSpeed = 1.0;
+
+
+
+    /* Date bar. */
 
     const qreal highlightTextHeight = minTickmarkHeight + (maxTickmarkHeight - minTickmarkHeight) * std::pow(tickmarkStepScale, 3.0);
     const qreal highlightTextTopAdjustment = -0.15;
 
     const qreal minHighlightSpanFraction = 0.15;
 
+
+    
+    /* Lines bar. */
+
+    const qreal lineCommentHeight = 0.75;
+
+
+
+    /* Global */
+
+    /** Minimal relative change of msecs-per-pixel value of a time slider for animation parameters to be recalculated.
+     * This value was introduced so that the parameters are not recalculated constantly when changes are small. */
     const qreal msecsPerPixelChangeThreshold = 1.0e-4;
+    
+    /** Lower limit on time slider scale. */
+    const qreal minMSecsPerPixel = 2.0;
 
-    const qreal tickmarkBarRelativeHeight = 0.6;
+    const QRectF dateBarPosition = QRectF(0.0, 0.0, 0.0, 0.2);
 
-    const qreal lineCommentRelativeHeight = 0.75;
+    const QRectF tickmarkBarPosition = QRectF(0.0, 0.2, 0.0, 0.4);
 
+    const QRectF lineBarPosition = QRectF(0.0, 0.6, 0.0, 0.4);
+
+    /** Maximal number of lines in a time slider. */
+    const int maxLines = 16;
+
+
+
+    /* Colors. */
     
     const QColor tickmarkColor(255, 255, 255, 255);
     const QColor positionMarkerColor(255, 255, 255, 196);
@@ -115,13 +181,7 @@ namespace {
 
     const QColor separatorColor(255, 255, 255, 64);
 
-    /** Lower zoom limit. */
-    const qreal minMSecsPerPixel = 2.0;
-
     const qreal degreesFor2x = 180.0;
-
-    const int maxLines = 16;
-
 
     bool checkLine(int line) {
         if(line < 0 || line >= maxLines) {
@@ -143,6 +203,13 @@ namespace {
             return true;
         }
     }
+
+    QRectF positionRect(const QRectF &sourceRect, const QRectF &position) {
+        QRectF result = SceneUtility::cwiseMul(position, sourceRect.size());
+        result.moveTopLeft(result.topLeft() + sourceRect.topLeft());
+        return result;
+    }
+
 
 } // anonymous namespace
 
@@ -500,9 +567,11 @@ void QnTimeSlider::updateToolTipText() {
 }
 
 void QnTimeSlider::updateLineCommentPixmap(int line) {
+    QRectF lineBarRect = positionRect(rect(), lineBarPosition);
+
     m_lineCommentPixmaps[line] = m_pixmapCache->textPixmap(
         m_lineComments[line],
-        qRound(lineHeight() * lineCommentRelativeHeight),
+        qRound(lineBarRect.height() / m_lineCount * lineCommentHeight),
         palette().color(QPalette::WindowText)
     );
 }
@@ -554,7 +623,7 @@ void QnTimeSlider::updateStepAnimationTargets() {
 
     /* Find maximal index of the time step to use. */
     int maxStepIndex = stepCount - 1;
-    qreal tickmarkSpanPixels = size().width() * maxTickmarkSpanFraction;
+    qreal tickmarkSpanPixels = size().width() * topLevelTickmarkStep;
     for(; maxStepIndex >= 0; maxStepIndex--)
         if(m_steps[maxStepIndex].stepMSecs / m_msecsPerPixel <= tickmarkSpanPixels)
             break;
@@ -567,7 +636,7 @@ void QnTimeSlider::updateStepAnimationTargets() {
 
         /* Target height & opacity. */
         qreal targetHeight;
-        if (separationPixels < minTickmarkSeparationPixels) {
+        if (separationPixels < minTickmarkLineStepPixels) {
             targetHeight = 0.0;
         } else if(i >= maxStepIndex) {
             targetHeight = maxTickmarkHeight;
@@ -581,20 +650,20 @@ void QnTimeSlider::updateStepAnimationTargets() {
             if(qFuzzyIsNull(targetHeight)) {
                 data.targetLineOpacity = 0.0;
             } else {
-                data.targetLineOpacity = minTickmarkOpacity + (1.0 - minTickmarkOpacity) * (data.targetHeight - minTickmarkHeight) / (maxTickmarkHeight - minTickmarkHeight);
+                data.targetLineOpacity = minTickmarkLineOpacity + (1.0 - minTickmarkLineOpacity) * (data.targetHeight - minTickmarkHeight) / (maxTickmarkHeight - minTickmarkHeight);
             }
         }
 
-        if(separationPixels < minTextSeparationPixels) {
+        if(separationPixels < minTickmarkTextStepPixels) {
             data.targetTextOpacity = 0.0;
         } else {
-            data.targetTextOpacity = qMax(minTextOpacity, data.targetLineOpacity);
+            data.targetTextOpacity = qMax(minTickmarkTextOpacity, data.targetLineOpacity);
         }
 
         /* Adjust for max height & opacity. */
-        qreal maxHeight = qMax(0.0, (separationPixels - criticalTickmarkSeparationPixels) / criticalTickmarkSeparationPixels);
-        qreal maxLineOpacity = minTickmarkOpacity + (1.0 - minTickmarkOpacity) * maxHeight;
-        qreal maxTextOpacity = qMin(maxLineOpacity, qMax(0.0, (separationPixels - criticalTextSeparationPixels) / criticalTextSeparationPixels));
+        qreal maxHeight = qMax(0.0, (separationPixels - criticalTickmarkLineStepPixels) / criticalTickmarkLineStepPixels);
+        qreal maxLineOpacity = minTickmarkLineOpacity + (1.0 - minTickmarkLineOpacity) * maxHeight;
+        qreal maxTextOpacity = qMin(maxLineOpacity, qMax(0.0, (separationPixels - criticalTickmarkTextStepPixels) / criticalTickmarkTextStepPixels));
         data.currentHeight      = qMin(data.currentHeight,      maxHeight);
         data.currentLineOpacity = qMin(data.currentLineOpacity, maxLineOpacity);
         data.currentTextOpacity = qMin(data.currentTextOpacity, maxTextOpacity);
@@ -607,10 +676,11 @@ void QnTimeSlider::animateStepValues(int deltaMSecs) {
     int stepCount = m_steps.size();
     qreal dt = deltaMSecs / 1000.0;
 
-    const qreal maxTextHeight = size().height() * tickmarkBarRelativeHeight * (1.0 - maxTickmarkHeight);
+    QRectF tickmarkBarRect = positionRect(rect(), tickmarkBarPosition);
+    const qreal maxTickmarkTextHeightPixels = tickmarkBarRect.height() * maxTickmarkHeight * tickmarkTextHeight;
 
-    /* Range of valid text height values, relative to maximal tickmark height. */
-    const qreal textHeightRange = (maxTextHeight - minTextHeight) / maxTickmarkHeight;
+    /* Range of valid text height values, relative to maximal tickmark bar height. */
+    const qreal textHeightRangePixels = (maxTickmarkTextHeightPixels - minTickmarkTextHeightPixels) / (tickmarkBarRect.height() * maxTickmarkHeight);
 
     for(int i = 0; i < stepCount; i++) {
         TimeStepData &data = m_stepData[i];
@@ -622,17 +692,8 @@ void QnTimeSlider::animateStepValues(int deltaMSecs) {
         data.currentLineOpacity = adjust(data.currentLineOpacity,   data.targetLineOpacity, opacitySpeed * dt);
         data.currentTextOpacity = adjust(data.currentTextOpacity,   data.targetTextOpacity, opacitySpeed * dt);
 
-        data.currentTextHeight  = minTextHeight + qMax(0, qRound(data.currentHeight * textHeightRange));
+        data.currentTextHeight  = minTickmarkTextHeightPixels + qMax(0, qRound(data.currentHeight * textHeightRangePixels));
     }
-}
-
-qreal QnTimeSlider::lineTop(int line) {
-    QRectF rect = this->rect();
-    return rect.top() + rect.height() * (tickmarkBarRelativeHeight + (1.0 - tickmarkBarRelativeHeight) * line / m_lineCount);
-}
-
-qreal QnTimeSlider::lineHeight() {
-    return size().height() * (1.0 - tickmarkBarRelativeHeight) / m_lineCount;
 }
 
 void QnTimeSlider::updateAggregationValue() {
@@ -660,7 +721,10 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
     sendPendingMouseMoves(widget);
 
     QRectF rect = this->rect();
-    qreal lineHeight = this->lineHeight();
+    QRectF dateBarRect = positionRect(rect, dateBarPosition);
+    QRectF lineBarRect = positionRect(rect, lineBarPosition);
+    QRectF tickmarkBarRect = positionRect(rect, tickmarkBarPosition);
+    qreal lineHeight = lineBarRect.height() / m_lineCount;
 
     /* Draw border. */
     {
@@ -670,18 +734,27 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
         painter->drawRect(rect);
     }
 
-    /* Draw time periods. */
-    for(int line = 0; line < m_lineCount; line++) {
-        drawPeriodsBar(
-            painter, 
-            m_lineTimePeriods[line].aggregated[Qn::RecordingTimePeriod],  
-            m_lineTimePeriods[line].aggregated[Qn::MotionTimePeriod], 
-            QRectF(rect.left(), lineTop(line), rect.width(), lineHeight)
-        );
-    }
-
     /* Draw background. */
-    drawSolidBackground(painter, QRectF(rect.left(), rect.top(), rect.width(), rect.height() * (m_lineCount == 0 ? 1.0 : tickmarkBarRelativeHeight)));
+    if(m_lineCount == 0) {
+        drawSolidBackground(painter, rect);
+    } else {
+        drawSolidBackground(painter, lineBarRect);
+        drawSolidBackground(painter, dateBarRect);
+
+        /* Draw lines background (that is, time periods). */
+        for(int line = 0; line < m_lineCount; line++) {
+            QRectF lineRect(lineBarRect.left(), lineBarRect.top() + line * lineHeight, lineBarRect.width(), lineHeight);
+
+            drawPeriodsBar(
+                painter, 
+                m_lineTimePeriods[line].aggregated[Qn::RecordingTimePeriod],  
+                m_lineTimePeriods[line].aggregated[Qn::MotionTimePeriod], 
+                lineRect
+            );
+
+            drawSeparator(painter, lineRect);
+        }
+    }
 
     /* Draw selection. */
     drawSelection(painter);
@@ -690,8 +763,8 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
     for(int line = 0; line < m_lineCount; line++) {
         const QPixmap *pixmap = m_lineCommentPixmaps[line];
         QRectF textRect(
-            rect.left(),
-            lineTop(line) + 0.5 * lineHeight * (1.0 - lineCommentRelativeHeight),
+            lineBarRect.left(),
+            lineBarRect.top() + lineHeight * line + 0.5 * lineHeight * (1.0 - lineCommentHeight),
             pixmap->width(),
             pixmap->height()
         );
@@ -700,11 +773,13 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
     }
 
     /* Draw tickmarks. */
-    drawTickmarks(painter, QRectF(rect.left(), rect.top(), rect.width(), rect.height() * tickmarkBarRelativeHeight));
+    drawTickmarks(painter, tickmarkBarRect);
+    drawSeparator(painter, tickmarkBarRect);
 
     /* Draw highlights. */
-    qreal hightlightTextPixelHeight = rect.height() * tickmarkBarRelativeHeight * highlightTextHeight;
-    drawHighlights(painter, rect.top(), rect.height() * tickmarkBarRelativeHeight, rect.top() + hightlightTextPixelHeight * highlightTextTopAdjustment, hightlightTextPixelHeight);
+    drawDates(painter, dateBarRect);
+    /*qreal hightlightTextPixelHeight = rect.height() * tickmarkBarPosition * highlightTextHeight;
+    drawHighlights(painter, rect.top(), rect.height() * tickmarkBarPosition, rect.top() + hightlightTextPixelHeight * highlightTextTopAdjustment, hightlightTextPixelHeight);*/
 
     /* Draw position marker. */
     drawMarker(painter, sliderPosition(), positionMarkerColor);
@@ -716,6 +791,15 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
 int QnTimeSlider::thumbnailsHeight() const
 {
     return rect().height();
+}
+
+void QnTimeSlider::drawSeparator(QPainter *painter, const QRectF &rect) {
+    if(qFuzzyCompare(rect.top(), this->rect().top()))
+        return; /* Don't draw separator at the top of the widget. */
+
+    QnScopedPainterPenRollback penRollback(painter, QPen(separatorColor, 0));
+    QnScopedPainterAntialiasingRollback antialiasingRollback(painter, false);
+    painter->drawLine(rect.topLeft(), rect.topRight());
 }
 
 void QnTimeSlider::drawSelection(QPainter *painter) {
@@ -833,11 +917,6 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, QnTimePeriodList &recorded,
 
         value = bestValue;
     }
-
-    /* Draw separator line. */
-    QnScopedPainterPenRollback penRollback(painter, QPen(separatorColor, 0));
-    QnScopedPainterAntialiasingRollback antialiasingRollback(painter, false);
-    painter->drawLine(rect.topLeft(), rect.topRight());
 }
 
 void QnTimeSlider::drawSolidBackground(QPainter *painter, const QRectF &rect) {
@@ -890,7 +969,7 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, const QRectF &rect) {
         /* Draw label if needed. */
         qreal tickmarkHeight = rect.height() * m_stepData[index].currentHeight;
         if(!qFuzzyIsNull(m_stepData[index].currentTextOpacity)) {
-            const QPixmap *pixmap = m_pixmapCache->positionPixmap(pos, m_stepData[index].currentTextHeight, m_steps[index]);
+            const QPixmap *pixmap = m_pixmapCache->positionShortPixmap(pos, m_stepData[index].currentTextHeight, m_steps[index]);
 
             QRectF textRect(x - pixmap->width() / 2.0, rect.top() + tickmarkHeight, pixmap->width(), pixmap->height());
             if(textRect.left() < rect.left())
@@ -918,10 +997,9 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, const QRectF &rect) {
     }
 }
 
-void QnTimeSlider::drawHighlights(QPainter *painter, qreal fillTop, qreal fillHeight, qreal textTop, qreal textHeight) {
+void QnTimeSlider::drawDates(QPainter *painter, const QRectF &rect) {
     int stepCount = m_steps.size();
-    QRectF rect = this->rect();
-    
+
     /* Find index of the highlight time step. */
     int highlightIndex = 0;
     qreal highlightSpanPixels = size().width() * minHighlightSpanFraction;
@@ -951,13 +1029,13 @@ void QnTimeSlider::drawHighlights(QPainter *painter, qreal fillTop, qreal fillHe
                 gradient.setColorAt(1.0, QColor(160, 160, 255, 0));
 
                 painter->setBrush(gradient);
-                painter->drawRect(QRectF(x0, fillTop, x1 - x0, fillHeight));
+                painter->drawRect(QRectF(x0, rect.top(), x1 - x0, rect.height()));
             }
 
-            const QPixmap *pixmap = m_pixmapCache->highlightPixmap(pos0, textHeight, highlightStep);
+            const QPixmap *pixmap = m_pixmapCache->positionLongPixmap(pos0, rect.height(), highlightStep);
 
             qreal x = (x0 + x1) / 2.0;
-            QRectF textRect(x - pixmap->width() / 2.0, textTop, pixmap->width(), pixmap->height());
+            QRectF textRect(x - pixmap->width() / 2.0, rect.top(), pixmap->width(), pixmap->height());
             QRectF pixmapRect(pixmap->rect());
             if(textRect.left() < rect.left()) {
                 textRect.moveRight(x1);

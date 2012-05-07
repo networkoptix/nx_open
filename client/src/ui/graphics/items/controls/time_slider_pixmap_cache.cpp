@@ -41,8 +41,8 @@ QnTimeSliderPixmapCache::QnTimeSliderPixmapCache(QObject *parent):
 QnTimeSliderPixmapCache::~QnTimeSliderPixmapCache() {
     qDeleteAll(m_pixmapByCacheKey);
     m_pixmapByCacheKey.clear();
-    m_pixmapByHighlightKey.clear();
-    m_pixmapByHighlightKey.clear();
+    m_pixmapByShortPositionKey.clear();
+    m_pixmapByLongPositionKey.clear();
 }
 
 Q_GLOBAL_STATIC(QnTimeSliderPixmapCache, qn_timeSliderPixmapCacheInstance)
@@ -51,43 +51,24 @@ QnTimeSliderPixmapCache *QnTimeSliderPixmapCache::instance() {
     return qn_timeSliderPixmapCacheInstance();
 }
 
-const QPixmap *QnTimeSliderPixmapCache::positionPixmap(qint64 position, int height, const QnTimeStep &step) {
-    qint32 key = cacheKey(position, height, step);
+const QPixmap *QnTimeSliderPixmapCache::positionShortPixmap(qint64 position, int height, const QnTimeStep &step) {
+    qint32 key = shortCacheKey(position, height, step);
 
-    QHash<qint32, const QPixmap *>::const_iterator itr = m_pixmapByPositionKey.find(key);
-    if(itr != m_pixmapByPositionKey.end())
+    QHash<qint32, const QPixmap *>::const_iterator itr = m_pixmapByShortPositionKey.find(key);
+    if(itr != m_pixmapByShortPositionKey.end())
         return *itr;
 
-    return m_pixmapByPositionKey[key] = textPixmap(toString(position, step), height, QColor(255, 255, 255, 255));
+    return m_pixmapByShortPositionKey[key] = textPixmap(toShortString(position, step), height, QColor(255, 255, 255, 255));
 }
 
-const QPixmap *QnTimeSliderPixmapCache::highlightPixmap(qint64 position, int height, const QnTimeStep &step) {
-    qint32 key = cacheKey(position, height, step);
+const QPixmap *QnTimeSliderPixmapCache::positionLongPixmap(qint64 position, int height, const QnTimeStep &step) {
+    QnTimeStepLongCacheKey key = longCacheKey(position, height, step);
 
-    QHash<qint32, const QPixmap *>::const_iterator itr = m_pixmapByPositionKey.find(key);
-    if(itr != m_pixmapByPositionKey.end())
+    QHash<QnTimeStepLongCacheKey, const QPixmap *>::const_iterator itr = m_pixmapByLongPositionKey.find(key);
+    if(itr != m_pixmapByLongPositionKey.end())
         return *itr;
 
-    QString text = toLongString(position, step);
-    QPixmap basePixmap = *textPixmap(text, height, QColor(0, 0, 0, 255));
-    QPixmap overPixmap = *textPixmap(text, height, QColor(255, 255, 255, 255));
-
-    QImage image(basePixmap.size() + QSize(6, 3), QImage::Format_ARGB32);
-    image.fill(qRgba(0, 0, 0, 0));
-    {
-        QPainter painter(&image);
-        painter.drawPixmap(3, 0, basePixmap);
-    }
-    image = gaussianBlur(image, 1.5);
-    QPixmap blurPixmap = QPixmap::fromImage(image);
-    {
-        QPainter painter(&image);
-        for(int i = 0; i < 8; i++)
-            painter.drawPixmap(0, 0, blurPixmap);
-        painter.drawPixmap(3, 0, overPixmap);
-    }
-
-    return m_pixmapByPositionKey[key] = new QPixmap(QPixmap::fromImage(image));
+    return m_pixmapByLongPositionKey[key] = textPixmap(toLongString(position, step), height, QColor(255, 255, 255, 255));
 }
 
 const QPixmap *QnTimeSliderPixmapCache::textPixmap(const QString &text, int height, const QColor &color) {
@@ -95,9 +76,9 @@ const QPixmap *QnTimeSliderPixmapCache::textPixmap(const QString &text, int heig
     if(!localColor.isValid())
         localColor = QColor(0, 0, 0, 255);
 
-    CacheKey key(text, height, localColor);
+    TextCacheKey key(text, height, localColor);
 
-    QHash<CacheKey, const QPixmap *>::const_iterator itr = m_pixmapByCacheKey.find(key);
+    QHash<TextCacheKey, const QPixmap *>::const_iterator itr = m_pixmapByCacheKey.find(key);
     if(itr != m_pixmapByCacheKey.end())
         return *itr;
 

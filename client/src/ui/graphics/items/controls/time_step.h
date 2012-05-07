@@ -2,6 +2,7 @@
 #define QN_TIME_STEP_H
 
 #include <QtCore/QtGlobal>
+#include <QtCore/QPair>
 
 class QnTimeStep {
 public:
@@ -55,9 +56,11 @@ public:
      * or for absolute times (i.e. obtained via <tt>QDateTime::toMSecsSinceEpoch</tt>). */
     bool isRelative;
 
-    /** Index of this time step in enclosing list. */
+    /** Index of this time step in the enclosing list. */
     int index;
 };
+
+typedef QPair<qint64, qint64> QnTimeStepLongCacheKey;
 
 qint64 roundUp(qint64 msecs, const QnTimeStep &step);
 
@@ -65,9 +68,11 @@ qint64 add(qint64 msecs, const QnTimeStep &step);
 
 qint64 absoluteNumber(qint64 msecs, const QnTimeStep &step);
 
-qint32 cacheKey(qint64 msecs, int height, const QnTimeStep &step);
+qint32 shortCacheKey(qint64 msecs, int height, const QnTimeStep &step);
 
-QString toString(qint64 msecs, const QnTimeStep &step);
+QnTimeStepLongCacheKey longCacheKey(qint64 msecs, int height, const QnTimeStep &step);
+
+QString toShortString(qint64 msecs, const QnTimeStep &step);
 
 QString toLongString(qint64 msecs, const QnTimeStep &step);
 

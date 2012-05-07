@@ -112,7 +112,7 @@ qint64 absoluteNumber(qint64 msecs, const QnTimeStep &step) {
     }
 }
 
-qint32 cacheKey(qint64 msecs, int height, const QnTimeStep &step) {
+qint32 shortCacheKey(qint64 msecs, int height, const QnTimeStep &step) {
     qint32 timeKey;
 
     if(step.isRelative) {
@@ -142,7 +142,14 @@ qint32 cacheKey(qint64 msecs, int height, const QnTimeStep &step) {
     return (timeKey << 16) | (height << 8) | (step.index << 1) | (step.isRelative ? 1 : 0);
 }
 
-QString toString(qint64 msecs, const QnTimeStep &step) {
+QnTimeStepLongCacheKey longCacheKey(qint64 msecs, int height, const QnTimeStep &step) {
+    return QnTimeStepLongCacheKey(
+        msecs,
+        (height << 8) | (step.index << 1) | (step.isRelative ? 1 : 0)
+    );
+}
+
+QString toShortString(qint64 msecs, const QnTimeStep &step) {
     if(step.isRelative)
         return QString::number(msecs / step.unitMSecs % step.wrapUnits) + step.format;
 

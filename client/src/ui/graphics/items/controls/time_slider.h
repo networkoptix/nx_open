@@ -127,12 +127,12 @@ private:
     bool scaleWindow(qreal factor, qint64 anchor);
 
     void drawPeriodsBar(QPainter *painter, QnTimePeriodList &recorded, QnTimePeriodList &motion, const QRectF &rect);
-    void drawPeriods(QPainter *painter, QnTimePeriodList &periods, const QColor &preColor, const QColor &pastColor, const QRectF &rect);
     void drawTickmarks(QPainter *painter, const QRectF &rect);
     void drawSolidBackground(QPainter *painter, const QRectF &rect);
     void drawMarker(QPainter *painter, qint64 pos, const QColor &color);
     void drawSelection(QPainter *painter);
-    void drawHighlights(QPainter *painter, qreal fillTop, qreal fillHeight, qreal textTop, qreal textHeight);
+    void drawSeparator(QPainter *painter, const QRectF &rect);
+    void drawDates(QPainter *painter, const QRectF &rect);
     void drawThumbnails(QPainter *painter, const QRectF &rect);
 
     void updateToolTipVisibility();
@@ -147,9 +147,6 @@ private:
     void updateAggregatedPeriods(int line, Qn::TimePeriodType type);
     
     void animateStepValues(int deltaMSecs);
-
-    qreal lineTop(int line);
-    qreal lineHeight();
 
 private:
     Q_DECLARE_PRIVATE(GraphicsSlider);

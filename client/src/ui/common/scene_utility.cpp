@@ -91,6 +91,24 @@ MarginsF SceneUtility::cwiseDiv(const MarginsF &l, const MarginsF &r) {
     );
 }
 
+QRectF SceneUtility::cwiseMul(const QRectF &l, const QSizeF &r) {
+    return QRectF(
+        l.left()   * r.width(),
+        l.top()    * r.height(),
+        l.width()  * r.width(),
+        l.height() * r.height()
+    );
+}
+
+QRectF SceneUtility::cwiseDiv(const QRectF &l, const QSizeF &r) {
+    return QRectF(
+        l.left()   / r.width(),
+        l.top()    / r.height(),
+        l.width()  / r.width(),
+        l.height() / r.height()
+    );
+}
+
 QMargins SceneUtility::cwiseSub(const QMargins &l, const QMargins &r) {
     return QMargins(
         l.left()   - r.left(), 
