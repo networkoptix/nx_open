@@ -6,29 +6,24 @@
 #include <QGraphicsLinearLayout>
 #include <QMessageBox>
 
-#include <core/resourcemanagment/resource_pool.h>
-#include <core/resource/video_server.h>
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>
+#include <utils/common/scoped_value_rollback.h>
+#include <utils/common/synctime.h>
 
-#include "camera/camera.h"
+#include <ui/style/skin.h>
+#include <ui/graphics/items/standard/graphics_label.h>
+#include <ui/graphics/items/controls/speed_slider.h>
+#include <ui/graphics/items/controls/volume_slider.h>
+#include <ui/graphics/items/controls/tool_tip_item.h>
+#include <ui/graphics/items/image_button_widget.h>
+#include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_navigator.h>
+#include <ui/workbench/workbench_context.h>
 
-#include "ui/style/skin.h"
-#include "ui/graphics/items/standard/graphics_label.h"
-#include "ui/graphics/items/controls/speed_slider.h"
-#include "ui/graphics/items/controls/volume_slider.h"
-#include "ui/graphics/items/controls/tool_tip_item.h"
-#include "ui/graphics/items/image_button_widget.h"
-
-#include "utils/common/synctime.h"
-#include "core/resource/security_cam_resource.h"
-#include "ui/workbench/workbench_display.h"
-#include "ui/workbench/workbench_navigator.h"
-#include "ui/workbench/workbench_context.h"
 #include "time_slider.h"
 #include "time_scroll_bar.h"
-#include "utils/common/scoped_value_rollback.h"
 
 QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *context): 
     base_type(parent),
@@ -114,6 +109,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
     m_speedSlider = new QnSpeedSlider(this);
     m_speedSlider->setCacheMode(QGraphicsItem::ItemCoordinateCache);
     m_speedSlider->setFocusProxy(this);
+    m_speedSlider->installEventFilter(this);
 
     m_volumeSlider = new QnVolumeSlider(this);
     m_volumeSlider->setCacheMode(QGraphicsItem::ItemCoordinateCache);
@@ -410,6 +406,25 @@ void QnNavigationItem::updateButtonsSyncEffectiveState() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+bool QnNavigationItem::eventFilter(QObject *watched, QEvent *event) {
+    if(watched == m_speedSlider && event->type() == QEvent::GraphicsSceneWheel)
+        return at_speedSlider_wheelEvent(static_cast<QGraphicsSceneWheelEvent *>(event));
+
+    base_type::eventFilter(watched, event);
+}
+
+bool QnNavigationItem::at_speedSlider_wheelEvent(QGraphicsSceneWheelEvent *event) {
+    if(event->delta() > 0) {
+        m_stepForwardButton->click();
+    } else if(event->delta() < 0) {
+        m_stepBackwardButton->click();
+    } else {
+        return false;
+    }
+
+    return true;
+}
+
 void QnNavigationItem::wheelEvent(QGraphicsSceneWheelEvent *event) {
     base_type::wheelEvent(event);
     
@@ -431,11 +446,18 @@ void QnNavigationItem::at_navigator_currentWidgetChanged() {
 }
 
 void QnNavigationItem::at_liveButton_clicked() {
-    if(m_liveButton->isChecked()) {
-        m_navigator->setLive(true);
-    } else {
+    m_navigator->setLive(true);
+
+    /* Move time scrollbar so that maximum is visible. */
+    m_timeSlider->finishAnimations();
+    m_timeScrollBar->setValue(m_timeScrollBar->maximum());
+
+    /* Reset speed. */
+    m_navigator->setSpeed(1.0);
+
+    /* Reset button's checked state. */
+    if(!m_liveButton->isChecked())
         m_liveButton->setChecked(true); /* Cannot go out of live mode by pressing 'live' button. */
-    }
 }
 
 void QnNavigationItem::at_syncButton_clicked() {
@@ -445,6 +467,8 @@ void QnNavigationItem::at_syncButton_clicked() {
 void QnNavigationItem::at_stepBackwardButton_clicked() {
     if(m_playButton->isChecked()) {
         m_speedSlider->speedDown();
+        if(qFuzzyIsNull(m_speedSlider->speed()))
+            m_speedSlider->speedDown(); /* Skip 'pause'. */
     } else {
         m_navigator->stepBackward();
     }
@@ -453,6 +477,8 @@ void QnNavigationItem::at_stepBackwardButton_clicked() {
 void QnNavigationItem::at_stepForwardButton_clicked() {
     if(m_playButton->isChecked()) {
         m_speedSlider->speedUp();
+        if(qFuzzyIsNull(m_speedSlider->speed()))
+            m_speedSlider->speedUp(); /* Skip 'pause'. */
     } else {
         m_navigator->stepForward();
     }

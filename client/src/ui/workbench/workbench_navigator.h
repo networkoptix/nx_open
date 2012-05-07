@@ -114,6 +114,7 @@ protected slots:
 
     void updateCurrentPeriods();
     void updateCurrentPeriods(Qn::TimePeriodType type);
+    void updateSyncedPeriods();
     void updateSyncedPeriods(Qn::TimePeriodType type);
     void updateLines();
 
