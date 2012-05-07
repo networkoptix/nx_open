@@ -643,7 +643,6 @@ void CLVideoStreamDisplay::setLastDisplayedTime(qint64 value)
     QMutexLocker lock(&m_timeMutex);
     if (m_timeChangeEnabled)
         m_lastDisplayedTime = value; 
-    }
 }
 
 void CLVideoStreamDisplay::blockTimeValue(qint64 time)
