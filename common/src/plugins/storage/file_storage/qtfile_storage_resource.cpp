@@ -108,3 +108,8 @@ QnStorageResource* QnQtFileStorageResource::instance()
 {
     return new QnQtFileStorageResource();
 }
+
+bool QnQtFileStorageResource::isStorageAvailableForWriting()
+{
+    return false; // it is read only file system
+}

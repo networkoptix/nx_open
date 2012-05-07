@@ -1,10 +1,9 @@
 #ifndef QN_MATH_H
 #define QN_MATH_H
 
-#include <QtCore/QtGlobal>
-
-#define _USE_MATH_DEFINES
 #include <cmath>
+
+#include <QtCore/QtGlobal>
 
 #include "fuzzy.h"
 #include "float.h"

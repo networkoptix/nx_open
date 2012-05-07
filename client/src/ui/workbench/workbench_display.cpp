@@ -227,11 +227,15 @@ void QnWorkbenchDisplay::setStreamsSynchronized(bool synchronized) {
     if(!m_streamSynchronizer) {
         QnWorkbenchRenderWatcher *renderWatcher = new QnWorkbenchRenderWatcher(this, this);
         m_streamSynchronizer = new QnWorkbenchStreamSynchronizer(this, renderWatcher, this);
+
+        connect(m_streamSynchronizer, SIGNAL(effectiveChanged()), this, SIGNAL(streamsSynchronizationEffectiveChanged()));
+        if(m_streamSynchronizer->isEffective())
+            emit streamsSynchronizationEffectiveChanged();
     }
 
     m_streamSynchronizer->setEnabled(synchronized);
 
-    emit streamsSynchronizedChanged(synchronized);
+    emit streamsSynchronizedChanged();
 }
 
 bool QnWorkbenchDisplay::isStreamsSynchronized() const {
@@ -239,6 +243,13 @@ bool QnWorkbenchDisplay::isStreamsSynchronized() const {
         return false;
 
     return m_streamSynchronizer->isEnabled();
+}
+
+bool QnWorkbenchDisplay::isStreamsSynchronizationEffective() const {
+    if(!m_streamSynchronizer)
+        return false;
+
+    return m_streamSynchronizer->isEffective();
 }
 
 void QnWorkbenchDisplay::setScene(QGraphicsScene *scene) {

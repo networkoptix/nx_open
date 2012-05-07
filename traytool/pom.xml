@@ -50,6 +50,15 @@
 		<mac.defines/>			
 	</properties>
 
+	<dependencies>
+		<dependency>
+			<groupId>com.nokia.qt</groupId>
+			<artifactId>qtsingleapplication</artifactId>
+			<version>4.7.4</version>
+			<type>zip</type>
+		</dependency>		
+	</dependencies>		
+
 	<build>
 		<directory>${arch}</directory>
 		<outputDirectory>${arch}</outputDirectory>
@@ -89,7 +98,7 @@
 									<map from="" to="INCLUDEPATH += "/>
 								</pathconvert>								
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${includes_pri}</echo>	
-								
+
 								<fileset id="qrc_path" dir="${project.build.sourceDirectory}">
 									<include name="**/*.qrc" />
 								</fileset>
@@ -134,7 +143,7 @@
 	</build>    
 
 	<profiles>
-		<profile>
+		<!--<profile>
 			<id>convert-clean</id>
 			<activation>				
 				<file>
@@ -142,45 +151,10 @@
 				</file>		
 			</activation>			
 			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<version>2.4</version>
-						<executions>
-							<execution>
-								<id>unpack-specific-libs</id>
-								<phase>validate</phase>
-								<goals>
-									<goal>unpack</goal>
-								</goals>
-								<configuration>
-									<artifactItems>
-										<!--<artifactItem>
-											<groupId>com.nokia.qt</groupId>
-											<artifactId>qtservice</artifactId>
-											<version>4.7.4</version>
-											<type>zip</type>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}</outputDirectory>
-										</artifactItem>	-->
-
-										<artifactItem>
-											<groupId>com.nokia.qt</groupId>
-											<artifactId>qtsingleapplication</artifactId>
-											<version>4.7.4</version>
-											<type>zip</type>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}</outputDirectory>
-										</artifactItem>									
-									</artifactItems>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>					
+				<plugins>			
 				</plugins>
 			</build>
-		</profile>	
+		</profile>	-->
 
 		<profile>
 			<id>convert-clean-windows</id>

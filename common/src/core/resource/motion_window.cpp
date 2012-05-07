@@ -151,7 +151,7 @@ bool QnMotionRegion::isValid(int maxMotionRects, int maxMaskRects) const
         if (getRectsBySens(sens).size() > maxMotionRects)
             return false;
     }
-    return getRectsBySens(0).size() <= maxMaskRects;
+    return getRectsBySens(0).size() <= maxMaskRects || maxMaskRects == 0;
 }
 
 int QnMotionRegion::getMotionRectCount() const

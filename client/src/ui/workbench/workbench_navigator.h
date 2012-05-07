@@ -54,6 +54,12 @@ public:
 
     QnResourceWidget *currentWidget();
 
+    Q_SLOT void jumpBackward();
+    Q_SLOT void jumpForward();
+
+    Q_SLOT void stepBackward();
+    Q_SLOT void stepForward();
+
     virtual Qn::ActionScope currentScope() const override;
     virtual QVariant currentTarget(Qn::ActionScope scope) const override;
 

@@ -248,12 +248,16 @@ public:
      */
     void clearMotionSelection();
 
+    bool isMotionSelectionEmpty() const;
+
     /**
      * \returns                         Current motion selection regions.
      */
     QList<QRegion> motionSelection() const;
 
-    void addToMotionRegion(int sens, const QRect& rect, int channel);
+    void addToMotionRegion(int sensitivity, const QRect &rect, int channel);
+
+    bool setMotionRegionSensitivity(int sensitivity, const QPoint &gridPos, int channel);
 
     void clearMotionRegions();
 
@@ -267,7 +271,10 @@ public:
         DrawMaskOnly,
         DrawAllMotionInfo
     };
-    QList<QnMotionRegion>& getMotionRegionList();
+
+    const QList<QnMotionRegion> &getMotionRegionList();
+
+    bool isMotionRegionsEmpty() const;
 
 public slots:
     void showActivityDecorations();

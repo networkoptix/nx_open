@@ -45,6 +45,55 @@
 		<mac.defines/>		
 	</properties>
 
+	<dependencies>
+		<dependency>
+			<groupId>org.ffmpeg</groupId>
+			<artifactId>ffmpeg</artifactId>
+			<version>${ffmpeg.version}</version>
+			<type>zip</type>
+			<classifier>${platform}-${arch}</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org</groupId>
+			<artifactId>openssl</artifactId>
+			<version>1.0.0e</version>
+			<type>zip</type>
+			<classifier>${platform}-${arch}</classifier>
+		</dependency>							
+		<dependency>
+			<groupId>com.google</groupId>
+			<artifactId>protobuf</artifactId>
+			<version>2.4.1</version>
+			<type>zip</type>
+			<classifier>${platform}-${arch}</classifier>
+		</dependency>							
+		<dependency>
+			<groupId>org</groupId>
+			<artifactId>qjson</artifactId>
+			<version>0.7.1</version>
+			<type>zip</type>
+			<classifier>${platform}-${arch}</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.nokia.qt</groupId>
+			<artifactId>qtcore</artifactId>
+			<version>4.7.4</version>
+			<type>zip</type>
+		</dependency>						
+		<dependency>
+			<groupId>com.nokia.qt</groupId>
+			<artifactId>qtsinglecoreapplication</artifactId>
+			<version>4.7.4</version>
+			<type>zip</type>
+		</dependency>
+		<dependency>
+			<groupId>com.nokia.qt</groupId>
+			<artifactId>qtservice</artifactId>
+			<version>4.7.4</version>
+			<type>zip</type>
+		</dependency>		
+	</dependencies>		
+
 	<build>
 		<plugins>
 			<plugin>
@@ -94,7 +143,7 @@
 	</build>    
 
 	<profiles>
-		<profile>
+		<!--<profile>
 			<id>convert-clean</id>
 			<activation>				
 				<file>
@@ -102,88 +151,10 @@
 				</file>		
 			</activation>			
 			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<version>2.4</version>
-						<executions>
-							<execution>
-								<id>unpack-specific-libs</id>
-								<phase>validate</phase>
-								<goals>
-									<goal>unpack</goal>
-								</goals>
-								<configuration>
-									<artifactItems>
-										<artifactItem>
-											<groupId>org.ffmpeg</groupId>
-											<artifactId>ffmpeg</artifactId>
-											<version>${ffmpeg.version}</version>
-											<type>zip</type>
-											<classifier>${platform}-${arch}</classifier>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}</outputDirectory>
-										</artifactItem>
-										<artifactItem>
-											<groupId>org</groupId>
-											<artifactId>openssl</artifactId>
-											<version>1.0.0e</version>
-											<type>zip</type>
-											<classifier>${platform}-${arch}</classifier>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}</outputDirectory>
-										</artifactItem>							
-										<artifactItem>
-											<groupId>com.google</groupId>
-											<artifactId>protobuf</artifactId>
-											<version>2.4.1</version>
-											<type>zip</type>
-											<classifier>${platform}-${arch}</classifier>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}</outputDirectory>
-										</artifactItem>							
-										<artifactItem>
-											<groupId>org</groupId>
-											<artifactId>qjson</artifactId>
-											<version>0.7.1</version>
-											<type>zip</type>
-											<classifier>${platform}-${arch}</classifier>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}</outputDirectory>
-										</artifactItem>
-										<artifactItem>
-											<groupId>com.nokia.qt</groupId>
-											<artifactId>qtcore</artifactId>
-											<version>4.7.4</version>
-											<type>zip</type>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}</outputDirectory>
-										</artifactItem>						
-										<artifactItem>
-											<groupId>com.nokia.qt</groupId>
-											<artifactId>qtsinglecoreapplication</artifactId>
-											<version>4.7.4</version>
-											<type>zip</type>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}</outputDirectory>
-										</artifactItem>
-										<artifactItem>
-											<groupId>com.nokia.qt</groupId>
-											<artifactId>qtservice</artifactId>
-											<version>4.7.4</version>
-											<type>zip</type>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}</outputDirectory>
-										</artifactItem>									
-									</artifactItems>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>					
+				<plugins>				
 				</plugins>
 			</build>
-		</profile>	
+		</profile>	-->
 
 		<profile>
 			<id>convert-clean-windows</id>
@@ -193,26 +164,7 @@
 				</os>
 			</activation>				
 			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<version>2.4</version>
-						<executions>
-							<execution>
-								<id>unpack-specific-libs</id>
-								<phase>validate</phase>
-								<goals>
-									<goal>unpack</goal>
-								</goals>
-								<configuration>
-									<artifactItems>						
-									
-									</artifactItems>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>					
+				<plugins>			
 					<plugin>
 						<groupId>com.goldin.plugins</groupId>
 						<artifactId>maven-copy-plugin</artifactId>
@@ -226,6 +178,7 @@
 								</goals>
 								<configuration>
 									<failIfNotFound>false</failIfNotFound>
+									<runIf/>
 									<resources>
 										<resource>
 											<targetPath>${project.build.directory}/bin</targetPath>
@@ -264,27 +217,67 @@
 												<include>*/${qtplugin2}/**</include>
 												<include>*/${qtplugin3}/**</include>
 											</includes>										
-										</resource>	
-										<resource>
-											<targetPaths>
-												<targetPath>${project.build.directory}/bin/release</targetPath>
-												<targetPath>${project.build.directory}/bin/debug</targetPath>
-											</targetPaths>
-											<directory>${basedir}/resource</directory>
-											<preservePath>true</preservePath>
-											<includes>
-												<include>**/*.xml</include>
-											</includes>
-											<filtering>false</filtering>
-										</resource>										
+										</resource>											
 									</resources>								
 								</configuration>
-							</execution>
+							</execution>							
 						</executions>
 					</plugin>					
 				</plugins>
 			</build>
-		</profile>		
+		</profile>	
+
+		<profile>
+			<id>linux</id>
+			<activation>
+				<os>
+					<family>unix</family>
+					<name>linux</name>
+				</os>		
+			</activation>
+			<!--<properties>
+				<arch>${os.arch}</arch>
+			</properties>	-->
+			<build>	
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>1.1.1</version>
+						<executions>
+							<execution>
+								<id>prepare-deb-contents</id>
+								<!--<id>default-cli</id>-->
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>./prepare-dist.sh</executable>
+									<workingDirectory>${project.build.directory}</workingDirectory>		
+									<!--<arguments>
+										<commandlineArgs>777</commandlineArgs>
+										<commandlineArgs>./copy-files.sh<&&>./copy-files.sh</commandlineArgs>
+									</arguments>-->
+								</configuration>
+							</execution>
+							<execution>
+								<id>build-deb</id>
+								<phase>package</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>./build-dist.sh</executable>
+									<workingDirectory>${project.build.directory}</workingDirectory>		
+								</configuration>
+							</execution>							
+						</executions>
+					</plugin>						
+				</plugins>	
+			</build>			
+		</profile>	
+
 		<profile>
 			<id>windows</id>
 			<activation>

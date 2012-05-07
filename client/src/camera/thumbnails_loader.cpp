@@ -112,7 +112,7 @@ void QnThumbnailsLoader::removeRange(qint64 startTimeMs, qint64 endTimeMs)
     }
 }
 
-QPixmap* QnThumbnailsLoader::getPixmapByTime(qint64 timeMs, quint64* realPixmapTimeMs)
+const QPixmap *QnThumbnailsLoader::getPixmapByTime(qint64 timeMs, quint64* realPixmapTimeMs)
 {
     QMutexLocker locker(&m_mutex);
     QMap<qint64, QPixmap>::iterator itrUp = m_images.lowerBound(timeMs);

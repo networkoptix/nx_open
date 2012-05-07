@@ -4,22 +4,16 @@
 #include "core/resourcemanagment/resource_pool.h"
 #include "core/resource/camera_history.h"
 
+namespace {
+    QAtomicInt qn_multiHandle(1);
+}
+
 QnMultiCameraTimePeriodLoader::QnMultiCameraTimePeriodLoader(QnNetworkResourcePtr resource, QObject *parent):
     QObject(parent),
-    m_mutex(QMutex::Recursive),
-    m_multiRequestCount(0)
-
+    m_mutex(QMutex::Recursive)
 {
     m_resource = resource;
 }
-
-/*
-Q_GLOBAL_STATIC(QnMultiCameraTimePeriodLoader, qn_multiCameraTimePeriodLoaderInstance);
-QnMultiCameraTimePeriodLoader *QnMultiCameraTimePeriodLoader::instance()
-{
-    return qn_multiCameraTimePeriodLoaderInstance();
-}
-*/
 
 QnMultiCameraTimePeriodLoader* QnMultiCameraTimePeriodLoader::newInstance(QnResourcePtr resource, QObject *parent)
 {
@@ -29,7 +23,6 @@ QnMultiCameraTimePeriodLoader* QnMultiCameraTimePeriodLoader::newInstance(QnReso
     return new QnMultiCameraTimePeriodLoader(netRes, parent);
 }
 
-
 int QnMultiCameraTimePeriodLoader::load(const QnTimePeriod &period, const QList<QRegion> &motionRegions)
 {
     if (period.isNull()) {
@@ -38,7 +31,7 @@ int QnMultiCameraTimePeriodLoader::load(const QnTimePeriod &period, const QList<
     }
 
     QMutexLocker lock(&m_mutex);
-    QList<int> hList;
+    QList<int> handles;
     
     // sometime camera moved between media server. Get all servers for requested time period
     QList<QnNetworkResourcePtr> cameraList = QnCameraHistoryPool::instance()->getAllCamerasWithSameMac(m_resource, period);
@@ -46,13 +39,14 @@ int QnMultiCameraTimePeriodLoader::load(const QnTimePeriod &period, const QList<
     {
         int handle = loadInternal(camera, period, motionRegions);
         if (handle > 0)
-            hList << handle;
+            handles << handle;
     }
-
-    if (hList.isEmpty())
+    
+    if (handles.isEmpty())
         return -1;
-    int multiHandle = ++m_multiRequestCount;
-    m_multiLoadProgress.insert(multiHandle, hList);
+
+    int multiHandle = qn_multiHandle.fetchAndAddAcquire(1);
+    m_multiLoadProgress.insert(multiHandle, handles);
     return multiHandle;
 }
 

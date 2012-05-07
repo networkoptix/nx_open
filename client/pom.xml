@@ -50,6 +50,78 @@
 		<mac.defines/>			
 	</properties>
 
+	<dependencies>
+		<dependency>
+			<groupId>org</groupId>
+			<artifactId>openssl</artifactId>
+			<version>1.0.0e</version>
+			<type>zip</type>
+			<classifier>${platform}-${arch}</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.ffmpeg</groupId>
+			<artifactId>ffmpeg</artifactId>
+			<version>${ffmpeg.version}</version>
+			<type>zip</type>
+			<classifier>${platform}-${arch}</classifier>
+		</dependency>						
+		<dependency>
+			<groupId>com.google</groupId>
+			<artifactId>protobuf</artifactId>
+			<version>2.4.1</version>
+			<type>zip</type>
+			<classifier>${platform}-${arch}</classifier>
+		</dependency>							
+		<dependency>
+			<groupId>org</groupId>
+			<artifactId>qjson</artifactId>
+			<version>0.7.1</version>
+			<type>zip</type>
+			<classifier>${platform}-${arch}</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.nokia.qt.addons</groupId>
+			<artifactId>qtcolorpicker</artifactId>
+			<version>2.6</version>
+			<type>zip</type>
+			<classifier>${platform}-${arch}</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.sourceforge.cloudcity</groupId>
+			<artifactId>bespin</artifactId>
+			<version>1.0</version>
+			<type>zip</type>
+			<classifier>${platform}-${arch}</classifier>
+		</dependency>								
+		<dependency>
+			<groupId>com.creativelabs</groupId>
+			<artifactId>openal</artifactId>
+			<version>1.1</version>
+			<type>zip</type>
+			<classifier>${platform}-${arch}</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.microsoft.directx</groupId>
+			<artifactId>d3d9</artifactId>
+			<version>JUN2010</version>
+			<type>zip</type>
+			<classifier>${platform}-${arch}</classifier>
+		</dependency>	
+		<dependency>
+			<groupId>com.microsoft.directx</groupId>
+			<artifactId>d3dx9</artifactId>
+			<version>JUN2010</version>
+			<type>zip</type>
+			<classifier>${platform}-${arch}</classifier>
+		</dependency>	
+		<dependency>
+			<groupId>com.nokia.qt</groupId>
+			<artifactId>qtsingleapplication</artifactId>
+			<version>4.7.4</version>
+			<type>zip</type>
+		</dependency>	
+	</dependencies>		
+
 	<build>
 		<directory>${arch}</directory>
 		<outputDirectory>${arch}</outputDirectory>
@@ -177,7 +249,7 @@
 	</build>    
 
 	<profiles>
-		<profile>
+		<!-- <profile>
 			<id>convert-clean</id>
 			<activation>				
 				<file>
@@ -185,117 +257,10 @@
 				</file> 		
 			</activation>			
 			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<version>2.4</version>
-						<executions>
-							<execution>
-								<id>unpack-specific-libs</id>
-								<phase>validate</phase>
-								<goals>
-									<goal>unpack</goal>
-								</goals>
-								<configuration>
-									<artifactItems>
-										<artifactItem>
-											<groupId>org</groupId>
-											<artifactId>openssl</artifactId>
-											<version>1.0.0e</version>
-											<type>zip</type>
-											<classifier>${platform}-${arch}</classifier>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}</outputDirectory>
-										</artifactItem>
-										<artifactItem>
-											<groupId>org.ffmpeg</groupId>
-											<artifactId>ffmpeg</artifactId>
-											<version>${ffmpeg.version}</version>
-											<type>zip</type>
-											<classifier>${platform}-${arch}</classifier>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}</outputDirectory>
-										</artifactItem>						
-										<artifactItem>
-											<groupId>com.google</groupId>
-											<artifactId>protobuf</artifactId>
-											<version>2.4.1</version>
-											<type>zip</type>
-											<classifier>${platform}-${arch}</classifier>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}</outputDirectory>
-										</artifactItem>							
-										<artifactItem>
-											<groupId>org</groupId>
-											<artifactId>qjson</artifactId>
-											<version>0.7.1</version>
-											<type>zip</type>
-											<classifier>${platform}-${arch}</classifier>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}</outputDirectory>
-										</artifactItem>
-										<artifactItem>
-											<groupId>com.nokia.qt.addons</groupId>
-											<artifactId>qtcolorpicker</artifactId>
-											<version>2.6</version>
-											<type>zip</type>
-											<classifier>${platform}-${arch}</classifier>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}</outputDirectory>
-										</artifactItem>
-										<artifactItem>
-											<groupId>com.sourceforge.cloudcity</groupId>
-											<artifactId>bespin</artifactId>
-											<version>dev-SNAPSHOT</version>
-											<type>zip</type>
-											<classifier>${platform}-${arch}</classifier>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}</outputDirectory>
-										</artifactItem>								
-										<artifactItem>
-											<groupId>com.creativelabs</groupId>
-											<artifactId>openal</artifactId>
-											<version>1.1</version>
-											<type>zip</type>
-											<classifier>${platform}-${arch}</classifier>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}</outputDirectory>
-										</artifactItem>
-										<artifactItem>
-											<groupId>com.microsoft.directx</groupId>
-											<artifactId>d3d9</artifactId>
-											<version>JUN2010</version>
-											<type>zip</type>
-											<classifier>${platform}-${arch}</classifier>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}</outputDirectory>
-										</artifactItem>	
-										<artifactItem>
-											<groupId>com.microsoft.directx</groupId>
-											<artifactId>d3dx9</artifactId>
-											<version>JUN2010</version>
-											<type>zip</type>
-											<classifier>${platform}-${arch}</classifier>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}</outputDirectory>
-										</artifactItem>	
-										<artifactItem>
-											<groupId>com.nokia.qt</groupId>
-											<artifactId>qtsingleapplication</artifactId>
-											<version>4.7.4</version>
-											<type>zip</type>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}</outputDirectory>
-										</artifactItem>									
-									</artifactItems>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>					
+				<plugins>		
 				</plugins>
 			</build>
-		</profile>	
+		</profile> -->	
 
 		<profile>
 			<id>convert-clean-windows</id>

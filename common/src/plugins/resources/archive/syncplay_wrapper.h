@@ -50,13 +50,16 @@ public:
     virtual void setSpeed(double value, qint64 currentTimeHint) override;
 
     virtual void reinitTime(qint64 newTime) override;
+
 public slots:
     void onEofReached(QnlTimeSource* src, bool value);
     void onConsumerBlocksReader(QnAbstractStreamDataProvider* reader, bool value);
+
 private slots:
     void onBeforeJump(qint64 mksec);
     void onJumpOccured(qint64 mksec);
     void onJumpCanceled(qint64 time);
+
 private:
     qint64 minTime() const;
     qint64 endTime() const;
@@ -66,6 +69,7 @@ private:
     qint64 getDisplayedTimeInternal() const;
     qint64 findTimeAtPlaybackMask(qint64 timeUsec);
     void setJumpTime(qint64 mksec);
+
 private:
     friend class QnSyncPlayArchiveDelegate;
     QN_DECLARE_PRIVATE(QnArchiveSyncPlayWrapper);

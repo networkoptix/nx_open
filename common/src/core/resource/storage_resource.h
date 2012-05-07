@@ -71,9 +71,15 @@ public:
     virtual qint64 getFreeSpace() = 0;
 
     /*
-    *   Returns true if storage physically acccesible right now
+    *   Returns true if storage physically acccesible right now (ready only check)
     */
     virtual bool isStorageAvailable() = 0;
+
+    /*
+    *   Returns true if storage physically acccesible and ready for writing
+    */
+    virtual bool isStorageAvailableForWriting() = 0;
+
 
     /*
     *   Remove file from storage
@@ -120,7 +126,7 @@ public:
     static QnStoragePluginFactory* instance();
 
     void registerStoragePlugin(const QString& name, StorageTypeInstance pluginInst, bool isDefaultProtocol = false);
-    QnStorageResource* createStorage(const QString& storageType);
+    QnStorageResource* createStorage(const QString& storageType, bool useDefaultForUnknownPrefix = true);
 private:
     QMap<QString, StorageTypeInstance> m_storageTypes;
     StorageTypeInstance m_defaultStoragePlugin;

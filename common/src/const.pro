@@ -85,7 +85,7 @@ win32 {
 unix {
   LIBS += -lz -lbz2
   DEFINES += QN_EXPORT=
-  QMAKE_CXXFLAGS += -msse4.1
+  QMAKE_CXXFLAGS += -msse2
 }
 
 mac {

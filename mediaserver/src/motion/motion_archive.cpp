@@ -161,10 +161,7 @@ void QnMotionArchive::fillFileNames(qint64 datetimeMs, QFile* motionFile, QFile*
     dir.mkpath(fileName);
 }
 
-inline bool mathImage_sse41(const __m128i* data, const __m128i* mask, int maskStart, int maskEnd)
-#if defined(Q_CC_GNU)
-    __attribute__ ((__target__ ("sse4.1")))
-#endif
+inline bool sse4_attribute mathImage_sse41(const __m128i* data, const __m128i* mask, int maskStart, int maskEnd)
 {
     for (int i = maskStart; i <= maskEnd; ++i)
     {
