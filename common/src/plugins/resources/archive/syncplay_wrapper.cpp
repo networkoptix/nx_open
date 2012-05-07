@@ -543,16 +543,18 @@ void QnArchiveSyncPlayWrapper::onEofReached(QnlTimeSource* source, bool value)
             break;
         }
     }
+	if (value)
+	{
+		bool allReady = d->speed > 0;
+		for (QList<ReaderInfo>::iterator i = d->readers.begin(); i < d->readers.end(); ++i)
+		{
+			if (i->enabled)
+				allReady &= (i->isEOF || i->reader->isRealTimeSource());
+		}
 
-    bool allReady = d->speed > 0;
-    for (QList<ReaderInfo>::iterator i = d->readers.begin(); i < d->readers.end(); ++i)
-    {
-        if (i->enabled)
-            allReady &= (i->isEOF || i->reader->isRealTimeSource());
-    }
-
-    if (allReady)
-        jumpTo(DATETIME_NOW, 0);
+		if (allReady)
+			jumpTo(DATETIME_NOW, 0);
+	}
 }
 
 qint64 QnArchiveSyncPlayWrapper::expectedTime() const
