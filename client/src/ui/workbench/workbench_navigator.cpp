@@ -322,8 +322,12 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnResourceWidget *widget) {
     updateCurrentWidget();
 }
 
-QnResourceWidget *QnWorkbenchNavigator::currentWidget() {
+QnResourceWidget *QnWorkbenchNavigator::currentWidget() const {
     return m_currentWidget;
+}
+
+bool QnWorkbenchNavigator::currentWidgetIsCamera() const {
+    return m_currentWidgetIsCamera;
 }
 
 QnWorkbenchNavigator::SliderUserData QnWorkbenchNavigator::currentSliderData() const {
@@ -561,6 +565,11 @@ void QnWorkbenchNavigator::updateCurrentPeriods(Qn::TimePeriodType type) {
     }
 }
 
+void QnWorkbenchNavigator::updateSyncedPeriods() {
+    for(int i = 0; i < Qn::TimePeriodTypeCount; i++)
+        updateSyncedPeriods(static_cast<Qn::TimePeriodType>(i));
+}
+
 void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodType type) {
     QVector<QnTimePeriodList> periods;
     foreach(const QnResourcePtr &resource, m_syncedResources.uniqueKeys())
@@ -568,10 +577,9 @@ void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodType type) {
 
     QnTimePeriodList mergedPeriods = QnTimePeriod::mergeTimePeriods(periods);
 
-    if (type == Qn::MotionTimePeriod) 
-    {
-        foreach(QnResourceWidget* widget, m_syncedWidgets) {
-            QnAbstractArchiveReader* archiveReader = widget->display()->archiveReader();
+    if (type == Qn::MotionTimePeriod) {
+        foreach(QnResourceWidget *widget, m_syncedWidgets) {
+            QnAbstractArchiveReader  *archiveReader = widget->display()->archiveReader();
             if (archiveReader)
                 archiveReader->setPlaybackMask(mergedPeriods);
         }
@@ -877,6 +885,8 @@ void QnWorkbenchNavigator::at_display_widgetAdded(QnResourceWidget *widget) {
         addSyncedWidget(widget);
 
         connect(widget, SIGNAL(motionSelectionChanged()), this, SLOT(at_widget_motionSelectionChanged()));
+
+        updateSyncedPeriods();
     }
 }
 
@@ -889,6 +899,7 @@ void QnWorkbenchNavigator::at_display_widgetAboutToBeRemoved(QnResourceWidget *w
                 loader->setMotionRegions(QList<QRegion>());
 
         removeSyncedWidget(widget);
+        updateSyncedPeriods();
     }
 }
 

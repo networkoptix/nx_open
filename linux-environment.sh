@@ -12,7 +12,7 @@ chmod 755 ~/environment/maven/bin/mvn
 echo 'export environment=~/environment' >> ~/.profile
 echo 'export PATH=~/environment/maven/bin:'$PATH >> ~/.profile
 echo 'export JAVA_HOME=/usr' >> ~/.profile
-. ~/.profile
+
 
 mkdir ~/projects
 
@@ -22,5 +22,7 @@ sudo python ./scripts/install_pip.py
 sudo python ./scripts/install_others.py
 
 cd ~/projects/netoptix_vms
+
+. ~/.profile
 
 sudo chown -R 

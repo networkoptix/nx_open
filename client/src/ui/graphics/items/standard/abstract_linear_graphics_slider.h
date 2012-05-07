@@ -14,8 +14,8 @@ public:
     explicit AbstractLinearGraphicsSlider(QGraphicsItem *parent = 0);
     virtual ~AbstractLinearGraphicsSlider();
 
-    virtual QPointF positionFromValue(qint64 logicalValue, bool doBound = true) const override;
-    virtual qint64 valueFromPosition(const QPointF &position) const override;
+    virtual QPointF positionFromValue(qint64 logicalValue, bool bound = true) const override;
+    virtual qint64 valueFromPosition(const QPointF &position, bool bound = true) const override;
 
     virtual void updateGeometry() override;
 
