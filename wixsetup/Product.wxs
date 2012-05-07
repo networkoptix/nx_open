@@ -186,6 +186,11 @@
         <CustomAction Id="InitDatabaseAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="check" Impersonate="no" />
         
+        <CustomAction Id="SyncDatabaseAction_Cmd" Property="SyncDatabaseAction"
+                      Value="&quot;[#dbsync.exe]&quot;" Execute="immediate" Impersonate="yes"/>
+        <CustomAction Id="SyncDatabaseAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
+                      Execute="deferred" Return="check" Impersonate="no" />
+    	
         <CustomAction Id="CloseTrayToolAction_Cmd" Property="CloseTrayToolAction"
                       Value="&quot;[VmsTrayToolDir]traytool.exe&quot; &quot;quit&quot;" Execute="immediate" />
         <CustomAction Id="CloseTrayToolAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
@@ -256,8 +261,13 @@
 <!--            <RemoveExistingProducts After="InstallInitialize" />-->
             <Custom Action="CloseTrayToolAction_Cmd" Before="CloseTrayToolAction"><![CDATA[ NOT $(var.VmsInstalling) ]]></Custom>
             <Custom Action="CloseTrayToolAction" Before="StopServices"><![CDATA[ NOT $(var.VmsInstalling) ]]></Custom>
-            <Custom Action="InitDatabaseAction_Cmd" After="InstallFiles"><![CDATA[ ($(var.VmsInstalling) AND &AppServerFeature=3) ]]></Custom>
+        	
+            <Custom Action="SyncDatabaseAction_Cmd" After="InstallFiles">      <![CDATA[ (!AppServerFeature=3 OR &AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="SyncDatabaseAction" After="SyncDatabaseAction_Cmd"><![CDATA[ (!AppServerFeature=3 OR &AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
+        	
+            <Custom Action="InitDatabaseAction_Cmd" After="SyncDatabaseAction"><![CDATA[ $(var.VmsInstalling) AND &AppServerFeature=3 ]]></Custom>
             <Custom Action="InitDatabaseAction" After="InitDatabaseAction_Cmd"><![CDATA[ $(var.VmsInstalling) AND &AppServerFeature=3 ]]></Custom>
+        	
 <!--            <Custom Action="LaunchApplication_cmd" Before="LaunchApplication"><![CDATA[ !TrayToolFeature=3 OR &TrayToolFeature=3 ]]></Custom>-->
             <Custom Action="LaunchApplication" After="InstallFinalize"><![CDATA[ (!AppServerFeature=3 OR &AppServerFeature=3 OR !ServerFeature=3 OR &ServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
         </InstallExecuteSequence>
@@ -281,26 +291,6 @@
             </Directory>
 
 
-            <Directory Id="SystemFolder">
-                <Directory Id="VmsSystemFolderConfig" Name="config">
-                    <Directory Id="VmsConfigSystemProfile" Name="systemprofile">
-                        <Directory Id="VmsSystemProfileAppData" Name="AppData">
-                            <Directory Id="VmsAppDataLocal" Name="Local">
-                                <Directory Id="VmsNetworkOptixAppData" Name="$(env.ORGANIZATION_NAME)">
-                                    <Directory Id="VmsAppServerAppDataDir" Name="Enterprise Controller">
-                                        <Directory Id="VmsAppServerDirDb" Name="db">
-                                            <Component Id="ecs.db" Guid="{4ECA39F8-FA7F-4489-8AC5-FAE68C486666}" Permanent="yes" NeverOverwrite="yes">
-                                                <File Id="ecs.db" Name="ecs.db" Source="../appserver/setup/build/exe.win32-2.7/db/ecs.db" KeyPath="yes"/>
-                                            </Component>
-                                        </Directory>
-                                    </Directory>
-                                </Directory>
-                            </Directory>
-                        </Directory>
-                    </Directory>
-                </Directory>
-            </Directory>
-            
             <Directory Id="ProgramFilesFolder">
                 <Directory Id="NetworkOptix" Name="$(env.ORGANIZATION_NAME)">
                     <Directory Id="INSTALLDIR" Name="$(env.APPLICATION_NAME)">
@@ -581,7 +571,6 @@
             
             <ComponentGroupRef Id="AppServerFilesComponent" />
             <ComponentRef Id="AppServerExecutable" />
-            <ComponentRef Id="ecs.db" />
             <ComponentRef Id="ecs.log" />           
             <ComponentRef Id="AppServerConfiguration"/>
             <ComponentRef Id="AppServerConfigurationGuid"/>
