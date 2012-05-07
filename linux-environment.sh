@@ -10,7 +10,7 @@ unzip ./maven.zip
 chmod 755 ~/environment/maven/bin/mvn
 
 echo 'export environment=~/environment' >> ~/.profile
-echo 'export PATH=~/environment/maven/bin/:'$PATH >> ~/.profile
+echo 'export PATH=~/environment/maven/bin:'$PATH >> ~/.profile
 echo 'export JAVA_HOME=/usr' >> ~/.profile
 . ~/.profile
 
