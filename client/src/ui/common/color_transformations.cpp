@@ -30,3 +30,13 @@ QColor toTransparent(const QColor &color, qreal opacity) {
     result.setAlpha(result.alpha() * opacity);
     return result;
 }
+
+QColor withAlpha(const QColor &color, int alpha) {
+    QColor result = color;
+    result.setAlpha(alpha);
+    return result;
+}
+
+
+
+

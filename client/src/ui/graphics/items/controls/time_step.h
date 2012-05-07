@@ -66,6 +66,8 @@ qint64 roundUp(qint64 msecs, const QnTimeStep &step);
 
 qint64 add(qint64 msecs, const QnTimeStep &step);
 
+qint64 sub(qint64 msecs, const QnTimeStep &step);
+
 qint64 absoluteNumber(qint64 msecs, const QnTimeStep &step);
 
 qint32 shortCacheKey(qint64 msecs, int height, const QnTimeStep &step);

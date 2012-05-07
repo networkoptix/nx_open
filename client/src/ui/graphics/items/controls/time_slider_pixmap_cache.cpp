@@ -4,10 +4,6 @@
 #include <QtGui/QPainter>
 #include <QtGui/QFont>
 
-#include <ui/common/image_processing.h>
-
-#include "time_step.h"
-
 namespace {
     QPixmap renderText(const QString &text, const QPen &pen, const QFont &font, int fontPixelSize = -1) {
         QFont actualFont = font;

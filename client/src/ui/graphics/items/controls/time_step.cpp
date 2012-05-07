@@ -87,6 +87,24 @@ qint64 add(qint64 msecs, const QnTimeStep &step) {
     }
 }
 
+qint64 sub(qint64 msecs, const QnTimeStep &step) {
+    if(step.isRelative)
+        return msecs - step.stepMSecs;
+
+    switch(step.type) {
+    case QnTimeStep::Milliseconds:
+    case QnTimeStep::Days:
+        return msecs - step.stepMSecs;
+    case QnTimeStep::Months:
+        return QDateTime::fromMSecsSinceEpoch(msecs).addMonths(-step.stepUnits).toMSecsSinceEpoch();
+    case QnTimeStep::Years:
+        return QDateTime::fromMSecsSinceEpoch(msecs).addYears(-step.stepUnits).toMSecsSinceEpoch();
+    default:
+        qnWarning("Invalid time step type '%1'.", static_cast<int>(step.type));
+        return msecs;
+    }
+}
+
 const QDateTime baseDateTime = QDateTime::fromMSecsSinceEpoch(0);
 
 qint64 absoluteNumber(qint64 msecs, const QnTimeStep &step) {

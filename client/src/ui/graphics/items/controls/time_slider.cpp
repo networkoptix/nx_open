@@ -12,7 +12,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 
-#include <ui/common/image_processing.h>
+#include <ui/common/color_transformations.h>
 #include <ui/common/scene_utility.h>
 #include <ui/style/noptix_style.h>
 #include <ui/style/globals.h>
@@ -77,7 +77,7 @@ namespace {
 
     /** Minimal distance between tickmarks from the same group for this group to be visible. 
      * Note that because of the fact that tickmarks do not disappear instantly, in some cases
-     * spep may become lower that this value. */
+     * step may become smaller that this value. */
     const qreal minTickmarkLineStepPixels = 5.0;
 
     /** Critical distance between tickmarks from the same group. 
@@ -107,7 +107,7 @@ namespace {
     const qreal maxTickmarkHeight = 1.0;
 
     /** Minimal tickmark height, relative to the height of the tickmark bar. */
-    const qreal minTickmarkHeight = maxTickmarkHeight / 3.0;
+    const qreal minTickmarkHeight = 0.1;
 
     /** Height of a tickmark text, relative to tickmark height. */
     const qreal tickmarkTextHeight = 1.0 / 3.0;
@@ -128,9 +128,8 @@ namespace {
 
 
     /* Date bar. */
-
-    const qreal highlightTextHeight = minTickmarkHeight + (maxTickmarkHeight - minTickmarkHeight) * std::pow(tickmarkStepScale, 3.0);
-    const qreal highlightTextTopAdjustment = -0.15;
+    const qreal dateTextTopMargin = 0.0;
+    const qreal dateTextBottomMargin = 0.1;
 
     const qreal minHighlightSpanFraction = 0.15;
 
@@ -138,7 +137,8 @@ namespace {
     
     /* Lines bar. */
 
-    const qreal lineCommentHeight = 0.75;
+    const qreal lineCommentTopMargin = 0.0;
+    const qreal lineCommentBottomMargin = 0.05;
 
 
 
@@ -151,14 +151,16 @@ namespace {
     /** Lower limit on time slider scale. */
     const qreal minMSecsPerPixel = 2.0;
 
-    const QRectF dateBarPosition = QRectF(0.0, 0.0, 0.0, 0.2);
+    const QRectF dateBarPosition = QRectF(0.0, 0.0, 1.0, 0.2);
 
-    const QRectF tickmarkBarPosition = QRectF(0.0, 0.2, 0.0, 0.4);
+    const QRectF tickmarkBarPosition = QRectF(0.0, 0.2, 1.0, 0.5);
 
-    const QRectF lineBarPosition = QRectF(0.0, 0.6, 0.0, 0.4);
+    const QRectF lineBarPosition = QRectF(0.0, 0.7, 1.0, 0.3);
 
     /** Maximal number of lines in a time slider. */
     const int maxLines = 16;
+
+    const qreal degreesFor2x = 180.0;
 
 
 
@@ -181,7 +183,9 @@ namespace {
 
     const QColor separatorColor(255, 255, 255, 64);
 
-    const qreal degreesFor2x = 180.0;
+    const QColor dateOverlayColorA(255, 255, 255, 48);
+    const QColor dateOverlayColorB = withAlpha(selectionColor, 48);
+
 
     bool checkLine(int line) {
         if(line < 0 || line >= maxLines) {
@@ -571,7 +575,7 @@ void QnTimeSlider::updateLineCommentPixmap(int line) {
 
     m_lineCommentPixmaps[line] = m_pixmapCache->textPixmap(
         m_lineComments[line],
-        qRound(lineBarRect.height() / m_lineCount * lineCommentHeight),
+        qRound(lineBarRect.height() / m_lineCount * (1.0 - lineCommentTopMargin - lineCommentBottomMargin)),
         palette().color(QPalette::WindowText)
     );
 }
@@ -679,8 +683,8 @@ void QnTimeSlider::animateStepValues(int deltaMSecs) {
     QRectF tickmarkBarRect = positionRect(rect(), tickmarkBarPosition);
     const qreal maxTickmarkTextHeightPixels = tickmarkBarRect.height() * maxTickmarkHeight * tickmarkTextHeight;
 
-    /* Range of valid text height values, relative to maximal tickmark bar height. */
-    const qreal textHeightRangePixels = (maxTickmarkTextHeightPixels - minTickmarkTextHeightPixels) / (tickmarkBarRect.height() * maxTickmarkHeight);
+    /* Range of valid text height values. */
+    const qreal textHeightRangePixels = qMax(0.0, maxTickmarkTextHeightPixels - minTickmarkTextHeightPixels);
 
     for(int i = 0; i < stepCount; i++) {
         TimeStepData &data = m_stepData[i];
@@ -692,7 +696,8 @@ void QnTimeSlider::animateStepValues(int deltaMSecs) {
         data.currentLineOpacity = adjust(data.currentLineOpacity,   data.targetLineOpacity, opacitySpeed * dt);
         data.currentTextOpacity = adjust(data.currentTextOpacity,   data.targetTextOpacity, opacitySpeed * dt);
 
-        data.currentTextHeight  = minTickmarkTextHeightPixels + qMax(0, qRound(data.currentHeight * textHeightRangePixels));
+        data.currentTextHeight  = minTickmarkTextHeightPixels + qRound(data.currentHeight * textHeightRangePixels);
+        data.currentLineHeight  = qMin(data.currentHeight * tickmarkBarRect.height() * tickmarkLineHeight, tickmarkBarRect.height() - data.currentTextHeight - 1.0);
     }
 }
 
@@ -738,7 +743,7 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
     if(m_lineCount == 0) {
         drawSolidBackground(painter, rect);
     } else {
-        drawSolidBackground(painter, lineBarRect);
+        drawSolidBackground(painter, tickmarkBarRect);
         drawSolidBackground(painter, dateBarRect);
 
         /* Draw lines background (that is, time periods). */
@@ -764,7 +769,7 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
         const QPixmap *pixmap = m_lineCommentPixmaps[line];
         QRectF textRect(
             lineBarRect.left(),
-            lineBarRect.top() + lineHeight * line + 0.5 * lineHeight * (1.0 - lineCommentHeight),
+            lineBarRect.top() + lineHeight * line + lineHeight * lineCommentTopMargin,
             pixmap->width(),
             pixmap->height()
         );
@@ -778,8 +783,6 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
 
     /* Draw highlights. */
     drawDates(painter, dateBarRect);
-    /*qreal hightlightTextPixelHeight = rect.height() * tickmarkBarPosition * highlightTextHeight;
-    drawHighlights(painter, rect.top(), rect.height() * tickmarkBarPosition, rect.top() + hightlightTextPixelHeight * highlightTextTopAdjustment, hightlightTextPixelHeight);*/
 
     /* Draw position marker. */
     drawMarker(painter, sliderPosition(), positionMarkerColor);
@@ -967,11 +970,11 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, const QRectF &rect) {
         qreal x = positionFromValue(pos).x();
 
         /* Draw label if needed. */
-        qreal tickmarkHeight = rect.height() * m_stepData[index].currentHeight;
+        qreal lineHeight = m_stepData[index].currentLineHeight;
         if(!qFuzzyIsNull(m_stepData[index].currentTextOpacity)) {
             const QPixmap *pixmap = m_pixmapCache->positionShortPixmap(pos, m_stepData[index].currentTextHeight, m_steps[index]);
 
-            QRectF textRect(x - pixmap->width() / 2.0, rect.top() + tickmarkHeight, pixmap->width(), pixmap->height());
+            QRectF textRect(x - pixmap->width() / 2.0, rect.top() + lineHeight, pixmap->width(), pixmap->height());
             if(textRect.left() < rect.left())
                 textRect.moveLeft(rect.left());
             if(textRect.right() > rect.right())
@@ -984,7 +987,7 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, const QRectF &rect) {
         /* Calculate line ends. */
         m_tickmarkLines[index] << 
             QPointF(x, rect.top() + 1.0 /* To prevent antialiased lines being drawn outside provided rect. */) <<
-            QPointF(x, rect.top() + tickmarkHeight);
+            QPointF(x, rect.top() + lineHeight);
     }
 
     /* Draw tickmarks. */
@@ -1009,55 +1012,53 @@ void QnTimeSlider::drawDates(QPainter *painter, const QRectF &rect) {
     highlightIndex = qMin(highlightIndex, stepCount - 1); // TODO: remove this line.
     const QnTimeStep &highlightStep = m_steps[highlightIndex];
 
+    /* Do some precalculations. */
+    const qreal textHeight = rect.height() * (1.0 - dateTextTopMargin - dateTextBottomMargin);
+    const qreal textTopMargin = rect.height() * dateTextTopMargin;
+
+    QnScopedPainterPenRollback penRollback(painter);
+    QnScopedPainterBrushRollback brushRollback(painter);
+
     /* Draw highlight. */
-    {
+    qint64 pos1 = roundUp(m_windowStart, highlightStep);
+    qint64 pos0 = sub(pos1, highlightStep);
+    qreal x0 = positionFromValue(m_windowStart).x();
+    qint64 number = absoluteNumber(pos1, highlightStep);
+    while(true) {
+        qreal x1 = positionFromValue(pos1).x();
+
         painter->setPen(Qt::NoPen);
+        painter->setBrush(number % 2 ? dateOverlayColorA : dateOverlayColorB);
+        painter->drawRect(QRectF(x0, rect.top(), x1 - x0, rect.height()));
 
-        qint64 pos0 = m_windowStart;
-        qint64 pos1 = roundUp(m_windowStart, highlightStep);
-        qreal x0 = positionFromValue(m_windowStart).x();
-        qint64 number = absoluteNumber(pos1, highlightStep);
-        while(true) {
-            qreal x1 = positionFromValue(pos1).x();
+        const QPixmap *pixmap = m_pixmapCache->positionLongPixmap(pos0, textHeight, highlightStep);
 
-            if(number % 2) {
-                QLinearGradient gradient;
-                gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
-                gradient.setStart(0.0, 0.0);
-                gradient.setFinalStop(0.0, 1.0);
-                gradient.setColorAt(0.0, QColor(160, 160, 255, 80));
-                gradient.setColorAt(1.0, QColor(160, 160, 255, 0));
-
-                painter->setBrush(gradient);
-                painter->drawRect(QRectF(x0, rect.top(), x1 - x0, rect.height()));
-            }
-
-            const QPixmap *pixmap = m_pixmapCache->positionLongPixmap(pos0, rect.height(), highlightStep);
-
-            qreal x = (x0 + x1) / 2.0;
-            QRectF textRect(x - pixmap->width() / 2.0, rect.top(), pixmap->width(), pixmap->height());
-            QRectF pixmapRect(pixmap->rect());
-            if(textRect.left() < rect.left()) {
-                textRect.moveRight(x1);
-                pixmapRect.setLeft(pixmapRect.left() + rect.left() - textRect.left());
-                textRect.setLeft(rect.left());
-            }
-            if(textRect.right() > rect.right()) {
-                textRect.moveLeft(x0);
-                pixmapRect.setRight(pixmapRect.right() + rect.right() - textRect.right());
-                textRect.setRight(rect.right());
-            }
-
-            painter->drawPixmap(textRect, *pixmap, pixmapRect);
-
-            if(pos1 >= m_windowEnd)
-                break;
-
-            pos0 = pos1;
-            pos1 = add(pos1, highlightStep);
-            number++;
-            x0 = x1;
+        qreal x = (x0 + x1) / 2.0;
+        QRectF textRect(x - pixmap->width() / 2.0, rect.top() + textTopMargin, pixmap->width(), pixmap->height());
+        QRectF pixmapRect(pixmap->rect());
+        if(textRect.left() < rect.left()) {
+            textRect.moveRight(x1);
+            pixmapRect.setLeft(pixmapRect.left() + rect.left() - textRect.left());
+            textRect.setLeft(rect.left());
         }
+        if(textRect.right() > rect.right()) {
+            textRect.moveLeft(x0);
+            pixmapRect.setRight(pixmapRect.right() + rect.right() - textRect.right());
+            textRect.setRight(rect.right());
+        }
+
+        painter->drawPixmap(textRect, *pixmap, pixmapRect);
+
+        if(pos1 >= m_windowEnd)
+            break;
+
+        painter->setPen(QPen(separatorColor, 0));
+        painter->drawLine(QPointF(x1, rect.top()), QPointF(x1, rect.bottom()));
+
+        pos0 = pos1;
+        pos1 = add(pos1, highlightStep);
+        number++;
+        x0 = x1;
     }
 }
 

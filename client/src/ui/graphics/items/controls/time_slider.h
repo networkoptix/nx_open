@@ -161,11 +161,13 @@ private:
 
         qreal currentHeight;
         qreal targetHeight;
-        int currentTextHeight;
         qreal currentLineOpacity;
         qreal targetLineOpacity;
         qreal currentTextOpacity;
         qreal targetTextOpacity;
+
+        int currentTextHeight;
+        qreal currentLineHeight;
     };
 
     qint64 m_windowStart, m_windowEnd;
