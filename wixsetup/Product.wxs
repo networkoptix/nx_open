@@ -262,11 +262,11 @@
             <Custom Action="CloseTrayToolAction_Cmd" Before="CloseTrayToolAction"><![CDATA[ NOT $(var.VmsInstalling) ]]></Custom>
             <Custom Action="CloseTrayToolAction" Before="StopServices"><![CDATA[ NOT $(var.VmsInstalling) ]]></Custom>
         	
-            <Custom Action="SyncDatabaseAction_Cmd" After="InstallFiles"><![CDATA[ ($(var.VmsInstalling) AND &AppServerFeature=3) ]]></Custom>
-            <Custom Action="SyncDatabaseAction" After="SyncDatabaseAction_Cmd"><![CDATA[ $(var.VmsInstalling) AND &AppServerFeature=3 ]]></Custom>
+            <Custom Action="SyncDatabaseAction_Cmd" After="InstallFiles">      <![CDATA[ (!AppServerFeature=3 OR &AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="SyncDatabaseAction" After="SyncDatabaseAction_Cmd"><![CDATA[ (!AppServerFeature=3 OR &AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
         	
-            <Custom Action="InitDatabaseAction_Cmd" After="SyncDatabaseAction"><![CDATA[ (!AppServerFeature=3 OR &AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
-            <Custom Action="InitDatabaseAction" After="InitDatabaseAction_Cmd"><![CDATA[ (!AppServerFeature=3 OR &AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="InitDatabaseAction_Cmd" After="SyncDatabaseAction"><![CDATA[ $(var.VmsInstalling) AND &AppServerFeature=3 ]]></Custom>
+            <Custom Action="InitDatabaseAction" After="InitDatabaseAction_Cmd"><![CDATA[ $(var.VmsInstalling) AND &AppServerFeature=3 ]]></Custom>
         	
 <!--            <Custom Action="LaunchApplication_cmd" Before="LaunchApplication"><![CDATA[ !TrayToolFeature=3 OR &TrayToolFeature=3 ]]></Custom>-->
             <Custom Action="LaunchApplication" After="InstallFinalize"><![CDATA[ (!AppServerFeature=3 OR &AppServerFeature=3 OR !ServerFeature=3 OR &ServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
