@@ -52,7 +52,8 @@ public:
     qreal minimalSpeed() const;
     qreal maximalSpeed() const;
 
-    QnResourceWidget *currentWidget();
+    QnResourceWidget *currentWidget() const;
+    bool currentWidgetIsCamera() const;
 
     Q_SLOT void jumpBackward();
     Q_SLOT void jumpForward();

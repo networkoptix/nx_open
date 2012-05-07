@@ -38,7 +38,7 @@ public:
     qreal minimalSpeedStep() const;
     void setMinimalSpeedStep(qreal minimalSpeedStep);
 
-    void finishAnimations();
+    Q_SLOT void finishAnimations();
 
 signals:
     void speedChanged(qreal speed);

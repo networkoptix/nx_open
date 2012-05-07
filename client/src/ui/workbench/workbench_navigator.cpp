@@ -322,8 +322,12 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnResourceWidget *widget) {
     updateCurrentWidget();
 }
 
-QnResourceWidget *QnWorkbenchNavigator::currentWidget() {
+QnResourceWidget *QnWorkbenchNavigator::currentWidget() const {
     return m_currentWidget;
+}
+
+bool QnWorkbenchNavigator::currentWidgetIsCamera() const {
+    return m_currentWidgetIsCamera;
 }
 
 QnWorkbenchNavigator::SliderUserData QnWorkbenchNavigator::currentSliderData() const {
