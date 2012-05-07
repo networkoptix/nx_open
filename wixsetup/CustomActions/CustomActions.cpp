@@ -189,6 +189,7 @@ UINT __stdcall FindFreePorts(MSIHANDLE hInstall)
     int freePort1 = NextFreePort(PORT_BASE, PORT_BASE + 100);
     int freePort2 = NextFreePort(PORT_BASE + 100, PORT_BASE + 200);
     int freePort3 = NextFreePort(PORT_BASE + 200, PORT_BASE + 300);
+    int freePort4 = NextFreePort(PORT_BASE + 300, PORT_BASE + 400);
 
     WCHAR portString[10];
 
@@ -201,6 +202,8 @@ UINT __stdcall FindFreePorts(MSIHANDLE hInstall)
     _itow_s(freePort3, portString, 10, 10);
     MsiSetProperty(hInstall, L"FREEPORT3", portString);
 
+    _itow_s(freePort4, portString, 10, 10);
+    MsiSetProperty(hInstall, L"FREEPORT4", portString);
 LExit:
 
     FinishWinsock();

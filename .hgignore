@@ -78,6 +78,10 @@ mediaserver/src/Makefile
 mediaserver/src/server.mak*
 mediaserver/src/server.vcproj
 
+mediaproxy/src/mediaproxy.vcproj
+mediaproxy/bin/debug
+mediaproxy/bin/release
+
 testcamera/src/testCamera.pro
 testcamera/src/testCamera.vcproj
 

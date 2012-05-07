@@ -70,6 +70,15 @@
                             Win64="no"/>
         </Property>
         
+        <Property Id="PROXY_PORT" Secure="yes">
+            <RegistrySearch Id="ProxyPortReg"
+                            Root="HKLM"
+                            Key="Software\Network Optix\Enterprise Controller"
+                            Name="proxyPort"
+                            Type="raw"
+                            Win64="no"/>
+        </Property>
+
         <!-- We use ecs password only when doing repair -->
         <Property Id="APPSERVER_PASSWORD_REG" Secure="yes">
             <RegistrySearch Id="AppServerPasswordReg"
@@ -166,10 +175,12 @@
         <CustomAction Id="AssignOldAppServerPort" Property="OLD_APPSERVER_PORT" Value="[APPSERVER_PORT]"/>
         <CustomAction Id="AssignOldServerRtspPort" Property="OLD_SERVER_RTSP_PORT" Value="[SERVER_RTSP_PORT]"/>
         <CustomAction Id="AssignOldServerApiPort" Property="OLD_SERVER_API_PORT" Value="[SERVER_API_PORT]"/>
+    	<CustomAction Id="AssignOldProxyPort" Property="OLD_PROXY_PORT" Value="[PROXY_PORT]"/>
         
         <CustomAction Id="AssignAppServerPort" Property="APPSERVER_PORT" Value="[FREEPORT1]"/>
         <CustomAction Id="AssignServerRtspPort" Property="SERVER_RTSP_PORT" Value="[FREEPORT2]"/>
         <CustomAction Id="AssignServerApiPort" Property="SERVER_API_PORT" Value="[FREEPORT3]"/>
+    	<CustomAction Id="AssignProxyPort" Property="PROXY_PORT" Value="[FREEPORT4]"/>
         
         <!-- Assign default values for Quick installation -->
         <CustomAction Id="AssignServerAppServerPort" Property="SERVER_APPSERVER_PORT" Value="[APPSERVER_PORT]"/>
@@ -190,7 +201,7 @@
                       Value="&quot;[#dbsync.exe]&quot;" Execute="immediate" Impersonate="yes"/>
         <CustomAction Id="SyncDatabaseAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="check" Impersonate="no" />
-    	
+        
         <CustomAction Id="CloseTrayToolAction_Cmd" Property="CloseTrayToolAction"
                       Value="&quot;[VmsTrayToolDir]traytool.exe&quot; &quot;quit&quot;" Execute="immediate" />
         <CustomAction Id="CloseTrayToolAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
@@ -229,10 +240,12 @@
             <Custom Action="FindFreePorts" Before="AssignOldAppServerPort"/>
             <Custom Action="AssignOldAppServerPort" Before="AssignOldServerRtspPort">1</Custom>
             <Custom Action="AssignOldServerRtspPort" Before="AssignOldServerApiPort">1</Custom>
-            <Custom Action="AssignOldServerApiPort" Before="AssignAppServerPort">1</Custom>
+            <Custom Action="AssignOldServerApiPort" Before="AssignOldProxyPort">1</Custom>
+        	<Custom Action="AssignOldProxyPort" Before="AssignAppServerPort">1</Custom>
             <Custom Action="AssignAppServerPort" Before="AssignServerRtspPort">NOT APPSERVER_PORT</Custom>
             <Custom Action="AssignServerRtspPort" Before="AssignServerApiPort">NOT SERVER_RTSP_PORT</Custom>
-            <Custom Action="AssignServerApiPort" Before="AssignServerAppServerPort">NOT SERVER_API_PORT</Custom>
+            <Custom Action="AssignServerApiPort" Before="AssignProxyPort">NOT SERVER_API_PORT</Custom>
+        	<Custom Action="AssignProxyPort" Before="AssignServerAppServerPort">NOT PROXY_PORT</Custom>
             <Custom Action="AssignServerAppServerPort" Before="AssignClientAppServerPort">1</Custom>
             <Custom Action="AssignClientAppServerPort" Before="SetMoviesFolder">1</Custom>
             <Custom Action="SetMoviesFolder" Before="GenerateGuidsForServers">1</Custom>
@@ -261,13 +274,13 @@
 <!--            <RemoveExistingProducts After="InstallInitialize" />-->
             <Custom Action="CloseTrayToolAction_Cmd" Before="CloseTrayToolAction"><![CDATA[ NOT $(var.VmsInstalling) ]]></Custom>
             <Custom Action="CloseTrayToolAction" Before="StopServices"><![CDATA[ NOT $(var.VmsInstalling) ]]></Custom>
-        	
+            
             <Custom Action="SyncDatabaseAction_Cmd" After="InstallFiles">      <![CDATA[ (!AppServerFeature=3 OR &AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
             <Custom Action="SyncDatabaseAction" After="SyncDatabaseAction_Cmd"><![CDATA[ (!AppServerFeature=3 OR &AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
-        	
+            
             <Custom Action="InitDatabaseAction_Cmd" After="SyncDatabaseAction"><![CDATA[ $(var.VmsInstalling) AND &AppServerFeature=3 ]]></Custom>
             <Custom Action="InitDatabaseAction" After="InitDatabaseAction_Cmd"><![CDATA[ $(var.VmsInstalling) AND &AppServerFeature=3 ]]></Custom>
-        	
+            
 <!--            <Custom Action="LaunchApplication_cmd" Before="LaunchApplication"><![CDATA[ !TrayToolFeature=3 OR &TrayToolFeature=3 ]]></Custom>-->
             <Custom Action="LaunchApplication" After="InstallFinalize"><![CDATA[ (!AppServerFeature=3 OR &AppServerFeature=3 OR !ServerFeature=3 OR &ServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
         </InstallExecuteSequence>
@@ -336,6 +349,7 @@
                                 <RegistryKey Root="HKLM"
                                              Key="Software\[Manufacturer]\Enterprise Controller" Action="create">
                                     <RegistryValue Type="string" Name="port" Value="[APPSERVER_PORT]"/>
+                                	<RegistryValue Type="string" Name="proxyPort" Value="[PROXY_PORT]"/>
                                     <RegistryValue Type="string" Name="login" Value="[APPSERVER_LOGIN]"/>
                                     <RegistryValue Type="string" Name="password" Value="[APPSERVER_PASSWORD]"/>
                                 </RegistryKey>
@@ -363,6 +377,38 @@
                             </Component>
                         </Directory>
                         
+                        <Directory Id="VmsProxyServerDir" Name="MediaProxy">
+                            <Component Id="ProxyExecutable" Guid="{7BD9B32D-BE6E-417F-B301-E07657F09B35}">
+                                <File Id="ProxyExe" Name="mediaproxy.exe" Source="../mediaproxy/bin/$(env.CONFIG)/mediaproxy.exe" KeyPath="yes">
+                                    <fire:FirewallException Id="FirewallExceptionMediaServer" Name="Network Optix Media Proxy" Scope="any" IgnoreFailure="yes"/>
+                                </File>
+                                
+                                <ServiceInstall Id="VmsMediaProxyService"
+                                                Name="VmsMediaProxy"
+                                                DisplayName="Network Optix Media Proxy"
+                                                Type="ownProcess"
+                                                Start="auto"
+                                                ErrorControl="normal"
+                                                Description="Network Optix Media Proxy">
+                                    <util:ServiceConfig FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart"/>
+                                </ServiceInstall>
+                                
+                                <ServiceControl Id="StartVmsProxyService" Name="VmsMediaProxy" Start="install" Wait="no" />
+                                <ServiceControl Id="StopVmsProxyService" Name="VmsMediaProxy" Stop="both" Wait="yes" Remove="uninstall" />
+                            </Component>
+                            
+                            <Component Id="ProxyQTLibraries" Guid="{A49B87BB-ADD9-41CA-87C0-304A8A483427}">
+                                <File Id="ServerQtCore$(var.suffix)4.dll" Name="QtCore$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtCore$(var.suffix)4.dll" />
+                                <File Id="ServerQtGui$(var.suffix)4.dll" Name="QtGui$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtGui$(var.suffix)4.dll" />
+                                <File Id="ServerQtMultimedia$(var.suffix)4.dll" Name="QtMultimedia$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtMultimedia$(var.suffix)4.dll" />
+                                <File Id="ServerQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtNetwork$(var.suffix)4.dll" />
+                                <File Id="ServerQtOpenGL$(var.suffix)4.dll" Name="QtOpenGL$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtOpenGL$(var.suffix)4.dll" />
+                                <File Id="ServerQtWebKit$(var.suffix)4.dll" Name="QtWebKit$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtWebKit$(var.suffix)4.dll" />
+                                <File Id="ServerQtXml$(var.suffix)4.dll" Name="QtXml$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtXml$(var.suffix)4.dll" />
+                                <File Id="ServerQtXmlPatterns$(var.suffix)4.dll" Name="QtXmlPatterns$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtXmlPatterns$(var.suffix)4.dll" />
+                            </Component>
+                        </Directory>
+                    	
                         <Directory Id="VmsMediaServerDir" Name="MediaServer">
                             <Component Id="ServerExecutable" Guid="06DFA703-0266-4970-BAC1-3730BF7D1C66">
                                 <File Id="ServerExe" Name="mediaserver.exe" Source="../mediaserver/bin/$(env.CONFIG)/mediaserver.exe" KeyPath="yes">
@@ -574,6 +620,9 @@
             <ComponentRef Id="ecs.log" />           
             <ComponentRef Id="AppServerConfiguration"/>
             <ComponentRef Id="AppServerConfigurationGuid"/>
+        	
+            <ComponentRef Id="ProxyExecutable" />
+            <ComponentRef Id="ProxyQTLibraries" />
         </Feature>
         
         <Feature Id="TrayToolFeature" Title="Tray Tool" AllowAdvertise="no" Display="hidden" Level="1">
@@ -733,11 +782,11 @@
             <Publish Dialog="AppServerDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg">1</Publish>
             
             <Publish Dialog="AppServerDlg" Control="Next" Property="BUSYPORT" Value="{}">1</Publish>
-            <Publish Dialog="AppServerDlg" Control="Next" Property="PORTSTOTEST" Value="[APPSERVER_PORT]" Order="1">1</Publish>
-            <Publish Dialog="AppServerDlg" Control="Next" Event="DoAction" Value="CheckPorts" Order="2"><![CDATA[ APPSERVER_PORT <> OLD_APPSERVER_PORT]]></Publish>
+            <Publish Dialog="AppServerDlg" Control="Next" Property="PORTSTOTEST" Value="[APPSERVER_PORT] [PROXY_PORT]" Order="1">1</Publish>
+            <Publish Dialog="AppServerDlg" Control="Next" Event="DoAction" Value="CheckPorts" Order="2"><![CDATA[ APPSERVER_PORT <> OLD_APPSERVER_PORT OR PROXY_PORT <> OLD_PROXY_PORT ]]></Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Event="NewDialog" Value="PortIsBusyDlg" Order="3">BUSYPORT</Publish>
             
-            <?define IsAsSettingsFilled="(APPSERVER_PORT AND APPSERVER_LOGIN AND APPSERVER_PASSWORD)" ?>
+            <?define IsAsSettingsFilled="(APPSERVER_PORT AND PROXY_PORT AND APPSERVER_LOGIN AND APPSERVER_PASSWORD)" ?>
             
             <Publish Dialog="AppServerDlg" Control="Next" Event="SpawnDialog" Value="AllFieldsAreMandatoryDlg"><![CDATA[ NOT $(var.IsAsSettingsFilled) ]]></Publish>
             
@@ -766,7 +815,7 @@
             <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg"><![CDATA[NOT $(var.VmsInstalling)]]></Publish>
 
             
-            <?define IsPortsValid="((&AppServerFeature=3 AND SERVER_RTSP_PORT<>APPSERVER_PORT AND SERVER_API_PORT<>APPSERVER_PORT AND SERVER_API_PORT<>SERVER_RTSP_PORT) OR (&AppServerFeature<>3 AND SERVER_API_PORT<>SERVER_RTSP_PORT))" ?>
+            <?define IsPortsValid="((&AppServerFeature=3 AND SERVER_RTSP_PORT<>APPSERVER_PORT AND SERVER_API_PORT<>APPSERVER_PORT AND SERVER_RTSP_PORT<>PROXY_PORT AND SERVER_API_PORT<>PROXY_PORT AND SERVER_API_PORT<>SERVER_RTSP_PORT) OR (&AppServerFeature<>3 AND SERVER_API_PORT<>SERVER_RTSP_PORT))" ?>
             <?define IsSettingsFilled="(SERVER_RTSP_PORT AND SERVER_API_PORT AND SERVER_APPSERVER_HOST AND SERVER_APPSERVER_PORT AND SERVER_APPSERVER_LOGIN AND SERVER_APPSERVER_PASSWORD)"?>
             <?define IsSettingsValid="($(var.IsPortsValid) AND $(var.IsSettingsFilled))"?>
             
