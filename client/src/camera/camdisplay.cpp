@@ -1158,7 +1158,7 @@ void CLCamDisplay::onRealTimeStreamHint(bool value)
 {
     m_isRealTimeSource = value;
     emit liveMode(m_isRealTimeSource);
-    if (m_isRealTimeSource)
+    if (m_isRealTimeSource && m_speed > 1)
         m_speed = 1.0f;
 }
 
