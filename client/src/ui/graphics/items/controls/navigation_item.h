@@ -33,6 +33,8 @@ public:
         return m_navigator;
     }
 
+    virtual bool eventFilter(QObject *watched, QEvent *event) override;
+
 private slots:
     void updateButtonsSyncState();
     void updateButtonsSyncEffectiveState();
@@ -46,6 +48,7 @@ private slots:
     void updateSpeedSliderParametersFromNavigator();
     void updateButtonsSpeedState();
 
+    bool at_speedSlider_wheelEvent(QGraphicsSceneWheelEvent *event);
     void at_navigator_currentWidgetAboutToBeChanged();
     void at_navigator_currentWidgetChanged();
     void at_liveButton_clicked();
