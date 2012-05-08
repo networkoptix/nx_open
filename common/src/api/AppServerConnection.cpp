@@ -472,17 +472,6 @@ int QnAppServerConnection::getUsers(QnUserResourceList& users, QByteArray& error
     return status;
 }
 
-int QnAppServerConnection::updateMediaProxyPort(const QString& errorString)
-{
-    // todo: implement me
-    return 0;
-}
-
-int QnAppServerConnection::getMediaProxyPort()
-{
-    return m_mediaProxyPort;
-}
-
 int QnAppServerConnection::getLicenses(QnLicenseList &licenses, QByteArray &errorString)
 {
     QByteArray data;
@@ -734,4 +723,20 @@ int QnAppServerConnection::setResourcesDisabledAsync(const QnResourceList &resou
     }
 
     return SessionManager::instance()->sendAsyncPostRequest(m_url, "disabled", requestParams, "", target, slot);
+}
+
+void QnAppServerConnectionFactory::setDefaultMediaProxyPort(int port)
+{
+    if (QnAppServerConnectionFactory *factory = theAppServerConnectionFactory()) {
+        factory->m_defaultMediaProxyPort = port;
+    }
+}
+
+int QnAppServerConnectionFactory::defaultMediaProxyPort()
+{
+    if (QnAppServerConnectionFactory *factory = theAppServerConnectionFactory()) {
+        return factory->m_defaultMediaProxyPort;
+    }
+
+    return 0;
 }

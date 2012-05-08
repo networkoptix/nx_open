@@ -21,6 +21,7 @@ function read_config {
     ECS_GUID=$(cat $CONFIG_FILE | grep ecsGuid | head -1 | sed 's/ecsGuid=\(.*\)/\1/g')
     LOG_FILE=$(cat $CONFIG_FILE | grep logFile | head -1 | sed 's/logFile=\(.*\)/\1/g')
     ECS_PORT=$(cat $CONFIG_FILE | grep port | head -1 | sed 's/port=\(.*\)/\1/g')
+    ECS_PROXY_PORT=$(cat $CONFIG_FILE | grep proxyPort | head -1 | sed 's/proxyPort=\(.*\)/\1/g')
     ECS_PASSWORD=$(cat $CONFIG_FILE | grep password | head -1 | sed 's/password=\(.*\)/\1/g')
 }
 
@@ -29,6 +30,7 @@ function write_config {
     [ -z "$ECS_GUID" ] || echo "ecsGuid=$ECS_GUID" >> $CONFIG_FILE
     [ -z "$LOG_FILE" ] || echo "logFile=$LOG_FILE" >> $CONFIG_FILE
     [ -z "$ECS_PORT" ] || echo "port=$ECS_PORT" >> $CONFIG_FILE
+    [ -z "$ECS_PROXY_PORT" ] || echo "proxyPort=$ECS_PROXY_PORT" >> $CONFIG_FILE
 }
 
 function to_int {
@@ -73,6 +75,22 @@ case "$1" in
         db_get networkoptix-entcontroller/ecs_port
       done
 
+      # Proxy port
+      db_input high networkoptix-entcontroller/ecs_proxy_port || true
+      db_go
+      db_get networkoptix-entcontroller/ecs_proxy_port
+      until port_is_ok "$RET"
+      do
+        db_input high networkoptix-entcontroller/ecs_port_invalid || true
+        db_go
+
+        { db_input high networkoptix-entcontroller/ecs_proxy_port; STATUS=$?; } || true
+        [ $STATUS -eq 30 ] && break
+
+        db_go
+        db_get networkoptix-entcontroller/ecs_proxy_port
+      done
+
       # Password should not be empty
       db_reset networkoptix-entcontroller/ecs_password
       db_input high networkoptix-entcontroller/ecs_password || true
@@ -91,6 +109,7 @@ case "$1" in
       done
 
       db_get networkoptix-entcontroller/ecs_port && ECS_PORT=$RET
+      db_get networkoptix-entcontroller/ecs_proxy_port && ECS_PROXY_PORT=$RET
       db_get networkoptix-entcontroller/ecs_password && ECS_PASSWORD=$RET
 
       write_config
@@ -120,4 +139,8 @@ if [ -e "/etc/init/networkoptix-entcontroller.conf" ]; then
 fi
 update-rc.d -f networkoptix-entcontroller remove >/dev/null || exit $?
 
+if [ -e "/etc/init/networkoptix-mediaproxy.conf" ]; then
+	invoke-rc.d networkoptix-mediaproxy start || exit $?
+fi
+update-rc.d -f networkoptix-mediaproxy remove >/dev/null || exit $?
 exit 0
