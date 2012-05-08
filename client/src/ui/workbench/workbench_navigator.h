@@ -144,7 +144,10 @@ protected slots:
     void at_timeSlider_contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
     void at_timeSlider_destroyed();
 
-    void at_scrollBar_destroyed();
+    void at_timeScrollBar_sliderPressed();
+    void at_timeScrollBar_sliderReleased();
+
+    void at_timeScrollBar_destroyed();
 
 private:
     QnTimeSlider *m_timeSlider;

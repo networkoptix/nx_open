@@ -108,7 +108,7 @@ void QnWorkbenchNavigator::setTimeScrollBar(QnTimeScrollBar *scrollBar) {
     m_timeScrollBar = scrollBar;
 
     if(m_timeScrollBar) {
-        connect(m_timeScrollBar, SIGNAL(destroyed()), this, SLOT(at_scrollBar_destroyed()));
+        connect(m_timeScrollBar, SIGNAL(destroyed()), this, SLOT(at_timeScrollBar_destroyed()));
 
         if(isValid())
             initialize();
@@ -139,6 +139,8 @@ void QnWorkbenchNavigator::initialize() {
 
     connect(m_timeScrollBar,                    SIGNAL(valueChanged(qint64)),                       this,   SLOT(updateSliderFromScrollBar()));
     connect(m_timeScrollBar,                    SIGNAL(pageStepChanged(qint64)),                    this,   SLOT(updateSliderFromScrollBar()));
+    connect(m_timeScrollBar,                    SIGNAL(sliderPressed()),                            this,   SLOT(at_timeScrollBar_sliderPressed()));
+    connect(m_timeScrollBar,                    SIGNAL(sliderReleased()),                           this,   SLOT(at_timeScrollBar_sliderReleased()));
     m_timeScrollBar->installEventFilter(this);
 
     updateLines();
@@ -918,8 +920,16 @@ void QnWorkbenchNavigator::at_timeSlider_destroyed() {
     setTimeSlider(NULL);
 }
 
-void QnWorkbenchNavigator::at_scrollBar_destroyed() {
+void QnWorkbenchNavigator::at_timeScrollBar_destroyed() {
     setTimeScrollBar(NULL);
+}
+
+void QnWorkbenchNavigator::at_timeScrollBar_sliderPressed() {
+    m_timeSlider->setSliderDown(true);
+}
+
+void QnWorkbenchNavigator::at_timeScrollBar_sliderReleased() {
+    m_timeSlider->setSliderDown(false);
 }
 
 
