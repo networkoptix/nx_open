@@ -327,6 +327,9 @@ void QnNavigationItem::updateSpeedSliderParametersFromNavigator() {
         minimalSpeed = qMax(qMin(-1.0, minimalSpeed * speedStep), minimalSpeed);
     }
 
+    /* The calls that follow may change speed */
+    QnScopedValueRollback<bool> guard(&m_updatingSpeedSliderFromNavigator, true);
+
     m_speedSlider->setSpeedRange(minimalSpeed, maximalSpeed);
     m_speedSlider->setMinimalSpeedStep(speedStep);
     m_speedSlider->setDefaultSpeed(defaultSpeed);
