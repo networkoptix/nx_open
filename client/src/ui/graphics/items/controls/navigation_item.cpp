@@ -207,13 +207,15 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
     
     connect(m_navigator,            SIGNAL(currentWidgetAboutToBeChanged()),    m_speedSlider,  SLOT(finishAnimations()));
     connect(m_navigator,            SIGNAL(currentWidgetChanged()),             this,           SLOT(updateSyncButtonEnabled()));
-    connect(m_navigator,            SIGNAL(playingChanged()),                   this,           SLOT(updatePlayButtonChecked()));
     connect(m_navigator,            SIGNAL(speedRangeChanged()),                this,           SLOT(updateSpeedSliderParametersFromNavigator()));
     connect(m_navigator,            SIGNAL(liveChanged()),                      this,           SLOT(updateLiveButtonChecked()));
     connect(m_navigator,            SIGNAL(liveSupportedChanged()),             this,           SLOT(updateLiveButtonEnabled()));
     connect(m_navigator,            SIGNAL(playingSupportedChanged()),          this,           SLOT(updatePlaybackButtonsEnabled()));
     connect(m_navigator,            SIGNAL(speedChanged()),                     this,           SLOT(updateSpeedSliderSpeedFromNavigator()));
     connect(m_navigator,            SIGNAL(speedRangeChanged()),                this,           SLOT(updateSpeedSliderParametersFromNavigator()));
+
+    /* Play button is not synced with the actual playing state, so we update it only when current widget changes. */
+    connect(m_navigator,            SIGNAL(currentWidgetChanged()),             this,           SLOT(updatePlayButtonChecked()));
 
 
     /* Create actions. */
