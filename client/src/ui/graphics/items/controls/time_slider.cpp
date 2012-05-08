@@ -163,6 +163,8 @@ namespace {
 
     const qreal degreesFor2x = 180.0;
 
+    const qreal zoomSideSnapDistance = 0.075;
+
 
 
     /* Colors. */
@@ -1152,6 +1154,12 @@ void QnTimeSlider::sliderChange(SliderChange change) {
         if((m_options & StickToMaximum) && windowEnd == m_oldMaximum)
             windowEnd = maximum();
 
+        /* Stick zoom anchor. */
+        if(m_zoomAnchor == m_oldMinimum)
+            m_zoomAnchor = minimum();
+        if(m_zoomAnchor == m_oldMaximum)
+            m_zoomAnchor = maximum();
+
         m_oldMinimum = minimum();
         m_oldMaximum = maximum();
 
@@ -1180,6 +1188,15 @@ void QnTimeSlider::wheelEvent(QGraphicsSceneWheelEvent *event) {
     qreal degrees = event->delta() / 8.0;
 
     m_zoomAnchor = valueFromPosition(event->pos());
+    
+    /* Snap zoom anchor to window sides. */
+    qreal windowRange = m_windowEnd - m_windowStart;
+    if((m_zoomAnchor - m_windowStart) / windowRange < zoomSideSnapDistance) {
+        m_zoomAnchor = m_windowStart;
+    } else if((m_windowEnd - m_zoomAnchor) / windowRange < zoomSideSnapDistance) {
+        m_zoomAnchor = m_windowEnd;
+    }
+
     kineticProcessor()->shift(degrees);
     kineticProcessor()->start();
 
@@ -1229,7 +1246,9 @@ void QnTimeSlider::keyPressEvent(QKeyEvent *event) {
 void QnTimeSlider::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) {
     base_type::mouseDoubleClickEvent(event);
 
-    kineticProcessor()->reset(); /* Stop kinetic zoom. */
-    m_unzooming = true;
+    if(event->button() == Qt::LeftButton) {
+        kineticProcessor()->reset(); /* Stop kinetic zoom. */
+        m_unzooming = true;
+    }
 }
 
