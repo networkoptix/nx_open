@@ -231,8 +231,8 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     m_aggregationMSecs(0.0),
     m_minimalWindow(0),
     m_selectionValid(false),
-    m_thumbnailsLoader(0),
-    m_pixmapCache(QnTimeSliderPixmapCache::instance())
+    m_pixmapCache(QnTimeSliderPixmapCache::instance()),
+    m_unzooming(false)
 {
     /* Set default property values. */
     setProperty(Qn::SliderLength, 0);
@@ -505,6 +505,14 @@ void QnTimeSlider::setToolTipFormat(const QString &format) {
     updateToolTipText();
 }
 
+QnThumbnailsLoader *QnTimeSlider::thumbnailsLoader() const {
+    return m_thumbnailsLoader.data();
+}
+
+void QnTimeSlider::setThumbnailsLoader(QnThumbnailsLoader *loader) {
+    m_thumbnailsLoader = loader;
+}
+
 QPointF QnTimeSlider::positionFromValue(qint64 logicalValue, bool bound) const {
     Q_D(const GraphicsSlider);
 
@@ -526,6 +534,11 @@ qint64 QnTimeSlider::valueFromPosition(const QPointF &position, bool bound) cons
 
 void QnTimeSlider::finishAnimations() {
     animateStepValues(10 * 1000);
+
+    if(m_unzooming) {
+        setWindow(minimum(), maximum());
+        m_unzooming = false;
+    }
 
     kineticProcessor()->reset();
 }
@@ -1070,31 +1083,27 @@ void QnTimeSlider::drawDates(QPainter *painter, const QRectF &rect) {
     }
 }
 
-void QnTimeSlider::drawThumbnails(QPainter *painter, const QRectF &rect) 
-{
-    if (m_thumbnailsLoader == 0)
+void QnTimeSlider::drawThumbnails(QPainter *painter, const QRectF &rect) {
+    QnThumbnailsLoader *loader = m_thumbnailsLoader.data();
+    if (!loader)
         return;
-
-    QnScopedPainterPenRollback penRollback(painter, QPen(Qt::green, 0));
-    painter->drawRect(rect);
-
-    if (m_thumbnailsLoader->step() == 0)
+    if (loader->step() == 0)
         return;
 
     qint64 currentTime = valueFromPosition(rect.topLeft());
     qint64 endTime = valueFromPosition(rect.topRight());
 
-    currentTime = qFloor(currentTime, m_thumbnailsLoader->step());
+    currentTime = qFloor(currentTime, loader->step());
 
-    for (; currentTime < endTime; currentTime += m_thumbnailsLoader->step()) {
-        m_thumbnailsLoader->lockPixmaps();
-        const QPixmap *pixmap = m_thumbnailsLoader->getPixmapByTime(currentTime);
+    for (; currentTime < endTime; currentTime += loader->step()) {
+        loader->lockPixmaps();
+        const QPixmap *pixmap = loader->getPixmapByTime(currentTime);
         if (pixmap) {
             QPointF pos = positionFromValue(currentTime, false);
             painter->drawRect(pos.x(), rect.top(), pixmap->size().width(), pixmap->size().height());
             painter->drawPixmap(QPointF(pos.x(), rect.top()), *pixmap);
         }
-        m_thumbnailsLoader->unlockPixmaps();
+        loader->unlockPixmaps();
     }
 }
 
@@ -1103,7 +1112,31 @@ void QnTimeSlider::drawThumbnails(QPainter *painter, const QRectF &rect)
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnTimeSlider::tick(int deltaMSecs) {
-    animateStepValues(deltaMSecs);
+    if(!m_unzooming) {
+        animateStepValues(deltaMSecs);
+    } else {
+        qreal sliderRange = maximum() - minimum();
+        qreal windowRange = m_windowEnd - m_windowStart;
+
+        if(!qFuzzyCompare(sliderRange, windowRange)) {
+            qreal progress = windowRange / sliderRange;
+            qreal speed = qMin(4.0 - 3.0 * progress, progress * 16.0);
+            qreal delta = speed * deltaMSecs / 1000.0 * sliderRange;
+
+            qreal startFraction = (m_windowStart - minimum()) / (sliderRange - windowRange);
+            qreal endFraction  = (maximum() - m_windowEnd) / (sliderRange - windowRange);
+
+            setWindow(
+                m_windowStart - static_cast<qint64>(delta * startFraction),
+                m_windowEnd + static_cast<qint64>(delta * endFraction)
+            );
+        }
+
+        if(minimum() == m_windowStart && maximum() == m_windowEnd)
+            m_unzooming = false;
+
+        animateStepValues(8.0 * deltaMSecs);
+    }
 }
 
 void QnTimeSlider::sliderChange(SliderChange change) {
@@ -1137,6 +1170,11 @@ void QnTimeSlider::sliderChange(SliderChange change) {
 }
 
 void QnTimeSlider::wheelEvent(QGraphicsSceneWheelEvent *event) {
+    if(m_unzooming) {
+        event->accept();
+        return; /* Do nothing if animated unzoom is in progress. */
+    }
+
     /* delta() returns the distance that the wheel is rotated 
      * in eighths (1/8s) of a degree. */
     qreal degrees = event->delta() / 8.0;
@@ -1188,7 +1226,10 @@ void QnTimeSlider::keyPressEvent(QKeyEvent *event) {
     }
 }
 
-void QnTimeSlider::setThumbnailsLoader(QnThumbnailsLoader* value)
-{
-    m_thumbnailsLoader = value;
+void QnTimeSlider::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) {
+    base_type::mouseDoubleClickEvent(event);
+
+    kineticProcessor()->reset(); /* Stop kinetic zoom. */
+    m_unzooming = true;
 }
+

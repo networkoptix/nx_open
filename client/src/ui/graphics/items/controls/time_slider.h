@@ -103,7 +103,9 @@ public:
     virtual qint64 valueFromPosition(const QPointF &position, bool bound = true) const override;
 
     int thumbnailsHeight() const;
-    void setThumbnailsLoader(QnThumbnailsLoader* value);
+    QnThumbnailsLoader *thumbnailsLoader() const;
+    void setThumbnailsLoader(QnThumbnailsLoader *value);
+
 signals:
     void windowChanged(qint64 windowStart, qint64 windowEnd);
     void selectionChanged(qint64 selectionStart, qint64 selectionEnd);
@@ -113,6 +115,7 @@ protected:
     virtual void wheelEvent(QGraphicsSceneWheelEvent *event) override;
     virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override;
     virtual void keyPressEvent(QKeyEvent *event) override;
+    virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
     virtual void tick(int deltaMSecs) override;
 
@@ -180,6 +183,7 @@ private:
     QString m_toolTipFormat;
 
     qint64 m_zoomAnchor;
+    bool m_unzooming;
 
     int m_lineCount;
     QVector<TypedPeriods> m_lineTimePeriods;
@@ -197,7 +201,7 @@ private:
     QHash<qint32, const QPixmap *> m_pixmapByHighlightKey;
     QHash<QPair<QString, int>, const QPixmap *> m_pixmapByTextKey;
 
-    QnThumbnailsLoader* m_thumbnailsLoader;
+    QWeakPointer<QnThumbnailsLoader> m_thumbnailsLoader;
     QnTimeSliderPixmapCache *m_pixmapCache;
 };
 

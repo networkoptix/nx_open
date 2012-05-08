@@ -4,7 +4,7 @@
 #include "device_plugins/archive/rtsp/rtsp_client_archive_delegate.h"
 #include "utils/media/frame_info.h"
 
-class QnThumbnailsLoader: CLLongRunnable
+class QnThumbnailsLoader: public CLLongRunnable
 {
     Q_OBJECT
 public:
@@ -14,16 +14,16 @@ public:
     void setThumbnailsSize(int width, int height);
 
     /*
-    * Load video pixmaps by specified time
-    */
+     * Load video pixmaps by specified time
+     */
     void loadRange(qint64 startTimeMs, qint64 endTimeMs, qint64 stepMs);
 
     QnTimePeriod loadedRange() const;
     qint64 lastLoadingTime() const;
 
     /*
-    * thumbnails step in ms
-    */
+     * thumbnails step in ms
+     */
     qint64 step() const;
 
 
@@ -31,15 +31,15 @@ public:
     void addRange(qint64 startTimeMs, qint64 endTimeMs, qint64 stepMs);
 
     /* 
-    * Remove part of data or all data 
-    */
+     * Remove part of data or all data 
+     */
     void removeRange(qint64 startTimeMs = -1, qint64 endTimeMs = INT64_MAX);
 
     /* 
-    * Find pixmap by specified time. 
-    * @param timeMs contain approximate time. 
-    * @param realPixmapTimeMs Return exact pixmap time if found. Otherwise return -1
-    */
+     * Find pixmap by specified time. 
+     * @param timeMs contain approximate time. 
+     * @param realPixmapTimeMs Return exact pixmap time if found. Otherwise return -1
+     */
     const QPixmap *getPixmapByTime(qint64 timeMs, quint64* realPixmapTimeMs = 0);
 
     void lockPixmaps();
