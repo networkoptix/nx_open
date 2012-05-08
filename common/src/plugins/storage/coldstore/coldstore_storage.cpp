@@ -2,7 +2,7 @@
 #include "coldstore_io_buffer.h"
 
 QnPlColdStoreStorage::QnPlColdStoreStorage():
-m_connectionPool(coldstoreAddr()),
+m_connectionPool(this),
 m_mutex(QMutex::Recursive)
 {
 
@@ -44,8 +44,7 @@ bool QnPlColdStoreStorage::isStorageAvailable()
 
 bool QnPlColdStoreStorage::isStorageAvailableForWriting()
 {
-    // todo: implement me
-    return true;
+    return isStorageAvailable();
 }
 
 

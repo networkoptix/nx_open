@@ -29,8 +29,9 @@ public:
     virtual bool isFileExists(const QString& url) override;
     virtual bool isDirExists(const QString& url) override;
 
-private:
     QString coldstoreAddr() const;
+private:
+    
 
     QString csDataFileName(const QnStorageURL& url) const;
 private:

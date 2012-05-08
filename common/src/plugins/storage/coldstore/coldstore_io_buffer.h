@@ -14,6 +14,10 @@ public:
     virtual void close () override;
 
 private:
+    QnPlColdStoreStoragePtr getColdStoreStorage() const;
+
+private:
+
     QString m_fileName;
     int m_n;
 };

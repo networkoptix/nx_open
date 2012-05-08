@@ -1,4 +1,5 @@
 #include "coldstore_io_buffer.h"
+#include "coldstore_storage.h"
 
 
 QnColdStoreIOBuffer::QnColdStoreIOBuffer(QnResourcePtr res, const QString& fn, int capacity):
@@ -33,4 +34,11 @@ void QnColdStoreIOBuffer::close()
     int size = buffer().size();
 
     size = size;
+}
+
+
+//==========================================================================================
+QnPlColdStoreStoragePtr QnColdStoreIOBuffer::getColdStoreStorage() const
+{
+    return getResource().dynamicCast<QnPlColdStoreStorage>();
 }

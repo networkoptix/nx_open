@@ -2,7 +2,7 @@
 #define coldstore_connection_pool_h1931
 #include "coldstore_api/sfs-client.h"
 
-
+class QnPlColdStoreStorage;
 
 class QnColdStoreConnection
 {
@@ -27,6 +27,8 @@ private:
     QTime m_lastUsed;
 
     bool m_isConnected;
+
+    QIODevice::OpenModeFlag m_openMode;
         
 };
 
@@ -36,7 +38,7 @@ private:
 class QnColdStoreConnectionPool
 {
 public:
-    QnColdStoreConnectionPool(const QString& addr);
+    QnColdStoreConnectionPool(QnPlColdStoreStorage *csStorage);
     virtual ~QnColdStoreConnectionPool();
 
     int read(const QString& csFn,   char* data, quint64 shift, int len);
@@ -45,7 +47,8 @@ private:
     void checkIfSomeConnectionsNeedToBeClosed();
 private:
 
-    QString m_csAddr;
+    QnPlColdStoreStorage *m_csStorage;
+    
     QHash<QString, QnColdStoreConnection*>  m_pool;
 };
 
