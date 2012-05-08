@@ -38,9 +38,9 @@ private:
                 continue;
 
             /* Qt is totally inconsistent in setting the button down positions for
-                * mouse events. So we invalidate positions for buttons that are not pressed. 
-                * This fixes some really surprising quirks in how selection is handled in
-                * graphics items. */
+             * mouse events. So we invalidate positions for buttons that are not pressed. 
+             * This fixes some really surprising quirks in how selection is handled in
+             * graphics items. */
             Qt::MouseButton button = static_cast<Qt::MouseButton>(i);
             event->setButtonDownPos(button, QPointF(m_nan, m_nan));
             event->setButtonDownScenePos(button, QPointF(m_nan, m_nan));

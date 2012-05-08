@@ -162,7 +162,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
         QEvent::GraphicsSceneHoverLeave
     };
 
-    Instrument::EventTypeSet widgetMousePressEventTypes = Instrument::makeSet(QEvent::MouseButtonPress, QEvent::MouseButtonDblClick);
+    Instrument::EventTypeSet widgetMouseEventTypes = Instrument::makeSet(QEvent::MouseButtonPress, QEvent::MouseButtonDblClick, QEvent::MouseMove, QEvent::MouseButtonRelease);
     Instrument::EventTypeSet mouseEventTypes = Instrument::makeSet(mouseEventTypeArray);
     Instrument::EventTypeSet wheelEventTypes = Instrument::makeSet(QEvent::GraphicsSceneWheel);
     Instrument::EventTypeSet dndEventTypes = Instrument::makeSet(QEvent::GraphicsSceneDragEnter, QEvent::GraphicsSceneDragMove, QEvent::GraphicsSceneDragLeave, QEvent::GraphicsSceneDrop);
@@ -234,11 +234,9 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_manager->installInstrument(new ForwardingInstrument(Instrument::Scene, keyEventTypes, this));
 
     /* View/viewport instruments. */
-    m_manager->installInstrument(new StopInstrument(Instrument::Viewport, widgetMousePressEventTypes, this));
+    m_manager->installInstrument(new StopInstrument(Instrument::Viewport, widgetMouseEventTypes, this));
     m_manager->installInstrument(m_handScrollInstrument);
-    m_manager->installInstrument(new StopAcceptedInstrument(Instrument::Viewport, widgetMousePressEventTypes, this));
-    m_manager->installInstrument(new ForwardingInstrument(Instrument::Viewport, widgetMousePressEventTypes, this));
-
+    m_manager->installInstrument(new ForwardingInstrument(Instrument::Viewport, widgetMouseEventTypes, this));
     m_manager->installInstrument(m_rotationInstrument, InstallationMode::InstallAfter, display()->transformationListenerInstrument());
     m_manager->installInstrument(m_resizingInstrument);
     m_manager->installInstrument(m_moveInstrument);

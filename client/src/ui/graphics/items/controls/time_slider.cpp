@@ -19,7 +19,7 @@
 #include <ui/style/noptix_style.h>
 #include <ui/style/globals.h>
 #include <ui/graphics/items/standard/graphics_slider_p.h>
-#include <ui/graphics/instruments/instrument_manager.h>
+#include <ui/graphics/instruments/hand_scroll_instrument.h>
 #include <ui/processors/kinetic_cutting_processor.h>
 #include <ui/processors/drag_processor.h>
 
@@ -244,6 +244,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     /* Set default property values. */
     setAcceptHoverEvents(true);
     setProperty(Qn::SliderLength, 0);
+    setProperty(Qn::NoHandScrollOver, true);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding, QSizePolicy::Slider);
 
     setWindowStart(minimum());
