@@ -78,6 +78,7 @@ mediaserver/src/Makefile
 mediaserver/src/server.mak*
 mediaserver/src/server.vcproj
 
+mediaproxy/src/version.h
 mediaproxy/src/mediaproxy.vcproj
 mediaproxy/bin/debug
 mediaproxy/bin/release
