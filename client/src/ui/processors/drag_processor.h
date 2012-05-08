@@ -88,6 +88,14 @@ public:
 
     void setHandler(DragProcessHandler *handler);
 
+    int startDragDistance() const {
+        return m_startDragDistance;
+    }
+
+    int effectiveStartDragDistance() const;
+
+    void setStartDragDistance(int startDragDistance);
+
     /**
      * Resets this drag processor, moving it into <tt>WAITING</tt> state. 
      */
@@ -159,7 +167,7 @@ private:
 
     void transition(QEvent *event, QGraphicsItem *item, State state);
     
-    void drag(QEvent *event, const QPoint &screenPos, const QPointF &scenePos);
+    void drag(QEvent *event, const QPoint &screenPos, const QPointF &scenePos, const QPointF &itemPos);
 
     QPoint screenPos(QWidget *widget, QMouseEvent *event);
 
@@ -172,6 +180,11 @@ private:
 
     template<class T>
     QPointF scenePos(T *object, QGraphicsSceneMouseEvent *event);
+
+    template<class T, class Event>
+    QPointF itemPos(T *object, Event *event);
+
+    QPointF itemPos(QGraphicsItem *item, QGraphicsSceneMouseEvent *event);
 
     template<class T, class Event>
     void mousePressEventInternal(T *object, Event *event);
@@ -187,6 +200,9 @@ private:
 private:
     /** Flags. */
     Flags m_flags;
+
+    /** Start drag distance. */
+    int m_startDragDistance;
 
     /** Drag handler. */
     DragProcessHandler *m_handler;

@@ -925,11 +925,11 @@ void QnWorkbenchNavigator::at_timeScrollBar_destroyed() {
 }
 
 void QnWorkbenchNavigator::at_timeScrollBar_sliderPressed() {
-    m_timeSlider->setSliderDown(true);
+    m_timeSlider->setOption(QnTimeSlider::AdjustWindowToPosition, false);
 }
 
 void QnWorkbenchNavigator::at_timeScrollBar_sliderReleased() {
-    m_timeSlider->setSliderDown(false);
+    m_timeSlider->setOption(QnTimeSlider::AdjustWindowToPosition, true);
 }
 
 

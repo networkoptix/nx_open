@@ -6,6 +6,7 @@
 #include <recording/time_period.h>
 
 #include <ui/processors/kinetic_process_handler.h>
+#include <ui/processors/drag_process_handler.h>
 #include <ui/animation/animation_timer_listener.h>
 #include <ui/animation/animated.h>
 
@@ -14,7 +15,7 @@
 class QnThumbnailsLoader;
 class QnTimeSliderPixmapCache;
 
-class QnTimeSlider: public Animated<QnToolTipSlider>, protected KineticProcessHandler, protected AnimationTimerListener {
+class QnTimeSlider: public Animated<QnToolTipSlider>, protected KineticProcessHandler, protected DragProcessHandler, protected AnimationTimerListener {
     Q_OBJECT;
     Q_PROPERTY(qint64 windowStart READ windowStart WRITE setWindowStart);
     Q_PROPERTY(qint64 windowEnd READ windowEnd WRITE setWindowEnd);
@@ -54,6 +55,18 @@ public:
          * Whether the user can edit current selection with '[' and ']' buttons.
          */
         SelectionEditable = 0x10,
+
+        /**
+         * Whether the window should be auto-adjusted to contain the current
+         * position.
+         */
+        AdjustWindowToPosition = 0x20,
+
+        /**
+         * Whether zooming with the mouse wheel close to the window's side
+         * should zoom into the side, not the mouse pointer position.
+         */
+        SnapZoomToSides = 0x40,
     };
     Q_DECLARE_FLAGS(Options, Option);
 
@@ -116,16 +129,37 @@ protected:
     virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override;
     virtual void keyPressEvent(QKeyEvent *event) override;
     virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
+    virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
+    virtual void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
+    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
+    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 
     virtual void tick(int deltaMSecs) override;
 
     virtual void kineticMove(const QVariant &degrees) override;
+
+    virtual void startDrag(DragInfo *info) override;
+    virtual void dragMove(DragInfo *info) override;
+    virtual void finishDrag(DragInfo *info) override;
 
     static QVector<QnTimeStep> createRelativeSteps();
     static QVector<QnTimeStep> createAbsoluteSteps();
     static QVector<QnTimeStep> enumerateSteps(const QVector<QnTimeStep> &steps);
 
 private:
+    enum Marker {
+        NoMarker,
+        SelectionStartMarker,
+        SelectionEndMarker,
+    };
+
+    Marker markerFromPosition(const QPointF &pos) const;
+    QPointF positionFromMarker(Marker marker) const;
+
+    void setMarkerSliderPosition(Marker marker, qint64 position);
+
     bool scaleWindow(qreal factor, qint64 anchor);
 
     void drawPeriodsBar(QPainter *painter, QnTimePeriodList &recorded, QnTimePeriodList &motion, const QRectF &rect);
@@ -183,8 +217,9 @@ private:
     QString m_toolTipFormat;
 
     qint64 m_zoomAnchor;
-
     bool m_unzooming;
+    Marker m_dragMarker;
+    QPointF m_dragDelta;
 
     int m_lineCount;
     QVector<TypedPeriods> m_lineTimePeriods;

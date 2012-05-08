@@ -12,6 +12,8 @@
 
 DragProcessor::DragProcessor(QObject *parent):
     QObject(parent),
+    m_flags(0),
+    m_startDragDistance(-1),
     m_handler(NULL),
     m_state(WAITING),
     m_dragTimerId(0),
@@ -42,6 +44,14 @@ void DragProcessor::setHandler(DragProcessHandler *handler) {
 
     if(m_handler != NULL)
         m_handler->m_processor = this;
+}
+
+int DragProcessor::effectiveStartDragDistance() const {
+    return m_startDragDistance < 0 ? QApplication::startDragDistance() : m_startDragDistance;
+}
+
+void DragProcessor::setStartDragDistance(int startDragDistance) {
+    m_startDragDistance = startDragDistance;
 }
 
 void DragProcessor::startDragTimer() {
@@ -263,18 +273,28 @@ QPointF DragProcessor::scenePos(T *, QGraphicsSceneMouseEvent *event) {
 }
 
 template<class T, class Event>
+QPointF DragProcessor::itemPos(T *, Event *) {
+    return QPointF(); /* No item involved. */
+}
+
+QPointF DragProcessor::itemPos(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
+    return event->pos();
+}
+
+template<class T, class Event>
 void DragProcessor::mousePressEventInternal(T *object, Event *event) {
     checkThread(object);
 
     if(m_state == WAITING) {
         m_info.m_triggerButton = event->button();
-        m_info.m_lastMouseScreenPos = m_info.m_mousePressScreenPos = screenPos(object, event);
-        m_info.m_lastMouseScenePos = m_info.m_mousePressScenePos = scenePos(object, event);
+        m_info.m_lastMouseScreenPos = m_info.m_mousePressScreenPos = m_info.m_mouseScreenPos = screenPos(object, event);
+        m_info.m_lastMouseScenePos = m_info.m_mousePressScenePos = m_info.m_mouseScenePos = scenePos(object, event);
+        m_info.m_lastMouseItemPos = m_info.m_mousePressItemPos = m_info.m_mouseItemPos = itemPos(object, event);
 
         transition(event, object, PREPAIRING);
     } else {
         if(m_state == DRAGGING)
-            drag(event, screenPos(object, event), scenePos(object, event));
+            drag(event, screenPos(object, event), scenePos(object, event), itemPos(object, event));
 
         /* Stop scrolling if the user has let go of the trigger button (even if we didn't get the release event). */
         if(!(event->buttons() & m_info.m_triggerButton))
@@ -290,7 +310,7 @@ void DragProcessor::timerEvent(QTimerEvent *event) {
         /* Using press pos here is not 100% correct, but we don't want to 
          * complicate the event handling logic even further to store the
          * current mouse pos. */
-        drag(event, m_info.m_mousePressScreenPos, m_info.m_mousePressScenePos); 
+        drag(event, m_info.m_mousePressScreenPos, m_info.m_mousePressScenePos, m_info.m_mousePressItemPos); 
     }
 }
 
@@ -309,7 +329,7 @@ void DragProcessor::mouseMoveEventInternal(T *object, Event *event) {
 
     /* Check for drag distance. */
     if (m_state == PREPAIRING) {
-        if ((m_info.m_mousePressScreenPos - screenPos(object, event)).manhattanLength() < QApplication::startDragDistance()) {
+        if ((m_info.m_mousePressScreenPos - screenPos(object, event)).manhattanLength() < effectiveStartDragDistance()) {
             return;
         } else {
             transition(event, object, DRAGGING);
@@ -318,14 +338,15 @@ void DragProcessor::mouseMoveEventInternal(T *object, Event *event) {
 
     /* Perform drag operation. */
     if(m_state == DRAGGING)
-        drag(event, screenPos(object, event), scenePos(object, event));
+        drag(event, screenPos(object, event), scenePos(object, event), itemPos(object, event));
 }
 
-void DragProcessor::drag(QEvent *event, const QPoint &screenPos, const QPointF &scenePos) {
+void DragProcessor::drag(QEvent *event, const QPoint &screenPos, const QPointF &scenePos, const QPointF &itemPos) {
     assert(m_state == DRAGGING);
 
     m_info.m_mouseScreenPos = screenPos;
     m_info.m_mouseScenePos = scenePos;
+    m_info.m_mouseItemPos = itemPos;
     m_info.m_event = event;
 
     if(!m_firstDragSent) {
@@ -339,6 +360,7 @@ void DragProcessor::drag(QEvent *event, const QPoint &screenPos, const QPointF &
 
     m_info.m_lastMouseScreenPos = m_info.m_mouseScreenPos;
     m_info.m_lastMouseScenePos = m_info.m_mouseScenePos;
+    m_info.m_lastMouseItemPos = m_info.m_mouseItemPos;
     m_info.m_event = NULL;
 }
 
@@ -350,7 +372,7 @@ void DragProcessor::mouseReleaseEventInternal(T *object, Event *event) {
         return;
 
     if(m_state == DRAGGING)
-        drag(event, screenPos(object, event), scenePos(object, event));
+        drag(event, screenPos(object, event), scenePos(object, event), itemPos(object, event));
 
     if(event->button() == m_info.m_triggerButton) {
         transition(event, object, WAITING);
@@ -414,7 +436,7 @@ void DragProcessor::widgetPaintEvent(QWidget *widget, QPaintEvent *event) {
         }
 
         QPoint screenPos = QCursor::pos();
-        drag(event, screenPos, QPointF());
+        drag(event, screenPos, QPointF(), QPointF());
     }
 }
 
@@ -430,7 +452,7 @@ void DragProcessor::paintEvent(QWidget *viewport, QPaintEvent *event) {
 
         if(viewport == m_viewport) {
             QPoint screenPos = QCursor::pos();
-            drag(event, screenPos, this->view(viewport)->mapToScene(viewport->mapFromGlobal(screenPos)));
+            drag(event, screenPos, this->view(viewport)->mapToScene(viewport->mapFromGlobal(screenPos)), QPointF());
         }
     }
 }
