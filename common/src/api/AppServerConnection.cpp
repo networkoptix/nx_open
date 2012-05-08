@@ -8,8 +8,6 @@
 #include "utils/common/synctime.h"
 
 
-int QnAppServerConnection::m_mediaProxyPort = 7009; // default value
-
 void conn_detail::ReplyProcessor::finished(int status, const QByteArray &result, const QByteArray &errorStringIn, int handle)
 {
     QByteArray errorString = errorStringIn;
