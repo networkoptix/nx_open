@@ -59,7 +59,7 @@ QHostAddress QnDroidResource::getHostAddress() const
         return QHostAddress();
 }
 
-bool QnDroidResource::setHostAddress(const QHostAddress &ip, QnDomain domain)
+bool QnDroidResource::setHostAddress(const QHostAddress &/*ip*/, QnDomain /*domain*/)
 {
     return false;
 }

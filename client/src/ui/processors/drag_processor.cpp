@@ -277,7 +277,7 @@ QPointF DragProcessor::itemPos(T *, Event *) {
     return QPointF(); /* No item involved. */
 }
 
-QPointF DragProcessor::itemPos(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
+QPointF DragProcessor::itemPos(QGraphicsItem *, QGraphicsSceneMouseEvent *event) {
     return event->pos();
 }
 

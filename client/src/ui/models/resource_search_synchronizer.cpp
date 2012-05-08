@@ -194,7 +194,7 @@ void QnResourceSearchSynchronizer::at_layout_aboutToBeDestroyed() {
     setLayout(NULL);
 }
 
-void QnResourceSearchSynchronizer::at_layout_itemAdded(QnWorkbenchItem *item) {
+void QnResourceSearchSynchronizer::at_layout_itemAdded(QnWorkbenchItem *) {
     return; /* No layout-to-model propagation. */
 }
 

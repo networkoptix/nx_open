@@ -136,6 +136,9 @@ bool QnResourceActionCondition::checkInternal(const ItemSequence &sequence) {
         return true;
     } else if(m_matchMode == Qn::ExactlyOne) {
         return count == 1;
+    } else {
+        qnWarning("Invalid match mode '%1'.", static_cast<int>(m_matchMode));
+        return false;
     }
 }
 

@@ -26,7 +26,7 @@ QString QnPlPulseResource::manufacture() const
     return MANUFACTURE;
 }
 
-void QnPlPulseResource::setIframeDistance(int frames, int timems)
+void QnPlPulseResource::setIframeDistance(int /*frames*/, int /*timems*/)
 {
 
 }
@@ -37,7 +37,7 @@ QnAbstractStreamDataProvider* QnPlPulseResource::createLiveDataProvider()
     return new RTP264StreamReader(toSharedPointer(), request);
 }
 
-void QnPlPulseResource::setCropingPhysical(QRect croping)
+void QnPlPulseResource::setCropingPhysical(QRect /*croping*/)
 {
 
 }

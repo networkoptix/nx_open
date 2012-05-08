@@ -422,7 +422,7 @@ bool QnNavigationItem::eventFilter(QObject *watched, QEvent *event) {
     if(watched == m_speedSlider && event->type() == QEvent::GraphicsSceneWheel)
         return at_speedSlider_wheelEvent(static_cast<QGraphicsSceneWheelEvent *>(event));
 
-    base_type::eventFilter(watched, event);
+    return base_type::eventFilter(watched, event);
 }
 
 bool QnNavigationItem::at_speedSlider_wheelEvent(QGraphicsSceneWheelEvent *event) {

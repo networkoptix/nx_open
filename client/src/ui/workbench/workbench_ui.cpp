@@ -1355,7 +1355,7 @@ void QnWorkbenchUi::at_titleItem_geometryChanged() {
     ));
 }
 
-void QnWorkbenchUi::at_titleItem_contextMenuRequested(QObject *target, QEvent *event) {
+void QnWorkbenchUi::at_titleItem_contextMenuRequested(QObject *, QEvent *event) {
     m_tabBarItem->setFocus();
 
     QGraphicsSceneContextMenuEvent *menuEvent = static_cast<QGraphicsSceneContextMenuEvent *>(event);

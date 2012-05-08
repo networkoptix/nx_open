@@ -630,7 +630,7 @@ int QnResourcePoolModel::rowCount(const QModelIndex &parent) const {
     return node(parent)->children().size();
 }
 
-int QnResourcePoolModel::columnCount(const QModelIndex &parent) const {
+int QnResourcePoolModel::columnCount(const QModelIndex &/*parent*/) const {
     return ColumnCount;
 }
 
@@ -868,7 +868,7 @@ void QnResourcePoolModel::at_resource_itemAdded(const QnLayoutItemData &item) {
     at_resource_itemAdded(toSharedPointer(checked_cast<QnLayoutResource *>(sender)), item);
 }
 
-void QnResourcePoolModel::at_resource_itemRemoved(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item) {
+void QnResourcePoolModel::at_resource_itemRemoved(const QnLayoutResourcePtr &, const QnLayoutItemData &item) {
     Node *node = this->node(item.uuid);
     node->clear();
 }

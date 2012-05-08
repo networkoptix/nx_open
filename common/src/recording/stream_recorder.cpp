@@ -17,25 +17,25 @@ static const int STORE_QUEUE_SIZE = 50;
 extern QMutex global_ffmpeg_mutex;
 
 QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
-QnAbstractDataConsumer(STORE_QUEUE_SIZE),
-m_device(dev),
-m_firstTime(true),
-m_packetWrited(false),
-m_formatCtx(0),
-m_truncateInterval(0),
-m_startDateTime(AV_NOPTS_VALUE),
-m_endDateTime(AV_NOPTS_VALUE),
-m_startOffset(0),
-m_forceDefaultCtx(true),
-m_prebufferingUsec(0),
-m_stopOnWriteError(true),
-m_waitEOF(false),
-m_endOfData(false),
-m_lastProgress(-1),
-m_EofDateTime(AV_NOPTS_VALUE),
-m_needCalcSignature(false),
-m_mdctx(0),
-m_container("matroska")
+    QnAbstractDataConsumer(STORE_QUEUE_SIZE),
+    m_device(dev),
+    m_firstTime(true),
+    m_packetWrited(false),
+    m_formatCtx(0),
+    m_truncateInterval(0),
+    m_startDateTime(AV_NOPTS_VALUE),
+    m_endDateTime(AV_NOPTS_VALUE),
+    m_startOffset(0),
+    m_forceDefaultCtx(true),
+    m_prebufferingUsec(0),
+    m_stopOnWriteError(true),
+    m_waitEOF(false),
+    m_endOfData(false),
+    m_lastProgress(-1),
+    m_EofDateTime(AV_NOPTS_VALUE),
+    m_needCalcSignature(false),
+    m_mdctx(0),
+    m_container("matroska")
 {
 	memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
 }
@@ -286,7 +286,6 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
     QnMediaResourcePtr mediaDev = qSharedPointerDynamicCast<QnMediaResource>(m_device);
     const QnVideoResourceLayout* layout = mediaDev->getVideoLayout(m_mediaProvider);
     QString layoutStr = QnArchiveStreamReader::serializeLayout(layout);
-    const QnResourceAudioLayout* audioLayout = mediaDev->getAudioLayout(m_mediaProvider);
 
     {
         QMutexLocker mutex(&global_ffmpeg_mutex);
@@ -478,7 +477,7 @@ QByteArray QnStreamRecorder::getSignature() const
     return QByteArray((const char*)md_value, md_len);
 }
 
-bool QnStreamRecorder::addSignatureFrame(QString& errorString)
+bool QnStreamRecorder::addSignatureFrame(QString &/*errorString*/)
 {
 
     AVCodecContext* srcCodec = m_formatCtx->streams[0]->codec;

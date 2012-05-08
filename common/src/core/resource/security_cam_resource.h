@@ -25,7 +25,7 @@ public:
 
     MotionTypeFlags supportedMotionType() const;
     MotionType getDefaultMotionType() const;
-    int motionWindowCnt() const;
+    int motionWindowCnt() const; // TODO: 'cnt' reads as 'cunt', and adequate people normally don't want cunts in their code. Rename.
     int motionMaskWindowCnt() const;
 
 
@@ -36,7 +36,7 @@ public:
     virtual ~QnSecurityCamResource();
 
     // like arecont or iqinvision
-    virtual QString manufacture() const = 0;
+    virtual QString manufacture() const = 0; // TODO: rename to manufacturer()
     virtual QString oemName() const;
 
 
@@ -46,7 +46,7 @@ public:
 
     virtual void setIframeDistance(int frames, int timems) = 0; // sets the distance between I frames
 
-    virtual QRect getCroping(QnDomain domain);
+    virtual QRect getCroping(QnDomain domain); // TODO: 'cropping' is spelled with double 'p'. Rename
     virtual void setCroping(QRect croping, QnDomain domain); // sets croping. rect is in the percents from 0 to 100
 
     void setDataProviderFactory(QnDataProviderFactory* dpFactory);
@@ -69,7 +69,7 @@ protected:
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(QnResource::ConnectionRole role);
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() = 0;
-    virtual void setCropingPhysical(QRect croping) = 0;
+    virtual void setCropingPhysical(QRect croping) = 0; // TODO: 'cropping'!!!
     virtual void setMotionMaskPhysical(int channel) { Q_UNUSED(channel); }
 
 protected:

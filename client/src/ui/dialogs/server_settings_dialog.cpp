@@ -185,7 +185,7 @@ bool ServerSettingsDialog::validateStorages(const QnAbstractStorageResourceList&
     return true;
 }
 
-void ServerSettingsDialog::at_checkPathReplyReceived(int status, bool result, int handle)
+void ServerSettingsDialog::at_checkPathReplyReceived(int /*status*/, bool result, int handle)
 {
     QMap<int, QString>::iterator itr = m_checkingStorageHandle.find(handle);
     if (itr != m_checkingStorageHandle.end())

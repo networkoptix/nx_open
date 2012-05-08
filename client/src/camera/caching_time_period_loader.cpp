@@ -224,7 +224,7 @@ void QnCachingTimePeriodLoader::at_loader_ready(const QnTimePeriodList &timePeri
     }
 }
 
-void QnCachingTimePeriodLoader::at_loader_failed(int status, int handle) {
+void QnCachingTimePeriodLoader::at_loader_failed(int /*status*/, int handle) {
     for(int i = 0; i < Qn::TimePeriodTypeCount; i++) {
         if(handle == m_handles[i]) {
             m_handles[i] = -1;

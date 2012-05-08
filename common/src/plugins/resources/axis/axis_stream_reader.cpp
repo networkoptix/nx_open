@@ -223,7 +223,6 @@ void QnAxisStreamReader::parseMotionInfo(QnCompressedVideoDataPtr videoData)
         {
             const quint8* payload = sei.m_userDataPayload[i].first;
             int len = sei.m_userDataPayload[i].second;
-            const quint8* payloadEnd = payload + len;
             if (len >= 16 && strncmp((const char*)payload, AXIS_SEI_UUID, 16) == 0)
             {
                 // AXIS SEI message detected

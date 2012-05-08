@@ -363,7 +363,7 @@ void QnSignHelper::extractSpsPpsFromPrivData(const QByteArray& data, SPSUnit& sp
     }
 }
 
-QString QnSignHelper::fillH264EncoderParams(const QByteArray& srcCodecExtraData, AVCodecContext* avctx)
+QString QnSignHelper::fillH264EncoderParams(const QByteArray& srcCodecExtraData, AVCodecContext* /*avctx*/)
 {
     QString result;
     SPSUnit sps;
@@ -395,7 +395,7 @@ QString QnSignHelper::fillH264EncoderParams(const QByteArray& srcCodecExtraData,
     return result;
 }
 
-int QnSignHelper::correctX264Bitstream(const QByteArray& srcCodecExtraData, AVCodecContext* videoCodecCtx, quint8* videoBuf, int out_size, int videoBufSize)
+int QnSignHelper::correctX264Bitstream(const QByteArray& srcCodecExtraData, AVCodecContext* /*videoCodecCtx*/, quint8* videoBuf, int out_size, int videoBufSize)
 {
     SPSUnit oldSps, newSps;
     PPSUnit oldPps, newPps;
@@ -454,12 +454,11 @@ int QnSignHelper::correctX264Bitstream(const QByteArray& srcCodecExtraData, AVCo
     return out_size;
 }
 
-int QnSignHelper::correctNalPrefix(const QByteArray& srcCodecExtraData, quint8* videoBuf, int out_size, int videoBufSize)
+int QnSignHelper::correctNalPrefix(const QByteArray& srcCodecExtraData, quint8* videoBuf, int out_size, int /*videoBufSize*/)
 {
     int x264PrefixLen = NALUnit::findNextNAL(videoBuf, videoBuf+out_size) - videoBuf;
 
     const quint8* spsPpsData = (quint8*) srcCodecExtraData.data();
-    const quint8* spsPpsEnd = spsPpsData + srcCodecExtraData.size();
     if (srcCodecExtraData.size() < 7)
         return out_size;
 
