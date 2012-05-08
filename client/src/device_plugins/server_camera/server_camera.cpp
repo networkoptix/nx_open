@@ -24,7 +24,7 @@ void QnServerCameraProcessor::processResources(const QnResourceList &resources)
             QString url = QnAppServerConnectionFactory::defaultUrl().host();
             if (url.isEmpty())
                 url = "127.0.0.1";
-            int port = QnAppServerConnection::getMediaProxyPort();
+            int port = QnAppServerConnectionFactory::defaultMediaProxyPort();
             QnRtspClientArchiveDelegate::setProxyAddr(url, port);
             QnVideoServerConnection::setProxyAddr(url, port);
             connect(videoServer.data(), SIGNAL(serverIFFound(QString)), this, SLOT(at_serverIfFound(QString)));

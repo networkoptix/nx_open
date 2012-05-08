@@ -4,6 +4,11 @@ Type: string
 Default: 7001
 Description: Enterprise Controller port:
 
+Template: networkoptix-entcontroller/ecs_proxy_port
+Type: string
+Default: 7301
+Description: Enterprise Controller Media Proxy port:
+
 Template: networkoptix-entcontroller/ecs_password
 Type: string
 Default: 
