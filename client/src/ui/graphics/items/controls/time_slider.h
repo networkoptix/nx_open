@@ -183,6 +183,7 @@ private:
     QString m_toolTipFormat;
 
     qint64 m_zoomAnchor;
+
     bool m_unzooming;
 
     int m_lineCount;

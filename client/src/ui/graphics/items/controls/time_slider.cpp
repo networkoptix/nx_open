@@ -427,11 +427,9 @@ void QnTimeSlider::setWindow(qint64 start, qint64 end) {
     end = qMax(start, qBound(minimum(), end, maximum()));
 
     if(end - start < m_minimalWindow) {
-        qint64 d0 = m_minimalWindow / 2;
-        qint64 d1 = m_minimalWindow - d0;
-
-        end -= d0;
-        start -= d1;
+        qint64 delta = (m_minimalWindow - (end - start) + 1) / 2;
+        start -= delta;
+        end += delta;
 
         if(start < minimum()) {
             end += minimum() - start;
@@ -1114,6 +1112,32 @@ void QnTimeSlider::drawThumbnails(QPainter *painter, const QRectF &rect) {
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnTimeSlider::tick(int deltaMSecs) {
+    if(!m_unzooming && !isSliderDown()) {
+        /* Apply window position corrections if no animation or user interaction is in progress. */
+        qint64 position = this->sliderPosition();
+        if(position >= m_windowStart && position <= m_windowEnd) {
+            qint64 windowRange = m_windowEnd - m_windowStart;
+
+            qreal speed;
+            if(position < m_windowStart + windowRange / 3) {
+                speed = -1.0 + static_cast<qreal>(position - m_windowStart) / (windowRange / 3);
+            } else if(position < m_windowEnd - windowRange / 3) {
+                speed = 0.0;
+            } else {
+                speed = 1.0 - static_cast<qreal>(m_windowEnd - position) / (windowRange / 3);
+            }
+            speed = speed * qMax(0.5 * windowRange, 32 * 1000.0);
+
+            qint64 delta = speed * deltaMSecs / 1000.0;
+            if(m_windowEnd + delta > maximum())
+                delta = maximum() - m_windowEnd;
+            if(m_windowStart + delta < minimum())
+                delta = minimum() - m_windowStart;
+
+            setWindow(m_windowStart + delta, m_windowEnd + delta);
+        }
+    }
+
     if(!m_unzooming) {
         animateStepValues(deltaMSecs);
     } else {

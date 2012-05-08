@@ -186,6 +186,10 @@ public:
         return mFriction;
     }
 
+    QVariant currentSpeed() const {
+        return mCurrentSpeed;
+    }
+
 protected:
     struct Shift {
         QVariant dv; /**< Spatial displacement. */
