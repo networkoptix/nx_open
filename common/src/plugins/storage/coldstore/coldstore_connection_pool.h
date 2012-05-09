@@ -60,6 +60,8 @@ private:
     QnPlColdStoreStorage *m_csStorage;
     
     QHash<QString, QnColdStoreConnection*>  m_pool;
+
+    QMutex m_mutex;
 };
 
 #endif // coldstore_connection_pool_h1931

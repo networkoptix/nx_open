@@ -5,6 +5,7 @@
 #include "libavformat/avio.h"
 #include "core/resource/storage_resource.h"
 #include "coldstore_connection_pool.h"
+#include "coldstore_storage_helper.h"
 
 
 class QnPlColdStoreStorage : public QnStorageResource
@@ -38,6 +39,8 @@ private:
     mutable QMutex m_mutex;
 
     QnColdStoreConnectionPool m_connectionPool;
+
+    QnColdStoreMetaDataPool m_metaDataPool;
 
 };
 

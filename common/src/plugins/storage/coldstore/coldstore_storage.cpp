@@ -3,6 +3,7 @@
 
 QnPlColdStoreStorage::QnPlColdStoreStorage():
 m_connectionPool(this),
+m_metaDataPool(this),
 m_mutex(QMutex::Recursive)
 {
 
@@ -53,7 +54,17 @@ QFileInfoList QnPlColdStoreStorage::getFileList(const QString& dirName)
     QnStorageURL sUrl = url2StorageURL(dirName);
     QString csUrl = csDataFileName(sUrl);
 
-    return QFileInfoList();
+    QnColdStoreMetaDataPtr md = m_metaDataPool.getStoreMetaData(csUrl);
+
+    if (!md)
+    {
+        return QFileInfoList();
+    }
+    else
+    {
+        return md->fileInfoList(dirName);
+    }
+
 }
 
 bool QnPlColdStoreStorage::isNeedControlFreeSpace() 

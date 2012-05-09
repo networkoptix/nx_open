@@ -2,7 +2,8 @@
 #include "coldstore_connection_pool.h"
 #include "coldstore_storage.h"
 
-QnColdStoreMetaData::QnColdStoreMetaData()
+QnColdStoreMetaData::QnColdStoreMetaData():
+m_mutex(QMutex::Recursive)
 {
     m_needsToBesaved = false;
     m_lastUsageTime.restart();
@@ -15,24 +16,52 @@ QnColdStoreMetaData::~QnColdStoreMetaData()
 
 void QnColdStoreMetaData::put(const QString& fn, QnCSFileInfo info)
 {
+    QMutexLocker lock(&m_mutex);
+
     m_lastUsageTime.restart();
     m_hash.insert(fn, info);
 }
 
 bool QnColdStoreMetaData::hasSuchFile(const QString& fn) const
 {
+    QMutexLocker lock(&m_mutex);
+
     m_lastUsageTime.restart();
     return m_hash.contains(fn);
 }
 
 QnCSFileInfo QnColdStoreMetaData::getFileinfo(const QString& fn) const
 {
+    QMutexLocker lock(&m_mutex);
+
     m_lastUsageTime.restart();
     return m_hash.value(fn);
 }
 
+QFileInfoList QnColdStoreMetaData::fileInfoList(const QString& subPath) const
+{
+    QMutexLocker lock(&m_mutex);
+
+    QFileInfoList result;
+
+    QHashIterator<QString, QnCSFileInfo> it(m_hash);
+    while (it.hasNext()) 
+    {
+        it.next();
+        QString fn = it.key();
+        
+        if (fn.contains(subPath))
+            result.push_back(QFileInfo(fn));
+    }
+
+    return result;
+
+}
+
 QByteArray QnColdStoreMetaData::toByteArray() const
 {
+    QMutexLocker lock(&m_mutex);
+
     QByteArray result;
     result.reserve(m_hash.size()*66 + 4); // to avoid memory reallocation
 
@@ -61,6 +90,8 @@ QByteArray QnColdStoreMetaData::toByteArray() const
 
 void QnColdStoreMetaData::fromByteArray(const QByteArray& ba)
 {
+    QMutexLocker lock(&m_mutex);
+
     m_hash.clear();
 
     QList<QByteArray> lst = ba.split(';');

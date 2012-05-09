@@ -46,7 +46,7 @@ bool QnColdStoreConnection::open(const QString& fn, QIODevice::OpenModeFlag flag
             0 //Timestamp of the current position.
             ) != Veracity::ISFS::STATUS_SUCCESS)
         {
-            Q_ASSERT(false);
+            //Q_ASSERT(false);
             return false;
         }
     }
@@ -173,7 +173,8 @@ int QnColdStoreConnection::age() const
 //==================================================================================
 
 QnColdStoreConnectionPool::QnColdStoreConnectionPool(QnPlColdStoreStorage *csStorage):
-m_csStorage(csStorage)
+m_csStorage(csStorage),
+m_mutex(QMutex::Recursive)
 {
     WSADATA wsaData;
     WORD wVersionRequested = MAKEWORD(1, 1);

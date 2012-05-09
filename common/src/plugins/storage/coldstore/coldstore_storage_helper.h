@@ -39,6 +39,8 @@ public:
     bool hasSuchFile(const QString& fn) const;
     QnCSFileInfo getFileinfo(const QString& fn) const;
 
+    QFileInfoList fileInfoList(const QString& subPath) const;
+
     QByteArray toByteArray() const;
     void fromByteArray(const QByteArray& ba);
 
@@ -51,6 +53,8 @@ private:
     mutable QTime m_lastUsageTime;
 
     bool m_needsToBesaved;
+
+    mutable QMutex m_mutex;
 };
 
 typedef QSharedPointer<QnColdStoreMetaData> QnColdStoreMetaDataPtr;
