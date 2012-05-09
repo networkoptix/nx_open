@@ -38,6 +38,7 @@ private:
     mutable QMutex m_mutex;
 
     QnColdStoreConnectionPool m_connectionPool;
+
 };
 
 

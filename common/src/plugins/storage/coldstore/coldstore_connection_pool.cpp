@@ -21,7 +21,7 @@ QnColdStoreConnection::~QnColdStoreConnection()
 
 }
 
-bool QnColdStoreConnection::open(const QString& fn, QIODevice::OpenModeFlag flag)
+bool QnColdStoreConnection::open(const QString& fn, QIODevice::OpenModeFlag flag, int channel)
 {
     if (!m_isConnected)
         return false;
@@ -38,10 +38,10 @@ bool QnColdStoreConnection::open(const QString& fn, QIODevice::OpenModeFlag flag
         if (m_connection.Open(
             cFn, 
             0, //Timestamp of file to open. This is ignored unless (file_name == 0).
-            0, //Channel number of file to open.
+            channel, //Channel number of file to open.
             &m_stream, 
             0, //File name of the opened file. This is useful with a time based open.
-            0, //Size in bytes of the opened file.
+            &m_openedStreamSize, //Size in bytes of the opened file.
             0,  //Current file position (measured in bytes from the start of the file). This is always 0 for a name based open.
             0 //Timestamp of the current position.
             ) != Veracity::ISFS::STATUS_SUCCESS)
@@ -71,6 +71,11 @@ bool QnColdStoreConnection::open(const QString& fn, QIODevice::OpenModeFlag flag
 
 
     return true;
+}
+
+qint64 QnColdStoreConnection::size() const
+{
+    return m_openedStreamSize;
 }
 
 void QnColdStoreConnection::close()
@@ -194,7 +199,7 @@ int QnColdStoreConnectionPool::read(const QString& csFn,   char* data, quint64 s
     if (it == m_pool.end())
     {
         connection = new QnColdStoreConnection(m_csStorage->coldstoreAddr());
-        if (connection->open(csFn, QIODevice::ReadOnly))
+        if (connection->open(csFn, QIODevice::ReadOnly, CS_ACTUAL_DATA_CHANNEL))
         {
             m_pool.insert(csFn, connection);
         }

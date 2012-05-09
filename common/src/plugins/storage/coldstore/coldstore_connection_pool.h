@@ -2,6 +2,9 @@
 #define coldstore_connection_pool_h1931
 #include "coldstore_api/sfs-client.h"
 
+#define CS_ACTUAL_DATA_CHANNEL 0
+#define CS_META_DATA_CHANNEL 1
+
 class QnPlColdStoreStorage;
 
 class QnColdStoreConnection
@@ -10,7 +13,10 @@ public:
     QnColdStoreConnection(const QString& addr);
     virtual ~QnColdStoreConnection();
 
-    bool open(const QString& fn, QIODevice::OpenModeFlag flag);
+    bool open(const QString& fn, QIODevice::OpenModeFlag flag, int channel);
+
+    qint64 size() const; // returns the size of opened channel
+
     void close();
 
 
@@ -29,6 +35,10 @@ private:
     bool m_isConnected;
 
     QIODevice::OpenModeFlag m_openMode;
+
+    Veracity::u64 m_openedStreamSize;
+
+
         
 };
 

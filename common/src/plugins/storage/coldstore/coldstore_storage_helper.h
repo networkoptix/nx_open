@@ -1,6 +1,7 @@
 #ifndef coldstore_helper_h_2137_h
 #define coldstore_helper_h_2137_h
 
+
 struct QnCSFileInfo
 {
     QnCSFileInfo()
@@ -31,6 +32,8 @@ public:
     QnColdStoreMetaData();
     ~QnColdStoreMetaData();
 
+    int age() const; // age in seconds ( last used )
+
     void put(const QString& fn, QnCSFileInfo info);
 
     bool hasSuchFile(const QString& fn) const;
@@ -45,10 +48,29 @@ public:
 private:
     QHash<QString, QnCSFileInfo> m_hash;
 
+    mutable QTime m_lastUsageTime;
+
     bool m_needsToBesaved;
 };
 
+typedef QSharedPointer<QnColdStoreMetaData> QnColdStoreMetaDataPtr;
+class QnPlColdStoreStorage;
 
+class QnColdStoreMetaDataPool
+{
+public:
+    QnColdStoreMetaDataPool(QnPlColdStoreStorage *csStorage);
+    ~QnColdStoreMetaDataPool();
+    QnColdStoreMetaDataPtr getStoreMetaData(const QString& csFn);
+private:
+    void checkIfSomedataNeedstoberemoved();
+private:    
+    QnPlColdStoreStorage* m_csStorage;
+
+    QHash<QString, QnColdStoreMetaDataPtr>  m_pool;
+
+    QMutex m_mutex;
+};
 
 
 #endif //coldstore_helper_h_2137_h
