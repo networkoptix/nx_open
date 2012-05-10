@@ -219,14 +219,14 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent, QnWorkbenchContext *
     ui->clearFilterButton->setIconSize(QSize(16, 16));
 
     m_resourceModel = new QnResourcePoolModel(this);
-    QSortFilterProxyModel *model = new QnResourceTreeSortProxyModel(this);
-    model->setSourceModel(m_resourceModel);
-    model->setSupportedDragActions(m_resourceModel->supportedDragActions());
-    model->setDynamicSortFilter(true);
-    model->setSortRole(Qt::DisplayRole);
-    model->setSortCaseSensitivity(Qt::CaseInsensitive);
-    model->sort(0);
-    ui->resourceTreeView->setModel(model);
+    m_resourceProxyModel = new QnResourceTreeSortProxyModel(this);
+    m_resourceProxyModel->setSourceModel(m_resourceModel);
+    m_resourceProxyModel->setSupportedDragActions(m_resourceModel->supportedDragActions());
+    m_resourceProxyModel->setDynamicSortFilter(true);
+    m_resourceProxyModel->setSortRole(Qt::DisplayRole);
+    m_resourceProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
+    m_resourceProxyModel->sort(0);
+    ui->resourceTreeView->setModel(m_resourceProxyModel);
 
     m_resourceDelegate = new QnResourceTreeItemDelegate(this);
     ui->resourceTreeView->setItemDelegate(m_resourceDelegate);
@@ -253,22 +253,23 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent, QnWorkbenchContext *
     connect(ui->searchTreeView,     SIGNAL(doubleClicked(QModelIndex)), this,               SLOT(at_treeView_doubleClicked(QModelIndex)));
     connect(ui->tabWidget,          SIGNAL(currentChanged(int)),        this,               SLOT(at_tabWidget_currentChanged(int)));
     connect(ui->resourceTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SIGNAL(selectionChanged()));
-
-    updateFilter();
+    connect(m_resourceProxyModel,   SIGNAL(rowsInserted(const QModelIndex &, int, int)), this, SLOT(at_resourceProxyModel_rowsInserted(const QModelIndex &, int, int)));
 
     /* Connect to context. */
     m_searchDelegate->setWorkbench(workbench());
     m_resourceDelegate->setWorkbench(workbench());
-    ui->filterLineEdit->setEnabled(true);
-    ui->typeComboBox->setEnabled(true);
+
+    connect(workbench(),        SIGNAL(currentLayoutAboutToBeChanged()),            this,   SLOT(at_workbench_currentLayoutAboutToBeChanged()));
+    connect(workbench(),        SIGNAL(currentLayoutChanged()),                     this,   SLOT(at_workbench_currentLayoutChanged()));
+    connect(workbench(),        SIGNAL(itemChanged(Qn::ItemRole)),                  this,   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
+    connect(workbench(),        SIGNAL(itemAdded(QnWorkbenchItem *)),               this,   SLOT(at_workbench_itemAdded(QnWorkbenchItem *)));
+    connect(workbench(),        SIGNAL(itemRemoved(QnWorkbenchItem *)),             this,   SLOT(at_workbench_itemRemoved(QnWorkbenchItem *)));
+
+    /* Run handlers. */
+    updateFilter();
 
     at_workbench_currentLayoutChanged();
-
-    connect(workbench(),        SIGNAL(currentLayoutAboutToBeChanged()),            this, SLOT(at_workbench_currentLayoutAboutToBeChanged()));
-    connect(workbench(),        SIGNAL(currentLayoutChanged()),                     this, SLOT(at_workbench_currentLayoutChanged()));
-    connect(workbench(),        SIGNAL(itemChanged(Qn::ItemRole)),                  this, SLOT(at_workbench_itemChanged(Qn::ItemRole)));
-    connect(workbench(),        SIGNAL(itemAdded(QnWorkbenchItem *)),               this, SLOT(at_workbench_itemAdded(QnWorkbenchItem *)));
-    connect(workbench(),        SIGNAL(itemRemoved(QnWorkbenchItem *)),             this, SLOT(at_workbench_itemRemoved(QnWorkbenchItem *)));
+    at_resourceProxyModel_rowsInserted(QModelIndex());
 }
 
 QnResourceTreeWidget::~QnResourceTreeWidget() {
@@ -276,8 +277,6 @@ QnResourceTreeWidget::~QnResourceTreeWidget() {
 
     at_workbench_currentLayoutAboutToBeChanged();
 
-    ui->filterLineEdit->setEnabled(false);
-    ui->typeComboBox->setEnabled(false);
     m_searchDelegate->setWorkbench(NULL);
     m_resourceDelegate->setWorkbench(NULL);
 }
@@ -301,12 +300,6 @@ void QnResourceTreeWidget::setCurrentTab(Tab tab) {
     }
 
     ui->tabWidget->setCurrentIndex(tab);
-}
-
-void QnResourceTreeWidget::open() {
-    QAbstractItemView *view = ui->tabWidget->currentIndex() == 0 ? ui->resourceTreeView : ui->searchTreeView;
-    foreach (const QModelIndex &index, view->selectionModel()->selectedRows())
-        at_treeView_doubleClicked(index);
 }
 
 QnResourceSearchProxyModel *QnResourceTreeWidget::layoutModel(QnWorkbenchLayout *layout, bool create) const {
@@ -445,6 +438,10 @@ void QnResourceTreeWidget::updateFilter(bool force) {
     }
 
     m_filterTimerId = startTimer(filter.isEmpty() ? 0 : 300);
+}
+
+void QnResourceTreeWidget::expandAll() {
+    currentItemView()->expandAll();
 }
 
 
@@ -589,4 +586,20 @@ void QnResourceTreeWidget::at_treeView_doubleClicked(const QModelIndex &index) {
     if (resource && !(resource->flags() & QnResource::layout)) /* Layouts cannot be activated by double clicking. */
         emit activated(resource);
 }
+
+void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex &parent, int start, int end) {
+    for(int i = start; i <= end; i++)
+        at_resourceProxyModel_rowsInserted(m_resourceProxyModel->index(i, 0, parent));
+}
+
+void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex &index) {
+    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+    int nodeType = index.data(Qn::NodeTypeRole).toInt();
+    if((resource && resource->checkFlags(QnResource::server)) || nodeType == Qn::ServersNode) 
+        ui->resourceTreeView->expand(index);
+
+    at_resourceProxyModel_rowsInserted(index, 0, m_resourceProxyModel->rowCount(index) - 1);
+}
+
+
 

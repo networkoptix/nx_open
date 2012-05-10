@@ -21,7 +21,7 @@ namespace QnResourceProperty {
     } // anonymous namespace
 
     /**
-     * Tests that the QnResource actualle exposes the properties defined in this file.
+     * Tests that the QnResource actually exposes the properties defined in this file.
      */
     void test();
 

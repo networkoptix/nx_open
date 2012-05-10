@@ -20,7 +20,7 @@ namespace Qn {
         UuidRole            = Qt::UserRole + 3, /**< Role for layout item's UUID. */
         SearchStringRole    = Qt::UserRole + 4, /**< Role for search string. */
         StatusRole          = Qt::UserRole + 5, /**< Role for resource's status. */
-        NodeTypeRole        = Qt::UserRole + 6, /**< Role for node type. */
+        NodeTypeRole        = Qt::UserRole + 6, /**< Role for node type, see <tt>Qn::NodeType</tt>. */
     };
 
 
