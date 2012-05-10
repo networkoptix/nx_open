@@ -760,7 +760,6 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
 
         if(replacedCamera) {
             oldDisabledFlags.push_back(replacedCamera->isDisabled());
-
             replacedCamera->setScheduleDisabled(sourceCamera->isScheduleDisabled());
             replacedCamera->setScheduleTasks(sourceCamera->getScheduleTasks());
             replacedCamera->setAuth(sourceCamera->getAuth());
@@ -774,8 +773,17 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
             modifiedResources.push_back(sourceCamera);
             modifiedResources.push_back(replacedCamera);
 
-            QnResourcePtr newServer = resourcePool()->getResourceById(sourceCamera->getParentId());
+            /* Replace scene items, if any. */
+            foreach(QnWorkbenchItem *item, workbench()->currentLayout()->items(sourceCamera->getUniqueId())) {
+                QnLayoutItemData data = item->data();
+                delete item;
+                
+                data.resource.id = replacedCamera->getId();
+                data.resource.path = replacedCamera->getUniqueId();
+                workbench()->currentLayout()->addItem(new QnWorkbenchItem(data, this));
+            }
 
+            QnResourcePtr newServer = resourcePool()->getResourceById(sourceCamera->getParentId());
             if (newServer->getStatus() == QnResource::Offline)
                 sourceCamera->setStatus(QnResource::Offline);
         } else {
