@@ -23,7 +23,8 @@ message Server {
     required string       url          = 5;
     required string       apiUrl       = 6;
     optional string       netAddrList  = 7;
-    repeated Storage      storage      = 8;
+    optional bool         reserve      = 8;
+    repeated Storage      storage      = 9;
 }
 
 message Servers {
