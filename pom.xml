@@ -6,32 +6,12 @@
     It should also be possible to have one maven project per solution project, 
     and have a parent pom to deletegate the build.
   -->
-	<!--test message-->
 	<groupId>com.networkoptix.hdwitness</groupId>
 	<version>1.0</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>hdwitness</artifactId>
 	<packaging>pom</packaging>
-	<name>HD Witness</name>
-
-	<pluginRepositories>
-		<pluginRepository>
-			<releases>
-				<enabled>true</enabled>
-				<updatePolicy>always</updatePolicy>
-				<checksumPolicy>warn</checksumPolicy>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>never</updatePolicy>
-				<checksumPolicy>fail</checksumPolicy>
-			</snapshots>
-			<id>goldin</id>
-			<name>Evgeny Goldin</name>
-			<url>http://evgeny-goldin.org/artifactory/repo/</url>
-			<layout>default</layout>
-		</pluginRepository>
-	</pluginRepositories>	
+	<name>HD Witness</name>	
 
 	<organization>
 		<name>Network Optix</name>
@@ -88,6 +68,28 @@
 			<properties>
 				<platform>linux</platform>
 			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>1.1.1</version>
+						<executions>
+							<execution>
+								<id>prepare-clean</id>
+								<phase>pre-clean</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>${session.executionRootDirectory}/linux-build-mvn.sh</executable>
+									<workingDirectory>${project.build.directory}</workingDirectory>
+								</configuration>
+							</execution>	
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
 		</profile>	
 		<profile>
 			<id>linux-x64</id>

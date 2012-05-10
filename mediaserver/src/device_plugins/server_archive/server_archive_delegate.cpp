@@ -113,6 +113,14 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
     qint64 chunkOffset = 0;
     if (newChunk.durationMs == -1) // last live chunk
     {
+        if (!m_reverseMode && time - newChunk.startTimeMs*1000 > 1000 * 1000ll) 
+        {
+            // seek > 1 seconds offset at last non-closed chunk. 
+            // Ignore seek, and go to EOF (actually seek always goes to the begin of the file if file is not closed, so it is slow)
+            m_eof = true;
+            return newChunk.startTimeMs*1000;
+        }
+
         // do not seek over live chunk because it's very slow (seek always going to begin of file because mkv seek catalog is't ready)
         chunkOffset = qBound(0ll, time - newChunk.startTimeMs*1000, BACKWARD_SEEK_STEP);
 
