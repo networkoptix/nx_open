@@ -107,7 +107,7 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(QnResourcePtr re
     for (int i = 0; i < videoServerList.size(); ++i)
     {
         QnVideoServerResourcePtr otherVideoServer = qSharedPointerDynamicCast<QnVideoServerResource> (qnResPool->getResourceById(videoServerList[i].getServerId()));
-        if (otherVideoServer == currentVideoServer && m_rtspSession.startTime() != AV_NOPTS_VALUE)
+        if (!otherVideoServer || otherVideoServer == currentVideoServer && m_rtspSession.startTime() != AV_NOPTS_VALUE)
         {
             // first server equal current server, so archive start point already found
             return 0;
