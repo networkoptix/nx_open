@@ -1,4 +1,5 @@
 #!/bin/bash
 
 . ~/.profile
-mvn clean package
+sudo chown -R `whoami`:sudo ./
+#mvn clean package
