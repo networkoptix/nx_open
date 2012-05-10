@@ -520,8 +520,6 @@ void QnMain::run()
     QnEventManager* eventManager = QnEventManager::instance();
     eventManager->run();
 
-    qnResPool->addResource(m_videoServer);
-
     m_processor = new QnAppserverResourceProcessor(m_videoServer->getId());
 
     QUrl rtspUrl(m_videoServer->getUrl());
