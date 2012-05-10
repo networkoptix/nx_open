@@ -423,8 +423,10 @@ void QnRtspConnectionProcessor::setRtspTime(qint64 time)
 qint64 QnRtspConnectionProcessor::getRtspTime()
 {
     Q_D(QnRtspConnectionProcessor);
-    //return d->playTime + d->playTimer.elapsed()*1000 * d->rtspScale;
-    return d->dataProcessor->getDisplayedTime();
+	if (d->dataProcessor)
+		return d->dataProcessor->getDisplayedTime();
+	else
+		return AV_NOPTS_VALUE;
 }
 
 void QnRtspConnectionProcessor::extractNptTime(const QString& strValue, qint64* dst)
