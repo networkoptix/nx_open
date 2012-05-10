@@ -135,6 +135,11 @@ void parseServers(QList<T> &servers, const PbServerList& pb_servers, QnResourceF
             server->setNetAddrList(netAddrList);
         }
 
+        if (pb_server.has_reserve())
+        {
+            server->setReserve(pb_server.reserve());
+        }
+
         if (pb_server.storage_size() > 0)
         {
             QnAbstractStorageResourceList storages;
@@ -624,6 +629,8 @@ void QnApiPbSerializer::serializeServer(const QnVideoServerResourcePtr& serverPt
 
     if (!serverPtr->getNetAddrList().isEmpty())
         pb_server.set_netaddrlist(serializeNetAddrList(serverPtr->getNetAddrList()).toUtf8().constData());
+
+    pb_server.set_reserve(serverPtr->getReserve());
 
     if (!serverPtr->getStorages().isEmpty()) {
         foreach (const QnAbstractStorageResourcePtr& storagePtr, serverPtr->getStorages()) {

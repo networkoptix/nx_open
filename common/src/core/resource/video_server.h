@@ -42,6 +42,9 @@ public:
 
     void determineOptimalNetIF();
     void setPrimaryIF(const QString& primaryIF);
+
+    void setReserve(bool reserve = true);
+    bool getReserve() const;
 signals:
     void serverIFFound(QString);
 private:
@@ -51,6 +54,7 @@ private:
     QList<QHostAddress> m_prevNetAddrList;
     QnAbstractStorageResourceList m_storages;
     bool m_primaryIFSelected;
+    bool m_reserve;
 };
 
 class QnVideoServerResourceFactory : public QnResourceFactory
