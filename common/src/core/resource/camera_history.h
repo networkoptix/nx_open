@@ -38,6 +38,7 @@ public:
 
     QnCameraTimePeriodList getTimePeriods() const;
     QnVideoServerResourcePtr getVideoServerOnTime(qint64 timestamp, bool searchForward, QnTimePeriod& currentPeriod);
+    QnNetworkResourcePtr getCameraOnTime(qint64 timestamp, bool searchForward, QnTimePeriod& currentPeriod);
     QnVideoServerResourcePtr getNextVideoServerOnTime(qint64 timestamp, bool searchForward, QnTimePeriod& currentPeriod);
     QList<QnNetworkResourcePtr> getAllCamerasWithSameMac(const QnTimePeriod& timePeriod);
 
@@ -64,6 +65,7 @@ public:
     void addCameraHistory(QnCameraHistoryPtr history);
     void addCameraHistoryItem(const QnCameraHistoryItem& historyItem);
 
+    QnNetworkResourcePtr getCurrentCamera(QnNetworkResourcePtr camera, const QnTimePeriod& timePeriod);
     QList<QnNetworkResourcePtr> getAllCamerasWithSameMac(QnNetworkResourcePtr camera, const QnTimePeriod& timePeriod);
     qint64 getMinTime(QnNetworkResourcePtr camera);
 private:
@@ -71,6 +73,8 @@ private:
     CameraHistoryMap m_cameraHistory;
     mutable QMutex m_mutex;
 };
+
+#define qnHistoryPool (QnCameraHistoryPool::instance())
 
 
 #endif // __CAMERA_HISTORY_H_
