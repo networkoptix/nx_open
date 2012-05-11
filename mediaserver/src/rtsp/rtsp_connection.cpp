@@ -163,7 +163,7 @@ void QnRtspConnectionProcessor::parseRequest()
         if (resource == 0) {
             resource = qnResPool->getNetResourceByMac(resId);
         }
-		if (resource->isDisabled())
+		if (resource && resource->isDisabled())
 			d->mediaRes.clear();
 		else
 			d->mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
