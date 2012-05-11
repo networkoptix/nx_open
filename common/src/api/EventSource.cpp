@@ -252,7 +252,7 @@ void QnEventSource::httpReadyRead()
                 emit connectionReset();
             }
 
-            if (event.dict.contains("proxyPort"))
+            if (event.dict.contains("proxy_port"))
                 QnAppServerConnectionFactory::setDefaultMediaProxyPort(event.dict["proxy_port"].toInt());
 
             emit connectionOpened();
