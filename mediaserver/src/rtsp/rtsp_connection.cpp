@@ -163,7 +163,10 @@ void QnRtspConnectionProcessor::parseRequest()
         if (resource == 0) {
             resource = qnResPool->getNetResourceByMac(resId);
         }
-        d->mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
+		if (resource->isDisabled())
+			d->mediaRes.clear();
+		else
+			d->mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
     }
     if (d->requestHeaders.value("x-media-quality") == QString("low"))
         d->quality = MEDIA_Quality_Low;
