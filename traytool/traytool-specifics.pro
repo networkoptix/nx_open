@@ -11,5 +11,6 @@ CONFIG(release, debug|release) {
 }
 
 win32 {
+  QMAKE_LFLAGS += /MACHINE:${arch}  
   RC_FILE = ${project.build.sourceDirectory}/traytool.rc
 }
