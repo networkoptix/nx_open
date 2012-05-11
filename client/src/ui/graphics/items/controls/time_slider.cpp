@@ -249,7 +249,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
 
     setWindowStart(minimum());
     setWindowEnd(maximum());
-    setOptions(StickToMinimum | StickToMaximum | UpdateToolTip | SelectionEditable | AdjustWindowToPosition | SnapZoomToSides);
+    setOptions(StickToMinimum | StickToMaximum | UpdateToolTip | SelectionEditable | AdjustWindowToPosition | SnapZoomToSides | UnzoomOnDoubleClick);
 
     setToolTipFormat(tr("hh:mm:ss", "DEFAULT_TOOL_TIP_FORMAT"));
 
@@ -554,6 +554,11 @@ void QnTimeSlider::finishAnimations() {
     }
 
     kineticProcessor()->reset();
+}
+
+void QnTimeSlider::animatedUnzoom() {
+    kineticProcessor()->reset(); /* Stop kinetic zoom. */
+    m_unzooming = true;
 }
 
 bool QnTimeSlider::scaleWindow(qreal factor, qint64 anchor) {
@@ -1341,10 +1346,8 @@ void QnTimeSlider::keyPressEvent(QKeyEvent *event) {
 void QnTimeSlider::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) {
     base_type::mouseDoubleClickEvent(event);
 
-    if(event->button() == Qt::LeftButton) {
-        kineticProcessor()->reset(); /* Stop kinetic zoom. */
-        m_unzooming = true;
-    }
+    if((m_options & UnzoomOnDoubleClick) && event->button() == Qt::LeftButton)
+        animatedUnzoom();
 }
 
 void QnTimeSlider::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
