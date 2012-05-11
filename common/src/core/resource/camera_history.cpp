@@ -192,8 +192,13 @@ qint64 QnCameraHistoryPool::getMinTime(QnNetworkResourcePtr camera)
     return history->getMinTime();
 }
 
-QnNetworkResourcePtr QnCameraHistoryPool::getCurrentCamera(const QnResourcePtr &resource) {
-    return getCurrentCamera(resource.dynamicCast<QnNetworkResource>());
+QnResourcePtr QnCameraHistoryPool::getCurrentCamera(const QnResourcePtr &resource) {
+    QnNetworkResourcePtr camera = resource.dynamicCast<QnNetworkResource>();
+    if(camera) {
+        return getCurrentCamera(camera);
+    } else {
+        return resource;
+    }
 }
 
 QnNetworkResourcePtr QnCameraHistoryPool::getCurrentCamera(const QnNetworkResourcePtr &camera) {
