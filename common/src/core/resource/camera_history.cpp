@@ -51,7 +51,15 @@ QnVideoServerResourcePtr QnCameraHistory::getVideoServerOnTime(qint64 timestamp,
     if (itr == m_timePeriods.end())
         return QnVideoServerResourcePtr();
     currentPeriod = *itr;
-    return qSharedPointerDynamicCast<QnVideoServerResource> (qnResPool->getResourceById(itr->getServerId()));
+    return qSharedPointerDynamicCast<QnVideoServerResource>(qnResPool->getResourceById(itr->getServerId()));
+}
+
+QnNetworkResourcePtr QnCameraHistory::getCameraOnTime(qint64 timestamp, bool searchForward, QnTimePeriod& currentPeriod) {
+    QnVideoServerResourcePtr server = getVideoServerOnTime(timestamp, searchForward, currentPeriod);
+    if(!server)
+        return QnNetworkResourcePtr();
+
+    return qSharedPointerDynamicCast<QnNetworkResource>(qnResPool->getResourceByUniqId(m_macAddress + server->getId().toString()));
 }
 
 QnVideoServerResourcePtr QnCameraHistory::getNextVideoServerFromTime(qint64 timestamp, QnTimePeriod& currentPeriod)
