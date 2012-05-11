@@ -142,7 +142,6 @@ QString QnStorageManager::dateTimeStr(qint64 dateTimeMs)
 
 QnTimePeriodList QnStorageManager::getRecordedPeriods(QnResourceList resList, qint64 startTime, qint64 endTime, qint64 detailLevel)
 {
-    QMutexLocker lock(&m_mutex);
     QVector<QnTimePeriodList> cameras;
     for (int i = 0; i < resList.size(); ++i)
     {
