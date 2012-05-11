@@ -13,6 +13,8 @@
 #include <netinet/in.h>
 #endif
 
+#define MAX_ERROR_MSG_LENGTH 1024
+
 /**
  *   Signals a problem with the execution of a socket call.
  */
@@ -38,7 +40,7 @@ public:
   const char *what() const throw();
 
 private:
-  QString userMessage;  // Exception message
+  char m_message[MAX_ERROR_MSG_LENGTH];
 };
 
 /**
