@@ -1,5 +1,7 @@
-#ifndef __CAMERA_HISTORY_H_
-#define __CAMERA_HISTORY_H_
+#ifndef QN_CAMERA_HISTORY_H
+#define QN_CAMERA_HISTORY_H
+
+#include <QtCore/QObject>
 
 #include "recording/time_period.h"
 #include "resource.h"
@@ -33,22 +35,29 @@ typedef QList<QnCameraTimePeriod> QnCameraTimePeriodList;
 class QN_EXPORT QnCameraHistory
 {
 public:
+    QnCameraHistory() {}
+
     QString getMacAddress() const;
     void setMacAddress(const QString& macAddress);
 
     QnCameraTimePeriodList getTimePeriods() const;
     QnVideoServerResourcePtr getVideoServerOnTime(qint64 timestamp, bool searchForward, QnTimePeriod& currentPeriod);
-    QnNetworkResourcePtr getCameraOnTime(qint64 timestamp, bool searchForward, QnTimePeriod& currentPeriod);
+    QnNetworkResourcePtr getCameraOnTime(qint64 timestamp, bool searchForward);
     QnVideoServerResourcePtr getNextVideoServerOnTime(qint64 timestamp, bool searchForward, QnTimePeriod& currentPeriod);
     QList<QnNetworkResourcePtr> getAllCamerasWithSameMac(const QnTimePeriod& timePeriod);
+    QList<QnNetworkResourcePtr> getAllCamerasWithSameMac();
 
     void addTimePeriod(const QnCameraTimePeriod& period);
     qint64 getMinTime() const;
+
 private:
     QnCameraTimePeriodList::const_iterator getVideoServerOnTimeItr(qint64 timestamp, bool searchForward);
     QnVideoServerResourcePtr getNextVideoServerFromTime(qint64 timestamp, QnTimePeriod& currentPeriod);
     QnVideoServerResourcePtr getPrevVideoServerFromTime(qint64 timestamp, QnTimePeriod& currentPeriod);
+
 private:
+    Q_DISABLE_COPY(QnCameraHistory);
+
     QnCameraTimePeriodList m_timePeriods;
     QString m_macAddress;
     mutable QMutex m_mutex;
@@ -57,17 +66,22 @@ private:
 typedef QSharedPointer<QnCameraHistory> QnCameraHistoryPtr;
 typedef QList<QnCameraHistoryPtr> QnCameraHistoryList;
 
-class QnCameraHistoryPool
-{
+class QnCameraHistoryPool: public QObject {
+    Q_OBJECT;
 public:
     static QnCameraHistoryPool* instance();
     QnCameraHistoryPtr getCameraHistory(const QString& mac);
     void addCameraHistory(QnCameraHistoryPtr history);
     void addCameraHistoryItem(const QnCameraHistoryItem& historyItem);
 
-    QnNetworkResourcePtr getCurrentCamera(QnNetworkResourcePtr camera, const QnTimePeriod& timePeriod);
-    QList<QnNetworkResourcePtr> getAllCamerasWithSameMac(QnNetworkResourcePtr camera, const QnTimePeriod& timePeriod);
+    QnNetworkResourcePtr getCurrentCamera(const QnNetworkResourcePtr &resource);
+
+    QList<QnNetworkResourcePtr> getAllCamerasWithSameMac(const QnNetworkResourcePtr &camera, const QnTimePeriod& timePeriod);
     qint64 getMinTime(QnNetworkResourcePtr camera);
+
+signals:
+    void currentCameraChanged(const QnNetworkResourcePtr &camera);
+
 private:
     typedef QMap<QString, QnCameraHistoryPtr> CameraHistoryMap;
     CameraHistoryMap m_cameraHistory;
@@ -77,4 +91,4 @@ private:
 #define qnHistoryPool (QnCameraHistoryPool::instance())
 
 
-#endif // __CAMERA_HISTORY_H_
+#endif // QN_CAMERA_HISTORY_H
