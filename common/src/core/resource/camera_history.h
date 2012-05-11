@@ -78,7 +78,7 @@ public:
     void addCameraHistoryItem(const QnCameraHistoryItem& historyItem);
 
     QnNetworkResourcePtr getCurrentCamera(const QnNetworkResourcePtr &resource);
-    QnNetworkResourcePtr getCurrentCamera(const QnResourcePtr &resource);
+    QnResourcePtr getCurrentCamera(const QnResourcePtr &resource);
 
     QnNetworkResourceList getAllCamerasWithSameMac(const QnNetworkResourcePtr &camera, const QnTimePeriod& timePeriod);
     qint64 getMinTime(QnNetworkResourcePtr camera);

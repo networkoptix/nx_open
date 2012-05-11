@@ -161,6 +161,13 @@ void QnEventManager::at_connectionClosed(QString errorString)
     emit connectionClosed();
 }
 
+void QnEventManager::at_connectionOpened()
+{
+    qDebug() << "Connection opened";
+
+    emit connectionOpened();
+}
+
 void QnEventManager::at_connectionReset()
 {
     QnAppServerConnectionFactory::createConnection()->
