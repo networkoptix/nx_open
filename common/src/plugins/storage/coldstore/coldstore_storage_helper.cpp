@@ -2,7 +2,8 @@
 #include "coldstore_connection_pool.h"
 #include "coldstore_storage.h"
 
-QnColdStoreMetaData::QnColdStoreMetaData():
+QnColdStoreMetaData::QnColdStoreMetaData(const QString& csFileName):
+m_csFileName(csFileName),
 m_mutex(QMutex::Recursive)
 {
     m_needsToBesaved = false;
@@ -22,20 +23,18 @@ void QnColdStoreMetaData::put(const QString& fn, QnCSFileInfo info)
     m_hash.insert(fn, info);
 }
 
-bool QnColdStoreMetaData::hasSuchFile(const QString& fn) const
-{
-    QMutexLocker lock(&m_mutex);
-
-    m_lastUsageTime.restart();
-    return m_hash.contains(fn);
-}
 
 QnCSFileInfo QnColdStoreMetaData::getFileinfo(const QString& fn) const
 {
     QMutexLocker lock(&m_mutex);
 
     m_lastUsageTime.restart();
-    return m_hash.value(fn);
+    QHash<QString, QnCSFileInfo>::const_iterator it = m_hash.find(fn);
+
+    if (it == m_hash.end())
+        return QnCSFileInfo();
+    else
+        return it.value();
 }
 
 QFileInfoList QnColdStoreMetaData::fileInfoList(const QString& subPath) const
@@ -125,6 +124,11 @@ int QnColdStoreMetaData::age() const
     return m_lastUsageTime.elapsed()/1000;
 }
 
+QString QnColdStoreMetaData::csFileName() const
+{
+    return m_csFileName;
+}
+
 //====================================================
 
 QnColdStoreMetaDataPool::QnColdStoreMetaDataPool(QnPlColdStoreStorage *csStorage):
@@ -159,7 +163,7 @@ QnColdStoreMetaDataPtr QnColdStoreMetaDataPool::getStoreMetaData(const QString& 
 
         if (connection.open(csFn, QIODevice::ReadOnly, CS_META_DATA_CHANNEL))
         {
-            md = QnColdStoreMetaDataPtr(new QnColdStoreMetaData());
+            md = QnColdStoreMetaDataPtr(new QnColdStoreMetaData(csFn));
 
             quint64 size = connection.size();
             QByteArray ba;

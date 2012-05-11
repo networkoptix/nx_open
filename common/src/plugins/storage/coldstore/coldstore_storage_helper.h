@@ -4,7 +4,9 @@
 
 struct QnCSFileInfo
 {
-    QnCSFileInfo()
+    QnCSFileInfo():
+    shift(0),
+    len(0)
     {
 
     }
@@ -29,14 +31,14 @@ struct QnCSFile
 class QnColdStoreMetaData
 {
 public:
-    QnColdStoreMetaData();
+    QnColdStoreMetaData(const QString& csFileName);
     ~QnColdStoreMetaData();
 
     int age() const; // age in seconds ( last used )
 
     void put(const QString& fn, QnCSFileInfo info);
 
-    bool hasSuchFile(const QString& fn) const;
+    // returns QnCSFileInfo with 0 len no such file
     QnCSFileInfo getFileinfo(const QString& fn) const;
 
     QFileInfoList fileInfoList(const QString& subPath) const;
@@ -47,7 +49,11 @@ public:
     bool needsToBesaved() const;
     void setNeedsToBesaved(bool v);
 
+    QString csFileName() const;
+
 private:
+    QString m_csFileName;
+
     QHash<QString, QnCSFileInfo> m_hash;
 
     mutable QTime m_lastUsageTime;

@@ -127,7 +127,7 @@ public:
     virtual void setUrl(const QString& value);
 protected:
 
-    QnStorageURL url2StorageURL(const QString& url);
+    QnStorageURL url2StorageURL(const QString& url) const;
 
 };
 

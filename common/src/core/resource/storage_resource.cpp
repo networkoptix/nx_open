@@ -132,7 +132,7 @@ void QnStorageResource::setUrl(const QString& value)
     QnResource::setUrl(value);
 }
 
-QnStorageURL QnStorageResource::url2StorageURL(const QString& url)
+QnStorageURL QnStorageResource::url2StorageURL(const QString& url) const
 {
     QnStorageURL result;
     QString rUrl = getUrl();

@@ -16,6 +16,22 @@ QnStorageResource* QnPlColdStoreStorage::instance()
 
 QIODevice* QnPlColdStoreStorage::open(const QString& fileName, QIODevice::OpenMode openMode)
 {
+    if (openMode == QIODevice::ReadOnly)
+    {
+        QnCSFileInfo fi = getFileInfo(fileName);
+        if (fi.len == 0)
+        {
+            return 0;
+        }
+        else
+        {
+            //QString csFileName = fileName2csFileName(fn);
+
+            //m_connectionPool.read()
+        }
+
+    }
+
     QnColdStoreIOBuffer* buff = new QnColdStoreIOBuffer(toSharedPointer(), fileName);
     buff->open(openMode);
 
@@ -51,10 +67,9 @@ bool QnPlColdStoreStorage::isStorageAvailableForWriting()
 
 QFileInfoList QnPlColdStoreStorage::getFileList(const QString& dirName) 
 {
-    QnStorageURL sUrl = url2StorageURL(dirName);
-    QString csUrl = csDataFileName(sUrl);
+    QString csFileName = fileName2csFileName(dirName);
 
-    QnColdStoreMetaDataPtr md = m_metaDataPool.getStoreMetaData(csUrl);
+    QnColdStoreMetaDataPtr md = getMetaDataFileForCsFile(csFileName);
 
     if (!md)
     {
@@ -102,8 +117,39 @@ qint64 QnPlColdStoreStorage::getFreeSpace()
     return 10*1024*1024*1024ll;
 }
 
+QnCSFileInfo QnPlColdStoreStorage::getFileInfo(const QString& fn)
+{
+    QString csFileName = fileName2csFileName(fn);
 
+    QnColdStoreMetaDataPtr md = getMetaDataFileForCsFile(csFileName);
+
+    if (!md)
+        return QnCSFileInfo();
+
+    return md->getFileinfo(fn);
+}
+
+QString QnPlColdStoreStorage::fileName2csFileName(const QString& fn) const
+{
+    return csDataFileName(url2StorageURL(fn));
+}
 //=======private==============================
+QnColdStoreMetaDataPtr QnPlColdStoreStorage::getMetaDataFileForCsFile(const QString& csFile)
+{
+    {
+        QMutexLocker lock(&m_mutex);
+        if (m_currentWritingFileMetaData && m_currentWritingFileMetaData->csFileName() == csFile)
+        {
+            return m_currentWritingFileMetaData;
+        }
+        else if (m_prevWritingFileMetaData && m_prevWritingFileMetaData->csFileName() == csFile)
+        {
+            return m_prevWritingFileMetaData;
+        }
+    }
+
+    return m_metaDataPool.getStoreMetaData(csFile);
+}
 
 QString QnPlColdStoreStorage::coldstoreAddr() const
 {
@@ -112,6 +158,7 @@ QString QnPlColdStoreStorage::coldstoreAddr() const
 
     return prefix == -1 ? "" : url.mid(prefix + 3);
 }
+
 
 QString QnPlColdStoreStorage::csDataFileName(const QnStorageURL& url) const
 {

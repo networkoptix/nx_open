@@ -31,8 +31,12 @@ public:
     virtual bool isDirExists(const QString& url) override;
 
     QString coldstoreAddr() const;
+
+    //=====================
+    QString fileName2csFileName(const QString& fn) const;
+    QnCSFileInfo getFileInfo(const QString& fn);
 private:
-    
+    QnColdStoreMetaDataPtr getMetaDataFileForCsFile(const QString& csFile);
 
     QString csDataFileName(const QnStorageURL& url) const;
 private:
@@ -41,6 +45,9 @@ private:
     QnColdStoreConnectionPool m_connectionPool;
 
     QnColdStoreMetaDataPool m_metaDataPool;
+
+    QnColdStoreMetaDataPtr m_currentWritingFileMetaData;
+    QnColdStoreMetaDataPtr m_prevWritingFileMetaData;
 
 };
 
