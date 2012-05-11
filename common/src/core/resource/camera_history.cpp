@@ -213,18 +213,22 @@ QnNetworkResourcePtr QnCameraHistoryPool::getCurrentCamera(const QnNetworkResour
 
 void QnCameraHistoryPool::addCameraHistory(QnCameraHistoryPtr history)
 {
-    QMutexLocker lock(&m_mutex);
+    QnCameraHistoryPtr oldHistory, newHistory;
 
-    QString key = history->getMacAddress();
-    if(m_cameraHistory.contains(key)) {
-        qnWarning("History for camera with MAC address '%1' is already in the pool", key);
-        return;
+    {
+        QMutexLocker lock(&m_mutex);
+        
+        QString key = history->getMacAddress();
+        
+        oldHistory = m_cameraHistory.value(key);
+        newHistory = history;
+
+        m_cameraHistory[key] = history;
     }
 
-    m_cameraHistory.insert(key, history);
-
-    foreach(const QnNetworkResourcePtr &camera, history->getAllCamerasWithSameMac())
-        emit currentCameraChanged(camera);
+    if(!oldHistory || (oldHistory->getCameraOnTime(DATETIME_NOW, true) != newHistory->getCameraOnTime(DATETIME_NOW, true)))
+        foreach(const QnNetworkResourcePtr &camera, newHistory->getAllCamerasWithSameMac())
+            emit currentCameraChanged(camera);
 }
 
 void QnCameraHistoryPool::addCameraHistoryItem(const QnCameraHistoryItem &historyItem)
