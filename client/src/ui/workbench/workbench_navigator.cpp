@@ -759,6 +759,8 @@ bool QnWorkbenchNavigator::eventFilter(QObject *watched, QEvent *event) {
     } else if(watched == m_timeScrollBar && event->type() == QEvent::GraphicsSceneWheel) {
         if(m_timeSlider->scene() && m_timeSlider->scene()->sendEvent(m_timeSlider, event))
             return true;
+    } else if(watched == m_timeScrollBar && event->type() == QEvent::GraphicsSceneMouseDoubleClick) {
+        m_timeSlider->animatedUnzoom();
     }
 
     return base_type::eventFilter(watched, event);

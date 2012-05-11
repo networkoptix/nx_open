@@ -67,6 +67,11 @@ public:
          * should zoom into the side, not the mouse pointer position.
          */
         SnapZoomToSides = 0x40,
+
+        /**
+         * Whether double clicking the time slider should start animated unzoom.
+         */
+        UnzoomOnDoubleClick = 0x80,
     };
     Q_DECLARE_FLAGS(Options, Option);
 
@@ -108,7 +113,8 @@ public:
     const QString &toolTipFormat() const;
     void setToolTipFormat(const QString &format);
 
-    void finishAnimations();
+    Q_SLOT void finishAnimations();
+    Q_SLOT void animatedUnzoom();
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
