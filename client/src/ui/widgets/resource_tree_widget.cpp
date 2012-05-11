@@ -465,8 +465,10 @@ void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *event) {
     if(menu->isEmpty())
         return;
 
-    /* Run menu. */
-    QAction *action = menu->exec(event->globalPos());
+    /* Run menu. 
+     * Note that we cannot use evet->globalPos() here as it doesn't work when
+     * the widget is embedded into graphics scene. */
+    QAction *action = menu->exec(QCursor::pos());
 
     /* Process tree-local actions. */
     if(action == m_renameAction)
