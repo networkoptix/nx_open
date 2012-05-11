@@ -98,6 +98,15 @@
 											<overWrite>false</overWrite>
 											<outputDirectory>${project.build.directory}/traytool</outputDirectory>
 										</artifactItem>								
+										<artifactItem>
+											<groupId>com.networkoptix.hdwitness</groupId>
+											<artifactId>mediaproxy</artifactId>
+											<version>1.0</version>
+											<type>zip</type>
+											<classifier>${platform}-${arch}-${build.configuration}-exec</classifier>
+											<overWrite>false</overWrite>
+											<outputDirectory>${project.build.directory}/mediaproxy</outputDirectory>
+										</artifactItem>											
 									</artifactItems>
 								</configuration>
 							</execution>
