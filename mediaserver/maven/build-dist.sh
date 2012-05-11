@@ -52,6 +52,14 @@ install -m 755 init.d/networkoptix-mediaserver $INITDSTAGE
 
 # Copy libraries
 cp -P $SERVER_LIB_PATH/*.so* $LIBSTAGE
+cp -P ${qt.dir}/libaudio.so* $LIBSTAGE
+cp -P ${qt.dir}/libXi.so* $LIBSTAGE
+cp -P ${qt.dir}/libXt.so* $LIBSTAGE
+cp -P ${qt.dir}/libXrender.so* $LIBSTAGE
+cp -P ${qt.dir}/libfontconfig.so* $LIBSTAGE
+cp -P ${qt.dir}/libICE.so* $LIBSTAGE
+cp -P ${qt.dir}/libSM.so* $LIBSTAGE
+
 # Copy required qt libraries
 #for file in $QT_FILES
 #do
