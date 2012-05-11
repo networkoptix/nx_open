@@ -71,13 +71,13 @@ QFileInfoList QnPlColdStoreStorage::getFileList(const QString& dirName)
 
     QnColdStoreMetaDataPtr md = getMetaDataFileForCsFile(csFileName);
 
-    if (!md)
+    if (md)
     {
-        return QFileInfoList();
+        return md->fileInfoList(dirName);
     }
     else
     {
-        return md->fileInfoList(dirName);
+        return QFileInfoList();
     }
 
 }
