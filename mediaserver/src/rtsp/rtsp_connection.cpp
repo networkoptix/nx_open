@@ -473,11 +473,10 @@ void QnRtspConnectionProcessor::parseRangeHeader(const QString& rangeStr, qint64
 void QnRtspConnectionProcessor::at_cameraDisabledChanged(bool oldValue, bool newValue)
 {
     Q_D(QnRtspConnectionProcessor);
+	QMutexLocker lock(&d->mutex);
     if (newValue) {
-        if (getRtspTime() == DATETIME_NOW) {
-            m_needStop = true;
-            d->socket->close();
-        }
+        m_needStop = true;
+        d->socket->close();
     }
 }
 
