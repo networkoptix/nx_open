@@ -21,7 +21,6 @@ void QnEventManager::init(const QUrl& url, int timeout)
     m_source = QSharedPointer<QnEventSource>(new QnEventSource(url, timeout));
 
     connect(m_source.data(), SIGNAL(eventReceived(QnEvent)), this, SLOT(at_eventReceived(QnEvent)));
-    connect(m_source.data(), SIGNAL(connectionOpened()), this, SLOT(at_connectionOpened()));
     connect(m_source.data(), SIGNAL(connectionClosed(QString)), this, SLOT(at_connectionClosed(QString)));
     connect(m_source.data(), SIGNAL(connectionReset()), this, SLOT(at_connectionReset()));
 }

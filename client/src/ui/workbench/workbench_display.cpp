@@ -598,7 +598,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
         return false;
     }
 
-    QnResourcePtr resource = qnHistoryPool->getCurrentCamera(qnResPool->getResourceByUniqId(item->resourceUid()));
+    QnResourcePtr resource = qnResPool->getResourceByUniqId(item->resourceUid());
     if(resource.isNull()) {
         qnDeleteLater(item);
         return false;
@@ -646,7 +646,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
     connect(item, SIGNAL(flagChanged(Qn::ItemFlag, bool)),              this, SLOT(at_item_flagChanged(Qn::ItemFlag, bool)));
 
     m_widgetByItem.insert(item, widget);
-    m_widgetsByResource[resource].push_back(widget);
+    m_widgetsByResource[widget->resource()].push_back(widget);
     if(widget->renderer() != NULL)
         m_widgetByRenderer.insert(widget->renderer(), widget);
 
