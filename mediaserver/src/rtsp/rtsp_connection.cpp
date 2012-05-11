@@ -163,7 +163,10 @@ void QnRtspConnectionProcessor::parseRequest()
         if (resource == 0) {
             resource = qnResPool->getNetResourceByMac(resId);
         }
-        d->mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
+		if (resource->isDisabled())
+			d->mediaRes.clear();
+		else
+			d->mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
     }
     if (d->requestHeaders.value("x-media-quality") == QString("low"))
         d->quality = MEDIA_Quality_Low;
@@ -473,11 +476,10 @@ void QnRtspConnectionProcessor::parseRangeHeader(const QString& rangeStr, qint64
 void QnRtspConnectionProcessor::at_cameraDisabledChanged(bool oldValue, bool newValue)
 {
     Q_D(QnRtspConnectionProcessor);
+	QMutexLocker lock(&d->mutex);
     if (newValue) {
-        if (getRtspTime() == DATETIME_NOW) {
-            m_needStop = true;
-            d->socket->close();
-        }
+        m_needStop = true;
+        d->socket->close();
     }
 }
 
