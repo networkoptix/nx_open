@@ -487,7 +487,7 @@ void QnRtspConnectionProcessor::createDataProvider()
 	if (camera)	
 	{
 		camera->inUse(d);
-		if (!d->liveDpHi) {
+		if (!d->liveDpHi && !d->mediaRes->isDisabled()) {
 			d->liveDpHi = camera->getLiveReader(QnResource::Role_LiveVideo);
             if (d->liveDpHi) {
                 connect(d->liveDpHi->getResource().data(), SIGNAL(disabledChanged(bool, bool)), this, SLOT(at_cameraDisabledChanged(bool, bool)), Qt::DirectConnection);
