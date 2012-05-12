@@ -59,6 +59,8 @@ public:
 
     QnNetworkResourcePtr getNetResourceByMac(const QString &mac) const;
 
+    QnNetworkResourceList getAllNetResourceByMac(const QString &mac) const;
+
     // returns list of resources with such flag
     QnResourceList getResourcesWithFlag(QnResource::Flag flag) const;
 

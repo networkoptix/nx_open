@@ -228,6 +228,19 @@ QnNetworkResourcePtr QnResourcePool::getNetResourceByMac(const QString &mac) con
     return QnNetworkResourcePtr(0);
 }
 
+QnNetworkResourceList QnResourcePool::getAllNetResourceByMac(const QString &mac) const
+{
+    QnNetworkResourceList result;
+    QMutexLocker locker(&m_resourcesMtx);
+    foreach (const QnResourcePtr &resource, m_resources) {
+        QnNetworkResourcePtr netResource = resource.dynamicCast<QnNetworkResource>();
+        if (netResource != 0 && netResource->getMAC().toString() == mac)
+            result << netResource;
+    }
+
+    return result;
+}
+
 QnResourcePtr QnResourcePool::getResourceByUniqId(const QString &id) const
 {
     QMutexLocker locker(&m_resourcesMtx);
