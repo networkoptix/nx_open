@@ -20,7 +20,7 @@
 
 	<properties>
 		<build.configuration>release</build.configuration>
-		<!-- <BUILD_NUMBER>0</BUILD_NUMBER> -->
+		<buildNumber>${BUILD_NUMBER}</buildNumber>
 		<environment.dir>${env.ENVIRONMENT}</environment.dir>
 		<customization>default</customization>
 	</properties>
