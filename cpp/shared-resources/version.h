@@ -8,8 +8,8 @@ const char* const APPLICATION_REVISION="${changeSet}";
 const char* const FFMPEG_VERSION="${ffmpeg.version}";
 
 // These constans are here for windows resouce file.
-#define VER_FILEVERSION             ${parsedVersion.majorVersion},${parsedVersion.minorVersion},${parsedVersion.incrementalVersion},${buildNumber}
-#define VER_FILEVERSION_STR         "${project.version}.${buildNumber}"
+#define VER_FILEVERSION             ${parsedVersion.majorVersion},${parsedVersion.minorVersion},${parsedVersion.incrementalVersion},${BUILD_NUMBER}
+#define VER_FILEVERSION_STR         "${project.version}.${BUILD_NUMBER}"
 #define VER_PRODUCTVERSION          ${parsedVersion.majorVersion},${parsedVersion.minorVersion},${parsedVersion.incrementalVersion}
 #define VER_PRODUCTVERSION_STR      "${project.version}"
 #define VER_COMPANYNAME_STR         "${pom.parent.organization.name}"
