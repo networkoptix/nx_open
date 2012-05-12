@@ -211,7 +211,9 @@ QnAbstractStorageResourcePtr createDefaultStorage()
 
 void setServerNameAndUrls(QnVideoServerResourcePtr server, const QString& myAddress)
 {
-    server->setName(QString("Server ") + myAddress);
+    if (server->getName().isEmpty())
+        server->setName(QString("Server ") + myAddress);
+
 #ifdef _TEST_TWO_SERVERS
     server->setUrl(QString("rtsp://") + myAddress + QString(':') + QString::number(55001));
     server->setApiUrl(QString("http://") + myAddress + QString(':') + QString::number(55002));
