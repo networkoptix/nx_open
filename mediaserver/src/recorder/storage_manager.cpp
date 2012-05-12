@@ -115,6 +115,7 @@ void QnStorageManager::addStorage(QnStorageResourcePtr storage)
     m_storageRoots.insert(storage->getIndex(), storage);
     if (storage->isStorageAvailable())
         storage->setStatus(QnResource::Online);
+    connect(storage.data(), SIGNAL(archiveRangeChanged(qint64, qint64)), this, SLOT(at_archiveRangeChanged(qint64, qint64)), Qt::DirectConnection);
 }
 
 QnStorageManager::~QnStorageManager()
@@ -222,6 +223,21 @@ void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
             break; // nothing to delete
         freeSpace = storage->getFreeSpace();
     }
+}
+
+void QnStorageManager::at_archiveRangeChanged(qint64 newStartTimeMs, qint64 newEndTimeMs)
+{
+    QnStorageResource* storage = qobject_cast<QnStorageResource*> (sender());
+    if (!storage)
+        return;
+
+    int storageIndex = detectStorageIndex(storage->getUrl());
+
+    foreach(DeviceFileCatalogPtr catalogHi, m_devFileCatalogHi)
+        catalogHi->deleteRecordsByStorage(storageIndex, newStartTimeMs);
+    
+    foreach(DeviceFileCatalogPtr catalogLow, m_devFileCatalogLow)
+        catalogLow->deleteRecordsByStorage(storageIndex, newStartTimeMs);
 }
 
 QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStreamDataProvider* provider)
