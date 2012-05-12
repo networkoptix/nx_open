@@ -147,7 +147,7 @@
         <Property Id="CLIENT_DIRECTORY_REG" Secure="yes">
             <RegistrySearch Id="ClientDirectoryReg"
                             Root="HKCU"
-                            Key="Software\Network Optix\Network Optix HD Witness Client"
+                            Key="Software\[Manufacturer]\HD Witness Client"
                             Name="mediaRoot"
                             Type="raw"
                             Win64="no"/>
@@ -299,7 +299,7 @@
             <Directory Id="CLIENT_DIRECTORY" Name="Client Media">
                 <Component Id="ClientDirectoryComponent" Guid="{953EF7FD-01CF-432f-936C-43F07BC918DE}" Permanent="yes">
                     <CreateFolder Directory="CLIENT_DIRECTORY"/>
-                    <RegistryValue Root='HKCU' Key='Software\[Manufacturer]\Network Optix HD Witness Client' Type='string' Value='' KeyPath='yes' />
+                    <RegistryValue Root='HKCU' Key='Software\[Manufacturer]\HD Witness Client' Type='string' Value='' KeyPath='yes' />
                 </Component>
             </Directory>
 
@@ -501,7 +501,7 @@
                                 </Condition>
 
                                 <RegistryKey Root="HKCU"
-                                             Key="Software\[Manufacturer]\Network Optix HD Witness Client"
+                                             Key="Software\[Manufacturer]\HD Witness Client"
                                              Action="create">
                                     <RegistryValue Type="string" Name="afterFirstRun" Value="false"/>
                                     <RegistryValue Type="string" Name="appserverHost" Value="[CLIENT_APPSERVER_HOST]"/>
