@@ -1,25 +1,23 @@
 #ifndef QN_ACTION_CONDITIONS_H
 #define QN_ACTION_CONDITIONS_H
 
-#include <QObject>
-#include <QWeakPointer>
+#include <QtCore/QObject>
+#include <QtCore/QWeakPointer>
+
 #include <core/resource/resource_fwd.h>
 #include <core/resourcemanagment/resource_criterion.h>
+
+#include <recording/time_period.h>
 #include <ui/workbench/workbench_context_aware.h>
+
 #include "action_fwd.h"
 #include "actions.h"
 
 namespace Qn {
     enum MatchMode {
-        Any,        /**< Match if at least one resource satisfies the criterion. */
-        All,        /**< Match only if all resources satisfy the criterion. */
-        ExactlyOne  /**< Match only if exactly one resource satisfies condition. */
-    };
-
-    enum PeriodType {
-        NullPeriod,     /**< No period. */
-        EmptyPeriod,    /**< Period of zero length. */
-        NormalPeriod,   /**< Normal period with non-zero length. */
+        Any,            /**< Match if at least one resource satisfies the criterion. */
+        All,            /**< Match only if all resources satisfy the criterion. */
+        ExactlyOne      /**< Match only if exactly one resource satisfies condition. */
     };
 
 } // namespace Qn
@@ -28,22 +26,59 @@ namespace Qn {
 class QnActionParameters;
 class QnWorkbenchContext;
 
+/**
+ * Base class for implementing conditions that must be satisfied for the
+ * action to be triggerable via hotkey or visible in the menu.
+ */
 class QnActionCondition: public QObject, public QnWorkbenchContextAware {
 public:
+    /**
+     * Constructor.
+     * 
+     * \param parent                    Context-aware parent.
+     */
     QnActionCondition(QObject *parent = NULL);
 
+    /**
+     * Main condition checking function.
+     * 
+     * By default it forwards control to one of the specialized functions
+     * based on the type of the default parameter. Note that these
+     * specialized functions cannot access other parameters.
+     * 
+     * 
+     */
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters);
+
+    /**
+     * Specialized condition function that catches all action parameters that
+     * are convertible to a resource list (<tt>Qn::ResourceType</tt>).
+     */
     virtual Qn::ActionVisibility check(const QnResourceList &resources);
 
+    /**
+     * Specialized condition function that catches all action parameters that
+     * are convertible to a list of layout items (<tt>Qn::LayoutItemType</tt>).
+     */
     virtual Qn::ActionVisibility check(const QnLayoutItemIndexList &layoutItems);
 
+    /**
+     * Specialized condition function that catches all action parameters that
+     * are convertible to a list of resource widgets. (<tt>Qn::WidgetType</tt>).
+     */
     virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets);
 
+    /**
+     * Specialized condition function that catches all action parameters that
+     * are convertible to a list of workbench layouts. (<tt>Qn::LayoutType</tt>).
+     */
     virtual Qn::ActionVisibility check(const QnWorkbenchLayoutList &layouts);
-
-    virtual Qn::ActionVisibility check(const QnActionParameters &parameters);
 };
 
 
+/**
+ * Condition for a single resource widget that checks its zoomed state.
+ */
 class QnItemZoomedActionCondition: public QnActionCondition {
 public:
     QnItemZoomedActionCondition(bool requiredZoomedState, QObject *parent = NULL):
@@ -56,6 +91,7 @@ public:
 private:
     bool m_requiredZoomedState;
 };
+
 
 class QnMotionGridDisplayActionCondition: public QnActionCondition {
 public:
@@ -85,6 +121,9 @@ public:
 };
 
 
+/**
+ * QnResourceCriterion-based action condition.
+ */
 class QnResourceActionCondition: public QnActionCondition {
 public:
     QnResourceActionCondition(const QnResourceCriterion &criterion, Qn::MatchMode matchMode = Qn::All, QObject *parent = NULL);
@@ -109,6 +148,9 @@ private:
 };
 
 
+/**
+ * Condition for resource removal.
+ */
 class QnResourceRemovalActionCondition: public QnActionCondition {
 public:
     QnResourceRemovalActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
@@ -117,6 +159,9 @@ public:
 };
 
 
+/**
+ * Condition for removal of a layout item.
+ */
 class QnLayoutItemRemovalActionCondition: public QnActionCondition {
 public:
     QnLayoutItemRemovalActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
@@ -125,6 +170,9 @@ public:
 };
 
 
+/**
+ * Condition for saving of a layout.
+ */
 class QnSaveLayoutActionCondition: public QnActionCondition {
 public:
     QnSaveLayoutActionCondition(bool isCurrent, QObject *parent = NULL): QnActionCondition(parent), m_current(isCurrent) {}
@@ -136,17 +184,23 @@ private:
 };
 
 
+/**
+ * Condition based on the count of layouts that are currently open.
+ */
 class QnLayoutCountActionCondition: public QnActionCondition {
 public:
-    QnLayoutCountActionCondition(int requiredCount, QObject *parent = NULL): QnActionCondition(parent), m_requiredCount(requiredCount) {}
+    QnLayoutCountActionCondition(int minimalRequiredCount, QObject *parent = NULL): QnActionCondition(parent), m_minimalRequiredCount(minimalRequiredCount) {}
 
     virtual Qn::ActionVisibility check(const QnWorkbenchLayoutList &layouts) override;
 
 private:
-    int m_requiredCount;
+    int m_minimalRequiredCount;
 };
 
 
+/**
+ * Condition for taking screenshot of a resource widget.
+ */
 class QnTakeScreenshotActionCondition: public QnActionCondition {
 public:
     QnTakeScreenshotActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
@@ -155,9 +209,13 @@ public:
 };
 
 
+/**
+ * Condition that is based on the type of the time period provided as one
+ * of the arguments of the parameters pack.
+ */
 class QnTimePeriodActionCondition: public QnActionCondition {
 public:
-    QnTimePeriodActionCondition(Qn::PeriodType periodType, Qn::ActionVisibility nonMatchingVisibility, QObject *parent = NULL):
+    QnTimePeriodActionCondition(Qn::TimePeriodType periodType, Qn::ActionVisibility nonMatchingVisibility, QObject *parent = NULL):
         QnActionCondition(parent),
         m_periodType(periodType),
         m_nonMatchingVisibility(nonMatchingVisibility)
@@ -166,7 +224,7 @@ public:
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 
 private:
-    Qn::PeriodType m_periodType;
+    Qn::TimePeriodType m_periodType;
     Qn::ActionVisibility m_nonMatchingVisibility;
 };
 

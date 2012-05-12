@@ -32,7 +32,7 @@ public:
 
         ERROR_TEXT_COLOR,
 
-        /** Size of a single unit of workbench grid coordinates, in scene coordinates.
+        /** Size of a single unit of workbench grid, in scene coordinates.
          * This basically is the width of a single video item in scene coordinates. */
         WORKBENCH_UNIT_SIZE,
 

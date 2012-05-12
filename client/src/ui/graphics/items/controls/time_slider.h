@@ -84,8 +84,8 @@ public:
     void setLineComment(int line, const QString &comment);
     QString lineComment(int line);
 
-    QnTimePeriodList timePeriods(int line, Qn::TimePeriodType type) const;
-    void setTimePeriods(int line, Qn::TimePeriodType type, const QnTimePeriodList &timePeriods);
+    QnTimePeriodList timePeriods(int line, Qn::TimePeriodRole type) const;
+    void setTimePeriods(int line, Qn::TimePeriodRole type, const QnTimePeriodList &timePeriods);
 
     Options options() const;
     void setOptions(Options options);
@@ -186,7 +186,7 @@ private:
     void updateLineCommentPixmap(int line);
     void updateLineCommentPixmaps();
     void updateAggregationValue();
-    void updateAggregatedPeriods(int line, Qn::TimePeriodType type);
+    void updateAggregatedPeriods(int line, Qn::TimePeriodRole type);
     
     void animateStepValues(int deltaMSecs);
 
@@ -194,8 +194,8 @@ private:
     Q_DECLARE_PRIVATE(GraphicsSlider);
 
     struct TypedPeriods {
-        QnTimePeriodList normal[Qn::TimePeriodTypeCount];
-        QnTimePeriodList aggregated[Qn::TimePeriodTypeCount];
+        QnTimePeriodList normal[Qn::TimePeriodRoleCount];
+        QnTimePeriodList aggregated[Qn::TimePeriodRoleCount];
     };
 
     struct TimeStepData {

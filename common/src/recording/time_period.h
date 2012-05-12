@@ -7,6 +7,23 @@
 struct QnTimePeriod;
 class QnTimePeriodList;
 
+namespace Qn {
+    enum TimePeriodType {
+        NullTimePeriod,     /**< No period. */
+        EmptyTimePeriod,    /**< Period of zero length. */
+        NormalTimePeriod,   /**< Normal period with non-zero length. */
+        TimePeriodTypeCount
+    };
+
+    enum TimePeriodRole {
+        RecordingRole,
+        MotionRole,
+        TimePeriodRoleCount
+    };
+
+} // namespace Qn
+
+
 struct QN_EXPORT QnTimePeriod
 {
     /**
@@ -75,6 +92,19 @@ struct QN_EXPORT QnTimePeriod
         return startTimeMs == 0 && durationMs == 0;
     }
 
+    /**
+     * \return                          Type of this time period.
+     */
+    Qn::TimePeriodType type() const {
+        if(isNull()) {
+            return Qn::NullTimePeriod;
+        } else if(isEmpty()) {
+            return Qn::EmptyTimePeriod;
+        } else {
+            return Qn::NormalTimePeriod;
+        }
+    }
+
     /** Start time in milliseconds. */
     qint64 startTimeMs;
 
@@ -98,7 +128,7 @@ public:
      *                                  If false, position of an interval preceding the value is returned. 
      *                                  Otherwise, position of an interval that follows the value is returned. 
      *                                  Note that this position may equal <tt>end</tt>.
-     * \returns                         Position of a time period that is the closest to the given time value.
+     * \returns                         Position of a time period that is closest to the given time value.
      */
     const_iterator findNearestPeriod(qint64 timeMs, bool searchForward) const
     {
@@ -122,17 +152,10 @@ bool operator < (qint64 first, const QnTimePeriod& other);
 bool operator < (const QnTimePeriod& other, qint64 first);
 
 
-namespace Qn {
-    enum TimePeriodType {
-        RecordingTimePeriod,
-        MotionTimePeriod,
-        TimePeriodTypeCount
-    };
-
-} // namespace Qn
-
 Q_DECLARE_TYPEINFO(QnTimePeriod, Q_MOVABLE_TYPE);
+
 Q_DECLARE_METATYPE(Qn::TimePeriodType);
+Q_DECLARE_METATYPE(Qn::TimePeriodRole);
 Q_DECLARE_METATYPE(QnTimePeriod);
 
 #endif // QN_TIME_PERIOD_H

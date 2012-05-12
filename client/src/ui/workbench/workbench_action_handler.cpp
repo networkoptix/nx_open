@@ -33,7 +33,7 @@
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
-#include <ui/actions/action_target_types.h>
+#include <ui/actions/action_parameter_types.h>
 #include <ui/actions/action_target_provider.h>
 
 #include <ui/dialogs/about_dialog.h>
@@ -1042,7 +1042,7 @@ void QnWorkbenchActionHandler::at_removeLayoutItemAction_triggered() {
     if(items.size() > 1) {
         QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
             widget(),
-            QnActionTargetTypes::resources(items),
+            QnActionParameterTypes::resources(items),
             tr("Remove Items"),
             tr("Are you sure you want to remove these %n item(s) from layout?", 0, items.size()),
             QDialogButtonBox::Yes | QDialogButtonBox::No
@@ -1340,12 +1340,12 @@ void QnWorkbenchActionHandler::at_exportTimeSelectionAction_triggered() {
         return;
     parameters.setItems(provider->currentTarget(Qn::SceneScope));
 
-    if(parameters.itemsSize() != 1)
+    if(parameters.size() != 1)
     {
         QMessageBox::critical(
             this->widget(), 
             tr("Cannot export file"), 
-            tr("Exactly one item must be selected for export, but %n item(s) are currently selected.", NULL, parameters.itemsSize()), 
+            tr("Exactly one item must be selected for export, but %n item(s) are currently selected.", NULL, parameters.size()), 
             QMessageBox::Ok
         );
         return;

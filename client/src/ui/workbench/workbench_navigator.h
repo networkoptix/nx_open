@@ -114,9 +114,9 @@ protected slots:
     void updateSliderFromScrollBar();
 
     void updateCurrentPeriods();
-    void updateCurrentPeriods(Qn::TimePeriodType type);
+    void updateCurrentPeriods(Qn::TimePeriodRole type);
     void updateSyncedPeriods();
-    void updateSyncedPeriods(Qn::TimePeriodType type);
+    void updateSyncedPeriods(Qn::TimePeriodRole type);
     void updateLines();
 
     void updateLive();
@@ -135,8 +135,8 @@ protected slots:
     void at_widget_motionSelectionChanged(QnResourceWidget *widget);
     void at_widget_motionSelectionChanged();
 
-    void at_loader_periodsChanged(QnCachingTimePeriodLoader *loader, Qn::TimePeriodType type);
-    void at_loader_periodsChanged(Qn::TimePeriodType type);
+    void at_loader_periodsChanged(QnCachingTimePeriodLoader *loader, Qn::TimePeriodRole type);
+    void at_loader_periodsChanged(Qn::TimePeriodRole type);
 
     void at_timeSlider_valueChanged(qint64 value);
     void at_timeSlider_sliderPressed();

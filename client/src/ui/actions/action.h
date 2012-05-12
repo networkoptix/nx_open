@@ -16,25 +16,51 @@ class QnActionCondition;
 class QnActionManager;
 class QnActionParameters;
 
+/**
+ * Action class that hooks into actions infrastructure to correctly check
+ * conditions and provide proper targets even if it was triggered with a 
+ * hotkey.
+ */
 class QnAction: public QAction, public QnWorkbenchContextAware {
     Q_OBJECT;
 public:
-    QnAction(QnActionManager *manager, Qn::ActionId id, QObject *parent = NULL);
+    /**
+     * Constructor.
+     * 
+     * \param id                        Identifier of this action.
+     * \param parent                    Context-aware parent of this action.
+     */
+    QnAction(Qn::ActionId id, QObject *parent = NULL);
 
+    /**
+     * Virtual destructor.
+     */
     virtual ~QnAction();
 
+    /**
+     * \returns                         Identifier of this action.
+     */
     Qn::ActionId id() const {
         return m_id;
     }
 
+    /**
+     * \returns                         Scope of this action.
+     */
     Qn::ActionScopes scope() const {
         return static_cast<Qn::ActionScopes>(static_cast<int>(m_flags) & Qn::ScopeMask);
     }
 
-    Qn::ActionTargetTypes targetTypes() const {
-        return static_cast<Qn::ActionTargetTypes>(static_cast<int>(m_flags) & Qn::TargetTypeMask);
+    /**
+     * \returns                         Possible types of this action's targets.
+     */
+    Qn::ActionParameterTypes targetTypes() const {
+        return static_cast<Qn::ActionParameterTypes>(static_cast<int>(m_flags) & Qn::TargetTypeMask);
     }
 
+    /**
+     * \returns                         Permissions that are require
+     */
     Qn::Permissions requiredPermissions(const QString &target = QString()) const {
         return m_requiredPermissions.value(target);
     }
