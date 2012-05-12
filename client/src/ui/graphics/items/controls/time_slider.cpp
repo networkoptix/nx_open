@@ -239,7 +239,8 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     m_selectionValid(false),
     m_pixmapCache(QnTimeSliderPixmapCache::instance()),
     m_unzooming(false),
-    m_dragMarker(NoMarker)
+    m_dragMarker(NoMarker),
+	m_lineCount(0)
 {
     /* Set default property values. */
     setAcceptHoverEvents(true);
