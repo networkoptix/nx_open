@@ -78,9 +78,9 @@ except OSError, e:
 os.system(r'light -cultures:en-US -loc CustomStrings.wxl -ext WixFirewallExtension.dll -ext WixUIExtension.dll -ext WixUtilExtension.dll -out %s -pdbout bin\%s\EVEMediaPlayerSetup.wixpdb obj\%s\*.wixobj' % (output_file_msi, CONFIG, CONFIG))
 
 os.system(r'cscript FixExitDialog.js %s' % output_file_msi)
-os.system(r'setupbld -out %s -ms %s -setup setup.exe' % (output_file_exe, output_file_msi))
+# os.system(r'setupbld -out %s -ms %s -setup setup.exe' % (output_file_exe, output_file_msi))
 # os.unlink(output_file_msi)
 
-if not os.path.exists(output_file_exe):
+if not os.path.exists(output_file_msi):
     print >> sys.stderr, 'Output file is not created. Build failed'
     sys.exit(1)
