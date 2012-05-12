@@ -303,7 +303,6 @@
                 </Component>
             </Directory>
 
-
             <Directory Id="ProgramFilesFolder">
                 <Directory Id="NetworkOptix" Name="$(env.ORGANIZATION_NAME)">
                     <Directory Id="INSTALLDIR" Name="$(env.APPLICATION_NAME)">
@@ -402,10 +401,7 @@
                                 <File Id="ProxyQtGui$(var.suffix)4.dll" Name="QtGui$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtGui$(var.suffix)4.dll" />
                                 <File Id="ProxyQtMultimedia$(var.suffix)4.dll" Name="QtMultimedia$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtMultimedia$(var.suffix)4.dll" />
                                 <File Id="ProxyQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtNetwork$(var.suffix)4.dll" />
-                                <File Id="ProxyQtOpenGL$(var.suffix)4.dll" Name="QtOpenGL$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtOpenGL$(var.suffix)4.dll" />
-                                <File Id="ProxyQtWebKit$(var.suffix)4.dll" Name="QtWebKit$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtWebKit$(var.suffix)4.dll" />
                                 <File Id="ProxyQtXml$(var.suffix)4.dll" Name="QtXml$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtXml$(var.suffix)4.dll" />
-                                <File Id="ProxyQtXmlPatterns$(var.suffix)4.dll" Name="QtXmlPatterns$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtXmlPatterns$(var.suffix)4.dll" />
                             </Component>
                         </Directory>
                         
@@ -471,10 +467,7 @@
                                 <File Id="ServerQtGui$(var.suffix)4.dll" Name="QtGui$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtGui$(var.suffix)4.dll" />
                                 <File Id="ServerQtMultimedia$(var.suffix)4.dll" Name="QtMultimedia$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtMultimedia$(var.suffix)4.dll" />
                                 <File Id="ServerQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtNetwork$(var.suffix)4.dll" />
-                                <File Id="ServerQtOpenGL$(var.suffix)4.dll" Name="QtOpenGL$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtOpenGL$(var.suffix)4.dll" />
-                                <File Id="ServerQtWebKit$(var.suffix)4.dll" Name="QtWebKit$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtWebKit$(var.suffix)4.dll" />
                                 <File Id="ServerQtXml$(var.suffix)4.dll" Name="QtXml$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtXml$(var.suffix)4.dll" />
-                                <File Id="ServerQtXmlPatterns$(var.suffix)4.dll" Name="QtXmlPatterns$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtXmlPatterns$(var.suffix)4.dll" />
                             </Component>
                             
                             <Component Id="ServerOpenSSL" Guid="{DC94094B-CA8C-4be0-9A8A-6DA35FCC77E6}">
@@ -542,9 +535,7 @@
                                 <File Id="ClientQtMultimedia$(var.suffix)4.dll" Name="QtMultimedia$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtMultimedia$(var.suffix)4.dll" />
                                 <File Id="ClientQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtNetwork$(var.suffix)4.dll" />
                                 <File Id="ClientQtOpenGL$(var.suffix)4.dll" Name="QtOpenGL$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtOpenGL$(var.suffix)4.dll" />
-                                <File Id="ClientQtWebKit$(var.suffix)4.dll" Name="QtWebKit$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtWebKit$(var.suffix)4.dll" />
                                 <File Id="ClientQtXml$(var.suffix)4.dll" Name="QtXml$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtXml$(var.suffix)4.dll" />
-                                <File Id="ClientQtXmlPatterns$(var.suffix)4.dll" Name="QtXmlPatterns$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtXmlPatterns$(var.suffix)4.dll" />
                             </Component>
                             
                             <Component Id="ClientOpenAL" Guid="{FA1A8B92-3BEF-4779-90E9-2F76CC9D79D3}">
