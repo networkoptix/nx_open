@@ -135,7 +135,9 @@ void QnVideoServerResource::setPrimaryIF(const QString& primaryIF)
     QUrl url(getUrl());
     url.setHost(primaryIF);
     setUrl(url.toString());
-    setName(QString("Server ") + primaryIF);
+    if (getName().isEmpty())
+        setName(QString("Server ") + primaryIF);
+
     emit serverIFFound(primaryIF);
 }
 
