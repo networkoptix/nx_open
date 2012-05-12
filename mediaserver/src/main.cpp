@@ -211,7 +211,9 @@ QnAbstractStorageResourcePtr createDefaultStorage()
 
 void setServerNameAndUrls(QnVideoServerResourcePtr server, const QString& myAddress)
 {
-    server->setName(QString("Server ") + myAddress);
+    if (server->getName().isEmpty())
+        server->setName(QString("Server ") + myAddress);
+
 #ifdef _TEST_TWO_SERVERS
     server->setUrl(QString("rtsp://") + myAddress + QString(':') + QString::number(55001));
     server->setApiUrl(QString("http://") + myAddress + QString(':') + QString::number(55002));
@@ -517,6 +519,14 @@ void QnMain::run()
             QnSleep::msleep(1000);
     }
 
+    QByteArray errorString;
+
+    int status;
+    do
+    {
+        status = appServerConnection->setResourceStatus(m_videoServer->getId(), QnResource::Online, errorString);
+    } while (status != 0);
+
     initAppServerEventConnection(qSettings, m_videoServer);
     QnEventManager* eventManager = QnEventManager::instance();
     eventManager->run();
@@ -529,8 +539,6 @@ void QnMain::run()
     m_restServer = new QnRestServer(QHostAddress::Any, apiUrl.port());
     m_restServer->registerHandler("api/RecordedTimePeriods", new QnRecordedChunkListHandler());
     m_restServer->registerHandler("api/CheckPath", new QnFsHelperHandler());
-
-    QByteArray errorString;
 
     foreach (QnAbstractStorageResourcePtr storage, m_videoServer->getStorages())
     {
