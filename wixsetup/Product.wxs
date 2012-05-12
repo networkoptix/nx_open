@@ -147,7 +147,7 @@
         <Property Id="CLIENT_DIRECTORY_REG" Secure="yes">
             <RegistrySearch Id="ClientDirectoryReg"
                             Root="HKCU"
-                            Key="Software\Network Optix\Network Optix HD Witness Client"
+                            Key="Software\[Manufacturer]\Network Optix HD Witness Client"
                             Name="mediaRoot"
                             Type="raw"
                             Win64="no"/>

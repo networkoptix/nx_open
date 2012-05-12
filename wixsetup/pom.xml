@@ -21,7 +21,7 @@
 	<name>HD Witness Installer</name>
 
 	<build>
-		<outputDirectory>${arch}</outputDirectory>
+		<directory>${arch}</directory>
 		<sourceDirectory>${basedir}</sourceDirectory>
 		<finalName>${pom.parent.artifactId}-${version}.${buildNumber}-${platform}-${arch}-${build.configuration}-${customization}</finalName>
 	</build>
@@ -129,9 +129,13 @@
 									<outputDirectory>${project.build.directory}</outputDirectory>
 									<resources>
 										<resource>
-											<directory>${project.build.sourceDirectory}/maven</directory>
+											<directory>${project.build.sourceDirectory}/maven/wix-resources</directory>
 											<filtering>true</filtering>
 										</resource>
+										<resource>
+											<directory>${project.build.sourceDirectory}/maven/bin-resources</directory>
+											<filtering>false</filtering>
+										</resource>										
 									</resources>            
 									<encoding>UTF-8</encoding>
 								</configuration>            
