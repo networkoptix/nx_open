@@ -147,7 +147,7 @@
         <Property Id="CLIENT_DIRECTORY_REG" Secure="yes">
             <RegistrySearch Id="ClientDirectoryReg"
                             Root="HKCU"
-                            Key="Software\Network Optix\Network Optix HD Witness Client"
+                            Key="Software\[Manufacturer]\Network Optix HD Witness Client"
                             Name="mediaRoot"
                             Type="raw"
                             Win64="no"/>
@@ -175,12 +175,12 @@
         <CustomAction Id="AssignOldAppServerPort" Property="OLD_APPSERVER_PORT" Value="[APPSERVER_PORT]"/>
         <CustomAction Id="AssignOldServerRtspPort" Property="OLD_SERVER_RTSP_PORT" Value="[SERVER_RTSP_PORT]"/>
         <CustomAction Id="AssignOldServerApiPort" Property="OLD_SERVER_API_PORT" Value="[SERVER_API_PORT]"/>
-    	<CustomAction Id="AssignOldProxyPort" Property="OLD_PROXY_PORT" Value="[PROXY_PORT]"/>
+        <CustomAction Id="AssignOldProxyPort" Property="OLD_PROXY_PORT" Value="[PROXY_PORT]"/>
         
         <CustomAction Id="AssignAppServerPort" Property="APPSERVER_PORT" Value="[FREEPORT1]"/>
         <CustomAction Id="AssignServerRtspPort" Property="SERVER_RTSP_PORT" Value="[FREEPORT2]"/>
         <CustomAction Id="AssignServerApiPort" Property="SERVER_API_PORT" Value="[FREEPORT3]"/>
-    	<CustomAction Id="AssignProxyPort" Property="PROXY_PORT" Value="[FREEPORT4]"/>
+        <CustomAction Id="AssignProxyPort" Property="PROXY_PORT" Value="[FREEPORT4]"/>
         
         <!-- Assign default values for Quick installation -->
         <CustomAction Id="AssignServerAppServerPort" Property="SERVER_APPSERVER_PORT" Value="[APPSERVER_PORT]"/>
@@ -207,10 +207,10 @@
         <CustomAction Id="CloseTrayToolAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="ignore" Impersonate="no" />
         
-<!--        <CustomAction Id="LaunchApplication_cmd" Property="LaunchApplication" Value="[VmsTrayToolDir]traytool.exe" Execute="immediate"/>
+        <CustomAction Id="LaunchApplication_cmd" Property="LaunchApplication" Value="[VmsTrayToolDir]traytool.exe" Execute="immediate"/>
         <CustomAction Id="LaunchApplication" BinaryKey="WixCA" DllEntry="CAQuietExec" Execute="deferred" Return="ignore"/>
--->     
-        <CustomAction Id="LaunchApplication" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="traytool.exe" ExeCommand=""/>
+     
+<!--        <CustomAction Id="LaunchApplication" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="traytool.exe" ExeCommand=""/>-->
         <CustomAction Id="NoDowngrade" Error="NoDowngrade" /> 
         
         <!--        <CustomAction Id="StartAppOnExit" FileKey="ClientExe" ExeCommand="" Execute="immediate" Impersonate="yes" Return="asyncNoWait"/>-->
@@ -241,11 +241,11 @@
             <Custom Action="AssignOldAppServerPort" Before="AssignOldServerRtspPort">1</Custom>
             <Custom Action="AssignOldServerRtspPort" Before="AssignOldServerApiPort">1</Custom>
             <Custom Action="AssignOldServerApiPort" Before="AssignOldProxyPort">1</Custom>
-        	<Custom Action="AssignOldProxyPort" Before="AssignAppServerPort">1</Custom>
+            <Custom Action="AssignOldProxyPort" Before="AssignAppServerPort">1</Custom>
             <Custom Action="AssignAppServerPort" Before="AssignServerRtspPort">NOT APPSERVER_PORT</Custom>
             <Custom Action="AssignServerRtspPort" Before="AssignServerApiPort">NOT SERVER_RTSP_PORT</Custom>
             <Custom Action="AssignServerApiPort" Before="AssignProxyPort">NOT SERVER_API_PORT</Custom>
-        	<Custom Action="AssignProxyPort" Before="AssignServerAppServerPort">NOT PROXY_PORT</Custom>
+            <Custom Action="AssignProxyPort" Before="AssignServerAppServerPort">NOT PROXY_PORT</Custom>
             <Custom Action="AssignServerAppServerPort" Before="AssignClientAppServerPort">1</Custom>
             <Custom Action="AssignClientAppServerPort" Before="SetMoviesFolder">1</Custom>
             <Custom Action="SetMoviesFolder" Before="GenerateGuidsForServers">1</Custom>
@@ -281,8 +281,8 @@
             <Custom Action="InitDatabaseAction_Cmd" After="SyncDatabaseAction"><![CDATA[ $(var.VmsInstalling) AND &AppServerFeature=3 ]]></Custom>
             <Custom Action="InitDatabaseAction" After="InitDatabaseAction_Cmd"><![CDATA[ $(var.VmsInstalling) AND &AppServerFeature=3 ]]></Custom>
             
-<!--            <Custom Action="LaunchApplication_cmd" Before="LaunchApplication"><![CDATA[ !TrayToolFeature=3 OR &TrayToolFeature=3 ]]></Custom>-->
-            <Custom Action="LaunchApplication" After="InstallFinalize"><![CDATA[ (!AppServerFeature=3 OR &AppServerFeature=3 OR !ServerFeature=3 OR &ServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="LaunchApplication_cmd" Before="LaunchApplication"><![CDATA[ !TrayToolFeature=3 OR &TrayToolFeature=3 ]]></Custom>
+            <Custom Action="LaunchApplication" Before="InstallFinalize"><![CDATA[ (!AppServerFeature=3 OR &AppServerFeature=3 OR !ServerFeature=3 OR &ServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
         </InstallExecuteSequence>
         
         <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
@@ -302,7 +302,6 @@
                     <RegistryValue Root='HKCU' Key='Software\[Manufacturer]\Network Optix HD Witness Client' Type='string' Value='' KeyPath='yes' />
                 </Component>
             </Directory>
-
 
             <Directory Id="ProgramFilesFolder">
                 <Directory Id="NetworkOptix" Name="$(env.ORGANIZATION_NAME)">
@@ -349,7 +348,7 @@
                                 <RegistryKey Root="HKLM"
                                              Key="Software\[Manufacturer]\Enterprise Controller" Action="create">
                                     <RegistryValue Type="string" Name="port" Value="[APPSERVER_PORT]"/>
-                                	<RegistryValue Type="string" Name="proxyPort" Value="[PROXY_PORT]"/>
+                                    <RegistryValue Type="string" Name="proxyPort" Value="[PROXY_PORT]"/>
                                     <RegistryValue Type="string" Name="login" Value="[APPSERVER_LOGIN]"/>
                                     <RegistryValue Type="string" Name="password" Value="[APPSERVER_PASSWORD]"/>
                                 </RegistryKey>
@@ -402,13 +401,10 @@
                                 <File Id="ProxyQtGui$(var.suffix)4.dll" Name="QtGui$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtGui$(var.suffix)4.dll" />
                                 <File Id="ProxyQtMultimedia$(var.suffix)4.dll" Name="QtMultimedia$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtMultimedia$(var.suffix)4.dll" />
                                 <File Id="ProxyQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtNetwork$(var.suffix)4.dll" />
-                                <File Id="ProxyQtOpenGL$(var.suffix)4.dll" Name="QtOpenGL$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtOpenGL$(var.suffix)4.dll" />
-                                <File Id="ProxyQtWebKit$(var.suffix)4.dll" Name="QtWebKit$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtWebKit$(var.suffix)4.dll" />
                                 <File Id="ProxyQtXml$(var.suffix)4.dll" Name="QtXml$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtXml$(var.suffix)4.dll" />
-                                <File Id="ProxyQtXmlPatterns$(var.suffix)4.dll" Name="QtXmlPatterns$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtXmlPatterns$(var.suffix)4.dll" />
                             </Component>
                         </Directory>
-                    	
+                        
                         <Directory Id="VmsMediaServerDir" Name="MediaServer">
                             <Component Id="ServerExecutable" Guid="06DFA703-0266-4970-BAC1-3730BF7D1C66">
                                 <File Id="ServerExe" Name="mediaserver.exe" Source="../mediaserver/bin/$(env.CONFIG)/mediaserver.exe" KeyPath="yes">
@@ -471,10 +467,7 @@
                                 <File Id="ServerQtGui$(var.suffix)4.dll" Name="QtGui$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtGui$(var.suffix)4.dll" />
                                 <File Id="ServerQtMultimedia$(var.suffix)4.dll" Name="QtMultimedia$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtMultimedia$(var.suffix)4.dll" />
                                 <File Id="ServerQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtNetwork$(var.suffix)4.dll" />
-                                <File Id="ServerQtOpenGL$(var.suffix)4.dll" Name="QtOpenGL$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtOpenGL$(var.suffix)4.dll" />
-                                <File Id="ServerQtWebKit$(var.suffix)4.dll" Name="QtWebKit$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtWebKit$(var.suffix)4.dll" />
                                 <File Id="ServerQtXml$(var.suffix)4.dll" Name="QtXml$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtXml$(var.suffix)4.dll" />
-                                <File Id="ServerQtXmlPatterns$(var.suffix)4.dll" Name="QtXmlPatterns$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtXmlPatterns$(var.suffix)4.dll" />
                             </Component>
                             
                             <Component Id="ServerOpenSSL" Guid="{DC94094B-CA8C-4be0-9A8A-6DA35FCC77E6}">
@@ -542,9 +535,7 @@
                                 <File Id="ClientQtMultimedia$(var.suffix)4.dll" Name="QtMultimedia$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtMultimedia$(var.suffix)4.dll" />
                                 <File Id="ClientQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtNetwork$(var.suffix)4.dll" />
                                 <File Id="ClientQtOpenGL$(var.suffix)4.dll" Name="QtOpenGL$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtOpenGL$(var.suffix)4.dll" />
-                                <File Id="ClientQtWebKit$(var.suffix)4.dll" Name="QtWebKit$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtWebKit$(var.suffix)4.dll" />
                                 <File Id="ClientQtXml$(var.suffix)4.dll" Name="QtXml$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtXml$(var.suffix)4.dll" />
-                                <File Id="ClientQtXmlPatterns$(var.suffix)4.dll" Name="QtXmlPatterns$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtXmlPatterns$(var.suffix)4.dll" />
                             </Component>
                             
                             <Component Id="ClientOpenAL" Guid="{FA1A8B92-3BEF-4779-90E9-2F76CC9D79D3}">
@@ -620,7 +611,7 @@
             <ComponentRef Id="ecs.log" />           
             <ComponentRef Id="AppServerConfiguration"/>
             <ComponentRef Id="AppServerConfigurationGuid"/>
-        	
+            
             <ComponentRef Id="ProxyExecutable" />
             <ComponentRef Id="ProxyQTLibraries" />
         </Feature>

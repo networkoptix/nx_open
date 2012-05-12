@@ -696,7 +696,7 @@ int QnRtspConnectionProcessor::composeSetParameter()
             checkQuality();
             d->qualityFastSwitch = false;
 
-            if (d->liveMode)
+            if (d->liveMode == Mode_Live)
             {
                 d->dataProcessor->lockDataQueue();
 

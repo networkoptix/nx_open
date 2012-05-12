@@ -96,9 +96,8 @@ void QnSettings::load()
     m_data.backgroundColor = QColor(5, 5, 50);
 #endif
     m_data.maxVideoItems = m_settings->value("maxVideoItems", 32).toInt();
-    m_data.downmixAudio = (m_settings->value("downmixAudio") == "true");
-    m_data.openLayoutsOnLogin = true;
-
+    m_data.downmixAudio = m_settings->value("downmixAudio").toBool();
+    m_data.openLayoutsOnLogin = m_settings->value("openLayoutsOnLogin", false).toBool();
 
     if (m_data.mediaRoot.isEmpty())
         m_data.mediaRoot = getMoviesDirectory() + QLatin1String("/EVE Media/");
