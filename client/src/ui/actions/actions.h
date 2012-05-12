@@ -410,6 +410,11 @@ namespace Qn {
          */
         ExportTimeSelectionAction,
 
+        /**
+         * Exports whole layout
+         */
+        ExportLayoutAction,
+
 
         ActionCount,
 

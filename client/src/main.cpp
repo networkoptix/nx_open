@@ -55,6 +55,7 @@
 #include "plugins/storage/file_storage/file_storage_resource.h"
 #include "plugins/storage/file_storage/qtfile_storage_resource.h"
 #include "core/resource/camera_history.h"
+#include "plugins/storage/file_storage/layout_storage_resource.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -87,6 +88,7 @@ void ffmpegInit()
 
     QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true); // true means use it plugin if no <protocol>:// prefix
     QnStoragePluginFactory::instance()->registerStoragePlugin("qtfile", QnQtFileStorageResource::instance);
+    QnStoragePluginFactory::instance()->registerStoragePlugin("layout", QnLayoutFileStorageResource::instance);
 
     /*
     extern URLProtocol ufile_protocol;

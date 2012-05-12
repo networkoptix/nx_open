@@ -14,28 +14,23 @@ CLVideoCamera::CLVideoCamera(QnMediaResourcePtr resource, bool generateEndOfStre
     m_extTimeSrc(0),
     m_isVisible(true),
     m_exportRecorder(0),
-    m_exportReader(0)
+    m_exportReader(0),
+    m_progressOffset(0)
 {
-    cl_log.log(QLatin1String("Creating camera for "), m_resource->toString(), cl_logDEBUG1);
+    if (m_resource)
+        cl_log.log(QLatin1String("Creating camera for "), m_resource->toString(), cl_logDEBUG1);
+    if (m_reader) {
+	    m_reader->addDataProcessor(&m_camdispay);
+        connect(m_reader, SIGNAL(streamPaused()), &m_camdispay, SLOT(onReaderPaused()), Qt::DirectConnection);
+        connect(m_reader, SIGNAL(streamResumed()), &m_camdispay, SLOT(onReaderResumed()), Qt::DirectConnection);
+        connect(m_reader, SIGNAL(prevFrameOccured()), &m_camdispay, SLOT(onPrevFrameOccured()), Qt::DirectConnection);
+        connect(m_reader, SIGNAL(nextFrameOccured()), &m_camdispay, SLOT(onNextFrameOccured()), Qt::DirectConnection);
 
-    int videonum = resource->getVideoLayout(m_reader)->numberOfChannels();// how many sensors camera has
-
-    //m_stat = new QnStatistics[videonum]; // array of statistics
-
-	m_reader->addDataProcessor(&m_camdispay);
-    //connect(m_reader, SIGNAL(jumpOccured(qint64, bool)), &m_camdispay, SLOT(jump(qint64)), Qt::DirectConnection);
-    connect(m_reader, SIGNAL(streamPaused()), &m_camdispay, SLOT(onReaderPaused()), Qt::DirectConnection);
-    connect(m_reader, SIGNAL(streamResumed()), &m_camdispay, SLOT(onReaderResumed()), Qt::DirectConnection);
-    connect(m_reader, SIGNAL(prevFrameOccured()), &m_camdispay, SLOT(onPrevFrameOccured()), Qt::DirectConnection);
-    connect(m_reader, SIGNAL(nextFrameOccured()), &m_camdispay, SLOT(onNextFrameOccured()), Qt::DirectConnection);
-
-    connect(m_reader, SIGNAL(slowSourceHint()), &m_camdispay, SLOT(onSlowSourceHint()), Qt::DirectConnection);
-    connect(m_reader, SIGNAL(beforeJump(qint64)), &m_camdispay, SLOT(onBeforeJump(qint64)), Qt::DirectConnection);
-    connect(m_reader, SIGNAL(jumpOccured(qint64)), &m_camdispay, SLOT(onJumpOccured(qint64)), Qt::DirectConnection);
-    connect(m_reader, SIGNAL(jumpCanceled(qint64)), &m_camdispay, SLOT(onJumpCanceled(qint64)), Qt::DirectConnection);
-    
-
-	//m_reader->setStatistics(m_stat);
+        connect(m_reader, SIGNAL(slowSourceHint()), &m_camdispay, SLOT(onSlowSourceHint()), Qt::DirectConnection);
+        connect(m_reader, SIGNAL(beforeJump(qint64)), &m_camdispay, SLOT(onBeforeJump(qint64)), Qt::DirectConnection);
+        connect(m_reader, SIGNAL(jumpOccured(qint64)), &m_camdispay, SLOT(onJumpOccured(qint64)), Qt::DirectConnection);
+        connect(m_reader, SIGNAL(jumpCanceled(qint64)), &m_camdispay, SLOT(onJumpCanceled(qint64)), Qt::DirectConnection);
+    }    
 
     if (m_GenerateEndOfStreamSignal)
         connect(&m_camdispay, SIGNAL( reachedTheEnd() ), this, SLOT( onReachedTheEnd() ));
@@ -43,7 +38,8 @@ CLVideoCamera::CLVideoCamera(QnMediaResourcePtr resource, bool generateEndOfStre
 
 CLVideoCamera::~CLVideoCamera()
 {
-	cl_log.log(QLatin1String("Destroy camera for "), m_resource->toString(), cl_logDEBUG1);
+    if (m_resource)
+	    cl_log.log(QLatin1String("Destroy camera for "), m_resource->toString(), cl_logDEBUG1);
 
 	stopDisplay();
 	delete m_reader;
@@ -177,7 +173,7 @@ void CLVideoCamera::onReachedTheEnd()
         emit reachedTheEnd();
 }
 
-void CLVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, const QString& fileName, const QString& format)
+void CLVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, const QString& fileName, const QString& format, QnStorageResourcePtr storage)
 {
     if (startTime > endTime)
         qSwap(startTime, endTime);
@@ -195,9 +191,11 @@ void CLVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, co
 
         m_exportRecorder = new QnStreamRecorder(m_resource);
         m_exportRecorder->disconnect(this);
+        if (storage)
+            m_exportRecorder->setStorage(storage);
         connect(m_exportRecorder, SIGNAL(recordingFailed(QString)), this, SIGNAL(exportFailed(QString)));
         connect(m_exportRecorder, SIGNAL(recordingFinished(QString)), this, SLOT(onExportFinished(QString)));
-        connect(m_exportRecorder, SIGNAL(recordingProgress(int)), this, SIGNAL(exportProgress(int)));
+        connect(m_exportRecorder, SIGNAL(recordingProgress(int)), this, SLOT(at_exportProgress(int)));
     }
 
     m_exportRecorder->clearUnprocessedData();
@@ -221,6 +219,11 @@ void CLVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, co
     m_exportRecorder->start();
 }
 
+void CLVideoCamera::at_exportProgress(int value)
+{
+    emit exportProgress(value + m_progressOffset);
+}
+
 void CLVideoCamera::onExportFinished(QString fileName)
 {
     stopExport();
@@ -237,4 +240,19 @@ void CLVideoCamera::stopExport()
     delete m_exportRecorder;
     m_exportReader = 0;
     m_exportRecorder = 0;
+}
+
+void CLVideoCamera::setResource(QnMediaResourcePtr resource)
+{
+    m_resource = resource;
+}
+
+void CLVideoCamera::setExportProgressOffset(int value)
+{
+    m_progressOffset = value;
+}
+
+int CLVideoCamera::getExportProgressOffset() const
+{
+    return m_progressOffset;
 }

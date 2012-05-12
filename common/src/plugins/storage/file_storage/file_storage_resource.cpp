@@ -30,8 +30,6 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
     return rez;
 }
 
-
-
 QnFileStorageResource::QnFileStorageResource()
 {
 };

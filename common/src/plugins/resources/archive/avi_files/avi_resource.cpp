@@ -34,7 +34,10 @@ QString QnAviResource::toString() const
 QnAbstractStreamDataProvider* QnAviResource::createDataProviderInternal(ConnectionRole /*role*/)
 {
     QnArchiveStreamReader* result = new QnArchiveStreamReader(toSharedPointer());
-    result->setArchiveDelegate(new QnAviArchiveDelegate());
+    QnAviArchiveDelegate* aviDelegate = new QnAviArchiveDelegate();
+    if (m_storage)
+        aviDelegate->setStorage(m_storage);
+    result->setArchiveDelegate(aviDelegate);
     if (checkFlags(still_image))
         result->setCycleMode(false);
 
@@ -57,4 +60,9 @@ const QnResourceAudioLayout* QnAviResource::getAudioLayout(const QnAbstractMedia
         return archiveReader->getDPAudioLayout();
 
     return QnMediaResource::getAudioLayout();
+}
+
+void QnAviResource::setStorage(QnStorageResourcePtr storage)
+{
+    m_storage = storage;
 }

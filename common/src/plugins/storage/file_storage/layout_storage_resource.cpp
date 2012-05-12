@@ -3,38 +3,65 @@
 #include "utils/common/util.h"
 #include "utils/common/buffered_file.h"
 
-class QnLayoutFile: public QFile
+class QnLayoutFile: public QIODevice
 {
 public:
     QnLayoutFile(QnLayoutFileStorageResource& storageResource, const QString& fileName):
-        QFile(storageResource.getUrl()),
+        m_file(QnLayoutFileStorageResource::removeProtocolPrefix(storageResource.getUrl())),
         m_storageResource(storageResource),
-        m_fileOffset(0)
+        m_fileOffset(0),
+        m_fileSize(0)
     {
-        m_fileName = fileName;
+        m_fileName = fileName.mid(fileName.indexOf('?')+1);
     }
 
     virtual bool seek(qint64 offset) override
     {
-        return QFile::seek(offset + m_fileOffset);
+        return m_file.seek(offset + m_fileOffset);
+    }
+
+    virtual qint64 size() const
+    {
+        return m_fileSize;   
+    }
+
+    virtual qint64 pos() const
+    {
+        return m_file.pos() - m_fileOffset;
+    }
+
+    virtual qint64	readData (char * data, qint64 maxSize ) override
+    {
+        return m_file.read(data, qMin(m_fileSize - pos(), maxSize));
+    }
+
+    virtual qint64	writeData (const char * data, qint64 maxSize ) override
+    {
+        return m_file.write(data, maxSize);
     }
 
     virtual bool open(QIODevice::OpenMode openMode) override
     {
-        if (openMode & QIODevice::WriteOnly) {
+        if (openMode & QIODevice::WriteOnly) 
+        {
             if (!m_storageResource.addFileEntry(m_fileName))
                 return false;
+            openMode |= QIODevice::Append;
         }
 
-        bool rez = QFile::open(openMode);
-        if (!rez)
-            return rez;
-        m_fileOffset = m_storageResource.getFileOffset(m_fileName);
+        if (!m_file.open(openMode))
+            return false;
+        m_fileOffset = m_storageResource.getFileOffset(m_fileName, &m_fileSize);
+        if (m_fileOffset == -1)
+            return false;
+        m_file.seek(m_fileOffset);
 
-        return rez;
+        return QIODevice::open(openMode);
     }
 
 private:
+    QFile m_file;
+    qint64 m_fileSize;
     QString m_fileName;
     qint64 m_fileOffset;
     QnLayoutFileStorageResource& m_storageResource;
@@ -42,9 +69,7 @@ private:
 
 QIODevice* QnLayoutFileStorageResource::open(const QString& url, QIODevice::OpenMode openMode)
 {
-    QString fileName = removeProtocolPrefix(url);
-
-    QFile* rez = new QFile(fileName);
+    QnLayoutFile* rez = new QnLayoutFile(*this, url);
     if (!rez->open(openMode))
     {
         delete rez;
@@ -108,7 +133,7 @@ QFileInfoList QnLayoutFileStorageResource::getFileList(const QString& dirName)
 
 bool QnLayoutFileStorageResource::isStorageAvailable()
 {
-    QString tmpDir = closeDirPath(getUrl()) + QString("tmp") + QString::number(rand());
+    QString tmpDir = closeDirPath(removeProtocolPrefix(getUrl())) + QString("tmp") + QString::number(rand());
     QDir dir(tmpDir);
     if (dir.exists()) {
         dir.remove(tmpDir);
@@ -150,7 +175,7 @@ bool QnLayoutFileStorageResource::isStorageAvailableForWriting()
 
 void QnLayoutFileStorageResource::readIndexHeader()
 {
-    QFile file(getUrl());
+    QFile file(removeProtocolPrefix(getUrl()));
     if (file.open(QIODevice::ReadOnly))
         file.read((char*) &m_index, sizeof(m_index));
 }
@@ -160,7 +185,7 @@ bool QnLayoutFileStorageResource::addFileEntry(const QString& fileName)
     if (m_index.entryCount >= MAX_FILES_AT_LAYOUT)
         return false;
 
-    QFile file(getUrl());
+    QFile file(removeProtocolPrefix(getUrl()));
     qint64 fileSize = file.size();
     if (fileSize > 0)
         readIndexHeader();
@@ -169,22 +194,30 @@ bool QnLayoutFileStorageResource::addFileEntry(const QString& fileName)
 
     m_index.entries[m_index.entryCount++] = QnLayoutFileIndexEntry(fileSize, qHash(fileName));
 
-    if (file.open(QIODevice::WriteOnly))
-        file.write((const char*) &m_index, sizeof(m_index));
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Append))
+        return false;
+    file.seek(0);
+    file.write((const char*) &m_index, sizeof(m_index));
     file.seek(fileSize);
     QByteArray utf8FileName = fileName.toUtf8();
+    utf8FileName.append('\0');
     file.write(utf8FileName);
 
     return true;
 }
 
-qint64 QnLayoutFileStorageResource::getFileOffset(const QString& fileName)
+qint64 QnLayoutFileStorageResource::getFileOffset(const QString& fileName, qint64* fileSize)
 {
-    QFile file(getUrl());
+    *fileSize = 0;
+    if (m_index.entryCount == 0)
+        readIndexHeader();
+
+    QFile file(removeProtocolPrefix(getUrl()));
     if (!file.open(QIODevice::ReadOnly))
         return -1;
 
     quint32 hash = qHash(fileName);
+    QByteArray utf8FileName = fileName.toUtf8();
     for (int i = 0; i < m_index.entryCount; ++i)
     {
         if (m_index.entries[i].fileNameCrc == hash)
@@ -192,8 +225,16 @@ qint64 QnLayoutFileStorageResource::getFileOffset(const QString& fileName)
             file.seek(m_index.entries[i].offset);
             char tmpBuffer[1024]; // buffer size is max file len
             int readed = file.read(tmpBuffer, sizeof(tmpBuffer));
-            if (fileName == QString::fromUtf8(tmpBuffer, readed))
-                return m_index.entries[i].offset;
+            QByteArray readedFileName(tmpBuffer, qMin(readed, utf8FileName.length()));
+            if (utf8FileName == readedFileName) 
+            {
+                qint64 offset = m_index.entries[i].offset + fileName.toUtf8().length()+1;
+                if (i < m_index.entryCount-1)
+                    *fileSize = m_index.entries[i+1].offset - offset;
+                else
+                    *fileSize = file.size() - offset;
+                return offset;
+            }
         }
     }
     return -1;

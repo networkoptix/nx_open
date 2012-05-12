@@ -16,7 +16,7 @@ class CLVideoCamera : public QObject
 {
     Q_OBJECT
 public:
-    CLVideoCamera(QnMediaResourcePtr resource, bool generateEndOfStreamSignal, QnAbstractMediaStreamDataProvider* reader);
+    CLVideoCamera(QnMediaResourcePtr resource, bool generateEndOfStreamSignal = false, QnAbstractMediaStreamDataProvider* reader = 0);
     virtual ~CLVideoCamera();
 
     void startRecording();
@@ -46,8 +46,11 @@ public:
     bool isVisible() const { return m_isVisible; }
     void setVisible(bool value) { m_isVisible = value; }
 
-    void exportMediaPeriodToFile(qint64 startTime, qint64 endTime, const QString& fileName, const QString& format);
+    void exportMediaPeriodToFile(qint64 startTime, qint64 endTime, const QString& fileName, const QString& format, QnStorageResourcePtr storage = QnStorageResourcePtr());
 
+    void setResource(QnMediaResourcePtr resource);
+    void setExportProgressOffset(int value);
+    int getExportProgressOffset() const;
 signals:
     void reachedTheEnd();
     void recordingFailed(QString errMessage);
@@ -65,7 +68,7 @@ public slots:
 
 protected slots:
     void onReachedTheEnd();
-
+    void at_exportProgress(int value);
 private:
     bool m_isVisible;
     QnMediaResourcePtr m_resource;
@@ -80,6 +83,7 @@ private:
 
     QnStreamRecorder* m_exportRecorder;
     QnAbstractArchiveReader* m_exportReader;
+    int m_progressOffset;
 };
 
 #endif //clcamera_h_1451
