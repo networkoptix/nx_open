@@ -156,6 +156,7 @@ public:
    *   @return false if unable to establish connection
    */
   bool connect(const QString &foreignAddress, unsigned short foreignPort);
+  void shutdown();
   virtual void close();
   void setReadTimeOut( unsigned int ms );
   void setWriteTimeOut( unsigned int ms );
