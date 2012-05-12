@@ -21,7 +21,6 @@
 	<name>HD Witness Installer</name>
 
 	<build>
-		<arch>x86</arch>
 		<outputDirectory>${arch}</outputDirectory>
 		<sourceDirectory>${basedir}</sourceDirectory>
 		<finalName>${pom.parent.artifactId}-${version}.${buildNumber}-${platform}-${arch}-${build.configuration}-${customization}</finalName>
