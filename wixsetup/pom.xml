@@ -23,7 +23,7 @@
 	<build>
 		<directory>${arch}</directory>
 		<sourceDirectory>${basedir}</sourceDirectory>
-		<finalName>${pom.parent.artifactId}-${version}.${buildNumber}-${platform}-${arch}-${build.configuration}-${customization}</finalName>
+		<finalName>${pom.parent.artifactId}-${version}.${BUILD_NUMBER}-${platform}-${arch}-${build.configuration}-${customization}</finalName>
 	</build>
 
 	<properties>
