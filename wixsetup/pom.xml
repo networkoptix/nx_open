@@ -54,7 +54,7 @@
 										<artifactItem>
 											<groupId>com.networkoptix.hdwitness</groupId>
 											<artifactId>appserver</artifactId>
-											<version>1.0</version>
+											<version>${project.version}</version>
 											<type>zip</type>
 											<classifier>${platform}-exec</classifier>
 											<overWrite>false</overWrite>
@@ -64,17 +64,17 @@
 										<artifactItem>
 											<groupId>com.networkoptix.hdwitness</groupId>
 											<artifactId>appserver</artifactId>
-											<version>1.0</version>
+											<version>${project.version}</version>
 											<type>zip</type>
 											<classifier>${platform}-exec</classifier>
 											<overWrite>false</overWrite>
-											<includes>ecs.exe,db/ecs.db</includes>
+											<includes>ecs.exe</includes>
 											<outputDirectory>${project.build.directory}/files</outputDirectory>
 										</artifactItem>								
 										<artifactItem>
 											<groupId>com.networkoptix.hdwitness</groupId>
 											<artifactId>client</artifactId>
-											<version>1.0</version>
+											<version>${project.version}</version>
 											<type>zip</type>
 											<classifier>${platform}-${arch}-${build.configuration}-exec</classifier>
 											<overWrite>false</overWrite>
@@ -83,7 +83,7 @@
 										<artifactItem>
 											<groupId>com.networkoptix.hdwitness</groupId>
 											<artifactId>mediaserver</artifactId>
-											<version>1.0</version>
+											<version>${project.version}</version>
 											<type>zip</type>
 											<classifier>${platform}-${arch}-${build.configuration}-exec</classifier>
 											<overWrite>false</overWrite>
@@ -92,7 +92,7 @@
 										<artifactItem>
 											<groupId>com.networkoptix.hdwitness</groupId>
 											<artifactId>traytool</artifactId>
-											<version>1.0</version>
+											<version>${project.version}</version>
 											<type>zip</type>
 											<classifier>${platform}-${arch}-${build.configuration}-exec</classifier>
 											<overWrite>false</overWrite>
@@ -101,7 +101,7 @@
 										<artifactItem>
 											<groupId>com.networkoptix.hdwitness</groupId>
 											<artifactId>mediaproxy</artifactId>
-											<version>1.0</version>
+											<version>${project.version}</version>
 											<type>zip</type>
 											<classifier>${platform}-${arch}-${build.configuration}-exec</classifier>
 											<overWrite>false</overWrite>
