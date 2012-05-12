@@ -334,6 +334,14 @@ void DeviceFileCatalog::updateDuration(int durationMs)
     str.flush();
 }
 
+void DeviceFileCatalog::deleteRecordsBeforeTime(qint64 timeMs)
+{
+    QMutexLocker lock(&m_mutex);
+    while (!m_chunks.isEmpty() && m_firstDeleteCount < m_chunks.size() && m_chunks[m_firstDeleteCount].startTimeMs < timeMs)
+        deleteFirstRecord();
+}
+
+
 void DeviceFileCatalog::deleteRecordsBefore(int idx)
 {
     int count = idx - m_firstDeleteCount; // m_firstDeleteCount may be changed during delete
@@ -346,6 +354,33 @@ void DeviceFileCatalog::clear()
     while(m_firstDeleteCount < m_chunks.size())
         deleteFirstRecord();
 }
+
+void DeviceFileCatalog::deleteRecordsByStorage(int storageIndex, qint64 timeMs)
+{
+    QMutexLocker lock(&m_mutex);
+
+    if (m_firstDeleteCount > 0) {
+        emit firstDataRemoved(m_firstDeleteCount);
+        m_chunks.erase(m_chunks.begin(), m_chunks.begin() + m_firstDeleteCount);
+        m_firstDeleteCount = 0;
+    }
+    for (int i = 0; i < m_chunks.size();)
+    {
+        if (m_chunks[i].storageIndex == storageIndex)
+        {
+            if (m_chunks[i].startTimeMs < timeMs)
+                m_chunks.remove(i);
+            else
+                break;
+
+        }
+        else {
+            ++i;
+        }
+    }
+
+}
+
 
 bool DeviceFileCatalog::deleteFirstRecord()
 {

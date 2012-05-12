@@ -16,6 +16,7 @@
 #include <utils/common/delete_later.h>
 
 #include <core/resource/layout_resource.h>
+#include <core/resource/camera_history.h>
 #include <core/resourcemanagment/resource_pool.h>
 #include <camera/resource_display.h>
 #include <camera/camera.h>
@@ -293,8 +294,8 @@ void QnWorkbenchDisplay::deinitSceneContext() {
         delete m_gridItem.data();
 
     /* Deinit workbench. */
-    disconnect(context(), NULL, this, NULL);
     disconnect(workbench(), NULL, this, NULL);
+    disconnect(qnHistoryPool, NULL, this, NULL);
 
     for(int i = 0; i < Qn::ItemRoleCount; i++)
         at_workbench_itemChanged(static_cast<Qn::ItemRole>(i), NULL);
@@ -341,12 +342,13 @@ void QnWorkbenchDisplay::initSceneContext() {
     m_gridItem.data()->setMapper(workbench()->mapper());
     m_gridItem.data()->setAnimationTimer(m_animationInstrument->animationTimer());
 
-    /* Connect to workbench. */
+    /* Connect to context. */
     connect(workbench(),            SIGNAL(itemChanged(Qn::ItemRole)),              this,                   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
     connect(workbench(),            SIGNAL(itemAdded(QnWorkbenchItem *)),           this,                   SLOT(at_workbench_itemAdded(QnWorkbenchItem *)));
     connect(workbench(),            SIGNAL(itemRemoved(QnWorkbenchItem *)),         this,                   SLOT(at_workbench_itemRemoved(QnWorkbenchItem *)));
     connect(workbench(),            SIGNAL(boundingRectChanged()),                  this,                   SLOT(fitInView()));
     connect(workbench(),            SIGNAL(currentLayoutChanged()),                 this,                   SLOT(at_workbench_currentLayoutChanged()));
+    connect(qnHistoryPool,          SIGNAL(currentCameraChanged(const QnNetworkResourcePtr &)), this,       SLOT(at_historyPool_currentCameraChanged(const QnNetworkResourcePtr &)));
 
     /* Connect to grid mapper. */
     QnWorkbenchGridMapper *mapper = workbench()->mapper();
@@ -495,11 +497,11 @@ WidgetAnimator *QnWorkbenchDisplay::animator(QnResourceWidget *widget) {
 }
 
 QnResourceWidget *QnWorkbenchDisplay::widget(QnWorkbenchItem *item) const {
-    return m_widgetByItem[item];
+    return m_widgetByItem.value(item);
 }
 
 QnResourceWidget *QnWorkbenchDisplay::widget(QnAbstractRenderer *renderer) const {
-    return m_widgetByRenderer[renderer];
+    return m_widgetByRenderer.value(renderer);
 }
 
 QnResourceWidget *QnWorkbenchDisplay::widget(Qn::ItemRole role) const {
@@ -508,6 +510,10 @@ QnResourceWidget *QnWorkbenchDisplay::widget(Qn::ItemRole role) const {
 
 QList<QnResourceWidget *> QnWorkbenchDisplay::widgets() const {
     return m_widgetByRenderer.values();
+}
+
+QList<QnResourceWidget *> QnWorkbenchDisplay::widgets(const QnResourcePtr &resource) const {
+    return m_widgetsByResource.value(resource);
 }
 
 QnResourceDisplay *QnWorkbenchDisplay::display(QnWorkbenchItem *item) const {
@@ -640,6 +646,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
     connect(item, SIGNAL(flagChanged(Qn::ItemFlag, bool)),              this, SLOT(at_item_flagChanged(Qn::ItemFlag, bool)));
 
     m_widgetByItem.insert(item, widget);
+    m_widgetsByResource[widget->resource()].push_back(widget);
     if(widget->renderer() != NULL)
         m_widgetByRenderer.insert(widget->renderer(), widget);
 
@@ -666,7 +673,7 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
     QnResourceWidget *widget = m_widgetByItem.value(item);
     if(widget == NULL) {
         assert(!destroyItem);
-        return false; /* Already cleaned up. */
+        return false; /* The widget wasn't created. */
     }
 
     disconnect(widget, NULL, this, NULL);
@@ -674,6 +681,7 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
     emit widgetAboutToBeRemoved(widget);
 
     m_widgetByItem.remove(item);
+    m_widgetsByResource[widget->resource()].removeOne(widget);
     if(widget->renderer() != NULL)
         m_widgetByRenderer.remove(widget->renderer());
 
@@ -1362,4 +1370,18 @@ void QnWorkbenchDisplay::at_context_permissionsChanged(const QnResourcePtr &reso
         }
     }
 }
+
+void QnWorkbenchDisplay::at_historyPool_currentCameraChanged(const QnNetworkResourcePtr &camera) {
+    foreach(QnResourceWidget *widget, widgets(camera)) {
+        QnNetworkResourcePtr currentCamera = qnHistoryPool->getCurrentCamera(camera);
+        if(currentCamera == camera)
+            continue;
+
+        QnWorkbenchItem *item = widget->item();
+
+        removeItemInternal(item, true, false);
+        addItemInternal(item, false);
+    }
+}
+
 

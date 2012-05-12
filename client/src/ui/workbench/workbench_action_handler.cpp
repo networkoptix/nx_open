@@ -773,16 +773,6 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
             modifiedResources.push_back(sourceCamera);
             modifiedResources.push_back(replacedCamera);
 
-            /* Replace scene items, if any. */
-            foreach(QnWorkbenchItem *item, workbench()->currentLayout()->items(sourceCamera->getUniqueId())) {
-                QnLayoutItemData data = item->data();
-                delete item;
-                
-                data.resource.id = replacedCamera->getId();
-                data.resource.path = replacedCamera->getUniqueId();
-                workbench()->currentLayout()->addItem(new QnWorkbenchItem(data, this));
-            }
-
             QnResourcePtr newServer = resourcePool()->getResourceById(sourceCamera->getParentId());
             if (newServer->getStatus() == QnResource::Offline)
                 sourceCamera->setStatus(QnResource::Offline);

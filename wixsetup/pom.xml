@@ -9,21 +9,21 @@
 	<parent>
 		<artifactId>hdwitness</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>1.0</version>
+		<version>1.0.9</version>
 		<relativePath>..</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>1.0</version>
+	<version>1.0.9</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>wixsetup</artifactId>
 	<packaging>pom</packaging>
 	<name>HD Witness Installer</name>
 
 	<build>
-		<outputDirectory>${arch}</outputDirectory>
+		<directory>${arch}</directory>
 		<sourceDirectory>${basedir}</sourceDirectory>
-		<finalName>${pom.parent.artifactId}-${version}.${buildNumber}-${platform}-${arch}-${build.configuration}-${customization}</finalName>
+		<finalName>${pom.parent.artifactId}-${version}.${BUILD_NUMBER}-${platform}-${arch}-${build.configuration}-${customization}</finalName>
 	</build>
 
 	<properties>
@@ -98,6 +98,15 @@
 											<overWrite>false</overWrite>
 											<outputDirectory>${project.build.directory}/traytool</outputDirectory>
 										</artifactItem>								
+										<artifactItem>
+											<groupId>com.networkoptix.hdwitness</groupId>
+											<artifactId>mediaproxy</artifactId>
+											<version>1.0</version>
+											<type>zip</type>
+											<classifier>${platform}-${arch}-${build.configuration}-exec</classifier>
+											<overWrite>false</overWrite>
+											<outputDirectory>${project.build.directory}/mediaproxy</outputDirectory>
+										</artifactItem>											
 									</artifactItems>
 								</configuration>
 							</execution>
@@ -120,9 +129,13 @@
 									<outputDirectory>${project.build.directory}</outputDirectory>
 									<resources>
 										<resource>
-											<directory>${project.build.sourceDirectory}/maven</directory>
+											<directory>${project.build.sourceDirectory}/maven/wix-resources</directory>
 											<filtering>true</filtering>
 										</resource>
+										<resource>
+											<directory>${project.build.sourceDirectory}/maven/bin-resources</directory>
+											<filtering>false</filtering>
+										</resource>										
 									</resources>            
 									<encoding>UTF-8</encoding>
 								</configuration>            

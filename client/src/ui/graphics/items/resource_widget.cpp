@@ -1,4 +1,3 @@
-
 #include "resource_widget.h"
 #include <cassert>
 #include <QPainter>
@@ -12,6 +11,7 @@
 #include <core/resource/resource_media_layout.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/camera_history.h>
 #include <core/resourcemanagment/resource_pool.h>
 
 #include <ui/common/color_transformations.h>
@@ -239,7 +239,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 
 
     /* Set up video rendering. */
-    m_resource = qnResPool->getResourceByUniqId(item->resourceUid());
+    m_resource = qnHistoryPool->getCurrentCamera(qnResPool->getResourceByUniqId(item->resourceUid()));
     m_display = new QnResourceDisplay(m_resource, this);
     connect(m_resource.data(), SIGNAL(resourceChanged()), this, SLOT(at_resource_resourceChanged()));
     connect(m_resource.data(), SIGNAL(nameChanged()), this, SLOT(at_resource_nameChanged()));
@@ -655,8 +655,7 @@ void QnResourceWidget::updateOverlayText() {
     QnMediaContextPtr codec = m_display->mediaProvider()->getCodecContext();
     if (codec && codec->ctx()) 
         codecName = codecIDToString(codec->ctx()->codec_id);
-
-    m_footerStatusLabel->setText(tr("%1fps @ %2Mbps (%3)").arg(fps, 0, 'g', 2).arg(mbps, 0, 'g', 2).arg(codecName));
+    m_footerStatusLabel->setText(tr("%1fps @ %2Mbps (%3) - %4").arg(fps, 0, 'g', 2).arg(mbps, 0, 'g', 2).arg(codecName).arg(m_renderer->isLowQualityImage(0) ? "LQ" : "HQ"));
 }
 
 

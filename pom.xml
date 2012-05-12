@@ -7,7 +7,7 @@
     and have a parent pom to deletegate the build.
   -->
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>1.0</version>
+	<version>1.0.9</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>hdwitness</artifactId>
 	<packaging>pom</packaging>
@@ -20,7 +20,7 @@
 
 	<properties>
 		<build.configuration>release</build.configuration>
-		<buildNumber>0</buildNumber>
+		<!-- <BUILD_NUMBER>0</BUILD_NUMBER> -->
 		<environment.dir>${env.ENVIRONMENT}</environment.dir>
 		<customization>default</customization>
 	</properties>

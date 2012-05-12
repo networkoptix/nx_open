@@ -331,6 +331,7 @@ int serverMain(int argc, char *argv[])
     QnLog::initLog(commandLinePreParser.value("--log-level").toString());
     cl_log.log(APPLICATION_NAME, " started", cl_logALWAYS);
     cl_log.log("Software version: ", APPLICATION_VERSION, cl_logALWAYS);
+	cl_log.log("Software revision: ", APPLICATION_REVISION, cl_logALWAYS);
     cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
 
     defaultMsgHandler = qInstallMsgHandler(myMsgHandler);

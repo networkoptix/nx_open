@@ -181,6 +181,8 @@ public:
 
     QnResourceWidget *widget(Qn::ItemRole role) const;
 
+    QList<QnResourceWidget *> widgets(const QnResourcePtr &resource) const;
+
     QList<QnResourceWidget *> widgets() const;
 
     QnResourceDisplay *display(QnWorkbenchItem *item) const;
@@ -348,6 +350,8 @@ protected slots:
 
     void at_view_destroyed();
 
+    void at_historyPool_currentCameraChanged(const QnNetworkResourcePtr &camera);
+
     void at_mapper_originChanged();
     void at_mapper_cellSizeChanged();
     void at_mapper_spacingChanged();
@@ -372,6 +376,9 @@ private:
 
     /** Renderer to widget mapping. */
     QHash<QnAbstractRenderer *, QnResourceWidget *> m_widgetByRenderer;
+
+    /** Resource to widget mapping. */
+    QHash<QnResourcePtr, QList<QnResourceWidget *> > m_widgetsByResource;
 
     /** Current front z displacement value. */
     qreal m_frontZ;

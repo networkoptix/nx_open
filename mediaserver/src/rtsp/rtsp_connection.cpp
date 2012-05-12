@@ -163,10 +163,7 @@ void QnRtspConnectionProcessor::parseRequest()
         if (resource == 0) {
             resource = qnResPool->getNetResourceByMac(resId);
         }
-		if (resource->isDisabled())
-			d->mediaRes.clear();
-		else
-			d->mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
+        d->mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
     }
     if (d->requestHeaders.value("x-media-quality") == QString("low"))
         d->quality = MEDIA_Quality_Low;
@@ -490,7 +487,7 @@ void QnRtspConnectionProcessor::createDataProvider()
 	if (camera)	
 	{
 		camera->inUse(d);
-		if (!d->liveDpHi) {
+		if (!d->liveDpHi && !d->mediaRes->isDisabled()) {
 			d->liveDpHi = camera->getLiveReader(QnResource::Role_LiveVideo);
             if (d->liveDpHi) {
                 connect(d->liveDpHi->getResource().data(), SIGNAL(disabledChanged(bool, bool)), this, SLOT(at_cameraDisabledChanged(bool, bool)), Qt::DirectConnection);
@@ -699,7 +696,7 @@ int QnRtspConnectionProcessor::composeSetParameter()
             checkQuality();
             d->qualityFastSwitch = false;
 
-            if (d->liveMode)
+            if (d->liveMode == Mode_Live)
             {
                 d->dataProcessor->lockDataQueue();
 

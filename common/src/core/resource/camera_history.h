@@ -44,8 +44,8 @@ public:
     QnVideoServerResourcePtr getVideoServerOnTime(qint64 timestamp, bool searchForward, QnTimePeriod& currentPeriod);
     QnNetworkResourcePtr getCameraOnTime(qint64 timestamp, bool searchForward);
     QnVideoServerResourcePtr getNextVideoServerOnTime(qint64 timestamp, bool searchForward, QnTimePeriod& currentPeriod);
-    QList<QnNetworkResourcePtr> getAllCamerasWithSameMac(const QnTimePeriod& timePeriod);
-    QList<QnNetworkResourcePtr> getAllCamerasWithSameMac();
+    QnNetworkResourceList getAllCamerasWithSameMac(const QnTimePeriod& timePeriod);
+    QnNetworkResourceList getAllCamerasWithSameMac();
 
     void addTimePeriod(const QnCameraTimePeriod& period);
     qint64 getMinTime() const;
@@ -69,14 +69,18 @@ typedef QList<QnCameraHistoryPtr> QnCameraHistoryList;
 class QnCameraHistoryPool: public QObject {
     Q_OBJECT;
 public:
+    QnCameraHistoryPool(QObject *parent = NULL);
+    virtual ~QnCameraHistoryPool();
+
     static QnCameraHistoryPool* instance();
     QnCameraHistoryPtr getCameraHistory(const QString& mac);
     void addCameraHistory(QnCameraHistoryPtr history);
     void addCameraHistoryItem(const QnCameraHistoryItem& historyItem);
 
     QnNetworkResourcePtr getCurrentCamera(const QnNetworkResourcePtr &resource);
+    QnResourcePtr getCurrentCamera(const QnResourcePtr &resource);
 
-    QList<QnNetworkResourcePtr> getAllCamerasWithSameMac(const QnNetworkResourcePtr &camera, const QnTimePeriod& timePeriod);
+    QnNetworkResourceList getAllCamerasWithSameMac(const QnNetworkResourcePtr &camera, const QnTimePeriod& timePeriod);
     qint64 getMinTime(QnNetworkResourcePtr camera);
 
 signals:
