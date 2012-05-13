@@ -6,12 +6,15 @@
 #include "core/resource/storage_resource.h"
 #include "coldstore_connection_pool.h"
 #include "coldstore_storage_helper.h"
+#include "coldstore_writer.h"
 
+class QnColdStoreIOBuffer;
 
 class QnPlColdStoreStorage : public QnStorageResource
 {
 public:
     QnPlColdStoreStorage();
+    ~QnPlColdStoreStorage();
 
     static QnStorageResource* instance();
 
@@ -32,13 +35,21 @@ public:
 
     QString coldstoreAddr() const;
 
+    void onWriteBuffClosed(QnColdStoreIOBuffer* buff);
+
+    void onWrite(const QByteArray& ba, const QString& fn);
+
     //=====================
     QString fileName2csFileName(const QString& fn) const;
     QnCSFileInfo getFileInfo(const QString& fn);
 private:
     QnColdStoreMetaDataPtr getMetaDataFileForCsFile(const QString& csFile);
-
     QString csDataFileName(const QnStorageURL& url) const;
+
+    bool hasOpenFilesFor(const QString& csFile) const;
+
+    QnColdStoreConnection* getPropriteConnectionForCsFile(const QString& csFile);
+
 private:
     mutable QMutex m_mutex;
 
@@ -49,6 +60,12 @@ private:
     QnColdStoreMetaDataPtr m_currentWritingFileMetaData;
     QnColdStoreMetaDataPtr m_prevWritingFileMetaData;
 
+    QnColdStoreWriter* m_cswriterThread;
+    QSet<QString> m_listOfWritingFiles;
+
+
+    QnColdStoreConnection* m_currentConnection;
+    QnColdStoreConnection* m_prevConnection;
 };
 
 

@@ -6,12 +6,6 @@ QnColdStoreIOBuffer::QnColdStoreIOBuffer(QnResourcePtr res, const QString& fn, i
 QnResourceConsumer(res),
 m_fileName(fn)
 {
-    static int n = 0;
-    ++n;
-
-    m_n = n;
-
-
     if (capacity)
         buffer().reserve(capacity);
 }
@@ -31,11 +25,16 @@ void QnColdStoreIOBuffer::close()
     if (!isConnectedToTheResource())
         return;
 
-    int size = buffer().size();
+    if (openMode() == QIODevice::WriteOnly)
+        getColdStoreStorage()->onWriteBuffClosed(this);
 
-    size = size;
+    QBuffer::close();
 }
 
+QString QnColdStoreIOBuffer::getFileName() const
+{
+    return m_fileName;
+}
 
 //==========================================================================================
 QnPlColdStoreStoragePtr QnColdStoreIOBuffer::getColdStoreStorage() const

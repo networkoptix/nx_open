@@ -1,11 +1,27 @@
 #include "coldstore_storage.h"
 #include "coldstore_io_buffer.h"
+#include "utils/common/sleep.h"
 
 QnPlColdStoreStorage::QnPlColdStoreStorage():
 m_connectionPool(this),
 m_metaDataPool(this),
-m_mutex(QMutex::Recursive)
+m_mutex(QMutex::Recursive),
+m_cswriterThread(0),
+m_currentConnection(0),
+m_prevConnection(0)
 {
+    
+}
+
+QnPlColdStoreStorage::~QnPlColdStoreStorage()
+{
+    if (m_cswriterThread)
+        m_cswriterThread->stop();
+
+    delete m_cswriterThread;
+
+    delete m_currentConnection;
+    delete m_prevConnection;
 
 }
 
@@ -16,6 +32,7 @@ QnStorageResource* QnPlColdStoreStorage::instance()
 
 QIODevice* QnPlColdStoreStorage::open(const QString& fileName, QIODevice::OpenMode openMode)
 {
+
     if (openMode == QIODevice::ReadOnly)
     {
         QnCSFileInfo fi = getFileInfo(fileName);
@@ -25,17 +42,64 @@ QIODevice* QnPlColdStoreStorage::open(const QString& fileName, QIODevice::OpenMo
         }
         else
         {
-            //QString csFileName = fileName2csFileName(fn);
+            QString csFileName = fileName2csFileName(fileName);
 
-            //m_connectionPool.read()
+            QnColdStoreIOBuffer* buff = new QnColdStoreIOBuffer(toSharedPointer(), fileName);
+            buff->open(QIODevice::WriteOnly);
+            buff->buffer().resize(fi.len);
+            m_connectionPool.read(fileName, buff->buffer().data(), fi.shift, fi.len);
+            buff->open(QIODevice::ReadOnly);
+
         }
 
     }
+    else if (openMode == QIODevice::WriteOnly)
+    {
+        QnColdStoreIOBuffer* buff = new QnColdStoreIOBuffer(toSharedPointer(), fileName);
+        buff->open(QIODevice::WriteOnly);
+    
+        {
+            QMutexLocker lock(&m_mutex);
+            m_listOfWritingFiles.insert(fileName);
+        }
+        
 
-    QnColdStoreIOBuffer* buff = new QnColdStoreIOBuffer(toSharedPointer(), fileName);
-    buff->open(openMode);
+        return buff;
+    }
 
-    return buff;
+    return 0;
+
+}
+
+void QnPlColdStoreStorage::onWriteBuffClosed(QnColdStoreIOBuffer* buff)
+{
+    QMutexLocker lock(&m_mutex);
+
+    if (!m_cswriterThread)
+    {
+        m_cswriterThread = new QnColdStoreWriter(toSharedPointer());
+        m_cswriterThread->start();
+    }
+
+    // here I assume if you copy QByteArray you do not copy memory 
+    while (m_cswriterThread->queueSize() > 20)
+        QnSleep::msleep(2); // to avoid crash( out of memory ) if write speed is less than in data
+
+    m_cswriterThread->write(buff->buffer(), buff->getFileName());
+}
+
+void QnPlColdStoreStorage::onWrite(const QByteArray& ba, const QString& fn)
+{
+    QString csFileName = fileName2csFileName(fn);
+
+    QMutexLocker lock(&m_mutex);
+
+    QnColdStoreConnection* connection = getPropriteConnectionForCsFile(csFileName);
+    if (connection==0)
+        return;
+
+    //QnColdStoreMetaDataPtr md = connection == 
+
 }
 
 int QnPlColdStoreStorage::getChunkLen() const 
@@ -69,15 +133,25 @@ QFileInfoList QnPlColdStoreStorage::getFileList(const QString& dirName)
 {
     QString csFileName = fileName2csFileName(dirName);
 
+    
     QnColdStoreMetaDataPtr md = getMetaDataFileForCsFile(csFileName);
+
+    QMutexLocker lock(&m_mutex);
+    // also add files still open files 
+    QFileInfoList openlst;
+    foreach(QString fn, m_listOfWritingFiles)
+        openlst.push_back(QFileInfo(fn));
 
     if (md)
     {
-        return md->fileInfoList(dirName);
+        
+        QFileInfoList result = md->fileInfoList(dirName);
+        result << openlst;
+        return result;
     }
     else
     {
-        return QFileInfoList();
+        return openlst;
     }
 
 }
@@ -134,6 +208,47 @@ QString QnPlColdStoreStorage::fileName2csFileName(const QString& fn) const
     return csDataFileName(url2StorageURL(fn));
 }
 //=======private==============================
+bool QnPlColdStoreStorage::hasOpenFilesFor(const QString& csFile) const
+{
+    QMutexLocker lock(&m_mutex);
+    foreach(QString fn, m_listOfWritingFiles)
+    {
+        if (fileName2csFileName(fn) == csFile)
+            return true;
+    }
+
+    return false;
+}
+
+QnColdStoreConnection* QnPlColdStoreStorage::getPropriteConnectionForCsFile(const QString& csFile)
+{
+    QMutexLocker lock(&m_mutex);
+
+    if (m_currentConnection == 0)
+    {
+        m_currentConnection = new QnColdStoreConnection(coldstoreAddr());
+        if (!m_currentConnection->open(csFile, QIODevice::WriteOnly, 0))
+        {
+        
+            delete m_currentConnection;
+            m_currentConnection = 0;
+            return 0;
+        }
+        return m_currentConnection;
+    }
+
+    if (m_prevConnection==0 && m_currentConnection->getFilename() == csFile)
+        return m_currentConnection;
+
+    if (m_prevConnection && m_prevConnection->getFilename() == csFile)
+        return m_prevConnection;
+
+    Q_ASSERT(false);
+    return 0;
+
+}
+
+
 QnColdStoreMetaDataPtr QnPlColdStoreStorage::getMetaDataFileForCsFile(const QString& csFile)
 {
     {
@@ -150,6 +265,7 @@ QnColdStoreMetaDataPtr QnPlColdStoreStorage::getMetaDataFileForCsFile(const QStr
 
     return m_metaDataPool.getStoreMetaData(csFile);
 }
+
 
 QString QnPlColdStoreStorage::coldstoreAddr() const
 {

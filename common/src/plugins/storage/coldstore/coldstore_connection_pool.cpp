@@ -26,6 +26,8 @@ bool QnColdStoreConnection::open(const QString& fn, QIODevice::OpenModeFlag flag
     if (!m_isConnected)
         return false;
 
+    m_filename = fn;
+
     m_lastUsed.restart();
     m_openMode = flag;
 
@@ -139,6 +141,7 @@ bool QnColdStoreConnection::write(const char* data, int len)
     return true;
 }
 
+
 int QnColdStoreConnection::read(char *data, int len)
 {
     if (!m_isConnected)
@@ -170,6 +173,12 @@ int QnColdStoreConnection::age() const
 {
     return m_lastUsed.elapsed()/1000;
 }
+
+QString QnColdStoreConnection::getFilename() const
+{
+    return m_filename;
+}
+
 //==================================================================================
 
 QnColdStoreConnectionPool::QnColdStoreConnectionPool(QnPlColdStoreStorage *csStorage):

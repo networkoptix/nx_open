@@ -15,7 +15,9 @@ public:
     virtual void beforeDisconnectFromResource() override;
     virtual void disconnectFromResource() override;
 
-    bool write(QByteArray ba, const QString& fn);
+    bool write(const QByteArray& ba, const QString& fn);
+
+    int queueSize() const;
 
 protected:
     void run() override;

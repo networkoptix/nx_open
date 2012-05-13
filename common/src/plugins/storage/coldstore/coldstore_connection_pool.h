@@ -26,6 +26,8 @@ public:
 
     int age() const; // return the number of seconds then the connection was used last time 
 
+    QString getFilename() const;
+
 private:
     Veracity::SFSClient m_connection;
     Veracity::u32 m_stream;
@@ -37,6 +39,8 @@ private:
     QIODevice::OpenModeFlag m_openMode;
 
     Veracity::u64 m_openedStreamSize;
+
+    QString m_filename;
 
 
         

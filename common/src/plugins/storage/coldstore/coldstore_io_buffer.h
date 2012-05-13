@@ -13,13 +13,15 @@ public:
 
     virtual void close () override;
 
+    QString getFileName() const;
+
 private:
     QnPlColdStoreStoragePtr getColdStoreStorage() const;
 
 private:
 
     QString m_fileName;
-    int m_n;
+    
 };
 
 #endif // cold_store_io_buffer_h_19_05
