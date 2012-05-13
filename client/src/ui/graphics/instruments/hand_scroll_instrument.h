@@ -1,7 +1,7 @@
 #ifndef QN_HAND_SCROLL_INSTRUMENT_H
 #define QN_HAND_SCROLL_INSTRUMENT_H
 
-#include <QCursor>
+#include <QtGui/QCursor>
 #include <ui/processors/kinetic_process_handler.h>
 #include "drag_processing_instrument.h"
 
@@ -40,5 +40,12 @@ private:
     QCursor m_originalCursor;
     QWeakPointer<QGraphicsView> m_currentView;
 };
+
+namespace Qn { namespace {
+    const char *NoHandScrollOver = "_qn_noHandScrollOver";
+
+#define NoHandScrollOver NoHandScrollOver
+}}
+
 
 #endif // QN_HAND_SCROLL_INSTRUMENT_H

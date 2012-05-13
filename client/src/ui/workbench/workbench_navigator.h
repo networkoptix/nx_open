@@ -52,7 +52,8 @@ public:
     qreal minimalSpeed() const;
     qreal maximalSpeed() const;
 
-    QnResourceWidget *currentWidget();
+    QnResourceWidget *currentWidget() const;
+    bool currentWidgetIsCamera() const;
 
     Q_SLOT void jumpBackward();
     Q_SLOT void jumpForward();
@@ -114,6 +115,7 @@ protected slots:
 
     void updateCurrentPeriods();
     void updateCurrentPeriods(Qn::TimePeriodType type);
+    void updateSyncedPeriods();
     void updateSyncedPeriods(Qn::TimePeriodType type);
     void updateLines();
 
@@ -142,7 +144,10 @@ protected slots:
     void at_timeSlider_contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
     void at_timeSlider_destroyed();
 
-    void at_scrollBar_destroyed();
+    void at_timeScrollBar_sliderPressed();
+    void at_timeScrollBar_sliderReleased();
+
+    void at_timeScrollBar_destroyed();
 
 private:
     QnTimeSlider *m_timeSlider;

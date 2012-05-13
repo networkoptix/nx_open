@@ -28,11 +28,10 @@ void QnCheckedButton::updateIcon() {
     QIcon icon;
 
     const int size = 64;
-
-    QPixmap normal          = generatePixmap(64, m_color,           false,  false);
-    QPixmap normalHovered   = generatePixmap(64, m_color,           true,   false);
-    QPixmap checked         = generatePixmap(64, m_checkedColor,    false,  true);
-    QPixmap checkedHovered  = generatePixmap(64, m_checkedColor,    true,   true);
+    QPixmap normal          = generatePixmap(size, m_color,           false,  false);
+    QPixmap normalHovered   = generatePixmap(size, m_color,           true,   false);
+    QPixmap checked         = generatePixmap(size, m_checkedColor,    false,  true);
+    QPixmap checkedHovered  = generatePixmap(size, m_checkedColor,    true,   true);
 
     icon.addPixmap(normal, QIcon::Normal, QIcon::Off);
     icon.addPixmap(normal, QIcon::Disabled, QIcon::Off);

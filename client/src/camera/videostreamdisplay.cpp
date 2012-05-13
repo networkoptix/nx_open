@@ -366,12 +366,13 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompress
         return Status_Displayed;
     }
 
-    if (reverseMode != m_prevReverseMode) 
+    if (reverseMode != m_prevReverseMode || m_needResetDecoder) 
     {
         clearReverseQueue();
         QMutexLocker lock(&m_mtx);
         dec->resetDecoder(data);
         m_prevReverseMode = reverseMode;
+        m_needResetDecoder = false;
     }
 
     QnFrameScaler::downscale_factor scaleFactor = determineScaleFactor(data->channelNumber, dec->getWidth(), dec->getHeight(), force_factor);

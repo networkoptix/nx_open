@@ -1,6 +1,6 @@
 #include <QtNetwork>
 #include "EventSource.h"
-
+#include "api/AppServerConnection.h"
 #include <utils/common/warnings.h>
 
 #define QN_EVENT_SOURCE_DEBUG
@@ -238,7 +238,6 @@ void QnEventSource::httpReadyRead()
         if (!event.load(parsed))
             continue;
 
-        // If it's ping event -> just update last event time (m_eventWaitTimer)
         if (event.eventType == QN_EVENT_EMPTY)
         {
             if (m_seqNumber == 0)
@@ -253,9 +252,15 @@ void QnEventSource::httpReadyRead()
                 emit connectionReset();
             }
 
+            if (event.dict.contains("proxy_port"))
+                QnAppServerConnectionFactory::setDefaultMediaProxyPort(event.dict["proxy_port"].toInt());
+
             emit connectionOpened();
         } else if (event.eventType != QN_EVENT_PING)
+        {
             emit eventReceived(event);
+        }
+        // If it's ping event -> just update last event time (m_eventWaitTimer)
     }
 }
 

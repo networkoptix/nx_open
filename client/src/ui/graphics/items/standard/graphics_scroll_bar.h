@@ -28,6 +28,7 @@ protected:
 #endif
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint) const override;
 
+    virtual void sliderChange(SliderChange change) override;
     virtual void initStyleOption(QStyleOption *option) const override;
 
 private:

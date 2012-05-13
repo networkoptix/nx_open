@@ -25,9 +25,8 @@ QString QnPlWatchDogResource::manufacture() const
     return MANUFACTURE;
 }
 
-void QnPlWatchDogResource::setIframeDistance(int frames, int timems)
+void QnPlWatchDogResource::setIframeDistance(int /*frames*/, int /*timems*/)
 {
-
 }
 
 QnAbstractStreamDataProvider* QnPlWatchDogResource::createLiveDataProvider()
@@ -35,9 +34,8 @@ QnAbstractStreamDataProvider* QnPlWatchDogResource::createLiveDataProvider()
     return new QnPlDWDStreamReader(toSharedPointer());
 }
 
-void QnPlWatchDogResource::setCropingPhysical(QRect croping)
+void QnPlWatchDogResource::setCropingPhysical(QRect /*croping*/)
 {
-
 }
 
 void QnPlWatchDogResource::init() 

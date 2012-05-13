@@ -35,6 +35,7 @@ appserver/proto/pb/gen
 appserver/test/executions
 appserver/static
 appserver/setup/static
+appserver/setup/stage-env
 appserver/version.py
 appserver/setup/version.py
 appserver/entcontroller.conf 
@@ -76,6 +77,12 @@ mediaserver/src/version.h
 mediaserver/src/Makefile
 mediaserver/src/server.mak*
 mediaserver/src/server.vcproj
+
+mediaproxy/src/version.h
+mediaproxy/src/mediaproxy.vcproj
+mediaproxy/bin/debug
+mediaproxy/bin/release
+mediaproxy/src/mediaproxy.pro
 
 testcamera/src/testCamera.pro
 testcamera/src/testCamera.vcproj

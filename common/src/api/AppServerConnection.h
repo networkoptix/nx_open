@@ -91,10 +91,13 @@ public:
     */
     int getResourcesAsync(const QString& args, const QString& objectName, QObject *target, const char *slot);
     int getLicensesAsync(QObject *target, const char *slot);
+
     int setResourceStatusAsync(const QnId& resourceId, QnResource::Status status , QObject *target, const char *slot);
-	int setResourceDisabledAsync(const QnId& resourceId, bool disabled, QObject *target, const char *slot);
-	int setResourcesStatusAsync(const QnResourceList& resources, QObject *target, const char *slot);
-	int setResourcesDisabledAsync(const QnResourceList& resources, QObject *target, const char *slot);
+    int setResourcesStatusAsync(const QnResourceList& resources, QObject *target, const char *slot);
+    int setResourceStatus(const QnId& resourceId, QnResource::Status status, QByteArray& errorString);
+
+    int setResourceDisabledAsync(const QnId& resourceId, bool disabled, QObject *target, const char *slot);
+    int setResourcesDisabledAsync(const QnResourceList& resources, QObject *target, const char *slot);
 
     int registerServer(const QnVideoServerResourcePtr&, QnVideoServerResourceList& servers, QByteArray& errorString);
     int addCamera(const QnVirtualCameraResourcePtr&, QnVirtualCameraResourceList& cameras, QByteArray& errorString);
@@ -107,7 +110,6 @@ public:
     int getLayouts(QnLayoutResourceList& layouts, QByteArray& errorString);
     int getUsers(QnUserResourceList& users, QByteArray& errorString);
     int getLicenses(QnLicenseList& licenses, QByteArray& errorString);
-    int updateMediaProxyPort(const QString& errorString);
     int getCameraHistoryList(QnCameraHistoryList& cameraHistoryList, QByteArray& errorString);
 
     int saveSync(const QnVideoServerResourcePtr&, QByteArray& errorString);
@@ -158,7 +160,6 @@ private:
     QnVideoServerResourceFactory m_serverFactory;
 
     QnApiSerializer& m_serializer;
-    static int m_mediaProxyPort;
 
     friend class QnAppServerConnectionFactory;
 };
@@ -169,8 +170,10 @@ class QN_EXPORT QnAppServerConnectionFactory
 {
 public:
     static QUrl defaultUrl();
+    static int defaultMediaProxyPort();
     static void setDefaultUrl(const QUrl &url);
     static void setDefaultFactory(QnResourceFactory*);
+    static void setDefaultMediaProxyPort(int port);
 
     static QnAppServerConnectionPtr createConnection();
     static QnAppServerConnectionPtr createConnection(const QUrl& url);
@@ -178,6 +181,7 @@ public:
 private:
     QMutex m_mutex;
     QUrl m_defaultUrl;
+    int m_defaultMediaProxyPort;
     QnResourceFactory* m_resourceFactory;
     QnApiPbSerializer m_serializer;
 };

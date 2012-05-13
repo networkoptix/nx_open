@@ -11,4 +11,6 @@ QColor toGrayscale(const QColor &color);
 QColor toTransparent(const QColor &color);
 QColor toTransparent(const QColor &color, qreal opacity);
 
+QColor withAlpha(const QColor &color, int alpha);
+
 #endif // QN_COLOR_TRANSFORMATIONS_H

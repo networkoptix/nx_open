@@ -1,9 +1,12 @@
 #include "hand_scroll_instrument.h"
-#include <QMouseEvent>
-#include <QWidget>
-#include <QScrollBar>
-#include <QGraphicsView>
-#include <QApplication>
+
+#include <QtGui/QMouseEvent>
+#include <QtGui/QWidget>
+#include <QtGui/QScrollBar>
+#include <QtGui/QGraphicsView>
+#include <QtGui/QApplication>
+#include <QtGui/QGraphicsObject>
+
 #include <ui/processors/kinetic_cutting_processor.h>
 #include <ui/animation/animation_event.h>
 
@@ -46,6 +49,11 @@ bool HandScrollInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event
         return false;
 
     if (event->button() != Qt::RightButton)
+        return false;
+
+    QGraphicsItem *mouseGrabberItem = view(viewport)->scene()->mouseGrabberItem();
+    QGraphicsObject *mouseGrabberObject = mouseGrabberItem ? mouseGrabberItem->toGraphicsObject() : NULL; 
+    if(mouseGrabberObject && mouseGrabberObject->property(Qn::NoHandScrollOver).value<bool>())
         return false;
 
     kineticProcessor()->reset();

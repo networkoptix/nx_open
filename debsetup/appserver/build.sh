@@ -23,6 +23,7 @@ SHARESTAGE=$STAGE$SHARETARGET
 INITSTAGE=$STAGE$INITTARGET
 INITDSTAGE=$STAGE$INITDTARGET
 
+PROXY_BIN_PATH=../../mediaproxy/bin/release
 ECS_PRESTAGE_PATH=../../appserver/setup/build/stage
 
 function build_ecs {
@@ -37,6 +38,8 @@ build_ecs
 sudo rm -rf $STAGEBASE
 mkdir -p $PKGSTAGE
 rmdir $PKGSTAGE
+
+############### Enterprise Controller
 cp -r $ECS_PRESTAGE_PATH $PKGSTAGE
 cp /lib/$ARCH-linux-gnu/libssl.so.1.0.0 $LIBSTAGE
 cp /lib/$ARCH-linux-gnu/libcrypto.so.1.0.0 $LIBSTAGE
@@ -47,9 +50,29 @@ touch $ETCSTAGE/entcontroller.conf
 mkdir -p $INITSTAGE
 mkdir -p $INITDSTAGE
 
-# Copy upstart and sysv script
+# Copy upstart and sysv scripts
 install -m 755 init/networkoptix-entcontroller.conf $INITSTAGE
 install -m 755 init.d/networkoptix-entcontroller $INITDSTAGE
+
+
+################ Media Proxy
+
+QT_FILES="libQtXml.so.4 libQtGui.so.4 libQtNetwork.so.4 libQtCore.so.4"
+
+# Copy mediaproxy binary
+install -m 755 $PROXY_BIN_PATH/mediaproxy $BINSTAGE/mediaproxy-bin
+
+# Copy mediaproxy startup script
+install -m 755 bin/mediaproxy $BINSTAGE
+
+# Copy required qt libraries
+for file in $QT_FILES
+do
+    install -m 644  $QT_LIB_PATH/$file $LIBSTAGE
+done
+
+install -m 755 init/networkoptix-mediaproxy.conf $INITSTAGE
+install -m 755 init.d/networkoptix-mediaproxy $INITDSTAGE
 
 # Prepare DEBIAN dir
 mkdir -p $STAGE/DEBIAN

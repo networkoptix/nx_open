@@ -11,6 +11,8 @@ for f in ${project.build.directory}/bin/${build.configuration}/${project.artifac
 
 echo "export LD_LIBRARY_PATH=${project.build.directory}/build/bin/${build.configuration}:/usr/lib:${basedir}/../common/${arch}/bin/${build.configuration}" > ${project.build.directory}/bin/${build.configuration}/env.sh
 
+sudo chown -R `whoami`:sudo ${project.build.directory}
+
 chmod 775 ./init.d/*
 chmod 775 ./debian/prerm 
 chmod 775 ./debian/postinst

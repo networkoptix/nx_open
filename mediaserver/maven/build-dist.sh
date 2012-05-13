@@ -33,7 +33,7 @@ SERVER_LIB_PATH=${project.build.directory}/build/bin/${build.configuration}
 #FFMPEG_FILES="libavcodec.so.[0-9][0-9] libavdevice.so.[0-9][0-9] libavfilter.so.2 libavformat.so.[0-9][0-9] libavutil.so.51 libswscale.so.2"
 
 # Prepare stage dir
-sudo rm -rf $STAGEBASE
+rm -rf $STAGEBASE
 mkdir -p $BINSTAGE
 mkdir -p $LIBSTAGE
 mkdir -p $ETCSTAGE
@@ -52,6 +52,14 @@ install -m 755 init.d/networkoptix-mediaserver $INITDSTAGE
 
 # Copy libraries
 cp -P $SERVER_LIB_PATH/*.so* $LIBSTAGE
+cp -P ${qt.dir}/libaudio.so* $LIBSTAGE
+cp -P ${qt.dir}/libXi.so* $LIBSTAGE
+cp -P ${qt.dir}/libXt.so* $LIBSTAGE
+cp -P ${qt.dir}/libXrender.so* $LIBSTAGE
+cp -P ${qt.dir}/libfontconfig.so* $LIBSTAGE
+cp -P ${qt.dir}/libICE.so* $LIBSTAGE
+cp -P ${qt.dir}/libSM.so* $LIBSTAGE
+
 # Copy required qt libraries
 #for file in $QT_FILES
 #do

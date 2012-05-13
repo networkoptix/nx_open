@@ -48,18 +48,25 @@ int getSystemErrCode()
 // SocketException Code
 
 SocketException::SocketException(const QString &message, bool inclSysMsg)
-  throw() : userMessage(message) {
+  throw() {
+  m_message[0] = 0;
+
+  QString userMessage(message);
   if (inclSysMsg) {
     userMessage.append(": ");
     userMessage.append(strerror(errno));
   }
+
+  QByteArray data = userMessage.toAscii();
+  strncpy(m_message, data.data(), MAX_ERROR_MSG_LENGTH-1);
+  m_message[MAX_ERROR_MSG_LENGTH-1] = 0;
 }
 
 SocketException::~SocketException() throw() {
 }
 
 const char *SocketException::what() const throw() {
-  return userMessage.toAscii();
+  return m_message;
 }
 
 // Function to fill in address structure given an address and port
@@ -308,6 +315,15 @@ bool CommunicatingSocket::connect(const QString &foreignAddress,
   mConnected = true;
 
   return true;
+}
+
+void CommunicatingSocket::shutdown()
+{
+#ifdef Q_OS_WIN
+    ::shutdown(sockDesc, SD_BOTH);
+#else
+    ::shutdown(sockDesc, SHUT_RDWR);
+#endif
 }
 
 void CommunicatingSocket::setReadTimeOut( unsigned int ms )

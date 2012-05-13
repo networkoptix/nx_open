@@ -162,6 +162,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
         QEvent::GraphicsSceneHoverLeave
     };
 
+    Instrument::EventTypeSet widgetMouseEventTypes = Instrument::makeSet(QEvent::MouseButtonPress, QEvent::MouseButtonDblClick, QEvent::MouseMove, QEvent::MouseButtonRelease);
     Instrument::EventTypeSet mouseEventTypes = Instrument::makeSet(mouseEventTypeArray);
     Instrument::EventTypeSet wheelEventTypes = Instrument::makeSet(QEvent::GraphicsSceneWheel);
     Instrument::EventTypeSet dndEventTypes = Instrument::makeSet(QEvent::GraphicsSceneDragEnter, QEvent::GraphicsSceneDragMove, QEvent::GraphicsSceneDragLeave, QEvent::GraphicsSceneDrop);
@@ -238,8 +239,11 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_manager->installInstrument(m_moveInstrument);
     m_manager->installInstrument(m_dragInstrument);
     m_manager->installInstrument(m_rubberBandInstrument);
-    m_manager->installInstrument(m_handScrollInstrument);
     m_manager->installInstrument(m_motionSelectionInstrument);
+
+    m_manager->installInstrument(new ForwardingInstrument(Instrument::Viewport, widgetMouseEventTypes, this), InstallationMode::InstallLast);
+    m_manager->installInstrument(m_handScrollInstrument, InstallationMode::InstallLast);
+    m_manager->installInstrument(new StopInstrument(Instrument::Viewport, widgetMouseEventTypes, this), InstallationMode::InstallLast);
 
     display()->setLayer(m_dropInstrument->surface(), Qn::UiLayer);
 

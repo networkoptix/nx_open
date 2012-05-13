@@ -138,4 +138,7 @@ extern "C" {
 #include <QtOpenGL/QGLWidget>
 #include <QFileSystemWatcher>
 
+// our headers
+#include "config.h"
+
 #endif

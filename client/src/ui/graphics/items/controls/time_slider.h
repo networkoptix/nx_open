@@ -6,6 +6,7 @@
 #include <recording/time_period.h>
 
 #include <ui/processors/kinetic_process_handler.h>
+#include <ui/processors/drag_process_handler.h>
 #include <ui/animation/animation_timer_listener.h>
 #include <ui/animation/animated.h>
 
@@ -14,7 +15,7 @@
 class QnThumbnailsLoader;
 class QnTimeSliderPixmapCache;
 
-class QnTimeSlider: public Animated<QnToolTipSlider>, protected KineticProcessHandler, protected AnimationTimerListener {
+class QnTimeSlider: public Animated<QnToolTipSlider>, protected KineticProcessHandler, protected DragProcessHandler, protected AnimationTimerListener {
     Q_OBJECT;
     Q_PROPERTY(qint64 windowStart READ windowStart WRITE setWindowStart);
     Q_PROPERTY(qint64 windowEnd READ windowEnd WRITE setWindowEnd);
@@ -54,6 +55,23 @@ public:
          * Whether the user can edit current selection with '[' and ']' buttons.
          */
         SelectionEditable = 0x10,
+
+        /**
+         * Whether the window should be auto-adjusted to contain the current
+         * position.
+         */
+        AdjustWindowToPosition = 0x20,
+
+        /**
+         * Whether zooming with the mouse wheel close to the window's side
+         * should zoom into the side, not the mouse pointer position.
+         */
+        SnapZoomToSides = 0x40,
+
+        /**
+         * Whether double clicking the time slider should start animated unzoom.
+         */
+        UnzoomOnDoubleClick = 0x80,
     };
     Q_DECLARE_FLAGS(Options, Option);
 
@@ -95,15 +113,18 @@ public:
     const QString &toolTipFormat() const;
     void setToolTipFormat(const QString &format);
 
-    void finishAnimations();
+    Q_SLOT void finishAnimations();
+    Q_SLOT void animatedUnzoom();
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
-    virtual QPointF positionFromValue(qint64 logicalValue, bool doBound = true) const override;
-    virtual qint64 valueFromPosition(const QPointF &position) const override;
+    virtual QPointF positionFromValue(qint64 logicalValue, bool bound = true) const override;
+    virtual qint64 valueFromPosition(const QPointF &position, bool bound = true) const override;
 
     int thumbnailsHeight() const;
-    void setThumbnailsLoader(QnThumbnailsLoader* value);
+    QnThumbnailsLoader *thumbnailsLoader() const;
+    void setThumbnailsLoader(QnThumbnailsLoader *value);
+
 signals:
     void windowChanged(qint64 windowStart, qint64 windowEnd);
     void selectionChanged(qint64 selectionStart, qint64 selectionEnd);
@@ -113,27 +134,48 @@ protected:
     virtual void wheelEvent(QGraphicsSceneWheelEvent *event) override;
     virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override;
     virtual void keyPressEvent(QKeyEvent *event) override;
+    virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
+    virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
+    virtual void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
+    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
+    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 
     virtual void tick(int deltaMSecs) override;
 
     virtual void kineticMove(const QVariant &degrees) override;
 
+    virtual void startDrag(DragInfo *info) override;
+    virtual void dragMove(DragInfo *info) override;
+    virtual void finishDrag(DragInfo *info) override;
+
     static QVector<QnTimeStep> createRelativeSteps();
     static QVector<QnTimeStep> createAbsoluteSteps();
-    static QVector<QnTimeStep> createStandardSteps(bool isRelative);
     static QVector<QnTimeStep> enumerateSteps(const QVector<QnTimeStep> &steps);
 
 private:
+    enum Marker {
+        NoMarker,
+        SelectionStartMarker,
+        SelectionEndMarker,
+    };
+
+    Marker markerFromPosition(const QPointF &pos) const;
+    QPointF positionFromMarker(Marker marker) const;
+
+    void setMarkerSliderPosition(Marker marker, qint64 position);
+
     bool scaleWindow(qreal factor, qint64 anchor);
 
-    void drawPeriodsBar(QPainter *painter, QnTimePeriodList &recorded, QnTimePeriodList &motion, qreal top, qreal height);
-    void drawPeriods(QPainter *painter, QnTimePeriodList &periods, qreal top, qreal height, const QColor &preColor, const QColor &pastColor);
-    void drawTickmarks(QPainter *painter, qreal top, qreal height);
-    void drawSolidBackground(QPainter *painter, qreal top, qreal height);
+    void drawPeriodsBar(QPainter *painter, QnTimePeriodList &recorded, QnTimePeriodList &motion, const QRectF &rect);
+    void drawTickmarks(QPainter *painter, const QRectF &rect);
+    void drawSolidBackground(QPainter *painter, const QRectF &rect);
     void drawMarker(QPainter *painter, qint64 pos, const QColor &color);
     void drawSelection(QPainter *painter);
-    void drawHighlights(QPainter *painter, qreal fillTop, qreal fillHeight, qreal textTop, qreal textHeight);
-    void drawThumbnails(QPainter *painter, const QRectF& rect);
+    void drawSeparator(QPainter *painter, const QRectF &rect);
+    void drawDates(QPainter *painter, const QRectF &rect);
+    void drawThumbnails(QPainter *painter, const QRectF &rect);
 
     void updateToolTipVisibility();
     void updateToolTipText();
@@ -148,9 +190,6 @@ private:
     
     void animateStepValues(int deltaMSecs);
 
-    qreal lineTop(int line);
-    qreal lineHeight();
-
 private:
     Q_DECLARE_PRIVATE(GraphicsSlider);
 
@@ -164,11 +203,13 @@ private:
 
         qreal currentHeight;
         qreal targetHeight;
-        int currentTextHeight;
         qreal currentLineOpacity;
         qreal targetLineOpacity;
         qreal currentTextOpacity;
         qreal targetTextOpacity;
+
+        int currentTextHeight;
+        qreal currentLineHeight;
     };
 
     qint64 m_windowStart, m_windowEnd;
@@ -182,6 +223,9 @@ private:
     QString m_toolTipFormat;
 
     qint64 m_zoomAnchor;
+    bool m_unzooming;
+    Marker m_dragMarker;
+    QPointF m_dragDelta;
 
     int m_lineCount;
     QVector<TypedPeriods> m_lineTimePeriods;
@@ -199,7 +243,7 @@ private:
     QHash<qint32, const QPixmap *> m_pixmapByHighlightKey;
     QHash<QPair<QString, int>, const QPixmap *> m_pixmapByTextKey;
 
-    QnThumbnailsLoader* m_thumbnailsLoader;
+    QWeakPointer<QnThumbnailsLoader> m_thumbnailsLoader;
     QnTimeSliderPixmapCache *m_pixmapCache;
 };
 

@@ -104,14 +104,25 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(QnResourcePtr re
     if (!history)
         return 0;
     QnCameraTimePeriodList videoServerList = history->getTimePeriods();
+    QList<QnVideoServerResourcePtr> checkServers;
+    bool firstServer = true;
     for (int i = 0; i < videoServerList.size(); ++i)
     {
         QnVideoServerResourcePtr otherVideoServer = qSharedPointerDynamicCast<QnVideoServerResource> (qnResPool->getResourceById(videoServerList[i].getServerId()));
-        if (otherVideoServer == currentVideoServer && m_rtspSession.startTime() != AV_NOPTS_VALUE)
+        if (!otherVideoServer)
+            continue;
+        if (firstServer && otherVideoServer == currentVideoServer)
+            return 0; // archive starts with current server
+        firstServer = false;
+        if (otherVideoServer != currentVideoServer && m_rtspSession.startTime() != AV_NOPTS_VALUE)
         {
-            // first server equal current server, so archive start point already found
-            return 0;
+            if (!checkServers.contains(otherVideoServer))
+                checkServers << otherVideoServer;
         }
+    }
+
+    foreach(QnVideoServerResourcePtr otherVideoServer, checkServers)
+    {
         QnResourcePtr otherCamera = qnResPool->getResourceByUniqId(mac + otherVideoServer->getId().toString());
         RTPSession otherRtspSession;
         otherRtspSession.setProxyAddr(m_proxyAddr, m_proxyPort);
@@ -133,6 +144,17 @@ QnResourcePtr QnRtspClientArchiveDelegate::getResourceOnTime(QnResourcePtr resou
     if (!netRes)
         return resource;
     QString mac = netRes->getMAC().toString();
+
+    if (time == DATETIME_NOW)
+    {
+        QnNetworkResourceList cameraList = qnResPool->getAllNetResourceByMac(mac);
+        foreach(QnNetworkResourcePtr camera, cameraList) {
+            if (!camera->isDisabled())
+                return camera;
+        }
+        return resource;
+    }
+
     QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(mac);
     if (!history)
         return resource;
@@ -142,8 +164,11 @@ QnResourcePtr QnRtspClientArchiveDelegate::getResourceOnTime(QnResourcePtr resou
 
     // get camera resource from other server. Unique id is mac + serverID
     QnResourcePtr newResource = qnResPool->getResourceByUniqId(mac + videoServer->getId().toString());
-    if (newResource && newResource != resource)
-        qDebug() << "switch to media server " << resource->getParentId();
+	if (newResource && newResource != resource) {
+		QnVideoServerResourcePtr videoServer = qSharedPointerDynamicCast<QnVideoServerResource> (qnResPool->getResourceById(resource->getParentId()));
+		if (videoServer)
+			qDebug() << "switch to media server " << videoServer->getUrl();
+	}
     return newResource ? newResource : resource;
 }
 
@@ -253,17 +278,30 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
                       m_rtspSession.getScale() <  0 && timeMs < m_serverTimePeriod.startTimeMs;
     if (result == 0 || outOfRange || result->dataType == QnAbstractMediaData::EMPTY_DATA)
     {
-        QnResourcePtr newResource = getNextVideoServerFromTime(m_resource, m_lastSeekTime/1000);
-        if (newResource) {
-            m_resource = m_resource;
-            m_lastSeekTime = m_position = m_serverTimePeriod.startTimeMs*1000;
-            close();
-            open(m_resource);
-            return getNextData();
-        }
-        else {
-            m_serverTimePeriod.clear();
-        }
+		qDebug() << "Reached the edge for archive in a current server. packetTime=" << QDateTime::fromMSecsSinceEpoch(timeMs).toString() <<
+			        "period: " << QDateTime::fromMSecsSinceEpoch(m_serverTimePeriod.startTimeMs).toString() << "-" << 
+					QDateTime::fromMSecsSinceEpoch(m_serverTimePeriod.endTimeMs()).toString();
+
+		if (m_lastSeekTime == AV_NOPTS_VALUE)
+			m_lastSeekTime = qnSyncTime->currentMSecsSinceEpoch()*1000;
+		QnResourcePtr newResource = getNextVideoServerFromTime(m_resource, m_lastSeekTime/1000);
+		if (newResource) {
+			m_lastSeekTime = m_serverTimePeriod.startTimeMs*1000;
+			if (m_rtspSession.getScale() > 0)
+				m_position = m_serverTimePeriod.startTimeMs*1000;
+			else
+				m_position = (m_serverTimePeriod.endTimeMs()-1)*1000;
+			close();
+			open(newResource);
+
+            result = getNextData();
+            if (result)
+                result->flags |= QnAbstractMediaData::MediaFlags_NewServer;
+			return result;
+		}
+		else {
+			m_serverTimePeriod.clear();
+		}
     }
 
     return result;

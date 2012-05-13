@@ -293,7 +293,6 @@ void QnWorkbenchDisplay::deinitSceneContext() {
         delete m_gridItem.data();
 
     /* Deinit workbench. */
-    disconnect(context(), NULL, this, NULL);
     disconnect(workbench(), NULL, this, NULL);
 
     for(int i = 0; i < Qn::ItemRoleCount; i++)
@@ -341,7 +340,7 @@ void QnWorkbenchDisplay::initSceneContext() {
     m_gridItem.data()->setMapper(workbench()->mapper());
     m_gridItem.data()->setAnimationTimer(m_animationInstrument->animationTimer());
 
-    /* Connect to workbench. */
+    /* Connect to context. */
     connect(workbench(),            SIGNAL(itemChanged(Qn::ItemRole)),              this,                   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
     connect(workbench(),            SIGNAL(itemAdded(QnWorkbenchItem *)),           this,                   SLOT(at_workbench_itemAdded(QnWorkbenchItem *)));
     connect(workbench(),            SIGNAL(itemRemoved(QnWorkbenchItem *)),         this,                   SLOT(at_workbench_itemRemoved(QnWorkbenchItem *)));
@@ -495,11 +494,11 @@ WidgetAnimator *QnWorkbenchDisplay::animator(QnResourceWidget *widget) {
 }
 
 QnResourceWidget *QnWorkbenchDisplay::widget(QnWorkbenchItem *item) const {
-    return m_widgetByItem[item];
+    return m_widgetByItem.value(item);
 }
 
 QnResourceWidget *QnWorkbenchDisplay::widget(QnAbstractRenderer *renderer) const {
-    return m_widgetByRenderer[renderer];
+    return m_widgetByRenderer.value(renderer);
 }
 
 QnResourceWidget *QnWorkbenchDisplay::widget(Qn::ItemRole role) const {
@@ -508,6 +507,10 @@ QnResourceWidget *QnWorkbenchDisplay::widget(Qn::ItemRole role) const {
 
 QList<QnResourceWidget *> QnWorkbenchDisplay::widgets() const {
     return m_widgetByRenderer.values();
+}
+
+QList<QnResourceWidget *> QnWorkbenchDisplay::widgets(const QnResourcePtr &resource) const {
+    return m_widgetsByResource.value(resource);
 }
 
 QnResourceDisplay *QnWorkbenchDisplay::display(QnWorkbenchItem *item) const {
@@ -640,6 +643,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
     connect(item, SIGNAL(flagChanged(Qn::ItemFlag, bool)),              this, SLOT(at_item_flagChanged(Qn::ItemFlag, bool)));
 
     m_widgetByItem.insert(item, widget);
+    m_widgetsByResource[widget->resource()].push_back(widget);
     if(widget->renderer() != NULL)
         m_widgetByRenderer.insert(widget->renderer(), widget);
 
@@ -652,6 +656,8 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
     connect(widget,                     SIGNAL(aboutToBeDestroyed()),   this,   SLOT(at_widget_aboutToBeDestroyed()));
     connect(m_widgetActivityInstrument, SIGNAL(activityStopped()),      widget, SLOT(showActivityDecorations()));
     connect(m_widgetActivityInstrument, SIGNAL(activityResumed()),      widget, SLOT(hideActivityDecorations()));
+    if(widgets(widget->resource()).size() == 1)
+        connect(widget->resource().data(),  SIGNAL(disabledChanged(bool, bool)), this, SLOT(at_resource_disabledChanged()), Qt::QueuedConnection);
 
     emit widgetAdded(widget);
 
@@ -666,14 +672,18 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
     QnResourceWidget *widget = m_widgetByItem.value(item);
     if(widget == NULL) {
         assert(!destroyItem);
-        return false; /* Already cleaned up. */
+        return false; /* The widget wasn't created. */
     }
 
     disconnect(widget, NULL, this, NULL);
+    disconnect(m_widgetActivityInstrument, NULL, widget, NULL);
+    if(widgets(widget->resource()).size() == 1)
+        disconnect(widget->resource().data(), NULL, this, NULL);
 
     emit widgetAboutToBeRemoved(widget);
 
     m_widgetByItem.remove(item);
+    m_widgetsByResource[widget->resource()].removeOne(widget);
     if(widget->renderer() != NULL)
         m_widgetByRenderer.remove(widget->renderer());
 
@@ -1363,3 +1373,23 @@ void QnWorkbenchDisplay::at_context_permissionsChanged(const QnResourcePtr &reso
     }
 }
 
+void QnWorkbenchDisplay::at_resource_disabledChanged() {
+    QObject *sender = this->sender();
+    if(!sender)
+        return; /* Already disconnected from this sender. */
+
+    at_resource_disabledChanged(toSharedPointer(checked_cast<QnResource *>(sender)));
+}
+
+void QnWorkbenchDisplay::at_resource_disabledChanged(const QnResourcePtr &resource) {
+    QnResourcePtr enabledResource = resourcePool()->getEnabledResourceByUniqueId(resource->getUniqueId());
+    if(!enabledResource || enabledResource == resource)
+        return;
+
+    foreach(QnResourceWidget *widget, widgets(resource)) {
+        QnWorkbenchItem *item = widget->item();
+
+        removeItemInternal(item, true, false);
+        addItemInternal(item, false);
+    }
+}

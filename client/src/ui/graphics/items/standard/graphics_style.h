@@ -59,8 +59,8 @@ public:
 
     QStyle::SubControl hitTestComplexControl(QStyle::ComplexControl control, const QStyleOptionComplex *option, const QPointF &position, const QGraphicsWidget *widget = 0) const;
 
-    static qreal sliderPositionFromValue(qint64 min, qint64 max, qint64 logicalValue, qreal span, bool upsideDown, bool doBound = true);
-    static qint64 sliderValueFromPosition(qint64 min, qint64 max, qreal pos, qreal span, bool upsideDown);
+    static qreal sliderPositionFromValue(qint64 min, qint64 max, qint64 logicalValue, qreal span, bool upsideDown, bool bound);
+    static qint64 sliderValueFromPosition(qint64 min, qint64 max, qreal pos, qreal span, bool upsideDown, bool bound);
 
 private:
     QWeakPointer<QStyle> m_baseStyle;

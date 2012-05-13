@@ -9,12 +9,12 @@
 	<parent>
 		<artifactId>hdwitness</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>1.0</version>
+		<version>1.0.9</version>
 		<relativePath>..</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>1.0</version>
+	<version>1.0.9</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>cpp</artifactId>
 	<packaging>pom</packaging>
@@ -222,6 +222,9 @@
 									<includes>
 										<include>${arch}/*.pro</include>
 									</includes>
+									<excludes>
+										<include>**/client.pro</include>
+									</excludes>	
 									<replacements>
 										<replacement>
 											<token>\\</token>

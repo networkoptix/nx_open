@@ -141,13 +141,6 @@ void QnResourceDiscoveryManager::run()
         QnSleep::msleep(1000);
     }
 
-    QString errorString;
-    while (appServerConnection->updateMediaProxyPort(errorString) != 0)
-    {
-        qWarning() << "Can't read ecs media proxy port: " << errorString;
-        QnSleep::msleep(1000);
-    }
-
     m_runNumber = 0;
 
     while (!needToStop())

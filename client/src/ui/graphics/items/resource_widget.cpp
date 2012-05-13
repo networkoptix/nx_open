@@ -1,4 +1,3 @@
-
 #include "resource_widget.h"
 #include <cassert>
 #include <QPainter>
@@ -239,7 +238,9 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 
 
     /* Set up video rendering. */
-    m_resource = qnResPool->getResourceByUniqId(item->resourceUid());
+    m_resource = qnResPool->getEnabledResourceByUniqueId(item->resourceUid());
+    if(!m_resource)
+        m_resource = qnResPool->getResourceByUniqId(item->resourceUid());
     m_display = new QnResourceDisplay(m_resource, this);
     connect(m_resource.data(), SIGNAL(resourceChanged()), this, SLOT(at_resource_resourceChanged()));
     connect(m_resource.data(), SIGNAL(nameChanged()), this, SLOT(at_resource_nameChanged()));
@@ -655,8 +656,7 @@ void QnResourceWidget::updateOverlayText() {
     QnMediaContextPtr codec = m_display->mediaProvider()->getCodecContext();
     if (codec && codec->ctx()) 
         codecName = codecIDToString(codec->ctx()->codec_id);
-
-    m_footerStatusLabel->setText(tr("%1fps @ %2Mbps (%3)").arg(fps, 0, 'g', 2).arg(mbps, 0, 'g', 2).arg(codecName));
+    m_footerStatusLabel->setText(tr("%1fps @ %2Mbps (%3) - %4").arg(fps, 0, 'g', 2).arg(mbps, 0, 'g', 2).arg(codecName).arg(m_renderer->isLowQualityImage(0) ? "LQ" : "HQ"));
 }
 
 

@@ -39,6 +39,13 @@ namespace {
 
 } // anonymous namespace
 
+void GraphicsScrollBarPrivate::setSliderPositionIgnoringAdjustments(qint64 position) {
+    bool adjustForPressedHandle = this->adjustForPressedHandle;
+    this->adjustForPressedHandle = false;
+    q_func()->setSliderPosition(position);
+    this->adjustForPressedHandle = adjustForPressedHandle;
+}
+
 bool GraphicsScrollBarPrivate::updateHoverControl(const QPointF &pos)
 {
     Q_Q(GraphicsScrollBar);
@@ -150,6 +157,7 @@ void GraphicsScrollBarPrivate::init()
 
     initControls(QStyle::CC_ScrollBar, QStyle::SC_ScrollBarGroove, QStyle::SC_ScrollBarSlider);
 
+    adjustForPressedHandle = true;
     invertedControls = true;
     pressedControl = hoverControl = QStyle::SC_None;
     pointerOutsidePressedControl = false;
@@ -225,6 +233,15 @@ QSizeF GraphicsScrollBar::sizeHint(Qt::SizeHint which, const QSizeF &constraint)
         size = QSize(scrollBarExtent, scrollBarExtent * 2 + scrollBarSliderMin);
 
     return style()->sizeFromContents(QStyle::CT_ScrollBar, &opt, size, this).expandedTo(QApplication::globalStrut());
+}
+
+void GraphicsScrollBar::sliderChange(SliderChange change) {
+    Q_D(GraphicsScrollBar);
+
+    base_type::sliderChange(change);
+
+    if(d->adjustForPressedHandle && d->pressedControl == QStyle::SC_ScrollBarSlider && (change == SliderStepsChange || change == SliderValueChange))
+        sendPendingMouseMoves(false);
 }
 
 bool GraphicsScrollBar::event(QEvent *event)
@@ -371,7 +388,7 @@ void GraphicsScrollBar::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
             if (!r.contains(event->pos()))
                 newPosition = d->snapBackPosition;
         }
-        setSliderPosition(newPosition);
+        d->setSliderPositionIgnoringAdjustments(newPosition);
     } else if (!style()->styleHint(QStyle::SH_ScrollBar_ScrollWhenPointerLeavesControl, &opt, this)) {
         if (style()->styleHint(QStyle::SH_ScrollBar_RollBetweenButtons, &opt, this)
                 && d->pressedControl & (QStyle::SC_ScrollBarAddLine | QStyle::SC_ScrollBarSubLine)) {

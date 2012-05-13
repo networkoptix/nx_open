@@ -9,21 +9,21 @@
 	<parent>
 		<artifactId>hdwitness</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>1.0</version>
+		<version>1.0.9</version>
 		<relativePath>..</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>1.0</version>
+	<version>1.0.9</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>wixsetup</artifactId>
 	<packaging>pom</packaging>
 	<name>HD Witness Installer</name>
 
 	<build>
-		<outputDirectory>${arch}</outputDirectory>
+		<directory>${arch}</directory>
 		<sourceDirectory>${basedir}</sourceDirectory>
-		<finalName>${pom.parent.artifactId}-${version}.${buildNumber}-${platform}-${arch}-${build.configuration}</finalName>
+		<finalName>${pom.parent.artifactId}-${version}.${buildNumber}-${platform}-${arch}-${build.configuration}-${customization}</finalName>
 	</build>
 
 	<properties>
@@ -54,7 +54,7 @@
 										<artifactItem>
 											<groupId>com.networkoptix.hdwitness</groupId>
 											<artifactId>appserver</artifactId>
-											<version>1.0</version>
+											<version>${project.version}</version>
 											<type>zip</type>
 											<classifier>${platform}-exec</classifier>
 											<overWrite>false</overWrite>
@@ -64,17 +64,17 @@
 										<artifactItem>
 											<groupId>com.networkoptix.hdwitness</groupId>
 											<artifactId>appserver</artifactId>
-											<version>1.0</version>
+											<version>${project.version}</version>
 											<type>zip</type>
 											<classifier>${platform}-exec</classifier>
 											<overWrite>false</overWrite>
-											<includes>ecs.exe,db/ecs.db</includes>
+											<includes>ecs.exe</includes>
 											<outputDirectory>${project.build.directory}/files</outputDirectory>
 										</artifactItem>								
 										<artifactItem>
 											<groupId>com.networkoptix.hdwitness</groupId>
 											<artifactId>client</artifactId>
-											<version>1.0</version>
+											<version>${project.version}</version>
 											<type>zip</type>
 											<classifier>${platform}-${arch}-${build.configuration}-exec</classifier>
 											<overWrite>false</overWrite>
@@ -83,7 +83,7 @@
 										<artifactItem>
 											<groupId>com.networkoptix.hdwitness</groupId>
 											<artifactId>mediaserver</artifactId>
-											<version>1.0</version>
+											<version>${project.version}</version>
 											<type>zip</type>
 											<classifier>${platform}-${arch}-${build.configuration}-exec</classifier>
 											<overWrite>false</overWrite>
@@ -92,12 +92,21 @@
 										<artifactItem>
 											<groupId>com.networkoptix.hdwitness</groupId>
 											<artifactId>traytool</artifactId>
-											<version>1.0</version>
+											<version>${project.version}</version>
 											<type>zip</type>
 											<classifier>${platform}-${arch}-${build.configuration}-exec</classifier>
 											<overWrite>false</overWrite>
 											<outputDirectory>${project.build.directory}/traytool</outputDirectory>
 										</artifactItem>								
+										<artifactItem>
+											<groupId>com.networkoptix.hdwitness</groupId>
+											<artifactId>mediaproxy</artifactId>
+											<version>${project.version}</version>
+											<type>zip</type>
+											<classifier>${platform}-${arch}-${build.configuration}-exec</classifier>
+											<overWrite>false</overWrite>
+											<outputDirectory>${project.build.directory}/mediaproxy</outputDirectory>
+										</artifactItem>											
 									</artifactItems>
 								</configuration>
 							</execution>
@@ -120,9 +129,13 @@
 									<outputDirectory>${project.build.directory}</outputDirectory>
 									<resources>
 										<resource>
-											<directory>${project.build.sourceDirectory}/maven</directory>
+											<directory>${project.build.sourceDirectory}/maven/wix-resources</directory>
 											<filtering>true</filtering>
 										</resource>
+										<resource>
+											<directory>${project.build.sourceDirectory}/maven/bin-resources</directory>
+											<filtering>false</filtering>
+										</resource>										
 									</resources>            
 									<encoding>UTF-8</encoding>
 								</configuration>            
@@ -293,7 +306,7 @@
 								</configuration>					
 							</execution>	-->				
 
-							<execution>
+							<!--<execution>
 								<id>integration-test</id>
 								<phase>integration-test</phase>
 								<goals>
@@ -303,8 +316,8 @@
 									<executable>test.bat</executable>
 									<workingDirectory>${baseDir}</workingDirectory>						
 								</configuration>	
-							</execution>					
-						</executions>
+							</execution>	-->				
+						</executions> 
 					</plugin>
 					<!--<plugin>
 				<groupId>org.codehaus.mojo</groupId>

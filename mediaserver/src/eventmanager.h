@@ -27,6 +27,7 @@ private slots:
     void at_eventReceived(QnEvent event);
     void at_connectionClosed(QString errorString);
     void at_connectionReset();
+
 private:
     QSharedPointer<QnEventSource> m_source;
 };

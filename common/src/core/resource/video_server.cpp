@@ -135,8 +135,20 @@ void QnVideoServerResource::setPrimaryIF(const QString& primaryIF)
     QUrl url(getUrl());
     url.setHost(primaryIF);
     setUrl(url.toString());
-    setName(QString("Server ") + primaryIF);
+    if (getName().isEmpty())
+        setName(QString("Server ") + primaryIF);
+
     emit serverIFFound(primaryIF);
+}
+
+void QnVideoServerResource::setReserve(bool reserve)
+{
+    m_reserve = reserve;
+}
+
+bool QnVideoServerResource::getReserve() const
+{
+    return m_reserve;
 }
 
 void QnVideoServerResource::determineOptimalNetIF()

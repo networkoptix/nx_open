@@ -213,7 +213,9 @@ QnAbstractStorageResourcePtr createDefaultStorage()
 
 void setServerNameAndUrls(QnVideoServerResourcePtr server, const QString& myAddress)
 {
-    server->setName(QString("Server ") + myAddress);
+    if (server->getName().isEmpty())
+        server->setName(QString("Server ") + myAddress);
+
 #ifdef _TEST_TWO_SERVERS
     server->setUrl(QString("rtsp://") + myAddress + QString(':') + QString::number(55001));
     server->setApiUrl(QString("http://") + myAddress + QString(':') + QString::number(55002));
@@ -331,6 +333,7 @@ int serverMain(int argc, char *argv[])
     QnLog::initLog(commandLinePreParser.value("--log-level").toString());
     cl_log.log(APPLICATION_NAME, " started", cl_logALWAYS);
     cl_log.log("Software version: ", APPLICATION_VERSION, cl_logALWAYS);
+	cl_log.log("Software revision: ", APPLICATION_REVISION, cl_logALWAYS);
     cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
 
     defaultMsgHandler = qInstallMsgHandler(myMsgHandler);
@@ -518,11 +521,17 @@ void QnMain::run()
             QnSleep::msleep(1000);
     }
 
+    QByteArray errorString;
+
+    int status;
+    do
+    {
+        status = appServerConnection->setResourceStatus(m_videoServer->getId(), QnResource::Online, errorString);
+    } while (status != 0);
+
     initAppServerEventConnection(qSettings, m_videoServer);
     QnEventManager* eventManager = QnEventManager::instance();
     eventManager->run();
-
-    qnResPool->addResource(m_videoServer);
 
     m_processor = new QnAppserverResourceProcessor(m_videoServer->getId());
 
@@ -532,8 +541,6 @@ void QnMain::run()
     m_restServer = new QnRestServer(QHostAddress::Any, apiUrl.port());
     m_restServer->registerHandler("api/RecordedTimePeriods", new QnRecordedChunkListHandler());
     m_restServer->registerHandler("api/CheckPath", new QnFsHelperHandler());
-
-    QByteArray errorString;
 
     foreach (QnAbstractStorageResourcePtr storage, m_videoServer->getStorages())
     {

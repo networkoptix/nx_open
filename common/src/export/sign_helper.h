@@ -23,6 +23,7 @@ public:
     QFontMetrics updateFontSize(QPainter& painter, const QSize& paintSize);
     static void updateDigest(AVCodecContext* srcCodec, EVP_MD_CTX* mdctx, const quint8* data, int size);
     void setSignOpacity(float opacity, QColor color);
+
 private:
     void drawOnSignFrame(AVFrame* frame);
     void extractSpsPpsFromPrivData(const QByteArray& data, SPSUnit& sps, PPSUnit& pps, bool& spsReady, bool& ppsReady);
@@ -31,6 +32,7 @@ private:
     int correctNalPrefix(const QByteArray& srcCodecExtraData, quint8* videoBuf, int out_size, int videoBufSize);
     int runX264Process(AVFrame* frame, QString optionStr, quint8* rezBuffer);
     int removeH264SeiMessage(quint8* buffer, int size);
+
 private:
     QPixmap m_logo;
     QPixmap m_roundRectPixmap;

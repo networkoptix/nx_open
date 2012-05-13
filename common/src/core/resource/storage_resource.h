@@ -11,6 +11,7 @@ class QnAbstractMediaStreamDataProvider;
 class QnAbstractStorageResource : public QnResource
 {
     Q_OBJECT
+
     Q_PROPERTY(qint64 spaceLimit READ getSpaceLimit WRITE setSpaceLimit)
     Q_PROPERTY(int maxStoreTime READ getMaxStoreTime WRITE setMaxStoreTime)
 
@@ -38,6 +39,13 @@ public:
     quint16 getIndex() const;
 
     void deserialize(const QnResourceParameters& parameters);
+signals:
+    /*
+     * Storage may emit archiveRangeChanged signal to inform server what some data in archive already deleted
+     * @param newStartTime - new archive start time point
+     * @param newEndTime - Not used now, reserved for future use
+     */
+    void archiveRangeChanged(qint64 newStartTimeMs, qint64 newEndTimeMs);
 private:
     qint64 m_spaceLimit;
     int m_maxStoreTime; // at seconds
@@ -58,6 +66,8 @@ struct QnStorageURL
 
 class QnStorageResource : public QnAbstractStorageResource
 {
+    Q_OBJECT
+
 public:
     QnStorageResource();
     virtual ~QnStorageResource();

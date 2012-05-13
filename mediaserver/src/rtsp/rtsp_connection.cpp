@@ -423,8 +423,10 @@ void QnRtspConnectionProcessor::setRtspTime(qint64 time)
 qint64 QnRtspConnectionProcessor::getRtspTime()
 {
     Q_D(QnRtspConnectionProcessor);
-    //return d->playTime + d->playTimer.elapsed()*1000 * d->rtspScale;
-    return d->dataProcessor->getDisplayedTime();
+	if (d->dataProcessor)
+		return d->dataProcessor->getDisplayedTime();
+	else
+		return AV_NOPTS_VALUE;
 }
 
 void QnRtspConnectionProcessor::extractNptTime(const QString& strValue, qint64* dst)
@@ -471,11 +473,10 @@ void QnRtspConnectionProcessor::parseRangeHeader(const QString& rangeStr, qint64
 void QnRtspConnectionProcessor::at_cameraDisabledChanged(bool oldValue, bool newValue)
 {
     Q_D(QnRtspConnectionProcessor);
+	QMutexLocker lock(&d->mutex);
     if (newValue) {
-        if (getRtspTime() == DATETIME_NOW) {
-            m_needStop = true;
-            d->socket->close();
-        }
+        m_needStop = true;
+        d->socket->shutdown();
     }
 }
 
@@ -486,7 +487,7 @@ void QnRtspConnectionProcessor::createDataProvider()
 	if (camera)	
 	{
 		camera->inUse(d);
-		if (!d->liveDpHi) {
+		if (!d->liveDpHi && !d->mediaRes->isDisabled()) {
 			d->liveDpHi = camera->getLiveReader(QnResource::Role_LiveVideo);
             if (d->liveDpHi) {
                 connect(d->liveDpHi->getResource().data(), SIGNAL(disabledChanged(bool, bool)), this, SLOT(at_cameraDisabledChanged(bool, bool)), Qt::DirectConnection);
@@ -695,7 +696,7 @@ int QnRtspConnectionProcessor::composeSetParameter()
             checkQuality();
             d->qualityFastSwitch = false;
 
-            if (d->liveMode)
+            if (d->liveMode == Mode_Live)
             {
                 d->dataProcessor->lockDataQueue();
 

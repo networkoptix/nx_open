@@ -14,6 +14,7 @@ class QToolButton;
 class QTreeView;
 class QModelIndex;
 class QItemSelectionModel;
+class QSortFilterProxyModel;
 
 class QnWorkbench;
 class QnWorkbenchItem;
@@ -31,7 +32,7 @@ namespace Ui {
 }
 
 class QnResourceTreeWidget: public QWidget, public QnWorkbenchContextAware, public QnActionTargetProvider {
-    Q_OBJECT
+    Q_OBJECT;
 
 public:
     enum Tab {
@@ -84,13 +85,16 @@ protected:
     void killSearchTimer();
 
 private slots:
-    void open();
+    void expandAll();
+
     void updateFilter(bool force = false);
     void forceUpdateFilter() { updateFilter(true); }
     
     void at_treeView_enterPressed(const QModelIndex &index);
     void at_treeView_doubleClicked(const QModelIndex &index);
     void at_tabWidget_currentChanged(int index);
+    void at_resourceProxyModel_rowsInserted(const QModelIndex &parent, int start, int end);
+    void at_resourceProxyModel_rowsInserted(const QModelIndex &index);
 
     void at_workbench_currentLayoutAboutToBeChanged();
     void at_workbench_currentLayoutChanged();
@@ -106,6 +110,7 @@ private:
     int m_filterTimerId;
 
     QnResourcePoolModel *m_resourceModel;
+    QSortFilterProxyModel *m_resourceProxyModel;
     QnResourceTreeItemDelegate *m_resourceDelegate;
     QnResourceTreeItemDelegate *m_searchDelegate;
 

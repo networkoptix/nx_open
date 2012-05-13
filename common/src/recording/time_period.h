@@ -111,7 +111,7 @@ public:
 
         /* Note that there is no need to check for itr != end() here as
          * the container is not empty. */
-        if (searchForward && !itr->containTime(timeMs)) 
+        if (searchForward && itr->endTimeMs() <= timeMs)
             ++itr;
         return itr;
     }

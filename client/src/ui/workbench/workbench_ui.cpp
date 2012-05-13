@@ -1355,10 +1355,16 @@ void QnWorkbenchUi::at_titleItem_geometryChanged() {
     ));
 }
 
-void QnWorkbenchUi::at_titleItem_contextMenuRequested(QObject *target, QEvent *event) {
+void QnWorkbenchUi::at_titleItem_contextMenuRequested(QObject *, QEvent *event) {
     m_tabBarItem->setFocus();
 
+    QGraphicsSceneContextMenuEvent *menuEvent = static_cast<QGraphicsSceneContextMenuEvent *>(event);
+    
+    /* Redirect context menu event to tab bar. */
+    QPointF pos = menuEvent->pos();
+    menuEvent->setPos(m_tabBarItem->mapFromItem(m_titleItem, pos));
     display()->scene()->sendEvent(m_tabBarItem, event);
+    menuEvent->setPos(pos);
 }
 
 void QnWorkbenchUi::at_fpsItem_geometryChanged() {

@@ -734,56 +734,48 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
     QnVideoServerResourcePtr server = parameters.argument<QnVideoServerResourcePtr>(Qn::ServerParameter);
     if(!server)
         return;
+    QnVirtualCameraResourceList serverCameras = QnResourceCriterion::filter<QnVirtualCameraResource>(resourcePool()->getResourcesWithParentId(server->getId()));
 
     QnVirtualCameraResourceList modifiedResources;
     QnResourceList errorResources;
     QList<int> oldDisabledFlags;
-    //QnVirtualCameraResourceList cameras;
-
-
 
     foreach(const QnResourcePtr &resource, resources) {
         if(resource->getParentId() == server->getId())
             continue; /* Moving resource into its owner does nothing. */
 
-        QnVirtualCameraResourcePtr srcCamera = resource.dynamicCast<QnVirtualCameraResource>();
-        if(!srcCamera)
+        QnVirtualCameraResourcePtr sourceCamera = resource.dynamicCast<QnVirtualCameraResource>();
+        if(!sourceCamera)
             continue;
 
-        QnMacAddress mac = srcCamera->getMAC();
+        QnMacAddress mac = sourceCamera->getMAC();
 
         QnVirtualCameraResourcePtr replacedCamera;
-        foreach(const QnResourcePtr otherResource, resourcePool()->getResourcesWithParentId(server->getId())) {
-            if(QnVirtualCameraResourcePtr otherCamera = otherResource.dynamicCast<QnVirtualCameraResource>()) {
-                if(otherCamera->getMAC() == mac) {
-                    replacedCamera = otherCamera;
-                    break;
-                }
+        foreach(const QnVirtualCameraResourcePtr &otherCamera, serverCameras) {
+            if(otherCamera->getMAC() == mac) {
+                replacedCamera = otherCamera;
+                break;
             }
         }
 
         if(replacedCamera) {
             oldDisabledFlags.push_back(replacedCamera->isDisabled());
-
-            replacedCamera->setScheduleDisabled(srcCamera->isScheduleDisabled());
-            replacedCamera->setScheduleTasks(srcCamera->getScheduleTasks());
-            replacedCamera->setAuth(srcCamera->getAuth());
-            replacedCamera->setMotionRegionList(srcCamera->getMotionRegionList(), QnDomainMemory);
+            replacedCamera->setScheduleDisabled(sourceCamera->isScheduleDisabled());
+            replacedCamera->setScheduleTasks(sourceCamera->getScheduleTasks());
+            replacedCamera->setAuth(sourceCamera->getAuth());
+            replacedCamera->setMotionRegionList(sourceCamera->getMotionRegionList(), QnDomainMemory);
+            replacedCamera->setName(sourceCamera->getName());
             replacedCamera->setDisabled(false);
 
+            oldDisabledFlags.push_back(sourceCamera->isDisabled());
+            sourceCamera->setDisabled(true);
 
-            oldDisabledFlags.push_back(srcCamera->isDisabled());
-            srcCamera->setDisabled(true);
-
-            modifiedResources.push_back(srcCamera);
+            modifiedResources.push_back(sourceCamera);
             modifiedResources.push_back(replacedCamera);
 
-            QnResourcePtr newServer = resourcePool()->getResourceById(srcCamera->getParentId());
-
+            QnResourcePtr newServer = resourcePool()->getResourceById(sourceCamera->getParentId());
             if (newServer->getStatus() == QnResource::Offline)
-                srcCamera->setStatus(QnResource::Offline);
-//            else
-//                network->setStatus(replacedNetwork->getStatus());
+                sourceCamera->setStatus(QnResource::Offline);
         } else {
             errorResources.push_back(resource);
         }

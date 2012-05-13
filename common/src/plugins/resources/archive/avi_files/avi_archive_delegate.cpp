@@ -264,7 +264,7 @@ void QnAviArchiveDelegate::doNotFindStreamInfo()
     m_streamsFound=true;
     if (m_formatContext)
     {
-        for (int i = 0; i < m_formatContext->nb_streams; ++i)
+        for (unsigned i = 0; i < m_formatContext->nb_streams; ++i)
             m_formatContext->streams[i]->first_dts = 0; // reset first_dts. If don't do it, av_seek will seek to begin of file always
     }
 }
@@ -363,7 +363,6 @@ void QnAviArchiveDelegate::initLayoutStreams()
     int lastStreamID = -1;
     m_firstVideoIndex = -1;
 
-    AVDictionaryEntry* entry;
     for(unsigned i = 0; i < m_formatContext->nb_streams; i++)
     {
         AVStream *strm= m_formatContext->streams[i];
@@ -381,7 +380,7 @@ void QnAviArchiveDelegate::initLayoutStreams()
         case AVMEDIA_TYPE_VIDEO:
             if (m_firstVideoIndex == -1)
                 m_firstVideoIndex = i;
-            while (m_indexToChannel.size() <= i)
+            while (m_indexToChannel.size() <= static_cast<int>(i))
                 m_indexToChannel << -1;
             m_indexToChannel[i] = videoNum;
             videoNum++;

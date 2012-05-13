@@ -72,6 +72,33 @@ public:
     }
 
     /**
+     * \returns                         Position of the mouse pointer at the moment the 
+     *                                  mouse button that initiated this drag process was pressed, 
+     *                                  in item coordinates.
+     */
+    const QPointF &mousePressItemPos() const {
+        return m_mousePressItemPos;
+    }
+
+    /**
+     * \returns                         Position of the mouse pointer at the last call to <tt>drag()</tt> 
+     *                                  handler function, in item coordinates.
+     *                                  When <tt>drag()</tt> is called for the first time, 
+     *                                  this function returns mouse press position.
+     */
+    const QPointF &lastMouseItemPos() const {
+        return m_lastMouseItemPos;
+    }
+
+    /**
+     * \returns                         Current position of the mouse pointer, in item coordinates. 
+     */
+    const QPointF &mouseItemPos() const {
+        return m_mouseItemPos;
+    }
+
+
+    /**
      * \returns                         Current keyboard modifiers. 
      */
     Qt::KeyboardModifiers modifiers() const;
@@ -143,17 +170,26 @@ private:
     /** Position in scene coordinates where trigger button was pressed. */
     QPointF m_mousePressScenePos;
 
+    /** Position in item coordinates where trigger button was pressed. */
+    QPointF m_mousePressItemPos;
+
     /** Mouse position in view coordinates where the last event was processed. */
     QPoint m_lastMouseScreenPos;
 
     /** Mouse position in scene coordinates where the last event was processed. */
     QPointF m_lastMouseScenePos;
 
+    /** Mouse position in item coordinates where the last event was processed. */
+    QPointF m_lastMouseItemPos;
+
     /** Current mouse position in view coordinates. */
     QPoint m_mouseScreenPos;
 
     /** Current mouse position in scene coordinates. */
     QPointF m_mouseScenePos;
+
+    /** Current mouse position in item coordinates. */
+    QPointF m_mouseItemPos;
 };
 
 #endif // QN_DRAG_INFO_H

@@ -8,8 +8,7 @@
 #include <QtGui/QFont>
 
 #include <utils/common/hash.h>
-
-class QnTimeStep;
+#include "time_step.h"
 
 /**
  * Global pixmap cache for time slider.
@@ -29,20 +28,20 @@ public:
 
     static QnTimeSliderPixmapCache *instance();
 
-    const QPixmap *positionPixmap(qint64 position, int height, const QnTimeStep &step);
-    const QPixmap *highlightPixmap(qint64 position, int height, const QnTimeStep &step);
+    const QPixmap *positionShortPixmap(qint64 position, int height, const QnTimeStep &step);
+    const QPixmap *positionLongPixmap(qint64 position, int height, const QnTimeStep &step);
     const QPixmap *textPixmap(const QString &text, int height, const QColor &color);
 
 private:
-    struct CacheKey {
-        CacheKey(QString text, int size, QColor color): text(text), size(size), color(color) {}
-        CacheKey(): size(0) {}
+    struct TextCacheKey {
+        TextCacheKey(QString text, int size, QColor color): text(text), size(size), color(color) {}
+        TextCacheKey(): size(0) {}
 
         QString text;
         int size;
         QColor color;
 
-        friend uint qHash(const CacheKey &key) {
+        friend uint qHash(const TextCacheKey &key) {
             using ::qHash;
 
             uint h1 = qHash(key.text);
@@ -52,14 +51,14 @@ private:
             return h1 ^ ((h2 << 16) | (h2 >> 16)) ^ h3;
         }
 
-        friend bool operator==(const CacheKey &l, const CacheKey &r) {
+        friend bool operator==(const TextCacheKey &l, const TextCacheKey &r) {
             return l.text == r.text && l.size == r.size && l.color == r.color;
         }
     };
 
-    QHash<qint32, const QPixmap *> m_pixmapByPositionKey;
-    QHash<qint32, const QPixmap *> m_pixmapByHighlightKey;
-    QHash<CacheKey, const QPixmap *> m_pixmapByCacheKey;
+    QHash<qint32, const QPixmap *> m_pixmapByShortPositionKey;
+    QHash<QnTimeStepLongCacheKey, const QPixmap *> m_pixmapByLongPositionKey;
+    QHash<TextCacheKey, const QPixmap *> m_pixmapByCacheKey;
     QFont m_font;
 };
 

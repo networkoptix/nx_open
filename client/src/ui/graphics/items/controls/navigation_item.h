@@ -33,21 +33,23 @@ public:
         return m_navigator;
     }
 
+    virtual bool eventFilter(QObject *watched, QEvent *event) override;
+
 private slots:
-    void updateButtonsSyncState();
-    void updateButtonsSyncEffectiveState();
-    void updateButtonsLiveState();
-    void updateButtonsLiveSupportedState();
-    void updateButtonsPlayingState();
-    void updateButtonsPlayingSupportedState();
-    void updateButtonsMuteState();
+    void updateSyncButtonChecked();
+    void updateSyncButtonEnabled();
+    void updateLiveButtonChecked();
+    void updateLiveButtonEnabled();
+    void updatePlaybackButtonsIcons();
+    void updatePlaybackButtonsEnabled();
+    void updateMuteButtonChecked();
     void updateNavigatorSpeedFromSpeedSlider();
     void updateSpeedSliderSpeedFromNavigator();
     void updateSpeedSliderParametersFromNavigator();
-    void updateButtonsSpeedState();
+    void updatePlaybackButtonsPressed();
+    void updatePlayButtonChecked();
 
-    void at_navigator_currentWidgetAboutToBeChanged();
-    void at_navigator_currentWidgetChanged();
+    bool at_speedSlider_wheelEvent(QGraphicsSceneWheelEvent *event);
     void at_liveButton_clicked();
     void at_syncButton_clicked();
     void at_stepBackwardButton_clicked();

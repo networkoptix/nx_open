@@ -810,7 +810,7 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
             m_afterJump = false;
         //cl_log.log("ProcessData 2", QDateTime::fromMSecsSinceEpoch(vd->timestamp/1000).toString("hh:mm:ss.zzz"), cl_logALWAYS);
     }
-    else if (media->flags & QnAbstractMediaData::MediaFlags_BOF)
+    else if (media->flags & QnAbstractMediaData::MediaFlags_NewServer)
     {
         afterJump(media);
         if (m_extTimeSrc)
@@ -1158,7 +1158,7 @@ void CLCamDisplay::onRealTimeStreamHint(bool value)
 {
     m_isRealTimeSource = value;
     emit liveMode(m_isRealTimeSource);
-    if (m_isRealTimeSource)
+    if (m_isRealTimeSource && m_speed > 1)
         m_speed = 1.0f;
 }
 

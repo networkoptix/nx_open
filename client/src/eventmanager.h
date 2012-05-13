@@ -31,6 +31,7 @@ private slots:
 
     void at_eventReceived(QnEvent event);
     void at_connectionClosed(QString errorString);
+    void at_connectionOpened();
     void at_connectionReset();
 
 private:

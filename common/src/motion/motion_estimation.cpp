@@ -519,9 +519,9 @@ void QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
     // test
     fillFrameRect(m_frames[idx], QRect(0,0,m_frames[idx]->width, m_frames[idx]->height), 130);
     if (m_totalFrames % 2 == 1)
-        fillFrameRect(m_frames[idx], QRect(QPoint(0, m_frames[idx]->height/2), QPoint(m_frames[idx]->width, m_frames[idx]->height)), 110);
+        fillFrameRect(m_frames[idx], QRect(QPoint(0, 0), QPoint(m_frames[idx]->width, m_frames[idx]->height/2)), 40);
     else
-        fillFrameRect(m_frames[idx], QRect(QPoint(0, 0), QPoint(m_frames[idx]->width, m_frames[idx]->height/2)), 110);
+        fillFrameRect(m_frames[idx], QRect(QPoint(0, m_frames[idx]->height/2), QPoint(m_frames[idx]->width, m_frames[idx]->height)), 40);
 #endif
 
     if (m_decoder->getWidth() != m_lastImgWidth || m_decoder->getHeight() != m_lastImgHeight || m_isNewMask)
@@ -550,6 +550,7 @@ void QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
             m_resultMotion[i] |= reverseBits( (_mm_movemask_epi8(rez2) << 16) + _mm_movemask_epi8(rez1));
             cur += 2;
             prev += 2;
+            mask += 2;
         }
     }
 #else
@@ -580,6 +581,7 @@ void QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
             m_resultMotion[i] |= reverseBits( (_mm_movemask_epi8(rez2) << 16) + _mm_movemask_epi8(rez1));
             cur += 2;
             prev += 2;
+            mask += 2;
         }
     }
 #endif

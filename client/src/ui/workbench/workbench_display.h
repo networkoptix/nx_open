@@ -181,6 +181,8 @@ public:
 
     QnResourceWidget *widget(Qn::ItemRole role) const;
 
+    QList<QnResourceWidget *> widgets(const QnResourcePtr &resource) const;
+
     QList<QnResourceWidget *> widgets() const;
 
     QnResourceDisplay *display(QnWorkbenchItem *item) const;
@@ -352,6 +354,9 @@ protected slots:
     void at_mapper_cellSizeChanged();
     void at_mapper_spacingChanged();
 
+    void at_resource_disabledChanged();
+    void at_resource_disabledChanged(const QnResourcePtr &resource);
+
 private:
     /* Directly visible state */
 
@@ -372,6 +377,9 @@ private:
 
     /** Renderer to widget mapping. */
     QHash<QnAbstractRenderer *, QnResourceWidget *> m_widgetByRenderer;
+
+    /** Resource to widget mapping. */
+    QHash<QnResourcePtr, QList<QnResourceWidget *> > m_widgetsByResource;
 
     /** Current front z displacement value. */
     qreal m_frontZ;

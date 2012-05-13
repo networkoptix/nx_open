@@ -108,7 +108,7 @@ void QnWorkbenchNavigator::setTimeScrollBar(QnTimeScrollBar *scrollBar) {
     m_timeScrollBar = scrollBar;
 
     if(m_timeScrollBar) {
-        connect(m_timeScrollBar, SIGNAL(destroyed()), this, SLOT(at_scrollBar_destroyed()));
+        connect(m_timeScrollBar, SIGNAL(destroyed()), this, SLOT(at_timeScrollBar_destroyed()));
 
         if(isValid())
             initialize();
@@ -139,6 +139,8 @@ void QnWorkbenchNavigator::initialize() {
 
     connect(m_timeScrollBar,                    SIGNAL(valueChanged(qint64)),                       this,   SLOT(updateSliderFromScrollBar()));
     connect(m_timeScrollBar,                    SIGNAL(pageStepChanged(qint64)),                    this,   SLOT(updateSliderFromScrollBar()));
+    connect(m_timeScrollBar,                    SIGNAL(sliderPressed()),                            this,   SLOT(at_timeScrollBar_sliderPressed()));
+    connect(m_timeScrollBar,                    SIGNAL(sliderReleased()),                           this,   SLOT(at_timeScrollBar_sliderReleased()));
     m_timeScrollBar->installEventFilter(this);
 
     updateLines();
@@ -322,8 +324,12 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnResourceWidget *widget) {
     updateCurrentWidget();
 }
 
-QnResourceWidget *QnWorkbenchNavigator::currentWidget() {
+QnResourceWidget *QnWorkbenchNavigator::currentWidget() const {
     return m_currentWidget;
+}
+
+bool QnWorkbenchNavigator::currentWidgetIsCamera() const {
+    return m_currentWidgetIsCamera;
 }
 
 QnWorkbenchNavigator::SliderUserData QnWorkbenchNavigator::currentSliderData() const {
@@ -561,12 +567,27 @@ void QnWorkbenchNavigator::updateCurrentPeriods(Qn::TimePeriodType type) {
     }
 }
 
+void QnWorkbenchNavigator::updateSyncedPeriods() {
+    for(int i = 0; i < Qn::TimePeriodTypeCount; i++)
+        updateSyncedPeriods(static_cast<Qn::TimePeriodType>(i));
+}
+
 void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodType type) {
     QVector<QnTimePeriodList> periods;
     foreach(const QnResourcePtr &resource, m_syncedResources.uniqueKeys())
         periods.push_back(loader(resource)->periods(type));
 
-    m_timeSlider->setTimePeriods(SyncedLine, type, QnTimePeriod::mergeTimePeriods(periods));
+    QnTimePeriodList mergedPeriods = QnTimePeriod::mergeTimePeriods(periods);
+
+    if (type == Qn::MotionTimePeriod) {
+        foreach(QnResourceWidget *widget, m_syncedWidgets) {
+            QnAbstractArchiveReader  *archiveReader = widget->display()->archiveReader();
+            if (archiveReader)
+                archiveReader->setPlaybackMask(mergedPeriods);
+        }
+    }
+
+    m_timeSlider->setTimePeriods(SyncedLine, type, mergedPeriods);
 }
 
 void QnWorkbenchNavigator::updateLines() {
@@ -738,6 +759,8 @@ bool QnWorkbenchNavigator::eventFilter(QObject *watched, QEvent *event) {
     } else if(watched == m_timeScrollBar && event->type() == QEvent::GraphicsSceneWheel) {
         if(m_timeSlider->scene() && m_timeSlider->scene()->sendEvent(m_timeSlider, event))
             return true;
+    } else if(watched == m_timeScrollBar && event->type() == QEvent::GraphicsSceneMouseDoubleClick) {
+        m_timeSlider->animatedUnzoom();
     }
 
     return base_type::eventFilter(watched, event);
@@ -866,6 +889,8 @@ void QnWorkbenchNavigator::at_display_widgetAdded(QnResourceWidget *widget) {
         addSyncedWidget(widget);
 
         connect(widget, SIGNAL(motionSelectionChanged()), this, SLOT(at_widget_motionSelectionChanged()));
+
+        updateSyncedPeriods();
     }
 }
 
@@ -878,6 +903,7 @@ void QnWorkbenchNavigator::at_display_widgetAboutToBeRemoved(QnResourceWidget *w
                 loader->setMotionRegions(QList<QRegion>());
 
         removeSyncedWidget(widget);
+        updateSyncedPeriods();
     }
 }
 
@@ -896,8 +922,16 @@ void QnWorkbenchNavigator::at_timeSlider_destroyed() {
     setTimeSlider(NULL);
 }
 
-void QnWorkbenchNavigator::at_scrollBar_destroyed() {
+void QnWorkbenchNavigator::at_timeScrollBar_destroyed() {
     setTimeScrollBar(NULL);
+}
+
+void QnWorkbenchNavigator::at_timeScrollBar_sliderPressed() {
+    m_timeSlider->setOption(QnTimeSlider::AdjustWindowToPosition, false);
+}
+
+void QnWorkbenchNavigator::at_timeScrollBar_sliderReleased() {
+    m_timeSlider->setOption(QnTimeSlider::AdjustWindowToPosition, true);
 }
 
 

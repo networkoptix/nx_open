@@ -113,7 +113,7 @@ QSize QnScheduleGridWidget::minimumSizeHint() const
     return sz.expandedTo(QApplication::globalStrut());
 }
 
-void QnScheduleGridWidget::paintEvent(QPaintEvent *event)
+void QnScheduleGridWidget::paintEvent(QPaintEvent *)
 {
     QPainter p(this);
     if (m_weekDaysSize.isEmpty())

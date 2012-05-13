@@ -8,8 +8,6 @@
 #include "utils/common/synctime.h"
 
 
-int QnAppServerConnection::m_mediaProxyPort = 7009; // default value
-
 void conn_detail::ReplyProcessor::finished(int status, const QByteArray &result, const QByteArray &errorStringIn, int handle)
 {
     QByteArray errorString = errorStringIn;
@@ -472,17 +470,6 @@ int QnAppServerConnection::getUsers(QnUserResourceList& users, QByteArray& error
     return status;
 }
 
-int QnAppServerConnection::updateMediaProxyPort(const QString& errorString)
-{
-    // todo: implement me
-    return 0;
-}
-
-int QnAppServerConnection::getMediaProxyPort()
-{
-    return m_mediaProxyPort;
-}
-
 int QnAppServerConnection::getLicenses(QnLicenseList &licenses, QByteArray &errorString)
 {
     QByteArray data;
@@ -720,6 +707,16 @@ int QnAppServerConnection::setResourcesStatusAsync(const QnResourceList &resourc
     return SessionManager::instance()->sendAsyncPostRequest(m_url, "status", requestParams, "", target, slot);
 }
 
+int QnAppServerConnection::setResourceStatus(const QnId &resourceId, QnResource::Status status, QByteArray &errorString)
+{
+    QnRequestParamList requestParams;
+    requestParams.append(QnRequestParam("id", resourceId.toString()));
+    requestParams.append(QnRequestParam("status", QString::number(status)));
+
+    QByteArray reply;
+    return SessionManager::instance()->sendPostRequest(m_url, "status", requestParams, "", reply, errorString);
+}
+
 int QnAppServerConnection::setResourcesDisabledAsync(const QnResourceList &resources, QObject *target, const char *slot)
 {
     QnRequestParamList requestParams;
@@ -734,4 +731,20 @@ int QnAppServerConnection::setResourcesDisabledAsync(const QnResourceList &resou
     }
 
     return SessionManager::instance()->sendAsyncPostRequest(m_url, "disabled", requestParams, "", target, slot);
+}
+
+void QnAppServerConnectionFactory::setDefaultMediaProxyPort(int port)
+{
+    if (QnAppServerConnectionFactory *factory = theAppServerConnectionFactory()) {
+        factory->m_defaultMediaProxyPort = port;
+    }
+}
+
+int QnAppServerConnectionFactory::defaultMediaProxyPort()
+{
+    if (QnAppServerConnectionFactory *factory = theAppServerConnectionFactory()) {
+        return factory->m_defaultMediaProxyPort;
+    }
+
+    return 0;
 }

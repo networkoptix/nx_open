@@ -99,10 +99,6 @@ void QnWorkbenchStreamSynchronizer::at_renderWatcher_displayingStateChanged(QnAb
     if(widget == NULL)
         return;
 
-    CLVideoCamera* camera = widget->display()->camera();
-    if(camera == NULL)
-        return;
-
     m_syncPlay->onConsumerBlocksReader(widget->display()->dataProvider(), !displaying);
 }
 

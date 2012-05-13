@@ -9,12 +9,12 @@
 	<parent>
 		<artifactId>cpp</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>1.0</version>
+		<version>1.0.9</version>
 		<relativePath>../cpp</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>1.0</version>
+	<version>1.0.9</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>common</artifactId>
 	<packaging>pom</packaging>
@@ -47,12 +47,6 @@
 	</properties>	
 
 	<dependencies>
-		<dependency>
-			<groupId>com.nokia.qt</groupId>
-			<artifactId>qtcore</artifactId>
-			<version>4.7.4</version>
-			<type>zip</type>
-		</dependency>
 		<dependency>
 			<groupId>com.nokia.qt</groupId>
 			<artifactId>qtcore</artifactId>

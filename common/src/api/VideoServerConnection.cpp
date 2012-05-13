@@ -49,7 +49,6 @@ protected:
             return rez;
         }
         QString host = query.peerHostName();
-        int peerPort = query.peerPort();
         QUrl url = query.url();
         url.setPath("");
         url.setUserInfo("");
