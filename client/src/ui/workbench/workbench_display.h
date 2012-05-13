@@ -67,10 +67,12 @@ public:
     virtual ~QnWorkbenchDisplay();
 
     /**
-     * \param synchronized              Whether camera streams on the scene should
+     * \param widget              Whether camera streams on the scene should
      *                                  be synchronized.
      */
-    void setStreamsSynchronized(bool synchronized);
+    void setStreamsSynchronized(QnResourceWidget* widget);
+    void setStreamsSynchronized(bool synchronized, qint64 currentTime, float speed);
+
 
     bool isStreamsSynchronized() const;
 

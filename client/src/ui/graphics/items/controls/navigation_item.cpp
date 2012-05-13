@@ -465,8 +465,12 @@ void QnNavigationItem::at_liveButton_clicked() {
         m_liveButton->setChecked(true); /* Cannot go out of live mode by pressing 'live' button. */
 }
 
-void QnNavigationItem::at_syncButton_clicked() {
-    display()->setStreamsSynchronized(m_syncButton->isChecked());
+void QnNavigationItem::at_syncButton_clicked() 
+{
+    if (m_syncButton->isChecked())
+        display()->setStreamsSynchronized(m_navigator->currentWidget());
+    else
+        display()->setStreamsSynchronized(0);
 }
 
 void QnNavigationItem::at_stepBackwardButton_clicked() {

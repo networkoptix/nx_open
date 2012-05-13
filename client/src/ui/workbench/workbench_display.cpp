@@ -220,7 +220,8 @@ QnWorkbenchDisplay::~QnWorkbenchDisplay() {
     setScene(NULL);
 }
 
-void QnWorkbenchDisplay::setStreamsSynchronized(bool synchronized) {
+void QnWorkbenchDisplay::setStreamsSynchronized(bool synchronized, qint64 currentTime, float speed)
+{
     if(synchronized == isStreamsSynchronized())
         return;
 
@@ -233,9 +234,24 @@ void QnWorkbenchDisplay::setStreamsSynchronized(bool synchronized) {
             emit streamsSynchronizationEffectiveChanged();
     }
 
-    m_streamSynchronizer->setEnabled(synchronized);
+    if (synchronized)
+        m_streamSynchronizer->enableSync(currentTime, speed);
+    else
+        m_streamSynchronizer->disableSync();
 
     emit streamsSynchronizedChanged();
+}
+
+void QnWorkbenchDisplay::setStreamsSynchronized(QnResourceWidget* widget)
+{
+    bool synchronized = widget != 0;
+    qint64 currentTime = AV_NOPTS_VALUE;
+    float speed = 1.0;
+    if (widget) {
+        currentTime = widget->display()->currentTimeUSec();
+        speed = widget->display()->camDisplay()->getSpeed();
+    }
+    setStreamsSynchronized(synchronized, currentTime, speed);
 }
 
 bool QnWorkbenchDisplay::isStreamsSynchronized() const {
