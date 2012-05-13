@@ -175,12 +175,12 @@
         <CustomAction Id="AssignOldAppServerPort" Property="OLD_APPSERVER_PORT" Value="[APPSERVER_PORT]"/>
         <CustomAction Id="AssignOldServerRtspPort" Property="OLD_SERVER_RTSP_PORT" Value="[SERVER_RTSP_PORT]"/>
         <CustomAction Id="AssignOldServerApiPort" Property="OLD_SERVER_API_PORT" Value="[SERVER_API_PORT]"/>
-    	<CustomAction Id="AssignOldProxyPort" Property="OLD_PROXY_PORT" Value="[PROXY_PORT]"/>
+        <CustomAction Id="AssignOldProxyPort" Property="OLD_PROXY_PORT" Value="[PROXY_PORT]"/>
         
         <CustomAction Id="AssignAppServerPort" Property="APPSERVER_PORT" Value="[FREEPORT1]"/>
         <CustomAction Id="AssignServerRtspPort" Property="SERVER_RTSP_PORT" Value="[FREEPORT2]"/>
         <CustomAction Id="AssignServerApiPort" Property="SERVER_API_PORT" Value="[FREEPORT3]"/>
-    	<CustomAction Id="AssignProxyPort" Property="PROXY_PORT" Value="[FREEPORT4]"/>
+        <CustomAction Id="AssignProxyPort" Property="PROXY_PORT" Value="[FREEPORT4]"/>
         
         <!-- Assign default values for Quick installation -->
         <CustomAction Id="AssignServerAppServerPort" Property="SERVER_APPSERVER_PORT" Value="[APPSERVER_PORT]"/>
@@ -241,11 +241,11 @@
             <Custom Action="AssignOldAppServerPort" Before="AssignOldServerRtspPort">1</Custom>
             <Custom Action="AssignOldServerRtspPort" Before="AssignOldServerApiPort">1</Custom>
             <Custom Action="AssignOldServerApiPort" Before="AssignOldProxyPort">1</Custom>
-        	<Custom Action="AssignOldProxyPort" Before="AssignAppServerPort">1</Custom>
+            <Custom Action="AssignOldProxyPort" Before="AssignAppServerPort">1</Custom>
             <Custom Action="AssignAppServerPort" Before="AssignServerRtspPort">NOT APPSERVER_PORT</Custom>
             <Custom Action="AssignServerRtspPort" Before="AssignServerApiPort">NOT SERVER_RTSP_PORT</Custom>
             <Custom Action="AssignServerApiPort" Before="AssignProxyPort">NOT SERVER_API_PORT</Custom>
-        	<Custom Action="AssignProxyPort" Before="AssignServerAppServerPort">NOT PROXY_PORT</Custom>
+            <Custom Action="AssignProxyPort" Before="AssignServerAppServerPort">NOT PROXY_PORT</Custom>
             <Custom Action="AssignServerAppServerPort" Before="AssignClientAppServerPort">1</Custom>
             <Custom Action="AssignClientAppServerPort" Before="SetMoviesFolder">1</Custom>
             <Custom Action="SetMoviesFolder" Before="GenerateGuidsForServers">1</Custom>
@@ -348,7 +348,7 @@
                                 <RegistryKey Root="HKLM"
                                              Key="Software\[Manufacturer]\Enterprise Controller" Action="create">
                                     <RegistryValue Type="string" Name="port" Value="[APPSERVER_PORT]"/>
-                                	<RegistryValue Type="string" Name="proxyPort" Value="[PROXY_PORT]"/>
+                                    <RegistryValue Type="string" Name="proxyPort" Value="[PROXY_PORT]"/>
                                     <RegistryValue Type="string" Name="login" Value="[APPSERVER_LOGIN]"/>
                                     <RegistryValue Type="string" Name="password" Value="[APPSERVER_PASSWORD]"/>
                                 </RegistryKey>
@@ -404,7 +404,7 @@
                                 <File Id="ProxyQtXml$(var.suffix)4.dll" Name="QtXml$(var.suffix)4.dll" Source="mediaproxy\QtXml$(var.suffix)4.dll" />
                             </Component>
                         </Directory>
-                    	
+                        
                         <Directory Id="VmsMediaServerDir" Name="MediaServer">
                             <Component Id="ServerExecutable" Guid="06DFA703-0266-4970-BAC1-3730BF7D1C66">
                                 <File Id="ServerExe" Name="mediaserver.exe" Source="mediaserver/mediaserver.exe" KeyPath="yes">
@@ -611,7 +611,7 @@
             <ComponentRef Id="ecs.log" />           
             <ComponentRef Id="AppServerConfiguration"/>
             <ComponentRef Id="AppServerConfigurationGuid"/>
-        	
+            
             <ComponentRef Id="ProxyExecutable" />
             <ComponentRef Id="ProxyQTLibraries" />
         </Feature>
@@ -715,6 +715,7 @@
             
             <Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="PasswordDlg">INSTALLTYPE=0</Publish>
             <Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="AdvancedTypeDlg">INSTALLTYPE=1</Publish>
+            <Publish Dialog="InstallTypeDlg" Control="Next" Event="AddLocal" Value="ALL">INSTALLTYPE=0</Publish>
             
             <Publish Dialog="PasswordDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg">1</Publish>
             <Publish Dialog="PasswordDlg" Control="Next" Event="SpawnDialog" Value="EmptyPasswordDlg">NOT APPSERVER_PASSWORD</Publish>
