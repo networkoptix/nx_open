@@ -116,9 +116,8 @@ protected:
 protected slots:
     void updateCurrentWidget();
     void updateSliderFromReader();
+    void updateSliderOptions();
     void updateScrollBarFromSlider();
-    void delayedLoadThumbnails();
-    void loadThumbnails(qint64 startTimeMs, qint64 endTimeMs);
     void updateSliderFromScrollBar();
 
     void updateCurrentPeriods();
@@ -133,7 +132,10 @@ protected slots:
     void updatePlayingSupported();
     void updateSpeed();
     void updateSpeedRange();
+    
     void updateThumbnails();
+    void delayedLoadThumbnails();
+    void loadThumbnails(qint64 startTimeMs, qint64 endTimeMs);
 
 protected slots:
     void at_display_widgetChanged(Qn::ItemRole role);
@@ -168,6 +170,7 @@ private:
     QnResourceWidget *m_centralWidget;
     QnResourceWidget *m_currentWidget;
     WidgetFlags m_currentWidgetFlags;
+    bool m_currentWidgetLoaded;
 
     bool m_updatingSliderFromReader;
     bool m_updatingSliderFromScrollBar;
