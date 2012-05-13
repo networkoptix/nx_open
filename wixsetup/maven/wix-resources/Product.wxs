@@ -284,8 +284,8 @@
             <Custom Action="InitDatabaseAction_Cmd" After="SyncDatabaseAction"><![CDATA[ $(var.VmsInstalling) AND &AppServerFeature=3 ]]></Custom>
             <Custom Action="InitDatabaseAction" After="InitDatabaseAction_Cmd"><![CDATA[ $(var.VmsInstalling) AND &AppServerFeature=3 ]]></Custom>
             
-            <Custom Action="LaunchApplication_cmd" Before="LaunchApplication"><![CDATA[ !TrayToolFeature=3 OR &TrayToolFeature=3 ]]></Custom>
-            <Custom Action="LaunchApplication" Before="InstallFinalize"><![CDATA[ (!AppServerFeature=3 OR &AppServerFeature=3 OR !ServerFeature=3 OR &ServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
+<!--            <Custom Action="LaunchApplication_cmd" Before="LaunchApplication"><![CDATA[ !TrayToolFeature=3 OR &TrayToolFeature=3 ]]></Custom>
+            <Custom Action="LaunchApplication" Before="InstallFinalize"><![CDATA[ (!AppServerFeature=3 OR &AppServerFeature=3 OR !ServerFeature=3 OR &ServerFeature=3) AND REMOVE <> "ALL" ]]></Custom> -->
         </InstallExecuteSequence>
         
         <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
