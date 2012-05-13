@@ -234,16 +234,16 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_manager->installInstrument(new ForwardingInstrument(Instrument::Scene, keyEventTypes, this));
 
     /* View/viewport instruments. */
-    m_manager->installInstrument(new ForwardingInstrument(Instrument::Viewport, widgetMouseEventTypes, this), InstallationMode::InstallLast);
-    m_manager->installInstrument(m_handScrollInstrument, InstallationMode::InstallLast);
-    m_manager->installInstrument(new StopInstrument(Instrument::Viewport, widgetMouseEventTypes, this), InstallationMode::InstallLast);
-
     m_manager->installInstrument(m_rotationInstrument, InstallationMode::InstallAfter, display()->transformationListenerInstrument());
     m_manager->installInstrument(m_resizingInstrument);
     m_manager->installInstrument(m_moveInstrument);
     m_manager->installInstrument(m_dragInstrument);
     m_manager->installInstrument(m_rubberBandInstrument);
     m_manager->installInstrument(m_motionSelectionInstrument);
+
+    m_manager->installInstrument(new ForwardingInstrument(Instrument::Viewport, widgetMouseEventTypes, this), InstallationMode::InstallLast);
+    m_manager->installInstrument(m_handScrollInstrument, InstallationMode::InstallLast);
+    m_manager->installInstrument(new StopInstrument(Instrument::Viewport, widgetMouseEventTypes, this), InstallationMode::InstallLast);
 
     display()->setLayer(m_dropInstrument->surface(), Qn::UiLayer);
 
