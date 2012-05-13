@@ -406,7 +406,7 @@ void QnNavigationItem::updateSyncButtonChecked() {
 }
 
 void QnNavigationItem::updateSyncButtonEnabled() {
-    bool enabled = display()->isStreamsSynchronizationEffective() && m_navigator->currentWidgetIsCamera();
+    bool enabled = display()->isStreamsSynchronizationEffective() && (m_navigator->currentWidgetFlags() & QnWorkbenchNavigator::WidgetSupportsSync);
 
     m_syncButton->setEnabled(enabled);
 }
