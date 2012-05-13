@@ -500,8 +500,8 @@ WidgetAnimator *QnWorkbenchDisplay::animator(QnResourceWidget *widget) {
      * Note that widget is set as animator's parent. */
     animator = new WidgetAnimator(widget, "enclosingGeometry", "rotation", widget); // ANIMATION: items.
     animator->setAbsoluteMovementSpeed(0.0);
-    animator->setRelativeMovementSpeed(1.0);
-    animator->setScalingSpeed(4.0);
+    animator->setRelativeMovementSpeed(8.0);
+    animator->setScalingSpeed(128.0);
     animator->setRotationSpeed(270.0);
     animator->setTimer(m_animationInstrument->animationTimer());
     animator->setTimeLimit(widgetAnimationDurationMsec);
@@ -986,23 +986,11 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
 
     /* Move! */
     WidgetAnimator *animator = this->animator(widget);
-    if(animate) { // ANIMATION: easing curves for items.
+    if(animate) {
         QEasingCurve easingCurve;
 
         QSizeF currentSize = widget->enclosingGeometry().size();
         QSizeF targetSize = enclosingGeometry.size();
-        /*
-        if(qFuzzyCompare(currentSize, targetSize)) {
-            // Item was moved without resizing.
-            easingCurve = QEasingCurve::InOutBack;
-        } else if(contains(targetSize, currentSize)) {
-            //Item was resized up.
-            easingCurve = QEasingCurve::InBack;
-        } else {
-            // Item was resized down.
-            easingCurve = QEasingCurve::OutBack;
-        }
-        /**/
 
         animator->moveTo(enclosingGeometry, item->rotation(), easingCurve);
     } else {
