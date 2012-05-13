@@ -1,5 +1,5 @@
-#ifndef QN_CONFIG_H
-#define QN_CONFIG_H
+#ifndef QN_COMMON_CONFIG_H
+#define QN_COMMON_CONFIG_H
 
 // -------------------------------------------------------------------------- //
 // Globals. Do not change.
@@ -37,4 +37,5 @@
 #endif
 
 
-#endif // QN_CONFIG_H
+
+#endif // QN_COMMON_CONFIG_H

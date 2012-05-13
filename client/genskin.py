@@ -18,12 +18,9 @@ def genskin():
       dirs.remove('.svn')  # don't visit SVN directories
 
     for f in files:
-      if f.endswith('.png'):
-        print >> skin_qrc, '<file alias="%s">%s</file>' % (os.path.join(parent, f).lower(), os.path.join('..', root, f).lower())
-      if f.endswith('.mkv'):
+      if f.endswith('.png') or f.endswith('.mkv') or f.endswith('.ini'):
         print >> skin_qrc, '<file alias="%s">%s</file>' % (os.path.join(parent, f).lower(), os.path.join('..', root, f).lower())
       
-
   print >> skin_qrc, """
   </qresource>
   </RCC>

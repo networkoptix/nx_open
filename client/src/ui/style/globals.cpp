@@ -1,53 +1,100 @@
 #include "globals.h"
+
 #include <cassert>
-#include <QFont>
-#include <QColor>
+
+#include <QtCore/QSettings>
+#include <QtGui/QFont>
+#include <QtGui/QColor>
+
+#include "config.h"
 
 Q_GLOBAL_STATIC(QnGlobals, globalsInstance);
 
+namespace {
+    QColor parseColor(const QString &name, const QColor &defaultValue = QColor()) {
+        QString trimmedName = name.trimmed();
+        if(trimmedName.startsWith(QLatin1String("QColor"))) {
+            trimmedName = trimmedName.mid(trimmedName.indexOf(QLatin1Char('(')) + 1);
+            trimmedName = trimmedName.left(trimmedName.lastIndexOf(QLatin1Char(')')));
+
+            QStringList args = trimmedName.split(QLatin1Char(','));
+            if(args.size() < 3 || args.size() > 4)
+                return defaultValue;
+
+            QList<int> colors;
+            foreach(const QString &arg, args) {
+                bool ok = false;
+                int color = arg.toInt(&ok);
+                if(!ok)
+                    return defaultValue;
+                colors.push_back(color);
+            }
+
+            QColor result(colors[0], colors[1], colors[2]);
+            if(colors.size() == 4)
+                result.setAlpha(colors[3]);
+
+            return result;
+        } else {
+            QColor result(trimmedName);
+            if(result.isValid()) {
+                return result;
+            } else {
+                return defaultValue;
+            }
+        }
+    }
+
+    QColor parseColor(const QVariant &value, const QColor &defaultValue = QColor()) {
+        if(value.userType() == QVariant::Color) {
+            return value.value<QColor>();
+        } else if(value.userType() == QVariant::StringList) {
+            return parseColor(value.toStringList().join(QLatin1String(",")), defaultValue);
+        } else {
+            return parseColor(value.toString(), defaultValue);
+        }
+    }
+
+} // anonymous namespace
+
+
 QnGlobals::QnGlobals(QObject *parent):
-    QObject(parent) 
+    QObject(parent)
 {
-    setValue(SETTINGS_FONT,                         QFont()/*("Bodoni MT", 12)*/);
-    setValue(SHADOW_COLOR,                          QColor(0, 0, 0, 128));
-    setValue(SELECTION_COLOR,                       QColor(0, 150, 255, 110));
-    //setValue(MOTION_RUBBER_BAND_BORDER_COLOR,       QColor(16, 128+16, 16, 255));
-    //setValue(MOTION_RUBBER_BAND_COLOR,              QColor(0, 255, 0, 64));
-    //setValue(MOTION_SELECTION_COLOR,                QColor(0, 255, 0, 40));
-    setValue(MOTION_MASK_RUBBER_BAND_BORDER_COLOR,  QColor(255, 255, 255, 80));
-	setValue(MOTION_MASK_RUBBER_BAND_COLOR,         QColor(255, 255, 255, 40));
-    setValue(MOTION_MASK_COLOR,                     QColor(180, 180, 180, 96));
-	setValue(FRAME_COLOR,                           QColor(128, 128, 128, 196));
-    setValue(SELECTED_FRAME_COLOR,                  QColor(64, 130, 180, 128));
-    setValue(OPACITY_CHANGE_PERIOD,                 250);
+    /* Ensure that default skin resource is loaded. 
+     * This is needed because globals instance may be constructed before the
+     * corresponding resource initializer is called. */
+    Q_INIT_RESOURCE(skin);
 
-    setValue(ERROR_TEXT_COLOR,                      QColor(255, 64, 64));
+    QScopedPointer<QSettings> settings(new QSettings(QString(QN_SKIN_PATH) + QLatin1String("/skin/globals.ini"), QSettings::IniFormat));
 
-    /* Graphics scene has problems with handling mouse events on small scales, so the larger this number, the better. */
-    setValue(WORKBENCH_UNIT_SIZE,                   10000.0);
-
-
-    setValue(DEFAULT_LAYOUT_CELL_ASPECT_RATIO,      4.0 / 3.0);
-    setValue(DEFAULT_LAYOUT_CELL_SPACING,           QSizeF(0.1, 0.1));
-
-
-
-    const int COLOR_LIGHT = 100;
-
-    setValue(RECORD_ALWAYS_COLOR,           QColor(0, COLOR_LIGHT, 0));
-    setValue(RECORD_MOTION_COLOR,           QColor(COLOR_LIGHT, 0, 0));
-    setValue(NO_RECORD_COLOR,               QColor(COLOR_LIGHT - 32, COLOR_LIGHT - 32, COLOR_LIGHT - 32));
-    //setValue(MRS_COLOR,                     QColor(0xCD, 0x7F, 0x32));
-    //setValue(MRS_COLOR,                     QColor(0xD9, 0xD9, 0x19));  
-    setValue(MRS_COLOR,                     QColor(200, 0, 0));  
-
-    setValue(SELECTION_OPACITY_DELTA,       QColor(0, 0, 0, 0x80));
-    setValue(SELECTION_BORDER_DELTA,        QColor(48, 48, 48, 0));
-
+    settings->beginGroup(QLatin1String("globals"));
+    init(Dummy<VARIABLE_COUNT>(), settings.data());
+    settings->endGroup();
 }
 
 QnGlobals::~QnGlobals() {
     return;
+}
+
+void QnGlobals::initValue(Variable variable, QSettings *settings, const QString &key, const QColor &defaultValue) {
+    setValue(variable, parseColor(settings->value(key), defaultValue));
+}
+
+void QnGlobals::initValue(Variable variable, QSettings *settings, const QString &key, int defaultValue) {
+    bool ok = false;
+    int value = settings->value(key).toInt(&ok);
+    if(!ok)
+        value = defaultValue;
+    setValue(variable, value);
+}
+
+void QnGlobals::initValue(Variable variable, QSettings *settings, const QString &key, qreal defaultValue) {
+    bool ok = false;
+    qreal value = settings->value(key).toReal(&ok);
+    if(!ok)
+        value = defaultValue;
+    setValue(variable, value);
 }
 
 QVariant QnGlobals::value(Variable variable) {
