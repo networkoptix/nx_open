@@ -317,6 +317,15 @@ bool CommunicatingSocket::connect(const QString &foreignAddress,
   return true;
 }
 
+void CommunicatingSocket::shutdown()
+{
+#ifdef Q_OS_WIN
+    ::shutdown(sockDesc, SD_BOTH);
+#else
+    ::shutdown(sockDesc, SHUT_RDWR);
+#endif
+}
+
 void CommunicatingSocket::setReadTimeOut( unsigned int ms )
 {
 	m_timeout = ms;

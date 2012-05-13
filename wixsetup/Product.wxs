@@ -715,6 +715,7 @@
             
             <Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="PasswordDlg">INSTALLTYPE=0</Publish>
             <Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="AdvancedTypeDlg">INSTALLTYPE=1</Publish>
+            <Publish Dialog="InstallTypeDlg" Control="Next" Event="AddLocal" Value="ALL">INSTALLTYPE=0</Publish>
             
             <Publish Dialog="PasswordDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg">1</Publish>
             <Publish Dialog="PasswordDlg" Control="Next" Event="SpawnDialog" Value="EmptyPasswordDlg">NOT APPSERVER_PASSWORD</Publish>
