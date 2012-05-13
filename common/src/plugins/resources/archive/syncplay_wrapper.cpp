@@ -675,14 +675,37 @@ void QnArchiveSyncPlayWrapper::onConsumerBlocksReader(QnAbstractStreamDataProvid
     }
 }
 
-void QnArchiveSyncPlayWrapper::setEnabled(bool value)
+void QnArchiveSyncPlayWrapper::disableSync()
 {
     Q_D(QnArchiveSyncPlayWrapper);
     QMutexLocker lock(&d->timeMutex);
-    d->enabled = value;
+    if (!d->enabled)
+        return;
+    d->enabled = false;
     foreach(const ReaderInfo& info, d->readers)
+        info.reader->setNavDelegate(0);
+}
+
+void QnArchiveSyncPlayWrapper::enableSync(qint64 currentTime, float currentSpeed)
+{
+    Q_D(QnArchiveSyncPlayWrapper);
+    QMutexLocker lock(&d->timeMutex);
+    if (d->enabled)
+        return;
+    d->enabled = true;
+
+    foreach(const ReaderInfo& info, d->readers) 
     {
-        info.reader->setNavDelegate(value ? this : 0);
+        if (currentTime != AV_NOPTS_VALUE) {
+            setJumpTime(currentTime);
+            info.reader->jumpToPreviousFrame(currentTime);
+            info.reader->setSpeed(currentSpeed, currentTime);
+        }
+        else {
+            info.reader->setSpeed(currentSpeed);
+        }
+
+        info.reader->setNavDelegate(this);
     }
 }
 
