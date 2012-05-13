@@ -532,6 +532,7 @@
                                 <File Id="ClientAvutilDll" Name="avutil-51.dll" Source="../client/bin/$(env.CONFIG)/avutil-51.dll"/>
                                 <File Id="ClientSwscaleDll" Name="swscale-2.dll" Source="../client/bin/$(env.CONFIG)/swscale-2.dll"/>
 <!--                                <File Id="ClientMp3lameDll" Name="libmp3lame-0.dll" Source="../client/bin/$(env.CONFIG)/libmp3lame-0.dll"/> -->
+                                <File Id="ClientX264" Name="x264.exe" Source="client/x264.exe"/>
                             </Component>
                             
                             <Component Id="ClientQTLibraries" Guid="{6BDC7AB9-6230-4cf3-9C1C-634C636D90BC}">

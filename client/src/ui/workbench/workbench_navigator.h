@@ -30,6 +30,14 @@ class QnWorkbenchNavigator: public QObject, public QnWorkbenchContextAware, publ
     typedef QObject base_type;
 
 public:
+    enum WidgetFlag {
+        WidgetUsesUTC = 0x1,
+        WidgetSupportsLive = 0x2,
+        WidgetSupportsPeriods = 0x4,
+        WidgetSupportsSync = 0x8
+    };
+    Q_DECLARE_FLAGS(WidgetFlags, WidgetFlag);
+
     QnWorkbenchNavigator(QObject *parent = NULL);
     virtual ~QnWorkbenchNavigator();
 
@@ -53,7 +61,7 @@ public:
     qreal maximalSpeed() const;
 
     QnResourceWidget *currentWidget() const;
-    bool currentWidgetIsCamera() const;
+    WidgetFlags currentWidgetFlags() const;
 
     Q_SLOT void jumpBackward();
     Q_SLOT void jumpForward();
@@ -158,7 +166,7 @@ private:
 
     QnResourceWidget *m_centralWidget;
     QnResourceWidget *m_currentWidget;
-    bool m_currentWidgetIsCamera;
+    WidgetFlags m_currentWidgetFlags;
 
     bool m_updatingSliderFromReader;
     bool m_updatingSliderFromScrollBar;
@@ -184,5 +192,7 @@ private:
     qint64 m_thumbnailsStartTimeMs;
     qint64 m_thumbnailsEndTimeMs;
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchNavigator::WidgetFlags);
 
 #endif // QN_WORKBENCH_NAVIGATOR_H
