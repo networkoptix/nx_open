@@ -48,6 +48,8 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_updatingSliderFromScrollBar(false),
     m_updatingScrollBarFromSlider(false),
     m_currentWidgetFlags(0),
+    m_currentWidgetLoaded(false),
+    m_currentWidgetIsCentral(false),
     m_startSelectionAction(new QAction(this)),
     m_endSelectionAction(new QAction(this)),
     m_clearSelectionAction(new QAction(this)),
@@ -474,18 +476,26 @@ void QnWorkbenchNavigator::stepForward() {
 // -------------------------------------------------------------------------- //
 void QnWorkbenchNavigator::updateCurrentWidget() {
     QnResourceWidget *widget = NULL;
+    bool isCentral = false;
     if (m_centralWidget != NULL || !display()->isStreamsSynchronized()) {
         widget = m_centralWidget;
+        isCentral = true;
     } else if(m_syncedWidgets.contains(m_currentWidget)) {
-        return;
+        widget = m_currentWidget;
     } else if (m_syncedWidgets.empty()) {
         widget = NULL;
     } else {
         widget = *m_syncedWidgets.begin();
     }
 
-    if (m_currentWidget == widget)
+    if (m_currentWidget == widget) {
+        if(m_currentWidgetIsCentral != isCentral) {
+            m_currentWidgetIsCentral = isCentral;
+            updateLines();
+        }
+
         return;
+    }
 
     emit currentWidgetAboutToBeChanged();
 
@@ -501,6 +511,7 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
         m_currentWidgetFlags = 0;
     }
     m_currentWidgetLoaded = false;
+    m_currentWidgetIsCentral = isCentral;
 
     updateLines();
     updateSliderOptions();
@@ -620,7 +631,7 @@ void QnWorkbenchNavigator::updateLines() {
     bool isZoomed = display()->widget(Qn::ZoomedRole) != NULL;
 
     if(m_currentWidgetFlags & WidgetSupportsPeriods) {
-        m_timeSlider->setLineVisible(CurrentLine, true);
+        m_timeSlider->setLineVisible(CurrentLine, m_currentWidgetIsCentral);
         m_timeSlider->setLineVisible(SyncedLine, !isZoomed);
 
         m_timeSlider->setLineComment(CurrentLine, m_currentWidget->resource()->getName());
