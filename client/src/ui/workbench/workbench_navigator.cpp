@@ -135,8 +135,9 @@ void QnWorkbenchNavigator::initialize() {
     connect(m_timeSlider,                       SIGNAL(rangeChanged(qint64, qint64)),               this,   SLOT(updateScrollBarFromSlider()));
     connect(m_timeSlider,                       SIGNAL(windowChanged(qint64, qint64)),              this,   SLOT(updateScrollBarFromSlider()));
     connect(m_timeSlider,                       SIGNAL(windowChanged(qint64, qint64)),              this,   SLOT(loadThumbnails(qint64, qint64)));
-    m_timeSlider->installEventFilter(this);
-
+    connect(m_timeSlider,                       SIGNAL(selectionChanged(qint64, qint64)),           this,   SLOT(at_timeSlider_selectionChanged()));
+    connect(m_timeSlider,                       SIGNAL(customContextMenuRequested(const QPointF &, const QPoint &)), this, SLOT(at_timeSlider_customContextMenuRequested(const QPointF &, const QPoint &)));
+    
     connect(m_timeScrollBar,                    SIGNAL(valueChanged(qint64)),                       this,   SLOT(updateSliderFromScrollBar()));
     connect(m_timeScrollBar,                    SIGNAL(pageStepChanged(qint64)),                    this,   SLOT(updateSliderFromScrollBar()));
     connect(m_timeScrollBar,                    SIGNAL(sliderPressed()),                            this,   SLOT(at_timeScrollBar_sliderPressed()));
@@ -764,10 +765,7 @@ void QnWorkbenchNavigator::updateThumbnails()
 // Handlers
 // -------------------------------------------------------------------------- //
 bool QnWorkbenchNavigator::eventFilter(QObject *watched, QEvent *event) {
-    if(watched == m_timeSlider && event->type() == QEvent::GraphicsSceneContextMenu) {
-        at_timeSlider_contextMenuEvent(static_cast<QGraphicsSceneContextMenuEvent *>(event));
-        return true;
-    } else if(watched == m_timeScrollBar && event->type() == QEvent::GraphicsSceneWheel) {
+    if(watched == m_timeScrollBar && event->type() == QEvent::GraphicsSceneWheel) {
         if(m_timeSlider->scene() && m_timeSlider->scene()->sendEvent(m_timeSlider, event))
             return true;
     } else if(watched == m_timeScrollBar && event->type() == QEvent::GraphicsSceneMouseDoubleClick) {
@@ -777,7 +775,7 @@ bool QnWorkbenchNavigator::eventFilter(QObject *watched, QEvent *event) {
     return base_type::eventFilter(watched, event);
 }
 
-void QnWorkbenchNavigator::at_timeSlider_contextMenuEvent(QGraphicsSceneContextMenuEvent *event) {
+void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPointF &pos, const QPoint &screenPos) {
     if(!context() || !context()->menu()) {
         qnWarning("Requesting context menu for a time slider while no menu manager instance is available.");
         return;
@@ -801,15 +799,15 @@ void QnWorkbenchNavigator::at_timeSlider_contextMenuEvent(QGraphicsSceneContextM
     manager->redirectAction(menu.data(), Qn::ClearTimeSelectionAction,  m_clearSelectionAction);
 
     /* Run menu. */
-    QAction *action = menu->exec(event->screenPos());
+    QAction *action = menu->exec(screenPos);
 
     /* Process slider-local actions. */
     if(action == m_startSelectionAction) {
-        qint64 position = m_timeSlider->valueFromPosition(event->pos());
+        qint64 position = m_timeSlider->valueFromPosition(pos);
         m_timeSlider->setSelection(position, position);
         m_timeSlider->setSelectionValid(true);
     } else if(action == m_endSelectionAction) {
-        qint64 position = m_timeSlider->valueFromPosition(event->pos());
+        qint64 position = m_timeSlider->valueFromPosition(pos);
         m_timeSlider->setSelection(qMin(position, m_timeSlider->selectionStart()), qMax(position, m_timeSlider->selectionEnd()));
         m_timeSlider->setSelectionValid(true);
     } else if(action == m_clearSelectionAction) {
@@ -888,6 +886,17 @@ void QnWorkbenchNavigator::at_timeSlider_sliderReleased() {
         m_currentWidget->display()->archiveReader()->setSingleShotMode(false);
         m_currentWidget->display()->camDisplay()->playAudio(true);
     }
+}
+
+void QnWorkbenchNavigator::at_timeSlider_selectionChanged() {
+    if(!m_timeSlider->isSelectionValid())
+        return;
+
+    if(m_timeSlider->selectionStart() == m_timeSlider->selectionEnd())
+        return;
+
+    if(m_timeSlider->windowEnd() == m_timeSlider->maximum() && (m_currentWidgetFlags & WidgetSupportsLive))
+        m_timeSlider->setWindowEnd(m_timeSlider->maximum() - 1); /* Go out of live. */
 }
 
 void QnWorkbenchNavigator::at_display_widgetChanged(Qn::ItemRole role) {

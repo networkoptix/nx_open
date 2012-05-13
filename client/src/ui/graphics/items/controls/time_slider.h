@@ -128,6 +128,7 @@ public:
 signals:
     void windowChanged(qint64 windowStart, qint64 windowEnd);
     void selectionChanged(qint64 selectionStart, qint64 selectionEnd);
+    void customContextMenuRequested(const QPointF &pos, const QPoint &screenPos);
 
 protected:
     virtual void sliderChange(SliderChange change) override;
@@ -141,11 +142,13 @@ protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
+    virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
 
     virtual void tick(int deltaMSecs) override;
 
     virtual void kineticMove(const QVariant &degrees) override;
 
+    virtual void startDragProcess(DragInfo *info) override;
     virtual void startDrag(DragInfo *info) override;
     virtual void dragMove(DragInfo *info) override;
     virtual void finishDrag(DragInfo *info) override;
@@ -226,6 +229,7 @@ private:
     bool m_unzooming;
     Marker m_dragMarker;
     QPointF m_dragDelta;
+    bool m_dragIsClick;
 
     int m_lineCount;
     QVector<TypedPeriods> m_lineTimePeriods;

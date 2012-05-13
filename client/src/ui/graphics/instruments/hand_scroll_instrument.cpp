@@ -51,9 +51,9 @@ bool HandScrollInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event
     if (event->button() != Qt::RightButton)
         return false;
 
-    QGraphicsItem *mouseGrabberItem = view(viewport)->scene()->mouseGrabberItem();
-    QGraphicsObject *mouseGrabberObject = mouseGrabberItem ? mouseGrabberItem->toGraphicsObject() : NULL; 
-    if(mouseGrabberObject && mouseGrabberObject->property(Qn::NoHandScrollOver).value<bool>())
+    QGraphicsItem *item = this->item(view(viewport), event->pos()); 
+    QGraphicsObject *object = item ? item->toGraphicsObject() : NULL;
+    if(object && object->property(Qn::NoHandScrollOver).toBool())
         return false;
 
     kineticProcessor()->reset();

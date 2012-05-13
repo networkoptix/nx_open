@@ -1,17 +1,10 @@
 #include "drag_instrument.h"
-#include <QMouseEvent>
-#include <QDrag>
+
+#include <QtGui/QMouseEvent>
+#include <QtGui/QDrag>
+
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/workbench/workbench_resource.h>
-
-namespace {
-    struct ItemAcceptsLeftMouseButton: public std::unary_function<QGraphicsItem *, bool> {
-        bool operator()(QGraphicsItem *item) const {
-            return item->acceptedMouseButtons() & Qt::LeftButton;
-        }
-    };
-
-} // anonymous namespace
 
 DragInstrument::DragInstrument(QObject *parent):
     DragProcessingInstrument(Viewport, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent)
