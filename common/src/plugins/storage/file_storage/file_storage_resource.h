@@ -12,6 +12,7 @@ class QnFileStorageResource: public QnStorageResource
 {
 public:
     QnFileStorageResource();
+    ~QnFileStorageResource();
 
     static QnStorageResource* instance();
 

@@ -4,13 +4,19 @@
 #include "coldstore_api/sfs-client.h"
 #include "libavformat/avio.h"
 #include "core/resource/storage_resource.h"
+#include "coldstore_connection_pool.h"
+#include "coldstore_storage_helper.h"
+#include "coldstore_writer.h"
 
-typedef qint64 STORAGE_FILE_HANDLER;
+class QnColdStoreIOBuffer;
 
 class QnPlColdStoreStorage : public QnStorageResource
 {
 public:
     QnPlColdStoreStorage();
+    ~QnPlColdStoreStorage();
+
+    static QnStorageResource* instance();
 
     virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
 
@@ -27,11 +33,39 @@ public:
     virtual bool isFileExists(const QString& url) override;
     virtual bool isDirExists(const QString& url) override;
 
+    QString coldstoreAddr() const;
+
+    void onWriteBuffClosed(QnColdStoreIOBuffer* buff);
+
+    void onWrite(const QByteArray& ba, const QString& fn);
+
+    //=====================
+    QString fileName2csFileName(const QString& fn) const;
+    QnCSFileInfo getFileInfo(const QString& fn);
 private:
+    QnColdStoreMetaDataPtr getMetaDataFileForCsFile(const QString& csFile);
+    QString csDataFileName(const QnStorageURL& url) const;
 
-    Veracity::ISFS* m_csConnection;
-    Veracity::u32 m_stream;
+    bool hasOpenFilesFor(const QString& csFile) const;
 
+    QnColdStoreConnection* getPropriteConnectionForCsFile(const QString& csFile);
+
+private:
+    mutable QMutex m_mutex;
+
+    QnColdStoreConnectionPool m_connectionPool;
+
+    QnColdStoreMetaDataPool m_metaDataPool;
+
+    QnColdStoreMetaDataPtr m_currentWritingFileMetaData;
+    QnColdStoreMetaDataPtr m_prevWritingFileMetaData;
+
+    QnColdStoreWriter* m_cswriterThread;
+    QSet<QString> m_listOfWritingFiles;
+
+
+    QnColdStoreConnection* m_currentConnection;
+    QnColdStoreConnection* m_prevConnection;
 };
 
 
