@@ -185,9 +185,12 @@ QnColdStoreConnectionPool::QnColdStoreConnectionPool(QnPlColdStoreStorage *csSto
 m_csStorage(csStorage),
 m_mutex(QMutex::Recursive)
 {
+    
+#ifdef _WIN32    
     WSADATA wsaData;
     WORD wVersionRequested = MAKEWORD(1, 1);
     WSAStartup(wVersionRequested, &wsaData);
+#endif
 }
 
 QnColdStoreConnectionPool::~QnColdStoreConnectionPool()
