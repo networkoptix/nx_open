@@ -5,7 +5,7 @@ PACKAGENAME=networkoptix-mediaserver
 VERSION=${project.version}
 ARCHITECTURE=${os.arch}
 
-TARGET=/opt/networkoptix/${PACKAGENAME}
+TARGET=/opt/networkoptix/mediaserver
 BINTARGET=$TARGET/bin
 LIBTARGET=$TARGET/lib
 ETCTARGET=$TARGET/etc
