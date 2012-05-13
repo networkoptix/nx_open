@@ -186,7 +186,7 @@ m_csStorage(csStorage),
 m_mutex(QMutex::Recursive)
 {
     
-#ifdef _WIN32    
+#ifdef Q_OS_WIN32
     WSADATA wsaData;
     WORD wVersionRequested = MAKEWORD(1, 1);
     WSAStartup(wVersionRequested, &wsaData);
