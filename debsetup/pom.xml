@@ -37,7 +37,7 @@
 							<goal>exec</goal>
 						</goals>
 						<configuration>
-							<executable>${session.executionRootDirectory}/linux-build-mvn.sh</executable>
+							<executable>${basedir}/../pre-clean.sh</executable>
 							<workingDirectory>${project.build.directory}</workingDirectory>
 						</configuration>
 					</execution>	

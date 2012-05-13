@@ -60,18 +60,6 @@
 				<version>1.1.1</version>
 				<executions>
 					<execution>
-						<id>prepare-clean</id>
-						<phase>pre-clean</phase>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-							<executable>pre-clean.sh</executable>
-							<workingDirectory>${basedir}</workingDirectory>
-						</configuration>
-					</execution>
-
-					<execution>
 						<id>prepare-deb-contents</id>
 						<!--<id>default-cli</id>-->
 						<phase>prepare-package</phase>
