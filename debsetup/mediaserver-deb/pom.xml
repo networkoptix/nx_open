@@ -1,0 +1,135 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<!--
+    Example pom for delegating maven goals to msbuild so it builds the "solution"
+ 
+    A solution can be a group of projects, but here we only have one.
+    It should also be possible to have one maven project per solution project, 
+    and have a parent pom to deletegate the build.
+  -->
+	<parent>
+		<artifactId>debsetup</artifactId>
+		<groupId>com.networkoptix.hdwitness</groupId>
+		<version>1.0.9</version>
+		<relativePath>..</relativePath>
+	</parent>
+
+	<groupId>com.networkoptix.hdwitness</groupId>
+	<version>1.0.9</version>
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>mediaserver-deb</artifactId>
+	<packaging>pom</packaging>
+	<name>Common POM for debs projects</name>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.networkoptix.hdwitness</groupId>
+			<artifactId>mediaserver</artifactId>
+			<version>${project.version}</version>
+			<type>zip</type>
+			<classifier>${platform}-${arch}-${build.configuration}-exec</classifier>
+		</dependency>
+	</dependencies>		
+
+	<build>
+		<directory>${arch}</directory>
+		<outputDirectory>${arch}</outputDirectory>
+		<sourceDirectory>${basedir}/src</sourceDirectory> 	
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.4</version>
+				<executions>
+					<execution>
+						<id>copy-artifacts</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<excludeTransitive>true</excludeTransitive>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.1.1</version>
+				<executions>
+					<execution>
+						<id>prepare-clean</id>
+						<phase>pre-clean</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>pre-clean.sh</executable>
+							<workingDirectory>${basedir}</workingDirectory>
+						</configuration>
+					</execution>
+
+					<execution>
+						<id>prepare-deb-contents</id>
+						<!--<id>default-cli</id>-->
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>${project.build.directory}/prepare-dist.sh</executable>
+							<workingDirectory>${project.build.directory}</workingDirectory>		
+						</configuration>
+					</execution>
+					<execution>
+						<id>build-deb</id>
+						<phase>package</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>${project.build.directory}/build-dist.sh</executable>
+							<workingDirectory>${project.build.directory}</workingDirectory>		
+						</configuration>
+					</execution>							
+				</executions>
+			</plugin>	
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.5</version>
+				<executions>
+					<execution>
+						<id>prepare-qt-project</id>
+						<phase>process-sources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+							<resources>          
+								<resource>
+									<directory>${basedir}</directory>
+									<filtering>true</filtering>
+									<includes>
+										<include>bin/**</include>
+										<include>debian/**</include>
+										<include>init/**</include>
+										<include>init.d/**</include>
+										<include>*.sh</include>
+									</includes>
+									<excludes>
+										<exclude>build.sh</exclude>
+									</excludes>									
+								</resource>		
+							</resources>              
+							<encoding>UTF-8</encoding>
+						</configuration>            
+					</execution>				
+				</executions>
+			</plugin>			
+		</plugins>		
+	</build>
+</project>
