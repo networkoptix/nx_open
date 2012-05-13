@@ -46,9 +46,6 @@
 			</activation>
 			<modules>
 				<module>client</module>	
-				<module>mediaproxy</module>					
-				<module>traytool</module>
-				<module>testcamera</module>				
 				<module>wixsetup</module>
 			</modules>
 			<properties>
@@ -63,7 +60,7 @@
 				</os> 
 			</activation>
 			<modules>
-				<!-- <module>debsetup</module> -->
+				<module>debsetup</module>
 			</modules>
 			<properties>
 				<platform>linux</platform>

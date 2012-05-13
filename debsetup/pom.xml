@@ -21,7 +21,7 @@
 	<name>Common POM for debs projects</name>
 
 	<modules>
-		<module>appserver-deb</module>
+		<!-- <module>appserver-deb</module> -->
 		<module>mediaserver-deb</module>
 	</modules>	
 
