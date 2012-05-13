@@ -259,6 +259,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     m_selectionValid(false),
     m_pixmapCache(QnTimeSliderPixmapCache::instance()),
     m_unzooming(false),
+    m_dragIsClick(false),
     m_dragMarker(NoMarker),
 	m_lineCount(0)
 {
@@ -1423,7 +1424,19 @@ void QnTimeSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
     base_type::mouseReleaseEvent(event);
     m_dragMarker = NoMarker;
 
+    if(m_dragIsClick && event->button() == Qt::RightButton)
+        emit customContextMenuRequested(event->pos(), event->screenPos());
+
     event->accept();
+}
+
+void QnTimeSlider::contextMenuEvent(QGraphicsSceneContextMenuEvent *event) {
+    event->ignore();
+    return;
+}
+
+void QnTimeSlider::startDragProcess(DragInfo *) {
+    m_dragIsClick = true;
 }
 
 void QnTimeSlider::startDrag(DragInfo *info) {
@@ -1436,6 +1449,7 @@ void QnTimeSlider::startDrag(DragInfo *info) {
         m_dragMarker = SelectionStartMarker;
     }
 
+    m_dragIsClick = false;
     m_dragDelta = positionFromMarker(m_dragMarker) - info->mousePressItemPos();
 }
 
@@ -1470,3 +1484,5 @@ void QnTimeSlider::dragMove(DragInfo *info) {
 void QnTimeSlider::finishDrag(DragInfo *) {
     setSliderDown(false);
 }
+
+
