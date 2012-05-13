@@ -18,7 +18,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>mediaserver-deb</artifactId>
 	<packaging>pom</packaging>
-	<name>Common POM for debs projects</name>
+	<name>Media Server Deb Package</name>
 
 	<dependencies>
 		<dependency>

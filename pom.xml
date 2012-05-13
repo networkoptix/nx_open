@@ -60,7 +60,7 @@
 				</os> 
 			</activation>
 			<modules>
-				<module>debsetup</module>
+				<module>debsetup/mediaserver-deb</module>
 			</modules>
 			<properties>
 				<platform>linux</platform>
