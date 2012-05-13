@@ -124,6 +124,8 @@ bool QnWorkbenchNavigator::isValid() {
 void QnWorkbenchNavigator::initialize() {
     assert(isValid());
 
+    connect(action(Qn::SelectionChangeAction),  SIGNAL(triggered()),                                this,   SLOT(updateCentralWidget()));
+
     connect(display(),                          SIGNAL(widgetChanged(Qn::ItemRole)),                this,   SLOT(at_display_widgetChanged(Qn::ItemRole)));
     connect(display(),                          SIGNAL(widgetAdded(QnResourceWidget *)),            this,   SLOT(at_display_widgetAdded(QnResourceWidget *)));
     connect(display(),                          SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)), this,   SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
@@ -156,13 +158,15 @@ void QnWorkbenchNavigator::initialize() {
 void QnWorkbenchNavigator::deinitialize() {
     assert(isValid());
 
+    disconnect(action(Qn::SelectionChangeAction),   NULL, this, NULL);
+
     disconnect(display(),                           NULL, this, NULL);
     disconnect(display()->beforePaintInstrument(),  NULL, this, NULL);
     
     disconnect(m_timeSlider,                        NULL, this, NULL);
     m_timeSlider->removeEventFilter(this);
 
-    disconnect(m_timeScrollBar,                         NULL, this, NULL);
+    disconnect(m_timeScrollBar,                     NULL, this, NULL);
     m_timeScrollBar->removeEventFilter(this);
 
     m_currentWidget = NULL;
@@ -296,15 +300,6 @@ qreal QnWorkbenchNavigator::maximalSpeed() const {
         return 16.0;
 
     return 1.0;
-}
-
-void QnWorkbenchNavigator::setCentralWidget(QnResourceWidget *widget) {
-    if(m_centralWidget == widget)
-        return;
-
-    m_centralWidget = widget;
-
-    updateCurrentWidget();
 }
 
 void QnWorkbenchNavigator::addSyncedWidget(QnResourceWidget *widget) {
@@ -474,6 +469,24 @@ void QnWorkbenchNavigator::stepForward() {
 // -------------------------------------------------------------------------- //
 // Updaters
 // -------------------------------------------------------------------------- //
+void QnWorkbenchNavigator::updateCentralWidget() {
+    QnResourceWidget *centralWidget = display()->widget(Qn::CentralRole);
+    if(centralWidget == NULL) {
+        if(QnActionTargetProvider *provider = menu()->targetProvider()) {
+            QnResourceWidgetList widgets = QnActionTargetTypes::widgets(provider->currentTarget(Qn::SceneScope));
+            if(widgets.size() == 1)
+                centralWidget = widgets[0];
+        }
+    }
+    
+    if(m_centralWidget == centralWidget)
+        return;
+
+    m_centralWidget = centralWidget;
+
+    updateCurrentWidget();
+}
+
 void QnWorkbenchNavigator::updateCurrentWidget() {
     QnResourceWidget *widget = NULL;
     bool isCentral = false;
@@ -931,7 +944,7 @@ void QnWorkbenchNavigator::at_timeSlider_selectionChanged() {
 
 void QnWorkbenchNavigator::at_display_widgetChanged(Qn::ItemRole role) {
     if(role == Qn::CentralRole)
-        setCentralWidget(display()->widget(role));
+        updateCentralWidget();
 
     if(role == Qn::ZoomedRole)
         updateLines();

@@ -103,7 +103,6 @@ protected:
     void deinitialize();
     bool isValid();
 
-    void setCentralWidget(QnResourceWidget *widget);
     void addSyncedWidget(QnResourceWidget *widget);
     void removeSyncedWidget(QnResourceWidget *widget);
     
@@ -114,6 +113,7 @@ protected:
     QnCachingTimePeriodLoader *loader(QnResourceWidget *widget);
 
 protected slots:
+    void updateCentralWidget();
     void updateCurrentWidget();
     void updateSliderFromReader();
     void updateSliderOptions();
