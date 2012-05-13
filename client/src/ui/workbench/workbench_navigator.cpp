@@ -135,6 +135,7 @@ void QnWorkbenchNavigator::initialize() {
     connect(m_timeSlider,                       SIGNAL(rangeChanged(qint64, qint64)),               this,   SLOT(updateScrollBarFromSlider()));
     connect(m_timeSlider,                       SIGNAL(windowChanged(qint64, qint64)),              this,   SLOT(updateScrollBarFromSlider()));
     connect(m_timeSlider,                       SIGNAL(windowChanged(qint64, qint64)),              this,   SLOT(loadThumbnails(qint64, qint64)));
+    connect(m_timeSlider,                       SIGNAL(selectionChanged(qint64, qint64)),           this,   SLOT(at_timeSlider_selectionChanged()));
     connect(m_timeSlider,                       SIGNAL(customContextMenuRequested(const QPointF &, const QPoint &)), this, SLOT(at_timeSlider_customContextMenuRequested(const QPointF &, const QPoint &)));
     
     connect(m_timeScrollBar,                    SIGNAL(valueChanged(qint64)),                       this,   SLOT(updateSliderFromScrollBar()));
@@ -885,6 +886,17 @@ void QnWorkbenchNavigator::at_timeSlider_sliderReleased() {
         m_currentWidget->display()->archiveReader()->setSingleShotMode(false);
         m_currentWidget->display()->camDisplay()->playAudio(true);
     }
+}
+
+void QnWorkbenchNavigator::at_timeSlider_selectionChanged() {
+    if(!m_timeSlider->isSelectionValid())
+        return;
+
+    if(m_timeSlider->selectionStart() == m_timeSlider->selectionEnd())
+        return;
+
+    if(m_timeSlider->windowEnd() == m_timeSlider->maximum() && (m_currentWidgetFlags & WidgetSupportsLive))
+        m_timeSlider->setWindowEnd(m_timeSlider->maximum() - 1); /* Go out of live. */
 }
 
 void QnWorkbenchNavigator::at_display_widgetChanged(Qn::ItemRole role) {

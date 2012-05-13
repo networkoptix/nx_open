@@ -149,6 +149,7 @@ protected slots:
     void at_timeSlider_valueChanged(qint64 value);
     void at_timeSlider_sliderPressed();
     void at_timeSlider_sliderReleased();
+    void at_timeSlider_selectionChanged();
     void at_timeSlider_customContextMenuRequested(const QPointF &pos, const QPoint &screenPos);
     void at_timeSlider_destroyed();
 
