@@ -350,11 +350,12 @@ protected slots:
 
     void at_view_destroyed();
 
-    void at_historyPool_currentCameraChanged(const QnNetworkResourcePtr &camera);
-
     void at_mapper_originChanged();
     void at_mapper_cellSizeChanged();
     void at_mapper_spacingChanged();
+
+    void at_resource_disabledChanged();
+    void at_resource_disabledChanged(const QnResourcePtr &resource);
 
 private:
     /* Directly visible state */

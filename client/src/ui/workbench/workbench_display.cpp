@@ -16,7 +16,6 @@
 #include <utils/common/delete_later.h>
 
 #include <core/resource/layout_resource.h>
-#include <core/resource/camera_history.h>
 #include <core/resourcemanagment/resource_pool.h>
 #include <camera/resource_display.h>
 #include <camera/camera.h>
@@ -295,7 +294,6 @@ void QnWorkbenchDisplay::deinitSceneContext() {
 
     /* Deinit workbench. */
     disconnect(workbench(), NULL, this, NULL);
-    disconnect(qnHistoryPool, NULL, this, NULL);
 
     for(int i = 0; i < Qn::ItemRoleCount; i++)
         at_workbench_itemChanged(static_cast<Qn::ItemRole>(i), NULL);
@@ -348,7 +346,6 @@ void QnWorkbenchDisplay::initSceneContext() {
     connect(workbench(),            SIGNAL(itemRemoved(QnWorkbenchItem *)),         this,                   SLOT(at_workbench_itemRemoved(QnWorkbenchItem *)));
     connect(workbench(),            SIGNAL(boundingRectChanged()),                  this,                   SLOT(fitInView()));
     connect(workbench(),            SIGNAL(currentLayoutChanged()),                 this,                   SLOT(at_workbench_currentLayoutChanged()));
-    connect(qnHistoryPool,          SIGNAL(currentCameraChanged(const QnNetworkResourcePtr &)), this,       SLOT(at_historyPool_currentCameraChanged(const QnNetworkResourcePtr &)));
 
     /* Connect to grid mapper. */
     QnWorkbenchGridMapper *mapper = workbench()->mapper();
@@ -659,6 +656,8 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
     connect(widget,                     SIGNAL(aboutToBeDestroyed()),   this,   SLOT(at_widget_aboutToBeDestroyed()));
     connect(m_widgetActivityInstrument, SIGNAL(activityStopped()),      widget, SLOT(showActivityDecorations()));
     connect(m_widgetActivityInstrument, SIGNAL(activityResumed()),      widget, SLOT(hideActivityDecorations()));
+    if(widgets(widget->resource()).size() == 1)
+        connect(widget->resource().data(),  SIGNAL(disabledChanged(bool, bool)), this, SLOT(at_resource_disabledChanged()), Qt::QueuedConnection);
 
     emit widgetAdded(widget);
 
@@ -677,6 +676,9 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
     }
 
     disconnect(widget, NULL, this, NULL);
+    disconnect(m_widgetActivityInstrument, NULL, widget, NULL);
+    if(widgets(widget->resource()).size() == 1)
+        disconnect(widget->resource().data(), NULL, this, NULL);
 
     emit widgetAboutToBeRemoved(widget);
 
@@ -1371,17 +1373,23 @@ void QnWorkbenchDisplay::at_context_permissionsChanged(const QnResourcePtr &reso
     }
 }
 
-void QnWorkbenchDisplay::at_historyPool_currentCameraChanged(const QnNetworkResourcePtr &camera) {
-    foreach(QnResourceWidget *widget, widgets(camera)) {
-        QnNetworkResourcePtr currentCamera = qnHistoryPool->getCurrentCamera(camera);
-        if(currentCamera == camera)
-            continue;
+void QnWorkbenchDisplay::at_resource_disabledChanged() {
+    QObject *sender = this->sender();
+    if(!sender)
+        return; /* Already disconnected from this sender. */
 
+    at_resource_disabledChanged(toSharedPointer(checked_cast<QnResource *>(sender)));
+}
+
+void QnWorkbenchDisplay::at_resource_disabledChanged(const QnResourcePtr &resource) {
+    QnResourcePtr enabledResource = resourcePool()->getEnabledResourceByUniqueId(resource->getUniqueId());
+    if(!enabledResource || enabledResource == resource)
+        return;
+
+    foreach(QnResourceWidget *widget, widgets(resource)) {
         QnWorkbenchItem *item = widget->item();
 
         removeItemInternal(item, true, false);
         addItemInternal(item, false);
     }
 }
-
-

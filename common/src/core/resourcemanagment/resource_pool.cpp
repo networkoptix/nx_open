@@ -241,6 +241,25 @@ QnNetworkResourceList QnResourcePool::getAllNetResourceByMac(const QString &mac)
     return result;
 }
 
+QnNetworkResourcePtr QnResourcePool::getEnabledResourceByMac(const QString &mac) const {
+    foreach(const QnNetworkResourcePtr &resource, getAllNetResourceByMac(mac))
+        if(!resource->isDisabled())
+            return resource;
+    return QnNetworkResourcePtr();
+}
+
+QnResourcePtr QnResourcePool::getEnabledResourceByUniqueId(const QString &uniqueId) const {
+    QnResourcePtr resource = getResourceByUniqId(uniqueId);
+    if(!resource || !resource->isDisabled())
+        return resource;
+
+    QnNetworkResourcePtr networkResource = resource.dynamicCast<QnNetworkResource>();
+    if(!networkResource)
+        return QnResourcePtr();
+
+    return getEnabledResourceByMac(networkResource->getMAC().toString());
+}
+
 QnResourcePtr QnResourcePool::getResourceByUniqId(const QString &id) const
 {
     QMutexLocker locker(&m_resourcesMtx);
