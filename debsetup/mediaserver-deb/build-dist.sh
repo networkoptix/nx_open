@@ -1,20 +1,19 @@
 #!/bin/bash
 
 #. ../common.sh
+PACKAGENAME=networkoptix-mediaserver
+VERSION=${project.version}
+ARCHITECTURE=${os.arch}
 
-TARGET=/opt/networkoptix/${project.artifactId}
+TARGET=/opt/networkoptix/${PACKAGENAME}
 BINTARGET=$TARGET/bin
 LIBTARGET=$TARGET/lib
 ETCTARGET=$TARGET/etc
 INITTARGET=/etc/init
 INITDTARGET=/etc/init.d
 
-PACKAGENAME=networkoptix-mediaserver
-VERSION=${project.version}
-ARCHITECTURE=${os.arch}
-
 STAGEBASE=deb
-STAGE=$STAGEBASE/${PACKAGENAME}-${project.version}-${arch}-${build.configuration}
+STAGE=$STAGEBASE/${PACKAGENAME}-${project.version}.${buildNumber}-${arch}-${build.configuration}
 BINSTAGE=$STAGE$BINTARGET
 LIBSTAGE=$STAGE$LIBTARGET
 ETCSTAGE=$STAGE$ETCTARGET
@@ -53,27 +52,6 @@ cp -P ${qt.dir}/libXrender.so* $LIBSTAGE
 cp -P ${qt.dir}/libfontconfig.so* $LIBSTAGE
 cp -P ${qt.dir}/libICE.so* $LIBSTAGE
 cp -P ${qt.dir}/libSM.so* $LIBSTAGE
-
-# Copy required qt libraries
-#for file in $QT_FILES
-#do
-#    install -m 644  $QT_LIB_PATH/$file $LIBSTAGE
-#done
-
-# Copy required ffmpeg libraries
-#for file in $FFMPEG_FILES
-#do
-#    install -m 644 $FFMPEG_PATH/lib/$file $LIBSTAGE
-#done
-
-# Copy qjson library
-#install -m 644 $QJSON_PATH/libqjson.so.0 $LIBSTAGE
-
-# Copy system libraries which may be absent on target platform
-#install -m 644 /usr/lib/libprotobuf.so.7 $LIBSTAGE
-
-# Copy libcrypto
-#install -m 644 /lib/$ARCH-linux-gnu/libcrypto.so.1.0.0 $LIBSTAGE
 
 # Prepare DEBIAN dir
 mkdir -p $STAGE/DEBIAN
