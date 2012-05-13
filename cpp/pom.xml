@@ -21,6 +21,7 @@
 	<name>Common POM for cpp projects</name>
 
 	<properties>
+		<assembly-skip>false</assembly-skip>
 		<convert-only>true</convert-only>
 		<ffmpeg.version>2012-04-10-N-39672-g40b7a27</ffmpeg.version>
 		<buildLib/>
@@ -173,7 +174,7 @@
 						</configuration>
 					</execution>				
 				</executions>
-			</plugin>					
+			</plugin>				
 		</plugins>		
 	</build>
 	<profiles>
@@ -273,6 +274,26 @@
 								</configuration>
 							</execution>							
 						</executions>
+					</plugin>	
+					<plugin>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<version>2.2.2</version>
+						<executions>
+							<execution>
+								<id>pack-binaries</id>
+								<!-- <id>default-cli</id> -->
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<descriptors>
+										<descriptor>${project.build.directory}/binaries-${build.configuration}.xml</descriptor>
+									</descriptors>	
+									<skip>${assembly-skip}</skip>									
+								</configuration>
+							</execution>
+						</executions>
 					</plugin>					
 				</plugins>
 			</build>
@@ -286,9 +307,9 @@
 					<name>linux</name>
 				</os>		
 			</activation>
-			<!--<properties>
-				<arch>${os.arch}</arch>
-			</properties>	-->
+			<properties>
+				<rename-skip>false</rename-skip>
+			</properties>
 			<build>	
 				<plugins>
 					<plugin>
@@ -353,6 +374,20 @@
 							</execution>
 
 							<execution>
+								<!--<id>default-cli</id>-->
+								<id>rename-binary</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>${project.build.directory}/prepare-package.sh</executable>
+									<workingDirectory>${project.build.directory}</workingDirectory>		
+									<skip>${assembly-skip}</skip>
+								</configuration>
+							</execution>
+
+							<execution>
 								<id>unzip-dependencies</id>
 								<phase>generate-sources</phase>
 								<goals>
@@ -367,7 +402,26 @@
 										<commandlineArgs>*.zip</commandlineArgs>
 									</arguments>
 								</configuration>
-							</execution>							
+							</execution>						
+						</executions>
+					</plugin>
+
+					<plugin>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<version>2.2.2</version>
+						<executions>
+							<execution>
+								<id>pack-binaries</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<descriptors>
+										<descriptor>${project.build.directory}/binaries-linux.xml</descriptor>
+									</descriptors>							
+								</configuration>
+							</execution>
 						</executions>
 					</plugin>
 				</plugins>	

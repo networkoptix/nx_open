@@ -1,0 +1,138 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<!--
+    Example pom for delegating maven goals to msbuild so it builds the "solution"
+ 
+    A solution can be a group of projects, but here we only have one.
+    It should also be possible to have one maven project per solution project, 
+    and have a parent pom to deletegate the build.
+  -->
+	<parent>
+		<artifactId>hdwitness</artifactId>
+		<groupId>com.networkoptix.hdwitness</groupId>
+		<version>1.0.9</version>
+		<relativePath>..</relativePath>
+	</parent>
+
+	<groupId>com.networkoptix.hdwitness</groupId>
+	<version>1.0.9</version>
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>debsetup</artifactId>
+	<packaging>pom</packaging>
+	<name>Common POM for debs projects</name>
+
+	<modules>
+		<module>appserver-deb</module>
+		<module>mediaserver-deb</module>
+	</modules>	
+
+	<build>
+		<directory>${arch}</directory>
+		<outputDirectory>${arch}</outputDirectory>
+		<sourceDirectory>${basedir}/src</sourceDirectory> 	
+		<plugins>	
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.1.1</version>
+				<executions>
+					<execution>
+						<id>prepare-clean</id>
+						<phase>pre-clean</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>${session.executionRootDirectory}/linux-build-mvn.sh</executable>
+							<workingDirectory>${project.build.directory}</workingDirectory>
+						</configuration>
+					</execution>	
+				</executions>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.7</version>
+				<executions>
+					<execution>
+						<id>chmod</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<failOnError>false</failOnError>
+							<target>							
+								<chmod file="${project.build.directory}/*.sh" perm="755"/>							
+							</target>
+						</configuration>
+					</execution>				
+				</executions>
+			</plugin>
+			
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.1.1</version>
+				<executions>
+					<execution>
+						<id>prepare-deb-contents</id>
+						<!--<id>default-cli</id>-->
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>./prepare-dist.sh</executable>
+							<workingDirectory>${project.build.directory}</workingDirectory>		
+						</configuration>
+					</execution>
+					<execution>
+						<id>build-deb</id>
+						<phase>package</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>./build-dist.sh</executable>
+							<workingDirectory>${project.build.directory}</workingDirectory>		
+						</configuration>
+					</execution>							
+				</executions>
+			</plugin>	
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.5</version>
+				<executions>
+					<execution>
+						<id>prepare-qt-project</id>
+						<phase>initialize</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+							<resources>          
+								<resource>
+									<directory>${basedir}</directory>
+									<filtering>true</filtering>
+									<includes>
+										<include>bin</include>
+										<include>debian</include>
+										<include>init</include>
+										<include>init.d</include>
+										<include>*.sh</include>
+									</includes>
+									<excludes>
+										<exclude>build.sh</exclude>
+									</excludes>									
+								</resource>		
+							</resources>              
+							<encoding>UTF-8</encoding>
+						</configuration>            
+					</execution>				
+				</executions>
+			</plugin>			
+		</plugins>		
+	</build>
+</project>
