@@ -140,7 +140,7 @@
 											<directory>${project.build.sourceDirectory}</directory>
 											<filtering>false</filtering>
 											<includes>
-												<include>CustomActions</include>
+												<include>CustomActions/**</include>
 											</includes>
 										</resource>											
 									</resources>            
