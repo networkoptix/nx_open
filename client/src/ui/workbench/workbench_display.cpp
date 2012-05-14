@@ -16,7 +16,6 @@
 #include <utils/common/delete_later.h>
 
 #include <core/resource/layout_resource.h>
-#include <core/resource/camera_history.h>
 #include <core/resourcemanagment/resource_pool.h>
 #include <camera/resource_display.h>
 #include <camera/camera.h>
@@ -151,8 +150,8 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_animationInstrument = new AnimationInstrument(this);
     m_boundingInstrument = new BoundingInstrument(this);
     m_transformListenerInstrument = new TransformListenerInstrument(this);
-    m_curtainActivityInstrument = new ActivityListenerInstrument(1000, this);
-    m_widgetActivityInstrument = new ActivityListenerInstrument(1000 * 10, this);
+    m_curtainActivityInstrument = new ActivityListenerInstrument(true, 1000, this);
+    m_widgetActivityInstrument = new ActivityListenerInstrument(true, 1000 * 10, this);
     m_paintForwardingInstrument = new ForwardingInstrument(Instrument::Viewport, paintEventTypes, this);
     m_selectionOverlayHackInstrument = new SelectionOverlayHackInstrument(this);
 
@@ -221,7 +220,8 @@ QnWorkbenchDisplay::~QnWorkbenchDisplay() {
     setScene(NULL);
 }
 
-void QnWorkbenchDisplay::setStreamsSynchronized(bool synchronized) {
+void QnWorkbenchDisplay::setStreamsSynchronized(bool synchronized, qint64 currentTime, float speed)
+{
     if(synchronized == isStreamsSynchronized())
         return;
 
@@ -234,9 +234,24 @@ void QnWorkbenchDisplay::setStreamsSynchronized(bool synchronized) {
             emit streamsSynchronizationEffectiveChanged();
     }
 
-    m_streamSynchronizer->setEnabled(synchronized);
+    if (synchronized)
+        m_streamSynchronizer->enableSync(currentTime, speed);
+    else
+        m_streamSynchronizer->disableSync();
 
     emit streamsSynchronizedChanged();
+}
+
+void QnWorkbenchDisplay::setStreamsSynchronized(QnResourceWidget* widget)
+{
+    bool synchronized = widget != 0;
+    qint64 currentTime = AV_NOPTS_VALUE;
+    float speed = 1.0;
+    if (widget) {
+        currentTime = widget->display()->currentTimeUSec();
+        speed = widget->display()->camDisplay()->getSpeed();
+    }
+    setStreamsSynchronized(synchronized, currentTime, speed);
 }
 
 bool QnWorkbenchDisplay::isStreamsSynchronized() const {
@@ -295,7 +310,6 @@ void QnWorkbenchDisplay::deinitSceneContext() {
 
     /* Deinit workbench. */
     disconnect(workbench(), NULL, this, NULL);
-    disconnect(qnHistoryPool, NULL, this, NULL);
 
     for(int i = 0; i < Qn::ItemRoleCount; i++)
         at_workbench_itemChanged(static_cast<Qn::ItemRole>(i), NULL);
@@ -348,7 +362,6 @@ void QnWorkbenchDisplay::initSceneContext() {
     connect(workbench(),            SIGNAL(itemRemoved(QnWorkbenchItem *)),         this,                   SLOT(at_workbench_itemRemoved(QnWorkbenchItem *)));
     connect(workbench(),            SIGNAL(boundingRectChanged()),                  this,                   SLOT(fitInView()));
     connect(workbench(),            SIGNAL(currentLayoutChanged()),                 this,                   SLOT(at_workbench_currentLayoutChanged()));
-    connect(qnHistoryPool,          SIGNAL(currentCameraChanged(const QnNetworkResourcePtr &)), this,       SLOT(at_historyPool_currentCameraChanged(const QnNetworkResourcePtr &)));
 
     /* Connect to grid mapper. */
     QnWorkbenchGridMapper *mapper = workbench()->mapper();
@@ -487,8 +500,8 @@ WidgetAnimator *QnWorkbenchDisplay::animator(QnResourceWidget *widget) {
      * Note that widget is set as animator's parent. */
     animator = new WidgetAnimator(widget, "enclosingGeometry", "rotation", widget); // ANIMATION: items.
     animator->setAbsoluteMovementSpeed(0.0);
-    animator->setRelativeMovementSpeed(1.0);
-    animator->setScalingSpeed(4.0);
+    animator->setRelativeMovementSpeed(8.0);
+    animator->setScalingSpeed(128.0);
     animator->setRotationSpeed(270.0);
     animator->setTimer(m_animationInstrument->animationTimer());
     animator->setTimeLimit(widgetAnimationDurationMsec);
@@ -659,6 +672,8 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
     connect(widget,                     SIGNAL(aboutToBeDestroyed()),   this,   SLOT(at_widget_aboutToBeDestroyed()));
     connect(m_widgetActivityInstrument, SIGNAL(activityStopped()),      widget, SLOT(showActivityDecorations()));
     connect(m_widgetActivityInstrument, SIGNAL(activityResumed()),      widget, SLOT(hideActivityDecorations()));
+    if(widgets(widget->resource()).size() == 1)
+        connect(widget->resource().data(),  SIGNAL(disabledChanged(bool, bool)), this, SLOT(at_resource_disabledChanged()), Qt::QueuedConnection);
 
     emit widgetAdded(widget);
 
@@ -677,6 +692,9 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
     }
 
     disconnect(widget, NULL, this, NULL);
+    disconnect(m_widgetActivityInstrument, NULL, widget, NULL);
+    if(widgets(widget->resource()).size() == 1)
+        disconnect(widget->resource().data(), NULL, this, NULL);
 
     emit widgetAboutToBeRemoved(widget);
 
@@ -968,23 +986,11 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
 
     /* Move! */
     WidgetAnimator *animator = this->animator(widget);
-    if(animate) { // ANIMATION: easing curves for items.
+    if(animate) {
         QEasingCurve easingCurve;
 
         QSizeF currentSize = widget->enclosingGeometry().size();
         QSizeF targetSize = enclosingGeometry.size();
-        /*
-        if(qFuzzyCompare(currentSize, targetSize)) {
-            // Item was moved without resizing.
-            easingCurve = QEasingCurve::InOutBack;
-        } else if(contains(targetSize, currentSize)) {
-            //Item was resized up.
-            easingCurve = QEasingCurve::InBack;
-        } else {
-            // Item was resized down.
-            easingCurve = QEasingCurve::OutBack;
-        }
-        /**/
 
         animator->moveTo(enclosingGeometry, item->rotation(), easingCurve);
     } else {
@@ -1371,17 +1377,23 @@ void QnWorkbenchDisplay::at_context_permissionsChanged(const QnResourcePtr &reso
     }
 }
 
-void QnWorkbenchDisplay::at_historyPool_currentCameraChanged(const QnNetworkResourcePtr &camera) {
-    foreach(QnResourceWidget *widget, widgets(camera)) {
-        QnNetworkResourcePtr currentCamera = qnHistoryPool->getCurrentCamera(camera);
-        if(currentCamera == camera)
-            continue;
+void QnWorkbenchDisplay::at_resource_disabledChanged() {
+    QObject *sender = this->sender();
+    if(!sender)
+        return; /* Already disconnected from this sender. */
 
+    at_resource_disabledChanged(toSharedPointer(checked_cast<QnResource *>(sender)));
+}
+
+void QnWorkbenchDisplay::at_resource_disabledChanged(const QnResourcePtr &resource) {
+    QnResourcePtr enabledResource = resourcePool()->getEnabledResourceByUniqueId(resource->getUniqueId());
+    if(!enabledResource || enabledResource == resource)
+        return;
+
+    foreach(QnResourceWidget *widget, widgets(resource)) {
         QnWorkbenchItem *item = widget->item();
 
         removeItemInternal(item, true, false);
         addItemInternal(item, false);
     }
 }
-
-

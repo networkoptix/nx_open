@@ -65,6 +65,7 @@ public slots:
 
     void stopExport();
     void onExportFinished(QString fileName);
+    void onExportFailed(QString fileName);
 
 protected slots:
     void onReachedTheEnd();

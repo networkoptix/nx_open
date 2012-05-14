@@ -637,6 +637,7 @@ void QnApiPbSerializer::serializeServer(const QnVideoServerResourcePtr& serverPt
     pb_server.set_url(serverPtr->getUrl().toUtf8().constData());
     pb_server.set_guid(serverPtr->getGuid().toAscii().constData());
     pb_server.set_apiurl(serverPtr->getApiUrl().toUtf8().constData());
+    pb_server.set_status(static_cast<proto::pb::Server_Status>(serverPtr->getStatus()));
 
     if (!serverPtr->getNetAddrList().isEmpty())
         pb_server.set_netaddrlist(serializeNetAddrList(serverPtr->getNetAddrList()).toUtf8().constData());

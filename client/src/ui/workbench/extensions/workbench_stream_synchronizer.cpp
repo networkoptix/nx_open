@@ -42,11 +42,15 @@ QnWorkbenchStreamSynchronizer::QnWorkbenchStreamSynchronizer(QnWorkbenchDisplay 
         at_display_widgetAdded(widget);
 }
 
-void QnWorkbenchStreamSynchronizer::setEnabled(bool enabled) {
-    if(m_syncPlay->isEnabled() == enabled)
-        return;
+void QnWorkbenchStreamSynchronizer::disableSync() {
+    if(m_syncPlay->isEnabled())
+        m_syncPlay->disableSync();
+}
 
-    m_syncPlay->setEnabled(enabled);
+void QnWorkbenchStreamSynchronizer::enableSync(qint64 currentTime, float speed) 
+{
+    if(!m_syncPlay->isEnabled())
+        m_syncPlay->enableSync(currentTime, speed);
 }
 
 bool QnWorkbenchStreamSynchronizer::isEnabled() const {

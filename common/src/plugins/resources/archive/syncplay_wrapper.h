@@ -38,8 +38,9 @@ public:
     virtual bool isMediaPaused() const;
     //void setPlaybackMask(const QnTimePeriodList& playbackMask);
 
+    void disableSync();
+    void enableSync(qint64 currentTime, float currentSpeed);
 
-    void setEnabled(bool value);
     virtual bool isEnabled() const;
 
     //virtual bool setMotionRegion(const QRegion& region);

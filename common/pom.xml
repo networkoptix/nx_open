@@ -9,18 +9,20 @@
 	<parent>
 		<artifactId>cpp</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>1.0</version>
+		<version>1.0.9</version>
 		<relativePath>../cpp</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>1.0</version>
+	<version>1.0.9</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>common</artifactId>
 	<packaging>pom</packaging>
 	<name>HD Witness Common Lib</name>
 
 	<properties>
+		<assembly-skip>true</assembly-skip>
+		<rename-skip>true</rename-skip>
 		<buildLib>staticlib</buildLib>
 		<!--QT libs used-->
 		<qtlib1>network</qtlib1>

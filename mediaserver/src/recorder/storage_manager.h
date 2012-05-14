@@ -10,8 +10,9 @@
 
 class QnAbstractMediaStreamDataProvider;
 
-class QnStorageManager
+class QnStorageManager: public QObject
 {
+    Q_OBJECT
 public:
     QnStorageManager();
     virtual ~QnStorageManager();
@@ -38,6 +39,8 @@ public:
     QnTimePeriodList getRecordedPeriods(QnResourceList resList, qint64 startTime, qint64 endTime, qint64 detailLevel);
     void loadFullFileCatalog();
     QnStorageResourcePtr getOptimalStorageRoot(QnAbstractMediaStreamDataProvider* provider);
+public slots:
+    void at_archiveRangeChanged(qint64 newStartTimeMs, qint64 newEndTimeMs);
 private:
     void clearSpace(QnStorageResourcePtr storage);
     int detectStorageIndex(const QString& path);

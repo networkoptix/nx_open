@@ -193,7 +193,7 @@ void CLVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, co
         m_exportRecorder->disconnect(this);
         if (storage)
             m_exportRecorder->setStorage(storage);
-        connect(m_exportRecorder, SIGNAL(recordingFailed(QString)), this, SIGNAL(exportFailed(QString)));
+        connect(m_exportRecorder, SIGNAL(recordingFailed(QString)), this, SLOT(onExportFailed(QString)));
         connect(m_exportRecorder, SIGNAL(recordingFinished(QString)), this, SLOT(onExportFinished(QString)));
         connect(m_exportRecorder, SIGNAL(recordingProgress(int)), this, SLOT(at_exportProgress(int)));
     }
@@ -228,6 +228,12 @@ void CLVideoCamera::onExportFinished(QString fileName)
 {
     stopExport();
     emit exportFinished(fileName);
+}
+
+void CLVideoCamera::onExportFailed(QString fileName)
+{
+    stopExport();
+    emit exportFailed(fileName);
 }
 
 void CLVideoCamera::stopExport()

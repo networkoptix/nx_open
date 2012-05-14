@@ -1,1 +1,1 @@
-mvn clean
+..\cpp\_clean.bat

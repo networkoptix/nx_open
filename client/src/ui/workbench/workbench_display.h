@@ -67,10 +67,12 @@ public:
     virtual ~QnWorkbenchDisplay();
 
     /**
-     * \param synchronized              Whether camera streams on the scene should
+     * \param widget              Whether camera streams on the scene should
      *                                  be synchronized.
      */
-    void setStreamsSynchronized(bool synchronized);
+    void setStreamsSynchronized(QnResourceWidget* widget);
+    void setStreamsSynchronized(bool synchronized, qint64 currentTime, float speed);
+
 
     bool isStreamsSynchronized() const;
 
@@ -98,7 +100,8 @@ public:
     }
 
     /**
-     * \returns                         Activity listener instrument used by this workbench display.
+     * \returns                         Activity listener instrument used by this workbench display to
+     *                                  implement automatic curtaining.
      */
     ActivityListenerInstrument *activityListenerInstrument() const {
         return m_curtainActivityInstrument;
@@ -350,11 +353,12 @@ protected slots:
 
     void at_view_destroyed();
 
-    void at_historyPool_currentCameraChanged(const QnNetworkResourcePtr &camera);
-
     void at_mapper_originChanged();
     void at_mapper_cellSizeChanged();
     void at_mapper_spacingChanged();
+
+    void at_resource_disabledChanged();
+    void at_resource_disabledChanged(const QnResourcePtr &resource);
 
 private:
     /* Directly visible state */

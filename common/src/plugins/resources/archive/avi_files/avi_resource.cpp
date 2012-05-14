@@ -2,6 +2,7 @@
 #include "avi_archive_delegate.h"
 #include "../archive_stream_reader.h"
 #include "../filetypesupport.h"
+#include "../single_shot_file_reader.h"
 
 QnAviResource::QnAviResource(const QString& file)
 {
@@ -33,6 +34,10 @@ QString QnAviResource::toString() const
 
 QnAbstractStreamDataProvider* QnAviResource::createDataProviderInternal(ConnectionRole /*role*/)
 {
+    if (FileTypeSupport::isImageFileExt(getUrl())) {
+        return new QnSingleShotFileStreamreader(toSharedPointer());
+    }
+
     QnArchiveStreamReader* result = new QnArchiveStreamReader(toSharedPointer());
     QnAviArchiveDelegate* aviDelegate = new QnAviArchiveDelegate();
     if (m_storage)

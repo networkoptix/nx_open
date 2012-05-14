@@ -9,18 +9,19 @@
 	<parent>
 		<artifactId>hdwitness</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>1.0</version>
+		<version>1.0.9</version>
 		<relativePath>..</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>1.0</version>
+	<version>1.0.9</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>cpp</artifactId>
 	<packaging>pom</packaging>
 	<name>Common POM for cpp projects</name>
 
 	<properties>
+		<assembly-skip>false</assembly-skip>
 		<convert-only>true</convert-only>
 		<ffmpeg.version>2012-04-10-N-39672-g40b7a27</ffmpeg.version>
 		<buildLib/>
@@ -173,7 +174,7 @@
 						</configuration>
 					</execution>				
 				</executions>
-			</plugin>					
+			</plugin>				
 		</plugins>		
 	</build>
 	<profiles>
@@ -273,6 +274,26 @@
 								</configuration>
 							</execution>							
 						</executions>
+					</plugin>	
+					<plugin>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<version>2.2.2</version>
+						<executions>
+							<execution>
+								<id>pack-binaries</id>
+								<!-- <id>default-cli</id> -->
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<descriptors>
+										<descriptor>${project.build.directory}/binaries-${build.configuration}.xml</descriptor>
+									</descriptors>	
+									<skip>${assembly-skip}</skip>									
+								</configuration>
+							</execution>
+						</executions>
 					</plugin>					
 				</plugins>
 			</build>
@@ -286,9 +307,9 @@
 					<name>linux</name>
 				</os>		
 			</activation>
-			<!--<properties>
-				<arch>${os.arch}</arch>
-			</properties>	-->
+			<properties>
+				<rename-skip>false</rename-skip>
+			</properties>
 			<build>	
 				<plugins>
 					<plugin>
@@ -346,9 +367,23 @@
 										<commandlineArgs>-f</commandlineArgs>
 										<commandlineArgs>Makefile.${build.configuration}</commandlineArgs>
 										<commandlineArgs>-j</commandlineArgs>
-										<commandlineArgs>2</commandlineArgs>
+										<commandlineArgs>1</commandlineArgs>
 										<!--<commandlineArgs>`cat /proc/cpuinfo | grep ^processor | wc -l`</commandlineArgs>-->
 									</arguments>
+								</configuration>
+							</execution>
+
+							<execution>
+								<!--<id>default-cli</id>-->
+								<id>rename-binary</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>${project.build.directory}/prepare-package.sh</executable>
+									<workingDirectory>${project.build.directory}</workingDirectory>		
+									<skip>${assembly-skip}</skip>
 								</configuration>
 							</execution>
 
@@ -367,7 +402,26 @@
 										<commandlineArgs>*.zip</commandlineArgs>
 									</arguments>
 								</configuration>
-							</execution>							
+							</execution>						
+						</executions>
+					</plugin>
+
+					<plugin>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<version>2.2.2</version>
+						<executions>
+							<execution>
+								<id>pack-binaries</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<descriptors>
+										<descriptor>${project.build.directory}/binaries-linux.xml</descriptor>
+									</descriptors>							
+								</configuration>
+							</execution>
 						</executions>
 					</plugin>
 				</plugins>	

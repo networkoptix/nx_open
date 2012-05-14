@@ -144,6 +144,17 @@ QnResourcePtr QnRtspClientArchiveDelegate::getResourceOnTime(QnResourcePtr resou
     if (!netRes)
         return resource;
     QString mac = netRes->getMAC().toString();
+
+    if (time == DATETIME_NOW)
+    {
+        QnNetworkResourceList cameraList = qnResPool->getAllNetResourceByMac(mac);
+        foreach(QnNetworkResourcePtr camera, cameraList) {
+            if (!camera->isDisabled())
+                return camera;
+        }
+        return resource;
+    }
+
     QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(mac);
     if (!history)
         return resource;

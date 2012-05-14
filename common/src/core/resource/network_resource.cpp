@@ -13,7 +13,7 @@ Q_DECLARE_METATYPE(QAuthenticator);
 QnNetworkResource::QnNetworkResource()
     : QnResource(),
       m_networkStatus(0),
-      m_networkTimeout(2000),
+      m_networkTimeout(500),
       m_authenticated(true),
       m_probablyNeedToUpdateStatus(false)
 {

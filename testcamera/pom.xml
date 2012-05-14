@@ -9,12 +9,12 @@
 	<parent>
 		<artifactId>cpp</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>1.0</version>
+		<version>1.0.9</version>
 		<relativePath>../cpp</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>1.0</version>
+	<version>1.0.9</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>testcamera</artifactId>
 	<packaging>pom</packaging>
@@ -77,41 +77,11 @@
 
 	<build>
 		<plugins>	
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.2.2</version>
-				<executions>
-					<execution>
-						<id>pack-binaries</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-						<configuration>
-							<descriptors>
-								<descriptor>${project.build.directory}/binaries-${build.configuration}.xml</descriptor>
-							</descriptors>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+
 		</plugins>
 	</build>    
 
 	<profiles>
-		<!--<profile>
-			<id>convert-clean</id>
-			<activation>				
-				<file>
-					<missing>${project.build.directory}/build/include</missing>
-				</file>		
-			</activation>			
-			<build>
-				<plugins>			
-				</plugins>
-			</build>
-		</profile>	-->
-
 		<profile>
 			<id>convert-clean-windows</id>
 			<activation>			

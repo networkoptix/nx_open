@@ -81,6 +81,12 @@ public:
     int lineCount() const;
     void setLineCount(int lineCount);
 
+    void setLineVisible(int line, bool visible);
+    bool isLineVisible(int line) const;
+
+    void setLineStretch(int line, qreal stretch);
+    qreal lineStretch(int line) const;
+
     void setLineComment(int line, const QString &comment);
     QString lineComment(int line);
 
@@ -128,6 +134,7 @@ public:
 signals:
     void windowChanged(qint64 windowStart, qint64 windowEnd);
     void selectionChanged(qint64 selectionStart, qint64 selectionEnd);
+    void customContextMenuRequested(const QPointF &pos, const QPoint &screenPos);
 
 protected:
     virtual void sliderChange(SliderChange change) override;
@@ -141,11 +148,13 @@ protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
+    virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
 
     virtual void tick(int deltaMSecs) override;
 
     virtual void kineticMove(const QVariant &degrees) override;
 
+    virtual void startDragProcess(DragInfo *info) override;
     virtual void startDrag(DragInfo *info) override;
     virtual void dragMove(DragInfo *info) override;
     virtual void finishDrag(DragInfo *info) override;
@@ -164,6 +173,8 @@ private:
     Marker markerFromPosition(const QPointF &pos) const;
     QPointF positionFromMarker(Marker marker) const;
 
+    qreal effectiveLineStretch(int line) const;
+
     void setMarkerSliderPosition(Marker marker, qint64 position);
 
     bool scaleWindow(qreal factor, qint64 anchor);
@@ -177,6 +188,7 @@ private:
     void drawDates(QPainter *painter, const QRectF &rect);
     void drawThumbnails(QPainter *painter, const QRectF &rect);
 
+    void updateVisibleLineCount();
     void updateToolTipVisibility();
     void updateToolTipText();
     void updateSteps();
@@ -187,16 +199,13 @@ private:
     void updateLineCommentPixmaps();
     void updateAggregationValue();
     void updateAggregatedPeriods(int line, Qn::TimePeriodType type);
-    
+    void updateTotalLineStretch();
+
+
     void animateStepValues(int deltaMSecs);
 
 private:
     Q_DECLARE_PRIVATE(GraphicsSlider);
-
-    struct TypedPeriods {
-        QnTimePeriodList normal[Qn::TimePeriodTypeCount];
-        QnTimePeriodList aggregated[Qn::TimePeriodTypeCount];
-    };
 
     struct TimeStepData {
         TimeStepData(): currentHeight(0.0), targetHeight(0.0), currentLineOpacity(0.0), targetLineOpacity(0.0), currentTextOpacity(0.0), targetTextOpacity(0.0) {}
@@ -210,6 +219,17 @@ private:
 
         int currentTextHeight;
         qreal currentLineHeight;
+    };
+
+    struct LineData {
+        LineData(): commentPixmap(NULL), visible(true), stretch(1.0) {}
+
+        QnTimePeriodList normalPeriods[Qn::TimePeriodTypeCount];
+        QnTimePeriodList aggregatedPeriods[Qn::TimePeriodTypeCount];
+        QString comment;
+        const QPixmap *commentPixmap;
+        bool visible;
+        qreal stretch;
     };
 
     qint64 m_windowStart, m_windowEnd;
@@ -226,11 +246,11 @@ private:
     bool m_unzooming;
     Marker m_dragMarker;
     QPointF m_dragDelta;
+    bool m_dragIsClick;
 
     int m_lineCount;
-    QVector<TypedPeriods> m_lineTimePeriods;
-    QVector<QString> m_lineComments;
-    QVector<const QPixmap *> m_lineCommentPixmaps;
+    qreal m_totalLineStretch;
+    QVector<LineData> m_lineData;
     qreal m_aggregationMSecs;
 
     QVector<QnTimeStep> m_steps;

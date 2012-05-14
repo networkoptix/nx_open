@@ -71,6 +71,8 @@ void QnCameraPool::addCameras(int count, QStringList fileList, double fps, int o
         camera->setFileList(fileList);
         camera->setFps(fps);
         camera->setOfflineFreq(offlineFreq);
+        foreach(QString fileName, fileList)
+            QnFileCache::instance()->getMediaData(fileName);
         m_cameras.insert(camera->getMac(), camera);
     }
 }

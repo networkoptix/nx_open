@@ -32,7 +32,13 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
 
 QnFileStorageResource::QnFileStorageResource()
 {
+
 };
+
+QnFileStorageResource::~QnFileStorageResource()
+{
+
+}
 
 bool QnFileStorageResource::isNeedControlFreeSpace()
 {

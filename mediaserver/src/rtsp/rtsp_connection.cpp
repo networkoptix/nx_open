@@ -476,7 +476,7 @@ void QnRtspConnectionProcessor::at_cameraDisabledChanged(bool oldValue, bool new
 	QMutexLocker lock(&d->mutex);
     if (newValue) {
         m_needStop = true;
-        d->socket->close();
+        d->socket->shutdown();
     }
 }
 
@@ -696,7 +696,7 @@ int QnRtspConnectionProcessor::composeSetParameter()
             checkQuality();
             d->qualityFastSwitch = false;
 
-            if (d->liveMode)
+            if (d->liveMode == Mode_Live)
             {
                 d->dataProcessor->lockDataQueue();
 

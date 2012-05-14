@@ -1,0 +1,71 @@
+#ifndef coldstore_connection_pool_h1931
+#define coldstore_connection_pool_h1931
+#include "coldstore_api/sfs-client.h"
+
+#define CS_ACTUAL_DATA_CHANNEL 0
+#define CS_META_DATA_CHANNEL 1
+
+class QnPlColdStoreStorage;
+
+class QnColdStoreConnection
+{
+public:
+    QnColdStoreConnection(const QString& addr);
+    virtual ~QnColdStoreConnection();
+
+    bool open(const QString& fn, QIODevice::OpenModeFlag flag, int channel);
+
+    qint64 size() const; // returns the size of opened channel
+
+    void close();
+
+
+    bool seek(qint64 pos);
+    bool write(const char* data, int len);
+    int read(char *data, int len);
+
+    int age() const; // return the number of seconds then the connection was used last time 
+
+    QString getFilename() const;
+
+private:
+    Veracity::SFSClient m_connection;
+    Veracity::u32 m_stream;
+
+    QTime m_lastUsed;
+
+    bool m_isConnected;
+
+    QIODevice::OpenModeFlag m_openMode;
+
+    Veracity::u64 m_openedStreamSize;
+
+    QString m_filename;
+
+
+        
+};
+
+//================================================================
+// the pool is used for read only.
+// all writes to coldstore goes through just one connection.
+class QnColdStoreConnectionPool
+{
+public:
+    QnColdStoreConnectionPool(QnPlColdStoreStorage *csStorage);
+    virtual ~QnColdStoreConnectionPool();
+
+    int read(const QString& csFn,   char* data, quint64 shift, int len);
+
+private:
+    void checkIfSomeConnectionsNeedToBeClosed();
+private:
+
+    QnPlColdStoreStorage *m_csStorage;
+    
+    QHash<QString, QnColdStoreConnection*>  m_pool;
+
+    QMutex m_mutex;
+};
+
+#endif // coldstore_connection_pool_h1931

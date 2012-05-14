@@ -12,14 +12,6 @@
 
 #include "noptix_style.h"
 
-#ifndef QN_SKIN_PATH
-#  ifdef CL_CUSTOMIZATION_PRESET
-#    define QN_SKIN_PATH QLatin1String(":/") + QLatin1String(CL_CUSTOMIZATION_PRESET)
-#  else
-#    define QN_SKIN_PATH QLatin1Char(':')
-#  endif
-#endif
-
 namespace {
     class QnIconBuilder {
         typedef QHash<QPair<QIcon::Mode, QIcon::State>, QPixmap> container_type;

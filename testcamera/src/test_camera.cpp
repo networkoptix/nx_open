@@ -9,53 +9,45 @@
 #include "plugins/resources/archive/avi_files/avi_archive_delegate.h"
 #include "utils/media/ffmpeg_helper.h"
 
-class QnFileCache
+QList<QnCompressedVideoDataPtr> QnFileCache::getMediaData(const QString& fileName)
 {
-public:
-    static QnFileCache* instance();
+    QMutexLocker lock(&m_mutex);
+    QList<QnCompressedVideoDataPtr> rez;
 
-    QList<QnCompressedVideoDataPtr> getMediaData(const QString& fileName)
+    MediaCache::iterator itr = m_cache.find(fileName);
+    if (itr != m_cache.end())
+        return *itr;
+
+    QnAviResourcePtr file(new QnAviResource(fileName));
+    QnAviArchiveDelegate aviDelegate;
+    if (!aviDelegate.open(file))
     {
-        QMutexLocker lock(&m_mutex);
-        QList<QnCompressedVideoDataPtr> rez;
-
-        MediaCache::iterator itr = m_cache.find(fileName);
-        if (itr != m_cache.end())
-            return *itr;
-
-        QnAviResourcePtr file(new QnAviResource(fileName));
-        QnAviArchiveDelegate aviDelegate;
-        if (!aviDelegate.open(file))
-        {
-            qDebug() << "Can't open file" << fileName;
-            return rez;
-        }
-
-        QnAbstractMediaDataPtr media;
-        qint64 totalSize = 0;
-        while (media = aviDelegate.getNextData())
-        {
-            QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(media);
-            if (!video)
-                continue;
-            rez << video;
-            totalSize += video->data.size();
-            if (totalSize > 1024*1024*200)
-            {
-                qDebug() << "File" << fileName << "too large. Using first 200M.";
-                break;
-            }
-        }
-
-        m_cache.insert(fileName, rez);
+        qDebug() << "Can't open file" << fileName;
         return rez;
     }
-    
-private:
-    typedef QMap<QString, QList<QnCompressedVideoDataPtr> > MediaCache;
-    MediaCache m_cache;
-    QMutex m_mutex;
-};
+
+    QnAbstractMediaDataPtr media;
+    qint64 totalSize = 0;
+
+    qDebug() << "Start buffering file" << fileName << "...";
+
+    while (media = aviDelegate.getNextData())
+    {
+        QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(media);
+        if (!video)
+            continue;
+        rez << video;
+        totalSize += video->data.size();
+        if (totalSize > 1024*1024*100)
+        {
+            qDebug() << "File" << fileName << "too large. Using first 100M.";
+            break;
+        }
+    }
+    qDebug() << "File" << fileName << "ready for streaming";
+    m_cache.insert(fileName, rez);
+    return rez;
+}
 
 Q_GLOBAL_STATIC(QnFileCache, inst);
 QnFileCache* QnFileCache::instance()

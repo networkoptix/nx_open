@@ -3,8 +3,14 @@
 
 QnMotionRegion::QnMotionRegion()
 {
-    //addRect((QnMotionRegion::MAX_SENSITIVITY - QnMotionRegion::MIN_SENSITIVITY)/2, QRect(0,0,MD_WIDTH, MD_HEIGHT));
-    addRect(0, QRect(0,0,MD_WIDTH, MD_HEIGHT));
+    addRect(8, QRect(0,0,MD_WIDTH, MD_HEIGHT));
+    //addRect(0, QRect(0,0,MD_WIDTH, MD_HEIGHT));
+}
+
+void QnMotionRegion::removeDefaultMotion()
+{
+    for (int i = MIN_SENSITIVITY; i <= MAX_SENSITIVITY; ++i)
+        m_data[i] = QRegion();
 }
 
 QRegion QnMotionRegion::getMotionMask() const
