@@ -312,6 +312,7 @@ void QnWorkbenchNavigator::addSyncedWidget(QnResourceWidget *widget) {
     m_syncedResources.insert(widget->resource(), QHashDummyValue());
 
     updateCurrentWidget();
+    updateSyncedPeriods();
 }
 
 void QnWorkbenchNavigator::removeSyncedWidget(QnResourceWidget *widget) {
@@ -322,7 +323,12 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnResourceWidget *widget) {
      * and is therefore perfectly safe. */
     m_syncedResources.erase(m_syncedResources.find(widget->resource()));
 
+    if(!widget->isMotionSelectionEmpty())
+        if(QnCachingTimePeriodLoader *loader = this->loader(widget->resource()))
+            loader->setMotionRegions(QList<QRegion>());
+
     updateCurrentWidget();
+    updateSyncedPeriods();
 }
 
 QnResourceWidget *QnWorkbenchNavigator::currentWidget() const {
@@ -576,7 +582,7 @@ void QnWorkbenchNavigator::updateSliderFromReader() {
     m_timeSlider->setMaximum(endTimeMSec);
     m_timeSlider->setValue(timeMSec);
 
-    /* Fix flags once reader has loaded. */
+    /* Fix flags once the reader has loaded. */
     if(!m_currentWidgetLoaded && startTimeUSec != AV_NOPTS_VALUE) {
         if(startTimeUSec > 1000000ll * 60 * 60 * 24 * 365)
             m_currentWidgetFlags |= WidgetUsesUTC;
@@ -585,8 +591,8 @@ void QnWorkbenchNavigator::updateSliderFromReader() {
 
         m_currentWidgetLoaded = true;
     }
-
-    if (timeUSec != AV_NOPTS_VALUE) {
+    
+    if (m_currentWidgetLoaded) {
         /* Update target time period for time period loaders. 
          * If playback is synchronized, do it for all cameras. */
         QnTimePeriod period(startTimeMSec, endTimeMSec - startTimeMSec);
@@ -598,9 +604,10 @@ void QnWorkbenchNavigator::updateSliderFromReader() {
             if(QnCachingTimePeriodLoader *loader = this->loader(m_currentWidget))
                 loader->setTargetPeriod(period);
         }
-
-        updateLive();
     }
+
+    if(timeUSec != AV_NOPTS_VALUE)
+        updateLive();
 }
 
 void QnWorkbenchNavigator::updateCurrentPeriods() {
@@ -955,8 +962,6 @@ void QnWorkbenchNavigator::at_display_widgetAdded(QnResourceWidget *widget) {
         addSyncedWidget(widget);
 
         connect(widget, SIGNAL(motionSelectionChanged()), this, SLOT(at_widget_motionSelectionChanged()));
-
-        updateSyncedPeriods();
     }
 }
 
@@ -964,12 +969,7 @@ void QnWorkbenchNavigator::at_display_widgetAboutToBeRemoved(QnResourceWidget *w
     if(QnSecurityCamResourcePtr cameraResource = widget->resource().dynamicCast<QnSecurityCamResource>()) {
         disconnect(widget, NULL, this, NULL);
 
-        if(!widget->isMotionSelectionEmpty())
-            if(QnCachingTimePeriodLoader *loader = this->loader(widget->resource()))
-                loader->setMotionRegions(QList<QRegion>());
-
         removeSyncedWidget(widget);
-        updateSyncedPeriods();
     }
 }
 
