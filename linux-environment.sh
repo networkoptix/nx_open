@@ -1,4 +1,4 @@
-sudo apt-get install -y openjdk-6-jre-headless protobuf-compiler build-essential unzip zip libqt4-dev libz-dev
+sudo apt-get install -y openjdk-6-jre-headless protobuf-compiler build-essential unzip zip libqt4-dev libz-dev python-dev
 
 mkdir -p ~/environment
 cd ~/environment
