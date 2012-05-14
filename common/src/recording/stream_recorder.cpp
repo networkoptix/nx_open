@@ -375,7 +375,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
         m_formatCtx->pb = m_storage->createFfmpegIOContext(url, QIODevice::WriteOnly);
         if (m_formatCtx->pb == 0) 
         {
-            m_lastErrMessage = "Can't allocate output stream for video recording.";
+            m_lastErrMessage = QString("Can't create output file ") + url;
             cl_log.log(m_lastErrMessage, cl_logERROR);
             return false;
         }
