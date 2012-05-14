@@ -833,11 +833,11 @@
             <Publish Dialog="MediaServerDlg" Control="Next" Property="CLIENT_APPSERVER_PASSWORD" Value="[SERVER_APPSERVER_PASSWORD]" Order="4">1</Publish>
             
             <Publish Dialog="MediaServerDlg" Control="Next" Property="BUSYPORT" Value="{}">1</Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORTSTOTEST" Value="[SERVER_API_PORT]" Order="1"><![CDATA[ SERVER_RTSP_PORT = RTSP_PORT OR SERVER_API_PORT <> OLD_API_PORT]]></Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORTSTOTEST" Value="[SERVER_RTSP_PORT]" Order="1"><![CDATA[ SERVER_RTSP_PORT <> RTSP_PORT OR SERVER_API_PORT = OLD_API_PORT]]></Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORTSTOTEST" Value="[SERVER_API_PORT] [SERVER_RTSP_PORT]" Order="1"><![CDATA[ SERVER_RTSP_PORT <> RTSP_PORT AND SERVER_API_PORT <> OLD_API_PORT]]></Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORTSTOTEST" Value="[SERVER_API_PORT]" Order="1"><![CDATA[ SERVER_RTSP_PORT = OLD_SERVER_RTSP_PORT OR SERVER_API_PORT <> OLD_SERVER_API_PORT]]></Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORTSTOTEST" Value="[SERVER_RTSP_PORT]" Order="1"><![CDATA[ SERVER_RTSP_PORT <> OLD_SERVER_RTSP_PORT OR SERVER_API_PORT = OLD_SERVER_API_PORT]]></Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORTSTOTEST" Value="[SERVER_API_PORT] [SERVER_RTSP_PORT]" Order="1"><![CDATA[ SERVER_RTSP_PORT <> OLD_SERVER_RTSP_PORT AND SERVER_API_PORT <> OLD_SERVER_API_PORT]]></Publish>
             
-            <Publish Dialog="MediaServerDlg" Control="Next" Event="DoAction" Value="CheckPorts2" Order="2"><![CDATA[ SERVER_RTSP_PORT <> RTSP_PORT OR SERVER_API_PORT <> OLD_API_PORT]]></Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Event="DoAction" Value="CheckPorts2" Order="2"><![CDATA[ SERVER_RTSP_PORT <> OLD_SERVER_RTSP_PORT OR SERVER_API_PORT <> OLD_SERVER_API_PORT]]></Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="PortIsBusyDlg" Order="3">BUSYPORT</Publish>
             
             <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_BACK" Value="MediaServerDlg">1</Publish>

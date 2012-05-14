@@ -159,7 +159,7 @@ UINT __stdcall CheckPorts(MSIHANDLE hInstall)
             break;
         }
 
-        portString = portString.Tokenize(L" ",curPos);
+        portString = portsString.Tokenize(L" ",curPos);
     }
 
     if (!foundBusyPort)
