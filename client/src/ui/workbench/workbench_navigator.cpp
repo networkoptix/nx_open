@@ -479,7 +479,7 @@ void QnWorkbenchNavigator::updateCentralWidget() {
     QnResourceWidget *centralWidget = display()->widget(Qn::CentralRole);
     if(centralWidget == NULL) {
         if(QnActionTargetProvider *provider = menu()->targetProvider()) {
-            QnResourceWidgetList widgets = QnActionTargetTypes::widgets(provider->currentTarget(Qn::SceneScope));
+            QnResourceWidgetList widgets = QnActionParameterTypes::widgets(provider->currentTarget(Qn::SceneScope));
             if(widgets.size() == 1)
                 centralWidget = widgets[0];
         }

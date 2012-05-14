@@ -1342,14 +1342,14 @@ void QnWorkbenchActionHandler::at_exportTimeSelectionAction_triggered() {
 
     QnResourceWidget *widget = NULL;
 
-    if(parameters.itemsSize() != 1) {
-        if(parameters.itemsSize() == 0 && display()->widgets().size() == 1) {
+    if(parameters.size() != 1) {
+        if(parameters.size() == 0 && display()->widgets().size() == 1) {
             widget = display()->widgets().front();
         } else {
             QMessageBox::critical(
                 this->widget(), 
                 tr("Cannot export file"), 
-                tr("Exactly one item must be selected for export, but %n item(s) are currently selected.", NULL, parameters.itemsSize()), 
+                tr("Exactly one item must be selected for export, but %n item(s) are currently selected.", NULL, parameters.size()), 
                 QMessageBox::Ok
             );
             return;
