@@ -206,17 +206,11 @@
                       Value="&quot;[VmsTrayToolDir]traytool.exe&quot; &quot;quit&quot;" Execute="immediate" />
         <CustomAction Id="CloseTrayToolAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="ignore" Impersonate="no" />
-        
-<!--        <CustomAction Id="LaunchApplication_cmd" Property="LaunchApplication" Value="[VmsTrayToolDir]traytool.exe" Execute="immediate"/>
-        <CustomAction Id="LaunchApplication" BinaryKey="WixCA" DllEntry="CAQuietExec" Execute="deferred" Return="ignore"/> -->
-
-        <Property Id="WixShellExecTarget" Value="&quot;[VmsTrayToolDir]traytool.exe&quot;" />
-        <CustomAction Id="LaunchApplication" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
-     
-<!--        <CustomAction Id="LaunchApplication" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="traytool.exe" ExeCommand=""/>-->
+      
+		<CustomAction Id="LaunchApplication" Execute="immediate" Impersonate="no" Return="asyncNoWait" FileKey="traytool.exe" ExeCommand="&quot;[VmsTrayToolDir]traytool.exe&quot;"/>
+		
         <CustomAction Id="NoDowngrade" Error="NoDowngrade" /> 
         
-        <!--        <CustomAction Id="StartAppOnExit" FileKey="ClientExe" ExeCommand="" Execute="immediate" Impersonate="yes" Return="asyncNoWait"/>-->
         
 <!--        <util:CloseApplication Id="CloseTrayTool" ElevatedCloseMessage="yes" CloseMessage="yes" Target="traytool.exe" RebootPrompt="no"/>-->
     
@@ -283,9 +277,7 @@
             
             <Custom Action="InitDatabaseAction_Cmd" After="SyncDatabaseAction"><![CDATA[ $(var.VmsInstalling) AND &AppServerFeature=3 ]]></Custom>
             <Custom Action="InitDatabaseAction" After="InitDatabaseAction_Cmd"><![CDATA[ $(var.VmsInstalling) AND &AppServerFeature=3 ]]></Custom>
-            
-<!--            <Custom Action="LaunchApplication_cmd" Before="LaunchApplication"><![CDATA[ !TrayToolFeature=3 OR &TrayToolFeature=3 ]]></Custom>
-            <Custom Action="LaunchApplication" Before="InstallFinalize"><![CDATA[ (!AppServerFeature=3 OR &AppServerFeature=3 OR !ServerFeature=3 OR &ServerFeature=3) AND REMOVE <> "ALL" ]]></Custom> -->
+            <Custom Action="LaunchApplication" After="InstallFinalize"><![CDATA[ (!AppServerFeature=3 OR &AppServerFeature=3 OR !ServerFeature=3 OR &ServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
         </InstallExecuteSequence>
         
         <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
@@ -702,9 +694,6 @@
             
             <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
             <!--            <Publish Dialog="ExitDialog" Control="Finish" Order="1" Event="DoAction" Value="StartAppOnExit">WIXUI_EXITDIALOGOPTIONALCHECKBOX</Publish>-->
-            <Publish Dialog="ExitDialog" Control="Finish" Order="1" Event="DoAction" Value="LaunchApplication">
-                <![CDATA[ (!AppServerFeature=3 OR &AppServerFeature=3 OR !ServerFeature=3 OR &ServerFeature=3) AND REMOVE <> "ALL" ]]>
-            </Publish>
             
             <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg">NOT PREVIOUSVERSIONSINSTALLED</Publish>          
             <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="UpgradeDlg">PREVIOUSVERSIONSINSTALLED</Publish>
