@@ -175,12 +175,12 @@
         <CustomAction Id="AssignOldAppServerPort" Property="OLD_APPSERVER_PORT" Value="[APPSERVER_PORT]"/>
         <CustomAction Id="AssignOldServerRtspPort" Property="OLD_SERVER_RTSP_PORT" Value="[SERVER_RTSP_PORT]"/>
         <CustomAction Id="AssignOldServerApiPort" Property="OLD_SERVER_API_PORT" Value="[SERVER_API_PORT]"/>
-    	<CustomAction Id="AssignOldProxyPort" Property="OLD_PROXY_PORT" Value="[PROXY_PORT]"/>
+        <CustomAction Id="AssignOldProxyPort" Property="OLD_PROXY_PORT" Value="[PROXY_PORT]"/>
         
         <CustomAction Id="AssignAppServerPort" Property="APPSERVER_PORT" Value="[FREEPORT1]"/>
         <CustomAction Id="AssignServerRtspPort" Property="SERVER_RTSP_PORT" Value="[FREEPORT2]"/>
         <CustomAction Id="AssignServerApiPort" Property="SERVER_API_PORT" Value="[FREEPORT3]"/>
-    	<CustomAction Id="AssignProxyPort" Property="PROXY_PORT" Value="[FREEPORT4]"/>
+        <CustomAction Id="AssignProxyPort" Property="PROXY_PORT" Value="[FREEPORT4]"/>
         
         <!-- Assign default values for Quick installation -->
         <CustomAction Id="AssignServerAppServerPort" Property="SERVER_APPSERVER_PORT" Value="[APPSERVER_PORT]"/>
@@ -206,14 +206,11 @@
                       Value="&quot;[VmsTrayToolDir]traytool.exe&quot; &quot;quit&quot;" Execute="immediate" />
         <CustomAction Id="CloseTrayToolAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="ignore" Impersonate="no" />
-        
-        <CustomAction Id="LaunchApplication_cmd" Property="LaunchApplication" Value="[VmsTrayToolDir]traytool.exe" Execute="immediate"/>
-        <CustomAction Id="LaunchApplication" BinaryKey="WixCA" DllEntry="CAQuietExec" Execute="deferred" Return="ignore"/>
-     
-<!--        <CustomAction Id="LaunchApplication" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="traytool.exe" ExeCommand=""/>-->
+      
+		<CustomAction Id="LaunchApplication" Execute="immediate" Impersonate="no" Return="asyncNoWait" FileKey="traytool.exe" ExeCommand="&quot;[VmsTrayToolDir]traytool.exe&quot;"/>
+		
         <CustomAction Id="NoDowngrade" Error="NoDowngrade" /> 
         
-        <!--        <CustomAction Id="StartAppOnExit" FileKey="ClientExe" ExeCommand="" Execute="immediate" Impersonate="yes" Return="asyncNoWait"/>-->
         
 <!--        <util:CloseApplication Id="CloseTrayTool" ElevatedCloseMessage="yes" CloseMessage="yes" Target="traytool.exe" RebootPrompt="no"/>-->
     
@@ -241,11 +238,11 @@
             <Custom Action="AssignOldAppServerPort" Before="AssignOldServerRtspPort">1</Custom>
             <Custom Action="AssignOldServerRtspPort" Before="AssignOldServerApiPort">1</Custom>
             <Custom Action="AssignOldServerApiPort" Before="AssignOldProxyPort">1</Custom>
-        	<Custom Action="AssignOldProxyPort" Before="AssignAppServerPort">1</Custom>
+            <Custom Action="AssignOldProxyPort" Before="AssignAppServerPort">1</Custom>
             <Custom Action="AssignAppServerPort" Before="AssignServerRtspPort">NOT APPSERVER_PORT</Custom>
             <Custom Action="AssignServerRtspPort" Before="AssignServerApiPort">NOT SERVER_RTSP_PORT</Custom>
             <Custom Action="AssignServerApiPort" Before="AssignProxyPort">NOT SERVER_API_PORT</Custom>
-        	<Custom Action="AssignProxyPort" Before="AssignServerAppServerPort">NOT PROXY_PORT</Custom>
+            <Custom Action="AssignProxyPort" Before="AssignServerAppServerPort">NOT PROXY_PORT</Custom>
             <Custom Action="AssignServerAppServerPort" Before="AssignClientAppServerPort">1</Custom>
             <Custom Action="AssignClientAppServerPort" Before="SetMoviesFolder">1</Custom>
             <Custom Action="SetMoviesFolder" Before="GenerateGuidsForServers">1</Custom>
@@ -280,9 +277,7 @@
             
             <Custom Action="InitDatabaseAction_Cmd" After="SyncDatabaseAction"><![CDATA[ $(var.VmsInstalling) AND &AppServerFeature=3 ]]></Custom>
             <Custom Action="InitDatabaseAction" After="InitDatabaseAction_Cmd"><![CDATA[ $(var.VmsInstalling) AND &AppServerFeature=3 ]]></Custom>
-            
-            <Custom Action="LaunchApplication_cmd" Before="LaunchApplication"><![CDATA[ !TrayToolFeature=3 OR &TrayToolFeature=3 ]]></Custom>
-            <Custom Action="LaunchApplication" Before="InstallFinalize"><![CDATA[ (!AppServerFeature=3 OR &AppServerFeature=3 OR !ServerFeature=3 OR &ServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="LaunchApplication" After="InstallFinalize"><![CDATA[ (!AppServerFeature=3 OR &AppServerFeature=3 OR !ServerFeature=3 OR &ServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
         </InstallExecuteSequence>
         
         <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
@@ -348,7 +343,7 @@
                                 <RegistryKey Root="HKLM"
                                              Key="Software\[Manufacturer]\Enterprise Controller" Action="create">
                                     <RegistryValue Type="string" Name="port" Value="[APPSERVER_PORT]"/>
-                                	<RegistryValue Type="string" Name="proxyPort" Value="[PROXY_PORT]"/>
+                                    <RegistryValue Type="string" Name="proxyPort" Value="[PROXY_PORT]"/>
                                     <RegistryValue Type="string" Name="login" Value="[APPSERVER_LOGIN]"/>
                                     <RegistryValue Type="string" Name="password" Value="[APPSERVER_PASSWORD]"/>
                                 </RegistryKey>
@@ -404,7 +399,7 @@
                                 <File Id="ProxyQtXml$(var.suffix)4.dll" Name="QtXml$(var.suffix)4.dll" Source="mediaproxy\QtXml$(var.suffix)4.dll" />
                             </Component>
                         </Directory>
-                    	
+                        
                         <Directory Id="VmsMediaServerDir" Name="MediaServer">
                             <Component Id="ServerExecutable" Guid="06DFA703-0266-4970-BAC1-3730BF7D1C66">
                                 <File Id="ServerExe" Name="mediaserver.exe" Source="mediaserver/mediaserver.exe" KeyPath="yes">
@@ -527,6 +522,7 @@
                                 <File Id="ClientAvutilDll" Name="avutil-51.dll" Source="client/avutil-51.dll"/>
                                 <File Id="ClientSwscaleDll" Name="swscale-2.dll" Source="client/swscale-2.dll"/>
                                 <File Id="ClientMp3lameDll" Name="libmp3lame-0.dll" Source="client/libmp3lame-0.dll"/>
+                                <File Id="ClientX264" Name="x264.exe" Source="client/x264.exe"/>								
                             </Component>
                             
                             <Component Id="ClientQTLibraries" Guid="{6BDC7AB9-6230-4cf3-9C1C-634C636D90BC}">
@@ -611,7 +607,7 @@
             <ComponentRef Id="ecs.log" />           
             <ComponentRef Id="AppServerConfiguration"/>
             <ComponentRef Id="AppServerConfigurationGuid"/>
-        	
+            
             <ComponentRef Id="ProxyExecutable" />
             <ComponentRef Id="ProxyQTLibraries" />
         </Feature>
@@ -715,7 +711,18 @@
             
             <Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="PasswordDlg">INSTALLTYPE=0</Publish>
             <Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="AdvancedTypeDlg">INSTALLTYPE=1</Publish>
+           <Publish Dialog="InstallTypeDlg" Control="Next" Event="AddLocal" Value="ALL">INSTALLTYPE=0</Publish>
+
+            <Publish Dialog="InstallTypeDlg" Control="Next" Property="SERVER_APPSERVER_HOST" Value="localhost" Order="4"><![CDATA[ INSTALLTYPE=0 ]]></Publish>
+            <Publish Dialog="InstallTypeDlg" Control="Next" Property="SERVER_APPSERVER_PORT" Value="[APPSERVER_PORT]" Order="4"><![CDATA[ INSTALLTYPE=0 ]]></Publish>
+            <Publish Dialog="InstallTypeDlg" Control="Next" Property="SERVER_APPSERVER_LOGIN" Value="[APPSERVER_LOGIN]" Order="4"><![CDATA[ INSTALLTYPE=0 ]]></Publish>
+            <Publish Dialog="InstallTypeDlg" Control="Next" Property="SERVER_APPSERVER_PASSWORD" Value="[APPSERVER_PASSWORD]" Order="4" ><![CDATA[ INSTALLTYPE=0 ]]></Publish>
             
+            <Publish Dialog="InstallTypeDlg" Control="Next" Property="CLIENT_APPSERVER_HOST" Value="localhost" Order="4"><![CDATA[ INSTALLTYPE=0 ]]></Publish>
+            <Publish Dialog="InstallTypeDlg" Control="Next" Property="CLIENT_APPSERVER_PORT" Value="[APPSERVER_PORT]" Order="4"><![CDATA[ INSTALLTYPE=0 ]]></Publish>
+            <Publish Dialog="InstallTypeDlg" Control="Next" Property="CLIENT_APPSERVER_LOGIN" Value="[APPSERVER_LOGIN]" Order="4"><![CDATA[ INSTALLTYPE=0 ]]></Publish>
+            <Publish Dialog="InstallTypeDlg" Control="Next" Property="CLIENT_APPSERVER_PASSWORD" Value="[APPSERVER_PASSWORD]" Order="4" ><![CDATA[ INSTALLTYPE=0 ]]></Publish>
+           
             <Publish Dialog="PasswordDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg">1</Publish>
             <Publish Dialog="PasswordDlg" Control="Next" Event="SpawnDialog" Value="EmptyPasswordDlg">NOT APPSERVER_PASSWORD</Publish>
             <Publish Dialog="PasswordDlg" Control="Next" Property="SERVER_APPSERVER_PASSWORD" Value="[APPSERVER_PASSWORD]">APPSERVER_PASSWORD</Publish>
@@ -826,11 +833,11 @@
             <Publish Dialog="MediaServerDlg" Control="Next" Property="CLIENT_APPSERVER_PASSWORD" Value="[SERVER_APPSERVER_PASSWORD]" Order="4">1</Publish>
             
             <Publish Dialog="MediaServerDlg" Control="Next" Property="BUSYPORT" Value="{}">1</Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORTSTOTEST" Value="[SERVER_API_PORT]" Order="1"><![CDATA[ SERVER_RTSP_PORT = RTSP_PORT OR SERVER_API_PORT <> OLD_API_PORT]]></Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORTSTOTEST" Value="[SERVER_RTSP_PORT]" Order="1"><![CDATA[ SERVER_RTSP_PORT <> RTSP_PORT OR SERVER_API_PORT = OLD_API_PORT]]></Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORTSTOTEST" Value="[SERVER_API_PORT] [SERVER_RTSP_PORT]" Order="1"><![CDATA[ SERVER_RTSP_PORT <> RTSP_PORT AND SERVER_API_PORT <> OLD_API_PORT]]></Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORTSTOTEST" Value="[SERVER_API_PORT]" Order="1"><![CDATA[ SERVER_RTSP_PORT = OLD_SERVER_RTSP_PORT OR SERVER_API_PORT <> OLD_SERVER_API_PORT]]></Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORTSTOTEST" Value="[SERVER_RTSP_PORT]" Order="1"><![CDATA[ SERVER_RTSP_PORT <> OLD_SERVER_RTSP_PORT OR SERVER_API_PORT = OLD_SERVER_API_PORT]]></Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORTSTOTEST" Value="[SERVER_API_PORT] [SERVER_RTSP_PORT]" Order="1"><![CDATA[ SERVER_RTSP_PORT <> OLD_SERVER_RTSP_PORT AND SERVER_API_PORT <> OLD_SERVER_API_PORT]]></Publish>
             
-            <Publish Dialog="MediaServerDlg" Control="Next" Event="DoAction" Value="CheckPorts2" Order="2"><![CDATA[ SERVER_RTSP_PORT <> RTSP_PORT OR SERVER_API_PORT <> OLD_API_PORT]]></Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Event="DoAction" Value="CheckPorts2" Order="2"><![CDATA[ SERVER_RTSP_PORT <> OLD_SERVER_RTSP_PORT OR SERVER_API_PORT <> OLD_SERVER_API_PORT]]></Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="PortIsBusyDlg" Order="3">BUSYPORT</Publish>
             
             <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_BACK" Value="MediaServerDlg">1</Publish>

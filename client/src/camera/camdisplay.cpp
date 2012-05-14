@@ -643,6 +643,11 @@ void CLCamDisplay::setSingleShotMode(bool single)
     m_singleShotMode = single;
 }
 
+float CLCamDisplay::getSpeed() const
+{
+    return m_speed;
+}
+
 void CLCamDisplay::setSpeed(float speed)
 {
     if (speed == 0)

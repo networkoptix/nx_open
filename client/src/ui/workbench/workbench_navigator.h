@@ -30,6 +30,14 @@ class QnWorkbenchNavigator: public QObject, public QnWorkbenchContextAware, publ
     typedef QObject base_type;
 
 public:
+    enum WidgetFlag {
+        WidgetUsesUTC = 0x1,
+        WidgetSupportsLive = 0x2,
+        WidgetSupportsPeriods = 0x4,
+        WidgetSupportsSync = 0x8
+    };
+    Q_DECLARE_FLAGS(WidgetFlags, WidgetFlag);
+
     QnWorkbenchNavigator(QObject *parent = NULL);
     virtual ~QnWorkbenchNavigator();
 
@@ -53,7 +61,7 @@ public:
     qreal maximalSpeed() const;
 
     QnResourceWidget *currentWidget() const;
-    bool currentWidgetIsCamera() const;
+    WidgetFlags currentWidgetFlags() const;
 
     Q_SLOT void jumpBackward();
     Q_SLOT void jumpForward();
@@ -95,7 +103,6 @@ protected:
     void deinitialize();
     bool isValid();
 
-    void setCentralWidget(QnResourceWidget *widget);
     void addSyncedWidget(QnResourceWidget *widget);
     void removeSyncedWidget(QnResourceWidget *widget);
     
@@ -106,11 +113,11 @@ protected:
     QnCachingTimePeriodLoader *loader(QnResourceWidget *widget);
 
 protected slots:
+    void updateCentralWidget();
     void updateCurrentWidget();
     void updateSliderFromReader();
+    void updateSliderOptions();
     void updateScrollBarFromSlider();
-    void delayedLoadThumbnails();
-    void loadThumbnails(qint64 startTimeMs, qint64 endTimeMs);
     void updateSliderFromScrollBar();
 
     void updateCurrentPeriods();
@@ -125,7 +132,10 @@ protected slots:
     void updatePlayingSupported();
     void updateSpeed();
     void updateSpeedRange();
+    
     void updateThumbnails();
+    void delayedLoadThumbnails();
+    void loadThumbnails(qint64 startTimeMs, qint64 endTimeMs);
 
 protected slots:
     void at_display_widgetChanged(Qn::ItemRole role);
@@ -141,7 +151,8 @@ protected slots:
     void at_timeSlider_valueChanged(qint64 value);
     void at_timeSlider_sliderPressed();
     void at_timeSlider_sliderReleased();
-    void at_timeSlider_contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
+    void at_timeSlider_selectionChanged();
+    void at_timeSlider_customContextMenuRequested(const QPointF &pos, const QPoint &screenPos);
     void at_timeSlider_destroyed();
 
     void at_timeScrollBar_sliderPressed();
@@ -158,7 +169,9 @@ private:
 
     QnResourceWidget *m_centralWidget;
     QnResourceWidget *m_currentWidget;
-    bool m_currentWidgetIsCamera;
+    WidgetFlags m_currentWidgetFlags;
+    bool m_currentWidgetLoaded;
+    bool m_currentWidgetIsCentral;
 
     bool m_updatingSliderFromReader;
     bool m_updatingSliderFromScrollBar;
@@ -184,5 +197,7 @@ private:
     qint64 m_thumbnailsStartTimeMs;
     qint64 m_thumbnailsEndTimeMs;
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchNavigator::WidgetFlags);
 
 #endif // QN_WORKBENCH_NAVIGATOR_H

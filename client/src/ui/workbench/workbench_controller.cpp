@@ -234,11 +234,8 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_manager->installInstrument(new ForwardingInstrument(Instrument::Scene, keyEventTypes, this));
 
     /* View/viewport instruments. */
-    m_manager->installInstrument(new ForwardingInstrument(Instrument::Viewport, widgetMouseEventTypes, this), InstallationMode::InstallLast);
-    m_manager->installInstrument(m_handScrollInstrument, InstallationMode::InstallLast);
-    m_manager->installInstrument(new StopInstrument(Instrument::Viewport, widgetMouseEventTypes, this), InstallationMode::InstallLast);
-
     m_manager->installInstrument(m_rotationInstrument, InstallationMode::InstallAfter, display()->transformationListenerInstrument());
+    m_manager->installInstrument(m_handScrollInstrument);
     m_manager->installInstrument(m_resizingInstrument);
     m_manager->installInstrument(m_moveInstrument);
     m_manager->installInstrument(m_dragInstrument);
@@ -968,7 +965,7 @@ void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *
     workbench()->setItem(Qn::RaisedRole, workbench()->item(Qn::RaisedRole) == workbenchItem ? NULL : workbenchItem);
 }
 
-void QnWorkbenchController::at_item_rightClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &info) {
+void QnWorkbenchController::at_item_rightClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info) {
     TRACE("ITEM RCLICKED");
 
     QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
@@ -985,7 +982,7 @@ void QnWorkbenchController::at_item_rightClicked(QGraphicsView *, QGraphicsItem 
     QScopedPointer<QMenu> menu(this->menu()->newMenu(Qn::SceneScope, display()->scene()->selectedItems()));
     if(menu->isEmpty())
         return;
-    
+
     menu->exec(info.screenPos());
 }
 
@@ -1053,6 +1050,7 @@ void QnWorkbenchController::at_scene_rightClicked(QGraphicsView *, const ClickIn
     if(menu->isEmpty())
         return;
 
+    /* We don't want the curtain to kick in while menu is open. */
     menu->exec(info.screenPos());
 }
 

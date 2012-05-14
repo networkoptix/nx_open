@@ -66,52 +66,16 @@
 			<version>2.4.1</version>
 			<type>zip</type>
 			<classifier>${platform}-${arch}</classifier>
-		</dependency>	
-		<dependency>
-			<groupId>com.nokia.qt</groupId>
-			<artifactId>qtcore</artifactId>
-			<version>4.7.4</version>
-			<type>zip</type>
-		</dependency>	
+		</dependency>
 	</dependencies>		
 
 	<build>
 		<plugins>	
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.2.2</version>
-				<executions>
-					<execution>
-						<id>pack-binaries</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-						<configuration>
-							<descriptors>
-								<descriptor>${project.build.directory}/binaries-${build.configuration}.xml</descriptor>
-							</descriptors>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+
 		</plugins>
 	</build>    
 
 	<profiles>
-		<!--<profile>
-			<id>convert-clean</id>
-			<activation>				
-				<file>
-					<missing>${project.build.directory}/build/include</missing>
-				</file>		
-			</activation>			
-			<build>
-				<plugins>			
-				</plugins>
-			</build>
-		</profile>	-->
-
 		<profile>
 			<id>convert-clean-windows</id>
 			<activation>			

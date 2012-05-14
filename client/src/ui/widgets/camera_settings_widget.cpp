@@ -65,9 +65,6 @@ const QnVirtualCameraResourceList &QnCameraSettingsWidget::cameras() const {
 }
 
 void QnCameraSettingsWidget::setResources(const QnResourceList &resources) {
-    if(m_resources == resources)
-        return;
-
     m_resources = resources.toSet().toList();
     m_cameras = QnResourceCriterion::filter<QnVirtualCameraResource>(m_resources);
 

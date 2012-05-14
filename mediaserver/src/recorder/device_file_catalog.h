@@ -40,6 +40,8 @@ public:
     bool deleteFirstRecord();
     void clear();
     void deleteRecordsBefore(int idx);
+    void deleteRecordsBeforeTime(qint64 timeMs);
+    void deleteRecordsByStorage(int storageIndex, qint64 timeMs);
     int findFileIndex(qint64 startTimeMs, FindMethod method) const;
     QString fullFileName(const Chunk& chunk) const;
     Chunk chunkAt(int index) const;

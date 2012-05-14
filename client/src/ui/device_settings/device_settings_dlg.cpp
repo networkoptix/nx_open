@@ -221,17 +221,22 @@ public:
           m_widget(widget), m_param(param)
     {}
 
-    void execute()
+    bool execute()
     {
         if (!isConnectedToTheResource())
-            return;
+            return false;
 
         QVariant value;
-        if (m_resource->getParam(m_param.name(), value, m_param.isPhysical() ? QnDomainPhysical : QnDomainMemory)) {
+        if (m_resource->getParam(m_param.name(), value, m_param.isPhysical() ? QnDomainPhysical : QnDomainMemory)) 
+        {
             QMetaProperty userProperty = m_widget->metaObject()->userProperty();
             if (userProperty.isValid())
                 userProperty.write(m_widget, value);
         }
+        else
+            return false;
+
+        return true;
     }
 
 private:

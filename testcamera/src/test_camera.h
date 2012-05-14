@@ -39,4 +39,16 @@ private:
     int m_offlineDuration;
 };
 
+class QnFileCache
+{
+public:
+    static QnFileCache* instance();
+
+    QList<QnCompressedVideoDataPtr> getMediaData(const QString& fileName);
+private:
+    typedef QMap<QString, QList<QnCompressedVideoDataPtr> > MediaCache;
+    MediaCache m_cache;
+    QMutex m_mutex;
+};
+
 #endif // __TEST_CAMERA_H__

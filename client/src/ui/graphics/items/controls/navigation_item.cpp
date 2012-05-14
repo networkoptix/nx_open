@@ -116,7 +116,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
     m_volumeSlider->setFocusProxy(this);
 
     m_timeSlider = new QnTimeSlider(this);
-    m_timeSlider->setMinimumHeight(60.0);
+    m_timeSlider->setMinimumHeight(70.0);
     m_timeSlider->setOption(QnTimeSlider::UnzoomOnDoubleClick, false);
 
     m_timeScrollBar = new QnTimeScrollBar(this);
@@ -406,7 +406,7 @@ void QnNavigationItem::updateSyncButtonChecked() {
 }
 
 void QnNavigationItem::updateSyncButtonEnabled() {
-    bool enabled = display()->isStreamsSynchronizationEffective() && m_navigator->currentWidgetIsCamera();
+    bool enabled = display()->isStreamsSynchronizationEffective() && (m_navigator->currentWidgetFlags() & QnWorkbenchNavigator::WidgetSupportsSync);
 
     m_syncButton->setEnabled(enabled);
 }
@@ -465,8 +465,12 @@ void QnNavigationItem::at_liveButton_clicked() {
         m_liveButton->setChecked(true); /* Cannot go out of live mode by pressing 'live' button. */
 }
 
-void QnNavigationItem::at_syncButton_clicked() {
-    display()->setStreamsSynchronized(m_syncButton->isChecked());
+void QnNavigationItem::at_syncButton_clicked() 
+{
+    if (m_syncButton->isChecked())
+        display()->setStreamsSynchronized(m_navigator->currentWidget());
+    else
+        display()->setStreamsSynchronized(0);
 }
 
 void QnNavigationItem::at_stepBackwardButton_clicked() {
