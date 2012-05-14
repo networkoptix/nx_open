@@ -962,10 +962,9 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
             if(button == QDialogButtonBox::Yes)
                 saveCameraSettingsFromDialog();
         }
-
-        cameraSettingsDialog()->widget()->setResources(resources);
-        updateCameraSettingsEditibility();
     }
+    cameraSettingsDialog()->widget()->setResources(resources);
+    updateCameraSettingsEditibility();
 
     cameraSettingsDialog()->show();
 }

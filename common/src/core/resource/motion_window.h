@@ -50,6 +50,7 @@ public:
     int getMotionRectCount() const;
     int getMaskRectCount() const;
 
+    void removeDefaultMotion();
 private:
     QRegion m_data[MAX_SENSITIVITY - MIN_SENSITIVITY+1];
 };

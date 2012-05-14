@@ -144,7 +144,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     /* Install and configure instruments. */
     m_fpsCountingInstrument = new FpsCountingInstrument(333, this);
     m_uiElementsInstrument = new UiElementsInstrument(this);
-    m_controlsActivityInstrument = new ActivityListenerInstrument(hideConstrolsTimeoutMSec, this);
+    m_controlsActivityInstrument = new ActivityListenerInstrument(true, hideConstrolsTimeoutMSec, this);
 
     m_manager->installInstrument(m_uiElementsInstrument, InstallationMode::InstallBefore, display()->paintForwardingInstrument());
     m_manager->installInstrument(m_fpsCountingInstrument, InstallationMode::InstallBefore, display()->paintForwardingInstrument());

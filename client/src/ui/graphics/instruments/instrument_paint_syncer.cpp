@@ -1,8 +1,8 @@
 #include "instrument_paint_syncer.h"
-#include <QEvent>
-#include <QDateTime>
-#include <QGLWidget>
-#include "utils/common/synctime.h"
+
+#include <QtCore/QEvent>
+#include <QtCore/QDateTime>
+#include <QtGui/QWidget>
 
 InstrumentPaintSyncer::InstrumentPaintSyncer(QObject *parent):
     QObject(parent),
@@ -24,7 +24,7 @@ bool InstrumentPaintSyncer::eventFilter(QObject *watched, QEvent *event) {
     }
 
     m_ticksSinceLastPaint = 0;
-    updateCurrentTime(qnSyncTime->currentMSecsSinceEpoch());
+    updateCurrentTime(QDateTime::currentMSecsSinceEpoch());
     return false;
 }
 

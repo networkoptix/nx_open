@@ -23,12 +23,20 @@ public:
     QnWorkbenchStreamSynchronizer(QnWorkbenchDisplay *display, QnWorkbenchRenderWatcher *renderWatcher, QObject *parent = NULL);
 
     /**
-     * Enables or disables this stream synchronizer. 
+     * Disable this stream synchronizer. 
      * When disabled, video streams of cameras on the scene are not synchronized.
      * 
-     * \param enabled                   Whether this stream synchronizer is to be enabled.
      */
-    void setEnabled(bool enabled);
+    void disableSync();
+
+    /**
+     * Enable this stream synchronizer. 
+     * When disabled, video streams of cameras on the scene are not synchronized.
+     * 
+     * \param currentTime seek all streams to specified time
+     * \param speed change speed for all streams
+     */
+    void enableSync(qint64 currentTime, float speed);
 
     /**
      * \returns                         Whether this stream synchronizer is enabled.

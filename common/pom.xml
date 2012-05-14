@@ -21,6 +21,8 @@
 	<name>HD Witness Common Lib</name>
 
 	<properties>
+		<assembly-skip>true</assembly-skip>
+		<rename-skip>true</rename-skip>
 		<buildLib>staticlib</buildLib>
 		<!--QT libs used-->
 		<qtlib1>network</qtlib1>

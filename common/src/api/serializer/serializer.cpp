@@ -50,7 +50,7 @@ void parseMotionRegionList(QList<QnMotionRegion>& regions, const QString& region
 void parseMotionRegion(QnMotionRegion& region, const QString& regionString)
 {
     QList<QRect> motionMask;
-    bool needAddDefaultMotion = false;
+    bool firstRect = true;
     foreach (QString rectString, regionString.split(';'))
     {
         QStringList rectList = rectString.split(',');
@@ -63,10 +63,13 @@ void parseMotionRegion(QnMotionRegion& region, const QString& regionString)
             r.setTop(rectList[1].toInt());
             r.setWidth(rectList[2].toInt());
             r.setHeight(rectList[3].toInt());
-            needAddDefaultMotion = true;
         }
         else if (rectList.size() == 5)
         {
+            if (firstRect) {
+                region.removeDefaultMotion();
+                firstRect = false;
+            }
             sensitivity = rectList[0].toInt();
             r.setLeft(rectList[1].toInt());
             r.setTop(rectList[2].toInt());
@@ -80,8 +83,6 @@ void parseMotionRegion(QnMotionRegion& region, const QString& regionString)
     }
     for (int i = 0; i < motionMask.size(); ++i)
         region.addRect(0, motionMask[i]);
-    if (needAddDefaultMotion)
-        region.addRect((QnMotionRegion::MAX_SENSITIVITY - QnMotionRegion::MIN_SENSITIVITY)/2, QRect(0,0,MD_WIDTH, MD_HEIGHT));
 }
 
 QString serializeMotionRegion(const QnMotionRegion& region)

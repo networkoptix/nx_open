@@ -1,17 +1,17 @@
 #include "activity_listener_instrument.h"
 #include <utils/common/warnings.h>
 
-ActivityListenerInstrument::ActivityListenerInstrument(int activityTimeoutMSec, QObject *parent):
+ActivityListenerInstrument::ActivityListenerInstrument(bool focusedOnly, int activityTimeoutMSec, QObject *parent):
     Instrument(
         makeSet(QEvent::Wheel, QEvent::MouseButtonPress, QEvent::MouseButtonDblClick, QEvent::MouseMove, QEvent::MouseButtonRelease), 
-        makeSet(QEvent::KeyPress, QEvent::KeyRelease), 
+        makeSet(QEvent::KeyPress, QEvent::KeyRelease) | (focusedOnly ? makeSet(QEvent::FocusIn, QEvent::FocusOut) : makeSet()), 
         makeSet(), 
         makeSet(), 
         parent
     ),
     m_activityTimeoutMSec(activityTimeoutMSec),
     m_active(true),
-    m_currentTimer(0)
+    m_autoStopping(true)
 {
     if(activityTimeoutMSec <= 0) {
         qnWarning("Invalid activity timeout '%1'", activityTimeoutMSec);
@@ -24,21 +24,25 @@ ActivityListenerInstrument::~ActivityListenerInstrument() {
 }
 
 void ActivityListenerInstrument::enabledNotify() {
-    if(m_currentTimer == 0)
-        m_currentTimer = startTimer(m_activityTimeoutMSec);
+    setAutoStopping(true);
 }
 
 void ActivityListenerInstrument::aboutToBeDisabledNotify() {
     activityDetected();
-
-    if(m_currentTimer != 0) {
-        killTimer(m_currentTimer);
-        m_currentTimer = 0;
-    }
+    setAutoStopping(false);
 }
 
-bool ActivityListenerInstrument::event(QGraphicsView *, QEvent *) {
-    activityDetected();
+bool ActivityListenerInstrument::event(QGraphicsView *, QEvent *event) {
+    switch(event->type()) {
+    case QEvent::FocusIn:
+        setAutoStopping(true);
+        break;
+    case QEvent::FocusOut:
+        setAutoStopping(false);
+        break;
+    default:
+        activityDetected();
+    }
     return false;
 }
 
@@ -47,22 +51,43 @@ bool ActivityListenerInstrument::event(QWidget *, QEvent *) {
     return false;
 }
 
-void ActivityListenerInstrument::timerEvent(QTimerEvent *) {
-    killTimer(m_currentTimer);
-    m_currentTimer = 0;
+void ActivityListenerInstrument::timerEvent(QTimerEvent *event) {
+    if(event->timerId() == m_timer.timerId()) {
+        m_timer.stop();
 
-    m_active = false;
-    emit activityStopped();
+        setActive(false);
+    }
 }
 
 void ActivityListenerInstrument::activityDetected() {
-    if(!m_active) {
+    setActive(true);
+
+    if(m_autoStopping)
+        m_timer.start(m_activityTimeoutMSec, this);
+}
+
+void ActivityListenerInstrument::setActive(bool active) {
+    if(m_active == active)
+        return;
+
+    m_active = active;
+
+    if(m_active) {
         emit activityResumed();
-        m_active = true;
+    } else {
+        emit activityStopped();
     }
+}
 
-    if(m_currentTimer != 0)
-        killTimer(m_currentTimer);
+void ActivityListenerInstrument::setAutoStopping(bool autoStopping) {
+    if(m_autoStopping == autoStopping) 
+        return;
 
-    m_currentTimer = startTimer(m_activityTimeoutMSec);
+    m_autoStopping = autoStopping;
+
+    if(m_autoStopping) {
+        m_timer.start(m_activityTimeoutMSec, this);
+    } else {
+        m_timer.stop();
+    }
 }

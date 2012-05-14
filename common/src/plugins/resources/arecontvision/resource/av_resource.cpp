@@ -89,12 +89,12 @@ public:
       {}
 
 
-      void execute()
+      bool execute()
       {
           if (!isConnectedToTheResource())
-              return;
+              return false;
 
-          getResource().dynamicCast<QnPlAreconVisionResource>()->setRegister(m_page,m_reg,m_val);
+          return getResource().dynamicCast<QnPlAreconVisionResource>()->setRegister(m_page,m_reg,m_val);
       }
 private:
     int m_page;
