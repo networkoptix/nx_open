@@ -494,7 +494,7 @@ int QnSignHelper::runX264Process(AVFrame* frame, QString optionStr, quint8* rezB
     file.close();
 
     QString executableName = closeDirPath(QFileInfo(qApp->argv()[0]).absolutePath()) + QString("x264");
-    QString command("%1 %2 -o \"%3\" --input-res %4x%5 \"%6\"");
+    QString command("\"%1\" %2 -o \"%3\" --input-res %4x%5 \"%6\"");
     QString outFileName(tempName+QString(".264"));
     command = command.arg(executableName).arg(optionStr).arg(outFileName).arg(frame->width).arg(frame->height).arg(tempName);
     int execResult = QProcess::execute(command);
