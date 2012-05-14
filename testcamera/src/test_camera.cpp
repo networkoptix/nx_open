@@ -46,7 +46,7 @@ public:
                 break;
             }
         }
-
+        qDebug() << "File" << fileName << "ready for streaming";
         m_cache.insert(fileName, rez);
         return rez;
     }
