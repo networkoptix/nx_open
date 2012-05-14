@@ -965,7 +965,7 @@ void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *
     workbench()->setItem(Qn::RaisedRole, workbench()->item(Qn::RaisedRole) == workbenchItem ? NULL : workbenchItem);
 }
 
-void QnWorkbenchController::at_item_rightClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &info) {
+void QnWorkbenchController::at_item_rightClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info) {
     TRACE("ITEM RCLICKED");
 
     QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
@@ -982,7 +982,7 @@ void QnWorkbenchController::at_item_rightClicked(QGraphicsView *, QGraphicsItem 
     QScopedPointer<QMenu> menu(this->menu()->newMenu(Qn::SceneScope, display()->scene()->selectedItems()));
     if(menu->isEmpty())
         return;
-    
+
     menu->exec(info.screenPos());
 }
 
@@ -1050,6 +1050,7 @@ void QnWorkbenchController::at_scene_rightClicked(QGraphicsView *, const ClickIn
     if(menu->isEmpty())
         return;
 
+    /* We don't want the curtain to kick in while menu is open. */
     menu->exec(info.screenPos());
 }
 

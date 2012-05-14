@@ -54,6 +54,7 @@
 #include "file_processor.h"
 
 #include "workbench.h"
+#include "workbench_display.h"
 #include "workbench_synchronizer.h"
 #include "workbench_layout.h"
 #include "workbench_item.h"
@@ -1339,18 +1340,23 @@ void QnWorkbenchActionHandler::at_exportTimeSelectionAction_triggered() {
         return;
     parameters.setItems(provider->currentTarget(Qn::SceneScope));
 
-    if(parameters.itemsSize() != 1)
-    {
-        QMessageBox::critical(
-            this->widget(), 
-            tr("Cannot export file"), 
-            tr("Exactly one item must be selected for export, but %n item(s) are currently selected.", NULL, parameters.itemsSize()), 
-            QMessageBox::Ok
-        );
-        return;
-    }
+    QnResourceWidget *widget = NULL;
 
-    QnResourceWidget *widget = parameters.widget();
+    if(parameters.itemsSize() != 1) {
+        if(parameters.itemsSize() == 0 && display()->widgets().size() == 1) {
+            widget = display()->widgets().front();
+        } else {
+            QMessageBox::critical(
+                this->widget(), 
+                tr("Cannot export file"), 
+                tr("Exactly one item must be selected for export, but %n item(s) are currently selected.", NULL, parameters.itemsSize()), 
+                QMessageBox::Ok
+            );
+            return;
+        }
+    } else {
+        widget = parameters.widget();
+    }
     if(!widget)
         return;
 
@@ -1414,7 +1420,6 @@ void QnWorkbenchActionHandler::at_exportTimeSelectionAction_triggered() {
     settings.setValue(QLatin1String("previousDir"), QFileInfo(fileName).absolutePath());
 
     QProgressDialog *exportProgressDialog = new QProgressDialog(this->widget());
-    exportProgressDialog->setWindowFlags(Qt::WindowStaysOnTopHint);
     exportProgressDialog->setWindowTitle(tr("Exporting Video"));
     exportProgressDialog->setLabelText(tr("Exporting to \"%1\"...").arg(fileName));
     exportProgressDialog->setRange(0, 100);
