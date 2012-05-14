@@ -53,16 +53,6 @@ private:
     QSet<QnAbstractMediaStreamDataProvider*> m_providers;
 };
 
-struct QnStorageURL
-{
-    QString resourceId;
-    QString quality;
-    QString y;
-    QString m;
-    QString d;
-    QString h;
-    QString file;
-};
 
 class QnStorageResource : public QnAbstractStorageResource
 {
@@ -136,8 +126,6 @@ public:
 public:
     virtual void setUrl(const QString& value);
 protected:
-
-    QnStorageURL url2StorageURL(const QString& url) const;
 
 };
 

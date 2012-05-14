@@ -28,6 +28,8 @@ bool QnColdStoreConnection::open(const QString& fn, QIODevice::OpenModeFlag flag
 
     m_filename = fn;
 
+    m_pos = 0;
+
     m_lastUsed.restart();
     m_openMode = flag;
 
@@ -123,6 +125,8 @@ bool QnColdStoreConnection::write(const char* data, int len)
 
     Veracity::u64 returned_data_length;
 
+    
+
     if (m_connection.Write(
         m_stream,
         data,
@@ -135,6 +139,8 @@ bool QnColdStoreConnection::write(const char* data, int len)
         Q_ASSERT(false);
         return false;
     }
+
+    m_pos += returned_data_length;
 
     Q_ASSERT(returned_data_length == len);
 
@@ -177,6 +183,11 @@ int QnColdStoreConnection::age() const
 QString QnColdStoreConnection::getFilename() const
 {
     return m_filename;
+}
+
+qint64 QnColdStoreConnection::pos() const
+{
+    return m_pos;
 }
 
 //==================================================================================
