@@ -10,6 +10,8 @@
 
 class QnColdStoreIOBuffer;
 
+
+
 class QnPlColdStoreStorage : public QnStorageResource
 {
 public:
@@ -46,25 +48,24 @@ private:
 
     QnColdStoreMetaDataPtr getMetaDataFileForCsFile(const QString& csFile);
     bool hasOpenFilesFor(const QString& csFile) const;
-    QnColdStoreConnection* getPropriteConnectionForCsFile(const QString& csFile);
+    QnCsTimeunitConnectionHelper* getPropriteConnectionForCsFile(const QString& csFile);
     QnCSFileInfo getFileInfo(const QString& fn);
 
 private:
+
+
+
     mutable QMutex m_mutex;
-
     QnColdStoreConnectionPool m_connectionPool;
-
     QnColdStoreMetaDataPool m_metaDataPool;
 
-    QnColdStoreMetaDataPtr m_currentWritingFileMetaData;
-    QnColdStoreMetaDataPtr m_prevWritingFileMetaData;
-
     QnColdStoreWriter* m_cswriterThread;
+
     QSet<QString> m_listOfWritingFiles;
 
+    QnCsTimeunitConnectionHelper* m_currH;
+    QnCsTimeunitConnectionHelper* m_prevH;
 
-    QnColdStoreConnection* m_currentConnection;
-    QnColdStoreConnection* m_prevConnection;
 };
 
 

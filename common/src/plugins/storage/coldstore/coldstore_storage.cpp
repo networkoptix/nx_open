@@ -2,13 +2,15 @@
 #include "coldstore_io_buffer.h"
 #include "utils/common/sleep.h"
 
+
+
 QnPlColdStoreStorage::QnPlColdStoreStorage():
 m_connectionPool(this),
 m_metaDataPool(this),
 m_mutex(QMutex::Recursive),
 m_cswriterThread(0),
-m_currentConnection(0),
-m_prevConnection(0)
+m_currH(0),
+m_prevH(0)
 {
     
 }
@@ -20,8 +22,8 @@ QnPlColdStoreStorage::~QnPlColdStoreStorage()
 
     delete m_cswriterThread;
 
-    delete m_currentConnection;
-    delete m_prevConnection;
+    delete m_currH;
+    delete m_prevH;
 
 }
 
@@ -63,6 +65,8 @@ QIODevice* QnPlColdStoreStorage::open(const QString& fileName, QIODevice::OpenMo
             QMutexLocker lock(&m_mutex);
             m_listOfWritingFiles.insert(nfileName);
         }
+
+        qDebug() << "file opened: " << nfileName;
         
 
         return buff;
@@ -94,18 +98,45 @@ void QnPlColdStoreStorage::onWrite(const QByteArray& ba, const QString& fn)
     QString csFileName = fileName2csFileName(fn);
 
     QMutexLocker lock(&m_mutex);
+    m_listOfWritingFiles.remove(fn);
 
-    QnColdStoreConnection* connection = getPropriteConnectionForCsFile(csFileName);
-    if (connection==0)
-        return;
+    QnCsTimeunitConnectionHelper* connectionH = getPropriteConnectionForCsFile(csFileName);
+    if (connectionH==0)
+    {
+        // must be a new h; need to swap;
+        Q_ASSERT(m_prevH == 0); // old h should not exist any mor 
+        //
+        
+    }
+    else if (connectionH == m_prevH)
+    {
+        // file from prev hour 
+        // lets check if this is the last one 
+        if (!hasOpenFilesFor(m_prevH->getCsFileName()))
+        {
+            // need to close prev h
+        }
+        else
+        {
+            // keep saving to prev h
+        }
 
-    //QnColdStoreMetaDataPtr md = connection == 
+    }
+    else if (connectionH == m_currH)
+    {
+        // keep saving to current h
+    }
+
+
+    qDebug() << "file closed: " << fn;
+
+    //QnColdStoreMetaDataPtr md = connectionH == 
 
 }
 
 int QnPlColdStoreStorage::getChunkLen() const 
 {
-    return 10*60; // 10 sec
+    return 10; // 10 sec
 }
 
 bool QnPlColdStoreStorage::isStorageAvailable() 
@@ -210,6 +241,7 @@ QnCSFileInfo QnPlColdStoreStorage::getFileInfo(const QString& fn)
 }
 
 //=======private==============================
+
 bool QnPlColdStoreStorage::hasOpenFilesFor(const QString& csFile) const
 {
     QMutexLocker lock(&m_mutex);
@@ -222,30 +254,31 @@ bool QnPlColdStoreStorage::hasOpenFilesFor(const QString& csFile) const
     return false;
 }
 
-QnColdStoreConnection* QnPlColdStoreStorage::getPropriteConnectionForCsFile(const QString& csFile)
+QnCsTimeunitConnectionHelper* QnPlColdStoreStorage::getPropriteConnectionForCsFile(const QString& csFile)
 {
     QMutexLocker lock(&m_mutex);
 
-    if (m_currentConnection == 0)
+    if (m_currH == 0)
     {
-        m_currentConnection = new QnColdStoreConnection(coldstoreAddr());
-        if (!m_currentConnection->open(csFile, QIODevice::WriteOnly, 0))
+        m_currH = new QnCsTimeunitConnectionHelper();
+
+        if (!m_currH->open(coldstoreAddr(),csFile))
         {
-        
-            delete m_currentConnection;
-            m_currentConnection = 0;
+            delete m_currH;
+            m_currH = 0;
             return 0;
         }
-        return m_currentConnection;
+
+        return m_currH;
     }
 
-    if (m_prevConnection==0 && m_currentConnection->getFilename() == csFile)
-        return m_currentConnection;
+    if (m_currH && m_currH->getCsFileName() == csFile)
+        return m_currH;
 
-    if (m_prevConnection && m_prevConnection->getFilename() == csFile)
-        return m_prevConnection;
+    if (m_prevH && m_prevH->getCsFileName() == csFile)
+        return m_prevH;
 
-    Q_ASSERT(false);
+    //Q_ASSERT(false);
     return 0;
 
 }
@@ -255,13 +288,13 @@ QnColdStoreMetaDataPtr QnPlColdStoreStorage::getMetaDataFileForCsFile(const QStr
 {
     {
         QMutexLocker lock(&m_mutex);
-        if (m_currentWritingFileMetaData && m_currentWritingFileMetaData->csFileName() == csFile)
+        if (m_currH && m_currH->getCsFileName() == csFile)
         {
-            return m_currentWritingFileMetaData;
+            return m_currH->getMD();
         }
-        else if (m_prevWritingFileMetaData && m_prevWritingFileMetaData->csFileName() == csFile)
+        else if (m_prevH && m_prevH->getCsFileName() == csFile)
         {
-            return m_prevWritingFileMetaData;
+            return m_prevH->getMD();
         }
     }
 
