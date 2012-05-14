@@ -105,7 +105,23 @@ void QnPlColdStoreStorage::onWrite(const QByteArray& ba, const QString& fn)
     {
         // must be a new h; need to swap;
         Q_ASSERT(m_prevH == 0); // old h should not exist any mor 
-        //
+        m_prevH = m_currH;
+
+        m_currH = new QnCsTimeunitConnectionHelper();
+        if (!m_currH->open(coldstoreAddr(), csFileName))
+        {
+            delete m_currH;
+            m_currH = 0;
+            return;
+        }
+        
+        //write into new curr 
+        m_mutex.unlock();
+        m_currH->write(ba, fn);
+        m_mutex.lock();
+
+        
+
         
     }
     else if (connectionH == m_prevH)
@@ -114,11 +130,23 @@ void QnPlColdStoreStorage::onWrite(const QByteArray& ba, const QString& fn)
         // lets check if this is the last one 
         if (!hasOpenFilesFor(m_prevH->getCsFileName()))
         {
-            // need to close prev h
+            // write into prev and close it
+            m_mutex.unlock();
+            m_prevH->write(ba, fn);
+            m_mutex.lock();
+
+            m_prevH->close();
+            delete m_prevH;
+            m_prevH = 0;
+
         }
         else
         {
             // keep saving to prev h
+            m_mutex.unlock();
+            m_prevH->write(ba, fn);
+            m_mutex.lock();
+
         }
 
     }
