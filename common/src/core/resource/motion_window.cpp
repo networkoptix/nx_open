@@ -3,7 +3,7 @@
 
 QnMotionRegion::QnMotionRegion()
 {
-    addRect(6, QRect(0,0,MD_WIDTH, MD_HEIGHT));
+    addRect(8, QRect(0,0,MD_WIDTH, MD_HEIGHT));
     //addRect(0, QRect(0,0,MD_WIDTH, MD_HEIGHT));
 }
 
