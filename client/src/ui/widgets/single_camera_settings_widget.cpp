@@ -113,8 +113,14 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
         ui->cameraMotionButton->setChecked(m_camera->getMotionType() != MT_SoftwareGrid);
         ui->softwareMotionButton->setChecked(m_camera->getMotionType() == MT_SoftwareGrid);
         //updateMaxMotionRect();
-        if (m_camera && m_motionWidget)
-            m_motionWidget->setNeedControlMaxRects(!ui->softwareMotionButton->isChecked());
+
+        bool mEnabled = m_camera->supportedMotionType() != MT_NoMotion;
+        ui->tabMotion->setEnabled(mEnabled);
+       
+        if (m_motionWidget) {
+            m_motionWidget->setVisible(mEnabled);
+            m_motionWidget->setNeedControlMaxRects(mEnabled && !ui->softwareMotionButton->isChecked());
+        }
 
 
         /*
