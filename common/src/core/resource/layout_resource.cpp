@@ -60,8 +60,11 @@ void QnLayoutResource::updateInner(QnResourcePtr other) {
     base_type::updateInner(other);
 
     QnLayoutResourcePtr localOther = other.dynamicCast<QnLayoutResource>();
-    if(localOther)
+    if(localOther) {
         setItems(localOther->getItems());
+        setCellAspectRatio(localOther->cellAspectRatio());
+        setCellSpacing(localOther->cellSpacing());
+    }
 }
 
 void QnLayoutResource::addItem(const QnLayoutItemData &item) {

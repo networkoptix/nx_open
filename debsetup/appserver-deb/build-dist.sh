@@ -26,6 +26,7 @@ INITSTAGE=$STAGE$INITTARGET
 INITDSTAGE=$STAGE$INITDTARGET
 
 PROXY_BIN_PATH=${project.build.directory}/bin
+PROXY_LIB_PATH=${project.build.directory}/build/bin/${build.configuration}
 ECS_PRESTAGE_PATH=${project.build.directory}/appserver/*
 	
 #. $SERVER_BIN_PATH/env.sh
@@ -55,6 +56,16 @@ install -m 755 init.d/networkoptix-entcontroller $INITDSTAGE
 
 # Copy mediaproxy binary
 install -m 755 $PROXY_BIN_PATH/mediaproxy-bin $BINSTAGE
+
+# Copy libraries
+cp -P $PROXY_LIB_PATH/*.so* $LIBSTAGE
+cp -P ${qt.dir}/libaudio.so* $LIBSTAGE
+cp -P ${qt.dir}/libXi.so* $LIBSTAGE
+cp -P ${qt.dir}/libXt.so* $LIBSTAGE
+cp -P ${qt.dir}/libXrender.so* $LIBSTAGE
+cp -P ${qt.dir}/libfontconfig.so* $LIBSTAGE
+cp -P ${qt.dir}/libICE.so* $LIBSTAGE
+cp -P ${qt.dir}/libSM.so* $LIBSTAGE
 
 # Copy mediaproxy startup script
 install -m 755 bin/mediaproxy $BINSTAGE
