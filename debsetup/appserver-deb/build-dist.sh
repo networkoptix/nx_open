@@ -1,6 +1,9 @@
 #!/bin/bash
 
-. ../common.sh
+#. ../common.sh
+PACKAGENAME=networkoptix-entcontroller
+VERSION=${project.version}
+ARCHITECTURE=${os.arch}
 
 TARGET=/opt/networkoptix/entcontroller
 BINTARGET=$TARGET/bin
@@ -11,9 +14,8 @@ SHARETARGET=$TARGET/share
 INITTARGET=/etc/init
 INITDTARGET=/etc/init.d
 
-PACKAGENAME=networkoptix-entcontroller
-STAGEBASE=package
-STAGE=$STAGEBASE/${PACKAGENAME}_${VERSION}_${ARCHITECTURE}
+STAGEBASE=deb
+STAGE=$STAGEBASE/${PACKAGENAME}-${project.version}.${buildNumber}-${arch}-${build.configuration}
 PKGSTAGE=$STAGE$TARGET
 BINSTAGE=$STAGE$BINTARGET
 LIBSTAGE=$STAGE$LIBTARGET
@@ -23,32 +25,26 @@ SHARESTAGE=$STAGE$SHARETARGET
 INITSTAGE=$STAGE$INITTARGET
 INITDSTAGE=$STAGE$INITDTARGET
 
-PROXY_BIN_PATH=../../mediaproxy/bin/release
-ECS_PRESTAGE_PATH=../../appserver/setup/build/stage
-
-function build_ecs {
-    pushd ../../appserver/setup
-    python setup.py build
-    popd
-}
-
-build_ecs
+PROXY_BIN_PATH=${project.build.directory}/bin
+ECS_PRESTAGE_PATH=${project.build.directory}/appserver/*
+	
+#. $SERVER_BIN_PATH/env.sh
 
 # Prepare stage dir
-sudo rm -rf $STAGEBASE
-mkdir -p $PKGSTAGE
-rmdir $PKGSTAGE
+rm -rf $STAGEBASE
+mkdir -p $BINSTAGE
+mkdir -p $LIBSTAGE
+mkdir -p $ETCSTAGE
+mkdir -p $INITSTAGE
+mkdir -p $INITDSTAGE
 
 ############### Enterprise Controller
 cp -r $ECS_PRESTAGE_PATH $PKGSTAGE
-cp /lib/$ARCH-linux-gnu/libssl.so.1.0.0 $LIBSTAGE
-cp /lib/$ARCH-linux-gnu/libcrypto.so.1.0.0 $LIBSTAGE
+cp ${qt.dir}/libssl.so.1.0.0 $LIBSTAGE
+cp ${qt.dir}/libcrypto.so.1.0.0 $LIBSTAGE
 
-mkdir -p $ETCSTAGE
 touch $ETCSTAGE/entcontroller.conf
 
-mkdir -p $INITSTAGE
-mkdir -p $INITDSTAGE
 
 # Copy upstart and sysv scripts
 install -m 755 init/networkoptix-entcontroller.conf $INITSTAGE
@@ -57,20 +53,11 @@ install -m 755 init.d/networkoptix-entcontroller $INITDSTAGE
 
 ################ Media Proxy
 
-QT_FILES="libQtXml.so.4 libQtGui.so.4 libQtNetwork.so.4 libQtCore.so.4"
-
 # Copy mediaproxy binary
-install -m 755 $PROXY_BIN_PATH/mediaproxy $BINSTAGE/mediaproxy-bin
+install -m 755 $PROXY_BIN_PATH/mediaproxy-bin $BINSTAGE
 
 # Copy mediaproxy startup script
 install -m 755 bin/mediaproxy $BINSTAGE
-
-# Copy required qt libraries
-for file in $QT_FILES
-do
-    install -m 644  $QT_LIB_PATH/$file $LIBSTAGE
-done
-
 install -m 755 init/networkoptix-mediaproxy.conf $INITSTAGE
 install -m 755 init.d/networkoptix-mediaproxy $INITDSTAGE
 
@@ -88,4 +75,4 @@ cp debian/conffiles $STAGE/DEBIAN
 (cd $STAGE; md5sum `find * -type f | grep -v '^DEBIAN/'` > DEBIAN/md5sums)
 
 sudo chown -R root:root $STAGEBASE
-(cd $STAGEBASE; sudo dpkg-deb -b networkoptix-entcontroller_${VERSION}_${ARCHITECTURE})
+(cd $STAGEBASE; sudo dpkg-deb -b ${PACKAGENAME}-${project.version}.${buildNumber}-${arch}-${build.configuration})
