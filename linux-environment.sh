@@ -22,6 +22,8 @@ python setup.py build
 sudo python setup.py install
 rm -Rf ./cx_Freeze*
 
+sudo cp ~/projects/netoptix_vms/appserver/patches/django_mgmt_init__.py /usr/local/lib/python2.7/dist-packages/django/core/management/__init__.py
+
 cd ~/projects/netoptix_vms/appserver/
 
 sudo python ./scripts/install_pip.py
