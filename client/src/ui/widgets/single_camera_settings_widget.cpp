@@ -115,10 +115,11 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
         //updateMaxMotionRect();
 
         bool mEnabled = m_camera->supportedMotionType() != MT_NoMotion;
-        ui->tabMotion->setEnabled(mEnabled);
+        ui->groupBoxSettings->setEnabled(mEnabled);
        
         if (m_motionWidget) {
             m_motionWidget->setVisible(mEnabled);
+            ui->motionEnableLabel->setVisible(!mEnabled);
             m_motionWidget->setNeedControlMaxRects(mEnabled && !ui->softwareMotionButton->isChecked());
         }
 
