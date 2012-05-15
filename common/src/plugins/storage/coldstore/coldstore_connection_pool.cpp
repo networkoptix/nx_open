@@ -39,7 +39,7 @@ bool QnColdStoreConnection::open(const QString& fn, QIODevice::OpenModeFlag flag
 
     if (m_openMode == QIODevice::ReadOnly)
     {
-        if (m_connection.Open(
+        Veracity::u32 status = m_connection.Open(
             cFn, 
             0, //Timestamp of file to open. This is ignored unless (file_name == 0).
             channel, //Channel number of file to open.
@@ -48,7 +48,9 @@ bool QnColdStoreConnection::open(const QString& fn, QIODevice::OpenModeFlag flag
             &m_openedStreamSize, //Size in bytes of the opened file.
             0,  //Current file position (measured in bytes from the start of the file). This is always 0 for a name based open.
             0 //Timestamp of the current position.
-            ) != Veracity::ISFS::STATUS_SUCCESS)
+            );
+
+        if ( status != Veracity::ISFS::STATUS_SUCCESS)
         {
             //Q_ASSERT(false);
             return false;

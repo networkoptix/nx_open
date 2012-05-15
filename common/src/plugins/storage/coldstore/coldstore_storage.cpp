@@ -12,7 +12,17 @@ m_cswriterThread(0),
 m_currH(0),
 m_prevH(0)
 {
-    
+    char dataW[100]; dataW[7] = 7;
+    QnColdStoreConnection connW("10.10.10.253");
+    bool b = connW.open("111", QIODevice::WriteOnly, 0);
+    connW.write(dataW, sizeof(dataW));
+
+    char dataR[100]; 
+    QnColdStoreConnection connR("10.10.10.253");
+    b = connW.open("111", QIODevice::ReadOnly, 0);
+    connW.read(dataR, sizeof(dataR));
+
+
 }
 
 QnPlColdStoreStorage::~QnPlColdStoreStorage()
@@ -50,8 +60,13 @@ QIODevice* QnPlColdStoreStorage::open(const QString& fileName, QIODevice::OpenMo
             QnColdStoreIOBuffer* buff = new QnColdStoreIOBuffer(toSharedPointer(), nfileName);
             buff->open(QIODevice::WriteOnly);
             buff->buffer().resize(fi.len);
-            m_connectionPool.read(nfileName, buff->buffer().data(), fi.shift, fi.len);
-            buff->open(QIODevice::ReadOnly);
+            if (m_connectionPool.read(nfileName, buff->buffer().data(), fi.shift, fi.len)>0)
+                buff->open(QIODevice::ReadOnly);
+            else
+            {
+                delete buff;
+                return 0;
+            }
 
         }
 
@@ -106,6 +121,15 @@ void QnPlColdStoreStorage::onWrite(const QByteArray& ba, const QString& fn)
         // must be a new h; need to swap;
         Q_ASSERT(m_prevH == 0); // old h should not exist any mor 
         m_prevH = m_currH;
+        
+        // lets check if this is the last one 
+        if (!hasOpenFilesFor(m_prevH->getCsFileName()))
+        {
+            m_prevH->close();
+            delete m_prevH;
+            m_prevH = 0;
+        }
+
 
         m_currH = new QnCsTimeunitConnectionHelper();
         if (!m_currH->open(coldstoreAddr(), csFileName))
@@ -153,6 +177,10 @@ void QnPlColdStoreStorage::onWrite(const QByteArray& ba, const QString& fn)
     else if (connectionH == m_currH)
     {
         // keep saving to current h
+        m_mutex.unlock();
+        m_currH->write(ba, fn);
+        m_mutex.lock();
+
     }
 
 
