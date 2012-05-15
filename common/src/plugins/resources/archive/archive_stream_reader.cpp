@@ -682,6 +682,10 @@ begin_label:
         m_playbackMaskSync.lock();
         qint64 newTime = m_playbackMaskHelper.findTimeAtPlaybackMask(m_currentData->timestamp, !reverseMode);
         m_playbackMaskSync.unlock();
+
+        if (newTime == DATETIME_NOW)
+            return createEmptyPacket(reverseMode); // EOF reached
+
         if (newTime != m_currentData->timestamp)
         {
             if (!exactJumpToSpecifiedFrame && channelCount > 1)
