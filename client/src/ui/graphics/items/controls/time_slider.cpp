@@ -88,11 +88,11 @@ namespace {
     const qreal criticalTickmarkLineStepPixels = 2.0;
 
     /** Minimal distance between tickmarks from the same group for text labels to be visible for this group. */
-    const qreal minTickmarkTextStepPixels = 30.0;
+    const qreal minTickmarkTextStepPixels = 40.0;
 
     /** Critical distance between tickmarks from the same group.
      * Text labels will never be displayed for tickmarks that are closer to each other. */
-    const qreal criticalTickmarkTextStepPixels = 20.0;
+    const qreal criticalTickmarkTextStepPixels = 25.0;
     
     /** Minimal opacity for a tickmark that is visible. */
     const qreal minTickmarkLineOpacity = 0.05;
@@ -332,7 +332,8 @@ QVector<QnTimeStep> QnTimeSlider::createAbsoluteSteps() {
         QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60,                   12,     24,     tr("h"),        tr("23h"),          QString(),          false) <<
         QnTimeStep(QnTimeStep::Days,            1000ll * 60 * 60 * 24,              1,      31,     tr("dd MMM"),   tr("29 Mar"),       tr("dd MMMM yyyy"), false) <<
         QnTimeStep(QnTimeStep::Months,          1000ll * 60 * 60 * 24 * 31,         1,      12,     tr("MMMM"),     tr("September"),    tr("MMMM yyyy"),    false) <<
-        QnTimeStep(QnTimeStep::Years,           1000ll * 60 * 60 * 24 * 365,        1,      50000,  tr("yyyy"),     tr("2000"),         tr("yyyy"),         false);
+        QnTimeStep(QnTimeStep::Years,           1000ll * 60 * 60 * 24 * 365,        1,      50000,  tr("yyyy"),     tr("2000"),         tr("yyyy"),         false) <<
+        QnTimeStep(QnTimeStep::Years,           1000ll * 60 * 60 * 24 * 365,        5,      50000,  tr("yyyy"),     tr("2000"),         tr("yyyy"),         false);
     return enumerateSteps(result);
 }
 
@@ -356,7 +357,8 @@ QVector<QnTimeStep> QnTimeSlider::createRelativeSteps() {
         QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60,                   12,     24,     tr("h"),        tr("23h"),          QString(),          true) <<
         QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60 * 24,              1,      31,     tr("d"),        tr("29d"),          QString(),          true) <<
         QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60 * 24 * 30,         1,      12,     tr("M"),        tr("11M"),          QString(),          true) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60 * 24 * 30 * 12,    1,      50000,  tr("y"),        tr("2000y"),        QString(),          true);
+        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60 * 24 * 30 * 12,    1,      50000,  tr("y"),        tr("2000y"),        QString(),          true) <<
+        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60 * 24 * 30 * 12,    5,      50000,  tr("y"),        tr("2000y"),        QString(),          true);
     return enumerateSteps(result);
 }
 
