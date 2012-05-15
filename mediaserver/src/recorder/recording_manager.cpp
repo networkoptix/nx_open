@@ -192,6 +192,9 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
         if (needStopLow)
             recorderLowRes->clearUnprocessedData();
 
+        if(res->getStatus() == QnResource::Recording)
+            res->setStatus(QnResource::Online);
+
         if (needStopHi)
             cl_log.log("Recording stopped for camera ", res->getUniqueId(), cl_logINFO);
     }
