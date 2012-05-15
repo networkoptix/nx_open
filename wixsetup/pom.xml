@@ -135,7 +135,14 @@
 										<resource>
 											<directory>${project.build.sourceDirectory}/maven/bin-resources</directory>
 											<filtering>false</filtering>
-										</resource>										
+										</resource>		
+										<resource>
+											<directory>${project.build.sourceDirectory}</directory>
+											<filtering>false</filtering>
+											<includes>
+												<include>CustomActions/**</include>
+											</includes>
+										</resource>											
 									</resources>            
 									<encoding>UTF-8</encoding>
 								</configuration>            

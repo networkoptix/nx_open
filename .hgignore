@@ -86,6 +86,8 @@ mediaproxy/src/mediaproxy.pro
 
 testcamera/src/testCamera.pro
 testcamera/src/testCamera.vcproj
+testcamera/bin/debug
+testcamera/bin/release
 
 winbuild/msvc2010/setup.bat
 

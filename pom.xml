@@ -61,6 +61,7 @@
 			</activation>
 			<modules>
 				<module>debsetup/mediaserver-deb</module>
+				<module>debsetup/appserver-deb</module>
 			</modules>
 			<properties>
 				<platform>linux</platform>

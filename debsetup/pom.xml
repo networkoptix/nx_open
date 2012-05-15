@@ -40,7 +40,30 @@
 							<executable>${basedir}/../pre-clean.sh</executable>
 							<workingDirectory>${project.build.directory}</workingDirectory>
 						</configuration>
-					</execution>	
+					</execution>
+					<execution>
+						<id>prepare-deb-contents</id>
+						<!--<id>default-cli</id>-->
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>${project.build.directory}/prepare-dist.sh</executable>
+							<workingDirectory>${project.build.directory}</workingDirectory>		
+						</configuration>
+					</execution>
+					<execution>
+						<id>build-deb</id>
+						<phase>package</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>${project.build.directory}/build-dist.sh</executable>
+							<workingDirectory>${project.build.directory}</workingDirectory>		
+						</configuration>
+					</execution>					
 				</executions>
 			</plugin>
 
@@ -63,45 +86,34 @@
 					</execution>				
 				</executions>
 			</plugin>
-			
+
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>1.1.1</version>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.4</version>
 				<executions>
 					<execution>
-						<id>prepare-deb-contents</id>
-						<!--<id>default-cli</id>-->
-						<phase>prepare-package</phase>
+						<id>copy-artifacts</id>
+						<phase>process-resources</phase>
 						<goals>
-							<goal>exec</goal>
+							<goal>copy-dependencies</goal>
 						</goals>
 						<configuration>
-							<executable>./prepare-dist.sh</executable>
-							<workingDirectory>${project.build.directory}</workingDirectory>		
+							<excludeTransitive>true</excludeTransitive>
+							<outputDirectory>${project.build.directory}</outputDirectory>
 						</configuration>
 					</execution>
-					<execution>
-						<id>build-deb</id>
-						<phase>package</phase>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-							<executable>./build-dist.sh</executable>
-							<workingDirectory>${project.build.directory}</workingDirectory>		
-						</configuration>
-					</execution>							
 				</executions>
-			</plugin>	
+			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
 				<version>2.5</version>
 				<executions>
 					<execution>
-						<id>prepare-qt-project</id>
-						<phase>initialize</phase>
+						<id>prepare-deb</id>
+						<phase>process-sources</phase>
 						<goals>
 							<goal>copy-resources</goal>
 						</goals>
@@ -112,10 +124,10 @@
 									<directory>${basedir}</directory>
 									<filtering>true</filtering>
 									<includes>
-										<include>bin</include>
-										<include>debian</include>
-										<include>init</include>
-										<include>init.d</include>
+										<include>bin/**</include>
+										<include>debian/**</include>
+										<include>init/**</include>
+										<include>init.d/**</include>
 										<include>*.sh</include>
 									</includes>
 									<excludes>
