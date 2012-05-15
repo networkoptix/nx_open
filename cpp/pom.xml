@@ -367,7 +367,7 @@
 										<commandlineArgs>-f</commandlineArgs>
 										<commandlineArgs>Makefile.${build.configuration}</commandlineArgs>
 										<commandlineArgs>-j</commandlineArgs>
-										<commandlineArgs>2</commandlineArgs>
+										<commandlineArgs>1</commandlineArgs>
 										<!--<commandlineArgs>`cat /proc/cpuinfo | grep ^processor | wc -l`</commandlineArgs>-->
 									</arguments>
 								</configuration>

@@ -583,10 +583,7 @@ void QnSystrayWindow::onShowMediaServerLogAction()
 
 void QnSystrayWindow::onShowAppServerLogAction()
 {
-    QString logFileName = m_mServerSettings.value("logFile").toString();
-    logFileName = logFileName.left(logFileName.lastIndexOf(MEDIA_SERVER_NAME));
-    logFileName += APP_SERVER_NAME;
-    logFileName += "\\ecs.log";
+    QString logFileName = m_appServerSettings.value("logFile").toString();
     QProcess::startDetached(QString("notepad ") + logFileName);
 }
 

@@ -150,8 +150,8 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_animationInstrument = new AnimationInstrument(this);
     m_boundingInstrument = new BoundingInstrument(this);
     m_transformListenerInstrument = new TransformListenerInstrument(this);
-    m_curtainActivityInstrument = new ActivityListenerInstrument(1000, this);
-    m_widgetActivityInstrument = new ActivityListenerInstrument(1000 * 10, this);
+    m_curtainActivityInstrument = new ActivityListenerInstrument(true, 1000, this);
+    m_widgetActivityInstrument = new ActivityListenerInstrument(true, 1000 * 10, this);
     m_paintForwardingInstrument = new ForwardingInstrument(Instrument::Viewport, paintEventTypes, this);
     m_selectionOverlayHackInstrument = new SelectionOverlayHackInstrument(this);
 

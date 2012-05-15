@@ -9,7 +9,7 @@ done
 
 cd ${project.build.directory}/qtlibs
 
-zip -y -r ../qtlibs-x86.zip ./**
+zip -y -r ../qtlibs-${arch}.zip ./**
 
 cd ${project.build.directory}
 

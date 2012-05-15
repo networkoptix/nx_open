@@ -66,13 +66,7 @@
 			<version>2.4.1</version>
 			<type>zip</type>
 			<classifier>${platform}-${arch}</classifier>
-		</dependency>	
-		<dependency>
-			<groupId>com.nokia.qt</groupId>
-			<artifactId>qtcore</artifactId>
-			<version>4.7.4</version>
-			<type>zip</type>
-		</dependency>	
+		</dependency>
 	</dependencies>		
 
 	<build>

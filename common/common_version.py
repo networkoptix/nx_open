@@ -2,7 +2,7 @@ import os, sys, re
 from convert import platform, setup_ffmpeg
 
 ORGANIZATION_NAME    = 'Network Optix'
-APPLICATION_VERSION  = '1.0.0'
+APPLICATION_VERSION  = '1.0.9'
 BUILD_NUMBER = os.getenv('BUILD_NUMBER', '0')
 
 def get_library_path():
@@ -28,7 +28,7 @@ def set_env():
         set_library_path(library_path)
     
     FFMPEG_VERSION = re.search(r'(N-[^\s]*)', ffmpeg_output).groups()[0]
-	
+    
     os.putenv('ORGANIZATION_NAME', ORGANIZATION_NAME)
     os.putenv('APPLICATION_VERSION', APPLICATION_VERSION)
     os.putenv('BUILD_NUMBER', BUILD_NUMBER)

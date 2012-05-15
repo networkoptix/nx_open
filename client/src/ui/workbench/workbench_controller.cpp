@@ -67,6 +67,7 @@
 #include <ui/graphics/items/grid_item.h>
 
 #include <ui/actions/action_manager.h>
+#include <ui/actions/action_target_provider.h>
 
 #include <file_processor.h>
 
@@ -965,7 +966,7 @@ void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *
     workbench()->setItem(Qn::RaisedRole, workbench()->item(Qn::RaisedRole) == workbenchItem ? NULL : workbenchItem);
 }
 
-void QnWorkbenchController::at_item_rightClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &info) {
+void QnWorkbenchController::at_item_rightClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info) {
     TRACE("ITEM RCLICKED");
 
     QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
@@ -982,7 +983,7 @@ void QnWorkbenchController::at_item_rightClicked(QGraphicsView *, QGraphicsItem 
     QScopedPointer<QMenu> menu(this->menu()->newMenu(Qn::SceneScope, display()->scene()->selectedItems()));
     if(menu->isEmpty())
         return;
-    
+
     menu->exec(info.screenPos());
 }
 
@@ -1050,6 +1051,7 @@ void QnWorkbenchController::at_scene_rightClicked(QGraphicsView *, const ClickIn
     if(menu->isEmpty())
         return;
 
+    /* We don't want the curtain to kick in while menu is open. */
     menu->exec(info.screenPos());
 }
 
@@ -1122,6 +1124,10 @@ void QnWorkbenchController::at_display_widgetAboutToBeRemoved(QnResourceWidget *
 void QnWorkbenchController::at_selectAllAction_triggered() {
     foreach(QnResourceWidget *widget, display()->widgets())
         widget->setSelected(true);
+
+    /* Move focus to scene if it's not there. */
+    if(menu()->targetProvider() && menu()->targetProvider()->currentScope() != Qn::SceneScope)
+        display()->scene()->setFocusItem(NULL);
 }
 
 void QnWorkbenchController::at_hideMotionAction_triggered() {

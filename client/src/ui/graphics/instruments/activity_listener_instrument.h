@@ -3,6 +3,8 @@
 
 #include "instrument.h"
 
+#include <QtCore/QBasicTimer>
+
 /**
  * This instrument makes it possible to listen to user activity.
  * 
@@ -13,7 +15,7 @@
 class ActivityListenerInstrument: public Instrument {
     Q_OBJECT;
 public:
-    ActivityListenerInstrument(int activityTimeoutMSec, QObject *parent = NULL);
+    ActivityListenerInstrument(bool focusedOnly, int activityTimeoutMSec, QObject *parent = NULL);
     virtual ~ActivityListenerInstrument();
 
     int activityTimeoutMSec() const {
@@ -33,11 +35,14 @@ protected:
     virtual void timerEvent(QTimerEvent *event) override;
 
     void activityDetected();
+    void setAutoStopping(bool autoStopping);
+    void setActive(bool active);
 
 private:
     int m_activityTimeoutMSec;
     bool m_active;
-    int m_currentTimer;
+    bool m_autoStopping;
+    QBasicTimer m_timer;
 };
 
 
