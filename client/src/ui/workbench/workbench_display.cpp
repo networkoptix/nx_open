@@ -943,7 +943,7 @@ void QnWorkbenchDisplay::synchronize(QnWorkbenchItem *item, bool animate) {
     if(widget == NULL)
         return; /* No widget was created for the item provided. */
 
-    synchronize(item, animate);
+    synchronize(widget, animate);
 }
 
 void QnWorkbenchDisplay::synchronize(QnResourceWidget *widget, bool animate) {
