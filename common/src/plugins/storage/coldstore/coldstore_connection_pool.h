@@ -28,6 +28,8 @@ public:
 
     QString getFilename() const;
 
+    qint64 pos() const;
+
 private:
     Veracity::SFSClient m_connection;
     Veracity::u32 m_stream;
@@ -42,6 +44,7 @@ private:
 
     QString m_filename;
 
+    qint64 m_pos;
 
         
 };

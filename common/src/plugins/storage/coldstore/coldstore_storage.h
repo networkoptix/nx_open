@@ -10,6 +10,8 @@
 
 class QnColdStoreIOBuffer;
 
+
+
 class QnPlColdStoreStorage : public QnStorageResource
 {
 public:
@@ -33,39 +35,37 @@ public:
     virtual bool isFileExists(const QString& url) override;
     virtual bool isDirExists(const QString& url) override;
 
-    QString coldstoreAddr() const;
-
-    void onWriteBuffClosed(QnColdStoreIOBuffer* buff);
-
-    void onWrite(const QByteArray& ba, const QString& fn);
-
     //=====================
+    QString coldstoreAddr() const;
+    void onWriteBuffClosed(QnColdStoreIOBuffer* buff);
+    void onWrite(const QByteArray& ba, const QString& fn);
+    
+private:
+
+    QString normolizeFileName(const QString& fn) const;
+
     QString fileName2csFileName(const QString& fn) const;
-    QnCSFileInfo getFileInfo(const QString& fn);
-private:
+
     QnColdStoreMetaDataPtr getMetaDataFileForCsFile(const QString& csFile);
-    QString csDataFileName(const QnStorageURL& url) const;
-
     bool hasOpenFilesFor(const QString& csFile) const;
-
-    QnColdStoreConnection* getPropriteConnectionForCsFile(const QString& csFile);
+    QnCsTimeunitConnectionHelper* getPropriteConnectionForCsFile(const QString& csFile);
+    QnCSFileInfo getFileInfo(const QString& fn);
 
 private:
+
+
+
     mutable QMutex m_mutex;
-
     QnColdStoreConnectionPool m_connectionPool;
-
     QnColdStoreMetaDataPool m_metaDataPool;
 
-    QnColdStoreMetaDataPtr m_currentWritingFileMetaData;
-    QnColdStoreMetaDataPtr m_prevWritingFileMetaData;
-
     QnColdStoreWriter* m_cswriterThread;
+
     QSet<QString> m_listOfWritingFiles;
 
+    QnCsTimeunitConnectionHelper* m_currH;
+    QnCsTimeunitConnectionHelper* m_prevH;
 
-    QnColdStoreConnection* m_currentConnection;
-    QnColdStoreConnection* m_prevConnection;
 };
 
 
