@@ -135,6 +135,8 @@ signals:
     void windowChanged(qint64 windowStart, qint64 windowEnd);
     void selectionChanged(qint64 selectionStart, qint64 selectionEnd);
     void customContextMenuRequested(const QPointF &pos, const QPoint &screenPos);
+    void selectionStarted();
+    void selectionFinished();
 
 protected:
     virtual void sliderChange(SliderChange change) override;

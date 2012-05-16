@@ -172,6 +172,8 @@ namespace {
 
     const int startDragDistance = 5;
 
+
+
     /* Colors. */
     
     const QColor tickmarkColor(255, 255, 255, 255);
@@ -1518,6 +1520,8 @@ void QnTimeSlider::startDrag(DragInfo *info) {
         setSelectionValid(true);
         setSelection(pos, pos);
         m_dragMarker = SelectionStartMarker;
+
+        emit selectionStarted();
     }
 
     m_dragIsClick = false;
@@ -1544,15 +1548,21 @@ void QnTimeSlider::dragMove(DragInfo *info) {
     default:
         break;
     }
-    if(selectionStart > selectionEnd) {
-        qSwap(selectionStart, selectionEnd);
-        m_dragMarker = otherMarker;
-    }
 
-    setSelection(selectionStart, selectionEnd);
+    if(m_dragMarker != NoMarker) {
+        if(selectionStart > selectionEnd) {
+            qSwap(selectionStart, selectionEnd);
+            m_dragMarker = otherMarker;
+        }
+
+        setSelection(selectionStart, selectionEnd);
+    }
 }
 
 void QnTimeSlider::finishDrag(DragInfo *) {
+    if(m_dragMarker == SelectionStartMarker || m_dragMarker == SelectionEndMarker)
+        emit selectionFinished();
+
     setSliderDown(false);
 }
 
