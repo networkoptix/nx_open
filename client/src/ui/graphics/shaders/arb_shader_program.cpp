@@ -54,7 +54,7 @@ bool QnArbShaderProgram::addShaderFromSourceCode(QGLShader::ShaderType type, con
 
     d->glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, d->fragmentProgram);
     d->glProgramStringARB(GL_FRAGMENT_PROGRAM_ARB, GL_PROGRAM_FORMAT_ASCII_ARB, qstrlen(source), source);
-    return glCheckError("glProgramStringARB") != GL_NO_ERROR;
+    return glCheckError("glProgramStringARB") == GL_NO_ERROR;
 }
 
 void QnArbShaderProgram::setLocalValue(QGLShader::ShaderType type, int location, GLfloat x, GLfloat y, GLfloat z, GLfloat w) {
