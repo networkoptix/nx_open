@@ -915,7 +915,7 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
     }
 
     /* Draw background. */
-    if(m_lineCount == 0) {
+    if(qFuzzyIsNull(m_totalLineStretch)) {
         drawSolidBackground(painter, rect);
     } else {
         drawSolidBackground(painter, tickmarkBarRect);
