@@ -269,6 +269,7 @@ int main(int argc, char *argv[])
     commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::Integer, "--screen", NULL, NULL));
     commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::String, "--delayed-drop", NULL, NULL));
     commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::String, "--log-level", NULL, NULL));
+    commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::Flag, "--soft-yuv", NULL, NULL));
     commandLinePreParser.parse(argc, argv);
 
     //===============
@@ -276,6 +277,9 @@ int main(int argc, char *argv[])
    
     //===============
     /* Set authentication parameters from command line. */
+    QnSettings::instance()->setForceSoftYUV(commandLinePreParser.value("--soft-yuv").toBool());
+
+
     QUrl authentication = QUrl::fromUserInput(commandLinePreParser.value("--auth").toString());
     if(authentication.isValid()) {
         out << QObject::tr("Using authentication parameters from command line: %1.").arg(authentication.toString()) << endl;
