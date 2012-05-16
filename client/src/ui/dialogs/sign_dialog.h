@@ -42,10 +42,10 @@ private:
     QStandardItemModel *m_connectionsModel;
     int m_requestHandle;
 
-    QnAviResourcePtr aviRes;
-    QnSignDialogGlWidget* glWindow;
+    QnAviResourcePtr m_resource;
+    QnSignDialogGlWidget* m_glWindow;
     QnAbstractArchiveReader* m_reader;
-    QnResourceWidgetRenderer* renderer;
+    QnResourceWidgetRenderer* m_renderer;
     CLCamDisplay* m_camDispay;
     QString m_fileName;
 };

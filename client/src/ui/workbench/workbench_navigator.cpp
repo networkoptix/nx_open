@@ -571,9 +571,6 @@ void QnWorkbenchNavigator::updateSliderFromReader() {
     if (m_timeSlider->isSliderDown())
         return;
 
-    if(m_pausedOverride)
-        return;
-
     QnAbstractArchiveReader *reader = m_currentWidget->display()->archiveReader();
     if (!reader)
         return;
@@ -586,12 +583,18 @@ void QnWorkbenchNavigator::updateSliderFromReader() {
     qint64 startTimeUSec = reader->startTime();                       /* vvvvv  If nothing is recorded, set minimum to end - 10s. */
     qint64 startTimeMSec = startTimeUSec == DATETIME_NOW ? endTimeMSec - 10000 : (startTimeUSec == AV_NOPTS_VALUE ? m_timeSlider->minimum() : startTimeUSec / 1000); 
 
-    qint64 timeUSec = m_currentWidget->display()->camera()->getCurrentTime();
-    qint64 timeMSec = timeUSec == DATETIME_NOW ? endTimeMSec : (timeUSec == AV_NOPTS_VALUE ? m_timeSlider->value() : timeUSec / 1000);
-
     m_timeSlider->setMinimum(startTimeMSec);
     m_timeSlider->setMaximum(endTimeMSec);
-    m_timeSlider->setValue(timeMSec);
+
+    if(!m_pausedOverride) {
+        qint64 timeUSec = m_currentWidget->display()->camera()->getCurrentTime();
+        qint64 timeMSec = timeUSec == DATETIME_NOW ? endTimeMSec : (timeUSec == AV_NOPTS_VALUE ? m_timeSlider->value() : timeUSec / 1000);
+
+        m_timeSlider->setValue(timeMSec);
+
+        if(timeUSec != AV_NOPTS_VALUE)
+            updateLive();
+    }
 
     /* Fix flags once the reader has loaded. */
     if(!m_currentWidgetLoaded && startTimeUSec != AV_NOPTS_VALUE) {
@@ -616,9 +619,6 @@ void QnWorkbenchNavigator::updateSliderFromReader() {
                 loader->setTargetPeriod(period);
         }
     }
-
-    if(timeUSec != AV_NOPTS_VALUE)
-        updateLive();
 }
 
 void QnWorkbenchNavigator::updateCurrentPeriods() {
