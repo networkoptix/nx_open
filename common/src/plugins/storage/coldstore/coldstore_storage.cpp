@@ -12,6 +12,7 @@ m_cswriterThread(0),
 m_currH(0),
 m_prevH(0)
 {
+    /*
     char dataW[100]; dataW[7] = 7;
     QnColdStoreConnection connW("10.10.10.253");
     bool b = connW.open("111", QIODevice::WriteOnly, 0);
@@ -21,6 +22,7 @@ m_prevH(0)
     QnColdStoreConnection connR("10.10.10.253");
     b = connW.open("111", QIODevice::ReadOnly, 0);
     connW.read(dataR, sizeof(dataR));
+    /**/
 
 
 }
@@ -79,6 +81,8 @@ QIODevice* QnPlColdStoreStorage::open(const QString& fileName, QIODevice::OpenMo
         {
             QMutexLocker lock(&m_mutex);
             m_listOfWritingFiles.insert(nfileName);
+
+            m_listOfExistingFiles.insert(nfileName);
         }
 
         qDebug() << "file opened: " << nfileName;
@@ -233,6 +237,10 @@ QFileInfoList QnPlColdStoreStorage::getFileList(const QString& dirName)
     QFileInfoList openlst;
     foreach(QString fn, m_listOfWritingFiles)
         openlst.push_back(QFileInfo(fn));
+
+    foreach(QString fn, m_listOfExistingFiles)
+        openlst.push_back(QFileInfo(fn));
+
 
     if (md)
     {
@@ -426,6 +434,13 @@ QString QnPlColdStoreStorage::fileName2csFileName(const QString& fn) const
 
     if (restList.size() > 5)
         s << restList.at(5); // 
+
+    //==============
+    s << "/";
+
+    if (restList.size() > 6)
+        s << restList.at(6); // 
+    //==============
 
 
     Q_ASSERT(result.length() < 63); // cold store filename limitation
