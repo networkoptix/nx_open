@@ -54,16 +54,20 @@ bool GridAdjustmentInstrument::wheelEvent(QGraphicsScene *, QGraphicsSceneWheelE
         QSizeF delta = m_speed * -degrees;
         
         qreal k = 1.0;
-        if(delta.width() < 0) {
-            k = qMin(k, spacing.width() / -delta.width());
-        } else {
-            k = qMin(k, (m_maxSpacing.width() - spacing.width()) / delta.width());
+        if(!qFuzzyIsNull(delta.width())) {
+            if(delta.width() < 0) {
+                k = qMin(k, spacing.width() / -delta.width());
+            } else {
+                k = qMin(k, (m_maxSpacing.width() - spacing.width()) / delta.width());
+            }
         }
         
-        if(delta.height() < 0) {
-            k = qMin(k, spacing.height() / -delta.height());
-        } else {
-            k = qMin(k, (m_maxSpacing.height() - spacing.height()) / delta.height());
+        if(!qFuzzyIsNull(delta.height())) {
+            if(delta.height() < 0) {
+                k = qMin(k, spacing.height() / -delta.height());
+            } else {
+                k = qMin(k, (m_maxSpacing.height() - spacing.height()) / delta.height());
+            }
         }
 
         workbench()->currentLayout()->setCellSpacing(spacing + k * delta);

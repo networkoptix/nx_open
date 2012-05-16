@@ -264,7 +264,7 @@ MotionTypeFlags QnSecurityCamResource::supportedMotionType() const
         }
     }
     else {
-        result |= MT_MotionWindow;
+        result = MT_NoMotion;
     }
     return result;
 }

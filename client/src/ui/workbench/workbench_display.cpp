@@ -530,11 +530,8 @@ QList<QnResourceWidget *> QnWorkbenchDisplay::widgets(const QnResourcePtr &resou
 }
 
 QnResourceDisplay *QnWorkbenchDisplay::display(QnWorkbenchItem *item) const {
-    QnResourceWidget *widget = this->widget(item);
-    if(widget == NULL)
-        return NULL;
-
-    return widget->display();
+    if(QnResourceWidget *widget = this->widget(item))
+        return widget->display();
 }
 
 CLVideoCamera *QnWorkbenchDisplay::camera(QnWorkbenchItem *item) const {
@@ -602,7 +599,11 @@ void QnWorkbenchDisplay::bringToFront(QnWorkbenchItem *item) {
         return;
     }
 
-    bringToFront(widget(item));
+    QnResourceWidget *widget = this->widget(item);
+    if(widget == NULL)
+        return; /* Widget was not created for the given item. */
+    
+    bringToFront(widget);
 }
 
 bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
@@ -860,11 +861,18 @@ QRectF QnWorkbenchDisplay::itemGeometry(QnWorkbenchItem *item, QRectF *enclosing
         return QRectF();
     }
 
+    QnResourceWidget *widget = this->widget(item);
+    if(widget == NULL) {
+        /* A perfectly normal situation - the widget was not created. */
+        if(enclosingGeometry)
+            *enclosingGeometry = QRectF();
+        return QRectF();
+    }
+
     QRectF result = itemEnclosingGeometry(item);
     if(enclosingGeometry != NULL)
         *enclosingGeometry = rotated(result, item->rotation());
 
-    QnResourceWidget *widget = this->widget(item);
     if(!widget->hasAspectRatio())
         return rotated(result, item->rotation());
 
@@ -931,7 +939,11 @@ void QnWorkbenchDisplay::synchronize(QnWorkbenchItem *item, bool animate) {
         return;
     }
 
-    synchronize(widget(item), animate);
+    QnResourceWidget *widget = this->widget(item);
+    if(widget == NULL)
+        return; /* No widget was created for the item provided. */
+
+    synchronize(widget, animate);
 }
 
 void QnWorkbenchDisplay::synchronize(QnResourceWidget *widget, bool animate) {
@@ -945,11 +957,18 @@ void QnWorkbenchDisplay::synchronize(QnResourceWidget *widget, bool animate) {
 }
 
 void QnWorkbenchDisplay::synchronizeGeometry(QnWorkbenchItem *item, bool animate) {
-    synchronizeGeometry(widget(item), animate);
+    QnResourceWidget *widget = this->widget(item);
+    if(widget == NULL)
+        return; /* No widget was created for the given item. */
+
+    synchronizeGeometry(widget, animate);
 }
 
 void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool animate) {
-    assert(widget != NULL);
+    if(widget == NULL) {
+        qnNullWarning(widget);
+        return;
+    }
 
     QnWorkbenchItem *item = widget->item();
     QnWorkbenchItem *zoomedItem = m_itemByRole[Qn::ZoomedRole];
@@ -1075,6 +1094,8 @@ void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate) {
         return; /* May have been unchecked already. */
 
     QnResourceWidget *widget = this->widget(item);
+    if(widget == NULL)
+        return; /* No widget was created for the given item. */
 
     /* Calculate target position. */
     QPointF newPos;
