@@ -686,14 +686,18 @@ void QnWorkbenchNavigator::updateScrollBarFromSlider() {
     if(m_updatingSliderFromScrollBar)
         return;
 
-    QnScopedValueRollback<bool> guard(&m_updatingScrollBarFromSlider, true);
+    {
+        QnScopedValueRollback<bool> guard(&m_updatingScrollBarFromSlider, true);
 
-    qint64 windowSize = m_timeSlider->windowEnd() - m_timeSlider->windowStart();
+        qint64 windowSize = m_timeSlider->windowEnd() - m_timeSlider->windowStart();
 
-    m_timeScrollBar->setRange(m_timeSlider->minimum(), m_timeSlider->maximum() - windowSize);
-    m_timeScrollBar->setValue(m_timeSlider->windowStart());
-    m_timeScrollBar->setPageStep(windowSize);
-    m_timeScrollBar->setIndicatorPosition(m_timeSlider->sliderPosition());
+        m_timeScrollBar->setRange(m_timeSlider->minimum(), m_timeSlider->maximum() - windowSize);
+        m_timeScrollBar->setValue(m_timeSlider->windowStart());
+        m_timeScrollBar->setPageStep(windowSize);
+        m_timeScrollBar->setIndicatorPosition(m_timeSlider->sliderPosition());
+    }
+
+    updateSliderFromScrollBar(); /* Bi-directional sync is needed as time scrollbar may adjust the provided values. */
 }
 
 void QnWorkbenchNavigator::delayedLoadThumbnails()
