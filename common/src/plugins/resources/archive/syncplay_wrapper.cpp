@@ -140,7 +140,11 @@ bool QnArchiveSyncPlayWrapper::isMediaPaused() const
     QMutexLocker lock(&d->timeMutex);
     bool rez = true;
     foreach(const ReaderInfo& info, d->readers)
+    {
+        info.reader->setNavDelegate(0);
         rez &= info.reader->isMediaPaused();
+        info.reader->setNavDelegate(const_cast<QnArchiveSyncPlayWrapper *>(this));
+    }
     return rez;
 }
 
@@ -199,8 +203,6 @@ void QnArchiveSyncPlayWrapper::setJumpTime(qint64 mksec)
 
 bool QnArchiveSyncPlayWrapper::jumpTo(qint64 mksec,  qint64 skipTime)
 {
-    qDebug() << "jumpTo=" << QDateTime::fromMSecsSinceEpoch(mksec).toString();
-
     Q_D(QnArchiveSyncPlayWrapper);
     QMutexLocker lock(&d->timeMutex);
     setJumpTime(skipTime ? skipTime : mksec);

@@ -90,8 +90,8 @@ public:
     void setLineComment(int line, const QString &comment);
     QString lineComment(int line);
 
-    QnTimePeriodList timePeriods(int line, Qn::TimePeriodType type) const;
-    void setTimePeriods(int line, Qn::TimePeriodType type, const QnTimePeriodList &timePeriods);
+    QnTimePeriodList timePeriods(int line, Qn::TimePeriodRole type) const;
+    void setTimePeriods(int line, Qn::TimePeriodRole type, const QnTimePeriodList &timePeriods);
 
     Options options() const;
     void setOptions(Options options);
@@ -115,6 +115,7 @@ public:
 
     bool isSelectionValid() const;
     void setSelectionValid(bool valid);
+    bool isSelecting() const;
 
     const QString &toolTipFormat() const;
     void setToolTipFormat(const QString &format);
@@ -135,6 +136,8 @@ signals:
     void windowChanged(qint64 windowStart, qint64 windowEnd);
     void selectionChanged(qint64 selectionStart, qint64 selectionEnd);
     void customContextMenuRequested(const QPointF &pos, const QPoint &screenPos);
+    void selectionPressed();
+    void selectionReleased();
 
 protected:
     virtual void sliderChange(SliderChange change) override;
@@ -198,7 +201,7 @@ private:
     void updateLineCommentPixmap(int line);
     void updateLineCommentPixmaps();
     void updateAggregationValue();
-    void updateAggregatedPeriods(int line, Qn::TimePeriodType type);
+    void updateAggregatedPeriods(int line, Qn::TimePeriodRole type);
     void updateTotalLineStretch();
 
 
@@ -247,6 +250,7 @@ private:
     Marker m_dragMarker;
     QPointF m_dragDelta;
     bool m_dragIsClick;
+    bool m_selecting;
 
     int m_lineCount;
     qreal m_totalLineStretch;

@@ -6,6 +6,7 @@
 #include "licensing/license.h"
 #include "utils/common/util.h"
 #include "utils/common/log.h"
+#include "ui/style/globals.h"
 
 namespace {
     QnSettings::ConnectionData readConnectionData(QSettings *settings)
@@ -91,9 +92,9 @@ void QnSettings::load()
     m_data.animateBackground = m_settings->value("animateBackground", true).toBool();
 
 #ifdef QN_HAS_BACKGROUND_COLOR_ADJUSTMENT
-    m_data.backgroundColor = m_settings->value("backgroundColor", QColor(5, 5, 50)).value<QColor>();
+    m_data.backgroundColor = m_settings->value("backgroundColor", qnGlobals->backgroundGradientColor()).value<QColor>();
 #else
-    m_data.backgroundColor = QColor(5, 5, 50);
+    m_data.backgroundColor = qnGlobals->backgroundGradientColor();
 #endif
     m_data.maxVideoItems = m_settings->value("maxVideoItems", 32).toInt();
     m_data.downmixAudio = m_settings->value("downmixAudio").toBool();

@@ -47,7 +47,7 @@
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
-#include <ui/actions/action_target_types.h>
+#include <ui/actions/action_parameter_types.h>
 #include <ui/widgets/resource_tree_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/widgets/help_widget.h>
@@ -573,7 +573,7 @@ QVariant QnWorkbenchUi::currentTarget(Qn::ActionScope scope) const {
     case Qn::SliderScope:
         return QVariant::fromValue(m_sliderItem->navigator()->currentWidget());
     case Qn::SceneScope:
-        return QVariant::fromValue(QnActionTargetTypes::widgets(display()->scene()->selectedItems()));
+        return QVariant::fromValue(QnActionParameterTypes::widgets(display()->scene()->selectedItems()));
     default:
         return QVariant();
     }
