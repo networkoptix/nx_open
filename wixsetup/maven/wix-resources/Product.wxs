@@ -207,8 +207,8 @@
         <CustomAction Id="CloseTrayToolAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="ignore" Impersonate="no" />
       
-		<CustomAction Id="LaunchApplication" Execute="immediate" Impersonate="no" Return="asyncNoWait" FileKey="traytool.exe" ExeCommand="&quot;[VmsTrayToolDir]traytool.exe&quot;"/>
-		
+        <CustomAction Id="LaunchApplication" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="traytool.exe" ExeCommand=""/>
+        
         <CustomAction Id="NoDowngrade" Error="NoDowngrade" /> 
         
         
@@ -522,7 +522,7 @@
                                 <File Id="ClientAvutilDll" Name="avutil-51.dll" Source="client/avutil-51.dll"/>
                                 <File Id="ClientSwscaleDll" Name="swscale-2.dll" Source="client/swscale-2.dll"/>
                                 <File Id="ClientMp3lameDll" Name="libmp3lame-0.dll" Source="client/libmp3lame-0.dll"/>
-                                <File Id="ClientX264" Name="x264.exe" Source="client/x264.exe"/>								
+                                <File Id="ClientX264" Name="x264.exe" Source="client/x264.exe"/>                                
                             </Component>
                             
                             <Component Id="ClientQTLibraries" Guid="{6BDC7AB9-6230-4cf3-9C1C-634C636D90BC}">
