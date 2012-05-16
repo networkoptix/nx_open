@@ -18,7 +18,7 @@ class QnActionParameters;
 
 /**
  * Action class that hooks into actions infrastructure to correctly check
- * conditions and provide proper targets even if it was triggered with a 
+ * conditions and provide proper action parameters even if it was triggered with a 
  * hotkey.
  */
 class QnAction: public QAction, public QnWorkbenchContextAware {
