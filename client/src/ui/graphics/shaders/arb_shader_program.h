@@ -1,9 +1,9 @@
 #ifndef QN_ARB_SHADER_H
 #define QN_ARB_SHADER_H
 
-#include <QObject>
-#include <QScopedPointer>
-#include <QGLShader>
+#include <QtCore/QObject>
+#include <QtCore/QScopedPointer>
+#include <QtOpenGL/QGLShader>
 
 class QnArbShaderProgramPrivate;
 
@@ -17,6 +17,8 @@ public:
     bool bind();
 
     void release();
+
+    bool isValid() const;
 
     bool addShaderFromSourceCode(QGLShader::ShaderType type, const char *source);
 

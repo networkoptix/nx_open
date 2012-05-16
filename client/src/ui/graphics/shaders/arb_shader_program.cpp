@@ -1,5 +1,7 @@
 #include "arb_shader_program.h"
-#include <QtOpenGL>
+
+#include <QtOpenGL/QtOpenGL>
+
 #include <utils/common/warnings.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_functions.h>
@@ -28,6 +30,10 @@ QnArbShaderProgram::~QnArbShaderProgram() {
         d->glDeleteProgramsARB(1, &d->fragmentProgram);
 }
 
+bool QnArbShaderProgram::isValid() const {
+    return d->valid;
+}
+
 bool QnArbShaderProgram::hasArbShaderPrograms(const QGLContext *context) {
     return QnGlFunctions(context).features() & QnGlFunctions::ArbPrograms;
 }
@@ -54,7 +60,8 @@ bool QnArbShaderProgram::addShaderFromSourceCode(QGLShader::ShaderType type, con
 
     d->glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, d->fragmentProgram);
     d->glProgramStringARB(GL_FRAGMENT_PROGRAM_ARB, GL_PROGRAM_FORMAT_ASCII_ARB, qstrlen(source), source);
-    return glCheckError("glProgramStringARB") == GL_NO_ERROR;
+    d->valid = glCheckError("glProgramStringARB") == GL_NO_ERROR;
+    return d->valid;
 }
 
 void QnArbShaderProgram::setLocalValue(QGLShader::ShaderType type, int location, GLfloat x, GLfloat y, GLfloat z, GLfloat w) {

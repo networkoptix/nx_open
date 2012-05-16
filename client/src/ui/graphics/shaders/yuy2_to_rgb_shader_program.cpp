@@ -3,7 +3,7 @@
 QnYuy2ToRgbShaderProgram::QnYuy2ToRgbShaderProgram(const QGLContext *context, QObject *parent):
     QnArbShaderProgram(context, parent) 
 {
-    m_isValid = addShaderFromSourceCode(QGLShader::Fragment, 
+    addShaderFromSourceCode(QGLShader::Fragment, 
         "!!ARBfp1.0"
         "PARAM c[5] = { program.local[0..1],"
         "                { 0.5, 2, 1, 0.0625 },"
@@ -50,7 +50,3 @@ QnYuy2ToRgbShaderProgram::QnYuy2ToRgbShaderProgram(const QGLContext *context, QO
     );
 }
 
-bool QnYuy2ToRgbShaderProgram::isValid() const
-{
-    return m_isValid;
-}
