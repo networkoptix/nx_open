@@ -605,7 +605,7 @@ void QnSystrayWindow::onSettingsAction()
     ui->rtspPortLineEdit->setText(m_mServerSettings.value("rtspPort").toString());
     ui->apiPortLineEdit->setText(m_mServerSettings.value("apiPort").toString());
     ui->appServerPortLineEdit->setText(m_appServerSettings.value("port").toString());
-    ui->proxyPortLineEdit->setText(m_appServerSettings.value("proxy_port", DEFAUT_PROXY_PORT).toString());
+    ui->proxyPortLineEdit->setText(m_appServerSettings.value("proxyPort", DEFAUT_PROXY_PORT).toString());
 
     ui->tabAppServer->setEnabled(m_appServerHandle != 0);
     ui->tabMediaServer->setEnabled(m_mediaServerHandle != 0);
