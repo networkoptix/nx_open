@@ -24,6 +24,26 @@
 		<directory>${arch}</directory>
 		<sourceDirectory>${basedir}</sourceDirectory>
 		<finalName>${pom.parent.artifactId}-${version}.${buildNumber}-${platform}-${arch}-${build.configuration}-${customization}</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>properties-maven-plugin</artifactId>
+				<version>1.0-alpha-2</version>
+				<executions>
+					<execution>
+						<phase>initialize</phase>
+						<goals>
+							<goal>read-project-properties</goal>
+						</goals>
+						<configuration>
+							<files>
+								<file>../build-${customization}.properties</file>
+							</files>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
 	</build>
 
 	<properties>
@@ -121,7 +141,7 @@
 						<executions>
 							<execution>
 								<id>prepare-resources</id>
-								<phase>initialize</phase>
+								<phase>process-sources</phase>
 								<goals>
 									<goal>copy-resources</goal>
 								</goals>
@@ -161,7 +181,7 @@
 						<executions>
 							<execution>
 								<id>wix-heat</id>
-								<phase>generate-sources</phase>
+								<phase>process-sources</phase>
 								<goals>
 									<goal>exec</goal>
 								</goals>

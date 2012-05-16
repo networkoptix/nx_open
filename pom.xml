@@ -23,12 +23,6 @@
 		<buildNumber>0</buildNumber>
 		<environment.dir>${env.ENVIRONMENT}</environment.dir>
 		<customization>default</customization>
-		<!-- <appserver.name>${appserver.name}</appserver.name>
-		<client.name>${client.name}</client.name>
-		<mediaserver.name>${mediaserver.name}</mediaserver.name>
-		<mediaproxy.name>${mediaproxy.name}</mediaproxy.name>
-		<testcamera.name>${testcamera.name}</testcamera.name>
-		<traytool.name>${traytool.name}</traytool.name> -->
 	</properties>
 	<modules>
 		<module>appserver</module>
