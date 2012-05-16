@@ -7,9 +7,6 @@ class QnYuy2ToRgbShaderProgram: public QnArbShaderProgram {
     Q_OBJECT;
 public:
     QnYuy2ToRgbShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL);
-    bool isValid() const;
-private:
-    bool m_isValid;
 };
 
 #endif // QN_YUY2_TO_RGB_SHADER_PROGRAM_H

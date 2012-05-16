@@ -4,7 +4,7 @@
 QnYv12ToRgbShaderProgram::QnYv12ToRgbShaderProgram(const QGLContext *context, QObject *parent): 
     QnArbShaderProgram(context, parent) 
 {
-    m_isValid = addShaderFromSourceCode(QGLShader::Fragment, 
+    addShaderFromSourceCode(QGLShader::Fragment, 
         "!!ARBfp1.0"
         "PARAM c[5] = { program.local[0..1],"
         "                { 1.164, 0, 1.596, 0.5 },"
@@ -39,7 +39,3 @@ void QnYv12ToRgbShaderProgram::setParameters(GLfloat brightness, GLfloat contras
     setLocalValue(QGLShader::Fragment, 1, saturation, opacity, 0.0, 0.0);
 }
 
-bool QnYv12ToRgbShaderProgram::isValid() const
-{
-    return m_isValid;
-}
