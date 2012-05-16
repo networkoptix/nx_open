@@ -115,6 +115,7 @@ public:
 
     bool isSelectionValid() const;
     void setSelectionValid(bool valid);
+    bool isSelecting() const;
 
     const QString &toolTipFormat() const;
     void setToolTipFormat(const QString &format);
@@ -135,8 +136,8 @@ signals:
     void windowChanged(qint64 windowStart, qint64 windowEnd);
     void selectionChanged(qint64 selectionStart, qint64 selectionEnd);
     void customContextMenuRequested(const QPointF &pos, const QPoint &screenPos);
-    void selectionStarted();
-    void selectionFinished();
+    void selectionPressed();
+    void selectionReleased();
 
 protected:
     virtual void sliderChange(SliderChange change) override;
@@ -249,6 +250,7 @@ private:
     Marker m_dragMarker;
     QPointF m_dragDelta;
     bool m_dragIsClick;
+    bool m_selecting;
 
     int m_lineCount;
     qreal m_totalLineStretch;

@@ -57,11 +57,11 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_lastLiveSupported(false),
     m_lastPlaying(false),
     m_lastPlayingSupported(false),
+    m_pausedOverride(false),
     m_lastSpeed(0.0),
     m_lastMinimalSpeed(0.0),
     m_lastMaximalSpeed(0.0)
-{    
-}
+{}
     
 QnWorkbenchNavigator::~QnWorkbenchNavigator() {
     return;
@@ -141,6 +141,7 @@ void QnWorkbenchNavigator::initialize() {
     connect(m_timeSlider,                       SIGNAL(windowChanged(qint64, qint64)),              this,   SLOT(loadThumbnails(qint64, qint64)));
     connect(m_timeSlider,                       SIGNAL(selectionChanged(qint64, qint64)),           this,   SLOT(at_timeSlider_selectionChanged()));
     connect(m_timeSlider,                       SIGNAL(customContextMenuRequested(const QPointF &, const QPoint &)), this, SLOT(at_timeSlider_customContextMenuRequested(const QPointF &, const QPoint &)));
+    connect(m_timeSlider,                       SIGNAL(selectionPressed()),                         this,   SLOT(at_timeSlider_selectionPressed()));
     m_timeSlider->setLineCount(SliderLineCount);
     m_timeSlider->setLineStretch(CurrentLine, 1.5);
     m_timeSlider->setLineStretch(SyncedLine, 1.0);
@@ -227,6 +228,8 @@ bool QnWorkbenchNavigator::setPlaying(bool playing) {
 
     if(!isPlayingSupported())
         return false;
+
+    m_pausedOverride = false;
 
     QnAbstractArchiveReader *reader = m_currentWidget->display()->archiveReader();
     CLCamDisplay *camDisplay = m_currentWidget->display()->camDisplay();
@@ -471,6 +474,11 @@ void QnWorkbenchNavigator::stepForward() {
     reader->nextFrame();
 }
 
+void QnWorkbenchNavigator::setPlayingTemporary(bool playing) {
+    m_currentWidget->display()->archiveReader()->setSingleShotMode(!playing);
+    m_currentWidget->display()->camDisplay()->playAudio(playing);
+}
+
 
 // -------------------------------------------------------------------------- //
 // Updaters
@@ -561,6 +569,9 @@ void QnWorkbenchNavigator::updateSliderFromReader() {
         return;
 
     if (m_timeSlider->isSliderDown())
+        return;
+
+    if(m_pausedOverride)
         return;
 
     QnAbstractArchiveReader *reader = m_currentWidget->display()->archiveReader();
@@ -922,20 +933,32 @@ void QnWorkbenchNavigator::at_timeSlider_sliderPressed() {
     if (!m_currentWidget)
         return;
 
-    if(m_lastPlaying) {
-        m_currentWidget->display()->archiveReader()->setSingleShotMode(true);
-        m_currentWidget->display()->camDisplay()->playAudio(false);
-    }
+    if(m_lastPlaying) 
+        setPlayingTemporary(false);
+
+    m_pausedOverride = true;
 }
 
 void QnWorkbenchNavigator::at_timeSlider_sliderReleased() {
-    if (!m_currentWidget)
+    if(!m_currentWidget)
         return;
 
-    if (m_lastPlaying) {
-        m_currentWidget->display()->archiveReader()->setSingleShotMode(false);
-        m_currentWidget->display()->camDisplay()->playAudio(true);
-    }
+    if(m_lastPlaying) 
+        setPlayingTemporary(true);
+
+    if(isPlaying())
+        m_pausedOverride = false;
+}
+
+void QnWorkbenchNavigator::at_timeSlider_selectionPressed() {
+    if(!m_currentWidget)
+        return;
+
+    if(m_lastPlaying)
+        setPlayingTemporary(true);
+    setPlaying(false);
+
+    m_pausedOverride = true;
 }
 
 void QnWorkbenchNavigator::at_timeSlider_selectionChanged() {

@@ -109,6 +109,8 @@ protected:
     SliderUserData currentSliderData() const;
     void setCurrentSliderData(const SliderUserData &localData);
 
+    void setPlayingTemporary(bool playing);
+
     QnCachingTimePeriodLoader *loader(const QnResourcePtr &resource);
     QnCachingTimePeriodLoader *loader(QnResourceWidget *widget);
 
@@ -151,6 +153,7 @@ protected slots:
     void at_timeSlider_valueChanged(qint64 value);
     void at_timeSlider_sliderPressed();
     void at_timeSlider_sliderReleased();
+    void at_timeSlider_selectionPressed();
     void at_timeSlider_selectionChanged();
     void at_timeSlider_customContextMenuRequested(const QPointF &pos, const QPoint &screenPos);
     void at_timeSlider_destroyed();
@@ -181,6 +184,7 @@ private:
     bool m_lastLiveSupported;
     bool m_lastPlaying;
     bool m_lastPlayingSupported;
+    bool m_pausedOverride;
 
     qreal m_lastSpeed;
     qreal m_lastMinimalSpeed;

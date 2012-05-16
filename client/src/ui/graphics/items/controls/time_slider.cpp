@@ -265,6 +265,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     m_pixmapCache(QnTimeSliderPixmapCache::instance()),
     m_unzooming(false),
     m_dragIsClick(false),
+    m_selecting(false),
     m_dragMarker(NoMarker),
 	m_lineCount(0),
     m_totalLineStretch(0.0)
@@ -567,6 +568,10 @@ bool QnTimeSlider::isSelectionValid() const {
 
 void QnTimeSlider::setSelectionValid(bool valid) {
     m_selectionValid = valid;
+}
+
+bool QnTimeSlider::isSelecting() const {
+    return m_selecting;
 }
 
 const QString &QnTimeSlider::toolTipFormat() const {
@@ -1520,12 +1525,13 @@ void QnTimeSlider::startDrag(DragInfo *info) {
         setSelectionValid(true);
         setSelection(pos, pos);
         m_dragMarker = SelectionStartMarker;
-
-        emit selectionStarted();
     }
 
+    m_selecting = true;
     m_dragIsClick = false;
     m_dragDelta = positionFromMarker(m_dragMarker) - info->mousePressItemPos();
+
+    emit selectionPressed();
 }
 
 void QnTimeSlider::dragMove(DragInfo *info) {
@@ -1560,8 +1566,8 @@ void QnTimeSlider::dragMove(DragInfo *info) {
 }
 
 void QnTimeSlider::finishDrag(DragInfo *) {
-    if(m_dragMarker == SelectionStartMarker || m_dragMarker == SelectionEndMarker)
-        emit selectionFinished();
+    emit selectionReleased();
+    m_selecting = false;
 
     setSliderDown(false);
 }

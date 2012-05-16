@@ -141,7 +141,9 @@ void QnArchiveStreamReader::pauseMedia()
 
 bool QnArchiveStreamReader::isMediaPaused() const
 {
-    return m_singleShot && m_singleQuantProcessed;
+    if(m_navDelegate)
+        return m_navDelegate->isMediaPaused();
+    return m_singleShot;
 }
 
 void QnArchiveStreamReader::setCurrentTime(qint64 value)
