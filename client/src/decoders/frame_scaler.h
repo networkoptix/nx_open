@@ -6,7 +6,7 @@
 class QnFrameScaler
 {
 public:
-    enum downscale_factor{factor_any = 0, factor_1 = 1, factor_2 = 2, factor_4 = 4, factor_8 = 8, factor_16 = 16, factor_32 = 32, factor_64 = 64, factor_128 = 128 , factor_256 = 256};
+    enum downscale_factor{factor_any = 0, factor_1 = 1, factor_2 = 2, factor_4 = 4, factor_8 = 8, factor_16 = 16, factor_32 = 32, factor_64 = 64, factor_128 = 128 , factor_256 = 256, factor_unknown = 512};
 
     static void downscale(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst, downscale_factor factor);
 private:
