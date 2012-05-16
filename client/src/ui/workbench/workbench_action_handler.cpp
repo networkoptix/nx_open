@@ -1380,7 +1380,7 @@ void QnWorkbenchActionHandler::at_exportTimeSelectionAction_triggered() {
             this->widget(), 
             tr("Export Video As..."),
             previousDir + QDir::separator() + suggestion,
-            tr("Matroska (*.mkv);; AVI (Audio/Video Interleaved)(*.avi)"),
+            tr("AVI (Audio/Video Interleaved)(*.avi);;Matroska (*.mkv)"),
             &selectedFilter,
             QFileDialog::DontUseNativeDialog
         );
