@@ -18,7 +18,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>client</artifactId>
 	<packaging>pom</packaging>
-	<name>Network Optix HD Witness Client</name>	
+	<name>${client.name}</name>	
 
 	<properties>
 		<custom.skin>default</custom.skin>

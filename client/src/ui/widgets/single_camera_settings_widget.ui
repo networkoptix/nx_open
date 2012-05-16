@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>3</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tabGeneral">
       <attribute name="title">
@@ -197,7 +197,22 @@
       <attribute name="title">
        <string>Motion</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_7" stretch="1,0">
+      <layout class="QVBoxLayout" name="verticalLayout_7" stretch="0,1,0">
+       <item>
+        <widget class="QLabel" name="motionEnableLabel">
+         <property name="font">
+          <font>
+           <pointsize>14</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Motion is not available for this camera</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
        <item>
         <widget class="QWidget" name="motionWidget" native="true"/>
        </item>

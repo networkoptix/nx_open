@@ -108,6 +108,7 @@ void QnSettings::load()
     m_lastUsed = readConnectionData(m_settings);
     m_settings->endGroup();
     m_settings->endGroup();
+    m_data.forceSoftYUV = false;
 }
 
 void QnSettings::save()
@@ -208,6 +209,18 @@ bool QnSettings::isBackgroundAnimated() const {
     QMutexLocker locker(&m_lock);
 
     return m_data.animateBackground;
+}
+
+bool QnSettings::isForceSoftYUV() const
+{
+    QMutexLocker locker(&m_lock);
+    return m_data.forceSoftYUV;
+}
+
+void QnSettings::setForceSoftYUV(bool value)
+{
+    QMutexLocker locker(&m_lock);
+    m_data.forceSoftYUV = value;
 }
 
 QColor QnSettings::backgroundColor() const {

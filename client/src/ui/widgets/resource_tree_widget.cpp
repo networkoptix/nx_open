@@ -28,6 +28,7 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_access_controller.h>
 
 #include "ui_resource_tree_widget.h"
 #include "ui/style/proxy_style.h"
@@ -40,7 +41,7 @@ Q_DECLARE_METATYPE(QnResourceSearchSynchronizer *);
 namespace {
     const char *qn_searchModelPropertyName = "_qn_searchModel";
     const char *qn_searchSynchronizerPropertyName = "_qn_searchSynchronizer";
-    const char *qn_searchStringPropertyName = "_qn_searchString";
+    const char *qn_filterPropertyName = "_qn_filter";
     const char *qn_searchCriterionPropertyName = "_qn_searchCriterion";
 }
 
@@ -302,9 +303,13 @@ void QnResourceTreeWidget::setCurrentTab(Tab tab) {
     ui->tabWidget->setCurrentIndex(tab);
 }
 
+bool QnResourceTreeWidget::isLayoutSearchable(QnWorkbenchLayout *layout) const {
+    return accessController()->permissions(layout->resource()) & Qn::WritePermission;
+}
+
 QnResourceSearchProxyModel *QnResourceTreeWidget::layoutModel(QnWorkbenchLayout *layout, bool create) const {
     QnResourceSearchProxyModel *result = layout->property(qn_searchModelPropertyName).value<QnResourceSearchProxyModel *>();
-    if(create && result == NULL) {
+    if(create && result == NULL && isLayoutSearchable(layout)) {
         result = new QnResourceSearchProxyModel(layout);
         result->setFilterCaseSensitivity(Qt::CaseInsensitive);
         result->setFilterKeyColumn(0);
@@ -322,7 +327,7 @@ QnResourceSearchProxyModel *QnResourceTreeWidget::layoutModel(QnWorkbenchLayout 
 
 QnResourceSearchSynchronizer *QnResourceTreeWidget::layoutSynchronizer(QnWorkbenchLayout *layout, bool create) const {
     QnResourceSearchSynchronizer *result = layout->property(qn_searchSynchronizerPropertyName).value<QnResourceSearchSynchronizer *>();
-    if(create && result == NULL) {
+    if(create && result == NULL && isLayoutSearchable(layout)) {
         result = new QnResourceSearchSynchronizer(layout);
         result->setLayout(layout);
         result->setModel(layoutModel(layout, true));
@@ -331,12 +336,12 @@ QnResourceSearchSynchronizer *QnResourceTreeWidget::layoutSynchronizer(QnWorkben
     return result;
 }
 
-QString QnResourceTreeWidget::layoutSearchString(QnWorkbenchLayout *layout) const {
-    return layout->property(qn_searchStringPropertyName).toString();
+QString QnResourceTreeWidget::layoutFilter(QnWorkbenchLayout *layout) const {
+    return layout->property(qn_filterPropertyName).toString();
 }
 
-void QnResourceTreeWidget::setLayoutSearchString(QnWorkbenchLayout *layout, const QString &searchString) const {
-    layout->setProperty(qn_searchStringPropertyName, searchString);
+void QnResourceTreeWidget::setLayoutFilter(QnWorkbenchLayout *layout, const QString &filter) const {
+    layout->setProperty(qn_filterPropertyName, filter);
 }
 
 void QnResourceTreeWidget::killSearchTimer() {
@@ -498,6 +503,15 @@ void QnResourceTreeWidget::timerEvent(QTimerEvent *event) {
 
         if (workbench()) {
             QnWorkbenchLayout *layout = workbench()->currentLayout();
+            if(!isLayoutSearchable(layout)) {
+                QString filter = ui->filterLineEdit->text();
+                menu()->trigger(Qn::OpenNewTabAction);
+                setLayoutFilter(layout, QString()); /* Clear old layout's filter. */
+
+                layout = workbench()->currentLayout();
+                ui->filterLineEdit->setText(filter);
+            }
+
             QnResourceSearchProxyModel *model = layoutModel(layout, true);
             
             QString filter = ui->filterLineEdit->text();
@@ -520,7 +534,7 @@ void QnResourceTreeWidget::at_workbench_currentLayoutAboutToBeChanged() {
     QnResourceSearchSynchronizer *synchronizer = layoutSynchronizer(layout, false);
     if(synchronizer)
         synchronizer->disableUpdates();
-    setLayoutSearchString(layout, ui->filterLineEdit->text());
+    setLayoutFilter(layout, ui->filterLineEdit->text());
 
     QnScopedValueRollback<bool> guard(&m_ignoreFilterChanges, true);
     ui->searchTreeView->setModel(NULL);
@@ -538,7 +552,7 @@ void QnResourceTreeWidget::at_workbench_currentLayoutChanged() {
     at_tabWidget_currentChanged(ui->tabWidget->currentIndex());
 
     QnScopedValueRollback<bool> guard(&m_ignoreFilterChanges, true);
-    ui->filterLineEdit->setText(layoutSearchString(layout));
+    ui->filterLineEdit->setText(layoutFilter(layout));
 
     /* Bold state has changed. */
     currentItemView()->update();

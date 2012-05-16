@@ -12,11 +12,12 @@ class QnSingleShotFileStreamreader : public QnAbstractMediaStreamDataProvider
 public:
 	QnSingleShotFileStreamreader(QnResourcePtr resource);
 	~QnSingleShotFileStreamreader(){stop();}
-
+    void setStorage(QnStorageResourcePtr storage);
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
     virtual void run() override;
 private:
+    QnStorageResourcePtr m_storage;
 };
 
 /**/
