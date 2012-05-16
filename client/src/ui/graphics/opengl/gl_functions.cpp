@@ -51,8 +51,14 @@ public:
         status &= resolve<PFNDeleteProgramsARB>         ("glDeleteProgramsARB",             &QnGl::glDeleteProgramsARB,             &glDeleteProgramsARB);
         status &= resolve<PFNGenProgramsARB>            ("glGenProgramsARB",                &QnGl::glGenProgramsARB,                &glGenProgramsARB);
         status &= resolve<PFNProgramLocalParameter4fARB>("glProgramLocalParameter4fARB",    &QnGl::glProgramLocalParameter4fARB,    &glProgramLocalParameter4fARB);
+
         if(status)
             m_features |= QnGlFunctions::ArbPrograms;
+
+        QByteArray renderer = reinterpret_cast<const char *>(glGetString(GL_RENDERER));
+        QByteArray vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
+		if (vendor.contains("Tungsten Graphics") && renderer.contains("Gallium 0.1, Poulsbo on EMGD"))
+			m_features |= QnGlFunctions::ShadersVendorBadList; // shaders are declared but does not works
 
         status = true;
         status &= resolve<PFNActiveTexture>             ("glActiveTexture",                 &QnGl::glActiveTexture,                 &glActiveTexture);
