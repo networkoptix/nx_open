@@ -726,7 +726,7 @@ void QnSystrayWindow::saveData()
     m_mServerSettings.setValue("rtspPort", ui->rtspPortLineEdit->text());
     m_mServerSettings.setValue("apiPort", ui->apiPortLineEdit->text());
     m_appServerSettings.setValue("port", ui->appServerPortLineEdit->text());
-    m_appServerSettings.setValue("proxy_port", ui->proxyPortLineEdit->text());
+    m_appServerSettings.setValue("proxyPort", ui->proxyPortLineEdit->text());
 
     QStringList urlList = m_settings.value("appserverUrlHistory").toString().split(';');
     urlList.insert(0, getAppServerURL().toString());
