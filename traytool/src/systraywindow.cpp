@@ -701,14 +701,21 @@ bool QnSystrayWindow::checkPort(const QString& text, const QString& message)
 
 bool QnSystrayWindow::validateData()
 {
-    if (!checkPort(ui->appServerPortLineEdit->text(), QString("Invalid ") + APP_SERVER_NAME + QString(" port specified.")))
-        return false;
-    if (!checkPort(ui->proxyPortLineEdit->text(), QString("Invalid media proxy port specified.")))
-        return false;
-    if (!checkPort(ui->rtspPortLineEdit->text(), "Invalid media server RTSP port specified."))
-        return false;
-    if (!checkPort(ui->apiPortLineEdit->text(), "Invalid media server API port specified."))
-        return false;
+    if (m_appServerHandle)
+    {
+        if (!checkPort(ui->appServerPortLineEdit->text(), QString("Invalid ") + APP_SERVER_NAME + QString(" port specified.")))
+            return false;
+        if (!checkPort(ui->proxyPortLineEdit->text(), QString("Invalid media proxy port specified.")))
+            return false;
+    }
+
+    if (m_mediaServerHandle)
+    {
+        if (!checkPort(ui->rtspPortLineEdit->text(), "Invalid media server RTSP port specified."))
+            return false;
+        if (!checkPort(ui->apiPortLineEdit->text(), "Invalid media server API port specified."))
+            return false;
+    }
     return true;
 }
 
