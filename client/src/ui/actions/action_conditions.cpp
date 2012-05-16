@@ -11,14 +11,14 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 
-#include "action_target_types.h"
+#include "action_parameter_types.h"
 #include "action_manager.h"
 
 QnActionCondition::QnActionCondition(QObject *parent): 
     QObject(parent),
     QnWorkbenchContextAware(parent)
 {
-    QnActionTargetTypes::initialize();
+    QnActionParameterTypes::initialize();
 }
 
 Qn::ActionVisibility QnActionCondition::check(const QnResourceList &) { 
@@ -26,19 +26,19 @@ Qn::ActionVisibility QnActionCondition::check(const QnResourceList &) {
 };
 
 Qn::ActionVisibility QnActionCondition::check(const QnLayoutItemIndexList &layoutItems) { 
-    return check(QnActionTargetTypes::resources(layoutItems));
+    return check(QnActionParameterTypes::resources(layoutItems));
 };
 
 Qn::ActionVisibility QnActionCondition::check(const QnResourceWidgetList &widgets) { 
-    return check(QnActionTargetTypes::layoutItems(widgets));
+    return check(QnActionParameterTypes::layoutItems(widgets));
 };
 
 Qn::ActionVisibility QnActionCondition::check(const QnWorkbenchLayoutList &layouts) { 
-    return check(QnActionTargetTypes::resources(layouts));
+    return check(QnActionParameterTypes::resources(layouts));
 };
 
 Qn::ActionVisibility QnActionCondition::check(const QnActionParameters &parameters) {
-    switch(parameters.itemsType()) {
+    switch(parameters.type()) {
     case Qn::ResourceType:
         return check(parameters.resources());
     case Qn::WidgetType:
@@ -147,7 +147,7 @@ bool QnResourceActionCondition::checkOne(const QnResourcePtr &resource) {
 }
 
 bool QnResourceActionCondition::checkOne(QnResourceWidget *widget) {
-    QnResourcePtr resource = QnActionTargetTypes::resource(widget);
+    QnResourcePtr resource = QnActionParameterTypes::resource(widget);
     return resource ? checkOne(resource) : false;
 }
 
@@ -206,7 +206,7 @@ Qn::ActionVisibility QnSaveLayoutActionCondition::check(const QnResourceList &re
 
 
 Qn::ActionVisibility QnLayoutCountActionCondition::check(const QnWorkbenchLayoutList &) {
-    if(workbench()->layouts().size() < m_requiredCount)
+    if(workbench()->layouts().size() < m_minimalRequiredCount)
         return Qn::DisabledAction;
 
     return Qn::EnabledAction;
@@ -229,17 +229,7 @@ Qn::ActionVisibility QnTimePeriodActionCondition::check(const QnActionParameters
         return Qn::InvisibleAction;
 
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodParameter);
-    
-    Qn::PeriodType periodType;
-    if(period.isNull()) {
-        periodType = Qn::NullPeriod;
-    } else if(period.isEmpty()) {
-        periodType = Qn::EmptyPeriod;
-    } else {
-        periodType = Qn::NormalPeriod;
-    }
-
-    if(m_periodType != periodType) {
+    if(m_periodType != period.type()) {
         return m_nonMatchingVisibility;
     } else {
         return Qn::EnabledAction;

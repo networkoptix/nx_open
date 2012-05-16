@@ -11,7 +11,7 @@
 #include <utils/common/checked_cast.h>
 
 #include <ui/actions/action_manager.h>
-#include <ui/actions/action_target_types.h>
+#include <ui/actions/action_parameter_types.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>

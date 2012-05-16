@@ -11,13 +11,13 @@
 class QVariant;
 class QGraphicsItem;
 
-class QnActionTargetTypes {
+class QnActionParameterTypes {
 public:
     static void initialize();
 
     static int size(const QVariant &items);
 
-    static Qn::ActionTargetType type(const QVariant &items);
+    static Qn::ActionParameterType type(const QVariant &items);
 
     static QnResourcePtr resource(QnResourceWidget *widget);
 
