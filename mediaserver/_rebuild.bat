@@ -1,1 +1,1 @@
-..\cpp\_rebuild.bat
+..\cpp\_rebuild.bat %1

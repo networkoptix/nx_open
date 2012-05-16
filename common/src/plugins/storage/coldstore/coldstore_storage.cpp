@@ -12,16 +12,6 @@ m_cswriterThread(0),
 m_currH(0),
 m_prevH(0)
 {
-    char dataW[100]; dataW[7] = 7;
-    QnColdStoreConnection connW("10.10.10.253");
-    bool b = connW.open("111", QIODevice::WriteOnly, 0);
-    connW.write(dataW, sizeof(dataW));
-
-    char dataR[100]; 
-    QnColdStoreConnection connR("10.10.10.253");
-    b = connW.open("111", QIODevice::ReadOnly, 0);
-    connW.read(dataR, sizeof(dataR));
-
 
 }
 

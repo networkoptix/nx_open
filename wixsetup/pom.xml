@@ -133,7 +133,11 @@
 											<filtering>true</filtering>
 										</resource>
 										<resource>
-											<directory>${project.build.sourceDirectory}/maven/bin-resources</directory>
+											<directory>${project.build.sourceDirectory}/maven/bin-resources/common</directory>
+											<filtering>false</filtering>
+										</resource>		
+										<resource>
+											<directory>${project.build.sourceDirectory}/maven/bin-resources/custom/${installer.customization}</directory>
 											<filtering>false</filtering>
 										</resource>		
 										<resource>
