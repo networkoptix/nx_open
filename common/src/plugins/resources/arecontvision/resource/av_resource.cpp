@@ -118,6 +118,8 @@ bool QnPlAreconVisionResource::setHostAddress(const QHostAddress& ip, QnDomain d
 
     if (domain == QnDomainPhysical)
     {
+        return false; // never change ip 
+
         QUdpSocket sock;
 
         sock.bind(getDiscoveryAddr() , 0); // address usesd to find cam
