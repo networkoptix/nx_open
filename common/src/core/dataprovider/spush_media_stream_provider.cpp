@@ -57,20 +57,7 @@ void CLServerPushStreamreader::run()
             closeStream();
         }
 
-        if (QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(this))
-        {
-            //"rtsp://192.168.0.108/axis-media/media.amp?streamprofile=netOptixSecondary"
-            //"rtsp://192.168.0.108/axis-media/media.amp?streamprofile=netOptixPrimary"
-
-
-            QnResource::ConnectionRole role = lp->getRole();
-            if (role == QnResource::Role_SecondaryLiveVideo)
-                role = role;
-        }
-
-
         QnAbstractMediaDataPtr data = getNextData();
-
 
 
 		if (data==0)

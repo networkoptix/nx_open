@@ -198,8 +198,7 @@ const QnScheduleTaskList &QnSecurityCamResource::getScheduleTasks() const
 
 bool QnSecurityCamResource::hasDualStreaming() const
 {
-    //return true;
-    return false;
+    return true;
 }
 
 MotionType QnSecurityCamResource::getDefaultMotionType() const

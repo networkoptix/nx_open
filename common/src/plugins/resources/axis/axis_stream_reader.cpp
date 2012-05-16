@@ -61,11 +61,11 @@ void QnAxisStreamReader::openStream()
     QByteArray action = "add";
     if (role == QnResource::Role_LiveVideo)
     {
-        profileName = "netOptix1";
+        profileName = "netOptixPrimary";
         profileDescription = "Network Optix Primary Stream";
     }
     else {
-        profileName = "netOptix2";
+        profileName = "netOptixSecondary";
         profileDescription = "Network Optix Secondary Stream";
     }
 
@@ -101,8 +101,7 @@ void QnAxisStreamReader::openStream()
     // ------------------- determine stream parameters ----------------------------
     float fps = getFps();
     float ar = res->getResolutionAspectRatio(res->getMaxResolution());
-    //QString resolution = (role == QnResource::Role_LiveVideo) ? res->getMaxResolution() : res->getNearestResolution("320x240", ar);
-    QString resolution = (role == QnResource::Role_LiveVideo) ? res->getMaxResolution() : res->getNearestResolution("352x240", ar);
+    QString resolution = (role == QnResource::Role_LiveVideo) ? res->getMaxResolution() : res->getNearestResolution("320x240", ar);
     if (resolution.isEmpty()) 
         qWarning() << "Can't determine max resolution for axis camera " << res->getName() << "use default resolution";
     QnStreamQuality quality = getQuality();
