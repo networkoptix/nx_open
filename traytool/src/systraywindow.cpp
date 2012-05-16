@@ -616,7 +616,7 @@ void QnSystrayWindow::onSettingsAction()
 bool QnSystrayWindow::isAppServerParamChanged() const
 {
     return ui->appServerPortLineEdit->text().toInt() != m_appServerSettings.value("port").toInt() ||
-           ui->proxyPortLineEdit->text().toInt() != m_appServerSettings.value("proxy_port", DEFAUT_PROXY_PORT).toInt();
+           ui->proxyPortLineEdit->text().toInt() != m_appServerSettings.value("proxyPort", DEFAUT_PROXY_PORT).toInt();
 }
 
 bool QnSystrayWindow::isMediaServerParamChanged() const
