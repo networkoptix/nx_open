@@ -33,7 +33,7 @@
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
-#include <ui/actions/action_target_types.h>
+#include <ui/actions/action_parameter_types.h>
 #include <ui/actions/action_target_provider.h>
 
 #include <ui/dialogs/about_dialog.h>
@@ -140,7 +140,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::OpenSingleLayoutAction),             SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
     connect(action(Qn::OpenMultipleLayoutsAction),          SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
     connect(action(Qn::OpenAnyNumberOfLayoutsAction),       SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
-    connect(action(Qn::OpenNewTabAction),                   SIGNAL(triggered()),    this,   SLOT(at_openNewLayoutAction_triggered()));
+    connect(action(Qn::OpenNewTabAction),                   SIGNAL(triggered()),    this,   SLOT(at_openNewTabAction_triggered()));
     connect(action(Qn::OpenNewWindowAction),                SIGNAL(triggered()),    this,   SLOT(at_openNewWindowAction_triggered()));
     connect(action(Qn::SaveLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_saveLayoutAction_triggered()));
     connect(action(Qn::SaveLayoutAsAction),                 SIGNAL(triggered()),    this,   SLOT(at_saveLayoutAsAction_triggered()));
@@ -606,7 +606,7 @@ void QnWorkbenchActionHandler::at_openLayoutsAction_triggered() {
     }
 }
 
-void QnWorkbenchActionHandler::at_openNewLayoutAction_triggered() {
+void QnWorkbenchActionHandler::at_openNewTabAction_triggered() {
     QnWorkbenchLayout *layout = new QnWorkbenchLayout(this);
     layout->setName(newLayoutName());
 
@@ -1042,7 +1042,7 @@ void QnWorkbenchActionHandler::at_removeLayoutItemAction_triggered() {
     if(items.size() > 1) {
         QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
             widget(),
-            QnActionTargetTypes::resources(items),
+            QnActionParameterTypes::resources(items),
             tr("Remove Items"),
             tr("Are you sure you want to remove these %n item(s) from layout?", 0, items.size()),
             QDialogButtonBox::Yes | QDialogButtonBox::No
@@ -1342,14 +1342,14 @@ void QnWorkbenchActionHandler::at_exportTimeSelectionAction_triggered() {
 
     QnResourceWidget *widget = NULL;
 
-    if(parameters.itemsSize() != 1) {
-        if(parameters.itemsSize() == 0 && display()->widgets().size() == 1) {
+    if(parameters.size() != 1) {
+        if(parameters.size() == 0 && display()->widgets().size() == 1) {
             widget = display()->widgets().front();
         } else {
             QMessageBox::critical(
                 this->widget(), 
                 tr("Cannot export file"), 
-                tr("Exactly one item must be selected for export, but %n item(s) are currently selected.", NULL, parameters.itemsSize()), 
+                tr("Exactly one item must be selected for export, but %n item(s) are currently selected.", NULL, parameters.size()), 
                 QMessageBox::Ok
             );
             return;
@@ -1380,7 +1380,7 @@ void QnWorkbenchActionHandler::at_exportTimeSelectionAction_triggered() {
             this->widget(), 
             tr("Export Video As..."),
             previousDir + QDir::separator() + suggestion,
-            tr("Matroska (*.mkv);; AVI (Audio/Video Interleaved)(*.avi)"),
+            tr("AVI (Audio/Video Interleaved)(*.avi);;Matroska (*.mkv)"),
             &selectedFilter,
             QFileDialog::DontUseNativeDialog
         );

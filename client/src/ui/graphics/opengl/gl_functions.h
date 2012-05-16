@@ -11,7 +11,8 @@ class QnGlFunctions {
 public:
     enum Feature {
         ArbPrograms = 0x1,
-        OpenGL1_3 = 0x2
+        OpenGL1_3 = 0x2,
+		ShadersVendorBadList = 0x4
     };
     Q_DECLARE_FLAGS(Features, Feature);
 

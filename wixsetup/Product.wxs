@@ -207,7 +207,7 @@
         <CustomAction Id="CloseTrayToolAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="ignore" Impersonate="no" />
         
-        <CustomAction Id="LaunchApplication" Execute="immediate" Impersonate="no" Return="asyncNoWait" FileKey="traytool.exe" ExeCommand="&quot;[VmsTrayToolDir]traytool.exe&quot;"/>
+        <CustomAction Id="LaunchApplication" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="traytool.exe" ExeCommand=""/>
         
         <CustomAction Id="NoDowngrade" Error="NoDowngrade" /> 
         

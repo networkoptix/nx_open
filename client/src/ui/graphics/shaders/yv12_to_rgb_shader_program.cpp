@@ -39,4 +39,3 @@ void QnYv12ToRgbShaderProgram::setParameters(GLfloat brightness, GLfloat contras
     setLocalValue(QGLShader::Fragment, 1, saturation, opacity, 0.0, 0.0);
 }
 
-

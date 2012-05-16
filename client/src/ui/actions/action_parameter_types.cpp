@@ -1,4 +1,4 @@
-﻿#include "action_target_types.h"
+﻿#include "action_parameter_types.h"
 #include <core/resource/resource_fwd.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
@@ -51,11 +51,11 @@ namespace {
 
 } // anonymous namespace
 
-void QnActionTargetTypes::initialize() {
+void QnActionParameterTypes::initialize() {
     qn_initializeActionMetaTypes();
 }
 
-int QnActionTargetTypes::size(const QVariant &items) {
+int QnActionParameterTypes::size(const QVariant &items) {
     int t = items.userType();
 
     if(t == qn_resourceList) {
@@ -75,7 +75,7 @@ int QnActionTargetTypes::size(const QVariant &items) {
     }
 }
 
-Qn::ActionTargetType QnActionTargetTypes::type(const QVariant &items) {
+Qn::ActionParameterType QnActionParameterTypes::type(const QVariant &items) {
     int t = items.userType();
 
     if(t == qn_resourceList) {
@@ -91,12 +91,12 @@ Qn::ActionTargetType QnActionTargetTypes::type(const QVariant &items) {
     } else if(t == qn_widget) {
         return Qn::WidgetType;
     } else {
-        return static_cast<Qn::ActionTargetType>(0);
+        return static_cast<Qn::ActionParameterType>(0);
     }
 }
 
-QnResourceList QnActionTargetTypes::resources(QnResourceWidget *widget) {
-    QnResourcePtr resource = QnActionTargetTypes::resource(widget);
+QnResourceList QnActionParameterTypes::resources(QnResourceWidget *widget) {
+    QnResourcePtr resource = QnActionParameterTypes::resource(widget);
 
     QnResourceList result;
     if(resource)
@@ -104,18 +104,18 @@ QnResourceList QnActionTargetTypes::resources(QnResourceWidget *widget) {
     return result;
 }
 
-QnResourcePtr QnActionTargetTypes::resource(QnResourceWidget *widget) {
+QnResourcePtr QnActionParameterTypes::resource(QnResourceWidget *widget) {
     if(widget == NULL)
         return QnResourcePtr();
 
     return widget->resource();
 }
 
-QnResourceList QnActionTargetTypes::resources(const QnResourceWidgetList &widgets) {
+QnResourceList QnActionParameterTypes::resources(const QnResourceWidgetList &widgets) {
     QnResourceList result;
 
     foreach(QnResourceWidget *widget, widgets) {
-        QnResourcePtr resource = QnActionTargetTypes::resource(widget);
+        QnResourcePtr resource = QnActionParameterTypes::resource(widget);
         if(!resource)
             continue;
 
@@ -125,7 +125,7 @@ QnResourceList QnActionTargetTypes::resources(const QnResourceWidgetList &widget
     return result;
 }
 
-QnResourceList QnActionTargetTypes::resources(const QnLayoutItemIndexList &layoutItems) {
+QnResourceList QnActionParameterTypes::resources(const QnLayoutItemIndexList &layoutItems) {
     QnResourceList result;
 
     foreach(const QnLayoutItemIndex &index, layoutItems) {
@@ -148,7 +148,7 @@ QnResourceList QnActionTargetTypes::resources(const QnLayoutItemIndexList &layou
     return result;
 }
 
-QnResourceList QnActionTargetTypes::resources(const QnWorkbenchLayoutList &layouts) {
+QnResourceList QnActionParameterTypes::resources(const QnWorkbenchLayoutList &layouts) {
     QnResourceList result;
 
     foreach(QnWorkbenchLayout *layout, layouts) {
@@ -162,7 +162,7 @@ QnResourceList QnActionTargetTypes::resources(const QnWorkbenchLayoutList &layou
     return result;
 }
 
-QnResourceList QnActionTargetTypes::resources(const QVariant &items) {
+QnResourceList QnActionParameterTypes::resources(const QVariant &items) {
     int t = items.userType();
 
     if(t == qn_resourceList) {
@@ -187,7 +187,7 @@ QnResourceList QnActionTargetTypes::resources(const QVariant &items) {
     }
 }
 
-QnLayoutItemIndex QnActionTargetTypes::layoutItem(QnResourceWidget *widget) {
+QnLayoutItemIndex QnActionParameterTypes::layoutItem(QnResourceWidget *widget) {
     QnWorkbenchLayout *layout = widget->item()->layout();
     if(layout == NULL)
         return QnLayoutItemIndex();
@@ -201,11 +201,11 @@ QnLayoutItemIndex QnActionTargetTypes::layoutItem(QnResourceWidget *widget) {
     return QnLayoutItemIndex(resource, widget->item()->uuid());
 }
 
-QnLayoutItemIndexList QnActionTargetTypes::layoutItems(const QnResourceWidgetList &widgets) {
+QnLayoutItemIndexList QnActionParameterTypes::layoutItems(const QnResourceWidgetList &widgets) {
     QnLayoutItemIndexList result;
     
     foreach(QnResourceWidget *widget, widgets) {
-        QnLayoutItemIndex layoutItem = QnActionTargetTypes::layoutItem(widget);
+        QnLayoutItemIndex layoutItem = QnActionParameterTypes::layoutItem(widget);
         if(!layoutItem.isNull())
             result.push_back(layoutItem);
     }
@@ -213,8 +213,8 @@ QnLayoutItemIndexList QnActionTargetTypes::layoutItems(const QnResourceWidgetLis
     return result;
 }
 
-QnLayoutItemIndexList QnActionTargetTypes::layoutItems(QnResourceWidget *widget) {
-    QnLayoutItemIndex layoutItem = QnActionTargetTypes::layoutItem(widget);
+QnLayoutItemIndexList QnActionParameterTypes::layoutItems(QnResourceWidget *widget) {
+    QnLayoutItemIndex layoutItem = QnActionParameterTypes::layoutItem(widget);
 
     QnLayoutItemIndexList result;
     if(!layoutItem.isNull())
@@ -222,7 +222,7 @@ QnLayoutItemIndexList QnActionTargetTypes::layoutItems(QnResourceWidget *widget)
     return result;
 }
 
-QnLayoutItemIndexList QnActionTargetTypes::layoutItems(const QVariant &items) {
+QnLayoutItemIndexList QnActionParameterTypes::layoutItems(const QVariant &items) {
     if(items.userType() == qn_layoutItemList) {
         return items.value<QnLayoutItemIndexList>();
     } else if(items.userType() == qn_widgetList) {
@@ -234,7 +234,7 @@ QnLayoutItemIndexList QnActionTargetTypes::layoutItems(const QVariant &items) {
     }
 }
 
-QnWorkbenchLayoutList QnActionTargetTypes::layouts(const QVariant &items) {
+QnWorkbenchLayoutList QnActionParameterTypes::layouts(const QVariant &items) {
     if(items.userType() == qn_layoutList) {
         return items.value<QnWorkbenchLayoutList>();
     } else {
@@ -242,7 +242,7 @@ QnWorkbenchLayoutList QnActionTargetTypes::layouts(const QVariant &items) {
     }
 }
 
-QnResourceWidgetList QnActionTargetTypes::widgets(const QVariant &items) {
+QnResourceWidgetList QnActionParameterTypes::widgets(const QVariant &items) {
     if(items.userType() == qn_widgetList) {
         return items.value<QnResourceWidgetList>();
     } else if(items.userType() == qn_widget) {
@@ -257,7 +257,7 @@ QnResourceWidgetList QnActionTargetTypes::widgets(const QVariant &items) {
     }
 }
 
-QnResourceWidgetList QnActionTargetTypes::widgets(const QList<QGraphicsItem *> items) {
+QnResourceWidgetList QnActionParameterTypes::widgets(const QList<QGraphicsItem *> items) {
     QnResourceWidgetList result;
 
     foreach(QGraphicsItem *item, items) {

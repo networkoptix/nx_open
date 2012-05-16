@@ -31,13 +31,15 @@ public:
 
         ERROR_TEXT_COLOR,
 
-        /** Size of a single unit of workbench grid coordinates, in scene coordinates.
+        /** Size of a single unit of workbench grid, in scene coordinates.
          * This basically is the width of a single video item in scene coordinates. */
         WORKBENCH_UNIT_SIZE,
 
         DEFAULT_LAYOUT_CELL_ASPECT_RATIO,
 
         DEFAULT_LAYOUT_CELL_SPACING,
+
+        BACKGROUD_GRADIENT_COLOR,
 
         VARIABLE_COUNT
     };
@@ -103,6 +105,8 @@ private:                                                                        
 
     QN_DECLARE_GLOBAL_VARIABLE(QColor,  selectionOpacityDelta,          SELECTION_OPACITY_DELTA,                QColor(0, 0, 0, 0x80));
     QN_DECLARE_GLOBAL_VARIABLE(QColor,  selectionBorderDelta,           SELECTION_BORDER_DELTA,                 QColor(48, 48, 48, 0));
+
+    QN_DECLARE_GLOBAL_VARIABLE(QColor,  backgroundGradientColor,        BACKGROUD_GRADIENT_COLOR,               QColor(5, 5, 50));
 #undef QN_DECLARE_GLOBAL_VARIABLE
 
 private:

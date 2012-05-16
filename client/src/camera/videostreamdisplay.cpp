@@ -375,11 +375,13 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompress
         m_needResetDecoder = false;
     }
 
-    QnFrameScaler::downscale_factor scaleFactor = determineScaleFactor(data->channelNumber, dec->getWidth(), dec->getHeight(), force_factor);
+    QnFrameScaler::downscale_factor scaleFactor = QnFrameScaler::factor_unknown;
+    if (dec->getWidth() > 0)
+        scaleFactor = determineScaleFactor(data->channelNumber, dec->getWidth(), dec->getHeight(), force_factor);
     PixelFormat pixFmt = dec->GetPixelFormat();
     bool useTmpFrame =  !QnGLRenderer::isPixelFormatSupported(pixFmt) ||
         !CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) || 
-        scaleFactor > QnFrameScaler::factor_1;
+        scaleFactor != QnFrameScaler::factor_1;
 
     CLVideoDecoderOutput* outFrame = m_frameQueue[m_frameQueueIndex];
     outFrame->channel = data->channelNumber;
@@ -463,7 +465,7 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompress
     }
 
     pixFmt = dec->GetPixelFormat();
-    if (!data->context) {
+    if (scaleFactor == QnFrameScaler::factor_unknown) {
         // for stiil images decoder parameters are not know before decoding, so recalculate parameters
         // It is got one more data copy from tmpFrame, but for movies we have got valid dst pointer (tmp or not) immediate before decoding
         // It is necessary for new logic with display queue

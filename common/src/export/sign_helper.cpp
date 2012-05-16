@@ -201,7 +201,7 @@ void QnSignHelper::draw(QPainter& painter, const QSize& paintSize, bool drawText
         QPainter p3(&m_backgroundPixmap);
         p3.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
         p3.fillRect(0,0, paintSize.width(), paintSize.height()/2, Qt::white);
-        p3.fillRect(0,paintSize.height()/2, paintSize.width(), paintSize.height()/2, Qt::blue);
+        p3.fillRect(0,paintSize.height()/2, paintSize.width(), paintSize.height()/2, Qt::gray);
 
         if (m_logo.width() > 0) {
             QPixmap logo = m_logo.scaledToWidth(paintSize.width()/8, Qt::SmoothTransformation);
@@ -246,7 +246,7 @@ void QnSignHelper::draw(QPainter& painter, const QSize& paintSize, bool drawText
     painter.translate((paintSize.width() - drawWidth)/2, paintSize.height()/2 + (paintSize.height()/2-drawheight)/2);
 
 
-    QColor signBkColor = blendColor(m_signBackground, m_opacity, Qt::blue);
+    QColor signBkColor = blendColor(m_signBackground, m_opacity, Qt::black);
     painter.fillRect(0, 0, SQUARE_SIZE*colCnt, SQUARE_SIZE*rowCnt, signBkColor);
 
     int cOffs = SQUARE_SIZE/16;

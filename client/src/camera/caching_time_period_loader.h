@@ -35,10 +35,10 @@ public:
     void setMotionRegions(const QList<QRegion> &motionRegions);
     bool isMotionRegionsEmpty() const;
 
-    QnTimePeriodList periods(Qn::TimePeriodType type);
+    QnTimePeriodList periods(Qn::TimePeriodRole type);
 
 signals:
-    void periodsChanged(Qn::TimePeriodType type);
+    void periodsChanged(Qn::TimePeriodRole type);
     void loadingFailed();
 
 private slots:
@@ -46,8 +46,8 @@ private slots:
     void at_loader_failed(int status, int handle);
 
 protected:
-    void load(Qn::TimePeriodType type);
-    void trim(Qn::TimePeriodType type, qint64 trimTime);
+    void load(Qn::TimePeriodRole type);
+    void trim(Qn::TimePeriodRole type, qint64 trimTime);
 
     QnTimePeriod addLoadingMargins(const QnTimePeriod &targetPeriod) const;
 
@@ -61,10 +61,10 @@ private:
 private:
     QnNetworkResourcePtr m_resource;
     QnTimePeriod m_loadedPeriod;
-    QnMultiCameraTimePeriodLoader *m_loaders[Qn::TimePeriodTypeCount];
-    int m_handles[Qn::TimePeriodTypeCount];
+    QnMultiCameraTimePeriodLoader *m_loaders[Qn::TimePeriodRoleCount];
+    int m_handles[Qn::TimePeriodRoleCount];
     QList<QRegion> m_motionRegions;
-    QnTimePeriodList m_periods[Qn::TimePeriodTypeCount];
+    QnTimePeriodList m_periods[Qn::TimePeriodRoleCount];
     qreal m_loadingMargin;
     qint64 m_updateInterval;
 };

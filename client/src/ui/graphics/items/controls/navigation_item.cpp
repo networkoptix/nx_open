@@ -345,6 +345,7 @@ void QnNavigationItem::updateSpeedSliderSpeedFromNavigator() {
     QnScopedValueRollback<bool> guard(&m_updatingSpeedSliderFromNavigator, true);
     m_speedSlider->setSpeed(m_navigator->speed());
     updatePlaybackButtonsPressed();
+    updatePlayButtonChecked();
 }
 
 void QnNavigationItem::updateNavigatorSpeedFromSpeedSlider() {
