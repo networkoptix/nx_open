@@ -394,6 +394,8 @@ void QnWorkbenchNavigator::jumpBackward() {
     if(!reader)
         return;
 
+    m_pausedOverride = false;
+
     qint64 pos;
     if(QnCachingTimePeriodLoader *loader = this->loader(m_currentWidget)) {
         const QnTimePeriodList fullPeriods = loader->periods(loader->isMotionRegionsEmpty() ? Qn::RecordingRole : Qn::MotionRole);
@@ -426,6 +428,8 @@ void QnWorkbenchNavigator::jumpForward() {
     if(!reader)
         return;
 
+    m_pausedOverride = false;
+
     qint64 pos;
     if(!(m_currentWidgetFlags & WidgetSupportsPeriods)) {
         pos = reader->endTime();
@@ -453,6 +457,8 @@ void QnWorkbenchNavigator::stepBackward() {
     if(!reader)
         return;
 
+    m_pausedOverride = false;
+
     if (!reader->isSkippingFrames() && reader->currentTime() > reader->startTime()) {
         quint64 currentTime = m_currentWidget->display()->camera()->getCurrentTime();
 
@@ -470,6 +476,8 @@ void QnWorkbenchNavigator::stepForward() {
     QnAbstractArchiveReader *reader = m_currentWidget->display()->archiveReader();
     if(!reader)
         return;
+
+    m_pausedOverride = false;
 
     reader->nextFrame();
 }
