@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
      xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
-    <Product Id="*" Name="${pom.parent.name}" Language="1033" Version="${version}.${buildNumber}" Manufacturer="${pom.parent.organization.name}" UpgradeCode="{CE572797-45BF-4f1c-A783-369EA79C597E}">
-        <Package Id="*" InstallerVersion="300" Compressed="yes" Keywords="Installer" Comments="${pom.parent.organization.name} ${pom.parent.name} Installer" Manufacturer="${pom.parent.organization.name}" InstallPrivileges="elevated" InstallScope="perMachine" />
+    <Product Id="*" Name="${product.name}" Language="1033" Version="${version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="{CE572797-45BF-4f1c-A783-369EA79C597E}">
+        <Package Id="*" InstallerVersion="300" Compressed="yes" Keywords="Installer" Comments="${company.name} ${product.name} Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine" />
         
         <!-- Wix Variables -->
         
@@ -41,7 +41,7 @@
         <Property Id="MSIRESTARTMANAGERCONTROL" Value="Disable" Secure="yes"/>
         
         <!-- Properties -->
-        <Property Id="WelcomeDlg_Title" Value="${pom.parent.name} Installer Setup" />
+        <Property Id="WelcomeDlg_Title" Value="${product.name} Installer Setup" />
         
         <Property Id="ARPPRODUCTICON" Value="eve_logo.ico" />
         
@@ -55,7 +55,7 @@
         <Property Id="APPSERVER_GUID" Secure="yes">
             <RegistrySearch Id="EcsGuidReg"
                             Root="HKLM"
-                            Key="Software\Network Optix\Enterprise Controller"
+                            Key="Software\${company.name}\${appserver.name}"
                             Name="ecsGuid"
                             Type="raw"
                             Win64="no"/>
@@ -64,7 +64,7 @@
         <Property Id="APPSERVER_PORT" Secure="yes">
             <RegistrySearch Id="AppServerPortReg"
                             Root="HKLM"
-                            Key="Software\Network Optix\Enterprise Controller"
+                            Key="Software\${company.name}\${appserver.name}"
                             Name="port"
                             Type="raw"
                             Win64="no"/>
@@ -73,7 +73,7 @@
         <Property Id="PROXY_PORT" Secure="yes">
             <RegistrySearch Id="ProxyPortReg"
                             Root="HKLM"
-                            Key="Software\Network Optix\Enterprise Controller"
+                            Key="Software\${company.name}\${appserver.name}"
                             Name="proxyPort"
                             Type="raw"
                             Win64="no"/>
@@ -83,7 +83,7 @@
         <Property Id="APPSERVER_PASSWORD_REG" Secure="yes">
             <RegistrySearch Id="AppServerPasswordReg"
                             Root="HKLM"
-                            Key="Software\Network Optix\Enterprise Controller"
+                            Key="Software\${company.name}\${appserver.name}"
                             Name="password"
                             Type="raw"
                             Win64="no"/>
@@ -100,7 +100,7 @@
         <Property Id="SERVER_RTSP_PORT" Secure="yes">
             <RegistrySearch Id="ServerRtspPortReg"
                             Root="HKLM"
-                            Key="Software\Network Optix\Network Optix Media Server"
+                            Key="Software\${company.name}\${mediaserver.name}"
                             Name="rtspPort"
                             Type="raw"
                             Win64="no"/>
@@ -108,7 +108,7 @@
         <Property Id="SERVER_API_PORT" Secure="yes">
             <RegistrySearch Id="ServerApiPortReg"
                             Root="HKLM"
-                            Key="Software\Network Optix\Network Optix Media Server"
+                            Key="Software\${company.name}\${mediaserver.name}"
                             Name="apiPort"
                             Type="raw"
                             Win64="no"/>
@@ -117,7 +117,7 @@
         <Property Id="SERVER_DIRECTORY_REG" Secure="yes">
             <RegistrySearch Id="ServerDirectoryReg"
                             Root="HKLM"
-                            Key="Software\Network Optix\Network Optix Media Server"
+                            Key="Software\${company.name}\${mediaserver.name}"
                             Name="mediaDir"
                             Type="raw"
                             Win64="no">
@@ -127,7 +127,7 @@
         <Property Id="SERVER_GUID" Secure="yes">
             <RegistrySearch Id="ServerGuidReg"
                             Root="HKLM"
-                            Key="Software\Network Optix\Network Optix Media Server"
+                            Key="Software\${company.name}\${mediaserver.name}"
                             Name="serverGuid"
                             Type="raw"
                             Win64="no"/>
@@ -147,7 +147,7 @@
         <Property Id="CLIENT_DIRECTORY_REG" Secure="yes">
             <RegistrySearch Id="ClientDirectoryReg"
                             Root="HKCU"
-                            Key="Software\[Manufacturer]\Network Optix HD Witness Client"
+                            Key="Software\[Manufacturer]\${client.name}"
                             Name="mediaRoot"
                             Type="raw"
                             Win64="no"/>
@@ -287,33 +287,33 @@
             <Directory Id="SERVER_DIRECTORY" Name="Server Media">
                 <Component Id="ServerDirectoryComponent" Guid="{C259A76D-4CAA-489f-A18F-28AED0232853}" Permanent="yes">
                     <CreateFolder Directory="SERVER_DIRECTORY"/>
-                    <RegistryValue Root='HKLM' Key='Software\[Manufacturer]\Network Optix Media Server' Type='string' Value='' KeyPath='yes' />
+                    <RegistryValue Root='HKLM' Key='Software\[Manufacturer]\${mediaserver.name}' Type='string' Value='' KeyPath='yes' />
                 </Component>
             </Directory>
             
             <Directory Id="CLIENT_DIRECTORY" Name="Client Media">
                 <Component Id="ClientDirectoryComponent" Guid="{953EF7FD-01CF-432f-936C-43F07BC918DE}" Permanent="yes">
                     <CreateFolder Directory="CLIENT_DIRECTORY"/>
-                    <RegistryValue Root='HKCU' Key='Software\[Manufacturer]\Network Optix HD Witness Client' Type='string' Value='' KeyPath='yes' />
+                    <RegistryValue Root='HKCU' Key='Software\[Manufacturer]\${client.name}' Type='string' Value='' KeyPath='yes' />
                 </Component>
             </Directory>
 
             <Directory Id="ProgramFilesFolder">
-                <Directory Id="NetworkOptix" Name="${pom.parent.organization.name}">
-                    <Directory Id="INSTALLDIR" Name="${pom.parent.name}">
-                        <Directory Id="VmsAppServerDir" Name="Enterprise Controller">
+                <Directory Id="NetworkOptix" Name="${company.name}">
+                    <Directory Id="INSTALLDIR" Name="${product.name}">
+                        <Directory Id="VmsAppServerDir" Name="${appserver.name}">
                             <Component Id="AppServerExecutable" Guid="{5FB5A627-BB1F-4d82-A06C-7672903DA4C7}">
                                 <File Id="ecexe" Name="ecs.exe" Source="files/ecs.exe" KeyPath="yes">
-                                    <fire:FirewallException Id="FirewallExceptionAppServer" Name="Network Optix Enterprise Controller" Scope="any" IgnoreFailure="yes" />
+                                    <fire:FirewallException Id="FirewallExceptionAppServer" Name="${company.name} ${appserver.name}" Scope="any" IgnoreFailure="yes" />
                                 </File>
                                 
                                 <ServiceInstall Id="VmsAppServerService"
                                                 Name="VmsAppServer"
-                                                DisplayName="Network Optix Enterprise Controller"
+                                                DisplayName="${company.name} ${appserver.name}"
                                                 Type="ownProcess"
                                                 Start="auto"
                                                 ErrorControl="normal"
-                                                Description="Network Optix Enterprise Controller">
+                                                Description="${company.name} ${appserver.name}">
                                     <util:ServiceConfig FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart"/>
                                 </ServiceInstall>
                                 
@@ -329,7 +329,7 @@
                             
                             <Component Id="AppServerConfigurationGuid" Guid="{2936DFE8-0645-4573-993F-D009EDFB1732}" Permanent="yes" NeverOverwrite="yes">
                                 <RegistryKey Root="HKLM"
-                                             Key="Software\[Manufacturer]\Enterprise Controller"
+                                             Key="Software\[Manufacturer]\${appserver.name}"
                                              Action="create">
                                     <RegistryValue Type="string" Name="ecsGuid" Value="[APPSERVER_GUID]" KeyPath="yes"/>
                                 </RegistryKey>
@@ -341,7 +341,7 @@
                                 </Condition>
                                 
                                 <RegistryKey Root="HKLM"
-                                             Key="Software\[Manufacturer]\Enterprise Controller" Action="create">
+                                             Key="Software\[Manufacturer]\${appserver.name}" Action="create">
                                     <RegistryValue Type="string" Name="port" Value="[APPSERVER_PORT]"/>
                                     <RegistryValue Type="string" Name="proxyPort" Value="[PROXY_PORT]"/>
                                     <RegistryValue Type="string" Name="login" Value="[APPSERVER_LOGIN]"/>
@@ -355,11 +355,11 @@
                                 <File Id="traytool.exe" Name="traytool.exe" Source="traytool/traytool.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionVmsTrayTool" Name="VMS Tray Tool" Scope="any" IgnoreFailure="yes"/>
                                     
-                                    <Shortcut Id="StartmenuTrayTool" Directory="ProgramMenuDir" Name="${pom.parent.name} Tray Assistant"
+                                    <Shortcut Id="StartmenuTrayTool" Directory="ProgramMenuDir" Name="${traytool.name}"
                                               WorkingDirectory='VmsTrayToolDir' Advertise="yes" Icon="icon_menu.exe" >
                                     </Shortcut>
                                     
-                                    <Shortcut Id="StartmenuStartupTrayTool" Directory="StartupFolder" Name="${pom.parent.name} Tray Assistant"
+                                    <Shortcut Id="StartmenuStartupTrayTool" Directory="StartupFolder" Name="${traytool.name}"
                                               WorkingDirectory='VmsTrayToolDir' Advertise="yes" Icon="icon_menu.exe" >
                                     </Shortcut>
                                 </File>
@@ -374,16 +374,16 @@
                         <Directory Id="VmsProxyServerDir" Name="MediaProxy">
                             <Component Id="ProxyExecutable" Guid="{7BD9B32D-BE6E-417F-B301-E07657F09B35}">
                                 <File Id="ProxyExe" Name="mediaproxy.exe" Source="mediaproxy/mediaproxy.exe" KeyPath="yes">
-                                    <fire:FirewallException Id="FirewallExceptionProxyServer" Name="Network Optix Media Proxy" Scope="any" IgnoreFailure="yes"/>
+                                    <fire:FirewallException Id="FirewallExceptionProxyServer" Name="${mediaproxy.name}" Scope="any" IgnoreFailure="yes"/>
                                 </File>
                                 
                                 <ServiceInstall Id="VmsMediaProxyService"
                                                 Name="VmsMediaProxy"
-                                                DisplayName="Network Optix Media Proxy"
+                                                DisplayName="${mediaproxy.name}"
                                                 Type="ownProcess"
                                                 Start="auto"
                                                 ErrorControl="normal"
-                                                Description="Network Optix Media Proxy">
+                                                Description="${mediaproxy.name}">
                                     <util:ServiceConfig FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart"/>
                                 </ServiceInstall>
                                 
@@ -403,16 +403,16 @@
                         <Directory Id="VmsMediaServerDir" Name="MediaServer">
                             <Component Id="ServerExecutable" Guid="06DFA703-0266-4970-BAC1-3730BF7D1C66">
                                 <File Id="ServerExe" Name="mediaserver.exe" Source="mediaserver/mediaserver.exe" KeyPath="yes">
-                                    <fire:FirewallException Id="FirewallExceptionMediaServer" Name="Network Optix Media Server" Scope="any" IgnoreFailure="yes"/>
+                                    <fire:FirewallException Id="FirewallExceptionMediaServer" Name="${mediaserver.name}" Scope="any" IgnoreFailure="yes"/>
                                 </File>
                                 
                                 <ServiceInstall Id="VmsMediaServerService"
                                                 Name="VmsMediaServer"
-                                                DisplayName="Network Optix Media Server"
+                                                DisplayName="${mediaserver.name}"
                                                 Type="ownProcess"
                                                 Start="auto"
                                                 ErrorControl="normal"
-                                                Description="Network Optix Media Server">
+                                                Description="${mediaserver.name}">
                                     <util:ServiceConfig FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart"/>
                                 </ServiceInstall>
                                 
@@ -422,7 +422,7 @@
                             
                             <Component Id="ServerConfigurationGuid" Guid="{A2F8AEC6-3050-4262-BEAF-3645943D932F}" Permanent="yes" NeverOverwrite="yes">
                                 <RegistryKey Root="HKLM"
-                                             Key="Software\[Manufacturer]\Network Optix Media Server"
+                                             Key="Software\[Manufacturer]\${mediaserver.name}"
                                              Action="create">
                                     <RegistryValue Type="string" Name="serverGuid" Value="[SERVER_GUID]" KeyPath="yes"/>
                                 </RegistryKey>
@@ -434,7 +434,7 @@
                                 </Condition>
 
                                 <RegistryKey Root="HKLM"
-                                             Key="Software\[Manufacturer]\Network Optix Media Server"
+                                             Key="Software\[Manufacturer]\${mediaserver.name}"
                                              Action="create">
                                     <RegistryValue Type="string" Name="appserverHost" Value="[SERVER_APPSERVER_HOST]"/>
                                     <RegistryValue Type="string" Name="appserverPort" Value="[SERVER_APPSERVER_PORT]"/>
@@ -480,10 +480,10 @@
                                 <File Id="ClientExe" Name="client.exe" Source="client/client.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionClient" Name="HD Witness" Scope="any" IgnoreFailure="yes"/>
                                     
-                                    <Shortcut Id="StartmenuClient" Directory="ProgramMenuDir" Name="${pom.parent.name}"
+                                    <Shortcut Id="StartmenuClient" Directory="ProgramMenuDir" Name="${product.name}"
                                               WorkingDirectory='VmsClientDir' Advertise="yes" Icon="icon_menu.exe" >
                                     </Shortcut>
-                                    <Shortcut Id="DesktopClient" Directory="DesktopFolder" Name="${pom.parent.name}"
+                                    <Shortcut Id="DesktopClient" Directory="DesktopFolder" Name="${product.name}"
                                               WorkingDirectory='VmsClientDir' Advertise="yes" Icon="icon_desktop.exe">
                                     </Shortcut>
                                 
@@ -496,7 +496,7 @@
                                 </Condition>
 
                                 <RegistryKey Root="HKCU"
-                                             Key="Software\[Manufacturer]\Network Optix HD Witness Client"
+                                             Key="Software\[Manufacturer]\${client.name}"
                                              Action="create">
                                     <RegistryValue Type="string" Name="afterFirstRun" Value="false"/>
                                     <RegistryValue Type="string" Name="appserverHost" Value="[CLIENT_APPSERVER_HOST]"/>
@@ -569,7 +569,7 @@
             </Directory>
             
             <Directory Id="ProgramMenuFolder" Name="Programs">
-                <Directory Id="ProgramMenuDir" Name="${pom.parent.organization.name}">
+                <Directory Id="ProgramMenuDir" Name="${company.name}">
                     <Component Id="UninstallProgramMenuFolder" DiskId="1" Guid="{3714E067-D4DC-4A09-9D06-EAC5BCB6ABF3}">
                         <RemoveFolder Id='DashMenuDirRem' On='uninstall' />
                     </Component>
@@ -598,7 +598,7 @@
             <?endif?>
         </Feature>
         
-        <Feature Id="AppServerFeature" Title="${pom.parent.name} Enterprise Controller" Level="1"
+        <Feature Id="AppServerFeature" Title="${product.name} ${appserver.name}" Level="1"
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="hidden" >
 <!--            <Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !AppServerFeature <> 3 ]]> </Condition>-->
             
@@ -620,7 +620,7 @@
             <ComponentRef Id="UninstallProgramMenuFolder"/>
         </Feature>
         
-        <Feature Id="ServerFeature" Title="${pom.parent.name} Media Server" Level="1"
+        <Feature Id="ServerFeature" Title="${product.name} Media Server" Level="1"
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
 <!--            <Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !ServerFeature <> 3 ]]> </Condition>-->
             
@@ -635,7 +635,7 @@
             <ComponentRef Id="ServerQjson"/>
         </Feature>
         
-        <Feature Id="ClientFeature" Title="${pom.parent.name} Client" Level="1"
+        <Feature Id="ClientFeature" Title="${product.name} Client" Level="1"
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
 <!--            <Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !ClientFeature <> 3 ]]> </Condition>-->
             

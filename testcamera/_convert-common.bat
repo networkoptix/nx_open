@@ -1,1 +1,1 @@
-..\cpp\_convert-common.bat
+..\cpp\_convert-common.bat %1
