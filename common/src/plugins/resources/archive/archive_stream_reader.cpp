@@ -912,6 +912,8 @@ bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
         return m_navDelegate->jumpTo(mksec, skipTime);
     }
 
+    qDebug() << "jumpTo(" << QDateTime::fromMSecsSinceEpoch(mksec / 1000).toString("hh:mm:ss.zzz") << "," << (mksec == skipTime ? "precise" : "rough") << ")";
+
     qint64 newTime = mksec;
     m_playbackMaskSync.lock();
     newTime = m_playbackMaskHelper.findTimeAtPlaybackMask(mksec, m_speed >= 0);

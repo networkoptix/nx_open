@@ -891,7 +891,7 @@ bool RTPSession::readTextResponce(QByteArray& response)
         }
 
         // buffer is full and we does not find text data (buffer is filled by binary data). Clear buffer (and drop some video frames) and try to find data again
-        qWarning() << "Can't find RTSP text response because of buffer is full! Drop some media data and find againg";
+        //qWarning() << "Can't find RTSP text response because of buffer is full! Drop some media data and find againg";
         quint8 tmpBuffer[1024*64];
         if (readBinaryResponce(tmpBuffer, sizeof(tmpBuffer)) == -1)
             break;
