@@ -96,7 +96,7 @@
 											<artifactId>client</artifactId>
 											<version>${project.version}</version>
 											<type>zip</type>
-											<classifier>${platform}-${arch}-${build.configuration}-exec</classifier>
+											<classifier>${platform}-${arch}-${build.configuration}-${customization}-exec</classifier>
 											<overWrite>false</overWrite>
 											<outputDirectory>${project.build.directory}/client</outputDirectory>
 										</artifactItem>
@@ -105,7 +105,7 @@
 											<artifactId>mediaserver</artifactId>
 											<version>${project.version}</version>
 											<type>zip</type>
-											<classifier>${platform}-${arch}-${build.configuration}-exec</classifier>
+											<classifier>${platform}-${arch}-${build.configuration}-${customization}-exec</classifier>
 											<overWrite>false</overWrite>
 											<outputDirectory>${project.build.directory}/mediaserver</outputDirectory>
 										</artifactItem>
@@ -114,7 +114,7 @@
 											<artifactId>traytool</artifactId>
 											<version>${project.version}</version>
 											<type>zip</type>
-											<classifier>${platform}-${arch}-${build.configuration}-exec</classifier>
+											<classifier>${platform}-${arch}-${build.configuration}-${customization}-exec</classifier>
 											<overWrite>false</overWrite>
 											<outputDirectory>${project.build.directory}/traytool</outputDirectory>
 										</artifactItem>								
@@ -123,7 +123,7 @@
 											<artifactId>mediaproxy</artifactId>
 											<version>${project.version}</version>
 											<type>zip</type>
-											<classifier>${platform}-${arch}-${build.configuration}-exec</classifier>
+											<classifier>${platform}-${arch}-${build.configuration}-${customization}-exec</classifier>
 											<overWrite>false</overWrite>
 											<outputDirectory>${project.build.directory}/mediaproxy</outputDirectory>
 										</artifactItem>											

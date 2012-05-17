@@ -9,7 +9,7 @@ static const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
 
 QnPlAxisResource::QnPlAxisResource()
 {
-    setAuth("root", "1");
+    setAuth("root", "root");
     m_lastMotionReadTime = 0;
 }
 
