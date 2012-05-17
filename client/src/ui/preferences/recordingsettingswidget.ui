@@ -80,7 +80,7 @@
          <string comment="Grabs Eve window"/>
         </property>
         <property name="text">
-         <string>HD Witness Window</string>
+         <string>Application Window</string>
         </property>
        </widget>
       </item>
