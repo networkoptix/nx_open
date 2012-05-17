@@ -103,19 +103,19 @@ void getFrame_avgY_array_8_x(const CLVideoDecoderOutput* frame, const CLVideoDec
             for (int i = 0; i < rowCnt;)
             {
                 //__m128i partSum = _mm_sad_epu8(*src, zerroConst); // src 16 bytes sum
-                __m128i partSum = _mm_sad_epu8(*src, *srcPrev); // src 16 bytes sum
+                __m128i partSum = _mm_sad_epu8(*src, *srcPrev); // src 16 bytes sum // SSE2
                 src += lineSize;
                 srcPrev += lineSize;
                 ++i;
-                blockSum = _mm_add_epi32(blockSum, partSum);
+                blockSum = _mm_add_epi32(blockSum, partSum); // SSE2
             }
             linePtr++;
             linePtrPrev++;
 
             // get avg value
             int pixels = rowCnt * 8;
-            *dstCurLine = _mm_cvtsi128_si32(blockSum) / pixels;
-            dstCurLine[MD_HEIGHT] = _mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)) / pixels;
+            *dstCurLine = _mm_cvtsi128_si32(blockSum) / pixels; // SSE2
+            dstCurLine[MD_HEIGHT] = _mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)) / pixels; // SSE2
             dstCurLine += MD_HEIGHT*2;
         }  
         curLineNum = nextLineNum;
@@ -150,21 +150,21 @@ void getFrame_avgY_array_8_x_mc(const CLVideoDecoderOutput* frame, quint8* dst)
         for (int x = 0; x < xSteps; ++x)
         {
             __m128i blockSum;
-            blockSum = _mm_xor_si128(blockSum, blockSum);
+            blockSum = _mm_xor_si128(blockSum, blockSum); // SSE2
             const __m128i* src = linePtr;
             for (int i = 0; i < rowCnt;)
             {
-                __m128i partSum = _mm_sad_epu8(*src, zerroConst); // src 16 bytes sum
+                __m128i partSum = _mm_sad_epu8(*src, zerroConst); // src 16 bytes sum // SSE2
                 src += lineSize;
                 ++i;
-                blockSum = _mm_add_epi32(blockSum, partSum);
+                blockSum = _mm_add_epi32(blockSum, partSum); // SSE2
             }
             linePtr++;
 
             // get avg value
             int pixels = rowCnt * 8;
-            *dstCurLine = _mm_cvtsi128_si32(blockSum) / pixels;
-            dstCurLine[MD_HEIGHT] = _mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)) / pixels;
+            *dstCurLine = _mm_cvtsi128_si32(blockSum) / pixels; // SSE2
+            dstCurLine[MD_HEIGHT] = _mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)) / pixels; // SSE2
             dstCurLine += MD_HEIGHT*2;
         }  
         curLineNum = nextLineNum;
@@ -199,23 +199,23 @@ void getFrame_avgY_array_16_x(const CLVideoDecoderOutput* frame, const CLVideoDe
         {
 
             __m128i blockSum;
-            blockSum = _mm_xor_si128(blockSum, blockSum);
+            blockSum = _mm_xor_si128(blockSum, blockSum); // SSE2
             const __m128i* src = linePtr;
             const __m128i* src2 = linePtr2;
             for (int i = 0; i < rowCnt;)
             {
-                __m128i partSum = _mm_sad_epu8(*src, *src2); // src 16 bytes sum
+                __m128i partSum = _mm_sad_epu8(*src, *src2); // src 16 bytes sum // SSE2
                 src += lineSize;
                 src2 += lineSize;
                 ++i;
-                blockSum = _mm_add_epi32(blockSum, partSum);
+                blockSum = _mm_add_epi32(blockSum, partSum); // SSE2
             }
             linePtr++;
             linePtr2++;
 
             // get avg value
             int pixels = rowCnt * 16;
-            *dstCurLine = (_mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)) + _mm_cvtsi128_si32(blockSum)) / pixels;
+            *dstCurLine = (_mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)) + _mm_cvtsi128_si32(blockSum)) / pixels; // SSE2
             dstCurLine += MD_HEIGHT;
         }  
         curLineNum = nextLineNum;
@@ -247,20 +247,20 @@ void getFrame_avgY_array_16_x_mc(const CLVideoDecoderOutput* frame, quint8* dst)
         {
 
             __m128i blockSum;
-            blockSum = _mm_xor_si128(blockSum, blockSum);
+            blockSum = _mm_xor_si128(blockSum, blockSum); // SSE2
             const __m128i* src = linePtr;
             for (int i = 0; i < rowCnt;)
             {
-                __m128i partSum = _mm_sad_epu8(*src, zerroConst); // src 16 bytes sum
+                __m128i partSum = _mm_sad_epu8(*src, zerroConst); // src 16 bytes sum // SSE2
                 src += lineSize;
                 ++i;
-                blockSum = _mm_add_epi32(blockSum, partSum);
+                blockSum = _mm_add_epi32(blockSum, partSum); // SSE2
             }
             linePtr++;
 
             // get avg value
             int pixels = rowCnt * 16;
-            *dstCurLine = (_mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)) + _mm_cvtsi128_si32(blockSum)) / pixels;
+            *dstCurLine = (_mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)) + _mm_cvtsi128_si32(blockSum)) / pixels; // SSE2
             dstCurLine += MD_HEIGHT;
         }  
         curLineNum = nextLineNum;
@@ -305,26 +305,26 @@ void getFrame_avgY_array_x_x(const CLVideoDecoderOutput* frame, const CLVideoDec
         {
 
             __m128i blockSum;
-            blockSum = _mm_xor_si128(blockSum, blockSum);
+            blockSum = _mm_xor_si128(blockSum, blockSum); // SSE2
             const __m128i* src = linePtr;
             const __m128i* src2 = linePtr2;
             for (int i = 0; i < rowCnt;)
             {
-                __m128i partSum = _mm_sad_epu8(*src, *src2); // src 16 bytes sum
+                __m128i partSum = _mm_sad_epu8(*src, *src2); // src 16 bytes sum // SSE2
                 src += lineSize;
                 src2 += lineSize;
                 ++i;
-                blockSum = _mm_add_epi32(blockSum, partSum);
+                blockSum = _mm_add_epi32(blockSum, partSum); // SSE2
             }
             linePtr++;
             linePtr2++;
 
             // get avg value
-            squareSum += _mm_cvtsi128_si32(blockSum);
+            squareSum += _mm_cvtsi128_si32(blockSum); // SSE2
             squareStep++;
             if (squareStep == sqWidth)
                 flushData();
-            squareSum += _mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8));
+            squareSum += _mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)); // SSE2
             if (squareStep == sqWidth)
                 flushData();
         }
@@ -371,23 +371,23 @@ void getFrame_avgY_array_x_x_mc(const CLVideoDecoderOutput* frame, quint8* dst, 
         {
 
             __m128i blockSum;
-            blockSum = _mm_xor_si128(blockSum, blockSum);
+            blockSum = _mm_xor_si128(blockSum, blockSum); // SSE2
             const __m128i* src = linePtr;
             for (int i = 0; i < rowCnt;)
             {
-                __m128i partSum = _mm_sad_epu8(*src, zerroConst); // src 16 bytes sum
+                __m128i partSum = _mm_sad_epu8(*src, zerroConst); // src 16 bytes sum // SSE2
                 src += lineSize;
                 ++i;
-                blockSum = _mm_add_epi32(blockSum, partSum);
+                blockSum = _mm_add_epi32(blockSum, partSum); // SSE2
             }
             linePtr++;
 
             // get avg value
-            squareSum += _mm_cvtsi128_si32(blockSum);
+            squareSum += _mm_cvtsi128_si32(blockSum); // SSE2
             squareStep++;
             if (squareStep == sqWidth)
                 flushData();
-            squareSum += _mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8));
+            squareSum += _mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)); // SSE2
             if (squareStep == sqWidth)
                 flushData();
         }
@@ -453,8 +453,8 @@ void QnMotionEstimation::scaleMask()
                 memcpy(dst + i*MD_HEIGHT , src + i*MD_HEIGHT, MD_HEIGHT);
         }
         else {
-            dst[0] = _mm_min_epu8(dst[0], src[0]);
-            dst[1] = _mm_min_epu8(dst[1], src[1]);
+            dst[0] = _mm_min_epu8(dst[0], src[0]); // SSE2
+            dst[1] = _mm_min_epu8(dst[1], src[1]); // SSE2
         }
         prevILineNum = iLineNum;
         scaledLineNum += lineStep;
@@ -462,7 +462,7 @@ void QnMotionEstimation::scaleMask()
     
     __m128i* mask = (__m128i*) m_scaledMask;
      for (int i = 0; i < m_scaledWidth*2; ++i)
-        mask[i] = _mm_sub_epi8(mask[i], sse_0x80_const);
+        mask[i] = _mm_sub_epi8(mask[i], sse_0x80_const); // SSE2
 }
 
 void QnMotionEstimation::reallocateMask(int width, int height)
@@ -543,10 +543,10 @@ void QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
         __m128i* mask = (__m128i*) m_scaledMask;
         for (int i = 0; i < m_scaledWidth; ++i)
         {
-            __m128i rez1 = _mm_cmpgt_epi8(_mm_sub_epi8(*cur, sse_0x80_const), mask[0]);
-            __m128i rez2 = _mm_cmpgt_epi8(_mm_sub_epi8(cur[1], sse_0x80_const), mask[1]);
+            __m128i rez1 = _mm_cmpgt_epi8(_mm_sub_epi8(*cur, sse_0x80_const), mask[0]); // SSE2
+            __m128i rez2 = _mm_cmpgt_epi8(_mm_sub_epi8(cur[1], sse_0x80_const), mask[1]); // SSE2
 
-            m_resultMotion[i] |= reverseBits( (_mm_movemask_epi8(rez2) << 16) + _mm_movemask_epi8(rez1));
+            m_resultMotion[i] |= reverseBits( (_mm_movemask_epi8(rez2) << 16) + _mm_movemask_epi8(rez1)); // SSE2
             cur += 2;
             mask += 2;
         }
