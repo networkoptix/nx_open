@@ -69,7 +69,7 @@ win* {
 unix {
   LIBS += ${linux.oslibs}
   DEFINES += QN_EXPORT=
-  QMAKE_CXXFLAGS += -msse4.1
+  QMAKE_CXXFLAGS += -msse2
   DEFINES += ${linux.defines}
 }
 
