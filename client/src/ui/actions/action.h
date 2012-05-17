@@ -52,14 +52,15 @@ public:
     }
 
     /**
-     * \returns                         Possible types of this action's targets.
+     * \returns                         Possible types of this action's default parameter.
      */
-    Qn::ActionParameterTypes targetTypes() const {
+    Qn::ActionParameterTypes defaultParameterTypes() const {
         return static_cast<Qn::ActionParameterTypes>(static_cast<int>(m_flags) & Qn::TargetTypeMask);
     }
 
     /**
-     * \returns                         Permissions that are require
+     * \param target                    Name of the action parameter.
+     * \returns                         Permissions that are required for the provided parameter.
      */
     Qn::Permissions requiredPermissions(const QString &target = QString()) const {
         return m_requiredPermissions.value(target);
@@ -67,6 +68,10 @@ public:
 
     void setRequiredPermissions(Qn::Permissions requiredPermissions);
 
+    /**
+     * \param target                    Name of action parameter.
+     * \param requiredPermissions       Permissions required for the provided parameter.
+     */
     void setRequiredPermissions(const QString &target, Qn::Permissions requiredPermissions);
 
     Qn::ActionFlags flags() const {
@@ -75,22 +80,43 @@ public:
 
     void setFlags(Qn::ActionFlags flags);
 
+    /**
+     * \returns                         Default text of this action.
+     */
     const QString &normalText() const {
         return m_normalText;
     }
 
+    /**
+     * \param normalText                Default text of this action.
+     */
     void setNormalText(const QString &normalText);
 
+    /**
+     * \returns                         Text for this action that is to be used when it is toggled.
+     */
     const QString &toggledText() const {
-        return m_toggledText;
+        return m_toggledText.isEmpty() ? m_normalText : m_toggledText;
     }
 
+    /**
+     * \param toggledText               Text for this action that is to be used when it is toggled.
+     *                                  If empty, default text will be used.
+     */
     void setToggledText(const QString &toggledText);
 
+    /**
+     * \returns                         Text for this action that is to be used when it is pulled into 
+     *                                  the enclosing menu.
+     */
     const QString &pulledText() const {
-        return m_pulledText;
+        return m_pulledText.isEmpty() ? m_normalText : m_pulledText;
     }
 
+    /**
+     * \param pulledText                Text for this action that is to be used when it is pulled into the
+     *                                  enclosing menu. If empty, default text will be used.
+     */
     void setPulledText(const QString &pulledText);
 
     QnActionCondition *condition() const {
@@ -113,7 +139,7 @@ protected:
     virtual bool event(QEvent *event) override;
 
 private slots:
-    void at_toggled(bool checked);
+    void updateText();
 
 private:
     const Qn::ActionId m_id;
