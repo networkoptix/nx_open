@@ -1,5 +1,4 @@
 TEMPLATE = app
-ICON = eve_logo.icns
 DEFINES += CL_FORCE_LOGO
 DEFINES += QT_QTCOLORPICKER_IMPORT
 
@@ -9,7 +8,6 @@ CONFIG(debug, debug|release) {
 
 win32 {
   QMAKE_LFLAGS += /MACHINE:${arch}
-  RC_FILE = ${project.build.sourceDirectory}/uniclient.rc
   QMAKE_CXXFLAGS += -Zc:wchar_t
   QMAKE_CXXFLAGS -= -Zc:wchar_t- 
 }

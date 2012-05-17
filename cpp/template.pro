@@ -1,6 +1,7 @@
 NAME=${project.artifactId}
 BUILDLIB = ${buildLib}
 TARGET = ${project.artifactId}
+ICON = ${project.build.directory}/hdw_logo.ico
 VERSION = ${project.version}
 QMAKE_INFO_PLIST = Info.plist
 CONFIG += precompile_header $$BUILDLIB
@@ -40,6 +41,7 @@ CONFIG(release, debug|release) {
 }
 
 win* {
+  RC_FILE = ${project.build.directory}/hdwitness.rc
   CONFIG += ${arch}
   LIBS += ${windows.oslibs}
   DEFINES += ${windows.defines}  

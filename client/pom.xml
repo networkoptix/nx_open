@@ -237,14 +237,6 @@
 								</pathconvert>								
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${pri})</echo>
 
-								<fileset id="qrc_path" dir="${project.build.sourceDirectory}">
-									<include name="**/*.qrc" />
-								</fileset>
-								<pathconvert pathsep="${line.separator}" property="qrc" refid="qrc_path">
-									<map from="" to="RESOURCES += "/>
-								</pathconvert>								
-								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${qrc}</echo>
-
 								<fileset id="generated_qrc_path" dir="${project.build.directory}">
 									<include name="**/*.qrc" />
 								</fileset>
