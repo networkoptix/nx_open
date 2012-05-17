@@ -1,6 +1,7 @@
 NAME=${project.artifactId}
 BUILDLIB = ${buildLib}
 TARGET = ${project.artifactId}
+ICON = ${project.build.directory}/hdw_logo.ico
 VERSION = ${project.version}
 QMAKE_INFO_PLIST = Info.plist
 CONFIG += precompile_header $$BUILDLIB
@@ -12,7 +13,7 @@ DEFINES += ${global.defines}
 
 QT *= ${qtlib1} ${qtlib2} ${qtlib3} ${qtlib4} ${qtlib5} ${qtlib6} ${qtlib7} ${qtlib8} ${qtlib9}
 
-INCLUDEPATH += ${project.build.sourceDirectory}  ${basedir}/../common/src ${project.build.directory}/build/include
+INCLUDEPATH += ${project.build.sourceDirectory} ${project.build.directory}  ${basedir}/../common/src ${project.build.directory}/build/include
 PRECOMPILED_HEADER = ${project.build.sourceDirectory}/StdAfx.h
 PRECOMPILED_SOURCE = ${project.build.sourceDirectory}/StdAfx.cpp
 
@@ -40,6 +41,7 @@ CONFIG(release, debug|release) {
 }
 
 win* {
+  RC_FILE = ${project.build.directory}/hdwitness.rc
   CONFIG += ${arch}
   LIBS += ${windows.oslibs}
   DEFINES += ${windows.defines}  
