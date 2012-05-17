@@ -11,7 +11,7 @@ def genskin():
   <qresource prefix="/skin">
   """
 
-  skin_dir = '${project.build.directory}/skin'
+  skin_dir = '${project.build.directory}/bin/${build.configuration}/skin'
   for root, dirs, files in os.walk(skin_dir):
     parent = root[len(skin_dir) + 1:]
     if '.svn' in dirs:

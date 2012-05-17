@@ -143,7 +143,7 @@
 							<outputDirectory>${project.build.directory}</outputDirectory>
 							<resources>          
 								<resource>
-									<targetPath>${project.build.directory}/skin</targetPath>
+									<targetPath>${project.build.directory}/bin/${build.configuration}/skin</targetPath>
 									<directory>${basedir}/resource</directory>
 									<includes>
 										<include>globals.ini</include>
@@ -151,7 +151,7 @@
 									<filtering>true</filtering>											
 								</resource>	
 								<resource>
-									<targetPath>${project.build.directory}/skin</targetPath>
+									<targetPath>${project.build.directory}/bin/${build.configuration}/skin</targetPath>
 									<directory>${basedir}/resource/${custom.skin}/skin</directory>
 									<filtering>false</filtering>
 									<includes>
