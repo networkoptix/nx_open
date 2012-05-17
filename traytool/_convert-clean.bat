@@ -1,1 +1,1 @@
-..\cpp\_convert-clean.bat
+..\cpp\_convert-clean.bat %1

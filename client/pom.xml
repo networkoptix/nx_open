@@ -18,10 +18,10 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>client</artifactId>
 	<packaging>pom</packaging>
-	<name>${client.name}</name>	
+	<name>HD Witness Client</name>
 
 	<properties>
-		<custom.skin>default</custom.skin>
+		<product.title>${client.name}</product.title>
 		<!--QT libs used-->	
 		<qtlib1>core</qtlib1>
 		<qtlib2>gui</qtlib2>
@@ -151,8 +151,12 @@
 									<filtering>true</filtering>											
 								</resource>	
 								<resource>
-									<directory>${basedir}/resource/${custom.skin}/</directory>
+									<targetPath>${project.build.directory}/skin</targetPath>
+									<directory>${basedir}/resource/${custom.skin}/skin</directory>
 									<filtering>false</filtering>
+									<includes>
+										<include>**/*.png</include>
+									</includes>	
 								</resource> 						
 							</resources>              
 							<encoding>UTF-8</encoding>

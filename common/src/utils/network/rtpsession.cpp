@@ -123,7 +123,7 @@ void RTPSession::parseSDP()
         else if (lineLower.startsWith("a=control:"))
         {
             QByteArray lineRest = line.mid(QByteArray("a=control:").length());
-            if (lineLower.startsWith("a=control:track"))
+            if (lineLower.startsWith("a=control:track") || lineLower.startsWith("a=control:video") || lineLower.startsWith("a=control:audio"))
             {
                 int i = 0;
                 for (; i < lineRest.size() && !(lineRest[i] >= '0' && lineRest[i] <= '9'); ++i);
@@ -143,6 +143,7 @@ void RTPSession::parseSDP()
                     trackNum = lineRest.mid(i).toUInt();
                 }
             }
+
         }
     }
     if (trackNum >= 0)

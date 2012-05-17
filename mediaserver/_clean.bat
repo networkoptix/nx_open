@@ -1,1 +1,1 @@
-..\cpp\_clean.bat
+..\cpp\_clean.bat %1

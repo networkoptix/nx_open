@@ -18,9 +18,10 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>testcamera</artifactId>
 	<packaging>pom</packaging>
-	<name>${testcamera.name}</name>	
+	<name>HD Witness Test Camera</name>	
 
 	<properties>
+		<product.title>${testcamera.name}</product.title>	
 		<!--QT libs used-->
 		<qtlib1>core</qtlib1>
 		<qtlib2>network</qtlib2>
