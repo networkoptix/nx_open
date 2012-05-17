@@ -18,7 +18,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>client</artifactId>
 	<packaging>pom</packaging>
-	<name>Network Optix HD Witness Client</name>	
+	<name>${client.name}</name>	
 
 	<properties>
 		<custom.skin>default</custom.skin>
@@ -128,6 +128,39 @@
 		<sourceDirectory>${basedir}/src</sourceDirectory>
 
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.5</version>
+				<executions>
+					<execution>
+						<id>prepare-skin</id>
+						<phase>initialize</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+							<resources>          
+								<resource>
+									<targetPath>${project.build.directory}/skin</targetPath>
+									<directory>${basedir}/resource</directory>
+									<includes>
+										<include>globals.ini</include>
+									</includes>	
+									<filtering>true</filtering>											
+								</resource>	
+								<resource>
+									<directory>${basedir}/resource/${custom.skin}/</directory>
+									<filtering>false</filtering>
+								</resource> 						
+							</resources>              
+							<encoding>UTF-8</encoding>
+						</configuration>            
+					</execution>				
+				</executions>
+			</plugin>			
+
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>

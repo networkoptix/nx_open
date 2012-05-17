@@ -1,6 +1,7 @@
 #include "single_shot_file_reader.h"
 #include "filetypesupport.h"
 #include "utils/common/synctime.h"
+#include "core/resource/storage_resource.h"
 
 QnSingleShotFileStreamreader::QnSingleShotFileStreamreader(QnResourcePtr resource):
     QnAbstractMediaStreamDataProvider(resource)
@@ -11,6 +12,7 @@ QnAbstractMediaDataPtr QnSingleShotFileStreamreader::getNextData()
 {
 	CodecID compressionType;
     QString lowerFileName = getResource()->getUrl().toLower();
+
 
     if (lowerFileName.endsWith(QLatin1String(".png")))
         compressionType = CODEC_ID_PNG;
@@ -25,11 +27,13 @@ QnAbstractMediaDataPtr QnSingleShotFileStreamreader::getNextData()
     else
         return QnAbstractMediaDataPtr();
 
-    QFile file(getResource()->getUrl());
-    if (!file.open(QIODevice::ReadOnly))
+    if (m_storage == 0)
+        m_storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(getResource()->getUrl()));
+    QIODevice* file = m_storage->open(getResource()->getUrl(), QIODevice::ReadOnly);
+    if (file == 0)
         return QnAbstractMediaDataPtr();
 
-    QByteArray srcData = file.readAll();
+    QByteArray srcData = file->readAll();
 	QnCompressedVideoDataPtr outData(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, srcData.size()));
     outData->data.write(srcData);
 
@@ -39,6 +43,7 @@ QnAbstractMediaDataPtr QnSingleShotFileStreamreader::getNextData()
     outData->dataProvider = this;
 	outData->channelNumber = 0;
 
+    delete file;
 	return outData;
 }
 
@@ -47,4 +52,9 @@ void QnSingleShotFileStreamreader::run()
     QnAbstractMediaDataPtr data = getNextData();
     if (data)
         putData(data);
+}
+
+void QnSingleShotFileStreamreader::setStorage(QnStorageResourcePtr storage)
+{
+    m_storage = storage;
 }

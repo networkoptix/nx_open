@@ -461,7 +461,7 @@ void QnMotionEstimation::scaleMask()
     }
     
     __m128i* mask = (__m128i*) m_scaledMask;
-     for (int i = 0; i < m_scaledWidth; ++i)
+     for (int i = 0; i < m_scaledWidth*2; ++i)
         mask[i] = _mm_sub_epi8(mask[i], sse_0x80_const);
 }
 
@@ -540,7 +540,6 @@ void QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
 
         // calculate difference between frames
         __m128i* cur = (__m128i*) m_frameBuffer[idx];
-        __m128i* prev = (__m128i*) m_frameBuffer[prevIdx];
         __m128i* mask = (__m128i*) m_scaledMask;
         for (int i = 0; i < m_scaledWidth; ++i)
         {
@@ -549,7 +548,6 @@ void QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
 
             m_resultMotion[i] |= reverseBits( (_mm_movemask_epi8(rez2) << 16) + _mm_movemask_epi8(rez1));
             cur += 2;
-            prev += 2;
             mask += 2;
         }
     }

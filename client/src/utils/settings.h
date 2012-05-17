@@ -29,6 +29,7 @@ public:
         bool animateBackground;
         bool openLayoutsOnLogin;
         QColor backgroundColor;
+        bool forceSoftYUV;
     };
 
     void update(const Data &data);
@@ -50,6 +51,9 @@ public:
     void setLayoutsOpenedOnLogin(bool openLayoutsOnLogin);
 
     void addAuxMediaRoot(const QString &root);
+
+    bool isForceSoftYUV() const;
+    void setForceSoftYUV(bool value);
 
     struct ConnectionData {
         ConnectionData()

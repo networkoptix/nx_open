@@ -80,21 +80,15 @@ private:
 // ------------------------------------
 
 SignDialog::SignDialog(const QString& fileName, QWidget *parent) :
-    QDialog(parent),
+    QDialog(parent, Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint),
     ui(new Ui::SignDialog),
     m_requestHandle(-1),
     m_camDispay(0),
     m_reader(0),
-    m_fileName(fileName)
+    m_fileName(fileName),
+    m_renderer(0),
+    m_glWindow(0)
 {
-    renderer = 0;
-    glWindow = 0;
-
-    Qt::WindowFlags flags = 0;
-    flags |= Qt::WindowMaximizeButtonHint;
-    flags |= Qt::WindowCloseButtonHint;
-    setWindowFlags( flags );
-
     ui->setupUi(this);
 
     QVBoxLayout* layout = new QVBoxLayout(ui->videoSpacer);
@@ -104,13 +98,11 @@ SignDialog::SignDialog(const QString& fileName, QWidget *parent) :
     QGLFormat glFormat;
     glFormat.setOption(QGL::SampleBuffers); /* Multisampling. */
     glFormat.setSwapInterval(1); /* Turn vsync on. */
-    glWindow = new QnSignDialogGlWidget(glFormat);
-    layout->addWidget(glWindow);
+    m_glWindow = new QnSignDialogGlWidget(glFormat);
+    layout->addWidget(m_glWindow);
 
-    
-    //aviRes = QnAviResourcePtr(new QnAviResource("e:/Users/roman76r/blake/FILMS_TEASERS 2_Open for Business Pt 1_kimberely Kane & Dahlia Grey.wmv"));
-    aviRes = QnAviResourcePtr(new QnAviResource(m_fileName));
-    m_reader = static_cast<QnAbstractArchiveReader*> (aviRes->createDataProvider(QnResource::Role_Default));
+    m_resource = QnAviResourcePtr(new QnAviResource(m_fileName));
+    m_reader = static_cast<QnAbstractArchiveReader*> (m_resource->createDataProvider(QnResource::Role_Default));
     m_reader->setCycleMode(false);
     m_camDispay = new QnSignDialogDisplay();
 
@@ -120,9 +112,9 @@ SignDialog::SignDialog(const QString& fileName, QWidget *parent) :
 
     connect(m_camDispay, SIGNAL(gotImageSize(int, int)), this, SLOT(at_gotImageSize(int, int)));
 
-    renderer = new QnResourceWidgetRenderer(1, 0, glWindow->context());
-    glWindow->setRenderer(renderer);
-    m_camDispay->addVideoChannel(0, renderer, true);
+    m_renderer = new QnResourceWidgetRenderer(1, 0, m_glWindow->context());
+    m_glWindow->setRenderer(m_renderer);
+    m_camDispay->addVideoChannel(0, m_renderer, true);
     m_camDispay->setSpeed(1024*1024);
     m_reader->addDataProcessor(m_camDispay);
     m_reader->start();
@@ -135,7 +127,7 @@ SignDialog::SignDialog(const QString& fileName, QWidget *parent) :
 
 SignDialog::~SignDialog()
 {
-    renderer->beforeDestroy();
+    m_renderer->beforeDestroy();
 
     m_reader->pleaseStop();
     m_camDispay->pleaseStop();
@@ -146,8 +138,8 @@ SignDialog::~SignDialog()
     
     delete m_camDispay;
     delete m_reader;
-    delete renderer;
-    delete glWindow;
+    delete m_renderer;
+    delete m_glWindow;
 }
 
 QRect SignDialog::calcVideoRect(double windowWidth, double windowHeight, double textureWidth, double textureHeight)
@@ -211,7 +203,7 @@ void SignDialog::at_calcSignInProgress(QByteArray sign, int progress)
 
 void SignDialog::at_gotImageSize(int width, int height)
 {
-    if (glWindow) 
-        glWindow->setImageSize(width, height);
+    if (m_glWindow) 
+        m_glWindow->setImageSize(width, height);
     ui->signInfoLabel->setImageSize(width, height);
 }

@@ -47,11 +47,10 @@ public:
     bool isLowQualityImage() const;
     qint64 lastDisplayedTime() const;
     QnMetaDataV1Ptr lastFrameMetadata(int channel) const; 
-
+    void setForceSoftYUV(bool value);
 private:
     void drawVideoTexture(QnGlRendererTexture *tex0, QnGlRendererTexture *tex1, QnGlRendererTexture *tex2, const float *v_array);
     void updateTexture();
-    void setForceSoftYUV(bool value);
     bool isYuvFormat() const;
     int glRGBFormat() const;
     QnGlRendererTexture *texture(int index);

@@ -24,6 +24,26 @@
 		<directory>${arch}</directory>
 		<sourceDirectory>${basedir}</sourceDirectory>
 		<finalName>${pom.parent.artifactId}-${version}.${buildNumber}-${platform}-${arch}-${build.configuration}-${customization}</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>properties-maven-plugin</artifactId>
+				<version>1.0-alpha-2</version>
+				<executions>
+					<execution>
+						<phase>initialize</phase>
+						<goals>
+							<goal>read-project-properties</goal>
+						</goals>
+						<configuration>
+							<files>
+								<file>../build-${customization}.properties</file>
+							</files>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
 	</build>
 
 	<properties>
@@ -76,7 +96,7 @@
 											<artifactId>client</artifactId>
 											<version>${project.version}</version>
 											<type>zip</type>
-											<classifier>${platform}-${arch}-${build.configuration}-exec</classifier>
+											<classifier>${platform}-${arch}-${build.configuration}-${customization}-exec</classifier>
 											<overWrite>false</overWrite>
 											<outputDirectory>${project.build.directory}/client</outputDirectory>
 										</artifactItem>
@@ -85,7 +105,7 @@
 											<artifactId>mediaserver</artifactId>
 											<version>${project.version}</version>
 											<type>zip</type>
-											<classifier>${platform}-${arch}-${build.configuration}-exec</classifier>
+											<classifier>${platform}-${arch}-${build.configuration}-${customization}-exec</classifier>
 											<overWrite>false</overWrite>
 											<outputDirectory>${project.build.directory}/mediaserver</outputDirectory>
 										</artifactItem>
@@ -94,7 +114,7 @@
 											<artifactId>traytool</artifactId>
 											<version>${project.version}</version>
 											<type>zip</type>
-											<classifier>${platform}-${arch}-${build.configuration}-exec</classifier>
+											<classifier>${platform}-${arch}-${build.configuration}-${customization}-exec</classifier>
 											<overWrite>false</overWrite>
 											<outputDirectory>${project.build.directory}/traytool</outputDirectory>
 										</artifactItem>								
@@ -103,7 +123,7 @@
 											<artifactId>mediaproxy</artifactId>
 											<version>${project.version}</version>
 											<type>zip</type>
-											<classifier>${platform}-${arch}-${build.configuration}-exec</classifier>
+											<classifier>${platform}-${arch}-${build.configuration}-${customization}-exec</classifier>
 											<overWrite>false</overWrite>
 											<outputDirectory>${project.build.directory}/mediaproxy</outputDirectory>
 										</artifactItem>											
@@ -121,7 +141,7 @@
 						<executions>
 							<execution>
 								<id>prepare-resources</id>
-								<phase>initialize</phase>
+								<phase>process-sources</phase>
 								<goals>
 									<goal>copy-resources</goal>
 								</goals>
@@ -133,7 +153,11 @@
 											<filtering>true</filtering>
 										</resource>
 										<resource>
-											<directory>${project.build.sourceDirectory}/maven/bin-resources</directory>
+											<directory>${project.build.sourceDirectory}/maven/bin-resources/common</directory>
+											<filtering>false</filtering>
+										</resource>		
+										<resource>
+											<directory>${project.build.sourceDirectory}/maven/bin-resources/custom/${installer.customization}</directory>
 											<filtering>false</filtering>
 										</resource>		
 										<resource>
@@ -157,7 +181,7 @@
 						<executions>
 							<execution>
 								<id>wix-heat</id>
-								<phase>generate-sources</phase>
+								<phase>process-sources</phase>
 								<goals>
 									<goal>exec</goal>
 								</goals>

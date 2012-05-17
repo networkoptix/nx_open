@@ -38,7 +38,7 @@
 				<version>1.0-alpha-2</version>
 				<executions>
 					<execution>
-						<phase>validate</phase>
+						<phase>initialize</phase>
 						<goals>
 							<goal>read-project-properties</goal>
 						</goals>

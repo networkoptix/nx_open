@@ -77,10 +77,11 @@ protected:
     QTreeView *currentItemView() const;
     QItemSelectionModel *currentSelectionModel() const;
 
+    bool isLayoutSearchable(QnWorkbenchLayout *layout) const;
     QnResourceSearchProxyModel *layoutModel(QnWorkbenchLayout *layout, bool create) const;
     QnResourceSearchSynchronizer *layoutSynchronizer(QnWorkbenchLayout *layout, bool create) const;
-    QString layoutSearchString(QnWorkbenchLayout *layout) const;
-    void setLayoutSearchString(QnWorkbenchLayout *layout, const QString &searchString) const;
+    QString layoutFilter(QnWorkbenchLayout *layout) const;
+    void setLayoutFilter(QnWorkbenchLayout *layout, const QString &filter) const;
 
     void killSearchTimer();
 
