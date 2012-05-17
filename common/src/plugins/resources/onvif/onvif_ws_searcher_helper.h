@@ -27,6 +27,7 @@ private:
 
     WSResult parseDigitalWachdog(QByteArray& datagram);
     WSResult parseBrickCom(QByteArray& datagram);
+    WSResult parseSony(QByteArray& datagram);
 };
 
 #endif // onvif_ws_searcher_helper_h1338
