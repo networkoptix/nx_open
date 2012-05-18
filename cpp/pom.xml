@@ -83,7 +83,7 @@
 							<failOnError>false</failOnError>
 
 							<target>							
-								<chmod file="${basedir}/../*.sh" perm="755"/>
+								<chmod file="${basedir}/../**/*.sh" perm="755"/>
 
 								<dirset id="includes_path" dir="${project.build.directory}/build/include" includes="*"/>
 								<pathconvert pathsep="${line.separator}" property="includes" refid="includes_path">
