@@ -394,6 +394,8 @@ void QnWorkbenchNavigator::jumpBackward() {
     if(!reader)
         return;
 
+    m_pausedOverride = false;
+
     qint64 pos;
     if(QnCachingTimePeriodLoader *loader = this->loader(m_currentWidget)) {
         const QnTimePeriodList fullPeriods = loader->periods(loader->isMotionRegionsEmpty() ? Qn::RecordingRole : Qn::MotionRole);
@@ -426,6 +428,8 @@ void QnWorkbenchNavigator::jumpForward() {
     if(!reader)
         return;
 
+    m_pausedOverride = false;
+
     qint64 pos;
     if(!(m_currentWidgetFlags & WidgetSupportsPeriods)) {
         pos = reader->endTime();
@@ -453,6 +457,8 @@ void QnWorkbenchNavigator::stepBackward() {
     if(!reader)
         return;
 
+    m_pausedOverride = false;
+
     if (!reader->isSkippingFrames() && reader->currentTime() > reader->startTime()) {
         quint64 currentTime = m_currentWidget->display()->camera()->getCurrentTime();
 
@@ -470,6 +476,8 @@ void QnWorkbenchNavigator::stepForward() {
     QnAbstractArchiveReader *reader = m_currentWidget->display()->archiveReader();
     if(!reader)
         return;
+
+    m_pausedOverride = false;
 
     reader->nextFrame();
 }
@@ -925,7 +933,7 @@ void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value) {
             if (m_timeSlider->isSliderDown()) {
                 reader->jumpTo(value * 1000, 0);
             } else {
-                reader->jumpToPreviousFrame(value * 1000);
+                reader->jumpTo(value * 1000, value * 1000); /* Precise seek. */
             }
         }
 
@@ -952,6 +960,9 @@ void QnWorkbenchNavigator::at_timeSlider_sliderReleased() {
 
     if(isPlaying())
         m_pausedOverride = false;
+
+    /* Handler must be re-run for precise seeking. */
+    at_timeSlider_valueChanged(m_timeSlider->value());
 }
 
 void QnWorkbenchNavigator::at_timeSlider_selectionPressed() {

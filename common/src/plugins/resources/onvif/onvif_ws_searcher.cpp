@@ -2,6 +2,7 @@
 #include "onvif_ws_searcher_helper.h"
 #include "../digitalwatchdog/digital_watchdog_resource.h"
 #include "../brickcom/brickcom_resource.h"
+#include "../sony/sony_resource.h"
 
 
 QnPlOnvifWsSearcher::QnPlOnvifWsSearcher()
@@ -62,6 +63,10 @@ QnResourcePtr QnPlOnvifWsSearcher::createResource(QnId resourceTypeId, const QnR
     {
         result = QnNetworkResourcePtr( new QnPlBrickcomResource() );
     }
+    else if (resourceType->getManufacture() == QnPlSonyResource::MANUFACTURE)
+    {
+        result = QnNetworkResourcePtr( new QnPlSonyResource() );
+    }
     else
         return QnResourcePtr(0);
 
@@ -105,6 +110,11 @@ QnNetworkResourcePtr QnPlOnvifWsSearcher::createResource(const QString& manufact
     {
         result = QnNetworkResourcePtr(new QnPlBrickcomResource());
     }
+    else if (manufacture == QnPlSonyResource::MANUFACTURE)
+    {
+        result = QnNetworkResourcePtr(new QnPlSonyResource());
+    }
+
 
         
     if (result)

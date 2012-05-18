@@ -145,7 +145,7 @@ DEFINES += __STDC_CONSTANT_MACROS
 
 unix {
   LIBS += -lz -lcrypto
-  QMAKE_CXXFLAGS += -msse4.1
+  QMAKE_CXXFLAGS += -msse2
   DEFINES += QN_EXPORT=
 }
 

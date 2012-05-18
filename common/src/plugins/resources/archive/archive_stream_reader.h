@@ -130,6 +130,7 @@ private:
     bool m_exactJumpToSpecifiedFrame;
     bool m_ignoreSkippingFrame;
     qint64 m_lastJumpTime;
+    qint64 m_lastSkipTime;
     qint64 m_skipFramesToTime;
     bool m_keepLastSkkipingFrame;
     bool m_singleShot;

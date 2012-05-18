@@ -1,1 +1,1 @@
-..\cpp\_convert.bat
+..\cpp\_convert.bat %1

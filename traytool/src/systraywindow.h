@@ -92,7 +92,8 @@ private:
     int updateServiceInfoInternal(SC_HANDLE service, const QString& serviceName, QAction* startAction, QAction* stopAction, QAction* logAction);
     bool validateData();
     void saveData();
-    bool checkPort(const QString& text, const QString& message);
+    bool checkPortNum(int port, const QString& message);
+    bool isPortFree(int port);
     QUrl getAppServerURL() const;
     void setAppServerURL(const QUrl& url);
     bool isAppServerParamChanged() const;

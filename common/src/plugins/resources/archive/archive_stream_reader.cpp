@@ -43,6 +43,7 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_keepLastSkkipingFrame(true),
     m_ignoreSkippingFrame(false),
     m_lastJumpTime(AV_NOPTS_VALUE),
+    m_lastSkipTime(AV_NOPTS_VALUE),
     m_exactJumpToSpecifiedFrame(false),
     m_quality(MEDIA_Quality_High),
     m_qualityFastSwitch(true),
@@ -135,7 +136,7 @@ void QnArchiveStreamReader::pauseMedia()
         QMutexLocker lock(&m_jumpMtx);
         m_singleShot = true;
         m_singleQuantProcessed = true;
-        m_lastJumpTime = AV_NOPTS_VALUE;
+        m_lastSkipTime = m_lastJumpTime = AV_NOPTS_VALUE;
     }
 }
 
@@ -704,7 +705,7 @@ begin_label:
 
     QMutexLocker mutex(&m_jumpMtx);
     if (jumpTime != DATETIME_NOW)
-        m_lastJumpTime = AV_NOPTS_VALUE; // allow duplicates jump to same position
+        m_lastSkipTime = m_lastJumpTime = AV_NOPTS_VALUE; // allow duplicates jump to same position
 
     return m_currentData;
 }
@@ -798,7 +799,7 @@ void QnArchiveStreamReader::setReverseMode(bool value, qint64 currentTimeHint)
         bool useMutex = !m_externalLocked;
         if (useMutex)
             m_jumpMtx.lock();
-        m_lastJumpTime = AV_NOPTS_VALUE;
+        m_lastSkipTime = m_lastJumpTime = AV_NOPTS_VALUE;
         m_reverseMode = value;
         m_currentTimeHint = currentTimeHint;
         if (useMutex)
@@ -912,6 +913,8 @@ bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
         return m_navDelegate->jumpTo(mksec, skipTime);
     }
 
+    qDebug() << "jumpTo(" << QDateTime::fromMSecsSinceEpoch(mksec / 1000).toString("hh:mm:ss.zzz") << "," << (mksec == skipTime ? "precise" : "rough") << ")";
+
     qint64 newTime = mksec;
     m_playbackMaskSync.lock();
     newTime = m_playbackMaskHelper.findTimeAtPlaybackMask(mksec, m_speed >= 0);
@@ -921,8 +924,9 @@ bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
 
 
     m_jumpMtx.lock();
-    bool needJump = newTime != m_lastJumpTime;
+    bool needJump = newTime != m_lastJumpTime || m_lastSkipTime != skipTime;
     m_lastJumpTime = newTime;
+    m_lastSkipTime = skipTime;
     m_jumpMtx.unlock();
 
     if (needJump)

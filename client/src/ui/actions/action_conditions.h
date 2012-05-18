@@ -46,7 +46,8 @@ public:
      * based on the type of the default parameter. Note that these
      * specialized functions cannot access other parameters.
      * 
-     * 
+     * \param parameters                Parameters to check.
+     * \returns                         Check result.
      */
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters);
 

@@ -571,10 +571,13 @@ void CLCamDisplay::onJumpOccured(qint64 time)
     m_buffering = getBufferingMask();
     m_lastDecodedTime = AV_NOPTS_VALUE;
     //clearUnprocessedData();
+    /*
     for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
         m_nextReverseTime[i] = AV_NOPTS_VALUE;
         m_display[i]->blockTimeValue(time);
     }
+    */
+    
     m_singleShotQuantProcessed = false;
     m_jumpTime = time;
 
@@ -605,12 +608,16 @@ void CLCamDisplay::afterJump(QnAbstractMediaDataPtr media)
     //m_previousVideoDisplayedTime = 0;
     m_totalFrames = 0;
     m_iFrames = 0;
-    for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
-        if (vd && !(vd->flags & QnAbstractMediaData::MediaFlags_Ignore))
-            m_display[i]->blockTimeValue(media->timestamp);
-        m_display[i]->unblockTimeValue();
+    if (!m_afterJump) // if not more (not handled yet) jumps expected
+    {
+        for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
+            if (media && !(media->flags & QnAbstractMediaData::MediaFlags_Ignore)) {
+                m_display[i]->blockTimeValue(media->timestamp);
+            }
+            m_nextReverseTime[i] = AV_NOPTS_VALUE;
+            m_display[i]->unblockTimeValue();
+        }
     }
-
     m_audioDisplay->clearAudioBuffer();
 
     if (mGenerateEndOfStreamSignal)
@@ -809,10 +816,12 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
             return true; // skip packet
         // clear everything we can
         m_bofReceived = false;
+        {
+            QMutexLocker lock(&m_timeMutex);
+            if (m_executingJump == 0) 
+                m_afterJump = false;
+        }
         afterJump(media);
-        QMutexLocker lock(&m_timeMutex);
-        if (m_executingJump == 0) 
-            m_afterJump = false;
         //cl_log.log("ProcessData 2", QDateTime::fromMSecsSinceEpoch(vd->timestamp/1000).toString("hh:mm:ss.zzz"), cl_logALWAYS);
     }
     else if (media->flags & QnAbstractMediaData::MediaFlags_NewServer)
@@ -991,7 +1000,7 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
 
             if (!display(vd, !(vd->flags & QnAbstractMediaData::MediaFlags_Ignore), speed))
                 return false; // keep frame
-            if (m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed)
+            if (m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed && !m_afterJump)
                 m_singleShotQuantProcessed = true;
             return result;
         }

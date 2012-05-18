@@ -18,10 +18,10 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>client</artifactId>
 	<packaging>pom</packaging>
-	<name>${client.name}</name>	
+	<name>HD Witness Client</name>
 
 	<properties>
-		<custom.skin>default</custom.skin>
+		<product.title>${client.name}</product.title>
 		<!--QT libs used-->	
 		<qtlib1>core</qtlib1>
 		<qtlib2>gui</qtlib2>
@@ -143,7 +143,7 @@
 							<outputDirectory>${project.build.directory}</outputDirectory>
 							<resources>          
 								<resource>
-									<targetPath>${project.build.directory}/skin</targetPath>
+									<targetPath>${project.build.directory}/bin/${build.configuration}/skin</targetPath>
 									<directory>${basedir}/resource</directory>
 									<includes>
 										<include>globals.ini</include>
@@ -151,8 +151,12 @@
 									<filtering>true</filtering>											
 								</resource>	
 								<resource>
-									<directory>${basedir}/resource/${custom.skin}/</directory>
+									<targetPath>${project.build.directory}/bin/${build.configuration}/skin</targetPath>
+									<directory>${basedir}/resource/${custom.skin}/skin</directory>
 									<filtering>false</filtering>
+									<includes>
+										<include>**/*.png</include>
+									</includes>	
 								</resource> 						
 							</resources>              
 							<encoding>UTF-8</encoding>
@@ -232,14 +236,6 @@
 									<map from="" to="include("/>
 								</pathconvert>								
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${pri})</echo>
-
-								<fileset id="qrc_path" dir="${project.build.sourceDirectory}">
-									<include name="**/*.qrc" />
-								</fileset>
-								<pathconvert pathsep="${line.separator}" property="qrc" refid="qrc_path">
-									<map from="" to="RESOURCES += "/>
-								</pathconvert>								
-								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${qrc}</echo>
 
 								<fileset id="generated_qrc_path" dir="${project.build.directory}">
 									<include name="**/*.qrc" />
