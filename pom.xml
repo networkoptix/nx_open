@@ -46,6 +46,7 @@
 				</os>
 			</activation>
 			<modules>
+				<module>client</module>
 				<module>traytool</module>	
 				<module>wixsetup</module>
 			</modules>
