@@ -13,7 +13,7 @@ from string import Template
 
 sys.path.insert(0, '../common')
 
-from convert import index_dirs, rmtree, setup_ffmpeg, instantiate_pro, copy_files, BUILDLIB, setup_tools, platform
+from convert import index_dirs, rmtree, setup_ffmpeg, setup_openssl, instantiate_pro, copy_files, BUILDLIB, setup_tools, platform
 from convert import gen_env_sh
 from convert import convert as convert_common
 from common_version import *
@@ -64,6 +64,7 @@ def gen_version_h():
 
 ffmpeg_path, ffmpeg_path_debug, ffmpeg_path_release = setup_ffmpeg()
 tools_path = setup_tools()
+openssl_path = setup_openssl()
 
 if os.path.exists('bin'):
     rmtree('bin')
@@ -98,6 +99,10 @@ if platform() == 'win32':
 elif platform() == 'mac':
     ldpath_debug += ':' + tools_path + '/lib'
     ldpath_release += ':' + tools_path + '/lib'
+
+if platform() == 'win32':
+    copy_files(openssl_path + '/bin/*.dll', 'bin/debug')
+    copy_files(openssl_path + '/bin/*.dll', 'bin/release')
 
 if platform() == 'mac':
     ldpath_debug += ':' + os.path.abspath('../common/bin/debug')

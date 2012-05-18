@@ -4,7 +4,7 @@
 #include "core/resource/resource_consumer.h"
 #include "utils/common/longrunnable.h"
 
-class QnCSFile;
+struct QnCSFile;
 
 class QnColdStoreWriter : public QnResourceConsumer, public CLLongRunnable
 {

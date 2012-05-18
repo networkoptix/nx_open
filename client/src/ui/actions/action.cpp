@@ -16,18 +16,15 @@
 #include "action_manager.h"
 #include "action_target_provider.h"
 #include "action_conditions.h"
-#include "action_target_types.h"
+#include "action_parameter_types.h"
 
 
-QnAction::QnAction(QnActionManager *manager, Qn::ActionId id, QObject *parent): 
+QnAction::QnAction(Qn::ActionId id, QObject *parent): 
     QAction(parent), 
-    QnWorkbenchContextAware(manager),
+    QnWorkbenchContextAware(parent),
     m_id(id),
     m_flags(0)
-{
-    if(!manager)
-        qnNullCritical(manager);
-}
+{}
 
 QnAction::~QnAction() {}
 
@@ -48,9 +45,18 @@ void QnAction::setNormalText(const QString &normalText) {
 }
 
 void QnAction::setToggledText(const QString &toggledText) {
+    if(m_toggledText == toggledText)
+        return;
+
     m_toggledText = toggledText;
 
-    connect(this, SIGNAL(toggled(bool)), this, SLOT(at_toggled(bool)), Qt::UniqueConnection);
+    if(m_toggledText.isEmpty()) {
+        disconnect(this, SIGNAL(toggled(bool)), this, SLOT(updateText()));
+    } else {
+        connect(this, SIGNAL(toggled(bool)), this, SLOT(updateText()), Qt::UniqueConnection);
+    }
+
+    updateText();
 }
 
 void QnAction::setPulledText(const QString &pulledText) {
@@ -73,7 +79,7 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
     if(!(this->scope() & scope) && scope != this->scope())
         return Qn::InvisibleAction;
 
-    int size = parameters.itemsSize();
+    int size = parameters.size();
 
     if(size == 0 && !(m_flags & Qn::NoTarget))
         return Qn::InvisibleAction;
@@ -84,8 +90,8 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
     if(size > 1 && !(m_flags & Qn::MultiTarget))
         return Qn::InvisibleAction;
 
-    Qn::ActionTargetType type = parameters.itemsType();
-    if(!(this->targetTypes() & type) && size != 0)
+    Qn::ActionParameterType type = parameters.type();
+    if(!(this->defaultParameterTypes() & type) && size != 0)
         return Qn::InvisibleAction;
 
     if(!m_requiredPermissions.empty()) {
@@ -97,7 +103,7 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
             if(key.isEmpty()) {
                 resources = parameters.resources();
             } else if(parameters.hasArgument(key)) {
-                resources = QnActionTargetTypes::resources(parameters.argument(key));
+                resources = QnActionParameterTypes::resources(parameters.argument(key));
             } else if(key == Qn::CurrentLayoutParameter) {
                 resources.push_back(context()->workbench()->currentLayout()->resource());
             } else if(key == Qn::CurrentUserParameter) {
@@ -169,7 +175,11 @@ bool QnAction::event(QEvent *event) {
     return QObject::event(event);
 }
 
-void QnAction::at_toggled(bool checked) {
-    setText(checked ? m_toggledText : m_normalText);
+void QnAction::updateText() {
+    if(isChecked()) {
+        setText(toggledText());
+    } else {
+        setText(normalText());
+    }
 }
 

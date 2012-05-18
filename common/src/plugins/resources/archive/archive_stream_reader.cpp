@@ -43,6 +43,7 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_keepLastSkkipingFrame(true),
     m_ignoreSkippingFrame(false),
     m_lastJumpTime(AV_NOPTS_VALUE),
+    m_lastSkipTime(AV_NOPTS_VALUE),
     m_exactJumpToSpecifiedFrame(false),
     m_quality(MEDIA_Quality_High),
     m_qualityFastSwitch(true),
@@ -135,13 +136,15 @@ void QnArchiveStreamReader::pauseMedia()
         QMutexLocker lock(&m_jumpMtx);
         m_singleShot = true;
         m_singleQuantProcessed = true;
-        m_lastJumpTime = AV_NOPTS_VALUE;
+        m_lastSkipTime = m_lastJumpTime = AV_NOPTS_VALUE;
     }
 }
 
 bool QnArchiveStreamReader::isMediaPaused() const
 {
-    return m_singleShot && m_singleQuantProcessed;
+    if(m_navDelegate)
+        return m_navDelegate->isMediaPaused();
+    return m_singleShot;
 }
 
 void QnArchiveStreamReader::setCurrentTime(qint64 value)
@@ -664,7 +667,7 @@ begin_label:
     if (videoData && videoData->context) 
         m_codecContext = videoData->context;
 
-    if (m_currentData && singleShotMode && m_skipFramesToTime == 0) {
+    if (videoData && singleShotMode && m_skipFramesToTime == 0) {
         m_singleQuantProcessed = true;
         //m_currentData->flags |= QnAbstractMediaData::MediaFlags_SingleShot;
     }
@@ -682,6 +685,10 @@ begin_label:
         m_playbackMaskSync.lock();
         qint64 newTime = m_playbackMaskHelper.findTimeAtPlaybackMask(m_currentData->timestamp, !reverseMode);
         m_playbackMaskSync.unlock();
+
+        if (newTime == DATETIME_NOW)
+            return createEmptyPacket(reverseMode); // EOF reached
+
         if (newTime != m_currentData->timestamp)
         {
             if (!exactJumpToSpecifiedFrame && channelCount > 1)
@@ -698,7 +705,7 @@ begin_label:
 
     QMutexLocker mutex(&m_jumpMtx);
     if (jumpTime != DATETIME_NOW)
-        m_lastJumpTime = AV_NOPTS_VALUE; // allow duplicates jump to same position
+        m_lastSkipTime = m_lastJumpTime = AV_NOPTS_VALUE; // allow duplicates jump to same position
 
     return m_currentData;
 }
@@ -792,7 +799,7 @@ void QnArchiveStreamReader::setReverseMode(bool value, qint64 currentTimeHint)
         bool useMutex = !m_externalLocked;
         if (useMutex)
             m_jumpMtx.lock();
-        m_lastJumpTime = AV_NOPTS_VALUE;
+        m_lastSkipTime = m_lastJumpTime = AV_NOPTS_VALUE;
         m_reverseMode = value;
         m_currentTimeHint = currentTimeHint;
         if (useMutex)
@@ -906,6 +913,8 @@ bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
         return m_navDelegate->jumpTo(mksec, skipTime);
     }
 
+    qDebug() << "jumpTo(" << QDateTime::fromMSecsSinceEpoch(mksec / 1000).toString("hh:mm:ss.zzz") << "," << (mksec == skipTime ? "precise" : "rough") << ")";
+
     qint64 newTime = mksec;
     m_playbackMaskSync.lock();
     newTime = m_playbackMaskHelper.findTimeAtPlaybackMask(mksec, m_speed >= 0);
@@ -915,8 +924,9 @@ bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
 
 
     m_jumpMtx.lock();
-    bool needJump = newTime != m_lastJumpTime;
+    bool needJump = newTime != m_lastJumpTime || m_lastSkipTime != skipTime;
     m_lastJumpTime = newTime;
+    m_lastSkipTime = skipTime;
     m_jumpMtx.unlock();
 
     if (needJump)

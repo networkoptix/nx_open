@@ -207,7 +207,7 @@
         <CustomAction Id="CloseTrayToolAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="ignore" Impersonate="no" />
         
-        <CustomAction Id="LaunchApplication" Execute="immediate" Impersonate="no" Return="asyncNoWait" FileKey="traytool.exe" ExeCommand="&quot;[VmsTrayToolDir]traytool.exe&quot;"/>
+        <CustomAction Id="LaunchApplication" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="traytool.exe" ExeCommand=""/>
         
         <CustomAction Id="NoDowngrade" Error="NoDowngrade" /> 
         
@@ -711,8 +711,18 @@
             
             <Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="PasswordDlg">INSTALLTYPE=0</Publish>
             <Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="AdvancedTypeDlg">INSTALLTYPE=1</Publish>
-            <Publish Dialog="InstallTypeDlg" Control="Next" Event="AddLocal" Value="ALL">INSTALLTYPE=0</Publish>
+        	<Publish Dialog="InstallTypeDlg" Control="Next" Event="AddLocal" Value="ALL">INSTALLTYPE=0</Publish>
+
+            <Publish Dialog="InstallTypeDlg" Control="Next" Property="SERVER_APPSERVER_HOST" Value="localhost" Order="4"><![CDATA[ INSTALLTYPE=0 ]]></Publish>
+            <Publish Dialog="InstallTypeDlg" Control="Next" Property="SERVER_APPSERVER_PORT" Value="[APPSERVER_PORT]" Order="4"><![CDATA[ INSTALLTYPE=0 ]]></Publish>
+            <Publish Dialog="InstallTypeDlg" Control="Next" Property="SERVER_APPSERVER_LOGIN" Value="[APPSERVER_LOGIN]" Order="4"><![CDATA[ INSTALLTYPE=0 ]]></Publish>
+            <Publish Dialog="InstallTypeDlg" Control="Next" Property="SERVER_APPSERVER_PASSWORD" Value="[APPSERVER_PASSWORD]" Order="4" ><![CDATA[ INSTALLTYPE=0 ]]></Publish>
             
+            <Publish Dialog="InstallTypeDlg" Control="Next" Property="CLIENT_APPSERVER_HOST" Value="localhost" Order="4"><![CDATA[ INSTALLTYPE=0 ]]></Publish>
+            <Publish Dialog="InstallTypeDlg" Control="Next" Property="CLIENT_APPSERVER_PORT" Value="[APPSERVER_PORT]" Order="4"><![CDATA[ INSTALLTYPE=0 ]]></Publish>
+            <Publish Dialog="InstallTypeDlg" Control="Next" Property="CLIENT_APPSERVER_LOGIN" Value="[APPSERVER_LOGIN]" Order="4"><![CDATA[ INSTALLTYPE=0 ]]></Publish>
+            <Publish Dialog="InstallTypeDlg" Control="Next" Property="CLIENT_APPSERVER_PASSWORD" Value="[APPSERVER_PASSWORD]" Order="4" ><![CDATA[ INSTALLTYPE=0 ]]></Publish>
+        	
             <Publish Dialog="PasswordDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg">1</Publish>
             <Publish Dialog="PasswordDlg" Control="Next" Event="SpawnDialog" Value="EmptyPasswordDlg">NOT APPSERVER_PASSWORD</Publish>
             <Publish Dialog="PasswordDlg" Control="Next" Property="SERVER_APPSERVER_PASSWORD" Value="[APPSERVER_PASSWORD]">APPSERVER_PASSWORD</Publish>
@@ -823,11 +833,11 @@
             <Publish Dialog="MediaServerDlg" Control="Next" Property="CLIENT_APPSERVER_PASSWORD" Value="[SERVER_APPSERVER_PASSWORD]" Order="4">1</Publish>
             
             <Publish Dialog="MediaServerDlg" Control="Next" Property="BUSYPORT" Value="{}">1</Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORTSTOTEST" Value="[SERVER_API_PORT]" Order="1"><![CDATA[ SERVER_RTSP_PORT = RTSP_PORT OR SERVER_API_PORT <> OLD_API_PORT]]></Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORTSTOTEST" Value="[SERVER_RTSP_PORT]" Order="1"><![CDATA[ SERVER_RTSP_PORT <> RTSP_PORT OR SERVER_API_PORT = OLD_API_PORT]]></Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORTSTOTEST" Value="[SERVER_API_PORT] [SERVER_RTSP_PORT]" Order="1"><![CDATA[ SERVER_RTSP_PORT <> RTSP_PORT AND SERVER_API_PORT <> OLD_API_PORT]]></Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORTSTOTEST" Value="[SERVER_API_PORT]" Order="1"><![CDATA[ SERVER_RTSP_PORT = OLD_SERVER_RTSP_PORT OR SERVER_API_PORT <> OLD_SERVER_API_PORT]]></Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORTSTOTEST" Value="[SERVER_RTSP_PORT]" Order="1"><![CDATA[ SERVER_RTSP_PORT <> OLD_SERVER_RTSP_PORT OR SERVER_API_PORT = OLD_SERVER_API_PORT]]></Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORTSTOTEST" Value="[SERVER_API_PORT] [SERVER_RTSP_PORT]" Order="1"><![CDATA[ SERVER_RTSP_PORT <> OLD_SERVER_RTSP_PORT AND SERVER_API_PORT <> OLD_SERVER_API_PORT]]></Publish>
             
-            <Publish Dialog="MediaServerDlg" Control="Next" Event="DoAction" Value="CheckPorts2" Order="2"><![CDATA[ SERVER_RTSP_PORT <> RTSP_PORT OR SERVER_API_PORT <> OLD_API_PORT]]></Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Event="DoAction" Value="CheckPorts2" Order="2"><![CDATA[ SERVER_RTSP_PORT <> OLD_SERVER_RTSP_PORT OR SERVER_API_PORT <> OLD_SERVER_API_PORT]]></Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="PortIsBusyDlg" Order="3">BUSYPORT</Publish>
             
             <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_BACK" Value="MediaServerDlg">1</Publish>

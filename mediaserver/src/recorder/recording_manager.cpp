@@ -192,8 +192,12 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
         if (needStopLow)
             recorderLowRes->clearUnprocessedData();
 
-        if (needStopHi)
+        if (needStopHi) {
             cl_log.log("Recording stopped for camera ", res->getUniqueId(), cl_logINFO);
+        }
+        if(!needStopHi && !needStopLow && res->getStatus() == QnResource::Recording)
+            res->setStatus(QnResource::Online); // may be recording thread was not runned, so reset status to online
+
     }
 }
 

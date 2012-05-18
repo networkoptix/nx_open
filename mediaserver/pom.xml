@@ -18,9 +18,10 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>mediaserver</artifactId>
 	<packaging>pom</packaging>
-	<name>Network Optix Media Server</name>	
+	<name>HD Witness Media Server</name>	
 
 	<properties>
+		<product.title>${mediaserver.name}</product.title>	
 		<!--QT libs used-->
 		<qtlib1>core</qtlib1>
 		<qtlib2>network</qtlib2>

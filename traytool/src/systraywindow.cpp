@@ -1,4 +1,5 @@
 #include <QtGui>
+#include <QTcpServer>
 
 #include "systraywindow.h"
 #include "ui_settings.h"
@@ -8,7 +9,7 @@
 #include "version.h"
 
 
-static const QString MEDIA_SERVER_NAME ("Network Optix Media Server");
+static const QString MEDIA_SERVER_NAME (QString(ORGANIZATION_NAME) + QString(" Media Server"));
 static const QString APP_SERVER_NAME("Enterprise Controller");
 static const int DEFAULT_APP_SERVER_PORT = 8000;
 static const int MESSAGE_DURATION = 3 * 1000;
@@ -605,7 +606,7 @@ void QnSystrayWindow::onSettingsAction()
     ui->rtspPortLineEdit->setText(m_mServerSettings.value("rtspPort").toString());
     ui->apiPortLineEdit->setText(m_mServerSettings.value("apiPort").toString());
     ui->appServerPortLineEdit->setText(m_appServerSettings.value("port").toString());
-    ui->proxyPortLineEdit->setText(m_appServerSettings.value("proxy_port", DEFAUT_PROXY_PORT).toString());
+    ui->proxyPortLineEdit->setText(m_appServerSettings.value("proxyPort", DEFAUT_PROXY_PORT).toString());
 
     ui->tabAppServer->setEnabled(m_appServerHandle != 0);
     ui->tabMediaServer->setEnabled(m_mediaServerHandle != 0);
@@ -616,7 +617,7 @@ void QnSystrayWindow::onSettingsAction()
 bool QnSystrayWindow::isAppServerParamChanged() const
 {
     return ui->appServerPortLineEdit->text().toInt() != m_appServerSettings.value("port").toInt() ||
-           ui->proxyPortLineEdit->text().toInt() != m_appServerSettings.value("proxy_port", DEFAUT_PROXY_PORT).toInt();
+           ui->proxyPortLineEdit->text().toInt() != m_appServerSettings.value("proxyPort", DEFAUT_PROXY_PORT).toInt();
 }
 
 bool QnSystrayWindow::isMediaServerParamChanged() const
@@ -688,27 +689,72 @@ void QnSystrayWindow::buttonClicked(QAbstractButton * button)
     }
 }
 
-bool QnSystrayWindow::checkPort(const QString& text, const QString& message)
+bool QnSystrayWindow::checkPortNum(int port, const QString& message)
 {
-    int port = text.toInt();
     if (port < 1 || port > 65535)
     {
-        QMessageBox::warning(this, tr("Systray"), message);
+        QMessageBox::warning(this, tr("Systray"), QString("Invalid ") + message + QString(" port specified."));
         return false;
     }
     return true;
 }
 
+bool QnSystrayWindow::isPortFree(int port)
+{
+    QTcpServer testServer;
+    return testServer.listen(QHostAddress::Any, port);
+}
+
 bool QnSystrayWindow::validateData()
 {
-    if (!checkPort(ui->appServerPortLineEdit->text(), QString("Invalid ") + APP_SERVER_NAME + QString(" port specified.")))
-        return false;
-    if (!checkPort(ui->proxyPortLineEdit->text(), QString("Invalid media proxy port specified.")))
-        return false;
-    if (!checkPort(ui->rtspPortLineEdit->text(), "Invalid media server RTSP port specified."))
-        return false;
-    if (!checkPort(ui->apiPortLineEdit->text(), "Invalid media server API port specified."))
-        return false;
+    struct PortInfo
+    {
+        PortInfo(int _newPort, int _oldPort, const QString& _descriptor)
+        {
+            newPort = _newPort;
+            descriptor = _descriptor;
+            oldPort = _oldPort;
+        }
+
+        int newPort;
+        int oldPort;
+        QString descriptor;
+    };
+    QList<PortInfo> checkedPorts;
+
+    if (m_appServerHandle)
+    {
+        checkedPorts << PortInfo(ui->appServerPortLineEdit->text().toInt(), m_appServerSettings.value("port").toInt(), APP_SERVER_NAME);
+        checkedPorts << PortInfo(ui->proxyPortLineEdit->text().toInt(), m_appServerSettings.value("proxyPort", DEFAUT_PROXY_PORT).toInt(), "media proxy");
+    }
+
+    if (m_mediaServerHandle)
+    {
+        checkedPorts << PortInfo(ui->rtspPortLineEdit->text().toInt(), m_mServerSettings.value("rtspPort").toInt(), "media server RTSP");
+        checkedPorts << PortInfo(ui->apiPortLineEdit->text().toInt(), m_mServerSettings.value("apiPort").toInt(), "media server API");
+    }
+    
+    for(int i = 0; i < checkedPorts.size(); ++i)
+    {
+        if (!checkPortNum(checkedPorts[i].newPort, checkedPorts[i].descriptor))
+            return false;
+        for (int j = i+1; j < checkedPorts.size(); ++j) {
+            if (checkedPorts[i].newPort == checkedPorts[j].newPort)
+            {
+                QMessageBox::warning(this, tr("Systray"), checkedPorts[i].descriptor + QString(" port is same as ") + checkedPorts[j].descriptor + QString(" port"));
+                return false;
+            }
+        }
+        bool isNewPort = true;
+        for (int j = 0; j < checkedPorts.size(); ++j) {
+            if (checkedPorts[j].oldPort == checkedPorts[i].newPort)
+                isNewPort = false;
+        }
+        if (isNewPort && !isPortFree(checkedPorts[i].newPort)) {
+            QMessageBox::warning(this, tr("Systray"), checkedPorts[i].descriptor + QString(" port already used by another process"));
+            return false;
+        }
+    }
     return true;
 }
 
@@ -719,7 +765,7 @@ void QnSystrayWindow::saveData()
     m_mServerSettings.setValue("rtspPort", ui->rtspPortLineEdit->text());
     m_mServerSettings.setValue("apiPort", ui->apiPortLineEdit->text());
     m_appServerSettings.setValue("port", ui->appServerPortLineEdit->text());
-    m_appServerSettings.setValue("proxy_port", ui->proxyPortLineEdit->text());
+    m_appServerSettings.setValue("proxyPort", ui->proxyPortLineEdit->text());
 
     QStringList urlList = m_settings.value("appserverUrlHistory").toString().split(';');
     urlList.insert(0, getAppServerURL().toString());

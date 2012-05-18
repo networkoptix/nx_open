@@ -135,48 +135,6 @@ void QnStorageResource::setUrl(const QString& value)
     QnResource::setUrl(value);
 }
 
-QnStorageURL QnStorageResource::url2StorageURL(const QString& url) const
-{
-    QnStorageURL result;
-    QString rUrl = getUrl();
-    
-    int index = url.indexOf(rUrl);
-
-    if (index < 0)
-        return result;
-
-    QString rest = url.mid(index + rUrl.size());
-
-    QStringList restList = rest.split("/", QString::SkipEmptyParts);
-    if (restList.size() ==0 )
-        return result;
-
-    if (restList.size() > 0)
-        result.quality = restList.at(0);
-
-    if (restList.size() > 1)
-        result.resourceId = restList.at(1);
-
-    if (restList.size() > 2)
-        result.y = restList.at(2);
-
-    if (restList.size() > 3)
-        result.m = restList.at(3);
-
-    if (restList.size() > 4)
-        result.d = restList.at(4);
-
-    if (restList.size() > 5)
-        result.h = restList.at(5);
-
-    if (restList.size() > 6)
-        result.file = restList.at(6);
-
-
-    return result;
-}
-
-
 
 AVIOContext* QnStorageResource::createFfmpegIOContext(const QString& url, QIODevice::OpenMode openMode, int IO_BLOCK_SIZE)
 {

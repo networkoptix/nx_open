@@ -9,7 +9,7 @@ static const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
 
 QnPlAxisResource::QnPlAxisResource()
 {
-    setAuth("root", "1");
+    setAuth("root", "root");
     m_lastMotionReadTime = 0;
 }
 
@@ -192,7 +192,27 @@ void QnPlAxisResource::init()
 
     m_resolutionList = body.mid(paramValuePos+1).split(',');
     for (int i = 0; i < m_resolutionList.size(); ++i)
+    {
         m_resolutionList[i] = m_resolutionList[i].toLower().trimmed();
+
+        
+        if (m_resolutionList[i]=="qcif")
+            m_resolutionList[i] = "176x120";
+
+        else if (m_resolutionList[i]=="cif")
+            m_resolutionList[i] = "352x240";
+
+        else if (m_resolutionList[i]=="2cif")
+            m_resolutionList[i] = "704x240";
+
+        else if (m_resolutionList[i]=="4cif")
+            m_resolutionList[i] = "704x480";
+
+        else if (m_resolutionList[i]=="d1")
+            m_resolutionList[i] = "720x480";
+
+    }
+
 
 
 

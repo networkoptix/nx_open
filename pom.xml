@@ -11,12 +11,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>hdwitness</artifactId>
 	<packaging>pom</packaging>
-	<name>HD Witness</name>	
+	<name>HD Witness</name>
 
-	<organization>
+	<!--<organization>
 		<name>Network Optix</name>
 		<url>networkoptix.com</url>
-	</organization>
+	</organization> -->
 
 	<properties>
 		<build.configuration>release</build.configuration>
@@ -29,6 +29,7 @@
 		<module>common</module>
 		<module>mediaserver</module>
 		<module>mediaproxy</module>
+		<module>testcamera</module>
 	</modules>
 	<build>
 		<defaultGoal>package</defaultGoal>
@@ -45,7 +46,8 @@
 				</os>
 			</activation>
 			<modules>
-				<module>client</module>	
+				<module>client</module>
+				<module>traytool</module>	
 				<module>wixsetup</module>
 			</modules>
 			<properties>
@@ -61,30 +63,13 @@
 			</activation>
 			<modules>
 				<module>debsetup/mediaserver-deb</module>
+				<module>debsetup/appserver-deb</module>
 			</modules>
 			<properties>
 				<platform>linux</platform>
 			</properties>
 			<build>
 				<plugins>
-					<!--<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>exec-maven-plugin</artifactId>
-						<version>1.1.1</version>
-						<executions>
-							<execution>
-								<id>prepare-clean</id>
-								<phase>pre-clean</phase>
-								<goals>
-									<goal>exec</goal>
-								</goals>
-								<configuration>
-									<executable>${session.executionRootDirectory}/linux-build-mvn.sh</executable>
-									<workingDirectory>${project.build.directory}</workingDirectory>
-								</configuration>
-							</execution>	
-						</executions>
-					</plugin>-->
 				</plugins>
 			</build>
 		</profile>	

@@ -11,7 +11,7 @@ def genskin():
   <qresource prefix="/skin">
   """
 
-  skin_dir = '${basedir}/resource/${custom.skin}/skin'
+  skin_dir = '${project.build.directory}/bin/${build.configuration}/skin'
   for root, dirs, files in os.walk(skin_dir):
     parent = root[len(skin_dir) + 1:]
     if '.svn' in dirs:
@@ -21,6 +21,8 @@ def genskin():
       if f.endswith('.png'):
         print >> skin_qrc, '<file alias="%s">%s</file>' % (os.path.join(parent, f).lower(), os.path.join(root, f).lower())
       if f.endswith('.mkv'):
+        print >> skin_qrc, '<file alias="%s">%s</file>' % (os.path.join(parent, f).lower(), os.path.join(root, f).lower())
+      if f.endswith('.ini'):
         print >> skin_qrc, '<file alias="%s">%s</file>' % (os.path.join(parent, f).lower(), os.path.join(root, f).lower())
       
 

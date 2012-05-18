@@ -123,7 +123,7 @@ void RTPSession::parseSDP()
         else if (lineLower.startsWith("a=control:"))
         {
             QByteArray lineRest = line.mid(QByteArray("a=control:").length());
-            if (lineLower.startsWith("a=control:track"))
+            if (lineLower.startsWith("a=control:track") || lineLower.startsWith("a=control:video") || lineLower.startsWith("a=control:audio"))
             {
                 int i = 0;
                 for (; i < lineRest.size() && !(lineRest[i] >= '0' && lineRest[i] <= '9'); ++i);
@@ -143,6 +143,7 @@ void RTPSession::parseSDP()
                     trackNum = lineRest.mid(i).toUInt();
                 }
             }
+
         }
     }
     if (trackNum >= 0)
@@ -890,7 +891,7 @@ bool RTPSession::readTextResponce(QByteArray& response)
         }
 
         // buffer is full and we does not find text data (buffer is filled by binary data). Clear buffer (and drop some video frames) and try to find data again
-        qWarning() << "Can't find RTSP text response because of buffer is full! Drop some media data and find againg";
+        //qWarning() << "Can't find RTSP text response because of buffer is full! Drop some media data and find againg";
         quint8 tmpBuffer[1024*64];
         if (readBinaryResponce(tmpBuffer, sizeof(tmpBuffer)) == -1)
             break;

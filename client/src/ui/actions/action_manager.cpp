@@ -14,7 +14,7 @@
 #include "action.h"
 #include "action_conditions.h"
 #include "action_target_provider.h"
-#include "action_target_types.h"
+#include "action_parameter_types.h"
 
 Q_DECLARE_METATYPE(QnAction *);
 
@@ -174,7 +174,7 @@ public:
     QnActionBuilder operator()(Qn::ActionId id) {
         QnAction *action = m_manager->m_actionById.value(id);
         if(action == NULL) {
-            action = new QnAction(m_manager, id, m_manager);
+            action = new QnAction(id, m_manager);
             m_manager->m_actionById[id] = action;
             m_manager->m_idByAction[action] = id;
         }
@@ -209,7 +209,7 @@ namespace {
     }
 
     bool checkType(const QVariant &items) {
-        Qn::ActionTargetType type = QnActionTargetTypes::type(items);
+        Qn::ActionParameterType type = QnActionParameterTypes::type(items);
         if(type == 0) {
             qnWarning("Unrecognized action target type '%1'.", items.typeName());
             return false;
@@ -229,7 +229,7 @@ QnActionManager::QnActionManager(QObject *parent):
     m_root(NULL),
     m_lastShownMenu(NULL)
 {
-    m_root = new QnAction(this, Qn::NoAction, this);
+    m_root = new QnAction(Qn::NoAction, this);
     m_actionById[Qn::NoAction] = m_root;
     m_idByAction[m_root] = Qn::NoAction;
 
@@ -352,7 +352,7 @@ QnActionManager::QnActionManager(QObject *parent):
             condition(hasFlags(QnResource::user));
 
         factory(Qn::OpenNewTabAction).
-            flags(Qn::Main | Qn::TabBar).
+            flags(Qn::Main | Qn::TabBar | Qn::SingleTarget | Qn::NoTarget).
             text(tr("Tab")).
             pulledText(tr("New Tab")).
             shortcut(tr("Ctrl+T")).
@@ -484,13 +484,13 @@ QnActionManager::QnActionManager(QObject *parent):
         separator();
 
     factory(Qn::CloseLayoutAction).
-        flags(Qn::TabBar | Qn::ScopelessHotkey).
+        flags(Qn::TabBar | Qn::ScopelessHotkey | Qn::SingleTarget).
         text(tr("Close")).
         shortcut(tr("Ctrl+W")).
         autoRepeat(false);
 
     factory(Qn::CloseAllButThisLayoutAction).
-        flags(Qn::TabBar).
+        flags(Qn::TabBar | Qn::SingleTarget).
         text(tr("Close All But This")).
         condition(new QnLayoutCountActionCondition(2, this));
 
@@ -699,24 +699,24 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Mark Selection Start")).
         shortcut(tr("[")).
         shortcutContext(Qt::WidgetShortcut).
-        condition(new QnTimePeriodActionCondition(Qn::NullPeriod, Qn::InvisibleAction, this));
+        condition(new QnTimePeriodActionCondition(Qn::NullTimePeriod, Qn::InvisibleAction, this));
 
     factory(Qn::EndTimeSelectionAction).
         flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Mark Selection End")).
         shortcut(tr("]")).
         shortcutContext(Qt::WidgetShortcut).
-        condition(new QnTimePeriodActionCondition(Qn::EmptyPeriod, Qn::InvisibleAction, this));
+        condition(new QnTimePeriodActionCondition(Qn::EmptyTimePeriod, Qn::InvisibleAction, this));
 
     factory(Qn::ClearTimeSelectionAction).
         flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Clear Selection")).
-        condition(new QnTimePeriodActionCondition(Qn::NormalPeriod, Qn::InvisibleAction, this));
+        condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::InvisibleAction, this));
 
     factory(Qn::ExportTimeSelectionAction).
         flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Export Selection")).
-        condition(new QnTimePeriodActionCondition(Qn::NormalPeriod, Qn::DisabledAction, this));
+        condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::DisabledAction, this));
 
     factory(Qn::ExportLayoutAction).
         flags(Qn::Slider | Qn::SingleTarget).

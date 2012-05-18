@@ -2,8 +2,7 @@
 #include "coldstore_connection_pool.h"
 #include "coldstore_storage.h"
 
-QnColdStoreMetaData::QnColdStoreMetaData(const QString& csFileName):
-m_csFileName(csFileName),
+QnColdStoreMetaData::QnColdStoreMetaData():
 m_mutex(QMutex::Recursive)
 {
     m_needsToBesaved = false;
@@ -124,10 +123,6 @@ int QnColdStoreMetaData::age() const
     return m_lastUsageTime.elapsed()/1000;
 }
 
-QString QnColdStoreMetaData::csFileName() const
-{
-    return m_csFileName;
-}
 
 //====================================================
 
@@ -163,7 +158,7 @@ QnColdStoreMetaDataPtr QnColdStoreMetaDataPool::getStoreMetaData(const QString& 
 
         if (connection.open(csFn, QIODevice::ReadOnly, CS_META_DATA_CHANNEL))
         {
-            md = QnColdStoreMetaDataPtr(new QnColdStoreMetaData(csFn));
+            md = QnColdStoreMetaDataPtr (new QnColdStoreMetaData() );
 
             quint64 size = connection.size();
             QByteArray ba;
@@ -212,3 +207,71 @@ void QnColdStoreMetaDataPool::checkIfSomedataNeedstoberemoved()
     }
 
 }
+
+//=============================================================
+
+QnCsTimeunitConnectionHelper::QnCsTimeunitConnectionHelper()
+{
+    m_connect = 0;
+    m_metaData = QnColdStoreMetaDataPtr(new QnColdStoreMetaData());
+}
+
+QnCsTimeunitConnectionHelper::~QnCsTimeunitConnectionHelper()
+{
+    close();
+}
+
+bool QnCsTimeunitConnectionHelper::open(const QString& addr, const QString& csFile)
+{
+    m_addr = addr;
+    m_csFileName = csFile;
+
+    m_connect = new QnColdStoreConnection(m_addr);
+    return m_connect->open(csFile, QIODevice::WriteOnly, CS_ACTUAL_DATA_CHANNEL);
+}
+
+void QnCsTimeunitConnectionHelper::write(const QByteArray& ba, const QString& fn)
+{
+    qint64 pos = m_connect->pos();
+    m_connect->write(ba.data(), ba.size());
+
+    QnCSFileInfo fi;
+    fi.len = ba.size();
+    fi.shift = pos;
+    m_metaData->put(fn, fi);
+
+}
+
+void QnCsTimeunitConnectionHelper::close()
+{
+    if (!m_connect)
+        return;
+    
+    QnColdStoreConnection conn(m_addr);
+
+    if (conn.open(m_connect->getFilename(), QIODevice::WriteOnly, CS_META_DATA_CHANNEL))
+    {
+        QByteArray ba = m_metaData->toByteArray();
+        conn.write(ba.data(), ba.size());
+    }
+
+    conn.close();
+
+
+    m_connect->close();
+    delete m_connect;
+
+    m_connect = 0;
+
+}
+
+QnColdStoreMetaDataPtr QnCsTimeunitConnectionHelper::getMD() 
+{
+    return m_metaData;
+}
+
+QString QnCsTimeunitConnectionHelper::getCsFileName() const
+{
+    return m_csFileName;
+}
+//=======================================================

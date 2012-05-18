@@ -254,6 +254,8 @@ bool QnAviArchiveDelegate::open(QnResourcePtr resource)
 
         if (!m_initialized )
             close();
+
+        getVideoLayout();
     }
     return m_initialized;
 }

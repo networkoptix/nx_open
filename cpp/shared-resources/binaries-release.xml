@@ -1,5 +1,5 @@
  <assembly>
-	<id>${platform}-${arch}-${build.configuration}-exec</id>
+	<id>${platform}-${arch}-${build.configuration}-${customization}-exec</id>
 	<formats>
 		<format>zip</format>
 	</formats>

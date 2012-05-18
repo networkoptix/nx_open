@@ -505,31 +505,37 @@ void AbstractGraphicsSlider::initStyleOption(QStyleOption *option) const {
                                    : !d->invertedAppearance;
         sliderOption->direction = Qt::LeftToRight; // we use the upsideDown option instead
 
-        sliderOption->minimum = d->minimum;
-        sliderOption->maximum = d->maximum;
-        sliderOption->sliderPosition = d->position;
-        sliderOption->sliderValue = d->value;
-        sliderOption->singleStep = d->singleStep;
-        sliderOption->pageStep = d->pageStep;
+        qint64 minimum      = d->minimum;
+        qint64 maximum      = d->maximum;
+        qint64 position     = d->position;
+        qint64 value        = d->value;
+        qint64 singleStep   = d->singleStep;
+        qint64 pageStep     = d->pageStep;
 
-        if(!isInt(sliderOption->maximum) || !isInt(sliderOption->minimum)) {
-            qint64 d = sliderOption->minimum;
-            sliderOption->minimum            = 0;
-            sliderOption->maximum           -= d;
-            sliderOption->sliderPosition    -= d;
-            sliderOption->sliderValue       -= d;
+        if(!isInt(maximum) || !isInt(minimum)) {
+            maximum     -= minimum;
+            position    -= minimum;
+            value       -= minimum;
+            minimum      = 0;
 
-            if(!isInt(sliderOption->maximum)) {
-                qint64 k = sliderOption->maximum >> 16;
+            if(!isInt(maximum)) {
+                qint64 k = maximum >> 16;
 
-                sliderOption->minimum           /= k;
-                sliderOption->maximum           /= k;
-                sliderOption->sliderPosition    /= k;
-                sliderOption->sliderValue       /= k;
-                sliderOption->singleStep        /= k;
-                sliderOption->pageStep          /= k;
+                minimum     /= k;
+                maximum     /= k;
+                position    /= k;
+                value       /= k;
+                singleStep  /= k;
+                pageStep    /= k;
             }
         }
+
+        sliderOption->minimum = minimum;
+        sliderOption->maximum = maximum;
+        sliderOption->sliderPosition = position;
+        sliderOption->sliderValue = value;
+        sliderOption->singleStep = singleStep;
+        sliderOption->pageStep = pageStep;
     }
 }
 

@@ -3,12 +3,16 @@
 #include <camera/gl_renderer.h>
 #include <utils/common/warnings.h>
 #include <utils/common/performance.h>
+#include "utils/settings.h"
 
 QnResourceWidgetRenderer::QnResourceWidgetRenderer(int channelCount, QObject *parent, const QGLContext *context):
     QObject(parent)
 {
-    for(int i = 0; i < channelCount; i++)
-        m_channelRenderers.push_back(new QnGLRenderer(context));
+    for(int i = 0; i < channelCount; i++) {
+        QnGLRenderer* renderer = new QnGLRenderer(context);
+        renderer->setForceSoftYUV(QnSettings::instance()->isForceSoftYUV());
+        m_channelRenderers.push_back(renderer);
+    }
 }
 
 void QnResourceWidgetRenderer::beforeDestroy() {

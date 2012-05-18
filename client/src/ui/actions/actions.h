@@ -421,25 +421,38 @@ namespace Qn {
         NoAction = -1
     };
 
+    /**
+     * Scope of an action.
+     * 
+     * Scope defines the menus in which an action can appear, and target
+     * for getting the action's parameters in case it was triggered with a 
+     * hotkey.
+     */
     enum ActionScope {
         InvalidScope            = 0x0,
-        MainScope               = 0x1,              /**< Application's main menu requested. */
-        SceneScope              = 0x2,              /**< Scene context menu requested. */
-        TreeScope               = 0x4,              /**< Tree context menu requested. */
-        SliderScope             = 0x8,              /**< Slider context menu requested. */
-        TabBarScope             = 0x10,             /**< Tab bar context menu requested. */
+        MainScope               = 0x1,              /**< Action appears in main menu. */
+        SceneScope              = 0x2,              /**< Action appears in scene context menu and its parameters are taken from the scene. */
+        TreeScope               = 0x4,              /**< Action appears in tree context menu. */
+        SliderScope             = 0x8,              /**< Action appears in slider context menu. */
+        TabBarScope             = 0x10,             /**< Action appears tab bar context menu. */
         ScopeMask               = 0xFF
     };
     Q_DECLARE_FLAGS(ActionScopes, ActionScope);
 
-    enum ActionTargetType {
-        ResourceType            = 0x100,             
-        LayoutItemType          = 0x200,
-        WidgetType              = 0x400,
-        LayoutType              = 0x800,
-        TargetTypeMask          = 0xF00
+    /**
+     * Type of an action parameter.
+     * 
+     * Note that some of these types are convertible to other types. 
+     */
+    enum ActionParameterType {
+        ResourceType            = 0x0100,           /**< Resource, <tt>QnResourcePtr</tt>. */
+        LayoutItemType          = 0x0200,           /**< Layout item, <tt>QnLayoutItemIndex</tt>. Convertible to resource. */    
+        WidgetType              = 0x0400,           /**< Resource widget, <tt>QnResourceWidget *</tt>. Convertible to layout item and resource. */
+        LayoutType              = 0x0800,           /**< Workbench layout, <tt>QnWorkbenchLayout *</tt>. Convertible to resource. */
+        OtherType               = 0x1000,           /**< Some other type. */
+        TargetTypeMask          = 0xFF00
     };
-    Q_DECLARE_FLAGS(ActionTargetTypes, ActionTargetType)
+    Q_DECLARE_FLAGS(ActionParameterTypes, ActionParameterType)
 
     enum ActionFlag {
         /** Action can be applied when there are no targets. */
@@ -460,7 +473,7 @@ namespace Qn {
         /** Action accepts resource widgets as target. */
         WidgetTarget            = WidgetType,     
 
-        /** Action accepts layouts as target. */
+        /** Action accepts workbench layouts as target. */
         LayoutTarget            = LayoutType,     
 
 
@@ -474,7 +487,7 @@ namespace Qn {
         ScopelessHotkey         = 0x200000,       
 
         /** Action can be pulled into enclosing menu if it is the only one in
-         * its submenu. It may have another text in this case. */
+         * its submenu. It may have different text in this case. */
         Pullable                = 0x400000,
 
         /** Action is not present in its corresponding menu. */
@@ -494,7 +507,7 @@ namespace Qn {
         Slider                  = Qn::SliderScope | WidgetTarget,    
 
         /** Action can appear in tab bar context menu. */
-        TabBar                  = Qn::TabBarScope | SingleTarget | LayoutTarget,      
+        TabBar                  = Qn::TabBarScope | LayoutTarget,      
     };
 
     Q_DECLARE_FLAGS(ActionFlags, ActionFlag);
@@ -513,7 +526,7 @@ namespace Qn {
 } // namespace Qn
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ActionScopes);
-Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ActionTargetTypes);
+Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ActionParameterTypes);
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ActionFlags);
 
 #endif // QN_ACTIONS_H

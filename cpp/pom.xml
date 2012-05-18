@@ -38,7 +38,7 @@
 				<version>1.0-alpha-2</version>
 				<executions>
 					<execution>
-						<phase>validate</phase>
+						<phase>initialize</phase>
 						<goals>
 							<goal>read-project-properties</goal>
 						</goals>
@@ -141,14 +141,6 @@
 								</pathconvert>									
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${headers}</echo>
 
-								<!--<fileset id="version_headers_path" dir="${project.build.directory}/build/include">
-									<include name="version/version.h" />
-								</fileset>
-								<pathconvert pathsep="${line.separator}" property="version_headers" refid="version_headers_path">
-									<map from="" to="HEADERS += "/>
-								</pathconvert>									
-								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${version_headers}</echo> -->							
-
 								<fileset id="sources_path" dir="${project.build.sourceDirectory}">
 									<include name="**/*.cpp" />
 									<include name="**/*.cc" />
@@ -169,7 +161,15 @@
 								<pathconvert pathsep="${line.separator}" property="add_sources" refid="add_sources_path">
 									<map from="" to="SOURCES += "/>
 								</pathconvert>
-								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${add_sources}</echo>							
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${add_sources}</echo>		
+
+								<fileset id="qrc_path" dir="${project.build.directory}">
+									<include name="**/*.qrc" />
+								</fileset>
+								<pathconvert pathsep="${line.separator}" property="qrc" refid="qrc_path">
+									<map from="" to="RESOURCES += "/>
+								</pathconvert>								
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${qrc}</echo>								
 							</target>
 						</configuration>
 					</execution>				
@@ -496,44 +496,32 @@
 									<outputDirectory>${project.build.directory}</outputDirectory>
 									<resources>          
 										<resource>
+											<targetPath>${project.build.directory}</targetPath>
 											<directory>${basedir}/maven</directory>
 											<filtering>true</filtering>
 										</resource>		
 										<resource>
+											<targetPath>${project.build.directory}</targetPath>
 											<directory>${project.build.directory}/maven</directory>
 											<filtering>true</filtering>
 										</resource>		
 										<resource>
+											<targetPath>${project.build.directory}</targetPath>
 											<directory>${basedir}/../cpp/shared-resources</directory>
+											<filtering>true</filtering>
+										</resource>
+										<resource>
+											<targetPath>${project.build.directory}</targetPath>
+											<directory>${basedir}/../cpp/shared-resources/icons/${custom.skin}</directory>
 											<excludes>
 												<exclude>version.h</exclude>
 											</excludes>
-											<filtering>true</filtering>
-										</resource>										
+											<filtering>false</filtering>
+										</resource>																		
 									</resources>              
 									<encoding>UTF-8</encoding>
 								</configuration>            
 							</execution>
-							<execution>
-								<id>generate-version</id>
-								<phase>initialize</phase>
-								<goals>
-									<goal>copy-resources</goal>
-								</goals>
-								<configuration>
-									<outputDirectory>${project.build.sourceDirectory}</outputDirectory>
-									<resources>          
-										<resource>
-											<directory>${basedir}/../cpp/shared-resources</directory>
-											<includes>
-												<include>version.h</include>
-											</includes>
-											<filtering>true</filtering>
-										</resource>	 						
-									</resources>              
-									<encoding>UTF-8</encoding>
-								</configuration>            
-							</execution>				
 						</executions>
 					</plugin>			
 				</plugins>

@@ -31,7 +31,7 @@ struct QnCSFile
 class QnColdStoreMetaData
 {
 public:
-    QnColdStoreMetaData(const QString& csFileName);
+    QnColdStoreMetaData();
     ~QnColdStoreMetaData();
 
     int age() const; // age in seconds ( last used )
@@ -49,10 +49,9 @@ public:
     bool needsToBesaved() const;
     void setNeedsToBesaved(bool v);
 
-    QString csFileName() const;
+
 
 private:
-    QString m_csFileName;
 
     QHash<QString, QnCSFileInfo> m_hash;
 
@@ -81,6 +80,35 @@ private:
 
     QMutex m_mutex;
 };
+
+class QnColdStoreConnection;
+
+class QnCsTimeunitConnectionHelper
+{
+public:
+    QnCsTimeunitConnectionHelper();
+    ~QnCsTimeunitConnectionHelper();
+
+    bool open(const QString& addr, const QString& csFile);
+
+    void write(const QByteArray& ba, const QString& fn);
+
+    void close();
+
+    QString getCsFileName() const; 
+
+    QnColdStoreMetaDataPtr getMD() ;
+
+private:
+    QnColdStoreConnection* m_connect;
+    QnColdStoreMetaDataPtr m_metaData;
+
+    QString m_csFileName;
+    QString m_addr;
+
+};
+
+
 
 
 #endif //coldstore_helper_h_2137_h
