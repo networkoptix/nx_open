@@ -39,6 +39,7 @@ appserver/version.py
 appserver/setup/version.py
 appserver/entcontroller.conf
 appserver/setup/build 
+appserver/version_maven.py
 
 build
 client/src/version.h
