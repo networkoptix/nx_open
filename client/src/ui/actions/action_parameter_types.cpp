@@ -9,99 +9,147 @@
 #include <ui/workbench/workbench_layout.h>
 #include "ui/workbench/workbench_layout_synchronizer.h"
 
-namespace {
-    int qn_resource = 0;
-    int qn_user = 0;
-    int qn_layout = 0;
-    int qn_server = 0;
-    int qn_resourceList = 0;
-    int qn_widget = 0;
-    int qn_widgetList = 0;
-    int qn_layoutItemList = 0;
-    int qn_layoutList = 0;
+namespace ParameterMetaType {
+    enum Type {
+        ResourcePtr,
+        UserResourcePtr,
+        LayoutResourcePtr,
+        VideoServerResourcePtr,
+        ResourceList,
+        ResourceWidget,
+        ResourceWidgetList,
+        LayoutItemIndexList,
+        WorkbenchLayoutList,
+        Invalid = -1
+    };
 
-    Q_GLOBAL_STATIC_WITH_INITIALIZER(bool, qn_initializeActionMetaTypes, {
-        qn_resource         = qMetaTypeId<QnResourcePtr>();
-        qn_user             = qMetaTypeId<QnUserResourcePtr>();
-        qn_layout           = qMetaTypeId<QnLayoutResourcePtr>();
-        qn_server           = qMetaTypeId<QnVideoServerResourcePtr>();
-        qn_resourceList     = qMetaTypeId<QnResourceList>();
-        qn_widget           = qMetaTypeId<QnResourceWidget *>();
-        qn_widgetList       = qMetaTypeId<QnResourceWidgetList>();
-        qn_layoutItemList   = qMetaTypeId<QnLayoutItemIndexList>();
-        qn_layoutList       = qMetaTypeId<QnWorkbenchLayoutList>();
+} // namespace ParameterMetaType
+
+namespace {
+    class ParameterMetaTypeMap {
+    public:
+        void set(int metaType, ParameterMetaType::Type type) {
+            if(metaType < 0)
+                return;
+
+            m_types.reserve(metaType + 1);
+            while(metaType >= m_types.size())
+                m_types.push_back(ParameterMetaType::Invalid);
+
+            m_types[metaType] = type;
+        }
+
+        ParameterMetaType::Type get(int metaType) {
+            if(metaType < 0 || metaType >= m_types.size())
+                return ParameterMetaType::Invalid;
+            return m_types[metaType];
+        }
+
+    private:
+        QVector<ParameterMetaType::Type> m_types;
+    };
+
+    Q_GLOBAL_STATIC_WITH_INITIALIZER(ParameterMetaTypeMap, qn_actionMetaTypeMap, {
+        using namespace ParameterMetaType;
+
+        x->set(qMetaTypeId<QnResourcePtr>(),                ResourcePtr);
+        x->set(qMetaTypeId<QnUserResourcePtr>(),            UserResourcePtr);
+        x->set(qMetaTypeId<QnLayoutResourcePtr>(),          LayoutResourcePtr);
+        x->set(qMetaTypeId<QnVideoServerResourcePtr>(),     VideoServerResourcePtr);
+        x->set(qMetaTypeId<QnResourceList>(),               ResourceList);
+        x->set(qMetaTypeId<QnResourceWidget *>(),           ResourceWidget);
+        x->set(qMetaTypeId<QnResourceWidgetList>(),         ResourceWidgetList);
+        x->set(qMetaTypeId<QnLayoutItemIndexList>(),        LayoutItemIndexList);
+        x->set(qMetaTypeId<QnWorkbenchLayoutList>(),        WorkbenchLayoutList);
     });
 
     QnResourcePtr singleResource(const QVariant &items) {
-        int t = items.userType();
+        using namespace ParameterMetaType;
 
-        QnResourcePtr result;
-        if(t == qn_resource) {
-            result = items.value<QnResourcePtr>();
-        } else if(t == qn_user) {
-            result = items.value<QnUserResourcePtr>();
-        } else if(t == qn_layout) {
-            result = items.value<QnLayoutResourcePtr>();
-        } else /* if(t == qn_server) */ {
-            result = items.value<QnVideoServerResourcePtr>();
+        switch(qn_actionMetaTypeMap()->get(items.userType())) {
+        case ResourcePtr:
+            return items.value<QnResourcePtr>();
+        case UserResourcePtr:
+            return items.value<QnUserResourcePtr>();
+        case LayoutResourcePtr:
+            return items.value<QnLayoutResourcePtr>();
+        case VideoServerResourcePtr:
+            return items.value<QnVideoServerResourcePtr>();
+        default:
+            return QnResourcePtr();
         }
+    }
 
+
+    template<class T>
+    bool isValid(const T &value) {
+        return value;
+    }
+
+    bool isValid(const QnLayoutItemIndex &value) {
+        return !value.isNull();
+    }
+
+    template<class List, class T>
+    List makeList(const T &value) {
+        List result;
+        if(isValid(value))
+            result.push_back(value);
         return result;
     }
 
 } // anonymous namespace
 
-void QnActionParameterTypes::initialize() {
-    qn_initializeActionMetaTypes();
-}
-
 int QnActionParameterTypes::size(const QVariant &items) {
-    int t = items.userType();
+    using namespace ParameterMetaType;
 
-    if(t == qn_resourceList) {
-        return items.value<QnResourceList>().size();
-    } else if(t == qn_widgetList) {
-        return items.value<QnResourceWidgetList>().size();
-    } else if(t == qn_layoutItemList) {
-        return items.value<QnLayoutItemIndexList>().size();
-    } else if(t == qn_layoutList) {
-        return items.value<QnWorkbenchLayoutList>().size();
-    } else if(t == qn_resource || t == qn_user || t == qn_layout || t == qn_server) {
+    switch(qn_actionMetaTypeMap()->get(items.userType())) {
+    case ResourcePtr:
+    case UserResourcePtr:
+    case LayoutResourcePtr:
+    case VideoServerResourcePtr:
         return singleResource(items) ? 1 : 0;
-    } else if(t == qn_widget) {
+    case ResourceList:
+        return items.value<QnResourceList>().size();
+    case ResourceWidget:
         return items.value<QnResourceWidget *>() ? 1 : 0;
-    } else {
+    case ResourceWidgetList:
+        return items.value<QnResourceWidgetList>().size();
+    case LayoutItemIndexList:
+        return items.value<QnLayoutItemIndexList>().size();
+    case WorkbenchLayoutList:
+        return items.value<QnWorkbenchLayoutList>().size();
+    default:
         return 0;
     }
 }
 
 Qn::ActionParameterType QnActionParameterTypes::type(const QVariant &items) {
-    int t = items.userType();
+    using namespace ParameterMetaType;
 
-    if(t == qn_resourceList) {
+    switch(qn_actionMetaTypeMap()->get(items.userType())) {
+    case ResourcePtr:
+    case UserResourcePtr:
+    case LayoutResourcePtr:
+    case VideoServerResourcePtr:
         return Qn::ResourceType;
-    } else if(t == qn_widgetList) {
+    case ResourceList:
+        return Qn::ResourceType;
+    case ResourceWidget:
         return Qn::WidgetType;
-    } else if(t == qn_layoutItemList) {
+    case ResourceWidgetList:
+        return Qn::WidgetType;
+    case LayoutItemIndexList:
         return Qn::LayoutItemType;
-    } else if(t == qn_layoutList) {
+    case WorkbenchLayoutList:
         return Qn::LayoutType;
-    } else if(t == qn_resource || t == qn_user || t == qn_layout || t == qn_server) {
-        return Qn::ResourceType;
-    } else if(t == qn_widget) {
-        return Qn::WidgetType;
-    } else {
-        return static_cast<Qn::ActionParameterType>(0);
+    default:
+        return Qn::OtherType;
     }
 }
 
 QnResourceList QnActionParameterTypes::resources(QnResourceWidget *widget) {
-    QnResourcePtr resource = QnActionParameterTypes::resource(widget);
-
-    QnResourceList result;
-    if(resource)
-        result.push_back(resource);
-    return result;
+    return makeList<QnResourceList>(QnActionParameterTypes::resource(widget));
 }
 
 QnResourcePtr QnActionParameterTypes::resource(QnResourceWidget *widget) {
@@ -163,26 +211,25 @@ QnResourceList QnActionParameterTypes::resources(const QnWorkbenchLayoutList &la
 }
 
 QnResourceList QnActionParameterTypes::resources(const QVariant &items) {
-    int t = items.userType();
+    using namespace ParameterMetaType;
 
-    if(t == qn_resourceList) {
+    switch(qn_actionMetaTypeMap()->get(items.userType())) {
+    case ResourcePtr:
+    case UserResourcePtr:
+    case LayoutResourcePtr:
+    case VideoServerResourcePtr:
+        return makeList<QnResourceList>(singleResource(items));
+    case ResourceList:
         return items.value<QnResourceList>();
-    } else if(t == qn_widgetList) {
-        return resources(items.value<QnResourceWidgetList>());
-    } else if(t == qn_layoutItemList) {
-        return resources(items.value<QnLayoutItemIndexList>());
-    } else if(t == qn_layoutList) {
-        return resources(items.value<QnWorkbenchLayoutList>());
-    } else if(t == qn_resource || t == qn_user || t == qn_layout || t == qn_server) {
-        QnResourcePtr resource = singleResource(items);
-
-        QnResourceList result;
-        if(resource)
-            result.push_back(resource);
-        return result;
-    } else if(t == qn_widget) {
+    case ResourceWidget:
         return resources(items.value<QnResourceWidget *>());
-    } else {
+    case ResourceWidgetList:
+        return resources(items.value<QnResourceWidgetList>());
+    case LayoutItemIndexList:
+        return resources(items.value<QnLayoutItemIndexList>());
+    case WorkbenchLayoutList:
+        return resources(items.value<QnWorkbenchLayoutList>());
+    default:
         return QnResourceList();
     }
 }
@@ -223,36 +270,46 @@ QnLayoutItemIndexList QnActionParameterTypes::layoutItems(QnResourceWidget *widg
 }
 
 QnLayoutItemIndexList QnActionParameterTypes::layoutItems(const QVariant &items) {
-    if(items.userType() == qn_layoutItemList) {
-        return items.value<QnLayoutItemIndexList>();
-    } else if(items.userType() == qn_widgetList) {
-        return layoutItems(items.value<QnResourceWidgetList>());
-    } else if(items.userType() == qn_widget) {
+    using namespace ParameterMetaType;
+
+    switch(qn_actionMetaTypeMap()->get(items.userType())) {
+    case ResourceWidget:
         return layoutItems(items.value<QnResourceWidget *>());
-    } else {
+    case ResourceWidgetList:
+        return layoutItems(items.value<QnResourceWidgetList>());
+    case LayoutItemIndexList:
+        return items.value<QnLayoutItemIndexList>();
+    default:
         return QnLayoutItemIndexList();
     }
 }
 
 QnWorkbenchLayoutList QnActionParameterTypes::layouts(const QVariant &items) {
-    if(items.userType() == qn_layoutList) {
+    using namespace ParameterMetaType;
+
+    switch(qn_actionMetaTypeMap()->get(items.userType())) {
+    case WorkbenchLayoutList:
         return items.value<QnWorkbenchLayoutList>();
-    } else {
+    default:
         return QnWorkbenchLayoutList();
     }
 }
 
 QnResourceWidgetList QnActionParameterTypes::widgets(const QVariant &items) {
-    if(items.userType() == qn_widgetList) {
-        return items.value<QnResourceWidgetList>();
-    } else if(items.userType() == qn_widget) {
+    using namespace ParameterMetaType;
+
+    switch(qn_actionMetaTypeMap()->get(items.userType())) {
+    case ResourceWidget: {
         QnResourceWidget *widget = items.value<QnResourceWidget *>();
-        
+
         QnResourceWidgetList result;
         if(widget)
             result.push_back(widget);
         return result;
-    } else {
+    }
+    case ResourceWidgetList:
+        return items.value<QnResourceWidgetList>();
+    default:
         return QnResourceWidgetList();
     }
 }

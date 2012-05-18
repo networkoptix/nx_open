@@ -11,10 +11,12 @@
 class QVariant;
 class QGraphicsItem;
 
+/**
+ * Helper class that implements <tt>QVariant</tt>-based overloading for
+ * the types supported by default action parameter.
+ */
 class QnActionParameterTypes {
 public:
-    static void initialize();
-
     static int size(const QVariant &items);
 
     static Qn::ActionParameterType type(const QVariant &items);
@@ -44,7 +46,6 @@ public:
     static QnResourceWidgetList widgets(const QVariant &items);
 
     static QnResourceWidgetList widgets(const QList<QGraphicsItem *> items);
-
 };
 
 Q_DECLARE_METATYPE(QnResourceWidgetList);

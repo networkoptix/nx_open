@@ -41,7 +41,12 @@ void QnAction::setFlags(Qn::ActionFlags flags) {
 }
 
 void QnAction::setNormalText(const QString &normalText) {
+    if(m_normalText == normalText)
+        return;
+
     m_normalText = normalText;
+
+    updateText();
 }
 
 void QnAction::setToggledText(const QString &toggledText) {
