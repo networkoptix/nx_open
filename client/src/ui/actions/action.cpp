@@ -45,9 +45,18 @@ void QnAction::setNormalText(const QString &normalText) {
 }
 
 void QnAction::setToggledText(const QString &toggledText) {
+    if(m_toggledText == toggledText)
+        return;
+
     m_toggledText = toggledText;
 
-    connect(this, SIGNAL(toggled(bool)), this, SLOT(at_toggled(bool)), Qt::UniqueConnection);
+    if(m_toggledText.isEmpty()) {
+        disconnect(this, SIGNAL(toggled(bool)), this, SLOT(updateText()));
+    } else {
+        connect(this, SIGNAL(toggled(bool)), this, SLOT(updateText()), Qt::UniqueConnection);
+    }
+
+    updateText();
 }
 
 void QnAction::setPulledText(const QString &pulledText) {
@@ -82,7 +91,7 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
         return Qn::InvisibleAction;
 
     Qn::ActionParameterType type = parameters.type();
-    if(!(this->targetTypes() & type) && size != 0)
+    if(!(this->defaultParameterTypes() & type) && size != 0)
         return Qn::InvisibleAction;
 
     if(!m_requiredPermissions.empty()) {
@@ -166,7 +175,11 @@ bool QnAction::event(QEvent *event) {
     return QObject::event(event);
 }
 
-void QnAction::at_toggled(bool checked) {
-    setText(checked ? m_toggledText : m_normalText);
+void QnAction::updateText() {
+    if(isChecked()) {
+        setText(toggledText());
+    } else {
+        setText(normalText());
+    }
 }
 

@@ -92,13 +92,15 @@ void QnArchiveSyncPlayWrapper::resumeMedia()
     bool resumed = false;
     foreach(const ReaderInfo& info, d->readers)
     {
+        info.reader->setNavDelegate(0);
+
         if (info.reader->isMediaPaused())
         {
-            info.reader->setNavDelegate(0);
             info.reader->resumeMedia();
-            info.reader->setNavDelegate(this);
             resumed = true;
         }
+
+        info.reader->setNavDelegate(this);
     }
     if (resumed)
         reinitTime(time);

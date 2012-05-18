@@ -98,23 +98,7 @@
 								<pathconvert pathsep="${line.separator}" property="includes_pri" refid="includes_pri_path">
 									<map from="" to="INCLUDEPATH += "/>
 								</pathconvert>								
-								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${includes_pri}</echo>	
-
-								<fileset id="qrc_path" dir="${project.build.sourceDirectory}">
-									<include name="**/*.qrc" />
-								</fileset>
-								<pathconvert pathsep="${line.separator}" property="qrc" refid="qrc_path">
-									<map from="" to="RESOURCES += "/>
-								</pathconvert>								
-								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${qrc}</echo>
-
-								<fileset id="generated_qrc_path" dir="${project.build.directory}">
-									<include name="**/*.qrc" />
-								</fileset>
-								<pathconvert pathsep="${line.separator}" property="generated_qrc" refid="generated_qrc_path">
-									<map from="" to="RESOURCES += "/>
-								</pathconvert>								
-								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${generated_qrc}</echo>														
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${includes_pri}</echo>														
 							</target>
 						</configuration>
 					</execution>
