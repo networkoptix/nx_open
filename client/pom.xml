@@ -156,6 +156,7 @@
 									<filtering>false</filtering>
 									<includes>
 										<include>**/*.png</include>
+										<include>**/*.mkv</include>
 									</includes>	
 								</resource> 						
 							</resources>              
@@ -186,7 +187,7 @@
 					</execution>
 					<execution>
 						<id>generate-help</id>
-						<phase>generate-resources</phase>
+						<phase>process-sources</phase>
 						<goals>
 							<goal>exec</goal>
 						</goals>
@@ -237,8 +238,9 @@
 								</pathconvert>								
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${pri})</echo>
 
-								<fileset id="generated_qrc_path" dir="${project.build.directory}">
-									<include name="**/*.qrc" />
+								<fileset id="generated_qrc_path" dir="${basedir}">
+									<include name="src/**/*.qrc" />
+									<include name="${arch}/**/*.qrc" />
 								</fileset>
 								<pathconvert pathsep="${line.separator}" property="generated_qrc" refid="generated_qrc_path">
 									<map from="" to="RESOURCES += "/>
