@@ -75,6 +75,7 @@ common/src/common.mak*
 common/src/common.vcproj
 common/x86
 common/x64
+common/src/version.h
 
 mediaserver/src/server.pro
 mediaserver/src/version.h
@@ -98,6 +99,7 @@ testcamera/bin/debug
 testcamera/bin/release
 testcamera/x86
 testcamera/x64
+testcamera/src/version.h
 
 winbuild/msvc2010/setup.bat
 
