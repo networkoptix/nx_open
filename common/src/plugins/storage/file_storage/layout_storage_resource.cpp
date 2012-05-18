@@ -1,7 +1,6 @@
 #include "layout_storage_resource.h"
 #include "recording/file_deletor.h"
 #include "utils/common/util.h"
-#include "utils/common/buffered_file.h"
 
 class QnLayoutFile: public QIODevice
 {

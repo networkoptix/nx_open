@@ -1,7 +1,13 @@
+#include <QDir>
+
 #include "file_storage_resource.h"
 #include "recording/file_deletor.h"
 #include "utils/common/util.h"
 #include "utils/common/buffered_file.h"
+
+#ifdef Q_OS_WIN
+#include "windows.h"
+#endif
 
 static const int IO_BLOCK_SIZE = 1024*1024*4;
 static const int FFMPEG_BUFFER_SIZE = 1024*1024*2;
@@ -147,4 +153,10 @@ QString QnFileStorageResource::removeProtocolPrefix(const QString& url)
 QnStorageResource* QnFileStorageResource::instance()
 {
     return new QnFileStorageResource();
+}
+
+float QnFileStorageResource::getAvarageWritingUsage() const
+{
+    QueueFileWriter* writer = QnWriterPool::instance()->getWriter(getUrl());
+    return writer ? writer->getAvarageUsage() : 0;
 }

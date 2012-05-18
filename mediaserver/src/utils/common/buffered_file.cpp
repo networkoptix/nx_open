@@ -1,13 +1,23 @@
-#include "buffered_file.h"
+#include <QDir>
 
+#include "buffered_file.h"
 #include <QSharedPointer>
+#include "utils/common/util.h"
+#include "core/resource/resource_fwd.h"
+#include "recorder/storage_manager.h"
+
+#ifdef Q_OS_WIN
+#include "windows.h"
+#endif
 
 static const int SECTOR_SIZE = 32768;
+static const qint64 AVG_USAGE_AGGREGATE_TIME = 10 * 1000000ll; // aggregation time in usecs
 
 // -------------- QueueFileWriter ------------
 
 QueueFileWriter::QueueFileWriter()
 {
+    m_writeTime = 0;
     start();
 }
 
@@ -29,6 +39,15 @@ qint64 QueueFileWriter::write(QBufferedFile* file, const char * data, qint64 len
     return fb.result;
 }
 
+void QueueFileWriter::removeOldWritingStatistics(qint64 currentTime)
+{
+    while (!m_writeTimings.isEmpty() && m_writeTimings.front().first < currentTime - AVG_USAGE_AGGREGATE_TIME) 
+    {
+        m_writeTime -= m_writeTimings.front().second;
+        m_writeTimings.dequeue();
+    }
+}
+
 void QueueFileWriter::run()
 {
     FileBlockInfo* fileBlock;
@@ -36,9 +55,18 @@ void QueueFileWriter::run()
     {
         if (m_dataQueue.pop(fileBlock, 100))
         {
-            QMutexLocker lock(&fileBlock->mutex);
-            fileBlock->result = fileBlock->file->writeUnbuffered(fileBlock->data, fileBlock->len);
-            fileBlock->condition.wakeAll();
+            qint64 currentTime = getUsecTimer();
+            {
+                QMutexLocker lock(&fileBlock->mutex);
+                fileBlock->result = fileBlock->file->writeUnbuffered(fileBlock->data, fileBlock->len);
+                fileBlock->condition.wakeAll();
+            }
+            qint64 now = getUsecTimer();
+
+            QMutexLocker lock(&m_timingsMutex);
+            removeOldWritingStatistics(currentTime);
+            m_writeTime += now - currentTime;
+            m_writeTimings << WriteTimingInfo(currentTime, now - currentTime);
         }
     }
 
@@ -51,52 +79,46 @@ void QueueFileWriter::run()
 }
 
 // -------------- WriterPool ------------
-class WriterPool
+QnWriterPool::QnWriterPool() 
 {
-public:
-    WriterPool() {}
-    ~WriterPool()
+
+}
+QnWriterPool::~QnWriterPool()
+{
+    foreach(QueueFileWriter* writer, m_writers.values())
+        delete writer;
+}
+
+QnWriterPool::WritersMap QnWriterPool::getAllWriters()
+{
+    QMutexLocker lock(&m_mutex);
+    return m_writers;
+}
+
+QueueFileWriter* QnWriterPool::getWriter(const QString& fileName)
+{
+    QString drive = fileName.left(fileName.indexOf('/'));
+    QnStorageResourcePtr storage = qnStorageMan->getStorageByUrl(fileName);
+    if (storage)
+        drive = storage->getUrl();
+    if (drive.endsWith('/'))
+        drive = drive.left(drive.length()-1);
+
+    QMutexLocker lock(&m_mutex);
+    WritersMap::iterator itr = m_writers.find(drive);
+    if (itr == m_writers.end())
     {
-        foreach(QueueFileWriter* writer, m_writers.values())
-            delete writer;
+        itr = m_writers.insert(drive, new QueueFileWriter());
     }
+    return itr.value();
+}
 
-    QueueFileWriter* getWriter(const QString& fileName)
-    {
-        //todo: determine physical drive here by path. Now I just got storage root
-        QString drive;
-        int cnt = 0;
-        for (int i = fileName.size()-1; i >= 0; --i)
-        {
-            if (fileName.at(i) == '/')
-            {
-                cnt++;
-                if (cnt >= 7) {
-                    drive = fileName.left(i);
-                    break;
-                }
-            }
-        }
-        if (drive.isEmpty())
-            drive = fileName.left(fileName.indexOf('/'));
+Q_GLOBAL_STATIC(QnWriterPool, inst)
 
-        QMutexLocker lock(&m_mutex);
-        WritersMap::iterator itr = m_writers.find(drive);
-        if (itr == m_writers.end())
-        {
-            itr = m_writers.insert(drive, new QueueFileWriter());
-        }
-        return itr.value();
-    }
-private:
-    QMutex m_mutex;
-    typedef QMap<QString, QueueFileWriter*> WritersMap;
-    WritersMap m_writers;
-};
-
-
-static WriterPool m_writerPool;
-
+QnWriterPool* QnWriterPool::instance()
+{
+    return inst();
+}
 
 // -------------- QBufferedFile -------------
 
@@ -263,7 +285,7 @@ bool QBufferedFile::open(QIODevice::OpenMode mode)
     m_filePos = 0;
 
     if (m_isDirectIO)
-        m_queueWriter = m_writerPool.getWriter(m_fileEngine.getFileName());
+        m_queueWriter = QnWriterPool::instance()->getWriter(m_fileEngine.getFileName());
 
     return QIODevice::open(mode | QIODevice::Unbuffered);
 }
@@ -281,4 +303,11 @@ qint64	QBufferedFile::pos() const
 void QBufferedFile::setSystemFlags(int systemFlags)
 {
     m_systemDependentFlags = systemFlags;
+}
+
+float QueueFileWriter::getAvarageUsage()
+{
+    QMutexLocker lock(&m_timingsMutex);
+    removeOldWritingStatistics(getUsecTimer());
+    return m_writeTime / (float) AVG_USAGE_AGGREGATE_TIME;
 }

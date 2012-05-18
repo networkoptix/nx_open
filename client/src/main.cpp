@@ -52,10 +52,9 @@
 #include "utils/network/socket.h"
 #include <openssl/evp.h>
 
-#include "plugins/storage/file_storage/file_storage_resource.h"
 #include "plugins/storage/file_storage/qtfile_storage_resource.h"
-#include "core/resource/camera_history.h"
 #include "plugins/storage/file_storage/layout_storage_resource.h"
+#include "core/resource/camera_history.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -86,7 +85,8 @@ void ffmpegInit()
     //avcodec_init();
     av_register_all();
 
-    QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true); // true means use it plugin if no <protocol>:// prefix
+    // client uses ordinary QT file to access file system, server uses buffering access implemented inside QnFileStorageResource
+    QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnQtFileStorageResource::instance, true);
     QnStoragePluginFactory::instance()->registerStoragePlugin("qtfile", QnQtFileStorageResource::instance);
     QnStoragePluginFactory::instance()->registerStoragePlugin("layout", QnLayoutFileStorageResource::instance);
 
