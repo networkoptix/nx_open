@@ -1089,7 +1089,7 @@ void QnWorkbenchUi::updateHelpContextInternal() {
         return; /* Focusing on help widget or title item shouldn't change help context. */
     } else if(focusItem == m_treeItem) {
         scope = Qn::TreeScope;
-    } else if(focusItem == m_sliderItem || m_treeItem->isAncestorOf(focusItem)) {
+    } else if(focusItem == m_sliderItem || m_sliderItem->isAncestorOf(focusItem)) {
         scope = Qn::SliderScope;
     } else {
         return;
