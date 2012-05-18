@@ -1046,7 +1046,7 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
                     m_syncAudioTime = m_lastAudioPacketTime; // sync audio time prevent stopping video, if audio track is disapearred
                 }                
                 display(vd, !ignoreVideo, speed);
-                if (m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed)
+                if (m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed && !m_afterJump)
                     m_singleShotQuantProcessed = true;
             }
 
