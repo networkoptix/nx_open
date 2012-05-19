@@ -1,5 +1,7 @@
 1.1
 
+- Linux server officially released 
+
 New Cameras and Recorders Supported:
  - Some Sony, Brickcom, Axis and Iq camera models
  - Axis Encoders.
