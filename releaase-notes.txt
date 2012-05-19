@@ -1,0 +1,32 @@
+1.1
+
+New Cameras and Recorders Supported:
+ - Sony
+ - Exacq Recorder
+ - Coldstore.
+
+New Features:
+
+ - It is possible to export in AVI format as well. This enables viewing exported video almost on any device.AVi is suggested by default. Mkv is still supported.
+ - Mediaproxy feature allows viewing streams from cameras in different subnet. The only thing is needed is to forward Proxy port on the router. See documentation for details.
+ - If adding a new storage to Media Server it is checked for validity and ability to write to.
+ - Swap Camera Features works much better. If swap a camera to another server it is still streaming. Recording flag is set automatically on a new server. Also archive is combined from all servers.
+ - Software Motion Detection allows grab motion detection from cameras not supporting Motion Map feature. However camera should support dualstreaming feature.
+ - Watermark feature generates watermark for each exported file. If viewing exported files in HD Witness the watermark can be checked. If a file was modified the watermark check will fail.
+ - Pan-temporal Timeline was completely redesigned.
+ - Servers node in Resource tree is opened automatically if a user logs in.	
+ - Exported videos are treated as cameras on slider.
+ - Playback (live/archive navigation) is more accurate and smooth.
+
+Bugs Fixed:
+ - Export could not be performed if only one item is on the scene. It was necessary to select it first (the warning was displayed). Now it is selected automaticelly.
+ - Sometimes status events could work incorrectly. This might result in "No Signal" in the camera along with streaming in the same time. Fixed.
+ - Fixed a crash in HD Witness Client if search returns a huge number of results.
+ - Server Name could not be changed. Fixed. 
+ - In some cases Back button could work incorrectly in HD Witness Installer. Fixed.
+ - If many items are on the scene and press the info button the info panels are resized inexpectedly. Fixed.
+ - Fixed an error that occured if try to modify installed HD Witness (add or remove components).
+ - RTSP Port wasn't checked for availability during the installation. Now it is.
+ - SSE 2,3 and 4 is determined incorrectly in runtime. It might result in crash on some processors (Atom, Pentium 4, some AMD models etc). Fixed.
+
+1.0 - Initial Release
