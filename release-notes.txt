@@ -1,8 +1,8 @@
 1.1
 
 New Cameras and Recorders Supported:
- - Sony
- - Exacq Recorder
+ - Some Sony, Brickcom, Axis and Iq camera models
+ - Axis Encoders.
  - Coldstore.
 
 New Features:
@@ -11,7 +11,7 @@ New Features:
  - Mediaproxy feature allows viewing streams from cameras in different subnet. The only thing is needed is to forward Proxy port on the router. Client automatically switching to proxy if media server is not allowed directly. See documentation for details.
  - If adding a new storage to Media Server it is checked for validity and ability to write to.
  - Swap Camera Features works much better. If swap a camera to another server it is still streaming. Recording flag is set automatically on a new server. Also archive is combined from all servers.
- - Software Motion Detection allows grab motion detection from cameras not supporting Motion Map feature. However camera should support dualstreaming feature.
+ - Software Motion Detection allows to do advanced motion detection with very precise and flexible motion mask(camera should support dualstreaming feature). It almost does not require additional CPU usage.
  - Watermark feature generates watermark for each exported file. If viewing exported files in HD Witness the watermark can be checked. If a file was modified the watermark check will fail.
  - Pan-temporal Timeline was completely redesigned.
  - Servers node in Resource tree is opened automatically if a user logs in.	
