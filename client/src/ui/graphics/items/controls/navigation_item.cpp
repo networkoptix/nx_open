@@ -118,8 +118,10 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
     m_timeSlider = new QnTimeSlider(this);
     m_timeSlider->setMinimumHeight(70.0);
     m_timeSlider->setOption(QnTimeSlider::UnzoomOnDoubleClick, false);
+    m_timeSlider->setFocusProxy(this);
 
     m_timeScrollBar = new QnTimeScrollBar(this);
+    m_timeScrollBar->setFocusProxy(this);
     
 
     /* Create navigator. */

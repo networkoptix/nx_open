@@ -5,7 +5,7 @@
     <name>QnContextHelp</name>
     <message>
         <source>ContextId_Scene</source>
-        <translation type="unfinished">&lt;html&gt;
+        <translation>&lt;html&gt;
 	&lt;head&gt;
 		&lt;title&gt;&lt;/title&gt;
 	&lt;/head&gt;
@@ -70,7 +70,7 @@
 			&lt;span class=&quot;desc&quot;&gt;• Fine - ALT+Click and Drag&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
 			&lt;p class=&quot;item&quot;&gt;Take Screenshot&lt;br /&gt;
 			&lt;span class=&quot;desc&quot;&gt;Item&apos;s Context Menu (ALT + S)&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
-			&lt;p class=&quot;item&quot;&gt;Toggle Iteem Info&lt;br /&gt;
+			&lt;p class=&quot;item&quot;&gt;Toggle Item Info&lt;br /&gt;
 			&lt;span class=&quot;desc&quot;&gt;Press &quot;i&quot; button. Info is Shown if Point on Item&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
 		&lt;p class=&quot;title&quot;&gt;Multi-Monitoring&lt;/p&gt;
 			&lt;br /&gt;&lt;span class=&quot;desc&quot;&gt;• Open a Separate Instance of HD Witness Using Main Menu&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
@@ -150,6 +150,7 @@
 			&lt;span class=&quot;desc&quot;&gt;• Click and Drag Slider on Pantemporal Time Line&lt;br /&gt;
 			&lt;p class=&quot;item&quot;&gt;Zoom Time Scale&lt;br /&gt;
 			&lt;span class=&quot;desc&quot;&gt;Mouse Wheel on Time Line&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
+			&lt;span class=&quot;desc&quot;&gt;Double Click on Scroller to Full Zoom Out&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
 			&lt;p class=&quot;item&quot;&gt;Switch to Live&lt;br /&gt;
 			&lt;span class=&quot;desc&quot;&gt;LIVE Button (L)&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
 			&lt;p class=&quot;item&quot;&gt;Toggle Cameras Sync&apos;d to Same Time &lt;br /&gt;
@@ -158,8 +159,9 @@
 			&lt;p class=&quot;item&quot;&gt;Select an Item to Export Video From&lt;br /&gt;
 			&lt;span class=&quot;desc&quot;&gt;Click an Item&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
 			&lt;p class=&quot;item&quot;&gt;Set Start/End Range for Export&lt;br /&gt;
-			&lt;span class=&quot;desc&quot;&gt;• Navigate Through Timeline to Desired Point&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
-			&lt;span class=&quot;desc&quot;&gt;• Open Context Menu and Set Start/End Point (SHIFT+Click)&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
+			&lt;span class=&quot;desc&quot;&gt;• Use &quot;[&quot; and &quot;]&quot; Shortcuts&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
+			&lt;span class=&quot;desc&quot;&gt;• Use Right Click and Drag&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
+			&lt;span class=&quot;desc&quot;&gt;• Resize Selected region by Dragging Edges&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
 			&lt;p class=&quot;item&quot;&gt;Export&lt;br /&gt;
 			&lt;span class=&quot;desc&quot;&gt;Use Context Menu&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
 	&lt;/body&gt;
@@ -231,7 +233,7 @@
     </message>
     <message>
         <source>ContextId_Search</source>
-        <translation type="unfinished">&lt;html&gt;
+        <translation>&lt;html&gt;
 	&lt;head&gt;
 		&lt;title&gt;&lt;/title&gt;
 	&lt;/head&gt;

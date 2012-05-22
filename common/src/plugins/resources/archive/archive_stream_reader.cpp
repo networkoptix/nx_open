@@ -667,7 +667,7 @@ begin_label:
     if (videoData && videoData->context) 
         m_codecContext = videoData->context;
 
-    if (m_currentData && singleShotMode && m_skipFramesToTime == 0) {
+    if (videoData && singleShotMode && m_skipFramesToTime == 0) {
         m_singleQuantProcessed = true;
         //m_currentData->flags |= QnAbstractMediaData::MediaFlags_SingleShot;
     }
