@@ -70,3 +70,9 @@ QnWorkbenchAccessController *QnWorkbenchContextAware::accessController() const {
 QnWorkbenchDisplay *QnWorkbenchContextAware::display() const {
     return context()->display();
 }
+
+QnWorkbenchNavigator *QnWorkbenchContextAware::navigator() const {
+    return context()->navigator();
+}
+
+

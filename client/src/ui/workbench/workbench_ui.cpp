@@ -493,7 +493,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(m_sliderOpacityProcessor,   SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateControlsVisibility()));
     connect(m_sliderOpacityProcessor,   SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateControlsVisibility()));
     connect(m_sliderItem,               SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_sliderItem_geometryChanged()));
-    connect(m_sliderItem->navigator(),  SIGNAL(currentWidgetChanged()),                                                             this,                           SLOT(updateControlsVisibility()));
+    connect(navigator(),                SIGNAL(currentWidgetChanged()),                                                             this,                           SLOT(updateControlsVisibility()));
 
 
     /* Connect to display. */
@@ -571,7 +571,7 @@ QVariant QnWorkbenchUi::currentTarget(Qn::ActionScope scope) const {
     case Qn::TreeScope:
         return m_treeWidget->currentTarget(scope);
     case Qn::SliderScope:
-        return QVariant::fromValue(m_sliderItem->navigator()->currentWidget());
+        return QVariant::fromValue(navigator()->currentWidget());
     case Qn::SceneScope:
         return QVariant::fromValue(QnActionParameterTypes::widgets(display()->scene()->selectedItems()));
     default:
@@ -847,7 +847,7 @@ void QnWorkbenchUi::updateHelpOpacity(bool animate) {
 }
 
 void QnWorkbenchUi::updateControlsVisibility(bool animate) {
-    bool sliderVisible = m_sliderItem->navigator()->currentWidget() != NULL && !m_sliderItem->navigator()->currentWidget()->display()->isStillImage();
+    bool sliderVisible = navigator()->currentWidget() != NULL && !navigator()->currentWidget()->display()->isStillImage();
 
     if(m_inactive) {
         bool hovered = m_sliderOpacityProcessor->isHovered() || m_treeOpacityProcessor->isHovered() || m_titleOpacityProcessor->isHovered() || m_helpOpacityProcessor->isHovered();

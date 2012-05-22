@@ -532,6 +532,7 @@ QList<QnResourceWidget *> QnWorkbenchDisplay::widgets(const QnResourcePtr &resou
 QnResourceDisplay *QnWorkbenchDisplay::display(QnWorkbenchItem *item) const {
     if(QnResourceWidget *widget = this->widget(item))
         return widget->display();
+    return NULL;
 }
 
 CLVideoCamera *QnWorkbenchDisplay::camera(QnWorkbenchItem *item) const {
