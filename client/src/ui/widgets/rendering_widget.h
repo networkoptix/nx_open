@@ -11,7 +11,7 @@ class QnResourceWidgetRenderer;
 class QnRenderingWidget: public QGLWidget {
     Q_OBJECT;
 public:
-    QnRenderingWidget(const QGLFormat &format, QWidget *parent = 0, const QGLWidget *shareWidget = 0, Qt::WindowFlags f = 0);
+    QnRenderingWidget(QWidget *parent = 0, Qt::WindowFlags f = 0);
 
     virtual ~QnRenderingWidget();
 
