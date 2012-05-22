@@ -6,6 +6,7 @@
 #include <core/resource/resource_fwd.h>
 
 class QnResourceDisplay;
+class QnResourceWidgetRenderer;
 
 class QnRenderingWidget: public QGLWidget {
     Q_OBJECT;
@@ -18,8 +19,8 @@ public:
     void setResource(const QnMediaResourcePtr &resource);
 
 protected:
-    virtual void resizeEvent(QResizeEvent *event) override;
-    virtual void paintEvent(QPaintEvent *event) override;
+    virtual void initializeGL() override;
+    virtual void paintGL() override;
 
 private:
     QnResourceDisplay *m_display;
