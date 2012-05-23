@@ -67,20 +67,6 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
     layout->setContentsMargins(0,0,0,10);
     layout->addWidget(m_renderingWidget);
 
-    /*dataProvider = static_cast<QnAbstractArchiveReader*>(m_resource->createDataProvider(QnResource::Role_Default));
-    dataProvider->setCycleMode(false);
-    camera = new CLVideoCamera(m_resource, false, dataProvider);
-    renderer = new QnResourceWidgetRenderer(1, 0, m_renderingWidget->context());
-    m_renderingWidget->setRenderer(renderer);
-    camera->getCamDisplay()->addVideoChannel(0, renderer, true);
-    camera->getCamDisplay()->setMTDecoding(true);
-    dataProvider->start();
-    */
-
-    //m_renderingWidget->setCamDisplay(camera->getCamDisplay());
-
-
-
     resetButton->setText(tr("&Reset"));
 
     m_connectionsModel = new QStandardItemModel(this);
@@ -110,15 +96,8 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
     updateFocus();
 }
 
-LoginDialog::~LoginDialog()
-{
-    /*renderer->beforeDestroy();
-    camera->beforeStopDisplay();
-    camera->stopDisplay();
-    
-    delete camera;
-    delete renderer;
-    delete m_renderingWidget;*/
+LoginDialog::~LoginDialog() {
+    return;
 }
 
 void LoginDialog::updateFocus() 
