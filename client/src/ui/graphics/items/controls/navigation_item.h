@@ -29,10 +29,6 @@ public:
         return m_timeScrollBar;
     }
 
-    QnWorkbenchNavigator *navigator() const {
-        return m_navigator;
-    }
-
     virtual bool eventFilter(QObject *watched, QEvent *event) override;
 
 private slots:

@@ -46,6 +46,10 @@ private:
 
     qint64 m_pos;
 
+    int m_channel;
+
+    bool m_opened;
+
         
 };
 
