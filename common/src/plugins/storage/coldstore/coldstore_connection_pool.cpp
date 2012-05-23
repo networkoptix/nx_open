@@ -2,7 +2,8 @@
 #include "coldstore_storage.h"
 
 
-QnColdStoreConnection::QnColdStoreConnection(const QString& addr)
+QnColdStoreConnection::QnColdStoreConnection(const QString& addr):
+m_opened(false)
 {
     QByteArray ipba = addr.toLocal8Bit();
     char* ip = ipba.data();
@@ -25,6 +26,8 @@ bool QnColdStoreConnection::open(const QString& fn, QIODevice::OpenModeFlag flag
 {
     if (!m_isConnected)
         return false;
+
+    m_channel = channel;
 
     m_filename = fn;
 
@@ -75,7 +78,7 @@ bool QnColdStoreConnection::open(const QString& fn, QIODevice::OpenModeFlag flag
         return false;
     }
 
-
+    m_opened = true;
     return true;
 }
 
@@ -86,18 +89,25 @@ qint64 QnColdStoreConnection::size() const
 
 void QnColdStoreConnection::close()
 {
-    if (!m_isConnected)
+    if (!m_isConnected || !m_opened)
         return;
+
+    m_opened = false;
 
     m_lastUsed.restart();
 
-    m_connection.Close(m_stream);
+    
+
+    Veracity::u32 status = m_connection.Close(m_stream);
+
+    qDebug() << " cs file closed==================!!!!:" << m_filename << " channel " << m_channel;
+
 }
 
 
 bool QnColdStoreConnection::seek(qint64 pos)
 {
-    if (!m_isConnected)
+    if (!m_isConnected || !m_opened)
         return false;
 
     m_lastUsed.restart();
@@ -120,7 +130,7 @@ bool QnColdStoreConnection::seek(qint64 pos)
 
 bool QnColdStoreConnection::write(const char* data, int len)
 {
-    if (!m_isConnected)
+    if (!m_isConnected || !m_opened)
         return false;
 
     m_lastUsed.restart();
@@ -152,7 +162,7 @@ bool QnColdStoreConnection::write(const char* data, int len)
 
 int QnColdStoreConnection::read(char *data, int len)
 {
-    if (!m_isConnected)
+    if (!m_isConnected || !m_opened)
         return -1;
 
     m_lastUsed.restart();
