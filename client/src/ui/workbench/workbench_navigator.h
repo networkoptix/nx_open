@@ -41,6 +41,7 @@ public:
     QnWorkbenchNavigator(QObject *parent = NULL);
     virtual ~QnWorkbenchNavigator();
 
+    // TODO: move time slider & time scrollbar out.
     QnTimeSlider *timeSlider() const;
     void setTimeSlider(QnTimeSlider *timeSlider);
 
