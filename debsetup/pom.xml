@@ -43,23 +43,12 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
 				<version>1.1.1</version>
 				<executions>
-					<execution>
-						<id>prepare-clean</id>
-						<phase>pre-clean</phase>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-							<executable>${basedir}/../pre-clean.sh</executable>
-							<workingDirectory>${project.build.directory}</workingDirectory>
-						</configuration>
-					</execution>
 					<execution>
 						<id>prepare-deb-contents</id>
 						<phase>prepare-package</phase>
@@ -90,6 +79,24 @@
 				<version>1.7</version>
 				<executions>
 					<execution>
+						<id>prepare-clean</id>
+						<phase>pre-clean</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+								<exec dir="${basedir}" executable="sudo" failifexecutionfails="false">
+									<arg line="rm -Rf ${project.build.directory}"/>
+								</exec>
+							</target>
+							<!--<target>
+								<chmod file="${basedir}/../pre-clean.sh" perm="755"/>	
+								<exec dir="${basedir}/../" executable="pre-clean.sh" failifexecutionfails="false" />
+							</target> -->
+						</configuration>
+					</execution>	
+					<execution>
 						<id>chmod</id>
 						<phase>process-resources</phase>
 						<goals>
@@ -101,7 +108,7 @@
 								<chmod file="${project.build.directory}/*.sh" perm="755"/>							
 							</target>
 						</configuration>
-					</execution>				
+					</execution>					
 				</executions>
 			</plugin>
 
