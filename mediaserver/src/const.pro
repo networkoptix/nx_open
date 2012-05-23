@@ -139,7 +139,7 @@ win32 {
     INCLUDEPATH += ../contrib/ffmpeg-misc-headers-win32
   }
 
-  LIBS += -lws2_32 -lIphlpapi -lOle32
+  LIBS += -lws2_32 -lIphlpapi -lOle32 -leay32 -lssleay32
 
   LIBS += -lwinmm
 

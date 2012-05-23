@@ -1,9 +1,14 @@
+#ifdef WIN32
+#include "openssl/evp.h"
+#else
+#include "evp.h"
+#endif
+
 #include "onvif_211_resource_searcher.h"
 #include "core/resource/camera_resource.h"
 #include "onvif_211_resource.h"
 #include "Onvif.nsmap"
 #include "soapDeviceBindingProxy.h"
-#include "evp.h"
 #include "wsseapi.h"
 
 const char* OnvifGeneric211ResourceSearcher::ONVIF_RT = "ONVIF";

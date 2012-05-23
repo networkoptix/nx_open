@@ -1,10 +1,15 @@
+#ifdef WIN32
+#include "openssl/evp.h"
+#else
+#include "evp.h"
+#endif
+
 #include "onvif_211_resource.h"
 #include "../onvif/dataprovider/onvif_mjpeg.h"
 #include "onvif_211_stream_reader.h"
 #include "utils/common/synctime.h"
 //#include "Onvif.nsmap"
 #include "soapMediaBindingProxy.h"
-#include "/usr/include/openssl/evp.h"
 #include "wsseapi.h"
 
 const char* QnPlOnvifGeneric211Resource::MANUFACTURE = "OnvifDevice";

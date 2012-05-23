@@ -1,3 +1,9 @@
+#ifdef WIN32
+#include "openssl/evp.h"
+#else
+#include "evp.h"
+#endif
+
 #include <QTextStream>
 #include "onvif_211_resource.h"
 #include "onvif_211_stream_reader.h"
@@ -6,9 +12,7 @@
 #include "utils/media/nalUnits.h"
 //#include "Onvif.nsmap"
 #include "soapMediaBindingProxy.h"
-#include "/usr/include/openssl/evp.h"
 #include "wsseapi.h"
-
 
 QnOnvifGeneric211StreamReader::QnOnvifGeneric211StreamReader(QnResourcePtr res):
     CLServerPushStreamreader(res),
