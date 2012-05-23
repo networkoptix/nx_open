@@ -122,8 +122,6 @@ void QnResourceDiscoveryManager::run()
         }
     }
 
-    cl_log.log(cl_logERROR, "DWW QnResourceDiscoveryManager bug1");
-
     while (!needToStop() && !m_ready)
         QnSleep::msleep(1);
 
@@ -133,21 +131,15 @@ void QnResourceDiscoveryManager::run()
         QnSleep::msleep(1000);
     }
 
-    cl_log.log(cl_logERROR, "DWW QnResourceDiscoveryManager bug2");
-
     while (!needToStop() && !initLicenses(appServerConnection))
     {
         QnSleep::msleep(1000);
     }
 
-    cl_log.log(cl_logERROR, "DWW QnResourceDiscoveryManager bug3");
-
     while (!needToStop() && !initCameraHistory(appServerConnection))
     {
         QnSleep::msleep(1000);
     }
-
-    cl_log.log(cl_logERROR, "DWW QnResourceDiscoveryManager bug4");
 
     m_runNumber = 0;
 

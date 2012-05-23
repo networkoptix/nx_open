@@ -547,8 +547,6 @@ QnAppServerConnectionPtr QnAppServerConnectionFactory::createConnection()
 
 bool initResourceTypes(QnAppServerConnectionPtr appServerConnection)
 {
-    cl_log.log(cl_logERROR, "DW initResourceTypes bug1");
-
     if (!qnResTypePool->isEmpty())
         return true;
 
@@ -561,11 +559,7 @@ bool initResourceTypes(QnAppServerConnectionPtr appServerConnection)
         return false;
     }
 
-    cl_log.log(cl_logERROR, "DW initResourceTypes bug2");
-
     qnResTypePool->addResourceTypeList(resourceTypeList);
-
-    cl_log.log(cl_logERROR, "DW initResourceTypes bug3");
 
     return true;
 }
