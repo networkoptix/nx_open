@@ -51,8 +51,6 @@
 
 #include "eventmanager.h"
 
-Q_DECLARE_METATYPE(QnWorkbenchLayout *);
-
 namespace {
 
     QToolButton *newActionButton(QAction *action, qreal sizeMultiplier = 1.0) {

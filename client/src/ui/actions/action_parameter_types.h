@@ -21,7 +21,19 @@ public:
 
     static Qn::ActionParameterType type(const QVariant &items);
 
+    static QnResourceList resources(const QVariant &items);
+
+    static QnLayoutItemIndexList layoutItems(const QVariant &items);
+
+    static QnWorkbenchLayoutList layouts(const QVariant &items);
+
+    static QnResourceWidgetList widgets(const QVariant &items);
+
+
+
     static QnResourcePtr resource(QnResourceWidget *widget);
+
+    static QnResourcePtr resource(QnWorkbenchLayout *layout);
 
     static QnResourceList resources(QnResourceWidget *widget);
 
@@ -29,21 +41,15 @@ public:
 
     static QnResourceList resources(const QnLayoutItemIndexList &layoutItems);
 
-    static QnResourceList resources(const QnWorkbenchLayoutList &layouts);
+    static QnResourceList resources(QnWorkbenchLayout *layout);
 
-    static QnResourceList resources(const QVariant &items);
+    static QnResourceList resources(const QnWorkbenchLayoutList &layouts);
 
     static QnLayoutItemIndex layoutItem(QnResourceWidget *widget);
 
     static QnLayoutItemIndexList layoutItems(const QnResourceWidgetList &widgets);
 
     static QnLayoutItemIndexList layoutItems(QnResourceWidget *widget);
-
-    static QnLayoutItemIndexList layoutItems(const QVariant &items);
-
-    static QnWorkbenchLayoutList layouts(const QVariant &items);
-
-    static QnResourceWidgetList widgets(const QVariant &items);
 
     static QnResourceWidgetList widgets(const QList<QGraphicsItem *> items);
 };

@@ -8,6 +8,10 @@
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
 
+/**
+ * Widget for displaying video from the given resource without constructing 
+ * the heavy graphics scene machinery.
+ */
 class QnRenderingWidget: public QGLWidget {
     Q_OBJECT;
 public:

@@ -105,9 +105,7 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
             Qn::Permissions requirements = pos.value();
 
             QnResourceList resources;
-            if(key.isEmpty()) {
-                resources = parameters.resources();
-            } else if(parameters.hasArgument(key)) {
+            if(parameters.hasArgument(key)) {
                 resources = QnActionParameterTypes::resources(parameters.argument(key));
             } else if(key == Qn::CurrentLayoutParameter) {
                 resources.push_back(context()->workbench()->currentLayout()->resource());

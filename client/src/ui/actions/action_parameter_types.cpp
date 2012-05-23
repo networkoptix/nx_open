@@ -19,6 +19,7 @@ namespace ParameterMetaType {
         ResourceWidget,
         ResourceWidgetList,
         LayoutItemIndexList,
+        WorkbenchLayout,
         WorkbenchLayoutList,
         Invalid = -1
     };
@@ -60,6 +61,7 @@ namespace {
         x->set(qMetaTypeId<QnResourceWidget *>(),           ResourceWidget);
         x->set(qMetaTypeId<QnResourceWidgetList>(),         ResourceWidgetList);
         x->set(qMetaTypeId<QnLayoutItemIndexList>(),        LayoutItemIndexList);
+        x->set(qMetaTypeId<QnWorkbenchLayout *>(),          WorkbenchLayout);
         x->set(qMetaTypeId<QnWorkbenchLayoutList>(),        WorkbenchLayoutList);
     });
 
@@ -117,6 +119,8 @@ int QnActionParameterTypes::size(const QVariant &items) {
         return items.value<QnResourceWidgetList>().size();
     case LayoutItemIndexList:
         return items.value<QnLayoutItemIndexList>().size();
+    case WorkbenchLayout:
+        return items.value<QnWorkbenchLayout *>() ? 1 : 0;
     case WorkbenchLayoutList:
         return items.value<QnWorkbenchLayoutList>().size();
     default:
@@ -132,15 +136,14 @@ Qn::ActionParameterType QnActionParameterTypes::type(const QVariant &items) {
     case UserResourcePtr:
     case LayoutResourcePtr:
     case VideoServerResourcePtr:
-        return Qn::ResourceType;
     case ResourceList:
         return Qn::ResourceType;
     case ResourceWidget:
-        return Qn::WidgetType;
     case ResourceWidgetList:
         return Qn::WidgetType;
     case LayoutItemIndexList:
         return Qn::LayoutItemType;
+    case WorkbenchLayout:
     case WorkbenchLayoutList:
         return Qn::LayoutType;
     default:
@@ -148,15 +151,15 @@ Qn::ActionParameterType QnActionParameterTypes::type(const QVariant &items) {
     }
 }
 
-QnResourceList QnActionParameterTypes::resources(QnResourceWidget *widget) {
-    return makeList<QnResourceList>(QnActionParameterTypes::resource(widget));
-}
-
 QnResourcePtr QnActionParameterTypes::resource(QnResourceWidget *widget) {
     if(widget == NULL)
         return QnResourcePtr();
 
     return widget->resource();
+}
+
+QnResourceList QnActionParameterTypes::resources(QnResourceWidget *widget) {
+    return makeList<QnResourceList>(resource(widget));
 }
 
 QnResourceList QnActionParameterTypes::resources(const QnResourceWidgetList &widgets) {
@@ -196,11 +199,22 @@ QnResourceList QnActionParameterTypes::resources(const QnLayoutItemIndexList &la
     return result;
 }
 
+QnResourcePtr QnActionParameterTypes::resource(QnWorkbenchLayout *layout) {
+    if(layout == NULL)
+        return QnResourcePtr();
+
+    return layout->resource();
+}
+
+QnResourceList QnActionParameterTypes::resources(QnWorkbenchLayout *layout) {
+    return makeList<QnResourceList>(resource(layout));
+}
+
 QnResourceList QnActionParameterTypes::resources(const QnWorkbenchLayoutList &layouts) {
     QnResourceList result;
 
     foreach(QnWorkbenchLayout *layout, layouts) {
-        QnLayoutResourcePtr resource = layout->resource();
+        QnResourcePtr resource = QnActionParameterTypes::resource(layout);
         if(!resource)
             continue;
 
@@ -227,6 +241,8 @@ QnResourceList QnActionParameterTypes::resources(const QVariant &items) {
         return resources(items.value<QnResourceWidgetList>());
     case LayoutItemIndexList:
         return resources(items.value<QnLayoutItemIndexList>());
+    case WorkbenchLayout:
+        return resources(items.value<QnWorkbenchLayout *>());
     case WorkbenchLayoutList:
         return resources(items.value<QnWorkbenchLayoutList>());
     default:
@@ -261,12 +277,7 @@ QnLayoutItemIndexList QnActionParameterTypes::layoutItems(const QnResourceWidget
 }
 
 QnLayoutItemIndexList QnActionParameterTypes::layoutItems(QnResourceWidget *widget) {
-    QnLayoutItemIndex layoutItem = QnActionParameterTypes::layoutItem(widget);
-
-    QnLayoutItemIndexList result;
-    if(!layoutItem.isNull())
-        result.push_back(layoutItem);
-    return result;
+    return makeList<QnLayoutItemIndexList>(QnActionParameterTypes::layoutItem(widget));
 }
 
 QnLayoutItemIndexList QnActionParameterTypes::layoutItems(const QVariant &items) {
@@ -288,6 +299,8 @@ QnWorkbenchLayoutList QnActionParameterTypes::layouts(const QVariant &items) {
     using namespace ParameterMetaType;
 
     switch(qn_actionMetaTypeMap()->get(items.userType())) {
+    case WorkbenchLayout:
+        return makeList<QnWorkbenchLayoutList>(items.value<QnWorkbenchLayout *>());
     case WorkbenchLayoutList:
         return items.value<QnWorkbenchLayoutList>();
     default:
@@ -299,14 +312,8 @@ QnResourceWidgetList QnActionParameterTypes::widgets(const QVariant &items) {
     using namespace ParameterMetaType;
 
     switch(qn_actionMetaTypeMap()->get(items.userType())) {
-    case ResourceWidget: {
-        QnResourceWidget *widget = items.value<QnResourceWidget *>();
-
-        QnResourceWidgetList result;
-        if(widget)
-            result.push_back(widget);
-        return result;
-    }
+    case ResourceWidget: 
+        return makeList<QnResourceWidgetList>(items.value<QnResourceWidget *>());
     case ResourceWidgetList:
         return items.value<QnResourceWidgetList>();
     default:
