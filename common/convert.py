@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #!/usr/bin/env python
 
-import shutil, glob, string
+import shutil, glob, string, array
 import os, sys, posixpath
 from platform import architecture
 
@@ -123,8 +123,9 @@ def setup_openssl():
     return openssl_path
 
 def setup_tools():
-    if platform() == 'linux':
-        return '/usr'
+    os_bit = ''
+    if platform() == 'linux' and array.array('L').itemsize != 4:
+        os_bit = '64'
 
     tools_path = os.getenv('EVE_TOOLS')
 
@@ -136,7 +137,7 @@ def setup_tools():
 #        print 'Please clone ssh://hg@noptix.dyndns.biz/evetools to ../.. or to directory referenced by EVE_TOOLS env variable'
 #        sys.exit(1)
         return qt_path(os.path.join(os.path.dirname(__file__), '..', 'build'))
-    return qt_path(os.path.join(tools_path, platform()))
+    return qt_path(os.path.join(tools_path, platform() + os_bit))
 
 
 def setup_ffmpeg():

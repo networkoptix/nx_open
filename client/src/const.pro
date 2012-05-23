@@ -41,6 +41,10 @@ PRECOMPILED_SOURCE = $$PWD/StdAfx.cpp
 
 QMAKE_CXXFLAGS += -I$$EVETOOLS_DIR/include
 
+unix {
+  QMAKE_CXXFLAGS += -I/usr/include
+}
+
 CONFIG(debug, debug|release) {
   CONFIG += console
   DESTDIR = ../bin/debug
@@ -127,6 +131,10 @@ DEFINES += __STDC_CONSTANT_MACROS
 
 LIBS += -L$$EVETOOLS_DIR/lib
 
+unix {
+  LIBS += -L/usr/lib
+}
+
 INCLUDEPATH += ../contrib/qtcolorpicker/src
 LIBS += -L../contrib/qtcolorpicker/lib
 DEFINES += QT_QTCOLORPICKER_IMPORT
@@ -138,6 +146,10 @@ CONFIG(debug, debug|release) {
   win32 {
       LIBS += -lQtSolutions_ColorPicker-2.6d -L../../common/contrib/qjson/lib/win32/debug
   }
+
+  unix {
+    LIBS += -L/usr/lib/debug
+  }
 }
 CONFIG(release, debug|release) {
   INCLUDEPATH += $$FFMPEG-release/include
@@ -145,6 +157,10 @@ CONFIG(release, debug|release) {
 
   win32 {
       LIBS += -lQtSolutions_ColorPicker-2.6 -L../../common/contrib/qjson/lib/win32/release
+  }
+
+  unix {
+    LIBS += -L/usr/lib/release
   }
 }
 

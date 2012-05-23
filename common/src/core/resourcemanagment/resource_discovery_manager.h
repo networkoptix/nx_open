@@ -61,7 +61,7 @@ private:
     void updateResourceStatus(QnResourcePtr res);
 
 
-    // ping resources from time to time to keep OS ARP table updated; speeds up resource start time in case if not recorded 
+    // ping resources from time to time to keep OS ARP table updated; speeds up resource (start) time in case if not recorded
     void pingResources(QnResourcePtr res);
 
 private:

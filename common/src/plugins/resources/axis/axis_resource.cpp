@@ -4,7 +4,7 @@
 #include "utils/common/synctime.h"
 
 const char* QnPlAxisResource::MANUFACTURE = "Axis";
-static const int MAX_AR_EPS = 0.01;
+static const float MAX_AR_EPS = 0.01;
 static const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
 
 QnPlAxisResource::QnPlAxisResource()
@@ -58,7 +58,7 @@ void QnPlAxisResource::clear()
 struct WindowInfo
 {
     enum RectType {Unknown, Motion, MotionMask};
-    WindowInfo(): left(-1), right(-1), top(-1), bottom(-1), rectType(Unknown) {};
+    WindowInfo(): left(-1), right(-1), top(-1), bottom(-1), rectType(Unknown) {}
     bool isValid() const 
     { 
         return left >= 0 && right >= 0 && top >= 0 && bottom >= 0 && rectType != Unknown;

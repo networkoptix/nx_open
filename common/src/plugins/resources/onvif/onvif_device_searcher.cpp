@@ -90,7 +90,7 @@ QnResourceList OnvifResourceSearcher::findResources()
 
         QUdpSocket sendSocket, recvSocket;
 
-        bool bindSucceeded = sendSocket.bind(localAddress, 0);
+        bool bindSucceeded = sendSocket.bind(localAddress, MDNS_PORT, QUdpSocket::ReuseAddressHint | QUdpSocket::ShareAddress);
         if (!bindSucceeded)
             continue;
 
@@ -142,17 +142,16 @@ void OnvifResourceSearcher::checkSocket(QUdpSocket& sock, QnResourceList& result
 
         sock.readDatagram(responseData.data(), responseData.size(),	&sender, &senderPort);
         //cl_log.log(cl_logALWAYS, "size: %d\n", responseData.size());
-        if (senderPort != MDNS_PORT)// || sender == localAddress)
-            senderPort = senderPort;
-        //continue;
+        if (sender == localAddress) continue;
 
-        QnNetworkResourcePtr nresource = processPacket(result, responseData);
+        QnNetworkResourcePtr nresource = processPacket(result, responseData, sender);
 
         if (nresource==0)
             continue;
 
-
         nresource->setHostAddress(sender, QnDomainMemory);
+        //nresource->setHostAddress(QHostAddress("174.34.67.10"), QnDomainMemory);
+        //nresource->setHostAddress(QHostAddress("192.168.2.11"), QnDomainMemory);
         nresource->setDiscoveryAddr(localAddress);
 
 

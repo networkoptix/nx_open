@@ -52,7 +52,7 @@ QnResourcePtr QnPlAxisResourceSearcher::checkHostAddr(QHostAddress addr)
     return QnResourcePtr(0);
 }
 
-QnNetworkResourcePtr QnPlAxisResourceSearcher::processPacket(QnResourceList& result, QByteArray& responseData)
+QnNetworkResourcePtr QnPlAxisResourceSearcher::processPacket(QnResourceList& result, QByteArray& responseData, const QHostAddress&)
 {
 
     QString smac;

@@ -18,7 +18,7 @@ public:
     virtual QnResourcePtr checkHostAddr(QHostAddress addr);
 
 protected:
-    QnNetworkResourcePtr processPacket(QnResourceList& result, QByteArray& responseData);
+    QnNetworkResourcePtr processPacket(QnResourceList& result, QByteArray& responseData, const QHostAddress& sender);
 };
 
 #endif //iq_device_server_h_1825

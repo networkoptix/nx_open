@@ -11,16 +11,16 @@ class OnvifResourceSearcher : public QnAbstractNetworkResourceSearcher
 protected:
     OnvifResourceSearcher();
 public:
-    
 
-	~OnvifResourceSearcher();
+
+    virtual ~OnvifResourceSearcher();
 
     bool isProxy() const;
 
     virtual QnResourceList findResources();
 
 protected:
-    virtual QnNetworkResourcePtr processPacket(QnResourceList& result, QByteArray& responseData) = 0;
+    virtual QnNetworkResourcePtr processPacket(QnResourceList& result, QByteArray& responseData, const QHostAddress& sender) = 0;
 private:
     void checkSocket(QUdpSocket& sock, QnResourceList& result, QHostAddress localAddress);
 };

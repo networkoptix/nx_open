@@ -75,6 +75,10 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../common/contrib/qjson/lib/win32/debug 
   }
 
+  unix {
+    LIBS += -L/usr/lib/debug
+  }
+
 }
 CONFIG(release, debug|release) {
   INCLUDEPATH += $$FFMPEG-release/include
@@ -82,6 +86,10 @@ CONFIG(release, debug|release) {
 
   win32 {
     LIBS += -L../../common/contrib/qjson/lib/win32/release 
+  }
+
+  unix {
+    LIBS += -L/usr/lib/release
   }
 }
 
@@ -111,11 +119,12 @@ unix:!mac {
     } else {
         LIBS += -L../../common/contrib/qjson/lib/linux-32
     }
+    QMAKE_CXXFLAGS += -I/usr/include
 }
 
 LIBS += -L$$EVETOOLS_DIR/lib
 
-LIBS += -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lqjson
+LIBS += -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lqjson -lgsoap-base -lonvif
 
 win32 {
   win32-msvc* {
@@ -144,7 +153,7 @@ win32 {
 DEFINES += __STDC_CONSTANT_MACROS
 
 unix {
-  LIBS += -lz -lcrypto
+  LIBS += -L/usr/lib -lz -lcrypto -lssl
   QMAKE_CXXFLAGS += -msse2
   DEFINES += QN_EXPORT=
 }
