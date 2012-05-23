@@ -477,16 +477,23 @@ void QnMain::run()
 
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
+    cl_log.log(cl_logERROR, "DW QnMain bug1");
+
     while (!needToStop() && !initResourceTypes(appServerConnection))
     {
+        cl_log.log(cl_logERROR, "DW QnMain bug2");
         QnSleep::msleep(1000);
     }
+
+    cl_log.log(cl_logERROR, "DW QnMain bug3");
 
 
     while (!needToStop() && !initLicenses(appServerConnection))
     {
         QnSleep::msleep(1000);
     }
+
+    cl_log.log(cl_logERROR, "DW QnMain bug4");
 
     if (needToStop())
         return;
