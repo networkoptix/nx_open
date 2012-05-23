@@ -11,31 +11,17 @@
 class QVariant;
 class QGraphicsItem;
 
+/**
+ * Helper class that implements <tt>QVariant</tt>-based overloading for
+ * the types supported by default action parameter.
+ */
 class QnActionParameterTypes {
 public:
-    static void initialize();
-
     static int size(const QVariant &items);
 
     static Qn::ActionParameterType type(const QVariant &items);
 
-    static QnResourcePtr resource(QnResourceWidget *widget);
-
-    static QnResourceList resources(QnResourceWidget *widget);
-
-    static QnResourceList resources(const QnResourceWidgetList &widgets);
-
-    static QnResourceList resources(const QnLayoutItemIndexList &layoutItems);
-
-    static QnResourceList resources(const QnWorkbenchLayoutList &layouts);
-
     static QnResourceList resources(const QVariant &items);
-
-    static QnLayoutItemIndex layoutItem(QnResourceWidget *widget);
-
-    static QnLayoutItemIndexList layoutItems(const QnResourceWidgetList &widgets);
-
-    static QnLayoutItemIndexList layoutItems(QnResourceWidget *widget);
 
     static QnLayoutItemIndexList layoutItems(const QVariant &items);
 
@@ -43,8 +29,29 @@ public:
 
     static QnResourceWidgetList widgets(const QVariant &items);
 
-    static QnResourceWidgetList widgets(const QList<QGraphicsItem *> items);
 
+
+    static QnResourcePtr resource(QnResourceWidget *widget);
+
+    static QnResourcePtr resource(QnWorkbenchLayout *layout);
+
+    static QnResourceList resources(QnResourceWidget *widget);
+
+    static QnResourceList resources(const QnResourceWidgetList &widgets);
+
+    static QnResourceList resources(const QnLayoutItemIndexList &layoutItems);
+
+    static QnResourceList resources(QnWorkbenchLayout *layout);
+
+    static QnResourceList resources(const QnWorkbenchLayoutList &layouts);
+
+    static QnLayoutItemIndex layoutItem(QnResourceWidget *widget);
+
+    static QnLayoutItemIndexList layoutItems(const QnResourceWidgetList &widgets);
+
+    static QnLayoutItemIndexList layoutItems(QnResourceWidget *widget);
+
+    static QnResourceWidgetList widgets(const QList<QGraphicsItem *> items);
 };
 
 Q_DECLARE_METATYPE(QnResourceWidgetList);

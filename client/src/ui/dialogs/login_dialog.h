@@ -12,7 +12,7 @@ class QnWorkbenchContext;
 class QnAbstractArchiveReader;
 class CLVideoCamera;
 class QnResourceWidgetRenderer;
-class QnMyGLWidget;
+class QnRenderingWidget;
 
 namespace Ui {
     class LoginDialog;
@@ -56,12 +56,7 @@ private:
     QDataWidgetMapper *m_dataWidgetMapper;
     int m_requestHandle;
 
-    QnAviResourcePtr aviRes;
-    QnMyGLWidget* glWindow;
-    QnAbstractArchiveReader* dataProvider;
-    CLVideoCamera* camera;
-    QnResourceWidgetRenderer* renderer;
-
+    QnRenderingWidget* m_renderingWidget;
 };
 
 #endif // LOGINDIALOG_H

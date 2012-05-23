@@ -83,3 +83,10 @@ void QnResourceWidgetRenderer::setChannelScreenSize(const QSize &screenSize) {
 bool QnResourceWidgetRenderer::constantDownscaleFactor() const {
     return false;
 }
+
+QSize QnResourceWidgetRenderer::sourceSize() const {
+    QMutexLocker locker(&m_mutex);
+
+    return m_sourceSize;
+}
+

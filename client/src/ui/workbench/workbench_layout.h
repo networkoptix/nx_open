@@ -331,4 +331,6 @@ private:
     const QSet<QnWorkbenchItem *> m_noItems;
 };
 
+Q_DECLARE_METATYPE(QnWorkbenchLayout *);
+
 #endif // QN_WORKBENCH_LAYOUT_H
