@@ -1,13 +1,15 @@
 #ifndef QN_ANIMATOR_H
 #define QN_ANIMATOR_H
 
-#include <QObject>
-#include <QScopedPointer>
-#include <QVariant>
-#include <QEasingCurve>
+#include <QtCore/QObject>
+#include <QtCore/QScopedPointer>
+#include <QtCore/QVariant>
+#include <QtCore/QEasingCurve>
+
+#include <ui/common/accessor.h>
+#include <ui/common/converter.h>
+
 #include "abstract_animator.h"
-#include "accessor.h"
-#include "converter.h"
 
 class MagnitudeCalculator;
 class LinearCombinator;

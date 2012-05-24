@@ -39,6 +39,7 @@ public:
     quint16 getIndex() const;
 
     void deserialize(const QnResourceParameters& parameters);
+
 signals:
     /*
      * Storage may emit archiveRangeChanged signal to inform server what some data in archive already deleted
@@ -46,6 +47,7 @@ signals:
      * @param newEndTime - Not used now, reserved for future use
      */
     void archiveRangeChanged(qint64 newStartTimeMs, qint64 newEndTimeMs);
+
 private:
     qint64 m_spaceLimit;
     int m_maxStoreTime; // at seconds
