@@ -3,18 +3,25 @@
 
 
 QnColdStoreConnection::QnColdStoreConnection(const QString& addr):
-m_opened(false)
+m_opened(false),
+m_mutex(QMutex::Recursive)
 {
+    QMutexLocker lock(&m_mutex);
+
     QByteArray ipba = addr.toLocal8Bit();
     char* ip = ipba.data();
 
     m_isConnected = false;
 
     m_isConnected = m_connection.Connect(ip) == Veracity::ISFS::STATUS_SUCCESS;
+    //m_connection.EraseAll();
+    
 }
 
 QnColdStoreConnection::~QnColdStoreConnection()
 {
+    QMutexLocker lock(&m_mutex);
+
     close();
 
     if (m_isConnected)
@@ -24,6 +31,8 @@ QnColdStoreConnection::~QnColdStoreConnection()
 
 bool QnColdStoreConnection::open(const QString& fn, QIODevice::OpenModeFlag flag, int channel)
 {
+    QMutexLocker lock(&m_mutex);
+
     if (!m_isConnected)
         return false;
 
@@ -40,18 +49,29 @@ bool QnColdStoreConnection::open(const QString& fn, QIODevice::OpenModeFlag flag
     const char* cFn = baFn.data();
     Q_ASSERT(fn.length() < 64);
 
+
     if (m_openMode == QIODevice::ReadOnly)
     {
-        Veracity::u32 status = m_connection.Open(
-            cFn, 
-            0, //Timestamp of file to open. This is ignored unless (file_name == 0).
-            channel, //Channel number of file to open.
-            &m_stream, 
-            0, //File name of the opened file. This is useful with a time based open.
-            &m_openedStreamSize, //Size in bytes of the opened file.
-            0,  //Current file position (measured in bytes from the start of the file). This is always 0 for a name based open.
-            0 //Timestamp of the current position.
-            );
+
+        Veracity::u32 status;
+
+        while(1)
+        {
+            status = m_connection.Open(
+                cFn, 
+                0, //Timestamp of file to open. This is ignored unless (file_name == 0).
+                channel, //Channel number of file to open.
+                &m_stream, 
+                0, //File name of the opened file. This is useful with a time based open.
+                &m_openedStreamSize, //Size in bytes of the opened file.
+                0,  //Current file position (measured in bytes from the start of the file). This is always 0 for a name based open.
+                0 //Timestamp of the current position.
+                );
+
+            if (status != Veracity::ISFS::STATUS_DISK_POWERING_UP)
+                break;
+
+        }
 
         if ( status != Veracity::ISFS::STATUS_SUCCESS)
         {
@@ -84,11 +104,13 @@ bool QnColdStoreConnection::open(const QString& fn, QIODevice::OpenModeFlag flag
 
 qint64 QnColdStoreConnection::size() const
 {
+    QMutexLocker lock(&m_mutex);
     return m_openedStreamSize;
 }
 
 void QnColdStoreConnection::close()
 {
+    QMutexLocker lock(&m_mutex);
     if (!m_isConnected || !m_opened)
         return;
 
@@ -100,36 +122,50 @@ void QnColdStoreConnection::close()
 
     Veracity::u32 status = m_connection.Close(m_stream);
 
-    qDebug() << " cs file closed==================!!!!:" << m_filename << " channel " << m_channel;
+    //qDebug() << " cs file closed==================!!!!:" << m_filename << " channel " << m_channel;
 
 }
 
 
 bool QnColdStoreConnection::seek(qint64 pos)
 {
+    QMutexLocker lock(&m_mutex);
     if (!m_isConnected || !m_opened)
         return false;
 
+    
+
     m_lastUsed.restart();
 
-    if (m_connection.Seek(
+    if (m_pos == pos)
+        return true; // does not need to seek extra time 
+
+    Veracity::u32 status = 
+        m_connection.Seek(
         m_stream, 
         pos, 
         0, //0 – Do step 1 (file_offset is relative to beginning of file).
         0, //If (seek_whence != 0xff) then this parameter is ignored.
         0, //If (seek_direction == 0xff) then this parameter is ignored
         0xff //seek_direction 0xff – Skip step 2
-        ) != Veracity::ISFS::STATUS_SUCCESS)
+        );
+
+    if (status != Veracity::ISFS::STATUS_SUCCESS)
     {
         Q_ASSERT(false);
         return false;
     }
 
+    m_pos = pos;
+
+
+    //qWarning() << "SEEK operation for " << m_filename <<  "  pos=" << pos;
     return true;
 }
 
 bool QnColdStoreConnection::write(const char* data, int len)
 {
+    QMutexLocker lock(&m_mutex);
     if (!m_isConnected || !m_opened)
         return false;
 
@@ -162,8 +198,11 @@ bool QnColdStoreConnection::write(const char* data, int len)
 
 int QnColdStoreConnection::read(char *data, int len)
 {
+    QMutexLocker lock(&m_mutex);
     if (!m_isConnected || !m_opened)
         return -1;
+
+    
 
     m_lastUsed.restart();
 
@@ -183,24 +222,81 @@ int QnColdStoreConnection::read(char *data, int len)
         return -1;
     }
 
+    m_pos += readed;
+
+    //qWarning() << "READ operation for " << m_filename <<  "  curr_pos=" << m_pos << " readLen=" << len;
 
     return readed;
 }
 
+qint64 QnColdStoreConnection::oldestFileTime(const QString& fn)
+{
+    QMutexLocker lock(&m_mutex);
+    m_lastUsed.restart();
+
+    QByteArray baFn = fn.toLatin1();
+    char* cFn = baFn.data();
+
+    Veracity::u32 resultSize;
+    Veracity::u32 resultCount;
+    char * result = new char[1024*1204];
+
+    m_connection.FileQuery
+        (
+        false, //False = duplicate results allowed in the result set
+        false, //False = don’t return the channel number in the result set
+        false, //false = don’t return the filename in the result set
+        true,//True = return the first_ms in the result set
+        0,
+        0,
+        cFn,
+        0, //The channel number to match,
+        true, //True – Use the channel in the file query
+        1, //limit resluts 
+        false,
+        0,
+        result,
+        &resultSize,
+        &resultCount);
+
+    if (resultCount==0)
+        return 0;
+
+    qint64 resultT = QString(result).toULongLong();
+
+    delete result;
+
+    return resultT;
+}
+
 int QnColdStoreConnection::age() const
 {
+    QMutexLocker lock(&m_mutex);
     return m_lastUsed.elapsed()/1000;
 }
 
 QString QnColdStoreConnection::getFilename() const
 {
+    QMutexLocker lock(&m_mutex);
     return m_filename;
 }
 
 qint64 QnColdStoreConnection::pos() const
 {
+    QMutexLocker lock(&m_mutex);
     return m_pos;
 }
+
+void QnColdStoreConnection::externalLock() const
+{
+    m_mutex.lock();
+}
+
+void QnColdStoreConnection::externalUnLock() const
+{
+    m_mutex.unlock();
+}
+
 
 //==================================================================================
 
@@ -218,6 +314,8 @@ m_mutex(QMutex::Recursive)
 
 QnColdStoreConnectionPool::~QnColdStoreConnectionPool()
 {
+    QMutexLocker lock(&m_mutex);
+
     QHashIterator<QString, QnColdStoreConnection*> it(m_pool);
     while (it.hasNext()) 
     {
@@ -228,6 +326,10 @@ QnColdStoreConnectionPool::~QnColdStoreConnectionPool()
 
 int QnColdStoreConnectionPool::read(const QString& csFn,   char* data, quint64 shift, int len)
 {
+    QMutexLocker lock(&m_mutex);
+
+    checkIfSomeConnectionsNeedToBeClosed();
+
     QHash<QString, QnColdStoreConnection*>::iterator it = m_pool.find(csFn);
 
     QnColdStoreConnection* connection;
@@ -250,20 +352,29 @@ int QnColdStoreConnectionPool::read(const QString& csFn,   char* data, quint64 s
         connection = it.value();
     }
 
+    m_mutex.unlock();
     
-    connection->seek(shift);
+    connection->externalLock();
+    if (!connection->seek(shift))
+    {
+        connection->externalUnLock();
+        m_mutex.lock();
 
+        return -1;
+    }
     int result = connection->read(data, len);
-    checkIfSomeConnectionsNeedToBeClosed();
+    connection->externalUnLock();
+
+    m_mutex.lock();
+
+    
     return result;
 }
 
 
 void QnColdStoreConnectionPool::checkIfSomeConnectionsNeedToBeClosed()
 {
-
-    if (m_pool.size() <= 20)
-        return;
+    QMutexLocker lock(&m_mutex);
 
     QHash<QString, QnColdStoreConnection*>::iterator it = m_pool.begin();
     while (it != m_pool.end()) 

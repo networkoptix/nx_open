@@ -98,7 +98,7 @@ void QnColdStoreMetaData::fromByteArray(const QByteArray& ba)
 
     QString version = QString(lst.at(0));
 
-    for (int i = 1; i < lst.size(); i+=3 )
+    for (int i = 1; i < lst.size() - 3; i+=3 )
     {
         QString fn = QString ( lst.at(i+0) );
         quint64 shift = QString ( lst.at(i+1) ).toLongLong(0, 16);
@@ -156,7 +156,9 @@ QnColdStoreMetaDataPtr QnColdStoreMetaDataPool::getStoreMetaData(const QString& 
 
         QnColdStoreConnection connection(m_csStorage->coldstoreAddr());
 
-        if (connection.open(csFn, QIODevice::ReadOnly, CS_META_DATA_CHANNEL))
+        //if (connection.open(csFn, QIODevice::ReadOnly, CS_META_DATA_CHANNEL))
+
+        if (connection.open(csFn + QString("_md"), QIODevice::ReadOnly, 0))
         {
             md = QnColdStoreMetaDataPtr (new QnColdStoreMetaData() );
 
@@ -249,7 +251,7 @@ void QnCsTimeunitConnectionHelper::close()
     
     QnColdStoreConnection conn(m_addr);
 
-    if (conn.open(m_connect->getFilename(), QIODevice::WriteOnly, CS_META_DATA_CHANNEL))
+    if (conn.open(m_connect->getFilename() + QString("_md"), QIODevice::WriteOnly, 0))
     {
         QByteArray ba = m_metaData->toByteArray();
         conn.write(ba.data(), ba.size());
