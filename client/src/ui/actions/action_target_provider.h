@@ -7,6 +7,10 @@
 class QVariant;
 class QnWorkbenchContext;
 
+/**
+ * Interface for querying current action scope from the application and 
+ * action target given an action scope.
+ */
 class QnActionTargetProvider {
 public:
     virtual ~QnActionTargetProvider() {};

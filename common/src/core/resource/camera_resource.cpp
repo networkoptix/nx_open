@@ -3,7 +3,8 @@
 #include "resource_consumer.h"
 
 QnVirtualCameraResource::QnVirtualCameraResource()
-    : m_scheduleDisabled(true)
+    : m_scheduleDisabled(true),
+      m_audioEnabled(false)
 {
 }
 
@@ -94,7 +95,10 @@ void QnVirtualCameraResource::updateInner(QnResourcePtr other)
 
     QnVirtualCameraResourcePtr camera = other.dynamicCast<QnVirtualCameraResource>();
     if (camera)
+    {
         m_scheduleDisabled = camera->isScheduleDisabled();
+        m_audioEnabled = camera->isAudioEnabled();
+    }
 }
 
 void QnVirtualCameraResource::setScheduleDisabled(bool disabled)
@@ -105,4 +109,14 @@ void QnVirtualCameraResource::setScheduleDisabled(bool disabled)
 bool QnVirtualCameraResource::isScheduleDisabled() const
 {
     return m_scheduleDisabled;
+}
+
+void QnVirtualCameraResource::setAudioEnabled(bool enabled)
+{
+    m_audioEnabled = enabled;
+}
+
+bool QnVirtualCameraResource::isAudioEnabled() const
+{
+    return m_audioEnabled;
 }

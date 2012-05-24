@@ -61,6 +61,7 @@ message Camera {
     optional string       password         = 13;
     repeated Property     property         = 14;
     repeated ScheduleTask scheduleTask     = 15;
+    optional bool         audioEnabled      = 16;
 }
 
 message Cameras {

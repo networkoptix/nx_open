@@ -38,7 +38,6 @@
 #include <ui/animation/viewport_animator.h>
 #include <ui/animation/animator_group.h>
 #include <ui/animation/opacity_animator.h>
-#include <ui/animation/accessor.h>
 
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/instruments/hand_scroll_instrument.h>

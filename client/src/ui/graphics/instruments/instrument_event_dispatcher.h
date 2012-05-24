@@ -1,12 +1,15 @@
 #ifndef QN_INSTRUMENT_EVENT_DISPATCHER_H
 #define QN_INSTRUMENT_EVENT_DISPATCHER_H
 
-#include <QObject>
-#include <QSet>
-#include <QList>
-#include <QHash>
-#include <QEvent> /* For QEvent::Type. */
-#include <QPair>
+#include <typeinfo>
+
+#include <QtCore/QObject>
+#include <QtCore/QSet>
+#include <QtCore/QList>
+#include <QtCore/QHash>
+#include <QtCore/QEvent> /* For QEvent::Type. */
+#include <QtCore/QPair>
+
 #include "instrument.h"
 #include "scene_event_filter.h"
 #include "installation_mode.h"
@@ -116,6 +119,17 @@ private:
     }
 
 protected:
+    struct TargetData {
+        TargetData() {}
+        TargetData(const std::type_info *typeInfo): typeInfo(typeInfo) {}
+
+        /** Runtime type of the target. */
+        const std::type_info *typeInfo;
+
+        /** Installed instruments. */
+        QList<Instrument *> instruments;
+    };
+
     /** Current dispatch depth. */
     int m_dispatchDepth;
 
@@ -129,7 +143,7 @@ protected:
     QSet<QPair<Instrument *, T*> > m_instrumentTargets;
 
     /** Target to instruments mapping. */
-    QHash<QPair<T *, QEvent::Type>, QList<Instrument *> > m_instrumentsByTarget;
+    QHash<QPair<T *, QEvent::Type>, TargetData> m_dataByTarget;
 };
 
 #endif // QN_INSTRUMENT_EVENT_DISPATCHER_H
