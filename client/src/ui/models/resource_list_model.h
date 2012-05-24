@@ -6,7 +6,27 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include "item_data_role.h"
+class AbstractAccessor;
+
+class QnResourceListModelColumn {
+public:
+    enum ItemDataRole {
+        FlagsRole = -1
+    };
+
+    QnResourceListModelColumn() {}
+
+    AbstractAccessor *accessor(int role) const {
+        return m_accessorByRole.value(role);
+    }
+
+
+private:
+    QSet<AbstractAccessor *> m_accessors;
+    QHash<int, AbstractAccessor *> m_accessorByRole;
+    QSet<QByteArray> m_signals;
+};
+
 
 class QnResourceListModel: public QAbstractListModel {
     Q_OBJECT;

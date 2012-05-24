@@ -21,7 +21,6 @@ public:
 
     virtual QString getUniqueId() const;
 
-
     void setSpaceLimit(qint64 value);
     qint64 getSpaceLimit() const;
 
@@ -144,6 +143,7 @@ public:
 
     void registerStoragePlugin(const QString& name, StorageTypeInstance pluginInst, bool isDefaultProtocol = false);
     QnStorageResource* createStorage(const QString& storageType, bool useDefaultForUnknownPrefix = true);
+
 private:
     QMap<QString, StorageTypeInstance> m_storageTypes;
     StorageTypeInstance m_defaultStoragePlugin;
