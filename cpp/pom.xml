@@ -218,6 +218,7 @@
 			</activation>
 			<properties>
 				<arch>x86</arch>
+				<openssl.version>0.9.8k</openssl.version>				
 			</properties>			
 			<build>
 				<plugins>					
@@ -318,6 +319,7 @@
 			</activation>
 			<properties>
 				<rename-skip>false</rename-skip>
+				<openssl.version>1.0.0e</openssl.version>
 			</properties>
 			<build>	
 				<plugins>
