@@ -55,7 +55,7 @@ void parseCameras(QList<T>& cameras, const PbCameraList& pb_cameras, QnResourceF
         if (pb_camera.has_status())
             parameters["status"] = QString::number((int)pb_camera.status());
 
-		parameters["disabled"] = QString::number((int)pb_camera.disabled());
+        parameters["disabled"] = QString::number((int)pb_camera.disabled());
         parameters["parentId"] = QString::number(pb_camera.parentid());
 
         QnResourcePtr cameraBase = resourceFactory.createResource(pb_camera.typeid_(), parameters);
@@ -67,6 +67,9 @@ void parseCameras(QList<T>& cameras, const PbCameraList& pb_cameras, QnResourceF
             continue;
 
         camera->setScheduleDisabled(pb_camera.scheduledisabled());
+        if (pb_camera.has_audioenabled())
+            camera->setAudioEnabled(pb_camera.audioenabled());
+
         camera->setAuth(QString::fromUtf8(pb_camera.login().c_str()), QString::fromUtf8(pb_camera.password().c_str()));
         camera->setMotionType(static_cast<MotionType>(pb_camera.motiontype()));
 
@@ -260,7 +263,7 @@ void parseUsers(QList<T>& users, const PbUserList& pb_users)
 
         user->setName(QString::fromUtf8(pb_user.name().c_str()));
         user->setAdmin(pb_user.isadmin());
-		user->setGuid(pb_user.guid().c_str());
+        user->setGuid(pb_user.guid().c_str());
 
         users.append(user);
     }
@@ -425,10 +428,11 @@ void serializeCamera_i(proto::pb::Camera& pb_camera, const QnVirtualCameraResour
     pb_camera.set_mac(cameraPtr->getMAC().toString().toUtf8().constData());
     pb_camera.set_login(cameraPtr->getAuth().user().toUtf8().constData());
     pb_camera.set_password(cameraPtr->getAuth().password().toUtf8().constData());
-	pb_camera.set_disabled(cameraPtr->isDisabled());
+    pb_camera.set_disabled(cameraPtr->isDisabled());
     pb_camera.set_status(static_cast<proto::pb::Camera_Status>(cameraPtr->getStatus()));
     pb_camera.set_region(serializeMotionRegionList(cameraPtr->getMotionRegionList()).toUtf8().constData());
     pb_camera.set_scheduledisabled(cameraPtr->isScheduleDisabled());
+    pb_camera.set_audioenabled(cameraPtr->isAudioEnabled());
     pb_camera.set_motiontype(static_cast<proto::pb::Camera_MotionType>(cameraPtr->getMotionType()));
 
     foreach(const QnScheduleTask& scheduleTaskIn, cameraPtr->getScheduleTasks()) {
@@ -545,8 +549,8 @@ void QnApiPbSerializer::deserializeResources(QnResourceList& resources, const QB
 
     parseCameras(resources, pb_resources.camera(), resourceFactory);
     parseServers(resources, pb_resources.server(), resourceFactory);
-	parseUsers(resources, pb_resources.user());
-	parseLayouts(resources, pb_resources.layout());
+    parseUsers(resources, pb_resources.user());
+    parseLayouts(resources, pb_resources.layout());
 }
 
 void QnApiPbSerializer::deserializeResourceTypes(QnResourceTypeList& resourceTypes, const QByteArray& data)
@@ -660,7 +664,7 @@ void QnApiPbSerializer::serializeUser(const QnUserResourcePtr& userPtr, QByteArr
     pb_user.set_name(userPtr->getName().toUtf8().constData());
     pb_user.set_password(userPtr->getPassword().toUtf8().constData());
     pb_user.set_isadmin(userPtr->isAdmin());
-	pb_user.set_guid(userPtr->getGuid().toAscii().constData());
+    pb_user.set_guid(userPtr->getGuid().toAscii().constData());
 
     std::string str;
     pb_users.SerializeToString(&str);
