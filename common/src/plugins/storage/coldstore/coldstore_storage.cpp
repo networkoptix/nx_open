@@ -10,7 +10,8 @@ m_metaDataPool(this),
 m_mutex(QMutex::Recursive),
 m_cswriterThread(0),
 m_currH(0),
-m_prevH(0)
+m_prevH(0),
+m_RangeUpdatedAtLeastOnce(false)
 {
     
     /*
@@ -20,13 +21,15 @@ m_prevH(0)
     QnColdStoreConnection connW("10.10.10.59");
     bool b = connW.open("333", QIODevice::WriteOnly, 0);
 
-    QnSleep::sleep(60*2);
 
-    for (int i = 0; i < 100*2; ++i)
+    for (int i = 0; i < 10*2; ++i)
         connW.write(dataW, sizeof(dataW));
 
     connW.close();
 
+
+    QnColdStoreConnection connT("10.10.10.59");
+    qint64 t =  connT.oldestFileTime("%33");
     
     
     QnColdStoreConnection connW1("10.10.10.59");
@@ -65,7 +68,6 @@ QnStorageResource* QnPlColdStoreStorage::instance()
 QIODevice* QnPlColdStoreStorage::open(const QString& fileName, QIODevice::OpenMode openMode)
 {
     //coldstore://10.10.10.59
-    
     QString nfileName = normolizeFileName(fileName);
 
     if (openMode == QIODevice::ReadOnly)
@@ -138,9 +140,12 @@ void QnPlColdStoreStorage::onWriteBuffClosed(QnColdStoreIOBuffer* buff)
 
 void QnPlColdStoreStorage::onWrite(const QByteArray& ba, const QString& fn)
 {
+    checkIfRangeNeedsToBeUpdated();
+
     QString csFileName = fileName2csFileName(fn);
 
     QMutexLocker lock(&m_mutex);
+    
     
 
     QnCsTimeunitConnectionHelper* connectionH = getPropriteConnectionForCsFile(csFileName);
@@ -399,6 +404,25 @@ QnColdStoreMetaDataPtr QnPlColdStoreStorage::getMetaDataFileForCsFile(const QStr
     }
 
     return m_metaDataPool.getStoreMetaData(csFile);
+}
+
+void QnPlColdStoreStorage::checkIfRangeNeedsToBeUpdated()
+{
+    if (!m_RangeUpdatedAtLeastOnce || m_lastRangeUpdate.elapsed() > 10*60*1000 )
+    {
+        m_RangeUpdatedAtLeastOnce = true;
+        m_lastRangeUpdate.restart();
+        qint64 t0 = getOldestFileTime();
+        qint64 t1 = QDateTime::currentMSecsSinceEpoch();
+        emit archiveRangeChanged(t0, t1);
+    }
+}
+
+qint64 QnPlColdStoreStorage::getOldestFileTime()
+{
+    QnColdStoreConnection conn(coldstoreAddr());
+
+    return conn.oldestFileTime("%_md%");
 }
 
 

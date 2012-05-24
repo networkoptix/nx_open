@@ -229,6 +229,46 @@ int QnColdStoreConnection::read(char *data, int len)
     return readed;
 }
 
+qint64 QnColdStoreConnection::oldestFileTime(const QString& fn)
+{
+    QMutexLocker lock(&m_mutex);
+    m_lastUsed.restart();
+
+    QByteArray baFn = fn.toLatin1();
+    char* cFn = baFn.data();
+
+    Veracity::u32 resultSize;
+    Veracity::u32 resultCount;
+    char * result = new char[1024*1204];
+
+    m_connection.FileQuery
+        (
+        false, //False = duplicate results allowed in the result set
+        false, //False = don’t return the channel number in the result set
+        false, //false = don’t return the filename in the result set
+        true,//True = return the first_ms in the result set
+        0,
+        0,
+        cFn,
+        0, //The channel number to match,
+        true, //True – Use the channel in the file query
+        1, //limit resluts 
+        false,
+        0,
+        result,
+        &resultSize,
+        &resultCount);
+
+    if (resultCount==0)
+        return 0;
+
+    qint64 resultT = QString(result).toULongLong();
+
+    delete result;
+
+    return resultT;
+}
+
 int QnColdStoreConnection::age() const
 {
     QMutexLocker lock(&m_mutex);

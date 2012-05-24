@@ -40,6 +40,8 @@ public:
     QString coldstoreAddr() const;
     void onWriteBuffClosed(QnColdStoreIOBuffer* buff);
     void onWrite(const QByteArray& ba, const QString& fn);
+
+    
     
 private:
 
@@ -51,6 +53,10 @@ private:
     bool hasOpenFilesFor(const QString& csFile) const;
     QnCsTimeunitConnectionHelper* getPropriteConnectionForCsFile(const QString& csFile);
     QnCSFileInfo getFileInfo(const QString& fn);
+
+    qint64 getOldestFileTime();
+
+    void checkIfRangeNeedsToBeUpdated();
 
 private:
 
@@ -67,6 +73,9 @@ private:
 
     QnCsTimeunitConnectionHelper* m_currH;
     QnCsTimeunitConnectionHelper* m_prevH;
+
+    QTime m_lastRangeUpdate;
+    bool m_RangeUpdatedAtLeastOnce;
 
 };
 

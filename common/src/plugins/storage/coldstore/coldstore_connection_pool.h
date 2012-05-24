@@ -13,6 +13,8 @@ public:
     QnColdStoreConnection(const QString& addr);
     virtual ~QnColdStoreConnection();
 
+    qint64 oldestFileTime(const QString& fn);
+
     bool open(const QString& fn, QIODevice::OpenModeFlag flag, int channel);
 
     qint64 size() const; // returns the size of opened channel
