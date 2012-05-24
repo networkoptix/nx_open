@@ -3,8 +3,10 @@
 #include "resource_consumer.h"
 
 QnVirtualCameraResource::QnVirtualCameraResource()
-    : m_scheduleDisabled(true)
+    : m_scheduleDisabled(true),
+    m_audioEnabled(false)
 {
+    m_audioEnabled = true; // for debug only!!!
 }
 
 int QnPhysicalCameraResource::getPrimaryStreamDesiredFps() const
@@ -105,4 +107,14 @@ void QnVirtualCameraResource::setScheduleDisabled(bool disabled)
 bool QnVirtualCameraResource::isScheduleDisabled() const
 {
     return m_scheduleDisabled;
+}
+
+bool QnVirtualCameraResource::isAudioEnabled() const
+{
+    return m_audioEnabled;
+}
+
+void QnVirtualCameraResource::setAudioEnabled(bool value)
+{
+    m_audioEnabled = value;
 }
