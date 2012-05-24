@@ -721,7 +721,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::ExportLayoutAction).
         flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Export selected media as layout")).
-        condition(new QnTimePeriodActionCondition(Qn::NormalPeriod, Qn::DisabledAction, this));
+        condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::DisabledAction, this));
 }
 
 QnActionManager::~QnActionManager() {
