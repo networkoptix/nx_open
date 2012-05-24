@@ -18,11 +18,11 @@ static const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
 const char* QnPlOnvifResource::ONVIF_PROTOCOL_PREFIX = "http://";
 const char* QnPlOnvifResource::ONVIF_URL_SUFFIX = ":80/onvif/device_service";
 const int QnPlOnvifResource::DEFAULT_IFRAME_DISTANCE = 20;
-const QString& QnPlOnvifResource::MEDIA_URL_PARAM_NAME = *(new QString("MediaUrl"));
-const QString& QnPlOnvifResource::DEVICE_URL_PARAM_NAME = *(new QString("DeviceUrl"));
-const QString& QnPlOnvifResource::MAX_FPS_PARAM_NAME = *(new QString("MaxFPS"));
-const QString& QnPlOnvifResource::AUDIO_SUPPORTED_PARAM_NAME = *(new QString("isAudioSupported"));
-const QString& QnPlOnvifResource::DUAL_STREAMING_PARAM_NAME = *(new QString("hasDualStreaming"));
+QString QnPlOnvifResource::MEDIA_URL_PARAM_NAME = QString("MediaUrl");
+QString QnPlOnvifResource::ONVIF_URL_PARAM_NAME = QString("DeviceUrl");
+QString QnPlOnvifResource::MAX_FPS_PARAM_NAME = QString("MaxFPS");
+QString QnPlOnvifResource::AUDIO_SUPPORTED_PARAM_NAME = QString("isAudioSupported");
+QString QnPlOnvifResource::DUAL_STREAMING_PARAM_NAME = QString("hasDualStreaming");
 const float QnPlOnvifResource::QUALITY_COEF = 0.2f;
 const char* QnPlOnvifResource::PROFILE_NAME_PRIMARY = "Netoptix Primary";
 const char* QnPlOnvifResource::PROFILE_NAME_SECONDARY = "Netoptix Secondary";
@@ -154,23 +154,24 @@ bool QnPlOnvifResource::setHostAddress(const QHostAddress &ip, QnDomain domain)
     {
         QMutexLocker lock(&m_mutex);
 
-        if (!m_mediaUrl.isEmpty())
+        QString mediaUrl = getMediaUrl();
+        if (!mediaUrl.isEmpty())
         {
-            QUrl url(m_mediaUrl);
+            QUrl url(mediaUrl);
             url.setHost(ip.toString());
-            m_mediaUrl = url.toString();
+            setMediaUrl(url.toString());
         }
 
-        if (!m_deviceOnvifUrl.isEmpty())
+        QString onvifUrl = getDeviceOnvifUrl();
+        if (!onvifUrl.isEmpty())
         {
-            QUrl url(m_deviceOnvifUrl);
+            QUrl url(onvifUrl);
             url.setHost(ip.toString());
-            m_deviceOnvifUrl= url.toString();
+            setDeviceOnvifUrl(url.toString());
         }
     }
 
     return QnPhysicalCameraResource::setHostAddress(ip, domain);
-
 }
 
 const QString QnPlOnvifResource::createOnvifEndpointUrl(const QString& ipAddress) {
@@ -178,13 +179,9 @@ const QString QnPlOnvifResource::createOnvifEndpointUrl(const QString& ipAddress
 }
 
 QnPlOnvifResource::QnPlOnvifResource() :
-    m_maxFps(QnPhysicalCameraResource::getMaxFps()),
     m_iframeDistance(DEFAULT_IFRAME_DISTANCE),
     m_minQuality(0),
     m_maxQuality(0),
-    m_hasDual(false),
-    m_mediaUrl(),
-    m_deviceOnvifUrl(),
     m_reinitDeviceInfo(false),
     m_codec(H264),
     m_audioCodec(AUDIO_NONE),
@@ -212,8 +209,10 @@ QString QnPlOnvifResource::manufacture() const
 
 bool QnPlOnvifResource::hasDualStreaming() const
 {
-    QMutexLocker lock(&m_mutex);
-    return m_hasDual;
+    QVariant mediaVariant;
+    QnSecurityCamResource* this_casted = const_cast<QnPlOnvifResource*>(this);
+    this_casted->getParam(DUAL_STREAMING_PARAM_NAME, mediaVariant, QnDomainMemory);
+    return mediaVariant.toInt();
 }
 
 const CameraPhysicalWindowSize QnPlOnvifResource::getPhysicalWindowSize() const
@@ -408,10 +407,23 @@ ResolutionPair QnPlOnvifResource::getSecondaryResolution() const
     return m_secondaryResolution;
 }
 
+void QnPlOnvifResource::setMaxFps(int f)
+{
+    setParam(MAX_FPS_PARAM_NAME, f, QnDomainDatabase);
+}
+
 int QnPlOnvifResource::getMaxFps()
 {
-    //Synchronization is not needed
-    return m_maxFps;
+    QVariant mediaVariant;
+    QnSecurityCamResource* this_casted = const_cast<QnPlOnvifResource*>(this);
+
+    if (!hasSuchParam(MAX_FPS_PARAM_NAME))
+    {
+        return QnPhysicalCameraResource::getMaxFps();
+    }
+
+    this_casted->getParam(MAX_FPS_PARAM_NAME, mediaVariant, QnDomainMemory);
+    return mediaVariant.toInt();
 }
 
 const QString QnPlOnvifResource::getPrimaryVideoEncoderId() const
@@ -428,14 +440,15 @@ const QString QnPlOnvifResource::getSecondaryVideoEncoderId() const
 
 QString QnPlOnvifResource::getDeviceOnvifUrl() const 
 { 
-    QMutexLocker lock(&m_mutex);
-    return m_deviceOnvifUrl;
+    QVariant mediaVariant;
+    QnSecurityCamResource* this_casted = const_cast<QnPlOnvifResource*>(this);
+    this_casted->getParam(ONVIF_URL_PARAM_NAME, mediaVariant, QnDomainMemory);
+    return mediaVariant.toString();
 }
 
 void QnPlOnvifResource::setDeviceOnvifUrl(const QString& src) 
 { 
-    QMutexLocker lock(&m_mutex);
-    m_deviceOnvifUrl = src; 
+    setParam(ONVIF_URL_PARAM_NAME, src, QnDomainDatabase);
 }
 
 bool QnPlOnvifResource::fetchAndSetDeviceInformation()
@@ -482,12 +495,10 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
             if (response.Capabilities->Media) 
             {
                 setMediaUrl(response.Capabilities->Media->XAddr.c_str());
-                setParam(MEDIA_URL_PARAM_NAME, getMediaUrl(), QnDomainDatabase);
             }
             if (response.Capabilities->Device) 
             {
                 setDeviceOnvifUrl(response.Capabilities->Device->XAddr.c_str());
-                setParam(DEVICE_URL_PARAM_NAME, getDeviceOnvifUrl(), QnDomainDatabase);
             }
         }
     }
@@ -525,9 +536,12 @@ bool QnPlOnvifResource::fetchAndSetResourceOptions()
     }
 
     //If failed - ignore
-    if (fetchAndSetAudioEncoderOptions(soapWrapper)) {
+    if (fetchAndSetAudioEncoderOptions(soapWrapper)) 
+    {
         setParam(AUDIO_SUPPORTED_PARAM_NAME, 1, QnDomainDatabase);
-    } else {
+    } 
+    else 
+    {
         setParam(AUDIO_SUPPORTED_PARAM_NAME, 0, QnDomainDatabase);
     }
 
@@ -575,12 +589,8 @@ void QnPlOnvifResource::setVideoEncoderOptionsH264(const VideoOptionsResp& respo
 
     if (response.Options->H264->FrameRateRange) 
     {
-       	setParam(MAX_FPS_PARAM_NAME, response.Options->H264->FrameRateRange->Max, QnDomainDatabase);
-	    QMutexLocker lock(&m_mutex);
-        m_maxFps = response.Options->H264->FrameRateRange->Max;
-      
-
-        qDebug() << "ONVIF max FPS: " << m_maxFps;
+        setMaxFps(response.Options->H264->FrameRateRange->Max);
+        qDebug() << "ONVIF max FPS: " << getMaxFps();
     } 
     else 
     {
@@ -640,12 +650,8 @@ void QnPlOnvifResource::setVideoEncoderOptionsJpeg(const VideoOptionsResp& respo
 
     if (response.Options->JPEG->FrameRateRange) 
     {
-        setParam(MAX_FPS_PARAM_NAME, response.Options->JPEG->FrameRateRange->Max, QnDomainDatabase);
-		QMutexLocker lock(&m_mutex);
-        m_maxFps = response.Options->JPEG->FrameRateRange->Max;
-        
-
-        qDebug() << "ONVIF max FPS: " << m_maxFps;
+        setMaxFps(response.Options->JPEG->FrameRateRange->Max);
+        qDebug() << "ONVIF max FPS: " << getMaxFps();
     } 
     else 
     {
@@ -721,36 +727,29 @@ bool QnPlOnvifResource::isSoapAuthorized() const
 
 QString QnPlOnvifResource::getMediaUrl() const 
 { 
-    QMutexLocker lock(&m_mutex);
-    return m_mediaUrl; 
+    QVariant mediaVariant;
+    QnSecurityCamResource* this_casted = const_cast<QnPlOnvifResource*>(this);
+    this_casted->getParam(MEDIA_URL_PARAM_NAME, mediaVariant, QnDomainMemory);
+    return mediaVariant.toString();
 }
 
 void QnPlOnvifResource::setMediaUrl(const QString& src) 
 {
-    QMutexLocker lock(&m_mutex);
-    m_mediaUrl = src; 
+    setParam(MEDIA_URL_PARAM_NAME, src, QnDomainDatabase);
 }
 
 
 void QnPlOnvifResource::setOnvifUrls()
 {
-    if (getDeviceOnvifUrl().isEmpty()) {
-        QVariant deviceVariant;
-        bool res = getParam(DEVICE_URL_PARAM_NAME, deviceVariant, QnDomainDatabase);
-        QString deviceStr(res? deviceVariant.toString(): "");
-
-        setDeviceOnvifUrl(deviceStr.isEmpty()? createOnvifEndpointUrl(): deviceStr);
-
+    if (getDeviceOnvifUrl().isEmpty()) 
+    {
+        setDeviceOnvifUrl(createOnvifEndpointUrl());
         qDebug() << "QnPlOnvifResource::setOnvifUrls: m_deviceOnvifUrl = " << getDeviceOnvifUrl();
     }
 
-    if (getMediaUrl().isEmpty()) {
-        QVariant mediaVariant;
-        bool res = getParam(MEDIA_URL_PARAM_NAME, mediaVariant, QnDomainDatabase);
-        QString mediaStr(res? mediaVariant.toString(): "");
-
-        setMediaUrl(mediaStr.isEmpty()? createOnvifEndpointUrl(): mediaStr);
-
+    if (getMediaUrl().isEmpty()) 
+    {
+        setMediaUrl(createOnvifEndpointUrl());
         qDebug() << "QnPlOnvifResource::setOnvifUrls: m_mediaUrl = " << getMediaUrl();
     }
 }
@@ -888,13 +887,10 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
 
 bool QnPlOnvifResource::fetchAndSetDualStreaming(MediaSoapWrapper& /*soapWrapper*/)
 {
-    {
-        QMutexLocker lock(&m_mutex);
-        m_hasDual = m_secondaryResolution != EMPTY_RESOLUTION_PAIR && !m_secondaryVideoEncoderId.isEmpty();
-    }
+    QMutexLocker lock(&m_mutex);
 
-    setParam(DUAL_STREAMING_PARAM_NAME, hasDualStreaming() ? 1 : 0, QnDomainDatabase);
-
+    bool dualStreaming = m_secondaryResolution != EMPTY_RESOLUTION_PAIR && !m_secondaryVideoEncoderId.isEmpty();
+    setParam(DUAL_STREAMING_PARAM_NAME, dualStreaming ? 1 : 0, QnDomainDatabase);
     return true;
 }
 

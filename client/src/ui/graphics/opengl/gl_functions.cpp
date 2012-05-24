@@ -33,6 +33,50 @@ namespace QnGl {
 #undef WARN
 } // namespace QnGl
 
+// -------------------------------------------------------------------------- //
+// QnGlFunctionsGlobal
+// -------------------------------------------------------------------------- //
+class QnGlFunctionsGlobal {
+public:
+    QnGlFunctionsGlobal(): 
+        m_initialized(false),
+        m_maxTextureSize(1024)  /* A sensible default supported by most modern GPUs. */
+    {}
+
+    GLint maxTextureSize() const {
+        return m_maxTextureSize;
+    }
+
+    void initialize(const QGLContext *context) {
+        QMutexLocker locker(&m_mutex);
+        if(m_initialized)
+            return;
+
+        if(!QGLContext::currentContext()) {
+            if(!context) {
+                qnWarning("No OpenGL context in scope, initialization failed.");
+                return;
+            }
+            
+            /* Nothing bad could come out of this call, so const_cast is OK. */
+            const_cast<QGLContext *>(context)->makeCurrent();
+        }
+
+        m_initialized = true;
+        locker.unlock();
+
+        glGetIntegerv(GL_MAX_TEXTURE_SIZE, &m_maxTextureSize);
+    }
+    
+
+private:
+    QMutex m_mutex;
+    bool m_initialized;
+    GLint m_maxTextureSize;
+};
+
+Q_GLOBAL_STATIC(QnGlFunctionsGlobal, qn_glFunctionsGlobal);
+
 
 // -------------------------------------------------------------------------- //
 // QnGlFunctionsPrivate
@@ -43,6 +87,8 @@ public:
         m_context(context),
         m_features(0)
     {
+        qn_glFunctionsGlobal()->initialize(context);
+
         bool status;
 
         status = true;
@@ -162,7 +208,7 @@ void QnGlFunctions::glActiveTexture(GLenum texture) {
 
 #ifdef Q_OS_WIN
 namespace {
-    QnGlFunctions::Features estimateFeatures(){
+    QnGlFunctions::Features estimateFeatures() {
         QnGlFunctions::Features result(0);
 
         DISPLAY_DEVICE dd; 
@@ -192,10 +238,20 @@ namespace {
 }
 #endif
 
-QnGlFunctions::Features QnGlFunctions::estimatedFeatures(){
+QnGlFunctions::Features QnGlFunctions::estimatedFeatures() {
 #ifdef Q_OS_WIN
     return *qn_estimatedFeatures();
 #else
     return QnGlFunctions::Features(0);
 #endif
 }
+
+GLint QnGlFunctions::estimatedInteger(GLenum target) {
+    if(target != GL_MAX_TEXTURE_SIZE) {
+        qnWarning("Target '%1' is not supported.", target);
+        return 0;
+    }
+
+    return qn_glFunctionsGlobal()->maxTextureSize();
+}
+

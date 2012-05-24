@@ -243,14 +243,18 @@ qint64 QnAviArchiveDelegate::seek(qint64 time, bool findIFrame)
 
 bool QnAviArchiveDelegate::open(QnResourcePtr resource)
 {
+    QMutexLocker lock(&m_openMutex); // need refactor. Now open may be called from UI thread!!!
+
     m_resource = resource;
     if (m_formatContext == 0)
     {
         m_eofReached = false;
         QString url = m_resource->getUrl(); // "c:/00-1A-07-03-BD-09.mkv"; //
-        if (m_storage == 0)
+        if (m_storage == 0) {
             m_storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(url));
-
+            if(!m_storage)
+                return false;
+        }
 
         m_formatContext = avformat_alloc_context();
         m_formatContext->pb = m_ioContext = m_storage->createFfmpegIOContext(url, QIODevice::ReadOnly);
