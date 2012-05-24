@@ -9,12 +9,12 @@
 	<parent>
 		<artifactId>cpp</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>1.0.9</version>
+		<version>1.1</version>
 		<relativePath>../cpp</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>1.0.9</version>
+	<version>1.1</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>client</artifactId>
 	<packaging>pom</packaging>
@@ -156,6 +156,7 @@
 									<filtering>false</filtering>
 									<includes>
 										<include>**/*.png</include>
+										<include>**/*.mkv</include>
 									</includes>	
 								</resource> 						
 							</resources>              
@@ -179,14 +180,14 @@
 						<configuration>
 							<executable>python</executable>
 							<arguments>
-								<argument>genskin.py</argument>
+								<argument>resources.py</argument>
 							</arguments>
 							<workingDirectory>${project.build.directory}</workingDirectory>		
 						</configuration>
 					</execution>
 					<execution>
 						<id>generate-help</id>
-						<phase>generate-resources</phase>
+						<phase>process-sources</phase>
 						<goals>
 							<goal>exec</goal>
 						</goals>
@@ -201,7 +202,7 @@
 				</executions>
 			</plugin>			
 
-			<plugin>
+			<!--<plugin>
 				<artifactId>maven-antrun-plugin</artifactId>
 				<version>1.7</version>
 				<executions>
@@ -237,8 +238,9 @@
 								</pathconvert>								
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${pri})</echo>
 
-								<fileset id="generated_qrc_path" dir="${project.build.directory}">
-									<include name="**/*.qrc" />
+								<fileset id="generated_qrc_path" dir="${basedir}">
+									<include name="src/**/*.qrc" />
+									<include name="${arch}/**/*.qrc" />
 								</fileset>
 								<pathconvert pathsep="${line.separator}" property="generated_qrc" refid="generated_qrc_path">
 									<map from="" to="RESOURCES += "/>
@@ -254,7 +256,7 @@
 						</configuration>
 					</execution>
 				</executions>
-			</plugin>		
+			</plugin>		-->
 		</plugins>
 	</build>    
 

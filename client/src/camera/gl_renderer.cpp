@@ -800,5 +800,5 @@ QnMetaDataV1Ptr QnGLRenderer::lastFrameMetadata(int channel) const
 
 bool QnGLRenderer::usingShaderYuvToRgb() const {
     return (d->features() & QnGlFunctions::ArbPrograms) && (d->features() & QnGlFunctions::OpenGL1_3) && !m_forceSoftYUV && isYuvFormat() && 
-		d->m_yv12ToRgbShaderProgram->isValid() && !(d->features() & QnGlFunctions::ShadersVendorBadList);
+		d->m_yv12ToRgbShaderProgram->isValid() && !(d->features() & QnGlFunctions::ShadersBroken);
 }

@@ -9,6 +9,7 @@
 #include "workbench_layout_snapshot_manager.h"
 #include "workbench_access_controller.h"
 #include "workbench_display.h"
+#include "workbench_navigator.h"
 
 QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *parent):
     QObject(parent)
@@ -30,9 +31,8 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
     m_snapshotManager.reset(new QnWorkbenchLayoutSnapshotManager(this));
     m_accessController.reset(new QnWorkbenchAccessController(this));
     m_menu.reset(new QnActionManager(this));
-
-    /* Create display. */
     m_display.reset(new QnWorkbenchDisplay(this));
+    m_navigator.reset(new QnWorkbenchNavigator(this));
 }
 
 QnWorkbenchContext::~QnWorkbenchContext() {
@@ -41,6 +41,7 @@ QnWorkbenchContext::~QnWorkbenchContext() {
     blockSignals(signalsBlocked);
 
     /* Destruction order of these objects is important. */
+    m_navigator.reset();
     m_display.reset();
     m_menu.reset();
     m_accessController.reset();

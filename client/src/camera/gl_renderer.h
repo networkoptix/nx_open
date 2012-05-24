@@ -48,6 +48,7 @@ public:
     qint64 lastDisplayedTime() const;
     QnMetaDataV1Ptr lastFrameMetadata(int channel) const; 
     void setForceSoftYUV(bool value);
+
 private:
     void drawVideoTexture(QnGlRendererTexture *tex0, QnGlRendererTexture *tex1, QnGlRendererTexture *tex2, const float *v_array);
     void updateTexture();

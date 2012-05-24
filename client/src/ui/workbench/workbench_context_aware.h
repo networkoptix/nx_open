@@ -14,6 +14,7 @@ class QnWorkbenchSynchronizer;
 class QnWorkbenchLayoutSnapshotManager;
 class QnWorkbenchAccessController;
 class QnWorkbenchDisplay;
+class QnWorkbenchNavigator;
 
 /**
  * This class simplifies access to workbench context. 
@@ -58,6 +59,8 @@ protected:
     QnWorkbenchAccessController *accessController() const;
 
     QnWorkbenchDisplay *display() const;
+
+    QnWorkbenchNavigator *navigator() const;
 
 private:
     QnWorkbenchContext *m_context;

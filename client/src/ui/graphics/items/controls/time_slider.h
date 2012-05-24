@@ -227,8 +227,8 @@ private:
     struct LineData {
         LineData(): commentPixmap(NULL), visible(true), stretch(1.0) {}
 
-        QnTimePeriodList normalPeriods[Qn::TimePeriodTypeCount];
-        QnTimePeriodList aggregatedPeriods[Qn::TimePeriodTypeCount];
+        QnTimePeriodList normalPeriods[Qn::TimePeriodRoleCount];
+        QnTimePeriodList aggregatedPeriods[Qn::TimePeriodRoleCount];
         QString comment;
         const QPixmap *commentPixmap;
         bool visible;

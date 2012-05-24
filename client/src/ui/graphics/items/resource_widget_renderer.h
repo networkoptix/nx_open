@@ -39,6 +39,8 @@ public:
 
     QnMetaDataV1Ptr lastFrameMetadata(int channel) const;
 
+    QSize sourceSize() const;
+
 signals:
     /**
      * This signal is emitted whenever the source geometry is changed.

@@ -34,11 +34,14 @@ public:
     virtual bool removeDir(const QString& url) override;
     virtual bool isFileExists(const QString& url) override;
     virtual bool isDirExists(const QString& url) override;
+    virtual bool isRealFiles() const override {return false;};
 
     //=====================
     QString coldstoreAddr() const;
     void onWriteBuffClosed(QnColdStoreIOBuffer* buff);
     void onWrite(const QByteArray& ba, const QString& fn);
+
+    
     
 private:
 
@@ -51,6 +54,10 @@ private:
     QnCsTimeunitConnectionHelper* getPropriteConnectionForCsFile(const QString& csFile);
     QnCSFileInfo getFileInfo(const QString& fn);
 
+    qint64 getOldestFileTime();
+
+    void checkIfRangeNeedsToBeUpdated();
+
 private:
 
 
@@ -62,9 +69,13 @@ private:
     QnColdStoreWriter* m_cswriterThread;
 
     QSet<QString> m_listOfWritingFiles;
+    //QSet<QString> m_listOfExistingFiles;
 
     QnCsTimeunitConnectionHelper* m_currH;
     QnCsTimeunitConnectionHelper* m_prevH;
+
+    QTime m_lastRangeUpdate;
+    bool m_RangeUpdatedAtLeastOnce;
 
 };
 

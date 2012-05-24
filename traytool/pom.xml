@@ -9,12 +9,12 @@
 	<parent>
 		<artifactId>cpp</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>1.0.9</version>
+		<version>1.1</version>
 		<relativePath>../cpp</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>1.0.9</version>
+	<version>1.1</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>traytool</artifactId>
 	<packaging>pom</packaging>
@@ -61,7 +61,7 @@
 	</dependencies>		
 
 	<build>
-		<directory>${arch}</directory>
+	<!--	<directory>${arch}</directory>
 		<outputDirectory>${arch}</outputDirectory>
 		<sourceDirectory>${basedir}/src</sourceDirectory>
 
@@ -104,7 +104,7 @@
 					</execution>
 				</executions>
 			</plugin>		
-		</plugins>
+		</plugins> -->
 	</build>    
 
 	<profiles>

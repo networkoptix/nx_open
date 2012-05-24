@@ -13,6 +13,8 @@ public:
     QnColdStoreConnection(const QString& addr);
     virtual ~QnColdStoreConnection();
 
+    qint64 oldestFileTime(const QString& fn);
+
     bool open(const QString& fn, QIODevice::OpenModeFlag flag, int channel);
 
     qint64 size() const; // returns the size of opened channel
@@ -30,6 +32,9 @@ public:
 
     qint64 pos() const;
 
+    void externalLock() const;
+    void externalUnLock() const;
+
 private:
     Veracity::SFSClient m_connection;
     Veracity::u32 m_stream;
@@ -46,6 +51,11 @@ private:
 
     qint64 m_pos;
 
+    int m_channel;
+
+    bool m_opened;
+
+    mutable QMutex m_mutex;
         
 };
 
