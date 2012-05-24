@@ -14,6 +14,8 @@ m_mutex(QMutex::Recursive)
     m_isConnected = false;
 
     m_isConnected = m_connection.Connect(ip) == Veracity::ISFS::STATUS_SUCCESS;
+    //m_connection.EraseAll();
+    
 }
 
 QnColdStoreConnection::~QnColdStoreConnection()
@@ -47,18 +49,29 @@ bool QnColdStoreConnection::open(const QString& fn, QIODevice::OpenModeFlag flag
     const char* cFn = baFn.data();
     Q_ASSERT(fn.length() < 64);
 
+
     if (m_openMode == QIODevice::ReadOnly)
     {
-        Veracity::u32 status = m_connection.Open(
-            cFn, 
-            0, //Timestamp of file to open. This is ignored unless (file_name == 0).
-            channel, //Channel number of file to open.
-            &m_stream, 
-            0, //File name of the opened file. This is useful with a time based open.
-            &m_openedStreamSize, //Size in bytes of the opened file.
-            0,  //Current file position (measured in bytes from the start of the file). This is always 0 for a name based open.
-            0 //Timestamp of the current position.
-            );
+
+        Veracity::u32 status;
+
+        while(1)
+        {
+            status = m_connection.Open(
+                cFn, 
+                0, //Timestamp of file to open. This is ignored unless (file_name == 0).
+                channel, //Channel number of file to open.
+                &m_stream, 
+                0, //File name of the opened file. This is useful with a time based open.
+                &m_openedStreamSize, //Size in bytes of the opened file.
+                0,  //Current file position (measured in bytes from the start of the file). This is always 0 for a name based open.
+                0 //Timestamp of the current position.
+                );
+
+            if (status != Veracity::ISFS::STATUS_DISK_POWERING_UP)
+                break;
+
+        }
 
         if ( status != Veracity::ISFS::STATUS_SUCCESS)
         {
@@ -274,6 +287,9 @@ QnColdStoreConnectionPool::~QnColdStoreConnectionPool()
 int QnColdStoreConnectionPool::read(const QString& csFn,   char* data, quint64 shift, int len)
 {
     QMutexLocker lock(&m_mutex);
+
+    checkIfSomeConnectionsNeedToBeClosed();
+
     QHash<QString, QnColdStoreConnection*>::iterator it = m_pool.find(csFn);
 
     QnColdStoreConnection* connection;
@@ -299,13 +315,19 @@ int QnColdStoreConnectionPool::read(const QString& csFn,   char* data, quint64 s
     m_mutex.unlock();
     
     connection->externalLock();
-    connection->seek(shift);
+    if (!connection->seek(shift))
+    {
+        connection->externalUnLock();
+        m_mutex.lock();
+
+        return -1;
+    }
     int result = connection->read(data, len);
     connection->externalUnLock();
 
     m_mutex.lock();
 
-    checkIfSomeConnectionsNeedToBeClosed();
+    
     return result;
 }
 
@@ -313,9 +335,6 @@ int QnColdStoreConnectionPool::read(const QString& csFn,   char* data, quint64 s
 void QnColdStoreConnectionPool::checkIfSomeConnectionsNeedToBeClosed()
 {
     QMutexLocker lock(&m_mutex);
-
-    if (m_pool.size() <= 20)
-        return;
 
     QHash<QString, QnColdStoreConnection*>::iterator it = m_pool.begin();
     while (it != m_pool.end()) 

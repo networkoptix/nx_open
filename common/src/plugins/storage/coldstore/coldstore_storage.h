@@ -34,6 +34,7 @@ public:
     virtual bool removeDir(const QString& url) override;
     virtual bool isFileExists(const QString& url) override;
     virtual bool isDirExists(const QString& url) override;
+    virtual bool isRealFiles() const override {return false;};
 
     //=====================
     QString coldstoreAddr() const;

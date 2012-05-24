@@ -123,6 +123,8 @@ public:
     */
     virtual bool isDirExists(const QString& url) = 0;
 
+    virtual bool isRealFiles() const{return true;};
+
 public:
     virtual void setUrl(const QString& value);
 protected:

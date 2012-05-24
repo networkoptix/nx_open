@@ -13,26 +13,33 @@ m_currH(0),
 m_prevH(0)
 {
     
-    /*/
-    char dataW[100]; dataW[7] = 7;
-    char dataR[100]; dataR[7] = 8;
+    /*
+    char dataW[1024*1024/2]; dataW[7] = 7;
+    //char dataR[1024]; dataR[7] = 8;
 
     QnColdStoreConnection connW("10.10.10.59");
-    bool b = connW.open("222", QIODevice::WriteOnly, 0);
-    connW.write(dataW, sizeof(dataW));
+    bool b = connW.open("333", QIODevice::WriteOnly, 0);
+
+    QnSleep::sleep(60*2);
+
+    for (int i = 0; i < 100*2; ++i)
+        connW.write(dataW, sizeof(dataW));
+
     connW.close();
 
     
-
+    
     QnColdStoreConnection connW1("10.10.10.59");
     b = connW1.open("222", QIODevice::WriteOnly, 1);
     connW1.write(dataW, sizeof(dataW));
     connW1.close();
+    
 
     
     QnColdStoreConnection connR("10.10.10.59");
-    b = connR.open("222", QIODevice::ReadOnly, 1);
-    connR.read(dataR, sizeof(dataR));
+    b = connR.open("333", QIODevice::ReadOnly, 0);
+    b = connR.seek(1024*1024*50);
+    int r = connR.read(dataW, sizeof(dataW));
     connR.close();
     /**/
     
@@ -100,13 +107,10 @@ QIODevice* QnPlColdStoreStorage::open(const QString& fileName, QIODevice::OpenMo
         {
             QMutexLocker lock(&m_mutex);
             m_listOfWritingFiles.insert(nfileName);
-            qWarning() << "file started : " << nfileName;
+            //qWarning() << "file started : " << nfileName;
 
             //m_listOfExistingFiles.insert(nfileName);
         }
-
-        //qWarning() << "file opened: " << nfileName;
-        
 
         return buff;
     }
@@ -142,6 +146,13 @@ void QnPlColdStoreStorage::onWrite(const QByteArray& ba, const QString& fn)
     QnCsTimeunitConnectionHelper* connectionH = getPropriteConnectionForCsFile(csFileName);
     if (connectionH==0)
     {
+        if (m_currH==0)
+        {
+            // must not be unless network issue 
+            m_listOfWritingFiles.remove(fn);
+            return;
+        }
+
         // must be a new h; need to swap;
         Q_ASSERT(m_prevH == 0); // old h should not exist any mor 
         m_prevH = m_currH;
@@ -180,6 +191,7 @@ void QnPlColdStoreStorage::onWrite(const QByteArray& ba, const QString& fn)
         if (!hasOpenFilesFor(m_prevH->getCsFileName()))
         {
             // write into prev and close it
+
             m_mutex.unlock();
             m_prevH->write(ba, fn);
             m_mutex.lock();
@@ -269,10 +281,10 @@ QFileInfoList QnPlColdStoreStorage::getFileList(const QString& dirName)
         result << md->fileInfoList(ndirName);;
     }
 
-    /*
+    
     foreach(QFileInfo fi, result)
     {
-        qWarning() << fi.fileName();
+        qWarning() << fi.absoluteFilePath();
     }
     /**/
 
