@@ -11,7 +11,7 @@
 #endif
 
 static const int SECTOR_SIZE = 32768;
-static const qint64 AVG_USAGE_AGGREGATE_TIME = 10 * 1000000ll; // aggregation time in usecs
+static const qint64 AVG_USAGE_AGGREGATE_TIME = 15 * 1000000ll; // aggregation time in usecs
 
 // -------------- QueueFileWriter ------------
 
