@@ -33,13 +33,20 @@ class QnMainWindow: public QWidget, public QnWorkbenchContextAware {
     typedef QWidget base_type;
 
 public:
-    QnMainWindow(QnWorkbenchContext *context, QWidget *parent = 0, Qt::WFlags flags = 0);
+    enum Option {
+        TitleBarDraggable = 0x1,    /**< Window can be moved by dragging the title bar. */
+    };
+    Q_DECLARE_FLAGS(Options, Option);
 
+    QnMainWindow(QnWorkbenchContext *context, QWidget *parent = 0, Qt::WFlags flags = 0);
     virtual ~QnMainWindow();
 
     bool isTitleVisible() const {
         return m_titleVisible;
     }
+
+    Options options() const;
+    void setOptions(Options options);
 
 public slots:
     void handleMessage(const QString &message);
@@ -72,6 +79,7 @@ protected slots:
 
     void updateFullScreenState();
     void updateDwmState();
+    void updateTitleBarDraggable();
 
     void at_fileOpenSignalizer_activated(QObject *object, QEvent *event);
     void at_sessionManager_error(int error);
@@ -98,6 +106,10 @@ private:
 
     QnDwm *m_dwm;
     bool m_drawCustomFrame;
+
+    Options m_options;
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnMainWindow::Options);
 
 #endif // QN_MAIN_WINDOW_H

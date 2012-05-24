@@ -105,7 +105,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     connect(m_dwm,                          SIGNAL(compositionChanged(bool)),               this,                                   SLOT(updateDwmState()));
     connect(m_dwm,                          SIGNAL(titleBarDoubleClicked()),                this,                                   SLOT(toggleFullScreen()));
 
-    /* Set up QWidget. */
+    /* Set up properties. */
     setWindowTitle(QApplication::applicationName());
     setAcceptDrops(true);
     setMinimumWidth(minimalWindowWidth);
@@ -115,6 +115,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
         palette.setColor(QPalette::Window, Qt::black);
         setPalette(palette);
     }
+    setOptions(TitleBarDraggable);
 
 
     /* Set up scene & view. */
@@ -290,6 +291,19 @@ void QnMainWindow::handleMessage(const QString &message) {
     menu()->trigger(Qn::DropResourcesAction, QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(files)));
 }
 
+QnMainWindow::Options QnMainWindow::options() const {
+    return m_options;
+}
+
+void QnMainWindow::setOptions(Options options) {
+    if(m_options == options)
+        return;
+
+    m_options = options;
+
+    updateTitleBarDraggable();
+}
+
 void QnMainWindow::updateFullScreenState() {
     bool fullScreen = isFullScreen();
 
@@ -329,7 +343,6 @@ void QnMainWindow::updateDwmState() {
         m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 0));
         m_dwm->disableBlurBehindWindow();
         m_dwm->enableDoubleClickProcessing();
-        m_dwm->disableTitleBarDrag();
 
         m_dwm->enableFrameEmulation();
         m_dwm->setEmulatedFrameMargins(QMargins(0, 0, 0, 0));
@@ -364,7 +377,6 @@ void QnMainWindow::updateDwmState() {
         m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 0));
         m_dwm->enableBlurBehindWindow(); /* For reasons unknown, this call is needed to prevent display artifacts. */
         m_dwm->enableDoubleClickProcessing();
-        m_dwm->enableTitleBarDrag();
 
         m_dwm->enableFrameEmulation();
         m_dwm->setEmulatedFrameMargins(frameMargins);
@@ -395,7 +407,6 @@ void QnMainWindow::updateDwmState() {
         m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 0));
         m_dwm->disableBlurBehindWindow();
         m_dwm->enableDoubleClickProcessing();
-        m_dwm->enableTitleBarDrag();
 
         m_dwm->enableFrameEmulation();
         m_dwm->setEmulatedFrameMargins(frameMargins);
@@ -410,6 +421,16 @@ void QnMainWindow::updateDwmState() {
             frameMargins.right(),
             frameMargins.bottom()
         );
+    }
+
+    updateTitleBarDraggable();
+}
+
+void QnMainWindow::updateTitleBarDraggable() {
+    if(isFullScreen()) {
+        m_dwm->disableTitleBarDrag();
+    } else {
+        m_dwm->enableTitleBarDrag(m_options & TitleBarDraggable);
     }
 }
 
