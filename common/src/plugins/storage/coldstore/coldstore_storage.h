@@ -62,7 +62,7 @@ private:
     QnColdStoreWriter* m_cswriterThread;
 
     QSet<QString> m_listOfWritingFiles;
-    QSet<QString> m_listOfExistingFiles;
+    //QSet<QString> m_listOfExistingFiles;
 
     QnCsTimeunitConnectionHelper* m_currH;
     QnCsTimeunitConnectionHelper* m_prevH;

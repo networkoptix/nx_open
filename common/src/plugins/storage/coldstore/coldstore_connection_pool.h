@@ -30,6 +30,9 @@ public:
 
     qint64 pos() const;
 
+    void externalLock() const;
+    void externalUnLock() const;
+
 private:
     Veracity::SFSClient m_connection;
     Veracity::u32 m_stream;
@@ -50,6 +53,7 @@ private:
 
     bool m_opened;
 
+    mutable QMutex m_mutex;
         
 };
 
