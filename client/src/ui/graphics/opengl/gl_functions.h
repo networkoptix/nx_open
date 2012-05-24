@@ -10,9 +10,9 @@ class QnGlFunctionsPrivate;
 class QnGlFunctions {
 public:
     enum Feature {
-        ArbPrograms = 0x1,
-        OpenGL1_3 = 0x2,
-		ShadersVendorBadList = 0x4
+        ArbPrograms = 0x1,          /**< Supports ARB shader programs. */
+        OpenGL1_3 = 0x2,            /**< Implements OpenGL1.3 spec. */
+        ShadersBroken = 0x4         /**< Vendor has messed something up, and shaders are not supported. */
     };
     Q_DECLARE_FLAGS(Features, Feature);
 
@@ -53,11 +53,14 @@ public:
     void glProgramLocalParameter4fARB(GLenum target, GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w) const;
 
     /* OpenGL1_3 group. */
+
     void glActiveTexture(GLenum texture);
 
 private:
     QSharedPointer<QnGlFunctionsPrivate> d;
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnGlFunctions::Features);
 
 
 #ifndef GL_FRAGMENT_PROGRAM_ARB

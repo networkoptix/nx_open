@@ -31,12 +31,12 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleEnabledChanged()),       this,   SLOT(at_dataChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(moreLicensesRequested()),        this,   SIGNAL(moreLicensesRequested()));
     connect(ui->webPageLabel,           SIGNAL(linkActivated(const QString &)), this,   SLOT(at_linkActivated(const QString &)));
-    connect(ui->motionWEBPageLink,      SIGNAL(linkActivated(const QString &)), this,   SLOT(at_linkActivated(const QString &)));
+    connect(ui->motionWebPageLabel,     SIGNAL(linkActivated(const QString &)), this,   SLOT(at_linkActivated(const QString &)));
 
-    connect(ui->cameraMotionButton, SIGNAL(clicked(bool)), SLOT(at_motionTypeChanged()));
-    connect(ui->softwareMotionButton, SIGNAL(clicked(bool)), SLOT(at_motionTypeChanged()));
-    connect(ui->comboBoxSensetivity, SIGNAL(currentIndexChanged(int)), this, SLOT(at_motionSensitivityChanged(int)));
-    connect(ui->clearAllButton, SIGNAL(clicked()), this, SLOT(at_motionSelectionCleared()));
+    connect(ui->cameraMotionButton,     SIGNAL(clicked(bool)),                  this,   SLOT(at_motionTypeChanged()));
+    connect(ui->softwareMotionButton,   SIGNAL(clicked(bool)),                  this,   SLOT(at_motionTypeChanged()));
+    connect(ui->sensitivityComboBox,    SIGNAL(currentIndexChanged(int)),       this,   SLOT(at_motionSensitivityChanged(int)));
+    connect(ui->resetMotionRegionsButton, SIGNAL(clicked()),                    this,   SLOT(at_motionSelectionCleared()));
 
     updateFromResource();
 }
@@ -107,7 +107,7 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
 
         QVariant val;
         QString webPageAddress = QString("<A HREF=\"http://%1/%2\">http://%1/%2</A>").arg(m_camera->getHostAddress().toString()).arg(val.toString());
-        ui->motionWEBPageLink->setText(tr("%1").arg(webPageAddress));
+        ui->motionWebPageLabel->setText(tr("%1").arg(webPageAddress));
         if(m_motionWidget) 
             m_motionWidget->setCamera(m_camera);
         ui->cameraMotionButton->setChecked(m_camera->getMotionType() != MT_SoftwareGrid);
@@ -115,11 +115,11 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
         //updateMaxMotionRect();
 
         bool mEnabled = m_camera->supportedMotionType() != MT_NoMotion;
-        ui->groupBoxSettings->setEnabled(mEnabled);
+        ui->motionSettingsGroupBox->setEnabled(mEnabled);
        
         if (m_motionWidget) {
             m_motionWidget->setVisible(mEnabled);
-            ui->motionEnableLabel->setVisible(!mEnabled);
+            ui->motionAvailableLabel->setVisible(!mEnabled);
             m_motionWidget->setNeedControlMaxRects(mEnabled && !ui->softwareMotionButton->isChecked());
         }
 
