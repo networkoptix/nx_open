@@ -8,9 +8,9 @@
 #include "../onvif/dataprovider/onvif_mjpeg.h"
 #include "onvif_211_stream_reader.h"
 #include "utils/common/synctime.h"
-//#include "Onvif.nsmap"
-#include "soapMediaBindingProxy.h"
-#include "wsseapi.h"
+//#include "onvif/Onvif.nsmap"
+#include "onvif/soapMediaBindingProxy.h"
+#include "onvif/wsseapi.h"
 
 const char* QnPlOnvifGeneric211Resource::MANUFACTURE = "OnvifDevice";
 static const float MAX_AR_EPS = 0.01;

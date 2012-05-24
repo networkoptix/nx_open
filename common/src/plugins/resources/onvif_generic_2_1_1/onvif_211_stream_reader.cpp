@@ -10,9 +10,9 @@
 #include "utils/common/sleep.h"
 #include "utils/common/synctime.h"
 #include "utils/media/nalUnits.h"
-//#include "Onvif.nsmap"
-#include "soapMediaBindingProxy.h"
-#include "wsseapi.h"
+//#include "onvif/Onvif.nsmap"
+#include "onvif/soapMediaBindingProxy.h"
+#include "onvif/wsseapi.h"
 
 QnOnvifGeneric211StreamReader::QnOnvifGeneric211StreamReader(QnResourcePtr res):
     CLServerPushStreamreader(res),

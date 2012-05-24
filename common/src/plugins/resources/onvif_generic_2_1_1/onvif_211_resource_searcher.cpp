@@ -7,9 +7,9 @@
 #include "onvif_211_resource_searcher.h"
 #include "core/resource/camera_resource.h"
 #include "onvif_211_resource.h"
-#include "Onvif.nsmap"
-#include "soapDeviceBindingProxy.h"
-#include "wsseapi.h"
+#include "onvif/Onvif.nsmap"
+#include "onvif/soapDeviceBindingProxy.h"
+#include "onvif/wsseapi.h"
 
 const char* OnvifGeneric211ResourceSearcher::ONVIF_RT = "ONVIF";
 

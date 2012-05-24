@@ -24,7 +24,7 @@ include(../../common/contrib/qtsingleapplication/src/qtsinglecoreapplication.pri
 win* {
     INCLUDEPATH += $$PWD/../../common/contrib/openssl/include
     INCLUDEPATH += ../../common/contrib/ffmpeg-misc-headers-win32
-    LIBS += -L$$PWD/../../common/contrib/openssl/bin -llibeay32
+    LIBS += -L$$PWD/../../common/contrib/openssl/bin -llibeay32 -lssleay32
 }
 
 INCLUDEPATH += ../../common/src
