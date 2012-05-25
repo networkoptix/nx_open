@@ -478,9 +478,17 @@ bool RTPSession::sendSetup()
         else
         {
             request += "interleaved=" + QString::number(itr.key()*2) + QString("-") + QString::number(itr.key()*2+1);
-            // todo: send TCP transport info here
         }
-        request += "\r\n\r\n";
+        request += "\r\n";
+
+        if (!m_SessionId.isEmpty()) {
+            request += "Session: ";
+            request += m_SessionId;
+            request += "\r\n";
+        }
+
+
+        request += "\r\n";
 
         //qDebug() << request;
 
