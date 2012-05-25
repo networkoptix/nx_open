@@ -997,9 +997,13 @@ void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
     if(resources.size() != 1)
         return;
 
-    QScopedPointer<ServerSettingsDialog> dialog(new ServerSettingsDialog(resources[0], widget()));
+    QScopedPointer<QnServerSettingsDialog> dialog(new QnServerSettingsDialog(resources[0], widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
+    if(!dialog->exec())
+        return;
+
+    // TODO: move submitToResources here.
+    connection()->saveAsync(resources[0], this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
 }
 
 void QnWorkbenchActionHandler::at_youtubeUploadAction_triggered() {

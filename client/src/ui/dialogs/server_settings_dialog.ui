@@ -277,72 +277,7 @@
   </layout>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>accepted()</signal>
-   <receiver>ServerSettingsDialog</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>227</x>
-     <y>311</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>227</x>
-     <y>165</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>rejected()</signal>
-   <receiver>ServerSettingsDialog</receiver>
-   <slot>reject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>227</x>
-     <y>311</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>227</x>
-     <y>165</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>addStorageButton</sender>
-   <signal>clicked()</signal>
-   <receiver>ServerSettingsDialog</receiver>
-   <slot>addClicked()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>380</x>
-     <y>148</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>227</x>
-     <y>165</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>removeStorageButton</sender>
-   <signal>clicked()</signal>
-   <receiver>ServerSettingsDialog</receiver>
-   <slot>removeClicked()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>380</x>
-     <y>180</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>227</x>
-     <y>165</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
  <slots>
   <slot>buttonClicked(QAbstractButton*)</slot>
   <slot>addClicked()</slot>

@@ -3,6 +3,7 @@
 
 #include <QtGui/QDataWidgetMapper>
 #include <QtGui/QStandardItemModel>
+#include <QtGui/QMessageBox>
 
 #include "api/AppServerConnection.h"
 
@@ -209,9 +210,9 @@ void ConnectionsSettingsWidget::testConnection()
         return;
     }
 
-    ConnectionTestingDialog dialog(this, url);
-    dialog.setModal(true);
-    dialog.exec();
+    QScopedPointer<QnConnectionTestingDialog> dialog(new QnConnectionTestingDialog(url, this));
+    dialog->setModal(true);
+    dialog->exec();
 }
 
 void ConnectionsSettingsWidget::newConnection()
