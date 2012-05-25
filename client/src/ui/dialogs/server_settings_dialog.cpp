@@ -1,11 +1,13 @@
 #include "login_dialog.h"
 #include "ui_server_settings_dialog.h"
 
-#include <set>
+#include <functional>
 
 #include <QtGui/QDataWidgetMapper>
 #include <QtGui/QMessageBox>
 #include <QtGui/QStandardItemModel>
+
+#include <utils/common/counter.h>
 
 #include "core/resource/resource.h"
 #include "ui/preferences/preferencesdialog.h"
@@ -16,67 +18,81 @@
 
 #define BILLION (1000000000LL)
 
-ServerSettingsDialog::ServerSettingsDialog(QnVideoServerResourcePtr server, QWidget *parent):
+QnServerSettingsDialog::QnServerSettingsDialog(QnVideoServerResourcePtr server, QWidget *parent):
     QDialog(parent),
     ui(new Ui::ServerSettingsDialog),
-    m_server(server),
-    m_connection(QnAppServerConnectionFactory::createConnection())
+    m_server(server)
 {
     ui->setupUi(this);
     ui->storagesTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->storagesTable->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
     ui->storagesTable->horizontalHeader()->setResizeMode(1, QHeaderView::ResizeToContents);
 
-    // qt designed do not save this flag (probably because of a bug in qt designer)
+    /* Qt designer does not save this flag (probably a bug in Qt designer). */
     ui->storagesTable->horizontalHeader()->setVisible(true);
 
-    initView();
+    connect(ui->addStorageButton,       SIGNAL(clicked()),  this,   SLOT(at_addStorageButton_clicked()));
+    connect(ui->removeStorageButton,    SIGNAL(clicked()),  this,   SLOT(at_removeStorageButton_clicked()));
+
+    updateFromResources();
 }
 
-ServerSettingsDialog::~ServerSettingsDialog()
-{
+QnServerSettingsDialog::~QnServerSettingsDialog() {
+    return;
 }
 
-void ServerSettingsDialog::requestFinished(int status, const QByteArray &/*errorString*/, QnResourceList /*resources*/, int /*handle*/)
-{
-    if (status == 0) {
-        QDialog::accept();
+void QnServerSettingsDialog::accept() {
+    setEnabled(false);
+    setCursor(Qt::WaitCursor);
+
+    QString errorString;
+    if (!validateStorages(tableStorages(), &errorString)) {
+        QMessageBox::warning(this, tr("Warning"), errorString, QMessageBox::Ok);
     } else {
-        QMessageBox::warning(this, "Can't save server configuration", "Can't save server. Please try again later.");
-        ui->buttonBox->setEnabled(true);
+        submitToResources(); 
+
+        QDialog::accept();
     }
+
+    unsetCursor();
+    setEnabled(true);
 }
 
-void ServerSettingsDialog::accept()
-{
-    ui->buttonBox->setEnabled(false);
-
-    startSaveProcess();
-
-    /*
-    if (saveToModel()) 
-    {
-        save();
-    }
-    else
-        ui->buttonBox->setEnabled(true);
-    */
-}
-
-
-void ServerSettingsDialog::reject()
-{
+void QnServerSettingsDialog::reject() {
     QDialog::reject();
 }
 
-void ServerSettingsDialog::startSaveProcess()
-{
-    QnAbstractStorageResourceList storages;
+int QnServerSettingsDialog::addTableRow(const QString &url, int spaceLimitGb) {
+    int row = ui->storagesTable->rowCount();
+    ui->storagesTable->insertRow(row);
+
+    QTableWidgetItem *urlItem = new QTableWidgetItem(url);
+    QTableWidgetItem *spaceItem = new QTableWidgetItem();
+    spaceItem->setData(Qt::DisplayRole, spaceLimitGb);
+
+    ui->storagesTable->setItem(row, 0, urlItem);
+    ui->storagesTable->setItem(row, 1, spaceItem);
+
+    ui->storagesTable->openPersistentEditor(spaceItem);
+
+    return row;
+}
+
+void QnServerSettingsDialog::setTableStorages(const QnAbstractStorageResourceList &storages) {
+    ui->storagesTable->clear();
+    ui->storagesTable->setColumnCount(2);
+
+    foreach (const QnAbstractStorageResourcePtr &storage, storages)
+        addTableRow(storage->getUrl(), storage->getSpaceLimit() / BILLION);
+}
+
+QnAbstractStorageResourceList QnServerSettingsDialog::tableStorages() const {
+    QnAbstractStorageResourceList result;
+
     int rowCount = ui->storagesTable->rowCount();
-    for (int row = 0; row < rowCount; ++row)
-    {
-        QString path = ui->storagesTable->item(row, 0) ? ui->storagesTable->item(row, 0)->text() : "";
-        int spaceLimit = static_cast<QSpinBox*>(ui->storagesTable->cellWidget(row, 1))->value();
+    for (int row = 0; row < rowCount; ++row) {
+        QString path = ui->storagesTable->item(row, 0)->text();
+        int spaceLimit = ui->storagesTable->item(row, 1)->data(Qt::DisplayRole).toInt();
 
         QnAbstractStorageResourcePtr storage(new QnAbstractStorageResource());
         storage->setName(QUuid::createUuid().toString());
@@ -84,49 +100,23 @@ void ServerSettingsDialog::startSaveProcess()
         storage->setUrl(path.trimmed());
         storage->setSpaceLimit(spaceLimit * BILLION);
 
-        storages.append(storage);
+        result.append(storage);
     }
 
-    QString errorString;
-    if (!validateStorages(storages, errorString))
-    {
-        ui->buttonBox->setEnabled(true);
-        QMessageBox mbox(QMessageBox::Warning, tr("Warning"), errorString, QMessageBox::Ok, this, Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
-        mbox.exec();
-        return;
-    }
-    m_tmpStorages = storages;
-    validateStoragesPathAsync();
+    return result;
 }
 
-void ServerSettingsDialog::updateFromResources() {
+void QnServerSettingsDialog::updateFromResources() {
     ui->nameEdit->setText(m_server->getName());
     ui->ipAddressEdit->setText(QUrl(m_server->getUrl()).host());
     ui->apiPortEdit->setText(QString::number(QUrl(m_server->getApiUrl()).port()));
     ui->rtspPortEdit->setText(QString::number(QUrl(m_server->getUrl()).port()));
 
-    foreach (const QnAbstractStorageResourcePtr &storage, m_server->getStorages()) {
-        int row = ui->storagesTable->rowCount();
-        ui->storagesTable->insertRow(row);
-
-        QTableWidgetItem *urlItem = new QTableWidgetItem(storage->getUrl(), QTableWidgetItem::Type);
-        QTableWidgetItem *spaceItem = new QTableWidgetItem(storage->getSpaceLimit() / BILLION, QTableWidgetItem::Type);
-
-        ui->storagesTable->openPersistentEditor();
-        ui->storagesTable->setItem(row, 0, );
-        static_cast<QSpinBox*>(ui->storagesTable->cellWidget(row,1))->setValue(storage->getSpaceLimit() / (BILLION));
-        // setItem(row, 1, new QTableWidgetItem(QString::number(storage->getSpaceLimit() / (BILLION)), QTableWidgetItem::Type));
-    }
+    setTableStorages(m_server->getStorages());
 }
 
-void ServerSettingsDialog::submitToResources() {
-
-}
-
-
-void ServerSettingsDialog::saveToModel()
-{
-    m_server->setStorages(m_tmpStorages);
+void QnServerSettingsDialog::submitToResources() {
+    m_server->setStorages(tableStorages());
     m_server->setName(ui->nameEdit->text());
 
     QUrl url(m_server->getUrl());
@@ -138,85 +128,74 @@ void ServerSettingsDialog::saveToModel()
     m_server->setApiUrl(apiUrl.toString());
 }
 
-void ServerSettingsDialog::initView()
-{
-}
-
-void ServerSettingsDialog::save()
+/*void QnServerSettingsDialog::save()
 {
     m_connection->saveAsync(m_server, this, SLOT(requestFinished(int,QByteArray,QnResourceList,int)));
+}*/
+
+bool QnServerSettingsDialog::validateStorages(const QnAbstractStorageResourceList &storages, QString *errorString) {
+    foreach (const QnAbstractStorageResourcePtr &storage, storages) {
+        if (storage->getUrl().isEmpty()) {
+            *errorString = "Storage path must not be empty.";
+            return false;
+        }
+
+        if (storage->getSpaceLimit() < 0) {
+            *errorString = "Space limit must be a non-negative integer.";
+            return false;
+        }
+    }
+
+    QScopedPointer<QnCounter> counter(new QnCounter(storages.size()));
+    QScopedPointer<QEventLoop> eventLoop(new QEventLoop());
+    connect(counter.data(), SIGNAL(reachedZero()), eventLoop.data(), SLOT(quit()));
+
+    QScopedPointer<detail::CheckPathReplyProcessor> processor(new detail::CheckPathReplyProcessor());
+    connect(processor.data(), SIGNAL(replyReceived(int, bool, int)), counter.data(), SLOT(decrement()));
+
+    QnVideoServerConnectionPtr serverConnection = m_server->apiConnection();
+    QHash<int, QnAbstractStorageResourcePtr> storageByHandle;
+    foreach (const QnAbstractStorageResourcePtr &storage, storages) {
+        int handle = serverConnection->asyncCheckPath(storage->getUrl(), processor.data(), SLOT(processReply(int, bool, int)));
+        storageByHandle[handle] = storage;
+    }
+
+    eventLoop->exec();
+
+    if(!processor->invalidHandles().empty()) {
+        QMessageBox::warning(this, tr("Invalid storage path"), tr("Storage path '%1' is invalid or not accessible for writing.").arg(storageByHandle.value(*processor->invalidHandles().begin())->getUrl()));
+        return false;
+    }
+
+    return true;
 }
 
-void ServerSettingsDialog::addClicked()
-{
-    int row = ui->storagesTable->rowCount();
-    ui->storagesTable->insertRow(row);
-    ui->storagesTable->setCellWidget (row, 1, createSpinCellWidget(ui->storagesTable));
+#if 0
+void ServerSettingsDialog::requestFinished(int status, const QByteArray &/*errorString*/, QnResourceList /*resources*/, int /*handle*/) {
+    if (status == 0) {
+        QDialog::accept();
+    } else {
+        QMessageBox::warning(this, "Can't save server configuration", "Can't save server. Please try again later.");
+        ui->buttonBox->setEnabled(true);
+    }
+}
+#endif
+
+
+// -------------------------------------------------------------------------- //
+// Handlers
+// -------------------------------------------------------------------------- //
+void QnServerSettingsDialog::at_addStorageButton_clicked() {
+    addTableRow(QString(), 5);
 }
 
-void ServerSettingsDialog::removeClicked()
-{
-    std::set<int> rows;
-
+void QnServerSettingsDialog::at_removeStorageButton_clicked() {
+    QList<int> rows;
     foreach (QModelIndex index, ui->storagesTable->selectionModel()->selectedRows())
-        rows.insert(index.row());
+        rows.push_back(index.row());
 
-    for (std::set<int>::const_reverse_iterator ci = rows.rbegin(); ci != rows.rend(); ++ci)
-        ui->storagesTable->removeRow(*ci);
+    qSort(rows.begin(), rows.end(), std::greater<int>()); /* Sort in descending order. */
+    foreach(int row, rows)
+        ui->storagesTable->removeRow(row);
 }
 
-bool ServerSettingsDialog::validateStorages(const QnAbstractStorageResourceList& storages, QString& errorString)
-{
-    foreach (const QnAbstractStorageResourcePtr& storage, storages)
-    {
-        if (storage->getUrl().isEmpty())
-        {
-            errorString = "Storage path should not be empty.";
-            return false;
-        }
-
-        if (storage->getSpaceLimit() < 0)
-        {
-            errorString = "Space Limit should be non-negative integer";
-            return false;
-        }
-    }
-
-    return true;
-}
-
-void ServerSettingsDialog::at_checkPathReplyReceived(int /*status*/, bool result, int handle)
-{
-    QMap<int, QString>::iterator itr = m_checkingStorageHandle.find(handle);
-    if (itr != m_checkingStorageHandle.end())
-    {
-        if (result)
-        {
-            m_checkingStorageHandle.erase(itr);
-            if (m_checkingStorageHandle.isEmpty()) 
-            {
-                // validation finished
-                saveToModel();
-                save();
-            }
-        }
-        else {
-            QMessageBox::warning(this, "Invalid storage path", QString("Storage path '%1' is invalid or not accessible for writting").arg(itr.value()));
-            m_checkingStorageHandle.clear();
-            ui->buttonBox->setEnabled(true);
-        }
-    }
-}
-
-bool ServerSettingsDialog::validateStoragesPathAsync()
-{
-    m_checkingStorageHandle.clear();
-    foreach (const QnAbstractStorageResourcePtr& storage, m_tmpStorages)
-    {
-        QnVideoServerConnectionPtr serverConnection = m_server->apiConnection();
-        int handle = serverConnection->asyncCheckPath(storage->getUrl(), this,  SLOT(at_checkPathReplyReceived(int, bool, int)));
-        m_checkingStorageHandle.insert(handle, storage->getUrl());
-    }
-
-    return true;
-}

@@ -997,7 +997,7 @@ void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
     if(resources.size() != 1)
         return;
 
-    QScopedPointer<ServerSettingsDialog> dialog(new ServerSettingsDialog(resources[0], widget()));
+    QScopedPointer<QnServerSettingsDialog> dialog(new QnServerSettingsDialog(resources[0], widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }

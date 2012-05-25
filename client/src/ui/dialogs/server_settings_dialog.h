@@ -10,43 +10,65 @@ namespace Ui {
     class ServerSettingsDialog;
 }
 
-class ServerSettingsDialog : public QDialog
-{
-    Q_OBJECT
+namespace detail {
+    class CheckPathReplyProcessor: public QObject {
+        Q_OBJECT;
+    public:
+        CheckPathReplyProcessor(QObject *parent = NULL): QObject(parent) {}
+
+        const QList<int> &invalidHandles() const {
+            return m_invalidHandles;
+        }
+
+    signals:
+        void replyReceived(int status, bool result, int handle);
+
+    public slots:
+        void processReply(int status, bool result, int handle) {
+            if(status != 0 || !result)
+                m_invalidHandles.push_back(handle);
+
+            emit replyReceived(status, result, handle);
+        }
+
+    private:
+        QList<int> m_invalidHandles;
+    };
+
+} // namespace detail
+
+
+class QnServerSettingsDialog: public QDialog {
+    Q_OBJECT;
 
 public:
-    explicit ServerSettingsDialog(QnVideoServerResourcePtr server, QWidget *parent = NULL);
-    virtual ~ServerSettingsDialog();
+    explicit QnServerSettingsDialog(QnVideoServerResourcePtr server, QWidget *parent = NULL);
+    virtual ~QnServerSettingsDialog();
 
 public slots:
     virtual void accept() override;
     virtual void reject() override;
 
-protected slots: 
-    void addClicked();
-    void removeClicked();
-    void requestFinished(int status, const QByteArray& errorString, QnResourceList resources, int handle);
-    void at_checkPathReplyReceived(int status, bool result, int handle);
-
 private:
     void updateFromResources();
     void submitToResources();
 
-    void initView();
-    void saveToModel();
-    bool validateStorages(const QnAbstractStorageResourceList& storages, QString& errorString);
-    bool validateStoragesPathAsync();
-    void save();
-    void startSaveProcess();
+    int addTableRow(const QString &url, int spaceLimitGb);
+
+    void setTableStorages(const QnAbstractStorageResourceList &storages);
+    QnAbstractStorageResourceList tableStorages() const;
+
+    bool validateStorages(const QnAbstractStorageResourceList &storages, QString *errorString);
+
+private slots: 
+    void at_addStorageButton_clicked();
+    void at_removeStorageButton_clicked();
 
 private:
-    Q_DISABLE_COPY(ServerSettingsDialog)
+    Q_DISABLE_COPY(QnServerSettingsDialog)
 
     QScopedPointer<Ui::ServerSettingsDialog> ui;
     QnVideoServerResourcePtr m_server;
-    QnAppServerConnectionPtr m_connection;
-    QMap<int, QString> m_checkingStorageHandle;
-    QnAbstractStorageResourceList m_tmpStorages;
 };
 
 #endif // SERVER_SETTINGS_DIALOG_H
