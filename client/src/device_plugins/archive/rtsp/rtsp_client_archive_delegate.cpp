@@ -123,12 +123,15 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(QnResourcePtr re
 
     foreach(QnVideoServerResourcePtr otherVideoServer, checkServers)
     {
+		if (otherVideoServer == currentVideoServer)
+			return 0; // archive starts with current server
+
         QnResourcePtr otherCamera = qnResPool->getResourceByUniqId(mac + otherVideoServer->getId().toString());
         RTPSession otherRtspSession;
         otherRtspSession.setProxyAddr(m_proxyAddr, m_proxyPort);
         if (otherRtspSession.open(getUrl(otherCamera)))
         {
-            if (otherRtspSession.startTime() != AV_NOPTS_VALUE)
+            if (otherRtspSession.startTime() != AV_NOPTS_VALUE && otherRtspSession.startTime() != DATETIME_NOW)
             {
                 return otherRtspSession.startTime();
             }
