@@ -3,8 +3,9 @@
 
 #include <QtGui/QDialog>
 
-#include "api/AppServerConnection.h"
-#include "core/resource/video_server.h"
+#include <core/resource/resource_fwd.h>
+
+#include "button_box_dialog.h"
 
 namespace Ui {
     class ServerSettingsDialog;
@@ -38,11 +39,13 @@ namespace detail {
 } // namespace detail
 
 
-class QnServerSettingsDialog: public QDialog {
+class QnServerSettingsDialog: public QnButtonBoxDialog {
     Q_OBJECT;
 
+    typedef QnButtonBoxDialog base_type;
+
 public:
-    explicit QnServerSettingsDialog(QnVideoServerResourcePtr server, QWidget *parent = NULL);
+    explicit QnServerSettingsDialog(const QnVideoServerResourcePtr &server, QWidget *parent = NULL);
     virtual ~QnServerSettingsDialog();
 
 public slots:
@@ -65,7 +68,7 @@ private slots:
     void at_removeStorageButton_clicked();
 
 private:
-    Q_DISABLE_COPY(QnServerSettingsDialog)
+    Q_DISABLE_COPY(QnServerSettingsDialog);
 
     QScopedPointer<Ui::ServerSettingsDialog> ui;
     QnVideoServerResourcePtr m_server;

@@ -1,25 +1,22 @@
-#include "login_dialog.h"
+#include "server_settings_dialog.h"
 #include "ui_server_settings_dialog.h"
 
 #include <functional>
 
+#include <QtCore/QUuid>
 #include <QtGui/QDataWidgetMapper>
 #include <QtGui/QMessageBox>
 #include <QtGui/QStandardItemModel>
 
 #include <utils/common/counter.h>
 
-#include "core/resource/resource.h"
-#include "ui/preferences/preferencesdialog.h"
-#include "ui/style/skin.h"
-#include "server_settings_dialog.h"
-
-#include "utils/settings.h"
+#include <core/resource/storage_resource.h>
+#include <core/resource/video_server.h>
 
 #define BILLION (1000000000LL)
 
-QnServerSettingsDialog::QnServerSettingsDialog(QnVideoServerResourcePtr server, QWidget *parent):
-    QDialog(parent),
+QnServerSettingsDialog::QnServerSettingsDialog(const QnVideoServerResourcePtr &server, QWidget *parent):
+    base_type(parent),
     ui(new Ui::ServerSettingsDialog),
     m_server(server)
 {
@@ -30,6 +27,8 @@ QnServerSettingsDialog::QnServerSettingsDialog(QnVideoServerResourcePtr server, 
 
     /* Qt designer does not save this flag (probably a bug in Qt designer). */
     ui->storagesTable->horizontalHeader()->setVisible(true);
+
+    setButtonBox(ui->buttonBox);
 
     connect(ui->addStorageButton,       SIGNAL(clicked()),  this,   SLOT(at_addStorageButton_clicked()));
     connect(ui->removeStorageButton,    SIGNAL(clicked()),  this,   SLOT(at_removeStorageButton_clicked()));
@@ -51,7 +50,7 @@ void QnServerSettingsDialog::accept() {
     } else {
         submitToResources(); 
 
-        QDialog::accept();
+        base_type::accept();
     }
 
     unsetCursor();
@@ -59,7 +58,7 @@ void QnServerSettingsDialog::accept() {
 }
 
 void QnServerSettingsDialog::reject() {
-    QDialog::reject();
+    base_type::reject();
 }
 
 int QnServerSettingsDialog::addTableRow(const QString &url, int spaceLimitGb) {
@@ -128,11 +127,6 @@ void QnServerSettingsDialog::submitToResources() {
     m_server->setApiUrl(apiUrl.toString());
 }
 
-/*void QnServerSettingsDialog::save()
-{
-    m_connection->saveAsync(m_server, this, SLOT(requestFinished(int,QByteArray,QnResourceList,int)));
-}*/
-
 bool QnServerSettingsDialog::validateStorages(const QnAbstractStorageResourceList &storages, QString *errorString) {
     foreach (const QnAbstractStorageResourcePtr &storage, storages) {
         if (storage->getUrl().isEmpty()) {
@@ -169,17 +163,6 @@ bool QnServerSettingsDialog::validateStorages(const QnAbstractStorageResourceLis
 
     return true;
 }
-
-#if 0
-void ServerSettingsDialog::requestFinished(int status, const QByteArray &/*errorString*/, QnResourceList /*resources*/, int /*handle*/) {
-    if (status == 0) {
-        QDialog::accept();
-    } else {
-        QMessageBox::warning(this, "Can't save server configuration", "Can't save server. Please try again later.");
-        ui->buttonBox->setEnabled(true);
-    }
-}
-#endif
 
 
 // -------------------------------------------------------------------------- //
