@@ -7,6 +7,9 @@
 #include <QtGui/QDataWidgetMapper>
 #include <QtGui/QMessageBox>
 #include <QtGui/QStandardItemModel>
+#include <QtGui/QStyledItemDelegate>
+#include <QtGui/QItemEditorFactory>
+#include <QtGui/QSpinBox>
 
 #include <utils/common/counter.h>
 
@@ -16,7 +19,20 @@
 namespace {
     const int defaultSpaceLimitGb = 5;
     const qint64 BILLION = 1000000000LL;
-}
+
+    class StorageSettingsItemEditorFactory: public QItemEditorFactory {
+    public:
+        virtual QWidget *createEditor(QVariant::Type type, QWidget *parent) const override {
+            QWidget *result = QItemEditorFactory::createEditor(type, parent);
+
+            if(QSpinBox *spinBox = dynamic_cast<QSpinBox *>(result))
+                spinBox->setRange(0, 10000); /* That's for space limit. */
+
+            return result;
+        }
+    };
+
+} // anonymous namespace
 
 QnServerSettingsDialog::QnServerSettingsDialog(const QnVideoServerResourcePtr &server, QWidget *parent):
     base_type(parent),
@@ -27,9 +43,11 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnVideoServerResourcePtr &s
     ui->storagesTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->storagesTable->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
     ui->storagesTable->horizontalHeader()->setResizeMode(1, QHeaderView::ResizeToContents);
+    ui->storagesTable->horizontalHeader()->setVisible(true); /* Qt designer does not save this flag (probably a bug in Qt designer). */
 
-    /* Qt designer does not save this flag (probably a bug in Qt designer). */
-    ui->storagesTable->horizontalHeader()->setVisible(true);
+    QStyledItemDelegate *itemDelegate = new QStyledItemDelegate(this);
+    itemDelegate->setItemEditorFactory(new StorageSettingsItemEditorFactory());
+    ui->storagesTable->setItemDelegate(itemDelegate);
 
     setButtonBox(ui->buttonBox);
 
