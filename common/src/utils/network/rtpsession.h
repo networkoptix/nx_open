@@ -12,6 +12,7 @@ class RTPSession;
 static const int RTSP_FFMPEG_GENERIC_HEADER_SIZE = 8;
 static const int RTSP_FFMPEG_VIDEO_HEADER_SIZE = 3;
 static const int RTSP_FFMPEG_METADATA_HEADER_SIZE = 4;
+static const int MAX_RTP_PACKET_SIZE = 1024 * 8;
 
 struct RtspStatistic {
     quint32 timestamp;
@@ -23,16 +24,19 @@ struct RtspStatistic {
 class RTPIODevice
 {
 public:
-    explicit RTPIODevice(RTPSession& owner);
+    explicit RTPIODevice(RTPSession* owner, bool useTCP);
     virtual ~RTPIODevice();
-    virtual qint64    read(char * data, qint64 maxSize );
-    void setTCPMode(bool mode) {m_tcpMode = mode;}
-    void setSocket(CommunicatingSocket* socket) { m_sock = socket; }
-    CommunicatingSocket* getSocket() const { return m_sock; }
+    virtual qint64 read(char * data, qint64 maxSize );
     
+    CommunicatingSocket* getMediaSocket();
+    UDPSocket* getRtcpSocket() const { return m_rtcpSocket; }
 private:
-    CommunicatingSocket* m_sock;
-    RTPSession& m_owner;
+    void processRtcpData();
+private:
+    UDPSocket* m_mediaSocket;
+    UDPSocket* m_rtcpSocket;
+
+    RTPSession* m_owner;
     qint64 m_receivedPackets;
     qint64 m_receivedOctets;
     bool m_tcpMode;
@@ -43,14 +47,26 @@ class RTPSession: public QObject
     Q_OBJECT;
 public:
 
+    //typedef QMap<int, QScopedPointer<RTPIODevice> > RtpIoTracks;
+
     struct SDPTrackInfo
     {
-        SDPTrackInfo() {}
-        SDPTrackInfo(const QString& _codecName, const QString& _codecType, const QString& _setupURL): codecName(_codecName), codecType(_codecType), setupURL(_setupURL) {}
+        SDPTrackInfo(const QString& _codecName, const QString& _codecType, const QString& _setupURL, int _mapNum, RTPSession* owner, bool useTCP):
+            codecName(_codecName), codecType(_codecType), setupURL(_setupURL), mapNum(_mapNum)
+        {
+            ioDevice = new RTPIODevice(owner, useTCP);
+        }
+        ~SDPTrackInfo() { delete ioDevice; }
+
         QString codecName;
         QString codecType;
         QString setupURL;
+        int mapNum;
+
+        RTPIODevice* ioDevice;
     };
+
+    typedef QMap<int, QSharedPointer<SDPTrackInfo> > TrackMap;
 
     RTPSession();
     ~RTPSession();
@@ -58,8 +74,13 @@ public:
     // returns true if stream was opened, false in case of some error
     bool open(const QString& url);
 
-    // position at mksec
-    RTPIODevice* play(qint64 positionStart, qint64 positionEnd, double scale);
+    /*
+    * Start playing RTSP sessopn.
+    * @param positionStart start position at mksec
+    * @param positionEnd end position at mksec
+    * @param scale playback speed
+    */
+    RTPSession::TrackMap play(qint64 positionStart, qint64 positionEnd, double scale);
 
     // returns true if there is no error delivering STOP
     bool stop();
@@ -73,8 +94,7 @@ public:
 
     const QByteArray& getSdp() const;
 
-    bool sendKeepAliveIfNeeded(const RtspStatistic *stats);
-    void processRtcpData(const RtspStatistic *stats);
+    bool sendKeepAliveIfNeeded();
 
     void setTransport(const QString& transport);
     QString getTrackFormat(int trackNum) const;
@@ -104,6 +124,13 @@ public:
 
     void setProxyAddr(const QString& addr, int port);
 
+    /*
+    * Find track by type ('video', 'audio' e t.c.) and returns track IO device. Returns 0 if track not found.
+    */
+    RTPIODevice* getTrackIoByType(const QString& trackType);
+
+    QString getCodecNameByType(const QString& trackType);
+    QList<QByteArray> getSdpByType(const QString& trackType) const;
 signals:
     void gotTextResponse(QByteArray text);
 private:
@@ -112,7 +139,7 @@ private:
     int readRAWData();
     bool sendDescribe();
     bool sendOptions();
-    RTPIODevice *sendSetup();
+    bool sendSetup();
     bool sendKeepAlive();
 
     bool readTextResponce(QByteArray &responce);
@@ -126,7 +153,6 @@ private:
     void parseSDP();
     int buildRTCPReport(quint8 *dstBuffer, const RtspStatistic *stats);
     void addAdditionAttrs(QByteArray& request);
-
 private:
     enum { RTSP_BUFFER_LEN = 1024 * 64 * 16 };
 
@@ -136,9 +162,7 @@ private:
     QByteArray m_sdp;
 
     TCPSocket m_tcpSock;
-    UDPSocket m_udpSock;
-    UDPSocket m_rtcpUdpSock;
-    RTPIODevice m_rtpIo;
+    //RtpIoTracks m_rtpIoTracks; // key: tracknum, value: track IO device
     int m_selectedAudioChannel;
 
     QUrl mUrl;
@@ -147,7 +171,7 @@ private:
     QString m_SessionId;
     unsigned short m_ServerPort;
     // format: key - track number, value - codec name
-    QMap<int, SDPTrackInfo> m_sdpTracks;
+    TrackMap m_sdpTracks;
 
     unsigned int m_TimeOut;
 
@@ -161,6 +185,7 @@ private:
     QAuthenticator m_auth;
     QString m_proxyAddr;
     int m_proxyPort;
+    QString m_contentBase;
 };
 
 #endif //rtp_session_h_1935_h

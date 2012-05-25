@@ -22,47 +22,97 @@ static const int TCP_CONNECT_TIMEOUT = 1000*3;
 
 //#define DEBUG_RTSP
 
-RTPIODevice::RTPIODevice(RTPSession& owner):
+RTPIODevice::RTPIODevice(RTPSession* owner, bool useTCP):
     m_owner(owner),
     m_receivedPackets(0),
     m_receivedOctets(0),
-    m_tcpMode(false)
+    m_tcpMode(false),
+    m_mediaSocket(0),
+    m_rtcpSocket(0)
 {
+    m_tcpMode = useTCP;
+    if (!m_tcpMode) 
+    {
+        m_mediaSocket = new UDPSocket(0);
+        m_mediaSocket->setReadTimeOut(500);
+
+        m_rtcpSocket = new UDPSocket(0);
+        m_rtcpSocket->setReadTimeOut(500);
+    }
 }
 
 RTPIODevice::~RTPIODevice()
 {
+    delete m_mediaSocket;
+    delete m_rtcpSocket;
 }
+
+/*
+void RTPIODevice::setTCPSocket(CommunicatingSocket* socket) 
+{
+    m_sock = socket; 
+    m_tcpMode = true;
+}
+*/
 
 qint64 RTPIODevice::read(char *data, qint64 maxSize)
 {
 
     int readed;
     if (m_tcpMode)
-        readed = m_owner.readBinaryResponce((quint8*) data, maxSize); // demux binary data from TCP socket
+        readed = m_owner->readBinaryResponce((quint8*) data, maxSize); // demux binary data from TCP socket
     else
-        readed = m_sock->recv(data, maxSize);
+        readed = m_mediaSocket->recv(data, maxSize);
     if (readed > 0)
     {
         m_receivedPackets++;
         m_receivedPackets += readed;
     }
+    m_owner->sendKeepAliveIfNeeded();
+    if (!m_tcpMode)
+        processRtcpData();
+    return readed;
+}
+
+void RTPIODevice::processRtcpData()
+{
     RtspStatistic stats;
     stats.nptTime = 0;
     stats.timestamp = 0;
     stats.receivedOctets = m_receivedPackets;
     stats.receivedPackets = m_receivedPackets;
-    m_owner.sendKeepAliveIfNeeded(&stats);
-    return readed;
+
+    quint8 rtcpBuffer[MAX_RTCP_PACKET_SIZE];
+    quint8 sendBuffer[MAX_RTCP_PACKET_SIZE];
+    while (m_rtcpSocket->hasData())
+    {
+        QString lastReceivedAddr;
+        unsigned short lastReceivedPort;
+        int readed = m_rtcpSocket->recvFrom(rtcpBuffer, sizeof(rtcpBuffer), lastReceivedAddr, lastReceivedPort);
+        if (readed > 0)
+        {
+            if (!m_rtcpSocket->isConnected())
+            {
+
+                m_rtcpSocket->setDestAddr(lastReceivedAddr, lastReceivedPort);
+            }
+
+            //quint32 timestamp = 0;
+            //double nptTime = 0;
+            int outBufSize = m_owner->buildRTCPReport(sendBuffer, &stats);
+            if (outBufSize > 0)
+            {
+                m_rtcpSocket->sendTo(sendBuffer, outBufSize);
+            }
+        }
+    }
 }
 
 
 //============================================================================================
 RTPSession::RTPSession():
     m_csec(2),
-    m_udpSock(0),
-    m_rtcpUdpSock(0),
-    m_rtpIo(*this),
+    //m_rtpIo(*this),
     m_transport("UDP"),
     m_selectedAudioChannel(0),
     m_startTime(AV_NOPTS_VALUE),
@@ -71,7 +121,6 @@ RTPSession::RTPSession():
     m_tcpTimeout(50 * 1000 * 1000),
     m_proxyPort(0)
 {
-    m_udpSock.setReadTimeOut(500);
     m_responseBuffer = new quint8[RTSP_BUFFER_LEN];
     m_responseBufferLen = 0;
 
@@ -91,8 +140,8 @@ void RTPSession::parseSDP()
     int mapNum = -1;
     QString codecName;
     QString codecType;
+    QString setupURL;
     int trackNum = -1;
-    QByteArray setupURL;
 
     foreach(QByteArray line, lines)
     {
@@ -101,7 +150,7 @@ void RTPSession::parseSDP()
         if (lineLower.startsWith("m="))
         {
             if (trackNum >= 0) {
-                m_sdpTracks.insert(trackNum, SDPTrackInfo(codecName, codecType, setupURL));
+                m_sdpTracks.insert(trackNum, QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(codecName, codecType, setupURL, mapNum, this, m_transport == "TCP")));
                 trackNum = -1;
                 setupURL.clear();
             }
@@ -147,7 +196,7 @@ void RTPSession::parseSDP()
         }
     }
     if (trackNum >= 0)
-        m_sdpTracks.insert(trackNum, SDPTrackInfo(codecName, codecType, setupURL));
+        m_sdpTracks.insert(trackNum, QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(codecName, codecType, setupURL, mapNum, this, m_transport == "TCP")));
 }
 
 void RTPSession::parseRangeHeader(const QString& rangeStr)
@@ -187,6 +236,7 @@ void RTPSession::parseRangeHeader(const QString& rangeStr)
 bool RTPSession::open(const QString& url)
 {
     mUrl = url;
+    m_contentBase = mUrl.toString();
     m_responseBufferLen = 0;
 
     //unsigned int port = DEFAULT_RTP_PORT;
@@ -221,6 +271,10 @@ bool RTPSession::open(const QString& url)
     if (!tmp.isEmpty())
         parseRangeHeader(tmp);
 
+    tmp = extractRTSPParam(response, "Content-Base:");
+    if (!tmp.isEmpty())
+        m_contentBase = tmp;
+
     int sdp_index = response.indexOf("\r\n\r\n");
 
     if (sdp_index  < 0 || sdp_index+4 >= response.size())
@@ -235,20 +289,15 @@ bool RTPSession::open(const QString& url)
     return true;
 }
 
-RTPIODevice* RTPSession::play(qint64 positionStart, qint64 positionEnd, double scale)
+RTPSession::TrackMap RTPSession::play(qint64 positionStart, qint64 positionEnd, double scale)
 {
-    RTPIODevice* ioDevice = sendSetup();
+    if (!sendSetup() || m_sdpTracks.isEmpty())
+        return TrackMap();
 
-    if (ioDevice == 0)
-        return 0;
+    if (!sendPlay(positionStart, positionEnd, scale)) 
+        m_sdpTracks.clear();
 
-
-    if (!sendPlay(positionStart, positionEnd, scale))
-        return 0;
-
-
-    return &m_rtpIo;
-
+    return m_sdpTracks;
 }
 
 bool RTPSession::stop()
@@ -258,7 +307,6 @@ bool RTPSession::stop()
     m_tcpSock.close();
     return true;
 }
-
 
 bool RTPSession::isOpened() const
 {
@@ -329,19 +377,63 @@ bool RTPSession::sendOptions()
 
 }
 
-RTPIODevice*  RTPSession::sendSetup()
+RTPIODevice* RTPSession::getTrackIoByType(const QString& trackType)
 {
-
-    int audioNum = 0;
-    if (m_transport == "UDP")
-        m_rtpIo.setSocket(&m_udpSock);
-    else
-        m_rtpIo.setSocket(&m_tcpSock);
-    for (QMap<int, SDPTrackInfo>::iterator itr = m_sdpTracks.begin(); itr != m_sdpTracks.end(); ++itr)
+    for (TrackMap::iterator itr = m_sdpTracks.begin(); itr != m_sdpTracks.end(); ++itr)
     {
-        if (getTrackType(itr.key()) == "audio" || m_transport == "UDP") 
+        if (getTrackType(itr.key()) == trackType)
+            return itr.value()->ioDevice;
+    }
+    return 0;
+}
+
+QString RTPSession::getCodecNameByType(const QString& trackType)
+{
+    for (TrackMap::iterator itr = m_sdpTracks.begin(); itr != m_sdpTracks.end(); ++itr)
+    {
+        if (getTrackType(itr.key()) == trackType)
+            return itr.value()->codecName;
+    }
+    return QString();
+}
+
+QList<QByteArray> RTPSession::getSdpByType(const QString& trackType) const
+{
+    QList<QByteArray> rez;
+    QList<QByteArray> tmp = m_sdp.split('\n');
+    
+    int mapNum = -1;
+    for (TrackMap::iterator itr = m_sdpTracks.begin(); itr != m_sdpTracks.end(); ++itr)
+    {
+        if (getTrackType(itr.key()) == trackType)
+            mapNum = itr.value()->mapNum;
+    }
+    if (mapNum == -1)
+        return rez;
+
+    for (int i = 0; i < tmp.size(); ++i)
+    {
+        QByteArray line = tmp[i].trimmed();
+        if (line.startsWith("a=")) {
+            QByteArray lineMapNum = line.split(' ')[0];
+            lineMapNum = lineMapNum.mid(line.indexOf(':')+1);
+            if (lineMapNum.toInt() == mapNum)
+                rez << line;
+        }
+    }
+    return rez;
+}
+
+bool RTPSession::sendSetup()
+{
+    int audioNum = 0;
+
+    for (TrackMap::iterator itr = m_sdpTracks.begin(); itr != m_sdpTracks.end(); ++itr)
+    {
+        QSharedPointer<SDPTrackInfo> trackInfo = itr.value();
+
+        if (getTrackType(itr.key()) == "audio")
         {
-            // todo: audio (multi tracks transfer) does not supported for UDP now
             if (audioNum++ != m_selectedAudioChannel)
                 continue;
         }
@@ -353,18 +445,18 @@ RTPIODevice*  RTPSession::sendSetup()
         QByteArray request;
         request += "SETUP ";
 
-        if (itr.value().setupURL.startsWith("rtsp://"))
+        if (trackInfo->setupURL.startsWith("rtsp://"))
         {
             // full track url in a prefix
-            request += itr.value().setupURL;
+            request += trackInfo->setupURL;
         }   
         else {
             request += mUrl.toString();
             request += '/';
-            if (itr.value().setupURL.isEmpty())
+            if (trackInfo->setupURL.isEmpty())
                 request += QString("trackID=");
             else
-                request += itr.value().setupURL;
+                request += trackInfo->setupURL;
             request += QByteArray::number(itr.key());
         }
 
@@ -379,9 +471,9 @@ RTPIODevice*  RTPSession::sendSetup()
         if (m_transport == "UDP")
         {
             request += "client_port=";
-            request += QString::number(m_udpSock.getLocalPort());
+            request += QString::number(trackInfo->ioDevice->getMediaSocket()->getLocalPort());
             request += '-';
-            request += QString::number(m_rtcpUdpSock.getLocalPort());
+            request += QString::number(trackInfo->ioDevice->getRtcpSocket()->getLocalPort());
         }
         else
         {
@@ -398,12 +490,12 @@ RTPIODevice*  RTPSession::sendSetup()
         QByteArray responce;
 
         if (!readTextResponce(responce))
-            return 0;
+            return false;
 
 
         if (!responce.startsWith("RTSP/1.0 200"))
         {
-            return 0;
+            return false;
         }
         m_TimeOut = 0; // default timeout 0 ( do not send keep alive )
 
@@ -431,8 +523,7 @@ RTPIODevice*  RTPSession::sendSetup()
 
         updateTransportHeader(responce);
     }
-
-    return &m_rtpIo;
+    return true;
 }
 
 void RTPSession::addAdditionAttrs(QByteArray& request)
@@ -507,7 +598,7 @@ bool RTPSession::sendPlay(qint64 startPos, qint64 endPos, double scale)
     m_scale = scale;
 
     request += "PLAY ";
-    request += mUrl.toString();
+    request += m_contentBase;
     request += " RTSP/1.0\r\n";
     request += "CSeq: ";
     request += QByteArray::number(m_csec++);
@@ -676,40 +767,8 @@ int RTPSession::buildRTCPReport(quint8* dstBuffer, const RtspStatistic* stats)
     return curBuffer - dstBuffer;
 }
 
-void RTPSession::processRtcpData(const RtspStatistic* stats)
+bool RTPSession::sendKeepAliveIfNeeded()
 {
-    quint8 rtcpBuffer[MAX_RTCP_PACKET_SIZE];
-    quint8 sendBuffer[MAX_RTCP_PACKET_SIZE];
-    while (m_rtcpUdpSock.hasData())
-    {
-        QString lastReceivedAddr;
-        unsigned short lastReceivedPort;
-        int readed = m_rtcpUdpSock.recvFrom(rtcpBuffer, sizeof(rtcpBuffer), lastReceivedAddr, lastReceivedPort);
-        if (readed > 0)
-        {
-            if (!m_rtcpUdpSock.isConnected())
-            {
-
-                m_rtcpUdpSock.setDestAddr(lastReceivedAddr, lastReceivedPort);
-            }
-
-            //quint32 timestamp = 0;
-            //double nptTime = 0;
-            if (stats)
-            {
-                int outBufSize = buildRTCPReport(sendBuffer, stats);
-                if (outBufSize > 0)
-                {
-                    m_rtcpUdpSock.sendTo(sendBuffer, outBufSize);
-                }
-            }
-        }
-    }
-}
-
-bool RTPSession::sendKeepAliveIfNeeded(const RtspStatistic* stats)
-{
-    processRtcpData(stats);
     // send rtsp keep alive
     if (m_TimeOut==0)
         return true;
@@ -945,18 +1004,16 @@ void RTPSession::updateTransportHeader(QByteArray& responce)
 void RTPSession::setTransport(const QString& transport)
 {
     m_transport = transport;
-    m_rtpIo.setTCPMode(m_transport == "TCP");
-
 }
 
 QString RTPSession::getTrackFormat(int trackNum) const
 {
-    return m_sdpTracks.value(trackNum).codecName;
+    return m_sdpTracks.value(trackNum)->codecName;
 }
 
 QString RTPSession::getTrackType(int trackNum) const
 {
-    return m_sdpTracks.value(trackNum).codecType;
+    return m_sdpTracks.value(trackNum)->codecType;
 }
 
 qint64 RTPSession::startTime() const
@@ -1008,4 +1065,12 @@ void RTPSession::setProxyAddr(const QString& addr, int port)
 {
     m_proxyAddr = addr;
     m_proxyPort = port;
+}
+
+CommunicatingSocket* RTPIODevice::getMediaSocket()
+{ 
+    if (m_tcpMode) 
+        return &m_owner->m_tcpSock;
+    else
+        return m_mediaSocket; 
 }

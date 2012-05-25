@@ -8,13 +8,14 @@
 #include "../media/nalUnits.h"
 
 
-class CLH264RtpParser: public CLRtpStreamParser
+class CLH264RtpParser: public QnRtpStreamParser
 {
 public:
-    CLH264RtpParser(RTPIODevice* input);
-    virtual QnAbstractMediaDataPtr getNextData();
+    CLH264RtpParser();
     virtual ~CLH264RtpParser();
-    virtual void setSDPInfo(const QByteArray& data);
+    virtual void CLH264RtpParser::setSDPInfo(QList<QByteArray> lines) override;
+
+    virtual bool processData(quint8* rtpBuffer, int readed, QnAbstractMediaDataPtr& result) override;
 private:
     QMap <int, QByteArray> m_allNonSliceNal;
     QList<QByteArray> m_sdpSpsPps;
@@ -28,6 +29,8 @@ private:
     quint64 m_lastTimeStamp;
     quint16 m_firstSeqNum;
     quint16 m_packetPerNal;
+
+    QnCompressedVideoDataPtr m_videoData;
 private:
     void serializeSpsPps(CLByteArray& dst);
     void decodeSpsInfo(const QByteArray& data);

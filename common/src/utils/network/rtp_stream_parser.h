@@ -36,18 +36,15 @@ typedef struct
 } RtpHeader;
 #pragma pack(pop)
 
-
-
-class CLRtpStreamParser
+class QnRtpStreamParser
 {
 public:
-    CLRtpStreamParser(RTPIODevice* input);
-    virtual void setSDPInfo(const QByteArray& data);
-    virtual QnAbstractMediaDataPtr getNextData() = 0;
-    virtual ~CLRtpStreamParser();
-protected:
-    RTPIODevice* m_input;
-    QByteArray m_sdp;
+    QnRtpStreamParser();
+    virtual void setSDPInfo(QList<QByteArray> sdpInfo) = 0;
+    
+    virtual bool processData(quint8* rtpBuffer, int readed, QnAbstractMediaDataPtr& result) = 0;
+
+    virtual ~QnRtpStreamParser();
 };
 
 #endif

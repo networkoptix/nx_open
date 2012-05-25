@@ -7,7 +7,7 @@
 
 
 
-class CLRtpStreamParser;
+class QnRtpStreamParser;
 
 class RTPH264StreamreaderDelegate : public QnResourceConsumer
 {
@@ -28,7 +28,7 @@ private:
     
     RTPSession m_RtpSession;
     RTPIODevice* m_rtpIo;
-    CLRtpStreamParser* m_streamParser;
+    QnRtpStreamParser* m_streamParser;
 
     QString m_request;
 

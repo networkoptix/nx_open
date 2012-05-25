@@ -196,7 +196,8 @@ bool QnRtspClientArchiveDelegate::open(QnResourcePtr resource)
         if (globalMinTime !=AV_NOPTS_VALUE)
             m_globalMinArchiveTime = globalMinTime;
 
-        m_rtpData = m_rtspSession.play(m_position, m_position, m_rtspSession.getScale());
+        m_rtspSession.play(m_position, m_position, m_rtspSession.getScale());
+        m_rtpData = m_rtspSession.getTrackIoByType("video");
         if (!m_rtpData)
             m_rtspSession.stop();
     }
@@ -217,7 +218,7 @@ void QnRtspClientArchiveDelegate::beforeClose()
     //m_waitBOF = false;
     m_closing = true;
     if (m_rtpData)
-        m_rtpData->getSocket()->close();
+        m_rtpData->getMediaSocket()->close();
 }
 
 void QnRtspClientArchiveDelegate::close()
@@ -359,7 +360,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
             data += 4;
         }
         else {
-            rtpChannelNum = m_rtpData->getSocket()->getLocalPort();
+            rtpChannelNum = m_rtpData->getMediaSocket()->getLocalPort();
         }
         const QString format = m_rtspSession.getTrackFormat(rtpChannelNum).toLower();
         if (format.isEmpty())

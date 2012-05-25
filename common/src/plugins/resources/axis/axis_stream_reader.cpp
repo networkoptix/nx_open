@@ -14,7 +14,7 @@ static const int AXIS_SEI_TRIGGER_DATA = 0x0a03;
 
 QnAxisStreamReader::QnAxisStreamReader(QnResourcePtr res):
     CLServerPushStreamreader(res),
-    m_RTP264(res)
+    m_rtpStreamParser(res)
 {
     m_axisRes = getResource().dynamicCast<QnPlAxisResource>();
 }
@@ -147,18 +147,18 @@ void QnAxisStreamReader::openStream()
 
 
     // ============== requesting a video ==========================
-    m_RTP264.setRequest(QString("axis-media/media.amp?streamprofile=") + profileName);
-    m_RTP264.openStream();
+    m_rtpStreamParser.setRequest(QString("axis-media/media.amp?streamprofile=") + profileName);
+    m_rtpStreamParser.openStream();
 }
 
 void QnAxisStreamReader::closeStream()
 {
-    m_RTP264.closeStream();
+    m_rtpStreamParser.closeStream();
 }
 
 bool QnAxisStreamReader::isStreamOpened() const
 {
-    return m_RTP264.isStreamOpened();
+    return m_rtpStreamParser.isStreamOpened();
 }
 
 QnMetaDataV1Ptr QnAxisStreamReader::getCameraMetadata()
@@ -270,6 +270,12 @@ bool QnAxisStreamReader::isGotFrame(QnCompressedVideoDataPtr videoData)
     return false;
 }
 
+void QnAxisStreamReader::pleaseStop()
+{
+    CLLongRunnable::pleaseStop();
+    m_rtpStreamParser.closeStream();
+}
+
 QnAbstractMediaDataPtr QnAxisStreamReader::getNextData()
 {
     if (getRole() == QnResource::Role_LiveVideo) 
@@ -287,7 +293,7 @@ QnAbstractMediaDataPtr QnAxisStreamReader::getNextData()
     QnAbstractMediaDataPtr rez;
     for (int i = 0; i < 10; ++i)
     {
-        rez = m_RTP264.getNextData();
+        rez = m_rtpStreamParser.getNextData();
         if (rez) 
         {
             QnCompressedVideoDataPtr videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(rez);
@@ -319,4 +325,3 @@ void QnAxisStreamReader::updateStreamParamsBasedOnFps()
 }
 
 //=====================================================================================
-
