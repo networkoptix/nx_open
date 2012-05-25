@@ -18,8 +18,6 @@
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/style/skin.h>
 
-Q_DECLARE_METATYPE(QnWorkbenchLayout *);
-
 QnLayoutTabBar::QnLayoutTabBar(QWidget *parent, QnWorkbenchContext *context):
     QTabBar(parent),
     QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent),

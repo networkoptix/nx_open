@@ -41,7 +41,12 @@ void QnAction::setFlags(Qn::ActionFlags flags) {
 }
 
 void QnAction::setNormalText(const QString &normalText) {
+    if(m_normalText == normalText)
+        return;
+
     m_normalText = normalText;
+
+    updateText();
 }
 
 void QnAction::setToggledText(const QString &toggledText) {
@@ -100,9 +105,7 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
             Qn::Permissions requirements = pos.value();
 
             QnResourceList resources;
-            if(key.isEmpty()) {
-                resources = parameters.resources();
-            } else if(parameters.hasArgument(key)) {
+            if(parameters.hasArgument(key)) {
                 resources = QnActionParameterTypes::resources(parameters.argument(key));
             } else if(key == Qn::CurrentLayoutParameter) {
                 resources.push_back(context()->workbench()->currentLayout()->resource());

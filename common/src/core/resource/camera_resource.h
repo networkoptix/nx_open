@@ -17,8 +17,11 @@ public:
     void setScheduleDisabled(bool blocked);
     bool isScheduleDisabled() const;
 
+    void setAudioEnabled(bool enabled);
+    bool isAudioEnabled() const;
 private:
     bool m_scheduleDisabled;
+    bool m_audioEnabled;
 };
 
 

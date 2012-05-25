@@ -119,12 +119,22 @@ public:
      */
     void setPulledText(const QString &pulledText);
 
+    /**
+     * \returns                         Condition associated with this action, of NULL if none.
+     */
     QnActionCondition *condition() const {
         return m_condition.data();
     }
 
+    /**
+     * \param condition                 New condition for this action.
+     */
     void setCondition(QnActionCondition *condition);
 
+    /**
+     * \returns                         Child actions. These action will appear
+     *                                  in a submenu for this action.
+     */
     const QList<QnAction *> &children() const {
         return m_children;
     }
@@ -133,6 +143,13 @@ public:
 
     void removeChild(QnAction *action);
 
+    /**
+     * \param scope                     Scope in which action is to be executed.
+     * \param parameters                Parameters for action execution.
+     * \returns                         Action visibility that determines whether
+     *                                  action can be executed and how it will
+     *                                  appear in context menu.
+     */
     Qn::ActionVisibility checkCondition(Qn::ActionScopes scope, const QnActionParameters &parameters) const;
 
 protected:

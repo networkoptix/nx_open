@@ -1,7 +1,7 @@
 #ifndef QN_ENVIRONMENT_H
 #define QN_ENVIRONMENT_H
 
-#include <QObject>
+#include <QtCore/QObject>
 
 class QnEnvironment: public QObject {
     Q_OBJECT;
