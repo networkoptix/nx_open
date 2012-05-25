@@ -27,8 +27,11 @@ protected slots:
     void removeClicked();
     void requestFinished(int status, const QByteArray& errorString, QnResourceList resources, int handle);
     void at_checkPathReplyReceived(int status, bool result, int handle);
+
 private:
-    QSpinBox* createSpinCellWidget(QWidget* parent);
+    void updateFromResources();
+    void submitToResources();
+
     void initView();
     void saveToModel();
     bool validateStorages(const QnAbstractStorageResourceList& storages, QString& errorString);

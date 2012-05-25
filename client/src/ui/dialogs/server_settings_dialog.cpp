@@ -14,13 +14,13 @@
 
 #include "utils/settings.h"
 
-#define BILLION 1000000000LL
+#define BILLION (1000000000LL)
 
 ServerSettingsDialog::ServerSettingsDialog(QnVideoServerResourcePtr server, QWidget *parent):
     QDialog(parent),
     ui(new Ui::ServerSettingsDialog),
     m_server(server),
-    m_connection (QnAppServerConnectionFactory::createConnection())
+    m_connection(QnAppServerConnectionFactory::createConnection())
 {
     ui->setupUi(this);
     ui->storagesTable->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -99,6 +99,31 @@ void ServerSettingsDialog::startSaveProcess()
     validateStoragesPathAsync();
 }
 
+void ServerSettingsDialog::updateFromResources() {
+    ui->nameEdit->setText(m_server->getName());
+    ui->ipAddressEdit->setText(QUrl(m_server->getUrl()).host());
+    ui->apiPortEdit->setText(QString::number(QUrl(m_server->getApiUrl()).port()));
+    ui->rtspPortEdit->setText(QString::number(QUrl(m_server->getUrl()).port()));
+
+    foreach (const QnAbstractStorageResourcePtr &storage, m_server->getStorages()) {
+        int row = ui->storagesTable->rowCount();
+        ui->storagesTable->insertRow(row);
+
+        QTableWidgetItem *urlItem = new QTableWidgetItem(storage->getUrl(), QTableWidgetItem::Type);
+        QTableWidgetItem *spaceItem = new QTableWidgetItem(storage->getSpaceLimit() / BILLION, QTableWidgetItem::Type);
+
+        ui->storagesTable->openPersistentEditor();
+        ui->storagesTable->setItem(row, 0, );
+        static_cast<QSpinBox*>(ui->storagesTable->cellWidget(row,1))->setValue(storage->getSpaceLimit() / (BILLION));
+        // setItem(row, 1, new QTableWidgetItem(QString::number(storage->getSpaceLimit() / (BILLION)), QTableWidgetItem::Type));
+    }
+}
+
+void ServerSettingsDialog::submitToResources() {
+
+}
+
+
 void ServerSettingsDialog::saveToModel()
 {
     m_server->setStorages(m_tmpStorages);
@@ -113,33 +138,8 @@ void ServerSettingsDialog::saveToModel()
     m_server->setApiUrl(apiUrl.toString());
 }
 
-QSpinBox* ServerSettingsDialog::createSpinCellWidget(QWidget* parent)
-{
-    QSpinBox* spinBox = new QSpinBox(parent);
-
-    spinBox->setValue(5);
-    spinBox->setMinimum(0);
-    spinBox->setMaximum(100000);
-
-    return spinBox;
-}
-
 void ServerSettingsDialog::initView()
 {
-    ui->nameEdit->setText(m_server->getName());
-    ui->ipAddressEdit->setText(QUrl(m_server->getUrl()).host());
-    ui->apiPortEdit->setText(QString::number(QUrl(m_server->getApiUrl()).port()));
-    ui->rtspPortEdit->setText(QString::number(QUrl(m_server->getUrl()).port()));
-
-    foreach (const QnAbstractStorageResourcePtr& storage, m_server->getStorages())
-    {
-        int row = ui->storagesTable->rowCount();
-        ui->storagesTable->insertRow(row);
-        ui->storagesTable->setCellWidget (row, 1, createSpinCellWidget(ui->storagesTable));
-        ui->storagesTable->setItem(row, 0, new QTableWidgetItem(storage->getUrl(), QTableWidgetItem::Type));
-        static_cast<QSpinBox*>(ui->storagesTable->cellWidget(row,1))->setValue(storage->getSpaceLimit() / (BILLION));
-        // setItem(row, 1, new QTableWidgetItem(QString::number(storage->getSpaceLimit() / (BILLION)), QTableWidgetItem::Type));
-    }
 }
 
 void ServerSettingsDialog::save()

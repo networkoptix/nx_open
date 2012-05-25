@@ -45,7 +45,6 @@ class QN_EXPORT QnResource : public QObject
     Q_PROPERTY(QString url READ getUrl WRITE setUrl)
     Q_PROPERTY(QDateTime lastDiscoveredTime READ getLastDiscoveredTime WRITE setLastDiscoveredTime)
     Q_PROPERTY(QStringList tags READ tagList WRITE setTags)
-    Q_CLASSINFO("url", "URL")
 
 public:
     enum ConnectionRole { Role_Default, Role_LiveVideo, Role_SecondaryLiveVideo, Role_Archive };
