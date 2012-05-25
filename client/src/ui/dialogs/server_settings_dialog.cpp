@@ -13,7 +13,10 @@
 #include <core/resource/storage_resource.h>
 #include <core/resource/video_server.h>
 
-#define BILLION (1000000000LL)
+namespace {
+    const int defaultSpaceLimitGb = 5;
+    const qint64 BILLION = 1000000000LL;
+}
 
 QnServerSettingsDialog::QnServerSettingsDialog(const QnVideoServerResourcePtr &server, QWidget *parent):
     base_type(parent),
@@ -30,8 +33,9 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnVideoServerResourcePtr &s
 
     setButtonBox(ui->buttonBox);
 
-    connect(ui->addStorageButton,       SIGNAL(clicked()),  this,   SLOT(at_addStorageButton_clicked()));
-    connect(ui->removeStorageButton,    SIGNAL(clicked()),  this,   SLOT(at_removeStorageButton_clicked()));
+    connect(ui->addStorageButton,       SIGNAL(clicked()),              this,   SLOT(at_addStorageButton_clicked()));
+    connect(ui->removeStorageButton,    SIGNAL(clicked()),              this,   SLOT(at_removeStorageButton_clicked()));
+    connect(ui->storagesTable,          SIGNAL(cellChanged(int, int)),  this,   SLOT(at_storagesTable_cellChanged(int, int)));
 
     updateFromResources();
 }
@@ -72,7 +76,7 @@ int QnServerSettingsDialog::addTableRow(const QString &url, int spaceLimitGb) {
     ui->storagesTable->setItem(row, 0, urlItem);
     ui->storagesTable->setItem(row, 1, spaceItem);
 
-    ui->storagesTable->openPersistentEditor(spaceItem);
+    updateSpaceLimitCell(row, true);
 
     return row;
 }
@@ -164,12 +168,45 @@ bool QnServerSettingsDialog::validateStorages(const QnAbstractStorageResourceLis
     return true;
 }
 
+void QnServerSettingsDialog::updateSpaceLimitCell(int row, bool force) {
+    QTableWidgetItem *urlItem = ui->storagesTable->item(row, 0);
+    QTableWidgetItem *spaceItem = ui->storagesTable->item(row, 1);
+    if(!urlItem || !spaceItem)
+        return;
+
+    QString url = urlItem->data(Qt::DisplayRole).toString();
+
+    bool newSupportsSpaceLimit = !url.trimmed().startsWith("coldstore://"); // TODO: evil hack, move out the check somewhere into storage factory.
+    bool oldSupportsSpaceLimit = spaceItem->flags() & Qt::ItemIsEditable;
+    if(newSupportsSpaceLimit != oldSupportsSpaceLimit || force) {
+        spaceItem->setFlags(newSupportsSpaceLimit ? (spaceItem->flags() | Qt::ItemIsEditable) : (spaceItem->flags() & ~Qt::ItemIsEditable));
+        
+        /* Adjust value. */
+        if(newSupportsSpaceLimit) {
+            bool ok;
+            int spaceLimitGb = spaceItem->data(Qt::DisplayRole).toInt(&ok);
+            if(!ok)
+                spaceLimitGb = defaultSpaceLimitGb;
+            spaceItem->setData(Qt::DisplayRole, spaceLimitGb);
+        } else {
+            spaceItem->setData(Qt::DisplayRole, QVariant());
+        }
+        
+        /* Open/close editor. */
+        if(newSupportsSpaceLimit) {
+            ui->storagesTable->openPersistentEditor(spaceItem);
+        } else {
+            ui->storagesTable->closePersistentEditor(spaceItem);
+        }
+    }
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnServerSettingsDialog::at_addStorageButton_clicked() {
-    addTableRow(QString(), 5);
+    addTableRow(QString(), defaultSpaceLimitGb);
 }
 
 void QnServerSettingsDialog::at_removeStorageButton_clicked() {
@@ -182,3 +219,9 @@ void QnServerSettingsDialog::at_removeStorageButton_clicked() {
         ui->storagesTable->removeRow(row);
 }
 
+void QnServerSettingsDialog::at_storagesTable_cellChanged(int row, int column) {
+    if(column != 0)
+        return;
+    
+    updateSpaceLimitCell(row);
+}
