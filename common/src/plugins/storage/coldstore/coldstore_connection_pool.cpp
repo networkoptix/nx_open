@@ -1,5 +1,6 @@
 #include "coldstore_connection_pool.h"
 #include "coldstore_storage.h"
+#include "utils/common/sleep.h"
 
 
 QnColdStoreConnection::QnColdStoreConnection(const QString& addr):
