@@ -259,6 +259,8 @@ void QnCsTimeunitConnectionHelper::close()
 
     conn.close();
 
+    qWarning() << "CS closing file " << m_connect->getFilename() + QString("_md") << " dataFile=" << m_csFileName;
+
 
     m_connect->close();
     delete m_connect;
