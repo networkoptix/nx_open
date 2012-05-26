@@ -29,7 +29,7 @@ void RTPH264StreamreaderDelegate::setRequest(const QString& request)
 
 QnAbstractMediaDataPtr RTPH264StreamreaderDelegate::getNextData()
 {
-    QnAbstractMediaDataPtr result;
+    QList<QnAbstractMediaDataPtr> result;
     quint8 rtpBuffer[MAX_RTP_PACKET_SIZE];
     int readed;
 
@@ -42,9 +42,9 @@ QnAbstractMediaDataPtr RTPH264StreamreaderDelegate::getNextData()
         {
             do {
                 readed = m_rtpIo->read( (char*) rtpBuffer, sizeof(rtpBuffer));
-            } while(m_streamParser->processData(rtpBuffer, readed, result ) && !result);
-            if (result)
-                return result;
+            } while(m_streamParser->processData(rtpBuffer, readed, result ) && result.isEmpty());
+            if (!result.isEmpty())
+                return result[0];
         }
     }
     closeStream();

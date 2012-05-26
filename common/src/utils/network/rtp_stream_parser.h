@@ -42,7 +42,7 @@ public:
     QnRtpStreamParser();
     virtual void setSDPInfo(QList<QByteArray> sdpInfo) = 0;
     
-    virtual bool processData(quint8* rtpBuffer, int readed, QnAbstractMediaDataPtr& result) = 0;
+    virtual bool processData(quint8* rtpBuffer, int readed, QList<QnAbstractMediaDataPtr>& result) = 0;
 
     virtual ~QnRtpStreamParser();
 };

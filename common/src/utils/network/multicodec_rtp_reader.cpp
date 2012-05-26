@@ -47,7 +47,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
     if (!isStreamOpened())
         return QnAbstractMediaDataPtr(0);
 
-    while (m_RtpSession.isOpened() && m_lastVideoData == 0 && m_lastAudioData == 0)
+    while (m_RtpSession.isOpened() && m_lastVideoData.isEmpty() && m_lastAudioData.isEmpty())
     {
         int nfds = 0;
         FD_ZERO(&read_set);
@@ -94,16 +94,16 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
         }
     }
 
-    if (m_lastVideoData)
+    if (!m_lastVideoData.isEmpty())
     {
-        result = m_lastVideoData;
-        m_lastVideoData.clear();
+        result = m_lastVideoData[0];
+        m_lastVideoData.removeAt(0);
         return result;
     }
-    if (m_lastAudioData)
+    if (!m_lastAudioData.isEmpty())
     {
-        result = m_lastAudioData;
-        m_lastAudioData.clear();
+        result = m_lastAudioData[0];
+        m_lastAudioData.removeAt(0);
         return result;
     }
 

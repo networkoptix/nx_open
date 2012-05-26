@@ -131,7 +131,7 @@ void CLH264RtpParser::decodeSpsInfo(const QByteArray& data)
     }
 }
 
-bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, QnAbstractMediaDataPtr& result)
+bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, QList<QnAbstractMediaDataPtr>& result)
 {
     result.clear();
 
@@ -328,7 +328,7 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, QnAbstractMedia
         if (rtpHeader)
             m_videoData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
 
-        result = m_videoData;
+        result << m_videoData;
         m_videoData.clear();
     }
     return true;

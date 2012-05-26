@@ -36,8 +36,8 @@ private:
 
     QString m_request;
 
-    QnAbstractMediaDataPtr m_lastVideoData;
-    QnAbstractMediaDataPtr m_lastAudioData;
+    QList<QnAbstractMediaDataPtr> m_lastVideoData;
+    QList<QnAbstractMediaDataPtr> m_lastAudioData;
 };
 
 #endif //__MULTI_CODEC_RTP_READER__

@@ -15,7 +15,7 @@ public:
     virtual ~CLH264RtpParser();
     virtual void CLH264RtpParser::setSDPInfo(QList<QByteArray> lines) override;
 
-    virtual bool processData(quint8* rtpBuffer, int readed, QnAbstractMediaDataPtr& result) override;
+    virtual bool processData(quint8* rtpBuffer, int readed, QList<QnAbstractMediaDataPtr>& result) override;
 private:
     QMap <int, QByteArray> m_allNonSliceNal;
     QList<QByteArray> m_sdpSpsPps;
