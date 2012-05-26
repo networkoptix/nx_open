@@ -1,16 +1,19 @@
 #include "magnitude.h"
+
 #include <cassert>
 #include <cmath> /* For std::abs & std::sqrt. */
-#include <QPointF>
-#include <QSizeF>
-#include <QRectF>
-#include <QVector2D>
-#include <QVector3D>
-#include <QVector4D>
-#include <QVariant>
-#include <QColor>
-#include <QMetaType>
-#include "protected_storage.h"
+
+#include <QtCore/QPointF>
+#include <QtCore/QSizeF>
+#include <QtCore/QRectF>
+#include <QtCore/QVariant>
+#include <QtCore/QMetaType>
+#include <QtGui/QVector2D>
+#include <QtGui/QVector3D>
+#include <QtGui/QVector4D>
+#include <QtGui/QColor>
+
+#include <utils/common/synchronized_flat_storage.h>
 
 namespace {
     template<class T>
@@ -34,27 +37,30 @@ namespace {
         }
     };
 
-    class Storage: public ProtectedStorage<MagnitudeCalculator> {
+    class Storage: public QnSynchronizedFlatStorage<int, MagnitudeCalculator *> {
+        typedef QnSynchronizedFlatStorage<int, MagnitudeCalculator *> base_type;
     public:
         Storage() {
-            add(new NoopMagnitudeCalculator());
-            add(new StandardMagnitudeCalculator<int>());
-            add(new StandardMagnitudeCalculator<long>());
-            add(new StandardMagnitudeCalculator<long long>());
-            add(new StandardMagnitudeCalculator<float>());
-            add(new StandardMagnitudeCalculator<double>());
-            add(new StandardMagnitudeCalculator<QPoint>());
-            add(new StandardMagnitudeCalculator<QPointF>());
-            add(new StandardMagnitudeCalculator<QSizeF>());
-            add(new StandardMagnitudeCalculator<QRectF>());
-            add(new StandardMagnitudeCalculator<QVector2D>());
-            add(new StandardMagnitudeCalculator<QVector3D>());
-            add(new StandardMagnitudeCalculator<QVector4D>());
-            add(new StandardMagnitudeCalculator<QColor>());
+            insert(new NoopMagnitudeCalculator());
+            insert(new StandardMagnitudeCalculator<int>());
+            insert(new StandardMagnitudeCalculator<long>());
+            insert(new StandardMagnitudeCalculator<long long>());
+            insert(new StandardMagnitudeCalculator<float>());
+            insert(new StandardMagnitudeCalculator<double>());
+            insert(new StandardMagnitudeCalculator<QPoint>());
+            insert(new StandardMagnitudeCalculator<QPointF>());
+            insert(new StandardMagnitudeCalculator<QSizeF>());
+            insert(new StandardMagnitudeCalculator<QRectF>());
+            insert(new StandardMagnitudeCalculator<QVector2D>());
+            insert(new StandardMagnitudeCalculator<QVector3D>());
+            insert(new StandardMagnitudeCalculator<QVector4D>());
+            insert(new StandardMagnitudeCalculator<QColor>());
         }
 
-        void add(MagnitudeCalculator *calculator) {
-            set(calculator->type(), calculator);
+        using base_type::insert;
+
+        void insert(MagnitudeCalculator *calculator) {
+            insert(calculator->type(), calculator);
         }
     };
 
@@ -63,11 +69,11 @@ namespace {
 } // anonymous namespace
 
 MagnitudeCalculator *MagnitudeCalculator::forType(int type) {
-    return storage()->get(type);
+    return storage()->value(type);
 }
 
 void MagnitudeCalculator::registerCalculator(MagnitudeCalculator *calculator) {
-    storage()->set(calculator->type(), calculator);
+    storage()->insert(calculator);
 }
 
 qreal MagnitudeCalculator::calculate(const QVariant &value) const {

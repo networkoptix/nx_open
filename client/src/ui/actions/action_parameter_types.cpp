@@ -1,4 +1,7 @@
 ﻿#include "action_parameter_types.h"
+
+#include <utils/common/flat_map.h>
+
 #include <core/resource/resource_fwd.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
@@ -7,7 +10,6 @@
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
-#include "ui/workbench/workbench_layout_synchronizer.h"
 
 namespace ParameterMetaType {
     enum Type {
@@ -27,48 +29,27 @@ namespace ParameterMetaType {
 } // namespace ParameterMetaType
 
 namespace {
-    class ParameterMetaTypeMap {
-    public:
-        void set(int metaType, ParameterMetaType::Type type) {
-            if(metaType < 0)
-                return;
-
-            m_types.reserve(metaType + 1);
-            while(metaType >= m_types.size())
-                m_types.push_back(ParameterMetaType::Invalid);
-
-            m_types[metaType] = type;
-        }
-
-        ParameterMetaType::Type get(int metaType) {
-            if(metaType < 0 || metaType >= m_types.size())
-                return ParameterMetaType::Invalid;
-            return m_types[metaType];
-        }
-
-    private:
-        QVector<ParameterMetaType::Type> m_types;
-    };
+    typedef QnFlatMap<int, ParameterMetaType::Type, QnValueConstructor<ParameterMetaType::Type, ParameterMetaType::Invalid> > ParameterMetaTypeMap;
 
     Q_GLOBAL_STATIC_WITH_INITIALIZER(ParameterMetaTypeMap, qn_actionMetaTypeMap, {
         using namespace ParameterMetaType;
 
-        x->set(qMetaTypeId<QnResourcePtr>(),                ResourcePtr);
-        x->set(qMetaTypeId<QnUserResourcePtr>(),            UserResourcePtr);
-        x->set(qMetaTypeId<QnLayoutResourcePtr>(),          LayoutResourcePtr);
-        x->set(qMetaTypeId<QnVideoServerResourcePtr>(),     VideoServerResourcePtr);
-        x->set(qMetaTypeId<QnResourceList>(),               ResourceList);
-        x->set(qMetaTypeId<QnResourceWidget *>(),           ResourceWidget);
-        x->set(qMetaTypeId<QnResourceWidgetList>(),         ResourceWidgetList);
-        x->set(qMetaTypeId<QnLayoutItemIndexList>(),        LayoutItemIndexList);
-        x->set(qMetaTypeId<QnWorkbenchLayout *>(),          WorkbenchLayout);
-        x->set(qMetaTypeId<QnWorkbenchLayoutList>(),        WorkbenchLayoutList);
+        x->insert(qMetaTypeId<QnResourcePtr>(),             ResourcePtr);
+        x->insert(qMetaTypeId<QnUserResourcePtr>(),         UserResourcePtr);
+        x->insert(qMetaTypeId<QnLayoutResourcePtr>(),       LayoutResourcePtr);
+        x->insert(qMetaTypeId<QnVideoServerResourcePtr>(),  VideoServerResourcePtr);
+        x->insert(qMetaTypeId<QnResourceList>(),            ResourceList);
+        x->insert(qMetaTypeId<QnResourceWidget *>(),        ResourceWidget);
+        x->insert(qMetaTypeId<QnResourceWidgetList>(),      ResourceWidgetList);
+        x->insert(qMetaTypeId<QnLayoutItemIndexList>(),     LayoutItemIndexList);
+        x->insert(qMetaTypeId<QnWorkbenchLayout *>(),       WorkbenchLayout);
+        x->insert(qMetaTypeId<QnWorkbenchLayoutList>(),     WorkbenchLayoutList);
     });
 
     QnResourcePtr singleResource(const QVariant &items) {
         using namespace ParameterMetaType;
 
-        switch(qn_actionMetaTypeMap()->get(items.userType())) {
+        switch(qn_actionMetaTypeMap()->value(items.userType())) {
         case ResourcePtr:
             return items.value<QnResourcePtr>();
         case UserResourcePtr:
@@ -105,7 +86,7 @@ namespace {
 int QnActionParameterTypes::size(const QVariant &items) {
     using namespace ParameterMetaType;
 
-    switch(qn_actionMetaTypeMap()->get(items.userType())) {
+    switch(qn_actionMetaTypeMap()->value(items.userType())) {
     case ResourcePtr:
     case UserResourcePtr:
     case LayoutResourcePtr:
@@ -131,7 +112,7 @@ int QnActionParameterTypes::size(const QVariant &items) {
 Qn::ActionParameterType QnActionParameterTypes::type(const QVariant &items) {
     using namespace ParameterMetaType;
 
-    switch(qn_actionMetaTypeMap()->get(items.userType())) {
+    switch(qn_actionMetaTypeMap()->value(items.userType())) {
     case ResourcePtr:
     case UserResourcePtr:
     case LayoutResourcePtr:
@@ -227,7 +208,7 @@ QnResourceList QnActionParameterTypes::resources(const QnWorkbenchLayoutList &la
 QnResourceList QnActionParameterTypes::resources(const QVariant &items) {
     using namespace ParameterMetaType;
 
-    switch(qn_actionMetaTypeMap()->get(items.userType())) {
+    switch(qn_actionMetaTypeMap()->value(items.userType())) {
     case ResourcePtr:
     case UserResourcePtr:
     case LayoutResourcePtr:
@@ -283,7 +264,7 @@ QnLayoutItemIndexList QnActionParameterTypes::layoutItems(QnResourceWidget *widg
 QnLayoutItemIndexList QnActionParameterTypes::layoutItems(const QVariant &items) {
     using namespace ParameterMetaType;
 
-    switch(qn_actionMetaTypeMap()->get(items.userType())) {
+    switch(qn_actionMetaTypeMap()->value(items.userType())) {
     case ResourceWidget:
         return layoutItems(items.value<QnResourceWidget *>());
     case ResourceWidgetList:
@@ -298,7 +279,7 @@ QnLayoutItemIndexList QnActionParameterTypes::layoutItems(const QVariant &items)
 QnWorkbenchLayoutList QnActionParameterTypes::layouts(const QVariant &items) {
     using namespace ParameterMetaType;
 
-    switch(qn_actionMetaTypeMap()->get(items.userType())) {
+    switch(qn_actionMetaTypeMap()->value(items.userType())) {
     case WorkbenchLayout:
         return makeList<QnWorkbenchLayoutList>(items.value<QnWorkbenchLayout *>());
     case WorkbenchLayoutList:
@@ -311,7 +292,7 @@ QnWorkbenchLayoutList QnActionParameterTypes::layouts(const QVariant &items) {
 QnResourceWidgetList QnActionParameterTypes::widgets(const QVariant &items) {
     using namespace ParameterMetaType;
 
-    switch(qn_actionMetaTypeMap()->get(items.userType())) {
+    switch(qn_actionMetaTypeMap()->value(items.userType())) {
     case ResourceWidget: 
         return makeList<QnResourceWidgetList>(items.value<QnResourceWidget *>());
     case ResourceWidgetList:

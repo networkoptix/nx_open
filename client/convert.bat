@@ -10,6 +10,6 @@ SET PATH=%PATH%;%QT_PATH%\bin
 
 call "%VS90COMNTOOLS%\..\..\VC\vcvarsall.bat"
 
-@start /B /WAIT convert.py
+@start /B /WAIT convert.py -parents
 
 ENDLOCAL

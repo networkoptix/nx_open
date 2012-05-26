@@ -1,10 +1,11 @@
 #ifndef QN_ACCESSOR_ANIMATION_H
 #define QN_ACCESSOR_ANIMATION_H
 
-#include <QVariantAnimation>
-#include <QScopedPointer>
-#include <QWeakPointer>
-#include "accessor.h"
+#include <QtCore/QVariantAnimation>
+#include <QtCore/QScopedPointer>
+#include <QtCore/QWeakPointer>
+
+#include <ui/common/accessor.h>
 
 class QnAccessorAnimation: public QVariantAnimation {
     Q_OBJECT;

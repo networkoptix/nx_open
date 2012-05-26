@@ -18,6 +18,7 @@
 		<assembly-skip>false</assembly-skip>
 		<convert-only>true</convert-only>
 		<ffmpeg.version>2012-04-10-N-39672-g40b7a27</ffmpeg.version>
+		<openssl.version>1.0.0e</openssl.version>
 		<buildLib/>
 	</properties>
 
@@ -192,7 +193,7 @@
 									<globmapper from="*.pri" to="*.pri)"/>
 								</pathconvert>								
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${pri}</echo>
-								
+
 								<fileset id="proto_path" dir="${project.build.sourceDirectory}" erroronmissingdir="false">
 									<include name="**/*.proto" />
 								</fileset>
@@ -217,7 +218,7 @@
 				</os>
 			</activation>
 			<properties>
-				<arch>x86</arch>
+				<arch>x86</arch>		
 			</properties>			
 			<build>
 				<plugins>					

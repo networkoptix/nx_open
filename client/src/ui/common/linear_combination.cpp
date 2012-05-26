@@ -1,15 +1,18 @@
 #include "linear_combination.h"
+
 #include <cassert>
-#include <QPointF>
-#include <QSizeF>
-#include <QRectF>
-#include <QVector2D>
-#include <QVector3D>
-#include <QVector4D>
-#include <QColor>
-#include <QVariant>
-#include <QMetaType>
-#include "protected_storage.h"
+
+#include <QtCore/QPointF>
+#include <QtCore/QSizeF>
+#include <QtCore/QRectF>
+#include <QtCore/QVariant>
+#include <QtCore/QMetaType>
+#include <QtGui/QVector2D>
+#include <QtGui/QVector3D>
+#include <QtGui/QVector4D>
+#include <QtGui/QColor>
+
+#include <utils/common/synchronized_flat_storage.h>
 
 namespace {
     template<class T>
@@ -36,26 +39,29 @@ namespace {
         virtual void calculateInternal(qreal, const void *, qreal, const void *, void *) const override {}
     };
 
-    class Storage: public ProtectedStorage<LinearCombinator> {
+    class Storage: public QnSynchronizedFlatStorage<int, LinearCombinator *> {
+        typedef QnSynchronizedFlatStorage<int, LinearCombinator *> base_type;
     public:
         Storage() {
-            add(new NoopLinearCombinator());
-            add(new StandardLinearCombinator<int>());
-            add(new StandardLinearCombinator<long>());
-            add(new StandardLinearCombinator<long long>());
-            add(new StandardLinearCombinator<float>());
-            add(new StandardLinearCombinator<double>());
-            add(new StandardLinearCombinator<QPointF>());
-            add(new StandardLinearCombinator<QSizeF>());
-            add(new StandardLinearCombinator<QRectF>());
-            add(new StandardLinearCombinator<QVector2D>());
-            add(new StandardLinearCombinator<QVector3D>());
-            add(new StandardLinearCombinator<QVector4D>());
-            add(new StandardLinearCombinator<QColor>());
+            insert(new NoopLinearCombinator());
+            insert(new StandardLinearCombinator<int>());
+            insert(new StandardLinearCombinator<long>());
+            insert(new StandardLinearCombinator<long long>());
+            insert(new StandardLinearCombinator<float>());
+            insert(new StandardLinearCombinator<double>());
+            insert(new StandardLinearCombinator<QPointF>());
+            insert(new StandardLinearCombinator<QSizeF>());
+            insert(new StandardLinearCombinator<QRectF>());
+            insert(new StandardLinearCombinator<QVector2D>());
+            insert(new StandardLinearCombinator<QVector3D>());
+            insert(new StandardLinearCombinator<QVector4D>());
+            insert(new StandardLinearCombinator<QColor>());
         }
 
-        void add(LinearCombinator *calculator) {
-            set(calculator->type(), calculator);
+        using base_type::insert;
+
+        void insert(LinearCombinator *calculator) {
+            insert(calculator->type(), calculator);
         }
     };
 
@@ -69,12 +75,12 @@ LinearCombinator::LinearCombinator(int type):
 {}
 
 LinearCombinator *LinearCombinator::forType(int type) {
-    return storage()->get(type);
+    return storage()->value(type);
 }
 
 void LinearCombinator::registerCombinator(LinearCombinator *combinator) {
     combinator->initZero();
-    storage()->set(combinator->type(), combinator);
+    storage()->insert(combinator);
 }
 
 QVariant LinearCombinator::combine(qreal a, const QVariant &x, qreal b, const QVariant &y) const {

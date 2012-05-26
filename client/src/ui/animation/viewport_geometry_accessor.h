@@ -1,7 +1,7 @@
 #ifndef QN_VIEWPORT_GEOMETRY_ACCESSOR_H
 #define QN_VIEWPORT_GEOMETRY_ACCESSOR_H
 
-#include "accessor.h"
+#include <ui/common/accessor.h>
 
 class ViewportGeometryAccessor: public AbstractAccessor {
 public:

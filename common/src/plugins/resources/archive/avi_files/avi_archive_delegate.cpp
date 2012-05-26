@@ -482,7 +482,7 @@ bool QnAviArchiveDelegate::isStreamsFound() const
     return m_streamsFound;
 }
 
-void QnAviArchiveDelegate::setStorage(QnStorageResourcePtr storage)
+void QnAviArchiveDelegate::setStorage(const QnStorageResourcePtr &storage)
 {
     m_storage = storage;
 }

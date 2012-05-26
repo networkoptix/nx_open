@@ -29,6 +29,16 @@ namespace detail {
 } // namespace detail
 
 
+/**
+ * Convenience base class for graphics items that need to hook into the 
+ * animation system provided by instrument manager.
+ * 
+ * Derived class should use <tt>registerAnimation</tt> and <tt>unregisterAnimation</tt>
+ * functions to register and unregister listeners that are to be animated.
+ * This class will properly link them with an animation timer once one is 
+ * available, and move to another animation timer in case the item's scene is
+ * changed.
+ */
 template<class Base>
 class Animated: public Base, protected detail::AnimatedBase {
 public:
