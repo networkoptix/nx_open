@@ -30,7 +30,12 @@ bool FileTypeSupport::isImageFileExt(const QString &filename)
     return false;
 }
 
+bool FileTypeSupport::isLayoutFileExt(const QString &filename)
+{
+    return filename.toLower().endsWith(".lyt");
+}
+
 bool FileTypeSupport::isFileSupported(const QString &filename)
 {
-    return isImageFileExt(filename) || isMovieFileExt(filename);
+    return isImageFileExt(filename) || isMovieFileExt(filename) || isLayoutFileExt(filename);
 }

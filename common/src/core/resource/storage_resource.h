@@ -39,6 +39,10 @@ public:
 
     void deserialize(const QnResourceParameters& parameters);
 
+    /*
+     * Returns storage usage in range [0..1]
+     */
+    virtual float getAvarageWritingUsage() const;
 signals:
     /*
      * Storage may emit archiveRangeChanged signal to inform server what some data in archive already deleted
