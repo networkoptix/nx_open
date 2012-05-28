@@ -3,8 +3,6 @@
 #include <QApplication>
 #include <QDir>
 #include "camera_pool.h"
-#include "core/resource/storage_resource.h"
-#include "plugins/storage/file_storage/file_storage_resource.h"
 #include "plugins/storage/file_storage/qtfile_storage_resource.h"
 
 QString doUnquote(const QString& fileName)
@@ -21,7 +19,7 @@ void ffmpegInit()
 {
     av_register_all();
 
-    QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true); // true means use it plugin if no <protocol>:// prefix
+    QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnQtFileStorageResource::instance, true);
     QnStoragePluginFactory::instance()->registerStoragePlugin("qtfile", QnQtFileStorageResource::instance);
 }
 
