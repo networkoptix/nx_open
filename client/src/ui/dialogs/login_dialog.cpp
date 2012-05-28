@@ -308,9 +308,9 @@ void LoginDialog::at_testButton_clicked()
         return;
     }
 
-    ConnectionTestingDialog dialog(this, url);
-    dialog.setModal(true);
-    dialog.exec();
+    QScopedPointer<QnConnectionTestingDialog> dialog(new QnConnectionTestingDialog(url, this));
+    dialog->setModal(true);
+    dialog->exec();
 }
 
 void LoginDialog::at_configureConnectionsButton_clicked()

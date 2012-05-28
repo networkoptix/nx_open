@@ -35,6 +35,7 @@
 #include <ui/graphics/instruments/activity_listener_instrument.h>
 #include <ui/graphics/instruments/fps_counting_instrument.h>
 #include <ui/graphics/instruments/drop_instrument.h>
+#include <ui/graphics/instruments/focus_listener_instrument.h>
 #include <ui/graphics/items/image_button_widget.h>
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/graphics/items/masked_proxy_widget.h>
@@ -122,7 +123,7 @@ namespace {
 QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     QObject(parent),
     QnWorkbenchContextAware(parent),
-    m_manager(display()->instrumentManager()),
+    m_instrumentManager(display()->instrumentManager()),
     m_treePinned(false),
     m_inactive(false),
     m_titleUsed(false),
@@ -146,9 +147,9 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_uiElementsInstrument = new UiElementsInstrument(this);
     m_controlsActivityInstrument = new ActivityListenerInstrument(true, hideConstrolsTimeoutMSec, this);
 
-    m_manager->installInstrument(m_uiElementsInstrument, InstallationMode::InstallBefore, display()->paintForwardingInstrument());
-    m_manager->installInstrument(m_fpsCountingInstrument, InstallationMode::InstallBefore, display()->paintForwardingInstrument());
-    m_manager->installInstrument(m_controlsActivityInstrument);
+    m_instrumentManager->installInstrument(m_uiElementsInstrument, InstallationMode::InstallBefore, display()->paintForwardingInstrument());
+    m_instrumentManager->installInstrument(m_fpsCountingInstrument, InstallationMode::InstallBefore, display()->paintForwardingInstrument());
+    m_instrumentManager->installInstrument(m_controlsActivityInstrument);
 
     connect(m_controlsActivityInstrument, SIGNAL(activityStopped()),                                                                this,                           SLOT(at_activityStopped()));
     connect(m_controlsActivityInstrument, SIGNAL(activityResumed()),                                                                this,                           SLOT(at_activityStarted()));
@@ -246,14 +247,14 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_treeShowingProcessor->setHoverEnterDelay(250);
 
     m_treeXAnimator = new VariantAnimator(this);
-    m_treeXAnimator->setTimer(display()->animationInstrument()->animationTimer());
+    m_treeXAnimator->setTimer(m_instrumentManager->animationTimer());
     m_treeXAnimator->setTargetObject(m_treeItem);
     m_treeXAnimator->setAccessor(new PropertyAccessor("x"));
     m_treeXAnimator->setSpeed(m_treeItem->size().width() * 2.0);
     m_treeXAnimator->setTimeLimit(500);
 
     m_treeOpacityAnimatorGroup = new AnimatorGroup(this);
-    m_treeOpacityAnimatorGroup->setTimer(display()->animationInstrument()->animationTimer());
+    m_treeOpacityAnimatorGroup->setTimer(m_instrumentManager->animationTimer());
     m_treeOpacityAnimatorGroup->addAnimator(opacityAnimator(m_treeItem));
     m_treeOpacityAnimatorGroup->addAnimator(opacityAnimator(m_treeBackgroundItem)); /* Speed of 1.0 is OK here. */
     m_treeOpacityAnimatorGroup->addAnimator(opacityAnimator(m_treeShowButton));
@@ -350,14 +351,14 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_titleOpacityProcessor->addTargetItem(m_titleShowButton);
 
     m_titleYAnimator = new VariantAnimator(this);
-    m_titleYAnimator->setTimer(display()->animationInstrument()->animationTimer());
+    m_titleYAnimator->setTimer(m_instrumentManager->animationTimer());
     m_titleYAnimator->setTargetObject(m_titleItem);
     m_titleYAnimator->setAccessor(new PropertyAccessor("y"));
     m_titleYAnimator->setSpeed(m_titleItem->size().height() * 2.0);
     m_titleYAnimator->setTimeLimit(500);
 
     m_titleOpacityAnimatorGroup = new AnimatorGroup(this);
-    m_titleOpacityAnimatorGroup->setTimer(display()->animationInstrument()->animationTimer());
+    m_titleOpacityAnimatorGroup->setTimer(m_instrumentManager->animationTimer());
     m_titleOpacityAnimatorGroup->addAnimator(opacityAnimator(m_titleItem));
     m_titleOpacityAnimatorGroup->addAnimator(opacityAnimator(m_titleBackgroundItem)); /* Speed of 1.0 is OK here. */
     m_titleOpacityAnimatorGroup->addAnimator(opacityAnimator(m_titleShowButton));
@@ -432,14 +433,14 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_helpShowingProcessor->setHoverEnterDelay(250);
 
     m_helpXAnimator = new VariantAnimator(this);
-    m_helpXAnimator->setTimer(display()->animationInstrument()->animationTimer());
+    m_helpXAnimator->setTimer(m_instrumentManager->animationTimer());
     m_helpXAnimator->setTargetObject(m_helpItem);
     m_helpXAnimator->setAccessor(new PropertyAccessor("x"));
     m_helpXAnimator->setSpeed(m_helpItem->size().width() * 2.0);
     m_helpXAnimator->setTimeLimit(500);
 
     m_helpOpacityAnimatorGroup = new AnimatorGroup(this);
-    m_helpOpacityAnimatorGroup->setTimer(display()->animationInstrument()->animationTimer());
+    m_helpOpacityAnimatorGroup->setTimer(m_instrumentManager->animationTimer());
     m_helpOpacityAnimatorGroup->addAnimator(opacityAnimator(m_helpItem));
     m_helpOpacityAnimatorGroup->addAnimator(opacityAnimator(m_helpBackgroundItem)); /* Speed of 1.0 is OK here. */
     m_helpOpacityAnimatorGroup->addAnimator(opacityAnimator(m_helpShowButton));
@@ -476,14 +477,14 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_sliderOpacityProcessor->addTargetItem(m_sliderShowButton);
 
     m_sliderYAnimator = new VariantAnimator(this);
-    m_sliderYAnimator->setTimer(display()->animationInstrument()->animationTimer());
+    m_sliderYAnimator->setTimer(m_instrumentManager->animationTimer());
     m_sliderYAnimator->setTargetObject(m_sliderItem);
     m_sliderYAnimator->setAccessor(new PropertyAccessor("y"));
     m_sliderYAnimator->setSpeed(m_sliderItem->size().height() * 2.0);
     m_sliderYAnimator->setTimeLimit(500);
 
     m_sliderOpacityAnimatorGroup = new AnimatorGroup(this);
-    m_sliderOpacityAnimatorGroup->setTimer(display()->animationInstrument()->animationTimer());
+    m_sliderOpacityAnimatorGroup->setTimer(m_instrumentManager->animationTimer());
     m_sliderOpacityAnimatorGroup->addAnimator(opacityAnimator(m_sliderItem));
     m_sliderOpacityAnimatorGroup->addAnimator(opacityAnimator(m_sliderShowButton)); /* Speed of 1.0 is OK here. */
 
@@ -527,18 +528,11 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     dropInstrument->setSurface(m_titleBackgroundItem);
 
     /* Set up help context processing. */
-    QnWorkbenchMotionDisplayWatcher *motionDisplayWatcher = new QnWorkbenchMotionDisplayWatcher(display(), this);
-    connect(m_sliderOpacityProcessor,   SIGNAL(focusEntered()),                                                                     this,                           SLOT(updateHelpContext()));
-    connect(m_sliderOpacityProcessor,   SIGNAL(focusLeft()),                                                                        this,                           SLOT(updateHelpContext()));
-    connect(m_treeOpacityProcessor,     SIGNAL(focusEntered()),                                                                     this,                           SLOT(updateHelpContext()));
-    connect(m_treeOpacityProcessor,     SIGNAL(focusLeft()),                                                                        this,                           SLOT(updateHelpContext()));
-    connect(m_helpOpacityProcessor,     SIGNAL(focusEntered()),                                                                     this,                           SLOT(updateHelpContext()));
-    connect(m_helpOpacityProcessor,     SIGNAL(focusLeft()),                                                                        this,                           SLOT(updateHelpContext()));
-    connect(m_titleOpacityProcessor,    SIGNAL(focusEntered()),                                                                     this,                           SLOT(updateHelpContext()));
-    connect(m_titleOpacityProcessor,    SIGNAL(focusLeft()),                                                                        this,                           SLOT(updateHelpContext()));
+    m_motionDisplayWatcher = new QnWorkbenchMotionDisplayWatcher(display(), this);
+    connect(display()->focusListenerInstrument(), SIGNAL(focusItemChanged()),                                                       this,                           SLOT(updateHelpContext()));
     connect(m_treeWidget,               SIGNAL(currentTabChanged()),                                                                this,                           SLOT(updateHelpContext()));
-    connect(motionDisplayWatcher,       SIGNAL(motionGridShown()),                                                                  this,                           SLOT(updateHelpContext()));
-    connect(motionDisplayWatcher,       SIGNAL(motionGridHidden()),                                                                 this,                           SLOT(updateHelpContext()));
+    connect(m_motionDisplayWatcher,     SIGNAL(motionGridShown()),                                                                  this,                           SLOT(updateHelpContext()));
+    connect(m_motionDisplayWatcher,     SIGNAL(motionGridHidden()),                                                                 this,                           SLOT(updateHelpContext()));
     connect(m_helpWidget,               SIGNAL(showRequested()),                                                                    this,                           SLOT(at_helpWidget_showRequested()));
     connect(m_helpWidget,               SIGNAL(hideRequested()),                                                                    this,                           SLOT(at_helpWidget_hideRequested()));
     updateHelpContext();
@@ -1070,24 +1064,15 @@ void QnWorkbenchUi::updateActivityInstrumentState() {
 }
 
 void QnWorkbenchUi::updateHelpContext() {
-    /* This totally evil hack is here to work around a problem that when scene 
-     * focus item changes, it is first cleared.
-     * 
-     * We want to skip the cleared state, hence the delay. There is a 
-     * better way of doing it, so this is a TODO. */
-    QTimer::singleShot(100, this, SLOT(updateHelpContextInternal()));
-}
-
-void QnWorkbenchUi::updateHelpContextInternal() {
     Qn::ActionScope scope = Qn::InvalidScope;
 
     QGraphicsItem *focusItem = display()->scene()->focusItem();
 
     if(focusItem == NULL || dynamic_cast<QnResourceWidget *>(focusItem)) {
         scope = Qn::SceneScope;
-    } else if(focusItem == m_helpItem || focusItem == m_titleItem || m_titleItem->isAncestorOf(focusItem)) {
+    } else if(focusItem == m_helpItem || m_helpItem->isAncestorOf(focusItem) || focusItem == m_titleItem || m_titleItem->isAncestorOf(focusItem)) {
         return; /* Focusing on help widget or title item shouldn't change help context. */
-    } else if(focusItem == m_treeItem) {
+    } else if(focusItem == m_treeItem || m_treeItem->isAncestorOf(focusItem)) {
         scope = Qn::TreeScope;
     } else if(focusItem == m_sliderItem || m_sliderItem->isAncestorOf(focusItem)) {
         scope = Qn::SliderScope;
@@ -1104,12 +1089,10 @@ void QnWorkbenchUi::updateHelpContextInternal() {
         context = QnContextHelp::ContextId_Slider;
         break;
     case Qn::SceneScope:
-        context = QnContextHelp::ContextId_Scene;
-        foreach(QnResourceWidget *widget, display()->widgets()) {
-            if(widget->displayFlags() & QnResourceWidget::DisplayMotionGrid) {
-                context = QnContextHelp::ContextId_MotionGrid;
-                break;
-            }
+        if(m_motionDisplayWatcher->isMotionGridDisplayed()) {
+            context = QnContextHelp::ContextId_MotionGrid;
+        } else {
+            context = QnContextHelp::ContextId_Scene;
         }
         break;
     default:

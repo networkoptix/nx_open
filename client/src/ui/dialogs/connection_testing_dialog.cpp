@@ -1,4 +1,4 @@
-#include "login_dialog.h"
+#include "connection_testing_dialog.h"
 #include "ui_connection_testing_dialog.h"
 
 #include <QtGui/QDataWidgetMapper>
@@ -10,11 +10,10 @@
 #include "core/resource/resource.h"
 #include "ui/preferences/preferencesdialog.h"
 #include "ui/style/skin.h"
-#include "connection_testing_dialog.h"
 
 #include "utils/settings.h"
 
-ConnectionTestingDialog::ConnectionTestingDialog(QWidget *parent, QUrl url) :
+QnConnectionTestingDialog::QnConnectionTestingDialog(const QUrl &url, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ConnectionTestingDialog),
     m_timeoutTimer(this),
@@ -35,11 +34,11 @@ ConnectionTestingDialog::ConnectionTestingDialog(QWidget *parent, QUrl url) :
     m_timeoutTimer.start();
 }
 
-ConnectionTestingDialog::~ConnectionTestingDialog()
+QnConnectionTestingDialog::~QnConnectionTestingDialog()
 {
 }
 
-void ConnectionTestingDialog::timeout()
+void QnConnectionTestingDialog::timeout()
 {
     if (ui->progressBar->value() != ui->progressBar->maximum())
     {
@@ -53,7 +52,7 @@ void ConnectionTestingDialog::timeout()
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
 }
 
-void ConnectionTestingDialog::testResults(int status, const QByteArray &data, const QByteArray& errorString, int requestHandle)
+void QnConnectionTestingDialog::testResults(int status, const QByteArray &data, const QByteArray& errorString, int requestHandle)
 {
     Q_UNUSED(data)
     Q_UNUSED(requestHandle)
@@ -75,19 +74,19 @@ void ConnectionTestingDialog::testResults(int status, const QByteArray &data, co
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
 }
 
-void ConnectionTestingDialog::testSettings()
+void QnConnectionTestingDialog::testSettings()
 {
     m_connection = QnAppServerConnectionFactory::createConnection(m_url);
     m_connection->testConnectionAsync(this, SLOT(testResults(int,QByteArray,QByteArray,int)));
 }
 
-void ConnectionTestingDialog::accept()
+void QnConnectionTestingDialog::accept()
 {
     QDialog::accept();
 }
 
 
-void ConnectionTestingDialog::reject()
+void QnConnectionTestingDialog::reject()
 {
     QDialog::reject();
 }

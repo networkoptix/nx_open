@@ -38,7 +38,8 @@ public:
     void doNotFindStreamInfo();
     bool isStreamsFound() const;
     void setUseAbsolutePos(bool value);
-    void setStorage(QnStorageResourcePtr storage);
+    void setStorage(const QnStorageResourcePtr &storage);
+
 protected:
     virtual qint64 packetTimestamp(const AVPacket& packet);
     virtual bool findStreams();

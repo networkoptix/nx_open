@@ -39,7 +39,7 @@ public:
         return m_positive.empty() && m_negative.empty();
     }
 
-    T value(const Key &key) {
+    T value(const Key &key) const {
         if(key >= 0) {
             return valueInternal(m_positive, key);
         } else {

@@ -147,6 +147,8 @@ public:
         return NULL;
     }
 
+    AnimationTimer *animationTimer() const;
+
     /**
      * \param scene                    Scene.
      * \returns                        List of all instrument managers managing

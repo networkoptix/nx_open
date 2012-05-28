@@ -275,7 +275,10 @@ QFileInfoList QnPlColdStoreStorage::getFileList(const QString& dirName)
     // also add files still open files 
     QFileInfoList result;
     foreach(QString fn, m_listOfWritingFiles)
-        result.push_back(QFileInfo(fn));
+    {
+        if (fileName2csFileName(fn) == csFileName) // check if open file belongs to this hour 
+            result.push_back(QFileInfo(fn));
+    }
 
     //foreach(QString fn, m_listOfExistingFiles)
     //    openlst.push_back(QFileInfo(fn));
@@ -286,7 +289,7 @@ QFileInfoList QnPlColdStoreStorage::getFileList(const QString& dirName)
         result << md->fileInfoList(ndirName);;
     }
 
-    
+    /*
     foreach(QFileInfo fi, result)
     {
         qWarning() << fi.absoluteFilePath();

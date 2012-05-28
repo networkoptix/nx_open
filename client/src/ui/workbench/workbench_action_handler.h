@@ -23,6 +23,7 @@ class QnWorkbenchActionHandler;
 class QnActionManager;
 class QnAction;
 class QnCameraSettingsDialog;
+class CLVideoCamera;
 
 namespace detail {
     class QnResourceStatusReplyProcessor: public QObject {
@@ -188,6 +189,7 @@ protected slots:
     void at_exitAction_triggered();
 
     void at_exportTimeSelectionAction_triggered();
+    void at_exportLayoutAction_triggered();
     void at_camera_exportFinished(QString fileName);
     void at_camera_exportFailed(QString errorMessage);
 
@@ -196,6 +198,8 @@ protected slots:
     void at_resource_deleted(int status, const QByteArray &data, const QByteArray &errorString, int handle);
 	void at_resources_statusSaved(int status, const QByteArray &errorString, const QnResourceList &resources, const QList<int> &oldDisabledFlags);
 
+    void at_layoutCamera_exportFinished(QString fileName);
+    void at_cameraCamera_exportFailed(QString errorMessage);
 private:
     friend class detail::QnResourceStatusReplyProcessor;
 
@@ -214,6 +218,13 @@ private:
     /** List of serialized resources that are to be dropped on the scene once
      * the user logs in. */
     QList<QnMimeData> m_delayedDrops;
+
+    CLVideoCamera* m_layoutExportCamera;
+    QQueue<QnMediaResourcePtr> m_layoutExportResources;
+    QString m_layoutFileName;
+    QnTimePeriod m_exportPeriod;
+    QProgressDialog *m_exportProgressDialog;
+    QnStorageResourcePtr m_exportStorage;
 };
 
 #endif // QN_WORKBENCH_ACTION_HANDLER_H

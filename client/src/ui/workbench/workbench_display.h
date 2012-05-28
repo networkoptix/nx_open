@@ -1,13 +1,14 @@
 #ifndef QN_WORKBENCH_MANAGER_H
 #define QN_WORKBENCH_MANAGER_H
 
-#include <QObject>
-#include <QHash>
+#include <QtCore/QObject>
+#include <QtCore/QHash>
+
 #include <core/resource/resource_fwd.h>
-#include <ui/animation/animation_timer_listener.h>
+
 #include <ui/common/scene_utility.h>
-#include <utils/common/rect_set.h>
-#include "recording/time_period.h"
+#include <recording/time_period.h>
+
 #include "workbench_globals.h"
 #include "workbench_context_aware.h"
 
@@ -19,9 +20,9 @@ class BoundingInstrument;
 class TransformListenerInstrument;
 class ActivityListenerInstrument;
 class ForwardingInstrument;
-class AnimationInstrument;
 class SignalingInstrument;
 class SelectionOverlayHackInstrument;
+class FocusListenerInstrument;
 
 class QnAbstractRenderer;
 
@@ -48,7 +49,7 @@ class CLCamDisplay;
  * 
  * It presents some low-level functions for viewport and item manipulation.
  */
-class QnWorkbenchDisplay: public QObject, public QnWorkbenchContextAware, protected AnimationTimerListener, protected SceneUtility {
+class QnWorkbenchDisplay: public QObject, public QnWorkbenchContextAware, protected SceneUtility {
     Q_OBJECT;
     Q_PROPERTY(qreal widgetsFrameOpacity READ widgetsFrameOpacity WRITE setWidgetsFrameOpacity);
     Q_ENUMS(Qn::ItemLayer);
@@ -107,18 +108,15 @@ public:
         return m_curtainActivityInstrument;
     }
 
+    FocusListenerInstrument *focusListenerInstrument() const {
+        return m_focusListenerInstrument;
+    }
+
     /**
      * \returns                         Paint forwarding instrument used by this workbench display.
      */
     ForwardingInstrument *paintForwardingInstrument() const {
         return m_paintForwardingInstrument;
-    }
-
-    /**
-     * \returns                         Animation instrument used by this workbench display.
-     */
-    AnimationInstrument *animationInstrument() const {
-        return m_animationInstrument;
     }
 
     SelectionOverlayHackInstrument *selectionOverlayHackInstrument() const {
@@ -289,8 +287,6 @@ signals:
     void streamsSynchronizationEffectiveChanged();
 
 protected:
-    virtual void tick(int deltaTime) override;
-    
     WidgetAnimator *animator(QnResourceWidget *widget);
 
     void synchronizeGeometry(QnWorkbenchItem *item, bool animate);
@@ -417,14 +413,14 @@ private:
     /** Activity listener instrument for resource widgets. */
     ActivityListenerInstrument *m_widgetActivityInstrument;
 
+    /** Focus listener instrument. */
+    FocusListenerInstrument *m_focusListenerInstrument;
+
     /** Bounding instrument. */
     BoundingInstrument *m_boundingInstrument;
 
     /** Paint forwarding instrument. */
     ForwardingInstrument *m_paintForwardingInstrument;
-
-    /** Instrument that provides animation timer. */
-    AnimationInstrument *m_animationInstrument;
 
     /** Selection overlay hack instrument. */
     SelectionOverlayHackInstrument *m_selectionOverlayHackInstrument;

@@ -39,8 +39,8 @@ namespace {
         virtual void calculateInternal(qreal, const void *, qreal, const void *, void *) const override {}
     };
 
-    class Storage: public QnSynchronizedFlatStorage<int, LinearCombinator> {
-        typedef QnSynchronizedFlatStorage<int, LinearCombinator> base_type;
+    class Storage: public QnSynchronizedFlatStorage<int, LinearCombinator *> {
+        typedef QnSynchronizedFlatStorage<int, LinearCombinator *> base_type;
     public:
         Storage() {
             insert(new NoopLinearCombinator());

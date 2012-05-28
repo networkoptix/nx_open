@@ -1,43 +1,47 @@
 #ifndef QN_PROTECTED_STORAGE_H
 #define QN_PROTECTED_STORAGE_H
 
-#include <QtCore/QSet>
-#include <QtCore/QVector>
 #include <QtCore/QReadWriteLock>
 #include <QtCore/QReadLocker>
 #include <QtCore/QWriteLocker>
 
 #include "warnings.h"
-#include "flat_map.h"
+#include "flat_storage.h"
 
 /**
  * This is a thread-safe container for heap-allocated items that takes ownership
  * of the items inside it.
  */
 template<class Key, class T>
-class QnSynchronizedFlatStorage {
+class QnSynchronizedFlatStorage: private QnFlatStorage<Key, T> {
+    typedef QnFlatStorage<Key, T> base_type;
 public:
     QnSynchronizedFlatStorage() {}
 
-    virtual ~QnSynchronizedFlatStorage() {
-        foreach(T *value, m_owned)
-            delete value;
-        m_storage.clear();
-        m_owned.clear();
-    }
+    ~QnSynchronizedFlatStorage() {}
 
-    T *value(const Key &key) {
+    T value(const Key &key) {
         QReadLocker guard(&m_lock);
 
-        return m_storage.value(key);
+        return base_type::value(key);
     }
 
-    void insert(const Key &key, T *value) {
+    void insert(const Key &key, T value, bool claimOwnership = true) {
         QWriteLocker guard(&m_lock);
 
-        m_storage[key] = value;
-        if(value != NULL)
-            m_owned.insert(value);
+        base_type::insert(key, value, claimOwnership);
+    }
+
+    void clear() {
+        QWriteLocker guard(&m_lock);
+
+        base_type::clear();
+    }
+
+    bool empty() const {
+        QReadLocker guard(&m_lock);
+
+        return base_type::empty();
     }
 
 private:
@@ -45,8 +49,6 @@ private:
 
 private:
     QReadWriteLock m_lock;
-    QnFlatMap<Key, T *> m_storage;
-    QSet<T *> m_owned;
 };
 
 #endif // QN_PROTECTED_STORAGE_H

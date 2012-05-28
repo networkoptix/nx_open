@@ -1,12 +1,15 @@
 NAME=${project.artifactId}
 BUILDLIB = ${buildLib}
 TARGET = ${project.artifactId}
-ICON = ${project.build.directory}/hdw_logo.ico
 VERSION = ${project.version}
 QMAKE_INFO_PLIST = Info.plist
 CONFIG += precompile_header $$BUILDLIB
 CONFIG -= flat app_bundle
 DEFINES += __STDC_CONSTANT_MACROS
+
+!contains(BUILDLIB, staticlib) {
+  ICON = ${project.build.directory}/hdw_logo.ico
+}
 
 LIBS += ${global.libs}
 DEFINES += ${global.defines}
@@ -41,7 +44,10 @@ CONFIG(release, debug|release) {
 }
 
 win* {
-  RC_FILE = ${project.build.directory}/hdwitness.rc
+  !contains(BUILDLIB, staticlib) {
+    RC_FILE = ${project.build.directory}/hdwitness.rc
+  }
+  
   CONFIG += ${arch}
   LIBS += ${windows.oslibs}
   DEFINES += ${windows.defines}  

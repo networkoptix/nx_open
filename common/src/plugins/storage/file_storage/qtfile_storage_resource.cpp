@@ -1,7 +1,6 @@
 #include "qtfile_storage_resource.h"
 #include "recording/file_deletor.h"
 #include "utils/common/util.h"
-#include "utils/common/buffered_file.h"
 
 static const int IO_BLOCK_SIZE = 1024*1024*4;
 static const int FFMPEG_BUFFER_SIZE = 1024*1024*2;
