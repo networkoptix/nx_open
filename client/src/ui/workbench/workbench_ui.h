@@ -36,6 +36,7 @@ class QnLayoutTabBar;
 class QnHelpWidget;
 class QnActionManager;
 class QnLayoutTabBar;
+class QnWorkbenchMotionDisplayWatcher;
 
 class QnWorkbenchUi: public QObject, public QnWorkbenchContextAware, public QnActionTargetProvider, protected SceneUtility {
     Q_OBJECT;
@@ -159,7 +160,6 @@ protected:
 
 protected slots:
     void updateHelpContext();
-    void updateHelpContextInternal();
     
     void updateTreeOpacity(bool animate = true);
     void updateSliderOpacity(bool animate = true);
@@ -361,6 +361,8 @@ private:
     AnimatorGroup *m_helpOpacityAnimatorGroup;
 
     bool m_helpPinned;
+
+    QnWorkbenchMotionDisplayWatcher *m_motionDisplayWatcher;
 
 
     /* Freespace-related state. */

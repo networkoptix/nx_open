@@ -333,8 +333,15 @@ bool Instrument::dispatchEvent(T *watched, QEvent *event) {
         return wheelEvent(watched, static_cast<QGraphicsSceneWheelEvent *>(event));
     case QEvent::GraphicsSceneHelp:
         return helpEvent(watched, static_cast<QGraphicsSceneHelpEvent *>(event));
-    case AnimationEvent::Animation:
-        return animationEvent(static_cast<AnimationEvent *>(event));
+    case AnimationEvent::Animation: {
+        AnimationEvent *e = static_cast<AnimationEvent *>(event);
+
+        /* Automagic support for paint-synced animations. */
+        if(m_animationTimer)
+            m_animationTimer->updateCurrentTime(e->time());
+
+        return animationEvent(e);
+    }
     default:
         return false;
     }
@@ -381,15 +388,6 @@ bool Instrument::dispatchEvent(QGraphicsItem *watched, QEvent *event) {
     default:
         return false;
     }
-}
-
-bool Instrument::animationEvent(AnimationEvent *event) {
-    /* Automagic support for paint-synced animations. */
-    if(m_animationTimer.isNull())
-        return false;
-
-    m_animationTimer->updateCurrentTime(event->time());
-    return false;
 }
 
 AnimationTimer *Instrument::animationTimer() {

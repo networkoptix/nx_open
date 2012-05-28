@@ -33,6 +33,7 @@
 #include <ui/graphics/instruments/stop_instrument.h>
 #include <ui/graphics/instruments/signaling_instrument.h>
 #include <ui/graphics/instruments/selection_overlay_hack_instrument.h>
+#include <ui/graphics/instruments/focus_listener_instrument.h>
 
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/graphics/items/resource_widget_renderer.h>
@@ -152,6 +153,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_transformListenerInstrument = new TransformListenerInstrument(this);
     m_curtainActivityInstrument = new ActivityListenerInstrument(true, 1000, this);
     m_widgetActivityInstrument = new ActivityListenerInstrument(true, 1000 * 10, this);
+    m_focusListenerInstrument = new FocusListenerInstrument(this);
     m_paintForwardingInstrument = new ForwardingInstrument(Instrument::Viewport, paintEventTypes, this);
     m_selectionOverlayHackInstrument = new SelectionOverlayHackInstrument(this);
 
@@ -160,6 +162,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_instrumentManager->installInstrument(m_paintForwardingInstrument);
     m_instrumentManager->installInstrument(m_beforePaintInstrument);
     m_instrumentManager->installInstrument(m_transformListenerInstrument);
+    m_instrumentManager->installInstrument(m_focusListenerInstrument);
     m_instrumentManager->installInstrument(resizeSignalingInstrument);
     m_instrumentManager->installInstrument(m_boundingInstrument);
     m_instrumentManager->installInstrument(m_curtainActivityInstrument);

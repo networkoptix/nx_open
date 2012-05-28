@@ -35,6 +35,7 @@
 #include <ui/graphics/instruments/activity_listener_instrument.h>
 #include <ui/graphics/instruments/fps_counting_instrument.h>
 #include <ui/graphics/instruments/drop_instrument.h>
+#include <ui/graphics/instruments/focus_listener_instrument.h>
 #include <ui/graphics/items/image_button_widget.h>
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/graphics/items/masked_proxy_widget.h>
@@ -527,18 +528,11 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     dropInstrument->setSurface(m_titleBackgroundItem);
 
     /* Set up help context processing. */
-    QnWorkbenchMotionDisplayWatcher *motionDisplayWatcher = new QnWorkbenchMotionDisplayWatcher(display(), this);
-    connect(m_sliderOpacityProcessor,   SIGNAL(focusEntered()),                                                                     this,                           SLOT(updateHelpContext()));
-    connect(m_sliderOpacityProcessor,   SIGNAL(focusLeft()),                                                                        this,                           SLOT(updateHelpContext()));
-    connect(m_treeOpacityProcessor,     SIGNAL(focusEntered()),                                                                     this,                           SLOT(updateHelpContext()));
-    connect(m_treeOpacityProcessor,     SIGNAL(focusLeft()),                                                                        this,                           SLOT(updateHelpContext()));
-    connect(m_helpOpacityProcessor,     SIGNAL(focusEntered()),                                                                     this,                           SLOT(updateHelpContext()));
-    connect(m_helpOpacityProcessor,     SIGNAL(focusLeft()),                                                                        this,                           SLOT(updateHelpContext()));
-    connect(m_titleOpacityProcessor,    SIGNAL(focusEntered()),                                                                     this,                           SLOT(updateHelpContext()));
-    connect(m_titleOpacityProcessor,    SIGNAL(focusLeft()),                                                                        this,                           SLOT(updateHelpContext()));
+    m_motionDisplayWatcher = new QnWorkbenchMotionDisplayWatcher(display(), this);
+    connect(display()->focusListenerInstrument(), SIGNAL(focusItemChanged()),                                                       this,                           SLOT(updateHelpContext()));
     connect(m_treeWidget,               SIGNAL(currentTabChanged()),                                                                this,                           SLOT(updateHelpContext()));
-    connect(motionDisplayWatcher,       SIGNAL(motionGridShown()),                                                                  this,                           SLOT(updateHelpContext()));
-    connect(motionDisplayWatcher,       SIGNAL(motionGridHidden()),                                                                 this,                           SLOT(updateHelpContext()));
+    connect(m_motionDisplayWatcher,     SIGNAL(motionGridShown()),                                                                  this,                           SLOT(updateHelpContext()));
+    connect(m_motionDisplayWatcher,     SIGNAL(motionGridHidden()),                                                                 this,                           SLOT(updateHelpContext()));
     connect(m_helpWidget,               SIGNAL(showRequested()),                                                                    this,                           SLOT(at_helpWidget_showRequested()));
     connect(m_helpWidget,               SIGNAL(hideRequested()),                                                                    this,                           SLOT(at_helpWidget_hideRequested()));
     updateHelpContext();
@@ -1070,24 +1064,15 @@ void QnWorkbenchUi::updateActivityInstrumentState() {
 }
 
 void QnWorkbenchUi::updateHelpContext() {
-    /* This totally evil hack is here to work around a problem that when scene 
-     * focus item changes, it is first cleared.
-     * 
-     * We want to skip the cleared state, hence the delay. There is a 
-     * better way of doing it, so this is a TODO. */
-    QTimer::singleShot(100, this, SLOT(updateHelpContextInternal()));
-}
-
-void QnWorkbenchUi::updateHelpContextInternal() {
     Qn::ActionScope scope = Qn::InvalidScope;
 
     QGraphicsItem *focusItem = display()->scene()->focusItem();
 
     if(focusItem == NULL || dynamic_cast<QnResourceWidget *>(focusItem)) {
         scope = Qn::SceneScope;
-    } else if(focusItem == m_helpItem || focusItem == m_titleItem || m_titleItem->isAncestorOf(focusItem)) {
+    } else if(focusItem == m_helpItem || m_helpItem->isAncestorOf(focusItem) || focusItem == m_titleItem || m_titleItem->isAncestorOf(focusItem)) {
         return; /* Focusing on help widget or title item shouldn't change help context. */
-    } else if(focusItem == m_treeItem) {
+    } else if(focusItem == m_treeItem || m_treeItem->isAncestorOf(focusItem)) {
         scope = Qn::TreeScope;
     } else if(focusItem == m_sliderItem || m_sliderItem->isAncestorOf(focusItem)) {
         scope = Qn::SliderScope;
@@ -1104,12 +1089,10 @@ void QnWorkbenchUi::updateHelpContextInternal() {
         context = QnContextHelp::ContextId_Slider;
         break;
     case Qn::SceneScope:
-        context = QnContextHelp::ContextId_Scene;
-        foreach(QnResourceWidget *widget, display()->widgets()) {
-            if(widget->displayFlags() & QnResourceWidget::DisplayMotionGrid) {
-                context = QnContextHelp::ContextId_MotionGrid;
-                break;
-            }
+        if(m_motionDisplayWatcher->isMotionGridDisplayed()) {
+            context = QnContextHelp::ContextId_MotionGrid;
+        } else {
+            context = QnContextHelp::ContextId_Scene;
         }
         break;
     default:

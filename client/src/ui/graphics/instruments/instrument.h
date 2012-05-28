@@ -563,7 +563,7 @@ protected:
     virtual bool helpEvent(QWidget *, QGraphicsSceneHelpEvent *) { return false; }
 
     /* Global animation event. Considered a viewport event. */
-    virtual bool animationEvent(AnimationEvent *event);
+    virtual bool animationEvent(AnimationEvent *) { return false; }
 
     /* Graphics view event filtering functions. */
     virtual bool event(QGraphicsView *, QEvent *);

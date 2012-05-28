@@ -22,6 +22,7 @@ class ActivityListenerInstrument;
 class ForwardingInstrument;
 class SignalingInstrument;
 class SelectionOverlayHackInstrument;
+class FocusListenerInstrument;
 
 class QnAbstractRenderer;
 
@@ -105,6 +106,10 @@ public:
      */
     ActivityListenerInstrument *activityListenerInstrument() const {
         return m_curtainActivityInstrument;
+    }
+
+    FocusListenerInstrument *focusListenerInstrument() const {
+        return m_focusListenerInstrument;
     }
 
     /**
@@ -407,6 +412,9 @@ private:
 
     /** Activity listener instrument for resource widgets. */
     ActivityListenerInstrument *m_widgetActivityInstrument;
+
+    /** Focus listener instrument. */
+    FocusListenerInstrument *m_focusListenerInstrument;
 
     /** Bounding instrument. */
     BoundingInstrument *m_boundingInstrument;
