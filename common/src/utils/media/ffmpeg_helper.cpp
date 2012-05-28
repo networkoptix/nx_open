@@ -587,6 +587,13 @@ void QnFfmpegHelper::serializeCodecContext(const AVCodecContext *ctx, QByteArray
         appendCtxField(data, Field_INTER_MATRIX, (const char*) ctx->inter_matrix, 64 * sizeof(int16_t));
     if (ctx->rc_override)
         appendCtxField(data, Field_OVERRIDE, (const char*) ctx->rc_override, ctx->rc_override_count * sizeof(*ctx->rc_override));
+
+    if (ctx->channels > 0)
+        appendCtxField(data, Field_Channels, (const char*) &ctx->channels, sizeof(int));
+    if (ctx->sample_rate > 0)
+        appendCtxField(data, Field_SampleRate, (const char*) &ctx->sample_rate, sizeof(int));
+    if (ctx->sample_fmt != AV_SAMPLE_FMT_NONE)
+        appendCtxField(data, Field_Sample_Fmt, (const char*) &ctx->sample_fmt, sizeof(AVSampleFormat));
 }
 
 AVCodecContext *QnFfmpegHelper::deserializeCodecContext(const char *data, int dataLen)
@@ -645,6 +652,15 @@ AVCodecContext *QnFfmpegHelper::deserializeCodecContext(const char *data, int da
             case Field_OVERRIDE:
                 ctx->rc_override = (RcOverride*) fieldData;
                 ctx->rc_override_count = size / sizeof(*ctx->rc_override);
+                break;
+            case Field_Channels:
+                ctx->channels = *(int*) fieldData;
+                break;
+            case Field_SampleRate:
+                ctx->sample_rate = *(int*) fieldData;
+                break;
+            case Field_Sample_Fmt:
+                ctx->sample_fmt = *(AVSampleFormat*) fieldData;
                 break;
         }
     }

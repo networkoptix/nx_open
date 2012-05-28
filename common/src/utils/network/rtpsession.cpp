@@ -235,6 +235,7 @@ void RTPSession::parseRangeHeader(const QString& rangeStr)
 
 bool RTPSession::open(const QString& url)
 {
+    m_SessionId.clear();
     mUrl = url;
     m_contentBase = mUrl.toString();
     m_responseBufferLen = 0;

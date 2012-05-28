@@ -40,6 +40,7 @@ private:
     bool m_auHeaderExists;
 
     AACCodec m_aacHelper;
+    QnMediaContextPtr m_context;
 };
 
 #endif // __AAC_RTP_PARSER_H
