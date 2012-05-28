@@ -1413,7 +1413,6 @@ void QnWorkbenchActionHandler::at_exportLayoutAction_triggered()
 
 
     m_exportProgressDialog = new QProgressDialog(this->widget());
-    m_exportProgressDialog->setWindowFlags(Qt::WindowStaysOnTopHint);
     m_exportProgressDialog->setWindowTitle(tr("Exporting Layout"));
     m_exportProgressDialog->setMinimumDuration(1000);
 

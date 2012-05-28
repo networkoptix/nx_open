@@ -5,10 +5,10 @@
 
 #include <functional> /* For std::binary_function. */
 
-#include <QtAlgorithms>
-#include <QGLContext>
-#include <QGLWidget>
-#include <QAction>
+#include <QtCore/QtAlgorithms>
+#include <QtGui/QAction>
+#include <QtOpenGL/QGLContext>
+#include <QtOpenGL/QGLWidget>
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
@@ -210,6 +210,8 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     connect(accessController(),             SIGNAL(permissionsChanged(const QnResourcePtr &)),          this,                   SLOT(at_context_permissionsChanged(const QnResourcePtr &)));
 
     /* Set up defaults. */
+    connect(this, SIGNAL(geometryAdjustmentRequested(QnWorkbenchItem *, bool)), this, SLOT(adjustGeometry(QnWorkbenchItem *, bool)), Qt::QueuedConnection);
+
     setScene(m_dummyScene);
 }
 
@@ -662,7 +664,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
     bringToFront(widget);
 
     if(item->checkFlag(Qn::PendingGeometryAdjustment))
-        adjustGeometry(item, animate);
+        adjustGeometryLater(item, animate); /* Changing item flags here may confuse the callee, so we do it through the event loop. */
 
     connect(widget,                     SIGNAL(aboutToBeDestroyed()),   this,   SLOT(at_widget_aboutToBeDestroyed()));
     connect(m_widgetActivityInstrument, SIGNAL(activityStopped()),      widget, SLOT(showActivityDecorations()));
@@ -1083,13 +1085,30 @@ void QnWorkbenchDisplay::synchronizeRaisedGeometry() {
     synchronizeGeometry(widget, animator(widget)->isRunning());
 }
 
-void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate) {
+void QnWorkbenchDisplay::adjustGeometryLater(QnWorkbenchItem *item, bool animate) {
     if(!item->checkFlag(Qn::PendingGeometryAdjustment))
-        return; /* May have been unchecked already. */
+        return;
 
     QnResourceWidget *widget = this->widget(item);
-    if(widget == NULL)
+    if(widget == NULL) {
+        return;
+    } else {
+        widget->hide(); /* So that it won't appear where it shouldn't. */
+    }
+
+    emit geometryAdjustmentRequested(item, animate);
+}
+
+void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate) {
+    if(!item->checkFlag(Qn::PendingGeometryAdjustment))
+        return;
+
+    QnResourceWidget *widget = this->widget(item);
+    if(widget == NULL) {
         return; /* No widget was created for the given item. */
+    } else {
+        widget->show(); /* It may have been hidden in a call to adjustGeometryLater. */
+    }
 
     /* Calculate target position. */
     QPointF newPos;
@@ -1288,7 +1307,7 @@ void QnWorkbenchDisplay::at_item_flagChanged(Qn::ItemFlag flag, bool value) {
         break;
     case Qn::PendingGeometryAdjustment:
         if(value)
-            adjustGeometry(static_cast<QnWorkbenchItem *>(sender()));
+            adjustGeometryLater(static_cast<QnWorkbenchItem *>(sender())); /* Changing item flags here may confuse the callee, so we do it through the event loop. */
         break;
     default:
         qnWarning("Invalid item flag '%1'.", static_cast<int>(flag));

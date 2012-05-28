@@ -211,6 +211,7 @@ QnResourcePtr QnResourceDirectoryBrowser::createArchiveResource(const QString& x
 
             QnAviResourcePtr aviResource(new QnAviResource(item.resource.path));
             aviResource->setStorage(storage);
+            aviResource->setId(item.resource.id);
             qnResPool->addResource(aviResource);
         }
         layout->setItems(updatedItems);
