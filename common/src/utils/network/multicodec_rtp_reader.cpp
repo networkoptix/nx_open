@@ -122,14 +122,12 @@ QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
         return 0;
 }
 
-void QnMulticodecRtpReader::initIO(RTPIODevice** ioDevice, QnRtpStreamParser** parser, const QString& mediaType)
+void QnMulticodecRtpReader::initIO(RTPIODevice** ioDevice, QnRtpStreamParser* parser, const QString& mediaType)
 {
-    delete *parser;
-    *parser = createParser(m_RtpSession.getCodecNameByType(mediaType));
     if (parser)
     {
         *ioDevice = m_RtpSession.getTrackIoByType(mediaType);
-        (*parser)->setSDPInfo(m_RtpSession.getSdpByType(mediaType));
+        parser->setSDPInfo(m_RtpSession.getSdpByType(mediaType));
     }
     else {
         if (!m_RtpSession.getCodecNameByType(mediaType).isEmpty())
@@ -156,8 +154,16 @@ void QnMulticodecRtpReader::openStream()
     {
         m_RtpSession.play(AV_NOPTS_VALUE, AV_NOPTS_VALUE, 1.0);
         
-        initIO(&m_videoIO, &m_videoParser, "video");
-        initIO(&m_audioIO, &m_audioParser, "audio");
+        delete m_videoParser;
+        m_videoParser = 0;
+        delete m_audioParser;
+        m_audioParser = 0;
+
+        m_videoParser = createParser(m_RtpSession.getCodecNameByType("video"));
+        m_audioParser = dynamic_cast<QnRtpAudioStreamParser*> (createParser(m_RtpSession.getCodecNameByType("audio")));
+
+        initIO(&m_videoIO, m_videoParser, "video");
+        initIO(&m_audioIO, m_audioParser, "audio");
     }
 
 }
@@ -171,4 +177,12 @@ void QnMulticodecRtpReader::closeStream()
 bool QnMulticodecRtpReader::isStreamOpened() const
 {
     return m_RtpSession.isOpened();
+}
+
+const QnResourceAudioLayout* QnMulticodecRtpReader::getAudioLayout() const
+{
+    if (m_audioParser)
+        return m_audioParser->getAudioLayout();
+    else
+        return 0;
 }

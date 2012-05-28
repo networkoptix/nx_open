@@ -69,7 +69,8 @@ public:
             {
                 if (audioNum++ < index)
                     continue;
-                result.codec = codecContext->codec_id;
+                //result.codec = codecContext->codec_id;
+                result.codecContext =  QnMediaContextPtr(new QnMediaContext(codecContext));
                 result.description = QString::number(++audioNumber);
                 result.description += QLatin1String(". ");
 

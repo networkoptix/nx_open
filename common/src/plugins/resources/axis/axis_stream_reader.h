@@ -4,6 +4,7 @@
 #include "core/dataprovider/live_stream_provider.h"
 #include "core/dataprovider/spush_media_stream_provider.h"
 #include "utils/network/multicodec_rtp_reader.h"
+#include "core/resource/resource_media_layout.h"
 
 class QnAxisStreamReader: public CLServerPushStreamreader , public QnLiveStreamProvider
 {
@@ -11,6 +12,7 @@ public:
     QnAxisStreamReader(QnResourcePtr res);
     virtual ~QnAxisStreamReader();
 
+    const QnResourceAudioLayout* getDPAudioLayout() const;
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
     virtual void openStream() override;

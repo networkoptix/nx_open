@@ -9,7 +9,7 @@
 #include "decoders/audio/aac.h"
 
 
-class QnAacRtpParser: public QnRtpStreamParser
+class QnAacRtpParser: public QnRtpAudioStreamParser
 {
 public:
     QnAacRtpParser();
@@ -17,6 +17,7 @@ public:
     virtual void setSDPInfo(QList<QByteArray> sdpInfo) override;
 
     virtual bool processData(quint8* rtpBuffer, int readed, QList<QnAbstractMediaDataPtr>& result) override;
+    virtual QnResourceAudioLayout* getAudioLayout() override;
 private:
     void processIntParam(const QByteArray& checkName, int& setValue, const QByteArray& param);
     void processHexParam(const QByteArray& checkName, QByteArray& setValue, const QByteArray& param);
@@ -41,6 +42,7 @@ private:
 
     AACCodec m_aacHelper;
     QnMediaContextPtr m_context;
+    QnRtspAudioLayout m_audioLayout;
 };
 
 #endif // __AAC_RTP_PARSER_H

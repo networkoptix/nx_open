@@ -3,8 +3,7 @@
 
 #include <QIODevice>
 #include "core/datapacket/mediadatapacket.h"
-
-
+#include "core/resource/resource_media_layout.h"
 
 class RTPIODevice;
 
@@ -45,6 +44,23 @@ public:
     virtual bool processData(quint8* rtpBuffer, int readed, QList<QnAbstractMediaDataPtr>& result) = 0;
 
     virtual ~QnRtpStreamParser();
+};
+
+class QnRtspAudioLayout: public QnResourceAudioLayout
+{
+public:
+    QnRtspAudioLayout(): QnResourceAudioLayout() {}
+    virtual int numberOfChannels() const override { return 1; }
+    virtual AudioTrack getAudioTrackInfo(int /*index*/) const override { return m_audioTrack; }
+    void setAudioTrackInfo(const AudioTrack& info) { m_audioTrack = info; }
+private:
+    AudioTrack m_audioTrack;
+};
+
+class QnRtpAudioStreamParser: public QnRtpStreamParser
+{
+public:
+    virtual QnResourceAudioLayout* getAudioLayout() = 0;
 };
 
 #endif

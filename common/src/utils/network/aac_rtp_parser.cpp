@@ -6,7 +6,7 @@
 #include "../common/math.h"
 
 QnAacRtpParser::QnAacRtpParser():
-        QnRtpStreamParser()
+    QnRtpAudioStreamParser()
 {
     m_sizeLength = 0;
     m_constantSize = 0;
@@ -104,6 +104,12 @@ void QnAacRtpParser::setSDPInfo(QList<QByteArray> lines)
     m_context->ctx()->channels = m_aacHelper.m_channels;
     m_context->ctx()->sample_rate = m_aacHelper.m_sample_rate;
     m_context->ctx()->sample_fmt = AV_SAMPLE_FMT_S16;
+    m_context->ctx()->time_base.num = 1;
+    m_context->ctx()->time_base.den = m_aacHelper.m_sample_rate;
+
+    QnResourceAudioLayout::AudioTrack track;
+    track.codecContext = m_context;
+    m_audioLayout.setAudioTrackInfo(track);
 
 }
 
@@ -191,4 +197,9 @@ bool QnAacRtpParser::processData(quint8* rtpBuffer, int bufferSize, QList<QnAbst
     }
 
     return true;
+}
+
+QnResourceAudioLayout* QnAacRtpParser::getAudioLayout()
+{
+    return &m_audioLayout;
 }

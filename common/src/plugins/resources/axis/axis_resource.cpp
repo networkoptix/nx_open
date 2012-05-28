@@ -377,13 +377,13 @@ void QnPlAxisResource::setMotionMaskPhysical(int channel)
 
 const QnResourceAudioLayout* QnPlAxisResource::getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
 {
-    if (isAudioEnabled())
-        return &m_audioLayout;
+    if (isAudioEnabled()) {
+        const QnAxisStreamReader* axisReader = dynamic_cast<const QnAxisStreamReader*>(dataProvider);
+        if (axisReader && axisReader->getDPAudioLayout())
+            return axisReader->getDPAudioLayout();
+        else
+            return QnPhysicalCameraResource::getAudioLayout(dataProvider);
+    }
     else
         return QnPhysicalCameraResource::getAudioLayout(dataProvider);
-}
-
-QnResourceAudioLayout::AudioTrack QnAxisAudioLayout::getAudioTrackInfo(int /*index*/) const
-{
-    return AudioTrack();
 }

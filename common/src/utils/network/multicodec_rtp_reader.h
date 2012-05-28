@@ -8,6 +8,8 @@
 
 
 class QnRtpStreamParser;
+class QnRtpAudioStreamParser;
+class QnResourceAudioLayout;
 
 class QnMulticodecRtpReader : public QnResourceConsumer
 {
@@ -23,16 +25,17 @@ public:
     void openStream();
     void closeStream() ;
     bool isStreamOpened() const;
+    const QnResourceAudioLayout* getAudioLayout() const;
 private:
     QnRtpStreamParser* createParser(const QString& codecName);
-    void initIO(RTPIODevice** ioDevice, QnRtpStreamParser** parser, const QString& mediaType);
+    void initIO(RTPIODevice** ioDevice, QnRtpStreamParser* parser, const QString& mediaType);
 private:
     
     RTPSession m_RtpSession;
     RTPIODevice* m_videoIO;
     RTPIODevice* m_audioIO;
     QnRtpStreamParser* m_videoParser;
-    QnRtpStreamParser* m_audioParser;
+    QnRtpAudioStreamParser* m_audioParser;
 
     QString m_request;
 
