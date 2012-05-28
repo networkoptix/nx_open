@@ -211,7 +211,7 @@ private:
     /* Global state. */
 
     /** Instrument manager for the scene. */
-    InstrumentManager *m_manager;
+    InstrumentManager *m_instrumentManager;
 
     /** Ui elements instrument. */
     UiElementsInstrument *m_uiElementsInstrument;

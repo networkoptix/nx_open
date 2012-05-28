@@ -122,7 +122,7 @@ namespace {
 QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     QObject(parent),
     QnWorkbenchContextAware(parent),
-    m_manager(display()->instrumentManager()),
+    m_instrumentManager(display()->instrumentManager()),
     m_treePinned(false),
     m_inactive(false),
     m_titleUsed(false),
@@ -146,9 +146,9 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_uiElementsInstrument = new UiElementsInstrument(this);
     m_controlsActivityInstrument = new ActivityListenerInstrument(true, hideConstrolsTimeoutMSec, this);
 
-    m_manager->installInstrument(m_uiElementsInstrument, InstallationMode::InstallBefore, display()->paintForwardingInstrument());
-    m_manager->installInstrument(m_fpsCountingInstrument, InstallationMode::InstallBefore, display()->paintForwardingInstrument());
-    m_manager->installInstrument(m_controlsActivityInstrument);
+    m_instrumentManager->installInstrument(m_uiElementsInstrument, InstallationMode::InstallBefore, display()->paintForwardingInstrument());
+    m_instrumentManager->installInstrument(m_fpsCountingInstrument, InstallationMode::InstallBefore, display()->paintForwardingInstrument());
+    m_instrumentManager->installInstrument(m_controlsActivityInstrument);
 
     connect(m_controlsActivityInstrument, SIGNAL(activityStopped()),                                                                this,                           SLOT(at_activityStopped()));
     connect(m_controlsActivityInstrument, SIGNAL(activityResumed()),                                                                this,                           SLOT(at_activityStarted()));
@@ -246,14 +246,14 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_treeShowingProcessor->setHoverEnterDelay(250);
 
     m_treeXAnimator = new VariantAnimator(this);
-    m_treeXAnimator->setTimer(display()->animationInstrument()->animationTimer());
+    m_treeXAnimator->setTimer(m_instrumentManager->animationTimer());
     m_treeXAnimator->setTargetObject(m_treeItem);
     m_treeXAnimator->setAccessor(new PropertyAccessor("x"));
     m_treeXAnimator->setSpeed(m_treeItem->size().width() * 2.0);
     m_treeXAnimator->setTimeLimit(500);
 
     m_treeOpacityAnimatorGroup = new AnimatorGroup(this);
-    m_treeOpacityAnimatorGroup->setTimer(display()->animationInstrument()->animationTimer());
+    m_treeOpacityAnimatorGroup->setTimer(m_instrumentManager->animationTimer());
     m_treeOpacityAnimatorGroup->addAnimator(opacityAnimator(m_treeItem));
     m_treeOpacityAnimatorGroup->addAnimator(opacityAnimator(m_treeBackgroundItem)); /* Speed of 1.0 is OK here. */
     m_treeOpacityAnimatorGroup->addAnimator(opacityAnimator(m_treeShowButton));
@@ -350,14 +350,14 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_titleOpacityProcessor->addTargetItem(m_titleShowButton);
 
     m_titleYAnimator = new VariantAnimator(this);
-    m_titleYAnimator->setTimer(display()->animationInstrument()->animationTimer());
+    m_titleYAnimator->setTimer(m_instrumentManager->animationTimer());
     m_titleYAnimator->setTargetObject(m_titleItem);
     m_titleYAnimator->setAccessor(new PropertyAccessor("y"));
     m_titleYAnimator->setSpeed(m_titleItem->size().height() * 2.0);
     m_titleYAnimator->setTimeLimit(500);
 
     m_titleOpacityAnimatorGroup = new AnimatorGroup(this);
-    m_titleOpacityAnimatorGroup->setTimer(display()->animationInstrument()->animationTimer());
+    m_titleOpacityAnimatorGroup->setTimer(m_instrumentManager->animationTimer());
     m_titleOpacityAnimatorGroup->addAnimator(opacityAnimator(m_titleItem));
     m_titleOpacityAnimatorGroup->addAnimator(opacityAnimator(m_titleBackgroundItem)); /* Speed of 1.0 is OK here. */
     m_titleOpacityAnimatorGroup->addAnimator(opacityAnimator(m_titleShowButton));
@@ -432,14 +432,14 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_helpShowingProcessor->setHoverEnterDelay(250);
 
     m_helpXAnimator = new VariantAnimator(this);
-    m_helpXAnimator->setTimer(display()->animationInstrument()->animationTimer());
+    m_helpXAnimator->setTimer(m_instrumentManager->animationTimer());
     m_helpXAnimator->setTargetObject(m_helpItem);
     m_helpXAnimator->setAccessor(new PropertyAccessor("x"));
     m_helpXAnimator->setSpeed(m_helpItem->size().width() * 2.0);
     m_helpXAnimator->setTimeLimit(500);
 
     m_helpOpacityAnimatorGroup = new AnimatorGroup(this);
-    m_helpOpacityAnimatorGroup->setTimer(display()->animationInstrument()->animationTimer());
+    m_helpOpacityAnimatorGroup->setTimer(m_instrumentManager->animationTimer());
     m_helpOpacityAnimatorGroup->addAnimator(opacityAnimator(m_helpItem));
     m_helpOpacityAnimatorGroup->addAnimator(opacityAnimator(m_helpBackgroundItem)); /* Speed of 1.0 is OK here. */
     m_helpOpacityAnimatorGroup->addAnimator(opacityAnimator(m_helpShowButton));
@@ -476,14 +476,14 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_sliderOpacityProcessor->addTargetItem(m_sliderShowButton);
 
     m_sliderYAnimator = new VariantAnimator(this);
-    m_sliderYAnimator->setTimer(display()->animationInstrument()->animationTimer());
+    m_sliderYAnimator->setTimer(m_instrumentManager->animationTimer());
     m_sliderYAnimator->setTargetObject(m_sliderItem);
     m_sliderYAnimator->setAccessor(new PropertyAccessor("y"));
     m_sliderYAnimator->setSpeed(m_sliderItem->size().height() * 2.0);
     m_sliderYAnimator->setTimeLimit(500);
 
     m_sliderOpacityAnimatorGroup = new AnimatorGroup(this);
-    m_sliderOpacityAnimatorGroup->setTimer(display()->animationInstrument()->animationTimer());
+    m_sliderOpacityAnimatorGroup->setTimer(m_instrumentManager->animationTimer());
     m_sliderOpacityAnimatorGroup->addAnimator(opacityAnimator(m_sliderItem));
     m_sliderOpacityAnimatorGroup->addAnimator(opacityAnimator(m_sliderShowButton)); /* Speed of 1.0 is OK here. */
 
