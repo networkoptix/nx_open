@@ -44,6 +44,8 @@ public:
 	bool isDownmixForced() const { return m_forceDownmix; }
 
     void playCurrentBuffer();
+
+    int getAudioBufferSize() const;
 private:
     // returns amount of ms which buffered before start playing 
     int playAfterMs() const;

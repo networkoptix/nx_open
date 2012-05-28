@@ -412,3 +412,8 @@ void CLAudioStreamDisplay::setForceDownmix(bool value)
     m_forceDownmix = value;
     m_isConvertMethodInitialized = false;
 }
+
+int CLAudioStreamDisplay::getAudioBufferSize() const
+{
+    return m_bufferMs;
+}
