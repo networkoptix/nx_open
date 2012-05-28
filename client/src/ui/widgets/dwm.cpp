@@ -584,20 +584,6 @@ bool QnDwmPrivate::calcSizeEvent(MSG *message, long *result) {
     /* Store input. */
     RECT targetGeometry = params->rgrc[0];
     RECT sourceGeometry = params->rgrc[1];
-    /* RECT sourceClientGeometry = params->rgrc[2]; */
-
-#if 0
-    /* Calculate valid area. */
-    SIZE validSize;
-    validSize.cx = qMin(sourceGeometry.right - sourceGeometry.left, targetGeometry.right - targetGeometry.left);
-    validSize.cy = qMin(sourceGeometry.bottom - sourceGeometry.top, targetGeometry.bottom - targetGeometry.top);
-
-    RECT validRect;
-    validRect.left = targetGeometry.left;
-    validRect.top = targetGeometry.top;
-    validRect.right = validRect.left + validSize.cx;
-    validRect.bottom = validRect.top + validSize.cy;
-#endif
 
     /* Prepare output.
      * 
@@ -613,9 +599,6 @@ bool QnDwmPrivate::calcSizeEvent(MSG *message, long *result) {
     params->rgrc[0].left     += userFrameMargins.left();
     params->rgrc[0].right    -= userFrameMargins.right();
 
-#if 0
-    *result = WVR_VALIDRECTS;
-#endif
     *result = WVR_REDRAW;
     return true;
 }
@@ -819,7 +802,6 @@ bool QnDwmPrivate::eraseBackground(MSG *message, long *result) {
     if(!systemPaintWindow) {
         if(transparentErasing) {
             HDC hdc = (HDC) message->wParam;
-            // HBRUSH hbr = (HBRUSH) GetClassLongPtrW(message->hwnd, GCLP_HBRBACKGROUND);
             HBRUSH hbr = (HBRUSH) GetStockObject(BLACK_BRUSH);
             if(!hbr) {
                 *result = 0;

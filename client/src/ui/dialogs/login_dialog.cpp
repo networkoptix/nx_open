@@ -10,6 +10,7 @@
 #include "ui/preferences/preferencesdialog.h"
 #include "ui/style/skin.h"
 #include "ui/workbench/workbench_context.h"
+#include "ui/widgets/rendering_widget.h"
 #include "connection_testing_dialog.h"
 
 #include "api/AppServerConnection.h"
@@ -18,9 +19,6 @@
 #include "utils/settings.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
-#include "camera/camera.h"
-#include "camera/gl_renderer.h"
-#include "ui/graphics/items/resource_widget_renderer.h"
 #include "plugins/resources/archive/filetypes.h"
 #include "plugins/resources/archive/filetypesupport.h"
 
@@ -34,109 +32,14 @@ namespace {
 
 } // anonymous namespace
 
-class QnMyGLWidget: public QGLWidget
-{
-public:
-    QnMyGLWidget(const QGLFormat &format, QWidget *parent = 0): QGLWidget(format, parent)
-    {
-        m_renderer = 0;
-        connect(&m_timer, SIGNAL(timeout()), this, SLOT(update()));
-        m_timer.start(16);
-        m_firstTime = true;
-    }
-
-    virtual void resizeEvent(QResizeEvent *event) override
-    {
-        static double sar = 1.0;
-        double windowHeight = event->size().height();
-        double windowWidth = event->size().width();
-        double textureWidth = 1920;
-        double textureHeight = 1080;
-        double newTextureWidth = static_cast<uint>(textureWidth * sar);
-
-        double windowAspect = windowWidth / windowHeight;
-        double textureAspect = textureWidth / textureHeight;
-        if (windowAspect > textureAspect)
-        {
-            // black bars at left and right
-            m_videoRect.setTop(0);
-            m_videoRect.setHeight(windowHeight);
-            double scale = windowHeight / textureHeight;
-            double scaledWidth = newTextureWidth * scale;
-            m_videoRect.setLeft((windowWidth - scaledWidth) / 2);
-            m_videoRect.setWidth(scaledWidth + 0.5);
-        }
-        else 
-        {
-            // black bars at the top and bottom
-            m_videoRect.setLeft(0);
-            m_videoRect.setWidth(windowWidth);
-            if (newTextureWidth < windowWidth) {
-                double scale = windowWidth / newTextureWidth;
-                double scaledHeight = textureHeight * scale;
-                m_videoRect.setTop((windowHeight - scaledHeight) / 2);
-                m_videoRect.setHeight(scaledHeight + 0.5);
-            }
-            else {
-                double newTextureHeight = windowWidth / textureAspect + 0.5;
-                m_videoRect.setTop((windowHeight - newTextureHeight) / 2);
-                m_videoRect.setHeight(newTextureHeight);
-            }
-        }
-
-        
-        if (m_renderer)
-            m_renderer->setChannelScreenSize(m_videoRect.size());
-    }
-
-    void setRenderer(QnResourceWidgetRenderer *renderer)
-    {
-        m_renderer = renderer;
-    }
-
-    
-    virtual void paintEvent(QPaintEvent *) override
-    {
-        QPainter painter(this);
-        painter.beginNativePainting();
-        if (m_renderer)
-            m_renderer->paint(0, m_videoRect, 1.0);
-        painter.endNativePainting();
-        if (m_firstTime)
-        {
-            if (m_camDisplay)
-                m_camDisplay->start();
-            m_firstTime = false;
-        }
-    }
-
-    void setCamDisplay(CLCamDisplay* camDisplay)
-    {
-        m_camDisplay = camDisplay;
-    }
-    
-private:
-    QRect m_videoRect;
-    QnResourceWidgetRenderer *m_renderer;
-    QTimer m_timer;
-    CLCamDisplay *m_camDisplay;
-    bool m_firstTime;
-};
-
-// ------------------------------------
 
 LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::LoginDialog),
     m_context(context),
-    m_requestHandle(-1)
+    m_requestHandle(-1),
+    m_renderingWidget(NULL)
 {
-    dataProvider = 0;
-    camera = 0;
-    renderer = 0;
-    glWindow = 0;
-
-
     if(!context)
         qnNullWarning(context);
 
@@ -146,42 +49,23 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
     /* Don't allow to save passwords, at least for now. */
     //ui->savePasswordCheckBox->hide();
 
-    //ui->titleLabel->setAlignment(Qt::AlignCenter);
-    //ui->titleLabel->setPixmap(qnSkin->pixmap("logo_1920_1080.png", QSize(250, 1000), Qt::KeepAspectRatio, Qt::SmoothTransformation));
-
-    QVBoxLayout* layout = new QVBoxLayout(ui->videoSpacer);
-    layout->setSpacing(0);
-    layout->setContentsMargins(0,0,0,10);
-
-    QGLFormat glFormat;
-    glFormat.setOption(QGL::SampleBuffers); /* Multisampling. */
-    glFormat.setSwapInterval(1); /* Turn vsync on. */
-    glWindow = new QnMyGLWidget(glFormat);
-    layout->addWidget(glWindow);
-
     QDir dir(":/skin");
     QStringList	introList = dir.entryList(QStringList() << "intro.*");
     QString resourceName = ":/skin/intro";
     if (!introList.isEmpty())
         resourceName = QString(":/skin/") + introList.first();
 
-    aviRes = QnAviResourcePtr(new QnAviResource(QString("qtfile://") + resourceName));
+    QnAviResourcePtr resource = QnAviResourcePtr(new QnAviResource(QString("qtfile://") + resourceName));
     if (FileTypeSupport::isImageFileExt(resourceName))
-        aviRes->addFlags(QnResource::still_image);
+        resource->addFlags(QnResource::still_image);
 
-    dataProvider = static_cast<QnAbstractArchiveReader*>(aviRes->createDataProvider(QnResource::Role_Default));
-    dataProvider->setCycleMode(false);
-    camera = new CLVideoCamera(aviRes, false, dataProvider);
-    
-    renderer = new QnResourceWidgetRenderer(1, 0, glWindow->context());
-    glWindow->setRenderer(renderer);
-    camera->getCamDisplay()->addVideoChannel(0, renderer, true);
-    camera->getCamDisplay()->setMTDecoding(true);
-    dataProvider->start();
+    m_renderingWidget = new QnRenderingWidget();
+    m_renderingWidget->setResource(resource);
 
-    glWindow->setCamDisplay(camera->getCamDisplay());
-
-
+    QVBoxLayout* layout = new QVBoxLayout(ui->videoSpacer);
+    layout->setSpacing(0);
+    layout->setContentsMargins(0,0,0,10);
+    layout->addWidget(m_renderingWidget);
 
     resetButton->setText(tr("&Reset"));
 
@@ -212,15 +96,8 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
     updateFocus();
 }
 
-LoginDialog::~LoginDialog()
-{
-    renderer->beforeDestroy();
-    camera->beforeStopDisplay();
-    camera->stopDisplay();
-    
-    delete camera;
-    delete renderer;
-    delete glWindow;
+LoginDialog::~LoginDialog() {
+    return;
 }
 
 void LoginDialog::updateFocus() 
@@ -431,9 +308,9 @@ void LoginDialog::at_testButton_clicked()
         return;
     }
 
-    ConnectionTestingDialog dialog(this, url);
-    dialog.setModal(true);
-    dialog.exec();
+    QScopedPointer<QnConnectionTestingDialog> dialog(new QnConnectionTestingDialog(url, this));
+    dialog->setModal(true);
+    dialog->exec();
 }
 
 void LoginDialog::at_configureConnectionsButton_clicked()

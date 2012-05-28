@@ -23,6 +23,7 @@ private:
     ClickInfoPrivate *d;
 };
 
+// TODO: rework this into a processor.
 
 /**
  * This instrument listens to click events and emits corresponding signals

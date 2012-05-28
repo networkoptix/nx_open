@@ -53,6 +53,7 @@ public:
     virtual const char* format() const = 0;
     virtual void deserializeCameras(QnVirtualCameraResourceList& cameras, const QByteArray& data, QnResourceFactory& resourceFactory) = 0;
     virtual void deserializeServers(QnVideoServerResourceList& servers, const QByteArray& data, QnResourceFactory& resourceFactory) = 0;
+    virtual void deserializeLayout(QnLayoutResourcePtr& layout, const QByteArray& data) = 0;
     virtual void deserializeLayouts(QnLayoutResourceList& layouts, const QByteArray& data) = 0;
     virtual void deserializeUsers(QnUserResourceList& users, const QByteArray& data) = 0;
     virtual void deserializeResources(QnResourceList& resources, const QByteArray& data, QnResourceFactory& resourceFactory) = 0;
@@ -60,6 +61,7 @@ public:
     virtual void deserializeLicenses(QnLicenseList& licenses, const QByteArray& data) = 0;
     virtual void deserializeCameraHistoryList(QnCameraHistoryList& cameraServerItems, const QByteArray& data) = 0;
 
+    virtual void serializeLayout(const QnLayoutResourcePtr& resource, QByteArray& data) = 0;
     virtual void serializeLayouts(const QnLayoutResourceList& layouts, QByteArray& data) = 0;
     virtual void serializeCameras(const QnVirtualCameraResourceList& cameras, QByteArray& data) = 0;
     virtual void serializeLicense(const QnLicensePtr& license, QByteArray& data) = 0;
@@ -69,7 +71,6 @@ protected:
     virtual void serializeCamera(const QnVirtualCameraResourcePtr& resource, QByteArray& data) = 0;
     virtual void serializeServer(const QnVideoServerResourcePtr& resource, QByteArray& data) = 0;
     virtual void serializeUser(const QnUserResourcePtr& resource, QByteArray& data) = 0;
-    virtual void serializeLayout(const QnLayoutResourcePtr& resource, QByteArray& data) = 0;
 };
 
 #endif // _API_SERIALIZER_H_

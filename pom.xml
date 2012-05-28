@@ -1,22 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<!--
-    Example pom for delegating maven goals to msbuild so it builds the "solution"
- 
-    A solution can be a group of projects, but here we only have one.
-    It should also be possible to have one maven project per solution project, 
-    and have a parent pom to deletegate the build.
-  -->
+
 	<groupId>com.networkoptix.hdwitness</groupId>
 	<version>1.1</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>hdwitness</artifactId>
 	<packaging>pom</packaging>
 	<name>HD Witness</name>
-
-	<!--<organization>
-		<name>Network Optix</name>
-		<url>networkoptix.com</url>
-	</organization> -->
 
 	<properties>
 		<build.configuration>release</build.configuration>
@@ -32,10 +21,7 @@
 		<module>testcamera</module>
 	</modules>
 	<build>
-		<defaultGoal>package</defaultGoal>
-		<plugins>
-
-		</plugins>		
+		<defaultGoal>install</defaultGoal>
 	</build>
 	<profiles>
 		<profile>
@@ -68,10 +54,6 @@
 			<properties>
 				<platform>linux</platform>
 			</properties>
-			<build>
-				<plugins>
-				</plugins>
-			</build>
 		</profile>	
 		<profile>
 			<id>linux-x64</id>
@@ -106,10 +88,6 @@
 				<file>
 					<missing>${project.build.directory}/build/include</missing>
 				</file> 
-				<!-- <property>
-					<name>convert-only</name>
-					<value>false</value>
-				</property>	-->			
 			</activation>				
 			<build>
 				<plugins>    
@@ -147,7 +125,6 @@
 						</configuration>
 					</plugin>
 				</plugins>
-
 			</build>
 		</profile>			
 	</profiles>	

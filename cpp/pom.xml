@@ -1,11 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<!--
-    Example pom for delegating maven goals to msbuild so it builds the "solution"
- 
-    A solution can be a group of projects, but here we only have one.
-    It should also be possible to have one maven project per solution project, 
-    and have a parent pom to deletegate the build.
-  -->
+
 	<parent>
 		<artifactId>hdwitness</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
@@ -24,6 +18,7 @@
 		<assembly-skip>false</assembly-skip>
 		<convert-only>true</convert-only>
 		<ffmpeg.version>2012-04-10-N-39672-g40b7a27</ffmpeg.version>
+		<openssl.version>1.0.0j</openssl.version>
 		<buildLib/>
 	</properties>
 
@@ -85,13 +80,13 @@
 							<target>							
 								<chmod file="${project.build.directory}/*.sh" perm="755"/>
 
-								<dirset id="includes_path" dir="${project.build.directory}/build/include" includes="*"/>
+								<dirset id="includes_path" dir="${project.build.directory}/build/include" includes="*" erroronmissingdir="false"/>
 								<pathconvert pathsep="${line.separator}" property="includes" refid="includes_path">
 									<map from="" to="INCLUDEPATH += "/>
 								</pathconvert>								
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${includes}</echo>
 
-								<fileset id="debug_libs_path" dir="${project.build.directory}/build/bin/debug">
+								<fileset id="debug_libs_path" dir="${project.build.directory}/build/bin/debug" erroronmissingdir="false">
 									<include name="**/*.lib" />
 								</fileset>
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}CONFIG(debug, debug|release) {</echo>
@@ -101,8 +96,7 @@
 								</pathconvert>								
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${debug_libs}${line.separator}}</echo>
 
-								<fileset id="release_libs_path" dir="${project.build.directory}/build/bin/release">
-									<include name="**/*.lib" />
+								<fileset id="release_libs_path" dir="${project.build.directory}/build/bin/release" erroronmissingdir="false">
 									<include name="**/*.lib" />
 								</fileset>
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}CONFIG(release, debug|release) {</echo>
@@ -112,7 +106,7 @@
 								</pathconvert>								
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${release_libs}${line.separator}}</echo>
 
-								<fileset id="linux_debug_libs_path" dir="${project.build.directory}/build/bin/debug">
+								<fileset id="linux_debug_libs_path" dir="${project.build.directory}/build/bin/debug" erroronmissingdir="false">
 									<include name="**/*.so" />
 								</fileset>
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}CONFIG(debug, debug|release) {</echo>
@@ -122,7 +116,7 @@
 								</pathconvert>								
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${linux_debug_libs}${line.separator}}</echo>
 
-								<fileset id="linux_release_libs_path" dir="${project.build.directory}/build/bin/release">
+								<fileset id="linux_release_libs_path" dir="${project.build.directory}/build/bin/release" erroronmissingdir="false">
 									<include name="**/*.so" />
 								</fileset>
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}CONFIG(release, debug|release) {</echo>
@@ -132,28 +126,26 @@
 								</pathconvert>								
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${linux_release_libs}${line.separator}}</echo>
 
-								<fileset id="headers_path" dir="${project.build.sourceDirectory}">
+								<fileset id="headers_path" dir="${project.build.sourceDirectory}" erroronmissingdir="false">
 									<include name="**/*.h" />
-									<exclude name="**/*dxva*/**" />
+									<!-- <exclude name="**/*dxva*/**" /> -->
 								</fileset>
 								<pathconvert pathsep="${line.separator}" property="headers" refid="headers_path">
 									<map from="" to="HEADERS += "/>
 								</pathconvert>									
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${headers}</echo>
 
-								<fileset id="sources_path" dir="${project.build.sourceDirectory}">
+								<fileset id="sources_path" dir="${project.build.sourceDirectory}" erroronmissingdir="false">
 									<include name="**/*.cpp" />
 									<include name="**/*.cc" />
 									<include name="**/*.c" />
-									<exclude name="**/*dxva*/**" />
-									<exclude name="${project.build.sourceDirectory}/decoders/video/dxva/copy.h" />
 								</fileset>
 								<pathconvert pathsep="${line.separator}" property="sources" refid="sources_path">
 									<map from="" to="SOURCES += "/>
 								</pathconvert>
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${sources}</echo>
 
-								<fileset id="add_sources_path" dir="${project.build.directory}/build/include">
+								<fileset id="add_sources_path" dir="${project.build.directory}/build/include" erroronmissingdir="false">
 									<include name="**/*.cpp" />
 									<include name="**/*.cc" />
 									<include name="**/*.c" />
@@ -161,15 +153,54 @@
 								<pathconvert pathsep="${line.separator}" property="add_sources" refid="add_sources_path">
 									<map from="" to="SOURCES += "/>
 								</pathconvert>
-								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${add_sources}</echo>		
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${add_sources}</echo>
 
-								<fileset id="qrc_path" dir="${project.build.directory}">
+								<fileset id="qrc_path" dir="${project.build.directory}" erroronmissingdir="false">
 									<include name="**/*.qrc" />
 								</fileset>
 								<pathconvert pathsep="${line.separator}" property="qrc" refid="qrc_path">
 									<map from="" to="RESOURCES += "/>
 								</pathconvert>								
-								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${qrc}</echo>								
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${qrc}</echo>
+
+								<fileset id="lang_path" dir="${project.build.sourceDirectory}" erroronmissingdir="false">
+									<include name="**/*.ts" />
+								</fileset>
+								<pathconvert pathsep="${line.separator}" property="lang" refid="lang_path">
+									<map from="" to="TRANSLATIONS += "/>
+								</pathconvert>								
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${lang}</echo>
+
+								<fileset id="forms_path" dir="${project.build.sourceDirectory}" erroronmissingdir="false">
+									<include name="**/*.ui" />
+								</fileset>
+								<pathconvert pathsep="${line.separator}" property="forms" refid="forms_path">
+									<map from="" to="FORMS += "/>
+								</pathconvert>								
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${forms}</echo>
+
+								<dirset id="includes_pri_path" dir="${project.build.directory}/build/pri" includes="*" erroronmissingdir="false"/>
+								<pathconvert pathsep="${line.separator}" property="includes_pri" refid="includes_pri_path">
+									<map from="" to="INCLUDEPATH += "/>
+								</pathconvert>								
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${includes_pri}</echo>	
+
+								<fileset id="pri_path" dir="${project.build.directory}/build/pri" erroronmissingdir="false">
+									<include name="**/src/*.pri" />
+								</fileset>
+								<pathconvert pathsep="${line.separator}" property="pri" refid="pri_path">
+									<map from="" to="include("/>
+									<globmapper from="*.pri" to="*.pri)"/>
+								</pathconvert>								
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${pri}</echo>
+
+								<fileset id="proto_path" dir="${project.build.sourceDirectory}" erroronmissingdir="false">
+									<include name="**/*.proto" />
+								</fileset>
+								<pathconvert pathsep="${line.separator}" property="proto" refid="proto_path">
+									<map from="" to="PB_FILES += "/>
+								</pathconvert>
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${proto}</echo>								
 							</target>
 						</configuration>
 					</execution>				
@@ -187,7 +218,7 @@
 				</os>
 			</activation>
 			<properties>
-				<arch>x86</arch>
+				<arch>x86</arch>		
 			</properties>			
 			<build>
 				<plugins>					
@@ -213,27 +244,6 @@
 									</replacements>
 								</configuration>								
 							</execution>
-							<execution>
-								<id>backslashes-replace</id>
-								<phase>generate-resources</phase>
-								<goals>
-									<goal>replace</goal>
-								</goals>    
-								<configuration>
-									<includes>
-										<include>${arch}/*.pro</include>
-									</includes>
-									<excludes>
-										<include>**/client.pro</include>
-									</excludes>	
-									<replacements>
-										<replacement>
-											<token>\\</token>
-											<value>/</value>
-										</replacement>         
-									</replacements>
-								</configuration>								
-							</execution>							
 						</executions>
 					</plugin>	
 					<plugin>

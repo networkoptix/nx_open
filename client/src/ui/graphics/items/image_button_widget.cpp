@@ -12,7 +12,6 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/checked_cast.h>
 
-#include <ui/animation/accessor.h>
 #include <ui/animation/variant_animator.h>
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
@@ -21,6 +20,7 @@
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_functions.h>
 #include <ui/common/scene_utility.h>
+#include <ui/common/accessor.h>
 
 namespace {
     bool checkPixmapGroupRole(QnImageButtonWidget::StateFlags *flags) {

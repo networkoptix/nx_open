@@ -34,10 +34,10 @@ public:
     virtual bool isDirExists(const QString& url) override;
     virtual qint64 getFreeSpace() override;
 private:
-    QString removeProtocolPrefix(const QString& url);
+    static QString removeProtocolPrefix(const QString& url);
 
     bool addFileEntry(const QString& fileName);
-    qint64 getFileOffset(const QString& fileName);
+    qint64 getFileOffset(const QString& fileName, qint64* fileSize);
     void readIndexHeader();
 private:
     static const int MAX_FILES_AT_LAYOUT = 256;

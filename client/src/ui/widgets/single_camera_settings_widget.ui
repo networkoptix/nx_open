@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="tabGeneral">
       <attribute name="title">
@@ -197,9 +197,9 @@
       <attribute name="title">
        <string>Motion</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_7" stretch="0,1,0">
+      <layout class="QVBoxLayout" name="verticalLayout_7" stretch="0,1,0,0">
        <item>
-        <widget class="QLabel" name="motionEnableLabel">
+        <widget class="QLabel" name="motionAvailableLabel">
          <property name="font">
           <font>
            <pointsize>14</pointsize>
@@ -217,169 +217,164 @@
         <widget class="QWidget" name="motionWidget" native="true"/>
        </item>
        <item>
-        <widget class="QGroupBox" name="groupBoxSettings">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
+        <widget class="QGroupBox" name="motionSettingsGroupBox">
          <property name="title">
           <string>Motion settings</string>
          </property>
-         <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0">
-          <item>
-           <layout class="QGridLayout" name="gridLayout">
-            <item row="5" column="3">
-             <spacer name="horizontalSpacer">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
+         <layout class="QFormLayout" name="formLayout_3">
+          <property name="labelAlignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_4">
+            <property name="text">
+             <string>Sensitivity:</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QComboBox" name="sensitivityComboBox">
+            <item>
+             <property name="text">
+              <string>0 (motion mask)</string>
+             </property>
             </item>
-            <item row="3" column="0">
-             <widget class="QLabel" name="sensetivityLabel">
-              <property name="text">
-               <string>Sensitivity:</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
+            <item>
+             <property name="text">
+              <string>1</string>
+             </property>
             </item>
-            <item row="3" column="1">
-             <widget class="QComboBox" name="comboBoxSensetivity">
-              <item>
-               <property name="text">
-                <string>0 (motion mask)</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>1</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>2</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>3</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>4</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>5</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>6</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>7</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>8</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>9 (maximum motion sensetivity)</string>
-               </property>
-              </item>
-             </widget>
+            <item>
+             <property name="text">
+              <string>2</string>
+             </property>
             </item>
-            <item row="5" column="0">
-             <widget class="QLabel" name="motionWebPageLabel">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>       Camera's motion web page:</string>
-              </property>
-              <property name="openExternalLinks">
-               <bool>false</bool>
-              </property>
-             </widget>
+            <item>
+             <property name="text">
+              <string>3</string>
+             </property>
             </item>
-            <item row="5" column="1">
-             <widget class="QLabel" name="motionWEBPageLink">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>motionWEBPage</string>
-              </property>
-             </widget>
+            <item>
+             <property name="text">
+              <string>4</string>
+             </property>
             </item>
-            <item row="1" column="0">
+            <item>
+             <property name="text">
+              <string>5</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>6</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>7</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>8</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>9 (maximum motion sensitivity)</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_5">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Camera motion web page:</string>
+            </property>
+            <property name="openExternalLinks">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLabel" name="motionWebPageLabel">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>URL</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>Motion detection:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <layout class="QVBoxLayout" name="verticalLayout_9">
+            <item>
              <widget class="QRadioButton" name="cameraMotionButton">
               <property name="text">
-               <string>Camera motion</string>
+               <string>Hardware (Camera built-in)</string>
               </property>
               <property name="checked">
                <bool>true</bool>
               </property>
              </widget>
             </item>
-            <item row="1" column="1">
+            <item>
              <widget class="QRadioButton" name="softwareMotionButton">
               <property name="text">
-               <string>Software motion</string>
+               <string>Software (On media server)</string>
               </property>
               <property name="checked">
                <bool>false</bool>
               </property>
              </widget>
             </item>
-            <item row="1" column="3">
-             <widget class="QPushButton" name="clearAllButton">
-              <property name="text">
-               <string>Reset motion regions</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="2">
-             <spacer name="horizontalSpacer_2">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
            </layout>
           </item>
          </layout>
         </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <spacer name="horizontalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="resetMotionRegionsButton">
+           <property name="text">
+            <string>Reset motion regions</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>

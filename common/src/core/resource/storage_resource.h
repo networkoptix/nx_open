@@ -21,7 +21,6 @@ public:
 
     virtual QString getUniqueId() const;
 
-
     void setSpaceLimit(qint64 value);
     qint64 getSpaceLimit() const;
 
@@ -39,6 +38,11 @@ public:
     quint16 getIndex() const;
 
     void deserialize(const QnResourceParameters& parameters);
+
+    /*
+     * Returns storage usage in range [0..1]
+     */
+    virtual float getAvarageWritingUsage() const;
 signals:
     /*
      * Storage may emit archiveRangeChanged signal to inform server what some data in archive already deleted
@@ -46,6 +50,7 @@ signals:
      * @param newEndTime - Not used now, reserved for future use
      */
     void archiveRangeChanged(qint64 newStartTimeMs, qint64 newEndTimeMs);
+
 private:
     qint64 m_spaceLimit;
     int m_maxStoreTime; // at seconds
@@ -123,6 +128,8 @@ public:
     */
     virtual bool isDirExists(const QString& url) = 0;
 
+    virtual bool isRealFiles() const{return true;};
+
 public:
     virtual void setUrl(const QString& value);
 protected:
@@ -140,6 +147,7 @@ public:
 
     void registerStoragePlugin(const QString& name, StorageTypeInstance pluginInst, bool isDefaultProtocol = false);
     QnStorageResource* createStorage(const QString& storageType, bool useDefaultForUnknownPrefix = true);
+
 private:
     QMap<QString, StorageTypeInstance> m_storageTypes;
     StorageTypeInstance m_defaultStoragePlugin;

@@ -17,9 +17,7 @@
 QnActionCondition::QnActionCondition(QObject *parent): 
     QObject(parent),
     QnWorkbenchContextAware(parent)
-{
-    QnActionParameterTypes::initialize();
-}
+{}
 
 Qn::ActionVisibility QnActionCondition::check(const QnResourceList &) { 
     return Qn::InvisibleAction; 

@@ -114,6 +114,7 @@ void QnAxisStreamReader::openStream()
     paramsStr.append("&fps=").append(QByteArray::number(fps));
     if (quality != QnQualityPreSeted)
         paramsStr.append("&compression=").append(QByteArray::number(toAxisQuality(quality)));
+    paramsStr.append("&audio=").append(res->isAudioEnabled() ? "1" : "0");
 
     // --------------- update or insert new profile ----------------------
     

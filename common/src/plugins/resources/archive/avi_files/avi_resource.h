@@ -20,6 +20,10 @@ public:
 
     virtual const QnVideoResourceLayout* getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider = 0) override;
     virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider = 0) override;
+
+    void setStorage(QnStorageResourcePtr);
+private:
+    QnStorageResourcePtr m_storage;
 };
 
 typedef QnSharedResourcePointer<QnAviResource> QnAviResourcePtr;

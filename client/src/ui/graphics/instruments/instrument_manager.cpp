@@ -310,6 +310,8 @@ InstrumentManager::InstrumentManager(QObject *parent):
     const_cast<InstrumentManager *&>(d_ptr->q_ptr) = this;
 
     d_func()->init();
+
+    installInstrument(new AnimationInstrument(this));
 }
 
 InstrumentManager::~InstrumentManager() {
@@ -526,15 +528,22 @@ QList<InstrumentManager *> InstrumentManager::managersOf(QGraphicsScene *scene) 
     return scene->property(managersPropertyName).value<QList<InstrumentManager *> >();
 }
 
+AnimationTimer *InstrumentManager::animationTimer() const {
+    AnimationInstrument *animationInstrument = instrument<AnimationInstrument>();
+    if(animationInstrument != NULL) {
+        return animationInstrument->animationTimer();
+    } else {
+        return NULL;
+    }
+}
+
 AnimationTimer *InstrumentManager::animationTimerOf(QGraphicsScene *scene) {
     if(scene == NULL)
         return NULL;
     
-    foreach(const InstrumentManager *manager, InstrumentManager::managersOf(scene)) {
-        AnimationInstrument *animationInstrument = manager->instrument<AnimationInstrument>();
-        if(animationInstrument != NULL)
-            return animationInstrument->animationTimer();
-    }
+    foreach(const InstrumentManager *manager, InstrumentManager::managersOf(scene)) 
+        if(AnimationTimer *result = manager->animationTimer())
+            return result;
 
     return NULL;
 }
