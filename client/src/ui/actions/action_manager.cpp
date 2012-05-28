@@ -380,7 +380,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory.enterSubMenu(); {
         factory(Qn::OpenFileAction).
             flags(Qn::Main | Qn::Scene).
-            requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
+            requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission | Qn::AddRemoveItemsPermission).
             text(tr("File(s)...")).
             shortcut(tr("Ctrl+O")).
             autoRepeat(false).
@@ -388,7 +388,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
         factory(Qn::OpenFolderAction).
             flags(Qn::Main | Qn::Scene).
-            requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
+            requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission | Qn::AddRemoveItemsPermission).
             text(tr("Folder..."));
     } factory.leaveSubMenu();
 
@@ -499,12 +499,12 @@ QnActionManager::QnActionManager(QObject *parent):
     /* Resource actions. */
     factory(Qn::OpenInLayoutAction).
         flags(Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
-        requiredPermissions(Qn::LayoutParameter, Qn::WritePermission).
+        requiredPermissions(Qn::LayoutParameter, Qn::WritePermission | Qn::AddRemoveItemsPermission).
         text(tr("Open in Layout"));
 
     factory(Qn::OpenInCurrentLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
-        requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
+        requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission | Qn::AddRemoveItemsPermission).
         text(tr("Open")).
         condition(hasFlags(QnResource::media), Qn::Any);
 

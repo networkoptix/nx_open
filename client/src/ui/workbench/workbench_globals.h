@@ -115,6 +115,11 @@ namespace Qn {
         ReadWriteSavePermission     = ReadPermission | WritePermission | SavePermission,
 
 
+        /* Layout-specific permissions. */
+
+        /** Permission to add or remove items from a layout. */
+        AddRemoveItemsPermission    = 0x00000010,
+
 
         /* User-specific permissions. */
 
@@ -128,14 +133,14 @@ namespace Qn {
         WriteAccessRightsPermission = 0x00000400,
 
         /** Permission to create layouts for the user. */
-        CreateLayoutPermission      = 0x00002000,
+        CreateLayoutPermission      = 0x00000800,
 
 
-
-        /* Global permissions. */
+        /* Current user-specific permissions. */
 
         /** Permission to create users. */
-        CreateUserPermission        = 0x00001000,
+        CreateUserPermission        = 0x10000000,
+
 
         AllPermissions              = 0xFFFFFFFF
     };
