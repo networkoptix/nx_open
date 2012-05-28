@@ -526,6 +526,17 @@ void QnApiPbSerializer::deserializeLayouts(QnLayoutResourceList& layouts, const 
     parseLayouts(layouts, pb_layouts.layout());
 }
 
+void QnApiPbSerializer::deserializeLayout(QnLayoutResourcePtr& layout, const QByteArray& data)
+{
+    QnLayoutResourceList layouts;
+    deserializeLayouts(layouts, data);
+
+    if (layouts.isEmpty())
+        layout = QnLayoutResourcePtr();
+    else
+        layout = layouts.at(0); 
+}
+
 void QnApiPbSerializer::deserializeUsers(QnUserResourceList& users, const QByteArray& data)
 {
     proto::pb::Users pb_users;
