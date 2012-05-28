@@ -11,6 +11,9 @@
 #include "core/datapacket/mediadatapacket.h"
 
 class _onvifMedia__GetVideoEncoderConfigurationOptionsResponse;
+//class _onvifMedia__GetVideoEncoderConfigurationsResponse;
+struct VideoEncoders;
+class _onvifMedia__GetProfilesResponse;
 
 //first = width, second = height
 typedef QPair<int, int> ResolutionPair;
@@ -23,7 +26,7 @@ public:
 
     QnPlOnvifGeneric211Resource();
 
-    static const QString createOnvifEndpointUrl(const QString ipAddress);
+    static const QString createOnvifEndpointUrl(const QString& ipAddress);
 
     virtual bool isResourceAccessible() override;
     virtual bool updateMACAddress() override;
@@ -31,7 +34,7 @@ public:
     virtual void setMotionMaskPhysical(int channel) override;
     virtual int getMaxFps() override;
     virtual void setIframeDistance(int /*frames*/, int /*timems*/) override {}
-    virtual bool hasDualStreaming() const override { return true; }
+    virtual bool hasDualStreaming() const override { return hasDual; }
 
     bool isInitialized() const;
 
@@ -41,6 +44,8 @@ public:
     const ResolutionPair getMaxResolution() const;
     const ResolutionPair getNearestResolution(const ResolutionPair& resolution, float aspectRatio) const;
     float getResolutionAspectRatio(const ResolutionPair& resolution) const;
+    bool isVideoOptionsNotSet() const { return videoOptionsNotSet; }
+    bool isSoapAuthorized() const;
 
     QRect getMotionWindow(int num) const;
     QMap<int, QRect>  getMotionWindows() const;
@@ -61,6 +66,8 @@ private:
     int toAxisMotionSensitivity(int sensitivity);
     void fetchAndSetVideoEncoderOptions();
     void setVideoEncoderOptions(const _onvifMedia__GetVideoEncoderConfigurationOptionsResponse& response);
+    void analyzeVideoEncoders(VideoEncoders& encoders, bool setOptions);
+    int countAppropriateProfiles(const _onvifMedia__GetProfilesResponse& response, VideoEncoders& encoders);
 private:
     static const char* ONVIF_PROTOCOL_PREFIX;
     static const char* ONVIF_URL_SUFFIX;
@@ -74,6 +81,8 @@ private:
     int iframeDistance;
     int minQuality;
     int maxQuality;
+    bool hasDual;
+    bool videoOptionsNotSet;
 };
 
 typedef QSharedPointer<QnPlOnvifGeneric211Resource> QnPlOnvifGeneric211ResourcePtr;
