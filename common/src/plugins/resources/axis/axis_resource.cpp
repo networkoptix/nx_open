@@ -374,3 +374,16 @@ void QnPlAxisResource::setMotionMaskPhysical(int channel)
         ++motionWndItr;
     }
 }
+
+const QnResourceAudioLayout* QnPlAxisResource::getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
+{
+    if (isAudioEnabled())
+        return &m_audioLayout;
+    else
+        return QnPhysicalCameraResource::getAudioLayout(dataProvider);
+}
+
+QnResourceAudioLayout::AudioTrack QnAxisAudioLayout::getAudioTrackInfo(int /*index*/) const
+{
+    return AudioTrack();
+}

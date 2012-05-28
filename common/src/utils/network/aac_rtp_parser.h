@@ -6,6 +6,7 @@
 
 #include "rtp_stream_parser.h"
 #include "../media/nalUnits.h"
+#include "decoders/audio/aac.h"
 
 
 class QnAacRtpParser: public QnRtpStreamParser
@@ -17,9 +18,9 @@ public:
 
     virtual bool processData(quint8* rtpBuffer, int readed, QList<QnAbstractMediaDataPtr>& result) override;
 private:
-    void processIntParam(const QByteArray& param, int& setValue, const QByteArray& checkName);
-    void processHexParam(const QByteArray& param, QByteArray& setValue, const QByteArray& checkName);
-    void processStringParam(const QByteArray& param, QByteArray& setValue, const QByteArray& checkName);
+    void processIntParam(const QByteArray& checkName, int& setValue, const QByteArray& param);
+    void processHexParam(const QByteArray& checkName, QByteArray& setValue, const QByteArray& param);
+    void processStringParam(const QByteArray& checkName, QByteArray& setValue, const QByteArray& param);
 private:
     int m_sizeLength; // 0 if constant size. see RFC3640
     int m_constantSize;
@@ -37,7 +38,8 @@ private:
     QByteArray m_config;
     QByteArray m_mode;
     bool m_auHeaderExists;
-    QByteArray m_adtsHeader;
+
+    AACCodec m_aacHelper;
 };
 
 #endif // __AAC_RTP_PARSER_H

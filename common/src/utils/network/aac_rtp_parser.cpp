@@ -3,6 +3,7 @@
 #include "rtpsession.h"
 #include "utils/common/synctime.h"
 #include "core/datapacket/mediadatapacket.h"
+#include "../common/math.h"
 
 QnAacRtpParser::QnAacRtpParser():
         QnRtpStreamParser()
@@ -27,7 +28,7 @@ QnAacRtpParser::~QnAacRtpParser()
 {
 }
 
-void QnAacRtpParser::processIntParam(const QByteArray& param, int& setValue, const QByteArray& checkName)
+void QnAacRtpParser::processIntParam(const QByteArray& checkName, int& setValue, const QByteArray& param)
 {
     int valuePos = param.indexOf('=');
     if (valuePos == -1)
@@ -38,7 +39,7 @@ void QnAacRtpParser::processIntParam(const QByteArray& param, int& setValue, con
         setValue = paramValue.toInt();
 }
 
-void QnAacRtpParser::processHexParam(const QByteArray& param, QByteArray& setValue, const QByteArray& checkName)
+void QnAacRtpParser::processHexParam(const QByteArray& checkName, QByteArray& setValue, const QByteArray& param)
 {
     int valuePos = param.indexOf('=');
     if (valuePos == -1)
@@ -49,7 +50,7 @@ void QnAacRtpParser::processHexParam(const QByteArray& param, QByteArray& setVal
         setValue = QByteArray::fromHex(paramValue);
 }
 
-void QnAacRtpParser::processStringParam(const QByteArray& param, QByteArray& setValue, const QByteArray& checkName)
+void QnAacRtpParser::processStringParam(const QByteArray& checkName, QByteArray& setValue, const QByteArray& param)
 {
     int valuePos = param.indexOf('=');
     if (valuePos == -1)
@@ -97,18 +98,16 @@ void QnAacRtpParser::setSDPInfo(QList<QByteArray> lines)
         }   
     }
     m_auHeaderExists = m_sizeLength || m_indexLength || m_indexDeltaLength || m_CTSDeltaLength || m_DTSDeltaLength || m_randomAccessIndication || m_streamStateIndication;
-
-    // todo: build m_adtsHeader here
+    m_aacHelper.readConfig(m_config);
 }
 
 bool QnAacRtpParser::processData(quint8* rtpBuffer, int bufferSize, QList<QnAbstractMediaDataPtr>& result)
 {
     result.clear();
     QVector<int> auSize;
-    QVector<int> auIndexDelta;
+    QVector<int> auIndex;
     QVector<int> auCtsDelta;
     QVector<int> auDtsDelta;
-    int auIndex = 0;
     bool rapFlag = false;
     int streamStateValue = 0;
 
@@ -121,23 +120,20 @@ bool QnAacRtpParser::processData(quint8* rtpBuffer, int bufferSize, QList<QnAbst
     {
         if (m_auHeaderExists)
         {
-            int firstHeader = 1;
             if (end - curPtr < 2)
                 return false;
-            int auHeaderLen = (curPtr[0] << 8) + curPtr[1];
-            do {
-                BitStreamReader reader(curPtr, curPtr + auHeaderLen);
-                int headerLen = m_sizeLength + m_indexLength*firstHeader + m_CTSDeltaLength + m_DTSDeltaLength + m_randomAccessIndication + m_streamStateIndication;
-                int bitsLeft = auHeaderLen*8 - reader.getBitsCount();
-                if (bitsLeft < headerLen)
-                    break;
-
+            unsigned auHeaderLen = (curPtr[0] << 8) + curPtr[1];
+            curPtr += 2;
+            BitStreamReader reader(curPtr, curPtr + auHeaderLen);
+            while(reader.getBitsCount() < auHeaderLen) 
+            {
                 if (m_sizeLength)
                     auSize << reader.getBits(m_sizeLength);
                 if (m_indexLength) {
-                    if (firstHeader)
-                        auIndex = reader.getBits(m_indexLength);
-                    auIndexDelta << reader.getBits(m_indexDeltaLength);
+                    if (auIndex.isEmpty())
+                        auIndex << reader.getBits(m_indexLength);
+                    else
+                        auIndex << auIndex.last() + reader.getBits(m_indexDeltaLength) + 1;
                 }
                 if (m_CTSDeltaLength) {
                     if (reader.getBit())
@@ -155,10 +151,8 @@ bool QnAacRtpParser::processData(quint8* rtpBuffer, int bufferSize, QList<QnAbst
                     rapFlag = reader.getBit();
                 if (m_streamStateIndication)
                     streamStateValue = reader.getBits(m_streamStateIndication);
-
-                firstHeader = 0;
-            } while (1);
-            curPtr += auHeaderLen;
+            }
+            curPtr += qPower2Ceil(auHeaderLen, 8)/8;
         }
     } catch(...) {
         return false;
@@ -167,20 +161,24 @@ bool QnAacRtpParser::processData(quint8* rtpBuffer, int bufferSize, QList<QnAbst
     for (int i = 0; curPtr < end; ++i)
     {
         int unitSize = m_constantSize;
-        if (curPtr + unitSize > end)
-            return false;
         
         if (!m_constantSize) {
             if (auSize.size() < i+1)
                 return false;
             unitSize = auSize[i];
         }
+        if (curPtr + unitSize > end)
+            return false;
+
         QnCompressedAudioDataPtr audioData = QnCompressedAudioDataPtr(new QnCompressedAudioData(CL_MEDIA_ALIGNMENT, unitSize));
         audioData->compressionType = CODEC_ID_AAC;
         audioData->timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;
 
-        audioData->data.write(m_adtsHeader);
+        quint8 adtsHeaderBuff[AAC_HEADER_LEN];
+        m_aacHelper.buildADTSHeader(adtsHeaderBuff, unitSize);
+        audioData->data.write((const char*) adtsHeaderBuff, AAC_HEADER_LEN);
         audioData->data.write((const char*)curPtr, unitSize);
+        result << audioData;
 
         curPtr += unitSize;
     }

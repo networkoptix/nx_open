@@ -296,12 +296,15 @@ QnAbstractMediaDataPtr QnAxisStreamReader::getNextData()
         rez = m_rtpStreamParser.getNextData();
         if (rez) 
         {
-            QnCompressedVideoDataPtr videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(rez);
-            if (videoData) 
+            if (rez->dataType == QnAbstractMediaData::VIDEO) {
+                QnCompressedVideoDataPtr videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(rez);
                 parseMotionInfo(videoData);
-            
-            if (isGotFrame(videoData))
+                if (isGotFrame(videoData))
+                    break;
+            }
+            else if (rez->dataType == QnAbstractMediaData::AUDIO) {
                 break;
+            }
         }
         else {
             closeStream();

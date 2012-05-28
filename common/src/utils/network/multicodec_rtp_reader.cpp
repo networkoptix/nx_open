@@ -3,6 +3,7 @@
 #include "core/resource/network_resource.h"
 #include "utils/network/h264_rtp_parser.h"
 #include "aac_rtp_parser.h"
+#include "utils/common/util.h"
 
 static const int RTSP_RETRY_COUNT = 3;
 
@@ -47,13 +48,14 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
     if (!isStreamOpened())
         return QnAbstractMediaDataPtr(0);
 
-    while (m_RtpSession.isOpened() && m_lastVideoData.isEmpty() && m_lastAudioData.isEmpty())
+    QTime dataTimer;
+    dataTimer.restart();
+
+    while (m_RtpSession.isOpened() && m_lastVideoData.isEmpty() && m_lastAudioData.isEmpty() && dataTimer.elapsed() <= MAX_FRAME_DURATION)
     {
         int nfds = 0;
         FD_ZERO(&read_set);
         
-        int vPort = m_videoIO->getMediaSocket()->getLocalPort();
-
         if(m_videoIO)  {
             FD_SET(m_videoIO->getMediaSocket()->handle(), &read_set);
             nfds = qMax(m_videoIO->getMediaSocket()->handle(), nfds);
@@ -116,6 +118,8 @@ QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
         return new CLH264RtpParser;
     else if (codecName == "mpeg4-generic")
         return new QnAacRtpParser;
+    else
+        return 0;
 }
 
 void QnMulticodecRtpReader::initIO(RTPIODevice** ioDevice, QnRtpStreamParser** parser, const QString& mediaType)

@@ -8,6 +8,14 @@
 #include "utils/network/simple_http_client.h"
 #include "core/datapacket/mediadatapacket.h"
 
+class QnAxisAudioLayout: public QnResourceAudioLayout
+{
+public:
+    QnAxisAudioLayout(): QnResourceAudioLayout() {}
+    virtual int numberOfChannels() const override { return 1; }
+    virtual AudioTrack getAudioTrackInfo(int /*index*/) const override;
+};
+
 class QnPlAxisResource : public QnPhysicalCameraResource
 {
 public:
@@ -36,6 +44,7 @@ public:
     void readMotionInfo();
 
     virtual void setMotionMaskPhysical(int channel) override;
+    virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider) override;
 protected:
     void init();
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
@@ -55,6 +64,7 @@ private:
     QMap<int, QRect> m_motionWindows;
     QMap<int, QRect> m_motionMask;
     qint64 m_lastMotionReadTime;
+    QnAxisAudioLayout m_audioLayout;
 };
 
 typedef QSharedPointer<QnPlAxisResource> QnPlAxisResourcePtr;
