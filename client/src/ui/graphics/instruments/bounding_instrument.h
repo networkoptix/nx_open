@@ -87,6 +87,14 @@ public:
      */
     void setSizeEnforced(QGraphicsView *view, bool sizeEnforced = true);
 
+    /**
+     * Enforces the given graphics view to preserve its current scale, even if 
+     * it lies outside the scale boundaries. Thus, the scale boundaries are
+     * effectively extended to include the current scale. However, they 
+     * will automatically be contracted once the graphics view's scale changes.
+     *
+     * \param view                      Graphics view to use.
+     */
     void stickScale(QGraphicsView *view);
 
 public slots:
