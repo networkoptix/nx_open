@@ -4,6 +4,8 @@
 #include "utils/network/h264_rtp_parser.h"
 #include "aac_rtp_parser.h"
 #include "utils/common/util.h"
+#include "core/resource/resource_media_layout.h"
+#include "core/resource/media_resource.h"
 
 static const int RTSP_RETRY_COUNT = 3;
 
@@ -19,6 +21,9 @@ m_audioIO(0)
         m_RtpSession.setTCPTimeout(netRes->getNetworkTimeout());
     else
         m_RtpSession.setTCPTimeout(1000 * 2);
+    QnMediaResourcePtr mr = qSharedPointerDynamicCast<QnMediaResource>(res);
+    m_numberOfVideoChannels = mr->getVideoLayout()->numberOfChannels();
+    
 }
 
 QnMulticodecRtpReader::~QnMulticodecRtpReader()
@@ -106,6 +111,8 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
     {
         result = m_lastAudioData[0];
         m_lastAudioData.removeAt(0);
+        result->channelNumber += m_numberOfVideoChannels;
+
         return result;
     }
 

@@ -41,6 +41,7 @@ private:
 
     QList<QnAbstractMediaDataPtr> m_lastVideoData;
     QList<QnAbstractMediaDataPtr> m_lastAudioData;
+    int m_numberOfVideoChannels;
 };
 
 #endif //__MULTI_CODEC_RTP_READER__

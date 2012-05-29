@@ -335,8 +335,8 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     }
 
     int rtspChannelNum = media->channelNumber;
-    if (media->dataType == QnAbstractMediaData::AUDIO)
-        rtspChannelNum += m_owner->numOfVideoChannels();
+    //if (media->dataType == QnAbstractMediaData::AUDIO)
+    //    rtspChannelNum += m_owner->numOfVideoChannels();
 
     //QMutexLocker lock(&m_mutex);
     m_mutex.lock();

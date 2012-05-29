@@ -2,7 +2,6 @@
 #include "core/resource/resource_media_layout.h"
 #include "core/datapacket/mediadatapacket.h"
 #include "utils/common/sleep.h"
-#include "core/resource/resource_media_layout.h"
 #include "utils/common/util.h"
 #include "../resource/camera_resource.h"
 

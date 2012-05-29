@@ -655,12 +655,15 @@ AVCodecContext *QnFfmpegHelper::deserializeCodecContext(const char *data, int da
                 break;
             case Field_Channels:
                 ctx->channels = *(int*) fieldData;
+                av_free(fieldData);
                 break;
             case Field_SampleRate:
                 ctx->sample_rate = *(int*) fieldData;
+                av_free(fieldData);
                 break;
             case Field_Sample_Fmt:
                 ctx->sample_fmt = *(AVSampleFormat*) fieldData;
+                av_free(fieldData);
                 break;
         }
     }

@@ -106,6 +106,9 @@ void QnAacRtpParser::setSDPInfo(QList<QByteArray> lines)
     m_context->ctx()->sample_fmt = AV_SAMPLE_FMT_S16;
     m_context->ctx()->time_base.num = 1;
     m_context->ctx()->time_base.den = m_aacHelper.m_sample_rate;
+    m_context->ctx()->extradata = (uint8_t*) av_malloc(m_config.size());
+    memcpy(m_context->ctx()->extradata, m_config.data(), m_config.size());
+    m_context->ctx()->extradata_size = m_config.size();
 
     QnResourceAudioLayout::AudioTrack track;
     track.codecContext = m_context;
@@ -187,9 +190,9 @@ bool QnAacRtpParser::processData(quint8* rtpBuffer, int bufferSize, QList<QnAbst
         audioData->context = m_context;
         audioData->timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;
 
-        quint8 adtsHeaderBuff[AAC_HEADER_LEN];
-        m_aacHelper.buildADTSHeader(adtsHeaderBuff, unitSize);
-        audioData->data.write((const char*) adtsHeaderBuff, AAC_HEADER_LEN);
+        //quint8 adtsHeaderBuff[AAC_HEADER_LEN];
+        //m_aacHelper.buildADTSHeader(adtsHeaderBuff, unitSize);
+        //audioData->data.write((const char*) adtsHeaderBuff, AAC_HEADER_LEN);
         audioData->data.write((const char*)curPtr, unitSize);
         result << audioData;
 

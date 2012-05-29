@@ -210,8 +210,8 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
     }
 
     int streamIndex = channel;
-    if (md->dataType == QnAbstractMediaData::AUDIO)
-        streamIndex += m_videoChannels;
+    //if (md->dataType == QnAbstractMediaData::AUDIO)
+    //    streamIndex += m_videoChannels;
 
     if (streamIndex >= m_formatCtx->nb_streams)
         return true; // skip packet
@@ -368,6 +368,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
             }
 
             avcodec_copy_context(audioStream->codec, audioLayout->getAudioTrackInfo(i).codecContext->ctx());
+            audioStream->codec->flags |= CODEC_FLAG_GLOBAL_HEADER;
             audioStream->first_dts = 0;
         }
 
