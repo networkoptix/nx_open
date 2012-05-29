@@ -27,8 +27,8 @@ message Camera {
     }
 
     message Property {
-      required int32  id     = 1;
-      required int32  typeId = 2;
+      required int32  typeId = 1;
+      optional string name   = 2;
       required string value  = 3;
     }
 

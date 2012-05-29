@@ -86,6 +86,7 @@ public:
     void append(const QnParam &param);
     bool isEmpty() const;
     QList<QnParam> list() const;
+    QList<QString> keys() const;
 
     QList<QString> groupList() const;
     QList<QString> subGroupList(const QString &group) const;
