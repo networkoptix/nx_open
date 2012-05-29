@@ -563,7 +563,7 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     updatePlaying();
     updateSpeedRange();
     updateSpeed();
-    updateThumbnails();
+    updateThumbnailsLoader();
 
     emit currentWidgetChanged();
 }
@@ -817,7 +817,7 @@ void QnWorkbenchNavigator::updateSpeedRange() {
     emit speedRangeChanged();
 }
 
-void QnWorkbenchNavigator::updateThumbnails() {
+void QnWorkbenchNavigator::updateThumbnailsLoader() {
     if (m_currentWidget) {
         m_thumbnailsLoader.reset(new QnThumbnailsLoader(m_currentWidget->resource()));
     } else {
