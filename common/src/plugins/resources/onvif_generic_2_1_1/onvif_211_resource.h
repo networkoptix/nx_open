@@ -73,10 +73,13 @@ private:
     int addMotionWindow();
     bool updateMotionWindow(int wndNum, int sensitivity, const QRect& rect);
     int toAxisMotionSensitivity(int sensitivity);
+    void fetchAndSetDeviceInformation();
     void fetchAndSetVideoEncoderOptions();
     void setVideoEncoderOptions(const _onvifMedia__GetVideoEncoderConfigurationOptionsResponse& response);
     void analyzeVideoEncoders(VideoEncoders& encoders, bool setOptions);
     int countAppropriateProfiles(const _onvifMedia__GetProfilesResponse& response, VideoEncoders& encoders);
+    void setOnvifUrls();
+    void save();
 private:
     static const char* ONVIF_PROTOCOL_PREFIX;
     static const char* ONVIF_URL_SUFFIX;
@@ -94,6 +97,7 @@ private:
     bool videoOptionsNotSet;
     QString mediaUrl;
     QString deviceUrl;
+    bool reinitDeviceInfo;
 };
 
 typedef QSharedPointer<QnPlOnvifGeneric211Resource> QnPlOnvifGeneric211ResourcePtr;
