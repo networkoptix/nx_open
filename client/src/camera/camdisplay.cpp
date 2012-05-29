@@ -896,7 +896,8 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
 
     bool flushCurrentBuffer = false;
     int expectedBufferSize = m_isRealTimeSource ? REALTIME_AUDIO_BUFFER_SIZE : DEFAULT_AUDIO_BUFF_SIZE;
-    bool audioParamsChanged = ad && (m_playingFormat != ad->format || m_audioDisplay->getAudioBufferSize() != expectedBufferSize);
+    QnCodecAudioFormat currentAudioFormat;
+    bool audioParamsChanged = ad && (m_playingFormat != currentAudioFormat.fromAvStream(ad->context) || m_audioDisplay->getAudioBufferSize() != expectedBufferSize);
     if (((media->flags & QnAbstractMediaData::MediaFlags_AfterEOF) || audioParamsChanged) &&
         m_videoQueue[0].size() > 0)
     {
@@ -914,7 +915,7 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
             delete m_audioDisplay;
             m_audioBufferSize = expectedBufferSize;
             m_audioDisplay = new CLAudioStreamDisplay(m_audioBufferSize);
-            m_playingFormat = ad->format;
+            m_playingFormat = currentAudioFormat;
         }
 
         // after seek, when audio is shifted related video (it is often), first audio packet will be < seek threshold

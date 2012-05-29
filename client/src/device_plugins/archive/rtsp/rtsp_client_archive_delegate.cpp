@@ -608,11 +608,11 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(con
                     video->height = context->ctx()->coded_height;
                 }
             }
-            else if (context && context->ctx()->codec_type == AVMEDIA_TYPE_AUDIO && dataType == QnAbstractMediaData::AUDIO)
+            else if (context && context->ctx() && context->ctx()->codec_type == AVMEDIA_TYPE_AUDIO && dataType == QnAbstractMediaData::AUDIO)
             {
                 QnCompressedAudioData *audio = new QnCompressedAudioData(CL_MEDIA_ALIGNMENT, dataSize); // , context
                 audio->context = context;
-                audio->format.fromAvStream(context->ctx());
+                //audio->format.fromAvStream(context->ctx());
                 nextPacket = QnCompressedAudioDataPtr(audio);
             }
             else

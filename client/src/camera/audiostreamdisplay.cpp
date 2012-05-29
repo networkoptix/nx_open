@@ -278,7 +278,8 @@ void CLAudioStreamDisplay::playCurrentBuffer()
             return;
 
         //  convert format
-        QnAudioFormat audioFormat = data->format;
+        QnCodecAudioFormat audioFormat;
+        audioFormat.fromAvStream(data->context->ctx());
         if (!m_isConvertMethodInitialized)
         {
             if (m_audioSound)
@@ -316,7 +317,7 @@ void CLAudioStreamDisplay::playCurrentBuffer()
 }
 
 //=======================================================================
-QnAudioFormat CLAudioStreamDisplay::downmix(CLByteArray& audio, QnAudioFormat format)
+QnCodecAudioFormat CLAudioStreamDisplay::downmix(CLByteArray& audio, QnCodecAudioFormat format)
 {
     if (format.channels() > 2)
     {
@@ -336,7 +337,7 @@ QnAudioFormat CLAudioStreamDisplay::downmix(CLByteArray& audio, QnAudioFormat fo
     return format;
 }
 
-QnAudioFormat CLAudioStreamDisplay::float2int16(CLByteArray& audio, QnAudioFormat format)
+QnCodecAudioFormat CLAudioStreamDisplay::float2int16(CLByteArray& audio, QnCodecAudioFormat format)
 {
     Q_ASSERT(sizeof(float) == 4); // not sure about sizeof(float) in 64 bit version
 
@@ -357,7 +358,7 @@ QnAudioFormat CLAudioStreamDisplay::float2int16(CLByteArray& audio, QnAudioForma
     return format;
 }
 
-QnAudioFormat CLAudioStreamDisplay::int32Toint16(CLByteArray& audio, QnAudioFormat format)
+QnCodecAudioFormat CLAudioStreamDisplay::int32Toint16(CLByteArray& audio, QnCodecAudioFormat format)
 {
     Q_ASSERT(sizeof(float) == 4); // not sure about sizeof(float) in 64 bit version
 
@@ -377,7 +378,7 @@ QnAudioFormat CLAudioStreamDisplay::int32Toint16(CLByteArray& audio, QnAudioForm
     return format;
 }
 
-QnAudioFormat CLAudioStreamDisplay::float2int32(CLByteArray& audio, QnAudioFormat format)
+QnCodecAudioFormat CLAudioStreamDisplay::float2int32(CLByteArray& audio, QnCodecAudioFormat format)
 {
     Q_ASSERT(sizeof(float) == 4); // not sure about sizeof(float) in 64 bit version
 

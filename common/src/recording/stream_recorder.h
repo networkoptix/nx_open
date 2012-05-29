@@ -119,6 +119,7 @@ private:
     QPixmap m_logo;
     QString m_container;
     int m_videoChannels;
+    QnCodecAudioFormat m_prevAudioFormat;
 };
 
 #endif // _STREAM_RECORDER_H__

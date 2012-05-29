@@ -65,6 +65,8 @@ CLFFmpegAudioDecoder::CLFFmpegAudioDecoder(QnCompressedAudioDataPtr data):
         avcodec_copy_context(c, data->context->ctx());
     }
     else {
+        Q_ASSERT_X(false, Q_FUNC_INFO, "Audio packets without codec is deprecated!");
+        /*
         c->codec_id = m_codec;
         c->codec_type = AVMEDIA_TYPE_AUDIO;
         c->sample_fmt = audioFormatQtToFfmpeg(data->format);
@@ -82,6 +84,7 @@ CLFFmpegAudioDecoder::CLFFmpegAudioDecoder(QnCompressedAudioDataPtr data):
             c->extradata = (quint8*) av_malloc(c->extradata_size);
             memcpy(c->extradata, &data->format.extraData[0], c->extradata_size);
         }
+        */
     }
 	avcodec_open(c, codec);
 

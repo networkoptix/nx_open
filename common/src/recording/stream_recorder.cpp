@@ -163,6 +163,17 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
         close();
     }
 
+    if (md->dataType == QnAbstractMediaData::AUDIO && m_truncateInterval > 0)
+    {
+        QnCompressedAudioDataPtr ad = qSharedPointerDynamicCast<QnCompressedAudioData>(md);
+        QnCodecAudioFormat audioFormat(ad->context);
+        if (!m_firstTime && audioFormat != m_prevAudioFormat) {
+            close(); // restart recording file if audio format is changed
+        }
+        m_prevAudioFormat = audioFormat; 
+    }
+    
+
     if (md->dataType == QnAbstractMediaData::META_V1)
         return saveMotion(md);
 

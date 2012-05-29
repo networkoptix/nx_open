@@ -6,7 +6,7 @@
 #include "utils/common/util.h"
 #include "core/resource/resource_media_layout.h"
 #include "core/resource/media_resource.h"
-#include "g711_rtp_parser.h"
+#include "simpleaudio_rtp_parser.h"
 
 static const int RTSP_RETRY_COUNT = 3;
 
@@ -127,17 +127,17 @@ QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
     else if (codecName == "mpeg4-generic")
         return new QnAacRtpParser;
     else if (codecName == "PCMA") {
-        QnG711RtpParser* result = new QnG711RtpParser;
+        QnSimpleAudioRtpParser* result = new QnSimpleAudioRtpParser;
         result->setCodecId(CODEC_ID_PCM_MULAW);
         return result;
     }
-    else if (codecName.startsWith("g726")) // g726-24, g726-32
+    else if (codecName.startsWith("g726")) // g726-24, g726-32 e.t.c
     { 
         int bitRatePos = codecName.indexOf('-');
         if (bitRatePos == -1)
             return 0;
         QString bitsPerSample = codecName.mid(bitRatePos+1);
-        QnG711RtpParser* result = new QnG711RtpParser;
+        QnSimpleAudioRtpParser* result = new QnSimpleAudioRtpParser;
         result->setCodecId(CODEC_ID_ADPCM_G726);
         result->setBitsPerSample(bitsPerSample.toInt()/8);
         result->setSampleFormat(AV_SAMPLE_FMT_S16);

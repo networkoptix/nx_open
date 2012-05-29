@@ -51,10 +51,10 @@ private:
     int playAfterMs() const;
     int msInQueue() const;
 
-	static QnAudioFormat downmix(CLByteArray& audio, QnAudioFormat format);
-	static QnAudioFormat float2int16(CLByteArray& audio, QnAudioFormat format);
-	static QnAudioFormat float2int32(CLByteArray& audio, QnAudioFormat format);
-    static QnAudioFormat int32Toint16(CLByteArray& audio, QnAudioFormat format);
+	static QnCodecAudioFormat downmix(CLByteArray& audio, QnCodecAudioFormat format);
+	static QnCodecAudioFormat float2int16(CLByteArray& audio, QnCodecAudioFormat format);
+	static QnCodecAudioFormat float2int32(CLByteArray& audio, QnCodecAudioFormat format);
+    static QnCodecAudioFormat int32Toint16(CLByteArray& audio, QnCodecAudioFormat format);
 	bool initFormatConvertRule(QnAudioFormat format);
 private:
 	enum SampleConvertMethod {SampleConvert_None, SampleConvert_Float2Int32, SampleConvert_Float2Int16, SampleConvert_Int32ToInt16};
