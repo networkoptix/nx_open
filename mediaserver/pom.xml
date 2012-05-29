@@ -60,7 +60,7 @@
 			<version>2.1.1</version>
 			<type>zip</type>
 			<classifier>${platform}-${arch}</classifier>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>org</groupId>
 			<artifactId>openssl</artifactId>

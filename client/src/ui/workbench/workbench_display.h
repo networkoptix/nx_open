@@ -298,7 +298,9 @@ protected:
 
     void updateCurrentMarginFlags();
 
-    void adjustGeometry(QnWorkbenchItem *item, bool animate = true);
+    void adjustGeometryLater(QnWorkbenchItem *item, bool animate = true);
+    Q_SLOT void adjustGeometry(QnWorkbenchItem *item, bool animate = true);
+    Q_SIGNAL void geometryAdjustmentRequested(QnWorkbenchItem *item, bool animate = true);
 
     qreal layerFrontZValue(Qn::ItemLayer layer) const;
     Qn::ItemLayer synchronizedLayer(QnWorkbenchItem *item) const;

@@ -1,7 +1,7 @@
 @echo off
 
 SET VERSION=${project.version}.${buildNumber}
-SET "CURRENTDIR=%cd%"
+SET "CURRENTDIR=${project.build.directory}"
 SET ARTIFACTID=${project.parent.artifactId}
 
 echo version = %VERSION%
@@ -10,10 +10,10 @@ rmdir /s /q "c:\records"
 
 CD %CURRENTDIR%
 
-start /B /WAIT msiexec /I "bin\${project.build.finalName}.msi" /qb- /Lv* "install.log" APPSERVER_PASSWORD=admin APPSERVER_PORT="8000" SERVER_APPSERVER_HOST="localhost" SERVER_APPSERVER_PORT="8000" SERVER_APPSERVER_LOGIN="admin" SERVER_APPSERVER_PASSWORD="admin" CLIENT_APPSERVER_HOST="localhost" CLIENT_APPSERVER_PORT="8000" CLIENT_APPSERVER_LOGIN="admin" CLIENT_APPSERVER_PASSWORD="admin" SERVER_DIRECTORY="c:\records"
+start /B /WAIT msiexec /I "bin\${project.build.finalName}.msi" /qb- /Lv* "install.log" APPSERVER_PASSWORD=123 APPSERVER_PORT="7001" SERVER_APPSERVER_HOST="localhost" SERVER_APPSERVER_PORT="7001" SERVER_APPSERVER_LOGIN="admin" SERVER_APPSERVER_PASSWORD="123" CLIENT_APPSERVER_HOST="localhost" CLIENT_APPSERVER_PORT="7001" CLIENT_APPSERVER_LOGIN="admin" CLIENT_APPSERVER_PASSWORD="123" SERVER_DIRECTORY="c:\records"
 echo installer errorlevel is %ERRORLEVEL%
 
-cd "%VS90COMNTOOLS%\..\..\..\Network Optix\HD Witness\Client\"
+cd "c:\Program Files\Network Optix\HD Witness\Client\"
 
 rem ugly hack! --auth parameter is applied only in second launch!
 call client.exe --test-timeout 5000 --auth "http://admin:admin@127.0.0.1:8000" --test-resource-substring Server
