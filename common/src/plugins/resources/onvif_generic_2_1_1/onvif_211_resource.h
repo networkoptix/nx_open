@@ -23,6 +23,8 @@ class QnPlOnvifGeneric211Resource : public QnPhysicalCameraResource
 {
 public:
     static const char* MANUFACTURE;
+    static const QString& MEDIA_URL_PARAM_NAME;
+    static const QString& DEVICE_URL_PARAM_NAME;
 
     QnPlOnvifGeneric211Resource();
 
