@@ -190,26 +190,25 @@ QnNetworkResourcePtr OnvifGeneric211ResourceSearcher::processPacket(QnResourceLi
         name = "Unknown - " + mac;
     }
 
-
+    //Trying to get onvif URLs
     QString mediaUrl;
     QString deviceUrl;
-
     {
-        //Trying to get MAC address
         _onvifDevice__GetCapabilities request;
         _onvifDevice__GetCapabilitiesResponse response;
         if (login) soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", login, passwd);
+
         soapRes = soapProxy.GetCapabilities(endpoint.toStdString().c_str(), NULL, &request, &response);
         if (soapRes != SOAP_OK && cl_log.logLevel() >= cl_logDEBUG1) {
-            qDebug() << "OnvifGeneric211ResourceSearcher::processPacket: GetCapabilities ERROR!!!! SOAP to endpoint '" << endpoint
-                     << "' failed. Error code: " << soapRes << "Description: "
-                     << soapProxy.soap_fault_string() << ". " << soapProxy.soap_fault_detail()
-                     << ". Can't fetch MAC, will try to get analog." ;
+            qDebug() << "OnvifGeneric211ResourceSearcher::processPacket: can't fetch media and device URLs. Reason: SOAP to endpoint "
+                     << endpoint << " failed. Error code: " << soapRes << "Description: "
+                     << soapProxy.soap_fault_string() << ". " << soapProxy.soap_fault_detail();
         }
-        mediaUrl = response.Capabilities->Media->XAddr.c_str();
-        qDebug() << "Media URL found: " << mediaUrl;
-        deviceUrl = response.Capabilities->Device->XAddr.c_str();
-        qDebug() << "Device URL found: " << deviceUrl;
+
+        if (response.Capabilities) {
+            mediaUrl = response.Capabilities->Media? response.Capabilities->Media->XAddr.c_str(): mediaUrl;
+            deviceUrl = response.Capabilities->Device? response.Capabilities->Device->XAddr.c_str(): deviceUrl;
+        }
     }
 
     QnNetworkResourcePtr resource( new QnPlOnvifGeneric211Resource() );
@@ -219,6 +218,14 @@ QnNetworkResourcePtr OnvifGeneric211ResourceSearcher::processPacket(QnResourceLi
     if (login) {
         qDebug() << "OnvifGeneric211ResourceSearcher::processPacket: Setting login = " << login << ", password = " << passwd;
         resource->setAuth(login, passwd);
+    }
+    if (!mediaUrl.isEmpty()) {
+        qDebug() << "OnvifGeneric211ResourceSearcher::processPacket: Setting mediaUrl = " << mediaUrl;
+        resource->setParam(QnPlOnvifGeneric211Resource::MEDIA_URL_PARAM_NAME, mediaUrl, QnDomainDatabase);
+    }
+    if (!deviceUrl.isEmpty()) {
+        qDebug() << "OnvifGeneric211ResourceSearcher::processPacket: Setting deviceUrl = " << deviceUrl;
+        resource->setParam(QnPlOnvifGeneric211Resource::DEVICE_URL_PARAM_NAME, deviceUrl, QnDomainDatabase);
     }
 
     qDebug() << "OnvifGeneric211ResourceSearcher::processPacket: Found new camera: endpoint: " << endpoint

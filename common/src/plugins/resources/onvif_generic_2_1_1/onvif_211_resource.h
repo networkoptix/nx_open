@@ -23,6 +23,8 @@ class QnPlOnvifGeneric211Resource : public QnPhysicalCameraResource
 {
 public:
     static const char* MANUFACTURE;
+    static const QString& MEDIA_URL_PARAM_NAME;
+    static const QString& DEVICE_URL_PARAM_NAME;
 
     QnPlOnvifGeneric211Resource();
 
@@ -50,6 +52,13 @@ public:
     QRect getMotionWindow(int num) const;
     QMap<int, QRect>  getMotionWindows() const;
     void readMotionInfo();
+
+    const QString& getMediaUrl() const { return mediaUrl; }
+    void setMediaUrl(const QString& src) { mediaUrl = src; }
+
+    const QString& getDeviceUrl() const { return deviceUrl; }
+    void setDeviceUrl(const QString& src) { deviceUrl = src; }
+
 protected:
     void init();
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
@@ -83,7 +92,6 @@ private:
     int maxQuality;
     bool hasDual;
     bool videoOptionsNotSet;
-public:
     QString mediaUrl;
     QString deviceUrl;
 };

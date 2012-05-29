@@ -21,6 +21,8 @@ static const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
 const char* QnPlOnvifGeneric211Resource::ONVIF_PROTOCOL_PREFIX = "http://";
 const char* QnPlOnvifGeneric211Resource::ONVIF_URL_SUFFIX = ":80/onvif/device_service";
 const int QnPlOnvifGeneric211Resource::DEFAULT_IFRAME_DISTANCE = 20;
+const QString& QnPlOnvifGeneric211Resource::MEDIA_URL_PARAM_NAME = *(new QString("MediaUrl"));
+const QString& QnPlOnvifGeneric211Resource::DEVICE_URL_PARAM_NAME = *(new QString("DeviceUrl"));
 
 
 //width > height is prefered
