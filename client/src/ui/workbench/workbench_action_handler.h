@@ -117,6 +117,8 @@ protected:
     bool closeLayouts(const QnLayoutResourceList &resources, bool waitForReply = false);
     bool closeLayouts(const QnWorkbenchLayoutList &layouts, bool waitForReply = false);
 
+    void setLayoutAspectRatio(const QnLayoutResourcePtr &resource, double aspectRatio);
+
     void openNewWindow(const QStringList &args);
 
     void saveCameraSettingsFromDialog();
@@ -188,11 +190,13 @@ protected slots:
     void at_takeScreenshotAction_triggered();
     void at_exitAction_triggered();
 
+    void at_setCurrentLayoutAspectRatio4x3Action_triggered();
+    void at_setCurrentLayoutAspectRatio16x9Action_triggered();
+
     void at_exportTimeSelectionAction_triggered();
     void at_exportLayoutAction_triggered();
     void at_camera_exportFinished(QString fileName);
     void at_camera_exportFailed(QString errorMessage);
-
 
     void at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle);
     void at_resource_deleted(int status, const QByteArray &data, const QByteArray &errorString, int handle);

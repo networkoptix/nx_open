@@ -125,55 +125,57 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     /* We're using queued connection here as modifying a field in its change notification handler may lead to problems. */
     connect(workbench(),                                    SIGNAL(layoutsChanged()), this, SLOT(at_workbench_layoutsChanged()), Qt::QueuedConnection);
 
-    connect(action(Qn::LightMainMenuAction),                SIGNAL(triggered()),    this,   SLOT(at_mainMenuAction_triggered()));
-    connect(action(Qn::DarkMainMenuAction),                 SIGNAL(triggered()),    this,   SLOT(at_mainMenuAction_triggered()));
-    connect(action(Qn::AboutAction),                        SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
-    connect(action(Qn::SystemSettingsAction),               SIGNAL(triggered()),    this,   SLOT(at_systemSettingsAction_triggered()));
-    connect(action(Qn::OpenFileAction),                     SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
-    connect(action(Qn::OpenFolderAction),                   SIGNAL(triggered()),    this,   SLOT(at_openFolderAction_triggered()));
-    connect(action(Qn::ConnectToServerAction),              SIGNAL(triggered()),    this,   SLOT(at_connectToServerAction_triggered()));
-    connect(action(Qn::GetMoreLicensesAction),              SIGNAL(triggered()),    this,   SLOT(at_getMoreLicensesAction_triggered()));
-    connect(action(Qn::ReconnectAction),                    SIGNAL(triggered()),    this,   SLOT(at_reconnectAction_triggered()));
-    connect(action(Qn::NextLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_nextLayoutAction_triggered()));
-    connect(action(Qn::PreviousLayoutAction),               SIGNAL(triggered()),    this,   SLOT(at_previousLayoutAction_triggered()));
-    connect(action(Qn::OpenInLayoutAction),                 SIGNAL(triggered()),    this,   SLOT(at_openInLayoutAction_triggered()));
-    connect(action(Qn::OpenInCurrentLayoutAction),          SIGNAL(triggered()),    this,   SLOT(at_openInCurrentLayoutAction_triggered()));
-    connect(action(Qn::OpenInNewLayoutAction),              SIGNAL(triggered()),    this,   SLOT(at_openInNewLayoutAction_triggered()));
-    connect(action(Qn::OpenInNewWindowAction),              SIGNAL(triggered()),    this,   SLOT(at_openInNewWindowAction_triggered()));
-    connect(action(Qn::OpenSingleLayoutAction),             SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
-    connect(action(Qn::OpenMultipleLayoutsAction),          SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
-    connect(action(Qn::OpenAnyNumberOfLayoutsAction),       SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
-    connect(action(Qn::OpenNewTabAction),                   SIGNAL(triggered()),    this,   SLOT(at_openNewTabAction_triggered()));
-    connect(action(Qn::OpenNewWindowAction),                SIGNAL(triggered()),    this,   SLOT(at_openNewWindowAction_triggered()));
-    connect(action(Qn::SaveLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_saveLayoutAction_triggered()));
-    connect(action(Qn::SaveLayoutAsAction),                 SIGNAL(triggered()),    this,   SLOT(at_saveLayoutAsAction_triggered()));
-    connect(action(Qn::SaveLayoutForCurrentUserAsAction),   SIGNAL(triggered()),    this,   SLOT(at_saveLayoutForCurrentUserAsAction_triggered()));
-    connect(action(Qn::SaveCurrentLayoutAction),            SIGNAL(triggered()),    this,   SLOT(at_saveCurrentLayoutAction_triggered()));
-    connect(action(Qn::SaveCurrentLayoutAsAction),          SIGNAL(triggered()),    this,   SLOT(at_saveCurrentLayoutAsAction_triggered()));
-    connect(action(Qn::CloseLayoutAction),                  SIGNAL(triggered()),    this,   SLOT(at_closeLayoutAction_triggered()));
-    connect(action(Qn::CloseAllButThisLayoutAction),        SIGNAL(triggered()),    this,   SLOT(at_closeAllButThisLayoutAction_triggered()));
-    connect(action(Qn::UserSettingsAction),                 SIGNAL(triggered()),    this,   SLOT(at_userSettingsAction_triggered()));
-    connect(action(Qn::CameraSettingsAction),               SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
-    connect(action(Qn::OpenInCameraSettingsDialogAction),   SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
-    connect(action(Qn::SelectionChangeAction),              SIGNAL(triggered()),    this,   SLOT(at_selectionChangeAction_triggered()));
-    connect(action(Qn::ServerSettingsAction),               SIGNAL(triggered()),    this,   SLOT(at_serverSettingsAction_triggered()));
-    connect(action(Qn::YouTubeUploadAction),                SIGNAL(triggered()),    this,   SLOT(at_youtubeUploadAction_triggered()));
-    connect(action(Qn::EditTagsAction),                     SIGNAL(triggered()),    this,   SLOT(at_editTagsAction_triggered()));
-    connect(action(Qn::OpenInFolderAction),                 SIGNAL(triggered()),    this,   SLOT(at_openInFolderAction_triggered()));
-    connect(action(Qn::DeleteFromDiskAction),               SIGNAL(triggered()),    this,   SLOT(at_deleteFromDiskAction_triggered()));
-    connect(action(Qn::RemoveLayoutItemAction),             SIGNAL(triggered()),    this,   SLOT(at_removeLayoutItemAction_triggered()));
-    connect(action(Qn::RemoveFromServerAction),             SIGNAL(triggered()),    this,   SLOT(at_removeFromServerAction_triggered()));
-    connect(action(Qn::NewUserAction),                      SIGNAL(triggered()),    this,   SLOT(at_newUserAction_triggered()));
-    connect(action(Qn::NewUserLayoutAction),                SIGNAL(triggered()),    this,   SLOT(at_newUserLayoutAction_triggered()));
-    connect(action(Qn::RenameAction),                       SIGNAL(triggered()),    this,   SLOT(at_renameAction_triggered()));
-    connect(action(Qn::DropResourcesAction),                SIGNAL(triggered()),    this,   SLOT(at_dropResourcesAction_triggered()));
-    connect(action(Qn::DelayedDropResourcesAction),         SIGNAL(triggered()),    this,   SLOT(at_delayedDropResourcesAction_triggered()));
-    connect(action(Qn::DropResourcesIntoNewLayoutAction),   SIGNAL(triggered()),    this,   SLOT(at_dropResourcesIntoNewLayoutAction_triggered()));
-    connect(action(Qn::MoveCameraAction),                   SIGNAL(triggered()),    this,   SLOT(at_moveCameraAction_triggered()));
-    connect(action(Qn::TakeScreenshotAction),               SIGNAL(triggered()),    this,   SLOT(at_takeScreenshotAction_triggered()));
-    connect(action(Qn::ExitAction),                         SIGNAL(triggered()),    this,   SLOT(at_exitAction_triggered()));
-    connect(action(Qn::ExportTimeSelectionAction),          SIGNAL(triggered()),    this,   SLOT(at_exportTimeSelectionAction_triggered()));
-    connect(action(Qn::ExportLayoutAction),                 SIGNAL(triggered()),    this,   SLOT(at_exportLayoutAction_triggered()));
+    connect(action(Qn::LightMainMenuAction),                    SIGNAL(triggered()),    this,   SLOT(at_mainMenuAction_triggered()));
+    connect(action(Qn::DarkMainMenuAction),                     SIGNAL(triggered()),    this,   SLOT(at_mainMenuAction_triggered()));
+    connect(action(Qn::AboutAction),                            SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
+    connect(action(Qn::SystemSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_systemSettingsAction_triggered()));
+    connect(action(Qn::OpenFileAction),                         SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
+    connect(action(Qn::OpenFolderAction),                       SIGNAL(triggered()),    this,   SLOT(at_openFolderAction_triggered()));
+    connect(action(Qn::ConnectToServerAction),                  SIGNAL(triggered()),    this,   SLOT(at_connectToServerAction_triggered()));
+    connect(action(Qn::GetMoreLicensesAction),                  SIGNAL(triggered()),    this,   SLOT(at_getMoreLicensesAction_triggered()));
+    connect(action(Qn::ReconnectAction),                        SIGNAL(triggered()),    this,   SLOT(at_reconnectAction_triggered()));
+    connect(action(Qn::NextLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_nextLayoutAction_triggered()));
+    connect(action(Qn::PreviousLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_previousLayoutAction_triggered()));
+    connect(action(Qn::OpenInLayoutAction),                     SIGNAL(triggered()),    this,   SLOT(at_openInLayoutAction_triggered()));
+    connect(action(Qn::OpenInCurrentLayoutAction),              SIGNAL(triggered()),    this,   SLOT(at_openInCurrentLayoutAction_triggered()));
+    connect(action(Qn::OpenInNewLayoutAction),                  SIGNAL(triggered()),    this,   SLOT(at_openInNewLayoutAction_triggered()));
+    connect(action(Qn::OpenInNewWindowAction),                  SIGNAL(triggered()),    this,   SLOT(at_openInNewWindowAction_triggered()));
+    connect(action(Qn::OpenSingleLayoutAction),                 SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
+    connect(action(Qn::OpenMultipleLayoutsAction),              SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
+    connect(action(Qn::OpenAnyNumberOfLayoutsAction),           SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
+    connect(action(Qn::OpenNewTabAction),                       SIGNAL(triggered()),    this,   SLOT(at_openNewTabAction_triggered()));
+    connect(action(Qn::OpenNewWindowAction),                    SIGNAL(triggered()),    this,   SLOT(at_openNewWindowAction_triggered()));
+    connect(action(Qn::SaveLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_saveLayoutAction_triggered()));
+    connect(action(Qn::SaveLayoutAsAction),                     SIGNAL(triggered()),    this,   SLOT(at_saveLayoutAsAction_triggered()));
+    connect(action(Qn::SaveLayoutForCurrentUserAsAction),       SIGNAL(triggered()),    this,   SLOT(at_saveLayoutForCurrentUserAsAction_triggered()));
+    connect(action(Qn::SaveCurrentLayoutAction),                SIGNAL(triggered()),    this,   SLOT(at_saveCurrentLayoutAction_triggered()));
+    connect(action(Qn::SaveCurrentLayoutAsAction),              SIGNAL(triggered()),    this,   SLOT(at_saveCurrentLayoutAsAction_triggered()));
+    connect(action(Qn::CloseLayoutAction),                      SIGNAL(triggered()),    this,   SLOT(at_closeLayoutAction_triggered()));
+    connect(action(Qn::CloseAllButThisLayoutAction),            SIGNAL(triggered()),    this,   SLOT(at_closeAllButThisLayoutAction_triggered()));
+    connect(action(Qn::UserSettingsAction),                     SIGNAL(triggered()),    this,   SLOT(at_userSettingsAction_triggered()));
+    connect(action(Qn::CameraSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
+    connect(action(Qn::OpenInCameraSettingsDialogAction),       SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
+    connect(action(Qn::SelectionChangeAction),                  SIGNAL(triggered()),    this,   SLOT(at_selectionChangeAction_triggered()));
+    connect(action(Qn::ServerSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_serverSettingsAction_triggered()));
+    connect(action(Qn::YouTubeUploadAction),                    SIGNAL(triggered()),    this,   SLOT(at_youtubeUploadAction_triggered()));
+    connect(action(Qn::EditTagsAction),                         SIGNAL(triggered()),    this,   SLOT(at_editTagsAction_triggered()));
+    connect(action(Qn::OpenInFolderAction),                     SIGNAL(triggered()),    this,   SLOT(at_openInFolderAction_triggered()));
+    connect(action(Qn::DeleteFromDiskAction),                   SIGNAL(triggered()),    this,   SLOT(at_deleteFromDiskAction_triggered()));
+    connect(action(Qn::RemoveLayoutItemAction),                 SIGNAL(triggered()),    this,   SLOT(at_removeLayoutItemAction_triggered()));
+    connect(action(Qn::RemoveFromServerAction),                 SIGNAL(triggered()),    this,   SLOT(at_removeFromServerAction_triggered()));
+    connect(action(Qn::NewUserAction),                          SIGNAL(triggered()),    this,   SLOT(at_newUserAction_triggered()));
+    connect(action(Qn::NewUserLayoutAction),                    SIGNAL(triggered()),    this,   SLOT(at_newUserLayoutAction_triggered()));
+    connect(action(Qn::RenameAction),                           SIGNAL(triggered()),    this,   SLOT(at_renameAction_triggered()));
+    connect(action(Qn::DropResourcesAction),                    SIGNAL(triggered()),    this,   SLOT(at_dropResourcesAction_triggered()));
+    connect(action(Qn::DelayedDropResourcesAction),             SIGNAL(triggered()),    this,   SLOT(at_delayedDropResourcesAction_triggered()));
+    connect(action(Qn::DropResourcesIntoNewLayoutAction),       SIGNAL(triggered()),    this,   SLOT(at_dropResourcesIntoNewLayoutAction_triggered()));
+    connect(action(Qn::MoveCameraAction),                       SIGNAL(triggered()),    this,   SLOT(at_moveCameraAction_triggered()));
+    connect(action(Qn::TakeScreenshotAction),                   SIGNAL(triggered()),    this,   SLOT(at_takeScreenshotAction_triggered()));
+    connect(action(Qn::ExitAction),                             SIGNAL(triggered()),    this,   SLOT(at_exitAction_triggered()));
+    connect(action(Qn::ExportTimeSelectionAction),              SIGNAL(triggered()),    this,   SLOT(at_exportTimeSelectionAction_triggered()));
+    connect(action(Qn::ExportLayoutAction),                     SIGNAL(triggered()),    this,   SLOT(at_exportLayoutAction_triggered()));
+    connect(action(Qn::SetCurrentLayoutAspectRatio4x3Action),   SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutAspectRatio4x3Action_triggered()));
+    connect(action(Qn::SetCurrentLayoutAspectRatio16x9Action),  SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutAspectRatio16x9Action_triggered()));
 
     /* Run handlers that update state. */
     at_eventManager_connectionClosed();
@@ -477,6 +479,7 @@ void QnWorkbenchActionHandler::submitDelayedDrops() {
 
     m_delayedDrops.clear();
 }
+
 
 
 // -------------------------------------------------------------------------- //
@@ -1616,6 +1619,14 @@ void QnWorkbenchActionHandler::at_camera_exportFailed(QString errorMessage) {
         camera->stopExport();
 
     QMessageBox::warning(widget(), tr("Could not export video"), errorMessage, QMessageBox::Ok);
+}
+
+void QnWorkbenchActionHandler::at_setCurrentLayoutAspectRatio4x3Action_triggered() {
+    workbench()->currentLayout()->resource()->setCellAspectRatio(4.0 / 3.0);
+}
+
+void QnWorkbenchActionHandler::at_setCurrentLayoutAspectRatio16x9Action_triggered() {
+    workbench()->currentLayout()->resource()->setCellAspectRatio(16.0 / 9.0);
 }
 
 void QnWorkbenchActionHandler::at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle) {
