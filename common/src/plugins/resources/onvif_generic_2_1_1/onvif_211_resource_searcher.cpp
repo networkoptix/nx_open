@@ -4,6 +4,7 @@
 #include "evp.h"
 #endif
 
+#include "rand.h"
 #include "onvif_211_resource_searcher.h"
 #include "core/resource/camera_resource.h"
 #include "onvif_211_resource.h"
@@ -65,7 +66,7 @@ QnResourcePtr OnvifGeneric211ResourceSearcher::checkHostAddr(QHostAddress addr)
     return QnResourcePtr(0);
 }
 
-QnNetworkResourcePtr OnvifGeneric211ResourceSearcher::processPacket(QnResourceList& result, QByteArray&, const QHostAddress& sender)
+QnNetworkResourcePtr OnvifGeneric211ResourceSearcher::processPacket(QnResourceList& result, QByteArray& mdnsPacketData, const QHostAddress& sender)
 {
     QString endpoint(QnPlOnvifGeneric211Resource::createOnvifEndpointUrl(sender.toString()));
     if (endpoint.isEmpty()) {
@@ -73,34 +74,111 @@ QnNetworkResourcePtr OnvifGeneric211ResourceSearcher::processPacket(QnResourceLi
         return QnNetworkResourcePtr(0);
     }
 
+    const char* login = 0;
+    const char* passwd = 0;
+    std::string onvifUser = "netoptix_onvif";
+    std::string onvifPasswd;
+    PasswordList passwords = passHelper.getPasswordsByManufacturer(mdnsPacketData);
+    PasswordList::ConstIterator passwdIter = passwords.begin();
+
+    int soapRes = SOAP_OK;
     DeviceBindingProxy soapProxy;
     soap_register_plugin(soapProxy.soap, soap_wsse);
 
-    //soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", "root", "admin123");
-    //soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", "admin", "admin");
+    //Trying to pick a password
+    do {
+        if (login) soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", login, passwd);
+
+        _onvifDevice__GetCapabilities request1;
+        request1.Category.push_back(onvifXsd__CapabilityCategory__All);
+        _onvifDevice__GetCapabilitiesResponse response1;
+        soapRes = soapProxy.GetCapabilities(endpoint.toStdString().c_str(), NULL, &request1, &response1);
+
+        if (soapRes == SOAP_OK || !passHelper.isNotAuthenticated(soapProxy.soap_fault())) break;
+        if (passwdIter == passwords.end()) {
+
+            //If we had no luck in picking a password, let's try to create a user
+            onvifPasswd = generateRandomPassword().toStdString();
+            onvifXsd__User newUser;
+            newUser.Username = onvifUser;
+            newUser.Password = &onvifPasswd;
+
+            for (int i = 0; i <= 2; ++i) {
+                _onvifDevice__CreateUsers request2;
+                _onvifDevice__CreateUsersResponse response2;
+
+                switch (i) {
+                    case 0: newUser.UserLevel = onvifXsd__UserLevel__Administrator; qDebug() << "Trying to create Admin"; break;
+                    case 1: newUser.UserLevel = onvifXsd__UserLevel__Operator; qDebug() << "Trying to create Operator"; break;
+                    case 2: newUser.UserLevel = onvifXsd__UserLevel__User; qDebug() << "Trying to create Regular User"; break;
+                    default: qWarning() << "OnvifGeneric211ResourceSearcher::processPacket: unknown user index."; break;
+                }
+                request2.User.push_back(&newUser);
+
+                soapRes = soapProxy.CreateUsers(endpoint.toStdString().c_str(), NULL, &request2, &response2);
+                if (soapRes == SOAP_OK) {
+                    qDebug() << "Usser created!";
+                    login = onvifUser.c_str();
+                    passwd = onvifPasswd.c_str();
+                    break;
+                } else {
+                    qDebug() << "Usser is NOT created";
+                    login = 0;
+                    passwd = 0;
+                }
+            }
+
+            break;
+        }
+
+        login = passwdIter->first;
+        passwd = passwdIter->second;
+        ++passwdIter;
+
+    } while (true);
+
+    //Trying to get MAC address
     _onvifDevice__GetNetworkInterfaces request1;
     _onvifDevice__GetNetworkInterfacesResponse response1;
-    if (int soapRes = soapProxy.GetNetworkInterfaces(endpoint.toStdString().c_str(), NULL, &request1, &response1) != SOAP_OK) {
+    if (login) soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", login, passwd);
+    soapRes = soapProxy.GetNetworkInterfaces(endpoint.toStdString().c_str(), NULL, &request1, &response1);
+    if (soapRes != SOAP_OK && cl_log.logLevel() >= cl_logDEBUG1) {
         qDebug() << "OnvifGeneric211ResourceSearcher::processPacket: SOAP to endpoint '" << endpoint
                  << "' failed. Error code: " << soapRes << "Description: "
-                 << soapProxy.soap_fault_string() << ". " << soapProxy.soap_fault_detail();
-        return QnNetworkResourcePtr(0);
+                 << soapProxy.soap_fault_string() << ". " << soapProxy.soap_fault_detail()
+                 << ". Can't fetch MAC, will try to get analog." ;
     }
-    QString mac(fetchNormalizeMacAddress(response1, sender.toString(), result));
-    if (mac.isEmpty()) {
+    QString mac(fetchMacAddress(response1, sender.toString()));
+    if (isMacAlreadyExists(mac, result)) {
         return QnNetworkResourcePtr(0);
     }
 
-    //soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", "root", "admin123");
-    //soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", "admin", "admin");
+    //Trying to get name and possibly MAC
     _onvifDevice__GetDeviceInformation request2;
     _onvifDevice__GetDeviceInformationResponse response2;
-    if (int soapRes = soapProxy.GetDeviceInformation(endpoint.toStdString().c_str(), NULL, &request2, &response2) != SOAP_OK) {
+    if (login) soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", login, passwd);
+    soapRes = soapProxy.GetDeviceInformation(endpoint.toStdString().c_str(), NULL, &request2, &response2);
+    if (soapRes != SOAP_OK) {
         qDebug() << "OnvifGeneric211ResourceSearcher::processPacket: SOAP to endpoint '" << endpoint
-                 << "' failed. Error code: " << soapRes << "Description: "
-                 << soapProxy.soap_fault_string() << ". " << soapProxy.soap_fault_detail();
-        return QnNetworkResourcePtr(0);
+                 << "' failed. Error code: " << soapRes << "Description: " << soapProxy.soap_fault_string() << ". "
+                 << soapProxy.soap_fault_detail() << ". Camera name will be set to 'Unknown'.";
     }
+
+    if (mac.isEmpty()) {
+        mac = fetchSerialConvertToMac(response2);
+        if (mac.isEmpty()) {
+            if (passHelper.isNotAuthenticated(soapProxy.soap_fault())) {
+                qCritical() << "OnvifGeneric211ResourceSearcher::processPacket: Can't get ONVIF device MAC address, because login/password required. Endpoint URL: " << endpoint;
+            }
+
+            return QnNetworkResourcePtr(0);
+        }
+
+        if (isMacAlreadyExists(mac, result)) {
+            return QnNetworkResourcePtr(0);
+        }
+    }
+
     QString name(fetchName(response2));
     if (name.isEmpty()) {
         qWarning() << "OnvifGeneric211ResourceSearcher::processPacket: can't fetch name of ONVIF device: endpoint: " << endpoint
@@ -112,6 +190,7 @@ QnNetworkResourcePtr OnvifGeneric211ResourceSearcher::processPacket(QnResourceLi
     resource->setTypeId(onvifTypeId);
     resource->setName(name);
     resource->setMAC(mac);
+    if (login) resource->setAuth(login, passwd);
 
     qDebug() << "OnvifGeneric211ResourceSearcher::processPacket: Found new camera: endpoint: " << endpoint
              << ", MAC: " << mac << ", name: " << name;
@@ -119,40 +198,39 @@ QnNetworkResourcePtr OnvifGeneric211ResourceSearcher::processPacket(QnResourceLi
     return resource;
 }
 
-const QString OnvifGeneric211ResourceSearcher::fetchNormalizeMacAddress(const _onvifDevice__GetNetworkInterfacesResponse& response,
-        const QString& senderIpAddress, QnResourceList& result) const {
-    QString mac(fetchMacAddress(response, senderIpAddress).toUpper().replace(":", "-"));
-    if (mac.isEmpty()) {
-        qDebug() << "OnvifGeneric211ResourceSearcher::fetchNormalizeMacAddress: MAC address was not found.";
-        return mac;
+const bool OnvifGeneric211ResourceSearcher::isMacAlreadyExists(const QString& mac, const QnResourceList& resList) const
+{
+    foreach(QnResourcePtr res, resList) {
+        QnNetworkResourcePtr netRes = res.dynamicCast<QnNetworkResource>();
+
+        if (netRes->getMAC().toString() == mac) {
+            return true;
+        }
     }
 
-    foreach(QnResourcePtr res, result)
-    {
-        QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
-
-        if (net_res->getMAC().toString() == mac)
-            return QString(); // already found;
-    }
-
-    return mac;
+    return false;
 }
 
 const QString OnvifGeneric211ResourceSearcher::fetchMacAddress(const _onvifDevice__GetNetworkInterfacesResponse& response,
-        const QString& senderIpAddress) const {
+        const QString& senderIpAddress) const
+{
+    QString someMacAddress;
     std::vector<class onvifXsd__NetworkInterface*> ifaces = response.NetworkInterfaces;
     std::vector<class onvifXsd__NetworkInterface*>::const_iterator ifacePtrIter = ifaces.begin();
 
-    qDebug() << "Sender address: " << senderIpAddress;
     while (ifacePtrIter != ifaces.end()) {
         onvifXsd__NetworkInterface* ifacePtr = *ifacePtrIter;
 
         if (ifacePtr->Enabled && ifacePtr->IPv4->Enabled) {
             onvifXsd__IPv4Configuration* conf = ifacePtr->IPv4->Config;
 
-            if (conf->DHCP) qDebug() << "Found address: " << conf->FromDHCP->Address.c_str();
-            if (conf->DHCP && senderIpAddress == conf->FromDHCP->Address.c_str()) {
-                return QString(ifacePtr->Info->HwAddress.c_str());
+            if (conf->DHCP) {
+                if (senderIpAddress == conf->FromDHCP->Address.c_str()) {
+                    return QString(ifacePtr->Info->HwAddress.c_str()).toUpper().replace(":", "-");
+                }
+                if (someMacAddress.isEmpty()) {
+                    someMacAddress = QString(ifacePtr->Info->HwAddress.c_str());
+                }
             }
 
             std::vector<class onvifXsd__PrefixedIPv4Address*> addresses = ifacePtr->IPv4->Config->Manual;
@@ -161,9 +239,11 @@ const QString OnvifGeneric211ResourceSearcher::fetchMacAddress(const _onvifDevic
             while (addrPtrIter != addresses.end()) {
                 onvifXsd__PrefixedIPv4Address* addrPtr = *addrPtrIter;
 
-                if (conf->DHCP) qDebug() << "Found address: " << addrPtr->Address.c_str();
                 if (senderIpAddress == addrPtr->Address.c_str()) {
-                    return QString(ifacePtr->Info->HwAddress.c_str());
+                    return QString(ifacePtr->Info->HwAddress.c_str()).toUpper().replace(":", "-");
+                }
+                if (someMacAddress.isEmpty()) {
+                    someMacAddress = QString(ifacePtr->Info->HwAddress.c_str());
                 }
 
                 ++addrPtrIter;
@@ -173,14 +253,50 @@ const QString OnvifGeneric211ResourceSearcher::fetchMacAddress(const _onvifDevic
         ++ifacePtrIter;
     }
 
-    //return QString("77:77:77:77:77:77");
-    //return QString("33:33:33:33:33:33");
-    //return QString("77:77:77:77:77:71");
-    //return QString("77:77:77:77:77:72");
-    //return QString("77:77:77:77:77:73");
-    return QString();
+    qDebug() << "OnvifGeneric211ResourceSearcher::fetchMacAddress: appropriate MAC address was not found for device with IP: "
+             << senderIpAddress.toStdString().c_str();
+    return someMacAddress.toUpper().replace(":", "-");
 }
 
-const QString OnvifGeneric211ResourceSearcher::fetchName(const _onvifDevice__GetDeviceInformationResponse& response) const {
+const QString OnvifGeneric211ResourceSearcher::fetchName(const _onvifDevice__GetDeviceInformationResponse& response) const
+{
     return QString((response.Manufacturer + " - " + response.Model).c_str());
+}
+
+const QString OnvifGeneric211ResourceSearcher::fetchSerialConvertToMac(const _onvifDevice__GetDeviceInformationResponse& response) const
+{
+    QString serial(response.SerialNumber.c_str());
+    serial.replace(QRegExp("[^\\w\\d]+"), "");
+
+    //Too small serial number (may be, its better to check < 12)
+    int size = serial.size();
+    if (size < 6) return QString();
+
+    QString result("FF-FF-FF-FF-FF-FF");
+    for (int i = 1; i < (size < 12? size: 12); i += 2) {
+        result[i - 1 + i / 2] = serial[i - 1];
+        result[i + i / 2] = serial[i];
+    }
+    if (size < 12 && size % 2) {
+        --size;
+        result[size + size / 2] = serial[size];
+    }
+
+    return result;
+}
+
+const QString OnvifGeneric211ResourceSearcher::generateRandomPassword() const
+{
+    QTime curTime(QTime::currentTime());
+    qsrand((curTime.hour() + 1) * (curTime.minute() + 1));
+
+    QString tmp;
+    QString result;
+    result += tmp.setNum(qrand());
+    result += tmp.setNum(curTime.second());
+    result += tmp.setNum(qrand());
+    result += tmp.setNum(curTime.msec());
+
+    qDebug() << "Random password is " << result;
+    return result;
 }

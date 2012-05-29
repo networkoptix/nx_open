@@ -3,10 +3,11 @@
 
 #include "core/resourcemanagment/resource_searcher.h"
 #include "../onvif/onvif_device_searcher.h"
+#include "onvif_211_helper.h"
 
 class _onvifDevice__GetNetworkInterfacesResponse;
 class _onvifDevice__GetDeviceInformationResponse;
-class DeviceBindingProxy;
+class SOAP_ENV__Fault;
 
 class OnvifGeneric211ResourceSearcher : public OnvifResourceSearcher
 {
@@ -23,15 +24,17 @@ public:
 
 protected:
     QnNetworkResourcePtr processPacket(QnResourceList& result, QByteArray& responseData, const QHostAddress& sender);
-    QnNetworkResourcePtr processPacket(DeviceBindingProxy& soapProxy, QnResourceList& result, QByteArray& responseData, const QHostAddress& sender);
 
 private:
     static const char* ONVIF_RT;
     QnId onvifTypeId;
+    PasswordHelper passHelper;
 
     const QString fetchMacAddress(const _onvifDevice__GetNetworkInterfacesResponse& response, const QString& senderIpAddress) const;
-    const QString fetchNormalizeMacAddress(const _onvifDevice__GetNetworkInterfacesResponse& response, const QString& senderIpAddress, QnResourceList& result) const;
+    const bool isMacAlreadyExists(const QString& mac, const QnResourceList& resList) const;
     const QString fetchName(const _onvifDevice__GetDeviceInformationResponse& response) const;
+    const QString fetchSerialConvertToMac(const _onvifDevice__GetDeviceInformationResponse& response) const;
+    const QString generateRandomPassword() const;
 };
 
 #endif // onvif_generic_2_1_1_resource_searcher
