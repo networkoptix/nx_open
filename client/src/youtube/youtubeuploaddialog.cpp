@@ -7,10 +7,6 @@
 #include <utils/common/warnings.h>
 
 #include <ui/workbench/workbench_context.h>
-#define USE_PREFERENCESWND
-#ifdef USE_PREFERENCESWND
-#include <ui/preferences/preferencesdialog.h>
-#endif
 
 #include "youtube_uploader.h"
 #include "youtubesettingswidget.h"
@@ -150,7 +146,6 @@ void YouTubeUploadDialog::authFailed()
 {
     ui->buttonBox->button(QDialogButtonBox::Save)->setEnabled(true);
 
-#ifndef USE_PREFERENCESWND
     QDialog dialog(this);
 
     YouTubeSettingsWidget *widget = new YouTubeSettingsWidget(&dialog);
@@ -164,16 +159,9 @@ void YouTubeUploadDialog::authFailed()
     dialogLayout->addWidget(widget);
     dialogLayout->addWidget(buttonBox);
     dialog.setLayout(dialogLayout);
-#else
-    QnPreferencesDialog dialog(m_context.data(), this);
-    dialog.setCurrentPage(QnPreferencesDialog::PageYouTubeSettings);
-    dialog.exec();
-#endif
 
     if (dialog.exec() == QDialog::Accepted) {
-#ifndef USE_PREFERENCESWND
         widget->accept();
-#endif
 
         m_youtubeuploader->setLogin(YouTubeSettingsWidget::login());
         m_youtubeuploader->setPassword(YouTubeSettingsWidget::password());

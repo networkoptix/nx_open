@@ -8,7 +8,6 @@
 #include <api/SessionManager.h>
 
 #include "core/resource/resource.h"
-#include "ui/preferences/preferencesdialog.h"
 #include "ui/style/skin.h"
 
 #include "utils/settings.h"

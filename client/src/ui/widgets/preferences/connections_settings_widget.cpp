@@ -1,5 +1,5 @@
-#include "connectionssettingswidget.h"
-#include "ui_connectionssettingswidget.h"
+#include "connections_settings_widget.h"
+#include "ui_connections_settings_widget.h"
 
 #include <QtGui/QDataWidgetMapper>
 #include <QtGui/QStandardItemModel>
