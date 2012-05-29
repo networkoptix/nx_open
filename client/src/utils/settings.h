@@ -5,40 +5,28 @@
 #include <QtCore/QUrl>
 #include <QtCore/QStringList>
 #include <QtCore/QMutex>
-
 #include <QtGui/QColor>
+
+#include <utils/common/property_storage.h>
 
 class QSettings;
 
-class QnSettings: public QObject {
+class QnSettings: public QnPropertyStorage {
     Q_OBJECT;
+
+    typedef QnPropertyStorage base_type;
 
 public:
     QnSettings();
 
     static QnSettings *instance();
 
-    struct Data
-    {
-        int maxVideoItems;
-        bool downmixAudio;
-        bool allowChangeIP;
-        bool afterFirstRun;
-        QString mediaRoot;
-        QStringList auxMediaRoots;
-        bool animateBackground;
-        bool openLayoutsOnLogin;
-        QColor backgroundColor;
-        bool forceSoftYUV;
-    };
-
-    void update(const Data &data);
-    void fillData(Data &data) const;
-
     void load();
     void save();
 
     int maxVideoItems() const;
+    void setMaxVideoItems(int maxVideoItems);
+
     bool downmixAudio() const;
     bool isAllowChangeIP() const;
     bool isAfterFirstRun() const;
@@ -93,7 +81,17 @@ private:
     mutable QMutex m_lock;
     QSettings *m_settings;
     ConnectionData m_lastUsed;
-    Data m_data;
+
+    int m_maxVideoItems;
+    bool m_downmixAudio;
+    bool m_allowChangeIP;
+    bool m_afterFirstRun;
+    QString m_mediaRoot;
+    QStringList m_auxMediaRoots;
+    bool m_animateBackground;
+    bool m_openLayoutsOnLogin;
+    QColor m_backgroundColor;
+    bool m_forceSoftYUV;
 };
 
 #define qnSettings QnSettings::instance()

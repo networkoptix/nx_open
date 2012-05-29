@@ -17,9 +17,9 @@
 #include "ui/actions/action_manager.h"
 #include "ui/workbench/workbench_context.h"
 
-#include <ui/widgets/preferences/connections_settings_widget.h>
-#include <ui/widgets/preferences/license_manager_widget.h>
-#include <ui/widgets/preferences/recording_settings_widget.h>
+#include <ui/widgets/settings/connections_settings_widget.h>
+#include <ui/widgets/settings/license_manager_widget.h>
+#include <ui/widgets/settings/recording_settings_widget.h>
 #include <youtube/youtubesettingswidget.h>
 
 namespace {
@@ -44,10 +44,11 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     QDialog(parent),
     QnWorkbenchContextAware(context),
     ui(new Ui::PreferencesDialog()),
-    connectionsSettingsWidget(NULL), 
-    videoRecorderWidget(NULL), 
-    youTubeSettingsWidget(NULL), 
-    licenseManagerWidget(NULL)
+    m_connectionsSettingsWidget(NULL), 
+    m_recordingSettingsWidget(NULL), 
+    m_youTubeSettingsWidget(NULL), 
+    m_licenseManagerWidget(NULL),
+    m_settings(qnSettings)
 {
     ui->setupUi(this);
 
@@ -63,11 +64,11 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     ui->lookAndFeelGroupBox->hide();
 #endif
 
-    connectionsSettingsWidget = new QnConnectionsSettingsWidget(this);
-    ui->tabWidget->insertTab(PageConnections, connectionsSettingsWidget, tr("Connections"));
+    m_connectionsSettingsWidget = new QnConnectionsSettingsWidget(this);
+    ui->tabWidget->insertTab(PageConnections, m_connectionsSettingsWidget, tr("Connections"));
 
-    videoRecorderWidget = new QnRecordingSettingsWidget(this);
-    ui->tabWidget->insertTab(PageRecordingSettings, videoRecorderWidget, tr("Screen Recorder"));
+    m_recordingSettingsWidget = new QnRecordingSettingsWidget(this);
+    ui->tabWidget->insertTab(PageRecordingSettings, m_recordingSettingsWidget, tr("Screen Recorder"));
 
 #if 0
     youTubeSettingsWidget = new YouTubeSettingsWidget(this);
@@ -75,16 +76,20 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
 #endif
 
 #ifndef CL_TRIAL_MODE
-    licenseManagerWidget = new QnLicenseManagerWidget(this);
-    ui->tabWidget->insertTab(PageLicense, licenseManagerWidget, tr("Licenses"));
+    m_licenseManagerWidget = new QnLicenseManagerWidget(this);
+    ui->tabWidget->insertTab(PageLicense, m_licenseManagerWidget, tr("Licenses"));
 #endif
 
-    connect(ui->auxMediaRootsList->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(auxMediaFolderSelectionChanged()));
-    connect(ui->animateBackgroundCheckBox, SIGNAL(stateChanged(int)), this, SLOT(at_animateBackgroundCheckBox_stateChanged(int)));
-    connect(ui->backgroundColorPicker, SIGNAL(colorChanged(const QColor &)), this, SLOT(at_backgroundColorPicker_colorChanged(const QColor &)));
+    connect(ui->browseMainMediaFolderButton,            SIGNAL(clicked()),                                          this, SLOT(at_browseMainMediaFolderButton_clicked()));
+    connect(ui->addExtraMediaFolderButton,              SIGNAL(clicked()),                                          this, SLOT(at_addExtraMediaFolderButton_clicked()));
+    connect(ui->removeExtraMediaFolderButton,           SIGNAL(clicked()),                                          this, SLOT(at_removeExtraMediaFolderButton_clicked()));
+    connect(ui->extraMediaFoldersList->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),   this, SLOT(at_extraMediaFoldersList_selectionChanged()));
+    connect(ui->animateBackgroundCheckBox,              SIGNAL(stateChanged(int)),                                  this, SLOT(at_animateBackgroundCheckBox_stateChanged(int)));
+    connect(ui->backgroundColorPicker,                  SIGNAL(colorChanged(const QColor &)),                       this, SLOT(at_backgroundColorPicker_colorChanged(const QColor &)));
+    connect(ui->buttonBox,                              SIGNAL(accepted()),                                         this, SLOT(accept()));
+    connect(ui->buttonBox,                              SIGNAL(rejected()),                                         this, SLOT(reject()));
 
     updateFromSettings();
-    updateCameras();
     updateStoredConnections();
 }
 
@@ -117,7 +122,7 @@ void QnPreferencesDialog::initColorPicker()
 
 void QnPreferencesDialog::accept()
 {
-    m_settingsData.animateBackground = ui->animateBackgroundCheckBox->isChecked();
+    /*m_settingsData.animateBackground = ui->animateBackgroundCheckBox->isChecked();
     m_settingsData.backgroundColor = ui->backgroundColorPicker->currentColor();
 
     m_settingsData.maxVideoItems = ui->maxVideoItemsSpinBox->value();
@@ -131,9 +136,9 @@ void QnPreferencesDialog::accept()
     checkLst.push_back(QDir::toNativeSeparators(settings->mediaRoot()));
     QnResourceDirectoryBrowser::instance().setPathCheckList(checkLst);
 
-    if (connectionsSettingsWidget) {
+    if (m_connectionsSettingsWidget) {
         QList<QnSettings::ConnectionData> connections;
-        foreach (const QnSettings::ConnectionData &conn, connectionsSettingsWidget->connections()) {
+        foreach (const QnSettings::ConnectionData &conn, m_connectionsSettingsWidget->connections()) {
             QnSettings::ConnectionData connection = conn;
 
             if (!connection.name.isEmpty() && connection.url.isValid())
@@ -142,74 +147,68 @@ void QnPreferencesDialog::accept()
         settings->setConnections(connections);
     }
 
-    if (videoRecorderWidget)
-        videoRecorderWidget->accept();
+    if (m_recordingSettingsWidget)
+        m_recordingSettingsWidget->accept();
 
-    //youTubeSettingsWidget->accept();
+    //m_youTubeSettingsWidget->accept();
 
-    QDialog::accept();
+    QDialog::accept();*/
+}
+
+void QnPreferencesDialog::commitToSettings() {
+    /*m_settings->set
+
+    m_settingsData.animateBackground = ui->animateBackgroundCheckBox->isChecked();
+    m_settingsData.backgroundColor = ui->backgroundColorPicker->currentColor();
+
+    m_settingsData.maxVideoItems = ui->maxVideoItemsSpinBox->value();
+    m_settingsData.downmixAudio = ui->downmixAudioCheckBox->isChecked();
+
+    QnSettings *settings = qnSettings;
+    settings->update(m_settingsData);
+    settings->save();
+
+    QStringList checkLst(settings->auxMediaRoots());
+    checkLst.push_back(QDir::toNativeSeparators(settings->mediaRoot()));
+    QnResourceDirectoryBrowser::instance().setPathCheckList(checkLst);*/
+
 }
 
 void QnPreferencesDialog::updateFromSettings()
 {
-    ui->animateBackgroundCheckBox->setChecked(m_settingsData.animateBackground);
-    ui->backgroundColorPicker->setCurrentColor(m_settingsData.backgroundColor);
-
-    ui->mediaRootLabel->setText(QDir::toNativeSeparators(m_settingsData.mediaRoot));
+#if 0
+    ui->animateBackgroundCheckBox->setChecked(m_settings->isBackgroundAnimated());
+    ui->backgroundColorPicker->setCurrentColor(m_settings->backgroundColor());
+    ui->mediaRootLabel->setText(QDir::toNativeSeparators(m_settings->mediaRoot()));
+    ui->maxVideoItemsSpinBox->setValue(m_settings->maxVideoItems());
+    ui->downmixAudioCheckBox->setChecked(m_settings->downmixAudio());
 
     ui->auxMediaRootsList->clear();
-    foreach (const QString &auxMediaRoot, m_settingsData.auxMediaRoots)
+    foreach (const QString &auxMediaRoot, m_settings->auxMediaRoots())
         ui->auxMediaRootsList->addItem(QDir::toNativeSeparators(auxMediaRoot));
 
-    const QList<QNetworkAddressEntry> ipv4entries = getAllIPv4AddressEntries();
-
     ui->networkInterfacesList->clear();
-    foreach (const QNetworkAddressEntry &entry, ipv4entries)
+    foreach (const QNetworkAddressEntry &entry, getAllIPv4AddressEntries())
         ui->networkInterfacesList->addItem(tr("IP Address: %1, Network Mask: %2").arg(entry.ip().toString()).arg(entry.netmask().toString()));
 
-    ui->camerasList->clear();
-    foreach (const CameraNameAndInfo &camera, m_cameras)
-        ui->camerasList->addItem(camera.first);
-
-    if (ipv4entries.isEmpty())
-        ui->cameraStatusLabel->setText(tr("No IP addresses detected. Ensure you either have static IP or there is DHCP server in your network."));
-    else if (m_cameras.isEmpty())
-        ui->cameraStatusLabel->setText(tr("No cameras detected. If you're connected to router check that it doesn't block broadcasts."));
-    else
-        ui->cameraStatusLabel->setText(QString());
-
-    ui->totalCamerasLabel->setText(tr("Total %1 cameras detected").arg(m_cameras.size()));
-
-    ui->maxVideoItemsSpinBox->setValue(m_settingsData.maxVideoItems);
-
-    ui->downmixAudioCheckBox->setChecked(m_settingsData.downmixAudio);
+    updateStoredConnections();
+#endif
 }
 
 void QnPreferencesDialog::updateStoredConnections()
 {
+#if 0
     QList<QnSettings::ConnectionData> connections;
-    foreach (const QnSettings::ConnectionData &conn, qnSettings->connections()) {
-        QnSettings::ConnectionData connection = conn;
-
-        if (!connection.name.trimmed().isEmpty()) // the last used one
+    foreach (const QnSettings::ConnectionData &connection, m_settings->connections())
+        if (!connection.name.trimmed().isEmpty()) /* The last used one. */
             connections.append(connection);
-    }
-    connectionsSettingsWidget->setConnections(connections);
+    m_connectionsSettingsWidget->setConnections(connections);
+#endif
 }
 
-void QnPreferencesDialog::updateCameras()
+void QnPreferencesDialog::at_browseMainMediaFolderButton_clicked()
 {
-    cl_log.log("Updating camera list", cl_logALWAYS);
-
-    m_cameras.clear();
-    foreach(QnResourcePtr resource, qnResPool->getResourcesWithFlag(QnResource::live))
-        m_cameras.append(CameraNameAndInfo(resource->getName(), cameraInfoString(resource)));
-
-    updateFromSettings();
-}
-
-void QnPreferencesDialog::mainMediaFolderBrowse()
-{
+#if 0
     QFileDialog fileDialog(this);
     fileDialog.setFileMode(QFileDialog::DirectoryOnly);
     if (!fileDialog.exec())
@@ -222,15 +221,16 @@ void QnPreferencesDialog::mainMediaFolderBrowse()
     m_settingsData.mediaRoot = fromNativePath(xdir);
 
     updateFromSettings();
+#endif
 }
 
-void QnPreferencesDialog::auxMediaFolderSelectionChanged()
+void QnPreferencesDialog::at_extraMediaFoldersList_selectionChanged()
 {
-    ui->auxRemovePushButton->setEnabled(!ui->auxMediaRootsList->selectedItems().isEmpty());
+    //ui->auxRemovePushButton->setEnabled(!ui->auxMediaRootsList->selectedItems().isEmpty());
 }
 
-void QnPreferencesDialog::auxMediaFolderBrowse()
-{
+void QnPreferencesDialog::at_addExtraMediaFolderButton_clicked()
+{/*
     QFileDialog fileDialog(this);
     fileDialog.setFileMode(QFileDialog::DirectoryOnly);
     if (!fileDialog.exec())
@@ -249,21 +249,15 @@ void QnPreferencesDialog::auxMediaFolderBrowse()
 
     m_settingsData.auxMediaRoots.append(xdir);
 
-    updateFromSettings();
+    updateFromSettings();*/
 }
 
-void QnPreferencesDialog::auxMediaFolderRemove()
+void QnPreferencesDialog::at_removeExtraMediaFolderButton_clicked()
 {
-    foreach (QListWidgetItem *item, ui->auxMediaRootsList->selectedItems())
+    /*foreach (QListWidgetItem *item, ui->auxMediaRootsList->selectedItems())
         m_settingsData.auxMediaRoots.removeAll(fromNativePath(item->text()));
 
-    updateFromSettings();
-}
-
-void QnPreferencesDialog::cameraSelected(int row)
-{
-    if (row >= 0 && row < m_cameras.size())
-        ui->cameraInfoLabel->setText(m_cameras[row].second);
+    updateFromSettings();*/
 }
 
 void QnPreferencesDialog::setCurrentPage(QnPreferencesDialog::SettingsPage page)

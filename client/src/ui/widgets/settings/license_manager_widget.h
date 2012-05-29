@@ -9,7 +9,7 @@
 class QNetworkAccessManager;
 
 namespace Ui {
-    class QnLicenseManagerWidget;
+    class LicenseManagerWidget;
 }
 
 class QnLicenseManagerWidget : public QWidget

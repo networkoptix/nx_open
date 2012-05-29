@@ -8,6 +8,7 @@
 
 
 class QnWorkbenchContext;
+class QnSettings;
 
 class QnConnectionsSettingsWidget;
 class QnLicenseManagerWidget;
@@ -35,37 +36,33 @@ public:
 
     void setCurrentPage(SettingsPage page);
 
+    virtual void accept() override;
+
 private:
     void updateFromSettings();
+    void commitToSettings();
+
     void updateStoredConnections();
     void initColorPicker();
 
 private slots:
     void at_animateBackgroundCheckBox_stateChanged(int state);
     void at_backgroundColorPicker_colorChanged(const QColor &color);
-
-    void updateCameras();
-
-    void accept();
-    void mainMediaFolderBrowse();
-    void auxMediaFolderBrowse();
-    void auxMediaFolderRemove();
-    void cameraSelected(int);
-    void auxMediaFolderSelectionChanged();
+    void at_browseMainMediaFolderButton_clicked();
+    void at_addExtraMediaFolderButton_clicked();
+    void at_removeExtraMediaFolderButton_clicked();
+    void at_extraMediaFoldersList_selectionChanged();
 
 private:
     Q_DISABLE_COPY(QnPreferencesDialog)
 
     QScopedPointer<Ui::PreferencesDialog> ui;
-    QnSettings::Data m_settingsData;
-    QnConnectionsSettingsWidget *connectionsSettingsWidget;
-    QnRecordingSettingsWidget *videoRecorderWidget;
-    QnYouTubeSettingsWidget *youTubeSettingsWidget;
-    QnLicenseManagerWidget *licenseManagerWidget;
+    QnConnectionsSettingsWidget *m_connectionsSettingsWidget;
+    QnRecordingSettingsWidget *m_recordingSettingsWidget;
+    QnYouTubeSettingsWidget *m_youTubeSettingsWidget;
+    QnLicenseManagerWidget *m_licenseManagerWidget;
 
-    typedef QPair<QString, QString> CameraNameAndInfo;
-
-    QList<CameraNameAndInfo> m_cameras;
+    QnSettings *m_settings;
 };
 
 #endif // QN_PREFERENCES_DIALOG_H

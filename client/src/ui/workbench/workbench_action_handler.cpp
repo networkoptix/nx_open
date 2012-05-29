@@ -50,6 +50,8 @@
 
 #include <ui/graphics/items/resource_widget.h>
 
+#include <utils/settings.h>
+
 #include "eventmanager.h"
 #include "file_processor.h"
 

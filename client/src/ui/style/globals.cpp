@@ -2,13 +2,14 @@
 
 #include <cassert>
 
+#include <QtCore/QScopedPointer>
 #include <QtCore/QSettings>
 #include <QtGui/QFont>
 #include <QtGui/QColor>
 
 #include "config.h"
 
-Q_GLOBAL_STATIC(QnGlobals, globalsInstance);
+Q_GLOBAL_STATIC(QnGlobals, qn_globalsInstance);
 
 namespace {
     QColor parseColor(const QString &name, const QColor &defaultValue = QColor()) {
@@ -59,56 +60,32 @@ namespace {
 
 
 QnGlobals::QnGlobals(QObject *parent):
-    QObject(parent)
+    base_type(parent)
 {
     /* Ensure that default skin resource is loaded. 
      * This is needed because globals instance may be constructed before the
      * corresponding resource initializer is called. */
     Q_INIT_RESOURCE(skin);
 
-    QScopedPointer<QSettings> settings(new QSettings(QString(QN_SKIN_PATH) + QLatin1String("/skin/globals.ini"), QSettings::IniFormat));
+    init();
 
-    settings->beginGroup(QLatin1String("globals"));
-    init(Dummy<VARIABLE_COUNT>(), settings.data());
-    settings->endGroup();
+    QScopedPointer<QSettings> settings(new QSettings(QString(QN_SKIN_PATH) + QLatin1String("/skin/globals.ini"), QSettings::IniFormat));
+    updateFromSettings(settings.data());
 }
 
 QnGlobals::~QnGlobals() {
     return;
 }
 
-void QnGlobals::initValue(Variable variable, QSettings *settings, const QString &key, const QColor &defaultValue) {
-    setValue(variable, parseColor(settings->value(key), defaultValue));
-}
-
-void QnGlobals::initValue(Variable variable, QSettings *settings, const QString &key, int defaultValue) {
-    bool ok = false;
-    int value = settings->value(key).toInt(&ok);
-    if(!ok)
-        value = defaultValue;
-    setValue(variable, value);
-}
-
-void QnGlobals::initValue(Variable variable, QSettings *settings, const QString &key, qreal defaultValue) {
-    bool ok = false;
-    qreal value = settings->value(key).toReal(&ok);
-    if(!ok)
-        value = defaultValue;
-    setValue(variable, value);
-}
-
-QVariant QnGlobals::value(Variable variable) {
-    assert(variable >= 0 && variable < VARIABLE_COUNT);
-
-    return m_globals[variable];
-}
-
-void QnGlobals::setValue(Variable variable, const QVariant &value) {
-    assert(variable >= 0 && variable < VARIABLE_COUNT);
-
-    m_globals[variable] = value;
-}
-
 QnGlobals *QnGlobals::instance() {
-    return globalsInstance();
+    return qn_globalsInstance();
+}
+
+void QnGlobals::updateFromSettings(QSettings *settings, int id) {
+    int type = this->type(id);
+    if(type == QMetaType::QColor) {
+        setValue(id, parseColor(settings->value(name(id)), value(id).value<QColor>()));
+    } else {
+        base_type::updateFromSettings(settings, id);
+    }
 }

@@ -215,14 +215,14 @@ FORMS += \
     youtube/youtubeuploaddialog.ui \
     youtube/youtubesetting.ui \
     ui/device_settings/camera_schedule_widget.ui \
-    ui/widgets/preferences/connections_settings_widget.ui \
-    ui/widgets/preferences/license_widget.ui \
-    ui/widgets/preferences/license_manager_widget.ui \
-    ui/widgets/preferences/recording_settings_widget.ui \
+    ui/widgets/settings/connections_settings_widget.ui \
+    ui/widgets/settings/license_widget.ui \
+    ui/widgets/settings/license_manager_widget.ui \
+    ui/widgets/settings/recording_settings_widget.ui \
     ui/widgets/help_widget.ui \
     ui/widgets/resource_tree_widget.ui \
-    ui/widgets/settings/single_camera_settings_widget.ui \
-    ui/widgets/settings/multiple_camera_settings_widget.ui \
+    ui/widgets/properties/single_camera_settings_widget.ui \
+    ui/widgets/properties/multiple_camera_settings_widget.ui \
 
 # CL_TRIAL_MODE 
 DEFINES += CL_FORCE_LOGO

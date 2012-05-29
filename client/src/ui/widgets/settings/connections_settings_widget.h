@@ -1,5 +1,5 @@
-#ifndef CONNECTIONSSETTINGSWIDGET_H
-#define CONNECTIONSSETTINGSWIDGET_H
+#ifndef QN_CONNECTIONS_SETTINGS_WIDGET_H
+#define QN_CONNECTIONS_SETTINGS_WIDGET_H
 
 #include <QtCore/QList>
 #include <QtCore/QUrl>
@@ -14,7 +14,7 @@ class QStandardItem;
 class QStandardItemModel;
 
 namespace Ui {
-    class QnConnectionsSettingsWidget;
+    class ConnectionsSettingsWidget;
 }
 
 class QnConnectionsSettingsWidget : public QWidget
@@ -56,4 +56,4 @@ private:
     QDataWidgetMapper *m_dataWidgetMapper;
 };
 
-#endif // CONNECTIONSSETTINGSWIDGET_H
+#endif // QN_CONNECTIONS_SETTINGS_WIDGET_H
