@@ -14,16 +14,16 @@ class QStandardItem;
 class QStandardItemModel;
 
 namespace Ui {
-    class ConnectionsSettingsWidget;
+    class QnConnectionsSettingsWidget;
 }
 
-class ConnectionsSettingsWidget : public QWidget
+class QnConnectionsSettingsWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit ConnectionsSettingsWidget(QWidget *parent = 0);
-    ~ConnectionsSettingsWidget();
+    explicit QnConnectionsSettingsWidget(QWidget *parent = 0);
+    ~QnConnectionsSettingsWidget();
 
     QList<QnSettings::ConnectionData> connections() const;
     void setConnections(const QList<QnSettings::ConnectionData> &connections);
@@ -44,7 +44,7 @@ private Q_SLOTS:
     void deleteConnection();
 
 private:
-    Q_DISABLE_COPY(ConnectionsSettingsWidget)
+    Q_DISABLE_COPY(QnConnectionsSettingsWidget)
 
     QUrl currentUrl();
 

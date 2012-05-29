@@ -7,13 +7,13 @@ namespace Ui {
     class YouTubeSettings;
 }
 
-class YouTubeSettingsWidget : public QWidget
+class QnYouTubeSettingsWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit YouTubeSettingsWidget(QWidget *parent = 0);
-    ~YouTubeSettingsWidget();
+    explicit QnYouTubeSettingsWidget(QWidget *parent = 0);
+    ~QnYouTubeSettingsWidget();
 
     static QString login();
     static QString password();

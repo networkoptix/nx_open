@@ -10,13 +10,13 @@ namespace Ui {
 }
 
 class VideoRecorderSettings;
-class RecordingSettingsWidget : public QWidget
+class QnRecordingSettingsWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit RecordingSettingsWidget(QWidget *parent = 0);
-    ~RecordingSettingsWidget();
+    explicit QnRecordingSettingsWidget(QWidget *parent = 0);
+    ~QnRecordingSettingsWidget();
 
     VideoRecorderSettings::CaptureMode captureMode() const;
     void setCaptureMode(VideoRecorderSettings::CaptureMode c);

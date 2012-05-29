@@ -9,16 +9,16 @@
 class QNetworkAccessManager;
 
 namespace Ui {
-    class LicenseManagerWidget;
+    class QnLicenseManagerWidget;
 }
 
-class LicenseManagerWidget : public QWidget
+class QnLicenseManagerWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit LicenseManagerWidget(QWidget *parent = 0);
-    virtual ~LicenseManagerWidget();
+    explicit QnLicenseManagerWidget(QWidget *parent = 0);
+    virtual ~QnLicenseManagerWidget();
 
 private slots:
     void updateLicenses();
@@ -37,7 +37,7 @@ private:
     void validateLicense(const QnLicensePtr &license);
 
 private:
-    Q_DISABLE_COPY(LicenseManagerWidget)
+    Q_DISABLE_COPY(QnLicenseManagerWidget)
 
     QScopedPointer<Ui::LicenseManagerWidget> ui;
     QNetworkAccessManager *m_httpClient;

@@ -10,7 +10,7 @@
 #include "ui/style/skin.h"
 #include "ui/dialogs/connection_testing_dialog.h"
 
-ConnectionsSettingsWidget::ConnectionsSettingsWidget(QWidget *parent) :
+QnConnectionsSettingsWidget::QnConnectionsSettingsWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ConnectionsSettingsWidget)
 {
@@ -58,11 +58,11 @@ ConnectionsSettingsWidget::ConnectionsSettingsWidget(QWidget *parent) :
     ui->connectionsTreeView->setFocus();
 }
 
-ConnectionsSettingsWidget::~ConnectionsSettingsWidget()
+QnConnectionsSettingsWidget::~QnConnectionsSettingsWidget()
 {
 }
 
-void ConnectionsSettingsWidget::changeEvent(QEvent *event)
+void QnConnectionsSettingsWidget::changeEvent(QEvent *event)
 {
     QWidget::changeEvent(event);
 
@@ -76,12 +76,12 @@ void ConnectionsSettingsWidget::changeEvent(QEvent *event)
     }
 }
 
-void ConnectionsSettingsWidget::retranslateUi()
+void QnConnectionsSettingsWidget::retranslateUi()
 {
     m_connectionsRootItem->setText(tr("Connections"));
 }
 
-QList<QnSettings::ConnectionData> ConnectionsSettingsWidget::connections() const
+QList<QnSettings::ConnectionData> QnConnectionsSettingsWidget::connections() const
 {
     QList<QnSettings::ConnectionData> connections;
     
@@ -108,7 +108,7 @@ QList<QnSettings::ConnectionData> ConnectionsSettingsWidget::connections() const
     return connections;
 }
 
-void ConnectionsSettingsWidget::setConnections(const QList<QnSettings::ConnectionData> &connections)
+void QnConnectionsSettingsWidget::setConnections(const QList<QnSettings::ConnectionData> &connections)
 {
     m_connectionsRootItem->removeRows(0, m_connectionsRootItem->rowCount());
 
@@ -116,7 +116,7 @@ void ConnectionsSettingsWidget::setConnections(const QList<QnSettings::Connectio
         addConnection(connection);
 }
 
-void ConnectionsSettingsWidget::addConnection(const QnSettings::ConnectionData &connection)
+void QnConnectionsSettingsWidget::addConnection(const QnSettings::ConnectionData &connection)
 {
     QList<QStandardItem *> row;
     row << new QStandardItem(!connection.name.trimmed().isEmpty() ? connection.name : tr("Unnamed"))
@@ -128,7 +128,7 @@ void ConnectionsSettingsWidget::addConnection(const QnSettings::ConnectionData &
     m_connectionsRootItem->appendRow(row);
 }
 
-void ConnectionsSettingsWidget::removeConnection(const QnSettings::ConnectionData &connection)
+void QnConnectionsSettingsWidget::removeConnection(const QnSettings::ConnectionData &connection)
 {
     for (int row = 0; row < m_connectionsRootItem->rowCount(); ++row) {
         if (connection.name == m_connectionsRootItem->child(row, 0)->text()) {
@@ -138,7 +138,7 @@ void ConnectionsSettingsWidget::removeConnection(const QnSettings::ConnectionDat
     }
 }
 
-void ConnectionsSettingsWidget::currentRowChanged(const QModelIndex &current, const QModelIndex &previous)
+void QnConnectionsSettingsWidget::currentRowChanged(const QModelIndex &current, const QModelIndex &previous)
 {
     m_dataWidgetMapper->setCurrentModelIndex(current);
 
@@ -171,7 +171,7 @@ void ConnectionsSettingsWidget::currentRowChanged(const QModelIndex &current, co
     }
 }
 
-QUrl ConnectionsSettingsWidget::currentUrl()
+QUrl QnConnectionsSettingsWidget::currentUrl()
 {
     const QModelIndex current = ui->connectionsTreeView->currentIndex();
 
@@ -189,14 +189,14 @@ QUrl ConnectionsSettingsWidget::currentUrl()
     return url;
 }
 
-void ConnectionsSettingsWidget::savePasswordToggled(bool save)
+void QnConnectionsSettingsWidget::savePasswordToggled(bool save)
 {
     if (!save)
         ui->passwordLineEdit->clear();
     ui->passwordLineEdit->setEnabled(save);
 }
 
-void ConnectionsSettingsWidget::testConnection()
+void QnConnectionsSettingsWidget::testConnection()
 {
     const QModelIndex current = ui->connectionsTreeView->currentIndex();
     if (current == m_connectionsRootItem->index())
@@ -215,7 +215,7 @@ void ConnectionsSettingsWidget::testConnection()
     dialog->exec();
 }
 
-void ConnectionsSettingsWidget::newConnection()
+void QnConnectionsSettingsWidget::newConnection()
 {
     QList<QStandardItem *> row;
     row << new QStandardItem(tr("Unnamed"))
@@ -232,7 +232,7 @@ void ConnectionsSettingsWidget::newConnection()
     ui->connectionNameLineEdit->selectAll();
 }
 
-void ConnectionsSettingsWidget::duplicateConnection()
+void QnConnectionsSettingsWidget::duplicateConnection()
 {
     const QModelIndex current = ui->connectionsTreeView->currentIndex();
     if (current == m_connectionsRootItem->index())
@@ -254,7 +254,7 @@ void ConnectionsSettingsWidget::duplicateConnection()
     ui->connectionNameLineEdit->selectAll();
 }
 
-void ConnectionsSettingsWidget::deleteConnection()
+void QnConnectionsSettingsWidget::deleteConnection()
 {
     const QModelIndex current = ui->connectionsTreeView->currentIndex();
     if (current == m_connectionsRootItem->index())

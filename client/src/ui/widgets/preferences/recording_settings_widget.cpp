@@ -23,7 +23,7 @@ static inline void setDefaultSoundIcon(QLabel *label)
 }
 
 
-RecordingSettingsWidget::RecordingSettingsWidget(QWidget *parent) :
+QnRecordingSettingsWidget::QnRecordingSettingsWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::RecordingSettings),
     settings(new VideoRecorderSettings(this))
@@ -112,7 +112,7 @@ RecordingSettingsWidget::RecordingSettingsWidget(QWidget *parent) :
 #endif
 }
 
-void RecordingSettingsWidget::onComboboxChanged(int index)
+void QnRecordingSettingsWidget::onComboboxChanged(int index)
 {
     additionalAdjustSize();
 #ifdef Q_OS_WIN32
@@ -128,12 +128,12 @@ void RecordingSettingsWidget::onComboboxChanged(int index)
 }
 
 
-RecordingSettingsWidget::~RecordingSettingsWidget()
+QnRecordingSettingsWidget::~QnRecordingSettingsWidget()
 {
     delete ui;
 }
 
-VideoRecorderSettings::CaptureMode RecordingSettingsWidget::captureMode() const
+VideoRecorderSettings::CaptureMode QnRecordingSettingsWidget::captureMode() const
 {
     if (ui->fullscreenButton->isChecked() && !ui->disableAeroCheckBox->isChecked())
         return VideoRecorderSettings::FullScreenMode;
@@ -143,7 +143,7 @@ VideoRecorderSettings::CaptureMode RecordingSettingsWidget::captureMode() const
         return VideoRecorderSettings::WindowMode;
 }
 
-void RecordingSettingsWidget::setCaptureMode(VideoRecorderSettings::CaptureMode c)
+void QnRecordingSettingsWidget::setCaptureMode(VideoRecorderSettings::CaptureMode c)
 {
     switch (c) {
     case VideoRecorderSettings::FullScreenMode:
@@ -162,17 +162,17 @@ void RecordingSettingsWidget::setCaptureMode(VideoRecorderSettings::CaptureMode 
     }
 }
 
-VideoRecorderSettings::DecoderQuality RecordingSettingsWidget::decoderQuality() const
+VideoRecorderSettings::DecoderQuality QnRecordingSettingsWidget::decoderQuality() const
 {
     return (VideoRecorderSettings::DecoderQuality)ui->qualityComboBox->currentIndex();
 }
 
-void RecordingSettingsWidget::setDecoderQuality(VideoRecorderSettings::DecoderQuality q)
+void QnRecordingSettingsWidget::setDecoderQuality(VideoRecorderSettings::DecoderQuality q)
 {
     ui->qualityComboBox->setCurrentIndex(q);
 }
 
-VideoRecorderSettings::Resolution RecordingSettingsWidget::resolution() const
+VideoRecorderSettings::Resolution QnRecordingSettingsWidget::resolution() const
 {
     int index = ui->resolutionComboBox->currentIndex();
 #ifdef CL_TRIAL_MODE
@@ -181,7 +181,7 @@ VideoRecorderSettings::Resolution RecordingSettingsWidget::resolution() const
     return (VideoRecorderSettings::Resolution) index;
 }
 
-void RecordingSettingsWidget::setResolution(VideoRecorderSettings::Resolution r)
+void QnRecordingSettingsWidget::setResolution(VideoRecorderSettings::Resolution r)
 {
 #ifdef CL_TRIAL_MODE
     ui->resolutionComboBox->setCurrentIndex(r - (int) VideoRecorderSettings::Res640x480);
@@ -190,7 +190,7 @@ void RecordingSettingsWidget::setResolution(VideoRecorderSettings::Resolution r)
 #endif
 }
 
-void RecordingSettingsWidget::accept()
+void QnRecordingSettingsWidget::accept()
 {
     settings->setCaptureMode(captureMode());
     settings->setDecoderQuality(decoderQuality());
@@ -204,7 +204,7 @@ void RecordingSettingsWidget::accept()
         QMessageBox::information(this, tr("Information"), tr("Very powerful machine is required for BestQuality and Native resolution."));
 }
 
-void RecordingSettingsWidget::onMonitorChanged(int index)
+void QnRecordingSettingsWidget::onMonitorChanged(int index)
 {
 #ifdef Q_OS_WIN
     if (index != qApp->desktop()->primaryScreen())
@@ -220,23 +220,23 @@ void RecordingSettingsWidget::onMonitorChanged(int index)
 #endif
 }
 
-int RecordingSettingsWidget::screen() const
+int QnRecordingSettingsWidget::screen() const
 {
     return ui->screenComboBox->itemData(ui->screenComboBox->currentIndex()).toInt();
 }
 
-void RecordingSettingsWidget::setScreen(int screen)
+void QnRecordingSettingsWidget::setScreen(int screen)
 {
     ui->screenComboBox->setCurrentIndex(screen);
 }
 
-QString RecordingSettingsWidget::primaryAudioDeviceName() const
+QString QnRecordingSettingsWidget::primaryAudioDeviceName() const
 {
     return ui->primaryAudioDeviceComboBox->currentText();
 }
 
 
-void RecordingSettingsWidget::setPrimaryAudioDeviceName(const QString &name)
+void QnRecordingSettingsWidget::setPrimaryAudioDeviceName(const QString &name)
 {
     if (name.isEmpty()) {
         ui->primaryAudioDeviceComboBox->setCurrentIndex(0);
@@ -251,12 +251,12 @@ void RecordingSettingsWidget::setPrimaryAudioDeviceName(const QString &name)
     }
 }
 
-QString RecordingSettingsWidget::secondaryAudioDeviceName() const
+QString QnRecordingSettingsWidget::secondaryAudioDeviceName() const
 {
     return ui->secondaryAudioDeviceComboBox->currentText();
 }
 
-void RecordingSettingsWidget::setSecondaryAudioDeviceName(const QString &name)
+void QnRecordingSettingsWidget::setSecondaryAudioDeviceName(const QString &name)
 {
     if (name.isEmpty()) {
         ui->secondaryAudioDeviceComboBox->setCurrentIndex(0);
@@ -271,7 +271,7 @@ void RecordingSettingsWidget::setSecondaryAudioDeviceName(const QString &name)
     }
 }
 
-void RecordingSettingsWidget::onDisableAeroChecked(bool enabled)
+void QnRecordingSettingsWidget::onDisableAeroChecked(bool enabled)
 {
     QDesktopWidget *desktop = qApp->desktop();
     if (enabled) {
@@ -301,7 +301,7 @@ void RecordingSettingsWidget::onDisableAeroChecked(bool enabled)
     }
 }
 
-void RecordingSettingsWidget::additionalAdjustSize()
+void QnRecordingSettingsWidget::additionalAdjustSize()
 {
     ui->label_primaryDeviceText->adjustSize();
     ui->label_secondaryDeviceText->adjustSize();

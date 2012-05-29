@@ -3,21 +3,22 @@
 
 #include <QtCore/QScopedPointer>
 #include <QtGui/QDialog>
-#include "utils/settings.h"
+
+#include <ui/workbench/workbench_context_aware.h>
 
 
 class QnWorkbenchContext;
 
-class ConnectionsSettingsWidget;
-class LicenseManagerWidget;
-class RecordingSettingsWidget;
-class YouTubeSettingsWidget;
+class QnConnectionsSettingsWidget;
+class QnLicenseManagerWidget;
+class QnRecordingSettingsWidget;
+class QnYouTubeSettingsWidget;
 
 namespace Ui {
     class PreferencesDialog;
 }
 
-class QnPreferencesDialog : public QDialog {
+class QnPreferencesDialog: public QDialog, protected QnWorkbenchContextAware {
     Q_OBJECT
 
 public:
@@ -35,7 +36,7 @@ public:
     void setCurrentPage(SettingsPage page);
 
 private:
-    void updateView();
+    void updateFromSettings();
     void updateStoredConnections();
     void initColorPicker();
 
@@ -57,10 +58,10 @@ private:
 
     QScopedPointer<Ui::PreferencesDialog> ui;
     QnSettings::Data m_settingsData;
-    ConnectionsSettingsWidget *connectionsSettingsWidget;
-    RecordingSettingsWidget *videoRecorderWidget;
-    YouTubeSettingsWidget *youTubeSettingsWidget;
-    LicenseManagerWidget *licenseManagerWidget;
+    QnConnectionsSettingsWidget *connectionsSettingsWidget;
+    QnRecordingSettingsWidget *videoRecorderWidget;
+    QnYouTubeSettingsWidget *youTubeSettingsWidget;
+    QnLicenseManagerWidget *licenseManagerWidget;
 
     typedef QPair<QString, QString> CameraNameAndInfo;
 
