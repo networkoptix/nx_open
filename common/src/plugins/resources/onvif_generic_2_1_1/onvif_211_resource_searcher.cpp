@@ -4,7 +4,6 @@
 #include "evp.h"
 #endif
 
-#include "rand.h"
 #include "onvif_211_resource_searcher.h"
 #include "core/resource/camera_resource.h"
 #include "onvif_211_resource.h"
