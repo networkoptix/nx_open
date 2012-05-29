@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
      xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
-    <Product Id="*" Name="${product.name}" Language="1033" Version="${version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="{CE572797-45BF-4f1c-A783-369EA79C597E}">
+    <Product Id="*" Name="${product.name}" Language="1033" Version="${project.version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="{CE572797-45BF-4f1c-A783-369EA79C597E}">
         <Package Id="*" InstallerVersion="300" Compressed="yes" Keywords="Installer" Comments="${company.name} ${product.name} Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine" />
         
         <!-- Wix Variables -->
@@ -221,10 +221,10 @@
     
 <!--        <Upgrade Id="{CE572797-45BF-4f1c-A783-369EA79C597E}">
             <UpgradeVersion
-                Minimum="0.0.0.0" Maximum="${version}.${buildNumber}"
+                Minimum="0.0.0.0" Maximum="${project.version}.${buildNumber}"
                 Property="PREVIOUSVERSIONSINSTALLED"
                 IncludeMinimum="yes" IncludeMaximum="yes" />
-            <UpgradeVersion OnlyDetect='no' Property='NEWERVERSIONINSTALLED' Minimum='${version}.${buildNumber}' IncludeMinimum='no' />
+            <UpgradeVersion OnlyDetect='no' Property='NEWERVERSIONINSTALLED' Minimum='${project.version}.${buildNumber}' IncludeMinimum='no' />
         </Upgrade>
 -->
         <?define EcsNeedsGuid="(&AppServerFeature AND NOT APPSERVER_GUID)"?>
