@@ -123,8 +123,8 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(QnResourcePtr re
 
     foreach(QnVideoServerResourcePtr otherVideoServer, checkServers)
     {
-		if (otherVideoServer == currentVideoServer)
-			return 0; // archive starts with current server
+        if (otherVideoServer == currentVideoServer)
+            return 0; // archive starts with current server
 
         QnResourcePtr otherCamera = qnResPool->getResourceByUniqId(mac + otherVideoServer->getId().toString());
         RTPSession otherRtspSession;
