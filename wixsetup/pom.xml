@@ -337,7 +337,7 @@
 								</configuration>					
 							</execution>	-->				
 
-							<!--<execution>
+							<execution>
 								<id>integration-test</id>
 								<phase>integration-test</phase>
 								<goals>
@@ -345,9 +345,9 @@
 								</goals>
 								<configuration>
 									<executable>test.bat</executable>
-									<workingDirectory>${baseDir}</workingDirectory>						
+									<workingDirectory>${project.build.directory}</workingDirectory>						
 								</configuration>	
-							</execution>	-->				
+							</execution>			
 						</executions> 
 					</plugin>
 					<!--<plugin>
