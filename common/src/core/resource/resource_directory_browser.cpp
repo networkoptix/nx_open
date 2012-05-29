@@ -194,6 +194,9 @@ QnResourcePtr QnResourceDirectoryBrowser::createArchiveResource(const QString& x
         layout->setId(QnId::generateSpecialId());
         layout->setName(QFileInfo(xfile).fileName() + QString(" - ") + layout->getName());
 
+        layout->addFlags(QnResource::url);
+        layout->setUrl(xfile);
+
         QnLayoutItemDataMap items = layout->getItems();
         QnLayoutItemDataMap updatedItems;
 
