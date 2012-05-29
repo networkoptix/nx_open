@@ -106,6 +106,9 @@ struct QnRunnableCleanup
 {
     static inline void cleanup(CLLongRunnable *runnable)
     {
+        if(!runnable)
+            return;
+
         if(runnable->isRunning()) {
             QObject::connect(runnable, SIGNAL(finished()), runnable, SLOT(deleteLater()));
             runnable->pleaseStop();
