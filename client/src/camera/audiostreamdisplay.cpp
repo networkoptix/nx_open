@@ -54,15 +54,16 @@ static void down_mix_to_stereo(T *data, int channels, int len)
 
 CLAudioStreamDisplay::CLAudioStreamDisplay(int bufferMs) :
     m_bufferMs(bufferMs),
-    m_decodedaudio(16, DEFAULT_AUDIO_FRAME_SIZE),
     m_tooFewDataDetected(true),
     m_isFormatSupported(true),
     m_audioSound(0),
     m_downmixing(false),
     m_forceDownmix(qnSettings->downmixAudio()),
     m_sampleConvertMethod(SampleConvert_None),
-    m_isConvertMethodInitialized(false)
+    m_isConvertMethodInitialized(false),
+    m_decodedAudioBuffer(CL_MEDIA_ALIGNMENT, AVCODEC_MAX_AUDIO_FRAME_SIZE)
 {
+    
 }
 
 CLAudioStreamDisplay::~CLAudioStreamDisplay()
@@ -251,6 +252,7 @@ void CLAudioStreamDisplay::playCurrentBuffer()
 
         //data->dataProvider->setNeedSleep(true); // need to introduce delay again
 
+        /*
         CLAudioData audio;
         audio.codec = data->compressionType;
         audio.inbuf = (unsigned char*)data->data.data();
@@ -258,6 +260,7 @@ void CLAudioStreamDisplay::playCurrentBuffer()
         audio.outbuf = &m_decodedaudio;
         audio.outbuf_len = 0;
         audio.format = data->format;
+        */
 
         if (data->compressionType == CODEC_ID_NONE)
         {
@@ -271,12 +274,11 @@ void CLAudioStreamDisplay::playCurrentBuffer()
 
         }
 
-        bool decoded = m_decoder[data->compressionType]->decode(audio);
-
-        if (!decoded || audio.outbuf_len == 0)
+        if (!m_decoder[data->compressionType]->decode(data, m_decodedAudioBuffer))
             return;
 
         //  convert format
+        QnAudioFormat audioFormat = data->format;
         if (!m_isConvertMethodInitialized)
         {
             if (m_audioSound)
@@ -285,62 +287,62 @@ void CLAudioStreamDisplay::playCurrentBuffer()
                 m_audioSound = 0;
             }
 
-            m_isFormatSupported = initFormatConvertRule(audio.format);
+            m_isFormatSupported = initFormatConvertRule(audioFormat);
             m_isConvertMethodInitialized = true;
             if (!m_isFormatSupported)
                 return; // can play audio
         }
         if (m_sampleConvertMethod == SampleConvert_Float2Int32)
-            float2int32(audio);
+            audioFormat = float2int32(m_decodedAudioBuffer, audioFormat);
         else if (m_sampleConvertMethod == SampleConvert_Float2Int16)
-            float2int16(audio);
+            audioFormat = float2int16(m_decodedAudioBuffer, audioFormat);
         else if (m_sampleConvertMethod == SampleConvert_Int32ToInt16)
-            int32Toint16(audio);
-        if (audio.format.channels() > 2 && m_downmixing)
-            downmix(audio);
+            audioFormat = int32Toint16(m_decodedAudioBuffer, audioFormat);
+        if (audioFormat.channels() > 2 && m_downmixing)
+            audioFormat = downmix(m_decodedAudioBuffer, audioFormat);
 
         //resume(); // does nothing if resumed already
 
         // play audio
         if (!m_audioSound) {
-            m_audioSound = QtvAudioDevice::instance()->addSound(audio.format);
+            m_audioSound = QtvAudioDevice::instance()->addSound(audioFormat);
             if (!m_audioSound)
                 m_isConvertMethodInitialized = false; // I have found PC where: 32-bit format sometime supported, sometimes not supported (may be several dll)
         }
 
         if (m_audioSound)
-            m_audioSound->play((const quint8*) audio.outbuf->data(), audio.outbuf_len);
+            m_audioSound->play((const quint8*) m_decodedAudioBuffer.data(), m_decodedAudioBuffer.size());
     }
 }
 
 //=======================================================================
-void CLAudioStreamDisplay::downmix(CLAudioData& audio)
+QnAudioFormat CLAudioStreamDisplay::downmix(CLByteArray& audio, QnAudioFormat format)
 {
-    if (audio.format.channels() > 2)
+    if (format.channels() > 2)
     {
-        if (audio.format.sampleSize() == 8)
-            down_mix_to_stereo<qint8>((qint8*)(audio.outbuf->data()), audio.format.channelCount(), audio.outbuf_len);
-        else if (audio.format.sampleSize() == 16)
-            down_mix_to_stereo<qint16>((qint16*)(audio.outbuf->data()), audio.format.channelCount(), audio.outbuf_len);
-        else if (audio.format.sampleSize() == 32)
-            down_mix_to_stereo<qint32>((qint32*)(audio.outbuf->data()), audio.format.channelCount(), audio.outbuf_len);
+        if (format.sampleSize() == 8)
+            down_mix_to_stereo<qint8>((qint8*)(audio.data()), format.channelCount(), audio.size());
+        else if (format.sampleSize() == 16)
+            down_mix_to_stereo<qint16>((qint16*)(audio.data()), format.channelCount(), audio.size());
+        else if (format.sampleSize() == 32)
+            down_mix_to_stereo<qint32>((qint32*)(audio.data()), format.channelCount(), audio.size());
         else
         {
             Q_ASSERT_X(1 == 0, Q_FUNC_INFO + __LINE__, "invalid sample size");
         }
-        audio.outbuf_len /= audio.format.channelCount();
-        audio.outbuf_len *= 2;
-        audio.format.setChannels(2);
+        audio.resize(audio.size() / format.channelCount() * 2);
+        format.setChannels(2);
     }
+    return format;
 }
 
-void CLAudioStreamDisplay::float2int16(CLAudioData& audio)
+QnAudioFormat CLAudioStreamDisplay::float2int16(CLByteArray& audio, QnAudioFormat format)
 {
     Q_ASSERT(sizeof(float) == 4); // not sure about sizeof(float) in 64 bit version
 
-    qint32* inP = (qint32*)(audio.outbuf->data());
+    qint32* inP = (qint32*)(audio.data());
     qint16* outP = (qint16*)inP;
-    int len = audio.outbuf_len/4;
+    int len = audio.size()/4;
 
     for (int i = 0; i < len; ++i)
     {
@@ -349,18 +351,19 @@ void CLAudioStreamDisplay::float2int16(CLAudioData& audio)
         ++inP;
         ++outP;
     }
-    audio.outbuf_len /= 2;
-    audio.format.setSampleSize(16);
-    audio.format.setSampleType(QnAudioFormat::SignedInt);
+    audio.resize(audio.size() / 2);
+    format.setSampleSize(16);
+    format.setSampleType(QnAudioFormat::SignedInt);
+    return format;
 }
 
-void CLAudioStreamDisplay::int32Toint16(CLAudioData& audio)
+QnAudioFormat CLAudioStreamDisplay::int32Toint16(CLByteArray& audio, QnAudioFormat format)
 {
     Q_ASSERT(sizeof(float) == 4); // not sure about sizeof(float) in 64 bit version
 
-    qint32* inP = (qint32*)(audio.outbuf->data());
+    qint32* inP = (qint32*)(audio.data());
     qint16* outP = (qint16*)inP;
-    int len = audio.outbuf_len/4;
+    int len = audio.size()/4;
 
     for (int i = 0; i < len; ++i)
     {
@@ -368,24 +371,26 @@ void CLAudioStreamDisplay::int32Toint16(CLAudioData& audio)
         ++inP;
         ++outP;
     }
-    audio.outbuf_len /= 2;
-    audio.format.setSampleSize(16);
-    audio.format.setSampleType(QnAudioFormat::SignedInt);
+    audio.resize(audio.size() / 2);
+    format.setSampleSize(16);
+    format.setSampleType(QnAudioFormat::SignedInt);
+    return format;
 }
 
-void CLAudioStreamDisplay::float2int32(CLAudioData& audio)
+QnAudioFormat CLAudioStreamDisplay::float2int32(CLByteArray& audio, QnAudioFormat format)
 {
     Q_ASSERT(sizeof(float) == 4); // not sure about sizeof(float) in 64 bit version
 
-    qint32* inP = (qint32*)(audio.outbuf->data());
-    int len = audio.outbuf_len/4;
+    qint32* inP = (qint32*)(audio.data());
+    int len = audio.size()/4;
     for (int i = 0; i < len; ++i)
     {
         float f = *((float*)inP);
         *inP = (qint32) (f * INT_MAX);
         ++inP;
     }
-    audio.format.setSampleType(QnAudioFormat::SignedInt);
+    format.setSampleType(QnAudioFormat::SignedInt);
+    return format;
 }
 
 int CLAudioStreamDisplay::playAfterMs() const

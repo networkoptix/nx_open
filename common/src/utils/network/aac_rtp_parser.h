@@ -19,10 +19,6 @@ public:
     virtual bool processData(quint8* rtpBuffer, int readed, QList<QnAbstractMediaDataPtr>& result) override;
     virtual QnResourceAudioLayout* getAudioLayout() override;
 private:
-    void processIntParam(const QByteArray& checkName, int& setValue, const QByteArray& param);
-    void processHexParam(const QByteArray& checkName, QByteArray& setValue, const QByteArray& param);
-    void processStringParam(const QByteArray& checkName, QByteArray& setValue, const QByteArray& param);
-private:
     int m_sizeLength; // 0 if constant size. see RFC3640
     int m_constantSize;
     int m_indexLength;

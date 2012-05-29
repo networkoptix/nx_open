@@ -17,6 +17,7 @@ QnAxisStreamReader::QnAxisStreamReader(QnResourcePtr res):
     m_rtpStreamParser(res)
 {
     m_axisRes = getResource().dynamicCast<QnPlAxisResource>();
+    m_rtpStreamParser.setDefaultAudioCodecName("PCMA"); // axis does not provide any audio codec info for g711, defaulting to g711 if no codec info
 }
 
 QnAxisStreamReader::~QnAxisStreamReader()

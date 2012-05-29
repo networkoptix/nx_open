@@ -6,6 +6,7 @@
 #include "utils/common/util.h"
 #include "core/resource/resource_media_layout.h"
 #include "core/resource/media_resource.h"
+#include "g711_rtp_parser.h"
 
 static const int RTSP_RETRY_COUNT = 3;
 
@@ -125,6 +126,23 @@ QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
         return new CLH264RtpParser;
     else if (codecName == "mpeg4-generic")
         return new QnAacRtpParser;
+    else if (codecName == "PCMA") {
+        QnG711RtpParser* result = new QnG711RtpParser;
+        result->setCodecId(CODEC_ID_PCM_MULAW);
+        return result;
+    }
+    else if (codecName.startsWith("g726")) // g726-24, g726-32
+    { 
+        int bitRatePos = codecName.indexOf('-');
+        if (bitRatePos == -1)
+            return 0;
+        QString bitsPerSample = codecName.mid(bitRatePos+1);
+        QnG711RtpParser* result = new QnG711RtpParser;
+        result->setCodecId(CODEC_ID_ADPCM_G726);
+        result->setBitsPerSample(bitsPerSample.toInt()/8);
+        result->setSampleFormat(AV_SAMPLE_FMT_S16);
+        return result;
+    }
     else
         return 0;
 }
@@ -184,6 +202,11 @@ void QnMulticodecRtpReader::closeStream()
 bool QnMulticodecRtpReader::isStreamOpened() const
 {
     return m_RtpSession.isOpened();
+}
+
+void QnMulticodecRtpReader::setDefaultAudioCodecName(const QString& value)
+{
+    m_RtpSession.setDefaultAudioCodecName(value);
 }
 
 const QnResourceAudioLayout* QnMulticodecRtpReader::getAudioLayout() const

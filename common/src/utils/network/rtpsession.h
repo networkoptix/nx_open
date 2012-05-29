@@ -131,6 +131,7 @@ public:
 
     QString getCodecNameByType(const QString& trackType);
     QList<QByteArray> getSdpByType(const QString& trackType) const;
+    void setDefaultAudioCodecName(const QString& value);
 signals:
     void gotTextResponse(QByteArray text);
 private:
@@ -186,6 +187,7 @@ private:
     QString m_proxyAddr;
     int m_proxyPort;
     QString m_contentBase;
+    QString m_defaultAudioCodecName;
 };
 
 #endif //rtp_session_h_1935_h

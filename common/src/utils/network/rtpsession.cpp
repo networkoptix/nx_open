@@ -150,11 +150,19 @@ void RTPSession::parseSDP()
         if (lineLower.startsWith("m="))
         {
             if (trackNum >= 0) {
+                if (codecType == "audio" && codecName.isEmpty())
+                    codecName = m_defaultAudioCodecName; // default audio codec
                 m_sdpTracks.insert(trackNum, QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(codecName, codecType, setupURL, mapNum, this, m_transport == "TCP")));
                 trackNum = -1;
                 setupURL.clear();
             }
-            codecType = lineLower.mid(2).split(' ')[0];
+            QList<QByteArray> trackParams = lineLower.mid(2).split(' ');
+            codecType = trackParams[0];
+            codecName.clear();
+            mapNum = 0;
+            if (trackParams.size() >= 2) {
+                mapNum = trackParams[2].toInt();
+            }
         }
         if (lineLower.startsWith("a=rtpmap"))
         {
@@ -195,8 +203,11 @@ void RTPSession::parseSDP()
 
         }
     }
-    if (trackNum >= 0)
+    if (trackNum >= 0) {
+        if (codecType == "audio" && codecName.isEmpty())
+            codecName = m_defaultAudioCodecName;
         m_sdpTracks.insert(trackNum, QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(codecName, codecType, setupURL, mapNum, this, m_transport == "TCP")));
+    }
 }
 
 void RTPSession::parseRangeHeader(const QString& rangeStr)
@@ -1076,6 +1087,11 @@ void RTPSession::setProxyAddr(const QString& addr, int port)
     m_proxyPort = port;
 }
 
+void RTPSession::setDefaultAudioCodecName(const QString& value)
+{
+    m_defaultAudioCodecName = value;
+}
+
 CommunicatingSocket* RTPIODevice::getMediaSocket()
 { 
     if (m_tcpMode) 
@@ -1083,3 +1099,4 @@ CommunicatingSocket* RTPIODevice::getMediaSocket()
     else
         return m_mediaSocket; 
 }
+

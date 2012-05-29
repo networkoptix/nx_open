@@ -61,6 +61,10 @@ class QnRtpAudioStreamParser: public QnRtpStreamParser
 {
 public:
     virtual QnResourceAudioLayout* getAudioLayout() = 0;
+protected:
+    void processIntParam(const QByteArray& checkName, int& setValue, const QByteArray& param);
+    void processHexParam(const QByteArray& checkName, QByteArray& setValue, const QByteArray& param);
+    void processStringParam(const QByteArray& checkName, QByteArray& setValue, const QByteArray& param);
 };
 
 #endif

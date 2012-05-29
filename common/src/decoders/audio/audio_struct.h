@@ -8,6 +8,7 @@
 #define QnAudioFormat QAudioFormat
 #endif
 
+/*
 class CLAlignedData;
 
 // input to the decoder 
@@ -23,5 +24,6 @@ struct CLAudioData
 
 	QnAudioFormat format;
 };
+*/
 
 #endif //audio_struct_h1530

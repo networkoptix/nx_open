@@ -590,7 +590,7 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(con
 
                 nextPacket = QnMetaDataV1Ptr(metadata);
             }
-            else if (context && context->ctx()->codec_type == AVMEDIA_TYPE_VIDEO && dataType == QnAbstractMediaData::VIDEO)
+            else if (context && context->ctx() && context->ctx()->codec_type == AVMEDIA_TYPE_VIDEO && dataType == QnAbstractMediaData::VIDEO)
             {
                 if (dataSize < RTSP_FFMPEG_VIDEO_HEADER_SIZE)
                     return result;
@@ -611,6 +611,7 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(con
             else if (context && context->ctx()->codec_type == AVMEDIA_TYPE_AUDIO && dataType == QnAbstractMediaData::AUDIO)
             {
                 QnCompressedAudioData *audio = new QnCompressedAudioData(CL_MEDIA_ALIGNMENT, dataSize); // , context
+                audio->context = context;
                 audio->format.fromAvStream(context->ctx());
                 nextPacket = QnCompressedAudioDataPtr(audio);
             }
