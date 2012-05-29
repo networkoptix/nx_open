@@ -617,7 +617,14 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(con
             }
             else
             {
-                qWarning() << "Unsupported RTP codec or packet type. codec=" << (context ? context->ctx()->codec_type : 0) << "dataType=" << dataType;
+                if (context && context->ctx())
+                    qWarning() << "Unsupported RTP codec or packet type. codec=" << context->ctx()->codec_type;
+                else if (dataType == QnAbstractMediaData::AUDIO)
+                    qWarning() << "Unsupported audio codec or codec params";
+                else if (dataType == QnAbstractMediaData::VIDEO)
+                    qWarning() << "Unsupported video or codec params";
+                else
+                    qWarning() << "Unsupported or unknown packet";
                 return result;
             }
 
