@@ -14,6 +14,8 @@ class QnStorageManager: public QObject
 {
     Q_OBJECT
 public:
+    typedef QMap<int, QnStorageResourcePtr> StorageMap;
+
     QnStorageManager();
     virtual ~QnStorageManager();
     static QnStorageManager* instance();
@@ -39,6 +41,8 @@ public:
     QnTimePeriodList getRecordedPeriods(QnResourceList resList, qint64 startTime, qint64 endTime, qint64 detailLevel);
     void loadFullFileCatalog();
     QnStorageResourcePtr getOptimalStorageRoot(QnAbstractMediaStreamDataProvider* provider);
+
+    StorageMap getAllStorages() const { return m_storageRoots; }
 public slots:
     void at_archiveRangeChanged(qint64 newStartTimeMs, qint64 newEndTimeMs);
 private:
@@ -49,7 +53,6 @@ private:
     void loadFullFileCatalogInternal(QnResource::ConnectionRole role);
     QnStorageResourcePtr extractStorageFromFileName(int& storageIndex, const QString& fileName, QString& mac, QString& quality);
 private:
-    typedef QMap<int, QnStorageResourcePtr> StorageMap;
     StorageMap m_storageRoots;
     typedef QMap<QString, DeviceFileCatalogPtr> FileCatalogMap;
     FileCatalogMap m_devFileCatalogHi;

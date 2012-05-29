@@ -218,6 +218,7 @@ void QnWorkbenchLayoutSynchronizer::at_resource_itemAdded(const QnLayoutItemData
 
     QnScopedValueRollback<bool> guard(&m_submit, false);
     m_layout->addItem(new QnWorkbenchItem(itemData, this));
+
 }
 
 void QnWorkbenchLayoutSynchronizer::at_resource_itemRemoved(const QnLayoutItemData &itemData) {

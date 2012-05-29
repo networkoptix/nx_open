@@ -326,16 +326,17 @@ protected:
     int motionGridWidth() const;
     int motionGridHeight() const;
     void drawMotionSensitivity(QPainter *painter, const QRectF &rect, const QnMotionRegion& region, int channel);
+
 signals:
     void updateOverlayTextLater();
 
 private slots:
     void updateOverlayText();
+    void updateButtonsVisibility();
 
     void at_sourceSizeChanged(const QSize &size);
     void at_resource_resourceChanged();
     void at_resource_nameChanged();
-    void at_camDisplay_stillImageChanged();
 
 private:
     /**
@@ -448,7 +449,9 @@ private:
 
     GraphicsLabel *m_footerTimeLabel;
 
+    QGraphicsLinearLayout *m_headerLayout;
     QnImageButtonWidget *m_infoButton;
+    QnImageButtonWidget *m_closeButton;
 
     /** Whether aboutToBeDestroyed signal has already been emitted. */
     bool m_aboutToBeDestroyedEmitted;

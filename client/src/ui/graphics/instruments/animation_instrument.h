@@ -4,6 +4,10 @@
 #include "instrument.h"
 #include <ui/animation/animation_event.h>
 
+/**
+ * Instrument that is used internally by instrument manager to maintain a 
+ * single animation timer instance.
+ */
 class AnimationInstrument: public Instrument {
     Q_OBJECT;
 public:

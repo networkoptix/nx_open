@@ -9,6 +9,19 @@
 class QnWorkbenchContext;
 class QnResourcePool;
 
+class QnWorkbenchPermissionsNotifier: public QObject {
+    Q_OBJECT;
+public:
+    QnWorkbenchPermissionsNotifier(QObject *parent = NULL): QObject(parent) {}
+
+signals:
+    void permissionsChanged(const QnResourcePtr &resource);
+
+private:
+    friend class QnWorkbenchAccessController;
+};
+
+
 /**
  * This class implements access control.
  */
@@ -18,9 +31,7 @@ public:
     QnWorkbenchAccessController(QObject *parent = NULL);
     virtual ~QnWorkbenchAccessController();
 
-    Qn::Permissions permissions(const QnResourcePtr &resource) const {
-        return m_permissionsByResource.value(resource);
-    }
+    Qn::Permissions permissions(const QnResourcePtr &resource) const;
 
     template<class ResourceList>
     Qn::Permissions permissions(const ResourceList &resources, const typename ResourceList::const_iterator * = NULL /* Let SFINAE filter out non-lists. */) const {
@@ -29,6 +40,8 @@ public:
             result &= permissions(resource);
         return result;
     }
+
+    QnWorkbenchPermissionsNotifier *notifier(const QnResourcePtr &resource) const;
 
     /**
      * The same as asking for permissions of the current user. 
@@ -69,8 +82,15 @@ private:
     Qn::Permissions calculatePermissions(const QnVideoServerResourcePtr &server);
 
 private:
+    struct PermissionsData {
+        PermissionsData(): permissions(0), notifier(NULL) {}
+
+        Qn::Permissions permissions;
+        mutable QnWorkbenchPermissionsNotifier *notifier;
+    };
+
     QnUserResourcePtr m_user;
-    QHash<QnResourcePtr, Qn::Permissions> m_permissionsByResource;
+    QHash<QnResourcePtr, PermissionsData> m_dataByResource;
 };
 
 

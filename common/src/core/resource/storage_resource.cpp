@@ -79,7 +79,10 @@ void QnAbstractStorageResource::deserialize(const QnResourceParameters& paramete
         setSpaceLimit(parameters[QLatin1String(SPACELIMIT)].toLongLong());
 }
 
-
+float QnAbstractStorageResource::getAvarageWritingUsage() const
+{
+    return 0.0;
+}
 
 // ------------------------------ QnStorageResource -------------------------------
 

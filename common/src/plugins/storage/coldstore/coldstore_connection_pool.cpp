@@ -1,5 +1,6 @@
 #include "coldstore_connection_pool.h"
 #include "coldstore_storage.h"
+#include "utils/common/sleep.h"
 
 
 QnColdStoreConnection::QnColdStoreConnection(const QString& addr):
@@ -70,6 +71,8 @@ bool QnColdStoreConnection::open(const QString& fn, QIODevice::OpenModeFlag flag
 
             if (status != Veracity::ISFS::STATUS_DISK_POWERING_UP)
                 break;
+
+            QnSleep::msleep(50); // to avoid net and cpu usage
 
         }
 

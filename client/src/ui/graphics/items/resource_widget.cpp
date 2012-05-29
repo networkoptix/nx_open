@@ -157,25 +157,22 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_infoButton->setCheckable(true);
     connect(m_infoButton, SIGNAL(toggled(bool)), this, SLOT(fadeInfo(bool)));
 
-    QnImageButtonWidget *closeButton = NULL;
-    if(accessController()->permissions(item->layout()->resource()) & Qn::WritePermission) { // TODO: should autoupdate on permission changes
-        closeButton = new QnImageButtonWidget();
-        closeButton->setIcon(qnSkin->icon("decorations/close_item.png"));
-        closeButton->setPreferredSize(headerButtonSize);
-        connect(closeButton, SIGNAL(clicked()), this, SLOT(close()));
-    }
-
-    QGraphicsLinearLayout *headerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-    headerLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-    headerLayout->setSpacing(2.0);
-    headerLayout->addItem(m_headerTitleLabel);
-    headerLayout->addStretch(0x1000); /* Set large enough stretch for the buttons to be placed at the right end of the layout. */
-    headerLayout->addItem(m_infoButton);
-    if(closeButton)
-        headerLayout->addItem(closeButton);
+    m_closeButton = new QnImageButtonWidget();
+    m_closeButton->setIcon(qnSkin->icon("decorations/close_item.png"));
+    m_closeButton->setPreferredSize(headerButtonSize);
+    connect(m_closeButton, SIGNAL(clicked()), this, SLOT(close()));
+    connect(accessController()->notifier(item->layout()->resource()), SIGNAL(permissionsChanged(const QnResourcePtr &)), this, SLOT(updateButtonsVisibility()));
+    
+    m_headerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+    m_headerLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    m_headerLayout->setSpacing(2.0);
+    m_headerLayout->addItem(m_headerTitleLabel);
+    m_headerLayout->addStretch(0x1000); /* Set large enough stretch for the buttons to be placed at the right end of the layout. */
+    m_headerLayout->addItem(m_infoButton);
+    m_headerLayout->addItem(m_closeButton);
 
     QGraphicsWidget *headerWidget = new QGraphicsWidget();
-    headerWidget->setLayout(headerLayout);
+    headerWidget->setLayout(m_headerLayout);
     headerWidget->setAcceptedMouseButtons(0);
     headerWidget->setAutoFillBackground(true);
     {
@@ -244,7 +241,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_display = new QnResourceDisplay(m_resource, this);
     connect(m_resource.data(), SIGNAL(resourceChanged()), this, SLOT(at_resource_resourceChanged()));
     connect(m_resource.data(), SIGNAL(nameChanged()), this, SLOT(at_resource_nameChanged()));
-    connect(m_display->camDisplay(), SIGNAL(stillImageChanged()), this, SLOT(at_camDisplay_stillImageChanged()));
+    connect(m_display->camDisplay(), SIGNAL(stillImageChanged()), this, SLOT(updateButtonsVisibility()));
 
     Q_ASSERT(m_display);
     m_videoLayout = m_display->videoLayout();
@@ -278,7 +275,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 
     /* Run handlers. */
     at_resource_nameChanged();
-    at_camDisplay_stillImageChanged();
+    updateButtonsVisibility();
 }
 
 
@@ -641,7 +638,7 @@ void QnResourceWidget::setDisplayFlags(DisplayFlags flags) {
 
 void QnResourceWidget::updateOverlayText() {
     qint64 time = m_renderer->lastDisplayedTime(0);
-    if (time > 1000000ll * 3600 * 24) /* Do not show time for regular media files. */
+    if (time > 1000000ll * 3600 * 24) /* Do not show time for regular media files. */ // TODO: try to avoid time comparison hacks.
         m_footerTimeLabel->setText(QDateTime::fromMSecsSinceEpoch(time/1000).toString(tr("hh:mm:ss.zzz")));
 
     qreal fps = 0.0;
@@ -657,6 +654,29 @@ void QnResourceWidget::updateOverlayText() {
     if (codec && codec->ctx()) 
         codecName = codecIDToString(codec->ctx()->codec_id);
     m_footerStatusLabel->setText(tr("%1fps @ %2Mbps (%3) - %4").arg(fps, 0, 'g', 2).arg(mbps, 0, 'g', 2).arg(codecName).arg(m_renderer->isLowQualityImage(0) ? "LQ" : "HQ"));
+}
+
+void QnResourceWidget::updateButtonsVisibility() {
+    bool closeButtonVisible = false;
+    if(item() && item()->layout()) {
+        Qn::Permissions requiredPermissions = Qn::WritePermission | Qn::AddRemoveItemsPermission;
+        closeButtonVisible = (accessController()->permissions(item()->layout()->resource()) & requiredPermissions) == requiredPermissions;
+    }
+
+    bool infoButtonVisible = !display()->camDisplay()->isStillImage();
+
+    if(m_closeButton->isVisible() != closeButtonVisible || m_infoButton->isVisible() != infoButtonVisible) {
+        m_infoButton->setVisible(infoButtonVisible);
+        m_closeButton->setVisible(closeButtonVisible);
+        
+        m_headerLayout->removeItem(m_infoButton);
+        m_headerLayout->removeItem(m_closeButton);
+
+        if(infoButtonVisible)
+            m_headerLayout->addItem(m_infoButton);
+        if(closeButtonVisible)
+            m_headerLayout->addItem(m_closeButton);
+    }
 }
 
 
@@ -814,9 +834,6 @@ void QnResourceWidget::at_resource_nameChanged() {
     m_headerTitleLabel->setText(m_resource->getName());
 }
 
-void QnResourceWidget::at_camDisplay_stillImageChanged() {
-    m_infoButton->setVisible(!display()->camDisplay()->isStillImage());
-}
 
 
 // -------------------------------------------------------------------------- //

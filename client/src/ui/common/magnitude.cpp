@@ -37,8 +37,8 @@ namespace {
         }
     };
 
-    class Storage: public QnSynchronizedFlatStorage<int, MagnitudeCalculator> {
-        typedef QnSynchronizedFlatStorage<int, MagnitudeCalculator> base_type;
+    class Storage: public QnSynchronizedFlatStorage<int, MagnitudeCalculator *> {
+        typedef QnSynchronizedFlatStorage<int, MagnitudeCalculator *> base_type;
     public:
         Storage() {
             insert(new NoopMagnitudeCalculator());

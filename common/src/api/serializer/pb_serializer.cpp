@@ -190,25 +190,14 @@ void parseLayouts(QList<T>& layouts, const PbLayoutList& pb_layouts)
 
         QnLayoutResourcePtr layout(new QnLayoutResource());
 
-        QnResourceParameters parameters;
         if (pb_layout.has_id())
-        {
             layout->setId(pb_layout.id());
-            parameters["id"] = QString::number(pb_layout.id());
-        }
 
         if (pb_layout.has_guid())
-        {
             layout->setGuid(pb_layout.guid().c_str());
-            parameters["guid"] = pb_layout.guid().c_str();
-        }
 
         layout->setParentId(pb_layout.parentid());
-        parameters["parentId"] = QString::number(pb_layout.parentid());
-
         layout->setName(QString::fromUtf8(pb_layout.name().c_str()));
-        parameters["name"] = QString::fromUtf8(pb_layout.name().c_str());
-
         layout->setCellAspectRatio(pb_layout.cellaspectratio());
         layout->setCellSpacing(QSizeF(pb_layout.cellspacingwidth(), pb_layout.cellspacingheight()));
 
@@ -251,15 +240,9 @@ void parseUsers(QList<T>& users, const PbUserList& pb_users)
         const proto::pb::User& pb_user = *ci;
 
         QnUserResourcePtr user(new QnUserResource());
-        QnResourceParameters parameters;
 
         if (pb_user.has_id())
-        {
             user->setId(pb_user.id());
-            parameters["id"] = QString::number(pb_user.id());
-        }
-
-        parameters["name"] = QString::fromUtf8(pb_user.name().c_str());
 
         user->setName(QString::fromUtf8(pb_user.name().c_str()));
         user->setAdmin(pb_user.isadmin());
@@ -524,6 +507,17 @@ void QnApiPbSerializer::deserializeLayouts(QnLayoutResourceList& layouts, const 
     }
 
     parseLayouts(layouts, pb_layouts.layout());
+}
+
+void QnApiPbSerializer::deserializeLayout(QnLayoutResourcePtr& layout, const QByteArray& data)
+{
+    QnLayoutResourceList layouts;
+    deserializeLayouts(layouts, data);
+
+    if (layouts.isEmpty())
+        layout = QnLayoutResourcePtr();
+    else
+        layout = layouts.at(0); 
 }
 
 void QnApiPbSerializer::deserializeUsers(QnUserResourceList& users, const QByteArray& data)

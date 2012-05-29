@@ -1,10 +1,12 @@
 #ifndef __BUFFERED_FILE_H__
 #define __BUFFERED_FILE_H__
 
+#include <QWaitCondition>
 #include <QString>
+#include <QQueue>
 #include "utils/fs/file.h"
-#include "longrunnable.h"
-#include "threadqueue.h"
+#include "utils/common/threadqueue.h"
+#include "utils/common/longrunnable.h"
 
 class QBufferedFile;
 
@@ -18,8 +20,15 @@ public:
 
     // write all data in a row
     qint64 write (QBufferedFile* file, const char * data, qint64 len);
+    
+    /*
+    * Returns storage usage in range [0..1]
+    */
+    float getAvarageUsage();
 protected:
     virtual void run();
+private:
+    void removeOldWritingStatistics(qint64 currentTime);
 private:
     struct FileBlockInfo
     {
@@ -34,6 +43,28 @@ private:
     };
 
     CLThreadQueue<FileBlockInfo*> m_dataQueue;
+
+    typedef QPair<qint64, int> WriteTimingInfo;
+    QQueue<WriteTimingInfo> m_writeTimings;
+    int m_writeTime;
+    mutable QMutex m_timingsMutex;
+};
+
+class QnWriterPool
+{
+public:
+    typedef QMap<QString, QueueFileWriter*> WritersMap;
+
+    QnWriterPool();
+    ~QnWriterPool();
+
+    static QnWriterPool* instance();
+
+    QueueFileWriter* getWriter(const QString& fileName);
+    WritersMap getAllWriters();
+private:
+    QMutex m_mutex;
+    WritersMap m_writers;
 };
 
 class QN_EXPORT QBufferedFile: public QIODevice

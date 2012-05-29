@@ -5,10 +5,10 @@
 
 #include <functional> /* For std::binary_function. */
 
-#include <QtAlgorithms>
-#include <QGLContext>
-#include <QGLWidget>
-#include <QAction>
+#include <QtCore/QtAlgorithms>
+#include <QtGui/QAction>
+#include <QtOpenGL/QGLContext>
+#include <QtOpenGL/QGLWidget>
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
@@ -32,8 +32,8 @@
 #include <ui/graphics/instruments/forwarding_instrument.h>
 #include <ui/graphics/instruments/stop_instrument.h>
 #include <ui/graphics/instruments/signaling_instrument.h>
-#include <ui/graphics/instruments/animation_instrument.h>
 #include <ui/graphics/instruments/selection_overlay_hack_instrument.h>
+#include <ui/graphics/instruments/focus_listener_instrument.h>
 
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/graphics/items/resource_widget_renderer.h>
@@ -141,17 +141,19 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
 {
     std::memset(m_itemByRole, 0, sizeof(m_itemByRole));
 
+    AnimationTimer *animationTimer = m_instrumentManager->animationTimer();
+
     /* Create and configure instruments. */
     Instrument::EventTypeSet paintEventTypes = Instrument::makeSet(QEvent::Paint);
 
     SignalingInstrument *resizeSignalingInstrument = new SignalingInstrument(Instrument::Viewport, Instrument::makeSet(QEvent::Resize), this);
     m_beforePaintInstrument = new SignalingInstrument(Instrument::Viewport, paintEventTypes, this);
     m_afterPaintInstrument = new SignalingInstrument(Instrument::Viewport, paintEventTypes, this);
-    m_animationInstrument = new AnimationInstrument(this);
     m_boundingInstrument = new BoundingInstrument(this);
     m_transformListenerInstrument = new TransformListenerInstrument(this);
     m_curtainActivityInstrument = new ActivityListenerInstrument(true, 1000, this);
     m_widgetActivityInstrument = new ActivityListenerInstrument(true, 1000 * 10, this);
+    m_focusListenerInstrument = new FocusListenerInstrument(this);
     m_paintForwardingInstrument = new ForwardingInstrument(Instrument::Viewport, paintEventTypes, this);
     m_selectionOverlayHackInstrument = new SelectionOverlayHackInstrument(this);
 
@@ -160,11 +162,11 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_instrumentManager->installInstrument(m_paintForwardingInstrument);
     m_instrumentManager->installInstrument(m_beforePaintInstrument);
     m_instrumentManager->installInstrument(m_transformListenerInstrument);
+    m_instrumentManager->installInstrument(m_focusListenerInstrument);
     m_instrumentManager->installInstrument(resizeSignalingInstrument);
     m_instrumentManager->installInstrument(m_boundingInstrument);
     m_instrumentManager->installInstrument(m_curtainActivityInstrument);
     m_instrumentManager->installInstrument(m_widgetActivityInstrument);
-    m_instrumentManager->installInstrument(m_animationInstrument);
     m_instrumentManager->installInstrument(m_selectionOverlayHackInstrument);
 
     m_curtainActivityInstrument->recursiveDisable();
@@ -177,13 +179,10 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     connect(m_curtainActivityInstrument,    SIGNAL(activityStopped()),                                  this,                   SLOT(at_activityStopped()));
     connect(m_curtainActivityInstrument,    SIGNAL(activityResumed()),                                  this,                   SLOT(at_activityStarted()));
 
-    /* Configure viewport updates. */
-    setTimer(new QAnimationTimer(this));
-
     /* Create curtain animator. */
     m_curtainAnimator = new QnCurtainAnimator(this);
     m_curtainAnimator->setSpeed(1.0); /* (255, 0, 0) -> (0, 0, 0) in 1 second. */
-    m_curtainAnimator->setTimer(m_animationInstrument->animationTimer());
+    m_curtainAnimator->setTimer(animationTimer);
     connect(m_curtainAnimator,              SIGNAL(curtained()),                                        this,                   SLOT(at_curtained()));
     connect(m_curtainAnimator,              SIGNAL(uncurtained()),                                      this,                   SLOT(at_uncurtained()));
 
@@ -193,7 +192,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_viewportAnimator->setRelativeMovementSpeed(1.0); /* Viewport movement speed in viewports per second. */
     m_viewportAnimator->setScalingSpeed(4.0); /* Viewport scaling speed, scale factor per second. */
     m_viewportAnimator->setTimeLimit(zoomAnimationDurationMsec);
-    m_viewportAnimator->setTimer(m_animationInstrument->animationTimer());
+    m_viewportAnimator->setTimer(animationTimer);
     connect(m_viewportAnimator,             SIGNAL(started()),                                          this,                   SIGNAL(viewportGrabbed()));
     connect(m_viewportAnimator,             SIGNAL(started()),                                          m_boundingInstrument,   SLOT(recursiveDisable()));
     connect(m_viewportAnimator,             SIGNAL(finished()),                                         this,                   SIGNAL(viewportUngrabbed()));
@@ -202,7 +201,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
 
     /* Create frame opacity animator. */
     m_frameOpacityAnimator = new VariantAnimator(this);
-    m_frameOpacityAnimator->setTimer(m_animationInstrument->animationTimer());
+    m_frameOpacityAnimator->setTimer(animationTimer);
     m_frameOpacityAnimator->setAccessor(new PropertyAccessor("widgetsFrameOpacity"));
     m_frameOpacityAnimator->setTargetObject(this);
     m_frameOpacityAnimator->setTimeLimit(500);
@@ -211,6 +210,8 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     connect(accessController(),             SIGNAL(permissionsChanged(const QnResourcePtr &)),          this,                   SLOT(at_context_permissionsChanged(const QnResourcePtr &)));
 
     /* Set up defaults. */
+    connect(this, SIGNAL(geometryAdjustmentRequested(QnWorkbenchItem *, bool)), this, SLOT(adjustGeometry(QnWorkbenchItem *, bool)), Qt::QueuedConnection);
+
     setScene(m_dummyScene);
 }
 
@@ -354,7 +355,7 @@ void QnWorkbenchDisplay::initSceneContext() {
     m_gridItem.data()->setOpacity(0.0);
     m_gridItem.data()->setLineWidth(100.0);
     m_gridItem.data()->setMapper(workbench()->mapper());
-    m_gridItem.data()->setAnimationTimer(m_animationInstrument->animationTimer());
+    m_gridItem.data()->setAnimationTimer(m_instrumentManager->animationTimer());
 
     /* Connect to context. */
     connect(workbench(),            SIGNAL(itemChanged(Qn::ItemRole)),              this,                   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
@@ -390,9 +391,6 @@ void QnWorkbenchDisplay::setView(QGraphicsView *view) {
         disconnect(m_view, NULL, this, NULL);
 
         m_viewportAnimator->setView(NULL);
-
-        /* Stop viewport updates. */
-        stopListening();
     }
 
     m_view = view;
@@ -440,9 +438,6 @@ void QnWorkbenchDisplay::setView(QGraphicsView *view) {
 
         /* Configure viewport animator. */
         m_viewportAnimator->setView(m_view);
-
-        /* Start viewport updates. */
-        startListening();
     }
 }
 
@@ -503,7 +498,7 @@ WidgetAnimator *QnWorkbenchDisplay::animator(QnResourceWidget *widget) {
     animator->setRelativeMovementSpeed(8.0);
     animator->setScalingSpeed(128.0);
     animator->setRotationSpeed(270.0);
-    animator->setTimer(m_animationInstrument->animationTimer());
+    animator->setTimer(m_instrumentManager->animationTimer());
     animator->setTimeLimit(widgetAnimationDurationMsec);
     widget->setData(ITEM_ANIMATOR_KEY, QVariant::fromValue<WidgetAnimator *>(animator));
     return animator;
@@ -669,7 +664,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
     bringToFront(widget);
 
     if(item->checkFlag(Qn::PendingGeometryAdjustment))
-        adjustGeometry(item, animate);
+        adjustGeometryLater(item, animate); /* Changing item flags here may confuse the callee, so we do it through the event loop. */
 
     connect(widget,                     SIGNAL(aboutToBeDestroyed()),   this,   SLOT(at_widget_aboutToBeDestroyed()));
     connect(m_widgetActivityInstrument, SIGNAL(activityStopped()),      widget, SLOT(showActivityDecorations()));
@@ -1090,13 +1085,30 @@ void QnWorkbenchDisplay::synchronizeRaisedGeometry() {
     synchronizeGeometry(widget, animator(widget)->isRunning());
 }
 
-void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate) {
+void QnWorkbenchDisplay::adjustGeometryLater(QnWorkbenchItem *item, bool animate) {
     if(!item->checkFlag(Qn::PendingGeometryAdjustment))
-        return; /* May have been unchecked already. */
+        return;
 
     QnResourceWidget *widget = this->widget(item);
-    if(widget == NULL)
+    if(widget == NULL) {
+        return;
+    } else {
+        widget->hide(); /* So that it won't appear where it shouldn't. */
+    }
+
+    emit geometryAdjustmentRequested(item, animate);
+}
+
+void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate) {
+    if(!item->checkFlag(Qn::PendingGeometryAdjustment))
+        return;
+
+    QnResourceWidget *widget = this->widget(item);
+    if(widget == NULL) {
         return; /* No widget was created for the given item. */
+    } else {
+        widget->show(); /* It may have been hidden in a call to adjustGeometryLater. */
+    }
 
     /* Calculate target position. */
     QPointF newPos;
@@ -1150,12 +1162,6 @@ void QnWorkbenchDisplay::updateFrameWidths() {
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDisplay :: handlers
 // -------------------------------------------------------------------------- //
-void QnWorkbenchDisplay::tick(int /*deltaTime*/) {
-    assert(m_view != NULL);
-
-    m_view->viewport()->update();
-}
-
 void QnWorkbenchDisplay::at_viewportAnimator_finished() {
     synchronizeSceneBounds();
 }
@@ -1301,7 +1307,7 @@ void QnWorkbenchDisplay::at_item_flagChanged(Qn::ItemFlag flag, bool value) {
         break;
     case Qn::PendingGeometryAdjustment:
         if(value)
-            adjustGeometry(static_cast<QnWorkbenchItem *>(sender()));
+            adjustGeometryLater(static_cast<QnWorkbenchItem *>(sender())); /* Changing item flags here may confuse the callee, so we do it through the event loop. */
         break;
     default:
         qnWarning("Invalid item flag '%1'.", static_cast<int>(flag));

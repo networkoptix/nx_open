@@ -27,8 +27,22 @@ QnWorkbenchAccessController::~QnWorkbenchAccessController() {
     at_context_userChanged(QnUserResourcePtr());
 }
 
+Qn::Permissions QnWorkbenchAccessController::permissions(const QnResourcePtr &resource) const {
+    return m_dataByResource.value(resource).permissions;
+}
+
 Qn::Permissions QnWorkbenchAccessController::permissions() const {
-    return m_permissionsByResource.value(m_user);
+    return m_dataByResource.value(m_user).permissions;
+}
+
+QnWorkbenchPermissionsNotifier *QnWorkbenchAccessController::notifier(const QnResourcePtr &resource) const {
+    if(!m_dataByResource.contains(resource))
+        return NULL;
+
+    const PermissionsData &data = m_dataByResource[resource];
+    if(!data.notifier)
+        data.notifier = new QnWorkbenchPermissionsNotifier(const_cast<QnWorkbenchAccessController *>(this));
+    return data.notifier;
 }
 
 bool QnWorkbenchAccessController::isOwner() const {
@@ -94,16 +108,16 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnUserRe
 
 Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayoutResourcePtr &layout) {
     if(isAdmin() || isOwner()) {
-        return Qn::ReadWriteSavePermission | Qn::RemovePermission;
+        return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission;
     } else {
         QnResourcePtr user = resourcePool()->getResourceById(layout->getParentId());
         if(user != m_user) 
             return 0; /* Viewer can't view other's layouts. */
 
         if(snapshotManager()->isLocal(layout)) {
-            return Qn::ReadPermission | Qn::WritePermission | Qn::RemovePermission; /* Can structurally modify local layouts only. */
+            return Qn::ReadPermission | Qn::WritePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission; /* Can structurally modify local layouts only. */
         } else {
-            return Qn::ReadPermission;
+            return Qn::ReadPermission | Qn::WritePermission;
         }
     }
 }
@@ -149,8 +163,12 @@ void QnWorkbenchAccessController::setPermissionsInternal(const QnResourcePtr &re
     if(permissions == this->permissions(resource))
         return;
 
-    m_permissionsByResource[resource] = permissions;
+    PermissionsData &data = m_dataByResource[resource];
+    data.permissions = permissions;
+    
     emit permissionsChanged(resource);
+    if(data.notifier)
+        emit data.notifier->permissionsChanged(resource);
 }
 
 
@@ -176,7 +194,7 @@ void QnWorkbenchAccessController::at_resourcePool_resourceRemoved(const QnResour
     disconnect(resource.data(), NULL, this, NULL);
 
     setPermissionsInternal(resource, 0); /* So that the signal is emitted. */
-    m_permissionsByResource.remove(resource);
+    m_dataByResource.remove(resource);
 }
 
 void QnWorkbenchAccessController::at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &layout) {
