@@ -89,13 +89,16 @@ QnNetworkResourcePtr OnvifGeneric211ResourceSearcher::processPacket(QnResourceLi
     do {
         if (login) soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", login, passwd);
 
+        qDebug() << "Trying login = " << login << ", password = " << passwd;
+
         _onvifDevice__GetCapabilities request1;
         request1.Category.push_back(onvifXsd__CapabilityCategory__All);
         _onvifDevice__GetCapabilitiesResponse response1;
         soapRes = soapProxy.GetCapabilities(endpoint.toStdString().c_str(), NULL, &request1, &response1);
 
-        if (soapRes == SOAP_OK || !passHelper.isNotAuthenticated(soapProxy.soap_fault())) break;
+        if (soapRes == SOAP_OK || !passHelper.isNotAuthenticated(soapProxy.soap_fault())) { qDebug() << "Finished"; break; }
         if (passwdIter == passwords.end()) {
+            qDebug() << "Trying to create a password";
 
             //If we had no luck in picking a password, let's try to create a user
             onvifPasswd = generateRandomPassword().toStdString();
@@ -136,6 +139,8 @@ QnNetworkResourcePtr OnvifGeneric211ResourceSearcher::processPacket(QnResourceLi
         ++passwdIter;
 
     } while (true);
+
+    qDebug() << "OnvifGeneric211ResourceSearcher::processPacket: Initial login = " << login << ", password = " << passwd;
 
     //Trying to get MAC address
     _onvifDevice__GetNetworkInterfaces request1;
@@ -186,11 +191,36 @@ QnNetworkResourcePtr OnvifGeneric211ResourceSearcher::processPacket(QnResourceLi
         name = "Unknown - " + mac;
     }
 
+
+    QString mediaUrl;
+    QString deviceUrl;
+
+    {
+        //Trying to get MAC address
+        _onvifDevice__GetCapabilities request;
+        _onvifDevice__GetCapabilitiesResponse response;
+        if (login) soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", login, passwd);
+        soapRes = soapProxy.GetCapabilities(endpoint.toStdString().c_str(), NULL, &request, &response);
+        if (soapRes != SOAP_OK && cl_log.logLevel() >= cl_logDEBUG1) {
+            qDebug() << "OnvifGeneric211ResourceSearcher::processPacket: GetCapabilities ERROR!!!! SOAP to endpoint '" << endpoint
+                     << "' failed. Error code: " << soapRes << "Description: "
+                     << soapProxy.soap_fault_string() << ". " << soapProxy.soap_fault_detail()
+                     << ". Can't fetch MAC, will try to get analog." ;
+        }
+        mediaUrl = response.Capabilities->Media->XAddr.c_str();
+        qDebug() << "Media URL found: " << mediaUrl;
+        deviceUrl = response.Capabilities->Device->XAddr.c_str();
+        qDebug() << "Device URL found: " << deviceUrl;
+    }
+
     QnNetworkResourcePtr resource( new QnPlOnvifGeneric211Resource() );
     resource->setTypeId(onvifTypeId);
     resource->setName(name);
     resource->setMAC(mac);
-    if (login) resource->setAuth(login, passwd);
+    if (login) {
+        qDebug() << "OnvifGeneric211ResourceSearcher::processPacket: Setting login = " << login << ", password = " << passwd;
+        resource->setAuth(login, passwd);
+    }
 
     qDebug() << "OnvifGeneric211ResourceSearcher::processPacket: Found new camera: endpoint: " << endpoint
              << ", MAC: " << mac << ", name: " << name;
@@ -265,21 +295,22 @@ const QString OnvifGeneric211ResourceSearcher::fetchName(const _onvifDevice__Get
 
 const QString OnvifGeneric211ResourceSearcher::fetchSerialConvertToMac(const _onvifDevice__GetDeviceInformationResponse& response) const
 {
-    QString serial(response.SerialNumber.c_str());
-    serial.replace(QRegExp("[^\\w\\d]+"), "");
+    QString serialAndHwdId(response.HardwareId.c_str());
+    serialAndHwdId += response.SerialNumber.c_str();
+    serialAndHwdId.replace(QRegExp("[^\\w\\d]+"), "");
 
     //Too small serial number (may be, its better to check < 12)
-    int size = serial.size();
+    int size = serialAndHwdId.size();
     if (size < 6) return QString();
 
     QString result("FF-FF-FF-FF-FF-FF");
     for (int i = 1; i < (size < 12? size: 12); i += 2) {
-        result[i - 1 + i / 2] = serial[i - 1];
-        result[i + i / 2] = serial[i];
+        result[i - 1 + i / 2] = serialAndHwdId[i - 1];
+        result[i + i / 2] = serialAndHwdId[i];
     }
     if (size < 12 && size % 2) {
         --size;
-        result[size + size / 2] = serial[size];
+        result[size + size / 2] = serialAndHwdId[size];
     }
 
     return result;

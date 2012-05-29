@@ -55,7 +55,10 @@ bool PasswordHelper::isNotAuthenticated(const SOAP_ENV__Fault* faultInfo)
 {
     if (faultInfo && faultInfo->SOAP_ENV__Code && faultInfo->SOAP_ENV__Code->SOAP_ENV__Subcode) {
         QString subcodeValue(faultInfo->SOAP_ENV__Code->SOAP_ENV__Subcode->SOAP_ENV__Value);
-        return subcodeValue.toLower().indexOf("notauthorized") != -1;
+        subcodeValue = subcodeValue.toLower();
+        qDebug() << "PasswordHelper::isNotAuthenticated: gathered string: " << subcodeValue;
+        return subcodeValue.indexOf("notauthorized") != -1 || subcodeValue.indexOf("not permitted") != -1
+                || subcodeValue.indexOf("operationprohibited") != -1;
     }
 
     return false;
@@ -125,9 +128,9 @@ PasswordHelper::PasswordHelper()
 
     setPasswordInfo(UBIQUITI_MANUFACTURER, MAIN_USER1, MAIN_USER1);
 
-    if (cl_log.logLevel() >= cl_logDEBUG1) {
-        printPasswords();
-    }
+    //if (cl_log.logLevel() >= cl_logDEBUG1) {
+    //    printPasswords();
+    //}
 }
 
 PasswordHelper::~PasswordHelper()
@@ -162,14 +165,14 @@ const PasswordList& PasswordHelper::getPasswordsByManufacturer(const QByteArray&
     ManufacturerPasswords::const_iterator iter = manufacturerPasswords.begin();
     while (iter != manufacturerPasswords.end()) {
         if (data.indexOf(iter.key()) != -1) {
-            qDebug() << "PasswordHelper::getPasswordsByManufacturer: manufacturer was found: " << iter.key();
+            //qDebug() << "PasswordHelper::getPasswordsByManufacturer: manufacturer was found: " << iter.key();
             return iter.value();
         }
 
         ++iter;
     }
 
-    qDebug() << "PasswordHelper::getPasswordsByManufacturer: manufacturer was not found";
+    //qDebug() << "PasswordHelper::getPasswordsByManufacturer: manufacturer was not found";
     return allPasswords;
 }
 

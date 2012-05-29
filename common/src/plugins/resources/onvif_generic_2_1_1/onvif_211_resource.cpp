@@ -62,7 +62,9 @@ QnPlOnvifGeneric211Resource::QnPlOnvifGeneric211Resource() :
     minQuality(0),
     maxQuality(0),
     hasDual(false),
-    videoOptionsNotSet(true)
+    videoOptionsNotSet(true),
+    mediaUrl(),
+    deviceUrl()
 {
 }
 
@@ -526,6 +528,8 @@ bool QnPlOnvifGeneric211Resource::isSoapAuthorized() const {
     MediaBindingProxy soapProxy;
     QString endpoint(createOnvifEndpointUrl());
 
+    qDebug() << "QnPlOnvifGeneric211Resource::isSoapAuthorized: mediaUrl is '" << mediaUrl << "'";
+
     QAuthenticator auth(getAuth());
     std::string login(auth.user().toStdString());
     std::string passwd(auth.password().toStdString());
@@ -533,6 +537,8 @@ bool QnPlOnvifGeneric211Resource::isSoapAuthorized() const {
         soap_register_plugin(soapProxy.soap, soap_wsse);
         soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", login.c_str(), passwd.c_str());
     }
+
+    qDebug() << "QnPlOnvifGeneric211Resource::isSoapAuthorized: login = " << login.c_str() << ", password = " << passwd.c_str();
 
     _onvifMedia__GetProfiles request;
     _onvifMedia__GetProfilesResponse response;

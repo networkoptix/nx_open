@@ -52,7 +52,7 @@ public:
     void readMotionInfo();
 protected:
     void init();
-    virtual QnAbstractStreamDataProvider* createLiveDataProvider();
+    virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
     virtual void setCropingPhysical(QRect croping);
 private:
@@ -83,6 +83,9 @@ private:
     int maxQuality;
     bool hasDual;
     bool videoOptionsNotSet;
+public:
+    QString mediaUrl;
+    QString deviceUrl;
 };
 
 typedef QSharedPointer<QnPlOnvifGeneric211Resource> QnPlOnvifGeneric211ResourcePtr;
