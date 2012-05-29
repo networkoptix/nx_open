@@ -6,7 +6,10 @@
 
 class QnThumbnailsLoader: public CLLongRunnable
 {
-    Q_OBJECT
+    Q_OBJECT;
+
+    typedef CLLongRunnable base_type;
+
 public:
     QnThumbnailsLoader(QnResourcePtr resource);
     virtual ~QnThumbnailsLoader();

@@ -1253,8 +1253,8 @@ void QnTimeSlider::drawThumbnails(QPainter *painter, const QRectF &rect) {
     if (loader->step() == 0)
         return;
 
-    qint64 currentTime = valueFromPosition(rect.topLeft());
-    qint64 endTime = valueFromPosition(rect.topRight());
+    qint64 currentTime = m_windowStart;
+    qint64 endTime = m_windowEnd;
 
     currentTime = qFloor(currentTime, loader->step());
 
