@@ -50,6 +50,13 @@ public:
     QRect getMotionWindow(int num) const;
     QMap<int, QRect>  getMotionWindows() const;
     void readMotionInfo();
+
+    const QString& getMediaUrl() const { return mediaUrl; }
+    void setMediaUrl(const QString& src) const { mediaUrl = src; }
+
+    const QString& getDeviceUrl() const { return deviceUrl; }
+    void setDeviceUrl(const QString& src) const { deviceUrl = src; }
+
 protected:
     void init();
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
@@ -83,7 +90,6 @@ private:
     int maxQuality;
     bool hasDual;
     bool videoOptionsNotSet;
-public:
     QString mediaUrl;
     QString deviceUrl;
 };
