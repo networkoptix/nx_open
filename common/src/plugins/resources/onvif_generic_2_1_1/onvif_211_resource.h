@@ -52,10 +52,10 @@ public:
     void readMotionInfo();
 
     const QString& getMediaUrl() const { return mediaUrl; }
-    void setMediaUrl(const QString& src) const { mediaUrl = src; }
+    void setMediaUrl(const QString& src) { mediaUrl = src; }
 
     const QString& getDeviceUrl() const { return deviceUrl; }
-    void setDeviceUrl(const QString& src) const { deviceUrl = src; }
+    void setDeviceUrl(const QString& src) { deviceUrl = src; }
 
 protected:
     void init();
