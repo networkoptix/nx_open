@@ -27,9 +27,8 @@ message Camera {
     }
 
     message Property {
-      required int32  typeId = 1;
-      optional string name   = 2;
-      required string value  = 3;
+      required string name   = 1;
+      required string value  = 2;
     }
 
     message ScheduleTask {
