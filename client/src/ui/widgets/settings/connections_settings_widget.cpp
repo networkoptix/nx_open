@@ -26,7 +26,7 @@ QnConnectionsSettingsWidget::QnConnectionsSettingsWidget(QWidget *parent) :
     ui->savePasswordCheckBox->hide();
 
     m_connectionsModel = new QStandardItemModel(this);
-    m_connectionsRootItem = new QStandardItem(qnSkin->icon("folder.png"), tr("Connections"));
+    m_connectionsRootItem = new QStandardItem(qnSkin->icon("folder.png"), QString());
     m_connectionsModel->appendRow(m_connectionsRootItem);
 
     ui->connectionsTreeView->setModel(m_connectionsModel);
@@ -56,6 +56,9 @@ QnConnectionsSettingsWidget::QnConnectionsSettingsWidget(QWidget *parent) :
 
     ui->connectionsTreeView->setCurrentIndex(m_connectionsRootItem->index());
     ui->connectionsTreeView->setFocus();
+
+
+    retranslateUi();
 }
 
 QnConnectionsSettingsWidget::~QnConnectionsSettingsWidget()
@@ -81,13 +84,13 @@ void QnConnectionsSettingsWidget::retranslateUi()
     m_connectionsRootItem->setText(tr("Connections"));
 }
 
-QList<QnSettings::ConnectionData> QnConnectionsSettingsWidget::connections() const
+QnConnectionDataList QnConnectionsSettingsWidget::connections() const
 {
-    QList<QnSettings::ConnectionData> connections;
+    QnConnectionDataList connections;
     
     for (int row = 0; row < m_connectionsRootItem->rowCount(); ++row)
     {
-        QnSettings::ConnectionData connection;
+        QnConnectionData connection;
         connection.name = m_connectionsRootItem->child(row, 0)->text();
 
         QString host = m_connectionsRootItem->child(row, 1)->text();
@@ -108,15 +111,15 @@ QList<QnSettings::ConnectionData> QnConnectionsSettingsWidget::connections() con
     return connections;
 }
 
-void QnConnectionsSettingsWidget::setConnections(const QList<QnSettings::ConnectionData> &connections)
+void QnConnectionsSettingsWidget::setConnections(const QnConnectionDataList &connections)
 {
     m_connectionsRootItem->removeRows(0, m_connectionsRootItem->rowCount());
 
-    foreach (const QnSettings::ConnectionData &connection, connections)
+    foreach (const QnConnectionData &connection, connections)
         addConnection(connection);
 }
 
-void QnConnectionsSettingsWidget::addConnection(const QnSettings::ConnectionData &connection)
+void QnConnectionsSettingsWidget::addConnection(const QnConnectionData &connection)
 {
     QList<QStandardItem *> row;
     row << new QStandardItem(!connection.name.trimmed().isEmpty() ? connection.name : tr("Unnamed"))
@@ -128,7 +131,7 @@ void QnConnectionsSettingsWidget::addConnection(const QnSettings::ConnectionData
     m_connectionsRootItem->appendRow(row);
 }
 
-void QnConnectionsSettingsWidget::removeConnection(const QnSettings::ConnectionData &connection)
+void QnConnectionsSettingsWidget::removeConnection(const QnConnectionData &connection)
 {
     for (int row = 0; row < m_connectionsRootItem->rowCount(); ++row) {
         if (connection.name == m_connectionsRootItem->child(row, 0)->text()) {

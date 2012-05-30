@@ -15,32 +15,49 @@ QnPropertyStorage::~QnPropertyStorage() {
 }
 
 QVariant QnPropertyStorage::value(int id) const {
-    startRead(id);
+    lock();
     QVariant result = m_valueById.value(id);
-    endRead(id);
-
+    unlock();
     return result;
 }
 
-void QnPropertyStorage::setValue(int id, const QVariant &value) {
+bool QnPropertyStorage::setValue(int id, const QVariant &value) {
     QVariant newValue = value;
 
     int type = this->type(id);
     if(type != QMetaType::Void && value.type() != type) {
         if(!newValue.convert(static_cast<QVariant::Type>(type))) {
             qnWarning("Cannot assign a value of type '%1' to a property '%2' of type '%3'.", QMetaType::typeName(value.userType()), name(id), QMetaType::typeName(type));
-            return;
+            return false;
         }
     }
 
-    if(this->value(id) == newValue)
-        return;
+    lock();
+    if(m_valueById.value(id) == newValue) {
+        unlock();
+        return false;
+    }
 
-    startWrite(id);
     m_valueById[id] = value;
-    endWrite(id);
+
+    QnPropertyNotifier *notifier = m_notifiers.value(id);
+    unlock();
 
     emit valueChanged(id);
+    if(notifier)
+        emit notifier->valueChanged(id);
+
+    return true;
+}
+
+QnPropertyNotifier *QnPropertyStorage::notifier(int id) const {
+    lock();
+    QnPropertyNotifier *&result = m_notifiers[id];
+    if(!result)
+        result = new QnPropertyNotifier(const_cast<QnPropertyStorage *>(this));
+    unlock();
+    
+    return result;
 }
 
 QString QnPropertyStorage::name(int id) const {
@@ -71,8 +88,10 @@ void QnPropertyStorage::updateFromSettings(QSettings *settings) {
         return;
     }
 
+    lock();
     foreach(int id, m_nameById.keys())
-        updateFromSettings(settings, id);
+        setValue(id, updateValueFromSettings(settings, id, value(id)));
+    unlock();
 }
 
 void QnPropertyStorage::submitToSettings(QSettings *settings) const {
@@ -81,15 +100,17 @@ void QnPropertyStorage::submitToSettings(QSettings *settings) const {
         return;
     }
 
+    lock();
     foreach(int id, m_nameById.keys())
-        submitToSettings(settings, id);
+        submitValueToSettings(settings, id, value(id));
+    unlock();
 }
 
-void QnPropertyStorage::updateFromSettings(QSettings *settings, int id) {
-    setValue(id, settings->value(name(id), this->value(id)));
+QVariant QnPropertyStorage::updateValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) {
+    return settings->value(name(id), defaultValue);
 }
 
-void QnPropertyStorage::submitToSettings(QSettings *settings, int id) const {
-    settings->setValue(name(id), value(id));
+void QnPropertyStorage::submitValueToSettings(QSettings *settings, int id, const QVariant &value) const {
+    settings->setValue(name(id), value);
 }
 

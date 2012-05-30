@@ -201,8 +201,8 @@ void LoginDialog::updateStoredConnections()
     m_connectionsModel->removeRows(0, m_connectionsModel->rowCount());
 
     int index = -1;
-    QnSettings::ConnectionData lastUsedConnection = qnSettings->lastUsedConnection();
-    foreach (const QnSettings::ConnectionData &connection, qnSettings->connections()) {
+    QnConnectionData lastUsedConnection = qnSettings->lastUsedConnection();
+    foreach (const QnConnectionData &connection, qnSettings->connections()) {
         if (connection.name.trimmed().isEmpty() || !connection.url.isValid())
             continue;
 
@@ -218,7 +218,7 @@ void LoginDialog::updateStoredConnections()
             index = m_connectionsModel->rowCount() - 1;
     }
     {
-        QnSettings::ConnectionData connection;
+        QnConnectionData connection;
         if (index == -1 || lastUsedConnection.name.trimmed().isEmpty()) {
             connection = lastUsedConnection;
             if (index == -1) {
@@ -287,7 +287,7 @@ void LoginDialog::at_testFinished(int status, const QByteArray &/*data*/, const 
         return;
     }
 
-    QnSettings::ConnectionData connectionData;
+    QnConnectionData connectionData;
     connectionData.url = currentUrl();
     qnSettings->setLastUsedConnection(connectionData);
 

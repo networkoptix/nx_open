@@ -6,6 +6,19 @@
 
 class QSettings;
 
+class QnPropertyNotifier: public QObject {
+    Q_OBJECT;
+public:
+    QnPropertyNotifier(QObject *parent = NULL): QObject(parent) {}
+
+signals:
+    void valueChanged(int id);
+
+private:
+    friend class QnPropertyStorage;
+};
+
+
 class QnPropertyStorage: public QObject {
     Q_OBJECT;
 public:
@@ -13,7 +26,9 @@ public:
     virtual ~QnPropertyStorage();
 
     QVariant value(int id) const;
-    virtual void setValue(int id, const QVariant &value);
+    virtual bool setValue(int id, const QVariant &value);
+
+    QnPropertyNotifier *notifier(int id) const;
 
     QString name(int id) const;
     int type(int id) const;
@@ -25,13 +40,11 @@ signals:
     void valueChanged(int id);
 
 protected:
-    virtual void updateFromSettings(QSettings *settings, int id);
-    virtual void submitToSettings(QSettings *settings, int id) const;
+    virtual QVariant updateValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue);
+    virtual void submitValueToSettings(QSettings *settings, int id, const QVariant &value) const;
 
-    virtual void startRead(int id) const { Q_UNUSED(id); }
-    virtual void endRead(int id) const { Q_UNUSED(id); }
-    virtual void startWrite(int id) { Q_UNUSED(id); }
-    virtual void endWrite(int id) { Q_UNUSED(id); }
+    virtual void lock() const {}
+    virtual void unlock() const {}
 
     void setName(int id, const QString &name);
     void setType(int id, int type);
@@ -45,17 +58,22 @@ protected:
                                                                                 \
     inline void init() { init(Dummy<LAST_ID>()); };                             \
 
-#define QN_DECLARE_PROPERTY(TYPE, ACCESSOR, ID, DEFAULT_VALUE)                  \
+#define QN_DECLARE_R_PROPERTY(TYPE, GETTER, ID, DEFAULT_VALUE)                  \
 public:                                                                         \
-    inline TYPE ACCESSOR() { return value(ID).value<TYPE>(); }                  \
-    inline void ACCESSOR(const TYPE &value) { setValue(ID, QVariant::fromValue<TYPE>(value)); } \
+    inline TYPE GETTER() const { return value(ID).value<TYPE>(); }              \
 private:                                                                        \
     inline void init(const Dummy<ID> &) {                                       \
         init(Dummy<ID - 1>());                                                  \
         setType(ID, qMetaTypeId<TYPE>());                                       \
         setValue(ID, QVariant::fromValue<TYPE>(DEFAULT_VALUE));                 \
-        setName(ID, QLatin1String(#ACCESSOR));                                  \
+        setName(ID, QLatin1String(#GETTER));                                    \
     }                                                                           \
+
+#define QN_DECLARE_RW_PROPERTY(TYPE, GETTER, SETTER, ID, DEFAULT_VALUE)         \
+    QN_DECLARE_R_PROPERTY(TYPE, GETTER, ID, DEFAULT_VALUE)                      \
+public:                                                                         \
+    inline void SETTER(const TYPE &value) { setValue(ID, QVariant::fromValue<TYPE>(value)); } \
+private:                                                                        \
 
 #define QN_END_PROPERTY_STORAGE()                                               \
 
@@ -63,6 +81,7 @@ private:
     QHash<int, QVariant> m_valueById;
     QHash<int, QString> m_nameById;
     QHash<int, int> m_typeById;
+    mutable QHash<int, QnPropertyNotifier *> m_notifiers;
 };
 
 #endif // QN_PROPERTY_STORAGE_H

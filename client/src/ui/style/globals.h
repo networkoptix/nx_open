@@ -61,35 +61,34 @@ public:
 
 
 protected:
-    using base_type::updateFromSettings;
-    virtual void updateFromSettings(QSettings *settings, int id) override;
+    virtual QVariant updateValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) override;
 
 private:
     QN_BEGIN_PROPERTY_STORAGE(VARIABLE_COUNT);
-        QN_DECLARE_PROPERTY(QFont,  settingsFont,                   SETTINGS_FONT,                          QFont());
-        QN_DECLARE_PROPERTY(QColor, shadowColor,                    SHADOW_COLOR,                           QColor(0, 0, 0, 128));
-        QN_DECLARE_PROPERTY(QColor, selectionColor,                 SELECTION_COLOR,                        QColor(0, 150, 255, 110));
-        QN_DECLARE_PROPERTY(QColor, motionMaskRubberBandBorderColor,MOTION_MASK_RUBBER_BAND_BORDER_COLOR,   QColor(255, 255, 255, 80));
-	    QN_DECLARE_PROPERTY(QColor, motionMaskRubberBandColor,      MOTION_MASK_RUBBER_BAND_COLOR,          QColor(255, 255, 255, 40));
+        QN_DECLARE_R_PROPERTY(QFont,    settingsFont,                   SETTINGS_FONT,                          QFont());
+        QN_DECLARE_R_PROPERTY(QColor,   shadowColor,                    SHADOW_COLOR,                           QColor(0, 0, 0, 128));
+        QN_DECLARE_R_PROPERTY(QColor,   selectionColor,                 SELECTION_COLOR,                        QColor(0, 150, 255, 110));
+        QN_DECLARE_R_PROPERTY(QColor,   motionMaskRubberBandBorderColor,MOTION_MASK_RUBBER_BAND_BORDER_COLOR,   QColor(255, 255, 255, 80));
+	    QN_DECLARE_R_PROPERTY(QColor,   motionMaskRubberBandColor,      MOTION_MASK_RUBBER_BAND_COLOR,          QColor(255, 255, 255, 40));
 
-        QN_DECLARE_PROPERTY(QColor, motionMaskColor,                MOTION_MASK_COLOR,                      QColor(180, 180, 180, 96));
-	    QN_DECLARE_PROPERTY(QColor, frameColor,                     FRAME_COLOR,                            QColor(128, 128, 128, 196));
-        QN_DECLARE_PROPERTY(QColor, selectedFrameColor,             SELECTED_FRAME_COLOR,                   QColor(64, 130, 180, 128));
-        QN_DECLARE_PROPERTY(int,    opacityChangePeriod,            OPACITY_CHANGE_PERIOD,                  250);
-        QN_DECLARE_PROPERTY(QColor, errorTextColor,                 ERROR_TEXT_COLOR,                       QColor(255, 64, 64));
-        QN_DECLARE_PROPERTY(qreal,  workbenchUnitSize,              WORKBENCH_UNIT_SIZE,                    10000.0); /* Graphics scene has problems with handling mouse events on small scales, so the larger this number, the better. */
-        QN_DECLARE_PROPERTY(qreal,  defaultLayoutCellAspectRatio,   DEFAULT_LAYOUT_CELL_ASPECT_RATIO,       4.0 / 3.0);
-        QN_DECLARE_PROPERTY(QSizeF, defaultLayoutCellSpacing,       DEFAULT_LAYOUT_CELL_SPACING,            QSizeF(0.1, 0.1));
+        QN_DECLARE_R_PROPERTY(QColor,   motionMaskColor,                MOTION_MASK_COLOR,                      QColor(180, 180, 180, 96));
+	    QN_DECLARE_R_PROPERTY(QColor,   frameColor,                     FRAME_COLOR,                            QColor(128, 128, 128, 196));
+        QN_DECLARE_R_PROPERTY(QColor,   selectedFrameColor,             SELECTED_FRAME_COLOR,                   QColor(64, 130, 180, 128));
+        QN_DECLARE_R_PROPERTY(int,      opacityChangePeriod,            OPACITY_CHANGE_PERIOD,                  250);
+        QN_DECLARE_R_PROPERTY(QColor,   errorTextColor,                 ERROR_TEXT_COLOR,                       QColor(255, 64, 64));
+        QN_DECLARE_R_PROPERTY(qreal,    workbenchUnitSize,              WORKBENCH_UNIT_SIZE,                    10000.0); /* Graphics scene has problems with handling mouse events on small scales, so the larger this number, the better. */
+        QN_DECLARE_R_PROPERTY(qreal,    defaultLayoutCellAspectRatio,   DEFAULT_LAYOUT_CELL_ASPECT_RATIO,       4.0 / 3.0);
+        QN_DECLARE_R_PROPERTY(QSizeF,   defaultLayoutCellSpacing,       DEFAULT_LAYOUT_CELL_SPACING,            QSizeF(0.1, 0.1));
 
-        QN_DECLARE_PROPERTY(QColor, recordMotionColor,              RECORD_MOTION_COLOR,                    QColor(100, 0, 0));
-        QN_DECLARE_PROPERTY(QColor, noRecordColor,                  NO_RECORD_COLOR,                        QColor(64, 64, 64));
-        QN_DECLARE_PROPERTY(QColor, mrsColor,                       MRS_COLOR,                              QColor(200, 0, 0));
-        QN_DECLARE_PROPERTY(QColor, recordAlwaysColor,              RECORD_ALWAYS_COLOR,                    QColor(0, 100, 0));
+        QN_DECLARE_R_PROPERTY(QColor,   recordMotionColor,              RECORD_MOTION_COLOR,                    QColor(100, 0, 0));
+        QN_DECLARE_R_PROPERTY(QColor,   noRecordColor,                  NO_RECORD_COLOR,                        QColor(64, 64, 64));
+        QN_DECLARE_R_PROPERTY(QColor,   mrsColor,                       MRS_COLOR,                              QColor(200, 0, 0));
+        QN_DECLARE_R_PROPERTY(QColor,   recordAlwaysColor,              RECORD_ALWAYS_COLOR,                    QColor(0, 100, 0));
 
-        QN_DECLARE_PROPERTY(QColor, selectionOpacityDelta,          SELECTION_OPACITY_DELTA,                QColor(0, 0, 0, 0x80));
-        QN_DECLARE_PROPERTY(QColor, selectionBorderDelta,           SELECTION_BORDER_DELTA,                 QColor(48, 48, 48, 0));
+        QN_DECLARE_R_PROPERTY(QColor,   selectionOpacityDelta,          SELECTION_OPACITY_DELTA,                QColor(0, 0, 0, 0x80));
+        QN_DECLARE_R_PROPERTY(QColor,   selectionBorderDelta,           SELECTION_BORDER_DELTA,                 QColor(48, 48, 48, 0));
 
-        QN_DECLARE_PROPERTY(QColor, backgroundGradientColor,        BACKGROUD_GRADIENT_COLOR,               QColor(5, 5, 50));
+        QN_DECLARE_R_PROPERTY(QColor,   backgroundGradientColor,        BACKGROUD_GRADIENT_COLOR,               QColor(5, 5, 50));
     QN_END_PROPERTY_STORAGE();
 };
 

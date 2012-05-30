@@ -4,6 +4,7 @@
 
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>
+#include <QtCore/QSettings>
 #include <QtGui/QDesktopWidget>
 
 #include <QtSingleApplication>
@@ -171,18 +172,17 @@ void addTestData()
 
 void initAppServerConnection()
 {
-    static const char* DEFAULT_CONNECTION_NAME = "default";
+    static const char *DEFAULT_CONNECTION_NAME = "default";
 
     QUrl appServerUrl;
 
-    QnSettings::ConnectionData lastUsedConnection = qnSettings->lastUsedConnection();
+    QnConnectionData lastUsedConnection = qnSettings->lastUsedConnection();
 
-    bool hasDefaultConnection = false;
-    QList<QnSettings::ConnectionData> connections = qnSettings->connections();
+    QnConnectionDataList connections = qnSettings->connections();
     int defaultConnectionIndex = -1;
     for (int i = 0; i < connections.size(); i++)
     {
-        const QnSettings::ConnectionData& connection = connections[i];
+        const QnConnectionData &connection = connections[i];
         if (connection.name == DEFAULT_CONNECTION_NAME)
         {
             defaultConnectionIndex = i;
@@ -191,7 +191,7 @@ void initAppServerConnection()
     }
 
     // If there is default connection, use lastUsedConnection even it's invalid
-    if (defaultConnectionIndex != -1 && qnSettings->isAfterFirstRun())
+    if (defaultConnectionIndex != -1 && !qnSettings->isFirstRun())
     {
         appServerUrl = lastUsedConnection.url;
     }
@@ -208,7 +208,7 @@ void initAppServerConnection()
 
         if (defaultConnectionIndex == -1)
         {
-            QnSettings::ConnectionData connection;
+            QnConnectionData connection;
             connection.name = DEFAULT_CONNECTION_NAME;
             connection.url = appServerUrl;
             connection.readOnly = true;
@@ -274,19 +274,14 @@ int main(int argc, char *argv[])
     commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::Flag, "--soft-yuv", NULL, NULL));
     commandLinePreParser.parse(argc, argv);
 
-    //===============
+    QnSettings::instance()->setSoftwareYuv(commandLinePreParser.value("--soft-yuv").toBool());
 
-   
-    //===============
     /* Set authentication parameters from command line. */
-    QnSettings::instance()->setForceSoftYUV(commandLinePreParser.value("--soft-yuv").toBool());
-
-
     QUrl authentication = QUrl::fromUserInput(commandLinePreParser.value("--auth").toString());
     if(authentication.isValid()) {
         out << QObject::tr("Using authentication parameters from command line: %1.").arg(authentication.toString()) << endl;
 
-        QnSettings::ConnectionData connection;
+        QnConnectionData connection;
         connection.url = authentication;
 
         qnSettings->setLastUsedConnection(connection);
@@ -320,7 +315,7 @@ int main(int argc, char *argv[])
     /* Initialize connections. */
     initAppServerConnection();
     qnSettings->save();
-    cl_log.log(QLatin1String("Using ") + qnSettings->mediaRoot() + QLatin1String(" as media root directory"), cl_logALWAYS);
+    cl_log.log(QLatin1String("Using ") + qnSettings->mediaFolder() + QLatin1String(" as media root directory"), cl_logALWAYS);
 
 
     /* Initialize application instance. */
@@ -370,8 +365,8 @@ int main(int argc, char *argv[])
     //QnResourceDirectoryBrowser
     QnResourceDirectoryBrowser::instance().setLocal(true);
     QStringList dirs;
-    dirs << qnSettings->mediaRoot();
-    dirs << qnSettings->auxMediaRoots();
+    dirs << qnSettings->mediaFolder();
+    dirs << qnSettings->extraMediaFolders();
     QnResourceDirectoryBrowser::instance().setPathCheckList(dirs);
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnResourceDirectoryBrowser::instance());
 

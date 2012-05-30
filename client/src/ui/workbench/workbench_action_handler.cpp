@@ -492,7 +492,7 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
         return;
 
     /* Open all user's layouts. */
-    if(qnSettings->layoutsOpenedOnLogin()) {
+    if(qnSettings->isLayoutsOpenedOnLogin()) {
         QnResourceList layouts = QnResourceCriterion::filter<QnLayoutResource, QnResourceList>(context()->resourcePool()->getResourcesWithParentId(user->getId()));
         menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
     }
@@ -903,7 +903,7 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
-    const QnSettings::ConnectionData connection = qnSettings->lastUsedConnection();
+    const QnConnectionData connection = qnSettings->lastUsedConnection();
     if (!connection.url.isValid()) 
         return;
     
@@ -1339,7 +1339,7 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
         QString newPassword = user->getPassword();
         if(newPassword != oldPassword) {
             /* Password was changed. Change it in global settings and hope for the best. */
-            QnSettings::ConnectionData data = qnSettings->lastUsedConnection();
+            QnConnectionData data = qnSettings->lastUsedConnection();
             data.url.setPassword(newPassword);
             qnSettings->setLastUsedConnection(data);
 
