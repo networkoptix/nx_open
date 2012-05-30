@@ -327,7 +327,7 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStati
         
         if (m_timeHelper) {
             m_videoData->timestamp = m_timeHelper->getUsecTime(ntohl(rtpHeader->timestamp), statistics, m_frequency);
-            qDebug() << "video. adjusttime to " << (m_videoData->timestamp - qnSyncTime->currentMSecsSinceEpoch()*1000)/1000 << "ms";
+            //qDebug() << "video. adjusttime to " << (m_videoData->timestamp - qnSyncTime->currentMSecsSinceEpoch()*1000)/1000 << "ms";
         }
         else
             m_videoData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;

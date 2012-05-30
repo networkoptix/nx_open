@@ -78,11 +78,7 @@ bool QnSimpleAudioRtpParser::processData(quint8* rtpBuffer, int bufferSize, cons
     audioData->context = m_context;
     if (m_timeHelper) {
         audioData->timestamp = m_timeHelper->getUsecTime(ntohl(rtpHeader->timestamp), statistics, m_frequency);
-        qDebug() << "audio. adjusttime to " << (audioData->timestamp - qnSyncTime->currentMSecsSinceEpoch()*1000)/1000 << "ms";
-        if (qAbs((audioData->timestamp - qnSyncTime->currentMSecsSinceEpoch()*1000)/1000) > 1000000ll * 10)
-        {
-            audioData->timestamp = m_timeHelper->getUsecTime(ntohl(rtpHeader->timestamp), statistics, m_frequency);
-        }
+        //qDebug() << "audio. adjusttime to " << (audioData->timestamp - qnSyncTime->currentMSecsSinceEpoch()*1000)/1000 << "ms";
     }
     else
         audioData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;

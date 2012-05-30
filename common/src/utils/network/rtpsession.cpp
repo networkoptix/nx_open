@@ -109,10 +109,8 @@ QnRtspTimeHelper::QnRtspTimeHelper():
 
 double QnRtspTimeHelper::cameraTimeToLocalTime(double cameraTime)
 {
-    double timeDiff = qnSyncTime->currentMSecsSinceEpoch()/1000.0 - cameraTime;
-    // check if first time or clock diff is large (clock was adjusted on camera or local machine)
-    if (m_cameraClockToLocalDiff == INT_MAX || qAbs(timeDiff-m_cameraClockToLocalDiff) > 100.0)  
-        m_cameraClockToLocalDiff = timeDiff;
+    if (m_cameraClockToLocalDiff == INT_MAX)  
+        m_cameraClockToLocalDiff = qnSyncTime->currentMSecsSinceEpoch()/1000.0 - cameraTime;;
     return cameraTime + m_cameraClockToLocalDiff;
 }
 
@@ -127,8 +125,14 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& stati
         return qnSyncTime->currentMSecsSinceEpoch() * 1000;
     else {
         int rtpTimeDiff = rtpTime - statistics.timestamp;
-        double result = cameraTimeToLocalTime(statistics.nptTime) + rtpTimeDiff / double(frequency);
-        return result * 1000000ll;
+        double resultInSecs = cameraTimeToLocalTime(statistics.nptTime) + rtpTimeDiff / double(frequency);
+        double localTimeInSecs = qnSyncTime->currentMSecsSinceEpoch()/1000.0;
+        if (qAbs(localTimeInSecs - resultInSecs) < MAX_FRAME_DURATION/1000)
+            return resultInSecs * 1000000ll;
+        else {
+            reset();
+            return getUsecTime(rtpTime, statistics, frequency);
+        }
     }
 }
 
