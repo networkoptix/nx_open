@@ -249,6 +249,7 @@ MotionTypeFlags QnSecurityCamResource::supportedMotionType() const
     QVariant val;
     MotionTypeFlags result = MT_Default;
     QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
+
     if (this_casted->getParam("supportedMotion", val, QnDomainMemory))
     {
         QStringList vals = val.toString().split(',');

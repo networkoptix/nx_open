@@ -427,10 +427,13 @@ void serializeCamera_i(proto::pb::Camera& pb_camera, const QnVirtualCameraResour
 
     QnParamList params = cameraPtr->getResourceParamList();
     foreach(QString key, params.keys()) {
-        proto::pb::Camera_Property& pb_property = *pb_camera.add_property();
+        if (params[key].domain() == QnDomainDatabase)
+        {
+            proto::pb::Camera_Property& pb_property = *pb_camera.add_property();
 
-        pb_property.set_name(key.toUtf8().constData());
-        pb_property.set_value(params[key].value().toString().toUtf8().constData());
+            pb_property.set_name(key.toUtf8().constData());
+            pb_property.set_value(params[key].value().toString().toUtf8().constData());
+        }
     }
 
     foreach (const QnScheduleTask& scheduleTaskIn, cameraPtr->getScheduleTasks()) {
