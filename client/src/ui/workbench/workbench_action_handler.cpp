@@ -118,17 +118,19 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     m_layoutExportCamera(0),
     m_exportProgressDialog(0)
 {
-    connect(context(),                                      SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(at_context_userChanged(const QnUserResourcePtr &)));
-    connect(context(),                                      SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(submitDelayedDrops()), Qt::QueuedConnection);
-    connect(context(),                                      SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(updateCameraSettingsEditibility()));
-    connect(QnEventManager::instance(),                     SIGNAL(connectionClosed()),                     this,   SLOT(at_eventManager_connectionClosed()));
-    connect(QnEventManager::instance(),                     SIGNAL(connectionOpened()),                     this,   SLOT(at_eventManager_connectionOpened()));
+    connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(at_context_userChanged(const QnUserResourcePtr &)));
+    connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(submitDelayedDrops()), Qt::QueuedConnection);
+    connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(updateCameraSettingsEditibility()));
+    connect(QnEventManager::instance(),                         SIGNAL(connectionClosed()),                     this,   SLOT(at_eventManager_connectionClosed()));
+    connect(QnEventManager::instance(),                         SIGNAL(connectionOpened()),                     this,   SLOT(at_eventManager_connectionOpened()));
 
     /* We're using queued connection here as modifying a field in its change notification handler may lead to problems. */
-    connect(workbench(),                                    SIGNAL(layoutsChanged()), this, SLOT(at_workbench_layoutsChanged()), Qt::QueuedConnection);
+    connect(workbench(),                                        SIGNAL(layoutsChanged()), this, SLOT(at_workbench_layoutsChanged()), Qt::QueuedConnection);
 
     connect(action(Qn::LightMainMenuAction),                    SIGNAL(triggered()),    this,   SLOT(at_mainMenuAction_triggered()));
     connect(action(Qn::DarkMainMenuAction),                     SIGNAL(triggered()),    this,   SLOT(at_mainMenuAction_triggered()));
+    connect(action(Qn::IncrementDebugCounterAction),            SIGNAL(triggered()),    this,   SLOT(at_incrementDebugCounterAction_triggered()));
+    connect(action(Qn::DecrementDebugCounterAction),            SIGNAL(triggered()),    this,   SLOT(at_decrementDebugCounterAction_triggered()));
     connect(action(Qn::AboutAction),                            SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
     connect(action(Qn::SystemSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_systemSettingsAction_triggered()));
     connect(action(Qn::OpenFileAction),                         SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
@@ -538,6 +540,14 @@ void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
 
     action(Qn::LightMainMenuAction)->setMenu(m_mainMenu.data());
     action(Qn::DarkMainMenuAction)->setMenu(m_mainMenu.data());
+}
+
+void QnWorkbenchActionHandler::at_incrementDebugCounterAction_triggered() {
+    qnSettings->setDebugCounter(qnSettings->debugCounter() + 1);
+}
+
+void QnWorkbenchActionHandler::at_decrementDebugCounterAction_triggered() {
+    qnSettings->setDebugCounter(qnSettings->debugCounter() - 1);
 }
 
 void QnWorkbenchActionHandler::at_nextLayoutAction_triggered() {

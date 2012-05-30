@@ -46,6 +46,9 @@ public:
         SOFTWARE_YUV,
         LAST_USED_CONNECTION,
         CONNECTIONS,
+
+        DEBUG_COUNTER,
+
         VARIABLE_COUNT
     };
     
@@ -91,6 +94,7 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                    isSoftwareYuv,          setSoftwareYuv,             SOFTWARE_YUV,               false);
         QN_DECLARE_RW_PROPERTY(QnConnectionData,        lastUsedConnection,     setLastUsedConnection,      LAST_USED_CONNECTION,       QnConnectionData());
         QN_DECLARE_RW_PROPERTY(QnConnectionDataList,    connections,            setConnections,             CONNECTIONS,                QnConnectionDataList());
+        QN_DECLARE_RW_PROPERTY(int,                     debugCounter,           setDebugCounter,            DEBUG_COUNTER,              0);
     QN_END_PROPERTY_STORAGE();
 
 private:
