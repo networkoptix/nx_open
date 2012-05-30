@@ -14,9 +14,14 @@
 const char* OnvifGeneric211ResourceSearcher::ONVIF_RT = "ONVIF";
 
 
-OnvifGeneric211ResourceSearcher::OnvifGeneric211ResourceSearcher():
-    onvifTypeId(qnResTypePool->getResourceTypeByName(ONVIF_RT)->getId())
+OnvifGeneric211ResourceSearcher::OnvifGeneric211ResourceSearcher()
 {
+	QnResourceTypePtr typePtr(qnResTypePool->getResourceTypeByName(ONVIF_RT));
+	if (!typePtr.isNull()) {
+		onvifTypeId = typePtr->getId();
+	} else {
+		qCritical() << "Can't find " << ONVIF_RT << " resource type in resource type pool";
+	}
 }
 
 OnvifGeneric211ResourceSearcher& OnvifGeneric211ResourceSearcher::instance()
