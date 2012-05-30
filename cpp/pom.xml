@@ -91,7 +91,7 @@
 							<target>							
 								<chmod file="${project.build.directory}/*.sh" perm="755"/>
 								
-								<exec dir="${project.build.directory}" executable="unzip">
+								<exec dir="${project.build.directory}" executable="unzip" failifexecutionfails="false">
    									<arg line="-a -u *.zip"/>
   								</exec>
 
