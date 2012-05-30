@@ -65,8 +65,8 @@ private:                                                                        
     inline void init(const Dummy<ID> &) {                                       \
         init(Dummy<ID - 1>());                                                  \
         setType(ID, qMetaTypeId<TYPE>());                                       \
-        setValue(ID, QVariant::fromValue<TYPE>(DEFAULT_VALUE));                 \
         setName(ID, QLatin1String(#GETTER));                                    \
+        setValue(ID, QVariant::fromValue<TYPE>(DEFAULT_VALUE));                 \
     }                                                                           \
 
 #define QN_DECLARE_RW_PROPERTY(TYPE, GETTER, SETTER, ID, DEFAULT_VALUE)         \

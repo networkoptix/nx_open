@@ -1,7 +1,8 @@
 #ifndef VIDEORECORDINGDIALOG_H
 #define VIDEORECORDINGDIALOG_H
 
-#include <QWidget>
+#include <QtCore/QScopedPointer>
+#include <QtGui/QWidget>
 
 #include "ui/screen_recording/video_recorder_settings.h"
 
@@ -9,23 +10,22 @@ namespace Ui {
     class RecordingSettings;
 }
 
-class VideoRecorderSettings;
 class QnRecordingSettingsWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit QnRecordingSettingsWidget(QWidget *parent = 0);
-    ~QnRecordingSettingsWidget();
+    explicit QnRecordingSettingsWidget(QWidget *parent = NULL);
+    virtual ~QnRecordingSettingsWidget();
 
-    VideoRecorderSettings::CaptureMode captureMode() const;
-    void setCaptureMode(VideoRecorderSettings::CaptureMode c);
+    Qn::CaptureMode captureMode() const;
+    void setCaptureMode(Qn::CaptureMode c);
 
-    VideoRecorderSettings::DecoderQuality decoderQuality() const;
-    void setDecoderQuality(VideoRecorderSettings::DecoderQuality q);
+    Qn::DecoderQuality decoderQuality() const;
+    void setDecoderQuality(Qn::DecoderQuality q);
 
-    VideoRecorderSettings::Resolution resolution() const;
-    void setResolution(VideoRecorderSettings::Resolution r);
+    Qn::Resolution resolution() const;
+    void setResolution(Qn::Resolution r);
 
     int screen() const;
     void setScreen(int screen);
@@ -36,18 +36,20 @@ public:
     QString secondaryAudioDeviceName() const;
     void setSecondaryAudioDeviceName(const QString &name);
 
-public slots:
-    void accept();
-    void onComboboxChanged(int index);
+    void updateFromSettings();
+    void submitToSettings();
+
 private:
     void additionalAdjustSize();
+
 private slots:
+    void onComboboxChanged(int index);
     void onMonitorChanged(int);
     void onDisableAeroChecked(bool);
 
 private:
-    Ui::RecordingSettings *ui;
-    VideoRecorderSettings *settings;
+    QScopedPointer<Ui::RecordingSettings> ui;
+    QnVideoRecorderSettings *m_settings;
 };
 
 #endif // VIDEORECORDINGDIALOG_H

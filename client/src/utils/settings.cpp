@@ -136,6 +136,9 @@ void QnSettings::submitValueToSettings(QSettings *settings, int id, const QVaria
             writeConnectionData(settings, connection);
         }
         settings->endArray();
+
+        /* Write out last used connection as it has been cleared. */
+        submitValueToSettings(settings, LAST_USED_CONNECTION, QVariant::fromValue<QnConnectionData>(lastUsedConnection()));
         break;
     }
 #ifndef QN_HAS_BACKGROUND_COLOR_ADJUSTMENT

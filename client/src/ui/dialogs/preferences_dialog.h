@@ -22,6 +22,8 @@ namespace Ui {
 class QnPreferencesDialog: public QDialog, protected QnWorkbenchContextAware {
     Q_OBJECT
 
+    typedef QDialog base_type;
+
 public:
     enum SettingsPage {
         PageGeneral = 0,
@@ -40,9 +42,8 @@ public:
 
 private:
     void updateFromSettings();
-    void commitToSettings();
+    void submitToSettings();
 
-    void updateStoredConnections();
     void initColorPicker();
 
 private slots:

@@ -57,13 +57,10 @@ public:
 
     static QnSettings *instance();
 
-    void load();
-    void save();
-
-    //void addAuxMediaRoot(const QString &root);
-
     virtual bool setValue(int id, const QVariant &value) override;
 
+    void load();
+    void save();
 
 signals:
     /**

@@ -5,13 +5,13 @@
 #include <QtGui/QDesktopWidget>
 #include <QtGui/QFileDialog>
 
-VideoRecorderSettings::VideoRecorderSettings(QObject *parent) :
+QnVideoRecorderSettings::QnVideoRecorderSettings(QObject *parent) :
     QObject(parent)
 {
     settings.beginGroup(QLatin1String("videoRecording"));
 }
 
-VideoRecorderSettings::~VideoRecorderSettings()
+QnVideoRecorderSettings::~QnVideoRecorderSettings()
 {
     settings.endGroup();
 }
@@ -33,17 +33,17 @@ QAudioDeviceInfo getDeviceByName(const QString &name, QAudio::Mode mode, bool *i
     return QAudioDeviceInfo::defaultInputDevice();
 }
 
-QAudioDeviceInfo VideoRecorderSettings::primaryAudioDevice() const
+QAudioDeviceInfo QnVideoRecorderSettings::primaryAudioDevice() const
 {
     return getDeviceByName(settings.value(QLatin1String("primaryAudioDevice")).toString(), QAudio::AudioInput);
 }
 
-void VideoRecorderSettings::setPrimaryAudioDeviceByName(const QString &audioDeviceName)
+void QnVideoRecorderSettings::setPrimaryAudioDeviceByName(const QString &audioDeviceName)
 {
     settings.setValue(QLatin1String("primaryAudioDevice"), audioDeviceName);
 }
 
-QAudioDeviceInfo VideoRecorderSettings::secondaryAudioDevice() const
+QAudioDeviceInfo QnVideoRecorderSettings::secondaryAudioDevice() const
 {
     QAudioDeviceInfo result;
     bool isDefault = true;
@@ -59,63 +59,63 @@ QAudioDeviceInfo VideoRecorderSettings::secondaryAudioDevice() const
     return getDeviceByName(settings.value(QLatin1String("secondaryAudioDevice")).toString(), QAudio::AudioInput);
 }
 
-void VideoRecorderSettings::setSecondaryAudioDeviceByName(const QString &audioDeviceName)
+void QnVideoRecorderSettings::setSecondaryAudioDeviceByName(const QString &audioDeviceName)
 {
     settings.setValue(QLatin1String("secondaryAudioDevice"), audioDeviceName);
 }
 
-bool VideoRecorderSettings::captureCursor() const
+bool QnVideoRecorderSettings::captureCursor() const
 {
     if (!settings.contains(QLatin1String("captureCursor")))
         return true;
     return settings.value(QLatin1String("captureCursor")).toBool();
 }
 
-void VideoRecorderSettings::setCaptureCursor(bool yes)
+void QnVideoRecorderSettings::setCaptureCursor(bool yes)
 {
     settings.setValue(QLatin1String("captureCursor"), yes);
 }
 
-VideoRecorderSettings::CaptureMode VideoRecorderSettings::captureMode() const
+Qn::CaptureMode QnVideoRecorderSettings::captureMode() const
 {
-    return (VideoRecorderSettings::CaptureMode)settings.value(QLatin1String("captureMode")).toInt();
+    return (Qn::CaptureMode) settings.value(QLatin1String("captureMode")).toInt();
 }
 
-void VideoRecorderSettings::setCaptureMode(VideoRecorderSettings::CaptureMode captureMode)
+void QnVideoRecorderSettings::setCaptureMode(Qn::CaptureMode captureMode)
 {
     settings.setValue(QLatin1String("captureMode"), captureMode);
 }
 
-VideoRecorderSettings::DecoderQuality VideoRecorderSettings::decoderQuality() const
+Qn::DecoderQuality QnVideoRecorderSettings::decoderQuality() const
 {
     if (!settings.contains(QLatin1String("decoderQuality")))
-        return VideoRecorderSettings::BalancedQuality;
-    return (VideoRecorderSettings::DecoderQuality)settings.value(QLatin1String("decoderQuality")).toInt();
+        return Qn::BalancedQuality;
+    return (Qn::DecoderQuality) settings.value(QLatin1String("decoderQuality")).toInt();
 }
 
-void VideoRecorderSettings::setDecoderQuality(VideoRecorderSettings::DecoderQuality decoderQuality)
+void QnVideoRecorderSettings::setDecoderQuality(Qn::DecoderQuality decoderQuality)
 {
     settings.setValue(QLatin1String("decoderQuality"), decoderQuality);
 }
 
-VideoRecorderSettings::Resolution VideoRecorderSettings::resolution() const
+Qn::Resolution QnVideoRecorderSettings::resolution() const
 {
-    Resolution rez = VideoRecorderSettings::ResQuaterNative;
+    Qn::Resolution rez = Qn::QuaterNativeResolution;
     if (settings.contains(QLatin1String("resolution")))
-        rez = (VideoRecorderSettings::Resolution)settings.value(QLatin1String("resolution")).toInt();
+        rez = (Qn::Resolution) settings.value(QLatin1String("resolution")).toInt();
 #ifdef CL_TRIAL_MODE
-    if ( rez < Res640x480)
-        rez = Res640x480;
+    if ( rez < Qn::Exact640x480Resolution)
+        rez = Qn::Exact640x480Resolution;
 #endif
     return rez;
 }
 
-void VideoRecorderSettings::setResolution(VideoRecorderSettings::Resolution resolution)
+void QnVideoRecorderSettings::setResolution(Qn::Resolution resolution)
 {
     settings.setValue(QLatin1String("resolution"), resolution);
 }
 
-int VideoRecorderSettings::screen() const
+int QnVideoRecorderSettings::screen() const
 {
     int oldScreen = settings.value(QLatin1String("screen")).toInt();
     QRect geometry = settings.value(QLatin1String("screenResolution")).toRect();
@@ -131,7 +131,7 @@ int VideoRecorderSettings::screen() const
     return desktop->primaryScreen();
 }
 
-void VideoRecorderSettings::setScreen(int screen)
+void QnVideoRecorderSettings::setScreen(int screen)
 {
     settings.setValue(QLatin1String("screen"), screen);
     settings.setValue(QLatin1String("screenResolution"),  qApp->desktop()->screen(screen)->geometry());

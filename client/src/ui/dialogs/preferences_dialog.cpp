@@ -7,9 +7,6 @@
 #include <QtGui/QMessageBox>
 
 #include <core/resource/resource_directory_browser.h>
-#include <core/resource/network_resource.h>
-#include <core/resource/resource.h>
-#include <core/resourcemanagment/resource_pool.h>
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>
 #include <utils/network/nettools.h>
@@ -21,23 +18,6 @@
 #include <ui/widgets/settings/license_manager_widget.h>
 #include <ui/widgets/settings/recording_settings_widget.h>
 #include <youtube/youtubesettingswidget.h>
-
-namespace {
-    QString cameraInfoString(QnResourcePtr resource)
-    {
-        QnNetworkResourcePtr networkResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
-        if (networkResource) {
-            return QnPreferencesDialog::tr("Name: %1\nCamera MAC Address: %2\nCamera IP Address: %3\nLocal IP Address: %4")
-                .arg(networkResource->getName())
-                .arg(networkResource->getMAC().toString())
-                .arg(networkResource->getHostAddress().toString())
-                .arg(networkResource->getDiscoveryAddr().toString());
-        }
-
-        return resource->getName();
-    }
-
-} // anonymous namespace
 
 
 QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *parent): 
@@ -51,8 +31,6 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     m_settings(qnSettings)
 {
     ui->setupUi(this);
-
-    ui->tabWidget->removeTab(1); /* Hide camera settings tab. */ // TODO: is it needed?
 
     ui->maxVideoItemsLabel->hide();
     ui->maxVideoItemsSpinBox->hide(); // TODO: Cannot edit max number of items on the scene.
@@ -90,15 +68,13 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     connect(ui->buttonBox,                              SIGNAL(rejected()),                                         this, SLOT(reject()));
 
     updateFromSettings();
-    updateStoredConnections();
 }
 
-QnPreferencesDialog::~QnPreferencesDialog()
-{
+QnPreferencesDialog::~QnPreferencesDialog() {
+    return;
 }
 
-void QnPreferencesDialog::initColorPicker() 
-{
+void QnPreferencesDialog::initColorPicker() {
     QtColorPicker *w = ui->backgroundColorPicker;
 
     /* No black here. */
@@ -120,144 +96,61 @@ void QnPreferencesDialog::initColorPicker()
     w->insertColor(Qt::lightGray,     tr("Light gray"));
 }
 
-void QnPreferencesDialog::accept()
-{
-    /*m_settingsData.animateBackground = ui->animateBackgroundCheckBox->isChecked();
-    m_settingsData.backgroundColor = ui->backgroundColorPicker->currentColor();
+void QnPreferencesDialog::accept() {
+    submitToSettings();
 
-    m_settingsData.maxVideoItems = ui->maxVideoItemsSpinBox->value();
-    m_settingsData.downmixAudio = ui->downmixAudioCheckBox->isChecked();
-
-    QnSettings *settings = qnSettings;
-    settings->update(m_settingsData);
-    settings->save();
-
-    QStringList checkLst(settings->auxMediaRoots());
-    checkLst.push_back(QDir::toNativeSeparators(settings->mediaRoot()));
-    QnResourceDirectoryBrowser::instance().setPathCheckList(checkLst);
-
-    if (m_connectionsSettingsWidget) {
-        QList<QnSettings::ConnectionData> connections;
-        foreach (const QnSettings::ConnectionData &conn, m_connectionsSettingsWidget->connections()) {
-            QnSettings::ConnectionData connection = conn;
-
-            if (!connection.name.isEmpty() && connection.url.isValid())
-                connections.append(connection);
-        }
-        settings->setConnections(connections);
-    }
-
-    if (m_recordingSettingsWidget)
-        m_recordingSettingsWidget->accept();
+    if (m_recordingSettingsWidget && m_recordingSettingsWidget->decoderQuality() == Qn::BestQuality && m_recordingSettingsWidget->resolution() == Qn::NativeResolution)
+        QMessageBox::information(this, tr("Information"), tr("Very powerful machine is required for BestQuality and Native resolution."));
 
     //m_youTubeSettingsWidget->accept();
 
-    QDialog::accept();*/
+    base_type::accept();
 }
 
-void QnPreferencesDialog::commitToSettings() {
-    /*m_settings->set
+void QnPreferencesDialog::submitToSettings() {
+    m_settings->setBackgroundAnimated(ui->animateBackgroundCheckBox->isChecked());
+    m_settings->setBackgroundColor(ui->backgroundColorPicker->currentColor());
+    m_settings->setMaxVideoItems(ui->maxVideoItemsSpinBox->value());
+    m_settings->setAudioDownmixed(ui->downmixAudioCheckBox->isChecked());
+    m_settings->save();
 
-    m_settingsData.animateBackground = ui->animateBackgroundCheckBox->isChecked();
-    m_settingsData.backgroundColor = ui->backgroundColorPicker->currentColor();
+    if (m_connectionsSettingsWidget) {
+        QnConnectionDataList connections;
+        foreach (const QnConnectionData &connection, m_connectionsSettingsWidget->connections())
+            if (!connection.name.isEmpty() && connection.url.isValid()) // TODO: get rid of these strange checks. They are in settings too.
+                connections.append(connection);
+        m_settings->setConnections(connections);
+    }
 
-    m_settingsData.maxVideoItems = ui->maxVideoItemsSpinBox->value();
-    m_settingsData.downmixAudio = ui->downmixAudioCheckBox->isChecked();
+    if (m_recordingSettingsWidget)
+        m_recordingSettingsWidget->submitToSettings();
 
-    QnSettings *settings = qnSettings;
-    settings->update(m_settingsData);
-    settings->save();
-
-    QStringList checkLst(settings->auxMediaRoots());
-    checkLst.push_back(QDir::toNativeSeparators(settings->mediaRoot()));
-    QnResourceDirectoryBrowser::instance().setPathCheckList(checkLst);*/
-
+    QStringList checkLst(m_settings->extraMediaFolders());
+    checkLst.push_back(QDir::toNativeSeparators(m_settings->mediaFolder()));
+    QnResourceDirectoryBrowser::instance().setPathCheckList(checkLst); // TODO: re-check if it is needed here.
 }
 
-void QnPreferencesDialog::updateFromSettings()
-{
-#if 0
+void QnPreferencesDialog::updateFromSettings() {
     ui->animateBackgroundCheckBox->setChecked(m_settings->isBackgroundAnimated());
     ui->backgroundColorPicker->setCurrentColor(m_settings->backgroundColor());
-    ui->mediaRootLabel->setText(QDir::toNativeSeparators(m_settings->mediaRoot()));
+    ui->mainMediaFolderLabel->setText(QDir::toNativeSeparators(m_settings->mediaFolder()));
     ui->maxVideoItemsSpinBox->setValue(m_settings->maxVideoItems());
-    ui->downmixAudioCheckBox->setChecked(m_settings->downmixAudio());
+    ui->downmixAudioCheckBox->setChecked(m_settings->isAudioDownmixed());
 
-    ui->auxMediaRootsList->clear();
-    foreach (const QString &auxMediaRoot, m_settings->auxMediaRoots())
-        ui->auxMediaRootsList->addItem(QDir::toNativeSeparators(auxMediaRoot));
+    ui->extraMediaFoldersList->clear();
+    foreach (const QString &extraMediaFolder, m_settings->extraMediaFolders())
+        ui->extraMediaFoldersList->addItem(QDir::toNativeSeparators(extraMediaFolder));
 
     ui->networkInterfacesList->clear();
     foreach (const QNetworkAddressEntry &entry, getAllIPv4AddressEntries())
         ui->networkInterfacesList->addItem(tr("IP Address: %1, Network Mask: %2").arg(entry.ip().toString()).arg(entry.netmask().toString()));
 
-    updateStoredConnections();
-#endif
-}
 
-void QnPreferencesDialog::updateStoredConnections()
-{
-#if 0
-    QList<QnSettings::ConnectionData> connections;
-    foreach (const QnSettings::ConnectionData &connection, m_settings->connections())
+    QnConnectionDataList connections;
+    foreach (const QnConnectionData &connection, m_settings->connections())
         if (!connection.name.trimmed().isEmpty()) /* The last used one. */
             connections.append(connection);
     m_connectionsSettingsWidget->setConnections(connections);
-#endif
-}
-
-void QnPreferencesDialog::at_browseMainMediaFolderButton_clicked()
-{
-#if 0
-    QFileDialog fileDialog(this);
-    fileDialog.setFileMode(QFileDialog::DirectoryOnly);
-    if (!fileDialog.exec())
-        return;
-
-    QString xdir = QDir::toNativeSeparators(fileDialog.selectedFiles().first());
-    if (xdir.isEmpty())
-        return;
-
-    m_settingsData.mediaRoot = fromNativePath(xdir);
-
-    updateFromSettings();
-#endif
-}
-
-void QnPreferencesDialog::at_extraMediaFoldersList_selectionChanged()
-{
-    //ui->auxRemovePushButton->setEnabled(!ui->auxMediaRootsList->selectedItems().isEmpty());
-}
-
-void QnPreferencesDialog::at_addExtraMediaFolderButton_clicked()
-{/*
-    QFileDialog fileDialog(this);
-    fileDialog.setFileMode(QFileDialog::DirectoryOnly);
-    if (!fileDialog.exec())
-        return;
-
-    QString xdir = QDir::toNativeSeparators(fileDialog.selectedFiles().first());
-    if (xdir.isEmpty())
-        return;
-
-    xdir = fromNativePath(xdir);
-    if (m_settingsData.auxMediaRoots.contains(xdir) || xdir == m_settingsData.mediaRoot)
-    {
-        QMessageBox::information(this, tr("Folder is already added"), tr("This folder is already added."), QMessageBox::Ok);
-        return;
-    }
-
-    m_settingsData.auxMediaRoots.append(xdir);
-
-    updateFromSettings();*/
-}
-
-void QnPreferencesDialog::at_removeExtraMediaFolderButton_clicked()
-{
-    /*foreach (QListWidgetItem *item, ui->auxMediaRootsList->selectedItems())
-        m_settingsData.auxMediaRoots.removeAll(fromNativePath(item->text()));
-
-    updateFromSettings();*/
 }
 
 void QnPreferencesDialog::setCurrentPage(QnPreferencesDialog::SettingsPage page)
@@ -268,6 +161,47 @@ void QnPreferencesDialog::setCurrentPage(QnPreferencesDialog::SettingsPage page)
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+void QnPreferencesDialog::at_browseMainMediaFolderButton_clicked() {
+    QFileDialog fileDialog(this);
+    fileDialog.setFileMode(QFileDialog::DirectoryOnly);
+    if (!fileDialog.exec())
+        return;
+
+    QString dir = QDir::toNativeSeparators(fileDialog.selectedFiles().first());
+    if (dir.isEmpty())
+        return;
+
+    ui->mainMediaFolderLabel->setText(dir);
+}
+
+void QnPreferencesDialog::at_addExtraMediaFolderButton_clicked() {
+    QFileDialog fileDialog(this);
+    fileDialog.setFileMode(QFileDialog::DirectoryOnly);
+    if (!fileDialog.exec())
+        return;
+
+    QString dir = QDir::toNativeSeparators(fileDialog.selectedFiles().first());
+    if (dir.isEmpty())
+        return;
+
+    if(!ui->extraMediaFoldersList->findItems(dir, Qt::MatchExactly).empty()) {
+        QMessageBox::information(this, tr("Folder is already added"), tr("This folder is already added."), QMessageBox::Ok);
+        return;
+    }
+
+    ui->extraMediaFoldersList->addItem(dir);
+}
+
+void QnPreferencesDialog::at_removeExtraMediaFolderButton_clicked()
+{
+    foreach(QListWidgetItem *item, ui->extraMediaFoldersList->selectedItems())
+        delete item;
+}
+
+void QnPreferencesDialog::at_extraMediaFoldersList_selectionChanged() {
+    ui->removeExtraMediaFolderButton->setEnabled(!ui->extraMediaFoldersList->selectedItems().isEmpty());
+}
+
 void QnPreferencesDialog::at_animateBackgroundCheckBox_stateChanged(int state) 
 {
     bool enabled = state == Qt::Checked;

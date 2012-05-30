@@ -79,7 +79,7 @@ void QnPropertyStorage::setType(int id, int type) {
     m_typeById[id] = type;
 
     if(type != QMetaType::Void)
-        setValue(id, value(id)); /* Re-convert. */
+        setValue(id, QVariant(type, static_cast<const void *>(NULL)));
 }
 
 void QnPropertyStorage::updateFromSettings(QSettings *settings) {
