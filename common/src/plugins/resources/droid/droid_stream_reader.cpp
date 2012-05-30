@@ -55,7 +55,7 @@ QnAbstractMediaDataPtr PlDroidStreamReader::getNextData()
 
         QMutexLocker lock(&m_controlPortSync);
         int readed = m_videoIoDevice->read( (char*) rtpBuffer, sizeof(rtpBuffer));
-        m_h264Parser->processData(rtpBuffer, readed, result );
+        m_h264Parser->processData(rtpBuffer, readed, m_videoIoDevice->getStatistic(), result );
     }
     return result.isEmpty() ? QnAbstractMediaDataPtr() : result[0];
 }

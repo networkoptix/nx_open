@@ -9,10 +9,11 @@
 #include "../common/sleep.h"
 #include "tcp_connection_processor.h"
 #include "simple_http_client.h"
+#include "utils/media/bitStream.h"
+#include "../common/synctime.h"
 
 #define DEFAULT_RTP_PORT 554
 #define RESERVED_TIMEOUT_TIME (5*1000)
-
 
 static const int MAX_RTCP_PACKET_SIZE = 1024 * 2;
 static const quint32 SSRC_CONST = 0x2a55a9e8;
@@ -22,10 +23,10 @@ static const int TCP_CONNECT_TIMEOUT = 1000*3;
 
 //#define DEBUG_RTSP
 
+// --------------------- RTPIODevice --------------------------
+
 RTPIODevice::RTPIODevice(RTPSession* owner, bool useTCP):
     m_owner(owner),
-    m_receivedPackets(0),
-    m_receivedOctets(0),
     m_tcpMode(false),
     m_mediaSocket(0),
     m_rtcpSocket(0)
@@ -65,8 +66,6 @@ qint64 RTPIODevice::read(char *data, qint64 maxSize)
         readed = m_mediaSocket->recv(data, maxSize);
     if (readed > 0)
     {
-        m_receivedPackets++;
-        m_receivedPackets += readed;
     }
     m_owner->sendKeepAliveIfNeeded();
     if (!m_tcpMode)
@@ -76,12 +75,6 @@ qint64 RTPIODevice::read(char *data, qint64 maxSize)
 
 void RTPIODevice::processRtcpData()
 {
-    RtspStatistic stats;
-    stats.nptTime = 0;
-    stats.timestamp = 0;
-    stats.receivedOctets = m_receivedPackets;
-    stats.receivedPackets = m_receivedPackets;
-
     quint8 rtcpBuffer[MAX_RTCP_PACKET_SIZE];
     quint8 sendBuffer[MAX_RTCP_PACKET_SIZE];
     while (m_rtcpSocket->hasData())
@@ -96,10 +89,8 @@ void RTPIODevice::processRtcpData()
 
                 m_rtcpSocket->setDestAddr(lastReceivedAddr, lastReceivedPort);
             }
-
-            //quint32 timestamp = 0;
-            //double nptTime = 0;
-            int outBufSize = m_owner->buildRTCPReport(sendBuffer, &stats);
+            m_statistic = m_owner->parseServerRTCPReport(rtcpBuffer, readed);
+            int outBufSize = m_owner->buildClientRTCPReport(sendBuffer);
             if (outBufSize > 0)
             {
                 m_rtcpSocket->sendTo(sendBuffer, outBufSize);
@@ -108,8 +99,41 @@ void RTPIODevice::processRtcpData()
     }
 }
 
+// ================================================== QnRtspTimeHelper ==========================================
 
-//============================================================================================
+QnRtspTimeHelper::QnRtspTimeHelper():
+    m_cameraClockToLocalDiff(INT_MAX)
+{
+
+}
+
+double QnRtspTimeHelper::cameraTimeToLocalTime(double cameraTime)
+{
+    double timeDiff = qnSyncTime->currentMSecsSinceEpoch()/1000.0 - cameraTime;
+    // check if first time or clock diff is large (clock was adjusted on camera or local machine)
+    if (m_cameraClockToLocalDiff == INT_MAX || qAbs(timeDiff-m_cameraClockToLocalDiff) > 100.0)  
+        m_cameraClockToLocalDiff = timeDiff;
+    return cameraTime + m_cameraClockToLocalDiff;
+}
+
+void QnRtspTimeHelper::reset()
+{
+    m_cameraClockToLocalDiff == INT_MAX;
+}
+
+qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& statistics, int frequency)
+{
+    if (statistics.isEmpty())
+        return qnSyncTime->currentMSecsSinceEpoch() * 1000;
+    else {
+        int rtpTimeDiff = rtpTime - statistics.timestamp;
+        double result = cameraTimeToLocalTime(statistics.nptTime) + rtpTimeDiff / double(frequency);
+        return result * 1000000ll;
+    }
+}
+
+
+// ================================================== RTPSession ==========================================
 RTPSession::RTPSession():
     m_csec(2),
     //m_rtpIo(*this),
@@ -740,11 +764,47 @@ bool RTPSession::sendTeardown()
     }
 }
 
-
+static const int RTCP_SENDER_REPORT = 200;
 static const int RTCP_RECEIVER_REPORT = 201;
 static const int RTCP_SOURCE_DESCRIPTION = 202;
 
-int RTPSession::buildRTCPReport(quint8* dstBuffer, const RtspStatistic* stats)
+RtspStatistic RTPSession::parseServerRTCPReport(quint8* srcBuffer, int srcBufferSize)
+{
+    static quint32 rtspTimeDiff = QDateTime::fromString("1900-01-01",Qt::ISODate).secsTo(QDateTime::fromString("1970-01-01",Qt::ISODate));
+
+    RtspStatistic stats;
+    try {
+        BitStreamReader reader(srcBuffer, srcBuffer + srcBufferSize);
+        reader.skipBits(8); // skip version
+
+        while (reader.getBitsLeft() > 0)
+        {
+            int messageCode = reader.getBits(8);
+            int messageLen = reader.getBits(16);
+            if (messageCode == RTCP_SENDER_REPORT)
+            {
+                reader.skipBits(32); // sender ssrc
+                quint32 intTime = reader.getBits(32);
+                quint32 fracTime = reader.getBits(32);
+                stats.nptTime = intTime + (double) fracTime / UINT_MAX - rtspTimeDiff;
+                stats.timestamp = reader.getBits(32);
+                stats.receivedPackets = reader.getBits(32);
+                stats.receivedOctets = reader.getBits(32);
+                break;
+            }
+            else {
+                reader.skipBits(32 * messageLen);
+            }
+        }
+    } catch(...)
+    {
+        
+    }
+    return stats;
+}
+
+
+int RTPSession::buildClientRTCPReport(quint8* dstBuffer)
 {
     QByteArray esDescr("netoptix");
 
@@ -756,12 +816,14 @@ int RTPSession::buildRTCPReport(quint8* dstBuffer, const RtspStatistic* stats)
 
     quint32* curBuf32 = (quint32*) curBuffer;
     *curBuf32++ = htonl(SSRC_CONST);
+    /*
     *curBuf32++ = htonl((quint32) stats->nptTime);
     quint32 fracTime = (quint32) ((stats->nptTime - (quint32) stats->nptTime) * UINT_MAX); // UINT32_MAX
     *curBuf32++ = htonl(fracTime);
     *curBuf32++ = htonl(stats->timestamp);
     *curBuf32++ = htonl(stats->receivedPackets);
     *curBuf32++ = htonl(stats->receivedOctets);
+    */
 
     // correct len field (count of 32 bit words -1)
     quint16 len = (quint16) (curBuf32 - (quint32*) dstBuffer);

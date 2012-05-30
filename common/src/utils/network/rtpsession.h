@@ -14,11 +14,28 @@ static const int RTSP_FFMPEG_VIDEO_HEADER_SIZE = 3;
 static const int RTSP_FFMPEG_METADATA_HEADER_SIZE = 4;
 static const int MAX_RTP_PACKET_SIZE = 1024 * 8;
 
-struct RtspStatistic {
+struct RtspStatistic 
+{
+    RtspStatistic(): timestamp(0), nptTime(0), receivedPackets(0), receivedOctets(0) {}
+    bool isEmpty() const { return timestamp == 0 && nptTime == 0; }
+
     quint32 timestamp;
     double nptTime;
     qint64 receivedPackets;
     qint64 receivedOctets;
+};
+
+class QnRtspTimeHelper
+{
+public:
+    QnRtspTimeHelper();
+
+    qint64 getUsecTime(quint32 rtpTime, const RtspStatistic& statistics, int rtpFrequency);
+    void reset();
+private:
+    double cameraTimeToLocalTime(double cameraTime); // time in seconds since 1.1.1970
+private:
+    double m_cameraClockToLocalDiff; // in secs
 };
 
 class RTPIODevice
@@ -28,6 +45,7 @@ public:
     virtual ~RTPIODevice();
     virtual qint64 read(char * data, qint64 maxSize );
     
+    const RtspStatistic& getStatistic() { return m_statistic;}
     CommunicatingSocket* getMediaSocket();
     UDPSocket* getRtcpSocket() const { return m_rtcpSocket; }
 private:
@@ -37,9 +55,8 @@ private:
     UDPSocket* m_rtcpSocket;
 
     RTPSession* m_owner;
-    qint64 m_receivedPackets;
-    qint64 m_receivedOctets;
     bool m_tcpMode;
+    RtspStatistic m_statistic;
 };
 
 class RTPSession: public QObject
@@ -152,7 +169,8 @@ private:
     void updateTransportHeader(QByteArray &responce);
 
     void parseSDP();
-    int buildRTCPReport(quint8 *dstBuffer, const RtspStatistic *stats);
+    RtspStatistic parseServerRTCPReport(quint8* srcBuffer, int srcBufferSize);
+    int buildClientRTCPReport(quint8 *dstBuffer);
     void addAdditionAttrs(QByteArray& request);
 private:
     enum { RTSP_BUFFER_LEN = 1024 * 64 * 16 };

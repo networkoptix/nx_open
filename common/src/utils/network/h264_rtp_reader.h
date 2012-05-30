@@ -17,21 +17,17 @@ public:
 	RTPH264StreamreaderDelegate(QnResourcePtr res);
 	virtual ~RTPH264StreamreaderDelegate();
 
-
     QnAbstractMediaDataPtr getNextData();
     void setRequest(const QString& request);
     void openStream();
     void closeStream() ;
     bool isStreamOpened() const;
-
 private:
-    
     RTPSession m_RtpSession;
     RTPIODevice* m_rtpIo;
     QnRtpStreamParser* m_streamParser;
 
     QString m_request;
-
 };
 
 #endif //h264_reader_deligate_h_1158

@@ -80,7 +80,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
             readed = m_videoIO->read( (char*) rtpBuffer, sizeof(rtpBuffer));
             if (readed < 1)
                 break;
-            if (!m_videoParser->processData(rtpBuffer, readed, m_lastVideoData)) {
+            if (!m_videoParser->processData(rtpBuffer, readed, m_videoIO->getStatistic(), m_lastVideoData)) {
                 if (++videoRetryCount > RTSP_RETRY_COUNT) {
                     closeStream();
                     return QnAbstractMediaDataPtr(0);
@@ -93,7 +93,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
             readed = m_audioIO->read( (char*) rtpBuffer, sizeof(rtpBuffer));
             if (readed < 1)
                 break;
-            if (!m_audioParser->processData(rtpBuffer, readed, m_lastAudioData)) {
+            if (!m_audioParser->processData(rtpBuffer, readed, m_audioIO->getStatistic(), m_lastAudioData)) {
                 if (++audioRetryCount > RTSP_RETRY_COUNT) {
                     closeStream();
                     return QnAbstractMediaDataPtr(0);
@@ -164,6 +164,7 @@ void QnMulticodecRtpReader::openStream()
 {
     if (isStreamOpened())
         return;
+    m_timeHelper.reset();
 
     QnNetworkResourcePtr nres = getResource().dynamicCast<QnNetworkResource>();
 
@@ -185,7 +186,11 @@ void QnMulticodecRtpReader::openStream()
         m_audioParser = 0;
 
         m_videoParser = createParser(m_RtpSession.getCodecNameByType("video"));
+        if (m_videoParser)
+            m_videoParser->setTimeHelper(&m_timeHelper);
         m_audioParser = dynamic_cast<QnRtpAudioStreamParser*> (createParser(m_RtpSession.getCodecNameByType("audio")));
+        if (m_audioParser)
+            m_audioParser->setTimeHelper(&m_timeHelper);
 
         initIO(&m_videoIO, m_videoParser, "video");
         initIO(&m_audioIO, m_audioParser, "audio");

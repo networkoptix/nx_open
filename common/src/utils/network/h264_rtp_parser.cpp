@@ -131,14 +131,13 @@ void CLH264RtpParser::decodeSpsInfo(const QByteArray& data)
     }
 }
 
-bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, QList<QnAbstractMediaDataPtr>& result)
+bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStatistic& statistics, QList<QnAbstractMediaDataPtr>& result)
 {
     result.clear();
 
     int nalUnitLen;
     int don;
     quint8 nalUnitType;
-    RtpHeader* rtpHeader = 0;
     bool isKeyFrame = false;
     quint16 lastSeqNum = 0;
 
@@ -150,7 +149,7 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, QList<QnAbstrac
         return false;
     }
     
-    rtpHeader = (RtpHeader*) rtpBuffer;
+    RtpHeader* rtpHeader = (RtpHeader*) rtpBuffer;
     quint8* curPtr = rtpBuffer + RtpHeader::RTP_HEADER_SIZE;
     int bytesLeft = readed - RtpHeader::RTP_HEADER_SIZE;
 
@@ -325,7 +324,12 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, QList<QnAbstrac
         else
             m_videoData->flags &= ~AV_PKT_FLAG_KEY;
         m_videoData->compressionType = CODEC_ID_H264;
-        if (rtpHeader)
+        
+        if (m_timeHelper) {
+            m_videoData->timestamp = m_timeHelper->getUsecTime(ntohl(rtpHeader->timestamp), statistics, m_frequency);
+            qDebug() << "video. adjusttime to " << (m_videoData->timestamp - qnSyncTime->currentMSecsSinceEpoch()*1000)/1000 << "ms";
+        }
+        else
             m_videoData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
 
         result << m_videoData;

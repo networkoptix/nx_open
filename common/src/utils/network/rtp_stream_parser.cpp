@@ -1,11 +1,17 @@
 #include "rtp_stream_parser.h"
 
-QnRtpStreamParser::QnRtpStreamParser()
+QnRtpStreamParser::QnRtpStreamParser():
+m_timeHelper(0)
 {
 }
 
 QnRtpStreamParser::~QnRtpStreamParser()
 {
+}
+
+void QnRtpStreamParser::setTimeHelper(QnRtspTimeHelper* timeHelper)
+{
+    m_timeHelper = timeHelper;
 }
 
 void QnRtpAudioStreamParser::processIntParam(const QByteArray& checkName, int& setValue, const QByteArray& param)
@@ -40,4 +46,3 @@ void QnRtpAudioStreamParser::processStringParam(const QByteArray& checkName, QBy
     if (paramName == checkName)
         setValue = paramValue;
 }
-

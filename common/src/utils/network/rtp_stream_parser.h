@@ -4,8 +4,10 @@
 #include <QIODevice>
 #include "core/datapacket/mediadatapacket.h"
 #include "core/resource/resource_media_layout.h"
+#include "rtpsession.h"
 
 class RTPIODevice;
+class RtspStatistic;
 
 #pragma pack(push, 1)
 typedef struct
@@ -41,9 +43,14 @@ public:
     QnRtpStreamParser();
     virtual void setSDPInfo(QList<QByteArray> sdpInfo) = 0;
     
-    virtual bool processData(quint8* rtpBuffer, int readed, QList<QnAbstractMediaDataPtr>& result) = 0;
+    virtual bool processData(quint8* rtpBuffer, int readed, const RtspStatistic& statistics, QList<QnAbstractMediaDataPtr>& result) = 0;
 
     virtual ~QnRtpStreamParser();
+
+    // used for sync audio/video streams
+    void setTimeHelper(QnRtspTimeHelper* timeHelper);
+protected:
+    QnRtspTimeHelper* m_timeHelper;
 };
 
 class QnRtspAudioLayout: public QnResourceAudioLayout

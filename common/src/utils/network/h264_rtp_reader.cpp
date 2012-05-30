@@ -42,7 +42,7 @@ QnAbstractMediaDataPtr RTPH264StreamreaderDelegate::getNextData()
         {
             do {
                 readed = m_rtpIo->read( (char*) rtpBuffer, sizeof(rtpBuffer));
-            } while(m_streamParser->processData(rtpBuffer, readed, result ) && result.isEmpty());
+            } while(m_streamParser->processData(rtpBuffer, readed, m_rtpIo->getStatistic(), result ) && result.isEmpty());
             if (!result.isEmpty())
                 return result[0];
         }

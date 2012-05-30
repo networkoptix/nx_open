@@ -18,7 +18,7 @@ QnAacRtpParser::QnAacRtpParser():
     m_streamStateIndication = 0;
     m_profile = 0;
     m_bitrate = 0;
-    m_frequency = 0;
+    m_frequency = 16000;
     m_channels = 0;
     m_streamtype = 0;
     m_auHeaderExists = false;
@@ -83,7 +83,7 @@ void QnAacRtpParser::setSDPInfo(QList<QByteArray> lines)
 
 }
 
-bool QnAacRtpParser::processData(quint8* rtpBuffer, int bufferSize, QList<QnAbstractMediaDataPtr>& result)
+bool QnAacRtpParser::processData(quint8* rtpBuffer, int bufferSize, const RtspStatistic& statistics, QList<QnAbstractMediaDataPtr>& result)
 {
     result.clear();
     QVector<int> auSize;
@@ -155,7 +155,11 @@ bool QnAacRtpParser::processData(quint8* rtpBuffer, int bufferSize, QList<QnAbst
         QnCompressedAudioDataPtr audioData = QnCompressedAudioDataPtr(new QnCompressedAudioData(CL_MEDIA_ALIGNMENT, unitSize));
         audioData->compressionType = CODEC_ID_AAC;
         audioData->context = m_context;
-        audioData->timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;
+        if (m_timeHelper)
+            audioData->timestamp = m_timeHelper->getUsecTime(ntohl(rtpHeader->timestamp), statistics, m_frequency);
+        else
+            audioData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
+
 
         //quint8 adtsHeaderBuff[AAC_HEADER_LEN];
         //m_aacHelper.buildADTSHeader(adtsHeaderBuff, unitSize);

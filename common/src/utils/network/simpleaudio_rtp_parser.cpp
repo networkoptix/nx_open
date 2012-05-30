@@ -63,7 +63,7 @@ void QnSimpleAudioRtpParser::setSDPInfo(QList<QByteArray> lines)
     m_audioLayout.setAudioTrackInfo(track);
 }
 
-bool QnSimpleAudioRtpParser::processData(quint8* rtpBuffer, int bufferSize, QList<QnAbstractMediaDataPtr>& result)
+bool QnSimpleAudioRtpParser::processData(quint8* rtpBuffer, int bufferSize, const RtspStatistic& statistics, QList<QnAbstractMediaDataPtr>& result)
 {
     result.clear();
 
@@ -76,7 +76,16 @@ bool QnSimpleAudioRtpParser::processData(quint8* rtpBuffer, int bufferSize, QLis
     QnCompressedAudioDataPtr audioData = QnCompressedAudioDataPtr(new QnCompressedAudioData(CL_MEDIA_ALIGNMENT, end - curPtr));
     audioData->compressionType = m_context->ctx()->codec_id;
     audioData->context = m_context;
-    audioData->timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;
+    if (m_timeHelper) {
+        audioData->timestamp = m_timeHelper->getUsecTime(ntohl(rtpHeader->timestamp), statistics, m_frequency);
+        qDebug() << "audio. adjusttime to " << (audioData->timestamp - qnSyncTime->currentMSecsSinceEpoch()*1000)/1000 << "ms";
+        if (qAbs((audioData->timestamp - qnSyncTime->currentMSecsSinceEpoch()*1000)/1000) > 1000000ll * 10)
+        {
+            audioData->timestamp = m_timeHelper->getUsecTime(ntohl(rtpHeader->timestamp), statistics, m_frequency);
+        }
+    }
+    else
+        audioData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
 
     audioData->data.write((const char*)curPtr, end - curPtr);
     result << audioData;
