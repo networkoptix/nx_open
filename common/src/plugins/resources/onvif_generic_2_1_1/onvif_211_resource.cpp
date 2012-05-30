@@ -641,8 +641,7 @@ void QnPlOnvifGeneric211Resource::save()
 {
     QByteArray errorStr;
     QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
-    conn->saveSync(toSharedPointer().dynamicCast<QnVirtualCameraResource>(), errorStr);
-    if (!errorStr.isEmpty()) {
+    if (conn->saveSync(toSharedPointer().dynamicCast<QnVirtualCameraResource>(), errorStr))
         qCritical() << "QnPlOnvifGeneric211Resource::init: can't save resource params to Enterprise Controller. Resource MAC: "
                     << getMAC().toString() << ". Description: " << errorStr;
     }
