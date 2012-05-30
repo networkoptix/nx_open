@@ -90,6 +90,10 @@
 							<failOnError>false</failOnError>
 							<target>							
 								<chmod file="${project.build.directory}/*.sh" perm="755"/>
+								
+								<exec dir="${project.build.directory}" executable="unzip">
+   									<arg line="-a -u *.zip"/>
+  								</exec>
 
 								<concat destfile="${project.build.directory}/${project.artifactId}.pro" append="true">
 									<filelist dir="${project.build.directory}" files="template.pro"/>
@@ -364,7 +368,7 @@
 						<executions>
 							<execution>
 								<id>generate-makefile</id>
-								<phase>generate-resources</phase>
+								<phase>process-resources</phase>
 								<goals>
 									<goal>exec</goal>
 								</goals>
