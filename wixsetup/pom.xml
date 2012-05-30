@@ -20,6 +20,10 @@
 	<packaging>pom</packaging>
 	<name>HD Witness Installer</name>
 
+	<properties>
+		<arch>x86</arch>
+	</properties>
+
 	<build>
 		<directory>${arch}</directory>
 		<sourceDirectory>${basedir}</sourceDirectory>
@@ -31,7 +35,7 @@
 				<version>1.0-alpha-2</version>
 				<executions>
 					<execution>
-						<phase>initialize</phase>
+						<phase>validate</phase>
 						<goals>
 							<goal>read-project-properties</goal>
 						</goals>
@@ -45,10 +49,6 @@
 			</plugin>
 		</plugins>
 	</build>
-
-	<properties>
-		<arch>x86</arch>
-	</properties>
 
 	<profiles>
 		<profile>
@@ -149,15 +149,11 @@
 									<outputDirectory>${project.build.directory}</outputDirectory>
 									<resources>
 										<resource>
-											<directory>${project.build.sourceDirectory}/maven/wix-resources</directory>
-											<filtering>true</filtering>
-										</resource>
-										<resource>
-											<directory>${project.build.sourceDirectory}/maven/bin-resources/common</directory>
+											<directory>${project.build.sourceDirectory}/maven-bin-resources/common</directory>
 											<filtering>false</filtering>
 										</resource>		
 										<resource>
-											<directory>${project.build.sourceDirectory}/maven/bin-resources/custom/${installer.customization}</directory>
+											<directory>${project.build.sourceDirectory}/maven-bin-resources/custom/${installer.customization}</directory>
 											<filtering>false</filtering>
 										</resource>		
 										<resource>
