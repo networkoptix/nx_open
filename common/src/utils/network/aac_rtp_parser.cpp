@@ -140,6 +140,7 @@ bool QnAacRtpParser::processData(quint8* rtpBuffer, int bufferSize, const RtspSt
         return false;
     }
 
+    quint32 rtpTime = ntohl(rtpHeader->timestamp);
     for (int i = 0; curPtr < end; ++i)
     {
         int unitSize = m_constantSize;
@@ -152,11 +153,15 @@ bool QnAacRtpParser::processData(quint8* rtpBuffer, int bufferSize, const RtspSt
         if (curPtr + unitSize > end)
             return false;
 
+        int rtpTimeOffset = 0;
+        if (auIndex.size() > i)
+            rtpTimeOffset = auIndex[i];
+
         QnCompressedAudioDataPtr audioData = QnCompressedAudioDataPtr(new QnCompressedAudioData(CL_MEDIA_ALIGNMENT, unitSize));
         audioData->compressionType = CODEC_ID_AAC;
         audioData->context = m_context;
         if (m_timeHelper)
-            audioData->timestamp = m_timeHelper->getUsecTime(ntohl(rtpHeader->timestamp), statistics, m_frequency);
+            audioData->timestamp = m_timeHelper->getUsecTime(rtpTime+rtpTimeOffset, statistics, m_frequency);
         else
             audioData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
 
