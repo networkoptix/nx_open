@@ -35,6 +35,7 @@ class QnTcpListener;
 // ----------------------------- QnRtspConnectionProcessorPrivate ----------------------------
 
 enum Mode {Mode_Live, Mode_Archive, Mode_ThumbNails};
+static const int MAX_CAMERA_OPEN_TIME = 1000 * 5;
 
 class QnRtspConnectionProcessor::QnRtspConnectionProcessorPrivate: public QnTCPConnectionProcessor::QnTCPConnectionProcessorPrivate
 {
@@ -322,9 +323,21 @@ int QnRtspConnectionProcessor::composeDescribe()
 
     
     const QnVideoResourceLayout* videoLayout = d->mediaRes->getVideoLayout(d->liveDpHi.data());
-    const QnResourceAudioLayout* audioLayout = d->mediaRes->getAudioLayout(d->liveDpHi.data());
+
+    int numAudio = 0;
+    QnVirtualCameraResourcePtr cameraResource = qSharedPointerDynamicCast<QnVirtualCameraResource>(d->mediaRes);
+    if (cameraResource) {
+        // avoid race condition if camera is starting now
+        if (cameraResource->isAudioEnabled())
+            numAudio = 1;
+    }
+    else {
+        const QnResourceAudioLayout* audioLayout = d->mediaRes->getAudioLayout(d->liveDpHi.data());
+        if (audioLayout)
+            numAudio = audioLayout->numberOfChannels();
+    }
+
     int numVideo = videoLayout ? videoLayout->numberOfChannels() : 1;
-    int numAudio = audioLayout ? audioLayout->numberOfChannels() : 0;
 
     addResponseRangeHeader();
 

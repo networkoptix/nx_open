@@ -254,6 +254,8 @@ void QnThumbnailsLoader::pleaseStop()
 {
     m_rtspClient->beforeClose();
     m_rtspClient->close();
+
+    base_type::pleaseStop();
 }
 
 qint64 QnThumbnailsLoader::step() const

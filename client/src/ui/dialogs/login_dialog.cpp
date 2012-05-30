@@ -1,26 +1,27 @@
 #include "login_dialog.h"
 #include "ui_login_dialog.h"
 
-#include <QEvent>
+#include <QtCore/QEvent>
 #include <QtGui/QDataWidgetMapper>
 #include <QtGui/QMessageBox>
 #include <QtGui/QStandardItemModel>
 
-#include "core/resource/resource.h"
-#include "ui/preferences/preferencesdialog.h"
-#include "ui/style/skin.h"
-#include "ui/workbench/workbench_context.h"
-#include "ui/widgets/rendering_widget.h"
-#include "connection_testing_dialog.h"
+#include <utils/settings.h>
+#include <core/resource/resource.h>
+#include <api/AppServerConnection.h>
+#include <api/SessionManager.h>
 
-#include "api/AppServerConnection.h"
-#include "api/SessionManager.h"
+#include <ui/dialogs/preferences_dialog.h>
+#include <ui/widgets/rendering_widget.h>
+#include <ui/style/skin.h>
+#include <ui/workbench/workbench_context.h>
 
-#include "utils/settings.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "plugins/resources/archive/filetypes.h"
 #include "plugins/resources/archive/filetypesupport.h"
+
+#include "connection_testing_dialog.h"
 
 namespace {
     void setEnabled(const QObjectList &objects, QObject *exclude, bool enabled) {

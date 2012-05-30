@@ -3,10 +3,11 @@
 
 #include <QIODevice>
 #include "core/datapacket/mediadatapacket.h"
-
-
+#include "core/resource/resource_media_layout.h"
+#include "rtpsession.h"
 
 class RTPIODevice;
+class RtspStatistic;
 
 #pragma pack(push, 1)
 typedef struct
@@ -36,18 +37,41 @@ typedef struct
 } RtpHeader;
 #pragma pack(pop)
 
-
-
-class CLRtpStreamParser
+class QnRtpStreamParser
 {
 public:
-    CLRtpStreamParser(RTPIODevice* input);
-    virtual void setSDPInfo(const QByteArray& data);
-    virtual QnAbstractMediaDataPtr getNextData() = 0;
-    virtual ~CLRtpStreamParser();
+    QnRtpStreamParser();
+    virtual void setSDPInfo(QList<QByteArray> sdpInfo) = 0;
+    
+    virtual bool processData(quint8* rtpBuffer, int readed, const RtspStatistic& statistics, QList<QnAbstractMediaDataPtr>& result) = 0;
+
+    virtual ~QnRtpStreamParser();
+
+    // used for sync audio/video streams
+    void setTimeHelper(QnRtspTimeHelper* timeHelper);
 protected:
-    RTPIODevice* m_input;
-    QByteArray m_sdp;
+    QnRtspTimeHelper* m_timeHelper;
+};
+
+class QnRtspAudioLayout: public QnResourceAudioLayout
+{
+public:
+    QnRtspAudioLayout(): QnResourceAudioLayout() {}
+    virtual int numberOfChannels() const override { return 1; }
+    virtual AudioTrack getAudioTrackInfo(int /*index*/) const override { return m_audioTrack; }
+    void setAudioTrackInfo(const AudioTrack& info) { m_audioTrack = info; }
+private:
+    AudioTrack m_audioTrack;
+};
+
+class QnRtpAudioStreamParser: public QnRtpStreamParser
+{
+public:
+    virtual QnResourceAudioLayout* getAudioLayout() = 0;
+protected:
+    void processIntParam(const QByteArray& checkName, int& setValue, const QByteArray& param);
+    void processHexParam(const QByteArray& checkName, QByteArray& setValue, const QByteArray& param);
+    void processStringParam(const QByteArray& checkName, QByteArray& setValue, const QByteArray& param);
 };
 
 #endif

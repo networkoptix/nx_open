@@ -108,6 +108,7 @@ private:
 
     qint64 getDisplayedMax() const;
     qint64 getDisplayedMin() const;
+    void setAudioBufferSize(int bufferSize);
 protected:
     CLVideoStreamDisplay* m_display[CL_MAX_CHANNELS];
 	QQueue<QnCompressedVideoDataPtr> m_videoQueue[CL_MAX_CHANNELS];
@@ -191,6 +192,8 @@ protected:
     bool m_executingChangeSpeed;
     bool m_eofSignalSended;
     bool m_lastLiveIsLowQuality;
+    int m_audioBufferSize;
+    qint64 m_minAudioDetectJumpInterval;
 };
 
 #endif //clcam_display_h_1211

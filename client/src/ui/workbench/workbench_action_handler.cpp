@@ -45,7 +45,7 @@
 #include <ui/dialogs/layout_name_dialog.h>
 #include <ui/dialogs/user_settings_dialog.h>
 #include <ui/dialogs/resource_list_dialog.h>
-#include <ui/preferences/preferencesdialog.h>
+#include <ui/dialogs/preferences_dialog.h>
 #include <youtube/youtubeuploaddialog.h>
 
 #include <ui/graphics/items/resource_widget.h>

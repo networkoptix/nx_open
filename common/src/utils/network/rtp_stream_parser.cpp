@@ -1,15 +1,48 @@
 #include "rtp_stream_parser.h"
 
-CLRtpStreamParser::CLRtpStreamParser(RTPIODevice* input):
-            m_input(input)
+QnRtpStreamParser::QnRtpStreamParser():
+m_timeHelper(0)
 {
 }
 
-CLRtpStreamParser::~CLRtpStreamParser()
+QnRtpStreamParser::~QnRtpStreamParser()
 {
 }
 
-void CLRtpStreamParser::setSDPInfo(const QByteArray& data)
+void QnRtpStreamParser::setTimeHelper(QnRtspTimeHelper* timeHelper)
 {
-    m_sdp = data;
+    m_timeHelper = timeHelper;
+}
+
+void QnRtpAudioStreamParser::processIntParam(const QByteArray& checkName, int& setValue, const QByteArray& param)
+{
+    int valuePos = param.indexOf('=');
+    if (valuePos == -1)
+        return;
+    QByteArray paramName = param.left(valuePos);
+    QByteArray paramValue = param.mid(valuePos+1);
+    if (paramName == checkName)
+        setValue = paramValue.toInt();
+}
+
+void QnRtpAudioStreamParser::processHexParam(const QByteArray& checkName, QByteArray& setValue, const QByteArray& param)
+{
+    int valuePos = param.indexOf('=');
+    if (valuePos == -1)
+        return;
+    QByteArray paramName = param.left(valuePos);
+    QByteArray paramValue = param.mid(valuePos+1);
+    if (paramName == checkName)
+        setValue = QByteArray::fromHex(paramValue);
+}
+
+void QnRtpAudioStreamParser::processStringParam(const QByteArray& checkName, QByteArray& setValue, const QByteArray& param)
+{
+    int valuePos = param.indexOf('=');
+    if (valuePos == -1)
+        return;
+    QByteArray paramName = param.left(valuePos);
+    QByteArray paramValue = param.mid(valuePos+1);
+    if (paramName == checkName)
+        setValue = paramValue;
 }

@@ -1,10 +1,10 @@
-#include "preferencesdialog.h"
-#include "ui_preferences.h"
+#include "preferences_dialog.h"
+#include "ui_preferences_dialog.h"
 
-#include <QDir>
-#include <QToolButton>
-#include <QFileDialog>
-#include <QMessageBox>
+#include <QtCore/QDir>
+#include <QtGui/QToolButton>
+#include <QtGui/QFileDialog>
+#include <QtGui/QMessageBox>
 
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource/network_resource.h>
@@ -17,10 +17,10 @@
 #include "ui/actions/action_manager.h"
 #include "ui/workbench/workbench_context.h"
 
-#include "connectionssettingswidget.h"
-#include "licensemanagerwidget.h"
-#include "recordingsettingswidget.h"
-#include "youtube/youtubesettingswidget.h"
+#include <ui/widgets/preferences/connections_settings_widget.h>
+#include <ui/widgets/preferences/license_manager_widget.h>
+#include <ui/widgets/preferences/recording_settings_widget.h>
+#include <youtube/youtubesettingswidget.h>
 
 namespace {
     QString cameraInfoString(QnResourcePtr resource)

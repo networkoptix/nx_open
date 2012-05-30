@@ -1,5 +1,5 @@
-#include "licensemanagerwidget.h"
-#include "ui_licensemanagerwidget.h"
+#include "license_manager_widget.h"
+#include "ui_license_manager_widget.h"
 
 #include <QtCore/QFile>
 #include <QtCore/QUrl>

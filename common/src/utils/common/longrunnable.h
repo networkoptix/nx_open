@@ -97,4 +97,26 @@ protected:
     QSemaphore m_semaphore;
 };
 
+
+/**
+ * Helper cleanup class to use CLLongRunnable inside Qt smart pointers in a 
+ * non-blocking fashion.
+ */
+struct QnRunnableCleanup
+{
+    static inline void cleanup(CLLongRunnable *runnable)
+    {
+        if(!runnable)
+            return;
+
+        if(runnable->isRunning()) {
+            QObject::connect(runnable, SIGNAL(finished()), runnable, SLOT(deleteLater()));
+            runnable->pleaseStop();
+        } else {
+            delete runnable;
+        }
+    }
+};
+
+
 #endif //cl_long_runnable_146

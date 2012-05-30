@@ -202,11 +202,7 @@ PRECOMPILED_SOURCE = $$PWD/StdAfx.cpp
 
 RESOURCES += ../build/skin.qrc
 FORMS += \
-    ui/preferences/connectionssettingswidget.ui \
-    ui/preferences/licensewidget.ui \
-    ui/preferences/licensemanagerwidget.ui \
-    ui/preferences/preferences.ui \
-    ui/preferences/recordingsettingswidget.ui \
+    ui/dialogs/preferences_dialog.ui \
     ui/dialogs/login_dialog.ui \
     ui/dialogs/sign_dialog.ui \
     ui/dialogs/tags_edit_dialog.ui \
@@ -219,10 +215,14 @@ FORMS += \
     youtube/youtubeuploaddialog.ui \
     youtube/youtubesetting.ui \
     ui/device_settings/camera_schedule_widget.ui \
+    ui/widgets/preferences/connections_settings_widget.ui \
+    ui/widgets/preferences/license_widget.ui \
+    ui/widgets/preferences/license_manager_widget.ui \
+    ui/widgets/preferences/recording_settings_widget.ui \
     ui/widgets/help_widget.ui \
     ui/widgets/resource_tree_widget.ui \
-    ui/widgets/single_camera_settings_widget.ui \
-    ui/widgets/multiple_camera_settings_widget.ui \
+    ui/widgets/settings/single_camera_settings_widget.ui \
+    ui/widgets/settings/multiple_camera_settings_widget.ui \
 
 # CL_TRIAL_MODE 
 DEFINES += CL_FORCE_LOGO

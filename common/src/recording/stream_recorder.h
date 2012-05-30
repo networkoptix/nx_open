@@ -118,6 +118,8 @@ private:
     EVP_MD_CTX* m_mdctx;
     QPixmap m_logo;
     QString m_container;
+    int m_videoChannels;
+    QnCodecAudioFormat m_prevAudioFormat;
 };
 
 #endif // _STREAM_RECORDER_H__

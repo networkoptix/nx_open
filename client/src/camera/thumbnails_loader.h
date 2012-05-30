@@ -6,7 +6,10 @@
 
 class QnThumbnailsLoader: public CLLongRunnable
 {
-    Q_OBJECT
+    Q_OBJECT;
+
+    typedef CLLongRunnable base_type;
+
 public:
     QnThumbnailsLoader(QnResourcePtr resource);
     virtual ~QnThumbnailsLoader();
@@ -45,11 +48,12 @@ public:
     void lockPixmaps();
     void unlockPixmaps();
 
+    virtual void pleaseStop() override;
+
 signals:
     void gotNewPixmap(qint64 timeMs, QPixmap pixmap);
 protected:
     virtual void run() override;
-    virtual void pleaseStop() override;
 private:
     void allocateScaleContext(int linesize, int width, int height, PixelFormat format);
     bool processFrame(const CLVideoDecoderOutput& outFrame);

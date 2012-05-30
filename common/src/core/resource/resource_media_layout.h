@@ -3,6 +3,8 @@
 
 #define CL_MAX_CHANNELS 4
 #include <QVector>
+#include <QStringList>
+#include "core/datapacket/mediadatapacket.h"
 
 class QN_EXPORT QnDeviceLayout
 {
@@ -16,8 +18,10 @@ class QnResourceAudioLayout: public QnDeviceLayout
 public:
     struct AudioTrack
     {
-        AudioTrack(): codec(CODEC_ID_NONE) {}
-        CodecID codec;
+        AudioTrack() {} //: codec(CODEC_ID_NONE) {}
+
+        QnMediaContextPtr codecContext;
+        //CodecID codec;
         QString description;
     };
 

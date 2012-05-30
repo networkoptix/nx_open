@@ -33,8 +33,8 @@ private:
 private:
     QMutex m_controlPortSync;
     TCPSocket m_tcpSock;
-    UDPSocket* m_videoSock;
-    UDPSocket* m_audioSock;
+    //UDPSocket* m_videoSock;
+    //UDPSocket* m_audioSock;
 
     QnDroidResourcePtr m_droidRes;
 
@@ -43,8 +43,9 @@ private:
     int m_audioPort;
     int m_dataPort;
     RTPSession m_rtpSession;
-    RTPIODevice m_ioDevice;
-    CLH264RtpParser m_h264Parser;
+    RTPIODevice* m_videoIoDevice;
+    RTPIODevice* m_audioIoDevice;
+    CLH264RtpParser* m_h264Parser;
     bool m_gotSDP;
 };
 

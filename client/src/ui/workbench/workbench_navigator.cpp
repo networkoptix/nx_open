@@ -563,7 +563,7 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     updatePlaying();
     updateSpeedRange();
     updateSpeed();
-    updateThumbnails();
+    updateThumbnailsLoader();
 
     emit currentWidgetChanged();
 }
@@ -817,19 +817,13 @@ void QnWorkbenchNavigator::updateSpeedRange() {
     emit speedRangeChanged();
 }
 
-void QnWorkbenchNavigator::updateThumbnails()
-{
-#ifdef ENABLE_SLIDER_THUMBNAILS
-    if (m_currentWidget)
-#else
-    if (0)
-#endif
-    {
+void QnWorkbenchNavigator::updateThumbnailsLoader() {
+    if (m_currentWidget) {
         m_thumbnailsLoader.reset(new QnThumbnailsLoader(m_currentWidget->resource()));
-    }
-    else {
+    } else {
         m_thumbnailsLoader.reset();
     }
+
     m_timeSlider->setThumbnailsLoader(m_thumbnailsLoader.data());
 }
 

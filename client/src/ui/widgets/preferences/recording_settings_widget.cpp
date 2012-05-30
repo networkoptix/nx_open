@@ -1,5 +1,5 @@
-#include "recordingsettingswidget.h"
-#include "ui_recordingsettingswidget.h"
+#include "recording_settings_widget.h"
+#include "ui_recording_settings_widget.h"
 
 #include <QtCore/QSettings>
 

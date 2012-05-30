@@ -7,6 +7,13 @@
 
 class QSettings;
 
+/**
+ * Global style settings.
+ * 
+ * Are expected to be initialized once and not to be changed afterwards. 
+ * Everything that is changeable is to be implemented at application settings
+ * level.
+ */
 class QnGlobals: public QObject {
     Q_OBJECT;
 public:
