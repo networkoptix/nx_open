@@ -35,7 +35,8 @@ QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     m_EofDateTime(AV_NOPTS_VALUE),
     m_needCalcSignature(false),
     m_mdctx(0),
-    m_container("matroska")
+    m_container("matroska"),
+    m_videoChannels(0)
 {
 	memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
 }
@@ -162,12 +163,23 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
         close();
     }
 
+    if (md->dataType == QnAbstractMediaData::AUDIO && m_truncateInterval > 0)
+    {
+        QnCompressedAudioDataPtr ad = qSharedPointerDynamicCast<QnCompressedAudioData>(md);
+        QnCodecAudioFormat audioFormat(ad->context);
+        if (!m_firstTime && audioFormat != m_prevAudioFormat) {
+            close(); // restart recording file if audio format is changed
+        }
+        m_prevAudioFormat = audioFormat; 
+    }
+    
+
     if (md->dataType == QnAbstractMediaData::META_V1)
         return saveMotion(md);
 
     QnCompressedVideoDataPtr vd = qSharedPointerDynamicCast<QnCompressedVideoData>(md);
-    if (!vd)
-        return true; // ignore audio data
+    //if (!vd)
+    //    return true; // ignore audio data
 
     if (vd && !m_gotKeyFrame[vd->channelNumber] && !(vd->flags & AV_PKT_FLAG_KEY))
         return true; // skip data
@@ -194,8 +206,6 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
     }
 
     int channel = md->channelNumber;
-    if (channel >= m_formatCtx->nb_streams)
-        return true; // skip packet
 
     if (md->flags & AV_PKT_FLAG_KEY)
     {
@@ -210,9 +220,16 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
         }
     }
 
+    int streamIndex = channel;
+    //if (md->dataType == QnAbstractMediaData::AUDIO)
+    //    streamIndex += m_videoChannels;
+
+    if (streamIndex >= m_formatCtx->nb_streams)
+        return true; // skip packet
+
     AVPacket avPkt;
     av_init_packet(&avPkt);
-    AVStream* stream = m_formatCtx->streams[channel];
+    AVStream* stream = m_formatCtx->streams[streamIndex];
     AVRational srcRate = {1, 1000000};
     Q_ASSERT(stream->time_base.num && stream->time_base.den);
 
@@ -222,7 +239,7 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
     avPkt.dts = avPkt.pts;
     if(md->flags & AV_PKT_FLAG_KEY)
         avPkt.flags |= AV_PKT_FLAG_KEY;
-    avPkt.stream_index= channel;
+    avPkt.stream_index= streamIndex;
     avPkt.data = (quint8*) md->data.data();
     avPkt.size = md->data.size();
 
@@ -297,9 +314,9 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
 
         m_formatCtx->start_time = mediaData->timestamp;
 
-        int vChannels = layout->numberOfChannels();
+        m_videoChannels = layout->numberOfChannels();
 
-        for (unsigned int i = 0; i < vChannels; ++i) 
+        for (unsigned int i = 0; i < m_videoChannels; ++i) 
         {
             AVStream* videoStream = av_new_stream(m_formatCtx, DEFAULT_VIDEO_STREAM_ID+i);
             if (videoStream == 0)
@@ -350,7 +367,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
             videoStream->first_dts = 0;
         }
 
-        /*
+        const QnResourceAudioLayout* audioLayout = mediaDev->getAudioLayout(m_mediaProvider);
         for (unsigned int i = 0; i < audioLayout->numberOfChannels(); ++i) 
         {
             AVStream* audioStream = av_new_stream(m_formatCtx, DEFAULT_AUDIO_STREAM_ID+i);
@@ -361,16 +378,10 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
                 return false;
             }
 
-            AVCodecContext* audioCodecCtx = audioStream->codec;
-            audioCodecCtx->codec_id = audioLayout->getAudioTrackInfo(i).codec;
-            audioCodecCtx->codec_type = AVMEDIA_TYPE_AUDIO;
-            audioCodecCtx->sample_rate = 48000;
-            audioCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
-
-            //AVRational srcRate = {1, 1000000};
-            //audioStream->first_dts = av_rescale_q(mediaData->timestamp, srcRate, audioStream->time_base);
+            avcodec_copy_context(audioStream->codec, audioLayout->getAudioTrackInfo(i).codecContext->ctx());
+            audioStream->codec->flags |= CODEC_FLAG_GLOBAL_HEADER;
+            audioStream->first_dts = 0;
         }
-        */
 
         m_formatCtx->pb = m_storage->createFfmpegIOContext(url, QIODevice::WriteOnly);
         if (m_formatCtx->pb == 0) 

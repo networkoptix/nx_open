@@ -69,7 +69,8 @@ public:
             {
                 if (audioNum++ < index)
                     continue;
-                result.codec = codecContext->codec_id;
+                //result.codec = codecContext->codec_id;
+                result.codecContext =  QnMediaContextPtr(new QnMediaContext(codecContext));
                 result.description = QString::number(++audioNumber);
                 result.description += QLatin1String(". ");
 
@@ -202,7 +203,7 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
                 }
 
                 audioData = new QnCompressedAudioData(CL_MEDIA_ALIGNMENT, packet.size, getCodecContext(stream));
-                audioData->format.fromAvStream(stream->codec);
+                //audioData->format.fromAvStream(stream->codec);
                 time_base = av_q2d(stream->time_base)*1e+6;
                 audioData->duration = qint64(time_base * packet.duration);
                 data = QnAbstractMediaDataPtr(audioData);

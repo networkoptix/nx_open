@@ -56,6 +56,8 @@ public:
 
     void done(unsigned int size);
 
+    void resize(unsigned int size);
+
     void ignore_first_bytes(int bytes_to_ignore);
 
     //======

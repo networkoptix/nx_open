@@ -186,8 +186,19 @@ public:
             QnAudioFormat(),
             bitrate(0),
             channel_layout(0),
-            block_align(0)
+            block_align(0),
+            m_bitsPerSample(0)
     {
+    }
+    QnCodecAudioFormat(QnMediaContextPtr ctx)
+    {
+        fromAvStream(ctx);
+    }
+
+    QnCodecAudioFormat& fromAvStream(QnMediaContextPtr ctx)
+    {
+        fromAvStream(ctx->ctx());
+        return *this;
     }
 
     void fromAvStream(AVCodecContext* c)
@@ -235,12 +246,14 @@ public:
         bitrate = c->bit_rate;
         channel_layout = c->channel_layout;
         block_align = c->block_align;
+        m_bitsPerSample = c->bits_per_coded_sample;
     }
 
     QVector<quint8> extraData; // codec extra data
     int bitrate;
     int channel_layout;
     int block_align;
+    int m_bitsPerSample;
 };
 
 
@@ -253,7 +266,7 @@ struct QnCompressedAudioData : public QnAbstractMediaData
         duration = 0;
         context = ctx;
 	}
-    QnCodecAudioFormat format;
+    //QnCodecAudioFormat format;
     quint64 duration;
 };
 typedef QSharedPointer<QnCompressedAudioData> QnCompressedAudioDataPtr;

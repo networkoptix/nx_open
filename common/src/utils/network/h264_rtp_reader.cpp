@@ -29,6 +29,9 @@ void RTPH264StreamreaderDelegate::setRequest(const QString& request)
 
 QnAbstractMediaDataPtr RTPH264StreamreaderDelegate::getNextData()
 {
+    QList<QnAbstractMediaDataPtr> result;
+    quint8 rtpBuffer[MAX_RTP_PACKET_SIZE];
+    int readed;
 
     if (!isStreamOpened())
         return QnAbstractMediaDataPtr(0);
@@ -37,16 +40,15 @@ QnAbstractMediaDataPtr RTPH264StreamreaderDelegate::getNextData()
     {
         for (int i = 0; i < RTSP_RETRY_COUNT; ++i)
         {
-            QnAbstractMediaDataPtr rez = m_streamParser->getNextData();
-            if (rez)
-                return rez;
+            do {
+                readed = m_rtpIo->read( (char*) rtpBuffer, sizeof(rtpBuffer));
+            } while(m_streamParser->processData(rtpBuffer, readed, m_rtpIo->getStatistic(), result ) && result.isEmpty());
+            if (!result.isEmpty())
+                return result[0];
         }
     }
     closeStream();
     return QnAbstractMediaDataPtr(0);
-
-
-
 }
 
 void RTPH264StreamreaderDelegate::openStream()
@@ -66,11 +68,12 @@ void RTPH264StreamreaderDelegate::openStream()
 
     if (m_RtpSession.open(url))
     {
-        m_rtpIo = m_RtpSession.play(AV_NOPTS_VALUE, AV_NOPTS_VALUE, 1.0);
+        m_RtpSession.play(AV_NOPTS_VALUE, AV_NOPTS_VALUE, 1.0);
+        m_rtpIo = m_RtpSession.getTrackIoByType("video");
         if (m_rtpIo)
         {
-            m_streamParser = new CLH264RtpParser(m_rtpIo);
-            m_streamParser->setSDPInfo(m_RtpSession.getSdp());
+            m_streamParser = new CLH264RtpParser();
+            m_streamParser->setSDPInfo(m_RtpSession.getSdpByType("video"));
         }
     }
 

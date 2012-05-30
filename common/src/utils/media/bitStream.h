@@ -74,6 +74,14 @@ private:
 			THROW_BITSTREAM_ERR;
 	}
 public:
+    BitStreamReader(): BitStream() {}
+
+    BitStreamReader(const quint8* buffer, const quint8* end): BitStream()
+    {
+        setBuffer(buffer, end);
+    }
+
+
 	inline void setBuffer(const quint8* buffer, const quint8* end) {
 		BitStream::setBuffer(buffer, end);
 		m_curVal = getCurVal(m_buffer);

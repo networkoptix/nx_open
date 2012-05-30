@@ -1,0 +1,30 @@
+#ifndef __G711_RTP_PARSER_H
+#define __G711_RTP_PARSER_H
+
+#include "rtp_stream_parser.h"
+
+// used for G711, G726 e.t.c simple audio codecs with one frame per packet
+
+class QnSimpleAudioRtpParser: public QnRtpAudioStreamParser
+{
+public:
+    QnSimpleAudioRtpParser();
+    virtual ~QnSimpleAudioRtpParser();
+    virtual void setSDPInfo(QList<QByteArray> sdpInfo) override;
+
+    virtual bool processData(quint8* rtpBuffer, int readed, const RtspStatistic& statistics, QList<QnAbstractMediaDataPtr>& result) override;
+    virtual QnResourceAudioLayout* getAudioLayout() override;
+    void setCodecId(CodecID codecId);
+    void setBitsPerSample(int value);
+    void setSampleFormat(AVSampleFormat sampleFormat);
+private:
+    QnMediaContextPtr m_context;
+    QnRtspAudioLayout m_audioLayout;
+    int m_frequency;
+    int m_channels;
+    int m_bits_per_coded_sample;
+    CodecID m_codecId;
+    AVSampleFormat m_sampleFormat;
+};
+
+#endif // __AAC_RTP_PARSER_H

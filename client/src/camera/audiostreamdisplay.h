@@ -44,15 +44,17 @@ public:
 	bool isDownmixForced() const { return m_forceDownmix; }
 
     void playCurrentBuffer();
+
+    int getAudioBufferSize() const;
 private:
     // returns amount of ms which buffered before start playing 
     int playAfterMs() const;
     int msInQueue() const;
 
-	static void downmix(CLAudioData& audio);
-	static void float2int16(CLAudioData& audio);
-	static void float2int32(CLAudioData& audio);
-	static void int32Toint16(CLAudioData& audio);
+	static QnCodecAudioFormat downmix(CLByteArray& audio, QnCodecAudioFormat format);
+	static QnCodecAudioFormat float2int16(CLByteArray& audio, QnCodecAudioFormat format);
+	static QnCodecAudioFormat float2int32(CLByteArray& audio, QnCodecAudioFormat format);
+    static QnCodecAudioFormat int32Toint16(CLByteArray& audio, QnCodecAudioFormat format);
 	bool initFormatConvertRule(QnAudioFormat format);
 private:
 	enum SampleConvertMethod {SampleConvert_None, SampleConvert_Float2Int32, SampleConvert_Float2Int16, SampleConvert_Int32ToInt16};
@@ -62,7 +64,7 @@ private:
 //	CLAbstractAudioDecoder* m_decoder[CL_VARIOUSE_DECODERS];
 
     int m_bufferMs;
-    CLAlignedData m_decodedaudio;
+    CLByteArray m_decodedAudioBuffer;
     bool m_tooFewDataDetected;
     bool m_isFormatSupported;
     QtvSound* m_audioSound;
