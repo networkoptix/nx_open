@@ -127,7 +127,7 @@ bool CLFFmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, CLByteArray& r
 
 		if (outbuf_len + out_size > result.capacity())
 		{
-            assert(false);
+            Q_ASSERT_X(false, Q_FUNC_INFO, "Too small output buffer for audio decoding!");
 			outbuf_len = 0;
 			outbuf = (unsigned char*)result.data(); // start form beginning
 		}
