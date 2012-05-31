@@ -28,7 +28,38 @@ static const unsigned char BitReverseTable256[] =
     0x07, 0x87, 0x47, 0xC7, 0x27, 0xA7, 0x67, 0xE7, 0x17, 0x97, 0x57, 0xD7, 0x37, 0xB7, 0x77, 0xF7, 
     0x0F, 0x8F, 0x4F, 0xCF, 0x2F, 0xAF, 0x6F, 0xEF, 0x1F, 0x9F, 0x5F, 0xDF, 0x3F, 0xBF, 0x7F, 0xFF
 };
+
+static int sensitivityToMask[10] = 
+{
+    255, //  0
+    64,
+    64,
+    48,
+    32,
+    24,
+    18,
+    14,
+    10,
+    9, // 9
+
+};
+
+static const int MIN_SQUARE_BY_SENS[10] = 
+{
+    INT_MAX, // motion mask: 0
+    sensitivityToMask[1]*32,
+    sensitivityToMask[2]*16,
+    sensitivityToMask[3]*8,
+    sensitivityToMask[4]*8,
+    sensitivityToMask[5]*4,
+    sensitivityToMask[6]*4,
+    sensitivityToMask[7]*2,
+    sensitivityToMask[8]*2,
+    sensitivityToMask[9]*1, // max sens: 9
+};
+
 static const __m128i sse_0x80_const = _mm_setr_epi32(0x80808080, 0x80808080, 0x80808080, 0x80808080);
+static const int LARGE_FILTER_MIN_SENSETIVITY = 5;
 
 quint32 reverseBits(quint32 v)
 {
@@ -493,6 +524,118 @@ void QnMotionEstimation::reallocateMask(int width, int height)
     m_isNewMask = false;
 }
 
+void QnMotionEstimation::analizeMotionAmount(quint8* frame)
+{
+    // 1. filtering. If a lot of motion around current pixel, mark it too, also remove motion if diff < mask
+
+    quint8* curPtr = frame;
+    const quint8* maskPtr = m_motionMask;
+
+    curPtr += m_scaledWidth;
+    maskPtr += m_scaledWidth;
+    for (int x = 1; x < m_scaledWidth-1; ++x)
+    {
+        curPtr++;
+        maskPtr++;
+        for (int y = 1; y < MD_HEIGHT-1; ++y)
+        {
+            if (*curPtr < *maskPtr)
+            {
+                int aroundMotionAmount = (curPtr[-1] + curPtr[1] + curPtr[-m_scaledWidth] + curPtr[m_scaledWidth])*2 +
+                    curPtr[-1-m_scaledWidth] + curPtr[-1+m_scaledWidth] + curPtr[1-m_scaledWidth] + curPtr[1+m_scaledWidth];
+                if (aroundMotionAmount >= (int) *maskPtr * 6)
+                    *curPtr = *maskPtr;
+                else
+                    *curPtr = 0;
+            }
+            curPtr++;
+            maskPtr++;
+        }
+        curPtr++;
+        maskPtr++;
+    }
+
+    // 2. Determine linked areas
+    curPtr = frame;
+    int currentLinkIndex = 1;
+    memset(m_linkedNums, 0, MD_HEIGHT * m_scaledWidth);
+    memset(m_linkedMap, 0, MD_HEIGHT * m_scaledWidth);
+    memset(m_linkedSquare, 0, MD_HEIGHT * m_scaledWidth);
+
+    // 2.1 top left pixel
+    if (*curPtr++)
+        *m_linkedNums = currentLinkIndex++;
+
+    // 2.2 top line
+    for (int x = 1; x < m_scaledWidth; ++x) {
+        if (*curPtr) {
+            if (m_linkedNums[-1]) 
+                *m_linkedNums = m_linkedNums[-1];
+            else 
+                *m_linkedNums = currentLinkIndex++;
+        }
+    }
+
+    for (int y = 1; y < MD_HEIGHT; ++y) 
+    {
+        // 2.3 left pixel
+        if (*curPtr)
+        {
+            if (m_linkedNums[-m_scaledWidth]) 
+                *m_linkedNums = m_linkedNums[-m_scaledWidth];
+            else 
+                *m_linkedNums = currentLinkIndex++;
+        }
+        // 2.4 all other pixels
+        for (int x = 1; x < m_scaledWidth; ++x) 
+        {
+            if (*curPtr)
+            {
+                if (m_linkedNums[-1]) {
+                    *m_linkedNums = m_linkedNums[-1];
+                    if (m_linkedNums[-m_scaledWidth] != *m_linkedNums)
+                        m_linkedMap[m_linkedNums[-m_scaledWidth]] = *m_linkedNums;
+                }
+                else if (m_linkedNums[-m_scaledWidth]) {
+                    *m_linkedNums = m_linkedNums[-m_scaledWidth];
+                }
+                else {
+                    *m_linkedNums = currentLinkIndex++;
+                }
+            }
+        }
+    }
+
+    // 3. path compression
+    for (int i = 1; i < currentLinkIndex; ++i)
+    {
+        if (m_linkedMap[m_linkedMap[i]])
+            m_linkedMap[i] = m_linkedMap[m_linkedMap[i]];
+    }
+
+    // 4. merge linked areas
+    for (int i = 0; i < MD_HEIGHT*m_scaledWidth; ++i)
+    {
+        if (m_linkedMap[m_linkedNums[i]])
+            m_linkedNums[i] = m_linkedMap[m_linkedNums[i]];
+    }
+
+    // 5. calculate square of each area
+    for (int i = 0; i < MD_HEIGHT*m_scaledWidth; ++i)
+    {
+        m_linkedSquare[m_linkedNums[i]] += frame[i];
+    }
+
+    // 6. remove motion if motion square is not enough and write result to bitarray
+    for (int i = 0; i < MD_HEIGHT*m_scaledWidth/32;)
+    {
+        quint32 data = 0;
+        for (int k = 0; k < 32; ++k, ++i)
+            data = (data << 1) + m_linkedSquare[m_linkedNums[i]] >= MIN_SQUARE_BY_SENS[m_motionMask[i]];
+        m_resultMotion[i/32] |= data;
+    }
+}
+
 void QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
 {
     QMutexLocker lock(&m_mutex);
@@ -531,6 +674,7 @@ void QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
 #ifdef ANALIZE_PER_PIXEL_DIF
     if (m_totalFrames > 0)
     {
+        // calculate difference between frames
         if (m_xStep == 8)
             getFrame_avgY_array_8_x (m_frames[idx], m_frames[prevIdx], m_frameBuffer[idx]);
         else if (m_xStep == 16)
@@ -538,7 +682,10 @@ void QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
         else
             getFrame_avgY_array_x_x (m_frames[idx], m_frames[prevIdx], m_frameBuffer[idx], m_xStep);
 
-        // calculate difference between frames
+
+        analizeMotionAmount(m_frameBuffer[idx]);
+
+        /*
         __m128i* cur = (__m128i*) m_frameBuffer[idx];
         __m128i* mask = (__m128i*) m_scaledMask;
         for (int i = 0; i < m_scaledWidth; ++i)
@@ -550,6 +697,7 @@ void QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
             cur += 2;
             mask += 2;
         }
+        */
     }
 #else
     // analize per macroblock diff
@@ -647,7 +795,7 @@ QnMetaDataV1Ptr QnMotionEstimation::getMotion()
     int prevILineNum = -1;
     quint32* dst = (quint32*) rez->data.data();
 
-    postFiltering();
+    //postFiltering();
 
     for (int y = 0; y < MD_WIDTH; ++y)
     {
@@ -686,25 +834,25 @@ bool QnMotionEstimation::existsMetadata() const
     return m_lastFrameTime - m_firstFrameTime >= 300; // 30 ms agg period
 }
 
-
-
-    /*
-    QFile testFile("c:/test.264");
-    testFile.open(QFile::ReadOnly);
-    QByteArray tmpData = testFile.readAll();
-    videoData = QnCompressedVideoDataPtr(new QnCompressedVideoData(tmpData.size(), 32));
-    videoData->data.write(tmpData);
-    videoData->compressionType = CODEC_ID_H264;
-    videoData->flags = AV_PKT_FLAG_KEY;
-    */
-    /*
-    QTime t;
-    t.restart();
-    for (int i = 0; i < 1000; ++i)
+QByteArray QnMotionEstimation::createSoftwareMotionMask(const QnMotionRegion& region)
+{
+    QByteArray rez;
+    rez.resize(MD_WIDTH * MD_HEIGHT);
+    memset(rez.data(), 255, MD_WIDTH * MD_HEIGHT);
+    for (int sens = QnMotionRegion::MIN_SENSITIVITY; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens)
     {
-        if (!m_decoder->decode(videoData, &m_outFrame))
-            return;
-    }
-    qDebug() << "decode time=" << t.elapsed();
-    */
+        foreach(const QRect& rect, region.getRectsBySens(sens))
+        {
+            for (int y = rect.top(); y <= rect.bottom(); ++y)
+            {
+                for (int x = rect.left(); x <= rect.right(); ++x)
+                {
+                    rez.data()[x * MD_HEIGHT + y] = sensitivityToMask[sens];
 
+                }
+
+            }
+        }
+    }
+    return rez;
+}
