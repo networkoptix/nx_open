@@ -128,7 +128,9 @@ public:
     virtual QPointF positionFromValue(qint64 logicalValue, bool bound = true) const override;
     virtual qint64 valueFromPosition(const QPointF &position, bool bound = true) const override;
 
-    int thumbnailsHeight() const;
+    qreal thumbnailsHeight() const;
+    void setThumbnailsHeight(qreal thumbnailsHeight);
+
     QnThumbnailsLoader *thumbnailsLoader() const;
     void setThumbnailsLoader(QnThumbnailsLoader *value);
 
@@ -268,6 +270,8 @@ private:
     QHash<QPair<QString, int>, const QPixmap *> m_pixmapByTextKey;
 
     QWeakPointer<QnThumbnailsLoader> m_thumbnailsLoader;
+    qreal m_thumbnailsHeight;
+
     QnTimeSliderPixmapCache *m_pixmapCache;
 };
 
