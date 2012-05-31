@@ -557,12 +557,6 @@
                                     <File Id="bespin$(var.suffix).dll" Name="bespin$(var.suffix).dll" Source="..\client\contrib\bespin\bin\msvc-x86\$(env.CONFIG)\styles\bespin$(var.suffix).dll" />
                                 </Component>
                             </Directory>
-                            
-                            <Directory Id="arecontvision" Name="arecontvision">
-                                <Component Id="arecontvision" Guid="{94FE9A39-0F46-4c79-A12F-7FCA2E3B5D16}">
-                                    <File Id="devicesxml" Name="devices.xml" Source="../client/resource/arecontvision/devices.xml"/>
-                                </Component>
-                            </Directory>
                         </Directory>
                     </Directory>
                 </Directory>
@@ -649,7 +643,6 @@
             <ComponentRef Id="ClientQjson"/>
             <ComponentRef Id="ClientQtColorPicker"/>
             <ComponentRef Id="bespin" />
-            <ComponentRef Id='arecontvision'/>
             
             <ComponentRef Id='ClientDirectoryComponent'/>
         </Feature>
@@ -711,7 +704,7 @@
             
             <Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="PasswordDlg">INSTALLTYPE=0</Publish>
             <Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="AdvancedTypeDlg">INSTALLTYPE=1</Publish>
-        	<Publish Dialog="InstallTypeDlg" Control="Next" Event="AddLocal" Value="ALL">INSTALLTYPE=0</Publish>
+            <Publish Dialog="InstallTypeDlg" Control="Next" Event="AddLocal" Value="ALL">INSTALLTYPE=0</Publish>
 
             <Publish Dialog="InstallTypeDlg" Control="Next" Property="SERVER_APPSERVER_HOST" Value="localhost" Order="4"><![CDATA[ INSTALLTYPE=0 ]]></Publish>
             <Publish Dialog="InstallTypeDlg" Control="Next" Property="SERVER_APPSERVER_PORT" Value="[APPSERVER_PORT]" Order="4"><![CDATA[ INSTALLTYPE=0 ]]></Publish>
@@ -722,7 +715,7 @@
             <Publish Dialog="InstallTypeDlg" Control="Next" Property="CLIENT_APPSERVER_PORT" Value="[APPSERVER_PORT]" Order="4"><![CDATA[ INSTALLTYPE=0 ]]></Publish>
             <Publish Dialog="InstallTypeDlg" Control="Next" Property="CLIENT_APPSERVER_LOGIN" Value="[APPSERVER_LOGIN]" Order="4"><![CDATA[ INSTALLTYPE=0 ]]></Publish>
             <Publish Dialog="InstallTypeDlg" Control="Next" Property="CLIENT_APPSERVER_PASSWORD" Value="[APPSERVER_PASSWORD]" Order="4" ><![CDATA[ INSTALLTYPE=0 ]]></Publish>
-        	
+            
             <Publish Dialog="PasswordDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg">1</Publish>
             <Publish Dialog="PasswordDlg" Control="Next" Event="SpawnDialog" Value="EmptyPasswordDlg">NOT APPSERVER_PASSWORD</Publish>
             <Publish Dialog="PasswordDlg" Control="Next" Property="SERVER_APPSERVER_PASSWORD" Value="[APPSERVER_PASSWORD]">APPSERVER_PASSWORD</Publish>

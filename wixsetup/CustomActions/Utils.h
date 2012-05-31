@@ -6,7 +6,7 @@ LPCWSTR GetProperty(MSIHANDLE hInstall, LPCWSTR name);
 CString GenerateGuid();
 
 bool IsPortAvailable(int port);
-int NextFreePort(int startPort, int endPort);
+bool IsPortRangeAvailable(int firstPort, int count);
 
 void InitWinsock();
 void FinishWinsock();

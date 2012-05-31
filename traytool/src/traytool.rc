@@ -1,4 +1,4 @@
-IDI_ICON1               ICON    DISCARDABLE     "traytool.ico"
+IDI_ICON1               ICON    DISCARDABLE     "../../cpp/shared-resources/icons/default/eve_logo.ico"
 
 #include <windows.h>
 #include "version.h"

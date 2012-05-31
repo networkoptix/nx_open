@@ -92,7 +92,7 @@ QVariant QnSettings::updateValueFromSettings(QSettings *settings, int id, const 
         result.readOnly = true;
 
         if(!result.url.isValid())
-            result.url = QUrl(QString(QLatin1String("http://admin@%1:%2")).arg(QLatin1String(DEFAULT_APPSERVER_HOST)).arg(DEFAULT_APPSERVER_PORT));
+            result.url = QUrl(QString(QLatin1String("https://admin@%1:%2")).arg(QLatin1String(DEFAULT_APPSERVER_HOST)).arg(DEFAULT_APPSERVER_PORT));
 
         return QVariant::fromValue<QnConnectionData>(result);
     }
@@ -111,8 +111,10 @@ QVariant QnSettings::updateValueFromSettings(QSettings *settings, int id, const 
         for (int i = 0; i < size; ++i) {
             settings->setArrayIndex(i);
             QnConnectionData connection = readConnectionData(settings);
-            if (connection.url.isValid())
+            if (connection.url.isValid()) {
+                connection.url.setScheme("https");
                 result.append(connection);
+            }
         }
         settings->endArray();
 

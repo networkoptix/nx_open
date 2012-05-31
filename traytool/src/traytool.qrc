@@ -4,6 +4,6 @@
     <file>images/heart.png</file>
     <file>images/trash.png</file>
     <file>images/traytool.png</file>
-    <file>traytool.ico</file>
+    <file>../../cpp/shared-resources/icons/default/eve_logo.ico</file>
  </qresource>
  </RCC>
