@@ -66,10 +66,10 @@ protected:
 private:                                                                        \
     inline void init(const Dummy<ID> &) {                                       \
         init(Dummy<ID - 1>());                                                  \
+        setWriteable(ID, WRITEABLE);                                            \
         setType(ID, qMetaTypeId<TYPE>());                                       \
         setName(ID, QLatin1String(NAME));                                       \
-        setValue(ID, QVariant::fromValue<TYPE>(DEFAULT_VALUE));                 \
-        setWriteable(ID, WRITEABLE);                                            \
+        updateValue(ID, QVariant::fromValue<TYPE>(DEFAULT_VALUE));              \
     }                                                                           \
 
 #define QN_DECLARE_R_PROPERTY(TYPE, GETTER, ID, DEFAULT_VALUE)                  \
