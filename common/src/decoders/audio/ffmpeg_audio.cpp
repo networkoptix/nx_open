@@ -1,5 +1,7 @@
 #include "ffmpeg_audio.h"
 
+#include <cassert>
+
 #include "core/datapacket/mediadatapacket.h"
 #include "audio_struct.h"
 #include "utils/common/aligned_data.h"

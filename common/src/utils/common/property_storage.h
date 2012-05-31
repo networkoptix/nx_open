@@ -54,6 +54,7 @@ protected:
     void setWriteable(int id, bool writeable);
 
 #define QN_BEGIN_PROPERTY_STORAGE(LAST_ID)                                      \
+private:                                                                        \
     template<int> struct Dummy {};                                              \
                                                                                 \
     template<int id>                                                            \
