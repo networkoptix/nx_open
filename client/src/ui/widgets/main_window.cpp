@@ -171,6 +171,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::RemoveFromServerAction));
     addAction(action(Qn::SelectAllAction));
     addAction(action(Qn::TakeScreenshotAction));
+    addAction(action(Qn::IncrementDebugCounterAction));
+    addAction(action(Qn::DecrementDebugCounterAction));
 
     connect(action(Qn::FullscreenAction),   SIGNAL(toggled(bool)),                          this,                                   SLOT(setFullScreen(bool)));
     connect(action(Qn::MinimizeAction),     SIGNAL(triggered()),                            this,                                   SLOT(minimize()));

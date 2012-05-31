@@ -744,10 +744,12 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::IncrementDebugCounterAction).
         flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::NoTarget).
+        shortcut(tr("Ctrl+Alt+Shift++")).
         text(tr("Increment Debug Counter"));
 
     factory(Qn::DecrementDebugCounterAction).
         flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::NoTarget).
+        shortcut(tr("Ctrl+Alt+Shift+-")).
         text(tr("Decrement Debug Counter"));
 }
 
