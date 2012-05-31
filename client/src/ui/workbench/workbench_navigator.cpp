@@ -139,6 +139,7 @@ void QnWorkbenchNavigator::initialize() {
     connect(m_timeSlider,                       SIGNAL(rangeChanged(qint64, qint64)),               this,   SLOT(updateScrollBarFromSlider()));
     connect(m_timeSlider,                       SIGNAL(windowChanged(qint64, qint64)),              this,   SLOT(updateScrollBarFromSlider()));
     connect(m_timeSlider,                       SIGNAL(windowChanged(qint64, qint64)),              this,   SLOT(loadThumbnails(qint64, qint64)));
+    connect(m_timeSlider,                       SIGNAL(windowChanged(qint64, qint64)),              this,   SLOT(updateTargetPeriod()));
     connect(m_timeSlider,                       SIGNAL(selectionChanged(qint64, qint64)),           this,   SLOT(at_timeSlider_selectionChanged()));
     connect(m_timeSlider,                       SIGNAL(customContextMenuRequested(const QPointF &, const QPoint &)), this, SLOT(at_timeSlider_customContextMenuRequested(const QPointF &, const QPoint &)));
     connect(m_timeSlider,                       SIGNAL(selectionPressed()),                         this,   SLOT(at_timeSlider_selectionPressed()));
@@ -609,23 +610,27 @@ void QnWorkbenchNavigator::updateSliderFromReader() {
         if(startTimeUSec > 1000000ll * 60 * 60 * 24 * 365)
             m_currentWidgetFlags |= WidgetUsesUTC;
 
-        updateSliderOptions();
-
         m_currentWidgetLoaded = true;
+
+        updateSliderOptions();
+        updateTargetPeriod();
     }
+}
+
+void QnWorkbenchNavigator::updateTargetPeriod() {
+    if (!m_currentWidgetLoaded) 
+        return;
     
-    if (m_currentWidgetLoaded) {
-        /* Update target time period for time period loaders. 
-         * If playback is synchronized, do it for all cameras. */
-        QnTimePeriod period(startTimeMSec, endTimeMSec - startTimeMSec);
-        if(display()->isStreamsSynchronized() && (m_currentWidgetFlags & WidgetSupportsPeriods)) {
-            foreach(QnResourceWidget *widget, m_syncedWidgets)
-                if(QnCachingTimePeriodLoader *loader = this->loader(widget))
-                    loader->setTargetPeriod(period);
-        } else if(m_currentWidgetFlags & WidgetSupportsPeriods) {
-            if(QnCachingTimePeriodLoader *loader = this->loader(m_currentWidget))
+    /* Update target time period for time period loaders. 
+     * If playback is synchronized, do it for all cameras. */
+    QnTimePeriod period(m_timeSlider->windowStart(), m_timeSlider->windowEnd() - m_timeSlider->windowStart());
+    if(display()->isStreamsSynchronized() && (m_currentWidgetFlags & WidgetSupportsPeriods)) {
+        foreach(QnResourceWidget *widget, m_syncedWidgets)
+            if(QnCachingTimePeriodLoader *loader = this->loader(widget))
                 loader->setTargetPeriod(period);
-        }
+    } else if(m_currentWidgetFlags & WidgetSupportsPeriods) {
+        if(QnCachingTimePeriodLoader *loader = this->loader(m_currentWidget))
+            loader->setTargetPeriod(period);
     }
 }
 
