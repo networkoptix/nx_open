@@ -13,6 +13,7 @@ namespace {
         QnConnectionData connection;
         connection.name = settings->value(QLatin1String("name")).toString();
         connection.url = settings->value(QLatin1String("url")).toString();
+        connection.url.setScheme(QLatin1String("https"));
         connection.readOnly = (settings->value(QLatin1String("readOnly")).toString() == "true");
 
         return connection;
@@ -111,10 +112,8 @@ QVariant QnSettings::updateValueFromSettings(QSettings *settings, int id, const 
         for (int i = 0; i < size; ++i) {
             settings->setArrayIndex(i);
             QnConnectionData connection = readConnectionData(settings);
-            if (connection.url.isValid()) {
-                connection.url.setScheme("https");
+            if (connection.url.isValid())
                 result.append(connection);
-            }
         }
         settings->endArray();
 
