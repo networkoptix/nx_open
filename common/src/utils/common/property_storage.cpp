@@ -22,6 +22,15 @@ QVariant QnPropertyStorage::value(int id) const {
 }
 
 bool QnPropertyStorage::setValue(int id, const QVariant &value) {
+    if(!isWriteable(id)) {
+        qnWarning("Property '%1' is not writeable.", name(id));
+        return false;
+    }
+    
+    return updateValue(id, value);
+}
+
+bool QnPropertyStorage::updateValue(int id, const QVariant &value) {
     QVariant newValue = value;
 
     int type = this->type(id);
@@ -79,7 +88,15 @@ void QnPropertyStorage::setType(int id, int type) {
     m_typeById[id] = type;
 
     if(type != QMetaType::Void)
-        setValue(id, QVariant(type, static_cast<const void *>(NULL)));
+        updateValue(id, QVariant(type, static_cast<const void *>(NULL)));
+}
+
+bool QnPropertyStorage::isWriteable(int id) const {
+    return m_writeableById.value(id);
+}
+
+void QnPropertyStorage::setWriteable(int id, bool writeable) {
+    m_writeableById[id] = writeable;
 }
 
 void QnPropertyStorage::updateFromSettings(QSettings *settings) {
@@ -90,7 +107,7 @@ void QnPropertyStorage::updateFromSettings(QSettings *settings) {
 
     lock();
     foreach(int id, m_nameById.keys())
-        setValue(id, updateValueFromSettings(settings, id, value(id)));
+        updateValue(id, updateValueFromSettings(settings, id, value(id)));
     unlock();
 }
 
@@ -102,7 +119,8 @@ void QnPropertyStorage::submitToSettings(QSettings *settings) const {
 
     lock();
     foreach(int id, m_nameById.keys())
-        submitValueToSettings(settings, id, value(id));
+        if(isWriteable(id))
+            submitValueToSettings(settings, id, value(id));
     unlock();
 }
 

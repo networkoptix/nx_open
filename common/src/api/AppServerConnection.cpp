@@ -514,7 +514,7 @@ QUrl QnAppServerConnectionFactory::defaultUrl()
 
 void QnAppServerConnectionFactory::setDefaultUrl(const QUrl &url)
 {
-    Q_ASSERT_X(url.isValid(), "QnAppServerConnectionFactory::initialize()", "an invalid url has passed");
+    Q_ASSERT_X(url.isValid(), "QnAppServerConnectionFactory::initialize()", "an invalid url was passed");
     Q_ASSERT_X(!url.isRelative(), "QnAppServerConnectionFactory::initialize()", "relative urls aren't supported");
 
     if (QnAppServerConnectionFactory *factory = theAppServerConnectionFactory()) {

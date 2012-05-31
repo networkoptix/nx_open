@@ -1,12 +1,11 @@
 #include "settings.h"
 
 #include <QtCore/QSettings>
-#include <QtCore/QDir>
 
-#include "licensing/license.h"
-#include "utils/common/util.h"
-#include "utils/common/log.h"
-#include "ui/style/globals.h"
+#include <utils/common/util.h>
+#include <utils/common/scoped_value_rollback.h>
+
+#include <ui/style/globals.h>
 
 namespace {
     QnConnectionData readConnectionData(QSettings *settings)
@@ -36,7 +35,8 @@ Q_GLOBAL_STATIC(QnSettings, qn_settings)
 
 QnSettings::QnSettings():
     m_mutex(QMutex::Recursive),
-    m_settings(new QSettings(this))
+    m_settings(new QSettings(this)),
+    m_loading(true)
 {
     init();
 
@@ -60,6 +60,8 @@ QnSettings::QnSettings():
 
     /* Load from settings. */
     load();
+
+    m_loading = false;
 }
 
 QnSettings::~QnSettings() {
@@ -80,6 +82,20 @@ void QnSettings::unlock() const {
 
 QVariant QnSettings::updateValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) {
     switch(id) {
+    case DEFAULT_CONNECTION: {
+        QnConnectionData result;
+        result.url.setScheme(QLatin1String("http"));
+        result.url.setHost(settings->value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString());
+        result.url.setPort(settings->value("appserverPort", DEFAULT_APPSERVER_PORT).toInt());
+        result.url.setUserName(settings->value("appserverLogin", QLatin1String("admin")).toString());
+        result.name = QLatin1String("default");
+        result.readOnly = true;
+
+        if(!result.url.isValid())
+            result.url = QUrl(QString(QLatin1String("http://admin@%1:%2")).arg(QLatin1String(DEFAULT_APPSERVER_HOST)).arg(DEFAULT_APPSERVER_PORT));
+
+        return QVariant::fromValue<QnConnectionData>(result);
+    }
     case LAST_USED_CONNECTION: {
         settings->beginGroup(QLatin1String("AppServerConnections"));
         settings->beginGroup(QLatin1String("lastUsed"));
@@ -88,7 +104,7 @@ QVariant QnSettings::updateValueFromSettings(QSettings *settings, int id, const 
         settings->endGroup();
         return QVariant::fromValue<QnConnectionData>(result);
     }
-    case CONNECTIONS: {
+    case CUSTOM_CONNECTIONS: {
         QnConnectionDataList result;
 
         const int size = settings->beginReadArray(QLatin1String("AppServerConnections"));
@@ -121,7 +137,7 @@ void QnSettings::submitValueToSettings(QSettings *settings, int id, const QVaria
         settings->endGroup();
         settings->endGroup();
         break;
-    case CONNECTIONS: {
+    case CUSTOM_CONNECTIONS: {
         settings->beginWriteArray(QLatin1String("AppServerConnections"));
         settings->remove(QLatin1String("")); /* Clear children. */
         int i = 0;
@@ -151,11 +167,18 @@ void QnSettings::submitValueToSettings(QSettings *settings, int id, const QVaria
     }
 }
 
-bool QnSettings::setValue(int id, const QVariant &value) {
-    bool changed = base_type::setValue(id, value);
+void QnSettings::updateFromSettings(QSettings *settings) {
+    QMutexLocker locker(&m_mutex);
+    QnScopedValueRollback<bool> guard(&m_loading, true);
 
-    /* Connection settings are to be written out right away. */
-    if(changed && id == CONNECTIONS || id == LAST_USED_CONNECTION)
+    base_type::updateFromSettings(settings);
+}
+
+bool QnSettings::updateValue(int id, const QVariant &value) {
+    bool changed = base_type::updateValue(id, value);
+
+    /* Settings are to be written out right away. */
+    if(!m_loading && changed)
         submitValueToSettings(m_settings, id, this->value(id));
 
     return changed;

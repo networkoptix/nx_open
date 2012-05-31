@@ -200,12 +200,19 @@ void LoginDialog::updateStoredConnections()
 {
     m_connectionsModel->removeRows(0, m_connectionsModel->rowCount());
 
-    int index = -1;
-    QnConnectionData lastUsedConnection = qnSettings->lastUsedConnection();
-    foreach (const QnConnectionData &connection, qnSettings->connections()) {
-        if (connection.name.trimmed().isEmpty() || !connection.url.isValid())
-            continue;
+    QnConnectionDataList connections = qnSettings->customConnections();
+    connections.push_front(qnSettings->defaultConnection());
 
+    QnConnectionData lastUsedConnection = qnSettings->lastUsedConnection();
+    if(!lastUsedConnection.url.isValid()) {
+        lastUsedConnection = qnSettings->defaultConnection();
+        lastUsedConnection.name = QString();
+    }
+    if(connections.contains(lastUsedConnection))
+        connections.removeOne(lastUsedConnection);
+    connections.push_front(lastUsedConnection);
+
+    foreach (const QnConnectionData &connection, connections) {
         QList<QStandardItem *> row;
         row << new QStandardItem(connection.name)
             << new QStandardItem(connection.url.host())
@@ -213,29 +220,9 @@ void LoginDialog::updateStoredConnections()
             << new QStandardItem(connection.url.userName())
             << new QStandardItem(connection.url.password());
         m_connectionsModel->appendRow(row);
-
-        if (lastUsedConnection == connection)
-            index = m_connectionsModel->rowCount() - 1;
-    }
-    {
-        QnConnectionData connection;
-        if (index == -1 || lastUsedConnection.name.trimmed().isEmpty()) {
-            connection = lastUsedConnection;
-            if (index == -1) {
-                index = 0;
-                connection.name.clear();
-            }
-        }
-        QList<QStandardItem *> row;
-        row << new QStandardItem(connection.name)
-            << new QStandardItem(connection.url.host())
-            << new QStandardItem(QString::number(connection.url.port()))
-            << new QStandardItem(connection.url.userName())
-            << new QStandardItem(connection.url.password());
-        m_connectionsModel->insertRow(0, row);
     }
 
-    ui->connectionsComboBox->setCurrentIndex(index);
+    ui->connectionsComboBox->setCurrentIndex(0); /* At last used connection. */
 }
 
 void LoginDialog::updateAcceptibility() 

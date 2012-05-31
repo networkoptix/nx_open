@@ -13,9 +13,15 @@ class QSettings;
 
 struct QnConnectionData {
     QnConnectionData(): readOnly(false) {}
+    QnConnectionData(const QString &name, const QUrl &url, bool readOnly = false): name(name), url(url), readOnly(readOnly) {}
 
-    inline bool operator==(const QnConnectionData &other) const
-    { return name == other.name && url == other.url; }
+    bool operator==(const QnConnectionData &other) const { 
+        return name == other.name && url == other.url; 
+    }
+
+    bool operator!=(const QnConnectionData &other) const {
+        return !(*this == other);
+    }
 
     QString name;
     QUrl url;
@@ -37,15 +43,16 @@ public:
     enum Variable {
         MAX_VIDEO_ITEMS,
         DOWNMIX_AUDIO,
-        FIRST_RUN,
         MEDIA_FOLDER,
         EXTRA_MEDIA_FOLDERS,
         BACKGROUND_ANIMATED,
         BACKGROUND_COLOR,
         OPEN_LAYOUTS_ON_LOGIN,
         SOFTWARE_YUV,
+        
+        DEFAULT_CONNECTION,
         LAST_USED_CONNECTION,
-        CONNECTIONS,
+        CUSTOM_CONNECTIONS,
 
         DEBUG_COUNTER,
 
@@ -57,7 +64,7 @@ public:
 
     static QnSettings *instance();
 
-    virtual bool setValue(int id, const QVariant &value) override;
+    virtual void updateFromSettings(QSettings *settings) override;
 
     void load();
     void save();
@@ -75,6 +82,8 @@ protected:
     virtual QVariant updateValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) override;
     virtual void submitValueToSettings(QSettings *settings, int id, const QVariant &value) const override;
 
+    virtual bool updateValue(int id, const QVariant &value) override;
+
     virtual void lock() const override;
     virtual void unlock() const override;
 
@@ -82,21 +91,22 @@ private:
     QN_BEGIN_PROPERTY_STORAGE(VARIABLE_COUNT);
         QN_DECLARE_RW_PROPERTY(int,                     maxVideoItems,          setMaxVideoItems,           MAX_VIDEO_ITEMS,            24);
         QN_DECLARE_RW_PROPERTY(bool,                    isAudioDownmixed,       setAudioDownmixed,          DOWNMIX_AUDIO,              false);
-        QN_DECLARE_RW_PROPERTY(bool,                    isFirstRun,             setFirstRun,                FIRST_RUN,                  true);
         QN_DECLARE_RW_PROPERTY(QString,                 mediaFolder,            setMediaFolder,             MEDIA_FOLDER,               QString());
         QN_DECLARE_RW_PROPERTY(QStringList,             extraMediaFolders,      setExtraMediaFolders,       EXTRA_MEDIA_FOLDERS,        QStringList());
         QN_DECLARE_RW_PROPERTY(bool,                    isBackgroundAnimated,   setBackgroundAnimated,      BACKGROUND_ANIMATED,        true);
         QN_DECLARE_RW_PROPERTY(QColor,                  backgroundColor,        setBackgroundColor,         BACKGROUND_COLOR,           QColor());
         QN_DECLARE_RW_PROPERTY(bool,                    isLayoutsOpenedOnLogin, setLayoutsOpenedOnLogin,    OPEN_LAYOUTS_ON_LOGIN,      false);
         QN_DECLARE_RW_PROPERTY(bool,                    isSoftwareYuv,          setSoftwareYuv,             SOFTWARE_YUV,               false);
+        QN_DECLARE_R_PROPERTY (QnConnectionData,        defaultConnection,                                  DEFAULT_CONNECTION,         QnConnectionData());
         QN_DECLARE_RW_PROPERTY(QnConnectionData,        lastUsedConnection,     setLastUsedConnection,      LAST_USED_CONNECTION,       QnConnectionData());
-        QN_DECLARE_RW_PROPERTY(QnConnectionDataList,    connections,            setConnections,             CONNECTIONS,                QnConnectionDataList());
+        QN_DECLARE_RW_PROPERTY(QnConnectionDataList,    customConnections,      setCustomConnections,       CUSTOM_CONNECTIONS,         QnConnectionDataList());
         QN_DECLARE_RW_PROPERTY(int,                     debugCounter,           setDebugCounter,            DEBUG_COUNTER,              0);
     QN_END_PROPERTY_STORAGE();
 
 private:
     mutable QMutex m_mutex;
     QSettings *m_settings;
+    bool m_loading;
 };
 
 

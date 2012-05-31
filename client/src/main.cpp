@@ -172,59 +172,10 @@ void addTestData()
 
 void initAppServerConnection()
 {
-    static const char *DEFAULT_CONNECTION_NAME = "default";
+    QUrl appServerUrl = qnSettings->lastUsedConnection().url;
 
-    QUrl appServerUrl;
-
-    QnConnectionData lastUsedConnection = qnSettings->lastUsedConnection();
-
-    QnConnectionDataList connections = qnSettings->connections();
-    int defaultConnectionIndex = -1;
-    for (int i = 0; i < connections.size(); i++)
-    {
-        const QnConnectionData &connection = connections[i];
-        if (connection.name == DEFAULT_CONNECTION_NAME)
-        {
-            defaultConnectionIndex = i;
-            break;
-        }
-    }
-
-    // If there is default connection, use lastUsedConnection even it's invalid
-    if (defaultConnectionIndex != -1 && !qnSettings->isFirstRun())
-    {
-        appServerUrl = lastUsedConnection.url;
-    }
-    // otherwise load default connection, add it as default and store it as last used
-    // In case we run first time after installation, replace default connection with registry settings
-    else
-    {
-        QSettings settings;
-        appServerUrl.setScheme(QLatin1String("http"));
-        appServerUrl.setHost(settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString());
-        appServerUrl.setPort(settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt());
-        appServerUrl.setUserName(settings.value("appserverLogin", QLatin1String("admin")).toString());
-        //appServerUrl.setPassword(settings.value("appserverPassword", QLatin1String("123")).toString());
-
-        if (defaultConnectionIndex == -1)
-        {
-            QnConnectionData connection;
-            connection.name = DEFAULT_CONNECTION_NAME;
-            connection.url = appServerUrl;
-            connection.readOnly = true;
-
-            connections.append(connection);
-        } else
-        {
-            connections[defaultConnectionIndex].url = appServerUrl;
-        }
-
-        qnSettings->setConnections(connections);
-
-        lastUsedConnection.url = appServerUrl;
-
-        qnSettings->setLastUsedConnection(lastUsedConnection);
-    }
+    if(!appServerUrl.isValid())
+        appServerUrl = qnSettings->defaultConnection().url;
 
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(&QnServerCameraFactory::instance());

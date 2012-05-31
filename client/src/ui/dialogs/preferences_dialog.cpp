@@ -115,11 +115,13 @@ void QnPreferencesDialog::submitToSettings() {
     m_settings->save();
 
     if (m_connectionsSettingsWidget) {
+        QnConnectionData defaultConnection = qnSettings->defaultConnection();
+
         QnConnectionDataList connections;
         foreach (const QnConnectionData &connection, m_connectionsSettingsWidget->connections())
-            if (!connection.name.isEmpty() && connection.url.isValid()) // TODO: get rid of these strange checks. They are in settings too.
+            if (connection != defaultConnection)
                 connections.append(connection);
-        m_settings->setConnections(connections);
+        m_settings->setCustomConnections(connections);
     }
 
     if (m_recordingSettingsWidget)
@@ -146,10 +148,8 @@ void QnPreferencesDialog::updateFromSettings() {
         ui->networkInterfacesList->addItem(tr("IP Address: %1, Network Mask: %2").arg(entry.ip().toString()).arg(entry.netmask().toString()));
 
 
-    QnConnectionDataList connections;
-    foreach (const QnConnectionData &connection, m_settings->connections())
-        if (!connection.name.trimmed().isEmpty()) /* The last used one. */
-            connections.append(connection);
+    QnConnectionDataList connections = qnSettings->customConnections();
+    connections.push_front(qnSettings->defaultConnection());
     m_connectionsSettingsWidget->setConnections(connections);
 }
 
