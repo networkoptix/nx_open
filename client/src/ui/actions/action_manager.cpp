@@ -740,6 +740,17 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Export Selected as Layout...")).
         condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::DisabledAction, this));
 
+
+
+    factory(Qn::IncrementDebugCounterAction).
+        flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::NoTarget).
+        shortcut(tr("Ctrl+Alt+Shift++")).
+        text(tr("Increment Debug Counter"));
+
+    factory(Qn::DecrementDebugCounterAction).
+        flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::NoTarget).
+        shortcut(tr("Ctrl+Alt+Shift+-")).
+        text(tr("Decrement Debug Counter"));
 }
 
 QnActionManager::~QnActionManager() {

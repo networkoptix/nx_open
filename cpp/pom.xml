@@ -20,6 +20,15 @@
 		<ffmpeg.version>2012-04-10-N-39672-g40b7a27</ffmpeg.version>
 		<openssl.version>1.0.0e</openssl.version>
 		<buildLib/>
+		<qtlib1/>
+		<qtlib2/>
+		<qtlib3/>
+		<qtlib4/>
+		<qtlib5/>
+		<qtlib6/>
+		<qtlib7/>
+		<qtlib8/>
+		<qtlib9/>	
 	</properties>
 
 	<build>
@@ -33,7 +42,7 @@
 				<version>1.0-alpha-2</version>
 				<executions>
 					<execution>
-						<phase>initialize</phase>
+						<phase>validate</phase>
 						<goals>
 							<goal>read-project-properties</goal>
 						</goals>
@@ -44,41 +53,55 @@
 						</configuration>
 					</execution>
 				</executions>
-			</plugin>		
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.1.1</version>
+				<executions>
+					<execution>
+						<id>additional-build-steps</id>
+						<phase>process-sources</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>python</executable>
+							<arguments>
+								<argument>build-prepare.py</argument>
+							</arguments>
+							<workingDirectory>${project.build.directory}</workingDirectory>		
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>					
 			<plugin>
 				<artifactId>maven-antrun-plugin</artifactId>
 				<version>1.7</version>
 				<executions>
 					<execution>
-						<id>generate-qt-template</id>
-						<phase>validate</phase>
+						<id>generate-qt-project</id>
+						<phase>generate-resources</phase>
 						<goals>
 							<goal>run</goal>
 						</goals>
 						<configuration>
 							<failOnError>false</failOnError>
-							<target>
-								<concat destfile="${project.build.directory}/maven/${project.artifactId}.pro" append="false">
-									<filelist dir="${basedir}/../cpp" files="template.pro"/>
-								</concat>
-								<echo file="${project.build.directory}/maven/${project.artifactId}.pro" append="true">${line.separator}</echo>
-								<concat destfile="${project.build.directory}/maven/${project.artifactId}.pro" append="true">
-									<filelist dir="${basedir}" files="${project.artifactId}-specifics.pro"/>
-								</concat>		
-							</target>								
-						</configuration>
-					</execution>				
-					<execution>
-						<id>add-basics-qt-project</id>
-						<phase>process-sources</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<failOnError>false</failOnError>
-
 							<target>							
 								<chmod file="${project.build.directory}/*.sh" perm="755"/>
+								
+								<exec dir="${project.build.directory}" executable="unzip" failifexecutionfails="false">
+   									<arg line="-a -u *.zip"/>
+  								</exec>
+
+								<concat destfile="${project.build.directory}/${project.artifactId}.pro" append="true">
+									<filelist dir="${project.build.directory}" files="template.pro"/>
+								</concat>	
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}</echo>
+								<concat destfile="${project.build.directory}/${project.artifactId}.pro" append="true">
+									<filelist dir="${project.build.directory}" files="${project.artifactId}-specifics.pro"/>
+								</concat>								
 
 								<dirset id="includes_path" dir="${project.build.directory}/build/include" includes="*" erroronmissingdir="false"/>
 								<pathconvert pathsep="${line.separator}" property="includes" refid="includes_path">
@@ -163,13 +186,13 @@
 								</pathconvert>								
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${qrc}</echo>
 
-								<fileset id="lang_path" dir="${project.build.sourceDirectory}" erroronmissingdir="false">
+								<!-- <fileset id="lang_path" dir="${project.build.sourceDirectory}" erroronmissingdir="false">
 									<include name="**/*.ts" />
 								</fileset>
 								<pathconvert pathsep="${line.separator}" property="lang" refid="lang_path">
 									<map from="" to="TRANSLATIONS += "/>
 								</pathconvert>								
-								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${lang}</echo>
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${lang}</echo> -->
 
 								<fileset id="forms_path" dir="${project.build.sourceDirectory}" erroronmissingdir="false">
 									<include name="**/*.ui" />
@@ -212,40 +235,16 @@
 		<profile>
 			<id>windows</id>
 			<activation>
-				<!--<activeByDefault>true</activeByDefault>-->
 				<os>
 					<family>Windows</family>
 				</os>
 			</activation>
 			<properties>
-				<arch>x86</arch>		
-			</properties>			
+				<arch>x86</arch>
+				<platform>windows</platform>
+			</properties>
 			<build>
 				<plugins>					
-					<plugin>
-						<groupId>com.google.code.maven-replacer-plugin</groupId>
-						<artifactId>maven-replacer-plugin</artifactId>
-						<version>1.4.0</version>
-						<executions>
-							<execution>
-								<phase>process-resources</phase>
-								<goals>
-									<goal>replace</goal>
-								</goals>
-								<configuration>
-									<includes>
-										<include>${arch}/${project.artifactId}-x64.vcproj</include>
-									</includes>
-									<replacements>
-										<replacement>
-											<token>Win32</token>
-											<value>${arch}</value>
-										</replacement>         
-									</replacements>
-								</configuration>								
-							</execution>
-						</executions>
-					</plugin>	
 					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>exec-maven-plugin</artifactId>
@@ -253,7 +252,7 @@
 						<executions>
 							<execution>
 								<id>generate-vcproj</id>
-								<phase>generate-resources</phase>
+								<phase>process-resources</phase>
 								<goals>
 									<goal>exec</goal>
 								</goals>
@@ -286,12 +285,35 @@
 						</executions>
 					</plugin>	
 					<plugin>
+						<groupId>com.google.code.maven-replacer-plugin</groupId>
+						<artifactId>maven-replacer-plugin</artifactId>
+						<version>1.4.0</version>
+						<executions>
+							<execution>
+								<phase>process-resources</phase>
+								<goals>
+									<goal>replace</goal>
+								</goals>
+								<configuration>
+									<includes>
+										<include>${arch}/${project.artifactId}-x64.vcproj</include>
+									</includes>
+									<replacements>
+										<replacement>
+											<token>Win32</token>
+											<value>${arch}</value>
+										</replacement>         
+									</replacements>
+								</configuration>								
+							</execution>
+						</executions>
+					</plugin>						
+					<plugin>
 						<artifactId>maven-assembly-plugin</artifactId>
 						<version>2.2.2</version>
 						<executions>
 							<execution>
 								<id>pack-binaries</id>
-								<!-- <id>default-cli</id> -->
 								<phase>package</phase>
 								<goals>
 									<goal>single</goal>
@@ -328,7 +350,7 @@
 						<version>2.4</version>
 						<executions>
 							<execution>
-								<id>unpack-platform-libs</id>
+								<id>copy-platform-libs</id>
 								<phase>validate</phase>
 								<goals>
 									<goal>copy-dependencies</goal>
@@ -346,7 +368,7 @@
 						<executions>
 							<execution>
 								<id>generate-makefile</id>
-								<phase>generate-resources</phase>
+								<phase>process-resources</phase>
 								<goals>
 									<goal>exec</goal>
 								</goals>
@@ -364,7 +386,6 @@
 								</configuration>
 							</execution>	
 							<execution>
-								<!--<id>default-cli</id>-->
 								<id>process-with-make</id>
 								<phase>process-classes</phase>
 								<goals>
@@ -378,14 +399,12 @@
 										<commandlineArgs>Makefile.${build.configuration}</commandlineArgs>
 										<commandlineArgs>-j</commandlineArgs>
 										<commandlineArgs>1</commandlineArgs>
-										<!--<commandlineArgs>`cat /proc/cpuinfo | grep ^processor | wc -l`</commandlineArgs>-->
 									</arguments>
 								</configuration>
 							</execution>
 
 							<execution>
-								<!--<id>default-cli</id>-->
-								<id>rename-binary</id>
+								<id>prepare-deb</id>
 								<phase>prepare-package</phase>
 								<goals>
 									<goal>exec</goal>
@@ -396,23 +415,6 @@
 									<skip>${assembly-skip}</skip>
 								</configuration>
 							</execution>
-
-							<execution>
-								<id>unzip-dependencies</id>
-								<phase>generate-sources</phase>
-								<goals>
-									<goal>exec</goal>
-								</goals>
-								<configuration>
-									<executable>unzip</executable>
-									<workingDirectory>${project.build.directory}</workingDirectory>		
-									<arguments>
-										<commandlineArgs>-a</commandlineArgs>
-										<commandlineArgs>-u</commandlineArgs>							
-										<commandlineArgs>*.zip</commandlineArgs>
-									</arguments>
-								</configuration>
-							</execution>						
 						</executions>
 					</plugin>
 
@@ -445,6 +447,9 @@
 					<family>Windows</family>
 				</os>
 			</activation>	
+			<properties>
+				<qtlib9>multimedia</qtlib9>
+			</properties>				
 			<dependencies>
 				<dependency>
 					<groupId>org.ffmpeg</groupId>
@@ -456,14 +461,14 @@
 			</dependencies>				
 			<build>
 				<plugins>
-					<plugin>
+					<!--<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-dependency-plugin</artifactId>
 						<version>2.4</version>
 						<executions>
 							<execution>
 								<id>unpack-platform-libs</id>
-								<phase>validate</phase>
+								<phase>generate-sources</phase>
 								<goals>
 									<goal>unpack-dependencies</goal>
 								</goals>
@@ -472,7 +477,65 @@
 								</configuration>
 							</execution>
 						</executions>
-					</plugin>
+					</plugin> -->
+					<plugin>
+						<groupId>com.goldin.plugins</groupId>
+						<artifactId>maven-copy-plugin</artifactId>
+						<version>0.2.3.6</version>
+						<executions>
+							<execution>
+								<id>copy-qt-libraries</id>
+								<phase>process-resources</phase>
+								<goals>
+									<goal>copy</goal>
+								</goals>
+								<configuration>
+									<runIf>{{ buildLib != "staticlib" }}</runIf>
+									<failIfNotFound>false</failIfNotFound>
+									<resources>
+										<resource>
+											<targetPath>${project.build.directory}/bin</targetPath>
+											<directory>${environment.dir}/qt/bin/${arch}</directory>
+											<preservePath>true</preservePath>
+											<includes>
+												<include>**/qt${qtlib1}4.*</include>
+												<include>**/qt${qtlib2}4.*</include>
+												<include>**/qt${qtlib3}4.*</include>
+												<include>**/qt${qtlib4}4.*</include>
+												<include>**/qt${qtlib5}4.*</include>
+												<include>**/qt${qtlib6}4.*</include>
+												<include>**/qt${qtlib7}4.*</include>
+												<include>**/qt${qtlib8}4.*</include>
+												<include>**/qt${qtlib9}4.*</include>
+												<include>**/qt${qtlib1}d4.*</include>
+												<include>**/qt${qtlib2}d4.*</include>
+												<include>**/qt${qtlib3}d4.*</include>
+												<include>**/qt${qtlib4}d4.*</include>
+												<include>**/qt${qtlib5}d4.*</include>
+												<include>**/qt${qtlib6}d4.*</include>
+												<include>**/qt${qtlib7}d4.*</include>
+												<include>**/qt${qtlib8}d4.*</include>
+												<include>**/qt${qtlib9}d4.*</include>												
+											</includes>
+											<excludes>
+												<exclude>**/*.lib</exclude>
+											</excludes>
+										</resource>
+										<resource>
+											<targetPath>${project.build.directory}/bin</targetPath>
+											<directory>${environment.dir}/qt/plugins/${arch}</directory>
+											<preservePath>true</preservePath>
+											<includes>
+												<include>*/${qtplugin1}/**</include>
+												<include>*/${qtplugin2}/**</include>
+												<include>*/${qtplugin3}/**</include>
+											</includes>										
+										</resource>	
+									</resources>								
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>						
 				</plugins>
 			</build>
 		</profile> 
@@ -480,14 +543,9 @@
 		<profile>
 			<id>convert-clean</id>
 			<activation>				
-				<activeByDefault>true</activeByDefault>
 				<file>
 					<missing>${project.build.directory}/build/include</missing>
 				</file> 
-				<!--<property>
-					<name>convert-only</name>
-					<value>false</value>
-				</property>	-->		
 			</activation>			
 			<build>
 				<plugins>
@@ -498,7 +556,7 @@
 						<executions>
 							<execution>
 								<id>prepare-qt-project</id>
-								<phase>initialize</phase>
+								<phase>generate-sources</phase>
 								<goals>
 									<goal>copy-resources</goal>
 								</goals>
@@ -507,27 +565,17 @@
 									<resources>          
 										<resource>
 											<targetPath>${project.build.directory}</targetPath>
-											<directory>${basedir}/maven</directory>
-											<filtering>true</filtering>
-										</resource>		
-										<resource>
-											<targetPath>${project.build.directory}</targetPath>
-											<directory>${project.build.directory}/maven</directory>
-											<filtering>true</filtering>
-										</resource>		
-										<resource>
-											<targetPath>${project.build.directory}</targetPath>
 											<directory>${basedir}/../cpp/shared-resources</directory>
 											<filtering>true</filtering>
+											<excludes>
+												<exclude>icons/**</exclude>
+											</excludes>
 										</resource>
 										<resource>
 											<targetPath>${project.build.directory}</targetPath>
 											<directory>${basedir}/../cpp/shared-resources/icons/${custom.skin}</directory>
-											<excludes>
-												<exclude>version.h</exclude>
-											</excludes>
 											<filtering>false</filtering>
-										</resource>																		
+										</resource>												
 									</resources>              
 									<encoding>UTF-8</encoding>
 								</configuration>            
@@ -536,6 +584,6 @@
 					</plugin>			
 				</plugins>
 			</build>
-		</profile>		
+		</profile>
 	</profiles>	
 </project>

@@ -426,6 +426,19 @@ namespace Qn {
         ExportLayoutAction,
 
 
+        /* Debug actions. */
+
+        /**
+         * Increments debug counter.
+         */
+        IncrementDebugCounterAction,
+
+        /**
+         * Decrements debug counter.
+         */
+        DecrementDebugCounterAction,
+
+
         ActionCount,
 
         NoAction = -1

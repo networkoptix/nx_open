@@ -6,7 +6,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <ui/widgets/settings/camera_settings_widget.h>
+#include <ui/widgets/properties/camera_settings_widget.h>
 
 class QAbstractButton;
 

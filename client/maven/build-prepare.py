@@ -1,4 +1,12 @@
-import os, posixpath
+import os, sys, posixpath
+
+def platform():
+    if sys.platform == 'win32':
+        return 'win32'
+    elif sys.platform == 'darwin':
+        return 'mac'
+    elif sys.platform == 'linux2':
+        return 'linux'
 
 def genskin():
   os.path = posixpath
@@ -11,20 +19,17 @@ def genskin():
   <qresource prefix="/skin">
   """
 
-  skin_dir = '${project.build.directory}/bin/${build.configuration}/skin'
+  skin_dir = '${basedir}/resource/${custom.skin}/skin'
   for root, dirs, files in os.walk(skin_dir):
     parent = root[len(skin_dir) + 1:]
-    if '.svn' in dirs:
-      dirs.remove('.svn')  # don't visit SVN directories
 
     for f in files:
       if f.endswith('.png'):
         print >> skin_qrc, '<file alias="%s">%s</file>' % (os.path.join(parent, f).lower(), os.path.join(root, f).lower())
       if f.endswith('.mkv'):
         print >> skin_qrc, '<file alias="%s">%s</file>' % (os.path.join(parent, f).lower(), os.path.join(root, f).lower())
-      if f.endswith('.ini'):
-        print >> skin_qrc, '<file alias="%s">%s</file>' % (os.path.join(parent, f).lower(), os.path.join(root, f).lower())
-
+  
+  print >> skin_qrc, '<file alias="globals.ini">${project.build.directory}/globals.ini</file>'
   print >> skin_qrc, """
   </qresource>
   </RCC>
@@ -62,4 +67,7 @@ def genhelp():
 
 if __name__ == '__main__':
   genskin()
+  os.system('${environment.dir}/qt/bin/lrelease ${project.build.directory}/${project.artifactId}-specifics.pro')
   genhelp()
+  if platform() == 'linux':
+    os.system('unzip -a -u *.zip')

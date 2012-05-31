@@ -358,7 +358,7 @@ void initAppServerConnection(const QSettings &settings)
     QUrl appServerUrl;
 
     // ### remove
-    appServerUrl.setScheme(QLatin1String("http"));
+    appServerUrl.setScheme(QLatin1String("https"));
     appServerUrl.setHost(settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString());
     appServerUrl.setPort(settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt());
     appServerUrl.setUserName(settings.value("appserverLogin", QLatin1String("admin")).toString());
@@ -374,7 +374,7 @@ void initAppServerEventConnection(const QSettings &settings, const QnVideoServer
     QUrl appServerEventsUrl;
 
     // ### remove
-    appServerEventsUrl.setScheme(QLatin1String("http"));
+    appServerEventsUrl.setScheme(QLatin1String("https"));
     appServerEventsUrl.setHost(settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString());
     appServerEventsUrl.setPort(settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt());
     appServerEventsUrl.setUserName(settings.value("appserverLogin", QLatin1String("admin")).toString());

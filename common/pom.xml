@@ -27,13 +27,13 @@
 		<!--QT libs used-->
 		<qtlib1>network</qtlib1>
 		<qtlib2>xml</qtlib2>
-		<qtlib3/>
+<!--		<qtlib3/>
 		<qtlib4/>
 		<qtlib5/>
 		<qtlib6/>
 		<qtlib7/>
 		<qtlib8/>
-		<qtlib9/>
+		<qtlib9/> -->
 		<!--Global libs-->
 		<global.libs/>		
 		<!--Specific os libs used-->
@@ -86,86 +86,5 @@
 	</dependencies>
 
 	<build>
-		<!-- <plugins>
-			<plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<version>1.7</version>
-				<executions>
-					<execution>
-						<id>add-specifics-to-qt-project</id>
-						<phase>process-sources</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<failOnError>false</failOnError>
-							<target>
-								<fileset id="proto_path" dir="src">
-									<include name="**/*.proto" />
-								</fileset>
-								<pathconvert pathsep="${line.separator}" property="proto" refid="proto_path">
-									<map from="" to="PB_FILES += "/>
-								</pathconvert>
-								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${proto}</echo>
-							</target>
-						</configuration>
-					</execution>				
-				</executions>
-			</plugin>								
-		</plugins> -->
 	</build>    
-
-	<profiles>
-		<profile>
-			<id>windows</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-				<os>
-					<family>Windows</family>
-				</os>
-			</activation>
-			<properties>
-				<qtlib9>multimedia</qtlib9>
-			</properties>						
-		</profile>
-		<profile>
-			<id>linux</id>
-			<properties>
-
-			</properties>
-		</profile>	
-		<profile>
-			<id>convert-clean</id>
-			<activation>				
-				<file>
-					<missing>${project.build.directory}/build/include</missing>
-				</file> 		
-			</activation>			
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>exec-maven-plugin</artifactId>
-						<version>1.1.1</version>
-						<executions>
-							<execution>
-								<id>generate-filetypes</id>
-								<phase>generate-sources</phase>
-								<goals>
-									<goal>exec</goal>
-								</goals>
-								<configuration>
-									<executable>python</executable>
-									<workingDirectory>${project.build.directory}</workingDirectory>	
-									<arguments>
-										<commandlineArgs>${project.build.directory}/gen_filetypes.py</commandlineArgs>
-									</arguments>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>					
-				</plugins>
-			</build>					
-		</profile>	
-	</profiles>
 </project>

@@ -16,7 +16,7 @@
 #include <ui/style/globals.h>
 
 
-LicenseManagerWidget::LicenseManagerWidget(QWidget *parent) :
+QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::LicenseManagerWidget),
     m_httpClient(NULL)
@@ -35,11 +35,11 @@ LicenseManagerWidget::LicenseManagerWidget(QWidget *parent) :
     at_gridLicenses_currentChanged();
 }
 
-LicenseManagerWidget::~LicenseManagerWidget()
+QnLicenseManagerWidget::~QnLicenseManagerWidget()
 {
 }
 
-void LicenseManagerWidget::updateLicenses() {
+void QnLicenseManagerWidget::updateLicenses() {
     m_licenses = qnLicensePool->getLicenses();
 
     if (m_licenses.hardwareId().isEmpty()) {
@@ -87,7 +87,7 @@ void LicenseManagerWidget::updateLicenses() {
     ui->infoLabel->setPalette(palette);
 }
 
-void LicenseManagerWidget::updateFromServer(const QString &serialKey, const QString &hardwareId) {
+void QnLicenseManagerWidget::updateFromServer(const QString &serialKey, const QString &hardwareId) {
     if (!m_httpClient)
         m_httpClient = new QNetworkAccessManager(this);
 
@@ -106,7 +106,7 @@ void LicenseManagerWidget::updateFromServer(const QString &serialKey, const QStr
     connect(reply, SIGNAL(finished()), this, SLOT(at_downloadFinished()));
 }
 
-void LicenseManagerWidget::validateLicense(const QnLicensePtr &license) {
+void QnLicenseManagerWidget::validateLicense(const QnLicensePtr &license) {
     if (license->isValid()) {
         QnAppServerConnectionPtr connection = QnAppServerConnectionFactory::createConnection();
 
@@ -121,7 +121,7 @@ void LicenseManagerWidget::validateLicense(const QnLicensePtr &license) {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void LicenseManagerWidget::at_licensesReceived(int status, const QByteArray &/*errorString*/, QnLicenseList licenses, int /*handle*/)
+void QnLicenseManagerWidget::at_licensesReceived(int status, const QByteArray &/*errorString*/, QnLicenseList licenses, int /*handle*/)
 {
     if (status != 0 || licenses.isEmpty())
     {
@@ -139,7 +139,7 @@ void LicenseManagerWidget::at_licensesReceived(int status, const QByteArray &/*e
     ui->licenseWidget->setSerialKey(QString());
 }
 
-void LicenseManagerWidget::at_downloadError() {
+void QnLicenseManagerWidget::at_downloadError() {
     if (QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender())) {
         disconnect(reply, SIGNAL(finished()), this, SLOT(at_downloadFinished()));
 
@@ -154,7 +154,7 @@ void LicenseManagerWidget::at_downloadError() {
     ui->licenseWidget->setState(LicenseWidget::Normal);
 }
 
-void LicenseManagerWidget::at_downloadFinished() {
+void QnLicenseManagerWidget::at_downloadFinished() {
     if (QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender())) {
         validateLicense(QnLicensePtr(new QnLicense(QnLicense::fromString(reply->readAll()))));
 
@@ -164,11 +164,11 @@ void LicenseManagerWidget::at_downloadFinished() {
     ui->licenseWidget->setState(LicenseWidget::Normal);
 }
 
-void LicenseManagerWidget::at_gridLicenses_currentChanged() {
+void QnLicenseManagerWidget::at_gridLicenses_currentChanged() {
     ui->detailsButton->setEnabled(ui->gridLicenses->selectionModel()->currentIndex().isValid());
 }
 
-void LicenseManagerWidget::at_licenseDetailsButton_clicked() {
+void QnLicenseManagerWidget::at_licenseDetailsButton_clicked() {
     const QnLicensePtr license = m_licenses.licenses().at(ui->gridLicenses->selectionModel()->selectedRows().front().row());
 
     QString details = tr("<b>Generic:</b><br />\n"
@@ -185,7 +185,7 @@ void LicenseManagerWidget::at_licenseDetailsButton_clicked() {
     QMessageBox::information(this, tr("License Details"), details);
 }
 
-void LicenseManagerWidget::at_licenseWidget_stateChanged() {
+void QnLicenseManagerWidget::at_licenseWidget_stateChanged() {
     if(ui->licenseWidget->state() != LicenseWidget::Waiting)
         return;
 

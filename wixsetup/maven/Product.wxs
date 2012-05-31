@@ -557,12 +557,6 @@
                                     <File Id="bespin$(var.suffix).dll" Name="bespin$(var.suffix).dll" Source="client\styles\bespin$(var.suffix).dll" />
                                 </Component>
                             </Directory>
-                            
-                            <Directory Id="arecontvision" Name="arecontvision">
-                                <Component Id="arecontvision" Guid="{94FE9A39-0F46-4c79-A12F-7FCA2E3B5D16}">
-                                    <File Id="devicesxml" Name="devices.xml" Source="client/arecontvision/devices.xml"/>
-                                </Component>
-                            </Directory>
                         </Directory>
                     </Directory>
                 </Directory>
@@ -649,7 +643,6 @@
             <ComponentRef Id="ClientQjson"/>
             <ComponentRef Id="ClientQtColorPicker"/>
             <ComponentRef Id="bespin" />
-            <ComponentRef Id='arecontvision'/>
             
             <ComponentRef Id='ClientDirectoryComponent'/>
         </Feature>
