@@ -44,8 +44,8 @@ YouTubeUploadDialog::YouTubeUploadDialog(QnWorkbenchContext *context, QnResource
 
 
     m_youtubeuploader = new YouTubeUploader(this);
-    m_youtubeuploader->setLogin(YouTubeSettingsWidget::login());
-    m_youtubeuploader->setPassword(YouTubeSettingsWidget::password());
+    m_youtubeuploader->setLogin(QnYouTubeSettingsWidget::login());
+    m_youtubeuploader->setPassword(QnYouTubeSettingsWidget::password());
 
     connect(m_youtubeuploader, SIGNAL(categoryListLoaded()), this, SLOT(categoryListLoaded()));
     connect(m_youtubeuploader, SIGNAL(authFailed()), this, SLOT(authFailed()));
@@ -148,7 +148,7 @@ void YouTubeUploadDialog::authFailed()
 
     QDialog dialog(this);
 
-    YouTubeSettingsWidget *widget = new YouTubeSettingsWidget(&dialog);
+    QnYouTubeSettingsWidget *widget = new QnYouTubeSettingsWidget(&dialog);
     widget->layout()->setContentsMargins(0, 0, 0, 0);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Close, Qt::Horizontal, &dialog);
@@ -163,8 +163,8 @@ void YouTubeUploadDialog::authFailed()
     if (dialog.exec() == QDialog::Accepted) {
         widget->accept();
 
-        m_youtubeuploader->setLogin(YouTubeSettingsWidget::login());
-        m_youtubeuploader->setPassword(YouTubeSettingsWidget::password());
+        m_youtubeuploader->setLogin(QnYouTubeSettingsWidget::login());
+        m_youtubeuploader->setPassword(QnYouTubeSettingsWidget::password());
 
         accept(); // retry
     }

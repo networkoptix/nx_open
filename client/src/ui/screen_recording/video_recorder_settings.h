@@ -5,19 +5,36 @@
 #include <QtCore/QSettings>
 #include <QtMultimedia/QAudioDeviceInfo>
 
-class VideoRecorderSettings : public QObject
+namespace Qn {
+    enum CaptureMode { 
+        FullScreenMode, 
+        FullScreenNoeroMode, 
+        WindowMode 
+    };
+
+    enum DecoderQuality { 
+        BestQuality, 
+        BalancedQuality, 
+        PerformanceQuality 
+    };
+
+    enum Resolution { 
+        NativeResolution, 
+        QuaterNativeResolution, 
+        Exact1920x1080Resolution, 
+        Exact1280x720Resolution, 
+        Exact640x480Resolution, 
+        Exact320x240Resolution 
+    };
+
+} // namespace Qn
+
+class QnVideoRecorderSettings : public QObject
 {
     Q_OBJECT
 public:
-    explicit VideoRecorderSettings(QObject *parent = 0);
-    ~VideoRecorderSettings();
-
-    enum CaptureMode { FullScreenMode, FullScreenNoeroMode, WindowMode };
-    enum DecoderQuality { BestQuality, BalancedQuality, PerformanceQuality };
-    enum Resolution { ResNative, ResQuaterNative, Res1920x1080, Res1280x720, Res640x480, Res320x240 };
-    Q_ENUMS(CaptureMode)
-    Q_ENUMS(DecoderQuality)
-    Q_ENUMS(Resolution)
+    explicit QnVideoRecorderSettings(QObject *parent = 0);
+    ~QnVideoRecorderSettings();
 
     QAudioDeviceInfo primaryAudioDevice() const;
     void setPrimaryAudioDeviceByName(const QString &name);
@@ -28,14 +45,14 @@ public:
     bool captureCursor() const;
     void setCaptureCursor(bool yes);
 
-    CaptureMode captureMode() const;
-    void setCaptureMode(CaptureMode c);
+    Qn::CaptureMode captureMode() const;
+    void setCaptureMode(Qn::CaptureMode c);
 
-    DecoderQuality decoderQuality() const;
-    void setDecoderQuality(DecoderQuality q);
+    Qn::DecoderQuality decoderQuality() const;
+    void setDecoderQuality(Qn::DecoderQuality q);
 
-    Resolution resolution() const;
-    void setResolution(Resolution r);
+    Qn::Resolution resolution() const;
+    void setResolution(Qn::Resolution r);
 
     int screen() const;
     void setScreen(int screen);

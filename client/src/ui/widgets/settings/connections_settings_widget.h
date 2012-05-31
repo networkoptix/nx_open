@@ -1,5 +1,5 @@
-#ifndef CONNECTIONSSETTINGSWIDGET_H
-#define CONNECTIONSSETTINGSWIDGET_H
+#ifndef QN_CONNECTIONS_SETTINGS_WIDGET_H
+#define QN_CONNECTIONS_SETTINGS_WIDGET_H
 
 #include <QtCore/QList>
 #include <QtCore/QUrl>
@@ -17,18 +17,18 @@ namespace Ui {
     class ConnectionsSettingsWidget;
 }
 
-class ConnectionsSettingsWidget : public QWidget
+class QnConnectionsSettingsWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit ConnectionsSettingsWidget(QWidget *parent = 0);
-    ~ConnectionsSettingsWidget();
+    explicit QnConnectionsSettingsWidget(QWidget *parent = 0);
+    ~QnConnectionsSettingsWidget();
 
-    QList<QnSettings::ConnectionData> connections() const;
-    void setConnections(const QList<QnSettings::ConnectionData> &connections);
-    void addConnection(const QnSettings::ConnectionData &connection);
-    void removeConnection(const QnSettings::ConnectionData &connection);
+    QnConnectionDataList connections() const;
+    void setConnections(const QnConnectionDataList &connections);
+    void addConnection(const QnConnectionData &connection);
+    void removeConnection(const QnConnectionData &connection);
 
 protected:
     void changeEvent(QEvent *event);
@@ -44,7 +44,7 @@ private Q_SLOTS:
     void deleteConnection();
 
 private:
-    Q_DISABLE_COPY(ConnectionsSettingsWidget)
+    Q_DISABLE_COPY(QnConnectionsSettingsWidget)
 
     QUrl currentUrl();
 
@@ -56,4 +56,4 @@ private:
     QDataWidgetMapper *m_dataWidgetMapper;
 };
 
-#endif // CONNECTIONSSETTINGSWIDGET_H
+#endif // QN_CONNECTIONS_SETTINGS_WIDGET_H

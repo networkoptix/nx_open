@@ -140,6 +140,9 @@ protected slots:
 
     void at_mainMenuAction_triggered();
 
+    void at_incrementDebugCounterAction_triggered();
+    void at_decrementDebugCounterAction_triggered();
+
     void at_nextLayoutAction_triggered();
     void at_previousLayoutAction_triggered();
     void at_openLayoutsAction_triggered();

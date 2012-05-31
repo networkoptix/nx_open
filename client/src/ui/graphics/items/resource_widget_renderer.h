@@ -1,14 +1,17 @@
 #ifndef QN_DISPLAY_WIDGET_RENDERER_H
 #define QN_DISPLAY_WIDGET_RENDERER_H
 
-#include <QObject>
-#include <QMutex>
+#include <QtCore/QObject>
+#include <QtCore/QMutex>
+
 #include <camera/abstractrenderer.h>
 #include <camera/render_status.h>
 
 class QThread;
+class QGLContext;
 
 class QnGLRenderer;
+
 
 class QnResourceWidgetRenderer: public QObject, public QnAbstractRenderer {
     Q_OBJECT;
