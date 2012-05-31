@@ -36,4 +36,11 @@ private:
     void printPasswords() const;
 };
 
+class SoapErrorHelper {
+    SoapErrorHelper(){}
+
+public:
+    static const QString fetchDescription(const SOAP_ENV__Fault* faultInfo);
+};
+
 #endif // onvif_2_1_1_helper_h

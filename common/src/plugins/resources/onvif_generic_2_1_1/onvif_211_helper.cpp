@@ -3,6 +3,10 @@
 #include "utils/common/log.h"
 #include <QDebug>
 
+//
+// PasswordHelper
+//
+
 const char* ADMIN1 = "admin";
 const char* ADMIN2 = "Admin";
 const char* ADMIN3 = "administrator";
@@ -200,4 +204,72 @@ void PasswordHelper::printPasswords() const
         qDebug() << "    " << listIter->first << " / " << listIter->second;
         ++listIter;
     }
+}
+
+
+//
+// SoapErrorHelper
+//
+
+const QString SoapErrorHelper::fetchDescription(const SOAP_ENV__Fault* faultInfo)
+{
+    if (!faultInfo) {
+        qDebug() << "SoapErrorHelper::fetchDescription: fault info is null";
+        return QString();
+    }
+
+    QString result("Fault Info. ");
+
+    if (faultInfo->faultcode) {
+        result += "Code: ";
+        result += faultInfo->faultcode;
+        result += ". ";
+    }
+
+    if (faultInfo->faultstring) {
+        result += "Descr: ";
+        result += faultInfo->faultstring;
+        result += ". ";
+    }
+
+    if (faultInfo->faultactor) {
+        result += "Factor: ";
+        result += faultInfo->faultactor;
+        result += ". ";
+    }
+
+    if (faultInfo->detail && faultInfo->detail->__any) {
+        result += "Details: ";
+        result += faultInfo->detail->__any;
+        result += ". ";
+    }
+
+    if (faultInfo->SOAP_ENV__Reason && faultInfo->SOAP_ENV__Reason->SOAP_ENV__Text) {
+        result += "Reason: ";
+        result += faultInfo->SOAP_ENV__Reason->SOAP_ENV__Text;
+        result += ". ";
+    }
+
+    if (faultInfo->SOAP_ENV__Code) {
+
+        if (faultInfo->SOAP_ENV__Code->SOAP_ENV__Value) {
+            result += "Additional: ";
+            result += faultInfo->SOAP_ENV__Code->SOAP_ENV__Value;
+            result += ". ";
+        }
+
+        if (faultInfo->SOAP_ENV__Code->SOAP_ENV__Subcode && faultInfo->SOAP_ENV__Code->SOAP_ENV__Subcode->SOAP_ENV__Value) {
+            result += "Sub info: ";
+            result += faultInfo->SOAP_ENV__Code->SOAP_ENV__Subcode->SOAP_ENV__Value;
+            result += ". ";
+        }
+    }
+
+    if (faultInfo->SOAP_ENV__Detail && faultInfo->SOAP_ENV__Detail->__any) {
+        result += "Additional details: ";
+        result += faultInfo->SOAP_ENV__Detail->__any;
+        result += ". ";
+    }
+
+    return result;
 }

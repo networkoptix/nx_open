@@ -86,9 +86,9 @@ const QString QnOnvifGeneric211StreamReader::updateCameraAndfetchStreamUrl(bool 
         int soapRes = soapProxy.GetProfiles(endpoint.toStdString().c_str(), NULL, &request, &response);
         if (soapRes != SOAP_OK) {
             qCritical() << "QnOnvifGeneric211StreamReader::updateCameraAndfetchStreamUrl (primary stream = "
-                << isPrimary << "): can't set values into ONVIF physical device (URL: "
-                << endpoint << ", MAC: " << m_onvifRes->getMAC().toString() << "). Root cause: SOAP request failed. Error code: "
-                << soapRes << ". Description: " << soapProxy.soap_fault_string() << ". " << soapProxy.soap_fault_detail();
+                << isPrimary << "): can't set values into ONVIF physical device (URL: " << endpoint << ", MAC: "
+                << m_onvifRes->getMAC().toString() << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
+                << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
             return QString();
         }
 
@@ -113,8 +113,8 @@ const QString QnOnvifGeneric211StreamReader::updateCameraAndfetchStreamUrl(bool 
         if (soapRes != SOAP_OK) {
             qWarning() << "QnOnvifGeneric211StreamReader::updateCameraAndfetchStreamUrl (primary stream = "
                 << isPrimary << "): can't set values into ONVIF physical device (URL: "
-                << endpoint << ", MAC: " << m_onvifRes->getMAC().toString() << "). Root cause: SOAP failed. Default settings will be used. Error code: "
-                << soapRes << ". Description: " << soapProxy.soap_fault_string() << ". " << soapProxy.soap_fault_detail();
+                << endpoint << ", MAC: " << m_onvifRes->getMAC().toString() << "). Root cause: SOAP failed. Default settings will be used. GSoap error code: "
+                << soapRes << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
         }
     }
 
@@ -149,8 +149,8 @@ const QString QnOnvifGeneric211StreamReader::updateCameraAndfetchStreamUrl(bool 
         if (soapRes != SOAP_OK) {
             qCritical() << "QnOnvifGeneric211StreamReader::updateCameraAndfetchStreamUrl (primary stream = "
                 << isPrimary << "): can't get stream URL of ONVIF device (URL: "
-                << endpoint << ", MAC: " << m_onvifRes->getMAC().toString() << "). Root cause: SOAP request failed. Error code: "
-                << soapRes << ". Description: " << soapProxy.soap_fault_string() << ". " << soapProxy.soap_fault_detail();
+                << endpoint << ", MAC: " << m_onvifRes->getMAC().toString() << "). Root cause: SOAP request failed. GSoap error code: "
+                << soapRes << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
             return QString();
         }
 

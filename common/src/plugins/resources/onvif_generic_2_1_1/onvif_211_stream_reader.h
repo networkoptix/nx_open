@@ -1,6 +1,7 @@
 #ifndef ONVIF_2_1_1_STREAM_REDER_H__
 #define ONVIF_2_1_1_STREAM_REDER_H__
 
+#include "onvif_211_helper.h"
 #include "core/dataprovider/live_stream_provider.h"
 #include "core/dataprovider/spush_media_stream_provider.h"
 #include "utils/network/h264_rtp_reader.h"

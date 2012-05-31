@@ -153,9 +153,8 @@ QnNetworkResourcePtr OnvifGeneric211ResourceSearcher::processPacket(QnResourceLi
     soapRes = soapProxy.GetNetworkInterfaces(endpoint.toStdString().c_str(), NULL, &request1, &response1);
     if (soapRes != SOAP_OK && cl_log.logLevel() >= cl_logDEBUG1) {
         qDebug() << "OnvifGeneric211ResourceSearcher::processPacket: SOAP to endpoint '" << endpoint
-                 << "' failed. Error code: " << soapRes << "Description: "
-                 << soapProxy.soap_fault_string() << ". " << soapProxy.soap_fault_detail()
-                 << ". Can't fetch MAC, will try to get analog." ;
+                 << "' failed. Can't fetch MAC, will try to get analog. GSoap error code: " << soapRes
+                 << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
     }
     QString mac(fetchMacAddress(response1, sender.toString()));
     if (isMacAlreadyExists(mac, result)) {
@@ -169,8 +168,8 @@ QnNetworkResourcePtr OnvifGeneric211ResourceSearcher::processPacket(QnResourceLi
     soapRes = soapProxy.GetDeviceInformation(endpoint.toStdString().c_str(), NULL, &request2, &response2);
     if (soapRes != SOAP_OK) {
         qDebug() << "OnvifGeneric211ResourceSearcher::processPacket: SOAP to endpoint '" << endpoint
-                 << "' failed. Error code: " << soapRes << "Description: " << soapProxy.soap_fault_string() << ". "
-                 << soapProxy.soap_fault_detail() << ". Camera name will be set to 'Unknown'.";
+                 << "' failed. Camera name will be set to 'Unknown'. GSoap error code: " << soapRes
+                 << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
     }
 
     if (mac.isEmpty()) {
@@ -206,8 +205,7 @@ QnNetworkResourcePtr OnvifGeneric211ResourceSearcher::processPacket(QnResourceLi
         soapRes = soapProxy.GetCapabilities(endpoint.toStdString().c_str(), NULL, &request, &response);
         if (soapRes != SOAP_OK && cl_log.logLevel() >= cl_logDEBUG1) {
             qDebug() << "OnvifGeneric211ResourceSearcher::processPacket: can't fetch media and device URLs. Reason: SOAP to endpoint "
-                     << endpoint << " failed. Error code: " << soapRes << "Description: "
-                     << soapProxy.soap_fault_string() << ". " << soapProxy.soap_fault_detail();
+                     << endpoint << " failed. GSoap error code: " << soapRes << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
         }
 
         if (response.Capabilities) {
