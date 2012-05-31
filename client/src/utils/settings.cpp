@@ -84,7 +84,7 @@ QVariant QnSettings::updateValueFromSettings(QSettings *settings, int id, const 
     switch(id) {
     case DEFAULT_CONNECTION: {
         QnConnectionData result;
-        result.url.setScheme(QLatin1String("http"));
+        result.url.setScheme(QLatin1String("https"));
         result.url.setHost(settings->value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString());
         result.url.setPort(settings->value("appserverPort", DEFAULT_APPSERVER_PORT).toInt());
         result.url.setUserName(settings->value("appserverLogin", QLatin1String("admin")).toString());

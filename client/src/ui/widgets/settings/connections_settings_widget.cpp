@@ -96,7 +96,7 @@ QnConnectionDataList QnConnectionsSettingsWidget::connections() const
         QString host = m_connectionsRootItem->child(row, 1)->text();
         int port = m_connectionsRootItem->child(row, 2)->text().toInt();
         
-        connection.url.setScheme("http");
+        connection.url.setScheme("https");
         connection.url.setHost(host);
         connection.url.setPort(port);
         connection.url.setUserName(m_connectionsRootItem->child(row, 3)->text());
@@ -183,7 +183,7 @@ QUrl QnConnectionsSettingsWidget::currentUrl()
     QString host = m_connectionsModel->itemFromIndex(current.sibling(current.row(), 1))->text();
     int port = m_connectionsModel->itemFromIndex(current.sibling(current.row(), 2))->text().toInt();
 
-    url.setScheme("http");
+    url.setScheme("https");
     url.setHost(host);
     url.setPort(port);
     url.setUserName(m_connectionsModel->itemFromIndex(current.sibling(current.row(), 3))->text());

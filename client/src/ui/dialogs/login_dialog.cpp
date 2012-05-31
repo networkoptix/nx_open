@@ -136,7 +136,7 @@ QUrl LoginDialog::currentUrl()
     QString host = m_connectionsModel->item(row, 1)->text();
     int port = m_connectionsModel->item(row, 2)->text().toInt();
 
-    url.setScheme("http");
+    url.setScheme("https");
     url.setHost(host);
     url.setPort(port);
     url.setUserName(m_connectionsModel->item(row, 3)->text());
