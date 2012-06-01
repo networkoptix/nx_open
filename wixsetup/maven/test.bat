@@ -25,9 +25,9 @@ echo installer errorlevel is %ERRORLEVEL%
 cd "%VS90COMNTOOLS%\..\..\..\Network Optix\HD Witness\Client\"
 
 rem ugly hack! --auth parameter is applied only in second launch!
-call client.exe --test-timeout 5000 --auth "http://%EC_LOGIN%:%EC_PASSWORD%@%EC_HOST%:%EC_PORT%" --test-resource-substring Server
+call client.exe --test-timeout 5000 --auth "https://%EC_LOGIN%:%EC_PASSWORD%@%EC_HOST%:%EC_PORT%" --test-resource-substring Server
 
-call client.exe --test-timeout 180000 --auth "http://%EC_LOGIN%:%EC_PASSWORD%@%EC_HOST%:%EC_PORT%" --test-resource-substring Server > test.txt
+call client.exe --test-timeout 180000 --auth "https://%EC_LOGIN%:%EC_PASSWORD%@%EC_HOST%:%EC_PORT%" --test-resource-substring Server > test.txt
 SET TESTRESULT=%ERRORLEVEL%
 echo test errorlevel is %TESTRESULT%
 
