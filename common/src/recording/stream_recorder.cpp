@@ -36,7 +36,8 @@ QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     m_needCalcSignature(false),
     m_mdctx(0),
     m_container("matroska"),
-    m_videoChannels(0)
+    m_videoChannels(0),
+    m_ioDevice(0)
 {
 	memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
 }
@@ -67,6 +68,15 @@ void QnStreamRecorder::close()
             if (m_formatCtx->streams[i]->codec->codec)
                 avcodec_close(m_formatCtx->streams[i]->codec);
         }
+
+        if (m_ioDevice)
+        {
+            delete m_ioDevice;
+            m_ioDevice = 0;
+            if (m_formatCtx && m_formatCtx->pb)
+                m_formatCtx->pb->opaque = 0;
+        }
+
         if (m_formatCtx->pb)
             m_storage->closeFfmpegIOContext(m_formatCtx->pb);
         avformat_free_context(m_formatCtx);
@@ -384,11 +394,14 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
         }
 
         m_formatCtx->pb = m_storage->createFfmpegIOContext(url, QIODevice::WriteOnly);
-        if (m_formatCtx->pb == 0) 
+        if (m_formatCtx->pb == 0)
         {
             m_lastErrMessage = QString("Can't create output file '%1'").arg(url);
             cl_log.log(m_lastErrMessage, cl_logERROR);
             return false;
+        }
+        else {
+            m_ioDevice = (QIODevice*) m_formatCtx->pb->opaque;
         }
 
         avformat_write_header(m_formatCtx, 0);

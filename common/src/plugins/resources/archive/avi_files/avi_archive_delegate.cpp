@@ -119,7 +119,8 @@ QnAviArchiveDelegate::QnAviArchiveDelegate():
     m_selectedAudioChannel(0),
     m_startTime(0),
     m_useAbsolutePos(true),
-    m_duration(AV_NOPTS_VALUE)
+    m_duration(AV_NOPTS_VALUE),
+    m_ioDevice(0)
 {
     close();
     m_audioLayout = new QnAviAudioLayout(this);
@@ -251,6 +252,7 @@ bool QnAviArchiveDelegate::open(QnResourcePtr resource)
             close();
             return false;
         }
+        m_ioDevice = (QIODevice*) m_formatContext->pb->opaque;
         m_initialized = avformat_open_input(&m_formatContext, "", 0, 0) >= 0;
 
         if (!m_initialized )
@@ -258,6 +260,7 @@ bool QnAviArchiveDelegate::open(QnResourcePtr resource)
 
         getVideoLayout();
     }
+
     return m_initialized;
 }
 
@@ -274,8 +277,15 @@ void QnAviArchiveDelegate::doNotFindStreamInfo()
 
 void QnAviArchiveDelegate::close()
 {
+    if (m_ioDevice)
+    {
+        delete m_ioDevice;
+        m_ioDevice = 0;
+        if (m_formatContext && m_formatContext->pb)
+            m_formatContext->pb->opaque = 0;
+    }
+
     if (m_formatContext) {
-        //avformat_close_input(&m_formatContext);
         m_storage->closeFfmpegIOContext(m_formatContext->pb);
         m_formatContext->pb = 0;
         avformat_free_context(m_formatContext);
