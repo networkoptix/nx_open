@@ -642,6 +642,11 @@ void QnMotionEstimation::analizeMotionAmount(quint8* frame)
                 else if (m_linkedNums[idx-MD_HEIGHT]) {
                     m_linkedNums[idx] = m_linkedNums[idx-MD_HEIGHT];
                 }
+#ifndef DISABLE_8_WAY_AREA
+                else if (m_linkedNums[idx-1-MD_HEIGHT]) {
+                    m_linkedNums[idx] = m_linkedNums[idx-1-MD_HEIGHT];
+                }
+#endif
                 else {
                     m_linkedNums[idx] = currentLinkIndex++;
                 }
