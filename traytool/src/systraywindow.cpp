@@ -784,7 +784,7 @@ void QnSystrayWindow::saveData()
 
     QString text = ui->appServerUrlComboBox->currentText();
     if (text.indexOf("://") == -1)
-        text = QString("http://") + text;
+        text = QString("https://") + text;
     setAppServerURL(text);
 }
 
@@ -792,7 +792,7 @@ void QnSystrayWindow::onTestButtonClicked()
 {
     QString text = ui->appServerUrlComboBox->currentText();
     if (text.indexOf("://") == -1)
-        text = QString("http://") + text;
+        text = QString("https://") + text;
 
     QUrl url(text);
     url.setUserName(ui->appServerLogin->text());

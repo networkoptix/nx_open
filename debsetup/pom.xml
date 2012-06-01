@@ -37,7 +37,7 @@
 						</goals>
 						<configuration>
 							<files>
-								<file>../build-${customization}.properties</file>
+								<file>../../build-${customization}.properties</file>
 							</files>
 						</configuration>
 					</execution>
