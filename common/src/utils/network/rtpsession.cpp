@@ -443,7 +443,7 @@ QList<QByteArray> RTPSession::getSdpByType(const QString& trackType) const
     QList<QByteArray> tmp = m_sdp.split('\n');
     
     int mapNum = -1;
-    for (TrackMap::iterator itr = m_sdpTracks.begin(); itr != m_sdpTracks.end(); ++itr)
+    for (TrackMap::const_iterator itr = m_sdpTracks.begin(); itr != m_sdpTracks.end(); ++itr)
     {
         if (getTrackType(itr.key()) == trackType)
             mapNum = itr.value()->mapNum;
