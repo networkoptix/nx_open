@@ -636,8 +636,13 @@ void QnMotionEstimation::analizeMotionAmount(quint8* frame)
             {
                 if (m_linkedNums[idx-1]) {
                     m_linkedNums[idx] = m_linkedNums[idx-1];
-                    if (m_linkedNums[idx-MD_HEIGHT] && m_linkedNums[idx-MD_HEIGHT] != m_linkedNums[idx])
-                        m_linkedMap[m_linkedNums[idx]] = m_linkedNums[idx-MD_HEIGHT];
+                    if (m_linkedNums[idx-MD_HEIGHT] && m_linkedNums[idx-MD_HEIGHT] != m_linkedNums[idx]) 
+                    {
+                        if (m_linkedNums[idx-MD_HEIGHT] < m_linkedNums[idx])
+                            m_linkedMap[m_linkedNums[idx]] = m_linkedNums[idx-MD_HEIGHT];
+                        else
+                            m_linkedMap[m_linkedNums[idx-MD_HEIGHT]] = m_linkedNums[idx];
+                    }
                 }
                 else if (m_linkedNums[idx-MD_HEIGHT]) {
                     m_linkedNums[idx] = m_linkedNums[idx-MD_HEIGHT];
