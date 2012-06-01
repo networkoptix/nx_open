@@ -120,7 +120,7 @@ private:
     QString m_container;
     int m_videoChannels;
     QnCodecAudioFormat m_prevAudioFormat;
-    QIODevice* m_ioDevice;
+    AVIOContext* m_ioContext;
 };
 
 #endif // _STREAM_RECORDER_H__
