@@ -4,7 +4,7 @@
 
 QnVirtualCameraResource::QnVirtualCameraResource()
     : m_scheduleDisabled(true),
-      m_audioEnabled(false)
+      m_audioEnabled(true)
 {
 }
 

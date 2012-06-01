@@ -132,13 +132,9 @@ QUrl LoginDialog::currentUrl()
     const int row = ui->connectionsComboBox->currentIndex();
 
     QUrl url;
-
-    QString host = m_connectionsModel->item(row, 1)->text();
-    int port = m_connectionsModel->item(row, 2)->text().toInt();
-
     url.setScheme("https");
-    url.setHost(host);
-    url.setPort(port);
+    url.setHost(m_connectionsModel->item(row, 1)->text());
+    url.setPort(m_connectionsModel->item(row, 2)->text().toInt());
     url.setUserName(m_connectionsModel->item(row, 3)->text());
     url.setPassword(m_connectionsModel->item(row, 4)->text());
 
@@ -292,7 +288,7 @@ void LoginDialog::at_testButton_clicked()
 
     if (!url.isValid())
     {
-        QMessageBox::warning(this, tr("Invalid paramters"), tr("The information you have entered is not valid."));
+        QMessageBox::warning(this, tr("Invalid parameters"), tr("The information you have entered is not valid."));
         return;
     }
 

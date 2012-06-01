@@ -6,9 +6,8 @@
 #include <QtGui/QStandardItemModel>
 
 #include <api/SessionManager.h>
-
-#include "core/resource/resource.h"
-#include "ui/style/skin.h"
+#include <utils/common/warnings.h>
+#include <core/resource/resource.h>
 
 #include "utils/settings.h"
 
@@ -18,6 +17,8 @@ QnConnectionTestingDialog::QnConnectionTestingDialog(const QUrl &url, QWidget *p
     m_timeoutTimer(this),
     m_url(url)
 {
+    qnDebug("Testing connectivity for URL '%1'.", url.toString());
+
     ui->setupUi(this);
 
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
