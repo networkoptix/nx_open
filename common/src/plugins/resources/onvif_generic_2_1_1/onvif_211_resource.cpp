@@ -52,6 +52,10 @@ struct VideoEncoders
 
 const QString QnPlOnvifGeneric211Resource::createOnvifEndpointUrl(const QString& ipAddress) {
     return ONVIF_PROTOCOL_PREFIX + ipAddress + ONVIF_URL_SUFFIX;
+    //return ONVIF_PROTOCOL_PREFIX + QString("10.10.10.73") + ONVIF_URL_SUFFIX;
+    //return ONVIF_PROTOCOL_PREFIX + QString("10.10.10.75") + ONVIF_URL_SUFFIX;
+    //return ONVIF_PROTOCOL_PREFIX + QString("10.10.10.12") + ONVIF_URL_SUFFIX;
+    //return ONVIF_PROTOCOL_PREFIX + QString("10.10.10.15") + ONVIF_URL_SUFFIX;
     //return ONVIF_PROTOCOL_PREFIX + QString("174.34.67.10") + ONVIF_URL_SUFFIX;
     //return ONVIF_PROTOCOL_PREFIX + QString("174.34.67.10") + ":81/onvif/device_service";
     //return ONVIF_PROTOCOL_PREFIX + QString("174.34.67.10") + ":82/onvif/device_service";
@@ -207,7 +211,7 @@ void QnPlOnvifGeneric211Resource::setMotionMaskPhysical(int channel)
 void QnPlOnvifGeneric211Resource::fetchAndSetDeviceInformation()
 {
     DeviceBindingProxy soapProxy;
-    QString endpoint(deviceUrl.isEmpty()? createOnvifEndpointUrl(): deviceUrl);
+    QString endpoint(deviceUrl);
 
     QAuthenticator auth(getAuth());
     std::string login(auth.user().toStdString());
@@ -252,7 +256,7 @@ void QnPlOnvifGeneric211Resource::fetchAndSetDeviceInformation()
 void QnPlOnvifGeneric211Resource::fetchAndSetVideoEncoderOptions()
 {
     MediaBindingProxy soapProxy;
-    QString endpoint(createOnvifEndpointUrl());
+    QString endpoint(mediaUrl);
 
     QAuthenticator auth(getAuth());
     std::string login(auth.user().toStdString());
@@ -589,7 +593,7 @@ int QnPlOnvifGeneric211Resource::countAppropriateProfiles(const _onvifMedia__Get
 
 bool QnPlOnvifGeneric211Resource::isSoapAuthorized() const {
     DeviceBindingProxy soapProxy;
-    QString endpoint(deviceUrl.isEmpty()? createOnvifEndpointUrl(): deviceUrl);
+    QString endpoint(deviceUrl);
 
     qDebug() << "QnPlOnvifGeneric211Resource::isSoapAuthorized: deviceUrl is '" << deviceUrl << "'";
 

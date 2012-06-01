@@ -57,12 +57,14 @@ const char* UBIQUITI_MANUFACTURER = "ubiquiti";
 
 bool PasswordHelper::isNotAuthenticated(const SOAP_ENV__Fault* faultInfo)
 {
+    qDebug() << "PasswordHelper::isNotAuthenticated: all fault info: " << SoapErrorHelper::fetchDescription(faultInfo);
+
     if (faultInfo && faultInfo->SOAP_ENV__Code && faultInfo->SOAP_ENV__Code->SOAP_ENV__Subcode) {
         QString subcodeValue(faultInfo->SOAP_ENV__Code->SOAP_ENV__Subcode->SOAP_ENV__Value);
         subcodeValue = subcodeValue.toLower();
         qDebug() << "PasswordHelper::isNotAuthenticated: gathered string: " << subcodeValue;
         return subcodeValue.indexOf("notauthorized") != -1 || subcodeValue.indexOf("not permitted") != -1
-                || subcodeValue.indexOf("operationprohibited") != -1;
+                || subcodeValue.indexOf("failedauthentication") != -1 || subcodeValue.indexOf("operationprohibited") != -1;
     }
 
     return false;

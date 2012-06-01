@@ -150,6 +150,10 @@ void OnvifResourceSearcher::checkSocket(QUdpSocket& sock, QnResourceList& result
             continue;
 
         nresource->setHostAddress(sender, QnDomainMemory);
+        //nresource->setHostAddress(QHostAddress("10.10.10.73"), QnDomainMemory);
+        //nresource->setHostAddress(QHostAddress("10.10.10.75"), QnDomainMemory);
+        //nresource->setHostAddress(QHostAddress("10.10.10.12"), QnDomainMemory);
+        //nresource->setHostAddress(QHostAddress("10.10.10.15"), QnDomainMemory);
         //nresource->setHostAddress(QHostAddress("174.34.67.10"), QnDomainMemory);
         //nresource->setHostAddress(QHostAddress("192.168.2.11"), QnDomainMemory);
         nresource->setDiscoveryAddr(localAddress);

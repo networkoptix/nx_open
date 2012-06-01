@@ -74,7 +74,7 @@ const QString QnOnvifGeneric211StreamReader::updateCameraAndfetchStreamUrl(bool 
     std::string passwd(auth.password().toStdString());
     if (!login.empty()) soap_register_plugin(soapProxy.soap, soap_wsse);
 
-    QString endpoint(m_onvifRes->createOnvifEndpointUrl());
+    QString endpoint(m_onvifRes->getMediaUrl());
     std::string profileToken;
 
     //Modifying appropriate profile (setting required values)
