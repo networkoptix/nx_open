@@ -285,7 +285,7 @@ void QnAviArchiveDelegate::close()
     }
 
     if (m_formatContext) 
-        avformat_free_context(m_formatContext);
+        avformat_close_input(&m_formatContext);
     
     m_contexts.clear();
     m_formatContext = 0;

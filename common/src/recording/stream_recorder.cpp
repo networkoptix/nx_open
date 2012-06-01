@@ -78,7 +78,7 @@ void QnStreamRecorder::close()
         }
 
         if (m_formatCtx) 
-            avformat_free_context(m_formatCtx);
+            avformat_close_input(&m_formatCtx);
         m_formatCtx = 0;
 
     }
