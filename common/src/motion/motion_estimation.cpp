@@ -32,13 +32,13 @@ static const unsigned char BitReverseTable256[] =
 static int sensitivityToMask[10] = 
 {
     255, //  0
-    64,
-    64,
-    48,
-    32,
     24,
+    20,
     18,
+    16,
     14,
+    12,
+    11,
     10,
     9, // 9
 
@@ -47,13 +47,13 @@ static int sensitivityToMask[10] =
 static const int MIN_SQUARE_BY_SENS[10] = 
 {
     INT_MAX, // motion mask: 0
-    sensitivityToMask[1]*32,
-    sensitivityToMask[2]*16,
-    sensitivityToMask[3]*8,
-    sensitivityToMask[4]*8,
-    sensitivityToMask[5]*4,
-    sensitivityToMask[6]*4,
-    sensitivityToMask[7]*2,
+    sensitivityToMask[1]*256,
+    sensitivityToMask[2]*128,
+    sensitivityToMask[3]*64,
+    sensitivityToMask[4]*32,
+    sensitivityToMask[5]*16,
+    sensitivityToMask[6]*8,
+    sensitivityToMask[7]*4,
     sensitivityToMask[8]*2,
     sensitivityToMask[9]*1, // max sens: 9
 };
@@ -442,12 +442,15 @@ QnMotionEstimation::QnMotionEstimation()
     m_frames[1]->setUseExternalData(false);
 
     m_scaledMask = 0; // mask scaled to x * MD_HEIGHT. for internal use
+    m_motionSensScaledMask = 0;
     m_frameBuffer[0] = m_frameBuffer[1] = 0;
+    m_filteredFrame = 0;
     m_scaledWidth = 0;
     m_xStep = 0; // 8, 16, 24 e.t.c value
     m_lastImgWidth = 0;
     m_lastImgHeight = 0;
     m_motionMask = 0;
+    m_motionSensMask = 0;
     m_totalFrames = 0;
     m_resultMotion = 0;
     m_firstFrameTime = AV_NOPTS_VALUE;
@@ -459,16 +462,19 @@ QnMotionEstimation::~QnMotionEstimation()
 {
     delete m_decoder;
     qFreeAligned(m_scaledMask);
+    qFreeAligned(m_motionSensScaledMask);
     qFreeAligned(m_frameBuffer[0]);
     qFreeAligned(m_frameBuffer[1]);
+    qFreeAligned(m_filteredFrame);
     qFreeAligned(m_motionMask);
+    qFreeAligned(m_motionSensMask);
     delete [] m_resultMotion;
     delete m_frames[0];
     delete m_frames[1];
 }
 
 // rescale motion mask width (mask rotated, so actually remove or duplicate some lines)
-void QnMotionEstimation::scaleMask()
+void QnMotionEstimation::scaleMask(quint8* mask, quint8* scaledMask)
 {
     float lineStep = m_scaledWidth / (float) MD_WIDTH;
     float scaledLineNum = 0;
@@ -476,8 +482,8 @@ void QnMotionEstimation::scaleMask()
     for (int y = 0; y < MD_WIDTH; ++y)
     {
         int iLineNum = (int) (scaledLineNum+0.5);
-        __m128i* dst = (__m128i*) (m_scaledMask + MD_HEIGHT*iLineNum);
-        __m128i* src = (__m128i*) (m_motionMask + MD_HEIGHT*y);
+        __m128i* dst = (__m128i*) (scaledMask + MD_HEIGHT*iLineNum);
+        __m128i* src = (__m128i*) (mask + MD_HEIGHT*y);
         if (iLineNum > prevILineNum) 
         {
             for (int i = 0; i < iLineNum - prevILineNum; ++i)
@@ -491,16 +497,18 @@ void QnMotionEstimation::scaleMask()
         scaledLineNum += lineStep;
     }
     
-    __m128i* mask = (__m128i*) m_scaledMask;
-     for (int i = 0; i < m_scaledWidth*2; ++i)
-        mask[i] = _mm_sub_epi8(mask[i], sse_0x80_const); // SSE2
+    //__m128i* curPtr = (__m128i*) mask;
+     //for (int i = 0; i < m_scaledWidth*2; ++i)
+     //   curPtr[i] = _mm_sub_epi8(curPtr[i], sse_0x80_const); // SSE2
 }
 
 void QnMotionEstimation::reallocateMask(int width, int height)
 {
     qFreeAligned(m_scaledMask);
+    qFreeAligned(m_motionSensScaledMask);
     qFreeAligned(m_frameBuffer[0]);
     qFreeAligned(m_frameBuffer[1]);
+    qFreeAligned(m_filteredFrame);
     delete [] m_resultMotion;
 
     m_lastImgWidth = width;
@@ -511,102 +519,138 @@ void QnMotionEstimation::reallocateMask(int width, int height)
         m_xStep -= 8;
     m_scaledWidth = m_lastImgWidth / m_xStep;
     m_scaledMask = (quint8*) qMallocAligned(MD_HEIGHT * m_scaledWidth, 32);
+    m_motionSensScaledMask = (quint8*) qMallocAligned(MD_HEIGHT * m_scaledWidth, 32);
     m_frameBuffer[0] = (quint8*) qMallocAligned(MD_HEIGHT * m_scaledWidth, 32);
     m_frameBuffer[1] = (quint8*) qMallocAligned(MD_HEIGHT * m_scaledWidth, 32);
+    m_filteredFrame = (quint8*) qMallocAligned(MD_HEIGHT * m_scaledWidth, 32);
     m_resultMotion = new quint32[MD_HEIGHT/4 * m_scaledWidth];
     memset(m_resultMotion, 0, MD_HEIGHT * m_scaledWidth);
 
     // scale motion mask to scaled size
-    if (m_scaledWidth != MD_WIDTH)
-        scaleMask();
-    else
+    if (m_scaledWidth != MD_WIDTH) {
+        scaleMask(m_motionMask, m_scaledMask);
+        scaleMask(m_motionSensMask, m_motionSensScaledMask);
+    }
+    else {
         memcpy(m_scaledMask, m_motionMask, MD_WIDTH * MD_HEIGHT);
+        memcpy(m_motionSensScaledMask, m_motionSensMask, MD_WIDTH * MD_HEIGHT);
+    }
     m_isNewMask = false;
 }
 
 void QnMotionEstimation::analizeMotionAmount(quint8* frame)
 {
     // 1. filtering. If a lot of motion around current pixel, mark it too, also remove motion if diff < mask
-
     quint8* curPtr = frame;
-    const quint8* maskPtr = m_motionMask;
+    quint8* dstPtr = m_filteredFrame;
+    const quint8* maskPtr = m_scaledMask;
 
-    curPtr += m_scaledWidth;
-    maskPtr += m_scaledWidth;
+    for (int y = 0; y < MD_HEIGHT; ++y) {
+        *dstPtr = *curPtr <= *maskPtr ? 0 : *curPtr;
+        curPtr++;
+        maskPtr++;
+        dstPtr++;
+    }
+
     for (int x = 1; x < m_scaledWidth-1; ++x)
     {
+        *dstPtr = *curPtr <= *maskPtr ? 0 : *curPtr;
         curPtr++;
         maskPtr++;
+        dstPtr++;
         for (int y = 1; y < MD_HEIGHT-1; ++y)
         {
-            if (*curPtr < *maskPtr)
+            if (*curPtr <= *maskPtr)
             {
-                int aroundMotionAmount = (curPtr[-1] + curPtr[1] + curPtr[-m_scaledWidth] + curPtr[m_scaledWidth])*2 +
-                    curPtr[-1-m_scaledWidth] + curPtr[-1+m_scaledWidth] + curPtr[1-m_scaledWidth] + curPtr[1+m_scaledWidth];
-                if (aroundMotionAmount >= (int) *maskPtr * 6)
-                    *curPtr = *maskPtr;
+                int aroundMotionAmount =(int(curPtr[-1] > maskPtr[-1]) +
+                                         int(curPtr[1]  > maskPtr[-1]) +
+                                         int(curPtr[-MD_HEIGHT] >maskPtr[-MD_HEIGHT]) + 
+                                         int(curPtr[MD_HEIGHT] >maskPtr[MD_HEIGHT]))*2 +
+                                         int(curPtr[-1-MD_HEIGHT] >maskPtr[-1-MD_HEIGHT]) +
+                                         int(curPtr[-1+MD_HEIGHT] >maskPtr[-1+MD_HEIGHT]) +
+                                         int(curPtr[1-MD_HEIGHT] >maskPtr[1-MD_HEIGHT]) +
+                                         int(curPtr[1+MD_HEIGHT] >maskPtr[1+MD_HEIGHT]);
+                if (aroundMotionAmount >= 6)
+                    *dstPtr = *maskPtr;
                 else
-                    *curPtr = 0;
+                    *dstPtr = 0;
             }
+            else {
+                *dstPtr = *curPtr;
+            }
+
             curPtr++;
             maskPtr++;
+            dstPtr++;
         }
+        *dstPtr = *curPtr <= *maskPtr ? 0 : *curPtr;
         curPtr++;
         maskPtr++;
+        dstPtr++;
+    }
+
+    for (int y = 0; y < MD_HEIGHT; ++y) {
+        *dstPtr = *curPtr <= *maskPtr ? 0 : *curPtr;
+        curPtr++;
+        maskPtr++;
+        dstPtr++;
     }
 
     // 2. Determine linked areas
-    curPtr = frame;
     int currentLinkIndex = 1;
-    memset(m_linkedNums, 0, MD_HEIGHT * m_scaledWidth);
-    memset(m_linkedMap, 0, MD_HEIGHT * m_scaledWidth);
-    memset(m_linkedSquare, 0, MD_HEIGHT * m_scaledWidth);
+    memset(m_linkedNums, 0, sizeof(m_linkedNums));
+    memset(m_linkedSquare, 0, sizeof(m_linkedSquare));
+    for (int i = 0; i < MD_HEIGHT*m_scaledWidth/2;++i)
+        m_linkedMap[i] = i;
 
+    int idx = 0;
     // 2.1 top left pixel
-    if (*curPtr++)
+    if (m_filteredFrame[idx++])
         *m_linkedNums = currentLinkIndex++;
 
-    // 2.2 top line
-    for (int x = 1; x < m_scaledWidth; ++x) {
-        if (*curPtr) {
-            if (m_linkedNums[-1]) 
-                *m_linkedNums = m_linkedNums[-1];
+    // 2.2 left col
+    for (int y = 1; y < MD_HEIGHT; ++y, ++idx) {
+        if (m_filteredFrame[idx]) {
+            if (m_linkedNums[idx-1]) 
+                m_linkedNums[idx] = m_linkedNums[idx-1];
             else 
-                *m_linkedNums = currentLinkIndex++;
+                m_linkedNums[idx] = currentLinkIndex++;
         }
     }
 
-    for (int y = 1; y < MD_HEIGHT; ++y) 
+    for (int x = 1; x < m_scaledWidth; ++x)
     {
-        // 2.3 left pixel
-        if (*curPtr)
+        // 2.3 top pixel
+        if (m_filteredFrame[idx])
         {
-            if (m_linkedNums[-m_scaledWidth]) 
-                *m_linkedNums = m_linkedNums[-m_scaledWidth];
+            if (m_linkedNums[idx-MD_HEIGHT])
+                m_linkedNums[idx] = m_linkedNums[idx-MD_HEIGHT];
             else 
-                *m_linkedNums = currentLinkIndex++;
+                m_linkedNums[idx] = currentLinkIndex++;
         }
+        idx++;
         // 2.4 all other pixels
-        for (int x = 1; x < m_scaledWidth; ++x) 
+        for (int y = 1; y < MD_HEIGHT; ++y, ++idx)
         {
-            if (*curPtr)
+            if (m_filteredFrame[idx])
             {
-                if (m_linkedNums[-1]) {
-                    *m_linkedNums = m_linkedNums[-1];
-                    if (m_linkedNums[-m_scaledWidth] != *m_linkedNums)
-                        m_linkedMap[m_linkedNums[-m_scaledWidth]] = *m_linkedNums;
+                if (m_linkedNums[idx-1]) {
+                    m_linkedNums[idx] = m_linkedNums[idx-1];
+                    if (m_linkedNums[idx-MD_HEIGHT] && m_linkedNums[idx-MD_HEIGHT] != m_linkedNums[idx])
+                        m_linkedMap[m_linkedNums[idx]] = m_linkedNums[idx-MD_HEIGHT];
                 }
-                else if (m_linkedNums[-m_scaledWidth]) {
-                    *m_linkedNums = m_linkedNums[-m_scaledWidth];
+                else if (m_linkedNums[idx-MD_HEIGHT]) {
+                    m_linkedNums[idx] = m_linkedNums[idx-MD_HEIGHT];
                 }
                 else {
-                    *m_linkedNums = currentLinkIndex++;
+                    m_linkedNums[idx] = currentLinkIndex++;
                 }
             }
         }
     }
 
     // 3. path compression
+    m_linkedMap[0] = 0;
     for (int i = 1; i < currentLinkIndex; ++i)
     {
         if (m_linkedMap[m_linkedMap[i]])
@@ -615,24 +659,24 @@ void QnMotionEstimation::analizeMotionAmount(quint8* frame)
 
     // 4. merge linked areas
     for (int i = 0; i < MD_HEIGHT*m_scaledWidth; ++i)
-    {
-        if (m_linkedMap[m_linkedNums[i]])
-            m_linkedNums[i] = m_linkedMap[m_linkedNums[i]];
-    }
+        m_linkedNums[i] = m_linkedMap[m_linkedNums[i]];
 
     // 5. calculate square of each area
     for (int i = 0; i < MD_HEIGHT*m_scaledWidth; ++i)
     {
-        m_linkedSquare[m_linkedNums[i]] += frame[i];
+        m_linkedSquare[m_linkedNums[i]] += m_filteredFrame[i];
     }
 
     // 6. remove motion if motion square is not enough and write result to bitarray
-    for (int i = 0; i < MD_HEIGHT*m_scaledWidth/32;)
+    for (int i = 0; i < MD_HEIGHT*m_scaledWidth;)
     {
         quint32 data = 0;
-        for (int k = 0; k < 32; ++k, ++i)
-            data = (data << 1) + m_linkedSquare[m_linkedNums[i]] >= MIN_SQUARE_BY_SENS[m_motionMask[i]];
-        m_resultMotion[i/32] |= data;
+        for (int k = 0; k < 32; ++k, ++i) 
+        {
+            data = (data << 1) + int(m_linkedSquare[m_linkedNums[i]] > MIN_SQUARE_BY_SENS[m_motionSensScaledMask[i]]);
+            //data = (data << 1) + (int)(m_filteredFrame[i] >= m_scaledMask[i]);
+        }
+        m_resultMotion[i/32-1] |= htonl(data);
     }
 }
 
@@ -660,11 +704,16 @@ void QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
 
 #if 0
     // test
-    fillFrameRect(m_frames[idx], QRect(0,0,m_frames[idx]->width, m_frames[idx]->height), 130);
-    if (m_totalFrames % 2 == 1)
-        fillFrameRect(m_frames[idx], QRect(QPoint(0, 0), QPoint(m_frames[idx]->width, m_frames[idx]->height/2)), 40);
-    else
-        fillFrameRect(m_frames[idx], QRect(QPoint(0, m_frames[idx]->height/2), QPoint(m_frames[idx]->width, m_frames[idx]->height)), 40);
+    fillFrameRect(m_frames[idx], QRect(0,0,m_frames[idx]->width, m_frames[idx]->height), 225);
+    if (m_totalFrames % 2 == 1) {
+        fillFrameRect(m_frames[idx], QRect(QPoint(0, 20), QPoint(m_frames[idx]->width, 32)), 20);
+        fillFrameRect(m_frames[idx], QRect(QPoint(0, m_frames[idx]->height/2), QPoint(m_frames[idx]->width, m_frames[idx]->height/2+8)), 20);
+
+        fillFrameRect(m_frames[idx], QRect(QPoint(0, m_frames[idx]->height/2-8), QPoint(m_frames[idx]->width/4, m_frames[idx]->height/2)), 20);
+        fillFrameRect(m_frames[idx], QRect(QPoint(m_frames[idx]->width/2, m_frames[idx]->height/2-24), QPoint(m_frames[idx]->width*3/4, m_frames[idx]->height/2)), 20);
+    }
+    //else
+    //    fillFrameRect(m_frames[idx], QRect(QPoint(0, m_frames[idx]->height/2), QPoint(m_frames[idx]->width, m_frames[idx]->height)), 40);
 #endif
 
     if (m_decoder->getWidth() != m_lastImgWidth || m_decoder->getHeight() != m_lastImgHeight || m_isNewMask)
@@ -684,6 +733,7 @@ void QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
 
 
         analizeMotionAmount(m_frameBuffer[idx]);
+        
 
         /*
         __m128i* cur = (__m128i*) m_frameBuffer[idx];
@@ -698,6 +748,8 @@ void QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
             mask += 2;
         }
         */
+        
+        
     }
 #else
     // analize per macroblock diff
@@ -819,26 +871,21 @@ QnMetaDataV1Ptr QnMotionEstimation::getMotion()
     return rez;
 }
 
-void QnMotionEstimation::setMotionMask(const QByteArray& mask)
-{
-    QMutexLocker lock(&m_mutex);
-    Q_ASSERT(mask.size() == MD_WIDTH * MD_HEIGHT);
-    qFreeAligned(m_motionMask);
-    m_motionMask = (quint8*) qMallocAligned(MD_WIDTH * MD_HEIGHT, 32);
-    memcpy(m_motionMask, mask.data(), MD_WIDTH * MD_HEIGHT);
-    m_isNewMask = true;
-}
 
 bool QnMotionEstimation::existsMetadata() const
 {
     return m_lastFrameTime - m_firstFrameTime >= 300; // 30 ms agg period
 }
 
-QByteArray QnMotionEstimation::createSoftwareMotionMask(const QnMotionRegion& region)
+void QnMotionEstimation::setMotionMask(const QnMotionRegion& region)
 {
-    QByteArray rez;
-    rez.resize(MD_WIDTH * MD_HEIGHT);
-    memset(rez.data(), 255, MD_WIDTH * MD_HEIGHT);
+    QMutexLocker lock(&m_mutex);
+    qFreeAligned(m_motionMask);
+    qFreeAligned(m_motionSensMask);
+    m_motionMask = (quint8*) qMallocAligned(MD_WIDTH * MD_HEIGHT, 32);
+    m_motionSensMask = (quint8*) qMallocAligned(MD_WIDTH * MD_HEIGHT, 32);
+
+    memset(m_motionMask, 255, MD_WIDTH * MD_HEIGHT);
     for (int sens = QnMotionRegion::MIN_SENSITIVITY; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens)
     {
         foreach(const QRect& rect, region.getRectsBySens(sens))
@@ -847,12 +894,12 @@ QByteArray QnMotionEstimation::createSoftwareMotionMask(const QnMotionRegion& re
             {
                 for (int x = rect.left(); x <= rect.right(); ++x)
                 {
-                    rez.data()[x * MD_HEIGHT + y] = sensitivityToMask[sens];
-
+                    m_motionMask[x * MD_HEIGHT + y] = sensitivityToMask[sens];
+                    m_motionSensMask[x * MD_HEIGHT + y] = sens;
                 }
 
             }
         }
     }
-    return rez;
+    m_lastImgWidth = m_lastImgHeight = 0;
 }

@@ -51,12 +51,6 @@ m_softMotionLastChannel(0)
     //m_softwareMotion = true;
 
     m_timeSinceLastMetaData.restart();
-
-    char mask[MD_WIDTH * MD_HEIGHT];
-    memset(mask, 10, sizeof(mask));
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-        m_motionEstimation[i].setMotionMask(QByteArray(mask, sizeof(mask))); // default mask
-
     m_layout = 0;
 }
 
@@ -136,7 +130,7 @@ void QnLiveStreamProvider::updateSoftwareMotion()
         for (int i = 0; i < m_layout->numberOfChannels(); ++i)
         {
             QnMotionRegion region = res->getMotionRegion(i);
-            m_motionEstimation[i].setMotionMask(QnMotionEstimation::createSoftwareMotionMask(region));
+            m_motionEstimation[i].setMotionMask(region);
         }
     }
 }

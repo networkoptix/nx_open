@@ -30,7 +30,7 @@ class QnRtspTimeHelper
 public:
     QnRtspTimeHelper();
 
-    qint64 getUsecTime(quint32 rtpTime, const RtspStatistic& statistics, int rtpFrequency);
+    qint64 getUsecTime(quint32 rtpTime, const RtspStatistic& statistics, int rtpFrequency, bool recursiveAllowed = true);
     void reset();
 private:
     double cameraTimeToLocalTime(double cameraTime); // time in seconds since 1.1.1970

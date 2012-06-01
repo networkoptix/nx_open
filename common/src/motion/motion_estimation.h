@@ -15,15 +15,14 @@ public:
     * Set motion mask as array of quint8 values in range [0..255] . array size is MD_WIDTH * MD_HEIGHT
     * As motion data, motion mask is rotated to 90 degree.
     */
-    void setMotionMask(const QByteArray& mask);
+    void setMotionMask(const QnMotionRegion& region);
     //void analizeFrame(const CLVideoDecoderOutput* frame);
     void analizeFrame(QnCompressedVideoDataPtr frame);
     QnMetaDataV1Ptr getMotion();
     bool existsMetadata() const;
 
-    static QByteArray createSoftwareMotionMask(const QnMotionRegion& region);
 private:
-    void scaleMask();
+    void scaleMask(quint8* mask, quint8* scaledMask);
     void reallocateMask(int width, int height);
     void postFiltering();
     void analizeMotionAmount(quint8* frame);
@@ -33,12 +32,15 @@ private:
     CLVideoDecoderOutput* m_frames[2];
     
     quint8* m_motionMask;
+    quint8* m_motionSensMask;
     quint8* m_scaledMask; // mask scaled to x * MD_HEIGHT. for internal use
+    quint8* m_motionSensScaledMask;
     int m_scaledWidth;
     int m_xStep; // 8, 16, 24 e.t.c value
     int m_lastImgWidth;
     int m_lastImgHeight;
     quint8* m_frameBuffer[2];
+    quint8* m_filteredFrame;
     quint32* m_resultMotion;
     qint64 m_firstFrameTime;
     qint64 m_lastFrameTime;
