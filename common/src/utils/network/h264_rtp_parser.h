@@ -14,7 +14,7 @@ class CLH264RtpParser: public QnRtpStreamParser
 public:
     CLH264RtpParser();
     virtual ~CLH264RtpParser();
-    virtual void CLH264RtpParser::setSDPInfo(QList<QByteArray> lines) override;
+    virtual void setSDPInfo(QList<QByteArray> lines) override;
 
     virtual bool processData(quint8* rtpBuffer, int readed, const RtspStatistic& statistics, QList<QnAbstractMediaDataPtr>& result) override;
 private:
