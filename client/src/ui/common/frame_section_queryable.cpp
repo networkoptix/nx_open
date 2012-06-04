@@ -45,14 +45,14 @@ Qt::WindowFrameSection Qn::toNaturalQtFrameSection(Qn::WindowFrameSections secti
 }
 
 Qn::WindowFrameSection Qn::toQnFrameSection(Qt::WindowFrameSection section) {
-    return static_cast<Qn::WindowFrameSection>(1 << (section - 1));
+    return static_cast<Qn::WindowFrameSection>(1 << section);
 }
 
 Qt::WindowFrameSection Qn::toQtFrameSection(Qn::WindowFrameSection section) {
     if(section == Qn::NoSection)
         return Qt::NoSection; /* qIntegerLog2's result is undefined if input is zero. */
 
-    Qt::WindowFrameSection result = static_cast<Qt::WindowFrameSection>(qIntegerLog2(section) + 1);
+    Qt::WindowFrameSection result = static_cast<Qt::WindowFrameSection>(qIntegerLog2(section));
 
     if(toQnFrameSection(result) != section) {
         qnWarning("Invalid Qn::WindowFrameSection '%1'.", static_cast<int>(section));
