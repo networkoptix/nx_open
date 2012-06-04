@@ -1,8 +1,8 @@
 #ifndef QN_FRAME_SECTION_QUERYABLE_H
 #define QN_FRAME_SECTION_QUERYABLE_H
 
-#include <Qt>
-#include <QRectF>
+#include <QtCore/Qt>
+#include <QtCore/QRectF>
 
 namespace Qn {
     /**
