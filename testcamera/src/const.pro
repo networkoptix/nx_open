@@ -2,12 +2,6 @@ INCLUDEPATH += ../../common/src
 
 INCLUDEPATH += ../../common/contrib/qjson/include
 
-win* {
-    INCLUDEPATH += $$PWD/../../common/contrib/openssl/include
-    INCLUDEPATH += ../../common/contrib/ffmpeg-misc-headers-win32
-    LIBS += -L$$PWD/../../common/contrib/openssl/bin -llibeay32
-}
-
 QT = core gui network xml opengl multimedia webkit
 CONFIG += console precompile_header
 CONFIG -= flat app_bundle

@@ -49,6 +49,9 @@ Qn::WindowFrameSection Qn::toQnFrameSection(Qt::WindowFrameSection section) {
 }
 
 Qt::WindowFrameSection Qn::toQtFrameSection(Qn::WindowFrameSection section) {
+    if(section == Qn::NoSection)
+        return Qt::NoSection; /* qIntegerLog2's result is undefined if input is zero. */
+
     Qt::WindowFrameSection result = static_cast<Qt::WindowFrameSection>(qIntegerLog2(section) + 1);
 
     if(toQnFrameSection(result) != section) {
