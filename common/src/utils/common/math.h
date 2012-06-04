@@ -145,6 +145,7 @@ inline int qIntegerLog2(quint32 value) {
     return 31 - __builtin_clz(value);
 }
 #elif defined(_MSC_VER)
+#   include <intrin.h>
 #   pragma intrinsic(_BitScanReverse)
 inline int qIntegerLog2(quint32 value) {
     unsigned long result;             /* MSVC intrinsic demands this type. */
