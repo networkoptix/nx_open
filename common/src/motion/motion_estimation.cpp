@@ -315,10 +315,9 @@ void getFrame_avgY_array_16_x_mc(const CLVideoDecoderOutput* frame, quint8* dst)
 
 void getFrame_avgY_array_x_x(const CLVideoDecoderOutput* frame, const CLVideoDecoderOutput* prevFrame, quint8* dst, int sqWidth)
 {
-#define flushData() \
+#define flushData(pixels) \
 {\
-    int pixels = rowCnt * sqWidth;\
-    *dstCurLine = squareSum / pixels;\
+    *dstCurLine = squareSum / (pixels);\
     squareStep = 0;\
     squareSum = 0;\
     dstCurLine += MD_HEIGHT;\
@@ -371,15 +370,15 @@ void getFrame_avgY_array_x_x(const CLVideoDecoderOutput* frame, const CLVideoDec
             squareSum += _mm_cvtsi128_si32(blockSum); // SSE2
             squareStep++;
             if (squareStep == sqWidthSteps)
-                flushData();
+                flushData(rowCnt * sqWidth);
             squareSum += _mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)); // SSE2
             squareStep++;
             if (squareStep == sqWidthSteps)
-                flushData();
+                flushData(rowCnt * sqWidth);
             
         }
         if (squareStep)
-            flushData();
+            flushData(rowCnt * squareStep*8);
         curLineNum = nextLineNum;
         curLinePtr += lineSize*rowCnt;
         prevLinePtr += lineSize*rowCnt;
@@ -537,6 +536,8 @@ void QnMotionEstimation::reallocateMask(int width, int height)
     if (m_lastImgWidth/m_xStep <= (MD_WIDTH*3)/4 && m_xStep > 8)
         m_xStep -= 8;
     m_scaledWidth = m_lastImgWidth / m_xStep;
+    if (m_lastImgWidth > m_scaledWidth*m_xStep)
+        m_scaledWidth++;
     m_scaledMask = (quint8*) qMallocAligned(MD_HEIGHT * m_scaledWidth, 32);
     m_motionSensScaledMask = (quint8*) qMallocAligned(MD_HEIGHT * m_scaledWidth, 32);
     m_frameBuffer[0] = (quint8*) qMallocAligned(MD_HEIGHT * m_scaledWidth, 32);
