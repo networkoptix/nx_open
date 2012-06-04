@@ -69,6 +69,19 @@ quint32 reverseBits(quint32 v)
         (BitReverseTable256[(v >> 24) & 0xff] << 24);
 }
 
+inline bool isMotionAt(const quint8* data, int x, int y)
+{
+    int shift = x*MD_HEIGHT + y;
+    return data[shift/8] & (128 >> (shift&7));
+}
+
+inline void setMotionAt(quint8* data, int x, int y) 
+{
+    int shift = x*MD_HEIGHT + y;
+    data[shift/8] |= (128 >> (shift&7));
+}
+
+
 // for test
 void fillFrameRect(CLVideoDecoderOutput* frame, const QRect& rect, quint8 value)
 {
@@ -689,8 +702,8 @@ void QnMotionEstimation::analizeMotionAmount(quint8* frame)
         quint32 data = 0;
         for (int k = 0; k < 32; ++k, ++i) 
         {
-            //data = (data << 1) + int(m_linkedSquare[m_linkedNums[i]] > MIN_SQUARE_BY_SENS[m_motionSensScaledMask[i]]);
-            data = (data << 1) + (int)(m_filteredFrame[i] >= m_scaledMask[i]);
+            data = (data << 1) + int(m_linkedSquare[m_linkedNums[i]] > MIN_SQUARE_BY_SENS[m_motionSensScaledMask[i]]);
+            //data = (data << 1) + (int)(m_filteredFrame[i] >= m_scaledMask[i]);
         }
         m_resultMotion[i/32-1] |= htonl(data);
     }
@@ -801,19 +814,6 @@ void QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
 #endif
     if (m_totalFrames == 0)
         m_totalFrames++;
-}
-
-
-inline bool isMotionAt(const quint8* data, int x, int y)
-{
-    int shift = x*MD_HEIGHT + y;
-    return data[shift/8] & (128 >> (shift&7));
-}
-
-inline void setMotionAt(quint8* data, int x, int y) 
-{
-    int shift = x*MD_HEIGHT + y;
-    data[shift/8] |= (128 >> (shift&7));
 }
 
 void QnMotionEstimation::postFiltering()
