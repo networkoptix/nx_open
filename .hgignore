@@ -38,7 +38,7 @@ appserver/setup/stage-env
 appserver/version.py
 appserver/setup/version.py
 appserver/entcontroller.conf
-appserver/setup/build 
+appserver/setup/build
 appserver/version_maven.py
 
 build
@@ -58,7 +58,7 @@ client/x64
 
 client/contrib/bespin/debug
 client/contrib/bespin/release
-client/contrib/bespin/Makefile* 
+client/contrib/bespin/Makefile*
 
 client/contrib/qtcolorpicker/Makefile*
 client/contrib/qtcolorpicker/buildlib
@@ -125,3 +125,4 @@ debsetup/mediaserver/x64
 debsetup/appserver/package
 debsetup/appserver/x86
 debsetup/appserver/x64
+cpp/x86/version.h
