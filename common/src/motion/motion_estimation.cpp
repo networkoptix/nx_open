@@ -32,7 +32,7 @@ static const unsigned char BitReverseTable256[] =
 static int sensitivityToMask[10] = 
 {
     255, //  0
-    24,
+    64,
     20,
     18,
     16,
@@ -248,7 +248,7 @@ void getFrame_avgY_array_16_x(const CLVideoDecoderOutput* frame, const CLVideoDe
             int pixels = rowCnt * 16;
             *dstCurLine = (_mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)) + _mm_cvtsi128_si32(blockSum)) / pixels; // SSE2
             dstCurLine += MD_HEIGHT;
-        }  
+        }
         curLineNum = nextLineNum;
         curLinePtr += lineSize*rowCnt;
         prevLinePtr += lineSize*rowCnt;
@@ -310,10 +310,14 @@ void getFrame_avgY_array_x_x(const CLVideoDecoderOutput* frame, const CLVideoDec
     squareSum = 0;\
     dstCurLine += MD_HEIGHT;\
 }
+
+    quint8* dstOrig = dst;
+
     Q_ASSERT(frame->width % 16 == 0);
     Q_ASSERT(frame->linesize[0] % 16 == 0);
-    Q_ASSERT(sqWidth % 8 == 0);
-    sqWidth /= 8;
+    Q_ASSERT(sqWidth % 16 == 0);
+    
+    int sqWidthSteps = sqWidth / 16;
 
     const __m128i* curLinePtr = (const __m128i*) frame->data[0];
     const __m128i* prevLinePtr = (const __m128i*) prevFrame->data[0];
@@ -339,25 +343,51 @@ void getFrame_avgY_array_x_x(const CLVideoDecoderOutput* frame, const CLVideoDec
             blockSum = _mm_xor_si128(blockSum, blockSum); // SSE2
             const __m128i* src = linePtr;
             const __m128i* src2 = linePtr2;
-            for (int i = 0; i < rowCnt;)
+            for (int i = 0; i < rowCnt; ++i)
             {
                 __m128i partSum = _mm_sad_epu8(*src, *src2); // src 16 bytes sum // SSE2
                 src += lineSize;
                 src2 += lineSize;
-                ++i;
                 blockSum = _mm_add_epi32(blockSum, partSum); // SSE2
             }
             linePtr++;
             linePtr2++;
 
+            /*
             // get avg value
             squareSum += _mm_cvtsi128_si32(blockSum); // SSE2
             squareStep++;
-            if (squareStep == sqWidth)
+            if (squareStep == sqWidthSteps)
                 flushData();
             squareSum += _mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)); // SSE2
-            if (squareStep == sqWidth)
+            if (squareStep == sqWidthSteps)
                 flushData();
+            */
+
+            squareSum += (_mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)) + _mm_cvtsi128_si32(blockSum));
+            squareStep++;
+            if (squareStep == sqWidthSteps) 
+            {
+                int pixels = rowCnt * sqWidth;
+                *dstCurLine = squareSum / pixels; // SSE2
+                squareStep = 0;
+                squareSum = 0;
+                dstCurLine += MD_HEIGHT;
+            }
+
+            /*
+            // get avg value
+            int pixels = rowCnt * 16;
+            *dstCurLine = (_mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)) + _mm_cvtsi128_si32(blockSum)) / pixels; // SSE2
+            dstCurLine += MD_HEIGHT;
+
+            // get avg value
+            int pixels = rowCnt * 8;
+            *dstCurLine = _mm_cvtsi128_si32(blockSum) / pixels; // SSE2
+            dstCurLine[MD_HEIGHT] = _mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)) / pixels; // SSE2
+            dstCurLine += MD_HEIGHT*2;
+            */
+
         }
         if (squareStep)
             flushData();
@@ -683,8 +713,8 @@ void QnMotionEstimation::analizeMotionAmount(quint8* frame)
         quint32 data = 0;
         for (int k = 0; k < 32; ++k, ++i) 
         {
-            data = (data << 1) + int(m_linkedSquare[m_linkedNums[i]] > MIN_SQUARE_BY_SENS[m_motionSensScaledMask[i]]);
-            //data = (data << 1) + (int)(m_filteredFrame[i] >= m_scaledMask[i]);
+            //data = (data << 1) + int(m_linkedSquare[m_linkedNums[i]] > MIN_SQUARE_BY_SENS[m_motionSensScaledMask[i]]);
+            data = (data << 1) + (int)(m_filteredFrame[i] >= m_scaledMask[i]);
         }
         m_resultMotion[i/32-1] |= htonl(data);
     }
@@ -873,6 +903,10 @@ QnMetaDataV1Ptr QnMotionEstimation::getMotion()
         prevILineNum = iLineNum;
         scaledLineNum += lineStep;
     }
+    for (int y = MD_WIDTH-4; y < MD_WIDTH; ++y) {
+        dst[y] = 0;
+    }
+
 
     memset(m_resultMotion, 0, MD_HEIGHT * m_scaledWidth);
     m_firstFrameTime = m_lastFrameTime;
