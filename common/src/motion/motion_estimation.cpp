@@ -73,10 +73,12 @@ class SadTransformInit
             return 0;
         
         double newValue;
-        if (value < 40)
-            newValue = std::pow((double)value, 1.4);
+        if (value < 32)
+            newValue = std::pow((double)value, 1.40);
+        else if (value < 80)
+            newValue = std::pow((double)value, 1.41);
         else
-            newValue = std::pow((double)value, 1.5);
+            newValue = std::pow((double)value, 1.45);
         /*
         if (value < 7)
             return 0;
@@ -102,7 +104,7 @@ class SadTransformInit
 public:
     SadTransformInit()  
     {
-#if 1
+#ifdef DEBUG_TRANSFORM
         // debug
         for (int i = 0; i < 256; ++i)
         {
@@ -430,7 +432,11 @@ void getFrame_avgY_array_x_x(const CLVideoDecoderOutput* frame, const CLVideoDec
     squareStep = 0;\
     squareSum = 0;\
     dstCurLine += MD_HEIGHT;\
+    gggMatrixCnt = 0; \
 }
+    quint8 gggMatrix[48*48];
+    int gggMatrixCnt = 0;
+
 
     quint8* dstOrig = dst;
 
@@ -467,6 +473,12 @@ void getFrame_avgY_array_x_x(const CLVideoDecoderOutput* frame, const CLVideoDec
             {
                 //__m128i partSum = _mm_sad_epu8(*src, *src2); // src 16 bytes sum // SSE2
                 __m128i partSum = advanced_sad_x_x(*src, *src2);
+                for (int k = 0; k < 16; ++k)
+                {
+                    const quint8* src1GG = (const quint8*) src;
+                    const quint8* src2GG = (const quint8*) src2;
+                    gggMatrix[gggMatrixCnt++] = qMax(*src2GG, *src1GG) - qMin(*src2GG, *src1GG);
+                }
                 src += lineSize;
                 src2 += lineSize;
                 blockSum = _mm_add_epi32(blockSum, partSum); // SSE2
@@ -484,8 +496,15 @@ void getFrame_avgY_array_x_x(const CLVideoDecoderOutput* frame, const CLVideoDec
 
 
             squareStep++;
-            if (squareStep == sqWidthSteps)
+            if (squareStep == sqWidthSteps) {
+                if (squareSum/(rowCnt * sqWidth) >= 10 && (dstCurLine - dst)/32 == 20 && y == 4)
+                {
+                    int xCoord = (dstCurLine - dst)/32;
+                    int yCoord = 4;
+                
+                }
                 flushData(rowCnt * sqWidth);
+            }
             
         }
         if (squareStep)
@@ -586,13 +605,15 @@ QnMotionEstimation::QnMotionEstimation()
     m_lastFrameTime = AV_NOPTS_VALUE;
     m_isNewMask = false;
     
+#ifdef DEBUG_TRANSFORM
     static int gg = 0;
     if (gg == 0)
     {
         gg = 1;
         SadTransformInit gg;
-        int ff = 1;
+        int gg2 = 1;
     }
+#endif
 }
 
 QnMotionEstimation::~QnMotionEstimation()
@@ -823,8 +844,21 @@ void QnMotionEstimation::analizeMotionAmount(quint8* frame)
         m_linkedSquare[m_linkedNums[i]] += m_filteredFrame[i];
     }
 
-    // 6. remove motion if motion square is not enough and write result to bitarray
+    for (int i = 1; i < currentLinkIndex; ++i)
+    {
+        if (m_linkedSquare[i] >= 20 && m_linkedSquare[i] <= 50)
+        {
+            // print square.
+            qDebug() << "-determine square size" << m_linkedSquare[i];
+            for (int k = 0; k < MD_HEIGHT*m_scaledWidth; ++k)
+            {
+                if (m_linkedNums[k] == i)
+                    qDebug() << "---- square data at" << k/MD_HEIGHT << 'x' << k%MD_HEIGHT << "=" << m_filteredFrame[k];
+            }
+        }
+    }
 
+    // 6. remove motion if motion square is not enough and write result to bitarray
     for (int i = 0; i < MD_HEIGHT*m_scaledWidth;)
     {
         quint32 data = 0;

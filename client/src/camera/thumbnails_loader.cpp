@@ -52,6 +52,8 @@ QnTimePeriod QnThumbnailsLoader::loadedRange() const
 
 void QnThumbnailsLoader::loadRange(qint64 startTimeMs, qint64 endTimeMs, qint64 stepMs)
 {
+    return;
+
     QMutexLocker locker(&m_mutex);
     QnTimePeriod oldPeriod(m_startTime, m_endTime - m_startTime);
     QnTimePeriod newPeriod(startTimeMs, endTimeMs - startTimeMs);
