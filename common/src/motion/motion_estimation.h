@@ -50,6 +50,7 @@ private:
     int m_linkedMap[MD_WIDTH*MD_HEIGHT];
     int m_linkedNums[MD_WIDTH*MD_HEIGHT];
     int m_linkedSquare[MD_WIDTH*MD_HEIGHT];
+    //quint8 m_sadTransformMatrix[10][256];
 };
 
 #endif // __MOTION_ESTIMATION_H__

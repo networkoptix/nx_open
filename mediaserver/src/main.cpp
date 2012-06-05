@@ -671,6 +671,7 @@ void stopServer(int signal)
 
 int main(int argc, char* argv[])
 {
+
     QnVideoService service(argc, argv);
 
     int result = service.exec();
