@@ -1,6 +1,9 @@
 #include "frame_section_queryable.h"
-#include <QRectF>
+
+#include <QtCore/QRectF>
+
 #include <utils/common/warnings.h>
+#include <utils/common/math.h>
 
 Qt::WindowFrameSection Qn::toNaturalQtFrameSection(Qn::WindowFrameSections sections) {
     if(sections == 0) { /* Filter out the most common case first. */
@@ -42,25 +45,21 @@ Qt::WindowFrameSection Qn::toNaturalQtFrameSection(Qn::WindowFrameSections secti
 }
 
 Qn::WindowFrameSection Qn::toQnFrameSection(Qt::WindowFrameSection section) {
-    return static_cast<Qn::WindowFrameSection>(1 << (section - 1));
+    return static_cast<Qn::WindowFrameSection>(1 << section);
 }
 
 Qt::WindowFrameSection Qn::toQtFrameSection(Qn::WindowFrameSection section) {
-    switch(section) {
-    case Qn::NoSection:             return Qt::NoSection;
-    case Qn::LeftSection:           return Qt::LeftSection;
-    case Qn::TopLeftSection:        return Qt::TopLeftSection;
-    case Qn::TopSection:            return Qt::TopSection;
-    case Qn::TopRightSection:       return Qt::TopRightSection;
-    case Qn::RightSection:          return Qt::RightSection;
-    case Qn::BottomRightSection:    return Qt::BottomRightSection;
-    case Qn::BottomSection:         return Qt::BottomSection;
-    case Qn::BottomLeftSection:     return Qt::BottomLeftSection;
-    case Qn::TitleBarArea:          return Qt::TitleBarArea;
-    default:
+    if(section == Qn::NoSection)
+        return Qt::NoSection; /* qIntegerLog2's result is undefined if input is zero. */
+
+    Qt::WindowFrameSection result = static_cast<Qt::WindowFrameSection>(qIntegerLog2(section));
+
+    if(toQnFrameSection(result) != section) {
         qnWarning("Invalid Qn::WindowFrameSection '%1'.", static_cast<int>(section));
         return Qt::NoSection;
     }
+
+    return result;
 }
 
 namespace {
