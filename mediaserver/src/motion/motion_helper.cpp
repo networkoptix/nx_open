@@ -108,7 +108,12 @@ QList<QDate> QnMotionHelper::recordedMonth(const QString& macAddress)
         QList<QFileInfo> monthDirs = yearDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Dirs);
         foreach(const QFileInfo& fiMonth, monthDirs)
         {
-            rez << QDate(fiYear.baseName().toInt(), fiMonth.baseName().toInt(), 1);
+			QDir monthDir(fiMonth.absoluteFilePath());
+			if (!monthDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files).isEmpty())
+				rez << QDate(fiYear.baseName().toInt(), fiMonth.baseName().toInt(), 1);
+			else {
+				monthDir.remove(fiMonth.absoluteFilePath());
+			}
         }
     }
     return rez;
