@@ -183,17 +183,6 @@ win32 {
 mac {
   LIBS += -framework IOKit -framework CoreServices
   LIBS += -lbz2
-
-  PRIVATE_FRAMEWORKS.files = ../resource/arecontvision
-  PRIVATE_FRAMEWORKS.path = Contents/MacOS
-  QMAKE_BUNDLE_DATA += PRIVATE_FRAMEWORKS
-
-  QMAKE_POST_LINK += mkdir -p `dirname $(TARGET)`/arecontvision; cp -f $$PWD/../resource/arecontvision/devices.xml `dirname $(TARGET)`/arecontvision
-
-#  QMAKE_CXXFLAGS += -DAPI_TEST_MAIN
-#  TARGET = consoleapp
-#  CONFIG   += console
-#  CONFIG   -= app_bundle
 }
 
 INCLUDEPATH += $$PWD
