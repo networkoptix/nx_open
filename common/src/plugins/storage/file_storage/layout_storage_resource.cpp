@@ -68,6 +68,13 @@ private:
 
 QIODevice* QnLayoutFileStorageResource::open(const QString& url, QIODevice::OpenMode openMode)
 {
+    if (getUrl().isEmpty()) {
+        int postfixPos = url.indexOf('?');
+        if (postfixPos == -1)
+            setUrl(url);
+        else
+            setUrl(url.left(postfixPos));
+    }
     QnLayoutFile* rez = new QnLayoutFile(*this, url);
     if (!rez->open(openMode))
     {
