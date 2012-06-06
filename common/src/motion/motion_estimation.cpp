@@ -583,7 +583,8 @@ QnMotionEstimation::QnMotionEstimation()
 
     m_scaledMask = 0; // mask scaled to x * MD_HEIGHT. for internal use
     m_motionSensScaledMask = 0;
-    m_frameBuffer[0] = m_frameBuffer[1] = 0;
+    for (int i = 0; i < FRAMES_BUFFER_SIZE; ++i)
+        m_frameBuffer[i] = 0;
     m_filteredFrame = 0;
     m_scaledWidth = 0;
     m_xStep = 0; // 8, 16, 24 e.t.c value
@@ -613,21 +614,14 @@ QnMotionEstimation::~QnMotionEstimation()
     delete m_decoder;
     qFreeAligned(m_scaledMask);
     qFreeAligned(m_motionSensScaledMask);
-    qFreeAligned(m_frameBuffer[0]);
-    qFreeAligned(m_frameBuffer[1]);
+    for (int i = 0; i < FRAMES_BUFFER_SIZE; ++i)
+        qFreeAligned(m_frameBuffer[i]);
     qFreeAligned(m_filteredFrame);
     qFreeAligned(m_motionMask);
     qFreeAligned(m_motionSensMask);
     delete [] m_resultMotion;
     delete m_frames[0];
     delete m_frames[1];
-
-    static int ggg = 0;
-    if (ggg == 0)
-    {
-        ggg = 1;
-        SadTransformInit test;
-    }
 }
 
 // rescale motion mask width (mask rotated, so actually remove or duplicate some lines)
@@ -663,8 +657,8 @@ void QnMotionEstimation::reallocateMask(int width, int height)
 {
     qFreeAligned(m_scaledMask);
     qFreeAligned(m_motionSensScaledMask);
-    qFreeAligned(m_frameBuffer[0]);
-    qFreeAligned(m_frameBuffer[1]);
+    for (int i = 0; i < FRAMES_BUFFER_SIZE; ++i)
+        qFreeAligned(m_frameBuffer[i]);
     qFreeAligned(m_filteredFrame);
     delete [] m_resultMotion;
 
@@ -878,8 +872,8 @@ void QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
         m_decoder->getContext()->flags |= CODEC_FLAG_GRAY;
     }
 
-    int idx = m_totalFrames % 2;
-    int prevIdx = (m_totalFrames-1) % 2;
+    int idx = m_totalFrames % FRAMES_BUFFER_SIZE;
+    int prevIdx = (m_totalFrames-1) % FRAMES_BUFFER_SIZE;
 
     if (!m_decoder->decode(videoData, m_frames[idx]))
         return;
@@ -1046,7 +1040,7 @@ QnMetaDataV1Ptr QnMotionEstimation::getMotion()
 
 bool QnMotionEstimation::existsMetadata() const
 {
-    return m_lastFrameTime - m_firstFrameTime >= 300; // 30 ms agg period
+    return m_lastFrameTime - m_firstFrameTime >= 300 * 1000; // 30 ms agg period
 }
 
 void QnMotionEstimation::setMotionMask(const QnMotionRegion& region)

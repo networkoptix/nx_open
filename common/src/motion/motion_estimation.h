@@ -6,6 +6,8 @@
 #include "decoders/video/ffmpeg.h"
 #include "core/resource/motion_window.h"
 
+static const int FRAMES_BUFFER_SIZE = 2;
+
 class QnMotionEstimation
 {
 public:
@@ -39,7 +41,7 @@ private:
     int m_xStep; // 8, 16, 24 e.t.c value
     int m_lastImgWidth;
     int m_lastImgHeight;
-    quint8* m_frameBuffer[2];
+    quint8* m_frameBuffer[FRAMES_BUFFER_SIZE];
     quint8* m_filteredFrame;
     quint32* m_resultMotion;
     qint64 m_firstFrameTime;
