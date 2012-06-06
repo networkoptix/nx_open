@@ -182,7 +182,7 @@ void saveFrame(quint8* data, int width, int height, int linesize, const QString&
     src.save(fileName);
 }
 
-inline __m128i advanced_sad_x_x(const __m128i src1, const __m128i src2)
+inline __m128i advanced_sad(const __m128i src1, const __m128i src2)
 {
 
     // get abs difference between frames
@@ -232,7 +232,7 @@ void getFrame_avgY_array_8_x(const CLVideoDecoderOutput* frame, const CLVideoDec
             for (int i = 0; i < rowCnt;)
             {
                 //__m128i partSum = _mm_sad_epu8(*src, zerroConst); // src 16 bytes sum
-                __m128i partSum = advanced_sad_x_x(*src, *srcPrev); // src 16 bytes sum // SSE2
+                __m128i partSum = advanced_sad(*src, *srcPrev); // src 16 bytes sum // SSE2
                 src += lineSize;
                 srcPrev += lineSize;
                 ++i;
@@ -333,7 +333,7 @@ void getFrame_avgY_array_16_x(const CLVideoDecoderOutput* frame, const CLVideoDe
             const __m128i* src2 = linePtr2;
             for (int i = 0; i < rowCnt;)
             {
-                __m128i partSum = advanced_sad_x_x(*src, *src2); // src 16 bytes sum // SSE2
+                __m128i partSum = advanced_sad(*src, *src2); // src 16 bytes sum // SSE2
                 src += lineSize;
                 src2 += lineSize;
                 ++i;
@@ -472,7 +472,7 @@ void getFrame_avgY_array_x_x(const CLVideoDecoderOutput* frame, const CLVideoDec
             for (int i = 0; i < rowCnt; ++i)
             {
                 //__m128i partSum = _mm_sad_epu8(*src, *src2); // src 16 bytes sum // SSE2
-                __m128i partSum = advanced_sad_x_x(*src, *src2);
+                __m128i partSum = advanced_sad(*src, *src2);
                 for (int k = 0; k < 16; ++k)
                 {
                     const quint8* src1GG = (const quint8*) src;
