@@ -2,12 +2,15 @@
 #define QN_INSTRUMENT_H
 
 #include <functional> /* For std::unary_function. */
-#include <QScopedPointer>
-#include <QObject>
-#include <QEvent> /* For QEvent::Type. */
-#include <QSet>
-#include <QList>
-#include <ui/common/scene_utility.h>
+
+#include <QtCore/QScopedPointer>
+#include <QtCore/QObject>
+#include <QtCore/QEvent> /* For QEvent::Type. */
+#include <QtCore/QSet>
+#include <QtCore/QList>
+
+#include <ui/common/geometry.h>
+#include <ui/common/scene_transformations.h>
 
 class QKeyEvent;
 class QMouseEvent;
@@ -117,7 +120,7 @@ namespace detail {
  * inside derived class's destructor if it reimplements either 
  * <tt>aboutToBeDisabledNotify()</tt> or <tt>aboutToBeUninstalledNotify()</tt>.
  */
-class Instrument: public QObject, protected SceneUtility {
+class Instrument: public QObject, protected QnGeometry, protected QnSceneTransformations {
     Q_OBJECT;
 
 public:
@@ -380,6 +383,12 @@ protected:
      * extension point cannot be called from the destructor of the base class.
      */
     void ensureUninstalled();
+
+    /**
+     * \param viewport                 Viewport. Must not be NULL and must actually be a viewport.
+     * \returns                        Graphics view of the given viewport.
+     */
+    static QGraphicsView *view(QWidget *viewport);
 
     /**
      * \param view                     Current view. Used to handle items that

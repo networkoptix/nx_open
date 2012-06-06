@@ -12,6 +12,8 @@
 
 #include "time_step.h"
 
+class QTimer;
+
 class QnThumbnailsLoader;
 class QnTimeSliderPixmapCache;
 
@@ -128,7 +130,9 @@ public:
     virtual QPointF positionFromValue(qint64 logicalValue, bool bound = true) const override;
     virtual qint64 valueFromPosition(const QPointF &position, bool bound = true) const override;
 
-    int thumbnailsHeight() const;
+    qreal thumbnailsHeight() const;
+    void setThumbnailsHeight(qreal thumbnailsHeight);
+
     QnThumbnailsLoader *thumbnailsLoader() const;
     void setThumbnailsLoader(QnThumbnailsLoader *value);
 
@@ -138,6 +142,7 @@ signals:
     void customContextMenuRequested(const QPointF &pos, const QPoint &screenPos);
     void selectionPressed();
     void selectionReleased();
+    void thumbnailsHeightChanged();
 
 protected:
     virtual void sliderChange(SliderChange change) override;
@@ -162,6 +167,8 @@ protected:
     virtual void dragMove(DragInfo *info) override;
     virtual void finishDrag(DragInfo *info) override;
 
+    virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint) const override;
+
     static QVector<QnTimeStep> createRelativeSteps();
     static QVector<QnTimeStep> createAbsoluteSteps();
     static QVector<QnTimeStep> enumerateSteps(const QVector<QnTimeStep> &steps);
@@ -176,6 +183,8 @@ private:
     Marker markerFromPosition(const QPointF &pos) const;
     QPointF positionFromMarker(Marker marker) const;
 
+    QRectF thumbnailsRect() const;
+    QRectF sliderRect() const;
     qreal effectiveLineStretch(int line) const;
 
     void setMarkerSliderPosition(Marker marker, qint64 position);
@@ -203,7 +212,8 @@ private:
     void updateAggregationValue();
     void updateAggregatedPeriods(int line, Qn::TimePeriodRole type);
     void updateTotalLineStretch();
-
+    void updateThumbnailsLater();
+    Q_SLOT void updateThumbnails();
 
     void animateStepValues(int deltaMSecs);
 
@@ -263,11 +273,11 @@ private:
     qreal m_animationUpdateMSecsPerPixel;
     QVector<qint64> m_nextTickmarkPos;
     QVector<QVector<QPointF> > m_tickmarkLines;
-    QHash<qint32, const QPixmap *> m_pixmapByPositionKey;
-    QHash<qint32, const QPixmap *> m_pixmapByHighlightKey;
-    QHash<QPair<QString, int>, const QPixmap *> m_pixmapByTextKey;
 
     QWeakPointer<QnThumbnailsLoader> m_thumbnailsLoader;
+    qreal m_thumbnailsHeight;
+    QTimer *m_thumbnailsUpdateTimer;
+
     QnTimeSliderPixmapCache *m_pixmapCache;
 };
 

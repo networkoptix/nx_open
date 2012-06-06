@@ -2,7 +2,7 @@
 #define QN_VIEWPORT_ANIMATOR_H
 
 #include <QObject>
-#include <ui/common/scene_utility.h>
+#include <ui/common/geometry.h>
 #include <ui/workbench/workbench_globals.h>
 #include "rect_animator.h"
 #include "viewport_geometry_accessor.h"

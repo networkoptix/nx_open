@@ -5,7 +5,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/checked_cast.h>
-#include <ui/common/scene_utility.h>
+#include <ui/common/geometry.h>
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/animation/variant_animator.h>
 #include "grid_highlight_item.h"
@@ -107,8 +107,8 @@ void QnGridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWid
     /* Draw! */
     QnScopedPainterPenRollback penRollback(painter, QPen(m_color, m_lineWidth));
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
-    QPointF topLeft = mapper()->mapFromGrid(gridRect.topLeft()) - SceneUtility::toPoint(mapper()->spacing()) / 2;
-    QPointF delta = SceneUtility::toPoint(mapper()->step());
+    QPointF topLeft = mapper()->mapFromGrid(gridRect.topLeft()) - QnGeometry::toPoint(mapper()->spacing()) / 2;
+    QPointF delta = QnGeometry::toPoint(mapper()->step());
 
     /* Vertical lines. */
     qreal x = topLeft.x();
@@ -205,7 +205,7 @@ void QnGridItem::setCellState(const QPoint &cell, int cellState) {
         data.item = newHighlightItem();
 
         qreal d =  m_lineWidth / 2; 
-        data.item->setRect(SceneUtility::dilated(mapper()->mapFromGrid(QRect(cell, cell)), mapper()->spacing() / 2).adjusted(d, d, -d, -d));
+        data.item->setRect(QnGeometry::dilated(mapper()->mapFromGrid(QRect(cell, cell)), mapper()->spacing() / 2).adjusted(d, d, -d, -d));
         setItemCell(data.item, cell);
     }
 

@@ -23,6 +23,10 @@ struct QnConnectionData {
         return !(*this == other);
     }
 
+    bool isValid() const {
+        return url.isValid() && !url.isRelative() && !url.host().isEmpty();
+    }
+
     QString name;
     QUrl url;
     bool readOnly;
