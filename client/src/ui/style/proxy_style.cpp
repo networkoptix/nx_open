@@ -5,19 +5,39 @@
 
 #include <utils/common/warnings.h>
 
-/* This object takes ownership of application styles. 
+/** 
+ * This class takes ownership of application styles. 
  * 
  * Proxy style cannot take ownership of application style because then application
  * style will be destroyed once the proxy style is destroyed.
  * 
- * In the same time, ownership of the application style must be transferred
+ * At the same time, ownership of the application style must be transferred
  * away from the application instance, since setting the global style to
- * proxy style will delete the current global style unless it is not
- * owned by the application instance.
+ * proxy style will delete the current global style if it is owned 
+ * by the application instance.
  *
  * Hence this little hack.
  */
-Q_GLOBAL_STATIC(QObject, styleStorage);
+class QnStyleStorage: public QObject {
+public:
+    QnStyleStorage(QObject *parent = NULL): QObject(parent) {}
+
+    virtual ~QnStyleStorage() {
+        if(!qApp)
+            return;
+
+        /* If application instance is still there, then we should transfer style
+         * ownership back so that it gets destroyed properly. */
+        foreach(QObject *child, children()) {
+            if(child == qApp->style()) {
+                child->setParent(qApp);
+                break;
+            }
+        }
+    }
+};
+
+Q_GLOBAL_STATIC(QnStyleStorage, styleStorage);
 
 QnProxyStyle::QnProxyStyle(QStyle *baseStyle, QObject *parent)
 {

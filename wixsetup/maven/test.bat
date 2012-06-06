@@ -22,12 +22,12 @@ CD %CURRENTDIR%
 start /B /WAIT msiexec /I "bin\${project.build.finalName}.msi" /qb- /Lv* "install.log" APPSERVER_PASSWORD="%EC_PASSWORD%" APPSERVER_PORT="%EC_PORT%" PROXY_PORT="%PROXY_PORT%" SERVER_APPSERVER_HOST="%EC_HOST%" SERVER_APPSERVER_PORT="%EC_PORT%" SERVER_APPSERVER_LOGIN="%EC_LOGIN%" SERVER_APPSERVER_PASSWORD="%EC_PASSWORD%" SERVER_RTSP_PORT="%SERVER_RTSP_PORT%" SERVER_API_PORT="%SERVER_API_PORT%" CLIENT_APPSERVER_HOST="%EC_HOST%" CLIENT_APPSERVER_PORT="%EC_PORT%" CLIENT_APPSERVER_LOGIN="%EC_LOGIN%" CLIENT_APPSERVER_PASSWORD="%EC_PASSWORD%" SERVER_DIRECTORY="%SERVER_DIRECTORY%"
 echo installer errorlevel is %ERRORLEVEL%
 
-cd "%VS90COMNTOOLS%\..\..\..\Network Optix\HD Witness\Client\"
+cd "%VS90COMNTOOLS%\..\..\..\${company.name}\${product.name}\Client\"
 
 rem ugly hack! --auth parameter is applied only in second launch!
-call client.exe --test-timeout 5000 --auth "http://%EC_LOGIN%:%EC_PASSWORD%@%EC_HOST%:%EC_PORT%" --test-resource-substring Server
+call client.exe --test-timeout 5000 --auth "https://%EC_LOGIN%:%EC_PASSWORD%@%EC_HOST%:%EC_PORT%" --test-resource-substring Server
 
-call client.exe --test-timeout 180000 --auth "http://%EC_LOGIN%:%EC_PASSWORD%@%EC_HOST%:%EC_PORT%" --test-resource-substring Server > test.txt
+call client.exe --test-timeout 180000 --auth "https://%EC_LOGIN%:%EC_PASSWORD%@%EC_HOST%:%EC_PORT%" --test-resource-substring Server > test.txt
 SET TESTRESULT=%ERRORLEVEL%
 echo test errorlevel is %TESTRESULT%
 

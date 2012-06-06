@@ -69,6 +69,7 @@ private:
 
     friend class QnAviAudioLayout;
     QnStorageResourcePtr m_storage;
+    AVIOContext* m_ioContext;
 };
 
 typedef QSharedPointer<QnAviArchiveDelegate> QnAviArchiveDelegatePtr;

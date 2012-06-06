@@ -192,6 +192,9 @@ bool QnMotionArchive::mathImage(const __m128i* data, const __m128i* mask, int ma
 
 QnTimePeriodList QnMotionArchive::mathPeriod(const QRegion& region, qint64 msStartTime, qint64 msEndTime, int detailLevel)
 {
+    if (minTime() != AV_NOPTS_VALUE)
+        msStartTime = qMax(minTime(), msStartTime);
+
     QnTimePeriodList rez;
     QFile motionFile, indexFile;
     quint8* buffer = (quint8*) qMallocAligned(MOTION_DATA_RECORD_SIZE * 1024, 32);

@@ -54,32 +54,13 @@ bool IsPortAvailable(int port)
     return bind_status == 0;
 }
 
-int NextFreePort(int startPort, int endPort)
+bool IsPortRangeAvailable(int firstPort, int count)
 {
-    unsigned short port;
-    for (port = startPort; port < endPort; port++) {
-        if (IsPortAvailable(port))
-            return port;
-    }
+    for (int port = firstPort; count; port++, count--)
+        if (!IsPortAvailable(port))
+            return false;
 
-    if (port == endPort) {
-        int serverfd = socket(AF_INET, SOCK_STREAM, 0);
-
-        sockaddr_in channel;
-        memset(&channel, 0, sizeof(channel));
-        channel.sin_family = AF_INET;
-        channel.sin_addr.s_addr = INADDR_ANY;
-
-        bind(serverfd, (sockaddr *) &channel, sizeof(channel));
-
-        socklen_t channellen;
-        getsockname(serverfd, (sockaddr*) &channel, &channellen);
-
-        port = ntohs(channel.sin_port);
-        closesocket(serverfd);
-    }
-
-    return port;
+    return true;
 }
 
 void InitWinsock()

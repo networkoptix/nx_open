@@ -110,7 +110,7 @@ QnRtspTimeHelper::QnRtspTimeHelper():
 double QnRtspTimeHelper::cameraTimeToLocalTime(double cameraTime)
 {
     if (m_cameraClockToLocalDiff == INT_MAX)  
-        m_cameraClockToLocalDiff = qnSyncTime->currentMSecsSinceEpoch()/1000.0 - cameraTime;;
+        m_cameraClockToLocalDiff = qnSyncTime->currentMSecsSinceEpoch()/1000.0 - cameraTime;
     return cameraTime + m_cameraClockToLocalDiff;
 }
 
@@ -119,7 +119,7 @@ void QnRtspTimeHelper::reset()
     m_cameraClockToLocalDiff == INT_MAX;
 }
 
-qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& statistics, int frequency)
+qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& statistics, int frequency, bool recursiveAllowed)
 {
     if (statistics.isEmpty())
         return qnSyncTime->currentMSecsSinceEpoch() * 1000;
@@ -127,11 +127,11 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& stati
         int rtpTimeDiff = rtpTime - statistics.timestamp;
         double resultInSecs = cameraTimeToLocalTime(statistics.nptTime) + rtpTimeDiff / double(frequency);
         double localTimeInSecs = qnSyncTime->currentMSecsSinceEpoch()/1000.0;
-        if (qAbs(localTimeInSecs - resultInSecs) < MAX_FRAME_DURATION/1000)
+        if (qAbs(localTimeInSecs - resultInSecs) < MAX_FRAME_DURATION/1000 || !recursiveAllowed)
             return resultInSecs * 1000000ll;
         else {
             reset();
-            return getUsecTime(rtpTime, statistics, frequency);
+            return getUsecTime(rtpTime, statistics, frequency, false);
         }
     }
 }
@@ -443,7 +443,7 @@ QList<QByteArray> RTPSession::getSdpByType(const QString& trackType) const
     QList<QByteArray> tmp = m_sdp.split('\n');
     
     int mapNum = -1;
-    for (TrackMap::iterator itr = m_sdpTracks.begin(); itr != m_sdpTracks.end(); ++itr)
+    for (TrackMap::const_iterator itr = m_sdpTracks.begin(); itr != m_sdpTracks.end(); ++itr)
     {
         if (getTrackType(itr.key()) == trackType)
             mapNum = itr.value()->mapNum;

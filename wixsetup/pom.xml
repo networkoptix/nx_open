@@ -27,7 +27,7 @@
 	<build>
 		<directory>${arch}</directory>
 		<sourceDirectory>${basedir}</sourceDirectory>
-		<finalName>${pom.parent.artifactId}-${project.version}.${buildNumber}-${platform}-${arch}-${build.configuration}-${customization}</finalName>
+		<finalName>${project.parent.artifactId}-${project.version}.${buildNumber}-${platform}-${arch}-${build.configuration}-${customization}</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>

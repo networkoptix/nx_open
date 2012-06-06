@@ -211,6 +211,7 @@ void SessionManager::doSendAsyncGetRequest(SessionManagerReplyProcessor* replyPr
 
     QNetworkReply* reply = m_accessManager->get(request);
     connect(reply, SIGNAL(finished()), replyProcessor, SLOT(at_replyReceived()));
+    connect(reply, SIGNAL(sslErrors(QList<QSslError>)), reply, SLOT(ignoreSslErrors()));
 }
 
 void SessionManager::doSendAsyncDeleteRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, int id, QObject *target, const char *slot, int handle)
@@ -232,6 +233,7 @@ void SessionManager::doSendAsyncDeleteRequest(SessionManagerReplyProcessor* repl
 
     QNetworkReply* reply = m_accessManager->deleteResource(request);
     connect(reply, SIGNAL(finished()), replyProcessor, SLOT(at_replyReceived()));
+    connect(reply, SIGNAL(sslErrors(QList<QSslError>)), reply, SLOT(ignoreSslErrors()));
 }
 
 int SessionManager::sendAsyncGetRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, QObject *target, const char *slot)
@@ -289,6 +291,7 @@ void SessionManager::doSendAsyncPostRequest(SessionManagerReplyProcessor* replyP
 
     QNetworkReply* reply = m_accessManager->post(request, data);
     connect(reply, SIGNAL(finished()), replyProcessor, SLOT(at_replyReceived()));
+    connect(reply, SIGNAL(sslErrors(QList<QSslError>)), reply, SLOT(ignoreSslErrors()));
 }
 
 int SessionManager::sendAsyncPostRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot)

@@ -14,8 +14,9 @@ static const int RTSP_FFMPEG_VIDEO_HEADER_SIZE = 3;
 static const int RTSP_FFMPEG_METADATA_HEADER_SIZE = 4;
 static const int MAX_RTP_PACKET_SIZE = 1024 * 8;
 
-struct RtspStatistic 
+class RtspStatistic 
 {
+public:
     RtspStatistic(): timestamp(0), nptTime(0), receivedPackets(0), receivedOctets(0) {}
     bool isEmpty() const { return timestamp == 0 && nptTime == 0; }
 
@@ -30,7 +31,7 @@ class QnRtspTimeHelper
 public:
     QnRtspTimeHelper();
 
-    qint64 getUsecTime(quint32 rtpTime, const RtspStatistic& statistics, int rtpFrequency);
+    qint64 getUsecTime(quint32 rtpTime, const RtspStatistic& statistics, int rtpFrequency, bool recursiveAllowed = true);
     void reset();
 private:
     double cameraTimeToLocalTime(double cameraTime); // time in seconds since 1.1.1970

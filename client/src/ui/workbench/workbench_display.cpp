@@ -12,8 +12,8 @@
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
-#include <utils/common/float.h>
 #include <utils/common/delete_later.h>
+#include <utils/common/math.h>
 
 #include <core/resource/layout_resource.h>
 #include <core/resourcemanagment/resource_pool.h>
