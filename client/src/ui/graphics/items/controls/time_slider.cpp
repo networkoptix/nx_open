@@ -917,6 +917,53 @@ void QnTimeSlider::updateTotalLineStretch() {
     updateLineCommentPixmaps();
 }
 
+void QnTimeSlider::updateThumbnailsLater() {
+    m_thumbnailsUpdateTimer->start(50);
+}
+
+void QnTimeSlider::updateThumbnails() {
+    m_thumbnailsUpdateTimer->stop();
+    if (!thumbnailsLoader())
+        return;
+
+    /* Don't load thumbnails too often. */
+    if (thumbnailsLoader()->currentMSecsSinceLastUpdate() < 500) {
+        updateThumbnailsLater();
+        return;
+    }
+
+    /* Update loader's bounding size. */
+    int boundingHeigth = qRound(m_thumbnailsHeight);
+    thumbnailsLoader()->setBoundingSize(QSize(boundingHeigth * 256, boundingHeigth));
+
+    /* Check actual thumbnail size. */
+    QSize size = thumbnailsLoader()->thumbnailSize();
+    if(size.isEmpty()) {
+        updateThumbnailsLater();
+        return; /* Not initialized yet. */
+    }
+
+    QnTimePeriod targetPeriod(m_windowStart, m_windowEnd - m_windowStart);
+    qint64 step = m_msecsPerPixel * size.width();
+
+    /* Maybe we don't need to send the request? Check that. */
+    if(thumbnailsLoader()->step() == step) {
+        QnTimePeriod loadedPeriod = thumbnailsLoader()->loadedRange();
+        if(!loadedPeriod.isEmpty()) {
+            QnTimePeriod extendedLoadedPeriod = QnTimePeriod(loadedPeriod.startTimeMs - step, loadedPeriod.durationMs + 2 * step);
+            if (extendedLoadedPeriod.containPeriod(targetPeriod))
+                return; 
+        }
+    }
+    
+    /* Add small margins to the period to request. */
+    qint64 d = targetPeriod.durationMs / 4;
+    QnTimePeriod extendedTargetPeriod = QnTimePeriod(targetPeriod.startTimeMs - d, targetPeriod.durationMs + 2 * d);
+
+    /* Load, finally. */
+    thumbnailsLoader()->loadRange(extendedTargetPeriod.startTimeMs, extendedTargetPeriod.endTimeMs(), step); 
+}
+
 
 
 
@@ -1281,14 +1328,12 @@ void QnTimeSlider::drawThumbnails(QPainter *painter, const QRectF &rect) {
     currentTime = qFloor(currentTime, loader->step());
 
     for (; currentTime < endTime; currentTime += loader->step()) {
-        loader->lockPixmaps();
-        const QPixmap *pixmap = loader->getPixmapByTime(currentTime);
+        QPixmapPtr pixmap = loader->getPixmapByTime(currentTime);
         if (pixmap) {
             QPointF pos = positionFromValue(currentTime, false);
             painter->drawRect(pos.x(), rect.top(), pixmap->size().width(), pixmap->size().height());
             painter->drawPixmap(QPointF(pos.x(), rect.top()), *pixmap);
         }
-        loader->unlockPixmaps();
     }
 }
 
@@ -1436,6 +1481,7 @@ void QnTimeSlider::resizeEvent(QGraphicsSceneResizeEvent *event) {
     updateMSecsPerPixel();
     updateLineCommentPixmaps();
     updateMinimalWindow();
+    updateThumbnailsLater();
 }
 
 void QnTimeSlider::kineticMove(const QVariant &degrees) {

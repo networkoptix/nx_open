@@ -1,15 +1,18 @@
 #ifndef QN_DRAG_PROCESSOR_H
 #define QN_DRAG_PROCESSOR_H
 
-#include <QObject>
-#include <QWeakPointer>
+#include <QtCore/QObject>
+#include <QtCore/QWeakPointer>
+
 #include <ui/common/geometry.h>
+
 #include "drag_info.h"
 #include "drag_process_handler.h"
 
 class QWidget;
 class QMouseEvent;
 class QPaintEvent;
+class QGraphicsSceneMouseEvent;
 
 class DragProcessHandler;
 
@@ -195,7 +198,7 @@ private:
     template<class T, class Event>
     void mouseReleaseEventInternal(T *object, Event *event);
 
-    using QnGeometry::view;
+    static QGraphicsView *view(QWidget *viewport);
 
 private:
     /** Flags. */

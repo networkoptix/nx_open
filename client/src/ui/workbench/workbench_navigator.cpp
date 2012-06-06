@@ -35,8 +35,6 @@
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "libavutil/avutil.h" // TODO: remove
 
-static const qint64 MIN_THUMBNAILS_UPDATE_INTERVAL = 500; // 500 ms
-
 QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     QObject(parent),
     QnWorkbenchContextAware(parent),

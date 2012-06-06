@@ -1,5 +1,12 @@
 #include "scene_transformations.h"
 
+#include <cassert>
+
+#include <QtCore/QDebug>
+
+#include "geometry.h"
+
+
 namespace {
 #ifdef QN_SCENE_TRANSFORMATIONS_DEBUG
     void debugViewportRect(QGraphicsView *view) {
@@ -92,20 +99,20 @@ void QnSceneTransformations::scaleViewport(QGraphicsView *view, qreal factor, QG
 void QnSceneTransformations::scaleViewportTo(QGraphicsView *view, const QSizeF &size, Qt::AspectRatioMode mode, QGraphicsView::ViewportAnchor anchor) {
     assert(view != NULL);
 
-    qreal factor = scaleFactor(mapRectToScene(view, view->viewport()->rect()).size(), size, mode);
+    qreal factor = QnGeometry::scaleFactor(mapRectToScene(view, view->viewport()->rect()).size(), size, mode);
 
     scaleViewport(view, factor, anchor);
 }
 
-QRectF QnGeometry::mapRectToScene(const QGraphicsView *view, const QRect &rect) {
+QRectF QnSceneTransformations::mapRectToScene(const QGraphicsView *view, const QRect &rect) {
     return mapRectToScene(view, QRectF(rect));
 }
 
-QRectF QnGeometry::mapRectToScene(const QGraphicsView *view, const QRectF &rect) {
+QRectF QnSceneTransformations::mapRectToScene(const QGraphicsView *view, const QRectF &rect) {
     return view->viewportTransform().inverted().mapRect(rect);
 }
 
-QRect QnGeometry::mapRectFromScene(const QGraphicsView *view, const QRectF &rect) {
+QRect QnSceneTransformations::mapRectFromScene(const QGraphicsView *view, const QRectF &rect) {
     return view->viewportTransform().mapRect(rect).toRect();
 }
 

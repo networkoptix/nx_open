@@ -137,7 +137,7 @@ namespace {
 } // anonymous namespace
 
 
-class BoundingInstrument::ViewData {
+class BoundingInstrument::ViewData: protected QnSceneTransformations {
 public:
     ViewData(): m_view(NULL) {}
 
@@ -282,11 +282,11 @@ public:
                 if(!qFuzzyBetween(logScale, m_stickyLogScaleLo, m_stickyLogScaleHi) && !qFuzzyCompare(logScale, logOldScale)) {
                     qreal logFactor = calculateCorrection(logOldScale, logScale, m_stickyLogScaleLo, m_stickyLogScaleHi);
 
-                    QnGeometry::scaleViewport(m_view, std::exp(logFactor * powFactor));
+                    scaleViewport(m_view, std::exp(logFactor * powFactor));
 
                     /* Calculate relative correction and move viewport. */
                     qreal correction = logFactor / (logOldScale - logScale); /* Always positive. */
-                    QnGeometry::moveViewportScene(m_view, (oldCenter - m_sceneViewportCenter) * correction);
+                    moveViewportScene(m_view, (oldCenter - m_sceneViewportCenter) * correction);
 
                     updateParameters();
                 } else {
@@ -299,7 +299,7 @@ public:
             if(!centerPositionBounds.contains(m_sceneViewportCenter) && !qFuzzyCompare(m_sceneViewportCenter, oldCenter)) {
                 QPointF correction = calculateCorrection(oldCenter, m_sceneViewportCenter, centerPositionBounds);
 
-                QnGeometry::moveViewportScene(m_view, correction);
+                moveViewportScene(m_view, correction);
 
                 updateParameters();
             }
@@ -319,7 +319,7 @@ public:
                     if(std::abs(logDelta) > std::abs(logDirection))
                         logDelta = logDirection;
 
-                    QnGeometry::scaleViewport(m_view, std::exp(logDelta * powFactor), m_fixedPoint);
+                    scaleViewport(m_view, std::exp(logDelta * powFactor), m_fixedPoint);
 
                     updateParameters();
                 } else {
@@ -340,7 +340,7 @@ public:
                         if(deltaLength > directionLength)
                             deltaLength = directionLength;
 
-                        QnGeometry::moveViewportScene(m_view, direction / directionLength * deltaLength);
+                        moveViewportScene(m_view, direction / directionLength * deltaLength);
                     }
                 }
             }

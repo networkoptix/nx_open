@@ -1,11 +1,16 @@
 #include "rotation_instrument.h"
+
 #include <cassert>
 #include <cmath> /* For std::fmod, std::floor, std::sin and std::cos. */
 #include <limits>
-#include <QMouseEvent>
-#include <QGraphicsObject>
-#include <ui/graphics/items/resource_widget.h>
+
+#include <QtGui/QMouseEvent>
+#include <QtGui/QGraphicsObject>
+
+#include <ui/graphics/items/resource_widget.h> // TODO: get rid of this include, implement for QGraphicsWidget
+
 #include <utils/common/scoped_painter_rollback.h>
+#include <utils/common/checked_cast.h>
 
 namespace {
     const QColor defaultColor(255, 0, 0, 96);
@@ -110,7 +115,7 @@ public:
             return; /* Target may get suddenly deleted. */
 
         /* Accessing viewport is safe here as it equals the passed widget. */
-        QGraphicsView *view = QnGeometry::view(m_viewport);
+        QGraphicsView *view = checked_cast<QGraphicsView *>(m_viewport->parent());
         QTransform sceneToViewport = view->viewportTransform();
 
         /* Map head & origin to viewport. */

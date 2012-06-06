@@ -3,6 +3,8 @@
 #include <cassert>
 #include <cmath> /* For std::sqrt, std::atan2. */
 
+#include <utils/common/warnings.h>
+
 QPointF QnGeometry::cwiseMul(const QPointF &l, const QPointF &r) {
     return QPointF(l.x() * r.x(), l.y() * r.y());
 }

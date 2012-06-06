@@ -2,10 +2,15 @@
 #define QN_THUMBNAILS_LOADER_H
 
 #include <QtCore/QScopedPointer>
+#include <QtCore/QSharedPointer>
+#include <QtCore/QMetaType>
+#include <QtCore/QMutex>
 
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "device_plugins/archive/rtsp/rtsp_client_archive_delegate.h"
 #include "utils/media/frame_info.h"
+
+typedef QSharedPointer<QPixmap> QPixmapPtr;
 
 class QnThumbnailsLoader: public CLLongRunnable {
     Q_OBJECT;
@@ -16,15 +21,19 @@ public:
     QnThumbnailsLoader(QnResourcePtr resource);
     virtual ~QnThumbnailsLoader();
 
-    void setThumbnailsBoundingSize(const QSize &size);
+    void setBoundingSize(const QSize &size);
+    QSize boundingSize() const;
+    
+    QSize thumbnailSize() const;
 
-    /*
+    /**
      * Load video pixmaps by specified time
      */
     void loadRange(qint64 startTimeMs, qint64 endTimeMs, qint64 stepMs);
 
     QnTimePeriod loadedRange() const;
-    qint64 lastLoadingTime() const;
+    
+    qint64 currentMSecsSinceLastUpdate() const;
 
     /*
      * thumbnails step in ms
@@ -45,15 +54,12 @@ public:
      * @param timeMs contain approximate time. 
      * @param realPixmapTimeMs Return exact pixmap time if found. Otherwise return -1
      */
-    const QPixmap *getPixmapByTime(qint64 timeMs, quint64 *realPixmapTimeMs = 0);
-
-    void lockPixmaps();
-    void unlockPixmaps();
+    QPixmapPtr getPixmapByTime(qint64 timeMs, quint64 *realPixmapTimeMs = 0);
 
     virtual void pleaseStop() override;
 
 signals:
-    void gotNewPixmap(qint64 timeMs, QPixmap pixmap);
+    void gotNewPixmap(qint64 timeMs, QPixmapPtr pixmap);
 
 protected:
     virtual void run() override;
@@ -67,8 +73,8 @@ private:
     QScopedPointer<QnRtspClientArchiveDelegate> m_rtspClient;
     QnResourcePtr m_resource;
 
-    QMap<qint64, QPixmap> m_images;
-    QMap<qint64, QPixmap> m_newImages;
+    QMap<qint64, QPixmapPtr> m_images;
+    QMap<qint64, QPixmapPtr> m_newImages;
 
     qint64 m_step;
     qint64 m_startTime;
@@ -81,10 +87,12 @@ private:
     int m_srcFormat;
     QSize m_srcSize;
     QSize m_boundingSize;
-    QSize m_outSize;
+    QSize m_dstSize;
 
     qint64 m_lastLoadedTime;
     bool m_breakCurrentJob;
 };
+
+Q_DECLARE_METATYPE(QPixmapPtr)
 
 #endif // __THUMBNAILS_LOADER_H__

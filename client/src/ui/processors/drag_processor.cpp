@@ -1,13 +1,18 @@
 #include "drag_processor.h"
+
 #include <cassert>
-#include <QApplication>
-#include <QMouseEvent>
-#include <QGraphicsSceneMouseEvent>
-#include <QGraphicsScene>
-#include <QGraphicsView>
-#include <QGraphicsItem>
-#include <QGraphicsObject>
+
+#include <QtGui/QApplication>
+#include <QtGui/QMouseEvent>
+#include <QtGui/QGraphicsSceneMouseEvent>
+#include <QtGui/QGraphicsScene>
+#include <QtGui/QGraphicsView>
+#include <QtGui/QGraphicsItem>
+#include <QtGui/QGraphicsObject>
+
 #include <utils/common/warnings.h>
+#include <utils/common/checked_cast.h>
+
 #include "drag_process_handler.h"
 
 DragProcessor::DragProcessor(QObject *parent):
@@ -300,6 +305,12 @@ void DragProcessor::mousePressEventInternal(T *object, Event *event) {
         if(!(event->buttons() & m_info.m_triggerButton))
             transition(event, object, WAITING);
     }
+}
+
+QGraphicsView *DragProcessor::view(QWidget *viewport) {
+    assert(viewport != NULL);
+
+    return checked_cast<QGraphicsView *>(viewport->parent());
 }
 
 void DragProcessor::timerEvent(QTimerEvent *event) {

@@ -87,6 +87,6 @@ public:
     static QRect mapRectFromScene(const QGraphicsView *view, const QRectF &rect);
 
 
-} // namespace QnSceneTransformations
+}; // class QnSceneTransformations
 
 #endif // QN_SCENE_TRANSFORMATIONS_H
