@@ -217,3 +217,52 @@ LExit:
     er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     return WcaFinalize(er);
 }
+
+void fixPath(CString& path)
+{
+	path.Replace(L"/", L"\\");
+}
+
+UINT __stdcall FixServerFolder(MSIHANDLE hInstall)
+{
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+
+    hr = WcaInitialize(hInstall, "FixServerFolder");
+    ExitOnFailure(hr, "Failed to initialize");
+
+    WcaLog(LOGMSG_STANDARD, "Initialized.");
+
+	{
+		CString serverFolder = GetProperty(hInstall, L"SERVER_DIRECTORY");
+		fixPath(serverFolder);
+		MsiSetProperty(hInstall, L"SERVER_DIRECTORY", serverFolder);
+	}
+
+LExit:
+    
+    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    return WcaFinalize(er);
+}
+
+UINT __stdcall FixClientFolder(MSIHANDLE hInstall)
+{
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+
+    hr = WcaInitialize(hInstall, "FixClientFolder");
+    ExitOnFailure(hr, "Failed to initialize");
+
+    WcaLog(LOGMSG_STANDARD, "Initialized.");
+
+	{
+		CString clientFolder = GetProperty(hInstall, L"CLIENT_DIRECTORY");
+		fixPath(clientFolder);
+		MsiSetProperty(hInstall, L"CLIENT_DIRECTORY", clientFolder);
+	}
+
+LExit:
+    
+    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    return WcaFinalize(er);
+}

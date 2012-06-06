@@ -36,7 +36,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
 
     connect(ui->cameraMotionButton,     SIGNAL(clicked(bool)),                  this,   SLOT(at_motionTypeChanged()));
     connect(ui->softwareMotionButton,   SIGNAL(clicked(bool)),                  this,   SLOT(at_motionTypeChanged()));
-    connect(ui->sensitivityComboBox,    SIGNAL(currentIndexChanged(int)),       this,   SLOT(at_motionSensitivityChanged(int)));
+    connect(ui->sensitivitySlider,      SIGNAL(valueChanged(int)),              this,   SLOT(at_motionSensitivityChanged(int)));
     connect(ui->resetMotionRegionsButton, SIGNAL(clicked()),                    this,   SLOT(at_motionSelectionCleared()));
 
     updateFromResource();
