@@ -914,7 +914,7 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
 
 void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     const QnConnectionData connection = qnSettings->lastUsedConnection();
-    if (!connection.url.isValid()) 
+    if (!connection.isValid()) 
         return;
     
     QnEventManager::instance()->stop();

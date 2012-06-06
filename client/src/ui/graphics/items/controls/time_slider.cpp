@@ -982,7 +982,7 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
     drawThumbnails(painter, QRectF(rect.left(), rect.top() - thumbnailsHeight(), rect.width(), thumbnailsHeight()));
 }
 
-int QnTimeSlider::thumbnailsHeight() const
+qreal QnTimeSlider::thumbnailsHeight() const
 {
     return rect().height();
 }
