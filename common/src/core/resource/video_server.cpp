@@ -2,7 +2,7 @@
 
 #include <QtCore/QUrl>
 #include "utils/common/delete_later.h"
-#include "api/SessionManager.h"
+#include "api/session_manager.h"
 
 QnLocalVideoServerResource::QnLocalVideoServerResource()
     : QnResource()
@@ -109,7 +109,7 @@ public:
     {
         QByteArray reply;
         QByteArray errorString;
-        SessionManager::instance()->sendGetRequest(m_url.toString(), "RecordedTimePeriods", QnRequestParamList(), reply, errorString);
+        QnSessionManager::instance()->sendGetRequest(m_url.toString(), "RecordedTimePeriods", QnRequestParamList(), reply, errorString);
         if (reply.contains("Parameter startTime must be provided"))
         {
             // server OK

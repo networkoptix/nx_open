@@ -5,7 +5,7 @@
 #include <QtGui/QMessageBox>
 #include <QtGui/QStandardItemModel>
 
-#include <api/SessionManager.h>
+#include <api/session_manager.h>
 #include <utils/common/warnings.h>
 #include <core/resource/resource.h>
 

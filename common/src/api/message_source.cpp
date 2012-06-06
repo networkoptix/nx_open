@@ -1,16 +1,34 @@
 #include <QtNetwork>
-#include "EventSource.h"
-#include "api/AppServerConnection.h"
+#include "message_source.h"
+#include "api/app_server_connection.h"
 #include <utils/common/warnings.h>
 
 #define QN_EVENT_SOURCE_DEBUG
 
-/* This interval (2T) has the following semantic:
-    - Server sends us pings every T msecs
-    - We wake up every 2T msecs
-    - If T msecs passed sinse last received ping => emit connectionClosed.
-*/
+/** 
+ * This interval (2T) has the following semantic:
+ *   - Server sends us pings every T msecs
+ *   - We wake up every 2T msecs
+ *   - If T msecs passed sinse last received ping => emit connectionClosed.
+ */
 static const int PING_INTERVAL = 60000;
+
+
+// -------------------------------------------------------------------------- //
+// QnJsonStreamParser
+// -------------------------------------------------------------------------- //
+class QnJsonStreamParser
+{
+public:
+    void addData(const QByteArray& data);
+    bool nextMessage(QVariant& parsed);
+
+private:
+    QQueue<QByteArray> blocks;
+    QByteArray incomplete;
+
+    QJson::Parser parser;
+};
 
 void QnJsonStreamParser::addData(const QByteArray& data)
 {
@@ -57,109 +75,20 @@ bool QnJsonStreamParser::nextMessage(QVariant& parsed)
     return ok;
 }
 
-QString QnEvent::objectNameLower() const
-{
-	if (objectName.isEmpty())
-		return objectName;
 
-	return objectName[0].toLower() + objectName.mid(1);
-}
-
-bool QnEvent::load(const QVariant& parsed)
-{   
-    dict = parsed.toMap();
-
-    if (!dict.contains("type"))
-        return false;
-
-    eventType = dict["type"].toString();
-
-    if (eventType != QN_EVENT_RES_CHANGE
-            && eventType != QN_EVENT_RES_DELETE
-			&& eventType != QN_EVENT_RES_SETPARAM
-			&& eventType != QN_EVENT_RES_STATUS_CHANGE
-			&& eventType != QN_EVENT_RES_DISABLED_CHANGE
-            && eventType != QN_EVENT_LICENSE_CHANGE
-            && eventType != QN_CAMERA_SERVER_ITEM
-            && eventType != QN_EVENT_EMPTY
-            && eventType != QN_EVENT_PING)
-    {
-        return false;
-    }
-
-    if (!dict.contains("seq_num"))
-    {
-        // version before 1.0.1
-        // Do not use seqNumber tracking
-        seqNumber = 0;
-    } else {
-        seqNumber = dict["seq_num"].toUInt();
-    }
-
-    if (eventType == QN_EVENT_LICENSE_CHANGE)
-    {
-        objectId = dict["id"].toString();
-        return true;
-    }
-
-    if (eventType == QN_CAMERA_SERVER_ITEM)
-    {
-        // will use dict
-        // need to refactor a bit
-        return true;
-    }
-
-    if (eventType == QN_EVENT_EMPTY || eventType == QN_EVENT_PING)
-        return true;
-
-    if (!dict.contains("resourceId"))
-        return false;
-
-    objectId = dict["resourceId"].toString();
-    if (dict.contains("parentId"))
-        parentId = dict["parentId"].toString();
-
-    objectName = dict["objectName"].toString();
-
-    if (dict.contains("resourceGuid"))
-        resourceGuid = dict["resourceGuid"].toString();
-
-    if (dict.contains("data"))
-        data = dict["data"].toString();
-
-    if (eventType == QN_EVENT_RES_SETPARAM)
-    {
-        if (!dict.contains("paramName") || !dict.contains("paramValue"))
-            return false;
-
-        paramName = dict["paramName"].toString();
-        paramValue = dict["paramValue"].toString();
-
-        return true;
-    }
-
-    return true;
-}
-
-quint32 QnEvent::nextSeqNumber(quint32 seqNumber)
-{
-    seqNumber++;
-
-    if (seqNumber == 0)
-        seqNumber++;
-
-    return seqNumber;
-}
-
-QnEventSource::QnEventSource(QUrl url, int retryTimeout): 
+// -------------------------------------------------------------------------- //
+// QnMessageSource
+// -------------------------------------------------------------------------- //
+QnMessageSource::QnMessageSource(QUrl url, int retryTimeout): 
     m_url(url),
     m_retryTimeout(retryTimeout),
     m_reply(NULL),
-    m_seqNumber(0)
+    m_seqNumber(0),
+    m_streamParser(new QnJsonStreamParser())
 {
     static volatile bool metaTypesInitialized = false;
     if (!metaTypesInitialized) {
-        qRegisterMetaType<QnEvent>();
+        qRegisterMetaType<QnMessage>();
         metaTypesInitialized = true;
     }
 
@@ -172,15 +101,18 @@ QnEventSource::QnEventSource(QUrl url, int retryTimeout):
     connect(&m_manager, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)),
             this, SLOT(sslErrors(QNetworkReply*,QList<QSslError>)));
 #endif
-
 }
 
-void QnEventSource::stop()
+QnMessageSource::~QnMessageSource() {
+    return;
+}
+
+void QnMessageSource::stop()
 {
     emit stopped();
 }
 
-void QnEventSource::doStop()
+void QnMessageSource::doStop()
 {
     m_pingTimer.stop();
 
@@ -188,7 +120,7 @@ void QnEventSource::doStop()
         m_reply->abort();
 }
 
-void QnEventSource::startRequest()
+void QnMessageSource::startRequest()
 {
     m_reply = m_manager.post(QNetworkRequest(m_url), "");
     connect(m_reply, SIGNAL(finished()),
@@ -200,7 +132,7 @@ void QnEventSource::startRequest()
     m_pingTimer.start(PING_INTERVAL);
 }
 
-void QnEventSource::httpFinished()
+void QnMessageSource::httpFinished()
 {
     if (!m_reply)
         return;
@@ -224,7 +156,7 @@ void QnEventSource::httpFinished()
     m_reply = 0;
 }
 
-void QnEventSource::httpReadyRead()
+void QnMessageSource::httpReadyRead()
 {
     QByteArray data = m_reply->readAll().data();
 
@@ -232,26 +164,26 @@ void QnEventSource::httpReadyRead()
     qDebug() << "Event data: " << data;
 #endif
 
-    m_streamParser.addData(data);
+    m_streamParser->addData(data);
 
     QVariant parsed;
-    while (m_streamParser.nextMessage(parsed))
+    while (m_streamParser->nextMessage(parsed))
     {
         // Restart timer for any event
         m_eventWaitTimer.restart();
 
-        QnEvent event;
+        QnMessage event;
         if (!event.load(parsed))
             continue;
 
-        if (event.eventType == QN_EVENT_EMPTY)
+        if (event.eventType == QN_MESSAGE_EMPTY)
         {
             if (m_seqNumber == 0)
             {
                 // No tracking yet. Just initialize seqNumber.
                 m_seqNumber = event.seqNumber;
             }
-            else if (QnEvent::nextSeqNumber(m_seqNumber) != event.seqNumber)
+            else if (QnMessage::nextSeqNumber(m_seqNumber) != event.seqNumber)
             {
                 // Tracking is on and some events are missed and/or reconnect occured
                 m_seqNumber = event.seqNumber;
@@ -262,22 +194,22 @@ void QnEventSource::httpReadyRead()
                 QnAppServerConnectionFactory::setDefaultMediaProxyPort(event.dict["proxyPort"].toInt());
 
             emit connectionOpened();
-        } else if (event.eventType != QN_EVENT_PING)
+        } else if (event.eventType != QN_MESSAGE_PING)
         {
-            emit eventReceived(event);
+            emit messageReceived(event);
         }
         // If it's ping event -> just update last event time (m_eventWaitTimer)
     }
 }
 
 
-void QnEventSource::slotAuthenticationRequired(QNetworkReply*,QAuthenticator *authenticator)
+void QnMessageSource::slotAuthenticationRequired(QNetworkReply*,QAuthenticator *authenticator)
 {
     authenticator->setUser("xxxuser");
     authenticator->setPassword("xxxpassword");
 }
 
-void QnEventSource::onPingTimer()
+void QnMessageSource::onPingTimer()
 {
     if (m_eventWaitTimer.elapsed() > PING_INTERVAL)
     {
@@ -288,7 +220,7 @@ void QnEventSource::onPingTimer()
 }
 
 #ifndef QT_NO_OPENSSL
-void QnEventSource::sslErrors(QNetworkReply*,const QList<QSslError> &errors)
+void QnMessageSource::sslErrors(QNetworkReply*,const QList<QSslError> &errors)
 {
     QString errorString;
     foreach (const QSslError &error, errors) {

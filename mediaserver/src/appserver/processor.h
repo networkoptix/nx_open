@@ -2,7 +2,7 @@
 #define _server_appserver_processor_h_
 
 #include "core/resource/resource.h"
-#include "api/AppServerConnection.h"
+#include "api/app_server_connection.h"
 
 class QnAppserverResourceProcessor : public QObject, public QnResourceProcessor
 {

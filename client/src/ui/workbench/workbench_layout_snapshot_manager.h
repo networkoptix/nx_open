@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <core/resource/resource_fwd.h>
-#include <api/AppServerConnection.h>
+#include <api/app_server_connection.h>
 #include "workbench_context_aware.h"
 #include "workbench_globals.h"
 

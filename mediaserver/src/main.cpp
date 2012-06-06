@@ -20,17 +20,17 @@
 #include "plugins/resources/arecontvision/resource/av_resource_searcher.h"
 #include "recorder/recording_manager.h"
 #include "recorder/storage_manager.h"
-#include "api/AppServerConnection.h"
+#include "api/app_server_connection.h"
 #include "appserver/processor.h"
 #include "recording/file_deletor.h"
 #include "rest/server/rest_server.h"
 #include "rest/handlers/recorded_chunks.h"
 #include "core/resource/video_server.h"
-#include "api/SessionManager.h"
+#include "api/session_manager.h"
 #include <signal.h>
 #include "core/misc/scheduleTask.h"
 #include "qtservice.h"
-#include "eventmanager.h"
+#include "server_message_processor.h"
 #include "settings.h"
 
 #include <fstream>
@@ -384,7 +384,7 @@ void initAppServerEventConnection(const QSettings &settings, const QnVideoServer
 
     static const int EVENT_RECONNECT_TIMEOUT = 3000;
 
-    QnEventManager* eventManager = QnEventManager::instance();
+    QnServerMessageProcessor* eventManager = QnServerMessageProcessor::instance();
     eventManager->init(appServerEventsUrl, EVENT_RECONNECT_TIMEOUT);
 }
 
@@ -463,7 +463,7 @@ void QnMain::loadResourcesFromECS()
 void QnMain::run()
 {
     // Create SessionManager
-    SessionManager* sm = SessionManager::instance();
+    QnSessionManager* sm = QnSessionManager::instance();
 
     QThread *thread = new QThread();
     sm->moveToThread(thread);
@@ -531,7 +531,7 @@ void QnMain::run()
     } while (status != 0);
 
     initAppServerEventConnection(qSettings, m_videoServer);
-    QnEventManager* eventManager = QnEventManager::instance();
+    QnServerMessageProcessor* eventManager = QnServerMessageProcessor::instance();
     eventManager->run();
 
     m_processor = new QnAppserverResourceProcessor(m_videoServer->getId());
@@ -667,7 +667,7 @@ void stopServer(int signal)
     qApp->quit();
 }
 
-#include "api/SessionManager.h"
+#include "api/session_manager.h"
 
 int main(int argc, char* argv[])
 {

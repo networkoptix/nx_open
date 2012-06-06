@@ -8,8 +8,8 @@
 
 #include <utils/settings.h>
 #include <core/resource/resource.h>
-#include <api/AppServerConnection.h>
-#include <api/SessionManager.h>
+#include <api/app_server_connection.h>
+#include <api/session_manager.h>
 
 #include <ui/dialogs/preferences_dialog.h>
 #include <ui/widgets/rendering_widget.h>

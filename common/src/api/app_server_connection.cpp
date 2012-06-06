@@ -1,10 +1,10 @@
-#include "AppServerConnection.h"
+#include "app_server_connection.h"
 
 #include <QtNetwork/QAuthenticator>
 #include <QtNetwork/QHostAddress>
 
 #include "utils/common/sleep.h"
-#include "SessionManager.h"
+#include "session_manager.h"
 #include "utils/common/synctime.h"
 
 
@@ -101,7 +101,7 @@ void conn_detail::LicenseReplyProcessor::finished(int status, const QByteArray &
         }
     } else
     {
-        errorString += SessionManager::formatNetworkError(status);
+        errorString += QnSessionManager::formatNetworkError(status);
     }
 
     emit finished(status, errorString, licenses, handle);
@@ -117,11 +117,11 @@ QnAppServerConnection::QnAppServerConnection(const QUrl &url, QnResourceFactory&
 
 int QnAppServerConnection::addObject(const QString& objectName, const QByteArray& data, QByteArray& reply, QByteArray& errorString)
 {
-    int status = SessionManager::instance()->sendPostRequest(m_url, objectName, m_requestParams, data, reply, errorString);
+    int status = QnSessionManager::instance()->sendPostRequest(m_url, objectName, m_requestParams, data, reply, errorString);
     if (status != 0)
     {
         errorString += "\nSessionManager::sendPostRequest(): ";
-        errorString += SessionManager::formatNetworkError(status) + reply;
+        errorString += QnSessionManager::formatNetworkError(status) + reply;
     }
 
     return status;
@@ -139,17 +139,17 @@ int QnAppServerConnection::getObjectsAsync(const QString& objectName, const QStr
             requestParams.append(QnRequestParam(argsKvList[0], argsKvList[1]));
     }
 
-    return SessionManager::instance()->sendAsyncGetRequest(m_url, objectName, requestParams, target, slot);
+    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, objectName, requestParams, target, slot);
 }
 
 int QnAppServerConnection::addObjectAsync(const QString& objectName, const QByteArray& data, QObject* target, const char* slot)
 {
-    return SessionManager::instance()->sendAsyncPostRequest(m_url, objectName, m_requestParams, data, target, slot);
+    return QnSessionManager::instance()->sendAsyncPostRequest(m_url, objectName, m_requestParams, data, target, slot);
 }
 
 int QnAppServerConnection::deleteObjectAsync(const QString& objectName, int id, QObject* target, const char* slot)
 {
-    return SessionManager::instance()->sendAsyncDeleteRequest(m_url, objectName, id, target, slot);
+    return QnSessionManager::instance()->sendAsyncDeleteRequest(m_url, objectName, id, target, slot);
 }
 
 int QnAppServerConnection::getObjects(const QString& objectName, const QString& args, QByteArray& data, QByteArray& errorString)
@@ -164,12 +164,12 @@ int QnAppServerConnection::getObjects(const QString& objectName, const QString& 
             requestParams.append(QnRequestParam(argsKvList[0], argsKvList[1]));
     }
 
-    return SessionManager::instance()->sendGetRequest(m_url, objectName, requestParams, data, errorString);
+    return QnSessionManager::instance()->sendGetRequest(m_url, objectName, requestParams, data, errorString);
 }
 
 int QnAppServerConnection::testConnectionAsync(QObject* target, const char *slot)
 {
-    return SessionManager::instance()->testConnectionAsync(m_url, target, slot);
+    return QnSessionManager::instance()->testConnectionAsync(m_url, target, slot);
 }
 
 QnAppServerConnection::~QnAppServerConnection()
@@ -664,7 +664,7 @@ qint64 QnAppServerConnection::getCurrentTime()
     QByteArray data;
     QByteArray errorString;
 
-    int rez = SessionManager::instance()->sendGetRequest(m_url, "time", data, errorString);
+    int rez = QnSessionManager::instance()->sendGetRequest(m_url, "time", data, errorString);
     if (rez != 0) {
         qWarning() << "Can't read time from Enterprise Controller" << errorString;
         return QDateTime::currentMSecsSinceEpoch();
@@ -679,7 +679,7 @@ int QnAppServerConnection::setResourceStatusAsync(const QnId &resourceId, QnReso
     requestParams.append(QnRequestParam("id", resourceId.toString()));
     requestParams.append(QnRequestParam("status", QString::number(status)));
 
-    return SessionManager::instance()->sendAsyncPostRequest(m_url, "status", requestParams, "", target, slot);
+    return QnSessionManager::instance()->sendAsyncPostRequest(m_url, "status", requestParams, "", target, slot);
 }
 
 int QnAppServerConnection::setResourceDisabledAsync(const QnId &resourceId, bool disabled, QObject *target, const char *slot)
@@ -688,7 +688,7 @@ int QnAppServerConnection::setResourceDisabledAsync(const QnId &resourceId, bool
     requestParams.append(QnRequestParam("id", resourceId.toString()));
     requestParams.append(QnRequestParam("disabled", QString::number((int)disabled)));
 
-    return SessionManager::instance()->sendAsyncPostRequest(m_url, "disabled", requestParams, "", target, slot);
+    return QnSessionManager::instance()->sendAsyncPostRequest(m_url, "disabled", requestParams, "", target, slot);
 }
 
 int QnAppServerConnection::setResourcesStatusAsync(const QnResourceList &resources, QObject *target, const char *slot)
@@ -704,7 +704,7 @@ int QnAppServerConnection::setResourcesStatusAsync(const QnResourceList &resourc
         n++;
     }
 
-    return SessionManager::instance()->sendAsyncPostRequest(m_url, "status", requestParams, "", target, slot);
+    return QnSessionManager::instance()->sendAsyncPostRequest(m_url, "status", requestParams, "", target, slot);
 }
 
 int QnAppServerConnection::setResourceStatus(const QnId &resourceId, QnResource::Status status, QByteArray &errorString)
@@ -714,7 +714,7 @@ int QnAppServerConnection::setResourceStatus(const QnId &resourceId, QnResource:
     requestParams.append(QnRequestParam("status", QString::number(status)));
 
     QByteArray reply;
-    return SessionManager::instance()->sendPostRequest(m_url, "status", requestParams, "", reply, errorString);
+    return QnSessionManager::instance()->sendPostRequest(m_url, "status", requestParams, "", reply, errorString);
 }
 
 int QnAppServerConnection::setResourcesDisabledAsync(const QnResourceList &resources, QObject *target, const char *slot)
@@ -730,7 +730,7 @@ int QnAppServerConnection::setResourcesDisabledAsync(const QnResourceList &resou
         n++;
     }
 
-    return SessionManager::instance()->sendAsyncPostRequest(m_url, "disabled", requestParams, "", target, slot);
+    return QnSessionManager::instance()->sendAsyncPostRequest(m_url, "disabled", requestParams, "", target, slot);
 }
 
 void QnAppServerConnectionFactory::setDefaultMediaProxyPort(int port)
