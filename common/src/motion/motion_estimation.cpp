@@ -33,8 +33,8 @@ static const unsigned char BitReverseTable256[] =
 static int sensitivityToMask[10] = 
 {
     255, //  0
-    64,
-    20,
+    26,
+    22,
     18,
     16,
     14,
@@ -48,12 +48,12 @@ static int sensitivityToMask[10] =
 static const int MIN_SQUARE_BY_SENS[10] = 
 {
     INT_MAX, // motion mask: 0
-    sensitivityToMask[1]*256,
-    sensitivityToMask[2]*128,
-    sensitivityToMask[3]*64,
-    sensitivityToMask[4]*32,
-    sensitivityToMask[5]*16,
-    sensitivityToMask[6]*8,
+    sensitivityToMask[1]*40,
+    sensitivityToMask[2]*26,
+    sensitivityToMask[3]*19,
+    sensitivityToMask[4]*13,
+    sensitivityToMask[5]*9,
+    sensitivityToMask[6]*6,
     sensitivityToMask[7]*4,
     sensitivityToMask[8]*2,
     sensitivityToMask[9]*1, // max sens: 9
