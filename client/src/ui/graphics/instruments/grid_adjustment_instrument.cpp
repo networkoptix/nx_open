@@ -72,7 +72,7 @@ bool GridAdjustmentInstrument::wheelEvent(QGraphicsScene *, QGraphicsSceneWheelE
 
         workbench()->currentLayout()->setCellSpacing(spacing + k * delta);
 
-        SceneUtility::moveViewportScene(this->view(viewport), workbench()->mapper()->mapFromGridF(gridMousePos) - event->scenePos());
+        QnGeometry::moveViewportScene(this->view(viewport), workbench()->mapper()->mapFromGridF(gridMousePos) - event->scenePos());
     }
 
     event->accept();

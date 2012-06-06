@@ -12,6 +12,8 @@
 
 #include "time_step.h"
 
+class QTimer;
+
 class QnThumbnailsLoader;
 class QnTimeSliderPixmapCache;
 
@@ -140,6 +142,7 @@ signals:
     void customContextMenuRequested(const QPointF &pos, const QPoint &screenPos);
     void selectionPressed();
     void selectionReleased();
+    void thumbnailsHeightChanged();
 
 protected:
     virtual void sliderChange(SliderChange change) override;
@@ -163,6 +166,8 @@ protected:
     virtual void startDrag(DragInfo *info) override;
     virtual void dragMove(DragInfo *info) override;
     virtual void finishDrag(DragInfo *info) override;
+
+    virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint) const override;
 
     static QVector<QnTimeStep> createRelativeSteps();
     static QVector<QnTimeStep> createAbsoluteSteps();
@@ -205,7 +210,8 @@ private:
     void updateAggregationValue();
     void updateAggregatedPeriods(int line, Qn::TimePeriodRole type);
     void updateTotalLineStretch();
-
+    void updateThumbnailsLater();
+    Q_SLOT void updateThumbnails();
 
     void animateStepValues(int deltaMSecs);
 
@@ -271,6 +277,7 @@ private:
 
     QWeakPointer<QnThumbnailsLoader> m_thumbnailsLoader;
     qreal m_thumbnailsHeight;
+    QTimer *m_thumbnailsUpdateTimer;
 
     QnTimeSliderPixmapCache *m_pixmapCache;
 };

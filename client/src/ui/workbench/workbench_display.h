@@ -6,7 +6,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <ui/common/scene_utility.h>
+#include <ui/common/geometry.h>
 #include <recording/time_period.h>
 
 #include "workbench_globals.h"
@@ -49,7 +49,7 @@ class CLCamDisplay;
  * 
  * It presents some low-level functions for viewport and item manipulation.
  */
-class QnWorkbenchDisplay: public QObject, public QnWorkbenchContextAware, protected SceneUtility {
+class QnWorkbenchDisplay: public QObject, public QnWorkbenchContextAware, protected QnGeometry {
     Q_OBJECT;
     Q_PROPERTY(qreal widgetsFrameOpacity READ widgetsFrameOpacity WRITE setWidgetsFrameOpacity);
     Q_ENUMS(Qn::ItemLayer);

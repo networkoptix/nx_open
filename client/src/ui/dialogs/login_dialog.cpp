@@ -200,9 +200,6 @@ void LoginDialog::updateStoredConnections()
     connections.push_front(qnSettings->defaultConnection());
 
     QnConnectionData lastUsedConnection = qnSettings->lastUsedConnection();
-
-    QString url = lastUsedConnection.url.toString();
-
     if(!lastUsedConnection.isValid()) {
         lastUsedConnection = qnSettings->defaultConnection();
         lastUsedConnection.name = QString();

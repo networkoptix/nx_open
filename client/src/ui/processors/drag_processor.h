@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QWeakPointer>
-#include <ui/common/scene_utility.h>
+#include <ui/common/geometry.h>
 #include "drag_info.h"
 #include "drag_process_handler.h"
 
@@ -34,7 +34,7 @@ class DragProcessHandler;
  * function was called, then <tt>finishDrag()</tt> will also be called even
  * if this drag processor or target surface is destroyed.
  */
-class DragProcessor: public QObject, protected SceneUtility {
+class DragProcessor: public QObject, protected QnGeometry {
     Q_OBJECT;
     Q_FLAGS(Flags Flag);
     Q_ENUMS(State);
@@ -195,7 +195,7 @@ private:
     template<class T, class Event>
     void mouseReleaseEventInternal(T *object, Event *event);
 
-    using SceneUtility::view;
+    using QnGeometry::view;
 
 private:
     /** Flags. */

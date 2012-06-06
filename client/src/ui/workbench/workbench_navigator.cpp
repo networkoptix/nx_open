@@ -138,7 +138,7 @@ void QnWorkbenchNavigator::initialize() {
     connect(m_timeSlider,                       SIGNAL(valueChanged(qint64)),                       this,   SLOT(updateScrollBarFromSlider()));
     connect(m_timeSlider,                       SIGNAL(rangeChanged(qint64, qint64)),               this,   SLOT(updateScrollBarFromSlider()));
     connect(m_timeSlider,                       SIGNAL(windowChanged(qint64, qint64)),              this,   SLOT(updateScrollBarFromSlider()));
-    connect(m_timeSlider,                       SIGNAL(windowChanged(qint64, qint64)),              this,   SLOT(loadThumbnails(qint64, qint64)));
+    connect(m_timeSlider,                       SIGNAL(windowChanged(qint64, qint64)),              this,   SLOT(updateThumbnailsLater()));
     connect(m_timeSlider,                       SIGNAL(windowChanged(qint64, qint64)),              this,   SLOT(updateTargetPeriod()));
     connect(m_timeSlider,                       SIGNAL(selectionChanged(qint64, qint64)),           this,   SLOT(at_timeSlider_selectionChanged()));
     connect(m_timeSlider,                       SIGNAL(customContextMenuRequested(const QPointF &, const QPoint &)), this, SLOT(at_timeSlider_customContextMenuRequested(const QPointF &, const QPoint &)));
@@ -713,51 +713,19 @@ void QnWorkbenchNavigator::updateScrollBarFromSlider() {
     updateSliderFromScrollBar(); /* Bi-directional sync is needed as time scrollbar may adjust the provided values. */
 }
 
-void QnWorkbenchNavigator::delayedLoadThumbnails()
-{
-    loadThumbnails(m_thumbnailsStartTimeMs, m_thumbnailsEndTimeMs);
+void QnWorkbenchNavigator::updateThumbnailsLater() {
+    QTimer::singleShot(50, this, SLOT(updateThumbnails()));
 }
 
-void QnWorkbenchNavigator::loadThumbnails(qint64 startTimeMs, qint64 endTimeMs)
-{
-    if (m_thumbnailsLoader == 0 || m_currentWidget == 0)
+void QnWorkbenchNavigator::updateThumbnails() {
+    if (!m_thumbnailsLoader || !m_currentWidget)
         return;
 
-    m_thumbnailsStartTimeMs = startTimeMs;
-    m_thumbnailsEndTimeMs = endTimeMs;
-    if (m_currentWidget->aspectRatio() <= 0) 
-    {
-        QTimer::singleShot(50, this, SLOT(delayedLoadThumbnails()));
-        return;
-    }
-    m_thumbnailsLoader->setThumbnailsSize(m_timeSlider->thumbnailsHeight() * m_currentWidget->aspectRatio(), m_timeSlider->thumbnailsHeight());
-
-    // calculate thumbnail size
-    qreal visualWidth = m_timeSlider->rect().width();
-    qreal thumbnailsWidth = m_timeSlider->thumbnailsHeight() * m_currentWidget->aspectRatio();
-
-    qreal timeInPixel = qreal(endTimeMs - startTimeMs) / visualWidth;
-    qint64 timeStep = thumbnailsWidth * timeInPixel;
-
-    // extend range slightly to out of screen
-    qint64 timeRange = endTimeMs - startTimeMs;
-    startTimeMs -= timeRange/4;
-    endTimeMs += timeRange/4;
-
-    QnTimePeriod loadedPeriod = m_thumbnailsLoader->loadedRange();
-    QnTimePeriod extendPeriod(loadedPeriod.startTimeMs-timeStep, loadedPeriod.durationMs + timeStep*2);
-    if (!loadedPeriod.isEmpty() && m_thumbnailsLoader->step() == timeStep && extendPeriod.containPeriod(QnTimePeriod(startTimeMs, endTimeMs - startTimeMs)))
-        return;
-
-    // check if data already exists or recently loaded
-    if (qnSyncTime->currentMSecsSinceEpoch() - m_thumbnailsLoader->lastLoadingTime() < MIN_THUMBNAILS_UPDATE_INTERVAL)
-    {
-        QTimer::singleShot(50, this, SLOT(delayedLoadThumbnails()));
+    if (m_currentWidget->aspectRatio() <= 0) {
+        updateThumbnailsLater();
         return;
     }
 
-    // load data
-    m_thumbnailsLoader->loadRange(startTimeMs, endTimeMs, timeStep);
 }
 
 void QnWorkbenchNavigator::updateLive() {

@@ -1,11 +1,13 @@
-#ifndef __THUMBNAILS_LOADER_H__
-#define __THUMBNAILS_LOADER_H__
+#ifndef QN_THUMBNAILS_LOADER_H
+#define QN_THUMBNAILS_LOADER_H
+
+#include <QtCore/QScopedPointer>
+
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "device_plugins/archive/rtsp/rtsp_client_archive_delegate.h"
 #include "utils/media/frame_info.h"
 
-class QnThumbnailsLoader: public CLLongRunnable
-{
+class QnThumbnailsLoader: public CLLongRunnable {
     Q_OBJECT;
 
     typedef CLLongRunnable base_type;
@@ -14,7 +16,7 @@ public:
     QnThumbnailsLoader(QnResourcePtr resource);
     virtual ~QnThumbnailsLoader();
 
-    void setThumbnailsSize(int width, int height);
+    void setThumbnailsBoundingSize(const QSize &size);
 
     /*
      * Load video pixmaps by specified time
@@ -43,7 +45,7 @@ public:
      * @param timeMs contain approximate time. 
      * @param realPixmapTimeMs Return exact pixmap time if found. Otherwise return -1
      */
-    const QPixmap *getPixmapByTime(qint64 timeMs, quint64* realPixmapTimeMs = 0);
+    const QPixmap *getPixmapByTime(qint64 timeMs, quint64 *realPixmapTimeMs = 0);
 
     void lockPixmaps();
     void unlockPixmaps();
@@ -52,32 +54,35 @@ public:
 
 signals:
     void gotNewPixmap(qint64 timeMs, QPixmap pixmap);
+
 protected:
     virtual void run() override;
+
 private:
-    void allocateScaleContext(int linesize, int width, int height, PixelFormat format);
-    bool processFrame(const CLVideoDecoderOutput& outFrame);
+    void ensureScaleContext(int lineSize, const QSize &size, PixelFormat format);
+    bool processFrame(const CLVideoDecoderOutput &outFrame);
+
 private:
+    mutable QMutex m_mutex;
     QScopedPointer<QnRtspClientArchiveDelegate> m_rtspClient;
+    QnResourcePtr m_resource;
+
     QMap<qint64, QPixmap> m_images;
     QMap<qint64, QPixmap> m_newImages;
-    QnResourcePtr m_resource;
 
     qint64 m_step;
     qint64 m_startTime;
     qint64 m_endTime;
-    int m_outWidth;
-    int m_outHeight;
     QQueue<QnTimePeriod> m_rangeToLoad;
-    mutable QMutex m_mutex;
-    SwsContext* m_scaleContext;
-    quint8* m_rgbaBuffer;
+    SwsContext *m_scaleContext;
+    quint8 *m_rgbaBuffer;
+
     int m_srcLineSize;
-    int m_srcWidth;
-    int m_srcHeight;
     int m_srcFormat;
-    int m_prevOutWidth;
-    int m_prevOutHeight;
+    QSize m_srcSize;
+    QSize m_boundingSize;
+    QSize m_outSize;
+
     qint64 m_lastLoadedTime;
     bool m_breakCurrentJob;
 };
