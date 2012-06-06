@@ -496,16 +496,8 @@ void getFrame_avgY_array_x_x(const CLVideoDecoderOutput* frame, const CLVideoDec
 
 
             squareStep++;
-            if (squareStep == sqWidthSteps) {
-                if (squareSum/(rowCnt * sqWidth) >= 10 && (dstCurLine - dst)/32 == 20 && y == 4)
-                {
-                    int xCoord = (dstCurLine - dst)/32;
-                    int yCoord = 4;
-                
-                }
+            if (squareStep == sqWidthSteps) 
                 flushData(rowCnt * sqWidth);
-            }
-            
         }
         if (squareStep)
             flushData(rowCnt * squareStep*8);
@@ -844,6 +836,7 @@ void QnMotionEstimation::analizeMotionAmount(quint8* frame)
         m_linkedSquare[m_linkedNums[i]] += m_filteredFrame[i];
     }
 
+#if 0
     for (int i = 1; i < currentLinkIndex; ++i)
     {
         if (m_linkedSquare[i] >= 20 && m_linkedSquare[i] <= 50)
@@ -857,6 +850,7 @@ void QnMotionEstimation::analizeMotionAmount(quint8* frame)
             }
         }
     }
+#endif
 
     // 6. remove motion if motion square is not enough and write result to bitarray
     for (int i = 0; i < MD_HEIGHT*m_scaledWidth;)
@@ -1041,10 +1035,6 @@ QnMetaDataV1Ptr QnMotionEstimation::getMotion()
         prevILineNum = iLineNum;
         scaledLineNum += lineStep;
     }
-    for (int y = MD_WIDTH-4; y < MD_WIDTH; ++y) {
-        dst[y] = 0;
-    }
-
 
     memset(m_resultMotion, 0, MD_HEIGHT * m_scaledWidth);
     m_firstFrameTime = m_lastFrameTime;
