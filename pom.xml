@@ -7,6 +7,11 @@
 	<packaging>pom</packaging>
 	<name>HD Witness</name>
 
+	<scm>
+		<connection>scm:hg:file:///${basedir}</connection>
+		<developerConnection>scm:hg:file:///${basedir}</developerConnection>
+	</scm>	
+
 	<properties>
 		<build.configuration>release</build.configuration>
 		<buildNumber>0</buildNumber>
