@@ -91,6 +91,7 @@
         
         <Property Id="APPSERVER_LOGIN" Secure="yes" Value="admin"/>
         <Property Id="APPSERVER_PASSWORD" Secure="yes"/>
+    	<Property Id="APPSERVER_PASSWORD_CONFIRM" Secure="yes"/>
         
         <!-- MediaServer properties-->
         <Property Id="SERVER_APPSERVER_HOST" Secure="yes" Value="localhost"/>
@@ -168,6 +169,8 @@
         <CustomAction Id="CheckPorts" BinaryKey="CustomActions.dll" DllEntry="CheckPorts"/>
         <CustomAction Id="CheckPorts2" BinaryKey="CustomActions.dll" DllEntry="CheckPorts"/>
         
+        <CustomAction Id="FixServerFolder" BinaryKey="CustomActions.dll" DllEntry="FixServerFolder"/>
+        <CustomAction Id="FixClientFolder" BinaryKey="CustomActions.dll" DllEntry="FixClientFolder"/>
         
         <CustomAction Id="SetNewGuidForEcs" Property="APPSERVER_GUID" Value="[APPSERVER_GUID_NEW]"/>
         <CustomAction Id="SetNewGuidForServer" Property="SERVER_GUID" Value="[SERVER_GUID_NEW]"/>
@@ -250,6 +253,9 @@
             <Custom Action="SetNewGuidForServer" Before="AssignClientFolder"><![CDATA[ $(var.ServerNeedsGuid)  ]]></Custom>
             
             
+            <Custom Action="FixClientFolder" After="ResetClientFolder"/>
+            <Custom Action="FixServerFolder" After="ResetServerFolder">IS_SERVER_DIRECTORY_REG</Custom>
+
             <Custom Action="ResetClientFolder" Before="CostInitialize"/>
             <Custom Action="ResetServerFolder" Before="CostInitialize">IS_SERVER_DIRECTORY_REG</Custom>
             
@@ -715,12 +721,15 @@
             <Publish Dialog="InstallTypeDlg" Control="Next" Property="CLIENT_APPSERVER_PORT" Value="[APPSERVER_PORT]" Order="4"><![CDATA[ INSTALLTYPE=0 ]]></Publish>
             <Publish Dialog="InstallTypeDlg" Control="Next" Property="CLIENT_APPSERVER_LOGIN" Value="[APPSERVER_LOGIN]" Order="4"><![CDATA[ INSTALLTYPE=0 ]]></Publish>
             <Publish Dialog="InstallTypeDlg" Control="Next" Property="CLIENT_APPSERVER_PASSWORD" Value="[APPSERVER_PASSWORD]" Order="4" ><![CDATA[ INSTALLTYPE=0 ]]></Publish>
-            
+
+        	<?define EcsPasswordsEqual="(APPSERVER_PASSWORD = APPSERVER_PASSWORD_CONFIRM)" ?>
+        	
             <Publish Dialog="PasswordDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg">1</Publish>
             <Publish Dialog="PasswordDlg" Control="Next" Event="SpawnDialog" Value="EmptyPasswordDlg">NOT APPSERVER_PASSWORD</Publish>
             <Publish Dialog="PasswordDlg" Control="Next" Property="SERVER_APPSERVER_PASSWORD" Value="[APPSERVER_PASSWORD]">APPSERVER_PASSWORD</Publish>
             <Publish Dialog="PasswordDlg" Control="Next" Property="CLIENT_APPSERVER_PASSWORD" Value="[APPSERVER_PASSWORD]">APPSERVER_PASSWORD</Publish>
-            <Publish Dialog="PasswordDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">APPSERVER_PASSWORD</Publish>
+        	<Publish Dialog="PasswordDlg" Control="Next" Event="SpawnDialog" Value="PasswordShouldMatchDlg" Order="2"><![CDATA[ NOT $(var.EcsPasswordsEqual) ]]></Publish>
+            <Publish Dialog="PasswordDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">$(var.EcsPasswordsEqual) AND APPSERVER_PASSWORD</Publish>
             
             <Publish Dialog="AdvancedTypeDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg">1</Publish>
             <Publish Dialog="AdvancedTypeDlg" Control="Next" Event="NewDialog" Value="MyFeaturesDlg">1</Publish>
@@ -771,11 +780,16 @@
             <Publish Dialog="InstallDirDlg" Control="Next" Event="DoAction" Value="CheckServerDirectoryWritable">1</Publish>
             
             <Publish Dialog="AppServerDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg">1</Publish>
-            
+     
+			<?define EcsPortsDiffer="(APPSERVER_PORT <> PROXY_PORT)" ?>
+        	<?define EcsNeedCheckPorts="(APPSERVER_PORT <> OLD_APPSERVER_PORT OR PROXY_PORT <> OLD_PROXY_PORT)" ?>
+        	
             <Publish Dialog="AppServerDlg" Control="Next" Property="BUSYPORT" Value="{}">1</Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Property="PORTSTOTEST" Value="[APPSERVER_PORT] [PROXY_PORT]" Order="1">1</Publish>
-            <Publish Dialog="AppServerDlg" Control="Next" Event="DoAction" Value="CheckPorts" Order="2"><![CDATA[ APPSERVER_PORT <> OLD_APPSERVER_PORT OR PROXY_PORT <> OLD_PROXY_PORT ]]></Publish>
-            <Publish Dialog="AppServerDlg" Control="Next" Event="NewDialog" Value="PortIsBusyDlg" Order="3">BUSYPORT</Publish>
+        	<Publish Dialog="AppServerDlg" Control="Next" Event="SpawnDialog" Value="PortDuplicateDlg" Order="2"><![CDATA[ NOT $(var.EcsPortsDiffer) ]]></Publish>
+        	<Publish Dialog="AppServerDlg" Control="Next" Event="SpawnDialog" Value="PasswordShouldMatchDlg" Order="2"><![CDATA[ $(var.EcsPortsDiffer) AND NOT $(var.EcsPasswordsEqual) ]]></Publish>
+            <Publish Dialog="AppServerDlg" Control="Next" Event="DoAction" Value="CheckPorts" Order="2"><![CDATA[ $(var.EcsPortsDiffer) AND $(var.EcsPasswordsEqual) AND $(var.EcsNeedCheckPorts) ]]></Publish>
+            <Publish Dialog="AppServerDlg" Control="Next" Event="NewDialog" Value="PortIsBusyDlg" Order="3"><![CDATA[ $(var.EcsPortsDiffer) AND $(var.EcsPasswordsEqual) AND BUSYPORT ]]></Publish>
             
             <?define IsAsSettingsFilled="(APPSERVER_PORT AND PROXY_PORT AND APPSERVER_LOGIN AND APPSERVER_PASSWORD)" ?>
             

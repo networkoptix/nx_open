@@ -8,3 +8,5 @@ GenerateGuidsForServers
 SetMoviesFolder
 CheckPorts
 FindFreePorts
+FixServerFolder
+FixClientFolder
