@@ -182,6 +182,25 @@ void saveFrame(quint8* data, int width, int height, int linesize, const QString&
     src.save(fileName);
 }
 
+inline __m128i advanced_sad_x_x(const __m128i src1, const __m128i src2)
+{
+
+    // get abs difference between frames
+    __m128i pixelsAbs = _mm_sub_epi8(_mm_max_epu8(src1, src2), _mm_min_epu8(src1, src2));
+
+    pixelsAbs =_mm_insert_epi16( pixelsAbs, sadTransformMatrix[_mm_extract_epi16(pixelsAbs, 0)], 0);
+    pixelsAbs =_mm_insert_epi16( pixelsAbs, sadTransformMatrix[_mm_extract_epi16(pixelsAbs, 1)], 1);
+    pixelsAbs =_mm_insert_epi16( pixelsAbs, sadTransformMatrix[_mm_extract_epi16(pixelsAbs, 2)], 2);
+    pixelsAbs =_mm_insert_epi16( pixelsAbs, sadTransformMatrix[_mm_extract_epi16(pixelsAbs, 3)], 3);
+    pixelsAbs =_mm_insert_epi16( pixelsAbs, sadTransformMatrix[_mm_extract_epi16(pixelsAbs, 4)], 4);
+    pixelsAbs =_mm_insert_epi16( pixelsAbs, sadTransformMatrix[_mm_extract_epi16(pixelsAbs, 5)], 5);
+    pixelsAbs =_mm_insert_epi16( pixelsAbs, sadTransformMatrix[_mm_extract_epi16(pixelsAbs, 6)], 6);
+    pixelsAbs =_mm_insert_epi16( pixelsAbs, sadTransformMatrix[_mm_extract_epi16(pixelsAbs, 7)], 7);
+
+    // return sum
+    return _mm_sad_epu8(pixelsAbs, zerroConst);
+}
+
 void getFrame_avgY_array_8_x(const CLVideoDecoderOutput* frame, const CLVideoDecoderOutput* prevFrame, quint8* dst)
 {
     //saveFrame(frame->data[0], frame->width, frame->height, frame->linesize[0], "c:/src_orig.bmp");
@@ -213,7 +232,7 @@ void getFrame_avgY_array_8_x(const CLVideoDecoderOutput* frame, const CLVideoDec
             for (int i = 0; i < rowCnt;)
             {
                 //__m128i partSum = _mm_sad_epu8(*src, zerroConst); // src 16 bytes sum
-                __m128i partSum = _mm_sad_epu8(*src, *srcPrev); // src 16 bytes sum // SSE2
+                __m128i partSum = advanced_sad_x_x(*src, *srcPrev); // src 16 bytes sum // SSE2
                 src += lineSize;
                 srcPrev += lineSize;
                 ++i;
@@ -314,7 +333,7 @@ void getFrame_avgY_array_16_x(const CLVideoDecoderOutput* frame, const CLVideoDe
             const __m128i* src2 = linePtr2;
             for (int i = 0; i < rowCnt;)
             {
-                __m128i partSum = _mm_sad_epu8(*src, *src2); // src 16 bytes sum // SSE2
+                __m128i partSum = advanced_sad_x_x(*src, *src2); // src 16 bytes sum // SSE2
                 src += lineSize;
                 src2 += lineSize;
                 ++i;
@@ -404,25 +423,6 @@ __m128i QnMotionEstimation::advanced_sad_x_x(const __m128i* src1, const __m128i*
     return _mm_sad_epu8(pixelsAbs, zerroConst);
 }
 */
-
-inline __m128i advanced_sad_x_x(const __m128i src1, const __m128i src2)
-{
-
-    // get abs difference between frames
-    __m128i pixelsAbs = _mm_sub_epi8(_mm_max_epu8(src1, src2), _mm_min_epu8(src1, src2));
-
-    pixelsAbs =_mm_insert_epi16( pixelsAbs, sadTransformMatrix[_mm_extract_epi16(pixelsAbs, 0)], 0);
-    pixelsAbs =_mm_insert_epi16( pixelsAbs, sadTransformMatrix[_mm_extract_epi16(pixelsAbs, 1)], 1);
-    pixelsAbs =_mm_insert_epi16( pixelsAbs, sadTransformMatrix[_mm_extract_epi16(pixelsAbs, 2)], 2);
-    pixelsAbs =_mm_insert_epi16( pixelsAbs, sadTransformMatrix[_mm_extract_epi16(pixelsAbs, 3)], 3);
-    pixelsAbs =_mm_insert_epi16( pixelsAbs, sadTransformMatrix[_mm_extract_epi16(pixelsAbs, 4)], 4);
-    pixelsAbs =_mm_insert_epi16( pixelsAbs, sadTransformMatrix[_mm_extract_epi16(pixelsAbs, 5)], 5);
-    pixelsAbs =_mm_insert_epi16( pixelsAbs, sadTransformMatrix[_mm_extract_epi16(pixelsAbs, 6)], 6);
-    pixelsAbs =_mm_insert_epi16( pixelsAbs, sadTransformMatrix[_mm_extract_epi16(pixelsAbs, 7)], 7);
-
-    // return sum
-    return _mm_sad_epu8(pixelsAbs, zerroConst);
-}
 
 void getFrame_avgY_array_x_x(const CLVideoDecoderOutput* frame, const CLVideoDecoderOutput* prevFrame, quint8* dst, int sqWidth)
 {
