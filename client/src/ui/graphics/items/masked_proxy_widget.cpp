@@ -1,6 +1,6 @@
 #include "masked_proxy_widget.h"
 #include <QStyleOptionGraphicsItem>
-#include <ui/common/scene_utility.h>
+#include <ui/common/geometry.h>
 
 namespace {
     template<class Base>

@@ -5,7 +5,7 @@
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
-#include <ui/common/scene_utility.h>
+#include <ui/common/geometry.h>
 
 namespace {
 
@@ -86,7 +86,7 @@ void CachingProxyWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem
     QRectF vertexRect = this->rect();
     QRectF textureRect = QRectF(
         QPointF(0.0, 0.0),
-        SceneUtility::cwiseDiv(vertexRect.size(), m_image.size())
+        QnGeometry::cwiseDiv(vertexRect.size(), m_image.size())
     );
     glBegin(GL_QUADS);
     glColor(1.0, 1.0, 1.0, effectiveOpacity());
@@ -139,7 +139,7 @@ void CachingProxyWidget::ensureCurrentWidgetSynchronized() {
 void CachingProxyWidget::ensureTextureSizeSynchronized() {
     assert(currentWidget() != NULL);
 
-    if(SceneUtility::contains(m_image.size(), currentWidget()->size()))
+    if(QnGeometry::contains(m_image.size(), currentWidget()->size()))
         return;
 
     if(m_image.width() == m_maxTextureSize)

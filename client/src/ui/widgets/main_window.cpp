@@ -57,7 +57,7 @@ namespace {
         QToolButton *button = new QToolButton();
         button->setDefaultAction(action);
 
-        qreal aspectRatio = SceneUtility::aspectRatio(action->icon().actualSize(QSize(1024, 1024)));
+        qreal aspectRatio = QnGeometry::aspectRatio(action->icon().actualSize(QSize(1024, 1024)));
         int iconHeight = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, 0, button) * sizeMultiplier;
         int iconWidth = iconHeight * aspectRatio;
         button->setFixedSize(iconWidth, iconHeight);

@@ -11,7 +11,7 @@
 #include <core/resource/motion_window.h>
 
 #include <ui/common/constrained_resizable.h>
-#include <ui/common/scene_utility.h>
+#include <ui/common/geometry.h>
 #include <ui/common/frame_section_queryable.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/graphics/instruments/instrumented.h>
@@ -42,7 +42,7 @@ class Instrument;
 #   undef NO_DATA
 #endif
 
-class QnResourceWidget: public Instrumented<QGraphicsWidget>, public QnWorkbenchContextAware, public QnPolygonalShapeProvider, public ConstrainedResizable, public FrameSectionQuearyable, protected SceneUtility {
+class QnResourceWidget: public Instrumented<QGraphicsWidget>, public QnWorkbenchContextAware, public QnPolygonalShapeProvider, public ConstrainedResizable, public FrameSectionQuearyable, protected QnGeometry {
     Q_OBJECT;
     Q_PROPERTY(qreal frameOpacity READ frameOpacity WRITE setFrameOpacity);
     Q_PROPERTY(qreal frameWidth READ frameWidth WRITE setFrameWidth);

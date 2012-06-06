@@ -1,6 +1,6 @@
 #include "workbench_item.h"
 #include <limits>
-#include <ui/common/scene_utility.h>
+#include <ui/common/geometry.h>
 #include <core/resource/layout_resource.h>
 #include "workbench_layout.h"
 #include "core/resourcemanagment/resource_pool.h"

@@ -99,6 +99,12 @@ void Instrument::ensureUninstalled() {
         m_manager->uninstallInstrument(this);
 }
 
+QGraphicsView *Instrument::view(QWidget *viewport) {
+    assert(viewport != NULL);
+
+    return checked_cast<QGraphicsView *>(viewport->parent());
+}
+
 QList<QGraphicsItem *> Instrument::items(QGraphicsView *view, const QPoint &viewPos) const {
     return items(view, view->mapToScene(viewPos));
 }
