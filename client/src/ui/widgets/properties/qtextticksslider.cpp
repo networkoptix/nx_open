@@ -17,6 +17,16 @@ QTextTicksSlider::~QTextTicksSlider()
 
 }
 
+void QTextTicksSlider::resizeEvent(QResizeEvent * event)
+{
+    if (minimumHeight() == 0)
+    {
+        QPainter painter(this);
+        QFontMetrics metrics(painter.font());
+        setMinimumHeight(height() + metrics.ascent());
+    }
+}
+
 void QTextTicksSlider::paintEvent(QPaintEvent * ev)
 {
     QStyleOptionSlider opt;
@@ -33,7 +43,13 @@ void QTextTicksSlider::paintEvent(QPaintEvent * ev)
     {
         QString text = QString::number(i);
         QSize tickSize = metrics.size(Qt::TextSingleLine, text);
-        QPointF p(xPos - tickSize.width()/2.0, (height() - tickSize.height())/2 + metrics.ascent());
+        //QPointF p(xPos - tickSize.width()/2.0, (height() - tickSize.height())/2 + metrics.ascent());
+        painter.setPen(Qt::darkGray);
+        if (i != value())
+            painter.drawLine(xPos, height()/2-2, xPos, height()/2+2);
+
+        painter.setPen(Qt::white);
+        QPointF p(xPos - tickSize.width()/2.0, (height() - tickSize.height()) + metrics.ascent());
         painter.drawText(p, text);
         xPos += tickWidth;
     }

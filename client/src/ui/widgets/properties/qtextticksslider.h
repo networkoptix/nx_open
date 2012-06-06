@@ -9,6 +9,7 @@ public:
     virtual ~QTextTicksSlider();
 protected:
     virtual void paintEvent(QPaintEvent * ev) override;
+    virtual void resizeEvent(QResizeEvent * event) override;
 };
 
 #endif // __TEXT_TICKS_SLIDER_H__

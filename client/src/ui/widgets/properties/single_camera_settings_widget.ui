@@ -282,6 +282,12 @@
           </item>
           <item row="1" column="1">
            <widget class="QTextTicksSlider" name="sensitivitySlider">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="maximum">
              <number>9</number>
             </property>
@@ -290,6 +296,9 @@
             </property>
             <property name="tickPosition">
              <enum>QSlider::NoTicks</enum>
+            </property>
+            <property name="tickInterval">
+             <number>0</number>
             </property>
            </widget>
           </item>
