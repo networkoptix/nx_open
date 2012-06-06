@@ -33,7 +33,7 @@ void QTextTicksSlider::paintEvent(QPaintEvent * ev)
     {
         QString text = QString::number(i);
         QSize tickSize = metrics.size(Qt::TextSingleLine, text);
-        QPointF p(xPos - tickSize.width()/2.0, height() - tickSize.height() + metrics.descent());
+        QPointF p(xPos - tickSize.width()/2.0, (height() - tickSize.height())/2 + metrics.ascent());
         painter.drawText(p, text);
         xPos += tickWidth;
     }
