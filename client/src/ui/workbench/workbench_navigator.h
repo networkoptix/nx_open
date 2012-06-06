@@ -140,9 +140,6 @@ protected slots:
     
     void updateThumbnailsLoader();
     
-    void updateThumbnailsLater();
-    void updateThumbnails();
-
 protected slots:
     void at_display_widgetChanged(Qn::ItemRole role);
     void at_display_widgetAdded(QnResourceWidget *widget);

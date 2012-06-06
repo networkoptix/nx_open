@@ -183,6 +183,8 @@ private:
     Marker markerFromPosition(const QPointF &pos) const;
     QPointF positionFromMarker(Marker marker) const;
 
+    QRectF thumbnailsRect() const;
+    QRectF sliderRect() const;
     qreal effectiveLineStretch(int line) const;
 
     void setMarkerSliderPosition(Marker marker, qint64 position);
@@ -271,9 +273,6 @@ private:
     qreal m_animationUpdateMSecsPerPixel;
     QVector<qint64> m_nextTickmarkPos;
     QVector<QVector<QPointF> > m_tickmarkLines;
-    QHash<qint32, const QPixmap *> m_pixmapByPositionKey;
-    QHash<qint32, const QPixmap *> m_pixmapByHighlightKey;
-    QHash<QPair<QString, int>, const QPixmap *> m_pixmapByTextKey;
 
     QWeakPointer<QnThumbnailsLoader> m_thumbnailsLoader;
     qreal m_thumbnailsHeight;

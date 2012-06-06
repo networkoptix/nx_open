@@ -134,7 +134,7 @@ void QnThumbnailsLoader::removeRange(qint64 startTimeMs, qint64 endTimeMs)
         itr = m_newImages.erase(itr);
 }
 
-QPixmapPtr QnThumbnailsLoader::getPixmapByTime(qint64 timeMs, quint64 *realPixmapTimeMs)
+QPixmapPtr QnThumbnailsLoader::getPixmapByTime(qint64 timeMs, qint64 *realPixmapTimeMs)
 {
     QMutexLocker locker(&m_mutex);
     QMap<qint64, QPixmapPtr>::iterator itrUp = m_images.lowerBound(timeMs);
@@ -168,19 +168,20 @@ QPixmapPtr QnThumbnailsLoader::getPixmapByTime(qint64 timeMs, quint64 *realPixma
 
 void QnThumbnailsLoader::ensureScaleContext(int lineSize, const QSize &size, PixelFormat format)
 {
-    if (m_scaleContext) 
-    {
-        QSize outSize = QnGeometry::expanded(QnGeometry::aspectRatio(size), m_boundingSize, Qt::KeepAspectRatio).toSize();
-        if (m_srcLineSize == lineSize && m_srcSize == size && m_srcFormat == format && m_dstSize == outSize)
+    QSize dstSize = QnGeometry::expanded(QnGeometry::aspectRatio(size), m_boundingSize, Qt::KeepAspectRatio).toSize();
+    
+    if (m_scaleContext) {
+        if (m_srcLineSize == lineSize && m_srcSize == size && m_srcFormat == format && m_dstSize == dstSize)
             return;
 
         sws_freeContext(m_scaleContext);
         m_scaleContext = 0;
-        m_srcLineSize = lineSize;
-        m_srcSize = size;
-        m_srcFormat = format;
-        m_dstSize = outSize;
     }
+        
+    m_srcLineSize = lineSize;
+    m_srcSize = size;
+    m_srcFormat = format;
+    m_dstSize = dstSize;
     qFreeAligned(m_rgbaBuffer);
 
     int numBytes = avpicture_get_size(PIX_FMT_RGBA, qPower2Ceil(static_cast<quint32>(m_dstSize.width()), 8), m_dstSize.height());
@@ -217,7 +218,7 @@ void QnThumbnailsLoader::run()
 {
     while (!m_needStop)
     {
-        if (m_rangeToLoad.isEmpty() || m_dstSize.isEmpty())
+        if (m_rangeToLoad.isEmpty() || m_boundingSize.isEmpty())
         {
             msleep(5);
             continue;

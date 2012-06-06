@@ -136,7 +136,6 @@ void QnWorkbenchNavigator::initialize() {
     connect(m_timeSlider,                       SIGNAL(valueChanged(qint64)),                       this,   SLOT(updateScrollBarFromSlider()));
     connect(m_timeSlider,                       SIGNAL(rangeChanged(qint64, qint64)),               this,   SLOT(updateScrollBarFromSlider()));
     connect(m_timeSlider,                       SIGNAL(windowChanged(qint64, qint64)),              this,   SLOT(updateScrollBarFromSlider()));
-    connect(m_timeSlider,                       SIGNAL(windowChanged(qint64, qint64)),              this,   SLOT(updateThumbnailsLater()));
     connect(m_timeSlider,                       SIGNAL(windowChanged(qint64, qint64)),              this,   SLOT(updateTargetPeriod()));
     connect(m_timeSlider,                       SIGNAL(selectionChanged(qint64, qint64)),           this,   SLOT(at_timeSlider_selectionChanged()));
     connect(m_timeSlider,                       SIGNAL(customContextMenuRequested(const QPointF &, const QPoint &)), this, SLOT(at_timeSlider_customContextMenuRequested(const QPointF &, const QPoint &)));
@@ -709,21 +708,6 @@ void QnWorkbenchNavigator::updateScrollBarFromSlider() {
     }
 
     updateSliderFromScrollBar(); /* Bi-directional sync is needed as time scrollbar may adjust the provided values. */
-}
-
-void QnWorkbenchNavigator::updateThumbnailsLater() {
-    QTimer::singleShot(50, this, SLOT(updateThumbnails()));
-}
-
-void QnWorkbenchNavigator::updateThumbnails() {
-    if (!m_thumbnailsLoader || !m_currentWidget)
-        return;
-
-    if (m_currentWidget->aspectRatio() <= 0) {
-        updateThumbnailsLater();
-        return;
-    }
-
 }
 
 void QnWorkbenchNavigator::updateLive() {
