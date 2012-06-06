@@ -1,16 +1,18 @@
 #ifndef _QN_EVENT_SOURCE_
 #define _QN_EVENT_SOURCE_
 
-#include <QString>
-#include <QMap>
-#include <QObject>
-#include <QNetworkAccessManager>
-#include <QUrl>
-#include <QTextStream>
-#include <QVariant>
-#include <QQueue>
-#include <QTime>
-#include <QTimer>
+#include <QtCore/QString>
+#include <QtCore/QMap>
+#include <QtCore/QObject>
+#include <QtCore/QUrl>
+#include <QtCore/QTextStream>
+#include <QtCore/QVariant>
+#include <QtCore/QQueue>
+#include <QtCore/QTime>
+#include <QtCore/QTimer>
+#include <QtCore/QMetaType>
+#include <QtNetwork/QNetworkAccessManager>
+
 #include <qjson/parser.h>
 
 #include "utils/common/qnid.h"
@@ -47,6 +49,7 @@ struct QnEvent
 
     static quint32 nextSeqNumber(quint32 seqNumber);
 };
+Q_DECLARE_METATYPE(QnEvent);
 
 class QnJsonStreamParser
 {

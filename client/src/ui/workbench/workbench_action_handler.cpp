@@ -917,7 +917,7 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     if (!connection.isValid()) 
         return;
     
-    QnEventManager::instance()->stop();
+    QnEventManager::instance()->stop(); // TODO: blocks gui thread.
     SessionManager::instance()->stop();
 
     QnAppServerConnectionFactory::setDefaultUrl(connection.url);

@@ -157,6 +157,12 @@ QnEventSource::QnEventSource(QUrl url, int retryTimeout):
     m_reply(NULL),
     m_seqNumber(0)
 {
+    static volatile bool metaTypesInitialized = false;
+    if (!metaTypesInitialized) {
+        qRegisterMetaType<QnEvent>();
+        metaTypesInitialized = true;
+    }
+
     connect(this, SIGNAL(stopped()), this, SLOT(doStop()));
     connect(&m_manager, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)),
             this, SLOT(slotAuthenticationRequired(QNetworkReply*,QAuthenticator*)));

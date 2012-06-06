@@ -1,17 +1,23 @@
-#include <QTimer>
-#include <QDebug>
-#include <qglobal.h>
+#include <QtCore/QTimer>
+#include <QtCore/QDebug>
+#include <QtCore/QtGlobal>
+#include <QtCore/QThread>
 
 #include "core/resourcemanagment/resource_discovery_manager.h"
 #include "core/resourcemanagment/resource_pool.h"
 #include "device_plugins/server_camera/server_camera.h"
 #include "eventmanager.h"
 
-Q_GLOBAL_STATIC(QnEventManager, static_instance)
+Q_GLOBAL_STATIC_WITH_INITIALIZER(QnEventManager, qn_eventManager_instance, {
+    QThread *thread = new QThread(); // TODO: leaking thread here.
+    thread->start();
+
+    x->moveToThread(thread);
+})
 
 QnEventManager* QnEventManager::instance()
 {
-    return static_instance();
+    return qn_eventManager_instance();
 }
 
 void QnEventManager::init()
