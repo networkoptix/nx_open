@@ -48,12 +48,12 @@ static int sensitivityToMask[10] =
 static const int MIN_SQUARE_BY_SENS[10] = 
 {
     INT_MAX, // motion mask: 0
-    sensitivityToMask[1]*40,
-    sensitivityToMask[2]*26,
-    sensitivityToMask[3]*19,
-    sensitivityToMask[4]*13,
-    sensitivityToMask[5]*9,
-    sensitivityToMask[6]*6,
+    sensitivityToMask[1]*68,
+    sensitivityToMask[2]*48,
+    sensitivityToMask[3]*34,
+    sensitivityToMask[4]*22,
+    sensitivityToMask[5]*14,
+    sensitivityToMask[6]*8,
     sensitivityToMask[7]*4,
     sensitivityToMask[8]*2,
     sensitivityToMask[9]*1, // max sens: 9
