@@ -1,7 +1,7 @@
 #ifndef QN_WORKBENCH_UTILITY_H
 #define QN_WORKBENCH_UTILITY_H
 
-#include <ui/common/scene_utility.h>
+#include <ui/common/geometry.h>
 #include <ui/common/magnitude.h>
 #include <cmath>
 #include "workbench_grid_mapper.h"
@@ -49,7 +49,7 @@ public:
      */
     QnAspectRatioMagnitudeCalculator(const QPointF &origin, const QSize &size, const QRect &boundary, qreal aspectRatio):
         m_origin(origin),
-        m_size(SceneUtility::toPoint(size)),
+        m_size(QnGeometry::toPoint(size)),
         m_boundary(boundary),
         m_aspectRatio(aspectRatio)
     {}
@@ -71,7 +71,7 @@ protected:
                 qMax(m_boundary.bottom(), p.y() + m_size.y() - 1)
             )
         );
-        qreal aspectDistance = qAbs(std::log(SceneUtility::aspectRatio(extendedRect) / m_aspectRatio));
+        qreal aspectDistance = qAbs(std::log(QnGeometry::aspectRatio(extendedRect) / m_aspectRatio));
 
         qreal extensionDistance = qAbs(m_boundary.width() - extendedRect.width()) + qAbs(m_boundary.height() - extendedRect.height());
 
@@ -103,13 +103,13 @@ inline QSize bestSingleBoundedSize(QnWorkbenchGridMapper *mapper, int bound, Qt:
         gridSize1.setWidth(qMax(gridSize1.width() - 1, 1));
     }
 
-    qreal distance0 = std::abs(std::log(SceneUtility::aspectRatio(mapper->mapFromGrid(gridSize0)) / aspectRatio)) / 1.25; /* Prefer larger size. */
-    qreal distance1 = std::abs(std::log(SceneUtility::aspectRatio(mapper->mapFromGrid(gridSize1)) / aspectRatio));
+    qreal distance0 = std::abs(std::log(QnGeometry::aspectRatio(mapper->mapFromGrid(gridSize0)) / aspectRatio)) / 1.25; /* Prefer larger size. */
+    qreal distance1 = std::abs(std::log(QnGeometry::aspectRatio(mapper->mapFromGrid(gridSize1)) / aspectRatio));
     return distance0 < distance1 ? gridSize0 : gridSize1;
 }
 
 inline QSize bestDoubleBoundedSize(QnWorkbenchGridMapper *mapper, const QSize &bound, qreal aspectRatio) {
-    qreal boundAspectRatio = SceneUtility::aspectRatio(mapper->mapFromGrid(bound));
+    qreal boundAspectRatio = QnGeometry::aspectRatio(mapper->mapFromGrid(bound));
 
     if(aspectRatio < boundAspectRatio) {
         return bestSingleBoundedSize(mapper, bound.height(), Qt::Vertical, aspectRatio);
@@ -122,7 +122,7 @@ inline QRect bestDoubleBoundedGeometry(QnWorkbenchGridMapper *mapper, const QRec
     QSize size = bestDoubleBoundedSize(mapper, bound.size(), aspectRatio);
 
     return QRect(
-        bound.topLeft() + SceneUtility::toPoint(bound.size() - size) / 2,
+        bound.topLeft() + QnGeometry::toPoint(bound.size() - size) / 2,
         size
     );
 }

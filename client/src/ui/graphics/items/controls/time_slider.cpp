@@ -1,9 +1,11 @@
 #include "time_slider.h"
 
 #include <cassert>
+#include <limits>
 
 #include <QtCore/QDateTime>
 #include <QtCore/QCoreApplication>
+#include <QtCore/QTimer>
 #include <QtCore/qmath.h>
 
 #include <QtGui/QPainter>
@@ -16,7 +18,7 @@
 #include <camera/thumbnails_loader.h>
 
 #include <ui/common/color_transformations.h>
-#include <ui/common/scene_utility.h>
+#include <ui/common/geometry.h>
 #include <ui/style/noptix_style.h>
 #include <ui/style/globals.h>
 #include <ui/graphics/items/standard/graphics_slider_p.h>
@@ -219,7 +221,7 @@ namespace {
     }
 
     QRectF positionRect(const QRectF &sourceRect, const QRectF &position) {
-        QRectF result = SceneUtility::cwiseMul(position, sourceRect.size());
+        QRectF result = QnGeometry::cwiseMul(position, sourceRect.size());
         result.moveTopLeft(result.topLeft() + sourceRect.topLeft());
         return result;
     }
@@ -237,12 +239,12 @@ namespace {
             return;
         } 
 
-        QRectF erodedTarget = SceneUtility::eroded(target, targetMargins);
+        QRectF erodedTarget = QnGeometry::eroded(target, targetMargins);
         if(!erodedTarget.isValid())
             return;
 
-        MarginsF sourceMargins = SceneUtility::cwiseMul(SceneUtility::cwiseDiv(targetMargins, target.size()), source.size());
-        QRectF erodedSource = SceneUtility::eroded(source, sourceMargins);
+        MarginsF sourceMargins = QnGeometry::cwiseMul(QnGeometry::cwiseDiv(targetMargins, target.size()), source.size());
+        QRectF erodedSource = QnGeometry::eroded(source, sourceMargins);
 
         painter->drawPixmap(erodedTarget, pixmap, erodedSource);
     }
@@ -268,8 +270,13 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     m_selecting(false),
     m_dragMarker(NoMarker),
 	m_lineCount(0),
-    m_totalLineStretch(0.0)
+    m_totalLineStretch(0.0),
+    m_thumbnailsHeight(0.0)
 {
+    /* Prepare thumbnail update timer. */
+    m_thumbnailsUpdateTimer = new QTimer(this);
+    connect(m_thumbnailsUpdateTimer, SIGNAL(timeout()), this, SLOT(updateThumbnails()));
+
     /* Set default property values. */
     setAcceptHoverEvents(true);
     setProperty(Qn::SliderLength, 0);
@@ -309,6 +316,9 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     updateSteps();
     updateMinimalWindow();
     sliderChange(SliderRangeChange);
+
+
+    setThumbnailsHeight(20);
 }
 
 QnTimeSlider::~QnTimeSlider() {
@@ -533,6 +543,7 @@ void QnTimeSlider::setWindow(qint64 start, qint64 end) {
 
         updateToolTipVisibility();
         updateMSecsPerPixel();
+        updateThumbnailsLater();
     }
 }
 
@@ -709,6 +720,32 @@ qreal QnTimeSlider::effectiveLineStretch(int line) const {
     return m_lineData[line].visible ? m_lineData[line].stretch : 0.0;
 }
 
+QRectF QnTimeSlider::thumbnailsRect() const {
+    QRectF rect = this->rect();
+    return QRectF(rect.left(), rect.top(), rect.width(), m_thumbnailsHeight);
+}
+
+QRectF QnTimeSlider::sliderRect() const {
+    QRectF rect = this->rect();
+    return QRectF(rect.left(), rect.top() + m_thumbnailsHeight, rect.width(), rect.height() - m_thumbnailsHeight);
+}
+
+qreal QnTimeSlider::thumbnailsHeight() const {
+    return m_thumbnailsHeight;
+}
+
+void QnTimeSlider::setThumbnailsHeight(qreal thumbnailsHeight) {
+    if(qFuzzyCompare(m_thumbnailsHeight, thumbnailsHeight))
+        return;
+
+    m_thumbnailsHeight = thumbnailsHeight;
+
+    updateGeometry();
+    updateThumbnailsLater();
+
+    emit thumbnailsHeightChanged();
+}
+
 
 // -------------------------------------------------------------------------- //
 // Updating
@@ -735,7 +772,7 @@ void QnTimeSlider::updateToolTipText() {
 }
 
 void QnTimeSlider::updateLineCommentPixmap(int line) {
-    QRectF lineBarRect = positionRect(rect(), lineBarPosition);
+    QRectF lineBarRect = positionRect(sliderRect(), lineBarPosition);
 
     m_lineData[line].commentPixmap = m_pixmapCache->textPixmap(
         m_lineData[line].comment,
@@ -844,7 +881,7 @@ void QnTimeSlider::animateStepValues(int deltaMSecs) {
     int stepCount = m_steps.size();
     qreal dt = deltaMSecs / 1000.0;
 
-    QRectF tickmarkBarRect = positionRect(rect(), tickmarkBarPosition);
+    QRectF tickmarkBarRect = positionRect(sliderRect(), tickmarkBarPosition);
     const qreal maxTickmarkTextHeightPixels = tickmarkBarRect.height() * maxTickmarkHeight * tickmarkTextHeight;
 
     /* Range of valid text height values. */
@@ -894,6 +931,49 @@ void QnTimeSlider::updateTotalLineStretch() {
     updateLineCommentPixmaps();
 }
 
+void QnTimeSlider::updateThumbnailsLater() {
+    if(!m_thumbnailsUpdateTimer->isActive())
+        m_thumbnailsUpdateTimer->start(50);
+}
+
+void QnTimeSlider::updateThumbnails() {
+    m_thumbnailsUpdateTimer->stop();
+    if (!thumbnailsLoader())
+        return;
+
+    /* Don't load thumbnails too often. */
+    if (thumbnailsLoader()->currentMSecsSinceLastUpdate() < 500) {
+        updateThumbnailsLater();
+        return;
+    }
+
+    /* Update loader's bounding size. */
+    int boundingHeigth = qRound(m_thumbnailsHeight);
+    thumbnailsLoader()->setBoundingSize(QSize(boundingHeigth * 256, boundingHeigth));
+
+    /* Check actual thumbnail size. */
+    QSize size = thumbnailsLoader()->thumbnailSize();
+    if(size.isEmpty())
+        size = QSize(boundingHeigth / 3 * 4, boundingHeigth); /* For uninitialized loader, assume 4:3 aspect ratio. */
+
+    QnTimePeriod targetPeriod(m_windowStart, m_windowEnd - m_windowStart);
+    qint64 step = m_msecsPerPixel * size.width();
+
+    /* Maybe we don't need to send the request? Check that. */
+    if(qAbs(thumbnailsLoader()->step() - step) < m_msecsPerPixel * 0.25)
+        if (thumbnailsLoader()->loadedRange().containPeriod(targetPeriod))
+            return; 
+    
+    /* Add small margins to the period to request. */
+    qint64 d = targetPeriod.durationMs / 4;
+    QnTimePeriod extendedTargetPeriod = QnTimePeriod(targetPeriod.startTimeMs - d, targetPeriod.durationMs + 2 * d);
+
+    /* Load, finally. */
+    thumbnailsLoader()->loadRange(extendedTargetPeriod.startTimeMs, extendedTargetPeriod.endTimeMs(), step); 
+}
+
+
+
 
 // -------------------------------------------------------------------------- //
 // Painting
@@ -901,25 +981,19 @@ void QnTimeSlider::updateTotalLineStretch() {
 void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *widget) {
     sendPendingMouseMoves(widget);
 
-    QRectF rect = this->rect();
-    QRectF dateBarRect = positionRect(rect, dateBarPosition);
-    QRectF lineBarRect = positionRect(rect, lineBarPosition);
-    QRectF tickmarkBarRect = positionRect(rect, tickmarkBarPosition);
+    QRectF thumbnailsRect = this->thumbnailsRect();
+    QRectF sliderRect = this->sliderRect();
+    QRectF dateBarRect = positionRect(sliderRect, dateBarPosition);
+    QRectF lineBarRect = positionRect(sliderRect, lineBarPosition);
+    QRectF tickmarkBarRect = positionRect(sliderRect, tickmarkBarPosition);
     
     qreal lineTop, lineUnit = qFuzzyIsNull(m_totalLineStretch) ? 0.0 : lineBarRect.height() / m_totalLineStretch;
 
-    /* Draw border. */
-    {
-        QnScopedPainterAntialiasingRollback antialiasingRollback(painter, false);
-        QnScopedPainterPenRollback penRollback(painter, QPen(separatorColor, 0));
-        QnScopedPainterBrushRollback brushRollback(painter, Qt::NoBrush);
-        painter->drawRect(rect);
-    }
-
     /* Draw background. */
     if(qFuzzyIsNull(m_totalLineStretch)) {
-        drawSolidBackground(painter, rect);
+        drawSolidBackground(painter, this->rect());
     } else {
+        drawSolidBackground(painter, thumbnailsRect);
         drawSolidBackground(painter, tickmarkBarRect);
         drawSolidBackground(painter, dateBarRect);
 
@@ -943,6 +1017,22 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
             
             lineTop += lineHeight;
         }
+    }
+
+    /* Draw thumbnails. */
+    drawThumbnails(painter, QnGeometry::eroded(thumbnailsRect, MarginsF(1.0, 1.0, 1.0, 0.0))); /* Rect is eroded so that thumbnails don't get painted under borders. */
+
+    /* Draw separators. */
+    drawSeparator(painter, thumbnailsRect);
+    drawSeparator(painter, tickmarkBarRect);
+    drawSeparator(painter, dateBarRect);
+
+    /* Draw border. */
+    {
+        QnScopedPainterAntialiasingRollback antialiasingRollback(painter, false);
+        QnScopedPainterPenRollback penRollback(painter, QPen(separatorColor, 0));
+        QnScopedPainterBrushRollback brushRollback(painter, Qt::NoBrush);
+        painter->drawRect(rect());
     }
 
     /* Draw selection. */
@@ -970,21 +1060,12 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
 
     /* Draw tickmarks. */
     drawTickmarks(painter, tickmarkBarRect);
-    drawSeparator(painter, tickmarkBarRect);
 
-    /* Draw highlights. */
+    /* Draw dates. */
     drawDates(painter, dateBarRect);
 
     /* Draw position marker. */
     drawMarker(painter, sliderPosition(), positionMarkerColor);
-
-    /* Draw thumbnails. */
-    drawThumbnails(painter, QRectF(rect.left(), rect.top() - thumbnailsHeight(), rect.width(), thumbnailsHeight()));
-}
-
-int QnTimeSlider::thumbnailsHeight() const
-{
-    return rect().height();
 }
 
 void QnTimeSlider::drawSeparator(QPainter *painter, const QRectF &rect) {
@@ -1247,26 +1328,34 @@ void QnTimeSlider::drawDates(QPainter *painter, const QRectF &rect) {
 }
 
 void QnTimeSlider::drawThumbnails(QPainter *painter, const QRectF &rect) {
-    QnThumbnailsLoader *loader = m_thumbnailsLoader.data();
-    if (!loader)
-        return;
-    if (loader->step() == 0)
+    if (!thumbnailsLoader())
         return;
 
-    qint64 currentTime = m_windowStart;
-    qint64 endTime = m_windowEnd;
+    if (thumbnailsLoader()->step() <= 0)
+        return;
 
-    currentTime = qFloor(currentTime, loader->step());
+    qint64 step = thumbnailsLoader()->step();
+    qint64 endTime = m_windowEnd + step;
+    
+    qint64 roundedStep = 1 << qIntegerLog2(thumbnailsLoader()->step()); /* So that small changes in step doesn't cause thumbnail jitter. */
+    qint64 time = qFloor(m_windowStart, roundedStep * 8); /* So that thumbnail skipping is more or less regular. */
 
-    for (; currentTime < endTime; currentTime += loader->step()) {
-        loader->lockPixmaps();
-        const QPixmap *pixmap = loader->getPixmapByTime(currentTime);
-        if (pixmap) {
-            QPointF pos = positionFromValue(currentTime, false);
-            painter->drawRect(pos.x(), rect.top(), pixmap->size().width(), pixmap->size().height());
-            painter->drawPixmap(QPointF(pos.x(), rect.top()), *pixmap);
-        }
-        loader->unlockPixmaps();
+    qreal boundary = -std::numeric_limits<qreal>::max();
+    for (; time < endTime; time += step) {
+        qint64 realTime;
+        QPixmapPtr pixmap = thumbnailsLoader()->getPixmapByTime(time, &realTime);
+        if (!pixmap) 
+            continue;
+       
+        qreal x = positionFromValue(time, false).x();
+        QSizeF targetSize(pixmap->width() * rect.height() / pixmap->height(), rect.height());
+        QRectF targetRect(x - targetSize.width() / 2, rect.top(), targetSize.width(), targetSize.height());
+        
+        if(targetRect.left() < boundary)
+            continue;
+        boundary = targetRect.right();
+
+        drawCroppedPixmap(painter, targetRect, rect, *pixmap, pixmap->rect());
     }
 }
 
@@ -1274,6 +1363,16 @@ void QnTimeSlider::drawThumbnails(QPainter *painter, const QRectF &rect) {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+QSizeF QnTimeSlider::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const {
+    if(which == Qt::MinimumSize) {
+        QSizeF result = base_type::sizeHint(which, constraint);
+        result.setHeight(m_thumbnailsHeight);
+        return result;
+    } else {
+        return base_type::sizeHint(which, constraint);
+    }
+}
+
 void QnTimeSlider::tick(int deltaMSecs) {
     if((m_options & AdjustWindowToPosition) && !m_unzooming && !isSliderDown()) {
         /* Apply window position corrections if no animation or user interaction is in progress. */
@@ -1404,6 +1503,7 @@ void QnTimeSlider::resizeEvent(QGraphicsSceneResizeEvent *event) {
     updateMSecsPerPixel();
     updateLineCommentPixmaps();
     updateMinimalWindow();
+    updateThumbnailsLater();
 }
 
 void QnTimeSlider::kineticMove(const QVariant &degrees) {

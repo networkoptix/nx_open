@@ -139,9 +139,7 @@ protected slots:
     void updateSpeedRange();
     
     void updateThumbnailsLoader();
-    void delayedLoadThumbnails();
-    void loadThumbnails(qint64 startTimeMs, qint64 endTimeMs);
-
+    
 protected slots:
     void at_display_widgetChanged(Qn::ItemRole role);
     void at_display_widgetAdded(QnResourceWidget *widget);
@@ -201,6 +199,8 @@ private:
     QHash<QnResourcePtr, QnCachingTimePeriodLoader *> m_loaderByResource;
     
     QScopedPointer<QnThumbnailsLoader, QnRunnableCleanup> m_thumbnailsLoader;
+
+
     qint64 m_thumbnailsStartTimeMs;
     qint64 m_thumbnailsEndTimeMs;
 };

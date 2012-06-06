@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QScopedPointer>
-#include <ui/common/scene_utility.h>
+#include <ui/common/geometry.h>
 #include <ui/actions/actions.h>
 #include <core/resource/resource_fwd.h>
 #include "workbench_globals.h"
@@ -45,7 +45,7 @@ class QnScreenRecorder;
 /**
  * This class implements default scene manipulation logic.
  */
-class QnWorkbenchController: public QObject, public QnWorkbenchContextAware, protected SceneUtility {
+class QnWorkbenchController: public QObject, public QnWorkbenchContextAware, protected QnGeometry {
     Q_OBJECT;
 
 public:

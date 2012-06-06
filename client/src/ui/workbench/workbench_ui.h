@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <core/resource/resource_fwd.h>
-#include <ui/common/scene_utility.h>
+#include <ui/common/geometry.h>
 #include <ui/actions/action_target_provider.h>
 #include "workbench_globals.h"
 #include "workbench_context_aware.h"
@@ -38,7 +38,7 @@ class QnActionManager;
 class QnLayoutTabBar;
 class QnWorkbenchMotionDisplayWatcher;
 
-class QnWorkbenchUi: public QObject, public QnWorkbenchContextAware, public QnActionTargetProvider, protected SceneUtility {
+class QnWorkbenchUi: public QObject, public QnWorkbenchContextAware, public QnActionTargetProvider, protected QnGeometry {
     Q_OBJECT;
     Q_ENUMS(Flags Flag);
 

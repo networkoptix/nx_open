@@ -2,7 +2,7 @@
 #define QN_CLICKABLE_H
 
 #include <QGraphicsSceneMouseEvent>
-#include <ui/common/scene_utility.h>
+#include <ui/common/geometry.h>
 
 /**
  * A mixin class that lets graphics items handle mouse clicks properly.
