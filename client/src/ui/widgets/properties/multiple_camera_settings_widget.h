@@ -44,7 +44,7 @@ private slots:
     void at_dataChanged();
     void at_cameraScheduleWidget_scheduleTasksChanged();
     void at_cameraScheduleWidget_scheduleEnabledChanged();
-
+    void at_enableAudioCheckBox_clicked();
 private:
     void setHasChanges(bool hasChanges);
 
