@@ -227,6 +227,7 @@ void CLAudioStreamDisplay::putData(QnCompressedAudioDataPtr data, qint64 minTime
     if (data!=0)
     {
         m_audioQueue.enqueue(data);
+        bufferSize = msInBuffer();
     }
 
 
