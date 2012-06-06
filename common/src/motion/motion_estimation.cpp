@@ -117,10 +117,8 @@ public:
             quint8 hi = transformValue(i >> 8);
             sadTransformMatrix[i] = low + (hi << 8);
         }
-        int gg = 4;
     }
-};
-//} initSad;
+} initSad;
 
 
 
