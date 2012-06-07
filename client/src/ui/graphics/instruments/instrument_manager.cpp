@@ -29,7 +29,8 @@ InstrumentManagerPrivate::InstrumentManagerPrivate():
     viewDispatcher(NULL),
     viewportDispatcher(NULL),
     itemDispatcher(NULL),
-    totalTickTime(0)
+    totalTickTime(0),
+    pendingDelayedItemProcessing(false)
 {}
 
 void InstrumentManagerPrivate::init() {
@@ -469,7 +470,7 @@ void InstrumentManager::unregisterView(QGraphicsView *view) {
     d->unregisterViewInternal(view, false);
 }
 
-void InstrumentManager::registerItem(QGraphicsItem *item) {
+void InstrumentManager::registerItem(QGraphicsItem *item, bool delayed) {
     Q_D(InstrumentManager);
 
     if (item == NULL) {
@@ -495,7 +496,17 @@ void InstrumentManager::registerItem(QGraphicsItem *item) {
     if (d->items.contains(item))
         return; /* Re-registration is allowed. */
 
-    d->registerItemInternal(item);
+    if(delayed) {
+        d->delayedItems.insert(item);
+
+        if(!d->pendingDelayedItemProcessing) {
+            d->pendingDelayedItemProcessing = true;
+            QMetaObject::invokeMethod(this, "at_delayedItemRegistrationRequested", Qt::QueuedConnection);
+        }
+    } else {
+        d->delayedItems.remove(item);
+        d->registerItemInternal(item);
+    }
 }
 
 void InstrumentManager::unregisterItem(QGraphicsItem *item) {
@@ -505,6 +516,9 @@ void InstrumentManager::unregisterItem(QGraphicsItem *item) {
         qnNullWarning(item);
         return;
     }
+
+    if (d->delayedItems.remove(item))
+        return; /* Was scheduled to be registered, but didn't have a chance to. */
 
     if (!d->items.contains(item))
         return;
@@ -522,6 +536,15 @@ void InstrumentManager::at_viewport_destroyed(QObject *viewport) {
 
 void InstrumentManager::at_viewportWatcher_destroyed(QObject *viewportWatcher) {
     d_func()->at_viewportWatcher_destroyed(viewportWatcher);
+}
+
+void InstrumentManager::at_delayedItemRegistrationRequested() {
+    Q_D(InstrumentManager);
+
+    while(!d->delayedItems.isEmpty())
+        registerItem(*d->delayedItems.begin(), false);
+
+    d->pendingDelayedItemProcessing = false;
 }
 
 QList<InstrumentManager *> InstrumentManager::managersOf(QGraphicsScene *scene) {

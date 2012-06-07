@@ -311,7 +311,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     setAcceptHoverEvents(true);
     setProperty(Qn::SliderLength, 0);
     setProperty(Qn::NoHandScrollOver, true);
-    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed, QSizePolicy::Slider);
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred, QSizePolicy::Slider);
 
     setWindowStart(minimum());
     setWindowEnd(maximum());
@@ -953,20 +953,26 @@ void QnTimeSlider::updateThumbnails() {
 
     /* Update loader's bounding size. */
     int boundingHeigth = qRound(thumbnailsHeight());
-    thumbnailsLoader()->setBoundingSize(QSize(boundingHeigth * 256, boundingHeigth));
+    QSize boundingSize = QSize(boundingHeigth * 256, boundingHeigth);
+    bool boundingSizeChanged = thumbnailsLoader()->boundingSize() != boundingSize;
+    thumbnailsLoader()->setBoundingSize(boundingSize);
 
     /* Check actual thumbnail size. */
     QSize size = thumbnailsLoader()->thumbnailSize();
-    if(size.isEmpty())
-        size = QSize(boundingHeigth / 3 * 4, boundingHeigth); /* For uninitialized loader, assume 4:3 aspect ratio. */
+    if(size.isEmpty()) {
+        size = QSize(boundingHeigth * 4 / 3, boundingHeigth); /* For uninitialized loader, assume 4:3 aspect ratio. */
+    } else if(size.height() != boundingHeigth) { // TODO: evil hack, should work on signals.
+        size = QSize(boundingHeigth * size.width() / size.height() , boundingHeigth);
+    }
 
     QnTimePeriod targetPeriod(m_windowStart, m_windowEnd - m_windowStart);
     qint64 step = m_msecsPerPixel * size.width();
 
     /* Maybe we don't need to send the request? Check that. */
-    if(qAbs(thumbnailsLoader()->step() - step) < m_msecsPerPixel * 0.25)
-        if (thumbnailsLoader()->loadedRange().containPeriod(targetPeriod))
-            return; 
+    if(!boundingSizeChanged)
+        if(qAbs(thumbnailsLoader()->step() - step) < m_msecsPerPixel * 0.25)
+            if (thumbnailsLoader()->loadedRange().containPeriod(targetPeriod))
+                return; 
     
     /* Add small margins to the period to request. */
     qint64 d = targetPeriod.durationMs / 4;
@@ -983,8 +989,6 @@ void QnTimeSlider::updateThumbnails() {
 // Painting
 // -------------------------------------------------------------------------- //
 void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *widget) {
-    qDebug() << size().height() << "=" << rulerRect().height() << "+" << thumbnailsRect().height();
-
     sendPendingMouseMoves(widget);
 
     QRectF thumbnailsRect = this->thumbnailsRect();

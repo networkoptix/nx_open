@@ -94,8 +94,11 @@ public:
      * destroyed. Unregistering it is up to the user.
      *
      * \param item                     Graphics item to register.
+     * \param delayed                  Whether delayed registration is to be performed.
+     *                                 It may be necessary when item is registered when
+     *                                 it is not yet fully constructed.
      */
-    void registerItem(QGraphicsItem *item);
+    void registerItem(QGraphicsItem *item, bool delayed = false);
 
     /**
      * Unregisters the given graphics item from this instrument manager.
@@ -162,6 +165,7 @@ private slots:
     void at_view_destroyed(QObject *view);
     void at_viewport_destroyed(QObject *viewport);
     void at_viewportWatcher_destroyed(QObject *viewportWatcher);
+    void at_delayedItemRegistrationRequested();
 
 private:
     InstrumentManagerPrivate *const d_ptr;

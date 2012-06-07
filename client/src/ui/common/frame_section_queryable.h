@@ -51,7 +51,7 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::WindowFrameSections);
 class FrameSectionQuearyable {
 public:
     /**
-     * \param region                    Region to get frame sections for.
+     * \param region                    Region to get frame sections for, in widget coordinates.
      * \returns                         Window frame sections that intersect the given region. 
      */
     virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const = 0;

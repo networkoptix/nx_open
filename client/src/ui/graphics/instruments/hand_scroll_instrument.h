@@ -42,6 +42,11 @@ private:
 };
 
 namespace Qn { namespace {
+    /**
+     * Name of the property to set on a graphics object to forbid hand scrolling
+     * on top of it. By default, this property is not set, and hand scrolling is
+     * thus enabled.
+     */
     const char *NoHandScrollOver = "_qn_noHandScrollOver";
 
 #define NoHandScrollOver NoHandScrollOver

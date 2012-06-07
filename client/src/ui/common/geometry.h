@@ -220,6 +220,15 @@ public:
     static QRectF dilated(const QRectF &rect, const MarginsF &amount);
 
     /**
+     * Dilates the given rectangle by the given amount.
+     * 
+     * \param rect                      Rectangle to dilate.
+     * \param amount                    Dilation amount.
+     * \returns                         Dilated rectangle.
+     */
+    static QRectF dilated(const QRectF &rect, qreal amount);
+
+    /**
      * Dilates the given size by the given amount.
      * 
      * \param size                      Size to dilate.
@@ -236,6 +245,15 @@ public:
      * \returns                         Eroded rectangle.
      */
     static QRectF eroded(const QRectF &rect, const MarginsF &amount);
+
+    /**
+     * Erodes the given rectangle by the given amount.
+     * 
+     * \param rect                      Rectangle to erode.
+     * \param amount                    Erosion amount.
+     * \returns                         Eroded rectangle.
+     */
+    static QRectF eroded(const QRectF &rect, qreal amount);
 
     /**
      * Erodes the given rectangle by the given amount.
