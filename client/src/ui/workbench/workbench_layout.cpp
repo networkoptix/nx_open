@@ -4,7 +4,7 @@
 #include <core/resource/layout_resource.h>
 #include <utils/common/warnings.h>
 #include <utils/common/range.h>
-#include <ui/common/scene_utility.h>
+#include <ui/common/geometry.h>
 #include <ui/style/globals.h>
 #include "workbench_item.h"
 #include "workbench_grid_walker.h"
@@ -400,12 +400,12 @@ const QSet<QnWorkbenchItem *> &QnWorkbenchLayout::items(const QString &resourceU
 
 QRect QnWorkbenchLayout::closestFreeSlot(const QPointF &gridPos, const QSize &size, TypedMagnitudeCalculator<QPoint> *metric) const {
     if(metric == NULL) {
-        QnDistanceMagnitudeCalculator metric(gridPos - SceneUtility::toPoint(QSizeF(size)) / 2.0);
+        QnDistanceMagnitudeCalculator metric(gridPos - QnGeometry::toPoint(QSizeF(size)) / 2.0);
         return closestFreeSlot(gridPos, size, &metric); /* Use default metric if none provided. */
     }
 
     /* Grid cell where starting search position lies. */
-    QPoint gridCell = (gridPos - SceneUtility::toPoint(QSizeF(size)) / 2.0).toPoint();
+    QPoint gridCell = (gridPos - QnGeometry::toPoint(QSizeF(size)) / 2.0).toPoint();
 
     /* Current bests. */
     qreal bestDistance = std::numeric_limits<qreal>::max();

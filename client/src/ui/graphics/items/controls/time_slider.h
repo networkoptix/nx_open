@@ -12,6 +12,8 @@
 
 #include "time_step.h"
 
+class QTimer;
+
 class QnThumbnailsLoader;
 class QnTimeSliderPixmapCache;
 
@@ -52,7 +54,8 @@ public:
         UseUTC = 0x8,
 
         /**
-         * Whether the user can edit current selection with '[' and ']' buttons.
+         * Whether the user can edit current selection with '[' and ']' buttons,
+         * and with mouse.
          */
         SelectionEditable = 0x10,
 
@@ -60,18 +63,18 @@ public:
          * Whether the window should be auto-adjusted to contain the current
          * position.
          */
-        AdjustWindowToPosition = 0x20,
+        AdjustWindowToPosition = 0x40,
 
         /**
          * Whether zooming with the mouse wheel close to the window's side
          * should zoom into the side, not the mouse pointer position.
          */
-        SnapZoomToSides = 0x40,
+        SnapZoomToSides = 0x80,
 
         /**
          * Whether double clicking the time slider should start animated unzoom.
          */
-        UnzoomOnDoubleClick = 0x80,
+        UnzoomOnDoubleClick = 0x100,
     };
     Q_DECLARE_FLAGS(Options, Option);
 
@@ -115,7 +118,6 @@ public:
 
     bool isSelectionValid() const;
     void setSelectionValid(bool valid);
-    bool isSelecting() const;
 
     const QString &toolTipFormat() const;
     void setToolTipFormat(const QString &format);
@@ -128,7 +130,10 @@ public:
     virtual QPointF positionFromValue(qint64 logicalValue, bool bound = true) const override;
     virtual qint64 valueFromPosition(const QPointF &position, bool bound = true) const override;
 
-    int thumbnailsHeight() const;
+    qreal thumbnailsHeight() const;
+    qreal rulerHeight() const;
+    void setRulerHeight(qreal rulerHeight);
+
     QnThumbnailsLoader *thumbnailsLoader() const;
     void setThumbnailsLoader(QnThumbnailsLoader *value);
 
@@ -162,6 +167,8 @@ protected:
     virtual void dragMove(DragInfo *info) override;
     virtual void finishDrag(DragInfo *info) override;
 
+    virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint) const override;
+
     static QVector<QnTimeStep> createRelativeSteps();
     static QVector<QnTimeStep> createAbsoluteSteps();
     static QVector<QnTimeStep> enumerateSteps(const QVector<QnTimeStep> &steps);
@@ -171,11 +178,14 @@ private:
         NoMarker,
         SelectionStartMarker,
         SelectionEndMarker,
+        CreateSelectionMarker
     };
 
-    Marker markerFromPosition(const QPointF &pos) const;
+    Marker markerFromPosition(const QPointF &pos, qreal maxDistance = 1.0) const;
     QPointF positionFromMarker(Marker marker) const;
 
+    QRectF thumbnailsRect() const;
+    QRectF rulerRect() const;
     qreal effectiveLineStretch(int line) const;
 
     void setMarkerSliderPosition(Marker marker, qint64 position);
@@ -203,7 +213,8 @@ private:
     void updateAggregationValue();
     void updateAggregatedPeriods(int line, Qn::TimePeriodRole type);
     void updateTotalLineStretch();
-
+    void updateThumbnailsLater();
+    Q_SLOT void updateThumbnails();
 
     void animateStepValues(int deltaMSecs);
 
@@ -263,11 +274,13 @@ private:
     qreal m_animationUpdateMSecsPerPixel;
     QVector<qint64> m_nextTickmarkPos;
     QVector<QVector<QPointF> > m_tickmarkLines;
-    QHash<qint32, const QPixmap *> m_pixmapByPositionKey;
-    QHash<qint32, const QPixmap *> m_pixmapByHighlightKey;
-    QHash<QPair<QString, int>, const QPixmap *> m_pixmapByTextKey;
 
     QWeakPointer<QnThumbnailsLoader> m_thumbnailsLoader;
+    QTimer *m_thumbnailsUpdateTimer;
+
+    qreal m_rulerHeight;
+    qreal m_prefferedHeight;
+
     QnTimeSliderPixmapCache *m_pixmapCache;
 };
 

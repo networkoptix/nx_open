@@ -5,7 +5,7 @@
 #include <QtGui/QStandardItemModel>
 #include <QtGui/QMessageBox>
 
-#include "api/AppServerConnection.h"
+#include "api/app_server_connection.h"
 
 #include "ui/style/skin.h"
 #include "ui/dialogs/connection_testing_dialog.h"

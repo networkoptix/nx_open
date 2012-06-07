@@ -92,7 +92,7 @@ QVariant QnSettings::updateValueFromSettings(QSettings *settings, int id, const 
         result.name = QLatin1String("default");
         result.readOnly = true;
 
-        if(!result.url.isValid())
+        if(!result.isValid())
             result.url = QUrl(QString(QLatin1String("https://admin@%1:%2")).arg(QLatin1String(DEFAULT_APPSERVER_HOST)).arg(DEFAULT_APPSERVER_PORT));
 
         return QVariant::fromValue<QnConnectionData>(result);
@@ -112,7 +112,7 @@ QVariant QnSettings::updateValueFromSettings(QSettings *settings, int id, const 
         for (int i = 0; i < size; ++i) {
             settings->setArrayIndex(i);
             QnConnectionData connection = readConnectionData(settings);
-            if (connection.url.isValid())
+            if (connection.isValid())
                 result.append(connection);
         }
         settings->endArray();
@@ -143,7 +143,7 @@ void QnSettings::submitValueToSettings(QSettings *settings, int id, const QVaria
         settings->remove(QLatin1String("")); /* Clear children. */
         int i = 0;
         foreach (const QnConnectionData &connection, value.value<QnConnectionDataList>()) {
-            if (!connection.url.isValid())
+            if (!connection.isValid())
                 continue;
 
             if (connection.name.trimmed().isEmpty())

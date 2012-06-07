@@ -4,7 +4,7 @@
 #include <QtGui/QDialog>
 #include <QtCore/QTimer>
 
-#include "api/AppServerConnection.h"
+#include "api/app_server_connection.h"
 
 class QDataWidgetMapper;
 class QStandardItemModel;

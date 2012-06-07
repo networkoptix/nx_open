@@ -25,6 +25,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     at_tabWidget_currentChanged();
 
     connect(ui->nameEdit,               SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dataChanged()));
+    connect(ui->checkBoxEnableAudio,    SIGNAL(stateChanged(int)),              this,   SLOT(at_dataChanged()));
     connect(ui->loginEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dataChanged()));
     connect(ui->passwordEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dataChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleTasksChanged()),         this,   SLOT(at_cameraScheduleWidget_scheduleTasksChanged()));
@@ -35,7 +36,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
 
     connect(ui->cameraMotionButton,     SIGNAL(clicked(bool)),                  this,   SLOT(at_motionTypeChanged()));
     connect(ui->softwareMotionButton,   SIGNAL(clicked(bool)),                  this,   SLOT(at_motionTypeChanged()));
-    connect(ui->sensitivityComboBox,    SIGNAL(currentIndexChanged(int)),       this,   SLOT(at_motionSensitivityChanged(int)));
+    connect(ui->sensitivitySlider,      SIGNAL(valueChanged(int)),              this,   SLOT(at_motionSensitivityChanged(int)));
     connect(ui->resetMotionRegionsButton, SIGNAL(clicked()),                    this,   SLOT(at_motionSelectionCleared()));
 
     updateFromResource();
@@ -206,6 +207,7 @@ void QnSingleCameraSettingsWidget::submitToResource() {
         return;
 
     m_camera->setName(ui->nameEdit->text());
+    m_camera->setAudioEnabled(ui->checkBoxEnableAudio->isChecked());
     m_camera->setUrl(ui->ipAddressEdit->text());
     m_camera->setAuth(ui->loginEdit->text(), ui->passwordEdit->text());
 
@@ -231,6 +233,7 @@ void QnSingleCameraSettingsWidget::submitToResource() {
 void QnSingleCameraSettingsWidget::updateFromResource() {
     if(!m_camera) {
         ui->nameEdit->setText(QString());
+        ui->checkBoxEnableAudio->setChecked(false);
         ui->macAddressEdit->setText(QString());
         ui->ipAddressEdit->setText(QString());
         ui->webPageLabel->setText(QString());
@@ -248,6 +251,9 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         QString webPageAddress = QString(QLatin1String("http://%1")).arg(m_camera->getHostAddress().toString());
 
         ui->nameEdit->setText(m_camera->getName());
+        ui->checkBoxEnableAudio->setChecked(m_camera->isAudioEnabled());
+        ui->checkBoxEnableAudio->setEnabled(m_camera->isAudioSupported());
+
         ui->macAddressEdit->setText(m_camera->getMAC().toString());
         ui->ipAddressEdit->setText(m_camera->getUrl());
         ui->webPageLabel->setText(tr("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
@@ -284,6 +290,7 @@ void QnSingleCameraSettingsWidget::setReadOnly(bool readOnly) {
 
     using ::setReadOnly;
     setReadOnly(ui->nameEdit, readOnly);
+    setReadOnly(ui->checkBoxEnableAudio, readOnly);
     setReadOnly(ui->loginEdit, readOnly);
     setReadOnly(ui->passwordEdit, readOnly);
     setReadOnly(ui->cameraScheduleWidget, readOnly);

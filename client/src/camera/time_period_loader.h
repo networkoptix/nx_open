@@ -4,7 +4,7 @@
 #include <QtCore/QObject>
 #include <QtGui/QRegion>
 
-#include "api/VideoServerConnection.h"
+#include "api/video_server_connection.h"
 #include "recording/time_period.h"
 #include "core/resource/network_resource.h"
 

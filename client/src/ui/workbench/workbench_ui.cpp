@@ -78,7 +78,7 @@ namespace {
         int baseSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);
 
         qreal height = baseSize * sizeMultiplier;
-        qreal width = height * SceneUtility::aspectRatio(action->icon().actualSize(QSize(1024, 1024)));
+        qreal width = height * QnGeometry::aspectRatio(action->icon().actualSize(QSize(1024, 1024)));
 
         QnZoomingImageButtonWidget *button = new QnZoomingImageButtonWidget(parent);
         button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, QSizePolicy::ToolButton);
@@ -1238,6 +1238,8 @@ void QnWorkbenchUi::at_sliderShowButton_toggled(bool checked) {
 }
 
 void QnWorkbenchUi::at_sliderItem_geometryChanged() {
+    setSliderOpened(m_sliderOpened, m_sliderYAnimator->isRunning());
+
     updateTreeGeometry();
     updateHelpGeometry();
 

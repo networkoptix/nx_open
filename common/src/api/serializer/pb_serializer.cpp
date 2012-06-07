@@ -5,7 +5,6 @@
 #include "resourceType.pb.h"
 #include "license.pb.h"
 #include "cameraServerItem.pb.h"
-#include "api/QStdIStream.h"
 
 #include "pb_serializer.h"
 

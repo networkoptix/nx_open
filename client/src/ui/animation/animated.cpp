@@ -1,54 +1,58 @@
 #include "animated.h"
 
+#include <utils/common/warnings.h>
+
 #include <ui/graphics/instruments/instrument_manager.h>
 
-void detail::AnimatedBase::ensureTimer() {
-    if(m_timer)
-        return;
+namespace {
+    class DummyAnimationTimerListener: public AnimationTimerListener {
+    protected:
+        virtual void tick(int) override {}
+    };
 
-    ensureGuard();
-    m_timer = m_guard.data();
-}
+} // anonymous namespace
 
-void detail::AnimatedBase::ensureGuard() {
-    if(m_guard)
-        return;
+detail::AnimatedBase::AnimatedBase():
+    m_listener(new DummyAnimationTimerListener()) 
+{}
 
-    m_guard.reset(new AnimationTimer());
+detail::AnimatedBase::~AnimatedBase() {
+    return;
 }
 
 void detail::AnimatedBase::updateScene(QGraphicsScene *scene) {
-    AnimationTimer *timer = InstrumentManager::animationTimerOf(scene);
-    if(timer == m_timer)
+    AnimationTimer *oldTimer = m_listener->timer();
+    AnimationTimer *newTimer = InstrumentManager::animationTimerOf(scene);
+    if(newTimer == oldTimer)
         return;
 
-    if(m_timer && !m_timer->listeners().empty()) {
-        if(!timer) {
-            ensureGuard();
-            timer = m_guard.data();
-        }
-
-        if(timer != m_timer) {
-            /* Move only those listeners that were registered with this item. */
-            foreach(AnimationTimerListener *listener, m_timer->listeners())
-                if(m_listeners.contains(listener))
-                    timer->addListener(listener);
-        }
-    }
-    
-    m_timer = timer;
+    m_listener->setTimer(newTimer);
+    foreach(AnimationTimerListener *listener, m_listeners)
+        listener->setTimer(newTimer);
 }
 
 void detail::AnimatedBase::registerAnimation(AnimationTimerListener *listener) {
-    ensureTimer();
+    if(listener == NULL) {
+        qnNullWarning(listener);
+        return;
+    }
 
-    m_timer->addListener(listener);
+    listener->setTimer(m_listener->timer());
     m_listeners.insert(listener);
 }
 
 void detail::AnimatedBase::unregisterAnimation(AnimationTimerListener *listener) {
-    ensureTimer();
+    if(listener == NULL) {
+        qnNullWarning(listener);
+        return;
+    }
 
     m_listeners.remove(listener);
-    m_timer->removeListener(listener);
+
+    if(listener->timer() != m_listener->timer()) {
+        qnWarning("Given listener was not registered with this animated item.");
+        return;
+    }
+
+    listener->setTimer(NULL);
 }

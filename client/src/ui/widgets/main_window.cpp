@@ -18,8 +18,8 @@
 #include <core/resourcemanagment/resource_pool.h>
 #include <core/resourcemanagment/resource_pool_user_watcher.h>
 
-#include <api/AppServerConnection.h>
-#include <api/SessionManager.h>
+#include <api/app_server_connection.h>
+#include <api/session_manager.h>
 
 #include "ui/actions/action_manager.h"
 
@@ -49,15 +49,13 @@
 #include "dwm.h"
 #include "layout_tab_bar.h"
 
-#include "eventmanager.h"
-
 namespace {
 
     QToolButton *newActionButton(QAction *action, qreal sizeMultiplier = 1.0) {
         QToolButton *button = new QToolButton();
         button->setDefaultAction(action);
 
-        qreal aspectRatio = SceneUtility::aspectRatio(action->icon().actualSize(QSize(1024, 1024)));
+        qreal aspectRatio = QnGeometry::aspectRatio(action->icon().actualSize(QSize(1024, 1024)));
         int iconHeight = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, 0, button) * sizeMultiplier;
         int iconWidth = iconHeight * aspectRatio;
         button->setFixedSize(iconWidth, iconHeight);

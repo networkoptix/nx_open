@@ -110,9 +110,9 @@ void QnPreferencesDialog::accept() {
 void QnPreferencesDialog::submitToSettings() {
     m_settings->setBackgroundAnimated(ui->animateBackgroundCheckBox->isChecked());
     m_settings->setBackgroundColor(ui->backgroundColorPicker->currentColor());
+    m_settings->setMediaFolder(ui->mainMediaFolderLabel->text());
     m_settings->setMaxVideoItems(ui->maxVideoItemsSpinBox->value());
     m_settings->setAudioDownmixed(ui->downmixAudioCheckBox->isChecked());
-    m_settings->save();
 
     if (m_connectionsSettingsWidget) {
         QnConnectionData defaultConnection = qnSettings->defaultConnection();
@@ -130,6 +130,8 @@ void QnPreferencesDialog::submitToSettings() {
     QStringList checkLst(m_settings->extraMediaFolders());
     checkLst.push_back(QDir::toNativeSeparators(m_settings->mediaFolder()));
     QnResourceDirectoryBrowser::instance().setPathCheckList(checkLst); // TODO: re-check if it is needed here.
+
+    m_settings->save();
 }
 
 void QnPreferencesDialog::updateFromSettings() {
@@ -146,7 +148,6 @@ void QnPreferencesDialog::updateFromSettings() {
     ui->networkInterfacesList->clear();
     foreach (const QNetworkAddressEntry &entry, getAllIPv4AddressEntries())
         ui->networkInterfacesList->addItem(tr("IP Address: %1, Network Mask: %2").arg(entry.ip().toString()).arg(entry.netmask().toString()));
-
 
     QnConnectionDataList connections = qnSettings->customConnections();
     connections.push_front(qnSettings->defaultConnection());

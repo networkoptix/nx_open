@@ -3,7 +3,7 @@
 
 #include "core/resource/resource.h"
 #include "core/resource/storage_resource.h"
-#include "api/VideoServerConnection.h"
+#include "api/video_server_connection.h"
 
 class QnLocalVideoServerResource : public QnResource
 {

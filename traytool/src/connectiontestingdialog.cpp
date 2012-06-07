@@ -5,7 +5,7 @@
 #include <QtGui/QStandardItemModel>
 
 #include "connectiontestingdialog.h"
-#include "api/SessionManager.h"
+#include "api/session_manager.h"
 
 ConnectionTestingDialog::ConnectionTestingDialog(QWidget *parent, QUrl url) :
     QDialog(parent),
@@ -13,7 +13,7 @@ ConnectionTestingDialog::ConnectionTestingDialog(QWidget *parent, QUrl url) :
     m_timeoutTimer(this),
     m_url(url)
 {
-    SessionManager::instance()->start();
+    QnSessionManager::instance()->start();
 
     ui->setupUi(this);
 
@@ -74,7 +74,7 @@ void ConnectionTestingDialog::testResults(int status, const QByteArray &data, co
 void ConnectionTestingDialog::testSettings()
 {
     qDebug() << m_url;
-    SessionManager::instance()->testConnectionAsync(m_url, this, SLOT(testResults(int,QByteArray,QByteArray,int)));
+    QnSessionManager::instance()->testConnectionAsync(m_url, this, SLOT(testResults(int,QByteArray,QByteArray,int)));
 }
 
 void ConnectionTestingDialog::accept()

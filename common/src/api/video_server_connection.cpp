@@ -2,12 +2,11 @@
 #include <QNetworkProxy>
 #include <QNetworkReply>
 #include <QSharedPointer>
-#include "QStdIStream.h"
 #include "utils/common/util.h"
 
-#include "VideoServerConnection.h"
-#include "VideoServerConnection_p.h"
-#include "SessionManager.h"
+#include "video_server_connection.h"
+#include "video_server_connection_p.h"
+#include "session_manager.h"
 #include "api/serializer/serializer.h"
 
 QString QnVideoServerConnection::m_proxyAddr;
@@ -93,8 +92,6 @@ namespace {
         QByteArray localReply = reply;
         QBuffer buffer(&localReply);
         buffer.open(QIODevice::ReadOnly);
-
-        QStdIStream is(&buffer);
 
         char format[3];
         buffer.read(format, 3);
@@ -184,7 +181,7 @@ int QnVideoServerConnection::asyncCheckPath(const QString& path, QObject *target
 
     QnRequestParamList params;
     params << QnRequestParam("path", path);
-    return SessionManager::instance()->sendAsyncGetRequest(m_url, "CheckPath", params, processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
+    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, "CheckPath", params, processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
 
 }
 
@@ -231,7 +228,7 @@ int QnVideoServerConnection::recordedTimePeriods(const QnRequestParamList& param
 {
     QByteArray reply;
 
-    if(SessionManager::instance()->sendGetRequest(m_url, "RecordedTimePeriods", params, reply, errorString))
+    if(QnSessionManager::instance()->sendGetRequest(m_url, "RecordedTimePeriods", params, reply, errorString))
         return 1;
 
     if (reply.startsWith("BIN"))
@@ -250,7 +247,7 @@ int QnVideoServerConnection::asyncRecordedTimePeriods(const QnRequestParamList& 
     detail::VideoServerSessionManagerReplyProcessor *processor = new detail::VideoServerSessionManagerReplyProcessor();
     connect(processor, SIGNAL(finished(int, const QnTimePeriodList&, int)), target, slot);
 
-    return SessionManager::instance()->sendAsyncGetRequest(m_url, "RecordedTimePeriods", params, processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
+    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, "RecordedTimePeriods", params, processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
 }
 
 void QnVideoServerConnection::setProxyAddr(const QString& addr, int port)

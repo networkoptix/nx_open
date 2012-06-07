@@ -1,54 +1,61 @@
-#include <QTimer>
-#include <QDebug>
-#include <qglobal.h>
+#include <QtCore/QTimer>
+#include <QtCore/QDebug>
+#include <QtCore/QtGlobal>
+#include <QtCore/QThread>
 
 #include "core/resourcemanagment/resource_discovery_manager.h"
 #include "core/resourcemanagment/resource_pool.h"
 #include "device_plugins/server_camera/server_camera.h"
-#include "eventmanager.h"
 
-Q_GLOBAL_STATIC(QnEventManager, static_instance)
+#include "client_message_processor.h"
 
-QnEventManager* QnEventManager::instance()
+Q_GLOBAL_STATIC_WITH_INITIALIZER(QnClientMessageProcessor, qn_eventManager_instance, {
+    QThread *thread = new QThread(); // TODO: leaking thread here.
+    thread->start();
+
+    x->moveToThread(thread);
+})
+
+QnClientMessageProcessor* QnClientMessageProcessor::instance()
 {
-    return static_instance();
+    return qn_eventManager_instance();
 }
 
-void QnEventManager::init()
+void QnClientMessageProcessor::init()
 {
     QUrl appServerEventsUrl = QnAppServerConnectionFactory::defaultUrl();
     appServerEventsUrl.setPath("/events");
     init(appServerEventsUrl, EVENT_RECONNECT_TIMEOUT);
 }
 
-void QnEventManager::init(const QUrl& url, int timeout)
+void QnClientMessageProcessor::init(const QUrl& url, int timeout)
 {
-    m_source = QSharedPointer<QnEventSource>(new QnEventSource(url, timeout));
+    m_source = QSharedPointer<QnMessageSource>(new QnMessageSource(url, timeout));
 
-    connect(m_source.data(), SIGNAL(eventReceived(QnEvent)), this, SLOT(at_eventReceived(QnEvent)));
+    connect(m_source.data(), SIGNAL(messageReceived(QnMessage)), this, SLOT(at_messageReceived(QnMessage)));
     connect(m_source.data(), SIGNAL(connectionOpened()), this, SLOT(at_connectionOpened()));
     connect(m_source.data(), SIGNAL(connectionClosed(QString)), this, SLOT(at_connectionClosed(QString)));
     connect(m_source.data(), SIGNAL(connectionReset()), this, SLOT(at_connectionReset()));
 }
 
-QnEventManager::QnEventManager()
+QnClientMessageProcessor::QnClientMessageProcessor()
 {
 }
 
-void QnEventManager::run()
+void QnClientMessageProcessor::run()
 {
     init();
 
     m_source->startRequest();
 }
 
-void QnEventManager::stop()
+void QnClientMessageProcessor::stop()
 {
     if (m_source)
         m_source->stop();
 }
 
-void QnEventManager::at_resourcesReceived(int status, const QByteArray& errorString, QnResourceList resources, int handle)
+void QnClientMessageProcessor::at_resourcesReceived(int status, const QByteArray& errorString, QnResourceList resources, int handle)
 {
 	if (status != 0)
 	{
@@ -73,7 +80,7 @@ void QnEventManager::at_resourcesReceived(int status, const QByteArray& errorStr
 	}
 }
 
-void QnEventManager::at_licensesReceived(int status, const QByteArray &errorString, QnLicenseList licenses, int handle)
+void QnClientMessageProcessor::at_licensesReceived(int status, const QByteArray &errorString, QnLicenseList licenses, int handle)
 {
     foreach (QnLicensePtr license, licenses.licenses())
     {
@@ -90,23 +97,23 @@ void QnEventManager::at_licensesReceived(int status, const QByteArray &errorStri
     qnLicensePool->replaceLicenses(licenses);
 }
 
-void QnEventManager::at_eventReceived(QnEvent event)
+void QnClientMessageProcessor::at_messageReceived(QnMessage event)
 {
     QByteArray debugStr;
     QTextStream stream(&debugStr);
 
     stream << "Got event: " << event.eventType << " " << event.objectName << " " << event.objectId << event.resourceGuid;
 
-    if (event.eventType == QN_EVENT_RES_DISABLED_CHANGE || event.eventType == QN_EVENT_RES_STATUS_CHANGE)
+    if (event.eventType == QN_MESSAGE_RES_DISABLED_CHANGE || event.eventType == QN_MESSAGE_RES_STATUS_CHANGE)
         stream << "data: " << event.data.toInt();
 
     qDebug() << debugStr;
 
-    if (event.eventType == QN_EVENT_LICENSE_CHANGE)
+    if (event.eventType == QN_MESSAGE_LICENSE_CHANGE)
     {
         QnAppServerConnectionFactory::createConnection()->getLicensesAsync(this, SLOT(at_licensesReceived(int,QByteArray,QnLicenseList,int)));
     }
-	else if (event.eventType == QN_EVENT_RES_DISABLED_CHANGE)
+	else if (event.eventType == QN_MESSAGE_RES_DISABLED_CHANGE)
 	{
 		QnResourcePtr resource;
 		if (!event.resourceGuid.isEmpty())
@@ -119,7 +126,7 @@ void QnEventManager::at_eventReceived(QnEvent event)
 			resource->setDisabled(event.data.toInt());
 		}
 	}
-    else if (event.eventType == QN_EVENT_RES_STATUS_CHANGE)
+    else if (event.eventType == QN_MESSAGE_RES_STATUS_CHANGE)
     {
         QnResourcePtr resource;
         if (!event.resourceGuid.isEmpty())
@@ -133,7 +140,7 @@ void QnEventManager::at_eventReceived(QnEvent event)
             resource->setStatus(status);
         }
     }
-    else if (event.eventType == QN_CAMERA_SERVER_ITEM)
+    else if (event.eventType == QN_MESSAGE_CAMERA_SERVER_ITEM)
     {
         QString mac = event.dict["mac"].toString();
         QString serverGuid = event.dict["server_guid"].toString();
@@ -143,32 +150,32 @@ void QnEventManager::at_eventReceived(QnEvent event)
 
         QnCameraHistoryPool::instance()->addCameraHistoryItem(historyItem);
     }
-    else if (event.eventType == QN_EVENT_RES_CHANGE)
+    else if (event.eventType == QN_MESSAGE_RES_CHANGE)
     {
         QnAppServerConnectionFactory::createConnection()->
                 getResourcesAsync(QString("id=%1").arg(event.objectId), event.objectNameLower(), this, SLOT(at_resourcesReceived(int,QByteArray,QnResourceList,int)));
-    } else if (event.eventType == QN_EVENT_RES_DELETE)
+    } else if (event.eventType == QN_MESSAGE_RES_DELETE)
     {
         QnResourcePtr ownResource = qnResPool->getResourceById(event.objectId);
         qnResPool->removeResource(ownResource);
     }
 }
 
-void QnEventManager::at_connectionClosed(QString errorString)
+void QnClientMessageProcessor::at_connectionClosed(QString errorString)
 {
     qDebug() << "Connection aborted:" << errorString;
 
     emit connectionClosed();
 }
 
-void QnEventManager::at_connectionOpened()
+void QnClientMessageProcessor::at_connectionOpened()
 {
     qDebug() << "Connection opened";
 
     emit connectionOpened();
 }
 
-void QnEventManager::at_connectionReset()
+void QnClientMessageProcessor::at_connectionReset()
 {
     QnAppServerConnectionFactory::createConnection()->
             getResourcesAsync("", "resourceEx", this, SLOT(at_resourcesReceived(int,QByteArray,QnResourceList,int)));

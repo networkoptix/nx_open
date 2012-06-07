@@ -5,12 +5,12 @@
 #include <QSize>
 #include <QRect>
 #include <QPoint>
-#include <ui/common/scene_utility.h>
+#include <ui/common/geometry.h>
 
 /**
  * Convenience class that stores grid parameters.
  */
-class QnWorkbenchGridMapper: public QObject, protected SceneUtility {
+class QnWorkbenchGridMapper: public QObject, protected QnGeometry {
     Q_OBJECT;
 public:
     QnWorkbenchGridMapper(QObject *parent = NULL);

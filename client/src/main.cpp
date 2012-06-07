@@ -25,7 +25,7 @@
 #include "core/resourcemanagment/resource_pool.h"
 #include "utils/client_util.h"
 #include "plugins/resources/arecontvision/resource/av_resource_searcher.h"
-#include "api/AppServerConnection.h"
+#include "api/app_server_connection.h"
 #include "device_plugins/server_camera/server_camera.h"
 #include "device_plugins/server_camera/appserver.h"
 #include "utils/util.h"
@@ -37,12 +37,11 @@
 #include "core/resource/storage_resource.h"
 
 #include "plugins/resources/axis/axis_resource_searcher.h"
-#include "eventmanager.h"
 #include "core/resource/resource_directory_browser.h"
 
 #include "tests/auto_tester.h"
 #include "plugins/resources/d-link/dlink_resource_searcher.h"
-#include "api/SessionManager.h"
+#include "api/session_manager.h"
 #include "plugins/resources/droid/droid_resource_searcher.h"
 #include "ui/actions/action_manager.h"
 #include "ui/tooltips/tool_tip.h"
@@ -56,6 +55,7 @@
 #include "plugins/storage/file_storage/qtfile_storage_resource.h"
 #include "plugins/storage/file_storage/layout_storage_resource.h"
 #include "core/resource/camera_history.h"
+#include "client_message_processor.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -293,7 +293,7 @@ int main(int argc, char *argv[])
 
 
     // Create and start SessionManager
-    SessionManager* sm = SessionManager::instance();
+    QnSessionManager* sm = QnSessionManager::instance();
     QThread *thread = new QThread();
     sm->moveToThread(thread);
     QObject::connect(sm, SIGNAL(destroyed()), thread, SLOT(quit()));
@@ -438,8 +438,8 @@ int main(int argc, char *argv[])
         out << autoTester.message();
     }
 
-    QnEventManager::instance()->stop();
-    SessionManager::instance()->stop();
+    QnClientMessageProcessor::instance()->stop();
+    QnSessionManager::instance()->stop();
 
     QnResource::stopCommandProc();
     QnResourceDiscoveryManager::instance().stop();

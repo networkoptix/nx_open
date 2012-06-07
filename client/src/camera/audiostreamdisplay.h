@@ -57,6 +57,7 @@ private:
     static QnCodecAudioFormat int32Toint16(CLByteArray& audio, QnCodecAudioFormat format);
 	bool initFormatConvertRule(QnAudioFormat format);
 private:
+    QMutex m_guiSync;
 	enum SampleConvertMethod {SampleConvert_None, SampleConvert_Float2Int32, SampleConvert_Float2Int16, SampleConvert_Int32ToInt16};
 
     QMap<CodecID, CLAbstractAudioDecoder*> m_decoder;

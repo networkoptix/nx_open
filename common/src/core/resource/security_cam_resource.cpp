@@ -243,6 +243,15 @@ int QnSecurityCamResource::motionMaskWindowCnt() const
     return 0;
 }
 
+bool QnSecurityCamResource::isAudioSupported() const
+{
+    QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
+    QVariant val;
+    if (this_casted->getParam("isAudioSupported", val, QnDomainMemory))
+        return val.toUInt() > 0;
+    else
+        return false;
+}
 
 MotionTypeFlags QnSecurityCamResource::supportedMotionType() const
 {

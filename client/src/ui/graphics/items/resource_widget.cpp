@@ -1102,7 +1102,7 @@ void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, con
                 motionPath.addRect(QRectF(QPointF(x*xStep, y*yStep), QPointF((x+1)*xStep, (y+1)*yStep)));
     QPen pen(QColor(0xff, 0, 0, 128));
     qreal unit = qnGlobals->workbenchUnitSize();
-    pen.setWidth(unit*0.002);
+    pen.setWidth(unit*0.003);
     painter->setPen(pen);
     painter->drawPath(motionPath);
 }
@@ -1159,7 +1159,7 @@ void QnResourceWidget::drawMotionMask(QPainter *painter, const QRectF &rect, int
         QRegion reg;
         for (int i = 0; i < 10; ++i) 
         {
-            QColor clr = i > 0 ? QColor(150 +  i*4, 16*(10-i), 0, 96+i*4) : qnGlobals->motionMaskColor();
+            QColor clr = i > 0 ? QColor(100 +  i*3, 16*(10-i), 0, 96+i*2) : qnGlobals->motionMaskColor();
             QRegion reg = m_motionRegionList[channel].getRegionBySens(i);
             if (i > 0)
                 reg -= m_motionRegionList[channel].getRegionBySens(0);

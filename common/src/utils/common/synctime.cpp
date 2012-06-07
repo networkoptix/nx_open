@@ -2,8 +2,8 @@
 #include <QtCore/QThreadPool>
 
 #include "synctime.h"
-#include "api/AppServerConnection.h"
-#include "api/SessionManager.h"
+#include "api/app_server_connection.h"
+#include "api/session_manager.h"
 
 static const int SYNC_TIME_INTERVAL = 1000 * 60 * 5;
 
@@ -50,7 +50,7 @@ qint64 QnSyncTime::currentMSecsSinceEpoch()
 {
     QMutexLocker lock(&m_mutex);
 
-    if ((m_lastReceivedTime == 0 || m_timer.elapsed() > SYNC_TIME_INTERVAL) && m_gotTimeTask == 0 && SessionManager::instance()->isReady())
+    if ((m_lastReceivedTime == 0 || m_timer.elapsed() > SYNC_TIME_INTERVAL) && m_gotTimeTask == 0 && QnSessionManager::instance()->isReady())
     {
         m_gotTimeTask = new QnSyncTimeTask(this);
         QThreadPool::globalInstance()->start(m_gotTimeTask);
