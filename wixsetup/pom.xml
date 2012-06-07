@@ -243,7 +243,8 @@
 										<argument>-ext</argument> 
 										<argument>WixUIExtension.dll</argument>
 										<argument>-ext</argument> 
-										<argument>WixUtilExtension.dll</argument> 
+										<argument>WixUtilExtension.dll</argument>
+										<argument>PasswordShouldMatchDlg.wxs</argument>
 										<argument>UpgradeDlg.wxs</argument> 
 										<argument>PasswordDlg.wxs</argument>
 										<argument>EmptyPasswordDlg.wxs</argument>
