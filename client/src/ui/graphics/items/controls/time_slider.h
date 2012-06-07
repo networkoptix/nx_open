@@ -62,7 +62,7 @@ public:
         /**
          * Whether the user can change thumbnail bar's size with mouse.
          */
-        ThumbnailBarEditable = 0x20,
+        ThumbnailsEditable = 0x20,
 
         /**
          * Whether the window should be auto-adjusted to contain the current
@@ -123,7 +123,6 @@ public:
 
     bool isSelectionValid() const;
     void setSelectionValid(bool valid);
-    bool isSelecting() const;
 
     const QString &toolTipFormat() const;
     void setToolTipFormat(const QString &format);
@@ -187,15 +186,17 @@ private:
     };
 
     enum DragItem {
-        NoItem,
+        NoItem = NoMarker,
         SelectionStartItem = SelectionStartMarker,
         SelectionEndItem = SelectionEndMarker,
         NewSelectionItem,
         ThumbnailsItem
     };
 
-    Marker markerFromPosition(const QPointF &pos) const;
+    Marker markerFromPosition(const QPointF &pos, qreal maxDistance = 1.0) const;
     QPointF positionFromMarker(Marker marker) const;
+    DragItem itemFromPosition(const QPointF &pos, qreal maxDistance = 1.0) const;
+    QPointF positionFromItem(DragItem item) const;
 
     QRectF thumbnailsRect() const;
     QRectF sliderRect() const;

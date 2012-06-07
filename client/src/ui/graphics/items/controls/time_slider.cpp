@@ -170,7 +170,7 @@ namespace {
 
     const qreal zoomSideSnapDistance = 0.075;
 
-    const qreal maxMarkerHoverDistance = 5.0;
+    const qreal hoverEffectDistance = 5.0;
 
     const int startDragDistance = 5;
 
@@ -285,7 +285,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
 
     setWindowStart(minimum());
     setWindowEnd(maximum());
-    setOptions(StickToMinimum | StickToMaximum | UpdateToolTip | SelectionEditable | ThumbnailBarEditable | AdjustWindowToPosition | SnapZoomToSides | UnzoomOnDoubleClick);
+    setOptions(StickToMinimum | StickToMaximum | UpdateToolTip | SelectionEditable | ThumbnailsEditable | AdjustWindowToPosition | SnapZoomToSides | UnzoomOnDoubleClick);
 
     setToolTipFormat(tr("hh:mm:ss", "DEFAULT_TOOL_TIP_FORMAT"));
 
@@ -583,10 +583,6 @@ void QnTimeSlider::setSelectionValid(bool valid) {
     m_selectionValid = valid;
 }
 
-bool QnTimeSlider::isSelecting() const {
-    return m_selecting;
-}
-
 const QString &QnTimeSlider::toolTipFormat() const {
     return m_toolTipFormat;
 }
@@ -670,14 +666,14 @@ bool QnTimeSlider::scaleWindow(qreal factor, qint64 anchor) {
     return end <= maximum();
 }
 
-QnTimeSlider::Marker QnTimeSlider::markerFromPosition(const QPointF &pos) const {
+QnTimeSlider::Marker QnTimeSlider::markerFromPosition(const QPointF &pos, qreal maxDistance) const {
     if(m_selectionValid) {
         QPointF selectionStart = positionFromValue(m_selectionStart);
-        if(qAbs(selectionStart.x() - pos.x()) < maxMarkerHoverDistance)
+        if(qAbs(selectionStart.x() - pos.x()) < maxDistance)
             return SelectionStartMarker;
         
         QPointF selectionEnd = positionFromValue(m_selectionEnd);
-        if(qAbs(selectionEnd.x() - pos.x()) < maxMarkerHoverDistance)
+        if(qAbs(selectionEnd.x() - pos.x()) < maxDistance)
             return SelectionEndMarker;
     }
 
@@ -700,6 +696,22 @@ QPointF QnTimeSlider::positionFromMarker(Marker marker) const {
         }
     default:
         return rect().topLeft();
+    }
+}
+
+QnTimeSlider::DragItem QnTimeSlider::itemFromPosition(const QPointF &pos, qreal maxDistance) const {
+    if(qAbs(thumbnailsRect().top() - pos.y()) < 2 * maxDistance) {
+        return ThumbnailsItem;
+    } else {
+        return static_cast<DragItem>(markerFromPosition(pos, maxDistance));
+    }
+}
+
+QPointF QnTimeSlider::positionFromItem(DragItem item) const {
+    if(item == ThumbnailsItem) {
+        return thumbnailsRect().topLeft();
+    } else {
+        return positionFromMarker(static_cast<Marker>(item));
     }
 }
 
@@ -979,6 +991,8 @@ void QnTimeSlider::updateThumbnails() {
 // Painting
 // -------------------------------------------------------------------------- //
 void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *widget) {
+    qDebug() << size().height() << "=" << sliderRect().height() << "+" << thumbnailsRect().height();
+
     sendPendingMouseMoves(widget);
 
     QRectF thumbnailsRect = this->thumbnailsRect();
@@ -1023,7 +1037,8 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
     drawThumbnails(painter, QnGeometry::eroded(thumbnailsRect, MarginsF(1.0, 1.0, 1.0, 0.0))); /* Rect is eroded so that thumbnails don't get painted under borders. */
 
     /* Draw separators. */
-    drawSeparator(painter, thumbnailsRect);
+    if(!thumbnailsRect.isEmpty())
+        drawSeparator(painter, thumbnailsRect);
     drawSeparator(painter, tickmarkBarRect);
     drawSeparator(painter, dateBarRect);
 
@@ -1334,6 +1349,9 @@ void QnTimeSlider::drawThumbnails(QPainter *painter, const QRectF &rect) {
     if (thumbnailsLoader()->step() <= 0)
         return;
 
+    if (rect.isEmpty())
+        return;
+
     qint64 step = thumbnailsLoader()->step();
     qint64 endTime = m_windowEnd + step;
     
@@ -1560,16 +1578,17 @@ void QnTimeSlider::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
 void QnTimeSlider::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
     base_type::hoverMoveEvent(event);
 
-    if(m_options & SelectionEditable) {
-        switch(markerFromPosition(event->pos())) {
-        case SelectionStartMarker:
-        case SelectionEndMarker:
-            setCursor(Qt::SplitHCursor);
-            break;
-        default:
-            unsetCursor();
-            break;
-        }
+    switch(itemFromPosition(event->pos(), hoverEffectDistance)) {
+    case SelectionStartItem:
+    case SelectionEndItem:
+        setCursor(Qt::SplitHCursor);
+        break;
+    case ThumbnailsItem:
+        setCursor(Qt::SplitVCursor);
+        break;
+    default:
+        unsetCursor();
+        break;
     }
 }
 
@@ -1577,12 +1596,10 @@ void QnTimeSlider::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     base_type::mousePressEvent(event);
 
     if(event->button() == Qt::LeftButton) {
-        Marker marker = markerFromPosition(event->pos());
+        m_dragItem = itemFromPosition(event->pos(), hoverEffectDistance);
 
-        if(marker != NoMarker) {
-            m_dragItem = static_cast<DragItem>(marker);
+        if(m_dragItem != NoItem)
             dragProcessor()->mousePressEvent(this, event);
-        }
 
         event->accept();
     } else if(event->button() == Qt::RightButton) {
@@ -1627,6 +1644,7 @@ void QnTimeSlider::startDrag(DragInfo *info) {
     setSliderDown(true);
 
     m_dragIsClick = false;
+    m_dragDelta = positionFromItem(m_dragItem) - info->mousePressItemPos();
 
     if(m_dragItem == NewSelectionItem) {
         qint64 pos = valueFromPosition(info->mouseItemPos());
@@ -1637,16 +1655,15 @@ void QnTimeSlider::startDrag(DragInfo *info) {
 
     if(m_dragItem == SelectionStartItem || m_dragItem == SelectionEndItem) {
         m_selecting = true;
-        m_dragDelta = positionFromMarker(static_cast<Marker>(m_dragItem)) - info->mousePressItemPos();
+        emit selectionPressed();
     }
-
-    emit selectionPressed();
 }
 
 void QnTimeSlider::dragMove(DragInfo *info) {
-    qint64 pos = valueFromPosition(info->mouseItemPos() + m_dragDelta);
+    QPointF mousePos = info->mouseItemPos() + m_dragDelta;
 
-    setSliderPosition(pos);
+    if(m_dragItem == NoItem || m_dragItem == SelectionStartItem || m_dragItem == SelectionEndItem)
+        setSliderPosition(valueFromPosition(mousePos));
     
     if((m_options & SelectionEditable) && (m_dragItem == SelectionStartItem || m_dragItem == SelectionEndItem)) {
         qint64 selectionStart = m_selectionStart;
@@ -1654,11 +1671,11 @@ void QnTimeSlider::dragMove(DragInfo *info) {
         DragItem otherItem = NoItem;
         switch(m_dragItem) {
         case SelectionStartItem:
-            selectionStart = pos;
+            selectionStart = sliderPosition();
             otherItem = SelectionEndItem;
             break;
         case SelectionEndItem:
-            selectionEnd = pos;
+            selectionEnd = sliderPosition();
             otherItem = SelectionStartItem;
             break;
         default:
@@ -1672,11 +1689,22 @@ void QnTimeSlider::dragMove(DragInfo *info) {
 
         setSelection(selectionStart, selectionEnd);
     }
+
+    if((m_options & ThumbnailsEditable) && m_dragItem == ThumbnailsItem) {
+        qreal minimumSliderHeight = minimumHeight() - m_thumbnailsHeight;
+        qreal totalHeight = rect().bottom() - (info->mouseItemPos() + m_dragDelta).y();
+        qreal thumbnailsHeight = qMax(0.0, totalHeight - minimumSliderHeight);
+
+        setMinimumHeight(minimumSliderHeight + thumbnailsHeight);
+        setThumbnailsHeight(thumbnailsHeight);
+    }
 }
 
 void QnTimeSlider::finishDrag(DragInfo *) {
-    emit selectionReleased();
-    m_selecting = false;
+    if(m_selecting) {
+        emit selectionReleased();
+        m_selecting = false;
+    }
 
     setSliderDown(false);
 }

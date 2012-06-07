@@ -65,8 +65,8 @@ protected:
     virtual void run() override;
 
 private:
-    void ensureScaleContext(int lineSize, const QSize &size, PixelFormat format);
-    bool processFrame(const CLVideoDecoderOutput &outFrame);
+    void ensureScaleContext(int lineSize, const QSize &size, const QSize &boundingSize, PixelFormat format);
+    bool processFrame(const CLVideoDecoderOutput &outFrame, const QSize &boundingSize);
 
 private:
     mutable QMutex m_mutex;

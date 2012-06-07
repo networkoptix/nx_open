@@ -166,9 +166,9 @@ QPixmapPtr QnThumbnailsLoader::getPixmapByTime(qint64 timeMs, qint64 *realPixmap
     }
 }
 
-void QnThumbnailsLoader::ensureScaleContext(int lineSize, const QSize &size, PixelFormat format)
+void QnThumbnailsLoader::ensureScaleContext(int lineSize, const QSize &size, const QSize &boundingSize, PixelFormat format)
 {
-    QSize dstSize = QnGeometry::expanded(QnGeometry::aspectRatio(size), m_boundingSize, Qt::KeepAspectRatio).toSize();
+    QSize dstSize = QnGeometry::expanded(QnGeometry::aspectRatio(size), boundingSize, Qt::KeepAspectRatio).toSize();
     
     if (m_scaleContext) {
         if (m_srcLineSize == lineSize && m_srcSize == size && m_srcFormat == format && m_dstSize == dstSize)
@@ -189,12 +189,12 @@ void QnThumbnailsLoader::ensureScaleContext(int lineSize, const QSize &size, Pix
     m_scaleContext = sws_getContext(m_srcSize.width(), m_srcSize.height(), format, m_dstSize.width(), m_dstSize.height(), PIX_FMT_BGRA, SWS_POINT, NULL, NULL, NULL);
 }
 
-bool QnThumbnailsLoader::processFrame(const CLVideoDecoderOutput &outFrame)
+bool QnThumbnailsLoader::processFrame(const CLVideoDecoderOutput &outFrame, const QSize &boundingSize)
 {
     int dstLineSize[4];
     quint8* dstBuffer[4];
 
-    ensureScaleContext(outFrame.linesize[0], QSize(outFrame.width, outFrame.height), (PixelFormat) outFrame.format);
+    ensureScaleContext(outFrame.linesize[0], QSize(outFrame.width, outFrame.height), boundingSize, (PixelFormat) outFrame.format);
 
     dstLineSize[0] = qPower2Ceil(static_cast<quint32>(m_dstSize.width() * 4), 32);
     dstLineSize[1] = dstLineSize[2] = dstLineSize[3] = 0;
@@ -218,7 +218,8 @@ void QnThumbnailsLoader::run()
 {
     while (!m_needStop)
     {
-        if (m_rangeToLoad.isEmpty() || m_boundingSize.isEmpty())
+        QSize boundingSize = this->boundingSize();
+        if (m_rangeToLoad.isEmpty() || boundingSize.isEmpty())
         {
             msleep(5);
             continue;
@@ -249,7 +250,7 @@ void QnThumbnailsLoader::run()
         {
             if (decoder.decode(frame, &outFrame))
             {
-                if (!processFrame(outFrame))
+                if (!processFrame(outFrame, boundingSize))
                     break;
             }
 
@@ -258,7 +259,7 @@ void QnThumbnailsLoader::run()
 
         QnCompressedVideoDataPtr emptyData(new QnCompressedVideoData(1,0));
         while (!m_needStop && decoder.decode(emptyData, &outFrame))
-            processFrame(outFrame);
+            processFrame(outFrame, boundingSize);
 
         m_rtspClient->close();
         if (m_rangeToLoad.isEmpty())
