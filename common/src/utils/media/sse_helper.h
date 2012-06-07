@@ -23,11 +23,13 @@
 
 #define sse4_attribute __attribute__ ((__target__ ("sse4.1")))
 
+#ifndef Q_OS_MAC // Mac gcc smmintrin.h header already has this
 __STATIC_INLINE int __attribute__((__always_inline__)) sse4_attribute
 _mm_testz_si128 (__m128i __M, __m128i __V)
 {
     return __builtin_ia32_ptestz128 ((__v2di)__M, (__v2di)__V);
 }
+#endif
 
 #else
 #include <smmintrin.h>

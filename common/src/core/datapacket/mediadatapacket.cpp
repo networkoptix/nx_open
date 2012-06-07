@@ -5,6 +5,10 @@
 #include "utils/media/sse_helper.h"
 #include "utils/common/synctime.h"
 
+#ifdef Q_OS_MAC
+#include <smmintrin.h>
+#endif
+
 extern QMutex global_ffmpeg_mutex;
 
 QnMediaContext::QnMediaContext(AVCodecContext* ctx)

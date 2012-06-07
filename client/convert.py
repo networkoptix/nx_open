@@ -190,8 +190,8 @@ copy_files('resource/arecontvision/*', 'bin/debug/arecontvision')
 copy_files('resource/arecontvision/*', 'bin/release/arecontvision')
 
 if platform() == 'mac':
-    gen_env_sh('bin/debug/env.sh', ldpath_debug)
-    gen_env_sh('bin/release/env.sh', ldpath_release)
+    gen_env_sh('bin/debug/env.sh', ldpath_debug, {'FFMPEG_PATH' : ffmpeg_path_debug, 'QJSON_PATH' : os.path.abspath(qjson_path)})
+    gen_env_sh('bin/release/env.sh', ldpath_release, {'FFMPEG_PATH' : ffmpeg_path_release, 'QJSON_PATH' : os.path.abspath(qjson_path)})
 
 gen_version_h()
 

@@ -1,5 +1,11 @@
 #include "frame_scaler.h"
 #include <emmintrin.h>
+
+#ifdef Q_OS_MAC
+#include <tmmintrin.h>
+#include <smmintrin.h>
+#endif
+
 #include "utils/media/sse_helper.h"
 #include "utils/common/math.h"
 
