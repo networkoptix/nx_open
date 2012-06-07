@@ -2,7 +2,6 @@
 #define ipwebcam_droid_device_server_h_1657
 
 #include "core/resourcemanagment/resource_searcher.h"
-#include "../onvif/onvif_device_searcher.h"
 
 class QnPlIpWebCamResourceSearcher : public QnAbstractNetworkResourceSearcher
 {

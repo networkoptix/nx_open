@@ -2,9 +2,8 @@
 #define isd_device_server_h_1936
 
 #include "core/resourcemanagment/resource_searcher.h"
-#include "../onvif/onvif_device_searcher.h"
 
-class QnPlISDResourceSearcher : public OnvifResourceSearcher
+class QnPlISDResourceSearcher : public QnAbstractNetworkResourceSearcher
 {
     QnPlISDResourceSearcher();
 
@@ -17,8 +16,7 @@ public:
 
     virtual QnResourcePtr checkHostAddr(QHostAddress addr);
 
-protected:
-    QnNetworkResourcePtr processPacket(QnResourceList& result, QByteArray& responseData, const QHostAddress& sender);
+    virtual QnResourceList findResources() { QnResourceList res; return res; }
 };
 
 #endif //isd_device_server_h_1936

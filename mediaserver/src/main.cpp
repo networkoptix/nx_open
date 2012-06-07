@@ -34,20 +34,22 @@
 #include "settings.h"
 
 #include <fstream>
-#include "plugins/resources/onvif_generic_2_1_1/onvif_211_resource_searcher.h"
-#include "plugins/resources/axis/axis_resource_searcher.h"
-#include "plugins/resources/d-link/dlink_resource_searcher.h"
+#include "plugins/resources/onvif/onvif_resource_searcher.h"
+//#include "plugins/resources/onvif_generic_2_1_1/onvif_211_resource_searcher.h"
+//#include "plugins/resources/onvif_generic_2_1_1/onvif_211_resource_searcher_wsdd.h"
+//#include "plugins/resources/axis/axis_resource_searcher.h"
+//#include "plugins/resources/d-link/dlink_resource_searcher.h"
 #include "utils/common/log.h"
 #include "camera/camera_pool.h"
-#include "plugins/resources/iqinvision/iqinvision_resource_searcher.h"
+//#include "plugins/resources/iqinvision/iqinvision_resource_searcher.h"
 #include "serverutil.h"
-#include "plugins/resources/droid_ipwebcam/ipwebcam_droid_resource_searcher.h"
-#include "plugins/resources/droid/droid_resource_searcher.h"
-#include "plugins/resources/isd/isd_resource_searcher.h"
-#include "plugins/resources/test_camera/testcamera_resource_searcher.h"
-#include "plugins/resources/onvif/onvif_ws_searcher.h"
+//#include "plugins/resources/droid_ipwebcam/ipwebcam_droid_resource_searcher.h"
+//#include "plugins/resources/droid/droid_resource_searcher.h"
+//#include "plugins/resources/isd/isd_resource_searcher.h"
+//#include "plugins/resources/test_camera/testcamera_resource_searcher.h"
+//#include "plugins/resources/onvif/onvif_ws_searcher.h"
 #include "utils/common/command_line_parser.h"
-#include "plugins/resources/pulse/pulse_resource_searcher.h"
+//#include "plugins/resources/pulse/pulse_resource_searcher.h"
 //#include "plugins/storage/file_storage/file_storage_protocol.h"
 #include "plugins/storage/file_storage/file_storage_resource.h"
 #include "plugins/storage/coldstore/coldstore_storage.h"
@@ -568,7 +570,9 @@ void QnMain::run()
     QnResourceDiscoveryManager::instance().setResourceProcessor(m_processor);
     //QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlArecontResourceSearcher::instance());
     //QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlAxisResourceSearcher::instance());
-    QnResourceDiscoveryManager::instance().addDeviceServer(&OnvifGeneric211ResourceSearcher::instance());
+    //QnResourceDiscoveryManager::instance().addDeviceServer(&OnvifGeneric211ResourceSearcher::instance());
+    //QnResourceDiscoveryManager::instance().addDeviceServer(&OnvifGeneric211ResourceSearcherWsdd::instance());
+    QnResourceDiscoveryManager::instance().addDeviceServer(&OnvifResourceSearcher::instance());
     //QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDlinkResourceSearcher::instance());
     //QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIqResourceSearcher::instance());
 

@@ -2,9 +2,8 @@
 #define axis_device_server_h_2219
 
 #include "core/resourcemanagment/resource_searcher.h"
-#include "../onvif/onvif_device_searcher.h"
 
-class QnPlAxisResourceSearcher : public OnvifResourceSearcher
+class QnPlAxisResourceSearcher : public QnAbstractNetworkResourceSearcher
 {
     QnPlAxisResourceSearcher();
 
@@ -17,8 +16,7 @@ public:
 
     virtual QnResourcePtr checkHostAddr(QHostAddress addr);
 
-protected:
-    QnNetworkResourcePtr processPacket(QnResourceList& result, QByteArray& responseData, const QHostAddress& sender);
+    virtual QnResourceList findResources() { QnResourceList res; return res; }
 };
 
 #endif // axis_device_server_h_2219
