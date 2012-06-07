@@ -7,7 +7,7 @@
 #include <climits>
 #include <QHash>
 #include "onvif_resource.h"
-#include "../onvif/dataprovider/onvif_mjpeg.h"
+//#include "../onvif/dataprovider/onvif_mjpeg.h"
 #include "onvif_stream_reader.h"
 #include "onvif_helper.h"
 #include "utils/common/synctime.h"
