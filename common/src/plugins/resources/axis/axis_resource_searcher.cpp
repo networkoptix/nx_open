@@ -41,6 +41,11 @@ QnResourcePtr QnPlAxisResourceSearcher::createResource(QnId resourceTypeId, cons
 
 }
 
+QnNetworkResourcePtr QnPlAxisResourceSearcher::createResource() const
+{
+    return QnVirtualCameraResourcePtr( new QnPlAxisResource() );
+}
+
 QString QnPlAxisResourceSearcher::manufacture() const
 {
     return QnPlAxisResource::MANUFACTURE;

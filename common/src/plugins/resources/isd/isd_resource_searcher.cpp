@@ -42,6 +42,11 @@ QnResourcePtr QnPlISDResourceSearcher::createResource(QnId resourceTypeId, const
 
 }
 
+QnNetworkResourcePtr QnPlISDResourceSearcher::createResource() const
+{
+    return QnVirtualCameraResourcePtr( new QnPlIsdResource() );
+}
+
 QString QnPlISDResourceSearcher::manufacture() const
 {
     return QnPlIsdResource::MANUFACTURE;

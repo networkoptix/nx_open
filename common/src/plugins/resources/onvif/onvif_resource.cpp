@@ -52,15 +52,6 @@ struct VideoEncoders
 
 const QString QnPlOnvifResource::createOnvifEndpointUrl(const QString& ipAddress) {
     return ONVIF_PROTOCOL_PREFIX + ipAddress + ONVIF_URL_SUFFIX;
-    //return ONVIF_PROTOCOL_PREFIX + QString("10.10.10.73") + ONVIF_URL_SUFFIX;
-    //return ONVIF_PROTOCOL_PREFIX + QString("10.10.10.75") + ONVIF_URL_SUFFIX;
-    //return ONVIF_PROTOCOL_PREFIX + QString("10.10.10.12") + ONVIF_URL_SUFFIX;
-    //return ONVIF_PROTOCOL_PREFIX + QString("10.10.10.15") + ONVIF_URL_SUFFIX;
-    //return ONVIF_PROTOCOL_PREFIX + QString("174.34.67.10") + ONVIF_URL_SUFFIX;
-    //return ONVIF_PROTOCOL_PREFIX + QString("174.34.67.10") + ":81/onvif/device_service";
-    //return ONVIF_PROTOCOL_PREFIX + QString("174.34.67.10") + ":82/onvif/device_service";
-    //return ONVIF_PROTOCOL_PREFIX + QString("174.34.67.10") + ":83/onvif/device_service";
-    //return ONVIF_PROTOCOL_PREFIX + QString("192.168.2.11") + ONVIF_URL_SUFFIX;
 }
 
 QnPlOnvifResource::QnPlOnvifResource() :
