@@ -66,6 +66,13 @@ void parseCameras(QList<T>& cameras, const PbCameraList& pb_cameras, QnResourceF
         if (camera.isNull())
             continue;
 
+        for (int j = 0; j < pb_camera.property_size(); j++)
+        {
+            const proto::pb::Camera_Property& pb_property = pb_camera.property(j);
+
+            camera->setParam(pb_property.name().c_str(), pb_property.value().c_str(), QnDomainDatabase);
+        }
+
         camera->setScheduleDisabled(pb_camera.scheduledisabled());
         if (pb_camera.has_audioenabled())
             camera->setAudioEnabled(pb_camera.audioenabled());
@@ -418,7 +425,18 @@ void serializeCamera_i(proto::pb::Camera& pb_camera, const QnVirtualCameraResour
     pb_camera.set_audioenabled(cameraPtr->isAudioEnabled());
     pb_camera.set_motiontype(static_cast<proto::pb::Camera_MotionType>(cameraPtr->getMotionType()));
 
-    foreach(const QnScheduleTask& scheduleTaskIn, cameraPtr->getScheduleTasks()) {
+    QnParamList params = cameraPtr->getResourceParamList();
+    foreach(QString key, params.keys()) {
+        if (params[key].domain() == QnDomainDatabase)
+        {
+            proto::pb::Camera_Property& pb_property = *pb_camera.add_property();
+
+            pb_property.set_name(key.toUtf8().constData());
+            pb_property.set_value(params[key].value().toString().toUtf8().constData());
+        }
+    }
+
+    foreach (const QnScheduleTask& scheduleTaskIn, cameraPtr->getScheduleTasks()) {
         proto::pb::Camera_ScheduleTask& pb_scheduleTask = *pb_camera.add_scheduletask();
 
         pb_scheduleTask.set_id(scheduleTaskIn.getId().toInt());

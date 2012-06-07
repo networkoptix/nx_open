@@ -1,6 +1,7 @@
-#ifndef ONVIF_2_1_1_STREAM_REDER_H__
-#define ONVIF_2_1_1_STREAM_REDER_H__
+#ifndef onvif_stream_reader_h
+#define onvif_stream_reader_h
 
+#include "onvif_helper.h"
 #include "core/dataprovider/live_stream_provider.h"
 #include "core/dataprovider/spush_media_stream_provider.h"
 #include "utils/network/h264_rtp_reader.h"
@@ -12,11 +13,11 @@ class onvifXsd__VideoEncoderConfiguration;
 
 const ResolutionPair SECONDARY_STREAM_DEFAULT_RESOLUTION(320, 240);
 
-class QnOnvifGeneric211StreamReader: public CLServerPushStreamreader , public QnLiveStreamProvider
+class QnOnvifStreamReader: public CLServerPushStreamreader , public QnLiveStreamProvider
 {
 public:
-    QnOnvifGeneric211StreamReader(QnResourcePtr res);
-    virtual ~QnOnvifGeneric211StreamReader();
+    QnOnvifStreamReader(QnResourcePtr res);
+    virtual ~QnOnvifStreamReader();
 
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
@@ -51,7 +52,7 @@ private:
 private:
     QnMetaDataV1Ptr m_lastMetadata;
     RTPH264StreamreaderDelegate m_RTP264;
-    QnPlOnvifGeneric211ResourcePtr m_onvifRes;
+    QnPlOnvifResourcePtr m_onvifRes;
 };
 
-#endif // ONVIF_2_1_1_STREAM_REDER_H__
+#endif // onvif_stream_reader_h

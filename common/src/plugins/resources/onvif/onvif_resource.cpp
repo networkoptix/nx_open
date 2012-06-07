@@ -6,21 +6,25 @@
 
 #include <climits>
 #include <QHash>
-#include "onvif_211_resource.h"
-#include "../onvif/dataprovider/onvif_mjpeg.h"
-#include "onvif_211_stream_reader.h"
-#include "onvif_211_helper.h"
+#include "onvif_resource.h"
+//#include "../onvif/dataprovider/onvif_mjpeg.h"
+#include "onvif_stream_reader.h"
+#include "onvif_helper.h"
 #include "utils/common/synctime.h"
 //#include "onvif/Onvif.nsmap"
+#include "onvif/soapDeviceBindingProxy.h"
 #include "onvif/soapMediaBindingProxy.h"
 #include "onvif/wsseapi.h"
+#include "api/AppServerConnection.h"
 
-const char* QnPlOnvifGeneric211Resource::MANUFACTURE = "OnvifDevice";
+const char* QnPlOnvifResource::MANUFACTURE = "OnvifDevice";
 static const float MAX_AR_EPS = 0.01;
 static const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
-const char* QnPlOnvifGeneric211Resource::ONVIF_PROTOCOL_PREFIX = "http://";
-const char* QnPlOnvifGeneric211Resource::ONVIF_URL_SUFFIX = ":80/onvif/device_service";
-const int QnPlOnvifGeneric211Resource::DEFAULT_IFRAME_DISTANCE = 20;
+const char* QnPlOnvifResource::ONVIF_PROTOCOL_PREFIX = "http://";
+const char* QnPlOnvifResource::ONVIF_URL_SUFFIX = ":80/onvif/device_service";
+const int QnPlOnvifResource::DEFAULT_IFRAME_DISTANCE = 20;
+const QString& QnPlOnvifResource::MEDIA_URL_PARAM_NAME = *(new QString("MediaUrl"));
+const QString& QnPlOnvifResource::DEVICE_URL_PARAM_NAME = *(new QString("DeviceUrl"));
 
 
 //width > height is prefered
@@ -43,11 +47,15 @@ struct VideoEncoders
 };
 
 //
-// QnPlOnvifGeneric211Resource
+// QnPlOnvifResource
 //
 
-const QString QnPlOnvifGeneric211Resource::createOnvifEndpointUrl(const QString& ipAddress) {
+const QString QnPlOnvifResource::createOnvifEndpointUrl(const QString& ipAddress) {
     return ONVIF_PROTOCOL_PREFIX + ipAddress + ONVIF_URL_SUFFIX;
+    //return ONVIF_PROTOCOL_PREFIX + QString("10.10.10.73") + ONVIF_URL_SUFFIX;
+    //return ONVIF_PROTOCOL_PREFIX + QString("10.10.10.75") + ONVIF_URL_SUFFIX;
+    //return ONVIF_PROTOCOL_PREFIX + QString("10.10.10.12") + ONVIF_URL_SUFFIX;
+    //return ONVIF_PROTOCOL_PREFIX + QString("10.10.10.15") + ONVIF_URL_SUFFIX;
     //return ONVIF_PROTOCOL_PREFIX + QString("174.34.67.10") + ONVIF_URL_SUFFIX;
     //return ONVIF_PROTOCOL_PREFIX + QString("174.34.67.10") + ":81/onvif/device_service";
     //return ONVIF_PROTOCOL_PREFIX + QString("174.34.67.10") + ":82/onvif/device_service";
@@ -55,66 +63,80 @@ const QString QnPlOnvifGeneric211Resource::createOnvifEndpointUrl(const QString&
     //return ONVIF_PROTOCOL_PREFIX + QString("192.168.2.11") + ONVIF_URL_SUFFIX;
 }
 
-QnPlOnvifGeneric211Resource::QnPlOnvifGeneric211Resource() :
+QnPlOnvifResource::QnPlOnvifResource() :
     m_lastMotionReadTime(0),
     maxFps(QnPhysicalCameraResource::getMaxFps()),
     iframeDistance(DEFAULT_IFRAME_DISTANCE),
     minQuality(0),
     maxQuality(0),
     hasDual(false),
-    videoOptionsNotSet(true)
+    videoOptionsNotSet(true),
+    mediaUrl(),
+    deviceUrl(),
+    reinitDeviceInfo(false)
 {
 }
 
-bool QnPlOnvifGeneric211Resource::isResourceAccessible()
+bool QnPlOnvifResource::isResourceAccessible()
 {
     return updateMACAddress();
 }
 
-bool QnPlOnvifGeneric211Resource::updateMACAddress()
+bool QnPlOnvifResource::updateMACAddress()
 {
     return true;
 }
 
-QString QnPlOnvifGeneric211Resource::manufacture() const
+QString QnPlOnvifResource::manufacture() const
 {
     return MANUFACTURE;
 }
 
-QnAbstractStreamDataProvider* QnPlOnvifGeneric211Resource::createLiveDataProvider()
+QnAbstractStreamDataProvider* QnPlOnvifResource::createLiveDataProvider()
 {
-    return new QnOnvifGeneric211StreamReader(toSharedPointer());
+    return new QnOnvifStreamReader(toSharedPointer());
 }
 
-void QnPlOnvifGeneric211Resource::setCropingPhysical(QRect /*croping*/)
+void QnPlOnvifResource::setCropingPhysical(QRect /*croping*/)
 {
 
 }
 
-void QnPlOnvifGeneric211Resource::init()
+void QnPlOnvifResource::init()
 {
     QMutexLocker lock(&m_mutex);
 
+    setOnvifUrls();
+
     if (!isSoapAuthorized()) {
+        reinitDeviceInfo = true;
         setStatus(QnResource::Unauthorized);
         return;
     }
 
+    if (reinitDeviceInfo) {
+        fetchAndSetDeviceInformation();
+        setOnvifUrls();
+        reinitDeviceInfo = false;
+    }
+
     fetchAndSetVideoEncoderOptions();
+
+    save();
 }
 
-const ResolutionPair QnPlOnvifGeneric211Resource::getMaxResolution() const
+const ResolutionPair QnPlOnvifResource::getMaxResolution() const
 {
     QMutexLocker lock(&m_mutex);
     return m_resolutionList.isEmpty()? EMPTY_RESOLUTION_PAIR: m_resolutionList.front();
 }
 
-float QnPlOnvifGeneric211Resource::getResolutionAspectRatio(const ResolutionPair& resolution) const
+float QnPlOnvifResource::getResolutionAspectRatio(const ResolutionPair& resolution) const
 {
     return resolution.second == 0? 0: static_cast<double>(resolution.first) / resolution.second;
 }
 
-const ResolutionPair QnPlOnvifGeneric211Resource::getNearestResolution(const ResolutionPair& resolution, float aspectRatio) const
+const ResolutionPair QnPlOnvifResource::getNearestResolution(const ResolutionPair& resolution, float aspectRatio) const
 {
     QMutexLocker lock(&m_mutex);
 
@@ -142,13 +164,13 @@ const ResolutionPair QnPlOnvifGeneric211Resource::getNearestResolution(const Res
     return bestIndex >= 0 ? m_resolutionList[bestIndex]: EMPTY_RESOLUTION_PAIR;
 }
 
-int QnPlOnvifGeneric211Resource::getMaxFps()
+int QnPlOnvifResource::getMaxFps()
 {
     //Synchronization is not needed
     return maxFps;
 }
 
-void QnPlOnvifGeneric211Resource::setMotionMaskPhysical(int channel)
+void QnPlOnvifResource::setMotionMaskPhysical(int channel)
 {
     /*QMutexLocker lock(&m_mutex);
 
@@ -186,9 +208,57 @@ void QnPlOnvifGeneric211Resource::setMotionMaskPhysical(int channel)
     }*/
 }
 
-void QnPlOnvifGeneric211Resource::fetchAndSetVideoEncoderOptions() {
+void QnPlOnvifResource::fetchAndSetDeviceInformation()
+{
+    DeviceBindingProxy soapProxy;
+    QString endpoint(deviceUrl);
+
+    QAuthenticator auth(getAuth());
+    std::string login(auth.user().toStdString());
+    std::string passwd(auth.password().toStdString());
+    if (!login.empty()) soap_register_plugin(soapProxy.soap, soap_wsse);
+
+    //Trying to get name
+    _onvifDevice__GetDeviceInformation request;
+    _onvifDevice__GetDeviceInformationResponse response;
+    if (!login.empty()) soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", login.c_str(), passwd.c_str());
+
+    int soapRes = soapProxy.GetDeviceInformation(endpoint.toStdString().c_str(), NULL, &request, &response);
+    if (soapRes != SOAP_OK) {
+        qWarning() << "QnPlOnvifResource::fetchAndSetDeviceInformation: GetDeviceInformation SOAP to endpoint "
+            << endpoint << " failed. Camera name will remain 'Unknown'. GSoap error code: " << soapRes
+            << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
+    } else {
+        setName((response.Manufacturer + " - " + response.Model).c_str());
+    }
+    soap_end(soapProxy.soap);
+
+    //Trying to get onvif URLs
+    _onvifDevice__GetCapabilities request2;
+    _onvifDevice__GetCapabilitiesResponse response2;
+    if (!login.empty()) soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", login.c_str(), passwd.c_str());
+
+    soapRes = soapProxy.GetCapabilities(endpoint.toStdString().c_str(), NULL, &request2, &response2);
+    if (soapRes != SOAP_OK && cl_log.logLevel() >= cl_logDEBUG1) {
+        qWarning() << "QnPlOnvifResource::fetchAndSetDeviceInformation: can't fetch media and device URLs. Reason: SOAP to endpoint "
+            << endpoint << " failed. GSoap error code: " << soapRes << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
+    }
+    soap_end(soapProxy.soap);
+
+    if (response2.Capabilities && response2.Capabilities->Media) {
+        setMediaUrl(response2.Capabilities->Media->XAddr.c_str());
+        setParam(MEDIA_URL_PARAM_NAME, getMediaUrl(), QnDomainDatabase);
+    }
+    if (response2.Capabilities && response2.Capabilities->Device) {
+        setDeviceUrl(response2.Capabilities->Device->XAddr.c_str());
+        setParam(DEVICE_URL_PARAM_NAME, getDeviceUrl(), QnDomainDatabase);
+    }
+}
+
+void QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
+{
     MediaBindingProxy soapProxy;
-    QString endpoint(createOnvifEndpointUrl());
+    QString endpoint(mediaUrl);
 
     QAuthenticator auth(getAuth());
     std::string login(auth.user().toStdString());
@@ -205,12 +275,14 @@ void QnPlOnvifGeneric211Resource::fetchAndSetVideoEncoderOptions() {
 
         int soapRes = soapProxy.GetVideoEncoderConfigurationOptions(endpoint.toStdString().c_str(), NULL, &request, &response);
         if (soapRes != SOAP_OK || !response.Options) {
-            qWarning() << "QnPlOnvifGeneric211Resource::fetchAndSetVideoEncoderOptions: can't init ONVIF device resource, will "
-                << "try alternative approach (URL: " << endpoint << ", MAC: " << getMAC().toString() << "). Root cause: SOAP request failed. Error code: "
-                << soapRes << "Description: " << soapProxy.soap_fault_string() << ". " << soapProxy.soap_fault_detail();
+            qWarning() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: can't init ONVIF device resource, will "
+                << "try alternative approach (URL: " << endpoint << ", MAC: " << getMAC().toString()
+                << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
+                << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
         } else {
             setVideoEncoderOptions(response);
         }
+        soap_end(soapProxy.soap);
     }
 
     //Alternative approach to fetching video encoder options
@@ -220,13 +292,14 @@ void QnPlOnvifGeneric211Resource::fetchAndSetVideoEncoderOptions() {
 
         int soapRes = soapProxy.GetVideoEncoderConfigurations(endpoint.toStdString().c_str(), NULL, &request, &videoEncoders.soapResponse);
         if (soapRes != SOAP_OK) {
-            qWarning() << "QnPlOnvifGeneric211Resource::fetchAndSetVideoEncoderOptions: can't init ONVIF device resource even with alternative approach, "
-                << "default settings will be used (URL: " << endpoint << ", MAC: " << getMAC().toString() << "). Root cause: SOAP request failed. Error code: "
-                << soapRes << "Description: " << soapProxy.soap_fault_string() << ". " << soapProxy.soap_fault_detail();
+            qWarning() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: can't init ONVIF device resource even with alternative approach, "
+                << "default settings will be used (URL: " << endpoint << ", MAC: " << getMAC().toString() << "). Root cause: SOAP request failed. GSoap error code: "
+                << soapRes << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
             videoEncoders.soapFailed = true;
         } else {
             analyzeVideoEncoders(videoEncoders, true);
         }
+        soap_end(soapProxy.soap);
     }
 
     //Analyzing availability of dual streaming
@@ -237,13 +310,14 @@ void QnPlOnvifGeneric211Resource::fetchAndSetVideoEncoderOptions() {
 
         int soapRes = soapProxy.GetVideoEncoderConfigurations(endpoint.toStdString().c_str(), NULL, &request, &videoEncoders.soapResponse);
         if (soapRes != SOAP_OK) {
-            qWarning() << "QnPlOnvifGeneric211Resource::fetchAndSetVideoEncoderOptions: can't feth video encoders info from ONVIF device (URL: "
-                << endpoint << ", MAC: " << getMAC().toString() << "). Root cause: SOAP request failed. Error code: "
-                << soapRes << "Description: " << soapProxy.soap_fault_string() << ". " << soapProxy.soap_fault_detail();
+            qWarning() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: can't feth video encoders info from ONVIF device (URL: "
+                << endpoint << ", MAC: " << getMAC().toString() << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
+                << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
             videoEncoders.soapFailed = true;
         } else {
             analyzeVideoEncoders(videoEncoders, false);
         }
+        soap_end(soapProxy.soap);
     }
 
     int appropriateProfiles = 0;
@@ -254,12 +328,13 @@ void QnPlOnvifGeneric211Resource::fetchAndSetVideoEncoderOptions() {
 
         int soapRes = soapProxy.GetProfiles(endpoint.toStdString().c_str(), NULL, &request, &response);
         if (soapRes != SOAP_OK) {
-            qWarning() << "QnPlOnvifGeneric211Resource::fetchAndSetVideoEncoderOptions: can't fetch preset profiles ONVIF device (URL: "
-                << endpoint << ", MAC: " << getMAC().toString() << "). Root cause: SOAP request failed. Error code: " << soapRes
-                << ". Description: " << soapProxy.soap_fault_string() << ". " << soapProxy.soap_fault_detail();
+            qWarning() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: can't fetch preset profiles ONVIF device (URL: "
+                << endpoint << ", MAC: " << getMAC().toString() << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
+                << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
         } else {
             appropriateProfiles = countAppropriateProfiles(response, videoEncoders);
         }
+        soap_end(soapProxy.soap);
     }
 
     if (appropriateProfiles >= 2) {
@@ -291,7 +366,7 @@ void QnPlOnvifGeneric211Resource::fetchAndSetVideoEncoderOptions() {
 
     for (int i = 0; i < profilesToCreateSize; ++i) {
         if (encodersIter == videoEncoders.videoEncodersUnused.end()) {
-            qCritical() << "QnPlOnvifGeneric211Resource::fetchAndSetVideoEncoderOptions: wrong unused video encoders size!";
+            qCritical() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: wrong unused video encoders size!";
             hasDual = false;
             return;
         }
@@ -308,13 +383,15 @@ void QnPlOnvifGeneric211Resource::fetchAndSetVideoEncoderOptions() {
 
         int soapRes = soapProxy.CreateProfile(endpoint.toStdString().c_str(), NULL, &request, &response);
         if (soapRes != SOAP_OK) {
-            qWarning() << "QnPlOnvifGeneric211Resource::fetchAndSetVideoEncoderOptions: can't create new profile for ONVIF device (URL: "
-                << endpoint << ", MAC: " << getMAC().toString() << "). Root cause: SOAP request failed. Error code: " << soapRes
-                << ". Description: " << soapProxy.soap_fault_string() << ". " << soapProxy.soap_fault_detail();
+            qWarning() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: can't create new profile for ONVIF device (URL: "
+                << endpoint << ", MAC: " << getMAC().toString() << "). Root cause: SOAP request failed. GSoap error code: "
+                << soapRes << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
 
             hasDual = false;
+            soap_end(soapProxy.soap);
             return;
         }
+        soap_end(soapProxy.soap);
 
         if (!login.empty()) soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", login.c_str(), passwd.c_str());
         _onvifMedia__AddVideoEncoderConfiguration request2;
@@ -324,13 +401,15 @@ void QnPlOnvifGeneric211Resource::fetchAndSetVideoEncoderOptions() {
 
         soapRes = soapProxy.AddVideoEncoderConfiguration(endpoint.toStdString().c_str(), NULL, &request2, &response2);
         if (soapRes != SOAP_OK) {
-            qWarning() << "QnPlOnvifGeneric211Resource::fetchAndSetVideoEncoderOptions: can't add video encoder to newly created profile for ONVIF device (URL: "
-                << endpoint << ", MAC: " << getMAC().toString() << "). Root cause: SOAP request failed. Error code: " << soapRes
-                << ". Description: " << soapProxy.soap_fault_string() << ". " << soapProxy.soap_fault_detail();
+            qWarning() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: can't add video encoder to newly created profile for ONVIF device (URL: "
+                << endpoint << ", MAC: " << getMAC().toString() << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
+                << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
 
             hasDual = false;
+            soap_end(soapProxy.soap);
             return;
         }
+        soap_end(soapProxy.soap);
 
         ++encodersIter;
     }
@@ -338,7 +417,7 @@ void QnPlOnvifGeneric211Resource::fetchAndSetVideoEncoderOptions() {
     hasDual = profilesToCreateSize + appropriateProfiles >= 2;
 }
 
-void QnPlOnvifGeneric211Resource::setVideoEncoderOptions(const _onvifMedia__GetVideoEncoderConfigurationOptionsResponse& response) {
+void QnPlOnvifResource::setVideoEncoderOptions(const _onvifMedia__GetVideoEncoderConfigurationOptionsResponse& response) {
     if (!response.Options) {
         return;
     }
@@ -349,18 +428,18 @@ void QnPlOnvifGeneric211Resource::setVideoEncoderOptions(const _onvifMedia__GetV
 
         qDebug() << "ONVIF quality range [" << minQuality << ", " << maxQuality << "]";
     } else {
-        qCritical() << "QnPlOnvifGeneric211Resource::setVideoEncoderOptions: can't fetch ONVIF quality range";
+        qCritical() << "QnPlOnvifResource::setVideoEncoderOptions: can't fetch ONVIF quality range";
     }
 
     if (!response.Options->H264) {
-        qCritical() << "QnPlOnvifGeneric211Resource::setVideoEncoderOptions: can't fetch (ONVIF) max fps, iframe distance and resolution list";
+        qCritical() << "QnPlOnvifResource::setVideoEncoderOptions: can't fetch (ONVIF) max fps, iframe distance and resolution list";
     } else {
         if (response.Options->H264->FrameRateRange) {
             maxFps = response.Options->H264->FrameRateRange->Max;
 
             qDebug() << "ONVIF max FPS: " << maxFps;
         } else {
-            qCritical() << "QnPlOnvifGeneric211Resource::setVideoEncoderOptions: can't fetch ONVIF max FPS";
+            qCritical() << "QnPlOnvifResource::setVideoEncoderOptions: can't fetch ONVIF max FPS";
         }
 
         if (response.Options->H264->GovLengthRange) {
@@ -368,13 +447,13 @@ void QnPlOnvifGeneric211Resource::setVideoEncoderOptions(const _onvifMedia__GetV
                 (DEFAULT_IFRAME_DISTANCE >= response.Options->H264->GovLengthRange->Max? response.Options->H264->GovLengthRange->Max: DEFAULT_IFRAME_DISTANCE);
             qDebug() << "ONVIF iframe distance: " << iframeDistance;
         } else {
-            qCritical() << "QnPlOnvifGeneric211Resource::setVideoEncoderOptions: can't fetch ONVIF iframe distance";
+            qCritical() << "QnPlOnvifResource::setVideoEncoderOptions: can't fetch ONVIF iframe distance";
         }
     }
 
     std::vector<onvifXsd__VideoResolution*>& resolutions = response.Options->H264->ResolutionsAvailable;
     if (resolutions.size() == 0) {
-        qCritical() << "QnPlOnvifGeneric211Resource::setVideoEncoderOptions: can't fetch ONVIF resolutions";
+        qCritical() << "QnPlOnvifResource::setVideoEncoderOptions: can't fetch ONVIF resolutions";
     } else {
         m_resolutionList.clear();
 
@@ -397,7 +476,7 @@ void QnPlOnvifGeneric211Resource::setVideoEncoderOptions(const _onvifMedia__GetV
     videoOptionsNotSet = false;
 }
 
-void QnPlOnvifGeneric211Resource::analyzeVideoEncoders(VideoEncoders& encoders, bool setOptions) {
+void QnPlOnvifResource::analyzeVideoEncoders(VideoEncoders& encoders, bool setOptions) {
     qDebug() << "Alternative video options. Size: " << encoders.soapResponse.Configurations.size();
     std::vector<onvifXsd__VideoEncoderConfiguration*>::const_iterator iter = encoders.soapResponse.Configurations.begin();
 
@@ -482,25 +561,25 @@ void QnPlOnvifGeneric211Resource::analyzeVideoEncoders(VideoEncoders& encoders, 
     videoOptionsNotSet = false;
 }
 
-int QnPlOnvifGeneric211Resource::innerQualityToOnvif(QnStreamQuality quality) const
+int QnPlOnvifResource::innerQualityToOnvif(QnStreamQuality quality) const
 {
     if (quality > QnQualityHighest) {
-        qWarning() << "QnPlOnvifGeneric211Resource::onvifQualityToInner: got unexpected quality (too big): " << quality;
+        qWarning() << "QnPlOnvifResource::onvifQualityToInner: got unexpected quality (too big): " << quality;
         return maxQuality;
     }
     if (quality < QnQualityLowest) {
-        qWarning() << "QnPlOnvifGeneric211Resource::onvifQualityToInner: got unexpected quality (too small): " << quality;
+        qWarning() << "QnPlOnvifResource::onvifQualityToInner: got unexpected quality (too small): " << quality;
         return minQuality;
     }
 
-    qDebug() << "QnPlOnvifGeneric211Resource::onvifQualityToInner: in quality = " << quality << ", out qualty = "
+    qDebug() << "QnPlOnvifResource::onvifQualityToInner: in quality = " << quality << ", out qualty = "
              << minQuality + (maxQuality - minQuality) * (quality - QnQualityLowest) / (QnQualityHighest - QnQualityLowest)
              << ", minOnvifQuality = " << minQuality << ", maxOnvifQuality = " << maxQuality;
 
     return minQuality + (maxQuality - minQuality) * (quality - QnQualityLowest) / (QnQualityHighest - QnQualityLowest);
 }
 
-int QnPlOnvifGeneric211Resource::countAppropriateProfiles(const _onvifMedia__GetProfilesResponse& response, VideoEncoders& encoders)
+int QnPlOnvifResource::countAppropriateProfiles(const _onvifMedia__GetProfilesResponse& response, VideoEncoders& encoders)
 {
     const std::vector<onvifXsd__Profile*>& profiles = response.Profiles;
     int result = 0;
@@ -522,9 +601,11 @@ int QnPlOnvifGeneric211Resource::countAppropriateProfiles(const _onvifMedia__Get
     return result;
 }
 
-bool QnPlOnvifGeneric211Resource::isSoapAuthorized() const {
-    MediaBindingProxy soapProxy;
-    QString endpoint(createOnvifEndpointUrl());
+bool QnPlOnvifResource::isSoapAuthorized() const {
+    DeviceBindingProxy soapProxy;
+    QString endpoint(deviceUrl);
+
+    qDebug() << "QnPlOnvifResource::isSoapAuthorized: deviceUrl is '" << deviceUrl << "'";
 
     QAuthenticator auth(getAuth());
     std::string login(auth.user().toStdString());
@@ -534,19 +615,50 @@ bool QnPlOnvifGeneric211Resource::isSoapAuthorized() const {
         soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", login.c_str(), passwd.c_str());
     }
 
-    _onvifMedia__GetProfiles request;
-    _onvifMedia__GetProfilesResponse response;
-    int soapRes = soapProxy.GetProfiles(endpoint.toStdString().c_str(), NULL, &request, &response);
-    if (soapRes != SOAP_OK) {
-        qCritical() << "QnPlOnvifGeneric211Resource::isSoapAuthorized: can't determine exactly whether authorized or not. ONVIF device (URL: "
-                    << endpoint << ", MAC: " << getMAC().toString() << "). Root cause: SOAP request failed. Error code: " << soapRes
-                    << ". Description: " << soapProxy.soap_fault_string() << ". " << soapProxy.soap_fault_detail();
-        return true;
-    }
+    qDebug() << "QnPlOnvifResource::isSoapAuthorized: login = " << login.c_str() << ", password = " << passwd.c_str();
 
-    if (PasswordHelper::isNotAuthenticated(soapProxy.soap_fault())) {
+    _onvifDevice__GetCapabilities request;
+    _onvifDevice__GetCapabilitiesResponse response;
+    int soapRes = soapProxy.GetCapabilities(endpoint.toStdString().c_str(), NULL, &request, &response);
+
+    if (soapRes != SOAP_OK && PasswordHelper::isNotAuthenticated(soapProxy.soap_fault())) {
+        soap_end(soapProxy.soap);
         return false;
     }
 
+    soap_end(soapProxy.soap);
     return true;
+}
+
+void QnPlOnvifResource::setOnvifUrls()
+{
+    if (deviceUrl.isEmpty()) {
+        QVariant deviceVariant;
+        bool res = getParam(DEVICE_URL_PARAM_NAME, deviceVariant, QnDomainDatabase);
+        QString deviceStr(res? deviceVariant.toString(): "");
+
+        deviceUrl = deviceStr.isEmpty()? createOnvifEndpointUrl(): deviceStr;
+
+        qDebug() << "QnPlOnvifResource::setOnvifUrls: deviceUrl = " << deviceUrl;
+    }
+
+    if (mediaUrl.isEmpty()) {
+        QVariant mediaVariant;
+        bool res = getParam(MEDIA_URL_PARAM_NAME, mediaVariant, QnDomainDatabase);
+        QString mediaStr(res? mediaVariant.toString(): "");
+
+        mediaUrl = mediaStr.isEmpty()? createOnvifEndpointUrl(): mediaStr;
+
+        qDebug() << "QnPlOnvifResource::setOnvifUrls: mediaUrl = " << mediaUrl;
+    }
+}
+
+void QnPlOnvifResource::save()
+{
+    QByteArray errorStr;
+    QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
+    if (conn->saveSync(toSharedPointer().dynamicCast<QnVirtualCameraResource>(), errorStr) != 0) {
+        qCritical() << "QnPlOnvifResource::init: can't save resource params to Enterprise Controller. Resource MAC: "
+                    << getMAC().toString() << ". Description: " << errorStr;
+    }
 }

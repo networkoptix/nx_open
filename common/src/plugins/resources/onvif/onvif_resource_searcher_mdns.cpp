@@ -1,7 +1,19 @@
-#include "onvif_device_searcher.h"
+#ifdef WIN32
+#include "openssl/evp.h"
+#else
+#include "evp.h"
+#endif
+
+#include "onvif_resource_searcher_mdns.h"
+//#include "onvif/Onvif.nsmap"
+#include "onvif/soapDeviceBindingProxy.h"
+#include "onvif/wsseapi.h"
+
 #include "utils/network/nettools.h"
 #include "utils/network/mdns.h"
 #include "utils/common/sleep.h"
+
+#include <QUdpSocket>
 
 #ifndef Q_OS_WIN
 #include <netinet/in.h>
@@ -43,29 +55,21 @@ bool multicastLeaveGroup(QUdpSocket& udpSocket, QHostAddress groupAddress)
 }
 
 
-
-
-OnvifResourceSearcher::OnvifResourceSearcher()
+OnvifResourceSearcherMdns::OnvifResourceSearcherMdns():
+    onvifFetcher(OnvifResourceInformationFetcher::instance())
 {
 
 }
 
-OnvifResourceSearcher::~OnvifResourceSearcher()
+OnvifResourceSearcherMdns& OnvifResourceSearcherMdns::instance()
 {
-
-};
-
-
-bool OnvifResourceSearcher::isProxy() const
-{
-    return false;
+    static OnvifResourceSearcherMdns inst;
+    return inst;
 }
 
-
-QnResourceList OnvifResourceSearcher::findResources()
+void OnvifResourceSearcherMdns::findResources(QnResourceList& result) const
 {
-    QnResourceList result;
-
+    EndpointInfoHash endpointInfo;
     QList<QHostAddress> localAddresses = getAllIPv4Addresses();
 #if 0
     CL_LOG(cl_logDEBUG1)
@@ -95,14 +99,13 @@ QnResourceList OnvifResourceSearcher::findResources()
             continue;
 
         bindSucceeded = recvSocket.bind(QHostAddress::Any, MDNS_PORT, QUdpSocket::ReuseAddressHint | QUdpSocket::ShareAddress);
-        
+
         if (!bindSucceeded)
             continue;
 
         if (!multicastJoinGroup(recvSocket, groupAddress, localAddress))      continue;
 
         MDNSPacket request;
-        MDNSPacket response;
 
         request.addQuery();
 
@@ -114,23 +117,19 @@ QnResourceList OnvifResourceSearcher::findResources()
         QTime time;
         time.start();
 
-        while(time.elapsed() < 200)
-        {
-            checkSocket(recvSocket, result, localAddress);
-            checkSocket(sendSocket, result, localAddress);
+        while(time.elapsed() < 200) {
+            checkSocket(recvSocket, localAddress, endpointInfo);
             QnSleep::msleep(10); // to avoid 100% cpu usage
-      
         }
 
         multicastLeaveGroup(recvSocket, groupAddress);
     }
 
-
-    return result;
+    onvifFetcher.findResources(endpointInfo, result);
 }
 
 
-void OnvifResourceSearcher::checkSocket(QUdpSocket& sock, QnResourceList& result, QHostAddress localAddress)
+void OnvifResourceSearcherMdns::checkSocket(QUdpSocket& sock, QHostAddress localAddress, EndpointInfoHash& endpointInfo) const
 {
     while (sock.hasPendingDatagrams())
     {
@@ -144,21 +143,12 @@ void OnvifResourceSearcher::checkSocket(QUdpSocket& sock, QnResourceList& result
         //cl_log.log(cl_logALWAYS, "size: %d\n", responseData.size());
         if (sender == localAddress) continue;
 
-        QnNetworkResourcePtr nresource = processPacket(result, responseData, sender);
-
-        if (nresource==0)
+        QString endpointUrl(QnPlOnvifResource::createOnvifEndpointUrl(sender.toString()));
+        if (endpointUrl.isEmpty() || endpointInfo.contains(endpointUrl)) {
             continue;
+        }
 
-        nresource->setHostAddress(sender, QnDomainMemory);
-        //nresource->setHostAddress(QHostAddress("174.34.67.10"), QnDomainMemory);
-        //nresource->setHostAddress(QHostAddress("192.168.2.11"), QnDomainMemory);
-        nresource->setDiscoveryAddr(localAddress);
-
-
-        result.push_back(nresource);
-
+        endpointInfo.insert(endpointUrl, EndpointAdditionalInfo(responseData, localAddress.toString()));
     }
 
 }
-
-

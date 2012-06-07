@@ -1,5 +1,5 @@
-#ifndef onvif_2_1_1_resource_h
-#define onvif_2_1_1_resource_h
+#ifndef onvif_resource_h
+#define onvif_resource_h
 
 #include <QList>
 #include <QMap>
@@ -19,12 +19,14 @@ class _onvifMedia__GetProfilesResponse;
 typedef QPair<int, int> ResolutionPair;
 const ResolutionPair EMPTY_RESOLUTION_PAIR(0, 0);
 
-class QnPlOnvifGeneric211Resource : public QnPhysicalCameraResource
+class QnPlOnvifResource : public QnPhysicalCameraResource
 {
 public:
     static const char* MANUFACTURE;
+    static const QString& MEDIA_URL_PARAM_NAME;
+    static const QString& DEVICE_URL_PARAM_NAME;
 
-    QnPlOnvifGeneric211Resource();
+    QnPlOnvifResource();
 
     static const QString createOnvifEndpointUrl(const QString& ipAddress);
 
@@ -50,9 +52,16 @@ public:
     QRect getMotionWindow(int num) const;
     QMap<int, QRect>  getMotionWindows() const;
     void readMotionInfo();
+
+    const QString& getMediaUrl() const { return mediaUrl; }
+    void setMediaUrl(const QString& src) { mediaUrl = src; }
+
+    const QString& getDeviceUrl() const { return deviceUrl; }
+    void setDeviceUrl(const QString& src) { deviceUrl = src; }
+
 protected:
     void init();
-    virtual QnAbstractStreamDataProvider* createLiveDataProvider();
+    virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
     virtual void setCropingPhysical(QRect croping);
 private:
@@ -64,10 +73,13 @@ private:
     int addMotionWindow();
     bool updateMotionWindow(int wndNum, int sensitivity, const QRect& rect);
     int toAxisMotionSensitivity(int sensitivity);
+    void fetchAndSetDeviceInformation();
     void fetchAndSetVideoEncoderOptions();
     void setVideoEncoderOptions(const _onvifMedia__GetVideoEncoderConfigurationOptionsResponse& response);
     void analyzeVideoEncoders(VideoEncoders& encoders, bool setOptions);
     int countAppropriateProfiles(const _onvifMedia__GetProfilesResponse& response, VideoEncoders& encoders);
+    void setOnvifUrls();
+    void save();
 private:
     static const char* ONVIF_PROTOCOL_PREFIX;
     static const char* ONVIF_URL_SUFFIX;
@@ -83,8 +95,11 @@ private:
     int maxQuality;
     bool hasDual;
     bool videoOptionsNotSet;
+    QString mediaUrl;
+    QString deviceUrl;
+    bool reinitDeviceInfo;
 };
 
-typedef QSharedPointer<QnPlOnvifGeneric211Resource> QnPlOnvifGeneric211ResourcePtr;
+typedef QSharedPointer<QnPlOnvifResource> QnPlOnvifResourcePtr;
 
-#endif //onvif_2_1_1_resource_h
+#endif //onvif_resource_h

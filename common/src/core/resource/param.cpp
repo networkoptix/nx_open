@@ -88,6 +88,11 @@ QList<QnParam> QnParamList::list() const
     return m_params.values();
 }
 
+QList<QString> QnParamList::keys() const
+{
+    return m_params.keys();
+}
+
 QList<QString> QnParamList::groupList() const
 {
     QList<QString> result;

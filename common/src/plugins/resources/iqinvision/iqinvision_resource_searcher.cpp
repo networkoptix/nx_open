@@ -54,7 +54,7 @@ QnResourcePtr QnPlIqResourceSearcher::checkHostAddr(QHostAddress addr)
     return QnResourcePtr(0);
 }
 
-QnNetworkResourcePtr QnPlIqResourceSearcher::processPacket(QnResourceList& result, QByteArray& responseData, const QHostAddress&)
+/*QnNetworkResourcePtr QnPlIqResourceSearcher::processPacket(QnResourceList& result, QByteArray& responseData, const QHostAddress&)
 {
 
     QString smac;
@@ -136,4 +136,4 @@ QnNetworkResourcePtr QnPlIqResourceSearcher::processPacket(QnResourceList& resul
     return resource;
 
 
-}
+}*/

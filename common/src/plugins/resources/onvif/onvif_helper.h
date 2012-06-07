@@ -1,5 +1,5 @@
-#ifndef onvif_2_1_1_helper_h
-#define onvif_2_1_1_helper_h
+#ifndef onvif_helper_h
+#define onvif_helper_h
 
 #include <QHash>
 #include <QString>
@@ -36,4 +36,11 @@ private:
     void printPasswords() const;
 };
 
-#endif // onvif_2_1_1_helper_h
+class SoapErrorHelper {
+    SoapErrorHelper(){}
+
+public:
+    static const QString fetchDescription(const SOAP_ENV__Fault* faultInfo);
+};
+
+#endif // onvif_helper_h

@@ -150,7 +150,7 @@ void QnApiSerializer::serialize(const QnResourcePtr& resource, QByteArray& data)
 {
     try {
         if (resource.dynamicCast<QnVirtualCameraResource>()) {
-            serializeCamera(resource.dynamicCast<QnVirtualCameraResource>(), data);
+			serializeCamera(resource.dynamicCast<QnVirtualCameraResource>(), data);
         } else if (resource.dynamicCast<QnVideoServerResource>()) {
             serializeServer(resource.dynamicCast<QnVideoServerResource>(), data);
         } else if (resource.dynamicCast<QnUserResource>()) {

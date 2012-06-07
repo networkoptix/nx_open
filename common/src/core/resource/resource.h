@@ -19,13 +19,6 @@ class QnAbstractStreamDataProvider;
 class QnResourceConsumer;
 class QnResourcePool;
 
-enum QN_EXPORT QnDomain
-{
-    QnDomainMemory = 1,
-    QnDomainDatabase = 2,
-    QnDomainPhysical = 4
-};
-
 typedef QMap<QString, QString> QnResourceParameters;
 
 class QN_EXPORT QnResource : public QObject

@@ -1,7 +1,11 @@
-#include "onvif_211_helper.h"
+#include "onvif_helper.h"
 #include "onvif/soapDeviceBindingProxy.h"
 #include "utils/common/log.h"
 #include <QDebug>
+
+//
+// PasswordHelper
+//
 
 const char* ADMIN1 = "admin";
 const char* ADMIN2 = "Admin";
@@ -53,9 +57,14 @@ const char* UBIQUITI_MANUFACTURER = "ubiquiti";
 
 bool PasswordHelper::isNotAuthenticated(const SOAP_ENV__Fault* faultInfo)
 {
+    qDebug() << "PasswordHelper::isNotAuthenticated: all fault info: " << SoapErrorHelper::fetchDescription(faultInfo);
+
     if (faultInfo && faultInfo->SOAP_ENV__Code && faultInfo->SOAP_ENV__Code->SOAP_ENV__Subcode) {
         QString subcodeValue(faultInfo->SOAP_ENV__Code->SOAP_ENV__Subcode->SOAP_ENV__Value);
-        return subcodeValue.toLower().indexOf("notauthorized") != -1;
+        subcodeValue = subcodeValue.toLower();
+        qDebug() << "PasswordHelper::isNotAuthenticated: gathered string: " << subcodeValue;
+        return subcodeValue.indexOf("notauthorized") != -1 || subcodeValue.indexOf("not permitted") != -1
+                || subcodeValue.indexOf("failedauthentication") != -1 || subcodeValue.indexOf("operationprohibited") != -1;
     }
 
     return false;
@@ -125,9 +134,9 @@ PasswordHelper::PasswordHelper()
 
     setPasswordInfo(UBIQUITI_MANUFACTURER, MAIN_USER1, MAIN_USER1);
 
-    if (cl_log.logLevel() >= cl_logDEBUG1) {
-        printPasswords();
-    }
+    //if (cl_log.logLevel() >= cl_logDEBUG1) {
+    //    printPasswords();
+    //}
 }
 
 PasswordHelper::~PasswordHelper()
@@ -162,14 +171,14 @@ const PasswordList& PasswordHelper::getPasswordsByManufacturer(const QByteArray&
     ManufacturerPasswords::const_iterator iter = manufacturerPasswords.begin();
     while (iter != manufacturerPasswords.end()) {
         if (data.indexOf(iter.key()) != -1) {
-            qDebug() << "PasswordHelper::getPasswordsByManufacturer: manufacturer was found: " << iter.key();
+            //qDebug() << "PasswordHelper::getPasswordsByManufacturer: manufacturer was found: " << iter.key();
             return iter.value();
         }
 
         ++iter;
     }
 
-    qDebug() << "PasswordHelper::getPasswordsByManufacturer: manufacturer was not found";
+    //qDebug() << "PasswordHelper::getPasswordsByManufacturer: manufacturer was not found";
     return allPasswords;
 }
 
@@ -197,4 +206,72 @@ void PasswordHelper::printPasswords() const
         qDebug() << "    " << listIter->first << " / " << listIter->second;
         ++listIter;
     }
+}
+
+
+//
+// SoapErrorHelper
+//
+
+const QString SoapErrorHelper::fetchDescription(const SOAP_ENV__Fault* faultInfo)
+{
+    if (!faultInfo) {
+        qDebug() << "SoapErrorHelper::fetchDescription: fault info is null";
+        return QString();
+    }
+
+    QString result("Fault Info. ");
+
+    if (faultInfo->faultcode) {
+        result += "Code: ";
+        result += faultInfo->faultcode;
+        result += ". ";
+    }
+
+    if (faultInfo->faultstring) {
+        result += "Descr: ";
+        result += faultInfo->faultstring;
+        result += ". ";
+    }
+
+    if (faultInfo->faultactor) {
+        result += "Factor: ";
+        result += faultInfo->faultactor;
+        result += ". ";
+    }
+
+    if (faultInfo->detail && faultInfo->detail->__any) {
+        result += "Details: ";
+        result += faultInfo->detail->__any;
+        result += ". ";
+    }
+
+    if (faultInfo->SOAP_ENV__Reason && faultInfo->SOAP_ENV__Reason->SOAP_ENV__Text) {
+        result += "Reason: ";
+        result += faultInfo->SOAP_ENV__Reason->SOAP_ENV__Text;
+        result += ". ";
+    }
+
+    if (faultInfo->SOAP_ENV__Code) {
+
+        if (faultInfo->SOAP_ENV__Code->SOAP_ENV__Value) {
+            result += "Additional: ";
+            result += faultInfo->SOAP_ENV__Code->SOAP_ENV__Value;
+            result += ". ";
+        }
+
+        if (faultInfo->SOAP_ENV__Code->SOAP_ENV__Subcode && faultInfo->SOAP_ENV__Code->SOAP_ENV__Subcode->SOAP_ENV__Value) {
+            result += "Sub info: ";
+            result += faultInfo->SOAP_ENV__Code->SOAP_ENV__Subcode->SOAP_ENV__Value;
+            result += ". ";
+        }
+    }
+
+    if (faultInfo->SOAP_ENV__Detail && faultInfo->SOAP_ENV__Detail->__any) {
+        result += "Additional details: ";
+        result += faultInfo->SOAP_ENV__Detail->__any;
+        result += ". ";
+    }
+
+    return result;
 }
