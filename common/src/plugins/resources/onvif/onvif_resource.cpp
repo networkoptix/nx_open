@@ -15,7 +15,7 @@
 #include "onvif/soapDeviceBindingProxy.h"
 #include "onvif/soapMediaBindingProxy.h"
 #include "onvif/wsseapi.h"
-#include "api/AppServerConnection.h"
+#include "api/app_server_connection.h"
 
 const char* QnPlOnvifResource::MANUFACTURE = "OnvifDevice";
 static const float MAX_AR_EPS = 0.01;
