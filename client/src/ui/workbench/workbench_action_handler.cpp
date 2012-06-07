@@ -21,7 +21,7 @@
 #include <core/resourcemanagment/resource_pool_user_watcher.h>
 #include <core/resourcemanagment/resource_pool.h>
 
-#include <api/SessionManager.h>
+#include <api/session_manager.h>
 
 #include <device_plugins/server_camera/appserver.h>
 
@@ -52,7 +52,7 @@
 
 #include <utils/settings.h>
 
-#include "eventmanager.h"
+#include "client_message_processor.h"
 #include "file_processor.h"
 
 #include "workbench.h"
@@ -121,8 +121,8 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(at_context_userChanged(const QnUserResourcePtr &)));
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(submitDelayedDrops()), Qt::QueuedConnection);
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(updateCameraSettingsEditibility()));
-    connect(QnEventManager::instance(),                         SIGNAL(connectionClosed()),                     this,   SLOT(at_eventManager_connectionClosed()));
-    connect(QnEventManager::instance(),                         SIGNAL(connectionOpened()),                     this,   SLOT(at_eventManager_connectionOpened()));
+    connect(QnClientMessageProcessor::instance(),                         SIGNAL(connectionClosed()),                     this,   SLOT(at_eventManager_connectionClosed()));
+    connect(QnClientMessageProcessor::instance(),                         SIGNAL(connectionOpened()),                     this,   SLOT(at_eventManager_connectionOpened()));
 
     /* We're using queued connection here as modifying a field in its change notification handler may lead to problems. */
     connect(workbench(),                                        SIGNAL(layoutsChanged()), this, SLOT(at_workbench_layoutsChanged()), Qt::QueuedConnection);
@@ -917,8 +917,8 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     if (!connection.isValid()) 
         return;
     
-    QnEventManager::instance()->stop();
-    SessionManager::instance()->stop();
+    QnClientMessageProcessor::instance()->stop(); // TODO: blocks gui thread.
+    QnSessionManager::instance()->stop();
 
     QnAppServerConnectionFactory::setDefaultUrl(connection.url);
 
@@ -942,8 +942,8 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
 
     qnLicensePool->reset();
 
-    SessionManager::instance()->start();
-    QnEventManager::instance()->run();
+    QnSessionManager::instance()->start();
+    QnClientMessageProcessor::instance()->run();
 
     QnResourceDiscoveryManager::instance().start();
     QnResourceDiscoveryManager::instance().setReady(true);

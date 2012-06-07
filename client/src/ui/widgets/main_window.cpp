@@ -18,8 +18,8 @@
 #include <core/resourcemanagment/resource_pool.h>
 #include <core/resourcemanagment/resource_pool_user_watcher.h>
 
-#include <api/AppServerConnection.h>
-#include <api/SessionManager.h>
+#include <api/app_server_connection.h>
+#include <api/session_manager.h>
 
 #include "ui/actions/action_manager.h"
 
@@ -48,8 +48,6 @@
 #include "resource_tree_widget.h"
 #include "dwm.h"
 #include "layout_tab_bar.h"
-
-#include "eventmanager.h"
 
 namespace {
 

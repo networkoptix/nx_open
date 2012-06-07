@@ -2,53 +2,53 @@
 #include <QDebug>
 #include <qglobal.h>
 
-#include "api/AppServerConnection.h"
+#include "api/app_server_connection.h"
 #include "core/resourcemanagment/resource_discovery_manager.h"
 #include "core/resourcemanagment/resource_pool.h"
-#include "eventmanager.h"
+#include "server_message_processor.h"
 #include "recorder/recording_manager.h"
 #include "serverutil.h"
 
-Q_GLOBAL_STATIC(QnEventManager, static_instance)
+Q_GLOBAL_STATIC(QnServerMessageProcessor, static_instance)
 
-QnEventManager* QnEventManager::instance()
+QnServerMessageProcessor* QnServerMessageProcessor::instance()
 {
     return static_instance();
 }
 
-void QnEventManager::init(const QUrl& url, int timeout)
+void QnServerMessageProcessor::init(const QUrl& url, int timeout)
 {
-    m_source = QSharedPointer<QnEventSource>(new QnEventSource(url, timeout));
+    m_source = QSharedPointer<QnMessageSource>(new QnMessageSource(url, timeout));
 
-    connect(m_source.data(), SIGNAL(eventReceived(QnEvent)), this, SLOT(at_eventReceived(QnEvent)));
+    connect(m_source.data(), SIGNAL(messageReceived(QnMessage)), this, SLOT(at_messageReceived(QnMessage)));
     connect(m_source.data(), SIGNAL(connectionClosed(QString)), this, SLOT(at_connectionClosed(QString)));
     connect(m_source.data(), SIGNAL(connectionReset()), this, SLOT(at_connectionReset()));
 }
 
-QnEventManager::QnEventManager()
+QnServerMessageProcessor::QnServerMessageProcessor()
 {
 }
 
-void QnEventManager::run()
+void QnServerMessageProcessor::run()
 {
     m_source->startRequest();
 }
 
-void QnEventManager::stop()
+void QnServerMessageProcessor::stop()
 {
     m_source->stop();
 }
 
-void QnEventManager::at_connectionReset()
+void QnServerMessageProcessor::at_connectionReset()
 {
     emit connectionReset();
 }
 
-void QnEventManager::at_eventReceived(QnEvent event)
+void QnServerMessageProcessor::at_messageReceived(QnMessage event)
 {
     qDebug() << "Got event: " << event.eventType << " " << event.objectName << " " << event.objectId;
 
-    if (event.eventType == QN_EVENT_LICENSE_CHANGE)
+    if (event.eventType == QN_MESSAGE_LICENSE_CHANGE)
     {
         QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
@@ -72,7 +72,7 @@ void QnEventManager::at_eventReceived(QnEvent event)
             qnLicensePool->replaceLicenses(licenses);
         }
     }
-    else if (event.eventType == QN_CAMERA_SERVER_ITEM)
+    else if (event.eventType == QN_MESSAGE_CAMERA_SERVER_ITEM)
     {
         QString mac = event.dict["mac"].toString();
         QString serverGuid = event.dict["server_guid"].toString();
@@ -82,7 +82,7 @@ void QnEventManager::at_eventReceived(QnEvent event)
 
         QnCameraHistoryPool::instance()->addCameraHistoryItem(historyItem);
     }
-    else if (event.eventType == QN_EVENT_RES_CHANGE)
+    else if (event.eventType == QN_MESSAGE_RES_CHANGE)
     {
         if (event.objectName != "Camera" && event.objectName != "Server")
             return;
@@ -115,11 +115,11 @@ void QnEventManager::at_eventReceived(QnEvent event)
                 QnRecordingManager::instance()->updateCamera(ownSecurityCamera);
         } else
         {
-            qDebug()  << "QnEventManager::eventReceived(): Can't get resource from appserver. Reason: "
+            qDebug()  << "QnEventManager::messageReceived(): Can't get resource from appserver. Reason: "
                       << errorString << ", Skipping event: " << event.eventType << " " << event.objectName << " " << event.objectId;
         }
     }
-    else if (event.eventType == QN_EVENT_RES_STATUS_CHANGE)
+    else if (event.eventType == QN_MESSAGE_RES_STATUS_CHANGE)
     {
         QnResourcePtr resource = qnResPool->getResourceById(event.objectId);
 
@@ -128,7 +128,7 @@ void QnEventManager::at_eventReceived(QnEvent event)
             QnResource::Status status = (QnResource::Status)event.data.toInt();
             resource->setStatus(status);
         }
-    } else if (event.eventType == QN_EVENT_RES_DISABLED_CHANGE)
+    } else if (event.eventType == QN_MESSAGE_RES_DISABLED_CHANGE)
 	{
 		QnResourcePtr resource = qnResPool->getResourceById(event.objectId);
 
@@ -136,7 +136,7 @@ void QnEventManager::at_eventReceived(QnEvent event)
 		{
 			resource->setDisabled(event.data.toInt());
 		}
-    } else if (event.eventType == QN_EVENT_RES_DELETE)
+    } else if (event.eventType == QN_MESSAGE_RES_DELETE)
     {
         QnResourcePtr resource = qnResPool->getResourceById(event.objectId);
 
@@ -147,7 +147,7 @@ void QnEventManager::at_eventReceived(QnEvent event)
     }
 }
 
-void QnEventManager::at_connectionClosed(QString errorString)
+void QnServerMessageProcessor::at_connectionClosed(QString errorString)
 {
     qDebug() << "QnEventManager::connectionClosed(): Connection aborted:" << errorString;
 }

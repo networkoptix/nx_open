@@ -1,4 +1,4 @@
-#include "SessionManager.h"
+#include "session_manager.h"
 
 #include <QtCore/QBuffer>
 #include <QtCore/QThread>
@@ -7,8 +7,8 @@
 
 #include "utils/common/warnings.h"
 
-Q_GLOBAL_STATIC(SessionManager, qn_sessionManagerInstance);
-QAtomicInt SessionManager::m_handle(1);
+Q_GLOBAL_STATIC(QnSessionManager, qn_sessionManagerInstance);
+QAtomicInt QnSessionManager::m_handle(1);
 
 void SessionManagerReplyProcessor::at_replyReceived()
 {
@@ -52,7 +52,7 @@ void SyncRequestProcessor::at_destroy()
     m_condition.wakeOne();
 }
 
-SessionManager::SessionManager()
+QnSessionManager::QnSessionManager()
     : m_accessManager(0)
 {
     qRegisterMetaType<QnRequestParamList>("QnRequestParamList");
@@ -65,7 +65,7 @@ SessionManager::SessionManager()
     connect(this, SIGNAL(aboutToBeStarted()), this, SLOT(doStart()));
 }
 
-SessionManager::~SessionManager()
+QnSessionManager::~QnSessionManager()
 {
     doStop();
     /*
@@ -75,22 +75,22 @@ SessionManager::~SessionManager()
     */
 }
 
-SessionManager *SessionManager::instance()
+QnSessionManager *QnSessionManager::instance()
 {
     return qn_sessionManagerInstance();
 }
 
-void SessionManager::start()
+void QnSessionManager::start()
 {
     emit aboutToBeStarted();
 }
 
-void SessionManager::stop()
+void QnSessionManager::stop()
 {
     emit aboutToBeStopped();
 }
 
-void SessionManager::doStart()
+void QnSessionManager::doStart()
 {
     QMutexLocker locker(&m_accessManagerMutex);
 
@@ -100,7 +100,7 @@ void SessionManager::doStart()
     m_accessManager = new QNetworkAccessManager(this);
 }
 
-void SessionManager::doStop()
+void QnSessionManager::doStop()
 {
     QMutexLocker locker(&m_accessManagerMutex);
 
@@ -111,12 +111,12 @@ void SessionManager::doStop()
     }
 }
 
-int SessionManager::testConnectionAsync(const QUrl& url, QObject* receiver, const char *slot)
+int QnSessionManager::testConnectionAsync(const QUrl& url, QObject* receiver, const char *slot)
 {
     return sendAsyncGetRequest(url, "ping", receiver, slot);
 }
 
-QUrl SessionManager::createApiUrl(const QUrl& baseUrl, const QString &objectName, const QnRequestParamList &params) const
+QUrl QnSessionManager::createApiUrl(const QUrl& baseUrl, const QString &objectName, const QnRequestParamList &params) const
 {
     QUrl url(baseUrl);
 
@@ -129,12 +129,12 @@ QUrl SessionManager::createApiUrl(const QUrl& baseUrl, const QString &objectName
     return url;
 }
 
-int SessionManager::sendPostRequest(const QUrl& url, const QString &objectName, const QByteArray& data, QByteArray &reply, QByteArray& errorString)
+int QnSessionManager::sendPostRequest(const QUrl& url, const QString &objectName, const QByteArray& data, QByteArray &reply, QByteArray& errorString)
 {
     return sendPostRequest(url, objectName, QnRequestParamList(), data, reply, errorString);
 }
 
-int SessionManager::sendPostRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QByteArray &reply, QByteArray& errorString)
+int QnSessionManager::sendPostRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QByteArray &reply, QByteArray& errorString)
 {
     SyncRequestProcessor syncProcessor;
     syncProcessor.moveToThread(this->thread());
@@ -155,18 +155,18 @@ int SessionManager::sendPostRequest(const QUrl& url, const QString &objectName, 
     return syncProcessor.wait(reply, errorString);
 }
 
-int SessionManager::sendGetRequest(const QUrl& url, const QString &objectName, QByteArray& reply, QByteArray& errorString)
+int QnSessionManager::sendGetRequest(const QUrl& url, const QString &objectName, QByteArray& reply, QByteArray& errorString)
 {
     return sendGetRequest(url, objectName, QnRequestParamList(), reply, errorString);
 }
 
-bool SessionManager::isReady() const
+bool QnSessionManager::isReady() const
 {
     QMutexLocker locker(&m_accessManagerMutex);
     return m_accessManager != 0;
 }
 
-int SessionManager::sendGetRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, QByteArray& reply, QByteArray& errorString)
+int QnSessionManager::sendGetRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, QByteArray& reply, QByteArray& errorString)
 {
     SyncRequestProcessor syncProcessor;
     syncProcessor.moveToThread(this->thread());
@@ -187,12 +187,12 @@ int SessionManager::sendGetRequest(const QUrl& url, const QString &objectName, c
     return syncProcessor.wait(reply, errorString);
 }
 
-int SessionManager::sendAsyncGetRequest(const QUrl& url, const QString &objectName, QObject *target, const char *slot)
+int QnSessionManager::sendAsyncGetRequest(const QUrl& url, const QString &objectName, QObject *target, const char *slot)
 {
     return sendAsyncGetRequest(url, objectName, QnRequestParamList(), target, slot);
 }
 
-void SessionManager::doSendAsyncGetRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, const QnRequestParamList &params, QObject *target, const char *slot, int handle)
+void QnSessionManager::doSendAsyncGetRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, const QnRequestParamList &params, QObject *target, const char *slot, int handle)
 {
     Q_UNUSED(target);
     Q_UNUSED(slot);
@@ -214,7 +214,7 @@ void SessionManager::doSendAsyncGetRequest(SessionManagerReplyProcessor* replyPr
     connect(reply, SIGNAL(sslErrors(QList<QSslError>)), reply, SLOT(ignoreSslErrors()));
 }
 
-void SessionManager::doSendAsyncDeleteRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, int id, QObject *target, const char *slot, int handle)
+void QnSessionManager::doSendAsyncDeleteRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, int id, QObject *target, const char *slot, int handle)
 {
     Q_UNUSED(target);
     Q_UNUSED(slot);
@@ -236,7 +236,7 @@ void SessionManager::doSendAsyncDeleteRequest(SessionManagerReplyProcessor* repl
     connect(reply, SIGNAL(sslErrors(QList<QSslError>)), reply, SLOT(ignoreSslErrors()));
 }
 
-int SessionManager::sendAsyncGetRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, QObject *target, const char *slot)
+int QnSessionManager::sendAsyncGetRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, QObject *target, const char *slot)
 {
     int handle = m_handle.fetchAndAddAcquire(1);
 
@@ -251,12 +251,12 @@ int SessionManager::sendAsyncGetRequest(const QUrl& url, const QString &objectNa
     return handle;
 }
 
-int SessionManager::sendAsyncPostRequest(const QUrl& url, const QString &objectName, const QByteArray& data, QObject *target, const char *slot)
+int QnSessionManager::sendAsyncPostRequest(const QUrl& url, const QString &objectName, const QByteArray& data, QObject *target, const char *slot)
 {
     return sendAsyncPostRequest(url, objectName, QnRequestParamList(), data, target, slot);
 }
 
-int SessionManager::sendAsyncDeleteRequest(const QUrl& url, const QString &objectName, int id, QObject *target, const char *slot)
+int QnSessionManager::sendAsyncDeleteRequest(const QUrl& url, const QString &objectName, int id, QObject *target, const char *slot)
 {
     int handle = m_handle.fetchAndAddAcquire(1);
 
@@ -271,7 +271,7 @@ int SessionManager::sendAsyncDeleteRequest(const QUrl& url, const QString &objec
     return handle;
 }
 
-void SessionManager::doSendAsyncPostRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot, int handle)
+void QnSessionManager::doSendAsyncPostRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot, int handle)
 {
     Q_UNUSED(target);
     Q_UNUSED(slot);
@@ -294,7 +294,7 @@ void SessionManager::doSendAsyncPostRequest(SessionManagerReplyProcessor* replyP
     connect(reply, SIGNAL(sslErrors(QList<QSslError>)), reply, SLOT(ignoreSslErrors()));
 }
 
-int SessionManager::sendAsyncPostRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot)
+int QnSessionManager::sendAsyncPostRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot)
 {
     int handle = m_handle.fetchAndAddAcquire(1);
 
@@ -309,7 +309,7 @@ int SessionManager::sendAsyncPostRequest(const QUrl& url, const QString &objectN
     return handle;
 }
 
-QByteArray SessionManager::formatNetworkError(int error)
+QByteArray QnSessionManager::formatNetworkError(int error)
 {
     QByteArray errorValue;
 
@@ -321,7 +321,7 @@ QByteArray SessionManager::formatNetworkError(int error)
     return errorValue;
 }
 
-void SessionManager::processReply(int status, const QByteArray &, const QByteArray &, int) {
+void QnSessionManager::processReply(int status, const QByteArray &, const QByteArray &, int) {
     emit replyReceived(status);
 }
 

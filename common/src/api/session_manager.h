@@ -70,12 +70,12 @@ private:
 };
 
 
-class SessionManager : public QObject
+class QnSessionManager : public QObject
 {
     Q_OBJECT
 
 public:
-    static SessionManager *instance();
+    static QnSessionManager *instance();
 
     QByteArray lastError() const;
 
@@ -99,8 +99,8 @@ private slots:
     void processReply(int status, const QByteArray &data, const QByteArray &errorString, int handle);
 
 public:
-    SessionManager();
-    virtual ~SessionManager();
+    QnSessionManager();
+    virtual ~QnSessionManager();
 
     void stop();
     void start();
@@ -137,7 +137,7 @@ private:
     QUrl createApiUrl(const QUrl& baseUrl, const QString &objectName, const QnRequestParamList &params = QnRequestParamList()) const;
 
 private:
-    Q_DISABLE_COPY(SessionManager)
+    Q_DISABLE_COPY(QnSessionManager)
 };
 
 #endif // __SESSION_MANAGER_H__

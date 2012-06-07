@@ -3,7 +3,7 @@
 #include "device_plugins/archive/rtsp/rtsp_client_archive_delegate.h"
 #include "core/resourcemanagment/resource_pool.h"
 #include "core/resource/video_server.h"
-#include "api/AppServerConnection.h"
+#include "api/app_server_connection.h"
 
 void QnServerCameraProcessor::at_serverIfFound(QString)
 {

@@ -14,7 +14,7 @@
 #include "core/resource/resource_fwd.h"
 #include "core/resource/camera_resource.h"
 #include "core/resource/camera_history.h"
-#include "api/AppServerConnection.h"
+#include "api/app_server_connection.h"
 
 QnRecordingManager::QnRecordingManager()
 {

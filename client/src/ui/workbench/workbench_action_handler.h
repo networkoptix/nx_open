@@ -6,7 +6,7 @@
 
 #include <QtGui/QDialogButtonBox>
 
-#include <api/AppServerConnection.h>
+#include <api/app_server_connection.h>
 #include <ui/actions/actions.h>
 #include "workbench_context_aware.h"
 

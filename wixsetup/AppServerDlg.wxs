@@ -27,13 +27,15 @@
 													<Control Id="FolderLabel" Type="Text" X="15" Y="60" Width="290" Height="18" NoPrefix="yes" Text="Please Select Enterprise Controller Parameters" />
 													<Control Type="Text" Id="PortLabel" Width="50" Height="17" X="15" Y="98" Text="Port" />
 													<Control Type="Text" Id="LoginLabel" Width="50" Height="17" X="15" Y="137" Text="Login" />
-													<Control Type="Text" Id="PasswordLabel" Width="50" Height="17" X="15" Y="157" Text="Password" />
+													<Control Type="Text" Id="PasswordLabel" Width="73" Height="17" X="15" Y="157" Text="Password" />
 													<Control Type="Edit" Id="Port" Width="263" Height="15" X="92" Y="96" Property="APPSERVER_PORT" />
+													<Control Type="Edit" Id="ProxyPort" Height="15" Width="263" X="92" Y="116" Property="PROXY_PORT" />
 													<Control Type="Edit" Id="Login" X="92" Y="135" Width="263" Height="15" Property="APPSERVER_LOGIN" Disabled="yes" />
-													<Control Type="Edit" Id="Password" Width="263" Height="15" X="92" Y="154" Property="APPSERVER_PASSWORD" />
-													<Control Id="groupBox1" Type="GroupBox" Height="103" Width="351" X="9" Y="80" Text="Network" />
+													<Control Type="Edit" Id="Password" Width="263" Height="15" X="92" Y="154" Property="APPSERVER_PASSWORD" Password="yes"/>
+													<Control Type="Edit" Id="PasswordConfirm" Height="15" Width="263" X="92" Y="174" Property="APPSERVER_PASSWORD_CONFIRM" Password="yes"/>
+													<Control Id="groupBox1" Type="GroupBox" Height="124" Width="351" X="9" Y="80" Text="Network" />
 													<Control Id="label1" Type="Text" Height="17" Width="50" X="15" Y="116" Text="Proxy Port" />
-													<Control Id="ProxyPort" Type="Edit" Height="15" Width="263" X="92" Y="116" Property="PROXY_PORT"/>
+													<Control Id="label2" Type="Text" Height="17" Width="73" X="15" Y="176" Text="Confirm Password" />
 												</Dialog>
         </UI>
     </Fragment>

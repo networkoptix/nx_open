@@ -268,7 +268,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     m_unzooming(false),
     m_dragIsClick(false),
     m_selecting(false),
-    m_dragMarker(NoMarker),
+    m_dragItem(NoItem),
 	m_lineCount(0),
     m_totalLineStretch(0.0),
     m_thumbnailsHeight(0.0)
@@ -285,7 +285,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
 
     setWindowStart(minimum());
     setWindowEnd(maximum());
-    setOptions(StickToMinimum | StickToMaximum | UpdateToolTip | SelectionEditable | AdjustWindowToPosition | SnapZoomToSides | UnzoomOnDoubleClick);
+    setOptions(StickToMinimum | StickToMaximum | UpdateToolTip | SelectionEditable | ThumbnailBarEditable | AdjustWindowToPosition | SnapZoomToSides | UnzoomOnDoubleClick);
 
     setToolTipFormat(tr("hh:mm:ss", "DEFAULT_TOOL_TIP_FORMAT"));
 
@@ -1560,14 +1560,16 @@ void QnTimeSlider::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
 void QnTimeSlider::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
     base_type::hoverMoveEvent(event);
 
-    switch(markerFromPosition(event->pos())) {
-    case SelectionStartMarker:
-    case SelectionEndMarker:
-        setCursor(Qt::SplitHCursor);
-        break;
-    default:
-        unsetCursor();
-        break;
+    if(m_options & SelectionEditable) {
+        switch(markerFromPosition(event->pos())) {
+        case SelectionStartMarker:
+        case SelectionEndMarker:
+            setCursor(Qt::SplitHCursor);
+            break;
+        default:
+            unsetCursor();
+            break;
+        }
     }
 }
 
@@ -1575,14 +1577,16 @@ void QnTimeSlider::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     base_type::mousePressEvent(event);
 
     if(event->button() == Qt::LeftButton) {
-        m_dragMarker = markerFromPosition(event->pos());
+        Marker marker = markerFromPosition(event->pos());
 
-        if(m_dragMarker != NoMarker)
+        if(marker != NoMarker) {
+            m_dragItem = static_cast<DragItem>(marker);
             dragProcessor()->mousePressEvent(this, event);
+        }
 
         event->accept();
     } else if(event->button() == Qt::RightButton) {
-        m_dragMarker = NoMarker;
+        m_dragItem = NewSelectionItem;
         dragProcessor()->mousePressEvent(this, event);
 
         event->accept();
@@ -1602,7 +1606,7 @@ void QnTimeSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
     dragProcessor()->mouseReleaseEvent(this, event);
 
     base_type::mouseReleaseEvent(event);
-    m_dragMarker = NoMarker;
+    m_dragItem = NoItem;
 
     if(m_dragIsClick && event->button() == Qt::RightButton)
         emit customContextMenuRequested(event->pos(), event->screenPos());
@@ -1622,16 +1626,19 @@ void QnTimeSlider::startDragProcess(DragInfo *) {
 void QnTimeSlider::startDrag(DragInfo *info) {
     setSliderDown(true);
 
-    if(m_dragMarker == NoMarker) {
+    m_dragIsClick = false;
+
+    if(m_dragItem == NewSelectionItem) {
         qint64 pos = valueFromPosition(info->mouseItemPos());
         setSelectionValid(true);
         setSelection(pos, pos);
-        m_dragMarker = SelectionStartMarker;
+        m_dragItem = SelectionStartItem;
     }
 
-    m_selecting = true;
-    m_dragIsClick = false;
-    m_dragDelta = positionFromMarker(m_dragMarker) - info->mousePressItemPos();
+    if(m_dragItem == SelectionStartItem || m_dragItem == SelectionEndItem) {
+        m_selecting = true;
+        m_dragDelta = positionFromMarker(static_cast<Marker>(m_dragItem)) - info->mousePressItemPos();
+    }
 
     emit selectionPressed();
 }
@@ -1641,26 +1648,26 @@ void QnTimeSlider::dragMove(DragInfo *info) {
 
     setSliderPosition(pos);
     
-    qint64 selectionStart = m_selectionStart;
-    qint64 selectionEnd = m_selectionEnd;
-    Marker otherMarker = NoMarker;
-    switch(m_dragMarker) {
-    case SelectionStartMarker:
-        selectionStart = pos;
-        otherMarker = SelectionEndMarker;
-        break;
-    case SelectionEndMarker:
-        selectionEnd = pos;
-        otherMarker = SelectionStartMarker;
-        break;
-    default:
-        break;
-    }
+    if((m_options & SelectionEditable) && (m_dragItem == SelectionStartItem || m_dragItem == SelectionEndItem)) {
+        qint64 selectionStart = m_selectionStart;
+        qint64 selectionEnd = m_selectionEnd;
+        DragItem otherItem = NoItem;
+        switch(m_dragItem) {
+        case SelectionStartItem:
+            selectionStart = pos;
+            otherItem = SelectionEndItem;
+            break;
+        case SelectionEndItem:
+            selectionEnd = pos;
+            otherItem = SelectionStartItem;
+            break;
+        default:
+            break;
+        }
 
-    if(m_dragMarker != NoMarker) {
         if(selectionStart > selectionEnd) {
             qSwap(selectionStart, selectionEnd);
-            m_dragMarker = otherMarker;
+            m_dragItem = otherItem;
         }
 
         setSelection(selectionStart, selectionEnd);

@@ -4,7 +4,7 @@
 #include <QtGui/QWidget>
 
 #include "licensing/license.h"
-#include "api/AppServerConnection.h"
+#include "api/app_server_connection.h"
 
 class QNetworkAccessManager;
 
