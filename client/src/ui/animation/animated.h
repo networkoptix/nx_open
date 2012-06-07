@@ -1,14 +1,18 @@
 #ifndef QN_ANIMATED_H
 #define QN_ANIMATED_H
 
+#include <QtCore/QSet>
+#include <QtCore/QScopedPointer>
 #include <QtGui/QGraphicsItem>
+
 #include "animation_timer.h"
 #include "animation_timer_listener.h"
 
 namespace detail {
     class AnimatedBase {
     protected:
-        AnimatedBase(): m_timer(NULL) {}
+        AnimatedBase();
+        virtual ~AnimatedBase();
 
         void updateScene(QGraphicsScene *scene);
 
@@ -17,12 +21,7 @@ namespace detail {
         void unregisterAnimation(AnimationTimerListener *listener);
 
     private:
-        void ensureTimer();
-        void ensureGuard();
-
-    private:
-        AnimationTimer *m_timer;
-        QScopedPointer<AnimationTimer> m_guard;
+        QScopedPointer<AnimationTimerListener> m_listener;
         QSet<AnimationTimerListener *> m_listeners;
     };
 

@@ -5,7 +5,7 @@
 #include <QtGui/QPushButton>
 
 #include <ui/actions/action_manager.h>
-#include <ui/widgets/camera_settings_widget.h>
+#include <ui/widgets/properties/camera_settings_widget.h>
 #include <ui/workbench/workbench_context.h>
 
 QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent, Qt::WindowFlags windowFlags):

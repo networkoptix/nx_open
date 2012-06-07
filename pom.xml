@@ -7,6 +7,11 @@
 	<packaging>pom</packaging>
 	<name>HD Witness</name>
 
+	<scm>
+		<connection>scm:hg:file:///${basedir}</connection>
+		<developerConnection>scm:hg:file:///${basedir}</developerConnection>
+	</scm>	
+
 	<properties>
 		<build.configuration>release</build.configuration>
 		<buildNumber>0</buildNumber>
@@ -22,7 +27,34 @@
 	</modules>
 	<build>
 		<defaultGoal>install</defaultGoal>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.5</version>
+				<executions>
+					<execution>
+						<id>copy-common-resources</id>
+						<phase>initialize</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+							<resources>          
+								<resource>
+									<directory>${basedir}/maven</directory>
+									<filtering>true</filtering>
+								</resource>		
+							</resources>              
+							<encoding>UTF-8</encoding>
+						</configuration>            
+					</execution>
+				</executions>
+			</plugin>			
+		</plugins>			
 	</build>
+
 	<profiles>
 		<profile>
 			<id>windows</id>
@@ -37,8 +69,30 @@
 				<module>wixsetup</module>
 			</modules>
 			<properties>
+				<arch>x86</arch>
 				<platform>windows</platform>
 			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<version>2.4</version>
+						<executions>
+							<execution>
+								<id>unpack-platform-libs</id>
+								<phase>generate-sources</phase>
+								<goals>
+									<goal>unpack-dependencies</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${project.build.directory}</outputDirectory>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
 		</profile>
 		<profile>
 			<id>linux</id>
@@ -81,6 +135,7 @@
 				<arch>x86</arch>
 			</properties>
 		</profile>
+
 		<profile>
 			<id>convert-clean</id>
 			<activation>				
@@ -126,6 +181,6 @@
 					</plugin>
 				</plugins>
 			</build>
-		</profile>			
+		</profile>	
 	</profiles>	
 </project>

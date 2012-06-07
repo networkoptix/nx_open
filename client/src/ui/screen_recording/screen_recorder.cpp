@@ -46,26 +46,26 @@ namespace {
     }
 #endif
 
-    QSize resolutionToSize(VideoRecorderSettings::Resolution resolution) {
+    QSize resolutionToSize(Qn::Resolution resolution) {
         QSize result(0, 0);
         switch(resolution) {
-        case VideoRecorderSettings::ResNative:          return QSize(0, 0);
-        case VideoRecorderSettings::ResQuaterNative:    return QSize(-2, -2);
-        case VideoRecorderSettings::Res1920x1080:       return QSize(1920, 1080);
-        case VideoRecorderSettings::Res1280x720:        return QSize(1280, 720);
-        case VideoRecorderSettings::Res640x480:         return QSize(640, 480);
-        case VideoRecorderSettings::Res320x240:         return QSize(320, 240);
+        case Qn::NativeResolution:          return QSize(0, 0);
+        case Qn::QuaterNativeResolution:    return QSize(-2, -2);
+        case Qn::Exact1920x1080Resolution:  return QSize(1920, 1080);
+        case Qn::Exact1280x720Resolution:   return QSize(1280, 720);
+        case Qn::Exact640x480Resolution:    return QSize(640, 480);
+        case Qn::Exact320x240Resolution:    return QSize(320, 240);
         default:
             qnWarning("Invalid resolution value '%1', treating as native resolution.", static_cast<int>(resolution));
             return QSize(0, 0);
         }
     }
 
-    float qualityToNumeric(VideoRecorderSettings::DecoderQuality quality) {
+    float qualityToNumeric(Qn::DecoderQuality quality) {
         switch(quality) {
-        case VideoRecorderSettings::BestQuality:        return 1.0;
-        case VideoRecorderSettings::BalancedQuality:    return 0.75;
-        case VideoRecorderSettings::PerformanceQuality: return 0.5;
+        case Qn::BestQuality:        return 1.0;
+        case Qn::BalancedQuality:    return 0.75;
+        case Qn::PerformanceQuality: return 0.5;
         default:
             qnWarning("Invalid quality value '%1', treating as best quality.", static_cast<int>(quality));
             return 1.0;
@@ -73,11 +73,11 @@ namespace {
     }
 
 #ifdef Q_OS_WIN
-    CLScreenGrabber::CaptureMode settingsToGrabberCaptureMode(VideoRecorderSettings::CaptureMode captureMode) {
+    CLScreenGrabber::CaptureMode settingsToGrabberCaptureMode(Qn::CaptureMode captureMode) {
         switch(captureMode) {
-        case VideoRecorderSettings::WindowMode:             return CLScreenGrabber::CaptureMode_Application;
-        case VideoRecorderSettings::FullScreenMode:         return CLScreenGrabber::CaptureMode_DesktopWithAero;
-        case VideoRecorderSettings::FullScreenNoeroMode:    return CLScreenGrabber::CaptureMode_DesktopWithoutAero;
+        case Qn::WindowMode:             return CLScreenGrabber::CaptureMode_Application;
+        case Qn::FullScreenMode:         return CLScreenGrabber::CaptureMode_DesktopWithAero;
+        case Qn::FullScreenNoeroMode:    return CLScreenGrabber::CaptureMode_DesktopWithoutAero;
         default:
             qnWarning("Invalid capture mode value '%1', treating as window mode.", static_cast<int>(captureMode));
             return CLScreenGrabber::CaptureMode_Application;
@@ -123,7 +123,7 @@ void QnScreenRecorder::startRecording(QGLWidget *appWidget) {
 #ifdef Q_OS_WIN
     QString filePath = getTempRecordingDir() + QLatin1String("/video_recording.ts");
 
-    VideoRecorderSettings recorderSettings;
+    QnVideoRecorderSettings recorderSettings;
     QAudioDeviceInfo audioDevice = recorderSettings.primaryAudioDevice();
     QAudioDeviceInfo secondAudioDevice = recorderSettings.secondaryAudioDevice();
     int screen = screenToAdapter(recorderSettings.screen());

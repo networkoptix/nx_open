@@ -123,8 +123,8 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(QnResourcePtr re
 
     foreach(QnVideoServerResourcePtr otherVideoServer, checkServers)
     {
-		if (otherVideoServer == currentVideoServer)
-			return 0; // archive starts with current server
+        if (otherVideoServer == currentVideoServer)
+            return 0; // archive starts with current server
 
         QnResourcePtr otherCamera = qnResPool->getResourceByUniqId(mac + otherVideoServer->getId().toString());
         RTPSession otherRtspSession;
@@ -199,7 +199,8 @@ bool QnRtspClientArchiveDelegate::open(QnResourcePtr resource)
         if (globalMinTime !=AV_NOPTS_VALUE)
             m_globalMinArchiveTime = globalMinTime;
 
-        m_rtpData = m_rtspSession.play(m_position, m_position, m_rtspSession.getScale());
+        m_rtspSession.play(m_position, m_position, m_rtspSession.getScale());
+        m_rtpData = m_rtspSession.getTrackIoByType("video");
         if (!m_rtpData)
             m_rtspSession.stop();
     }
@@ -220,7 +221,7 @@ void QnRtspClientArchiveDelegate::beforeClose()
     //m_waitBOF = false;
     m_closing = true;
     if (m_rtpData)
-        m_rtpData->getSocket()->close();
+        m_rtpData->getMediaSocket()->close();
 }
 
 void QnRtspClientArchiveDelegate::close()
@@ -362,7 +363,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
             data += 4;
         }
         else {
-            rtpChannelNum = m_rtpData->getSocket()->getLocalPort();
+            rtpChannelNum = m_rtpData->getMediaSocket()->getLocalPort();
         }
         const QString format = m_rtspSession.getTrackFormat(rtpChannelNum).toLower();
         if (format.isEmpty())
@@ -592,7 +593,7 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(con
 
                 nextPacket = QnMetaDataV1Ptr(metadata);
             }
-            else if (context && context->ctx()->codec_type == AVMEDIA_TYPE_VIDEO && dataType == QnAbstractMediaData::VIDEO)
+            else if (context && context->ctx() && context->ctx()->codec_type == AVMEDIA_TYPE_VIDEO && dataType == QnAbstractMediaData::VIDEO)
             {
                 if (dataSize < RTSP_FFMPEG_VIDEO_HEADER_SIZE)
                     return result;
@@ -610,15 +611,23 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(con
                     video->height = context->ctx()->coded_height;
                 }
             }
-            else if (context && context->ctx()->codec_type == AVMEDIA_TYPE_AUDIO && dataType == QnAbstractMediaData::AUDIO)
+            else if (context && context->ctx() && context->ctx()->codec_type == AVMEDIA_TYPE_AUDIO && dataType == QnAbstractMediaData::AUDIO)
             {
                 QnCompressedAudioData *audio = new QnCompressedAudioData(CL_MEDIA_ALIGNMENT, dataSize); // , context
-                audio->format.fromAvStream(context->ctx());
+                audio->context = context;
+                //audio->format.fromAvStream(context->ctx());
                 nextPacket = QnCompressedAudioDataPtr(audio);
             }
             else
             {
-                qWarning() << "Unsupported RTP codec or packet type. codec=" << (context ? context->ctx()->codec_type : 0) << "dataType=" << dataType;
+                if (context && context->ctx())
+                    qWarning() << "Unsupported RTP codec or packet type. codec=" << context->ctx()->codec_type;
+                else if (dataType == QnAbstractMediaData::AUDIO)
+                    qWarning() << "Unsupported audio codec or codec params";
+                else if (dataType == QnAbstractMediaData::VIDEO)
+                    qWarning() << "Unsupported video or codec params";
+                else
+                    qWarning() << "Unsupported or unknown packet";
                 return result;
             }
 

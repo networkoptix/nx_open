@@ -2,7 +2,7 @@
 #include <cmath> /* For std::abs, std::exp & std::log. */
 #include <QRectF>
 #include <utils/common/warnings.h>
-#include <ui/common/scene_utility.h>
+#include <ui/common/geometry.h>
 
 RectAnimator::RectAnimator(QObject *parent):
     base_type(parent),
@@ -29,8 +29,8 @@ int RectAnimator::estimatedDuration(const QVariant &from, const QVariant &to) co
 
     static const qreal eps = 1.0e-6;
 
-    qreal startDiagonal = SceneUtility::length(startRect.size());
-    qreal targetDiagonal = SceneUtility::length(targetRect.size());
+    qreal startDiagonal = QnGeometry::length(startRect.size());
+    qreal targetDiagonal = QnGeometry::length(targetRect.size());
 
     /* Formulas below don't do well with zero diagonals, so we adjust them. */
     if(qFuzzyIsNull(startDiagonal)) {
@@ -44,7 +44,7 @@ int RectAnimator::estimatedDuration(const QVariant &from, const QVariant &to) co
     }
 
     qreal movementSpeed = absoluteMovementSpeed() + relativeMovementSpeed() * (startDiagonal + targetDiagonal) / 2;
-    qreal movementTime = SceneUtility::length(targetRect.center() - startRect.center()) / movementSpeed;
+    qreal movementTime = QnGeometry::length(targetRect.center() - startRect.center()) / movementSpeed;
 
     qreal scalingTime = std::abs(std::log(startDiagonal / targetDiagonal)) / m_logScalingSpeed;
 

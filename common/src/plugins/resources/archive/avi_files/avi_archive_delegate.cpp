@@ -69,7 +69,8 @@ public:
             {
                 if (audioNum++ < index)
                     continue;
-                result.codec = codecContext->codec_id;
+                //result.codec = codecContext->codec_id;
+                result.codecContext =  QnMediaContextPtr(new QnMediaContext(codecContext));
                 result.description = QString::number(++audioNumber);
                 result.description += QLatin1String(". ");
 
@@ -118,7 +119,8 @@ QnAviArchiveDelegate::QnAviArchiveDelegate():
     m_selectedAudioChannel(0),
     m_startTime(0),
     m_useAbsolutePos(true),
-    m_duration(AV_NOPTS_VALUE)
+    m_duration(AV_NOPTS_VALUE),
+    m_ioContext(0)
 {
     close();
     m_audioLayout = new QnAviAudioLayout(this);
@@ -202,7 +204,7 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
                 }
 
                 audioData = new QnCompressedAudioData(CL_MEDIA_ALIGNMENT, packet.size, getCodecContext(stream));
-                audioData->format.fromAvStream(stream->codec);
+                //audioData->format.fromAvStream(stream->codec);
                 time_base = av_q2d(stream->time_base)*1e+6;
                 audioData->duration = qint64(time_base * packet.duration);
                 data = QnAbstractMediaDataPtr(audioData);
@@ -245,18 +247,19 @@ bool QnAviArchiveDelegate::open(QnResourcePtr resource)
 
 
         m_formatContext = avformat_alloc_context();
-        m_formatContext->pb = m_storage->createFfmpegIOContext(url, QIODevice::ReadOnly);
-        if (!m_formatContext->pb) {
+        m_formatContext->pb = m_ioContext = m_storage->createFfmpegIOContext(url, QIODevice::ReadOnly);
+        if (!m_ioContext) {
             close();
             return false;
         }
         m_initialized = avformat_open_input(&m_formatContext, "", 0, 0) >= 0;
 
-        if (!m_initialized )
+        if (!m_initialized ) 
             close();
-
+        
         getVideoLayout();
     }
+
     return m_initialized;
 }
 
@@ -273,12 +276,17 @@ void QnAviArchiveDelegate::doNotFindStreamInfo()
 
 void QnAviArchiveDelegate::close()
 {
-    if (m_formatContext) {
-        //avformat_close_input(&m_formatContext);
-        m_storage->closeFfmpegIOContext(m_formatContext->pb);
-        m_formatContext->pb = 0;
-        avformat_free_context(m_formatContext);
+    if (m_ioContext)
+    {
+        m_storage->closeFfmpegIOContext(m_ioContext);
+        m_ioContext = 0;
+        if (m_formatContext)
+            m_formatContext->pb = 0;
     }
+
+    if (m_formatContext) 
+        avformat_close_input(&m_formatContext);
+    
     m_contexts.clear();
     m_formatContext = 0;
     m_initialized = false;

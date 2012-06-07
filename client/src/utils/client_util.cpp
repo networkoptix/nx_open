@@ -3,7 +3,7 @@
 
 QString getTempRecordingDir()
 {
-    QString path = qnSettings->mediaRoot() + QLatin1String("/_temp/");
+    QString path = qnSettings->mediaFolder() + QLatin1String("/_temp/");
     if (!QDir(path).exists())
         QDir().mkpath(path);
     return path;
@@ -11,5 +11,5 @@ QString getTempRecordingDir()
 
 QString getRecordingDir()
 {
-    return qnSettings->mediaRoot() + QLatin1String("/_Recorded/");
+    return qnSettings->mediaFolder() + QLatin1String("/_Recorded/");
 }

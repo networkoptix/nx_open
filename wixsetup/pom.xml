@@ -20,10 +20,14 @@
 	<packaging>pom</packaging>
 	<name>HD Witness Installer</name>
 
+	<properties>
+		<arch>x86</arch>
+	</properties>
+
 	<build>
 		<directory>${arch}</directory>
 		<sourceDirectory>${basedir}</sourceDirectory>
-		<finalName>${pom.parent.artifactId}-${version}.${buildNumber}-${platform}-${arch}-${build.configuration}-${customization}</finalName>
+		<finalName>${project.parent.artifactId}-${project.version}.${buildNumber}-${platform}-${arch}-${build.configuration}-${customization}</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -31,7 +35,7 @@
 				<version>1.0-alpha-2</version>
 				<executions>
 					<execution>
-						<phase>initialize</phase>
+						<phase>validate</phase>
 						<goals>
 							<goal>read-project-properties</goal>
 						</goals>
@@ -45,10 +49,6 @@
 			</plugin>
 		</plugins>
 	</build>
-
-	<properties>
-		<arch>x86</arch>
-	</properties>
 
 	<profiles>
 		<profile>
@@ -149,15 +149,11 @@
 									<outputDirectory>${project.build.directory}</outputDirectory>
 									<resources>
 										<resource>
-											<directory>${project.build.sourceDirectory}/maven/wix-resources</directory>
-											<filtering>true</filtering>
-										</resource>
-										<resource>
-											<directory>${project.build.sourceDirectory}/maven/bin-resources/common</directory>
+											<directory>${project.build.sourceDirectory}/maven-bin-resources/common</directory>
 											<filtering>false</filtering>
 										</resource>		
 										<resource>
-											<directory>${project.build.sourceDirectory}/maven/bin-resources/custom/${installer.customization}</directory>
+											<directory>${project.build.sourceDirectory}/maven-bin-resources/custom/${installer.customization}</directory>
 											<filtering>false</filtering>
 										</resource>		
 										<resource>
@@ -247,7 +243,8 @@
 										<argument>-ext</argument> 
 										<argument>WixUIExtension.dll</argument>
 										<argument>-ext</argument> 
-										<argument>WixUtilExtension.dll</argument> 
+										<argument>WixUtilExtension.dll</argument>
+										<argument>PasswordShouldMatchDlg.wxs</argument>
 										<argument>UpgradeDlg.wxs</argument> 
 										<argument>PasswordDlg.wxs</argument>
 										<argument>EmptyPasswordDlg.wxs</argument>
@@ -317,6 +314,26 @@
 								</configuration>
 							</execution>
 
+							<!--<execution>
+								<id>wix-pack-exe</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>setupbld</executable>
+									<workingDirectory>${project.build.directory}</workingDirectory>
+									<arguments>
+										<argument>-out</argument>
+										<argument>bin/${project.build.finalName}.exe</argument>
+										<argument>-ms</argument>
+										<argument>bin/${project.build.finalName}.msi</argument>
+										<argument>-setup</argument>
+										<argument>setup.exe</argument>
+									</arguments>		
+								</configuration>					
+							</execution>	-->				
+
 							<execution>
 								<id>integration-test</id>
 								<phase>integration-test</phase>
@@ -324,10 +341,10 @@
 									<goal>exec</goal>
 								</goals>
 								<configuration>
-									<executable>test.bat</executable>
+									<executable>${project.build.directory}/test.bat</executable>
 									<workingDirectory>${project.build.directory}</workingDirectory>						
 								</configuration>	
-							</execution>			
+							</execution>
 						</executions> 
 					</plugin>
 					<!--<plugin>
@@ -344,7 +361,7 @@
 						<configuration>
 							<artifacts>
 								<artifact>
-									<file>${basedir}/bin/${msbuild.configuration}/${pom.parent.artifact}-${version}.exe</file>
+									<file>${basedir}/bin/${msbuild.configuration}/${pom.parent.artifact}-${project.version}.exe</file>
 									<type>exe</type>
 									<classifier>${platform}-x86-${msbuild.configuration}</classifier>
 								</artifact>

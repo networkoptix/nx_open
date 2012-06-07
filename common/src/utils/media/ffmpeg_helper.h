@@ -35,7 +35,7 @@ private:
 class QnFfmpegHelper
 {
 private:
-    enum CodecCtxField { Field_RC_EQ, Field_EXTRADATA, Field_INTRA_MATRIX, Field_INTER_MATRIX, Field_OVERRIDE };
+    enum CodecCtxField { Field_RC_EQ, Field_EXTRADATA, Field_INTRA_MATRIX, Field_INTER_MATRIX, Field_OVERRIDE, Field_Channels, Field_SampleRate, Field_Sample_Fmt, Field_BitsPerSample };
     static void appendCtxField(QByteArray *dst, CodecCtxField field, const char* data, int size);
 public:
     static void serializeCodecContext(const AVCodecContext *ctx, QByteArray *data);

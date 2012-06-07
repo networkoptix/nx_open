@@ -1,26 +1,27 @@
 #include "login_dialog.h"
 #include "ui_login_dialog.h"
 
-#include <QEvent>
+#include <QtCore/QEvent>
 #include <QtGui/QDataWidgetMapper>
 #include <QtGui/QMessageBox>
 #include <QtGui/QStandardItemModel>
 
-#include "core/resource/resource.h"
-#include "ui/preferences/preferencesdialog.h"
-#include "ui/style/skin.h"
-#include "ui/workbench/workbench_context.h"
-#include "ui/widgets/rendering_widget.h"
-#include "connection_testing_dialog.h"
+#include <utils/settings.h>
+#include <core/resource/resource.h>
+#include <api/app_server_connection.h>
+#include <api/session_manager.h>
 
-#include "api/AppServerConnection.h"
-#include "api/SessionManager.h"
+#include <ui/dialogs/preferences_dialog.h>
+#include <ui/widgets/rendering_widget.h>
+#include <ui/style/skin.h>
+#include <ui/workbench/workbench_context.h>
 
-#include "utils/settings.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "plugins/resources/archive/filetypes.h"
 #include "plugins/resources/archive/filetypesupport.h"
+
+#include "connection_testing_dialog.h"
 
 namespace {
     void setEnabled(const QObjectList &objects, QObject *exclude, bool enabled) {
@@ -131,13 +132,9 @@ QUrl LoginDialog::currentUrl()
     const int row = ui->connectionsComboBox->currentIndex();
 
     QUrl url;
-
-    QString host = m_connectionsModel->item(row, 1)->text();
-    int port = m_connectionsModel->item(row, 2)->text().toInt();
-
-    url.setScheme("http");
-    url.setHost(host);
-    url.setPort(port);
+    url.setScheme("https");
+    url.setHost(m_connectionsModel->item(row, 1)->text());
+    url.setPort(m_connectionsModel->item(row, 2)->text().toInt());
     url.setUserName(m_connectionsModel->item(row, 3)->text());
     url.setPassword(m_connectionsModel->item(row, 4)->text());
 
@@ -199,12 +196,19 @@ void LoginDialog::updateStoredConnections()
 {
     m_connectionsModel->removeRows(0, m_connectionsModel->rowCount());
 
-    int index = -1;
-    QnSettings::ConnectionData lastUsedConnection = qnSettings->lastUsedConnection();
-    foreach (const QnSettings::ConnectionData &connection, qnSettings->connections()) {
-        if (connection.name.trimmed().isEmpty() || !connection.url.isValid())
-            continue;
+    QnConnectionDataList connections = qnSettings->customConnections();
+    connections.push_front(qnSettings->defaultConnection());
 
+    QnConnectionData lastUsedConnection = qnSettings->lastUsedConnection();
+    if(!lastUsedConnection.isValid()) {
+        lastUsedConnection = qnSettings->defaultConnection();
+        lastUsedConnection.name = QString();
+    }
+    if(connections.contains(lastUsedConnection))
+        connections.removeOne(lastUsedConnection);
+    connections.push_front(lastUsedConnection);
+
+    foreach (const QnConnectionData &connection, connections) {
         QList<QStandardItem *> row;
         row << new QStandardItem(connection.name)
             << new QStandardItem(connection.url.host())
@@ -212,29 +216,9 @@ void LoginDialog::updateStoredConnections()
             << new QStandardItem(connection.url.userName())
             << new QStandardItem(connection.url.password());
         m_connectionsModel->appendRow(row);
-
-        if (lastUsedConnection == connection)
-            index = m_connectionsModel->rowCount() - 1;
-    }
-    {
-        QnSettings::ConnectionData connection;
-        if (index == -1 || lastUsedConnection.name.trimmed().isEmpty()) {
-            connection = lastUsedConnection;
-            if (index == -1) {
-                index = 0;
-                connection.name.clear();
-            }
-        }
-        QList<QStandardItem *> row;
-        row << new QStandardItem(connection.name)
-            << new QStandardItem(connection.url.host())
-            << new QStandardItem(QString::number(connection.url.port()))
-            << new QStandardItem(connection.url.userName())
-            << new QStandardItem(connection.url.password());
-        m_connectionsModel->insertRow(0, row);
     }
 
-    ui->connectionsComboBox->setCurrentIndex(index);
+    ui->connectionsComboBox->setCurrentIndex(0); /* At last used connection. */
 }
 
 void LoginDialog::updateAcceptibility() 
@@ -286,7 +270,7 @@ void LoginDialog::at_testFinished(int status, const QByteArray &/*data*/, const 
         return;
     }
 
-    QnSettings::ConnectionData connectionData;
+    QnConnectionData connectionData;
     connectionData.url = currentUrl();
     qnSettings->setLastUsedConnection(connectionData);
 
@@ -304,7 +288,7 @@ void LoginDialog::at_testButton_clicked()
 
     if (!url.isValid())
     {
-        QMessageBox::warning(this, tr("Invalid paramters"), tr("The information you have entered is not valid."));
+        QMessageBox::warning(this, tr("Invalid parameters"), tr("The information you have entered is not valid."));
         return;
     }
 

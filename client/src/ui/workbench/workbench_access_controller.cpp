@@ -8,6 +8,14 @@
 #include "workbench_context.h"
 #include "workbench_layout_snapshot_manager.h"
 
+namespace {
+    bool isFileLayout(const QnLayoutResourcePtr &layout) {
+        return (layout->flags() & QnResource::url) && !layout->getUrl().isEmpty();
+    }
+
+} // anonymous namespace
+
+
 QnWorkbenchAccessController::QnWorkbenchAccessController(QObject *parent):
     QObject(parent),
     QnWorkbenchContextAware(parent)
@@ -107,7 +115,9 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnUserRe
 }
 
 Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayoutResourcePtr &layout) {
-    if(isAdmin() || isOwner()) {
+    if(isFileLayout(layout)) {
+        return Qn::ReadPermission;
+    } else if(isAdmin() || isOwner()) {
         return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission;
     } else {
         QnResourcePtr user = resourcePool()->getResourceById(layout->getParentId());

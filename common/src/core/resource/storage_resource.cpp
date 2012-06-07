@@ -166,7 +166,6 @@ void QnStorageResource::closeFfmpegIOContext(AVIOContext* ioContext)
     if (ioContext)
     {
         QIODevice* ioDevice = (QIODevice*) ioContext->opaque;
-        ioDevice->close();
         delete ioDevice;
         ioContext->opaque = 0;
         avio_close(ioContext);

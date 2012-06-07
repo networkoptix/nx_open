@@ -4,7 +4,7 @@
 #include <camera/camdisplay.h>
 
 #include <ui/graphics/items/resource_widget_renderer.h>
-#include <ui/common/scene_utility.h>
+#include <ui/common/geometry.h>
 
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
 
@@ -105,7 +105,7 @@ void QnRenderingWidget::paintGL() {
         glLoadIdentity();
         m_renderer->paint(
             0,
-            SceneUtility::expanded(SceneUtility::aspectRatio(sourceSize), rect(), Qt::KeepAspectRatio, Qt::AlignCenter),
+            QnGeometry::expanded(QnGeometry::aspectRatio(sourceSize), rect(), Qt::KeepAspectRatio, Qt::AlignCenter),
             1.0
         );
     }

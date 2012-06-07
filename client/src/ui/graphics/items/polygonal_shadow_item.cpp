@@ -1,6 +1,6 @@
 #include "polygonal_shadow_item.h"
 #include <ui/graphics/opengl/gl_shortcuts.h>
-#include <ui/common/scene_utility.h>
+#include <ui/common/geometry.h>
 
 QnPolygonalShadowItem::QnPolygonalShadowItem(QGraphicsItem *parent):
     QGraphicsObject(parent),

@@ -7,7 +7,15 @@ win32 {
   CONFIG += x86
   QT *= multimedia
   INCLUDEPATH += $$PWD/../../common/contrib/openssl/include
+  
   LIBS += -L$$PWD/../../common/contrib/openssl/bin -llibeay32 -ssleay32
+  win32-msvc2010 {
+    LIBS += -L$$PWD/../../common/contrib/openssl/bin/win32-msvc2010
+  }
+  win32-msvc2008 {
+    LIBS += -L$$PWD/../../common/contrib/openssl/bin
+  }
+  LIBS += -llibeay32
 }
 
 FFMPEG = %FFMPEG

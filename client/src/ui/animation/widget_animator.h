@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QMetaType>
-#include <ui/common/scene_utility.h>
+#include <ui/common/geometry.h>
 #include "animator_group.h"
 
 class QGraphicsWidget;

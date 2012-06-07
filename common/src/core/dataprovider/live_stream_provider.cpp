@@ -51,12 +51,6 @@ m_softMotionLastChannel(0)
     //m_softwareMotion = true;
 
     m_timeSinceLastMetaData.restart();
-
-    char mask[MD_WIDTH * MD_HEIGHT];
-    memset(mask, 10, sizeof(mask));
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-        m_motionEstimation[i].setMotionMask(QByteArray(mask, sizeof(mask))); // default mask
-
     m_layout = 0;
 }
 
@@ -119,44 +113,6 @@ QnStreamQuality QnLiveStreamProvider::getQuality() const
     return m_quality;
 }
 
-QByteArray QnLiveStreamProvider::createSoftwareMotionMask(const QnMotionRegion& region)
-{
-    static int sensitivityToMask[10] = 
-    {
-        255, //  0
-        64,
-        48,
-        32,
-        24,
-        16,
-        10,
-        8,
-        6,
-        5, // 9
-    };
-
-    QByteArray rez;
-    rez.resize(MD_WIDTH * MD_HEIGHT);
-    memset(rez.data(), 255, MD_WIDTH * MD_HEIGHT);
-    for (int sens = QnMotionRegion::MIN_SENSITIVITY; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens)
-    {
-        foreach(const QRect& rect, region.getRectsBySens(sens))
-        {
-            for (int y = rect.top(); y <= rect.bottom(); ++y)
-            {
-                for (int x = rect.left(); x <= rect.right(); ++x)
-                {
-                    rez.data()[x * MD_HEIGHT + y] = sensitivityToMask[sens];
-
-                }
-
-            }
-        }
-    }
-    return rez;
-}
-
-
 void QnLiveStreamProvider::updateSoftwareMotion()
 {
     QnAbstractMediaStreamDataProvider* ap = dynamic_cast<QnAbstractMediaStreamDataProvider*>(this);
@@ -174,7 +130,7 @@ void QnLiveStreamProvider::updateSoftwareMotion()
         for (int i = 0; i < m_layout->numberOfChannels(); ++i)
         {
             QnMotionRegion region = res->getMotionRegion(i);
-            m_motionEstimation[i].setMotionMask(createSoftwareMotionMask(region));
+            m_motionEstimation[i].setMotionMask(region);
         }
     }
 }

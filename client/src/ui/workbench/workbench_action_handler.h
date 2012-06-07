@@ -6,7 +6,7 @@
 
 #include <QtGui/QDialogButtonBox>
 
-#include <api/AppServerConnection.h>
+#include <api/app_server_connection.h>
 #include <ui/actions/actions.h>
 #include "workbench_context_aware.h"
 
@@ -117,6 +117,8 @@ protected:
     bool closeLayouts(const QnLayoutResourceList &resources, bool waitForReply = false);
     bool closeLayouts(const QnWorkbenchLayoutList &layouts, bool waitForReply = false);
 
+    void setLayoutAspectRatio(const QnLayoutResourcePtr &resource, double aspectRatio);
+
     void openNewWindow(const QStringList &args);
 
     void saveCameraSettingsFromDialog();
@@ -137,6 +139,9 @@ protected slots:
     void at_eventManager_connectionOpened();
 
     void at_mainMenuAction_triggered();
+
+    void at_incrementDebugCounterAction_triggered();
+    void at_decrementDebugCounterAction_triggered();
 
     void at_nextLayoutAction_triggered();
     void at_previousLayoutAction_triggered();
@@ -188,11 +193,13 @@ protected slots:
     void at_takeScreenshotAction_triggered();
     void at_exitAction_triggered();
 
+    void at_setCurrentLayoutAspectRatio4x3Action_triggered();
+    void at_setCurrentLayoutAspectRatio16x9Action_triggered();
+
     void at_exportTimeSelectionAction_triggered();
     void at_exportLayoutAction_triggered();
     void at_camera_exportFinished(QString fileName);
     void at_camera_exportFailed(QString errorMessage);
-
 
     void at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle);
     void at_resource_deleted(int status, const QByteArray &data, const QByteArray &errorString, int handle);

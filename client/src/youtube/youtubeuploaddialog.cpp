@@ -7,10 +7,6 @@
 #include <utils/common/warnings.h>
 
 #include <ui/workbench/workbench_context.h>
-#define USE_PREFERENCESWND
-#ifdef USE_PREFERENCESWND
-#include <ui/preferences/preferencesdialog.h>
-#endif
 
 #include "youtube_uploader.h"
 #include "youtubesettingswidget.h"
@@ -48,8 +44,8 @@ YouTubeUploadDialog::YouTubeUploadDialog(QnWorkbenchContext *context, QnResource
 
 
     m_youtubeuploader = new YouTubeUploader(this);
-    m_youtubeuploader->setLogin(YouTubeSettingsWidget::login());
-    m_youtubeuploader->setPassword(YouTubeSettingsWidget::password());
+    m_youtubeuploader->setLogin(QnYouTubeSettingsWidget::login());
+    m_youtubeuploader->setPassword(QnYouTubeSettingsWidget::password());
 
     connect(m_youtubeuploader, SIGNAL(categoryListLoaded()), this, SLOT(categoryListLoaded()));
     connect(m_youtubeuploader, SIGNAL(authFailed()), this, SLOT(authFailed()));
@@ -150,10 +146,9 @@ void YouTubeUploadDialog::authFailed()
 {
     ui->buttonBox->button(QDialogButtonBox::Save)->setEnabled(true);
 
-#ifndef USE_PREFERENCESWND
     QDialog dialog(this);
 
-    YouTubeSettingsWidget *widget = new YouTubeSettingsWidget(&dialog);
+    QnYouTubeSettingsWidget *widget = new QnYouTubeSettingsWidget(&dialog);
     widget->layout()->setContentsMargins(0, 0, 0, 0);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Close, Qt::Horizontal, &dialog);
@@ -164,19 +159,12 @@ void YouTubeUploadDialog::authFailed()
     dialogLayout->addWidget(widget);
     dialogLayout->addWidget(buttonBox);
     dialog.setLayout(dialogLayout);
-#else
-    QnPreferencesDialog dialog(m_context.data(), this);
-    dialog.setCurrentPage(QnPreferencesDialog::PageYouTubeSettings);
-    dialog.exec();
-#endif
 
     if (dialog.exec() == QDialog::Accepted) {
-#ifndef USE_PREFERENCESWND
         widget->accept();
-#endif
 
-        m_youtubeuploader->setLogin(YouTubeSettingsWidget::login());
-        m_youtubeuploader->setPassword(YouTubeSettingsWidget::password());
+        m_youtubeuploader->setLogin(QnYouTubeSettingsWidget::login());
+        m_youtubeuploader->setPassword(QnYouTubeSettingsWidget::password());
 
         accept(); // retry
     }

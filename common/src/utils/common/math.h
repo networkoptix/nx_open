@@ -4,6 +4,7 @@
 #include <cmath>
 
 #include <QtCore/QtGlobal>
+#include <QtCore/qnumeric.h>
 
 #include "fuzzy.h"
 #include "float.h"
@@ -131,5 +132,52 @@ T qRound(T value, T step) {
     return qCeil(value - step / 2, step);
 }
 
+
+/**
+ * \returns                             Index of the leading 1 bit, counting the least significant bit at index 0.  
+ *                                      (1 << IntegerLog2(x)) is a mask for the most significant bit of x.
+ *                                      Result is undefined if input is zero.
+ */
+int qIntegerLog2(quint32 value);
+
+#if defined(__GNUC__)
+inline int qIntegerLog2(quint32 value) {
+    return 31 - __builtin_clz(value);
+}
+#elif defined(_MSC_VER)
+#   include <intrin.h>
+#   pragma intrinsic(_BitScanReverse)
+inline int qIntegerLog2(quint32 value) {
+    unsigned long result;             /* MSVC intrinsic demands this type. */
+    _BitScanReverse(&result, value);
+    return result;
+}
+#else
+inline int qIntegerLog2(quint32 value) {
+    /* Default version using regular operations. Code taken from:
+     * http://graphics.stanford.edu/~seander/bithacks.html#IntegerLog */
+    int result, shift;
+
+    shift = (value > 0xFFFF) << 4;
+    value >>= shift;
+    result = shift;
+
+    shift = (value > 0xFF) << 3;
+    value >>= shift;
+    result |= shift;
+
+    shift = (value > 0xF) << 2;
+    value >>= shift;
+    result |= shift;
+
+    shift = (value > 0x3) << 1;
+    value >>= shift;
+    result |= shift;
+
+    result |= (value >> 1);
+
+    return result;
+}
+#endif
 
 #endif // QN_MATH_H

@@ -20,10 +20,9 @@ void PlDroidStreamReader::setSDPInfo(quint32 ipv4, QByteArray sdpInfo)
 PlDroidStreamReader::PlDroidStreamReader(QnResourcePtr res):
     CLServerPushStreamreader(res),
     m_rtpSession(),
-    m_ioDevice(m_rtpSession),
-    m_h264Parser(&m_ioDevice),
-    m_videoSock(0),
-    m_audioSock(0),
+    m_videoIoDevice(0),
+    m_audioIoDevice(0),
+    m_h264Parser(0),
     m_gotSDP(0)
 {
     m_droidRes = qSharedPointerDynamicCast<QnDroidResource>(res);
@@ -32,8 +31,6 @@ PlDroidStreamReader::PlDroidStreamReader(QnResourcePtr res):
     m_videoPort = 0;
     m_audioPort = 0;
     m_dataPort = 0;
-
-    m_ioDevice.setTCPMode(false);
 }
 
 PlDroidStreamReader::~PlDroidStreamReader()
@@ -43,11 +40,13 @@ PlDroidStreamReader::~PlDroidStreamReader()
 
 QnAbstractMediaDataPtr PlDroidStreamReader::getNextData()
 {
+    QList<QnAbstractMediaDataPtr> result;
+    quint8 rtpBuffer[MAX_RTP_PACKET_SIZE];
+
     if (!isStreamOpened())
         return QnAbstractMediaDataPtr(0);
 
-    QnAbstractMediaDataPtr rez;
-    while (!m_needStop && rez == 0)
+    while (!m_needStop && result.isEmpty())
     {
         if (!m_gotSDP) {
             msleep(10);
@@ -55,9 +54,10 @@ QnAbstractMediaDataPtr PlDroidStreamReader::getNextData()
         }
 
         QMutexLocker lock(&m_controlPortSync);
-        rez = m_h264Parser.getNextData();
+        int readed = m_videoIoDevice->read( (char*) rtpBuffer, sizeof(rtpBuffer));
+        m_h264Parser->processData(rtpBuffer, readed, m_videoIoDevice->getStatistic(), result );
     }
-    return rez;
+    return result.isEmpty() ? QnAbstractMediaDataPtr() : result[0];
 }
 
 void PlDroidStreamReader::openStream()
@@ -98,21 +98,17 @@ void PlDroidStreamReader::openStream()
         return;
     }
 
-    m_videoSock = new UDPSocket();
-    m_videoSock->setLocalPort(0);
-    m_audioSock = new UDPSocket();
-    m_audioSock->setLocalPort(0);
-
-    m_videoSock->setReadTimeOut(DROID_TIMEOUT);
-    m_audioSock->setReadTimeOut(DROID_TIMEOUT);
+    m_videoIoDevice = new RTPIODevice(&m_rtpSession, false);
+    m_audioIoDevice = new RTPIODevice(&m_rtpSession, false);
+    m_h264Parser = new CLH264RtpParser();
 
     {
         QMutexLocker lock(&m_allReadersMutex);
         quint32 ip = res->getHostAddress().toIPv4Address();
         m_allReaders.insert(ip, this);
     }
-
-    QByteArray request = QString("v:%1,a:%2,f:%3").arg(m_videoSock->getLocalPort()).arg(m_audioSock->getLocalPort()).arg(DROID_CONTROL_TCP_SERVER_PORT).toAscii();
+    QByteArray request = QString("v:%1,a:%2,f:%3").arg(m_videoIoDevice->getMediaSocket()->getLocalPort()).
+                            arg(m_audioIoDevice->getMediaSocket()->getLocalPort()).arg(DROID_CONTROL_TCP_SERVER_PORT).toAscii();
     
     int sendLen = m_tcpSock.send(request.data(), request.size());
     if (sendLen != request.size())
@@ -134,8 +130,6 @@ void PlDroidStreamReader::openStream()
         }
     }
     */
-
-    m_ioDevice.setSocket(m_videoSock);
 }
 
 void PlDroidStreamReader::closeStream()
@@ -146,18 +140,19 @@ void PlDroidStreamReader::closeStream()
         m_allReaders.remove(ip);
     }
 
-    delete m_videoSock;
-    delete m_audioSock;
-
-    m_videoSock = 0;
-    m_audioSock = 0;
+    delete m_videoIoDevice;
+    delete m_audioIoDevice;
+    delete m_h264Parser;
+    m_videoIoDevice = 0;
+    m_audioIoDevice = 0;
+    m_h264Parser = 0;
 
     m_tcpSock.close();
 }
 
 bool PlDroidStreamReader::isStreamOpened() const
 {
-    return m_tcpSock.isConnected() && m_videoSock != 0;
+    return m_tcpSock.isConnected() && m_videoIoDevice != 0;
 }
 
 void PlDroidStreamReader::updateStreamParamsBasedOnQuality()
@@ -173,6 +168,6 @@ void PlDroidStreamReader::updateStreamParamsBasedOnFps()
 void PlDroidStreamReader::setSDPInfo(QByteArray sdpInfo)
 {
     QMutexLocker lock(&m_controlPortSync);
-    m_h264Parser.setSDPInfo(sdpInfo);
+    m_h264Parser->setSDPInfo(sdpInfo.split('\n'));
     m_gotSDP = true;
 }

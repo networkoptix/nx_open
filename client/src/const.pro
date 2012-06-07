@@ -92,7 +92,14 @@ win* {
     LIBS += -L$$OPENAL_LIBS_PATH -lOpenAL32
 
     INCLUDEPATH += $$PWD/../../common/contrib/openssl/include
-    LIBS += -L$$PWD/../../common/contrib/openssl/bin -llibeay32
+
+	win32-msvc2010 {
+		LIBS += -L$$PWD/../../common/contrib/openssl/bin/win32-msvc2010
+	}
+	win32-msvc2008 {
+		LIBS += -L$$PWD/../../common/contrib/openssl/bin
+	}
+	LIBS += -llibeay32
 }
 
 mac {
@@ -218,11 +225,7 @@ PRECOMPILED_SOURCE = $$PWD/StdAfx.cpp
 
 RESOURCES += ../build/skin.qrc
 FORMS += \
-    ui/preferences/connectionssettingswidget.ui \
-    ui/preferences/licensewidget.ui \
-    ui/preferences/licensemanagerwidget.ui \
-    ui/preferences/preferences.ui \
-    ui/preferences/recordingsettingswidget.ui \
+    ui/dialogs/preferences_dialog.ui \
     ui/dialogs/login_dialog.ui \
     ui/dialogs/sign_dialog.ui \
     ui/dialogs/tags_edit_dialog.ui \
@@ -235,10 +238,14 @@ FORMS += \
     youtube/youtubeuploaddialog.ui \
     youtube/youtubesetting.ui \
     ui/device_settings/camera_schedule_widget.ui \
+    ui/widgets/settings/connections_settings_widget.ui \
+    ui/widgets/settings/license_widget.ui \
+    ui/widgets/settings/license_manager_widget.ui \
+    ui/widgets/settings/recording_settings_widget.ui \
     ui/widgets/help_widget.ui \
     ui/widgets/resource_tree_widget.ui \
-    ui/widgets/single_camera_settings_widget.ui \
-    ui/widgets/multiple_camera_settings_widget.ui \
+    ui/widgets/properties/single_camera_settings_widget.ui \
+    ui/widgets/properties/multiple_camera_settings_widget.ui \
 
 # CL_TRIAL_MODE 
 DEFINES += CL_FORCE_LOGO

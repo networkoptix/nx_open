@@ -655,21 +655,21 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(hasFlags(QnResource::layout) || hasFlags(QnResource::media) || hasFlags(QnResource::remote_server));
 
     factory(Qn::YouTubeUploadAction).
-        //flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
+        //flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget). // TODO
         text(tr("Upload to YouTube...")).
         //shortcut(tr("Ctrl+Y")).
         autoRepeat(false).
         condition(hasFlags(QnResource::ARCHIVE));
 
     factory(Qn::EditTagsAction).
-        //flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
+        //flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget). // TODO
         text(tr("Edit tags...")).
         shortcut(tr("Alt+T")).
         autoRepeat(false).
         condition(hasFlags(QnResource::media));
 
     factory(Qn::DeleteFromDiskAction).
-        //flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
+        //flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget). // TODO
         text(tr("Delete from Disk")).
         autoRepeat(false).
         condition(hasFlags(QnResource::url | QnResource::local | QnResource::media));
@@ -693,6 +693,23 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Server Settings...")).
         condition(new QnResourceActionCondition(hasFlags(QnResource::remote_server), Qn::ExactlyOne, this));
 
+    factory().
+        flags(Qn::Scene | Qn::NoTarget).
+        text(tr("Change Cell Aspect Ratio"));
+
+    factory.enterSubMenu(); {
+        factory(Qn::SetCurrentLayoutAspectRatio4x3Action).
+            flags(Qn::Scene | Qn::NoTarget).
+            requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
+            text(tr("4:3"));
+
+        factory(Qn::SetCurrentLayoutAspectRatio16x9Action).
+            flags(Qn::Scene | Qn::NoTarget).
+            requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
+            text(tr("16:9"));
+    } factory.leaveSubMenu();
+
+
 
     factory(Qn::StartTimeSelectionAction).
         flags(Qn::Slider | Qn::SingleTarget).
@@ -715,13 +732,25 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::ExportTimeSelectionAction).
         flags(Qn::Slider | Qn::SingleTarget).
-        text(tr("Export Selection")).
+        text(tr("Export Selection...")).
         condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::DisabledAction, this));
 
     factory(Qn::ExportLayoutAction).
         flags(Qn::Slider | Qn::SingleTarget).
-        text(tr("Export selected media as layout")).
+        text(tr("Export Selected as Layout...")).
         condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::DisabledAction, this));
+
+
+
+    factory(Qn::IncrementDebugCounterAction).
+        flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::NoTarget).
+        shortcut(tr("Ctrl+Alt+Shift++")).
+        text(tr("Increment Debug Counter"));
+
+    factory(Qn::DecrementDebugCounterAction).
+        flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::NoTarget).
+        shortcut(tr("Ctrl+Alt+Shift+-")).
+        text(tr("Decrement Debug Counter"));
 }
 
 QnActionManager::~QnActionManager() {

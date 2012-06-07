@@ -6,7 +6,7 @@
 #include <QtGui/QMessageBox>
 #include <QtGui/QTabWidget>
 
-#include <api/AppServerConnection.h>
+#include <api/app_server_connection.h>
 
 #include "device_settings_tab.h"
 

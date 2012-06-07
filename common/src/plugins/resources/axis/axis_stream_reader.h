@@ -3,7 +3,8 @@
 
 #include "core/dataprovider/live_stream_provider.h"
 #include "core/dataprovider/spush_media_stream_provider.h"
-#include "utils/network/h264_rtp_reader.h"
+#include "utils/network/multicodec_rtp_reader.h"
+#include "core/resource/resource_media_layout.h"
 
 class QnAxisStreamReader: public CLServerPushStreamreader , public QnLiveStreamProvider
 {
@@ -11,6 +12,7 @@ public:
     QnAxisStreamReader(QnResourcePtr res);
     virtual ~QnAxisStreamReader();
 
+    const QnResourceAudioLayout* getDPAudioLayout() const;
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
     virtual void openStream() override;
@@ -20,6 +22,8 @@ protected:
 
     virtual void updateStreamParamsBasedOnQuality() override;
     virtual void updateStreamParamsBasedOnFps() override;
+
+    virtual void pleaseStop() override;
 private:
 
     QnAbstractMediaDataPtr getNextDataMPEG(CodecID ci);
@@ -35,7 +39,7 @@ private:
     bool isGotFrame(QnCompressedVideoDataPtr videoData);
 private:
     QnMetaDataV1Ptr m_lastMetadata;
-    RTPH264StreamreaderDelegate m_RTP264;
+    QnMulticodecRtpReader m_rtpStreamParser;
     QnPlAxisResourcePtr m_axisRes;
 };
 

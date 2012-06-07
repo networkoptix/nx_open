@@ -176,7 +176,11 @@ UINT __stdcall FindFreePorts(MSIHANDLE hInstall)
 {
     InitWinsock();
 
+    static const int PORTS_TO_ALLOCATE = 4;
+
     static const int PORT_BASE = 7001;
+    static const int PORT_RANGE_STEP = 10;
+    static const int PORT_RANGES_TO_TRY = 100;
 
     HRESULT hr = S_OK;
     UINT er = ERROR_SUCCESS;
@@ -186,27 +190,79 @@ UINT __stdcall FindFreePorts(MSIHANDLE hInstall)
 
     WcaLog(LOGMSG_STANDARD, "Initialized.");
 
-    int freePort1 = NextFreePort(PORT_BASE, PORT_BASE + 100);
-    int freePort2 = NextFreePort(PORT_BASE + 100, PORT_BASE + 200);
-    int freePort3 = NextFreePort(PORT_BASE + 200, PORT_BASE + 300);
-    int freePort4 = NextFreePort(PORT_BASE + 300, PORT_BASE + 400);
+    int firstPort = PORT_BASE;
+    for (int i = 0; i < PORT_RANGES_TO_TRY; i++)
+    {
+        if (!IsPortRangeAvailable(firstPort, PORTS_TO_ALLOCATE))
+            firstPort += PORT_RANGE_STEP;
+    }
 
-    WCHAR portString[10];
+    // Assume we've found a free range
+    for (int i = 1; i <= PORTS_TO_ALLOCATE; i++)
+    {
+        int port = firstPort - 1 + i;
 
-    _itow_s(freePort1, portString, 10, 10);
-    MsiSetProperty(hInstall, L"FREEPORT1", portString);
+        CString portPropertyName;
+        portPropertyName.Format(L"FREEPORT%d", i);
 
-    _itow_s(freePort2, portString, 10, 10);
-    MsiSetProperty(hInstall, L"FREEPORT2", portString);
+        CString portPropertyValue;
+        portPropertyValue.Format(L"%d", port);
 
-    _itow_s(freePort3, portString, 10, 10);
-    MsiSetProperty(hInstall, L"FREEPORT3", portString);
+        MsiSetProperty(hInstall, portPropertyName, portPropertyValue);
+    }
 
-    _itow_s(freePort4, portString, 10, 10);
-    MsiSetProperty(hInstall, L"FREEPORT4", portString);
 LExit:
 
     FinishWinsock();
+    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    return WcaFinalize(er);
+}
+
+void fixPath(CString& path)
+{
+	path.Replace(L"/", L"\\");
+}
+
+UINT __stdcall FixServerFolder(MSIHANDLE hInstall)
+{
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+
+    hr = WcaInitialize(hInstall, "FixServerFolder");
+    ExitOnFailure(hr, "Failed to initialize");
+
+    WcaLog(LOGMSG_STANDARD, "Initialized.");
+
+	{
+		CString serverFolder = GetProperty(hInstall, L"SERVER_DIRECTORY");
+		fixPath(serverFolder);
+		MsiSetProperty(hInstall, L"SERVER_DIRECTORY", serverFolder);
+	}
+
+LExit:
+    
+    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    return WcaFinalize(er);
+}
+
+UINT __stdcall FixClientFolder(MSIHANDLE hInstall)
+{
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+
+    hr = WcaInitialize(hInstall, "FixClientFolder");
+    ExitOnFailure(hr, "Failed to initialize");
+
+    WcaLog(LOGMSG_STANDARD, "Initialized.");
+
+	{
+		CString clientFolder = GetProperty(hInstall, L"CLIENT_DIRECTORY");
+		fixPath(clientFolder);
+		MsiSetProperty(hInstall, L"CLIENT_DIRECTORY", clientFolder);
+	}
+
+LExit:
+    
     er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     return WcaFinalize(er);
 }

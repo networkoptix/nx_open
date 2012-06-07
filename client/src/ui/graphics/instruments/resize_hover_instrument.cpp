@@ -2,7 +2,7 @@
 #include <QGraphicsItem>
 #include <QGraphicsWidget>
 #include <QGraphicsSceneHoverEvent>
-#include <ui/common/scene_utility.h>
+#include <ui/common/geometry.h>
 #include <ui/common/frame_section_queryable.h>
 
 namespace {

@@ -4,6 +4,7 @@
 
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>
+#include <QtCore/QSettings>
 #include <QtGui/QDesktopWidget>
 
 #include <QtSingleApplication>
@@ -24,7 +25,7 @@
 #include "core/resourcemanagment/resource_pool.h"
 #include "utils/client_util.h"
 #include "plugins/resources/arecontvision/resource/av_resource_searcher.h"
-#include "api/AppServerConnection.h"
+#include "api/app_server_connection.h"
 #include "device_plugins/server_camera/server_camera.h"
 #include "device_plugins/server_camera/appserver.h"
 #include "utils/util.h"
@@ -36,12 +37,11 @@
 #include "core/resource/storage_resource.h"
 
 #include "plugins/resources/axis/axis_resource_searcher.h"
-#include "eventmanager.h"
 #include "core/resource/resource_directory_browser.h"
 
 #include "tests/auto_tester.h"
 #include "plugins/resources/d-link/dlink_resource_searcher.h"
-#include "api/SessionManager.h"
+#include "api/session_manager.h"
 #include "plugins/resources/droid/droid_resource_searcher.h"
 #include "ui/actions/action_manager.h"
 #include "ui/tooltips/tool_tip.h"
@@ -55,6 +55,7 @@
 #include "plugins/storage/file_storage/qtfile_storage_resource.h"
 #include "plugins/storage/file_storage/layout_storage_resource.h"
 #include "core/resource/camera_history.h"
+#include "client_message_processor.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -171,60 +172,10 @@ void addTestData()
 
 void initAppServerConnection()
 {
-    static const char* DEFAULT_CONNECTION_NAME = "default";
+    QUrl appServerUrl = qnSettings->lastUsedConnection().url;
 
-    QUrl appServerUrl;
-
-    QnSettings::ConnectionData lastUsedConnection = qnSettings->lastUsedConnection();
-
-    bool hasDefaultConnection = false;
-    QList<QnSettings::ConnectionData> connections = qnSettings->connections();
-    int defaultConnectionIndex = -1;
-    for (int i = 0; i < connections.size(); i++)
-    {
-        const QnSettings::ConnectionData& connection = connections[i];
-        if (connection.name == DEFAULT_CONNECTION_NAME)
-        {
-            defaultConnectionIndex = i;
-            break;
-        }
-    }
-
-    // If there is default connection, use lastUsedConnection even it's invalid
-    if (defaultConnectionIndex != -1 && qnSettings->isAfterFirstRun())
-    {
-        appServerUrl = lastUsedConnection.url;
-    }
-    // otherwise load default connection, add it as default and store it as last used
-    // In case we run first time after installation, replace default connection with registry settings
-    else
-    {
-        QSettings settings;
-        appServerUrl.setScheme(QLatin1String("http"));
-        appServerUrl.setHost(settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString());
-        appServerUrl.setPort(settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt());
-        appServerUrl.setUserName(settings.value("appserverLogin", QLatin1String("admin")).toString());
-        //appServerUrl.setPassword(settings.value("appserverPassword", QLatin1String("123")).toString());
-
-        if (defaultConnectionIndex == -1)
-        {
-            QnSettings::ConnectionData connection;
-            connection.name = DEFAULT_CONNECTION_NAME;
-            connection.url = appServerUrl;
-            connection.readOnly = true;
-
-            connections.append(connection);
-        } else
-        {
-            connections[defaultConnectionIndex].url = appServerUrl;
-        }
-
-        qnSettings->setConnections(connections);
-
-        lastUsedConnection.url = appServerUrl;
-
-        qnSettings->setLastUsedConnection(lastUsedConnection);
-    }
+    if(!appServerUrl.isValid())
+        appServerUrl = qnSettings->defaultConnection().url;
 
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(&QnServerCameraFactory::instance());
@@ -274,19 +225,14 @@ int main(int argc, char *argv[])
     commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::Flag, "--soft-yuv", NULL, NULL));
     commandLinePreParser.parse(argc, argv);
 
-    //===============
+    QnSettings::instance()->setSoftwareYuv(commandLinePreParser.value("--soft-yuv").toBool());
 
-   
-    //===============
     /* Set authentication parameters from command line. */
-    QnSettings::instance()->setForceSoftYUV(commandLinePreParser.value("--soft-yuv").toBool());
-
-
     QUrl authentication = QUrl::fromUserInput(commandLinePreParser.value("--auth").toString());
     if(authentication.isValid()) {
         out << QObject::tr("Using authentication parameters from command line: %1.").arg(authentication.toString()) << endl;
 
-        QnSettings::ConnectionData connection;
+        QnConnectionData connection;
         connection.url = authentication;
 
         qnSettings->setLastUsedConnection(connection);
@@ -320,7 +266,7 @@ int main(int argc, char *argv[])
     /* Initialize connections. */
     initAppServerConnection();
     qnSettings->save();
-    cl_log.log(QLatin1String("Using ") + qnSettings->mediaRoot() + QLatin1String(" as media root directory"), cl_logALWAYS);
+    cl_log.log(QLatin1String("Using ") + qnSettings->mediaFolder() + QLatin1String(" as media root directory"), cl_logALWAYS);
 
 
     /* Initialize application instance. */
@@ -347,7 +293,7 @@ int main(int argc, char *argv[])
 
 
     // Create and start SessionManager
-    SessionManager* sm = SessionManager::instance();
+    QnSessionManager* sm = QnSessionManager::instance();
     QThread *thread = new QThread();
     sm->moveToThread(thread);
     QObject::connect(sm, SIGNAL(destroyed()), thread, SLOT(quit()));
@@ -370,8 +316,8 @@ int main(int argc, char *argv[])
     //QnResourceDirectoryBrowser
     QnResourceDirectoryBrowser::instance().setLocal(true);
     QStringList dirs;
-    dirs << qnSettings->mediaRoot();
-    dirs << qnSettings->auxMediaRoots();
+    dirs << qnSettings->mediaFolder();
+    dirs << qnSettings->extraMediaFolders();
     QnResourceDirectoryBrowser::instance().setPathCheckList(dirs);
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnResourceDirectoryBrowser::instance());
 
@@ -492,8 +438,8 @@ int main(int argc, char *argv[])
         out << autoTester.message();
     }
 
-    QnEventManager::instance()->stop();
-    SessionManager::instance()->stop();
+    QnClientMessageProcessor::instance()->stop();
+    QnSessionManager::instance()->stop();
 
     QnResource::stopCommandProc();
     QnResourceDiscoveryManager::instance().stop();

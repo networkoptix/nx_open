@@ -4,6 +4,11 @@
 #include <QEvent>
 #include <QVariant>
 
+/**
+ * Universal custom event.
+ * 
+ * Can be used to pass additional data to the receiver.
+ */
 class QnInvocationEvent: public QEvent {
 public:
     /** Event type for invocation. */

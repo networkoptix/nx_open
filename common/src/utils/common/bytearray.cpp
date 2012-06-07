@@ -138,6 +138,11 @@ void CLByteArray::done(unsigned int size)
     m_size += size;
 }
 
+void CLByteArray::resize(unsigned int size)
+{
+    m_size += size;
+}
+
 void CLByteArray::removeZerosAtTheEnd()
 {
     while (m_size>0 && m_data[m_size-1] == 0)

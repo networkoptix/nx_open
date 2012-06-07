@@ -1,30 +1,18 @@
 #include "sign_dialog.h"
 #include "ui_sign_dialog.h"
 
-#include <QEvent>
-#include <QtGui/QDataWidgetMapper>
-#include <QtGui/QMessageBox>
-#include <QtGui/QStandardItemModel>
-
-#include "core/resource/resource.h"
-#include "ui/preferences/preferencesdialog.h"
-#include "ui/style/skin.h"
-#include "ui/workbench/workbench_context.h"
-#include "connection_testing_dialog.h"
-
-#include "api/AppServerConnection.h"
-#include "api/SessionManager.h"
-
-#include "utils/settings.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
+
 #include "camera/camera.h"
 #include "camera/gl_renderer.h"
-#include "ui/graphics/items/resource_widget_renderer.h"
 #include "camera/camdisplay.h"
+#include "camera/sync_dialog_display.h"
+
+#include "ui/graphics/items/resource_widget_renderer.h"
+
 #include "decoders/video/ffmpeg.h"
 #include "export/sign_helper.h"
-#include "camera/sync_dialog_display.h"
 
 
 class QnSignDialogGlWidget: public QGLWidget

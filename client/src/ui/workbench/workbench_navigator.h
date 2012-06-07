@@ -4,6 +4,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QSet>
 
+#include <utils/common/longrunnable.h>
 #include <core/resource/resource_fwd.h>
 
 #include <ui/actions/action_target_provider.h>
@@ -127,6 +128,7 @@ protected slots:
     void updateCurrentPeriods(Qn::TimePeriodRole type);
     void updateSyncedPeriods();
     void updateSyncedPeriods(Qn::TimePeriodRole type);
+    void updateTargetPeriod();
     void updateLines();
 
     void updateLive();
@@ -136,10 +138,8 @@ protected slots:
     void updateSpeed();
     void updateSpeedRange();
     
-    void updateThumbnails();
-    void delayedLoadThumbnails();
-    void loadThumbnails(qint64 startTimeMs, qint64 endTimeMs);
-
+    void updateThumbnailsLoader();
+    
 protected slots:
     void at_display_widgetChanged(Qn::ItemRole role);
     void at_display_widgetAdded(QnResourceWidget *widget);
@@ -198,7 +198,9 @@ private:
 
     QHash<QnResourcePtr, QnCachingTimePeriodLoader *> m_loaderByResource;
     
-    QScopedPointer<QnThumbnailsLoader> m_thumbnailsLoader;
+    QScopedPointer<QnThumbnailsLoader, QnRunnableCleanup> m_thumbnailsLoader;
+
+
     qint64 m_thumbnailsStartTimeMs;
     qint64 m_thumbnailsEndTimeMs;
 };

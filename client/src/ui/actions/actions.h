@@ -135,16 +135,16 @@ namespace Qn {
          */
         SaveCurrentLayoutAsAction,
 
-            /**
-             * Opens a file dialog and adds selected files to the current layout.
-             */
-            OpenFileAction,
+        /**
+         * Opens a file dialog and adds selected files to the current layout.
+         */
+        OpenFileAction,
 
-            /**
-             * Opens a file dialog and adds all files from selected folder 
-             * to the current layout.
-             */
-            OpenFolderAction,
+        /**
+         * Opens a file dialog and adds all files from selected folder 
+         * to the current layout.
+         */
+        OpenFolderAction,
 
         /**
          * Starts / stops screen recording.
@@ -386,6 +386,16 @@ namespace Qn {
          */
         NewUserLayoutAction,
 
+        /**
+         * Sets aspect ratio of current layout's cells to 16x9.
+         */
+        SetCurrentLayoutAspectRatio16x9Action,
+
+        /**
+         * Sets aspect ratio of current layout's cells to 4x3.
+         */
+        SetCurrentLayoutAspectRatio4x3Action,
+
 
 
         /* Slider actions. */
@@ -414,6 +424,19 @@ namespace Qn {
          * Exports whole layout
          */
         ExportLayoutAction,
+
+
+        /* Debug actions. */
+
+        /**
+         * Increments debug counter.
+         */
+        IncrementDebugCounterAction,
+
+        /**
+         * Decrements debug counter.
+         */
+        DecrementDebugCounterAction,
 
 
         ActionCount,

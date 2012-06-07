@@ -36,6 +36,8 @@ void AnimationTimerListener::stopListening() {
 
 void AnimationTimerListener::setTimer(AnimationTimer *timer) {
     /* Note that m_timer field is changed in addListener/removeListener methods. */
+    if(m_timer == timer)
+        return;
 
     if(timer != NULL) {
         timer->addListener(this);
@@ -138,6 +140,9 @@ void AnimationTimer::addListener(AnimationTimerListener *listener) {
         qnNullWarning(listener);
         return;
     }
+
+    if(listener->m_timer == this)
+        return;
 
     if(listener->m_timer != NULL)
         listener->m_timer->removeListener(listener);

@@ -5,7 +5,7 @@
 
 #include "youtube_uploader.h"
 
-YouTubeSettingsWidget::YouTubeSettingsWidget(QWidget *parent) :
+QnYouTubeSettingsWidget::QnYouTubeSettingsWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::YouTubeSettings)
 {
@@ -24,12 +24,12 @@ YouTubeSettingsWidget::YouTubeSettingsWidget(QWidget *parent) :
     authPairChanged(); // reset
 }
 
-YouTubeSettingsWidget::~YouTubeSettingsWidget()
+QnYouTubeSettingsWidget::~QnYouTubeSettingsWidget()
 {
     delete ui;
 }
 
-QString YouTubeSettingsWidget::login()
+QString QnYouTubeSettingsWidget::login()
 {
     QSettings settings;
     settings.beginGroup(QLatin1String("youtube"));
@@ -37,7 +37,7 @@ QString YouTubeSettingsWidget::login()
     return settings.value(QLatin1String("login")).toString();
 }
 
-QString YouTubeSettingsWidget::password()
+QString QnYouTubeSettingsWidget::password()
 {
     QSettings settings;
     settings.beginGroup(QLatin1String("youtube"));
@@ -45,7 +45,7 @@ QString YouTubeSettingsWidget::password()
     return QString::fromAscii(QByteArray::fromBase64(settings.value(QLatin1String("password")).toByteArray()));
 }
 
-void YouTubeSettingsWidget::accept()
+void QnYouTubeSettingsWidget::accept()
 {
     QSettings settings;
     settings.beginGroup(QLatin1String("youtube"));
@@ -56,13 +56,13 @@ void YouTubeSettingsWidget::accept()
     settings.endGroup();
 }
 
-void YouTubeSettingsWidget::authPairChanged()
+void QnYouTubeSettingsWidget::authPairChanged()
 {
     ui->tryAuthButton->setEnabled(!ui->loginLineEdit->text().isEmpty() && !ui->passwordLineEdit->text().isEmpty());
     ui->authResultLabel->setText(QString());
 }
 
-void YouTubeSettingsWidget::tryAuth()
+void QnYouTubeSettingsWidget::tryAuth()
 {
     ui->tryAuthButton->setEnabled(false);
     ui->authResultLabel->setText(QString());
@@ -77,7 +77,7 @@ void YouTubeSettingsWidget::tryAuth()
     youtubeuploader->tryAuth();
 }
 
-void YouTubeSettingsWidget::authFailed()
+void QnYouTubeSettingsWidget::authFailed()
 {
     ui->authResultLabel->setText(tr("Authentication Failed!"));
     ui->tryAuthButton->setEnabled(true);
@@ -85,7 +85,7 @@ void YouTubeSettingsWidget::authFailed()
     sender()->deleteLater();
 }
 
-void YouTubeSettingsWidget::authFinished()
+void QnYouTubeSettingsWidget::authFinished()
 {
     ui->authResultLabel->setText(tr("Authentication Succeeded"));
     ui->tryAuthButton->setEnabled(true);

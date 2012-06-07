@@ -48,7 +48,6 @@ protected:
     QnMetaDataV1Ptr getMetaData();
 
     virtual QnMetaDataV1Ptr getCameraMetadata();
-    QByteArray createSoftwareMotionMask(const QnMotionRegion& region);
 protected:
     mutable QMutex m_livemutex;
 

@@ -3,7 +3,7 @@
 #include <limits>
 #include <QGraphicsView>
 #include <QMargins>
-#include <ui/common/scene_utility.h>
+#include <ui/common/geometry.h>
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
 #include <ui/common/linear_combination.h>
@@ -75,9 +75,9 @@ void ViewportAnimator::setMarginFlags(Qn::MarginFlags marginFlags) {
 }
 
 int ViewportAnimator::estimatedDuration(const QVariant &from, const QVariant &to) const {
-    qreal aspectRatio = SceneUtility::aspectRatio(view()->viewport()->rect());
-    QRectF startRect = SceneUtility::expanded(aspectRatio, from.toRectF(), Qt::KeepAspectRatioByExpanding, Qt::AlignCenter);
-    QRectF targetRect = SceneUtility::expanded(aspectRatio, to.toRectF(), Qt::KeepAspectRatioByExpanding, Qt::AlignCenter);
+    qreal aspectRatio = QnGeometry::aspectRatio(view()->viewport()->rect());
+    QRectF startRect = QnGeometry::expanded(aspectRatio, from.toRectF(), Qt::KeepAspectRatioByExpanding, Qt::AlignCenter);
+    QRectF targetRect = QnGeometry::expanded(aspectRatio, to.toRectF(), Qt::KeepAspectRatioByExpanding, Qt::AlignCenter);
 
     return base_type::estimatedDuration(startRect, targetRect);
 }
@@ -104,68 +104,68 @@ QRectF ViewportAnimator::realToAdjusted(const QGraphicsView *view, const QRectF 
     if(view == NULL)
         return realRect; /* Graphics view was destroyed, cannot adjust. */
 
-    MarginsF relativeMargins = SceneUtility::cwiseDiv(m_margins, view->viewport()->size());
+    MarginsF relativeMargins = QnGeometry::cwiseDiv(m_margins, view->viewport()->size());
 
     /* Calculate size to match real aspect ratio. */
-    QSizeF fixedRealSize = SceneUtility::expanded(SceneUtility::aspectRatio(view->viewport()->size()), realRect.size(), Qt::KeepAspectRatioByExpanding);
+    QSizeF fixedRealSize = QnGeometry::expanded(QnGeometry::aspectRatio(view->viewport()->size()), realRect.size(), Qt::KeepAspectRatioByExpanding);
 
     /* Calculate resulting size. */
     QSizeF adjustedSize = fixedRealSize;
     if(m_marginFlags & Qn::MarginsAffectSize)
-        adjustedSize = SceneUtility::cwiseMul(adjustedSize, QSizeF(1.0, 1.0) - SceneUtility::sizeDelta(relativeMargins));
+        adjustedSize = QnGeometry::cwiseMul(adjustedSize, QSizeF(1.0, 1.0) - QnGeometry::sizeDelta(relativeMargins));
 
     /* Calculate resulting position. */
     QPointF adjustedCenter = realRect.center();
     if(m_marginFlags & Qn::MarginsAffectPosition) {
-        QRectF fixedRealRect = QRectF(adjustedCenter - SceneUtility::toPoint(fixedRealSize) / 2, fixedRealSize);
+        QRectF fixedRealRect = QRectF(adjustedCenter - QnGeometry::toPoint(fixedRealSize) / 2, fixedRealSize);
 
-        adjustedCenter = SceneUtility::eroded(fixedRealRect, SceneUtility::cwiseMul(fixedRealRect.size(), relativeMargins)).center();
+        adjustedCenter = QnGeometry::eroded(fixedRealRect, QnGeometry::cwiseMul(fixedRealRect.size(), relativeMargins)).center();
 
         /* Adjust so that adjusted rect lies inside the real one. */
         adjustedCenter.rx() = qBound(fixedRealRect.left() + adjustedSize.width()  / 2, adjustedCenter.x(), fixedRealRect.right()  - adjustedSize.width()  / 2);
         adjustedCenter.ry() = qBound(fixedRealRect.top()  + adjustedSize.height() / 2, adjustedCenter.y(), fixedRealRect.bottom() - adjustedSize.height() / 2);
     }
 
-    return QRectF(adjustedCenter - SceneUtility::toPoint(adjustedSize) / 2, adjustedSize);
+    return QRectF(adjustedCenter - QnGeometry::toPoint(adjustedSize) / 2, adjustedSize);
 }
 
 QRectF ViewportAnimator::adjustedToReal(const QGraphicsView *view, const QRectF &adjustedRect) const {
     if(view == NULL)
         return adjustedRect; /* Graphics view was destroyed, cannot adjust. */
 
-    MarginsF relativeMargins = SceneUtility::cwiseDiv(m_margins, view->viewport()->size());
+    MarginsF relativeMargins = QnGeometry::cwiseDiv(m_margins, view->viewport()->size());
 
     /* Calculate margins that can be used for expanding adjusted to real rect. 
      * Note that these margins are still positive, so SceneUtility::dilated should be used with them. */
-    MarginsF inverseRelativeMargins = SceneUtility::cwiseDiv(relativeMargins, QSize(1.0, 1.0) - SceneUtility::sizeDelta(relativeMargins));
+    MarginsF inverseRelativeMargins = QnGeometry::cwiseDiv(relativeMargins, QSize(1.0, 1.0) - QnGeometry::sizeDelta(relativeMargins));
 
     /* Calculate size to match adjusted aspect ratio. */
     QSizeF fixedAdjustedSize;
     {
         QSize adjustedViewportSize = view->viewport()->size();
         if(m_marginFlags & Qn::MarginsAffectSize)
-            adjustedViewportSize = SceneUtility::eroded(adjustedViewportSize, m_margins);
+            adjustedViewportSize = QnGeometry::eroded(adjustedViewportSize, m_margins);
 
-        fixedAdjustedSize = SceneUtility::expanded(SceneUtility::aspectRatio(adjustedViewportSize), adjustedRect.size(), Qt::KeepAspectRatioByExpanding);
+        fixedAdjustedSize = QnGeometry::expanded(QnGeometry::aspectRatio(adjustedViewportSize), adjustedRect.size(), Qt::KeepAspectRatioByExpanding);
     }
 
     /* Calculate resulting size. */
     QSizeF realSize = fixedAdjustedSize;
     if(m_marginFlags & Qn::MarginsAffectSize)
-        realSize = SceneUtility::cwiseMul(realSize, QSizeF(1.0, 1.0) + SceneUtility::sizeDelta(inverseRelativeMargins));
+        realSize = QnGeometry::cwiseMul(realSize, QSizeF(1.0, 1.0) + QnGeometry::sizeDelta(inverseRelativeMargins));
 
     /* Calculate resulting position. */
     QPointF realCenter = adjustedRect.center();
     if(m_marginFlags & Qn::MarginsAffectPosition) {
-        QRectF fixedAdjustedRect = QRectF(realCenter - SceneUtility::toPoint(fixedAdjustedSize) / 2, fixedAdjustedSize);
+        QRectF fixedAdjustedRect = QRectF(realCenter - QnGeometry::toPoint(fixedAdjustedSize) / 2, fixedAdjustedSize);
 
-        realCenter = SceneUtility::dilated(fixedAdjustedRect, SceneUtility::cwiseMul(fixedAdjustedRect.size(), inverseRelativeMargins)).center();
+        realCenter = QnGeometry::dilated(fixedAdjustedRect, QnGeometry::cwiseMul(fixedAdjustedRect.size(), inverseRelativeMargins)).center();
 
         /* Adjust so that adjusted rect lies inside the real one. */
         realCenter.rx() = qBound(adjustedRect.right()  - realSize.width()  / 2, realCenter.x(), adjustedRect.left() + realSize.width()  / 2);
         realCenter.ry() = qBound(adjustedRect.bottom() - realSize.height() / 2, realCenter.y(), adjustedRect.top()  + realSize.height() / 2);
     }
 
-    return QRectF(realCenter - SceneUtility::toPoint(realSize) / 2, realSize);
+    return QRectF(realCenter - QnGeometry::toPoint(realSize) / 2, realSize);
 }
  

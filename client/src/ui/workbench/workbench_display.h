@@ -5,9 +5,10 @@
 #include <QtCore/QHash>
 
 #include <core/resource/resource_fwd.h>
-
-#include <ui/common/scene_utility.h>
 #include <recording/time_period.h>
+
+#include <ui/common/geometry.h>
+#include <ui/common/scene_transformations.h>
 
 #include "workbench_globals.h"
 #include "workbench_context_aware.h"
@@ -49,7 +50,7 @@ class CLCamDisplay;
  * 
  * It presents some low-level functions for viewport and item manipulation.
  */
-class QnWorkbenchDisplay: public QObject, public QnWorkbenchContextAware, protected SceneUtility {
+class QnWorkbenchDisplay: public QObject, public QnWorkbenchContextAware, protected QnGeometry, protected QnSceneTransformations {
     Q_OBJECT;
     Q_PROPERTY(qreal widgetsFrameOpacity READ widgetsFrameOpacity WRITE setWidgetsFrameOpacity);
     Q_ENUMS(Qn::ItemLayer);

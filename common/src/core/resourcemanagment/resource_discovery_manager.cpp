@@ -6,7 +6,7 @@
 #include "../resource/network_resource.h"
 #include "resource_pool.h"
 #include "utils/common/util.h"
-#include "api/AppServerConnection.h"
+#include "api/app_server_connection.h"
 #include "core/resource/resource_directory_browser.h"
 #include "utils/common/synctime.h"
 #include "utils/network/ping.h"

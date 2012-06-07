@@ -39,7 +39,7 @@ struct QN_EXPORT QnTimePeriod
 
     bool operator==(const QnTimePeriod& other) const;
 
-    static QnTimePeriodList mergeTimePeriods(QVector<QnTimePeriodList> periods);
+    static QnTimePeriodList mergeTimePeriods(const QVector<QnTimePeriodList>& periods);
     static QnTimePeriodList aggregateTimePeriods(const QnTimePeriodList& periods, int detailLevelMs);
     
     /** 

@@ -31,7 +31,6 @@
 #include <camera/camdisplay.h>
 
 #include <ui/screen_recording/screen_recorder.h>
-#include <ui/preferences/preferencesdialog.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 
