@@ -54,26 +54,32 @@ public:
         UseUTC = 0x8,
 
         /**
-         * Whether the user can edit current selection with '[' and ']' buttons.
+         * Whether the user can edit current selection with '[' and ']' buttons,
+         * and with mouse.
          */
         SelectionEditable = 0x10,
+
+        /**
+         * Whether the user can change thumbnail bar's size with mouse.
+         */
+        ThumbnailBarEditable = 0x20,
 
         /**
          * Whether the window should be auto-adjusted to contain the current
          * position.
          */
-        AdjustWindowToPosition = 0x20,
+        AdjustWindowToPosition = 0x40,
 
         /**
          * Whether zooming with the mouse wheel close to the window's side
          * should zoom into the side, not the mouse pointer position.
          */
-        SnapZoomToSides = 0x40,
+        SnapZoomToSides = 0x80,
 
         /**
          * Whether double clicking the time slider should start animated unzoom.
          */
-        UnzoomOnDoubleClick = 0x80,
+        UnzoomOnDoubleClick = 0x100,
     };
     Q_DECLARE_FLAGS(Options, Option);
 
@@ -180,6 +186,14 @@ private:
         SelectionEndMarker,
     };
 
+    enum DragItem {
+        NoItem,
+        SelectionStartItem = SelectionStartMarker,
+        SelectionEndItem = SelectionEndMarker,
+        NewSelectionItem,
+        ThumbnailsItem
+    };
+
     Marker markerFromPosition(const QPointF &pos) const;
     QPointF positionFromMarker(Marker marker) const;
 
@@ -257,7 +271,7 @@ private:
 
     qint64 m_zoomAnchor;
     bool m_unzooming;
-    Marker m_dragMarker;
+    DragItem m_dragItem;
     QPointF m_dragDelta;
     bool m_dragIsClick;
     bool m_selecting;
