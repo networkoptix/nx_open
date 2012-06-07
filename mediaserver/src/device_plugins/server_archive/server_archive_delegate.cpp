@@ -413,8 +413,8 @@ bool QnServerArchiveDelegate::switchToChunk(const DeviceFileCatalog::Chunk newCh
     m_aviDelegate->close();
     m_aviDelegate->setStorage(qnStorageMan->getStorageByUrl(url));
     bool rez = m_aviDelegate->open(m_fileRes);
-    //if (rez)
-    //    m_aviDelegate->setAudioChannel(m_selectedAudioChannel);
+    if (rez)
+        m_aviDelegate->setAudioChannel(m_selectedAudioChannel);
     return rez;
 }
 
@@ -450,6 +450,7 @@ bool QnServerArchiveDelegate::setQualityInternal(MediaQuality quality, bool fast
         m_newQualityAviDelegate->setStorage(qnStorageMan->getStorageByUrl(m_newQualityFileRes->getUrl()));
         if (!m_newQualityAviDelegate->open(m_newQualityFileRes))
             return false;
+        m_newQualityAviDelegate->setAudioChannel(m_selectedAudioChannel);
         qint64 chunkOffset = (timeMs - m_newQualityChunk.startTimeMs)*1000;
         m_newQualityAviDelegate->doNotFindStreamInfo();
         if (m_newQualityAviDelegate->seek(chunkOffset, false) == -1)
