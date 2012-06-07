@@ -142,8 +142,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 {
     memset(m_widgetByRole, 0, sizeof(m_widgetByRole));
 
-    QGraphicsLayout::setInstantInvalidatePropagation(true);
-
     /* Install and configure instruments. */
     m_fpsCountingInstrument = new FpsCountingInstrument(333, this);
     m_uiElementsInstrument = new UiElementsInstrument(this);

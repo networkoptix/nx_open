@@ -60,11 +60,6 @@ public:
         SelectionEditable = 0x10,
 
         /**
-         * Whether the user can change thumbnail bar's size with mouse.
-         */
-        ThumbnailsEditable = 0x20,
-
-        /**
          * Whether the window should be auto-adjusted to contain the current
          * position.
          */
@@ -136,7 +131,8 @@ public:
     virtual qint64 valueFromPosition(const QPointF &position, bool bound = true) const override;
 
     qreal thumbnailsHeight() const;
-    void setThumbnailsHeight(qreal thumbnailsHeight);
+    qreal rulerHeight() const;
+    void setRulerHeight(qreal rulerHeight);
 
     QnThumbnailsLoader *thumbnailsLoader() const;
     void setThumbnailsLoader(QnThumbnailsLoader *value);
@@ -147,7 +143,6 @@ signals:
     void customContextMenuRequested(const QPointF &pos, const QPoint &screenPos);
     void selectionPressed();
     void selectionReleased();
-    void thumbnailsHeightChanged();
 
 protected:
     virtual void sliderChange(SliderChange change) override;
@@ -183,23 +178,14 @@ private:
         NoMarker,
         SelectionStartMarker,
         SelectionEndMarker,
-    };
-
-    enum DragItem {
-        NoItem = NoMarker,
-        SelectionStartItem = SelectionStartMarker,
-        SelectionEndItem = SelectionEndMarker,
-        NewSelectionItem,
-        ThumbnailsItem
+        CreateSelectionMarker
     };
 
     Marker markerFromPosition(const QPointF &pos, qreal maxDistance = 1.0) const;
     QPointF positionFromMarker(Marker marker) const;
-    DragItem itemFromPosition(const QPointF &pos, qreal maxDistance = 1.0) const;
-    QPointF positionFromItem(DragItem item) const;
 
     QRectF thumbnailsRect() const;
-    QRectF sliderRect() const;
+    QRectF rulerRect() const;
     qreal effectiveLineStretch(int line) const;
 
     void setMarkerSliderPosition(Marker marker, qint64 position);
@@ -272,7 +258,7 @@ private:
 
     qint64 m_zoomAnchor;
     bool m_unzooming;
-    DragItem m_dragItem;
+    Marker m_dragMarker;
     QPointF m_dragDelta;
     bool m_dragIsClick;
     bool m_selecting;
@@ -290,8 +276,10 @@ private:
     QVector<QVector<QPointF> > m_tickmarkLines;
 
     QWeakPointer<QnThumbnailsLoader> m_thumbnailsLoader;
-    qreal m_thumbnailsHeight;
     QTimer *m_thumbnailsUpdateTimer;
+
+    qreal m_rulerHeight;
+    qreal m_prefferedHeight;
 
     QnTimeSliderPixmapCache *m_pixmapCache;
 };
