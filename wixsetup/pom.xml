@@ -317,26 +317,6 @@
 								</configuration>
 							</execution>
 
-							<!--<execution>
-								<id>wix-pack-exe</id>
-								<phase>prepare-package</phase>
-								<goals>
-									<goal>exec</goal>
-								</goals>
-								<configuration>
-									<executable>setupbld</executable>
-									<workingDirectory>${project.build.directory}</workingDirectory>
-									<arguments>
-										<argument>-out</argument>
-										<argument>bin/${project.build.finalName}.exe</argument>
-										<argument>-ms</argument>
-										<argument>bin/${project.build.finalName}.msi</argument>
-										<argument>-setup</argument>
-										<argument>setup.exe</argument>
-									</arguments>		
-								</configuration>					
-							</execution>	-->				
-
 							<execution>
 								<id>integration-test</id>
 								<phase>integration-test</phase>
