@@ -56,6 +56,13 @@
 		</dependency>
 		<dependency>
 			<groupId>org</groupId>
+			<artifactId>onvif</artifactId>
+			<version>2.1.1-SNAPSHOT</version>
+			<type>zip</type>
+			<classifier>${platform}-${arch}</classifier>
+		</dependency>		
+		<dependency>
+			<groupId>org</groupId>
 			<artifactId>openssl</artifactId>
 			<version>${openssl.version}</version>
 			<type>zip</type>
