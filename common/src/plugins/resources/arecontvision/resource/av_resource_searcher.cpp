@@ -82,7 +82,7 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
             continue;
         }
 
-#elif defined Q_OS_WIN
+#else // elif defined Q_OS_WIN
     for (int i = 0; i < ipaddrs.size();++i)
     {
         QUdpSocket sock;

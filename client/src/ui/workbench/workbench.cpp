@@ -235,16 +235,16 @@ void QnWorkbench::setItem(Qn::ItemRole role, QnWorkbenchItem *item) {
     emit itemChanged(role);
 
     /* Update central item. */
-    switch(role) {
-    case Qn::ZoomedRole:
-        setItem(Qn::CentralRole, item);
-        break;
-    case Qn::RaisedRole:
-        if(!m_itemByRole[Qn::ZoomedRole])
-            setItem(Qn::CentralRole, item);
-        break;
-    default:
-        break;
+    if(role != Qn::CentralRole) {
+        if(m_itemByRole[Qn::ZoomedRole]) {
+            setItem(Qn::CentralRole, m_itemByRole[Qn::ZoomedRole]);
+        } else if(m_itemByRole[Qn::RaisedRole]) {
+            setItem(Qn::CentralRole, m_itemByRole[Qn::RaisedRole]);
+        } else if(m_itemByRole[Qn::SingleSelectedRole]) {
+            setItem(Qn::CentralRole, m_itemByRole[Qn::SingleSelectedRole]);
+        } else {
+            setItem(Qn::CentralRole, NULL);
+        }
     }
 }
 

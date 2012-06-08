@@ -4,6 +4,10 @@
 #include "utils/common/util.h"
 #include "motion_helper.h"
 
+#ifdef Q_OS_MAC
+#include <smmintrin.h>
+#endif
+
 static const char version = 1;
 static const quint16 DETAILED_AGGREGATE_INTERVAL = 5; // at seconds
 static const quint16 COARSE_AGGREGATE_INTERVAL = 3600; // at seconds

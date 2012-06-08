@@ -62,7 +62,6 @@ QSize QnThumbnailsLoader::thumbnailSize() const {
     return m_dstSize;
 }
 
-
 QnTimePeriod QnThumbnailsLoader::loadedRange() const
 {
     QMutexLocker locker(&m_mutex);

@@ -90,18 +90,18 @@ win32 {
 }
 
 unix {
-  LIBS += -lz -lbz2
   DEFINES += QN_EXPORT=
-  QMAKE_CXXFLAGS += -msse2
 }
 
 mac {
-  LIBS += -framework IOKit -lcrypto
-  LIBS += -L../contrib/qjson/lib/mac
+  QMAKE_CXXFLAGS += -msse4.1
+  QMAKE_CFLAGS += -msse4.1
+  LIBS += -framework CoreFoundation -framework IOKit -lcrypto -L../contrib/qjson/lib/mac
 }
 
 unix:!mac {
-  LIBS += -L../contrib/qjson/lib/linux
+  QMAKE_CXXFLAGS += -msse2
+  LIBS += -lz -lbz2 -L../contrib/qjson/lib/linux
 }
 
 DEFINES += __STDC_CONSTANT_MACROS

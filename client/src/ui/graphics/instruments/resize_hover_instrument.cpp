@@ -48,14 +48,14 @@ void ResizeHoverInstrument::unregisteredNotify(QGraphicsItem *item) {
 
 bool ResizeHoverInstrument::hoverMoveEvent(QGraphicsItem *item, QGraphicsSceneHoverEvent *event) {
     QGraphicsWidget *widget = static_cast<QGraphicsWidget *>(item);
-    if (!hasDecoration(widget))
-        return false;
+    FrameSectionQuearyable *queryable = m_queryableByItem.value(item);
+    if(!queryable && !((widget->windowFlags() & Qt::Window) && (widget->windowFlags() & Qt::WindowTitleHint)))
+        return false; /* Has no decorations and not queryable for frame sections. */
 
     Qt::WindowFrameSection section;
     if(!m_effective) {
         section = Qt::NoSection;
     } else {
-        FrameSectionQuearyable *queryable = m_queryableByItem.value(item);
         if(queryable == NULL) {
             section = open(widget)->getWindowFrameSectionAt(event->pos());
         } else {

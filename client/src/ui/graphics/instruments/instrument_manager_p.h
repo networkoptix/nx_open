@@ -64,7 +64,10 @@ private:
     QSet<QGraphicsView *> views;
     QSet<QGraphicsItem *> items;
     QList<Instrument *> instruments;
-    
+
+    QSet<QGraphicsItem *> delayedItems;
+    bool pendingDelayedItemProcessing;
+
     InstrumentPaintSyncer *paintSyncer;
     qint64 totalTickTime;
     QList<QWidget *> syncedViewports;

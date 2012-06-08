@@ -338,12 +338,20 @@ QRectF QnGeometry::dilated(const QRectF &rect, const MarginsF &amount) {
     return rect.adjusted(-amount.left(), -amount.top(), amount.right(), amount.bottom());
 }
 
+QRectF QnGeometry::dilated(const QRectF &rect, qreal amount) {
+    return rect.adjusted(-amount, -amount, amount, amount);
+}
+
 QSizeF QnGeometry::dilated(const QSizeF &size, const MarginsF &amount) {
     return size + sizeDelta(amount);
 }
 
 QRectF QnGeometry::eroded(const QRectF &rect, const MarginsF &amount) {
     return rect.adjusted(amount.left(), amount.top(), -amount.right(), -amount.bottom());
+}
+
+QRectF QnGeometry::eroded(const QRectF &rect, qreal amount) {
+    return rect.adjusted(amount, amount, -amount, -amount);
 }
 
 QRect QnGeometry::eroded(const QRect &rect, const QMargins &amount) {

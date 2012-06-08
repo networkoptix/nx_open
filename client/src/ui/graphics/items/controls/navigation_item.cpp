@@ -35,7 +35,6 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
     setFlag(QGraphicsItem::ItemIsSelectable, false);
     setFlag(QGraphicsItem::ItemIsFocusable, true);
     setFocusPolicy(Qt::ClickFocus);
-
     setCursor(Qt::ArrowCursor);
 
     setAutoFillBackground(true);
@@ -106,8 +105,8 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
     m_volumeSlider->setCacheMode(QGraphicsItem::ItemCoordinateCache);
 
     m_timeSlider = new QnTimeSlider(this);
-    m_timeSlider->setMinimumHeight(70.0);
     m_timeSlider->setOption(QnTimeSlider::UnzoomOnDoubleClick, false);
+    m_timeSlider->setRulerHeight(70.0);
 
     m_timeScrollBar = new QnTimeScrollBar(this);
     

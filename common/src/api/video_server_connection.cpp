@@ -1,8 +1,6 @@
 #include <QDebug>
 #include <QNetworkProxy>
 #include <QNetworkReply>
-#include <QDomDocument>
-#include <QXmlInputSource>
 #include <QSharedPointer>
 #include "utils/common/util.h"
 
