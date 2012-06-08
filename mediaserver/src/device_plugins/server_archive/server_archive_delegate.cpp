@@ -88,12 +88,12 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
     {
         newChunk = findChunk(m_catalogLow, timeMs, findMethod);
         newChunkCatalog = m_catalogLow;
-        int distanceLow = newChunk.distanceToTime(timeMs);
+        qint64 distanceLow = newChunk.distanceToTime(timeMs);
         if (distanceLow > 0) 
         {
             // Low quality chunk not found exactly for requested time. So, find chunk in high quality sequence
             DeviceFileCatalog::Chunk newChunkPrimary = findChunk(m_catalogHi, timeMs, findMethod); 
-            int distanceHi = newChunkPrimary.distanceToTime(timeMs);
+            qint64 distanceHi = newChunkPrimary.distanceToTime(timeMs);
             if (distanceLow - distanceHi > SECOND_STREAM_FIND_EPS)
             {
                 newChunk = newChunkPrimary;
