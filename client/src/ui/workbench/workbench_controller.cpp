@@ -715,7 +715,7 @@ void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, 
     }
 
     /* Calculate new grid rect based on the dragged frame section. */
-    QRect newResizingWidgetRect = resizeRect(widget->item()->geometry(), gridSize, info.frameSection());
+    QRect newResizingWidgetRect = Qn::resizeRect(widget->item()->geometry(), gridSize, info.frameSection());
     if(newResizingWidgetRect != m_resizedWidgetRect) {
         QnWorkbenchLayout::Disposition disposition;
         widget->item()->layout()->canMoveItem(widget->item(), newResizingWidgetRect, &disposition);

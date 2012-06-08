@@ -65,29 +65,7 @@ bool ResizeHoverInstrument::hoverMoveEvent(QGraphicsItem *item, QGraphicsSceneHo
         }
     }
 
-    Qt::CursorShape cursorShape;
-    switch (section) {
-    case Qt::TopLeftSection:
-    case Qt::BottomRightSection:
-        cursorShape = Qt::SizeFDiagCursor;
-        break;
-    case Qt::TopRightSection:
-    case Qt::BottomLeftSection:
-        cursorShape = Qt::SizeBDiagCursor;
-        break;
-    case Qt::LeftSection:
-    case Qt::RightSection:
-        cursorShape = Qt::SizeHorCursor;
-        break;
-    case Qt::TopSection:
-    case Qt::BottomSection:
-        cursorShape = Qt::SizeVerCursor;
-        break;
-    default:
-        cursorShape = Qt::ArrowCursor;
-        break;
-    }
-
+    Qt::CursorShape cursorShape = Qn::calculateHoverCursorShape(section);
     if(widget->cursor().shape() != cursorShape)
         widget->setCursor(cursorShape);
 

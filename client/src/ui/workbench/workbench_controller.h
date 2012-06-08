@@ -12,6 +12,7 @@
 class QGraphicsScene;
 class QGraphicsView;
 class QGraphicsItem;
+class QGraphicsWidget;
 class QMenu;
 class QLabel;
 class QPropertyAnimation;

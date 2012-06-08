@@ -33,9 +33,6 @@ public:
     static QMargins cwiseSub(const QMargins &l, const QMargins &r);
     static QMargins cwiseAdd(const QMargins &l, const QMargins &r);
 
-    static QRectF resizeRect(const QRectF &rect, const QSizeF &size, Qt::WindowFrameSection resizeGrip);
-    static QRect resizeRect(const QRect &rect, const QSize &size, Qt::WindowFrameSection resizeGrip);
-
     /**
      * \param margins                   Margins.
      * \returns                         Amount by which the size of some rectangle 

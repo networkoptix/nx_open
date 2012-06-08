@@ -18,8 +18,9 @@ public:
     };
     Q_DECLARE_FLAGS(HandlingFlags, HandlingFlag);
 
-    static const GraphicsItemChange ItemHandlingFlagsChange = static_cast<GraphicsItemChange>(0x1000);
-    static const GraphicsItemChange ItemHandlingFlagsHaveChanged = static_cast<GraphicsItemChange>(0x1001);
+    /* Note that it is important for these values to fit into unsigned char as sizeof(GraphicsItemChange) may equal 1. */
+    static const GraphicsItemChange ItemHandlingFlagsChange = static_cast<GraphicsItemChange>(0x80u);
+    static const GraphicsItemChange ItemHandlingFlagsHaveChanged = static_cast<GraphicsItemChange>(0x81u);
 
     /* Get basic syntax highlighting. */
 #define ItemHandlingFlagsChange ItemHandlingFlagsChange
@@ -45,8 +46,11 @@ protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
+    virtual bool windowFrameEvent(QEvent *event) override;
 
     virtual void initStyleOption(QStyleOption *option) const;
+
+    virtual Qt::WindowFrameSection windowFrameSectionAt(const QPointF& pos) const override;
 
 protected:
     QScopedPointer<GraphicsWidgetPrivate> d_ptr;
