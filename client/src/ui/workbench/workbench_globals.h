@@ -10,9 +10,10 @@ namespace Qn {
      * Note that at any time there may exist no more than a single item for each role.
      */
     enum ItemRole {
-        RaisedRole,     /**< The item is raised. */
-        ZoomedRole,     /**< The item is zoomed. */
-        CentralRole,    /**< The item is 'central' --- it is either zoomed, or raised and there are no zoomed item. */
+        SingleSelectedRole, /**< Item is the only selected item on a workbench. */
+        RaisedRole,         /**< Item is raised. */
+        ZoomedRole,         /**< Item is zoomed. */
+        CentralRole,        /**< Item is 'central' --- zoomed, raised, or single selected. */
         ItemRoleCount
     };
     

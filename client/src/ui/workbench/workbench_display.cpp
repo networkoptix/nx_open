@@ -1357,6 +1357,17 @@ void QnWorkbenchDisplay::at_scene_destroyed() {
 
 void QnWorkbenchDisplay::at_scene_selectionChanged() {
     m_frameWidthsDirty = true;
+
+    /* Update single selected item. */
+    QList<QGraphicsItem *> selection = m_instrumentManager->scene()->selectedItems();
+    if(selection.size() == 1) {
+        QGraphicsItem *item = selection.front();
+        QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
+
+        workbench()->setItem(Qn::SingleSelectedRole, widget->item());
+    } else {
+        workbench()->setItem(Qn::SingleSelectedRole, NULL);
+    }
 }
 
 void QnWorkbenchDisplay::at_view_destroyed() {
