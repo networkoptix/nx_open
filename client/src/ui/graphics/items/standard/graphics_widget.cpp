@@ -437,9 +437,8 @@ void GraphicsWidgetPrivate::windowFrameMousePressEvent(QGraphicsSceneMouseEvent 
         return;
 
     ensureWindowData();
-    windowData->startGeometry = q->geometry();
-    windowData->startTransform = q->parentItem() ? q->itemTransform(q->parentItem()) : q->sceneTransform();
     windowData->grabbedSection = q->windowFrameSectionAt(event->pos());
+    windowData->startSize = q->size();
 
     if (windowData->closeButtonHovered) {
         windowData->closeButtonGrabbed = true;
@@ -465,6 +464,7 @@ void GraphicsWidgetPrivate::windowFrameMousePressEvent(QGraphicsSceneMouseEvent 
     case Qt::BottomSection:
     case Qt::BottomLeftSection:
         if(handlingFlags & GraphicsWidget::ItemHandlesResizing) {
+            windowData->startPinPoint = q->mapToParent(Qn::calculatePinPoint(q->rect(), windowData->grabbedSection));
             event->accept();
         } else {
             windowData->grabbedSection = Qt::NoSection;
@@ -499,7 +499,7 @@ void GraphicsWidgetPrivate::windowFrameMouseMoveEvent(QGraphicsSceneMouseEvent *
     }
 
     if(windowData->grabbedSection != Qt::NoSection) {
-        QSizeF newSize = windowData->startGeometry.size() + Qn::calculateResizeDelta(
+        QSizeF newSize = windowData->startSize + Qn::calculateSizeDelta(
             event->pos() - q->mapFromScene(event->buttonDownScenePos(Qt::LeftButton)), 
             windowData->grabbedSection
         );
@@ -511,15 +511,11 @@ void GraphicsWidgetPrivate::windowFrameMouseMoveEvent(QGraphicsSceneMouseEvent *
         );
         /* We don't handle heightForWidth. */
 
-        /* Calculate new geometry. */
-        QRectF newRect = Qn::resizeRect(QRectF(QPointF(0.0, 0.0), windowData->startGeometry.size()), newSize, windowData->grabbedSection);
-        QRectF newGeometry = QRectF(
-            windowData->startTransform.map(newRect.topLeft()),
-            newRect.size()
-        );
-
-        /* Perform the actual resizing / moving. */
-        q->setGeometry(newGeometry);
+        /* Change size & position. */
+        q->resize(newSize);
+        if(windowData->grabbedSection != Qt::TitleBarArea)
+            q->setPos(q->pos() + windowData->startPinPoint - q->mapToParent(Qn::calculatePinPoint(q->rect(), windowData->grabbedSection)));
+        
         event->accept();
     }
 }

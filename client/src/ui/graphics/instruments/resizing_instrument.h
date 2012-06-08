@@ -97,7 +97,8 @@ private:
     ResizeHoverInstrument *m_resizeHoverInstrument;
     int m_effectiveDistance;
     bool m_effective;
-    QRectF m_startGeometry;
+    QPointF m_startPinPoint;
+    QSizeF m_startSize;
     QTransform m_startTransform;
     bool m_resizingStartedEmitted;
     Qt::WindowFrameSection m_section;

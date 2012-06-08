@@ -47,8 +47,8 @@ protected:
         uint closeButtonHovered: 1;
         uint closeButtonGrabbed: 1;
         QRectF closeButtonRect;
-        QRectF startGeometry;
-        QTransform startTransform;
+        QPointF startPinPoint;
+        QSizeF startSize;
         WindowData(): 
             grabbedSection(Qt::NoSection), 
             closeButtonHovered(false), 

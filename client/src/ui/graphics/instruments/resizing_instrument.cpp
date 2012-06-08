@@ -95,8 +95,8 @@ bool ResizingInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) 
         return false;
 
     /* Ok to go. */
-    m_startGeometry = widget->geometry();
-    m_startTransform = widget->parentItem() ? widget->itemTransform(widget->parentItem()) : widget->sceneTransform();
+    m_startSize = widget->size();
+    m_startPinPoint = widget->mapToParent(Qn::calculatePinPoint(widget->rect(), section));
     m_section = section;
     m_widget = widget;
     m_resizable = dynamic_cast<ConstrainedResizable *>(widget);
@@ -149,7 +149,7 @@ void ResizingInstrument::dragMove(DragInfo *info) {
         return;
 
     /* Calculate new size. */
-    QSizeF newSize = m_startGeometry.size() + Qn::calculateResizeDelta(
+    QSizeF newSize = m_startSize + Qn::calculateSizeDelta(
         widget->mapFromScene(info->mouseScenePos()) - widget->mapFromScene(info->mousePressScenePos()), 
         m_section
     );
@@ -164,15 +164,9 @@ void ResizingInstrument::dragMove(DragInfo *info) {
     if(m_resizable != NULL)
         newSize = m_resizable->constrainedSize(newSize);
 
-    /* Calculate new geometry. */
-    QRectF newRect = Qn::resizeRect(QRectF(QPointF(0.0, 0.0), m_startGeometry.size()), newSize, m_section);
-    QRectF newGeometry = QRectF(
-        m_startTransform.map(newRect.topLeft()),
-        newRect.size()
-    );
-
-    /* Perform the actual resizing. */
-    widget->setGeometry(newGeometry);
+    /* Change size & position. */
+    widget->resize(newSize);
+    widget->setPos(widget->pos() + m_startPinPoint - widget->mapToParent(Qn::calculatePinPoint(widget->rect(), m_section)));
 
     emit resizing(info->view(), widget, ResizingInfo(this));
 }

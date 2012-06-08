@@ -217,27 +217,25 @@ namespace {
         }
     }
 
-    template<class Point, class Size>
-    Size calculateSizeDeltaInternal(const Point &delta, Qt::WindowFrameSection section) {
-        /* Note that QRect::right & QRect::bottom return not what is expected (see Qt docs).
-         * This is why these methods are not used here. */
+    template<class Size, class Point>
+    Size calculateSizeDeltaInternal(const Point &dragDelta, Qt::WindowFrameSection section) {
         switch (section) {
         case Qt::LeftSection:
-            return Size(-delta.x(), 0);
+            return Size(-dragDelta.x(), 0);
         case Qt::TopLeftSection:
-            return Size(-delta.x(), -delta.y());
+            return Size(-dragDelta.x(), -dragDelta.y());
         case Qt::TopSection:
-            return Size(0, -delta.y());
+            return Size(0, -dragDelta.y());
         case Qt::TopRightSection:
-            return Size(delta.x(), -delta.y());
+            return Size(dragDelta.x(), -dragDelta.y());
         case Qt::RightSection:
-            return Size(delta.x(), 0);
+            return Size(dragDelta.x(), 0);
         case Qt::BottomRightSection:
-            return Size(delta.x(), delta.y());
+            return Size(dragDelta.x(), dragDelta.y());
         case Qt::BottomSection:
-            return Size(0, delta.y());
+            return Size(0, dragDelta.y());
         case Qt::BottomLeftSection:
-            return Size(-delta.x(), delta.y());
+            return Size(-dragDelta.x(), dragDelta.y());
         case Qt::TitleBarArea:
             return Size(0, 0);
         default:
@@ -246,14 +244,45 @@ namespace {
         }
     }
 
+
+    template<class Point, class Rect>
+    Point calculatePinPointInternal(const Rect &rect, Qt::WindowFrameSection section) {
+        /* Note that QRect::right & QRect::bottom return not what is expected (see Qt docs).
+         * This is why these methods are not used here. */
+        switch(section) {
+        case Qt::LeftSection:
+            return rect.topRight();
+        case Qt::TopLeftSection:
+            return rect.bottomRight();
+        case Qt::TopSection:
+            return rect.bottomLeft();
+        case Qt::TopRightSection:
+            return rect.bottomLeft();
+        case Qt::RightSection:
+            return rect.topLeft();
+        case Qt::BottomRightSection:
+            return rect.topLeft();
+        case Qt::BottomSection:
+            return rect.topLeft();
+        case Qt::BottomLeftSection:
+            return rect.topRight();
+        case Qt::TitleBarArea:
+            qnWarning("There is no pin-point when dragging title bar area.");
+            return Point();
+        default:
+            qnWarning("Invalid window frame section '%1'.", section);
+            return Point();
+        }
+    }
+
 } // anonymous namespace
 
-QSizeF Qn::calculateResizeDelta(const QPointF &delta, Qt::WindowFrameSection section) {
-    return calculateSizeDeltaInternal<QPointF, QSizeF>(delta, section);
+QSizeF Qn::calculateSizeDelta(const QPointF &dragDelta, Qt::WindowFrameSection section) {
+    return calculateSizeDeltaInternal<QSizeF, QPointF>(dragDelta, section);
 }
 
-QSize Qn::calculateResizeDelta(const QPoint &delta, Qt::WindowFrameSection section) {
-    return calculateSizeDeltaInternal<QPoint, QSize>(delta, section);
+QSize Qn::calculateSizeDelta(const QPoint &dragDelta, Qt::WindowFrameSection section) {
+    return calculateSizeDeltaInternal<QSize, QPoint>(dragDelta, section);
 }
 
 QRectF Qn::resizeRect(const QRectF &rect, const QSizeF &size, Qt::WindowFrameSection section) {
@@ -264,3 +293,10 @@ QRect Qn::resizeRect(const QRect &rect, const QSize &size, Qt::WindowFrameSectio
     return resizeRectInternal<QRect, QSize>(rect, size, section);
 }
 
+QPointF Qn::calculatePinPoint(const QRectF &rect, Qt::WindowFrameSection section) {
+    return calculatePinPointInternal<QPointF, QRectF>(rect, section);
+}
+
+QPoint Qn::calculatePinPoint(const QRect &rect, Qt::WindowFrameSection section) {
+    return calculatePinPointInternal<QPoint, QRect>(rect, section);
+}

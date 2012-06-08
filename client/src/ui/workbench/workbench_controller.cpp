@@ -695,17 +695,14 @@ void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, 
         return;
 
     QnResourceWidget *widget = m_resizedWidget;
-
-    QRectF newSceneGeometry = widget->geometry();
-
-    /* Calculate new size in grid coordinates. */
-    QSizeF gridSizeF = mapper()->mapToGridF(newSceneGeometry.size());
+    QRectF gridRectF = mapper()->mapToGridF(widget->geometry());
+    
+    /* Calculate integer size. */
+    QSizeF gridSizeF = gridRectF.size();
     QSize gridSize = QSize(
         qMax(1, qRound(gridSizeF.width())),
         qMax(1, qRound(gridSizeF.height()))
     );
-
-    /* Adjust for aspect ratio. */
     if(widget->hasAspectRatio()) {
         if(widget->aspectRatio() > 1.0) {
             gridSize = bestSingleBoundedSize(mapper(), gridSize.width(), Qt::Horizontal, widget->aspectRatio());
@@ -714,8 +711,12 @@ void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, 
         }
     }
 
+    /* Calculate integer position. */
+    QPointF gridPosF = gridRectF.topLeft() + toPoint(gridSizeF - gridSize) / 2.0;
+    QPoint gridPos = gridPosF.toPoint(); /* QPointF::toPoint() uses qRound() internally. */
+
     /* Calculate new grid rect based on the dragged frame section. */
-    QRect newResizingWidgetRect = Qn::resizeRect(widget->item()->geometry(), gridSize, info.frameSection());
+    QRect newResizingWidgetRect = QRect(gridPos, gridSize);
     if(newResizingWidgetRect != m_resizedWidgetRect) {
         QnWorkbenchLayout::Disposition disposition;
         widget->item()->layout()->canMoveItem(widget->item(), newResizingWidgetRect, &disposition);
