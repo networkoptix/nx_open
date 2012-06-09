@@ -517,17 +517,17 @@ void AbstractGraphicsSlider::initStyleOption(QStyleOption *option) const {
             position    -= minimum;
             value       -= minimum;
             minimum      = 0;
+        }
 
-            if(!isInt(maximum)) {
-                qint64 k = maximum >> 16;
+        if(!isInt(maximum) || !isInt(pageStep) || !isInt(singleStep)) {
+            qint64 k = qMax(qMax(maximum, pageStep), singleStep) >> 16;
 
-                minimum     /= k;
-                maximum     /= k;
-                position    /= k;
-                value       /= k;
-                singleStep  /= k;
-                pageStep    /= k;
-            }
+            minimum     /= k;
+            maximum     /= k;
+            position    /= k;
+            value       /= k;
+            singleStep  /= k;
+            pageStep    /= k;
         }
 
         sliderOption->minimum = minimum;
