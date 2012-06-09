@@ -35,6 +35,13 @@ qint64 DeviceFileCatalog::Chunk::distanceToTime(qint64 timeMs) const
         return startTimeMs - timeMs;
 }
 
+qint64 DeviceFileCatalog::Chunk::endTimeMs() const
+{
+    if (durationMs == -1)
+        return startTimeMs;
+    else
+        return startTimeMs + durationMs;
+}
 
 DeviceFileCatalog::DeviceFileCatalog(const QString& macAddress, QnResource::ConnectionRole role):
     m_firstDeleteCount(0),
@@ -447,6 +454,14 @@ int DeviceFileCatalog::findFileIndex(qint64 startTimeMs, FindMethod method) cons
          }
     }
     return itr - m_chunks.begin();
+}
+
+void DeviceFileCatalog::updateChunkDuration(Chunk& chunk)
+{
+    QMutexLocker lock(&m_mutex);
+    ChunkMap::const_iterator itr = qLowerBound(m_chunks.begin() + m_firstDeleteCount, m_chunks.end(), chunk.startTimeMs);
+    if (itr != m_chunks.end() && itr->startTimeMs == chunk.startTimeMs)
+        chunk.durationMs = itr->durationMs;
 }
 
 QString DeviceFileCatalog::fullFileName(const Chunk& chunk) const
