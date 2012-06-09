@@ -22,6 +22,14 @@ MoveInstrument::~MoveInstrument() {
     ensureUninstalled();
 }
 
+void MoveInstrument::moveItem(QGraphicsItem *item, const QPointF &sceneDeltaPos) const {
+    item->setPos(
+        item->pos() + 
+        item->mapToParent(item->mapFromScene(sceneDeltaPos)) - 
+        item->mapToParent(item->mapFromScene(QPointF()))
+    );
+}
+
 bool MoveInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
     if(!dragProcessor()->isWaiting())
         return false;
@@ -37,14 +45,8 @@ bool MoveInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
     QGraphicsItem *draggedItem = item(view, event->pos(), ItemAcceptsLeftMouseButton());
     if (draggedItem == NULL || !(draggedItem->flags() & QGraphicsItem::ItemIsMovable))
         return false;
+    m_draggedItem = draggedItem;
 
-    /* If a user tries to ctrl-drag an item, we should select it when dragging starts. */
-    if (event->modifiers() & Qt::ControlModifier) {
-        m_itemToSelect = draggedItem;
-    } else {
-        m_itemToSelect.clear();
-    }
-    
     dragProcessor()->mousePressEvent(viewport, event);
 
     event->accept();
@@ -59,10 +61,9 @@ void MoveInstrument::startDrag(DragInfo *info) {
     if(!m_effective)
         return;
 
-    if(!m_itemToSelect.isNull()) {
-        m_itemToSelect.data()->setSelected(true);
-        m_itemToSelect.clear();
-    }
+    /* If a user tries to ctrl-drag an item, we should select it when dragging starts. */
+    if ((info->modifiers() & Qt::ControlModifier) && draggedItem())
+        draggedItem()->setSelected(true);
 
     emit moveStarted(info->view(), scene()->selectedItems());
 }
@@ -71,11 +72,14 @@ void MoveInstrument::dragMove(DragInfo *info) {
     if(!m_effective)
         return;
 
-    QPointF delta = info->mouseScenePos() - info->lastMouseScenePos();
+    QPointF sceneDelta = info->mouseScenePos() - info->lastMouseScenePos();
 
     /* Drag selected items. */
-    foreach (QGraphicsItem *item, scene()->selectedItems())
-        item->setPos(item->pos() + delta);
+    QList<QGraphicsItem *> selectedItems = scene()->selectedItems();
+    foreach (QGraphicsItem *item, selectedItems)
+        moveItem(item, sceneDelta);
+    if(draggedItem() && !draggedItem()->isSelected())
+        moveItem(draggedItem(), sceneDelta);
 
     emit move(info->view(), scene()->selectedItems(), info->mouseScenePos() - info->mousePressScenePos());
 }

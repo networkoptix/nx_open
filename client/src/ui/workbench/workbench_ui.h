@@ -152,6 +152,7 @@ protected:
     void updateTreeGeometry();
     void updateHelpGeometry();
     void updateFpsGeometry();
+    void updateSliderResizerGeometry();
 
     QRectF updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
     QRectF updatedHelpGeometry(const QRectF &helpGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);

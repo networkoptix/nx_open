@@ -44,8 +44,15 @@ protected:
     virtual void finishDragProcess(DragInfo *info) override;
 
 private:
+    QGraphicsItem *draggedItem() const {
+        return m_draggedItem.data();
+    }
+
+    void moveItem(QGraphicsItem *item, const QPointF &sceneDeltaPos) const;
+
+private:
     bool m_effective;
-    WeakGraphicsItemPointer m_itemToSelect;
+    WeakGraphicsItemPointer m_draggedItem;
 };
 
 #endif // QN_MOVE_INSTRUMENT_H

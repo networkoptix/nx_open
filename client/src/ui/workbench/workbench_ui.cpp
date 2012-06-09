@@ -37,6 +37,7 @@
 #include <ui/graphics/instruments/drop_instrument.h>
 #include <ui/graphics/instruments/focus_listener_instrument.h>
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
+#include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/graphics/items/image_button_widget.h>
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/graphics/items/masked_proxy_widget.h>
@@ -44,6 +45,8 @@
 #include <ui/graphics/items/simple_frame_widget.h>
 #include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/graphics/items/controls/navigation_item.h>
+#include <ui/graphics/items/controls/time_slider.h>
+#include <ui/graphics/items/controls/tool_tip_item.h>
 
 #include <ui/processors/hover_processor.h>
 
@@ -99,51 +102,19 @@ namespace {
         return button;
     }
 
-    const qreal resizerExpansion = 8.0; // TODO: replace expansion with window frame
-
-    class QnTopResizerWidget: public Instrumented<QGraphicsWidget>, public FrameSectionQuearyable, public ConstrainedResizable {
-        typedef Instrumented<QGraphicsWidget> base_type;
+    class QnTopResizerWidget: public Instrumented<GraphicsWidget> {
+        typedef Instrumented<GraphicsWidget> base_type;
 
     public:
-        QnTopResizerWidget(qreal minimalSize, QGraphicsItem *parent = NULL, Qt::WindowFlags wFlags = 0):
-            base_type(parent, wFlags),
-            m_minimalHeight(minimalSize)
+        QnTopResizerWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags wFlags = 0):
+            base_type(parent, wFlags)
         {
             setAcceptedMouseButtons(Qt::LeftButton);
-            setAcceptHoverEvents(true);
+            setCursor(Qt::SizeVerCursor);
+            setAcceptHoverEvents(false);
+            setFlag(ItemHasNoContents, true);
+            setFlag(ItemIsMovable, true);
         }
-
-    protected:
-        virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override {
-            QRectF rect = this->rect();
-
-            if(region.intersects(QRectF(rect.left(), rect.top(), rect.width(), qMin(resizerExpansion, rect.height())))) {
-                return Qn::TopSection;
-            } else {
-                return Qn::NoSection;
-            }
-        }
-
-        virtual QSizeF constrainedSize(const QSizeF constraint) const override {
-            QSizeF result = constraint;
-
-            qreal minimal = m_minimalHeight + 2 * resizerExpansion;
-            qreal central = minimal + 20.0;
-            qreal maximal = 200.0 + 2 * resizerExpansion;
-
-            if(result.height() < (central + minimal) / 2.0) {
-                result.setHeight(minimal);
-            } else if(result.height() < central) {
-                result.setHeight(central);
-            } else if(result.height() > maximal) {
-                result.setHeight(maximal);
-            }
-
-            return result;
-        }
-
-    private:
-        qreal m_minimalHeight;
     };
 
     const qreal normalTreeOpacity = 0.85;
@@ -508,22 +479,27 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
 
     /* Navigation slider. */
+    m_sliderResizerItem = new QnTopResizerWidget(m_controlsWidget);
+    m_sliderResizerItem->setProperty(Qn::NoHandScrollOver, true);
+    m_instrumentManager->registerItem(m_sliderResizerItem); /* We want it registered right away. */
+
+    m_sliderItem = new QnNavigationItem(m_controlsWidget);
+    m_sliderItem->setFrameColor(QColor(110, 110, 110, 255));
+    m_sliderItem->setFrameWidth(0.5);
+    m_sliderItem->timeSlider()->toolTipItem()->setParentItem(m_controlsWidget);
+
     m_sliderShowButton = newShowHideButton(m_controlsWidget);
     {
         QTransform transform;
         transform.rotate(-90);
         m_sliderShowButton->setTransform(transform);
     }
-
-    m_sliderItem = new QnNavigationItem(m_controlsWidget);
-    m_sliderItem->setFrameColor(QColor(110, 110, 110, 255));
-    m_sliderItem->setFrameWidth(0.5);
-
-    m_sliderResizerItem = new QnTopResizerWidget(m_sliderItem->effectiveSizeHint(Qt::MinimumSize).height(), m_controlsWidget);
-    m_sliderResizerItem->setProperty(Qn::NoHandScrollOver, true);
-    m_instrumentManager->registerItem(m_sliderResizerItem); /* We want it registered right away. */
-
     m_sliderShowButton->setFocusProxy(m_sliderItem);
+    
+    /* There is no stackAfter function, so we have to resort to ugly copypasta. */
+    m_sliderShowButton->stackBefore(m_sliderItem->timeSlider()->toolTipItem());
+    m_sliderResizerItem->stackBefore(m_sliderShowButton);
+    m_sliderItem->stackBefore(m_sliderResizerItem);
 
     m_sliderOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_sliderOpacityProcessor->addTargetItem(m_sliderItem);
@@ -812,6 +788,8 @@ void QnWorkbenchUi::setSliderOpacity(qreal opacity, bool animate) {
         m_sliderItem->setOpacity(opacity);
         m_sliderShowButton->setOpacity(opacity);
     }
+
+    m_sliderResizerItem->setVisible(!qFuzzyIsNull(opacity));
 }
 
 void QnWorkbenchUi::setTitleOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate) {
@@ -1036,6 +1014,14 @@ void QnWorkbenchUi::updateFpsGeometry() {
         return;
 
     m_fpsItem->setPos(pos);
+}
+
+void QnWorkbenchUi::updateSliderResizerGeometry() {
+    QRectF sliderResizerGeometry = m_sliderItem->geometry();
+    sliderResizerGeometry.moveTo(sliderResizerGeometry.topLeft() - QPointF(0, 8));
+    sliderResizerGeometry.setHeight(16);
+    m_sliderResizerItem->setGeometry(sliderResizerGeometry);
+    m_sliderResizerItem->setPos(sliderResizerGeometry.topLeft());
 }
 
 QMargins QnWorkbenchUi::calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY, qreal helpX) {
@@ -1299,11 +1285,9 @@ void QnWorkbenchUi::at_sliderItem_geometryChanged() {
     updateHelpGeometry();
 
     updateViewportMargins();
+    updateSliderResizerGeometry();
 
     QRectF geometry = m_sliderItem->geometry();
-
-    m_sliderResizerItem->setGeometry(dilated(m_sliderItem->geometry(), resizerExpansion));
-
     m_sliderShowButton->setPos(QPointF(
         (geometry.left() + geometry.right() - m_titleShowButton->size().height()) / 2,
         qMin(m_controlsWidgetRect.bottom(), geometry.top())
@@ -1314,8 +1298,28 @@ void QnWorkbenchUi::at_sliderResizerItem_geometryChanged() {
     if(m_ignoreSliderResizerGeometryChanges)
         return;
 
+    QRectF sliderGeometry = m_sliderItem->geometry();
+    qreal sliderBottom = sliderGeometry.bottom();
+
+    qreal targetHeight = sliderGeometry.bottom() - m_sliderResizerItem->geometry().center().y();
+    qreal minHeight = m_sliderItem->effectiveSizeHint(Qt::MinimumSize).height();
+    qreal jmpHeight = minHeight + 20;
+    qreal maxHeight = minHeight + 200;
+    
+    if(targetHeight < (minHeight + jmpHeight) / 2) {
+        targetHeight = minHeight;
+    } else if(targetHeight < minHeight) {
+        targetHeight = minHeight;
+    } else if(targetHeight > maxHeight) {
+        targetHeight = maxHeight;
+    }
+
+    sliderGeometry.setHeight(targetHeight);
+    sliderGeometry.moveBottom(sliderBottom);
+
     QnScopedValueRollback<bool> guard(&m_ignoreSliderResizerGeometryChanges, true);
-    m_sliderItem->setGeometry(eroded(m_sliderResizerItem->geometry(), resizerExpansion));
+    m_sliderItem->setGeometry(sliderGeometry);
+    updateSliderResizerGeometry();
 }
 
 void QnWorkbenchUi::at_treeWidget_activated(const QnResourcePtr &resource) {
