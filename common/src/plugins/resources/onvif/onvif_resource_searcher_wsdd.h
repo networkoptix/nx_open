@@ -2,6 +2,7 @@
 #define onvif_resource_searcher_wsdd_h
 
 #include "onvif_resource_information_fetcher.h"
+#include "onvif_special_resource.h"
 
 struct wsdd__ProbeMatchesType;
 struct wsdd__ProbeType;
@@ -26,7 +27,7 @@ class OnvifResourceSearcherWsdd
 public:
     static OnvifResourceSearcherWsdd& instance();
 
-    void findResources(QnResourceList& result) const;
+    void findResources(QnResourceList& result, const OnvifSpecialResourceCreatorPtr& creator) const;
 
 private:
 

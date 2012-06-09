@@ -11,8 +11,9 @@ typedef QSet<QPair<const char*, const char*> > PasswordList;
 
 class SOAP_ENV__Fault;
 
-class PasswordHelper {
-    //QHash<Manufacturer in lower case, Passwords>
+class PasswordHelper
+{
+    //QHash<Manufacturer, Passwords>
     typedef QHash<QString, PasswordList> ManufacturerPasswords;
 
     PasswordList allPasswords;
@@ -27,7 +28,7 @@ public:
     PasswordHelper();
     ~PasswordHelper();
 
-    const PasswordList& getPasswordsByManufacturer(const QByteArray& mdnsPacketData) const;
+    const PasswordList& getPasswordsByManufacturer(const QString& mdnsPacketData) const;
 
 private:
 
@@ -36,7 +37,34 @@ private:
     void printPasswords() const;
 };
 
-class SoapErrorHelper {
+class ManufacturerHelper
+{
+    typedef QHash<QString, QString> ManufacturerAliases;
+
+    ManufacturerAliases manufacturerMdns;
+    ManufacturerAliases manufacturerWsdd;
+    ManufacturerAliases manufacturerOnvif;
+
+public:
+
+    ManufacturerHelper();
+    ~ManufacturerHelper();
+
+    const QString manufacturerFromMdns(const QByteArray& packetData) const;
+    const QString manufacturerFromWsdd(const QByteArray& packetData) const;
+    const QString manufacturerFromOnvif(const QByteArray& packetData) const;
+
+private:
+
+    void setMdnsAliases();
+    void setWsddAliases();
+    void setOnvifAliases();
+    void setAliases(ManufacturerAliases& container, const char* token, const char* manufacturer);
+    const QString manufacturerFrom(const ManufacturerAliases& tokens, const QByteArray& packetData) const;
+};
+
+class SoapErrorHelper
+{
     SoapErrorHelper(){}
 
 public:

@@ -12,9 +12,11 @@ class QnPlIqResourceSearcher : /*public OnvifResourceSearcher,*/ public OnvifSpe
 public:
     static QnPlIqResourceSearcher& instance();
 
-    QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
+    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
 
     virtual QnNetworkResourcePtr createResource() const;
+
+    virtual QnNetworkResourcePtr createResource(const QByteArray& responseData) const;
 
     // return the manufacture of the server
     virtual QString manufacture() const;

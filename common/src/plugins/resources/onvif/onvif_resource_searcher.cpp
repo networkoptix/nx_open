@@ -4,7 +4,8 @@
 
 OnvifResourceSearcher::OnvifResourceSearcher():
     wsddSearcher(OnvifResourceSearcherWsdd::instance()),
-    mdnsSearcher(OnvifResourceSearcherMdns::instance())
+    mdnsSearcher(OnvifResourceSearcherMdns::instance()),
+    specialResourceCreator(0)
 {
 
 }
@@ -14,6 +15,10 @@ OnvifResourceSearcher::~OnvifResourceSearcher()
 
 }
 
+void OnvifResourceSearcher::init(const OnvifSpecialResourceCreatorPtr& creator)
+{
+    specialResourceCreator = creator;
+}
 
 OnvifResourceSearcher& OnvifResourceSearcher::instance()
 {
@@ -42,35 +47,42 @@ QnResourceList OnvifResourceSearcher::findResources()
     QnResourceList result;
 
     //Order is important! WS-Discovery should be the first (it provides more info, than mDNS)
-    wsddSearcher.findResources(result);
-    mdnsSearcher.findResources(result);
+    wsddSearcher.findResources(result, specialResourceCreator);
+    mdnsSearcher.findResources(result, specialResourceCreator);
 
     return result;
 }
 
 QnResourcePtr OnvifResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
 {
-    QnNetworkResourcePtr result;
+    QnResourcePtr result;
 
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
 
     if (resourceType.isNull())
     {
-        qDebug() << "No resource type for ID = " << resourceTypeId;
+        qDebug() << "OnvifResourceSearcher::createResource: no resource type for ID = " << resourceTypeId;
+        return result;
+    }
 
+    result = specialResourceCreator->createById(resourceType, parameters);
+    if (!result.isNull()) {
         return result;
     }
 
     if (resourceType->getManufacture() != manufacture())
     {
-        qDebug() << "Manufacture " << resourceType->getManufacture() << " != " << manufacture();
+        qDebug() << "OnvifResourceSearcher::createResource: manufacture " << resourceType->getManufacture()
+                 << " != " << manufacture();
         return result;
     }
 
     result = QnVirtualCameraResourcePtr( new QnPlOnvifResource( ) );
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create ONVIF camera resource. TypeID: " << resourceTypeId.toString() << ", Parameters: " << parameters;
+    qDebug() << "OnvifResourceSearcher::createResource: create ONVIF camera resource. TypeID: "
+             << resourceTypeId.toString() << ", Parameters: " << parameters;
+
     result->deserialize(parameters);
 
     return result;

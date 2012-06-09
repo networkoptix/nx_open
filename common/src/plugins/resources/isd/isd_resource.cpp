@@ -2,7 +2,8 @@
 #include "../onvif/dataprovider/rtp264_stream_provider.h"
 
 
-const char* QnPlIsdResource::MANUFACTURE = "ISD";
+extern const char* ISD_MANUFACTURER;
+const char* QnPlIsdResource::MANUFACTURE = ISD_MANUFACTURER;
 
 
 QnPlIsdResource::QnPlIsdResource()

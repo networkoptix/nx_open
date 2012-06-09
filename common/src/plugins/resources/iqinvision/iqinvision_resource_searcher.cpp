@@ -59,7 +59,8 @@ QnResourcePtr QnPlIqResourceSearcher::checkHostAddr(QHostAddress addr)
     return QnResourcePtr(0);
 }
 
-/*QnNetworkResourcePtr QnPlIqResourceSearcher::processPacket(QnResourceList& result, QByteArray& responseData, const QHostAddress&)
+//QnNetworkResourcePtr QnPlIqResourceSearcher::processPacket(QnResourceList& result, QByteArray& responseData)
+QnNetworkResourcePtr QnPlIqResourceSearcher::createResource(const QByteArray& responseData) const
 {
 
     QString smac;
@@ -112,13 +113,13 @@ QnResourcePtr QnPlIqResourceSearcher::checkHostAddr(QHostAddress addr)
 
     smac = smac.toUpper();
 
-    foreach(QnResourcePtr res, result)
-    {
-        QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
-
-        if (net_res->getMAC().toString() == smac)
-            return QnNetworkResourcePtr(0); // already found;
-    }
+    //foreach(QnResourcePtr res, result)
+    //{
+    //    QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
+    //
+    //    if (net_res->getMAC().toString() == smac)
+    //        return QnNetworkResourcePtr(0); // already found;
+    //}
 
 
     QnNetworkResourcePtr resource ( new QnPlIqResource() );
@@ -141,4 +142,4 @@ QnResourcePtr QnPlIqResourceSearcher::checkHostAddr(QHostAddress addr)
     return resource;
 
 
-}*/
+}

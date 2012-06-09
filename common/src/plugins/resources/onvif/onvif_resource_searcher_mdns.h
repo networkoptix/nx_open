@@ -5,6 +5,7 @@
 //#include "../onvif/onvif_device_searcher.h"
 #include "onvif_resource.h"
 #include "onvif_resource_information_fetcher.h"
+#include "onvif_special_resource.h"
 
 class _onvifDevice__GetNetworkInterfacesResponse;
 class _onvifDevice__GetDeviceInformationResponse;
@@ -17,7 +18,7 @@ class OnvifResourceSearcherMdns
 public:
     static OnvifResourceSearcherMdns& instance();
 
-    void findResources(QnResourceList& result) const;
+    void findResources(QnResourceList& result, const OnvifSpecialResourceCreatorPtr& creator) const;
 
 private:
 

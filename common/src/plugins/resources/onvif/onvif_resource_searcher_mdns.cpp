@@ -67,7 +67,7 @@ OnvifResourceSearcherMdns& OnvifResourceSearcherMdns::instance()
     return inst;
 }
 
-void OnvifResourceSearcherMdns::findResources(QnResourceList& result) const
+void OnvifResourceSearcherMdns::findResources(QnResourceList& result, const OnvifSpecialResourceCreatorPtr& creator) const
 {
     EndpointInfoHash endpointInfo;
     QList<QHostAddress> localAddresses = getAllIPv4Addresses();
@@ -117,7 +117,7 @@ void OnvifResourceSearcherMdns::findResources(QnResourceList& result) const
         QTime time;
         time.start();
 
-        while(time.elapsed() < 200) {
+        while(time.elapsed() < 1000) {
             checkSocket(recvSocket, localAddress, endpointInfo);
             QnSleep::msleep(10); // to avoid 100% cpu usage
         }
@@ -125,7 +125,7 @@ void OnvifResourceSearcherMdns::findResources(QnResourceList& result) const
         multicastLeaveGroup(recvSocket, groupAddress);
     }
 
-    onvifFetcher.findResources(endpointInfo, result);
+    onvifFetcher.findResources(endpointInfo, result, creator);
 }
 
 
@@ -148,7 +148,8 @@ void OnvifResourceSearcherMdns::checkSocket(QUdpSocket& sock, QHostAddress local
             continue;
         }
 
-        endpointInfo.insert(endpointUrl, EndpointAdditionalInfo(responseData, localAddress.toString()));
+        endpointInfo.insert(endpointUrl, EndpointAdditionalInfo(
+            EndpointAdditionalInfo::MDNS, responseData, localAddress.toString()));
     }
 
 }

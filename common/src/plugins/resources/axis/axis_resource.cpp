@@ -3,7 +3,8 @@
 #include "axis_stream_reader.h"
 #include "utils/common/synctime.h"
 
-const char* QnPlAxisResource::MANUFACTURE = "Axis";
+extern const char* AXIS_MANUFACTURER;
+const char* QnPlAxisResource::MANUFACTURE = AXIS_MANUFACTURER;
 static const float MAX_AR_EPS = 0.01;
 static const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
 

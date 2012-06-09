@@ -2,7 +2,8 @@
 #include "../onvif/dataprovider/onvif_mjpeg.h"
 #include "dlink_stream_reader.h"
 
-const char* QnPlDlinkResource::MANUFACTURE = "Dlink";
+extern const char* DLINK_MANUFACTURER;
+const char* QnPlDlinkResource::MANUFACTURE = DLINK_MANUFACTURER;
 
 
 QnDlink_cam_info::QnDlink_cam_info():

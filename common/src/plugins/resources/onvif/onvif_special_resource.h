@@ -10,11 +10,13 @@ public:
 
     virtual QnNetworkResourcePtr createResource() const = 0;
 
-    virtual QnResourcePtr createResource(QnId /*resourceTypeId*/, const QnResourceParameters& /*parameters*/) = 0;
+    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters& parameters) = 0;
+
+    virtual QnNetworkResourcePtr createResource(const QByteArray& responseData) const = 0;
 
     virtual QString manufacture() const = 0;
 
-    virtual ~OnvifSpecialResource() = 0;
+    virtual ~OnvifSpecialResource() {}
 };
 
 class OnvifSpecialResourceCreator
@@ -23,25 +25,34 @@ public:
 
     virtual QnNetworkResourcePtr createByManufacturer(const QString& manufacturer) const = 0;
 
-    virtual QnResourcePtr createById(QnId resourceTypeId, const QnResourceParameters &parameters) const = 0;
+    virtual QnResourcePtr createById(const QnResourceTypePtr& resourceTypePtr, const QnResourceParameters &parameters) const = 0;
 
-    virtual ~OnvifSpecialResourceCreator();
+    virtual QnNetworkResourcePtr createByPacketData(const QByteArray& packetData, const QString& manufacturer) const = 0;
+
+    virtual ~OnvifSpecialResourceCreator() {}
 };
-
-typedef QSharedPointer<OnvifSpecialResource> OnvifSpecialResourcePtr;
 
 class OnvifSpecialResources: public OnvifSpecialResourceCreator
 {
-    typedef QHash<QString, OnvifSpecialResourcePtr> ResByManufacturer;
+    typedef QHash<QString, OnvifSpecialResource*> ResByManufacturer;
     ResByManufacturer resources;
 
 public:
 
-    void add(const OnvifSpecialResourcePtr& resource);
+    OnvifSpecialResources();
+
+    ~OnvifSpecialResources();
+
+    void add(OnvifSpecialResource* resource);
 
     virtual QnNetworkResourcePtr createByManufacturer(const QString& manufacturer) const;
 
-    QnResourcePtr createById(QnId resourceTypeId, const QnResourceParameters &parameters) const;
+    virtual QnNetworkResourcePtr createByPacketData(const QByteArray& packetData, const QString& manufacturer) const;
+
+    QnResourcePtr createById(const QnResourceTypePtr& resourceTypePtr, const QnResourceParameters &parameters) const;
 };
+
+typedef QSharedPointer<OnvifSpecialResources> OnvifSpecialResourcesPtr;
+typedef QSharedPointer<OnvifSpecialResourceCreator> OnvifSpecialResourceCreatorPtr;
 
 #endif // onvif_special_device_h
