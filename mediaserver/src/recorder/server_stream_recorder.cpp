@@ -11,25 +11,19 @@ QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::Co
     QnStreamRecorder(dev),
     m_role(role),
     m_mediaProvider(mediaProvider),
-    m_scheduleMutex(QMutex::Recursive)
+    m_scheduleMutex(QMutex::Recursive),
+    m_dualStreamingHelper(0)
 {
     //m_skipDataToTime = AV_NOPTS_VALUE;
     m_lastMotionTimeUsec = AV_NOPTS_VALUE;
-    m_lastMotionContainData = false;
     //m_needUpdateStreamParams = true;
     m_lastWarningTime = 0;
     m_stopOnWriteError = false;
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
-        m_motionMaskBinData[i] = (__m128i*) qMallocAligned(MD_WIDTH * MD_HEIGHT/8, 32);
-        memset(m_motionMaskBinData[i], 0, MD_WIDTH * MD_HEIGHT/8);
-    }
 }
 
 QnServerStreamRecorder::~QnServerStreamRecorder()
 {
     stop();
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i) 
-        qFreeAligned(m_motionMaskBinData[i]);
 }
 
 bool QnServerStreamRecorder::canAcceptData() const
@@ -99,6 +93,13 @@ bool QnServerStreamRecorder::isMotionRec(QnScheduleTask::RecordingType recType) 
 
 void QnServerStreamRecorder::beforeProcessData(QnAbstractMediaDataPtr media)
 {
+    Q_ASSERT_X(m_dualStreamingHelper, Q_FUNC_INFO, "Dual streaming helper must be defined!");
+    QnMetaDataV1Ptr metaData = qSharedPointerDynamicCast<QnMetaDataV1>(media);
+    if (metaData) {
+        m_dualStreamingHelper->onMotion(metaData);
+        return;
+    }
+
     bool isRecording = m_currentScheduleTask.getRecordingType() != QnScheduleTask::RecordingType_Never;
 	if (!m_device->isDisabled()) {
 		if (isRecording) {
@@ -114,6 +115,18 @@ void QnServerStreamRecorder::beforeProcessData(QnAbstractMediaDataPtr media)
     if (!isMotionRec(m_currentScheduleTask.getRecordingType()))
         return;
 
+    qint64 motionTime = m_dualStreamingHelper->getLastMotionTime();
+    if (motionTime == AV_NOPTS_VALUE) 
+    {
+        setPrebufferingUsec(m_currentScheduleTask.getBeforeThreshold()*1000000ll); // no more motion, set prebuffer again
+    }
+    else
+    {
+        m_lastMotionTimeUsec = motionTime;
+        setPrebufferingUsec(0); // motion in progress, flush prebuffer
+    }
+
+    /*
     QnMetaDataV1Ptr metaData = qSharedPointerDynamicCast<QnMetaDataV1>(media);
     if (metaData) {
         
@@ -131,6 +144,7 @@ void QnServerStreamRecorder::beforeProcessData(QnAbstractMediaDataPtr media)
         // no motion sometime. Go to prebuffering mode
         setPrebufferingUsec(m_currentScheduleTask.getBeforeThreshold()*1000000ll);
     }
+    */
 }
 
 bool QnServerStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
@@ -145,6 +159,10 @@ bool QnServerStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
         return false;
     }
     
+    QnMetaDataV1Ptr metaData = qSharedPointerDynamicCast<QnMetaDataV1>(media);
+    if (metaData)
+        return true;
+
     // write motion only
     // if prebuffering mode and all buffer is full - drop data
 
@@ -238,9 +256,8 @@ void QnServerStreamRecorder::updateCamera(QnSecurityCamResourcePtr cameraRes)
 {
     QMutexLocker lock(&m_scheduleMutex);
     m_schedule = cameraRes->getScheduleTasks();
-    Q_ASSERT(((unsigned long)m_motionMaskBinData[0])%16 == 0);
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-        QnMetaDataV1::createMask(cameraRes->getMotionMask(i), (char*)m_motionMaskBinData[i]);
+    Q_ASSERT_X(m_dualStreamingHelper, Q_FUNC_INFO, "DialStreaming helper must be defined!");
+    m_dualStreamingHelper->updateCamera(cameraRes);
     m_lastSchedulePeriod.clear();
     updateScheduleInfo(qnSyncTime->currentMSecsSinceEpoch());
 
@@ -285,4 +302,9 @@ void QnServerStreamRecorder::endOfRun()
     QnStreamRecorder::endOfRun();
     if(m_device->getStatus() == QnResource::Recording)
 		m_device->setStatus(QnResource::Online);
+}
+
+void QnServerStreamRecorder::setDualStreamingHelper(QnDualStreamingHelperPtr helper)
+{
+    m_dualStreamingHelper = helper;
 }

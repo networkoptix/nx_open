@@ -7,6 +7,7 @@
 #include "recording/time_period.h"
 #include "motion/motion_estimation.h"
 #include "core/dataprovider/media_streamdataprovider.h"
+#include "dualstreaming_helper.h"
 
 class QnServerStreamRecorder: public QnStreamRecorder
 {
@@ -18,6 +19,8 @@ public:
     void updateCamera(QnSecurityCamResourcePtr cameraRes);
     QnScheduleTask currentScheduleTask() const;
     void updateScheduleInfo(qint64 timeMs);
+
+    void setDualStreamingHelper(QnDualStreamingHelperPtr helper);
 signals:
     void fpsChanged(QnServerStreamRecorder* recorder, float value);
 protected:
@@ -45,12 +48,12 @@ private:
     QnScheduleTask m_currentScheduleTask;
     //qint64 m_skipDataToTime;
     qint64 m_lastMotionTimeUsec;
-    bool m_lastMotionContainData;
+    //bool m_lastMotionContainData;
     //bool m_needUpdateStreamParams;
     mutable qint64 m_lastWarningTime;
     QnResource::ConnectionRole m_role;
-    __m128i *m_motionMaskBinData[CL_MAX_CHANNELS];
     QnAbstractMediaStreamDataProvider* m_mediaProvider;
+    QnDualStreamingHelperPtr m_dualStreamingHelper;
 };
 
 #endif // __SERVER_STREAM_RECORDER_H__
