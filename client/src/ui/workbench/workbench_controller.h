@@ -110,7 +110,7 @@ protected slots:
     void at_resizingFinished(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
 
     void at_moveStarted(QGraphicsView *view, const QList<QGraphicsItem *> &items);
-    void at_move(QGraphicsView *view, const QList<QGraphicsItem *> &items, const QPointF &totalDelta);
+    void at_move(QGraphicsView *view, const QPointF &totalDelta);
     void at_moveFinished(QGraphicsView *view, const QList<QGraphicsItem *> &items);
 
     void at_rotationStarted(QGraphicsView *view, QnResourceWidget *widget);

@@ -30,7 +30,7 @@ public:
 signals:
     void moveProcessStarted(QGraphicsView *view);
     void moveStarted(QGraphicsView *view, const QList<QGraphicsItem *> &items);
-    void move(QGraphicsView *view, const QList<QGraphicsItem *> &items, const QPointF &totalDelta);
+    void move(QGraphicsView *view, const QPointF &totalDelta);
     void moveFinished(QGraphicsView *view, const QList<QGraphicsItem *> &items);
     void moveProcessFinished(QGraphicsView *view);
 
@@ -52,7 +52,9 @@ private:
 
 private:
     bool m_effective;
+    bool m_moveStartedEmitted;
     WeakGraphicsItemPointer m_draggedItem;
+    WeakGraphicsItemPointerList m_draggedItems;
 };
 
 #endif // QN_MOVE_INSTRUMENT_H
