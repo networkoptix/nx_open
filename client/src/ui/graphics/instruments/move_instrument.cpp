@@ -80,6 +80,7 @@ void MoveInstrument::startDrag(DragInfo *info) {
     }
 
     emit moveStarted(info->view(), m_draggedItems.materialized());
+    m_moveStartedEmitted = true;
 }
 
 void MoveInstrument::dragMove(DragInfo *info) {

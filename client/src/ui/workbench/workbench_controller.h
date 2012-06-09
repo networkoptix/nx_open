@@ -34,6 +34,7 @@ class ClickInstrument;
 class ClickInfo;
 class ResizingInfo;
 
+class QnToggle;
 class QnActionManager;
 class QnWorkbenchDisplay;
 class QnWorkbenchLayout;
@@ -161,6 +162,9 @@ private:
     /** Widgets by role. */
     QnResourceWidget *m_widgetByRole[Qn::ItemRoleCount];
 
+    /** Zoomed state toggle. */
+    QnToggle *m_zoomedToggle;
+
 
     /* Instruments. */
 
@@ -201,10 +205,12 @@ private:
     ClickInstrument *m_itemLeftClickInstrument;
 
 
+
     /* Keyboard control-related state. */
 
     /** Last keyboard cursor position. */
     QPoint m_cursorPos;
+
 
 
     /* Resizing-related state. */
@@ -214,6 +220,7 @@ private:
 
     /** Current grid rect of the widget being resized. */
     QRect m_resizedWidgetRect;
+
 
 
     /* Dragging-related state. */
@@ -229,6 +236,7 @@ private:
 
     /** Target geometries for concatenation of dragged and replaced item lists. */
     QList<QRect> m_dragGeometries;
+
 
 
     /* Screen recording-related state. */

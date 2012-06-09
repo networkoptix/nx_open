@@ -20,6 +20,7 @@
 #include <utils/common/util.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/delete_later.h>
+#include <utils/common/toggle.h>
 
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource/security_cam_resource.h>
@@ -33,6 +34,8 @@
 #include <ui/screen_recording/screen_recorder.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
+
+#include "ui/dialogs/sign_dialog.h" // TODO: move out.
 
 #include <ui/animation/viewport_animator.h>
 #include <ui/animation/animator_group.h>
@@ -77,7 +80,7 @@
 #include "workbench.h"
 #include "workbench_display.h"
 #include "help/qncontext_help.h"
-#include "ui/dialogs/sign_dialog.h"
+
 
 //#define QN_WORKBENCH_CONTROLLER_DEBUG
 
@@ -316,6 +319,14 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(display(),                  SIGNAL(widgetChanged(Qn::ItemRole)),                                                        this,                           SLOT(at_display_widgetChanged(Qn::ItemRole)));
     connect(display(),                  SIGNAL(widgetAdded(QnResourceWidget *)),                                                    this,                           SLOT(at_display_widgetAdded(QnResourceWidget *)));
     connect(display(),                  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),                                         this,                           SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
+
+    /* Set up zoom toggle. */
+    m_zoomedToggle = new QnToggle(this);
+    connect(m_zoomedToggle,             SIGNAL(activated()),                                                                        m_moveInstrument,               SLOT(recursiveDisable()));
+    connect(m_zoomedToggle,             SIGNAL(deactivated()),                                                                      m_moveInstrument,               SLOT(recursiveEnable()));
+    connect(m_zoomedToggle,             SIGNAL(activated()),                                                                        m_resizingInstrument,           SLOT(recursiveDisable()));
+    connect(m_zoomedToggle,             SIGNAL(deactivated()),                                                                      m_resizingInstrument,           SLOT(recursiveEnable()));
+    m_zoomedToggle->setActive(display()->widget(Qn::ZoomedRole) != NULL);
 
     /* Set up context menu. */
     QWidget *window = display()->view()->window();
@@ -1060,28 +1071,30 @@ void QnWorkbenchController::at_scene_doubleClicked(QGraphicsView *, const ClickI
 }
 
 void QnWorkbenchController::at_display_widgetChanged(Qn::ItemRole role) {
-    QnResourceWidget *widget = display()->widget(role);
+    QnResourceWidget *newWidget = display()->widget(role);
     QnResourceWidget *oldWidget = m_widgetByRole[role];
-    if(widget == oldWidget)
+    if(newWidget == oldWidget)
         return;
 
-    m_widgetByRole[role] = widget;
+    m_widgetByRole[role] = newWidget;
 
-    if(widget)
-        widget->setFocus();
+    if(newWidget)
+        newWidget->setFocus();
 
     switch(role) {
     case Qn::ZoomedRole: {
-        if(widget == NULL) { /* Un-raise on un-zoom. */
+        m_zoomedToggle->setActive(newWidget != NULL);
+
+        if(newWidget == NULL) { /* Un-raise on un-zoom. */
             workbench()->setItem(Qn::RaisedRole, NULL);
         } else {
-            m_cursorPos = widget->item()->geometry().topLeft();
+            m_cursorPos = newWidget->item()->geometry().topLeft();
         }
         break;
     }
     case Qn::RaisedRole:
-        if(widget != NULL)
-            m_cursorPos = widget->item()->geometry().topLeft();
+        if(newWidget != NULL)
+            m_cursorPos = newWidget->item()->geometry().topLeft();
         break;
     default:
         break;
