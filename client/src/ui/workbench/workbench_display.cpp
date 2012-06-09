@@ -1359,7 +1359,7 @@ void QnWorkbenchDisplay::at_scene_selectionChanged() {
     m_frameWidthsDirty = true;
 
     /* Update single selected item. */
-    QList<QGraphicsItem *> selection = m_instrumentManager->scene()->selectedItems();
+    QList<QGraphicsItem *> selection = m_instrumentManager->scene()->selectedItems(); // TODO: scene may be NULL here
     if(selection.size() == 1) {
         QGraphicsItem *item = selection.front();
         QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
