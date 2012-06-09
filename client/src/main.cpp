@@ -223,21 +223,23 @@ int main(int argc, char *argv[])
     commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::String, "--delayed-drop", NULL, NULL));
     commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::String, "--log-level", NULL, NULL));
     commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::Flag, "--soft-yuv", NULL, NULL));
+    commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::Flag, "--open-layouts-on-login", NULL, NULL));
     commandLinePreParser.parse(argc, argv);
 
-    QnSettings::instance()->setSoftwareYuv(commandLinePreParser.value("--soft-yuv").toBool());
+    if(commandLinePreParser.value("--soft-yuv").toBool())
+        qnSettings->setSoftwareYuv(true);
+
+    if(commandLinePreParser.value("--open-layouts-on-login").toBool())
+        qnSettings->setLayoutsOpenedOnLogin(true);
 
     /* Set authentication parameters from command line. */
     QUrl authentication = QUrl::fromUserInput(commandLinePreParser.value("--auth").toString());
     if(authentication.isValid()) {
         out << QObject::tr("Using authentication parameters from command line: %1.").arg(authentication.toString()) << endl;
-
-        QnConnectionData connection;
-        connection.url = authentication;
-
-        qnSettings->setLastUsedConnection(connection);
+        qnSettings->setLastUsedConnection(QnConnectionData(QString(), authentication));
     }
 
+    /* Set other options from command line. */
 
     /* Create application instance. */
     QtSingleApplication *singleApplication = NULL;
@@ -450,5 +452,4 @@ int main(int argc, char *argv[])
 #endif
 
 
-//============================================
 
