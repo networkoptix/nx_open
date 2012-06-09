@@ -64,8 +64,8 @@ void QnCameraMotionMaskWidget::init()
     /* Disable unused instruments. */
     m_controller->motionSelectionInstrument()->disable();
     m_controller->itemRightClickInstrument()->disable();
-    m_controller->moveInstrument()->setEffective(false);
-    m_controller->resizingInstrument()->setEffective(false);
+    m_controller->moveInstrument()->disable();
+    m_controller->resizingInstrument()->disable();
     m_controller->rubberBandInstrument()->disable();
     m_controller->itemLeftClickInstrument()->disable();
 

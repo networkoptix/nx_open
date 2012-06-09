@@ -1072,11 +1072,6 @@ void QnWorkbenchController::at_display_widgetChanged(Qn::ItemRole role) {
 
     switch(role) {
     case Qn::ZoomedRole: {
-        bool effective = widget == NULL;
-        m_resizingInstrument->setEffective(effective);
-        m_resizingInstrument->resizeHoverInstrument()->setEffective(effective);
-        m_moveInstrument->setEffective(effective);
-
         if(widget == NULL) { /* Un-raise on un-zoom. */
             workbench()->setItem(Qn::RaisedRole, NULL);
         } else {

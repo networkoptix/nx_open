@@ -41,8 +41,7 @@ Qt::WindowFrameSection ResizingInfo::frameSection() const {
 ResizingInstrument::ResizingInstrument(QObject *parent):
     base_type(Viewport, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent),
     m_resizeHoverInstrument(new ResizeHoverInstrument(this)),
-    m_effectiveDistance(0),
-    m_effective(true)
+    m_effectiveDistance(0)
 {}
 
 ResizingInstrument::~ResizingInstrument() {
@@ -130,9 +129,6 @@ void ResizingInstrument::startDrag(DragInfo *info) {
         return;
     }
 
-    if(!m_effective)
-        return;
-
     emit resizingStarted(info->view(), m_widget.data(), ResizingInfo(this));
     m_resizingStartedEmitted = true;
 }
@@ -144,9 +140,6 @@ void ResizingInstrument::dragMove(DragInfo *info) {
         dragProcessor()->reset();
         return;
     }
-
-    if(!m_effective)
-        return;
 
     /* Calculate new size. */
     QSizeF newSize = m_startSize + Qn::calculateSizeDelta(

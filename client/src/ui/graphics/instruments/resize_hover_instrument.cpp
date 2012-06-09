@@ -27,8 +27,7 @@ namespace {
 
 ResizeHoverInstrument::ResizeHoverInstrument(QObject *parent):
     Instrument(Item, makeSet(QEvent::GraphicsSceneHoverMove, QEvent::GraphicsSceneHoverLeave), parent),
-    m_effectiveDistance(0.0),
-    m_effective(true)
+    m_effectiveDistance(0.0)
 {}
 
 bool ResizeHoverInstrument::registeredNotify(QGraphicsItem *item) {
@@ -53,16 +52,12 @@ bool ResizeHoverInstrument::hoverMoveEvent(QGraphicsItem *item, QGraphicsSceneHo
         return false; /* Has no decorations and not queryable for frame sections. */
 
     Qt::WindowFrameSection section;
-    if(!m_effective) {
-        section = Qt::NoSection;
+    if(queryable == NULL) {
+        section = open(widget)->getWindowFrameSectionAt(event->pos());
     } else {
-        if(queryable == NULL) {
-            section = open(widget)->getWindowFrameSectionAt(event->pos());
-        } else {
-            QRectF effectiveRect = item->mapRectFromScene(0, 0, m_effectiveDistance, m_effectiveDistance);
-            qreal effectiveDistance = qMax(effectiveRect.width(), effectiveRect.height());
-            section = queryable->windowFrameSectionAt(QRectF(event->pos() - QPointF(effectiveDistance, effectiveDistance), QSizeF(2 * effectiveDistance, 2 * effectiveDistance)));
-        }
+        QRectF effectiveRect = item->mapRectFromScene(0, 0, m_effectiveDistance, m_effectiveDistance);
+        qreal effectiveDistance = qMax(effectiveRect.width(), effectiveRect.height());
+        section = queryable->windowFrameSectionAt(QRectF(event->pos() - QPointF(effectiveDistance, effectiveDistance), QSizeF(2 * effectiveDistance, 2 * effectiveDistance)));
     }
 
     Qt::CursorShape cursorShape = Qn::calculateHoverCursorShape(section);

@@ -15,7 +15,7 @@ namespace {
 
 MoveInstrument::MoveInstrument(QObject *parent): 
     DragProcessingInstrument(Viewport, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent),
-    m_effective(true)
+    m_moveStartedEmitted(true)
 {}
 
 MoveInstrument::~MoveInstrument() {
@@ -67,9 +67,6 @@ void MoveInstrument::startDrag(DragInfo *info) {
         return;
     }
 
-    if(!m_effective)
-        return;
-
     /* If a user tries to ctrl-drag an item, we should select it when dragging starts. */
     if ((info->modifiers() & Qt::ControlModifier))
         draggedItem()->setSelected(true);
@@ -86,9 +83,6 @@ void MoveInstrument::startDrag(DragInfo *info) {
 }
 
 void MoveInstrument::dragMove(DragInfo *info) {
-    if(!m_effective)
-        return;
-
     QPointF sceneDelta = info->mouseScenePos() - info->lastMouseScenePos();
 
     /* Drag selected items. */
@@ -100,9 +94,6 @@ void MoveInstrument::dragMove(DragInfo *info) {
 }
 
 void MoveInstrument::finishDrag(DragInfo *info) {
-    if(!m_effective)
-        return;
-
     if(m_moveStartedEmitted)
         emit moveFinished(info->view(), m_draggedItems.materialized());
 }

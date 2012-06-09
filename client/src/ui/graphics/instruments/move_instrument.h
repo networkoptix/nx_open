@@ -12,21 +12,6 @@ public:
 
     virtual ~MoveInstrument();
 
-    /**
-     * Whether the instrument is effective.
-     * 
-     * When dragging instrument is not effective it never starts the actual
-     * drag. However, drag process is still handled and <tt>moveProcessStarted</tt>
-     * signal is emitted.
-     */
-    bool isEffective() const {
-        return m_effective;
-    }
-
-    void setEffective(bool effective) {
-        m_effective = effective;
-    }
-
 signals:
     void moveProcessStarted(QGraphicsView *view);
     void moveStarted(QGraphicsView *view, const QList<QGraphicsItem *> &items);
@@ -51,7 +36,6 @@ private:
     void moveItem(QGraphicsItem *item, const QPointF &sceneDeltaPos) const;
 
 private:
-    bool m_effective;
     bool m_moveStartedEmitted;
     WeakGraphicsItemPointer m_draggedItem;
     WeakGraphicsItemPointerList m_draggedItems;
