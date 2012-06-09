@@ -215,8 +215,8 @@ QnAbstractMediaDataPtr QnOnvifStreamReader::getNextData()
             return QnAbstractMediaDataPtr(0);
     }
 
-    //if (needMetaData())
-    //    return getMetaData();
+    if (needMetaData())
+        return getMetaData();
 
     QnAbstractMediaDataPtr rez;
     for (int i = 0; i < 10; ++i)
