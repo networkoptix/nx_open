@@ -91,6 +91,12 @@ void QnServerStreamRecorder::updateStreamParams()
     }
 }
 
+bool QnServerStreamRecorder::isMotionRec(QnScheduleTask::RecordingType recType) const
+{
+    return recType == QnScheduleTask::RecordingType_MotionOnly || 
+           m_role == QnResource::Role_LiveVideo && recType == QnScheduleTask::RecordingType_MotionPlusLQ;
+}
+
 void QnServerStreamRecorder::beforeProcessData(QnAbstractMediaDataPtr media)
 {
     bool isRecording = m_currentScheduleTask.getRecordingType() != QnScheduleTask::RecordingType_Never;
@@ -105,9 +111,8 @@ void QnServerStreamRecorder::beforeProcessData(QnAbstractMediaDataPtr media)
 		}
 	}
 
-    if (m_currentScheduleTask.getRecordingType() != QnScheduleTask::RecordingType_MotionOnly) {
+    if (!isMotionRec(m_currentScheduleTask.getRecordingType()))
         return;
-    }
 
     QnMetaDataV1Ptr metaData = qSharedPointerDynamicCast<QnMetaDataV1>(media);
     if (metaData) {
@@ -132,12 +137,15 @@ bool QnServerStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
 {
     if (m_currentScheduleTask.getRecordingType() == QnScheduleTask::RecordingType_Run)
         return true;
+    else if (m_currentScheduleTask.getRecordingType() == QnScheduleTask::RecordingType_MotionPlusLQ && m_role == QnResource::Role_SecondaryLiveVideo)
+        return true;
     else if (m_currentScheduleTask.getRecordingType() == QnScheduleTask::RecordingType_Never)
     {
         close();
         return false;
     }
-
+    
+    // write motion only
     // if prebuffering mode and all buffer is full - drop data
 
     bool rez = m_lastMotionTimeUsec != AV_NOPTS_VALUE && media->timestamp < m_lastMotionTimeUsec + m_currentScheduleTask.getAfterThreshold()*1000000ll;
@@ -155,7 +163,7 @@ void QnServerStreamRecorder::updateRecordingType(const QnScheduleTask& scheduleT
     str.flush();
     cl_log.log(msg, cl_logINFO);
 
-    if (scheduleTask.getRecordingType() != QnScheduleTask::RecordingType_MotionOnly)
+    if (!isMotionRec(scheduleTask.getRecordingType()))
     {
         flushPrebuffer();
         setPrebufferingUsec(0);

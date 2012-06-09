@@ -12,7 +12,7 @@
 class QnScheduleTask
 {
 public:
-    enum RecordingType { RecordingType_Run, RecordingType_MotionOnly, RecordingType_Never };
+    enum RecordingType { RecordingType_Run, RecordingType_MotionOnly, RecordingType_Never, RecordingType_MotionPlusLQ };
 
     struct Data
     {
