@@ -1356,10 +1356,13 @@ void QnWorkbenchDisplay::at_scene_destroyed() {
 }
 
 void QnWorkbenchDisplay::at_scene_selectionChanged() {
+    if(m_instrumentManager->scene() == NULL)
+        return; /* Do nothing if scene is being destroyed. */
+
     m_frameWidthsDirty = true;
 
     /* Update single selected item. */
-    QList<QGraphicsItem *> selection = m_instrumentManager->scene()->selectedItems(); // TODO: scene may be NULL here
+    QList<QGraphicsItem *> selection = m_scene->selectedItems();
     if(selection.size() == 1) {
         QGraphicsItem *item = selection.front();
         QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
