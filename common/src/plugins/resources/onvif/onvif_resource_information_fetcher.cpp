@@ -417,6 +417,15 @@ bool OnvifResourceInformationFetcher::findSpecialResource(const EndpointAddition
         return false;
     }
 
+	QnMacAddress mac = resource->getMAC();
+	foreach(QnResourcePtr res, result)
+    {
+        QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
+    
+        if (net_res->getMAC() == mac)
+            return true;
+    }
+
     resource->setHostAddress(sender, QnDomainMemory);
     resource->setDiscoveryAddr(QHostAddress(info.discoveryIp));
 
