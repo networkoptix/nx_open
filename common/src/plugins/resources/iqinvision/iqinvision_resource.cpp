@@ -2,7 +2,8 @@
 #include "iqinvision_resource.h"
 #include "../onvif/dataprovider/rtp264_stream_provider.h"
 
-const char* QnPlIqResource::MANUFACTURE = "IqEye";
+extern const char* IQINVISION_MANUFACTURER;
+const char* QnPlIqResource::MANUFACTURE = IQINVISION_MANUFACTURER;
 
 
 QnPlIqResource::QnPlIqResource()

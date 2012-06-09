@@ -189,7 +189,7 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
     }
 }
 
-void OnvifResourceSearcherWsdd::findResources(QnResourceList& result) const
+void OnvifResourceSearcherWsdd::findResources(QnResourceList& result, const OnvifSpecialResourceCreatorPtr& creator) const
 {
     EndpointInfoHash endpoints;
     findEndpoints(endpoints);
@@ -199,12 +199,12 @@ void OnvifResourceSearcherWsdd::findResources(QnResourceList& result) const
     qDebug() << "OnvifResourceSearcherWsdd::findResources: Endpoints in the list:"
              << (endpoints.size()? "": " EMPTY");
     while (endpIter != endpoints.end()) {
-        qDebug() << "    " << endpIter.key() << ": " << endpIter.value().manufacture
+        qDebug() << "    " << endpIter.key() << ": " << endpIter.value().data
                  << ", discovered in " << endpIter.value().discoveryIp;
         ++endpIter;
     }
 
-    onvifFetcher.findResources(endpoints, result);
+    onvifFetcher.findResources(endpoints, result, creator);
 }
 
 const QStringList OnvifResourceSearcherWsdd::getAddrPrefixes(const QString& host) const
@@ -309,7 +309,8 @@ void OnvifResourceSearcherWsdd::addEndpointToHash(EndpointInfoHash& hash,
         return;
     }
 
-    hash.insert(appropriateAddr, EndpointAdditionalInfo(getManufacturer(probeMatches), host));
+    hash.insert(appropriateAddr, EndpointAdditionalInfo(
+        EndpointAdditionalInfo::WSDD, QByteArray(getManufacturer(probeMatches).toStdString().c_str()), host));
 }
 
 void OnvifResourceSearcherWsdd::printProbeMatches(const wsdd__ProbeMatchesType* probeMatches,

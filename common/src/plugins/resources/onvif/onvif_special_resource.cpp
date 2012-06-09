@@ -2,7 +2,17 @@
 #include <QDebug>
 
 
-void OnvifSpecialResources::add(const OnvifSpecialResourcePtr& resource)
+OnvifSpecialResources::OnvifSpecialResources()
+{
+
+}
+
+OnvifSpecialResources::~OnvifSpecialResources()
+{
+
+}
+
+void OnvifSpecialResources::add(OnvifSpecialResource* resource)
 {
     QString manufacturer = resource->manufacture().toLower();
     if (resources.contains(manufacturer)) {
@@ -31,12 +41,11 @@ QnNetworkResourcePtr OnvifSpecialResources::createByManufacturer(const QString& 
     return result;
 }
 
-QnResourcePtr OnvifSpecialResources::createById(QnId resourceTypeId, const QnResourceParameters &parameters) const
+QnResourcePtr OnvifSpecialResources::createById(const QnResourceTypePtr& resourceTypePtr, const QnResourceParameters &parameters) const
 {
     QnResourcePtr result(0);
-    QnResourceTypePtr resourceTypePtr = qnResTypePool->getResourceType(resourceTypeId);
     if (resourceTypePtr.isNull()) {
-        qDebug() << "OnvifSpecialResources::createById: can't create resource for typeId: " << resourceTypeId.toString();
+        qDebug() << "OnvifSpecialResources::createById: got empty resource type pointer";
         return result;
     }
 
@@ -44,11 +53,30 @@ QnResourcePtr OnvifSpecialResources::createById(QnId resourceTypeId, const QnRes
     ResByManufacturer::ConstIterator resourceIter = resources.find(key);
 
     if (resourceIter != resources.end()) {
-        result = resourceIter.value()->createResource(resourceTypeId, parameters);
+        result = resourceIter.value()->createResource(resourceTypePtr->getId(), parameters);
     }
 
     if (result.isNull()) {
-        qDebug() << "OnvifSpecialResources::createById: can't create resource for typeId: " << resourceTypeId.toString();
+        qDebug() << "OnvifSpecialResources::createById: can't create resource for typeId: "
+                 << resourceTypePtr->getId().toString();
+    }
+
+    return result;
+}
+
+QnNetworkResourcePtr OnvifSpecialResources::createByPacketData(const QByteArray& packetData, const QString& manufacturer) const
+{
+    QString key = manufacturer.toLower();
+    ResByManufacturer::ConstIterator resourceIter = resources.find(key);
+
+    QnNetworkResourcePtr result(0);
+
+    if (resourceIter != resources.end()) {
+        result = resourceIter.value()->createResource(packetData);
+    }
+
+    if (result.isNull()) {
+        qWarning() << "OnvifSpecialResources::createByPacketData: can't create resource for manufacturer: " << manufacturer;
     }
 
     return result;

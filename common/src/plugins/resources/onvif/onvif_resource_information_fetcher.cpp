@@ -30,17 +30,19 @@ OnvifResourceInformationFetcher& OnvifResourceInformationFetcher::instance()
     return inst;
 }
 
-void OnvifResourceInformationFetcher::findResources(const EndpointInfoHash& endpointInfo, QnResourceList& result) const
+void OnvifResourceInformationFetcher::findResources(const EndpointInfoHash& endpointInfo, QnResourceList& result,
+        const OnvifSpecialResourceCreatorPtr& creator) const
 {
     EndpointInfoHash::ConstIterator iter = endpointInfo.begin();
 
     while(iter != endpointInfo.end()) {
-        findResources(iter.key(), iter.value(), result);
+        findResources(iter.key(), iter.value(), creator, result);
 
         ++iter;
     }
 }
-void OnvifResourceInformationFetcher::findResources(const QString& endpoint, const EndpointAdditionalInfo& info, QnResourceList& result) const
+void OnvifResourceInformationFetcher::findResources(const QString& endpoint, const EndpointAdditionalInfo& info,
+    const OnvifSpecialResourceCreatorPtr& creator, QnResourceList& result) const
 {
     if (endpoint.isEmpty()) {
         qDebug() << "OnvifResourceInformationFetcher::findResources: response packet was received, but appropriate URL was not found.";
@@ -52,7 +54,15 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     const char* passwd = 0;
     std::string onvifUser = "netoptix_onvif";
     std::string onvifPasswd;
-    PasswordList passwords = passHelper.getPasswordsByManufacturer(info.manufacture);
+
+    QString manufacturer = info.src == EndpointAdditionalInfo::MDNS? manufacturersData.manufacturerFromMdns(info.data):
+        manufacturersData.manufacturerFromWsdd(info.data);
+
+    if (findSpecialResource(info, sender, manufacturer, creator, result)) {
+        return;
+    }
+
+    PasswordList passwords = passwordsData.getPasswordsByManufacturer(manufacturer);
     PasswordList::ConstIterator passwdIter = passwords.begin();
 
     int soapRes = SOAP_OK;
@@ -70,7 +80,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         _onvifDevice__GetCapabilitiesResponse response1;
         soapRes = soapProxy.GetCapabilities(endpoint.toStdString().c_str(), NULL, &request1, &response1);
 
-        if (soapRes == SOAP_OK || !passHelper.isNotAuthenticated(soapProxy.soap_fault())) {
+        if (soapRes == SOAP_OK || !passwordsData.isNotAuthenticated(soapProxy.soap_fault())) {
             qDebug() << "Finished picking password";
             soap_end(soapProxy.soap);
             break;
@@ -155,7 +165,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     if (mac.isEmpty()) {
         mac = fetchSerialConvertToMac(response2);
         if (mac.isEmpty()) {
-            if (passHelper.isNotAuthenticated(soapProxy.soap_fault())) {
+            if (passwordsData.isNotAuthenticated(soapProxy.soap_fault())) {
                 qCritical() << "OnvifResourceInformationFetcher::findResources: Can't get ONVIF device MAC address, because login/password required. Endpoint URL: " << endpoint;
             }
 
@@ -176,6 +186,12 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
                    << ", MAC: " << mac;
         name = "Unknown - " + mac;
     }
+
+    if (manufacturer.isEmpty()) {
+        QByteArray manufacturerTmp(fetchManufacturer(response2).toStdString().c_str());
+        manufacturer = manufacturersData.manufacturerFromWsdd(manufacturerTmp);
+    }
+    qDebug() << "OnvifResourceInformationFetcher::findResources: manufacturer: " << manufacturer;
 
     //Trying to get onvif URLs
     QString mediaUrl;
@@ -198,27 +214,58 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         }
     }
 
-    QnNetworkResourcePtr resource( new QnPlOnvifResource() );
-    resource->setHostAddress(sender, QnDomainMemory);
-    resource->setDiscoveryAddr(QHostAddress(info.discoveryIp));
-    resource->setTypeId(onvifTypeId);
-    resource->setName(name);
-    resource->setMAC(mac);
-    if (login) {
-        qDebug() << "OnvifResourceInformationFetcher::findResources: Setting login = " << login << ", password = " << passwd;
-        resource->setAuth(login, passwd);
-    }
-    if (!mediaUrl.isEmpty()) {
-        qDebug() << "OnvifResourceInformationFetcher::findResources: Setting mediaUrl = " << mediaUrl;
-        resource->setParam(QnPlOnvifResource::MEDIA_URL_PARAM_NAME, mediaUrl, QnDomainDatabase);
-    }
-    if (!deviceUrl.isEmpty()) {
-        qDebug() << "OnvifResourceInformationFetcher::findResources: Setting deviceUrl = " << deviceUrl;
-        resource->setParam(QnPlOnvifResource::DEVICE_URL_PARAM_NAME, deviceUrl, QnDomainDatabase);
+    qDebug() << "OnvifResourceInformationFetcher::createResource: Found new camera: endpoint: " << endpoint
+             << ", MAC: " << mac << ", name: " << name;
+
+    createResource(creator, manufacturer, QHostAddress(sender), QHostAddress(info.discoveryIp),
+        name, mac, login, passwd, mediaUrl, deviceUrl, result);
+}
+
+void OnvifResourceInformationFetcher::createResource(const OnvifSpecialResourceCreatorPtr& creator, const QString& manufacturer,
+    const QHostAddress& sender, const QHostAddress& discoveryIp, const QString& name, const QString& mac, const char* login,
+    const char* passwd, const QString& mediaUrl, const QString& deviceUrl, QnResourceList& result) const
+{
+    QnNetworkResourcePtr resource(0);
+
+    if (!creator.isNull() && !manufacturer.isEmpty()) {
+        resource = creator->createByManufacturer(manufacturer);
+
+        if (!resource.isNull()) {
+            QnId rt = qnResTypePool->getResourceTypeId(manufacturer, name);
+            if (rt.isValid()) {
+                resource->setTypeId(rt);
+            } else {
+                qDebug() << "OnvifResourceInformationFetcher::createResource: can't find resource type for "
+                         << manufacturer << " " << name;
+                resource.clear();
+            }
+        }
     }
 
-    qDebug() << "OnvifResourceInformationFetcher::findResources: Found new camera: endpoint: " << endpoint
-             << ", MAC: " << mac << ", name: " << name;
+    if (resource.isNull()) {
+        resource = QnNetworkResourcePtr(new QnPlOnvifResource());
+        resource->setTypeId(onvifTypeId);
+    }
+
+    resource->setHostAddress(sender, QnDomainMemory);
+    resource->setDiscoveryAddr(discoveryIp);
+    resource->setName(name);
+    resource->setMAC(mac);
+
+    if (login) {
+        qDebug() << "OnvifResourceInformationFetcher::createResource: Setting login = " << login << ", password = " << passwd;
+        resource->setAuth(login, passwd);
+    }
+
+    if (!mediaUrl.isEmpty()) {
+        qDebug() << "OnvifResourceInformationFetcher::createResource: Setting mediaUrl = " << mediaUrl;
+        resource->setParam(QnPlOnvifResource::MEDIA_URL_PARAM_NAME, mediaUrl, QnDomainDatabase);
+    }
+
+    if (!deviceUrl.isEmpty()) {
+        qDebug() << "OnvifResourceInformationFetcher::createResource: Setting deviceUrl = " << deviceUrl;
+        resource->setParam(QnPlOnvifResource::DEVICE_URL_PARAM_NAME, deviceUrl, QnDomainDatabase);
+    }
 
     result.push_back(resource);
 }
@@ -288,6 +335,11 @@ const QString OnvifResourceInformationFetcher::fetchName(const _onvifDevice__Get
     return QString((response.Manufacturer + " - " + response.Model).c_str());
 }
 
+const QString OnvifResourceInformationFetcher::fetchManufacturer(const _onvifDevice__GetDeviceInformationResponse& response) const
+{
+    return QString(response.Manufacturer.c_str());
+}
+
 const QString OnvifResourceInformationFetcher::fetchSerialConvertToMac(const _onvifDevice__GetDeviceInformationResponse& response) const
 {
     QString serialAndHwdId(response.HardwareId.c_str());
@@ -347,4 +399,28 @@ QHostAddress OnvifResourceInformationFetcher::hostAddressFromEndpoint(const QStr
     QString tmp = endpoint.mid(pos1, pos2);
     qDebug() << "OnvifResourceInformationFetcher::hostAddressFromEndpoint: IP: " << tmp;
     return QHostAddress(tmp);
+}
+
+bool OnvifResourceInformationFetcher::findSpecialResource(const EndpointAdditionalInfo& info, const QHostAddress& sender,
+    const QString& manufacturer, const OnvifSpecialResourceCreatorPtr& creator, QnResourceList& result) const
+{
+    qDebug() << "OnvifResourceInformationFetcher::findSpecialResource: manuf: "
+             << manufacturer << ", source: " << info.src;
+    if (manufacturer.isEmpty() || creator.isNull() || info.src != EndpointAdditionalInfo::MDNS) {
+        qDebug() << "OnvifResourceInformationFetcher::findSpecialResource: not appropriate params";
+        return false;
+    }
+
+    QnNetworkResourcePtr resource(creator->createByPacketData(info.data, manufacturer));
+    if (resource.isNull()) {
+        qDebug() << "OnvifResourceInformationFetcher::findSpecialResource: resource is null";
+        return false;
+    }
+
+    resource->setHostAddress(sender, QnDomainMemory);
+    resource->setDiscoveryAddr(QHostAddress(info.discoveryIp));
+
+    result.push_back(resource);
+    qDebug() << "OnvifResourceInformationFetcher::findSpecialResource: resource found: " << resource->toString();
+    return true;
 }

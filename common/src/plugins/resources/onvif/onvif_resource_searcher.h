@@ -6,12 +6,14 @@
 #include "core/resourcemanagment/resource_searcher.h"
 #include "onvif_resource_searcher_wsdd.h"
 #include "onvif_resource_searcher_mdns.h"
+#include "onvif_special_resource.h"
 
 
 class OnvifResourceSearcher : public QnAbstractNetworkResourceSearcher
 {
     OnvifResourceSearcherWsdd& wsddSearcher;
     OnvifResourceSearcherMdns& mdnsSearcher;
+    OnvifSpecialResourceCreatorPtr specialResourceCreator;
 
 protected:
     OnvifResourceSearcher();
@@ -21,6 +23,9 @@ protected:
 public:
 
     static OnvifResourceSearcher& instance();
+
+    //Is not synchronized!!!
+    void init(const OnvifSpecialResourceCreatorPtr& creator);
 
     bool isProxy() const;
 

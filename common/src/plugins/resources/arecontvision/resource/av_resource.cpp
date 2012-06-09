@@ -14,7 +14,8 @@
 #include "utils/network/nettools.h"
 #include "utils/network/ping.h"
 
-const char* QnPlAreconVisionResource::MANUFACTURE = "ArecontVision";
+extern const char* ARECONT_VISION_MANUFACTURER;
+const char* QnPlAreconVisionResource::MANUFACTURE = ARECONT_VISION_MANUFACTURER;
 #define MAX_RESPONSE_LEN (4*1024)
 
 

@@ -2,7 +2,8 @@
 #include "digital_watchdog_stream_reader.h"
 
 
-const char* QnPlWatchDogResource::MANUFACTURE = "Digital Watchdog";
+extern const char* DIGITALWATCHDOG_MANUFACTURER;
+const char* QnPlWatchDogResource::MANUFACTURE = DIGITALWATCHDOG_MANUFACTURER;
 
 
 QnPlWatchDogResource::QnPlWatchDogResource()
