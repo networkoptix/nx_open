@@ -320,6 +320,9 @@ InstrumentManager::~InstrumentManager() {
 
     if (d->scene != NULL)
         unregisterScene(d->scene);
+
+    delete d_ptr;
+    d_ptr = NULL;
 }
 
 QGraphicsScene *InstrumentManager::scene() const {

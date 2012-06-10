@@ -1,3 +1,8 @@
+
+#ifdef QN_USE_VLD
+#   include <vld.h>
+#endif
+
 #include "version.h"
 #include "ui/widgets/main_window.h"
 #include "utils/settings.h"
@@ -296,7 +301,7 @@ int main(int argc, char *argv[])
 
     // Create and start SessionManager
     QnSessionManager* sm = QnSessionManager::instance();
-    QThread *thread = new QThread();
+    QThread *thread = new QThread(); // TODO: leaking thread.
     sm->moveToThread(thread);
     QObject::connect(sm, SIGNAL(destroyed()), thread, SLOT(quit()));
     QObject::connect(thread , SIGNAL(finished()), thread, SLOT(deleteLater()));
