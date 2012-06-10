@@ -1,3 +1,4 @@
+//#define QN_USE_VLD
 
 #ifdef QN_USE_VLD
 #   include <vld.h>
