@@ -71,4 +71,6 @@ void QnTimeScrollBar::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
     }
 }
 
-
+void QnTimeScrollBar::contextMenuEvent(QGraphicsSceneContextMenuEvent *) {
+    return; /* No default context menu. */
+}

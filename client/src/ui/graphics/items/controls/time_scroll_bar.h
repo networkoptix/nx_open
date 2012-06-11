@@ -17,6 +17,9 @@ public:
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
+protected:
+    virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
+
 private:
     qint64 m_indicatorPosition;
 };
