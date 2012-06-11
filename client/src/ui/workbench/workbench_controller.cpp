@@ -766,16 +766,6 @@ void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget
 void QnWorkbenchController::at_moveStarted(QGraphicsView *, const QList<QGraphicsItem *> &items) {
     TRACE("MOVE STARTED");
 
-    if(items.isEmpty())
-        return;
-
-    /* Bring to front preserving relative order. */
-    display()->bringToFront(items);
-    display()->setLayer(items, Qn::FrontLayer);
-
-    /* Show grid. */
-    display()->gridItem()->animatedShow();
-
     /* Build item lists. */
     foreach (QGraphicsItem *item, items) {
         QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
@@ -786,11 +776,15 @@ void QnWorkbenchController::at_moveStarted(QGraphicsView *, const QList<QGraphic
 
         opacityAnimator(widget)->animateTo(widgetManipulationOpacity);
     }
+    if(m_draggedWorkbenchItems.empty())
+        return;
 
-    /* Un-raise if raised is among the dragged. */
-    //QnResourceWidget *raisedWidget = display()->widget(workbench()->raisedItem());
-    //if(raisedWidget != NULL && items.contains(raisedWidget))
-    //    workbench()->setRaisedItem(NULL);
+    /* Bring to front preserving relative order. */
+    display()->bringToFront(items);
+    display()->setLayer(items, Qn::FrontLayer);
+
+    /* Show grid. */
+    display()->gridItem()->animatedShow();
 }
 
 void QnWorkbenchController::at_move(QGraphicsView *, const QPointF &totalDelta) {
