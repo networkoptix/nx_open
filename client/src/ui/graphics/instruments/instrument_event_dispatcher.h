@@ -104,6 +104,8 @@ private:
         return true;
     }
 
+    bool registeredNotify(Instrument *instrument, QGraphicsItem *target) const;
+
     template<class Y>
     bool registeredNotify(Instrument *instrument, Y *target) const {
         return instrument->registeredNotify(target);

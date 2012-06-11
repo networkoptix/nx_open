@@ -12,6 +12,7 @@
 #include <utils/common/checked_cast.h>
 
 #include "instrument.h"
+#include "instrument_item_condition.h"
 
 template<class T>
 bool InstrumentEventDispatcherBase<T>::eventFilter(QObject *target, QEvent *event) {
@@ -35,6 +36,15 @@ InstrumentEventDispatcher<T>::InstrumentEventDispatcher(QObject *parent):
     /* Enforce a complete type for RTTI trickery to work. */
     typedef char IsIncompleteType[sizeof(T) ? 1 : -1];
     (void) sizeof(IsIncompleteType);
+}
+
+template<class T>
+bool InstrumentEventDispatcher<T>::registeredNotify(Instrument *instrument, QGraphicsItem *target) const {
+    foreach(InstrumentItemCondition *itemCondition, instrument->itemConditions())
+        if(!itemCondition->operator()(target, instrument))
+            return false;
+
+    return instrument->registeredNotify(target);
 }
 
 template<class T>
