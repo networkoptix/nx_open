@@ -139,7 +139,7 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
 
     if (newChunk.startTimeMs != m_currentChunk.startTimeMs || newChunkCatalog != m_currentChunkCatalog)
     {
-        bool isStreamsFound = m_aviDelegate->isStreamsFound();
+        bool isStreamsFound = m_aviDelegate->isStreamsFound() && newChunkCatalog == m_currentChunkCatalog;
         if (!switchToChunk(newChunk, newChunkCatalog))
             return -1;
         if (isStreamsFound)
@@ -187,7 +187,8 @@ DeviceFileCatalog::Chunk QnServerArchiveDelegate::findChunk(DeviceFileCatalogPtr
 
 bool QnServerArchiveDelegate::getNextChunk(DeviceFileCatalog::Chunk& chunk, DeviceFileCatalogPtr& chunkCatalog)
 {
-    m_currentChunkCatalog->updateChunkDuration(m_currentChunk); // may be opened chunk already closed. Update duration if needed
+    if (m_currentChunk.durationMs == -1)
+        m_currentChunkCatalog->updateChunkDuration(m_currentChunk); // may be opened chunk already closed. Update duration if needed
     if (m_currentChunk.durationMs == -1)
         return false;
     m_skipFramesToTime = m_currentChunk.endTimeMs()*1000;
@@ -211,7 +212,7 @@ QnAbstractMediaDataPtr QnServerArchiveDelegate::getNextData()
     int waitMotionCnt = 0;
 begin_label:
     QnAbstractMediaDataPtr data = m_aviDelegate->getNextData();
-    if (!data || data->timestamp >= m_currentChunk.endTimeMs())
+    if (!data || m_currentChunk.durationMs != -1 && data->timestamp >= m_currentChunk.durationMs*1000)
     {
         DeviceFileCatalog::Chunk chunk;
         DeviceFileCatalogPtr chunkCatalog;
@@ -226,9 +227,10 @@ begin_label:
             }
         } while (!switchToChunk(chunk, chunkCatalog));
 
-        if (m_skipFramesToTime != 0)
+        if (m_skipFramesToTime > m_currentChunk.startTimeMs*1000)
         {
-            m_aviDelegate->seek(m_skipFramesToTime, true);
+            qint64 chunkOffset = m_skipFramesToTime - m_currentChunk.startTimeMs*1000;
+            m_aviDelegate->seek(chunkOffset, true);
         }
 
         data = m_aviDelegate->getNextData();
@@ -352,6 +354,8 @@ bool QnServerArchiveDelegate::setQualityInternal(MediaQuality quality, bool fast
         m_newQualityChunk = findChunk(m_newQualityCatalog, timeMs, DeviceFileCatalog::OnRecordHole_NextChunk);
         if (m_newQualityChunk.distanceToTime(timeMs) > SECOND_STREAM_FIND_EPS) 
             return false; // we can't find requested quality for current time, so do not perform soft (on next I-frame) qualiy changing
+        if (m_newQualityCatalog == m_currentChunkCatalog)
+            return false; // we already on requested quality
         
         QString url = m_newQualityCatalog->fullFileName(m_newQualityChunk);
         m_newQualityFileRes = QnAviResourcePtr(new QnAviResource(url));

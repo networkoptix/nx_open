@@ -6,6 +6,7 @@
 #include "core/resource/resource_fwd.h"
 #include "core/resource/camera_resource.h"
 #include "utils/common/synctime.h"
+#include "utils/common/util.h"
 
 QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::ConnectionRole role, QnAbstractMediaStreamDataProvider* mediaProvider):
     QnStreamRecorder(dev),
@@ -168,8 +169,14 @@ bool QnServerStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
 
     bool rez = m_lastMotionTimeUsec != AV_NOPTS_VALUE && media->timestamp < m_lastMotionTimeUsec + m_currentScheduleTask.getAfterThreshold()*1000000ll;
     //qDebug() << "needSaveData=" << rez << "df=" << (media->timestamp - (m_lastMotionTimeUsec + m_currentScheduleTask.getAfterThreshold()*1000000ll))/1000000.0;
-    if (!rez)
+    if (!rez && m_endDateTime != AV_NOPTS_VALUE) 
+    {
+        if (media->timestamp - m_endDateTime < MAX_FRAME_DURATION*1000)
+            m_endDateTime = media->timestamp;
+        else
+            m_endDateTime += MIN_FRAME_DURATION*1000;
         close();
+    }
     return rez;
 }
 
