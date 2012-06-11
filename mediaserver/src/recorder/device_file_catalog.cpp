@@ -38,9 +38,22 @@ qint64 DeviceFileCatalog::Chunk::distanceToTime(qint64 timeMs) const
 qint64 DeviceFileCatalog::Chunk::endTimeMs() const
 {
     if (durationMs == -1)
-        return startTimeMs;
+        return DATETIME_NOW;
     else
         return startTimeMs + durationMs;
+}
+
+bool DeviceFileCatalog::Chunk::containsTime(qint64 timeMs) const
+{
+    if (startTimeMs == -1)
+        return false;
+    else 
+        return qBetween(timeMs, startTimeMs, endTimeMs());
+}
+
+void DeviceFileCatalog::Chunk::truncate(qint64 timeMs)
+{
+    durationMs = qMax(0ll, timeMs - startTimeMs);
 }
 
 DeviceFileCatalog::DeviceFileCatalog(const QString& macAddress, QnResource::ConnectionRole role):

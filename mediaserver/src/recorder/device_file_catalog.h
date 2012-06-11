@@ -27,6 +27,9 @@ public:
 
         qint64 distanceToTime(qint64 timeMs) const;
         qint64 endTimeMs() const;
+        bool containsTime(qint64 timeMs) const;
+        void truncate(qint64 timeMs);
+
 
         qint64 startTimeMs; // chunk startTime at ms
         int durationMs; // chunk duration at ms

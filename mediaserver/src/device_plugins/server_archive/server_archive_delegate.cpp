@@ -86,8 +86,8 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
     DeviceFileCatalog::Chunk newChunk;
     DeviceFileCatalogPtr newChunkCatalog;
 
-    m_dialQualityHelper.setFindMethod(m_reverseMode ? DeviceFileCatalog::OnRecordHole_PrevChunk : DeviceFileCatalog::OnRecordHole_NextChunk);
-    m_dialQualityHelper.findDataForTime(time, newChunk, newChunkCatalog);
+    DeviceFileCatalog::FindMethod findMethod = m_reverseMode ? DeviceFileCatalog::OnRecordHole_PrevChunk : DeviceFileCatalog::OnRecordHole_NextChunk;
+    m_dialQualityHelper.findDataForTime(time, newChunk, newChunkCatalog, findMethod);
 
 
     qint64 chunkOffset = 0;
@@ -167,8 +167,9 @@ bool QnServerArchiveDelegate::getNextChunk(DeviceFileCatalog::Chunk& chunk, Devi
     if (m_currentChunk.durationMs == -1)
         return false;
     m_skipFramesToTime = m_currentChunk.endTimeMs()*1000;
-    m_dialQualityHelper.findDataForTime(m_currentChunk.endTimeMs(), chunk, chunkCatalog);
-    return chunk.startTimeMs > m_currentChunk.startTimeMs;
+    m_dialQualityHelper.findDataForTime(m_currentChunk.endTimeMs(), chunk, chunkCatalog, DeviceFileCatalog::OnRecordHole_NextChunk);
+    return chunk.startTimeMs > m_currentChunk.startTimeMs || 
+           chunkCatalog != m_currentChunkCatalog && chunk.endTimeMs() > m_currentChunk.endTimeMs();
 }
 
 QnAbstractMediaDataPtr QnServerArchiveDelegate::getNextData()
@@ -186,7 +187,7 @@ QnAbstractMediaDataPtr QnServerArchiveDelegate::getNextData()
     int waitMotionCnt = 0;
 begin_label:
     QnAbstractMediaDataPtr data = m_aviDelegate->getNextData();
-    if (!data)
+    if (!data || data->timestamp >= m_currentChunk.endTimeMs())
     {
         DeviceFileCatalog::Chunk chunk;
         DeviceFileCatalogPtr chunkCatalog;
@@ -210,6 +211,7 @@ begin_label:
         if (data) 
             data->flags &= ~QnAbstractMediaData::MediaFlags_BOF;
     }
+
     if (data && !(data->flags & QnAbstractMediaData::MediaFlags_LIVE)) 
     {
         data->timestamp +=m_currentChunk.startTimeMs*1000;
