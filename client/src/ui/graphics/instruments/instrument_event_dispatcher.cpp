@@ -40,11 +40,7 @@ InstrumentEventDispatcher<T>::InstrumentEventDispatcher(QObject *parent):
 
 template<class T>
 bool InstrumentEventDispatcher<T>::registeredNotify(Instrument *instrument, QGraphicsItem *target) const {
-    foreach(InstrumentItemCondition *itemCondition, instrument->itemConditions())
-        if(!itemCondition->operator()(target, instrument))
-            return false;
-
-    return instrument->registeredNotify(target);
+    return instrument->satisfiesItemConditions(target) && instrument->registeredNotify(target);
 }
 
 template<class T>

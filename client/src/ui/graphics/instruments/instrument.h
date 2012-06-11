@@ -258,6 +258,12 @@ public:
     void removeItemCondition(InstrumentItemCondition *itemCondition);
 
     /**
+     * \param item                      Item to check.
+     * \returns                         Whether the given item satisfies this instrument's item conditions.
+     */
+    bool satisfiesItemConditions(QGraphicsItem *item) const;
+
+    /**
      * This function is to be used in constructors of derived classes.
      * 
      * \returns                        Empty event type set.
