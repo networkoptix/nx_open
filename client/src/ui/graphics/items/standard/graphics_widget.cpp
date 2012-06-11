@@ -217,7 +217,7 @@ void GraphicsWidget::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     if(event->button() == Qt::LeftButton && (flags() & ItemIsSelectable)) {
         bool multiSelect = (event->modifiers() & Qt::ControlModifier) != 0;
         if (!multiSelect) {
-            if (!isSelected()) {
+            if (!isSelected() && (flags() & ItemIsSelectable)) {
                 if (QGraphicsScene *scene = this->scene()) {
                     /* Don't emit multiple notifications. */
                     bool signalsBlocked = scene->blockSignals(true);
@@ -255,7 +255,8 @@ void GraphicsWidget::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
         QList<QGraphicsItem *> selectedItems;
         QHash<QGraphicsItem *, QPointF> initialPositions;
         if (scene() && sd) {
-            selectedItems = scene()->selectedItems();
+            if(flags() & ItemIsSelectable)
+                selectedItems = scene()->selectedItems(); /* Drag selected items only if current item is selectable. */
             initialPositions = sd->movingItemsInitialPositions;
             if (initialPositions.isEmpty()) {
                 foreach (QGraphicsItem *item, selectedItems)

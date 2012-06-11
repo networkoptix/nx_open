@@ -12,7 +12,6 @@
 #include <utils/common/checked_cast.h>
 
 #include "instrument.h"
-#include "instrument_item_condition.h"
 
 template<class T>
 bool InstrumentEventDispatcherBase<T>::eventFilter(QObject *target, QEvent *event) {

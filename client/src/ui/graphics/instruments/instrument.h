@@ -12,6 +12,8 @@
 #include <ui/common/geometry.h>
 #include <ui/common/scene_transformations.h>
 
+#include "instrument_item_condition.h"
+
 class QKeyEvent;
 class QMouseEvent;
 class QWheelEvent;

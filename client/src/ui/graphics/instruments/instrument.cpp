@@ -34,7 +34,6 @@
 #include <utils/common/checked_cast.h>
 
 #include "instrument_manager.h"
-#include "instrument_item_condition.h"
 
 Instrument::Instrument(const EventTypeSet &viewportEventTypes, const EventTypeSet &viewEventTypes, const EventTypeSet &sceneEventTypes, const EventTypeSet &itemEventTypes, QObject *parent):
     QObject(parent),
