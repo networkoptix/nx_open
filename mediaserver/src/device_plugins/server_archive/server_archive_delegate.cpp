@@ -33,14 +33,37 @@ QnServerArchiveDelegate::~QnServerArchiveDelegate()
 
 qint64 QnServerArchiveDelegate::startTime()
 {
-	if (!m_catalogHi || m_catalogHi->minTime() == AV_NOPTS_VALUE)
-		return AV_NOPTS_VALUE;
-    return m_catalogHi->minTime()*1000;
+    if (m_catalogHi && m_catalogHi->minTime() != AV_NOPTS_VALUE)
+    {
+        if (m_catalogLow && m_catalogLow->minTime() != AV_NOPTS_VALUE)
+            return qMin(m_catalogHi->minTime(), m_catalogLow->minTime())*1000;
+        else
+            return m_catalogHi->minTime()*1000;
+    }
+    else if (m_catalogLow && m_catalogLow->minTime() != AV_NOPTS_VALUE)
+    {
+        return m_catalogLow->minTime()*1000;
+    }
+    else
+        return AV_NOPTS_VALUE;
 }
 
 qint64 QnServerArchiveDelegate::endTime()
 {
-    return m_catalogHi  ? m_catalogHi->maxTime()*1000 : 0;
+    if (m_catalogHi)
+    {
+        if (m_catalogLow)
+            return qMax(m_catalogHi->maxTime(), m_catalogLow->maxTime())*1000;
+        else
+            return m_catalogHi->maxTime()*1000;
+    }
+    else if (m_catalogLow)
+    {
+        return m_catalogLow->maxTime()*1000;
+    }
+    else {
+        return 0;
+    }
 }
 
 bool QnServerArchiveDelegate::open(QnResourcePtr resource)
@@ -87,7 +110,7 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
     DeviceFileCatalogPtr newChunkCatalog;
 
     DeviceFileCatalog::FindMethod findMethod = m_reverseMode ? DeviceFileCatalog::OnRecordHole_PrevChunk : DeviceFileCatalog::OnRecordHole_NextChunk;
-    m_dialQualityHelper.findDataForTime(time, newChunk, newChunkCatalog, findMethod);
+    m_dialQualityHelper.findDataForTime(timeMs, newChunk, newChunkCatalog, findMethod);
 
 
     qint64 chunkOffset = 0;
@@ -114,7 +137,7 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
         chunkOffset = qBound(0ll, time - newChunk.startTimeMs*1000, newChunk.durationMs*1000 - BACKWARD_SEEK_STEP);
     }
 
-    if (newChunk.startTimeMs != m_currentChunk.startTimeMs)
+    if (newChunk.startTimeMs != m_currentChunk.startTimeMs || newChunkCatalog != m_currentChunkCatalog)
     {
         bool isStreamsFound = m_aviDelegate->isStreamsFound();
         if (!switchToChunk(newChunk, newChunkCatalog))
@@ -122,6 +145,7 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
         if (isStreamsFound)
             m_aviDelegate->doNotFindStreamInfo(); // optimization
     }
+
 
     qint64 seekRez = m_aviDelegate->seek(chunkOffset, findIFrame);
     if (seekRez == -1)

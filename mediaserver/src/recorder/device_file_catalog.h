@@ -59,6 +59,7 @@ public:
     qint64 maxTime() const;
     bool lastFileDuplicateName() const;
     qint64 firstTime() const;
+    QnResource::ConnectionRole getRole() const { return m_role; }
 
     // Detail level determine time duration (in microseconds) visible at 1 screen pixel
     // All information less than detail level is discarded
