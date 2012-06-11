@@ -12,6 +12,8 @@
 #include "onvif/wsseapi.h"
 
 const char* OnvifResourceInformationFetcher::ONVIF_RT = "ONVIF";
+std::string& OnvifResourceInformationFetcher::STD_ONVIF_USER = *(new std::string("admin"));
+std::string& OnvifResourceInformationFetcher::STD_ONVIF_PASSWORD = *(new std::string("admin"));
 
 
 OnvifResourceInformationFetcher::OnvifResourceInformationFetcher()
@@ -52,8 +54,6 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     QHostAddress sender(hostAddressFromEndpoint(endpoint));
     const char* login = 0;
     const char* passwd = 0;
-    std::string onvifUser = "netoptix_onvif";
-    std::string onvifPasswd;
 
     QString manufacturer = info.src == EndpointAdditionalInfo::MDNS? manufacturersData.manufacturerFromMdns(info.data):
         manufacturersData.manufacturerFromWsdd(info.data);
@@ -92,10 +92,9 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
             qDebug() << "Trying to create a password";
 
             //If we had no luck in picking a password, let's try to create a user
-            onvifPasswd = generateRandomPassword().toStdString();
             onvifXsd__User newUser;
-            newUser.Username = onvifUser;
-            newUser.Password = &onvifPasswd;
+            newUser.Username = STD_ONVIF_USER;
+            newUser.Password = &STD_ONVIF_PASSWORD;
 
             for (int i = 0; i <= 2; ++i) {
                 _onvifDevice__CreateUsers request2;
@@ -112,13 +111,13 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
                 soapRes = soapProxy.CreateUsers(endpoint.toStdString().c_str(), NULL, &request2, &response2);
                 if (soapRes == SOAP_OK) {
                     qDebug() << "User created!";
-                    login = onvifUser.c_str();
-                    passwd = onvifPasswd.c_str();
+                    login = STD_ONVIF_USER.c_str();
+                    passwd = STD_ONVIF_PASSWORD.c_str();
                     soap_end(soapProxy.soap);
                     break;
                 }
 
-                qDebug() << "Usser is NOT created";
+                qDebug() << "User is NOT created";
                 login = 0;
                 passwd = 0;
                 soap_end(soapProxy.soap);
@@ -363,21 +362,21 @@ const QString OnvifResourceInformationFetcher::fetchSerialConvertToMac(const _on
     return result;
 }
 
-const QString OnvifResourceInformationFetcher::generateRandomPassword() const
-{
-    QTime curTime(QTime::currentTime());
-    qsrand((curTime.hour() + 1) * (curTime.minute() + 1));
-
-    QString tmp;
-    QString result;
-    result += tmp.setNum(qrand());
-    result += tmp.setNum(curTime.second());
-    result += tmp.setNum(qrand());
-    result += tmp.setNum(curTime.msec());
-
-    qDebug() << "Random password is " << result;
-    return result;
-}
+//const QString OnvifResourceInformationFetcher::generateRandomPassword() const
+//{
+//    QTime curTime(QTime::currentTime());
+//    qsrand((curTime.hour() + 1) * (curTime.minute() + 1));
+//
+//    QString tmp;
+//    QString result;
+//    result += tmp.setNum(qrand());
+//    result += tmp.setNum(curTime.second());
+//    result += tmp.setNum(qrand());
+//    result += tmp.setNum(curTime.msec());
+//
+//    qDebug() << "Random password is " << result;
+//    return result;
+//}
 
 QHostAddress OnvifResourceInformationFetcher::hostAddressFromEndpoint(const QString& endpoint) const
 {

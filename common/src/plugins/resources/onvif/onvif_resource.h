@@ -25,6 +25,7 @@ public:
     static const char* MANUFACTURE;
     static const QString& MEDIA_URL_PARAM_NAME;
     static const QString& DEVICE_URL_PARAM_NAME;
+	static const float QUALITY_COEF;
 
     QnPlOnvifResource();
 
@@ -80,6 +81,8 @@ private:
     int countAppropriateProfiles(const _onvifMedia__GetProfilesResponse& response, VideoEncoders& encoders);
     void setOnvifUrls();
     void save();
+	void setMinMaxQuality(int min, int max);
+	int round(float value);
 private:
     static const char* ONVIF_PROTOCOL_PREFIX;
     static const char* ONVIF_URL_SUFFIX;

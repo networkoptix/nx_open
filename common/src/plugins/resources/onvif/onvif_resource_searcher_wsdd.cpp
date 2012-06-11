@@ -110,7 +110,7 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
             QUdpSocket qSocket;
             if (!qSocket.bind(localAddress, 0)) {
                 qWarning() << "OnvifResourceSearcherWsdd::findEndpoints: QUdpSocket.bind failed. Interface: " << host;
-                return;
+                break;
             }
 
             int port = qSocket.localPort();

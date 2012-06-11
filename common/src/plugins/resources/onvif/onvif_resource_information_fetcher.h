@@ -34,6 +34,8 @@ typedef QHash<QString, EndpointAdditionalInfo> EndpointInfoHash;
 class OnvifResourceInformationFetcher
 {
     static const char* ONVIF_RT;
+	static std::string& STD_ONVIF_USER;
+	static std::string& STD_ONVIF_PASSWORD;
     QnId onvifTypeId;
     PasswordHelper passwordsData;
     ManufacturerHelper manufacturersData;
@@ -66,7 +68,7 @@ private:
     const QString fetchName(const _onvifDevice__GetDeviceInformationResponse& response) const;
     const QString fetchManufacturer(const _onvifDevice__GetDeviceInformationResponse& response) const;
     const QString fetchSerialConvertToMac(const _onvifDevice__GetDeviceInformationResponse& response) const;
-    const QString generateRandomPassword() const;
+    //const QString generateRandomPassword() const;
     QHostAddress hostAddressFromEndpoint(const QString& endpoint) const;
 };
 

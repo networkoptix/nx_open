@@ -6,6 +6,7 @@
 
 #include <climits>
 #include <QHash>
+#include <cmath>
 #include "onvif_resource.h"
 //#include "../onvif/dataprovider/onvif_mjpeg.h"
 #include "onvif_stream_reader.h"
@@ -25,6 +26,7 @@ const char* QnPlOnvifResource::ONVIF_URL_SUFFIX = ":80/onvif/device_service";
 const int QnPlOnvifResource::DEFAULT_IFRAME_DISTANCE = 20;
 const QString& QnPlOnvifResource::MEDIA_URL_PARAM_NAME = *(new QString("MediaUrl"));
 const QString& QnPlOnvifResource::DEVICE_URL_PARAM_NAME = *(new QString("DeviceUrl"));
+const float QnPlOnvifResource::QUALITY_COEF = 0.2;
 
 
 //width > height is prefered
@@ -414,8 +416,7 @@ void QnPlOnvifResource::setVideoEncoderOptions(const _onvifMedia__GetVideoEncode
     }
 
     if (response.Options->QualityRange) {
-        minQuality = response.Options->QualityRange->Min;
-        maxQuality = response.Options->QualityRange->Max;
+		setMinMaxQuality(response.Options->QualityRange->Min, response.Options->QualityRange->Max);
 
         qDebug() << "ONVIF quality range [" << minQuality << ", " << maxQuality << "]";
     } else {
@@ -652,4 +653,30 @@ void QnPlOnvifResource::save()
         qCritical() << "QnPlOnvifResource::init: can't save resource params to Enterprise Controller. Resource MAC: "
                     << getMAC().toString() << ". Description: " << errorStr;
     }
+}
+
+void QnPlOnvifResource::setMinMaxQuality(int min, int max)
+{
+	//return minQuality + (maxQuality - minQuality) * (quality - QnQualityLowest) / (QnQualityHighest - QnQualityLowest);
+	int netoptixDelta = QnQualityHighest - QnQualityLowest;
+    int onvifDelta = max - min;
+
+	if (netoptixDelta < 0 || onvifDelta < 0) {
+		qWarning() << "QnPlOnvifResource::setMinMaxQuality: incorrect values: min > max: onvif ["
+			       << min << ", " << max << "] netoptix [" << QnQualityLowest << ", " << QnQualityHighest << "]";
+		return;
+	}
+
+	float coef = (1 - ((float)netoptixDelta) / onvifDelta) * 0.5;
+	coef = coef <= 0? 0.0: (coef <= QUALITY_COEF? coef: QUALITY_COEF);
+	int shift = round(onvifDelta * coef);
+
+	minQuality = min + shift;
+	maxQuality = max - shift;
+}
+
+int QnPlOnvifResource::round(float value)
+{
+	float floorVal = floorf(value);
+    return floorVal - value < 0.5? (int)value: (int)value + 1;
 }
