@@ -46,9 +46,9 @@ QnResourceList OnvifResourceSearcher::findResources()
 {
     QnResourceList result;
 
-    //Order is important! WS-Discovery should be the first (it provides more info, than mDNS)
-    wsddSearcher.findResources(result, specialResourceCreator);
+    //Order is important! mdns shuold be the first to avoid creating ONVIF resource, when special is expected
     mdnsSearcher.findResources(result, specialResourceCreator);
+    wsddSearcher.findResources(result, specialResourceCreator);
 
     return result;
 }
