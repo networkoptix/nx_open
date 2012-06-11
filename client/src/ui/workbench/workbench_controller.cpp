@@ -20,6 +20,7 @@
 #include <utils/common/util.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/delete_later.h>
+#include <utils/common/toggle.h>
 
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource/security_cam_resource.h>
@@ -33,6 +34,8 @@
 #include <ui/screen_recording/screen_recorder.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
+
+#include "ui/dialogs/sign_dialog.h" // TODO: move out.
 
 #include <ui/animation/viewport_animator.h>
 #include <ui/animation/animator_group.h>
@@ -77,7 +80,7 @@
 #include "workbench.h"
 #include "workbench_display.h"
 #include "help/qncontext_help.h"
-#include "ui/dialogs/sign_dialog.h"
+
 
 //#define QN_WORKBENCH_CONTROLLER_DEBUG
 
@@ -250,7 +253,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(sceneClickInstrument,       SIGNAL(clicked(QGraphicsView *, const ClickInfo &)),                                        this,                           SLOT(at_scene_clicked(QGraphicsView *, const ClickInfo &)));
     connect(sceneClickInstrument,       SIGNAL(doubleClicked(QGraphicsView *, const ClickInfo &)),                                  this,                           SLOT(at_scene_doubleClicked(QGraphicsView *, const ClickInfo &)));
     connect(m_moveInstrument,           SIGNAL(moveStarted(QGraphicsView *, QList<QGraphicsItem *>)),                               this,                           SLOT(at_moveStarted(QGraphicsView *, QList<QGraphicsItem *>)));
-    connect(m_moveInstrument,           SIGNAL(move(QGraphicsView *, QList<QGraphicsItem *>, const QPointF &)),                     this,                           SLOT(at_move(QGraphicsView *, QList<QGraphicsItem *>, const QPointF &)));
+    connect(m_moveInstrument,           SIGNAL(move(QGraphicsView *, const QPointF &)),                                             this,                           SLOT(at_move(QGraphicsView *, const QPointF &)));
     connect(m_moveInstrument,           SIGNAL(moveFinished(QGraphicsView *, QList<QGraphicsItem *>)),                              this,                           SLOT(at_moveFinished(QGraphicsView *, QList<QGraphicsItem *>)));
     connect(m_resizingInstrument,       SIGNAL(resizingStarted(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),          this,                           SLOT(at_resizingStarted(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)));
     connect(m_resizingInstrument,       SIGNAL(resizing(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),                 this,                           SLOT(at_resizing(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)));
@@ -270,14 +273,6 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(display(),                  SIGNAL(viewportGrabbed()),                                                                  m_wheelZoomInstrument,          SLOT(recursiveDisable()));
     connect(display(),                  SIGNAL(viewportUngrabbed()),                                                                m_wheelZoomInstrument,          SLOT(recursiveEnable()));
 
-    connect(m_resizingInstrument,       SIGNAL(resizingProcessStarted(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),   m_itemMouseForwardingInstrument, SLOT(recursiveDisable()));
-    connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *, const ResizingInfo &)),  m_itemMouseForwardingInstrument, SLOT(recursiveEnable()));
-    connect(m_moveInstrument,           SIGNAL(moveProcessStarted(QGraphicsView *)),                                                m_itemMouseForwardingInstrument, SLOT(recursiveDisable()));
-    connect(m_moveInstrument,           SIGNAL(moveProcessFinished(QGraphicsView *)),                                               m_itemMouseForwardingInstrument, SLOT(recursiveEnable()));
-    connect(m_dragInstrument,           SIGNAL(dragProcessStarted(QGraphicsView *)),                                                m_itemMouseForwardingInstrument, SLOT(recursiveDisable()));
-    connect(m_dragInstrument,           SIGNAL(dragProcessFinished(QGraphicsView *)),                                               m_itemMouseForwardingInstrument, SLOT(recursiveEnable()));
-    connect(m_rotationInstrument,       SIGNAL(rotationProcessStarted(QGraphicsView *, QnResourceWidget *)),                        m_itemMouseForwardingInstrument, SLOT(recursiveDisable()));
-    connect(m_rotationInstrument,       SIGNAL(rotationProcessFinished(QGraphicsView *, QnResourceWidget *)),                       m_itemMouseForwardingInstrument, SLOT(recursiveEnable()));
     connect(m_handScrollInstrument,     SIGNAL(scrollProcessStarted(QGraphicsView *)),                                              m_itemMouseForwardingInstrument, SLOT(recursiveDisable()));
     connect(m_handScrollInstrument,     SIGNAL(scrollProcessFinished(QGraphicsView *)),                                             m_itemMouseForwardingInstrument, SLOT(recursiveEnable()));
     connect(m_rubberBandInstrument,     SIGNAL(rubberBandProcessStarted(QGraphicsView *)),                                          m_itemMouseForwardingInstrument, SLOT(recursiveDisable()));
@@ -324,6 +319,14 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(display(),                  SIGNAL(widgetChanged(Qn::ItemRole)),                                                        this,                           SLOT(at_display_widgetChanged(Qn::ItemRole)));
     connect(display(),                  SIGNAL(widgetAdded(QnResourceWidget *)),                                                    this,                           SLOT(at_display_widgetAdded(QnResourceWidget *)));
     connect(display(),                  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),                                         this,                           SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
+
+    /* Set up zoom toggle. */
+    m_zoomedToggle = new QnToggle(this);
+    connect(m_zoomedToggle,             SIGNAL(activated()),                                                                        m_moveInstrument,               SLOT(recursiveDisable()));
+    connect(m_zoomedToggle,             SIGNAL(deactivated()),                                                                      m_moveInstrument,               SLOT(recursiveEnable()));
+    connect(m_zoomedToggle,             SIGNAL(activated()),                                                                        m_resizingInstrument,           SLOT(recursiveDisable()));
+    connect(m_zoomedToggle,             SIGNAL(deactivated()),                                                                      m_resizingInstrument,           SLOT(recursiveEnable()));
+    m_zoomedToggle->setActive(display()->widget(Qn::ZoomedRole) != NULL);
 
     /* Set up context menu. */
     QWidget *window = display()->view()->window();
@@ -695,17 +698,14 @@ void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, 
         return;
 
     QnResourceWidget *widget = m_resizedWidget;
-
-    QRectF newSceneGeometry = widget->geometry();
-
-    /* Calculate new size in grid coordinates. */
-    QSizeF gridSizeF = mapper()->mapToGridF(newSceneGeometry.size());
+    QRectF gridRectF = mapper()->mapToGridF(widget->geometry());
+    
+    /* Calculate integer size. */
+    QSizeF gridSizeF = gridRectF.size();
     QSize gridSize = QSize(
         qMax(1, qRound(gridSizeF.width())),
         qMax(1, qRound(gridSizeF.height()))
     );
-
-    /* Adjust for aspect ratio. */
     if(widget->hasAspectRatio()) {
         if(widget->aspectRatio() > 1.0) {
             gridSize = bestSingleBoundedSize(mapper(), gridSize.width(), Qt::Horizontal, widget->aspectRatio());
@@ -714,8 +714,12 @@ void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, 
         }
     }
 
+    /* Calculate integer position. */
+    QPointF gridPosF = gridRectF.topLeft() + toPoint(gridSizeF - gridSize) / 2.0;
+    QPoint gridPos = gridPosF.toPoint(); /* QPointF::toPoint() uses qRound() internally. */
+
     /* Calculate new grid rect based on the dragged frame section. */
-    QRect newResizingWidgetRect = resizeRect(widget->item()->geometry(), gridSize, info.frameSection());
+    QRect newResizingWidgetRect = QRect(gridPos, gridSize);
     if(newResizingWidgetRect != m_resizedWidgetRect) {
         QnWorkbenchLayout::Disposition disposition;
         widget->item()->layout()->canMoveItem(widget->item(), newResizingWidgetRect, &disposition);
@@ -762,13 +766,6 @@ void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget
 void QnWorkbenchController::at_moveStarted(QGraphicsView *, const QList<QGraphicsItem *> &items) {
     TRACE("MOVE STARTED");
 
-    /* Bring to front preserving relative order. */
-    display()->bringToFront(items);
-    display()->setLayer(items, Qn::FrontLayer);
-
-    /* Show grid. */
-    display()->gridItem()->animatedShow();
-
     /* Build item lists. */
     foreach (QGraphicsItem *item, items) {
         QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
@@ -779,14 +776,18 @@ void QnWorkbenchController::at_moveStarted(QGraphicsView *, const QList<QGraphic
 
         opacityAnimator(widget)->animateTo(widgetManipulationOpacity);
     }
+    if(m_draggedWorkbenchItems.empty())
+        return;
 
-    /* Un-raise if raised is among the dragged. */
-    //QnResourceWidget *raisedWidget = display()->widget(workbench()->raisedItem());
-    //if(raisedWidget != NULL && items.contains(raisedWidget))
-    //    workbench()->setRaisedItem(NULL);
+    /* Bring to front preserving relative order. */
+    display()->bringToFront(items);
+    display()->setLayer(items, Qn::FrontLayer);
+
+    /* Show grid. */
+    display()->gridItem()->animatedShow();
 }
 
-void QnWorkbenchController::at_move(QGraphicsView *, const QList<QGraphicsItem *> &, const QPointF &totalDelta) {
+void QnWorkbenchController::at_move(QGraphicsView *, const QPointF &totalDelta) {
     if(m_draggedWorkbenchItems.empty())
         return;
 
@@ -1064,33 +1065,30 @@ void QnWorkbenchController::at_scene_doubleClicked(QGraphicsView *, const ClickI
 }
 
 void QnWorkbenchController::at_display_widgetChanged(Qn::ItemRole role) {
-    QnResourceWidget *widget = display()->widget(role);
+    QnResourceWidget *newWidget = display()->widget(role);
     QnResourceWidget *oldWidget = m_widgetByRole[role];
-    if(widget == oldWidget)
+    if(newWidget == oldWidget)
         return;
 
-    m_widgetByRole[role] = widget;
+    m_widgetByRole[role] = newWidget;
 
-    if(widget)
-        widget->setFocus();
+    if(newWidget)
+        newWidget->setFocus();
 
     switch(role) {
     case Qn::ZoomedRole: {
-        bool effective = widget == NULL;
-        m_resizingInstrument->setEffective(effective);
-        m_resizingInstrument->resizeHoverInstrument()->setEffective(effective);
-        m_moveInstrument->setEffective(effective);
+        m_zoomedToggle->setActive(newWidget != NULL);
 
-        if(widget == NULL) { /* Un-raise on un-zoom. */
+        if(newWidget == NULL) { /* Un-raise on un-zoom. */
             workbench()->setItem(Qn::RaisedRole, NULL);
         } else {
-            m_cursorPos = widget->item()->geometry().topLeft();
+            m_cursorPos = newWidget->item()->geometry().topLeft();
         }
         break;
     }
     case Qn::RaisedRole:
-        if(widget != NULL)
-            m_cursorPos = widget->item()->geometry().topLeft();
+        if(newWidget != NULL)
+            m_cursorPos = newWidget->item()->geometry().topLeft();
         break;
     default:
         break;

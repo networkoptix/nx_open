@@ -64,8 +64,8 @@ void QnCameraMotionMaskWidget::init()
     /* Disable unused instruments. */
     m_controller->motionSelectionInstrument()->disable();
     m_controller->itemRightClickInstrument()->disable();
-    m_controller->moveInstrument()->setEffective(false);
-    m_controller->resizingInstrument()->setEffective(false);
+    m_controller->moveInstrument()->disable();
+    m_controller->resizingInstrument()->disable();
     m_controller->rubberBandInstrument()->disable();
     m_controller->itemLeftClickInstrument()->disable();
 
@@ -164,6 +164,67 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
     emit motionRegionListChanged();
 }
 
+void QnCameraMotionMaskWidget::showTooManyWindowsMessage(const QnMotionRegion &region)
+{
+    int maxWndCnt = region.getMotionRectCount();
+    int maxMaskCnt = region.getMaskRectCount();
+
+    if (maxWndCnt > m_camera->motionWindowCnt()) {
+        QMessageBox::warning(
+            this, 
+            tr("Too many motion windows"), 
+            tr("Maximum amount of motion windows for current camera is %1, but %2 motion windows are currently selected.").arg(m_camera->motionWindowCnt()).arg(maxWndCnt)
+            );
+    }
+    else if (maxMaskCnt > m_camera->motionMaskWindowCnt()) {
+        QMessageBox::warning(
+            this, 
+            tr("Too many motion windows"), 
+            tr("Maximum amount of motion mask windows for current camera is %1, but %2 motion mask windows are currently selected.").arg(m_camera->motionMaskWindowCnt()).arg(maxMaskCnt)
+            );
+    }
+}
+
+void QnCameraMotionMaskWidget::setNeedControlMaxRects(bool value)
+{
+    m_needControlMaxRects = value;
+    if (m_resourceWidget && m_needControlMaxRects) 
+    {
+        const QList<QnMotionRegion> &regions = m_resourceWidget->getMotionRegionList();
+        for (int i = 0; i < regions.size(); ++i) {
+            if (!regions[i].isValid(m_camera->motionWindowCnt(), m_camera->motionMaskWindowCnt())) {
+                showTooManyWindowsMessage(regions[i]);
+                break;
+            }
+        }
+    }
+};
+
+void QnCameraMotionMaskWidget::setMotionSensitivity(int value)
+{
+    m_motionSensitivity = value;
+}
+
+void QnCameraMotionMaskWidget::clearMotion()
+{
+    at_motionRegionCleared();
+}
+
+int QnCameraMotionMaskWidget::gridPosToChannelPos(QPoint &pos)
+{
+    const QnVideoResourceLayout* layout = m_camera->getVideoLayout();
+    for (int i = 0; i < layout->numberOfChannels(); ++i)
+    {
+        QRect r(layout->h_position(i)*MD_WIDTH, layout->v_position(i)*MD_HEIGHT, MD_WIDTH, MD_HEIGHT);
+        if (r.contains(pos)) 
+        {
+            pos -= r.topLeft();
+            return i;
+        }
+    }
+    return 0;
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -226,46 +287,6 @@ void QnCameraMotionMaskWidget::at_motionRegionCleared()
         emit motionRegionListChanged();
 }
 
-void QnCameraMotionMaskWidget::setNeedControlMaxRects(bool value)
-{
-    m_needControlMaxRects = value;
-    if (m_resourceWidget && m_needControlMaxRects) 
-    {
-        const QList<QnMotionRegion> &regions = m_resourceWidget->getMotionRegionList();
-        for (int i = 0; i < regions.size(); ++i) {
-            if (!regions[i].isValid(m_camera->motionWindowCnt(), m_camera->motionMaskWindowCnt())) {
-                showTooManyWindowsMessage(regions[i]);
-                break;
-            }
-        }
-    }
-};
-
-void QnCameraMotionMaskWidget::setMotionSensitivity(int value)
-{
-    m_motionSensitivity = value;
-}
-
-void QnCameraMotionMaskWidget::clearMotion()
-{
-    at_motionRegionCleared();
-}
-
-int QnCameraMotionMaskWidget::gridPosToChannelPos(QPoint &pos)
-{
-    const QnVideoResourceLayout* layout = m_camera->getVideoLayout();
-    for (int i = 0; i < layout->numberOfChannels(); ++i)
-    {
-        QRect r(layout->h_position(i)*MD_WIDTH, layout->v_position(i)*MD_HEIGHT, MD_WIDTH, MD_HEIGHT);
-        if (r.contains(pos)) 
-        {
-            pos -= r.topLeft();
-            return i;
-        }
-    }
-    return 0;
-}
-
 void QnCameraMotionMaskWidget::at_itemClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info)
 {
     if (!m_resourceWidget)
@@ -278,23 +299,3 @@ void QnCameraMotionMaskWidget::at_itemClicked(QGraphicsView *view, QGraphicsItem
         emit motionRegionListChanged();
 }
 
-void QnCameraMotionMaskWidget::showTooManyWindowsMessage(const QnMotionRegion &region)
-{
-    int maxWndCnt = region.getMotionRectCount();
-    int maxMaskCnt = region.getMaskRectCount();
-    
-    if (maxWndCnt > m_camera->motionWindowCnt()) {
-        QMessageBox::warning(
-            this, 
-            tr("Too many motion windows"), 
-            tr("Maximum amount of motion windows for current camera is %1, but %2 motion windows are currently selected.").arg(m_camera->motionWindowCnt()).arg(maxWndCnt)
-        );
-    }
-    else if (maxMaskCnt > m_camera->motionMaskWindowCnt()) {
-        QMessageBox::warning(
-            this, 
-            tr("Too many motion windows"), 
-            tr("Maximum amount of motion mask windows for current camera is %1, but %2 motion mask windows are currently selected.").arg(m_camera->motionMaskWindowCnt()).arg(maxMaskCnt)
-        );
-    }
-}

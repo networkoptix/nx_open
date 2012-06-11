@@ -49,6 +49,7 @@ class InstrumentManager;
 class InstrumentItemEventDispatcher;
 template<class T>
 class InstrumentEventDispatcher;
+class InstrumentItemCondition;
 
 namespace detail {
     struct AlwaysTrue: public std::unary_function<QGraphicsItem *, bool> {
@@ -104,7 +105,7 @@ namespace detail {
  * 
  * Note that when uninstalled, instrument is always considered disabled. Upon
  * installation it restores its enabled state. This means that if the instrument
- * is installed and then uninstalled, the following notifications functions will 
+ * is installed and then uninstalled, the following notification functions will 
  * be called:
  * <ol>
  * <li><tt>installedNotify()</tt></li>
@@ -220,6 +221,41 @@ public:
      * \returns                        Whether this instrument is enabled.
      */
     bool isEnabled() const;
+
+    /**
+     * \returns                        List of item conditions of this instrument.
+     */
+    const QList<InstrumentItemCondition *> &itemConditions() const {
+        return m_itemConditions;
+    }
+
+    /**
+     * This function sets item conditions of the instrument. Note that once 
+     * instrument is installed, item conditions cannot be changed.
+     * 
+     * Instrument takes ownership of the supplied item conditions.
+     *
+     * \param itemConditions           New item conditions for this instrument.
+     */
+    void setItemConditions(const QList<InstrumentItemCondition *> &itemConditions);
+
+    /**
+     * This function registers additional item condition with this instrument.
+     * Note that once instrument is installed, new item conditions cannot be added.
+     * 
+     * Instrument takes ownership of the supplied item condition.
+     *
+     * \param itemCondition            Item condition to add to this instrument's item conditions list.
+     */
+    void addItemCondition(InstrumentItemCondition *itemCondition);
+
+    /**
+     * This function unregisters an item condition with this instrument.
+     * Note that once instrument is installed, new item conditions cannot be added.
+     * 
+     * \param itemCondition            Item condition to remove from this instrument's item condition list.
+     */
+    void removeItemCondition(InstrumentItemCondition *itemCondition);
 
     /**
      * This function is to be used in constructors of derived classes.
@@ -703,6 +739,8 @@ private:
 private:
     InstrumentManager *m_manager;
     QGraphicsScene *m_scene;
+    QList<InstrumentItemCondition *> m_itemConditions;
+    QSet<InstrumentItemCondition *> m_ownedItemConditions;
     QScopedPointer<AnimationTimer> m_animationTimer;
     EventTypeSet m_watchedEventTypes[WatchedTypeCount];
     int m_disabledCounter;

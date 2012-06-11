@@ -44,7 +44,7 @@ void QnToolTipSlider::init() {
     m_sliderUnderMouse = false;
     m_toolTipUnderMouse = false;
 
-    setToolTipItem(new QnSliderToolTipItem());
+    setToolTipItem(new QnSliderToolTipItem(this));
     setAcceptHoverEvents(true);
 
     updateToolTipPosition();
@@ -68,7 +68,7 @@ void QnToolTipSlider::setToolTipItem(QnToolTipItem *toolTipItem) {
 
     m_toolTipItem = toolTipItem;
     if(m_toolTipItem) {
-        m_toolTipItem->setParentItem(this);
+        m_toolTipItem->setParent(this); /* Claim ownership, but not in graphics item sense. */
         m_toolTipItem->setFocusProxy(this);
         m_toolTipItem->setOpacity(opacity);
         m_toolTipItem->setText(toolTip());
@@ -121,7 +121,7 @@ void QnToolTipSlider::updateToolTipPosition() {
     qreal x = positionFromValue(sliderPosition()).x() + handleRect.width() / 2.0;
     qreal y = handleRect.top();
     
-    m_toolTipItem->setPos(x, y);
+    m_toolTipItem->setPos(m_toolTipItem->mapToParent(m_toolTipItem->mapFromItem(this, x, y)));
 }
 
 

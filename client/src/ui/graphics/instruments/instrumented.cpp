@@ -15,6 +15,6 @@ void detail::InstrumentedBase::updateScene(QGraphicsScene *scene, QGraphicsItem 
 
     if(m_scene != NULL)
         foreach(InstrumentManager *manager, InstrumentManager::managersOf(m_scene))
-            manager->registerItem(item);
+            manager->registerItem(item, true);
 }
         

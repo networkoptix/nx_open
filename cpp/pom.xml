@@ -90,12 +90,12 @@
 							<failOnError>false</failOnError>
 							<target>							
 								<chmod file="${project.build.directory}/*.sh" perm="755"/>
-								
-								<exec dir="${project.build.directory}" executable="unzip" failifexecutionfails="false">
-   									<arg line="-a -u *.zip"/>
-  								</exec>
 
-								<concat destfile="${project.build.directory}/${project.artifactId}.pro" append="true">
+								<exec dir="${project.build.directory}" executable="unzip" failifexecutionfails="false">
+									<arg line="-a -u *.zip"/>
+								</exec>
+
+								<concat destfile="${project.build.directory}/${project.artifactId}.pro" append="false">
 									<filelist dir="${project.build.directory}" files="template.pro"/>
 								</concat>	
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}</echo>
@@ -224,7 +224,8 @@
 								<pathconvert pathsep="${line.separator}" property="proto" refid="proto_path">
 									<map from="" to="PB_FILES += "/>
 								</pathconvert>
-								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${proto}</echo>								
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${proto}</echo>
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}</echo>								
 							</target>
 						</configuration>
 					</execution>				

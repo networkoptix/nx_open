@@ -67,6 +67,9 @@ void HoverFocusProcessor::addTargetItem(QGraphicsItem *item) {
         return;
     }
 
+    if(m_items.contains(item))
+        return;
+
     if(scene() != NULL)
         item->installSceneEventFilter(this);
     item->setAcceptHoverEvents(true);
@@ -78,22 +81,13 @@ void HoverFocusProcessor::removeTargetItem(QGraphicsItem *item) {
     if(item == NULL)
         return; /* Removing an item that is not there is OK, even if it's a NULL item. */
 
-    for(int i = 0; i < m_items.size(); i++) {
-        if(m_items[i].data() == item) {
-            if(scene() != NULL)
-                item->removeSceneEventFilter(this);
-            m_items.removeAt(i);
-            return;
-        }
-    }
+    bool removed = m_items.removeOne(item);
+    if(removed && scene())
+        item->removeSceneEventFilter(this);
 }
 
 QList<QGraphicsItem *> HoverFocusProcessor::targetItems() const {
-    QList<QGraphicsItem *> result;
-    foreach(const WeakGraphicsItemPointer &item, m_items)
-        if(!item.isNull())
-            result.push_back(item.data());
-    return result;
+    return m_items.materialized();
 }
 
 void HoverFocusProcessor::forceHoverLeave() {
@@ -179,13 +173,13 @@ QVariant HoverFocusProcessor::itemChange(GraphicsItemChange change, const QVaria
         case ItemSceneChange:
             if(scene() != NULL)
                 foreach(const WeakGraphicsItemPointer &item, m_items)
-                    if(!item.isNull())
+                    if(item)
                         item.data()->removeSceneEventFilter(this);
             break;
         case ItemSceneHasChanged:
             if(scene() != NULL)
                 foreach(const WeakGraphicsItemPointer &item, m_items)
-                    if(!item.isNull())
+                    if(item)
                         item.data()->installSceneEventFilter(this);
             break;
         default:

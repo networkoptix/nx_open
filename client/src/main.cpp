@@ -1,3 +1,9 @@
+//#define QN_USE_VLD
+
+#ifdef QN_USE_VLD
+#   include <vld.h>
+#endif
+
 #include "version.h"
 #include "ui/widgets/main_window.h"
 #include "utils/settings.h"
@@ -223,21 +229,23 @@ int main(int argc, char *argv[])
     commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::String, "--delayed-drop", NULL, NULL));
     commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::String, "--log-level", NULL, NULL));
     commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::Flag, "--soft-yuv", NULL, NULL));
+    commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::Flag, "--open-layouts-on-login", NULL, NULL));
     commandLinePreParser.parse(argc, argv);
 
-    QnSettings::instance()->setSoftwareYuv(commandLinePreParser.value("--soft-yuv").toBool());
+    if(commandLinePreParser.value("--soft-yuv").toBool())
+        qnSettings->setSoftwareYuv(true);
+
+    if(commandLinePreParser.value("--open-layouts-on-login").toBool())
+        qnSettings->setLayoutsOpenedOnLogin(true);
 
     /* Set authentication parameters from command line. */
     QUrl authentication = QUrl::fromUserInput(commandLinePreParser.value("--auth").toString());
     if(authentication.isValid()) {
         out << QObject::tr("Using authentication parameters from command line: %1.").arg(authentication.toString()) << endl;
-
-        QnConnectionData connection;
-        connection.url = authentication;
-
-        qnSettings->setLastUsedConnection(connection);
+        qnSettings->setLastUsedConnection(QnConnectionData(QString(), authentication));
     }
 
+    /* Set other options from command line. */
 
     /* Create application instance. */
     QtSingleApplication *singleApplication = NULL;
@@ -294,7 +302,7 @@ int main(int argc, char *argv[])
 
     // Create and start SessionManager
     QnSessionManager* sm = QnSessionManager::instance();
-    QThread *thread = new QThread();
+    QThread *thread = new QThread(); // TODO: leaking thread.
     sm->moveToThread(thread);
     QObject::connect(sm, SIGNAL(destroyed()), thread, SLOT(quit()));
     QObject::connect(thread , SIGNAL(finished()), thread, SLOT(deleteLater()));
@@ -450,5 +458,4 @@ int main(int argc, char *argv[])
 #endif
 
 
-//============================================
 

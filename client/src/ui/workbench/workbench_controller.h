@@ -12,6 +12,7 @@
 class QGraphicsScene;
 class QGraphicsView;
 class QGraphicsItem;
+class QGraphicsWidget;
 class QMenu;
 class QLabel;
 class QPropertyAnimation;
@@ -33,6 +34,7 @@ class ClickInstrument;
 class ClickInfo;
 class ResizingInfo;
 
+class QnToggle;
 class QnActionManager;
 class QnWorkbenchDisplay;
 class QnWorkbenchLayout;
@@ -109,7 +111,7 @@ protected slots:
     void at_resizingFinished(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
 
     void at_moveStarted(QGraphicsView *view, const QList<QGraphicsItem *> &items);
-    void at_move(QGraphicsView *view, const QList<QGraphicsItem *> &items, const QPointF &totalDelta);
+    void at_move(QGraphicsView *view, const QPointF &totalDelta);
     void at_moveFinished(QGraphicsView *view, const QList<QGraphicsItem *> &items);
 
     void at_rotationStarted(QGraphicsView *view, QnResourceWidget *widget);
@@ -160,6 +162,9 @@ private:
     /** Widgets by role. */
     QnResourceWidget *m_widgetByRole[Qn::ItemRoleCount];
 
+    /** Zoomed state toggle. */
+    QnToggle *m_zoomedToggle;
+
 
     /* Instruments. */
 
@@ -200,10 +205,12 @@ private:
     ClickInstrument *m_itemLeftClickInstrument;
 
 
+
     /* Keyboard control-related state. */
 
     /** Last keyboard cursor position. */
     QPoint m_cursorPos;
+
 
 
     /* Resizing-related state. */
@@ -213,6 +220,7 @@ private:
 
     /** Current grid rect of the widget being resized. */
     QRect m_resizedWidgetRect;
+
 
 
     /* Dragging-related state. */
@@ -228,6 +236,7 @@ private:
 
     /** Target geometries for concatenation of dragged and replaced item lists. */
     QList<QRect> m_dragGeometries;
+
 
 
     /* Screen recording-related state. */

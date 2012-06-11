@@ -22,14 +22,14 @@ QnWorkbenchStreamSynchronizer::QnWorkbenchStreamSynchronizer(QnWorkbenchDisplay 
     }
 
     /* Prepare syncplay. */
-    m_syncPlay = new QnArchiveSyncPlayWrapper();
+    m_syncPlay = new QnArchiveSyncPlayWrapper(); // TODO: QnArchiveSyncPlayWrapper destructor doesn't get called, investigate.
 
     /* Connect to display. */
     connect(display,    SIGNAL(widgetAdded(QnResourceWidget *)),              this,   SLOT(at_display_widgetAdded(QnResourceWidget *)));
     connect(display,    SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),   this,   SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
     
     /* Prepare counter. */
-    m_counter = new QnCounter(1);
+    m_counter = new QnCounter(1); // TODO: this one also doesn't get destroyed.
     connect(this,                       SIGNAL(destroyed()),    m_counter,      SLOT(decrement()));
     connect(m_counter,                  SIGNAL(reachedZero()),  m_syncPlay,     SLOT(deleteLater()));
     connect(m_counter,                  SIGNAL(reachedZero()),  m_counter,      SLOT(deleteLater()));

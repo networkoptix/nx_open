@@ -1,7 +1,9 @@
 #include "single_camera_settings_widget.h"
 #include "ui_single_camera_settings_widget.h"
 
+#include <QtCore/QUrl>
 #include <QtGui/QMessageBox>
+#include <QtGui/QDesktopServices>
 
 #include "core/resource/resource.h"
 #include "core/resource/camera_resource.h"
@@ -20,6 +22,9 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     m_readOnly(false)
 {
     ui->setupUi(this);
+
+    m_motionLayout = new QVBoxLayout(ui->motionWidget);
+    m_motionLayout->setContentsMargins(0, 0, 0, 0);
     
     connect(ui->tabWidget,              SIGNAL(currentChanged(int)),            this,   SLOT(at_tabWidget_currentChanged()));
     at_tabWidget_currentChanged();
@@ -44,52 +49,6 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
 
 QnSingleCameraSettingsWidget::~QnSingleCameraSettingsWidget() {
     return;
-}
-
-void QnSingleCameraSettingsWidget::at_motionSensitivityChanged(int value)
-{
-    if(m_motionWidget)
-        m_motionWidget->setMotionSensitivity(value);
-}
-
-void QnSingleCameraSettingsWidget::at_motionTypeChanged()
-{
-    at_dataChanged();
-    if (m_camera && m_motionWidget)
-        m_motionWidget->setNeedControlMaxRects(!ui->softwareMotionButton->isChecked());
-    if (ui->softwareMotionButton->isChecked())
-    {
-        float maxFps = m_camera->getMaxFps()-2;
-        float currentMaxFps = ui->cameraScheduleWidget->getGridMaxFps();
-        if (currentMaxFps > maxFps)
-        {
-            QMessageBox::warning(this, tr("Too big fps"), 
-                tr("For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps dropped down to %2").arg(currentMaxFps).arg(maxFps));
-        }
-        ui->cameraScheduleWidget->setMaxFps(maxFps);
-    }
-    else {
-        ui->cameraScheduleWidget->setMaxFps(m_camera->getMaxFps());
-    }
-}
-
-void QnSingleCameraSettingsWidget::at_motionSelectionCleared()
-{
-    if (m_motionWidget)
-        m_motionWidget->clearMotion();
-}
-
-
-void QnSingleCameraSettingsWidget::at_linkActivated(const QString &urlString)
-{
-    QUrl url(urlString);
-
-    if (!m_readOnly) {
-        url.setUserName(ui->loginEdit->text());
-        url.setPassword(ui->passwordEdit->text());
-    }
-
-    QDesktopServices::openUrl(url);
 }
 
 const QnVirtualCameraResourcePtr &QnSingleCameraSettingsWidget::camera() const {
@@ -314,6 +273,62 @@ void QnSingleCameraSettingsWidget::setHasChanges(bool hasChanges) {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+void QnSingleCameraSettingsWidget::hideEvent(QHideEvent *event) {
+    base_type::hideEvent(event);
+
+    if(m_motionWidget) {
+        delete m_motionWidget;
+        m_motionWidget = NULL;
+    }
+}
+
+void QnSingleCameraSettingsWidget::showEvent(QShowEvent *event) {
+    base_type::showEvent(event);
+    
+    at_tabWidget_currentChanged(); /* Re-create motion widget if needed. */
+}
+
+void QnSingleCameraSettingsWidget::at_motionSensitivityChanged(int value) {
+    if(m_motionWidget)
+        m_motionWidget->setMotionSensitivity(value);
+}
+
+void QnSingleCameraSettingsWidget::at_motionTypeChanged() {
+    at_dataChanged();
+    if (m_camera && m_motionWidget)
+        m_motionWidget->setNeedControlMaxRects(!ui->softwareMotionButton->isChecked());
+    if (ui->softwareMotionButton->isChecked())
+    {
+        float maxFps = m_camera->getMaxFps()-2;
+        float currentMaxFps = ui->cameraScheduleWidget->getGridMaxFps();
+        if (currentMaxFps > maxFps)
+        {
+            QMessageBox::warning(this, tr("Too big fps"), 
+                tr("For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps dropped down to %2").arg(currentMaxFps).arg(maxFps));
+        }
+        ui->cameraScheduleWidget->setMaxFps(maxFps);
+    }
+    else {
+        ui->cameraScheduleWidget->setMaxFps(m_camera->getMaxFps());
+    }
+}
+
+void QnSingleCameraSettingsWidget::at_motionSelectionCleared() {
+    if (m_motionWidget)
+        m_motionWidget->clearMotion();
+}
+
+void QnSingleCameraSettingsWidget::at_linkActivated(const QString &urlString) {
+    QUrl url(urlString);
+
+    if (!m_readOnly) {
+        url.setUserName(ui->loginEdit->text());
+        url.setPassword(ui->passwordEdit->text());
+    }
+
+    QDesktopServices::openUrl(url);
+}
+
 void QnSingleCameraSettingsWidget::at_tabWidget_currentChanged() {
     if(m_motionWidget != NULL)
         return;
@@ -322,14 +337,12 @@ void QnSingleCameraSettingsWidget::at_tabWidget_currentChanged() {
         return;
 
     m_motionWidget = new QnCameraMotionMaskWidget(this);
-    setCamera(m_camera);
+    setCamera(m_camera); // TODO: find the one who wrote this line and use your mad swordsmanship skillz on him.
     
     using ::setReadOnly;
     setReadOnly(m_motionWidget, m_readOnly);
     
-    QVBoxLayout *layout = new QVBoxLayout(ui->motionWidget);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget(m_motionWidget);
+    m_motionLayout->addWidget(m_motionWidget);
 
     connect(m_motionWidget, SIGNAL(motionRegionListChanged()), this, SLOT(at_dataChanged()));
 }

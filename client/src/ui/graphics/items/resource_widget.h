@@ -9,14 +9,15 @@
 
 #include <camera/render_status.h>
 #include <core/resource/motion_window.h>
+#include <core/resource/resource_consumer.h>
+#include <core/datapacket/mediadatapacket.h> /* For QnMetaDataV1Ptr. */
 
 #include <ui/common/constrained_resizable.h>
 #include <ui/common/geometry.h>
 #include <ui/common/frame_section_queryable.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/graphics/instruments/instrumented.h>
-#include <core/resource/resource_consumer.h>
-#include <core/datapacket/mediadatapacket.h> /* For QnMetaDataV1Ptr. */
+#include <ui/graphics/items/standard/graphics_widget.h>
 
 #include "polygonal_shadow_item.h"
 
@@ -42,7 +43,7 @@ class Instrument;
 #   undef NO_DATA
 #endif
 
-class QnResourceWidget: public Instrumented<QGraphicsWidget>, public QnWorkbenchContextAware, public QnPolygonalShapeProvider, public ConstrainedResizable, public FrameSectionQuearyable, protected QnGeometry {
+class QnResourceWidget: public Instrumented<GraphicsWidget>, public QnWorkbenchContextAware, public QnPolygonalShapeProvider, public ConstrainedResizable, public FrameSectionQuearyable, protected QnGeometry {
     Q_OBJECT;
     Q_PROPERTY(qreal frameOpacity READ frameOpacity WRITE setFrameOpacity);
     Q_PROPERTY(qreal frameWidth READ frameWidth WRITE setFrameWidth);
@@ -51,7 +52,7 @@ class QnResourceWidget: public Instrumented<QGraphicsWidget>, public QnWorkbench
     Q_PROPERTY(qreal enclosingAspectRatio READ enclosingAspectRatio WRITE setEnclosingAspectRatio);
     Q_FLAGS(DisplayFlags DisplayFlag);
 
-    typedef Instrumented<QGraphicsWidget> base_type;
+    typedef Instrumented<GraphicsWidget> base_type;
 
 public:
     enum DisplayFlag {

@@ -1,14 +1,18 @@
 #ifndef QN_WORKBENCH_UI_H
 #define QN_WORKBENCH_UI_H
 
-#include <QObject>
+#include <QtCore/QObject>
+
 #include <core/resource/resource_fwd.h>
+
 #include <ui/common/geometry.h>
 #include <ui/actions/action_target_provider.h>
+
 #include "workbench_globals.h"
 #include "workbench_context_aware.h"
 
 class QGraphicsProxyWidget;
+class QGraphicsWidget;
 
 class CLVideoCamera;
 
@@ -148,6 +152,7 @@ protected:
     void updateTreeGeometry();
     void updateHelpGeometry();
     void updateFpsGeometry();
+    void updateSliderResizerGeometry();
 
     QRectF updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
     QRectF updatedHelpGeometry(const QRectF &helpGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
@@ -183,6 +188,7 @@ protected slots:
     void at_controlsWidget_geometryChanged();
 
     void at_sliderItem_geometryChanged();
+    void at_sliderResizerItem_geometryChanged();
     void at_sliderShowButton_toggled(bool checked);
 
     void at_treeWidget_activated(const QnResourcePtr &resource);
@@ -267,6 +273,10 @@ private:
     /** Navigation item. */
     QnNavigationItem *m_sliderItem;
 
+    QGraphicsWidget *m_sliderResizerItem;
+
+    bool m_ignoreSliderResizerGeometryChanges;
+
     /** Hover processor that is used to change slider opacity when mouse is hovered over it. */
     HoverFocusProcessor *m_sliderOpacityProcessor;
 
@@ -276,6 +286,7 @@ private:
     QnImageButtonWidget *m_sliderShowButton;
 
     AnimatorGroup *m_sliderOpacityAnimatorGroup;
+
 
 
     /* Tree-related state. */
@@ -314,6 +325,7 @@ private:
     VariantAnimator *m_treeXAnimator;
 
 
+
     /* Title-related state. */
 
     /** Title bar widget. */
@@ -336,6 +348,7 @@ private:
     VariantAnimator *m_titleYAnimator;
 
     HoverFocusProcessor *m_titleOpacityProcessor;
+
 
 
     /* Help window-related state. */

@@ -22,7 +22,7 @@ Q_GLOBAL_STATIC(Manufactures, manufactures)
 
 void CLDeviceSettingsDlgFactory::initialize()
 {
-    CLDeviceSettingsDlgFactory::registerDlgManufacture(new DefaultDlgManufacture);
+    CLDeviceSettingsDlgFactory::registerDlgManufacture(new DefaultDlgManufacture); // TODO: leaking allocated objects
     CLDeviceSettingsDlgFactory::registerDlgManufacture(new AreconVisionDlgManufacture);
 }
 

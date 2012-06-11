@@ -17,14 +17,6 @@ public:
         m_effectiveDistance = effectiveDistance;
     }
 
-    bool isEffective() const {
-        return m_effective;
-    }
-
-    void setEffective(bool effective) {
-        m_effective = effective;
-    }
-
 protected:
     virtual bool registeredNotify(QGraphicsItem *item) override;
     virtual void unregisteredNotify(QGraphicsItem *item) override;
@@ -34,7 +26,6 @@ protected:
 
 private:
     qreal m_effectiveDistance;
-    bool m_effective;
     QHash<QGraphicsItem *, FrameSectionQuearyable *> m_queryableByItem;
 };
 

@@ -41,12 +41,12 @@ private:
 DropInstrument::DropInstrument(bool intoNewLayout, QnWorkbenchContext *context, QObject *parent):
     Instrument(Item, makeSet(/* No events here, we'll receive them from the surface item. */), parent),
     m_context(context),
-    m_intoNewLayout(intoNewLayout)
+    m_intoNewLayout(intoNewLayout),
+    m_filterItem(new SceneEventFilterItem())
 {
     if(context == NULL)
         qnNullWarning(context);
 
-    m_filterItem = new SceneEventFilterItem();
     m_filterItem->setEventFilter(this);
 }
 
@@ -56,7 +56,7 @@ QGraphicsObject *DropInstrument::surface() const {
 
 void DropInstrument::setSurface(QGraphicsObject *surface) {
     if(this->surface()) {
-        this->surface()->removeSceneEventFilter(m_filterItem);
+        this->surface()->removeSceneEventFilter(filterItem());
 
         if(this->surface()->parent() == this)
             delete this->surface();
@@ -66,13 +66,13 @@ void DropInstrument::setSurface(QGraphicsObject *surface) {
 
     if(this->surface()) {
         this->surface()->setAcceptDrops(true);
-        this->surface()->installSceneEventFilter(m_filterItem);
+        this->surface()->installSceneEventFilter(filterItem());
     }
 }
 
 void DropInstrument::installedNotify() {
     DestructionGuardItem *guard = new DestructionGuardItem();
-    guard->setGuarded(m_filterItem);
+    guard->setGuarded(filterItem());
     guard->setPos(0.0, 0.0);
     scene()->addItem(guard);
 

@@ -33,9 +33,6 @@ public:
     static QMargins cwiseSub(const QMargins &l, const QMargins &r);
     static QMargins cwiseAdd(const QMargins &l, const QMargins &r);
 
-    static QRectF resizeRect(const QRectF &rect, const QSizeF &size, Qt::WindowFrameSection resizeGrip);
-    static QRect resizeRect(const QRect &rect, const QSize &size, Qt::WindowFrameSection resizeGrip);
-
     /**
      * \param margins                   Margins.
      * \returns                         Amount by which the size of some rectangle 
@@ -220,6 +217,15 @@ public:
     static QRectF dilated(const QRectF &rect, const MarginsF &amount);
 
     /**
+     * Dilates the given rectangle by the given amount.
+     * 
+     * \param rect                      Rectangle to dilate.
+     * \param amount                    Dilation amount.
+     * \returns                         Dilated rectangle.
+     */
+    static QRectF dilated(const QRectF &rect, qreal amount);
+
+    /**
      * Dilates the given size by the given amount.
      * 
      * \param size                      Size to dilate.
@@ -236,6 +242,15 @@ public:
      * \returns                         Eroded rectangle.
      */
     static QRectF eroded(const QRectF &rect, const MarginsF &amount);
+
+    /**
+     * Erodes the given rectangle by the given amount.
+     * 
+     * \param rect                      Rectangle to erode.
+     * \param amount                    Erosion amount.
+     * \returns                         Eroded rectangle.
+     */
+    static QRectF eroded(const QRectF &rect, qreal amount);
 
     /**
      * Erodes the given rectangle by the given amount.

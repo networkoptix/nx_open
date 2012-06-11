@@ -34,7 +34,6 @@
 #include <utils/common/checked_cast.h>
 #include "instrument_manager.h"
 
-
 Instrument::Instrument(const EventTypeSet &viewportEventTypes, const EventTypeSet &viewEventTypes, const EventTypeSet &sceneEventTypes, const EventTypeSet &itemEventTypes, QObject *parent):
     QObject(parent),
     m_animationTimer(NULL)
@@ -69,6 +68,8 @@ void Instrument::initialize() {
 
 Instrument::~Instrument() {
     ensureUninstalled();
+
+    setItemConditions(QList<InstrumentItemCondition *>());
 }
 
 bool Instrument::watches(WatchedType type) const {
@@ -92,6 +93,53 @@ const Instrument::EventTypeSet &Instrument::watchedEventTypes(WatchedType type) 
     }
 
     return m_watchedEventTypes[type];
+}
+
+void Instrument::setItemConditions(const QList<InstrumentItemCondition *> &itemConditions) {
+    if(isInstalled()) {
+        qnWarning("Cannot change item conditions of an installed instrument.");
+        m_ownedItemConditions.unite(itemConditions.toSet()); /* We must claim ownership. */
+        return;
+    }
+
+    qDeleteAll(m_ownedItemConditions);
+    m_ownedItemConditions = itemConditions.toSet();
+    m_itemConditions = itemConditions;
+}
+
+void Instrument::addItemCondition(InstrumentItemCondition *itemCondition) {
+    if(!itemCondition) {
+        qnNullWarning(itemCondition);
+        return;
+    }
+
+    if(isInstalled()) {
+        qnWarning("Cannot change item conditions of an installed instrument.");
+        m_ownedItemConditions.insert(itemCondition); /* We must claim ownership. */
+        return;
+    }
+
+    if(m_itemConditions.contains(itemCondition))
+        return; /* Re-registration is allowed. */
+ 
+    m_ownedItemConditions.insert(itemCondition);
+    m_itemConditions.push_back(itemCondition);
+}
+
+void Instrument::removeItemCondition(InstrumentItemCondition *itemCondition) {
+    if(!itemCondition) {
+        qnNullWarning(itemCondition);
+        return;
+    }
+
+    if(isInstalled()) {
+        qnWarning("Cannot change item conditions of an installed instrument.");
+        m_ownedItemConditions.remove(itemCondition); /* But we must release ownership nevertheless. */
+        return;
+    }
+
+    m_ownedItemConditions.remove(itemCondition);
+    m_itemConditions.removeAll(itemCondition);
 }
 
 void Instrument::ensureUninstalled() {

@@ -39,11 +39,15 @@ protected:
         return m_guard.data();
     }
 
+    SceneEventFilterItem *filterItem() const {
+        return m_filterItem.data();
+    }
+
 private:
     QnResourceList m_resources;
     
     QWeakPointer<QnWorkbenchContext> m_context;
-    SceneEventFilterItem *m_filterItem;
+    QScopedPointer<SceneEventFilterItem> m_filterItem;
     QWeakPointer<DestructionGuardItem> m_guard;
     QWeakPointer<QGraphicsObject> m_surface;
     bool m_intoNewLayout;

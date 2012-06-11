@@ -76,10 +76,10 @@ CONFIG(release, debug|release) {
 
 CONFIG(debug, debug|release) {
   INCLUDEPATH += $$FFMPEG-debug/include
-  LIBS += -L$$FFMPEG-debug/bin -L$$FFMPEG-debug/lib -L$$PWD/../../common/bin/debug -lcommon -L$$EVETOOLS_DIR/lib/debug
+  LIBS += -L$$FFMPEG-debug/bin -L$$FFMPEG-debug/lib -L$$PWD/../../common/bin/debug -lcommon
 
   win32 {
-    LIBS += -L../../common/contrib/qjson/lib/win32/debug 
+    LIBS += -L../../common/contrib/qjson/lib/win32/debug -L$$EVETOOLS_DIR/lib/debug
   }
 
   unix {
@@ -89,15 +89,19 @@ CONFIG(debug, debug|release) {
 }
 CONFIG(release, debug|release) {
   INCLUDEPATH += $$FFMPEG-release/include
-  LIBS += -L$$FFMPEG-release/bin -L$$FFMPEG-release/lib -L$$PWD/../../common/bin/release -lcommon -L$$EVETOOLS_DIR/lib/release
+  LIBS += -L$$FFMPEG-release/bin -L$$FFMPEG-release/lib -L$$PWD/../../common/bin/release -lcommon
 
   win32 {
-    LIBS += -L../../common/contrib/qjson/lib/win32/release 
+    LIBS += -L../../common/contrib/qjson/lib/win32/release -L$$EVETOOLS_DIR/lib/release
   }
 
   unix {
     LIBS += -L/usr/lib/release
   }
+}
+
+unix {
+    LIBS += -L$$EVETOOLS_DIR/lib
 }
 
 QMAKE_CXXFLAGS += -I$$EVETOOLS_DIR/include
@@ -161,12 +165,16 @@ DEFINES += __STDC_CONSTANT_MACROS
 
 unix {
   LIBS += -L/usr/lib -lz -lcrypto -lssl
-  QMAKE_CXXFLAGS += -msse2
   DEFINES += QN_EXPORT=
 }
 
+unix:!mac {
+  QMAKE_CXXFLAGS += -msse2
+}
+
 mac {
-  LIBS += -lbz2 -framework IOKit -framework CoreServices
+  QMAKE_CXXFLAGS += -msse4.1
+  LIBS += -lbz2 -framework IOKit -framework CoreFoundation -framework CoreServices
 }
 
 INCLUDEPATH += $$PWD

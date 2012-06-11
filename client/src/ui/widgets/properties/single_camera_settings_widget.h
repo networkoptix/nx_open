@@ -9,11 +9,15 @@ namespace Ui {
     class SingleCameraSettingsWidget;
 }
 
+class QVBoxLayout;
+
 class QnCameraMotionMaskWidget;
 
 class QnSingleCameraSettingsWidget : public QWidget {
     Q_OBJECT;
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly);
+
+    typedef QWidget base_type;
 
 public:
     explicit QnSingleCameraSettingsWidget(QWidget *parent = NULL);
@@ -42,6 +46,10 @@ signals:
     void hasChangesChanged();
     void moreLicensesRequested();
 
+protected:
+    virtual void showEvent(QShowEvent *event) override;
+    virtual void hideEvent(QHideEvent *event) override;
+
 private slots:
     void at_tabWidget_currentChanged();
     void at_dataChanged();
@@ -50,9 +58,11 @@ private slots:
     void at_motionTypeChanged();
     void at_motionSensitivityChanged(int value);
     void at_motionSelectionCleared();
+
 private:
     void setHasChanges(bool hasChanges);
     void updateMaxMotionRect();
+
 private:
     Q_DISABLE_COPY(QnSingleCameraSettingsWidget);
 
@@ -63,6 +73,7 @@ private:
     bool m_readOnly;
 
     QnCameraMotionMaskWidget *m_motionWidget;
+    QVBoxLayout *m_motionLayout;
 };
 
 #endif // CAMERA_SETTINGS_DIALOG_H

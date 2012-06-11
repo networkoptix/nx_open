@@ -1,7 +1,8 @@
 #ifndef QN_HOVER_FOCUS_PROCESSOR_H
 #define QN_HOVER_FOCUS_PROCESSOR_H
 
-#include <QGraphicsObject>
+#include <QtGui/QGraphicsObject>
+
 #include <ui/common/weak_graphics_item_pointer.h>
 
 /**
@@ -132,7 +133,7 @@ private:
     int m_focusLeaveTimerId;
     bool m_hovered;
     bool m_focused;
-    QList<WeakGraphicsItemPointer> m_items;
+    WeakGraphicsItemPointerList m_items;
 };
 
 
