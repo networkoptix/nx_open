@@ -244,8 +244,13 @@ begin_label:
         m_lastPacketTime = data->timestamp;
 
         if (m_skipFramesToTime) {
-            if (data->timestamp < m_skipFramesToTime)
+            if (data->timestamp < m_skipFramesToTime) 
+            {
+                if (data->dataType == QnAbstractMediaData::AUDIO)
+                    goto begin_label; // skip data
                 data->flags |= QnAbstractMediaData::MediaFlags_Ignore;
+                data->timestamp = m_skipFramesToTime;
+            }
             else
                 m_skipFramesToTime = 0;
         }
