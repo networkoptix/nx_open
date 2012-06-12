@@ -2,16 +2,17 @@
 #define isd_device_server_h_1936
 
 #include "core/resourcemanagment/resource_searcher.h"
-#include "../onvif/onvif_device_searcher.h"
+#include "../onvif_old/onvif_device_searcher.h"
 
-class QnPlISDResourceSearcher : public OnvifResourceSearcher
+class QnPlISDResourceSearcher : public OnvifResourceSearcherOld
 {
     QnPlISDResourceSearcher();
 
 public:
     static QnPlISDResourceSearcher& instance();
 
-    QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
+    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
+
     // return the manufacture of the server
     virtual QString manufacture() const;
 

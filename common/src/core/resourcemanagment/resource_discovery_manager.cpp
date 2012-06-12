@@ -155,7 +155,7 @@ void QnResourceDiscoveryManager::run()
             m_resourceProcessor->processResources(result);
         }
 
-        int global_delay_between_search = 1000;
+        int global_delay_between_search = 60000;
         smartSleep(global_delay_between_search);
         ++m_runNumber;
     }

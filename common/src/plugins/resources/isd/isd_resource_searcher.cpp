@@ -76,25 +76,25 @@ QnNetworkResourcePtr QnPlISDResourceSearcher::processPacket(QnResourceList& resu
 
     //name = responseData.mid();
     name = "ISDcam";
-/*
-    for (int i = iqpos; i < macpos; i++)
-    {
-        name += QLatin1Char(responseData[i]);
-    }
-*/
+//
+//    for (int i = iqpos; i < macpos; i++)
+//    {
+//        name += QLatin1Char(responseData[i]);
+//    }
+//
     name.replace(QString(" "), QString()); // remove spaces
     name.replace(QString("-"), QString()); // remove spaces
     name.replace(QString("\t"), QString()); // remove tabs
 
     //macpos++; // -
-/*
-    while(responseData.at(macpos)==' ')
-        ++macpos;
-
-
-    if (macpos+12 > responseData.size())
-        return QnNetworkResourcePtr(0);
-*/
+//
+//    while(responseData.at(macpos)==' ')
+//        ++macpos;
+//
+//
+//    if (macpos+12 > responseData.size())
+//        return QnNetworkResourcePtr(0);
+//
 
 
     for (int i = 0; i < 12; i++)
@@ -113,7 +113,7 @@ QnNetworkResourcePtr QnPlISDResourceSearcher::processPacket(QnResourceList& resu
     foreach(QnResourcePtr res, result)
     {
         QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
-
+    
         if (net_res->getMAC().toString() == smac)
             return QnNetworkResourcePtr(0); // already found;
     }
