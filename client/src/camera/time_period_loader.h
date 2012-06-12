@@ -82,16 +82,27 @@ private:
     struct LoadingInfo 
     {
         LoadingInfo(const QnTimePeriod &period, int handle): period(period), handle(handle) {}
+
+        /** Period for which chunks are being loaded. */
         QnTimePeriod period;
+
+        /** Real loading handle, provided by the server connection object. */
         int handle;
+
+        /** List of local (fake) handles for requests to this time period loader
+         * that are waiting for the same time period to be loaded. */
         QList<int> waitingHandles;
     };
 
+    /** Thread safety. */
     mutable QMutex m_mutex;
+
+    /** Video server connection that this loader uses. */
     QnVideoServerConnectionPtr m_connection;
+
+    /** Network resource that this loader gets chunks for. */
     QnNetworkResourcePtr m_resource;
 
-    bool m_mergePeriods;
     QnTimePeriodList m_loadedPeriods;
     QList<LoadingInfo> m_loading;
 
