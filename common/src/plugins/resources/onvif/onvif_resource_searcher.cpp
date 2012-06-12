@@ -46,8 +46,8 @@ QnResourceList OnvifResourceSearcher::findResources()
 {
     QnResourceList result;
 
-    //Order is important! mdns shuold be the first to avoid creating ONVIF resource, when special is expected
-    mdnsSearcher.findResources(result, specialResourceCreator);
+    //Order is important! mdns should be the first to avoid creating ONVIF resource, when special is expected
+    //mdnsSearcher.findResources(result, specialResourceCreator);
     wsddSearcher.findResources(result, specialResourceCreator);
 
     return result;
@@ -58,14 +58,13 @@ QnResourcePtr OnvifResourceSearcher::createResource(QnId resourceTypeId, const Q
     QnResourcePtr result;
 
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
-
     if (resourceType.isNull())
     {
         qDebug() << "OnvifResourceSearcher::createResource: no resource type for ID = " << resourceTypeId;
         return result;
     }
 
-    result = specialResourceCreator->createById(resourceType, parameters);
+    result = specialResourceCreator.isNull()? result: specialResourceCreator->createById(resourceType, parameters);
     if (!result.isNull()) {
         return result;
     }

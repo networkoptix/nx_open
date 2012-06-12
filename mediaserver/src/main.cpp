@@ -578,7 +578,7 @@ void QnMain::run()
     specialResourcesPtr->add(&QnPlAxisResourceSearcher::instance());
     specialResourcesPtr->add(&QnPlIqResourceSearcher::instance());
     specialResourcesPtr->add(&QnPlISDResourceSearcher::instance());
-    OnvifResourceSearcher::instance().init(specialResourcesPtr);
+    //OnvifResourceSearcher::instance().init(specialResourcesPtr);
     QnResourceDiscoveryManager::instance().addDeviceServer(&OnvifResourceSearcher::instance());
 
     //
