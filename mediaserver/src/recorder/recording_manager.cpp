@@ -221,7 +221,8 @@ void QnRecordingManager::updateCamera(QnSecurityCamResourcePtr res)
         if (itrRec != m_recordMap.end())
         {
             const Recorders& recorders = itrRec.value();
-            recorders.recorderHiRes->updateCamera(res);
+            if (recorders.recorderHiRes)
+                recorders.recorderHiRes->updateCamera(res);
             if (recorders.recorderLowRes)
                 recorders.recorderLowRes->updateCamera(res);
 
@@ -231,13 +232,20 @@ void QnRecordingManager::updateCamera(QnSecurityCamResourcePtr res)
         {
             QnServerStreamRecorder* recorderHiRes = createRecorder(res, camera, QnResource::Role_LiveVideo);
             QnServerStreamRecorder* recorderLowRes = createRecorder(res, camera, QnResource::Role_SecondaryLiveVideo);
+
+            if (!recorderHiRes && !recorderLowRes)
+                return;
+            
             QnDualStreamingHelperPtr dialStreamingHelper(new QnDualStreamingHelper());
-            recorderHiRes->setDualStreamingHelper(dialStreamingHelper);
-            recorderLowRes->setDualStreamingHelper(dialStreamingHelper);
+			if (recorderHiRes)
+				recorderHiRes->setDualStreamingHelper(dialStreamingHelper);
+			if (recorderLowRes)
+				recorderLowRes->setDualStreamingHelper(dialStreamingHelper);
 
             m_recordMap.insert(res, Recorders(recorderHiRes, recorderLowRes));
 
-            recorderHiRes->updateCamera(cameraRes);
+            if (recorderHiRes)
+                recorderHiRes->updateCamera(cameraRes);
             if (recorderLowRes)
                 recorderLowRes->updateCamera(cameraRes);
 
@@ -246,10 +254,21 @@ void QnRecordingManager::updateCamera(QnSecurityCamResourcePtr res)
     }
 }
 
+void QnRecordingManager::at_cameraStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus)
+{
+    if (oldStatus == QnResource::Offline && newStatus == QnResource::Online)
+    {
+        QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource> (dynamic_cast<QnSecurityCamResource*>(sender())->toSharedPointer());
+        if (camera)
+            updateCamera(camera);
+    }
+}
+
 void QnRecordingManager::onNewResource(QnResourcePtr res)
 {
     QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource>(res);
     if (camera) {
+        connect(camera.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(at_cameraStatusChanged(QnResource::Status, QnResource::Status)));
         updateCamera(camera);
         return;
     }
@@ -299,7 +318,12 @@ void QnRecordingManager::onTimer()
     {
         QnVideoCamera* camera = qnCameraPool->getVideoCamera(itrRec.key());
         const Recorders& recorders = itrRec.value();
-        recorders.recorderHiRes->updateScheduleInfo(time);
+
+        if (!recorders.recorderHiRes && !recorders.recorderLowRes)
+            return; // no recorders are created now
+
+        if (recorders.recorderHiRes)
+            recorders.recorderHiRes->updateScheduleInfo(time);
         if (recorders.recorderLowRes)
             recorders.recorderLowRes->updateScheduleInfo(time);
         startOrStopRecording(itrRec.key(), camera, recorders.recorderHiRes, recorders.recorderLowRes);

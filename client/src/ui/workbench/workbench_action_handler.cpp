@@ -1383,7 +1383,7 @@ void QnWorkbenchActionHandler::at_exportLayoutAction_triggered()
             this->widget(), 
             tr("Export Layout As..."),
             previousDir + QDir::separator() + suggestion,
-            tr("Layout media file (*.lyt)"),
+            tr("Layout media file (*.layout)"),
             &selectedFilter,
             QFileDialog::DontUseNativeDialog
             );
@@ -1392,7 +1392,7 @@ void QnWorkbenchActionHandler::at_exportLayoutAction_triggered()
         if (fileName.isEmpty())
             return;
 
-        if (!fileName.toLower().endsWith(QLatin1String(".lyt"))) {
+        if (!fileName.toLower().endsWith(QLatin1String(".layout"))) {
             fileName += QChar('.') + selectedExtension;
 
             if (QFile::exists(fileName)) {

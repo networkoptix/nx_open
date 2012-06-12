@@ -351,6 +351,7 @@ void QnCameraScheduleWidget::updateGridParams(bool fromUserInput)
             ui->gridWidget->setDefaultParam(QnScheduleGridWidget::SecondParam, getShortText(ui->qualityComboBox->currentText()));
         }
     }
+    emit gridParamsChanged();
 }
 
 void QnCameraScheduleWidget::setMaxFps(int value)
@@ -479,3 +480,7 @@ void QnCameraScheduleWidget::at_licensesButton_clicked()
     emit moreLicensesRequested();
 }
 
+bool QnCameraScheduleWidget::isSecondaryStreamReserver() const
+{
+    return ui->recordMotionPlusLQButton->isChecked();
+}
