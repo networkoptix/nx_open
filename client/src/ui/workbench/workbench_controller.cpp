@@ -426,9 +426,6 @@ void QnWorkbenchController::moveCursor(const QPoint &direction) {
     QPoint upos = m_cursorPos;
     QnWorkbenchItem *item = workbench()->currentLayout()->item(upos);
 
-    if(item && !item->geometry().contains(upos))
-        upos = item->geometry().topLeft();
-
     QRect boundingRect = workbench()->currentLayout()->boundingRect();
     if(boundingRect.isEmpty())
         return;
@@ -1086,18 +1083,12 @@ void QnWorkbenchController::at_display_widgetChanged(Qn::ItemRole role) {
         newWidget->setFocus();
 
     switch(role) {
-    case Qn::ZoomedRole: {
+    case Qn::ZoomedRole:
         m_zoomedToggle->setActive(newWidget != NULL);
-
-        if(newWidget == NULL) { /* Un-raise on un-zoom. */
-            workbench()->setItem(Qn::RaisedRole, NULL);
-        } else {
-            m_cursorPos = newWidget->item()->geometry().topLeft();
-        }
         break;
-    }
     case Qn::RaisedRole:
-        if(newWidget != NULL)
+    case Qn::CentralRole:
+        if(newWidget)
             m_cursorPos = newWidget->item()->geometry().topLeft();
         break;
     default:
@@ -1196,3 +1187,5 @@ void QnWorkbenchController::at_recordingAction_triggered(bool checked) {
 void QnWorkbenchController::at_fitInViewAction_triggered() {
     display()->fitInView();
 }
+
+
