@@ -393,8 +393,8 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
         m_mutex.unlock();
         return false;
     }
+    param.setDomain(domain);
 
-    
     QVariant oldValue = param.value();
     m_mutex.unlock();
 
@@ -407,6 +407,7 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
     //QnDomainMemory should changed anyway
     {
         QMutexLocker locker(&m_mutex); // block paramList changing
+        m_resourceParamList[name].setDomain(domain);
         if (!m_resourceParamList[name].setValue(val))
         {
             cl_log.log("cannot set such param!", cl_logWARNING);

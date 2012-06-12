@@ -33,6 +33,8 @@ public:
     static QMargins cwiseSub(const QMargins &l, const QMargins &r);
     static QMargins cwiseAdd(const QMargins &l, const QMargins &r);
 
+    static int dot(const QPoint &l, const QPoint &r);
+
     /**
      * \param margins                   Margins.
      * \returns                         Amount by which the size of some rectangle 

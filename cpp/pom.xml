@@ -18,7 +18,7 @@
 		<assembly-skip>false</assembly-skip>
 		<convert-only>true</convert-only>
 		<ffmpeg.version>2012-04-10-N-39672-g40b7a27</ffmpeg.version>
-		<openssl.version>1.0.0e</openssl.version>
+		<openssl.version>1.0.0j</openssl.version>
 		<buildLib/>
 		<qtlib1/>
 		<qtlib2/>
@@ -136,23 +136,23 @@
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}CONFIG(debug, debug|release) {</echo>
 								<pathconvert pathsep="${line.separator}" property="linux_debug_libs" refid="linux_debug_libs_path">
 									<map from="${project.build.directory}/build/bin/debug/lib" to="     LIBS += -l"/>									
-									<regexpmapper from="^(.*)\.so$$" to="\1"/>
+									<regexpmapper from="^(.*)\.(.*)$$" to="\1"/>
 								</pathconvert>								
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${linux_debug_libs}${line.separator}}</echo>
 
 								<fileset id="linux_release_libs_path" dir="${project.build.directory}/build/bin/release" erroronmissingdir="false">
 									<include name="**/*.so" />
+									<include name="**/*.a" />									
 								</fileset>
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}CONFIG(release, debug|release) {</echo>
 								<pathconvert pathsep="${line.separator}" property="linux_release_libs" refid="linux_release_libs_path">
 									<map from="${project.build.directory}/build/bin/release/lib" to="    LIBS += -l"/>									
-									<regexpmapper from="^(.*)\.so$$" to="\1"/>
+									<regexpmapper from="^(.*)\.(.*)$$" to="\1"/>
 								</pathconvert>								
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${linux_release_libs}${line.separator}}</echo>
 
 								<fileset id="headers_path" dir="${project.build.sourceDirectory}" erroronmissingdir="false">
 									<include name="**/*.h" />
-									<!-- <exclude name="**/*dxva*/**" /> -->
 								</fileset>
 								<pathconvert pathsep="${line.separator}" property="headers" refid="headers_path">
 									<map from="" to="HEADERS += "/>

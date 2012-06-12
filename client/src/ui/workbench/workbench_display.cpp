@@ -1181,19 +1181,18 @@ void QnWorkbenchDisplay::at_workbench_itemRemoved(QnWorkbenchItem *item) {
 }
 
 void QnWorkbenchDisplay::at_workbench_itemChanged(Qn::ItemRole role, QnWorkbenchItem *item) {
-    if(item == m_itemByRole[role])
-        return;
-
     QnWorkbenchItem *oldItem = m_itemByRole[role];
     QnWorkbenchItem *newItem = item;
+    if(oldItem == newItem)
+        return;
+
     m_itemByRole[role] = newItem;
 
-    /* Sync geometry. */
     switch(role) {
     case Qn::RaisedRole: {
-        /* Sync new & old items. */
+        /* Sync new & old geometry. */
         if(oldItem != NULL)
-            synchronize(oldItem);
+            synchronize(oldItem, true);
 
         if(newItem != NULL) {
             bringToFront(newItem);
@@ -1203,6 +1202,7 @@ void QnWorkbenchDisplay::at_workbench_itemChanged(Qn::ItemRole role, QnWorkbench
         break;
     }
     case Qn::ZoomedRole: {
+        /* Sync new & old items. */
         if(oldItem != NULL) {
             synchronize(oldItem, true);
 
@@ -1220,8 +1220,33 @@ void QnWorkbenchDisplay::at_workbench_itemChanged(Qn::ItemRole role, QnWorkbench
             m_viewportAnimator->moveTo(fitInViewGeometry());
         }
 
+        /* Sync scene geometry. */
         synchronizeSceneBounds();
         synchronizeSceneBoundsExtension();
+
+        /* Un-raise on un-zoom. */
+        if(newItem == NULL)
+            workbench()->setItem(Qn::RaisedRole, NULL);
+
+        /* Update media quality. */
+        if(QnResourceWidget *oldWidget = this->widget(oldItem))
+            if (oldWidget->display()->archiveReader())
+                oldWidget->display()->archiveReader()->enableQualityChange();
+        if(QnResourceWidget *newWidget = this->widget(newItem)) {
+            if (newWidget->display()->archiveReader()) {
+                newWidget->display()->archiveReader()->setQuality(MEDIA_Quality_High, true);
+                newWidget->display()->archiveReader()->disableQualityChange();
+            }
+        }
+
+        /* Hide / show other items when zoomed. */
+        if(newItem)
+            opacityAnimator(widget(newItem))->animateTo(1.0);
+        qreal opacity = newItem ? 0.0 : 1.0;
+        foreach(QnResourceWidget *widget, m_widgetByRenderer)
+            if(widget->item() != newItem)
+                opacityAnimator(widget)->animateTo(opacity);
+
         break;
     }
     case Qn::CentralRole: {
@@ -1233,6 +1258,7 @@ void QnWorkbenchDisplay::at_workbench_itemChanged(Qn::ItemRole role, QnWorkbench
         CLCamDisplay *newCamDisplay = camDisplay(newItem);
         if(newCamDisplay != NULL)
             newCamDisplay->playAudio(true);
+
         break;
     }
     default:
@@ -1240,40 +1266,11 @@ void QnWorkbenchDisplay::at_workbench_itemChanged(Qn::ItemRole role, QnWorkbench
         return;
     }
 
-    /* Update media quality. */
-    if(role == Qn::ZoomedRole) {
-        if(QnResourceWidget *oldWidget = this->widget(oldItem)) {
-            if (oldWidget->display()->archiveReader()) {
-                //oldWidget->display()->archiveReader()->setQuality(MEDIA_Quality_Low);
-            	oldWidget->display()->archiveReader()->enableQualityChange();
-            }
-        }
-        if(QnResourceWidget *newWidget = this->widget(newItem)) {
-            if (newWidget->display()->archiveReader()) {
-            	newWidget->display()->archiveReader()->setQuality(MEDIA_Quality_High, true);
-            	newWidget->display()->archiveReader()->disableQualityChange();
-			}
-        }
-    }
-
-    /* Hide / show other items when zoomed. */
-    if(role == Qn::ZoomedRole) {
-        QnWorkbenchItem *zoomedItem = m_itemByRole[Qn::ZoomedRole];
-        if(zoomedItem)
-            opacityAnimator(widget(zoomedItem))->animateTo(1.0);
-        qreal opacity = zoomedItem ? 0.0 : 1.0;
-
-        foreach(QnResourceWidget *widget, m_widgetByRenderer)
-            if(widget->item() != zoomedItem)
-                opacityAnimator(widget)->animateTo(opacity);
-    }
-
     /* Update margin flags. */
     updateCurrentMarginFlags();
 
     emit widgetChanged(role);
 }
-
 
 void QnWorkbenchDisplay::at_workbench_itemChanged(Qn::ItemRole role) {
     at_workbench_itemChanged(role, workbench()->item(role));
@@ -1367,7 +1364,7 @@ void QnWorkbenchDisplay::at_scene_selectionChanged() {
         QGraphicsItem *item = selection.front();
         QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
 
-        workbench()->setItem(Qn::SingleSelectedRole, widget->item());
+        workbench()->setItem(Qn::SingleSelectedRole, widget ? widget->item() : NULL);
     } else {
         workbench()->setItem(Qn::SingleSelectedRole, NULL);
     }

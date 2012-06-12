@@ -111,6 +111,10 @@ QMargins QnGeometry::cwiseAdd(const QMargins &l, const QMargins &r) {
     );
 }
 
+int QnGeometry::dot(const QPoint &l, const QPoint &r) {
+    return l.x() * r.x() + l.y() * r.y();
+}
+
 QSizeF QnGeometry::sizeDelta(const MarginsF &margins) {
     return QSizeF(margins.left() + margins.right(), margins.top() + margins.bottom());
 }

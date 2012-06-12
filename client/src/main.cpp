@@ -54,7 +54,7 @@
 #include "plugins/resources/iqinvision/iqinvision_resource_searcher.h"
 #include "plugins/resources/droid_ipwebcam/ipwebcam_droid_resource_searcher.h"
 #include "plugins/resources/isd/isd_resource_searcher.h"
-#include "plugins/resources/onvif/onvif_ws_searcher.h"
+//#include "plugins/resources/onvif/onvif_ws_searcher.h"
 #include "utils/network/socket.h"
 #include <openssl/evp.h>
 

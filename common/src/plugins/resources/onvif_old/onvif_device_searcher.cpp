@@ -45,24 +45,24 @@ bool multicastLeaveGroup(QUdpSocket& udpSocket, QHostAddress groupAddress)
 
 
 
-OnvifResourceSearcher::OnvifResourceSearcher()
+OnvifResourceSearcherOld::OnvifResourceSearcherOld()
 {
 
 }
 
-OnvifResourceSearcher::~OnvifResourceSearcher()
+OnvifResourceSearcherOld::~OnvifResourceSearcherOld()
 {
 
 };
 
 
-bool OnvifResourceSearcher::isProxy() const
+bool OnvifResourceSearcherOld::isProxy() const
 {
     return false;
 }
 
 
-QnResourceList OnvifResourceSearcher::findResources()
+QnResourceList OnvifResourceSearcherOld::findResources()
 {
     QnResourceList result;
 
@@ -71,7 +71,7 @@ QnResourceList OnvifResourceSearcher::findResources()
     CL_LOG(cl_logDEBUG1)
     {
         QString log;
-        QTextStream(&log) << "OnvifResourceSearcher::findDevices  found " << localAddresses.size() << " adapter(s) with IPV4";
+        QTextStream(&log) << "OnvifResourceSearcherOld::findDevices  found " << localAddresses.size() << " adapter(s) with IPV4";
         cl_log.log(log, cl_logDEBUG1);
 
         for (int i = 0; i < localAddresses.size();++i)
@@ -130,7 +130,7 @@ QnResourceList OnvifResourceSearcher::findResources()
 }
 
 
-void OnvifResourceSearcher::checkSocket(QUdpSocket& sock, QnResourceList& result, QHostAddress localAddress)
+void OnvifResourceSearcherOld::checkSocket(QUdpSocket& sock, QnResourceList& result, QHostAddress localAddress)
 {
     while (sock.hasPendingDatagrams())
     {

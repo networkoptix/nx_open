@@ -6,6 +6,13 @@
 #include <QtCore/QSharedPointer>
 #include <QtCore/QVariant>
 
+enum QN_EXPORT QnDomain
+{
+    QnDomainMemory = 1,
+    QnDomainDatabase = 2,
+    QnDomainPhysical = 4
+};
+
 struct QN_EXPORT QnParamType
 {
     enum DataType { None, Value, OnOff, Boolen, MinMaxStep, Enumeration, Button };
@@ -42,15 +49,18 @@ typedef QSharedPointer<QnParamType> QnParamTypePtr;
 
 struct QN_EXPORT QnParam
 {
-    QnParam() : m_paramType(new QnParamType) {}
-    QnParam(QnParamTypePtr paramType, const QVariant &value = QVariant())
-        : m_paramType(paramType)
+    QnParam() : m_paramType(new QnParamType), m_domain(QnDomainMemory) {}
+    QnParam(QnParamTypePtr paramType, const QVariant &value = QVariant(), QnDomain domain = QnDomainMemory)
+        : m_paramType(paramType),
+          m_domain(domain)
     { setValue(value); }
 
     bool isValid() const { return !m_paramType->name.isEmpty(); }
 
     bool setValue(const QVariant &val); // safe way to set value
     const QVariant &value() const { return m_value; }
+    QnDomain domain() const { return m_domain; }
+    void setDomain(QnDomain domain) { m_domain = domain; }
     const QVariant &defaultValue() const { return m_paramType->default_value; }
     const QString &name() const { return m_paramType->name; }
     const QString &group() const { return m_paramType->group; }
@@ -69,6 +79,7 @@ struct QN_EXPORT QnParam
 private:
     QnParamTypePtr m_paramType;
     QVariant m_value;
+    QnDomain m_domain;
 };
 
 Q_DECLARE_METATYPE(QnParam)
@@ -86,6 +97,7 @@ public:
     void append(const QnParam &param);
     bool isEmpty() const;
     QList<QnParam> list() const;
+    QList<QString> keys() const;
 
     QList<QString> groupList() const;
     QList<QString> subGroupList(const QString &group) const;

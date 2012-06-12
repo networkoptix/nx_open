@@ -108,7 +108,7 @@ QnNetworkResourcePtr QnPlAxisResourceSearcher::processPacket(QnResourceList& res
     foreach(QnResourcePtr res, result)
     {
         QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
-
+    
         if (net_res->getMAC().toString() == smac)
             return QnNetworkResourcePtr(0); // already found;
     }

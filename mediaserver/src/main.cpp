@@ -34,6 +34,7 @@
 #include "settings.h"
 
 #include <fstream>
+#include "plugins/resources/onvif/onvif_resource_searcher.h"
 #include "plugins/resources/axis/axis_resource_searcher.h"
 #include "plugins/resources/d-link/dlink_resource_searcher.h"
 #include "utils/common/log.h"
@@ -44,7 +45,6 @@
 #include "plugins/resources/droid/droid_resource_searcher.h"
 #include "plugins/resources/isd/isd_resource_searcher.h"
 #include "plugins/resources/test_camera/testcamera_resource_searcher.h"
-#include "plugins/resources/onvif/onvif_ws_searcher.h"
 #include "utils/common/command_line_parser.h"
 #include "plugins/resources/pulse/pulse_resource_searcher.h"
 //#include "plugins/storage/file_storage/file_storage_protocol.h"
@@ -436,7 +436,7 @@ void QnMain::loadResourcesFromECS()
     while (appServerConnection->getCameras(cameras, m_videoServer->getId(), errorString) != 0)
     {
         qDebug() << "QnMain::run(): Can't get cameras. Reason: " << errorString;
-        QnSleep::msleep(1000);
+        QnSleep::msleep(10000);
     }
     foreach(const QnSecurityCamResourcePtr &camera, cameras)
     {
@@ -565,18 +565,17 @@ void QnMain::run()
     //============================
     QnResourceDiscoveryManager::instance().setServer(true);
     QnResourceDiscoveryManager::instance().setResourceProcessor(m_processor);
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlArecontResourceSearcher::instance());
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlAxisResourceSearcher::instance());
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDlinkResourceSearcher::instance());
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIqResourceSearcher::instance());
 
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlArecontResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDlinkResourceSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIpWebCamResourceSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDroidResourceSearcher::instance());
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlISDResourceSearcher::instance());
-
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnTestCameraResourceSearcher::instance());
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlOnvifWsSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlPulseSearcher::instance());
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlAxisResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIqResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlISDResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance().addDeviceServer(&OnvifResourceSearcher::instance());
 
     //
 

@@ -8,6 +8,7 @@ win32 {
   QT *= multimedia
   INCLUDEPATH += $$PWD/../../common/contrib/openssl/include
   
+  LIBS += -L$$PWD/../../common/contrib/openssl/bin -llibeay32 -ssleay32
   win32-msvc2010 {
     LIBS += -L$$PWD/../../common/contrib/openssl/bin/win32-msvc2010
   }
@@ -90,6 +91,7 @@ win32 {
 }
 
 unix {
+  INCLUDEPATH += /usr/include/openssl
   DEFINES += QN_EXPORT=
 }
 
@@ -107,12 +109,16 @@ unix:!mac {
 DEFINES += __STDC_CONSTANT_MACROS
 
 
-unix {
-    LIBS += -lprotobuf
-}
-
 QMAKE_CXXFLAGS += -I$$EVETOOLS_DIR/include 
 LIBS += -L$$EVETOOLS_DIR/lib
+
+PROTOC_FILE = $$EVETOOLS_DIR/bin/protoc
+
+unix {
+    LIBS += -lprotobuf -L/usr/lib
+    QMAKE_CXXFLAGS += -I$$/usr/include
+    PROTOC_FILE = /usr/bin/protoc
+}
 
 # Define override specifier.
 OVERRIDE_DEFINITION = "override="
@@ -132,7 +138,7 @@ PB_FILES = $$PWD/api/pb/camera.proto \
 pb.name = Generating code from ${QMAKE_FILE_IN}
 pb.input = PB_FILES
 pb.output = $${MOC_DIR}/${QMAKE_FILE_BASE}.pb.cc
-pb.commands = $$EVETOOLS_DIR/bin/protoc --proto_path=../src/api/pb --cpp_out=$${MOC_DIR} ../src/api/pb/${QMAKE_FILE_BASE}.proto
+pb.commands = $$PROTOC_FILE --proto_path=../src/api/pb --cpp_out=$${MOC_DIR} ../src/api/pb/${QMAKE_FILE_BASE}.proto
 pb.CONFIG += target_predeps
 pb.variable_out = GENERATED_SOURCES
 QMAKE_EXTRA_COMPILERS += pb

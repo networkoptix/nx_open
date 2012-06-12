@@ -61,7 +61,7 @@ static const qint64 DATETIME_NOW = INT64_MAX;
 #define DATETIME_NOW DATETIME_NOW /* Get some syntax highlighting. */
 
 static const char *DEFAULT_APPSERVER_HOST = "127.0.0.1";
-static const int DEFAULT_APPSERVER_PORT = 8000;
+static const int DEFAULT_APPSERVER_PORT = 7001;
 
 static const int MAX_RTSP_DATA_LEN = 65535 - 16;
 

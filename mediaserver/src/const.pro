@@ -24,7 +24,7 @@ include(../../common/contrib/qtsingleapplication/src/qtsinglecoreapplication.pri
 win* {
     INCLUDEPATH += $$PWD/../../common/contrib/openssl/include
     INCLUDEPATH += ../../common/contrib/ffmpeg-misc-headers-win32
-    
+    LIBS += -L$$PWD/../../common/contrib/openssl/bin -llibeay32
     win32-msvc2010 {
         LIBS += -L$$PWD/../../common/contrib/openssl/bin/win32-msvc2010
     }
@@ -82,6 +82,10 @@ CONFIG(debug, debug|release) {
     LIBS += -L../../common/contrib/qjson/lib/win32/debug -L$$EVETOOLS_DIR/lib/debug
   }
 
+  unix {
+    LIBS += -L/usr/lib/debug
+  }
+
 }
 CONFIG(release, debug|release) {
   INCLUDEPATH += $$FFMPEG-release/include
@@ -89,6 +93,10 @@ CONFIG(release, debug|release) {
 
   win32 {
     LIBS += -L../../common/contrib/qjson/lib/win32/release -L$$EVETOOLS_DIR/lib/release
+  }
+
+  unix {
+    LIBS += -L/usr/lib/release
   }
 }
 
@@ -122,11 +130,12 @@ unix:!mac {
     } else {
         LIBS += -L../../common/contrib/qjson/lib/linux-32
     }
+    QMAKE_CXXFLAGS += -I/usr/include
 }
 
 LIBS += -L$$EVETOOLS_DIR/lib
 
-LIBS += -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lqjson
+LIBS += -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lqjson -lgsoap-base -lonvif
 
 win32 {
   win32-msvc* {
@@ -141,7 +150,7 @@ win32 {
     INCLUDEPATH += ../contrib/ffmpeg-misc-headers-win32
   }
 
-  LIBS += -lws2_32 -lIphlpapi -lOle32
+  LIBS += -lws2_32 -lIphlpapi -lOle32 -leay32 -lssleay32
 
   LIBS += -lwinmm
 
@@ -155,7 +164,7 @@ win32 {
 DEFINES += __STDC_CONSTANT_MACROS
 
 unix {
-  LIBS += -lz -lcrypto
+  LIBS += -L/usr/lib -lz -lcrypto -lssl
   DEFINES += QN_EXPORT=
 }
 

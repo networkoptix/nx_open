@@ -48,7 +48,7 @@ void CLNetState::updateNetState()
 		else
 			net_state_changed = true; // ip changed or new subnet
 
-		new_netstate[entry.ip().toString()] = state;
+        new_netstate[entry.ip().toString()] = state;
 	}
 
 	if (new_netstate.size()!=m_netstate.size())
