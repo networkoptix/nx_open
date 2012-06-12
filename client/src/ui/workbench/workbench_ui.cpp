@@ -504,6 +504,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     m_sliderOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_sliderOpacityProcessor->addTargetItem(m_sliderItem);
+    m_sliderOpacityProcessor->addTargetItem(m_sliderItem->timeSlider()->toolTipItem());
     m_sliderOpacityProcessor->addTargetItem(m_sliderShowButton);
     m_sliderOpacityProcessor->addTargetItem(m_sliderResizerItem);
 
