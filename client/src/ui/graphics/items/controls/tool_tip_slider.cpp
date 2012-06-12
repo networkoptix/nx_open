@@ -23,6 +23,23 @@ namespace {
 
 } // anonymous namespace
 
+/**
+ * Note that this is a separate class so that user classes derived from 
+ * <tt>QnToolTipSlider</tt> can freely inherit <tt>AnimationTimerListener</tt>
+ * without any conflicts.
+ */
+class QnToolTipSliderAnimationListener: public AnimationTimerListener {
+public:
+    QnToolTipSliderAnimationListener(QnToolTipSlider *slider): m_slider(slider) {
+        startListening();
+    }
+
+    virtual void tick(int) override;
+
+private:
+    QnToolTipSlider *m_slider;
+};
+
 
 QnToolTipSlider::QnToolTipSlider(QGraphicsItem *parent):
     base_type(Qt::Horizontal, parent)
@@ -46,6 +63,9 @@ void QnToolTipSlider::init() {
 
     setToolTipItem(new QnSliderToolTipItem(this));
     setAcceptHoverEvents(true);
+
+    m_animationListener.reset(new QnToolTipSliderAnimationListener(this));
+    registerAnimation(m_animationListener.data());
 
     updateToolTipPosition();
     updateToolTipVisibility();
@@ -71,9 +91,14 @@ void QnToolTipSlider::setToolTipItem(QnToolTipItem *toolTipItem) {
         m_toolTipItem->setParent(this); /* Claim ownership, but not in graphics item sense. */
         m_toolTipItem->setFocusProxy(this);
         m_toolTipItem->setOpacity(opacity);
-        m_toolTipItem->setText(toolTip());
         m_toolTipItem->setAcceptHoverEvents(true);
         m_toolTipItem->installEventFilter(this);
+        m_toolTipItem->setFlag(ItemIgnoresParentOpacity, true);
+
+        updateToolTipText();
+        updateToolTipOpacity();
+        updateToolTipPosition();
+        updateToolTipVisibility();
     }
 }
 
@@ -110,6 +135,20 @@ void QnToolTipSlider::updateToolTipVisibility() {
     }
 }
 
+void QnToolTipSlider::updateToolTipOpacity() {
+    if(!m_toolTipItem)
+        return;
+
+    m_toolTipItem->setOpacity(effectiveOpacity());
+}
+
+void QnToolTipSlider::updateToolTipText() {
+    if(!m_toolTipItem)
+        return;
+
+    m_toolTipItem->setText(toolTip());
+}
+
 void QnToolTipSlider::updateToolTipPosition() {
     if(!m_toolTipItem)
         return;
@@ -128,6 +167,13 @@ void QnToolTipSlider::updateToolTipPosition() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+void QnToolTipSliderAnimationListener::tick(int) {
+    /* Unfortunately, there is no notification for a change in effective opacity,
+     * so we have to track it in animation handler (which gets invoked before the
+     * paint event). */
+    m_slider->updateToolTipOpacity();
+}
+
 bool QnToolTipSlider::eventFilter(QObject *target, QEvent *event) {
     if(target == m_toolTipItem) {
         QGraphicsSceneMouseEvent *e = static_cast<QGraphicsSceneMouseEvent *>(event);
@@ -194,8 +240,16 @@ void QnToolTipSlider::sliderChange(SliderChange change) {
 QVariant QnToolTipSlider::itemChange(GraphicsItemChange change, const QVariant &value) {
     QVariant result = base_type::itemChange(change, value);
 
-    if(change == ItemToolTipHasChanged && m_toolTipItem)
-        m_toolTipItem->setText(toolTip());
+    switch(change) {
+    case ItemToolTipHasChanged:
+        updateToolTipText();
+        break;
+    case ItemOpacityHasChanged:
+        updateToolTipOpacity();
+        break;
+    default:
+        break;
+    }
 
     return result;
 }
@@ -230,3 +284,4 @@ void QnToolTipSlider::resizeEvent(QGraphicsSceneResizeEvent *event) {
 
     updateToolTipPosition();
 }
+
