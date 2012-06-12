@@ -376,6 +376,7 @@ void RTPSession::addAuth(QByteArray& request)
 
 bool RTPSession::sendDescribe()
 {
+    m_sdpTracks.clear();
     QByteArray request;
     request += "DESCRIBE ";
     request += mUrl.toString();

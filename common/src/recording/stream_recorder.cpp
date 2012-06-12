@@ -37,7 +37,9 @@ QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     m_mdctx(0),
     m_container("matroska"),
     m_videoChannels(0),
-    m_ioContext(0)
+    m_ioContext(0),
+    m_needReopen(false),
+    m_isAudioPresent(false)
 {
 	memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
 }
@@ -109,6 +111,12 @@ void QnStreamRecorder::flushPrebuffer()
 
 bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
 {
+    if (m_needReopen)
+    {
+        m_needReopen = false;
+        close();
+    }
+
     QnAbstractMediaDataPtr md = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
     if (!md)
         return true; // skip unknown data
@@ -377,8 +385,10 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
         }
 
         const QnResourceAudioLayout* audioLayout = mediaDev->getAudioLayout(m_mediaProvider);
+        m_isAudioPresent = false;
         for (unsigned int i = 0; i < audioLayout->numberOfChannels(); ++i) 
         {
+            m_isAudioPresent = true;
             AVStream* audioStream = av_new_stream(m_formatCtx, DEFAULT_AUDIO_STREAM_ID+i);
             if (audioStream == 0)
             {
@@ -548,4 +558,14 @@ void QnStreamRecorder::setContainer(const QString& container)
     // convert short file ext to ffmpeg container name
     if (m_container == QString("mkv"))
         m_container = "matroska";
+}
+
+void QnStreamRecorder::setNeedReopen()
+{
+    m_needReopen = true;
+}
+
+bool QnStreamRecorder::isAudioPresent() const
+{
+    return m_isAudioPresent;
 }

@@ -58,6 +58,8 @@ public:
     void setStorage(QnStorageResourcePtr storage);
 
     void setContainer(const QString& container);
+    void setNeedReopen();
+    bool isAudioPresent() const;
 signals:
     void recordingFailed(QString errMessage);
     void recordingStarted();
@@ -121,6 +123,8 @@ private:
     int m_videoChannels;
     QnCodecAudioFormat m_prevAudioFormat;
     AVIOContext* m_ioContext;
+    bool m_needReopen;
+    bool m_isAudioPresent;
 };
 
 #endif // _STREAM_RECORDER_H__

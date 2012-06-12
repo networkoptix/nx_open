@@ -22,12 +22,13 @@ protected:
     virtual void closeStream() = 0;
     virtual bool isStreamOpened() const = 0;
 	void pleaseReOpen();
-
+    virtual void afterUpdate() override;
 private:
 	void run(); // in a loop: takes data from device and puts into queue
     virtual void beforeRun() override;
 private:
     bool m_needReopen;
+    bool m_cameraAudioEnabled;
 };
 
 #endif //server_push_stream_reader_h2055

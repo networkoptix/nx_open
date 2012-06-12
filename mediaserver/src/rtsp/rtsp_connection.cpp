@@ -55,7 +55,8 @@ public:
         qualityFastSwitch(true),
         prevStartTime(AV_NOPTS_VALUE),
         prevEndTime(AV_NOPTS_VALUE),
-        metadataChannelNum(2)
+        metadataChannelNum(2),
+        audioEnabled(false)
     {
     }
 
@@ -124,6 +125,7 @@ public:
     qint64 prevStartTime;
     qint64 prevEndTime;
     int metadataChannelNum;
+    bool audioEnabled;
 };
 
 // ----------------------------- QnRtspConnectionProcessor ----------------------------
@@ -328,7 +330,8 @@ int QnRtspConnectionProcessor::composeDescribe()
     QnVirtualCameraResourcePtr cameraResource = qSharedPointerDynamicCast<QnVirtualCameraResource>(d->mediaRes);
     if (cameraResource) {
         // avoid race condition if camera is starting now
-        if (cameraResource->isAudioEnabled())
+        d->audioEnabled = cameraResource->isAudioEnabled();
+        if (d->audioEnabled)
             numAudio = 1;
     }
     else {
@@ -483,6 +486,20 @@ void QnRtspConnectionProcessor::parseRangeHeader(const QString& rangeStr, qint64
     }
 }
 
+void QnRtspConnectionProcessor::at_cameraUpdated()
+{
+    Q_D(QnRtspConnectionProcessor);
+	QMutexLocker lock(&d->mutex);
+
+    QnVirtualCameraResourcePtr cameraResource = qSharedPointerDynamicCast<QnVirtualCameraResource>(d->mediaRes);
+    if (cameraResource) {
+        if (cameraResource->isAudioEnabled() != d->audioEnabled) {
+            m_needStop = true;
+            d->socket->shutdown();
+        }
+    }
+}
+
 void QnRtspConnectionProcessor::at_cameraDisabledChanged(bool oldValue, bool newValue)
 {
     Q_D(QnRtspConnectionProcessor);
@@ -504,6 +521,7 @@ void QnRtspConnectionProcessor::createDataProvider()
 			d->liveDpHi = camera->getLiveReader(QnResource::Role_LiveVideo);
             if (d->liveDpHi) {
                 connect(d->liveDpHi->getResource().data(), SIGNAL(disabledChanged(bool, bool)), this, SLOT(at_cameraDisabledChanged(bool, bool)), Qt::DirectConnection);
+                connect(d->liveDpHi->getResource().data(), SIGNAL(resourceChanged()), this, SLOT(at_cameraUpdated()), Qt::DirectConnection);
 				d->liveDpHi->start();
             }
 		}
