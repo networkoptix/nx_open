@@ -384,7 +384,7 @@ bool QnMotionArchive::saveToArchiveInternal(QnMetaDataV1Ptr data)
     m_detailedIndexFile.flush();
     m_detailedMotionFile.flush();
 
-    m_maxMotionTime = data->timestamp;
+    m_maxMotionTime = data->timestamp/1000;
     if (m_minMotionTime == AV_NOPTS_VALUE)
         m_minMotionTime = m_maxMotionTime;
     return true;
