@@ -5,12 +5,17 @@
 #include <QtCore/QScopedPointer>
 #include <QtGui/QGraphicsItem>
 
+#include <utils/common/forward.h>
+
 #include "animation_timer.h"
 #include "animation_timer_listener.h"
 
+template<class Base, bool baseIsAnimated>
+class Animated;
+
 namespace detail {
     class AnimatedBase {
-    protected:
+    private:
         AnimatedBase();
         virtual ~AnimatedBase();
 
@@ -20,9 +25,25 @@ namespace detail {
 
         void unregisterAnimation(AnimationTimerListener *listener);
 
+        template<class Base, bool baseIsAnimated>
+        friend class Animated; /* So that only this class can access our methods. */
+
     private:
         QScopedPointer<AnimationTimerListener> m_listener;
         QSet<AnimationTimerListener *> m_listeners;
+    };
+
+    template<class Base>
+    struct base_is_animated {
+        typedef char true_type;
+        typedef struct { char dummy[2]; } false_type;
+
+        static true_type check(AnimatedBase *);
+        static false_type check(...);
+
+        enum {
+            value = (sizeof(check(static_cast<Base *>(NULL))) == sizeof(true_type))
+        };
     };
 
 } // namespace detail
@@ -38,22 +59,10 @@ namespace detail {
  * available, and move to another animation timer in case the item's scene is
  * changed.
  */
-template<class Base>
-class Animated: public Base, protected detail::AnimatedBase {
+template<class Base, bool baseIsAnimated = detail::base_is_animated<Base>::value>
+class Animated: public Base, public detail::AnimatedBase {
 public:
-    template<class T0>
-    Animated(const T0 &arg0): Base(arg0) {
-        updateScene(this->scene());
-    }
-
-    template<class T0, class T1>
-    Animated(const T0 &arg0, const T1 &arg1): Base(arg0, arg1) {
-        updateScene(this->scene());
-    }
-
-    virtual ~Animated() {
-        updateScene(NULL);
-    }
+    QN_FORWARD_CONSTRUCTOR(Animated, Base, { updateScene(this->scene()); });
 
     using detail::AnimatedBase::registerAnimation;
     using detail::AnimatedBase::unregisterAnimation;
@@ -65,7 +74,19 @@ protected:
 
         return Base::itemChange(change, value);
     }
-
 };
+
+
+/**
+ * Specialization that prevents creation of two animation data instances in
+ * a single class, even if it was tagged as 'Animated' several times 
+ * (e.g. one of its bases is animated).
+ */
+template<class Base>
+class Animated<Base, true>: public Base {
+public:
+    QN_FORWARD_CONSTRUCTOR(Animated, Base, {});
+};
+
 
 #endif // QN_ANIMATED_H
