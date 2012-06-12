@@ -2,8 +2,7 @@
 #include "brickcom_resource.h"
 
 
-extern const char* BRICKCOM_MANUFACTURER;
-const char* QnPlBrickcomResource::MANUFACTURE = BRICKCOM_MANUFACTURER;
+const char* QnPlBrickcomResource::MANUFACTURE = "Brickcom";
 
 
 QnPlBrickcomResource::QnPlBrickcomResource()

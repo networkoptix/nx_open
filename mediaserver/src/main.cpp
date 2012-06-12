@@ -34,7 +34,6 @@
 #include "settings.h"
 
 #include <fstream>
-#include "plugins/resources/onvif/onvif_special_resource.h"
 #include "plugins/resources/onvif/onvif_resource_searcher.h"
 #include "plugins/resources/axis/axis_resource_searcher.h"
 #include "plugins/resources/d-link/dlink_resource_searcher.h"
@@ -573,12 +572,9 @@ void QnMain::run()
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDroidResourceSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnTestCameraResourceSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlPulseSearcher::instance());
-
-    OnvifSpecialResourcesPtr specialResourcesPtr(new OnvifSpecialResources());
-    specialResourcesPtr->add(&QnPlAxisResourceSearcher::instance());
-    specialResourcesPtr->add(&QnPlIqResourceSearcher::instance());
-    specialResourcesPtr->add(&QnPlISDResourceSearcher::instance());
-    //OnvifResourceSearcher::instance().init(specialResourcesPtr);
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlAxisResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIqResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlISDResourceSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&OnvifResourceSearcher::instance());
 
     //

@@ -189,7 +189,7 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
     }
 }
 
-void OnvifResourceSearcherWsdd::findResources(QnResourceList& result, const OnvifSpecialResourceCreatorPtr& creator) const
+void OnvifResourceSearcherWsdd::findResources(QnResourceList& result) const
 {
     EndpointInfoHash endpoints;
     findEndpoints(endpoints);
@@ -204,7 +204,7 @@ void OnvifResourceSearcherWsdd::findResources(QnResourceList& result, const Onvi
         ++endpIter;
     }
 
-    onvifFetcher.findResources(endpoints, result, creator);
+    onvifFetcher.findResources(endpoints, result);
 }
 
 const QStringList OnvifResourceSearcherWsdd::getAddrPrefixes(const QString& host) const

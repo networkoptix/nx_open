@@ -32,19 +32,17 @@ OnvifResourceInformationFetcher& OnvifResourceInformationFetcher::instance()
     return inst;
 }
 
-void OnvifResourceInformationFetcher::findResources(const EndpointInfoHash& endpointInfo, QnResourceList& result,
-        const OnvifSpecialResourceCreatorPtr& creator) const
+void OnvifResourceInformationFetcher::findResources(const EndpointInfoHash& endpointInfo, QnResourceList& result) const
 {
     EndpointInfoHash::ConstIterator iter = endpointInfo.begin();
 
     while(iter != endpointInfo.end()) {
-        findResources(iter.key(), iter.value(), creator, result);
+        findResources(iter.key(), iter.value(), result);
 
         ++iter;
     }
 }
-void OnvifResourceInformationFetcher::findResources(const QString& endpoint, const EndpointAdditionalInfo& info,
-    const OnvifSpecialResourceCreatorPtr& creator, QnResourceList& result) const
+void OnvifResourceInformationFetcher::findResources(const QString& endpoint, const EndpointAdditionalInfo& info, QnResourceList& result) const
 {
     if (endpoint.isEmpty()) {
         qDebug() << "OnvifResourceInformationFetcher::findResources: response packet was received, but appropriate URL was not found.";
@@ -54,14 +52,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     QHostAddress sender(hostAddressFromEndpoint(endpoint));
     const char* login = 0;
     const char* passwd = 0;
-
-    QString manufacturer = info.src == EndpointAdditionalInfo::MDNS? manufacturersData.manufacturerFromMdns(info.data):
-        manufacturersData.manufacturerFromWsdd(info.data);
-
-    if (findSpecialResource(info, sender, manufacturer, creator, result)) {
-        return;
-    }
-
+    QString manufacturer("");//ToDo: find manufacturer
     PasswordList passwords = passwordsData.getPasswordsByManufacturer(manufacturer);
     PasswordList::ConstIterator passwdIter = passwords.begin();
 
@@ -218,30 +209,14 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     qDebug() << "OnvifResourceInformationFetcher::createResource: Found new camera: endpoint: " << endpoint
              << ", MAC: " << mac << ", name: " << name;
 
-    createResource(creator, manufacturer, QHostAddress(sender), QHostAddress(info.discoveryIp),
+    createResource(manufacturer, QHostAddress(sender), QHostAddress(info.discoveryIp),
         name, mac, login, passwd, mediaUrl, deviceUrl, result);
 }
 
-void OnvifResourceInformationFetcher::createResource(const OnvifSpecialResourceCreatorPtr& creator, const QString& manufacturer,
-    const QHostAddress& sender, const QHostAddress& discoveryIp, const QString& name, const QString& mac, const char* login,
-    const char* passwd, const QString& mediaUrl, const QString& deviceUrl, QnResourceList& result) const
+void OnvifResourceInformationFetcher::createResource(const QString& manufacturer, const QHostAddress& sender, const QHostAddress& discoveryIp,
+    const QString& name, const QString& mac, const char* login, const char* passwd, const QString& mediaUrl, const QString& deviceUrl, QnResourceList& result) const
 {
     QnNetworkResourcePtr resource(0);
-
-    if (!creator.isNull() && !manufacturer.isEmpty()) {
-        resource = creator->createByManufacturer(manufacturer);
-
-        if (!resource.isNull()) {
-            QnId rt = qnResTypePool->getResourceTypeId(manufacturer, name);
-            if (rt.isValid()) {
-                resource->setTypeId(rt);
-            } else {
-                qDebug() << "OnvifResourceInformationFetcher::createResource: can't find resource type for "
-                         << manufacturer << " " << name;
-                resource.clear();
-            }
-        }
-    }
 
     if (resource.isNull()) {
         resource = QnNetworkResourcePtr(new QnPlOnvifResource());
@@ -400,37 +375,4 @@ QHostAddress OnvifResourceInformationFetcher::hostAddressFromEndpoint(const QStr
     QString tmp = endpoint.mid(pos1, pos2);
     qDebug() << "OnvifResourceInformationFetcher::hostAddressFromEndpoint: IP: " << tmp;
     return QHostAddress(tmp);
-}
-
-bool OnvifResourceInformationFetcher::findSpecialResource(const EndpointAdditionalInfo& info, const QHostAddress& sender,
-    const QString& manufacturer, const OnvifSpecialResourceCreatorPtr& creator, QnResourceList& result) const
-{
-    qDebug() << "OnvifResourceInformationFetcher::findSpecialResource: manuf: "
-             << manufacturer << ", source: " << info.src;
-    if (manufacturer.isEmpty() || creator.isNull() || info.src != EndpointAdditionalInfo::MDNS) {
-        qDebug() << "OnvifResourceInformationFetcher::findSpecialResource: not appropriate params";
-        return false;
-    }
-
-    QnNetworkResourcePtr resource(creator->createByPacketData(info.data, manufacturer));
-    if (resource.isNull()) {
-        qDebug() << "OnvifResourceInformationFetcher::findSpecialResource: resource is null";
-        return false;
-    }
-
-	QnMacAddress mac = resource->getMAC();
-	foreach(QnResourcePtr res, result)
-    {
-        QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
-    
-        if (net_res->getMAC() == mac)
-            return true;
-    }
-
-    resource->setHostAddress(sender, QnDomainMemory);
-    resource->setDiscoveryAddr(QHostAddress(info.discoveryIp));
-
-    result.push_back(resource);
-    qDebug() << "OnvifResourceInformationFetcher::findSpecialResource: resource found: " << resource->toString();
-    return true;
 }

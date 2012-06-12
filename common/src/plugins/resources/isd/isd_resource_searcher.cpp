@@ -42,11 +42,6 @@ QnResourcePtr QnPlISDResourceSearcher::createResource(QnId resourceTypeId, const
 
 }
 
-QnNetworkResourcePtr QnPlISDResourceSearcher::createResource() const
-{
-    return QnVirtualCameraResourcePtr( new QnPlIsdResource() );
-}
-
 QString QnPlISDResourceSearcher::manufacture() const
 {
     return QnPlIsdResource::MANUFACTURE;
@@ -58,8 +53,7 @@ QnResourcePtr QnPlISDResourceSearcher::checkHostAddr(QHostAddress addr)
     return QnResourcePtr(0);
 }
 
-//QnNetworkResourcePtr QnPlISDResourceSearcher::processPacket(QnResourceList& result, QByteArray& responseData)
-QnNetworkResourcePtr QnPlISDResourceSearcher::createResource(const QByteArray& responseData) const
+QnNetworkResourcePtr QnPlISDResourceSearcher::processPacket(QnResourceList& result, QByteArray& responseData)
 {
 
     QString smac;
@@ -116,13 +110,13 @@ QnNetworkResourcePtr QnPlISDResourceSearcher::createResource(const QByteArray& r
 
     smac = smac.toUpper();
 
-    //foreach(QnResourcePtr res, result)
-    //{
-    //    QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
-    //
-    //    if (net_res->getMAC().toString() == smac)
-    //        return QnNetworkResourcePtr(0); // already found;
-    //}
+    foreach(QnResourcePtr res, result)
+    {
+        QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
+    
+        if (net_res->getMAC().toString() == smac)
+            return QnNetworkResourcePtr(0); // already found;
+    }
 
 
     QnNetworkResourcePtr resource ( new QnPlIsdResource() );

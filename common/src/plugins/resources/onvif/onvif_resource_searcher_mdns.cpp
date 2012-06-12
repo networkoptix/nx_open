@@ -1,4 +1,4 @@
-#ifdef WIN32
+/*#ifdef WIN32
 #include "openssl/evp.h"
 #else
 #include "evp.h"
@@ -153,3 +153,4 @@ void OnvifResourceSearcherMdns::checkSocket(QUdpSocket& sock, QHostAddress local
     }
 
 }
+*/

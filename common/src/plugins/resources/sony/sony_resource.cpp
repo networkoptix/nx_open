@@ -2,8 +2,7 @@
 #include "sony_resource.h"
 
 
-extern const char* SONY_MANUFACTURER;
-const char* QnPlSonyResource::MANUFACTURE = SONY_MANUFACTURER;
+const char* QnPlSonyResource::MANUFACTURE = "Sony";
 
 
 QnPlSonyResource::QnPlSonyResource()

@@ -2,8 +2,7 @@
 #include "droid_stream_reader.h"
 
 
-extern const char* DROID_MANUFACTURER;
-const char* QnDroidResource::MANUFACTURE = DROID_MANUFACTURER;
+const char* QnDroidResource::MANUFACTURE = "NetworkOptixDroid";
 
 QnDroidResource::QnDroidResource()
 {

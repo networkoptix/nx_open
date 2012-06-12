@@ -3,8 +3,7 @@
 #include "pulse_resource.h"
 
 
-extern const char* PULSE_MANUFACTURER;
-const char* QnPlPulseResource::MANUFACTURE = PULSE_MANUFACTURER;
+const char* QnPlPulseResource::MANUFACTURE = "Pulse";
 
 
 QnPlPulseResource::QnPlPulseResource()

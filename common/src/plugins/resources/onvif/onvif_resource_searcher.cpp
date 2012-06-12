@@ -5,7 +5,6 @@
 OnvifResourceSearcher::OnvifResourceSearcher():
     wsddSearcher(OnvifResourceSearcherWsdd::instance()),
     mdnsSearcher(OnvifResourceSearcherMdns::instance()),
-    specialResourceCreator(0)
 {
 
 }
@@ -13,11 +12,6 @@ OnvifResourceSearcher::OnvifResourceSearcher():
 OnvifResourceSearcher::~OnvifResourceSearcher()
 {
 
-}
-
-void OnvifResourceSearcher::init(const OnvifSpecialResourceCreatorPtr& creator)
-{
-    specialResourceCreator = creator;
 }
 
 OnvifResourceSearcher& OnvifResourceSearcher::instance()
@@ -48,7 +42,7 @@ QnResourceList OnvifResourceSearcher::findResources()
 
     //Order is important! mdns should be the first to avoid creating ONVIF resource, when special is expected
     //mdnsSearcher.findResources(result, specialResourceCreator);
-    wsddSearcher.findResources(result, specialResourceCreator);
+    wsddSearcher.findResources(result);
 
     return result;
 }
@@ -61,11 +55,6 @@ QnResourcePtr OnvifResourceSearcher::createResource(QnId resourceTypeId, const Q
     if (resourceType.isNull())
     {
         qDebug() << "OnvifResourceSearcher::createResource: no resource type for ID = " << resourceTypeId;
-        return result;
-    }
-
-    result = specialResourceCreator.isNull()? result: specialResourceCreator->createById(resourceType, parameters);
-    if (!result.isNull()) {
         return result;
     }
 

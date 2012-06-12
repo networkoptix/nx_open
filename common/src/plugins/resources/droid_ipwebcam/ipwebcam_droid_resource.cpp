@@ -2,8 +2,7 @@
 #include "ipwebcam_droid_resource.h"
 #include "ipwebcam_droid_stream_reader.h"
 
-extern const char* DROID_MANUFACTURER;
-const char* QnPlDriodIpWebCamResource::MANUFACTURE = DROID_MANUFACTURER;
+const char* QnPlDriodIpWebCamResource::MANUFACTURE = "NetworkOptixDroid";
 
 
 QnPlDriodIpWebCamResource::QnPlDriodIpWebCamResource()

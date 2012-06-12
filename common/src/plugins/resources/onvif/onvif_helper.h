@@ -13,6 +13,42 @@ class SOAP_ENV__Fault;
 
 class PasswordHelper
 {
+    const char* ACTI_MANUFACTURER = "Acti";
+    const char* ARECONT_VISION_MANUFACTURER = "ArecontVision";
+    const char* AVIGILON_MANUFACTURER = "Avigilon";
+    const char* AXIS_MANUFACTURER;
+    const char* BASLER_MANUFACTURER;
+    const char* BOSH_DINION_MANUFACTURER;
+    const char* BRICKCOM_MANUFACTURER;
+    const char* CISCO_MANUFACTURER;
+    const char* DIGITALWATCHDOG_MANUFACTURER;
+    const char* DLINK_MANUFACTURER;
+    const char* DROID_MANUFACTURER;
+    const char* GRANDSTREAM_MANUFACTURER;
+    const char* HIKVISION_MANUFACTURER;
+    const char* HONEYWELL_MANUFACTURER;
+    const char* IQINVISION_MANUFACTURER;
+    const char* IPX_DDK_MANUFACTURER;
+    const char* ISD_MANUFACTURER;
+    const char* MOBOTIX_MANUFACTURER;
+    const char* PANASONIC_MANUFACTURER;
+    const char* PELCO_SARIX_MANUFACTURER;
+    const char* PIXORD_MANUFACTURER;
+    const char* PULSE_MANUFACTURER;
+    const char* SAMSUNG_MANUFACTURER;
+    const char* SANYO_MANUFACTURER;
+    const char* SCALLOP_MANUFACTURER;
+    const char* SONY_MANUFACTURER;
+    const char* STARDOT_MANUFACTURER;
+    const char* STARVEDIA_MANUFACTURER;
+    const char* TRENDNET_MANUFACTURER;
+    const char* TOSHIBA_MANUFACTURER;
+    const char* VIDEOIQ_MANUFACTURER;
+    const char* VIVOTEK_MANUFACTURER;
+    const char* UBIQUITI_MANUFACTURER;
+
+    const QRegExp& WHITE_SPACES;
+
     //QHash<Manufacturer, Passwords>
     typedef QHash<QString, PasswordList> ManufacturerPasswords;
 
@@ -35,32 +71,6 @@ private:
     void setPasswordInfo(const char* manufacturer, const char* login, const char* passwd);
     void setPasswordInfo(const char* manufacturer);
     void printPasswords() const;
-};
-
-class ManufacturerHelper
-{
-    typedef QHash<QString, QString> ManufacturerAliases;
-
-    ManufacturerAliases manufacturerMdns;
-    ManufacturerAliases manufacturerWsdd;
-    ManufacturerAliases manufacturerOnvif;
-
-public:
-
-    ManufacturerHelper();
-    ~ManufacturerHelper();
-
-    const QString manufacturerFromMdns(const QByteArray& packetData) const;
-    const QString manufacturerFromWsdd(const QByteArray& packetData) const;
-    const QString manufacturerFromOnvif(const QByteArray& packetData) const;
-
-private:
-
-    void setMdnsAliases();
-    void setWsddAliases();
-    void setOnvifAliases();
-    void setAliases(ManufacturerAliases& container, const char* token, const char* manufacturer);
-    const QString manufacturerFrom(const ManufacturerAliases& tokens, const QByteArray& packetData) const;
 };
 
 class SoapErrorHelper
