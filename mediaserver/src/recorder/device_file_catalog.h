@@ -26,6 +26,10 @@ public:
         }
 
         qint64 distanceToTime(qint64 timeMs) const;
+        qint64 endTimeMs() const;
+        bool containsTime(qint64 timeMs) const;
+        void truncate(qint64 timeMs);
+
 
         qint64 startTimeMs; // chunk startTime at ms
         int durationMs; // chunk duration at ms
@@ -46,6 +50,7 @@ public:
     void deleteRecordsBeforeTime(qint64 timeMs);
     void deleteRecordsByStorage(int storageIndex, qint64 timeMs);
     int findFileIndex(qint64 startTimeMs, FindMethod method) const;
+    void updateChunkDuration(Chunk& chunk);
     QString fullFileName(const Chunk& chunk) const;
     Chunk chunkAt(int index) const;
     bool isLastChunk(qint64 startTimeMs) const;
@@ -54,6 +59,7 @@ public:
     qint64 maxTime() const;
     bool lastFileDuplicateName() const;
     qint64 firstTime() const;
+    QnResource::ConnectionRole getRole() const { return m_role; }
 
     // Detail level determine time duration (in microseconds) visible at 1 screen pixel
     // All information less than detail level is discarded
