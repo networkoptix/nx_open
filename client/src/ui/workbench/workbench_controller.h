@@ -211,6 +211,8 @@ private:
     /** Last keyboard cursor position. */
     QPoint m_cursorPos;
 
+    /** Last item that was affected by keyboard control. */
+    QWeakPointer<QnWorkbenchItem> m_cursorItem;
 
 
     /* Resizing-related state. */

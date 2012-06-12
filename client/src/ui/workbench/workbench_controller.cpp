@@ -139,6 +139,19 @@ namespace {
         );
     }
 
+    int distance(int l, int h, int v) {
+        if(l > h)
+            return distance(h, l, v);
+
+        if(v <= l) {
+            return l - v;
+        } else if(v >= h) {
+            return v - h;
+        } else {
+            return 0;
+        }
+    }
+
     template<class T>
     struct IsInstanceOf {
         template<class Y>
@@ -423,46 +436,74 @@ void QnWorkbenchController::displayMotionGrid(const QList<QnResourceWidget *> &w
 }
 
 void QnWorkbenchController::moveCursor(const QPoint &direction) {
-    QPoint upos = m_cursorPos;
-    QnWorkbenchItem *item = workbench()->currentLayout()->item(upos);
+    QnWorkbenchItem *centerItem = m_cursorItem.data();
+    if(!centerItem)
+        centerItem = workbench()->currentLayout()->item(m_cursorPos);
+
+    QPoint center = m_cursorPos;
+    if(centerItem && !centerItem->geometry().contains(center))
+        center = centerItem->geometry().topLeft();
+
+    QRect centerRect;
+    if(centerItem) {
+        centerRect = centerItem->geometry();
+    } else {
+        centerRect = QRect(center, QSize(1, 1));
+    }
+    
+    QPoint aAxis = direction; /* Direction axis (a-axis) */
+    QPoint bAxis = QPoint(-aAxis.y(), aAxis.x()); /* Axis perpendicular to direction (b-axis). */
+
+    int aCenterRectL = dot(centerRect.topLeft(), aAxis);
+    int aCenterRectH = dot(centerRect.bottomRight(), aAxis);
+    int bCenterRectL = dot(centerRect.topLeft(), bAxis);
+    int bCenterRectH = dot(centerRect.bottomRight(), bAxis);
 
     QRect boundingRect = workbench()->currentLayout()->boundingRect();
-    if(boundingRect.isEmpty())
-        return;
+    int aBoundingSize = qAbs(dot(toPoint(boundingRect.size()), aAxis)); /* Size of the bounding rect projected to the a-axis. */
 
-    QPoint vpos = upos;
-    QnWorkbenchItem *newItem = NULL;
-    while(true) {
-        upos = modulo(upos + direction, boundingRect);
+    int bestDistance = std::numeric_limits<int>::max();
+    QPoint bestPos = center;
 
-        newItem = workbench()->currentLayout()->item(upos);
-        if(newItem != NULL && newItem != item)
-            break;
+    foreach(QnWorkbenchItem *item, workbench()->currentLayout()->items()) {
+        if(item == centerItem)
+            continue;
 
-        if(upos == vpos) {
-            if(!item)
-                break;
+        const QRect &geometry = item->geometry();
+        for (int r = geometry.top(); r <= geometry.bottom(); r++) {
+            for (int c = geometry.left(); c <= geometry.right(); c++) {
+                QPoint pos(c, r);
 
-            vpos += QPoint(qAbs(direction.y()), qAbs(direction.x()));
-            if(!item->geometry().contains(vpos))
-                break;
+                int arDistance = distance(aCenterRectL, aCenterRectH, dot(pos, aAxis));
+                int brDistance = distance(bCenterRectL, bCenterRectH, dot(pos, bAxis));
+                if(brDistance > arDistance)
+                    continue;
 
-            upos = vpos;
+                int aDistance = (dot(pos - center, aAxis) + aBoundingSize) % aBoundingSize;
+                int bDistance = qAbs(dot(pos - center, bAxis));
+
+                int distance = (aDistance << 16) + bDistance;
+                if(distance < bestDistance) {
+                    bestDistance = distance;
+                    bestPos = pos;
+                }
+            }
         }
     }
+
+    if(bestPos == center)
+        return;
 
     Qn::ItemRole role = Qn::ZoomedRole;
     if(!workbench()->item(role))
         role = Qn::RaisedRole;
-    
-    if(newItem != NULL && (newItem != item || item != workbench()->item(role))) {
-        workbench()->setItem(role, newItem);
 
-        display()->scene()->clearSelection();
-        display()->widget(newItem)->setSelected(true);
-
-        m_cursorPos = upos;
-    }
+    QnWorkbenchItem *bestItem = workbench()->currentLayout()->item(bestPos);
+    display()->scene()->clearSelection();
+    display()->widget(bestItem)->setSelected(true);
+    workbench()->setItem(role, bestItem);
+    m_cursorPos = bestPos;
+    m_cursorItem = bestItem;
 }
 
 
@@ -1088,8 +1129,10 @@ void QnWorkbenchController::at_display_widgetChanged(Qn::ItemRole role) {
         break;
     case Qn::RaisedRole:
     case Qn::CentralRole:
-        if(newWidget)
+        if(newWidget) {
+            m_cursorItem = newWidget->item();
             m_cursorPos = newWidget->item()->geometry().topLeft();
+        }
         break;
     default:
         break;
