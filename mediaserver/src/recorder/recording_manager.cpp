@@ -232,8 +232,10 @@ void QnRecordingManager::updateCamera(QnSecurityCamResourcePtr res)
             QnServerStreamRecorder* recorderHiRes = createRecorder(res, camera, QnResource::Role_LiveVideo);
             QnServerStreamRecorder* recorderLowRes = createRecorder(res, camera, QnResource::Role_SecondaryLiveVideo);
             QnDualStreamingHelperPtr dialStreamingHelper(new QnDualStreamingHelper());
-            recorderHiRes->setDualStreamingHelper(dialStreamingHelper);
-            recorderLowRes->setDualStreamingHelper(dialStreamingHelper);
+			if (recorderHiRes)
+				recorderHiRes->setDualStreamingHelper(dialStreamingHelper);
+			if (recorderLowRes)
+				recorderLowRes->setDualStreamingHelper(dialStreamingHelper);
 
             m_recordMap.insert(res, Recorders(recorderHiRes, recorderLowRes));
 
