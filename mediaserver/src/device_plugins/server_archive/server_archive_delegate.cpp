@@ -251,8 +251,6 @@ begin_label:
                 data->flags |= QnAbstractMediaData::MediaFlags_Ignore;
                 data->timestamp = m_skipFramesToTime;
             }
-            else
-                m_skipFramesToTime = 0;
         }
 
         // Switch quality on I-frame (slow switching without seek) check
@@ -355,12 +353,22 @@ bool QnServerArchiveDelegate::setQualityInternal(MediaQuality quality, bool fast
         // no immediate seek is need. change catalog on next i-frame
         
 
-        m_newQualityCatalog = quality == MEDIA_Quality_High ? m_catalogHi : m_catalogLow;
+        m_newQualityCatalog = (quality == MEDIA_Quality_High ? m_catalogHi : m_catalogLow);
         m_newQualityChunk = findChunk(m_newQualityCatalog, timeMs, DeviceFileCatalog::OnRecordHole_NextChunk);
-        if (m_newQualityChunk.distanceToTime(timeMs) > SECOND_STREAM_FIND_EPS) 
-            return false; // we can't find requested quality for current time, so do not perform soft (on next I-frame) qualiy changing
-        if (m_newQualityCatalog == m_currentChunkCatalog)
-            return false; // we already on requested quality
+        if (m_newQualityChunk.startTimeMs == -1)
+            return false; // requested quality is absent at all
+
+        if (m_newQualityCatalog == m_currentChunkCatalog) 
+        {
+            // we already on requested quality
+            if (m_currentChunk.startTimeMs == m_newQualityChunk.startTimeMs)
+                m_currentChunk.durationMs = m_newQualityChunk.durationMs; // also remove current chunk duration limit if exists
+            return false; // no seek is required
+        }
+
+        if (m_newQualityChunk.startTimeMs >= m_currentChunk.endTimeMs())
+            return false; // requested quality absent for current position. Current chunk can be played to the end. no seek is needed (return false)
+
         
         QString url = m_newQualityCatalog->fullFileName(m_newQualityChunk);
         m_newQualityFileRes = QnAviResourcePtr(new QnAviResource(url));
