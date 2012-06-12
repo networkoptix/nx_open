@@ -202,6 +202,15 @@ void QnMulticodecRtpReader::closeStream()
 {
     m_RtpSession.sendTeardown();
     m_RtpSession.stop();
+
+    m_videoIO = 0;
+    m_audioIO = 0;
+    
+    delete m_videoParser;
+    delete m_audioParser;
+    m_videoParser = 0;
+    m_audioParser = 0;
+
 }
 
 bool QnMulticodecRtpReader::isStreamOpened() const

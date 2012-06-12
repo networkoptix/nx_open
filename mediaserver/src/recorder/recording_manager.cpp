@@ -254,6 +254,21 @@ void QnRecordingManager::updateCamera(QnSecurityCamResourcePtr res)
     }
 }
 
+void QnRecordingManager::at_cameraUpdated()
+{
+    QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource> (dynamic_cast<QnVirtualCameraResource*>(sender())->toSharedPointer());
+    if (camera) {
+        QMap<QnResourcePtr, Recorders>::iterator itr = m_recordMap.find(camera); // && m_recordMap.value(camera).recorderHiRes->isRunning();
+        if (itr != m_recordMap.end()) 
+        {
+            if (itr->recorderHiRes && itr->recorderHiRes->isAudioPresent() != camera->isAudioEnabled()) 
+                itr->recorderHiRes->setNeedReopen();
+            if (itr->recorderLowRes && itr->recorderLowRes->isAudioPresent() != camera->isAudioEnabled()) 
+                itr->recorderLowRes->setNeedReopen();
+        }
+    }
+}
+
 void QnRecordingManager::at_cameraStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus)
 {
     if (oldStatus == QnResource::Offline && newStatus == QnResource::Online)
@@ -269,6 +284,7 @@ void QnRecordingManager::onNewResource(QnResourcePtr res)
     QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource>(res);
     if (camera) {
         connect(camera.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(at_cameraStatusChanged(QnResource::Status, QnResource::Status)));
+        connect(camera.data(), SIGNAL(resourceChanged()), this, SLOT(at_cameraUpdated()));
         updateCamera(camera);
         return;
     }

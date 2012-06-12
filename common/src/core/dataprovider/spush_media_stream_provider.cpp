@@ -8,8 +8,12 @@
 
 CLServerPushStreamreader::CLServerPushStreamreader(QnResourcePtr dev ):
 QnAbstractMediaStreamDataProvider(dev),
-m_needReopen(false)
+m_needReopen(false),
+m_cameraAudioEnabled(false)
 {
+    QnPhysicalCameraResourcePtr camera = getResource().dynamicCast<QnPhysicalCameraResource>();
+    if (camera) 
+        m_cameraAudioEnabled = camera->isAudioEnabled();
 }
 
 void CLServerPushStreamreader::run()
@@ -166,4 +170,14 @@ void CLServerPushStreamreader::beforeRun()
 void CLServerPushStreamreader::pleaseReOpen()
 {
     m_needReopen = true;
+}
+
+void CLServerPushStreamreader::afterUpdate() 
+{
+    QnPhysicalCameraResourcePtr camera = getResource().dynamicCast<QnPhysicalCameraResource>();
+    if (camera) {
+        if (m_cameraAudioEnabled != camera->isAudioEnabled())
+            pleaseReOpen();
+        m_cameraAudioEnabled = camera->isAudioEnabled();
+    }
 }

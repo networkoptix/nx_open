@@ -35,6 +35,7 @@ protected:
     QString getRangeStr();
 private slots:
     void at_cameraDisabledChanged(bool oldValue, bool newValue);
+    void at_cameraUpdated();
 private:
     void checkQuality();
     void processRequest();
