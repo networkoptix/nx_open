@@ -32,6 +32,7 @@
 #include <ui/animation/animation_timer.h>
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
+
 #include "instrument_manager.h"
 
 Instrument::Instrument(const EventTypeSet &viewportEventTypes, const EventTypeSet &viewEventTypes, const EventTypeSet &sceneEventTypes, const EventTypeSet &itemEventTypes, QObject *parent):
@@ -96,15 +97,22 @@ const Instrument::EventTypeSet &Instrument::watchedEventTypes(WatchedType type) 
 }
 
 void Instrument::setItemConditions(const QList<InstrumentItemCondition *> &itemConditions) {
+    QList<InstrumentItemCondition *> effectiveItemConditions = itemConditions;
+
+    if(itemConditions.contains(NULL)) {
+        qnWarning("Given item conditions list contains NULL conditions.");
+        effectiveItemConditions.removeAll(NULL);
+    }
+
     if(isInstalled()) {
         qnWarning("Cannot change item conditions of an installed instrument.");
-        m_ownedItemConditions.unite(itemConditions.toSet()); /* We must claim ownership. */
+        m_ownedItemConditions.unite(effectiveItemConditions.toSet()); /* We must claim ownership. */
         return;
     }
 
     qDeleteAll(m_ownedItemConditions);
-    m_ownedItemConditions = itemConditions.toSet();
-    m_itemConditions = itemConditions;
+    m_ownedItemConditions = effectiveItemConditions.toSet();
+    m_itemConditions = effectiveItemConditions;
 }
 
 void Instrument::addItemCondition(InstrumentItemCondition *itemCondition) {
@@ -140,6 +148,19 @@ void Instrument::removeItemCondition(InstrumentItemCondition *itemCondition) {
 
     m_ownedItemConditions.remove(itemCondition);
     m_itemConditions.removeAll(itemCondition);
+}
+
+bool Instrument::satisfiesItemConditions(QGraphicsItem *item) const {
+    if(!item) {
+        qnNullWarning(item);
+        return false;
+    }
+
+    foreach(InstrumentItemCondition *condition, m_itemConditions)
+        if(!condition->operator()(item, const_cast<Instrument *>(this)))
+            return false;
+
+    return true;
 }
 
 void Instrument::ensureUninstalled() {

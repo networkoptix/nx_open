@@ -25,14 +25,19 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     ui->recordMotionButton->setColor(qnGlobals->recordMotionColor());
     ui->recordMotionButton->setCheckedColor(shiftColor(qnGlobals->recordMotionColor(), SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA));
 
+    ui->recordMotionPlusLQButton->setColor(shiftColor(qnGlobals->recordMotionColor(),0,1,0));
+    ui->recordMotionPlusLQButton->setCheckedColor(shiftColor(qnGlobals->recordMotionColor(), SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA));
+    ui->recordMotionPlusLQButton->setInsideColor(qnGlobals->recordAlwaysColor()); // inside color
+
     ui->noRecordButton->setColor(qnGlobals->noRecordColor());
     ui->noRecordButton->setCheckedColor(shiftColor(qnGlobals->noRecordColor(), SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA));
 
-    connect(ui->recordAlwaysButton,     SIGNAL(toggled(bool)),              this,   SLOT(updateGridParams()));
-    connect(ui->recordMotionButton,     SIGNAL(toggled(bool)),              this,   SLOT(updateGridParams()));
-    connect(ui->noRecordButton,         SIGNAL(toggled(bool)),              this,   SLOT(updateGridParams()));
-    connect(ui->qualityComboBox,        SIGNAL(currentIndexChanged(int)),   this,   SLOT(updateGridParams()));
-    connect(ui->fpsSpinBox,             SIGNAL(valueChanged(double)),       this,   SLOT(updateGridParams()));
+    connect(ui->recordAlwaysButton,      SIGNAL(toggled(bool)),              this,   SLOT(updateGridParams()));
+    connect(ui->recordMotionButton,      SIGNAL(toggled(bool)),              this,   SLOT(updateGridParams()));
+    connect(ui->recordMotionPlusLQButton,SIGNAL(toggled(bool)),              this,   SLOT(updateGridParams()));
+    connect(ui->noRecordButton,          SIGNAL(toggled(bool)),              this,   SLOT(updateGridParams()));
+    connect(ui->qualityComboBox,         SIGNAL(currentIndexChanged(int)),   this,   SLOT(updateGridParams()));
+    connect(ui->fpsSpinBox,              SIGNAL(valueChanged(double)),       this,   SLOT(updateGridParams()));
     
     connect(ui->licensesButton,         SIGNAL(clicked()),                  this,   SLOT(at_licensesButton_clicked()));
     connect(ui->displayQualityCheckBox, SIGNAL(stateChanged(int)),          this,   SLOT(at_displayQualiteCheckBox_stateChanged(int)));
@@ -90,6 +95,7 @@ void QnCameraScheduleWidget::setReadOnly(bool readOnly)
     using ::setReadOnly;
     setReadOnly(ui->recordAlwaysButton, readOnly);
     setReadOnly(ui->recordMotionButton, readOnly);
+    setReadOnly(ui->recordMotionPlusLQButton, readOnly);
     setReadOnly(ui->noRecordButton, readOnly);
     setReadOnly(ui->qualityComboBox, readOnly);
     setReadOnly(ui->fpsSpinBox, readOnly);
@@ -136,6 +142,8 @@ QList<QnScheduleTask::Data> QnCameraScheduleWidget::scheduleTasks() const
                     recordType = QnScheduleTask::RecordingType_Run;
                 else if (color == ui->recordMotionButton->color())
                     recordType = QnScheduleTask::RecordingType_MotionOnly;
+                else if (color == ui->recordMotionPlusLQButton->color())
+                    recordType = QnScheduleTask::RecordingType_MotionPlusLQ;
                 else if (color == ui->noRecordButton->color())
                     recordType = QnScheduleTask::RecordingType_Never;
                 else
@@ -218,11 +226,15 @@ void QnCameraScheduleWidget::setScheduleTasks(const QList<QnScheduleTask::Data> 
     foreach (const QnScheduleTask::Data &task, tasks) {
         const int row = task.m_dayOfWeek - 1;
 
-        QColor color;
+        QColor color, colorInside;
         switch (task.m_recordType) {
-        case QnScheduleTask::RecordingType_Run: color = ui->recordAlwaysButton->color(); break;
-        case QnScheduleTask::RecordingType_MotionOnly: color = ui->recordMotionButton->color(); break;
-        case QnScheduleTask::RecordingType_Never: color = ui->noRecordButton->color(); break;
+        case QnScheduleTask::RecordingType_Run: colorInside = color = ui->recordAlwaysButton->color(); break;
+        case QnScheduleTask::RecordingType_MotionOnly: colorInside = color = ui->recordMotionButton->color(); break;
+        case QnScheduleTask::RecordingType_MotionPlusLQ: 
+            color = ui->recordMotionPlusLQButton->color(); 
+            colorInside = ui->recordAlwaysButton->color();
+            break;
+        case QnScheduleTask::RecordingType_Never: colorInside = color = ui->noRecordButton->color(); break;
         default:
             qWarning("QnCameraScheduleWidget::setScheduleTasks(): Unhandled RecordingType value %d", task.m_recordType);
             break;
@@ -252,6 +264,7 @@ void QnCameraScheduleWidget::setScheduleTasks(const QList<QnScheduleTask::Data> 
             const QPoint cell(col, row);
 
             ui->gridWidget->setCellValue(cell, QnScheduleGridWidget::ColorParam, color.rgba());
+            ui->gridWidget->setCellValue(cell, QnScheduleGridWidget::ColorInsideParam, colorInside.rgba());
             ui->gridWidget->setCellValue(cell, QnScheduleGridWidget::SecondParam, shortQuality);
             ui->gridWidget->setCellValue(cell, QnScheduleGridWidget::FirstParam, fps);
         }
@@ -310,9 +323,11 @@ void QnCameraScheduleWidget::updateGridParams(bool fromUserInput)
         color = ui->recordMotionButton->color();
     else if (ui->noRecordButton->isChecked())
         color = ui->noRecordButton->color();
+    else if (ui->recordMotionPlusLQButton->isChecked())
+        color = ui->recordMotionPlusLQButton->color();
 
     bool enabled = !ui->noRecordButton->isChecked();
-    bool motionEnabled = ui->recordMotionButton->isChecked();
+    bool motionEnabled = ui->recordMotionButton->isChecked() || ui->recordMotionPlusLQButton->isChecked();
 
     ui->fpsSpinBox->setEnabled(enabled);
     ui->qualityComboBox->setEnabled(enabled);
@@ -321,6 +336,10 @@ void QnCameraScheduleWidget::updateGridParams(bool fromUserInput)
 
     if(!(m_readOnly && fromUserInput)) {
         ui->gridWidget->setDefaultParam(QnScheduleGridWidget::ColorParam, color.rgba());
+        if (ui->recordMotionPlusLQButton->isChecked())
+            ui->gridWidget->setDefaultParam(QnScheduleGridWidget::ColorInsideParam, ui->recordAlwaysButton->color().rgba());
+        else
+            ui->gridWidget->setDefaultParam(QnScheduleGridWidget::ColorInsideParam, color.rgba());
         if (ui->noRecordButton->isChecked())
         {
             ui->gridWidget->setDefaultParam(QnScheduleGridWidget::FirstParam, QLatin1String("-"));
@@ -332,6 +351,7 @@ void QnCameraScheduleWidget::updateGridParams(bool fromUserInput)
             ui->gridWidget->setDefaultParam(QnScheduleGridWidget::SecondParam, getShortText(ui->qualityComboBox->currentText()));
         }
     }
+    emit gridParamsChanged();
 }
 
 void QnCameraScheduleWidget::setMaxFps(int value)
@@ -423,6 +443,8 @@ void QnCameraScheduleWidget::at_gridWidget_cellActivated(const QPoint &cell)
         ui->recordAlwaysButton->setChecked(true);
     else if (color == ui->recordMotionButton->color())
         ui->recordMotionButton->setChecked(true);
+    else if (color == ui->recordMotionPlusLQButton->color())
+        ui->recordMotionPlusLQButton->setChecked(true);
     else if (color == ui->noRecordButton->color())
         ui->noRecordButton->setChecked(true);
     if (color != ui->noRecordButton->color())
@@ -458,3 +480,7 @@ void QnCameraScheduleWidget::at_licensesButton_clicked()
     emit moreLicensesRequested();
 }
 
+bool QnCameraScheduleWidget::isSecondaryStreamReserver() const
+{
+    return ui->recordMotionPlusLQButton->isChecked();
+}

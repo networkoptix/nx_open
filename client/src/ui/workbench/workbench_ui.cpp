@@ -114,6 +114,7 @@ namespace {
             setAcceptHoverEvents(false);
             setFlag(ItemHasNoContents, true);
             setFlag(ItemIsMovable, true);
+            setHandlingFlag(ItemHandlesMovement, true);
         }
     };
 

@@ -74,7 +74,7 @@ public:
     }
 
     MoveInstrument *moveInstrument() const {
-        return m_moveInstrument;
+        return m_widgetMoveInstrument;
     }
 
     ForwardingInstrument *itemMouseForwardingInstrument() const {
@@ -174,8 +174,8 @@ private:
     /** Wheel zoom instrument. */
     WheelZoomInstrument *m_wheelZoomInstrument;
 
-    /** Dragging instrument. */
-    MoveInstrument *m_moveInstrument;
+    /** Widget moving instrument. */
+    MoveInstrument *m_widgetMoveInstrument;
 
     /** Rotation instrument. */
     RotationInstrument *m_rotationInstrument;
@@ -211,6 +211,8 @@ private:
     /** Last keyboard cursor position. */
     QPoint m_cursorPos;
 
+    /** Last item that was affected by keyboard control. */
+    QWeakPointer<QnWorkbenchItem> m_cursorItem;
 
 
     /* Resizing-related state. */

@@ -12,6 +12,8 @@
 #include <ui/common/geometry.h>
 #include <ui/common/scene_transformations.h>
 
+#include "instrument_item_condition.h"
+
 class QKeyEvent;
 class QMouseEvent;
 class QWheelEvent;
@@ -256,6 +258,12 @@ public:
      * \param itemCondition            Item condition to remove from this instrument's item condition list.
      */
     void removeItemCondition(InstrumentItemCondition *itemCondition);
+
+    /**
+     * \param item                      Item to check.
+     * \returns                         Whether the given item satisfies this instrument's item conditions.
+     */
+    bool satisfiesItemConditions(QGraphicsItem *item) const;
 
     /**
      * This function is to be used in constructors of derived classes.

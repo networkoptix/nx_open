@@ -141,30 +141,37 @@ QString QnStorageManager::dateTimeStr(qint64 dateTimeMs)
     return text;
 }
 
+void QnStorageManager::getTimePeriodInternal(QVector<QnTimePeriodList>& cameras, QnNetworkResourcePtr camera, qint64 startTime, qint64 endTime, qint64 detailLevel, DeviceFileCatalogPtr catalog)
+{
+    if (catalog) {
+        cameras << catalog->getTimePeriods(startTime, endTime, detailLevel);
+        if (!cameras.last().isEmpty())
+        {
+            QnTimePeriod& lastPeriod = cameras.last().last();
+            bool isActive = !camera->isDisabled() && (camera->getStatus() == QnResource::Online || camera->getStatus() == QnResource::Recording);
+            if (lastPeriod.durationMs == -1 && !isActive)
+            {
+                lastPeriod.durationMs = 0;
+                Recorders recorders = QnRecordingManager::instance()->findRecorders(camera);
+                if (catalog->getRole() == QnResource::Role_LiveVideo && recorders.recorderHiRes)
+                    lastPeriod.durationMs = recorders.recorderHiRes->duration()/1000;
+                else if (catalog->getRole() == QnResource::Role_SecondaryLiveVideo && recorders.recorderLowRes)
+                    lastPeriod.durationMs = recorders.recorderLowRes->duration()/1000;
+            }
+        }
+    }
+}
+
 QnTimePeriodList QnStorageManager::getRecordedPeriods(QnResourceList resList, qint64 startTime, qint64 endTime, qint64 detailLevel)
 {
     QVector<QnTimePeriodList> cameras;
     for (int i = 0; i < resList.size(); ++i)
     {
         QnNetworkResourcePtr camera = qSharedPointerDynamicCast<QnNetworkResource> (resList[i]);
-        if (camera) 
-        {
-            DeviceFileCatalogPtr catalog = getFileCatalog(camera->getMAC().toString(), QnResource::Role_LiveVideo);
-            if (catalog) {
-                cameras << catalog->getTimePeriods(startTime, endTime, detailLevel);
-                if (!cameras.last().isEmpty())
-                {
-                    QnTimePeriod& lastPeriod = cameras.last().last();
-					bool isActive = !camera->isDisabled() && (camera->getStatus() == QnResource::Online || camera->getStatus() == QnResource::Recording);
-                    if (lastPeriod.durationMs == -1 && !isActive)
-                    {
-                        lastPeriod.durationMs = 0;
-                        Recorders recorders = QnRecordingManager::instance()->findRecorders(camera);
-                        if(recorders.recorderHiRes)
-                            lastPeriod.durationMs = recorders.recorderHiRes->duration()/1000;
-                    }
-                }
-            }
+        if (camera) {
+            QString mac = camera->getMAC().toString();
+            getTimePeriodInternal(cameras, camera, startTime, endTime, detailLevel, getFileCatalog(mac, QnResource::Role_LiveVideo));
+            getTimePeriodInternal(cameras, camera, startTime, endTime, detailLevel, getFileCatalog(mac, QnResource::Role_SecondaryLiveVideo));
         }
     }
 

@@ -44,6 +44,7 @@ private slots:
     void onRemoveResource(QnResourcePtr res);
     void onTimer();
     void at_updateStorage();
+    void at_cameraStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
 private:
     QnServerStreamRecorder* createRecorder(QnResourcePtr res, QnVideoCamera* camera, QnResource::ConnectionRole role);
     void startOrStopRecording(QnResourcePtr res, QnVideoCamera* camera, QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes);

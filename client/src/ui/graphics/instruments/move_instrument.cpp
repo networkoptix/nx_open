@@ -43,7 +43,7 @@ bool MoveInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
 
     /* Find the item to drag. */
     QGraphicsItem *draggedItem = item(view, event->pos(), ItemAcceptsLeftMouseButton());
-    if (draggedItem == NULL || !(draggedItem->flags() & QGraphicsItem::ItemIsMovable))
+    if (draggedItem == NULL || !(draggedItem->flags() & QGraphicsItem::ItemIsMovable) || !satisfiesItemConditions(draggedItem))
         return false;
     m_draggedItem = draggedItem;
 

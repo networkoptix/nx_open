@@ -26,7 +26,7 @@ QnScheduleGridWidget::QnScheduleGridWidget(QWidget *parent)
     m_readOnly = false;
     m_defaultParams[FirstParam] = 10;
     m_defaultParams[SecondParam] = QLatin1String("Md");
-    m_defaultParams[ColorParam] = qnGlobals->recordAlwaysColor().rgba();
+    m_defaultParams[ColorInsideParam] = m_defaultParams[ColorParam] = qnGlobals->recordAlwaysColor().rgba();
     resetCellValues();
 
 
@@ -158,6 +158,7 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *)
         for (int y = 0; y < rowCount(); ++y)
         {
             QColor color(m_gridParams[x][y][ColorParam].toUInt());
+            QColor colorInside(m_gridParams[x][y][ColorInsideParam].toUInt());
             if (!m_mousePressed) {
                 if (y == m_mouseMoveCell.y() && x == m_mouseMoveCell.x() ||
                     m_mouseMoveCell.y() == -1 && x == m_mouseMoveCell.x() ||
@@ -165,28 +166,61 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *)
                     m_mouseMoveCell.y() == -1 && m_mouseMoveCell.x() == -1)
                 {
                     color = shiftColor(color, SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA);
+                    colorInside = shiftColor(colorInside, SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA);
                 }
             }
-            if (!m_enabled)
+            if (!m_enabled) {
                 color = toGrayscale(color);
+                colorInside = toGrayscale(colorInside);
+            }
 
             QPointF leftTop(cellSize*x, cellSize*y);
             QPointF rightBottom(leftTop.x() + cellSize, leftTop.y() + cellSize);
-            //p.setBrush(QBrush(color));
-            //p.drawRect(leftTop.x(), leftTop.y(), cellSize, cellSize);
             p.fillRect(QRectF(leftTop.x(), leftTop.y(), cellSize, cellSize), color);
 
-            // draw text parameters
             QColor penClr(255, 255, 255, 128);
+            if (!m_enabled)
+                penClr = toGrayscale(penClr);
+            if (m_showFirstParam && m_showSecondParam)
+            {
+                QPoint p1 = QPointF(leftTop.x(), rightBottom.y()).toPoint();
+                QPoint p2(p1.x() + int(cellSize+0.5), p1.y() - int(cellSize+0.5));
+                p.drawLine(p1, p2);
+            }
+
+            if (colorInside.toRgb() != color.toRgb()) {
+                //p.fillRect(QRectF(leftTop.x() + cellSize/3, leftTop.y() + cellSize/3, cellSize/3, cellSize/3), colorInside);
+                p.translate(leftTop);
+
+                p.setBrush(m_enabled ? colorInside : toGrayscale(colorInside));
+                QColor penClr(shiftColor(color, -32,-32,-32));
+                if (!m_enabled)
+                    penClr = toGrayscale(penClr);
+                p.setPen(penClr);
+
+                qreal trOffset = cellSize/6;
+                qreal trSize = cellSize/10;
+
+                QPointF points[6];
+                points[0] = QPointF(cellSize - trOffset - trSize, trOffset);
+                points[1] = QPointF(cellSize - trOffset, trOffset);
+                points[2] = QPointF(cellSize-trOffset, trOffset + trSize);
+                points[3] = QPointF(trOffset + trSize, cellSize - trOffset);
+                points[4] = QPointF(trOffset, cellSize - trOffset);
+                points[5] = QPointF(trOffset, cellSize - trSize - trOffset);
+                p.drawPolygon(points, 6);
+
+                p.translate(-leftTop.x(),-leftTop.y());
+            }
+
+            // draw text parameters
+            penClr = QColor(255, 255, 255, 128);
             if (!m_enabled)
                 penClr = toGrayscale(penClr);
 
             p.setPen(penClr);
             if (m_showFirstParam && m_showSecondParam)
             {
-                QPoint p1 = QPointF(leftTop.x(), rightBottom.y()).toPoint();
-                QPoint p2(p1.x() + int(cellSize+0.5), p1.y() - int(cellSize+0.5));
-                p.drawLine(p1, p2);
                 p.drawText(QRectF(leftTop, leftTop+QPointF(cellSize/2.0, cellSize/2.0)), Qt::AlignCenter | Qt::AlignHCenter, m_gridParams[x][y][FirstParam].toString());
                 p.drawText(QRectF(leftTop+QPointF(cellSize/2.0, cellSize/2.0), rightBottom), Qt::AlignCenter | Qt::AlignHCenter, m_gridParams[x][y][SecondParam].toString());
             }
@@ -194,6 +228,8 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *)
                 p.drawText(QRectF(leftTop, leftTop+QPointF(cellSize, cellSize)), Qt::AlignCenter | Qt::AlignHCenter, m_gridParams[x][y][FirstParam].toString());
             else if (m_showSecondParam)
                 p.drawText(QRectF(leftTop, leftTop+QPointF(cellSize, cellSize)), Qt::AlignCenter | Qt::AlignHCenter, m_gridParams[x][y][SecondParam].toString());
+
+
             p.setPen(QColor(255, 255, 255));
 
         }
@@ -224,13 +260,11 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *)
 
 
     // draw selection
-    //penClr = QColor(qnGlobals->motionRubberBandBorderColor());
     penClr = subColor(QColor(m_defaultParams[ColorParam].toUInt()), qnGlobals->selectionBorderDelta());
     if (!m_enabled)
         penClr = toGrayscale(penClr);
 
     p.setPen(penClr);
-    //QColor brushClr(qnGlobals->motionRubberBandColor());
     QColor brushClr = subColor(QColor(m_defaultParams[ColorParam].toUInt()), qnGlobals->selectionOpacityDelta());
     if (!m_enabled)
         brushClr = toGrayscale(brushClr);
@@ -420,7 +454,7 @@ void QnScheduleGridWidget::resetCellValues()
     CellParams emptyParams;
     emptyParams[FirstParam] = QLatin1String("-");
     emptyParams[SecondParam] = QLatin1String("-");
-    emptyParams[ColorParam] = qnGlobals->noRecordColor().rgba();
+    emptyParams[ColorInsideParam] = emptyParams[ColorParam] = qnGlobals->noRecordColor().rgba();
 
     for (int col = 0; col < columnCount(); ++col)
         for (int row = 0; row < rowCount(); ++row)

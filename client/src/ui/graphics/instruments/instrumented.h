@@ -3,6 +3,8 @@
 
 #include <QGraphicsItem>
 
+#include <utils/common/forward.h>
+
 namespace detail {
     class InstrumentedBase {
     protected:
@@ -24,15 +26,7 @@ namespace detail {
 template<class Base>
 class Instrumented: public Base, private detail::InstrumentedBase {
 public:
-    template<class T0>
-    Instrumented(const T0 &arg0): Base(arg0) {
-        updateScene(this->scene(), this);
-    }
-
-    template<class T0, class T1>
-    Instrumented(const T0 &arg0, const T1 &arg1): Base(arg0, arg1) {
-        updateScene(this->scene(), this);
-    }
+    QN_FORWARD_CONSTRUCTOR(Instrumented, Base, { updateScene(this->scene(), this); });
 
     virtual ~Instrumented() {
         updateScene(NULL, this);

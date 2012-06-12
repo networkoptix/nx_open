@@ -34,6 +34,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->loginEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dataChanged()));
     connect(ui->passwordEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dataChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleTasksChanged()),         this,   SLOT(at_cameraScheduleWidget_scheduleTasksChanged()));
+    connect(ui->cameraScheduleWidget,   SIGNAL(gridParamsChanged()),            this,   SLOT(updateMaxFPS()));
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleEnabledChanged()),       this,   SLOT(at_dataChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(moreLicensesRequested()),        this,   SIGNAL(moreLicensesRequested()));
     connect(ui->webPageLabel,           SIGNAL(linkActivated(const QString &)), this,   SLOT(at_linkActivated(const QString &)));
@@ -219,10 +220,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         ui->loginEdit->setText(m_camera->getAuth().user());
         ui->passwordEdit->setText(m_camera->getAuth().password());
 
-        if (ui->softwareMotionButton->isChecked())
-            ui->cameraScheduleWidget->setMaxFps(m_camera->getMaxFps()-2);
-        else
-            ui->cameraScheduleWidget->setMaxFps(m_camera->getMaxFps());
+        updateMaxFPS();
 
         QList<QnScheduleTask::Data> scheduleTasks;
         foreach (const QnScheduleTask& scheduleTaskData, m_camera->getScheduleTasks())
@@ -297,7 +295,12 @@ void QnSingleCameraSettingsWidget::at_motionTypeChanged() {
     at_dataChanged();
     if (m_camera && m_motionWidget)
         m_motionWidget->setNeedControlMaxRects(!ui->softwareMotionButton->isChecked());
-    if (ui->softwareMotionButton->isChecked())
+    updateMaxFPS();
+}
+
+void QnSingleCameraSettingsWidget::updateMaxFPS()
+{
+    if (ui->softwareMotionButton->isChecked() || ui->cameraScheduleWidget->isSecondaryStreamReserver())
     {
         float maxFps = m_camera->getMaxFps()-2;
         float currentMaxFps = ui->cameraScheduleWidget->getGridMaxFps();
