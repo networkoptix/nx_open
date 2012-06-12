@@ -4,7 +4,7 @@
 #include "core/resourcemanagment/resource_searcher.h"
 #include "../onvif_old/onvif_device_searcher.h"
 
-class QnPlIqResourceSearcher : public OnvifResourceSearcher
+class QnPlIqResourceSearcher : public OnvifResourceSearcherOld
 {
     QnPlIqResourceSearcher();
 

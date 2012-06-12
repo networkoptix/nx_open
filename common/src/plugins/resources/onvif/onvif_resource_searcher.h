@@ -11,7 +11,7 @@
 class OnvifResourceSearcher : public QnAbstractNetworkResourceSearcher
 {
     OnvifResourceSearcherWsdd& wsddSearcher;
-    OnvifResourceSearcherMdns& mdnsSearcher;
+    //OnvifResourceSearcherMdns& mdnsSearcher;
 
 protected:
     OnvifResourceSearcher();

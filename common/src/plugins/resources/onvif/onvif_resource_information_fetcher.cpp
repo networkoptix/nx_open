@@ -179,9 +179,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         name = "Unknown - " + mac;
     }
 
-    if (manufacturer.isEmpty()) {
-        QByteArray manufacturerTmp(fetchManufacturer(response2).toStdString().c_str());
-        manufacturer = manufacturersData.manufacturerFromWsdd(manufacturerTmp);
+    if (manufacturer.isEmpty()) { //ToDo" fetch manufacturer
     }
     qDebug() << "OnvifResourceInformationFetcher::findResources: manufacturer: " << manufacturer;
 

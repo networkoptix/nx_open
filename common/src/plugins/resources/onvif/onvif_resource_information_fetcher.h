@@ -37,7 +37,6 @@ class OnvifResourceInformationFetcher
 	static std::string& STD_ONVIF_PASSWORD;
     QnId onvifTypeId;
     PasswordHelper passwordsData;
-    ManufacturerHelper manufacturersData;
 
 public:
 

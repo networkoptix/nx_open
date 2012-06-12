@@ -1,10 +1,11 @@
 #include "onvif_resource_searcher.h"
 #include "core/resource/camera_resource.h"
+#include "onvif_resource.h"
 
 
 OnvifResourceSearcher::OnvifResourceSearcher():
-    wsddSearcher(OnvifResourceSearcherWsdd::instance()),
-    mdnsSearcher(OnvifResourceSearcherMdns::instance()),
+    wsddSearcher(OnvifResourceSearcherWsdd::instance())
+    //mdnsSearcher(OnvifResourceSearcherMdns::instance()),
 {
 
 }
