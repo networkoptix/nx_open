@@ -58,7 +58,7 @@ private slots:
     void at_motionTypeChanged();
     void at_motionSensitivityChanged(int value);
     void at_motionSelectionCleared();
-
+    void updateMaxFPS();
 private:
     void setHasChanges(bool hasChanges);
     void updateMaxMotionRect();

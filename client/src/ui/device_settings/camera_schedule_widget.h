@@ -36,11 +36,12 @@ public:
     const QnVirtualCameraResourceList &cameras() const;
     void setCameras(const QnVirtualCameraResourceList &cameras);
     int getGridMaxFps();
+    bool isSecondaryStreamReserver() const;
 signals:
     void scheduleTasksChanged();
     void scheduleEnabledChanged();
     void moreLicensesRequested();
-
+    void gridParamsChanged();
 private slots:
     void updateGridParams(bool fromUserInput = false);
     void updateGridEnabledState();
