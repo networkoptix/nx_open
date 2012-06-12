@@ -1019,11 +1019,20 @@ void QnWorkbenchUi::updateFpsGeometry() {
 }
 
 void QnWorkbenchUi::updateSliderResizerGeometry() {
-    QRectF sliderResizerGeometry = m_sliderItem->geometry();
+    QnTimeSlider *timeSlider = m_sliderItem->timeSlider();
+    QRectF timeSliderRect = timeSlider->rect();
+
+    QRectF sliderResizerGeometry = QRectF(
+        m_controlsWidget->mapFromItem(timeSlider, timeSliderRect.topLeft()),
+        m_controlsWidget->mapFromItem(timeSlider, timeSliderRect.topRight())
+    );
     sliderResizerGeometry.moveTo(sliderResizerGeometry.topLeft() - QPointF(0, 8));
     sliderResizerGeometry.setHeight(16);
+    
     m_sliderResizerItem->setGeometry(sliderResizerGeometry);
-    m_sliderResizerItem->setPos(sliderResizerGeometry.topLeft());
+
+    /* This one is needed here as we're in a handler and thus geometry change doesn't adjust position =(. */
+    m_sliderResizerItem->setPos(sliderResizerGeometry.topLeft());  // TODO: remove this ugly hack.
 }
 
 QMargins QnWorkbenchUi::calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY, qreal helpX) {
