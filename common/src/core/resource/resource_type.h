@@ -62,6 +62,8 @@ private:
 class QN_EXPORT QnResourceTypePool
 {
 public:
+    typedef QMap<QnId, QnResourceTypePtr> QnResourceTypeMap;
+
     static QnResourceTypePool *instance();
 
     QnResourceTypePtr getResourceTypeByName(const QString& name) const;
@@ -70,11 +72,11 @@ public:
     void addResourceTypeList(const QList<QnResourceTypePtr>& resourceType);
 
     QnId getResourceTypeId(const QString& manufacture, const QString& name) const;
+    QnResourceTypeMap getResourceTypeMap() const;
 
     bool isEmpty() const;
 private:
     mutable QMutex m_mutex;
-    typedef QMap<QnId, QnResourceTypePtr> QnResourceTypeMap;
     QnResourceTypeMap m_resourceTypeMap;
 };
 

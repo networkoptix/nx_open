@@ -16,7 +16,9 @@ std::string& OnvifResourceInformationFetcher::STD_ONVIF_USER = *(new std::string
 std::string& OnvifResourceInformationFetcher::STD_ONVIF_PASSWORD = *(new std::string("admin"));
 
 
-OnvifResourceInformationFetcher::OnvifResourceInformationFetcher()
+OnvifResourceInformationFetcher::OnvifResourceInformationFetcher():
+    passwordsData(PasswordHelper::instance()),
+    camersNamesData(NameHelper::instance())
 {
 	QnResourceTypePtr typePtr(qnResTypePool->getResourceTypeByName(ONVIF_RT));
 	if (!typePtr.isNull()) {
@@ -49,11 +51,15 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         return;
     }
 
+    if (camersNamesData.isSupported(info.name)) {
+        qDebug() << "OnvifResourceInformationFetcher::findResources: skipping camera " << info.name;
+        return;
+    }
+
     QHostAddress sender(hostAddressFromEndpoint(endpoint));
     const char* login = 0;
     const char* passwd = 0;
-    QString manufacturer("");//ToDo: find manufacturer
-    PasswordList passwords = passwordsData.getPasswordsByManufacturer(manufacturer);
+    PasswordList passwords = passwordsData.getPasswordsByManufacturer(info.manufacturer);
     PasswordList::ConstIterator passwdIter = passwords.begin();
 
     int soapRes = SOAP_OK;
@@ -155,7 +161,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     }
 
     if (mac.isEmpty()) {
-        mac = fetchSerialConvertToMac(response2);
+        mac = fetchSerial(response2);
         if (mac.isEmpty()) {
             if (passwordsData.isNotAuthenticated(soapProxy.soap_fault())) {
                 qCritical() << "OnvifResourceInformationFetcher::findResources: Can't get ONVIF device MAC address, because login/password required. Endpoint URL: " << endpoint;
@@ -174,12 +180,21 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
 
     QString name(fetchName(response2));
     if (name.isEmpty()) {
+        name = info.name;
+    } else if (camersNamesData.isSupported(name)) {
+        qDebug() << "OnvifResourceInformationFetcher::findResources: (later step) skipping camera " << name;
+        return;
+    }
+
+    if (name.isEmpty()) {
         qWarning() << "OnvifResourceInformationFetcher::findResources: can't fetch name of ONVIF device: endpoint: " << endpoint
                    << ", MAC: " << mac;
         name = "Unknown - " + mac;
     }
 
-    if (manufacturer.isEmpty()) { //ToDo" fetch manufacturer
+    QString manufacturer(fetchManufacturer(response2));
+    if (manufacturer.isEmpty()) {
+        manufacturer = info.manufacturer;
     }
     qDebug() << "OnvifResourceInformationFetcher::findResources: manufacturer: " << manufacturer;
 
@@ -205,7 +220,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     }
 
     qDebug() << "OnvifResourceInformationFetcher::createResource: Found new camera: endpoint: " << endpoint
-             << ", MAC: " << mac << ", name: " << name;
+             << ", MAC: " << mac << ", manufacturer: " << manufacturer << ", name: " << name;
 
     createResource(manufacturer, QHostAddress(sender), QHostAddress(info.discoveryIp),
         name, mac, login, passwd, mediaUrl, deviceUrl, result);
@@ -214,16 +229,12 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
 void OnvifResourceInformationFetcher::createResource(const QString& manufacturer, const QHostAddress& sender, const QHostAddress& discoveryIp,
     const QString& name, const QString& mac, const char* login, const char* passwd, const QString& mediaUrl, const QString& deviceUrl, QnResourceList& result) const
 {
-    QnNetworkResourcePtr resource(0);
+    QnNetworkResourcePtr resource = QnNetworkResourcePtr(new QnPlOnvifResource());
 
-    if (resource.isNull()) {
-        resource = QnNetworkResourcePtr(new QnPlOnvifResource());
-        resource->setTypeId(onvifTypeId);
-    }
-
+    resource->setTypeId(onvifTypeId);
     resource->setHostAddress(sender, QnDomainMemory);
     resource->setDiscoveryAddr(discoveryIp);
-    resource->setName(name);
+    resource->setName(manufacturer + " - " + name);
     resource->setMAC(mac);
 
     if (login) {
@@ -306,7 +317,7 @@ const QString OnvifResourceInformationFetcher::fetchMacAddress(const _onvifDevic
 
 const QString OnvifResourceInformationFetcher::fetchName(const _onvifDevice__GetDeviceInformationResponse& response) const
 {
-    return QString((response.Manufacturer + " - " + response.Model).c_str());
+    return QString(response.Model.c_str());
 }
 
 const QString OnvifResourceInformationFetcher::fetchManufacturer(const _onvifDevice__GetDeviceInformationResponse& response) const
@@ -314,27 +325,9 @@ const QString OnvifResourceInformationFetcher::fetchManufacturer(const _onvifDev
     return QString(response.Manufacturer.c_str());
 }
 
-const QString OnvifResourceInformationFetcher::fetchSerialConvertToMac(const _onvifDevice__GetDeviceInformationResponse& response) const
+const QString OnvifResourceInformationFetcher::fetchSerial(const _onvifDevice__GetDeviceInformationResponse& response) const
 {
-    QString serialAndHwdId(response.HardwareId.c_str());
-    serialAndHwdId += response.SerialNumber.c_str();
-    serialAndHwdId.replace(QRegExp("[^\\w\\d]+"), "");
-
-    //Too small serial number (may be, its better to check < 12)
-    int size = serialAndHwdId.size();
-    if (size < 6) return QString();
-
-    QString result("FF-FF-FF-FF-FF-FF");
-    for (int i = 1; i < (size < 12? size: 12); i += 2) {
-        result[i - 1 + i / 2] = serialAndHwdId[i - 1];
-        result[i + i / 2] = serialAndHwdId[i];
-    }
-    if (size < 12 && size % 2) {
-        --size;
-        result[size + size / 2] = serialAndHwdId[size];
-    }
-
-    return result;
+    return (response.HardwareId + "::" + response.SerialNumber).c_str();
 }
 
 //const QString OnvifResourceInformationFetcher::generateRandomPassword() const

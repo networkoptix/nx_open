@@ -10,18 +10,13 @@ class SOAP_ENV__Fault;
 
 struct EndpointAdditionalInfo
 {
-    enum Source {
-        MDNS,
-        WSDD
-    };
-
-    Source src;
-    QByteArray data;
+    QString name;
+    QString manufacturer;
     QString discoveryIp;
 
-    EndpointAdditionalInfo(Source newSrc, const QByteArray& newData, const QString& newDiscoveryIp):
-        src(newSrc),
-        data(newData),
+    EndpointAdditionalInfo(const QString& newName, const QString& newManufacturer, const QString& newDiscoveryIp):
+        name(newName),
+        manufacturer(newManufacturer),
         discoveryIp(newDiscoveryIp)
     {
 
@@ -36,7 +31,8 @@ class OnvifResourceInformationFetcher
 	static std::string& STD_ONVIF_USER;
 	static std::string& STD_ONVIF_PASSWORD;
     QnId onvifTypeId;
-    PasswordHelper passwordsData;
+    PasswordHelper& passwordsData;
+    NameHelper& camersNamesData;
 
 public:
 
@@ -61,7 +57,7 @@ private:
     const bool isMacAlreadyExists(const QString& mac, const QnResourceList& resList) const;
     const QString fetchName(const _onvifDevice__GetDeviceInformationResponse& response) const;
     const QString fetchManufacturer(const _onvifDevice__GetDeviceInformationResponse& response) const;
-    const QString fetchSerialConvertToMac(const _onvifDevice__GetDeviceInformationResponse& response) const;
+    const QString fetchSerial(const _onvifDevice__GetDeviceInformationResponse& response) const;
     //const QString generateRandomPassword() const;
     QHostAddress hostAddressFromEndpoint(const QString& endpoint) const;
 };

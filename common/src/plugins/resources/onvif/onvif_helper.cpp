@@ -1,8 +1,11 @@
 #include "onvif_helper.h"
 #include "onvif/soapDeviceBindingProxy.h"
 #include "utils/common/log.h"
+#include "core/resource/resource_type.h"
 #include <QDebug>
 
+//const QRegExp& UNNEEDED_CHARACTERS = *new QRegExp("[\\t\\n -]+");
+const QRegExp& UNNEEDED_CHARACTERS = *new QRegExp("[^\\d\\w]+");
 
 const char* PasswordHelper::ACTI_MANUFACTURER = "acti";
 const char* PasswordHelper::ARECONT_VISION_MANUFACTURER = "arecontvision";
@@ -38,8 +41,6 @@ const char* PasswordHelper::VIDEOIQ_MANUFACTURER = "videoiq";
 const char* PasswordHelper::VIVOTEK_MANUFACTURER = "vivotek";
 const char* PasswordHelper::UBIQUITI_MANUFACTURER = "ubiquiti";
 
-const QRegExp& PasswordHelper::WHITE_SPACES = *new QRegExp("[\t\n ]+");
-
 const char* ADMIN1 = "admin";
 const char* ADMIN2 = "Admin";
 const char* ADMIN3 = "administrator";
@@ -61,6 +62,12 @@ const char* PASSWD11 = "ikwd";
 //
 // PasswordHelper
 //
+
+PasswordHelper& PasswordHelper::instance()
+{
+    static PasswordHelper inst;
+    return inst;
+}
 
 bool PasswordHelper::isNotAuthenticated(const SOAP_ENV__Fault* faultInfo)
 {
@@ -168,9 +175,9 @@ void PasswordHelper::setPasswordInfo(const char* manufacturer)
 const PasswordList& PasswordHelper::getPasswordsByManufacturer(const QString& manufacturer) const
 {
     qDebug() << "PasswordHelper::getPasswordsByManufacturer: manufacturer: " << manufacturer
-        << ", normalized: " << manufacturer.toLower().replace(WHITE_SPACES, "");
+        << ", normalized: " << manufacturer.toLower().replace(UNNEEDED_CHARACTERS, "");
     ManufacturerPasswords::ConstIterator it = manufacturer.isEmpty()? manufacturerPasswords.end():
-        manufacturerPasswords.find(manufacturer.toLower().replace(WHITE_SPACES, ""));
+        manufacturerPasswords.find(manufacturer.toLower().replace(UNNEEDED_CHARACTERS, ""));
 
     if (it == manufacturerPasswords.end()) {
         return allPasswords;
@@ -203,11 +210,6 @@ void PasswordHelper::printPasswords() const
         qDebug() << "    " << listIter->first << " / " << listIter->second;
         ++listIter;
     }
-}
-
-PasswordHelper::~PasswordHelper()
-{
-
 }
 
 //
@@ -275,4 +277,40 @@ const QString SoapErrorHelper::fetchDescription(const SOAP_ENV__Fault* faultInfo
     }
 
     return result;
+}
+
+//
+// NameHelper
+//
+
+NameHelper::NameHelper()
+{
+    QnResourceTypePool::QnResourceTypeMap typeMap = qnResTypePool->getResourceTypeMap();
+
+    foreach(QnResourceTypePtr rt, typeMap) {
+        QString normalizedManufacturer = rt->getManufacture().toLower().replace(UNNEEDED_CHARACTERS, "");
+        QString normalizedName = rt->getName().toLower().replace(UNNEEDED_CHARACTERS, "").replace(normalizedManufacturer, "");
+        camerasNames.insert(normalizedName);
+    }
+}
+
+NameHelper& NameHelper::instance()
+{
+    static NameHelper inst;
+    return inst;
+}
+
+bool NameHelper::isSupported(const QString& cameraName) const
+{
+    qDebug() << "NameHelper::isSupported: camera name: " << cameraName << ", normalized: "
+             << cameraName.toLower().replace(UNNEEDED_CHARACTERS, "");
+
+    QSet<QString>::ConstIterator it = camerasNames.constFind(cameraName.toLower().replace(UNNEEDED_CHARACTERS, ""));
+    if (it == camerasNames.constEnd()) {
+        qDebug() << "NameHelper::isSupported: can't find " << cameraName;
+        return false;
+    }
+
+    qDebug() << "NameHelper::isSupported: " << cameraName << " found";
+    return true;
 }

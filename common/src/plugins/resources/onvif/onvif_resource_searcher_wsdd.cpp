@@ -40,6 +40,7 @@ extern bool multicastLeaveGroup(QUdpSocket& udpSocket, QHostAddress groupAddress
 
 QString& OnvifResourceSearcherWsdd::LOCAL_ADDR = *new QString("127.0.0.1");
 const char OnvifResourceSearcherWsdd::SCOPES_NAME_PREFIX[] = "onvif://www.onvif.org/name/";
+const char OnvifResourceSearcherWsdd::SCOPES_HARDWARE_PREFIX[] = "onvif://www.onvif.org/hardware/";
 const char OnvifResourceSearcherWsdd::PROBE_TYPE[] = "onvifDiscovery:NetworkVideoTransmitter";
 const char OnvifResourceSearcherWsdd::WSA_ADDRESS[] = "http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous";
 const char OnvifResourceSearcherWsdd::WSDD_ADDRESS[] = "urn:schemas-xmlsoap-org:ws:2005:04:discovery";
@@ -199,8 +200,8 @@ void OnvifResourceSearcherWsdd::findResources(QnResourceList& result) const
     qDebug() << "OnvifResourceSearcherWsdd::findResources: Endpoints in the list:"
              << (endpoints.size()? "": " EMPTY");
     while (endpIter != endpoints.end()) {
-        qDebug() << "    " << endpIter.key() << ": " << endpIter.value().data
-                 << ", discovered in " << endpIter.value().discoveryIp;
+        qDebug() << "    " << endpIter.key() << ": " << endpIter.value().manufacturer
+                 << " - " << endpIter.value().name << ", discovered in " << endpIter.value().discoveryIp;
         ++endpIter;
     }
 
@@ -260,7 +261,7 @@ const QString OnvifResourceSearcherWsdd::getAppropriateAddress(
     return appropriateAddr;
 }
 
-const QString OnvifResourceSearcherWsdd::getManufacturer(const wsdd__ProbeMatchesType* probeMatches) const
+const QString OnvifResourceSearcherWsdd::getManufacturer(const wsdd__ProbeMatchesType* probeMatches, const QString& name) const
 {
     if (!probeMatches || !probeMatches->ProbeMatch ||
             !probeMatches->ProbeMatch->Scopes || !probeMatches->ProbeMatch->Scopes->__item) {
@@ -276,6 +277,25 @@ const QString OnvifResourceSearcherWsdd::getManufacturer(const wsdd__ProbeMatche
     }
 
     int skipSize = sizeof(SCOPES_NAME_PREFIX) - 1;
+    return scopes.mid(posStart + skipSize, posEnd - posStart - skipSize).replace(name, "");
+}
+
+const QString OnvifResourceSearcherWsdd::getName(const wsdd__ProbeMatchesType* probeMatches) const
+{
+    if (!probeMatches || !probeMatches->ProbeMatch ||
+        !probeMatches->ProbeMatch->Scopes || !probeMatches->ProbeMatch->Scopes->__item) {
+            return QString();
+    }
+
+    QString scopes(probeMatches->ProbeMatch->Scopes->__item);
+    int posStart = scopes.indexOf(SCOPES_HARDWARE_PREFIX);
+    int posEnd = posStart != -1? scopes.indexOf(" ", posStart): -1;
+
+    if (posEnd == -1) {
+        return QString();
+    }
+
+    int skipSize = sizeof(SCOPES_HARDWARE_PREFIX) - 1;
     return scopes.mid(posStart + skipSize, posEnd - posStart - skipSize);
 }
 
@@ -309,8 +329,11 @@ void OnvifResourceSearcherWsdd::addEndpointToHash(EndpointInfoHash& hash,
         return;
     }
 
-    hash.insert(appropriateAddr, EndpointAdditionalInfo(
-        EndpointAdditionalInfo::WSDD, QByteArray(getManufacturer(probeMatches).toStdString().c_str()), host));
+    QString name = getName(probeMatches);
+    QString manufacturer = getManufacturer(probeMatches, name);
+
+    hash.insert(appropriateAddr, EndpointAdditionalInfo(QUrl::fromPercentEncoding(QByteArray(name.toStdString().c_str())).trimmed(),
+        QUrl::fromPercentEncoding(QByteArray(manufacturer.toStdString().c_str())).trimmed(), host));
 }
 
 void OnvifResourceSearcherWsdd::printProbeMatches(const wsdd__ProbeMatchesType* probeMatches,

@@ -47,8 +47,6 @@ class PasswordHelper
     static const char* VIVOTEK_MANUFACTURER;
     static const char* UBIQUITI_MANUFACTURER;
 
-    static const QRegExp& WHITE_SPACES;
-
     //QHash<Manufacturer, Passwords>
     typedef QHash<QString, PasswordList> ManufacturerPasswords;
 
@@ -56,13 +54,14 @@ class PasswordHelper
     ManufacturerPasswords manufacturerPasswords;
 
     PasswordHelper(const PasswordHelper&) {}
+    PasswordHelper();
+    ~PasswordHelper() {};
 
 public:
 
-    static bool isNotAuthenticated(const SOAP_ENV__Fault* faultInfo);
+    static PasswordHelper& PasswordHelper::instance();
 
-    PasswordHelper();
-    ~PasswordHelper();
+    static bool isNotAuthenticated(const SOAP_ENV__Fault* faultInfo);;
 
     const PasswordList& getPasswordsByManufacturer(const QString& mdnsPacketData) const;
 
@@ -79,6 +78,21 @@ class SoapErrorHelper
 
 public:
     static const QString fetchDescription(const SOAP_ENV__Fault* faultInfo);
+};
+
+class NameHelper
+{
+    QSet<QString> camerasNames;
+
+    NameHelper(const NameHelper&) {}
+    NameHelper();
+    ~NameHelper() {};
+
+public:
+
+    static NameHelper& NameHelper::instance();
+
+    bool isSupported(const QString& cameraName) const;
 };
 
 #endif // onvif_helper_h

@@ -174,3 +174,10 @@ bool QnResourceTypePool::isEmpty() const
 
     return m_resourceTypeMap.isEmpty();
 }
+
+QnResourceTypePool::QnResourceTypeMap QnResourceTypePool::getResourceTypeMap() const
+{
+    QMutexLocker lock(&m_mutex);
+
+    return QnResourceTypeMap(m_resourceTypeMap);
+}
