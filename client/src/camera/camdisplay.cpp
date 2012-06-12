@@ -933,8 +933,8 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
         {
             if (m_audioDisplay->msInBuffer() > m_audioBufferSize)
             {
-                
-                if (m_isRealTimeSource)
+                bool useSync = m_extTimeSrc && m_extTimeSrc->isEnabled();
+                if (m_isRealTimeSource || useSync)
                     return true; // skip data
                 else
                     QnSleep::msleep(40); // Audio buffer too large. waiting
