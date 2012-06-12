@@ -302,6 +302,10 @@ NameHelper& NameHelper::instance()
 
 bool NameHelper::isSupported(const QString& cameraName) const
 {
+    if (cameraName.isEmpty()) {
+        return false;
+    }
+
     qDebug() << "NameHelper::isSupported: camera name: " << cameraName << ", normalized: "
              << cameraName.toLower().replace(UNNEEDED_CHARACTERS, "");
 

@@ -306,7 +306,7 @@ void QnOnvifStreamReader::setRequiredValues(onvifXsd__VideoEncoderConfiguration*
         config->Resolution->Width = maxResolution.first;
         config->Resolution->Height = maxResolution.second;
     } else {
-        ResolutionPair resolution = m_onvifRes->getNearestResolution(
+        ResolutionPair resolution = m_onvifRes->getNearestResolutionForSecondary(
             SECONDARY_STREAM_DEFAULT_RESOLUTION, m_onvifRes->getResolutionAspectRatio(maxResolution));
 
         if (resolution != EMPTY_RESOLUTION_PAIR) {

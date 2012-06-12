@@ -270,11 +270,12 @@ const QString OnvifResourceSearcherWsdd::getManufacturer(const wsdd__ProbeMatche
 
     QString scopes(probeMatches->ProbeMatch->Scopes->__item);
     int posStart = scopes.indexOf(SCOPES_NAME_PREFIX);
-    int posEnd = posStart != -1? scopes.indexOf(" ", posStart): -1;
-
-    if (posEnd == -1) {
+    if (posStart == -1) {
         return QString();
     }
+
+    int posEnd = posStart != -1? scopes.indexOf(" ", posStart): -1;
+    posEnd = posEnd != -1? posEnd: scopes.size();
 
     int skipSize = sizeof(SCOPES_NAME_PREFIX) - 1;
     return scopes.mid(posStart + skipSize, posEnd - posStart - skipSize).replace(name, "");
@@ -289,11 +290,12 @@ const QString OnvifResourceSearcherWsdd::getName(const wsdd__ProbeMatchesType* p
 
     QString scopes(probeMatches->ProbeMatch->Scopes->__item);
     int posStart = scopes.indexOf(SCOPES_HARDWARE_PREFIX);
-    int posEnd = posStart != -1? scopes.indexOf(" ", posStart): -1;
-
-    if (posEnd == -1) {
+    if (posStart == -1) {
         return QString();
     }
+
+    int posEnd = posStart != -1? scopes.indexOf(" ", posStart): -1;
+    posEnd = posEnd != -1? posEnd: scopes.size();
 
     int skipSize = sizeof(SCOPES_HARDWARE_PREFIX) - 1;
     return scopes.mid(posStart + skipSize, posEnd - posStart - skipSize);

@@ -18,6 +18,7 @@ class _onvifMedia__GetProfilesResponse;
 //first = width, second = height
 typedef QPair<int, int> ResolutionPair;
 const ResolutionPair EMPTY_RESOLUTION_PAIR(0, 0);
+const ResolutionPair SECONDARY_STREAM_DEFAULT_RESOLUTION(320, 240);
 
 class QnPlOnvifResource : public QnPhysicalCameraResource
 {
@@ -26,6 +27,7 @@ public:
     static const QString& MEDIA_URL_PARAM_NAME;
     static const QString& DEVICE_URL_PARAM_NAME;
 	static const float QUALITY_COEF;
+    static const double MAX_SECONDARY_RESOLUTION_SQUARE;
 
     QnPlOnvifResource();
 
@@ -45,7 +47,8 @@ public:
     const QString createOnvifEndpointUrl() const { return createOnvifEndpointUrl(getHostAddress().toString()); }
 
     const ResolutionPair getMaxResolution() const;
-    const ResolutionPair getNearestResolution(const ResolutionPair& resolution, float aspectRatio) const;
+    const ResolutionPair getNearestResolutionForSecondary(const ResolutionPair& resolution, float aspectRatio) const;
+    const ResolutionPair getNearestResolution(const ResolutionPair& resolution, float aspectRatio, double maxResolutionSquare) const;
     float getResolutionAspectRatio(const ResolutionPair& resolution) const;
     bool isVideoOptionsNotSet() const { return videoOptionsNotSet; }
     bool isSoapAuthorized() const;

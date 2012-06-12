@@ -11,8 +11,6 @@ class _onvifMedia__GetProfileResponse;
 class onvifXsd__Profile;
 class onvifXsd__VideoEncoderConfiguration;
 
-const ResolutionPair SECONDARY_STREAM_DEFAULT_RESOLUTION(320, 240);
-
 class QnOnvifStreamReader: public CLServerPushStreamreader , public QnLiveStreamProvider
 {
 public:

@@ -19,7 +19,7 @@
 #include "api/app_server_connection.h"
 
 const char* QnPlOnvifResource::MANUFACTURE = "OnvifDevice";
-static const float MAX_AR_EPS = 0.01;
+static const float MAX_EPS = 0.01;
 static const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
 const char* QnPlOnvifResource::ONVIF_PROTOCOL_PREFIX = "http://";
 const char* QnPlOnvifResource::ONVIF_URL_SUFFIX = ":80/onvif/device_service";
@@ -27,6 +27,10 @@ const int QnPlOnvifResource::DEFAULT_IFRAME_DISTANCE = 20;
 const QString& QnPlOnvifResource::MEDIA_URL_PARAM_NAME = *(new QString("MediaUrl"));
 const QString& QnPlOnvifResource::DEVICE_URL_PARAM_NAME = *(new QString("DeviceUrl"));
 const float QnPlOnvifResource::QUALITY_COEF = 0.2;
+
+//Forth times greater than default = 320 x 240
+const double QnPlOnvifResource::MAX_SECONDARY_RESOLUTION_SQUARE =
+    SECONDARY_STREAM_DEFAULT_RESOLUTION.first * SECONDARY_STREAM_DEFAULT_RESOLUTION.second * 4;
 
 
 //width > height is prefered
@@ -129,18 +133,24 @@ float QnPlOnvifResource::getResolutionAspectRatio(const ResolutionPair& resoluti
     return resolution.second == 0? 0: static_cast<double>(resolution.first) / resolution.second;
 }
 
-const ResolutionPair QnPlOnvifResource::getNearestResolution(const ResolutionPair& resolution, float aspectRatio) const
+const ResolutionPair QnPlOnvifResource::getNearestResolutionForSecondary(const ResolutionPair& resolution, float aspectRatio) const
+{
+    return getNearestResolution(resolution, aspectRatio, MAX_SECONDARY_RESOLUTION_SQUARE);
+}
+
+const ResolutionPair QnPlOnvifResource::getNearestResolution(const ResolutionPair& resolution, float aspectRatio,
+    double maxResolutionSquare) const
 {
     QMutexLocker lock(&m_mutex);
 
     int bestIndex = -1;
-    double bestMatchCoeff = INT_MAX;
+    double bestMatchCoeff = maxResolutionSquare > MAX_EPS? maxResolutionSquare: INT_MAX;
     double requestSquare = resolution.first * resolution.second;
     if (requestSquare == 0) return EMPTY_RESOLUTION_PAIR;
 
     for (int i = 0; i < m_resolutionList.size(); ++i) {
         float ar = getResolutionAspectRatio(m_resolutionList[i]);
-        if (qAbs(ar - aspectRatio) > MAX_AR_EPS) {
+        if (qAbs(ar - aspectRatio) > MAX_EPS) {
             continue;
         }
 
@@ -148,7 +158,7 @@ const ResolutionPair QnPlOnvifResource::getNearestResolution(const ResolutionPai
         if (square == 0) continue;
 
         double matchCoeff = qMax(requestSquare, square) / qMin(requestSquare, square);
-        if (matchCoeff < bestMatchCoeff) {
+        if (matchCoeff <= bestMatchCoeff + MAX_EPS) {
             bestIndex = i;
             bestMatchCoeff = matchCoeff;
         }
@@ -296,6 +306,12 @@ void QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
     }
 
     //Analyzing availability of dual streaming
+
+    hasDual = getNearestResolutionForSecondary(SECONDARY_STREAM_DEFAULT_RESOLUTION, getResolutionAspectRatio(getMaxResolution())) != EMPTY_RESOLUTION_PAIR;
+    //If we have no appropriate resolution - dual streaming is not possible
+    if (!hasDual) {
+        return;
+    }
 
     if (!videoEncoders.filled && !videoEncoders.soapFailed) {
         if (!login.empty()) soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", login.c_str(), passwd.c_str());
