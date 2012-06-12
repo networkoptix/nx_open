@@ -55,7 +55,8 @@ int QnTimePeriodLoader::load(const QnTimePeriod &timePeriod, const QList<QRegion
     }
     m_motionRegions = motionRegions;
 
-    foreach(const QnTimePeriod& loadedPeriod, m_loadedPeriods) 
+    /* Check whether the requested data is already loaded. */
+    foreach(const QnTimePeriod &loadedPeriod, m_loadedPeriods) 
     {
         if (loadedPeriod.containPeriod(timePeriod)) 
         {
@@ -70,11 +71,11 @@ int QnTimePeriodLoader::load(const QnTimePeriod &timePeriod, const QList<QRegion
         }
     }
 
+    /* Check whether requested data is currently being loaded. */
     for (int i = 0; i < m_loading.size(); ++i)
     {
         if (m_loading[i].period.containPeriod(timePeriod)) 
         {
-            /* Same data is currently being loaded. */
             int handle = qn_fakeHandle.fetchAndAddAcquire(1);
 
             m_loading[i].waitingHandles << handle;
@@ -82,8 +83,8 @@ int QnTimePeriodLoader::load(const QnTimePeriod &timePeriod, const QList<QRegion
         }
     }
 
+    /* Try to reduce duration of the period to load. */
     QnTimePeriod periodToLoad = timePeriod;
-    /* Try to reduce duration of loading period. */
     if (!m_loadedPeriods.isEmpty())
     {
         QnTimePeriodList::iterator itr = qUpperBound(m_loadedPeriods.begin(), m_loadedPeriods.end(), periodToLoad.startTimeMs);
