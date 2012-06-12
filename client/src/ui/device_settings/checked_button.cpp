@@ -3,15 +3,36 @@
 #include <QtGui/QPainter>
 
 namespace {
-    QPixmap generatePixmap(int size, const QColor &color, bool hovered, bool checked) {
+    QPixmap generatePixmap(int size, const QColor &color, const QColor &insideColor, bool hovered, bool checked) {
         QPixmap result(size, size);
         result.fill(QColor(Qt::gray));
 
         QPainter painter(&result);
         painter.setPen(QColor(Qt::black));
+        
         painter.setBrush(hovered ? color.lighter() : color);
         int offset = checked ? 4 : 0;
         painter.drawRect(offset, offset, result.width() - offset * 2, result.height() - offset * 2);
+
+        if (insideColor.toRgb() != color.toRgb()) 
+        {
+            painter.setBrush(hovered ? insideColor.lighter() : insideColor);
+            //offset = result.width()/3;
+            //painter.drawRect(offset, offset, result.width() - offset * 2, result.height() - offset * 2);
+            QPointF points[6];
+            qreal cellSize = result.width();
+            qreal trOffset = cellSize/6;
+            qreal trSize = cellSize/10;
+            points[0] = QPointF(cellSize - trOffset - trSize, trOffset);
+            points[1] = QPointF(cellSize - trOffset, trOffset);
+            points[2] = QPointF(cellSize-trOffset, trOffset + trSize);
+            points[3] = QPointF(trOffset + trSize, cellSize - trOffset);
+            points[4] = QPointF(trOffset, cellSize - trOffset);
+            points[5] = QPointF(trOffset, cellSize - trSize - trOffset);
+            painter.drawPolygon(points, 6);
+        }
+
+
         painter.end();
 
         return result;
@@ -21,6 +42,7 @@ namespace {
 
 QnCheckedButton::QnCheckedButton(QWidget* parent): QToolButton(parent)
 {
+    m_insideColorDefined = false;
     updateIcon();
 }
 
@@ -28,10 +50,10 @@ void QnCheckedButton::updateIcon() {
     QIcon icon;
 
     const int size = 64;
-    QPixmap normal          = generatePixmap(size, m_color,           false,  false);
-    QPixmap normalHovered   = generatePixmap(size, m_color,           true,   false);
-    QPixmap checked         = generatePixmap(size, m_checkedColor,    false,  true);
-    QPixmap checkedHovered  = generatePixmap(size, m_checkedColor,    true,   true);
+    QPixmap normal          = generatePixmap(size, m_color,           m_insideColorDefined ? m_insideColor : m_color, false,  false);
+    QPixmap normalHovered   = generatePixmap(size, m_color,           m_insideColorDefined ? m_insideColor : m_color, true,   false);
+    QPixmap checked         = generatePixmap(size, m_checkedColor,    m_insideColorDefined ? m_insideColor : m_checkedColor, false,  true);
+    QPixmap checkedHovered  = generatePixmap(size, m_checkedColor,    m_insideColorDefined ? m_insideColor : m_checkedColor, true,   true);
 
     icon.addPixmap(normal, QIcon::Normal, QIcon::Off);
     icon.addPixmap(normal, QIcon::Disabled, QIcon::Off);
@@ -57,6 +79,17 @@ void QnCheckedButton::setColor(const QColor& color)
         return;
 
     m_color = color;
+
+    updateIcon();
+}
+
+void QnCheckedButton::setInsideColor(const QColor& color)
+{
+    if(m_insideColor == color)
+        return;
+
+    m_insideColor = color;
+    m_insideColorDefined = true;
 
     updateIcon();
 }

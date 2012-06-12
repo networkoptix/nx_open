@@ -10,6 +10,7 @@
 #include "recorder/storage_manager.h"
 #include "utils/media/sse_helper.h"
 #include "motion/motion_archive.h"
+#include "dualquality_helper.h"
 
 class QnServerArchiveDelegate: public QnAbstractArchiveDelegate
 {
@@ -35,7 +36,7 @@ public:
 private:
     bool switchToChunk(const DeviceFileCatalog::Chunk newChunk, DeviceFileCatalogPtr newCatalog);
     qint64 seekInternal(qint64 time, bool findIFrame, bool recursive);
-    void getNextChunk(DeviceFileCatalog::Chunk& chunk, DeviceFileCatalogPtr& chunkCatalog);
+    bool getNextChunk(DeviceFileCatalog::Chunk& chunk, DeviceFileCatalogPtr& chunkCatalog);
     bool setQualityInternal(MediaQuality quality, bool fastSwitch, qint64 timeMs, bool recursive);
 
     DeviceFileCatalog::Chunk findChunk(DeviceFileCatalogPtr catalog, qint64 time, DeviceFileCatalog::FindMethod findMethod);
@@ -75,6 +76,7 @@ private:
     bool m_sendMotion;
     bool m_eof;
     MediaQuality m_quality;
+    QnDialQualityHelper m_dialQualityHelper;
 };
 
 #endif // _SERVER_ARCHIVE_DELEGATE_H__

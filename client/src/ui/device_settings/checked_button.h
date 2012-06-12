@@ -11,6 +11,8 @@ public:
     QColor color() const;
     void setColor(const QColor& color);
 
+    void setInsideColor(const QColor& color);
+
     QColor checkedColor() const;
     void setCheckedColor(const QColor& color);
 
@@ -19,7 +21,9 @@ protected:
 
 private:
     QColor m_color;
+    QColor m_insideColor;
     QColor m_checkedColor;
+    bool m_insideColorDefined;
 };
 
 #endif // __QN_CHECKED_BUTTON_H__
