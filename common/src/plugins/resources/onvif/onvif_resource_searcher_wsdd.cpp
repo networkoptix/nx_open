@@ -241,7 +241,8 @@ const QString OnvifResourceSearcherWsdd::getAppropriateAddress(
 
     int relevantLevel = 0;
     QString addrListStr(probeMatches->ProbeMatch->XAddrs);
-    foreach (const QString addrStr, addrListStr.split(" ")) {
+    QStringList addrList = addrListStr.split(" ");
+    foreach (const QString addrStr, addrList) {
         if (addrStr.startsWith(prefixes[2])) {
             if (addrStr.startsWith(prefixes[0])) {
                 appropriateAddr = addrStr;
@@ -258,7 +259,7 @@ const QString OnvifResourceSearcherWsdd::getAppropriateAddress(
     qDebug() << "OnvifResourceSearcherWsdd::getAppropriateAddress: address = " << appropriateAddr
              << ". Interface: " << prefixes[0];
 
-    return appropriateAddr;
+    return !appropriateAddr.isEmpty()? appropriateAddr: (addrList.isEmpty()? appropriateAddr: addrList.at(0));
 }
 
 const QString OnvifResourceSearcherWsdd::getManufacturer(const wsdd__ProbeMatchesType* probeMatches, const QString& name) const

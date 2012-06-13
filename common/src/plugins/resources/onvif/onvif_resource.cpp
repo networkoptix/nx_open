@@ -673,7 +673,6 @@ void QnPlOnvifResource::save()
 
 void QnPlOnvifResource::setMinMaxQuality(int min, int max)
 {
-	//return minQuality + (maxQuality - minQuality) * (quality - QnQualityLowest) / (QnQualityHighest - QnQualityLowest);
 	int netoptixDelta = QnQualityHighest - QnQualityLowest;
     int onvifDelta = max - min;
 
