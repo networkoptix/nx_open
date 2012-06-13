@@ -173,7 +173,7 @@ void QnMulticodecRtpReader::openStream()
 
     QString url;
     if (m_request.length() > 0)
-        QTextStream(&url) << "rtsp://" << "10.0.2.19" /*nres->getHostAddress().toString()*/  << "/" << m_request;
+        QTextStream(&url) << "rtsp://" << nres->getHostAddress().toString() << "/" << m_request;
     else
         QTextStream(&url) << "rtsp://" << nres->getHostAddress().toString();
 
