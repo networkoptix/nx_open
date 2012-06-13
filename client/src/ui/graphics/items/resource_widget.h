@@ -293,6 +293,8 @@ signals:
     void aboutToBeDestroyed();
     void displayFlagsChanged();
     void motionSelectionChanged();
+    void rotationStartRequested();
+    void rotationStopRequested();
 
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -338,7 +340,6 @@ private slots:
     void at_sourceSizeChanged(const QSize &size);
     void at_resource_resourceChanged();
     void at_resource_nameChanged();
-    void at_rotateButton_clicked();
 
 private:
     /**

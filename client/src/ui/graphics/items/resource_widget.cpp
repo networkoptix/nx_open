@@ -166,13 +166,15 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_rotateButton = new QnImageButtonWidget();
     m_rotateButton->setIcon(qnSkin->icon("decorations/rotate_item.png"));
     m_rotateButton->setPreferredSize(headerButtonSize);
-    connect(m_rotateButton, SIGNAL(clicked()), this, SLOT(at_rotateButton_clicked()));
+    connect(m_rotateButton, SIGNAL(pressed()), this, SIGNAL(rotationStartRequested()));
+    connect(m_rotateButton, SIGNAL(released()), this, SIGNAL(rotationStopRequested()));
 
     m_headerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     m_headerLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
     m_headerLayout->setSpacing(2.0);
     m_headerLayout->addItem(m_headerTitleLabel);
     m_headerLayout->addStretch(0x1000); /* Set large enough stretch for the buttons to be placed at the right end of the layout. */
+    m_headerLayout->addItem(m_rotateButton);
     m_headerLayout->addItem(m_infoButton);
     m_headerLayout->addItem(m_closeButton);
 
@@ -674,8 +676,11 @@ void QnResourceWidget::updateButtonsVisibility() {
         m_infoButton->setVisible(infoButtonVisible);
         m_closeButton->setVisible(closeButtonVisible);
         
+        m_headerLayout->removeItem(m_rotateButton);
         m_headerLayout->removeItem(m_infoButton);
         m_headerLayout->removeItem(m_closeButton);
+
+        m_headerLayout->addItem(m_rotateButton);
 
         if(infoButtonVisible)
             m_headerLayout->addItem(m_infoButton);
@@ -837,10 +842,6 @@ void QnResourceWidget::at_resource_resourceChanged() {
 
 void QnResourceWidget::at_resource_nameChanged() {
     m_headerTitleLabel->setText(m_resource->getName());
-}
-
-void QnResourceWidget::at_rotateButton_clicked() {
-    
 }
 
 

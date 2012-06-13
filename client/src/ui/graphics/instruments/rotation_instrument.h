@@ -22,6 +22,12 @@ public:
 
     void setRotationItemZValue(qreal rotationItemZValue);
 
+public slots:
+    void start(QGraphicsWidget *target);
+    void start(QGraphicsView *view, QGraphicsWidget *target);
+
+    /* Use DragProcessingInstrument::reset to stop rotation. */
+
 signals:
     void rotationProcessStarted(QGraphicsView *view, QGraphicsWidget *widget);
     void rotationStarted(QGraphicsView *view, QGraphicsWidget *widget);
@@ -41,6 +47,7 @@ protected:
     virtual void finishDrag(DragInfo *info) override;
     virtual void finishDragProcess(DragInfo *info) override;
 
+private:
     RotationItem *rotationItem() const {
         return m_rotationItem.data();
     }
@@ -48,6 +55,8 @@ protected:
     QGraphicsWidget *target() const {
         return m_target.data();
     }
+
+    void startInternal(QGraphicsView *view, QMouseEvent *event, QGraphicsWidget *target, bool instantStart);
 
 private:
     QWeakPointer<RotationItem> m_rotationItem;

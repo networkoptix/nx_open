@@ -109,7 +109,7 @@ public:
 
     void widgetEvent(QWidget *widget, QEvent *event);
 
-    void widgetMousePressEvent(QWidget *widget, QMouseEvent *event);
+    void widgetMousePressEvent(QWidget *widget, QMouseEvent *event, bool instantDrag = false);
 
     void widgetMouseMoveEvent(QWidget *widget, QMouseEvent *event);
 
@@ -120,7 +120,7 @@ public:
 
     /* Set of view-level event handler functions that are to be used from user code. */
 
-    void mousePressEvent(QWidget *viewport, QMouseEvent *event);
+    void mousePressEvent(QWidget *viewport, QMouseEvent *event, bool instantDrag = false);
 
     void mouseMoveEvent(QWidget *viewport, QMouseEvent *event);
 
@@ -131,7 +131,7 @@ public:
 
     /* Set of scene-level event handler functions that are to be used from user code. */
 
-    void mousePressEvent(QGraphicsScene *scene, QGraphicsSceneMouseEvent *event);
+    void mousePressEvent(QGraphicsScene *scene, QGraphicsSceneMouseEvent *event, bool instantDrag = false);
 
     void mouseMoveEvent(QGraphicsScene *scene, QGraphicsSceneMouseEvent *event);
 
@@ -140,7 +140,7 @@ public:
     
     /* Set of item-level event handler functions that are to be used from user code. */
 
-    void mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event);
+    void mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event, bool instantDrag = false);
 
     void mouseMoveEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event);
 
@@ -190,7 +190,7 @@ private:
     QPointF itemPos(QGraphicsItem *item, QGraphicsSceneMouseEvent *event);
 
     template<class T, class Event>
-    void mousePressEventInternal(T *object, Event *event);
+    void mousePressEventInternal(T *object, Event *event, bool instantDrag);
 
     template<class T, class Event>
     void mouseMoveEventInternal(T *object, Event *event);

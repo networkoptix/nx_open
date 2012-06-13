@@ -1142,8 +1142,12 @@ void QnWorkbenchController::at_display_widgetChanged(Qn::ItemRole role) {
 }
 
 void QnWorkbenchController::at_display_widgetAdded(QnResourceWidget *widget) {
-    if(widget->display() != NULL && widget->display()->camera() != NULL)
+    if(widget->display() != NULL && widget->display()->camera() != NULL) { // TODO: is this condition really needed?
         widget->installEventFilter(this);
+
+        connect(widget, SIGNAL(rotationStartRequested()),   this,   SLOT(at_widget_rotationStartRequested()));
+        connect(widget, SIGNAL(rotationStopRequested()),    this,   SLOT(at_widget_rotationStopRequested()));
+    }
 }
 
 void QnWorkbenchController::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {
@@ -1161,6 +1165,20 @@ void QnWorkbenchController::at_display_widgetAboutToBeRemoved(QnResourceWidget *
 
     if(widget->display() != NULL && widget->display()->camera() != NULL)
         widget->removeEventFilter(this);
+
+    disconnect(widget, NULL, this, NULL);
+}
+
+void QnWorkbenchController::at_widget_rotationStartRequested(QnResourceWidget *widget) {
+    m_rotationInstrument->start(display()->view(), widget);
+}
+
+void QnWorkbenchController::at_widget_rotationStartRequested() {
+    at_widget_rotationStartRequested(checked_cast<QnResourceWidget *>(sender()));
+}
+
+void QnWorkbenchController::at_widget_rotationStopRequested() {
+    m_rotationInstrument->reset();
 }
 
 void QnWorkbenchController::at_selectAllAction_triggered() {

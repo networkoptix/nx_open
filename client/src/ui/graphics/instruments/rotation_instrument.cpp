@@ -6,9 +6,11 @@
 
 #include <QtGui/QMouseEvent>
 #include <QtGui/QGraphicsWidget>
+#include <QtGui/QApplication>
 
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/checked_cast.h>
+#include <utils/common/warnings.h>
 
 namespace {
     const QColor defaultColor(255, 0, 0, 96);
@@ -242,7 +244,7 @@ void RotationInstrument::installedNotify() {
     assert(rotationItem() == NULL);
 
     m_rotationItem = new RotationItem();
-    rotationItem()->setParent(this); /* Just to feel totally safe. */
+    rotationItem()->setParent(this); /* Just to feel totally safe. Note that this is a parent in QObject sense. */
     rotationItem()->setZValue(m_rotationItemZValue);
     rotationItem()->setVisible(false);
     scene()->addItem(rotationItem());
@@ -257,6 +259,46 @@ void RotationInstrument::aboutToBeUninstalledNotify() {
         delete rotationItem();
 }
 
+void RotationInstrument::start(QGraphicsWidget *target) {
+    start(NULL, target);
+}
+
+void RotationInstrument::start(QGraphicsView *view, QGraphicsWidget *target) {
+    if(!target) {
+        qnNullWarning(target);
+        return;
+    }
+
+    if(!satisfiesItemConditions(target))
+        return;
+
+    if(!view) {
+        QGraphicsScene *scene = target->scene();
+        if(scene && !scene->views().empty())
+            view = scene->views().front();
+    }
+    if(!view)
+        return;
+
+    QMouseEvent event(
+        QEvent::MouseButtonPress, 
+        view->viewport()->mapFromGlobal(QCursor::pos()),
+        QCursor::pos(),
+        Qt::LeftButton,
+        qApp->mouseButtons() | Qt::LeftButton,
+        0
+    );
+
+    startInternal(view, &event, target, true);
+}
+
+void RotationInstrument::startInternal(QGraphicsView *view, QMouseEvent *event, QGraphicsWidget *target, bool instantStart) {
+    m_target = target;
+    m_originAngle = calculateSceneAngle(target, view->mapToScene(event->pos()), calculateOrigin(view, target));
+
+    dragProcessor()->mousePressEvent(view->viewport(), event, instantStart);
+}
+
 bool RotationInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
     if(event->button() != Qt::LeftButton)
         return false;
@@ -269,10 +311,7 @@ bool RotationInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) 
     if(!target || !satisfiesItemConditions(target))
         return false;
 
-    m_target = target;
-    m_originAngle = calculateSceneAngle(target, view->mapToScene(event->pos()), calculateOrigin(view, target));
-    
-    dragProcessor()->mousePressEvent(viewport, event);
+    startInternal(view, event, target, false);
     
     event->accept();
     return false;
