@@ -70,7 +70,8 @@ QnPlOnvifResource::QnPlOnvifResource() :
     videoOptionsNotSet(true),
     mediaUrl(),
     deviceUrl(),
-    reinitDeviceInfo(false)
+    reinitDeviceInfo(false),
+    codec(H264)
 {
 }
 
@@ -89,6 +90,16 @@ QString QnPlOnvifResource::manufacture() const
     return MANUFACTURE;
 }
 
+bool QnPlOnvifResource::hasDualStreaming() const
+{
+    return hasDual;
+}
+
+QnPlOnvifResource::CODECS QnPlOnvifResource::getCodec() const
+{
+    return codec;
+}
+
 QnAbstractStreamDataProvider* QnPlOnvifResource::createLiveDataProvider()
 {
     return new QnOnvifStreamReader(toSharedPointer());
@@ -99,9 +110,11 @@ void QnPlOnvifResource::setCropingPhysical(QRect /*croping*/)
 
 }
 
-void QnPlOnvifResource::init()
+void QnPlOnvifResource::initInternal()
 {
     QMutexLocker lock(&m_mutex);
+
+    codec = H264;
 
     setOnvifUrls();
 
@@ -309,13 +322,15 @@ void QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
         soap_end(soapProxy.soap);
     }
 
-    //Analyzing availability of dual streaming
-
-    hasDual = getNearestResolutionForSecondary(SECONDARY_STREAM_DEFAULT_RESOLUTION, getResolutionAspectRatio(getMaxResolution())) != EMPTY_RESOLUTION_PAIR;
-    //If we have no appropriate resolution - dual streaming is not possible
-    if (!hasDual) {
+    if (videoOptionsNotSet && codec == H264) {
+        codec = JPEG;
+        fetchAndSetVideoEncoderOptions();
         return;
     }
+
+    //Analyzing availability of dual streaming
+
+    bool hasDualTmp = getNearestResolutionForSecondary(SECONDARY_STREAM_DEFAULT_RESOLUTION, getResolutionAspectRatio(getMaxResolution())) != EMPTY_RESOLUTION_PAIR;
 
     if (!videoEncoders.filled && !videoEncoders.soapFailed) {
         if (!login.empty()) soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", login.c_str(), passwd.c_str());
@@ -352,7 +367,7 @@ void QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
 
     if (appropriateProfiles >= 2) {
         //Its OK, we have at least two streams
-        hasDual = true;
+        hasDual = hasDualTmp;
         return;
     }
 
@@ -427,7 +442,7 @@ void QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
         ++encodersIter;
     }
 
-    hasDual = profilesToCreateSize + appropriateProfiles >= 2;
+    hasDual = (profilesToCreateSize + appropriateProfiles >= 2) && hasDualTmp;
 }
 
 void QnPlOnvifResource::setVideoEncoderOptions(const _onvifMedia__GetVideoEncoderConfigurationOptionsResponse& response) {
@@ -443,29 +458,45 @@ void QnPlOnvifResource::setVideoEncoderOptions(const _onvifMedia__GetVideoEncode
         qCritical() << "QnPlOnvifResource::setVideoEncoderOptions: can't fetch ONVIF quality range";
     }
 
-    if (!response.Options->H264) {
-        qCritical() << "QnPlOnvifResource::setVideoEncoderOptions: can't fetch (ONVIF) max fps, iframe distance and resolution list";
+    bool result = false;
+    if (codec == H264) {
+        result = setVideoEncoderOptionsH264(response);
     } else {
-        if (response.Options->H264->FrameRateRange) {
-            maxFps = response.Options->H264->FrameRateRange->Max;
+        result = setVideoEncoderOptionsJpeg(response);
+    }
 
-            qDebug() << "ONVIF max FPS: " << maxFps;
-        } else {
-            qCritical() << "QnPlOnvifResource::setVideoEncoderOptions: can't fetch ONVIF max FPS";
-        }
+    videoOptionsNotSet = !result;
+}
 
-        if (response.Options->H264->GovLengthRange) {
-            iframeDistance = DEFAULT_IFRAME_DISTANCE <= response.Options->H264->GovLengthRange->Min? response.Options->H264->GovLengthRange->Min:
-                (DEFAULT_IFRAME_DISTANCE >= response.Options->H264->GovLengthRange->Max? response.Options->H264->GovLengthRange->Max: DEFAULT_IFRAME_DISTANCE);
-            qDebug() << "ONVIF iframe distance: " << iframeDistance;
-        } else {
-            qCritical() << "QnPlOnvifResource::setVideoEncoderOptions: can't fetch ONVIF iframe distance";
-        }
+bool QnPlOnvifResource::setVideoEncoderOptionsH264(const _onvifMedia__GetVideoEncoderConfigurationOptionsResponse& response) {
+    if (!response.Options->H264) {
+        qCritical() << "QnPlOnvifResource::setVideoEncoderOptionsH264: can't fetch (ONVIF) max fps, iframe distance and resolution list";
+        return false;
+    }
+
+    bool result = false;
+
+    if (response.Options->H264->FrameRateRange) {
+        maxFps = response.Options->H264->FrameRateRange->Max;
+        result = true;
+
+        qDebug() << "ONVIF max FPS: " << maxFps;
+    } else {
+        qCritical() << "QnPlOnvifResource::setVideoEncoderOptionsH264: can't fetch ONVIF max FPS";
+    }
+
+    if (response.Options->H264->GovLengthRange) {
+        iframeDistance = DEFAULT_IFRAME_DISTANCE <= response.Options->H264->GovLengthRange->Min? response.Options->H264->GovLengthRange->Min:
+            (DEFAULT_IFRAME_DISTANCE >= response.Options->H264->GovLengthRange->Max? response.Options->H264->GovLengthRange->Max: DEFAULT_IFRAME_DISTANCE);
+        result = true;
+        qDebug() << "ONVIF iframe distance: " << iframeDistance;
+    } else {
+        qCritical() << "QnPlOnvifResource::setVideoEncoderOptionsH264: can't fetch ONVIF iframe distance";
     }
 
     std::vector<onvifXsd__VideoResolution*>& resolutions = response.Options->H264->ResolutionsAvailable;
     if (resolutions.size() == 0) {
-        qCritical() << "QnPlOnvifResource::setVideoEncoderOptions: can't fetch ONVIF resolutions";
+        qCritical() << "QnPlOnvifResource::setVideoEncoderOptionsH264: can't fetch ONVIF resolutions";
     } else {
         m_resolutionList.clear();
 
@@ -475,6 +506,8 @@ void QnPlOnvifResource::setVideoEncoderOptions(const _onvifMedia__GetVideoEncode
             ++resPtrIter;
         }
         qSort(m_resolutionList.begin(), m_resolutionList.end(), resolutionGreaterThan);
+
+        result = true;
     }
 
     //Printing fetched resolutions
@@ -485,7 +518,51 @@ void QnPlOnvifResource::setVideoEncoderOptions(const _onvifMedia__GetVideoEncode
         }
     }
 
-    videoOptionsNotSet = false;
+    return result;
+}
+
+bool QnPlOnvifResource::setVideoEncoderOptionsJpeg(const _onvifMedia__GetVideoEncoderConfigurationOptionsResponse& response) {
+    if (!response.Options->JPEG) {
+        qCritical() << "QnPlOnvifResource::setVideoEncoderOptionsJpeg: can't fetch (ONVIF) max fps, iframe distance and resolution list";
+        return false;
+    }
+
+    bool result = false;
+
+    if (response.Options->JPEG->FrameRateRange) {
+        maxFps = response.Options->JPEG->FrameRateRange->Max;
+        result = true;
+
+        qDebug() << "ONVIF max FPS: " << maxFps;
+    } else {
+        qCritical() << "QnPlOnvifResource::setVideoEncoderOptionsJpeg: can't fetch ONVIF max FPS";
+    }
+
+    std::vector<onvifXsd__VideoResolution*>& resolutions = response.Options->JPEG->ResolutionsAvailable;
+    if (resolutions.size() == 0) {
+        qCritical() << "QnPlOnvifResource::setVideoEncoderOptionsJpeg: can't fetch ONVIF resolutions";
+    } else {
+        m_resolutionList.clear();
+
+        std::vector<onvifXsd__VideoResolution*>::const_iterator resPtrIter = resolutions.begin();
+        while (resPtrIter != resolutions.end()) {
+            m_resolutionList.append(ResolutionPair((*resPtrIter)->Width, (*resPtrIter)->Height));
+            ++resPtrIter;
+        }
+        qSort(m_resolutionList.begin(), m_resolutionList.end(), resolutionGreaterThan);
+
+        result = true;
+    }
+
+    //Printing fetched resolutions
+    if (cl_log.logLevel() >= cl_logDEBUG1) {
+        qDebug() << "ONVIF resolutions: ";
+        foreach (ResolutionPair resolution, m_resolutionList) {
+            qDebug() << resolution.first << " x " << resolution.second;
+        }
+    }
+
+    return result;
 }
 
 void QnPlOnvifResource::analyzeVideoEncoders(VideoEncoders& encoders, bool setOptions) {
@@ -504,11 +581,13 @@ void QnPlOnvifResource::analyzeVideoEncoders(VideoEncoders& encoders, bool setOp
     encoders.videoEncodersUsed.clear();
     encoders.videoEncodersUnused.clear();
     encoders.filled = true;
+    bool result = false;
 
     while (iter != encoders.soapResponse.Configurations.end()) {
         onvifXsd__VideoEncoderConfiguration* conf = *iter;
 
-        if (conf->Encoding == onvifXsd__VideoEncoding__H264) {
+        if (conf->Encoding == onvifXsd__VideoEncoding__H264 && codec == H264 || 
+                conf->Encoding == onvifXsd__VideoEncoding__JPEG && codec == JPEG) {
             QString encodersHashKey(conf->token.c_str());
             if (!encoders.videoEncodersUnused.contains(encodersHashKey)) {
                 encoders.videoEncodersUnused.insert(encodersHashKey, conf);
@@ -518,6 +597,8 @@ void QnPlOnvifResource::analyzeVideoEncoders(VideoEncoders& encoders, bool setOp
                 ++iter;
                 continue;
             }
+
+            result = true;
 
             if (minQuality > conf->Quality) minQuality = conf->Quality;
             if (maxQuality < conf->Quality) maxQuality = conf->Quality;
@@ -540,7 +621,7 @@ void QnPlOnvifResource::analyzeVideoEncoders(VideoEncoders& encoders, bool setOp
         ++iter;
     }
 
-    if (!setOptions) {
+    if (!setOptions || !result) {
         return;
     }
 
@@ -598,7 +679,9 @@ int QnPlOnvifResource::countAppropriateProfiles(const _onvifMedia__GetProfilesRe
 
     for (long i = 0; i < profiles.size(); ++i) {
         onvifXsd__Profile* profilePtr = profiles.at(i);
-        if (!profilePtr->VideoEncoderConfiguration || profilePtr->VideoEncoderConfiguration->Encoding != onvifXsd__VideoEncoding__H264) {
+        if (!profilePtr->VideoEncoderConfiguration || 
+                profilePtr->VideoEncoderConfiguration->Encoding != onvifXsd__VideoEncoding__H264 && codec == H264 ||
+                profilePtr->VideoEncoderConfiguration->Encoding != onvifXsd__VideoEncoding__JPEG && codec == JPEG) {
             continue;
         }
 

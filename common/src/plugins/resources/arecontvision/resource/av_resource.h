@@ -22,8 +22,6 @@ public:
     CLHttpStatus setRegister(int page, int num, int val);
     CLHttpStatus setRegister_asynch(int page, int num, int val);
 
-    virtual void init() override;
-
     bool isPanoramic() const;
     bool isDualSensor() const;
 
@@ -56,6 +54,8 @@ public:
     int totalMdZones() const;
 
 protected:
+    virtual void initInternal() override;
+
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 
     // should just do physical job ( network or so ) do not care about memory domain

@@ -13,6 +13,9 @@ public:
     QnLocalVideoServerResource();
 
     virtual QString getUniqueId() const;
+
+protected:
+    virtual void initInternal() override {}
 };
 
 
@@ -47,6 +50,8 @@ public:
     bool getReserve() const;
 signals:
     void serverIFFound(QString);
+protected:
+    void initInternal() override {}
 private:
     QnVideoServerConnectionPtr m_restConnection;
     QString m_apiUrl;

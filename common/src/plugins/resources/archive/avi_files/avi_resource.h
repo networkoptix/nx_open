@@ -22,6 +22,8 @@ public:
     virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider = 0) override;
 
     void setStorage(QnStorageResourcePtr);
+protected:
+    virtual void initInternal() override {}
 private:
     QnStorageResourcePtr m_storage;
 };

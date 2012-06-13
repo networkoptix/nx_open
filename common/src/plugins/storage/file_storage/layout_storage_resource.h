@@ -33,6 +33,10 @@ public:
     virtual bool isFileExists(const QString& url) override;
     virtual bool isDirExists(const QString& url) override;
     virtual qint64 getFreeSpace() override;
+
+protected:
+    void initInternal() override {}
+
 private:
     static QString removeProtocolPrefix(const QString& url);
 

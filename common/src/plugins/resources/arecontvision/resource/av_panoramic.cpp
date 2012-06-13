@@ -131,9 +131,9 @@ bool QnArecontPanoramicResource::setSpecialParam(const QString& name, const QVar
     return false;
 }
 
-void QnArecontPanoramicResource::init()
+void QnArecontPanoramicResource::initInternal()
 {
-    QnPlAreconVisionResource::init();
+    QnPlAreconVisionResource::initInternal();
     setRegister(3, 100, 10); // sets I frame frequency to 10
 }
 

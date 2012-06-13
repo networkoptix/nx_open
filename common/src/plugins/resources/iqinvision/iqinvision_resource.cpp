@@ -64,7 +64,7 @@ void QnPlIqResource::setCropingPhysical(QRect /*croping*/)
 
 }
 
-void QnPlIqResource::init() 
+void QnPlIqResource::initInternal() 
 {
     setOID("1.2.6.5", "1"); // Reset crop to maximum size
 }
