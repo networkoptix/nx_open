@@ -18,6 +18,9 @@ QN_EXPORT unsigned char* MACsToByte2(const QString& macs, unsigned char* pbyAddr
 // returns list of IPv4 addresses of current machine
 QN_EXPORT QList<QHostAddress> getAllIPv4Addresses();
 
+// returns list of IPv4 addresses of current machine. Skip 127.0.0.1 and addresses we can't bind to.
+QList<QHostAddress> allLocalAddresses();
+
 //returns list of all IPV4 QNetworkAddressEntries of current machine; this function takes time; 
 QN_EXPORT QList<QNetworkAddressEntry> getAllIPv4AddressEntries();
 

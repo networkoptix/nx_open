@@ -48,7 +48,12 @@ protected:
 
     virtual void run();
 
+signals:
+    void localInterfacesChanged();
+
 private:
+    void updateLocalNetworkInterfaces();
+
     // returns new resources( not from pool) or updates some in resource pool
     QnResourceList findNewResources(bool *ip_finished);
 
@@ -76,6 +81,8 @@ private:
     bool m_foundSmth; // minor just to minimize lof output
 
     unsigned int m_runNumber;
+
+    QList<QHostAddress> m_allLocalAddresses;
 };
 
 #endif //QN_RESOURCE_DISCOVERY_MANAGER_H

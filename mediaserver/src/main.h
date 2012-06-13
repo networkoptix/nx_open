@@ -21,6 +21,8 @@ public:
 
 private slots:
     void loadResourcesFromECS();
+    void at_localInterfacesChanged();
+    void at_serverSaved(int, const QByteArray&, const QnResourceList&, int);
 
 private:
     int m_argc;

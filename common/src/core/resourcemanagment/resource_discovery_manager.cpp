@@ -145,6 +145,8 @@ void QnResourceDiscoveryManager::run()
 
     while (!needToStop())
     {
+        updateLocalNetworkInterfaces();
+
         bool ip_finished;
         QnResourceList result = findNewResources(&ip_finished);
         if (ip_finished)
@@ -158,6 +160,20 @@ void QnResourceDiscoveryManager::run()
         int global_delay_between_search = 10000;
         smartSleep(global_delay_between_search);
         ++m_runNumber;
+    }
+}
+
+void QnResourceDiscoveryManager::updateLocalNetworkInterfaces()
+{
+    QList<QHostAddress> localAddresses = allLocalAddresses();
+    if (localAddresses != m_allLocalAddresses)
+    {
+        // Skip first time.
+        // We suppose here that allLocalAddresses never returns empty list
+        if (!m_allLocalAddresses.isEmpty())
+            emit localInterfacesChanged();
+
+        m_allLocalAddresses = localAddresses;
     }
 }
 
