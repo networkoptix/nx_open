@@ -214,6 +214,8 @@ void QnPlOnvifResource::setMotionMaskPhysical(int channel)
 void QnPlOnvifResource::fetchAndSetDeviceInformation()
 {
     DeviceBindingProxy soapProxy;
+    soapProxy.soap->send_timeout = 5;
+    soapProxy.soap->recv_timeout = 5;
     QString endpoint(deviceUrl);
 
     QAuthenticator auth(getAuth());
@@ -261,6 +263,8 @@ void QnPlOnvifResource::fetchAndSetDeviceInformation()
 void QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
 {
     MediaBindingProxy soapProxy;
+    soapProxy.soap->send_timeout = 5;
+    soapProxy.soap->recv_timeout = 5;
     QString endpoint(mediaUrl);
 
     QAuthenticator auth(getAuth());
@@ -572,15 +576,15 @@ void QnPlOnvifResource::analyzeVideoEncoders(VideoEncoders& encoders, bool setOp
 int QnPlOnvifResource::innerQualityToOnvif(QnStreamQuality quality) const
 {
     if (quality > QnQualityHighest) {
-        qWarning() << "QnPlOnvifResource::onvifQualityToInner: got unexpected quality (too big): " << quality;
+        qWarning() << "QnPlOnvifResource::innerQualityToOnvif: got unexpected quality (too big): " << quality;
         return maxQuality;
     }
     if (quality < QnQualityLowest) {
-        qWarning() << "QnPlOnvifResource::onvifQualityToInner: got unexpected quality (too small): " << quality;
+        qWarning() << "QnPlOnvifResource::innerQualityToOnvif: got unexpected quality (too small): " << quality;
         return minQuality;
     }
 
-    qDebug() << "QnPlOnvifResource::onvifQualityToInner: in quality = " << quality << ", out qualty = "
+    qDebug() << "QnPlOnvifResource::innerQualityToOnvif: in quality = " << quality << ", out qualty = "
              << minQuality + (maxQuality - minQuality) * (quality - QnQualityLowest) / (QnQualityHighest - QnQualityLowest)
              << ", minOnvifQuality = " << minQuality << ", maxOnvifQuality = " << maxQuality;
 
@@ -611,6 +615,8 @@ int QnPlOnvifResource::countAppropriateProfiles(const _onvifMedia__GetProfilesRe
 
 bool QnPlOnvifResource::isSoapAuthorized() const {
     DeviceBindingProxy soapProxy;
+    soapProxy.soap->send_timeout = 5;
+    soapProxy.soap->recv_timeout = 5;
     QString endpoint(deviceUrl);
 
     qDebug() << "QnPlOnvifResource::isSoapAuthorized: deviceUrl is '" << deviceUrl << "'";
@@ -673,7 +679,6 @@ void QnPlOnvifResource::save()
 
 void QnPlOnvifResource::setMinMaxQuality(int min, int max)
 {
-	//return minQuality + (maxQuality - minQuality) * (quality - QnQualityLowest) / (QnQualityHighest - QnQualityLowest);
 	int netoptixDelta = QnQualityHighest - QnQualityLowest;
     int onvifDelta = max - min;
 

@@ -178,10 +178,15 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     }
     soap_end(soapProxy.soap);
 
+    QString manufacturer(fetchManufacturer(response2));
+    if (manufacturer.isEmpty()) {
+        manufacturer = info.manufacturer;
+    }
+
     QString name(fetchName(response2));
     if (name.isEmpty()) {
         name = info.name;
-    } else if (camersNamesData.isSupported(name)) {
+    } else if (camersNamesData.isSupported(QString(name).replace(manufacturer, ""))) {
         qDebug() << "OnvifResourceInformationFetcher::findResources: (later step) skipping camera " << name;
         return;
     }
@@ -192,10 +197,6 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         name = "Unknown - " + mac;
     }
 
-    QString manufacturer(fetchManufacturer(response2));
-    if (manufacturer.isEmpty()) {
-        manufacturer = info.manufacturer;
-    }
     qDebug() << "OnvifResourceInformationFetcher::findResources: manufacturer: " << manufacturer;
 
     //Trying to get onvif URLs

@@ -68,6 +68,8 @@ const QString QnOnvifStreamReader::updateCameraAndfetchStreamUrl() const
 const QString QnOnvifStreamReader::updateCameraAndfetchStreamUrl(bool isPrimary) const
 {
     MediaBindingProxy soapProxy;
+    soapProxy.soap->send_timeout = 5;
+    soapProxy.soap->recv_timeout = 5;
 
     QAuthenticator auth(m_onvifRes->getAuth());
     std::string login(auth.user().toStdString());
