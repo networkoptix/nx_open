@@ -64,8 +64,8 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
 
     int soapRes = SOAP_OK;
     DeviceBindingProxy soapProxy;
-    soapProxy.soap->send_timeout = -200000;
-    soapProxy.soap->recv_timeout = -200000;
+    soapProxy.soap->send_timeout = 5;
+    soapProxy.soap->recv_timeout = 5;
     soap_register_plugin(soapProxy.soap, soap_wsse);
 
     //Trying to pick a password

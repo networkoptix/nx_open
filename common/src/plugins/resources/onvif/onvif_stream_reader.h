@@ -4,7 +4,7 @@
 #include "onvif_helper.h"
 #include "core/dataprovider/live_stream_provider.h"
 #include "core/dataprovider/spush_media_stream_provider.h"
-#include "utils/network/h264_rtp_reader.h"
+#include "utils/network/multicodec_rtp_reader.h"
 
 class _onvifMedia__GetProfilesResponse;
 class _onvifMedia__GetProfileResponse;
@@ -49,7 +49,7 @@ private:
     void printProfile(const _onvifMedia__GetProfileResponse& response, bool isPrimary) const;
 private:
     QnMetaDataV1Ptr m_lastMetadata;
-    RTPH264StreamreaderDelegate m_RTP264;
+    QnMulticodecRtpReader m_multiCodec;
     QnPlOnvifResourcePtr m_onvifRes;
 };
 

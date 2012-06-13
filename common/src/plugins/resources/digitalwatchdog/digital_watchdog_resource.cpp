@@ -38,7 +38,7 @@ void QnPlWatchDogResource::setCropingPhysical(QRect /*croping*/)
 {
 }
 
-void QnPlWatchDogResource::init() 
+void QnPlWatchDogResource::initInternal() 
 {
     //QnPlWatchDogResource::
 

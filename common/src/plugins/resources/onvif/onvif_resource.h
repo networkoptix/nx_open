@@ -23,6 +23,12 @@ const ResolutionPair SECONDARY_STREAM_DEFAULT_RESOLUTION(320, 240);
 class QnPlOnvifResource : public QnPhysicalCameraResource
 {
 public:
+    enum CODECS
+    {
+        H264,
+        JPEG
+    };
+
     static const char* MANUFACTURE;
     static const QString& MEDIA_URL_PARAM_NAME;
     static const QString& DEVICE_URL_PARAM_NAME;
@@ -39,7 +45,7 @@ public:
     virtual void setMotionMaskPhysical(int channel) override;
     virtual int getMaxFps() override;
     virtual void setIframeDistance(int /*frames*/, int /*timems*/) override {}
-    virtual bool hasDualStreaming() const override { return hasDual; }
+    virtual bool hasDualStreaming() const override;
 
     bool isInitialized() const;
 
@@ -63,8 +69,10 @@ public:
     const QString& getDeviceUrl() const { return deviceUrl; }
     void setDeviceUrl(const QString& src) { deviceUrl = src; }
 
+    CODECS getCodec() const;
+
 protected:
-    void init();
+    void initInternal() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
     virtual void setCropingPhysical(QRect croping);
@@ -80,6 +88,8 @@ private:
     void fetchAndSetDeviceInformation();
     void fetchAndSetVideoEncoderOptions();
     void setVideoEncoderOptions(const _onvifMedia__GetVideoEncoderConfigurationOptionsResponse& response);
+    bool setVideoEncoderOptionsH264(const _onvifMedia__GetVideoEncoderConfigurationOptionsResponse& response);
+    bool setVideoEncoderOptionsJpeg(const _onvifMedia__GetVideoEncoderConfigurationOptionsResponse& response);
     void analyzeVideoEncoders(VideoEncoders& encoders, bool setOptions);
     int countAppropriateProfiles(const _onvifMedia__GetProfilesResponse& response, VideoEncoders& encoders);
     void setOnvifUrls();
@@ -104,6 +114,7 @@ private:
     QString mediaUrl;
     QString deviceUrl;
     bool reinitDeviceInfo;
+    CODECS codec;
 };
 
 typedef QSharedPointer<QnPlOnvifResource> QnPlOnvifResourcePtr;

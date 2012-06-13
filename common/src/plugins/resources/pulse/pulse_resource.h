@@ -25,6 +25,8 @@ public:
 
 protected:
 
+    void initInternal() override {}
+
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 
     virtual void setCropingPhysical(QRect croping);

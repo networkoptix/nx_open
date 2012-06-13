@@ -151,7 +151,7 @@ void QnPlAxisResource::readMotionInfo()
     }
 }
 
-void QnPlAxisResource::init()
+void QnPlAxisResource::initInternal()
 {
     QMutexLocker lock(&m_mutex);
 

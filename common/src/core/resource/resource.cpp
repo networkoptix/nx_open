@@ -23,7 +23,8 @@ QnResource::QnResource():
     m_flags(0),
 	m_disabled(false),
     m_status(Offline),
-    m_resourcePool(NULL)
+    m_resourcePool(NULL),
+    m_initialized(false)
 {
     static volatile bool metaTypesInitialized = false;
     if (!metaTypesInitialized) {
@@ -536,6 +537,9 @@ void QnResource::setStatus(QnResource::Status newStatus, bool silenceMode)
 	qDebug() << "Change status. oldValue=" << oldStatus << " new value=" << newStatus << " id=" << m_id << " name=" << getName();
 #endif
 
+    if (newStatus == Offline)
+        m_initialized = false;
+
     if (oldStatus == Offline && newStatus == Online)
         init();
 
@@ -724,12 +728,16 @@ bool QnResource::isDisabled() const
 
 void QnResource::setDisabled(bool disabled)
 {
+    if (m_disabled == disabled)
+        return;
+
     bool oldDisabled = m_disabled;
 
     {
         QMutexLocker mutexLocker(&m_mutex);
 
         m_disabled = disabled;
+        m_initialized = false;
     }
 
     if (oldDisabled != disabled)
@@ -737,3 +745,10 @@ void QnResource::setDisabled(bool disabled)
 
 }
 
+void QnResource::init()
+{
+    if (!m_initialized) {
+        m_initialized = true;
+        initInternal();
+    }
+}

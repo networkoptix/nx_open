@@ -178,7 +178,7 @@ static bool sizeCompare(const QSize &s1, const QSize &s2)
     return s1.width() > s2.width();
 }
 
-void QnPlDlinkResource::init()
+void QnPlDlinkResource::initInternal()
 {
 
     CLHttpStatus status;
