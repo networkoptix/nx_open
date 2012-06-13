@@ -275,6 +275,8 @@ private:
 
     QGraphicsWidget *m_sliderResizerItem;
 
+    QGraphicsWidget *m_sliderEaterItem;
+
     bool m_ignoreSliderResizerGeometryChanges;
 
     /** Hover processor that is used to change slider opacity when mouse is hovered over it. */

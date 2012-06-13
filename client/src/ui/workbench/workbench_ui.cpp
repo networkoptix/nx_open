@@ -102,8 +102,8 @@ namespace {
         return button;
     }
 
-    class QnTopResizerWidget: public Instrumented<GraphicsWidget> {
-        typedef Instrumented<GraphicsWidget> base_type;
+    class QnTopResizerWidget: public GraphicsWidget {
+        typedef GraphicsWidget base_type;
 
     public:
         QnTopResizerWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags wFlags = 0):
@@ -115,6 +115,33 @@ namespace {
             setFlag(ItemHasNoContents, true);
             setFlag(ItemIsMovable, true);
             setHandlingFlag(ItemHandlesMovement, true);
+        }
+    };
+
+    class QnEventEatingWidget: public GraphicsWidget {
+        typedef GraphicsWidget base_type;
+    
+    public:
+        QnEventEatingWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags wFlags = 0):
+            base_type(parent, wFlags)
+        {
+            setAcceptedMouseButtons(Qt::LeftButton);
+            setAcceptHoverEvents(true);
+            setFlag(ItemHasNoContents, true);
+        }
+
+    protected:
+        virtual bool sceneEvent(QEvent *event) override {
+            switch(event->type()) {
+            case QEvent::GraphicsSceneMousePress:
+            case QEvent::GraphicsSceneMouseRelease:
+            case QEvent::GraphicsSceneMouseMove:
+            case QEvent::GraphicsSceneMouseDoubleClick:
+                event->accept();
+                return true;
+            default:
+                return base_type::sceneEvent(event);
+            }
         }
     };
 
@@ -480,6 +507,8 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
 
     /* Navigation slider. */
+    m_sliderEaterItem = new QnEventEatingWidget(m_controlsWidget);
+
     m_sliderResizerItem = new QnTopResizerWidget(m_controlsWidget);
     m_sliderResizerItem->setProperty(Qn::NoHandScrollOver, true);
     m_instrumentManager->registerItem(m_sliderResizerItem); /* We want it registered right away. */
@@ -496,7 +525,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
         m_sliderShowButton->setTransform(transform);
     }
     m_sliderShowButton->setFocusProxy(m_sliderItem);
-    
+
     /* There is no stackAfter function, so we have to resort to ugly copypasta. */
     m_sliderShowButton->stackBefore(m_sliderItem->timeSlider()->toolTipItem());
     m_sliderResizerItem->stackBefore(m_sliderShowButton);
@@ -792,6 +821,7 @@ void QnWorkbenchUi::setSliderOpacity(qreal opacity, bool animate) {
     }
 
     m_sliderResizerItem->setVisible(!qFuzzyIsNull(opacity));
+    m_sliderEaterItem->setVisible(!qFuzzyIsNull(opacity));
 }
 
 void QnWorkbenchUi::setTitleOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate) {
@@ -1297,6 +1327,9 @@ void QnWorkbenchUi::at_sliderItem_geometryChanged() {
 
     updateViewportMargins();
     updateSliderResizerGeometry();
+
+    m_sliderEaterItem->resize(m_sliderItem->size().width(), 30);
+    m_sliderEaterItem->setPos(m_sliderItem->pos() + QPointF(0, -30));
 
     QRectF geometry = m_sliderItem->geometry();
     m_sliderShowButton->setPos(QPointF(

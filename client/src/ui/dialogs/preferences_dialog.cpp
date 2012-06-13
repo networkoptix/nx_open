@@ -162,6 +162,7 @@ void QnPreferencesDialog::setCurrentPage(QnPreferencesDialog::SettingsPage page)
     ui->tabWidget->setCurrentIndex(int(page));
 }
 
+
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
