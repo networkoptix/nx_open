@@ -146,8 +146,8 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
     QGraphicsLinearLayout *rightLayoutHL = new QGraphicsLinearLayout(Qt::Horizontal);
     rightLayoutHL->setContentsMargins(0, 0, 0, 0);
     rightLayoutHL->setSpacing(3);
-    rightLayoutHL->addItem(m_volumeSlider);
     rightLayoutHL->addItem(m_muteButton);
+    rightLayoutHL->addItem(m_volumeSlider);
 
     QGraphicsLinearLayout *rightLayoutV = new QGraphicsLinearLayout(Qt::Vertical);
     rightLayoutV->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
