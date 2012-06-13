@@ -177,8 +177,6 @@ void QnMulticodecRtpReader::openStream()
     else
         QTextStream(&url) << "rtsp://" << nres->getHostAddress().toString();
 
-    url = "rtsp://10.0.2.19/onvif-media/media.amp?profile=quality_jpeg&sessiontimeout=60";
-
     m_RtpSession.setAuth(nres->getAuth());
 
     if (m_RtpSession.open(url))
