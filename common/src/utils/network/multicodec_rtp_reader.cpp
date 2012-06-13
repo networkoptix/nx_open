@@ -129,9 +129,14 @@ QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
         return new QnMjpegRtpParser;
     else if (codecName == "mpeg4-generic")
         return new QnAacRtpParser;
-    else if (codecName == "PCMA") {
+    else if (codecName == "PCMU") {
         QnSimpleAudioRtpParser* result = new QnSimpleAudioRtpParser;
         result->setCodecId(CODEC_ID_PCM_MULAW);
+        return result;
+    }
+    else if (codecName == "PCMA") {
+        QnSimpleAudioRtpParser* result = new QnSimpleAudioRtpParser;
+        result->setCodecId(CODEC_ID_PCM_ALAW);
         return result;
     }
     else if (codecName.startsWith("g726")) // g726-24, g726-32 e.t.c

@@ -166,6 +166,7 @@ QString findCodecById(int num)
 {
     switch (num)
     {
+        case 0: return "PCMU";
         case 8: return "PCMA";
         case 26: return "JPEG";
         default: return "";
