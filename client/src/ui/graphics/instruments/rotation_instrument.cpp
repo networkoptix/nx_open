@@ -269,6 +269,9 @@ void RotationInstrument::start(QGraphicsView *view, QGraphicsWidget *target) {
         return;
     }
 
+    if(!isEnabled())
+        return;
+
     if(!satisfiesItemConditions(target))
         return;
 

@@ -747,7 +747,9 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::ToggleThumbnailsAction).
         flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Show Thumbnails")).
-        toggledText(tr("Hide Thumbnails"));
+        toggledText(tr("Hide Thumbnails")).
+        icon(qnSkin->icon("thumbnails.png"));
+
 
     factory(Qn::IncrementDebugCounterAction).
         flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::NoTarget).
