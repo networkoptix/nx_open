@@ -13,6 +13,28 @@
 
 #include <ui/graphics/items/resource_widget.h>
 
+namespace {
+
+    struct IsMotionSelectable {
+    public:
+        IsMotionSelectable(bool *canClearThrough): m_canClearThrough(canClearThrough) {
+            *m_canClearThrough = true;
+        }
+
+        bool operator()(QGraphicsItem *item) const {
+            if(item->toGraphicsObject() && item->toGraphicsObject()->property(Qn::NoMotionClearThrough).toBool())
+                *m_canClearThrough = false;
+
+            return item->isWidget() && dynamic_cast<QnResourceWidget *>(item);
+        }
+
+    private:
+        bool *m_canClearThrough;
+    };
+
+} // anonymous namespace
+
+
 class MotionSelectionItem: public QGraphicsObject {
 public:
     MotionSelectionItem(): 
@@ -198,8 +220,8 @@ bool MotionSelectionInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *
         return false;
 
     QGraphicsView *view = this->view(viewport);
-    QnResourceWidget *target = this->item<QnResourceWidget>(view, event->pos());
-    if(target == NULL)
+    QnResourceWidget *target = dynamic_cast<QnResourceWidget *>(this->item(view, event->pos(), IsMotionSelectable(&m_isClickAllowed)));
+    if(!target)
         return false;
 
     Qt::KeyboardModifiers selectionModifiers = this->selectionModifiers(target);
@@ -305,7 +327,7 @@ void MotionSelectionInstrument::finishDrag(DragInfo *info) {
 }
 
 void MotionSelectionInstrument::finishDragProcess(DragInfo *info) {
-    if (m_isClick && target()) {
+    if (m_isClick && m_isClickAllowed && target()) {
         Qt::KeyboardModifiers selectionModifiers = this->selectionModifiers(target());
         if((info->modifiers() & selectionModifiers) == selectionModifiers && (info->modifiers() & m_multiSelectionModifiers) != m_multiSelectionModifiers) {
             emit motionRegionCleared(info->view(), target());

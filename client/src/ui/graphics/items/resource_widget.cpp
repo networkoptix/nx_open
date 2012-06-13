@@ -157,12 +157,14 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_infoButton->setIcon(qnSkin->icon("decorations/info.png"));
     m_infoButton->setPreferredSize(headerButtonSize);
     m_infoButton->setCheckable(true);
+    m_infoButton->setProperty(Qn::NoMotionClearThrough, true);
     connect(m_infoButton, SIGNAL(toggled(bool)), this, SLOT(fadeInfo(bool)));
 
     m_closeButton = new QnImageButtonWidget();
     m_closeButton->setParent(this);
     m_closeButton->setIcon(qnSkin->icon("decorations/close_item.png"));
     m_closeButton->setPreferredSize(headerButtonSize);
+    m_closeButton->setProperty(Qn::NoMotionClearThrough, true);
     connect(m_closeButton, SIGNAL(clicked()), this, SLOT(close()));
     connect(accessController()->notifier(item->layout()->resource()), SIGNAL(permissionsChanged(const QnResourcePtr &)), this, SLOT(updateButtonsVisibility()));
     
@@ -170,6 +172,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_rotateButton->setParent(this);
     m_rotateButton->setIcon(qnSkin->icon("decorations/rotate_item.png"));
     m_rotateButton->setPreferredSize(headerButtonSize);
+    m_rotateButton->setProperty(Qn::NoMotionClearThrough, true);
     connect(m_rotateButton, SIGNAL(pressed()), this, SIGNAL(rotationStartRequested()));
     connect(m_rotateButton, SIGNAL(released()), this, SIGNAL(rotationStopRequested()));
 
@@ -178,6 +181,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_searchButton->setIcon(qnSkin->icon("decorations/search.png"));
     m_searchButton->setPreferredSize(headerButtonSize);
     m_searchButton->setCheckable(true);
+    m_searchButton->setProperty(Qn::NoMotionClearThrough, true);
     connect(m_searchButton, SIGNAL(toggled(bool)), this, SLOT(at_searchButton_toggled(bool)));
 
     m_headerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
