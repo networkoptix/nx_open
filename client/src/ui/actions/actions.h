@@ -421,9 +421,15 @@ namespace Qn {
         ExportTimeSelectionAction,
 
         /**
-         * Exports whole layout
+         * Exports whole layout.
          */
         ExportLayoutAction,
+
+        /**
+         * Shows/hides thumbnails.
+         */
+        ToggleThumbnailsAction,
+
 
 
         /* Debug actions. */

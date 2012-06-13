@@ -740,7 +740,14 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Export Selected as Layout...")).
         condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::DisabledAction, this));
 
+    factory().
+        flags(Qn::Slider).
+        separator();
 
+    factory(Qn::ToggleThumbnailsAction).
+        flags(Qn::Slider | Qn::SingleTarget).
+        text(tr("Show Thumbnails")).
+        toggledText(tr("Hide Thumbnails"));
 
     factory(Qn::IncrementDebugCounterAction).
         flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::NoTarget).
