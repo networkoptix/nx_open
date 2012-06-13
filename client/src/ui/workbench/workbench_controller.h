@@ -114,8 +114,8 @@ protected slots:
     void at_move(QGraphicsView *view, const QPointF &totalDelta);
     void at_moveFinished(QGraphicsView *view, const QList<QGraphicsItem *> &items);
 
-    void at_rotationStarted(QGraphicsView *view, QnResourceWidget *widget);
-    void at_rotationFinished(QGraphicsView *view, QnResourceWidget *widget);
+    void at_rotationStarted(QGraphicsView *view, QGraphicsWidget *widget);
+    void at_rotationFinished(QGraphicsView *view, QGraphicsWidget *widget);
 
     void at_motionSelectionProcessStarted(QGraphicsView *view, QnResourceWidget *widget);
     void at_motionRegionCleared(QGraphicsView *view, QnResourceWidget *widget);

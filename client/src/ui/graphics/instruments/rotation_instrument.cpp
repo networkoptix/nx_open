@@ -82,6 +82,11 @@ namespace {
         return calculateItemAngle(widget, widget->mapFromScene(scenePoint), widget->mapFromScene(sceneOrigin));
     }
 
+    struct ItemAcceptsLeftMouseButton: public std::unary_function<QGraphicsItem *, bool> {
+        bool operator()(QGraphicsItem *item) const {
+            return item->acceptedMouseButtons() & Qt::LeftButton;
+        }
+    };
 
 } // anonymous namespace
 
@@ -260,7 +265,7 @@ bool RotationInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) 
         return false;
 
     QGraphicsView *view = this->view(viewport);
-    QGraphicsWidget *target = this->item<QGraphicsWidget>(view, event->pos());
+    QGraphicsWidget *target = this->item<QGraphicsWidget>(view, event->pos(), ItemAcceptsLeftMouseButton());
     if(!target || !satisfiesItemConditions(target))
         return false;
 
