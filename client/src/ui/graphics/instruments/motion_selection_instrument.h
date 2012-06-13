@@ -21,7 +21,6 @@ public:
     };
 
     MotionSelectionInstrument(QObject *parent = NULL);
-    
     virtual ~MotionSelectionInstrument();
 
     void setColor(ColorRole role, const QColor &color);
@@ -52,6 +51,7 @@ signals:
 
 protected:
     virtual void installedNotify() override;
+    virtual void aboutToBeDisabledNotify() override;
     virtual void aboutToBeUninstalledNotify() override;
 
     virtual bool mousePressEvent(QWidget *viewport, QMouseEvent *event) override;
@@ -71,6 +71,8 @@ protected:
         return m_target.data();
     }
 
+    Qt::KeyboardModifiers selectionModifiers(QnResourceWidget *target) const;
+
     void ensureSelectionItem();
 
 private:
@@ -78,7 +80,7 @@ private:
     QWeakPointer<MotionSelectionItem> m_selectionItem;
     QWeakPointer<QnResourceWidget> m_target;
     bool m_selectionStartedEmitted;
-    bool m_emptyDrag;
+    bool m_isClick;
     Qt::KeyboardModifiers m_selectionModifiers;
     Qt::KeyboardModifiers m_multiSelectionModifiers;
 };

@@ -96,7 +96,7 @@ private:
 
 MotionSelectionInstrument::MotionSelectionInstrument(QObject *parent):
     base_type(Viewport, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent),
-    m_emptyDrag(false),
+    m_isClick(false),
     m_selectionModifiers(0),
     m_multiSelectionModifiers(Qt::ControlModifier)
 {
@@ -110,6 +110,10 @@ MotionSelectionInstrument::MotionSelectionInstrument(QObject *parent):
         qMin(highlight.blue() / 2 + 110, 255),
         127
     );
+}
+
+MotionSelectionInstrument::~MotionSelectionInstrument() {
+    ensureUninstalled();
 }
 
 void MotionSelectionInstrument::setColor(ColorRole role, const QColor &color) {
@@ -149,16 +153,18 @@ Qt::KeyboardModifiers MotionSelectionInstrument::multiSelectionModifiers() const
     return m_multiSelectionModifiers;
 }
 
-MotionSelectionInstrument::~MotionSelectionInstrument() {
-    ensureUninstalled();
-}
-
 void MotionSelectionInstrument::installedNotify() {
     assert(selectionItem() == NULL);
 
     ensureSelectionItem();
 
     base_type::installedNotify();
+}
+
+void MotionSelectionInstrument::aboutToBeDisabledNotify() {
+    m_isClick = false;
+
+    base_type::aboutToBeDisabledNotify();
 }
 
 void MotionSelectionInstrument::aboutToBeUninstalledNotify() {
@@ -180,6 +186,13 @@ void MotionSelectionInstrument::ensureSelectionItem() {
         scene()->addItem(selectionItem());
 }
 
+Qt::KeyboardModifiers MotionSelectionInstrument::selectionModifiers(QnResourceWidget *target) const {
+    if(!target)
+        return m_selectionModifiers;
+
+    return qvariant_cast<int>(target->property(Qn::MotionSelectionModifiers), m_selectionModifiers);
+}
+
 bool MotionSelectionInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
     if(event->button() != Qt::LeftButton)
         return false;
@@ -189,7 +202,7 @@ bool MotionSelectionInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *
     if(target == NULL)
         return false;
 
-    Qt::KeyboardModifiers selectionModifiers = qvariant_cast<int>(target->property(Qn::MotionSelectionModifiers).toInt(), m_selectionModifiers);
+    Qt::KeyboardModifiers selectionModifiers = this->selectionModifiers(target);
     if((event->modifiers() & selectionModifiers) != selectionModifiers)
         return false;
 
@@ -211,13 +224,12 @@ bool MotionSelectionInstrument::paintEvent(QWidget *viewport, QPaintEvent *event
 }
 
 void MotionSelectionInstrument::startDragProcess(DragInfo *info) {
-    m_emptyDrag = true;
+    m_isClick = true;
     emit selectionProcessStarted(info->view(), target());
 }
 
-void MotionSelectionInstrument::startDrag(DragInfo *info) 
-{
-    m_emptyDrag = false;
+void MotionSelectionInstrument::startDrag(DragInfo *info) {
+    m_isClick = false;
     m_selectionStartedEmitted = false;
 
     if(target() == NULL) {
@@ -293,11 +305,13 @@ void MotionSelectionInstrument::finishDrag(DragInfo *info) {
 }
 
 void MotionSelectionInstrument::finishDragProcess(DragInfo *info) {
-    if (m_emptyDrag && (info->modifiers() & m_selectionModifiers) == m_selectionModifiers && (info->modifiers() & m_multiSelectionModifiers) != m_multiSelectionModifiers)
-    {
-        emit motionRegionCleared(info->view(), target());
-        m_emptyDrag = false;
+    if (m_isClick && target()) {
+        Qt::KeyboardModifiers selectionModifiers = this->selectionModifiers(target());
+        if((info->modifiers() & selectionModifiers) == selectionModifiers && (info->modifiers() & m_multiSelectionModifiers) != m_multiSelectionModifiers) {
+            emit motionRegionCleared(info->view(), target());
+            m_isClick = false;
+        }
     }
-    emit selectionProcessFinished(info->view(), target());
 
+    emit selectionProcessFinished(info->view(), target());
 }
