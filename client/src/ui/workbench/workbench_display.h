@@ -41,6 +41,7 @@ class QnGridItem;
 class QnWorkbenchRenderWatcher;
 class QnWorkbenchContext;
 class QnWorkbenchStreamSynchronizer;
+class QnToggle;
 
 class CLVideoCamera;
 class CLCamDisplay;
@@ -370,6 +371,9 @@ private:
 
     /** Stream synchronizer. */
     QnWorkbenchStreamSynchronizer *m_streamSynchronizer;
+
+    /** Zoomed state toggle. */
+    QnToggle *m_zoomedToggle;
 
 
     /* Internal state. */
