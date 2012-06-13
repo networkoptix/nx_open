@@ -345,7 +345,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(display(),                  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),                                         this,                           SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
 
     /* Set up zoom toggle. */
-    m_zoomedToggle = new QnToggle(this);
+    m_zoomedToggle = new QnToggle(false, this);
     connect(m_zoomedToggle,             SIGNAL(activated()),                                                                        m_moveInstrument,               SLOT(recursiveDisable()));
     connect(m_zoomedToggle,             SIGNAL(deactivated()),                                                                      m_moveInstrument,               SLOT(recursiveEnable()));
     connect(m_zoomedToggle,             SIGNAL(activated()),                                                                        m_resizingInstrument,           SLOT(recursiveDisable()));

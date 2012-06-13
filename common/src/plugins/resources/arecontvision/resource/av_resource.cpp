@@ -218,7 +218,7 @@ QnResourcePtr QnPlAreconVisionResource::updateResource()
     return result;
 }
 
-void QnPlAreconVisionResource::init()
+void QnPlAreconVisionResource::initInternal()
 {
     QRect rect = getCroping(QnDomainMemory);
     setCropingPhysical(rect);

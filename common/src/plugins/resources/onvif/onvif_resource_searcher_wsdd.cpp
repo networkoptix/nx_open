@@ -259,7 +259,6 @@ const QString OnvifResourceSearcherWsdd::getAppropriateAddress(
     qDebug() << "OnvifResourceSearcherWsdd::getAppropriateAddress: address = " << appropriateAddr
              << ". Interface: " << prefixes[0];
 
-    //return !appropriateAddr.isEmpty()? appropriateAddr: (addrList.isEmpty()? appropriateAddr: addrList.at(0));
     return appropriateAddr;
 }
 
