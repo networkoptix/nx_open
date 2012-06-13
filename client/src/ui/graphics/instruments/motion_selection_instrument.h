@@ -2,7 +2,8 @@
 #define QN_MOTION_SELECTION_INSTRUMENT_H
 
 #include "drag_processing_instrument.h"
-#include <QWeakPointer>
+
+#include <QtCore/QWeakPointer>
 
 class QnResourceWidget;
 class MotionSelectionItem;
@@ -81,6 +82,21 @@ private:
     Qt::KeyboardModifiers m_selectionModifiers;
     Qt::KeyboardModifiers m_multiSelectionModifiers;
 };
+
+
+namespace Qn { namespace {
+    /**
+     * Name of the property to set on a <tt>QnResourceWidget</tt> to change
+     * the keyboard modifiers that must be pressed to activate the
+     * motion selection instrument.
+     * 
+     * If not set, default modifiers set for the motion selection instrument
+     * will be used.
+     */
+    const char *MotionSelectionModifiers = "_qn_motionSelectionModifiers";
+
+#define MotionSelectionModifiers MotionSelectionModifiers
+}}
 
 
 #endif // QN_MOTION_SELECTION_INSTRUMENT_H

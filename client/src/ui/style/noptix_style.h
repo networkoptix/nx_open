@@ -58,8 +58,22 @@ private:
 
 
 namespace Qn { namespace {
+    /**
+     * Name of a property to set on a <tt>QAction</tt> that is checkable, but for
+     * which checkbox must not be displayed in a menu. 
+     */
     const char *HideCheckBoxInMenu              = "_qn_hideCheckBoxInMenu";
+
+    /**
+     * Name of a property to set on a <tt>QAbstractItemView</tt> to change
+     * default opacity if its items' background.
+     */
     const char *ItemViewItemBackgroundOpacity   = "_qn_itemViewItemBackgroundOpacity";
+
+    /**
+     * Name of a property to set on a <tt>QAbstractSlider</tt> or 
+     * <tt>AbstractGraphicsSlider</tt> to change default width of the slider handle.
+     */
     const char *SliderLength                    = "_qn_sliderLength";
 
 #define HideCheckBoxInMenu HideCheckBoxInMenu

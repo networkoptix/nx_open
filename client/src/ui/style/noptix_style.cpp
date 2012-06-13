@@ -7,7 +7,10 @@
 #include <QSet>
 #include <QToolBar>
 #include <QAbstractItemView>
+
 #include <utils/common/scoped_painter_rollback.h>
+#include <utils/common/variant.h>
+
 #include "noptix_style_animator.h"
 #include "globals.h"
 #include "skin.h"
@@ -62,9 +65,8 @@ int QnNoptixStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, c
         return 18;
     case PM_SliderLength:
         if(target) {
-            bool ok;
-            int result = target->property(Qn::SliderLength).toInt(&ok);
-            if(ok)
+            int result = qvariant_cast<int>(target->property(Qn::SliderLength), -1);
+            if(result >= 0)
                 return result;
         }
         break;
@@ -283,7 +285,7 @@ bool QnNoptixStyle::drawMenuItemControl(const QStyleOption *option, QPainter *pa
     /* There are cases when we want an action to be checkable, but do not want the checkbox displayed in the menu. 
      * So we introduce an internal property for this. */
     QAction *action = menu->actionAt(option->rect.center());
-    if(!action || !action->property(Qn::HideCheckBoxInMenu).value<bool>()) 
+    if(!action || !action->property(Qn::HideCheckBoxInMenu).toBool()) 
         return false;
     
     QStyleOptionMenuItem::CheckType checkType = itemOption->checkType;
@@ -391,12 +393,12 @@ bool QnNoptixStyle::drawPanelItemViewPrimitive(PrimitiveElement element, const Q
     if(!widget)
         return false;
 
-    QVariant value = widget->property(Qn::ItemViewItemBackgroundOpacity);
-    if(!value.isValid())
+    qreal itemOpacity = qvariant_cast<qreal>(widget->property(Qn::ItemViewItemBackgroundOpacity), 1.0);
+    if(qFuzzyCompare(itemOpacity, 1.0))
         return false;
 
     qreal opacity = painter->opacity();
-    painter->setOpacity(opacity * value.toReal());
+    painter->setOpacity(opacity * itemOpacity);
     base_type::drawPrimitive(element, option, painter, widget);
     painter->setOpacity(opacity);
     return true;

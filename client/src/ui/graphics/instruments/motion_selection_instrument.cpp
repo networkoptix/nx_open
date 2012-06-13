@@ -1,13 +1,17 @@
 #include "motion_selection_instrument.h"
+
 #include <cassert>
-#include <QGraphicsObject>
-#include <QMouseEvent>
-#include <QApplication>
-#include <QStyle>
+
+#include <QtGui/QGraphicsObject>
+#include <QtGui/QMouseEvent>
+#include <QtGui/QApplication>
+#include <QtGui/QStyle>
+
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/warnings.h>
+#include <utils/common/variant.h>
+
 #include <ui/graphics/items/resource_widget.h>
-#include "utils/settings.h"
 
 class MotionSelectionItem: public QGraphicsObject {
 public:
@@ -180,12 +184,13 @@ bool MotionSelectionInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *
     if(event->button() != Qt::LeftButton)
         return false;
 
-    if((event->modifiers() & m_selectionModifiers) != m_selectionModifiers)
-        return false;
-
     QGraphicsView *view = this->view(viewport);
     QnResourceWidget *target = this->item<QnResourceWidget>(view, event->pos());
     if(target == NULL)
+        return false;
+
+    Qt::KeyboardModifiers selectionModifiers = qvariant_cast<int>(target->property(Qn::MotionSelectionModifiers).toInt(), m_selectionModifiers);
+    if((event->modifiers() & selectionModifiers) != selectionModifiers)
         return false;
 
     m_target = target;
