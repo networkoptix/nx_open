@@ -214,6 +214,8 @@ void QnPlOnvifResource::setMotionMaskPhysical(int channel)
 void QnPlOnvifResource::fetchAndSetDeviceInformation()
 {
     DeviceBindingProxy soapProxy;
+    soapProxy.soap->send_timeout = 5;
+    soapProxy.soap->recv_timeout = 5;
     QString endpoint(deviceUrl);
 
     QAuthenticator auth(getAuth());
@@ -261,6 +263,8 @@ void QnPlOnvifResource::fetchAndSetDeviceInformation()
 void QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
 {
     MediaBindingProxy soapProxy;
+    soapProxy.soap->send_timeout = 5;
+    soapProxy.soap->recv_timeout = 5;
     QString endpoint(mediaUrl);
 
     QAuthenticator auth(getAuth());
@@ -611,6 +615,8 @@ int QnPlOnvifResource::countAppropriateProfiles(const _onvifMedia__GetProfilesRe
 
 bool QnPlOnvifResource::isSoapAuthorized() const {
     DeviceBindingProxy soapProxy;
+    soapProxy.soap->send_timeout = 5;
+    soapProxy.soap->recv_timeout = 5;
     QString endpoint(deviceUrl);
 
     qDebug() << "QnPlOnvifResource::isSoapAuthorized: deviceUrl is '" << deviceUrl << "'";
