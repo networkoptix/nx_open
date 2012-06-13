@@ -11,10 +11,10 @@ public:
     bool getDescription();
 
     virtual bool hasDualStreaming() const override;
-    virtual void init() override;
 
     bool getParamPhysical(int cannel, const QString& name, QVariant &val);
 protected:
+    void initInternal() override;
 
     virtual bool setParamPhysical(const QnParam &param, const QVariant &val) override;
     virtual bool setSpecialParam(const QString& name, const QVariant& val, QnDomain domain);

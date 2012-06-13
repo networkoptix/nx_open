@@ -1370,6 +1370,20 @@ void QnWorkbenchActionHandler::at_exportLayoutAction_triggered()
 
     m_exportPeriod = parameters.argument<QnTimePeriod>(Qn::TimePeriodParameter);
 
+    if(m_exportPeriod.durationMs * items.size() > 1000 * 60 * 30) { // TODO: implement more precise estimation
+        int button = QMessageBox::question(
+            this->widget(),
+            tr("Warning"),
+            tr("You are about to export several video sequences with a total length exceeding 30 minutes. \n\
+It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.\n\
+Do you want to continue?"),
+               QMessageBox::Yes | QMessageBox::No
+            );
+        if(button == QMessageBox::No)
+            return;
+    }
+
+
     QSettings settings;
     settings.beginGroup(QLatin1String("export"));
     QString previousDir = settings.value(QLatin1String("previousDir")).toString();
@@ -1537,6 +1551,18 @@ void QnWorkbenchActionHandler::at_exportTimeSelectionAction_triggered() {
 
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodParameter);
 
+    if(period.durationMs > 1000 * 60 * 30) { // TODO: implement more precise estimation
+        int button = QMessageBox::question(
+            this->widget(),
+            tr("Warning"),
+            tr("You are about to export a video sequence that is longer than 30 minutes. \n\
+It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.\n\
+Do you want to continue?"),
+            QMessageBox::Yes | QMessageBox::No
+        );
+        if(button == QMessageBox::No)
+            return;
+    }
 
     QnNetworkResourcePtr networkResource = widget->resource().dynamicCast<QnNetworkResource>();
     QnSecurityCamResourcePtr cameraResource = widget->resource().dynamicCast<QnSecurityCamResource>();

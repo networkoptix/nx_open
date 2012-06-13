@@ -121,28 +121,6 @@ QHostAddress resolveHost(const QString& hostString)
     return host;
 }
 
-
-QList<QHostAddress> allLocalAddresses()
-{
-    QList<QHostAddress> rez;
-
-    // if nothing else works use first enabled hostaddr
-    QList<QHostAddress> ipaddrs = getAllIPv4Addresses();
-
-    for (int i = 0; i < ipaddrs.size();++i)
-    {
-        QString addr = ipaddrs.at(i).toString();
-        bool isLocalAddress = addr == "localhost" || addr == "127.0.0.1";
-        if (isLocalAddress || !QUdpSocket().bind(ipaddrs.at(i), 0))
-            continue;
-        rez << ipaddrs.at(i);
-    }
-    if (rez.isEmpty())
-        rez << QHostAddress("127.0.0.1");
-
-    return rez;
-}
-
 QString defaultLocalAddress(const QHostAddress& target)
 {
     {
@@ -460,6 +438,21 @@ void QnMain::loadResourcesFromECS()
     }
 }
 
+void QnMain::at_localInterfacesChanged()
+{
+    QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
+
+    m_videoServer->setNetAddrList(allLocalAddresses());
+
+    appServerConnection->saveAsync(m_videoServer, this, SLOT(at_serverSaved(int, const QByteArray&, const QnResourceList&, int)));
+}
+
+void QnMain::at_serverSaved(int status, const QByteArray &errorString, const QnResourceList &, int)
+{
+    if (status != 0)
+        qWarning() << "Error saving server: " << errorString;
+}
+
 void QnMain::run()
 {
     // Create SessionManager
@@ -575,6 +568,7 @@ void QnMain::run()
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlAxisResourceSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIqResourceSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlISDResourceSearcher::instance());
+    //Onvif searcher should be the last:
     QnResourceDiscoveryManager::instance().addDeviceServer(&OnvifResourceSearcher::instance());
 
     //
@@ -614,6 +608,8 @@ void QnMain::run()
 
     m_rtspListener = new QnRtspListener(QHostAddress::Any, rtspUrl.port());
     m_rtspListener->start();
+
+    connect(&QnResourceDiscoveryManager::instance(), SIGNAL(localInterfacesChanged()), this, SLOT(at_localInterfacesChanged()));
 
     exec();
 }

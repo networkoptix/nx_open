@@ -107,7 +107,7 @@ public:
     QDateTime getLastStatusUpdateTime() const;
 
     // this function is called if resourse changes state from offline to online or so 
-    virtual void init(){};
+    void init();
 
     // flags like network media and so on
     Flags flags() const;
@@ -217,6 +217,8 @@ protected:
 
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
 
+    virtual void initInternal() = 0;
+
 private:
     /* The following consumer-related API is private as it is supposed to be used from QnResourceConsumer instances only.
      * Using it from other places may break invariants. */
@@ -291,7 +293,7 @@ private:
 
     QStringList m_tags;
 
-    
+    bool m_initialized;    
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResource::Flags);

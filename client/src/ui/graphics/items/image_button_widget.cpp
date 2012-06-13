@@ -281,6 +281,8 @@ void QnImageButtonWidget::clickedNotify(QGraphicsSceneMouseEvent *event) {
 
 void QnImageButtonWidget::pressedNotify(QGraphicsSceneMouseEvent *) {
     setPressed(true);
+
+    emit pressed();
 }
 
 void QnImageButtonWidget::releasedNotify(QGraphicsSceneMouseEvent *event) {
@@ -290,6 +292,8 @@ void QnImageButtonWidget::releasedNotify(QGraphicsSceneMouseEvent *event) {
      * release event, skip them. */ 
     m_skipNextHoverEvents = 2;
     m_nextHoverEventPos = event->screenPos();
+
+    emit released();
 }
 
 bool QnImageButtonWidget::skipHoverEvent(QGraphicsSceneHoverEvent *event) {

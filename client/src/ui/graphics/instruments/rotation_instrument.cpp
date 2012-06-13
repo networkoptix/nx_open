@@ -5,12 +5,12 @@
 #include <limits>
 
 #include <QtGui/QMouseEvent>
-#include <QtGui/QGraphicsObject>
-
-#include <ui/graphics/items/resource_widget.h> // TODO: get rid of this include, implement for QGraphicsWidget
+#include <QtGui/QGraphicsWidget>
+#include <QtGui/QApplication>
 
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/checked_cast.h>
+#include <utils/common/warnings.h>
 
 namespace {
     const QColor defaultColor(255, 0, 0, 96);
@@ -41,7 +41,7 @@ namespace {
 
     const qreal centroidBorder = 0.5;
 
-    QPointF calculateOrigin(QGraphicsView *view, QnResourceWidget *widget) {
+    QPointF calculateOrigin(QGraphicsView *view, QGraphicsWidget *widget) {
         QRect viewportRect = view->viewport()->rect();
         qreal viewportDiameter = QnGeometry::length(view->mapToScene(viewportRect.bottomRight()) - view->mapToScene(viewportRect.topLeft()));
 
@@ -76,14 +76,19 @@ namespace {
         }
     }
 
-    qreal calculateItemAngle(QnResourceWidget *, const QPointF &itemPoint, const QPointF &itemOrigin) {
+    qreal calculateItemAngle(QGraphicsWidget *, const QPointF &itemPoint, const QPointF &itemOrigin) {
         return QnGeometry::atan2(itemPoint - itemOrigin);
     }
 
-    qreal calculateSceneAngle(QnResourceWidget *widget, const QPointF &scenePoint, const QPointF &sceneOrigin) {
+    qreal calculateSceneAngle(QGraphicsWidget *widget, const QPointF &scenePoint, const QPointF &sceneOrigin) {
         return calculateItemAngle(widget, widget->mapFromScene(scenePoint), widget->mapFromScene(sceneOrigin));
     }
 
+    struct ItemAcceptsLeftMouseButton: public std::unary_function<QGraphicsItem *, bool> {
+        bool operator()(QGraphicsItem *item) const {
+            return item->acceptedMouseButtons() & Qt::LeftButton;
+        }
+    };
 
 } // anonymous namespace
 
@@ -158,7 +163,7 @@ public:
      * 
      * \param viewport                  Viewport to draw this item on.
      */
-    void start(QWidget *viewport, QnResourceWidget *target) {
+    void start(QWidget *viewport, QGraphicsWidget *target) {
         m_viewport = viewport;
         m_target = target;
 
@@ -195,7 +200,7 @@ public:
         return m_viewport;
     }
 
-    QnResourceWidget *target() const {
+    QGraphicsWidget *target() const {
         return m_target.data();
     }
 
@@ -204,7 +209,7 @@ private:
     QWidget *m_viewport;
 
     /** Widget being rotated. */
-    QWeakPointer<QnResourceWidget> m_target;
+    QWeakPointer<QGraphicsWidget> m_target;
 
     /** Head of the rotation item, in scene coordinates. */
     QPointF m_sceneHead;
@@ -239,7 +244,7 @@ void RotationInstrument::installedNotify() {
     assert(rotationItem() == NULL);
 
     m_rotationItem = new RotationItem();
-    rotationItem()->setParent(this); /* Just to feel totally safe. */
+    rotationItem()->setParent(this); /* Just to feel totally safe. Note that this is a parent in QObject sense. */
     rotationItem()->setZValue(m_rotationItemZValue);
     rotationItem()->setVisible(false);
     scene()->addItem(rotationItem());
@@ -254,6 +259,49 @@ void RotationInstrument::aboutToBeUninstalledNotify() {
         delete rotationItem();
 }
 
+void RotationInstrument::start(QGraphicsWidget *target) {
+    start(NULL, target);
+}
+
+void RotationInstrument::start(QGraphicsView *view, QGraphicsWidget *target) {
+    if(!target) {
+        qnNullWarning(target);
+        return;
+    }
+
+    if(!isEnabled())
+        return;
+
+    if(!satisfiesItemConditions(target))
+        return;
+
+    if(!view) {
+        QGraphicsScene *scene = target->scene();
+        if(scene && !scene->views().empty())
+            view = scene->views().front();
+    }
+    if(!view)
+        return;
+
+    QMouseEvent event(
+        QEvent::MouseButtonPress, 
+        view->viewport()->mapFromGlobal(QCursor::pos()),
+        QCursor::pos(),
+        Qt::LeftButton,
+        qApp->mouseButtons() | Qt::LeftButton,
+        0
+    );
+
+    startInternal(view, &event, target, true);
+}
+
+void RotationInstrument::startInternal(QGraphicsView *view, QMouseEvent *event, QGraphicsWidget *target, bool instantStart) {
+    m_target = target;
+    m_originAngle = calculateSceneAngle(target, view->mapToScene(event->pos()), calculateOrigin(view, target));
+
+    dragProcessor()->mousePressEvent(view->viewport(), event, instantStart);
+}
+
 bool RotationInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
     if(event->button() != Qt::LeftButton)
         return false;
@@ -262,14 +310,11 @@ bool RotationInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) 
         return false;
 
     QGraphicsView *view = this->view(viewport);
-    QnResourceWidget *target = this->item<QnResourceWidget>(view, event->pos());
-    if(target == NULL)
+    QGraphicsWidget *target = this->item<QGraphicsWidget>(view, event->pos(), ItemAcceptsLeftMouseButton());
+    if(!target || !satisfiesItemConditions(target))
         return false;
 
-    m_target = target;
-    m_originAngle = calculateSceneAngle(target, view->mapToScene(event->pos()), calculateOrigin(view, target));
-    
-    dragProcessor()->mousePressEvent(viewport, event);
+    startInternal(view, event, target, false);
     
     event->accept();
     return false;

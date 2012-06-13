@@ -14,6 +14,7 @@
 #include <utils/common/checked_cast.h>
 #include <utils/common/delete_later.h>
 #include <utils/common/math.h>
+#include <utils/common/toggle.h>
 
 #include <core/resource/layout_resource.h>
 #include <core/resourcemanagment/resource_pool.h>
@@ -178,6 +179,11 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     connect(m_beforePaintInstrument,        SIGNAL(activated(QWidget *, QEvent *)),                     this,                   SLOT(updateFrameWidths()));
     connect(m_curtainActivityInstrument,    SIGNAL(activityStopped()),                                  this,                   SLOT(at_activityStopped()));
     connect(m_curtainActivityInstrument,    SIGNAL(activityResumed()),                                  this,                   SLOT(at_activityStarted()));
+
+    /* Create zoomed toggle. */
+    m_zoomedToggle = new QnToggle(false, this);
+    connect(m_zoomedToggle,                 SIGNAL(activated()),                                        m_curtainActivityInstrument, SLOT(recursiveEnable()));
+    connect(m_zoomedToggle,                 SIGNAL(deactivated()),                                      m_curtainActivityInstrument, SLOT(recursiveDisable()));
 
     /* Create curtain animator. */
     m_curtainAnimator = new QnCurtainAnimator(this);
@@ -1202,18 +1208,15 @@ void QnWorkbenchDisplay::at_workbench_itemChanged(Qn::ItemRole role, QnWorkbench
         break;
     }
     case Qn::ZoomedRole: {
-        /* Sync new & old items. */
-        if(oldItem != NULL) {
-            synchronize(oldItem, true);
+        m_zoomedToggle->setActive(newItem != NULL);
 
-            m_curtainActivityInstrument->recursiveDisable();
-        }
+        /* Sync new & old items. */
+        if(oldItem != NULL)
+            synchronize(oldItem, true);
 
         if(newItem != NULL) {
             bringToFront(newItem);
             synchronize(newItem, true);
-
-            m_curtainActivityInstrument->recursiveEnable();
 
             m_viewportAnimator->moveTo(itemGeometry(newItem));
         } else {

@@ -14,6 +14,7 @@ public:
     static bool isAcceptedUrl(const QString& url);
     static QString urlToFirstVTS(const QString& url);
 protected:
+    virtual void initInternal() override {}
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
 };
 

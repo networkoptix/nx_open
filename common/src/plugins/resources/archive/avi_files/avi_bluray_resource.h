@@ -13,6 +13,9 @@ public:
 
 	virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
     static bool isAcceptedUrl(const QString& url);
+
+protected:
+    virtual void initInternal() override {}
 };
 
 #endif // QN_AVI_BLURAY_RESOURCE_H

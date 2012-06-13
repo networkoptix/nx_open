@@ -4,7 +4,7 @@
 #include "drag_processing_instrument.h"
 #include <QWeakPointer>
 
-class QnResourceWidget;
+class QGraphicsWidget;
 
 class RotationItem;
 
@@ -22,11 +22,17 @@ public:
 
     void setRotationItemZValue(qreal rotationItemZValue);
 
+public slots:
+    void start(QGraphicsWidget *target);
+    void start(QGraphicsView *view, QGraphicsWidget *target);
+
+    /* Use DragProcessingInstrument::reset to stop rotation. */
+
 signals:
-    void rotationProcessStarted(QGraphicsView *view, QnResourceWidget *widget);
-    void rotationStarted(QGraphicsView *view, QnResourceWidget *widget);
-    void rotationFinished(QGraphicsView *view, QnResourceWidget *widget);
-    void rotationProcessFinished(QGraphicsView *view, QnResourceWidget *widget);
+    void rotationProcessStarted(QGraphicsView *view, QGraphicsWidget *widget);
+    void rotationStarted(QGraphicsView *view, QGraphicsWidget *widget);
+    void rotationFinished(QGraphicsView *view, QGraphicsWidget *widget);
+    void rotationProcessFinished(QGraphicsView *view, QGraphicsWidget *widget);
 
 protected:
     virtual void installedNotify() override;
@@ -41,17 +47,20 @@ protected:
     virtual void finishDrag(DragInfo *info) override;
     virtual void finishDragProcess(DragInfo *info) override;
 
+private:
     RotationItem *rotationItem() const {
         return m_rotationItem.data();
     }
 
-    QnResourceWidget *target() const {
+    QGraphicsWidget *target() const {
         return m_target.data();
     }
 
+    void startInternal(QGraphicsView *view, QMouseEvent *event, QGraphicsWidget *target, bool instantStart);
+
 private:
     QWeakPointer<RotationItem> m_rotationItem;
-    QWeakPointer<QnResourceWidget> m_target;
+    QWeakPointer<QGraphicsWidget> m_target;
     bool m_rotationStartedEmitted;
     qreal m_originAngle;
     qreal m_lastRotation;

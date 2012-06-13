@@ -11,7 +11,7 @@ ActivityListenerInstrument::ActivityListenerInstrument(bool focusedOnly, int act
     ),
     m_activityTimeoutMSec(activityTimeoutMSec),
     m_active(true),
-    m_autoStopping(true)
+    m_autoStopping(false)
 {
     if(activityTimeoutMSec <= 0) {
         qnWarning("Invalid activity timeout '%1'", activityTimeoutMSec);

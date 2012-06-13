@@ -163,6 +163,9 @@ protected:
     void setTitleOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
     void setHelpOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
 
+    bool isThumbnailsVisible() const;
+    void setThumbnailsVisible(bool visible) const;
+
 protected slots:
     void updateHelpContext();
     
@@ -190,6 +193,7 @@ protected slots:
     void at_sliderItem_geometryChanged();
     void at_sliderResizerItem_geometryChanged();
     void at_sliderShowButton_toggled(bool checked);
+    void at_toggleThumbnailsAction_toggled(bool checked);
 
     void at_treeWidget_activated(const QnResourcePtr &resource);
     void at_treeItem_paintGeometryChanged();
@@ -274,6 +278,8 @@ private:
     QnNavigationItem *m_sliderItem;
 
     QGraphicsWidget *m_sliderResizerItem;
+
+    QGraphicsWidget *m_sliderEaterItem;
 
     bool m_ignoreSliderResizerGeometryChanges;
 

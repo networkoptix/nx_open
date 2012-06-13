@@ -74,7 +74,7 @@ public:
     }
 
     MoveInstrument *moveInstrument() const {
-        return m_widgetMoveInstrument;
+        return m_moveInstrument;
     }
 
     ForwardingInstrument *itemMouseForwardingInstrument() const {
@@ -114,8 +114,8 @@ protected slots:
     void at_move(QGraphicsView *view, const QPointF &totalDelta);
     void at_moveFinished(QGraphicsView *view, const QList<QGraphicsItem *> &items);
 
-    void at_rotationStarted(QGraphicsView *view, QnResourceWidget *widget);
-    void at_rotationFinished(QGraphicsView *view, QnResourceWidget *widget);
+    void at_rotationStarted(QGraphicsView *view, QGraphicsWidget *widget);
+    void at_rotationFinished(QGraphicsView *view, QGraphicsWidget *widget);
 
     void at_motionSelectionProcessStarted(QGraphicsView *view, QnResourceWidget *widget);
     void at_motionRegionCleared(QGraphicsView *view, QnResourceWidget *widget);
@@ -135,6 +135,10 @@ protected slots:
     void at_display_widgetAdded(QnResourceWidget *widget);
     void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
     void at_display_widgetChanged(Qn::ItemRole role);
+
+    void at_widget_rotationStartRequested(QnResourceWidget *widget);
+    void at_widget_rotationStartRequested();
+    void at_widget_rotationStopRequested();
 
     void at_selectAllAction_triggered();
     void at_showMotionAction_triggered();
@@ -175,7 +179,7 @@ private:
     WheelZoomInstrument *m_wheelZoomInstrument;
 
     /** Widget moving instrument. */
-    MoveInstrument *m_widgetMoveInstrument;
+    MoveInstrument *m_moveInstrument;
 
     /** Rotation instrument. */
     RotationInstrument *m_rotationInstrument;

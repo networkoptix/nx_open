@@ -66,6 +66,27 @@ QList<QHostAddress> getAllIPv4Addresses()
     return result;
 }
 
+QList<QHostAddress> allLocalAddresses()
+{
+    QList<QHostAddress> rez;
+
+    // if nothing else works use first enabled hostaddr
+    QList<QHostAddress> ipaddrs = getAllIPv4Addresses();
+
+    for (int i = 0; i < ipaddrs.size();++i)
+    {
+        QString addr = ipaddrs.at(i).toString();
+        bool isLocalAddress = addr == "localhost" || addr == "127.0.0.1";
+        if (isLocalAddress || !QUdpSocket().bind(ipaddrs.at(i), 0))
+            continue;
+        rez << ipaddrs.at(i);
+    }
+    if (rez.isEmpty())
+        rez << QHostAddress("127.0.0.1");
+
+    return rez;
+}
+
 QString MACToString (const unsigned char* mac)
 {
     char t[4];

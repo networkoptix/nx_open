@@ -241,7 +241,8 @@ const QString OnvifResourceSearcherWsdd::getAppropriateAddress(
 
     int relevantLevel = 0;
     QString addrListStr(probeMatches->ProbeMatch->XAddrs);
-    foreach (const QString addrStr, addrListStr.split(" ")) {
+    QStringList addrList = addrListStr.split(" ");
+    foreach (const QString addrStr, addrList) {
         if (addrStr.startsWith(prefixes[2])) {
             if (addrStr.startsWith(prefixes[0])) {
                 appropriateAddr = addrStr;

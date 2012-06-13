@@ -2,7 +2,7 @@ import os, sys, re
 from convert import platform, setup_ffmpeg
 
 ORGANIZATION_NAME    = 'Network Optix'
-APPLICATION_VERSION  = '1.0.9'
+APPLICATION_VERSION  = '1.1.9'
 BUILD_NUMBER = os.getenv('BUILD_NUMBER', '0')
 
 def get_library_path():

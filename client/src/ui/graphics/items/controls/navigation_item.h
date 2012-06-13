@@ -65,6 +65,7 @@ private:
     QnImageButtonWidget *m_mrsButton;
     QnImageButtonWidget *m_syncButton;
     QnImageButtonWidget *m_muteButton;
+    QnImageButtonWidget *m_thumbnailsButton;
 
     GraphicsLabel *m_timeLabel;
 

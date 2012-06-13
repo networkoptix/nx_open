@@ -293,6 +293,8 @@ signals:
     void aboutToBeDestroyed();
     void displayFlagsChanged();
     void motionSelectionChanged();
+    void rotationStartRequested();
+    void rotationStopRequested();
 
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -338,6 +340,7 @@ private slots:
     void at_sourceSizeChanged(const QSize &size);
     void at_resource_resourceChanged();
     void at_resource_nameChanged();
+    void at_searchButton_toggled(bool checked);
 
 private:
     /**
@@ -453,6 +456,8 @@ private:
     QGraphicsLinearLayout *m_headerLayout;
     QnImageButtonWidget *m_infoButton;
     QnImageButtonWidget *m_closeButton;
+    QnImageButtonWidget *m_rotateButton;
+    QnImageButtonWidget *m_searchButton;
 
     /** Whether aboutToBeDestroyed signal has already been emitted. */
     bool m_aboutToBeDestroyedEmitted;

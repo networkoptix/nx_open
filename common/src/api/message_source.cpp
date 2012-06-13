@@ -185,6 +185,8 @@ void QnMessageSource::httpReadyRead()
             }
             else if (QnMessage::nextSeqNumber(m_seqNumber) != event.seqNumber)
             {
+                qWarning() << "QnMessageSource::httpReadyRead(): One or more event are lost. Emitting connectionReset().";
+
                 // Tracking is on and some events are missed and/or reconnect occured
                 m_seqNumber = event.seqNumber;
                 emit connectionReset();
@@ -192,6 +194,20 @@ void QnMessageSource::httpReadyRead()
 
             if (event.dict.contains("proxyPort"))
                 QnAppServerConnectionFactory::setDefaultMediaProxyPort(event.dict["proxyPort"].toInt());
+
+#if 0
+            // Here we can check component versions
+            if (event.dict.contains("version"))
+            {
+                // If we're connecting to old AS
+                if (compareVersions(qApp->applicationVersion(), event.dict["version"].toString()) > 0)
+                {
+                    qWarning() << "Version mismatch. This enterprise controller requires";
+                }
+            }
+#endif
+
+            QnAppServerConnectionFactory::setDefaultMediaProxyPort(event.dict["version"].toInt());
 
             emit connectionOpened();
         } else if (event.eventType != QN_MESSAGE_PING)

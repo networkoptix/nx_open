@@ -23,9 +23,9 @@ public:
 
     bool hasDualStreaming() const override {return false;}
 
-    virtual void init() override;
-
 protected:
+
+    void initInternal() override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 

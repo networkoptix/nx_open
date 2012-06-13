@@ -152,12 +152,16 @@ void QnPreferencesDialog::updateFromSettings() {
     QnConnectionDataList connections = qnSettings->customConnections();
     connections.push_front(qnSettings->defaultConnection());
     m_connectionsSettingsWidget->setConnections(connections);
+
+    if(m_recordingSettingsWidget)
+        m_recordingSettingsWidget->updateFromSettings();
 }
 
 void QnPreferencesDialog::setCurrentPage(QnPreferencesDialog::SettingsPage page)
 {
     ui->tabWidget->setCurrentIndex(int(page));
 }
+
 
 // -------------------------------------------------------------------------- //
 // Handlers

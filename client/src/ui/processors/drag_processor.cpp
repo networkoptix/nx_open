@@ -287,7 +287,7 @@ QPointF DragProcessor::itemPos(QGraphicsItem *, QGraphicsSceneMouseEvent *event)
 }
 
 template<class T, class Event>
-void DragProcessor::mousePressEventInternal(T *object, Event *event) {
+void DragProcessor::mousePressEventInternal(T *object, Event *event, bool instantDrag) {
     checkThread(object);
 
     if(m_state == WAITING) {
@@ -296,7 +296,15 @@ void DragProcessor::mousePressEventInternal(T *object, Event *event) {
         m_info.m_lastMouseScenePos = m_info.m_mousePressScenePos = m_info.m_mouseScenePos = scenePos(object, event);
         m_info.m_lastMouseItemPos = m_info.m_mousePressItemPos = m_info.m_mouseItemPos = itemPos(object, event);
 
-        transition(event, object, PREPAIRING);
+        if(!instantDrag) {
+            transition(event, object, PREPAIRING);
+        } else {
+            transition(event, object, DRAGGING);
+
+            /* Send drag right away if needed. */
+            if(m_state == DRAGGING)
+                drag(event, m_info.m_mousePressScreenPos, m_info.m_mousePressScenePos, m_info.m_mousePressItemPos); 
+        }
     } else {
         if(m_state == DRAGGING)
             drag(event, screenPos(object, event), scenePos(object, event), itemPos(object, event));
@@ -410,8 +418,8 @@ void DragProcessor::widgetEvent(QWidget *widget, QEvent *event) {
     }
 }
 
-void DragProcessor::widgetMousePressEvent(QWidget *widget, QMouseEvent *event) {
-    mousePressEventInternal(widget, event);
+void DragProcessor::widgetMousePressEvent(QWidget *widget, QMouseEvent *event, bool instantDrag) {
+    mousePressEventInternal(widget, event, instantDrag);
 }
 
 void DragProcessor::widgetMouseMoveEvent(QWidget *widget, QMouseEvent *event) {
@@ -422,10 +430,10 @@ void DragProcessor::widgetMouseReleaseEvent(QWidget *widget, QMouseEvent *event)
     mouseReleaseEventInternal(widget, event);
 }
 
-void DragProcessor::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
+void DragProcessor::mousePressEvent(QWidget *viewport, QMouseEvent *event, bool instantDrag) {
     m_viewport = viewport;
 
-    mousePressEventInternal(this->view(viewport), event);
+    mousePressEventInternal(this->view(viewport), event, instantDrag);
 }
 
 void DragProcessor::mouseMoveEvent(QWidget *viewport, QMouseEvent *event) {
@@ -468,10 +476,10 @@ void DragProcessor::paintEvent(QWidget *viewport, QPaintEvent *event) {
     }
 }
 
-void DragProcessor::mousePressEvent(QGraphicsScene *scene, QGraphicsSceneMouseEvent *event) {
+void DragProcessor::mousePressEvent(QGraphicsScene *scene, QGraphicsSceneMouseEvent *event, bool instantDrag) {
     m_viewport = event->widget();
 
-    mousePressEventInternal(scene, event);
+    mousePressEventInternal(scene, event, instantDrag);
 }
 
 void DragProcessor::mouseMoveEvent(QGraphicsScene *scene, QGraphicsSceneMouseEvent *event) {
@@ -482,10 +490,10 @@ void DragProcessor::mouseReleaseEvent(QGraphicsScene *scene, QGraphicsSceneMouse
     mouseReleaseEventInternal(scene, event);
 }
 
-void DragProcessor::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
+void DragProcessor::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event, bool instantDrag) {
     m_viewport = event->widget();
 
-    mousePressEventInternal(item, event);
+    mousePressEventInternal(item, event, instantDrag);
 }
 
 void DragProcessor::mouseMoveEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {

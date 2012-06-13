@@ -16,7 +16,7 @@
 
 QnOnvifStreamReader::QnOnvifStreamReader(QnResourcePtr res):
     CLServerPushStreamreader(res),
-    m_RTP264(res)
+    m_multiCodec(res)
 {
     m_onvifRes = getResource().dynamicCast<QnPlOnvifResource>();
 }
@@ -43,8 +43,8 @@ void QnOnvifStreamReader::openStream()
         return;
     }
 
-    m_RTP264.setRequest(streamUrl);
-    m_RTP264.openStream();
+    m_multiCodec.setRequest(streamUrl);
+    m_multiCodec.openStream();
 }
 
 const QString QnOnvifStreamReader::updateCameraAndfetchStreamUrl() const
@@ -68,6 +68,8 @@ const QString QnOnvifStreamReader::updateCameraAndfetchStreamUrl() const
 const QString QnOnvifStreamReader::updateCameraAndfetchStreamUrl(bool isPrimary) const
 {
     MediaBindingProxy soapProxy;
+    soapProxy.soap->send_timeout = 5;
+    soapProxy.soap->recv_timeout = 5;
 
     QAuthenticator auth(m_onvifRes->getAuth());
     std::string login(auth.user().toStdString());
@@ -177,12 +179,12 @@ const QString QnOnvifStreamReader::updateCameraAndfetchStreamUrl(bool isPrimary)
 
 void QnOnvifStreamReader::closeStream()
 {
-    m_RTP264.closeStream();
+    m_multiCodec.closeStream();
 }
 
 bool QnOnvifStreamReader::isStreamOpened() const
 {
-    return m_RTP264.isStreamOpened();
+    return m_multiCodec.isStreamOpened();
 }
 
 QnMetaDataV1Ptr QnOnvifStreamReader::getCameraMetadata()
@@ -221,7 +223,7 @@ QnAbstractMediaDataPtr QnOnvifStreamReader::getNextData()
     QnAbstractMediaDataPtr rez;
     for (int i = 0; i < 10; ++i)
     {
-        rez = m_RTP264.getNextData();
+        rez = m_multiCodec.getNextData();
         if (rez) 
         {
             QnCompressedVideoDataPtr videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(rez);
@@ -263,7 +265,9 @@ onvifXsd__Profile* QnOnvifStreamReader::findAppropriateProfile(const _onvifMedia
 
     for (long i = 0; i < profiles.size(); ++i) {
         onvifXsd__Profile* profilePtr = profiles.at(i);
-        if (!profilePtr->VideoEncoderConfiguration || profilePtr->VideoEncoderConfiguration->Encoding != onvifXsd__VideoEncoding__H264) {
+        if (!profilePtr->VideoEncoderConfiguration || 
+                profilePtr->VideoEncoderConfiguration->Encoding != onvifXsd__VideoEncoding__H264 && m_onvifRes->getCodec() == QnPlOnvifResource::H264 ||
+                profilePtr->VideoEncoderConfiguration->Encoding != onvifXsd__VideoEncoding__JPEG && m_onvifRes->getCodec() == QnPlOnvifResource::JPEG) {
             continue;
         }
 

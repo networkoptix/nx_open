@@ -82,8 +82,13 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
     m_syncButton->setPreferredSize(48, 24);
     m_syncButton->setCheckable(true);
 
+    m_thumbnailsButton = new QnImageButtonWidget(this);
+    m_thumbnailsButton->setDefaultAction(action(Qn::ToggleThumbnailsAction));
+    m_thumbnailsButton->setPreferredSize(40, 40);
+
 
     /* Time label. */
+#if 0
     m_timeLabel = new GraphicsLabel(this);
     m_timeLabel->setObjectName("TimeLabel");
     m_timeLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, QSizePolicy::Label);
@@ -94,6 +99,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
         pal.setColor(QPalette::WindowText, QColor(63, 159, 216));
         m_timeLabel->setPalette(pal);
     }
+#endif
 
 
     /* Create sliders. */
@@ -146,8 +152,8 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
     QGraphicsLinearLayout *rightLayoutHL = new QGraphicsLinearLayout(Qt::Horizontal);
     rightLayoutHL->setContentsMargins(0, 0, 0, 0);
     rightLayoutHL->setSpacing(3);
-    rightLayoutHL->addItem(m_volumeSlider);
     rightLayoutHL->addItem(m_muteButton);
+    rightLayoutHL->addItem(m_volumeSlider);
 
     QGraphicsLinearLayout *rightLayoutV = new QGraphicsLinearLayout(Qt::Vertical);
     rightLayoutV->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
@@ -156,7 +162,11 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
     rightLayoutV->addItem(rightLayoutHL);
     rightLayoutV->addItem(rightLayoutHU);
     rightLayoutV->setAlignment(rightLayoutHU, Qt::AlignRight | Qt::AlignVCenter);
+    rightLayoutV->addItem(m_thumbnailsButton);
+    rightLayoutV->setAlignment(m_thumbnailsButton, Qt::AlignCenter);
+#if 0
     rightLayoutV->addItem(m_timeLabel);
+#endif
 
     QGraphicsLinearLayout *sliderLayout = new QGraphicsLinearLayout(Qt::Vertical);
     sliderLayout->setContentsMargins(0, 0, 0, 0);
