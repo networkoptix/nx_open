@@ -572,15 +572,15 @@ void QnPlOnvifResource::analyzeVideoEncoders(VideoEncoders& encoders, bool setOp
 int QnPlOnvifResource::innerQualityToOnvif(QnStreamQuality quality) const
 {
     if (quality > QnQualityHighest) {
-        qWarning() << "QnPlOnvifResource::onvifQualityToInner: got unexpected quality (too big): " << quality;
+        qWarning() << "QnPlOnvifResource::innerQualityToOnvif: got unexpected quality (too big): " << quality;
         return maxQuality;
     }
     if (quality < QnQualityLowest) {
-        qWarning() << "QnPlOnvifResource::onvifQualityToInner: got unexpected quality (too small): " << quality;
+        qWarning() << "QnPlOnvifResource::innerQualityToOnvif: got unexpected quality (too small): " << quality;
         return minQuality;
     }
 
-    qDebug() << "QnPlOnvifResource::onvifQualityToInner: in quality = " << quality << ", out qualty = "
+    qDebug() << "QnPlOnvifResource::innerQualityToOnvif: in quality = " << quality << ", out qualty = "
              << minQuality + (maxQuality - minQuality) * (quality - QnQualityLowest) / (QnQualityHighest - QnQualityLowest)
              << ", minOnvifQuality = " << minQuality << ", maxOnvifQuality = " << maxQuality;
 
