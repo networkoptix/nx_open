@@ -199,10 +199,6 @@ private:
     QHash<QnResourcePtr, QnCachingTimePeriodLoader *> m_loaderByResource;
     
     QScopedPointer<QnThumbnailsLoader, QnRunnableCleanup> m_thumbnailsLoader;
-
-
-    qint64 m_thumbnailsStartTimeMs;
-    qint64 m_thumbnailsEndTimeMs;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchNavigator::WidgetFlags);
