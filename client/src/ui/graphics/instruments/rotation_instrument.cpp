@@ -5,9 +5,7 @@
 #include <limits>
 
 #include <QtGui/QMouseEvent>
-#include <QtGui/QGraphicsObject>
-
-#include <ui/graphics/items/resource_widget.h> // TODO: get rid of this include, implement for QGraphicsWidget
+#include <QtGui/QGraphicsWidget>
 
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/checked_cast.h>
@@ -41,7 +39,7 @@ namespace {
 
     const qreal centroidBorder = 0.5;
 
-    QPointF calculateOrigin(QGraphicsView *view, QnResourceWidget *widget) {
+    QPointF calculateOrigin(QGraphicsView *view, QGraphicsWidget *widget) {
         QRect viewportRect = view->viewport()->rect();
         qreal viewportDiameter = QnGeometry::length(view->mapToScene(viewportRect.bottomRight()) - view->mapToScene(viewportRect.topLeft()));
 
@@ -76,11 +74,11 @@ namespace {
         }
     }
 
-    qreal calculateItemAngle(QnResourceWidget *, const QPointF &itemPoint, const QPointF &itemOrigin) {
+    qreal calculateItemAngle(QGraphicsWidget *, const QPointF &itemPoint, const QPointF &itemOrigin) {
         return QnGeometry::atan2(itemPoint - itemOrigin);
     }
 
-    qreal calculateSceneAngle(QnResourceWidget *widget, const QPointF &scenePoint, const QPointF &sceneOrigin) {
+    qreal calculateSceneAngle(QGraphicsWidget *widget, const QPointF &scenePoint, const QPointF &sceneOrigin) {
         return calculateItemAngle(widget, widget->mapFromScene(scenePoint), widget->mapFromScene(sceneOrigin));
     }
 
@@ -158,7 +156,7 @@ public:
      * 
      * \param viewport                  Viewport to draw this item on.
      */
-    void start(QWidget *viewport, QnResourceWidget *target) {
+    void start(QWidget *viewport, QGraphicsWidget *target) {
         m_viewport = viewport;
         m_target = target;
 
@@ -195,7 +193,7 @@ public:
         return m_viewport;
     }
 
-    QnResourceWidget *target() const {
+    QGraphicsWidget *target() const {
         return m_target.data();
     }
 
@@ -204,7 +202,7 @@ private:
     QWidget *m_viewport;
 
     /** Widget being rotated. */
-    QWeakPointer<QnResourceWidget> m_target;
+    QWeakPointer<QGraphicsWidget> m_target;
 
     /** Head of the rotation item, in scene coordinates. */
     QPointF m_sceneHead;
@@ -262,8 +260,8 @@ bool RotationInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) 
         return false;
 
     QGraphicsView *view = this->view(viewport);
-    QnResourceWidget *target = this->item<QnResourceWidget>(view, event->pos());
-    if(target == NULL)
+    QGraphicsWidget *target = this->item<QGraphicsWidget>(view, event->pos());
+    if(!target || !satisfiesItemConditions(target))
         return false;
 
     m_target = target;

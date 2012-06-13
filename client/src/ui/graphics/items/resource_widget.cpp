@@ -163,6 +163,11 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     connect(m_closeButton, SIGNAL(clicked()), this, SLOT(close()));
     connect(accessController()->notifier(item->layout()->resource()), SIGNAL(permissionsChanged(const QnResourcePtr &)), this, SLOT(updateButtonsVisibility()));
     
+    m_rotateButton = new QnImageButtonWidget();
+    m_rotateButton->setIcon(qnSkin->icon("decorations/rotate_item.png"));
+    m_rotateButton->setPreferredSize(headerButtonSize);
+    connect(m_rotateButton, SIGNAL(clicked()), this, SLOT(at_rotateButton_clicked()));
+
     m_headerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     m_headerLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
     m_headerLayout->setSpacing(2.0);
@@ -834,6 +839,9 @@ void QnResourceWidget::at_resource_nameChanged() {
     m_headerTitleLabel->setText(m_resource->getName());
 }
 
+void QnResourceWidget::at_rotateButton_clicked() {
+    
+}
 
 
 // -------------------------------------------------------------------------- //

@@ -74,7 +74,7 @@ public:
     }
 
     MoveInstrument *moveInstrument() const {
-        return m_widgetMoveInstrument;
+        return m_moveInstrument;
     }
 
     ForwardingInstrument *itemMouseForwardingInstrument() const {
@@ -175,7 +175,7 @@ private:
     WheelZoomInstrument *m_wheelZoomInstrument;
 
     /** Widget moving instrument. */
-    MoveInstrument *m_widgetMoveInstrument;
+    MoveInstrument *m_moveInstrument;
 
     /** Rotation instrument. */
     RotationInstrument *m_rotationInstrument;

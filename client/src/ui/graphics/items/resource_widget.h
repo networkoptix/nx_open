@@ -338,6 +338,7 @@ private slots:
     void at_sourceSizeChanged(const QSize &size);
     void at_resource_resourceChanged();
     void at_resource_nameChanged();
+    void at_rotateButton_clicked();
 
 private:
     /**
@@ -453,6 +454,7 @@ private:
     QGraphicsLinearLayout *m_headerLayout;
     QnImageButtonWidget *m_infoButton;
     QnImageButtonWidget *m_closeButton;
+    QnImageButtonWidget *m_rotateButton;
 
     /** Whether aboutToBeDestroyed signal has already been emitted. */
     bool m_aboutToBeDestroyedEmitted;
