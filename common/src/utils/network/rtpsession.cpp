@@ -161,6 +161,17 @@ RTPSession::~RTPSession()
     delete [] m_responseBuffer;
 }
 
+// see rfc1890 for full RTP predefined codec list
+QString findCodecById(int num)
+{
+    switch (num)
+    {
+        case 8: return "PCMA";
+        case 26: return "JPEG";
+        default: return "";
+    }
+}
+
 void RTPSession::parseSDP()
 {
     QList<QByteArray> lines = m_sdp.split('\n');
@@ -178,8 +189,8 @@ void RTPSession::parseSDP()
         if (lineLower.startsWith("m="))
         {
             if (trackNum >= 0) {
-                if (codecType == "audio" && codecName.isEmpty())
-                    codecName = m_defaultAudioCodecName; // default audio codec
+                if (codecName.isEmpty())
+                    codecName = findCodecById(mapNum);
                 m_sdpTracks.insert(trackNum, QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(codecName, codecType, setupURL, mapNum, this, m_transport == "TCP")));
                 trackNum = -1;
                 setupURL.clear();
@@ -188,8 +199,8 @@ void RTPSession::parseSDP()
             codecType = trackParams[0];
             codecName.clear();
             mapNum = 0;
-            if (trackParams.size() >= 2) {
-                mapNum = trackParams[2].toInt();
+            if (trackParams.size() >= 4) {
+                mapNum = trackParams[3].toInt();
             }
         }
         if (lineLower.startsWith("a=rtpmap"))
@@ -232,8 +243,8 @@ void RTPSession::parseSDP()
         }
     }
     if (trackNum >= 0) {
-        if (codecType == "audio" && codecName.isEmpty())
-            codecName = m_defaultAudioCodecName;
+        if (codecName.isEmpty())
+            codecName = findCodecById(mapNum);
         m_sdpTracks.insert(trackNum, QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(codecName, codecType, setupURL, mapNum, this, m_transport == "TCP")));
     }
 }
@@ -1152,11 +1163,6 @@ void RTPSession::setProxyAddr(const QString& addr, int port)
 {
     m_proxyAddr = addr;
     m_proxyPort = port;
-}
-
-void RTPSession::setDefaultAudioCodecName(const QString& value)
-{
-    m_defaultAudioCodecName = value;
 }
 
 CommunicatingSocket* RTPIODevice::getMediaSocket()

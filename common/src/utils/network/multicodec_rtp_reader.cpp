@@ -7,6 +7,7 @@
 #include "core/resource/resource_media_layout.h"
 #include "core/resource/media_resource.h"
 #include "simpleaudio_rtp_parser.h"
+#include "mjpeg_rtp_parser.h"
 
 static const int RTSP_RETRY_COUNT = 3;
 
@@ -124,6 +125,8 @@ QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
 {
     if (codecName == "h264")
         return new CLH264RtpParser;
+    else if (codecName == "JPEG")
+        return new QnMjpegRtpParser;
     else if (codecName == "mpeg4-generic")
         return new QnAacRtpParser;
     else if (codecName == "PCMA") {
@@ -170,9 +173,11 @@ void QnMulticodecRtpReader::openStream()
 
     QString url;
     if (m_request.length() > 0)
-        QTextStream(&url) << "rtsp://" << nres->getHostAddress().toString() << "/" << m_request;
+        QTextStream(&url) << "rtsp://" << "10.0.2.19" /*nres->getHostAddress().toString()*/  << "/" << m_request;
     else
         QTextStream(&url) << "rtsp://" << nres->getHostAddress().toString();
+
+    url = "rtsp://10.0.2.19/onvif-media/media.amp?profile=quality_jpeg&sessiontimeout=60";
 
     m_RtpSession.setAuth(nres->getAuth());
 
@@ -216,11 +221,6 @@ void QnMulticodecRtpReader::closeStream()
 bool QnMulticodecRtpReader::isStreamOpened() const
 {
     return m_RtpSession.isOpened();
-}
-
-void QnMulticodecRtpReader::setDefaultAudioCodecName(const QString& value)
-{
-    m_RtpSession.setDefaultAudioCodecName(value);
 }
 
 const QnResourceAudioLayout* QnMulticodecRtpReader::getAudioLayout() const
