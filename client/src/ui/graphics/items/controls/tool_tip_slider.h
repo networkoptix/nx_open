@@ -7,6 +7,8 @@
 #include <ui/animation/animated.h>
 #include <ui/graphics/items/standard/graphics_slider.h>
 
+class VariantAnimator;
+
 class QnToolTipItem;
 
 class QnToolTipSlider: public Animated<GraphicsSlider> {
@@ -49,9 +51,12 @@ private:
 
 private:
     friend class QnToolTipSliderAnimationListener;
+    friend class QnToolTipSliderVisibilityAccessor;
 
     QScopedPointer<QnToolTipSliderAnimationListener> m_animationListener;
     QnToolTipItem *m_toolTipItem;
+    VariantAnimator *m_toolTipItemVisibilityAnimator;
+    qreal m_toolTipItemVisibility;
     QBasicTimer m_hideTimer;
     bool m_autoHideToolTip;
     bool m_sliderUnderMouse;
