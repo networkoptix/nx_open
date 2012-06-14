@@ -1,5 +1,5 @@
 #include "isd_resource.h"
-#include "../onvif/dataprovider/rtp264_stream_provider.h"
+#include "../onvif/dataprovider/rtp_stream_provider.h"
 
 
 const char* QnPlIsdResource::MANUFACTURE = "ISD";
@@ -51,9 +51,22 @@ QnAbstractStreamDataProvider* QnPlIsdResource::createLiveDataProvider()
 
     }
 
-    return new RTP264StreamReader(toSharedPointer(), request);
+    return new QnRtpStreamReader(toSharedPointer(), request);
 }
 
 void QnPlIsdResource::setCropingPhysical(QRect /*croping*/)
 {
+}
+
+const QnResourceAudioLayout* QnPlIsdResource::getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
+{
+    if (isAudioEnabled()) {
+        const QnRtpStreamReader* rtspReader = dynamic_cast<const QnRtpStreamReader*>(dataProvider);
+        if (rtspReader && rtspReader->getDPAudioLayout())
+            return rtspReader->getDPAudioLayout();
+        else
+            return QnPhysicalCameraResource::getAudioLayout(dataProvider);
+    }
+    else
+        return QnPhysicalCameraResource::getAudioLayout(dataProvider);
 }

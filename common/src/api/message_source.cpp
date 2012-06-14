@@ -205,9 +205,9 @@ void QnMessageSource::httpReadyRead()
                     qWarning() << "Version mismatch. This enterprise controller requires";
                 }
             }
-#endif
 
             QnAppServerConnectionFactory::setDefaultMediaProxyPort(event.dict["version"].toInt());
+#endif
 
             emit connectionOpened();
         } else if (event.eventType != QN_MESSAGE_PING)
