@@ -18,6 +18,9 @@ public:
 
     virtual bool processData(quint8* rtpBuffer, int readed, const RtspStatistic& statistics, QList<QnAbstractMediaDataPtr>& result) override;
 private:
+    int makeHeaders(quint8 *p, int type, int w, int h, u_char *lqt, u_char *cqt, u_short dri);
+    void updateHeaderTables(quint8* lummaTable, quint8* chromaTable);
+private:
     QnCompressedVideoDataPtr m_videoData;
     int m_frequency;
     QnMediaContextPtr m_context;
@@ -30,6 +33,17 @@ private:
     quint8* m_lumaQTPtr;
     quint8* m_chromaQTPtr;
     int m_lastJpegQ;
+
+    int m_hdrQ;
+    int m_hdrDri;
+    int m_hdrWidth;
+    int m_hdrHeight;
+    quint8 m_hdrBuffer[1024];
+    int m_headerLen;
+    quint8* m_lummaTablePos;
+    quint8* m_chromaTablePos;
+
+    CLByteArray m_frameData;
 };
 
 #endif

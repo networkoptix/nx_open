@@ -194,8 +194,7 @@ u_char * MakeDRIHeader(u_char *p, u_short dri) {
  *    interchange format (except for possible trailing garbage and
  *    absence of an EOI marker to terminate the scan).
  */
-int MakeHeaders(u_char *p, int type, int w, int h, u_char *lqt,
-                u_char *cqt, u_short dri)
+int QnMjpegRtpParser::makeHeaders(quint8 *p, int type, int w, int h, u_char *lqt, u_char *cqt, u_short dri)
 {
         u_char *start = p;
 
@@ -205,7 +204,9 @@ int MakeHeaders(u_char *p, int type, int w, int h, u_char *lqt,
         *p++ = 0xff;
         *p++ = 0xd8;            /* SOI */
 
+        m_lummaTablePos = p;
         p = MakeQuantHeader(p, lqt, 0);
+        m_chromaTablePos = p;
         p = MakeQuantHeader(p, cqt, 1);
 
         if (dri != 0)
@@ -267,17 +268,32 @@ int MakeHeaders(u_char *p, int type, int w, int h, u_char *lqt,
         return (p - start);
 };
 
+void QnMjpegRtpParser::updateHeaderTables(quint8* lummaTable, quint8* chromaTable)
+{
+    memcpy(m_lummaTablePos, lummaTable, 64*1);
+    memcpy(m_chromaTablePos, chromaTable, 64*1);
+}
+
 // -----------------------------------------------------------------------
 
 QnMjpegRtpParser::QnMjpegRtpParser():
     QnRtpStreamParser(),
-    m_frequency(90000)
+    m_frequency(90000),
+    m_frameData(CL_MEDIA_ALIGNMENT, 1024*64)
 {
     memset(m_lummaTable, 0, sizeof(m_lummaTable));
     memset(m_chromaTable, 0, sizeof(m_chromaTable));
     m_sdpWidth = 0;
     m_sdpHeight = 0;
     m_lastJpegQ = -1;
+
+    m_hdrQ = -1;
+    m_hdrDri = 0;
+    m_hdrWidth = -1;
+    m_hdrHeight = -1;
+    m_headerLen = 0;
+    m_lummaTablePos = 0;
+    m_chromaTablePos = 0;
 }
 
 QnMjpegRtpParser::~QnMjpegRtpParser()
@@ -353,6 +369,8 @@ bool QnMjpegRtpParser::processData(quint8* rtpBuffer, int readed, const RtspStat
         }
 
         //3. Quantization Table header
+        quint8* lummaTable = 0;
+        quint8* chromaTable = 0;
         if (jpegQ >= 128)
         {
             if (bytesLeft < 4)
@@ -373,8 +391,13 @@ bool QnMjpegRtpParser::processData(quint8* rtpBuffer, int readed, const RtspStat
                 if (length < 64 * (lummaSize+chromaSize))
                     return false;
                 //rfc2435. same table for each frame, make deep copy of tables
-                memcpy(m_lummaTable, curPtr, 64*lummaSize);
-                memcpy(m_chromaTable, curPtr + 64*lummaSize, 64*chromaSize);
+                lummaTable = curPtr;
+                chromaTable = curPtr + 64*lummaSize;
+                if (jpegQ != 255) {
+                    // make deep copy because same table will be reused
+                    memcpy(m_lummaTable, curPtr, 64*lummaSize);
+                    memcpy(m_chromaTable, curPtr + 64*lummaSize, 64*chromaSize);
+                }
             }
             
             curPtr += length;
@@ -385,9 +408,25 @@ bool QnMjpegRtpParser::processData(quint8* rtpBuffer, int readed, const RtspStat
             m_lastJpegQ = jpegQ;
         }
 
-        m_videoData = QnCompressedVideoDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, bytesLeft + DEFAULT_MJPEG_HEADER_SIZE));
-        int headerLen = MakeHeaders((quint8*)m_videoData->data.data(), jpegType, width, height, m_lummaTable, m_chromaTable, dri);
-        m_videoData->data.done(headerLen);
+        if (m_hdrQ != jpegQ || dri != m_hdrDri || m_hdrWidth != width || m_hdrHeight != height) 
+        {
+            if (jpegQ != 255)
+                m_headerLen = makeHeaders(m_hdrBuffer, jpegType, width, height, m_lummaTable, m_chromaTable, dri); // use deep copy
+            else {
+                if (!lummaTable || !chromaTable)
+                    return false;
+                m_headerLen = makeHeaders(m_hdrBuffer, jpegType, width, height, lummaTable, chromaTable, dri); // use tables direct pointer
+            }
+            m_hdrQ = jpegQ;
+            m_hdrDri = dri;
+            m_hdrWidth = width;
+            m_hdrHeight = height;
+        }
+        else if (lummaTable && chromaTable) {
+            updateHeaderTables(lummaTable, chromaTable);
+        }
+
+        m_frameData.clear();
     }
 
     if (!m_context) 
@@ -397,18 +436,20 @@ bool QnMjpegRtpParser::processData(quint8* rtpBuffer, int readed, const RtspStat
         m_jpegHeader.Initialize(qApp->organizationName().toAscii().constData(), qApp->applicationName().toAscii().constData(), "");
     }
 
+
+    m_frameData.write((const char*)curPtr, bytesLeft);
+
     bool lastPacketReceived = rtpHeader->marker;
-
-    if (!m_videoData)
-        return false;
-
-    m_videoData->data.write((const char*)curPtr, bytesLeft);
-
     if (lastPacketReceived)
     {
-        quint8* EOI_marker = (quint8*) m_videoData->data.data() + m_videoData->data.size() - 2;
-        if (m_videoData->data.size() < 2 || EOI_marker[0] != jpeg_end[0] || EOI_marker[1] != jpeg_end[1])
-            m_videoData->data.write((const char*) jpeg_end, sizeof(jpeg_end));
+        quint8* EOI_marker = (quint8*) m_frameData.data() + m_frameData.size() - 2;
+        if (m_frameData.size() < 2 || EOI_marker[0] != jpeg_end[0] || EOI_marker[1] != jpeg_end[1])
+            m_frameData.write((const char*) jpeg_end, sizeof(jpeg_end));
+
+        m_videoData = QnCompressedVideoDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, m_headerLen + m_frameData.size()));
+        m_videoData->data.write((const char*)m_hdrBuffer, m_headerLen);
+        m_videoData->data.write(m_frameData);
+        m_frameData.clear();
 
 
         m_videoData->channelNumber = 0;
