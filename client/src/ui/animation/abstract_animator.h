@@ -29,9 +29,9 @@ public:
      * Animator state.
      */
     enum State { 
-        STOPPED = 0, /**< Animator is stopped. */
-        PAUSED  = 1, /**< Animator is paused. */
-        RUNNING = 2  /**< Animator is running. */
+        Stopped = 0, /**< Animator is stopped. */
+        Paused  = 1, /**< Animator is paused. */
+        Running = 2  /**< Animator is running. */
     };
 
     /**
@@ -64,21 +64,21 @@ public:
      * \returns                         Whether this animator is running.
      */
     bool isRunning() const {
-        return state() == RUNNING;
+        return state() == Running;
     }
 
     /**
      * \returns                         Whether this animator is paused.
      */
     bool isPaused() const {
-        return state() == PAUSED;
+        return state() == Paused;
     }
 
     /**
      * \returns                         Whether this animator is stopped.
      */
     bool isStopped() const {
-        return state() == STOPPED;
+        return state() == Stopped;
     }
 
     /**
@@ -133,8 +133,8 @@ protected:
      * This function updates the state of this animator.
      * 
      * Note that this function will always be called for transitions to 
-     * "neighbor" states. That is, in case of a STOPPED to RUNNING transition,
-     * it will be called twice - first with PAUSED and then with RUNNING as 
+     * "neighboring" states. That is, in case of a Stopped to Running transition,
+     * it will be called twice - first with Paused and then with Running as 
      * a parameter.
      * 
      * It can be overridden in derived class in case special processing is needed.

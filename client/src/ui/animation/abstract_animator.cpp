@@ -13,7 +13,7 @@ namespace {
 AbstractAnimator::AbstractAnimator(QObject *parent):
     QObject(parent),
     m_group(NULL),
-    m_state(STOPPED),
+    m_state(Stopped),
     m_timeLimitMSec(-1),
     m_durationOverride(-1),
     m_durationValid(false),
@@ -62,15 +62,15 @@ int AbstractAnimator::duration() const {
 }
 
 void AbstractAnimator::start() {
-    setState(RUNNING);
+    setState(Running);
 }
 
 void AbstractAnimator::pause() {
-    setState(PAUSED);
+    setState(Paused);
 }
 
 void AbstractAnimator::stop() {
-    setState(STOPPED);
+    setState(Stopped);
 }
 
 void AbstractAnimator::setDurationOverride(int durationOverride) {
@@ -80,7 +80,7 @@ void AbstractAnimator::setDurationOverride(int durationOverride) {
 }
 
 void AbstractAnimator::setState(State newState) {
-    assert(newState == STOPPED || newState == PAUSED || newState == RUNNING);
+    assert(newState == Stopped || newState == Paused || newState == Running);
 
     int d = newState > m_state ? 1 : -1;
     for(int i = m_state; i != newState;) {
@@ -114,22 +114,22 @@ void AbstractAnimator::updateState(State newState) {
     State oldState = m_state;
     m_state = newState;
 
-    if(newState == RUNNING && timer() == NULL && m_group == NULL)
+    if(newState == Running && timer() == NULL && m_group == NULL)
         qnWarning("This animator is not assigned to an animation timer, animation won't work.");
 
     switch(newState) {
-    case STOPPED: /* PAUSED -> STOPPED. */
+    case Stopped: /* Paused -> Stopped. */
         emit finished();
         break;
-    case PAUSED:
-        if(oldState == STOPPED) { /* STOPPED -> PAUSED. */
+    case Paused:
+        if(oldState == Stopped) { /* Stopped -> Paused. */
             emit started();
-        } else { /* RUNNING -> PAUSED. */
+        } else { /* Running -> Paused. */
             m_currentTime = 0;
             stopListening();
         }
         break;
-    case RUNNING: /* PAUSED -> RUNNING. */
+    case Running: /* Paused -> Running. */
         m_currentTime = 0;
         startListening();
         if(duration() < minimalDurationMSec)

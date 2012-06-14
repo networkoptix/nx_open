@@ -203,7 +203,7 @@ void VariantAnimator::updateCurrentValue(const QVariant &value) const {
 void VariantAnimator::updateState(State newState) {
     State oldState = state();
 
-    if(oldState == STOPPED) {
+    if(oldState == Stopped) {
         if(accessor() == NULL) {
             qnWarning("Accessor not set, cannot start animator.");
             return;
@@ -211,7 +211,7 @@ void VariantAnimator::updateState(State newState) {
 
         if(targetObject() == NULL)
             return; /* This is a normal use case, don't emit warnings. */
-    } if(oldState == RUNNING) {
+    } if(oldState == Running) {
         if(currentTime() < duration()) {
             m_easingCurveCorrection = this->easingCurveProgress(currentTime());
 
@@ -221,10 +221,10 @@ void VariantAnimator::updateState(State newState) {
         }
     }
 
-    if(newState == RUNNING) {
+    if(newState == Running) {
         m_internalStartValue = currentValue();
         invalidateDuration();
-    } else if(newState == STOPPED) {
+    } else if(newState == Stopped) {
         m_easingCurveCorrection = 0.0;
     }
 
@@ -279,7 +279,7 @@ QVariant VariantAnimator::internalTargetValue() const {
 }
 
 QVariant VariantAnimator::internalStartValue() const {
-    if(state() == RUNNING) {
+    if(state() == Running) {
         return m_internalStartValue;
     } else {
         return currentValue();
