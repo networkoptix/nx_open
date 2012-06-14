@@ -321,6 +321,7 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnResourceWidget *widget) {
     /* QHash::erase does nothing when called for container's end, 
      * and is therefore perfectly safe. */
     m_syncedResources.erase(m_syncedResources.find(widget->resource()));
+    m_motionIgnoreWidgets.remove(widget);
 
     if(!widget->isMotionSelectionEmpty())
         if(QnCachingTimePeriodLoader *loader = this->loader(widget->resource()))
@@ -525,6 +526,12 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     WidgetFlags previousWidgetFlags = m_currentWidgetFlags;
     m_localDataByWidget[m_currentWidget] = currentSliderData();
 
+    if(m_currentWidget) {
+        QnAbstractArchiveReader  *archiveReader = m_currentWidget->display()->archiveReader();
+        if (archiveReader)
+            archiveReader->setPlaybackMask(QnTimePeriodList());
+    }
+
     m_currentWidget = widget;
     if(m_currentWidget) {
         m_currentWidgetFlags = 0;
@@ -627,11 +634,15 @@ void QnWorkbenchNavigator::updateCurrentPeriods() {
 }
 
 void QnWorkbenchNavigator::updateCurrentPeriods(Qn::TimePeriodRole type) {
-    if(QnCachingTimePeriodLoader *loader = this->loader(m_currentWidget)) {
-        m_timeSlider->setTimePeriods(CurrentLine, type, loader->periods(type));
-    } else {
-        m_timeSlider->setTimePeriods(CurrentLine, type, QnTimePeriodList());
+    QnTimePeriodList periods;
+
+    if(type == Qn::MotionRole && m_currentWidget && !(m_currentWidget->displayFlags() & QnResourceWidget::DisplayMotionGrid)) {
+        /* Use empty periods. */
+    } else if(QnCachingTimePeriodLoader *loader = this->loader(m_currentWidget)) {
+        periods = loader->periods(type);
     }
+
+    m_timeSlider->setTimePeriods(CurrentLine, type, periods);
 }
 
 void QnWorkbenchNavigator::updateSyncedPeriods() {
@@ -640,22 +651,26 @@ void QnWorkbenchNavigator::updateSyncedPeriods() {
 }
 
 void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodRole type) {
-    QVector<QnTimePeriodList> periods;
-    foreach(const QnResourcePtr &resource, m_syncedResources.uniqueKeys())
-        if(QnCachingTimePeriodLoader *loader = this->loader(resource))
-            periods.push_back(loader->periods(type));
+    QVector<QnTimePeriodList> periodsList;
+    foreach(const QnResourceWidget *widget, m_syncedWidgets) {
+        if(type == Qn::MotionRole && !(widget->displayFlags() & QnResourceWidget::DisplayMotionGrid)) {
+            /* Ignore it. */
+        } else if(QnCachingTimePeriodLoader *loader = this->loader(widget->resource())) {
+            periodsList.push_back(loader->periods(type));
+        }
+    }
 
-    QnTimePeriodList mergedPeriods = QnTimePeriod::mergeTimePeriods(periods);
+    QnTimePeriodList periods = QnTimePeriod::mergeTimePeriods(periodsList);
 
     if (type == Qn::MotionRole) {
         foreach(QnResourceWidget *widget, m_syncedWidgets) {
             QnAbstractArchiveReader  *archiveReader = widget->display()->archiveReader();
             if (archiveReader)
-                archiveReader->setPlaybackMask(mergedPeriods);
+                archiveReader->setPlaybackMask(periods);
         }
     }
 
-    m_timeSlider->setTimePeriods(SyncedLine, type, mergedPeriods);
+    m_timeSlider->setTimePeriods(SyncedLine, type, periods);
 }
 
 void QnWorkbenchNavigator::updateLines() {
@@ -939,6 +954,7 @@ void QnWorkbenchNavigator::at_display_widgetAdded(QnResourceWidget *widget) {
         addSyncedWidget(widget);
 
         connect(widget, SIGNAL(motionSelectionChanged()), this, SLOT(at_widget_motionSelectionChanged()));
+        connect(widget, SIGNAL(displayFlagsChanged()), this, SLOT(at_widget_displayFlagsChanged()));
     }
 }
 
@@ -959,6 +975,27 @@ void QnWorkbenchNavigator::at_widget_motionSelectionChanged(QnResourceWidget *wi
      * just to feel safe. */
     if(QnCachingTimePeriodLoader *loader = this->loader(widget->resource()))
         loader->setMotionRegions(widget->motionSelection());
+}
+
+void QnWorkbenchNavigator::at_widget_displayFlagsChanged() {
+    at_widget_displayFlagsChanged(checked_cast<QnResourceWidget *>(sender()));
+}
+
+void QnWorkbenchNavigator::at_widget_displayFlagsChanged(QnResourceWidget *widget) {
+    int oldSize = m_motionIgnoreWidgets.size();
+    if(widget->displayFlags() & QnResourceWidget::DisplayMotionGrid) {
+        m_motionIgnoreWidgets.insert(widget);
+    } else {
+        m_motionIgnoreWidgets.remove(widget);
+    }
+    int newSize = m_motionIgnoreWidgets.size();
+
+    if(oldSize != newSize) {
+        updateSyncedPeriods(Qn::MotionRole);
+
+        if(widget == m_currentWidget)
+            updateCurrentPeriods(Qn::MotionRole);
+    }
 }
 
 void QnWorkbenchNavigator::at_timeSlider_destroyed() {
