@@ -84,7 +84,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
 
     m_thumbnailsButton = new QnImageButtonWidget(this);
     m_thumbnailsButton->setDefaultAction(action(Qn::ToggleThumbnailsAction));
-    m_thumbnailsButton->setPreferredSize(40, 40);
+    m_thumbnailsButton->setPreferredSize(96, 24);
 
 
     /* Time label. */
