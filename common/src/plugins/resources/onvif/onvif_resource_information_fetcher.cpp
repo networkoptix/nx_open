@@ -74,10 +74,9 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
 
         qDebug() << "Trying login = " << login << ", password = " << passwd;
 
-        _onvifDevice__GetCapabilities request1;
-        request1.Category.push_back(onvifXsd__CapabilityCategory__All);
-        _onvifDevice__GetCapabilitiesResponse response1;
-        soapRes = soapProxy.GetCapabilities(endpoint.toStdString().c_str(), NULL, &request1, &response1);
+        _onvifDevice__GetDeviceInformation request1;
+        _onvifDevice__GetDeviceInformationResponse response1;
+        soapRes = soapProxy.GetDeviceInformation(endpoint.toStdString().c_str(), NULL, &request1, &response1);
 
         if (soapRes == SOAP_OK || !passwordsData.isNotAuthenticated(soapProxy.soap_fault())) {
             qDebug() << "Finished picking password";
@@ -230,6 +229,10 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
 void OnvifResourceInformationFetcher::createResource(const QString& manufacturer, const QHostAddress& sender, const QHostAddress& discoveryIp,
     const QString& name, const QString& mac, const char* login, const char* passwd, const QString& mediaUrl, const QString& deviceUrl, QnResourceList& result) const
 {
+    if (mac.isEmpty()) {
+        return;
+    }
+
     QnNetworkResourcePtr resource = QnNetworkResourcePtr(new QnPlOnvifResource());
 
     resource->setTypeId(onvifTypeId);
@@ -328,7 +331,8 @@ const QString OnvifResourceInformationFetcher::fetchManufacturer(const _onvifDev
 
 const QString OnvifResourceInformationFetcher::fetchSerial(const _onvifDevice__GetDeviceInformationResponse& response) const
 {
-    return (response.HardwareId + "::" + response.SerialNumber).c_str();
+    return (response.HardwareId.empty()? QString(): QString((response.HardwareId + "::").c_str())) +
+        (response.SerialNumber.empty()? QString(): QString(response.SerialNumber.c_str()));
 }
 
 //const QString OnvifResourceInformationFetcher::generateRandomPassword() const
