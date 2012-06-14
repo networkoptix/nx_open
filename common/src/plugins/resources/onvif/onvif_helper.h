@@ -59,7 +59,7 @@ class PasswordHelper
 
 public:
 
-    static PasswordHelper& PasswordHelper::instance();
+    static PasswordHelper& instance();
 
     static bool isNotAuthenticated(const SOAP_ENV__Fault* faultInfo);;
 
@@ -90,7 +90,7 @@ class NameHelper
 
 public:
 
-    static NameHelper& NameHelper::instance();
+    static NameHelper& instance();
 
     bool isSupported(const QString& cameraName) const;
 };
