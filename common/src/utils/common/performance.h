@@ -20,6 +20,8 @@ public:
     static qint64 currentThreadCycles();
 
     static qint64 currentCpuFrequency();
+
+	static qint64 currentCpuUsage();
 };
 
 
