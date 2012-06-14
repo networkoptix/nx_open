@@ -200,6 +200,10 @@ namespace{
 			if(m_cpu_count <= 0)
 				return false;
 
+			QnPerformance::CpuInfo info = QnPerformance::getCpuInfo();
+			if (info.Cores != m_cpu_count) 
+				return false;
+
 			m_timer = SetTimer(0, 0, 2000, timerCallback);
 
 			return true;
@@ -340,3 +344,60 @@ qint64 QnPerformance::currentCpuUsage(){
     return 50;
 #endif
 }
+
+namespace {
+#ifdef Q_OS_WIN
+	QnPerformance::CpuInfo estimateCpuInfo() {
+		QnPerformance::CpuInfo info;
+
+		/*SYSTEM_INFO si;
+		memset( &si, 0, sizeof(si));
+		GetSystemInfo(&si);
+		info.Cores = si.dwNumberOfProcessors;*/
+
+		int CPUInfo[4] = {-1};
+        unsigned   nExIds, i =  0;
+        char CPUBrandString[0x40];
+        // Get the information associated with each extended ID.
+        __cpuid(CPUInfo, 0x80000000);
+        nExIds = CPUInfo[0];
+        for (i=0x80000000; i<=nExIds; ++i)
+        {
+                __cpuid(CPUInfo, i);
+                // Interpret CPU brand string
+                if  (i == 0x80000002)
+                        memcpy(CPUBrandString, CPUInfo, sizeof(CPUInfo));
+                else if  (i == 0x80000003)
+                        memcpy(CPUBrandString + 16, CPUInfo, sizeof(CPUInfo));
+                else if  (i == 0x80000004)
+                        memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
+        }
+        //string includes manufacturer, model and clockspeed
+		info.Model = CPUBrandString;
+
+        SYSTEM_INFO sysInfo;
+        GetSystemInfo(&sysInfo);
+		info.Cores = sysInfo.dwNumberOfProcessors;
+
+        return info;
+    }
+
+    Q_GLOBAL_STATIC_WITH_INITIALIZER(QnPerformance::CpuInfo, qn_estimatedCpuInfo, { *x = estimateCpuInfo(); });
+#endif
+
+} // anonymous namespace
+
+QnPerformance::CpuInfo QnPerformance::getCpuInfo(){
+	
+#ifdef Q_OS_WIN
+	return *qn_estimatedCpuInfo();
+#else
+	CpuInfo info;
+	info.Clock = "3.5GHz";
+	info.Model = "Sandy Bridge";
+	info.Cores = 4;
+	return info;
+#endif
+	
+}
+

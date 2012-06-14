@@ -5,6 +5,12 @@
 
 class QnPerformance {
 public:
+	struct CpuInfo{
+		QString Model;
+		uint Cores;
+		QString Clock;
+	};
+
     static qint64 currentThreadTimeMSecs();
 
     /**
@@ -22,6 +28,8 @@ public:
     static qint64 currentCpuFrequency();
 
 	static qint64 currentCpuUsage();
+
+	static CpuInfo getCpuInfo();
 };
 
 
