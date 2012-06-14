@@ -34,7 +34,7 @@ CLServerPushStreamreader(res),
 mHttpClient(0),
 m_h264(false),
 m_mpeg4(false),
-mRTP264(res)
+m_rtpReader(res)
 {
     
 }
@@ -96,8 +96,8 @@ void PlDlinkStreamReader::openStream()
         }
 
         QString url = (role == QnResource::Role_SecondaryLiveVideo) ? srtpUrls.at(1) : srtpUrls.at(0);
-        mRTP264.setRequest(url);
-        mRTP264.openStream();
+        m_rtpReader.setRequest(url);
+        m_rtpReader.openStream();
     }
     else
     {
@@ -130,12 +130,12 @@ void PlDlinkStreamReader::closeStream()
 {
     delete mHttpClient;
     mHttpClient = 0;
-    mRTP264.closeStream();
+    m_rtpReader.closeStream();
 }
 
 bool PlDlinkStreamReader::isStreamOpened() const
 {
-    return (mHttpClient && mHttpClient->isOpened()) || mRTP264.isStreamOpened();
+    return (mHttpClient && mHttpClient->isOpened()) || m_rtpReader.isStreamOpened();
 }
 
 QnAbstractMediaDataPtr PlDlinkStreamReader::getNextData()

@@ -35,7 +35,7 @@ QnAbstractStreamDataProvider* QnPlSonyResource::createLiveDataProvider()
 {
     QString request = "media/video1";
 
-    return new RTP264StreamReader(toSharedPointer(), request);
+    return new QnRtpStreamReader(toSharedPointer(), request);
 }
 
 void QnPlSonyResource::setCropingPhysical(QRect croping)

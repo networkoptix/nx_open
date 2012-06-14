@@ -23,6 +23,7 @@ public:
 
     bool hasDualStreaming() const override {return false;}
 
+    virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider) override;
 protected:
 
     void initInternal() override {}

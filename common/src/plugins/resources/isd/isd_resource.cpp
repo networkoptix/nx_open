@@ -51,9 +51,22 @@ QnAbstractStreamDataProvider* QnPlIsdResource::createLiveDataProvider()
 
     }
 
-    return new RTP264StreamReader(toSharedPointer(), request);
+    return new QnRtpStreamReader(toSharedPointer(), request);
 }
 
 void QnPlIsdResource::setCropingPhysical(QRect /*croping*/)
 {
+}
+
+const QnResourceAudioLayout* QnPlIsdResource::getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
+{
+    if (isAudioEnabled()) {
+        const QnRtpStreamReader* rtspReader = dynamic_cast<const QnRtpStreamReader*>(dataProvider);
+        if (rtspReader && rtspReader->getDPAudioLayout())
+            return rtspReader->getDPAudioLayout();
+        else
+            return QnPhysicalCameraResource::getAudioLayout(dataProvider);
+    }
+    else
+        return QnPhysicalCameraResource::getAudioLayout(dataProvider);
 }

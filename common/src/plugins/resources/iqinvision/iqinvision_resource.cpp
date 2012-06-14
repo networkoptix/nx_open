@@ -53,7 +53,7 @@ QnAbstractStreamDataProvider* QnPlIqResource::createLiveDataProvider()
         name == QLatin1String("IQM32N") ||
         //name == QLatin1String("IQ765N") ||
         name == QLatin1String("IQM32S"))
-        return new RTP264StreamReader(toSharedPointer());
+        return new QnRtpStreamReader(toSharedPointer());
         /**/
 
     return new MJPEGtreamreader(toSharedPointer(), "now.jpg?snap=spush");

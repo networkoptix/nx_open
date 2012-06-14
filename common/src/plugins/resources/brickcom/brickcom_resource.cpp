@@ -35,7 +35,7 @@ QnAbstractStreamDataProvider* QnPlBrickcomResource::createLiveDataProvider()
 {
     QString request = "ONVIF/channel1";
 
-    return new RTP264StreamReader(toSharedPointer(), request);
+    return new QnRtpStreamReader(toSharedPointer(), request);
 }
 
 void QnPlBrickcomResource::setCropingPhysical(QRect croping)

@@ -3,7 +3,7 @@
 
 #include "../onvif/dataprovider/rtp264_stream_provider.h"
 
-class QnPlDWDStreamReader : public RTP264StreamReader
+class QnPlDWDStreamReader : public QnRtpStreamReader
 {
 public:
     QnPlDWDStreamReader(QnResourcePtr res);

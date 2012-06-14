@@ -3,7 +3,7 @@
 
 
 QnPlDWDStreamReader::QnPlDWDStreamReader(QnResourcePtr res):
-    RTP264StreamReader(res)
+    QnRtpStreamReader(res)
 {
 
 }
@@ -44,8 +44,8 @@ void QnPlDWDStreamReader::openStream()
     }
     /**/
 
-    RTP264StreamReader::setRequest("h264");
-    RTP264StreamReader::openStream();
+    QnRtpStreamReader::setRequest("h264");
+    QnRtpStreamReader::openStream();
 }
 
 void QnPlDWDStreamReader::updateStreamParamsBasedOnQuality()

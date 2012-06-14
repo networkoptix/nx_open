@@ -34,7 +34,7 @@ void QnPlPulseResource::setIframeDistance(int /*frames*/, int /*timems*/)
 QnAbstractStreamDataProvider* QnPlPulseResource::createLiveDataProvider()
 {
     QString request = "0";
-    return new RTP264StreamReader(toSharedPointer(), request);
+    return new QnRtpStreamReader(toSharedPointer(), request);
 }
 
 void QnPlPulseResource::setCropingPhysical(QRect /*croping*/)
