@@ -1400,13 +1400,13 @@ Do you want to continue?"),
             &selectedFilter,
             QFileDialog::DontUseNativeDialog
             );
-        selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')) + 1, 3);
 
+        selectedExtension = ".layout";
         if (fileName.isEmpty())
             return;
 
-        if (!fileName.toLower().endsWith(QLatin1String(".layout"))) {
-            fileName += QChar('.') + selectedExtension;
+        if (!fileName.toLower().endsWith(selectedExtension)) {
+            fileName += selectedExtension;
 
             if (QFile::exists(fileName)) {
                 QMessageBox::StandardButton button = QMessageBox::information(

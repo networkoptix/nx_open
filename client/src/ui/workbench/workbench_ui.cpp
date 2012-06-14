@@ -1362,7 +1362,6 @@ void QnWorkbenchUi::at_sliderResizerItem_geometryChanged() {
         return;
 
     QRectF sliderGeometry = m_sliderItem->geometry();
-    qreal sliderBottom = sliderGeometry.bottom();
 
     qreal targetHeight = sliderGeometry.bottom() - m_sliderResizerItem->geometry().center().y();
     qreal minHeight = m_sliderItem->effectiveSizeHint(Qt::MinimumSize).height();
@@ -1377,12 +1376,15 @@ void QnWorkbenchUi::at_sliderResizerItem_geometryChanged() {
         targetHeight = maxHeight;
     }
 
-    sliderGeometry.setHeight(targetHeight);
-    sliderGeometry.moveBottom(sliderBottom);
+    if(!qFuzzyCompare(sliderGeometry.height(), targetHeight)) {
+        qreal sliderTop = sliderGeometry.top();
+        sliderGeometry.setHeight(targetHeight);
+        sliderGeometry.moveTop(sliderTop);
 
-    QnScopedValueRollback<bool> guard(&m_ignoreSliderResizerGeometryChanges, true);
-    m_sliderItem->setGeometry(sliderGeometry);
-    updateSliderResizerGeometry();
+        QnScopedValueRollback<bool> guard(&m_ignoreSliderResizerGeometryChanges, true);
+        m_sliderItem->setGeometry(sliderGeometry);
+        updateSliderResizerGeometry();
+    }
 
     action(Qn::ToggleThumbnailsAction)->setChecked(isThumbnailsVisible());
 }
