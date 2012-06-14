@@ -112,6 +112,16 @@ void QnStorageManager::addStorage(QnStorageResourcePtr storage)
 {
     storage->setIndex(detectStorageIndex(storage->getUrl()));
     QMutexLocker lock(&m_mutex);
+    
+    // remove existing storage record if exists
+    for (StorageMap::iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
+    {
+        if (itr.value()->getId() == storage->getId()) {
+            m_storageRoots.erase(itr);
+            break;
+        }
+    }
+
     m_storageRoots.insert(storage->getIndex(), storage);
     if (storage->isStorageAvailable())
         storage->setStatus(QnResource::Online);
@@ -264,6 +274,8 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
         //for (int i = 0; i < m_storageRoots.size(); ++i)
         for (StorageMap::const_iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
         {
+            if (!itr.value()->getStatus() == QnResource::Offline)
+                continue; // do not use offline storages for writting
             if (!itr.value()->isNeedControlFreeSpace()) {
                 maxSpace = minSpace = 0; // do not count free space, balance by bitrate
                 break;
@@ -277,11 +289,13 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
         balanceByBitrate = maxSpace - minSpace <= BALANCE_BY_FREE_SPACE_THRESHOLD; 
     }
     
-    if (balanceByBitrate)
+    for (StorageMap::const_iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
     {
-        // select storage with mimimum bitrate
-        for (StorageMap::const_iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
-        {
+        if (!itr.value()->getStatus() == QnResource::Offline)
+            continue; // do not use offline storages for writting
+
+        if (balanceByBitrate) 
+        {   // select storage with mimimum bitrate
             float bitrate = itr.value()->bitrate();
             if (bitrate < minBitrate)
             {
@@ -289,12 +303,8 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
                 result = itr.value();
             }
         }
-    }
-    else 
-    {
-        // select storage with maximum free space
-        for (StorageMap::const_iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
-        {
+        else 
+        {   // select storage with maximum free space
             qint64 freeSpace = itr.value()->getFreeSpace();
             if (freeSpace > maxFreeSpace)
             {

@@ -147,6 +147,8 @@ protected slots:
 
     void at_widget_motionSelectionChanged(QnResourceWidget *widget);
     void at_widget_motionSelectionChanged();
+    void at_widget_displayFlagsChanged(QnResourceWidget *widget);
+    void at_widget_displayFlagsChanged();
 
     void at_loader_periodsChanged(QnCachingTimePeriodLoader *loader, Qn::TimePeriodRole type);
     void at_loader_periodsChanged(Qn::TimePeriodRole type);
@@ -170,6 +172,8 @@ private:
 
     QSet<QnResourceWidget *> m_syncedWidgets;
     QMultiHash<QnResourcePtr, QHashDummyValue> m_syncedResources;
+
+    QSet<QnResourceWidget *> m_motionIgnoreWidgets;
 
     QnResourceWidget *m_centralWidget;
     QnResourceWidget *m_currentWidget;

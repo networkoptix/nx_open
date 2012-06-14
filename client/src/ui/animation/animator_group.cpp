@@ -104,7 +104,7 @@ bool AnimatorGroup::event(QEvent *event) {
 }
 
 void AnimatorGroup::updateState(State newState) {
-    if(newState == RUNNING) {
+    if(newState == Running) {
         invalidateDuration();
 
         foreach(AbstractAnimator *animator, m_animators)
