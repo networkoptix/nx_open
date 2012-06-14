@@ -60,6 +60,25 @@ OnvifResourceSearcherWsdd& OnvifResourceSearcherWsdd::instance()
     return inst;
 }
 
+//To avoid recreating of gsoap socket, these 2 functions must be assigned
+int nullGsoapFconnect(struct soap*, const char*, const char*, int)
+{
+    return SOAP_OK;
+}
+
+int nullGsoapFdisconnect(struct soap*)
+{
+    return SOAP_OK;
+}
+
+//Socket send through QUdpSocket
+int gsoapFsend(struct soap *soap, const char *s, size_t n)
+{
+    QUdpSocket& qSocket = *reinterpret_cast<QUdpSocket*>(soap->user);
+    qSocket.writeDatagram(QByteArray(std::string(s, n).c_str()), QHostAddress("239.255.255.250"), 3702);
+    return SOAP_OK;
+}
+
 void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
 {
 #ifdef Q_OS_LINUX
@@ -100,43 +119,30 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
 #endif
         qDebug() << "OnvifResourceSearcherWsdd::findEndpoints(): Binding to Interface: " << host;
 
+        QUdpSocket qSocket;
+        if (!qSocket.bind(localAddress, 0)) {
+            qWarning() << "OnvifResourceSearcherWsdd::findEndpoints: QUdpSocket.bind failed. Interface: " << host;
+            continue;
+        }
+
         QStringList addrPrefixes = getAddrPrefixes(host);
         wsddProxy soapWsddProxy(SOAP_IO_UDP);
         soapWsddProxy.soap->recv_timeout = -500000;
+        soapWsddProxy.soap->user = &qSocket;
+        soapWsddProxy.soap->fconnect = nullGsoapFconnect;
+        soapWsddProxy.soap->fdisconnect = nullGsoapFdisconnect;
+        soapWsddProxy.soap->fsend = gsoapFsend;
+        soapWsddProxy.soap->fopen = NULL;
+        soapWsddProxy.soap->socket = qSocket.socketDescriptor();
+        soapWsddProxy.soap->master = qSocket.socketDescriptor();
 
-        //Finding free port and binding (soap_bind doesn't accept port = 0, so we had to workaround)
-        bool soapSocketBinded = false;
-        int maxTries = 20;
-        while (!soapSocketBinded && --maxTries >= 0) {
-            QUdpSocket qSocket;
-            if (!qSocket.bind(localAddress, 0)) {
-                qWarning() << "OnvifResourceSearcherWsdd::findEndpoints: QUdpSocket.bind failed. Interface: " << host;
-                break;
-            }
-
-            int port = qSocket.localPort();
-            qSocket.close();
-            soapSocketBinded = soap_valid_socket(soap_bind(soapWsddProxy.soap, host.toStdString().c_str(), port, 0));
-            if (!soapSocketBinded) {
-                qDebug() << "OnvifResourceSearcherWsdd::findEndpoints: soap_bind returns error: "
-                         << SoapErrorHelper::fetchDescription(soapWsddProxy.soap_fault());
 #ifdef Q_OS_LINUX
-                continue;
-            }
-
-            int res = setsockopt(soapWsddProxy.soap->master, SOL_SOCKET, SO_BINDTODEVICE, ifa->ifa_name, strlen(ifa->ifa_name));
-            if (res != 0) {
-                qWarning() << "QnPlDlinkResourceSearcher::findResources(): Can't bind to interface " << ifa->ifa_name << ": " << strerror(errno);
-                soapSocketBinded = false;
-                break;
-#endif
-            }
-        }
-
-        if (!soapSocketBinded) {
-            qWarning() << "OnvifResourceSearcherWsdd::findEndpoints: gSoap soap_bind failed. Interface: " << host;
+        int res = setsockopt(qSocket.socketDescriptor(), SOL_SOCKET, SO_BINDTODEVICE, ifa->ifa_name, strlen(ifa->ifa_name));
+        if (res != 0) {
+            qWarning() << "QnPlDlinkResourceSearcher::findResources(): Can't bind to interface " << ifa->ifa_name << ": " << strerror(errno);
             continue;
         }
+#endif
 
         wsdd__ProbeType wsddProbe;
         wsa__EndpointReferenceType replyTo;
@@ -187,6 +193,8 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
 
             soap_end(soapWsddProxy.soap);
         }
+
+        qSocket.close();
     }
 }
 
