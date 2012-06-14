@@ -12,6 +12,8 @@ namespace {
 
         QFontMetrics metrics(actualFont);
         QSize textSize = metrics.size(Qt::TextSingleLine, text);
+        if(textSize.isEmpty())
+            return QPixmap();
 
         QPixmap pixmap(textSize.width(), metrics.height());
         pixmap.fill(QColor(0, 0, 0, 0));
