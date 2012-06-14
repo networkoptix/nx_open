@@ -274,7 +274,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
         //for (int i = 0; i < m_storageRoots.size(); ++i)
         for (StorageMap::const_iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
         {
-            if (!itr.value()->getStatus() == QnResource::Offline)
+            if (itr.value()->getStatus() == QnResource::Offline)
                 continue; // do not use offline storages for writting
             if (!itr.value()->isNeedControlFreeSpace()) {
                 maxSpace = minSpace = 0; // do not count free space, balance by bitrate
@@ -291,7 +291,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
     
     for (StorageMap::const_iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
     {
-        if (!itr.value()->getStatus() == QnResource::Offline)
+        if (itr.value()->getStatus() == QnResource::Offline)
             continue; // do not use offline storages for writting
 
         if (balanceByBitrate) 
