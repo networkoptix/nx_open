@@ -595,6 +595,7 @@ QnMotionEstimation::QnMotionEstimation()
     m_firstFrameTime = AV_NOPTS_VALUE;
     m_lastFrameTime = AV_NOPTS_VALUE;
     m_isNewMask = false;
+    m_linkedNums = 0;
     
 #ifdef DEBUG_TRANSFORM
     static int gg = 0;
@@ -617,6 +618,7 @@ QnMotionEstimation::~QnMotionEstimation()
     qFreeAligned(m_filteredFrame);
     qFreeAligned(m_motionMask);
     qFreeAligned(m_motionSensMask);
+    qFreeAligned(m_linkedNums);
     delete [] m_resultMotion;
     delete m_frames[0];
     delete m_frames[1];
@@ -658,6 +660,7 @@ void QnMotionEstimation::reallocateMask(int width, int height)
     for (int i = 0; i < FRAMES_BUFFER_SIZE; ++i)
         qFreeAligned(m_frameBuffer[i]);
     qFreeAligned(m_filteredFrame);
+    qFreeAligned(m_linkedNums);
     delete [] m_resultMotion;
 
     m_lastImgWidth = width;
@@ -670,6 +673,7 @@ void QnMotionEstimation::reallocateMask(int width, int height)
     if (m_lastImgWidth > m_scaledWidth*m_xStep)
         m_scaledWidth++;
     m_scaledMask = (quint8*) qMallocAligned(MD_HEIGHT * m_scaledWidth, 32);
+    m_linkedNums = (int*) qMallocAligned(MD_HEIGHT * m_scaledWidth * sizeof(int), 32);
     m_motionSensScaledMask = (quint8*) qMallocAligned(MD_HEIGHT * m_scaledWidth, 32);
     m_frameBuffer[0] = (quint8*) qMallocAligned(MD_HEIGHT * m_scaledWidth, 32);
     m_frameBuffer[1] = (quint8*) qMallocAligned(MD_HEIGHT * m_scaledWidth, 32);
@@ -749,7 +753,7 @@ void QnMotionEstimation::analizeMotionAmount(quint8* frame)
 
     // 2. Determine linked areas
     int currentLinkIndex = 1;
-    memset(m_linkedNums, 0, sizeof(m_linkedNums));
+    memset(m_linkedNums, 0, sizeof(int) * MD_HEIGHT * m_scaledWidth);
     memset(m_linkedSquare, 0, sizeof(m_linkedSquare));
     for (int i = 0; i < MD_HEIGHT*m_scaledWidth/2;++i)
         m_linkedMap[i] = i;
@@ -1046,6 +1050,7 @@ void QnMotionEstimation::setMotionMask(const QnMotionRegion& region)
     QMutexLocker lock(&m_mutex);
     qFreeAligned(m_motionMask);
     qFreeAligned(m_motionSensMask);
+    qFreeAligned(m_linkedNums);
     m_motionMask = (quint8*) qMallocAligned(MD_WIDTH * MD_HEIGHT, 32);
     m_motionSensMask = (quint8*) qMallocAligned(MD_WIDTH * MD_HEIGHT, 32);
 

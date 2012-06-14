@@ -50,7 +50,7 @@ private:
     bool m_isNewMask;
 
     int m_linkedMap[MD_WIDTH*MD_HEIGHT];
-    int m_linkedNums[MD_WIDTH*MD_HEIGHT];
+    int* m_linkedNums;
     int m_linkedSquare[MD_WIDTH*MD_HEIGHT];
     //quint8 m_sadTransformMatrix[10][256];
 };
