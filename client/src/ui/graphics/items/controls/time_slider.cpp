@@ -984,7 +984,7 @@ void QnTimeSlider::updateThumbnails() {
 
     /* Maybe we don't need to send the request? Check that. */
     if(!boundingSizeChanged)
-        if(qAbs(thumbnailsLoader()->step() - step) < m_msecsPerPixel * 0.25)
+        if(qAbs(thumbnailsLoader()->step() - step) < m_msecsPerPixel * 5.0)
             if (thumbnailsLoader()->loadedRange().containPeriod(targetPeriod))
                 return; 
     
@@ -1355,23 +1355,30 @@ void QnTimeSlider::drawDates(QPainter *painter, const QRectF &rect) {
 }
 
 void QnTimeSlider::drawThumbnails(QPainter *painter, const QRectF &rect) {
-    if (!thumbnailsLoader())
-        return;
-
-    if (thumbnailsLoader()->step() <= 0)
-        return;
-
     if (rect.height() < thumbnailHeightForDrawing)
         return;
 
-    qint64 step = thumbnailsLoader()->step();
-    qint64 endTime = m_windowEnd + step;
-    
-    qint64 roundedStep = 1 << qIntegerLog2(thumbnailsLoader()->step()); /* So that small changes in step doesn't cause thumbnail jitter. */
-    qint64 time = qFloor(m_windowStart, roundedStep * 8); /* So that thumbnail skipping is more or less regular. */
+    if (!thumbnailsLoader())
+        return;
 
-    qreal boundary = -std::numeric_limits<qreal>::max();
-    for (; time < endTime; time += step) {
+    qint64 step = thumbnailsLoader()->step();
+    if (thumbnailsLoader()->step() <= 0)
+        return;
+
+    qreal aspectRatio = QnGeometry::aspectRatio(thumbnailsLoader()->thumbnailSize());
+    qreal thumbnailWidth = rect.height() * aspectRatio;
+    qint64 bestStep = static_cast<qint64>(0.95 * m_msecsPerPixel * thumbnailWidth);
+    step = qCeil(bestStep, step);
+
+    qint64 startTime = thumbnailsLoader()->loadedRange().startTimeMs;
+    if(startTime < m_windowStart)
+        startTime += qFloor(m_windowStart - startTime, step);
+    qint64 endTime = thumbnailsLoader()->loadedRange().endTimeMs();
+    if(endTime > m_windowEnd + step)
+        endTime = m_windowEnd + step;
+
+    QRectF boundingRect = rect; 
+    for (qint64 time = startTime; time < endTime; time += step) {
         qint64 realTime;
         QPixmapPtr pixmap = thumbnailsLoader()->getPixmapByTime(time, &realTime);
         if (!pixmap) 
@@ -1381,11 +1388,8 @@ void QnTimeSlider::drawThumbnails(QPainter *painter, const QRectF &rect) {
         QSizeF targetSize(pixmap->width() * rect.height() / pixmap->height(), rect.height());
         QRectF targetRect(x - targetSize.width() / 2, rect.top(), targetSize.width(), targetSize.height());
         
-        if(targetRect.left() < boundary)
-            continue;
-        boundary = targetRect.right();
-
-        drawCroppedPixmap(painter, targetRect, rect, *pixmap, pixmap->rect());
+        drawCroppedPixmap(painter, targetRect, boundingRect, *pixmap, pixmap->rect());
+        boundingRect.setLeft(qMax(boundingRect.left(), targetRect.right()));
     }
 }
 
