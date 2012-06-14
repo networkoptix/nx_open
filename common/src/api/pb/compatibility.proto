@@ -1,0 +1,11 @@
+package proto.pb;
+
+message CompatibilityItem {
+    required string ver1  = 1;
+    required string comp1 = 2;
+    required string ver2  = 3;
+}
+
+message CompatibilityInfo {
+    repeated CompatibilityItem item = 1;
+}

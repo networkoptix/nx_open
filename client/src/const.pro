@@ -93,13 +93,13 @@ win* {
 
     INCLUDEPATH += $$PWD/../../common/contrib/openssl/include
 
-	win32-msvc2010 {
-		LIBS += -L$$PWD/../../common/contrib/openssl/bin/win32-msvc2010
-	}
-	win32-msvc2008 {
-		LIBS += -L$$PWD/../../common/contrib/openssl/bin
-	}
-	LIBS += -llibeay32
+    win32-msvc2010 {
+        LIBS += -L$$PWD/../../common/contrib/openssl/bin/win32-msvc2010
+    }
+    win32-msvc2008 {
+        LIBS += -L$$PWD/../../common/contrib/openssl/bin
+    }
+    LIBS += -llibeay32
 }
 
 mac {
@@ -250,3 +250,5 @@ DEFINES += $$OVERRIDE_DEFINITION
 
 # Uncomment to enable background color adjustment
 # DEFINES += QN_HAS_BACKGROUND_COLOR_ADJUSTMENT
+
+SOURCES += $$PWD/../build/generated/compatibility.cpp

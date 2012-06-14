@@ -22,6 +22,7 @@ from convert import convert as convert_common
 from common_version import *
 
 from filetypes import all_filetypes, video_filetypes, image_filetypes
+from gencomp import gencomp
 
 APPLICATION_NAME = 'Network Optix HD Witness Client'
 
@@ -183,12 +184,6 @@ if platform() == 'mac':
     ldpath_debug += ':' + os.path.abspath('../common/bin/debug')
     ldpath_release += ':' + os.path.abspath('../common/bin/release')
 
-os.mkdir('bin/debug/arecontvision')
-os.mkdir('bin/release/arecontvision')
-
-copy_files('resource/arecontvision/*', 'bin/debug/arecontvision')
-copy_files('resource/arecontvision/*', 'bin/release/arecontvision')
-
 if platform() == 'mac':
     gen_env_sh('bin/debug/env.sh', ldpath_debug, {'FFMPEG_PATH' : ffmpeg_path_debug, 'QJSON_PATH' : os.path.abspath(qjson_path)})
     gen_env_sh('bin/release/env.sh', ldpath_release, {'FFMPEG_PATH' : ffmpeg_path_release, 'QJSON_PATH' : os.path.abspath(qjson_path)})
@@ -196,6 +191,9 @@ if platform() == 'mac':
 gen_version_h()
 
 genskin()
+
+os.makedirs('build/generated')
+gencomp_cpp(open('build/generated/compatibility.cpp', 'w'))
 
 index_dirs(('src',), 'src/const.pro', 'src/client.pro', exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
 instantiate_pro('src/client.pro', {'BUILDLIB' : BUILDLIB, 'FFMPEG' : ffmpeg_path, 'EVETOOLS_DIR' : tools_path})

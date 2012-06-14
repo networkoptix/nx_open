@@ -1,0 +1,5 @@
+import "compatibility.proto";
+
+message ConnectInfo {
+    optional CompatibilityInfo compatibilityInfo = 1;
+}
