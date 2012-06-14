@@ -12,6 +12,7 @@
 
 class QAction;
 class QMenu;
+class QProgressDialog;
 
 class QnMimeData;
 class QnResourcePool;
@@ -230,7 +231,7 @@ private:
     QQueue<QnMediaResourcePtr> m_layoutExportResources;
     QString m_layoutFileName;
     QnTimePeriod m_exportPeriod;
-    QProgressDialog *m_exportProgressDialog;
+    QWeakPointer<QProgressDialog> m_exportProgressDialog;
     QnStorageResourcePtr m_exportStorage;
 };
 

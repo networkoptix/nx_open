@@ -115,14 +115,13 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     QnWorkbenchContextAware(parent),
     m_selectionUpdatePending(false),
     m_selectionScope(Qn::SceneScope),
-    m_layoutExportCamera(0),
-    m_exportProgressDialog(0)
+    m_layoutExportCamera(0)
 {
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(at_context_userChanged(const QnUserResourcePtr &)));
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(submitDelayedDrops()), Qt::QueuedConnection);
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(updateCameraSettingsEditibility()));
-    connect(QnClientMessageProcessor::instance(),                         SIGNAL(connectionClosed()),                     this,   SLOT(at_eventManager_connectionClosed()));
-    connect(QnClientMessageProcessor::instance(),                         SIGNAL(connectionOpened()),                     this,   SLOT(at_eventManager_connectionOpened()));
+    connect(QnClientMessageProcessor::instance(),               SIGNAL(connectionClosed()),                     this,   SLOT(at_eventManager_connectionClosed()));
+    connect(QnClientMessageProcessor::instance(),               SIGNAL(connectionOpened()),                     this,   SLOT(at_eventManager_connectionOpened()));
 
     /* We're using queued connection here as modifying a field in its change notification handler may lead to problems. */
     connect(workbench(),                                        SIGNAL(layoutsChanged()), this, SLOT(at_workbench_layoutsChanged()), Qt::QueuedConnection);
@@ -1440,17 +1439,17 @@ Do you want to continue?"),
     layoutStorage.setUrl(fileName);
     m_layoutFileName = fileName;
 
+    QProgressDialog *exportProgressDialog = new QProgressDialog(this->widget());
+    exportProgressDialog = new QProgressDialog(this->widget());
+    exportProgressDialog->setWindowTitle(tr("Exporting Layout"));
+    exportProgressDialog->setMinimumDuration(1000);
+    m_exportProgressDialog = exportProgressDialog;
 
-    m_exportProgressDialog = new QProgressDialog(this->widget());
-    m_exportProgressDialog->setWindowTitle(tr("Exporting Layout"));
-    m_exportProgressDialog->setMinimumDuration(1000);
-
-    m_layoutExportCamera = new CLVideoCamera(QnMediaResourcePtr(0));
-    connect(m_exportProgressDialog,   SIGNAL(canceled()),                 m_layoutExportCamera,   SLOT(stopLayoutExport()));
-    connect(m_exportProgressDialog,   SIGNAL(canceled()),                 m_exportProgressDialog,   SLOT(deleteLater()));
-    connect(m_layoutExportCamera,   SIGNAL(exportProgress(int)),        m_exportProgressDialog,   SLOT(setValue(int)));
-    connect(m_layoutExportCamera,   SIGNAL(exportFailed(QString)),      m_exportProgressDialog,   SLOT(deleteLater()));
-    //connect(m_layoutExportCamera,   SIGNAL(exportFinished(QString)),    m_exportProgressDialog,   SLOT(deleteLater()));
+    m_layoutExportCamera = new CLVideoCamera(QnMediaResourcePtr(0)); // TODO: leaking memory here.
+    connect(exportProgressDialog,   SIGNAL(canceled()),                 m_layoutExportCamera,   SLOT(stopLayoutExport()));
+    connect(exportProgressDialog,   SIGNAL(canceled()),                 exportProgressDialog,   SLOT(deleteLater()));
+    connect(m_layoutExportCamera,   SIGNAL(exportProgress(int)),        exportProgressDialog,   SLOT(setValue(int)));
+    connect(m_layoutExportCamera,   SIGNAL(exportFailed(QString)),      exportProgressDialog,   SLOT(deleteLater()));
     connect(m_layoutExportCamera,   SIGNAL(exportFailed(QString)),      this,                   SLOT(at_layoutCamera_exportFailed(QString)));
     connect(m_layoutExportCamera,   SIGNAL(exportFinished(QString)),    this,                   SLOT(at_layoutCamera_exportFinished(QString)));
 
@@ -1485,7 +1484,7 @@ Do you want to continue?"),
         device->write(layoutData);
         delete device;
 
-        m_exportProgressDialog->setRange(0, m_layoutExportResources.size() * 100);
+        exportProgressDialog->setRange(0, m_layoutExportResources.size() * 100);
         m_layoutExportCamera->setExportProgressOffset(-100);
         at_layoutCamera_exportFinished(fileName);
     }
@@ -1496,18 +1495,19 @@ Do you want to continue?"),
 
 void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
 {
-    if (m_layoutExportResources.isEmpty())
-    {
+    if (m_layoutExportResources.isEmpty()) {
         disconnect(sender(), NULL, this, NULL);
-        m_exportProgressDialog->deleteLater();
+        if(m_exportProgressDialog)
+            m_exportProgressDialog.data()->deleteLater();
         QMessageBox::information(widget(), tr("Export finished"), tr("Export successfully finished"), QMessageBox::Ok);
-    }
-    else {
+    } else {
         m_layoutExportCamera->setExportProgressOffset(m_layoutExportCamera->getExportProgressOffset() + 100);
         QnMediaResourcePtr mediaRes = m_layoutExportResources.dequeue();
         m_layoutExportCamera->setResource(mediaRes);
-        m_exportProgressDialog->setLabelText(tr("Exporting %1 to \"%2\"...").arg(mediaRes->getUrl()).arg(m_layoutFileName));
         m_layoutExportCamera->exportMediaPeriodToFile(m_exportPeriod.startTimeMs * 1000ll, (m_exportPeriod.startTimeMs + m_exportPeriod.durationMs) * 1000ll, mediaRes->getUniqueId(), "mkv", m_exportStorage);
+
+        if(m_exportProgressDialog)
+            m_exportProgressDialog.data()->setLabelText(tr("Exporting %1 to \"%2\"...").arg(mediaRes->getUrl()).arg(m_layoutFileName));
     }
 }
 
