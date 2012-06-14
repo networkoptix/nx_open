@@ -20,7 +20,7 @@ DragProcessor::DragProcessor(QObject *parent):
     m_flags(0),
     m_startDragDistance(-1),
     m_handler(NULL),
-    m_state(WAITING),
+    m_state(Waiting),
     m_dragTimerId(0),
     m_transitionCounter(0),
     m_firstDragSent(false)
@@ -31,7 +31,7 @@ DragProcessor::~DragProcessor() {
 }
 
 void DragProcessor::reset() {
-    transition(static_cast<QMouseEvent *>(NULL), WAITING);
+    transition(static_cast<QMouseEvent *>(NULL), Waiting);
 }
 
 void DragProcessor::setHandler(DragProcessHandler *handler) {
@@ -107,25 +107,25 @@ void DragProcessor::transitionInternalHelper(State newState) {
 
     /* Note that handler may trigger another transition. */
     switch(newState) {
-    case WAITING:
+    case Waiting:
         switch(m_state) {
-        case PREPAIRING:
+        case Prepairing:
             killDragTimer();
-            m_state = WAITING;
+            m_state = Waiting;
             if(m_handler != NULL)
                 m_handler->finishDragProcess(&m_info);
             break;
-        case DRAGGING:
+        case Running:
             if(m_handler != NULL) {
-                m_state = PREPAIRING;
+                m_state = Prepairing;
                 m_handler->finishDrag(&m_info);
                 if(transitionCounter == m_transitionCounter) {
                     /* No nested transitions => go on. */
-                    m_state = WAITING;
+                    m_state = Waiting;
                     m_handler->finishDragProcess(&m_info);
                 }
             } else {
-                m_state = WAITING;
+                m_state = Waiting;
             }
             break;
         default:
@@ -141,16 +141,16 @@ void DragProcessor::transitionInternalHelper(State newState) {
             m_info.m_item = NULL;
         }
         break;
-    case PREPAIRING:
+    case Prepairing:
         startDragTimer();
         switch(m_state) {
-        case WAITING:
-            m_state = PREPAIRING;
+        case Waiting:
+            m_state = Prepairing;
             if(m_handler != NULL)
                 m_handler->startDragProcess(&m_info);
             break;
-        case DRAGGING:
-            m_state = PREPAIRING;
+        case Running:
+            m_state = Prepairing;
             if(m_handler != NULL)
                 m_handler->finishDrag(&m_info);
             break;
@@ -158,23 +158,23 @@ void DragProcessor::transitionInternalHelper(State newState) {
             return;
         }
         break;
-    case DRAGGING:
+    case Running:
         switch(m_state) {
-        case WAITING:
+        case Waiting:
             if(m_handler != NULL) {
-                m_state = PREPAIRING;
+                m_state = Prepairing;
                 m_handler->startDragProcess(&m_info);
                 if(transitionCounter == m_transitionCounter) {
                     /* No nested transitions => go on. */
-                    m_state = DRAGGING;
+                    m_state = Running;
                     m_handler->startDrag(&m_info);
                 }
             } else {
-                m_state = DRAGGING;
+                m_state = Running;
             }
             break;
-        case PREPAIRING:
-            m_state = DRAGGING;
+        case Prepairing:
+            m_state = Running;
             killDragTimer();
             if(m_handler != NULL)
                 m_handler->startDrag(&m_info);
@@ -204,7 +204,7 @@ void DragProcessor::transition(QEvent *event, State state) {
         m_info.m_view = NULL;
         m_info.m_scene = NULL;
         m_info.m_item = NULL;
-        transitionInternal(event, WAITING);
+        transitionInternal(event, Waiting);
         return;
     }
 
@@ -290,28 +290,28 @@ template<class T, class Event>
 void DragProcessor::mousePressEventInternal(T *object, Event *event, bool instantDrag) {
     checkThread(object);
 
-    if(m_state == WAITING) {
+    if(m_state == Waiting) {
         m_info.m_triggerButton = event->button();
         m_info.m_lastMouseScreenPos = m_info.m_mousePressScreenPos = m_info.m_mouseScreenPos = screenPos(object, event);
         m_info.m_lastMouseScenePos = m_info.m_mousePressScenePos = m_info.m_mouseScenePos = scenePos(object, event);
         m_info.m_lastMouseItemPos = m_info.m_mousePressItemPos = m_info.m_mouseItemPos = itemPos(object, event);
 
         if(!instantDrag) {
-            transition(event, object, PREPAIRING);
+            transition(event, object, Prepairing);
         } else {
-            transition(event, object, DRAGGING);
+            transition(event, object, Running);
 
             /* Send drag right away if needed. */
-            if(m_state == DRAGGING)
+            if(m_state == Running)
                 drag(event, m_info.m_mousePressScreenPos, m_info.m_mousePressScenePos, m_info.m_mousePressItemPos); 
         }
     } else {
-        if(m_state == DRAGGING)
+        if(m_state == Running)
             drag(event, screenPos(object, event), scenePos(object, event), itemPos(object, event));
 
         /* Stop scrolling if the user has let go of the trigger button (even if we didn't get the release event). */
         if(!(event->buttons() & m_info.m_triggerButton))
-            transition(event, object, WAITING);
+            transition(event, object, Waiting);
     }
 }
 
@@ -322,10 +322,10 @@ QGraphicsView *DragProcessor::view(QWidget *viewport) {
 }
 
 void DragProcessor::timerEvent(QTimerEvent *event) {
-    transition(static_cast<QMouseEvent *>(NULL), DRAGGING);
+    transition(static_cast<QMouseEvent *>(NULL), Running);
 
     /* Send drag right away. */
-    if(m_state == DRAGGING) {
+    if(m_state == Running) {
         /* Using press pos here is not 100% correct, but we don't want to 
          * complicate the event handling logic even further to store the
          * current mouse pos. */
@@ -337,31 +337,31 @@ template<class T, class Event>
 void DragProcessor::mouseMoveEventInternal(T *object, Event *event) {
     checkThread(object);
 
-    if (m_state == WAITING)
+    if (m_state == Waiting)
         return;
 
     /* Stop dragging if the user has let go of the trigger button (even if we didn't get the release event). */
     if (!(event->buttons() & m_info.m_triggerButton)) {
-        transition(event, object, WAITING);
+        transition(event, object, Waiting);
         return;
     }
 
     /* Check for drag distance. */
-    if (m_state == PREPAIRING) {
+    if (m_state == Prepairing) {
         if ((m_info.m_mousePressScreenPos - screenPos(object, event)).manhattanLength() < effectiveStartDragDistance()) {
             return;
         } else {
-            transition(event, object, DRAGGING);
+            transition(event, object, Running);
         }
     }
 
     /* Perform drag operation. */
-    if(m_state == DRAGGING)
+    if(m_state == Running)
         drag(event, screenPos(object, event), scenePos(object, event), itemPos(object, event));
 }
 
 void DragProcessor::drag(QEvent *event, const QPoint &screenPos, const QPointF &scenePos, const QPointF &itemPos) {
-    assert(m_state == DRAGGING);
+    assert(m_state == Running);
 
     m_info.m_mouseScreenPos = screenPos;
     m_info.m_mouseScenePos = scenePos;
@@ -387,14 +387,14 @@ template<class T, class Event>
 void DragProcessor::mouseReleaseEventInternal(T *object, Event *event) {
     checkThread(object);
 
-    if (m_state == WAITING)
+    if (m_state == Waiting)
         return;
 
-    if(m_state == DRAGGING)
+    if(m_state == Running)
         drag(event, screenPos(object, event), scenePos(object, event), itemPos(object, event));
 
     if(event->button() == m_info.m_triggerButton) {
-        transition(event, object, WAITING);
+        transition(event, object, Waiting);
         return;
     }
 }
@@ -447,10 +447,10 @@ void DragProcessor::mouseReleaseEvent(QWidget *viewport, QMouseEvent *event) {
 void DragProcessor::widgetPaintEvent(QWidget *widget, QPaintEvent *event) {
     checkThread(widget);
 
-    if(m_state == DRAGGING) {
+    if(m_state == Running) {
         /* Stop dragging if the user has let go of the trigger button (even if we didn't get the release event). */
         if (!(QApplication::mouseButtons() & m_info.m_triggerButton)) {
-            transition(event, WAITING);
+            transition(event, Waiting);
             return;
         }
 
@@ -462,10 +462,10 @@ void DragProcessor::widgetPaintEvent(QWidget *widget, QPaintEvent *event) {
 void DragProcessor::paintEvent(QWidget *viewport, QPaintEvent *event) {
     checkThread(viewport);
 
-    if(m_state == DRAGGING) {
+    if(m_state == Running) {
         /* Stop dragging if the user has let go of the trigger button (even if we didn't get the release event). */
         if (!(QApplication::mouseButtons() & m_info.m_triggerButton)) {
-            transition(event, WAITING);
+            transition(event, Waiting);
             return;
         }
 

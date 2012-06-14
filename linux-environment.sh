@@ -3,11 +3,15 @@ sudo apt-get install -y openjdk-6-jre-headless protobuf-compiler build-essential
 mkdir -p ~/environment
 cd ~/environment
 
-mkdir maven
-cd ./maven
-wget --no-check-certificate https://boris:pizdohuj@noptix.enk.me/jenkins/maven.zip
-unzip ./maven.zip
-chmod 755 ~/environment/maven/bin/mvn
+hg clone ssh://hg@noptix.enk.me/buildenv ~/environment
+chmod 755 ~/environment/get_buildenv.sh
+~/environment/get_buildenv.sh
+
+#mkdir maven
+#cd ./maven
+#wget --no-check-certificate https://boris:pizdohuj@noptix.enk.me/jenkins/maven.zip
+#unzip ./maven.zip
+#chmod 755 ~/environment/maven/bin/mvn
 
 echo 'export environment=~/environment' >> ~/.profile
 echo 'export PATH=~/environment/maven/bin:'$PATH >> ~/.profile

@@ -44,9 +44,9 @@ class DragProcessor: public QObject, protected QnGeometry {
 
 public:
     enum State {
-        WAITING,    /**< Waiting for the drag process to start. */
-        PREPAIRING, /**< Drag process started, waiting for actual drag to start. */
-        DRAGGING    /**< Drag is in progress. */
+        Waiting,    /**< Waiting for the drag process to start. */
+        Prepairing, /**< Drag process started, waiting for actual drag to start. */
+        Running     /**< Drag is in progress. */
     };
 
     enum Flag {
@@ -66,15 +66,15 @@ public:
     }
 
     bool isWaiting() const {
-        return m_state == WAITING;
+        return m_state == Waiting;
     }
 
     bool isPrepairing() const {
-        return m_state == PREPAIRING;
+        return m_state == Prepairing;
     }
 
-    bool isDragging() const {
-        return m_state == DRAGGING;
+    bool isRunning() const {
+        return m_state == Running;
     }
 
     Flags flags() const {
@@ -100,7 +100,7 @@ public:
     void setStartDragDistance(int startDragDistance);
 
     /**
-     * Resets this drag processor, moving it into <tt>WAITING</tt> state. 
+     * Resets this drag processor, moving it into <tt>Waiting</tt> state. 
      */
     void reset();
 

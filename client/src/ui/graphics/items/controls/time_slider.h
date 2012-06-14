@@ -190,6 +190,8 @@ private:
 
     void setMarkerSliderPosition(Marker marker, qint64 position);
 
+    bool isAnimatingWindow() const;
+
     bool scaleWindow(qreal factor, qint64 anchor);
 
     void drawPeriodsBar(QPainter *painter, QnTimePeriodList &recorded, QnTimePeriodList &motion, const QRectF &rect);
