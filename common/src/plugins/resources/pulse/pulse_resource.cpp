@@ -1,5 +1,5 @@
 
-#include "../onvif/dataprovider/rtp264_stream_provider.h"
+#include "../onvif/dataprovider/rtp_stream_provider.h"
 #include "pulse_resource.h"
 
 

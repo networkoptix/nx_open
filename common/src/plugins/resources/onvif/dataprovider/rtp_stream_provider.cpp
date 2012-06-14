@@ -1,4 +1,4 @@
-#include "rtp264_stream_provider.h"
+#include "rtp_stream_provider.h"
 
 QnRtpStreamReader::QnRtpStreamReader(QnResourcePtr res, const QString& request):
 CLServerPushStreamreader(res),

@@ -1,6 +1,6 @@
 #include "../onvif/dataprovider/onvif_mjpeg.h"
 #include "iqinvision_resource.h"
-#include "../onvif/dataprovider/rtp264_stream_provider.h"
+#include "../onvif/dataprovider/rtp_stream_provider.h"
 
 const char* QnPlIqResource::MANUFACTURE = "IqEye";
 
