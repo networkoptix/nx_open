@@ -5,7 +5,7 @@ KineticProcessor::KineticProcessor(int type, QObject *parent):
     QObject(parent),
     mType(type),
     mFlags(0),
-    mState(MEASURING),
+    mState(Measuring),
     mHandler(NULL),
     mMaxShiftCount(DEFAULT_MAX_SHIFT_COUNT),
     mMaxShiftInterval(DEFAULT_MAX_SHIFT_INTERVAL_MSEC / 1000.0),
@@ -33,7 +33,7 @@ KineticProcessor::~KineticProcessor() {
 }
 
 void KineticProcessor::reset() {
-    transition(MEASURING);
+    transition(Measuring);
 
     mShifts.clear();
     mLastShiftTimeMSec = qnSyncTime->currentMSecsSinceEpoch();
@@ -179,12 +179,12 @@ void KineticProcessor::transition(State state) {
     mState = state;
 
     switch(state) {
-    case MEASURING: /* KINETIC -> MEASURING. */
+    case Measuring: /* Running -> Measuring. */
         stopListening();
         if(mHandler != NULL)
             mHandler->finishKinetic();
         return;
-    case KINETIC: /* MEASURING -> KINETIC. */
+    case Running: /* Measuring -> Running. */
         mInitialSpeed = mCurrentSpeed = calculateSpeed();
         if(mState == state) { /* State may get changed in a callback. */
             if(timer() == NULL) {

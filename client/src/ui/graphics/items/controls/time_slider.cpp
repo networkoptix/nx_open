@@ -607,6 +607,8 @@ QnThumbnailsLoader *QnTimeSlider::thumbnailsLoader() const {
 
 void QnTimeSlider::setThumbnailsLoader(QnThumbnailsLoader *loader) {
     m_thumbnailsLoader = loader;
+
+    updateThumbnails();
 }
 
 QPointF QnTimeSlider::positionFromValue(qint64 logicalValue, bool bound) const {
@@ -642,6 +644,10 @@ void QnTimeSlider::finishAnimations() {
 void QnTimeSlider::animatedUnzoom() {
     kineticProcessor()->reset(); /* Stop kinetic zoom. */
     m_unzooming = true;
+}
+
+bool QnTimeSlider::isAnimatingWindow() const {
+    return m_unzooming || kineticProcessor()->isRunning();
 }
 
 bool QnTimeSlider::scaleWindow(qreal factor, qint64 anchor) {
@@ -945,8 +951,14 @@ void QnTimeSlider::updateThumbnails() {
     if (!thumbnailsLoader())
         return;
 
+    /* Don't update thumbnails if slider window is being animated. */
+    if(isAnimatingWindow()) {
+        updateThumbnailsLater();
+        return;
+    }
+
     /* Don't load thumbnails too often. */
-    if (thumbnailsLoader()->currentMSecsSinceLastUpdate() < 500) {
+    if (thumbnailsLoader()->currentMSecsSinceLastUpdate() < 1000) {
         updateThumbnailsLater();
         return;
     }
@@ -964,6 +976,8 @@ void QnTimeSlider::updateThumbnails() {
     } else if(size.height() != boundingHeigth) { // TODO: evil hack, should work on signals.
         size = QSize(boundingHeigth * size.width() / size.height() , boundingHeigth);
     }
+    if(size.isEmpty())
+        return;
 
     QnTimePeriod targetPeriod(m_windowStart, m_windowEnd - m_windowStart);
     qint64 step = m_msecsPerPixel * size.width();
@@ -980,6 +994,8 @@ void QnTimeSlider::updateThumbnails() {
 
     /* Load, finally. */
     thumbnailsLoader()->loadRange(extendedTargetPeriod.startTimeMs, extendedTargetPeriod.endTimeMs(), step); 
+
+    qDebug() << "LOADED!!!" << QDateTime::currentMSecsSinceEpoch();
 }
 
 
@@ -1613,7 +1629,7 @@ void QnTimeSlider::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 void QnTimeSlider::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
     dragProcessor()->mouseMoveEvent(this, event);
 
-    if(!dragProcessor()->isDragging())
+    if(!dragProcessor()->isRunning())
         base_type::mouseMoveEvent(event);
 
     event->accept();

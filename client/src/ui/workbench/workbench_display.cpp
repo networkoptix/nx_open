@@ -1250,6 +1250,9 @@ void QnWorkbenchDisplay::at_workbench_itemChanged(Qn::ItemRole role, QnWorkbench
             if(widget->item() != newItem)
                 opacityAnimator(widget)->animateTo(opacity);
 
+        /* Update margin flags. */
+        updateCurrentMarginFlags();
+
         break;
     }
     case Qn::CentralRole: {
@@ -1265,12 +1268,8 @@ void QnWorkbenchDisplay::at_workbench_itemChanged(Qn::ItemRole role, QnWorkbench
         break;
     }
     default:
-        qnWarning("Invalid item role %1.", static_cast<int>(role));
         return;
     }
-
-    /* Update margin flags. */
-    updateCurrentMarginFlags();
 
     emit widgetChanged(role);
 }

@@ -51,8 +51,8 @@ public:
      * Kinetic state.
      */
     enum State {
-        MEASURING, /**< Recording shifts. */
-        KINETIC    /**< Performing kinetic motion. */
+        Measuring, /**< Recording shifts. */
+        Running    /**< Performing kinetic motion. */
     };
 
     enum {
@@ -87,7 +87,7 @@ public:
      * Starts kinetic process.
      */
     void start() {
-        transition(KINETIC);
+        transition(Running);
     }
 
     /**
@@ -116,6 +116,21 @@ public:
      */
     State state() const {
         return mState;
+    }
+
+    /**
+     * \returns                         Whether this processor is currently measuring offsets to
+     *                                  start a kinetic motion.
+     */
+    bool isMeasuring() const {
+        return mState == Measuring;
+    }
+
+    /**
+     * \returns                         Whether this processor is currently performing a kinetic motion.
+     */
+    bool isRunning() const {
+        return mState == Running;
     }
 
     /**
