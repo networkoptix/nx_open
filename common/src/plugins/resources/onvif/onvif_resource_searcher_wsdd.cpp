@@ -194,6 +194,8 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
             soap_end(soapWsddProxy.soap);
         }
 
+        soapWsddProxy.soap->socket = SOAP_INVALID_SOCKET;
+        soapWsddProxy.soap->master = SOAP_INVALID_SOCKET;
         qSocket.close();
     }
 }
