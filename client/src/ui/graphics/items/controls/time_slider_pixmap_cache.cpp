@@ -4,49 +4,23 @@
 #include <QtGui/QPainter>
 #include <QtGui/QFont>
 
-namespace {
-    QPixmap renderText(const QString &text, const QPen &pen, const QFont &font, int fontPixelSize = -1) {
-        QFont actualFont = font;
-        if(fontPixelSize != -1)
-            actualFont.setPixelSize(fontPixelSize);
-
-        QFontMetrics metrics(actualFont);
-        QSize textSize = metrics.size(Qt::TextSingleLine, text);
-        if(textSize.isEmpty())
-            return QPixmap();
-
-        QPixmap pixmap(textSize.width(), metrics.height());
-        pixmap.fill(QColor(0, 0, 0, 0));
-
-        QPainter painter(&pixmap);
-        painter.setCompositionMode(QPainter::CompositionMode_Source);
-        painter.setPen(pen);
-        painter.setFont(actualFont);
-        painter.drawText(pixmap.rect(), Qt::AlignCenter | Qt::TextSingleLine, text);
-        painter.end();
-
-        return pixmap;
-    }
-
-} // anonymous namespace
+#include <ui/common/text_pixmap_cache.h>
 
 QnTimeSliderPixmapCache::QnTimeSliderPixmapCache(QObject *parent):
-    QObject(parent)
-{
-    m_font = QApplication::font();
-}
+    QObject(parent),
+    m_font(QApplication::font()),
+    m_cache(QnTextPixmapCache::instance())
+{}
 
 QnTimeSliderPixmapCache::~QnTimeSliderPixmapCache() {
-    qDeleteAll(m_pixmapByCacheKey);
-    m_pixmapByCacheKey.clear();
     m_pixmapByShortPositionKey.clear();
     m_pixmapByLongPositionKey.clear();
 }
 
-Q_GLOBAL_STATIC(QnTimeSliderPixmapCache, qn_timeSliderPixmapCacheInstance)
+Q_GLOBAL_STATIC(QnTimeSliderPixmapCache, qn_timeSliderPixmapCache_instance)
 
 QnTimeSliderPixmapCache *QnTimeSliderPixmapCache::instance() {
-    return qn_timeSliderPixmapCacheInstance();
+    return qn_timeSliderPixmapCache_instance();
 }
 
 const QPixmap *QnTimeSliderPixmapCache::positionShortPixmap(qint64 position, int height, const QnTimeStep &step) {
@@ -70,23 +44,9 @@ const QPixmap *QnTimeSliderPixmapCache::positionLongPixmap(qint64 position, int 
 }
 
 const QPixmap *QnTimeSliderPixmapCache::textPixmap(const QString &text, int height, const QColor &color) {
-    QColor localColor = color.toRgb();
-    if(!localColor.isValid())
-        localColor = QColor(0, 0, 0, 255);
-
-    TextCacheKey key(text, height, localColor);
-
-    QHash<TextCacheKey, const QPixmap *>::const_iterator itr = m_pixmapByCacheKey.find(key);
-    if(itr != m_pixmapByCacheKey.end())
-        return *itr;
-
-    QPixmap *result = new QPixmap(renderText(
-        text,
-        QPen(localColor, 0), 
-        m_font, 
-        height
-    ));
-
-    return m_pixmapByCacheKey[key] = result;
+    QFont localFont = m_font;
+    localFont.setPixelSize(height);
+    
+    return m_cache->pixmap(text, localFont, color);
 }
 
