@@ -240,6 +240,70 @@ namespace{
 } // anonymous namespace
 #endif
 
+#ifndef Q_OS_WIN
+namespace{
+    char* GetSystemOutput(char* cmd)
+    {
+        int buff_size = 32;
+        char* buff = new char[buff_size];
+
+        char* ret = NULL;
+        string str = "";
+
+        int fd[2];
+        int old_fd[3];
+        pipe(fd);
+
+        old_fd[0] = dup(STDIN_FILENO);
+        old_fd[1] = dup(STDOUT_FILENO);
+        old_fd[2] = dup(STDERR_FILENO);
+
+        int pid = fork();
+        switch(pid)
+        {
+        case 0:
+            close(fd[0]);
+            close(STDOUT_FILENO);
+            close(STDERR_FILENO);
+            dup2(fd[1], STDOUT_FILENO);
+            dup2(fd[1], STDERR_FILENO);
+            system(cmd);
+            //execlp((const char*)cmd, cmd,0);
+            close (fd[1]);
+            exit(0);
+            break;
+        case -1:
+            cerr << "GetSystemOutput/fork() error\n" << endl;
+            exit(1);
+        default:
+            close(fd[1]);
+            dup2(fd[0], STDIN_FILENO);
+
+            int rc = 1;
+            while (rc > 0)
+            {
+                rc = read(fd[0], buff, buff_size);
+                str.append(buff, rc);
+                //memset(buff, 0, buff_size);
+            }
+
+            ret = new char [strlen((char*)str.c_str())];
+
+            strcpy(ret, (char*)str.c_str());
+
+            waitpid(pid, NULL, 0);
+            close(fd[0]);
+        }
+
+        dup2(STDIN_FILENO, old_fd[0]);
+        dup2(STDOUT_FILENO, old_fd[1]);
+        dup2(STDERR_FILENO, old_fd[2]);
+
+        return ret;
+    }
+} //anonymous namespace
+#endif
+
 namespace {
 #ifdef Q_OS_WIN
     qint64 fileTimeToNSec(const FILETIME &fileTime) {
@@ -273,7 +337,55 @@ namespace {
 
     Q_GLOBAL_STATIC_WITH_INITIALIZER(qint64, qn_estimatedCpuFrequency, { *x = estimateCpuFrequency(); });
 #endif
+} // anonymous namespace
 
+namespace {
+QString estimateCpuBrand() {
+    #ifdef Q_OS_WIN
+        int CPUInfo[4] = {-1};
+        unsigned   nExIds, i =  0;
+        char CPUBrandString[0x40];
+        // Get the information associated with each extended ID.
+        __cpuid(CPUInfo, 0x80000000);
+        nExIds = CPUInfo[0];
+        for (i=0x80000000; i<=nExIds; ++i)
+        {
+            __cpuid(CPUInfo, i);
+            // Interpret CPU brand string
+            if  (i == 0x80000002)
+                memcpy(CPUBrandString, CPUInfo, sizeof(CPUInfo));
+            else if  (i == 0x80000003)
+                memcpy(CPUBrandString + 16, CPUInfo, sizeof(CPUInfo));
+            else if  (i == 0x80000004)
+                memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
+        }
+        return CPUBrandString;
+#else
+    // const 14 - length of substring 'model name : '
+    return GetSystemOutput("grep 'model name' /proc/cpuinfo | head -1 | awk '{print substr($0, 14)}'");
+#endif
+    }
+    Q_GLOBAL_STATIC_WITH_INITIALIZER(QString, qn_estimatedCpuBrand, { *x = estimateCpuBrand(); });
+} // anonymous namespace
+
+namespace {
+    int estimateCpuCores() {
+        int qt_count = QThread::idealThreadCount();
+        if (qt_count > 0)
+            return qt_count;
+
+#ifdef Q_OS_WIN
+        SYSTEM_INFO sysInfo;
+        GetSystemInfo(&sysInfo);
+        return sysInfo.dwNumberOfProcessors;
+#else
+        // does not support multi-core processors yes
+        // 'cpu cores' check is required
+        return QString(GetSystemOutput("grep 'processor' /proc/cpuinfo | wc -l")).toInt();
+#endif
+    }
+
+    Q_GLOBAL_STATIC_WITH_INITIALIZER(int, qn_estimatedCpuCores, { *x = estimateCpuCores(); });
 } // anonymous namespace
 
 
@@ -324,60 +436,12 @@ qint64 QnPerformance::currentCpuUsage(){
 #endif
 }
 
-namespace {
-#ifdef Q_OS_WIN
-    QString estimateCpuBrand() {
-        int CPUInfo[4] = {-1};
-        unsigned   nExIds, i =  0;
-        char CPUBrandString[0x40];
-        // Get the information associated with each extended ID.
-        __cpuid(CPUInfo, 0x80000000);
-        nExIds = CPUInfo[0];
-        for (i=0x80000000; i<=nExIds; ++i)
-        {
-            __cpuid(CPUInfo, i);
-            // Interpret CPU brand string
-            if  (i == 0x80000002)
-                memcpy(CPUBrandString, CPUInfo, sizeof(CPUInfo));
-            else if  (i == 0x80000003)
-                memcpy(CPUBrandString + 16, CPUInfo, sizeof(CPUInfo));
-            else if  (i == 0x80000004)
-                memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
-        }
-        return CPUBrandString;
-    }
-
-    Q_GLOBAL_STATIC_WITH_INITIALIZER(QString, qn_estimatedCpuBrand, { *x = estimateCpuBrand(); });
-#endif
-
-} // anonymous namespace
-
-namespace {
-#ifdef Q_OS_WIN
-    int estimateCpuCores() {
-        SYSTEM_INFO sysInfo;
-        GetSystemInfo(&sysInfo);
-        return sysInfo.dwNumberOfProcessors;
-    }
-
-    Q_GLOBAL_STATIC_WITH_INITIALIZER(int, qn_estimatedCpuCores, { *x = estimateCpuCores(); });
-#endif
-
-} // anonymous namespace
-
 QString QnPerformance::getCpuBrand(){
-#ifdef Q_OS_WIN
     return *qn_estimatedCpuBrand();
-#else
-    return "Sandy Bridge @3.5GHz"
-#endif
 }
 
 int QnPerformance::getCpuCores(){
-#ifdef Q_OS_WIN
     return *qn_estimatedCpuCores();
-#else
-    return 4;
 #endif
 }
 
