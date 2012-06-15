@@ -1050,7 +1050,6 @@ void QnMotionEstimation::setMotionMask(const QnMotionRegion& region)
     QMutexLocker lock(&m_mutex);
     qFreeAligned(m_motionMask);
     qFreeAligned(m_motionSensMask);
-    qFreeAligned(m_linkedNums);
     m_motionMask = (quint8*) qMallocAligned(MD_WIDTH * MD_HEIGHT, 32);
     m_motionSensMask = (quint8*) qMallocAligned(MD_WIDTH * MD_HEIGHT, 32);
 
