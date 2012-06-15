@@ -353,21 +353,21 @@ bool QnMjpegRtpParser::processData(quint8* rtpBuffer, int readed, const RtspStat
     int height = *curPtr++;
 
     bytesLeft-=8;
+
+    quint16 dri = 0;
+    // 2. restart marker header (optional)
+    if (jpegType >= 64 && jpegType <= 127)
+    {
+        if (bytesLeft < 4)
+            return false;
+        dri = (curPtr[0] << 8) + curPtr[1];
+
+        curPtr += 4;
+        bytesLeft -= 4;
+    }
+
     if (fragmentOffset == 0)
     {
-        quint16 dri = 0;
-
-        // 2. restart marker header (optional)
-        if (jpegType >= 64 && jpegType <= 127)
-        {
-            if (bytesLeft < 4)
-                return false;
-            dri = (curPtr[0] << 8) + curPtr[1];
-            
-            curPtr += 4;
-            bytesLeft -= 4;
-        }
-
         //3. Quantization Table header
         quint8* lummaTable = 0;
         quint8* chromaTable = 0;
