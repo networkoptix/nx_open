@@ -360,12 +360,12 @@ bool QnMjpegRtpParser::processData(quint8* rtpBuffer, int readed, const RtspStat
         // 2. restart marker header (optional)
         if (jpegType >= 64 && jpegType <= 127)
         {
-            if (bytesLeft < 3)
+            if (bytesLeft < 4)
                 return false;
             dri = (curPtr[0] << 8) + curPtr[1];
             
-            curPtr += 3;
-            bytesLeft -= 3;
+            curPtr += 4;
+            bytesLeft -= 4;
         }
 
         //3. Quantization Table header
@@ -386,6 +386,11 @@ bool QnMjpegRtpParser::processData(quint8* rtpBuffer, int readed, const RtspStat
 
             int lummaSize = (Precision&1) ? 2 : 1;
             int chromaSize = (Precision&2) ? 2 : 1;
+
+            if (lummaSize != 1 || chromaSize != 1) {
+                qWarning() << "16 bit MJPEG are not supported";
+                return false; // only 8 bit MJPEG are supported
+            }
 
             if (length > 0) {
                 if (length < 64 * (lummaSize+chromaSize))
