@@ -276,16 +276,14 @@ void QnAviArchiveDelegate::doNotFindStreamInfo()
 
 void QnAviArchiveDelegate::close()
 {
+    if (m_formatContext) 
+        avformat_close_input(&m_formatContext);
+
     if (m_ioContext)
     {
         m_storage->closeFfmpegIOContext(m_ioContext);
         m_ioContext = 0;
-        if (m_formatContext)
-            m_formatContext->pb = 0;
     }
-
-    if (m_formatContext) 
-        avformat_close_input(&m_formatContext);
     
     m_contexts.clear();
     m_formatContext = 0;
