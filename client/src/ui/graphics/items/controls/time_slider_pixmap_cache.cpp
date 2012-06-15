@@ -9,7 +9,9 @@
 QnTimeSliderPixmapCache::QnTimeSliderPixmapCache(QObject *parent):
     QObject(parent),
     m_font(QApplication::font()),
-    m_cache(QnTextPixmapCache::instance())
+    m_cache(QnTextPixmapCache::instance()),
+    m_pixmapByShortPositionKey(64 * 1024 * 1024), /* These are frequently reused, so we want the cache to be big. */
+    m_pixmapByLongPositionKey(2 * 1024 * 1024) /* These are rarely reused once out of scope, so we don't want the cache to be large. */
 {}
 
 QnTimeSliderPixmapCache::~QnTimeSliderPixmapCache() {
@@ -23,27 +25,31 @@ QnTimeSliderPixmapCache *QnTimeSliderPixmapCache::instance() {
     return qn_timeSliderPixmapCache_instance();
 }
 
-const QPixmap *QnTimeSliderPixmapCache::positionShortPixmap(qint64 position, int height, const QnTimeStep &step) {
+const QPixmap &QnTimeSliderPixmapCache::positionShortPixmap(qint64 position, int height, const QnTimeStep &step) {
     qint32 key = shortCacheKey(position, height, step);
 
-    QHash<qint32, const QPixmap *>::const_iterator itr = m_pixmapByShortPositionKey.find(key);
-    if(itr != m_pixmapByShortPositionKey.end())
-        return *itr;
+    const QPixmap *result = m_pixmapByShortPositionKey.object(key);
+    if(result)
+        return *result;
 
-    return m_pixmapByShortPositionKey[key] = textPixmap(toShortString(position, step), height, QColor(255, 255, 255, 255));
+    result = new QPixmap(textPixmap(toShortString(position, step), height, QColor(255, 255, 255, 255)));
+    m_pixmapByShortPositionKey.insert(key, result, result->width() * result->height() * result->depth() / 8);
+    return *result;
 }
 
-const QPixmap *QnTimeSliderPixmapCache::positionLongPixmap(qint64 position, int height, const QnTimeStep &step) {
+const QPixmap &QnTimeSliderPixmapCache::positionLongPixmap(qint64 position, int height, const QnTimeStep &step) {
     QnTimeStepLongCacheKey key = longCacheKey(position, height, step);
 
-    QHash<QnTimeStepLongCacheKey, const QPixmap *>::const_iterator itr = m_pixmapByLongPositionKey.find(key);
-    if(itr != m_pixmapByLongPositionKey.end())
-        return *itr;
+    const QPixmap *result = m_pixmapByLongPositionKey.object(key);
+    if(result)
+        return *result;
 
-    return m_pixmapByLongPositionKey[key] = textPixmap(toLongString(position, step), height, QColor(255, 255, 255, 255));
+    result = new QPixmap(textPixmap(toLongString(position, step), height, QColor(255, 255, 255, 255)));
+    m_pixmapByLongPositionKey.insert(key, result, result->width() * result->height() * result->depth() / 8);
+    return *result;
 }
 
-const QPixmap *QnTimeSliderPixmapCache::textPixmap(const QString &text, int height, const QColor &color) {
+const QPixmap &QnTimeSliderPixmapCache::textPixmap(const QString &text, int height, const QColor &color) {
     QFont localFont = m_font;
     localFont.setPixelSize(height);
     
