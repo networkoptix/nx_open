@@ -471,6 +471,29 @@ void QnMain::run()
 
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
+    QByteArray errorString;
+    QnConnectInfoPtr connectInfo(new QnConnectInfo());
+    while (!needToStop() && appServerConnection->connect(connectInfo, errorString))
+    {
+        cl_log.log("Can't connect to Enterprise Controller: ", errorString.data(), cl_logWARNING);
+        QnSleep::msleep(1000);
+    }
+
+    QnCompatibilityChecker remoteChecker(connectInfo->compatibilityItems);
+    QnCompatibilityChecker localChecker(localCompatibilityItems());
+
+    QnCompatibilityChecker* compatibilityChecker;
+    if (remoteChecker.size() > localChecker.size())
+        compatibilityChecker = &remoteChecker;
+    else
+        compatibilityChecker = &localChecker;
+
+    if (!compatibilityChecker->isCompatible("MediaServer", qApp->applicationVersion(), "ECS", connectInfo->version))
+    {
+        cl_log.log(cl_logERROR, "Incompatible Enterprise Controller version detected! Giving up.");
+        return;
+    }
+
     while (!needToStop() && !initResourceTypes(appServerConnection))
     {
         QnSleep::msleep(1000);
@@ -514,8 +537,6 @@ void QnMain::run()
         if (m_videoServer.isNull())
             QnSleep::msleep(1000);
     }
-
-    QByteArray errorString;
 
     int status;
     do

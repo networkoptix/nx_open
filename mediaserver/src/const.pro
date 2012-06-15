@@ -192,3 +192,5 @@ DEFINES += CL_TRIAL_MODE CL_FORCE_LOGO
 OVERRIDE_DEFINITION = "override="
 win32-msvc*:OVERRIDE_DEFINITION = "override=override"
 DEFINES += $$OVERRIDE_DEFINITION
+
+SOURCES += $$PWD/../build/generated/compatibility_info.cpp

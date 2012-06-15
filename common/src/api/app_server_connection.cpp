@@ -191,6 +191,27 @@ int QnAppServerConnection::connectAsync(QObject* target, const char *slot)
     return connectAsync_i(params, target, slot);
 }
 
+int QnAppServerConnection::connect(QnConnectInfoPtr &connectInfo, QByteArray& errorString)
+{
+    QByteArray data;
+    QByteArray replyData;
+
+    QnRequestParamList params;
+    int status = QnSessionManager::instance()->sendPostRequest(m_url, "connect", params, data, replyData, errorString);
+
+    if (status == 0)
+    {
+        try {
+            m_serializer.deserializeConnectInfo(connectInfo, replyData);
+        } catch (const QnSerializeException& e) {
+            errorString += e.errorString();
+            status = -1;
+        }
+    }
+
+    return status;
+}
+
 QnAppServerConnection::~QnAppServerConnection()
 {
 }

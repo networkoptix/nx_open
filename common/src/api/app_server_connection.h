@@ -60,6 +60,8 @@ public:
     int testConnectionAsync(QObject* target, const char* slot);
     int connectAsync(QObject* target, const char *slot);
 
+    int connect(QnConnectInfoPtr& connectInfo, QByteArray &errorString);
+
     int getResourceTypes(QnResourceTypeList& resourceTypes, QByteArray& errorString);
 
     int getResources(QnResourceList& resources, QByteArray& errorString);

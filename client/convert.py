@@ -139,6 +139,7 @@ os.mkdir('bin/debug-test')
 os.mkdir('bin/release-test')
 
 os.mkdir('build')
+os.mkdir('build/generated')
 
 if platform() == 'mac':
     ldpath_debug = ''
@@ -192,7 +193,6 @@ gen_version_h()
 
 genskin()
 
-os.makedirs('build/generated')
 gencomp_cpp(open('build/generated/compatibility_info.cpp', 'w'))
 
 index_dirs(('src',), 'src/const.pro', 'src/client.pro', exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
