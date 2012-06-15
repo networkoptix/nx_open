@@ -1,38 +1,39 @@
 #include "performance.h"
-#include <QtGlobal>
+
+#include <QtCore/QtGlobal>
 
 #ifdef Q_OS_WIN
 #   define NOMINMAX
+#   define _WIN32_DCOM
 #   include <Windows.h>
+#   include <comdef.h>
+#   include <Wbemidl.h>
+#   pragma comment(lib, "wbemuuid.lib")
 #endif
+
+#include "warnings.h"
+
+namespace {
 
 // cpu_usage block
 #ifdef Q_OS_WIN
-#include "warnings.h"
 
-#define _WIN32_DCOM
-#include <comdef.h>
-#include <Wbemidl.h>
-# pragma comment(lib, "wbemuuid.lib")
-
-namespace{
-    // Does not work in Windows 2000 or earlier
-    class WmiRefresher{
-
+    // Does not work in Windows 2000 or earlier // TODO: check windows version and write a qnWarning about it.
+    class WmiRefresher {
     public:
-        WmiRefresher(){
+        WmiRefresher() {
             m_locator = NULL;
             m_service = NULL;
             m_cpu_count = -1;
             m_prev_cpu = 0;
             m_prev_ts = 0;
-            m_usage = 50;
+            m_usage = 0;
             m_initialized = init();
         }
 
-        ~WmiRefresher(){
+        ~WmiRefresher() {
             if(m_initialized){
-                m_service->Release();
+                m_service->Release(); 
                 m_locator->Release();     
                 CoUninitialize();
             }
@@ -42,14 +43,14 @@ namespace{
             }
         }
 
-        uint usage(){
+        uint usage() {
             return m_usage;
         }
 
     private:
         static VOID CALLBACK timerCallback(HWND /*hwnd*/, UINT /*uMsg*/, UINT_PTR /*idEvent*/, DWORD /*dwTime*/);
 
-        void refresh(){
+        void refresh() {
             char q_str[100];
             sprintf(q_str, "SELECT * FROM Win32_PerfRawData_PerfProc_Thread WHERE IdProcess=%d", GetCurrentProcessId());
             IEnumWbemClassObject* pEnumerator = query(q_str);
@@ -58,7 +59,7 @@ namespace{
                 ULONG uReturn = 0;
                 qulonglong cpu = 0;
                 qulonglong ts = 0;
-                while (pEnumerator)
+                while (pEnumerator) // TODO: maybe while(true) ?
                 {
                     pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
 
@@ -68,7 +69,7 @@ namespace{
                     VARIANT vtProc;
 
                     pclsObj->Get(L"PercentProcessorTime", 0, &vtProc, 0, 0);
-                    QString qstr((QChar*)vtProc.bstrVal, ::SysStringLen(vtProc.bstrVal));
+                    QString qstr((QChar*)vtProc.bstrVal, ::SysStringLen(vtProc.bstrVal)); // TODO: check VARIANT type (vtProc.vt), or maybe write a more generic variant-to-longlong conversion function.
                     cpu = cpu + qstr.toULongLong();
 
                     if (ts == 0){
@@ -170,7 +171,6 @@ namespace{
 
             // Step 5: --------------------------------------------------
             // Set security levels on the proxy -------------------------
-
             hres = CoSetProxyBlanket(
                 m_service,                   // Indicates the proxy to set
                 RPC_C_AUTHN_WINNT,           // RPC_C_AUTHN_xxx
@@ -217,6 +217,9 @@ namespace{
         }
 
     private:
+        // TODO: add doxydocs for the class fields.
+
+
         bool m_initialized;
         IWbemLocator *m_locator;
         IWbemServices *m_service;
@@ -225,24 +228,21 @@ namespace{
         quint64 m_prev_ts;
         uint m_usage;
         UINT_PTR m_timer;
-
-
     };
 
     Q_GLOBAL_STATIC(WmiRefresher, refresherInstance);
-    // initializer for Q_GLOBAL_STATIC singletone
+    // initializer for Q_GLOBAL_STATIC singleton
     WmiRefresher* dummy = refresherInstance();
 
     VOID CALLBACK WmiRefresher::timerCallback(HWND /*hwnd*/, UINT /*uMsg*/, UINT_PTR /*idEvent*/, DWORD /*dwTime*/) {
         refresherInstance()->refresh();
     }
 
-} // anonymous namespace
-#else
+#else // TODO: #elif here
+
 #include <time.h>
 #include <signal.h>
 
-namespace {
     class CpuUsageRefresher{
 
     public:
@@ -250,7 +250,7 @@ namespace {
             m_cpu_count = -1;
             m_prev_cpu = 0;
             m_prev_ts = 0;
-            m_usage = 50;
+            m_usage = 0;
             m_initialized = init();
         }
 
@@ -296,7 +296,6 @@ namespace {
             its.it_value.tv_sec = 0;
             its.it_value.tv_nsec = expireMS * 1000000;
             timer_settime(*m_timer, 0, &its, NULL);
-
             
             return true;
         }
@@ -317,14 +316,10 @@ namespace {
     VOID CALLBACK CpuUsageRefresher::timerCallback(int sig, siginfo_t *si, void *uc){
         refresherInstance()->refresh();
     }
-}
-
-
 #endif
 
-namespace{
 #ifndef Q_OS_WIN
-    QString GetSystemOutput(char* cmd)
+    QString GetSystemOutput(const char *cmd) // TODO: class & type names start with a Capital letter, function names with a lowercase.
     {
         QProcess p;
         p.start(cmd);
@@ -337,9 +332,7 @@ namespace{
         return p.readAll();
     }
 #endif
-} //anonymous namespace
 
-namespace {
 #ifdef Q_OS_WIN
     qint64 fileTimeToNSec(const FILETIME &fileTime) {
         LARGE_INTEGER intTime;
@@ -372,12 +365,11 @@ namespace {
 
     Q_GLOBAL_STATIC_WITH_INITIALIZER(qint64, qn_estimatedCpuFrequency, { *x = estimateCpuFrequency(); });
 #endif
-} // anonymous namespace
 
-namespace {
-QString estimateCpuBrand() {
-    #ifdef Q_OS_WIN
-        int CPUInfo[4] = {-1};
+
+    QString estimateCpuBrand() {
+#ifdef Q_OS_WIN
+        int CPUInfo[4] = {-1}; // TODO: class names start with a Capital letter, variable names - with a lowercase.
         unsigned   nExIds, i =  0;
         char CPUBrandString[0x40];
         // Get the information associated with each extended ID.
@@ -397,13 +389,11 @@ QString estimateCpuBrand() {
         return CPUBrandString;
 #else
     // const 14 - length of substring 'model name : '
-    return GetSystemOutput("grep 'model name' /proc/cpuinfo | head -1 | awk '{print substr($0, 14)}'");
+    return GetSystemOutput("grep 'model name' /proc/cpuinfo | head -1 | awk '{print substr($0, 14)}'"); // TODO: get rid of `awk`, extract what is needed here.
 #endif
     }
-    Q_GLOBAL_STATIC_WITH_INITIALIZER(QString, qn_estimatedCpuBrand, { *x = estimateCpuBrand(); });
-} // anonymous namespace
 
-namespace {
+
     int estimateCpuCores() {
         int qt_count = QThread::idealThreadCount();
         if (qt_count > 0)
@@ -421,7 +411,9 @@ namespace {
 #endif
     }
 
+    Q_GLOBAL_STATIC_WITH_INITIALIZER(QString, qn_estimatedCpuBrand, { *x = estimateCpuBrand(); });
     Q_GLOBAL_STATIC_WITH_INITIALIZER(int, qn_estimatedCpuCores, { *x = estimateCpuCores(); });
+
 } // anonymous namespace
 
 
