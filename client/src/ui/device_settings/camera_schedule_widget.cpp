@@ -354,6 +354,16 @@ void QnCameraScheduleWidget::updateGridParams(bool fromUserInput)
     emit gridParamsChanged();
 }
 
+void QnCameraScheduleWidget::setFps(int value)
+{
+    ui->fpsSpinBox->setValue(value);
+}
+
+int QnCameraScheduleWidget::getMaxFps() const
+{
+    return ui->fpsSpinBox->maximum();
+}
+
 void QnCameraScheduleWidget::setMaxFps(int value)
 {
     if(value < ui->fpsSpinBox->minimum())

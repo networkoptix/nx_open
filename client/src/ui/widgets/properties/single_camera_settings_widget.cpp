@@ -232,6 +232,12 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         QnVirtualCameraResourceList cameras;
         cameras.push_back(m_camera);
         ui->cameraScheduleWidget->setCameras(cameras);
+
+        int currentCameraFps = ui->cameraScheduleWidget->getGridMaxFps();
+        if (currentCameraFps > 0)
+            ui->cameraScheduleWidget->setFps(currentCameraFps);
+        else
+            ui->cameraScheduleWidget->setFps(ui->cameraScheduleWidget->getMaxFps()/2);
     }
 
     setHasChanges(false);

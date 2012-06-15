@@ -27,6 +27,8 @@ public:
     void setScheduleTasks(const QList<QnScheduleTask::Data> &tasks);
     void setScheduleEnabled(bool enabled);
     void setMaxFps(int value);
+    int getMaxFps() const;
+    void setFps(int value);
 
     int activeCameraCount() const;
 
