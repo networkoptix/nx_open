@@ -74,9 +74,9 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
 
         qDebug() << "Trying login = " << login << ", password = " << passwd;
 
-        _onvifDevice__GetDeviceInformation request1;
-        _onvifDevice__GetDeviceInformationResponse response1;
-        soapRes = soapProxy.GetDeviceInformation(endpoint.toStdString().c_str(), NULL, &request1, &response1);
+        _onvifDevice__GetNetworkInterfaces request1;
+        _onvifDevice__GetNetworkInterfacesResponse response1;
+        soapRes = soapProxy.GetNetworkInterfaces(endpoint.toStdString().c_str(), NULL, &request1, &response1);
 
         if (soapRes == SOAP_OK || !passwordsData.isNotAuthenticated(soapProxy.soap_fault())) {
             qDebug() << "Finished picking password";
