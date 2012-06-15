@@ -138,7 +138,7 @@ namespace {
     const qreal dateTextBottomMargin = 0.1;
 
     const qreal minDateSpanFraction = 0.15;
-    const qreal minDateSpanPixels = 140;
+    const qreal minDateSpanPixels = 160;
 
 
     

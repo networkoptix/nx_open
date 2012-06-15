@@ -496,6 +496,7 @@ void QnWorkbenchNavigator::updateCentralWidget() {
     m_centralWidget = centralWidget;
 
     updateCurrentWidget();
+    updateThumbnailsLoader();
 }
 
 void QnWorkbenchNavigator::updateCurrentWidget() {
@@ -558,7 +559,6 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     updatePlaying();
     updateSpeedRange();
     updateSpeed();
-    updateThumbnailsLoader();
 
     emit currentWidgetChanged();
 }
@@ -778,8 +778,8 @@ void QnWorkbenchNavigator::updateSpeedRange() {
 }
 
 void QnWorkbenchNavigator::updateThumbnailsLoader() {
-    if (m_currentWidget) {
-        m_thumbnailsLoader.reset(new QnThumbnailsLoader(m_currentWidget->resource()));
+    if (m_centralWidget) {
+        m_thumbnailsLoader.reset(new QnThumbnailsLoader(m_centralWidget->resource()));
     } else {
         m_thumbnailsLoader.reset();
     }
