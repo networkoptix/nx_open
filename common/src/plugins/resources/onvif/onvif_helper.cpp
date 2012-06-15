@@ -103,6 +103,8 @@ PasswordHelper::PasswordHelper()
 
     setPasswordInfo(CISCO_MANUFACTURER);
 
+    setPasswordInfo(DIGITALWATCHDOG_MANUFACTURER, ADMIN1, ADMIN1);
+
     setPasswordInfo(GRANDSTREAM_MANUFACTURER, ADMIN1, ADMIN1);
 
     setPasswordInfo(HIKVISION_MANUFACTURER, ADMIN1, PASSWD3);
