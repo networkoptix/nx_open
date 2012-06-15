@@ -280,6 +280,8 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     m_rulerHeight(0.0),
     m_prefferedHeight(0.0)
 {
+    m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("NO THUMBNAILS\nAVAILABLE"), 16, QColor(255, 255, 255, 255));
+
     /* Prepare thumbnail update timer. */
     m_thumbnailsUpdateTimer = new QTimer(this);
     connect(m_thumbnailsUpdateTimer, SIGNAL(timeout()), this, SLOT(updateThumbnails()));
@@ -1358,8 +1360,14 @@ void QnTimeSlider::drawThumbnails(QPainter *painter, const QRectF &rect) {
     if (rect.height() < thumbnailHeightForDrawing)
         return;
 
-    if (!thumbnailsLoader())
+    if (!thumbnailsLoader() || thumbnailsLoader()->loadedRange().isEmpty()) {
+        QSizeF labelSizeBound = rect.size();
+        labelSizeBound.setHeight(m_noThumbnailsPixmap->height());
+
+        QRectF labelRect = QnGeometry::aligned(QnGeometry::expanded(QnGeometry::aspectRatio(m_noThumbnailsPixmap->size()), labelSizeBound, Qt::KeepAspectRatio), rect, Qt::AlignCenter);
+        drawCroppedPixmap(painter, labelRect, rect, *m_noThumbnailsPixmap, m_noThumbnailsPixmap->rect());
         return;
+    }
 
     qint64 step = thumbnailsLoader()->step();
     if (thumbnailsLoader()->step() <= 0)

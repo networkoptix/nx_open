@@ -42,6 +42,13 @@ QnThumbnailsLoader::~QnThumbnailsLoader() {
     qFreeAligned(m_rgbaBuffer);
 }
 
+QnResourcePtr QnThumbnailsLoader::resource() const 
+{
+    QMutexLocker locker(&m_mutex);
+
+    return m_resource;
+}
+
 void QnThumbnailsLoader::setBoundingSize(const QSize &size) 
 {
     QMutexLocker locker(&m_mutex);

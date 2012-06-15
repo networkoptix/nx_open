@@ -778,13 +778,19 @@ void QnWorkbenchNavigator::updateSpeedRange() {
 }
 
 void QnWorkbenchNavigator::updateThumbnailsLoader() {
-    if (m_centralWidget) {
-        m_thumbnailsLoader.reset(new QnThumbnailsLoader(m_centralWidget->resource()));
-    } else {
-        m_thumbnailsLoader.reset();
-    }
+    QnResourcePtr resource;
 
-    m_timeSlider->setThumbnailsLoader(m_thumbnailsLoader.data());
+    if (m_centralWidget)
+        if(QnCachingTimePeriodLoader *loader = this->loader(m_centralWidget))
+            if(!loader->periods(Qn::RecordingRole).isEmpty())
+                resource = m_centralWidget->resource();
+
+    if(!resource) {
+        m_timeSlider->setThumbnailsLoader(NULL);
+    } else if(!m_timeSlider->thumbnailsLoader() || m_timeSlider->thumbnailsLoader()->resource() != resource) {
+        m_thumbnailsLoader.reset(new QnThumbnailsLoader(resource));
+        m_timeSlider->setThumbnailsLoader(m_thumbnailsLoader.data());
+    }
 }
 
 
@@ -854,6 +860,9 @@ void QnWorkbenchNavigator::at_loader_periodsChanged(QnCachingTimePeriodLoader *l
     
     if(m_syncedResources.contains(resource))
         updateSyncedPeriods(type);
+
+    if(m_centralWidget && m_centralWidget->resource() == resource)
+        updateThumbnailsLoader();
 }
 
 void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value) {

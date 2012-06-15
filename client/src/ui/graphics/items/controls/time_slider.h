@@ -279,6 +279,7 @@ private:
 
     QWeakPointer<QnThumbnailsLoader> m_thumbnailsLoader;
     QTimer *m_thumbnailsUpdateTimer;
+    const QPixmap *m_noThumbnailsPixmap;
 
     qreal m_rulerHeight;
     qreal m_prefferedHeight;
