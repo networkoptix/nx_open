@@ -1506,6 +1506,12 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
         m_layoutExportCamera->setResource(mediaRes);
         m_layoutExportCamera->exportMediaPeriodToFile(m_exportPeriod.startTimeMs * 1000ll, (m_exportPeriod.startTimeMs + m_exportPeriod.durationMs) * 1000ll, mediaRes->getUniqueId(), "mkv", m_exportStorage);
 
+        QnLayoutResourcePtr layout =  QnLayoutResource::fromFile(m_layoutFileName);
+        if (layout) {
+            layout->setStatus(QnResource::Online);
+            resourcePool()->addResource(layout);
+        }
+
         if(m_exportProgressDialog)
             m_exportProgressDialog.data()->setLabelText(tr("Exporting %1 to \"%2\"...").arg(mediaRes->getUrl()).arg(m_layoutFileName));
     }

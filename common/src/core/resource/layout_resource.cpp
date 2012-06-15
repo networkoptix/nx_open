@@ -1,5 +1,9 @@
 #include "layout_resource.h"
 #include <utils/common/warnings.h>
+#include "plugins/storage/file_storage/layout_storage_resource.h"
+#include "api/serializer/pb_serializer.h"
+#include "plugins/resources/archive/avi_files/avi_resource.h"
+#include "core/resourcemanagment/resource_pool.h"
 
 QnLayoutResource::QnLayoutResource(): 
     base_type(),
@@ -167,3 +171,53 @@ void QnLayoutResource::removeItemUnderLock(const QUuid &itemUuid) {
     m_mutex.unlock();
 }
 
+QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
+{
+    QnLayoutResourcePtr layout;
+    QnLayoutFileStorageResource layoutStorage;
+    layoutStorage.setUrl(xfile);
+    QIODevice* layoutFile = layoutStorage.open("layout.pb", QIODevice::ReadOnly);
+    if (layoutFile == 0)
+        return layout;
+    QByteArray layoutData = layoutFile->readAll();
+
+    QnApiPbSerializer serializer;
+    try {
+        serializer.deserializeLayout(layout, layoutData);
+        if (layout == 0)
+            return layout;
+    } catch(...) {
+        return layout;
+    }
+    layout->setGuid(QUuid::createUuid());
+    layout->setParentId(0);
+    layout->setId(QnId::generateSpecialId());
+    layout->setName(QFileInfo(xfile).fileName() + QString(" - ") + layout->getName());
+
+    layout->addFlags(QnResource::url);
+    layout->setUrl(xfile);
+
+    QnLayoutItemDataMap items = layout->getItems();
+    QnLayoutItemDataMap updatedItems;
+
+    // todo: here is bad place to add resources to pool. need rafactor
+    for(QnLayoutItemDataMap::iterator itr = items.begin(); itr != items.end(); ++itr)
+    {
+        QnLayoutItemData& item = itr.value();
+        item.uuid = QUuid::createUuid();
+        item.resource.id = QnId::generateSpecialId();
+        item.resource.path = QString("layout://") + xfile + QString('?') + item.resource.path + QString(".mkv");
+        updatedItems.insert(item.uuid, item);
+
+        QnStorageResourcePtr storage(new QnLayoutFileStorageResource());
+        storage->setUrl(QString("layout://") + xfile);
+
+        QnAviResourcePtr aviResource(new QnAviResource(item.resource.path));
+        aviResource->setStorage(storage);
+        aviResource->setId(item.resource.id);
+        qnResPool->addResource(aviResource);
+    }
+    layout->setItems(updatedItems);
+    layout->addFlags(QnResource::local_media);
+    return layout;
+}
