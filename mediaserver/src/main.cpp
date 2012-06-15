@@ -55,6 +55,10 @@
 #include "rest/handlers/get_statistics.h"
 
 
+// This constant is used while checking for compatibility.
+// Do not change it until you know what you're doing.
+static const char COMPONENT_NAME[] = "MediaServer";
+
 static const char SERVICE_NAME[] = "Network Optix VMS Media Server";
 
 class QnMain;
@@ -488,7 +492,7 @@ void QnMain::run()
     else
         compatibilityChecker = &localChecker;
 
-    if (!compatibilityChecker->isCompatible("MediaServer", qApp->applicationVersion(), "ECS", connectInfo->version))
+    if (!compatibilityChecker->isCompatible(COMPONENT_NAME, qApp->applicationVersion(), "ECS", connectInfo->version))
     {
         cl_log.log(cl_logERROR, "Incompatible Enterprise Controller version detected! Giving up.");
         return;
