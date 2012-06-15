@@ -688,6 +688,7 @@ void QnResourceWidget::updateButtonsVisibility() {
     if(m_closeButton->isVisible() != closeButtonVisible || m_infoButton->isVisible() != infoButtonVisible || m_searchButton->isVisible() != searchButtonVisible) {
         m_infoButton->setVisible(infoButtonVisible);
         m_closeButton->setVisible(closeButtonVisible);
+        m_searchButton->setVisible(searchButtonVisible);
         
         m_headerLayout->removeItem(m_searchButton);
         m_headerLayout->removeItem(m_rotateButton);
