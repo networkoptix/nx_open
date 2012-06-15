@@ -75,7 +75,7 @@ int nullGsoapFdisconnect(struct soap*)
 int gsoapFsend(struct soap *soap, const char *s, size_t n)
 {
     QUdpSocket& qSocket = *reinterpret_cast<QUdpSocket*>(soap->user);
-    qSocket.writeDatagram(QByteArray(std::string(s, n).c_str()), QHostAddress("239.255.255.250"), 3702);
+    qSocket.writeDatagram(QByteArray(s, n), QHostAddress("239.255.255.250"), 3702);
     return SOAP_OK;
 }
 
