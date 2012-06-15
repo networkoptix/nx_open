@@ -23,6 +23,8 @@
 
 #include "connection_testing_dialog.h"
 
+#include "connectinfo.h"
+
 namespace {
     void setEnabled(const QObjectList &objects, QObject *exclude, bool enabled) {
         foreach(QObject *object, objects)
@@ -153,7 +155,7 @@ void LoginDialog::accept()
     }
 
     QnAppServerConnectionPtr connection = QnAppServerConnectionFactory::createConnection(url);
-    m_requestHandle = connection->testConnectionAsync(this, SLOT(at_testFinished(int, const QByteArray &, const QByteArray &, int)));
+    m_requestHandle = connection->connectAsync(this, SLOT(at_connectFinished(int, const QByteArray &, QnConnectInfoPtr, int)));
 
     updateUsability();
 }
@@ -253,7 +255,7 @@ void LoginDialog::updateUsability() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void LoginDialog::at_testFinished(int status, const QByteArray &/*data*/, const QByteArray &/*errorString*/, int requestHandle)
+void LoginDialog::at_connectFinished(int status, const QByteArray &/*errorString*/, QnConnectInfoPtr connectInfo, int requestHandle)
 {
     if(m_requestHandle != requestHandle) 
         return;
@@ -266,6 +268,26 @@ void LoginDialog::at_testFinished(int status, const QByteArray &/*data*/, const 
             this, 
             tr("Could not connect to Enterprise Controller"), 
             tr("Connection to the Enterprise Controller could not be established.\nConnection details that you have entered are incorrect, please try again.\n\nIf this error persists, please contact your VMS administrator.")
+        );
+        return;
+    }
+
+
+    QnCompatibilityChecker remoteChecker(connectInfo->compatibilityItems);
+    QnCompatibilityChecker localChecker(localCompatibilityItems());
+
+    QnCompatibilityChecker* compatibilityChecker;
+    if (remoteChecker.size() > localChecker.size())
+        compatibilityChecker = &remoteChecker;
+    else
+        compatibilityChecker = &localChecker;
+
+    if (!compatibilityChecker->isCompatible("Client", qApp->applicationVersion(), "ECS", connectInfo->version))
+    {
+        QMessageBox::warning(
+            this,
+            tr("Could not connect to Enterprise Controller"),
+            tr("Connection could not be established.\nThe Enterprise Controller is incompatible. Please upgrade your client or contact VMS administrator.")
         );
         return;
     }

@@ -111,11 +111,6 @@ void QnSessionManager::doStop()
     }
 }
 
-int QnSessionManager::testConnectionAsync(const QUrl& url, QObject* receiver, const char *slot)
-{
-    return sendAsyncGetRequest(url, "ping", receiver, slot);
-}
-
 QUrl QnSessionManager::createApiUrl(const QUrl& baseUrl, const QString &objectName, const QnRequestParamList &params) const
 {
     QUrl url(baseUrl);

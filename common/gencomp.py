@@ -3,10 +3,13 @@ from compinfo import fill_compatibility_matrix, version_to_string, COMPATIBILITY
 def gencomp_cpp(xfile):
     header = """#include "compatibility.h"
 
-QnCompatibilityInfo compatibilityInfo[] = {
+QList<QnCompatibilityItem> localCompatibilityItems()
+{
+    QList<QnCompatibilityItem> items;
 """
 
     footer = """
+    return items;
 }"""
 
     fill_compatibility_matrix()
@@ -16,7 +19,7 @@ QnCompatibilityInfo compatibilityInfo[] = {
     sorted_matrix.sort(key=lambda x: x.v1[1] * 100 + hash(x.comp1) + x.v2[1])
 
     for ci in sorted_matrix:
-        print >> xfile, '    { "%s", "%s", "%s" },' % (version_to_string(ci.v1), ci.comp1, version_to_string(ci.v2))
+        print >> xfile, '    items.append(QnCompatibilityItem("%s", "%s", "%s"));' % (version_to_string(ci.v1), ci.comp1, version_to_string(ci.v2))
     print >> xfile, footer
 
 def gencomp_py(xfile):

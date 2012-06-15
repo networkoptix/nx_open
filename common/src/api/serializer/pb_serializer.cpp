@@ -5,6 +5,7 @@
 #include "resourceType.pb.h"
 #include "license.pb.h"
 #include "cameraServerItem.pb.h"
+#include "connectinfo.pb.h"
 
 #include "pb_serializer.h"
 
@@ -600,6 +601,24 @@ void QnApiPbSerializer::deserializeCameraHistoryList(QnCameraHistoryList &camera
     }
 
     parserCameraServerItems(cameraHistoryList, pb_csis.cameraserveritem());
+}
+
+void QnApiPbSerializer::deserializeConnectInfo(QnConnectInfoPtr& connectInfo, const QByteArray& data)
+{
+    proto::pb::ConnectInfo pb_connectInfo;
+
+    if (!pb_connectInfo.ParseFromArray(data.data(), data.size())) {
+        QByteArray errorString;
+        errorString = "QnApiPbSerializer::deserializeConnectInfo(): Can't parse message";
+        throw QnSerializeException(errorString);
+    }
+
+    connectInfo->version = pb_connectInfo.version().c_str();
+    typedef google::protobuf::RepeatedPtrField<proto::pb::CompatibilityItem> PbCompatibilityItemList;
+    PbCompatibilityItemList items = pb_connectInfo.compatibilityinfo().item();
+    for (PbCompatibilityItemList::const_iterator ci = items.begin(); ci != items.end(); ++ci) {
+        connectInfo->compatibilityItems.append(QnCompatibilityItem(ci->ver1().c_str(), ci->comp1().c_str(), ci->ver2().c_str()));
+    }
 }
 
 void QnApiPbSerializer::serializeCameras(const QnVirtualCameraResourceList& cameras, QByteArray& data)

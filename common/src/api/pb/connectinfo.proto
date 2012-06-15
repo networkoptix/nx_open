@@ -1,5 +1,8 @@
+package proto.pb;
+
 import "compatibility.proto";
 
 message ConnectInfo {
-    optional CompatibilityInfo compatibilityInfo = 1;
+    optional string version = 1;
+    optional CompatibilityInfo compatibilityInfo = 2;
 }

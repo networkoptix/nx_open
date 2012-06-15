@@ -251,4 +251,4 @@ DEFINES += $$OVERRIDE_DEFINITION
 # Uncomment to enable background color adjustment
 # DEFINES += QN_HAS_BACKGROUND_COLOR_ADJUSTMENT
 
-SOURCES += $$PWD/../build/generated/compatibility.cpp
+SOURCES += $$PWD/../build/generated/compatibility_info.cpp

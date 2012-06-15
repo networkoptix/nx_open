@@ -22,7 +22,7 @@ from convert import convert as convert_common
 from common_version import *
 
 from filetypes import all_filetypes, video_filetypes, image_filetypes
-from gencomp import gencomp
+from gencomp import gencomp_cpp
 
 APPLICATION_NAME = 'Network Optix HD Witness Client'
 
@@ -193,7 +193,7 @@ gen_version_h()
 genskin()
 
 os.makedirs('build/generated')
-gencomp_cpp(open('build/generated/compatibility.cpp', 'w'))
+gencomp_cpp(open('build/generated/compatibility_info.cpp', 'w'))
 
 index_dirs(('src',), 'src/const.pro', 'src/client.pro', exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
 instantiate_pro('src/client.pro', {'BUILDLIB' : BUILDLIB, 'FFMPEG' : ffmpeg_path, 'EVETOOLS_DIR' : tools_path})

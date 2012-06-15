@@ -11,8 +11,8 @@ V13 = Version(1, 3)
 V14 = Version(1, 4)
            
 COMPATIBILITY_INFO = (
-    (V13, (CL,), Range(V12, V12)),
-    (V14, (CL,), Range(V12, V13)),
+#    (V13, (CL,), Range(V12, V12)),
+#    (V14, (CL,), Range(V12, V13)),
 )
 COMPATIBILITY_MATRIX = set()
 
