@@ -90,6 +90,9 @@ namespace Qn {
 
         /** Unsaved changes are present in the layout. */
         LayoutIsChanged = 0x4,
+
+        /** Layout is a file. */
+        LayoutIsFile = 0x8,
     };
     Q_DECLARE_FLAGS(LayoutFlags, LayoutFlag);
 

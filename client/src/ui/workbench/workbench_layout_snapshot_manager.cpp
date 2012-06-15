@@ -144,7 +144,15 @@ void QnWorkbenchLayoutSnapshotManager::disconnectFrom(const QnLayoutResourcePtr 
 }
 
 Qn::LayoutFlags QnWorkbenchLayoutSnapshotManager::defaultFlags(const QnLayoutResourcePtr &resource) const {
-    return resource->getId().isSpecial() ? Qn::LayoutIsLocal : static_cast<Qn::LayoutFlags>(0);
+    Qn::LayoutFlags result;
+
+    if(resource->getId().isSpecial())
+        result |= Qn::LayoutIsLocal;
+
+    if((resource->flags() & QnResource::local_media) == QnResource::local_media)
+        result |= Qn::LayoutIsFile;
+
+    return result;
 }
 
 
