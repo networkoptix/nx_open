@@ -5,12 +5,6 @@
 
 class QnPerformance {
 public:
-	struct CpuInfo{
-		QString Model;
-		uint Cores;
-		QString Clock;
-	};
-
     static qint64 currentThreadTimeMSecs();
 
     /**
@@ -27,9 +21,21 @@ public:
 
     static qint64 currentCpuFrequency();
 
-	static qint64 currentCpuUsage();
+    /**
+     * \returns                         Percent of CPU time (both user and kernel) consumed 
+     *                                  by the current process in last few seconds.
+     */
+    static qint64 currentCpuUsage();
 
-	static CpuInfo getCpuInfo();
+    /**
+    * \returns                          Brandstring includes manufacturer, model and clockspeed
+    */
+    static QString getCpuBrand();
+
+    /**
+    * \returns                          Number of CPU cores
+    */
+    static int getCpuCores();
 };
 
 

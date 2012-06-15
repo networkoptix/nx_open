@@ -8,257 +8,236 @@
 
 // cpu_usage block
 #ifdef Q_OS_WIN
-	#include "warnings.h"
+#include "warnings.h"
 
-	#define _WIN32_DCOM
-	#include <comdef.h>
-	#include <Wbemidl.h>
-	# pragma comment(lib, "wbemuuid.lib")
+#define _WIN32_DCOM
+#include <comdef.h>
+#include <Wbemidl.h>
+# pragma comment(lib, "wbemuuid.lib")
 
 namespace{
-	class WmiRefresher;
+    // Does not work in Windows 2000 or earlier
+    class WmiRefresher{
 
-	// singletone instance to static timer link
-	static WmiRefresher* wmiRefresher = NULL;
+    public:
+        WmiRefresher(){
+            m_locator = NULL;
+            m_service = NULL;
+            m_cpu_count = -1;
+            m_prev_cpu = 0;
+            m_prev_ts = 0;
+            m_usage = 50;
+            m_initialized = init();
+        }
 
-	// Does not work in Windows 2000 or earlier
-	class WmiRefresher{
-	private:
-		bool m_initialized;
-		IWbemLocator *m_locator;
-		IWbemServices *m_service;
-		int m_cpu_count;
-		qulonglong m_prev_cpu;
-		qulonglong m_prev_ts;
-		uint m_usage;
-		UINT_PTR m_timer;
+        ~WmiRefresher(){
+            if(m_initialized){
+                m_service->Release();
+                m_locator->Release();     
+                CoUninitialize();
+            }
+            if(m_timer != 0) {
+                KillTimer(NULL, m_timer); 
+                m_timer = 0;
+            }
+        }
 
-	public:
-		void refresh(){
-			char q_str[100];
-			sprintf(q_str, "SELECT * FROM Win32_PerfRawData_PerfProc_Thread WHERE IdProcess=%d", GetCurrentProcessId());
-			IEnumWbemClassObject* pEnumerator = query(q_str);
-			if (pEnumerator){
-				IWbemClassObject *pclsObj;
-				ULONG uReturn = 0;
-				qulonglong cpu = 0;
-				qulonglong ts = 0;
-				while (pEnumerator)
-				{
-					pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
+        uint usage(){
+            return m_usage;
+        }
 
-					if(0 == uReturn)
-						break;
+    private:
+        static VOID CALLBACK timerCallback(HWND /*hwnd*/, UINT /*uMsg*/, UINT_PTR /*idEvent*/, DWORD /*dwTime*/);
 
-					VARIANT vtProc;
+        void refresh(){
+            char q_str[100];
+            sprintf(q_str, "SELECT * FROM Win32_PerfRawData_PerfProc_Thread WHERE IdProcess=%d", GetCurrentProcessId());
+            IEnumWbemClassObject* pEnumerator = query(q_str);
+            if (pEnumerator){
+                IWbemClassObject *pclsObj;
+                ULONG uReturn = 0;
+                qulonglong cpu = 0;
+                qulonglong ts = 0;
+                while (pEnumerator)
+                {
+                    pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
 
-					pclsObj->Get(L"PercentProcessorTime", 0, &vtProc, 0, 0);
-					QString qstr((QChar*)vtProc.bstrVal, ::SysStringLen(vtProc.bstrVal));
-					cpu = cpu + qstr.toULongLong();
+                    if(0 == uReturn)
+                        break;
 
-					if (ts == 0){
-						pclsObj->Get(L"Timestamp_Sys100NS",0, &vtProc, 0, 0);
-						QString qstr((QChar*)vtProc.bstrVal, ::SysStringLen(vtProc.bstrVal));
-						ts = qstr.toULongLong();
-					}
+                    VARIANT vtProc;
 
-					VariantClear(&vtProc);
-					pclsObj->Release();
-				}
-				pEnumerator->Release();
+                    pclsObj->Get(L"PercentProcessorTime", 0, &vtProc, 0, 0);
+                    QString qstr((QChar*)vtProc.bstrVal, ::SysStringLen(vtProc.bstrVal));
+                    cpu = cpu + qstr.toULongLong();
 
-				if (m_prev_ts > 0){
-					m_usage = ((cpu - m_prev_cpu) * 100) / ((ts - m_prev_ts) * m_cpu_count);
-					qnDebug("usage %1", m_usage);
-				}
-				m_prev_cpu = cpu;
-				m_prev_ts = ts;
-			}
-		}
+                    if (ts == 0){
+                        pclsObj->Get(L"Timestamp_Sys100NS",0, &vtProc, 0, 0);
+                        QString qstr((QChar*)vtProc.bstrVal, ::SysStringLen(vtProc.bstrVal));
+                        ts = qstr.toULongLong();
+                    }
 
-		static VOID CALLBACK timerCallback(HWND /*hwnd*/, UINT /*uMsg*/, UINT_PTR /*idEvent*/, DWORD /*dwTime*/) {
-			wmiRefresher->refresh();
-		}
+                    VariantClear(&vtProc);
+                    pclsObj->Release();
+                }
+                pEnumerator->Release();
 
+                if (m_prev_ts > 0){
+                    m_usage = ((cpu - m_prev_cpu) * 100) / ((ts - m_prev_ts) * m_cpu_count);
+                    qnDebug("usage %1", m_usage);
+                }
+                m_prev_cpu = cpu;
+                m_prev_ts = ts;
+            }
+        }
 
-	private:
-		bool init(){
-			HRESULT hres;
+        bool init(){
+            HRESULT hres;
 
-			// Step 1: --------------------------------------------------
-			// Initialize COM. ------------------------------------------
-			hres =  CoInitializeEx(0, COINIT_MULTITHREADED); 
-			if (FAILED(hres))
-			{
-				qnDebug("Failed to initialize COM library. Error code = 0x%1", QString::number(hres, 16));
-				return false;
-			}
+            // Step 1: --------------------------------------------------
+            // Initialize COM. ------------------------------------------
+            hres =  CoInitializeEx(0, COINIT_MULTITHREADED); 
+            if (FAILED(hres))
+            {
+                qnDebug("Failed to initialize COM library. Error code = 0x%1", QString::number(hres, 16));
+                return false;
+            }
 
-			// Step 2: --------------------------------------------------
-			// Set general COM security levels --------------------------
-			hres =  CoInitializeSecurity(
-				NULL, 
-				-1,                          // COM authentication
-				NULL,                        // Authentication services
-				NULL,                        // Reserved
-				RPC_C_AUTHN_LEVEL_DEFAULT,   // Default authentication 
-				RPC_C_IMP_LEVEL_IMPERSONATE, // Default Impersonation  
-				NULL,                        // Authentication info
-				EOAC_NONE,                   // Additional capabilities 
-				NULL                         // Reserved
-				);
+            // Step 2: --------------------------------------------------
+            // Set general COM security levels --------------------------
+            hres =  CoInitializeSecurity(
+                NULL, 
+                -1,                          // COM authentication
+                NULL,                        // Authentication services
+                NULL,                        // Reserved
+                RPC_C_AUTHN_LEVEL_DEFAULT,   // Default authentication 
+                RPC_C_IMP_LEVEL_IMPERSONATE, // Default Impersonation  
+                NULL,                        // Authentication info
+                EOAC_NONE,                   // Additional capabilities 
+                NULL                         // Reserved
+                );
 
-			if (FAILED(hres))
-			{
-				qnDebug("Failed to initialize security. Error code = 0x%1", QString::number(hres, 16));
-				CoUninitialize();
-				return false;                    
-			}
+            if (FAILED(hres))
+            {
+                qnDebug("Failed to initialize security. Error code = 0x%1", QString::number(hres, 16));
+                CoUninitialize();
+                return false;                    
+            }
 
-			// Step 3: ---------------------------------------------------
-			// Obtain the initial locator to WMI -------------------------
-			hres = CoCreateInstance(
-				CLSID_WbemLocator,             
-				0, 
-				CLSCTX_INPROC_SERVER, 
-				IID_IWbemLocator, (LPVOID *) &m_locator);
+            // Step 3: ---------------------------------------------------
+            // Obtain the initial locator to WMI -------------------------
+            hres = CoCreateInstance(
+                CLSID_WbemLocator,             
+                0, 
+                CLSCTX_INPROC_SERVER, 
+                IID_IWbemLocator, (LPVOID *) &m_locator);
 
-			if (FAILED(hres))
-			{
-				qnDebug("Failed to create IWbemLocator object. Err code = 0x%1", QString::number(hres, 16));
-				CoUninitialize();
-				return false;                
-			}
+            if (FAILED(hres))
+            {
+                qnDebug("Failed to create IWbemLocator object. Err code = 0x%1", QString::number(hres, 16));
+                CoUninitialize();
+                return false;                
+            }
 
-			// Step 4: -----------------------------------------------------
-			// Connect to WMI through the IWbemLocator::ConnectServer method
-
-
-			// Connect to the root\cimv2 namespace with
-			// the current user and obtain pointer pSvc
-			// to make IWbemServices calls.
-			hres = m_locator->ConnectServer(
-				_bstr_t(L"ROOT\\CIMV2"), // Object path of WMI namespace
-				NULL,                    // User name. NULL = current user
-				NULL,                    // User password. NULL = current
-				0,                       // Locale. NULL indicates current
-				NULL,                    // Security flags.
-				0,                       // Authority (e.g. Kerberos)
-				0,                       // Context object 
-				&m_service               // pointer to IWbemServices proxy
-				);
-
-			if (FAILED(hres))
-			{
-				qnDebug("Could not connect. Error code = 0x%1", QString::number(hres, 16)); 
-				m_locator->Release();
-				CoUninitialize();
-				return false;
-			}
-
-			qnDebug("Connected to ROOT\\CIMV2 WMI namespace\n");
+            // Step 4: -----------------------------------------------------
+            // Connect to WMI through the IWbemLocator::ConnectServer method
 
 
-			// Step 5: --------------------------------------------------
-			// Set security levels on the proxy -------------------------
+            // Connect to the root\cimv2 namespace with
+            // the current user and obtain pointer pSvc
+            // to make IWbemServices calls.
+            hres = m_locator->ConnectServer(
+                _bstr_t(L"ROOT\\CIMV2"), // Object path of WMI namespace
+                NULL,                    // User name. NULL = current user
+                NULL,                    // User password. NULL = current
+                0,                       // Locale. NULL indicates current
+                NULL,                    // Security flags.
+                0,                       // Authority (e.g. Kerberos)
+                0,                       // Context object 
+                &m_service               // pointer to IWbemServices proxy
+                );
 
-			hres = CoSetProxyBlanket(
-				m_service,                   // Indicates the proxy to set
-				RPC_C_AUTHN_WINNT,           // RPC_C_AUTHN_xxx
-				RPC_C_AUTHZ_NONE,            // RPC_C_AUTHZ_xxx
-				NULL,                        // Server principal name 
-				RPC_C_AUTHN_LEVEL_CALL,      // RPC_C_AUTHN_LEVEL_xxx 
-				RPC_C_IMP_LEVEL_IMPERSONATE, // RPC_C_IMP_LEVEL_xxx
-				NULL,                        // client identity
-				EOAC_NONE                    // proxy capabilities 
-				);
+            if (FAILED(hres))
+            {
+                qnDebug("Could not connect. Error code = 0x%1", QString::number(hres, 16)); 
+                m_locator->Release();
+                CoUninitialize();
+                return false;
+            }
 
-			if (FAILED(hres))
-			{
-				qnDebug("Could not set proxy blanket. Error code = 0x%1", QString::number(hres, 16));  
-				m_service->Release();
-				m_locator->Release();     
-				CoUninitialize();
-				return false;
-			}
+            qnDebug("Connected to ROOT\\CIMV2 WMI namespace\n");
 
-			IEnumWbemClassObject* pEnumerator = query("SELECT * FROM Win32_PerfFormattedData_PerfOS_Processor");
-			if (pEnumerator){
-				IWbemClassObject *pclsObj;
-				ULONG uReturn = 0;
-				while (pEnumerator)
-				{
-					pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
-					if(0 == uReturn)
-						break;
-					m_cpu_count++;
-					pclsObj->Release();
-				}
-				pEnumerator->Release();
-			}
 
-			if(m_cpu_count <= 0)
-				return false;
+            // Step 5: --------------------------------------------------
+            // Set security levels on the proxy -------------------------
 
-			QnPerformance::CpuInfo info = QnPerformance::getCpuInfo();
-			if (info.Cores != m_cpu_count) 
-				return false;
+            hres = CoSetProxyBlanket(
+                m_service,                   // Indicates the proxy to set
+                RPC_C_AUTHN_WINNT,           // RPC_C_AUTHN_xxx
+                RPC_C_AUTHZ_NONE,            // RPC_C_AUTHZ_xxx
+                NULL,                        // Server principal name 
+                RPC_C_AUTHN_LEVEL_CALL,      // RPC_C_AUTHN_LEVEL_xxx 
+                RPC_C_IMP_LEVEL_IMPERSONATE, // RPC_C_IMP_LEVEL_xxx
+                NULL,                        // client identity
+                EOAC_NONE                    // proxy capabilities 
+                );
 
-			m_timer = SetTimer(0, 0, 2000, timerCallback);
+            if (FAILED(hres))
+            {
+                qnDebug("Could not set proxy blanket. Error code = 0x%1", QString::number(hres, 16));  
+                m_service->Release();
+                m_locator->Release();     
+                CoUninitialize();
+                return false;
+            }
 
-			return true;
-		}
+            m_cpu_count = QnPerformance::getCpuCores();
+            qnDebug("CpuInfo %1, cores %2\n", QnPerformance::getCpuBrand(), m_cpu_count);
+            m_timer = SetTimer(0, 0, 2000, timerCallback);
+            return true;
+        }
 
-		IEnumWbemClassObject* query(char* query_str){
-			IEnumWbemClassObject* enumerator = NULL;
-			HRESULT hres;
-			hres = m_service->ExecQuery(
-				bstr_t("WQL"), 
-				bstr_t(query_str),
-				WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, 
-				NULL,
-				&enumerator);
+        // possibly will be used in other WMI requests
+        IEnumWbemClassObject* query(char* query_str){
+            IEnumWbemClassObject* enumerator = NULL;
+            HRESULT hres;
+            hres = m_service->ExecQuery(
+                bstr_t("WQL"), 
+                bstr_t(query_str),
+                WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, 
+                NULL,
+                &enumerator);
 
-			if (FAILED(hres))
-			{
-				qnDebug("Query failed. Error code = 0x%1", QString::number(hres, 16));
-				return NULL;
-			}
-			return enumerator;
-		}
+            if (FAILED(hres))
+            {
+                qnDebug("Query failed. Error code = 0x%1", QString::number(hres, 16));
+                return NULL;
+            }
+            return enumerator;
+        }
 
-	public:
-		WmiRefresher(){
-			m_locator = NULL;
-			m_service = NULL;
-			m_cpu_count = -1;
-			m_prev_cpu = 0;
-			m_prev_ts = 0;
-			m_usage = 50;
-			wmiRefresher = this;
-			m_initialized = init();
-		}
+    private:
+        bool m_initialized;
+        IWbemLocator *m_locator;
+        IWbemServices *m_service;
+        int m_cpu_count;
+        quint64 m_prev_cpu;
+        quint64 m_prev_ts;
+        uint m_usage;
+        UINT_PTR m_timer;
 
-		~WmiRefresher(){
-			if(m_initialized){
-				m_service->Release();
-				m_locator->Release();     
-				CoUninitialize();
-			}
-			if(m_timer != 0) {
-				KillTimer(NULL, m_timer); 
-				m_timer = 0;
-			}
-		}
 
-		uint usage(){
-			return m_usage;
-		}
-	};
-}
-	Q_GLOBAL_STATIC(WmiRefresher, refresherInstance);
-	// initializer for Q_GLOBAL_STATIC singletone
-	WmiRefresher* dummy = refresherInstance();
+    };
+
+    Q_GLOBAL_STATIC(WmiRefresher, refresherInstance);
+    // initializer for Q_GLOBAL_STATIC singletone
+    WmiRefresher* dummy = refresherInstance();
+
+    VOID CALLBACK WmiRefresher::timerCallback(HWND /*hwnd*/, UINT /*uMsg*/, UINT_PTR /*idEvent*/, DWORD /*dwTime*/) {
+        refresherInstance()->refresh();
+    }
+
+} // anonymous namespace
 #endif
 
 namespace {
@@ -267,7 +246,7 @@ namespace {
         LARGE_INTEGER intTime;
         intTime.HighPart = fileTime.dwHighDateTime;
         intTime.LowPart = fileTime.dwLowDateTime;
-            
+
         /* Convert from 100-nanoseconds to nanoseconds. */
         return intTime.QuadPart * 100;
     }
@@ -277,7 +256,7 @@ namespace {
         QueryPerformanceFrequency(&freq);
 
         DWORD64 startCycles = __rdtsc();
-        
+
         LARGE_INTEGER stop;
         QueryPerformanceCounter(&stop);
         stop.QuadPart += freq.QuadPart / 10; /* Run for 0.1 sec. */
@@ -339,7 +318,7 @@ qint64 QnPerformance::currentCpuFrequency() {
 
 qint64 QnPerformance::currentCpuUsage(){
 #ifdef Q_OS_WIN
-    return wmiRefresher->usage();
+    return refresherInstance()->usage();
 #else
     return 50;
 #endif
@@ -347,15 +326,8 @@ qint64 QnPerformance::currentCpuUsage(){
 
 namespace {
 #ifdef Q_OS_WIN
-	QnPerformance::CpuInfo estimateCpuInfo() {
-		QnPerformance::CpuInfo info;
-
-		/*SYSTEM_INFO si;
-		memset( &si, 0, sizeof(si));
-		GetSystemInfo(&si);
-		info.Cores = si.dwNumberOfProcessors;*/
-
-		int CPUInfo[4] = {-1};
+    QString estimateCpuBrand() {
+        int CPUInfo[4] = {-1};
         unsigned   nExIds, i =  0;
         char CPUBrandString[0x40];
         // Get the information associated with each extended ID.
@@ -363,41 +335,49 @@ namespace {
         nExIds = CPUInfo[0];
         for (i=0x80000000; i<=nExIds; ++i)
         {
-                __cpuid(CPUInfo, i);
-                // Interpret CPU brand string
-                if  (i == 0x80000002)
-                        memcpy(CPUBrandString, CPUInfo, sizeof(CPUInfo));
-                else if  (i == 0x80000003)
-                        memcpy(CPUBrandString + 16, CPUInfo, sizeof(CPUInfo));
-                else if  (i == 0x80000004)
-                        memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
+            __cpuid(CPUInfo, i);
+            // Interpret CPU brand string
+            if  (i == 0x80000002)
+                memcpy(CPUBrandString, CPUInfo, sizeof(CPUInfo));
+            else if  (i == 0x80000003)
+                memcpy(CPUBrandString + 16, CPUInfo, sizeof(CPUInfo));
+            else if  (i == 0x80000004)
+                memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
         }
-        //string includes manufacturer, model and clockspeed
-		info.Model = CPUBrandString;
-
-        SYSTEM_INFO sysInfo;
-        GetSystemInfo(&sysInfo);
-		info.Cores = sysInfo.dwNumberOfProcessors;
-
-        return info;
+        return CPUBrandString;
     }
 
-    Q_GLOBAL_STATIC_WITH_INITIALIZER(QnPerformance::CpuInfo, qn_estimatedCpuInfo, { *x = estimateCpuInfo(); });
+    Q_GLOBAL_STATIC_WITH_INITIALIZER(QString, qn_estimatedCpuBrand, { *x = estimateCpuBrand(); });
 #endif
 
 } // anonymous namespace
 
-QnPerformance::CpuInfo QnPerformance::getCpuInfo(){
-	
+namespace {
 #ifdef Q_OS_WIN
-	return *qn_estimatedCpuInfo();
-#else
-	CpuInfo info;
-	info.Clock = "3.5GHz";
-	info.Model = "Sandy Bridge";
-	info.Cores = 4;
-	return info;
+    int estimateCpuCores() {
+        SYSTEM_INFO sysInfo;
+        GetSystemInfo(&sysInfo);
+        return sysInfo.dwNumberOfProcessors;
+    }
+
+    Q_GLOBAL_STATIC_WITH_INITIALIZER(int, qn_estimatedCpuCores, { *x = estimateCpuCores(); });
 #endif
-	
+
+} // anonymous namespace
+
+QString QnPerformance::getCpuBrand(){
+#ifdef Q_OS_WIN
+    return *qn_estimatedCpuBrand();
+#else
+    return "Sandy Bridge @3.5GHz"
+#endif
+}
+
+int QnPerformance::getCpuCores(){
+#ifdef Q_OS_WIN
+    return *qn_estimatedCpuCores();
+#else
+    return 4;
+#endif
 }
 
