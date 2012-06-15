@@ -322,12 +322,6 @@ void QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
         soap_end(soapProxy.soap);
     }
 
-    if (videoOptionsNotSet && codec == H264) {
-        codec = JPEG;
-        fetchAndSetVideoEncoderOptions();
-        return;
-    }
-
     //Analyzing availability of dual streaming
 
     bool hasDualTmp = getNearestResolutionForSecondary(SECONDARY_STREAM_DEFAULT_RESOLUTION, getResolutionAspectRatio(getMaxResolution())) != EMPTY_RESOLUTION_PAIR;
@@ -346,6 +340,12 @@ void QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
             analyzeVideoEncoders(videoEncoders, false);
         }
         soap_end(soapProxy.soap);
+    }
+
+    if ((videoOptionsNotSet || videoEncoders.videoEncodersUnused.isEmpty()) && codec == H264) {
+        codec = JPEG;
+        fetchAndSetVideoEncoderOptions();
+        return;
     }
 
     int appropriateProfiles = 0;

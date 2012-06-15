@@ -250,6 +250,8 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
     AVRational srcRate = {1, 1000000};
     Q_ASSERT(stream->time_base.num && stream->time_base.den);
 
+    Q_ASSERT(md->timestamp >= 0);
+
     m_endDateTime = md->timestamp;
 
     avPkt.pts = av_rescale_q(md->timestamp-m_startDateTime, srcRate, stream->time_base);
