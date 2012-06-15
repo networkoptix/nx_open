@@ -238,71 +238,106 @@ namespace{
     }
 
 } // anonymous namespace
-#endif
+#else
+#include <time.h>
+#include <signal.h>
 
-#ifndef Q_OS_WIN
-namespace{
-    char* GetSystemOutput(char* cmd)
-    {
-        int buff_size = 32;
-        char* buff = new char[buff_size];
+namespace {
+    class CpuUsageRefresher{
 
-        char* ret = NULL;
-        string str = "";
-
-        int fd[2];
-        int old_fd[3];
-        pipe(fd);
-
-        old_fd[0] = dup(STDIN_FILENO);
-        old_fd[1] = dup(STDOUT_FILENO);
-        old_fd[2] = dup(STDERR_FILENO);
-
-        int pid = fork();
-        switch(pid)
-        {
-        case 0:
-            close(fd[0]);
-            close(STDOUT_FILENO);
-            close(STDERR_FILENO);
-            dup2(fd[1], STDOUT_FILENO);
-            dup2(fd[1], STDERR_FILENO);
-            system(cmd);
-            //execlp((const char*)cmd, cmd,0);
-            close (fd[1]);
-            exit(0);
-            break;
-        case -1:
-            cerr << "GetSystemOutput/fork() error\n" << endl;
-            exit(1);
-        default:
-            close(fd[1]);
-            dup2(fd[0], STDIN_FILENO);
-
-            int rc = 1;
-            while (rc > 0)
-            {
-                rc = read(fd[0], buff, buff_size);
-                str.append(buff, rc);
-                //memset(buff, 0, buff_size);
-            }
-
-            ret = new char [strlen((char*)str.c_str())];
-
-            strcpy(ret, (char*)str.c_str());
-
-            waitpid(pid, NULL, 0);
-            close(fd[0]);
+    public:
+        CpuUsageRefresher(){
+            m_cpu_count = -1;
+            m_prev_cpu = 0;
+            m_prev_ts = 0;
+            m_usage = 50;
+            m_initialized = init();
         }
 
-        dup2(STDIN_FILENO, old_fd[0]);
-        dup2(STDOUT_FILENO, old_fd[1]);
-        dup2(STDERR_FILENO, old_fd[2]);
+        ~CpuUsageRefresher(){
 
-        return ret;
+        }
+
+        uint usage(){
+            return m_usage;
+        }
+
+    private:
+        static VOID CALLBACK timerCallback(int sig, siginfo_t *si, void *uc);
+
+        void refresh(){
+            qnDebug("callback");
+        }
+
+        bool init(){
+            m_cpu_count = QnPerformance::getCpuCores();
+            qnDebug("CpuInfo %1, cores %2\n", QnPerformance::getCpuBrand(), m_cpu_count);
+
+            struct sigevent         te;
+            struct itimerspec       its;
+            struct sigaction        sa;
+            int                     sigNo = SIGRTMIN;
+            int intervalMS = 2000;
+            int expireMS = 20000;
+
+            /* Set up signal handler. */
+            sa.sa_flags = SA_SIGINFO;
+            sa.sa_sigaction = timerCallback;
+            sigemptyset(&sa.sa_mask);
+
+            /* Set and enable alarm */
+            te.sigev_notify = SIGEV_THREAD;
+            te.sigev_signo = sigNo;
+            te.sigev_value.sival_ptr = &m_timer;
+            timer_create(CLOCK_REALTIME, &te, m_timer);
+
+            its.it_interval.tv_sec = 0;
+            its.it_interval.tv_nsec = intervalMS * 1000000;
+            its.it_value.tv_sec = 0;
+            its.it_value.tv_nsec = expireMS * 1000000;
+            timer_settime(*m_timer, 0, &its, NULL);
+
+            
+            return true;
+        }
+
+    private:
+        bool m_initialized;
+        int m_cpu_count;
+        quint64 m_prev_cpu;
+        quint64 m_prev_ts;
+        uint m_usage;
+        timer_t m_timer;
+    };
+
+    Q_GLOBAL_STATIC(CpuUsageRefresher, refresherInstance);
+    // initializer for Q_GLOBAL_STATIC singletone
+    CpuUsageRefresher* dummy = refresherInstance();
+
+    VOID CALLBACK CpuUsageRefresher::timerCallback(int sig, siginfo_t *si, void *uc){
+        refresherInstance()->refresh();
     }
-} //anonymous namespace
+}
+
+
 #endif
+
+namespace{
+#ifndef Q_OS_WIN
+    QString GetSystemOutput(char* cmd)
+    {
+        QProcess p;
+        p.start(cmd);
+        if (!p.waitForStarted())
+            return false;
+
+        if (!p.waitForFinished())
+            return false;
+
+        return p.readAll();
+    }
+#endif
+} //anonymous namespace
 
 namespace {
 #ifdef Q_OS_WIN
@@ -381,7 +416,8 @@ namespace {
 #else
         // does not support multi-core processors yes
         // 'cpu cores' check is required
-        return QString(GetSystemOutput("grep 'processor' /proc/cpuinfo | wc -l")).toInt();
+        // not so important cause QThread::idealThreadCount() is working in most cases
+        return GetSystemOutput("grep 'processor' /proc/cpuinfo | wc -l").toInt();
 #endif
     }
 
@@ -442,6 +478,5 @@ QString QnPerformance::getCpuBrand(){
 
 int QnPerformance::getCpuCores(){
     return *qn_estimatedCpuCores();
-#endif
 }
 
