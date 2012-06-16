@@ -115,8 +115,21 @@ void QnCameraScheduleWidget::setCameras(const QnVirtualCameraResourceList &camer
     m_cameras = cameras;
 
     int enabledCount = 0, disabledCount = 0;
-    foreach (QnVirtualCameraResourcePtr camera, m_cameras)
+    ui->recordMotionButton->setEnabled(true);
+    ui->recordMotionPlusLQButton->setEnabled(true);
+    foreach (QnVirtualCameraResourcePtr camera, m_cameras) {
         (camera->isScheduleDisabled() ? disabledCount : enabledCount)++;
+        if (camera->supportedMotionType() == MT_NoMotion) {
+            ui->recordMotionButton->setEnabled(false);
+            ui->recordMotionPlusLQButton->setEnabled(false);
+        }
+        else if (!camera->hasDualStreaming()) {
+            ui->recordMotionPlusLQButton->setEnabled(false);
+        }
+    }
+    ui->labelMotionOnly->setEnabled(ui->recordMotionButton->isEnabled());
+    ui->labelMotionPlusLQ->setEnabled(ui->recordMotionPlusLQButton->isEnabled());
+
     if(enabledCount > 0 && disabledCount > 0) {
         ui->enableRecordingCheckBox->setCheckState(Qt::PartiallyChecked);
     } else {

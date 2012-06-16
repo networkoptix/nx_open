@@ -325,7 +325,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="label_6">
+             <widget class="QLabel" name="labelMotionOnly">
               <property name="text">
                <string>Motion only</string>
               </property>
@@ -376,7 +376,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="label_16">
+             <widget class="QLabel" name="labelMotionPlusLQ">
               <property name="text">
                <string>Motion+ low quality always</string>
               </property>

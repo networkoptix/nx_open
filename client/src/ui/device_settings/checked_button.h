@@ -16,9 +16,10 @@ public:
     QColor checkedColor() const;
     void setCheckedColor(const QColor& color);
 
+    void setEnabled(bool value);
 protected:
     void updateIcon();
-
+    QPixmap generatePixmap(int size, const QColor &color, const QColor &insideColor, bool hovered, bool checked);
 private:
     QColor m_color;
     QColor m_insideColor;

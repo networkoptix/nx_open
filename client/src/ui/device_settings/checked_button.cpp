@@ -1,44 +1,49 @@
 #include "checked_button.h"
 
 #include <QtGui/QPainter>
+#include "ui/common/color_transformations.h"
 
-namespace {
-    QPixmap generatePixmap(int size, const QColor &color, const QColor &insideColor, bool hovered, bool checked) {
-        QPixmap result(size, size);
-        result.fill(QColor(Qt::gray));
+QPixmap QnCheckedButton::generatePixmap(int size, const QColor &color, const QColor &insideColor, bool hovered, bool checked) 
+{
+    QPixmap result(size, size);
+    result.fill(QColor(Qt::gray));
 
-        QPainter painter(&result);
-        painter.setPen(QColor(Qt::black));
-        
-        painter.setBrush(hovered ? color.lighter() : color);
-        int offset = checked ? 4 : 0;
-        painter.drawRect(offset, offset, result.width() - offset * 2, result.height() - offset * 2);
+    QPainter painter(&result);
+    painter.setPen(QColor(Qt::black));
+    
+    QColor brushClr(hovered ? color.lighter() : color);
+    if (!isEnabled())
+        brushClr = shiftColor(brushClr, -64, -64, -64);
+    painter.setBrush(brushClr);
+    int offset = checked ? 4 : 0;
+    painter.drawRect(offset, offset, result.width() - offset * 2, result.height() - offset * 2);
 
-        if (insideColor.toRgb() != color.toRgb()) 
-        {
-            painter.setBrush(hovered ? insideColor.lighter() : insideColor);
-            //offset = result.width()/3;
-            //painter.drawRect(offset, offset, result.width() - offset * 2, result.height() - offset * 2);
-            QPointF points[6];
-            qreal cellSize = result.width();
-            qreal trOffset = cellSize/6;
-            qreal trSize = cellSize/10;
-            points[0] = QPointF(cellSize - trOffset - trSize, trOffset);
-            points[1] = QPointF(cellSize - trOffset, trOffset);
-            points[2] = QPointF(cellSize-trOffset, trOffset + trSize);
-            points[3] = QPointF(trOffset + trSize, cellSize - trOffset);
-            points[4] = QPointF(trOffset, cellSize - trOffset);
-            points[5] = QPointF(trOffset, cellSize - trSize - trOffset);
-            painter.drawPolygon(points, 6);
-        }
-
-
-        painter.end();
-
-        return result;
+    if (insideColor.toRgb() != color.toRgb()) 
+    {
+        brushClr = QColor(hovered ? insideColor.lighter() : insideColor);
+        if (!isEnabled())
+            brushClr = shiftColor(brushClr, -64, -64, -64);
+        painter.setBrush(brushClr);
+        //offset = result.width()/3;
+        //painter.drawRect(offset, offset, result.width() - offset * 2, result.height() - offset * 2);
+        QPointF points[6];
+        qreal cellSize = result.width();
+        qreal trOffset = cellSize/6;
+        qreal trSize = cellSize/10;
+        points[0] = QPointF(cellSize - trOffset - trSize, trOffset);
+        points[1] = QPointF(cellSize - trOffset, trOffset);
+        points[2] = QPointF(cellSize-trOffset, trOffset + trSize);
+        points[3] = QPointF(trOffset + trSize, cellSize - trOffset);
+        points[4] = QPointF(trOffset, cellSize - trOffset);
+        points[5] = QPointF(trOffset, cellSize - trSize - trOffset);
+        painter.drawPolygon(points, 6);
     }
 
-} // anonymous namespace
+
+    painter.end();
+
+    return result;
+}
 
 QnCheckedButton::QnCheckedButton(QWidget* parent): QToolButton(parent)
 {
@@ -80,6 +85,12 @@ void QnCheckedButton::setColor(const QColor& color)
 
     m_color = color;
 
+    updateIcon();
+}
+
+void QnCheckedButton::setEnabled(bool value)
+{
+    QToolButton::setEnabled(value);
     updateIcon();
 }
 

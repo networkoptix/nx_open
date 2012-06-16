@@ -65,6 +65,7 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
     if (m_camera)
     {
         ui->softwareMotionButton->setEnabled(camera->supportedMotionType() & MT_SoftwareGrid);
+        ui->cameraMotionButton->setEnabled(camera->supportedMotionType() & MT_HardwareGrid);
 
         QVariant val;
         QString webPageAddress = QString("<A HREF=\"http://%1/%2\">http://%1/%2</A>").arg(m_camera->getHostAddress().toString()).arg(val.toString());
