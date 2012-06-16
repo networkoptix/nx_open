@@ -28,6 +28,7 @@
 #include <ui/graphics/items/controls/time_scroll_bar.h>
 #include <ui/graphics/instruments/signaling_instrument.h>
 
+#include "workbench.h"
 #include "workbench_display.h"
 #include "workbench_context.h"
 #include "workbench_item.h"
@@ -124,6 +125,8 @@ bool QnWorkbenchNavigator::isValid() {
 
 void QnWorkbenchNavigator::initialize() {
     assert(isValid());
+
+    connect(workbench(),                        SIGNAL(currentLayoutChanged()),                     this,   SLOT(updateSliderOptions()));
 
     connect(display(),                          SIGNAL(widgetChanged(Qn::ItemRole)),                this,   SLOT(at_display_widgetChanged(Qn::ItemRole)));
     connect(display(),                          SIGNAL(widgetAdded(QnResourceWidget *)),            this,   SLOT(at_display_widgetAdded(QnResourceWidget *)));
@@ -575,6 +578,11 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
 
 void QnWorkbenchNavigator::updateSliderOptions() {
     m_timeSlider->setOption(QnTimeSlider::UseUTC, m_currentWidgetFlags & WidgetUsesUTC);
+
+    bool selectionEditable = !(snapshotManager()->flags(workbench()->currentLayout()->resource()) & Qn::LayoutIsFile);
+    m_timeSlider->setOption(QnTimeSlider::SelectionEditable, selectionEditable);
+    if(!selectionEditable)
+        m_timeSlider->setSelectionValid(false);
 }
 
 void QnWorkbenchNavigator::updateSliderFromReader() {
@@ -837,9 +845,10 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
         return;
 
     /* Add slider-local actions to the menu. */
-    manager->redirectAction(menu.data(), Qn::StartTimeSelectionAction,  m_startSelectionAction);
-    manager->redirectAction(menu.data(), Qn::EndTimeSelectionAction,    m_endSelectionAction);
-    manager->redirectAction(menu.data(), Qn::ClearTimeSelectionAction,  m_clearSelectionAction);
+    bool selectionEditable = m_timeSlider->options() & QnTimeSlider::SelectionEditable;
+    manager->redirectAction(menu.data(), Qn::StartTimeSelectionAction,  selectionEditable ? m_startSelectionAction : NULL);
+    manager->redirectAction(menu.data(), Qn::EndTimeSelectionAction,    selectionEditable ? m_endSelectionAction : NULL);
+    manager->redirectAction(menu.data(), Qn::ClearTimeSelectionAction,  selectionEditable ? m_clearSelectionAction : NULL);
 
     /* Run menu. */
     QAction *action = menu->exec(screenPos);
