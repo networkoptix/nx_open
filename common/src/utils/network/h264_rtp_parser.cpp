@@ -131,6 +131,23 @@ void CLH264RtpParser::decodeSpsInfo(const QByteArray& data)
     }
 }
 
+QnCompressedVideoDataPtr CLH264RtpParser::createVideoData(quint32 rtpTime, const RtspStatistic& statistics)
+{
+    QnCompressedVideoDataPtr result = QnCompressedVideoDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, DEFAULT_SLICE_SIZE));
+    result->compressionType = CODEC_ID_H264;
+    result->width = m_sps.getWidth();
+    result->height = m_sps.getHeight();
+
+    if (m_timeHelper) {
+        result->timestamp = m_timeHelper->getUsecTime(rtpTime, statistics, m_frequency);
+        //qDebug() << "video. adjusttime to " << (m_videoData->timestamp - qnSyncTime->currentMSecsSinceEpoch()*1000)/1000 << "ms";
+    }
+    else
+        result->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
+
+    return result;
+}
+
 bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStatistic& statistics, QList<QnAbstractMediaDataPtr>& result)
 {
     result.clear();
@@ -160,9 +177,9 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStati
     curPtr++;
     bytesLeft--;
 
-    if (m_videoData == 0) {
-        m_videoData = QnCompressedVideoDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, DEFAULT_SLICE_SIZE));
-        m_videoData->compressionType = CODEC_ID_H264;
+    if (m_videoData == 0) 
+    {
+        m_videoData = createVideoData(ntohl(rtpHeader->timestamp), statistics);
     }
 
     while (bytesLeft > 0)
@@ -231,10 +248,10 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStati
 
                 if (firstPacketReceived)
                 {
-                    if (m_videoData->data.size() > 0) {
+                    if (m_videoData->data.size() > 0) 
+                    {
                         result << m_videoData;
-                        m_videoData = QnCompressedVideoDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, DEFAULT_SLICE_SIZE));
-                        m_videoData->compressionType = CODEC_ID_H264;
+                        m_videoData = createVideoData(ntohl(rtpHeader->timestamp), statistics);
                     }
 
                     m_firstSeqNum = ntohs(rtpHeader->sequence);
@@ -310,6 +327,12 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStati
                 //return false;
                 break;
             default:
+                if (m_videoData->data.size() > 0) 
+                {
+                    result << m_videoData;
+                    m_videoData = createVideoData(ntohl(rtpHeader->timestamp), statistics);
+                }
+
                 isKeyFrame = (packetType & 0x1f) == nuSliceIDR;
                 if (isKeyFrame) {
                     m_videoData->flags |= AV_PKT_FLAG_KEY;
@@ -327,16 +350,6 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStati
 
     if (lastPacketReceived)
     {
-        m_videoData->width = m_sps.getWidth();
-        m_videoData->height = m_sps.getHeight();
-
-        if (m_timeHelper) {
-            m_videoData->timestamp = m_timeHelper->getUsecTime(ntohl(rtpHeader->timestamp), statistics, m_frequency);
-            //qDebug() << "video. adjusttime to " << (m_videoData->timestamp - qnSyncTime->currentMSecsSinceEpoch()*1000)/1000 << "ms";
-        }
-        else
-            m_videoData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
-
         result << m_videoData;
         m_videoData.clear();
     }
