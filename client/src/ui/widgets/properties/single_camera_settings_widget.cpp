@@ -19,7 +19,8 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     m_motionWidget(NULL),
     m_hasChanges(false),
     m_hasScheduleChanges(false),
-    m_readOnly(false)
+    m_readOnly(false),
+    m_inUpdateMaxFps(false)
 {
     ui->setupUi(this);
 
@@ -311,6 +312,9 @@ void QnSingleCameraSettingsWidget::at_motionTypeChanged() {
 
 void QnSingleCameraSettingsWidget::updateMaxFPS()
 {
+    if (m_inUpdateMaxFps)
+        return; // do not show message twice
+    m_inUpdateMaxFps = true;
     if (ui->softwareMotionButton->isChecked() || ui->cameraScheduleWidget->isSecondaryStreamReserver())
     {
         float maxFps = m_camera->getMaxFps()-2;
@@ -325,6 +329,7 @@ void QnSingleCameraSettingsWidget::updateMaxFPS()
     else {
         ui->cameraScheduleWidget->setMaxFps(m_camera->getMaxFps());
     }
+    m_inUpdateMaxFps = false;
 }
 
 void QnSingleCameraSettingsWidget::at_motionSelectionCleared() {
