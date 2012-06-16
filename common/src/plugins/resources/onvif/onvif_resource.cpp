@@ -92,6 +92,7 @@ QString QnPlOnvifResource::manufacture() const
 
 bool QnPlOnvifResource::hasDualStreaming() const
 {
+    return false;
     return hasDual;
 }
 

@@ -2,7 +2,8 @@
 #define cl_adaptive_sleep_137
 
 #include "utils/common/sleep.h"
-
+#include <QMutex>
+#include <QWaitCondition>
 
 
 const int MAX_VALID_SLEEP_TIME = 5000000;
@@ -62,6 +63,43 @@ public:
         return havetowait;
     }
 
+    int terminatedSleep(qint64 usec, qint64 maxSleepTime = INT_MAX)
+    {
+        if (m_firstTime)
+        {
+            m_firstTime = false;
+            m_prevEndTime.start();
+            m_totalTime = 0;
+        }
+
+        m_totalTime += usec;
+
+        qint64 now = (qint64)m_prevEndTime.elapsed() * 1000;
+        qint64 havetowait = m_totalTime - now;
+
+        if (havetowait<=0)
+        {
+            if (-havetowait > m_maxOverdraft && m_maxOverdraft > 0)
+                afterdelay();
+            return havetowait;
+        }
+        //cl_log.log("sleep time=", havetowait/1000000.0, cl_logALWAYS);
+        if (havetowait < MAX_VALID_SLEEP_TIME) 
+        {
+            QMutexLocker lock(&m_mutex);
+            m_waitCond.wait(&m_mutex, qMin(havetowait / 1000, maxSleepTime / 1000));
+        }
+        else {
+            afterdelay();
+        }
+        return havetowait;
+    }
+
+    void breakSleep()
+    {
+        m_waitCond.wakeAll();
+    }
+
     int addQuant(qint64 usec)
     {
         if (m_firstTime)
@@ -87,6 +125,10 @@ private:
     bool m_firstTime;
     qint64 m_maxOverdraft;
     qint64 m_totalTime;
+    
+    // used for terminated sleep
+    QMutex m_mutex;
+    QWaitCondition m_waitCond;
 };
 
 #endif //cl_adaptive_sleep_137

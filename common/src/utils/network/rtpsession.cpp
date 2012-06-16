@@ -116,7 +116,7 @@ double QnRtspTimeHelper::cameraTimeToLocalTime(double cameraTime)
 
 void QnRtspTimeHelper::reset()
 {
-    m_cameraClockToLocalDiff == INT_MAX;
+    m_cameraClockToLocalDiff = INT_MAX;
 }
 
 qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& statistics, int frequency, bool recursiveAllowed)
@@ -125,7 +125,7 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& stati
         return qnSyncTime->currentMSecsSinceEpoch() * 1000;
     else {
         int rtpTimeDiff = rtpTime - statistics.timestamp;
-        double resultInSecs = cameraTimeToLocalTime(statistics.nptTime) + rtpTimeDiff / double(frequency);
+        double resultInSecs = cameraTimeToLocalTime(statistics.nptTime + rtpTimeDiff / double(frequency));
         double localTimeInSecs = qnSyncTime->currentMSecsSinceEpoch()/1000.0;
         if (qAbs(localTimeInSecs - resultInSecs) < MAX_FRAME_DURATION/1000 || !recursiveAllowed)
             return resultInSecs * 1000000ll;

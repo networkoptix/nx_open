@@ -221,6 +221,7 @@ QnAbstractMediaDataPtr QnOnvifStreamReader::getNextData()
         return getMetaData();
 
     QnAbstractMediaDataPtr rez;
+    int errorCount = 0;
     for (int i = 0; i < 10; ++i)
     {
         rez = m_multiCodec.getNextData();
@@ -234,8 +235,11 @@ QnAbstractMediaDataPtr QnOnvifStreamReader::getNextData()
                 break;
         }
         else {
-            closeStream();
-            break;
+            errorCount++;
+            if (errorCount > 1) {
+                closeStream();
+                break;
+            }
         }
     }
     

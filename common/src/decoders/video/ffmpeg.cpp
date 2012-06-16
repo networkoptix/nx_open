@@ -143,8 +143,7 @@ void CLFFmpegVideoDecoder::determineOptimalThreadType(const QnCompressedVideoDat
             }
         }
     }
-    bool isLive = data && (data->flags & QnAbstractMediaData::MediaFlags_LIVE);
-    m_context->thread_type = m_mtDecoding && (m_forceSliceDecoding != 1) && !isLive ? FF_THREAD_FRAME : FF_THREAD_SLICE;
+    m_context->thread_type = m_mtDecoding && (m_forceSliceDecoding != 1) ? FF_THREAD_FRAME : FF_THREAD_SLICE;
 
     if (m_context->codec_id == CODEC_ID_H264 && m_context->thread_type == FF_THREAD_SLICE)
     {
