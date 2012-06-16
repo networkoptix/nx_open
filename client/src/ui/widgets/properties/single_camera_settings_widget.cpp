@@ -65,7 +65,11 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
     if (m_camera)
     {
         ui->softwareMotionButton->setEnabled(camera->supportedMotionType() & MT_SoftwareGrid);
-        ui->cameraMotionButton->setEnabled(camera->supportedMotionType() & MT_HardwareGrid);
+        //ui->cameraMotionButton->setEnabled(camera->supportedMotionType() & MT_HardwareGrid);
+        if (camera->supportedMotionType() & MT_HardwareGrid)
+            ui->cameraMotionButton->setText("Hardware (Camera built-in)");
+        else
+            ui->cameraMotionButton->setText("Do not record motion");
 
         QVariant val;
         QString webPageAddress = QString("<A HREF=\"http://%1/%2\">http://%1/%2</A>").arg(m_camera->getHostAddress().toString()).arg(val.toString());
