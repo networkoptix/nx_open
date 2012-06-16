@@ -158,9 +158,6 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStati
     bool isKeyFrame = false;
     quint16 lastSeqNum = 0;
 
-    bool firstPacketReceived = false;
-    bool lastPacketReceived = false;
-
     if (readed < RtpHeader::RTP_HEADER_SIZE + 1) {
         m_videoData.clear();
         return false;
@@ -171,7 +168,10 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStati
     int bytesLeft = readed - RtpHeader::RTP_HEADER_SIZE;
 
     if (rtpHeader->padding)
-        bytesLeft -= ntohl(rtpHeader->padding);
+        --bytesLeft;
+
+    bool firstPacketReceived = false;
+    bool lastPacketReceived = rtpHeader->marker;
 
     int packetType = *curPtr & 0x1f;
     curPtr++;
@@ -291,12 +291,12 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStati
                 {
                     // it is slice
                     isKeyFrame = nalUnitType == nuSliceIDR;
+                    if (isKeyFrame)
+                        m_videoData->flags |= AV_PKT_FLAG_KEY;
                     if (m_videoData->data.size() == 0)
                     {
-                        if (isKeyFrame) {
-                            m_videoData->flags |= AV_PKT_FLAG_KEY;
+                        if (isKeyFrame) 
                             serializeSpsPps(m_videoData->data);
-                        }
                         m_videoData->data.write(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
                         nalUnitType += 0x40;
                         m_videoData->data.write( (const char*) &nalUnitType, 1);
@@ -330,9 +330,39 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStati
                 if (m_videoData->data.size() > 0) 
                 {
                     result << m_videoData;
-                    m_videoData = createVideoData(ntohl(rtpHeader->timestamp), statistics);
+                    m_videoData.clear();
                 }
 
+                nalUnitType = packetType & 0x1f;
+
+                if (nalUnitType >= nuSliceNonIDR && nalUnitType <= nuSliceIDR)
+                {
+                    if (!m_videoData)
+                        m_videoData = createVideoData(ntohl(rtpHeader->timestamp), statistics);
+                    isKeyFrame = nalUnitType == nuSliceIDR;
+                    // it is slice
+                    if (isKeyFrame) {
+                        m_videoData->flags |= AV_PKT_FLAG_KEY;
+                        serializeSpsPps(m_videoData->data);
+                    }
+                    m_videoData->data.write(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
+                    m_videoData->data.write((const char*)curPtr-1, bytesLeft+1);
+                    lastPacketReceived = true;
+                }
+                else
+                {
+                    QByteArray& data = m_allNonSliceNal[nalUnitType];
+                    data.clear();
+                    data += QByteArray(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
+                    data += QByteArray( (const char*) curPtr-1, bytesLeft+1);
+                    m_builtinSpsFound |= nalUnitType == nuSPS;
+                    m_builtinPpsFound |= nalUnitType == nuPPS;
+                    if (nalUnitType == nuSPS)
+                        decodeSpsInfo(data);
+                }
+
+
+                /*
                 isKeyFrame = (packetType & 0x1f) == nuSliceIDR;
                 if (isKeyFrame) {
                     m_videoData->flags |= AV_PKT_FLAG_KEY;
@@ -342,8 +372,10 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStati
                 m_videoData->data.write(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
                 m_videoData->data.write((const char*) curPtr-1, bytesLeft+1);
 
-                bytesLeft = 0;
                 lastPacketReceived = true;
+                */
+
+                bytesLeft = 0;
                 break; // ignore unknown data
         }
     }
