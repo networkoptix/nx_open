@@ -30,8 +30,11 @@
 
 #include "workbench_display.h"
 #include "workbench_context.h"
-#include "camera/thumbnails_loader.h"
+#include "workbench_item.h"
+#include "workbench_layout.h"
+#include "workbench_layout_snapshot_manager.h"
 
+#include "camera/thumbnails_loader.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "libavutil/avutil.h" // TODO: remove
 
@@ -536,8 +539,15 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     m_currentWidget = widget;
     if(m_currentWidget) {
         m_currentWidgetFlags = 0;
+
+        bool layoutIsFile = snapshotManager()->flags(m_currentWidget->item()->layout()->resource()) & Qn::LayoutIsFile;
+
         if(m_currentWidget->resource().dynamicCast<QnSecurityCamResource>())
             m_currentWidgetFlags |= WidgetSupportsLive | WidgetSupportsPeriods | WidgetSupportsSync | WidgetUsesUTC;
+
+        if(layoutIsFile)
+            m_currentWidgetFlags |= WidgetSupportsSync;
+
     } else {
         m_currentWidgetFlags = 0;
     }
@@ -590,7 +600,7 @@ void QnWorkbenchNavigator::updateSliderFromReader() {
     m_timeSlider->setMaximum(endTimeMSec);
 
     if(!m_pausedOverride) {
-        qint64 timeUSec = m_currentWidget->display()->camera()->getCurrentTime();
+        qint64 timeUSec = reader->isRealTimeSource() ? DATETIME_NOW : m_currentWidget->display()->camera()->getCurrentTime();
         qint64 timeMSec = timeUSec == DATETIME_NOW ? endTimeMSec : (timeUSec == AV_NOPTS_VALUE ? m_timeSlider->value() : timeUSec / 1000);
 
         m_timeSlider->setValue(timeMSec);
