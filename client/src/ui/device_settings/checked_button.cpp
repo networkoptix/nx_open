@@ -12,7 +12,7 @@ QPixmap QnCheckedButton::generatePixmap(int size, const QColor &color, const QCo
     painter.setPen(QColor(Qt::black));
     
     QColor brushClr(hovered ? color.lighter() : color);
-    if (!isEnabled())
+    if (!m_isEnabled)
         brushClr = shiftColor(brushClr, -64, -64, -64);
     painter.setBrush(brushClr);
     int offset = checked ? 4 : 0;
@@ -21,7 +21,7 @@ QPixmap QnCheckedButton::generatePixmap(int size, const QColor &color, const QCo
     if (insideColor.toRgb() != color.toRgb()) 
     {
         brushClr = QColor(hovered ? insideColor.lighter() : insideColor);
-        if (!isEnabled())
+        if (!m_isEnabled)
             brushClr = shiftColor(brushClr, -64, -64, -64);
         painter.setBrush(brushClr);
         //offset = result.width()/3;
@@ -48,6 +48,7 @@ QPixmap QnCheckedButton::generatePixmap(int size, const QColor &color, const QCo
 QnCheckedButton::QnCheckedButton(QWidget* parent): QToolButton(parent)
 {
     m_insideColorDefined = false;
+    m_isEnabled = isEnabled();
     updateIcon();
 }
 
@@ -91,6 +92,7 @@ void QnCheckedButton::setColor(const QColor& color)
 void QnCheckedButton::setEnabled(bool value)
 {
     QToolButton::setEnabled(value);
+    m_isEnabled = value;
     updateIcon();
 }
 

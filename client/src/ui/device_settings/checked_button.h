@@ -25,6 +25,7 @@ private:
     QColor m_insideColor;
     QColor m_checkedColor;
     bool m_insideColorDefined;
+    bool m_isEnabled;
 };
 
 #endif // __QN_CHECKED_BUTTON_H__
