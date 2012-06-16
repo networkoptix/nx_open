@@ -137,9 +137,10 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
     buttonsLayout->setAlignment(m_jumpForwardButton, Qt::AlignCenter);
 
     QGraphicsLinearLayout *leftLayoutV = new QGraphicsLinearLayout(Qt::Vertical);
-    leftLayoutV->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
-    leftLayoutV->setContentsMargins(0, 0, 0, 0);
+    leftLayoutV->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
+    leftLayoutV->setContentsMargins(0, 3, 0, 0);
     leftLayoutV->setSpacing(0);
+    leftLayoutV->setMinimumHeight(87.0);
     leftLayoutV->addItem(m_speedSlider);
     leftLayoutV->addItem(buttonsLayout);
 
@@ -156,14 +157,15 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
     rightLayoutHL->addItem(m_volumeSlider);
 
     QGraphicsLinearLayout *rightLayoutV = new QGraphicsLinearLayout(Qt::Vertical);
-    rightLayoutV->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
+    rightLayoutV->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
     rightLayoutV->setContentsMargins(0, 3, 0, 0);
     rightLayoutV->setSpacing(0);
+    rightLayoutV->setMinimumHeight(87.0);
     rightLayoutV->addItem(rightLayoutHL);
     rightLayoutV->addItem(rightLayoutHU);
-    rightLayoutV->setAlignment(rightLayoutHU, Qt::AlignRight | Qt::AlignVCenter);
     rightLayoutV->addItem(m_thumbnailsButton);
     rightLayoutV->setAlignment(m_thumbnailsButton, Qt::AlignCenter);
+    rightLayoutV->setAlignment(rightLayoutHU, Qt::AlignRight | Qt::AlignVCenter);
 #if 0
     rightLayoutV->addItem(m_timeLabel);
 #endif
@@ -175,12 +177,24 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
     sliderLayout->setStretchFactor(m_timeSlider, 0x1000);
     sliderLayout->addItem(m_timeScrollBar);
 
+    QGraphicsLinearLayout *leftLayoutVV = new QGraphicsLinearLayout(Qt::Vertical);
+    leftLayoutVV->setContentsMargins(0, 0, 0, 0);
+    leftLayoutVV->setSpacing(0);
+    leftLayoutVV->addStretch(1);
+    leftLayoutVV->addItem(leftLayoutV);
+
+    QGraphicsLinearLayout *rightLayoutVV = new QGraphicsLinearLayout(Qt::Vertical);
+    rightLayoutVV->setContentsMargins(0, 0, 0, 0);
+    rightLayoutVV->setSpacing(0);
+    rightLayoutVV->addStretch(1);
+    rightLayoutVV->addItem(rightLayoutV);
+
     QGraphicsLinearLayout *mainLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     mainLayout->setContentsMargins(5, 0, 5, 0);
     mainLayout->setSpacing(10);
-    mainLayout->addItem(leftLayoutV);
+    mainLayout->addItem(leftLayoutVV);
     mainLayout->addItem(sliderLayout);
-    mainLayout->addItem(rightLayoutV);
+    mainLayout->addItem(rightLayoutVV);
     setLayout(mainLayout);
 
 
