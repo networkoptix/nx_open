@@ -158,7 +158,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
 
     QGraphicsLinearLayout *rightLayoutV = new QGraphicsLinearLayout(Qt::Vertical);
     rightLayoutV->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
-    rightLayoutV->setContentsMargins(0, 3, 0, 0);
+    rightLayoutV->setContentsMargins(0, 3, 0, 3);
     rightLayoutV->setSpacing(0);
     rightLayoutV->setMinimumHeight(87.0);
     rightLayoutV->addItem(rightLayoutHL);
@@ -200,7 +200,8 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
 
     /* Set up handlers. */
     connect(display(),              SIGNAL(streamsSynchronizedChanged()),       this,           SLOT(updateSyncButtonChecked()));
-    connect(display(),              SIGNAL(streamsSynchronizationEffectiveChanged()), this,      SLOT(updateSyncButtonEnabled()));
+    connect(display(),              SIGNAL(streamsSynchronizationEffectiveChanged()), this,     SLOT(updateSyncButtonChecked()));
+    connect(display(),              SIGNAL(streamsSynchronizationEffectiveChanged()), this,     SLOT(updateSyncButtonEnabled()));
 
     connect(m_speedSlider,          SIGNAL(roundedSpeedChanged(qreal)),         this,           SLOT(updateNavigatorSpeedFromSpeedSlider()));
     connect(m_volumeSlider,         SIGNAL(valueChanged(qint64)),               this,           SLOT(updateMuteButtonChecked()));
@@ -415,7 +416,7 @@ void QnNavigationItem::updateLiveButtonEnabled() {
 }
 
 void QnNavigationItem::updateSyncButtonChecked() {
-    m_syncButton->setChecked(display()->isStreamsSynchronized());
+    m_syncButton->setChecked(display()->isStreamsSynchronized() && display()->isStreamsSynchronizationEffective());
 }
 
 void QnNavigationItem::updateSyncButtonEnabled() {

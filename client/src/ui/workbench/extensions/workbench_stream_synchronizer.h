@@ -25,7 +25,6 @@ public:
     /**
      * Disable this stream synchronizer. 
      * When disabled, video streams of cameras on the scene are not synchronized.
-     * 
      */
     void disableSync();
 
