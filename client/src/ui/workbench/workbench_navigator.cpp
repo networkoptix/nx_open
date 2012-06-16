@@ -590,7 +590,7 @@ void QnWorkbenchNavigator::updateSliderFromReader() {
     m_timeSlider->setMaximum(endTimeMSec);
 
     if(!m_pausedOverride) {
-        qint64 timeUSec = m_currentWidget->display()->camera()->getCurrentTime();
+        qint64 timeUSec = reader->isRealTimeSource() ? DATETIME_NOW : m_currentWidget->display()->camera()->getCurrentTime();
         qint64 timeMSec = timeUSec == DATETIME_NOW ? endTimeMSec : (timeUSec == AV_NOPTS_VALUE ? m_timeSlider->value() : timeUSec / 1000);
 
         m_timeSlider->setValue(timeMSec);
