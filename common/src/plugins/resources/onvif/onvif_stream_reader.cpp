@@ -13,6 +13,7 @@
 //#include "onvif/Onvif.nsmap"
 #include "onvif/soapMediaBindingProxy.h"
 #include "onvif/wsseapi.h"
+#include "utils/network/tcp_connection_priv.h"
 
 QnOnvifStreamReader::QnOnvifStreamReader(QnResourcePtr res):
     CLServerPushStreamreader(res),
@@ -45,6 +46,8 @@ void QnOnvifStreamReader::openStream()
 
     m_multiCodec.setRequest(streamUrl);
     m_multiCodec.openStream();
+    if (m_multiCodec.getLastResponseCode() == CODE_AUTH_REQUIRED)
+        m_resource->setStatus(QnResource::Unauthorized);
 }
 
 const QString QnOnvifStreamReader::updateCameraAndfetchStreamUrl() const
@@ -231,7 +234,7 @@ QnAbstractMediaDataPtr QnOnvifStreamReader::getNextData()
             //ToDo: if (videoData)
             //    parseMotionInfo(videoData);
             
-            if (isGotFrame(videoData))
+            if (!videoData || isGotFrame(videoData))
                 break;
         }
         else {

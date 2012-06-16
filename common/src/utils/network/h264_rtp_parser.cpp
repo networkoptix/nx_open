@@ -160,8 +160,10 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStati
     curPtr++;
     bytesLeft--;
 
-    if (m_videoData == 0)
+    if (m_videoData == 0) {
         m_videoData = QnCompressedVideoDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, DEFAULT_SLICE_SIZE));
+        m_videoData->compressionType = CODEC_ID_H264;
+    }
 
     while (bytesLeft > 0)
     {
@@ -191,12 +193,14 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStati
                     return false;
                 }
                 nalUnitType = *curPtr & 0x1f;
-                if ((nalUnitType & 0x1f) >= nuSliceNonIDR && nalUnitType <= nuSliceIDR)
+                if (nalUnitType >= nuSliceNonIDR && nalUnitType <= nuSliceIDR)
                 {
                     isKeyFrame = (nalUnitType & 0x1f) == nuSliceIDR;
                     // it is slice
-                    if (isKeyFrame)
+                    if (isKeyFrame) {
+                        m_videoData->flags |= AV_PKT_FLAG_KEY;
                         serializeSpsPps(m_videoData->data);
+                    }
                     m_videoData->data.write(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
                     m_videoData->data.write((const char*)curPtr, nalUnitLen);
                     lastPacketReceived = true;
@@ -227,7 +231,12 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStati
 
                 if (firstPacketReceived)
                 {
-                    m_videoData->data.clear();
+                    if (m_videoData->data.size() > 0) {
+                        result << m_videoData;
+                        m_videoData = QnCompressedVideoDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, DEFAULT_SLICE_SIZE));
+                        m_videoData->compressionType = CODEC_ID_H264;
+                    }
+
                     m_firstSeqNum = ntohs(rtpHeader->sequence);
                     m_packetPerNal = 0;
                 }
@@ -267,8 +276,10 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStati
                     isKeyFrame = nalUnitType == nuSliceIDR;
                     if (m_videoData->data.size() == 0)
                     {
-                        if (isKeyFrame)
+                        if (isKeyFrame) {
+                            m_videoData->flags |= AV_PKT_FLAG_KEY;
                             serializeSpsPps(m_videoData->data);
+                        }
                         m_videoData->data.write(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
                         nalUnitType += 0x40;
                         m_videoData->data.write( (const char*) &nalUnitType, 1);
@@ -300,8 +311,10 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStati
                 break;
             default:
                 isKeyFrame = (packetType & 0x1f) == nuSliceIDR;
-                if (isKeyFrame)
+                if (isKeyFrame) {
+                    m_videoData->flags |= AV_PKT_FLAG_KEY;
                     serializeSpsPps(m_videoData->data);
+                }
 
                 m_videoData->data.write(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
                 m_videoData->data.write((const char*) curPtr-1, bytesLeft+1);
@@ -317,14 +330,6 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStati
         m_videoData->width = m_sps.getWidth();
         m_videoData->height = m_sps.getHeight();
 
-
-        m_videoData->channelNumber = 0;
-        if (isKeyFrame)
-            m_videoData->flags |= AV_PKT_FLAG_KEY;
-        else
-            m_videoData->flags &= ~AV_PKT_FLAG_KEY;
-        m_videoData->compressionType = CODEC_ID_H264;
-        
         if (m_timeHelper) {
             m_videoData->timestamp = m_timeHelper->getUsecTime(ntohl(rtpHeader->timestamp), statistics, m_frequency);
             //qDebug() << "video. adjusttime to " << (m_videoData->timestamp - qnSyncTime->currentMSecsSinceEpoch()*1000)/1000 << "ms";
@@ -335,5 +340,6 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStati
         result << m_videoData;
         m_videoData.clear();
     }
+
     return true;
 }

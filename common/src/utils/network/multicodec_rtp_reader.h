@@ -26,6 +26,7 @@ public:
     void closeStream() ;
     bool isStreamOpened() const;
     const QnResourceAudioLayout* getAudioLayout() const;
+    int getLastResponseCode() const;
 private:
     QnRtpStreamParser* createParser(const QString& codecName);
     void initIO(RTPIODevice** ioDevice, QnRtpStreamParser* parser, const QString& mediaType);
