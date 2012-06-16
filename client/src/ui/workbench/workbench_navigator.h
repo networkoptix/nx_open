@@ -137,7 +137,7 @@ protected slots:
     void updatePlayingSupported();
     void updateSpeed();
     void updateSpeedRange();
-    
+   
     void updateThumbnailsLoader();
     
 protected slots:
