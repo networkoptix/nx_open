@@ -26,6 +26,8 @@ public:
     
     QSize thumbnailSize() const;
 
+    QnResourcePtr resource() const;
+
     /**
      * Load video pixmaps by specified time
      */

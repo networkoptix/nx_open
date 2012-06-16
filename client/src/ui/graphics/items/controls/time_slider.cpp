@@ -280,6 +280,8 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     m_rulerHeight(0.0),
     m_prefferedHeight(0.0)
 {
+    m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("NO THUMBNAILS\nAVAILABLE"), 16, QColor(255, 255, 255, 255));
+
     /* Prepare thumbnail update timer. */
     m_thumbnailsUpdateTimer = new QTimer(this);
     connect(m_thumbnailsUpdateTimer, SIGNAL(timeout()), this, SLOT(updateThumbnails()));
@@ -1072,15 +1074,15 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
         if(qFuzzyIsNull(lineHeight))
             continue;
 
-        const QPixmap *pixmap = m_lineData[line].commentPixmap;
+        QPixmap pixmap = m_lineData[line].commentPixmap;
         QRectF textRect(
             lineBarRect.left(),
             lineTop + lineHeight * lineCommentTopMargin,
-            pixmap->width(),
-            pixmap->height()
+            pixmap.width(),
+            pixmap.height()
         );
 
-        painter->drawPixmap(textRect, *pixmap, pixmap->rect());
+        painter->drawPixmap(textRect, pixmap, pixmap.rect());
 
         lineTop += lineHeight;
     }
@@ -1275,11 +1277,11 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, const QRectF &rect) {
         /* Draw label if needed. */
         qreal lineHeight = m_stepData[index].currentLineHeight;
         if(!qFuzzyIsNull(m_stepData[index].currentTextOpacity)) {
-            const QPixmap *pixmap = m_pixmapCache->positionShortPixmap(pos, m_stepData[index].currentTextHeight, m_steps[index]);
-            QRectF textRect(x - pixmap->width() / 2.0, rect.top() + lineHeight, pixmap->width(), pixmap->height());
+            QPixmap pixmap = m_pixmapCache->positionShortPixmap(pos, m_stepData[index].currentTextHeight, m_steps[index]);
+            QRectF textRect(x - pixmap.width() / 2.0, rect.top() + lineHeight, pixmap.width(), pixmap.height());
 
             QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * m_stepData[index].currentTextOpacity);
-            drawCroppedPixmap(painter, textRect, rect, *pixmap, pixmap->rect());
+            drawCroppedPixmap(painter, textRect, rect, pixmap, pixmap.rect());
         }
 
         /* Calculate line ends. */
@@ -1331,15 +1333,15 @@ void QnTimeSlider::drawDates(QPainter *painter, const QRectF &rect) {
         painter->setBrush(number % 2 ? dateOverlayColorA : dateOverlayColorB);
         painter->drawRect(QRectF(x0, rect.top(), x1 - x0, rect.height()));
 
-        const QPixmap *pixmap = m_pixmapCache->positionLongPixmap(pos0, textHeight, highlightStep);
+        QPixmap pixmap = m_pixmapCache->positionLongPixmap(pos0, textHeight, highlightStep);
 
-        QRectF textRect((x0 + x1) / 2.0 - pixmap->width() / 2.0, rect.top() + textTopMargin, pixmap->width(), pixmap->height());
+        QRectF textRect((x0 + x1) / 2.0 - pixmap.width() / 2.0, rect.top() + textTopMargin, pixmap.width(), pixmap.height());
         if(textRect.left() < rect.left())
             textRect.moveRight(x1);
         if(textRect.right() > rect.right())
             textRect.moveLeft(x0);
 
-        drawCroppedPixmap(painter, textRect, rect, *pixmap, pixmap->rect());
+        drawCroppedPixmap(painter, textRect, rect, pixmap, pixmap.rect());
 
         if(pos1 >= m_windowEnd)
             break;
@@ -1358,8 +1360,14 @@ void QnTimeSlider::drawThumbnails(QPainter *painter, const QRectF &rect) {
     if (rect.height() < thumbnailHeightForDrawing)
         return;
 
-    if (!thumbnailsLoader())
+    if (!thumbnailsLoader() || thumbnailsLoader()->loadedRange().isEmpty()) {
+        QSizeF labelSizeBound = rect.size();
+        labelSizeBound.setHeight(m_noThumbnailsPixmap.height());
+
+        QRectF labelRect = QnGeometry::aligned(QnGeometry::expanded(QnGeometry::aspectRatio(m_noThumbnailsPixmap.size()), labelSizeBound, Qt::KeepAspectRatio), rect, Qt::AlignCenter);
+        drawCroppedPixmap(painter, labelRect, rect, m_noThumbnailsPixmap, m_noThumbnailsPixmap.rect());
         return;
+    }
 
     qint64 step = thumbnailsLoader()->step();
     if (thumbnailsLoader()->step() <= 0)

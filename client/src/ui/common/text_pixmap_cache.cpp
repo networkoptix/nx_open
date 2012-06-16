@@ -1,7 +1,10 @@
 #include "text_pixmap_cache.h"
 
-#include <QtCore/QHash>
+#include <QtCore/QCache>
 #include <QtGui/QFont>
+#include <QtGui/QPixmap>
+#include <QtGui/QPainter>
+#include <QtGui/QFontMetrics>
 
 #include <utils/common/hashed_font.h>
 #include <utils/common/hash.h>
@@ -30,12 +33,12 @@ namespace {
 
 class QnTextPixmapCachePrivate {
 public:
-    QnTextPixmapCachePrivate() {
-        return;
-    }
+    QnTextPixmapCachePrivate(): 
+        pixmapByKey(64 * 1024 * 1024) /* 64 Megabytes. */ 
+    {}
 
     virtual ~QnTextPixmapCachePrivate() {
-        qDeleteAll(pixmapByKey);
+        return;
     }
 
     struct Key {
@@ -59,16 +62,14 @@ public:
         }
     };
 
-    QHash<Key, const QPixmap *> pixmapByKey;
+    QCache<Key, const QPixmap> pixmapByKey;
 };
 
 
 QnTextPixmapCache::QnTextPixmapCache(QObject *parent): 
     QObject(parent),
     d(new QnTextPixmapCachePrivate())
-{
-
-}
+{}
 
 QnTextPixmapCache::~QnTextPixmapCache() {
     return;
@@ -80,24 +81,24 @@ QnTextPixmapCache *QnTextPixmapCache::instance() {
     return qn_textPixmapCache_instance();
 }
 
-const QPixmap *QnTextPixmapCache::pixmap(const QString &text, const QFont &font, const QColor &color) {
+const QPixmap &QnTextPixmapCache::pixmap(const QString &text, const QFont &font, const QColor &color) {
     QColor localColor = color.toRgb();
     if(!localColor.isValid())
         localColor = QColor(0, 0, 0, 255);
 
     QnTextPixmapCachePrivate::Key key(text, font, localColor);
+    const QPixmap *result = d->pixmapByKey.object(key);
+    if(result)
+        return *result;
 
-    QHash<QnTextPixmapCachePrivate::Key, const QPixmap *>::const_iterator pos = d->pixmapByKey.find(key);
-    if(pos != d->pixmapByKey.end())
-        return *pos;
-
-    QPixmap *result = new QPixmap(renderText(
+    result = new QPixmap(renderText(
         text,
         QPen(localColor, 0), 
         font
     ));
+    d->pixmapByKey.insert(key, result, result->height() * result->width() * result->depth() / 8);
 
-    return d->pixmapByKey[key] = result;
+    return *result;
 }
 
 

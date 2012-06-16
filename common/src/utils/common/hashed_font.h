@@ -46,7 +46,7 @@ private:
         /* |31    ...    16|15|14|13 12 11 10| 9  8| 7| 6  5  4| 3| 2| 1| 0| *
          * | StyleStrategy |  |Fp| StyleHint |Style|Ls|  Caps  |Kr|St|Ov|Un| */
         quint32 flags = 
-            (font.underline()) | 
+            (font.underline() << 0) | 
             (font.overline() << 1) |
             (font.strikeOut() << 2) |
             (font.kerning() << 3) |
