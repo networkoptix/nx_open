@@ -11,6 +11,7 @@
 #include "simple_http_client.h"
 #include "utils/media/bitStream.h"
 #include "../common/synctime.h"
+#include "tcp_connection_priv.h"
 
 #define DEFAULT_RTP_PORT 554
 #define RESERVED_TIMEOUT_TIME (5*1000)
@@ -47,6 +48,7 @@ RTPIODevice::~RTPIODevice()
     delete m_mediaSocket;
     delete m_rtcpSocket;
 }
+
 
 /*
 void RTPIODevice::setTCPSocket(CommunicatingSocket* socket) 
@@ -147,7 +149,8 @@ RTPSession::RTPSession():
     m_endTime(AV_NOPTS_VALUE),
     m_scale(1.0),
     m_tcpTimeout(50 * 1000 * 1000),
-    m_proxyPort(0)
+    m_proxyPort(0),
+    m_responseCode(CODE_OK)
 {
     m_responseBuffer = new quint8[RTSP_BUFFER_LEN];
     m_responseBufferLen = 0;
@@ -159,6 +162,11 @@ RTPSession::~RTPSession()
 {
     m_tcpSock.close();
     delete [] m_responseBuffer;
+}
+
+int RTPSession::getLastResponseCode() const
+{
+    return m_responseCode;
 }
 
 // see rfc1890 for full RTP predefined codec list
@@ -284,9 +292,21 @@ void RTPSession::parseRangeHeader(const QString& rangeStr)
     }
 }
 
+void RTPSession::updateResponseStatus(const QByteArray& response)
+{
+    int firstLineEnd = response.indexOf('\n');
+    if (firstLineEnd >= 0) {
+        QList<QByteArray> params = response.left(firstLineEnd).split(' ');
+        if (params.size() >= 2) {
+            m_responseCode = params[1].trimmed().toInt();
+        }
+    }
+}
+
 bool RTPSession::open(const QString& url)
 {
     m_SessionId.clear();
+    m_responseCode = CODE_OK;
     mUrl = url;
     m_contentBase = mUrl.toString();
     m_responseBufferLen = 0;
@@ -326,6 +346,9 @@ bool RTPSession::open(const QString& url)
     tmp = extractRTSPParam(response, "Content-Base:");
     if (!tmp.isEmpty())
         m_contentBase = tmp;
+
+
+    updateResponseStatus(response);
 
     int sdp_index = response.indexOf("\r\n\r\n");
 
@@ -1173,4 +1196,3 @@ CommunicatingSocket* RTPIODevice::getMediaSocket()
     else
         return m_mediaSocket; 
 }
-
