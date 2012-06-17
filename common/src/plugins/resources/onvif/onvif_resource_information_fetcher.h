@@ -12,11 +12,13 @@ struct EndpointAdditionalInfo
 {
     QString name;
     QString manufacturer;
+    QString mac;
     QString discoveryIp;
 
-    EndpointAdditionalInfo(const QString& newName, const QString& newManufacturer, const QString& newDiscoveryIp):
+    EndpointAdditionalInfo(const QString& newName, const QString& newManufacturer, const QString& newMac, const QString& newDiscoveryIp):
         name(newName),
         manufacturer(newManufacturer),
+        mac(newMac),
         discoveryIp(newDiscoveryIp)
     {
 

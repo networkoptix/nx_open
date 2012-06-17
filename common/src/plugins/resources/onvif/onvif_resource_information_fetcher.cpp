@@ -161,6 +161,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
 
     if (mac.isEmpty()) {
         mac = fetchSerial(response2);
+        mac = mac.isEmpty()? info.mac: mac;
         if (mac.isEmpty()) {
             if (passwordsData.isNotAuthenticated(soapProxy.soap_fault())) {
                 qCritical() << "OnvifResourceInformationFetcher::findResources: Can't get ONVIF device MAC address, because login/password required. Endpoint URL: " << endpoint;
