@@ -52,6 +52,7 @@ public:
     void restore(const QnLayoutResourcePtr &resource);
 
     Qn::LayoutFlags flags(const QnLayoutResourcePtr &resource) const;
+    Qn::LayoutFlags flags(QnWorkbenchLayout *layout) const;
 
     bool isChanged(const QnLayoutResourcePtr &resource) const {
         return flags(resource) & Qn::LayoutIsChanged;

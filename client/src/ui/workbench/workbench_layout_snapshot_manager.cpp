@@ -7,6 +7,7 @@
 #include "workbench_context.h"
 #include "workbench_layout_snapshot_storage.h"
 #include "workbench_layout_synchronizer.h"
+#include "workbench_layout.h"
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchLayoutReplyProcessor
@@ -59,6 +60,11 @@ QnAppServerConnectionPtr QnWorkbenchLayoutSnapshotManager::connection() const {
 }
 
 Qn::LayoutFlags QnWorkbenchLayoutSnapshotManager::flags(const QnLayoutResourcePtr &resource) const {
+    if(!resource) {
+        qnNullWarning(resource);
+        return Qn::LayoutIsLocal;
+    }
+
     QHash<QnLayoutResourcePtr, Qn::LayoutFlags>::const_iterator pos = m_flagsByLayout.find(resource);
     if(pos == m_flagsByLayout.end()) {
         if(resource->resourcePool() == resourcePool()) {
@@ -71,6 +77,19 @@ Qn::LayoutFlags QnWorkbenchLayoutSnapshotManager::flags(const QnLayoutResourcePt
     }
 
     return *pos;
+}
+
+Qn::LayoutFlags QnWorkbenchLayoutSnapshotManager::flags(QnWorkbenchLayout *layout) const {
+    if(!layout) {
+        qnNullWarning(layout);
+        return Qn::LayoutIsLocal;
+    }
+
+    QnLayoutResourcePtr resource = layout->resource();
+    if(!resource)
+        return Qn::LayoutIsLocal;
+
+    return flags(resource);
 }
 
 void QnWorkbenchLayoutSnapshotManager::setFlags(const QnLayoutResourcePtr &resource, Qn::LayoutFlags flags) {
