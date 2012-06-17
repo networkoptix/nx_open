@@ -210,7 +210,7 @@ void OnvifResourceSearcherWsdd::findResources(QnResourceList& result) const
     qDebug() << "OnvifResourceSearcherWsdd::findResources: Endpoints in the list:"
              << (endpoints.size()? "": " EMPTY");
     while (endpIter != endpoints.end()) {
-        qDebug() << "    " << endpIter.key() << ": " << endpIter.value().manufacturer
+        qDebug() << "    " << endpIter.key() << " (" << endpIter.value().mac << "): " << endpIter.value().manufacturer
                  << " - " << endpIter.value().name << ", discovered in " << endpIter.value().discoveryIp;
         ++endpIter;
     }
@@ -285,13 +285,13 @@ const QString OnvifResourceSearcherWsdd::getMac(const wsdd__ProbeMatchesType* pr
     if (pos == -1) {
         return QString();
     }
-    QString macFromEndpoint = endpoint.right(pos + 1).trimmed();
+    QString macFromEndpoint = endpoint.right(endpoint.size() - pos - 1).trimmed();
 
     pos = messageId.lastIndexOf("-");
     if (pos == -1) {
         return QString();
     }
-    QString macFromMessageId = messageId.right(pos + 1).trimmed();
+    QString macFromMessageId = messageId.right(messageId.size() - pos - 1).trimmed();
 
     if (macFromEndpoint.size() == 12 && macFromEndpoint == macFromMessageId) {
         QString result;
