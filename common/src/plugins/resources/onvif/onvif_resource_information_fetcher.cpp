@@ -44,6 +44,7 @@ void OnvifResourceInformationFetcher::findResources(const EndpointInfoHash& endp
         ++iter;
     }
 }
+
 void OnvifResourceInformationFetcher::findResources(const QString& endpoint, const EndpointAdditionalInfo& info, QnResourceList& result) const
 {
     if (endpoint.isEmpty()) {
