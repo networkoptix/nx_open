@@ -35,6 +35,7 @@ private:
 private:
     void serializeSpsPps(CLByteArray& dst);
     void decodeSpsInfo(const QByteArray& data);
+    QnCompressedVideoDataPtr createVideoData(quint32 rtpTime, const RtspStatistic& statistics);
 };
 
 #endif
