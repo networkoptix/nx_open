@@ -63,7 +63,7 @@ public:
      * \returns                         Permissions that are required for the provided parameter.
      */
     Qn::Permissions requiredPermissions(const QString &target = QString()) const {
-        return m_requiredPermissions.value(target);
+        return m_permissions.value(target).required;
     }
 
     void setRequiredPermissions(Qn::Permissions requiredPermissions);
@@ -73,6 +73,18 @@ public:
      * \param requiredPermissions       Permissions required for the provided parameter.
      */
     void setRequiredPermissions(const QString &target, Qn::Permissions requiredPermissions);
+
+    /**
+     * \param target                    Name of the action parameter.
+     * \returns                         Permissions that must not be present for the provided parameter.
+     */
+    Qn::Permissions forbiddenPermissions(const QString &target = QString()) const {
+        return m_permissions.value(target).forbidden;
+    }
+
+    void setForbiddenPermissions(const QString &target, Qn::Permissions forbiddenPermissions);
+
+    void setForbiddenPermissions(Qn::Permissions forbiddenPermissions);
 
     Qn::ActionFlags flags() const {
         return m_flags;
@@ -159,9 +171,16 @@ private slots:
     void updateText();
 
 private:
+    struct Permissions {
+        Permissions(): required(0), forbidden(0) {}
+
+        Qn::Permissions required;
+        Qn::Permissions forbidden;
+    };
+
     const Qn::ActionId m_id;
     Qn::ActionFlags m_flags;
-    QHash<QString, Qn::Permissions> m_requiredPermissions;
+    QHash<QString, Permissions> m_permissions;
     QString m_normalText, m_toggledText, m_pulledText;
     QWeakPointer<QnActionCondition> m_condition;
 

@@ -133,6 +133,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::AboutAction),                            SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
     connect(action(Qn::SystemSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_systemSettingsAction_triggered()));
     connect(action(Qn::OpenFileAction),                         SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
+    connect(action(Qn::OpenLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_openLayoutAction_triggered()));
     connect(action(Qn::OpenFolderAction),                       SIGNAL(triggered()),    this,   SLOT(at_openFolderAction_triggered()));
     connect(action(Qn::ConnectToServerAction),                  SIGNAL(triggered()),    this,   SLOT(at_connectToServerAction_triggered()));
     connect(action(Qn::GetMoreLicensesAction),                  SIGNAL(triggered()),    this,   SLOT(at_getMoreLicensesAction_triggered()));
@@ -616,6 +617,8 @@ void QnWorkbenchActionHandler::at_openInNewWindowAction_triggered() {
 void QnWorkbenchActionHandler::at_openLayoutsAction_triggered() {
     foreach(const QnResourcePtr &resource, menu()->currentParameters(sender()).resources()) {
         QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>();
+        if(!layoutResource)
+            continue;
 
         QnWorkbenchLayout *layout = QnWorkbenchLayout::instance(layoutResource);
         if(layout == NULL) {
@@ -859,14 +862,29 @@ void QnWorkbenchActionHandler::at_openFileAction_triggered() {
     dialog->setOption(QFileDialog::DontUseNativeDialog, true);
     dialog->setFileMode(QFileDialog::ExistingFiles);
     QStringList filters;
-    filters << tr("All Supported (*.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)");
+    filters << tr("All Supported (*.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff *.layout)");
     filters << tr("Video (*.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)");
     filters << tr("Pictures (*.jpg *.png *.gif *.bmp *.tiff)");
+    filters << tr("Layouts (*.layout)");
     filters << tr("All files (*.*)");
     dialog->setNameFilters(filters);
     
     if(dialog->exec())
-        addToLayout(workbench()->currentLayout()->resource(), dialog->selectedFiles(), false);
+        menu()->trigger(Qn::DropResourcesAction, addToResourcePool(dialog->selectedFiles()));
+}
+
+void QnWorkbenchActionHandler::at_openLayoutAction_triggered() {
+    QScopedPointer<QFileDialog> dialog(new QFileDialog(widget(), tr("Open file")));
+    dialog->setOption(QFileDialog::DontUseNativeDialog, true);
+    dialog->setFileMode(QFileDialog::ExistingFiles);
+    QStringList filters;
+    filters << tr("All Supported (*.layout)");
+    filters << tr("Layouts (*.layout)");
+    filters << tr("All files (*.*)");
+    dialog->setNameFilters(filters);
+
+    if(dialog->exec())
+        menu()->trigger(Qn::DropResourcesAction, QnResourceCriterion::filter<QnLayoutResource, QnResourceList>(addToResourcePool(dialog->selectedFiles())));
 }
 
 void QnWorkbenchActionHandler::at_openFolderAction_triggered() {
@@ -876,7 +894,7 @@ void QnWorkbenchActionHandler::at_openFolderAction_triggered() {
     dialog->setOptions(QFileDialog::ShowDirsOnly);
     
     if(dialog->exec())
-        addToLayout(workbench()->currentLayout()->resource(), dialog->selectedFiles(), false);
+        menu()->trigger(Qn::DropResourcesAction, addToResourcePool(dialog->selectedFiles()));
 }
 
 void QnWorkbenchActionHandler::at_aboutAction_triggered() {

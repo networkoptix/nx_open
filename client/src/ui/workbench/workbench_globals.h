@@ -140,7 +140,7 @@ namespace Qn {
         CreateLayoutPermission      = 0x00000800,
 
 
-        /* Current user-specific permissions. */
+        /* Current user-specific permissions. Are meaningful for a resource representing current user only. */
 
         /** Permission to create users. */
         CreateUserPermission        = 0x10000000,

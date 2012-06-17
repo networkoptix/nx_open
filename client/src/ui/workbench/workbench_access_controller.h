@@ -43,11 +43,6 @@ public:
 
     QnWorkbenchPermissionsNotifier *notifier(const QnResourcePtr &resource) const;
 
-    /**
-     * The same as asking for permissions of the current user. 
-     */
-    Qn::Permissions permissions() const;
-
     bool isOwner() const;
     bool isAdmin() const;
     bool isViewer() const;

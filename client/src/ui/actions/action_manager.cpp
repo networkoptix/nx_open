@@ -121,6 +121,18 @@ public:
         return *this;
     }
 
+    QnActionBuilder forbiddenPermissions(Qn::Permissions permissions) {
+        m_action->setForbiddenPermissions(permissions);
+
+        return *this;
+    }
+
+    QnActionBuilder forbiddenPermissions(const QString &key, Qn::Permissions permissions) {
+        m_action->setForbiddenPermissions(key, permissions);
+
+        return *this;
+    }
+
     QnActionBuilder separator(bool isSeparator = true) {
         m_action->setSeparator(isSeparator);
         m_action->setFlags(m_action->flags() | Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::WidgetTarget | Qn::ResourceTarget | Qn::LayoutItemTarget);
@@ -368,7 +380,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
         factory(Qn::NewUserAction).
             flags(Qn::Main | Qn::Tree | Qn::NoTarget).
-            requiredPermissions(Qn::CreateUserPermission).
+            requiredPermissions(Qn::CurrentUserParameter, Qn::CreateUserPermission).
             text(tr("User...")).
             pulledText(tr("New User..."));
     } factory.leaveSubMenu();
@@ -385,6 +397,12 @@ QnActionManager::QnActionManager(QObject *parent):
             shortcut(tr("Ctrl+O")).
             autoRepeat(false).
             icon(qnSkin->icon("folder.png"));
+
+        factory(Qn::OpenLayoutAction).
+            flags(Qn::Main | Qn::Scene).
+            forbiddenPermissions(Qn::CurrentLayoutParameter, Qn::AddRemoveItemsPermission).
+            text(tr("Layout(s)...")).
+            autoRepeat(false);
 
         factory(Qn::OpenFolderAction).
             flags(Qn::Main | Qn::Scene).
