@@ -752,3 +752,8 @@ void QnResource::init()
         initInternal();
     }
 }
+
+bool QnResource::isInitialized() const
+{
+    return m_initialized;
+}
