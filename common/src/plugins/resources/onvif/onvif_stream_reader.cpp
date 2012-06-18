@@ -246,11 +246,51 @@ const QString QnOnvifStreamReader::updateCameraAndfetchStreamUrl() const
     return QString();
 }
 
+//int (*fsend)(struct soap*, const char*, size_t);
+int gsoapFsend2(struct soap *soap, const char *s, size_t n)
+{
+    int (*fsend)(struct soap*, const char*, size_t);
+    memcpy((void*)fsend, soap->user, sizeof(void*));
+    /*QByteArray tmpA(s, n);
+    QString tmp(tmpA);
+    int pos1 = tmp.indexOf("<onvifXsd:UseCount>");
+    int pos2 = tmp.indexOf("</onvifXsd:UseCount>");
+    if (pos1 != -1 && pos2 != -1) {
+        tmp = tmp.replace(pos1, pos2 - pos1 + sizeof("</onvifXsd:UseCount>"), QString(""));
+    }
+    return fsend(soap, tmp.toStdString().c_str(), tmp.size());*/
+    return fsend(soap, s, n);
+}
+
+int gsoapFfiltersend(struct soap* soap, const char** s, size_t* n)
+{
+    QString tmp(QByteArray(*s, *n));
+    if (tmp == "onvifXsd:UseCount") {
+        if (soap->user == (void*)(-1)) {
+            soap->user = (void*)(-2);
+        } else {
+            soap->user = (void*)(-1);
+        }
+    }
+
+    if (soap->user != 0) {
+        *n = 0;
+    }
+
+    if (soap->user == (void*)(-2) && tmp == "<") {
+        soap->user = 0;
+    }
+
+    return SOAP_OK;
+}
+
 const QString QnOnvifStreamReader::updateCameraAndfetchStreamUrl(bool isPrimary) const
 {
     MediaBindingProxy soapProxy;
-    soapProxy.soap->send_timeout = 5;
+    soapProxy.soap->send_timeout = 500;
     soapProxy.soap->recv_timeout = 5;
+    soapProxy.soap->user = 0;
+    soapProxy.soap->ffiltersend = gsoapFfiltersend;
 
     QAuthenticator auth(m_onvifRes->getAuth());
     std::string login(auth.user().toStdString());
@@ -289,7 +329,22 @@ const QString QnOnvifStreamReader::updateCameraAndfetchStreamUrl(bool isPrimary)
         profileToken = profilePtr->token;
         _onvifMedia__SetVideoEncoderConfiguration encRequest;
         _onvifMedia__SetVideoEncoderConfigurationResponse encResponse;
-        encRequest.Configuration = profilePtr->VideoEncoderConfiguration;
+
+        onvifXsd__VideoEncoderConfiguration config;
+        config.Name = profilePtr->VideoEncoderConfiguration->Name;
+        config.token = profilePtr->VideoEncoderConfiguration->token;
+        config.Encoding = profilePtr->VideoEncoderConfiguration->Encoding;
+        config.Resolution = profilePtr->VideoEncoderConfiguration->Resolution;
+        config.Quality = profilePtr->VideoEncoderConfiguration->Quality;
+        config.RateControl = profilePtr->VideoEncoderConfiguration->RateControl;
+        config.MPEG4 = NULL;
+        config.H264 = NULL;
+        config.Multicast = NULL;
+        config.__anyAttribute = NULL;
+        config.SessionTimeout = profilePtr->VideoEncoderConfiguration->SessionTimeout;
+
+        encRequest.Configuration = &config;
+        profilePtr->VideoEncoderConfiguration;
 
         VideoEncoderChanges changes;
         fillVideoEncoderChanges(changes);
