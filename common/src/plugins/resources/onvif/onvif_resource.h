@@ -52,10 +52,9 @@ public:
     int innerQualityToOnvif(QnStreamQuality quality) const;
     const QString createOnvifEndpointUrl() const { return createOnvifEndpointUrl(getHostAddress().toString()); }
 
+    const ResolutionPair getPrimaryResolution() const;
+    const ResolutionPair getSecondaryResolution() const;
     const ResolutionPair getMaxResolution() const;
-    const ResolutionPair getNearestResolutionForSecondary(const ResolutionPair& resolution, float aspectRatio) const;
-    const ResolutionPair getNearestResolution(const ResolutionPair& resolution, float aspectRatio, double maxResolutionSquare) const;
-    float getResolutionAspectRatio(const ResolutionPair& resolution) const;
     bool isVideoOptionsNotSet() const { return videoOptionsNotSet; }
     bool isSoapAuthorized() const;
 
@@ -96,6 +95,10 @@ private:
     void save();
 	void setMinMaxQuality(int min, int max);
 	int round(float value);
+    const ResolutionPair getNearestResolutionForSecondary(const ResolutionPair& resolution, float aspectRatio) const;
+    const ResolutionPair getNearestResolution(const ResolutionPair& resolution, float aspectRatio, double maxResolutionSquare) const;
+    float getResolutionAspectRatio(const ResolutionPair& resolution) const;
+    void findSetPrimarySecondaryResolution();
 private:
     static const char* ONVIF_PROTOCOL_PREFIX;
     static const char* ONVIF_URL_SUFFIX;
@@ -115,6 +118,8 @@ private:
     QString deviceUrl;
     bool reinitDeviceInfo;
     CODECS codec;
+    ResolutionPair primaryResolution;
+    ResolutionPair secondaryResolution;
 };
 
 typedef QSharedPointer<QnPlOnvifResource> QnPlOnvifResourcePtr;
