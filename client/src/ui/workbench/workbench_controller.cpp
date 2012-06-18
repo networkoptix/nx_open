@@ -753,10 +753,7 @@ void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, 
     
     /* Calculate integer size. */
     QSizeF gridSizeF = gridRectF.size();
-    QSize gridSize = QSize(
-        qMax(1, qRound(gridSizeF.width())),
-        qMax(1, qRound(gridSizeF.height()))
-    );
+    QSize gridSize = mapper()->mapToGrid(widget->size());
     if(widget->hasAspectRatio()) {
         if(widget->aspectRatio() > 1.0) {
             gridSize = bestSingleBoundedSize(mapper(), gridSize.width(), Qt::Horizontal, widget->aspectRatio());
