@@ -248,6 +248,11 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
                 else
                     return CL_HTTP_AUTH_REQUIRED;
             }
+            else if (m_responseLine.contains("not found"))
+            {
+                return CL_HTTP_NOT_FOUND;
+            }
+
 
             return CL_TRANSPORT_ERROR;
         }
