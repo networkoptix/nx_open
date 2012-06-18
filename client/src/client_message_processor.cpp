@@ -104,8 +104,11 @@ void QnClientMessageProcessor::at_messageReceived(QnMessage event)
 
     stream << "Got event: " << event.eventType << " " << event.objectName << " " << event.objectId << event.resourceGuid;
 
-    if (event.eventType == QN_MESSAGE_RES_DISABLED_CHANGE || event.eventType == QN_MESSAGE_RES_STATUS_CHANGE)
-        stream << "data: " << event.data.toInt();
+    if (event.eventType == QN_MESSAGE_RES_DISABLED_CHANGE)
+        stream << "disabled: " << event.disabled.toInt();
+
+    if(event.eventType == QN_MESSAGE_RES_STATUS_CHANGE)
+        stream << "status: " << event.status.toInt();
 
     qDebug() << debugStr;
 
@@ -123,7 +126,7 @@ void QnClientMessageProcessor::at_messageReceived(QnMessage event)
 
 		if (resource)
 		{
-			resource->setDisabled(event.data.toInt());
+            resource->setDisabled(event.disabled.toInt());
 		}
 	}
     else if (event.eventType == QN_MESSAGE_RES_STATUS_CHANGE)
@@ -136,7 +139,7 @@ void QnClientMessageProcessor::at_messageReceived(QnMessage event)
 
         if (resource)
         {
-            QnResource::Status status = (QnResource::Status)event.data.toInt();
+            QnResource::Status status = (QnResource::Status)event.status.toInt();
             resource->setStatus(status);
         }
     }

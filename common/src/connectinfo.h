@@ -9,6 +9,7 @@ struct QnConnectInfo
 {
     QString version;
     QList<QnCompatibilityItem> compatibilityItems;
+    int proxyPort;
 };
 
 typedef QSharedPointer<QnConnectInfo> QnConnectInfoPtr;

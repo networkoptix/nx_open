@@ -19,7 +19,6 @@ bool QnMessage::load(const QVariant& parsed)
 
     if (eventType != QN_MESSAGE_RES_CHANGE
         && eventType != QN_MESSAGE_RES_DELETE
-        && eventType != QN_MESSAGE_RES_SETPARAM
         && eventType != QN_MESSAGE_RES_STATUS_CHANGE
         && eventType != QN_MESSAGE_RES_DISABLED_CHANGE
         && eventType != QN_MESSAGE_LICENSE_CHANGE
@@ -66,20 +65,6 @@ bool QnMessage::load(const QVariant& parsed)
 
     if (dict.contains("resourceGuid"))
         resourceGuid = dict["resourceGuid"].toString();
-
-    if (dict.contains("data"))
-        data = dict["data"].toString();
-
-    if (eventType == QN_MESSAGE_RES_SETPARAM)
-    {
-        if (!dict.contains("paramName") || !dict.contains("paramValue"))
-            return false;
-
-        paramName = dict["paramName"].toString();
-        paramValue = dict["paramValue"].toString();
-
-        return true;
-    }
 
     return true;
 }

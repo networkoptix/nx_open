@@ -4,5 +4,6 @@ import "compatibility.proto";
 
 message ConnectInfo {
     optional string version = 1;
-    optional CompatibilityInfo compatibilityInfo = 2;
+    optional CompatibilityItems compatibilityItems = 2;
+    optional int32 proxyPort = 3;
 }

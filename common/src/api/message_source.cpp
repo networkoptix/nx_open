@@ -192,9 +192,6 @@ void QnMessageSource::httpReadyRead()
                 emit connectionReset();
             }
 
-            if (event.dict.contains("proxyPort"))
-                QnAppServerConnectionFactory::setDefaultMediaProxyPort(event.dict["proxyPort"].toInt());
-
 #if 0
             // Here we can check component versions
             if (event.dict.contains("version"))

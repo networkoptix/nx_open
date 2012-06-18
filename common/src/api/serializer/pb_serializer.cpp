@@ -426,7 +426,8 @@ void serializeCamera_i(proto::pb::Camera& pb_camera, const QnVirtualCameraResour
     pb_camera.set_motiontype(static_cast<proto::pb::Camera_MotionType>(cameraPtr->getMotionType()));
 
     QnParamList params = cameraPtr->getResourceParamList();
-    foreach(QString key, params.keys()) {
+    foreach(QString key, params.keys())
+    {
         if (params[key].domain() == QnDomainDatabase)
         {
             proto::pb::Camera_Property& pb_property = *pb_camera.add_property();
@@ -436,7 +437,8 @@ void serializeCamera_i(proto::pb::Camera& pb_camera, const QnVirtualCameraResour
         }
     }
 
-    foreach(const QnScheduleTask& scheduleTaskIn, cameraPtr->getScheduleTasks()) {
+    foreach(const QnScheduleTask& scheduleTaskIn, cameraPtr->getScheduleTasks())
+    {
         proto::pb::Camera_ScheduleTask& pb_scheduleTask = *pb_camera.add_scheduletask();
 
         pb_scheduleTask.set_id(scheduleTaskIn.getId().toInt());
@@ -594,7 +596,8 @@ void QnApiPbSerializer::deserializeCameraHistoryList(QnCameraHistoryList &camera
 {
     proto::pb::CameraServerItems pb_csis;
 
-    if (!pb_csis.ParseFromArray(data.data(), data.size())) {
+    if (!pb_csis.ParseFromArray(data.data(), data.size()))
+    {
         QByteArray errorString;
         errorString = "QnApiPbSerializer::deserializeLicenses(): Can't parse message";
         throw QnSerializeException(errorString);
@@ -607,18 +610,23 @@ void QnApiPbSerializer::deserializeConnectInfo(QnConnectInfoPtr& connectInfo, co
 {
     proto::pb::ConnectInfo pb_connectInfo;
 
-    if (!pb_connectInfo.ParseFromArray(data.data(), data.size())) {
+    if (!pb_connectInfo.ParseFromArray(data.data(), data.size()))
+    {
         QByteArray errorString;
         errorString = "QnApiPbSerializer::deserializeConnectInfo(): Can't parse message";
         throw QnSerializeException(errorString);
     }
 
     connectInfo->version = pb_connectInfo.version().c_str();
+
     typedef google::protobuf::RepeatedPtrField<proto::pb::CompatibilityItem> PbCompatibilityItemList;
     PbCompatibilityItemList items = pb_connectInfo.compatibilityinfo().item();
-    for (PbCompatibilityItemList::const_iterator ci = items.begin(); ci != items.end(); ++ci) {
+
+    for (PbCompatibilityItemList::const_iterator ci = items.begin(); ci != items.end(); ++ci)
+    {
         connectInfo->compatibilityItems.append(QnCompatibilityItem(ci->ver1().c_str(), ci->comp1().c_str(), ci->ver2().c_str()));
     }
+    connectInfo->proxyPort = pb_connectInfo.proxyport();
 }
 
 void QnApiPbSerializer::serializeCameras(const QnVirtualCameraResourceList& cameras, QByteArray& data)

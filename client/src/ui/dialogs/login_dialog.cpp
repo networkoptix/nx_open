@@ -292,6 +292,8 @@ void LoginDialog::at_connectFinished(int status, const QByteArray &/*errorString
         return;
     }
 
+    QnAppServerConnectionFactory::setDefaultMediaProxyPort(connectInfo->proxyPort);
+
     QnConnectionData connectionData;
     connectionData.url = currentUrl();
     qnSettings->setLastUsedConnection(connectionData);
