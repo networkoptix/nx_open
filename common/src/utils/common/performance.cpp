@@ -94,7 +94,7 @@ namespace {
         }
 
         bool init(){
-            if QSysInfo::windowsVersion() <= QSysInfo::WV_2000{
+            if (QSysInfo::windowsVersion() <= QSysInfo::WV_2000){
                 qnWarning("Windows version too low to use WMI");
                 return false;
             }
