@@ -10,7 +10,7 @@
 #include "core/resource/storage_resource.h"
 
 extern QMutex global_ffmpeg_mutex;
-
+static const qint64 UTC_TIME_DETECTION_THRESHOLD = 1000000ll * 3600*24*100;
 
 class QnAviAudioLayout: public QnResourceAudioLayout
 {
@@ -321,8 +321,11 @@ QnVideoResourceLayout* QnAviArchiveDelegate::getVideoLayout()
             if (m_useAbsolutePos)
             {
                 AVDictionaryEntry* start_time = av_dict_get(m_formatContext->metadata,getTagName(Tag_startTime, format), 0, 0);
-                if (start_time)
+                if (start_time) {
                     m_startTime = QString(start_time->value).toLongLong()*1000ll;
+                    if (m_startTime >= UTC_TIME_DETECTION_THRESHOLD)
+                        m_resource->addFlags(QnResource::utc);
+                }
             }
         }
     }
