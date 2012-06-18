@@ -157,6 +157,7 @@ QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
 
 void QnMulticodecRtpReader::initIO(RTPIODevice** ioDevice, QnRtpStreamParser* parser, const QString& mediaType)
 {
+    *ioDevice = 0;
     if (parser)
     {
         *ioDevice = m_RtpSession.getTrackIoByType(mediaType);
@@ -214,15 +215,6 @@ void QnMulticodecRtpReader::closeStream()
 {
     m_RtpSession.sendTeardown();
     m_RtpSession.stop();
-
-    m_videoIO = 0;
-    m_audioIO = 0;
-    
-    delete m_videoParser;
-    delete m_audioParser;
-    m_videoParser = 0;
-    m_audioParser = 0;
-
 }
 
 bool QnMulticodecRtpReader::isStreamOpened() const

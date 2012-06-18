@@ -1059,6 +1059,7 @@ bool RTPSession::readTextResponce(QByteArray& response)
             }
             if (startPtr)
             {
+                Q_ASSERT((m_responseBuffer+m_responseBufferLen) - curPtr >= 0);
                 response.append(QByteArray::fromRawData((char*)startPtr, curPtr - startPtr));
 
                 memmove(startPtr, curPtr, (m_responseBuffer+m_responseBufferLen) - curPtr);

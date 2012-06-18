@@ -66,8 +66,7 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
     if (m_camera)
     {
         ui->softwareMotionButton->setEnabled(camera->supportedMotionType() & MT_SoftwareGrid);
-        //ui->cameraMotionButton->setEnabled(camera->supportedMotionType() & MT_HardwareGrid);
-        if (camera->supportedMotionType() & MT_HardwareGrid)
+        if (camera->supportedMotionType() & (MT_HardwareGrid | MT_MotionWindow))
             ui->cameraMotionButton->setText("Hardware (Camera built-in)");
         else
             ui->cameraMotionButton->setText("Do not record motion");
