@@ -20,12 +20,17 @@ void QnDialQualityHelper::findDataForTime(const qint64 time, DeviceFileCatalog::
     chunk = catalog->chunkAt(catalog->findFileIndex(time, findMethod));
 
     qint64 timeDistance = chunk.distanceToTime(time);
+    if (findMethod == DeviceFileCatalog::OnRecordHole_NextChunk && chunk.endTimeMs() <= time)
+        timeDistance = INT_MAX; // actually chunk not found
     if (timeDistance > 0)
     {
         // chunk not found. check in alternate quality
         DeviceFileCatalogPtr catalogAlt = (m_quality == MEDIA_Quality_High ? m_catalogLow : m_catalogHi);
         DeviceFileCatalog::Chunk altChunk = catalogAlt->chunkAt(catalogAlt->findFileIndex(time, findMethod));
         qint64 timeDistanceAlt = altChunk.distanceToTime(time);
+        if (findMethod == DeviceFileCatalog::OnRecordHole_NextChunk && altChunk.endTimeMs() <= time)
+            timeDistanceAlt = INT_MAX; // actually chunk not found
+
         if (timeDistance - timeDistanceAlt > SECOND_STREAM_FIND_EPS) 
         {
             // alternate quality matched better
