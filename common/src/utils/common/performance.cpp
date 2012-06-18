@@ -1,8 +1,8 @@
 #include "performance.h"
-
 #include <QtCore/QtGlobal>
+
 // timer step in seconds
-#define CPU_USAGE_REFRESH 2
+#define CPU_USAGE_REFRESH 1
 
 
 #ifdef Q_OS_WIN
@@ -18,15 +18,15 @@
 
 namespace {
 
-// cpu_usage block
-#ifdef Q_OS_WIN
+    // cpu_usage block
+#if defined(Q_OS_WIN)
 
-    // Does not work in Windows 2000 or earlier // TODO: check windows version and write a qnWarning about it.
     class CpuUsageRefresher {
     public:
+
+        CpuUsageRefresher() {
             m_locator = NULL;
             m_service = NULL;
-            m_cpu_count = -1;
             m_prev_cpu = 0;
             m_prev_ts = 0;
             m_usage = 0;
@@ -59,34 +59,33 @@ namespace {
             if (pEnumerator){
                 IWbemClassObject *pclsObj;
                 ULONG uReturn = 0;
-                qulonglong cpu = 0;
-                qulonglong ts = 0;
-                while (pEnumerator) // TODO: maybe while(true) ?
+                quint64 cpu = 0;
+                quint64 ts = 0;
+
+                pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
+                while (uReturn != 0)
                 {
-                    pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
-
-                    if(0 == uReturn)
-                        break;
-
                     VARIANT vtProc;
 
                     pclsObj->Get(L"PercentProcessorTime", 0, &vtProc, 0, 0);
                     QString qstr((QChar*)vtProc.bstrVal, ::SysStringLen(vtProc.bstrVal)); // TODO: check VARIANT type (vtProc.vt), or maybe write a more generic variant-to-longlong conversion function.
                     cpu = cpu + qstr.toULongLong();
+                    VariantClear(&vtProc);
 
                     if (ts == 0){
                         pclsObj->Get(L"Timestamp_Sys100NS",0, &vtProc, 0, 0);
                         QString qstr((QChar*)vtProc.bstrVal, ::SysStringLen(vtProc.bstrVal));
                         ts = qstr.toULongLong();
                     }
-
                     VariantClear(&vtProc);
                     pclsObj->Release();
+
+                    pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
                 }
                 pEnumerator->Release();
 
                 if (m_prev_ts > 0){
-                    m_usage = ((cpu - m_prev_cpu) * 100) / ((ts - m_prev_ts) * m_cpu_count);
+                    m_usage = ((cpu - m_prev_cpu) * 100) / ((ts - m_prev_ts) * QnPerformance::getCpuCores());
                     qnDebug("usage %1", m_usage);
                 }
                 m_prev_cpu = cpu;
@@ -95,6 +94,12 @@ namespace {
         }
 
         bool init(){
+            if QSysInfo::windowsVersion() <= QSysInfo::WV_2000{
+                qnWarning("Windows version too low to use WMI");
+                return false;
+            }
+            
+
             HRESULT hres;
 
             // Step 1: --------------------------------------------------
@@ -193,8 +198,7 @@ namespace {
                 return false;
             }
 
-            m_cpu_count = QnPerformance::getCpuCores();
-            qnDebug("CpuInfo %1, cores %2\n", QnPerformance::getCpuBrand(), m_cpu_count);
+            qnDebug("CpuInfo %1, cores %2\n", QnPerformance::getCpuBrand(), QnPerformance::getCpuCores());
             m_timer = SetTimer(0, 0, CPU_USAGE_REFRESH * 1000, timerCallback);
             return true;
         }
@@ -219,16 +223,25 @@ namespace {
         }
 
     private:
-        // TODO: add doxydocs for the class fields.
-
-
+        /** Flag of successful initialization */
         bool m_initialized;
+
+        /** WMI namespace locator interface*/
         IWbemLocator *m_locator;
+
+        /** WMI services provider interface */ 
         IWbemServices *m_service;
-        int m_cpu_count;
+
+        /** Previous value of raw WMI PercentProcessorTime stat */
         quint64 m_prev_cpu;
+
+        /** Previous value of raw WMI Timestamp_Sys100NS stat */
         quint64 m_prev_ts;
+
+        /** Processor usage percent for the last CPU_USAGE_REFRESH seconds */
         uint m_usage;
+
+        /** System timer for processor usage calculating */
         UINT_PTR m_timer;
     };
 
@@ -240,7 +253,7 @@ namespace {
         refresherInstance()->refresh();
     }
 
-#else // TODO: #elif here
+#elif defined(Q_OS_LINUX)
 
 #include <time.h>
 #include <signal.h>
@@ -248,99 +261,7 @@ namespace {
 
 #define SIG_CODE SIGRTMIN
 
-    class CpuUsageRefresher{
-
-    public:
-        CpuUsageRefresher(){
-            m_cpu_count = -1;
-            m_prev_cpu = 0;
-            m_prev_ts = 0;
-            m_usage = 0;
-            m_initialized = init();
-        }
-
-        ~CpuUsageRefresher(){
-            timer_delete(m_timer);
-        }
-
-        uint usage(){
-            return m_usage;
-        }
-
-    private:
-        static void timerCallback(int sig, siginfo_t *si, void *uc);
-
-        void refresh(){
-            qnDebug("callback");
-        }
-
-        bool init(){
-            m_cpu_count = QnPerformance::getCpuCores();
-            qnDebug("CpuInfo %1, cores %2\n", QnPerformance::getCpuBrand(), m_cpu_count);
-
-            struct sigevent sev;
-            struct itimerspec its;
-            struct sigaction sa;
-
-            /* Establish handler for timer signal */
-
-            qnDebug("Establishing handler for signal %1\n", SIG_CODE);
-            sa.sa_flags = SA_SIGINFO;
-            sa.sa_sigaction = timerCallback;
-            sigemptyset(&sa.sa_mask);
-            if (sigaction(SIG_CODE, &sa, NULL) == -1){
-                qnDebug("Err %1", errno);
-                return false;
-            }
-
-
-            /* Create the timer */
-            qnDebug("Creating timer...\n");
-            sev.sigev_notify = SIGEV_SIGNAL;
-            sev.sigev_signo = SIG_CODE;
-            sev.sigev_value.sival_ptr = &m_timer;
-            if (timer_create(CLOCK_REALTIME, &sev, &m_timer) == -1){
-                qnDebug("Err %1", errno);
-                return false;
-            }
-            
-            /* Start the timer */
-            qnDebug("Starting timer...");
-            its.it_value.tv_sec = CPU_USAGE_REFRESH;
-            its.it_value.tv_nsec = 0;
-            its.it_interval.tv_sec = its.it_value.tv_sec;
-            its.it_interval.tv_nsec = its.it_value.tv_nsec;
-
-            if (timer_settime(m_timer, 0, &its, NULL) == -1){
-                qnDebug("Err %1", errno);
-                return false;
-            }
-            return true;
-        }
-
-    private:
-        bool m_initialized;
-        int m_cpu_count;
-        quint64 m_prev_cpu;
-        quint64 m_prev_ts;
-        uint m_usage;
-        timer_t m_timer;
-    };
-
-    Q_GLOBAL_STATIC(CpuUsageRefresher, refresherInstance);
-    // initializer for Q_GLOBAL_STATIC singletone
-    CpuUsageRefresher* dummy = refresherInstance();
-
-    VOID CALLBACK CpuUsageRefresher::timerCallback(int sig, siginfo_t *si, void *uc){
-        CpuUsageRefresher refresher = refresherInstance();
-        if (si->si_value.sival_ptr == &(refresher->m_timer)){
-            refresher->refresh();
-        }
-    }
-#endif
-
-#ifndef Q_OS_WIN
-    QString GetSystemOutput(const char *cmd) // TODO: class & type names start with a Capital letter, function names with a lowercase.
+    QString getSystemOutput(const char *cmds) 
     {
         QStringList list = cmds.split('|');
         QStringListIterator iter(list);
@@ -370,76 +291,166 @@ namespace {
 
         return QString(prev->readAll());
     }
-#endif
 
-#ifdef Q_OS_WIN
-    qint64 fileTimeToNSec(const FILETIME &fileTime) {
-        LARGE_INTEGER intTime;
-        intTime.HighPart = fileTime.dwHighDateTime;
-        intTime.LowPart = fileTime.dwLowDateTime;
+    class CpuUsageRefresher{
 
-        /* Convert from 100-nanoseconds to nanoseconds. */
-        return intTime.QuadPart * 100;
-    }
-
-    qint64 estimateCpuFrequency() {
-        LARGE_INTEGER freq;
-        QueryPerformanceFrequency(&freq);
-
-        DWORD64 startCycles = __rdtsc();
-
-        LARGE_INTEGER stop;
-        QueryPerformanceCounter(&stop);
-        stop.QuadPart += freq.QuadPart / 10; /* Run for 0.1 sec. */
-
-        LARGE_INTEGER current;
-        do {
-            QueryPerformanceCounter(&current);
-        } while (current.QuadPart < stop.QuadPart);
-
-        DWORD64 endCycles = __rdtsc();
-
-        return (endCycles - startCycles) * 10;
-    }
-
-    Q_GLOBAL_STATIC_WITH_INITIALIZER(qint64, qn_estimatedCpuFrequency, { *x = estimateCpuFrequency(); });
-#endif
-
-
-    QString estimateCpuBrand() {
-#ifdef Q_OS_WIN
-        int CPUInfo[4] = {-1}; // TODO: class names start with a Capital letter, variable names - with a lowercase.
-        unsigned   nExIds, i =  0;
-        char CPUBrandString[0x40];
-        // Get the information associated with each extended ID.
-        __cpuid(CPUInfo, 0x80000000);
-        nExIds = CPUInfo[0];
-        for (i=0x80000000; i<=nExIds; ++i)
-        {
-            __cpuid(CPUInfo, i);
-            // Interpret CPU brand string
-            if  (i == 0x80000002)
-                memcpy(CPUBrandString, CPUInfo, sizeof(CPUInfo));
-            else if  (i == 0x80000003)
-                memcpy(CPUBrandString + 16, CPUInfo, sizeof(CPUInfo));
-            else if  (i == 0x80000004)
-                memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
+    public:
+        CpuUsageRefresher(){
+            m_prev_cpu = 0;
+            m_prev_ts = 0;
+            m_usage = 0;
+            m_initialized = init();
         }
-        return CPUBrandString;
-#else
-        // const 14 - length of substring 'model name : ' with tabs
-        // TODO: get rid of `awk`, extract what is needed here.
-        return GetSystemOutput("grep \"model name\" /proc/cpuinfo | head -1 | awk \"{print substr($0, 14)}\"");
+
+        ~CpuUsageRefresher(){
+            timer_delete(m_timer);
+        }
+
+        uint usage(){
+            return m_usage;
+        }
+
+    private:
+        static void timerCallback(int sig, siginfo_t *si, void *uc);
+
+        void refresh(){
+            qnDebug("callback");
+        }
+
+        bool init(){
+            qnDebug("CpuInfo %1, cores %2\n", QnPerformance::getCpuBrand(), QnPerformance::getCpuCores());
+
+            struct sigevent sev;
+            struct itimerspec its;
+            struct sigaction sa;
+
+            /* Establish handler for timer signal */
+
+            qnDebug("Establishing handler for signal %1\n", SIG_CODE);
+            sa.sa_flags = SA_SIGINFO;
+            sa.sa_sigaction = timerCallback;
+            sigemptyset(&sa.sa_mask);
+            if (sigaction(SIG_CODE, &sa, NULL) == -1){
+                qnDebug("Err %1", errno);
+                return false;
+            }
+
+
+            /* Create the timer */
+            qnDebug("Creating timer...\n");
+            sev.sigev_notify = SIGEV_SIGNAL;
+            sev.sigev_signo = SIG_CODE;
+            sev.sigev_value.sival_ptr = &m_timer;
+            if (timer_create(CLOCK_REALTIME, &sev, &m_timer) == -1){
+                qnDebug("Err %1", errno);
+                return false;
+            }
+
+            /* Start the timer */
+            qnDebug("Starting timer...");
+            its.it_value.tv_sec = CPU_USAGE_REFRESH;
+            its.it_value.tv_nsec = 0;
+            its.it_interval.tv_sec = its.it_value.tv_sec;
+            its.it_interval.tv_nsec = its.it_value.tv_nsec;
+
+            if (timer_settime(m_timer, 0, &its, NULL) == -1){
+                qnDebug("Err %1", errno);
+                return false;
+            }
+            return true;
+        }
+
+    private:
+        bool m_initialized;
+        quint64 m_prev_cpu;
+        quint64 m_prev_ts;
+        uint m_usage;
+        timer_t m_timer;
+    };
+
+    Q_GLOBAL_STATIC(CpuUsageRefresher, refresherInstance);
+    // initializer for Q_GLOBAL_STATIC singleton
+    CpuUsageRefresher* dummy = refresherInstance();
+
+    VOID CALLBACK CpuUsageRefresher::timerCallback(int sig, siginfo_t *si, void *uc){
+        CpuUsageRefresher refresher = refresherInstance();
+        if (si->si_value.sival_ptr == &(refresher->m_timer)){
+            refresher->refresh();
+        }
+    }
+}
 #endif
+
+#ifdef Q_OS_WIN
+qint64 fileTimeToNSec(const FILETIME &fileTime) {
+    LARGE_INTEGER intTime;
+    intTime.HighPart = fileTime.dwHighDateTime;
+    intTime.LowPart = fileTime.dwLowDateTime;
+
+    /* Convert from 100-nanoseconds to nanoseconds. */
+    return intTime.QuadPart * 100;
+}
+
+qint64 estimateCpuFrequency() {
+    LARGE_INTEGER freq;
+    QueryPerformanceFrequency(&freq);
+
+    DWORD64 startCycles = __rdtsc();
+
+    LARGE_INTEGER stop;
+    QueryPerformanceCounter(&stop);
+    stop.QuadPart += freq.QuadPart / 10; /* Run for 0.1 sec. */
+
+    LARGE_INTEGER current;
+    do {
+        QueryPerformanceCounter(&current);
+    } while (current.QuadPart < stop.QuadPart);
+
+    DWORD64 endCycles = __rdtsc();
+
+    return (endCycles - startCycles) * 10;
+}
+
+Q_GLOBAL_STATIC_WITH_INITIALIZER(qint64, qn_estimatedCpuFrequency, { *x = estimateCpuFrequency(); });
+#endif
+
+
+QString estimateCpuBrand() {
+#if defined(Q_OS_WIN)
+    int oCPUInfo[4] = {-1}; // TODO: class names start with a Capital letter, variable names - with a lowercase.
+    unsigned nExIds, i =  0;
+    char brandString[0x40];
+    // Get the information associated with each extended ID.
+    __cpuid(oCPUInfo, 0x80000000);
+    nExIds = oCPUInfo[0];
+    for (i=0x80000000; i<=nExIds; ++i)
+    {
+        __cpuid(oCPUInfo, i);
+        // Interpret CPU brand string
+        if  (i == 0x80000002)
+            memcpy(brandString, oCPUInfo, sizeof(oCPUInfo));
+        else if  (i == 0x80000003)
+            memcpy(brandString + 16, oCPUInfo, sizeof(oCPUInfo));
+        else if  (i == 0x80000004)
+            memcpy(brandString + 32, oCPUInfo, sizeof(oCPUInfo));
     }
+    return brandString;
+#elif defined(Q_OS_LINUX)
+    // 13 - const length of 'model name : ' string with tabs - standard output of /proc/cpuinfo
+    return getSystemOutput("grep \"model name\" /proc/cpuinfo | head -1").mid(13);
+#else
+    qnWarning("Essential define not found");
+    return "Unknown CPU"
+#endif
+}
 
 
-    int estimateCpuCores() {
-        return QThread::idealThreadCount();
-    }
+int estimateCpuCores() {
+    return QThread::idealThreadCount();
+}
 
-    Q_GLOBAL_STATIC_WITH_INITIALIZER(QString, qn_estimatedCpuBrand, { *x = estimateCpuBrand(); });
-    Q_GLOBAL_STATIC_WITH_INITIALIZER(int, qn_estimatedCpuCores, { *x = estimateCpuCores(); });
+Q_GLOBAL_STATIC_WITH_INITIALIZER(QString, qn_estimatedCpuBrand, { *x = estimateCpuBrand(); });
+Q_GLOBAL_STATIC_WITH_INITIALIZER(int, qn_estimatedCpuCores, { *x = estimateCpuCores(); });
 
 } // anonymous namespace
 
@@ -484,7 +495,10 @@ qint64 QnPerformance::currentCpuFrequency() {
 }
 
 qint64 QnPerformance::currentCpuUsage(){
+#if defined(Q_OS_WIN) || defined(Q_OS_LINUX)
     return refresherInstance()->usage();
+#else
+    return -1;
 #endif
 }
 
