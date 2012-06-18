@@ -11,6 +11,8 @@
 #include "workbench_item.h"
 #include "ui/style/globals.h"
 
+#include "plugins/resources/archive/avi_files/avi_resource.h"
+
 namespace {
     const char *layoutSynchronizerPropertyName = "_qn_layoutSynchronizer";
 }
@@ -149,7 +151,39 @@ void QnWorkbenchLayoutSynchronizer::update() {
     if(!m_update)
         return;
 
-    QnScopedValueRollback<bool> guard(&m_submit, false);
+    /* Fix up items that are stored in layout. */ // TODO: this code does not belong here.
+    {
+        QnScopedValueRollback<bool> updateGuard(&m_update, false);
+
+        foreach(QnLayoutItemData data, m_resource->getItems()) {
+            if(!data.resource.id.isValid()) {
+                QnResourcePtr resource = qnResPool->getResourceByUniqId(data.resource.path);
+                if(!resource) {
+                    if(data.resource.path.isEmpty()) {
+                        qnWarning("Invalid item with empty id and path in layout '%1'.", m_resource->getName());
+                    } else {
+                        resource = QnResourcePtr(new QnAviResource(data.resource.path));
+                        qnResPool->addResource(resource);
+                    }
+                }
+
+                if(resource) {
+                    data.resource.id = resource->getId();
+                    m_resource->updateItem(data.uuid, data);
+                }
+            } else if(data.resource.path.isEmpty()) {
+                QnResourcePtr resource = qnResPool->getResourceById(data.resource.id);
+                if(!resource) {
+                    qnWarning("Invalid resource id '%1'.", data.resource.id.toString());
+                } else {
+                    data.resource.path = resource->getUniqueId();
+                    m_resource->updateItem(data.uuid, data);
+                }
+            }
+        }
+    }
+
+    QnScopedValueRollback<bool> submitGuard(&m_submit, false);
     m_layout->update(m_resource);
 }
 
@@ -198,7 +232,7 @@ void QnWorkbenchLayoutSynchronizer::submitPendingItemsLater() {
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnWorkbenchLayoutSynchronizer::at_resource_resourceChanged() {
-    update();
+    update(); // TODO: check why there is no update guard here
 }
 
 void QnWorkbenchLayoutSynchronizer::at_resource_nameChanged() {
