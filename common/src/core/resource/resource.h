@@ -189,6 +189,7 @@ public:
     bool hasConsumer(QnResourceConsumer *consumer) const;
     bool hasUnprocessedCommands() const;
     bool isInitialized() const;
+
 signals:
     void parameterValueChanged(const QnParam &param);
     void statusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
@@ -196,6 +197,7 @@ signals:
     void nameChanged();
     void parentIdChanged();
     void idChanged(const QnId &oldId, const QnId &newId);
+    void flagsChanged();
 
     void resourceChanged();
 

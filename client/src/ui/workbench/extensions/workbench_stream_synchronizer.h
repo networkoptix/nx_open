@@ -1,9 +1,11 @@
 #ifndef QN_WORKBENCH_STREAM_SYNCHRONIZER_H
 #define QN_WORKBENCH_STREAM_SYNCHRONIZER_H
 
-#include <QObject>
-#include <QWeakPointer>
-#include "recording/time_period.h"
+#include <QtCore/QObject>
+#include <QtCore/QWeakPointer>
+#include <QtCore/QSet>
+
+#include <core/resource/resource_fwd.h>
 
 class QnCounter;
 class QnWorkbenchDisplay;
@@ -56,6 +58,9 @@ protected slots:
     void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
     void at_renderWatcher_displayingStateChanged(QnAbstractRenderer *renderer, bool displaying);
 
+    void at_resource_flagsChanged();
+    void at_resource_flagsChanged(const QnResourcePtr &resource);
+
 private:
     /** Number of widgets that can be synchronized. */
     int m_widgetCount;
@@ -69,6 +74,8 @@ private:
 
     /** Workbench display that this stream synchronizer was created for. */
     QWeakPointer<QnWorkbenchDisplay> m_display;
+
+    QSet<QnResourceWidget *> m_queuedWidgets;
 };
 
 #endif // QN_WORKBENCH_STREAM_SYNCHRONIZER_H
