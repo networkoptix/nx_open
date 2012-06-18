@@ -103,7 +103,6 @@
 								<exec dir="${project.build.directory}" executable="unzip" failifexecutionfails="false">
 									<arg line="-a -u *.zip *.a"/>
 								</exec>                             
-
 								
 								<concat destfile="${project.build.directory}/${project.artifactId}.pro" append="false">
 									<filelist dir="${project.build.directory}" files="template.pro"/>
