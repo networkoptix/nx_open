@@ -147,7 +147,7 @@ void QnVideoCamera::createReader(QnResource::ConnectionRole role)
 QnAbstractMediaStreamDataProviderPtr QnVideoCamera::getLiveReader(QnResource::ConnectionRole role)
 {
     QMutexLocker lock(&m_getReaderMutex);
-	if (m_primaryReader == 0 && !m_resource->isDisabled() && m_resource->getStatus() == QnResource::Online)
+	if (m_primaryReader == 0 && !m_resource->isDisabled())
     {
         m_resource->init();
         createReader(QnResource::Role_LiveVideo);
