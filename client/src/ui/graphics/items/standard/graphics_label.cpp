@@ -126,3 +126,4 @@ void GraphicsLabel::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
         painter->drawStaticText(0.0, 0.0, d->staticText);
     }
 }
+

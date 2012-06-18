@@ -15,21 +15,29 @@
 
 namespace {
 
-    struct IsMotionSelectable {
+    struct BlocksMotionSelection {
     public:
-        IsMotionSelectable(bool *canClearThrough): m_canClearThrough(canClearThrough) {
-            *m_canClearThrough = true;
+        BlocksMotionSelection(bool *blockMotionClearing): m_blockMotionClearing(blockMotionClearing) {
+            *m_blockMotionClearing = false;
         }
 
         bool operator()(QGraphicsItem *item) const {
-            if(item->toGraphicsObject() && item->toGraphicsObject()->property(Qn::NoMotionClearThrough).toBool())
-                *m_canClearThrough = false;
+            if(!(item->acceptedMouseButtons() & Qt::LeftButton))
+                return false; /* Skip to next item. */
+                
+            if(item->isWidget() && dynamic_cast<QnResourceWidget *>(item))
+                return true;
 
-            return item->isWidget() && dynamic_cast<QnResourceWidget *>(item);
+            if(item->toGraphicsObject() && item->toGraphicsObject()->property(Qn::NoBlockMotionSelection).toBool()) {
+                *m_blockMotionClearing = true; 
+                return false;
+            }
+
+            return true;
         }
 
     private:
-        bool *m_canClearThrough;
+        bool *m_blockMotionClearing;
     };
 
 } // anonymous namespace
@@ -220,7 +228,7 @@ bool MotionSelectionInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *
         return false;
 
     QGraphicsView *view = this->view(viewport);
-    QnResourceWidget *target = dynamic_cast<QnResourceWidget *>(this->item(view, event->pos(), IsMotionSelectable(&m_isClickAllowed)));
+    QnResourceWidget *target = dynamic_cast<QnResourceWidget *>(this->item(view, event->pos(), BlocksMotionSelection(&m_clearingBlocked)));
     if(!target)
         return false;
 
@@ -327,7 +335,7 @@ void MotionSelectionInstrument::finishDrag(DragInfo *info) {
 }
 
 void MotionSelectionInstrument::finishDragProcess(DragInfo *info) {
-    if (m_isClick && m_isClickAllowed && target()) {
+    if (m_isClick && !m_clearingBlocked && target()) {
         Qt::KeyboardModifiers selectionModifiers = this->selectionModifiers(target());
         if((info->modifiers() & selectionModifiers) == selectionModifiers && (info->modifiers() & m_multiSelectionModifiers) != m_multiSelectionModifiers) {
             emit motionRegionCleared(info->view(), target());
