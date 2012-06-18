@@ -1,4 +1,4 @@
-package proto.pb;
+package pb;
 
 message CompatibilityItem {
     required string ver1  = 1;

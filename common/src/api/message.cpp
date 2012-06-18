@@ -1,70 +1,36 @@
 #include "message.h"
 
-QString QnMessage::objectNameLower() const
+#include "message.pb.h"
+
+bool QnMessage::load(const pb::Message &message)
 {
-    if (objectName.isEmpty())
-        return objectName;
+    eventType = (Message_Type)message.type();
+    seqNumber = message.seqnumber();
 
-    return objectName[0].toLower() + objectName.mid(1);
-}
-
-bool QnMessage::load(const QVariant& parsed)
-{   
-    dict = parsed.toMap();
-
-    if (!dict.contains("type"))
-        return false;
-
-    eventType = dict["type"].toString();
-
-    if (eventType != QN_MESSAGE_RES_CHANGE
-        && eventType != QN_MESSAGE_RES_DELETE
-        && eventType != QN_MESSAGE_RES_STATUS_CHANGE
-        && eventType != QN_MESSAGE_RES_DISABLED_CHANGE
-        && eventType != QN_MESSAGE_LICENSE_CHANGE
-        && eventType != QN_MESSAGE_CAMERA_SERVER_ITEM
-        && eventType != QN_MESSAGE_EMPTY
-        && eventType != QN_MESSAGE_PING)
+    switch (eventType)
     {
-        return false;
+        case pb::Message_Type_ResourceChange:
+        case pb::Message_Type_ResourceDisabledChange:
+        case pb::Message_Type_ResourceStatusChange:
+        {
+            // TODO:
+            //resource =;
+            break;
+        }
+        case pb::Message_Type_License:
+        {
+            //license =;
+            break;
+        }
+        case pb::Message_Type_CameraServerItem:
+        {
+            break;
+        }
+        case pb::Message_Type_ResourceDelete:
+        {
+            break;
+        }
     }
-
-    if (!dict.contains("seq_num"))
-    {
-        // version before 1.0.1
-        // Do not use seqNumber tracking
-        seqNumber = 0;
-    } else {
-        seqNumber = dict["seq_num"].toUInt();
-    }
-
-    if (eventType == QN_MESSAGE_LICENSE_CHANGE)
-    {
-        objectId = dict["id"].toString();
-        return true;
-    }
-
-    if (eventType == QN_MESSAGE_CAMERA_SERVER_ITEM)
-    {
-        // will use dict
-        // need to refactor a bit
-        return true;
-    }
-
-    if (eventType == QN_MESSAGE_EMPTY || eventType == QN_MESSAGE_PING)
-        return true;
-
-    if (!dict.contains("resourceId"))
-        return false;
-
-    objectId = dict["resourceId"].toString();
-    if (dict.contains("parentId"))
-        parentId = dict["parentId"].toString();
-
-    objectName = dict["objectName"].toString();
-
-    if (dict.contains("resourceGuid"))
-        resourceGuid = dict["resourceGuid"].toString();
 
     return true;
 }

@@ -1,4 +1,4 @@
-package proto.pb;
+package pb;
 
 import "resource.proto";
 

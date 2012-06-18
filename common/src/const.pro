@@ -135,7 +135,8 @@ PB_FILES = $$PWD/api/pb/camera.proto \
            $$PWD/api/pb/server.proto \
            $$PWD/api/pb/ms_recordedTimePeriod.proto \
            $$PWD/api/pb/compatibility.proto \
-           $$PWD/api/pb/connectinfo.proto
+           $$PWD/api/pb/connectinfo.proto \
+           $$PWD/api/pb/message.proto
 
 pb.name = Generating code from ${QMAKE_FILE_IN}
 pb.input = PB_FILES

@@ -1,4 +1,4 @@
-package proto.pb;
+package pb;
 
 message Resource {
     extensions 100 to max;

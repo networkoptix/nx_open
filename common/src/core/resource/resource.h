@@ -21,6 +21,11 @@ class QnResourcePool;
 
 typedef QMap<QString, QString> QnResourceParameters;
 
+//struct QN_EXPORT QnResourceData
+//{
+    // resource fields here
+//};
+
 class QN_EXPORT QnResource : public QObject
 {
     Q_OBJECT
@@ -105,6 +110,9 @@ public:
     Status getStatus() const;
     virtual void setStatus(Status newStatus, bool silenceMode = false);
     QDateTime getLastStatusUpdateTime() const;
+
+//    void fromData(const QnResourceData& data);
+//    QnResourceData toData();
 
     // this function is called if resourse changes state from offline to online or so 
     void init();
