@@ -71,7 +71,9 @@ QnPlOnvifResource::QnPlOnvifResource() :
     mediaUrl(),
     deviceUrl(),
     reinitDeviceInfo(false),
-    codec(H264)
+    codec(H264),
+    primaryResolution(EMPTY_RESOLUTION_PAIR),
+    secondaryResolution(EMPTY_RESOLUTION_PAIR)
 {
 }
 
@@ -179,6 +181,57 @@ const ResolutionPair QnPlOnvifResource::getNearestResolution(const ResolutionPai
     }
 
     return bestIndex >= 0 ? m_resolutionList[bestIndex]: EMPTY_RESOLUTION_PAIR;
+}
+
+void QnPlOnvifResource::findSetPrimarySecondaryResolution()
+{
+    QMutexLocker lock(&m_mutex);
+
+    if (m_resolutionList.isEmpty()) {
+        return;
+    }
+
+    primaryResolution = m_resolutionList.front();
+    float currentAspect = getResolutionAspectRatio(primaryResolution);
+    secondaryResolution = getNearestResolutionForSecondary(SECONDARY_STREAM_DEFAULT_RESOLUTION, currentAspect);
+
+    if (secondaryResolution != EMPTY_RESOLUTION_PAIR) {
+        return;
+    }
+
+    double currentSquare = primaryResolution.first * primaryResolution.second;
+
+    foreach (ResolutionPair resolution, m_resolutionList) {
+        float aspect = getResolutionAspectRatio(resolution);
+        if (abs(aspect - currentAspect) < MAX_EPS) {
+            continue;
+        }
+        currentAspect = aspect;
+
+        double square = resolution.first * resolution.second;
+        if (square == 0 || currentSquare / square > 2.0) {
+            break;
+        }
+
+        ResolutionPair tmp = getNearestResolutionForSecondary(SECONDARY_STREAM_DEFAULT_RESOLUTION, currentAspect);
+        if (tmp != EMPTY_RESOLUTION_PAIR) {
+            primaryResolution = resolution;
+            secondaryResolution = tmp;
+            return;
+        }
+    }
+}
+
+const ResolutionPair QnPlOnvifResource::getPrimaryResolution() const
+{
+    QMutexLocker lock(&m_mutex);
+    return primaryResolution;
+}
+
+const ResolutionPair QnPlOnvifResource::getSecondaryResolution() const
+{
+    QMutexLocker lock(&m_mutex);
+    return primaryResolution;
 }
 
 int QnPlOnvifResource::getMaxFps()
@@ -323,9 +376,12 @@ void QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
         soap_end(soapProxy.soap);
     }
 
+    //All VideoEncoder options are set, so we can calculate resolutions for the streams
+    findSetPrimarySecondaryResolution();
+
     //Analyzing availability of dual streaming
 
-    bool hasDualTmp = getNearestResolutionForSecondary(SECONDARY_STREAM_DEFAULT_RESOLUTION, getResolutionAspectRatio(getMaxResolution())) != EMPTY_RESOLUTION_PAIR;
+    bool hasDualTmp = secondaryResolution != EMPTY_RESOLUTION_PAIR;
 
     if (!videoEncoders.filled && !videoEncoders.soapFailed) {
         if (!login.empty()) soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", login.c_str(), passwd.c_str());

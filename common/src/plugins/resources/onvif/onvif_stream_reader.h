@@ -28,8 +28,7 @@ class QnOnvifStreamReader: public CLServerPushStreamreader , public QnLiveStream
     {
         static const char* DESCRIPTION;
 
-        QString oldNamePrimary;
-        QString oldNameSecondary;
+        QString oldName;
     public:
         VideoEncoderNameChange() {};
         virtual ~VideoEncoderNameChange() {};
@@ -43,8 +42,7 @@ class QnOnvifStreamReader: public CLServerPushStreamreader , public QnLiveStream
     {
         static const char* DESCRIPTION;
 
-        int oldFpsPrimary;
-        int oldFpsSecondary;
+        int oldFps;
     public:
         VideoEncoderFpsChange() {};
         virtual ~VideoEncoderFpsChange() {};
@@ -58,8 +56,7 @@ class QnOnvifStreamReader: public CLServerPushStreamreader , public QnLiveStream
     {
         static const char* DESCRIPTION;
 
-        float oldQualityPrimary;
-        float oldQualitySecondary;
+        float oldQuality;
     public:
         VideoEncoderQualityChange() {};
         virtual ~VideoEncoderQualityChange() {};
@@ -73,8 +70,7 @@ class QnOnvifStreamReader: public CLServerPushStreamreader , public QnLiveStream
     {
         static const char* DESCRIPTION;
 
-        ResolutionPair oldResolutionPrimary;
-        ResolutionPair oldResolutionSecondary;
+        ResolutionPair oldResolution;
     public:
         VideoEncoderResolutionChange() {};
         virtual ~VideoEncoderResolutionChange() {};
@@ -119,7 +115,6 @@ private:
 
     void fillVideoEncoderChanges(VideoEncoderChanges& changes) const;
     void clearVideoEncoderChanges(VideoEncoderChanges& changes) const;
-    void setRequiredValues(onvifXsd__VideoEncoderConfiguration* config, bool isPrimary) const;
     const QString normalizeStreamSrcUrl(const std::string& src) const;
     void printProfile(const _onvifMedia__GetProfileResponse& response, bool isPrimary) const;
 private:
