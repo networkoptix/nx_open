@@ -96,9 +96,6 @@ void QnResourcePool::addResources(const QnResourceList &resources)
         }
 
         resource->setResourcePool(this);
-
-        if ( resource->getStatus() != QnResource::Offline && !resource->isDisabled() )
-            resource->init();
     }
 
     QMap<QnId, QnResourcePtr> newResources; // sort by id
