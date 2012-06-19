@@ -302,7 +302,7 @@ const QString OnvifResourceSearcherWsdd::getMac(const wsdd__ProbeMatchesType* pr
             result[ind - 1] = macFromEndpoint[i - 1];
         }
 
-        return result;
+        return result.toUpper();
     }
 
     return QString();
@@ -380,7 +380,7 @@ void OnvifResourceSearcherWsdd::fillWsddStructs(wsdd__ProbeType& probe, wsa__End
 }
 
 void OnvifResourceSearcherWsdd::addEndpointToHash(EndpointInfoHash& hash, const wsdd__ProbeMatchesType* probeMatches,
-    const SOAP_ENV__Header* /*header*/, const QStringList& addrPrefixes, const QString& host) const
+    const SOAP_ENV__Header* header, const QStringList& addrPrefixes, const QString& host) const
 {
     if (!probeMatches || !probeMatches->ProbeMatch) {
         return;
@@ -393,7 +393,7 @@ void OnvifResourceSearcherWsdd::addEndpointToHash(EndpointInfoHash& hash, const 
 
     QString name = getName(probeMatches);
     QString manufacturer = getManufacturer(probeMatches, name);
-    QString uniqId = getEndpointAddress(probeMatches);
+    QString uniqId = getMac(probeMatches, header);//getEndpointAddress(probeMatches);
 
     hash.insert(appropriateAddr, EndpointAdditionalInfo(name, manufacturer, uniqId, host));
 }
