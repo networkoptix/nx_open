@@ -126,8 +126,9 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
                 if (memcmp(data, "Arecont_Vision-AV2000", 21 )!=0)
                     continue; // this responde id not from arecont camera
 
-                unsigned char mac[6];
+                char mac[7];
                 memcpy(mac,data + 22,6);
+                mac[6] = 0;
 
                 /*/
                 QString smac = MACToString(mac);

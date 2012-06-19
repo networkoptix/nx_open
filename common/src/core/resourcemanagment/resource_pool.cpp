@@ -221,7 +221,7 @@ QnNetworkResourcePtr QnResourcePool::getNetResourceByMac(const QString &mac) con
     QMutexLocker locker(&m_resourcesMtx);
     foreach (const QnResourcePtr &resource, m_resources) {
         QnNetworkResourcePtr netResource = resource.dynamicCast<QnNetworkResource>();
-        if (netResource != 0 && netResource->getMAC().toString() == mac)
+        if (netResource != 0 && netResource->getMAC() == mac)
             return netResource;
     }
 
@@ -234,7 +234,7 @@ QnNetworkResourceList QnResourcePool::getAllNetResourceByMac(const QString &mac)
     QMutexLocker locker(&m_resourcesMtx);
     foreach (const QnResourcePtr &resource, m_resources) {
         QnNetworkResourcePtr netResource = resource.dynamicCast<QnNetworkResource>();
-        if (netResource != 0 && netResource->getMAC().toString() == mac)
+        if (netResource != 0 && netResource->getMAC() == mac)
             result << netResource;
     }
 
@@ -257,7 +257,7 @@ QnResourcePtr QnResourcePool::getEnabledResourceByUniqueId(const QString &unique
     if(!networkResource)
         return QnResourcePtr();
 
-    return getEnabledResourceByMac(networkResource->getMAC().toString());
+    return getEnabledResourceByMac(networkResource->getMAC());
 }
 
 QnResourcePtr QnResourcePool::getResourceByUniqId(const QString &id) const

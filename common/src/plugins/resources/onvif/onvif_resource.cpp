@@ -350,7 +350,7 @@ void QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
         int soapRes = soapProxy.GetVideoEncoderConfigurationOptions(endpoint.toStdString().c_str(), NULL, &request, &response);
         if (soapRes != SOAP_OK || !response.Options) {
             qWarning() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: can't init ONVIF device resource, will "
-                << "try alternative approach (URL: " << endpoint << ", MAC: " << getMAC().toString()
+                << "try alternative approach (URL: " << endpoint << ", MAC: " << getMAC()
                 << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
                 << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
         } else {
@@ -367,7 +367,7 @@ void QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
         int soapRes = soapProxy.GetVideoEncoderConfigurations(endpoint.toStdString().c_str(), NULL, &request, &videoEncoders.soapResponse);
         if (soapRes != SOAP_OK) {
             qWarning() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: can't init ONVIF device resource even with alternative approach, "
-                << "default settings will be used (URL: " << endpoint << ", MAC: " << getMAC().toString() << "). Root cause: SOAP request failed. GSoap error code: "
+                << "default settings will be used (URL: " << endpoint << ", MAC: " << getMAC() << "). Root cause: SOAP request failed. GSoap error code: "
                 << soapRes << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
             videoEncoders.soapFailed = true;
         } else {
@@ -390,7 +390,7 @@ void QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
         int soapRes = soapProxy.GetVideoEncoderConfigurations(endpoint.toStdString().c_str(), NULL, &request, &videoEncoders.soapResponse);
         if (soapRes != SOAP_OK) {
             qWarning() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: can't feth video encoders info from ONVIF device (URL: "
-                << endpoint << ", MAC: " << getMAC().toString() << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
+                << endpoint << ", MAC: " << getMAC() << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
                 << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
             videoEncoders.soapFailed = true;
         } else {
@@ -414,7 +414,7 @@ void QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
         int soapRes = soapProxy.GetProfiles(endpoint.toStdString().c_str(), NULL, &request, &response);
         if (soapRes != SOAP_OK) {
             qWarning() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: can't fetch preset profiles ONVIF device (URL: "
-                << endpoint << ", MAC: " << getMAC().toString() << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
+                << endpoint << ", MAC: " << getMAC() << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
                 << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
         } else {
             appropriateProfiles = countAppropriateProfiles(response, videoEncoders);
@@ -469,7 +469,7 @@ void QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
         int soapRes = soapProxy.CreateProfile(endpoint.toStdString().c_str(), NULL, &request, &response);
         if (soapRes != SOAP_OK) {
             qWarning() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: can't create new profile for ONVIF device (URL: "
-                << endpoint << ", MAC: " << getMAC().toString() << "). Root cause: SOAP request failed. GSoap error code: "
+                << endpoint << ", MAC: " << getMAC() << "). Root cause: SOAP request failed. GSoap error code: "
                 << soapRes << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
 
             hasDual = false;
@@ -487,7 +487,7 @@ void QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
         soapRes = soapProxy.AddVideoEncoderConfiguration(endpoint.toStdString().c_str(), NULL, &request2, &response2);
         if (soapRes != SOAP_OK) {
             qWarning() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: can't add video encoder to newly created profile for ONVIF device (URL: "
-                << endpoint << ", MAC: " << getMAC().toString() << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
+                << endpoint << ", MAC: " << getMAC() << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
                 << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
 
             hasDual = false;
@@ -813,7 +813,7 @@ void QnPlOnvifResource::save()
     QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
     if (conn->saveSync(toSharedPointer().dynamicCast<QnVirtualCameraResource>(), errorStr) != 0) {
         qCritical() << "QnPlOnvifResource::init: can't save resource params to Enterprise Controller. Resource MAC: "
-                    << getMAC().toString() << ". Description: " << errorStr;
+                    << getMAC() << ". Description: " << errorStr;
     }
 }
 

@@ -140,7 +140,7 @@ QnRequestParamList QnVideoServerConnection::createParamList(const QnNetworkResou
     QnRequestParamList result;
 
     foreach(QnNetworkResourcePtr netResource, list)
-        result << QnRequestParam("mac", netResource->getMAC().toString());
+        result << QnRequestParam("mac", netResource->getMAC());
     result << QnRequestParam("startTime", QString::number(startTimeUSec));
     result << QnRequestParam("endTime", QString::number(endTimeUSec));
     result << QnRequestParam("detail", QString::number(detail));

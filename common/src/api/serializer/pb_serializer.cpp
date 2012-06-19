@@ -414,7 +414,7 @@ void serializeCamera_i(proto::pb::Camera& pb_camera, const QnVirtualCameraResour
     pb_camera.set_name(cameraPtr->getName().toUtf8().constData());
     pb_camera.set_typeid_(cameraPtr->getTypeId().toInt());
     pb_camera.set_url(cameraPtr->getUrl().toUtf8().constData());
-    pb_camera.set_mac(cameraPtr->getMAC().toString().toUtf8().constData());
+    pb_camera.set_mac(cameraPtr->getMAC().toUtf8().constData());
     pb_camera.set_login(cameraPtr->getAuth().user().toUtf8().constData());
     pb_camera.set_password(cameraPtr->getAuth().password().toUtf8().constData());
     pb_camera.set_disabled(cameraPtr->isDisabled());

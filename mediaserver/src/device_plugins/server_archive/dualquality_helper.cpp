@@ -10,8 +10,8 @@ QnDialQualityHelper::QnDialQualityHelper()
 
 void QnDialQualityHelper::setResource(QnNetworkResourcePtr netResource)
 {
-    m_catalogHi = qnStorageMan->getFileCatalog(netResource->getMAC().toString(), QnResource::Role_LiveVideo);
-    m_catalogLow = qnStorageMan->getFileCatalog(netResource->getMAC().toString(), QnResource::Role_SecondaryLiveVideo);
+    m_catalogHi = qnStorageMan->getFileCatalog(netResource->getMAC(), QnResource::Role_LiveVideo);
+    m_catalogLow = qnStorageMan->getFileCatalog(netResource->getMAC(), QnResource::Role_SecondaryLiveVideo);
 }
 
 void QnDialQualityHelper::findDataForTime(const qint64 time, DeviceFileCatalog::Chunk& chunk, DeviceFileCatalogPtr& catalog, DeviceFileCatalog::FindMethod findMethod)

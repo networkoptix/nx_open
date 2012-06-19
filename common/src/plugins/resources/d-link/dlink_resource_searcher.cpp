@@ -158,7 +158,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             {
                 QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
 
-                if (net_res->getMAC().toString() == smac)
+                if (net_res->getMAC() == smac)
                 {
                     haveToContinue = true;
                     break; // already found;

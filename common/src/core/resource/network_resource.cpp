@@ -50,7 +50,7 @@ void QnNetworkResource::deserialize(const QnResourceParameters& parameters)
 
 QString QnNetworkResource::getUniqueId() const
 {
-    return getMAC().toString();
+    return getMAC();
 }
 
 bool QnNetworkResource::equalsTo(const QnResourcePtr other) const
@@ -77,13 +77,13 @@ bool QnNetworkResource::setHostAddress(const QHostAddress &ip, QnDomain domain)
     return (domain == QnDomainMemory);
 }
 
-QnMacAddress QnNetworkResource::getMAC() const
+QString QnNetworkResource::getMAC() const
 {
     QMutexLocker mutexLocker(&m_mutex);
     return m_macAddress;
 }
 
-void  QnNetworkResource::setMAC(const QnMacAddress &mac)
+void  QnNetworkResource::setMAC(const QString &mac)
 {
     QMutexLocker mutexLocker(&m_mutex);
     m_macAddress = mac;
@@ -139,7 +139,7 @@ QString QnNetworkResource::toString() const
 QString QnNetworkResource::toSearchString() const
 {
     QString result;
-    QTextStream(&result) << QnResource::toSearchString() << " " << getMAC().toString();
+    QTextStream(&result) << QnResource::toSearchString() << " " << getMAC();
     return result;
 }
 
@@ -230,7 +230,7 @@ bool QnNetworkResource::conflicting()
         return false;
 //#endif
 
-    if (mac!=m_macAddress.toString())// someone else has this IP
+    if (mac!=m_macAddress)// someone else has this IP
     {
         addNetworkStatus(QnNetworkResource::BadHostAddr);
         return true;
@@ -251,7 +251,7 @@ bool QnNetworkResource::conflicting()
 
 
 
-    if (mac!=m_macAddress.toString() && mac!="00-00-00-00-00-00")// someone else has this IP
+    if (mac!=m_macAddress && mac!="00-00-00-00-00-00")// someone else has this IP
     {
         addNetworkStatus(QnNetworkResource::BadHostAddr);
         return true;
