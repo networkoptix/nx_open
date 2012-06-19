@@ -29,6 +29,15 @@ struct QnMessage
     quint32 seqNumber;
 
     QnResourcePtr resource;
+
+	// These fields are temporary and caused by
+	// heavy-weightness of QnResource
+	// TODO: Ivan. Replace resource with lightweight transfer object here
+	QnId resourceId;
+	QString resourceGuid;
+	bool resourceDisabled;
+	QnResource::Status resourceStatus;
+
     QnLicensePtr license;
     QnCameraHistoryItemPtr cameraServerItem;
 

@@ -106,10 +106,10 @@ void QnClientMessageProcessor::at_messageReceived(QnMessage message)
     // stream << "Got message: " << event.xtype << " " << event.objectName << " " << event.objectId << event.resourceGuid;
 
 	if (message.eventType == Message_Type_ResourceDisabledChange)
-        stream << "disabled: " << message.resource->isDisabled();
+        stream << "disabled: " << message.resourceDisabled;
 
     if(message.eventType == Message_Type_ResourceStatusChange)
-        stream << "status: " << (int)message.resource->getStatus();
+        stream << "status: " << (int)message.resourceStatus;
 
     qDebug() << debugStr;
 
@@ -121,27 +121,27 @@ void QnClientMessageProcessor::at_messageReceived(QnMessage message)
 	else if (message.eventType == Message_Type_ResourceDisabledChange)
 	{
 		QnResourcePtr resource;
-		if (!message.resource->getGuid().isEmpty())
-			resource = qnResPool->getResourceByGuid(message.resource->getGuid());
+		if (!message.resourceGuid.isEmpty())
+			resource = qnResPool->getResourceByGuid(message.resourceGuid);
 		else
-			resource = qnResPool->getResourceById(message.resource->getId());
+			resource = qnResPool->getResourceById(message.resourceId);
 
 		if (resource)
 		{
-			resource->setDisabled(message.resource->isDisabled());
+			resource->setDisabled(message.resourceDisabled);
 		}
 	}
     else if (message.eventType == Message_Type_ResourceStatusChange)
     {
 		QnResourcePtr resource;
-		if (!message.resource->getGuid().isEmpty())
-			resource = qnResPool->getResourceByGuid(message.resource->getGuid());
+		if (!message.resourceGuid.isEmpty())
+			resource = qnResPool->getResourceByGuid(message.resourceGuid);
 		else
-			resource = qnResPool->getResourceById(message.resource->getId());
+			resource = qnResPool->getResourceById(message.resourceId);
 
         if (resource)
         {
-			resource->setStatus(message.resource->getStatus());
+			resource->setStatus(message.resourceStatus);
         }
     }
 	else if (message.eventType == Message_Type_CameraServerItem)
@@ -152,7 +152,7 @@ void QnClientMessageProcessor::at_messageReceived(QnMessage message)
     {
         QnResourcePtr ownResource;
     
-		QString guid = message.resource->getGuid();
+		QString guid = message.resourceGuid;
 		if (!guid.isEmpty())
 			ownResource = qnResPool->getResourceByGuid(guid);
         else
@@ -164,7 +164,7 @@ void QnClientMessageProcessor::at_messageReceived(QnMessage message)
 			ownResource->update(message.resource);
 	} else if (message.eventType == Message_Type_ResourceDelete)
     {
-        QnResourcePtr ownResource = qnResPool->getResourceById(message.resource->getId());
+        QnResourcePtr ownResource = qnResPool->getResourceById(message.resourceId);
         qnResPool->removeResource(ownResource);
     }
 }

@@ -21,6 +21,7 @@ static const int PING_INTERVAL = 60000;
 class QnPbStreamParser
 {
 public:
+	void reset();
     void addData(const QByteArray& data);
     bool nextMessage(pb::Message& parsed);
 
@@ -28,6 +29,11 @@ private:
     QQueue<QByteArray> blocks;
     QByteArray incomplete;
 };
+
+void QnPbStreamParser::reset()
+{
+	incomplete.clear();
+}
 
 void QnPbStreamParser::addData(const QByteArray& data)
 {
@@ -166,6 +172,8 @@ void QnMessageSource::doStop()
 
 void QnMessageSource::startRequest()
 {
+	m_streamParser->reset();
+
     m_reply = m_manager.post(QNetworkRequest(m_url), "");
     connect(m_reply, SIGNAL(finished()),
             this, SLOT(httpFinished()));
@@ -202,16 +210,7 @@ void QnMessageSource::httpFinished()
 
 void QnMessageSource::httpReadyRead()
 {
-    QByteArray data = m_reply->readAll().data();
-
-	if (data.size() == 0)
-	{
-		qDebug() << "empty";
-	}
-
-#ifdef QN_EVENT_SOURCE_DEBUG
-    qDebug() << "Event data: " << data;
-#endif
+	QByteArray data = m_reply->readAll();
 
     m_streamParser->addData(data);
 

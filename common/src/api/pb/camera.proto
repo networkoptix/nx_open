@@ -38,7 +38,7 @@ message Camera {
         required int32   fps             = 11;
     }
 
-    required bool         scheduleDisabled = 1;
+    optional bool         scheduleDisabled = 1;
     optional MotionType   motionType       = 2;
     optional string       region           = 3;
     optional string       mac              = 4;

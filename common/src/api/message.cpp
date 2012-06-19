@@ -16,11 +16,32 @@ bool QnMessage::load(const pb::Message &message)
     switch (eventType)
     {
         case pb::Message_Type_ResourceChange:
-        case pb::Message_Type_ResourceDisabledChange:
-        case pb::Message_Type_ResourceStatusChange:
         {
 			const pb::ResourceMessage& resourceMessage = message.GetExtension(pb::ResourceMessage::message);
 			parseResource(resource, resourceMessage.resource(), *QnAppServerConnectionFactory::defaultFactory());
+            break;
+        }
+        case pb::Message_Type_ResourceDisabledChange:
+		{
+			const pb::ResourceMessage& resourceMessage = message.GetExtension(pb::ResourceMessage::message);
+			resourceId = resourceMessage.resource().id();
+			resourceGuid = resourceMessage.resource().guid().c_str();
+			resourceDisabled = resourceMessage.resource().disabled();
+			break;
+		}
+        case pb::Message_Type_ResourceStatusChange:
+		{
+			const pb::ResourceMessage& resourceMessage = message.GetExtension(pb::ResourceMessage::message);
+			resourceId = resourceMessage.resource().id();
+			resourceGuid = resourceMessage.resource().guid().c_str();
+			resourceStatus = static_cast<QnResource::Status>(resourceMessage.resource().status());
+			break;
+		}
+        case pb::Message_Type_ResourceDelete:
+        {
+			const pb::ResourceMessage& resourceMessage = message.GetExtension(pb::ResourceMessage::message);
+			resourceId = resourceMessage.resource().id();
+			resourceGuid = resourceMessage.resource().guid().c_str();
             break;
         }
         case pb::Message_Type_License:
@@ -33,13 +54,6 @@ bool QnMessage::load(const pb::Message &message)
         {
 			const pb::CameraServerItemMessage& cameraServerItemMessage = message.GetExtension(pb::CameraServerItemMessage::message);
 			parseCameraServerItem(cameraServerItem, cameraServerItemMessage.cameraserveritem());
-            break;
-        }
-        case pb::Message_Type_ResourceDelete:
-        {
-			const pb::ResourceMessage& resourceMessage = message.GetExtension(pb::ResourceMessage::message);
-
-			// TODO: Ivan
             break;
         }
     }

@@ -98,23 +98,23 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage event)
     }
     else if (event.eventType == Message_Type_ResourceStatusChange)
     {
-		QnResourcePtr resource = qnResPool->getResourceById(event.resource->getId());
+		QnResourcePtr resource = qnResPool->getResourceById(event.resourceId);
 
         if (resource)
         {
-            resource->setStatus(event.resource->getStatus());
+            resource->setStatus(event.resourceStatus);
         }
 	} else if (event.eventType == Message_Type_ResourceDisabledChange)
 	{
-		QnResourcePtr resource = qnResPool->getResourceById(event.resource->getId());
+		QnResourcePtr resource = qnResPool->getResourceById(event.resourceId);
 
 		if (resource)
 		{
-			resource->setDisabled(event.resource->isDisabled());
+			resource->setDisabled(event.resourceDisabled);
 		}
 	} else if (event.eventType == Message_Type_ResourceDelete)
     {
-        QnResourcePtr resource = qnResPool->getResourceById(event.resource->getId());
+        QnResourcePtr resource = qnResPool->getResourceById(event.resourceId);
 
         if (resource)
         {
