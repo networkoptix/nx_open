@@ -14,6 +14,7 @@ class _onvifMedia__GetVideoEncoderConfigurationOptionsResponse;
 //class _onvifMedia__GetVideoEncoderConfigurationsResponse;
 struct VideoEncoders;
 class _onvifMedia__GetProfilesResponse;
+class _onvifMedia__GetVideoSourceConfigurationsResponse;
 
 //first = width, second = height
 typedef QPair<int, int> ResolutionPair;
@@ -91,6 +92,7 @@ private:
     bool setVideoEncoderOptionsJpeg(const _onvifMedia__GetVideoEncoderConfigurationOptionsResponse& response);
     void analyzeVideoEncoders(VideoEncoders& encoders, bool setOptions);
     int countAppropriateProfiles(const _onvifMedia__GetProfilesResponse& response, VideoEncoders& encoders);
+    void setVideoSource(const _onvifMedia__GetVideoSourceConfigurationsResponse& response, VideoEncoders& encoders) const;
     void setOnvifUrls();
     void save();
 	void setMinMaxQuality(int min, int max);
