@@ -12,7 +12,7 @@ class RTPSession;
 static const int RTSP_FFMPEG_GENERIC_HEADER_SIZE = 8;
 static const int RTSP_FFMPEG_VIDEO_HEADER_SIZE = 3;
 static const int RTSP_FFMPEG_METADATA_HEADER_SIZE = 4;
-static const int MAX_RTP_PACKET_SIZE = 1024 * 8;
+static const int MAX_RTP_PACKET_SIZE = 1024 * 16;
 
 class RtspStatistic 
 {
@@ -149,6 +149,8 @@ public:
 
     QString getCodecNameByType(const QString& trackType);
     QList<QByteArray> getSdpByType(const QString& trackType) const;
+
+    int getLastResponseCode() const;
 signals:
     void gotTextResponse(QByteArray text);
 private:
@@ -172,6 +174,7 @@ private:
     RtspStatistic parseServerRTCPReport(quint8* srcBuffer, int srcBufferSize);
     int buildClientRTCPReport(quint8 *dstBuffer);
     void addAdditionAttrs(QByteArray& request);
+    void updateResponseStatus(const QByteArray& response);
 private:
     enum { RTSP_BUFFER_LEN = 1024 * 64 * 16 };
 
@@ -205,6 +208,7 @@ private:
     QString m_proxyAddr;
     int m_proxyPort;
     QString m_contentBase;
+    int m_responseCode;
 };
 
 #endif //rtp_session_h_1935_h

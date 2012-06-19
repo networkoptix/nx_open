@@ -9,7 +9,7 @@
 //first - login, second - password
 typedef QSet<QPair<const char*, const char*> > PasswordList;
 
-class SOAP_ENV__Fault;
+struct SOAP_ENV__Fault;
 
 class PasswordHelper
 {

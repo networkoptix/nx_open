@@ -13,10 +13,12 @@ CLH264RtpParser::CLH264RtpParser():
         m_rtpChannel(98),
         m_builtinSpsFound(false),
         m_builtinPpsFound(false),
+        m_keyDataExists(false),
         m_timeCycles(0),
         m_lastTimeStamp(0),
         m_firstSeqNum(0),
-        m_packetPerNal(0)
+        m_packetPerNal(0),
+        m_videoBuffer(CL_MEDIA_ALIGNMENT, 1024*128)
 {
 }
 
@@ -101,9 +103,19 @@ void CLH264RtpParser::setSDPInfo(QList<QByteArray> lines)
     }
 }
 
+int CLH264RtpParser::getSpsPpsSize() const
+{
+    int result = 0;
+    for (int i = 0; i < m_sdpSpsPps.size(); ++i)
+        result += m_sdpSpsPps[i].size();
+    return result;
+}
+
 void CLH264RtpParser::serializeSpsPps(CLByteArray& dst)
 {
-
+    for (int i = 0; i < m_sdpSpsPps.size(); ++i)
+        dst.write(m_sdpSpsPps[i]);
+    /*
     if (m_builtinSpsFound && m_builtinPpsFound)
     {
         QMap<int, QByteArray>::const_iterator itr;
@@ -115,6 +127,7 @@ void CLH264RtpParser::serializeSpsPps(CLByteArray& dst)
         for (int i = 0; i < m_sdpSpsPps.size(); ++i)
             dst.write(m_sdpSpsPps[i]);
     }
+    */
 }
 
 void CLH264RtpParser::decodeSpsInfo(const QByteArray& data)
@@ -131,6 +144,48 @@ void CLH264RtpParser::decodeSpsInfo(const QByteArray& data)
     }
 }
 
+QnCompressedVideoDataPtr CLH264RtpParser::createVideoData(quint32 rtpTime, const RtspStatistic& statistics)
+{
+    int addheaderSize = 0;
+    if (m_keyDataExists && (!m_builtinSpsFound || !m_builtinPpsFound))
+        addheaderSize = getSpsPpsSize();
+    QnCompressedVideoDataPtr result = QnCompressedVideoDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, m_videoBuffer.size() + addheaderSize));
+    result->compressionType = CODEC_ID_H264;
+    result->width = m_sps.getWidth();
+    result->height = m_sps.getHeight();
+    if (m_keyDataExists) {
+        result->flags = AV_PKT_FLAG_KEY;
+        if (!m_builtinSpsFound || !m_builtinPpsFound)
+            serializeSpsPps(result->data);
+    }
+    result->data.write(m_videoBuffer);
+
+    if (m_timeHelper) {
+        result->timestamp = m_timeHelper->getUsecTime(rtpTime, statistics, m_frequency);
+        //qDebug() << "video. adjusttime to " << (m_videoData->timestamp - qnSyncTime->currentMSecsSinceEpoch()*1000)/1000 << "ms";
+    }
+    else
+        result->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
+
+    clearInternalBuffer();
+    return result;
+}
+
+bool CLH264RtpParser::clearInternalBuffer()
+{
+    m_videoBuffer.clear();
+    m_keyDataExists = m_builtinPpsFound = m_builtinSpsFound = false;
+    m_packetPerNal = INT_MIN;
+    return false;
+}
+
+void CLH264RtpParser::updateNalFlags(int nalUnitType)
+{
+    m_builtinSpsFound |= nalUnitType == nuSPS;
+    m_builtinPpsFound |= nalUnitType == nuPPS;
+    m_keyDataExists   |= nalUnitType == nuSliceIDR;
+}
+
 bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStatistic& statistics, QList<QnAbstractMediaDataPtr>& result)
 {
     result.clear();
@@ -138,202 +193,88 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStati
     int nalUnitLen;
     int don;
     quint8 nalUnitType;
-    bool isKeyFrame = false;
-    quint16 lastSeqNum = 0;
 
-    bool firstPacketReceived = false;
-    bool lastPacketReceived = false;
-
-    if (readed < RtpHeader::RTP_HEADER_SIZE + 1) {
-        m_videoData.clear();
-        return false;
-    }
+    if (readed < RtpHeader::RTP_HEADER_SIZE + 1) 
+        return clearInternalBuffer();
     
     RtpHeader* rtpHeader = (RtpHeader*) rtpBuffer;
     quint8* curPtr = rtpBuffer + RtpHeader::RTP_HEADER_SIZE;
-    int bytesLeft = readed - RtpHeader::RTP_HEADER_SIZE;
+    quint8* bufferEnd = rtpBuffer + readed;
 
     if (rtpHeader->padding)
-        bytesLeft -= ntohl(rtpHeader->padding);
+        --bufferEnd;
 
-    int packetType = *curPtr & 0x1f;
-    curPtr++;
-    bytesLeft--;
+    int packetType = *curPtr++ & 0x1f;
 
-    if (m_videoData == 0)
-        m_videoData = QnCompressedVideoDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, DEFAULT_SLICE_SIZE));
-
-    while (bytesLeft > 0)
+    switch (packetType)
     {
-        switch (packetType)
-        {
-            case STAP_B_PACKET:
-                if (bytesLeft < 2)
-                {
-                    m_videoData.clear();
-                    return false;
-                }
-                don = (*curPtr << 8) + curPtr[1];
-                curPtr += 2;
-                bytesLeft -= 2;
-            case STAP_A_PACKET:
-                if (bytesLeft < 2)
-                {
-                    m_videoData.clear();
-                    return false;
-                }
-                nalUnitLen = (*curPtr << 8) + curPtr[1];
-                curPtr += 2;
-                bytesLeft -= 2;
-                if (bytesLeft < nalUnitLen)
-                {
-                    m_videoData.clear();
-                    return false;
-                }
-                nalUnitType = *curPtr & 0x1f;
-                if ((nalUnitType & 0x1f) >= nuSliceNonIDR && nalUnitType <= nuSliceIDR)
-                {
-                    isKeyFrame = (nalUnitType & 0x1f) == nuSliceIDR;
-                    // it is slice
-                    if (isKeyFrame)
-                        serializeSpsPps(m_videoData->data);
-                    m_videoData->data.write(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
-                    m_videoData->data.write((const char*)curPtr, nalUnitLen);
-                    lastPacketReceived = true;
-                }
-                else
-                {
-                    QByteArray& data = m_allNonSliceNal[nalUnitType];
-                    data.clear();
-                    data += QByteArray(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
-                    data += QByteArray( (const char*) curPtr, nalUnitLen);
-                    m_builtinSpsFound |= nalUnitType == nuSPS;
-                    m_builtinPpsFound |= nalUnitType == nuPPS;
-                    if (nalUnitType == nuSPS)
-                        decodeSpsInfo(data);
-                }
-                curPtr += nalUnitLen;
-                bytesLeft -= nalUnitLen;
-                break;
-            case FU_B_PACKET:
-            case FU_A_PACKET:
-                if (bytesLeft < 1)
-                {
-                    m_videoData.clear();
-                    return false;
-                }
-                firstPacketReceived = *curPtr  & 0x80;
-                lastPacketReceived = *curPtr & 0x40;
+        case STAP_B_PACKET:
+            if (bufferEnd-curPtr < 2)
+                return clearInternalBuffer();
+            don = (*curPtr++ << 8) + *curPtr++;
+        case STAP_A_PACKET:
+            if (bufferEnd-curPtr < 2)
+                return clearInternalBuffer();
+            nalUnitLen = (*curPtr++ << 8) + *curPtr++;
+            if (bufferEnd-curPtr < nalUnitLen)
+                return clearInternalBuffer();
 
-                if (firstPacketReceived)
+            nalUnitType = *curPtr & 0x1f;
+            m_videoBuffer.write(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
+            m_videoBuffer.write((const char*)curPtr, nalUnitLen);
+            updateNalFlags(nalUnitType);
+            break;
+        case FU_B_PACKET:
+        case FU_A_PACKET:
+            if (bufferEnd-curPtr < 1)
+                return clearInternalBuffer();
+            nalUnitType = *curPtr & 0x1f;
+            updateNalFlags(nalUnitType);
+            if (*curPtr  & 0x80) // FU_A first packet
+            {
+                m_firstSeqNum = ntohs(rtpHeader->sequence);
+                m_packetPerNal = 0;
+                m_videoBuffer.write(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
+                nalUnitType += 0x40;
+                m_videoBuffer.write( (const char*) &nalUnitType, 1);
+            }
+            else
+                m_packetPerNal++;
+            if (*curPtr  & 0x40) // FU_A last packet
+            {
+                if ((quint16) (ntohs(rtpHeader->sequence) - m_firstSeqNum) != m_packetPerNal)
                 {
-                    m_videoData->data.clear();
-                    m_firstSeqNum = ntohs(rtpHeader->sequence);
-                    m_packetPerNal = 0;
+                    qWarning() << "RTP Packet lost detected!!";
+                    return clearInternalBuffer(); // packet lost detected
                 }
-                else
-                    m_packetPerNal++;
-                if (lastPacketReceived)
-                {
-                    lastSeqNum = ntohs(rtpHeader->sequence);
-                    if ((quint16) (lastSeqNum - m_firstSeqNum) != m_packetPerNal)
-                    {
-                        // packet lost detected
-                        cl_log.log(QLatin1String("RTP Packet lost detected!!"), cl_logWARNING);
-                        m_videoData.clear();
-                        return false;
-                    }
-
-                }
-
-                nalUnitType = *curPtr & 0x1f;
-                curPtr++;
-                bytesLeft--;
-                if (packetType == FU_B_PACKET)
-                {
-                    if (bytesLeft < 2)
-                    {
-                        m_videoData.clear();
-                        return false;
-                    }
-                    don = (*curPtr << 8) + curPtr[1];
-                    curPtr += 2;
-                    bytesLeft -= 2;
-                }
-
-                if (nalUnitType >= nuSliceNonIDR && nalUnitType  <= nuSliceIDR)
-                {
-                    // it is slice
-                    isKeyFrame = nalUnitType == nuSliceIDR;
-                    if (m_videoData->data.size() == 0)
-                    {
-                        if (isKeyFrame)
-                            serializeSpsPps(m_videoData->data);
-                        m_videoData->data.write(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
-                        nalUnitType += 0x40;
-                        m_videoData->data.write( (const char*) &nalUnitType, 1);
-                    }
-                    m_videoData->data.write( (const char*) curPtr, bytesLeft);
-                }
-                else
-                {
-                    QByteArray& data = m_allNonSliceNal[nalUnitType];
-                    if (firstPacketReceived)
-                    {
-                        data.clear();
-                        data += QByteArray(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
-                        data += nalUnitType;
-                    }
-                    data += QByteArray( (const char*) curPtr, bytesLeft);
-                    m_builtinSpsFound |= nalUnitType == nuSPS;
-                    m_builtinPpsFound |= nalUnitType == nuPPS;
-                    if (nalUnitType == nuSPS)
-                        decodeSpsInfo(data);
-                }
-                bytesLeft = 0;
-                break;
-            case MTAP16_PACKET:
-            case MTAP24_PACKET:
-                // not implemented
-                //m_videoData.clear();
-                //return false;
-                break;
-            default:
-                isKeyFrame = (packetType & 0x1f) == nuSliceIDR;
-                if (isKeyFrame)
-                    serializeSpsPps(m_videoData->data);
-
-                m_videoData->data.write(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
-                m_videoData->data.write((const char*) curPtr-1, bytesLeft+1);
-
-                bytesLeft = 0;
-                lastPacketReceived = true;
-                break; // ignore unknown data
+            }
+            curPtr++;
+            if (packetType == FU_B_PACKET)
+            {
+                if (bufferEnd-curPtr < 2)
+                    return clearInternalBuffer();
+                don = (*curPtr++ << 8) + *curPtr++;
+            }
+            m_videoBuffer.write( (const char*) curPtr, bufferEnd - curPtr);
+            break;
+        case MTAP16_PACKET:
+        case MTAP24_PACKET:
+            // not implemented
+            return clearInternalBuffer();
+        default:
+            curPtr--;
+            nalUnitType = *curPtr & 0x1f;
+            m_videoBuffer.write(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
+            m_videoBuffer.write((const char*) curPtr, bufferEnd - curPtr);
+            updateNalFlags(nalUnitType);
+            break; // ignore unknown data
         }
+
+    if (rtpHeader->marker) 
+    {   // last packet
+        if (m_videoBuffer.size() > 0)
+            result << createVideoData(ntohl(rtpHeader->timestamp), statistics);
     }
 
-    if (lastPacketReceived)
-    {
-        m_videoData->width = m_sps.getWidth();
-        m_videoData->height = m_sps.getHeight();
-
-
-        m_videoData->channelNumber = 0;
-        if (isKeyFrame)
-            m_videoData->flags |= AV_PKT_FLAG_KEY;
-        else
-            m_videoData->flags &= ~AV_PKT_FLAG_KEY;
-        m_videoData->compressionType = CODEC_ID_H264;
-        
-        if (m_timeHelper) {
-            m_videoData->timestamp = m_timeHelper->getUsecTime(ntohl(rtpHeader->timestamp), statistics, m_frequency);
-            //qDebug() << "video. adjusttime to " << (m_videoData->timestamp - qnSyncTime->currentMSecsSinceEpoch()*1000)/1000 << "ms";
-        }
-        else
-            m_videoData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
-
-        result << m_videoData;
-        m_videoData.clear();
-    }
     return true;
 }

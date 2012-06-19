@@ -127,7 +127,7 @@ void QnMotionArchive::loadRecordedRange()
 {
     m_minMotionTime = AV_NOPTS_VALUE;
     m_maxMotionTime = AV_NOPTS_VALUE;
-    QList<QDate> existsRecords = QnMotionHelper::instance()->recordedMonth(m_resource->getMAC().toString());
+    QList<QDate> existsRecords = QnMotionHelper::instance()->recordedMonth(m_resource->getMAC());
     if (existsRecords.isEmpty())
         return;
 
@@ -144,7 +144,7 @@ void QnMotionArchive::loadRecordedRange()
 
 QString QnMotionArchive::getFilePrefix(const QDate& datetime)
 {
-    return QnMotionHelper::instance()->getMotionDir(datetime, m_resource->getMAC().toString());
+    return QnMotionHelper::instance()->getMotionDir(datetime, m_resource->getMAC());
 }
 
 QString QnMotionArchive::getChannelPrefix()

@@ -13,6 +13,75 @@ class onvifXsd__VideoEncoderConfiguration;
 
 class QnOnvifStreamReader: public CLServerPushStreamreader , public QnLiveStreamProvider
 {
+    class VideoEncoderChange
+    {
+    public:
+        VideoEncoderChange() {};
+        virtual ~VideoEncoderChange() {};
+
+        virtual void doChange(onvifXsd__VideoEncoderConfiguration* config, const QnOnvifStreamReader& reader, bool isPrimary) = 0;
+        virtual void undoChange(onvifXsd__VideoEncoderConfiguration* config, bool isPrimary) = 0;
+        virtual QString description() = 0;
+    };
+
+    class VideoEncoderNameChange: public VideoEncoderChange
+    {
+        static const char* DESCRIPTION;
+
+        QString oldName;
+    public:
+        VideoEncoderNameChange() {};
+        virtual ~VideoEncoderNameChange() {};
+
+        void doChange(onvifXsd__VideoEncoderConfiguration* config, const QnOnvifStreamReader& reader, bool isPrimary);
+        void undoChange(onvifXsd__VideoEncoderConfiguration* config, bool isPrimary);
+        QString description();
+    };
+
+    class VideoEncoderFpsChange: public VideoEncoderChange
+    {
+        static const char* DESCRIPTION;
+
+        int oldFps;
+    public:
+        VideoEncoderFpsChange() {};
+        virtual ~VideoEncoderFpsChange() {};
+
+        void doChange(onvifXsd__VideoEncoderConfiguration* config, const QnOnvifStreamReader& reader, bool isPrimary);
+        void undoChange(onvifXsd__VideoEncoderConfiguration* config, bool isPrimary);
+        QString description();
+    };
+
+    class VideoEncoderQualityChange: public VideoEncoderChange
+    {
+        static const char* DESCRIPTION;
+
+        float oldQuality;
+    public:
+        VideoEncoderQualityChange() {};
+        virtual ~VideoEncoderQualityChange() {};
+
+        void doChange(onvifXsd__VideoEncoderConfiguration* config, const QnOnvifStreamReader& reader, bool isPrimary);
+        void undoChange(onvifXsd__VideoEncoderConfiguration* config, bool isPrimary);
+        QString description();
+    };
+
+    class VideoEncoderResolutionChange: public VideoEncoderChange
+    {
+        static const char* DESCRIPTION;
+
+        ResolutionPair oldResolution;
+    public:
+        VideoEncoderResolutionChange() {};
+        virtual ~VideoEncoderResolutionChange() {};
+
+        void doChange(onvifXsd__VideoEncoderConfiguration* config, const QnOnvifStreamReader& reader, bool isPrimary);
+        void undoChange(onvifXsd__VideoEncoderConfiguration* config, bool isPrimary);
+        QString description();
+    };
+
+    typedef QList<VideoEncoderChange*> VideoEncoderChanges;
+
 public:
     QnOnvifStreamReader(QnResourcePtr res);
     virtual ~QnOnvifStreamReader();
@@ -44,7 +113,8 @@ private:
     //Returned ptr can be used only when response is not destroyed!
     onvifXsd__Profile* findAppropriateProfile(const _onvifMedia__GetProfilesResponse& response, bool isPrimary) const;
 
-    void setRequiredValues(onvifXsd__VideoEncoderConfiguration* config, bool isPrimary) const;
+    void fillVideoEncoderChanges(VideoEncoderChanges& changes) const;
+    void clearVideoEncoderChanges(VideoEncoderChanges& changes) const;
     const QString normalizeStreamSrcUrl(const std::string& src) const;
     void printProfile(const _onvifMedia__GetProfileResponse& response, bool isPrimary) const;
 private:

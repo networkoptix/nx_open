@@ -44,10 +44,15 @@ void OnvifResourceInformationFetcher::findResources(const EndpointInfoHash& endp
         ++iter;
     }
 }
+
 void OnvifResourceInformationFetcher::findResources(const QString& endpoint, const EndpointAdditionalInfo& info, QnResourceList& result) const
 {
     if (endpoint.isEmpty()) {
         qDebug() << "OnvifResourceInformationFetcher::findResources: response packet was received, but appropriate URL was not found.";
+        return;
+    }
+
+    if (isMacAlreadyExists(info.uniqId, result)) {
         return;
     }
 
@@ -74,10 +79,9 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
 
         qDebug() << "Trying login = " << login << ", password = " << passwd;
 
-        _onvifDevice__GetCapabilities request1;
-        request1.Category.push_back(onvifXsd__CapabilityCategory__All);
-        _onvifDevice__GetCapabilitiesResponse response1;
-        soapRes = soapProxy.GetCapabilities(endpoint.toStdString().c_str(), NULL, &request1, &response1);
+        _onvifDevice__GetNetworkInterfaces request1;
+        _onvifDevice__GetNetworkInterfacesResponse response1;
+        soapRes = soapProxy.GetNetworkInterfaces(endpoint.toStdString().c_str(), NULL, &request1, &response1);
 
         if (soapRes == SOAP_OK || !passwordsData.isNotAuthenticated(soapProxy.soap_fault())) {
             qDebug() << "Finished picking password";
@@ -133,23 +137,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
 
     qDebug() << "OnvifResourceInformationFetcher::findResources: Initial login = " << login << ", password = " << passwd;
 
-    //Trying to get MAC address
-    _onvifDevice__GetNetworkInterfaces request1;
-    _onvifDevice__GetNetworkInterfacesResponse response1;
-    if (login) soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", login, passwd);
-    soapRes = soapProxy.GetNetworkInterfaces(endpoint.toStdString().c_str(), NULL, &request1, &response1);
-    if (soapRes != SOAP_OK && cl_log.logLevel() >= cl_logDEBUG1) {
-        qDebug() << "OnvifResourceInformationFetcher::findResources: SOAP to endpoint '" << endpoint
-                 << "' failed. Can't fetch MAC, will try to get analog. GSoap error code: " << soapRes
-                 << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
-    }
-    soap_end(soapProxy.soap);
-    QString mac(fetchMacAddress(response1, sender.toString()));
-    if (isMacAlreadyExists(mac, result)) {
-        return;
-    }
-
-    //Trying to get name and possibly MAC
+    //Trying to get name and manufacturer
     _onvifDevice__GetDeviceInformation request2;
     _onvifDevice__GetDeviceInformationResponse response2;
     if (login) soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", login, passwd);
@@ -159,24 +147,6 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
                  << "' failed. Camera name will be set to 'Unknown'. GSoap error code: " << soapRes
                  << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
     }
-
-    if (mac.isEmpty()) {
-        mac = fetchSerial(response2);
-        if (mac.isEmpty()) {
-            if (passwordsData.isNotAuthenticated(soapProxy.soap_fault())) {
-                qCritical() << "OnvifResourceInformationFetcher::findResources: Can't get ONVIF device MAC address, because login/password required. Endpoint URL: " << endpoint;
-            }
-
-            soap_end(soapProxy.soap);
-            return;
-        }
-
-        if (isMacAlreadyExists(mac, result)) {
-            soap_end(soapProxy.soap);
-            return;
-        }
-    }
-    soap_end(soapProxy.soap);
 
     QString manufacturer(fetchManufacturer(response2));
     if (manufacturer.isEmpty()) {
@@ -193,8 +163,8 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
 
     if (name.isEmpty()) {
         qWarning() << "OnvifResourceInformationFetcher::findResources: can't fetch name of ONVIF device: endpoint: " << endpoint
-                   << ", MAC: " << mac;
-        name = "Unknown - " + mac;
+                   << ", MAC: " << info.uniqId;
+        name = "Unknown - " + info.uniqId;
     }
 
     qDebug() << "OnvifResourceInformationFetcher::findResources: manufacturer: " << manufacturer;
@@ -218,25 +188,33 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
             mediaUrl = response.Capabilities->Media? response.Capabilities->Media->XAddr.c_str(): mediaUrl;
             deviceUrl = response.Capabilities->Device? response.Capabilities->Device->XAddr.c_str(): deviceUrl;
         }
+
+        if (deviceUrl.isEmpty()) {
+            deviceUrl = endpoint;
+        }
     }
 
     qDebug() << "OnvifResourceInformationFetcher::createResource: Found new camera: endpoint: " << endpoint
-             << ", MAC: " << mac << ", manufacturer: " << manufacturer << ", name: " << name;
+             << ", MAC: " << info.uniqId << ", manufacturer: " << manufacturer << ", name: " << name;
 
     createResource(manufacturer, QHostAddress(sender), QHostAddress(info.discoveryIp),
-        name, mac, login, passwd, mediaUrl, deviceUrl, result);
+        name, info.uniqId, login, passwd, mediaUrl, deviceUrl, result);
 }
 
 void OnvifResourceInformationFetcher::createResource(const QString& manufacturer, const QHostAddress& sender, const QHostAddress& discoveryIp,
-    const QString& name, const QString& mac, const char* login, const char* passwd, const QString& mediaUrl, const QString& deviceUrl, QnResourceList& result) const
+    const QString& name, const QString& uniqId, const char* login, const char* passwd, const QString& mediaUrl, const QString& deviceUrl, QnResourceList& result) const
 {
+    if (uniqId.isEmpty()) {
+        return;
+    }
+
     QnNetworkResourcePtr resource = QnNetworkResourcePtr(new QnPlOnvifResource());
 
     resource->setTypeId(onvifTypeId);
     resource->setHostAddress(sender, QnDomainMemory);
     resource->setDiscoveryAddr(discoveryIp);
     resource->setName(manufacturer + " - " + name);
-    resource->setMAC(mac);
+    resource->setMAC(uniqId);
 
     if (login) {
         qDebug() << "OnvifResourceInformationFetcher::createResource: Setting login = " << login << ", password = " << passwd;
@@ -261,7 +239,7 @@ const bool OnvifResourceInformationFetcher::isMacAlreadyExists(const QString& ma
     foreach(QnResourcePtr res, resList) {
         QnNetworkResourcePtr netRes = res.dynamicCast<QnNetworkResource>();
 
-        if (netRes->getMAC().toString() == mac) {
+        if (netRes->getMAC() == mac) {
             return true;
         }
     }
@@ -328,7 +306,8 @@ const QString OnvifResourceInformationFetcher::fetchManufacturer(const _onvifDev
 
 const QString OnvifResourceInformationFetcher::fetchSerial(const _onvifDevice__GetDeviceInformationResponse& response) const
 {
-    return (response.HardwareId + "::" + response.SerialNumber).c_str();
+    return (response.HardwareId.empty()? QString(): QString((response.HardwareId + "::").c_str())) +
+        (response.SerialNumber.empty()? QString(): QString(response.SerialNumber.c_str()));
 }
 
 //const QString OnvifResourceInformationFetcher::generateRandomPassword() const

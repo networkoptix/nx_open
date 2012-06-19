@@ -233,24 +233,27 @@ QRectF QnGeometry::expanded(qreal aspectRatio, const QRectF &minRect, Qt::Aspect
     if(mode == Qt::IgnoreAspectRatio)
         return minRect;
 
-    QSizeF newSize = expanded(aspectRatio, minRect.size(), mode);
+    return aligned(expanded(aspectRatio, minRect.size(), mode), minRect, alignment);
+}
+
+QRectF QnGeometry::aligned(const QSizeF &size, const QRectF &rect, Qt::Alignment alignment) {
     QRectF result;
-    result.setSize(newSize);
+    result.setSize(size);
 
     if(alignment & Qt::AlignHCenter) {
-        result.moveLeft(minRect.left() + (minRect.width() - newSize.width()) / 2);
+        result.moveLeft(rect.left() + (rect.width() - size.width()) / 2);
     } else if(alignment & Qt::AlignRight) {
-        result.moveRight(minRect.right());
+        result.moveRight(rect.right());
     } else {
-        result.moveLeft(minRect.left());
+        result.moveLeft(rect.left());
     }
 
     if(alignment & Qt::AlignVCenter) {
-        result.moveTop(minRect.top() + (minRect.height() - newSize.height()) / 2);
+        result.moveTop(rect.top() + (rect.height() - size.height()) / 2);
     } else if(alignment & Qt::AlignBottom) {
-        result.moveBottom(minRect.bottom());
+        result.moveBottom(rect.bottom());
     } else {
-        result.moveTop(minRect.top());
+        result.moveTop(rect.top());
     }
 
     return result;

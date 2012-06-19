@@ -19,7 +19,8 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     m_motionWidget(NULL),
     m_hasChanges(false),
     m_hasScheduleChanges(false),
-    m_readOnly(false)
+    m_readOnly(false),
+    m_inUpdateMaxFps(false)
 {
     ui->setupUi(this);
 
@@ -65,6 +66,10 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
     if (m_camera)
     {
         ui->softwareMotionButton->setEnabled(camera->supportedMotionType() & MT_SoftwareGrid);
+        if (camera->supportedMotionType() & (MT_HardwareGrid | MT_MotionWindow))
+            ui->cameraMotionButton->setText("Hardware (Camera built-in)");
+        else
+            ui->cameraMotionButton->setText("Do not record motion");
 
         QVariant val;
         QString webPageAddress = QString("<A HREF=\"http://%1/%2\">http://%1/%2</A>").arg(m_camera->getHostAddress().toString()).arg(val.toString());
@@ -214,7 +219,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         ui->checkBoxEnableAudio->setChecked(m_camera->isAudioEnabled());
         ui->checkBoxEnableAudio->setEnabled(m_camera->isAudioSupported());
 
-        ui->macAddressEdit->setText(m_camera->getMAC().toString());
+        ui->macAddressEdit->setText(m_camera->getMAC());
         ui->ipAddressEdit->setText(m_camera->getUrl());
         ui->webPageLabel->setText(tr("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
         ui->loginEdit->setText(m_camera->getAuth().user());
@@ -232,6 +237,12 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         QnVirtualCameraResourceList cameras;
         cameras.push_back(m_camera);
         ui->cameraScheduleWidget->setCameras(cameras);
+
+        int currentCameraFps = ui->cameraScheduleWidget->getGridMaxFps();
+        if (currentCameraFps > 0)
+            ui->cameraScheduleWidget->setFps(currentCameraFps);
+        else
+            ui->cameraScheduleWidget->setFps(ui->cameraScheduleWidget->getMaxFps()/2);
     }
 
     setHasChanges(false);
@@ -300,6 +311,9 @@ void QnSingleCameraSettingsWidget::at_motionTypeChanged() {
 
 void QnSingleCameraSettingsWidget::updateMaxFPS()
 {
+    if (m_inUpdateMaxFps)
+        return; // do not show message twice
+    m_inUpdateMaxFps = true;
     if (ui->softwareMotionButton->isChecked() || ui->cameraScheduleWidget->isSecondaryStreamReserver())
     {
         float maxFps = m_camera->getMaxFps()-2;
@@ -314,6 +328,7 @@ void QnSingleCameraSettingsWidget::updateMaxFPS()
     else {
         ui->cameraScheduleWidget->setMaxFps(m_camera->getMaxFps());
     }
+    m_inUpdateMaxFps = false;
 }
 
 void QnSingleCameraSettingsWidget::at_motionSelectionCleared() {

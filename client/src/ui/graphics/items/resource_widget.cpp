@@ -138,6 +138,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 
     /* Header overlay. */
     m_headerTitleLabel = new GraphicsLabel();
+    m_headerTitleLabel->setAcceptedMouseButtons(0);
     m_headerTitleLabel->setPerformanceHint(QStaticText::AggressiveCaching);
 
     qreal buttonSize = 24; /* In pixels. */
@@ -157,14 +158,14 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_infoButton->setIcon(qnSkin->icon("decorations/info.png"));
     m_infoButton->setPreferredSize(headerButtonSize);
     m_infoButton->setCheckable(true);
-    m_infoButton->setProperty(Qn::NoMotionClearThrough, true);
+    m_infoButton->setProperty(Qn::NoBlockMotionSelection, true);
     connect(m_infoButton, SIGNAL(toggled(bool)), this, SLOT(fadeInfo(bool)));
 
     m_closeButton = new QnImageButtonWidget();
     m_closeButton->setParent(this);
     m_closeButton->setIcon(qnSkin->icon("decorations/close_item.png"));
     m_closeButton->setPreferredSize(headerButtonSize);
-    m_closeButton->setProperty(Qn::NoMotionClearThrough, true);
+    m_closeButton->setProperty(Qn::NoBlockMotionSelection, true);
     connect(m_closeButton, SIGNAL(clicked()), this, SLOT(close()));
     connect(accessController()->notifier(item->layout()->resource()), SIGNAL(permissionsChanged(const QnResourcePtr &)), this, SLOT(updateButtonsVisibility()));
     
@@ -172,7 +173,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_rotateButton->setParent(this);
     m_rotateButton->setIcon(qnSkin->icon("decorations/rotate_item.png"));
     m_rotateButton->setPreferredSize(headerButtonSize);
-    m_rotateButton->setProperty(Qn::NoMotionClearThrough, true);
+    m_rotateButton->setProperty(Qn::NoBlockMotionSelection, true);
     connect(m_rotateButton, SIGNAL(pressed()), this, SIGNAL(rotationStartRequested()));
     connect(m_rotateButton, SIGNAL(released()), this, SIGNAL(rotationStopRequested()));
 
@@ -181,7 +182,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_searchButton->setIcon(qnSkin->icon("decorations/search.png"));
     m_searchButton->setPreferredSize(headerButtonSize);
     m_searchButton->setCheckable(true);
-    m_searchButton->setProperty(Qn::NoMotionClearThrough, true);
+    m_searchButton->setProperty(Qn::NoBlockMotionSelection, true);
     connect(m_searchButton, SIGNAL(toggled(bool)), this, SLOT(at_searchButton_toggled(bool)));
 
     m_headerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
@@ -216,8 +217,10 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 
     /* Footer overlay. */
     m_footerStatusLabel = new GraphicsLabel();
+    m_footerStatusLabel->setAcceptedMouseButtons(0);
 
     m_footerTimeLabel = new GraphicsLabel();
+    m_footerTimeLabel->setAcceptedMouseButtons(0);
 
     QGraphicsLinearLayout *footerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     footerLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
@@ -688,6 +691,7 @@ void QnResourceWidget::updateButtonsVisibility() {
     if(m_closeButton->isVisible() != closeButtonVisible || m_infoButton->isVisible() != infoButtonVisible || m_searchButton->isVisible() != searchButtonVisible) {
         m_infoButton->setVisible(infoButtonVisible);
         m_closeButton->setVisible(closeButtonVisible);
+        m_searchButton->setVisible(searchButtonVisible);
         
         m_headerLayout->removeItem(m_searchButton);
         m_headerLayout->removeItem(m_rotateButton);

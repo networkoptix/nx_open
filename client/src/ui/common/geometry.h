@@ -200,6 +200,8 @@ public:
      */
     static QRectF expanded(qreal aspectRatio, const QRectF &minRect, Qt::AspectRatioMode mode, Qt::Alignment alignment = Qt::AlignCenter);
 
+    static QRectF aligned(const QSizeF &size, const QRectF &rect, Qt::Alignment alignment = Qt::AlignCenter);
+
     /**
      * Dilates the given rectangle by the given amount.
      * 

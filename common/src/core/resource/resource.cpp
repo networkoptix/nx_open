@@ -75,11 +75,11 @@ void QnResource::updateInner(QnResourcePtr other)
 
     m_id = other->m_id;
     m_typeId = other->m_typeId;
-    m_flags = other->m_flags;
     m_lastDiscoveredTime = other->m_lastDiscoveredTime;
     m_tags = other->m_tags;
     m_url = other->m_url;
 
+    setFlags(other->m_flags);
     setName(other->m_name);
     setParentId(other->m_parentId);
 }
@@ -178,19 +178,27 @@ QnResource::Flags QnResource::flags() const
 void QnResource::setFlags(Flags flags)
 {
     QMutexLocker mutexLocker(&m_mutex);
+
+    if(m_flags == flags)
+        return;
+
     m_flags = flags;
+
+    emit flagsChanged();
 }
 
 void QnResource::addFlags(Flags flags)
 {
     QMutexLocker mutexLocker(&m_mutex);
-    m_flags |= flags;
+    
+    setFlags(m_flags | flags);
 }
 
 void QnResource::removeFlags(Flags flags)
 {
     QMutexLocker mutexLocker(&m_mutex);
-    m_flags &= ~flags;
+
+    setFlags(m_flags & ~flags);
 }
 
 QString QnResource::toString() const
@@ -751,4 +759,9 @@ void QnResource::init()
         m_initialized = true;
         initInternal();
     }
+}
+
+bool QnResource::isInitialized() const
+{
+    return m_initialized;
 }

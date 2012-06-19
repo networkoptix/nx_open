@@ -123,11 +123,11 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
 
 QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
 {
-    if (codecName == "h264")
+    if (codecName == "H264")
         return new CLH264RtpParser;
     else if (codecName == "JPEG")
         return new QnMjpegRtpParser;
-    else if (codecName == "mpeg4-generic")
+    else if (codecName == "MPEG4-GENERIC")
         return new QnAacRtpParser;
     else if (codecName == "PCMU") {
         QnSimpleAudioRtpParser* result = new QnSimpleAudioRtpParser;
@@ -139,7 +139,7 @@ QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
         result->setCodecId(CODEC_ID_PCM_ALAW);
         return result;
     }
-    else if (codecName.startsWith("g726")) // g726-24, g726-32 e.t.c
+    else if (codecName.startsWith("G726")) // g726-24, g726-32 e.t.c
     { 
         int bitRatePos = codecName.indexOf('-');
         if (bitRatePos == -1)
@@ -157,6 +157,7 @@ QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
 
 void QnMulticodecRtpReader::initIO(RTPIODevice** ioDevice, QnRtpStreamParser* parser, const QString& mediaType)
 {
+    *ioDevice = 0;
     if (parser)
     {
         *ioDevice = m_RtpSession.getTrackIoByType(mediaType);
@@ -193,32 +194,27 @@ void QnMulticodecRtpReader::openStream()
         delete m_audioParser;
         m_audioParser = 0;
 
-        m_videoParser = createParser(m_RtpSession.getCodecNameByType("video"));
+        m_videoParser = createParser(m_RtpSession.getCodecNameByType("video").toUpper());
         if (m_videoParser)
             m_videoParser->setTimeHelper(&m_timeHelper);
-        m_audioParser = dynamic_cast<QnRtpAudioStreamParser*> (createParser(m_RtpSession.getCodecNameByType("audio")));
+        m_audioParser = dynamic_cast<QnRtpAudioStreamParser*> (createParser(m_RtpSession.getCodecNameByType("audio").toUpper()));
         if (m_audioParser)
             m_audioParser->setTimeHelper(&m_timeHelper);
 
         initIO(&m_videoIO, m_videoParser, "video");
         initIO(&m_audioIO, m_audioParser, "audio");
     }
+}
 
+int QnMulticodecRtpReader::getLastResponseCode() const
+{
+    return m_RtpSession.getLastResponseCode();
 }
 
 void QnMulticodecRtpReader::closeStream()
 {
     m_RtpSession.sendTeardown();
     m_RtpSession.stop();
-
-    m_videoIO = 0;
-    m_audioIO = 0;
-    
-    delete m_videoParser;
-    delete m_audioParser;
-    m_videoParser = 0;
-    m_audioParser = 0;
-
 }
 
 bool QnMulticodecRtpReader::isStreamOpened() const

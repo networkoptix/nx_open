@@ -33,7 +33,15 @@ void QnAction::setRequiredPermissions(Qn::Permissions requiredPermissions) {
 }
 
 void QnAction::setRequiredPermissions(const QString &target, Qn::Permissions requiredPermissions) {
-    m_requiredPermissions[target] = requiredPermissions;
+    m_permissions[target].required = requiredPermissions;
+}
+
+void QnAction::setForbiddenPermissions(const QString &target, Qn::Permissions forbiddenPermissions) {
+    m_permissions[target].forbidden = forbiddenPermissions;
+}
+
+void QnAction::setForbiddenPermissions(Qn::Permissions forbiddenPermissions) {
+    setForbiddenPermissions(QString(), forbiddenPermissions);
 }
 
 void QnAction::setFlags(Qn::ActionFlags flags) {
@@ -99,10 +107,11 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
     if(!(this->defaultParameterTypes() & type) && size != 0)
         return Qn::InvisibleAction;
 
-    if(!m_requiredPermissions.empty()) {
-        for(QHash<QString, Qn::Permissions>::const_iterator pos = m_requiredPermissions.begin(), end = m_requiredPermissions.end(); pos != end; pos++) {
+    if(!m_permissions.empty()) {
+        for(QHash<QString, Permissions>::const_iterator pos = m_permissions.begin(), end = m_permissions.end(); pos != end; pos++) {
             const QString &key = pos.key();
-            Qn::Permissions requirements = pos.value();
+            Qn::Permissions required = pos->required;
+            Qn::Permissions forbidden = pos->forbidden;
 
             QnResourceList resources;
             if(parameters.hasArgument(key)) {
@@ -113,13 +122,10 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
                 resources.push_back(context()->user());
             }
 
-            if(resources.empty() && key.isEmpty()) {
-                if((accessController()->permissions() & requirements) != requirements)
-                    return Qn::InvisibleAction;
-            } else {
-                if((accessController()->permissions(resources) & requirements) != requirements)
-                    return Qn::InvisibleAction;
-            }
+            if((accessController()->permissions(resources) & required) != required)
+                return Qn::InvisibleAction;
+            if((accessController()->permissions(resources) & forbidden) != 0)
+                return Qn::InvisibleAction;
         }
     }
 

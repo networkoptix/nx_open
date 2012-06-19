@@ -12,6 +12,7 @@
 
 class QAction;
 class QMenu;
+class QProgressDialog;
 
 class QnMimeData;
 class QnResourcePool;
@@ -167,6 +168,7 @@ protected slots:
     void at_delayedDropResourcesAction_triggered();
     void at_dropResourcesIntoNewLayoutAction_triggered();
     void at_openFileAction_triggered();
+    void at_openLayoutAction_triggered();
     void at_openFolderAction_triggered();
     void at_aboutAction_triggered();
     void at_systemSettingsAction_triggered();
@@ -230,7 +232,7 @@ private:
     QQueue<QnMediaResourcePtr> m_layoutExportResources;
     QString m_layoutFileName;
     QnTimePeriod m_exportPeriod;
-    QProgressDialog *m_exportProgressDialog;
+    QWeakPointer<QProgressDialog> m_exportProgressDialog;
     QnStorageResourcePtr m_exportStorage;
 };
 

@@ -1060,10 +1060,12 @@ void QnWorkbenchUi::updateSliderResizerGeometry() {
     sliderResizerGeometry.moveTo(sliderResizerGeometry.topLeft() - QPointF(0, 8));
     sliderResizerGeometry.setHeight(16);
     
-    m_sliderResizerItem->setGeometry(sliderResizerGeometry);
+    if(!qFuzzyCompare(sliderResizerGeometry, m_sliderResizerItem->geometry())) {
+        m_sliderResizerItem->setGeometry(sliderResizerGeometry);
 
-    /* This one is needed here as we're in a handler and thus geometry change doesn't adjust position =(. */
-    m_sliderResizerItem->setPos(sliderResizerGeometry.topLeft());  // TODO: remove this ugly hack.
+        /* This one is needed here as we're in a handler and thus geometry change doesn't adjust position =(. */
+        m_sliderResizerItem->setPos(sliderResizerGeometry.topLeft());  // TODO: remove this ugly hack.
+    }
 }
 
 QMargins QnWorkbenchUi::calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY, qreal helpX) {
@@ -1358,11 +1360,7 @@ void QnWorkbenchUi::at_toggleThumbnailsAction_toggled(bool checked) {
 }
 
 void QnWorkbenchUi::at_sliderResizerItem_geometryChanged() {
-    if(m_ignoreSliderResizerGeometryChanges)
-        return;
-
     QRectF sliderGeometry = m_sliderItem->geometry();
-    qreal sliderBottom = sliderGeometry.bottom();
 
     qreal targetHeight = sliderGeometry.bottom() - m_sliderResizerItem->geometry().center().y();
     qreal minHeight = m_sliderItem->effectiveSizeHint(Qt::MinimumSize).height();
@@ -1377,11 +1375,15 @@ void QnWorkbenchUi::at_sliderResizerItem_geometryChanged() {
         targetHeight = maxHeight;
     }
 
-    sliderGeometry.setHeight(targetHeight);
-    sliderGeometry.moveBottom(sliderBottom);
+    if(!qFuzzyCompare(sliderGeometry.height(), targetHeight)) {
+        qreal sliderTop = sliderGeometry.top();
+        sliderGeometry.setHeight(targetHeight);
+        sliderGeometry.moveTop(sliderTop);
 
-    QnScopedValueRollback<bool> guard(&m_ignoreSliderResizerGeometryChanges, true);
-    m_sliderItem->setGeometry(sliderGeometry);
+        QnScopedValueRollback<bool> guard(&m_ignoreSliderResizerGeometryChanges, true);
+        m_sliderItem->setGeometry(sliderGeometry);
+    }
+
     updateSliderResizerGeometry();
 
     action(Qn::ToggleThumbnailsAction)->setChecked(isThumbnailsVisible());

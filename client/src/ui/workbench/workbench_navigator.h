@@ -137,9 +137,11 @@ protected slots:
     void updatePlayingSupported();
     void updateSpeed();
     void updateSpeedRange();
-    
+   
     void updateThumbnailsLoader();
     
+    void updateCurrentWidgetFlags();
+
 protected slots:
     void at_display_widgetChanged(Qn::ItemRole role);
     void at_display_widgetAdded(QnResourceWidget *widget);
@@ -149,6 +151,9 @@ protected slots:
     void at_widget_motionSelectionChanged();
     void at_widget_displayFlagsChanged(QnResourceWidget *widget);
     void at_widget_displayFlagsChanged();
+
+    void at_resource_flagsChanged();
+    void at_resource_flagsChanged(const QnResourcePtr &resource);
 
     void at_loader_periodsChanged(QnCachingTimePeriodLoader *loader, Qn::TimePeriodRole type);
     void at_loader_periodsChanged(Qn::TimePeriodRole type);

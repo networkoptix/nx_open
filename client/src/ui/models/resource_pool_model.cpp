@@ -182,8 +182,10 @@ public:
             bastard = !(m_model->accessController()->permissions(m_resource) & Qn::ReadPermission); /* Hide non-readable resources. */
             if(!bastard) {
                 QnLayoutResourcePtr layout = m_resource.dynamicCast<QnLayoutResource>();
-                if(layout)
-                    bastard = m_model->snapshotManager()->isLocal(layout); /* Hide local layouts. */
+                if(layout) {
+                    /* Hide local layouts that are not file-based. */
+                    bastard = m_model->snapshotManager()->isLocal(layout) && (m_flags & QnResource::local_media) != QnResource::local_media; 
+                }
                 if(!bastard)
                     bastard = (m_flags & QnResource::local_server) == QnResource::local_server; /* Hide local server resource. */
             }

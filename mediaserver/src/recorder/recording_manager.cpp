@@ -110,7 +110,7 @@ bool QnRecordingManager::isResourceDisabled(QnResourcePtr res) const
 bool QnRecordingManager::updateCameraHistory(QnResourcePtr res)
 {
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(res);
-    QString macAddress = netRes->getMAC().toString();
+    QString macAddress = netRes->getMAC();
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
     if (QnCameraHistoryPool::instance()->getMinTime(netRes) == AV_NOPTS_VALUE)
     {
@@ -122,7 +122,7 @@ bool QnRecordingManager::updateCameraHistory(QnResourcePtr res)
     }
 
     QnVideoServerResourcePtr server = qSharedPointerDynamicCast<QnVideoServerResource>(qnResPool->getResourceById(res->getParentId()));
-    QnCameraHistoryItem cameraHistoryItem(netRes->getMAC().toString(), currentTime, server->getGuid());
+    QnCameraHistoryItem cameraHistoryItem(netRes->getMAC(), currentTime, server->getGuid());
     QByteArray errStr;
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
     if (appServerConnection->addCameraHistoryItem(cameraHistoryItem, errStr) != 0) {

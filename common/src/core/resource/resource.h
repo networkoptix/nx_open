@@ -21,11 +21,6 @@ class QnResourcePool;
 
 typedef QMap<QString, QString> QnResourceParameters;
 
-//struct QN_EXPORT QnResourceData
-//{
-    // resource fields here
-//};
-
 class QN_EXPORT QnResource : public QObject
 {
     Q_OBJECT
@@ -67,11 +62,13 @@ public:
         layout = 0x1000,        /**< Layout resource. */
         user = 0x2000,          /**< User resource. */
 
+        utc = 0x4000,           /**< Resource uses UTC-based timing. */
+
         local_media = local | media,
 
         local_server = local | server,
         remote_server = remote | server,
-        live_cam = live | media | video | streamprovider, // don't set w/o `local` or `remote` flag
+        live_cam = utc | live | media | video | streamprovider, // don't set w/o `local` or `remote` flag
         local_live_cam = live_cam | local | network,
         server_live_cam = live_cam | remote,// | network,
         server_archive = remote | media | video | audio | streamprovider,
@@ -110,9 +107,6 @@ public:
     Status getStatus() const;
     virtual void setStatus(Status newStatus, bool silenceMode = false);
     QDateTime getLastStatusUpdateTime() const;
-
-//    void fromData(const QnResourceData& data);
-//    QnResourceData toData();
 
     // this function is called if resourse changes state from offline to online or so 
     void init();
@@ -194,6 +188,7 @@ public:
 
     bool hasConsumer(QnResourceConsumer *consumer) const;
     bool hasUnprocessedCommands() const;
+    bool isInitialized() const;
 
 signals:
     void parameterValueChanged(const QnParam &param);
@@ -202,6 +197,7 @@ signals:
     void nameChanged();
     void parentIdChanged();
     void idChanged(const QnId &oldId, const QnId &newId);
+    void flagsChanged();
 
     void resourceChanged();
 

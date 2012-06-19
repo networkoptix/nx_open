@@ -1,0 +1,20 @@
+Regress Testing
+
++ 1) Events and statuses (several clients ans servers)
+2) Playback (live, archive, RADASS, sync)
+3) Recording (motion, lo-hi streams, audio)
++ 4) Camera drag
+5) Interface (Scene, Tree)
++ 6) Motion Detection (smart search)
+7) Discovery (onvif, std)
++ 8) Search (different privileges)
+9) Properties (server, cameras, multi-item)
+10) Export (files, layo, watermarks)
+11) Screen Recording
+12) Screenshot
+13) Installer (traytool, upgrade)
++ 14) Mediaproxy
+15) Admin/user privileges
++ 16) Layouts
++ 17) Licenses
+18) Long-time testing (leaks)

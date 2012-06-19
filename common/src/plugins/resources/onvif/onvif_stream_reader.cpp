@@ -13,6 +13,167 @@
 //#include "onvif/Onvif.nsmap"
 #include "onvif/soapMediaBindingProxy.h"
 #include "onvif/wsseapi.h"
+#include "utils/network/tcp_connection_priv.h"
+
+//
+// VideoEncoderNameChange
+//
+
+const char* QnOnvifStreamReader::VideoEncoderNameChange::DESCRIPTION = "name";
+
+void QnOnvifStreamReader::VideoEncoderNameChange::doChange(onvifXsd__VideoEncoderConfiguration* config, 
+    const QnOnvifStreamReader& /*reader*/, bool isPrimary)
+{
+    if (!config) {
+        qWarning() << "QnOnvifStreamReader::VideoEncoderNameChange::doChange: got NULL ptr";
+        return;
+    }
+
+    oldName = config->Name.c_str();
+
+    if (isPrimary) {
+        config->Name = "Netoptix Primary Encoder";
+    } else {    
+        config->Name = "Netoptix Secondary Encoder";
+    }
+}
+
+void QnOnvifStreamReader::VideoEncoderNameChange::undoChange(onvifXsd__VideoEncoderConfiguration* config, bool /*isPrimary*/)
+{
+    if (!config) {
+        qWarning() << "QnOnvifStreamReader::VideoEncoderNameChange::undoChange";
+        return;
+    }
+
+    config->Name = oldName.toStdString();
+}
+
+QString QnOnvifStreamReader::VideoEncoderNameChange::description()
+{
+    return DESCRIPTION;
+}
+
+//
+// VideoEncoderFpsChange
+//
+
+const char* QnOnvifStreamReader::VideoEncoderFpsChange::DESCRIPTION = "fps";
+
+void QnOnvifStreamReader::VideoEncoderFpsChange::doChange(onvifXsd__VideoEncoderConfiguration* config, 
+    const QnOnvifStreamReader& reader, bool /*isPrimary*/)
+{
+    if (!config || !config->RateControl) {
+        qWarning() << "QnOnvifStreamReader::VideoEncoderFpsChange::doChange: got NULL ptr";
+        return;
+    }
+
+    oldFps = config->RateControl->FrameRateLimit;
+    config->RateControl->FrameRateLimit = reader.getFps();
+}
+
+void QnOnvifStreamReader::VideoEncoderFpsChange::undoChange(onvifXsd__VideoEncoderConfiguration* config, bool /*isPrimary*/)
+{
+    if (!config || !config->RateControl) {
+        qWarning() << "QnOnvifStreamReader::VideoEncoderFpsChange::undoChange: got NULL ptr";
+        return;
+    }
+
+    config->RateControl->FrameRateLimit = oldFps;
+}
+
+QString QnOnvifStreamReader::VideoEncoderFpsChange::description()
+{
+    return DESCRIPTION;
+}
+
+//
+// VideoEncoderQualityChange
+//
+
+const char* QnOnvifStreamReader::VideoEncoderQualityChange::DESCRIPTION = "quality";
+
+void QnOnvifStreamReader::VideoEncoderQualityChange::doChange(onvifXsd__VideoEncoderConfiguration* config,
+    const QnOnvifStreamReader& reader, bool /*isPrimary*/)
+{
+    if (!config) {
+        qWarning() << "QnOnvifStreamReader::VideoEncoderQualityChange::doChange: got NULL ptr";
+        return;
+    }
+
+    oldQuality = config->Quality;
+
+    QnStreamQuality quality = reader.getQuality();
+    if (quality == QnQualityPreSeted) {
+        qDebug() << "QnOnvifStreamReader::VideoEncoderQualityChange::doChange: ONVIF device "
+                 << reader.m_onvifRes->getMAC() << " will leave default quality";
+        return;
+    }
+
+    config->Quality = reader.m_onvifRes->innerQualityToOnvif(quality);
+}
+
+void QnOnvifStreamReader::VideoEncoderQualityChange::undoChange(onvifXsd__VideoEncoderConfiguration* config, bool /*isPrimary*/)
+{
+    if (!config || !config->RateControl) {
+        qWarning() << "QnOnvifStreamReader::VideoEncoderQualityChange::undoChange: got NULL ptr";
+        return;
+    }
+
+    config->Quality = oldQuality;
+}
+
+QString QnOnvifStreamReader::VideoEncoderQualityChange::description()
+{
+    return DESCRIPTION;
+}
+
+//
+// VideoEncoderResolutionChange
+//
+
+const char* QnOnvifStreamReader::VideoEncoderResolutionChange::DESCRIPTION = "resolution";
+
+void QnOnvifStreamReader::VideoEncoderResolutionChange::doChange(onvifXsd__VideoEncoderConfiguration* config, 
+    const QnOnvifStreamReader& reader, bool isPrimary)
+{
+    if (!config || !config->Resolution) {
+        qWarning() << "QnOnvifStreamReader::VideoEncoderResolutionChange::doChange: got NULL ptr";
+        return;
+    }
+
+    oldResolution.first = config->Resolution->Width;
+    oldResolution.second = config->Resolution->Height;
+
+    ResolutionPair resolution = isPrimary? reader.m_onvifRes->getPrimaryResolution(): reader.m_onvifRes->getSecondaryResolution();
+    if (resolution == EMPTY_RESOLUTION_PAIR) {
+        qWarning() << "QnOnvifStreamReader::VideoEncoderResolutionChange::doChange: Can't determine (primary=" << isPrimary << ") resolution "
+            << "for ONVIF device (MAC: " << reader.m_onvifRes->getMAC() << "). Default resolution will be used.";
+        return;
+    }
+
+    config->Resolution->Width = resolution.first;
+    config->Resolution->Height = resolution.second;
+}
+
+void QnOnvifStreamReader::VideoEncoderResolutionChange::undoChange(onvifXsd__VideoEncoderConfiguration* config, bool /*isPrimary*/)
+{
+    if (!config || !config->Resolution) {
+        qWarning() << "QnOnvifStreamReader::VideoEncoderResolutionChange::undoChange: got NULL ptr";
+        return;
+    }
+
+    config->Resolution->Width = oldResolution.first;
+    config->Resolution->Height = oldResolution.second;
+}
+
+QString QnOnvifStreamReader::VideoEncoderResolutionChange::description()
+{
+    return DESCRIPTION;
+}
+
+//
+// QnOnvifStreamReader
+//
 
 QnOnvifStreamReader::QnOnvifStreamReader(QnResourcePtr res):
     CLServerPushStreamreader(res),
@@ -24,6 +185,24 @@ QnOnvifStreamReader::QnOnvifStreamReader(QnResourcePtr res):
 QnOnvifStreamReader::~QnOnvifStreamReader()
 {
 
+}
+
+void QnOnvifStreamReader::fillVideoEncoderChanges(VideoEncoderChanges& changes) const
+{
+    clearVideoEncoderChanges(changes);
+
+    changes.append(new VideoEncoderNameChange());
+    changes.append(new VideoEncoderFpsChange());
+    changes.append(new VideoEncoderQualityChange());
+    changes.append(new VideoEncoderResolutionChange());
+}
+
+void QnOnvifStreamReader::clearVideoEncoderChanges(VideoEncoderChanges& changes) const
+{
+    foreach(VideoEncoderChange* change, changes) {
+        delete change;
+    }
+    changes.clear();
 }
 
 void QnOnvifStreamReader::openStream()
@@ -39,12 +218,14 @@ void QnOnvifStreamReader::openStream()
     QString streamUrl = updateCameraAndfetchStreamUrl();
     if (streamUrl.isEmpty()) {
         qCritical() << "QnOnvifStreamReader::openStream: can't fetch stream URL for resource with MAC: "
-                    << m_onvifRes->getMAC().toString();
+                    << m_onvifRes->getMAC();
         return;
     }
 
     m_multiCodec.setRequest(streamUrl);
     m_multiCodec.openStream();
+    if (m_multiCodec.getLastResponseCode() == CODE_AUTH_REQUIRED)
+        m_resource->setStatus(QnResource::Unauthorized);
 }
 
 const QString QnOnvifStreamReader::updateCameraAndfetchStreamUrl() const
@@ -89,7 +270,7 @@ const QString QnOnvifStreamReader::updateCameraAndfetchStreamUrl(bool isPrimary)
         if (soapRes != SOAP_OK) {
             qCritical() << "QnOnvifStreamReader::updateCameraAndfetchStreamUrl (primary stream = "
                 << isPrimary << "): can't set values into ONVIF physical device (URL: " << endpoint << ", MAC: "
-                << m_onvifRes->getMAC().toString() << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
+                << m_onvifRes->getMAC() << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
                 << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
             soap_end(soapProxy.soap);
             return QString();
@@ -100,27 +281,36 @@ const QString QnOnvifStreamReader::updateCameraAndfetchStreamUrl(bool isPrimary)
         if (!profilePtr) {
             qCritical() << "QnOnvifStreamReader::updateCameraAndfetchStreamUrl (primary stream = "
                 << isPrimary << "): can't set values into ONVIF physical device (URL: "
-                << endpoint << ", MAC: " << m_onvifRes->getMAC().toString() << "). Root cause: there is no appropriate profile";
+                << endpoint << ", MAC: " << m_onvifRes->getMAC() << "). Root cause: there is no appropriate profile";
             return QString();
         }
 
-        profileToken = profilePtr->token;
-
         //Setting required values into profile
-        if (!login.empty()) soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", login.c_str(), passwd.c_str());
+        profileToken = profilePtr->token;
         _onvifMedia__SetVideoEncoderConfiguration encRequest;
         _onvifMedia__SetVideoEncoderConfigurationResponse encResponse;
         encRequest.Configuration = profilePtr->VideoEncoderConfiguration;
-        setRequiredValues(encRequest.Configuration, isPrimary);
 
-        soapRes = soapProxy.SetVideoEncoderConfiguration(endpoint.toStdString().c_str(), NULL, &encRequest, &encResponse);
-        if (soapRes != SOAP_OK) {
-            qWarning() << "QnOnvifStreamReader::updateCameraAndfetchStreamUrl (primary stream = "
-                << isPrimary << "): can't set values into ONVIF physical device (URL: "
-                << endpoint << ", MAC: " << m_onvifRes->getMAC().toString() << "). Root cause: SOAP failed. Default settings will be used. GSoap error code: "
-                << soapRes << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
+        VideoEncoderChanges changes;
+        fillVideoEncoderChanges(changes);
+
+        foreach(VideoEncoderChange* change, changes) {
+            if (!login.empty()) soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", login.c_str(), passwd.c_str());
+            change->doChange(encRequest.Configuration, *this, isPrimary);
+
+            soapRes = soapProxy.SetVideoEncoderConfiguration(endpoint.toStdString().c_str(), NULL, &encRequest, &encResponse);
+            if (soapRes != SOAP_OK) {
+                qWarning() << "QnOnvifStreamReader::updateCameraAndfetchStreamUrl (primary stream = "
+                    << isPrimary << "): can't set " << change->description() << " into ONVIF physical device (URL: "
+                    << endpoint << ", MAC: " << m_onvifRes->getMAC() << "). Root cause: SOAP failed. Default settings will be used. GSoap error code: "
+                    << soapRes << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
+
+                change->undoChange(encRequest.Configuration, isPrimary);
+            }
+            soap_end(soapProxy.soap);
         }
-        soap_end(soapProxy.soap);
+
+        clearVideoEncoderChanges(changes);
     }
 
     //Printing modified profile
@@ -155,7 +345,7 @@ const QString QnOnvifStreamReader::updateCameraAndfetchStreamUrl(bool isPrimary)
         if (soapRes != SOAP_OK) {
             qCritical() << "QnOnvifStreamReader::updateCameraAndfetchStreamUrl (primary stream = "
                 << isPrimary << "): can't get stream URL of ONVIF device (URL: "
-                << endpoint << ", MAC: " << m_onvifRes->getMAC().toString() << "). Root cause: SOAP request failed. GSoap error code: "
+                << endpoint << ", MAC: " << m_onvifRes->getMAC() << "). Root cause: SOAP request failed. GSoap error code: "
                 << soapRes << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
             soap_end(soapProxy.soap);
             return QString();
@@ -165,11 +355,11 @@ const QString QnOnvifStreamReader::updateCameraAndfetchStreamUrl(bool isPrimary)
         if (!response.MediaUri) {
             qCritical() << "QnOnvifStreamReader::updateCameraAndfetchStreamUrl (primary stream = "
                 << isPrimary << "): can't get stream URL of ONVIF device (URL: "
-                << endpoint << ", MAC: " << m_onvifRes->getMAC().toString() << "). Root cause: got empty response.";
+                << endpoint << ", MAC: " << m_onvifRes->getMAC() << "). Root cause: got empty response.";
             return QString();
         }
 
-        qDebug() << "URL of ONVIF device stream (MAC: " << m_onvifRes->getMAC().toString()
+        qDebug() << "URL of ONVIF device stream (MAC: " << m_onvifRes->getMAC()
                  << ") successfully fetched: " << response.MediaUri->Uri.c_str();
         return QString(normalizeStreamSrcUrl(response.MediaUri->Uri));
     }
@@ -221,6 +411,7 @@ QnAbstractMediaDataPtr QnOnvifStreamReader::getNextData()
         return getMetaData();
 
     QnAbstractMediaDataPtr rez;
+    int errorCount = 0;
     for (int i = 0; i < 10; ++i)
     {
         rez = m_multiCodec.getNextData();
@@ -230,12 +421,15 @@ QnAbstractMediaDataPtr QnOnvifStreamReader::getNextData()
             //ToDo: if (videoData)
             //    parseMotionInfo(videoData);
             
-            if (isGotFrame(videoData))
+            if (!videoData || isGotFrame(videoData))
                 break;
         }
         else {
-            closeStream();
-            break;
+            errorCount++;
+            if (errorCount > 1) {
+                closeStream();
+                break;
+            }
         }
     }
     
@@ -263,7 +457,7 @@ onvifXsd__Profile* QnOnvifStreamReader::findAppropriateProfile(const _onvifMedia
     float minVal = 0;
     long minInd = -1;
 
-    for (long i = 0; i < profiles.size(); ++i) {
+    for (unsigned long i = 0; i < profiles.size(); ++i) {
         onvifXsd__Profile* profilePtr = profiles.at(i);
         if (!profilePtr->VideoEncoderConfiguration || 
                 profilePtr->VideoEncoderConfiguration->Encoding != onvifXsd__VideoEncoding__H264 && m_onvifRes->getCodec() == QnPlOnvifResource::H264 ||
@@ -288,42 +482,6 @@ onvifXsd__Profile* QnOnvifStreamReader::findAppropriateProfile(const _onvifMedia
     return 0;
 }
 
-void QnOnvifStreamReader::setRequiredValues(onvifXsd__VideoEncoderConfiguration* config, bool isPrimary) const
-{
-    if (!config) {
-        qWarning() << "QnOnvifStreamReader::setRequiredValues: got NULL ptr";
-        return;
-    }
-
-    config->Name = isPrimary? "Netoptix Primary Encoder": "Netoptix Secondary Encoder";
-    config->RateControl->FrameRateLimit = getFps();
-
-    QnStreamQuality quality = getQuality();
-    if (quality != QnQualityPreSeted)
-        config->Quality = m_onvifRes->innerQualityToOnvif(quality);
-
-    ResolutionPair maxResolution = m_onvifRes->getMaxResolution();
-    if (maxResolution == EMPTY_RESOLUTION_PAIR) {
-        qWarning() << "QnOnvifStreamReader::setRequiredValues: Can't determine max resolution for ONVIF device (MAC: "
-                   << m_onvifRes->getMAC().toString() << "). Default resolution will be used.";
-    } else if (isPrimary) {
-        config->Resolution->Width = maxResolution.first;
-        config->Resolution->Height = maxResolution.second;
-    } else {
-        ResolutionPair resolution = m_onvifRes->getNearestResolutionForSecondary(
-            SECONDARY_STREAM_DEFAULT_RESOLUTION, m_onvifRes->getResolutionAspectRatio(maxResolution));
-
-        if (resolution != EMPTY_RESOLUTION_PAIR) {
-            config->Resolution->Width = resolution.first;
-            config->Resolution->Height = resolution.second;
-        } else {
-            qWarning() << "QnOnvifStreamReader::setRequiredValues: "
-                       << "Can't determine resolution for secondary stream of ONVIF device (MAC: "
-                       << m_onvifRes->getMAC().toString() << "). Default resolution will be used.";
-        }
-    }
-}
-
 //Deleting protocol, host and port from URL assuming that input URLs cannot be without
 //protocol, but with host specified.
 const QString QnOnvifStreamReader::normalizeStreamSrcUrl(const std::string& src) const
@@ -344,7 +502,7 @@ const QString QnOnvifStreamReader::normalizeStreamSrcUrl(const std::string& src)
 
 void QnOnvifStreamReader::printProfile(const _onvifMedia__GetProfileResponse& response, bool isPrimary) const
 {
-    qDebug() << "ONVIF device (MAC: " << m_onvifRes->getMAC().toString() << ") has the following "
+    qDebug() << "ONVIF device (MAC: " << m_onvifRes->getMAC() << ") has the following "
              << (isPrimary? "primary": "secondary") << " profile:";
     qDebug() << "Name: " << response.Profile->Name.c_str();
     qDebug() << "Token: " << response.Profile->token.c_str();

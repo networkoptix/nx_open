@@ -238,12 +238,12 @@ private:
     };
 
     struct LineData {
-        LineData(): commentPixmap(NULL), visible(true), stretch(1.0) {}
+        LineData(): visible(true), stretch(1.0) {}
 
         QnTimePeriodList normalPeriods[Qn::TimePeriodRoleCount];
         QnTimePeriodList aggregatedPeriods[Qn::TimePeriodRoleCount];
         QString comment;
-        const QPixmap *commentPixmap;
+        QPixmap commentPixmap;
         bool visible;
         qreal stretch;
     };
@@ -279,6 +279,7 @@ private:
 
     QWeakPointer<QnThumbnailsLoader> m_thumbnailsLoader;
     QTimer *m_thumbnailsUpdateTimer;
+    QPixmap m_noThumbnailsPixmap;
 
     qreal m_rulerHeight;
     qreal m_prefferedHeight;

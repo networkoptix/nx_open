@@ -41,6 +41,10 @@ public:
 
     void setCellSpacing(const QSizeF &cellSpacing);
 
+    /*
+    * Deserialize layout resource from file
+    */
+    static QnLayoutResourcePtr fromFile(const QString& xfile);
 signals:
     void itemAdded(const QnLayoutItemData &item);
     void itemRemoved(const QnLayoutItemData &item);
@@ -67,3 +71,4 @@ Q_DECLARE_METATYPE(QnLayoutResourcePtr);
 Q_DECLARE_METATYPE(QnLayoutResourceList);
 
 #endif // QN_LAYOUT_RESOURCE_H
+

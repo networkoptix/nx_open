@@ -272,6 +272,8 @@ MotionTypeFlags QnSecurityCamResource::supportedMotionType() const
             else if (s1 == QString("motionwindow"))
                 result |= MT_MotionWindow;
         }
+        if (!hasDualStreaming())
+            result &= ~MT_SoftwareGrid;
     }
     else {
         result = MT_NoMotion;

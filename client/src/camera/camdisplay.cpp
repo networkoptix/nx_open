@@ -353,6 +353,10 @@ bool CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         if (m_dataQueue.size() > 0) {
             sleep = false;
             m_realTimeHurryUp = 5;
+            if (m_dataQueue.size() > m_dataQueue.maxSize()/2 && m_playAudio && needToSleep < 50000) {
+                // looks like not enought CPU for camera with high FPS value. I've add fps to switch logic to reduce real-time lag (MT decoding has addition 2-th frame delay)
+                setMTDecoding(true); 
+            }
         }
         else if (m_realTimeHurryUp)
         {
@@ -431,12 +435,20 @@ bool CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             }
         }
         else {
-            realSleepTime = m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed ? m_delay.sleep(needToSleep, needToSleep*qAbs(speed)*2) : m_delay.addQuant(needToSleep);
+            if (m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed) {
+                if (m_isRealTimeSource)
+                    realSleepTime = m_delay.terminatedSleep(needToSleep, needToSleep*qAbs(speed)*2);
+                else
+                    realSleepTime = m_delay.sleep(needToSleep, needToSleep*qAbs(speed)*2);
+            }
+            else
+                realSleepTime = m_delay.addQuant(needToSleep);
         }
 
         //qDebug() << "sleep time: " << needToSleep/1000.0 << "  real:" << realSleepTime/1000.0;
         hurryUpCheck(vd, speed, needToSleep, realSleepTime);
     }
+
     int channel = vd->channelNumber;
 
     if (m_singleShotMode && m_singleShotQuantProcessed)
@@ -736,6 +748,16 @@ bool CLCamDisplay::useSync(QnCompressedVideoDataPtr vd)
 {
     //return m_extTimeSrc && !(vd->flags & (QnAbstractMediaData::MediaFlags_LIVE | QnAbstractMediaData::MediaFlags_BOF)) && !m_singleShotMode;
     return m_extTimeSrc && m_extTimeSrc->isEnabled() && !(vd->flags & QnAbstractMediaData::MediaFlags_LIVE);
+}
+
+void CLCamDisplay::putData(QnAbstractDataPacketPtr data)
+{
+    QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
+    if (media && (media->flags & QnAbstractMediaData::MediaFlags_LIVE) && m_dataQueue.size() > 0) 
+    {
+        m_delay.breakSleep();
+    }
+    QnAbstractDataConsumer::putData(data);
 }
 
 bool CLCamDisplay::canAcceptData() const

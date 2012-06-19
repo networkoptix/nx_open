@@ -86,7 +86,6 @@ private:
     qreal m_aspectRatio;
 };
 
-
 inline QSize bestSingleBoundedSize(QnWorkbenchGridMapper *mapper, int bound, Qt::Orientation boundOrientation, qreal aspectRatio) {
     QSizeF sceneSize = mapper->mapFromGrid(boundOrientation == Qt::Horizontal ? QSize(bound, 0) : QSize(0, bound));
     if(boundOrientation == Qt::Horizontal) {
@@ -102,6 +101,20 @@ inline QSize bestSingleBoundedSize(QnWorkbenchGridMapper *mapper, int bound, Qt:
     } else {
         gridSize1.setWidth(qMax(gridSize1.width() - 1, 1));
     }
+
+    QSize gridSize2 = gridSize1;
+    if(boundOrientation == Qt::Horizontal) {
+        gridSize2.setWidth(qMax(gridSize2.width() - 1, 1));
+    } else {
+        gridSize2.setHeight(qMax(gridSize2.height() - 1, 1));
+    }
+
+    qreal aspectRatio0 = QnGeometry::aspectRatio(mapper->mapFromGrid(gridSize0));
+    qreal aspectRatio1 = QnGeometry::aspectRatio(mapper->mapFromGrid(gridSize1));
+    qreal aspectRatio2 = QnGeometry::aspectRatio(mapper->mapFromGrid(gridSize2));
+
+    if((aspectRatio1 < aspectRatio) == (aspectRatio2 < aspectRatio))
+        return gridSize0;
 
     qreal distance0 = std::abs(std::log(QnGeometry::aspectRatio(mapper->mapFromGrid(gridSize0)) / aspectRatio)) / 1.25; /* Prefer larger size. */
     qreal distance1 = std::abs(std::log(QnGeometry::aspectRatio(mapper->mapFromGrid(gridSize1)) / aspectRatio));

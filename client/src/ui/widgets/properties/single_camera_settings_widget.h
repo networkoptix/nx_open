@@ -74,6 +74,7 @@ private:
 
     QnCameraMotionMaskWidget *m_motionWidget;
     QVBoxLayout *m_motionLayout;
+    bool m_inUpdateMaxFps;
 };
 
 #endif // CAMERA_SETTINGS_DIALOG_H

@@ -25,6 +25,7 @@ private:
     int m_rtpChannel;
     bool m_builtinSpsFound;
     bool m_builtinPpsFound;
+    bool m_keyDataExists;
     quint64 m_timeCycles;
     quint64 m_timeCycleValue;
     quint64 m_lastTimeStamp;
@@ -32,9 +33,14 @@ private:
     quint16 m_packetPerNal;
 
     QnCompressedVideoDataPtr m_videoData;
+    CLByteArray m_videoBuffer;
 private:
     void serializeSpsPps(CLByteArray& dst);
     void decodeSpsInfo(const QByteArray& data);
+    QnCompressedVideoDataPtr createVideoData(quint32 rtpTime, const RtspStatistic& statistics);
+    bool clearInternalBuffer(); // function always returns false to convenient exit from main routine
+    void updateNalFlags(int nalUnitType);
+    int getSpsPpsSize() const;
 };
 
 #endif

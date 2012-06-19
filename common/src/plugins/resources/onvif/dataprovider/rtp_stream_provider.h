@@ -3,16 +3,17 @@
 
 #include "core/dataprovider/spush_media_stream_provider.h"
 #include "core/dataprovider/live_stream_provider.h"
-#include "utils/network/h264_rtp_reader.h"
+#include "utils/network/multicodec_rtp_reader.h"
 
 
-class RTP264StreamReader: public CLServerPushStreamreader , public QnLiveStreamProvider
+class QnRtpStreamReader: public CLServerPushStreamreader , public QnLiveStreamProvider
 {
 public:
-    RTP264StreamReader(QnResourcePtr res, const QString& request = "");
-    virtual ~RTP264StreamReader();
+    QnRtpStreamReader(QnResourcePtr res, const QString& request = "");
+    virtual ~QnRtpStreamReader();
 
     void setRequest(const QString& request);
+    const QnResourceAudioLayout* getDPAudioLayout() const;
 protected:
     
 
@@ -26,8 +27,7 @@ protected:
 
     void updateStreamParamsBasedOnFps() override {};
 private:
-
-    RTPH264StreamreaderDelegate mRTP264;
+    QnMulticodecRtpReader m_rtpReader;
     QString m_request;
 
 

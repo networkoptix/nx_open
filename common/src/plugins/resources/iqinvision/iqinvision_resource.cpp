@@ -1,6 +1,6 @@
 #include "../onvif/dataprovider/onvif_mjpeg.h"
 #include "iqinvision_resource.h"
-#include "../onvif/dataprovider/rtp264_stream_provider.h"
+#include "../onvif/dataprovider/rtp_stream_provider.h"
 
 const char* QnPlIqResource::MANUFACTURE = "IqEye";
 
@@ -53,7 +53,7 @@ QnAbstractStreamDataProvider* QnPlIqResource::createLiveDataProvider()
         name == QLatin1String("IQM32N") ||
         //name == QLatin1String("IQ765N") ||
         name == QLatin1String("IQM32S"))
-        return new RTP264StreamReader(toSharedPointer());
+        return new QnRtpStreamReader(toSharedPointer());
         /**/
 
     return new MJPEGtreamreader(toSharedPointer(), "now.jpg?snap=spush");

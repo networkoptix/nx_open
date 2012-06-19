@@ -19,14 +19,14 @@
 #include "api/app_server_connection.h"
 
 const char* QnPlOnvifResource::MANUFACTURE = "OnvifDevice";
-static const float MAX_EPS = 0.01;
+static const float MAX_EPS = 0.01f;
 static const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
 const char* QnPlOnvifResource::ONVIF_PROTOCOL_PREFIX = "http://";
 const char* QnPlOnvifResource::ONVIF_URL_SUFFIX = ":80/onvif/device_service";
 const int QnPlOnvifResource::DEFAULT_IFRAME_DISTANCE = 20;
 const QString& QnPlOnvifResource::MEDIA_URL_PARAM_NAME = *(new QString("MediaUrl"));
 const QString& QnPlOnvifResource::DEVICE_URL_PARAM_NAME = *(new QString("DeviceUrl"));
-const float QnPlOnvifResource::QUALITY_COEF = 0.2;
+const float QnPlOnvifResource::QUALITY_COEF = 0.2f;
 
 //Forth times greater than default = 320 x 240
 const double QnPlOnvifResource::MAX_SECONDARY_RESOLUTION_SQUARE =
@@ -71,7 +71,9 @@ QnPlOnvifResource::QnPlOnvifResource() :
     mediaUrl(),
     deviceUrl(),
     reinitDeviceInfo(false),
-    codec(H264)
+    codec(H264),
+    primaryResolution(EMPTY_RESOLUTION_PAIR),
+    secondaryResolution(EMPTY_RESOLUTION_PAIR)
 {
 }
 
@@ -92,6 +94,7 @@ QString QnPlOnvifResource::manufacture() const
 
 bool QnPlOnvifResource::hasDualStreaming() const
 {
+    return false;
     return hasDual;
 }
 
@@ -180,13 +183,64 @@ const ResolutionPair QnPlOnvifResource::getNearestResolution(const ResolutionPai
     return bestIndex >= 0 ? m_resolutionList[bestIndex]: EMPTY_RESOLUTION_PAIR;
 }
 
+void QnPlOnvifResource::findSetPrimarySecondaryResolution()
+{
+    QMutexLocker lock(&m_mutex);
+
+    if (m_resolutionList.isEmpty()) {
+        return;
+    }
+
+    primaryResolution = m_resolutionList.front();
+    float currentAspect = getResolutionAspectRatio(primaryResolution);
+    secondaryResolution = getNearestResolutionForSecondary(SECONDARY_STREAM_DEFAULT_RESOLUTION, currentAspect);
+
+    if (secondaryResolution != EMPTY_RESOLUTION_PAIR) {
+        return;
+    }
+
+    double currentSquare = primaryResolution.first * primaryResolution.second;
+
+    foreach (ResolutionPair resolution, m_resolutionList) {
+        float aspect = getResolutionAspectRatio(resolution);
+        if (abs(aspect - currentAspect) < MAX_EPS) {
+            continue;
+        }
+        currentAspect = aspect;
+
+        double square = resolution.first * resolution.second;
+        if (square == 0 || currentSquare / square > 2.0) {
+            break;
+        }
+
+        ResolutionPair tmp = getNearestResolutionForSecondary(SECONDARY_STREAM_DEFAULT_RESOLUTION, currentAspect);
+        if (tmp != EMPTY_RESOLUTION_PAIR) {
+            primaryResolution = resolution;
+            secondaryResolution = tmp;
+            return;
+        }
+    }
+}
+
+const ResolutionPair QnPlOnvifResource::getPrimaryResolution() const
+{
+    QMutexLocker lock(&m_mutex);
+    return primaryResolution;
+}
+
+const ResolutionPair QnPlOnvifResource::getSecondaryResolution() const
+{
+    QMutexLocker lock(&m_mutex);
+    return primaryResolution;
+}
+
 int QnPlOnvifResource::getMaxFps()
 {
     //Synchronization is not needed
     return maxFps;
 }
 
-void QnPlOnvifResource::setMotionMaskPhysical(int channel)
+void QnPlOnvifResource::setMotionMaskPhysical(int /*channel*/)
 {
     /*QMutexLocker lock(&m_mutex);
 
@@ -296,7 +350,7 @@ void QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
         int soapRes = soapProxy.GetVideoEncoderConfigurationOptions(endpoint.toStdString().c_str(), NULL, &request, &response);
         if (soapRes != SOAP_OK || !response.Options) {
             qWarning() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: can't init ONVIF device resource, will "
-                << "try alternative approach (URL: " << endpoint << ", MAC: " << getMAC().toString()
+                << "try alternative approach (URL: " << endpoint << ", MAC: " << getMAC()
                 << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
                 << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
         } else {
@@ -313,7 +367,7 @@ void QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
         int soapRes = soapProxy.GetVideoEncoderConfigurations(endpoint.toStdString().c_str(), NULL, &request, &videoEncoders.soapResponse);
         if (soapRes != SOAP_OK) {
             qWarning() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: can't init ONVIF device resource even with alternative approach, "
-                << "default settings will be used (URL: " << endpoint << ", MAC: " << getMAC().toString() << "). Root cause: SOAP request failed. GSoap error code: "
+                << "default settings will be used (URL: " << endpoint << ", MAC: " << getMAC() << "). Root cause: SOAP request failed. GSoap error code: "
                 << soapRes << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
             videoEncoders.soapFailed = true;
         } else {
@@ -322,15 +376,12 @@ void QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
         soap_end(soapProxy.soap);
     }
 
-    if (videoOptionsNotSet && codec == H264) {
-        codec = JPEG;
-        fetchAndSetVideoEncoderOptions();
-        return;
-    }
+    //All VideoEncoder options are set, so we can calculate resolutions for the streams
+    findSetPrimarySecondaryResolution();
 
     //Analyzing availability of dual streaming
 
-    bool hasDualTmp = getNearestResolutionForSecondary(SECONDARY_STREAM_DEFAULT_RESOLUTION, getResolutionAspectRatio(getMaxResolution())) != EMPTY_RESOLUTION_PAIR;
+    bool hasDualTmp = secondaryResolution != EMPTY_RESOLUTION_PAIR;
 
     if (!videoEncoders.filled && !videoEncoders.soapFailed) {
         if (!login.empty()) soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", login.c_str(), passwd.c_str());
@@ -339,13 +390,19 @@ void QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
         int soapRes = soapProxy.GetVideoEncoderConfigurations(endpoint.toStdString().c_str(), NULL, &request, &videoEncoders.soapResponse);
         if (soapRes != SOAP_OK) {
             qWarning() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: can't feth video encoders info from ONVIF device (URL: "
-                << endpoint << ", MAC: " << getMAC().toString() << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
+                << endpoint << ", MAC: " << getMAC() << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
                 << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
             videoEncoders.soapFailed = true;
         } else {
             analyzeVideoEncoders(videoEncoders, false);
         }
         soap_end(soapProxy.soap);
+    }
+
+    if ((videoOptionsNotSet || videoEncoders.videoEncodersUnused.isEmpty()) && codec == H264) {
+        codec = JPEG;
+        fetchAndSetVideoEncoderOptions();
+        return;
     }
 
     int appropriateProfiles = 0;
@@ -357,7 +414,7 @@ void QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
         int soapRes = soapProxy.GetProfiles(endpoint.toStdString().c_str(), NULL, &request, &response);
         if (soapRes != SOAP_OK) {
             qWarning() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: can't fetch preset profiles ONVIF device (URL: "
-                << endpoint << ", MAC: " << getMAC().toString() << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
+                << endpoint << ", MAC: " << getMAC() << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
                 << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
         } else {
             appropriateProfiles = countAppropriateProfiles(response, videoEncoders);
@@ -389,7 +446,7 @@ void QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
     std::string profileName = "Netoptix ";
     std::string profileToken = "netoptix";
 
-    profilesToCreateSize = profilesToCreateSize < 2? (profilesToCreateSize - appropriateProfiles): (2 - appropriateProfiles);
+    profilesToCreateSize = profilesToCreateSize < 2 - appropriateProfiles? profilesToCreateSize: (2 - appropriateProfiles);
     QHash<QString, onvifXsd__VideoEncoderConfiguration*>::const_iterator encodersIter = videoEncoders.videoEncodersUnused.begin();
 
     for (int i = 0; i < profilesToCreateSize; ++i) {
@@ -412,7 +469,7 @@ void QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
         int soapRes = soapProxy.CreateProfile(endpoint.toStdString().c_str(), NULL, &request, &response);
         if (soapRes != SOAP_OK) {
             qWarning() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: can't create new profile for ONVIF device (URL: "
-                << endpoint << ", MAC: " << getMAC().toString() << "). Root cause: SOAP request failed. GSoap error code: "
+                << endpoint << ", MAC: " << getMAC() << "). Root cause: SOAP request failed. GSoap error code: "
                 << soapRes << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
 
             hasDual = false;
@@ -430,7 +487,7 @@ void QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
         soapRes = soapProxy.AddVideoEncoderConfiguration(endpoint.toStdString().c_str(), NULL, &request2, &response2);
         if (soapRes != SOAP_OK) {
             qWarning() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: can't add video encoder to newly created profile for ONVIF device (URL: "
-                << endpoint << ", MAC: " << getMAC().toString() << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
+                << endpoint << ", MAC: " << getMAC() << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
                 << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
 
             hasDual = false;
@@ -677,7 +734,7 @@ int QnPlOnvifResource::countAppropriateProfiles(const _onvifMedia__GetProfilesRe
     const std::vector<onvifXsd__Profile*>& profiles = response.Profiles;
     int result = 0;
 
-    for (long i = 0; i < profiles.size(); ++i) {
+    for (unsigned long i = 0; i < profiles.size(); ++i) {
         onvifXsd__Profile* profilePtr = profiles.at(i);
         if (!profilePtr->VideoEncoderConfiguration || 
                 profilePtr->VideoEncoderConfiguration->Encoding != onvifXsd__VideoEncoding__H264 && codec == H264 ||
@@ -756,7 +813,7 @@ void QnPlOnvifResource::save()
     QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
     if (conn->saveSync(toSharedPointer().dynamicCast<QnVirtualCameraResource>(), errorStr) != 0) {
         qCritical() << "QnPlOnvifResource::init: can't save resource params to Enterprise Controller. Resource MAC: "
-                    << getMAC().toString() << ". Description: " << errorStr;
+                    << getMAC() << ". Description: " << errorStr;
     }
 }
 

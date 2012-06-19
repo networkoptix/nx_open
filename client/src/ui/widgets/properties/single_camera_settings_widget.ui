@@ -258,7 +258,7 @@
             <item>
              <widget class="QRadioButton" name="softwareMotionButton">
               <property name="text">
-               <string>Software (On media server)</string>
+               <string>Software (On media server, max fps may be slightly decreased)</string>
               </property>
               <property name="checked">
                <bool>false</bool>

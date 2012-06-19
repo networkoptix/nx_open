@@ -179,7 +179,7 @@ QnTimePeriodList QnStorageManager::getRecordedPeriods(QnResourceList resList, qi
     {
         QnNetworkResourcePtr camera = qSharedPointerDynamicCast<QnNetworkResource> (resList[i]);
         if (camera) {
-            QString mac = camera->getMAC().toString();
+            QString mac = camera->getMAC();
             getTimePeriodInternal(cameras, camera, startTime, endTime, detailLevel, getFileCatalog(mac, QnResource::Role_LiveVideo));
             getTimePeriodInternal(cameras, camera, startTime, endTime, detailLevel, getFileCatalog(mac, QnResource::Role_SecondaryLiveVideo));
         }
@@ -329,8 +329,8 @@ QString QnStorageManager::getFileName(const qint64& dateTime, const QnNetworkRes
     if (!prefix.isEmpty())
         base += prefix + "/";
 
-    QString text = base + camera->getMAC().toString();
-    Q_ASSERT(!camera->getMAC().toString().isEmpty());
+    QString text = base + camera->getMAC();
+    Q_ASSERT(!camera->getMAC().isEmpty());
     text += QString("/") + dateTimeStr(dateTime);
     QList<QFileInfo> list = storage->getFileList(text);
     QList<QString> baseNameList;
