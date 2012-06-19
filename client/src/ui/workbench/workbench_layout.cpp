@@ -94,7 +94,7 @@ bool QnWorkbenchLayout::update(const QnLayoutResourcePtr &resource) {
     foreach(QnWorkbenchItem *item, m_items)
         item->setPinned(false);
 
-    foreach(const QnLayoutItemData data, resource->getItems()) {
+    foreach(QnLayoutItemData data, resource->getItems()) {
         QnWorkbenchItem *item = this->item(data.uuid);
         if(item == NULL) {
             addItem(new QnWorkbenchItem(data, this));

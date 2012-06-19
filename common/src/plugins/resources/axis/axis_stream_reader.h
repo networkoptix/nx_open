@@ -41,6 +41,8 @@ private:
     QnMetaDataV1Ptr m_lastMetadata;
     QnMulticodecRtpReader m_rtpStreamParser;
     QnPlAxisResourcePtr m_axisRes;
+
+    bool m_oldFirmwareWarned;
 };
 
 #endif // AXIS_STREAM_REDER_H__

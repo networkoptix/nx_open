@@ -446,7 +446,7 @@ void QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
     std::string profileName = "Netoptix ";
     std::string profileToken = "netoptix";
 
-    profilesToCreateSize = profilesToCreateSize < 2? (profilesToCreateSize - appropriateProfiles): (2 - appropriateProfiles);
+    profilesToCreateSize = profilesToCreateSize < 2 - appropriateProfiles? profilesToCreateSize: (2 - appropriateProfiles);
     QHash<QString, onvifXsd__VideoEncoderConfiguration*>::const_iterator encodersIter = videoEncoders.videoEncodersUnused.begin();
 
     for (int i = 0; i < profilesToCreateSize; ++i) {

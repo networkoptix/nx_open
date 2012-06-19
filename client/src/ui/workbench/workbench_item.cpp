@@ -24,7 +24,7 @@ QnWorkbenchItem::QnWorkbenchItem(const QnLayoutItemData &data, QObject *parent):
 {
     if(m_resourceUid.isEmpty()) {
         qnWarning("Creating a workbench item from item data with invalid unique id.");
-        // TODO: bring this warning back, fix layout item data conventions.
+        // TODO: fix layout item data conventions.
 
         QnResourcePtr resource = qnResPool->getResourceById(data.resource.id);
         if(resource)

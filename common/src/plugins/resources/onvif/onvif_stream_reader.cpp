@@ -287,10 +287,10 @@ int gsoapFfiltersend(struct soap* soap, const char** s, size_t* n)
 const QString QnOnvifStreamReader::updateCameraAndfetchStreamUrl(bool isPrimary) const
 {
     MediaBindingProxy soapProxy;
-    soapProxy.soap->send_timeout = 500;
+    soapProxy.soap->send_timeout = 5;
     soapProxy.soap->recv_timeout = 5;
-    soapProxy.soap->user = 0;
-    soapProxy.soap->ffiltersend = gsoapFfiltersend;
+    //soapProxy.soap->user = 0;
+    //soapProxy.soap->ffiltersend = gsoapFfiltersend;
 
     QAuthenticator auth(m_onvifRes->getAuth());
     std::string login(auth.user().toStdString());
@@ -329,22 +329,7 @@ const QString QnOnvifStreamReader::updateCameraAndfetchStreamUrl(bool isPrimary)
         profileToken = profilePtr->token;
         _onvifMedia__SetVideoEncoderConfiguration encRequest;
         _onvifMedia__SetVideoEncoderConfigurationResponse encResponse;
-
-        onvifXsd__VideoEncoderConfiguration config;
-        config.Name = profilePtr->VideoEncoderConfiguration->Name;
-        config.token = profilePtr->VideoEncoderConfiguration->token;
-        config.Encoding = profilePtr->VideoEncoderConfiguration->Encoding;
-        config.Resolution = profilePtr->VideoEncoderConfiguration->Resolution;
-        config.Quality = profilePtr->VideoEncoderConfiguration->Quality;
-        config.RateControl = profilePtr->VideoEncoderConfiguration->RateControl;
-        config.MPEG4 = NULL;
-        config.H264 = NULL;
-        config.Multicast = NULL;
-        config.__anyAttribute = NULL;
-        config.SessionTimeout = profilePtr->VideoEncoderConfiguration->SessionTimeout;
-
-        encRequest.Configuration = &config;
-        profilePtr->VideoEncoderConfiguration;
+        encRequest.Configuration = profilePtr->VideoEncoderConfiguration;
 
         VideoEncoderChanges changes;
         fillVideoEncoderChanges(changes);
