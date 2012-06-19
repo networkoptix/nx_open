@@ -288,22 +288,18 @@ void MotionSelectionInstrument::dragMove(DragInfo *info) {
         dragProcessor()->reset();
         return;
     }
-    
     ensureSelectionItem();
-    QPointF itemPos = target()->mapFromScene(info->mousePressScenePos());
-    QPoint gridOrigin = target()->mapToMotionGrid(itemPos);
-    QPoint gridCorner = target()->mapToMotionGrid(target()->mapFromScene(info->mouseScenePos()));
+    QPoint gridOrigin = target()->mapToMotionGrid(target()->mapFromScene(info->mousePressScenePos()));
+    QPoint gridCorner = target()->mapToMotionGrid(target()->mapFromScene(info->mouseScenePos())) + QPoint(1, 1);
     
-    if ((info->mouseScreenPos() - info->mousePressScreenPos()).manhattanLength() >= QApplication::startDragDistance())
-    {
-        if (gridCorner.x() >= gridOrigin.x())
-            gridCorner += QPoint(1, 0);
-        else 
-            gridOrigin += QPoint(1, 0);
-        if (gridCorner.y() >= gridOrigin.y())
-            gridCorner += QPoint(0, 1);
-        else 
-            gridOrigin += QPoint(0, 1);
+    if (gridCorner.x() <= gridOrigin.x()){
+        gridCorner -= QPoint(1, 0);
+        gridOrigin += QPoint(1, 0);
+    }
+
+    if (gridCorner.y() <= gridOrigin.y()){
+        gridCorner -= QPoint(0, 1);
+        gridOrigin += QPoint(0, 1);
     }
 
     selectionItem()->setOrigin(target()->mapFromMotionGrid(gridOrigin));

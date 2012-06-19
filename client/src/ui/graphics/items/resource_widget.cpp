@@ -582,7 +582,7 @@ QPoint QnResourceWidget::mapToMotionGrid(const QPointF &itemPos)
     QPointF gridPosF(cwiseDiv(itemPos, toPoint(cwiseDiv(size(), QSizeF(motionGridWidth(), motionGridHeight())))));
     QPoint gridPos(qFuzzyFloor(gridPosF.x()), qFuzzyFloor(gridPosF.y()));
 
-    return bounded(gridPos, QRect(0, 0, motionGridWidth() + 1, motionGridHeight() + 1));
+    return bounded(gridPos, QRect(0, 0, motionGridWidth(), motionGridHeight()));
 }
 
 QPointF QnResourceWidget::mapFromMotionGrid(const QPoint &gridPos) {
