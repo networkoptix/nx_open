@@ -19,14 +19,14 @@
 #include "api/app_server_connection.h"
 
 const char* QnPlOnvifResource::MANUFACTURE = "OnvifDevice";
-static const float MAX_EPS = 0.01;
+static const float MAX_EPS = 0.01f;
 static const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
 const char* QnPlOnvifResource::ONVIF_PROTOCOL_PREFIX = "http://";
 const char* QnPlOnvifResource::ONVIF_URL_SUFFIX = ":80/onvif/device_service";
 const int QnPlOnvifResource::DEFAULT_IFRAME_DISTANCE = 20;
 const QString& QnPlOnvifResource::MEDIA_URL_PARAM_NAME = *(new QString("MediaUrl"));
 const QString& QnPlOnvifResource::DEVICE_URL_PARAM_NAME = *(new QString("DeviceUrl"));
-const float QnPlOnvifResource::QUALITY_COEF = 0.2;
+const float QnPlOnvifResource::QUALITY_COEF = 0.2f;
 
 //Forth times greater than default = 320 x 240
 const double QnPlOnvifResource::MAX_SECONDARY_RESOLUTION_SQUARE =
@@ -240,7 +240,7 @@ int QnPlOnvifResource::getMaxFps()
     return maxFps;
 }
 
-void QnPlOnvifResource::setMotionMaskPhysical(int channel)
+void QnPlOnvifResource::setMotionMaskPhysical(int /*channel*/)
 {
     /*QMutexLocker lock(&m_mutex);
 
@@ -734,7 +734,7 @@ int QnPlOnvifResource::countAppropriateProfiles(const _onvifMedia__GetProfilesRe
     const std::vector<onvifXsd__Profile*>& profiles = response.Profiles;
     int result = 0;
 
-    for (long i = 0; i < profiles.size(); ++i) {
+    for (unsigned long i = 0; i < profiles.size(); ++i) {
         onvifXsd__Profile* profilePtr = profiles.at(i);
         if (!profilePtr->VideoEncoderConfiguration || 
                 profilePtr->VideoEncoderConfiguration->Encoding != onvifXsd__VideoEncoding__H264 && codec == H264 ||
