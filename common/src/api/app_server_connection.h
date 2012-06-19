@@ -157,6 +157,8 @@ class QN_EXPORT QnAppServerConnectionFactory
 public:
     static QUrl defaultUrl();
     static int defaultMediaProxyPort();
+	static QnResourceFactory* defaultFactory();
+
     static void setDefaultUrl(const QUrl &url);
     static void setDefaultFactory(QnResourceFactory*);
     static void setDefaultMediaProxyPort(int port);

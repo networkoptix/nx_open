@@ -74,7 +74,11 @@ void ConnectionTestingDialog::testResults(int status, const QByteArray &data, co
 void ConnectionTestingDialog::testSettings()
 {
     qDebug() << m_url;
-    QnSessionManager::instance()->testConnectionAsync(m_url, this, SLOT(testResults(int,QByteArray,QByteArray,int)));
+
+	QByteArray data;
+    QnRequestParamList params;
+    params.append(QnRequestParam("ping", "1"));
+    QnSessionManager::instance()->sendAsyncPostRequest(m_url, "connect", params, data, this, SLOT(testResults(int,QByteArray,QByteArray,int)));
 }
 
 void ConnectionTestingDialog::accept()

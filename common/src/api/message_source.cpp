@@ -204,6 +204,11 @@ void QnMessageSource::httpReadyRead()
 {
     QByteArray data = m_reply->readAll().data();
 
+	if (data.size() == 0)
+	{
+		qDebug() << "empty";
+	}
+
 #ifdef QN_EVENT_SOURCE_DEBUG
     qDebug() << "Event data: " << data;
 #endif

@@ -25,6 +25,7 @@ void QnClientMessageProcessor::init()
 {
     QUrl appServerEventsUrl = QnAppServerConnectionFactory::defaultUrl();
     appServerEventsUrl.setPath("/events/");
+	appServerEventsUrl.addQueryItem("format", "pb");
     init(appServerEventsUrl, EVENT_RECONNECT_TIMEOUT);
 }
 
@@ -185,5 +186,5 @@ void QnClientMessageProcessor::at_connectionOpened()
 void QnClientMessageProcessor::at_connectionReset()
 {
     QnAppServerConnectionFactory::createConnection()->
-            getResourcesAsync("", "resourceEx", this, SLOT(at_resourcesReceived(int,QByteArray,QnResourceList,int)));
+            getResourcesAsync("", "resource", this, SLOT(at_resourcesReceived(int,QByteArray,QnResourceList,int)));
 }

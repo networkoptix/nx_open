@@ -6,19 +6,12 @@
 #include "licensing/license.h"
 #include "core/resource/camera_history.h"
 
-static const char* QN_MESSAGE_RES_CHANGE            = "RC";
-static const char* QN_MESSAGE_RES_STATUS_CHANGE     = "RSC";
-static const char* QN_MESSAGE_RES_DISABLED_CHANGE   = "RDC";
-static const char* QN_MESSAGE_RES_DELETE            = "RD";
-static const char* QN_MESSAGE_LICENSE_CHANGE        = "LC";
-static const char* QN_MESSAGE_CAMERA_SERVER_ITEM    = "CSI";
-
 namespace pb {
     class Message;
 }
 
 // Copied from message.pb.h
-// TODO: Somehow avoid duplicaton of this enum
+// TODO: Ivan. Somehow avoid duplicaton of this enum
 enum Message_Type {
   Message_Type_Initial = 0,
   Message_Type_Ping = 1,

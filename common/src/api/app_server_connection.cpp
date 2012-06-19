@@ -72,7 +72,7 @@ void conn_detail::ReplyProcessor::finished(int status, const QByteArray &result,
         QnResourceList resources;
         qCopy(layouts.begin(), layouts.end(), std::back_inserter(resources));
         emit finished(status, errorString, resources, handle);
-    } else if (m_objectName == "resourceEx")
+    } else if (m_objectName == "resource")
     {
         QnResourceList resources;
 
@@ -236,7 +236,7 @@ int QnAppServerConnection::getResourceTypes(QnResourceTypeList& resourceTypes, Q
 int QnAppServerConnection::getResources(QnResourceList& resources, QByteArray& errorString)
 {
     QByteArray data;
-    int status = getObjects("resourceEx", "", data, errorString);
+    int status = getObjects("resource", "", data, errorString);
 
     if (status == 0)
     {
@@ -263,7 +263,7 @@ int QnAppServerConnection::getResource(const QnId& id, QnResourcePtr& resource, 
 int QnAppServerConnection::getResources(const QString& args, QnResourceList& resources, QByteArray& errorString)
 {
     QByteArray data;
-    int status = getObjects("resourceEx", args, data, errorString);
+    int status = getObjects("resource", args, data, errorString);
 
     if (status == 0)
     {
@@ -348,7 +348,7 @@ int QnAppServerConnection::addLicenseAsync(const QnLicensePtr &license, QObject 
     QByteArray data;
     m_serializer.serializeLicense(license, data);
 
-    return addObjectAsync("license", data, processor, SLOT(finished(int, QByteArray, QByteArray, int)));
+    return addObjectAsync("license", data, processor, SLOT(finishedLicense(int, QByteArray, QByteArray, int)));
 }
 
 int QnAppServerConnection::getResourcesAsync(const QString& args, const QString& objectName, QObject *target, const char *slot)
@@ -784,6 +784,15 @@ int QnAppServerConnectionFactory::defaultMediaProxyPort()
 {
     if (QnAppServerConnectionFactory *factory = theAppServerConnectionFactory()) {
         return factory->m_defaultMediaProxyPort;
+    }
+
+    return 0;
+}
+
+QnResourceFactory* QnAppServerConnectionFactory::defaultFactory()
+{
+    if (QnAppServerConnectionFactory *factory = theAppServerConnectionFactory()) {
+        return factory->m_resourceFactory;
     }
 
     return 0;

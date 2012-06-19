@@ -361,8 +361,9 @@ void initAppServerEventConnection(const QSettings &settings, const QnVideoServer
     appServerEventsUrl.setPort(settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt());
     appServerEventsUrl.setUserName(settings.value("appserverLogin", QLatin1String("admin")).toString());
     appServerEventsUrl.setPassword(settings.value("appserverPassword", QLatin1String("123")).toString());
-    appServerEventsUrl.setPath("/events");
+    appServerEventsUrl.setPath("/events/");
     appServerEventsUrl.addQueryItem("id", mediaServer->getId().toString());
+	appServerEventsUrl.addQueryItem("format", "pb");
 
     static const int EVENT_RECONNECT_TIMEOUT = 3000;
 
