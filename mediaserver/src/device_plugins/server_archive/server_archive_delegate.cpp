@@ -75,8 +75,8 @@ bool QnServerArchiveDelegate::open(QnResourcePtr resource)
     Q_ASSERT(netResource != 0);
     m_dialQualityHelper.setResource(netResource);
 
-    m_catalogHi = qnStorageMan->getFileCatalog(netResource->getMAC(), QnResource::Role_LiveVideo);
-    m_catalogLow = qnStorageMan->getFileCatalog(netResource->getMAC(), QnResource::Role_SecondaryLiveVideo);
+    m_catalogHi = qnStorageMan->getFileCatalog(netResource->getMAC().toString(), QnResource::Role_LiveVideo);
+    m_catalogLow = qnStorageMan->getFileCatalog(netResource->getMAC().toString(), QnResource::Role_SecondaryLiveVideo);
 
     m_currentChunkCatalog = m_quality == MEDIA_Quality_High ? m_catalogHi : m_catalogLow;
 

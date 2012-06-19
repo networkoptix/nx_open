@@ -175,7 +175,7 @@ QnCameraHistoryPtr QnCameraHistoryPool::getCameraHistory(const QString& mac)
 
 QnNetworkResourceList QnCameraHistoryPool::getAllCamerasWithSameMac(const QnNetworkResourcePtr &camera, const QnTimePeriod& timePeriod)
 {
-    QnCameraHistoryPtr history = getCameraHistory(camera->getMAC());
+    QnCameraHistoryPtr history = getCameraHistory(camera->getMAC().toString());
     if (!history)
         return QList<QnNetworkResourcePtr>() << camera;
     return history->getAllCamerasWithSameMac(timePeriod);
@@ -185,7 +185,7 @@ qint64 QnCameraHistoryPool::getMinTime(QnNetworkResourcePtr camera)
 {
     if (!camera)
         return AV_NOPTS_VALUE;
-    QnCameraHistoryPtr history = getCameraHistory(camera->getMAC());
+    QnCameraHistoryPtr history = getCameraHistory(camera->getMAC().toString());
     if (!history)
         return AV_NOPTS_VALUE;
 
@@ -205,7 +205,7 @@ QnNetworkResourcePtr QnCameraHistoryPool::getCurrentCamera(const QnNetworkResour
     if(!camera)
         return camera;
 
-    QnCameraHistoryPtr history = getCameraHistory(camera->getMAC());
+    QnCameraHistoryPtr history = getCameraHistory(camera->getMAC().toString());
     if(!history)
         return camera;
 

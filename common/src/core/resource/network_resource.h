@@ -32,8 +32,8 @@ public:
     virtual QHostAddress getHostAddress() const;
     virtual bool setHostAddress(const QHostAddress &ip, QnDomain domain = QnDomainMemory);
 
-    QString getMAC() const;
-    void setMAC(const QString &mac);
+    QnMacAddress getMAC() const;
+    void setMAC(const QnMacAddress &mac);
 
     inline void setAuth(const QString &user, const QString &password)
     { QAuthenticator auth; auth.setUser(user); auth.setPassword(password); setAuth(auth); }
@@ -94,7 +94,7 @@ private:
     bool m_authenticated;
 
     //QHostAddress m_hostAddr;
-    QString m_macAddress;
+    QnMacAddress m_macAddress;
 
 
     QHostAddress m_localAddress; // address used to discover this resource ( in case if machine has more than one NIC/address

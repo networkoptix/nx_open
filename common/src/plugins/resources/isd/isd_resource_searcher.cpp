@@ -114,7 +114,7 @@ QnNetworkResourcePtr QnPlISDResourceSearcher::processPacket(QnResourceList& resu
     {
         QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
     
-        if (net_res->getMAC() == smac)
+        if (net_res->getMAC().toString() == smac)
             return QnNetworkResourcePtr(0); // already found;
     }
 
