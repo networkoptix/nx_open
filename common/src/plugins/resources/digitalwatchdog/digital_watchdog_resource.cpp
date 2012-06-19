@@ -13,17 +13,26 @@ bool QnPlWatchDogResource::isDualStreamingEnabled()
     {
         QByteArray body;
         http.readAll(body);
-        QList<QByteArray> lines = body.split('\n');
-        for (int i = 0; i < lines.size(); ++i) {
-            if (lines[i].toLower().startsWith("onvif_stream_number")) {
+        QList<QByteArray> lines = body.split(',');
+        for (int i = 0; i < lines.size(); ++i) 
+        {
+            if (lines[i].toLower().contains("onvif_stream_number")) 
+            {
                 QList<QByteArray> params = lines[i].split(':');
-                if (params.size() >= 2) {
+                if (params.size() >= 2) 
+                {
                     int streams = params[1].trimmed().toInt();
+                    
                     return streams >= 2;
                 }
             }
         }
     }
+    else if (status == CL_HTTP_AUTH_REQUIRED) 
+    {
+        setStatus(Unauthorized);
+    }
+
     return false;
 }
 
@@ -39,6 +48,6 @@ void QnPlWatchDogResource::initInternal()
         setStatus(Offline);
     }
     else {
-        QnPhysicalCameraResource::initInternal();
+        QnPlOnvifResource::initInternal();
     }
 }
