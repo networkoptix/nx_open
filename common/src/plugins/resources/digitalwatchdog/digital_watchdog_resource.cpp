@@ -38,6 +38,7 @@ void QnPlWatchDogResource::initInternal()
         CLHttpStatus status = http.doPOST(QByteArray("/cgi-bin/onvifsetup.cgi"), request);
         setStatus(Offline);
     }
-
-    QnPhysicalCameraResource::initInternal();
+    else {
+        QnPhysicalCameraResource::initInternal();
+    }
 }
