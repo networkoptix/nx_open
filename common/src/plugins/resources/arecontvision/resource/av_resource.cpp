@@ -133,7 +133,7 @@ bool QnPlAreconVisionResource::setHostAddress(const QHostAddress& ip, QnDomain d
         int shift = 22;
         memcpy(data,basic_str.data(),shift);
 
-        memcpy(data + shift, QnMacAddress(getMAC()).toBytes(), 6);//     MACsToByte(m_mac, (unsigned char*)data + shift); //memcpy(data + shift, mac, 6);
+        memcpy(data + shift, getMAC().toBytes(), 6);//     MACsToByte(m_mac, (unsigned char*)data + shift); //memcpy(data + shift, mac, 6);
 
         quint32 new_ip = htonl(ip.toIPv4Address());
         memcpy(data + shift + 6, &new_ip,4);
@@ -286,7 +286,7 @@ bool QnPlAreconVisionResource::updateMACAddress()
     if (!getParam("MACAddress", val, QnDomainPhysical))
         return false;
 
-    setMAC(val.toString());
+    setMAC(QnMacAddress(val.toString()));
 
     return true;
 }

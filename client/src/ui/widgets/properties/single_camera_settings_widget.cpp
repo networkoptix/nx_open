@@ -219,7 +219,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         ui->checkBoxEnableAudio->setChecked(m_camera->isAudioEnabled());
         ui->checkBoxEnableAudio->setEnabled(m_camera->isAudioSupported());
 
-        ui->macAddressEdit->setText(m_camera->getMAC());
+		ui->macAddressEdit->setText(m_camera->getMAC().toString());
         ui->ipAddressEdit->setText(m_camera->getUrl());
         ui->webPageLabel->setText(tr("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
         ui->loginEdit->setText(m_camera->getAuth().user());
