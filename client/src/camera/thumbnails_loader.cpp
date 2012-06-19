@@ -7,27 +7,29 @@
 
 #include "ui/common/geometry.h"
 
+#include "plugins/resources/archive/archive_stream_reader.h"
+#include "device_plugins/archive/rtsp/rtsp_client_archive_delegate.h"
+#include "utils/media/frame_info.h"
+
 
 QnThumbnailsLoader::QnThumbnailsLoader(QnResourcePtr resource):
     m_mutex(QMutex::Recursive),
     m_rtspClient(new QnRtspClientArchiveDelegate()),
     m_resource(resource),
-    m_step(0),
+    m_timeStep(0),
     m_startTime(0),
     m_endTime(0),
     m_scaleContext(NULL),
-    m_rgbaBuffer(NULL),
-    m_boundingSize(128, 128 * 3 / 4),
-    m_dstSize(0, 0),
-    m_srcSize(0, 0),
-    m_srcLineSize(0),
-    m_srcFormat(0),
-    m_lastLoadedTime(0),
-    m_breakCurrentJob(false)
+    m_scaleBuffer(NULL),
+    m_boundingSize(128, 96), /* That's 4:3 aspect ratio. */
+    m_scaleSourceSize(0, 0),
+    m_scaleTargetSize(0, 0),
+    m_scaleSourceLine(0),
+    m_scaleSourceFormat(0)
 {
     static volatile bool metaTypesInitialized = false;
     if (!metaTypesInitialized) {
-        qRegisterMetaType<QPixmapPtr>();
+        qRegisterMetaType<QnThumbnail>();
         metaTypesInitialized = true;
     }
 
@@ -39,25 +41,23 @@ QnThumbnailsLoader::~QnThumbnailsLoader() {
     stop();
     if (m_scaleContext)
         sws_freeContext(m_scaleContext);
-    qFreeAligned(m_rgbaBuffer);
+    
+    qFreeAligned(m_scaleBuffer);
 }
 
-QnResourcePtr QnThumbnailsLoader::resource() const 
-{
-    QMutexLocker locker(&m_mutex);
+QnResourcePtr QnThumbnailsLoader::resource() const {
+    /* Resource is immutable, so we don't need a lock here. */
 
     return m_resource;
 }
 
-void QnThumbnailsLoader::setBoundingSize(const QSize &size) 
-{
+void QnThumbnailsLoader::setBoundingSize(const QSize &size) {
     QMutexLocker locker(&m_mutex);
 
     m_boundingSize = size;
 }
 
-QSize QnThumbnailsLoader::boundingSize() const 
-{
+QSize QnThumbnailsLoader::boundingSize() const {
     QMutexLocker locker(&m_mutex);
 
     return m_boundingSize;
@@ -66,15 +66,53 @@ QSize QnThumbnailsLoader::boundingSize() const
 QSize QnThumbnailsLoader::thumbnailSize() const {
     QMutexLocker locker(&m_mutex);
 
-    return m_dstSize;
+    return m_scaleTargetSize;
 }
 
-QnTimePeriod QnThumbnailsLoader::loadedRange() const
-{
+qint64 QnThumbnailsLoader::timeStep() const {
     QMutexLocker locker(&m_mutex);
-    return QnTimePeriod(m_startTime, m_endTime - m_startTime);
+
+    return m_timeStep;
 }
 
+void QnThumbnailsLoader::setTimeStep(qint64 timeStep) {
+    QMutexLocker locker(&m_mutex);
+
+    m_timeStep = timeStep;
+}
+
+qint64 QnThumbnailsLoader::startTime() const {
+    QMutexLocker locker(&m_mutex);
+
+    return m_startTime;
+}
+
+void QnThumbnailsLoader::setStartTime(qint64 startTime) const {
+    QMutexLocker locker(&m_mutex);
+
+    m_startTime = startTime;
+}
+
+qint64 QnThumbnailsLoader::endTime() const {
+    QMutexLocker locker(&m_mutex);
+
+    return m_endTime;
+}
+
+void QnThumbnailsLoader::setEndTime(qint64 endTime) {
+    QMutexLocker locker(&m_mutex);
+
+    m_endTime = endTime;
+}
+
+void QnThumbnailsLoader::pleaseStop() {
+    m_rtspClient->beforeClose();
+    m_rtspClient->close();
+
+    base_type::pleaseStop();
+}
+
+#if 0
 void QnThumbnailsLoader::loadRange(qint64 startTimeMs, qint64 endTimeMs, qint64 stepMs)
 {
     QMutexLocker locker(&m_mutex);
@@ -286,7 +324,4 @@ void QnThumbnailsLoader::pleaseStop()
     base_type::pleaseStop();
 }
 
-qint64 QnThumbnailsLoader::step() const
-{
-    return m_step;
-}
+#endif

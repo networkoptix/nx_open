@@ -6,9 +6,14 @@
 #include <QtCore/QMetaType>
 #include <QtCore/QMutex>
 
-#include "plugins/resources/archive/archive_stream_reader.h"
-#include "device_plugins/archive/rtsp/rtsp_client_archive_delegate.h"
-#include "utils/media/frame_info.h"
+#include <utils/common/longrunnable.h>
+#include <core/resource/resource_fwd.h>
+
+#include "thumbnail.h"
+
+class CLVideoDecoderOutput;
+class QnRtspClientArchiveDelegate;
+class SwsContext;
 
 typedef QSharedPointer<QPixmap> QPixmapPtr;
 
@@ -21,78 +26,51 @@ public:
     QnThumbnailsLoader(QnResourcePtr resource);
     virtual ~QnThumbnailsLoader();
 
+    QnResourcePtr resource() const;
+
     void setBoundingSize(const QSize &size);
     QSize boundingSize() const;
     
     QSize thumbnailSize() const;
 
-    QnResourcePtr resource() const;
+    qint64 timeStep() const;
+    void setTimeStep(qint64 timeStep);
 
-    /**
-     * Load video pixmaps by specified time
-     */
-    void loadRange(qint64 startTimeMs, qint64 endTimeMs, qint64 stepMs);
+    qint64 startTime() const;
+    void setStartTime(qint64 startTime) const;
 
-    QnTimePeriod loadedRange() const;
-    
-    qint64 currentMSecsSinceLastUpdate() const;
-
-    /*
-     * thumbnails step in ms
-     */
-    qint64 step() const;
-
-
-    /* Extent existing range to new range using previously defined step */
-    void addRange(qint64 startTimeMs, qint64 endTimeMs, qint64 stepMs);
-
-    /* 
-     * Remove part of data or all data 
-     */
-    void removeRange(qint64 startTimeMs = -1, qint64 endTimeMs = INT64_MAX);
-
-    /* 
-     * Find pixmap by specified time. 
-     * @param timeMs contain approximate time. 
-     * @param realPixmapTimeMs Return exact pixmap time if found. Otherwise return -1
-     */
-    QPixmapPtr getPixmapByTime(qint64 timeMs, qint64 *realPixmapTimeMs = 0);
+    qint64 endTime() const;
+    void setEndTime(qint64 endTime);
 
     virtual void pleaseStop() override;
 
 signals:
-    void gotNewPixmap(qint64 timeMs, QPixmapPtr pixmap);
+    void thumbnailLoaded(QnThumbnail thumbnail);
+    void thumbnailSizeChanged();
+    void timeStepChanged();
 
 protected:
     virtual void run() override;
 
 private:
-    void ensureScaleContext(int lineSize, const QSize &size, const QSize &boundingSize, PixelFormat format);
+    void ensureScaleContext(int lineSize, const QSize &size, const QSize &boundingSize, int format);
     bool processFrame(const CLVideoDecoderOutput &outFrame, const QSize &boundingSize);
 
 private:
     mutable QMutex m_mutex;
-    QScopedPointer<QnRtspClientArchiveDelegate> m_rtspClient;
-    QnResourcePtr m_resource;
+    const QnResourcePtr m_resource;
+    const QScopedPointer<QnRtspClientArchiveDelegate> m_rtspClient;
 
-    QMap<qint64, QPixmapPtr> m_images;
-    QMap<qint64, QPixmapPtr> m_newImages;
+    qint64 m_startTime, m_endTime, m_timeStep;
 
-    qint64 m_step;
-    qint64 m_startTime;
-    qint64 m_endTime;
-    QQueue<QnTimePeriod> m_rangeToLoad;
-    SwsContext *m_scaleContext;
-    quint8 *m_rgbaBuffer;
-
-    int m_srcLineSize;
-    int m_srcFormat;
-    QSize m_srcSize;
     QSize m_boundingSize;
-    QSize m_dstSize;
-
-    qint64 m_lastLoadedTime;
-    bool m_breakCurrentJob;
+    
+    SwsContext *m_scaleContext;
+    quint8 *m_scaleBuffer;
+    QSize m_scaleSourceSize;
+    QSize m_scaleTargetSize;
+    int m_scaleSourceLine;
+    int m_scaleSourceFormat;
 };
 
 Q_DECLARE_METATYPE(QPixmapPtr)
