@@ -52,10 +52,10 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         return;
     }
 
-    //if (camersNamesData.isSupported(info.name)) {
-    //    qDebug() << "OnvifResourceInformationFetcher::findResources: skipping camera " << info.name;
-    //    return;
-    //}
+    if (camersNamesData.isSupported(info.name)) {
+        qDebug() << "OnvifResourceInformationFetcher::findResources: skipping camera " << info.name;
+        return;
+    }
 
     QHostAddress sender(hostAddressFromEndpoint(endpoint));
     const char* login = 0;
@@ -187,10 +187,10 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     QString name(fetchName(response2));
     if (name.isEmpty()) {
         name = info.name;
-    } /*else if (camersNamesData.isSupported(QString(name).replace(manufacturer, ""))) {
+    } else if (camersNamesData.isSupported(QString(name).replace(manufacturer, ""))) {
         qDebug() << "OnvifResourceInformationFetcher::findResources: (later step) skipping camera " << name;
         return;
-    }*/
+    }
 
     if (name.isEmpty()) {
         qWarning() << "OnvifResourceInformationFetcher::findResources: can't fetch name of ONVIF device: endpoint: " << endpoint
