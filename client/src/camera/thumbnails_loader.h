@@ -9,6 +9,7 @@
 #include <utils/common/longrunnable.h>
 #include <core/resource/resource_fwd.h>
 
+#include "recording/time_period.h"
 #include "thumbnail.h"
 
 class CLVideoDecoderOutput;
@@ -37,10 +38,14 @@ public:
     void setTimeStep(qint64 timeStep);
 
     qint64 startTime() const;
-    void setStartTime(qint64 startTime) const;
+    void setStartTime(qint64 startTime);
 
     qint64 endTime() const;
     void setEndTime(qint64 endTime);
+
+    qint64 setTimePeriod(qint64 startTime, qint64 endTime);
+    qint64 setTimePeriod(const QnTimePeriod &timePeriod);
+    const QnTimePeriod &timePeriod() const;
 
     virtual void pleaseStop() override;
 
@@ -61,7 +66,8 @@ private:
     const QnResourcePtr m_resource;
     const QScopedPointer<QnRtspClientArchiveDelegate> m_rtspClient;
 
-    qint64 m_startTime, m_endTime, m_timeStep;
+    QnTimePeriod m_timePeriod;
+    qint64 m_timeStep;
 
     QSize m_boundingSize;
     
@@ -71,6 +77,8 @@ private:
     QSize m_scaleTargetSize;
     int m_scaleSourceLine;
     int m_scaleSourceFormat;
+
+    QHash<qint64, QnThumbnail> m_thumbnailByTime;
 };
 
 Q_DECLARE_METATYPE(QPixmapPtr)

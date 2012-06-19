@@ -17,8 +17,6 @@ QnThumbnailsLoader::QnThumbnailsLoader(QnResourcePtr resource):
     m_rtspClient(new QnRtspClientArchiveDelegate()),
     m_resource(resource),
     m_timeStep(0),
-    m_startTime(0),
-    m_endTime(0),
     m_scaleContext(NULL),
     m_scaleBuffer(NULL),
     m_boundingSize(128, 96), /* That's 4:3 aspect ratio. */
@@ -84,25 +82,41 @@ void QnThumbnailsLoader::setTimeStep(qint64 timeStep) {
 qint64 QnThumbnailsLoader::startTime() const {
     QMutexLocker locker(&m_mutex);
 
-    return m_startTime;
+    return m_timePeriod.startTimeMs;
 }
 
-void QnThumbnailsLoader::setStartTime(qint64 startTime) const {
+void QnThumbnailsLoader::setStartTime(qint64 startTime) {
     QMutexLocker locker(&m_mutex);
 
-    m_startTime = startTime;
+    setTimePeriod(startTime, m_timePeriod.endTimeMs());
 }
 
 qint64 QnThumbnailsLoader::endTime() const {
     QMutexLocker locker(&m_mutex);
 
-    return m_endTime;
+    return m_timePeriod.startTimeMs;
 }
 
 void QnThumbnailsLoader::setEndTime(qint64 endTime) {
     QMutexLocker locker(&m_mutex);
 
-    m_endTime = endTime;
+    setTimePeriod(m_timePeriod.startTimeMs, endTime);
+}
+
+qint64 QnThumbnailsLoader::setTimePeriod(qint64 startTime, qint64 endTime) {
+    setTimePeriod(QnTimePeriod(startTime, endTime - startTime));
+}
+
+qint64 QnThumbnailsLoader::setTimePeriod(const QnTimePeriod &timePeriod) {
+    QMutexLocker locker(&m_mutex);
+
+    m_timePeriod = timePeriod;
+}
+
+const QnTimePeriod &QnThumbnailsLoader::timePeriod() const {
+    QMutexLocker locker(&m_mutex);
+
+    return m_timePeriod;
 }
 
 void QnThumbnailsLoader::pleaseStop() {
@@ -111,6 +125,12 @@ void QnThumbnailsLoader::pleaseStop() {
 
     base_type::pleaseStop();
 }
+
+void QnThumbnailsLoader::run() {
+
+}
+
+
 
 #if 0
 void QnThumbnailsLoader::loadRange(qint64 startTimeMs, qint64 endTimeMs, qint64 stepMs)
