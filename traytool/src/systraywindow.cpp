@@ -563,7 +563,7 @@ void QnSystrayWindow::createTrayIcon()
 QUrl QnSystrayWindow::getAppServerURL() const
 {
     QUrl appServerUrl;
-    appServerUrl.setScheme("http");
+    appServerUrl.setScheme("https");
     appServerUrl.setHost(m_mServerSettings.value("appserverHost").toString());
     int appServerPort = m_mServerSettings.value("appserverPort").toInt();
     appServerUrl.setPort(appServerPort != 0 ? appServerPort : DEFAULT_APP_SERVER_PORT);

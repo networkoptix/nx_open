@@ -81,7 +81,7 @@ private:
     QWeakPointer<QnResourceWidget> m_target;
     bool m_selectionStartedEmitted;
     bool m_isClick;
-    bool m_isClickAllowed;
+    bool m_clearingBlocked;
     Qt::KeyboardModifiers m_selectionModifiers;
     Qt::KeyboardModifiers m_multiSelectionModifiers;
 };
@@ -99,14 +99,13 @@ namespace Qn { namespace {
     const char *MotionSelectionModifiers = "_qn_motionSelectionModifiers";
 
     /**
-     * Name of the property to set on a graphics item to make it opaque to
-     * motion selection clear events (that is, mouse clicks that clear motion
-     * selection). 
+     * Name of the property to set on a graphics item to stop it from
+     * blocking motion selection.
      */
-    const char *NoMotionClearThrough = "_qn_noMotionClearThrough";
+    const char *NoBlockMotionSelection = "_qn_noBlockMotionSelection";
 
 #define MotionSelectionModifiers MotionSelectionModifiers
-#define NoMotionClearThrough NoMotionClearThrough
+#define NoBlockMotionSelection NoBlockMotionSelection
 }}
 
 

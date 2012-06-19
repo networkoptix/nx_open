@@ -210,7 +210,7 @@ void OnvifResourceSearcherWsdd::findResources(QnResourceList& result) const
     qDebug() << "OnvifResourceSearcherWsdd::findResources: Endpoints in the list:"
              << (endpoints.size()? "": " EMPTY");
     while (endpIter != endpoints.end()) {
-        qDebug() << "    " << endpIter.key() << " (" << endpIter.value().mac << "): " << endpIter.value().manufacturer
+        qDebug() << "    " << endpIter.key() << " (" << endpIter.value().uniqId << "): " << endpIter.value().manufacturer
                  << " - " << endpIter.value().name << ", discovered in " << endpIter.value().discoveryIp;
         ++endpIter;
     }
@@ -302,10 +302,19 @@ const QString OnvifResourceSearcherWsdd::getMac(const wsdd__ProbeMatchesType* pr
             result[ind - 1] = macFromEndpoint[i - 1];
         }
 
-        return result;
+        return result.toUpper();
     }
 
     return QString();
+}
+
+const QString OnvifResourceSearcherWsdd::getEndpointAddress(const wsdd__ProbeMatchesType* probeMatches) const
+{
+    if (!probeMatches || !probeMatches->ProbeMatch) {
+        return QString();
+    }
+
+    return QString(probeMatches->ProbeMatch->wsa__EndpointReference.Address);
 }
 
 const QString OnvifResourceSearcherWsdd::getManufacturer(const wsdd__ProbeMatchesType* probeMatches, const QString& name) const
@@ -384,9 +393,9 @@ void OnvifResourceSearcherWsdd::addEndpointToHash(EndpointInfoHash& hash, const 
 
     QString name = getName(probeMatches);
     QString manufacturer = getManufacturer(probeMatches, name);
-    QString mac = getMac(probeMatches, header);
+    QString uniqId = getMac(probeMatches, header);//getEndpointAddress(probeMatches);
 
-    hash.insert(appropriateAddr, EndpointAdditionalInfo(name, manufacturer, mac, host));
+    hash.insert(appropriateAddr, EndpointAdditionalInfo(name, manufacturer, uniqId, host));
 }
 
 void OnvifResourceSearcherWsdd::printProbeMatches(const wsdd__ProbeMatchesType* probeMatches,

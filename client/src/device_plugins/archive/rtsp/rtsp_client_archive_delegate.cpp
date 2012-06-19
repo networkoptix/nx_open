@@ -59,7 +59,7 @@ QnResourcePtr QnRtspClientArchiveDelegate::getNextVideoServerFromTime(QnResource
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(resource);
     if (!netRes)
         return QnResourcePtr();
-    QString mac = netRes->getMAC().toString();
+	QString mac = netRes->getMAC().toString();
     QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(mac);
     if (!history)
         return QnResourcePtr();
@@ -79,7 +79,7 @@ QString QnRtspClientArchiveDelegate::getUrl(QnResourcePtr resource)
     QString url = server->getUrl() + QString('/');
     QnNetworkResourcePtr netResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
     if (netResource != 0)
-        url += netResource->getMAC().toString();
+		url += netResource->getMAC().toString();
     else
         url += server->getUrl();
     return url;
@@ -99,7 +99,7 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(QnResourcePtr re
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(resource);
     if (!netRes)
         return 0;
-    QString mac = netRes->getMAC().toString();
+	QString mac = netRes->getMAC().toString();
     QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(mac);
     if (!history)
         return 0;
@@ -146,7 +146,7 @@ QnResourcePtr QnRtspClientArchiveDelegate::getResourceOnTime(QnResourcePtr resou
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(resource);
     if (!netRes)
         return resource;
-    QString mac = netRes->getMAC().toString();
+	QString mac = netRes->getMAC().toString();
 
     if (time == DATETIME_NOW)
     {

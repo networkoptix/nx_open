@@ -6,19 +6,19 @@
 
 class _onvifDevice__GetNetworkInterfacesResponse;
 class _onvifDevice__GetDeviceInformationResponse;
-class SOAP_ENV__Fault;
+struct SOAP_ENV__Fault;
 
 struct EndpointAdditionalInfo
 {
     QString name;
     QString manufacturer;
-    QString mac;
+    QString uniqId;
     QString discoveryIp;
 
-    EndpointAdditionalInfo(const QString& newName, const QString& newManufacturer, const QString& newMac, const QString& newDiscoveryIp):
+    EndpointAdditionalInfo(const QString& newName, const QString& newManufacturer, const QString& newUniqId, const QString& newDiscoveryIp):
         name(newName),
         manufacturer(newManufacturer),
-        mac(newMac),
+        uniqId(newUniqId),
         discoveryIp(newDiscoveryIp)
     {
 

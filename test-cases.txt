@@ -8,13 +8,13 @@ Regress Testing
 + 6) Motion Detection (smart search)
 7) Discovery (onvif, std)
 + 8) Search (different privileges)
-9) Properties (server, cameras, multi-item)
++ 9) Properties (server, cameras, multi-item)
 10) Export (files, layo, watermarks)
-11) Screen Recording
-12) Screenshot
++ 11) Screen Recording
++ 12) Screenshot
 13) Installer (traytool, upgrade)
 + 14) Mediaproxy
-15) Admin/user privileges
++ 15) Admin/user privileges
 + 16) Layouts
 + 17) Licenses
 18) Long-time testing (leaks)

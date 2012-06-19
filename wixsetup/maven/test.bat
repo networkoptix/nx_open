@@ -25,7 +25,7 @@ echo installer errorlevel is %ERRORLEVEL%
 cd "%VS90COMNTOOLS%\..\..\..\${company.name}\${product.name}\Client\"
 
 rem ugly hack! --auth parameter is applied only in second launch!
-call client.exe --test-timeout 5000 --auth "https://%EC_LOGIN%:%EC_PASSWORD%@%EC_HOST%:%EC_PORT%" --test-resource-substring Server
+rem call client.exe --test-timeout 5000 --auth "https://%EC_LOGIN%:%EC_PASSWORD%@%EC_HOST%:%EC_PORT%" --test-resource-substring Server
 
 call client.exe --test-timeout 180000 --auth "https://%EC_LOGIN%:%EC_PASSWORD%@%EC_HOST%:%EC_PORT%" --test-resource-substring Server > test.txt
 SET TESTRESULT=%ERRORLEVEL%
@@ -37,7 +37,7 @@ sc stop vmsappserver
 taskkill /F /IM traytool.exe
 taskkill /F /IM client.exe
 taskkill /F /IM mediaserver.exe
-taskkill /F /IM ec.exe
+taskkill /F /IM ecs.exe
 
 sc delete vmsappserver
 sc delete vmsmediaserver

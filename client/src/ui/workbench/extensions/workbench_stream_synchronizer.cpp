@@ -1,6 +1,8 @@
 #include "workbench_stream_synchronizer.h"
 #include <utils/common/warnings.h>
 #include <utils/common/counter.h>
+#include <utils/common/checked_cast.h>
+#include <core/resource/resource.h>
 #include <camera/resource_display.h>
 #include <camera/camdisplay.h>
 #include <camera/camera.h>
@@ -62,8 +64,12 @@ bool QnWorkbenchStreamSynchronizer::isEffective() const {
 }
 
 void QnWorkbenchStreamSynchronizer::at_display_widgetAdded(QnResourceWidget *widget) {
-    if(!widget->resource()->checkFlags(QnResource::live_cam))
+    connect(widget->resource().data(), SIGNAL(flagsChanged()), this, SLOT(at_resource_flagsChanged()));
+
+    if(!widget->resource()->checkFlags(QnResource::utc)) {
+        m_queuedWidgets.insert(widget);
         return;
+    }
 
     if(widget->display()->archiveReader() == NULL) 
         return;
@@ -82,7 +88,11 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAdded(QnResourceWidget *wid
 }
 
 void QnWorkbenchStreamSynchronizer::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {
-    if(!widget->resource()->checkFlags(QnResource::live_cam))
+    disconnect(widget->resource().data(), NULL, this, NULL);
+
+    m_queuedWidgets.remove(widget);
+
+    if(!widget->resource()->checkFlags(QnResource::utc))
         return;
 
     if(widget->display()->archiveReader() == NULL) 
@@ -104,5 +114,27 @@ void QnWorkbenchStreamSynchronizer::at_renderWatcher_displayingStateChanged(QnAb
         return;
 
     m_syncPlay->onConsumerBlocksReader(widget->display()->dataProvider(), !displaying);
+}
+
+void QnWorkbenchStreamSynchronizer::at_resource_flagsChanged() {
+    if(!sender())
+        return;
+
+    at_resource_flagsChanged(checked_cast<QnResource *>(sender())->toSharedPointer());
+}
+
+void QnWorkbenchStreamSynchronizer::at_resource_flagsChanged(const QnResourcePtr &resource) {
+    if(!(resource->flags() & QnResource::utc))
+        return; // TODO: implement reverse handling?
+
+    foreach(QnResourceWidget *widget, m_queuedWidgets) {
+        if(widget->resource() == resource) {
+            m_queuedWidgets.remove(widget);
+
+            m_widgetCount++;
+            if(m_widgetCount == 1)
+                emit effectiveChanged();
+        }
+    }
 }
 

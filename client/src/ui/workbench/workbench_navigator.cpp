@@ -540,25 +540,11 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     }
 
     m_currentWidget = widget;
-    if(m_currentWidget) {
-        m_currentWidgetFlags = 0;
-
-        bool layoutIsFile = snapshotManager()->flags(m_currentWidget->item()->layout()->resource()) & Qn::LayoutIsFile;
-
-        if(m_currentWidget->resource().dynamicCast<QnSecurityCamResource>())
-            m_currentWidgetFlags |= WidgetSupportsLive | WidgetSupportsPeriods | WidgetSupportsSync | WidgetUsesUTC;
-
-        if(layoutIsFile)
-            m_currentWidgetFlags |= WidgetSupportsSync;
-
-    } else {
-        m_currentWidgetFlags = 0;
-    }
     m_currentWidgetLoaded = false;
     m_currentWidgetIsCentral = isCentral;
 
+    updateCurrentWidgetFlags();
     updateLines();
-    updateSliderOptions();
 
     updateSliderFromReader();
     if(!((m_currentWidgetFlags & WidgetSupportsSync) && (previousWidgetFlags & WidgetSupportsSync) && display()->isStreamsSynchronized()) && m_currentWidget)
@@ -574,6 +560,29 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     updateSpeed();
 
     emit currentWidgetChanged();
+}
+
+void QnWorkbenchNavigator::updateCurrentWidgetFlags() {
+    WidgetFlags flags = 0;
+
+    if(m_currentWidget) {
+        flags = 0;
+
+        if(m_currentWidget->resource().dynamicCast<QnSecurityCamResource>())
+            flags |= WidgetSupportsLive | WidgetSupportsPeriods;
+
+        if(m_currentWidget->resource()->flags() & QnResource::utc)
+            flags |= WidgetUsesUTC | WidgetSupportsSync;
+    } else {
+        flags = 0;
+    }
+
+    if(m_currentWidgetFlags == flags)
+        return;
+
+    m_currentWidgetFlags = flags;
+    
+    updateSliderOptions();
 }
 
 void QnWorkbenchNavigator::updateSliderOptions() {
@@ -617,14 +626,8 @@ void QnWorkbenchNavigator::updateSliderFromReader() {
             updateLive();
     }
 
-    /* Fix flags once the reader has loaded. */
     if(!m_currentWidgetLoaded && startTimeUSec != AV_NOPTS_VALUE) {
-        if(startTimeUSec > 1000000ll * 60 * 60 * 24 * 365)
-            m_currentWidgetFlags |= WidgetUsesUTC;
-
         m_currentWidgetLoaded = true;
-
-        updateSliderOptions();
         updateTargetPeriod();
     }
 }
@@ -983,12 +986,14 @@ void QnWorkbenchNavigator::at_display_widgetAdded(QnResourceWidget *widget) {
 
         connect(widget, SIGNAL(motionSelectionChanged()), this, SLOT(at_widget_motionSelectionChanged()));
         connect(widget, SIGNAL(displayFlagsChanged()), this, SLOT(at_widget_displayFlagsChanged()));
+        connect(widget->resource().data(), SIGNAL(flagsChanged()), this, SLOT(at_resource_flagsChanged()));
     }
 }
 
 void QnWorkbenchNavigator::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {
     if(QnSecurityCamResourcePtr cameraResource = widget->resource().dynamicCast<QnSecurityCamResource>()) {
         disconnect(widget, NULL, this, NULL);
+        disconnect(widget->resource().data(), NULL, this, NULL);
 
         removeSyncedWidget(widget);
     }
@@ -1024,6 +1029,20 @@ void QnWorkbenchNavigator::at_widget_displayFlagsChanged(QnResourceWidget *widge
         if(widget == m_currentWidget)
             updateCurrentPeriods(Qn::MotionRole);
     }
+}
+
+void QnWorkbenchNavigator::at_resource_flagsChanged() {
+    if(!sender())
+        return;
+
+    at_resource_flagsChanged(checked_cast<QnResource *>(sender())->toSharedPointer());
+}
+
+void QnWorkbenchNavigator::at_resource_flagsChanged(const QnResourcePtr &resource) {
+    if(!resource || !m_currentWidget || m_currentWidget->resource() != resource)
+        return;
+
+    updateCurrentWidgetFlags();
 }
 
 void QnWorkbenchNavigator::at_timeSlider_destroyed() {
