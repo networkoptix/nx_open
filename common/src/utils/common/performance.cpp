@@ -5,30 +5,33 @@
 #define CPU_USAGE_REFRESH 1
 
 
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN)
 #   define NOMINMAX
 #   define _WIN32_DCOM
 #   include <Windows.h>
 #   include <comdef.h>
 #   include <Wbemidl.h>
 #   pragma comment(lib, "wbemuuid.lib")
+#elif defined(Q_OS_LINUX)
+#   include <time.h>
+#   include <signal.h>
+#   include <errno.h>
+#   define SIG_CODE SIGRTMIN
 #endif
 
 #include "warnings.h"
 
-namespace {
-
     // cpu_usage block
 #if defined(Q_OS_WIN)
-
+namespace {
     class CpuUsageRefresher {
     public:
 
         CpuUsageRefresher() {
             m_locator = NULL;
             m_service = NULL;
-            m_prev_cpu = 0;
-            m_prev_ts = 0;
+            m_cpu = 0;
+            m_ts = 0;
             m_usage = 0;
             m_initialized = init();
         }
@@ -54,7 +57,7 @@ namespace {
 
         void refresh() {
             char q_str[100];
-            sprintf(q_str, "SELECT * FROM Win32_PerfRawData_PerfProc_Thread WHERE IdProcess=%d", GetCurrentProcessId());
+            sprintf(q_str, "SELECT * FROM Win32_PerfRawData_PerfProc_Thread WHERE IdProcess=%d", QCoreApplication::applicationPid());
             IEnumWbemClassObject* pEnumerator = query(q_str);
             if (pEnumerator){
                 IWbemClassObject *pclsObj;
@@ -84,12 +87,11 @@ namespace {
                 }
                 pEnumerator->Release();
 
-                if (m_prev_ts > 0){
-                    m_usage = ((cpu - m_prev_cpu) * 100) / ((ts - m_prev_ts) * QnPerformance::getCpuCores());
-                    qnDebug("usage %1", m_usage);
+                if (m_ts > 0){
+                    m_usage = ((cpu - m_cpu) * 100) / ((ts - m_ts) * QnPerformance::getCpuCores());
                 }
-                m_prev_cpu = cpu;
-                m_prev_ts = ts;
+                m_cpu = cpu;
+                m_ts = ts;
             }
         }
 
@@ -107,7 +109,7 @@ namespace {
             hres =  CoInitializeEx(0, COINIT_MULTITHREADED); 
             if (FAILED(hres))
             {
-                qnDebug("Failed to initialize COM library. Error code = 0x%1", QString::number(hres, 16));
+                qnWarning("WMI: Failed to initialize COM library. Error code = 0x%1", QString::number(hres, 16));
                 return false;
             }
 
@@ -127,7 +129,7 @@ namespace {
 
             if (FAILED(hres))
             {
-                qnDebug("Failed to initialize security. Error code = 0x%1", QString::number(hres, 16));
+                qnWarning("WMI: Failed to initialize security. Error code = 0x%1", QString::number(hres, 16));
                 CoUninitialize();
                 return false;                    
             }
@@ -142,7 +144,7 @@ namespace {
 
             if (FAILED(hres))
             {
-                qnDebug("Failed to create IWbemLocator object. Err code = 0x%1", QString::number(hres, 16));
+                qnWarning("WMI: Failed to create IWbemLocator object. Err code = 0x%1", QString::number(hres, 16));
                 CoUninitialize();
                 return false;                
             }
@@ -167,14 +169,11 @@ namespace {
 
             if (FAILED(hres))
             {
-                qnDebug("Could not connect. Error code = 0x%1", QString::number(hres, 16)); 
+                qnWarning("WMI: Could not connect. Error code = 0x%1", QString::number(hres, 16));
                 m_locator->Release();
                 CoUninitialize();
                 return false;
             }
-
-            qnDebug("Connected to ROOT\\CIMV2 WMI namespace\n");
-
 
             // Step 5: --------------------------------------------------
             // Set security levels on the proxy -------------------------
@@ -191,14 +190,12 @@ namespace {
 
             if (FAILED(hres))
             {
-                qnDebug("Could not set proxy blanket. Error code = 0x%1", QString::number(hres, 16));  
+                qnWarning("WMI: Could not set proxy blanket. Error code = 0x%1", QString::number(hres, 16));
                 m_service->Release();
                 m_locator->Release();     
                 CoUninitialize();
                 return false;
             }
-
-            qnDebug("CpuInfo %1, cores %2\n", QnPerformance::getCpuBrand(), QnPerformance::getCpuCores());
             m_timer = SetTimer(0, 0, CPU_USAGE_REFRESH * 1000, timerCallback);
             return true;
         }
@@ -216,7 +213,7 @@ namespace {
 
             if (FAILED(hres))
             {
-                qnDebug("Query failed. Error code = 0x%1", QString::number(hres, 16));
+                qnWarning("WMI: Query failed. Error code = 0x%1", QString::number(hres, 16));
                 return NULL;
             }
             return enumerator;
@@ -233,10 +230,10 @@ namespace {
         IWbemServices *m_service;
 
         /** Previous value of raw WMI PercentProcessorTime stat */
-        quint64 m_prev_cpu;
+        quint64 m_cpu;
 
         /** Previous value of raw WMI Timestamp_Sys100NS stat */
-        quint64 m_prev_ts;
+        quint64 m_ts;
 
         /** Processor usage percent for the last CPU_USAGE_REFRESH seconds */
         uint m_usage;
@@ -252,16 +249,11 @@ namespace {
     VOID CALLBACK CpuUsageRefresher::timerCallback(HWND /*hwnd*/, UINT /*uMsg*/, UINT_PTR /*idEvent*/, DWORD /*dwTime*/) {
         refresherInstance()->refresh();
     }
-
+} // anonymous namespace
 #elif defined(Q_OS_LINUX)
-
-#include <time.h>
-#include <signal.h>
-#include <errno.h>
-
-#define SIG_CODE SIGRTMIN
-
-    QString getSystemOutput(const char *cmds) 
+namespace{
+// very useful function, I'd move it to any shared linux util class
+    static QString getSystemOutput(QString cmds)
     {
         QStringList list = cmds.split('|');
         QStringListIterator iter(list);
@@ -292,78 +284,105 @@ namespace {
         return QString(prev->readAll());
     }
 
-    class CpuUsageRefresher{
+    static void timerCallback(int sig, siginfo_t *si, void *uc);
 
+    class CpuUsageRefresher{
     public:
         CpuUsageRefresher(){
-            m_prev_cpu = 0;
-            m_prev_ts = 0;
+            m_cpu = 0;
+            m_process_cpu = 0;
             m_usage = 0;
+            m_timer = 0;
             m_initialized = init();
         }
 
         ~CpuUsageRefresher(){
-            timer_delete(m_timer);
+            if (m_timer)
+                timer_delete(m_timer);
         }
 
         uint usage(){
             return m_usage;
         }
 
-    private:
-        static void timerCallback(int sig, siginfo_t *si, void *uc);
-
-        void refresh(){
-            qnDebug("callback");
+        void** getTimerId(){
+            return &m_timer;
         }
 
+        void refresh(){
+            qulonglong cpu = getCpu();
+            qulonglong process_cpu = getProcessCpu();
+            if (process_cpu > 0 && m_cpu > 0){
+                m_usage = ((process_cpu - m_process_cpu) * 100) / (cpu - m_cpu);
+            }
+            m_cpu = cpu;
+            m_process_cpu = process_cpu;
+        }
+
+    private:
         bool init(){
-            qnDebug("CpuInfo %1, cores %2\n", QnPerformance::getCpuBrand(), QnPerformance::getCpuCores());
-
-            struct sigevent sev;
-            struct itimerspec its;
-            struct sigaction sa;
-
             /* Establish handler for timer signal */
-
-            qnDebug("Establishing handler for signal %1\n", SIG_CODE);
+            struct sigaction sa;
             sa.sa_flags = SA_SIGINFO;
             sa.sa_sigaction = timerCallback;
             sigemptyset(&sa.sa_mask);
             if (sigaction(SIG_CODE, &sa, NULL) == -1){
-                qnDebug("Err %1", errno);
+                qnWarning("Establishing handler error %1", errno);
                 return false;
             }
 
-
             /* Create the timer */
-            qnDebug("Creating timer...\n");
+            struct sigevent sev;
             sev.sigev_notify = SIGEV_SIGNAL;
             sev.sigev_signo = SIG_CODE;
-            sev.sigev_value.sival_ptr = &m_timer;
+            sev.sigev_value.sival_ptr = getTimerId();
             if (timer_create(CLOCK_REALTIME, &sev, &m_timer) == -1){
-                qnDebug("Err %1", errno);
+                qnWarning("Creating timer error %1", errno);
                 return false;
             }
 
             /* Start the timer */
-            qnDebug("Starting timer...");
+            struct itimerspec its;
             its.it_value.tv_sec = CPU_USAGE_REFRESH;
             its.it_value.tv_nsec = 0;
             its.it_interval.tv_sec = its.it_value.tv_sec;
             its.it_interval.tv_nsec = its.it_value.tv_nsec;
 
             if (timer_settime(m_timer, 0, &its, NULL) == -1){
-                qnDebug("Err %1", errno);
+                qnWarning("Starting timer error %1", errno);
                 return false;
             }
             return true;
         }
 
-    private:
+        /** Calculate total cpu jiffies */
+        qulonglong getCpu(){
+            qulonglong result = 0;
+
+            QString proc_stat = getSystemOutput("cat /proc/stat | grep \"cpu \"").mid(5);
+            QStringList list = proc_stat.split(' ', QString::SkipEmptyParts);
+            QStringListIterator iter(list);
+            while (iter.hasNext())
+                result += iter.next().toULongLong();
+            return result;
+        }
+
+        qulonglong getProcessCpu(){
+            QString request = QString("cat /proc/%1/stat").arg(QCoreApplication::applicationPid ());
+            QStringList proc_stat = getSystemOutput(request).split(' ', QString::SkipEmptyParts);
+            if (proc_stat.count() > 14){
+                return (proc_stat[13]).toULongLong() +
+                        proc_stat[14].toULongLong();
+            }
+            else{
+                qWarning("Linux: proc stat is absent");
+                return 0;
+            }
+        }
+
         bool m_initialized;
-        quint64 m_prev_cpu;
-        quint64 m_prev_ts;
+        quint64 m_cpu;
+        quint64 m_process_cpu;
         uint m_usage;
         timer_t m_timer;
     };
@@ -372,9 +391,9 @@ namespace {
     // initializer for Q_GLOBAL_STATIC singleton
     CpuUsageRefresher* dummy = refresherInstance();
 
-    VOID CALLBACK CpuUsageRefresher::timerCallback(int sig, siginfo_t *si, void *uc){
-        CpuUsageRefresher refresher = refresherInstance();
-        if (si->si_value.sival_ptr == &(refresher->m_timer)){
+    static void timerCallback(int, siginfo_t *si, void*){
+        CpuUsageRefresher *refresher = refresherInstance();
+        if (si->si_value.sival_ptr == refresher->getTimerId()){
             refresher->refresh();
         }
     }
@@ -451,9 +470,6 @@ int estimateCpuCores() {
 
 Q_GLOBAL_STATIC_WITH_INITIALIZER(QString, qn_estimatedCpuBrand, { *x = estimateCpuBrand(); });
 Q_GLOBAL_STATIC_WITH_INITIALIZER(int, qn_estimatedCpuCores, { *x = estimateCpuCores(); });
-
-} // anonymous namespace
-
 
 qint64 QnPerformance::currentThreadTimeMSecs() {
     qint64 result = currentThreadTimeNSecs();
