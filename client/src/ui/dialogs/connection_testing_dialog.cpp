@@ -52,9 +52,8 @@ void QnConnectionTestingDialog::timeout()
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
 }
 
-void QnConnectionTestingDialog::testResults(int status, const QByteArray &data, const QByteArray& errorString, int requestHandle)
+void QnConnectionTestingDialog::testResults(int status, const QByteArray &errorString, QnConnectInfoPtr connectInfo, int requestHandle)
 {
-    Q_UNUSED(data)
     Q_UNUSED(requestHandle)
 	Q_UNUSED(errorString)
 
@@ -64,8 +63,17 @@ void QnConnectionTestingDialog::testResults(int status, const QByteArray &data, 
         return;
     }
 
+    QnCompatibilityChecker remoteChecker(connectInfo->compatibilityItems);
+    QnCompatibilityChecker localChecker(localCompatibilityItems());
+
+    QnCompatibilityChecker* compatibilityChecker;
+    if (remoteChecker.size() > localChecker.size())
+        compatibilityChecker = &remoteChecker;
+    else
+        compatibilityChecker = &localChecker;
+
     ui->progressBar->setValue(ui->progressBar->maximum());
-    if (status) {
+    if (status || !compatibilityChecker->isCompatible("Client", qApp->applicationVersion(), "ECS", connectInfo->version)) {
         ui->statusLabel->setText("Failed");
     } else {
         ui->statusLabel->setText("Success");
@@ -77,7 +85,7 @@ void QnConnectionTestingDialog::testResults(int status, const QByteArray &data, 
 void QnConnectionTestingDialog::testSettings()
 {
     m_connection = QnAppServerConnectionFactory::createConnection(m_url);
-    m_connection->testConnectionAsync(this, SLOT(testResults(int,QByteArray,QByteArray,int)));
+    m_connection->testConnectionAsync(this, SLOT(testResults(int,QByteArray,QnConnectInfoPtr,int)));
 }
 
 void QnConnectionTestingDialog::accept()

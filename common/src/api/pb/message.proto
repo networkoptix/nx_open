@@ -1,0 +1,47 @@
+package pb;
+
+import "resource.proto";
+import "license.proto";
+import "cameraServerItem.proto";
+
+message Message { 
+    extensions 100 to max;
+
+    enum Type {
+        Initial                = 0;
+        Ping                   = 1;
+        ResourceChange         = 2;
+        ResourceDelete         = 3;
+        ResourceStatusChange   = 4;
+        ResourceDisabledChange = 5;
+        License                = 6;
+        CameraServerItem       = 7;
+    }
+
+    required Type type = 1;
+    required uint32 seqNumber = 2;
+}
+
+message ResourceMessage {
+    extend Message {
+        required ResourceMessage message = 100;
+    }
+
+    required Resource resource = 1;
+}
+
+message LicenseMessage {
+    extend Message {
+        required LicenseMessage message = 101;
+    }
+
+    required License license = 1;
+}
+
+message CameraServerItemMessage {
+    extend Message {
+        required CameraServerItemMessage message = 102;
+    }
+
+    required CameraServerItem cameraServerItem = 1;
+}

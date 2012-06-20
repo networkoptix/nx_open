@@ -2,6 +2,7 @@
 #define LOGINDIALOG_H
 
 #include <QtGui/QDialog>
+#include "connectinfo.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 
 class QDataWidgetMapper;
@@ -45,7 +46,7 @@ private slots:
     void at_configureConnectionsButton_clicked();
     void at_testButton_clicked();
     void at_connectionsComboBox_currentIndexChanged(int index);
-    void at_testFinished(int status, const QByteArray &data, const QByteArray &errorString, int requestHandle);
+    void at_connectFinished(int status, const QByteArray &errorString, QnConnectInfoPtr connectInfo, int requestHandle);
 
 private:
     Q_DISABLE_COPY(LoginDialog)

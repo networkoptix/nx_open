@@ -55,6 +55,10 @@
 #include "rest/handlers/get_statistics.h"
 
 
+// This constant is used while checking for compatibility.
+// Do not change it until you know what you're doing.
+static const char COMPONENT_NAME[] = "MediaServer";
+
 static const char SERVICE_NAME[] = "Network Optix VMS Media Server";
 
 class QnMain;
@@ -357,8 +361,9 @@ void initAppServerEventConnection(const QSettings &settings, const QnVideoServer
     appServerEventsUrl.setPort(settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt());
     appServerEventsUrl.setUserName(settings.value("appserverLogin", QLatin1String("admin")).toString());
     appServerEventsUrl.setPassword(settings.value("appserverPassword", QLatin1String("123")).toString());
-    appServerEventsUrl.setPath("/events");
+    appServerEventsUrl.setPath("/events/");
     appServerEventsUrl.addQueryItem("id", mediaServer->getId().toString());
+	appServerEventsUrl.addQueryItem("format", "pb");
 
     static const int EVENT_RECONNECT_TIMEOUT = 3000;
 
@@ -471,6 +476,29 @@ void QnMain::run()
 
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
+    QByteArray errorString;
+    QnConnectInfoPtr connectInfo(new QnConnectInfo());
+    while (!needToStop() && appServerConnection->connect(connectInfo, errorString))
+    {
+        cl_log.log("Can't connect to Enterprise Controller: ", errorString.data(), cl_logWARNING);
+        QnSleep::msleep(1000);
+    }
+
+    QnCompatibilityChecker remoteChecker(connectInfo->compatibilityItems);
+    QnCompatibilityChecker localChecker(localCompatibilityItems());
+
+    QnCompatibilityChecker* compatibilityChecker;
+    if (remoteChecker.size() > localChecker.size())
+        compatibilityChecker = &remoteChecker;
+    else
+        compatibilityChecker = &localChecker;
+
+    if (!compatibilityChecker->isCompatible(COMPONENT_NAME, qApp->applicationVersion(), "ECS", connectInfo->version))
+    {
+        cl_log.log(cl_logERROR, "Incompatible Enterprise Controller version detected! Giving up.");
+        return;
+    }
+
     while (!needToStop() && !initResourceTypes(appServerConnection))
     {
         QnSleep::msleep(1000);
@@ -514,8 +542,6 @@ void QnMain::run()
         if (m_videoServer.isNull())
             QnSleep::msleep(1000);
     }
-
-    QByteArray errorString;
 
     int status;
     do
