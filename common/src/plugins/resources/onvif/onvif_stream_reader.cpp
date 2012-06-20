@@ -22,7 +22,7 @@
 const char* QnOnvifStreamReader::VideoEncoderNameChange::DESCRIPTION = "name";
 
 void QnOnvifStreamReader::VideoEncoderNameChange::doChange(onvifXsd__VideoEncoderConfiguration* config, 
-    const QnOnvifStreamReader& /*reader*/, bool isPrimary)
+    const QnOnvifStreamReader& reader, bool isPrimary)
 {
     if (!config) {
         qWarning() << "QnOnvifStreamReader::VideoEncoderNameChange::doChange: got NULL ptr";
@@ -31,6 +31,7 @@ void QnOnvifStreamReader::VideoEncoderNameChange::doChange(onvifXsd__VideoEncode
 
     oldName = config->Name.c_str();
 
+    config->Encoding = reader.m_onvifRes->getCodec() == QnPlOnvifResource::H264? onvifXsd__VideoEncoding__H264: onvifXsd__VideoEncoding__JPEG;
     if (isPrimary) {
         config->Name = "Netoptix Primary Encoder";
     } else {    
@@ -295,20 +296,21 @@ const QString QnOnvifStreamReader::updateCameraAndfetchStreamUrl(bool isPrimary)
         fillVideoEncoderChanges(changes);
 
         foreach(VideoEncoderChange* change, changes) {
-            if (!login.empty()) soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", login.c_str(), passwd.c_str());
             change->doChange(encRequest.Configuration, *this, isPrimary);
+        }
+            if (!login.empty()) soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", login.c_str(), passwd.c_str());
 
             soapRes = soapProxy.SetVideoEncoderConfiguration(endpoint.toStdString().c_str(), NULL, &encRequest, &encResponse);
             if (soapRes != SOAP_OK) {
                 qWarning() << "QnOnvifStreamReader::updateCameraAndfetchStreamUrl (primary stream = "
-                    << isPrimary << "): can't set " << change->description() << " into ONVIF physical device (URL: "
+                    << isPrimary << "): can't set required values into ONVIF physical device (URL: "
                     << endpoint << ", MAC: " << m_onvifRes->getMAC().toString() << "). Root cause: SOAP failed. Default settings will be used. GSoap error code: "
                     << soapRes << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
 
-                change->undoChange(encRequest.Configuration, isPrimary);
+                //change->undoChange(encRequest.Configuration, isPrimary);
             }
             soap_end(soapProxy.soap);
-        }
+        /*}*/
 
         clearVideoEncoderChanges(changes);
     }
@@ -459,11 +461,11 @@ onvifXsd__Profile* QnOnvifStreamReader::findAppropriateProfile(const _onvifMedia
 
     for (unsigned long i = 0; i < profiles.size(); ++i) {
         onvifXsd__Profile* profilePtr = profiles.at(i);
-        if (!profilePtr->VideoEncoderConfiguration || 
+        /*if (!profilePtr->VideoEncoderConfiguration || 
                 profilePtr->VideoEncoderConfiguration->Encoding != onvifXsd__VideoEncoding__H264 && m_onvifRes->getCodec() == QnPlOnvifResource::H264 ||
                 profilePtr->VideoEncoderConfiguration->Encoding != onvifXsd__VideoEncoding__JPEG && m_onvifRes->getCodec() == QnPlOnvifResource::JPEG) {
             continue;
-        }
+        }*/
 
         float quality = profilePtr->VideoEncoderConfiguration->Quality;
         if (minVal > quality || minVal == quality && maxInd == minInd || minInd == -1) {

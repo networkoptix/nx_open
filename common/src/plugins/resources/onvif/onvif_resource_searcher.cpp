@@ -1,6 +1,7 @@
 #include "onvif_resource_searcher.h"
 #include "core/resource/camera_resource.h"
 #include "onvif_resource.h"
+#include "onvif_resource_information_fetcher.h"
 
 
 OnvifResourceSearcher::OnvifResourceSearcher():
@@ -59,14 +60,20 @@ QnResourcePtr OnvifResourceSearcher::createResource(QnId resourceTypeId, const Q
         return result;
     }
 
-    if (resourceType->getManufacture() != manufacture())
+    //if (resourceType->getManufacture() != manufacture())
+    /*
+    if (!resourceType->getAllManufacturesIncludeAncessor().contains(manufacture()))
     {
         qDebug() << "OnvifResourceSearcher::createResource: manufacture " << resourceType->getManufacture()
                  << " != " << manufacture();
         return result;
     }
+    */
+    
+    result = OnvifResourceInformationFetcher::createOnvifResourceByManufacture(resourceType->getName()); // use name instead of manufacture to instanciate child onvif resource
+    if (!result )
+        return result; // not found
 
-    result = QnVirtualCameraResourcePtr( new QnPlOnvifResource( ) );
     result->setTypeId(resourceTypeId);
 
     qDebug() << "OnvifResourceSearcher::createResource: create ONVIF camera resource. TypeID: "
