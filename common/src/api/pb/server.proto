@@ -1,12 +1,10 @@
-package proto.pb;
+package pb;
+
+import "resource.proto";
 
 message Server {
-    enum Status {
-       Offline      = 0;
-       Unauthorized = 1;
-       Online       = 2;
-       Disabled     = 3;
-       Recording    = 4;
+    extend Resource {
+        required Server resource = 101;
     }
 
     message Storage {
@@ -16,17 +14,8 @@ message Server {
         required int64        spaceLimit   = 4;
     }
 
-    optional int32        id           = 1;
-    required string       name         = 2;
-    optional Status       status       = 3;
-    required string       guid         = 4;
-    required string       url          = 5;
-    required string       apiUrl       = 6;
-    optional string       netAddrList  = 7;
-    optional bool         reserve      = 8;
-    repeated Storage      storage      = 9;
-}
-
-message Servers {
-    repeated Server server = 1;
+    required string       apiUrl       = 1;
+    optional string       netAddrList  = 2;
+    optional bool         reserve      = 3;
+    repeated Storage      storage      = 4;
 }

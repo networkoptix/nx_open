@@ -27,6 +27,7 @@ client/bin
 mediaserver/bin
 traytool/bin
 
+appserver/gen
 appserver/db/ecs.db
 appserver/setup/db/ecs.db
 appserver/proto/xml/gen

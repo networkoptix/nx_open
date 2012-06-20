@@ -1,4 +1,4 @@
-package proto.pb;
+package pb;
 
 message CameraServerItem {
     required string  mac         = 1;

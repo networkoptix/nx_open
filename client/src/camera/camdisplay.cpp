@@ -878,7 +878,8 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
         if (m_emptyPacketCounter >= 3)
         {
             bool isLive = emptyData->flags & QnAbstractMediaData::MediaFlags_LIVE;
-            if (m_extTimeSrc && !isLive) {
+            bool isVideoCamera = qSharedPointerDynamicCast<QnVirtualCameraResource>(emptyData->dataProvider->getResource()) != 0;
+            if (m_extTimeSrc && !isLive && isVideoCamera) {
             	m_extTimeSrc->onEofReached(this, true); // jump to live if needed
                 m_eofSignalSended = true;
             }
