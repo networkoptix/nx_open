@@ -29,6 +29,8 @@ public slots:
     virtual void accept() override;
     virtual void reject() override;
     void reset();
+    void perform();
+    void cancelProgress();
 
 protected:
     virtual void changeEvent(QEvent *event) override;
@@ -57,6 +59,10 @@ private:
     int m_requestHandle;
 
     QnRenderingWidget* m_renderingWidget;
+
+    QProgressDialog* pd;
+    QTimer* t;
+    int steps;
 };
 
 #endif // LOGINDIALOG_H

@@ -284,6 +284,17 @@ void LoginDialog::at_connectionsComboBox_currentIndexChanged(int index)
 
 void LoginDialog::at_testButton_clicked()
 {
+    steps = 0;
+    pd = new QProgressDialog("Operation in progress.", "Cancel", 0, 100);
+    pd->setWindowModality(Qt::WindowModal);
+    //  connect(pd, SIGNAL(canceled()), this, SLOT(cancel()));
+    t = new QTimer(this);
+    connect(t, SIGNAL(timeout()), this, SLOT(perform()));
+    connect(pd, SIGNAL(canceled()), this, SLOT(cancelProgress()));
+    t->start(500);
+    pd->show();
+    return;
+
     QUrl url = currentUrl();
 
     if (!url.isValid())
@@ -304,4 +315,17 @@ void LoginDialog::at_configureConnectionsButton_clicked()
 
     if (dialog->exec() == QDialog::Accepted)
         updateStoredConnections();
+}
+
+void LoginDialog::perform()
+{
+    pd->setValue(steps);
+    //... perform one percent of the operation
+    steps++;
+    if (steps > pd->maximum())
+        t->stop();
+}
+
+void LoginDialog::cancelProgress(){
+    exit(0);
 }

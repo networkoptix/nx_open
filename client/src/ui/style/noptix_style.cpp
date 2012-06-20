@@ -124,6 +124,9 @@ void QnNoptixStyle::drawControl(ControlElement element, const QStyleOption *opti
         if(drawItemViewItemControl(option, painter, widget))
             return;
         break;
+    case CE_ProgressBar:
+        if(drawProgressBarControl(option, painter, widget))
+            return;
     default:
         break;
     }
@@ -320,6 +323,24 @@ bool QnNoptixStyle::drawItemViewItemControl(const QStyleOption *option, QPainter
     return true;
 }
 
+bool QnNoptixStyle::drawProgressBarControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const{
+    /* Bespin's progress bar painting is way too ugly, so we do it our way. */
+
+    const QStyleOptionProgressBarV2 *pb = qstyleoption_cast<const QStyleOptionProgressBarV2 *>(option);
+    if (!pb)
+        return false;
+
+    bool hover = (option->state & State_Enabled) && (option->state & State_MouseOver);
+
+    // groove + contents ======
+    drawProgressBarGroove(pb, painter, widget);
+    drawProgressBarContents(pb, painter, widget);
+    // label? =========
+    if (hover && pb->textVisible)
+        drawProgressBarLabel(pb, painter, widget);
+    return true;
+}
+
 bool QnNoptixStyle::drawSliderComplexControl(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const {
     /* Bespin's slider painting is way too slow, so we do it our way. */
     const QStyleOptionSlider *sliderOption = qstyleoption_cast<const QStyleOptionSlider *>(option);
@@ -505,5 +526,75 @@ qreal QnNoptixStyle::hoverProgress(const QStyleOption *option, const QWidget *wi
     return progress;
 }
 
+// -------------------------------------------------------------------------- //
+// Progress bar appearance
+// -------------------------------------------------------------------------- //
 
+void QnNoptixStyle::drawProgressBarGroove(const QStyleOptionProgressBarV2 *pb, QPainter *painter, const QWidget *widget) const{
+    bool reverse = pb->direction == Qt::RightToLeft;
+    if (pb->invertedAppearance)
+        reverse = !reverse;
+    const bool vertical = (pb->orientation == Qt::Vertical);
 
+    const bool busy = pb->maximum == 0 && pb->minimum == 0;
+    int x,y,l,t;
+    pb->rect.getRect(&x,&y,&l,&t);
+
+    if (vertical) // swap width & height...
+    { int h = x; x = y; y = h; l = pb->rect.height(); t = pb->rect.width(); }
+
+    double val = 0.0;
+    val = pb->progress / double(pb->maximum - pb->minimum);
+
+    // maybe there's nothing to do for us
+    if (val == 1.0)
+        return;
+}
+
+void QnNoptixStyle::drawProgressBarContents(const QStyleOptionProgressBarV2 *pb, QPainter *painter, const QWidget *widget) const{
+    bool reverse = pb->direction == Qt::RightToLeft;
+    if (pb->invertedAppearance)
+        reverse = !reverse;
+    const bool vertical = (pb->orientation == Qt::Vertical);
+
+    const bool busy = pb->maximum == 0 && pb->minimum == 0;
+    int x,y,l,t;
+    pb->rect.getRect(&x,&y,&l,&t);
+
+    if (vertical) // swap width & height...
+    { int h = x; x = y; y = h; l = pb->rect.height(); t = pb->rect.width(); }
+
+    double val = 0.0;
+    val = pb->progress / double(pb->maximum - pb->minimum);
+
+    // maybe there's nothing to do for us
+    if (val == 0.0)
+        return;
+}
+
+void QnNoptixStyle::drawProgressBarLabel(const QStyleOptionProgressBarV2 *pb, QPainter *painter, const QWidget *widget) const{
+    painter->save();
+    QRect rect = pb->rect;
+    if (pb->orientation == Qt::Vertical)
+    {   // vertical progresses have text rotated by 90 or 270
+        QMatrix m;
+        int h = rect.height(); rect.setHeight(rect.width()); rect.setWidth(h);
+        if (pb->bottomToTop)
+        { m.translate(0.0, pb->rect.height()); m.rotate(-90); }
+        else
+        { m.translate(pb->rect.width(), 0.0); m.rotate(90); }
+        painter->setMatrix(m);
+    }
+    int flags = Qt::AlignCenter | Qt::TextSingleLine;
+    QRect tr = painter->boundingRect(rect, flags, pb->text);
+    if (!tr.isValid())
+    { painter->restore(); return; }
+   // tr.adjust(-Dpi::target.f6, -Dpi::target.f3, Dpi::target.f6, Dpi::target.f3);
+   // Tile::setShape(Tile::Full);
+    QColor bg = pb->palette.color(QPalette::Window); bg.setAlpha(200);
+   // masks.rect[true].render(tr, painter, bg);
+   // Tile::reset();
+    painter->setPen( pb->palette.color(QPalette::WindowText));
+    painter->drawText(rect, flags, pb->text);
+    painter->restore();
+}
