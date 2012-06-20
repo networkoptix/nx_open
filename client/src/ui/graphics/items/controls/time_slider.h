@@ -182,6 +182,41 @@ private:
         CreateSelectionMarker
     };
 
+    struct TimeStepData {
+        TimeStepData(): currentHeight(0.0), targetHeight(0.0), currentLineOpacity(0.0), targetLineOpacity(0.0), currentTextOpacity(0.0), targetTextOpacity(0.0) {}
+
+        qreal currentHeight;
+        qreal targetHeight;
+        qreal currentLineOpacity;
+        qreal targetLineOpacity;
+        qreal currentTextOpacity;
+        qreal targetTextOpacity;
+
+        int currentTextHeight;
+        qreal currentLineHeight;
+    };
+
+    struct LineData {
+        LineData(): visible(true), stretch(1.0) {}
+
+        QnTimePeriodList normalPeriods[Qn::TimePeriodRoleCount];
+        QnTimePeriodList aggregatedPeriods[Qn::TimePeriodRoleCount];
+        QString comment;
+        QPixmap commentPixmap;
+        bool visible;
+        qreal stretch;
+    };
+
+    struct ThumbnailData {
+        ThumbnailData(): opacity(0.0), hiding(false) {}
+
+        QnThumbnail thumbnail;
+        qreal pos;
+        qreal opacity;
+        bool hiding;
+    };
+
+private:
     Marker markerFromPosition(const QPointF &pos, qreal maxDistance = 1.0) const;
     QPointF positionFromMarker(Marker marker) const;
 
@@ -223,44 +258,12 @@ private:
     Q_SLOT void clearThumbnails();
 
     void animateStepValues(int deltaMSecs);
+    void animateThumbnails(int deltaMSecs);
+    bool animateThumbnail(qreal dt, ThumbnailData &data);
+    void freezeThumbnails();
 
 private:
     Q_DECLARE_PRIVATE(GraphicsSlider);
-
-    struct TimeStepData {
-        TimeStepData(): currentHeight(0.0), targetHeight(0.0), currentLineOpacity(0.0), targetLineOpacity(0.0), currentTextOpacity(0.0), targetTextOpacity(0.0) {}
-
-        qreal currentHeight;
-        qreal targetHeight;
-        qreal currentLineOpacity;
-        qreal targetLineOpacity;
-        qreal currentTextOpacity;
-        qreal targetTextOpacity;
-
-        int currentTextHeight;
-        qreal currentLineHeight;
-    };
-
-    struct LineData {
-        LineData(): visible(true), stretch(1.0) {}
-
-        QnTimePeriodList normalPeriods[Qn::TimePeriodRoleCount];
-        QnTimePeriodList aggregatedPeriods[Qn::TimePeriodRoleCount];
-        QString comment;
-        QPixmap commentPixmap;
-        bool visible;
-        qreal stretch;
-    };
-
-    struct ThumbnailData {
-        ThumbnailData(): opacity(1.0), hiding(false), dynamic(true) {}
-
-        QnThumbnail thumbnail;
-        QPointF pos;
-        qreal opacity;
-        bool hiding;
-        bool dynamic;
-    };
 
     qint64 m_windowStart, m_windowEnd;
     qint64 m_minimalWindow;
@@ -295,6 +298,7 @@ private:
     QTimer *m_thumbnailsUpdateTimer;
     QPixmap m_noThumbnailsPixmap;
     QMap<qint64, ThumbnailData> m_thumbnailData;
+    QList<ThumbnailData> m_oldThumbnailData;
 
     qreal m_rulerHeight;
     qreal m_prefferedHeight;

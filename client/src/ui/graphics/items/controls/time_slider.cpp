@@ -642,6 +642,7 @@ qint64 QnTimeSlider::valueFromPosition(const QPointF &position, bool bound) cons
 
 void QnTimeSlider::finishAnimations() {
     animateStepValues(10 * 1000);
+    animateThumbnails(10 * 1000);
 
     if(m_unzooming) {
         setWindow(minimum(), maximum());
@@ -765,6 +766,35 @@ void QnTimeSlider::setRulerHeight(qreal rulerHeight) {
     updateGeometry();
     updateThumbnailsLater();
 }
+
+void QnTimeSlider::addThumbnail(const QnThumbnail &thumbnail) {
+    ThumbnailData data;
+    data.thumbnail = thumbnail;
+
+    m_thumbnailData[thumbnail.time()] = data;
+}
+
+void QnTimeSlider::clearThumbnails() {
+    m_thumbnailData.clear();
+}
+
+void QnTimeSlider::freezeThumbnails() {
+    m_oldThumbnailData = m_thumbnailData.values();
+    clearThumbnails();
+
+    QRectF rect = this->rect();
+    qreal thumbnailsHeight = this->thumbnailsHeight();
+
+    for(int i = 0; i < m_oldThumbnailData.size(); i++) {
+        ThumbnailData &data = m_oldThumbnailData[i];
+        data.hiding = true;
+
+        QPointF pos = positionFromValue(data.thumbnail.time(), false);
+        qreal width = data.thumbnail.size().width() * thumbnailsHeight / data.thumbnail.size().height();
+        data.pos = (pos.x() - rect.center().x()) / width;
+    }
+}
+
 
 
 // -------------------------------------------------------------------------- //
@@ -922,6 +952,33 @@ void QnTimeSlider::animateStepValues(int deltaMSecs) {
     }
 }
 
+void QnTimeSlider::animateThumbnails(int deltaMSecs) {
+    qreal dt = deltaMSecs / 1000.0;
+
+    bool oldShown = false;
+    for(QList<ThumbnailData>::iterator pos = m_oldThumbnailData.begin(); pos != m_oldThumbnailData.end(); pos++)
+        oldShown |= animateThumbnail(dt, *pos);
+    
+    if(!oldShown) {
+        m_oldThumbnailData.clear();
+
+        for(QMap<qint64, ThumbnailData>::iterator pos = m_thumbnailData.begin(); pos != m_thumbnailData.end(); pos++)
+            animateThumbnail(dt, *pos);
+    }
+}
+
+bool QnTimeSlider::animateThumbnail(qreal dt, ThumbnailData &data) {
+    if(data.hiding) {
+        data.opacity = qMax(0.0, data.opacity - dt * 2.0);
+
+        return !qFuzzyIsNull(data.opacity);
+    } else {
+        data.opacity = qMin(1.0, data.opacity + dt * 2.0);
+
+        return true;
+    }
+}
+
 void QnTimeSlider::updateAggregationValue() {
     /* Aggregate to half-pixels. */
     qreal aggregationMSecs = m_msecsPerPixel / 2.0;
@@ -961,12 +1018,6 @@ void QnTimeSlider::updateThumbnails() {
     if (!thumbnailsLoader())
         return;
 
-    /* Don't update thumbnails if slider window is being animated. */
-    if(isAnimatingWindow()) {
-        updateThumbnailsLater();
-        return;
-    }
-
     /* Update loader's bounding size. */
     int boundingHeigth = qRound(thumbnailsHeight());
     QSize boundingSize = QSize(boundingHeigth * 256, boundingHeigth);
@@ -986,31 +1037,30 @@ void QnTimeSlider::updateThumbnails() {
     QnTimePeriod targetPeriod(m_windowStart, m_windowEnd - m_windowStart);
     qint64 step = m_msecsPerPixel * size.width();
 
-    /* Maybe we don't need to send the request? Check that. */
-    if(!boundingSizeChanged)
-        if(qAbs(thumbnailsLoader()->timeStep() - step) < m_msecsPerPixel * 5.0)
-            return; 
+    bool updateTimeStep = true;
+    if(!boundingSizeChanged) {
+        qreal deltaStep = step - thumbnailsLoader()->timeStep();
+
+        if(deltaStep < m_msecsPerPixel * 5.0 && deltaStep > 0.0)
+            updateTimeStep = false;
+    }
     
     /* Add small margins to the period to request. */
     qint64 d = targetPeriod.durationMs / 4;
     QnTimePeriod extendedTargetPeriod = QnTimePeriod(targetPeriod.startTimeMs - d, targetPeriod.durationMs + 2 * d);
 
     /* Load, finally. */
+    if(updateTimeStep) {
+        if(m_oldThumbnailData.isEmpty())
+            freezeThumbnails();
+
+        if(!isAnimatingWindow())
+            thumbnailsLoader()->setTimeStep(step);
+    }
     thumbnailsLoader()->setTimePeriod(extendedTargetPeriod.startTimeMs, extendedTargetPeriod.endTimeMs()); 
-    thumbnailsLoader()->setTimeStep(step);
 
-    qDebug() << "LOADED!!!" << QDateTime::currentMSecsSinceEpoch();
-}
-
-void QnTimeSlider::addThumbnail(const QnThumbnail &thumbnail) {
-    ThumbnailData data;
-    data.thumbnail = thumbnail;
-
-    m_thumbnailData[thumbnail.time()] = data;
-}
-
-void QnTimeSlider::clearThumbnails() {
-    m_thumbnailData.clear();
+    if(isAnimatingWindow())
+        updateThumbnailsLater();
 }
 
 
@@ -1388,23 +1438,49 @@ void QnTimeSlider::drawThumbnails(QPainter *painter, const QRectF &rect) {
     qreal aspectRatio = QnGeometry::aspectRatio(thumbnailsLoader()->thumbnailSize());
     qreal thumbnailWidth = rect.height() * aspectRatio;
 
-    qint64 startTime = qFloor(m_windowStart, step);
-    qint64 endTime = qCeil(m_windowEnd, step);
+    if(!m_oldThumbnailData.isEmpty()) {
+        QRectF boundingRect = rect; 
+        for (int i = 0; i < m_oldThumbnailData.size(); i++) {
+            const ThumbnailData &data = m_oldThumbnailData[i];
+            if(data.thumbnail.isEmpty())
+                continue;
 
-    QRectF boundingRect = rect; 
-    for (qint64 time = startTime; time < endTime; time += step) {
-        ThumbnailData data = m_thumbnailData.value(time);
-        if(data.thumbnail.isEmpty())
-            continue;
-       
-        const QPixmap &pixmap = data.thumbnail.pixmap();
+            const QPixmap &pixmap = data.thumbnail.pixmap();
 
-        qreal x = positionFromValue(time, false).x();
-        QSizeF targetSize(pixmap.width() * rect.height() / pixmap.height(), rect.height());
-        QRectF targetRect(x - targetSize.width() / 2, rect.top(), targetSize.width(), targetSize.height());
-        
-        drawCroppedPixmap(painter, targetRect, boundingRect, pixmap, pixmap.rect());
-        boundingRect.setLeft(qMax(boundingRect.left(), targetRect.right()));
+            qreal x = rect.width() / 2 + data.pos * thumbnailWidth;;
+            QSizeF targetSize(pixmap.width() * rect.height() / pixmap.height(), rect.height());
+            QRectF targetRect(x - targetSize.width() / 2, rect.top(), targetSize.width(), targetSize.height());
+
+            qreal opacity = painter->opacity();
+            painter->setOpacity(opacity * data.opacity);
+            drawCroppedPixmap(painter, targetRect, boundingRect, pixmap, pixmap.rect());
+            painter->setOpacity(opacity);
+
+            boundingRect.setLeft(qMax(boundingRect.left(), targetRect.right()));
+        }
+    } else {
+        qint64 startTime = qFloor(m_windowStart, step);
+        qint64 endTime = qCeil(m_windowEnd, step);
+
+        QRectF boundingRect = rect; 
+        for (qint64 time = startTime; time < endTime; time += step) {
+            ThumbnailData data = m_thumbnailData.value(time);
+            if(data.thumbnail.isEmpty())
+                continue;
+
+            const QPixmap &pixmap = data.thumbnail.pixmap();
+
+            qreal x = positionFromValue(time, false).x();
+            QSizeF targetSize(pixmap.width() * rect.height() / pixmap.height(), rect.height());
+            QRectF targetRect(x - targetSize.width() / 2, rect.top(), targetSize.width(), targetSize.height());
+
+            qreal opacity = painter->opacity();
+            painter->setOpacity(opacity * data.opacity);
+            drawCroppedPixmap(painter, targetRect, boundingRect, pixmap, pixmap.rect());
+            painter->setOpacity(opacity);
+
+            boundingRect.setLeft(qMax(boundingRect.left(), targetRect.right()));
+        }
     }
 }
 
@@ -1481,6 +1557,8 @@ void QnTimeSlider::tick(int deltaMSecs) {
 
         animateStepValues(8.0 * deltaMSecs);
     }
+
+    animateThumbnails(deltaMSecs);
 }
 
 void QnTimeSlider::sliderChange(SliderChange change) {
