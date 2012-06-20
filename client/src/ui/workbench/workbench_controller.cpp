@@ -434,7 +434,7 @@ void QnWorkbenchController::displayMotionGrid(const QList<QnResourceWidget *> &w
         if(!(widget->resource()->flags() & QnResource::network))
             continue;
 
-        widget->setDisplayFlag(QnResourceWidget::DisplayMotionGrid, display);
+        widget->setDisplayFlag(QnResourceWidget::DisplayMotion, display);
     }
 }
 
@@ -980,7 +980,7 @@ void QnWorkbenchController::at_motionSelectionProcessStarted(QGraphicsView *, Qn
         return;
     }
 
-    widget->setDisplayFlag(QnResourceWidget::DisplayMotionGrid, true);
+    widget->setDisplayFlag(QnResourceWidget::DisplayMotion, true);
     foreach(QnResourceWidget *otherWidget, display()->widgets())
         if(otherWidget != widget)
             otherWidget->clearMotionSelection();
@@ -1215,7 +1215,7 @@ void QnWorkbenchController::at_toggleMotionAction_triggered() {
 
     bool hidden = false;
     foreach(QnResourceWidget *widget, widgets)
-        if((widget->resource()->flags() & QnResource::network) && !(widget->displayFlags() & QnResourceWidget::DisplayMotionGrid))
+        if((widget->resource()->flags() & QnResource::network) && !(widget->displayFlags() & QnResourceWidget::DisplayMotion))
             hidden = true;
 
     if(hidden) {

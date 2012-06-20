@@ -660,7 +660,7 @@ void QnWorkbenchNavigator::updateCurrentPeriods() {
 void QnWorkbenchNavigator::updateCurrentPeriods(Qn::TimePeriodRole type) {
     QnTimePeriodList periods;
 
-    if(type == Qn::MotionRole && m_currentWidget && !(m_currentWidget->displayFlags() & QnResourceWidget::DisplayMotionGrid)) {
+    if(type == Qn::MotionRole && m_currentWidget && !(m_currentWidget->displayFlags() & QnResourceWidget::DisplayMotion)) {
         /* Use empty periods. */
     } else if(QnCachingTimePeriodLoader *loader = this->loader(m_currentWidget)) {
         periods = loader->periods(type);
@@ -677,7 +677,7 @@ void QnWorkbenchNavigator::updateSyncedPeriods() {
 void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodRole type) {
     QVector<QnTimePeriodList> periodsList;
     foreach(const QnResourceWidget *widget, m_syncedWidgets) {
-        if(type == Qn::MotionRole && !(widget->displayFlags() & QnResourceWidget::DisplayMotionGrid)) {
+        if(type == Qn::MotionRole && !(widget->displayFlags() & QnResourceWidget::DisplayMotion)) {
             /* Ignore it. */
         } else if(QnCachingTimePeriodLoader *loader = this->loader(widget->resource())) {
             periodsList.push_back(loader->periods(type));
@@ -1019,7 +1019,7 @@ void QnWorkbenchNavigator::at_widget_displayFlagsChanged() {
 
 void QnWorkbenchNavigator::at_widget_displayFlagsChanged(QnResourceWidget *widget) {
     int oldSize = m_motionIgnoreWidgets.size();
-    if(widget->displayFlags() & QnResourceWidget::DisplayMotionGrid) {
+    if(widget->displayFlags() & QnResourceWidget::DisplayMotion) {
         m_motionIgnoreWidgets.insert(widget);
     } else {
         m_motionIgnoreWidgets.remove(widget);

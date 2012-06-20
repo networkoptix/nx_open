@@ -295,12 +295,12 @@ namespace Qn {
         UnmaximizeItemAction,
 
         /**
-         * Shows motion search grid on an item.
+         * Shows motion on an item.
          */
         ShowMotionAction,
 
         /**
-         * Hides motion search grid on an item.
+         * Hides motion on an item.
          */
         HideMotionAction,
 

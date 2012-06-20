@@ -157,7 +157,7 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
         m_resourceWidget = m_context->display()->widget(item);
         m_resourceWidget->setDrawMotionWindows(QnResourceWidget::DrawAllMotionInfo);
         m_resourceWidget->setDisplayFlag(QnResourceWidget::DisplayButtons, false);
-        m_resourceWidget->setDisplayFlag(QnResourceWidget::DisplayMotionGrid, true);
+        m_resourceWidget->setDisplayFlag(QnResourceWidget::DisplayMotion, true);
     }
 
     /* Consider motion mask list changed. */

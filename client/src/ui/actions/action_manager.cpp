@@ -608,25 +608,25 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::ShowMotionAction).
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
-        text(tr("Show Motion Grid")).
+        text(tr("Show Motion")).
         shortcut(tr("Alt+G")).
         condition(new QnMotionGridDisplayActionCondition(false, this));
 
     factory(Qn::HideMotionAction).
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
-        text(tr("Hide Motion Grid")).
+        text(tr("Hide Motion")).
         shortcut(tr("Alt+G")).
         condition(new QnMotionGridDisplayActionCondition(true, this));
 
     factory(Qn::ToggleMotionAction).
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::HotkeyOnly).
-        text(tr("Toggle Motion Grid Display")).
+        text(tr("Toggle Motion Display")).
         shortcut(tr("Alt+G")).
         condition(new QnMotionGridDisplayActionCondition(this));
 
     factory(Qn::CheckFileSignatureAction).
         flags(Qn::Scene | Qn::SingleTarget).
-        text(tr("Check file watermark")).
+        text(tr("Check File Watermark")).
         shortcut(tr("Alt+C")).
         autoRepeat(false).
         condition(new QnCheckFileSignatureActionCondition(this));
