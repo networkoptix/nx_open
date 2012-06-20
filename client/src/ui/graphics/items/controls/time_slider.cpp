@@ -782,8 +782,8 @@ void QnTimeSlider::freezeThumbnails() {
     m_oldThumbnailData = m_thumbnailData.values();
     clearThumbnails();
 
-    QRectF rect = this->rect();
-    qreal thumbnailsHeight = this->thumbnailsHeight();
+    QRectF rect = QnGeometry::eroded(this->thumbnailsRect(), MarginsF(1.0, 1.0, 1.0, 0.0));
+    qreal thumbnailsHeight = rect.height();
 
     for(int i = 0; i < m_oldThumbnailData.size(); i++) {
         ThumbnailData &data = m_oldThumbnailData[i];
