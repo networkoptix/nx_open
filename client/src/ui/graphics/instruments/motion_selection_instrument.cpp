@@ -55,7 +55,7 @@ public:
     }
 
     virtual QRectF boundingRect() const override {
-        return QRectF(m_origin, m_corner).normalized().united(QRectF(m_mouse_origin, m_mouse_corner).normalized());
+        return QRectF(m_origin, m_corner).normalized().united(QRectF(m_mouseOrigin, m_mouseCorner).normalized());
     }
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *widget) override {
@@ -67,10 +67,12 @@ public:
         QnScopedPainterBrushRollback brushRollback(painter, m_colors[MotionSelectionInstrument::Base]);
         painter->drawRect(QRectF(m_origin, m_corner).normalized());
         
+#ifdef QN_SHOW_MOTION_SELECTION_FRAME
         /* Draw mouse rubber band */
         painter->setPen(m_colors[MotionSelectionInstrument::MouseBorder]);
-        painter->setBrush(Qt::transparent);
-        painter->drawRect(QRectF(m_mouse_origin, m_mouse_corner).normalized());
+        painter->setBrush(Qt::NoBrush);
+        painter->drawRect(QRectF(m_mouseOrigin, m_mouseCorner).normalized());
+#endif
     }
 
     /**
@@ -95,8 +97,8 @@ public:
     /**
      * Sets this item's grid selection - fixed on cell borders.
      * 
-     * \param origin Origin in parent coordinates
-     * \param corner Corner in parent coordinates
+     * \param origin                    Origin in parent coordinates
+     * \param corner                    Corner in parent coordinates
      */
     void setGridSelection(const QPointF &origin, const QPointF &corner) {
         prepareGeometryChange();
@@ -107,32 +109,32 @@ public:
     /**
      * Sets this item's grid selection in grid coordinates.
      * 
-     * \param origin Origin in grid coordinates
-     * \param corner Corner in grid coordinates
+     * \param gridOrigin                Origin in grid coordinates
+     * \param gridCorner                Corner in grid coordinates
      */
-    void setGridRect(const QPoint &grid_origin, const QPoint &grid_corner) {
-        m_grid_origin = grid_origin;
-        m_grid_corner = grid_corner;
+    void setGridRect(const QPoint &gridOrigin, const QPoint &gridCorner) {
+        m_gridOrigin = gridOrigin;
+        m_gridCorner = gridCorner;
     }
 
     /**
      * Sets this item's mouse rubber band selection.
      * 
-     * \param origin Origin in parent coordinates
+     * \param mouseOrigin               Origin in parent coordinates
      */
-    void setMouseOrigin(const QPointF &mouse_origin) {
+    void setMouseOrigin(const QPointF &mouseOrigin) {
         prepareGeometryChange();
-        m_mouse_origin = mouse_origin;
+        m_mouseOrigin = mouseOrigin;
     }
 
     /**
      * Sets this item's mouse rubber band selection.
      * 
-     * \param corner Corner in parent coordinates
+     * \param mouseCorner               Corner in parent coordinates
      */
-    void setMouseCorner(const QPointF &mouse_corner) {
+    void setMouseCorner(const QPointF &mouseCorner) {
         prepareGeometryChange();
-        m_mouse_corner = mouse_corner;
+        m_mouseCorner = mouseCorner;
     }
 
     void setColor(MotionSelectionInstrument::ColorRole role, const QColor &color) {
@@ -145,9 +147,9 @@ public:
      */
     QRect gridRect(){
         return QRect(
-            QPoint(qMin(m_grid_origin.x(), m_grid_corner.x()), qMin(m_grid_origin.y(), m_grid_corner.y())),
-            QSize(qAbs(m_grid_origin.x() - m_grid_corner.x()), qAbs(m_grid_origin.y() - m_grid_corner.y()))
-            );
+            QPoint(qMin(m_gridOrigin.x(), m_gridCorner.x()), qMin(m_gridOrigin.y(), m_gridCorner.y())),
+            QSize(qAbs(m_gridOrigin.x() - m_gridCorner.x()), qAbs(m_gridOrigin.y() - m_gridCorner.y()))
+        );
     }
 
 private:
@@ -161,16 +163,16 @@ private:
     QPointF m_corner;
 
     /** Origin of the selection item, in grid coordinates. */
-    QPoint m_grid_origin;
+    QPoint m_gridOrigin;
 
     /** Second corner of the selection item, in grid coordinates. */
-    QPoint m_grid_corner;
+    QPoint m_gridCorner;
 
     /** Origin of the mouse rubber band, in parent coordinates. */
-    QPointF m_mouse_origin;
+    QPointF m_mouseOrigin;
 
     /** Second corner of the mouse rubber band, in parent coordinates. */
-    QPointF m_mouse_corner;
+    QPointF m_mouseCorner;
 
     /** Colors for drawing the selection rect. */
     QColor m_colors[MotionSelectionInstrument::RoleCount];
@@ -337,7 +339,7 @@ void MotionSelectionInstrument::startDrag(DragInfo *info) {
     selectionItem()->setViewport(info->view()->viewport());
     selectionItem()->setVisible(true);
 
-    // safe initialize block
+    /* Safe initialize block. */
     QPoint gridPos = target()->mapToMotionGrid(itemPos);
     selectionItem()->setGridRect(gridPos, gridPos);
     selectionItem()->setGridSelection(target()->mapFromMotionGrid(gridPos),
