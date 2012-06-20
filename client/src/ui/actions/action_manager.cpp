@@ -755,7 +755,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::ExportLayoutAction).
         flags(Qn::Slider | Qn::SingleTarget).
-        text(tr("Export Selected as Layout...")).
+        text(tr("Export Selection for All Items...")).
         condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::DisabledAction, this));
 
     factory().
