@@ -984,22 +984,20 @@ void QnWorkbenchNavigator::at_display_widgetChanged(Qn::ItemRole role) {
 }
 
 void QnWorkbenchNavigator::at_display_widgetAdded(QnResourceWidget *widget) {
-    if(QnSecurityCamResourcePtr cameraResource = widget->resource().dynamicCast<QnSecurityCamResource>()) {
+    if(widget->resource()->flags() & QnResource::utc)
         addSyncedWidget(widget);
 
-        connect(widget, SIGNAL(motionSelectionChanged()), this, SLOT(at_widget_motionSelectionChanged()));
-        connect(widget, SIGNAL(displayFlagsChanged()), this, SLOT(at_widget_displayFlagsChanged()));
-        connect(widget->resource().data(), SIGNAL(flagsChanged()), this, SLOT(at_resource_flagsChanged()));
-    }
+    connect(widget, SIGNAL(motionSelectionChanged()), this, SLOT(at_widget_motionSelectionChanged()));
+    connect(widget, SIGNAL(displayFlagsChanged()), this, SLOT(at_widget_displayFlagsChanged()));
+    connect(widget->resource().data(), SIGNAL(flagsChanged()), this, SLOT(at_resource_flagsChanged()));
 }
 
 void QnWorkbenchNavigator::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {
-    if(QnSecurityCamResourcePtr cameraResource = widget->resource().dynamicCast<QnSecurityCamResource>()) {
-        disconnect(widget, NULL, this, NULL);
-        disconnect(widget->resource().data(), NULL, this, NULL);
+    disconnect(widget, NULL, this, NULL);
+    disconnect(widget->resource().data(), NULL, this, NULL);
 
+    if(widget->resource()->flags() & QnResource::utc)
         removeSyncedWidget(widget);
-    }
 }
 
 void QnWorkbenchNavigator::at_widget_motionSelectionChanged() {
