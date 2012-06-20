@@ -1567,12 +1567,17 @@ void QnTimeSlider::sliderChange(SliderChange change) {
     switch(change) {
     case SliderRangeChange: {
         qint64 windowStart = m_windowStart;
-        if((m_options & StickToMinimum) && windowStart == m_oldMinimum)
-            windowStart = minimum();
-
         qint64 windowEnd = m_windowEnd;
-        if((m_options & StickToMaximum) && windowEnd == m_oldMaximum)
+
+        if((m_options & StickToMaximum) && windowEnd == m_oldMaximum) {
+            windowStart += maximum() - windowEnd;
             windowEnd = maximum();
+        }
+
+        if((m_options & StickToMinimum) && windowStart == m_oldMinimum) {
+            windowEnd += minimum() - windowStart;
+            windowStart = minimum();
+        }
 
         /* Stick zoom anchor. */
         if(m_zoomAnchor == m_oldMinimum)
