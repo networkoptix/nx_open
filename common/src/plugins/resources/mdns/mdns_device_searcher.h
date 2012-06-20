@@ -6,14 +6,14 @@
 #include "core/resourcemanagment/resource_searcher.h"
 
 
-class OnvifResourceSearcherOld : public QnAbstractNetworkResourceSearcher
+class QnMdnsResourceSearcher : public QnAbstractNetworkResourceSearcher
 {
 protected:
-    OnvifResourceSearcherOld();
+    QnMdnsResourceSearcher();
 public:
     
 
-	~OnvifResourceSearcherOld();
+	~QnMdnsResourceSearcher();
 
     bool isProxy() const;
 

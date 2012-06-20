@@ -2,9 +2,10 @@
 #define iq_device_server_h_1825
 
 #include "core/resourcemanagment/resource_searcher.h"
-#include "../onvif_old/onvif_device_searcher.h"
+#include "../mdns/mdns_device_searcher.h"
 
-class QnPlIqResourceSearcher : public OnvifResourceSearcherOld
+
+class QnPlIqResourceSearcher : public QnMdnsResourceSearcher
 {
     QnPlIqResourceSearcher();
 
