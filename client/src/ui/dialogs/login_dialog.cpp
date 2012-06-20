@@ -157,6 +157,18 @@ void LoginDialog::accept()
     QnAppServerConnectionPtr connection = QnAppServerConnectionFactory::createConnection(url);
     m_requestHandle = connection->connectAsync(this, SLOT(at_connectFinished(int, const QByteArray &, QnConnectInfoPtr, int)));
 
+	{
+		// Temporary 1.0/1.1 version check.
+		// Let's remove it 1.3/1.4.
+		QUrl httpUrl;
+		httpUrl.setHost(url.host());
+		httpUrl.setPort(url.port());
+		httpUrl.setScheme("http");
+		httpUrl.setUserName("");
+		httpUrl.setPassword("");
+		QnSessionManager::instance()->sendAsyncGetRequest(httpUrl, "resourceEx", this, SLOT(at_oldHttpConnectFinished(int,QByteArray,QByteArray,int)));
+	}
+
     updateUsability();
 }
 
@@ -255,6 +267,24 @@ void LoginDialog::updateUsability() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+void LoginDialog::at_oldHttpConnectFinished(int status, QByteArray errorString, QByteArray data, int handle)
+{
+	Q_UNUSED(handle);
+
+	if (status == 204)
+	{
+		m_requestHandle = -1;
+
+		updateUsability();
+
+        QMessageBox::warning(
+            this,
+            tr("Could not connect to Enterprise Controller"),
+            tr("Connection could not be established.\nThe Enterprise Controller is incompatible. Please upgrade your enterprise controller or contact VMS administrator.")
+        );
+	}
+}
+
 void LoginDialog::at_connectFinished(int status, const QByteArray &/*errorString*/, QnConnectInfoPtr connectInfo, int requestHandle)
 {
     if(m_requestHandle != requestHandle) 

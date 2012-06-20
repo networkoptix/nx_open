@@ -371,6 +371,26 @@ void initAppServerEventConnection(const QSettings &settings, const QnVideoServer
     eventManager->init(appServerEventsUrl, EVENT_RECONNECT_TIMEOUT);
 }
 
+bool checkIfAppServerIsOld()
+{
+    // Check if that was 1.0/1.1
+    QUrl httpUrl;
+    httpUrl.setHost(QnAppServerConnectionFactory::defaultUrl().host());
+    httpUrl.setPort(QnAppServerConnectionFactory::defaultUrl().port());
+    httpUrl.setScheme("http");
+    httpUrl.setUserName("");
+    httpUrl.setPassword("");
+
+    QByteArray reply, errorString;
+    if (QnSessionManager::instance()->sendGetRequest(httpUrl, "resourceEx", reply, errorString) == 204)
+    {
+        cl_log.log("Old Incomatible Enterprise Controller version detected. Please update yout Enterprise Controler", cl_logERROR);
+        return true;
+    }
+
+    return false;
+}
+
 QnMain::QnMain(int argc, char* argv[])
     : m_argc(argc),
     m_argv(argv),
@@ -478,9 +498,16 @@ void QnMain::run()
 
     QByteArray errorString;
     QnConnectInfoPtr connectInfo(new QnConnectInfo());
-    while (!needToStop() && appServerConnection->connect(connectInfo, errorString))
+    while (!needToStop())
     {
+        if (checkIfAppServerIsOld())
+            return;
+
+        if (appServerConnection->connect(connectInfo, errorString) == 0)
+            break;
+
         cl_log.log("Can't connect to Enterprise Controller: ", errorString.data(), cl_logWARNING);
+
         QnSleep::msleep(1000);
     }
 
