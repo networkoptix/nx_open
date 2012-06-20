@@ -461,11 +461,11 @@ onvifXsd__Profile* QnOnvifStreamReader::findAppropriateProfile(const _onvifMedia
 
     for (unsigned long i = 0; i < profiles.size(); ++i) {
         onvifXsd__Profile* profilePtr = profiles.at(i);
-        /*if (!profilePtr->VideoEncoderConfiguration || 
+        if (!profilePtr->VideoEncoderConfiguration/* || 
                 profilePtr->VideoEncoderConfiguration->Encoding != onvifXsd__VideoEncoding__H264 && m_onvifRes->getCodec() == QnPlOnvifResource::H264 ||
-                profilePtr->VideoEncoderConfiguration->Encoding != onvifXsd__VideoEncoding__JPEG && m_onvifRes->getCodec() == QnPlOnvifResource::JPEG) {
+                profilePtr->VideoEncoderConfiguration->Encoding != onvifXsd__VideoEncoding__JPEG && m_onvifRes->getCodec() == QnPlOnvifResource::JPEG*/) {
             continue;
-        }*/
+        }
 
         float quality = profilePtr->VideoEncoderConfiguration->Quality;
         if (minVal > quality || minVal == quality && maxInd == minInd || minInd == -1) {

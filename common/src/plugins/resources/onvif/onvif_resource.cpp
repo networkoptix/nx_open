@@ -861,11 +861,11 @@ int QnPlOnvifResource::countAppropriateProfiles(const _onvifMedia__GetProfilesRe
 
     for (unsigned long i = 0; i < profiles.size(); ++i) {
         onvifXsd__Profile* profilePtr = profiles.at(i);
-        /*if (!profilePtr->VideoEncoderConfiguration || 
+        if (!profilePtr->VideoEncoderConfiguration/* || 
                 profilePtr->VideoEncoderConfiguration->Encoding != onvifXsd__VideoEncoding__H264 && codec == H264 ||
-                profilePtr->VideoEncoderConfiguration->Encoding != onvifXsd__VideoEncoding__JPEG && codec == JPEG) {
+                profilePtr->VideoEncoderConfiguration->Encoding != onvifXsd__VideoEncoding__JPEG && codec == JPEG*/) {
             continue;
-        }*/
+        }
 
         QString encodersHashKey(profilePtr->VideoEncoderConfiguration->token.c_str());
         onvifXsd__VideoEncoderConfiguration* encoder = encoders.videoEncodersUnused.take(encodersHashKey);
