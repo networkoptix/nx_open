@@ -5,31 +5,16 @@
 #include "core/resource/camera_resource.h"
 #include "utils/network/simple_http_client.h"
 #include "core/datapacket/mediadatapacket.h"
+#include "../onvif/onvif_resource.h"
 
-class QnPlWatchDogResource : public QnPhysicalCameraResource
+class QnPlWatchDogResource : public QnPlOnvifResource
 {
 public:
-    static const char* MANUFACTURE;
-
     QnPlWatchDogResource();
-
-    virtual bool isResourceAccessible();
-
-    virtual bool updateMACAddress();
-
-    virtual QString manufacture() const;
-
-    virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
-
-    bool hasDualStreaming() const override {return false;}
-
 protected:
-
-    void initInternal() override;
-
-    virtual QnAbstractStreamDataProvider* createLiveDataProvider();
-
-    virtual void setCropingPhysical(QRect croping);
+    bool initInternal() override;
+private:
+    bool isDualStreamingEnabled();
 };
 
 typedef QnSharedResourcePointer<QnPlWatchDogResource> QnPlWatchDogResourcePtr;

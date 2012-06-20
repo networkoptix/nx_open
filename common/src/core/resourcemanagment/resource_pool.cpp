@@ -58,7 +58,7 @@ void QnResourcePool::setLayoutsUpdated(bool updateLayouts) {
 
 void QnResourcePool::addResources(const QnResourceList &resources)
 {
-    QMutexLocker locker(&m_resourcesMtx);
+    m_resourcesMtx.lock();
 
     foreach (const QnResourcePtr &resource, resources)
     {
@@ -118,12 +118,17 @@ void QnResourcePool::addResources(const QnResourceList &resources)
         }
     }
 
+    m_resourcesMtx.unlock();
+
     foreach (const QnResourcePtr &resource, newResources.values())
     {
         connect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)), this, SLOT(handleStatusChange()), Qt::QueuedConnection);
         connect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)), this, SLOT(handleResourceChange()), Qt::QueuedConnection);
 		connect(resource.data(), SIGNAL(disabledChanged(bool, bool)), this, SLOT(handleResourceChange()), Qt::QueuedConnection);
         connect(resource.data(), SIGNAL(resourceChanged()), this, SLOT(handleResourceChange()), Qt::QueuedConnection);
+
+        if (resource->getStatus() != QnResource::Offline && !resource->isDisabled())
+            resource->init();
 
         TRACE("RESOURCE ADDED" << resource->metaObject()->className() << resource->getName());
         emit resourceAdded(resource);

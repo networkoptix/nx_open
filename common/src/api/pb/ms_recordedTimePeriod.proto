@@ -1,4 +1,4 @@
-package proto.pb;
+package pb;
 
 message RecordedTimePeriod {
     required int64 startTime = 1;

@@ -14,6 +14,8 @@ class _onvifMedia__GetVideoEncoderConfigurationOptionsResponse;
 //class _onvifMedia__GetVideoEncoderConfigurationsResponse;
 struct VideoEncoders;
 class _onvifMedia__GetProfilesResponse;
+class _onvifMedia__GetVideoSourceConfigurationsResponse;
+class _onvifDevice__GetNetworkInterfacesResponse;
 
 //first = width, second = height
 typedef QPair<int, int> ResolutionPair;
@@ -35,10 +37,15 @@ public:
 	static const float QUALITY_COEF;
     static const double MAX_SECONDARY_RESOLUTION_SQUARE;
 
+    static const QString fetchMacAddress(const _onvifDevice__GetNetworkInterfacesResponse& response, const QString& senderIpAddress);
+
     QnPlOnvifResource();
 
     static const QString createOnvifEndpointUrl(const QString& ipAddress);
 
+    virtual bool setHostAddress(const QHostAddress &ip, QnDomain domain = QnDomainMemory) override;
+    virtual QHostAddress getHostAddress() const override;
+    virtual QString getUniqueId() const override;
     virtual bool isResourceAccessible() override;
     virtual bool updateMACAddress() override;
     virtual QString manufacture() const override;
@@ -46,6 +53,7 @@ public:
     virtual int getMaxFps() override;
     virtual void setIframeDistance(int /*frames*/, int /*timems*/) override {}
     virtual bool hasDualStreaming() const override;
+    virtual bool shoudResolveConflicts() const override;
 
     bool isInitialized() const;
 
@@ -71,7 +79,7 @@ public:
     CODECS getCodec() const;
 
 protected:
-    void initInternal() override;
+    bool initInternal() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
     virtual void setCropingPhysical(QRect croping);
@@ -91,6 +99,7 @@ private:
     bool setVideoEncoderOptionsJpeg(const _onvifMedia__GetVideoEncoderConfigurationOptionsResponse& response);
     void analyzeVideoEncoders(VideoEncoders& encoders, bool setOptions);
     int countAppropriateProfiles(const _onvifMedia__GetProfilesResponse& response, VideoEncoders& encoders);
+    void setVideoSource(const _onvifMedia__GetVideoSourceConfigurationsResponse& response, VideoEncoders& encoders) const;
     void setOnvifUrls();
     void save();
 	void setMinMaxQuality(int min, int max);
@@ -120,6 +129,7 @@ private:
     CODECS codec;
     ResolutionPair primaryResolution;
     ResolutionPair secondaryResolution;
+    QHostAddress m_hostAddr;
 };
 
 typedef QSharedPointer<QnPlOnvifResource> QnPlOnvifResourcePtr;

@@ -542,7 +542,6 @@ bool CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 
 void CLCamDisplay::onBeforeJump(qint64 time)
 {
-    onRealTimeStreamHint(time == DATETIME_NOW && m_speed >= 0);
 
     /*
     if (time < 1000000ll * 100000)
@@ -552,6 +551,7 @@ void CLCamDisplay::onBeforeJump(qint64 time)
     */
     
     QMutexLocker lock(&m_timeMutex);
+    onRealTimeStreamHint(time == DATETIME_NOW && m_speed >= 0);
 
     m_lastDecodedTime = AV_NOPTS_VALUE;
     for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
@@ -791,8 +791,11 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
     m_processedPackets++;
 
     bool mediaIsLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
+
+    m_timeMutex.lock();
     if (mediaIsLive != m_isRealTimeSource && !m_buffering)
         onRealTimeStreamHint(mediaIsLive);
+    m_timeMutex.unlock();
 
     float speed = m_speed;
     bool speedIsNegative = speed < 0;
@@ -875,7 +878,8 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
         if (m_emptyPacketCounter >= 3)
         {
             bool isLive = emptyData->flags & QnAbstractMediaData::MediaFlags_LIVE;
-            if (m_extTimeSrc && !isLive) {
+            bool isVideoCamera = qSharedPointerDynamicCast<QnVirtualCameraResource>(emptyData->dataProvider->getResource()) != 0;
+            if (m_extTimeSrc && !isLive && isVideoCamera) {
             	m_extTimeSrc->onEofReached(this, true); // jump to live if needed
                 m_eofSignalSended = true;
             }

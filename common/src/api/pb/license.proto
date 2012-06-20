@@ -1,4 +1,4 @@
-package proto.pb;
+package pb;
 
 message License {
     required string name        = 1;

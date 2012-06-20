@@ -20,6 +20,7 @@
 QnResource::QnResource(): 
     QObject(),
     m_mutex(QMutex::Recursive),
+    m_initMutex(QMutex::Recursive),
     m_flags(0),
 	m_disabled(false),
     m_status(Offline),
@@ -755,10 +756,9 @@ void QnResource::setDisabled(bool disabled)
 
 void QnResource::init()
 {
-    if (!m_initialized) {
-        m_initialized = true;
-        initInternal();
-    }
+    QMutexLocker lock(&m_initMutex);
+    if (!m_initialized)
+        m_initialized = initInternal();
 }
 
 bool QnResource::isInitialized() const

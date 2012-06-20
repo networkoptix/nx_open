@@ -1,48 +1,56 @@
 #include "digital_watchdog_resource.h"
-#include "digital_watchdog_stream_reader.h"
-
-
-const char* QnPlWatchDogResource::MANUFACTURE = "Digital Watchdog";
-
 
 QnPlWatchDogResource::QnPlWatchDogResource()
 {
-    setAuth("admin", "admin");
+
 }
 
-bool QnPlWatchDogResource::isResourceAccessible()
+bool QnPlWatchDogResource::isDualStreamingEnabled()
 {
-    return updateMACAddress();
+    CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth());
+    CLHttpStatus status = http.doGET(QByteArray("/cgi-bin/getconfig.cgi?action=onvif"));
+    if (status == CL_HTTP_SUCCESS) 
+    {
+        QByteArray body;
+        http.readAll(body);
+        QList<QByteArray> lines = body.split(',');
+        for (int i = 0; i < lines.size(); ++i) 
+        {
+            if (lines[i].toLower().contains("onvif_stream_number")) 
+            {
+                QList<QByteArray> params = lines[i].split(':');
+                if (params.size() >= 2) 
+                {
+                    int streams = params[1].trimmed().toInt();
+                    
+                    return streams >= 2;
+                }
+            }
+        }
+    }
+    else if (status == CL_HTTP_AUTH_REQUIRED) 
+    {
+        setStatus(Unauthorized);
+    }
+
+    return false;
 }
 
-bool QnPlWatchDogResource::updateMACAddress()
+bool QnPlWatchDogResource::initInternal() 
 {
-    return true;
-}
-
-QString QnPlWatchDogResource::manufacture() const
-{
-    return MANUFACTURE;
-}
-
-void QnPlWatchDogResource::setIframeDistance(int /*frames*/, int /*timems*/)
-{
-}
-
-QnAbstractStreamDataProvider* QnPlWatchDogResource::createLiveDataProvider()
-{
-    return new QnPlDWDStreamReader(toSharedPointer());
-}
-
-void QnPlWatchDogResource::setCropingPhysical(QRect /*croping*/)
-{
-}
-
-void QnPlWatchDogResource::initInternal() 
-{
-    //QnPlWatchDogResource::
-
-    //
-
-    //cameraname1=1CH&cameraname2=2CH&resolution1=1920:1080&resolution2=960:544&codec1=h264&codec2=mjpeg&bitrate1=4000&bitrate2=4000&framerate1=30&framerate2=30&quality1=2&quality2=2
+    if (!isDualStreamingEnabled()) 
+    {
+        // The camera most likely is going to reset after enabling dual streaming
+        CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth());
+        QByteArray request;
+        request.append("onvif_stream_number=2&onvif_use_service=true&onvif_service_port=8032&");
+        request.append("onvif_use_discovery=true&onvif_use_security=true&onvif_security_opts=63&onvif_use_sa=true&reboot=true");
+        CLHttpStatus status = http.doPOST(QByteArray("/cgi-bin/onvifsetup.cgi"), request);
+        setStatus(Offline);
+        return false;
+    }
+    else 
+    {
+        return QnPlOnvifResource::initInternal();
+    }
 }

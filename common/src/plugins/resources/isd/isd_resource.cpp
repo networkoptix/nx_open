@@ -7,7 +7,7 @@ const char* QnPlIsdResource::MANUFACTURE = "ISD";
 
 QnPlIsdResource::QnPlIsdResource()
 {
-    setAuth("root", "system");
+    setAuth("root", "admin");
     
 }
 
@@ -30,28 +30,33 @@ void QnPlIsdResource::setIframeDistance(int /*frames*/, int /*timems*/)
 {
 }
 
-QnAbstractStreamDataProvider* QnPlIsdResource::createLiveDataProvider()
+bool QnPlIsdResource::initInternal()
 {
-    QString request = "stream1";
+    CLHttpStatus status;
+    QByteArray reslst1 = downloadFile(status, "api/param.cgi?req=VideoInput.1.h264.1.ResolutionList",  getHostAddress(), 80, 1000, getAuth());
 
-
-    QFile file(QLatin1String("c:/isd.txt")); // Create a file handle for the file named
-    if (file.exists())
+    if (status == CL_HTTP_AUTH_REQUIRED)
     {
-        QString line;
-
-        if (file.open(QIODevice::ReadOnly)) // Open the file
-        {
-            QTextStream stream(&file); // Set the stream to read from myFile
-            line = stream.readLine().trimmed(); // this reads a line (QString) from the file
-
-            if (line.length() > 0)
-                request = line;
-        }
-
+        setStatus(Unauthorized);
+        return false;
     }
 
-    return new QnRtpStreamReader(toSharedPointer(), request);
+    QByteArray reslst2 = downloadFile(status, "api/param.cgi?req=VideoInput.1.h264.1.ResolutionList",  getHostAddress(), 80, 1000, getAuth());
+
+    if (status == CL_HTTP_AUTH_REQUIRED)
+    {
+        setStatus(Unauthorized);
+        return false;
+    }
+
+    return true;
+
+}
+
+QnAbstractStreamDataProvider* QnPlIsdResource::createLiveDataProvider()
+{
+
+    return new QnRtpStreamReader(toSharedPointer(), "stream1");
 }
 
 void QnPlIsdResource::setCropingPhysical(QRect /*croping*/)

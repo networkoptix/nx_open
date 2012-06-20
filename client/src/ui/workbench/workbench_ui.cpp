@@ -1360,6 +1360,9 @@ void QnWorkbenchUi::at_toggleThumbnailsAction_toggled(bool checked) {
 }
 
 void QnWorkbenchUi::at_sliderResizerItem_geometryChanged() {
+    if(m_ignoreSliderResizerGeometryChanges)
+        return;
+
     QRectF sliderGeometry = m_sliderItem->geometry();
 
     qreal targetHeight = sliderGeometry.bottom() - m_sliderResizerItem->geometry().center().y();

@@ -10,6 +10,7 @@
 #include "onvif/Onvif.nsmap"
 #include "onvif/soapDeviceBindingProxy.h"
 #include "onvif/wsseapi.h"
+#include "../digitalwatchdog/digital_watchdog_resource.h"
 
 const char* OnvifResourceInformationFetcher::ONVIF_RT = "ONVIF";
 std::string& OnvifResourceInformationFetcher::STD_ONVIF_USER = *(new std::string("admin"));
@@ -52,7 +53,8 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         return;
     }
 
-    if (isMacAlreadyExists(info.uniqId, result)) {
+    QString mac = info.mac;
+    if (isMacAlreadyExists(info.uniqId, result) || isMacAlreadyExists(mac, result)) {
         return;
     }
 
@@ -61,7 +63,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         return;
     }
 
-    QHostAddress sender(hostAddressFromEndpoint(endpoint));
+    QHostAddress sender(QUrl(endpoint).host());
     const char* login = 0;
     const char* passwd = 0;
     PasswordList passwords = passwordsData.getPasswordsByManufacturer(info.manufacturer);
@@ -85,6 +87,14 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
 
         if (soapRes == SOAP_OK || !passwordsData.isNotAuthenticated(soapProxy.soap_fault())) {
             qDebug() << "Finished picking password";
+
+
+            QString tmp = QnPlOnvifResource::fetchMacAddress(response1, sender.toString());
+            if (!tmp.isEmpty() && mac != tmp) {
+                mac = tmp;
+                if (isMacAlreadyExists(mac, result)) return;
+            }
+
             soap_end(soapProxy.soap);
             break;
         }
@@ -198,37 +208,37 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
              << ", MAC: " << info.uniqId << ", manufacturer: " << manufacturer << ", name: " << name;
 
     createResource(manufacturer, QHostAddress(sender), QHostAddress(info.discoveryIp),
-        name, info.uniqId, login, passwd, mediaUrl, deviceUrl, result);
+        name, mac, info.uniqId, login, passwd, mediaUrl, deviceUrl, result);
 }
 
-void OnvifResourceInformationFetcher::createResource(const QString& manufacturer, const QHostAddress& sender, const QHostAddress& discoveryIp,
-    const QString& name, const QString& uniqId, const char* login, const char* passwd, const QString& mediaUrl, const QString& deviceUrl, QnResourceList& result) const
+void OnvifResourceInformationFetcher::createResource(const QString& manufacturer, const QHostAddress& sender, const QHostAddress& discoveryIp, const QString& name, 
+    const QString& mac, const QString& uniqId, const char* login, const char* passwd, const QString& mediaUrl, const QString& deviceUrl, QnResourceList& result) const
 {
     if (uniqId.isEmpty()) {
         return;
     }
 
-    QnNetworkResourcePtr resource = QnNetworkResourcePtr(new QnPlOnvifResource());
+    QnNetworkResourcePtr resource = createOnvifResourceByManufacture(manufacturer);
+    if (!resource)
+        return;
 
-    resource->setTypeId(onvifTypeId);
+    QnId rt = qnResTypePool->getResourceTypeId("OnvifDevice", manufacturer); // try to find child resource type, use real manufacturer name as camera model in onvif XML
+    if (rt.isValid())
+        resource->setTypeId(rt);
+    else
+        resource->setTypeId(onvifTypeId); // no child resourceType found. Use root ONVIF resource type
+
     resource->setHostAddress(sender, QnDomainMemory);
     resource->setDiscoveryAddr(discoveryIp);
     resource->setName(manufacturer + " - " + name);
-    resource->setMAC(uniqId);
+    resource->setMAC(mac);
+    resource->setUrl("http://" + QUrl(deviceUrl).host() + "?uniq-id=" + uniqId);
+    resource->setParam(QnPlOnvifResource::MEDIA_URL_PARAM_NAME, mediaUrl, QnDomainDatabase);
+    resource->setParam(QnPlOnvifResource::DEVICE_URL_PARAM_NAME, deviceUrl, QnDomainDatabase);
 
     if (login) {
         qDebug() << "OnvifResourceInformationFetcher::createResource: Setting login = " << login << ", password = " << passwd;
         resource->setAuth(login, passwd);
-    }
-
-    if (!mediaUrl.isEmpty()) {
-        qDebug() << "OnvifResourceInformationFetcher::createResource: Setting mediaUrl = " << mediaUrl;
-        resource->setParam(QnPlOnvifResource::MEDIA_URL_PARAM_NAME, mediaUrl, QnDomainDatabase);
-    }
-
-    if (!deviceUrl.isEmpty()) {
-        qDebug() << "OnvifResourceInformationFetcher::createResource: Setting deviceUrl = " << deviceUrl;
-        resource->setParam(QnPlOnvifResource::DEVICE_URL_PARAM_NAME, deviceUrl, QnDomainDatabase);
     }
 
     result.push_back(resource);
@@ -236,62 +246,18 @@ void OnvifResourceInformationFetcher::createResource(const QString& manufacturer
 
 const bool OnvifResourceInformationFetcher::isMacAlreadyExists(const QString& mac, const QnResourceList& resList) const
 {
-    foreach(QnResourcePtr res, resList) {
-        QnNetworkResourcePtr netRes = res.dynamicCast<QnNetworkResource>();
+    if (!mac.isEmpty()) {
 
-        if (netRes->getMAC().toString() == mac) {
-            return true;
+        foreach(QnResourcePtr res, resList) {
+            QnNetworkResourcePtr netRes = res.dynamicCast<QnNetworkResource>();
+
+            if (netRes->getMAC().toString() == mac) {
+                return true;
+            }
         }
     }
 
     return false;
-}
-
-const QString OnvifResourceInformationFetcher::fetchMacAddress(const _onvifDevice__GetNetworkInterfacesResponse& response,
-        const QString& senderIpAddress) const
-{
-    QString someMacAddress;
-    std::vector<class onvifXsd__NetworkInterface*> ifaces = response.NetworkInterfaces;
-    std::vector<class onvifXsd__NetworkInterface*>::const_iterator ifacePtrIter = ifaces.begin();
-
-    while (ifacePtrIter != ifaces.end()) {
-        onvifXsd__NetworkInterface* ifacePtr = *ifacePtrIter;
-
-        if (ifacePtr->Enabled && ifacePtr->IPv4->Enabled) {
-            onvifXsd__IPv4Configuration* conf = ifacePtr->IPv4->Config;
-
-            if (conf->DHCP) {
-                if (senderIpAddress == conf->FromDHCP->Address.c_str()) {
-                    return QString(ifacePtr->Info->HwAddress.c_str()).toUpper().replace(":", "-");
-                }
-                if (someMacAddress.isEmpty()) {
-                    someMacAddress = QString(ifacePtr->Info->HwAddress.c_str());
-                }
-            }
-
-            std::vector<class onvifXsd__PrefixedIPv4Address*> addresses = ifacePtr->IPv4->Config->Manual;
-            std::vector<class onvifXsd__PrefixedIPv4Address*>::const_iterator addrPtrIter = addresses.begin();
-
-            while (addrPtrIter != addresses.end()) {
-                onvifXsd__PrefixedIPv4Address* addrPtr = *addrPtrIter;
-
-                if (senderIpAddress == addrPtr->Address.c_str()) {
-                    return QString(ifacePtr->Info->HwAddress.c_str()).toUpper().replace(":", "-");
-                }
-                if (someMacAddress.isEmpty()) {
-                    someMacAddress = QString(ifacePtr->Info->HwAddress.c_str());
-                }
-
-                ++addrPtrIter;
-            }
-        }
-
-        ++ifacePtrIter;
-    }
-
-    qDebug() << "OnvifResourceInformationFetcher::fetchMacAddress: appropriate MAC address was not found for device with IP: "
-             << senderIpAddress.toStdString().c_str();
-    return someMacAddress.toUpper().replace(":", "-");
 }
 
 const QString OnvifResourceInformationFetcher::fetchName(const _onvifDevice__GetDeviceInformationResponse& response) const
@@ -326,24 +292,13 @@ const QString OnvifResourceInformationFetcher::fetchSerial(const _onvifDevice__G
 //    return result;
 //}
 
-QHostAddress OnvifResourceInformationFetcher::hostAddressFromEndpoint(const QString& endpoint) const
+QnNetworkResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManufacture(const QString& manufacture)
 {
-    char marker[] = "://";
-    int pos1 = endpoint.indexOf(marker);
-    if (pos1 == -1) {
-        qWarning() << "OnvifResourceInformationFetcher::hostAddressFromEndpoint: invalid URL: " << endpoint;
-        return QHostAddress();
-    }
+    QnNetworkResourcePtr resource;
+    if (manufacture.toLower().contains("digital watchdog"))
+        resource = QnNetworkResourcePtr(new QnPlWatchDogResource());
+    else
+        resource = QnNetworkResourcePtr(new QnPlOnvifResource());
 
-    pos1 += sizeof(marker) - 1;
-    int pos2 = endpoint.indexOf(":", pos1);
-    int pos3 = endpoint.indexOf("/", pos1);
-    //Nearest match:
-    pos2 = pos2 < pos3 && pos2 != -1? pos2: (pos3 != -1? pos3: pos2);
-    //Size:
-    pos2 = pos2 == -1? -1: pos2 - pos1;
-
-    QString tmp = endpoint.mid(pos1, pos2);
-    qDebug() << "OnvifResourceInformationFetcher::hostAddressFromEndpoint: IP: " << tmp;
-    return QHostAddress(tmp);
+    return resource;
 }

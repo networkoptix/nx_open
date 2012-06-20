@@ -52,7 +52,6 @@ signals:
     void archiveRangeChanged(qint64 newStartTimeMs, qint64 newEndTimeMs);
 
 protected:
-    virtual void initInternal() override {}
 
 private:
     qint64 m_spaceLimit;

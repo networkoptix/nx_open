@@ -175,14 +175,15 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
             if (soapRes != SOAP_OK) {
                 if (soapRes == SOAP_EOF) {
                     qDebug() << "OnvifResourceSearcherWsdd::findEndpoints: All devices found. Interface: " << host;
+                    soap_end(soapWsddProxy.soap);
+                    break;
                 } else {
                     qWarning() << "OnvifResourceSearcherWsdd::findEndpoints: SOAP failed. GSoap error code: "
                                << soapRes << SoapErrorHelper::fetchDescription(soapWsddProxy.soap_fault())
                                << ". Interface: " << host;
+                    soap_end(soapWsddProxy.soap);
+                    continue;
                 }
-
-                soap_end(soapWsddProxy.soap);
-                break;
             }
 
             addEndpointToHash(result, wsddProbeMatches.wsdd__ProbeMatches, soapWsddProxy.soap->header, addrPrefixes, host);
@@ -302,7 +303,7 @@ const QString OnvifResourceSearcherWsdd::getMac(const wsdd__ProbeMatchesType* pr
             result[ind - 1] = macFromEndpoint[i - 1];
         }
 
-        return result;
+        return result.toUpper();
     }
 
     return QString();
@@ -380,7 +381,7 @@ void OnvifResourceSearcherWsdd::fillWsddStructs(wsdd__ProbeType& probe, wsa__End
 }
 
 void OnvifResourceSearcherWsdd::addEndpointToHash(EndpointInfoHash& hash, const wsdd__ProbeMatchesType* probeMatches,
-    const SOAP_ENV__Header* /*header*/, const QStringList& addrPrefixes, const QString& host) const
+    const SOAP_ENV__Header* header, const QStringList& addrPrefixes, const QString& host) const
 {
     if (!probeMatches || !probeMatches->ProbeMatch) {
         return;
@@ -393,9 +394,11 @@ void OnvifResourceSearcherWsdd::addEndpointToHash(EndpointInfoHash& hash, const 
 
     QString name = getName(probeMatches);
     QString manufacturer = getManufacturer(probeMatches, name);
-    QString uniqId = getEndpointAddress(probeMatches);
+    QString mac = getMac(probeMatches, header);
+    QString uniqId = !mac.isEmpty()? mac: getEndpointAddress(probeMatches);
+    
 
-    hash.insert(appropriateAddr, EndpointAdditionalInfo(name, manufacturer, uniqId, host));
+    hash.insert(appropriateAddr, EndpointAdditionalInfo(name, manufacturer, mac, uniqId, host));
 }
 
 void OnvifResourceSearcherWsdd::printProbeMatches(const wsdd__ProbeMatchesType* probeMatches,

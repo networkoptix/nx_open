@@ -24,7 +24,7 @@ public:
     bool hasDualStreaming() const override {return false;}
 
 protected:
-    void initInternal() override;
+    bool initInternal() override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
     virtual void setCropingPhysical(QRect croping);
