@@ -36,9 +36,10 @@ bool QnPlWatchDogResource::isDualStreamingEnabled()
     return false;
 }
 
-void QnPlWatchDogResource::initInternal() 
+bool QnPlWatchDogResource::initInternal() 
 {
-    if (!isDualStreamingEnabled()) {
+    if (!isDualStreamingEnabled()) 
+    {
         // The camera most likely is going to reset after enabling dual streaming
         CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth());
         QByteArray request;
@@ -46,8 +47,10 @@ void QnPlWatchDogResource::initInternal()
         request.append("onvif_use_discovery=true&onvif_use_security=true&onvif_security_opts=63&onvif_use_sa=true&reboot=true");
         CLHttpStatus status = http.doPOST(QByteArray("/cgi-bin/onvifsetup.cgi"), request);
         setStatus(Offline);
+        return false;
     }
-    else {
-        QnPlOnvifResource::initInternal();
+    else 
+    {
+        return QnPlOnvifResource::initInternal();
     }
 }

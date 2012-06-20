@@ -218,20 +218,20 @@ QnResourcePtr QnPlAreconVisionResource::updateResource()
     return result;
 }
 
-void QnPlAreconVisionResource::initInternal()
+bool QnPlAreconVisionResource::initInternal()
 {
     QRect rect = getCroping(QnDomainMemory);
     setCropingPhysical(rect);
 
     QVariant val;
     if (!getParam("Firmware version", val, QnDomainPhysical))
-        return;
+        return false;
 
     if (!getParam("Image engine", val, QnDomainPhysical ))
-        return;
+        return false;
 
     if (!getParam("Net version", val, QnDomainPhysical))
-        return;
+        return false;
 
     //if (!getDescription())
     //    return;
@@ -240,12 +240,12 @@ void QnPlAreconVisionResource::initInternal()
 
 
     if (!setParam("Enable motion detection", "on", QnDomainPhysical)) // enables motion detection;
-        return;
+        return false;
 
     // check if we've got 1024 zones
     setParam("TotalZones", 1024, QnDomainPhysical); // try to set total zones to 64; new cams support it
     if (!getParam("TotalZones", val, QnDomainPhysical))
-        return;
+        return false;
 
     if (val.toInt() == 1024)
         m_totalMdZones = 1024;
@@ -268,6 +268,8 @@ void QnPlAreconVisionResource::initInternal()
 
     setParam("Zone size", zone_size, QnDomainPhysical);
     setMotionMaskPhysical(0);
+
+    return true;
 }
 
 QString QnPlAreconVisionResource::manufacture() const
