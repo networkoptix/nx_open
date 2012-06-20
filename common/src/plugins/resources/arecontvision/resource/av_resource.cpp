@@ -118,7 +118,7 @@ bool QnPlAreconVisionResource::setHostAddress(const QHostAddress& ip, QnDomain d
 
     if (domain == QnDomainPhysical)
     {
-        // return false; // never change ip 
+        return false; // never change ip 
 
         QUdpSocket sock;
 
