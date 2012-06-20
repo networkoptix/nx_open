@@ -726,7 +726,7 @@ void QnApiPbSerializer::serializeUser(const QnUserResourcePtr& userPtr, QByteArr
     pb::Resource& pb_userResource = *pb_users.add_resource();
 
 	pb_userResource.set_type(pb::Resource_Type_User);
-    pb::User &pb_user = *pb_userResource.MutableExtension(pb::User.resource);
+    pb::User &pb_user = *pb_userResource.MutableExtension(pb::User::resource);
 
     if (userPtr->getId().isValid())
         pb_userResource.set_id(userPtr->getId().toInt());
