@@ -249,7 +249,7 @@ void QnThumbnailsLoader::run() {
     assert(QThread::currentThread() == this); /* This function is supposed to be run from thumbnail rendering thread only. */
 
     m_helper = new QnThumbnailsLoaderHelper(this);
-    connect(this, SIGNAL(processingRequested()), m_helper, SLOT(slot0()), Qt::QueuedConnection);
+    connect(this, SIGNAL(processingRequested()), m_helper, SLOT(process()), Qt::QueuedConnection);
     connect(m_helper, SIGNAL(thumbnailLoaded(const QnThumbnail &)), this, SLOT(addThumbnail(const QnThumbnail &)));
 
     if(!m_processingQueue.empty())
