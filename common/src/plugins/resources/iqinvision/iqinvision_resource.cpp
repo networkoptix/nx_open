@@ -64,9 +64,9 @@ void QnPlIqResource::setCropingPhysical(QRect /*croping*/)
 
 }
 
-void QnPlIqResource::initInternal() 
+bool QnPlIqResource::initInternal() 
 {
-    setOID("1.2.6.5", "1"); // Reset crop to maximum size
+    return (setOID("1.2.6.5", "1") == CL_HTTP_SUCCESS); // Reset crop to maximum size
 }
 
 CLHttpStatus QnPlIqResource::readOID(const QString& oid, QString& result)

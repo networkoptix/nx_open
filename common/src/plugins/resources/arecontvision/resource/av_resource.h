@@ -54,7 +54,7 @@ public:
     int totalMdZones() const;
 
 protected:
-    virtual void initInternal() override;
+    virtual bool initInternal() override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 

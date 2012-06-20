@@ -42,7 +42,7 @@ void QnWorkbenchMotionDisplayWatcher::at_display_widgetAboutToBeRemoved(QnResour
 void QnWorkbenchMotionDisplayWatcher::at_widget_displayFlagsChanged(QnResourceWidget *widget, int displayFlags) {
     bool oldDisplayed = isMotionGridDisplayed();
 
-    if(displayFlags & QnResourceWidget::DisplayMotionGrid) {
+    if(displayFlags & QnResourceWidget::DisplayMotion) {
         m_widgets.insert(widget);
     } else {
         m_widgets.remove(widget);

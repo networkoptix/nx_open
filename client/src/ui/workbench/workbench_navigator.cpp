@@ -657,7 +657,7 @@ void QnWorkbenchNavigator::updateCurrentPeriods() {
 void QnWorkbenchNavigator::updateCurrentPeriods(Qn::TimePeriodRole type) {
     QnTimePeriodList periods;
 
-    if(type == Qn::MotionRole && m_currentWidget && !(m_currentWidget->displayFlags() & QnResourceWidget::DisplayMotionGrid)) {
+    if(type == Qn::MotionRole && m_currentWidget && !(m_currentWidget->displayFlags() & QnResourceWidget::DisplayMotion)) {
         /* Use empty periods. */
     } else if(QnCachingTimePeriodLoader *loader = this->loader(m_currentWidget)) {
         periods = loader->periods(type);
@@ -674,7 +674,7 @@ void QnWorkbenchNavigator::updateSyncedPeriods() {
 void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodRole type) {
     QVector<QnTimePeriodList> periodsList;
     foreach(const QnResourceWidget *widget, m_syncedWidgets) {
-        if(type == Qn::MotionRole && !(widget->displayFlags() & QnResourceWidget::DisplayMotionGrid)) {
+        if(type == Qn::MotionRole && !(widget->displayFlags() & QnResourceWidget::DisplayMotion)) {
             /* Ignore it. */
         } else if(QnCachingTimePeriodLoader *loader = this->loader(widget->resource())) {
             periodsList.push_back(loader->periods(type));
@@ -981,22 +981,20 @@ void QnWorkbenchNavigator::at_display_widgetChanged(Qn::ItemRole role) {
 }
 
 void QnWorkbenchNavigator::at_display_widgetAdded(QnResourceWidget *widget) {
-    if(QnSecurityCamResourcePtr cameraResource = widget->resource().dynamicCast<QnSecurityCamResource>()) {
+    if(widget->resource()->flags() & QnResource::utc)
         addSyncedWidget(widget);
 
-        connect(widget, SIGNAL(motionSelectionChanged()), this, SLOT(at_widget_motionSelectionChanged()));
-        connect(widget, SIGNAL(displayFlagsChanged()), this, SLOT(at_widget_displayFlagsChanged()));
-        connect(widget->resource().data(), SIGNAL(flagsChanged()), this, SLOT(at_resource_flagsChanged()));
-    }
+    connect(widget, SIGNAL(motionSelectionChanged()), this, SLOT(at_widget_motionSelectionChanged()));
+    connect(widget, SIGNAL(displayFlagsChanged()), this, SLOT(at_widget_displayFlagsChanged()));
+    connect(widget->resource().data(), SIGNAL(flagsChanged()), this, SLOT(at_resource_flagsChanged()));
 }
 
 void QnWorkbenchNavigator::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {
-    if(QnSecurityCamResourcePtr cameraResource = widget->resource().dynamicCast<QnSecurityCamResource>()) {
-        disconnect(widget, NULL, this, NULL);
-        disconnect(widget->resource().data(), NULL, this, NULL);
+    disconnect(widget, NULL, this, NULL);
+    disconnect(widget->resource().data(), NULL, this, NULL);
 
+    if(widget->resource()->flags() & QnResource::utc)
         removeSyncedWidget(widget);
-    }
 }
 
 void QnWorkbenchNavigator::at_widget_motionSelectionChanged() {
@@ -1016,7 +1014,7 @@ void QnWorkbenchNavigator::at_widget_displayFlagsChanged() {
 
 void QnWorkbenchNavigator::at_widget_displayFlagsChanged(QnResourceWidget *widget) {
     int oldSize = m_motionIgnoreWidgets.size();
-    if(widget->displayFlags() & QnResourceWidget::DisplayMotionGrid) {
+    if(widget->displayFlags() & QnResourceWidget::DisplayMotion) {
         m_motionIgnoreWidgets.insert(widget);
     } else {
         m_motionIgnoreWidgets.remove(widget);

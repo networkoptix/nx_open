@@ -30,7 +30,7 @@ void QnPlIsdResource::setIframeDistance(int /*frames*/, int /*timems*/)
 {
 }
 
-void QnPlIsdResource::initInternal()
+bool QnPlIsdResource::initInternal()
 {
     CLHttpStatus status;
     QByteArray reslst1 = downloadFile(status, "api/param.cgi?req=VideoInput.1.h264.1.ResolutionList",  getHostAddress(), 80, 1000, getAuth());
@@ -38,7 +38,7 @@ void QnPlIsdResource::initInternal()
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
         setStatus(Unauthorized);
-        return;
+        return false;
     }
 
     QByteArray reslst2 = downloadFile(status, "api/param.cgi?req=VideoInput.1.h264.1.ResolutionList",  getHostAddress(), 80, 1000, getAuth());
@@ -46,10 +46,10 @@ void QnPlIsdResource::initInternal()
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
         setStatus(Unauthorized);
-        return;
+        return false;
     }
 
-
+    return true;
 
 }
 

@@ -132,7 +132,7 @@ void parseCameras(QnVirtualCameraResourceList& cameras, const PbResourceList& pb
 
 void parseServer(QnVideoServerResourcePtr &server, const pb::Resource &pb_serverResource, QnResourceFactory &resourceFactory)
 {
-    const pb::Server& pb_server = pb_serverResource.GetExtension(pb::Server.resource);
+    const pb::Server& pb_server = pb_serverResource.GetExtension(pb::Server::resource);
 
     server = QnVideoServerResourcePtr(new QnVideoServerResource());
     server->setId(pb_serverResource.id());
@@ -198,7 +198,7 @@ void parseServers(QnVideoServerResourceList &servers, const PbResourceList &pb_s
 
 void parseLayout(QnLayoutResourcePtr& layout, const pb::Resource& pb_layoutResource)
 {
-    const pb::Layout& pb_layout = pb_layoutResource.GetExtension(pb::Layout.resource);
+    const pb::Layout& pb_layout = pb_layoutResource.GetExtension(pb::Layout::resource);
 
     layout = QnLayoutResourcePtr(new QnLayoutResource());
 
@@ -253,7 +253,7 @@ void parseLayouts(QnLayoutResourceList& layouts, const PbResourceList& pb_layout
 
 void parseUser(QnUserResourcePtr& user, const pb::Resource& pb_userResource)
 {
-    const pb::User& pb_user = pb_userResource.GetExtension(pb::User.resource);
+    const pb::User& pb_user = pb_userResource.GetExtension(pb::User::resource);
 
     user = QnUserResourcePtr(new QnUserResource());
 
@@ -690,7 +690,7 @@ void QnApiPbSerializer::serializeServer(const QnVideoServerResourcePtr& serverPt
 
     pb::Resource& pb_serverResource = *pb_servers.add_resource();
 	pb_serverResource.set_type(pb::Resource_Type_Server);
-    pb::Server &pb_server = *pb_serverResource.MutableExtension(pb::Server.resource);
+    pb::Server &pb_server = *pb_serverResource.MutableExtension(pb::Server::resource);
 
     pb_serverResource.set_id(serverPtr->getId().toInt());
     pb_serverResource.set_name(serverPtr->getName().toUtf8().constData());
@@ -726,7 +726,7 @@ void QnApiPbSerializer::serializeUser(const QnUserResourcePtr& userPtr, QByteArr
     pb::Resource& pb_userResource = *pb_users.add_resource();
 
 	pb_userResource.set_type(pb::Resource_Type_User);
-    pb::User &pb_user = *pb_userResource.MutableExtension(pb::User.resource);
+    pb::User &pb_user = *pb_userResource.MutableExtension(pb::User::resource);
 
     if (userPtr->getId().isValid())
         pb_userResource.set_id(userPtr->getId().toInt());

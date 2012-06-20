@@ -151,7 +151,7 @@ void QnPlAxisResource::readMotionInfo()
     }
 }
 
-void QnPlAxisResource::initInternal()
+bool QnPlAxisResource::initInternal()
 {
     QMutexLocker lock(&m_mutex);
 
@@ -164,7 +164,7 @@ void QnPlAxisResource::initInternal()
         if (status != CL_HTTP_SUCCESS) {
             if (status == CL_HTTP_AUTH_REQUIRED)
                 setStatus(QnResource::Unauthorized);
-            return;
+            return false;
         }
     }
 
@@ -176,7 +176,7 @@ void QnPlAxisResource::initInternal()
     if (status != CL_HTTP_SUCCESS) {
         if (status == CL_HTTP_AUTH_REQUIRED)
             setStatus(QnResource::Unauthorized);
-        return;
+        return false;
     }
 
     m_resolutionList.clear();
@@ -187,7 +187,7 @@ void QnPlAxisResource::initInternal()
     if (paramValuePos == -1)
     {
         qWarning() << Q_FUNC_INFO << "Unexpected server answer. Can't read resolution list";
-        return;
+        return false;
     }
 
     m_resolutionList = body.mid(paramValuePos+1).split(',');
@@ -213,13 +213,13 @@ void QnPlAxisResource::initInternal()
 
     }
 
-
-
-
+    
     //root.Image.MotionDetection=no
     //root.Image.I0.TriggerData.MotionDetectionEnabled=yes
     //root.Image.I1.TriggerData.MotionDetectionEnabled=yes
     //root.Properties.Motion.MaxNbrOfWindows=10
+
+    return true;
 }
 
 QByteArray QnPlAxisResource::getMaxResolution() const

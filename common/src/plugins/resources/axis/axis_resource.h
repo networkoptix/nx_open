@@ -38,7 +38,7 @@ public:
     virtual void setMotionMaskPhysical(int channel) override;
     virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider) override;
 protected:
-    void initInternal() override;
+    bool initInternal() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 
     virtual void setCropingPhysical(QRect croping);
