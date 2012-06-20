@@ -26,11 +26,18 @@ public:
     virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider) override;
 protected:
 
-    void initInternal() override {}
+    void initInternal() override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 
     virtual void setCropingPhysical(QRect croping);
+
+protected:
+    QSize m_resolution1;
+    QSize m_resolution2;
+
+    int m_MaxFps;
+
 };
 
 #endif //isd_resource_h_1934

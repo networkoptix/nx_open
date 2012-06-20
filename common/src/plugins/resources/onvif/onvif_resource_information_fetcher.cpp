@@ -10,6 +10,7 @@
 #include "onvif/Onvif.nsmap"
 #include "onvif/soapDeviceBindingProxy.h"
 #include "onvif/wsseapi.h"
+#include "../digitalwatchdog/digital_watchdog_resource.h"
 
 const char* OnvifResourceInformationFetcher::ONVIF_RT = "ONVIF";
 std::string& OnvifResourceInformationFetcher::STD_ONVIF_USER = *(new std::string("admin"));
@@ -208,9 +209,16 @@ void OnvifResourceInformationFetcher::createResource(const QString& manufacturer
         return;
     }
 
-    QnNetworkResourcePtr resource = QnNetworkResourcePtr(new QnPlOnvifResource());
+    QnNetworkResourcePtr resource = createOnvifResourceByManufacture(manufacturer);
+    if (!resource)
+        return;
 
-    resource->setTypeId(onvifTypeId);
+    QnId rt = qnResTypePool->getResourceTypeId("OnvifDevice", manufacturer); // try to find child resource type, use real manufacturer name as camera model in onvif XML
+    if (rt.isValid())
+        resource->setTypeId(rt);
+    else
+        resource->setTypeId(onvifTypeId); // no child resourceType found. Use root ONVIF resource type
+
     resource->setHostAddress(sender, QnDomainMemory);
     resource->setDiscoveryAddr(discoveryIp);
     resource->setName(manufacturer + " - " + name);
@@ -346,4 +354,16 @@ QHostAddress OnvifResourceInformationFetcher::hostAddressFromEndpoint(const QStr
     QString tmp = endpoint.mid(pos1, pos2);
     qDebug() << "OnvifResourceInformationFetcher::hostAddressFromEndpoint: IP: " << tmp;
     return QHostAddress(tmp);
+}
+
+
+QnNetworkResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManufacture(const QString& manufacture)
+{
+    QnNetworkResourcePtr resource;
+    if (manufacture.toLower().contains("digital watchdog"))
+        resource = QnNetworkResourcePtr(new QnPlWatchDogResource());
+    else
+        resource = QnNetworkResourcePtr(new QnPlOnvifResource());
+
+    return resource;
 }

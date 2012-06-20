@@ -41,7 +41,7 @@ public:
     static OnvifResourceInformationFetcher& instance();
 
     void findResources(const EndpointInfoHash& endpointInfo, QnResourceList& result) const;
-
+    static QnNetworkResourcePtr createOnvifResourceByManufacture (const QString& manufacture);
 private:
 
     OnvifResourceInformationFetcher();
@@ -62,6 +62,7 @@ private:
     const QString fetchSerial(const _onvifDevice__GetDeviceInformationResponse& response) const;
     //const QString generateRandomPassword() const;
     QHostAddress hostAddressFromEndpoint(const QString& endpoint) const;
+
 };
 
 #endif // onvif_resource_information_fetcher_h
