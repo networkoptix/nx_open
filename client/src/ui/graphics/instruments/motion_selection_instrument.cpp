@@ -96,12 +96,28 @@ public:
         m_corner = corner;
     }
 
+    void setGridOrigin(const QPoint &grid_origin) {
+        m_grid_origin = grid_origin;
+    }
+
+    void setGridCorner(const QPoint &grid_corner) {
+        m_grid_corner = grid_corner;
+    }
+
     const QPointF &origin() const {
         return m_origin;
     }
 
     const QPointF &corner() const {
         return m_corner;
+    }
+
+    const QPoint &grid_origin() const {
+        return m_grid_origin;
+    }
+
+    const QPoint &grid_corner() const {
+        return m_grid_corner;
     }
 
     void setColor(MotionSelectionInstrument::ColorRole role, const QColor &color) {
@@ -119,6 +135,12 @@ private:
 
     /** Second corner of the selection item, in parent coordinates. */
     QPointF m_corner;
+
+    /** Origin of the selection item, in grid coordinates. */
+    QPoint m_grid_origin;
+
+    /** Second corner of the selection item, in grid coordinates. */
+    QPoint m_grid_corner;
 
     /** Colors for drawing the selection rect. */
     QColor m_colors[MotionSelectionInstrument::RoleCount];
@@ -276,6 +298,7 @@ void MotionSelectionInstrument::startDrag(DragInfo *info) {
     QPointF itemPos = target()->mapFromScene(info->mousePressScenePos());
     QPoint gridPos = target()->mapToMotionGrid(itemPos);
     selectionItem()->setOrigin(target()->mapFromMotionGrid(gridPos));
+    selectionItem()->setGridOrigin(gridPos);
     selectionItem()->setViewport(info->view()->viewport());
     selectionItem()->setVisible(true);
 
@@ -302,24 +325,44 @@ void MotionSelectionInstrument::dragMove(DragInfo *info) {
         gridOrigin += QPoint(0, 1);
     }
 
+    selectionItem()->setGridOrigin(gridOrigin);
+    selectionItem()->setGridCorner(gridCorner);
     selectionItem()->setOrigin(target()->mapFromMotionGrid(gridOrigin));
     selectionItem()->setCorner(target()->mapFromMotionGrid(gridCorner));
+
+    qnDebug("mouse %1 %2", info->mouseScenePos().x(), info->mouseScenePos().y());
+    qnDebug("origin %1 %2", gridOrigin.x(), gridOrigin.y());
+    qnDebug("corner %1 %2", gridCorner.x(), gridCorner.y());
 }
 
 void MotionSelectionInstrument::finishDrag(DragInfo *info) {
     ensureSelectionItem();
     if(target() != NULL) {
         /* Qt handles QRect borders in totally inhuman way, so we have to do everything by hand. */
-        QPoint o = target()->mapToMotionGrid(selectionItem()->origin());
-        QPoint c = target()->mapToMotionGrid(selectionItem()->corner());
+        /*QPoint o = target()->mapToMotionGrid(selectionItem()->origin());
+        QPoint c = target()->mapToMotionGrid(selectionItem()->corner());*/
+
+        QPoint o = selectionItem()->grid_origin();
+        QPoint c = selectionItem()->grid_corner();
+
+        QRect new_selection = selectionItem()->boundingRect().toRect();
+
+        qnDebug("finish origin %1 %2", selectionItem()->origin().x(), selectionItem()->origin().y());
+        qnDebug("finish corner %1 %2", selectionItem()->corner().x(), selectionItem()->corner().y());
+        qnDebug("o %1 %2", o.x(), o.y());
+        qnDebug("c %1 %2", c.x(), c.y());
+        QRect old_selection = QRect(
+            QPoint(qMin(o.x(), c.x()), qMin(o.y(), c.y())),
+            QSize(qAbs(o.x() - c.x()), qAbs(o.y() - c.y()))
+            );
 
         emit motionRegionSelected(
             info->view(), 
             target(), 
-            QRect(
+            /*QRect(
                 QPoint(qMin(o.x(), c.x()), qMin(o.y(), c.y())),
                 QSize(qAbs(o.x() - c.x()), qAbs(o.y() - c.y()))
-            )
+            )*/ old_selection
         );
     }
 
