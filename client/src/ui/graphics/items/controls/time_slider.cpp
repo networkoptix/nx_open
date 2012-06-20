@@ -608,7 +608,15 @@ QnThumbnailsLoader *QnTimeSlider::thumbnailsLoader() const {
 }
 
 void QnTimeSlider::setThumbnailsLoader(QnThumbnailsLoader *loader) {
+    if(m_thumbnailsLoader)
+        disconnect(m_thumbnailsLoader.data(), NULL, this, NULL);
+
     m_thumbnailsLoader = loader;
+
+    if(m_thumbnailsLoader) {
+        connect(m_thumbnailsLoader.data(), SIGNAL(thumbnailsInvalidated()), this, SLOT(clearThumbnails()));
+        connect(m_thumbnailsLoader.data(), SIGNAL(thumbnailLoaded(const QnThumbnail &)), this, SLOT(addThumbnail(const QnThumbnail &)));
+    }
 
     updateThumbnails();
 }
@@ -959,12 +967,6 @@ void QnTimeSlider::updateThumbnails() {
         return;
     }
 
-    /* Don't load thumbnails too often. */
-    if (thumbnailsLoader()->currentMSecsSinceLastUpdate() < 1000) {
-        updateThumbnailsLater();
-        return;
-    }
-
     /* Update loader's bounding size. */
     int boundingHeigth = qRound(thumbnailsHeight());
     QSize boundingSize = QSize(boundingHeigth * 256, boundingHeigth);
@@ -986,20 +988,30 @@ void QnTimeSlider::updateThumbnails() {
 
     /* Maybe we don't need to send the request? Check that. */
     if(!boundingSizeChanged)
-        if(qAbs(thumbnailsLoader()->step() - step) < m_msecsPerPixel * 5.0)
-            if (thumbnailsLoader()->loadedRange().containPeriod(targetPeriod))
-                return; 
+        if(qAbs(thumbnailsLoader()->timeStep() - step) < m_msecsPerPixel * 5.0)
+            return; 
     
     /* Add small margins to the period to request. */
     qint64 d = targetPeriod.durationMs / 4;
     QnTimePeriod extendedTargetPeriod = QnTimePeriod(targetPeriod.startTimeMs - d, targetPeriod.durationMs + 2 * d);
 
     /* Load, finally. */
-    thumbnailsLoader()->loadRange(extendedTargetPeriod.startTimeMs, extendedTargetPeriod.endTimeMs(), step); 
+    thumbnailsLoader()->setTimePeriod(extendedTargetPeriod.startTimeMs, extendedTargetPeriod.endTimeMs()); 
+    thumbnailsLoader()->setTimeStep(step);
 
     qDebug() << "LOADED!!!" << QDateTime::currentMSecsSinceEpoch();
 }
 
+void QnTimeSlider::addThumbnail(const QnThumbnail &thumbnail) {
+    ThumbnailData data;
+    data.thumbnail = thumbnail;
+
+    m_thumbnailData[thumbnail.time()] = data;
+}
+
+void QnTimeSlider::clearThumbnails() {
+    m_thumbnailData.clear();
+}
 
 
 
@@ -1360,7 +1372,7 @@ void QnTimeSlider::drawThumbnails(QPainter *painter, const QRectF &rect) {
     if (rect.height() < thumbnailHeightForDrawing)
         return;
 
-    if (!thumbnailsLoader() || thumbnailsLoader()->loadedRange().isEmpty()) {
+    if (!thumbnailsLoader()) {
         QSizeF labelSizeBound = rect.size();
         labelSizeBound.setHeight(m_noThumbnailsPixmap.height());
 
@@ -1369,34 +1381,29 @@ void QnTimeSlider::drawThumbnails(QPainter *painter, const QRectF &rect) {
         return;
     }
 
-    qint64 step = thumbnailsLoader()->step();
-    if (thumbnailsLoader()->step() <= 0)
+    qint64 step = thumbnailsLoader()->timeStep();
+    if (thumbnailsLoader()->timeStep() <= 0)
         return;
 
     qreal aspectRatio = QnGeometry::aspectRatio(thumbnailsLoader()->thumbnailSize());
     qreal thumbnailWidth = rect.height() * aspectRatio;
-    qint64 bestStep = static_cast<qint64>(0.95 * m_msecsPerPixel * thumbnailWidth);
-    step = qCeil(bestStep, step);
 
-    qint64 startTime = thumbnailsLoader()->loadedRange().startTimeMs;
-    if(startTime < m_windowStart)
-        startTime += qFloor(m_windowStart - startTime, step);
-    qint64 endTime = thumbnailsLoader()->loadedRange().endTimeMs();
-    if(endTime > m_windowEnd + step)
-        endTime = m_windowEnd + step;
+    qint64 startTime = qFloor(m_windowStart, step);
+    qint64 endTime = qCeil(m_windowEnd, step);
 
     QRectF boundingRect = rect; 
     for (qint64 time = startTime; time < endTime; time += step) {
-        qint64 realTime;
-        QPixmapPtr pixmap = thumbnailsLoader()->getPixmapByTime(time, &realTime);
-        if (!pixmap) 
+        ThumbnailData data = m_thumbnailData.value(time);
+        if(data.thumbnail.isEmpty())
             continue;
        
+        const QPixmap &pixmap = data.thumbnail.pixmap();
+
         qreal x = positionFromValue(time, false).x();
-        QSizeF targetSize(pixmap->width() * rect.height() / pixmap->height(), rect.height());
+        QSizeF targetSize(pixmap.width() * rect.height() / pixmap.height(), rect.height());
         QRectF targetRect(x - targetSize.width() / 2, rect.top(), targetSize.width(), targetSize.height());
         
-        drawCroppedPixmap(painter, targetRect, boundingRect, *pixmap, pixmap->rect());
+        drawCroppedPixmap(painter, targetRect, boundingRect, pixmap, pixmap.rect());
         boundingRect.setLeft(qMax(boundingRect.left(), targetRect.right()));
     }
 }

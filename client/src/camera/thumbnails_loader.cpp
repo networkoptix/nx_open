@@ -1,7 +1,12 @@
 #include "thumbnails_loader.h"
 
+#include <cassert>
+
+#include <QtCore/QTimer>
 #include <QtGui/QPixmap>
 #include <QtGui/QImage>
+
+#include <utils/common/math.h>
 
 #include "decoders/video/ffmpeg.h"
 
@@ -11,19 +16,26 @@
 #include "device_plugins/archive/rtsp/rtsp_client_archive_delegate.h"
 #include "utils/media/frame_info.h"
 
+#include "thumbnails_loader_helper.h"
 
 QnThumbnailsLoader::QnThumbnailsLoader(QnResourcePtr resource):
-    m_mutex(QMutex::Recursive),
+    m_mutex(QMutex::NonRecursive),
     m_rtspClient(new QnRtspClientArchiveDelegate()),
     m_resource(resource),
     m_timeStep(0),
+    m_requestStart(0),
+    m_requestEnd(0),
+    m_processingStart(0),
+    m_processingEnd(0),
     m_scaleContext(NULL),
     m_scaleBuffer(NULL),
     m_boundingSize(128, 96), /* That's 4:3 aspect ratio. */
     m_scaleSourceSize(0, 0),
     m_scaleTargetSize(0, 0),
     m_scaleSourceLine(0),
-    m_scaleSourceFormat(0)
+    m_scaleSourceFormat(0),
+    m_helper(NULL),
+    m_generation(0)
 {
     static volatile bool metaTypesInitialized = false;
     if (!metaTypesInitialized) {
@@ -52,7 +64,12 @@ QnResourcePtr QnThumbnailsLoader::resource() const {
 void QnThumbnailsLoader::setBoundingSize(const QSize &size) {
     QMutexLocker locker(&m_mutex);
 
+    if(m_boundingSize == size)
+        return;
+
     m_boundingSize = size;
+
+    updateTargetSizeLocked(true);
 }
 
 QSize QnThumbnailsLoader::boundingSize() const {
@@ -76,61 +93,304 @@ qint64 QnThumbnailsLoader::timeStep() const {
 void QnThumbnailsLoader::setTimeStep(qint64 timeStep) {
     QMutexLocker locker(&m_mutex);
 
+    if(m_timeStep == timeStep)
+        return;
+
     m_timeStep = timeStep;
+
+    invalidateThumbnailsLocked();
 }
 
 qint64 QnThumbnailsLoader::startTime() const {
     QMutexLocker locker(&m_mutex);
 
-    return m_timePeriod.startTimeMs;
+    return m_requestStart;
 }
 
 void QnThumbnailsLoader::setStartTime(qint64 startTime) {
     QMutexLocker locker(&m_mutex);
 
-    setTimePeriod(startTime, m_timePeriod.endTimeMs());
+    setTimePeriodLocked(startTime, qMax(startTime, m_requestEnd));
 }
 
 qint64 QnThumbnailsLoader::endTime() const {
     QMutexLocker locker(&m_mutex);
 
-    return m_timePeriod.startTimeMs;
+    return m_requestStart;
 }
 
 void QnThumbnailsLoader::setEndTime(qint64 endTime) {
     QMutexLocker locker(&m_mutex);
 
-    setTimePeriod(m_timePeriod.startTimeMs, endTime);
+    setTimePeriodLocked(qMin(m_requestStart, endTime), endTime);
 }
 
-qint64 QnThumbnailsLoader::setTimePeriod(qint64 startTime, qint64 endTime) {
-    setTimePeriod(QnTimePeriod(startTime, endTime - startTime));
-}
-
-qint64 QnThumbnailsLoader::setTimePeriod(const QnTimePeriod &timePeriod) {
+void QnThumbnailsLoader::setTimePeriod(qint64 startTime, qint64 endTime) {
     QMutexLocker locker(&m_mutex);
 
-    m_timePeriod = timePeriod;
+    setTimePeriodLocked(startTime, endTime);
 }
 
-const QnTimePeriod &QnThumbnailsLoader::timePeriod() const {
+void QnThumbnailsLoader::setTimePeriod(const QnTimePeriod &timePeriod) {
     QMutexLocker locker(&m_mutex);
 
-    return m_timePeriod;
+    setTimePeriodLocked(timePeriod.startTimeMs, timePeriod.endTimeMs());
+}
+
+void QnThumbnailsLoader::setTimePeriodLocked(qint64 startTime, qint64 endTime) {
+    if(endTime < startTime)
+        endTime = startTime;
+
+    if(m_timeStep != 0) {
+        startTime = qFloor(startTime, m_timeStep);
+        endTime = qCeil(endTime, m_timeStep);
+    }
+
+    if(m_requestStart == startTime && m_requestEnd == endTime)
+        return;
+
+    m_requestStart = startTime;
+    m_requestEnd = endTime;
+
+    updateProcessingLocked();
+}
+
+QnTimePeriod QnThumbnailsLoader::timePeriod() const {
+    QMutexLocker locker(&m_mutex);
+
+    return QnTimePeriod(m_requestStart, m_requestEnd - m_requestStart);
 }
 
 void QnThumbnailsLoader::pleaseStop() {
     m_rtspClient->beforeClose();
     m_rtspClient->close();
+    quit();
 
     base_type::pleaseStop();
 }
 
-void QnThumbnailsLoader::run() {
+void QnThumbnailsLoader::updateTargetSizeLocked(bool invalidate) {
+    QSize targetSize;
 
+    if(!m_scaleSourceSize.isEmpty() && !m_boundingSize.isEmpty())
+        targetSize = QnGeometry::expanded(QnGeometry::aspectRatio(m_scaleSourceSize), m_boundingSize, Qt::KeepAspectRatio).toSize();
+
+    if(m_targetSize == targetSize)
+        return;
+
+    m_targetSize = targetSize;
+
+    if(invalidate)
+        invalidateThumbnailsLocked();
 }
 
+void QnThumbnailsLoader::invalidateThumbnailsLocked() {
+    m_thumbnailByTime.clear();
+    m_processingQueue.clear();
+    m_processingStart = m_processingEnd = 0;
+    m_generation++;
 
+    updateProcessingLocked();
+
+    m_mutex.unlock();
+    emit thumbnailsInvalidated();
+    m_mutex.lock();
+}
+
+void QnThumbnailsLoader::updateProcessingLocked() {
+    if(m_timeStep == 0 || m_boundingSize.isEmpty() || (m_requestStart == 0 && m_requestEnd == 0))
+        return;
+
+    /* Discard old loaded period if it doesn't intersect with the new one. */
+    if((m_requestStart > m_processingEnd + m_timeStep || m_requestEnd < m_processingStart - m_timeStep) && m_processingStart != 0 && m_processingEnd != 0) {
+        invalidateThumbnailsLocked();
+        return;
+    }
+
+    /* Add margins. */
+    qint64 requestStart = m_requestStart;
+    qint64 requestEnd = m_requestEnd;
+    qint64 requestSize = requestEnd - requestStart;
+    requestStart = qFloor(qMax(0ll, requestStart - requestSize / 4), m_timeStep);
+    requestEnd = qCeil(requestEnd + requestSize / 4, m_timeStep);
+
+    qint64 start, end;
+
+    /* Try 1st option. */
+    start = requestStart;
+    end = qMin(m_processingStart - m_timeStep, requestEnd);
+    if(start <= end)
+        enqueueForProcessingLocked(start, end);
+
+    /* Try 2nd option. */
+    start = qMax(m_processingEnd + m_timeStep, requestStart);
+    end = requestEnd;
+    if(start <= end)
+        enqueueForProcessingLocked(start, end);
+
+    /* Update loaded period accordingly. */
+    if(m_processingStart == 0 && m_processingEnd == 0) {
+        m_processingStart = requestStart;
+        m_processingEnd = requestEnd;
+    } else {
+        m_processingStart = qMin(m_processingStart, requestStart);
+        m_processingEnd = qMax(m_processingEnd, requestEnd);
+    }
+}
+
+void QnThumbnailsLoader::enqueueForProcessingLocked(qint64 startTime, qint64 endTime) {
+    m_processingQueue.enqueue(QnTimePeriod(startTime, endTime - startTime));
+
+    if(m_processingQueue.size() == 1)
+        emit processingRequested();
+}
+
+void QnThumbnailsLoader::run() {
+    assert(QThread::currentThread() == this); /* This function is supposed to be run from thumbnail rendering thread only. */
+
+    m_helper = new QnThumbnailsLoaderHelper(this);
+    connect(this, SIGNAL(processingRequested()), m_helper, SLOT(slot0()), Qt::QueuedConnection);
+    connect(m_helper, SIGNAL(thumbnailLoaded(const QnThumbnail &)), this, SLOT(addThumbnail(const QnThumbnail &)));
+
+    if(!m_processingQueue.empty())
+        emit processingRequested();
+
+    base_type::run();
+
+    delete m_helper;
+    m_helper = NULL;
+}
+
+void QnThumbnailsLoader::process() {
+    QnTimePeriod period;
+    QSize boundingSize;
+    qint64 timeStep;
+    int generation;
+
+    {
+        QMutexLocker locker(&m_mutex);
+
+        if(m_processingQueue.isEmpty())
+            return;
+
+        period = m_processingQueue.dequeue();
+        boundingSize = m_boundingSize;
+        timeStep = m_timeStep;
+        generation = m_generation;
+    }
+
+    m_rtspClient->setAdditionalAttribute("x-media-step", QByteArray::number(timeStep * 1000));
+
+    if (!m_rtspClient->open(m_resource))
+        QTimer::singleShot(500, m_helper, SLOT(slot0()));
+
+    m_rtspClient->seek(period.startTimeMs * 1000, period.endTimeMs() * 1000);
+    QnCompressedVideoDataPtr frame = m_rtspClient->getNextData().dynamicCast<QnCompressedVideoData>();
+    if (frame) {
+        CLFFmpegVideoDecoder decoder(frame->compressionType, frame, false);
+        CLVideoDecoderOutput outFrame;
+        outFrame.setUseExternalData(false);
+
+        bool invalidated = false;
+        while (frame) {
+            if (decoder.decode(frame, &outFrame))
+                generateThumbnail(outFrame, boundingSize, timeStep, generation);
+
+            {
+                QMutexLocker locker(&m_mutex);
+                if(m_generation != generation) {
+                    invalidated = true;
+                    break;
+                }
+            }
+
+            frame = qSharedPointerDynamicCast<QnCompressedVideoData> (m_rtspClient->getNextData());
+        }
+
+        if(!invalidated) {
+            QnCompressedVideoDataPtr emptyData(new QnCompressedVideoData(1,0));
+            while (decoder.decode(emptyData, &outFrame))
+                generateThumbnail(outFrame, boundingSize, timeStep, generation);
+        }
+    }
+    m_rtspClient->close();
+
+    /*for(qint64 time = period.startTimeMs; time < period.endTimeMs(); time++)
+        if(!m_thumbnailByTime)
+            (QnThumbnail(QPixmap()));*/
+}
+
+void QnThumbnailsLoader::addThumbnail(const QnThumbnail &thumbnail) {
+    {
+        QMutexLocker locker(&m_mutex);
+
+        if(thumbnail.generation() != m_generation)
+            return; /* Already outdated. */
+
+        m_thumbnailByTime.insert(thumbnail.time(), thumbnail);
+    }
+
+    emit thumbnailLoaded(thumbnail);
+}
+
+void QnThumbnailsLoader::ensureScaleContextLocked(int lineSize, const QSize &sourceSize, const QSize &boundingSize, int format) {
+    bool needsReallocation = true;
+    
+    if(m_scaleSourceSize != sourceSize) {
+        m_scaleSourceSize = sourceSize;
+        m_scaleSourceFormat = format;
+        m_scaleSourceLine = lineSize;
+        updateTargetSizeLocked(false);
+    }
+
+    if(m_scaleSourceLine == lineSize && m_scaleSourceSize == sourceSize && m_scaleSourceFormat == format && m_targetSize == m_scaleTargetSize)
+        needsReallocation = false;
+
+    if(!m_scaleContext)
+        needsReallocation = true;
+
+    if(needsReallocation) {
+        if(m_scaleContext) {
+            sws_freeContext(m_scaleContext);
+            m_scaleContext = 0;
+
+            qFreeAligned(m_scaleBuffer);
+            m_scaleBuffer = NULL;
+        }
+
+        m_scaleSourceSize = sourceSize;
+        m_scaleSourceFormat = format;
+        m_scaleSourceLine = lineSize;
+        m_scaleTargetSize = m_targetSize;
+
+        int numBytes = avpicture_get_size(PIX_FMT_RGBA, qPower2Ceil(static_cast<quint32>(m_scaleTargetSize.width()), 8), m_scaleTargetSize.height());
+        m_scaleBuffer = static_cast<quint8 *>(qMallocAligned(numBytes, 32));
+        m_scaleContext = sws_getContext(m_scaleSourceSize.width(), m_scaleSourceSize.height(), static_cast<PixelFormat>(m_scaleSourceFormat), m_scaleTargetSize.width(), m_scaleTargetSize.height(), PIX_FMT_BGRA, SWS_POINT, NULL, NULL, NULL);
+    }
+}
+
+void QnThumbnailsLoader::generateThumbnail(const CLVideoDecoderOutput &outFrame, const QSize &boundingSize, qint64 timeStep, int generation) {
+    QSize scaleTargetSize;
+    {
+        QMutexLocker locker(&m_mutex);
+        ensureScaleContextLocked(outFrame.linesize[0], QSize(outFrame.width, outFrame.height), boundingSize, (PixelFormat) outFrame.format);
+        scaleTargetSize = m_scaleTargetSize;
+    }
+
+    int dstLineSize[4];
+    quint8* dstBuffer[4];
+    dstLineSize[0] = qPower2Ceil(static_cast<quint32>(scaleTargetSize.width() * 4), 32);
+    dstLineSize[1] = dstLineSize[2] = dstLineSize[3] = 0;
+    QImage image(m_scaleBuffer, scaleTargetSize.width(), scaleTargetSize.height(), dstLineSize[0], QImage::Format_ARGB32_Premultiplied);
+    dstBuffer[0] = dstBuffer[1] = dstBuffer[2] = dstBuffer[3] = m_scaleBuffer;
+
+    sws_scale(m_scaleContext, outFrame.data, outFrame.linesize, 0, outFrame.height, dstBuffer, dstLineSize);
+
+    QPixmap pixmap(QPixmap::fromImage(image));
+
+    qint64 actualTime = outFrame.pkt_dts / 1000;
+    emit m_helper->thumbnailLoaded(QnThumbnail(pixmap, pixmap.size(), qRound(actualTime, timeStep), actualTime, timeStep, generation));
+}
 
 #if 0
 void QnThumbnailsLoader::loadRange(qint64 startTimeMs, qint64 endTimeMs, qint64 stepMs)

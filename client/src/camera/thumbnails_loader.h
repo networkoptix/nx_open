@@ -2,9 +2,9 @@
 #define QN_THUMBNAILS_LOADER_H
 
 #include <QtCore/QScopedPointer>
-#include <QtCore/QSharedPointer>
 #include <QtCore/QMetaType>
 #include <QtCore/QMutex>
+#include <QtCore/QQueue>
 
 #include <utils/common/longrunnable.h>
 #include <core/resource/resource_fwd.h>
@@ -14,9 +14,10 @@
 
 class CLVideoDecoderOutput;
 class QnRtspClientArchiveDelegate;
-class SwsContext;
+struct SwsContext;
 
 typedef QSharedPointer<QPixmap> QPixmapPtr;
+
 
 class QnThumbnailsLoader: public CLLongRunnable {
     Q_OBJECT;
@@ -43,33 +44,48 @@ public:
     qint64 endTime() const;
     void setEndTime(qint64 endTime);
 
-    qint64 setTimePeriod(qint64 startTime, qint64 endTime);
-    qint64 setTimePeriod(const QnTimePeriod &timePeriod);
-    const QnTimePeriod &timePeriod() const;
+    void setTimePeriod(qint64 startTime, qint64 endTime);
+    void setTimePeriod(const QnTimePeriod &timePeriod);
+    QnTimePeriod timePeriod() const;
 
     virtual void pleaseStop() override;
 
 signals:
-    void thumbnailLoaded(QnThumbnail thumbnail);
-    void thumbnailSizeChanged();
-    void timeStepChanged();
+    void thumbnailLoaded(const QnThumbnail &thumbnail);
+    void thumbnailsInvalidated();
 
 protected:
     virtual void run() override;
 
-private:
-    void ensureScaleContext(int lineSize, const QSize &size, const QSize &boundingSize, int format);
-    bool processFrame(const CLVideoDecoderOutput &outFrame, const QSize &boundingSize);
+    void updateTargetSizeLocked(bool invalidate);
+    void invalidateThumbnailsLocked();
+    void updateProcessingLocked();
+
+    void enqueueForProcessingLocked(qint64 startTime, qint64 endTime);
+    Q_SIGNAL void processingRequested();
+    void process();
+
+    Q_SLOT void addThumbnail(const QnThumbnail &thumbnail);
+
+    void generateThumbnail(const CLVideoDecoderOutput &outFrame, const QSize &boundingSize, qint64 timeStep, int generation);
 
 private:
+    void ensureScaleContextLocked(int lineSize, const QSize &sourceSize, const QSize &boundingSize, int format);
+    bool processFrame(const CLVideoDecoderOutput &outFrame, const QSize &boundingSize);
+
+    void setTimePeriodLocked(qint64 startTime, qint64 endTime);
+
+private:
+    friend class QnThumbnailsLoaderHelper;
+
     mutable QMutex m_mutex;
     const QnResourcePtr m_resource;
     const QScopedPointer<QnRtspClientArchiveDelegate> m_rtspClient;
 
-    QnTimePeriod m_timePeriod;
-    qint64 m_timeStep;
+    qint64 m_timeStep, m_requestStart, m_requestEnd, m_processingStart, m_processingEnd;
 
     QSize m_boundingSize;
+    QSize m_targetSize;
     
     SwsContext *m_scaleContext;
     quint8 *m_scaleBuffer;
@@ -77,8 +93,11 @@ private:
     QSize m_scaleTargetSize;
     int m_scaleSourceLine;
     int m_scaleSourceFormat;
-
+    
     QHash<qint64, QnThumbnail> m_thumbnailByTime;
+    QQueue<QnTimePeriod> m_processingQueue;
+    QnThumbnailsLoaderHelper *m_helper;
+    int m_generation;
 };
 
 Q_DECLARE_METATYPE(QPixmapPtr)

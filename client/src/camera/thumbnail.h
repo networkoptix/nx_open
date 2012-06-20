@@ -10,12 +10,13 @@
  */
 class QnThumbnail {
 public:
-    QnThumbnail(const QPixmap &pixmap, const QSize &size, qint64 time, qint64 actualTime, qint64 timeStep): 
+    QnThumbnail(const QPixmap &pixmap, const QSize &size, qint64 time, qint64 actualTime, qint64 timeStep, int generation): 
         m_pixmap(pixmap),
         m_size(size),
         m_time(time),
         m_actualTime(actualTime),
-        m_timeStep(timeStep)
+        m_timeStep(timeStep),
+        m_generation(generation)
     {}
 
     QnThumbnail():
@@ -48,11 +49,16 @@ public:
         return m_timeStep;
     }
 
+    int generation() const {
+        return m_generation;
+    }
+
 private:
     QPixmap m_pixmap;
     QSize m_size;
     qint64 m_time, m_actualTime;
     qint64 m_timeStep;
+    int m_generation;
 };
 
 Q_DECLARE_METATYPE(QnThumbnail);

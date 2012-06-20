@@ -11,6 +11,7 @@
 #include <ui/animation/animated.h>
 
 #include "time_step.h"
+#include "camera/thumbnail.h"
 
 class QTimer;
 
@@ -218,6 +219,9 @@ private:
     void updateThumbnailsLater();
     Q_SLOT void updateThumbnails();
 
+    Q_SLOT void addThumbnail(const QnThumbnail &thumbnail);
+    Q_SLOT void clearThumbnails();
+
     void animateStepValues(int deltaMSecs);
 
 private:
@@ -246,6 +250,16 @@ private:
         QPixmap commentPixmap;
         bool visible;
         qreal stretch;
+    };
+
+    struct ThumbnailData {
+        ThumbnailData(): opacity(1.0), hiding(false), dynamic(true) {}
+
+        QnThumbnail thumbnail;
+        QPointF pos;
+        qreal opacity;
+        bool hiding;
+        bool dynamic;
     };
 
     qint64 m_windowStart, m_windowEnd;
@@ -280,6 +294,7 @@ private:
     QWeakPointer<QnThumbnailsLoader> m_thumbnailsLoader;
     QTimer *m_thumbnailsUpdateTimer;
     QPixmap m_noThumbnailsPixmap;
+    QMap<qint64, ThumbnailData> m_thumbnailData;
 
     qreal m_rulerHeight;
     qreal m_prefferedHeight;
