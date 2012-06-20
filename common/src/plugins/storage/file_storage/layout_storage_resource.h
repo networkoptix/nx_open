@@ -35,7 +35,6 @@ public:
     virtual qint64 getFreeSpace() override;
 
 protected:
-    void initInternal() override {}
 
 private:
     static QString removeProtocolPrefix(const QString& url);

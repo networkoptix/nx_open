@@ -42,7 +42,6 @@ public:
     void onWrite(const QByteArray& ba, const QString& fn);
 
 protected:
-    void initInternal() override {}    
     
 private:
 

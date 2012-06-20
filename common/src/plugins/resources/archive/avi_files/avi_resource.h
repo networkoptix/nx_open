@@ -23,7 +23,7 @@ public:
 
     void setStorage(QnStorageResourcePtr);
 protected:
-    virtual void initInternal() override {}
+
 private:
     QnStorageResourcePtr m_storage;
 };

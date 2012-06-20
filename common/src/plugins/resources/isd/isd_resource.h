@@ -26,7 +26,7 @@ public:
     virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider) override;
 protected:
 
-    void initInternal() override;
+    bool initInternal() override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 
