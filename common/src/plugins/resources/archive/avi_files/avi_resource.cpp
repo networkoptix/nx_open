@@ -8,7 +8,8 @@ QnAviResource::QnAviResource(const QString& file)
 {
     //setUrl(QDir::cleanPath(file));
     setUrl(file);
-    setName(QFileInfo(file).fileName());
+    QString shortName = QFileInfo(file).fileName();
+    setName(shortName.mid(shortName.indexOf('?')+1));
 }
 
 QnAviResource::~QnAviResource()

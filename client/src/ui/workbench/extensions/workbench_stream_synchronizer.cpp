@@ -10,6 +10,7 @@
 #include <ui/graphics/items/resource_widget.h>
 #include <plugins/resources/archive/syncplay_wrapper.h>
 #include "workbench_render_watcher.h"
+#include "core/resource/security_cam_resource.h"
 
 QnWorkbenchStreamSynchronizer::QnWorkbenchStreamSynchronizer(QnWorkbenchDisplay *display, QnWorkbenchRenderWatcher *renderWatcher, QObject *parent):
     QObject(parent),
@@ -83,8 +84,13 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAdded(QnResourceWidget *wid
     connect(widget->display()->archiveReader(), SIGNAL(destroyed()), m_counter, SLOT(decrement()));
 
     m_widgetCount++;
-    if(m_widgetCount == 1)
+    if(m_widgetCount == 1) 
+    {
+        if(!widget->resource().dynamicCast<QnSecurityCamResource>())
+            widget->display()->archiveReader()->jumpTo(0, 0); // change current position from live to left edge if it is not camera
+
         emit effectiveChanged();
+    }
 }
 
 void QnWorkbenchStreamSynchronizer::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {
