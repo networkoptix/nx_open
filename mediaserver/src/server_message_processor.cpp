@@ -46,44 +46,29 @@ void QnServerMessageProcessor::at_connectionReset()
 
 void QnServerMessageProcessor::at_messageReceived(QnMessage event)
 {
-    qDebug() << "Got event: " << event.eventType << " " << event.objectName << " " << event.objectId;
+    // qDebug() << "Got event: " << event.eventType << " " << event.objectName << " " << event.objectId;
 
-    if (event.eventType == QN_MESSAGE_LICENSE_CHANGE)
+	if (event.eventType == Message_Type_License)
     {
-        QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
-
-        QnLicenseList licenses;
-        QByteArray errorString;
-
-        if (appServerConnection->getLicenses(licenses, errorString) == 0)
-        {
-            foreach (QnLicensePtr license, licenses.licenses())
-            {
-                // Someone wants to steal our software
-                if (!license->isValid())
-                {
-                    QnLicenseList dummy;
-                    dummy.setHardwareId("invalid");
-                    qnLicensePool->replaceLicenses(dummy);
-                    break;
-                }
-            }
-
-            qnLicensePool->replaceLicenses(licenses);
-        }
+		// New license added
+		if (event.license->isValid())
+			qnLicensePool->addLicense(event.license);
     }
-    else if (event.eventType == QN_MESSAGE_CAMERA_SERVER_ITEM)
+	else if (event.eventType == Message_Type_CameraServerItem)
     {
-        QString mac = event.dict["mac"].toString();
+/*        QString mac = event.dict["mac"].toString();
         QString serverGuid = event.dict["server_guid"].toString();
         qint64 timestamp_ms = event.dict["timestamp"].toLongLong();
 
-        QnCameraHistoryItem historyItem(mac, timestamp_ms, serverGuid);
+        QnCameraHistoryItem historyItem(mac, timestamp_ms, serverGuid);*/
 
-        QnCameraHistoryPool::instance()->addCameraHistoryItem(historyItem);
+        QnCameraHistoryPool::instance()->addCameraHistoryItem(*event.cameraServerItem);
     }
-    else if (event.eventType == QN_MESSAGE_RES_CHANGE)
+	else if (event.eventType == Message_Type_ResourceChange)
     {
+		QnResourcePtr resource = event.resource;
+		// TODO: Fix it
+		/*
         if (event.objectName != "Camera" && event.objectName != "Server")
             return;
 
@@ -92,53 +77,44 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage event)
             return;
         else if (event.objectName == "Camera" && event.parentId != ownVideoServer->getId())
             return;
-
+*/
         QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
         QByteArray errorString;
-        QnResourcePtr resource;
-        if (appServerConnection->getResource(event.objectId, resource, errorString) == 0)
+        QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId());
+        if (ownResource)
         {
-            QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId());
-            if (ownResource)
-            {
-                ownResource->update(resource);
-            }
-            else
-            {
-                qnResPool->addResource(resource);
-                ownResource = resource;
-            }
-
-            QnSecurityCamResourcePtr ownSecurityCamera = ownResource.dynamicCast<QnSecurityCamResource>();
-            if (ownSecurityCamera)
-                QnRecordingManager::instance()->updateCamera(ownSecurityCamera);
-        } else
-        {
-            qDebug()  << "QnEventManager::messageReceived(): Can't get resource from appserver. Reason: "
-                      << errorString << ", Skipping event: " << event.eventType << " " << event.objectName << " " << event.objectId;
+            ownResource->update(resource);
         }
+        else
+        {
+            qnResPool->addResource(resource);
+            ownResource = resource;
+        }
+
+        QnSecurityCamResourcePtr ownSecurityCamera = ownResource.dynamicCast<QnSecurityCamResource>();
+        if (ownSecurityCamera)
+            QnRecordingManager::instance()->updateCamera(ownSecurityCamera);
     }
-    else if (event.eventType == QN_MESSAGE_RES_STATUS_CHANGE)
+    else if (event.eventType == Message_Type_ResourceStatusChange)
     {
-        QnResourcePtr resource = qnResPool->getResourceById(event.objectId);
+		QnResourcePtr resource = qnResPool->getResourceById(event.resourceId);
 
         if (resource)
         {
-            QnResource::Status status = (QnResource::Status)event.data.toInt();
-            resource->setStatus(status);
+            resource->setStatus(event.resourceStatus);
         }
-    } else if (event.eventType == QN_MESSAGE_RES_DISABLED_CHANGE)
+	} else if (event.eventType == Message_Type_ResourceDisabledChange)
 	{
-		QnResourcePtr resource = qnResPool->getResourceById(event.objectId);
+		QnResourcePtr resource = qnResPool->getResourceById(event.resourceId);
 
 		if (resource)
 		{
-			resource->setDisabled(event.data.toInt());
+			resource->setDisabled(event.resourceDisabled);
 		}
-    } else if (event.eventType == QN_MESSAGE_RES_DELETE)
+	} else if (event.eventType == Message_Type_ResourceDelete)
     {
-        QnResourcePtr resource = qnResPool->getResourceById(event.objectId);
+        QnResourcePtr resource = qnResPool->getResourceById(event.resourceId);
 
         if (resource)
         {

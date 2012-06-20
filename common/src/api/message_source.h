@@ -19,6 +19,7 @@
 #include "message.h"
 
 class QnJsonStreamParser;
+class QnPbStreamParser;
 
 class QnMessageSource : public QObject
 {
@@ -61,7 +62,7 @@ private:
     QTime m_eventWaitTimer;
     QTimer m_pingTimer;
 
-    QScopedPointer<QnJsonStreamParser> m_streamParser;
+    QScopedPointer<QnPbStreamParser> m_streamParser;
 };
 
 #endif // _QN_EVENT_SOURCE_

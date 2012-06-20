@@ -1,13 +1,12 @@
-package proto.pb;
+package pb;
+
+import "resource.proto";
 
 message User {
-    optional int32  id       = 1;
-    required string name     = 2;
-    optional string password = 3;
-    required bool isAdmin    = 4;
-    required string guid     = 5;
-}
+    extend Resource {
+        required User resource = 102;
+    }
 
-message Users {
-    repeated User user = 1;
+    optional string password = 1;
+    required bool isAdmin    = 2;
 }

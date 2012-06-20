@@ -1,12 +1,10 @@
-package proto.pb;
+package pb;
+
+import "resource.proto";
 
 message Camera {
-    enum Status {
-       Offline      = 0;
-       Unauthorized = 1;
-       Online       = 2;
-       Disabled     = 3;
-       Recording    = 4;
+    extend Resource {
+        required Camera resource = 100;
     }
 
     enum MotionType {
@@ -26,11 +24,6 @@ message Camera {
         Preset  = 5;
     }
 
-    message Property {
-      required string name   = 1;
-      required string value  = 2;
-    }
-
     message ScheduleTask {
         required int32   id              = 1;         
         required int32   sourceId        = 2;
@@ -45,24 +38,12 @@ message Camera {
         required int32   fps             = 11;
     }
 
-    optional int32        id               = 1;
-    required int32        typeId           = 2;
-    required int32        parentId         = 3;
-    required string       name             = 4;
-    required string       url              = 5;
-    required Status       status           = 6;
-    required bool         disabled         = 7;
-    required bool         scheduleDisabled = 8;
-    optional MotionType   motionType       = 9;
-    optional string       region           = 10;
-    optional string       mac              = 11;
-    optional string       login            = 12;
-    optional string       password         = 13;
-    repeated Property     property         = 14;
-    repeated ScheduleTask scheduleTask     = 15;
-    optional bool         audioEnabled      = 16;
-}
-
-message Cameras {
-    repeated Camera camera = 1;
+    optional bool         scheduleDisabled = 1;
+    optional MotionType   motionType       = 2;
+    optional string       region           = 3;
+    optional string       mac              = 4;
+    optional string       login            = 5;
+    optional string       password         = 6;
+    repeated ScheduleTask scheduleTask     = 7;
+    optional bool         audioEnabled     = 8;
 }

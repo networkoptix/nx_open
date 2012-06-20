@@ -11,6 +11,7 @@
 #include "core/resource/user_resource.h"
 #include "core/resource/camera_history.h"
 #include "licensing/license.h"
+#include "connectinfo.h"
 
 
 void parseRegion(QRegion& region, const QString& regionString);
@@ -60,6 +61,7 @@ public:
     virtual void deserializeResourceTypes(QnResourceTypeList& resourceTypes, const QByteArray& data) = 0;
     virtual void deserializeLicenses(QnLicenseList& licenses, const QByteArray& data) = 0;
     virtual void deserializeCameraHistoryList(QnCameraHistoryList& cameraServerItems, const QByteArray& data) = 0;
+    virtual void deserializeConnectInfo(QnConnectInfoPtr& connectInfo, const QByteArray& data) = 0;
 
     virtual void serializeLayout(const QnLayoutResourcePtr& resource, QByteArray& data) = 0;
     virtual void serializeLayouts(const QnLayoutResourceList& layouts, QByteArray& data) = 0;
