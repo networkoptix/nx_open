@@ -52,6 +52,21 @@ void QnConnectionTestingDialog::timeout()
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
 }
 
+void QnConnectionTestingDialog::oldHttpTestResults(int status, QByteArray errorString, QByteArray data, int handle)
+{
+	Q_UNUSED(handle);
+
+	if (status == 204)
+	{
+		if (m_timeoutTimer.isActive())
+			m_timeoutTimer.stop();
+		else
+			return;
+
+		ui->statusLabel->setText("Failed");
+	}
+}
+
 void QnConnectionTestingDialog::testResults(int status, const QByteArray &errorString, QnConnectInfoPtr connectInfo, int requestHandle)
 {
     Q_UNUSED(requestHandle)
@@ -86,6 +101,14 @@ void QnConnectionTestingDialog::testSettings()
 {
     m_connection = QnAppServerConnectionFactory::createConnection(m_url);
     m_connection->testConnectionAsync(this, SLOT(testResults(int,QByteArray,QnConnectInfoPtr,int)));
+
+	QUrl httpUrl;
+	httpUrl.setHost(m_url.host());
+	httpUrl.setPort(m_url.port());
+	httpUrl.setScheme("http");
+	httpUrl.setUserName("");
+	httpUrl.setPassword("");
+	QnSessionManager::instance()->sendAsyncGetRequest(httpUrl, "resourceEx", this, SLOT(oldHttpTestResults(int,QByteArray,QByteArray,int)));
 }
 
 void QnConnectionTestingDialog::accept()
