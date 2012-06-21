@@ -5,13 +5,16 @@
 #include <QtGui/QMessageBox>
 #include <QtGui/QDesktopServices>
 
-#include "core/resource/resource.h"
-#include "core/resource/camera_resource.h"
-#include "core/resourcemanagment/resource_pool.h"
-#include "ui/common/read_only.h"
-#include "ui/device_settings/camera_schedule_widget.h"
-#include "ui/device_settings/camera_motion_mask_widget.h"
-#include "ui/graphics/items/resource_widget.h"
+#include <utils/common/delete_later.h>
+
+#include <core/resource/resource.h>
+#include <core/resource/camera_resource.h>
+#include <core/resourcemanagment/resource_pool.h>
+
+#include <ui/common/read_only.h>
+#include <ui/device_settings/camera_schedule_widget.h>
+#include <ui/device_settings/camera_motion_mask_widget.h>
+#include <ui/graphics/items/resource_widget.h>
 
 QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     QWidget(parent),
@@ -286,7 +289,7 @@ void QnSingleCameraSettingsWidget::hideEvent(QHideEvent *event) {
     base_type::hideEvent(event);
 
     if(m_motionWidget) {
-        delete m_motionWidget;
+        qnDeleteLater(m_motionWidget);
         m_motionWidget = NULL;
     }
 }
