@@ -48,6 +48,10 @@ public:
         m_animationByWidget[widget].value = value;
     }
 
+    bool connected(const QWidget *widget){
+        return m_animationByWidget.contains(widget);
+    }
+
 protected:
     virtual void tick(int deltaTime) override {
         for(QHash<const QWidget *, Animation>::iterator pos = m_animationByWidget.begin(), end = m_animationByWidget.end(); pos != end; pos++) {
