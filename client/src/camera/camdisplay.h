@@ -94,6 +94,7 @@ protected:
 
 	void clearVideoQueue();
     void enqueueVideo(QnCompressedVideoDataPtr vd);
+    bool isAudioHoleDetected(QnCompressedVideoDataPtr vd);
     void afterJump(QnAbstractMediaDataPtr media);
     void processNewSpeed(float speed);
     bool useSync(QnCompressedVideoDataPtr vd);

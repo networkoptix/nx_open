@@ -1131,7 +1131,10 @@ void RTPSession::setTransport(const QString& transport)
 
 QString RTPSession::getTrackFormat(int trackNum) const
 {
-    return m_sdpTracks.value(trackNum)->codecName;
+    if (m_sdpTracks.contains(trackNum))
+        return m_sdpTracks.value(trackNum)->codecName;
+    else
+        return QString();
 }
 
 QString RTPSession::getTrackType(int trackNum) const
