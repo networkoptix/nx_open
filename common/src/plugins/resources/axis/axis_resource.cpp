@@ -95,15 +95,18 @@ QRect QnPlAxisResource::gridRectToAxisRect(const QRect& gridRect)
 
 bool QnPlAxisResource::readMotionInfo()
 {
-    m_mutex.lock();
+    
+    {
+        QMutexLocker lock(&m_mutex);
+        qint64 time = qnSyncTime->currentMSecsSinceEpoch();
+        if (time - m_lastMotionReadTime < MOTION_INFO_UPDATE_INTERVAL)
+            return true;
 
-    qint64 time = qnSyncTime->currentMSecsSinceEpoch();
-    if (time - m_lastMotionReadTime < MOTION_INFO_UPDATE_INTERVAL)
-        return true;
+        m_lastMotionReadTime = time;
+    }
 
-    m_lastMotionReadTime = time;
 
-    m_mutex.unlock();
+    
 
     // read motion windows coordinates
     CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth());
