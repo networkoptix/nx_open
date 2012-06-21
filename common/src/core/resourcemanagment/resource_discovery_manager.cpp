@@ -584,6 +584,12 @@ void QnResourceDiscoveryManager::updateResourceStatus(QnResourcePtr res)
 				rpNetRes->setStatus(QnResource::Online);
 
         }
+        else if (!rpNetRes->isInitialized())
+        {
+            rpNetRes->init(); // Resource already in resource pool. Try to init resource if resource is not authorized or not initialized by other reason
+            if (rpNetRes->isInitialized() && rpNetRes->getStatus() == QnResource::Unauthorized)
+                rpNetRes->setStatus(QnResource::Online);
+        }
 
 
         rpNetRes->setLastDiscoveredTime(qnSyncTime->currentDateTime());
