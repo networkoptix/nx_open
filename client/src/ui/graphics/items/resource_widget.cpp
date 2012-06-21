@@ -650,6 +650,9 @@ void QnResourceWidget::setDisplayFlags(DisplayFlags flags) {
         QnAbstractArchiveReader *reader = m_display->archiveReader();
         if (reader)
             reader->setSendMotion(flags & DisplayMotion);
+
+        if(!(flags & DisplayMotion))
+            m_searchButton->setChecked(false);
     }
 
     if(changedFlags & DisplayButtons)
