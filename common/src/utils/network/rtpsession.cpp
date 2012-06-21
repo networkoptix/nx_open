@@ -326,9 +326,6 @@ bool RTPSession::open(const QString& url)
     if (!rez)
         return false;
 
-    m_tcpSock.setReadTimeOut(m_tcpTimeout);
-    m_tcpSock.setWriteTimeOut(m_tcpTimeout);
-
     m_tcpSock.setNoDelay(true);
 
     if (!sendDescribe())
@@ -360,6 +357,9 @@ bool RTPSession::open(const QString& url)
 
     if (m_sdpTracks.size()<=0)
         return false;
+
+    m_tcpSock.setReadTimeOut(m_tcpTimeout);
+    m_tcpSock.setWriteTimeOut(m_tcpTimeout);
 
     return true;
 }
