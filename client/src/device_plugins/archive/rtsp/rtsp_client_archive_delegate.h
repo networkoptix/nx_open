@@ -52,6 +52,7 @@ public:
 private:
     QnAbstractDataPacketPtr processFFmpegRtpPayload(const quint8* data, int dataSize);
     void processMetadata(const quint8* data, int dataSize);
+    bool openInternal(QnResourcePtr resource);
     void reopen();
 
     // determine camera's video server on specified time

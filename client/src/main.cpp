@@ -416,11 +416,15 @@ int main(int argc, char *argv[])
     /* Process pending events before executing actions. */
     qApp->processEvents();
 
-    /* Open connection settings dialog. */
-    if(!authentication.isValid()) {
-        context->menu()->trigger(Qn::ConnectToServerAction);
-    } else {
-        context->menu()->trigger(Qn::ReconnectAction);
+    /* Really argc==1. */
+    if (argc <= 1)
+    {
+        /* Open connection settings dialog. */
+        if(!authentication.isValid()) {
+            context->menu()->trigger(Qn::ConnectToServerAction);
+        } else {
+            context->menu()->trigger(Qn::ReconnectAction);
+        }
     }
 
     /* Drop resources if needed. */

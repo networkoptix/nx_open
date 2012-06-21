@@ -20,7 +20,7 @@ static const int MAX_RTCP_PACKET_SIZE = 1024 * 2;
 static const quint32 SSRC_CONST = 0x2a55a9e8;
 static const quint32 CSRC_CONST = 0xe8a9552a;
 
-static const int TCP_CONNECT_TIMEOUT = 1000*3;
+static const int TCP_CONNECT_TIMEOUT = 1000*2;
 
 //#define DEBUG_RTSP
 
@@ -326,9 +326,6 @@ bool RTPSession::open(const QString& url)
     if (!rez)
         return false;
 
-    m_tcpSock.setReadTimeOut(m_tcpTimeout);
-    m_tcpSock.setWriteTimeOut(m_tcpTimeout);
-
     m_tcpSock.setNoDelay(true);
 
     if (!sendDescribe())
@@ -360,6 +357,9 @@ bool RTPSession::open(const QString& url)
 
     if (m_sdpTracks.size()<=0)
         return false;
+
+    m_tcpSock.setReadTimeOut(m_tcpTimeout);
+    m_tcpSock.setWriteTimeOut(m_tcpTimeout);
 
     return true;
 }

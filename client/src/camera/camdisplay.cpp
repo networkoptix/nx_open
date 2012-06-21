@@ -118,7 +118,8 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_executingChangeSpeed(false),
       m_eofSignalSended(false),
       m_lastLiveIsLowQuality(false),
-      m_audioDisplay(0)
+      m_audioDisplay(0),
+      m_videoQueueDuration(0)
 {
     m_storedMaxQueueSize = m_dataQueue.maxSize();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
@@ -1154,7 +1155,7 @@ QnCompressedVideoDataPtr CLCamDisplay::nextInOutVideodata(QnCompressedVideoDataP
         enqueueVideo(incoming);
 
     // queue is not empty
-    return m_videoQueue[channel].dequeue();
+    return dequeueVideo(channel);
 }
 
 quint64 CLCamDisplay::nextVideoImageTime(QnCompressedVideoDataPtr incoming, int channel) const
@@ -1185,6 +1186,7 @@ void CLCamDisplay::clearVideoQueue()
             m_videoQueue[i].dequeue();
     }
     m_videoBufferOverflow = false;
+    m_videoQueueDuration = 0;
 }
 
 bool CLCamDisplay::isAudioHoleDetected(QnCompressedVideoDataPtr vd)
@@ -1196,16 +1198,32 @@ bool CLCamDisplay::isAudioHoleDetected(QnCompressedVideoDataPtr vd)
         return false; // do not change behaviour for local files
     if (m_videoQueue->isEmpty())
         return false;
-    return m_videoQueue->last()->timestamp - m_videoQueue->first()->timestamp >= MAX_FRAME_DURATION*1000ll;
+    //return m_videoQueue->last()->timestamp - m_videoQueue->first()->timestamp >= MAX_FRAME_DURATION*1000ll;
+    return m_videoQueueDuration > m_audioDisplay->getAudioBufferSize() * 2 * 1000;
+}
+
+QnCompressedVideoDataPtr CLCamDisplay::dequeueVideo(int channel)
+{
+    if (m_videoQueue[channel].size() > 1) {
+        qint64 timeDiff = m_videoQueue[channel].at(1)->timestamp - m_videoQueue[channel].front()->timestamp;
+        if (timeDiff <= MAX_FRAME_DURATION*1000ll) // ignore data holes
+            m_videoQueueDuration -= timeDiff;
+    }
+    return m_videoQueue[channel].dequeue();
 }
 
 void CLCamDisplay::enqueueVideo(QnCompressedVideoDataPtr vd)
 {
+    if (!m_videoQueue[vd->channelNumber].isEmpty()) {
+        qint64 timeDiff = vd->timestamp - m_videoQueue[vd->channelNumber].last()->timestamp;
+        if (timeDiff <= MAX_FRAME_DURATION*1000ll) // ignore data holes
+            m_videoQueueDuration += timeDiff; 
+    }
     m_videoQueue[vd->channelNumber].enqueue(vd);
     if (m_videoQueue[vd->channelNumber].size() > 60 * 6) // I assume we are not gonna buffer
     {
         cl_log.log(QLatin1String("Video buffer overflow!"), cl_logWARNING);
-        m_videoQueue[vd->channelNumber].dequeue();
+        dequeueVideo(vd->channelNumber);
         // some protection for very large difference between video and audio tracks. Need to improve sync logic for this case (now a lot of glithces)
         m_videoBufferOverflow = true;
     }

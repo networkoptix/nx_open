@@ -76,6 +76,7 @@ static const qint64 MAX_FIRST_GOP_FRAMES = 250;
 
 static const qint64 MAX_FRAME_DURATION = 5 * 1000;
 static const qint64 MIN_FRAME_DURATION = 15;
+static const qint64 MAX_AUDIO_FRAME_DURATION = 150;
 
 quint64 QN_EXPORT getUsecTimer();
 

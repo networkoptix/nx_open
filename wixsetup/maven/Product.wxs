@@ -23,8 +23,8 @@
         <?define VmsChanging=" (Installed AND REMOVE <> "ALL") "?>
         <?define VmsRemoving=" (Installed AND REMOVE = "ALL") "?>
         <?define VmsRepairing=" (REINSTALLMODE) " ?>
-		
-		<?define LaunchClientChecBoxText="Launch ${product.name} when setup exits." ?>
+        
+        <?define LaunchClientChecBoxText="Launch ${product.name} when setup exits." ?>
         
         <SetProperty Id="REBOOT" Value="reallysuppress" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
         <SetProperty Id="PREVIOUSVERSIONSINSTALLED" Value="[MIGRATE]" After="FindRelatedProducts"/>
@@ -42,8 +42,8 @@
         
         <Property Id="MSIRESTARTMANAGERCONTROL" Value="Disable" Secure="yes"/>
 
-		<Property Id="LAUNCHAPPONEXIT" Secure="yes" />
-    	<Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(var.LaunchClientChecBoxText)" />
+        <Property Id="LAUNCHAPPONEXIT" Secure="yes" />
+        <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(var.LaunchClientChecBoxText)" />
        
         <!-- Properties -->
         <Property Id="WelcomeDlg_Title" Value="${product.name} Installer Setup" />
@@ -96,7 +96,7 @@
         
         <Property Id="APPSERVER_LOGIN" Secure="yes" Value="admin"/>
         <Property Id="APPSERVER_PASSWORD" Secure="yes"/>
-		<Property Id="APPSERVER_PASSWORD_CONFIRM" Secure="yes"/>
+        <Property Id="APPSERVER_PASSWORD_CONFIRM" Secure="yes"/>
         
         <!-- MediaServer properties-->
         <Property Id="SERVER_APPSERVER_HOST" Secure="yes" Value="localhost"/>
@@ -478,10 +478,6 @@
                                 <File Id="Serverlibeay32.dll" Name="libeay32.dll" Source="mediaserver\libeay32.dll"/>
                                 <File Id="Serverssleay32.dll" Name="ssleay32.dll" Source="mediaserver\ssleay32.dll"/>
                             </Component>
-                            
-                            <Component Id="ServerQjson" Guid="{809F73F7-A313-4190-8DF5-389D6B57064B}">
-                                <File Id="ServerQjsonDll" Name="qjson.dll" Source="mediaserver/qjson.dll"/>
-                            </Component>
                         </Directory>
                         
                         <Directory Id="VmsClientDir" Name="Client">
@@ -550,10 +546,6 @@
                             <Component Id="ClientOpenSSL" Guid="{D7E994B3-B437-4993-A04E-C15AF9DF8312}">
                                 <File Id="Clientlibeay32.dll" Name="libeay32.dll" Source="client\libeay32.dll"/>
                                 <File Id="Clientssleay32.dll" Name="ssleay32.dll" Source="client\ssleay32.dll"/>
-                            </Component>
-                            
-                            <Component Id="ClientQjson" Guid="{E22DFDE7-0917-4feb-971D-74457D2DAD71}">
-                                <File Id="ClientQjsonDll" Name="qjson.dll" Source="client/qjson.dll"/>
                             </Component>
                             
                             <Component Id="ClientQtColorPicker" Guid="{A8E0F358-198A-4D79-A6F0-607D60F524EE}">
@@ -634,7 +626,6 @@
             <ComponentRef Id="ServerFFmpegLibraries"/>
             <ComponentRef Id="ServerQTLibraries" />
             <ComponentRef Id="ServerOpenSSL"/>
-            <ComponentRef Id="ServerQjson"/>
         </Feature>
         
         <Feature Id="ClientFeature" Title="${product.name} Client" Level="1"
@@ -648,7 +639,6 @@
             <ComponentRef Id="ImageFormats" />
             <ComponentRef Id="ClientOpenAL" />
             <ComponentRef Id="ClientOpenSSL" />
-            <ComponentRef Id="ClientQjson"/>
             <ComponentRef Id="ClientQtColorPicker"/>
             <ComponentRef Id="bespin" />
             
@@ -722,15 +712,15 @@
             <Publish Dialog="InstallTypeDlg" Control="Next" Property="CLIENT_APPSERVER_HOST" Value="localhost" Order="4"><![CDATA[ INSTALLTYPE=0 ]]></Publish>
             <Publish Dialog="InstallTypeDlg" Control="Next" Property="CLIENT_APPSERVER_PORT" Value="[APPSERVER_PORT]" Order="4"><![CDATA[ INSTALLTYPE=0 ]]></Publish>
             <Publish Dialog="InstallTypeDlg" Control="Next" Property="CLIENT_APPSERVER_LOGIN" Value="[APPSERVER_LOGIN]" Order="4"><![CDATA[ INSTALLTYPE=0 ]]></Publish>
-			
-			<?define EcsPasswordsEqual="(APPSERVER_PASSWORD = APPSERVER_PASSWORD_CONFIRM)" ?>
+            
+            <?define EcsPasswordsEqual="(APPSERVER_PASSWORD = APPSERVER_PASSWORD_CONFIRM)" ?>
            
             <Publish Dialog="PasswordDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg">1</Publish>
             <Publish Dialog="PasswordDlg" Control="Next" Event="SpawnDialog" Value="EmptyPasswordDlg">NOT APPSERVER_PASSWORD</Publish>
             <Publish Dialog="PasswordDlg" Control="Next" Property="SERVER_APPSERVER_PASSWORD" Value="[APPSERVER_PASSWORD]">APPSERVER_PASSWORD</Publish>
-			<Publish Dialog="PasswordDlg" Control="Next" Event="SpawnDialog" Value="PasswordShouldMatchDlg" Order="2"><![CDATA[ NOT $(var.EcsPasswordsEqual) ]]></Publish>
-			<Publish Dialog="PasswordDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">$(var.EcsPasswordsEqual) AND APPSERVER_PASSWORD</Publish>
-			
+            <Publish Dialog="PasswordDlg" Control="Next" Event="SpawnDialog" Value="PasswordShouldMatchDlg" Order="2"><![CDATA[ NOT $(var.EcsPasswordsEqual) ]]></Publish>
+            <Publish Dialog="PasswordDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">$(var.EcsPasswordsEqual) AND APPSERVER_PASSWORD</Publish>
+            
             <Publish Dialog="AdvancedTypeDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg">1</Publish>
             <Publish Dialog="AdvancedTypeDlg" Control="Next" Event="NewDialog" Value="MyFeaturesDlg">1</Publish>
             
@@ -766,8 +756,8 @@
             <Publish Dialog="MyFeaturesDlg" Control="Next" Property="CLIENT_APPSERVER_HOST" Value="{}" Order="4"><![CDATA[ NOT $(var.AppServerInstallingClient) ]]></Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Property="CLIENT_APPSERVER_PORT" Value="{}" Order="4"><![CDATA[ NOT $(var.AppServerInstallingClient) ]]></Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Property="CLIENT_APPSERVER_LOGIN" Value="{}" Order="4"><![CDATA[ NOT $(var.AppServerInstallingClient) ]]></Publish>
-			<Publish Dialog="MyFeaturesDlg" Control="Next" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="{}"><![CDATA[ &ClientFeature <> 3 ]]></Publish>
-        	<Publish Dialog="MyFeaturesDlg" Control="Next" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(var.LaunchClientChecBoxText)"><![CDATA[ &ClientFeature = 3 ]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="{}"><![CDATA[ &ClientFeature <> 3 ]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(var.LaunchClientChecBoxText)"><![CDATA[ &ClientFeature = 3 ]]></Publish>
             
             <Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg">1</Publish>
             <Publish Dialog="InstallDirDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
@@ -781,13 +771,13 @@
             
             <Publish Dialog="AppServerDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg">1</Publish>
 
-			<?define EcsPortsDiffer="(APPSERVER_PORT <> PROXY_PORT)" ?>
-        	<?define EcsNeedCheckPorts="(APPSERVER_PORT <> OLD_APPSERVER_PORT OR PROXY_PORT <> OLD_PROXY_PORT)" ?>			
+            <?define EcsPortsDiffer="(APPSERVER_PORT <> PROXY_PORT)" ?>
+            <?define EcsNeedCheckPorts="(APPSERVER_PORT <> OLD_APPSERVER_PORT OR PROXY_PORT <> OLD_PROXY_PORT)" ?>          
             
             <Publish Dialog="AppServerDlg" Control="Next" Property="BUSYPORT" Value="{}">1</Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Property="PORTSTOTEST" Value="[APPSERVER_PORT] [PROXY_PORT]" Order="1">1</Publish>
-			<Publish Dialog="AppServerDlg" Control="Next" Event="SpawnDialog" Value="PortDuplicateDlg" Order="2"><![CDATA[ NOT $(var.EcsPortsDiffer) ]]></Publish>
-        	<Publish Dialog="AppServerDlg" Control="Next" Event="SpawnDialog" Value="PasswordShouldMatchDlg" Order="2"><![CDATA[ $(var.EcsPortsDiffer) AND NOT $(var.EcsPasswordsEqual) ]]></Publish>
+            <Publish Dialog="AppServerDlg" Control="Next" Event="SpawnDialog" Value="PortDuplicateDlg" Order="2"><![CDATA[ NOT $(var.EcsPortsDiffer) ]]></Publish>
+            <Publish Dialog="AppServerDlg" Control="Next" Event="SpawnDialog" Value="PasswordShouldMatchDlg" Order="2"><![CDATA[ $(var.EcsPortsDiffer) AND NOT $(var.EcsPasswordsEqual) ]]></Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Event="DoAction" Value="CheckPorts" Order="2"><![CDATA[ $(var.EcsPortsDiffer) AND $(var.EcsPasswordsEqual) AND $(var.EcsNeedCheckPorts) ]]></Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Event="NewDialog" Value="PortIsBusyDlg" Order="3"><![CDATA[ $(var.EcsPortsDiffer) AND $(var.EcsPasswordsEqual) AND BUSYPORT ]]></Publish>
             

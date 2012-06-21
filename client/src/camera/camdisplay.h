@@ -94,6 +94,7 @@ protected:
 
 	void clearVideoQueue();
     void enqueueVideo(QnCompressedVideoDataPtr vd);
+    QnCompressedVideoDataPtr dequeueVideo(int channel);
     bool isAudioHoleDetected(QnCompressedVideoDataPtr vd);
     void afterJump(QnAbstractMediaDataPtr media);
     void processNewSpeed(float speed);
@@ -195,6 +196,7 @@ protected:
     bool m_lastLiveIsLowQuality;
     int m_audioBufferSize;
     qint64 m_minAudioDetectJumpInterval;
+    qint64 m_videoQueueDuration;
 };
 
 #endif //clcam_display_h_1211
