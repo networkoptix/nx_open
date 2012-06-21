@@ -113,7 +113,7 @@ inline QSize bestSingleBoundedSize(QnWorkbenchGridMapper *mapper, int bound, Qt:
     qreal aspectRatio1 = QnGeometry::aspectRatio(mapper->mapFromGrid(gridSize1));
     qreal aspectRatio2 = QnGeometry::aspectRatio(mapper->mapFromGrid(gridSize2));
 
-    if((aspectRatio1 < aspectRatio) == (aspectRatio2 < aspectRatio))
+    if((aspectRatio1 < aspectRatio) == (aspectRatio2 < aspectRatio) && gridSize1 != gridSize2)
         return gridSize0;
 
     qreal distance0 = std::abs(std::log(QnGeometry::aspectRatio(mapper->mapFromGrid(gridSize0)) / aspectRatio)) / 1.25; /* Prefer larger size. */
