@@ -28,6 +28,8 @@ const int QnPlOnvifResource::DEFAULT_IFRAME_DISTANCE = 20;
 const QString& QnPlOnvifResource::MEDIA_URL_PARAM_NAME = *(new QString("MediaUrl"));
 const QString& QnPlOnvifResource::DEVICE_URL_PARAM_NAME = *(new QString("DeviceUrl"));
 const float QnPlOnvifResource::QUALITY_COEF = 0.2f;
+const char* QnPlOnvifResource::PROFILE_NAME_PRIMARY = "Netoptix Primary";
+const char* QnPlOnvifResource::PROFILE_NAME_SECONDARY = "Netoptix Secondary";
 
 //Forth times greater than default = 320 x 240
 const double QnPlOnvifResource::MAX_SECONDARY_RESOLUTION_SQUARE =

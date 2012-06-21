@@ -32,6 +32,8 @@ public:
     static const QString& DEVICE_URL_PARAM_NAME;
 	static const float QUALITY_COEF;
     static const double MAX_SECONDARY_RESOLUTION_SQUARE;
+    static const char* PROFILE_NAME_PRIMARY;
+    static const char* PROFILE_NAME_SECONDARY;
 
     static const QString fetchMacAddress(const NetIfacesResp& response, const QString& senderIpAddress);
 
