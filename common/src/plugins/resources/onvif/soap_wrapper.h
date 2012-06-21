@@ -5,6 +5,8 @@
 
 struct soap;
 class DeviceBindingProxy;
+class MediaBindingProxy;
+
 class _onvifDevice__GetNetworkInterfaces;
 class _onvifDevice__GetNetworkInterfacesResponse;
 class _onvifDevice__CreateUsers;
@@ -23,17 +25,51 @@ typedef _onvifDevice__GetDeviceInformationResponse DeviceInfoResp;
 typedef _onvifDevice__GetCapabilities CapabilitiesReq;
 typedef _onvifDevice__GetCapabilitiesResponse CapabilitiesResp;
 
+class _onvifMedia__GetVideoEncoderConfigurationOptions;
+class _onvifMedia__GetVideoEncoderConfigurationOptionsResponse;
+class _onvifMedia__GetVideoSourceConfigurations;
+class _onvifMedia__GetVideoSourceConfigurationsResponse;
+class _onvifMedia__GetVideoEncoderConfigurations;
+class _onvifMedia__GetVideoEncoderConfigurationsResponse;
+class _onvifMedia__GetProfiles;
+class _onvifMedia__GetProfilesResponse;
+class _onvifMedia__AddVideoSourceConfiguration;
+class _onvifMedia__AddVideoSourceConfigurationResponse;
+class _onvifMedia__CreateProfile;
+class _onvifMedia__CreateProfileResponse;
+class _onvifMedia__AddVideoEncoderConfiguration;
+class _onvifMedia__AddVideoEncoderConfigurationResponse;
+
+typedef _onvifMedia__GetVideoEncoderConfigurationOptions VideoOptionsReq;
+typedef _onvifMedia__GetVideoEncoderConfigurationOptionsResponse VideoOptionsResp;
+typedef _onvifMedia__GetVideoSourceConfigurations VideoSrcConfigsReq;
+typedef _onvifMedia__GetVideoSourceConfigurationsResponse VideoSrcConfigsResp;
+typedef _onvifMedia__GetVideoEncoderConfigurations VideoConfigsReq;
+typedef _onvifMedia__GetVideoEncoderConfigurationsResponse VideoConfigsResp;
+typedef _onvifMedia__GetProfiles ProfilesReq;
+typedef _onvifMedia__GetProfilesResponse ProfilesResp;
+typedef _onvifMedia__AddVideoSourceConfiguration AddVideoSrcConfigReq;
+typedef _onvifMedia__AddVideoSourceConfigurationResponse AddVideoSrcConfigResp;
+typedef _onvifMedia__CreateProfile CreateProfileReq;
+typedef _onvifMedia__CreateProfileResponse CreateProfileResp;
+typedef _onvifMedia__AddVideoEncoderConfiguration AddVideoConfigReq;
+typedef _onvifMedia__AddVideoEncoderConfigurationResponse AddVideoConfigResp;
+
+//
+// SoapWrapper
+//
+
 template <class T>
 class SoapWrapper
 {
+    char* m_login;
+    char* m_passwd;
     bool invoked;
 
 protected:
 
     T* m_soapProxy;
     char* m_endpoint;
-    char* m_login;
-    char* m_passwd;
 
 public:
 
@@ -44,6 +80,7 @@ public:
     const char* getLogin();
     const char* getPassword();
     QString getLastError();
+    bool isNotAuthenticated();
 
 private:
     SoapWrapper();
@@ -54,6 +91,10 @@ protected:
     void beforeMethodInvocation();
     void setLoginPassword(const std::string& login, const std::string& passwd);
 };
+
+//
+// DeviceSoapWrapper
+//
 
 class DeviceSoapWrapper: public SoapWrapper<DeviceBindingProxy>
 {
@@ -77,6 +118,30 @@ private:
     DeviceSoapWrapper(const DeviceSoapWrapper&);
 };
 
+//
+// MediaSoapWrapper
+//
 
+class MediaSoapWrapper: public SoapWrapper<MediaBindingProxy>
+{
+    PasswordHelper& passwordsData;
+
+public:
+
+    MediaSoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd);
+    virtual ~MediaSoapWrapper();
+
+    int getVideoEncoderConfigurationOptions(VideoOptionsReq& request, VideoOptionsResp& response);
+    int getVideoSourceConfigurations(VideoSrcConfigsReq& request, VideoSrcConfigsResp& response);
+    int getVideoEncoderConfigurations(VideoConfigsReq& request, VideoConfigsResp& response);
+    int getProfiles(ProfilesReq& request, ProfilesResp& response);
+    int addVideoSourceConfiguration(AddVideoSrcConfigReq& request, AddVideoSrcConfigResp& response);
+    int createProfile(CreateProfileReq& request, CreateProfileResp& response);
+    int addVideoEncoderConfiguration(AddVideoConfigReq& request, AddVideoConfigResp& response);
+
+private:
+    MediaSoapWrapper();
+    MediaSoapWrapper(const MediaSoapWrapper&);
+};
 
 #endif //onvif_soap_wrapper_h

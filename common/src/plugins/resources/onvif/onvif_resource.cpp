@@ -16,7 +16,7 @@
 //#include "onvif/Onvif.nsmap"
 #include "onvif/soapDeviceBindingProxy.h"
 #include "onvif/soapMediaBindingProxy.h"
-#include "onvif/wsseapi.h"
+//#include "onvif/wsseapi.h"
 #include "api/app_server_connection.h"
 
 const char* QnPlOnvifResource::MANUFACTURE = "OnvifDevice";
@@ -44,7 +44,7 @@ bool resolutionGreaterThan(const ResolutionPair &s1, const ResolutionPair &s2)
 
 struct VideoEncoders
 {
-    _onvifMedia__GetVideoEncoderConfigurationsResponse soapResponse;
+    VideoConfigsResp soapResponse;
     QHash<QString, onvifXsd__VideoEncoderConfiguration*> videoEncodersUnused;
     QHash<QString, onvifXsd__VideoEncoderConfiguration*> videoEncodersUsed;
     class onvifXsd__VideoSourceConfiguration* videoSource;
@@ -58,7 +58,7 @@ struct VideoEncoders
 // QnPlOnvifResource
 //
 
-const QString QnPlOnvifResource::fetchMacAddress(const _onvifDevice__GetNetworkInterfacesResponse& response,
+const QString QnPlOnvifResource::fetchMacAddress(const NetIfacesResp& response,
     const QString& senderIpAddress)
 {
     QString someMacAddress;
@@ -328,139 +328,120 @@ void QnPlOnvifResource::setMotionMaskPhysical(int /*channel*/)
 
 void QnPlOnvifResource::fetchAndSetDeviceInformation()
 {
-    DeviceBindingProxy soapProxy;
-    soapProxy.soap->send_timeout = 5;
-    soapProxy.soap->recv_timeout = 5;
-    QString endpoint(deviceUrl);
-
     QAuthenticator auth(getAuth());
-    std::string login(auth.user().toStdString());
-    std::string passwd(auth.password().toStdString());
-    if (!login.empty()) soap_register_plugin(soapProxy.soap, soap_wsse);
-
+    DeviceSoapWrapper soapWrapper(deviceUrl.toStdString(), auth.user().toStdString(), auth.password().toStdString());
+    
     //Trying to get name
-    _onvifDevice__GetDeviceInformation request;
-    _onvifDevice__GetDeviceInformationResponse response;
-    if (!login.empty()) soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", login.c_str(), passwd.c_str());
+    {
+        DeviceInfoReq request;
+        DeviceInfoResp response;
 
-    int soapRes = soapProxy.GetDeviceInformation(endpoint.toStdString().c_str(), NULL, &request, &response);
-    if (soapRes != SOAP_OK) {
-        qWarning() << "QnPlOnvifResource::fetchAndSetDeviceInformation: GetDeviceInformation SOAP to endpoint "
-            << endpoint << " failed. Camera name will remain 'Unknown'. GSoap error code: " << soapRes
-            << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
-    } else {
-        setName((response.Manufacturer + " - " + response.Model).c_str());
+        int soapRes = soapWrapper.getDeviceInformation(request, response);
+        if (soapRes != SOAP_OK) {
+            qWarning() << "QnPlOnvifResource::fetchAndSetDeviceInformation: GetDeviceInformation SOAP to endpoint "
+                << deviceUrl << " failed. Camera name will remain 'Unknown'. GSoap error code: " << soapRes
+                << ". " << soapWrapper.getLastError();
+        } else {
+            setName((response.Manufacturer + " - " + response.Model).c_str());
+        }
     }
-    soap_end(soapProxy.soap);
 
     //Trying to get onvif URLs
-    _onvifDevice__GetCapabilities request2;
-    _onvifDevice__GetCapabilitiesResponse response2;
-    if (!login.empty()) soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", login.c_str(), passwd.c_str());
+    {
+        CapabilitiesReq request;
+        CapabilitiesResp response;
 
-    soapRes = soapProxy.GetCapabilities(endpoint.toStdString().c_str(), NULL, &request2, &response2);
-    if (soapRes != SOAP_OK && cl_log.logLevel() >= cl_logDEBUG1) {
-        qWarning() << "QnPlOnvifResource::fetchAndSetDeviceInformation: can't fetch media and device URLs. Reason: SOAP to endpoint "
-            << endpoint << " failed. GSoap error code: " << soapRes << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
-    }
-    soap_end(soapProxy.soap);
+        int soapRes = soapWrapper.getCapabilities(request, response);
+        if (soapRes != SOAP_OK && cl_log.logLevel() >= cl_logDEBUG1) {
+            qWarning() << "QnPlOnvifResource::fetchAndSetDeviceInformation: can't fetch media and device URLs. Reason: SOAP to endpoint "
+                << deviceUrl << " failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
+        }
 
-    if (response2.Capabilities && response2.Capabilities->Media) {
-        setMediaUrl(response2.Capabilities->Media->XAddr.c_str());
-        setParam(MEDIA_URL_PARAM_NAME, getMediaUrl(), QnDomainDatabase);
-    }
-    if (response2.Capabilities && response2.Capabilities->Device) {
-        setDeviceUrl(response2.Capabilities->Device->XAddr.c_str());
-        setParam(DEVICE_URL_PARAM_NAME, getDeviceUrl(), QnDomainDatabase);
+        if (response.Capabilities) {
+            if (response.Capabilities->Media) {
+                setMediaUrl(response.Capabilities->Media->XAddr.c_str());
+                setParam(MEDIA_URL_PARAM_NAME, getMediaUrl(), QnDomainDatabase);
+            }
+            if (response.Capabilities->Device) {
+                setDeviceUrl(response.Capabilities->Device->XAddr.c_str());
+                setParam(DEVICE_URL_PARAM_NAME, getDeviceUrl(), QnDomainDatabase);
+            }
+        }
     }
 
     //Trying to get MAC
-    _onvifDevice__GetNetworkInterfaces request3;
-    _onvifDevice__GetNetworkInterfacesResponse response3;
-    if (!login.empty()) soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", login.c_str(), passwd.c_str());
+    {
+        NetIfacesReq request;
+        NetIfacesResp response;
 
-    soapRes = soapProxy.GetNetworkInterfaces(endpoint.toStdString().c_str(), NULL, &request3, &response3);
-    if (soapRes != SOAP_OK && cl_log.logLevel() >= cl_logDEBUG1) {
-        qWarning() << "QnPlOnvifResource::fetchAndSetDeviceInformation: can't fetch MAC address. Reason: SOAP to endpoint "
-            << endpoint << " failed. GSoap error code: " << soapRes << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
+        int soapRes = soapWrapper.getNetworkInterfaces(request, response);
+        if (soapRes != SOAP_OK && cl_log.logLevel() >= cl_logDEBUG1) {
+            qWarning() << "QnPlOnvifResource::fetchAndSetDeviceInformation: can't fetch MAC address. Reason: SOAP to endpoint "
+                << deviceUrl << " failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
+        }
+        QString mac = fetchMacAddress(response, QUrl(deviceUrl).host());
+        if (!mac.isEmpty()) setMAC(mac);
     }
-    QString mac = fetchMacAddress(response3, QUrl(deviceUrl).host());
-    if (!mac.isEmpty()) setMAC(mac);
-    soap_end(soapProxy.soap);
 }
 
 void QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
 {
-    MediaBindingProxy soapProxy;
-    soapProxy.soap->send_timeout = 5;
-    soapProxy.soap->recv_timeout = 5;
-    QString endpoint(mediaUrl);
-
     QAuthenticator auth(getAuth());
-    std::string login(auth.user().toStdString());
-    std::string passwd(auth.password().toStdString());
-    if (!login.empty()) soap_register_plugin(soapProxy.soap, soap_wsse);
+    MediaSoapWrapper soapWrapper(mediaUrl.toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString());
     VideoEncoders videoEncoders;
 
     //Getting video options
     {
-        if (!login.empty()) soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", login.c_str(), passwd.c_str());
-        _onvifMedia__GetVideoEncoderConfigurationOptions request;
-        _onvifMedia__GetVideoEncoderConfigurationOptionsResponse response;
+        VideoOptionsReq request;
+        VideoOptionsResp response;
 
-        int soapRes = soapProxy.GetVideoEncoderConfigurationOptions(endpoint.toStdString().c_str(), NULL, &request, &response);
+        int soapRes = soapWrapper.getVideoEncoderConfigurationOptions(request, response);
         if (soapRes != SOAP_OK || !response.Options) {
             qWarning() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: can't init ONVIF device resource, will "
-                << "try alternative approach (URL: " << endpoint << ", MAC: " << getMAC().toString()
+                << "try alternative approach (URL: " << mediaUrl << ", UniqueId: " << getUniqueId()
                 << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
-                << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
+                << ". " << soapWrapper.getLastError();
         } else {
             
             if (!response.Options->H264 && response.Options->JPEG) {
                 codec = JPEG;
                 fetchAndSetVideoEncoderOptions();
-                soap_end(soapProxy.soap);
                 return;
             }
 
             setVideoEncoderOptions(response);
         }
-        soap_end(soapProxy.soap);
     }
 
     //Getting video sources
     {
-        if (!login.empty()) soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", login.c_str(), passwd.c_str());
-        _onvifMedia__GetVideoSourceConfigurations request;
-        _onvifMedia__GetVideoSourceConfigurationsResponse response;
+        VideoSrcConfigsReq request;
+        VideoSrcConfigsResp response;
 
-        int soapRes = soapProxy.GetVideoSourceConfigurations(endpoint.toStdString().c_str(), NULL, &request, &response);
+        int soapRes = soapWrapper.getVideoSourceConfigurations(request, response);
         if (soapRes != SOAP_OK || response.Configurations.size() == 0) {
             qWarning() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: can't get ONVIF device video sources, will "
-                << "try use default (URL: " << endpoint << ", MAC: " << getMAC().toString()
+                << "try use default (URL: " << mediaUrl << ", UniqueId: " << getUniqueId()
                 << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
-                << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
+                << ". " << soapWrapper.getLastError();
         } else {
             setVideoSource(response, videoEncoders);
         }
-        soap_end(soapProxy.soap);
     }
 
     //Alternative approach to fetching video encoder options
     if (videoOptionsNotSet) {
-        if (!login.empty()) soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", login.c_str(), passwd.c_str());
-        _onvifMedia__GetVideoEncoderConfigurations request;
+        VideoConfigsReq request;
 
-        int soapRes = soapProxy.GetVideoEncoderConfigurations(endpoint.toStdString().c_str(), NULL, &request, &videoEncoders.soapResponse);
+        int soapRes = soapWrapper.getVideoEncoderConfigurations(request, videoEncoders.soapResponse);
         if (soapRes != SOAP_OK) {
             qWarning() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: can't init ONVIF device resource even with alternative approach, "
-                << "default settings will be used (URL: " << endpoint << ", MAC: " << getMAC().toString() << "). Root cause: SOAP request failed. GSoap error code: "
-                << soapRes << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
+                << "default settings will be used (URL: " << mediaUrl << ", UniqueId: " << getUniqueId() << "). Root cause: SOAP request failed. GSoap error code: "
+                << soapRes << ". " << soapWrapper.getLastError();
             videoEncoders.soapFailed = true;
         } else {
             analyzeVideoEncoders(videoEncoders, true);
         }
-        soap_end(soapProxy.soap);
     }
 
     //All VideoEncoder options are set, so we can calculate resolutions for the streams
@@ -471,55 +452,49 @@ void QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
     bool hasDualTmp = secondaryResolution != EMPTY_RESOLUTION_PAIR;
 
     if (!videoEncoders.filled && !videoEncoders.soapFailed) {
-        if (!login.empty()) soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", login.c_str(), passwd.c_str());
-        _onvifMedia__GetVideoEncoderConfigurations request;
+        VideoConfigsReq request;
 
-        int soapRes = soapProxy.GetVideoEncoderConfigurations(endpoint.toStdString().c_str(), NULL, &request, &videoEncoders.soapResponse);
+        int soapRes = soapWrapper.getVideoEncoderConfigurations(request, videoEncoders.soapResponse);
         if (soapRes != SOAP_OK) {
             qWarning() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: can't feth video encoders info from ONVIF device (URL: "
-                << endpoint << ", MAC: " << getMAC().toString() << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
-                << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
+                << mediaUrl << ", MAC: " << getMAC().toString() << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
+                << ". " << soapWrapper.getLastError();
             videoEncoders.soapFailed = true;
         } else {
             analyzeVideoEncoders(videoEncoders, false);
         }
-        soap_end(soapProxy.soap);
     }
 
     int appropriateProfiles = 0;
     {
-        if (!login.empty()) soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", login.c_str(), passwd.c_str());
-        _onvifMedia__GetProfiles request;
-        _onvifMedia__GetProfilesResponse response;
+        ProfilesReq request;
+        ProfilesResp response;
 
-        int soapRes = soapProxy.GetProfiles(endpoint.toStdString().c_str(), NULL, &request, &response);
+        int soapRes = soapWrapper.getProfiles(request, response);
         if (soapRes != SOAP_OK) {
             qWarning() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: can't fetch preset profiles ONVIF device (URL: "
-                << endpoint << ", MAC: " << getMAC().toString() << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
-                << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
+                << mediaUrl << ", UniqueId: " << getUniqueId() << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
+                << ". " << soapWrapper.getLastError();
         } else {
             appropriateProfiles = countAppropriateProfiles(response, videoEncoders);
         }
-        soap_end(soapProxy.soap);
 
         //Setting chosen video source
         if (videoEncoders.videoSource) {
             std::vector<onvifXsd__Profile*>::const_iterator it = response.Profiles.begin();
             while (it != response.Profiles.end()) {
                 if (!(*it)->VideoSourceConfiguration || (*it)->VideoSourceConfiguration->token != videoEncoders.videoSource->token) {
-                    if (!login.empty()) soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", login.c_str(), passwd.c_str());
-                    _onvifMedia__AddVideoSourceConfiguration request2;
+                    AddVideoSrcConfigReq request2;
                     request2.ProfileToken = (*it)->token;
                     request2.ConfigurationToken = videoEncoders.videoSource->token;
-                    _onvifMedia__AddVideoSourceConfigurationResponse response2;
+                    AddVideoSrcConfigResp response2;
 
-                    soapRes = soapProxy.AddVideoSourceConfiguration(endpoint.toStdString().c_str(), NULL, &request2, &response2);
+                    soapRes = soapWrapper.addVideoSourceConfiguration(request2, response2);
                     if (soapRes != SOAP_OK) {
                         qWarning() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: can't set video sources to ONVIF device profile (URL: "
-                            << endpoint << ", MAC: " << getMAC().toString() << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
-                            << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
+                            << mediaUrl << ", UniqueId: " << getUniqueId() << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
+                            << ". " << soapWrapper.getLastError();
                     }
-                    soap_end(soapProxy.soap);
                 }
 
                 ++it;
@@ -565,41 +540,35 @@ void QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
         std::string profileNameCurr = profileName + iStr;
         std::string profileTokenCurr = profileToken + iStr;
 
-        if (!login.empty()) soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", login.c_str(), passwd.c_str());
-        _onvifMedia__CreateProfile request;
+        CreateProfileReq request;
         request.Name = profileNameCurr;
         request.Token = &profileTokenCurr;
-        _onvifMedia__CreateProfileResponse response;
+        CreateProfileResp response;
 
-        int soapRes = soapProxy.CreateProfile(endpoint.toStdString().c_str(), NULL, &request, &response);
+        int soapRes = soapWrapper.createProfile(request, response);
         if (soapRes != SOAP_OK) {
             qWarning() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: can't create new profile for ONVIF device (URL: "
-                << endpoint << ", MAC: " << getMAC().toString() << "). Root cause: SOAP request failed. GSoap error code: "
-                << soapRes << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
+                << mediaUrl << ", UniqueId: " << getUniqueId() << "). Root cause: SOAP request failed. GSoap error code: "
+                << soapRes << ". " << soapWrapper.getLastError();
 
             hasDual = false;
-            soap_end(soapProxy.soap);
             return;
         }
-        soap_end(soapProxy.soap);
 
-        if (!login.empty()) soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", login.c_str(), passwd.c_str());
-        _onvifMedia__AddVideoEncoderConfiguration request2;
+        AddVideoConfigReq request2;
         request2.ConfigurationToken = encodersIter.key().toStdString();
         request2.ProfileToken = profileTokenCurr;
-        _onvifMedia__AddVideoEncoderConfigurationResponse response2;
+        AddVideoConfigResp response2;
 
-        soapRes = soapProxy.AddVideoEncoderConfiguration(endpoint.toStdString().c_str(), NULL, &request2, &response2);
+        soapRes = soapWrapper.addVideoEncoderConfiguration(request2, response2);
         if (soapRes != SOAP_OK) {
             qWarning() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: can't add video encoder to newly created profile for ONVIF device (URL: "
-                << endpoint << ", MAC: " << getMAC().toString() << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
-                << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
+                << mediaUrl << ", MAC: " << getMAC().toString() << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
+                << ". " << soapWrapper.getLastError();
 
             hasDual = false;
-            soap_end(soapProxy.soap);
             return;
         }
-        soap_end(soapProxy.soap);
 
         ++encodersIter;
     }
@@ -607,7 +576,7 @@ void QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
     hasDual = (profilesToCreateSize + appropriateProfiles >= 2) && hasDualTmp;
 }
 
-void QnPlOnvifResource::setVideoSource(const _onvifMedia__GetVideoSourceConfigurationsResponse& response, VideoEncoders& encoders) const
+void QnPlOnvifResource::setVideoSource(const VideoSrcConfigsResp& response, VideoEncoders& encoders) const
 {
     unsigned long square = 0;
     std::vector<onvifXsd__VideoSourceConfiguration*>::const_iterator it = response.Configurations.begin();
@@ -627,7 +596,7 @@ void QnPlOnvifResource::setVideoSource(const _onvifMedia__GetVideoSourceConfigur
     }
 }
 
-void QnPlOnvifResource::setVideoEncoderOptions(const _onvifMedia__GetVideoEncoderConfigurationOptionsResponse& response) {
+void QnPlOnvifResource::setVideoEncoderOptions(const VideoOptionsResp& response) {
     if (!response.Options) {
         return;
     }
@@ -650,7 +619,7 @@ void QnPlOnvifResource::setVideoEncoderOptions(const _onvifMedia__GetVideoEncode
     videoOptionsNotSet = !result;
 }
 
-bool QnPlOnvifResource::setVideoEncoderOptionsH264(const _onvifMedia__GetVideoEncoderConfigurationOptionsResponse& response) {
+bool QnPlOnvifResource::setVideoEncoderOptionsH264(const VideoOptionsResp& response) {
     if (!response.Options->H264) {
         qCritical() << "QnPlOnvifResource::setVideoEncoderOptionsH264: can't fetch (ONVIF) max fps, iframe distance and resolution list";
         return false;
@@ -703,7 +672,7 @@ bool QnPlOnvifResource::setVideoEncoderOptionsH264(const _onvifMedia__GetVideoEn
     return result;
 }
 
-bool QnPlOnvifResource::setVideoEncoderOptionsJpeg(const _onvifMedia__GetVideoEncoderConfigurationOptionsResponse& response) {
+bool QnPlOnvifResource::setVideoEncoderOptionsJpeg(const VideoOptionsResp& response) {
     if (!response.Options->JPEG) {
         qCritical() << "QnPlOnvifResource::setVideoEncoderOptionsJpeg: can't fetch (ONVIF) max fps, iframe distance and resolution list";
         return false;
@@ -854,7 +823,7 @@ int QnPlOnvifResource::innerQualityToOnvif(QnStreamQuality quality) const
     return minQuality + (maxQuality - minQuality) * (quality - QnQualityLowest) / (QnQualityHighest - QnQualityLowest);
 }
 
-int QnPlOnvifResource::countAppropriateProfiles(const _onvifMedia__GetProfilesResponse& response, VideoEncoders& encoders)
+int QnPlOnvifResource::countAppropriateProfiles(const ProfilesResp& response, VideoEncoders& encoders)
 {
     const std::vector<onvifXsd__Profile*>& profiles = response.Profiles;
     int result = 0;
@@ -879,33 +848,20 @@ int QnPlOnvifResource::countAppropriateProfiles(const _onvifMedia__GetProfilesRe
 }
 
 bool QnPlOnvifResource::isSoapAuthorized() const {
-    DeviceBindingProxy soapProxy;
-    soapProxy.soap->send_timeout = 5;
-    soapProxy.soap->recv_timeout = 5;
-    QString endpoint(deviceUrl);
+    QAuthenticator auth(getAuth());
+    DeviceSoapWrapper soapWrapper(deviceUrl.toStdString(), auth.user().toStdString(), auth.password().toStdString());
 
     qDebug() << "QnPlOnvifResource::isSoapAuthorized: deviceUrl is '" << deviceUrl << "'";
+    qDebug() << "QnPlOnvifResource::isSoapAuthorized: login = " << soapWrapper.getLogin() << ", password = " << soapWrapper.getPassword();
 
-    QAuthenticator auth(getAuth());
-    std::string login(auth.user().toStdString());
-    std::string passwd(auth.password().toStdString());
-    if (!login.empty()) {
-        soap_register_plugin(soapProxy.soap, soap_wsse);
-        soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", login.c_str(), passwd.c_str());
-    }
+    NetIfacesReq request;
+    NetIfacesResp response;
+    int soapRes = soapWrapper.getNetworkInterfaces(request, response);
 
-    qDebug() << "QnPlOnvifResource::isSoapAuthorized: login = " << login.c_str() << ", password = " << passwd.c_str();
-
-    _onvifDevice__GetNetworkInterfaces request;
-    _onvifDevice__GetNetworkInterfacesResponse response;
-    int soapRes = soapProxy.GetNetworkInterfaces(endpoint.toStdString().c_str(), NULL, &request, &response);
-
-    if (soapRes != SOAP_OK && PasswordHelper::isNotAuthenticated(soapProxy.soap_fault())) {
-        soap_end(soapProxy.soap);
+    if (soapRes != SOAP_OK && soapWrapper.isNotAuthenticated()) {
         return false;
     }
 
-    soap_end(soapProxy.soap);
     return true;
 }
 

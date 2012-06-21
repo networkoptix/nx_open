@@ -7,6 +7,7 @@
 #include "soap_wrapper.h"
 #include "onvif/Onvif.nsmap"
 #include "onvif/soapDeviceBindingProxy.h"
+#include "onvif/soapMediaBindingProxy.h"
 #include "onvif/wsseapi.h"
 
 #include <QtGlobal>
@@ -112,6 +113,12 @@ QString SoapWrapper<T>::getLastError()
     return SoapErrorHelper::fetchDescription(m_soapProxy->soap_fault());
 }
 
+template <class T>
+bool SoapWrapper<T>::isNotAuthenticated()
+{
+    return PasswordHelper::isNotAuthenticated(m_soapProxy->soap_fault());
+}
+
 //
 // DeviceSoapWrapper
 //
@@ -144,7 +151,7 @@ bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer)
         NetIfacesResp response1;
         soapRes = getNetworkInterfaces(request1, response1);
 
-        if (soapRes == SOAP_OK || !passwordsData.isNotAuthenticated(m_soapProxy->soap_fault())) {
+        if (soapRes == SOAP_OK || !isNotAuthenticated()) {
             qDebug() << "Finished picking password";
 
             return soapRes == SOAP_OK;
@@ -218,6 +225,64 @@ int DeviceSoapWrapper::getCapabilities(CapabilitiesReq& request, CapabilitiesRes
 }
 
 //
+// MediaSoapWrapper
+//
+
+MediaSoapWrapper::MediaSoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd):
+    SoapWrapper<MediaBindingProxy>(endpoint, login, passwd),
+    passwordsData(PasswordHelper::instance())
+{
+
+}
+
+MediaSoapWrapper::~MediaSoapWrapper()
+{
+
+}
+
+int MediaSoapWrapper::getVideoEncoderConfigurationOptions(VideoOptionsReq& request, VideoOptionsResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->GetVideoEncoderConfigurationOptions(m_endpoint, NULL, &request, &response);
+}
+
+int MediaSoapWrapper::getVideoSourceConfigurations(VideoSrcConfigsReq& request, VideoSrcConfigsResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->GetVideoSourceConfigurations(m_endpoint, NULL, &request, &response);
+}
+
+int MediaSoapWrapper::getVideoEncoderConfigurations(VideoConfigsReq& request, VideoConfigsResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->GetVideoEncoderConfigurations(m_endpoint, NULL, &request, &response);
+}
+
+int MediaSoapWrapper::getProfiles(ProfilesReq& request, ProfilesResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->GetProfiles(m_endpoint, NULL, &request, &response);
+}
+
+int MediaSoapWrapper::addVideoSourceConfiguration(AddVideoSrcConfigReq& request, AddVideoSrcConfigResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->AddVideoSourceConfiguration(m_endpoint, NULL, &request, &response);
+}
+
+int MediaSoapWrapper::createProfile(CreateProfileReq& request, CreateProfileResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->CreateProfile(m_endpoint, NULL, &request, &response);
+}
+
+int MediaSoapWrapper::addVideoEncoderConfiguration(AddVideoConfigReq& request, AddVideoConfigResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->AddVideoEncoderConfiguration(m_endpoint, NULL, &request, &response);
+}
+
+//
 // Explicit instantiating
 //
 
@@ -225,3 +290,10 @@ template soap* SoapWrapper<DeviceBindingProxy>::getSoap();
 template const char* SoapWrapper<DeviceBindingProxy>::getLogin();
 template const char* SoapWrapper<DeviceBindingProxy>::getPassword();
 template QString SoapWrapper<DeviceBindingProxy>::getLastError();
+template bool SoapWrapper<DeviceBindingProxy>::isNotAuthenticated();
+
+template soap* SoapWrapper<MediaBindingProxy>::getSoap();
+template const char* SoapWrapper<MediaBindingProxy>::getLogin();
+template const char* SoapWrapper<MediaBindingProxy>::getPassword();
+template QString SoapWrapper<MediaBindingProxy>::getLastError();
+template bool SoapWrapper<MediaBindingProxy>::isNotAuthenticated();
