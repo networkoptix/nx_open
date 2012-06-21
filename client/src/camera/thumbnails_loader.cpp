@@ -282,7 +282,7 @@ void QnThumbnailsLoader::process() {
     m_rtspClient->setAdditionalAttribute("x-media-step", QByteArray::number(timeStep * 1000));
 
     if (!m_rtspClient->open(m_resource))
-        QTimer::singleShot(500, m_helper, SLOT(slot0()));
+        QTimer::singleShot(500, m_helper, SLOT(process()));
 
     m_rtspClient->seek(period.startTimeMs * 1000, period.endTimeMs() * 1000);
     QnCompressedVideoDataPtr frame = m_rtspClient->getNextData().dynamicCast<QnCompressedVideoData>();

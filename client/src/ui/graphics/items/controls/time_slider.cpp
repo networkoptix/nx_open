@@ -1462,6 +1462,11 @@ void QnTimeSlider::drawThumbnails(QPainter *painter, const QRectF &rect) {
         qint64 startTime = qFloor(m_windowStart, step);
         qint64 endTime = qCeil(m_windowEnd, step);
 
+        qDebug() << "<<<<<THUMBNAILS";
+        foreach(const ThumbnailData &data, m_thumbnailData)
+            qDebug() << data.thumbnail.isEmpty() << QDateTime::fromMSecsSinceEpoch(data.thumbnail.time());
+        qDebug() << ">>>>>THUMBNAILS";
+
         QRectF boundingRect = rect; 
         for (qint64 time = startTime; time < endTime; time += step) {
             ThumbnailData data = m_thumbnailData.value(time);
