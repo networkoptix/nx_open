@@ -12,6 +12,8 @@ class onvifXsd__VideoEncoderConfiguration;
 
 class QnOnvifStreamReader: public CLServerPushStreamreader , public QnLiveStreamProvider
 {
+    static const int MAX_VIDEO_PARAMS_RESET_TRIES;
+
 public:
     QnOnvifStreamReader(QnResourcePtr res);
     virtual ~QnOnvifStreamReader();
@@ -37,12 +39,16 @@ private:
     void fillMotionInfo(const QRect& rect);
     bool isGotFrame(QnCompressedVideoDataPtr videoData);
 
-    const QString updateCameraAndfetchStreamUrl() const;
-    const QString updateCameraAndfetchStreamUrl(bool isPrimary) const;
+    const QString updateCameraAndFetchStreamUrl() const;
+    const QString updateCameraAndFetchStreamUrl(bool isPrimary) const;
 
+    const QString getStreamUrl(MediaSoapWrapper& soapWrapper, const std::string& profileToken, bool isPrimary) const;
+
+    std::string findAppropriateProfileToken(MediaSoapWrapper& soapWrapper, bool isPrimary) const;
     //Returned ptr can be used only when response is not destroyed!
     onvifXsd__Profile* findAppropriateProfile(const ProfilesResp& response, bool isPrimary) const;
 
+    void setVideoEncoderParams(MediaSoapWrapper& soapWrapper, onvifXsd__Profile& profile, bool isPrimary) const;
     void updateVideoEncoderParams(onvifXsd__VideoEncoderConfiguration* config, bool isPrimary) const;
     const QString normalizeStreamSrcUrl(const std::string& src) const;
     void printProfile(const ProfileResp& response, bool isPrimary) const;
