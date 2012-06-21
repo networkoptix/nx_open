@@ -24,8 +24,8 @@
         <?define VmsRemoving=" (Installed AND REMOVE = "ALL") "?>
         <?define VmsRepairing=" (REINSTALLMODE) " ?>
         
-    	<?define LaunchClientChecBoxText="Launch $(env.APPLICATION_NAME) when setup exits." ?>
-    	
+        <?define LaunchClientChecBoxText="Launch $(env.APPLICATION_NAME) when setup exits." ?>
+        
         <SetProperty Id="REBOOT" Value="reallysuppress" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
         <SetProperty Id="PREVIOUSVERSIONSINSTALLED" Value="[MIGRATE]" After="FindRelatedProducts"/>
         <SetProperty Id="APPSERVER_PASSWORD" Value="[APPSERVER_PASSWORD_REG]" After="FindRelatedProducts">$(var.VmsRepairing)</SetProperty>
@@ -41,9 +41,9 @@
         <Icon Id="eve_logo.ico" SourceFile="Binary\eve\eve_logo.ico"/>
         
         <Property Id="MSIRESTARTMANAGERCONTROL" Value="Disable" Secure="yes"/>
-    	
-    	<Property Id="LAUNCHAPPONEXIT" Secure="yes" />
-    	<Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(var.LaunchClientChecBoxText)" />
+        
+        <Property Id="LAUNCHAPPONEXIT" Secure="yes" />
+        <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(var.LaunchClientChecBoxText)" />
        
         <!-- Properties -->
         <Property Id="WelcomeDlg_Title" Value="$(env.APPLICATION_NAME)(beta) Setup" />
@@ -96,7 +96,7 @@
         
         <Property Id="APPSERVER_LOGIN" Secure="yes" Value="admin"/>
         <Property Id="APPSERVER_PASSWORD" Secure="yes"/>
-    	<Property Id="APPSERVER_PASSWORD_CONFIRM" Secure="yes"/>
+        <Property Id="APPSERVER_PASSWORD_CONFIRM" Secure="yes"/>
         
         <!-- MediaServer properties-->
         <Property Id="SERVER_APPSERVER_HOST" Secure="yes" Value="localhost"/>
@@ -213,9 +213,9 @@
                       Value="&quot;[VmsTrayToolDir]traytool.exe&quot; &quot;quit&quot;" Execute="immediate" />
         <CustomAction Id="CloseTrayToolAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="ignore" Impersonate="no" />
-        
+
         <CustomAction Id="LaunchTrayTool" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="traytool.exe" ExeCommand=""/>
-        <CustomAction Id="LaunchClient" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="client.exe" ExeCommand=""/>
+        <CustomAction Id="LaunchClient" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="HDWitness.exe" ExeCommand=""/>
         
         <CustomAction Id="NoDowngrade" Error="NoDowngrade" /> 
         
@@ -256,7 +256,7 @@
             <Custom Action="GenerateGuidsForServers" Before="SetNewGuidForEcs"><![CDATA[ $(var.EcsNeedsGuid) OR $(var.ServerNeedsGuid) ]]></Custom>
             <Custom Action="SetNewGuidForEcs" Before="SetNewGuidForServer"><![CDATA[ $(var.EcsNeedsGuid) ]]></Custom>
             <Custom Action="SetNewGuidForServer" Before="AssignClientFolder"><![CDATA[ $(var.ServerNeedsGuid)  ]]></Custom>
-        	
+            
             <Custom Action="FixClientFolder" After="ResetClientFolder"/>
             <Custom Action="FixServerFolder" After="ResetServerFolder">IS_SERVER_DIRECTORY_REG</Custom>
 
@@ -379,6 +379,10 @@
                                 <File Id="TrayToolQtGui$(var.suffix)4.dll" Name="QtGui$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtGui$(var.suffix)4.dll"  />
                                 <File Id="TrayToolQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtNetwork$(var.suffix)4.dll"  />
                             </Component>
+                            <Component Id="TrayToolOpenSSL" Guid="{9C379C95-1EDE-49b0-8C6C-7B55ADE60599}">
+                                <File Id="TrayToollibeay32.dll" Name="libeay32.dll" Source="..\common\contrib\openssl\bin\libeay32.dll"/>
+                                <File Id="TrayToolssleay32.dll" Name="ssleay32.dll" Source="..\common\contrib\openssl\bin\ssleay32.dll"/>
+                            </Component>
                         </Directory>
                         
                         <Directory Id="VmsProxyServerDir" Name="MediaProxy">
@@ -407,6 +411,11 @@
                                 <File Id="ProxyQtMultimedia$(var.suffix)4.dll" Name="QtMultimedia$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtMultimedia$(var.suffix)4.dll" />
                                 <File Id="ProxyQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtNetwork$(var.suffix)4.dll" />
                                 <File Id="ProxyQtXml$(var.suffix)4.dll" Name="QtXml$(var.suffix)4.dll" Source="$(env.QTDIR)\bin\QtXml$(var.suffix)4.dll" />
+                            </Component>
+
+                            <Component Id="ProxyOpenSSL" Guid="{B2CFCF46-4618-44a9-9BB5-7C832AA10652}">
+                                <File Id="Proxylibeay32.dll" Name="libeay32.dll" Source="..\common\contrib\openssl\bin\libeay32.dll"/>
+                                <File Id="Proxyssleay32.dll" Name="ssleay32.dll" Source="..\common\contrib\openssl\bin\ssleay32.dll"/>
                             </Component>
                         </Directory>
                         
@@ -487,7 +496,7 @@
                         
                         <Directory Id="VmsClientDir" Name="Client">
                             <Component Id="ClientExecutable" Guid="{7AAC7815-50A6-4dc9-ADD2-BDD9B7EE8FEF}">
-                                <File Id="client.exe" Name="client.exe" Source="../client/bin/$(env.CONFIG)/client.exe" KeyPath="yes">
+                                <File Id="HDWitness.exe" Name="HDWitness.exe" Source="../client/bin/$(env.CONFIG)/client.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionClient" Name="HD Witness" Scope="any" IgnoreFailure="yes"/>
                                     
                                     <Shortcut Id="StartmenuClient" Directory="ProgramMenuDir" Name="$(env.APPLICATION_NAME)"
@@ -613,6 +622,7 @@
             
             <ComponentRef Id="ProxyExecutable" />
             <ComponentRef Id="ProxyQTLibraries" />
+            <ComponentRef Id="ProxyOpenSSL" />
         </Feature>
         
         <Feature Id="TrayToolFeature" Title="Tray Tool" AllowAdvertise="no" Display="hidden" Level="1">
@@ -620,6 +630,7 @@
             
             <ComponentRef Id="traytool.exe"/>
             <ComponentRef Id="TrayToolQTLibraries"/>
+            <ComponentRef Id="TrayToolOpenSSL"/>
             <ComponentRef Id="UninstallProgramMenuFolder"/>
         </Feature>
         
@@ -641,7 +652,9 @@
         <Feature Id="ClientFeature" Title="$(env.APPLICATION_NAME) Client" Level="1"
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
 <!--            <Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !ClientFeature <> 3 ]]> </Condition>-->
-            
+           
+            <ComponentRef Id="NovFileAssociation"/>
+ 
             <ComponentRef Id="ClientExecutable" />
             <ComponentRef Id="ClientConfiguration" />
             <ComponentRef Id="ClientFFmpegLibraries"/>
@@ -724,12 +737,12 @@
             <Publish Dialog="InstallTypeDlg" Control="Next" Property="CLIENT_APPSERVER_PORT" Value="[APPSERVER_PORT]" Order="4"><![CDATA[ INSTALLTYPE=0 ]]></Publish>
             <Publish Dialog="InstallTypeDlg" Control="Next" Property="CLIENT_APPSERVER_LOGIN" Value="[APPSERVER_LOGIN]" Order="4"><![CDATA[ INSTALLTYPE=0 ]]></Publish>
 
-        	<?define EcsPasswordsEqual="(APPSERVER_PASSWORD = APPSERVER_PASSWORD_CONFIRM)" ?>
-        	
+            <?define EcsPasswordsEqual="(APPSERVER_PASSWORD = APPSERVER_PASSWORD_CONFIRM)" ?>
+            
             <Publish Dialog="PasswordDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg">1</Publish>
             <Publish Dialog="PasswordDlg" Control="Next" Event="SpawnDialog" Value="EmptyPasswordDlg">NOT APPSERVER_PASSWORD</Publish>
             <Publish Dialog="PasswordDlg" Control="Next" Property="SERVER_APPSERVER_PASSWORD" Value="[APPSERVER_PASSWORD]">APPSERVER_PASSWORD</Publish>
-        	<Publish Dialog="PasswordDlg" Control="Next" Event="SpawnDialog" Value="PasswordShouldMatchDlg" Order="2"><![CDATA[ NOT $(var.EcsPasswordsEqual) ]]></Publish>
+            <Publish Dialog="PasswordDlg" Control="Next" Event="SpawnDialog" Value="PasswordShouldMatchDlg" Order="2"><![CDATA[ NOT $(var.EcsPasswordsEqual) ]]></Publish>
             <Publish Dialog="PasswordDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">$(var.EcsPasswordsEqual) AND APPSERVER_PASSWORD</Publish>
             
             <Publish Dialog="AdvancedTypeDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg">1</Publish>
@@ -767,8 +780,8 @@
             <Publish Dialog="MyFeaturesDlg" Control="Next" Property="CLIENT_APPSERVER_HOST" Value="{}" Order="4"><![CDATA[ NOT $(var.AppServerInstallingClient) ]]></Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Property="CLIENT_APPSERVER_PORT" Value="{}" Order="4"><![CDATA[ NOT $(var.AppServerInstallingClient) ]]></Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Property="CLIENT_APPSERVER_LOGIN" Value="{}" Order="4"><![CDATA[ NOT $(var.AppServerInstallingClient) ]]></Publish>
-        	<Publish Dialog="MyFeaturesDlg" Control="Next" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="{}"><![CDATA[ &ClientFeature <> 3 ]]></Publish>
-        	<Publish Dialog="MyFeaturesDlg" Control="Next" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(var.LaunchClientChecBoxText)"><![CDATA[ &ClientFeature = 3 ]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="{}"><![CDATA[ &ClientFeature <> 3 ]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(var.LaunchClientChecBoxText)"><![CDATA[ &ClientFeature = 3 ]]></Publish>
             
             <Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg">1</Publish>
             <Publish Dialog="InstallDirDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
@@ -782,13 +795,13 @@
             
             <Publish Dialog="AppServerDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg">1</Publish>
      
-			<?define EcsPortsDiffer="(APPSERVER_PORT <> PROXY_PORT)" ?>
-        	<?define EcsNeedCheckPorts="(APPSERVER_PORT <> OLD_APPSERVER_PORT OR PROXY_PORT <> OLD_PROXY_PORT)" ?>
-        	
+            <?define EcsPortsDiffer="(APPSERVER_PORT <> PROXY_PORT)" ?>
+            <?define EcsNeedCheckPorts="(APPSERVER_PORT <> OLD_APPSERVER_PORT OR PROXY_PORT <> OLD_PROXY_PORT)" ?>
+            
             <Publish Dialog="AppServerDlg" Control="Next" Property="BUSYPORT" Value="{}">1</Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Property="PORTSTOTEST" Value="[APPSERVER_PORT] [PROXY_PORT]" Order="1">1</Publish>
-        	<Publish Dialog="AppServerDlg" Control="Next" Event="SpawnDialog" Value="PortDuplicateDlg" Order="2"><![CDATA[ NOT $(var.EcsPortsDiffer) ]]></Publish>
-        	<Publish Dialog="AppServerDlg" Control="Next" Event="SpawnDialog" Value="PasswordShouldMatchDlg" Order="2"><![CDATA[ $(var.EcsPortsDiffer) AND NOT $(var.EcsPasswordsEqual) ]]></Publish>
+            <Publish Dialog="AppServerDlg" Control="Next" Event="SpawnDialog" Value="PortDuplicateDlg" Order="2"><![CDATA[ NOT $(var.EcsPortsDiffer) ]]></Publish>
+            <Publish Dialog="AppServerDlg" Control="Next" Event="SpawnDialog" Value="PasswordShouldMatchDlg" Order="2"><![CDATA[ $(var.EcsPortsDiffer) AND NOT $(var.EcsPasswordsEqual) ]]></Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Event="DoAction" Value="CheckPorts" Order="2"><![CDATA[ $(var.EcsPortsDiffer) AND $(var.EcsPasswordsEqual) AND $(var.EcsNeedCheckPorts) ]]></Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Event="NewDialog" Value="PortIsBusyDlg" Order="3"><![CDATA[ $(var.EcsPortsDiffer) AND $(var.EcsPasswordsEqual) AND BUSYPORT ]]></Publish>
             
