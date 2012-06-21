@@ -755,7 +755,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::ExportLayoutAction).
         flags(Qn::Slider | Qn::SingleTarget).
-        text(tr("Export Selection for All Items...")).
+        text(tr("Export Selection as Multi-Stream...")).
         condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::DisabledAction, this));
 
     factory().
