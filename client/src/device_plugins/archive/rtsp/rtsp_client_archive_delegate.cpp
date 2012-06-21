@@ -193,6 +193,7 @@ bool QnRtspClientArchiveDelegate::open(QnResourcePtr resource)
     m_rtspSession.setTransport("TCP");
 
     m_rtspSession.setProxyAddr(m_proxyAddr, m_proxyPort);
+    m_rtpData = 0;
     if (m_rtspSession.open(getUrl(resource))) 
     {
         qint64 globalMinTime = checkMinTimeFromOtherServer(resource);
