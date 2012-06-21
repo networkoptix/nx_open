@@ -3,10 +3,7 @@
 
 #include "core/resourcemanagment/resource_searcher.h"
 #include "onvif_helper.h"
-
-class _onvifDevice__GetNetworkInterfacesResponse;
-class _onvifDevice__GetDeviceInformationResponse;
-struct SOAP_ENV__Fault;
+#include "soap_wrapper.h"
 
 struct EndpointAdditionalInfo
 {
@@ -36,7 +33,7 @@ class OnvifResourceInformationFetcher
 	static std::string& STD_ONVIF_USER;
 	static std::string& STD_ONVIF_PASSWORD;
     QnId onvifTypeId;
-    PasswordHelper& passwordsData;
+    //PasswordHelper& passwordsData;
     NameHelper& camersNamesData;
 
 public:
@@ -57,10 +54,9 @@ private:
         const QString& uniqId, const char* login, const char* passwd, const QString& mediaUrl, const QString& deviceUrl, QnResourceList& result) const;
 
     const bool isMacAlreadyExists(const QString& mac, const QnResourceList& resList) const;
-    const QString fetchName(const _onvifDevice__GetDeviceInformationResponse& response) const;
-    const QString fetchManufacturer(const _onvifDevice__GetDeviceInformationResponse& response) const;
-    const QString fetchSerial(const _onvifDevice__GetDeviceInformationResponse& response) const;
-    //const QString generateRandomPassword() const;
+    const QString fetchName(const DeviceInfoResp& response) const;
+    const QString fetchManufacturer(const DeviceInfoResp& response) const;
+    const QString fetchSerial(const DeviceInfoResp& response) const;
 
 };
 
