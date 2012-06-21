@@ -55,7 +55,7 @@ public:
         qualityFastSwitch(true),
         prevStartTime(AV_NOPTS_VALUE),
         prevEndTime(AV_NOPTS_VALUE),
-        metadataChannelNum(2),
+        metadataChannelNum(7),
         audioEnabled(false)
     {
     }
@@ -352,9 +352,9 @@ int QnRtspConnectionProcessor::composeDescribe()
         sdp << "a=rtpmap:" << RTP_FFMPEG_GENERIC_CODE << ' ' << RTP_FFMPEG_GENERIC_STR << "/" << CLOCK_FREQUENCY << ENDL;
     }
 
-    d->metadataChannelNum = i;
+    //d->metadataChannelNum = i;
     sdp << "m=metadata " << d->metadataChannelNum << " RTP/AVP " << RTP_METADATA_CODE << ENDL;
-    sdp << "a=control:trackID=" << i << ENDL;
+    sdp << "a=control:trackID=" << d->metadataChannelNum << ENDL;
     sdp << "a=rtpmap:" << RTP_METADATA_CODE << ' ' << RTP_METADATA_GENERIC_STR << "/" << CLOCK_FREQUENCY << ENDL;
 
     return CODE_OK;
