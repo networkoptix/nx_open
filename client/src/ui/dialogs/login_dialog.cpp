@@ -322,7 +322,7 @@ void LoginDialog::perform()
     pd->setValue(steps);
     //... perform one percent of the operation
     steps++;
-    if (steps > pd->maximum())
+    if (steps > pd->maximum() - 1)
         t->stop();
 }
 

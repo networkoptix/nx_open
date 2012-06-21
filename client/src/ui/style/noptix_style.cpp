@@ -342,10 +342,6 @@ bool QnNoptixStyle::drawProgressBarControl(const QStyleOption *option, QPainter 
  /*   if (vertical) // swap width & height...
     { int h = x; x = y; y = h; l = pb->rect.height(); t = pb->rect.width(); }*/
 
-    double val = 1.0;
-    if (!busy)
-        val = pb->progress / double(pb->maximum - pb->minimum);
-
     float anim_val = .0;
     if (!m_animator->connected(widget)){
         m_animator->start(widget, .5, anim_val);
@@ -359,13 +355,7 @@ bool QnNoptixStyle::drawProgressBarControl(const QStyleOption *option, QPainter 
 
     painter->save();
 
-  /*  int limit = QPalette::NColorRoles;
-    int step = l / limit;
-    for (int i = 0; i < limit; i++ ){
-        QPalette::ColorRole role = static_cast<QPalette::ColorRole>(i);
-        painter->setBrush(pb->palette.color(role));
-        painter->drawRect(x + step*i, y, x + step * (i+1), t);
-    }*/
+    const double val = busy ? 1.0 : pb->progress / double(pb->maximum - pb->minimum);
 
     painter->setPen(Qt::NoPen);
     if (val > 0.0){ // draw Contents
@@ -375,7 +365,8 @@ bool QnNoptixStyle::drawProgressBarControl(const QStyleOption *option, QPainter 
         const int mid = (y + t) / 2;
         const int space = l * (val * .125);
 
-        QLinearGradient gradient(x - space, mid, x + offset + space, mid);
+        //QLinearGradient gradient(x - space, mid, x + offset + space, mid);
+         QLinearGradient gradient(x - space, mid, x + l + space, mid);
         if (anim_val < .08){
             float second_focus = .9 + anim_val*1.25;
             gradient.setColorAt(second_focus, f2);
@@ -386,6 +377,7 @@ bool QnNoptixStyle::drawProgressBarControl(const QStyleOption *option, QPainter 
             gradient.setColorAt(second_focus, f2);
             gradient.setColorAt(second_focus + .1, f1);
         }
+  
 
         float focus = .1 + anim_val * .8;
         gradient.setColorAt(focus, f2);
@@ -403,17 +395,16 @@ bool QnNoptixStyle::drawProgressBarControl(const QStyleOption *option, QPainter 
         }
     }
 
-    if (true){ // draw Groove
-        QLinearGradient gradient((x + l)/ 2, 0 , (x + l) / 2, y + t);
-        gradient.setColorAt(0, pb->palette.color(QPalette::Window));
-        gradient.setColorAt(.2, pb->palette.color(QPalette::Highlight));
-        gradient.setColorAt(.4, pb->palette.color(QPalette::Highlight));
-        gradient.setColorAt(.5, QColor(4, 67, 154));
-        gradient.setColorAt(1,  pb->palette.color(QPalette::Button));
-        painter->setBrush(gradient);
-        painter->setOpacity(.5);
-        painter->drawRoundedRect(x, y, l, t, 6, 6);
-    }
+    /* Draw groove */
+    QLinearGradient gradient((x + l)/ 2, 0 , (x + l) / 2, y + t);
+    gradient.setColorAt(0, pb->palette.color(QPalette::Window));
+    gradient.setColorAt(.2, pb->palette.color(QPalette::Highlight));
+    gradient.setColorAt(.4, pb->palette.color(QPalette::Highlight));
+    gradient.setColorAt(.5, QColor(4, 67, 154));
+    gradient.setColorAt(1,  pb->palette.color(QPalette::Button));
+    painter->setBrush(gradient);
+    painter->setOpacity(.5);
+    painter->drawRoundedRect(x, y, l, t, 6, 6);
 
     painter->setOpacity(1);
     painter->setPen(pb->palette.color(QPalette::Window));
