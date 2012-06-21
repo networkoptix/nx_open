@@ -1189,6 +1189,8 @@ void CLCamDisplay::clearVideoQueue()
 
 bool CLCamDisplay::isAudioHoleDetected(QnCompressedVideoDataPtr vd)
 {
+    if (!vd)
+        return false;
     bool isVideoCamera = qSharedPointerDynamicCast<QnVirtualCameraResource>(vd->dataProvider->getResource()) != 0;
     if (!isVideoCamera)
         return false; // do not change behaviour for local files
