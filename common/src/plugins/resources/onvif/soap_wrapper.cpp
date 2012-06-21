@@ -282,6 +282,24 @@ int MediaSoapWrapper::addVideoEncoderConfiguration(AddVideoConfigReq& request, A
     return m_soapProxy->AddVideoEncoderConfiguration(m_endpoint, NULL, &request, &response);
 }
 
+int MediaSoapWrapper::setVideoEncoderConfiguration(SetVideoConfigReq& request, SetVideoConfigResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->SetVideoEncoderConfiguration(m_endpoint, NULL, &request, &response);
+}
+
+int MediaSoapWrapper::getProfile(ProfileReq& request, ProfileResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->GetProfile(m_endpoint, NULL, &request, &response);
+}
+
+int MediaSoapWrapper::getStreamUri(StreamUriReq& request, StreamUriResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->GetStreamUri(m_endpoint, NULL, &request, &response);
+}
+
 //
 // Explicit instantiating
 //

@@ -39,6 +39,12 @@ class _onvifMedia__CreateProfile;
 class _onvifMedia__CreateProfileResponse;
 class _onvifMedia__AddVideoEncoderConfiguration;
 class _onvifMedia__AddVideoEncoderConfigurationResponse;
+class _onvifMedia__SetVideoEncoderConfiguration;
+class _onvifMedia__SetVideoEncoderConfigurationResponse;
+class _onvifMedia__GetProfile;
+class _onvifMedia__GetProfileResponse;
+class _onvifMedia__GetStreamUri;
+class _onvifMedia__GetStreamUriResponse;
 
 typedef _onvifMedia__GetVideoEncoderConfigurationOptions VideoOptionsReq;
 typedef _onvifMedia__GetVideoEncoderConfigurationOptionsResponse VideoOptionsResp;
@@ -54,6 +60,12 @@ typedef _onvifMedia__CreateProfile CreateProfileReq;
 typedef _onvifMedia__CreateProfileResponse CreateProfileResp;
 typedef _onvifMedia__AddVideoEncoderConfiguration AddVideoConfigReq;
 typedef _onvifMedia__AddVideoEncoderConfigurationResponse AddVideoConfigResp;
+typedef _onvifMedia__SetVideoEncoderConfiguration SetVideoConfigReq;
+typedef _onvifMedia__SetVideoEncoderConfigurationResponse SetVideoConfigResp;
+typedef _onvifMedia__GetProfile ProfileReq;
+typedef _onvifMedia__GetProfileResponse ProfileResp;
+typedef _onvifMedia__GetStreamUri StreamUriReq;
+typedef _onvifMedia__GetStreamUriResponse StreamUriResp;
 
 //
 // SoapWrapper
@@ -138,6 +150,9 @@ public:
     int addVideoSourceConfiguration(AddVideoSrcConfigReq& request, AddVideoSrcConfigResp& response);
     int createProfile(CreateProfileReq& request, CreateProfileResp& response);
     int addVideoEncoderConfiguration(AddVideoConfigReq& request, AddVideoConfigResp& response);
+    int setVideoEncoderConfiguration(SetVideoConfigReq& request, SetVideoConfigResp& response);
+    int getProfile(ProfileReq& request, ProfileResp& response);
+    int getStreamUri(StreamUriReq& request, StreamUriResp& response);
 
 private:
     MediaSoapWrapper();

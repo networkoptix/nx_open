@@ -12,7 +12,7 @@
 #include "utils/media/nalUnits.h"
 //#include "onvif/Onvif.nsmap"
 #include "onvif/soapMediaBindingProxy.h"
-#include "onvif/wsseapi.h"
+//#include "onvif/wsseapi.h"
 #include "utils/network/tcp_connection_priv.h"
 
 //
@@ -249,47 +249,36 @@ const QString QnOnvifStreamReader::updateCameraAndfetchStreamUrl() const
 
 const QString QnOnvifStreamReader::updateCameraAndfetchStreamUrl(bool isPrimary) const
 {
-    MediaBindingProxy soapProxy;
-    soapProxy.soap->send_timeout = 5;
-    soapProxy.soap->recv_timeout = 5;
-
     QAuthenticator auth(m_onvifRes->getAuth());
-    std::string login(auth.user().toStdString());
-    std::string passwd(auth.password().toStdString());
-    if (!login.empty()) soap_register_plugin(soapProxy.soap, soap_wsse);
-
-    QString endpoint(m_onvifRes->getMediaUrl());
+    MediaSoapWrapper soapWrapper(m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString());
     std::string profileToken;
 
     //Modifying appropriate profile (setting required values)
     {
         //Fetching appropriate profile if it exists
-        if (!login.empty()) soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", login.c_str(), passwd.c_str());
-        _onvifMedia__GetProfiles request;
-        _onvifMedia__GetProfilesResponse response;
-        int soapRes = soapProxy.GetProfiles(endpoint.toStdString().c_str(), NULL, &request, &response);
+        ProfilesReq request;
+        ProfilesResp response;
+        int soapRes = soapWrapper.getProfiles(request, response);
         if (soapRes != SOAP_OK) {
             qCritical() << "QnOnvifStreamReader::updateCameraAndfetchStreamUrl (primary stream = "
-                << isPrimary << "): can't set values into ONVIF physical device (URL: " << endpoint << ", MAC: "
-                << m_onvifRes->getMAC().toString() << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
-                << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
-            soap_end(soapProxy.soap);
+                << isPrimary << "): can't set values into ONVIF physical device (URL: " << m_onvifRes->getMediaUrl() << ", UniqueId: "
+                << m_onvifRes->getUniqueId() << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
+                << ". " << soapWrapper.getLastError();
             return QString();
         }
-        soap_end(soapProxy.soap);
 
         onvifXsd__Profile* profilePtr = findAppropriateProfile(response, isPrimary);
         if (!profilePtr) {
             qCritical() << "QnOnvifStreamReader::updateCameraAndfetchStreamUrl (primary stream = "
                 << isPrimary << "): can't set values into ONVIF physical device (URL: "
-                << endpoint << ", MAC: " << m_onvifRes->getMAC().toString() << "). Root cause: there is no appropriate profile";
+                << m_onvifRes->getMediaUrl() << ", MAC: " << m_onvifRes->getUniqueId() << "). Root cause: there is no appropriate profile";
             return QString();
         }
 
         //Setting required values into profile
         profileToken = profilePtr->token;
-        _onvifMedia__SetVideoEncoderConfiguration encRequest;
-        _onvifMedia__SetVideoEncoderConfigurationResponse encResponse;
+        SetVideoConfigReq encRequest;
+        SetVideoConfigResp encResponse;
         encRequest.Configuration = profilePtr->VideoEncoderConfiguration;
 
         VideoEncoderChanges changes;
@@ -298,18 +287,15 @@ const QString QnOnvifStreamReader::updateCameraAndfetchStreamUrl(bool isPrimary)
         foreach(VideoEncoderChange* change, changes) {
             change->doChange(encRequest.Configuration, *this, isPrimary);
         }
-            if (!login.empty()) soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", login.c_str(), passwd.c_str());
-
-            soapRes = soapProxy.SetVideoEncoderConfiguration(endpoint.toStdString().c_str(), NULL, &encRequest, &encResponse);
+            soapRes = soapWrapper.setVideoEncoderConfiguration(encRequest, encResponse);
             if (soapRes != SOAP_OK) {
                 qWarning() << "QnOnvifStreamReader::updateCameraAndfetchStreamUrl (primary stream = "
                     << isPrimary << "): can't set required values into ONVIF physical device (URL: "
-                    << endpoint << ", MAC: " << m_onvifRes->getMAC().toString() << "). Root cause: SOAP failed. Default settings will be used. GSoap error code: "
-                    << soapRes << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
+                    << m_onvifRes->getMediaUrl() << ", UniqueId: " << m_onvifRes->getUniqueId() << "). Root cause: SOAP failed. Default settings will be used. GSoap error code: "
+                    << soapRes << ". " << soapWrapper.getLastError();
 
                 //change->undoChange(encRequest.Configuration, isPrimary);
             }
-            soap_end(soapProxy.soap);
         /*}*/
 
         clearVideoEncoderChanges(changes);
@@ -317,22 +303,19 @@ const QString QnOnvifStreamReader::updateCameraAndfetchStreamUrl(bool isPrimary)
 
     //Printing modified profile
     if (cl_log.logLevel() >= cl_logDEBUG1) {
-        if (!login.empty()) soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", login.c_str(), passwd.c_str());
-        _onvifMedia__GetProfile request;
-        _onvifMedia__GetProfileResponse response;
+        ProfileReq request;
+        ProfileResp response;
         request.ProfileToken = profileToken;
 
-        if (soapProxy.GetProfile(endpoint.toStdString().c_str(), NULL, &request, &response) == SOAP_OK) {
+        if (soapWrapper.getProfile(request, response) == SOAP_OK) {
             printProfile(response, isPrimary);
         }
-        soap_end(soapProxy.soap);
     }
 
     //Fetching stream URL
     {
-        if (!login.empty()) soap_wsse_add_UsernameTokenDigest(soapProxy.soap, "Id", login.c_str(), passwd.c_str());
-        _onvifMedia__GetStreamUriResponse response;
-        _onvifMedia__GetStreamUri request;
+        StreamUriResp response;
+        StreamUriReq request;
         onvifXsd__StreamSetup streamSetup;
         onvifXsd__Transport transport;
 
@@ -343,25 +326,23 @@ const QString QnOnvifStreamReader::updateCameraAndfetchStreamUrl(bool isPrimary)
         request.StreamSetup->Transport->Protocol = onvifXsd__TransportProtocol__UDP;
         request.ProfileToken = profileToken;
 
-        int soapRes = soapProxy.GetStreamUri(endpoint.toStdString().c_str(), NULL, &request, &response);
+        int soapRes = soapWrapper.getStreamUri(request, response);
         if (soapRes != SOAP_OK) {
             qCritical() << "QnOnvifStreamReader::updateCameraAndfetchStreamUrl (primary stream = "
                 << isPrimary << "): can't get stream URL of ONVIF device (URL: "
-                << endpoint << ", MAC: " << m_onvifRes->getMAC().toString() << "). Root cause: SOAP request failed. GSoap error code: "
-                << soapRes << SoapErrorHelper::fetchDescription(soapProxy.soap_fault());
-            soap_end(soapProxy.soap);
+                << m_onvifRes->getMediaUrl() << ", UniqueId: " << m_onvifRes->getUniqueId() << "). Root cause: SOAP request failed. GSoap error code: "
+                << soapRes << ". " << soapWrapper.getLastError();
             return QString();
         }
-        soap_end(soapProxy.soap);
 
         if (!response.MediaUri) {
             qCritical() << "QnOnvifStreamReader::updateCameraAndfetchStreamUrl (primary stream = "
                 << isPrimary << "): can't get stream URL of ONVIF device (URL: "
-                << endpoint << ", MAC: " << m_onvifRes->getMAC().toString() << "). Root cause: got empty response.";
+                << m_onvifRes->getMediaUrl() << ", UniqueId: " << m_onvifRes->getUniqueId() << "). Root cause: got empty response.";
             return QString();
         }
 
-        qDebug() << "URL of ONVIF device stream (MAC: " << m_onvifRes->getMAC().toString()
+        qDebug() << "URL of ONVIF device stream (UniqueId: " << m_onvifRes->getUniqueId()
                  << ") successfully fetched: " << response.MediaUri->Uri.c_str();
         return QString(normalizeStreamSrcUrl(response.MediaUri->Uri));
     }
@@ -450,7 +431,7 @@ void QnOnvifStreamReader::updateStreamParamsBasedOnFps()
         pleaseReOpen();
 }
 
-onvifXsd__Profile* QnOnvifStreamReader::findAppropriateProfile(const _onvifMedia__GetProfilesResponse& response,
+onvifXsd__Profile* QnOnvifStreamReader::findAppropriateProfile(const ProfilesResp& response,
         bool isPrimary) const
 {
     const std::vector<onvifXsd__Profile*>& profiles = response.Profiles;
@@ -502,9 +483,9 @@ const QString QnOnvifStreamReader::normalizeStreamSrcUrl(const std::string& src)
     return result;
 }
 
-void QnOnvifStreamReader::printProfile(const _onvifMedia__GetProfileResponse& response, bool isPrimary) const
+void QnOnvifStreamReader::printProfile(const ProfileResp& response, bool isPrimary) const
 {
-    qDebug() << "ONVIF device (MAC: " << m_onvifRes->getMAC().toString() << ") has the following "
+    qDebug() << "ONVIF device (UniqueId: " << m_onvifRes->getUniqueId() << ") has the following "
              << (isPrimary? "primary": "secondary") << " profile:";
     qDebug() << "Name: " << response.Profile->Name.c_str();
     qDebug() << "Token: " << response.Profile->token.c_str();
