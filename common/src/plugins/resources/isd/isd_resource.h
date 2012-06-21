@@ -25,12 +25,12 @@ public:
 
     virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider) override;
 protected:
-
     bool initInternal() override;
-
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
-
     virtual void setCropingPhysical(QRect croping);
+
+private:
+    
 
 protected:
     QSize m_resolution1;
