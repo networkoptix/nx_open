@@ -14,6 +14,7 @@
 #include "noptix_style_animator.h"
 #include "globals.h"
 #include "skin.h"
+#include "../common/text_pixmap_cache.h"
 
 namespace {
     const char *qn_hoveredPropertyName = "_qn_hovered";
@@ -335,16 +336,15 @@ bool QnNoptixStyle::drawProgressBarControl(const QStyleOption *option, QPainter 
     if (pb->invertedAppearance)
         reverse = !reverse;
     const bool vertical = (pb->orientation == Qt::Vertical);
- //   const bool busy = pb->maximum == 0 && pb->minimum == 0;
+    const bool busy = pb->maximum == pb->minimum;
     int x,y,l,t;
     pb->rect.getRect(&x,&y,&l,&t);
  /*   if (vertical) // swap width & height...
     { int h = x; x = y; y = h; l = pb->rect.height(); t = pb->rect.width(); }*/
 
-    double val = 0.0;
-    val = pb->progress / double(pb->maximum - pb->minimum);
-
-    int offset = l * val;
+    double val = 1.0;
+    if (!busy)
+        val = pb->progress / double(pb->maximum - pb->minimum);
 
     float anim_val = .0;
     if (!m_animator->connected(widget)){
@@ -359,9 +359,6 @@ bool QnNoptixStyle::drawProgressBarControl(const QStyleOption *option, QPainter 
 
     painter->save();
 
-    QColor bg = pb->palette.color(QPalette::Window);
-    painter->setPen(bg);
-
   /*  int limit = QPalette::NColorRoles;
     int step = l / limit;
     for (int i = 0; i < limit; i++ ){
@@ -370,7 +367,41 @@ bool QnNoptixStyle::drawProgressBarControl(const QStyleOption *option, QPainter 
         painter->drawRect(x + step*i, y, x + step * (i+1), t);
     }*/
 
-    int mid = (y + t) / 2;
+    painter->setPen(Qt::NoPen);
+    if (val > 0.0){ // draw Contents
+        const QColor f1(4, 154, 116);
+        const QColor f2 = pb->palette.color(QPalette::WindowText);
+        const int offset = l * val;
+        const int mid = (y + t) / 2;
+        const int space = l * (val * .125);
+
+        QLinearGradient gradient(x - space, mid, x + offset + space, mid);
+        if (anim_val < .08){
+            float second_focus = .9 + anim_val*1.25;
+            gradient.setColorAt(second_focus, f2);
+            gradient.setColorAt(second_focus - .1, f1);
+        } else
+        if (anim_val > .92){
+            float second_focus = .1 - (1.0 - anim_val)*1.25;
+            gradient.setColorAt(second_focus, f2);
+            gradient.setColorAt(second_focus + .1, f1);
+        }
+
+        float focus = .1 + anim_val * .8;
+        gradient.setColorAt(focus, f2);
+        gradient.setColorAt(focus - .1, f1);
+        gradient.setColorAt(focus + .1, f1);
+
+        painter->setBrush(gradient);
+        painter->setOpacity(1);
+        if (l * val > 12) 
+            painter->drawRoundedRect(x, y, l* val, y + t, 6, 6);
+        else{
+            painter->setClipRegion(QRegion(x, y, 12, y+t, QRegion::Ellipse));
+            painter->drawRoundedRect(x - 12, y, 12 + l*val, y + t, 6, 6);
+            painter->setClipping(false);
+        }
+    }
 
     if (true){ // draw Groove
         QLinearGradient gradient((x + l)/ 2, 0 , (x + l) / 2, y + t);
@@ -380,20 +411,15 @@ bool QnNoptixStyle::drawProgressBarControl(const QStyleOption *option, QPainter 
         gradient.setColorAt(.5, QColor(4, 67, 154));
         gradient.setColorAt(1,  pb->palette.color(QPalette::Button));
         painter->setBrush(gradient);
-        painter->setOpacity(1);
+        painter->setOpacity(.5);
         painter->drawRoundedRect(x, y, l, t, 6, 6);
     }
 
-    if (val > 0.0){ // draw Contents
-        QLinearGradient gradient(x, mid, x + offset, mid);
-        QColor f1(4, 154, 116);
-        gradient.setColorAt(0, f1);
-        gradient.setColorAt(anim_val, pb->palette.color(QPalette::WindowText));
-        gradient.setColorAt(1, f1);
-        painter->setBrush(gradient);
-        painter->setOpacity(.7);
-        painter->drawRoundedRect(x, y, l* val, y + t, 6, 6);
-    }
+    painter->setOpacity(1);
+    painter->setPen(pb->palette.color(QPalette::Window));
+    painter->setBrush(Qt::NoBrush);
+    painter->drawRoundedRect(x, y, l, t, 6, 6);
+
 
     // label? =========
     if (/*hover &&*/ pb->textVisible){
@@ -412,8 +438,12 @@ bool QnNoptixStyle::drawProgressBarControl(const QStyleOption *option, QPainter 
         QRect tr = painter->boundingRect(rect, flags, pb->text);
         if (!tr.isValid())
         { painter->restore(); return true; }
-        painter->setPen( pb->palette.color(QPalette::WindowText));
-        painter->drawText(rect, flags, pb->text);
+
+        QnTextPixmapCache* cache = QnTextPixmapCache::instance();
+        QPixmap text = cache->pixmap(pb->text, painter->font(), pb->palette.color(QPalette::WindowText));
+        painter->drawPixmap(tr, text);
+//        painter->setPen( pb->palette.color(QPalette::WindowText));
+//        painter->drawText(rect, flags, pb->text);
     }
 
     painter->restore();
