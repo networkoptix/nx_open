@@ -69,7 +69,12 @@ QnAbstractMediaDataPtr QnThumbnailsStreamReader::getNextData()
     }
 
     currentPos = qMax(currentPos, m_delegate->seek(currentPos, true));
-    QnAbstractMediaDataPtr result = m_delegate->getNextData();
+    QnAbstractMediaDataPtr result;
+    do {
+        result = m_delegate->getNextData();
+    }
+    while (result && result->dataType != QnAbstractMediaData::VIDEO);
+
     currentPos += m_frameStep;
 
     QMutexLocker lock(&m_mutex);
