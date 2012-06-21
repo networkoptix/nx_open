@@ -155,7 +155,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 
     m_infoButton = new QnImageButtonWidget();
     m_infoButton->setParent(this);
-    m_infoButton->setIcon(qnSkin->icon("decorations/info.png"));
+    m_infoButton->setIcon(qnSkin->icon("decorations/item_info.png"));
     m_infoButton->setPreferredSize(headerButtonSize);
     m_infoButton->setCheckable(true);
     m_infoButton->setProperty(Qn::NoBlockMotionSelection, true);
@@ -163,7 +163,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 
     m_closeButton = new QnImageButtonWidget();
     m_closeButton->setParent(this);
-    m_closeButton->setIcon(qnSkin->icon("decorations/close_item.png"));
+    m_closeButton->setIcon(qnSkin->icon("decorations/item_close.png"));
     m_closeButton->setPreferredSize(headerButtonSize);
     m_closeButton->setProperty(Qn::NoBlockMotionSelection, true);
     connect(m_closeButton, SIGNAL(clicked()), this, SLOT(close()));
@@ -171,7 +171,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     
     m_rotateButton = new QnImageButtonWidget();
     m_rotateButton->setParent(this);
-    m_rotateButton->setIcon(qnSkin->icon("decorations/rotate_item.png"));
+    m_rotateButton->setIcon(qnSkin->icon("decorations/item_rotate.png"));
     m_rotateButton->setPreferredSize(headerButtonSize);
     m_rotateButton->setProperty(Qn::NoBlockMotionSelection, true);
     connect(m_rotateButton, SIGNAL(pressed()), this, SIGNAL(rotationStartRequested()));
@@ -179,7 +179,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 
     m_searchButton = new QnImageButtonWidget();
     m_searchButton->setParent(this);
-    m_searchButton->setIcon(qnSkin->icon("decorations/search.png"));
+    m_searchButton->setIcon(qnSkin->icon("decorations/item_search.png"));
     m_searchButton->setPreferredSize(headerButtonSize);
     m_searchButton->setCheckable(true);
     m_searchButton->setProperty(Qn::NoBlockMotionSelection, true);
