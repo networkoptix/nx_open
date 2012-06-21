@@ -177,6 +177,16 @@ QnResourcePtr QnRtspClientArchiveDelegate::getResourceOnTime(QnResourcePtr resou
 
 bool QnRtspClientArchiveDelegate::open(QnResourcePtr resource)
 {
+    bool rez = openInternal(resource);
+    if (!rez) {
+        for (int i = 0; i < 50 && !m_closing; ++i)
+            QnSleep::msleep(10);
+    }
+    return rez;
+}
+
+bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
+{
     if (m_opened)
         return true;
 
@@ -208,10 +218,6 @@ bool QnRtspClientArchiveDelegate::open(QnResourcePtr resource)
         m_rtspSession.stop();
     }
     m_opened = m_rtspSession.isOpened();
-    if (!m_opened) {
-        for (int i = 0; i < 50 && !m_closing; ++i)
-            QnSleep::msleep(10);
-    }
     m_sendedCSec = m_rtspSession.lastSendedCSeq();
     return m_opened;
 }
@@ -267,7 +273,7 @@ void QnRtspClientArchiveDelegate::reopen()
         QnSleep::msleep(10);
 
     if (m_resource)
-        open(m_resource);
+        openInternal(m_resource);
 }
 
 QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
@@ -296,7 +302,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
 			else
 				m_position = (m_serverTimePeriod.endTimeMs()-1)*1000;
 			close();
-			open(newResource);
+			openInternal(newResource);
 
             result = getNextData();
             if (result)
@@ -462,7 +468,29 @@ qint64 QnRtspClientArchiveDelegate::seek(qint64 time, bool findIFrame)
     }
 
     if (!m_opened && m_resource) {
-        open(m_resource);
+        if (!openInternal(m_resource)) 
+        {
+            // Try next server in the list immediatly, It is improve seek time if current server is offline and next server is exists
+            while (!m_closing)
+            {
+                QnResourcePtr nextResource = getNextVideoServerFromTime(m_resource, m_lastSeekTime/1000);
+                if (nextResource && nextResource != m_resource) 
+                {
+                    m_resource = nextResource;
+                    m_lastSeekTime = m_serverTimePeriod.startTimeMs*1000;
+                    if (m_rtspSession.getScale() > 0)
+                        m_position = m_serverTimePeriod.startTimeMs*1000;
+                    else
+                        m_position = (m_serverTimePeriod.endTimeMs()-1)*1000;
+                    close();
+                    if (openInternal(newResource))
+                        break;
+                }
+                else {
+                    break;
+                }
+            }
+        }
     }
     else {
         if (!findIFrame)
@@ -680,7 +708,7 @@ void QnRtspClientArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
     if (!m_opened && m_resource) {
         m_rtspSession.setScale(qAbs(m_rtspSession.getScale()) * sign);
         m_position = displayTime;
-        open(m_resource);
+        openInternal(m_resource);
     }
     else {
         m_rtspSession.sendPlay(displayTime, AV_NOPTS_VALUE, qAbs(m_rtspSession.getScale()) * sign);
