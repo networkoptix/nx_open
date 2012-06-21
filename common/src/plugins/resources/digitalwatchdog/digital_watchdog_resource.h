@@ -12,7 +12,7 @@ class QnPlWatchDogResource : public QnPlOnvifResource
 public:
     QnPlWatchDogResource();
 protected:
-    void initInternal() override;
+    bool initInternal() override;
 private:
     bool isDualStreamingEnabled();
 };

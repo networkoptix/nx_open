@@ -27,6 +27,7 @@ client/bin
 mediaserver/bin
 traytool/bin
 
+appserver/gen
 appserver/db/ecs.db
 appserver/setup/db/ecs.db
 appserver/proto/xml/gen
@@ -127,3 +128,6 @@ debsetup/appserver/package
 debsetup/appserver/x86
 debsetup/appserver/x64
 cpp/x86/version.h
+common/compatibility_info.cpp
+client/src/compatibility_info.cpp
+mediaserver/src/compatibility_info.cpp

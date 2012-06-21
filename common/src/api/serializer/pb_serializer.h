@@ -20,6 +20,7 @@ public:
     void deserializeResourceTypes(QnResourceTypeList& resourceTypes, const QByteArray& data) override;
     void deserializeLicenses(QnLicenseList& licenses, const QByteArray& data) override;
     void deserializeCameraHistoryList(QnCameraHistoryList& cameraServerItems, const QByteArray& data) override;
+    void deserializeConnectInfo(QnConnectInfoPtr& connectInfo, const QByteArray& data) override;
 
     void serializeLayouts(const QnLayoutResourceList& layouts, QByteArray& data) override;
     void serializeLayout(const QnLayoutResourcePtr& resource, QByteArray& data) override;

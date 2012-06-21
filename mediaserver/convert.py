@@ -16,6 +16,7 @@ from convert import index_dirs, rmtree, setup_ffmpeg, setup_qjson, setup_openssl
 from convert import gen_env_sh
 from convert import convert as convert_common
 from common_version import *
+from gencomp import gencomp_cpp
 
 APPLICATION_NAME = 'Network Optix Media Server'
 FFMPEG_VERSION = '2011-08-29'
@@ -36,7 +37,7 @@ def gen_version_h():
     print >> version_h, 'static const char* APPLICATION_NAME="%s";' % APPLICATION_NAME
     print >> version_h, 'static const char* APPLICATION_VERSION="%s.%s";' % (APPLICATION_VERSION, BUILD_NUMBER)
     print >> version_h, 'const char* const APPLICATION_REVISION="%s";' % REVISION
-    print >> version_h, 'const char* const FFMPEG_VERSION="%s";' % FFMPEG_VERSION	
+    print >> version_h, 'const char* const FFMPEG_VERSION="%s";' % FFMPEG_VERSION   
     print >> version_h, ''
 
     print >> version_h, '// There constans are here for windows resouce file.'
@@ -81,6 +82,7 @@ os.mkdir('bin/debug-test')
 os.mkdir('bin/release-test')
 
 os.mkdir('build')
+os.mkdir('build/generated')
 
 if platform() != 'win32':
     ldpath_debug = ''
@@ -122,6 +124,7 @@ if platform() != 'win32':
     gen_env_sh('bin/release/env.sh', ldpath_release, {'FFMPEG_PATH' : ffmpeg_path_release, 'QJSON_PATH' : os.path.abspath(qjson_path)})
 
 gen_version_h()
+gencomp_cpp(open('build/generated/compatibility_info.cpp', 'w'))
 
 index_dirs(('src',), 'src/const.pro', 'src/server.pro', exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
 instantiate_pro('src/server.pro', {'BUILDLIB' : BUILDLIB, 'FFMPEG' : ffmpeg_path, 'EVETOOLS_DIR' : tools_path})

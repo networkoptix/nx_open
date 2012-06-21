@@ -15,7 +15,6 @@ public:
     virtual QString getUniqueId() const;
 
 protected:
-    virtual void initInternal() override {}
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
 };
 

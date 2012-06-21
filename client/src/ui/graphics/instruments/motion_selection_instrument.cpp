@@ -55,16 +55,24 @@ public:
     }
 
     virtual QRectF boundingRect() const override {
-        return QRectF(m_origin, m_corner).normalized();
+        return QRectF(m_origin, m_corner).normalized().united(QRectF(m_mouseOrigin, m_mouseCorner).normalized());
     }
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *widget) override {
         if (widget != m_viewport)
             return; /* Draw it on source viewport only. */
 
+        /* Draw selection on cells */
         QnScopedPainterPenRollback penRollback(painter, m_colors[MotionSelectionInstrument::Border]);
         QnScopedPainterBrushRollback brushRollback(painter, m_colors[MotionSelectionInstrument::Base]);
-        painter->drawRect(boundingRect());
+        painter->drawRect(QRectF(m_origin, m_corner).normalized());
+        
+#ifdef QN_SHOW_MOTION_SELECTION_FRAME
+        /* Draw mouse rubber band */
+        painter->setPen(m_colors[MotionSelectionInstrument::MouseBorder]);
+        painter->setBrush(Qt::NoBrush);
+        painter->drawRect(QRectF(m_mouseOrigin, m_mouseCorner).normalized());
+#endif
     }
 
     /**
@@ -86,28 +94,62 @@ public:
         return m_viewport;
     }
 
-    void setOrigin(const QPointF &origin) {
+    /**
+     * Sets this item's grid selection - fixed on cell borders.
+     * 
+     * \param origin                    Origin in parent coordinates
+     * \param corner                    Corner in parent coordinates
+     */
+    void setGridSelection(const QPointF &origin, const QPointF &corner) {
         prepareGeometryChange();
         m_origin = origin;
-    }
-
-    void setCorner(const QPointF &corner) {
-        prepareGeometryChange();
         m_corner = corner;
     }
 
-    const QPointF &origin() const {
-        return m_origin;
+    /**
+     * Sets this item's grid selection in grid coordinates.
+     * 
+     * \param gridOrigin                Origin in grid coordinates
+     * \param gridCorner                Corner in grid coordinates
+     */
+    void setGridRect(const QPoint &gridOrigin, const QPoint &gridCorner) {
+        m_gridOrigin = gridOrigin;
+        m_gridCorner = gridCorner;
     }
 
-    const QPointF &corner() const {
-        return m_corner;
+    /**
+     * Sets this item's mouse rubber band selection.
+     * 
+     * \param mouseOrigin               Origin in parent coordinates
+     */
+    void setMouseOrigin(const QPointF &mouseOrigin) {
+        prepareGeometryChange();
+        m_mouseOrigin = mouseOrigin;
+    }
+
+    /**
+     * Sets this item's mouse rubber band selection.
+     * 
+     * \param mouseCorner               Corner in parent coordinates
+     */
+    void setMouseCorner(const QPointF &mouseCorner) {
+        prepareGeometryChange();
+        m_mouseCorner = mouseCorner;
     }
 
     void setColor(MotionSelectionInstrument::ColorRole role, const QColor &color) {
         m_colors[role] = color;
-
         update();
+    }
+
+    /**
+     * \returns selected rect in grid coordinates
+     */
+    QRect gridRect(){
+        return QRect(
+            QPoint(qMin(m_gridOrigin.x(), m_gridCorner.x()), qMin(m_gridOrigin.y(), m_gridCorner.y())),
+            QSize(qAbs(m_gridOrigin.x() - m_gridCorner.x()), qAbs(m_gridOrigin.y() - m_gridCorner.y()))
+        );
     }
 
 private:
@@ -119,6 +161,18 @@ private:
 
     /** Second corner of the selection item, in parent coordinates. */
     QPointF m_corner;
+
+    /** Origin of the selection item, in grid coordinates. */
+    QPoint m_gridOrigin;
+
+    /** Second corner of the selection item, in grid coordinates. */
+    QPoint m_gridCorner;
+
+    /** Origin of the mouse rubber band, in parent coordinates. */
+    QPointF m_mouseOrigin;
+
+    /** Second corner of the mouse rubber band, in parent coordinates. */
+    QPointF m_mouseCorner;
 
     /** Colors for drawing the selection rect. */
     QColor m_colors[MotionSelectionInstrument::RoleCount];
@@ -137,6 +191,12 @@ MotionSelectionInstrument::MotionSelectionInstrument(QObject *parent):
     m_colors[Base] = QColor(
         qMin(highlight.red() / 2 + 110, 255),
         qMin(highlight.green() / 2 + 110, 255),
+        qMin(highlight.blue() / 2 + 110, 255),
+        127
+    );
+    m_colors[MouseBorder] = QColor(
+        qMin(highlight.red() / 2 + 110, 255),
+        255,
         qMin(highlight.blue() / 2 + 110, 255),
         127
     );
@@ -210,8 +270,9 @@ void MotionSelectionInstrument::ensureSelectionItem() {
 
     m_selectionItem = new MotionSelectionItem();
     selectionItem()->setVisible(false);
-    selectionItem()->setColor(Base,     m_colors[Base]);
-    selectionItem()->setColor(Border,   m_colors[Border]);
+    selectionItem()->setColor(Base,         m_colors[Base]);
+    selectionItem()->setColor(Border,       m_colors[Border]);
+    selectionItem()->setColor(MouseBorder,  m_colors[MouseBorder]);
     if(scene() != NULL)
         scene()->addItem(selectionItem());
 }
@@ -274,10 +335,16 @@ void MotionSelectionInstrument::startDrag(DragInfo *info) {
     ensureSelectionItem();
     selectionItem()->setParentItem(target());
     QPointF itemPos = target()->mapFromScene(info->mousePressScenePos());
-    QPoint gridPos = target()->mapToMotionGrid(itemPos);
-    selectionItem()->setOrigin(target()->mapFromMotionGrid(gridPos));
+    selectionItem()->setMouseOrigin(itemPos);
     selectionItem()->setViewport(info->view()->viewport());
     selectionItem()->setVisible(true);
+
+    /* Safe initialize block. */
+    QPoint gridPos = target()->mapToMotionGrid(itemPos);
+    selectionItem()->setGridRect(gridPos, gridPos);
+    selectionItem()->setGridSelection(target()->mapFromMotionGrid(gridPos),
+                                      target()->mapFromMotionGrid(gridPos));
+    selectionItem()->setMouseCorner(itemPos);
 
     emit selectionStarted(info->view(), target());
     m_selectionStartedEmitted = true;
@@ -288,42 +355,33 @@ void MotionSelectionInstrument::dragMove(DragInfo *info) {
         dragProcessor()->reset();
         return;
     }
-    
     ensureSelectionItem();
-    QPointF itemPos = target()->mapFromScene(info->mousePressScenePos());
-    QPoint gridOrigin = target()->mapToMotionGrid(itemPos);
-    QPoint gridCorner = target()->mapToMotionGrid(target()->mapFromScene(info->mouseScenePos()));
-    
-    if ((info->mouseScreenPos() - info->mousePressScreenPos()).manhattanLength() >= QApplication::startDragDistance())
-    {
-        if (gridCorner.x() >= gridOrigin.x())
-            gridCorner += QPoint(1, 0);
-        else 
-            gridOrigin += QPoint(1, 0);
-        if (gridCorner.y() >= gridOrigin.y())
-            gridCorner += QPoint(0, 1);
-        else 
-            gridOrigin += QPoint(0, 1);
+
+    QPoint gridOrigin = target()->mapToMotionGrid(target()->mapFromScene(info->mousePressScenePos()));
+    QPoint gridCorner = target()->mapToMotionGrid(target()->mapFromScene(info->mouseScenePos())) + QPoint(1, 1);
+    if (gridCorner.x() <= gridOrigin.x()){
+        gridCorner -= QPoint(1, 0);
+        gridOrigin += QPoint(1, 0);
     }
 
-    selectionItem()->setOrigin(target()->mapFromMotionGrid(gridOrigin));
-    selectionItem()->setCorner(target()->mapFromMotionGrid(gridCorner));
+    if (gridCorner.y() <= gridOrigin.y()){
+        gridCorner -= QPoint(0, 1);
+        gridOrigin += QPoint(0, 1);
+    }
+
+    selectionItem()->setGridRect(gridOrigin, gridCorner);
+    selectionItem()->setGridSelection(target()->mapFromMotionGrid(gridOrigin),
+                                      target()->mapFromMotionGrid(gridCorner));
+    selectionItem()->setMouseCorner(target()->mapFromScene(info->mouseScenePos()));
 }
 
 void MotionSelectionInstrument::finishDrag(DragInfo *info) {
     ensureSelectionItem();
     if(target() != NULL) {
-        /* Qt handles QRect borders in totally inhuman way, so we have to do everything by hand. */
-        QPoint o = target()->mapToMotionGrid(selectionItem()->origin());
-        QPoint c = target()->mapToMotionGrid(selectionItem()->corner());
-
         emit motionRegionSelected(
             info->view(), 
             target(), 
-            QRect(
-                QPoint(qMin(o.x(), c.x()), qMin(o.y(), c.y())),
-                QSize(qAbs(o.x() - c.x()), qAbs(o.y() - c.y()))
-            )
+            selectionItem()->gridRect()
         );
     }
 

@@ -3,11 +3,12 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
-#include <QNetworkAccessManager>
+#include <QtNetwork/QNetworkAccessManager>
+#include <QtNetwork/QNetworkReply>
 #include <QtCore/QMutex>
 #include <QtCore/QWaitCondition>
 #include <QtCore/QSet>
-
+#include <QtCore/QTimer>
 #include "utils/common/base.h"
 #include "utils/common/longrunnable.h"
 
@@ -53,9 +54,8 @@ public:
           m_target(target),
           m_slot(slot),
           m_handle(handle)
-    {}
-
-    void addTarget(QObject* target);
+    {
+    }
 
 signals:
     void finished(int status, const QByteArray& data, const QByteArray& errorString, int handle);
@@ -119,8 +119,6 @@ public:
     int sendAsyncPostRequest(const QUrl& url, const QString &objectName, const QByteArray& data, QObject *target, const char *slot);
     int sendAsyncPostRequest(const QUrl& url, const QString &objectName, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot);
     int sendAsyncDeleteRequest(const QUrl& url, const QString &objectName, int id, QObject *target, const char *slot);
-
-    int testConnectionAsync(const QUrl& url, QObject* receiver, const char *slot);
 
 signals:
     void asyncGetRequest(SessionManagerReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, const QnRequestParamList &params, QObject *target, const char *slot, int handle);

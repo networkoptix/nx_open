@@ -2,36 +2,46 @@
 #define QN_MESSAGE_H
 
 #include "utils/common/qnid.h"
+#include "core/resource/resource.h"
+#include "licensing/license.h"
+#include "core/resource/camera_history.h"
 
-static const char* QN_MESSAGE_EMPTY                 = "EE";
-static const char* QN_MESSAGE_PING                  = "PE";
-static const char* QN_MESSAGE_RES_CHANGE            = "RC";
-static const char* QN_MESSAGE_RES_STATUS_CHANGE     = "RSC";
-static const char* QN_MESSAGE_RES_DISABLED_CHANGE   = "RDC";
-static const char* QN_MESSAGE_RES_DELETE            = "RD";
-static const char* QN_MESSAGE_RES_SETPARAM          = "RSP";
-static const char* QN_MESSAGE_LICENSE_CHANGE        = "LC";
-static const char* QN_MESSAGE_CAMERA_SERVER_ITEM    = "CSI";
+namespace pb {
+    class Message;
+}
+
+// Copied from message.pb.h
+// TODO: Ivan. Somehow avoid duplicaton of this enum
+enum Message_Type {
+  Message_Type_Initial = 0,
+  Message_Type_Ping = 1,
+  Message_Type_ResourceChange = 2,
+  Message_Type_ResourceDelete = 3,
+  Message_Type_ResourceStatusChange = 4,
+  Message_Type_ResourceDisabledChange = 5,
+  Message_Type_License = 6,
+  Message_Type_CameraServerItem = 7
+};
 
 struct QnMessage
 {
-    QString eventType;
+    Message_Type eventType;
     quint32 seqNumber;
 
-    QString objectName;
-    QnId objectId;
-    QnId parentId;
-    QString resourceGuid;
-    QString data;
+    QnResourcePtr resource;
 
-    // for RSP event
-    QString paramName;
-    QString paramValue;
+	// These fields are temporary and caused by
+	// heavy-weightness of QnResource
+	// TODO: Ivan. Replace resource with lightweight transfer object here
+	QnId resourceId;
+	QString resourceGuid;
+	bool resourceDisabled;
+	QnResource::Status resourceStatus;
 
-    QMap<QString, QVariant> dict;
+    QnLicensePtr license;
+    QnCameraHistoryItemPtr cameraServerItem;
 
-    bool load(const QVariant& parsed);
-    QString objectNameLower() const;
+    bool load(const pb::Message& message);
 
     static quint32 nextSeqNumber(quint32 seqNumber);
 };

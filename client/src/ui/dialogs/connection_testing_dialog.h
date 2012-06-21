@@ -25,7 +25,9 @@ public slots:
     virtual void reject() override;
 
     void timeout();
-    void testResults(int status, const QByteArray &data, const QByteArray &errorString, int requestHandle);
+
+	void oldHttpTestResults(int status ,QByteArray errorString,QByteArray data, int handle);
+    void testResults(int status, const QByteArray &errorString, QnConnectInfoPtr connectInfo, int requestHandle);
 
 private:
     void testSettings();

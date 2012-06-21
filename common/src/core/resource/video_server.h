@@ -15,7 +15,7 @@ public:
     virtual QString getUniqueId() const;
 
 protected:
-    virtual void initInternal() override {}
+
 };
 
 
@@ -51,7 +51,7 @@ public:
 signals:
     void serverIFFound(QString);
 protected:
-    void initInternal() override {}
+
 private:
     QnVideoServerConnectionPtr m_restConnection;
     QString m_apiUrl;

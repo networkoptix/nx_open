@@ -17,6 +17,7 @@ public:
     enum ColorRole {
         Base,       /**< Color of the selection rect. */
         Border,     /**< Color of the selection rect's border. */
+        MouseBorder,/**< Color of the mouse rect's border. */
         RoleCount
     };
 

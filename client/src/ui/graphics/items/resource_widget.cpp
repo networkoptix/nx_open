@@ -582,7 +582,7 @@ QPoint QnResourceWidget::mapToMotionGrid(const QPointF &itemPos)
     QPointF gridPosF(cwiseDiv(itemPos, toPoint(cwiseDiv(size(), QSizeF(motionGridWidth(), motionGridHeight())))));
     QPoint gridPos(qFuzzyFloor(gridPosF.x()), qFuzzyFloor(gridPosF.y()));
 
-    return bounded(gridPos, QRect(0, 0, motionGridWidth() + 1, motionGridHeight() + 1));
+    return bounded(gridPos, QRect(0, 0, motionGridWidth(), motionGridHeight()));
 }
 
 QPointF QnResourceWidget::mapFromMotionGrid(const QPoint &gridPos) {
@@ -646,10 +646,10 @@ void QnResourceWidget::setDisplayFlags(DisplayFlags flags) {
     DisplayFlags changedFlags = m_displayFlags ^ flags;
     m_displayFlags = flags;
 
-    if(changedFlags & DisplayMotionGrid) {
+    if(changedFlags & DisplayMotion) {
         QnAbstractArchiveReader *reader = m_display->archiveReader();
         if (reader)
-            reader->setSendMotion(flags & DisplayMotionGrid);
+            reader->setSendMotion(flags & DisplayMotion);
     }
 
     if(changedFlags & DisplayButtons)
@@ -865,7 +865,7 @@ void QnResourceWidget::at_resource_nameChanged() {
 
 void QnResourceWidget::at_searchButton_toggled(bool checked) {
     if(checked) {
-        setDisplayFlag(DisplayMotionGrid, true);
+        setDisplayFlag(DisplayMotion, true);
         setProperty(Qn::MotionSelectionModifiers, 0);
     } else {
         setProperty(Qn::MotionSelectionModifiers, QVariant());
@@ -983,7 +983,7 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     }
 
     /* Draw motion grid. */
-    if (m_displayFlags & DisplayMotionGrid) {
+    if (m_displayFlags & DisplayMotion) {
         for(int i = 0; i < m_channelCount; i++) 
         {
             QRectF rect = channelRect(i);
@@ -1083,11 +1083,12 @@ void QnResourceWidget::drawOverlayIcon(int channel, const QRectF &rect) {
 }
 
 void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, const QnMetaDataV1Ptr &motion, int channel) {
-    double xStep = rect.width() / (double) MD_WIDTH;
-    double yStep = rect.height() / (double) MD_HEIGHT;
+    qreal xStep = rect.width() / MD_WIDTH;
+    qreal yStep = rect.height() / MD_HEIGHT;
 
     ensureMotionMask();
 
+#if 0
     QVector<QPointF> gridLines;
 
     for (int x = 0; x < MD_WIDTH; ++x)
@@ -1124,6 +1125,7 @@ void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, con
     painter->setPen(QPen(QColor(255, 255, 255, 40)));
     painter->translate(rect.topLeft());
     painter->drawLines(gridLines);
+#endif
 
     if (!motion || motion->channelNumber != channel)
         return;
@@ -1135,10 +1137,10 @@ void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, con
     for (int y = 0; y < MD_HEIGHT; ++y)
         for (int x = 0; x < MD_WIDTH; ++x)
             if(motion->isMotionAt(x, y))
-                motionPath.addRect(QRectF(QPointF(x*xStep, y*yStep), QPointF((x+1)*xStep, (y+1)*yStep)));
-    QPen pen(QColor(0xff, 0, 0, 128));
+                motionPath.addRect(QRectF(QPointF(x * xStep, y * yStep), QPointF((x + 1) * xStep, (y + 1) * yStep)));
+    QPen pen(QColor(255, 0, 0, 128));
     qreal unit = qnGlobals->workbenchUnitSize();
-    pen.setWidth(unit*0.003);
+    pen.setWidth(unit * 0.003);
     painter->setPen(pen);
     painter->drawPath(motionPath);
 }

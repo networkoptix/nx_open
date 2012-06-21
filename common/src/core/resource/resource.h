@@ -221,7 +221,7 @@ protected:
 
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
 
-    virtual void initInternal() = 0;
+    virtual bool initInternal() {return true;};
 
 private:
     /* The following consumer-related API is private as it is supposed to be used from QnResourceConsumer instances only.
@@ -298,6 +298,7 @@ private:
     QStringList m_tags;
 
     bool m_initialized;    
+    QMutex m_initMutex;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResource::Flags);

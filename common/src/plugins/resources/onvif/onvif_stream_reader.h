@@ -5,9 +5,8 @@
 #include "core/dataprovider/live_stream_provider.h"
 #include "core/dataprovider/spush_media_stream_provider.h"
 #include "utils/network/multicodec_rtp_reader.h"
+#include "soap_wrapper.h"
 
-class _onvifMedia__GetProfilesResponse;
-class _onvifMedia__GetProfileResponse;
 class onvifXsd__Profile;
 class onvifXsd__VideoEncoderConfiguration;
 
@@ -111,12 +110,12 @@ private:
     const QString updateCameraAndfetchStreamUrl(bool isPrimary) const;
 
     //Returned ptr can be used only when response is not destroyed!
-    onvifXsd__Profile* findAppropriateProfile(const _onvifMedia__GetProfilesResponse& response, bool isPrimary) const;
+    onvifXsd__Profile* findAppropriateProfile(const ProfilesResp& response, bool isPrimary) const;
 
     void fillVideoEncoderChanges(VideoEncoderChanges& changes) const;
     void clearVideoEncoderChanges(VideoEncoderChanges& changes) const;
     const QString normalizeStreamSrcUrl(const std::string& src) const;
-    void printProfile(const _onvifMedia__GetProfileResponse& response, bool isPrimary) const;
+    void printProfile(const ProfileResp& response, bool isPrimary) const;
 private:
     QnMetaDataV1Ptr m_lastMetadata;
     QnMulticodecRtpReader m_multiCodec;

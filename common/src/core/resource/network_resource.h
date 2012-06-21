@@ -27,7 +27,7 @@ public:
 
     virtual bool equalsTo(const QnResourcePtr other) const;
 
-    QString getUniqueId() const;
+    virtual QString getUniqueId() const;
 
     virtual QHostAddress getHostAddress() const;
     virtual bool setHostAddress(const QHostAddress &ip, QnDomain domain = QnDomainMemory);

@@ -80,6 +80,7 @@ void QnCameraMotionMaskWidget::init()
     m_motionSelectionInstrument->setMultiSelectionModifiers(Qt::NoModifier);
 	m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Base, qnGlobals->motionMaskRubberBandColor());
 	m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Border, qnGlobals->motionMaskRubberBandBorderColor());
+    m_motionSelectionInstrument->setColor(MotionSelectionInstrument::MouseBorder, qnGlobals->motionMaskMouseFrameColor());
     display->instrumentManager()->installInstrument(m_motionSelectionInstrument);
 
     m_clickInstrument = new ClickInstrument(Qt::LeftButton, 0, Instrument::Item, this);
@@ -157,7 +158,7 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
         m_resourceWidget = m_context->display()->widget(item);
         m_resourceWidget->setDrawMotionWindows(QnResourceWidget::DrawAllMotionInfo);
         m_resourceWidget->setDisplayFlag(QnResourceWidget::DisplayButtons, false);
-        m_resourceWidget->setDisplayFlag(QnResourceWidget::DisplayMotionGrid, true);
+        m_resourceWidget->setDisplayFlag(QnResourceWidget::DisplayMotion, true);
     }
 
     /* Consider motion mask list changed. */

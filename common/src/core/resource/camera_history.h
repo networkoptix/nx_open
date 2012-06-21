@@ -20,6 +20,7 @@ struct QN_EXPORT QnCameraHistoryItem
     qint64 timestamp;
     QString videoServerGuid;
 };
+typedef QSharedPointer<QnCameraHistoryItem> QnCameraHistoryItemPtr;
 
 struct QN_EXPORT QnCameraTimePeriod: QnTimePeriod
 {

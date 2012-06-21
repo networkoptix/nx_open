@@ -1,4 +1,4 @@
-package proto.pb;
+package pb;
 
 enum ParamType {
     Nope        = 0;

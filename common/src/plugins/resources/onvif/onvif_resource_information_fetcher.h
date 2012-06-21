@@ -3,21 +3,21 @@
 
 #include "core/resourcemanagment/resource_searcher.h"
 #include "onvif_helper.h"
-
-class _onvifDevice__GetNetworkInterfacesResponse;
-class _onvifDevice__GetDeviceInformationResponse;
-struct SOAP_ENV__Fault;
+#include "soap_wrapper.h"
 
 struct EndpointAdditionalInfo
 {
     QString name;
     QString manufacturer;
+    QString mac;
     QString uniqId;
     QString discoveryIp;
 
-    EndpointAdditionalInfo(const QString& newName, const QString& newManufacturer, const QString& newUniqId, const QString& newDiscoveryIp):
+    EndpointAdditionalInfo(const QString& newName, const QString& newManufacturer, const QString& newMac, 
+            const QString& newUniqId, const QString& newDiscoveryIp):
         name(newName),
         manufacturer(newManufacturer),
+        mac(newMac),
         uniqId(newUniqId),
         discoveryIp(newDiscoveryIp)
     {
@@ -33,7 +33,7 @@ class OnvifResourceInformationFetcher
 	static std::string& STD_ONVIF_USER;
 	static std::string& STD_ONVIF_PASSWORD;
     QnId onvifTypeId;
-    PasswordHelper& passwordsData;
+    //PasswordHelper& passwordsData;
     NameHelper& camersNamesData;
 
 public:
@@ -50,18 +50,13 @@ private:
 
     bool findSpecialResource(const EndpointAdditionalInfo& info, const QHostAddress& sender, const QString& manufacturer, QnResourceList& result) const;
 
-    const QString fetchMacAddress(const _onvifDevice__GetNetworkInterfacesResponse& response,
-        const QString& senderIpAddress) const;
-
     void createResource(const QString& manufacturer, const QHostAddress& sender, const QHostAddress& discoveryIp, const QString& name, const QString& mac,
-        const char* login, const char* passwd, const QString& mediaUrl, const QString& deviceUrl, QnResourceList& result) const;
+        const QString& uniqId, const char* login, const char* passwd, const QString& mediaUrl, const QString& deviceUrl, QnResourceList& result) const;
 
     const bool isMacAlreadyExists(const QString& mac, const QnResourceList& resList) const;
-    const QString fetchName(const _onvifDevice__GetDeviceInformationResponse& response) const;
-    const QString fetchManufacturer(const _onvifDevice__GetDeviceInformationResponse& response) const;
-    const QString fetchSerial(const _onvifDevice__GetDeviceInformationResponse& response) const;
-    //const QString generateRandomPassword() const;
-    QHostAddress hostAddressFromEndpoint(const QString& endpoint) const;
+    const QString fetchName(const DeviceInfoResp& response) const;
+    const QString fetchManufacturer(const DeviceInfoResp& response) const;
+    const QString fetchSerial(const DeviceInfoResp& response) const;
 
 };
 
