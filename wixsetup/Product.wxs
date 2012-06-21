@@ -487,11 +487,7 @@
                             <Component Id="ServerOpenSSL" Guid="{DC94094B-CA8C-4be0-9A8A-6DA35FCC77E6}">
                                 <File Id="Serverlibeay32.dll" Name="libeay32.dll" Source="..\common\contrib\openssl\bin\libeay32.dll"/>
                                 <File Id="Serverssleay32.dll" Name="ssleay32.dll" Source="..\common\contrib\openssl\bin\ssleay32.dll"/>
-                            </Component>
-                            
-                            <Component Id="ServerQjson" Guid="{809F73F7-A313-4190-8DF5-389D6B57064B}">
-                                <File Id="ServerQjsonDll" Name="qjson.dll" Source="../mediaserver/bin/$(env.CONFIG)/qjson.dll"/>
-                            </Component>
+                            </Component>                            
                         </Directory>
                         
                         <Directory Id="VmsClientDir" Name="Client">
@@ -560,10 +556,6 @@
                             <Component Id="ClientOpenSSL" Guid="{D7E994B3-B437-4993-A04E-C15AF9DF8312}">
                                 <File Id="Clientlibeay32.dll" Name="libeay32.dll" Source="..\common\contrib\openssl\bin\libeay32.dll"/>
                                 <File Id="Clientssleay32.dll" Name="ssleay32.dll" Source="..\common\contrib\openssl\bin\ssleay32.dll"/>
-                            </Component>
-                            
-                            <Component Id="ClientQjson" Guid="{E22DFDE7-0917-4feb-971D-74457D2DAD71}">
-                                <File Id="ClientQjsonDll" Name="qjson.dll" Source="../client/bin/$(env.CONFIG)/qjson.dll"/>
                             </Component>
                             
                             <Component Id="ClientQtColorPicker" Guid="{A8E0F358-198A-4D79-A6F0-607D60F524EE}">
@@ -646,7 +638,6 @@
             <ComponentRef Id="ServerFFmpegLibraries"/>
             <ComponentRef Id="ServerQTLibraries" />
             <ComponentRef Id="ServerOpenSSL"/>
-            <ComponentRef Id="ServerQjson"/>
         </Feature>
         
         <Feature Id="ClientFeature" Title="$(env.APPLICATION_NAME) Client" Level="1"
@@ -662,7 +653,6 @@
             <ComponentRef Id="ImageFormats" />
             <ComponentRef Id="ClientOpenAL" />
             <ComponentRef Id="ClientOpenSSL" />
-            <ComponentRef Id="ClientQjson"/>
             <ComponentRef Id="ClientQtColorPicker"/>
             <ComponentRef Id="bespin" />
             

@@ -17,7 +17,7 @@ import re
 sys.path.insert(0, os.path.join('..', 'common'))
 
 from convert import index_dirs, setup_ffmpeg, gen_filetypes_h, rmtree, instantiate_pro, BUILDLIB
-from convert import qt_path, copy_files, setup_tools, setup_qjson, setup_openssl, platform, gen_env_sh
+from convert import qt_path, copy_files, setup_tools, setup_openssl, platform, gen_env_sh
 from convert import convert as convert_common
 from common_version import *
 
@@ -124,7 +124,6 @@ ffmpeg_path, ffmpeg_path_debug, ffmpeg_path_release = setup_ffmpeg()
 openal_path = setup_openal()
 openssl_path = setup_openssl()
 tools_path = setup_tools()
-qjson_path = setup_qjson()
 
 if os.path.exists('bin'):
     rmtree('bin')
@@ -171,23 +170,13 @@ elif platform() == 'mac':
     ldpath_debug += ':' + tools_path + '/lib'
     ldpath_release += ':' + tools_path + '/lib'
 
-if platform() == 'win32':
-    copy_files(qjson_path + '/release/qjson.dll', 'bin/release')
-    copy_files(qjson_path + '/debug/qjson.dll', 'bin/debug')
-elif platform() == 'mac':
-    ldpath_debug += ':' + os.path.abspath(qjson_path)
-    ldpath_release += ':' + os.path.abspath(qjson_path)
-elif platform() == 'linux':
-    copy_files(qjson_path + '/libqjson.so.0', 'bin/release')
-    copy_files(qjson_path + '/libqjson.so.0', 'bin/debug')
-
 if platform() == 'mac':
     ldpath_debug += ':' + os.path.abspath('../common/bin/debug')
     ldpath_release += ':' + os.path.abspath('../common/bin/release')
 
 if platform() == 'mac':
-    gen_env_sh('bin/debug/env.sh', ldpath_debug, {'FFMPEG_PATH' : ffmpeg_path_debug, 'QJSON_PATH' : os.path.abspath(qjson_path)})
-    gen_env_sh('bin/release/env.sh', ldpath_release, {'FFMPEG_PATH' : ffmpeg_path_release, 'QJSON_PATH' : os.path.abspath(qjson_path)})
+    gen_env_sh('bin/debug/env.sh', ldpath_debug, {'FFMPEG_PATH' : ffmpeg_path_debug})
+    gen_env_sh('bin/release/env.sh', ldpath_release, {'FFMPEG_PATH' : ffmpeg_path_release})
 
 gen_version_h()
 

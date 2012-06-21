@@ -49,21 +49,14 @@ INCLUDEPATH += $$PWD/common $$PWD/common/core $$PWD/common/utils $$PWD/common/pl
 CONFIG(debug, debug|release) {
   INCLUDEPATH += $$FFMPEG-debug/include
   LIBS = -L$$FFMPEG-debug/bin -L$$FFMPEG-debug/lib $$LIBS
-  win32 {
-    LIBS+=-L../contrib/qjson/lib/win32/debug
-  }
 }
 CONFIG(release, debug|release) {
   INCLUDEPATH += $$FFMPEG-release/include
   LIBS = -L$$FFMPEG-release/bin -L$$FFMPEG-release/lib $$LIBS
-  win32 {
-    LIBS+=-L../contrib/qjson/lib/win32/release
-  }
 }
 
-LIBS += -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lqjson
+LIBS += -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale
 
-INCLUDEPATH += ../contrib/qjson/include
 win32 {
   INCLUDEPATH += ../contrib/ffmpeg-misc-headers-win32 
   LIBS += -lws2_32 -lIphlpapi -lOle32 
@@ -98,12 +91,12 @@ unix {
 mac {
   QMAKE_CXXFLAGS += -msse4.1
   QMAKE_CFLAGS += -msse4.1
-  LIBS += -framework CoreFoundation -framework IOKit -lcrypto -L../contrib/qjson/lib/mac
+  LIBS += -framework CoreFoundation -framework IOKit -lcrypto
 }
 
 unix:!mac {
   QMAKE_CXXFLAGS += -msse2
-  LIBS += -lz -lbz2 -L../contrib/qjson/lib/linux
+  LIBS += -lz -lbz2
 }
 
 DEFINES += __STDC_CONSTANT_MACROS

@@ -21,7 +21,7 @@ static const int PING_INTERVAL = 60000;
 class QnPbStreamParser
 {
 public:
-	void reset();
+    void reset();
     void addData(const QByteArray& data);
     bool nextMessage(pb::Message& parsed);
 
@@ -32,7 +32,7 @@ private:
 
 void QnPbStreamParser::reset()
 {
-	incomplete.clear();
+    incomplete.clear();
 }
 
 void QnPbStreamParser::addData(const QByteArray& data)
@@ -63,68 +63,6 @@ bool QnPbStreamParser::nextMessage(pb::Message& parsed)
 
     return true;
 }
-
-// -------------------------------------------------------------------------- //
-// QnJsonStreamParser
-// -------------------------------------------------------------------------- //
-class QnJsonStreamParser
-{
-public:
-    void addData(const QByteArray& data);
-    bool nextMessage(QVariant& parsed);
-
-private:
-    QQueue<QByteArray> blocks;
-    QByteArray incomplete;
-
-    QJson::Parser parser;
-};
-
-void QnJsonStreamParser::addData(const QByteArray& data)
-{
-    if (!incomplete.isEmpty())
-    {
-        incomplete += data;
-
-        if (incomplete.endsWith('\n'))
-        {
-            foreach(QByteArray block, incomplete.trimmed().split('\n'))
-            {
-                blocks.enqueue(block);
-            }
-            incomplete.clear();
-        }
-    } else
-    {
-        if (data.endsWith('\n'))
-        {
-            foreach(QByteArray block, data.trimmed().split('\n'))
-            {
-                blocks.enqueue(block);
-            }
-        } else
-        {
-            incomplete = data;
-        }
-    }
-}
-
-bool QnJsonStreamParser::nextMessage(QVariant& parsed)
-{
-    if (blocks.isEmpty())
-        return false;
-
-    QByteArray block = blocks.dequeue();
-
-    bool ok;
-    parsed = parser.parse(block, &ok);
-
-    if (!ok)
-        qnWarning("Error parsing JSON block: %1.", block);
-
-    return ok;
-}
-
 
 // -------------------------------------------------------------------------- //
 // QnMessageSource
@@ -172,7 +110,7 @@ void QnMessageSource::doStop()
 
 void QnMessageSource::startRequest()
 {
-	m_streamParser->reset();
+    m_streamParser->reset();
 
     m_reply = m_manager.post(QNetworkRequest(m_url), "");
     connect(m_reply, SIGNAL(finished()),
@@ -210,7 +148,7 @@ void QnMessageSource::httpFinished()
 
 void QnMessageSource::httpReadyRead()
 {
-	QByteArray data = m_reply->readAll();
+    QByteArray data = m_reply->readAll();
 
     m_streamParser->addData(data);
 
