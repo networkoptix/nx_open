@@ -138,6 +138,8 @@ const QnResourcePtr &QnCameraMotionMaskWidget::camera() const {
 
 void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
 {
+    // TODO: Why don't we return if the camera didn't change? *What the fuck?*
+
     QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
 
 	m_camera = camera;
