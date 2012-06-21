@@ -9,13 +9,9 @@
 #include "core/resource/camera_resource.h"
 #include "utils/network/simple_http_client.h"
 #include "core/datapacket/mediadatapacket.h"
+#include "soap_wrapper.h"
 
-class _onvifMedia__GetVideoEncoderConfigurationOptionsResponse;
-//class _onvifMedia__GetVideoEncoderConfigurationsResponse;
 struct VideoEncoders;
-class _onvifMedia__GetProfilesResponse;
-class _onvifMedia__GetVideoSourceConfigurationsResponse;
-class _onvifDevice__GetNetworkInterfacesResponse;
 
 //first = width, second = height
 typedef QPair<int, int> ResolutionPair;
@@ -36,8 +32,10 @@ public:
     static const QString& DEVICE_URL_PARAM_NAME;
 	static const float QUALITY_COEF;
     static const double MAX_SECONDARY_RESOLUTION_SQUARE;
+    static const char* PROFILE_NAME_PRIMARY;
+    static const char* PROFILE_NAME_SECONDARY;
 
-    static const QString fetchMacAddress(const _onvifDevice__GetNetworkInterfacesResponse& response, const QString& senderIpAddress);
+    static const QString fetchMacAddress(const NetIfacesResp& response, const QString& senderIpAddress);
 
     QnPlOnvifResource();
 
@@ -94,12 +92,12 @@ private:
     int toAxisMotionSensitivity(int sensitivity);
     void fetchAndSetDeviceInformation();
     void fetchAndSetVideoEncoderOptions();
-    void setVideoEncoderOptions(const _onvifMedia__GetVideoEncoderConfigurationOptionsResponse& response);
-    bool setVideoEncoderOptionsH264(const _onvifMedia__GetVideoEncoderConfigurationOptionsResponse& response);
-    bool setVideoEncoderOptionsJpeg(const _onvifMedia__GetVideoEncoderConfigurationOptionsResponse& response);
+    void setVideoEncoderOptions(const VideoOptionsResp& response);
+    bool setVideoEncoderOptionsH264(const VideoOptionsResp& response);
+    bool setVideoEncoderOptionsJpeg(const VideoOptionsResp& response);
     void analyzeVideoEncoders(VideoEncoders& encoders, bool setOptions);
     int countAppropriateProfiles(const _onvifMedia__GetProfilesResponse& response, VideoEncoders& encoders);
-    void setVideoSource(const _onvifMedia__GetVideoSourceConfigurationsResponse& response, VideoEncoders& encoders) const;
+    void setVideoSource(const VideoSrcConfigsResp& response, VideoEncoders& encoders) const;
     void setOnvifUrls();
     void save();
 	void setMinMaxQuality(int min, int max);

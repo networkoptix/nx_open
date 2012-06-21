@@ -2,9 +2,10 @@
 #define axis_device_server_h_2219
 
 #include "core/resourcemanagment/resource_searcher.h"
-#include "../onvif_old/onvif_device_searcher.h"
+#include "../mdns/mdns_device_searcher.h"
 
-class QnPlAxisResourceSearcher : public OnvifResourceSearcherOld
+
+class QnPlAxisResourceSearcher : public QnMdnsResourceSearcher
 {
     QnPlAxisResourceSearcher();
 

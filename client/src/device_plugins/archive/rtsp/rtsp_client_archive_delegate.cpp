@@ -366,8 +366,9 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
             rtpChannelNum = m_rtpData->getMediaSocket()->getLocalPort();
         }
         const QString format = m_rtspSession.getTrackFormat(rtpChannelNum).toLower();
-        if (format.isEmpty())
-            qWarning() << Q_FUNC_INFO << __LINE__ << "RTP track" << rtpChannelNum << "not found";
+        if (format.isEmpty()) {
+            //qWarning() << Q_FUNC_INFO << __LINE__ << "RTP track" << rtpChannelNum << "not found";
+        }
         else if (format == QLatin1String("ffmpeg")) {
             result = qSharedPointerDynamicCast<QnAbstractMediaData>(processFFmpegRtpPayload(data, blockSize));
         }

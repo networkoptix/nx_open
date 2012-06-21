@@ -1,4 +1,4 @@
-#include "onvif_device_searcher.h"
+#include "mdns_device_searcher.h"
 #include "utils/network/nettools.h"
 #include "utils/network/mdns.h"
 #include "utils/common/sleep.h"
@@ -7,6 +7,7 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #endif
+
 
 
 quint16 MDNS_PORT = 5353;
@@ -45,24 +46,24 @@ bool multicastLeaveGroup(QUdpSocket& udpSocket, QHostAddress groupAddress)
 
 
 
-OnvifResourceSearcherOld::OnvifResourceSearcherOld()
+QnMdnsResourceSearcher::QnMdnsResourceSearcher()
 {
 
 }
 
-OnvifResourceSearcherOld::~OnvifResourceSearcherOld()
+QnMdnsResourceSearcher::~QnMdnsResourceSearcher()
 {
 
 };
 
 
-bool OnvifResourceSearcherOld::isProxy() const
+bool QnMdnsResourceSearcher::isProxy() const
 {
     return false;
 }
 
 
-QnResourceList OnvifResourceSearcherOld::findResources()
+QnResourceList QnMdnsResourceSearcher::findResources()
 {
     QnResourceList result;
 
@@ -71,7 +72,7 @@ QnResourceList OnvifResourceSearcherOld::findResources()
     CL_LOG(cl_logDEBUG1)
     {
         QString log;
-        QTextStream(&log) << "OnvifResourceSearcherOld::findDevices  found " << localAddresses.size() << " adapter(s) with IPV4";
+        QTextStream(&log) << "QnMdnsResourceSearcher::findDevices  found " << localAddresses.size() << " adapter(s) with IPV4";
         cl_log.log(log, cl_logDEBUG1);
 
         for (int i = 0; i < localAddresses.size();++i)
@@ -130,7 +131,7 @@ QnResourceList OnvifResourceSearcherOld::findResources()
 }
 
 
-void OnvifResourceSearcherOld::checkSocket(QUdpSocket& sock, QnResourceList& result, QHostAddress localAddress)
+void QnMdnsResourceSearcher::checkSocket(QUdpSocket& sock, QnResourceList& result, QHostAddress localAddress)
 {
     while (sock.hasPendingDatagrams())
     {

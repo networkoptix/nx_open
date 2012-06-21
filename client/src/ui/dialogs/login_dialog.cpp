@@ -107,9 +107,9 @@ void LoginDialog::updateFocus()
 {
     int size = m_dataWidgetMapper->model()->columnCount();
 
-    int i;
-    for(i = 0; i < size; i++) {
-        QWidget *widget = m_dataWidgetMapper->mappedWidgetAt(i);
+    QWidget *widget = NULL;
+    for(int i = 0; i < size; i++) {
+        widget = m_dataWidgetMapper->mappedWidgetAt(i);
         if(!widget)
             continue;
 
@@ -124,9 +124,10 @@ void LoginDialog::updateFocus()
         if((value.userType() == QVariant::Int || value.userType() == QVariant::LongLong) && value.toInt() == 0)
             break;
     }
-
-    if(i < size)
-        m_dataWidgetMapper->mappedWidgetAt(i)->setFocus();
+    
+    /* Set focus on the last widget in list if every widget is filled. */
+    if(widget)
+        widget->setFocus();
 }
 
 QUrl LoginDialog::currentUrl()
@@ -299,6 +300,7 @@ void LoginDialog::at_connectFinished(int status, const QByteArray &/*errorString
             tr("Could not connect to Enterprise Controller"), 
             tr("Connection to the Enterprise Controller could not be established.\nConnection details that you have entered are incorrect, please try again.\n\nIf this error persists, please contact your VMS administrator.")
         );
+        updateFocus();
         return;
     }
 
@@ -317,8 +319,9 @@ void LoginDialog::at_connectFinished(int status, const QByteArray &/*errorString
         QMessageBox::warning(
             this,
             tr("Could not connect to Enterprise Controller"),
-            tr("Connection could not be established.\nThe Enterprise Controller is incompatible. Please upgrade your client or contact VMS administrator.")
+            tr("Connection could not be established.\nThe Enterprise Controller is incompatible with this client. Please upgrade your client or contact your VMS administrator.")
         );
+        updateFocus();
         return;
     }
 
@@ -349,6 +352,8 @@ void LoginDialog::at_testButton_clicked()
     QScopedPointer<QnConnectionTestingDialog> dialog(new QnConnectionTestingDialog(url, this));
     dialog->setModal(true);
     dialog->exec();
+
+    updateFocus();
 }
 
 void LoginDialog::at_configureConnectionsButton_clicked()

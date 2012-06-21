@@ -33,7 +33,7 @@ public:
 
     QRect getMotionWindow(int num) const;
     QMap<int, QRect>  getMotionWindows() const;
-    void readMotionInfo();
+    bool readMotionInfo();
 
     virtual void setMotionMaskPhysical(int channel) override;
     virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider) override;

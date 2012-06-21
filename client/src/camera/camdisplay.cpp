@@ -1019,7 +1019,7 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
         // three are 3 possible scenarios:
 
         //1) we do not have audio playing;
-        if (!haveAudio(speed))
+        if (!haveAudio(speed) || isAudioHoleDetected(vd))
         {
             qint64 m_videoDuration = m_videoQueue[0].size() * m_lastNonZerroDuration;
             if (vd && m_videoDuration >  1000 * 1000)
@@ -1185,6 +1185,18 @@ void CLCamDisplay::clearVideoQueue()
             m_videoQueue[i].dequeue();
     }
     m_videoBufferOverflow = false;
+}
+
+bool CLCamDisplay::isAudioHoleDetected(QnCompressedVideoDataPtr vd)
+{
+    if (!vd)
+        return false;
+    bool isVideoCamera = qSharedPointerDynamicCast<QnVirtualCameraResource>(vd->dataProvider->getResource()) != 0;
+    if (!isVideoCamera)
+        return false; // do not change behaviour for local files
+    if (m_videoQueue->isEmpty())
+        return false;
+    return m_videoQueue->last()->timestamp - m_videoQueue->first()->timestamp >= MAX_FRAME_DURATION*1000ll;
 }
 
 void CLCamDisplay::enqueueVideo(QnCompressedVideoDataPtr vd)

@@ -185,15 +185,16 @@ void QnMulticodecRtpReader::openStream()
 
     m_RtpSession.setAuth(nres->getAuth());
 
+    delete m_videoParser;
+    m_videoParser = 0;
+    delete m_audioParser;
+    m_audioParser = 0;
+    m_videoIO = m_audioIO = 0;
+
     if (m_RtpSession.open(url))
     {
         m_RtpSession.play(AV_NOPTS_VALUE, AV_NOPTS_VALUE, 1.0);
         
-        delete m_videoParser;
-        m_videoParser = 0;
-        delete m_audioParser;
-        m_audioParser = 0;
-
         m_videoParser = createParser(m_RtpSession.getCodecNameByType("video").toUpper());
         if (m_videoParser)
             m_videoParser->setTimeHelper(&m_timeHelper);
