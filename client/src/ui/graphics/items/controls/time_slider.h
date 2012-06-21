@@ -5,6 +5,7 @@
 
 #include <recording/time_period.h>
 
+#include <ui/common/functors.h>
 #include <ui/processors/kinetic_process_handler.h>
 #include <ui/processors/drag_process_handler.h>
 #include <ui/animation/animation_timer_listener.h>
@@ -17,6 +18,7 @@ class QTimer;
 
 class QnThumbnailsLoader;
 class QnTimeSliderPixmapCache;
+
 
 class QnTimeSlider: public Animated<QnToolTipSlider>, protected KineticProcessHandler, protected DragProcessHandler, protected AnimationTimerListener {
     Q_OBJECT;
@@ -220,6 +222,8 @@ private:
     Marker markerFromPosition(const QPointF &pos, qreal maxDistance = 1.0) const;
     QPointF positionFromMarker(Marker marker) const;
 
+    qreal quickPositionFromValue(qint64 logicalValue, bool bound = true) const;
+
     QRectF thumbnailsRect() const;
     QRectF rulerRect() const;
     qreal effectiveLineStretch(int line) const;
@@ -251,8 +255,10 @@ private:
     void updateAggregationValue();
     void updateAggregatedPeriods(int line, Qn::TimePeriodRole type);
     void updateTotalLineStretch();
-    void updateThumbnailsLater();
-    Q_SLOT void updateThumbnails();
+    void updateThumbnailsStepSize();
+    void updateThumbnailsPeriod();
+    void updateThumbnailsStepSizeLater();
+    Q_SLOT void updateThumbnailsStepSizeTimer();
 
     Q_SLOT void addThumbnail(const QnThumbnail &thumbnail);
     Q_SLOT void clearThumbnails();
@@ -275,6 +281,9 @@ private:
     Options m_options;
     QString m_toolTipFormat;
 
+    QnLinearFunction m_unboundMapper;
+    QnBoundedLinearFunction m_boundMapper;
+
     qint64 m_zoomAnchor;
     bool m_unzooming;
     Marker m_dragMarker;
@@ -296,10 +305,11 @@ private:
 
     QWeakPointer<QnThumbnailsLoader> m_thumbnailsLoader;
     QTimer *m_thumbnailsUpdateTimer;
+    qint64 m_lastThumbnailsUpdateTime;
     QPixmap m_noThumbnailsPixmap;
     QMap<qint64, ThumbnailData> m_thumbnailData;
     QList<ThumbnailData> m_oldThumbnailData;
-
+    
     qreal m_rulerHeight;
     qreal m_prefferedHeight;
 

@@ -278,13 +278,14 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
 	m_lineCount(0),
     m_totalLineStretch(0.0),
     m_rulerHeight(0.0),
-    m_prefferedHeight(0.0)
+    m_prefferedHeight(0.0),
+    m_lastThumbnailsUpdateTime(0)
 {
     m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("NO THUMBNAILS\nAVAILABLE"), 16, QColor(255, 255, 255, 255));
 
     /* Prepare thumbnail update timer. */
     m_thumbnailsUpdateTimer = new QTimer(this);
-    connect(m_thumbnailsUpdateTimer, SIGNAL(timeout()), this, SLOT(updateThumbnails()));
+    connect(m_thumbnailsUpdateTimer, SIGNAL(timeout()), this, SLOT(updateThumbnailsStepSizeTimer()));
 
     /* Set default vector sizes. */
     m_lineData.resize(maxLines);
@@ -550,7 +551,7 @@ void QnTimeSlider::setWindow(qint64 start, qint64 end) {
 
         updateToolTipVisibility();
         updateMSecsPerPixel();
-        updateThumbnailsLater();
+        updateThumbnailsPeriod();
     }
 }
 
@@ -618,7 +619,8 @@ void QnTimeSlider::setThumbnailsLoader(QnThumbnailsLoader *loader) {
         connect(m_thumbnailsLoader.data(), SIGNAL(thumbnailLoaded(const QnThumbnail &)), this, SLOT(addThumbnail(const QnThumbnail &)));
     }
 
-    updateThumbnails();
+    updateThumbnailsPeriod();
+    updateThumbnailsStepSize();
 }
 
 QPointF QnTimeSlider::positionFromValue(qint64 logicalValue, bool bound) const {
@@ -638,6 +640,14 @@ qint64 QnTimeSlider::valueFromPosition(const QPointF &position, bool bound) cons
     d->ensureMapper();
 
     return GraphicsStyle::sliderValueFromPosition(m_windowStart, m_windowEnd, position.x(), d->pixelPosMax - d->pixelPosMin, d->upsideDown, bound);
+}
+
+qreal QnTimeSlider::quickPositionFromValue(qint64 logicalValue, bool bound) const {
+    if(bound) {
+        return m_boundMapper(logicalValue);
+    } else {
+        return m_unboundMapper(logicalValue);
+    }
 }
 
 void QnTimeSlider::finishAnimations() {
@@ -764,7 +774,7 @@ void QnTimeSlider::setRulerHeight(qreal rulerHeight) {
     m_rulerHeight = rulerHeight;
 
     updateGeometry();
-    updateThumbnailsLater();
+    updateThumbnailsStepSize();
 }
 
 void QnTimeSlider::addThumbnail(const QnThumbnail &thumbnail) {
@@ -789,9 +799,9 @@ void QnTimeSlider::freezeThumbnails() {
         ThumbnailData &data = m_oldThumbnailData[i];
         data.hiding = true;
 
-        QPointF pos = positionFromValue(data.thumbnail.time(), false);
+        qreal pos = quickPositionFromValue(data.thumbnail.time(), false);
         qreal width = data.thumbnail.size().width() * thumbnailsHeight / data.thumbnail.size().height();
-        data.pos = (pos.x() - rect.center().x()) / width;
+        data.pos = (pos - rect.center().x()) / width;
     }
 }
 
@@ -854,6 +864,7 @@ void QnTimeSlider::updateMSecsPerPixel() {
 
     m_msecsPerPixel = msecsPerPixel;
 
+    updateThumbnailsStepSize();
     updateStepAnimationTargets();
     updateAggregationValue();
 }
@@ -1008,23 +1019,35 @@ void QnTimeSlider::updateTotalLineStretch() {
     updateLineCommentPixmaps();
 }
 
-void QnTimeSlider::updateThumbnailsLater() {
-    if(!m_thumbnailsUpdateTimer->isActive())
-        m_thumbnailsUpdateTimer->start(50);
-}
-
-void QnTimeSlider::updateThumbnails() {
-    m_thumbnailsUpdateTimer->stop();
+void QnTimeSlider::updateThumbnailsPeriod() {
     if (!thumbnailsLoader())
         return;
 
-    /* Update loader's bounding size. */
+    thumbnailsLoader()->setTimePeriod(m_windowStart, m_windowEnd);
+}
+
+void QnTimeSlider::updateThumbnailsStepSizeLater() {
+    m_thumbnailsUpdateTimer->start(100); /* Re-start it if it's active. */
+}
+
+void QnTimeSlider::updateThumbnailsStepSizeTimer() {
+    m_thumbnailsUpdateTimer->stop();
+    updateThumbnailsStepSize();
+}
+
+void QnTimeSlider::updateThumbnailsStepSize() {
+    if (!thumbnailsLoader())
+        return; /* Nothing to update. */
+
+    if (m_thumbnailsUpdateTimer->isActive())
+        return; /* We'll get updated once the timer hits. */
+    
+    /* Calculate new bounding size. */
     int boundingHeigth = qRound(thumbnailsHeight());
     QSize boundingSize = QSize(boundingHeigth * 256, boundingHeigth);
     bool boundingSizeChanged = thumbnailsLoader()->boundingSize() != boundingSize;
-    thumbnailsLoader()->setBoundingSize(boundingSize);
 
-    /* Check actual thumbnail size. */
+    /* Calculate actual thumbnail size. */
     QSize size = thumbnailsLoader()->thumbnailSize();
     if(size.isEmpty()) {
         size = QSize(boundingHeigth * 4 / 3, boundingHeigth); /* For uninitialized loader, assume 4:3 aspect ratio. */
@@ -1034,33 +1057,28 @@ void QnTimeSlider::updateThumbnails() {
     if(size.isEmpty())
         return;
 
-    QnTimePeriod targetPeriod(m_windowStart, m_windowEnd - m_windowStart);
-    qint64 step = m_msecsPerPixel * size.width();
+    /* Calculate new time step. */
+    qint64 timeStep = m_msecsPerPixel * size.width();
+    bool timeStepChanged = timeStep != thumbnailsLoader()->timeStep();
 
-    bool updateTimeStep = true;
-    if(!boundingSizeChanged) {
-        qreal deltaStep = step - thumbnailsLoader()->timeStep();
+    /* Nothing changed? Leave. */
+    if(!timeStepChanged && !boundingSizeChanged)
+        return;
 
-        if(deltaStep < m_msecsPerPixel * 5.0 && deltaStep > 0.0)
-            updateTimeStep = false;
+    /* Ok, thumbnails have to be re-generated. So we first freeze our old thumbnails. */
+    if(m_oldThumbnailData.isEmpty())
+        freezeThumbnails();
+
+    /* If animation is running, we want to wait until it's finished. 
+     * We also don't want to update thumbnails too often. */
+    qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+    if(isAnimatingWindow() || currentTime - m_lastThumbnailsUpdateTime < 1000) {
+        updateThumbnailsStepSizeLater();
+    } else {
+        m_lastThumbnailsUpdateTime = currentTime;
+        thumbnailsLoader()->setBoundingSize(boundingSize);
+        thumbnailsLoader()->setTimeStep(timeStep);
     }
-    
-    /* Add small margins to the period to request. */
-    qint64 d = targetPeriod.durationMs / 4;
-    QnTimePeriod extendedTargetPeriod = QnTimePeriod(targetPeriod.startTimeMs - d, targetPeriod.durationMs + 2 * d);
-
-    /* Load, finally. */
-    if(updateTimeStep) {
-        if(m_oldThumbnailData.isEmpty())
-            freezeThumbnails();
-
-        if(!isAnimatingWindow())
-            thumbnailsLoader()->setTimeStep(step);
-    }
-    thumbnailsLoader()->setTimePeriod(extendedTargetPeriod.startTimeMs, extendedTargetPeriod.endTimeMs()); 
-
-    if(isAnimatingWindow())
-        updateThumbnailsLater();
 }
 
 
@@ -1070,6 +1088,9 @@ void QnTimeSlider::updateThumbnails() {
 // -------------------------------------------------------------------------- //
 void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *widget) {
     sendPendingMouseMoves(widget);
+
+    m_unboundMapper = QnLinearFunction(m_windowStart, positionFromValue(m_windowStart).x(), m_windowEnd, positionFromValue(m_windowEnd).x());
+    m_boundMapper = QnBoundedLinearFunction(m_unboundMapper, rect().left(), rect().right());
 
     QRectF thumbnailsRect = this->thumbnailsRect();
     QRectF rulerRect = this->rulerRect();
@@ -1182,8 +1203,8 @@ void QnTimeSlider::drawSelection(QPainter *painter) {
     if(selectionStart < selectionEnd) {
         QRectF rect = this->rect();
         QRectF selectionRect(
-            QPointF(positionFromValue(selectionStart).x(), rect.top()),
-            QPointF(positionFromValue(selectionEnd).x(), rect.bottom())
+            QPointF(quickPositionFromValue(selectionStart), rect.top()),
+            QPointF(quickPositionFromValue(selectionEnd), rect.bottom())
         );
 
         QnScopedPainterAntialiasingRollback antialiasingRollback(painter, false);
@@ -1201,7 +1222,7 @@ void QnTimeSlider::drawMarker(QPainter *painter, qint64 pos, const QColor &color
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, false);
     QnScopedPainterPenRollback penRollback(painter, QPen(color, 0));
 
-    qreal x = positionFromValue(pos).x();
+    qreal x = quickPositionFromValue(pos);
     QRectF rect = this->rect();
 
     painter->drawLine(QPointF(x, rect.top()), QPointF(x, rect.bottom()));
@@ -1210,7 +1231,7 @@ void QnTimeSlider::drawMarker(QPainter *painter, qint64 pos, const QColor &color
 void QnTimeSlider::drawPeriodsBar(QPainter *painter, QnTimePeriodList &recorded, QnTimePeriodList &motion, const QRectF &rect) {
     qint64 minimumValue = this->windowStart();
     qint64 maximumValue = this->windowEnd();
-    qreal centralPos = positionFromValue(this->sliderPosition()).x();
+    qreal centralPos = quickPositionFromValue(this->sliderPosition());
 
     /* The code here may look complicated, but it takes care of not rendering
      * different motion periods several times over the same location. 
@@ -1261,8 +1282,8 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, QnTimePeriodList &recorded,
             bestIndex = Qn::TimePeriodRoleCount;
         }
 
-        qreal leftPos = positionFromValue(value).x();
-        qreal rightPos = positionFromValue(bestValue).x();
+        qreal leftPos = quickPositionFromValue(value);
+        qreal rightPos = quickPositionFromValue(bestValue);
         if(rightPos <= centralPos) {
             painter->fillRect(QRectF(leftPos, rect.top(), rightPos - leftPos, rect.height()), pastColor[bestIndex]);
         } else if(leftPos >= centralPos) {
@@ -1286,9 +1307,9 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, QnTimePeriodList &recorded,
 }
 
 void QnTimeSlider::drawSolidBackground(QPainter *painter, const QRectF &rect) {
-    qreal leftPos = positionFromValue(windowStart()).x();
-    qreal rightPos = positionFromValue(windowEnd()).x();
-    qreal centralPos = positionFromValue(sliderPosition()).x();
+    qreal leftPos = quickPositionFromValue(windowStart());
+    qreal rightPos = quickPositionFromValue(windowEnd());
+    qreal centralPos = quickPositionFromValue(sliderPosition());
 
     if(!qFuzzyCompare(leftPos, centralPos))
         painter->fillRect(QRectF(leftPos, rect.top(), centralPos - leftPos, rect.height()), pastBackgroundColor);
@@ -1334,7 +1355,7 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, const QRectF &rect) {
         }
         index--;
 
-        qreal x = positionFromValue(pos, false).x();
+        qreal x = quickPositionFromValue(pos, false);
 
         /* Draw label if needed. */
         qreal lineHeight = m_stepData[index].currentLineHeight;
@@ -1386,10 +1407,10 @@ void QnTimeSlider::drawDates(QPainter *painter, const QRectF &rect) {
     /* Draw highlight. */
     qint64 pos1 = roundUp(m_windowStart, highlightStep);
     qint64 pos0 = sub(pos1, highlightStep);
-    qreal x0 = positionFromValue(m_windowStart).x();
+    qreal x0 = quickPositionFromValue(m_windowStart);
     qint64 number = absoluteNumber(pos1, highlightStep);
     while(true) {
-        qreal x1 = positionFromValue(pos1).x();
+        qreal x1 = quickPositionFromValue(pos1);
 
         painter->setPen(Qt::NoPen);
         painter->setBrush(number % 2 ? dateOverlayColorA : dateOverlayColorB);
@@ -1462,20 +1483,24 @@ void QnTimeSlider::drawThumbnails(QPainter *painter, const QRectF &rect) {
         qint64 startTime = qFloor(m_windowStart, step);
         qint64 endTime = qCeil(m_windowEnd, step);
 
-        qDebug() << "<<<<<THUMBNAILS";
-        foreach(const ThumbnailData &data, m_thumbnailData)
-            qDebug() << data.thumbnail.isEmpty() << QDateTime::fromMSecsSinceEpoch(data.thumbnail.time());
-        qDebug() << ">>>>>THUMBNAILS";
+        qreal t1 = m_windowStart;
+        qreal t2 = m_windowEnd;
+        qreal x1 = quickPositionFromValue(t1, false);
+        qreal x2 = quickPositionFromValue(t1, false);
 
         QRectF boundingRect = rect; 
         for (qint64 time = startTime; time < endTime; time += step) {
-            ThumbnailData data = m_thumbnailData.value(time);
+            QMap<qint64, ThumbnailData>::iterator pos = m_thumbnailData.find(time);
+            if(pos == m_thumbnailData.end())
+                continue;
+
+            ThumbnailData &data = *pos;
             if(data.thumbnail.isEmpty())
                 continue;
 
             const QPixmap &pixmap = data.thumbnail.pixmap();
 
-            qreal x = positionFromValue(time, false).x();
+            qreal x = quickPositionFromValue(time, false);
             QSizeF targetSize(pixmap.width() * rect.height() / pixmap.height(), rect.height());
             QRectF targetRect(x - targetSize.width() / 2, rect.top(), targetSize.width(), targetSize.height());
 
@@ -1647,7 +1672,7 @@ void QnTimeSlider::resizeEvent(QGraphicsSceneResizeEvent *event) {
     updateMSecsPerPixel();
     updateLineCommentPixmaps();
     updateMinimalWindow();
-    updateThumbnailsLater();
+    updateThumbnailsStepSize();
 }
 
 void QnTimeSlider::kineticMove(const QVariant &degrees) {
