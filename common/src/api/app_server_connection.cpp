@@ -349,7 +349,7 @@ int QnAppServerConnection::addLicenseAsync(const QnLicensePtr &license, QObject 
     QByteArray data;
     m_serializer.serializeLicense(license, data);
 
-    return addObjectAsync("license", data, processor, SLOT(finishedLicense(int, QByteArray, QByteArray, int)));
+    return addObjectAsync("license", data, processor, SLOT(finishedLicense(int, QByteArray, QnLicenseList, int)));
 }
 
 int QnAppServerConnection::getResourcesAsync(const QString& args, const QString& objectName, QObject *target, const char *slot)
