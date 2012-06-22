@@ -67,8 +67,13 @@ public:
     /** This function calls from reader */
     virtual void beforeChangeReverseMode(bool /*reverseMode*/) {}
 
+    /** This function used for thumbnails loader. Get data with specified media step from specified time interval*/
+    virtual void setRange(qint64 startTime, qint64 endTime, qint64 frameStep) {}
+
 protected:
     Flags m_flags;
 };
+
+typedef QSharedPointer<QnAbstractArchiveDelegate> QnAbstractArchiveDelegatePtr;
 
 #endif

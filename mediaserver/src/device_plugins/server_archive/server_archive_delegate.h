@@ -79,4 +79,6 @@ private:
     QnDialQualityHelper m_dialQualityHelper;
 };
 
+typedef QSharedPointer<QnServerArchiveDelegate> QnServerArchiveDelegatePtr;
+
 #endif // _SERVER_ARCHIVE_DELEGATE_H__

@@ -7,8 +7,9 @@
 #include <QtCore/QMutex>
 
 #include "plugins/resources/archive/archive_stream_reader.h"
-#include "device_plugins/archive/rtsp/rtsp_client_archive_delegate.h"
 #include "utils/media/frame_info.h"
+#include "plugins/resources/archive/abstract_archive_delegate.h"
+#include "utils/common/math.h"
 
 typedef QSharedPointer<QPixmap> QPixmapPtr;
 
@@ -72,7 +73,7 @@ private:
 
 private:
     mutable QMutex m_mutex;
-    QScopedPointer<QnRtspClientArchiveDelegate> m_rtspClient;
+    QList<QnAbstractArchiveDelegatePtr > m_delegates;
     QnResourcePtr m_resource;
 
     QMap<qint64, QPixmapPtr> m_images;
