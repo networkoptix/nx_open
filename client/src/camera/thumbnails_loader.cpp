@@ -361,7 +361,8 @@ void QnThumbnailsLoader::process() {
         QnThumbnail thumbnail;
         qint64 time = period.startTimeMs;
         QnCompressedVideoDataPtr frame = client->getNextData().dynamicCast<QnCompressedVideoData>();
-        if (frame) {
+        if (frame) 
+        {
             if (!camera)
                 frame->flags &= ~QnAbstractMediaData::MediaFlags_BOF;
             CLFFmpegVideoDecoder decoder(frame->compressionType, frame, false);
@@ -369,7 +370,10 @@ void QnThumbnailsLoader::process() {
             outFrame.setUseExternalData(false);
 
             while (frame) {
-                if (decoder.decode(frame, &outFrame)) {
+                m_timingsQueue << frame->timestamp;
+                if (decoder.decode(frame, &outFrame)) 
+                {
+                    outFrame.pkt_dts = m_timingsQueue.dequeue();
                     thumbnail = generateThumbnail(outFrame, boundingSize, timeStep, generation);
                     time = processThumbnail(thumbnail, time, thumbnail.time(), outFrame.flags & QnAbstractMediaData::MediaFlags_BOF);
                 }
@@ -388,7 +392,11 @@ void QnThumbnailsLoader::process() {
             if(!invalidated) {
                 /* Make sure decoder's buffer is empty. */
                 QnCompressedVideoDataPtr emptyData(new QnCompressedVideoData(1, 0));
-                while (decoder.decode(emptyData, &outFrame)) {
+                while (decoder.decode(emptyData, &outFrame)) 
+                {
+                    Q_ASSERT(!m_timingsQueue.isEmpty());
+                    if (!m_timingsQueue.isEmpty())
+                        outFrame.pkt_dts = m_timingsQueue.dequeue();
                     thumbnail = generateThumbnail(outFrame, boundingSize, timeStep, generation);
                     time = processThumbnail(thumbnail, time, thumbnail.time(), outFrame.flags & QnAbstractMediaData::MediaFlags_BOF);
                 }
