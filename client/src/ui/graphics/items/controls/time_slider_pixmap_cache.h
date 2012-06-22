@@ -33,6 +33,7 @@ private:
     QnTextPixmapCache *m_cache;
     QCache<qint32, const QPixmap> m_pixmapByShortPositionKey;
     QCache<QnTimeStepLongCacheKey, const QPixmap> m_pixmapByLongPositionKey;
+    QPixmap m_nullPixmap;
 };
 
 #endif // QN_TIME_SLIDER_PIXMAP_CACHE_H

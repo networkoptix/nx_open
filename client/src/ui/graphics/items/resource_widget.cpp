@@ -678,7 +678,7 @@ void QnResourceWidget::updateOverlayText() {
     QnMediaContextPtr codec = m_display->mediaProvider()->getCodecContext();
     if (codec && codec->ctx()) 
         codecName = codecIDToString(codec->ctx()->codec_id);
-    m_footerStatusLabel->setText(tr("%1fps @ %2Mbps (%3) - %4").arg(fps, 0, 'g', 2).arg(mbps, 0, 'g', 2).arg(codecName).arg(m_renderer->isLowQualityImage(0) ? "LQ" : "HQ"));
+    m_footerStatusLabel->setText(tr("%1fps @ %2Mbps (%3) - %4").arg(fps, 0, 'f', 2).arg(mbps, 0, 'f', 2).arg(codecName).arg(m_renderer->isLowQualityImage(0) ? "LQ" : "HQ"));
 }
 
 void QnResourceWidget::updateButtonsVisibility() {

@@ -29,7 +29,8 @@ public:
     enum Flag 
     { 
         Flag_SlowSource = 1, 
-        Flag_CanProcessNegativeSpeed = 2 // flag inform that delegate is going to process negative speed. If flag is not setted, ArchiveReader is going to process negative speed
+        Flag_CanProcessNegativeSpeed = 2, // flag inform that delegate is going to process negative speed. If flag is not setted, ArchiveReader is going to process negative speed
+        Flag_CanProcessMediaStep = 4      // flag inform that delegate is going to process media step itself.
     };
     Q_DECLARE_FLAGS(Flags, Flag);
 

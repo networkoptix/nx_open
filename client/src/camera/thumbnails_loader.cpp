@@ -26,7 +26,7 @@
 #include "thumbnails_loader_helper.h"
 
 namespace {
-    const qint64 defaultUpdateInterval = 60 * 1000; /* One minute. */
+    const qint64 defaultUpdateInterval = 30 * 1000; /* 30 seconds. */
 
 }
 
@@ -172,10 +172,8 @@ void QnThumbnailsLoader::pleaseStop() {
     {
         QMutexLocker locker(&m_mutex);
 
-        foreach(QnAbstractArchiveDelegatePtr client, m_delegates) {
+        foreach(QnAbstractArchiveDelegatePtr client, m_delegates) 
             client->beforeClose();
-            client->close();
-        }
     }
 
     quit();
@@ -371,9 +369,6 @@ void QnThumbnailsLoader::process() {
         if(invalidated)
             break;
     }
-    m_mutex.lock();
-    m_delegates.clear();
-    m_mutex.unlock();
 }
 
 void QnThumbnailsLoader::addThumbnail(const QnThumbnail &thumbnail) {

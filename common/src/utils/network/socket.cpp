@@ -401,8 +401,10 @@ unsigned short CommunicatingSocket::getForeignPort()  {
   sockaddr_in addr;
   unsigned int addr_len = sizeof(addr);
 
-  if (getpeername(sockDesc, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0) {
-    throw SocketException("Fetch of foreign port failed (getpeername())", true);
+  if (getpeername(sockDesc, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0) 
+  {
+    qWarning() << "Fetch of foreign port failed (getpeername())";
+    return -1;
   }
   return ntohs(addr.sin_port);
 }
