@@ -71,7 +71,8 @@ protected:
 
     Q_SLOT void addThumbnail(const QnThumbnail &thumbnail);
 
-    void generateThumbnail(const CLVideoDecoderOutput &outFrame, const QSize &boundingSize, qint64 timeStep, int generation);
+    QnThumbnail generateThumbnail(const CLVideoDecoderOutput &outFrame, const QSize &boundingSize, qint64 timeStep, int generation);
+    qint64 processThumbnail(const QnThumbnail &thumbnail, qint64 startTime, qint64 endTime, bool ignorePeriod);
 
 private:
     void ensureScaleContextLocked(int lineSize, const QSize &sourceSize, const QSize &boundingSize, int format);

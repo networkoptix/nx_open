@@ -25,6 +25,15 @@ public:
         m_timeStep(0)
     {}
 
+    QnThumbnail(const QnThumbnail &other, qint64 time):
+        m_pixmap(other.m_pixmap),
+        m_size(other.m_size),
+        m_time(time),
+        m_actualTime(other.m_actualTime),
+        m_timeStep(other.m_timeStep),
+        m_generation(other.m_generation)
+    {}
+
     bool isEmpty() const {
         return m_pixmap.isNull();
     }

@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+#include <limits>
+
 #include <QtCore/QTimer>
 #include <QtGui/QPixmap>
 #include <QtGui/QImage>
@@ -28,7 +30,7 @@
 namespace {
     const qint64 defaultUpdateInterval = 30 * 1000; /* 30 seconds. */
 
-    const int maxStackSize = 32;
+    const int maxStackSize = 1024;
 
     const qint64 invalidProcessingTime = std::numeric_limits<qint64>::min() / 2;
 }
@@ -353,6 +355,8 @@ void QnThumbnailsLoader::process() {
     {
         client->setRange(period.startTimeMs * 1000, (period.endTimeMs() + timeStep) * 1000, timeStep * 1000);
 
+        QnThumbnail thumbnail;
+        qint64 time = period.startTimeMs;
         QnCompressedVideoDataPtr frame = client->getNextData().dynamicCast<QnCompressedVideoData>();
         if (frame) {
             if (!camera)
@@ -362,8 +366,10 @@ void QnThumbnailsLoader::process() {
             outFrame.setUseExternalData(false);
 
             while (frame) {
-                if (decoder.decode(frame, &outFrame))
-                    generateThumbnail(outFrame, boundingSize, timeStep, generation);
+                if (decoder.decode(frame, &outFrame)) {
+                    thumbnail = generateThumbnail(outFrame, boundingSize, timeStep, generation);
+                    time = processThumbnail(thumbnail, time, thumbnail.time(), outFrame.flags & QnAbstractMediaData::MediaFlags_BOF);
+                }
 
                 {
                     QMutexLocker locker(&m_mutex);
@@ -377,9 +383,15 @@ void QnThumbnailsLoader::process() {
             }
 
             if(!invalidated) {
-                QnCompressedVideoDataPtr emptyData(new QnCompressedVideoData(1,0));
-                while (decoder.decode(emptyData, &outFrame))
-                    generateThumbnail(outFrame, boundingSize, timeStep, generation);
+                /* Make sure decoder's buffer is empty. */
+                QnCompressedVideoDataPtr emptyData(new QnCompressedVideoData(1, 0));
+                while (decoder.decode(emptyData, &outFrame)) {
+                    thumbnail = generateThumbnail(outFrame, boundingSize, timeStep, generation);
+                    time = processThumbnail(thumbnail, time, thumbnail.time(), outFrame.flags & QnAbstractMediaData::MediaFlags_BOF);
+                }
+
+                /* Fill remaining time values with thumbnails. */
+                processThumbnail(thumbnail, time + timeStep, period.endTimeMs(), false);
             }
         }
         client->close();
@@ -442,10 +454,7 @@ void QnThumbnailsLoader::ensureScaleContextLocked(int lineSize, const QSize &sou
     }
 }
 
-void QnThumbnailsLoader::generateThumbnail(const CLVideoDecoderOutput &outFrame, const QSize &boundingSize, qint64 timeStep, int generation) {
-    if(outFrame.pkt_dts == AV_NOPTS_VALUE)
-        return; /* Skip end-of-stream packet. */
-
+QnThumbnail QnThumbnailsLoader::generateThumbnail(const CLVideoDecoderOutput &outFrame, const QSize &boundingSize, qint64 timeStep, int generation) {
     QSize scaleTargetSize;
     {
         QMutexLocker locker(&m_mutex);
@@ -463,8 +472,25 @@ void QnThumbnailsLoader::generateThumbnail(const CLVideoDecoderOutput &outFrame,
     sws_scale(m_scaleContext, outFrame.data, outFrame.linesize, 0, outFrame.height, dstBuffer, dstLineSize);
 
     QPixmap pixmap(QPixmap::fromImage(image));
-
     qint64 actualTime = outFrame.pkt_dts / 1000;
-    emit m_helper->thumbnailLoaded(QnThumbnail(pixmap, pixmap.size(), qRound(actualTime, timeStep), actualTime, timeStep, generation));
+
+    return QnThumbnail(pixmap, pixmap.size(), qRound(actualTime, timeStep), actualTime, timeStep, generation);
+
+    /*qint64 endTime = qRound(actualTime, timeStep);
+    qint64 startTime = (outFrame.flags & QnAbstractMediaData::MediaFlags_BOF) ? endTime : time + timeStep;
+    for(qint64 time = startTime; time <= endTime; time += timeStep)
+        emit m_helper->thumbnailLoaded(QnThumbnail(pixmap, pixmap.size(), time, actualTime, timeStep, generation));*/
 }
 
+qint64 QnThumbnailsLoader::processThumbnail(const QnThumbnail &thumbnail, qint64 startTime, qint64 endTime, bool ignorePeriod) {
+    if(ignorePeriod) {
+        emit m_helper->thumbnailLoaded(thumbnail);
+
+        return thumbnail.time();
+    } else {
+        for(qint64 time = startTime; time <= endTime; time += thumbnail.timeStep())
+            emit m_helper->thumbnailLoaded(QnThumbnail(thumbnail, time));
+
+        return qMax(endTime, startTime);
+    }
+}

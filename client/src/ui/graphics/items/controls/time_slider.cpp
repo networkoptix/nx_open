@@ -778,14 +778,10 @@ void QnTimeSlider::setRulerHeight(qreal rulerHeight) {
 }
 
 void QnTimeSlider::addThumbnail(const QnThumbnail &thumbnail) {
-    QMap<qint64, ThumbnailData>::iterator pos = m_thumbnailData.find(thumbnail.time());
-    if(pos == m_thumbnailData.end()) {
-        m_thumbnailData[thumbnail.time()] = ThumbnailData(thumbnail);
-    } else {
-        pos->thumbnail = thumbnail;
-    }
-
-    qDebug() << "N" << QTime().addMSecs(thumbnail.time());
+    if(m_thumbnailData.contains(thumbnail.time())) 
+        return; /* There is no real point in overwriting existing thumbnails. Besides, it would result in flicker. */
+ 
+    m_thumbnailData[thumbnail.time()] = ThumbnailData(thumbnail);
 }
 
 void QnTimeSlider::clearThumbnails() {
