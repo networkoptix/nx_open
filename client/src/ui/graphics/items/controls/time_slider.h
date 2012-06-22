@@ -309,6 +309,7 @@ private:
     QPixmap m_noThumbnailsPixmap;
     QMap<qint64, ThumbnailData> m_thumbnailData;
     QList<ThumbnailData> m_oldThumbnailData;
+    QRectF m_thumbnailsPaintRect;
     
     qreal m_rulerHeight;
     qreal m_prefferedHeight;
