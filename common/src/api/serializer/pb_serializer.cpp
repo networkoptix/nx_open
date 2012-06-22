@@ -48,6 +48,7 @@ void parseCamera(QnVirtualCameraResourcePtr& camera, const pb::Resource& pb_came
     parameters["name"] = QString::fromUtf8(pb_cameraResource.name().c_str());
     parameters["url"] = QString::fromUtf8(pb_cameraResource.url().c_str());
     parameters["mac"] = QString::fromUtf8(pb_camera.mac().c_str());
+    parameters["physicalId"] = QString::fromUtf8(pb_camera.physicalid().c_str());
     parameters["login"] = QString::fromUtf8(pb_camera.login().c_str());
     parameters["password"] = QString::fromUtf8(pb_camera.password().c_str());
 
@@ -66,7 +67,7 @@ void parseCamera(QnVirtualCameraResourcePtr& camera, const pb::Resource& pb_came
         return;
 
     for (int j = 0; j < pb_cameraResource.property_size(); j++)
-	{
+    {
         const pb::Resource_Property& pb_property = pb_cameraResource.property(j);
 
         camera->setParam(pb_property.name().c_str(), pb_property.value().c_str(), QnDomainDatabase);
@@ -75,6 +76,9 @@ void parseCamera(QnVirtualCameraResourcePtr& camera, const pb::Resource& pb_came
     camera->setScheduleDisabled(pb_camera.scheduledisabled());
     if (pb_camera.has_audioenabled())
         camera->setAudioEnabled(pb_camera.audioenabled());
+
+    if (pb_camera.has_physicalid())
+        camera->setPhysicalId(pb_camera.physicalid().c_str());
 
     camera->setAuth(QString::fromUtf8(pb_camera.login().c_str()), QString::fromUtf8(pb_camera.password().c_str()));
     camera->setMotionType(static_cast<MotionType>(pb_camera.motiontype()));
@@ -123,8 +127,8 @@ void parseCameras(QnVirtualCameraResourceList& cameras, const PbResourceList& pb
     {
         const pb::Resource& pb_cameraResource = *ci;
 
-		QnVirtualCameraResourcePtr camera;
-		parseCamera(camera, pb_cameraResource, resourceFactory);
+        QnVirtualCameraResourcePtr camera;
+        parseCamera(camera, pb_cameraResource, resourceFactory);
 
         cameras.append(camera);
     }
@@ -190,8 +194,8 @@ void parseServers(QnVideoServerResourceList &servers, const PbResourceList &pb_s
     {
         const pb::Resource& pb_serverResource = *ci;
 
-		QnVideoServerResourcePtr server;
-		parseServer(server, pb_serverResource, resourceFactory);
+        QnVideoServerResourcePtr server;
+        parseServer(server, pb_serverResource, resourceFactory);
         servers.append(server);
     }
 }
@@ -245,8 +249,8 @@ void parseLayouts(QnLayoutResourceList& layouts, const PbResourceList& pb_layout
     for (PbResourceList::const_iterator ci = pb_layouts.begin(); ci != pb_layouts.end(); ++ci)
     {
         const pb::Resource& pb_layoutResource = *ci;
-		QnLayoutResourcePtr layout;
-		parseLayout(layout, pb_layoutResource);
+        QnLayoutResourcePtr layout;
+        parseLayout(layout, pb_layoutResource);
         layouts.append(layout);
     }
 }
@@ -270,22 +274,22 @@ void parseUsers(QnUserResourceList& users, const PbResourceList& pb_users)
     for (PbResourceList::const_iterator ci = pb_users.begin(); ci != pb_users.end(); ++ci)
     {
         const pb::Resource& pb_userResource = *ci;
-		QnUserResourcePtr user;
-		parseUser(user, pb_userResource);
+        QnUserResourcePtr user;
+        parseUser(user, pb_userResource);
         users.append(user);
     }
 }
 
 void parseResources(QnResourceList& resources, const PbResourceList& pb_resources, QnResourceFactory& resourceFactory)
 {
-	for (PbResourceList::const_iterator ci = pb_resources.begin(); ci != pb_resources.end(); ++ci)
-	{
+    for (PbResourceList::const_iterator ci = pb_resources.begin(); ci != pb_resources.end(); ++ci)
+    {
         const pb::Resource& pb_resource = *ci;
 
-		QnResourcePtr resource;
-		parseResource(resource, pb_resource, resourceFactory);
-		resources.append(resource);
-	}
+        QnResourcePtr resource;
+        parseResource(resource, pb_resource, resourceFactory);
+        resources.append(resource);
+    }
 }
 
 void parseResourceTypes(QList<QnResourceTypePtr>& resourceTypes, const PbResourceTypeList& pb_resourceTypes)
@@ -381,8 +385,8 @@ void parseLicenses(QnLicenseList& licenses, const PbLicenseList& pb_licenses)
     {
         const pb::License& pb_license = *ci;
 
-		QnLicensePtr license;
-		parseLicense(license, pb_license);
+        QnLicensePtr license;
+        parseLicense(license, pb_license);
         licenses.append(license);
 
     }
@@ -434,7 +438,7 @@ void parserCameraServerItems(QnCameraHistoryList& cameraServerItems, const PbCam
 
 void serializeCamera_i(pb::Resource& pb_cameraResource, const QnVirtualCameraResourcePtr& cameraPtr)
 {
-	pb_cameraResource.set_type(pb::Resource_Type_Camera);
+    pb_cameraResource.set_type(pb::Resource_Type_Camera);
     pb::Camera &pb_camera = *pb_cameraResource.MutableExtension(pb::Camera::resource);
 
     pb_cameraResource.set_id(cameraPtr->getId().toInt());
@@ -443,6 +447,7 @@ void serializeCamera_i(pb::Resource& pb_cameraResource, const QnVirtualCameraRes
     pb_cameraResource.set_typeid_(cameraPtr->getTypeId().toInt());
     pb_cameraResource.set_url(cameraPtr->getUrl().toUtf8().constData());
     pb_camera.set_mac(cameraPtr->getMAC().toString().toUtf8().constData());
+    pb_camera.set_physicalid(cameraPtr->getPhysicalId().toUtf8().constData());
     pb_camera.set_login(cameraPtr->getAuth().user().toUtf8().constData());
     pb_camera.set_password(cameraPtr->getAuth().password().toUtf8().constData());
     pb_cameraResource.set_disabled(cameraPtr->isDisabled());
@@ -491,7 +496,7 @@ void serializeCameraServerItem_i(pb::CameraServerItem& pb_cameraServerItem, cons
 
 void serializeLayout_i(pb::Resource& pb_layoutResource, const QnLayoutResourcePtr& layoutIn)
 {
-	pb_layoutResource.set_type(pb::Resource_Type_Layout);
+    pb_layoutResource.set_type(pb::Resource_Type_Layout);
     pb::Layout &pb_layout = *pb_layoutResource.MutableExtension(pb::Layout::resource);
 
     pb_layoutResource.set_parentid(layoutIn->getParentId().toInt());
@@ -689,7 +694,7 @@ void QnApiPbSerializer::serializeServer(const QnVideoServerResourcePtr& serverPt
     pb::Resources pb_servers;
 
     pb::Resource& pb_serverResource = *pb_servers.add_resource();
-	pb_serverResource.set_type(pb::Resource_Type_Server);
+    pb_serverResource.set_type(pb::Resource_Type_Server);
     pb::Server &pb_server = *pb_serverResource.MutableExtension(pb::Server::resource);
 
     pb_serverResource.set_id(serverPtr->getId().toInt());
@@ -725,7 +730,7 @@ void QnApiPbSerializer::serializeUser(const QnUserResourcePtr& userPtr, QByteArr
     pb::Resources pb_users;
     pb::Resource& pb_userResource = *pb_users.add_resource();
 
-	pb_userResource.set_type(pb::Resource_Type_User);
+    pb_userResource.set_type(pb::Resource_Type_User);
     pb::User &pb_user = *pb_userResource.MutableExtension(pb::User::resource);
 
     if (userPtr->getId().isValid())
@@ -785,37 +790,37 @@ void QnApiPbSerializer::serializeCameraServerItem(const QnCameraHistoryItem& cam
 
 void parseResource(QnResourcePtr& resource, const pb::Resource& pb_resource, QnResourceFactory& resourceFactory)
 {
-	switch (pb_resource.type())
-	{
-		case pb::Resource_Type_Camera:
-		{
-			QnVirtualCameraResourcePtr camera;
-			parseCamera(camera, pb_resource, resourceFactory);
-			resource = camera;
-			break;
-		}
-		case pb::Resource_Type_Server:
-		{
-			QnVideoServerResourcePtr server;
-			parseServer(server, pb_resource, resourceFactory);
-			resource = server;
-			break;
-		}
-		case pb::Resource_Type_User:
-		{
-			QnUserResourcePtr user;
-			parseUser(user, pb_resource);
-			resource = user;
-			break;
-		}
-		case pb::Resource_Type_Layout:
-		{
-			QnLayoutResourcePtr layout;
-			parseLayout(layout, pb_resource);
-			resource = layout;
-			break;
-		}
-	}
+    switch (pb_resource.type())
+    {
+        case pb::Resource_Type_Camera:
+        {
+            QnVirtualCameraResourcePtr camera;
+            parseCamera(camera, pb_resource, resourceFactory);
+            resource = camera;
+            break;
+        }
+        case pb::Resource_Type_Server:
+        {
+            QnVideoServerResourcePtr server;
+            parseServer(server, pb_resource, resourceFactory);
+            resource = server;
+            break;
+        }
+        case pb::Resource_Type_User:
+        {
+            QnUserResourcePtr user;
+            parseUser(user, pb_resource);
+            resource = user;
+            break;
+        }
+        case pb::Resource_Type_Layout:
+        {
+            QnLayoutResourcePtr layout;
+            parseLayout(layout, pb_resource);
+            resource = layout;
+            break;
+        }
+    }
 }
 
 void parseLicense(QnLicensePtr& license, const pb::License& pb_license)
@@ -831,11 +836,11 @@ void parseLicense(QnLicensePtr& license, const pb::License& pb_license)
 
 void parseCameraServerItem(QnCameraHistoryItemPtr& historyItem, const pb::CameraServerItem& pb_cameraServerItem)
 {
-	historyItem = QnCameraHistoryItemPtr(new QnCameraHistoryItem(
-											pb_cameraServerItem.mac().c_str(),
-											pb_cameraServerItem.timestamp(),
-											pb_cameraServerItem.serverguid().c_str()
-										));
+    historyItem = QnCameraHistoryItemPtr(new QnCameraHistoryItem(
+                                            pb_cameraServerItem.mac().c_str(),
+                                            pb_cameraServerItem.timestamp(),
+                                            pb_cameraServerItem.serverguid().c_str()
+                                        ));
 
 }
 
