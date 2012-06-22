@@ -8,6 +8,7 @@
 #include "core/resource/layout_resource.h"
 #include "core/resource/user_resource.h"
 #include "core/resource/camera_resource.h"
+#include "plugins/resources/archive/avi_files/avi_resource.h"
 
 #ifdef QN_RESOURCE_POOL_DEBUG
 #   define TRACE(...) qDebug << __VA_ARGS__;
@@ -92,6 +93,36 @@ void QnResourcePool::addResources(const QnResourceList &resources)
             else
             {
                 resource->setId(QnId::generateSpecialId());
+            }
+        }
+
+        /* Fix up items that are stored in layout. */
+        if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
+            foreach(QnLayoutItemData data, layout->getItems()) {
+                if(!data.resource.id.isValid()) {
+                    QnResourcePtr resource = qnResPool->getResourceByUniqId(data.resource.path);
+                    if(!resource) {
+                        if(data.resource.path.isEmpty()) {
+                            qnWarning("Invalid item with empty id and path in layout '%1'.", layout->getName());
+                        } else {
+                            resource = QnResourcePtr(new QnAviResource(data.resource.path));
+                            qnResPool->addResource(resource);
+                        }
+                    }
+
+                    if(resource) {
+                        data.resource.id = resource->getId();
+                        layout->updateItem(data.uuid, data);
+                    }
+                } else if(data.resource.path.isEmpty()) {
+                    QnResourcePtr resource = qnResPool->getResourceById(data.resource.id);
+                    if(!resource) {
+                        qnWarning("Invalid resource id '%1'.", data.resource.id.toString());
+                    } else {
+                        data.resource.path = resource->getUniqueId();
+                        layout->updateItem(data.uuid, data);
+                    }
+                }
             }
         }
 
