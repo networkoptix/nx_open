@@ -167,24 +167,36 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
     emit motionRegionListChanged();
 }
 
-void QnCameraMotionMaskWidget::showTooManyWindowsMessage(const QnMotionRegion &region)
+void QnCameraMotionMaskWidget::showTooManyWindowsMessage(const QnMotionRegion &region, const QnMotionRegion::RegionValid kind)
 {
-    int maxWndCnt = region.getMotionRectCount();
-    int maxMaskCnt = region.getMaskRectCount();
-
-    if (maxWndCnt > m_camera->motionWindowCount()) {
-        QMessageBox::warning(
-            this, 
-            tr("Too many motion windows"), 
-            tr("Maximum amount of motion windows for current camera is %1, but %2 motion windows are currently selected.").arg(m_camera->motionWindowCount()).arg(maxWndCnt)
-            );
-    }
-    else if (maxMaskCnt > m_camera->motionMaskWindowCount()) {
-        QMessageBox::warning(
-            this, 
-            tr("Too many motion windows"), 
-            tr("Maximum amount of motion mask windows for current camera is %1, but %2 motion mask windows are currently selected.").arg(m_camera->motionMaskWindowCount()).arg(maxMaskCnt)
-            );
+    switch(kind){
+        case QnMotionRegion::WINDOWS:
+            QMessageBox::warning(
+                this, 
+                tr("Too many motion windows"), 
+                tr("Maximum amount of motion windows for current camera is %1, but %2 motion windows are currently selected.")
+                .arg(m_camera->motionWindowCount())
+                .arg(region.getMotionRectCount())
+                );
+            break;
+        case QnMotionRegion::SENS:
+            QMessageBox::warning(
+                this, 
+                tr("Too many motion windows"), 
+                tr("Maximum amount of different motion sensitivities for current camera is %1, but %2 motion sensitivities are currently selected.")
+                .arg(m_camera->motionSensWindowCount())
+                .arg(region.getMotionSensCount())
+                );
+            break;
+        case QnMotionRegion::MASKS:
+            QMessageBox::warning(
+                this, 
+                tr("Too many motion windows"), 
+                tr("Maximum amount of motion mask windows for current camera is %1, but %2 motion mask windows are currently selected.")
+                .arg(m_camera->motionMaskWindowCount())
+                .arg(region.getMaskRectCount())
+                );
+            break;
     }
 }
 
@@ -223,8 +235,10 @@ bool QnCameraMotionMaskWidget::isValidMotionRegion(){
     {
         const QList<QnMotionRegion> &regions = m_resourceWidget->getMotionRegionList();
         for (int i = 0; i < regions.size(); ++i) {
-            if (!regions[i].isValid(m_camera->motionWindowCount(), m_camera->motionMaskWindowCount(), m_camera->motionSensWindowCount())) {
-                showTooManyWindowsMessage(regions[i]);
+            QnMotionRegion::RegionValid kind = regions[i].isValid(m_camera->motionWindowCount(),
+                m_camera->motionMaskWindowCount(), m_camera->motionSensWindowCount());
+            if (kind != QnMotionRegion::VALID) {
+                showTooManyWindowsMessage(regions[i], kind);
                 return false;
             }
         }

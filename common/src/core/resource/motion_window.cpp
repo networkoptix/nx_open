@@ -148,7 +148,7 @@ bool QnMotionRegion::updateSensitivityAt(const QPoint& pos, int newSens)
     return false;
 }
 
-bool QnMotionRegion::isValid(int maxMotionRects, int maxMaskRects, int maxMotionSens) const
+QnMotionRegion::RegionValid QnMotionRegion::isValid(int maxMotionRects, int maxMaskRects, int maxMotionSens) const
 {
     int count = 0;
     int sens_count = 0;
@@ -159,21 +159,37 @@ bool QnMotionRegion::isValid(int maxMotionRects, int maxMaskRects, int maxMotion
         if (rects > 0)
             sens_count++;
     }
-    bool valid_masks = maxMaskRects == 0 || getRectsBySens(0).size() <= maxMaskRects;
-    if (maxMotionSens > 0)
-        return (sens_count <= maxMotionSens) && valid_masks;
-    return (count <= maxMotionRects) && valid_masks;
+    if (maxMaskRects > 0 && getRectsBySens(0).size() > maxMaskRects)
+        return MASKS;
+    if (maxMotionSens > 0 && sens_count > maxMotionSens)
+        return SENS;
+    if(count < maxMotionRects)
+        return WINDOWS;
+    return VALID;
 }
 
 int QnMotionRegion::getMotionRectCount() const
 {
-    int rez = 0;
+    int count = 0;
     for (int sens = QnMotionRegion::MIN_SENSITIVITY+1; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens)
-        rez = qMax(rez, getRectsBySens(sens).size());
-    return rez;
+    {
+        count +=  getRectsBySens(sens).size();
+    }
+    return count;
 }
 
 int QnMotionRegion::getMaskRectCount() const
 {
     return getRectsBySens(0).size();
+}
+
+int QnMotionRegion::getMotionSensCount() const
+{
+    int sens_count = 0;
+    for (int sens = QnMotionRegion::MIN_SENSITIVITY+1; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens)
+    {
+        if (getRectsBySens(sens).size() > 0)
+            sens_count++;
+    }
+    return sens_count;
 }
