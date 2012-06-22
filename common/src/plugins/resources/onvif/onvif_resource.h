@@ -73,6 +73,8 @@ protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
     virtual void setCropingPhysical(QRect croping);
+
+    virtual void updateResourceCapabilities(){};
 private:
 
     QString getDeviceUrl() const { return m_deviceUrl; }

@@ -85,6 +85,8 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         }
     }
 
+    //some cameras returns by default not specific names; for example vivoteck returns "networkcamera" -> just in case we request params one more time.
+
     //Trying to get name and manufacturer
     {
         DeviceInfoReq request;
