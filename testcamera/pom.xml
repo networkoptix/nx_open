@@ -48,13 +48,6 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org</groupId>
-			<artifactId>openssl</artifactId>
-			<version>${openssl.version}</version>
-			<type>zip</type>
-			<classifier>${platform}-${arch}</classifier>
-		</dependency>	
-		<dependency>
 			<groupId>org.ffmpeg</groupId>
 			<artifactId>ffmpeg</artifactId>
 			<version>${ffmpeg.version}</version>
