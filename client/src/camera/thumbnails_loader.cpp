@@ -355,6 +355,8 @@ void QnThumbnailsLoader::process() {
 
         QnCompressedVideoDataPtr frame = client->getNextData().dynamicCast<QnCompressedVideoData>();
         if (frame) {
+            if (!camera)
+                frame->flags &= ~QnAbstractMediaData::MediaFlags_BOF;
             CLFFmpegVideoDecoder decoder(frame->compressionType, frame, false);
             CLVideoDecoderOutput outFrame;
             outFrame.setUseExternalData(false);
