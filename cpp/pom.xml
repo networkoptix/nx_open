@@ -31,6 +31,16 @@
 		<qtlib9/>	
 	</properties>
 
+	<dependencies>
+		<dependency>
+			<groupId>org</groupId>
+			<artifactId>openssl</artifactId>
+			<version>${openssl.version}</version>
+			<type>zip</type>
+			<classifier>${platform}-${arch}</classifier>
+		</dependency>
+	</dependencies>		
+	
 	<build>
 		<directory>${arch}</directory>
 		<outputDirectory>${arch}</outputDirectory>
