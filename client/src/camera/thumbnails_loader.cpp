@@ -9,16 +9,18 @@
 #include <utils/common/math.h>
 #include <utils/common/synctime.h>
 
-#include "decoders/video/ffmpeg.h"
-
-#include "ui/common/geometry.h"
-#include "plugins/resources/archive/avi_files/thumbnails_archive_delegate.h"
-#include "device_plugins/archive/rtsp/rtsp_client_archive_delegate.h"
 #include "core/resource/camera_resource.h"
 #include "core/resource/camera_history.h"
 
+#include "decoders/video/ffmpeg.h"
+
+#include "ui/common/geometry.h"
+
+#include "plugins/resources/archive/avi_files/thumbnails_archive_delegate.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
+
 #include "device_plugins/archive/rtsp/rtsp_client_archive_delegate.h"
+
 #include "utils/media/frame_info.h"
 
 #include "thumbnails_loader_helper.h"
