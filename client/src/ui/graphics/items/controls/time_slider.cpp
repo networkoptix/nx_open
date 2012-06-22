@@ -782,6 +782,8 @@ void QnTimeSlider::addThumbnail(const QnThumbnail &thumbnail) {
     data.thumbnail = thumbnail;
 
     m_thumbnailData[thumbnail.time()] = data;
+
+    qDebug() << "N" << thumbnail.time();
 }
 
 void QnTimeSlider::clearThumbnails() {
@@ -789,19 +791,21 @@ void QnTimeSlider::clearThumbnails() {
 }
 
 void QnTimeSlider::freezeThumbnails() {
+    qDebug() << "FREEZE";
+
     m_oldThumbnailData = m_thumbnailData.values();
     clearThumbnails();
 
-    QRectF rect = QnGeometry::eroded(this->thumbnailsRect(), MarginsF(1.0, 1.0, 1.0, 0.0));
-    qreal thumbnailsHeight = rect.height();
+    qreal center = m_thumbnailsPaintRect.center().x();
+    qreal height = m_thumbnailsPaintRect.height();
 
     for(int i = 0; i < m_oldThumbnailData.size(); i++) {
         ThumbnailData &data = m_oldThumbnailData[i];
         data.hiding = true;
 
         qreal pos = quickPositionFromValue(data.thumbnail.time(), false);
-        qreal width = data.thumbnail.size().width() * thumbnailsHeight / data.thumbnail.size().height();
-        data.pos = (pos - rect.center().x()) / width;
+        qreal width = data.thumbnail.size().width() * height / data.thumbnail.size().height();
+        data.pos = (pos - center) / width;
     }
 }
 
@@ -834,9 +838,13 @@ void QnTimeSlider::updateToolTipText() {
 void QnTimeSlider::updateLineCommentPixmap(int line) {
     QRectF lineBarRect = positionRect(rulerRect(), lineBarPosition);
 
+    int height = qFloor(lineBarRect.height() * m_lineData[line].stretch / m_totalLineStretch * (1.0 - lineCommentTopMargin - lineCommentBottomMargin));
+    if(height <= 0)
+        return;
+
     m_lineData[line].commentPixmap = m_pixmapCache->textPixmap(
         m_lineData[line].comment,
-        qFloor(lineBarRect.height() * m_lineData[line].stretch / m_totalLineStretch * (1.0 - lineCommentTopMargin - lineCommentBottomMargin)),
+        height,
         palette().color(QPalette::WindowText)
     );
 }
@@ -1027,7 +1035,7 @@ void QnTimeSlider::updateThumbnailsPeriod() {
 }
 
 void QnTimeSlider::updateThumbnailsStepSizeLater() {
-    m_thumbnailsUpdateTimer->start(100); /* Re-start it if it's active. */
+    m_thumbnailsUpdateTimer->start(250); /* Re-start it if it's active. */
 }
 
 void QnTimeSlider::updateThumbnailsStepSizeTimer() {
@@ -1039,8 +1047,10 @@ void QnTimeSlider::updateThumbnailsStepSize() {
     if (!thumbnailsLoader())
         return; /* Nothing to update. */
 
-    if (m_thumbnailsUpdateTimer->isActive())
-        return; /* We'll get updated once the timer hits. */
+    if (m_thumbnailsUpdateTimer->isActive()) {
+        updateThumbnailsStepSizeLater(); /* Re-start the timer. */
+        return;
+    }
     
     /* Calculate new bounding size. */
     int boundingHeigth = qRound(thumbnailsHeight());
@@ -1442,6 +1452,8 @@ void QnTimeSlider::drawDates(QPainter *painter, const QRectF &rect) {
 void QnTimeSlider::drawThumbnails(QPainter *painter, const QRectF &rect) {
     if (rect.height() < thumbnailHeightForDrawing)
         return;
+
+    m_thumbnailsPaintRect = rect;
 
     if (!thumbnailsLoader()) {
         QSizeF labelSizeBound = rect.size();
