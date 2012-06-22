@@ -255,7 +255,7 @@ private:
     void updateAggregationValue();
     void updateAggregatedPeriods(int line, Qn::TimePeriodRole type);
     void updateTotalLineStretch();
-    void updateThumbnailsStepSize();
+    void updateThumbnailsStepSize(bool instant);
     void updateThumbnailsPeriod();
     void updateThumbnailsStepSizeLater();
     Q_SLOT void updateThumbnailsStepSizeTimer();
