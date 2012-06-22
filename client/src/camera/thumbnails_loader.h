@@ -77,6 +77,8 @@ private:
 
     void setTimePeriodLocked(qint64 startTime, qint64 endTime);
 
+    bool isProcessingPeriodValid() const;
+
 private:
     friend class QnThumbnailsLoaderHelper;
 
