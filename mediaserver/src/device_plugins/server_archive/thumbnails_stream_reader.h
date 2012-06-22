@@ -29,9 +29,6 @@ private:
     QnAbstractMediaDataPtr createEmptyPacket();
 private:
     QnAbstractArchiveDelegate* m_delegate;
-    qint64 m_startTime;
-    qint64 m_endTime;
-    qint64 m_frameStep;
     qint64 m_currentPos;
     int m_cseq;
 };

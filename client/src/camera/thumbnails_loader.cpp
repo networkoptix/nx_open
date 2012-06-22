@@ -6,11 +6,14 @@
 #include "decoders/video/ffmpeg.h"
 
 #include "ui/common/geometry.h"
+#include "plugins/resources/archive/avi_files/thumbnails_archive_delegate.h"
+#include "device_plugins/archive/rtsp/rtsp_client_archive_delegate.h"
+#include "core/resource/camera_resource.h"
+#include "core/resource/camera_history.h"
 
 
 QnThumbnailsLoader::QnThumbnailsLoader(QnResourcePtr resource):
     m_mutex(QMutex::Recursive),
-    m_rtspClient(new QnRtspClientArchiveDelegate()),
     m_resource(resource),
     m_step(0),
     m_startTime(0),
@@ -84,7 +87,6 @@ void QnThumbnailsLoader::loadRange(qint64 startTimeMs, qint64 endTimeMs, qint64 
     {
         m_step = stepMs;
         m_breakCurrentJob = true;
-        m_rtspClient->setAdditionalAttribute("x-media-step", QByteArray::number(m_step*1000));
         m_newImages.clear();
         m_rangeToLoad.clear();
         m_startTime = m_endTime = 0;
@@ -230,44 +232,68 @@ void QnThumbnailsLoader::run()
             msleep(5);
             continue;
         }
-        if (!m_rtspClient->open(m_resource))
-        {
-            msleep(500);
-            continue;
-        }
 
-        
         m_mutex.lock();
         QnTimePeriod period = m_rangeToLoad.dequeue();
         m_breakCurrentJob = false;
         m_mutex.unlock();
 
-        m_rtspClient->seek(period.startTimeMs*1000, period.endTimeMs()*1000);
-
-        QnCompressedVideoDataPtr frame = qSharedPointerDynamicCast<QnCompressedVideoData>(m_rtspClient->getNextData());
-        if (!frame) 
-            continue;
-
-        CLFFmpegVideoDecoder decoder(frame->compressionType, frame, false);
-        CLVideoDecoderOutput outFrame;
-        outFrame.setUseExternalData(false);
-
-        while (!m_needStop && frame)
-        {
-            if (decoder.decode(frame, &outFrame))
+        m_delegates.clear();
+        QnPhysicalCameraResourcePtr camera = qSharedPointerDynamicCast<QnPhysicalCameraResource> (m_resource);
+        if (camera) {
+            QnNetworkResourceList cameras = QnCameraHistoryPool::instance()->getAllCamerasWithSameMac(camera, period);
+            for (int i = 0; i < cameras.size(); ++i) 
             {
-                if (!processFrame(outFrame, boundingSize))
-                    break;
+                QnAbstractArchiveDelegatePtr rtspClient(new QnRtspClientArchiveDelegate());
+                if (rtspClient->open(cameras[i])) {
+                    m_delegates << rtspClient;
+                }
+            }
+        }
+        else {
+            QnAviArchiveDelegatePtr aviDelegate(new QnAviArchiveDelegate());
+            QnThumbnailsArchiveDelegatePtr thumbnailDelegate(new QnThumbnailsArchiveDelegate(aviDelegate));
+            if (thumbnailDelegate->open(m_resource))
+                m_delegates << thumbnailDelegate;
+        }
+        
+        /*
+        if (!m_rtspClient->open(m_resource))
+        {
+            msleep(500);
+            continue;
+        }
+        */
+        
+        foreach(QnAbstractArchiveDelegatePtr client, m_delegates)
+        {
+            client->setRange(period.startTimeMs*1000, period.endTimeMs()*1000, m_step*1000);
+
+            QnCompressedVideoDataPtr frame = qSharedPointerDynamicCast<QnCompressedVideoData>(client->getNextData());
+            if (!frame) 
+                continue;
+
+            CLFFmpegVideoDecoder decoder(frame->compressionType, frame, false);
+            CLVideoDecoderOutput outFrame;
+            outFrame.setUseExternalData(false);
+
+            while (!m_needStop && frame)
+            {
+                if (decoder.decode(frame, &outFrame))
+                {
+                    if (!processFrame(outFrame, boundingSize))
+                        break;
+                }
+
+                frame = qSharedPointerDynamicCast<QnCompressedVideoData> (client->getNextData());
             }
 
-            frame = qSharedPointerDynamicCast<QnCompressedVideoData> (m_rtspClient->getNextData());
+            QnCompressedVideoDataPtr emptyData(new QnCompressedVideoData(1,0));
+            while (!m_needStop && decoder.decode(emptyData, &outFrame))
+                processFrame(outFrame, boundingSize);
+            client->close();
         }
 
-        QnCompressedVideoDataPtr emptyData(new QnCompressedVideoData(1,0));
-        while (!m_needStop && decoder.decode(emptyData, &outFrame))
-            processFrame(outFrame, boundingSize);
-
-        m_rtspClient->close();
         if (m_rangeToLoad.isEmpty())
         {
             QMutexLocker lock(&m_mutex);
@@ -280,9 +306,10 @@ void QnThumbnailsLoader::run()
 
 void QnThumbnailsLoader::pleaseStop()
 {
-    m_rtspClient->beforeClose();
-    m_rtspClient->close();
-
+    foreach(QnAbstractArchiveDelegatePtr client, m_delegates) {
+        client->beforeClose();
+        client->close();
+    }
     base_type::pleaseStop();
 }
 

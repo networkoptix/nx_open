@@ -52,14 +52,14 @@ public:
     qint64 getMinTime() const;
 
 private:
-    QnCameraTimePeriodList::const_iterator getVideoServerOnTimeItr(qint64 timestamp, bool searchForward);
-    QnVideoServerResourcePtr getNextVideoServerFromTime(qint64 timestamp, QnTimePeriod& currentPeriod);
-    QnVideoServerResourcePtr getPrevVideoServerFromTime(qint64 timestamp, QnTimePeriod& currentPeriod);
-
+    QnCameraTimePeriodList::const_iterator getVideoServerOnTimeItr(const QnCameraTimePeriodList& timePeriods, qint64 timestamp, bool searchForward);
+    QnVideoServerResourcePtr getNextVideoServerFromTime(const QnCameraTimePeriodList& timePeriods, qint64 timestamp, QnTimePeriod& currentPeriod);
+    QnVideoServerResourcePtr getPrevVideoServerFromTime(const QnCameraTimePeriodList& timePeriods, qint64 timestamp, QnTimePeriod& currentPeriod);
+    QnCameraTimePeriodList getOnlineTimePeriods() const;
 private:
     Q_DISABLE_COPY(QnCameraHistory);
 
-    QnCameraTimePeriodList m_timePeriods;
+    QnCameraTimePeriodList m_fullTimePeriods;
     QString m_macAddress;
     mutable QMutex m_mutex;
 };
