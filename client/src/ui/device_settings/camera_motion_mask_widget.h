@@ -38,6 +38,9 @@ public:
 
     void setNeedControlMaxRects(bool value);
 
+    /** Check if motion region is valid */
+    bool isValidMotionRegion();
+
 signals:
     void motionRegionListChanged();
 

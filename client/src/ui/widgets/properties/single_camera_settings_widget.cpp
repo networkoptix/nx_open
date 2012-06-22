@@ -279,6 +279,13 @@ void QnSingleCameraSettingsWidget::setHasChanges(bool hasChanges) {
     emit hasChangesChanged();
 }
 
+bool QnSingleCameraSettingsWidget::isValidMotionRegion(){
+    if (!m_motionWidget) 
+        return true;
+
+    return m_motionWidget->isValidMotionRegion();
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers

@@ -191,16 +191,6 @@ void QnCameraMotionMaskWidget::showTooManyWindowsMessage(const QnMotionRegion &r
 void QnCameraMotionMaskWidget::setNeedControlMaxRects(bool value)
 {
     m_needControlMaxRects = value;
-    if (m_resourceWidget && m_needControlMaxRects) 
-    {
-        const QList<QnMotionRegion> &regions = m_resourceWidget->getMotionRegionList();
-        for (int i = 0; i < regions.size(); ++i) {
-            if (!regions[i].isValid(m_camera->motionWindowCnt(), m_camera->motionMaskWindowCnt())) {
-                showTooManyWindowsMessage(regions[i]);
-                break;
-            }
-        }
-    }
 };
 
 void QnCameraMotionMaskWidget::setMotionSensitivity(int value)
@@ -226,6 +216,20 @@ int QnCameraMotionMaskWidget::gridPosToChannelPos(QPoint &pos)
         }
     }
     return 0;
+}
+
+bool QnCameraMotionMaskWidget::isValidMotionRegion(){
+    if (m_resourceWidget && m_needControlMaxRects) 
+    {
+        const QList<QnMotionRegion> &regions = m_resourceWidget->getMotionRegionList();
+        for (int i = 0; i < regions.size(); ++i) {
+            if (!regions[i].isValid(m_camera->motionWindowCnt(), m_camera->motionMaskWindowCnt(), m_camera->motionSensWindowCnt())) {
+                showTooManyWindowsMessage(regions[i]);
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 
@@ -257,14 +261,8 @@ void QnCameraMotionMaskWidget::at_motionRegionSelected(QGraphicsView *, QnResour
         {
             QnMotionRegion newRegion = widget->getMotionRegionList()[i];
             newRegion.addRect(m_motionSensitivity, r);
-            if (!m_needControlMaxRects || newRegion.isValid(m_camera->motionWindowCnt(), m_camera->motionMaskWindowCnt())) 
-            {
-                widget->addToMotionRegion(m_motionSensitivity, r, i);
-                changed = true;
-            }
-            else {
-                showTooManyWindowsMessage(newRegion);
-            }
+            widget->addToMotionRegion(m_motionSensitivity, r, i);
+            changed = true;
         }
     }
     

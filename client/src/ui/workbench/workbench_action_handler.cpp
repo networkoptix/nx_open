@@ -423,6 +423,10 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog() {
     QnVirtualCameraResourceList cameras = cameraSettingsDialog()->widget()->cameras();
     if(cameras.empty())
         return;
+    
+    /* Dialog will be shown inside */
+    if (!cameraSettingsDialog()->widget()->isValidMotionRegion())
+        return; 
 
     /* Limit the number of active cameras. */
     int activeCameras = resourcePool()->activeCameras() + cameraSettingsDialog()->widget()->activeCameraCount();

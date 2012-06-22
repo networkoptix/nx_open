@@ -26,10 +26,12 @@ public:
     static const int MIN_SENSITIVITY = 0; // equal motion mask
     static const int MAX_SENSITIVITY = 9; // max motion sensitivity
 
-    /* 
-    * Returns false if any region in range [1..MAX] contain too many rects (> maxRectCount). For motionMask region (index 0) no any limits.
+    /** 
+    * \returns false if sum of rects in all regions in range [1..MAX] greater than maxRectCount OR
+    * sum of rects in motionMask region (index 0) greater than maxMaskRects OR
+    * number of regions with at least 1 rect is greater than maxMotionSens
     */
-    bool isValid(int maxMotionRects, int maxMaskRects) const;
+    bool isValid(int maxMotionRects, int maxMaskRects, int maxMotionSens) const;
 
     bool operator==(const QnMotionRegion& other) const;
     bool operator!=(const QnMotionRegion& other) const;
