@@ -70,13 +70,6 @@
             <classifier>${platform}-${arch}</classifier>
         </dependency>
         <dependency>
-            <groupId>org</groupId>
-            <artifactId>openssl</artifactId>
-            <version>${openssl.version}</version>
-            <type>zip</type>
-            <classifier>${platform}-${arch}</classifier>
-        </dependency>                           
-        <dependency>
             <groupId>com.google</groupId>
             <artifactId>protobuf</artifactId>
             <version>2.4.1</version>

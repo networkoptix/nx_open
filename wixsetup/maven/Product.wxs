@@ -214,7 +214,7 @@
                       Execute="deferred" Return="ignore" Impersonate="no" />
       
         <CustomAction Id="LaunchTrayTool" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="traytool.exe" ExeCommand=""/>
-        <CustomAction Id="LaunchClient" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="client.exe" ExeCommand=""/>
+        <CustomAction Id="LaunchClient" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="HDWitness.exe" ExeCommand=""/>
         
         <CustomAction Id="NoDowngrade" Error="NoDowngrade" /> 
         
@@ -378,6 +378,10 @@
                                 <File Id="TrayToolQtGui$(var.suffix)4.dll" Name="QtGui$(var.suffix)4.dll" Source="traytool\QtGui$(var.suffix)4.dll"  />
                                 <File Id="TrayToolQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="traytool\QtNetwork$(var.suffix)4.dll"  />
                             </Component>
+                            <Component Id="TrayToolOpenSSL" Guid="{9C379C95-1EDE-49b0-8C6C-7B55ADE60599}">
+                                <File Id="TrayToollibeay32.dll" Name="libeay32.dll" Source="traytool\libeay32.dll"/>
+                                <File Id="TrayToolssleay32.dll" Name="ssleay32.dll" Source="traytool\ssleay32.dll"/>
+                            </Component>							
                         </Directory>
                         
                         <Directory Id="VmsProxyServerDir" Name="MediaProxy">
@@ -407,6 +411,10 @@
                                 <File Id="ProxyQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="mediaproxy\QtNetwork$(var.suffix)4.dll" />
                                 <File Id="ProxyQtXml$(var.suffix)4.dll" Name="QtXml$(var.suffix)4.dll" Source="mediaproxy\QtXml$(var.suffix)4.dll" />
                             </Component>
+                            <Component Id="ProxyOpenSSL" Guid="{B2CFCF46-4618-44a9-9BB5-7C832AA10652}">
+                                <File Id="Proxylibeay32.dll" Name="libeay32.dll" Source="mediaproxy\libeay32.dll"/>
+                                <File Id="Proxyssleay32.dll" Name="ssleay32.dll" Source="mediaproxy\ssleay32.dll"/>
+                            </Component>							
                         </Directory>
                         
                         <Directory Id="VmsMediaServerDir" Name="MediaServer">
@@ -482,7 +490,7 @@
                         
                         <Directory Id="VmsClientDir" Name="Client">
                             <Component Id="ClientExecutable" Guid="{7AAC7815-50A6-4dc9-ADD2-BDD9B7EE8FEF}">
-                                <File Id="client.exe" Name="client.exe" Source="client/client.exe" KeyPath="yes">
+                                <File Id="HDWitness.exe" Name="HDWitness.exe" Source="client/client.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionClient" Name="HD Witness" Scope="any" IgnoreFailure="yes"/>
                                     
                                     <Shortcut Id="StartmenuClient" Directory="ProgramMenuDir" Name="${product.name}"
@@ -604,6 +612,7 @@
             
             <ComponentRef Id="ProxyExecutable" />
             <ComponentRef Id="ProxyQTLibraries" />
+			<ComponentRef Id="ProxyOpenSSL" />
         </Feature>
         
         <Feature Id="TrayToolFeature" Title="Tray Tool" AllowAdvertise="no" Display="hidden" Level="1">
@@ -611,6 +620,7 @@
             
             <ComponentRef Id="traytool.exe"/>
             <ComponentRef Id="TrayToolQTLibraries"/>
+			<ComponentRef Id="TrayToolOpenSSL"/>
             <ComponentRef Id="UninstallProgramMenuFolder"/>
         </Feature>
         
@@ -618,6 +628,8 @@
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
 <!--            <Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !ServerFeature <> 3 ]]> </Condition>-->
             
+			<ComponentRef Id="NovFileAssociation"/>
+			
             <ComponentRef Id='ServerDirectoryComponent'/>
             <ComponentRef Id='ServerConfiguration'/>
             <ComponentRef Id='ServerConfigurationGuid'/>
@@ -756,7 +768,7 @@
             <Publish Dialog="MyFeaturesDlg" Control="Next" Property="CLIENT_APPSERVER_HOST" Value="{}" Order="4"><![CDATA[ NOT $(var.AppServerInstallingClient) ]]></Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Property="CLIENT_APPSERVER_PORT" Value="{}" Order="4"><![CDATA[ NOT $(var.AppServerInstallingClient) ]]></Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Property="CLIENT_APPSERVER_LOGIN" Value="{}" Order="4"><![CDATA[ NOT $(var.AppServerInstallingClient) ]]></Publish>
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="{}"><![CDATA[ &ClientFeature <> 3 ]]></Publish>
+			<Publish Dialog="MyFeaturesDlg" Control="Next" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="{}"><![CDATA[ &ClientFeature <> 3 ]]></Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(var.LaunchClientChecBoxText)"><![CDATA[ &ClientFeature = 3 ]]></Publish>
             
             <Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg">1</Publish>
@@ -771,12 +783,12 @@
             
             <Publish Dialog="AppServerDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg">1</Publish>
 
-            <?define EcsPortsDiffer="(APPSERVER_PORT <> PROXY_PORT)" ?>
-            <?define EcsNeedCheckPorts="(APPSERVER_PORT <> OLD_APPSERVER_PORT OR PROXY_PORT <> OLD_PROXY_PORT)" ?>          
+			<?define EcsPortsDiffer="(APPSERVER_PORT <> PROXY_PORT)" ?>
+            <?define EcsNeedCheckPorts="(APPSERVER_PORT <> OLD_APPSERVER_PORT OR PROXY_PORT <> OLD_PROXY_PORT)" ?>        
             
             <Publish Dialog="AppServerDlg" Control="Next" Property="BUSYPORT" Value="{}">1</Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Property="PORTSTOTEST" Value="[APPSERVER_PORT] [PROXY_PORT]" Order="1">1</Publish>
-            <Publish Dialog="AppServerDlg" Control="Next" Event="SpawnDialog" Value="PortDuplicateDlg" Order="2"><![CDATA[ NOT $(var.EcsPortsDiffer) ]]></Publish>
+			<Publish Dialog="AppServerDlg" Control="Next" Event="SpawnDialog" Value="PortDuplicateDlg" Order="2"><![CDATA[ NOT $(var.EcsPortsDiffer) ]]></Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Event="SpawnDialog" Value="PasswordShouldMatchDlg" Order="2"><![CDATA[ $(var.EcsPortsDiffer) AND NOT $(var.EcsPasswordsEqual) ]]></Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Event="DoAction" Value="CheckPorts" Order="2"><![CDATA[ $(var.EcsPortsDiffer) AND $(var.EcsPasswordsEqual) AND $(var.EcsNeedCheckPorts) ]]></Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Event="NewDialog" Value="PortIsBusyDlg" Order="3"><![CDATA[ $(var.EcsPortsDiffer) AND $(var.EcsPasswordsEqual) AND BUSYPORT ]]></Publish>
