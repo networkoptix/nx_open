@@ -1281,7 +1281,7 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
         timeString = QTime().addMSecs(time).toString(QLatin1String("hh.mm.ss"));
     }
 
-    QString suggetion = widget->resource()->getName() + QLatin1String("_") + timeString;
+    QString suggetion = widget->resource()->getName() + QLatin1String("_") + timeString; // TODO: remove non-filename chars
 
     QSettings settings;
     settings.beginGroup(QLatin1String("screenshots"));

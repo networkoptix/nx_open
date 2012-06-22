@@ -651,8 +651,13 @@ void QnResourceWidget::setDisplayFlags(DisplayFlags flags) {
         if (reader)
             reader->setSendMotion(flags & DisplayMotion);
 
-        if(!(flags & DisplayMotion))
-            m_searchButton->setChecked(false);
+        m_searchButton->setChecked(flags & DisplayMotion);
+
+        if(flags & DisplayMotion) {
+            setProperty(Qn::MotionSelectionModifiers, 0);
+        } else {
+            setProperty(Qn::MotionSelectionModifiers, QVariant()); /* Use defaults. */
+        }
     }
 
     if(changedFlags & DisplayButtons)
@@ -867,12 +872,7 @@ void QnResourceWidget::at_resource_nameChanged() {
 }
 
 void QnResourceWidget::at_searchButton_toggled(bool checked) {
-    if(checked) {
-        setDisplayFlag(DisplayMotion, true);
-        setProperty(Qn::MotionSelectionModifiers, 0);
-    } else {
-        setProperty(Qn::MotionSelectionModifiers, QVariant());
-    }
+    setDisplayFlag(DisplayMotion, checked);
 }
 
 // -------------------------------------------------------------------------- //

@@ -94,15 +94,15 @@ private:
 };
 
 
-class QnMotionGridDisplayActionCondition: public QnActionCondition {
+class QnSmartSearchActionCondition: public QnActionCondition {
 public:
-    QnMotionGridDisplayActionCondition(bool requiredGridDisplayValue, QObject *parent = NULL): 
+    QnSmartSearchActionCondition(bool requiredGridDisplayValue, QObject *parent = NULL): 
         QnActionCondition(parent),
         m_hasRequiredGridDisplayValue(true),
         m_requiredGridDisplayValue(requiredGridDisplayValue)
     {}
 
-    QnMotionGridDisplayActionCondition(QObject *parent = NULL):
+    QnSmartSearchActionCondition(QObject *parent = NULL):
         QnActionCondition(parent),
         m_hasRequiredGridDisplayValue(false),
         m_requiredGridDisplayValue(false)

@@ -59,7 +59,7 @@ Qn::ActionVisibility QnItemZoomedActionCondition::check(const QnResourceWidgetLi
 }
 
 
-Qn::ActionVisibility QnMotionGridDisplayActionCondition::check(const QnResourceWidgetList &widgets) {
+Qn::ActionVisibility QnSmartSearchActionCondition::check(const QnResourceWidgetList &widgets) {
     foreach(QGraphicsItem *item, widgets) {
         QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
         if(widget == NULL)

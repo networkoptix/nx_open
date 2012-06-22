@@ -606,23 +606,23 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(new QnItemZoomedActionCondition(true, this));
 
-    factory(Qn::ShowMotionAction).
+    factory(Qn::StartSmartSearchAction).
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
-        text(tr("Show Motion")).
+        text(tr("Start Smart Search")).
         shortcut(tr("Alt+G")).
-        condition(new QnMotionGridDisplayActionCondition(false, this));
+        condition(new QnSmartSearchActionCondition(false, this));
 
-    factory(Qn::HideMotionAction).
+    factory(Qn::StopSmartSearchAction).
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
-        text(tr("Hide Motion")).
+        text(tr("Stop Smart Search")).
         shortcut(tr("Alt+G")).
-        condition(new QnMotionGridDisplayActionCondition(true, this));
+        condition(new QnSmartSearchActionCondition(true, this));
 
-    factory(Qn::ToggleMotionAction).
+    factory(Qn::ToggleSmartSearchAction).
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::HotkeyOnly).
-        text(tr("Toggle Motion Display")).
+        text(tr("Toggle Smart Search")).
         shortcut(tr("Alt+G")).
-        condition(new QnMotionGridDisplayActionCondition(this));
+        condition(new QnSmartSearchActionCondition(this));
 
     factory(Qn::CheckFileSignatureAction).
         flags(Qn::Scene | Qn::SingleTarget).
