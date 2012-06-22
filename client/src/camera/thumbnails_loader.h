@@ -61,6 +61,8 @@ protected:
 
     void updateTargetSizeLocked(bool invalidate);
     void invalidateThumbnailsLocked();
+    Q_SIGNAL void updateProcessingLater();
+    Q_SLOT void updateProcessing();
     void updateProcessingLocked();
 
     void enqueueForProcessingLocked(qint64 startTime, qint64 endTime);

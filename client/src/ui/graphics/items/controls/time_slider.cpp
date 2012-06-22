@@ -784,6 +784,8 @@ void QnTimeSlider::addThumbnail(const QnThumbnail &thumbnail) {
     } else {
         pos->thumbnail = thumbnail;
     }
+
+    qDebug() << "N" << QTime().addMSecs(thumbnail.time());
 }
 
 void QnTimeSlider::clearThumbnails() {
@@ -1029,6 +1031,9 @@ void QnTimeSlider::updateThumbnailsPeriod() {
     if (!thumbnailsLoader())
         return;
 
+    if(m_thumbnailsUpdateTimer->isActive())
+        return;
+
     thumbnailsLoader()->setTimePeriod(m_windowStart, m_windowEnd);
 }
 
@@ -1086,6 +1091,7 @@ void QnTimeSlider::updateThumbnailsStepSize(bool instant) {
         m_lastThumbnailsUpdateTime = currentTime;
         thumbnailsLoader()->setBoundingSize(boundingSize);
         thumbnailsLoader()->setTimeStep(timeStep);
+        updateThumbnailsPeriod();
     }
 }
 

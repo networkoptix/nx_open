@@ -58,6 +58,8 @@ QnThumbnailsLoader::QnThumbnailsLoader(QnResourcePtr resource):
         metaTypesInitialized = true;
     }
 
+    connect(this, SIGNAL(updateProcessingLater()), this, SLOT(updateProcessing()), Qt::QueuedConnection);
+
     start();
 }
 
@@ -162,7 +164,7 @@ void QnThumbnailsLoader::setTimePeriodLocked(qint64 startTime, qint64 endTime) {
     m_requestStart = startTime;
     m_requestEnd = endTime;
 
-    updateProcessingLocked();
+    emit updateProcessingLater(); /* We don't need to unlock here. */
 }
 
 QnTimePeriod QnThumbnailsLoader::timePeriod() const {
@@ -205,11 +207,16 @@ void QnThumbnailsLoader::invalidateThumbnailsLocked() {
     m_processingStart = m_processingEnd = invalidProcessingTime;
     m_generation++;
 
-    updateProcessingLocked();
-
     m_mutex.unlock();
+    emit updateProcessingLater();
     emit thumbnailsInvalidated();
     m_mutex.lock();
+}
+
+void QnThumbnailsLoader::updateProcessing() {
+    QMutexLocker locker(&m_mutex);
+
+    updateProcessingLocked();
 }
 
 void QnThumbnailsLoader::updateProcessingLocked() {
