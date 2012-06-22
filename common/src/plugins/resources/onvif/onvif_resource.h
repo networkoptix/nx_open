@@ -47,32 +47,24 @@ public:
     virtual bool isResourceAccessible() override;
     virtual bool updateMACAddress() override;
     virtual QString manufacture() const override;
-    virtual void setMotionMaskPhysical(int channel) override;
+
     virtual int getMaxFps() override;
     virtual void setIframeDistance(int /*frames*/, int /*timems*/) override {}
     virtual bool hasDualStreaming() const override;
     virtual bool shoudResolveConflicts() const override;
 
-    bool isInitialized() const;
-
     int innerQualityToOnvif(QnStreamQuality quality) const;
     const QString createOnvifEndpointUrl() const { return createOnvifEndpointUrl(getHostAddress().toString()); }
 
-    const ResolutionPair getPrimaryResolution() const;
-    const ResolutionPair getSecondaryResolution() const;
-    const ResolutionPair getMaxResolution() const;
-    bool isVideoOptionsNotSet() const { return videoOptionsNotSet; }
+    ResolutionPair getPrimaryResolution() const;
+    ResolutionPair getSecondaryResolution() const;
+    ResolutionPair getMaxResolution() const;
+    bool isVideoOptionsNotSet() const { return m_videoOptionsNotSet; }
     bool isSoapAuthorized() const;
 
-    QRect getMotionWindow(int num) const;
-    QMap<int, QRect>  getMotionWindows() const;
-    void readMotionInfo();
 
-    const QString& getMediaUrl() const { return mediaUrl; }
-    void setMediaUrl(const QString& src) { mediaUrl = src; }
-
-    const QString& getDeviceUrl() const { return deviceUrl; }
-    void setDeviceUrl(const QString& src) { deviceUrl = src; }
+    QString getMediaUrl() const;
+    void setMediaUrl(const QString& src);
 
     CODECS getCodec() const;
 
@@ -82,14 +74,10 @@ protected:
 
     virtual void setCropingPhysical(QRect croping);
 private:
-    void clear();
-    static QRect axisRectToGridRect(const QRect& axisRect);
-    static QRect gridRectToAxisRect(const QRect& gridRect);
 
-    bool removeMotionWindow(int wndNum);
-    int addMotionWindow();
-    bool updateMotionWindow(int wndNum, int sensitivity, const QRect& rect);
-    int toAxisMotionSensitivity(int sensitivity);
+    QString getDeviceUrl() const { return m_deviceUrl; }
+    void setDeviceUrl(const QString& src) { m_deviceUrl = src; }
+
     void fetchAndSetDeviceInformation();
     void fetchAndSetVideoEncoderOptions();
     void setVideoEncoderOptions(const VideoOptionsResp& response);
@@ -102,8 +90,8 @@ private:
     void save();
 	void setMinMaxQuality(int min, int max);
 	int round(float value);
-    const ResolutionPair getNearestResolutionForSecondary(const ResolutionPair& resolution, float aspectRatio) const;
-    const ResolutionPair getNearestResolution(const ResolutionPair& resolution, float aspectRatio, double maxResolutionSquare) const;
+    ResolutionPair getNearestResolutionForSecondary(const ResolutionPair& resolution, float aspectRatio) const;
+    ResolutionPair getNearestResolution(const ResolutionPair& resolution, float aspectRatio, double maxResolutionSquare) const;
     float getResolutionAspectRatio(const ResolutionPair& resolution) const;
     void findSetPrimarySecondaryResolution();
 private:
@@ -114,19 +102,19 @@ private:
     QList<ResolutionPair> m_resolutionList; //Sorted desc
     QMap<int, QRect> m_motionWindows;
     QMap<int, QRect> m_motionMask;
-    qint64 m_lastMotionReadTime;
-    int maxFps;
-    int iframeDistance;
-    int minQuality;
-    int maxQuality;
-    bool hasDual;
-    bool videoOptionsNotSet;
-    QString mediaUrl;
-    QString deviceUrl;
-    bool reinitDeviceInfo;
-    CODECS codec;
-    ResolutionPair primaryResolution;
-    ResolutionPair secondaryResolution;
+
+    int m_maxFps;
+    int m_iframeDistance;
+    int m_minQuality;
+    int m_maxQuality;
+    bool m_hasDual;
+    bool m_videoOptionsNotSet;
+    QString m_mediaUrl;
+    QString m_deviceUrl;
+    bool m_reinitDeviceInfo;
+    CODECS m_codec;
+    ResolutionPair m_primaryResolution;
+    ResolutionPair m_secondaryResolution;
     QHostAddress m_hostAddr;
 };
 

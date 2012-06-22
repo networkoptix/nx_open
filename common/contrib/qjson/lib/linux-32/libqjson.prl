@@ -1,5 +1,0 @@
-QMAKE_PRL_BUILD_DIR = /home/ivan/sdk/qjson/src/
-QMAKE_PRO_INPUT = src.pro
-QMAKE_PRL_TARGET = libqjson.so.0.7.1
-QMAKE_PRL_CONFIG = include_source_dir lex yacc warn_on uic resources qt warn_on release incremental link_prl def_files_disabled exceptions no_mocdepend release stl qt_no_framework create_prl moc thread dll
-QMAKE_PRL_VERSION = 0.7.1

@@ -56,7 +56,7 @@ private:
     void updateFromResources();
     void submitToResources();
 
-    int addTableRow(const QString &url, int spaceLimitGb);
+    int addTableRow(int id, const QString &url, int spaceLimitGb);
 
     void setTableStorages(const QnAbstractStorageResourceList &storages);
     QnAbstractStorageResourceList tableStorages() const;

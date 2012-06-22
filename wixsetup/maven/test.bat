@@ -27,7 +27,7 @@ cd "%VS90COMNTOOLS%\..\..\..\${company.name}\${product.name}\Client\"
 rem ugly hack! --auth parameter is applied only in second launch!
 rem call client.exe --test-timeout 5000 --auth "https://%EC_LOGIN%:%EC_PASSWORD%@%EC_HOST%:%EC_PORT%" --test-resource-substring Server
 
-call client.exe --test-timeout 180000 --auth "https://%EC_LOGIN%:%EC_PASSWORD%@%EC_HOST%:%EC_PORT%" --test-resource-substring Server > test.txt
+call hdwitness.exe --test-timeout 180000 --auth "https://%EC_LOGIN%:%EC_PASSWORD%@%EC_HOST%:%EC_PORT%" --test-resource-substring Server > test.txt
 SET TESTRESULT=%ERRORLEVEL%
 echo test errorlevel is %TESTRESULT%
 
@@ -35,7 +35,7 @@ sc stop vmsmediaserver
 sc stop vmsappserver
 
 taskkill /F /IM traytool.exe
-taskkill /F /IM client.exe
+taskkill /F /IM hdwitness.exe
 taskkill /F /IM mediaserver.exe
 taskkill /F /IM ecs.exe
 

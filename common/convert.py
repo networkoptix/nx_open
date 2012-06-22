@@ -108,15 +108,6 @@ def gen_filetypes_h():
 def host_platform_bits():
     return architecture()[0][0:2]
 
-def setup_qjson():
-    qjson_path = '../common/contrib/qjson'
-
-    arch_suffix = ''
-    if platform() == 'linux':
-        arch_suffix = '-' + host_platform_bits()
-
-    return qjson_path + '/lib/' + platform() + arch_suffix
-
 def setup_openssl():
     openssl_path = '../common/contrib/openssl'
 

@@ -14,11 +14,8 @@
 #include <QtCore/QScopedPointer>
 #include <QtNetwork/QNetworkAccessManager>
 
-#include <qjson/parser.h>
-
 #include "message.h"
 
-class QnJsonStreamParser;
 class QnPbStreamParser;
 
 class QnMessageSource : public QObject
