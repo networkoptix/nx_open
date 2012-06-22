@@ -172,10 +172,8 @@ void QnThumbnailsLoader::pleaseStop() {
     {
         QMutexLocker locker(&m_mutex);
 
-        foreach(QnAbstractArchiveDelegatePtr client, m_delegates) {
+        foreach(QnAbstractArchiveDelegatePtr client, m_delegates) 
             client->beforeClose();
-            client->close();
-        }
     }
 
     quit();
