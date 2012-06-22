@@ -95,6 +95,7 @@ private:
     int m_scaleSourceFormat;
     
     QHash<qint64, QnThumbnail> m_thumbnailByTime;
+    qint64 m_maxLoadedTime;
     QQueue<QnTimePeriod> m_processingQueue;
     QnThumbnailsLoaderHelper *m_helper;
     int m_generation;

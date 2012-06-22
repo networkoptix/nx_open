@@ -435,7 +435,7 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog() {
         QMessageBox::warning(widget(), tr("Could not Enable Recording"), message);
         cameraSettingsDialog()->widget()->setCamerasActive(false);
     }
-
+    
     /* Submit and save it. */
     cameraSettingsDialog()->widget()->submitToResources();
     connection()->saveAsync(cameras, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));

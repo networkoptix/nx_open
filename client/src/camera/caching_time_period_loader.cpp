@@ -9,8 +9,8 @@
 #include "multi_camera_time_period_loader.h"
 
 namespace {
-    qint64 minLoadingMargin = 60 * 60 * 1000; /* 1 hour. */
-    qint64 defaultUpdateInterval = 10 * 1000;
+    const qint64 minLoadingMargin = 60 * 60 * 1000; /* 1 hour. */
+    const qint64 defaultUpdateInterval = 10 * 1000;
 }
 
 

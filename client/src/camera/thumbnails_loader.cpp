@@ -7,6 +7,7 @@
 #include <QtGui/QImage>
 
 #include <utils/common/math.h>
+#include <utils/common/synctime.h>
 
 #include "decoders/video/ffmpeg.h"
 
@@ -17,6 +18,12 @@
 #include "utils/media/frame_info.h"
 
 #include "thumbnails_loader_helper.h"
+
+namespace {
+    const qint64 defaultUpdateInterval = 60 * 1000; /* One minute. */
+
+}
+
 
 QnThumbnailsLoader::QnThumbnailsLoader(QnResourcePtr resource):
     m_mutex(QMutex::NonRecursive),
@@ -141,11 +148,6 @@ void QnThumbnailsLoader::setTimePeriodLocked(qint64 startTime, qint64 endTime) {
     if(endTime < startTime)
         endTime = startTime;
 
-    if(m_timeStep != 0) {
-        startTime = qFloor(startTime, m_timeStep);
-        endTime = qCeil(endTime, m_timeStep);
-    }
-
     if(m_requestStart == startTime && m_requestEnd == endTime)
         return;
 
@@ -187,6 +189,7 @@ void QnThumbnailsLoader::updateTargetSizeLocked(bool invalidate) {
 void QnThumbnailsLoader::invalidateThumbnailsLocked() {
     m_thumbnailByTime.clear();
     m_processingQueue.clear();
+    m_maxLoadedTime = 0;
     m_processingStart = m_processingEnd = 0;
     m_generation++;
 
@@ -198,43 +201,60 @@ void QnThumbnailsLoader::invalidateThumbnailsLocked() {
 }
 
 void QnThumbnailsLoader::updateProcessingLocked() {
+    /* Don't load anything if request fits into processed period. */
+    if(m_requestStart >= m_processingStart && m_requestEnd <= m_processingEnd)
+        return;
+
+    /* Also don't load anything if this loader is not yet initialized. */
     if(m_timeStep == 0 || m_boundingSize.isEmpty() || (m_requestStart == 0 && m_requestEnd == 0))
         return;
 
-    /* Discard old loaded period if it doesn't intersect with the new one. */
+    /* Discard old loaded period if it cannot be used to extend then new one. */
     if((m_requestStart > m_processingEnd + m_timeStep || m_requestEnd < m_processingStart - m_timeStep) && m_processingStart != 0 && m_processingEnd != 0) {
         invalidateThumbnailsLocked();
         return;
     }
 
     /* Add margins. */
-    qint64 requestStart = m_requestStart;
-    qint64 requestEnd = m_requestEnd;
-    qint64 requestSize = requestEnd - requestStart;
-    requestStart = qFloor(qMax(0ll, requestStart - requestSize / 4), m_timeStep);
-    requestEnd = qCeil(requestEnd + requestSize / 4, m_timeStep);
+    qint64 processingStart = m_requestStart;
+    qint64 processingEnd = m_requestEnd;
+    qint64 processingSize = processingEnd - processingStart;
+    processingStart = qFloor(qMax(0ll, processingStart - processingSize / 4), m_timeStep);
+    processingEnd = qCeil(processingEnd + processingSize / 4, m_timeStep);
 
+    /* Trim at live. */
+    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
+    if(processingEnd > currentTime)
+        processingEnd = currentTime + defaultUpdateInterval;
+
+    /* Adjust for the chunks near live that could not be loaded at the last request. */
+    if(m_processingStart < m_maxLoadedTime && m_maxLoadedTime < m_processingEnd) {
+        processingStart = qMin(processingStart, m_maxLoadedTime + m_timeStep);
+        m_processingEnd = m_maxLoadedTime;
+    }
+
+    /* Enqueue ranges that are not loaded yet. */
     qint64 start, end;
 
     /* Try 1st option. */
-    start = requestStart;
-    end = qMin(m_processingStart - m_timeStep, requestEnd);
+    start = processingStart;
+    end = qMin(m_processingStart - m_timeStep, processingEnd);
     if(start <= end)
         enqueueForProcessingLocked(start, end);
 
     /* Try 2nd option. */
-    start = qMax(m_processingEnd + m_timeStep, requestStart);
-    end = requestEnd;
+    start = qMax(m_processingEnd + m_timeStep, processingStart);
+    end = processingEnd;
     if(start <= end)
         enqueueForProcessingLocked(start, end);
 
     /* Update loaded period accordingly. */
     if(m_processingStart == 0 && m_processingEnd == 0) {
-        m_processingStart = requestStart;
-        m_processingEnd = requestEnd;
+        m_processingStart = processingStart;
+        m_processingEnd = processingEnd;
     } else {
-        m_processingStart = qMin(m_processingStart, requestStart);
-        m_processingEnd = qMax(m_processingEnd, requestEnd);
+        m_processingStart = qMin(m_processingStart, processingStart);
+        m_processingEnd = qMax(m_processingEnd, processingEnd);
     }
 }
 
@@ -328,6 +348,7 @@ void QnThumbnailsLoader::addThumbnail(const QnThumbnail &thumbnail) {
             return; /* Already outdated. */
 
         m_thumbnailByTime.insert(thumbnail.time(), thumbnail);
+        m_maxLoadedTime = qMax(thumbnail.time(), m_maxLoadedTime);
     }
 
     emit thumbnailLoaded(thumbnail);
