@@ -1489,7 +1489,7 @@ void QnTimeSlider::drawThumbnails(QPainter *painter, const QRectF &rect) {
         qreal x2 = quickPositionFromValue(t1, false);
 
         QRectF boundingRect = rect; 
-        for (qint64 time = startTime; time < endTime; time += step) {
+        for (qint64 time = startTime; time <= endTime; time += step) {
             QMap<qint64, ThumbnailData>::iterator pos = m_thumbnailData.find(time);
             if(pos == m_thumbnailData.end())
                 continue;
