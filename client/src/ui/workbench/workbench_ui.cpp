@@ -186,7 +186,8 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_flags(0),
     m_ignoreClickEvent(false),
     m_inFreespace(false),
-    m_ignoreSliderResizerGeometryChanges(false)
+    m_ignoreSliderResizerGeometryChanges(false),
+    m_ignoreSliderResizerGeometryChanges2(false)
 {
     memset(m_widgetByRole, 0, sizeof(m_widgetByRole));
 
@@ -1050,10 +1051,10 @@ void QnWorkbenchUi::updateFpsGeometry() {
 }
 
 void QnWorkbenchUi::updateSliderResizerGeometry() {
-    if(m_ignoreSliderResizerGeometryChanges)
+    if(m_ignoreSliderResizerGeometryChanges2) {
+        QMetaObject::invokeMethod(this, "updateSliderResizerGeometry", Qt::QueuedConnection);
         return;
-
-    QnScopedValueRollback<bool> guard(&m_ignoreSliderResizerGeometryChanges, true);
+    }
 
     QnTimeSlider *timeSlider = m_sliderItem->timeSlider();
     QRectF timeSliderRect = timeSlider->rect();
@@ -1066,6 +1067,8 @@ void QnWorkbenchUi::updateSliderResizerGeometry() {
     sliderResizerGeometry.setHeight(16);
     
     if(!qFuzzyCompare(sliderResizerGeometry, m_sliderResizerItem->geometry())) {
+        QnScopedValueRollback<bool> guard(&m_ignoreSliderResizerGeometryChanges2, true);
+
         m_sliderResizerItem->setGeometry(sliderResizerGeometry);
 
         /* This one is needed here as we're in a handler and thus geometry change doesn't adjust position =(. */

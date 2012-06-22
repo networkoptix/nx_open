@@ -152,7 +152,7 @@ protected:
     void updateTreeGeometry();
     void updateHelpGeometry();
     void updateFpsGeometry();
-    void updateSliderResizerGeometry();
+    Q_SLOT void updateSliderResizerGeometry();
 
     QRectF updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
     QRectF updatedHelpGeometry(const QRectF &helpGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
@@ -282,6 +282,7 @@ private:
     QGraphicsWidget *m_sliderEaterItem;
 
     bool m_ignoreSliderResizerGeometryChanges;
+    bool m_ignoreSliderResizerGeometryChanges2;
 
     /** Hover processor that is used to change slider opacity when mouse is hovered over it. */
     HoverFocusProcessor *m_sliderOpacityProcessor;
