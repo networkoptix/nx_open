@@ -35,6 +35,9 @@ public:
     QnMacAddress getMAC() const;
     void setMAC(const QnMacAddress &mac);
 
+    QString getPhysicalId() const;
+    void setPhysicalId(const QString& physicalId);
+
     inline void setAuth(const QString &user, const QString &password)
     { QAuthenticator auth; auth.setUser(user); auth.setPassword(password); setAuth(auth); }
     void setAuth(const QAuthenticator &auth);
@@ -95,7 +98,7 @@ private:
 
     //QHostAddress m_hostAddr;
     QnMacAddress m_macAddress;
-
+    QString m_physicalId;
 
     QHostAddress m_localAddress; // address used to discover this resource ( in case if machine has more than one NIC/address
 

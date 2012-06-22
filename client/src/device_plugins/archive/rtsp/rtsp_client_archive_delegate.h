@@ -48,7 +48,7 @@ public:
     static void setProxyAddr(const QString& addr, int port);
 
     void setAdditionalAttribute(const QByteArray& name, const QByteArray& value);
-
+    virtual void setRange(qint64 startTime, qint64 endTime, qint64 frameStep) override;
 private:
     QnAbstractDataPacketPtr processFFmpegRtpPayload(const quint8* data, int dataSize);
     void processMetadata(const quint8* data, int dataSize);
@@ -95,5 +95,7 @@ private:
     static int m_proxyPort;
     qint64 m_forcedEndTime;
 };
+
+typedef QSharedPointer<QnRtspClientArchiveDelegate> QnRtspClientArchiveDelegatePtr;
 
 #endif

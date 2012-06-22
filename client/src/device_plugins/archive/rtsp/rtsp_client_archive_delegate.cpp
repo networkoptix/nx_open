@@ -797,3 +797,9 @@ void QnRtspClientArchiveDelegate::beforeChangeReverseMode(bool reverseMode)
             m_blockReopening = false;
     }
 }
+
+void QnRtspClientArchiveDelegate::setRange(qint64 startTime, qint64 endTime, qint64 frameStep)
+{
+    setAdditionalAttribute("x-media-step", QByteArray::number(frameStep));
+    seek(startTime, endTime);
+}

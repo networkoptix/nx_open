@@ -46,4 +46,5 @@ message Camera {
     optional string       password         = 6;
     repeated ScheduleTask scheduleTask     = 7;
     optional bool         audioEnabled     = 8;
+    optional string       physicalId       = 9;
 }

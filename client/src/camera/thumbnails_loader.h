@@ -80,7 +80,7 @@ private:
 
     mutable QMutex m_mutex;
     const QnResourcePtr m_resource;
-    const QScopedPointer<QnRtspClientArchiveDelegate> m_rtspClient;
+    QList<QnAbstractArchiveDelegatePtr> m_delegates;
 
     qint64 m_timeStep, m_requestStart, m_requestEnd, m_processingStart, m_processingEnd;
 
@@ -104,3 +104,4 @@ private:
 Q_DECLARE_METATYPE(QPixmapPtr)
 
 #endif // __THUMBNAILS_LOADER_H__
+
