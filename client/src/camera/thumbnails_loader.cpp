@@ -311,7 +311,7 @@ void QnThumbnailsLoader::process() {
         generation = m_generation;
     }
 
-    QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(m_resource);
+    QnPhysicalCameraResourcePtr camera = qSharedPointerDynamicCast<QnPhysicalCameraResource>(m_resource);
     if (camera) {
         QnNetworkResourceList cameras = QnCameraHistoryPool::instance()->getAllCamerasWithSameMac(camera, period);
         for (int i = 0; i < cameras.size(); ++i) 
@@ -371,9 +371,6 @@ void QnThumbnailsLoader::process() {
         if(invalidated)
             break;
     }
-    m_mutex.lock();
-    m_delegates.clear();
-    m_mutex.unlock();
 }
 
 void QnThumbnailsLoader::addThumbnail(const QnThumbnail &thumbnail) {

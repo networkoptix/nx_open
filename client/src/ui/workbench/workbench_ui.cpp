@@ -1050,6 +1050,11 @@ void QnWorkbenchUi::updateFpsGeometry() {
 }
 
 void QnWorkbenchUi::updateSliderResizerGeometry() {
+    if(m_ignoreSliderResizerGeometryChanges)
+        return;
+
+    QnScopedValueRollback<bool> guard(&m_ignoreSliderResizerGeometryChanges, true);
+
     QnTimeSlider *timeSlider = m_sliderItem->timeSlider();
     QRectF timeSliderRect = timeSlider->rect();
 
