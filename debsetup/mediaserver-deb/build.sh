@@ -56,9 +56,6 @@ do
     install -m 644 $FFMPEG_PATH/lib/$file $LIBSTAGE
 done
 
-# Copy qjson library
-install -m 644 $QJSON_PATH/libqjson.so.0 $LIBSTAGE
-
 # Copy system libraries which may be absent on target platform
 install -m 644 /usr/lib/libprotobuf.so.7 $LIBSTAGE
 

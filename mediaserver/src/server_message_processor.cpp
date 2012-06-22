@@ -67,17 +67,23 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage event)
 	else if (event.eventType == Message_Type_ResourceChange)
     {
 		QnResourcePtr resource = event.resource;
-		// TODO: Fix it
-		/*
-        if (event.objectName != "Camera" && event.objectName != "Server")
-            return;
 
         QnVideoServerResourcePtr ownVideoServer = qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnVideoServerResource>();
-        if (event.objectName == "Server" && event.resourceGuid != serverGuid())
+
+        bool isServer = resource.dynamicCast<QnVideoServerResource>();
+        bool isCamera = resource.dynamicCast<QnVirtualCameraResource>();
+
+        if (!isServer && !isCamera)
             return;
-        else if (event.objectName == "Camera" && event.parentId != ownVideoServer->getId())
+
+        // If the resource is mediaServer then egnore if not this server
+        if (isServer && resource->getGuid() != serverGuid())
             return;
-*/
+
+        // If camera from other server - ignore 
+        if (isCamera && resource->getParentId() != ownVideoServer->getId())
+            return;
+
         QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
         QByteArray errorString;

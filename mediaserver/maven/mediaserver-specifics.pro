@@ -8,6 +8,5 @@ win32 {
 }
 
 mac {
-  LIBS += -L../../common/contrib/qjson/lib/mac
-  DEFINES += QN_EXPORT=	
+  DEFINES += QN_EXPORT= 
 }

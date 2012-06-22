@@ -35,7 +35,6 @@ win* {
 }
 
 INCLUDEPATH += ../../common/src
-INCLUDEPATH += ../../common/contrib/qjson/include
 INCLUDEPATH += ../../common/contrib/qt
 
 win32: RC_FILE = server.rc
@@ -79,7 +78,7 @@ CONFIG(debug, debug|release) {
   LIBS += -L$$FFMPEG-debug/bin -L$$FFMPEG-debug/lib -L$$PWD/../../common/bin/debug -lcommon
 
   win32 {
-    LIBS += -L../../common/contrib/qjson/lib/win32/debug -L$$EVETOOLS_DIR/lib/debug
+    LIBS += -L$$EVETOOLS_DIR/lib/debug
   }
 
   unix {
@@ -92,7 +91,7 @@ CONFIG(release, debug|release) {
   LIBS += -L$$FFMPEG-release/bin -L$$FFMPEG-release/lib -L$$PWD/../../common/bin/release -lcommon
 
   win32 {
-    LIBS += -L../../common/contrib/qjson/lib/win32/release -L$$EVETOOLS_DIR/lib/release
+    LIBS += -L$$EVETOOLS_DIR/lib/release
   }
 
   unix {
@@ -118,24 +117,18 @@ win32 {
 }
 
 mac {
-    LIBS += -L../../common/contrib/qjson/lib/mac -lprotobuf
+    LIBS += -lprotobuf
     DEFINES += QN_EXPORT=
 }
 
 unix:!mac {
     LIBS += -lprotobuf
-    HARDWARE_PLATFORM = $$system(uname -i)
-    contains( HARDWARE_PLATFORM, x86_64 ) {
-        LIBS += -L../../common/contrib/qjson/lib/linux-64 
-    } else {
-        LIBS += -L../../common/contrib/qjson/lib/linux-32
-    }
     QMAKE_CXXFLAGS += -I/usr/include
 }
 
 LIBS += -L$$EVETOOLS_DIR/lib
 
-LIBS += -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lqjson -lgsoap-base -lonvif
+LIBS += -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lgsoap-base -lonvif
 
 win32 {
   win32-msvc* {

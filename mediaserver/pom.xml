@@ -1,108 +1,94 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<!--
+    <!--
     Example pom for delegating maven goals to msbuild so it builds the "solution"
  
     A solution can be a group of projects, but here we only have one.
     It should also be possible to have one maven project per solution project, 
     and have a parent pom to deletegate the build.
   -->
-	<parent>
-		<artifactId>cpp</artifactId>
-		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>1.1</version>
-		<relativePath>../cpp</relativePath>
-	</parent>
+    <parent>
+        <artifactId>cpp</artifactId>
+        <groupId>com.networkoptix.hdwitness</groupId>
+        <version>1.1</version>
+        <relativePath>../cpp</relativePath>
+    </parent>
 
-	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>1.1</version>
-	<modelVersion>4.0.0</modelVersion>
-	<artifactId>mediaserver</artifactId>
-	<packaging>pom</packaging>
-	<name>HD Witness Media Server</name>	
+    <groupId>com.networkoptix.hdwitness</groupId>
+    <version>1.1</version>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>mediaserver</artifactId>
+    <packaging>pom</packaging>
+    <name>HD Witness Media Server</name>    
 
-	<properties>
-		<product.title>${mediaserver.name}</product.title>	
-		<!--QT libs used-->
-		<qtlib1>core</qtlib1>
-		<qtlib2>network</qtlib2>
-		<qtlib3>xml</qtlib3>
-		<qtlib4>gui</qtlib4>
-		<!--<qtlib5/>
-		<qtlib6/>
-		<qtlib7/>
-		<qtlib8/>
-		<qtlib9/>-->
-		<!--Global libs-->
-		<global.libs>-lcommon</global.libs>
-		<!--Specific os libs used-->
-		<windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lwinmm</windows.oslibs>
-		<linux.oslibs>-lz</linux.oslibs>
-		<mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
-		<!--Global defines-->
-		<global.defines/>
-		<!--Specific os defines-->
-		<windows.defines/>
-		<linux.defines/>
-		<mac.defines/>		
-	</properties>
+    <properties>
+        <product.title>${mediaserver.name}</product.title>  
+        <!--QT libs used-->
+        <qtlib1>core</qtlib1>
+        <qtlib2>network</qtlib2>
+        <qtlib3>xml</qtlib3>
+        <qtlib4>gui</qtlib4>
+        <!--<qtlib5/>
+        <qtlib6/>
+        <qtlib7/>
+        <qtlib8/>
+        <qtlib9/>-->
+        <!--Global libs-->
+        <global.libs>-lcommon</global.libs>
+        <!--Specific os libs used-->
+        <windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lwinmm</windows.oslibs>
+        <linux.oslibs>-lz</linux.oslibs>
+        <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
+        <!--Global defines-->
+        <global.defines/>
+        <!--Specific os defines-->
+        <windows.defines/>
+        <linux.defines/>
+        <mac.defines/>      
+    </properties>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.ffmpeg</groupId>
-			<artifactId>ffmpeg</artifactId>
-			<version>${ffmpeg.version}</version>
-			<type>zip</type>
-			<classifier>${platform}-${arch}</classifier>
-		</dependency>
-		<dependency>
-			<groupId>org</groupId>
-			<artifactId>onvif</artifactId>
-			<version>2.1.1-SNAPSHOT</version>
-			<type>zip</type>
-			<classifier>${platform}-${arch}</classifier>
-		</dependency>		
-		<dependency>
-			<groupId>org</groupId>
-			<artifactId>openssl</artifactId>
-			<version>${openssl.version}</version>
-			<type>zip</type>
-			<classifier>${platform}-${arch}</classifier>
-		</dependency>							
-		<dependency>
-			<groupId>com.google</groupId>
-			<artifactId>protobuf</artifactId>
-			<version>2.4.1</version>
-			<type>zip</type>
-			<classifier>${platform}-${arch}</classifier>
-		</dependency>							
-		<dependency>
-			<groupId>org</groupId>
-			<artifactId>qjson</artifactId>
-			<version>0.7.1</version>
-			<type>zip</type>
-			<classifier>${platform}-${arch}</classifier>
-		</dependency>
-		<dependency>
-			<groupId>com.nokia.qt</groupId>
-			<artifactId>qtcore</artifactId>
-			<version>4.7.4</version>
-			<type>zip</type>
-		</dependency>						
-		<dependency>
-			<groupId>com.nokia.qt</groupId>
-			<artifactId>qtsinglecoreapplication</artifactId>
-			<version>4.7.4</version>
-			<type>zip</type>
-		</dependency>
-		<dependency>
-			<groupId>com.nokia.qt</groupId>
-			<artifactId>qtservice</artifactId>
-			<version>4.7.4</version>
-			<type>zip</type>
-		</dependency>		
-	</dependencies>		
+    <dependencies>
+        <dependency>
+            <groupId>org.ffmpeg</groupId>
+            <artifactId>ffmpeg</artifactId>
+            <version>${ffmpeg.version}</version>
+            <type>zip</type>
+            <classifier>${platform}-${arch}</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org</groupId>
+            <artifactId>onvif</artifactId>
+            <version>2.1.1-SNAPSHOT</version>
+            <type>zip</type>
+            <classifier>${platform}-${arch}</classifier>
+        </dependency>                                 
+        <dependency>
+            <groupId>com.google</groupId>
+            <artifactId>protobuf</artifactId>
+            <version>2.4.1</version>
+            <type>zip</type>
+            <classifier>${platform}-${arch}</classifier>
+        </dependency>                           
+        <dependency>
+            <groupId>com.nokia.qt</groupId>
+            <artifactId>qtcore</artifactId>
+            <version>4.7.4</version>
+            <type>zip</type>
+        </dependency>                       
+        <dependency>
+            <groupId>com.nokia.qt</groupId>
+            <artifactId>qtsinglecoreapplication</artifactId>
+            <version>4.7.4</version>
+            <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>com.nokia.qt</groupId>
+            <artifactId>qtservice</artifactId>
+            <version>4.7.4</version>
+            <type>zip</type>
+        </dependency>       
+    </dependencies>     
 
-	<build>
+    <build>
 
-	</build>    
+    </build>    
 </project>
