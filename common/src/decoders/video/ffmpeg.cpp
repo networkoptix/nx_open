@@ -447,7 +447,7 @@ bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, CLVideoDe
                     av_picture_copy((AVPicture*) outFrame, (AVPicture*) (m_frame), m_context->pix_fmt, m_context->width, m_context->height);
                 }
 
-                outFrame->pkt_dts = m_frame->pkt_dts;
+                outFrame->pkt_dts = m_frame->pkt_dts != AV_NOPTS_VALUE ? m_frame->pkt_dts : m_frame->pkt_pts;
             }
         }
 

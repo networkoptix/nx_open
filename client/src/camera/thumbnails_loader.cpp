@@ -239,8 +239,8 @@ void QnThumbnailsLoader::updateProcessingLocked() {
         processingEnd = currentTime + defaultUpdateInterval;
 
     /* Adjust for the chunks near live that could not be loaded at the last request. */
-    if(m_processingStart < m_maxLoadedTime && m_maxLoadedTime < m_processingEnd) {
-        processingStart = qMin(processingStart, m_maxLoadedTime + m_timeStep);
+    if(m_processingStart < m_maxLoadedTime && m_maxLoadedTime < m_processingEnd && processingStart > m_maxLoadedTime) {
+        processingStart = m_maxLoadedTime + m_timeStep;
         m_processingEnd = m_maxLoadedTime;
     }
 
@@ -337,7 +337,7 @@ void QnThumbnailsLoader::process() {
     bool invalidated = false;
     foreach(QnAbstractArchiveDelegatePtr client, delegates) 
     {
-        client->setRange(period.startTimeMs * 1000, period.endTimeMs() * 1000, timeStep * 1000);
+        client->setRange(period.startTimeMs * 1000, (period.endTimeMs() + timeStep) * 1000, timeStep * 1000);
 
         QnCompressedVideoDataPtr frame = client->getNextData().dynamicCast<QnCompressedVideoData>();
         if (frame) {
@@ -424,6 +424,9 @@ void QnThumbnailsLoader::ensureScaleContextLocked(int lineSize, const QSize &sou
 }
 
 void QnThumbnailsLoader::generateThumbnail(const CLVideoDecoderOutput &outFrame, const QSize &boundingSize, qint64 timeStep, int generation) {
+    if(outFrame.pkt_dts == AV_NOPTS_VALUE)
+        return; /* Skip end-of-stream packet. */
+
     QSize scaleTargetSize;
     {
         QMutexLocker locker(&m_mutex);
