@@ -478,11 +478,6 @@ QnThumbnail QnThumbnailsLoader::generateThumbnail(const CLVideoDecoderOutput &ou
     qint64 actualTime = outFrame.pkt_dts / 1000;
 
     return QnThumbnail(pixmap, pixmap.size(), qRound(actualTime, timeStep), actualTime, timeStep, generation);
-
-    /*qint64 endTime = qRound(actualTime, timeStep);
-    qint64 startTime = (outFrame.flags & QnAbstractMediaData::MediaFlags_BOF) ? endTime : time + timeStep;
-    for(qint64 time = startTime; time <= endTime; time += timeStep)
-        emit m_helper->thumbnailLoaded(QnThumbnail(pixmap, pixmap.size(), time, actualTime, timeStep, generation));*/
 }
 
 qint64 QnThumbnailsLoader::processThumbnail(const QnThumbnail &thumbnail, qint64 startTime, qint64 endTime, bool ignorePeriod) {
