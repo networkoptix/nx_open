@@ -778,12 +778,12 @@ void QnTimeSlider::setRulerHeight(qreal rulerHeight) {
 }
 
 void QnTimeSlider::addThumbnail(const QnThumbnail &thumbnail) {
-    ThumbnailData data;
-    data.thumbnail = thumbnail;
-
-    m_thumbnailData[thumbnail.time()] = data;
-
-    qDebug() << "N" << thumbnail.time();
+    QMap<qint64, ThumbnailData>::iterator pos = m_thumbnailData.find(thumbnail.time());
+    if(pos == m_thumbnailData.end()) {
+        m_thumbnailData[thumbnail.time()] = ThumbnailData(thumbnail);
+    } else {
+        pos->thumbnail = thumbnail;
+    }
 }
 
 void QnTimeSlider::clearThumbnails() {
@@ -791,8 +791,6 @@ void QnTimeSlider::clearThumbnails() {
 }
 
 void QnTimeSlider::freezeThumbnails() {
-    qDebug() << "FREEZE";
-
     m_oldThumbnailData = m_thumbnailData.values();
     clearThumbnails();
 

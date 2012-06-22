@@ -4,7 +4,7 @@
 #include <QtCore/QScopedPointer>
 #include <QtCore/QMetaType>
 #include <QtCore/QMutex>
-#include <QtCore/QQueue>
+#include <QtCore/QStack>
 
 #include <utils/common/longrunnable.h>
 #include <core/resource/resource_fwd.h>
@@ -98,7 +98,7 @@ private:
     
     QHash<qint64, QnThumbnail> m_thumbnailByTime;
     qint64 m_maxLoadedTime;
-    QQueue<QnTimePeriod> m_processingQueue;
+    QStack<QnTimePeriod> m_processingStack;
     QnThumbnailsLoaderHelper *m_helper;
     int m_generation;
 };

@@ -28,6 +28,7 @@
 namespace {
     const qint64 defaultUpdateInterval = 30 * 1000; /* 30 seconds. */
 
+    const int maxStackSize = 32;
 }
 
 
@@ -197,7 +198,7 @@ void QnThumbnailsLoader::updateTargetSizeLocked(bool invalidate) {
 
 void QnThumbnailsLoader::invalidateThumbnailsLocked() {
     m_thumbnailByTime.clear();
-    m_processingQueue.clear();
+    m_processingStack.clear();
     m_maxLoadedTime = 0;
     m_processingStart = m_processingEnd = 0;
     m_generation++;
@@ -268,9 +269,12 @@ void QnThumbnailsLoader::updateProcessingLocked() {
 }
 
 void QnThumbnailsLoader::enqueueForProcessingLocked(qint64 startTime, qint64 endTime) {
-    m_processingQueue.enqueue(QnTimePeriod(startTime, endTime - startTime));
+    m_processingStack.push(QnTimePeriod(startTime, endTime - startTime));
 
-    if(m_processingQueue.size() == 1)
+    while(m_processingStack.size() > maxStackSize)
+        m_processingStack.pop();
+
+    if(m_processingStack.size() == 1)
         emit processingRequested();
 }
 
@@ -281,7 +285,7 @@ void QnThumbnailsLoader::run() {
     connect(this, SIGNAL(processingRequested()), m_helper, SLOT(process()), Qt::QueuedConnection);
     connect(m_helper, SIGNAL(thumbnailLoaded(const QnThumbnail &)), this, SLOT(addThumbnail(const QnThumbnail &)));
 
-    if(!m_processingQueue.empty())
+    if(!m_processingStack.empty())
         emit processingRequested();
 
     base_type::run();
@@ -300,10 +304,10 @@ void QnThumbnailsLoader::process() {
     {
         QMutexLocker locker(&m_mutex);
 
-        if(m_processingQueue.isEmpty())
+        if(m_processingStack.isEmpty())
             return;
 
-        period = m_processingQueue.dequeue();
+        period = m_processingStack.pop();
         boundingSize = m_boundingSize;
         timeStep = m_timeStep;
         generation = m_generation;
@@ -369,6 +373,9 @@ void QnThumbnailsLoader::process() {
         if(invalidated)
             break;
     }
+
+    /* Go on with processing. */
+    QMetaObject::invokeMethod(m_helper, "process", Qt::QueuedConnection); // TODO: use connections.
 }
 
 void QnThumbnailsLoader::addThumbnail(const QnThumbnail &thumbnail) {

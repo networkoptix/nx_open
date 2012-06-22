@@ -1272,7 +1272,16 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
         return;
     }
 
-    QString suggetion = tr("screenshot");
+    // TODO: move out, common code
+    QString timeString;
+    qint64 time = display->camDisplay()->getCurrentTime();
+    if(widget->resource()->flags() & QnResource::utc) {
+
+    } else {
+
+    }
+
+    QString suggetion = widget->resource()->getName() + QLatin1String("_") + display->camDisplay()->getCurrentTime();
 
     QSettings settings;
     settings.beginGroup(QLatin1String("screenshots"));
