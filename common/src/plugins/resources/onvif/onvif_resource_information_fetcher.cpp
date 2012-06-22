@@ -174,7 +174,10 @@ void OnvifResourceInformationFetcher::createResource(const QString& manufacturer
     resource->setDiscoveryAddr(discoveryIp);
     resource->setName(manufacturer + " - " + name);
     resource->setMAC(mac);
-    resource->setUrl("http://" + QUrl(deviceUrl).host() + "?uniq-id=" + uniqId);
+
+    if (!mac.size())
+        resource->setPhysicalId(uniqId);
+
     resource->setParam(QnPlOnvifResource::MEDIA_URL_PARAM_NAME, mediaUrl, QnDomainDatabase);
     resource->setParam(QnPlOnvifResource::DEVICE_URL_PARAM_NAME, deviceUrl, QnDomainDatabase);
 
