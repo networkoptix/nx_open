@@ -1276,12 +1276,12 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
     QString timeString;
     qint64 time = display->camDisplay()->getCurrentTime();
     if(widget->resource()->flags() & QnResource::utc) {
-
+        timeString = QDateTime::fromMSecsSinceEpoch(time).toString(QLatin1String("yyyy-MMM-dd_hh.mm.ss"));
     } else {
-
+        timeString = QTime().addMSecs(time).toString(QLatin1String("hh.mm.ss"));
     }
 
-    QString suggetion = widget->resource()->getName() + QLatin1String("_") + display->camDisplay()->getCurrentTime();
+    QString suggetion = widget->resource()->getName() + QLatin1String("_") + timeString; // TODO: remove non-filename chars
 
     QSettings settings;
     settings.beginGroup(QLatin1String("screenshots"));
