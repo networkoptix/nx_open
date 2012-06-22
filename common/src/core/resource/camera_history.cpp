@@ -36,7 +36,7 @@ QnCameraTimePeriodList QnCameraHistory::getOnlineTimePeriods() const
     for (QnCameraTimePeriodList::const_iterator itr = m_fullTimePeriods.constBegin(); itr != m_fullTimePeriods.constEnd(); ++itr)
     {
         QnResourcePtr resource = qnResPool->getResourceByGuid(itr->videoServerGuid);
-        if (!resource->isDisabled() && (resource->getStatus() == QnResource::Online || resource->getStatus() == QnResource::Recording))
+        if (resource && !resource->isDisabled() && (resource->getStatus() == QnResource::Online || resource->getStatus() == QnResource::Recording))
             result << *itr;        
     }
     return result;
