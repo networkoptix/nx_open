@@ -32,12 +32,12 @@ public:
 private:
 
     void findEndpoints(EndpointInfoHash& result) const;
-    const QStringList getAddrPrefixes(const QString& host) const;
-    const QString getAppropriateAddress(const wsdd__ProbeMatchesType* probeMatches, const QStringList& prefixes) const;
-    const QString getName(const wsdd__ProbeMatchesType* probeMatches) const;
-    const QString getManufacturer(const wsdd__ProbeMatchesType* probeMatches, const QString& name) const;
-    const QString getMac(const wsdd__ProbeMatchesType* probeMatches, const SOAP_ENV__Header* header) const;
-    const QString getEndpointAddress(const wsdd__ProbeMatchesType* probeMatches) const;
+    QStringList getAddrPrefixes(const QString& host) const;
+    QString getAppropriateAddress(const wsdd__ProbeMatchesType* probeMatches, const QStringList& prefixes) const;
+    QString getName(const wsdd__ProbeMatchesType* probeMatches) const;
+    QString getManufacturer(const wsdd__ProbeMatchesType* probeMatches, const QString& name) const;
+    QString getMac(const wsdd__ProbeMatchesType* probeMatches, const SOAP_ENV__Header* header) const;
+    QString getEndpointAddress(const wsdd__ProbeMatchesType* probeMatches) const;
     void fillWsddStructs(wsdd__ProbeType& probe, wsa__EndpointReferenceType& endpoint) const;
     void printProbeMatches(const wsdd__ProbeMatchesType* probeMatches, const SOAP_ENV__Header* header) const;
     void addEndpointToHash(EndpointInfoHash& hash, const wsdd__ProbeMatchesType* probeMatches,
