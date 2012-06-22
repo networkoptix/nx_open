@@ -778,12 +778,14 @@ void QnTimeSlider::setRulerHeight(qreal rulerHeight) {
 }
 
 void QnTimeSlider::addThumbnail(const QnThumbnail &thumbnail) {
-    ThumbnailData data;
-    data.thumbnail = thumbnail;
+    QMap<qint64, ThumbnailData>::iterator pos = m_thumbnailData.find(thumbnail.time());
+    if(pos == m_thumbnailData.end()) {
+        m_thumbnailData[thumbnail.time()] = ThumbnailData(thumbnail);
+    } else {
+        pos->thumbnail = thumbnail;
+    }
 
-    m_thumbnailData[thumbnail.time()] = data;
-
-    qDebug() << "N" << thumbnail.time();
+    qDebug() << "N" << QTime().addMSecs(thumbnail.time());
 }
 
 void QnTimeSlider::clearThumbnails() {
@@ -791,8 +793,6 @@ void QnTimeSlider::clearThumbnails() {
 }
 
 void QnTimeSlider::freezeThumbnails() {
-    qDebug() << "FREEZE";
-
     m_oldThumbnailData = m_thumbnailData.values();
     clearThumbnails();
 
@@ -1031,6 +1031,9 @@ void QnTimeSlider::updateThumbnailsPeriod() {
     if (!thumbnailsLoader())
         return;
 
+    if(m_thumbnailsUpdateTimer->isActive())
+        return;
+
     thumbnailsLoader()->setTimePeriod(m_windowStart, m_windowEnd);
 }
 
@@ -1088,6 +1091,7 @@ void QnTimeSlider::updateThumbnailsStepSize(bool instant) {
         m_lastThumbnailsUpdateTime = currentTime;
         thumbnailsLoader()->setBoundingSize(boundingSize);
         thumbnailsLoader()->setTimeStep(timeStep);
+        updateThumbnailsPeriod();
     }
 }
 

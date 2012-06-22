@@ -25,8 +25,6 @@ public:
 
     void deserialize(const QnResourceParameters& parameters);
 
-    virtual bool equalsTo(const QnResourcePtr other) const;
-
     virtual QString getUniqueId() const;
 
     virtual QHostAddress getHostAddress() const;

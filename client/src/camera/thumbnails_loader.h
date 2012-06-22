@@ -4,7 +4,7 @@
 #include <QtCore/QScopedPointer>
 #include <QtCore/QMetaType>
 #include <QtCore/QMutex>
-#include <QtCore/QQueue>
+#include <QtCore/QStack>
 
 #include <utils/common/longrunnable.h>
 #include <core/resource/resource_fwd.h>
@@ -61,6 +61,8 @@ protected:
 
     void updateTargetSizeLocked(bool invalidate);
     void invalidateThumbnailsLocked();
+    Q_SIGNAL void updateProcessingLater();
+    Q_SLOT void updateProcessing();
     void updateProcessingLocked();
 
     void enqueueForProcessingLocked(qint64 startTime, qint64 endTime);
@@ -76,6 +78,8 @@ private:
     bool processFrame(const CLVideoDecoderOutput &outFrame, const QSize &boundingSize);
 
     void setTimePeriodLocked(qint64 startTime, qint64 endTime);
+
+    bool isProcessingPeriodValid() const;
 
 private:
     friend class QnThumbnailsLoaderHelper;
@@ -98,7 +102,7 @@ private:
     
     QHash<qint64, QnThumbnail> m_thumbnailByTime;
     qint64 m_maxLoadedTime;
-    QQueue<QnTimePeriod> m_processingQueue;
+    QStack<QnTimePeriod> m_processingStack;
     QnThumbnailsLoaderHelper *m_helper;
     int m_generation;
 };

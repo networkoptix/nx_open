@@ -596,7 +596,12 @@ QnResourcePoolModel::Node *QnResourcePoolModel::expectedParent(Node *node) {
     if((node->resourceFlags() & QnResource::local_media) == QnResource::local_media)
         return m_localNode;
 
-    return this->node(resourcePool()->getResourceById(node->resource()->getParentId()));
+    QnResourcePtr parentResource = resourcePool()->getResourceById(node->resource()->getParentId());
+    if(!parentResource) {
+        return NULL;
+    } else {
+        return this->node(parentResource);
+    }
 }
 
 

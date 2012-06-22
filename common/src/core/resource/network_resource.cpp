@@ -53,17 +53,9 @@ void QnNetworkResource::deserialize(const QnResourceParameters& parameters)
 
 QString QnNetworkResource::getUniqueId() const
 {
-    return getMAC().toString();
+    return getPhysicalId();
 }
 
-bool QnNetworkResource::equalsTo(const QnResourcePtr other) const
-{
-    QnNetworkResourcePtr nr = other.dynamicCast<QnNetworkResource>();
-    if (!nr)
-        return false;
-
-    return (getHostAddress() == nr->getHostAddress() && getMAC() == nr->getMAC());
-}
 
 QHostAddress QnNetworkResource::getHostAddress() const
 {
