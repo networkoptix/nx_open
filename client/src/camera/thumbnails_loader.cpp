@@ -309,7 +309,7 @@ void QnThumbnailsLoader::process() {
         generation = m_generation;
     }
 
-    QnPhysicalCameraResourcePtr camera = qSharedPointerDynamicCast<QnPhysicalCameraResource>(m_resource);
+    QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(m_resource);
     if (camera) {
         QnNetworkResourceList cameras = QnCameraHistoryPool::instance()->getAllCamerasWithSameMac(camera, period);
         for (int i = 0; i < cameras.size(); ++i) 
