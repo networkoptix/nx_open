@@ -801,10 +801,14 @@ void QnWorkbenchNavigator::updateSpeedRange() {
 void QnWorkbenchNavigator::updateThumbnailsLoader() {
     QnResourcePtr resource;
 
-    if (m_centralWidget)
-        if(QnCachingTimePeriodLoader *loader = this->loader(m_centralWidget))
+    if (m_centralWidget) {
+        if(QnCachingTimePeriodLoader *loader = this->loader(m_centralWidget)) {
             if(!loader->periods(Qn::RecordingRole).isEmpty())
                 resource = m_centralWidget->resource();
+        } else if(!m_currentWidget->display()->isStillImage()) {
+            resource = m_centralWidget->resource();
+        }
+    }
 
     if(!resource) {
         m_timeSlider->setThumbnailsLoader(NULL);

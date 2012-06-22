@@ -86,8 +86,8 @@ Qn::ActionVisibility QnCheckFileSignatureActionCondition::check(const QnResource
         if(widget == NULL)
             continue;
 
-        bool isCamera = widget->resource()->flags() & QnResource::network;
-        if(isCamera)
+        bool isUnsupported = widget->resource()->flags() & (QnResource::network | QnResource::still_image);
+        if(isUnsupported)
             return Qn::InvisibleAction;
     }
     return Qn::EnabledAction;
