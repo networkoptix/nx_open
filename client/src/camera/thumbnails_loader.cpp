@@ -489,7 +489,7 @@ qint64 QnThumbnailsLoader::processThumbnail(const QnThumbnail &thumbnail, qint64
     if(ignorePeriod) {
         emit m_helper->thumbnailLoaded(thumbnail);
 
-        return thumbnail.time();
+        return thumbnail.time() + thumbnail.timeStep();
     } else {
         for(qint64 time = startTime; time <= endTime; time += thumbnail.timeStep())
             emit m_helper->thumbnailLoaded(QnThumbnail(thumbnail, time));
