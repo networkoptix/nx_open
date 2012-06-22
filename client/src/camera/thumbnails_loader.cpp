@@ -28,6 +28,9 @@
 namespace {
     const qint64 defaultUpdateInterval = 30 * 1000; /* 30 seconds. */
 
+    const int maxStackSize = 32;
+
+    const qint64 invalidProcessingTime = std::numeric_limits<qint64>::min() / 2;
 }
 
 
@@ -37,8 +40,8 @@ QnThumbnailsLoader::QnThumbnailsLoader(QnResourcePtr resource):
     m_timeStep(0),
     m_requestStart(0),
     m_requestEnd(0),
-    m_processingStart(0),
-    m_processingEnd(0),
+    m_processingStart(invalidProcessingTime),
+    m_processingEnd(invalidProcessingTime),
     m_scaleContext(NULL),
     m_scaleBuffer(NULL),
     m_boundingSize(128, 96), /* That's 4:3 aspect ratio. */
@@ -54,6 +57,8 @@ QnThumbnailsLoader::QnThumbnailsLoader(QnResourcePtr resource):
         qRegisterMetaType<QnThumbnail>();
         metaTypesInitialized = true;
     }
+
+    connect(this, SIGNAL(updateProcessingLater()), this, SLOT(updateProcessing()), Qt::QueuedConnection);
 
     start();
 }
@@ -159,7 +164,7 @@ void QnThumbnailsLoader::setTimePeriodLocked(qint64 startTime, qint64 endTime) {
     m_requestStart = startTime;
     m_requestEnd = endTime;
 
-    updateProcessingLocked();
+    emit updateProcessingLater(); /* We don't need to unlock here. */
 }
 
 QnTimePeriod QnThumbnailsLoader::timePeriod() const {
@@ -197,16 +202,21 @@ void QnThumbnailsLoader::updateTargetSizeLocked(bool invalidate) {
 
 void QnThumbnailsLoader::invalidateThumbnailsLocked() {
     m_thumbnailByTime.clear();
-    m_processingQueue.clear();
+    m_processingStack.clear();
     m_maxLoadedTime = 0;
-    m_processingStart = m_processingEnd = 0;
+    m_processingStart = m_processingEnd = invalidProcessingTime;
     m_generation++;
 
-    updateProcessingLocked();
-
     m_mutex.unlock();
+    emit updateProcessingLater();
     emit thumbnailsInvalidated();
     m_mutex.lock();
+}
+
+void QnThumbnailsLoader::updateProcessing() {
+    QMutexLocker locker(&m_mutex);
+
+    updateProcessingLocked();
 }
 
 void QnThumbnailsLoader::updateProcessingLocked() {
@@ -218,8 +228,10 @@ void QnThumbnailsLoader::updateProcessingLocked() {
     if(m_timeStep == 0 || m_boundingSize.isEmpty() || (m_requestStart == 0 && m_requestEnd == 0))
         return;
 
+    bool processingPeriodValid = m_processingStart >= 0 && m_processingEnd >= 0;
+
     /* Discard old loaded period if it cannot be used to extend then new one. */
-    if((m_requestStart > m_processingEnd + m_timeStep || m_requestEnd < m_processingStart - m_timeStep) && m_processingStart != 0 && m_processingEnd != 0) {
+    if(processingPeriodValid && (m_requestStart > m_processingEnd + m_timeStep || m_requestEnd < m_processingStart - m_timeStep)) {
         invalidateThumbnailsLocked();
         return;
     }
@@ -242,35 +254,39 @@ void QnThumbnailsLoader::updateProcessingLocked() {
         m_processingEnd = m_maxLoadedTime;
     }
 
-    /* Enqueue ranges that are not loaded yet. */
-    qint64 start, end;
+    if(processingPeriodValid) {
+        /* Enqueue ranges that are not loaded yet. */
+        qint64 start, end;
 
-    /* Try 1st option. */
-    start = processingStart;
-    end = qMin(m_processingStart - m_timeStep, processingEnd);
-    if(start <= end)
-        enqueueForProcessingLocked(start, end);
+        /* Try 1st option. */
+        start = processingStart;
+        end = qMin(m_processingStart - m_timeStep, processingEnd);
+        if(start <= end)
+            enqueueForProcessingLocked(start, end);
 
-    /* Try 2nd option. */
-    start = qMax(m_processingEnd + m_timeStep, processingStart);
-    end = processingEnd;
-    if(start <= end)
-        enqueueForProcessingLocked(start, end);
+        /* Try 2nd option. */
+        start = qMax(m_processingEnd + m_timeStep, processingStart);
+        end = processingEnd;
+        if(start <= end)
+            enqueueForProcessingLocked(start, end);
 
-    /* Update loaded period accordingly. */
-    if(m_processingStart == 0 && m_processingEnd == 0) {
-        m_processingStart = processingStart;
-        m_processingEnd = processingEnd;
-    } else {
         m_processingStart = qMin(m_processingStart, processingStart);
         m_processingEnd = qMax(m_processingEnd, processingEnd);
+    } else {
+        enqueueForProcessingLocked(processingStart, processingEnd);
+
+        m_processingStart = processingStart;
+        m_processingEnd = processingEnd;
     }
 }
 
 void QnThumbnailsLoader::enqueueForProcessingLocked(qint64 startTime, qint64 endTime) {
-    m_processingQueue.enqueue(QnTimePeriod(startTime, endTime - startTime));
+    m_processingStack.push(QnTimePeriod(startTime, endTime - startTime));
 
-    if(m_processingQueue.size() == 1)
+    while(m_processingStack.size() > maxStackSize)
+        m_processingStack.pop();
+
+    if(m_processingStack.size() == 1)
         emit processingRequested();
 }
 
@@ -281,7 +297,7 @@ void QnThumbnailsLoader::run() {
     connect(this, SIGNAL(processingRequested()), m_helper, SLOT(process()), Qt::QueuedConnection);
     connect(m_helper, SIGNAL(thumbnailLoaded(const QnThumbnail &)), this, SLOT(addThumbnail(const QnThumbnail &)));
 
-    if(!m_processingQueue.empty())
+    if(!m_processingStack.empty())
         emit processingRequested();
 
     base_type::run();
@@ -300,10 +316,10 @@ void QnThumbnailsLoader::process() {
     {
         QMutexLocker locker(&m_mutex);
 
-        if(m_processingQueue.isEmpty())
+        if(m_processingStack.isEmpty())
             return;
 
-        period = m_processingQueue.dequeue();
+        period = m_processingStack.pop();
         boundingSize = m_boundingSize;
         timeStep = m_timeStep;
         generation = m_generation;
@@ -369,6 +385,9 @@ void QnThumbnailsLoader::process() {
         if(invalidated)
             break;
     }
+
+    /* Go on with processing. */
+    QMetaObject::invokeMethod(m_helper, "process", Qt::QueuedConnection); // TODO: use connections.
 }
 
 void QnThumbnailsLoader::addThumbnail(const QnThumbnail &thumbnail) {

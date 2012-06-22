@@ -211,6 +211,7 @@ private:
 
     struct ThumbnailData {
         ThumbnailData(): opacity(0.0), hiding(false) {}
+        ThumbnailData(const QnThumbnail &thumbnail): thumbnail(thumbnail), opacity(0.0), hiding(false) {}
 
         QnThumbnail thumbnail;
         qreal pos;
