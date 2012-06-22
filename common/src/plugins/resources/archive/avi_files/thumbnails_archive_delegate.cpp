@@ -79,7 +79,8 @@ QnAbstractMediaDataPtr QnThumbnailsArchiveDelegate::getNextData()
     }
     while (result && result->dataType != QnAbstractMediaData::VIDEO && result->dataType != QnAbstractMediaData::EMPTY_DATA);
 
-    m_currentPos += m_frameStep;
+    if (!delegateForMediaStep)
+        m_currentPos += m_frameStep;
 
     if (!result || result->dataType == QnAbstractMediaData::EMPTY_DATA)
         m_currentPos = DATETIME_NOW;

@@ -40,6 +40,7 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate():
     m_rtpDataBuffer = new quint8[MAX_RTP_BUFFER_SIZE];
     m_flags |= Flag_SlowSource;
     m_flags |= Flag_CanProcessNegativeSpeed;
+    m_flags |= Flag_CanProcessMediaStep;
 }
 
 void QnRtspClientArchiveDelegate::setProxyAddr(const QString& addr, int port)

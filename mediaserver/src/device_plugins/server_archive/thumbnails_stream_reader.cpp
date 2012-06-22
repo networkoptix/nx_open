@@ -55,6 +55,8 @@ void QnThumbnailsStreamReader::run()
 
     beforeRun();
 
+    m_delegate->open(getResource());
+
     while(!needToStop())
     {
         pauseDelay(); // pause if needed;
@@ -100,8 +102,10 @@ void QnThumbnailsStreamReader::run()
                 continue; // need key data but got not key data
         }
 
-        if(data)
+        if(data) {
             data->dataProvider = this;
+            data->opaque = m_cseq;
+        }
 
         if (videoData)
             m_stat[videoData->channelNumber].onData(videoData->data.size());
