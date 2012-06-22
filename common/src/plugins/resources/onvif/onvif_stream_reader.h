@@ -36,7 +36,6 @@ private:
     QStringList getRTPurls() const;
     void processTriggerData(const quint8* payload, int len);
 
-    void fillMotionInfo(const QRect& rect);
     bool isGotFrame(QnCompressedVideoDataPtr videoData);
 
     const QString updateCameraAndFetchStreamUrl() const;

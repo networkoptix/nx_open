@@ -142,11 +142,13 @@ QString QnPlOnvifResource::manufacture() const
 
 bool QnPlOnvifResource::hasDualStreaming() const
 {
+    QMutexLocker lock(&m_mutex);
     return m_hasDual;
 }
 
 QnPlOnvifResource::CODECS QnPlOnvifResource::getCodec() const
 {
+    QMutexLocker lock(&m_mutex);
     return m_codec;
 }
 
@@ -833,6 +835,19 @@ bool QnPlOnvifResource::isSoapAuthorized() const
 
     return true;
 }
+
+QString QnPlOnvifResource::getMediaUrl() const 
+{ 
+    QMutexLocker lock(&m_mutex);
+    return m_mediaUrl; 
+}
+
+void QnPlOnvifResource::setMediaUrl(const QString& src) 
+{
+    QMutexLocker lock(&m_mutex);
+    m_mediaUrl = src; 
+}
+
 
 void QnPlOnvifResource::setOnvifUrls()
 {

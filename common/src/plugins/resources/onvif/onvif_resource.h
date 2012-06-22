@@ -63,8 +63,8 @@ public:
     bool isSoapAuthorized() const;
 
 
-    QString getMediaUrl() const { return m_mediaUrl; }
-    void setMediaUrl(const QString& src) { m_mediaUrl = src; }
+    QString getMediaUrl() const;
+    void setMediaUrl(const QString& src);
 
     CODECS getCodec() const;
 
