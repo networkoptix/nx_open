@@ -26,7 +26,7 @@
 #include "thumbnails_loader_helper.h"
 
 namespace {
-    const qint64 defaultUpdateInterval = 60 * 1000; /* One minute. */
+    const qint64 defaultUpdateInterval = 30 * 1000; /* 30 seconds. */
 
 }
 

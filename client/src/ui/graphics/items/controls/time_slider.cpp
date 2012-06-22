@@ -620,7 +620,7 @@ void QnTimeSlider::setThumbnailsLoader(QnThumbnailsLoader *loader) {
     }
 
     updateThumbnailsPeriod();
-    updateThumbnailsStepSize();
+    updateThumbnailsStepSize(true);
 }
 
 QPointF QnTimeSlider::positionFromValue(qint64 logicalValue, bool bound) const {
@@ -774,7 +774,7 @@ void QnTimeSlider::setRulerHeight(qreal rulerHeight) {
     m_rulerHeight = rulerHeight;
 
     updateGeometry();
-    updateThumbnailsStepSize();
+    updateThumbnailsStepSize(false);
 }
 
 void QnTimeSlider::addThumbnail(const QnThumbnail &thumbnail) {
@@ -872,7 +872,7 @@ void QnTimeSlider::updateMSecsPerPixel() {
 
     m_msecsPerPixel = msecsPerPixel;
 
-    updateThumbnailsStepSize();
+    updateThumbnailsStepSize(false);
     updateStepAnimationTargets();
     updateAggregationValue();
 }
@@ -1040,10 +1040,10 @@ void QnTimeSlider::updateThumbnailsStepSizeLater() {
 
 void QnTimeSlider::updateThumbnailsStepSizeTimer() {
     m_thumbnailsUpdateTimer->stop();
-    updateThumbnailsStepSize();
+    updateThumbnailsStepSize(true);
 }
 
-void QnTimeSlider::updateThumbnailsStepSize() {
+void QnTimeSlider::updateThumbnailsStepSize(bool instant) {
     if (!thumbnailsLoader())
         return; /* Nothing to update. */
 
@@ -1082,7 +1082,7 @@ void QnTimeSlider::updateThumbnailsStepSize() {
     /* If animation is running, we want to wait until it's finished. 
      * We also don't want to update thumbnails too often. */
     qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
-    if(isAnimatingWindow() || currentTime - m_lastThumbnailsUpdateTime < 1000) {
+    if(!instant || isAnimatingWindow() || currentTime - m_lastThumbnailsUpdateTime < 1000) {
         updateThumbnailsStepSizeLater();
     } else {
         m_lastThumbnailsUpdateTime = currentTime;
@@ -1684,7 +1684,7 @@ void QnTimeSlider::resizeEvent(QGraphicsSceneResizeEvent *event) {
     updateMSecsPerPixel();
     updateLineCommentPixmaps();
     updateMinimalWindow();
-    updateThumbnailsStepSize();
+    updateThumbnailsStepSize(false);
 }
 
 void QnTimeSlider::kineticMove(const QVariant &degrees) {
