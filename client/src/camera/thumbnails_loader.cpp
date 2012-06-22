@@ -328,6 +328,8 @@ void QnThumbnailsLoader::process() {
         generation = m_generation;
     }
 
+    qDebug() << "[" << period.startTimeMs << "," << period.endTimeMs() + timeStep << ")";
+
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(m_resource);
     if (camera) {
         QnNetworkResourceList cameras = QnCameraHistoryPool::instance()->getAllCamerasWithSameMac(camera, period);
@@ -392,7 +394,7 @@ void QnThumbnailsLoader::process() {
                 }
 
                 /* Fill remaining time values with thumbnails. */
-                processThumbnail(thumbnail, time + timeStep, period.endTimeMs(), false);
+                processThumbnail(thumbnail, time, period.endTimeMs(), false);
             }
         }
         client->close();
@@ -492,6 +494,6 @@ qint64 QnThumbnailsLoader::processThumbnail(const QnThumbnail &thumbnail, qint64
         for(qint64 time = startTime; time <= endTime; time += thumbnail.timeStep())
             emit m_helper->thumbnailLoaded(QnThumbnail(thumbnail, time));
 
-        return qMax(endTime, startTime);
+        return qMin(startTime, endTime + thumbnail.timeStep());
     }
 }
