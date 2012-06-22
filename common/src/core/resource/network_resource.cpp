@@ -90,15 +90,20 @@ void  QnNetworkResource::setMAC(const QnMacAddress &mac)
 {
     QMutexLocker mutexLocker(&m_mutex);
     m_macAddress = mac;
+
+    if (getPhysicalId().size()==0)
+        setPhysicalId(mac.toString());
 }
 
 QString QnNetworkResource::getPhysicalId() const
 {
+    QMutexLocker mutexLocker(&m_mutex);
     return m_physicalId;
 }
 
 void QnNetworkResource::setPhysicalId(const QString &physicalId)
 {
+    QMutexLocker mutexLocker(&m_mutex);
     m_physicalId = physicalId;
 }
 
