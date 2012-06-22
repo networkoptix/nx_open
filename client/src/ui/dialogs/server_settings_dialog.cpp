@@ -83,11 +83,12 @@ void QnServerSettingsDialog::reject() {
     base_type::reject();
 }
 
-int QnServerSettingsDialog::addTableRow(const QString &url, int spaceLimitGb) {
+int QnServerSettingsDialog::addTableRow(int id, const QString &url, int spaceLimitGb) {
     int row = ui->storagesTable->rowCount();
     ui->storagesTable->insertRow(row);
 
     QTableWidgetItem *urlItem = new QTableWidgetItem(url);
+    urlItem->setData(Qt::UserRole, id);
     QTableWidgetItem *spaceItem = new QTableWidgetItem();
     spaceItem->setData(Qt::DisplayRole, spaceLimitGb);
 
@@ -104,7 +105,7 @@ void QnServerSettingsDialog::setTableStorages(const QnAbstractStorageResourceLis
     ui->storagesTable->setColumnCount(2);
 
     foreach (const QnAbstractStorageResourcePtr &storage, storages)
-        addTableRow(storage->getUrl(), storage->getSpaceLimit() / BILLION);
+        addTableRow(storage->getId().toInt(), storage->getUrl(), storage->getSpaceLimit() / BILLION);
 }
 
 QnAbstractStorageResourceList QnServerSettingsDialog::tableStorages() const {
@@ -112,10 +113,13 @@ QnAbstractStorageResourceList QnServerSettingsDialog::tableStorages() const {
 
     int rowCount = ui->storagesTable->rowCount();
     for (int row = 0; row < rowCount; ++row) {
+        int id = ui->storagesTable->item(row, 0)->data(Qt::UserRole).toInt();
         QString path = ui->storagesTable->item(row, 0)->text();
         int spaceLimit = ui->storagesTable->item(row, 1)->data(Qt::DisplayRole).toInt();
 
         QnAbstractStorageResourcePtr storage(new QnAbstractStorageResource());
+        if (id)
+            storage->setId(id);
         storage->setName(QUuid::createUuid().toString());
         storage->setParentId(m_server->getId());
         storage->setUrl(path.trimmed());
@@ -224,7 +228,7 @@ void QnServerSettingsDialog::updateSpaceLimitCell(int row, bool force) {
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnServerSettingsDialog::at_addStorageButton_clicked() {
-    addTableRow(QString(), defaultSpaceLimitGb);
+    addTableRow(0, QString(), defaultSpaceLimitGb);
 }
 
 void QnServerSettingsDialog::at_removeStorageButton_clicked() {
