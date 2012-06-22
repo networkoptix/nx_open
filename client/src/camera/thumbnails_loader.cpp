@@ -24,6 +24,7 @@
 #include "utils/media/frame_info.h"
 
 #include "thumbnails_loader_helper.h"
+#include <limits>
 
 namespace {
     const qint64 defaultUpdateInterval = 30 * 1000; /* 30 seconds. */
