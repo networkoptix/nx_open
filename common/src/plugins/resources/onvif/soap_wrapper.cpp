@@ -108,9 +108,15 @@ const char* SoapWrapper<T>::getPassword()
 }
 
 template <class T>
-QString SoapWrapper<T>::getLastError()
+const QString SoapWrapper<T>::getLastError()
 {
     return SoapErrorHelper::fetchDescription(m_soapProxy->soap_fault());
+}
+
+template <class T>
+const QString SoapWrapper<T>::getEndpointUrl()
+{
+    return m_endpoint;
 }
 
 template <class T>
@@ -307,11 +313,13 @@ int MediaSoapWrapper::getStreamUri(StreamUriReq& request, StreamUriResp& respons
 template soap* SoapWrapper<DeviceBindingProxy>::getSoap();
 template const char* SoapWrapper<DeviceBindingProxy>::getLogin();
 template const char* SoapWrapper<DeviceBindingProxy>::getPassword();
-template QString SoapWrapper<DeviceBindingProxy>::getLastError();
+template const QString SoapWrapper<DeviceBindingProxy>::getLastError();
+template const QString SoapWrapper<DeviceBindingProxy>::getEndpointUrl();
 template bool SoapWrapper<DeviceBindingProxy>::isNotAuthenticated();
 
 template soap* SoapWrapper<MediaBindingProxy>::getSoap();
 template const char* SoapWrapper<MediaBindingProxy>::getLogin();
 template const char* SoapWrapper<MediaBindingProxy>::getPassword();
-template QString SoapWrapper<MediaBindingProxy>::getLastError();
+template const QString SoapWrapper<MediaBindingProxy>::getLastError();
+template const QString SoapWrapper<MediaBindingProxy>::getEndpointUrl();
 template bool SoapWrapper<MediaBindingProxy>::isNotAuthenticated();

@@ -45,6 +45,8 @@ class _onvifMedia__GetProfile;
 class _onvifMedia__GetProfileResponse;
 class _onvifMedia__GetStreamUri;
 class _onvifMedia__GetStreamUriResponse;
+class _onvifMedia__AddVideoSourceConfiguration;
+class _onvifMedia__AddVideoSourceConfigurationResponse;
 
 typedef _onvifMedia__GetVideoEncoderConfigurationOptions VideoOptionsReq;
 typedef _onvifMedia__GetVideoEncoderConfigurationOptionsResponse VideoOptionsResp;
@@ -91,7 +93,8 @@ public:
     soap* getSoap();
     const char* getLogin();
     const char* getPassword();
-    QString getLastError();
+    const QString getLastError();
+    const QString getEndpointUrl();
     bool isNotAuthenticated();
 
 private:

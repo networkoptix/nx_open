@@ -11,7 +11,6 @@
 #include "core/datapacket/mediadatapacket.h"
 #include "soap_wrapper.h"
 
-struct VideoEncoders;
 
 //first = width, second = height
 typedef QPair<int, int> ResolutionPair;
@@ -59,7 +58,6 @@ public:
     ResolutionPair getPrimaryResolution() const;
     ResolutionPair getSecondaryResolution() const;
     ResolutionPair getMaxResolution() const;
-    bool isVideoOptionsNotSet() const { return m_videoOptionsNotSet; }
     bool isSoapAuthorized() const;
 
 
@@ -80,22 +78,24 @@ private:
     QString getDeviceUrl() const { return m_deviceUrl; }
     void setDeviceUrl(const QString& src) { m_deviceUrl = src; }
 
-    void fetchAndSetDeviceInformation();
-    void fetchAndSetVideoEncoderOptions();
+    bool fetchAndSetDeviceInformation();
+    bool fetchAndSetResourceOptions();
+    void fetchAndSetPrimarySecondaryResolution();
+    bool fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper);
+    bool fetchAndSetDualStreaming(MediaSoapWrapper& soapWrapper);
+
     void setVideoEncoderOptions(const VideoOptionsResp& response);
-    bool setVideoEncoderOptionsH264(const VideoOptionsResp& response);
-    bool setVideoEncoderOptionsJpeg(const VideoOptionsResp& response);
-    void analyzeVideoEncoders(VideoEncoders& encoders, bool setOptions);
-    int countAppropriateProfiles(const _onvifMedia__GetProfilesResponse& response, VideoEncoders& encoders);
-    void setVideoSource(const VideoSrcConfigsResp& response, VideoEncoders& encoders) const;
+    void setVideoEncoderOptionsH264(const VideoOptionsResp& response);
+    void setVideoEncoderOptionsJpeg(const VideoOptionsResp& response);
+    void setMinMaxQuality(int min, int max);
     void setOnvifUrls();
+
     void save();
-	void setMinMaxQuality(int min, int max);
+	
 	int round(float value);
     ResolutionPair getNearestResolutionForSecondary(const ResolutionPair& resolution, float aspectRatio) const;
     ResolutionPair getNearestResolution(const ResolutionPair& resolution, float aspectRatio, double maxResolutionSquare) const;
     float getResolutionAspectRatio(const ResolutionPair& resolution) const;
-    void findSetPrimarySecondaryResolution();
 private:
     static const char* ONVIF_PROTOCOL_PREFIX;
     static const char* ONVIF_URL_SUFFIX;
@@ -110,7 +110,6 @@ private:
     int m_minQuality;
     int m_maxQuality;
     bool m_hasDual;
-    bool m_videoOptionsNotSet;
     QString m_mediaUrl;
     QString m_deviceUrl;
     bool m_reinitDeviceInfo;
