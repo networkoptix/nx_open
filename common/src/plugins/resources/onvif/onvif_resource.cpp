@@ -382,6 +382,8 @@ void QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
         }
     }
 
+    updateResourceCapabilities();
+
     //Getting video sources
     {
         VideoSrcConfigsReq request;
