@@ -42,8 +42,8 @@ public:
     void setMacAddress(const QString& macAddress);
 
     QnCameraTimePeriodList getTimePeriods() const;
-    QnVideoServerResourcePtr getVideoServerOnTime(qint64 timestamp, bool searchForward, QnTimePeriod& currentPeriod);
-    QnNetworkResourcePtr getCameraOnTime(qint64 timestamp, bool searchForward);
+    QnVideoServerResourcePtr getVideoServerOnTime(qint64 timestamp, bool searchForward, QnTimePeriod& currentPeriod, bool gotOfflineCameras);
+    QnNetworkResourcePtr getCameraOnTime(qint64 timestamp, bool searchForward, bool gotOfflineCameras);
     QnVideoServerResourcePtr getNextVideoServerOnTime(qint64 timestamp, bool searchForward, QnTimePeriod& currentPeriod);
     QnNetworkResourceList getAllCamerasWithSameMac(const QnTimePeriod& timePeriod);
     QnNetworkResourceList getAllCamerasWithSameMac();
@@ -78,8 +78,8 @@ public:
     void addCameraHistory(QnCameraHistoryPtr history);
     void addCameraHistoryItem(const QnCameraHistoryItem& historyItem);
 
-    QnNetworkResourcePtr getCurrentCamera(const QnNetworkResourcePtr &resource);
-    QnResourcePtr getCurrentCamera(const QnResourcePtr &resource);
+    //QnNetworkResourcePtr getCurrentCamera(const QnNetworkResourcePtr &resource);
+    //QnResourcePtr getCurrentCamera(const QnResourcePtr &resource);
 
     QnNetworkResourceList getAllCamerasWithSameMac(const QnNetworkResourcePtr &camera, const QnTimePeriod& timePeriod);
     qint64 getMinTime(QnNetworkResourcePtr camera);
