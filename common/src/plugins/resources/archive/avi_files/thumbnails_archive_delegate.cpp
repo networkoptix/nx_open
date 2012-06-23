@@ -84,10 +84,12 @@ QnAbstractMediaDataPtr QnThumbnailsArchiveDelegate::getNextData()
     }
     while (result && result->dataType != QnAbstractMediaData::VIDEO && result->dataType != QnAbstractMediaData::EMPTY_DATA);
 
-    if (result && holeDetected)
-        result->flags |= QnAbstractMediaData::MediaFlags_BOF;
-    else
-        result->flags &= ~QnAbstractMediaData::MediaFlags_BOF;
+    if (result) {
+        if (holeDetected)
+            result->flags |= QnAbstractMediaData::MediaFlags_BOF;
+        else
+            result->flags &= ~QnAbstractMediaData::MediaFlags_BOF;
+    }
 
     if (!delegateForMediaStep)
         m_currentPos += m_frameStep;
