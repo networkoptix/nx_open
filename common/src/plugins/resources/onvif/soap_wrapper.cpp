@@ -336,6 +336,30 @@ int MediaSoapWrapper::setAudioEncoderConfiguration(SetAudioConfigReq& request, S
     return m_soapProxy->SetAudioEncoderConfiguration(m_endpoint, NULL, &request, &response);
 }
 
+int MediaSoapWrapper::getAudioSourceConfigurations(AudioSrcConfigsReq& request, AudioSrcConfigsResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->GetAudioSourceConfigurations(m_endpoint, NULL, &request, &response);
+}
+
+int MediaSoapWrapper::setAudioSourceConfiguration(SetAudioSrcConfigReq& request, SetAudioSrcConfigResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->SetAudioSourceConfiguration(m_endpoint, NULL, &request, &response);
+}
+
+int MediaSoapWrapper::addAudioSourceConfiguration(AddAudioSrcConfigReq& request, AddAudioSrcConfigResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->AddAudioSourceConfiguration(m_endpoint, NULL, &request, &response);
+}
+
+int MediaSoapWrapper::getVideoSourceConfigurationOptions(VideoSrcOptionsReq& request, VideoSrcOptionsResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->GetVideoSourceConfigurationOptions(m_endpoint, NULL, &request, &response);
+}
+
 //
 // Explicit instantiating
 //

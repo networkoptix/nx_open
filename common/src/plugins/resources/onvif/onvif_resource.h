@@ -13,12 +13,30 @@
 
 
 class onvifXsd__AudioEncoderConfigurationOption;
+class onvifXsd__VideoSourceConfigurationOptions;
 typedef onvifXsd__AudioEncoderConfigurationOption AudioOptions;
+typedef onvifXsd__VideoSourceConfigurationOptions VideoSrcOptions;
 
 //first = width, second = height
 typedef QPair<int, int> ResolutionPair;
 const ResolutionPair EMPTY_RESOLUTION_PAIR(0, 0);
 const ResolutionPair SECONDARY_STREAM_DEFAULT_RESOLUTION(320, 240);
+
+
+struct CameraPhysicalWindowSize
+{
+    int x;
+    int y;
+    int width;
+    int height;
+
+    CameraPhysicalWindowSize(): x(0), y(0), width(0), height(0) {}
+
+    bool isValid()
+    {
+        return x >= 0 && y >=0 && width > 0 && height > 0;
+    }
+};
 
 class QnPlOnvifResource : public QnPhysicalCameraResource
 {
@@ -73,6 +91,7 @@ public:
     ResolutionPair getSecondaryResolution() const;
     ResolutionPair getMaxResolution() const;
     bool isSoapAuthorized() const;
+    const CameraPhysicalWindowSize getPhysicalWindowSize() const;
 
 
     QString getMediaUrl() const;
@@ -98,12 +117,14 @@ private:
     void fetchAndSetPrimarySecondaryResolution();
     bool fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetAudioEncoderOptions(MediaSoapWrapper& soapWrapper);
+    bool fetchAndSetVideoSourceOptions(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetDualStreaming(MediaSoapWrapper& soapWrapper);
 
     void setVideoEncoderOptions(const VideoOptionsResp& response);
     void setVideoEncoderOptionsH264(const VideoOptionsResp& response);
     void setVideoEncoderOptionsJpeg(const VideoOptionsResp& response);
     void setAudioEncoderOptions(const AudioOptions& options);
+    void setVideoSourceOptions(const VideoSrcOptions& options);
     void setMinMaxQuality(int min, int max);
     void setOnvifUrls();
 
@@ -137,6 +158,7 @@ private:
     ResolutionPair m_secondaryResolution;
     int m_audioBitrate;
     int m_audioSamplerate;
+    CameraPhysicalWindowSize m_physicalWindowSize;
 
 };
 
