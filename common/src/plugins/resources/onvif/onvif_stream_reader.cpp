@@ -477,12 +477,15 @@ VideoSource* QnOnvifStreamReader::fetchUpdateVideoSource(VideoSrcConfigsResp& re
     const char* name = isPrimary? NETOPTIX_PRIMARY_NAME: NETOPTIX_SECONDARY_NAME;
     const char* filteredName = isPrimary? NETOPTIX_SECONDARY_NAME: NETOPTIX_PRIMARY_NAME;
 
-    while (it != response.Configurations.end()) {
-        if (!(*it) || !(*it)->Bounds || (*it)->Name == filteredName) {
+    for (;it != response.Configurations.end(); ++it) 
+    {
+        if (!(*it) || !(*it)->Bounds || (*it)->Name == filteredName) 
+        {
             continue;
         }
 
-        if ((*it)->Name == name) {
+        if ((*it)->Name == name) 
+        {
             return *it;
         }
 
@@ -491,8 +494,6 @@ VideoSource* QnOnvifStreamReader::fetchUpdateVideoSource(VideoSrcConfigsResp& re
             square = curSquare;
             result = *it;
         }
-
-        ++it;
     }
 
     return result;
