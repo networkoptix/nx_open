@@ -49,6 +49,8 @@ public:
 
     void setAdditionalAttribute(const QByteArray& name, const QByteArray& value);
     virtual void setRange(qint64 startTime, qint64 endTime, qint64 frameStep) override;
+
+    void setMultiserverAllowed(bool value);
 private:
     QnAbstractDataPacketPtr processFFmpegRtpPayload(const quint8* data, int dataSize);
     void processMetadata(const quint8* data, int dataSize);
@@ -94,6 +96,7 @@ private:
     static QString m_proxyAddr;
     static int m_proxyPort;
     qint64 m_forcedEndTime;
+    bool m_isMultiserverAllowed;
 };
 
 typedef QSharedPointer<QnRtspClientArchiveDelegate> QnRtspClientArchiveDelegatePtr;

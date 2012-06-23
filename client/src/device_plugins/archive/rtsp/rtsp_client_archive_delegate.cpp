@@ -35,7 +35,8 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate():
     m_sendedCSec(0),
     m_globalMinArchiveTime(AV_NOPTS_VALUE),
     m_lastMinTimeTime(0),
-    m_forcedEndTime(AV_NOPTS_VALUE)
+    m_forcedEndTime(AV_NOPTS_VALUE),
+    m_isMultiserverAllowed(true)
 {
     m_rtpDataBuffer = new quint8[MAX_RTP_BUFFER_SIZE];
     m_flags |= Flag_SlowSource;
@@ -104,7 +105,7 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(QnResourcePtr re
     QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(physicalId);
     if (!history)
         return 0;
-    QnCameraTimePeriodList videoServerList = history->getTimePeriods();
+    QnCameraTimePeriodList videoServerList = history->getOnlineTimePeriods();
     QList<QnVideoServerResourcePtr> checkServers;
     bool firstServer = true;
     for (int i = 0; i < videoServerList.size(); ++i)
@@ -191,7 +192,8 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
     if (m_opened)
         return true;
 
-    resource = getResourceOnTime(resource, m_position != DATETIME_NOW ? m_position/1000 : m_position);
+    if (m_isMultiserverAllowed)
+        resource = getResourceOnTime(resource, m_position != DATETIME_NOW ? m_position/1000 : m_position);
 
     m_closing = false;
     m_resource = resource;
@@ -281,7 +283,7 @@ void QnRtspClientArchiveDelegate::reopen()
 QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
 {
     QnAbstractMediaDataPtr result = getNextDataInternal();
-    if (m_serverTimePeriod.isNull())
+    if (m_serverTimePeriod.isNull() || !m_isMultiserverAllowed)
         return result;
     
     // Check if archive moved to other video server
@@ -460,17 +462,19 @@ qint64 QnRtspClientArchiveDelegate::seek(qint64 time, bool findIFrame)
 
     //deleteContexts(); // context is going to create again on first data after SEEK, so ignore rest of data before seek
     m_lastSeekTime = m_position = time;
-    
-    QnResourcePtr newResource = getResourceOnTime(m_resource, m_position/1000);
-    if (newResource)
-    {
-        if (newResource != m_resource)
-            close();
-        m_resource = newResource;
+    QnResourcePtr newResource;
+    if (m_isMultiserverAllowed) {
+        newResource = getResourceOnTime(m_resource, m_position/1000);
+        if (newResource)
+        {
+            if (newResource != m_resource)
+                close();
+            m_resource = newResource;
+        }
     }
 
     if (!m_opened && m_resource) {
-        if (!openInternal(m_resource)) 
+        if (!openInternal(m_resource) && m_isMultiserverAllowed)
         {
             // Try next server in the list immediatly, It is improve seek time if current server is offline and next server is exists
             while (!m_closing)
@@ -803,4 +807,9 @@ void QnRtspClientArchiveDelegate::setRange(qint64 startTime, qint64 endTime, qin
 {
     setAdditionalAttribute("x-media-step", QByteArray::number(frameStep));
     seek(startTime, endTime);
+}
+
+void QnRtspClientArchiveDelegate::setMultiserverAllowed(bool value)
+{
+    m_isMultiserverAllowed = value;
 }

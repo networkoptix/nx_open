@@ -36,26 +36,31 @@ typedef QList<QnCameraTimePeriod> QnCameraTimePeriodList;
 class QN_EXPORT QnCameraHistory
 {
 public:
-    QnCameraHistory() {}
+    QnCameraHistory();
 
     QString getPhysicalId() const;
     void setPhysicalId(const QString& physicalId);
 
-    QnCameraTimePeriodList getTimePeriods() const;
     QnVideoServerResourcePtr getVideoServerOnTime(qint64 timestamp, bool searchForward, QnTimePeriod& currentPeriod, bool gotOfflineCameras);
     QnNetworkResourcePtr getCameraOnTime(qint64 timestamp, bool searchForward, bool gotOfflineCameras);
     QnVideoServerResourcePtr getNextVideoServerOnTime(qint64 timestamp, bool searchForward, QnTimePeriod& currentPeriod);
     QnNetworkResourceList getAllCamerasWithSamePhysicalId(const QnTimePeriod& timePeriod);
     QnNetworkResourceList getAllCamerasWithSamePhysicalId();
 
+    /*
+    * Exclude offline or disabled resources
+    */
+    QnNetworkResourceList getOnlineCamerasWithSamePhysicalId(const QnTimePeriod& timePeriod);
+
     void addTimePeriod(const QnCameraTimePeriod& period);
     qint64 getMinTime() const;
 
+    QnCameraTimePeriodList getOnlineTimePeriods() const;
 private:
     QnCameraTimePeriodList::const_iterator getVideoServerOnTimeItr(const QnCameraTimePeriodList& timePeriods, qint64 timestamp, bool searchForward);
     QnVideoServerResourcePtr getNextVideoServerFromTime(const QnCameraTimePeriodList& timePeriods, qint64 timestamp, QnTimePeriod& currentPeriod);
     QnVideoServerResourcePtr getPrevVideoServerFromTime(const QnCameraTimePeriodList& timePeriods, qint64 timestamp, QnTimePeriod& currentPeriod);
-    QnCameraTimePeriodList getOnlineTimePeriods() const;
+    QnNetworkResourceList getCamerasWithSamePhysicalIdInternal(const QnTimePeriod& timePeriod, const QnCameraTimePeriodList cameraHistory);
 private:
     Q_DISABLE_COPY(QnCameraHistory);
 
@@ -82,6 +87,7 @@ public:
     //QnResourcePtr getCurrentCamera(const QnResourcePtr &resource);
 
     QnNetworkResourceList getAllCamerasWithSamePhysicalId(const QnNetworkResourcePtr &camera, const QnTimePeriod& timePeriod);
+    QnNetworkResourceList getOnlineCamerasWithSamePhysicalId(const QnNetworkResourcePtr &camera, const QnTimePeriod& timePeriod);
     qint64 getMinTime(QnNetworkResourcePtr camera);
 
 signals:

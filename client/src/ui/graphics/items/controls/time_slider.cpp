@@ -778,6 +778,9 @@ void QnTimeSlider::setRulerHeight(qreal rulerHeight) {
 }
 
 void QnTimeSlider::addThumbnail(const QnThumbnail &thumbnail) {
+    if(m_thumbnailsUpdateTimer->isActive())
+        return;
+
     if(m_thumbnailData.contains(thumbnail.time())) 
         return; /* There is no real point in overwriting existing thumbnails. Besides, it would result in flicker. */
  
@@ -1027,7 +1030,7 @@ void QnTimeSlider::updateThumbnailsPeriod() {
     if (!thumbnailsLoader())
         return;
 
-    if(m_thumbnailsUpdateTimer->isActive())
+    if(m_thumbnailsUpdateTimer->isActive() || !m_oldThumbnailData.isEmpty())
         return;
 
     thumbnailsLoader()->setTimePeriod(m_windowStart, m_windowEnd);
@@ -1471,7 +1474,7 @@ void QnTimeSlider::drawThumbnails(QPainter *painter, const QRectF &rect) {
     qreal aspectRatio = QnGeometry::aspectRatio(thumbnailsLoader()->thumbnailSize());
     qreal thumbnailWidth = rect.height() * aspectRatio;
 
-    if(!m_oldThumbnailData.isEmpty()) {
+    if(!m_oldThumbnailData.isEmpty() || m_thumbnailsUpdateTimer->isActive()) {
         QRectF boundingRect = rect; 
         for (int i = 0; i < m_oldThumbnailData.size(); i++) {
             const ThumbnailData &data = m_oldThumbnailData[i];

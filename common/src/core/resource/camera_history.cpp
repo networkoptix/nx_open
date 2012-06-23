@@ -14,6 +14,12 @@ QnId QnCameraTimePeriod::getServerId() const
     return id;
 }
 
+QnCameraHistory::QnCameraHistory(): m_mutex(QMutex::Recursive)
+{
+
+}
+
+
 QString QnCameraHistory::getPhysicalId() const
 {
     return m_physicalId;
@@ -24,14 +30,9 @@ void QnCameraHistory::setPhysicalId(const QString& physicalId)
     m_physicalId = physicalId;
 }
 
-QnCameraTimePeriodList QnCameraHistory::getTimePeriods() const
-{
-    QMutexLocker lock(&m_mutex);
-    return getOnlineTimePeriods();
-}
-
 QnCameraTimePeriodList QnCameraHistory::getOnlineTimePeriods() const
 {
+    QMutexLocker lock(&m_mutex);
     QnCameraTimePeriodList result;
     for (QnCameraTimePeriodList::const_iterator itr = m_fullTimePeriods.constBegin(); itr != m_fullTimePeriods.constEnd(); ++itr)
     {
@@ -138,15 +139,15 @@ qint64 QnCameraHistory::getMinTime() const
     return m_fullTimePeriods.first().startTimeMs;
 }
 
-QnNetworkResourceList QnCameraHistory::getAllCamerasWithSamePhysicalId(const QnTimePeriod& timePeriod)
+QnNetworkResourceList QnCameraHistory::getCamerasWithSamePhysicalIdInternal(const QnTimePeriod& timePeriod, const QnCameraTimePeriodList cameraHistory)
 {
     QSet<QnNetworkResourcePtr> rez;
 
     QMutexLocker lock (&m_mutex);
 
-    QnCameraTimePeriodList::const_iterator itrStart = getVideoServerOnTimeItr(m_fullTimePeriods, timePeriod.startTimeMs, true);
-    QnCameraTimePeriodList::const_iterator itrEnd = getVideoServerOnTimeItr(m_fullTimePeriods, timePeriod.endTimeMs(), false);
-    if (itrEnd != m_fullTimePeriods.constEnd())
+    QnCameraTimePeriodList::const_iterator itrStart = getVideoServerOnTimeItr(cameraHistory, timePeriod.startTimeMs, true);
+    QnCameraTimePeriodList::const_iterator itrEnd = getVideoServerOnTimeItr(cameraHistory, timePeriod.endTimeMs(), false);
+    if (itrEnd != cameraHistory.constEnd())
         itrEnd++;
 
     for (QnCameraTimePeriodList::const_iterator itr = itrStart; itr < itrEnd; ++itr)
@@ -158,6 +159,16 @@ QnNetworkResourceList QnCameraHistory::getAllCamerasWithSamePhysicalId(const QnT
     }
 
     return rez.toList();
+}
+
+QnNetworkResourceList QnCameraHistory::getAllCamerasWithSamePhysicalId(const QnTimePeriod& timePeriod)
+{
+    return getCamerasWithSamePhysicalIdInternal(timePeriod, m_fullTimePeriods);
+}
+
+QnNetworkResourceList QnCameraHistory::getOnlineCamerasWithSamePhysicalId(const QnTimePeriod& timePeriod)
+{
+    return getCamerasWithSamePhysicalIdInternal(timePeriod, getOnlineTimePeriods());
 }
 
 QnNetworkResourceList QnCameraHistory::getAllCamerasWithSamePhysicalId() {
@@ -195,6 +206,14 @@ QnNetworkResourceList QnCameraHistoryPool::getAllCamerasWithSamePhysicalId(const
     if (!history)
         return QList<QnNetworkResourcePtr>() << camera;
     return history->getAllCamerasWithSamePhysicalId(timePeriod);
+}
+
+QnNetworkResourceList QnCameraHistoryPool::getOnlineCamerasWithSamePhysicalId(const QnNetworkResourcePtr &camera, const QnTimePeriod& timePeriod)
+{
+    QnCameraHistoryPtr history = getCameraHistory(camera->getPhysicalId());
+    if (!history)
+        return QList<QnNetworkResourcePtr>() << camera;
+    return history->getOnlineCamerasWithSamePhysicalId(timePeriod);
 }
 
 qint64 QnCameraHistoryPool::getMinTime(QnNetworkResourcePtr camera)
