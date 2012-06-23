@@ -259,10 +259,11 @@ private:
     void updateAggregationValue();
     void updateAggregatedPeriods(int line, Qn::TimePeriodRole type);
     void updateTotalLineStretch();
-    void updateThumbnailsStepSize(bool instant);
+    void updateThumbnailsStepSize(bool instant, bool forced = false);
     void updateThumbnailsPeriod();
     void updateThumbnailsStepSizeLater();
     Q_SLOT void updateThumbnailsStepSizeTimer();
+    Q_SLOT void updateThumbnailsStepSizeForced();
 
     Q_SLOT void addThumbnail(const QnThumbnail &thumbnail);
     Q_SLOT void clearThumbnails();

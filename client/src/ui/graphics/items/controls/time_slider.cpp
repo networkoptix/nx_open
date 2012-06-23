@@ -622,6 +622,7 @@ void QnTimeSlider::setThumbnailsLoader(QnThumbnailsLoader *loader) {
     m_thumbnailsLoader = loader;
 
     if(m_thumbnailsLoader) {
+        connect(m_thumbnailsLoader.data(), SIGNAL(sourceSizeChanged()), this, SLOT(updateThumbnailsStepSizeForced()));
         connect(m_thumbnailsLoader.data(), SIGNAL(thumbnailsInvalidated()), this, SLOT(clearThumbnails()));
         connect(m_thumbnailsLoader.data(), SIGNAL(thumbnailLoaded(const QnThumbnail &)), this, SLOT(addThumbnail(const QnThumbnail &)));
     }
@@ -1053,12 +1054,17 @@ void QnTimeSlider::updateThumbnailsStepSizeLater() {
     m_thumbnailsUpdateTimer->start(250); /* Re-start it if it's active. */
 }
 
+void QnTimeSlider::updateThumbnailsStepSizeForced() {
+    m_thumbnailsUpdateTimer->stop();
+    updateThumbnailsStepSize(true, true);
+}
+
 void QnTimeSlider::updateThumbnailsStepSizeTimer() {
     m_thumbnailsUpdateTimer->stop();
     updateThumbnailsStepSize(true);
 }
 
-void QnTimeSlider::updateThumbnailsStepSize(bool instant) {
+void QnTimeSlider::updateThumbnailsStepSize(bool instant, bool forced) {
     if (!thumbnailsLoader())
         return; /* Nothing to update. */
 
@@ -1097,7 +1103,7 @@ void QnTimeSlider::updateThumbnailsStepSize(bool instant) {
     /* If animation is running, we want to wait until it's finished. 
      * We also don't want to update thumbnails too often. */
     qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
-    if(!instant || isAnimatingWindow() || currentTime - m_lastThumbnailsUpdateTime < 1000) {
+    if((!instant || isAnimatingWindow() || currentTime - m_lastThumbnailsUpdateTime < 1000) && !forced) {
         updateThumbnailsStepSizeLater();
     } else {
         m_lastThumbnailsUpdateTime = currentTime;
