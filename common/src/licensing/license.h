@@ -17,7 +17,7 @@ public:
       */
     bool isValid() const;
 
-    const QByteArray& name() const;
+    const QString& name() const;
     const QByteArray& key() const;
     const qint32 cameraCount() const;
     const QByteArray& hardwareId() const;

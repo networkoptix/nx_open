@@ -106,7 +106,7 @@ QnLicense::QnLicense(const QByteArray& name, const QByteArray& key, int cameraCo
 {
 }
 
-const QByteArray& QnLicense::name() const
+const QString &QnLicense::name() const
 {
     return m_name;
 }
