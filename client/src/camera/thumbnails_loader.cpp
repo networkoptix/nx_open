@@ -357,6 +357,8 @@ void QnThumbnailsLoader::process() {
     foreach(QnAbstractArchiveDelegatePtr client, delegates) 
     {
         client->setRange(period.startTimeMs * 1000, (period.endTimeMs() + timeStep) * 1000, timeStep * 1000);
+        QQueue<qint64> timingsQueue;
+        QQueue<int> frameFlags;
 
         QnThumbnail thumbnail;
         qint64 time = period.startTimeMs;
@@ -370,13 +372,13 @@ void QnThumbnailsLoader::process() {
             outFrame.setUseExternalData(false);
 
             while (frame) {
-                m_timingsQueue << frame->timestamp;
-                m_frameFlags << frame->flags;
+                timingsQueue << frame->timestamp;
+                frameFlags << frame->flags;
                 if (decoder.decode(frame, &outFrame)) 
                 {
-                    outFrame.pkt_dts = m_timingsQueue.dequeue();
+                    outFrame.pkt_dts = timingsQueue.dequeue();
                     thumbnail = generateThumbnail(outFrame, boundingSize, timeStep, generation);
-                    time = processThumbnail(thumbnail, time, thumbnail.time(), m_frameFlags.dequeue() & QnAbstractMediaData::MediaFlags_BOF);
+                    time = processThumbnail(thumbnail, time, thumbnail.time(), frameFlags.dequeue() & QnAbstractMediaData::MediaFlags_BOF);
                 }
 
                 {
@@ -395,11 +397,11 @@ void QnThumbnailsLoader::process() {
                 QnCompressedVideoDataPtr emptyData(new QnCompressedVideoData(1, 0));
                 while (decoder.decode(emptyData, &outFrame)) 
                 {
-                    Q_ASSERT(!m_timingsQueue.isEmpty());
-                    if (!m_timingsQueue.isEmpty())
-                        outFrame.pkt_dts = m_timingsQueue.dequeue();
+                    Q_ASSERT(!timingsQueue.isEmpty());
+                    if (!timingsQueue.isEmpty())
+                        outFrame.pkt_dts = timingsQueue.dequeue();
                     thumbnail = generateThumbnail(outFrame, boundingSize, timeStep, generation);
-                    time = processThumbnail(thumbnail, time, thumbnail.time(), m_frameFlags.dequeue() & QnAbstractMediaData::MediaFlags_BOF);
+                    time = processThumbnail(thumbnail, time, thumbnail.time(), frameFlags.dequeue() & QnAbstractMediaData::MediaFlags_BOF);
                 }
 
                 /* Fill remaining time values with thumbnails. */
