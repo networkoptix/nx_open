@@ -514,7 +514,7 @@ bool QnOnvifStreamReader::sendConfigToCamera(MediaSoapWrapper& soapWrapper, Came
     }
 
     if (!result ||
-        (!sendVideoSourceToCamera(soapWrapper, info, *info.finalProfile) || true) || //This is not critical
+        (!sendVideoSourceToCamera(soapWrapper, info, *info.finalProfile) && false) || //This is not critical
         !sendVideoEncoderToCamera(soapWrapper, info, *info.finalProfile))
     {
         return false;
