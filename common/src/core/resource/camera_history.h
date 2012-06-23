@@ -9,14 +9,14 @@
 
 struct QN_EXPORT QnCameraHistoryItem
 {
-    QnCameraHistoryItem(const QString& mac_, qint64 timestamp_, const QString& videoServerGuid_)
-        : mac(mac_),
+    QnCameraHistoryItem(const QString& physicalId_, qint64 timestamp_, const QString& videoServerGuid_)
+        : physicalId(physicalId_),
           timestamp(timestamp_),
           videoServerGuid(videoServerGuid_)
     {
     }
 
-    QString mac;
+    QString physicalId;
     qint64 timestamp;
     QString videoServerGuid;
 };
@@ -38,15 +38,15 @@ class QN_EXPORT QnCameraHistory
 public:
     QnCameraHistory() {}
 
-    QString getMacAddress() const;
-    void setMacAddress(const QString& macAddress);
+    QString getPhysicalId() const;
+    void setPhysicalId(const QString& physicalId);
 
     QnCameraTimePeriodList getTimePeriods() const;
     QnVideoServerResourcePtr getVideoServerOnTime(qint64 timestamp, bool searchForward, QnTimePeriod& currentPeriod, bool gotOfflineCameras);
     QnNetworkResourcePtr getCameraOnTime(qint64 timestamp, bool searchForward, bool gotOfflineCameras);
     QnVideoServerResourcePtr getNextVideoServerOnTime(qint64 timestamp, bool searchForward, QnTimePeriod& currentPeriod);
-    QnNetworkResourceList getAllCamerasWithSameMac(const QnTimePeriod& timePeriod);
-    QnNetworkResourceList getAllCamerasWithSameMac();
+    QnNetworkResourceList getAllCamerasWithSamePhysicalId(const QnTimePeriod& timePeriod);
+    QnNetworkResourceList getAllCamerasWithSamePhysicalId();
 
     void addTimePeriod(const QnCameraTimePeriod& period);
     qint64 getMinTime() const;
@@ -60,7 +60,7 @@ private:
     Q_DISABLE_COPY(QnCameraHistory);
 
     QnCameraTimePeriodList m_fullTimePeriods;
-    QString m_macAddress;
+    QString m_physicalId;
     mutable QMutex m_mutex;
 };
 
@@ -74,14 +74,14 @@ public:
     virtual ~QnCameraHistoryPool();
 
     static QnCameraHistoryPool* instance();
-    QnCameraHistoryPtr getCameraHistory(const QString& mac);
+    QnCameraHistoryPtr getCameraHistory(const QString& physicalId);
     void addCameraHistory(QnCameraHistoryPtr history);
     void addCameraHistoryItem(const QnCameraHistoryItem& historyItem);
 
     //QnNetworkResourcePtr getCurrentCamera(const QnNetworkResourcePtr &resource);
     //QnResourcePtr getCurrentCamera(const QnResourcePtr &resource);
 
-    QnNetworkResourceList getAllCamerasWithSameMac(const QnNetworkResourcePtr &camera, const QnTimePeriod& timePeriod);
+    QnNetworkResourceList getAllCamerasWithSamePhysicalId(const QnNetworkResourcePtr &camera, const QnTimePeriod& timePeriod);
     qint64 getMinTime(QnNetworkResourcePtr camera);
 
 signals:

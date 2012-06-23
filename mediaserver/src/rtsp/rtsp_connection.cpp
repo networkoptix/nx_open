@@ -164,7 +164,7 @@ void QnRtspConnectionProcessor::parseRequest()
             resId = resId.mid(1);
         QnResourcePtr resource = qnResPool->getResourceByUrl(resId);
         if (resource == 0) {
-            resource = qnResPool->getNetResourceByMac(resId);
+            resource = qnResPool->getNetResourceByPhysicalId(resId);
         }
         d->mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
     }

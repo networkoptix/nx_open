@@ -149,7 +149,7 @@ QString QnNetworkResource::toString() const
 QString QnNetworkResource::toSearchString() const
 {
     QString result;
-    QTextStream(&result) << QnResource::toSearchString() << " " << getMAC().toString();
+    QTextStream(&result) << QnResource::toSearchString() << " " << getPhysicalId();
     return result;
 }
 

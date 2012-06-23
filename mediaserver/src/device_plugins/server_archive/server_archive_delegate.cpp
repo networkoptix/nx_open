@@ -75,8 +75,8 @@ bool QnServerArchiveDelegate::open(QnResourcePtr resource)
     Q_ASSERT(netResource != 0);
     m_dialQualityHelper.setResource(netResource);
 
-    m_catalogHi = qnStorageMan->getFileCatalog(netResource->getMAC().toString(), QnResource::Role_LiveVideo);
-    m_catalogLow = qnStorageMan->getFileCatalog(netResource->getMAC().toString(), QnResource::Role_SecondaryLiveVideo);
+    m_catalogHi = qnStorageMan->getFileCatalog(netResource->getPhysicalId(), QnResource::Role_LiveVideo);
+    m_catalogLow = qnStorageMan->getFileCatalog(netResource->getPhysicalId(), QnResource::Role_SecondaryLiveVideo);
 
     m_currentChunkCatalog = m_quality == MEDIA_Quality_High ? m_catalogHi : m_catalogLow;
 
@@ -405,17 +405,4 @@ bool QnServerArchiveDelegate::setQualityInternal(MediaQuality quality, bool fast
         }
     }
     return fastSwitch; // if fastSwitch return true that mean need seek
-}
-
-DeviceFileCatalog::Chunk QnServerArchiveDelegate::getCurrentChunk() const
-{
-    return m_currentChunk;
-}
-
-bool QnServerArchiveDelegate::isHoleFromLeftOfCurrentChunk() const
-{
-    DeviceFileCatalog::Chunk newChunk;
-    DeviceFileCatalogPtr newChunkCatalog;
-    m_dialQualityHelper.findDataForTime(m_currentChunk.startTimeMs-1, newChunk, newChunkCatalog, DeviceFileCatalog::OnRecordHole_NextChunk);
-    return newChunk.startTimeMs >= m_currentChunk.startTimeMs;
 }

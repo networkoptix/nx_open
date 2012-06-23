@@ -34,7 +34,7 @@ int QnMultiCameraTimePeriodLoader::load(const QnTimePeriod &period, const QList<
     QList<int> handles;
     
     // sometime camera moved between media server. Get all servers for requested time period
-    QList<QnNetworkResourcePtr> cameraList = QnCameraHistoryPool::instance()->getAllCamerasWithSameMac(m_resource, period);
+    QList<QnNetworkResourcePtr> cameraList = QnCameraHistoryPool::instance()->getAllCamerasWithSamePhysicalId(m_resource, period);
     foreach(const QnNetworkResourcePtr& camera, cameraList)
     {
         int handle = loadInternal(camera, period, motionRegions);

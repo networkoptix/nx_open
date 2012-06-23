@@ -22,6 +22,8 @@ const QString& QnPlOnvifResource::DEVICE_URL_PARAM_NAME = *(new QString("DeviceU
 const float QnPlOnvifResource::QUALITY_COEF = 0.2f;
 const char* QnPlOnvifResource::PROFILE_NAME_PRIMARY = "Netoptix Primary";
 const char* QnPlOnvifResource::PROFILE_NAME_SECONDARY = "Netoptix Secondary";
+const int QnPlOnvifResource::MAX_AUDIO_BITRATE = 64; //kbps
+const int QnPlOnvifResource::MAX_AUDIO_SAMPLERATE = 32; //khz
 
 //Forth times greater than default = 320 x 240
 const double QnPlOnvifResource::MAX_SECONDARY_RESOLUTION_SQUARE =
@@ -99,8 +101,11 @@ QnPlOnvifResource::QnPlOnvifResource() :
     m_deviceUrl(),
     m_reinitDeviceInfo(false),
     m_codec(H264),
+    m_audioCodec(AUDIO_NONE),
     m_primaryResolution(EMPTY_RESOLUTION_PAIR),
-    m_secondaryResolution(EMPTY_RESOLUTION_PAIR)
+    m_secondaryResolution(EMPTY_RESOLUTION_PAIR),
+    m_audioBitrate(0),
+    m_audioSamplerate(0)
 {
 }
 
@@ -125,10 +130,26 @@ bool QnPlOnvifResource::hasDualStreaming() const
     return m_hasDual;
 }
 
+int QnPlOnvifResource::getAudioBitrate() const
+{
+    return m_audioBitrate;
+}
+
+int QnPlOnvifResource::getAudioSamplerate() const
+{
+    return m_audioSamplerate;
+}
+
 QnPlOnvifResource::CODECS QnPlOnvifResource::getCodec() const
 {
     QMutexLocker lock(&m_mutex);
     return m_codec;
+}
+
+QnPlOnvifResource::AUDIO_CODECS QnPlOnvifResource::getAudioCodec() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_audioCodec;
 }
 
 QnAbstractStreamDataProvider* QnPlOnvifResource::createLiveDataProvider()
@@ -348,6 +369,9 @@ bool QnPlOnvifResource::fetchAndSetResourceOptions()
         return false;
     }
 
+    //If failed - ignore
+    fetchAndSetAudioEncoderOptions(soapWrapper);
+
     updateResourceCapabilities();
 
     //All VideoEncoder options are set, so we can calculate resolutions for the streams
@@ -542,8 +566,8 @@ void QnPlOnvifResource::save()
     QByteArray errorStr;
     QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
     if (conn->saveSync(toSharedPointer().dynamicCast<QnVirtualCameraResource>(), errorStr) != 0) {
-        qCritical() << "QnPlOnvifResource::init: can't save resource params to Enterprise Controller. Resource MAC: "
-                    << getMAC().toString() << ". Description: " << errorStr;
+        qCritical() << "QnPlOnvifResource::init: can't save resource params to Enterprise Controller. Resource physicalId: "
+                    << getPhysicalId() << ". Description: " << errorStr;
     }
 }
 
@@ -581,6 +605,9 @@ bool QnPlOnvifResource::shoudResolveConflicts() const
 bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper)
 {
     VideoOptionsReq request;
+    request.ConfigurationToken = NULL;
+    request.ProfileToken = NULL;
+
     VideoOptionsResp response;
 
     int soapRes = soapWrapper.getVideoEncoderConfigurationOptions(request, response);
@@ -632,4 +659,148 @@ bool QnPlOnvifResource::fetchAndSetDualStreaming(MediaSoapWrapper& soapWrapper)
     }
 
     return true;
+}
+
+bool QnPlOnvifResource::fetchAndSetAudioEncoderOptions(MediaSoapWrapper& soapWrapper)
+{
+    AudioOptionsReq request;
+    request.ConfigurationToken = NULL;
+    request.ProfileToken = NULL;
+
+    AudioOptionsResp response;
+
+    int soapRes = soapWrapper.getAudioEncoderConfigurationOptions(request, response);
+    if (soapRes != SOAP_OK || !response.Options) {
+
+        qWarning() << "QnPlOnvifResource::fetchAndSetAudioEncoderOptions: can't receive data from camera (or data is empty) (URL: " 
+            << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId()
+            << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
+            << ". " << soapWrapper.getLastError();
+        return false;
+
+    }
+
+    AUDIO_CODECS codec = AUDIO_NONE;
+    AudioOptions* options = NULL;
+
+    std::vector<AudioOptions*>::const_iterator it = response.Options->Options.begin();
+
+    while (it != response.Options->Options.end()) {
+
+        AudioOptions* curOpts = *it;
+        if (curOpts)
+        {
+            switch (curOpts->Encoding)
+            {
+                case onvifXsd__AudioEncoding__G711:
+                    if (codec < G711) {
+                        codec = G711;
+                        options = curOpts;
+                    }
+                    break;
+                case onvifXsd__AudioEncoding__G726:
+                    if (codec < G726) {
+                        codec = G726;
+                        options = curOpts;
+                    }
+                    break;
+                case onvifXsd__AudioEncoding__AAC:
+                    if (codec < AAC) {
+                        codec = AAC;
+                        options = curOpts;
+                    }
+                    break;
+                default:
+                    qWarning() << "QnPlOnvifResource::fetchAndSetAudioEncoderOptions: got unknown codec type: " 
+                        << curOpts->Encoding << " (URL: " << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId()
+                        << "). Root cause: SOAP request failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
+                    break;
+            }
+        }
+
+        ++it;
+    }
+
+    if (!options) {
+
+        qWarning() << "QnPlOnvifResource::fetchAndSetAudioEncoderOptions: camera didn't return data for G711, G726 or ACC (URL: " 
+            << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId()
+            << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
+            << ". " << soapWrapper.getLastError();
+        return false;
+
+    }
+
+    {
+        QMutexLocker lock(&m_mutex);
+        m_audioCodec = codec;
+    }
+
+    setAudioEncoderOptions(*options);
+
+    return true;
+}
+
+void QnPlOnvifResource::setAudioEncoderOptions(const AudioOptions& options)
+{
+    int bitRate = 0;
+    if (options.BitrateList)
+    {
+        bitRate = findClosestRateFloor(options.BitrateList->Items, MAX_AUDIO_BITRATE);
+    }
+    else
+    {
+        qWarning() << "QnPlOnvifResource::fetchAndSetAudioEncoderOptions: camera didn't return Bitrate List ( UniqueId: " 
+            << getUniqueId() << ").";
+    }
+
+    int sampleRate = 0;
+    if (options.SampleRateList)
+    {
+        sampleRate = findClosestRateFloor(options.SampleRateList->Items, MAX_AUDIO_SAMPLERATE);
+    }
+    else
+    {
+        qWarning() << "QnPlOnvifResource::fetchAndSetAudioEncoderOptions: camera didn't return Samplerate List ( UniqueId: " 
+            << getUniqueId() << ").";
+    }
+
+    {
+        QMutexLocker lock(&m_mutex);
+        m_audioSamplerate = sampleRate;
+        m_audioBitrate = bitRate;
+    }
+}
+
+int QnPlOnvifResource::findClosestRateFloor(const std::vector<int>& values, int threshold) const
+{
+    int floor = threshold;
+    int ceil = threshold;
+
+    std::vector<int>::const_iterator it = values.begin();
+
+    while (it != values.end())
+    {
+        if (*it == threshold) {
+            return *it;
+        }
+
+        if (*it < threshold && *it > floor) {
+            floor = *it;
+        } else if (*it > threshold && *it < ceil) {
+            ceil == *it;
+        }
+
+        ++it;
+    }
+
+    if (floor < threshold) {
+        return floor;
+    }
+
+    if (ceil > threshold) {
+        return ceil;
+    }
+
+    return 0;
 }

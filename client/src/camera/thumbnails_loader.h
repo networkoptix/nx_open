@@ -106,7 +106,6 @@ private:
     QStack<QnTimePeriod> m_processingStack;
     QnThumbnailsLoaderHelper *m_helper;
     int m_generation;
-    QQueue<qint64> m_timingsQueue;
 };
 
 Q_DECLARE_METATYPE(QPixmapPtr)

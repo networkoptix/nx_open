@@ -627,18 +627,19 @@ QnMotionEstimation::~QnMotionEstimation()
 // rescale motion mask width (mask rotated, so actually remove or duplicate some lines)
 void QnMotionEstimation::scaleMask(quint8* mask, quint8* scaledMask)
 {
-    float lineStep = m_scaledWidth / (float) MD_WIDTH;
+    float lineStep = (m_scaledWidth-1) / float(MD_WIDTH-1);
     float scaledLineNum = 0;
     int prevILineNum = -1;
     for (int y = 0; y < MD_WIDTH; ++y)
     {
         int iLineNum = (int) (scaledLineNum+0.5);
+        Q_ASSERT(iLineNum < m_scaledWidth);
         __m128i* dst = (__m128i*) (scaledMask + MD_HEIGHT*iLineNum);
         __m128i* src = (__m128i*) (mask + MD_HEIGHT*y);
         if (iLineNum > prevILineNum) 
         {
-            for (int i = 0; i < iLineNum - prevILineNum; ++i)
-                memcpy(dst + i*MD_HEIGHT , src + i*MD_HEIGHT, MD_HEIGHT);
+            for (int i = 0; i < iLineNum - prevILineNum; ++i) 
+                memcpy(dst - i*MD_HEIGHT/sizeof(__m128i) , src, MD_HEIGHT);
         }
         else {
             dst[0] = _mm_min_epu8(dst[0], src[0]); // SSE2

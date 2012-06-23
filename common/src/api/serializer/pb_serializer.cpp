@@ -419,7 +419,7 @@ void parserCameraServerItems(QnCameraHistoryList& cameraServerItems, const PbCam
         camit.toFront();
 
         qint64 duration;
-        cameraHistory->setMacAddress(ci.key());
+        cameraHistory->setPhysicalId(ci.key());
         while (camit.hasNext())
         {
             camit.next();
@@ -489,7 +489,7 @@ void serializeCamera_i(pb::Resource& pb_cameraResource, const QnVirtualCameraRes
 
 void serializeCameraServerItem_i(pb::CameraServerItem& pb_cameraServerItem, const QnCameraHistoryItem& cameraServerItem)
 {
-    pb_cameraServerItem.set_mac(cameraServerItem.mac.toStdString());
+    pb_cameraServerItem.set_mac(cameraServerItem.physicalId.toStdString());
     pb_cameraServerItem.set_timestamp(cameraServerItem.timestamp);
     pb_cameraServerItem.set_serverguid(cameraServerItem.videoServerGuid.toStdString());
 }

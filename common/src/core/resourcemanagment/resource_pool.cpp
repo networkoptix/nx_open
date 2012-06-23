@@ -252,33 +252,33 @@ QnResourcePtr QnResourcePool::getResourceByUrl(const QString &url) const
     return QnResourcePtr(0);
 }
 
-QnNetworkResourcePtr QnResourcePool::getNetResourceByMac(const QString &mac) const
+QnNetworkResourcePtr QnResourcePool::getNetResourceByPhysicalId(const QString &physicalId) const
 {
     QMutexLocker locker(&m_resourcesMtx);
     foreach (const QnResourcePtr &resource, m_resources) {
         QnNetworkResourcePtr netResource = resource.dynamicCast<QnNetworkResource>();
-        if (netResource != 0 && netResource->getMAC().toString() == mac)
+        if (netResource != 0 && netResource->getPhysicalId() == physicalId)
             return netResource;
     }
 
     return QnNetworkResourcePtr(0);
 }
 
-QnNetworkResourceList QnResourcePool::getAllNetResourceByMac(const QString &mac) const
+QnNetworkResourceList QnResourcePool::getAllNetResourceByPhysicalId(const QString &physicalId) const
 {
     QnNetworkResourceList result;
     QMutexLocker locker(&m_resourcesMtx);
     foreach (const QnResourcePtr &resource, m_resources) {
         QnNetworkResourcePtr netResource = resource.dynamicCast<QnNetworkResource>();
-        if (netResource != 0 && netResource->getMAC().toString() == mac)
+        if (netResource != 0 && netResource->getPhysicalId() == physicalId)
             result << netResource;
     }
 
     return result;
 }
 
-QnNetworkResourcePtr QnResourcePool::getEnabledResourceByMac(const QString &mac) const {
-    foreach(const QnNetworkResourcePtr &resource, getAllNetResourceByMac(mac))
+QnNetworkResourcePtr QnResourcePool::getEnabledResourceByPhysicalId(const QString &physicalId) const {
+    foreach(const QnNetworkResourcePtr &resource, getAllNetResourceByPhysicalId(physicalId))
         if(!resource->isDisabled())
             return resource;
     return QnNetworkResourcePtr();
@@ -293,7 +293,7 @@ QnResourcePtr QnResourcePool::getEnabledResourceByUniqueId(const QString &unique
     if(!networkResource)
         return QnResourcePtr();
 
-    return getEnabledResourceByMac(networkResource->getMAC().toString());
+    return getEnabledResourceByPhysicalId(networkResource->getPhysicalId());
 }
 
 QnResourcePtr QnResourcePool::getResourceByUniqId(const QString &id) const

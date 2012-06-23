@@ -40,6 +40,7 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
 
         QByteArray errorString;
         QnVirtualCameraResourceList cameras;
+        QString password = cameraResource->getAuth().password();
         if (m_appServer->addCamera(cameraResource, cameras, errorString) != 0)
         {
             qCritical() << "QnAppserverResourceProcessor::processResources(): Call to addCamera failed. Reason: " << errorString;
