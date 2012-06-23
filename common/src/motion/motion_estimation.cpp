@@ -639,7 +639,7 @@ void QnMotionEstimation::scaleMask(quint8* mask, quint8* scaledMask)
         if (iLineNum > prevILineNum) 
         {
             for (int i = 0; i < iLineNum - prevILineNum; ++i) 
-                memcpy(dst - i*MD_HEIGHT/16 , src, MD_HEIGHT);
+                memcpy(dst - i*MD_HEIGHT/sizeof(__m128i) , src, MD_HEIGHT);
         }
         else {
             dst[0] = _mm_min_epu8(dst[0], src[0]); // SSE2
