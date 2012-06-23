@@ -315,9 +315,6 @@ void QnThumbnailsLoader::process() {
     qint64 timeStep;
     int generation;
     QList<QnAbstractArchiveDelegatePtr> delegates;
-    QQueue<qint64> timingsQueue;
-    QQueue<int> frameFlags;
-
 
     {
         QMutexLocker locker(&m_mutex);
@@ -360,6 +357,8 @@ void QnThumbnailsLoader::process() {
     foreach(QnAbstractArchiveDelegatePtr client, delegates) 
     {
         client->setRange(period.startTimeMs * 1000, (period.endTimeMs() + timeStep) * 1000, timeStep * 1000);
+        QQueue<qint64> timingsQueue;
+        QQueue<int> frameFlags;
 
         QnThumbnail thumbnail;
         qint64 time = period.startTimeMs;
