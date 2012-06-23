@@ -129,9 +129,9 @@ bool CLFFmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, CLByteArray& r
 
 		if (outbuf_len + out_size > result.capacity())
 		{
-            Q_ASSERT_X(false, Q_FUNC_INFO, "Too small output buffer for audio decoding!");
-			outbuf_len = 0;
-			outbuf = (unsigned char*)result.data(); // start form beginning
+            //Q_ASSERT_X(false, Q_FUNC_INFO, "Too small output buffer for audio decoding!");
+            result.reallocate(result.capacity()*2);
+            outbuf = (quint8*) result.data() + outbuf_len;
 		}
 
         AVPacket avpkt;
