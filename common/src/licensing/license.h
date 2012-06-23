@@ -10,7 +10,7 @@
 class QnLicense
 {
 public:
-    QnLicense(const QByteArray& name, const QByteArray& key, int cameraCount, const QByteArray& hardwareId, const QByteArray& signature);
+    QnLicense(const QString& name, const QByteArray& key, int cameraCount, const QByteArray& hardwareId, const QByteArray& signature);
 
     /**
       * Check if signature matches other fields
@@ -30,7 +30,7 @@ public:
     static const QByteArray FREE_LICENSE_KEY;
 
 private:
-    QByteArray m_name;
+    QString m_name;
     QByteArray m_key;
     qint32 m_cameraCount;
     QByteArray m_signature;
