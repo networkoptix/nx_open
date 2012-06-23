@@ -286,7 +286,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     m_rulerHeight(0.0),
     m_prefferedHeight(0.0),
     m_lastThumbnailsUpdateTime(0),
-    m_lastHoverThumbnail(0)
+    m_lastHoverThumbnail(-1)
 {
     m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("NO THUMBNAILS\nAVAILABLE"), 16, QColor(255, 255, 255, 255));
 
@@ -1761,9 +1761,24 @@ void QnTimeSlider::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
 
     unsetCursor();
 
-    QMap<qint64, ThumbnailData>::iterator oldPos = m_thumbnailData.find(m_lastHoverThumbnail);
-    if(oldPos != m_thumbnailData.end())
-        oldPos->selecting = false;
+    setThumbnailSelecting(m_lastHoverThumbnail, false);
+}
+
+void QnTimeSlider::setThumbnailSelecting(qint64 time, bool selecting) {
+    if(time < 0)
+        return;
+
+    QMap<qint64, ThumbnailData>::iterator pos = m_thumbnailData.find(time);
+    if(pos == m_thumbnailData.end())
+        return;
+
+    qint64 actualTime = pos->thumbnail.actualTime();
+
+    QMap<qint64, ThumbnailData>::iterator ipos;
+    for(ipos = pos; ipos != m_thumbnailData.begin() && ipos->thumbnail.actualTime() == actualTime; ipos--)
+        ipos->selecting = selecting;
+    for(ipos = pos + 1; ipos != m_thumbnailData.end() && ipos->thumbnail.actualTime() == actualTime; ipos++)
+        ipos->selecting = selecting;
 }
 
 void QnTimeSlider::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
@@ -1781,21 +1796,13 @@ void QnTimeSlider::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
 
     if(thumbnailsRect().contains(event->pos()) && thumbnailsLoader() && thumbnailsLoader()->timeStep() != 0 && m_oldThumbnailData.isEmpty() && !m_thumbnailsUpdateTimer->isActive()) {
         qint64 time = qRound(valueFromPosition(event->pos()), thumbnailsLoader()->timeStep());
-        
-        QMap<qint64, ThumbnailData>::iterator pos = m_thumbnailData.find(time);
-        if(pos != m_thumbnailData.end()) {
-            QMap<qint64, ThumbnailData>::iterator oldPos = m_thumbnailData.find(m_lastHoverThumbnail);
-            if(oldPos != m_thumbnailData.end())
-                oldPos->selecting = false;
 
-            pos->selecting = true;
-
-            m_lastHoverThumbnail = time;
-        }
+        setThumbnailSelecting(m_lastHoverThumbnail, false);
+        setThumbnailSelecting(time, true);
+        m_lastHoverThumbnail = time;
     } else {
-        QMap<qint64, ThumbnailData>::iterator oldPos = m_thumbnailData.find(m_lastHoverThumbnail);
-        if(oldPos != m_thumbnailData.end())
-            oldPos->selecting = false;
+        setThumbnailSelecting(m_lastHoverThumbnail, false);
+        m_lastHoverThumbnail = -1;
     }
 }
 
@@ -1816,6 +1823,14 @@ void QnTimeSlider::mousePressEvent(QGraphicsSceneMouseEvent *event) {
         QMap<qint64, ThumbnailData>::const_iterator pos = m_thumbnailData.find(time);
         if(pos != m_thumbnailData.end()) {
             setSliderPosition(pos->thumbnail.actualTime());
+            if(pos->thumbnail.actualTime() > m_windowEnd) {
+                qint64 d = pos->thumbnail.actualTime() - m_windowEnd;
+                setWindow(m_windowStart + d, m_windowEnd + d);
+            } else if(pos->thumbnail.actualTime() < m_windowStart) {
+                qint64 d = m_windowStart - pos->thumbnail.actualTime();
+                setWindow(m_windowStart - d, m_windowEnd - d);
+            }
+
             processed = true;
         }
     }
