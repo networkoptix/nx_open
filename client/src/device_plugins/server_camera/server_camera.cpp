@@ -85,32 +85,7 @@ QnAbstractStreamDataProvider* QnServerCamera::createLiveDataProvider()
 
 QString QnServerCamera::getUniqueId() const
 {
-    QString id = getMAC().toString();
-    QString urlStr = getUrl(); // some onvif cameras do not give us a mac without password; so as unique id we ses ws setion id 
-    
-    if (urlStr.contains("://")) {
-        QUrl url(urlStr);
-        QString tmp = url.queryItemValue("uniq-id");
-
-        if (!tmp.isEmpty()) {
-            id = tmp;
-        } else {
-            qCritical() << "QnServerCamera::getUniqueId: Unique Id is absent in ONVIF device URL: " << urlStr;
-        }
-    }
-
-    //getUniqueId should never be changed 
-    return id + getParentId().toString();
-}
-
-QHostAddress QnServerCamera::getHostAddress() const
-{
-    QString url = getUrl(); // some onvif cameras do not give us a mac without password; so as unique id we ses ws setion id 
-    if (!url.contains("://"))
-        return QnVirtualCameraResource::getHostAddress();
-
-    return QHostAddress(QUrl(url).host());
-
+    return getPhysicalId() + getParentId().toString();
 }
 
 // --------------------------- QnServerCameraFactory -----------------------------
