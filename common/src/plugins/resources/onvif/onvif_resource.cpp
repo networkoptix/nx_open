@@ -285,7 +285,7 @@ ResolutionPair QnPlOnvifResource::getPrimaryResolution() const
 ResolutionPair QnPlOnvifResource::getSecondaryResolution() const
 {
     QMutexLocker lock(&m_mutex);
-    return m_primaryResolution;
+    return m_secondaryResolution;
 }
 
 int QnPlOnvifResource::getMaxFps()

@@ -74,6 +74,24 @@ void QnLiveStreamProvider::setRole(QnResource::ConnectionRole role)
                 m_quality = QnQualityLowest;
                 needUpdate = true;
             }
+
+            QnAbstractMediaStreamDataProvider* ap = dynamic_cast<QnAbstractMediaStreamDataProvider*>(this);
+            Q_ASSERT(ap);
+
+            QnPhysicalCameraResourcePtr res = ap->getResource().dynamicCast<QnPhysicalCameraResource>();
+            Q_ASSERT(res);
+
+
+            int oldFps = m_fps;
+            int newFps = qMin(5, res->getMaxFps());
+            newFps = qMax(1, newFps);
+
+            if (newFps != oldFps)
+            {
+                needUpdate = true;
+            }
+
+            m_fps = newFps;
         }
 
     }

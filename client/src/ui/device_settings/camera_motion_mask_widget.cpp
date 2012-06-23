@@ -26,6 +26,7 @@
 #include "ui/workbench/workbench_context.h"
 #include "camera/resource_display.h" // TODO: remove
 #include "ui/style/globals.h"
+#include <limits>
 
 
 QnCameraMotionMaskWidget::QnCameraMotionMaskWidget(QWidget *parent): 
