@@ -45,20 +45,10 @@ QnAbstractMediaDataPtr QnThumbnailsStreamReader::createEmptyPacket()
 QnAbstractMediaDataPtr QnThumbnailsStreamReader::getNextData()
 {
     QnAbstractMediaDataPtr result = m_delegate->getNextData();
-    if (result) {
-        result->flags &= ~QnAbstractMediaData::MediaFlags_BOF;
-        DeviceFileCatalog::Chunk ch = m_archiveDelegate->getCurrentChunk();
-        if (ch.startTimeMs != m_prevChunk.startTimeMs || ch.endTimeMs() != m_prevChunk.endTimeMs())
-        {
-            m_prevChunk = ch;
-            if (m_archiveDelegate->isHoleFromLeftOfCurrentChunk())
-                result->flags |= QnAbstractMediaData::MediaFlags_BOF;
-        }
+    if (result) 
         return result;
-    }
-    else {
+    else 
         return createEmptyPacket();
-    }
 }
 
 void QnThumbnailsStreamReader::run()

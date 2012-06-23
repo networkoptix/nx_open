@@ -34,7 +34,6 @@ private:
     qint64 m_currentPos;
     int m_cseq;
     QnServerArchiveDelegatePtr m_archiveDelegate;
-    DeviceFileCatalog::Chunk m_prevChunk;
 };
 
 #endif //THUMBNAILS_STREAM_READER_H__

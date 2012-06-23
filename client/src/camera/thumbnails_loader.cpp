@@ -371,11 +371,12 @@ void QnThumbnailsLoader::process() {
 
             while (frame) {
                 m_timingsQueue << frame->timestamp;
+                m_frameFlags << frame->flags;
                 if (decoder.decode(frame, &outFrame)) 
                 {
                     outFrame.pkt_dts = m_timingsQueue.dequeue();
                     thumbnail = generateThumbnail(outFrame, boundingSize, timeStep, generation);
-                    time = processThumbnail(thumbnail, time, thumbnail.time(), outFrame.flags & QnAbstractMediaData::MediaFlags_BOF);
+                    time = processThumbnail(thumbnail, time, thumbnail.time(), m_frameFlags.dequeue() & QnAbstractMediaData::MediaFlags_BOF);
                 }
 
                 {
@@ -398,7 +399,7 @@ void QnThumbnailsLoader::process() {
                     if (!m_timingsQueue.isEmpty())
                         outFrame.pkt_dts = m_timingsQueue.dequeue();
                     thumbnail = generateThumbnail(outFrame, boundingSize, timeStep, generation);
-                    time = processThumbnail(thumbnail, time, thumbnail.time(), outFrame.flags & QnAbstractMediaData::MediaFlags_BOF);
+                    time = processThumbnail(thumbnail, time, thumbnail.time(), m_frameFlags.dequeue() & QnAbstractMediaData::MediaFlags_BOF);
                 }
 
                 /* Fill remaining time values with thumbnails. */
