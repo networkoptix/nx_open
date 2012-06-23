@@ -45,7 +45,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
 
     connect(ui->cameraMotionButton,     SIGNAL(clicked(bool)),                  this,   SLOT(at_motionTypeChanged()));
     connect(ui->softwareMotionButton,   SIGNAL(clicked(bool)),                  this,   SLOT(at_motionTypeChanged()));
-    connect(ui->sensitivitySlider,      SIGNAL(valueChanged(int)),              this,   SLOT(at_motionSensitivityChanged(int)));
+    connect(ui->sensitivitySlider,      SIGNAL(valueChanged(int)),              this,   SLOT(updateMotionWidgetSensitivity()));
     connect(ui->resetMotionRegionsButton, SIGNAL(clicked()),                    this,   SLOT(at_motionSelectionCleared()));
 
     updateFromResource();
@@ -168,6 +168,8 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         m_cameraSupportsMotion = false;
         ui->motionSettingsGroupBox->setEnabled(false);
         ui->motionAvailableLabel->setVisible(true);
+
+        
     } else {
         QString webPageAddress = QString(QLatin1String("http://%1")).arg(m_camera->getHostAddress().toString());
 
@@ -232,6 +234,7 @@ void QnSingleCameraSettingsWidget::updateMotionWidgetFromResource() {
         m_motionWidget->setVisible(m_cameraSupportsMotion);
     }
     updateMotionWidgetNeedControlMaxRect();
+    ui->sensitivitySlider->setValue(m_motionWidget->motionSensitivity());
 
     connectToMotionWidget();
 }
@@ -292,6 +295,11 @@ void QnSingleCameraSettingsWidget::updateMotionWidgetNeedControlMaxRect() {
     m_motionWidget->setNeedControlMaxRects(m_cameraSupportsMotion && !ui->softwareMotionButton->isChecked());
 }
 
+void QnSingleCameraSettingsWidget::updateMotionWidgetSensitivity() {
+    if(m_motionWidget)
+        m_motionWidget->setMotionSensitivity(ui->sensitivitySlider->value());
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -316,11 +324,6 @@ void QnSingleCameraSettingsWidget::showEvent(QShowEvent *event) {
     at_tabWidget_currentChanged(); /* Re-create motion widget if needed. */
 }
 
-void QnSingleCameraSettingsWidget::at_motionSensitivityChanged(int value) {
-    if(m_motionWidget)
-        m_motionWidget->setMotionSensitivity(value);
-}
-
 void QnSingleCameraSettingsWidget::at_motionTypeChanged() {
     at_dataChanged();
 
@@ -328,14 +331,12 @@ void QnSingleCameraSettingsWidget::at_motionTypeChanged() {
     updateMaxFPS();
 }
 
-void QnSingleCameraSettingsWidget::updateMaxFPS()
-{
+void QnSingleCameraSettingsWidget::updateMaxFPS() {
     if (m_inUpdateMaxFps)
         return; /* Do not show message twice. */
 
     m_inUpdateMaxFps = true;
-    if (ui->softwareMotionButton->isChecked() || ui->cameraScheduleWidget->isSecondaryStreamReserver())
-    {
+    if (ui->softwareMotionButton->isChecked() || ui->cameraScheduleWidget->isSecondaryStreamReserver()) {
         float maxFps = m_camera->getMaxFps()-2;
         float currentMaxFps = ui->cameraScheduleWidget->getGridMaxFps();
         if (currentMaxFps > maxFps)
@@ -344,8 +345,7 @@ void QnSingleCameraSettingsWidget::updateMaxFPS()
                 tr("For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps dropped down to %2").arg(currentMaxFps).arg(maxFps));
         }
         ui->cameraScheduleWidget->setMaxFps(maxFps);
-    }
-    else {
+    } else {
         ui->cameraScheduleWidget->setMaxFps(m_camera->getMaxFps());
     }
     m_inUpdateMaxFps = false;

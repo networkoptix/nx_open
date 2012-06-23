@@ -34,7 +34,8 @@ public:
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
 
-    void setMotionSensitivity(int value);
+    int motionSensitivity() const;
+    void setMotionSensitivity(int motionSensitivity);
 
     void setNeedControlMaxRects(bool value);
 
