@@ -332,10 +332,11 @@ void QnThumbnailsLoader::process() {
 
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(m_resource);
     if (camera) {
-        QnNetworkResourceList cameras = QnCameraHistoryPool::instance()->getAllCamerasWithSamePhysicalId(camera, period);
+        QnNetworkResourceList cameras = QnCameraHistoryPool::instance()->getOnlineCamerasWithSamePhysicalId(camera, period);
         for (int i = 0; i < cameras.size(); ++i) 
         {
-            QnAbstractArchiveDelegatePtr rtspDelegate(new QnRtspClientArchiveDelegate());
+            QnRtspClientArchiveDelegatePtr rtspDelegate(new QnRtspClientArchiveDelegate());
+            rtspDelegate->setMultiserverAllowed(false);
             QnThumbnailsArchiveDelegatePtr thumbnailDelegate(new QnThumbnailsArchiveDelegate(rtspDelegate));
             if (thumbnailDelegate->open(cameras[i]))
                 delegates << thumbnailDelegate;
