@@ -67,13 +67,13 @@ public:
 
     // fill data
     void fill(quint8 filler, int size);
-private:
-    Q_DISABLE_COPY(CLByteArray)
 
     // this function reallocates data and changes capacity.
     // if new capacity smaller than current size this function does nothing
     // return false if can not allocate new memory
     bool reallocate(unsigned int new_capacity);
+private:
+    Q_DISABLE_COPY(CLByteArray)
 
 private:
     unsigned int m_alignment;
