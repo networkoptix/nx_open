@@ -1509,11 +1509,6 @@ void QnTimeSlider::drawThumbnails(QPainter *painter, const QRectF &rect) {
         qint64 startTime = qFloor(m_windowStart, step);
         qint64 endTime = qCeil(m_windowEnd, step);
 
-        qreal t1 = m_windowStart;
-        qreal t2 = m_windowEnd;
-        qreal x1 = quickPositionFromValue(t1, false);
-        qreal x2 = quickPositionFromValue(t1, false);
-
         QRectF boundingRect = rect; 
         for (qint64 time = startTime; time <= endTime; time += step) {
             QMap<qint64, ThumbnailData>::iterator pos = m_thumbnailData.find(time);
@@ -1805,29 +1800,33 @@ void QnTimeSlider::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
 }
 
 void QnTimeSlider::mousePressEvent(QGraphicsSceneMouseEvent *event) {
-    base_type::mousePressEvent(event);
-
     if(event->button() == Qt::LeftButton) {
         m_dragMarker = markerFromPosition(event->pos(), hoverEffectDistance);
-
-        if(m_dragMarker != NoMarker)
-            dragProcessor()->mousePressEvent(this, event);
-
-        event->accept();
     } else if(event->button() == Qt::RightButton) {
-        if(m_options & SelectionEditable)
-            m_dragMarker = CreateSelectionMarker;
-        dragProcessor()->mousePressEvent(this, event);
-
-        event->accept();
+        if(m_options & SelectionEditable) {
+            m_dragMarker = CreateSelectionMarker; 
+        } else {
+            m_dragMarker = NoMarker;
+        }
     }
+
+    bool processed = false;
+    if(thumbnailsLoader() && thumbnailsLoader()->timeStep() != 0 && event->button() == Qt::LeftButton && thumbnailsRect().contains(event->pos())) {
+        qint64 time = qRound(valueFromPosition(event->pos(), false), thumbnailsLoader()->timeStep());
+        QMap<qint64, ThumbnailData>::const_iterator pos = m_thumbnailData.find(time);
+        if(pos != m_thumbnailData.end()) {
+            setSliderPosition(pos->thumbnail.actualTime());
+            processed = true;
+        }
+    }
+
+    dragProcessor()->mousePressEvent(this, event, m_dragMarker == NoMarker && !processed);
+
+    event->accept();
 }
 
 void QnTimeSlider::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
     dragProcessor()->mouseMoveEvent(this, event);
-
-    if(!dragProcessor()->isRunning())
-        base_type::mouseMoveEvent(event);
 
     event->accept();
 }
@@ -1835,7 +1834,6 @@ void QnTimeSlider::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
 void QnTimeSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
     dragProcessor()->mouseReleaseEvent(this, event);
 
-    base_type::mouseReleaseEvent(event);
     m_dragMarker = NoMarker;
 
     if(m_dragIsClick && event->button() == Qt::RightButton)

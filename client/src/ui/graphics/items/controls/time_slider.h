@@ -272,6 +272,8 @@ private:
     bool animateThumbnail(qreal dt, ThumbnailData &data);
     void freezeThumbnails();
 
+    void setThumbnailSelecting(qint64 time, bool selecting);
+
 private:
     Q_DECLARE_PRIVATE(GraphicsSlider);
 
