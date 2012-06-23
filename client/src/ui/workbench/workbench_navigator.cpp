@@ -147,6 +147,8 @@ void QnWorkbenchNavigator::initialize() {
     m_timeSlider->setLineCount(SliderLineCount);
     m_timeSlider->setLineStretch(CurrentLine, 1.5);
     m_timeSlider->setLineStretch(SyncedLine, 1.0);
+    m_timeSlider->setRange(0, 1000ll * 60 * 60 * 24);
+    m_timeSlider->setWindow(m_timeSlider->minimum(), m_timeSlider->maximum());
 
     connect(m_timeScrollBar,                    SIGNAL(valueChanged(qint64)),                       this,   SLOT(updateSliderFromScrollBar()));
     connect(m_timeScrollBar,                    SIGNAL(pageStepChanged(qint64)),                    this,   SLOT(updateSliderFromScrollBar()));

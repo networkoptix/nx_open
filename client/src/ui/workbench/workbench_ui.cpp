@@ -908,7 +908,7 @@ void QnWorkbenchUi::updateHelpOpacity(bool animate) {
 }
 
 void QnWorkbenchUi::updateControlsVisibility(bool animate) {
-    bool sliderVisible = navigator()->currentWidget() != NULL && !navigator()->currentWidget()->display()->isStillImage();
+    bool sliderVisible = navigator()->currentWidget() != NULL && !navigator()->currentWidget()->display()->isStillImage() && !(navigator()->currentWidget()->resource()->flags() & QnResource::still_image);
 
     if(m_inactive) {
         bool hovered = m_sliderOpacityProcessor->isHovered() || m_treeOpacityProcessor->isHovered() || m_titleOpacityProcessor->isHovered() || m_helpOpacityProcessor->isHovered();
