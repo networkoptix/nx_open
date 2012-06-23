@@ -84,7 +84,7 @@ QnAbstractMediaDataPtr QnThumbnailsArchiveDelegate::getNextData()
     }
     while (result && result->dataType != QnAbstractMediaData::VIDEO && result->dataType != QnAbstractMediaData::EMPTY_DATA);
 
-    if (result) {
+    if (result && !delegateForMediaStep) {
         if (holeDetected)
             result->flags |= QnAbstractMediaData::MediaFlags_BOF;
         else
