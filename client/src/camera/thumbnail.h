@@ -5,6 +5,8 @@
 #include <QtCore/QMetaType>
 #include <QtGui/QPixmap>
 
+#include <ui/common/geometry.h>
+
 /**
  * Value class representing a single video thumbnail.
  */
@@ -44,6 +46,10 @@ public:
 
     const QSize &size() const {
         return m_size;
+    }
+
+    qreal aspectRatio() const {
+        return QnGeometry::aspectRatio(m_size);
     }
 
     qint64 time() const {

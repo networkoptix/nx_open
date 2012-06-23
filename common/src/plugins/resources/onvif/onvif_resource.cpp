@@ -130,6 +130,12 @@ bool QnPlOnvifResource::hasDualStreaming() const
     return m_hasDual;
 }
 
+const CameraPhysicalWindowSize QnPlOnvifResource::getPhysicalWindowSize() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_physicalWindowSize;
+}
+
 int QnPlOnvifResource::getAudioBitrate() const
 {
     return m_audioBitrate;
@@ -371,6 +377,7 @@ bool QnPlOnvifResource::fetchAndSetResourceOptions()
 
     //If failed - ignore
     fetchAndSetAudioEncoderOptions(soapWrapper);
+    fetchAndSetVideoSourceOptions(soapWrapper);
 
     updateResourceCapabilities();
 
@@ -803,4 +810,89 @@ int QnPlOnvifResource::findClosestRateFloor(const std::vector<int>& values, int 
     }
 
     return 0;
+}
+
+bool QnPlOnvifResource::fetchAndSetVideoSourceOptions(MediaSoapWrapper& soapWrapper)
+{
+    VideoSrcOptionsReq request;
+    request.ConfigurationToken = NULL;
+    request.ProfileToken = NULL;
+
+    VideoSrcOptionsResp response;
+
+    int soapRes = soapWrapper.getVideoSourceConfigurationOptions(request, response);
+    if (soapRes != SOAP_OK || !response.Options) {
+
+        qWarning() << "QnPlOnvifResource::fetchAndSetVideoSourceOptions: can't receive data from camera (or data is empty) (URL: " 
+            << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId()
+            << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
+            << ". " << soapWrapper.getLastError();
+        return false;
+
+    }
+
+    setVideoSourceOptions(*response.Options);
+
+    return true;
+}
+
+void QnPlOnvifResource::setVideoSourceOptions(const VideoSrcOptions& options)
+{
+    if (!options.BoundsRange) {
+        qWarning() << "QnPlOnvifResource::setVideoSourceOptions: camera didn't return physical window size ( UniqueId: " 
+            << getUniqueId() << ").";
+        return;
+    }
+
+    int x = 0;
+    if (options.BoundsRange->XRange)
+    {
+        x = options.BoundsRange->XRange->Min;
+    }
+    else
+    {
+        qWarning() << "QnPlOnvifResource::setVideoSourceOptions: camera didn't return X-range ( UniqueId: " 
+            << getUniqueId() << ").";
+    }
+
+    int y = 0;
+    if (options.BoundsRange->YRange)
+    {
+        y = options.BoundsRange->YRange->Min;
+    }
+    else
+    {
+        qWarning() << "QnPlOnvifResource::setVideoSourceOptions: camera didn't return Y-range ( UniqueId: " 
+            << getUniqueId() << ").";
+    }
+
+    int width = 0;
+    if (options.BoundsRange->WidthRange)
+    {
+        width = options.BoundsRange->WidthRange->Max;
+    }
+    else
+    {
+        qWarning() << "QnPlOnvifResource::setVideoSourceOptions: camera didn't return width-range ( UniqueId: " 
+            << getUniqueId() << ").";
+    }
+
+    int height = 0;
+    if (options.BoundsRange->HeightRange)
+    {
+        height = options.BoundsRange->HeightRange->Max;
+    }
+    else
+    {
+        qWarning() << "QnPlOnvifResource::setVideoSourceOptions: camera didn't return width-range ( UniqueId: " 
+            << getUniqueId() << ").";
+    }
+
+    {
+        QMutexLocker lock(&m_mutex);
+        m_physicalWindowSize.x = x;
+        m_physicalWindowSize.y = y;
+        m_physicalWindowSize.width = width;
+        m_physicalWindowSize.height = height;
+    }
 }
