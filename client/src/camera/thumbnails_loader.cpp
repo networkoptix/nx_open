@@ -331,7 +331,7 @@ void QnThumbnailsLoader::process() {
         generation = m_generation;
     }
 
-    qDebug() << "[" << period.startTimeMs << "," << period.endTimeMs() + timeStep << ")";
+    qDebug() << "QnThumbnailsLoader::process [" << period.startTimeMs << "," << period.endTimeMs() + timeStep << ")";
 
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(m_resource);
     if (camera) {
