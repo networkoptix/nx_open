@@ -35,6 +35,7 @@ public:
     void setBoundingSize(const QSize &size);
     QSize boundingSize() const;
     
+    QSize sourceSize() const;
     QSize thumbnailSize() const;
 
     qint64 timeStep() const;
@@ -53,6 +54,7 @@ public:
     virtual void pleaseStop() override;
 
 signals:
+    void sourceSizeChanged();
     void thumbnailLoaded(const QnThumbnail &thumbnail);
     void thumbnailsInvalidated();
 

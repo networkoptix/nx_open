@@ -147,6 +147,8 @@ void QnWorkbenchNavigator::initialize() {
     m_timeSlider->setLineCount(SliderLineCount);
     m_timeSlider->setLineStretch(CurrentLine, 1.5);
     m_timeSlider->setLineStretch(SyncedLine, 1.0);
+    m_timeSlider->setRange(0, 1000ll * 60 * 60 * 24);
+    m_timeSlider->setWindow(m_timeSlider->minimum(), m_timeSlider->maximum());
 
     connect(m_timeScrollBar,                    SIGNAL(valueChanged(qint64)),                       this,   SLOT(updateSliderFromScrollBar()));
     connect(m_timeScrollBar,                    SIGNAL(pageStepChanged(qint64)),                    this,   SLOT(updateSliderFromScrollBar()));
@@ -206,9 +208,9 @@ bool QnWorkbenchNavigator::setLive(bool live) {
         return false;
 
     if(live) {
-        m_timeSlider->setValue(m_timeSlider->maximum());
+        m_timeSlider->setValue(m_timeSlider->maximum(), true);
     } else {
-        m_timeSlider->setValue(m_timeSlider->minimum()); // TODO: need to save position here.
+        m_timeSlider->setValue(m_timeSlider->minimum(), true); // TODO: need to save position here.
     }
     return true;
 }
@@ -449,7 +451,6 @@ void QnWorkbenchNavigator::jumpForward() {
         }
     }
     reader->jumpTo(pos, 0);
-
 }
 
 void QnWorkbenchNavigator::stepBackward() {
@@ -620,7 +621,7 @@ void QnWorkbenchNavigator::updateSliderFromReader() {
         qint64 timeUSec = m_currentWidget->display()->camDisplay()->isRealTimeSource() ? DATETIME_NOW : m_currentWidget->display()->camera()->getCurrentTime();
         qint64 timeMSec = timeUSec == DATETIME_NOW ? endTimeMSec : (timeUSec == AV_NOPTS_VALUE ? m_timeSlider->value() : timeUSec / 1000);
 
-        m_timeSlider->setValue(timeMSec);
+        m_timeSlider->setValue(timeMSec, true);
 
         if(timeUSec != AV_NOPTS_VALUE)
             updateLive();
