@@ -26,7 +26,6 @@
 #include "utils/media/frame_info.h"
 
 #include "thumbnails_loader_helper.h"
-#include <limits>
 
 namespace {
     const qint64 defaultUpdateInterval = 30 * 1000; /* 30 seconds. */
@@ -96,6 +95,12 @@ QSize QnThumbnailsLoader::boundingSize() const {
     QMutexLocker locker(&m_mutex);
 
     return m_boundingSize;
+}
+
+QSize QnThumbnailsLoader::sourceSize() const {
+    QMutexLocker locker(&m_mutex);
+
+    return m_scaleSourceSize;
 }
 
 QSize QnThumbnailsLoader::thumbnailSize() const {
@@ -444,6 +449,10 @@ void QnThumbnailsLoader::ensureScaleContextLocked(int lineSize, const QSize &sou
         m_scaleSourceFormat = format;
         m_scaleSourceLine = lineSize;
         updateTargetSizeLocked(false);
+        
+        m_mutex.unlock();
+        emit sourceSizeChanged();
+        m_mutex.lock();
     }
 
     if(m_scaleSourceLine == lineSize && m_scaleSourceSize == sourceSize && m_scaleSourceFormat == format && m_targetSize == m_scaleTargetSize)
