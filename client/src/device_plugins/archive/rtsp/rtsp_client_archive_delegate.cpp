@@ -60,15 +60,15 @@ QnResourcePtr QnRtspClientArchiveDelegate::getNextVideoServerFromTime(QnResource
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(resource);
     if (!netRes)
         return QnResourcePtr();
-	QString mac = netRes->getMAC().toString();
-    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(mac);
+	QString physicalId = netRes->getPhysicalId();
+    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(physicalId);
     if (!history)
         return QnResourcePtr();
     QnVideoServerResourcePtr videoServer = history->getNextVideoServerOnTime(time, m_rtspSession.getScale() >= 0, m_serverTimePeriod);
     if (!videoServer)
         return QnResourcePtr();
-    // get camera resource from other server. Unique id is mac + serverID
-    QnResourcePtr newResource = qnResPool->getResourceByUniqId(mac + videoServer->getId().toString());
+    // get camera resource from other server. Unique id is physicalId + serverID
+    QnResourcePtr newResource = qnResPool->getResourceByUniqId(physicalId + videoServer->getId().toString());
     return newResource;
 }
 
@@ -80,7 +80,7 @@ QString QnRtspClientArchiveDelegate::getUrl(QnResourcePtr resource)
     QString url = server->getUrl() + QString('/');
     QnNetworkResourcePtr netResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
     if (netResource != 0)
-		url += netResource->getMAC().toString();
+		url += netResource->getPhysicalId();
     else
         url += server->getUrl();
     return url;
@@ -100,8 +100,8 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(QnResourcePtr re
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(resource);
     if (!netRes)
         return 0;
-	QString mac = netRes->getMAC().toString();
-    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(mac);
+	QString physicalId = netRes->getPhysicalId();
+    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(physicalId);
     if (!history)
         return 0;
     QnCameraTimePeriodList videoServerList = history->getTimePeriods();
@@ -127,7 +127,7 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(QnResourcePtr re
         if (otherVideoServer == currentVideoServer)
             return 0; // archive starts with current server
 
-        QnResourcePtr otherCamera = qnResPool->getResourceByUniqId(mac + otherVideoServer->getId().toString());
+        QnResourcePtr otherCamera = qnResPool->getResourceByUniqId(physicalId + otherVideoServer->getId().toString());
         RTPSession otherRtspSession;
         otherRtspSession.setProxyAddr(m_proxyAddr, m_proxyPort);
         if (otherRtspSession.open(getUrl(otherCamera)))
@@ -147,11 +147,11 @@ QnResourcePtr QnRtspClientArchiveDelegate::getResourceOnTime(QnResourcePtr resou
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(resource);
     if (!netRes)
         return resource;
-	QString mac = netRes->getMAC().toString();
+	QString physicalId = netRes->getPhysicalId();
 
     if (time == DATETIME_NOW)
     {
-        QnNetworkResourceList cameraList = qnResPool->getAllNetResourceByMac(mac);
+        QnNetworkResourceList cameraList = qnResPool->getAllNetResourceByPhysicalId(physicalId);
         foreach(QnNetworkResourcePtr camera, cameraList) {
             if (!camera->isDisabled())
                 return camera;
@@ -159,15 +159,15 @@ QnResourcePtr QnRtspClientArchiveDelegate::getResourceOnTime(QnResourcePtr resou
         return resource;
     }
 
-    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(mac);
+    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(physicalId);
     if (!history)
         return resource;
     QnVideoServerResourcePtr videoServer = history->getVideoServerOnTime(time, m_rtspSession.getScale() >= 0, m_serverTimePeriod, false);
     if (!videoServer)
         return resource;
 
-    // get camera resource from other server. Unique id is mac + serverID
-    QnResourcePtr newResource = qnResPool->getResourceByUniqId(mac + videoServer->getId().toString());
+    // get camera resource from other server. Unique id is physicalId + serverID
+    QnResourcePtr newResource = qnResPool->getResourceByUniqId(physicalId + videoServer->getId().toString());
 	if (newResource && newResource != resource) {
 		QnVideoServerResourcePtr videoServer = qSharedPointerDynamicCast<QnVideoServerResource> (qnResPool->getResourceById(resource->getParentId()));
 		if (videoServer)

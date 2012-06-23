@@ -773,11 +773,11 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
         if(!sourceCamera)
             continue;
 
-		QnMacAddress mac = sourceCamera->getMAC();
+		QString physicalId = sourceCamera->getPhysicalId();
 
         QnVirtualCameraResourcePtr replacedCamera;
         foreach(const QnVirtualCameraResourcePtr &otherCamera, serverCameras) {
-            if(otherCamera->getMAC() == mac) {
+            if(otherCamera->getPhysicalId() == physicalId) {
                 replacedCamera = otherCamera;
                 break;
             }
@@ -1604,7 +1604,7 @@ Do you want to continue?"),
     settings.beginGroup(QLatin1String("export"));
     QString previousDir = settings.value(QLatin1String("previousDir")).toString();
     QString dateFormat = cameraResource ? tr("dd-mmm-yyyy hh-mm-ss") : tr("hh-mm-ss");
-	QString suggestion = networkResource ? networkResource->getMAC().toString() : QString();
+	QString suggestion = networkResource ? networkResource->getPhysicalId() : QString();
 
     QString fileName;
     QString selectedExtension;

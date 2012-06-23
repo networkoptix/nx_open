@@ -332,7 +332,7 @@ void QnThumbnailsLoader::process() {
 
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(m_resource);
     if (camera) {
-        QnNetworkResourceList cameras = QnCameraHistoryPool::instance()->getAllCamerasWithSameMac(camera, period);
+        QnNetworkResourceList cameras = QnCameraHistoryPool::instance()->getAllCamerasWithSamePhysicalId(camera, period);
         for (int i = 0; i < cameras.size(); ++i) 
         {
             QnAbstractArchiveDelegatePtr rtspDelegate(new QnRtspClientArchiveDelegate());
