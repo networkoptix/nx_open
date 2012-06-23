@@ -232,7 +232,7 @@ namespace {
         return result;
     }
 
-    void drawCroppedPixmap(QPainter *painter, const QRectF &target, const QRectF &cropTarget, const QPixmap &pixmap, const QRectF &source) {
+    void drawCroppedPixmap(QPainter *painter, const QRectF &target, const QRectF &cropTarget, const QPixmap &pixmap, const QRectF &source, QRectF *drawnTarget = NULL) {
         MarginsF targetMargins(
             qMax(0.0, cropTarget.left() - target.left()),
             qMax(0.0, cropTarget.top() - target.top()),
@@ -240,19 +240,25 @@ namespace {
             qMax(0.0, target.bottom() - cropTarget.bottom())
         );
 
+        QRectF erodedTarget;
+
         if(targetMargins.isNull()) {
-            painter->drawPixmap(target, pixmap, source);
-            return;
+            erodedTarget = target;
+        } else {
+            erodedTarget = QnGeometry::eroded(target, targetMargins);
         } 
 
-        QRectF erodedTarget = QnGeometry::eroded(target, targetMargins);
-        if(!erodedTarget.isValid())
-            return;
+        if(!erodedTarget.isValid()) {
+            erodedTarget = QRectF();
+        } else {
+            MarginsF sourceMargins = QnGeometry::cwiseMul(QnGeometry::cwiseDiv(targetMargins, target.size()), source.size());
+            QRectF erodedSource = QnGeometry::eroded(source, sourceMargins);
 
-        MarginsF sourceMargins = QnGeometry::cwiseMul(QnGeometry::cwiseDiv(targetMargins, target.size()), source.size());
-        QRectF erodedSource = QnGeometry::eroded(source, sourceMargins);
+            painter->drawPixmap(erodedTarget, pixmap, erodedSource);
+        }
 
-        painter->drawPixmap(erodedTarget, pixmap, erodedSource);
+        if(drawnTarget)
+            *drawnTarget = erodedTarget;
     }
 
 } // anonymous namespace
@@ -279,7 +285,8 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     m_totalLineStretch(0.0),
     m_rulerHeight(0.0),
     m_prefferedHeight(0.0),
-    m_lastThumbnailsUpdateTime(0)
+    m_lastThumbnailsUpdateTime(0),
+    m_lastHoverThumbnail(0)
 {
     m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("NO THUMBNAILS\nAVAILABLE"), 16, QColor(255, 255, 255, 255));
 
@@ -986,12 +993,18 @@ void QnTimeSlider::animateThumbnails(int deltaMSecs) {
 }
 
 bool QnTimeSlider::animateThumbnail(qreal dt, ThumbnailData &data) {
+    if(data.selecting && !data.hiding) {
+        data.selection = qMin(1.0, data.selection + dt * 4.0);
+    } else {
+        data.selection = qMax(0.0, data.selection - dt * 4.0);
+    }
+
     if(data.hiding) {
-        data.opacity = qMax(0.0, data.opacity - dt * 2.0);
+        data.opacity = qMax(0.0, data.opacity - dt * 4.0);
 
         return !qFuzzyIsNull(data.opacity);
     } else {
-        data.opacity = qMin(1.0, data.opacity + dt * 2.0);
+        data.opacity = qMin(1.0, data.opacity + dt * 4.0);
 
         return true;
     }
@@ -1144,7 +1157,7 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
     }
 
     /* Draw thumbnails. */
-    drawThumbnails(painter, QnGeometry::eroded(thumbnailsRect, MarginsF(1.0, 1.0, 1.0, 0.0))); /* Rect is eroded so that thumbnails don't get painted under borders. */
+    drawThumbnails(painter, QnGeometry::eroded(thumbnailsRect, MarginsF(1.0, 1.0, 1.0, 1.0))); /* Rect is eroded so that thumbnails don't get painted under borders. */
 
     /* Draw separators. */
     if(!thumbnailsRect.isEmpty())
@@ -1481,20 +1494,18 @@ void QnTimeSlider::drawThumbnails(QPainter *painter, const QRectF &rect) {
             if(data.thumbnail.isEmpty())
                 continue;
 
-            const QPixmap &pixmap = data.thumbnail.pixmap();
-
             qreal x = rect.width() / 2 + data.pos * thumbnailWidth;;
-            QSizeF targetSize(pixmap.width() * rect.height() / pixmap.height(), rect.height());
+            QSizeF targetSize(data.thumbnail.aspectRatio() * rect.height(), rect.height());
             QRectF targetRect(x - targetSize.width() / 2, rect.top(), targetSize.width(), targetSize.height());
 
-            qreal opacity = painter->opacity();
-            painter->setOpacity(opacity * data.opacity);
-            drawCroppedPixmap(painter, targetRect, boundingRect, pixmap, pixmap.rect());
-            painter->setOpacity(opacity);
+            drawThumbnail(painter, data, targetRect, boundingRect);
 
             boundingRect.setLeft(qMax(boundingRect.left(), targetRect.right()));
         }
     } else {
+        QnScopedPainterPenRollback penRollback(painter);
+        QnScopedPainterBrushRollback brushRollback(painter);
+
         qint64 startTime = qFloor(m_windowStart, step);
         qint64 endTime = qCeil(m_windowEnd, step);
 
@@ -1513,22 +1524,37 @@ void QnTimeSlider::drawThumbnails(QPainter *painter, const QRectF &rect) {
             if(data.thumbnail.isEmpty())
                 continue;
 
-            const QPixmap &pixmap = data.thumbnail.pixmap();
-
             qreal x = quickPositionFromValue(time, false);
-            QSizeF targetSize(pixmap.width() * rect.height() / pixmap.height(), rect.height());
+            QSizeF targetSize(data.thumbnail.aspectRatio() * rect.height(), rect.height());
             QRectF targetRect(x - targetSize.width() / 2, rect.top(), targetSize.width(), targetSize.height());
 
-            qreal opacity = painter->opacity();
-            painter->setOpacity(opacity * data.opacity);
-            drawCroppedPixmap(painter, targetRect, boundingRect, pixmap, pixmap.rect());
-            painter->setOpacity(opacity);
+            drawThumbnail(painter, data, targetRect, boundingRect);
 
             boundingRect.setLeft(qMax(boundingRect.left(), targetRect.right()));
         }
     }
 }
 
+void QnTimeSlider::drawThumbnail(QPainter *painter, const ThumbnailData &data, const QRectF &targetRect, const QRectF &boundingRect) {
+    const QPixmap &pixmap = data.thumbnail.pixmap();
+
+    qreal opacity = painter->opacity();
+    painter->setOpacity(opacity * data.opacity);
+
+    QRectF rect;
+    drawCroppedPixmap(painter, targetRect, boundingRect, pixmap, pixmap.rect(), &rect);
+
+    if(!rect.isEmpty()) {
+        qreal a = data.selection;
+        qreal width = 1.0 + a * 2.0;
+        QColor color = linearCombine(1.0 - a, QColor(255, 255, 255, 32), a, selectionMarkerColor);
+
+        painter->setPen(QPen(color, width));
+        painter->setBrush(Qt::NoBrush);
+        painter->drawRect(QnGeometry::eroded(rect, width / 2.0));
+    }
+    painter->setOpacity(opacity);
+}
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -1739,6 +1765,10 @@ void QnTimeSlider::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
     base_type::hoverLeaveEvent(event);
 
     unsetCursor();
+
+    QMap<qint64, ThumbnailData>::iterator oldPos = m_thumbnailData.find(m_lastHoverThumbnail);
+    if(oldPos != m_thumbnailData.end())
+        oldPos->selecting = false;
 }
 
 void QnTimeSlider::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
@@ -1752,6 +1782,25 @@ void QnTimeSlider::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
     default:
         unsetCursor();
         break;
+    }
+
+    if(thumbnailsRect().contains(event->pos()) && thumbnailsLoader() && thumbnailsLoader()->timeStep() != 0 && m_oldThumbnailData.isEmpty() && !m_thumbnailsUpdateTimer->isActive()) {
+        qint64 time = qRound(valueFromPosition(event->pos()), thumbnailsLoader()->timeStep());
+        
+        QMap<qint64, ThumbnailData>::iterator pos = m_thumbnailData.find(time);
+        if(pos != m_thumbnailData.end()) {
+            QMap<qint64, ThumbnailData>::iterator oldPos = m_thumbnailData.find(m_lastHoverThumbnail);
+            if(oldPos != m_thumbnailData.end())
+                oldPos->selecting = false;
+
+            pos->selecting = true;
+
+            m_lastHoverThumbnail = time;
+        }
+    } else {
+        QMap<qint64, ThumbnailData>::iterator oldPos = m_thumbnailData.find(m_lastHoverThumbnail);
+        if(oldPos != m_thumbnailData.end())
+            oldPos->selecting = false;
     }
 }
 

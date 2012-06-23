@@ -210,13 +210,15 @@ private:
     };
 
     struct ThumbnailData {
-        ThumbnailData(): pos(0.0), opacity(0.0), hiding(false) {}
-        ThumbnailData(const QnThumbnail &thumbnail): thumbnail(thumbnail), pos(0.0), opacity(0.0), hiding(false) {}
+        ThumbnailData(): pos(0.0), opacity(0.0), hiding(false), selection(0.0), selecting(false) {}
+        ThumbnailData(const QnThumbnail &thumbnail): thumbnail(thumbnail), pos(0.0), opacity(0.0), hiding(false), selection(0.0), selecting(false) {}
 
         QnThumbnail thumbnail;
         qreal pos;
         qreal opacity;
+        qreal selection;
         bool hiding;
+        bool selecting;
     };
 
 private:
@@ -243,6 +245,7 @@ private:
     void drawSeparator(QPainter *painter, const QRectF &rect);
     void drawDates(QPainter *painter, const QRectF &rect);
     void drawThumbnails(QPainter *painter, const QRectF &rect);
+    void drawThumbnail(QPainter *painter, const ThumbnailData &data, const QRectF &targetRect, const QRectF &boundingRect);
 
     void updateVisibleLineCount();
     void updateToolTipVisibility();
@@ -311,7 +314,8 @@ private:
     QMap<qint64, ThumbnailData> m_thumbnailData;
     QList<ThumbnailData> m_oldThumbnailData;
     QRectF m_thumbnailsPaintRect;
-    
+    qint64 m_lastHoverThumbnail;
+
     qreal m_rulerHeight;
     qreal m_prefferedHeight;
 
