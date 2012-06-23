@@ -1107,6 +1107,25 @@ void QnTimeSlider::updateThumbnailsStepSize(bool instant) {
     }
 }
 
+void QnTimeSlider::setThumbnailSelecting(qint64 time, bool selecting) {
+    if(time < 0)
+        return;
+
+    QMap<qint64, ThumbnailData>::iterator pos = m_thumbnailData.find(time);
+    if(pos == m_thumbnailData.end())
+        return;
+
+    qint64 actualTime = pos->thumbnail.actualTime();
+
+    QMap<qint64, ThumbnailData>::iterator ipos;
+    for(ipos = pos; ipos->thumbnail.actualTime() == actualTime; ipos--) {
+        ipos->selecting = selecting;
+        if(ipos == m_thumbnailData.begin())
+            break;
+    }
+    for(ipos = pos + 1; ipos != m_thumbnailData.end() && ipos->thumbnail.actualTime() == actualTime; ipos++)
+        ipos->selecting = selecting;
+}
 
 
 // -------------------------------------------------------------------------- //
@@ -1543,10 +1562,18 @@ void QnTimeSlider::drawThumbnail(QPainter *painter, const ThumbnailData &data, c
         qreal a = data.selection;
         qreal width = 1.0 + a * 2.0;
         QColor color = linearCombine(1.0 - a, QColor(255, 255, 255, 32), a, selectionMarkerColor);
+        rect = QnGeometry::eroded(rect, width / 2.0);
 
         painter->setPen(QPen(color, width));
         painter->setBrush(Qt::NoBrush);
-        painter->drawRect(QnGeometry::eroded(rect, width / 2.0));
+        painter->drawRect(rect);
+
+        qreal x = quickPositionFromValue(data.thumbnail.actualTime());
+        if(x >= rect.left() && x <= rect.right()) {
+            painter->setPen(Qt::NoPen);
+            painter->setBrush(withAlpha(color, (color.alpha() + 255) / 2));
+            painter->drawEllipse(QPointF(x, rect.bottom()), width * 2, width * 2);
+        }
     }
     painter->setOpacity(opacity);
 }
@@ -1762,23 +1789,6 @@ void QnTimeSlider::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
     unsetCursor();
 
     setThumbnailSelecting(m_lastHoverThumbnail, false);
-}
-
-void QnTimeSlider::setThumbnailSelecting(qint64 time, bool selecting) {
-    if(time < 0)
-        return;
-
-    QMap<qint64, ThumbnailData>::iterator pos = m_thumbnailData.find(time);
-    if(pos == m_thumbnailData.end())
-        return;
-
-    qint64 actualTime = pos->thumbnail.actualTime();
-
-    QMap<qint64, ThumbnailData>::iterator ipos;
-    for(ipos = pos; ipos != m_thumbnailData.begin() && ipos->thumbnail.actualTime() == actualTime; ipos--)
-        ipos->selecting = selecting;
-    for(ipos = pos + 1; ipos != m_thumbnailData.end() && ipos->thumbnail.actualTime() == actualTime; ipos++)
-        ipos->selecting = selecting;
 }
 
 void QnTimeSlider::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
