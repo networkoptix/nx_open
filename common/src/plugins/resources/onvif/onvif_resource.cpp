@@ -55,7 +55,7 @@ const QString QnPlOnvifResource::fetchMacAddress(const NetIfacesResp& response,
         if (ifacePtr->Enabled && ifacePtr->IPv4->Enabled) {
             onvifXsd__IPv4Configuration* conf = ifacePtr->IPv4->Config;
 
-            if (conf->DHCP) {
+            if (conf->DHCP && conf->FromDHCP) {
                 if (senderIpAddress == conf->FromDHCP->Address.c_str()) {
                     return QString(ifacePtr->Info->HwAddress.c_str()).toUpper().replace(":", "-");
                 }
