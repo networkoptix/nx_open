@@ -26,9 +26,9 @@ public:
     static const int MIN_SENSITIVITY = 0; // equal motion mask
     static const int MAX_SENSITIVITY = 9; // max motion sensitivity
 
-    /* 
-    * Returns false if any region in range [1..MAX] contain too many rects (> maxRectCount). For motionMask region (index 0) no any limits.
-    */
+    /**
+     * Returns false if any region in range [1..MAX] contain too many rects (> maxRectCount). For motionMask region (index 0) no any limits.
+     */
     bool isValid(int maxMotionRects, int maxMaskRects) const;
 
     bool operator==(const QnMotionRegion& other) const;
@@ -36,13 +36,13 @@ public:
     bool isEmpty() const;
 
     void addRect(int sensitivity, const QRect& rect);
-    QRegion getMotionMask() const; // return info with zerro sensitivity only
+    QRegion getMotionMask() const; // return info with zero sensitivity only
     QRegion getRegionBySens(int value) const;
     QMultiMap<int, QRect> getAllMotionRects() const;
 
-    /* 
-    * Returns simplified version of region's rects
-    */
+    /**
+     * Returns simplified version of region's rects
+     */
     QVector<QRect> getRectsBySens(int value) const;
 
     bool updateSensitivityAt(const QPoint& pos, int sens);
@@ -52,7 +52,7 @@ public:
 
     void removeDefaultMotion();
 private:
-    QRegion m_data[MAX_SENSITIVITY - MIN_SENSITIVITY+1];
+    QRegion m_data[MAX_SENSITIVITY - MIN_SENSITIVITY + 1];
 };
 
 

@@ -56,9 +56,10 @@ private slots:
     void at_cameraScheduleWidget_scheduleTasksChanged();
     void at_linkActivated(const QString &urlString);
     void at_motionTypeChanged();
-    void at_motionSensitivityChanged(int value);
     void at_motionSelectionCleared();
+    
     void updateMaxFPS();
+    void updateMotionWidgetSensitivity();
 
 private:
     void setHasChanges(bool hasChanges);

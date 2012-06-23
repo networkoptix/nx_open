@@ -466,7 +466,7 @@ private:
     QVector<ChannelState> m_channelState;
 
     /** Image region where motion is currently present, in parrots. */
-    QList<QnMotionRegion> m_motionRegionList;
+    QList<QnMotionRegion> m_motionRegionList; // TODO: WHY THE HELL THIS ONE IS OF SIZE 4?????????? Find the one who did it and use your swordsmanship skillz on him.
 
     /** Whether the motion mask is valid. */
     bool m_motionMaskValid;

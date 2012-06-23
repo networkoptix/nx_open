@@ -503,9 +503,8 @@ bool QnResourceWidget::setMotionRegionSensitivity(int sensitivity, const QPoint 
 }
 
 void QnResourceWidget::clearMotionRegions() {
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
         m_motionRegionList[i] = QnMotionRegion();
-    }
     m_motionMaskValid = true;
 
     invalidateMotionMaskBinData();

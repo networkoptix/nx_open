@@ -24,7 +24,9 @@
 #include "ui/workbench/workbench_controller.h"
 #include "ui/workbench/workbench_layout.h"
 #include "ui/workbench/workbench_context.h"
+#include "camera/resource_display.h" // TODO: remove
 #include "ui/style/globals.h"
+#include <limits>
 
 
 QnCameraMotionMaskWidget::QnCameraMotionMaskWidget(QWidget *parent): 
@@ -148,6 +150,7 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
 
     if(!m_camera) {
         m_resourceWidget = 0;
+        m_motionSensitivity = QnMotionRegion::MIN_SENSITIVITY;
     } else {
         /* Add single item to the layout. */
         QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid(), this);
@@ -161,6 +164,28 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
         m_resourceWidget->setDrawMotionWindows(QnResourceWidget::DrawAllMotionInfo);
         m_resourceWidget->setDisplayFlag(QnResourceWidget::DisplayButtons, false);
         m_resourceWidget->setDisplayFlag(QnResourceWidget::DisplayMotion, true);
+
+        /* Find best value for sensitivity. */
+        int counts[QnMotionRegion::MAX_SENSITIVITY - QnMotionRegion::MIN_SENSITIVITY + 1];
+        memset(counts, 0, sizeof(counts));
+
+        int channelCount = m_resourceWidget->display()->videoLayout()->numberOfChannels(); // TODO: WHAT THE HELL???? We shouldn't be needing this shit here.
+        
+        for(int channel = 0; channel < channelCount; channel++)
+            for(int sensitivity = QnMotionRegion::MIN_SENSITIVITY; sensitivity <= QnMotionRegion::MAX_SENSITIVITY; sensitivity++)
+                foreach(const QRect &rect, m_resourceWidget->getMotionRegionList()[channel].getRectsBySens(sensitivity))
+                    counts[sensitivity - QnMotionRegion::MIN_SENSITIVITY] += rect.width() * rect.height();
+
+        int bestCount = std::numeric_limits<int>::min();
+        int bestSensitivity = 0;
+        for(int sensitivity = QnMotionRegion::MIN_SENSITIVITY; sensitivity <= QnMotionRegion::MAX_SENSITIVITY; sensitivity++) {
+            if(counts[sensitivity - QnMotionRegion::MIN_SENSITIVITY] > bestCount) {
+                bestCount = counts[sensitivity - QnMotionRegion::MIN_SENSITIVITY];
+                bestSensitivity = sensitivity;
+            }
+        }
+
+        m_motionSensitivity = bestSensitivity;
     }
 
     /* Consider motion mask list changed. */
@@ -177,14 +202,13 @@ void QnCameraMotionMaskWidget::showTooManyWindowsMessage(const QnMotionRegion &r
             this, 
             tr("Too many motion windows"), 
             tr("Maximum amount of motion windows for current camera is %1, but %2 motion windows are currently selected.").arg(m_camera->motionWindowCnt()).arg(maxWndCnt)
-            );
-    }
-    else if (maxMaskCnt > m_camera->motionMaskWindowCnt()) {
+        );
+    } else if (maxMaskCnt > m_camera->motionMaskWindowCnt()) {
         QMessageBox::warning(
             this, 
             tr("Too many motion windows"), 
             tr("Maximum amount of motion mask windows for current camera is %1, but %2 motion mask windows are currently selected.").arg(m_camera->motionMaskWindowCnt()).arg(maxMaskCnt)
-            );
+        );
     }
 }
 
@@ -203,18 +227,22 @@ void QnCameraMotionMaskWidget::setNeedControlMaxRects(bool value)
     }
 };
 
-void QnCameraMotionMaskWidget::setMotionSensitivity(int value)
+int QnCameraMotionMaskWidget::motionSensitivity() const 
 {
-    m_motionSensitivity = value;
+    return m_motionSensitivity;
 }
 
-void QnCameraMotionMaskWidget::clearMotion()
+void QnCameraMotionMaskWidget::setMotionSensitivity(int motionSensitivity) 
+{
+    m_motionSensitivity = motionSensitivity;
+}
+
+void QnCameraMotionMaskWidget::clearMotion() 
 {
     at_motionRegionCleared();
 }
 
-int QnCameraMotionMaskWidget::gridPosToChannelPos(QPoint &pos)
-{
+int QnCameraMotionMaskWidget::gridPosToChannelPos(QPoint &pos) {
     const QnVideoResourceLayout* layout = m_camera->getVideoLayout();
     for (int i = 0; i < layout->numberOfChannels(); ++i)
     {
