@@ -435,7 +435,7 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog() {
         QMessageBox::warning(widget(), tr("Could not Enable Recording"), message);
         cameraSettingsDialog()->widget()->setCamerasActive(false);
     }
-
+    
     /* Submit and save it. */
     cameraSettingsDialog()->widget()->submitToResources();
     connection()->saveAsync(cameras, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
@@ -1272,7 +1272,16 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
         return;
     }
 
-    QString suggetion = tr("screenshot");
+    // TODO: move out, common code
+    QString timeString;
+    qint64 time = display->camDisplay()->getCurrentTime();
+    if(widget->resource()->flags() & QnResource::utc) {
+        timeString = QDateTime::fromMSecsSinceEpoch(time).toString(QLatin1String("yyyy-MMM-dd_hh.mm.ss"));
+    } else {
+        timeString = QTime().addMSecs(time).toString(QLatin1String("hh.mm.ss"));
+    }
+
+    QString suggetion = widget->resource()->getName() + QLatin1String("_") + timeString; // TODO: remove non-filename chars
 
     QSettings settings;
     settings.beginGroup(QLatin1String("screenshots"));

@@ -40,6 +40,7 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate():
     m_rtpDataBuffer = new quint8[MAX_RTP_BUFFER_SIZE];
     m_flags |= Flag_SlowSource;
     m_flags |= Flag_CanProcessNegativeSpeed;
+    m_flags |= Flag_CanProcessMediaStep;
 }
 
 void QnRtspClientArchiveDelegate::setProxyAddr(const QString& addr, int port)
@@ -161,7 +162,7 @@ QnResourcePtr QnRtspClientArchiveDelegate::getResourceOnTime(QnResourcePtr resou
     QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(mac);
     if (!history)
         return resource;
-    QnVideoServerResourcePtr videoServer = history->getVideoServerOnTime(time, m_rtspSession.getScale() >= 0, m_serverTimePeriod);
+    QnVideoServerResourcePtr videoServer = history->getVideoServerOnTime(time, m_rtspSession.getScale() >= 0, m_serverTimePeriod, false);
     if (!videoServer)
         return resource;
 

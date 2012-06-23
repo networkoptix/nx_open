@@ -651,8 +651,13 @@ void QnResourceWidget::setDisplayFlags(DisplayFlags flags) {
         if (reader)
             reader->setSendMotion(flags & DisplayMotion);
 
-        if(!(flags & DisplayMotion))
-            m_searchButton->setChecked(false);
+        m_searchButton->setChecked(flags & DisplayMotion);
+
+        if(flags & DisplayMotion) {
+            setProperty(Qn::MotionSelectionModifiers, 0);
+        } else {
+            setProperty(Qn::MotionSelectionModifiers, QVariant()); /* Use defaults. */
+        }
     }
 
     if(changedFlags & DisplayButtons)
@@ -678,7 +683,7 @@ void QnResourceWidget::updateOverlayText() {
     QnMediaContextPtr codec = m_display->mediaProvider()->getCodecContext();
     if (codec && codec->ctx()) 
         codecName = codecIDToString(codec->ctx()->codec_id);
-    m_footerStatusLabel->setText(tr("%1fps @ %2Mbps (%3) - %4").arg(fps, 0, 'g', 2).arg(mbps, 0, 'g', 2).arg(codecName).arg(m_renderer->isLowQualityImage(0) ? "LQ" : "HQ"));
+    m_footerStatusLabel->setText(tr("%1fps @ %2Mbps (%3) - %4").arg(fps, 0, 'f', 2).arg(mbps, 0, 'f', 2).arg(codecName).arg(m_renderer->isLowQualityImage(0) ? "LQ" : "HQ"));
 }
 
 void QnResourceWidget::updateButtonsVisibility() {
@@ -867,12 +872,7 @@ void QnResourceWidget::at_resource_nameChanged() {
 }
 
 void QnResourceWidget::at_searchButton_toggled(bool checked) {
-    if(checked) {
-        setDisplayFlag(DisplayMotion, true);
-        setProperty(Qn::MotionSelectionModifiers, 0);
-    } else {
-        setProperty(Qn::MotionSelectionModifiers, QVariant());
-    }
+    setDisplayFlag(DisplayMotion, checked);
 }
 
 // -------------------------------------------------------------------------- //

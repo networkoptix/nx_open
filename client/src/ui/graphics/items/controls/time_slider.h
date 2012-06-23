@@ -5,17 +5,20 @@
 
 #include <recording/time_period.h>
 
+#include <ui/common/functors.h>
 #include <ui/processors/kinetic_process_handler.h>
 #include <ui/processors/drag_process_handler.h>
 #include <ui/animation/animation_timer_listener.h>
 #include <ui/animation/animated.h>
 
 #include "time_step.h"
+#include "camera/thumbnail.h"
 
 class QTimer;
 
 class QnThumbnailsLoader;
 class QnTimeSliderPixmapCache;
+
 
 class QnTimeSlider: public Animated<QnToolTipSlider>, protected KineticProcessHandler, protected DragProcessHandler, protected AnimationTimerListener {
     Q_OBJECT;
@@ -181,8 +184,46 @@ private:
         CreateSelectionMarker
     };
 
+    struct TimeStepData {
+        TimeStepData(): currentHeight(0.0), targetHeight(0.0), currentLineOpacity(0.0), targetLineOpacity(0.0), currentTextOpacity(0.0), targetTextOpacity(0.0) {}
+
+        qreal currentHeight;
+        qreal targetHeight;
+        qreal currentLineOpacity;
+        qreal targetLineOpacity;
+        qreal currentTextOpacity;
+        qreal targetTextOpacity;
+
+        int currentTextHeight;
+        qreal currentLineHeight;
+    };
+
+    struct LineData {
+        LineData(): visible(true), stretch(1.0) {}
+
+        QnTimePeriodList normalPeriods[Qn::TimePeriodRoleCount];
+        QnTimePeriodList aggregatedPeriods[Qn::TimePeriodRoleCount];
+        QString comment;
+        QPixmap commentPixmap;
+        bool visible;
+        qreal stretch;
+    };
+
+    struct ThumbnailData {
+        ThumbnailData(): pos(0.0), opacity(0.0), hiding(false) {}
+        ThumbnailData(const QnThumbnail &thumbnail): thumbnail(thumbnail), pos(0.0), opacity(0.0), hiding(false) {}
+
+        QnThumbnail thumbnail;
+        qreal pos;
+        qreal opacity;
+        bool hiding;
+    };
+
+private:
     Marker markerFromPosition(const QPointF &pos, qreal maxDistance = 1.0) const;
     QPointF positionFromMarker(Marker marker) const;
+
+    qreal quickPositionFromValue(qint64 logicalValue, bool bound = true) const;
 
     QRectF thumbnailsRect() const;
     QRectF rulerRect() const;
@@ -215,38 +256,21 @@ private:
     void updateAggregationValue();
     void updateAggregatedPeriods(int line, Qn::TimePeriodRole type);
     void updateTotalLineStretch();
-    void updateThumbnailsLater();
-    Q_SLOT void updateThumbnails();
+    void updateThumbnailsStepSize(bool instant);
+    void updateThumbnailsPeriod();
+    void updateThumbnailsStepSizeLater();
+    Q_SLOT void updateThumbnailsStepSizeTimer();
+
+    Q_SLOT void addThumbnail(const QnThumbnail &thumbnail);
+    Q_SLOT void clearThumbnails();
 
     void animateStepValues(int deltaMSecs);
+    void animateThumbnails(int deltaMSecs);
+    bool animateThumbnail(qreal dt, ThumbnailData &data);
+    void freezeThumbnails();
 
 private:
     Q_DECLARE_PRIVATE(GraphicsSlider);
-
-    struct TimeStepData {
-        TimeStepData(): currentHeight(0.0), targetHeight(0.0), currentLineOpacity(0.0), targetLineOpacity(0.0), currentTextOpacity(0.0), targetTextOpacity(0.0) {}
-
-        qreal currentHeight;
-        qreal targetHeight;
-        qreal currentLineOpacity;
-        qreal targetLineOpacity;
-        qreal currentTextOpacity;
-        qreal targetTextOpacity;
-
-        int currentTextHeight;
-        qreal currentLineHeight;
-    };
-
-    struct LineData {
-        LineData(): visible(true), stretch(1.0) {}
-
-        QnTimePeriodList normalPeriods[Qn::TimePeriodRoleCount];
-        QnTimePeriodList aggregatedPeriods[Qn::TimePeriodRoleCount];
-        QString comment;
-        QPixmap commentPixmap;
-        bool visible;
-        qreal stretch;
-    };
 
     qint64 m_windowStart, m_windowEnd;
     qint64 m_minimalWindow;
@@ -257,6 +281,9 @@ private:
     qint64 m_oldMinimum, m_oldMaximum;
     Options m_options;
     QString m_toolTipFormat;
+
+    QnLinearFunction m_unboundMapper;
+    QnBoundedLinearFunction m_boundMapper;
 
     qint64 m_zoomAnchor;
     bool m_unzooming;
@@ -279,8 +306,12 @@ private:
 
     QWeakPointer<QnThumbnailsLoader> m_thumbnailsLoader;
     QTimer *m_thumbnailsUpdateTimer;
+    qint64 m_lastThumbnailsUpdateTime;
     QPixmap m_noThumbnailsPixmap;
-
+    QMap<qint64, ThumbnailData> m_thumbnailData;
+    QList<ThumbnailData> m_oldThumbnailData;
+    QRectF m_thumbnailsPaintRect;
+    
     qreal m_rulerHeight;
     qreal m_prefferedHeight;
 

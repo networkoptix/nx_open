@@ -12,7 +12,7 @@ public:
 
     void setResource(QnNetworkResourcePtr netResource);
     void setPrefferedQuality(MediaQuality quality);
-    void findDataForTime(const qint64 time, DeviceFileCatalog::Chunk& resultChunk, DeviceFileCatalogPtr& resultCatalog, DeviceFileCatalog::FindMethod findMethod);
+    void findDataForTime(const qint64 time, DeviceFileCatalog::Chunk& resultChunk, DeviceFileCatalogPtr& resultCatalog, DeviceFileCatalog::FindMethod findMethod) const;
 
     //void findNextChunk(const DeviceFileCatalogPtr& currentCatalog, const DeviceFileCatalog::Chunk& currentChunk, DeviceFileCatalog::Chunk& nextChunk, DeviceFileCatalogPtr& nextCatalog);
 private:

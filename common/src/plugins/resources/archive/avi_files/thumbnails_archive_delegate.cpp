@@ -14,8 +14,9 @@ QnThumbnailsArchiveDelegate::QnThumbnailsArchiveDelegate(QnAbstractArchiveDelega
 void QnThumbnailsArchiveDelegate::setRange(qint64 startTime, qint64 endTime, qint64 frameStep)
 {
     m_frameStep = frameStep;
-    m_rangeStart = startTime;
+    m_currentPos = m_rangeStart = startTime;
     m_rangeEnd = endTime;
+    m_baseDelegate->setRange(startTime, endTime, frameStep);
 }
 
 bool QnThumbnailsArchiveDelegate::open(QnResourcePtr resource)
@@ -65,19 +66,23 @@ QnAbstractMediaDataPtr QnThumbnailsArchiveDelegate::getNextData()
     if (m_rangeStart == AV_NOPTS_VALUE)
         return QnAbstractMediaDataPtr();
 
-    if (m_currentPos >= m_rangeEnd || m_currentPos == DATETIME_NOW || m_rangeStart == DATETIME_NOW)
+    if (m_currentPos > m_rangeEnd || m_currentPos == DATETIME_NOW || m_rangeStart == DATETIME_NOW)
         return QnAbstractMediaDataPtr();
 
-    m_currentPos = qMax(m_currentPos, m_baseDelegate->seek(m_currentPos, true));
+    bool delegateForMediaStep = m_baseDelegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanProcessMediaStep;
+    if (!delegateForMediaStep)
+        m_currentPos = qMax(m_currentPos, m_baseDelegate->seek(m_currentPos, true));
+    
     QnAbstractMediaDataPtr result;
     do {
         result = m_baseDelegate->getNextData();
     }
-    while (result && result->dataType != QnAbstractMediaData::VIDEO);
+    while (result && result->dataType != QnAbstractMediaData::VIDEO && result->dataType != QnAbstractMediaData::EMPTY_DATA);
 
-    m_currentPos += m_frameStep;
+    if (!delegateForMediaStep)
+        m_currentPos += m_frameStep;
 
-    if (!result || qSharedPointerDynamicCast<QnEmptyMediaData>(result)) 
+    if (!result || result->dataType == QnAbstractMediaData::EMPTY_DATA)
         m_currentPos = DATETIME_NOW;
     return result;
 }

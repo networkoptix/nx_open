@@ -678,7 +678,7 @@ void QnApiPbSerializer::serializeLicense(const QnLicensePtr& license, QByteArray
     pb::Licenses pb_licenses;
 
     pb::License& pb_license = *(pb_licenses.add_license());
-    pb_license.set_name(license->name().constData());
+    pb_license.set_name(license->name().toUtf8().constData());
     pb_license.set_key(license->key().constData());
     pb_license.set_cameracount(license->cameraCount());
     pb_license.set_hwid(license->hardwareId().constData());
@@ -826,7 +826,7 @@ void parseResource(QnResourcePtr& resource, const pb::Resource& pb_resource, QnR
 void parseLicense(QnLicensePtr& license, const pb::License& pb_license)
 {
     license = QnLicensePtr(new QnLicense(
-                            pb_license.name().c_str(),
+                            QString::fromUtf8(pb_license.name().c_str()),
                             pb_license.key().c_str(),
                             pb_license.cameracount(),
                             pb_license.hwid().c_str(),

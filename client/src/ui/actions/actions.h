@@ -295,19 +295,19 @@ namespace Qn {
         UnmaximizeItemAction,
 
         /**
-         * Shows motion on an item.
+         * Shows motion on an item and turns on smart search mode.
          */
-        ShowMotionAction,
+        StartSmartSearchAction,
 
         /**
-         * Hides motion on an item.
+         * Hides motion on an item and turns off smart search mode.
          */
-        HideMotionAction,
+        StopSmartSearchAction,
 
         /**
-         * Hides motion search grid on an item.
+         * Toggles item's smart search mode.
          */
-        ToggleMotionAction,
+        ToggleSmartSearchAction,
 
         /**
          * Check file signature (for local files only)

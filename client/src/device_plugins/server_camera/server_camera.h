@@ -22,12 +22,11 @@ public:
     virtual bool updateMACAddress();
     virtual QString manufacture() const;
     virtual void setIframeDistance(int frames, int timems);
-    QHostAddress getHostAddress() const override;
 
     virtual const QnVideoResourceLayout* getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider = 0) override;
     virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider = 0) override;
 protected:
-    virtual QString getUniqueId() const;
+    virtual QString getUniqueId() const override;
     virtual void setCropingPhysical(QRect croping);
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 };

@@ -53,17 +53,9 @@ void QnNetworkResource::deserialize(const QnResourceParameters& parameters)
 
 QString QnNetworkResource::getUniqueId() const
 {
-    return getMAC().toString();
+    return getPhysicalId();
 }
 
-bool QnNetworkResource::equalsTo(const QnResourcePtr other) const
-{
-    QnNetworkResourcePtr nr = other.dynamicCast<QnNetworkResource>();
-    if (!nr)
-        return false;
-
-    return (getHostAddress() == nr->getHostAddress() && getMAC() == nr->getMAC());
-}
 
 QHostAddress QnNetworkResource::getHostAddress() const
 {
@@ -90,15 +82,20 @@ void  QnNetworkResource::setMAC(const QnMacAddress &mac)
 {
     QMutexLocker mutexLocker(&m_mutex);
     m_macAddress = mac;
+
+    if (getPhysicalId().size()==0)
+        setPhysicalId(mac.toString());
 }
 
 QString QnNetworkResource::getPhysicalId() const
 {
+    QMutexLocker mutexLocker(&m_mutex);
     return m_physicalId;
 }
 
 void QnNetworkResource::setPhysicalId(const QString &physicalId)
 {
+    QMutexLocker mutexLocker(&m_mutex);
     m_physicalId = physicalId;
 }
 

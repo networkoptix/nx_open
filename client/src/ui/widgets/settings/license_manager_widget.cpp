@@ -137,6 +137,8 @@ void QnLicenseManagerWidget::at_licensesReceived(int status, const QByteArray &/
 
     QMessageBox::information(this, tr("License Activation"), message);
     ui->licenseWidget->setSerialKey(QString());
+
+    updateLicenses();
 }
 
 void QnLicenseManagerWidget::at_downloadError() {
@@ -178,7 +180,7 @@ void QnLicenseManagerWidget::at_licenseDetailsButton_clicked() {
         "<br />\n"
         "<b>Features:</b><br />\n"
         "Archive Streams Allowed: %4")
-        .arg(license->name().constData())
+        .arg(license->name().toUtf8().constData())
         .arg(license->key().constData())
         .arg(license->hardwareId().constData())
         .arg(license->cameraCount());

@@ -100,7 +100,7 @@ QString QnServerCamera::getUniqueId() const
     }
 
     //getUniqueId should never be changed 
-	return id + getParentId().toString();
+    return id + getParentId().toString();
 }
 
 QHostAddress QnServerCamera::getHostAddress() const

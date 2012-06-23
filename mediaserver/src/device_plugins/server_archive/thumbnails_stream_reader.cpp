@@ -1,6 +1,5 @@
 #include "thumbnails_stream_reader.h"
 #include "plugins/resources/archive/avi_files/avi_archive_delegate.h"
-#include "device_plugins/server_archive/server_archive_delegate.h"
 #include "utils/common/util.h"
 #include "plugins/resources/archive/avi_files/thumbnails_archive_delegate.h"
 
@@ -14,11 +13,11 @@ static const int FFMPEG_PROBE_BUFFER_SIZE = 1024 * 512;
 static const qint64 LIVE_SEEK_OFFSET = 1000000ll * 10;
 
 QnThumbnailsStreamReader::QnThumbnailsStreamReader(QnResourcePtr dev ) :
-    QnAbstractMediaStreamDataProvider(dev)
+    QnAbstractMediaStreamDataProvider(dev),
+    m_archiveDelegate(new QnServerArchiveDelegate)
 {
-    QnServerArchiveDelegatePtr archiveDelegate(new QnServerArchiveDelegate);
-    archiveDelegate->setQuality(MEDIA_Quality_Low, true);
-    m_delegate = new QnThumbnailsArchiveDelegate(archiveDelegate);
+    m_archiveDelegate->setQuality(MEDIA_Quality_Low, true);
+    m_delegate = new QnThumbnailsArchiveDelegate(m_archiveDelegate);
     m_cseq = 0;
 }
 
@@ -46,7 +45,20 @@ QnAbstractMediaDataPtr QnThumbnailsStreamReader::createEmptyPacket()
 QnAbstractMediaDataPtr QnThumbnailsStreamReader::getNextData()
 {
     QnAbstractMediaDataPtr result = m_delegate->getNextData();
-    return result ? result : createEmptyPacket();
+    if (result) {
+        result->flags &= ~QnAbstractMediaData::MediaFlags_BOF;
+        DeviceFileCatalog::Chunk ch = m_archiveDelegate->getCurrentChunk();
+        if (ch.startTimeMs != m_prevChunk.startTimeMs || ch.endTimeMs() != m_prevChunk.endTimeMs())
+        {
+            m_prevChunk = ch;
+            if (m_archiveDelegate->isHoleFromLeftOfCurrentChunk())
+                result->flags |= QnAbstractMediaData::MediaFlags_BOF;
+        }
+        return result;
+    }
+    else {
+        return createEmptyPacket();
+    }
 }
 
 void QnThumbnailsStreamReader::run()
@@ -54,6 +66,8 @@ void QnThumbnailsStreamReader::run()
     CL_LOG(cl_logINFO) cl_log.log(QLatin1String("QnThumbnailsStreamReader started."), cl_logINFO);
 
     beforeRun();
+
+    m_delegate->open(getResource());
 
     while(!needToStop())
     {
@@ -100,8 +114,10 @@ void QnThumbnailsStreamReader::run()
                 continue; // need key data but got not key data
         }
 
-        if(data)
+        if(data) {
             data->dataProvider = this;
+            data->opaque = m_cseq;
+        }
 
         if (videoData)
             m_stat[videoData->channelNumber].onData(videoData->data.size());

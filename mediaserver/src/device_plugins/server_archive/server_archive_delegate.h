@@ -33,6 +33,9 @@ public:
     virtual void onReverseMode(qint64 displayTime, bool value);
 
     virtual bool setQuality(MediaQuality quality, bool fastSwitch);
+
+    DeviceFileCatalog::Chunk getCurrentChunk() const;
+    bool isHoleFromLeftOfCurrentChunk() const;
 private:
     bool switchToChunk(const DeviceFileCatalog::Chunk newChunk, DeviceFileCatalogPtr newCatalog);
     qint64 seekInternal(qint64 time, bool findIFrame, bool recursive);

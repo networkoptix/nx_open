@@ -2,16 +2,24 @@
 #define QN_THUMBNAILS_LOADER_H
 
 #include <QtCore/QScopedPointer>
-#include <QtCore/QSharedPointer>
 #include <QtCore/QMetaType>
 #include <QtCore/QMutex>
+#include <QtCore/QStack>
 
-#include "plugins/resources/archive/archive_stream_reader.h"
-#include "utils/media/frame_info.h"
+#include <utils/common/longrunnable.h>
+#include <core/resource/resource_fwd.h>
+
+#include "recording/time_period.h"
+#include "thumbnail.h"
+
 #include "plugins/resources/archive/abstract_archive_delegate.h"
-#include "utils/common/math.h"
+
+class CLVideoDecoderOutput;
+class QnRtspClientArchiveDelegate;
+struct SwsContext;
 
 typedef QSharedPointer<QPixmap> QPixmapPtr;
+
 
 class QnThumbnailsLoader: public CLLongRunnable {
     Q_OBJECT;
@@ -22,80 +30,86 @@ public:
     QnThumbnailsLoader(QnResourcePtr resource);
     virtual ~QnThumbnailsLoader();
 
+    QnResourcePtr resource() const;
+
     void setBoundingSize(const QSize &size);
     QSize boundingSize() const;
     
     QSize thumbnailSize() const;
 
-    QnResourcePtr resource() const;
+    qint64 timeStep() const;
+    void setTimeStep(qint64 timeStep);
 
-    /**
-     * Load video pixmaps by specified time
-     */
-    void loadRange(qint64 startTimeMs, qint64 endTimeMs, qint64 stepMs);
+    qint64 startTime() const;
+    void setStartTime(qint64 startTime);
 
-    QnTimePeriod loadedRange() const;
-    
-    qint64 currentMSecsSinceLastUpdate() const;
+    qint64 endTime() const;
+    void setEndTime(qint64 endTime);
 
-    /*
-     * thumbnails step in ms
-     */
-    qint64 step() const;
-
-
-    /* Extent existing range to new range using previously defined step */
-    void addRange(qint64 startTimeMs, qint64 endTimeMs, qint64 stepMs);
-
-    /* 
-     * Remove part of data or all data 
-     */
-    void removeRange(qint64 startTimeMs = -1, qint64 endTimeMs = INT64_MAX);
-
-    /* 
-     * Find pixmap by specified time. 
-     * @param timeMs contain approximate time. 
-     * @param realPixmapTimeMs Return exact pixmap time if found. Otherwise return -1
-     */
-    QPixmapPtr getPixmapByTime(qint64 timeMs, qint64 *realPixmapTimeMs = 0);
+    void setTimePeriod(qint64 startTime, qint64 endTime);
+    void setTimePeriod(const QnTimePeriod &timePeriod);
+    QnTimePeriod timePeriod() const;
 
     virtual void pleaseStop() override;
 
 signals:
-    void gotNewPixmap(qint64 timeMs, QPixmapPtr pixmap);
+    void thumbnailLoaded(const QnThumbnail &thumbnail);
+    void thumbnailsInvalidated();
 
 protected:
     virtual void run() override;
 
+    void updateTargetSizeLocked(bool invalidate);
+    void invalidateThumbnailsLocked();
+    Q_SIGNAL void updateProcessingLater();
+    Q_SLOT void updateProcessing();
+    void updateProcessingLocked();
+
+    void enqueueForProcessingLocked(qint64 startTime, qint64 endTime);
+    Q_SIGNAL void processingRequested();
+    void process();
+
+    Q_SLOT void addThumbnail(const QnThumbnail &thumbnail);
+
+    QnThumbnail generateThumbnail(const CLVideoDecoderOutput &outFrame, const QSize &boundingSize, qint64 timeStep, int generation);
+    qint64 processThumbnail(const QnThumbnail &thumbnail, qint64 startTime, qint64 endTime, bool ignorePeriod);
+
 private:
-    void ensureScaleContext(int lineSize, const QSize &size, const QSize &boundingSize, PixelFormat format);
+    void ensureScaleContextLocked(int lineSize, const QSize &sourceSize, const QSize &boundingSize, int format);
     bool processFrame(const CLVideoDecoderOutput &outFrame, const QSize &boundingSize);
 
+    void setTimePeriodLocked(qint64 startTime, qint64 endTime);
+
+    bool isProcessingPeriodValid() const;
+
 private:
+    friend class QnThumbnailsLoaderHelper;
+
     mutable QMutex m_mutex;
-    QList<QnAbstractArchiveDelegatePtr > m_delegates;
-    QnResourcePtr m_resource;
+    const QnResourcePtr m_resource;
+    QList<QnAbstractArchiveDelegatePtr> m_delegates;
 
-    QMap<qint64, QPixmapPtr> m_images;
-    QMap<qint64, QPixmapPtr> m_newImages;
+    qint64 m_timeStep, m_requestStart, m_requestEnd, m_processingStart, m_processingEnd;
 
-    qint64 m_step;
-    qint64 m_startTime;
-    qint64 m_endTime;
-    QQueue<QnTimePeriod> m_rangeToLoad;
-    SwsContext *m_scaleContext;
-    quint8 *m_rgbaBuffer;
-
-    int m_srcLineSize;
-    int m_srcFormat;
-    QSize m_srcSize;
     QSize m_boundingSize;
-    QSize m_dstSize;
-
-    qint64 m_lastLoadedTime;
-    bool m_breakCurrentJob;
+    QSize m_targetSize;
+    
+    SwsContext *m_scaleContext;
+    quint8 *m_scaleBuffer;
+    QSize m_scaleSourceSize;
+    QSize m_scaleTargetSize;
+    int m_scaleSourceLine;
+    int m_scaleSourceFormat;
+    
+    QHash<qint64, QnThumbnail> m_thumbnailByTime;
+    qint64 m_maxLoadedTime;
+    QStack<QnTimePeriod> m_processingStack;
+    QnThumbnailsLoaderHelper *m_helper;
+    int m_generation;
+    QQueue<qint64> m_timingsQueue;
 };
 
 Q_DECLARE_METATYPE(QPixmapPtr)
 
 #endif // __THUMBNAILS_LOADER_H__
+

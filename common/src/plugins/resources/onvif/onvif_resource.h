@@ -40,9 +40,7 @@ public:
 
     static const QString createOnvifEndpointUrl(const QString& ipAddress);
 
-    virtual bool setHostAddress(const QHostAddress &ip, QnDomain domain = QnDomainMemory) override;
-    virtual QHostAddress getHostAddress() const override;
-    virtual QString getUniqueId() const override;
+
     virtual bool isResourceAccessible() override;
     virtual bool updateMACAddress() override;
     virtual QString manufacture() const override;
@@ -116,7 +114,7 @@ private:
     CODECS m_codec;
     ResolutionPair m_primaryResolution;
     ResolutionPair m_secondaryResolution;
-    QHostAddress m_hostAddr;
+
 };
 
 typedef QSharedPointer<QnPlOnvifResource> QnPlOnvifResourcePtr;

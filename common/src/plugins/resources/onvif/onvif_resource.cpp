@@ -572,36 +572,6 @@ int QnPlOnvifResource::round(float value)
     return floorVal - value < 0.5? (int)value: (int)value + 1;
 }
 
-QHostAddress QnPlOnvifResource::getHostAddress() const
-{
-    return QHostAddress(QUrl(getUrl()).host());
-}
-
-bool QnPlOnvifResource::setHostAddress(const QHostAddress &ip, QnDomain domain)
-{
-    QUrl url = getUrl();
-    url.setHost(ip.toString());
-    setUrl(url.toString());
-
-    return (domain == QnDomainMemory);
-}
-
-QString QnPlOnvifResource::getUniqueId() const
-{
-    QUrl url(getUrl());
-    QList<QPair<QString, QString> > params = url.queryItems();
-    QList<QPair<QString, QString> >::ConstIterator it = params.begin();
-
-    while (it != params.end()) {
-        if (it->first == "uniq-id") {
-            return it->second;
-        }
-        ++it;
-    }
-
-    qCritical() << "QnPlOnvifResource::getUniqueId: Unique Id is absent in ONVIF device URL: " << getUrl();
-    return QString();
-}
 
 bool QnPlOnvifResource::shoudResolveConflicts() const
 {

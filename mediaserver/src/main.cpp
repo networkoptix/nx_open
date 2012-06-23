@@ -511,6 +511,9 @@ void QnMain::run()
         QnSleep::msleep(1000);
     }
 
+    if (needToStop())
+        return;
+
     QnCompatibilityChecker remoteChecker(connectInfo->compatibilityItems);
     QnCompatibilityChecker localChecker(localCompatibilityItems());
 
