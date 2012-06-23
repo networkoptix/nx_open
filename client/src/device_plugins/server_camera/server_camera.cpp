@@ -90,18 +90,13 @@ QString QnServerCamera::getUniqueId() const
     
     if (urlStr.contains("://")) {
         QUrl url(urlStr);
-        QList<QPair<QString, QString> > params = url.queryItems();
-        QList<QPair<QString, QString> >::ConstIterator it = params.begin();
+        QString tmp = url.queryItemValue("uniq-id");
 
-        while (it != params.end()) {
-            if (it->first == "uniq-id") {
-                id = it->second;
-                break;
-            }
-            ++it;
+        if (!tmp.isEmpty()) {
+            id = tmp;
+        } else {
+            qCritical() << "QnServerCamera::getUniqueId: Unique Id is absent in ONVIF device URL: " << urlStr;
         }
-
-        qCritical() << "QnServerCamera::getUniqueId: Unique Id is absent in ONVIF device URL: " << urlStr;
     }
 
     //getUniqueId should never be changed 
