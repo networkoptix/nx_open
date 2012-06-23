@@ -608,13 +608,13 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::StartSmartSearchAction).
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
-        text(tr("Start Smart Search")).
+        text(tr("Show Motion/Smart Search")).
         shortcut(tr("Alt+G")).
         condition(new QnSmartSearchActionCondition(false, this));
 
     factory(Qn::StopSmartSearchAction).
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
-        text(tr("Stop Smart Search")).
+        text(tr("Hide Motion/Smart Search")).
         shortcut(tr("Alt+G")).
         condition(new QnSmartSearchActionCondition(true, this));
 

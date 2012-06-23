@@ -7,67 +7,87 @@ struct soap;
 class DeviceBindingProxy;
 class MediaBindingProxy;
 
-class _onvifDevice__GetNetworkInterfaces;
-class _onvifDevice__GetNetworkInterfacesResponse;
 class _onvifDevice__CreateUsers;
 class _onvifDevice__CreateUsersResponse;
-class _onvifDevice__GetDeviceInformation;
-class _onvifDevice__GetDeviceInformationResponse;
 class _onvifDevice__GetCapabilities;
 class _onvifDevice__GetCapabilitiesResponse;
+class _onvifDevice__GetDeviceInformation;
+class _onvifDevice__GetDeviceInformationResponse;
+class _onvifDevice__GetNetworkInterfaces;
+class _onvifDevice__GetNetworkInterfacesResponse;
 
-typedef _onvifDevice__GetNetworkInterfaces NetIfacesReq;
-typedef _onvifDevice__GetNetworkInterfacesResponse NetIfacesResp;
 typedef _onvifDevice__CreateUsers CreateUsersReq;
 typedef _onvifDevice__CreateUsersResponse CreateUsersResp;
-typedef _onvifDevice__GetDeviceInformation DeviceInfoReq;
-typedef _onvifDevice__GetDeviceInformationResponse DeviceInfoResp;
 typedef _onvifDevice__GetCapabilities CapabilitiesReq;
 typedef _onvifDevice__GetCapabilitiesResponse CapabilitiesResp;
+typedef _onvifDevice__GetDeviceInformation DeviceInfoReq;
+typedef _onvifDevice__GetDeviceInformationResponse DeviceInfoResp;
+typedef _onvifDevice__GetNetworkInterfaces NetIfacesReq;
+typedef _onvifDevice__GetNetworkInterfacesResponse NetIfacesResp;
 
-class _onvifMedia__GetVideoEncoderConfigurationOptions;
-class _onvifMedia__GetVideoEncoderConfigurationOptionsResponse;
-class _onvifMedia__GetVideoSourceConfigurations;
-class _onvifMedia__GetVideoSourceConfigurationsResponse;
-class _onvifMedia__GetVideoEncoderConfigurations;
-class _onvifMedia__GetVideoEncoderConfigurationsResponse;
-class _onvifMedia__GetProfiles;
-class _onvifMedia__GetProfilesResponse;
+
+class _onvifMedia__AddAudioEncoderConfiguration;
+class _onvifMedia__AddAudioEncoderConfigurationResponse;
+class _onvifMedia__AddVideoEncoderConfiguration;
+class _onvifMedia__AddVideoEncoderConfigurationResponse;
 class _onvifMedia__AddVideoSourceConfiguration;
 class _onvifMedia__AddVideoSourceConfigurationResponse;
 class _onvifMedia__CreateProfile;
 class _onvifMedia__CreateProfileResponse;
-class _onvifMedia__AddVideoEncoderConfiguration;
-class _onvifMedia__AddVideoEncoderConfigurationResponse;
-class _onvifMedia__SetVideoEncoderConfiguration;
-class _onvifMedia__SetVideoEncoderConfigurationResponse;
+class _onvifMedia__GetAudioEncoderConfigurationOptions;
+class _onvifMedia__GetAudioEncoderConfigurationOptionsResponse;
+class _onvifMedia__GetAudioEncoderConfigurations;
+class _onvifMedia__GetAudioEncoderConfigurationsResponse;
 class _onvifMedia__GetProfile;
 class _onvifMedia__GetProfileResponse;
+class _onvifMedia__GetProfiles;
+class _onvifMedia__GetProfilesResponse;
 class _onvifMedia__GetStreamUri;
 class _onvifMedia__GetStreamUriResponse;
-class _onvifMedia__AddVideoSourceConfiguration;
-class _onvifMedia__AddVideoSourceConfigurationResponse;
+class _onvifMedia__GetVideoEncoderConfigurationOptions;
+class _onvifMedia__GetVideoEncoderConfigurationOptionsResponse;
+class _onvifMedia__GetVideoEncoderConfigurations;
+class _onvifMedia__GetVideoEncoderConfigurationsResponse;
+class _onvifMedia__GetVideoSourceConfigurations;
+class _onvifMedia__GetVideoSourceConfigurationsResponse;
+class _onvifMedia__SetAudioEncoderConfiguration;
+class _onvifMedia__SetAudioEncoderConfigurationResponse;
+class _onvifMedia__SetVideoEncoderConfiguration;
+class _onvifMedia__SetVideoEncoderConfigurationResponse;
+class _onvifMedia__SetVideoSourceConfiguration;
+class _onvifMedia__SetVideoSourceConfigurationResponse;
 
-typedef _onvifMedia__GetVideoEncoderConfigurationOptions VideoOptionsReq;
-typedef _onvifMedia__GetVideoEncoderConfigurationOptionsResponse VideoOptionsResp;
-typedef _onvifMedia__GetVideoSourceConfigurations VideoSrcConfigsReq;
-typedef _onvifMedia__GetVideoSourceConfigurationsResponse VideoSrcConfigsResp;
-typedef _onvifMedia__GetVideoEncoderConfigurations VideoConfigsReq;
-typedef _onvifMedia__GetVideoEncoderConfigurationsResponse VideoConfigsResp;
-typedef _onvifMedia__GetProfiles ProfilesReq;
-typedef _onvifMedia__GetProfilesResponse ProfilesResp;
+typedef _onvifMedia__AddAudioEncoderConfiguration AddAudioConfigReq;
+typedef _onvifMedia__AddAudioEncoderConfigurationResponse AddAudioConfigResp;
+typedef _onvifMedia__AddVideoEncoderConfiguration AddVideoConfigReq;
+typedef _onvifMedia__AddVideoEncoderConfigurationResponse AddVideoConfigResp;
 typedef _onvifMedia__AddVideoSourceConfiguration AddVideoSrcConfigReq;
 typedef _onvifMedia__AddVideoSourceConfigurationResponse AddVideoSrcConfigResp;
 typedef _onvifMedia__CreateProfile CreateProfileReq;
 typedef _onvifMedia__CreateProfileResponse CreateProfileResp;
-typedef _onvifMedia__AddVideoEncoderConfiguration AddVideoConfigReq;
-typedef _onvifMedia__AddVideoEncoderConfigurationResponse AddVideoConfigResp;
-typedef _onvifMedia__SetVideoEncoderConfiguration SetVideoConfigReq;
-typedef _onvifMedia__SetVideoEncoderConfigurationResponse SetVideoConfigResp;
+typedef _onvifMedia__GetAudioEncoderConfigurationOptions AudioOptionsReq;
+typedef _onvifMedia__GetAudioEncoderConfigurationOptionsResponse AudioOptionsResp;
+typedef _onvifMedia__GetAudioEncoderConfigurations AudioConfigsReq;
+typedef _onvifMedia__GetAudioEncoderConfigurationsResponse AudioConfigsResp;
 typedef _onvifMedia__GetProfile ProfileReq;
 typedef _onvifMedia__GetProfileResponse ProfileResp;
+typedef _onvifMedia__GetProfiles ProfilesReq;
+typedef _onvifMedia__GetProfilesResponse ProfilesResp;
 typedef _onvifMedia__GetStreamUri StreamUriReq;
 typedef _onvifMedia__GetStreamUriResponse StreamUriResp;
+typedef _onvifMedia__GetVideoEncoderConfigurationOptions VideoOptionsReq;
+typedef _onvifMedia__GetVideoEncoderConfigurationOptionsResponse VideoOptionsResp;
+typedef _onvifMedia__GetVideoEncoderConfigurations VideoConfigsReq;
+typedef _onvifMedia__GetVideoEncoderConfigurationsResponse VideoConfigsResp;
+typedef _onvifMedia__GetVideoSourceConfigurations VideoSrcConfigsReq;
+typedef _onvifMedia__GetVideoSourceConfigurationsResponse VideoSrcConfigsResp;
+typedef _onvifMedia__SetAudioEncoderConfiguration SetAudioConfigReq;
+typedef _onvifMedia__SetAudioEncoderConfigurationResponse SetAudioConfigResp;
+typedef _onvifMedia__SetVideoEncoderConfiguration SetVideoConfigReq;
+typedef _onvifMedia__SetVideoEncoderConfigurationResponse SetVideoConfigResp;
+typedef _onvifMedia__SetVideoSourceConfiguration SetVideoSrcConfigReq;
+typedef _onvifMedia__SetVideoSourceConfigurationResponse SetVideoSrcConfigResp;
+
 
 //
 // SoapWrapper
@@ -123,10 +143,11 @@ public:
     //Input: normalized manufacturer
     bool fetchLoginPassword(const QString& manufacturer);
 
-    int getNetworkInterfaces(NetIfacesReq& request, NetIfacesResp& response);
-    int createUsers(CreateUsersReq& request, CreateUsersResp& response);
-    int getDeviceInformation(DeviceInfoReq& request, DeviceInfoResp& response);
     int getCapabilities(CapabilitiesReq& request, CapabilitiesResp& response);
+    int getDeviceInformation(DeviceInfoReq& request, DeviceInfoResp& response);
+    int getNetworkInterfaces(NetIfacesReq& request, NetIfacesResp& response);
+
+    int createUsers(CreateUsersReq& request, CreateUsersResp& response);
 
 private:
     DeviceSoapWrapper();
@@ -146,16 +167,24 @@ public:
     MediaSoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd);
     virtual ~MediaSoapWrapper();
 
-    int getVideoEncoderConfigurationOptions(VideoOptionsReq& request, VideoOptionsResp& response);
-    int getVideoSourceConfigurations(VideoSrcConfigsReq& request, VideoSrcConfigsResp& response);
-    int getVideoEncoderConfigurations(VideoConfigsReq& request, VideoConfigsResp& response);
-    int getProfiles(ProfilesReq& request, ProfilesResp& response);
-    int addVideoSourceConfiguration(AddVideoSrcConfigReq& request, AddVideoSrcConfigResp& response);
-    int createProfile(CreateProfileReq& request, CreateProfileResp& response);
-    int addVideoEncoderConfiguration(AddVideoConfigReq& request, AddVideoConfigResp& response);
-    int setVideoEncoderConfiguration(SetVideoConfigReq& request, SetVideoConfigResp& response);
+    int getAudioEncoderConfigurationOptions(AudioOptionsReq& request, AudioOptionsResp& response);
+    int getAudioEncoderConfigurations(AudioConfigsReq& request, AudioConfigsResp& response);
     int getProfile(ProfileReq& request, ProfileResp& response);
+    int getProfiles(ProfilesReq& request, ProfilesResp& response);
     int getStreamUri(StreamUriReq& request, StreamUriResp& response);
+    int getVideoEncoderConfigurationOptions(VideoOptionsReq& request, VideoOptionsResp& response);
+    int getVideoEncoderConfigurations(VideoConfigsReq& request, VideoConfigsResp& response);
+    int getVideoSourceConfigurations(VideoSrcConfigsReq& request, VideoSrcConfigsResp& response);
+
+    int addAudioEncoderConfiguration(AddAudioConfigReq& request, AddAudioConfigResp& response);
+    int addVideoEncoderConfiguration(AddVideoConfigReq& request, AddVideoConfigResp& response);
+    int addVideoSourceConfiguration(AddVideoSrcConfigReq& request, AddVideoSrcConfigResp& response);
+
+    int createProfile(CreateProfileReq& request, CreateProfileResp& response);
+
+    int setAudioEncoderConfiguration(SetAudioConfigReq& request, SetAudioConfigResp& response);
+    int setVideoEncoderConfiguration(SetVideoConfigReq& request, SetVideoConfigResp& response);
+    int setVideoSourceConfiguration(SetVideoSrcConfigReq& request, SetVideoSrcConfigResp& response);
 
 private:
     MediaSoapWrapper();
