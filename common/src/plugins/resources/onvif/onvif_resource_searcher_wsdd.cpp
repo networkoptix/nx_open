@@ -128,7 +128,7 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
 
         QStringList addrPrefixes = getAddrPrefixes(host);
         wsddProxy soapWsddProxy(SOAP_IO_UDP);
-        soapWsddProxy.soap->recv_timeout = -500000;
+        soapWsddProxy.soap->recv_timeout = -1000000;
         soapWsddProxy.soap->user = &qSocket;
         soapWsddProxy.soap->fconnect = nullGsoapFconnect;
         soapWsddProxy.soap->fdisconnect = nullGsoapFdisconnect;
