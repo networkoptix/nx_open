@@ -59,15 +59,25 @@ private slots:
     void at_motionSensitivityChanged(int value);
     void at_motionSelectionCleared();
     void updateMaxFPS();
+
 private:
     void setHasChanges(bool hasChanges);
-    void updateMaxMotionRect();
+
+    void updateMotionWidgetFromResource();
+    void submitMotionWidgetToResource();
+
+    void updateMotionWidgetNeedControlMaxRect();
+
+    void disconnectFromMotionWidget();
+    void connectToMotionWidget();
 
 private:
     Q_DISABLE_COPY(QnSingleCameraSettingsWidget);
 
     QScopedPointer<Ui::SingleCameraSettingsWidget> ui;
     QnVirtualCameraResourcePtr m_camera;
+    bool m_cameraSupportsMotion;
+
     bool m_hasChanges;
     bool m_hasScheduleChanges;
     bool m_readOnly;
