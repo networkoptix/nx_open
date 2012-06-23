@@ -562,6 +562,46 @@ void QnTimeSlider::setWindow(qint64 start, qint64 end) {
     }
 }
 
+bool QnTimeSlider::windowContains(qint64 position) {
+    return m_windowStart <= position && position <= m_windowEnd;
+}
+
+void QnTimeSlider::ensureWindowContains(qint64 position) {
+    qint64 d = 0;
+
+    if(position < m_windowStart) {
+        d = position - m_windowStart;
+    } else if(m_windowEnd < position) {
+        d = position - m_windowEnd;
+    } else {
+        return;
+    }
+
+    setWindow(m_windowStart + d, m_windowEnd + d);
+}
+
+void QnTimeSlider::setSliderPosition(qint64 position, bool keepInWindow) {
+    if(!keepInWindow) {
+        return setSliderPosition(position);
+    } else {
+        bool inWindow = windowContains(sliderPosition());
+        setSliderPosition(position);
+        if(inWindow)
+            ensureWindowContains(sliderPosition());
+    }
+}
+
+void QnTimeSlider::setValue(qint64 value, bool keepInWindow) {
+    if(!keepInWindow) {
+        return setValue(value);
+    } else {
+        bool inWindow = windowContains(this->value());
+        setValue(value);
+        if(inWindow)
+            ensureWindowContains(this->value());
+    }
+}
+
 qint64 QnTimeSlider::selectionStart() const {
     return m_selectionStart;
 }
@@ -1838,15 +1878,7 @@ void QnTimeSlider::mousePressEvent(QGraphicsSceneMouseEvent *event) {
         qint64 time = qRound(valueFromPosition(event->pos(), false), thumbnailsLoader()->timeStep());
         QMap<qint64, ThumbnailData>::const_iterator pos = m_thumbnailData.find(time);
         if(pos != m_thumbnailData.end()) {
-            setSliderPosition(pos->thumbnail.actualTime());
-            if(pos->thumbnail.actualTime() > m_windowEnd) {
-                qint64 d = pos->thumbnail.actualTime() - m_windowEnd;
-                setWindow(m_windowStart + d, m_windowEnd + d);
-            } else if(pos->thumbnail.actualTime() < m_windowStart) {
-                qint64 d = m_windowStart - pos->thumbnail.actualTime();
-                setWindow(m_windowStart - d, m_windowEnd - d);
-            }
-
+            setSliderPosition(pos->thumbnail.actualTime(), true);
             processed = true;
         }
     }

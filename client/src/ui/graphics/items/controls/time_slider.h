@@ -111,6 +111,15 @@ public:
 
     void setWindow(qint64 start, qint64 end);
 
+    bool windowContains(qint64 position);
+    void ensureWindowContains(qint64 position);
+
+    using base_type::setSliderPosition;
+    void setSliderPosition(qint64 position, bool keepInWindow);
+
+    using base_type::setValue;
+    void setValue(qint64 value, bool keepInWindow);
+
     qint64 selectionStart() const;
     void setSelectionStart(qint64 selectionStart);
 

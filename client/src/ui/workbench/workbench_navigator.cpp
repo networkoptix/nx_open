@@ -206,9 +206,9 @@ bool QnWorkbenchNavigator::setLive(bool live) {
         return false;
 
     if(live) {
-        m_timeSlider->setValue(m_timeSlider->maximum());
+        m_timeSlider->setValue(m_timeSlider->maximum(), true);
     } else {
-        m_timeSlider->setValue(m_timeSlider->minimum()); // TODO: need to save position here.
+        m_timeSlider->setValue(m_timeSlider->minimum(), true); // TODO: need to save position here.
     }
     return true;
 }
@@ -449,7 +449,6 @@ void QnWorkbenchNavigator::jumpForward() {
         }
     }
     reader->jumpTo(pos, 0);
-
 }
 
 void QnWorkbenchNavigator::stepBackward() {
@@ -620,7 +619,7 @@ void QnWorkbenchNavigator::updateSliderFromReader() {
         qint64 timeUSec = m_currentWidget->display()->camDisplay()->isRealTimeSource() ? DATETIME_NOW : m_currentWidget->display()->camera()->getCurrentTime();
         qint64 timeMSec = timeUSec == DATETIME_NOW ? endTimeMSec : (timeUSec == AV_NOPTS_VALUE ? m_timeSlider->value() : timeUSec / 1000);
 
-        m_timeSlider->setValue(timeMSec);
+        m_timeSlider->setValue(timeMSec, true);
 
         if(timeUSec != AV_NOPTS_VALUE)
             updateLive();
