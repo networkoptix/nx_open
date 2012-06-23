@@ -12,6 +12,9 @@
 #include "soap_wrapper.h"
 
 
+class onvifXsd__AudioEncoderConfigurationOption;
+typedef onvifXsd__AudioEncoderConfigurationOption AudioOptions;
+
 //first = width, second = height
 typedef QPair<int, int> ResolutionPair;
 const ResolutionPair EMPTY_RESOLUTION_PAIR(0, 0);
@@ -26,6 +29,15 @@ public:
         JPEG
     };
 
+    enum AUDIO_CODECS
+    {
+        AUDIO_NONE,
+        G726,
+        G711,
+        AAC,
+        SIZE_OF_AUDIO_CODECS
+    };
+
     static const char* MANUFACTURE;
     static const QString& MEDIA_URL_PARAM_NAME;
     static const QString& DEVICE_URL_PARAM_NAME;
@@ -33,6 +45,8 @@ public:
     static const double MAX_SECONDARY_RESOLUTION_SQUARE;
     static const char* PROFILE_NAME_PRIMARY;
     static const char* PROFILE_NAME_SECONDARY;
+    static const int MAX_AUDIO_BITRATE;
+    static const int MAX_AUDIO_SAMPLERATE;
 
     static const QString fetchMacAddress(const NetIfacesResp& response, const QString& senderIpAddress);
 
@@ -53,6 +67,8 @@ public:
     int innerQualityToOnvif(QnStreamQuality quality) const;
     const QString createOnvifEndpointUrl() const { return createOnvifEndpointUrl(getHostAddress().toString()); }
 
+    int getAudioBitrate() const;
+    int getAudioSamplerate() const;
     ResolutionPair getPrimaryResolution() const;
     ResolutionPair getSecondaryResolution() const;
     ResolutionPair getMaxResolution() const;
@@ -63,6 +79,7 @@ public:
     void setMediaUrl(const QString& src);
 
     CODECS getCodec() const;
+    AUDIO_CODECS getAudioCodec() const;
 
 protected:
     bool initInternal() override;
@@ -80,11 +97,13 @@ private:
     bool fetchAndSetResourceOptions();
     void fetchAndSetPrimarySecondaryResolution();
     bool fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper);
+    bool fetchAndSetAudioEncoderOptions(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetDualStreaming(MediaSoapWrapper& soapWrapper);
 
     void setVideoEncoderOptions(const VideoOptionsResp& response);
     void setVideoEncoderOptionsH264(const VideoOptionsResp& response);
     void setVideoEncoderOptionsJpeg(const VideoOptionsResp& response);
+    void setAudioEncoderOptions(const AudioOptions& options);
     void setMinMaxQuality(int min, int max);
     void setOnvifUrls();
 
@@ -94,6 +113,7 @@ private:
     ResolutionPair getNearestResolutionForSecondary(const ResolutionPair& resolution, float aspectRatio) const;
     ResolutionPair getNearestResolution(const ResolutionPair& resolution, float aspectRatio, double maxResolutionSquare) const;
     float getResolutionAspectRatio(const ResolutionPair& resolution) const;
+    int findClosestRateFloor(const std::vector<int>& values, int threshold) const;
 private:
     static const char* ONVIF_PROTOCOL_PREFIX;
     static const char* ONVIF_URL_SUFFIX;
@@ -112,8 +132,11 @@ private:
     QString m_deviceUrl;
     bool m_reinitDeviceInfo;
     CODECS m_codec;
+    AUDIO_CODECS m_audioCodec;
     ResolutionPair m_primaryResolution;
     ResolutionPair m_secondaryResolution;
+    int m_audioBitrate;
+    int m_audioSamplerate;
 
 };
 
