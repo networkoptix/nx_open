@@ -130,7 +130,7 @@ const QString QnOnvifStreamReader::updateCameraAndFetchStreamUrl(bool isPrimary)
         return QString();
     }
 
-    if (sendConfigToCamera(soapWrapper, info)) {
+    if (!sendConfigToCamera(soapWrapper, info)) {
         return QString();
     }
 
@@ -513,9 +513,14 @@ bool QnOnvifStreamReader::sendConfigToCamera(MediaSoapWrapper& soapWrapper, Came
         info.finalProfile = info.predefinedProfile;
     }
 
-    if (!result ||
-        (!sendVideoSourceToCamera(soapWrapper, info, *info.finalProfile) && false) || //This is not critical
-        !sendVideoEncoderToCamera(soapWrapper, info, *info.finalProfile))
+    if (!result) {
+        return false;
+    }
+    
+    //This is not critical if failed
+    sendVideoSourceToCamera(soapWrapper, info, *info.finalProfile);
+
+    if (!sendVideoEncoderToCamera(soapWrapper, info, *info.finalProfile))
     {
         return false;
     }
