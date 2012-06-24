@@ -21,6 +21,8 @@ typedef onvifXsd__VideoSourceConfiguration VideoSource;
 typedef onvifXsd__AudioEncoderConfiguration AudioEncoder;
 typedef onvifXsd__AudioSourceConfiguration AudioSource;
 
+typedef QSharedPointer<Profile> ProfilePtr;
+
 class QnOnvifStreamReader: public CLServerPushStreamreader , public QnLiveStreamProvider
 {
     static const char* NETOPTIX_PRIMARY_NAME;
