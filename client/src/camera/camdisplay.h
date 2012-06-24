@@ -56,6 +56,7 @@ public:
 
     void setSingleShotMode(bool single);
 
+    QSize getFrameSize(int channel) const;
     QImage getScreenshot(int channel);
     bool isRealTimeSource() const;
 

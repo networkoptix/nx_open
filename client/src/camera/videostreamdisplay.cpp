@@ -698,6 +698,18 @@ void CLVideoStreamDisplay::clearReverseQueue()
     m_lastDisplayedFrame = 0;
 }
 
+QSize CLVideoStreamDisplay::getFrameSize() const {
+    if (m_decoder.isEmpty())
+        return QSize();
+    QnAbstractVideoDecoder* dec = m_decoder.begin().value();
+    QMutexLocker mutex(&m_mtx);
+    const AVFrame* lastFrame = dec->lastFrame();
+    if(lastFrame)
+        return QSize(lastFrame->width, lastFrame->height);
+
+    return QSize();
+}
+
 QImage CLVideoStreamDisplay::getScreenshot()
 {
     if (m_decoder.isEmpty())

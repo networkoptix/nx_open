@@ -678,11 +678,15 @@ void QnResourceWidget::updateOverlayText() {
         mbps += statistics->getBitrate();
     }
 
+    QSize size = m_display->camDisplay()->getFrameSize(0); // TODO: roma, check implementation.
+    if(size.isEmpty())
+        size = QSize(0, 0);
+
     QString codecName;
     QnMediaContextPtr codec = m_display->mediaProvider()->getCodecContext();
-    if (codec && codec->ctx()) 
+    if (codec && codec->ctx())
         codecName = codecIDToString(codec->ctx()->codec_id);
-    m_footerStatusLabel->setText(tr("%1fps @ %2Mbps (%3) - %4").arg(fps, 0, 'f', 2).arg(mbps, 0, 'f', 2).arg(codecName).arg(m_renderer->isLowQualityImage(0) ? "LQ" : "HQ"));
+    m_footerStatusLabel->setText(tr("%1x%2 %3fps @ %4Mbps (%5)").arg(size.width()).arg(size.height()).arg(fps, 0, 'f', 2).arg(mbps, 0, 'f', 2).arg(codecName));
 }
 
 void QnResourceWidget::updateButtonsVisibility() {

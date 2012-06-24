@@ -51,6 +51,7 @@ public:
     void setResource(QnMediaResourcePtr resource);
     void setExportProgressOffset(int value);
     int getExportProgressOffset() const;
+
 signals:
     void reachedTheEnd();
     void recordingFailed(QString errMessage);

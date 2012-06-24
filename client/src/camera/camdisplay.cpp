@@ -189,6 +189,10 @@ QImage CLCamDisplay::getScreenshot(int channel)
     return m_display[channel]->getScreenshot();
 }
 
+QSize CLCamDisplay::getFrameSize(int channel) const {
+    return m_display[channel]->getFrameSize();
+}
+
 void CLCamDisplay::hurryUpCheck(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime)
 {
     bool isVideoCamera = qSharedPointerDynamicCast<QnVirtualCameraResource>(vd->dataProvider->getResource()) != 0;
