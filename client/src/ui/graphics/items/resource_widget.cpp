@@ -1094,7 +1094,7 @@ void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, con
 
     ensureMotionMask();
 
-#if 0
+#if 1
     QVector<QPointF> gridLines;
 
     for (int x = 0; x < MD_WIDTH; ++x)
@@ -1128,7 +1128,7 @@ void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, con
     }
 
     QnScopedPainterTransformRollback transformRollback(painter);
-    painter->setPen(QPen(QColor(255, 255, 255, 40)));
+    painter->setPen(QPen(QColor(255, 255, 255, 16)));
     painter->translate(rect.topLeft());
     painter->drawLines(gridLines);
 #endif
