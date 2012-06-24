@@ -414,7 +414,8 @@ void QnThumbnailsLoader::process() {
                 }
 
                 /* Fill remaining time values with thumbnails. */
-                processThumbnail(thumbnail, time, period.endTimeMs(), false);
+                if (!thumbnail.isEmpty())
+                    processThumbnail(thumbnail, time, period.endTimeMs(), false);
             }
         }
         client->close();
