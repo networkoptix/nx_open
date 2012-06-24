@@ -393,6 +393,7 @@ void MotionSelectionInstrument::finishDrag(DragInfo *info) {
 }
 
 void MotionSelectionInstrument::finishDragProcess(DragInfo *info) {
+#if 0
     if (m_isClick && !m_clearingBlocked && target()) {
         Qt::KeyboardModifiers selectionModifiers = this->selectionModifiers(target());
         if((info->modifiers() & selectionModifiers) == selectionModifiers && (info->modifiers() & m_multiSelectionModifiers) != m_multiSelectionModifiers) {
@@ -400,6 +401,7 @@ void MotionSelectionInstrument::finishDragProcess(DragInfo *info) {
             m_isClick = false;
         }
     }
+#endif
 
     emit selectionProcessFinished(info->view(), target());
 }
