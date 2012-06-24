@@ -756,9 +756,15 @@ void QnResource::setDisabled(bool disabled)
 
 void QnResource::init()
 {
-    QMutexLocker lock(&m_initMutex);
-    if (!m_initialized)
-        m_initialized = initInternal();
+        QMutexLocker lock(&m_initMutex);
+        if (!m_initialized) 
+        {
+            m_initialized = initInternal();
+            if (!m_initialized && (getStatus() == Online || getStatus() == Recording))
+                setStatus(Offline);
+        }
+
+
 }
 
 bool QnResource::isInitialized() const
