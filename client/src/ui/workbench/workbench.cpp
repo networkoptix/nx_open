@@ -250,20 +250,26 @@ void QnWorkbench::setItem(Qn::ItemRole role, QnWorkbenchItem *item) {
     }
 }
 
+void QnWorkbench::updateSingleRoleItem() {
+    if(m_currentLayout->items().size() == 1) {
+        setItem(Qn::SingleRole, *m_currentLayout->items().begin());
+    } else {
+        setItem(Qn::SingleRole, NULL);
+    }
+}
+
 void QnWorkbench::at_layout_itemAdded(QnWorkbenchItem *item) {
     emit itemAdded(item);
 
-    if(m_currentLayout->items().size() == 1)
-        setItem(Qn::SingleRole, *m_currentLayout->items().begin());
+    updateSingleRoleItem();
 }
 
 void QnWorkbench::at_layout_itemRemoved(QnWorkbenchItem *item) {
+    updateSingleRoleItem();
+
     for(int i = 0; i < Qn::ItemRoleCount; i++)
         if(item == m_itemByRole[i])
             setItem(static_cast<Qn::ItemRole>(i), NULL);
-
-    if(m_currentLayout->items().size() == 1)
-        setItem(Qn::SingleRole, *m_currentLayout->items().begin());
 
     emit itemRemoved(item);
 }
