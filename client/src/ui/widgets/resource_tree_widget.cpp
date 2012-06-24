@@ -100,9 +100,10 @@ protected:
             if(!raisedItem)
                 raisedItem = workbench()->item(Qn::ZoomedRole);
         }
-        
+
+        QRect decorationRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &optionV4, optionV4.widget);
+
         if(raisedItem && (raisedItem->uuid() == uuid || (resource && uuid.isNull() && raisedItem->resourceUid() == resource->getUniqueId()))) {
-            QRect decorationRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &optionV4, optionV4.widget);
             m_raisedIcon.paint(painter, decorationRect);
 
             QRect rect = optionV4.rect;
@@ -120,16 +121,16 @@ protected:
             optionV4.rect = rect;
         }
 
-        /* Draw item. */
-        style->drawControl(QStyle::CE_ItemViewItem, &optionV4, painter, optionV4.widget);
-
         /* Draw 'recording' icon. */
         if(resource && resource->getStatus() == QnResource::Recording) {
-            QRect iconRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &optionV4, optionV4.widget);
+            QRect iconRect = decorationRect;
             iconRect.moveLeft(iconRect.left() - iconRect.width() - 2);
 
             m_recIcon.paint(painter, iconRect);
         }
+
+        /* Draw item. */
+        style->drawControl(QStyle::CE_ItemViewItem, &optionV4, painter, optionV4.widget);
     }
 
     virtual void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override {
