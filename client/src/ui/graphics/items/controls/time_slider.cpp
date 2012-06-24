@@ -1130,7 +1130,7 @@ void QnTimeSlider::updateThumbnailsStepSize(bool instant, bool forced) {
 
     /* Calculate new time step. */
     qint64 timeStep = m_msecsPerPixel * size.width();
-    bool timeStepChanged = timeStep != thumbnailsLoader()->timeStep();
+    bool timeStepChanged = qAbs(timeStep / m_msecsPerPixel - thumbnailsLoader()->timeStep() / m_msecsPerPixel) >= 1;
 
     /* Nothing changed? Leave. */
     if(!timeStepChanged && !boundingSizeChanged)
