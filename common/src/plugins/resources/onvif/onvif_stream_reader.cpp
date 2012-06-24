@@ -268,26 +268,38 @@ void QnOnvifStreamReader::updateVideoEncoder(VideoEncoder& encoder, bool isPrima
     encoder.Encoding = m_onvifRes->getCodec() == QnPlOnvifResource::H264? onvifXsd__VideoEncoding__H264: onvifXsd__VideoEncoding__JPEG;
     encoder.Name = isPrimary? NETOPTIX_PRIMARY_NAME: NETOPTIX_SECONDARY_NAME;
 
-    if (!encoder.RateControl) {
+    QnStreamQuality quality = getQuality();
+    ResolutionPair resolution = isPrimary? m_onvifRes->getPrimaryResolution(): m_onvifRes->getSecondaryResolution();
+
+    if (!encoder.RateControl) 
+    {
         qWarning() << "QnOnvifStreamReader::updateVideoEncoderParams: RateControl is NULL. UniqueId: " << m_onvifRes->getUniqueId();
-    } else {
+    } else 
+    {
         encoder.RateControl->FrameRateLimit = getFps();
+        encoder.RateControl->BitrateLimit = bestBitrateKbps(quality, QSize(resolution.first, resolution.second), encoder.RateControl->FrameRateLimit);
     }
 
-    QnStreamQuality quality = getQuality();
-    if (quality != QnQualityPreSeted) {
+    
+    if (quality != QnQualityPreSeted) 
+    {
         encoder.Quality = m_onvifRes->innerQualityToOnvif(quality);
     }
 
-    if (!encoder.Resolution) {
+    if (!encoder.Resolution) 
+    {
         qWarning() << "QnOnvifStreamReader::updateVideoEncoderParams: Resolution is NULL. UniqueId: " << m_onvifRes->getUniqueId();
-    } else {
-
-        ResolutionPair resolution = isPrimary? m_onvifRes->getPrimaryResolution(): m_onvifRes->getSecondaryResolution();
-        if (resolution == EMPTY_RESOLUTION_PAIR) {
+    } 
+    else 
+    {
+       
+        if (resolution == EMPTY_RESOLUTION_PAIR) 
+        {
             qWarning() << "QnOnvifStreamReader::updateVideoEncoderParams: : Can't determine (" << (isPrimary? "primary": "secondary") 
                 << ") resolution " << "for ONVIF device (UniqueId: " << m_onvifRes->getUniqueId() << "). Default resolution will be used.";
-        } else {
+        } 
+        else 
+        {
 
             encoder.Resolution->Width = resolution.first;
             encoder.Resolution->Height = resolution.second;

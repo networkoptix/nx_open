@@ -5,37 +5,49 @@
 
 int bestBitrateKbps(QnStreamQuality q, QSize resolution, int fps)
 {
-    // I assume for a good quality 30 fps for 640x480 we need 800kbps 
+    // I assume for a QnQualityHighest quality 30 fps for 1080 we need 10 mbps
+    // I assume for a QnQualityLowest quality 30 fps for 1080 we need 1 mbps
 
-    int kbps = 400;
+    int hiEnd = 1024*10;
+    int lowEnd = 1024*1;
 
+    float resolutionFactor = resolution.width()*resolution.height()/1920.0/1080;
+    resolutionFactor = pow(resolutionFactor, (float)0.5);
+
+    float frameRateFactor = fps/30.0;
+
+    int result = (lowEnd + (hiEnd - lowEnd) * (q - QnQualityLowest) / (QnQualityHighest - QnQualityLowest)) *resolutionFactor * frameRateFactor;
+
+    return result;
+
+    
+    /*
     switch (q)
     {
     case QnQualityHighest:
-        kbps = 800;
+
     	break;
 
     case QnQualityHigh:
-        kbps = 600;
+
         break;
 
     case QnQualityNormal:
-        kbps = 450;
+
         break;
 
     case QnQualityLow:
-        kbps = 300;
+
         break;
 
     case QnQualityLowest:
-        kbps = 100;
+
         break;
     }
+    /**/
 
-    float resolutionFactor = resolution.width()*resolution.height()/640.0/480.0;
-    float frameRateFactor = fps/30.0;
 
-    return kbps*resolutionFactor*frameRateFactor;
+
 }
 
 
