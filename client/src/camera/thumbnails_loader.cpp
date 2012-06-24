@@ -323,6 +323,7 @@ void QnThumbnailsLoader::run() {
 void QnThumbnailsLoader::process() {
     QnTimePeriod period;
     QSize boundingSize;
+    QSize thumbnailSize;
     qint64 timeStep;
     int generation;
     QList<QnAbstractArchiveDelegatePtr> delegates;
@@ -335,6 +336,7 @@ void QnThumbnailsLoader::process() {
 
         period = m_processingStack.pop();
         boundingSize = m_boundingSize;
+        thumbnailSize = m_scaleTargetSize;
         timeStep = m_timeStep;
         generation = m_generation;
     }
@@ -372,7 +374,7 @@ void QnThumbnailsLoader::process() {
         QQueue<qint64> timingsQueue;
         QQueue<int> frameFlags;
 
-        QnThumbnail thumbnail;
+        QnThumbnail thumbnail(QPixmap(), thumbnailSize, period.startTimeMs, period.startTimeMs, timeStep, generation);
         qint64 time = period.startTimeMs;
         QnCompressedVideoDataPtr frame = client->getNextData().dynamicCast<QnCompressedVideoData>();
         if (frame) 
@@ -420,8 +422,7 @@ void QnThumbnailsLoader::process() {
                 }
 
                 /* Fill remaining time values with thumbnails. */
-                if (!thumbnail.isEmpty())
-                    processThumbnail(thumbnail, time, period.endTimeMs(), false);
+                processThumbnail(thumbnail, time, period.endTimeMs(), false);
             }
         }
         client->close();
