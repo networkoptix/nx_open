@@ -125,19 +125,8 @@ protected:
 
         /* Draw 'recording' icon. */
         if(resource && resource->getStatus() == QnResource::Recording) {
-            QRect textRect = style->subElementRect(QStyle::SE_ItemViewItemText, &optionV4, optionV4.widget);
-            int textMargin = style->pixelMetric(QStyle::PM_FocusFrameHMargin, 0, optionV4.widget) + 1;
-            textRect = textRect.adjusted(textMargin, 0, -textMargin, 0);
-
-            QFontMetrics metrics(optionV4.font);
-            int textWidth = metrics.width(optionV4.text);
-
-            QRect iconRect = QRect(
-                textRect.left() + textWidth + textMargin,
-                textRect.top() + 2,
-                textRect.height() - 4,
-                textRect.height() - 4
-            );
+            QRect iconRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &optionV4, optionV4.widget);
+            iconRect.moveLeft(iconRect.left() - iconRect.width() - 2);
 
             m_recIcon.paint(painter, iconRect);
         }
