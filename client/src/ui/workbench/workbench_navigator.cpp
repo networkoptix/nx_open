@@ -66,7 +66,8 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
 {}
     
 QnWorkbenchNavigator::~QnWorkbenchNavigator() {
-    return;
+    foreach(QnThumbnailsLoader *loader, m_thumbnailLoaderByResource)
+        QnRunnableCleanup::cleanup(loader);
 }
 
 QnTimeSlider *QnWorkbenchNavigator::timeSlider() const {
@@ -389,6 +390,21 @@ QnCachingTimePeriodLoader *QnWorkbenchNavigator::loader(const QnResourcePtr &res
 
 QnCachingTimePeriodLoader *QnWorkbenchNavigator::loader(QnResourceWidget *widget) {
     return widget ? loader(widget->resource()) : NULL;
+}
+
+QnThumbnailsLoader *QnWorkbenchNavigator::thumbnailLoader(const QnResourcePtr &resource) {
+    QHash<QnResourcePtr, QnThumbnailsLoader *>::const_iterator pos = m_thumbnailLoaderByResource.find(resource);
+    if(pos != m_thumbnailLoaderByResource.end())
+        return *pos;
+
+    QnThumbnailsLoader *loader = new QnThumbnailsLoader(resource);
+
+    m_thumbnailLoaderByResource[resource] = loader;
+    return loader;
+}
+
+QnThumbnailsLoader *QnWorkbenchNavigator::thumbnailLoader(QnResourceWidget *widget) {
+    return widget ? thumbnailLoader(widget->resource()) : NULL;
 }
 
 void QnWorkbenchNavigator::jumpBackward() {
@@ -814,8 +830,7 @@ void QnWorkbenchNavigator::updateThumbnailsLoader() {
     if(!resource) {
         m_timeSlider->setThumbnailsLoader(NULL);
     } else if(!m_timeSlider->thumbnailsLoader() || m_timeSlider->thumbnailsLoader()->resource() != resource) {
-        m_thumbnailsLoader.reset(new QnThumbnailsLoader(resource));
-        m_timeSlider->setThumbnailsLoader(m_thumbnailsLoader.data());
+        m_timeSlider->setThumbnailsLoader(thumbnailLoader(resource));
     }
 }
 

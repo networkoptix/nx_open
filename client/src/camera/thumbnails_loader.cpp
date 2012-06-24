@@ -181,6 +181,12 @@ QnTimePeriod QnThumbnailsLoader::timePeriod() const {
     return QnTimePeriod(m_requestStart, m_requestEnd - m_requestStart);
 }
 
+QHash<qint64, QnThumbnail> QnThumbnailsLoader::thumbnails() const {
+    QMutexLocker locker(&m_mutex);
+
+    return m_thumbnailByTime;
+}
+
 void QnThumbnailsLoader::pleaseStop() {
     {
         QMutexLocker locker(&m_mutex);

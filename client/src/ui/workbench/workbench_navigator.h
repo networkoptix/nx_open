@@ -116,6 +116,9 @@ protected:
     QnCachingTimePeriodLoader *loader(const QnResourcePtr &resource);
     QnCachingTimePeriodLoader *loader(QnResourceWidget *widget);
 
+    QnThumbnailsLoader *thumbnailLoader(const QnResourcePtr &resource);
+    QnThumbnailsLoader *thumbnailLoader(QnResourceWidget *widget);
+
 protected slots:
     void updateCentralWidget();
     void updateCurrentWidget();
@@ -207,7 +210,7 @@ private:
 
     QHash<QnResourcePtr, QnCachingTimePeriodLoader *> m_loaderByResource;
     
-    QScopedPointer<QnThumbnailsLoader, QnRunnableCleanup> m_thumbnailsLoader;
+    QHash<QnResourcePtr, QnThumbnailsLoader *> m_thumbnailLoaderByResource;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchNavigator::WidgetFlags);

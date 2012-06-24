@@ -656,6 +656,13 @@ QnThumbnailsLoader *QnTimeSlider::thumbnailsLoader() const {
 }
 
 void QnTimeSlider::setThumbnailsLoader(QnThumbnailsLoader *loader) {
+    if(m_thumbnailsLoader.data() == loader)
+        return;
+
+    clearThumbnails();
+    m_oldThumbnailData.clear();
+    m_thumbnailsUpdateTimer->stop();
+
     if(m_thumbnailsLoader)
         disconnect(m_thumbnailsLoader.data(), NULL, this, NULL);
 
@@ -669,6 +676,10 @@ void QnTimeSlider::setThumbnailsLoader(QnThumbnailsLoader *loader) {
 
     updateThumbnailsPeriod();
     updateThumbnailsStepSize(true);
+
+    if(m_thumbnailsLoader)
+        foreach(const QnThumbnail &thumbnail, loader->thumbnails())
+            addThumbnail(thumbnail);
 }
 
 QPointF QnTimeSlider::positionFromValue(qint64 logicalValue, bool bound) const {

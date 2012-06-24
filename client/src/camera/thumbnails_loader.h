@@ -51,6 +51,8 @@ public:
     void setTimePeriod(const QnTimePeriod &timePeriod);
     QnTimePeriod timePeriod() const;
 
+    QHash<qint64, QnThumbnail> thumbnails() const;
+
     virtual void pleaseStop() override;
 
 signals:
