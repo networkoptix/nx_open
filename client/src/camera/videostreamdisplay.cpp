@@ -373,7 +373,7 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompress
         dec->resetDecoder(data);
         m_prevReverseMode = reverseMode;
         m_needResetDecoder = false;
-        data->flags |= QnAbstractMediaData::MediaFlags_DecodeTwice;
+        //data->flags |= QnAbstractMediaData::MediaFlags_DecodeTwice;
     }
 
     QnFrameScaler::downscale_factor scaleFactor = QnFrameScaler::factor_unknown;
