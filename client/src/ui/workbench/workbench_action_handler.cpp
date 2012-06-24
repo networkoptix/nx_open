@@ -984,8 +984,10 @@ void QnWorkbenchActionHandler::at_editTagsAction_triggered() {
 void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
     QnResourceList resources = QnResourceCriterion::filter<QnVirtualCameraResource, QnResourceList>(menu()->currentParameters(sender()).resources());
 
+    bool newlyCreated = false;
     if(!cameraSettingsDialog()) {
         m_cameraSettingsDialog = new QnCameraSettingsDialog(widget());
+        newlyCreated = true;
         
         connect(cameraSettingsDialog(), SIGNAL(buttonClicked(QDialogButtonBox::StandardButton)), this, SLOT(at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton)));
     }
@@ -1006,7 +1008,10 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
     cameraSettingsDialog()->widget()->setResources(resources);
     updateCameraSettingsEditibility();
 
+    QRect oldGeometry = cameraSettingsDialog()->geometry();
     cameraSettingsDialog()->show();
+    if(!newlyCreated)
+        cameraSettingsDialog()->setGeometry(oldGeometry);
 }
 
 void QnWorkbenchActionHandler::at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton button) {
