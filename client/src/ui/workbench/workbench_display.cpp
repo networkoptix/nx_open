@@ -42,6 +42,8 @@
 #include <ui/graphics/items/image_button_widget.h>
 #include <ui/graphics/items/grid_item.h>
 
+#include "ui/graphics/opengl/gl_hardware_check.h"
+
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
 
@@ -415,7 +417,10 @@ void QnWorkbenchDisplay::setView(QGraphicsView *view) {
             QGLFormat glFormat;
             glFormat.setOption(QGL::SampleBuffers); /* Multisampling. */
             glFormat.setSwapInterval(1); /* Turn vsync on. */
-            m_view->setViewport(new QGLWidget(glFormat));
+
+            QGLWidget *glWidget = new QGLWidget(glFormat);
+            HardwareCheckEventFilter* filter = new HardwareCheckEventFilter(glWidget);
+            m_view->setViewport(glWidget);
         }
 
         /* Turn on antialiasing at QPainter level. */
