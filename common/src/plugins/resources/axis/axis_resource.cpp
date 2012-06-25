@@ -4,7 +4,7 @@
 #include "utils/common/synctime.h"
 
 const char* QnPlAxisResource::MANUFACTURE = "Axis";
-static const float MAX_AR_EPS = 0.01;
+static const float MAX_AR_EPS = 0.02;
 static const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
 
 QnPlAxisResource::QnPlAxisResource()

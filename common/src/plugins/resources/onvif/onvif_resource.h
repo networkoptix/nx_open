@@ -14,13 +14,16 @@
 
 class onvifXsd__AudioEncoderConfigurationOption;
 class onvifXsd__VideoSourceConfigurationOptions;
+class onvifXsd__VideoEncoderConfigurationOptions;
 typedef onvifXsd__AudioEncoderConfigurationOption AudioOptions;
 typedef onvifXsd__VideoSourceConfigurationOptions VideoSrcOptions;
+typedef onvifXsd__VideoEncoderConfigurationOptions VideoOptions;
 
 //first = width, second = height
 typedef QPair<int, int> ResolutionPair;
 const ResolutionPair EMPTY_RESOLUTION_PAIR(0, 0);
 const ResolutionPair SECONDARY_STREAM_DEFAULT_RESOLUTION(320, 240);
+const ResolutionPair SECONDARY_STREAM_MAX_RESOLUTION(640, 480);
 
 
 struct CameraPhysicalWindowSize
@@ -59,6 +62,7 @@ public:
     static const char* MANUFACTURE;
     static const QString& MEDIA_URL_PARAM_NAME;
     static const QString& DEVICE_URL_PARAM_NAME;
+    static const QString& MAX_FPS_PARAM_NAME;
 	static const float QUALITY_COEF;
     static const double MAX_SECONDARY_RESOLUTION_SQUARE;
     static const char* PROFILE_NAME_PRIMARY;
@@ -92,6 +96,8 @@ public:
     ResolutionPair getMaxResolution() const;
     bool isSoapAuthorized() const;
     const CameraPhysicalWindowSize getPhysicalWindowSize() const;
+    const QString QnPlOnvifResource::getPrimaryVideoEncoderId() const;
+    const QString QnPlOnvifResource::getSecondaryVideoEncoderId() const;
 
 
     QString getMediaUrl() const;
@@ -159,6 +165,8 @@ private:
     int m_audioBitrate;
     int m_audioSamplerate;
     CameraPhysicalWindowSize m_physicalWindowSize;
+    QString m_primaryVideoEncoderId;
+    QString m_secondaryVideoEncoderId;
 
 };
 
