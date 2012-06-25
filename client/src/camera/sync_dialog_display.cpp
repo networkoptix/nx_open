@@ -31,6 +31,21 @@ QnSignDialogDisplay::~QnSignDialogDisplay()
     delete m_tmpMdCtx;
 }
 
+void QnSignDialogDisplay::finilizeSign()
+{
+    QSharedPointer<CLVideoDecoderOutput> lastFrame = m_display[0]->flush(QnFrameScaler::factor_any, 0);
+
+    quint8 md_value[EVP_MAX_MD_SIZE];
+    quint32 md_len = 0;
+    EVP_DigestFinal_ex(m_mdctx, md_value, &md_len);
+    QByteArray calculatedSign((const char*)md_value, md_len);
+
+    QnSignHelper signHelper;
+    QByteArray signFromPicture = signHelper.getSign(lastFrame.data(), md_len);
+    emit calcSignInProgress(calculatedSign, 100);
+    emit gotSignature(calculatedSign, signFromPicture);
+}
+
 bool QnSignDialogDisplay::processData(QnAbstractDataPacketPtr data)
 {
     QnEmptyMediaDataPtr eofPacket = qSharedPointerDynamicCast<QnEmptyMediaData>(data);
@@ -52,17 +67,7 @@ bool QnSignDialogDisplay::processData(QnAbstractDataPacketPtr data)
         {
             if (m_prevFrame->flags & AV_PKT_FLAG_KEY)
                 m_display[0]->dispay(m_prevFrame, true, QnFrameScaler::factor_any); // repeat last frame on the screen (may be skipped because of time check)
-            QSharedPointer<CLVideoDecoderOutput> lastFrame = m_display[0]->flush(QnFrameScaler::factor_any, 0);
-
-            quint8 md_value[EVP_MAX_MD_SIZE];
-            quint32 md_len = 0;
-            EVP_DigestFinal_ex(m_mdctx, md_value, &md_len);
-            QByteArray calculatedSign((const char*)md_value, md_len);
-
-            QnSignHelper signHelper;
-            QByteArray signFromPicture = signHelper.getSign(lastFrame.data(), md_len);
-            emit calcSignInProgress(calculatedSign, 100);
-            emit gotSignature(calculatedSign, signFromPicture);
+            finilizeSign();
         }
         else {
             emit calcSignInProgress(QByteArray(), 100);
@@ -99,13 +104,18 @@ bool QnSignDialogDisplay::processData(QnAbstractDataPacketPtr data)
 
             QByteArray calculatedSign((const char*)md_value, md_len);
             QnArchiveStreamReader* reader = dynamic_cast<QnArchiveStreamReader*> (video->dataProvider);
-            int progress =  (video->timestamp - reader->startTime()) / (double) (reader->endTime() - reader->startTime()) * 100;
+            int progress = 100;
+            if (reader)
+                progress =  (video->timestamp - reader->startTime()) / (double) (reader->endTime() - reader->startTime()) * 100;
             m_lastDisplayTime2 = qnSyncTime->currentMSecsSinceEpoch();
 
             emit calcSignInProgress(calculatedSign, progress);
         }
         m_prevFrame = video;
     }
+
+    if (video && (video->flags & QnAbstractMediaData::MediaFlags_StillImage))
+        finilizeSign();
 
     return true;
 }
