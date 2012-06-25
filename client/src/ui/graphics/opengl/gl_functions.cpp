@@ -64,6 +64,8 @@ public:
         QByteArray vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
         if (vendor.contains("Tungsten Graphics") && renderer.contains("Gallium 0.1, Poulsbo on EMGD"))
             m_features |= QnGlFunctions::ShadersBroken; /* Shaders are declared but don't work. */
+        if (vendor.contains("Intel") && renderer.contains("Intel(R) HD Graphics 3000"))
+            m_features |= QnGlFunctions::OpenGLBroken; /* OpenGL is declared but don't work. */
     }
 
     virtual ~QnGlFunctionsPrivate() {}

@@ -26,7 +26,7 @@ namespace detail {
         void unregisterAnimation(AnimationTimerListener *listener);
 
         template<class Base, bool baseIsAnimated>
-        friend class Animated; /* So that only this class can access our methods. */
+        friend class ::Animated; /* So that only this class can access our methods. */
 
     private:
         QScopedPointer<AnimationTimerListener> m_listener;

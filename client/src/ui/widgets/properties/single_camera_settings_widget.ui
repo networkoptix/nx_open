@@ -412,7 +412,7 @@
   <customwidget>
    <class>QTextTicksSlider</class>
    <extends>QSlider</extends>
-   <header>qtextticksslider.h</header>
+   <header>ui/widgets/properties/qtextticksslider.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
