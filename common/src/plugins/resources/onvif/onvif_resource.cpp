@@ -49,7 +49,8 @@ const QString QnPlOnvifResource::fetchMacAddress(const NetIfacesResp& response,
     std::vector<class onvifXsd__NetworkInterface*> ifaces = response.NetworkInterfaces;
     std::vector<class onvifXsd__NetworkInterface*>::const_iterator ifacePtrIter = ifaces.begin();
 
-    while (ifacePtrIter != ifaces.end()) {
+    while (ifacePtrIter != ifaces.end()) 
+    {
         onvifXsd__NetworkInterface* ifacePtr = *ifacePtrIter;
 
         if (ifacePtr->Enabled && ifacePtr->IPv4->Enabled) {
@@ -152,10 +153,22 @@ QnPlOnvifResource::CODECS QnPlOnvifResource::getCodec() const
     return m_codec;
 }
 
+void QnPlOnvifResource::setCodec(QnPlOnvifResource::CODECS c)
+{
+    QMutexLocker lock(&m_mutex);
+    m_codec = c;
+}
+
 QnPlOnvifResource::AUDIO_CODECS QnPlOnvifResource::getAudioCodec() const
 {
     QMutexLocker lock(&m_mutex);
     return m_audioCodec;
+}
+
+void QnPlOnvifResource::setAudioCodec(QnPlOnvifResource::AUDIO_CODECS c)
+{
+    QMutexLocker lock(&m_mutex);
+    m_audioCodec = c;
 }
 
 QnAbstractStreamDataProvider* QnPlOnvifResource::createLiveDataProvider()
@@ -170,9 +183,7 @@ void QnPlOnvifResource::setCropingPhysical(QRect /*croping*/)
 
 bool QnPlOnvifResource::initInternal()
 {
-    QMutexLocker lock(&m_mutex);
-
-    m_codec = H264;
+    setCodec(H264);
 
     setOnvifUrls();
 
@@ -189,7 +200,8 @@ bool QnPlOnvifResource::initInternal()
         m_reinitDeviceInfo = false;
     }
 
-    if (!fetchAndSetResourceOptions()) {
+    if (!fetchAndSetResourceOptions()) 
+    {
         return false;
     }
 
@@ -324,12 +336,16 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
         DeviceInfoResp response;
 
         int soapRes = soapWrapper.getDeviceInformation(request, response);
-        if (soapRes != SOAP_OK) {
+        if (soapRes != SOAP_OK) 
+        {
             qWarning() << "QnPlOnvifResource::fetchAndSetDeviceInformation: GetDeviceInformation SOAP to endpoint "
                 << soapWrapper.getEndpointUrl() << " failed. Camera name will remain 'Unknown'. GSoap error code: " << soapRes
                 << ". " << soapWrapper.getLastError();
+
             result = false;
-        } else {
+        } 
+        else 
+        {
             setName((response.Manufacturer + " - " + response.Model).c_str());
         }
     }
@@ -340,18 +356,22 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
         CapabilitiesResp response;
 
         int soapRes = soapWrapper.getCapabilities(request, response);
-        if (soapRes != SOAP_OK) {
+        if (soapRes != SOAP_OK) 
+        {
             qWarning() << "QnPlOnvifResource::fetchAndSetDeviceInformation: can't fetch media and device URLs. Reason: SOAP to endpoint "
                 << getDeviceOnvifUrl() << " failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
             result = false;
         }
 
-        if (response.Capabilities) {
-            if (response.Capabilities->Media) {
+        if (response.Capabilities) 
+        {
+            if (response.Capabilities->Media) 
+            {
                 setMediaUrl(response.Capabilities->Media->XAddr.c_str());
                 setParam(MEDIA_URL_PARAM_NAME, getMediaUrl(), QnDomainDatabase);
             }
-            if (response.Capabilities->Device) {
+            if (response.Capabilities->Device) 
+            {
                 setDeviceOnvifUrl(response.Capabilities->Device->XAddr.c_str());
                 setParam(DEVICE_URL_PARAM_NAME, getDeviceOnvifUrl(), QnDomainDatabase);
             }
@@ -364,13 +384,18 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
         NetIfacesResp response;
 
         int soapRes = soapWrapper.getNetworkInterfaces(request, response);
-        if (soapRes != SOAP_OK) {
+        if (soapRes != SOAP_OK) 
+        {
             qWarning() << "QnPlOnvifResource::fetchAndSetDeviceInformation: can't fetch MAC address. Reason: SOAP to endpoint "
                 << getDeviceOnvifUrl() << " failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
             result = false;
         }
+
         QString mac = fetchMacAddress(response, QUrl(getDeviceOnvifUrl()).host());
-        if (!mac.isEmpty()) setMAC(mac);
+
+        if (!mac.isEmpty()) 
+            setMAC(mac);
+
     }
 
     return result;
@@ -379,7 +404,7 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
 bool QnPlOnvifResource::fetchAndSetResourceOptions()
 {
     QAuthenticator auth(getAuth());
-    MediaSoapWrapper soapWrapper(m_mediaUrl.toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString());
+    MediaSoapWrapper soapWrapper(getMediaUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString());
 
     if (!fetchAndSetVideoEncoderOptions(soapWrapper)) {
         return false;
@@ -411,9 +436,12 @@ void QnPlOnvifResource::setVideoEncoderOptions(const VideoOptionsResp& response)
         qCritical() << "QnPlOnvifResource::setVideoEncoderOptions: camera didn't return quality range. UniqueId: " << getUniqueId();
     }
 
-    if (m_codec == H264) {
+    if (getCodec() == H264) 
+    {
         setVideoEncoderOptionsH264(response);
-    } else {
+    } 
+    else 
+    {
         setVideoEncoderOptionsJpeg(response);
     }
 }
@@ -424,39 +452,51 @@ void QnPlOnvifResource::setVideoEncoderOptionsH264(const VideoOptionsResp& respo
         return;
     }
 
-    if (response.Options->H264->FrameRateRange) {
+    if (response.Options->H264->FrameRateRange) 
+    {
+        QMutexLocker lock(&m_mutex);
         m_maxFps = response.Options->H264->FrameRateRange->Max;
 
         qDebug() << "ONVIF max FPS: " << m_maxFps;
-    } else {
+    } 
+    else 
+    {
         qCritical() << "QnPlOnvifResource::setVideoEncoderOptionsH264: can't fetch Max FPS. UniqueId: " << getUniqueId();
     }
 
-    if (response.Options->H264->GovLengthRange) {
-
+    if (response.Options->H264->GovLengthRange) 
+    {
+        QMutexLocker lock(&m_mutex);
         m_iframeDistance = DEFAULT_IFRAME_DISTANCE <= response.Options->H264->GovLengthRange->Min? response.Options->H264->GovLengthRange->Min:
             (DEFAULT_IFRAME_DISTANCE >= response.Options->H264->GovLengthRange->Max? response.Options->H264->GovLengthRange->Max: DEFAULT_IFRAME_DISTANCE);
         qDebug() << "ONVIF iframe distance: " << m_iframeDistance;
 
-    } else {
+    } 
+    else 
+    {
         qCritical() << "QnPlOnvifResource::setVideoEncoderOptionsH264: can't fetch Iframe Distance. UniqueId: " << getUniqueId();
     }
 
     std::vector<onvifXsd__VideoResolution*>& resolutions = response.Options->H264->ResolutionsAvailable;
     if (resolutions.size() == 0) {
         qCritical() << "QnPlOnvifResource::setVideoEncoderOptionsH264: can't fetch Resolutions. UniqueId: " << getUniqueId();
-    } else {
-
+    } 
+    else 
+    {
+        QMutexLocker lock(&m_mutex);
         m_resolutionList.clear();
 
         std::vector<onvifXsd__VideoResolution*>::const_iterator resPtrIter = resolutions.begin();
-        while (resPtrIter != resolutions.end()) {
+        while (resPtrIter != resolutions.end()) 
+        {
             m_resolutionList.append(ResolutionPair((*resPtrIter)->Width, (*resPtrIter)->Height));
             ++resPtrIter;
         }
         qSort(m_resolutionList.begin(), m_resolutionList.end(), resolutionGreaterThan);
 
     }
+
+    QMutexLocker lock(&m_mutex);
 
     //Printing fetched resolutions
     if (cl_log.logLevel() >= cl_logDEBUG1) {
@@ -467,23 +507,34 @@ void QnPlOnvifResource::setVideoEncoderOptionsH264(const VideoOptionsResp& respo
     }
 }
 
-void QnPlOnvifResource::setVideoEncoderOptionsJpeg(const VideoOptionsResp& response) {
-    if (!response.Options->JPEG) {
+void QnPlOnvifResource::setVideoEncoderOptionsJpeg(const VideoOptionsResp& response) 
+{
+
+    if (!response.Options->JPEG) 
+    {
         qCritical() << "QnPlOnvifResource::setVideoEncoderOptionsJpeg: can't fetch Max FPS, Iframe Distance and Resolution List. UniqueId: " << getUniqueId();
     }
 
-    if (response.Options->JPEG->FrameRateRange) {
+    if (response.Options->JPEG->FrameRateRange) 
+    {
+        QMutexLocker lock(&m_mutex);
         m_maxFps = response.Options->JPEG->FrameRateRange->Max;
 
         qDebug() << "ONVIF max FPS: " << m_maxFps;
-    } else {
+    } 
+    else 
+    {
         qCritical() << "QnPlOnvifResource::setVideoEncoderOptionsJpeg: can't fetch Max FPS. UniqueId: " << getUniqueId();
     }
 
     std::vector<onvifXsd__VideoResolution*>& resolutions = response.Options->JPEG->ResolutionsAvailable;
-    if (resolutions.size() == 0) {
+    if (resolutions.size() == 0) 
+    {
         qCritical() << "QnPlOnvifResource::setVideoEncoderOptionsJpeg: can't fetch Resolutions. UniqueId: " << getUniqueId();
-    } else {
+    } 
+    else 
+    {
+        QMutexLocker lock(&m_mutex);
 
         m_resolutionList.clear();
 
@@ -495,6 +546,7 @@ void QnPlOnvifResource::setVideoEncoderOptionsJpeg(const VideoOptionsResp& respo
         qSort(m_resolutionList.begin(), m_resolutionList.end(), resolutionGreaterThan);
     }
 
+    QMutexLocker lock(&m_mutex);
     //Printing fetched resolutions
     if (cl_log.logLevel() >= cl_logDEBUG1) {
         qDebug() << "ONVIF resolutions: ";
@@ -567,14 +619,14 @@ void QnPlOnvifResource::setOnvifUrls()
         qDebug() << "QnPlOnvifResource::setOnvifUrls: m_deviceOnvifUrl = " << getDeviceOnvifUrl();
     }
 
-    if (m_mediaUrl.isEmpty()) {
+    if (getMediaUrl().isEmpty()) {
         QVariant mediaVariant;
         bool res = getParam(MEDIA_URL_PARAM_NAME, mediaVariant, QnDomainDatabase);
         QString mediaStr(res? mediaVariant.toString(): "");
 
-        m_mediaUrl = mediaStr.isEmpty()? createOnvifEndpointUrl(): mediaStr;
+        setMediaUrl(mediaStr.isEmpty()? createOnvifEndpointUrl(): mediaStr);
 
-        qDebug() << "QnPlOnvifResource::setOnvifUrls: m_mediaUrl = " << m_mediaUrl;
+        qDebug() << "QnPlOnvifResource::setOnvifUrls: m_mediaUrl = " << getMediaUrl();
     }
 }
 
@@ -638,11 +690,16 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
 
     }
 
-    if (response.Options->H264) {
-        m_codec = H264;
-    } else if (response.Options->JPEG) {
-        m_codec = JPEG;
-    } else {
+    if (response.Options->H264) 
+    {
+        setCodec(H264);
+    } 
+    else if (response.Options->JPEG) 
+    {
+        setCodec(JPEG);
+    } 
+    else 
+    {
 
         qCritical() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: camera didn't return data for H264 and MJPEG (URL: " 
             << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId()
@@ -665,7 +722,7 @@ bool QnPlOnvifResource::fetchAndSetDualStreaming(MediaSoapWrapper& soapWrapper)
     int soapRes = soapWrapper.getVideoEncoderConfigurations(request, response);
     if (soapRes != SOAP_OK) {
         qCritical() << "QnPlOnvifResource::fetchAndSetDualStreaming: can't define availability of dual streaming (URL: "
-            << m_mediaUrl << ", UniqueId: " << getUniqueId() << "). Root cause: SOAP request failed. GSoap error code: "
+            << getMediaUrl() << ", UniqueId: " << getUniqueId() << "). Root cause: SOAP request failed. GSoap error code: "
             << soapRes << ". " << soapWrapper.getLastError();
         return false;
     }
@@ -748,10 +805,8 @@ bool QnPlOnvifResource::fetchAndSetAudioEncoderOptions(MediaSoapWrapper& soapWra
 
     }
 
-    {
-        QMutexLocker lock(&m_mutex);
-        m_audioCodec = codec;
-    }
+    
+    setAudioCodec(codec);
 
     setAudioEncoderOptions(*options);
 
