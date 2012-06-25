@@ -419,7 +419,7 @@ void QnWorkbenchDisplay::setView(QGraphicsView *view) {
             glFormat.setSwapInterval(1); /* Turn vsync on. */
 
             QGLWidget *glWidget = new QGLWidget(glFormat);
-            HardwareCheckEventFilter* filter = new HardwareCheckEventFilter(glWidget);
+            QnGlHardwareChecker* filter = new QnGlHardwareChecker(glWidget);
             m_view->setViewport(glWidget);
         }
 
