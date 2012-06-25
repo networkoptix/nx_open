@@ -450,7 +450,7 @@ void QnThumbnailsLoader::addThumbnail(const QnThumbnail &thumbnail) {
 }
 
 void QnThumbnailsLoader::ensureScaleContextLocked(int lineSize, const QSize &sourceSize, const QSize &boundingSize, int format) {
-    bool needsReallocation = true;
+    bool needsReallocation = false;
     
     if(m_scaleSourceSize != sourceSize) {
         m_scaleSourceSize = sourceSize;
@@ -461,10 +461,12 @@ void QnThumbnailsLoader::ensureScaleContextLocked(int lineSize, const QSize &sou
         m_mutex.unlock();
         emit sourceSizeChanged();
         m_mutex.lock();
+
+        needsReallocation = true;
     }
 
-    if(m_scaleSourceLine == lineSize && m_scaleSourceSize == sourceSize && m_scaleSourceFormat == format && m_targetSize == m_scaleTargetSize)
-        needsReallocation = false;
+    if(m_scaleSourceLine != lineSize || m_scaleSourceSize != sourceSize || m_scaleSourceFormat != format || m_targetSize == m_scaleTargetSize)
+        needsReallocation = true;
 
     if(!m_scaleContext)
         needsReallocation = true;
