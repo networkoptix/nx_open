@@ -220,7 +220,11 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
         if (globalMinTime !=AV_NOPTS_VALUE)
             m_globalMinArchiveTime = globalMinTime;
 
-        m_rtspSession.play(m_position, m_position, m_rtspSession.getScale());
+        qint64 endTime = m_position;
+        if (m_forcedEndTime)
+            endTime = m_forcedEndTime;
+
+        m_rtspSession.play(m_position, endTime, m_rtspSession.getScale());
         m_rtpData = m_rtspSession.getTrackIoByType("video");
         if (!m_rtpData)
             m_rtspSession.stop();
@@ -480,6 +484,9 @@ qint64 QnRtspClientArchiveDelegate::seek(qint64 time, bool findIFrame)
         }
     }
 
+    if (!findIFrame)
+        m_rtspSession.setAdditionAttribute("x-no-find-iframe", "1");
+
     if (!m_opened && m_resource) {
         if (!openInternal(m_resource) && m_isMultiserverAllowed)
         {
@@ -506,8 +513,6 @@ qint64 QnRtspClientArchiveDelegate::seek(qint64 time, bool findIFrame)
         }
     }
     else {
-        if (!findIFrame)
-            m_rtspSession.setAdditionAttribute("x-no-find-iframe", "1");
         qint64 endTime = AV_NOPTS_VALUE;
         if (m_forcedEndTime)
             endTime = m_forcedEndTime;
