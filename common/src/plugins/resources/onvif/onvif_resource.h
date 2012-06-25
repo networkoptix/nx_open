@@ -96,8 +96,8 @@ public:
     ResolutionPair getMaxResolution() const;
     bool isSoapAuthorized() const;
     const CameraPhysicalWindowSize getPhysicalWindowSize() const;
-    const QString QnPlOnvifResource::getPrimaryVideoEncoderId() const;
-    const QString QnPlOnvifResource::getSecondaryVideoEncoderId() const;
+    const QString getPrimaryVideoEncoderId() const;
+    const QString getSecondaryVideoEncoderId() const;
 
 
     QString getMediaUrl() const;
