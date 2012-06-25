@@ -52,6 +52,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_currentWidgetFlags(0),
     m_currentWidgetLoaded(false),
     m_currentWidgetIsCentral(false),
+    m_sliderDataInvalid(false),
     m_startSelectionAction(new QAction(this)),
     m_endSelectionAction(new QAction(this)),
     m_clearSelectionAction(new QAction(this)),
@@ -361,9 +362,12 @@ QnWorkbenchNavigator::SliderUserData QnWorkbenchNavigator::currentSliderData() c
     return result;
 }
 
-void QnWorkbenchNavigator::setCurrentSliderData(const SliderUserData &localData) {
+void QnWorkbenchNavigator::setCurrentSliderData(const SliderUserData &localData, bool preferToPreserveWindow) {
     m_timeSlider->setSelectionValid(localData.selectionValid);
     m_timeSlider->setSelection(localData.selection.startTimeMs, localData.selection.startTimeMs + localData.selection.durationMs);
+
+    if(preferToPreserveWindow && m_timeSlider->value() >= m_timeSlider->windowStart() && m_timeSlider->value() <= m_timeSlider->windowEnd())
+        return; /* Just skip window initialization. */
 
     qint64 windowStart = localData.window.startTimeMs;
     qint64 windowEnd = localData.window.durationMs == -1 ? m_timeSlider->maximum() : localData.window.startTimeMs + localData.window.durationMs;
@@ -563,9 +567,9 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     updateCurrentWidgetFlags();
     updateLines();
 
-    updateSliderFromReader();
     if(!((m_currentWidgetFlags & WidgetSupportsSync) && (previousWidgetFlags & WidgetSupportsSync) && display()->isStreamsSynchronized()) && m_currentWidget)
-        setCurrentSliderData(m_localDataByWidget.value(m_currentWidget));
+        m_sliderDataInvalid = true;
+    updateSliderFromReader(false);
     m_timeSlider->finishAnimations();
 
     updateCurrentPeriods();
@@ -611,7 +615,7 @@ void QnWorkbenchNavigator::updateSliderOptions() {
         m_timeSlider->setSelectionValid(false);
 }
 
-void QnWorkbenchNavigator::updateSliderFromReader() {
+void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
     if (!m_currentWidget)
         return;
 
@@ -637,15 +641,21 @@ void QnWorkbenchNavigator::updateSliderFromReader() {
         qint64 timeUSec = m_currentWidget->display()->camDisplay()->isRealTimeSource() ? DATETIME_NOW : m_currentWidget->display()->camera()->getCurrentTime();
         qint64 timeMSec = timeUSec == DATETIME_NOW ? endTimeMSec : (timeUSec == AV_NOPTS_VALUE ? m_timeSlider->value() : timeUSec / 1000);
 
-        m_timeSlider->setValue(timeMSec, true);
+        m_timeSlider->setValue(timeMSec, keepInWindow);
 
         if(timeUSec != AV_NOPTS_VALUE)
             updateLive();
     }
 
-    if(!m_currentWidgetLoaded && startTimeUSec != AV_NOPTS_VALUE) {
+    if(!m_currentWidgetLoaded && (startTimeUSec != AV_NOPTS_VALUE && endTimeUSec != AV_NOPTS_VALUE)) {
         m_currentWidgetLoaded = true;
         updateTargetPeriod();
+
+        if(m_sliderDataInvalid) {
+            setCurrentSliderData(m_localDataByWidget.value(m_currentWidget), m_currentWidgetFlags & WidgetUsesUTC);
+            m_timeSlider->finishAnimations();
+            m_sliderDataInvalid = false;
+        }
     }
 }
 

@@ -33,6 +33,8 @@ public:
 
     Qn::Permissions permissions(const QnResourcePtr &resource) const;
 
+    bool hasPermissions(const QnResourcePtr &resource, Qn::Permissions requiredPermissions) const;
+
     template<class ResourceList>
     Qn::Permissions permissions(const ResourceList &resources, const typename ResourceList::const_iterator * = NULL /* Let SFINAE filter out non-lists. */) const {
         Qn::Permissions result = Qn::AllPermissions;
