@@ -727,7 +727,32 @@ QnActionManager::QnActionManager(QObject *parent):
             text(tr("16:9"));
     } factory.leaveSubMenu();
 
+    factory().
+        flags(Qn::Scene | Qn::NoTarget).
+        text(tr("Change Cell Spacing"));
 
+    factory.enterSubMenu(); {
+        factory(Qn::SetCurrentLayoutItemSpacing0Action).
+            flags(Qn::Scene | Qn::NoTarget).
+            requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
+            text(tr("0%"));
+
+        factory(Qn::SetCurrentLayoutItemSpacing10Action).
+            flags(Qn::Scene | Qn::NoTarget).
+            requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
+            text(tr("10%"));
+
+        factory(Qn::SetCurrentLayoutItemSpacing20Action).
+            flags(Qn::Scene | Qn::NoTarget).
+            requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
+            text(tr("20%"));
+
+        factory(Qn::SetCurrentLayoutItemSpacing30Action).
+            flags(Qn::Scene | Qn::NoTarget).
+            requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
+            text(tr("30%"));
+
+    } factory.leaveSubMenu();
 
     factory(Qn::StartTimeSelectionAction).
         flags(Qn::Slider | Qn::SingleTarget).
