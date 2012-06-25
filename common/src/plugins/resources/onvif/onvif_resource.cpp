@@ -319,7 +319,7 @@ void QnPlOnvifResource::fetchAndSetPrimarySecondaryResolution()
         return;
     }
 
-    double currentSquare = m_primaryResolution.first * m_primaryResolution.second;
+    double maxSquare = m_primaryResolution.first * m_primaryResolution.second;
 
     foreach (ResolutionPair resolution, m_resolutionList) {
         float aspect = getResolutionAspectRatio(resolution);
@@ -329,7 +329,7 @@ void QnPlOnvifResource::fetchAndSetPrimarySecondaryResolution()
         currentAspect = aspect;
 
         double square = resolution.first * resolution.second;
-        if (square == 0 || currentSquare / square > 2.0) {
+        if (square <= 0.95 * maxSquare) {
             break;
         }
 
