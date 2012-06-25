@@ -316,7 +316,7 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
 {
     bool result = true;
     QAuthenticator auth(getAuth());
-    DeviceSoapWrapper soapWrapper(m_deviceOnvifUrl.toStdString(), auth.user().toStdString(), auth.password().toStdString());
+    DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), auth.user().toStdString(), auth.password().toStdString());
     
     //Trying to get name
     {
@@ -326,7 +326,7 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
         int soapRes = soapWrapper.getDeviceInformation(request, response);
         if (soapRes != SOAP_OK) {
             qWarning() << "QnPlOnvifResource::fetchAndSetDeviceInformation: GetDeviceInformation SOAP to endpoint "
-                << m_deviceOnvifUrl << " failed. Camera name will remain 'Unknown'. GSoap error code: " << soapRes
+                << soapWrapper.getEndpointUrl() << " failed. Camera name will remain 'Unknown'. GSoap error code: " << soapRes
                 << ". " << soapWrapper.getLastError();
             result = false;
         } else {
@@ -342,7 +342,7 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
         int soapRes = soapWrapper.getCapabilities(request, response);
         if (soapRes != SOAP_OK) {
             qWarning() << "QnPlOnvifResource::fetchAndSetDeviceInformation: can't fetch media and device URLs. Reason: SOAP to endpoint "
-                << m_deviceOnvifUrl << " failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
+                << getDeviceOnvifUrl() << " failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
             result = false;
         }
 
@@ -366,10 +366,10 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
         int soapRes = soapWrapper.getNetworkInterfaces(request, response);
         if (soapRes != SOAP_OK) {
             qWarning() << "QnPlOnvifResource::fetchAndSetDeviceInformation: can't fetch MAC address. Reason: SOAP to endpoint "
-                << m_deviceOnvifUrl << " failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
+                << getDeviceOnvifUrl() << " failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
             result = false;
         }
-        QString mac = fetchMacAddress(response, QUrl(m_deviceOnvifUrl).host());
+        QString mac = fetchMacAddress(response, QUrl(getDeviceOnvifUrl()).host());
         if (!mac.isEmpty()) setMAC(mac);
     }
 
@@ -525,9 +525,9 @@ int QnPlOnvifResource::innerQualityToOnvif(QnStreamQuality quality) const
 bool QnPlOnvifResource::isSoapAuthorized() const 
 {
     QAuthenticator auth(getAuth());
-    DeviceSoapWrapper soapWrapper(m_deviceOnvifUrl.toStdString(), auth.user().toStdString(), auth.password().toStdString());
+    DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), auth.user().toStdString(), auth.password().toStdString());
 
-    qDebug() << "QnPlOnvifResource::isSoapAuthorized: m_deviceOnvifUrl is '" << m_deviceOnvifUrl << "'";
+    qDebug() << "QnPlOnvifResource::isSoapAuthorized: m_deviceOnvifUrl is '" << getDeviceOnvifUrl() << "'";
     qDebug() << "QnPlOnvifResource::isSoapAuthorized: login = " << soapWrapper.getLogin() << ", password = " << soapWrapper.getPassword();
 
     NetIfacesReq request;
@@ -557,14 +557,14 @@ void QnPlOnvifResource::setMediaUrl(const QString& src)
 
 void QnPlOnvifResource::setOnvifUrls()
 {
-    if (m_deviceOnvifUrl.isEmpty()) {
+    if (getDeviceOnvifUrl().isEmpty()) {
         QVariant deviceVariant;
         bool res = getParam(DEVICE_URL_PARAM_NAME, deviceVariant, QnDomainDatabase);
         QString deviceStr(res? deviceVariant.toString(): "");
 
-        m_deviceOnvifUrl = deviceStr.isEmpty()? createOnvifEndpointUrl(): deviceStr;
+        setDeviceOnvifUrl(deviceStr.isEmpty()? createOnvifEndpointUrl(): deviceStr);
 
-        qDebug() << "QnPlOnvifResource::setOnvifUrls: m_deviceOnvifUrl = " << m_deviceOnvifUrl;
+        qDebug() << "QnPlOnvifResource::setOnvifUrls: m_deviceOnvifUrl = " << getDeviceOnvifUrl();
     }
 
     if (m_mediaUrl.isEmpty()) {
