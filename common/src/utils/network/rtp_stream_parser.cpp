@@ -21,7 +21,7 @@ void QnRtpAudioStreamParser::processIntParam(const QByteArray& checkName, int& s
         return;
     QByteArray paramName = param.left(valuePos);
     QByteArray paramValue = param.mid(valuePos+1);
-    if (paramName == checkName)
+    if (paramName.toLower() == checkName.toLower())
         setValue = paramValue.toInt();
 }
 
@@ -32,7 +32,7 @@ void QnRtpAudioStreamParser::processHexParam(const QByteArray& checkName, QByteA
         return;
     QByteArray paramName = param.left(valuePos);
     QByteArray paramValue = param.mid(valuePos+1);
-    if (paramName == checkName)
+    if (paramName.toLower() == checkName.toLower())
         setValue = QByteArray::fromHex(paramValue);
 }
 
@@ -43,6 +43,6 @@ void QnRtpAudioStreamParser::processStringParam(const QByteArray& checkName, QBy
         return;
     QByteArray paramName = param.left(valuePos);
     QByteArray paramValue = param.mid(valuePos+1);
-    if (paramName == checkName)
+    if (paramName.toLower() == checkName.toLower())
         setValue = paramValue;
 }
