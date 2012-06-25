@@ -192,8 +192,7 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
     if (m_opened)
         return true;
 
-    if (m_isMultiserverAllowed)
-        resource = getResourceOnTime(resource, m_position != DATETIME_NOW ? m_position/1000 : m_position);
+    resource = getResourceOnTime(resource, m_position != DATETIME_NOW ? m_position/1000 : m_position);
 
     m_closing = false;
     m_resource = resource;
