@@ -52,6 +52,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_currentWidgetFlags(0),
     m_currentWidgetLoaded(false),
     m_currentWidgetIsCentral(false),
+    m_sliderDataInvalid(false),
     m_startSelectionAction(new QAction(this)),
     m_endSelectionAction(new QAction(this)),
     m_clearSelectionAction(new QAction(this)),
@@ -566,9 +567,9 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     updateCurrentWidgetFlags();
     updateLines();
 
-    updateSliderFromReader(false);
     if(!((m_currentWidgetFlags & WidgetSupportsSync) && (previousWidgetFlags & WidgetSupportsSync) && display()->isStreamsSynchronized()) && m_currentWidget)
-        setCurrentSliderData(m_localDataByWidget.value(m_currentWidget), true);
+        m_sliderDataInvalid = true;
+    updateSliderFromReader(false);
     m_timeSlider->finishAnimations();
 
     updateCurrentPeriods();
@@ -646,9 +647,15 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
             updateLive();
     }
 
-    if(!m_currentWidgetLoaded && startTimeUSec != AV_NOPTS_VALUE) {
+    if(!m_currentWidgetLoaded && (startTimeUSec != AV_NOPTS_VALUE && endTimeUSec != AV_NOPTS_VALUE)) {
         m_currentWidgetLoaded = true;
         updateTargetPeriod();
+
+        if(m_sliderDataInvalid) {
+            setCurrentSliderData(m_localDataByWidget.value(m_currentWidget), m_currentWidgetFlags & WidgetUsesUTC);
+            m_timeSlider->finishAnimations();
+            m_sliderDataInvalid = false;
+        }
     }
 }
 
