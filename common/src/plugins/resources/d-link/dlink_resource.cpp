@@ -437,7 +437,3 @@ void QnPlDlinkResource::setMotionMaskPhysical(int channel)
     }
 
 }
-bool QnPlDlinkResource::hasDualStreaming() const
-{
-    return false;
-}
