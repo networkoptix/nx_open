@@ -219,3 +219,9 @@ void QnCameraSettingsWidget::setMode(Mode mode) {
 void QnCameraSettingsWidget::at_moreLicensesRequested() {
     menu()->trigger(Qn::GetMoreLicensesAction);
 }
+
+bool QnCameraSettingsWidget::isValidMotionRegion(){
+    if (mode() == SingleMode)
+        return m_singleWidget->isValidMotionRegion();
+    return true;
+}

@@ -87,7 +87,7 @@ private:
     const QString fetchStreamUrl(MediaSoapWrapper& soapWrapper, const std::string& profileToken, bool isPrimary) const;
 
     void updateVideoEncoderParams(onvifXsd__VideoEncoderConfiguration* config, bool isPrimary) const;
-    const QString normalizeStreamSrcUrl(const std::string& src) const;
+
     void printProfile(const Profile& profile, bool isPrimary) const;
 private:
     QnMetaDataV1Ptr m_lastMetadata;
