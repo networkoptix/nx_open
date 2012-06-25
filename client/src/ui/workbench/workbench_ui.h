@@ -164,7 +164,7 @@ protected:
     void setHelpOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
 
     bool isThumbnailsVisible() const;
-    void setThumbnailsVisible(bool visible) const;
+    void setThumbnailsVisible(bool visible);
 
 protected slots:
     void updateHelpContext();
@@ -294,6 +294,7 @@ private:
 
     AnimatorGroup *m_sliderOpacityAnimatorGroup;
 
+    qreal m_lastThumbnailsHeight;
 
 
     /* Tree-related state. */
@@ -383,6 +384,7 @@ private:
     bool m_helpPinned;
 
     QnWorkbenchMotionDisplayWatcher *m_motionDisplayWatcher;
+
 
 
     /* Freespace-related state. */

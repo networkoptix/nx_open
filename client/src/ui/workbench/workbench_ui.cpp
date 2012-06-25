@@ -187,7 +187,8 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_ignoreClickEvent(false),
     m_inFreespace(false),
     m_ignoreSliderResizerGeometryChanges(false),
-    m_ignoreSliderResizerGeometryChanges2(false)
+    m_ignoreSliderResizerGeometryChanges2(false),
+    m_lastThumbnailsHeight(48.0)
 {
     memset(m_widgetByRole, 0, sizeof(m_widgetByRole));
 
@@ -1200,14 +1201,19 @@ bool QnWorkbenchUi::isThumbnailsVisible() const {
     return !qFuzzyCompare(m_sliderItem->geometry().height(), m_sliderItem->effectiveSizeHint(Qt::MinimumSize).height());
 }
 
-void QnWorkbenchUi::setThumbnailsVisible(bool visible) const {
+void QnWorkbenchUi::setThumbnailsVisible(bool visible) {
     if(visible == isThumbnailsVisible())
         return;
 
-    qreal height = m_sliderItem->effectiveSizeHint(Qt::MinimumSize).height() + (visible ? 48.0 : 0.0);
-    
+    qreal sliderHeight = m_sliderItem->effectiveSizeHint(Qt::MinimumSize).height();
+    if(!visible) {
+        m_lastThumbnailsHeight = m_sliderItem->geometry().height() - sliderHeight;
+    } else {
+        sliderHeight += m_lastThumbnailsHeight;
+    }
+
     QRectF geometry = m_sliderItem->geometry();
-    geometry.setHeight(height);
+    geometry.setHeight(sliderHeight);
     m_sliderItem->setGeometry(geometry);
 }
 

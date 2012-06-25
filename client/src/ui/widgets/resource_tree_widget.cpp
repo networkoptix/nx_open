@@ -100,9 +100,10 @@ protected:
             if(!raisedItem)
                 raisedItem = workbench()->item(Qn::ZoomedRole);
         }
-        
+
+        QRect decorationRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &optionV4, optionV4.widget);
+
         if(raisedItem && (raisedItem->uuid() == uuid || (resource && uuid.isNull() && raisedItem->resourceUid() == resource->getUniqueId()))) {
-            QRect decorationRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &optionV4, optionV4.widget);
             m_raisedIcon.paint(painter, decorationRect);
 
             QRect rect = optionV4.rect;
@@ -120,27 +121,16 @@ protected:
             optionV4.rect = rect;
         }
 
-        /* Draw item. */
-        style->drawControl(QStyle::CE_ItemViewItem, &optionV4, painter, optionV4.widget);
-
         /* Draw 'recording' icon. */
         if(resource && resource->getStatus() == QnResource::Recording) {
-            QRect textRect = style->subElementRect(QStyle::SE_ItemViewItemText, &optionV4, optionV4.widget);
-            int textMargin = style->pixelMetric(QStyle::PM_FocusFrameHMargin, 0, optionV4.widget) + 1;
-            textRect = textRect.adjusted(textMargin, 0, -textMargin, 0);
-
-            QFontMetrics metrics(optionV4.font);
-            int textWidth = metrics.width(optionV4.text);
-
-            QRect iconRect = QRect(
-                textRect.left() + textWidth + textMargin,
-                textRect.top() + 2,
-                textRect.height() - 4,
-                textRect.height() - 4
-            );
+            QRect iconRect = decorationRect;
+            iconRect.moveLeft(iconRect.left() - iconRect.width() - 2);
 
             m_recIcon.paint(painter, iconRect);
         }
+
+        /* Draw item. */
+        style->drawControl(QStyle::CE_ItemViewItem, &optionV4, painter, optionV4.widget);
     }
 
     virtual void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override {

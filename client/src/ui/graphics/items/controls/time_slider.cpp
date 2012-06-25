@@ -656,6 +656,13 @@ QnThumbnailsLoader *QnTimeSlider::thumbnailsLoader() const {
 }
 
 void QnTimeSlider::setThumbnailsLoader(QnThumbnailsLoader *loader) {
+    if(m_thumbnailsLoader.data() == loader)
+        return;
+
+    clearThumbnails();
+    m_oldThumbnailData.clear();
+    m_thumbnailsUpdateTimer->stop();
+
     if(m_thumbnailsLoader)
         disconnect(m_thumbnailsLoader.data(), NULL, this, NULL);
 
@@ -669,6 +676,10 @@ void QnTimeSlider::setThumbnailsLoader(QnThumbnailsLoader *loader) {
 
     updateThumbnailsPeriod();
     updateThumbnailsStepSize(true);
+
+    if(m_thumbnailsLoader)
+        foreach(const QnThumbnail &thumbnail, loader->thumbnails())
+            addThumbnail(thumbnail);
 }
 
 QPointF QnTimeSlider::positionFromValue(qint64 logicalValue, bool bound) const {
@@ -1130,7 +1141,7 @@ void QnTimeSlider::updateThumbnailsStepSize(bool instant, bool forced) {
 
     /* Calculate new time step. */
     qint64 timeStep = m_msecsPerPixel * size.width();
-    bool timeStepChanged = timeStep != thumbnailsLoader()->timeStep();
+    bool timeStepChanged = qAbs(timeStep / m_msecsPerPixel - thumbnailsLoader()->timeStep() / m_msecsPerPixel) >= 1;
 
     /* Nothing changed? Leave. */
     if(!timeStepChanged && !boundingSizeChanged)

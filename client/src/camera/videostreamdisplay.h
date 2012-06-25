@@ -38,6 +38,7 @@ public:
     qint64 getLastDisplayedTime() const;
     void setLastDisplayedTime(qint64 value);
     void afterJump();
+    QSize getFrameSize() const;
     QImage getScreenshot();
     void blockTimeValue(qint64 time);
     void unblockTimeValue();
@@ -55,7 +56,7 @@ public:
     QSharedPointer<CLVideoDecoderOutput> flush(QnFrameScaler::downscale_factor force_factor, int channelNum);
 private:
     bool m_needResetDecoder;
-    QMutex m_mtx;
+    mutable QMutex m_mtx;
     mutable QMutex m_timeMutex;
     QMap<CodecID, QnAbstractVideoDecoder*> m_decoder;
 
@@ -92,6 +93,7 @@ private:
     bool m_timeChangeEnabled;
     BufferedFrameDisplayer* m_bufferedFrameDisplayer;
     bool m_canUseBufferedFrameDisplayer;
+
 private:
     QSize m_imageSize;
     CLVideoDecoderOutput* m_lastDisplayedFrame;

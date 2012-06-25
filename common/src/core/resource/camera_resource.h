@@ -20,6 +20,7 @@ public:
     bool isAudioEnabled() const;
     void setAudioEnabled(bool value);
 
+
 private:
     bool m_scheduleDisabled;
     bool m_audioEnabled;
@@ -39,6 +40,8 @@ public:
     void onPrimaryFpsUpdated(int newFps);
 
     virtual int getMaxFps() override {return QnVirtualCameraResource::getMaxFps();}
+
+    virtual int suggestBitrateKbps(QnStreamQuality q, QSize resolution, int fps) const;
 
 #ifdef _DEBUG
     void debugCheck() const;

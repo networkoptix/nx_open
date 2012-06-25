@@ -399,7 +399,7 @@ QnActionManager::QnActionManager(QObject *parent):
             icon(qnSkin->icon("folder.png"));
 
         factory(Qn::OpenLayoutAction).
-            flags(Qn::Main | Qn::Scene).
+            //flags(Qn::Main | Qn::Scene). // TODO
             forbiddenPermissions(Qn::CurrentLayoutParameter, Qn::AddRemoveItemsPermission).
             text(tr("Layout(s)...")).
             autoRepeat(false);
@@ -754,7 +754,7 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::DisabledAction, this));
 
     factory(Qn::ExportLayoutAction).
-        flags(Qn::Slider | Qn::SingleTarget).
+        // flags(Qn::Slider | Qn::SingleTarget). // TODO
         text(tr("Export Selection as Multi-Stream...")).
         condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::DisabledAction, this));
 

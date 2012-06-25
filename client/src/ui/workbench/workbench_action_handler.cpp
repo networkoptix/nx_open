@@ -862,10 +862,11 @@ void QnWorkbenchActionHandler::at_openFileAction_triggered() {
     dialog->setOption(QFileDialog::DontUseNativeDialog, true);
     dialog->setFileMode(QFileDialog::ExistingFiles);
     QStringList filters;
-    filters << tr("All Supported (*.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff *.layout)");
+    //filters << tr("All Supported (*.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff *.layout)");
+    filters << tr("All Supported (*.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)");
     filters << tr("Video (*.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)");
     filters << tr("Pictures (*.jpg *.png *.gif *.bmp *.tiff)");
-    filters << tr("Layouts (*.layout)");
+    //filters << tr("Layouts (*.layout)"); // TODO
     filters << tr("All files (*.*)");
     dialog->setNameFilters(filters);
     
@@ -984,8 +985,10 @@ void QnWorkbenchActionHandler::at_editTagsAction_triggered() {
 void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
     QnResourceList resources = QnResourceCriterion::filter<QnVirtualCameraResource, QnResourceList>(menu()->currentParameters(sender()).resources());
 
+    bool newlyCreated = false;
     if(!cameraSettingsDialog()) {
         m_cameraSettingsDialog = new QnCameraSettingsDialog(widget());
+        newlyCreated = true;
         
         connect(cameraSettingsDialog(), SIGNAL(buttonClicked(QDialogButtonBox::StandardButton)), this, SLOT(at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton)));
     }
@@ -995,7 +998,7 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
             QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
                 widget(), 
                 QnResourceList(cameraSettingsDialog()->widget()->resources()),
-                tr("Cameras Not Saved"), 
+                tr("Camera(s) not Saved"), 
                 tr("Save changes to the following %n camera(s)?", NULL, cameraSettingsDialog()->widget()->resources().size()),
                 QDialogButtonBox::Yes | QDialogButtonBox::No
             );
@@ -1006,7 +1009,10 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
     cameraSettingsDialog()->widget()->setResources(resources);
     updateCameraSettingsEditibility();
 
+    QRect oldGeometry = cameraSettingsDialog()->geometry();
     cameraSettingsDialog()->show();
+    if(!newlyCreated)
+        cameraSettingsDialog()->setGeometry(oldGeometry);
 }
 
 void QnWorkbenchActionHandler::at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton button) {

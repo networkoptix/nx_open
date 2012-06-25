@@ -3,41 +3,6 @@
 #include "cpull_media_stream_provider.h"
 #include "core/resource/camera_resource.h"
 
-int bestBitrateKbps(QnStreamQuality q, QSize resolution, int fps)
-{
-    // I assume for a good quality 30 fps for 640x480 we need 800kbps 
-
-    int kbps = 400;
-
-    switch (q)
-    {
-    case QnQualityHighest:
-        kbps = 800;
-    	break;
-
-    case QnQualityHigh:
-        kbps = 600;
-        break;
-
-    case QnQualityNormal:
-        kbps = 450;
-        break;
-
-    case QnQualityLow:
-        kbps = 300;
-        break;
-
-    case QnQualityLowest:
-        kbps = 100;
-        break;
-    }
-
-    float resolutionFactor = resolution.width()*resolution.height()/640.0/480.0;
-    float frameRateFactor = fps/30.0;
-
-    return kbps*resolutionFactor*frameRateFactor;
-}
-
 
 QnLiveStreamProvider::QnLiveStreamProvider():
 m_quality(QnQualityNormal),
