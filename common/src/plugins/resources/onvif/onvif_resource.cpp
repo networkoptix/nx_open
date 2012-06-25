@@ -819,10 +819,13 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
         return false;
     }
 
-    if (optIt->optionsResp.Options->H264) {
-        m_codec = H264;
-    } else if (optIt->optionsResp.Options->JPEG) {
-        m_codec = JPEG;
+    if (optIt->optionsResp.Options->H264) 
+    {
+        setCodec(H264);
+    } 
+    else if (optIt->optionsResp.Options->JPEG) 
+    {
+        setCodec(JPEG);
     }
 
     setVideoEncoderOptions(optIt->optionsResp);
