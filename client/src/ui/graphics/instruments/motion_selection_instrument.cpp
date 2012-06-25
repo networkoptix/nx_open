@@ -281,7 +281,7 @@ Qt::KeyboardModifiers MotionSelectionInstrument::selectionModifiers(QnResourceWi
     if(!target)
         return m_selectionModifiers;
 
-    return qvariant_cast<int>(target->property(Qn::MotionSelectionModifiers), m_selectionModifiers);
+    return static_cast<Qt::KeyboardModifiers>(qvariant_cast<int>(target->property(Qn::MotionSelectionModifiers), m_selectionModifiers));
 }
 
 bool MotionSelectionInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {

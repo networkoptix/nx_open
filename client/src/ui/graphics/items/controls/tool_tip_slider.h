@@ -10,6 +10,7 @@
 class VariantAnimator;
 
 class QnToolTipItem;
+class QnToolTipSliderAnimationListener;
 
 class QnToolTipSlider: public Animated<GraphicsSlider> {
     Q_OBJECT;

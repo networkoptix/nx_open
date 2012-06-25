@@ -2,8 +2,11 @@
 #include <emmintrin.h>
 
 #ifdef Q_OS_MAC
-#include <tmmintrin.h>
 #include <smmintrin.h>
+#endif
+
+#ifdef Q_OS_UNIX
+#include <tmmintrin.h>
 #endif
 
 #include "utils/media/sse_helper.h"
@@ -65,7 +68,7 @@ void downscalePlate_factor2_sse2_intr(unsigned char * dst, const unsigned int ds
     }
 }
 
-void downscalePlate_factor4_ssse3_intr(unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
+void sse4_attribute downscalePlate_factor4_ssse3_intr(unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
                                        const unsigned int width, const unsigned int src_stride, unsigned int height, int filler)
 {
     Q_ASSERT(qPower2Ceil(width, 16) <= src_stride && qPower2Ceil(width/4,8) <= dst_stride);
