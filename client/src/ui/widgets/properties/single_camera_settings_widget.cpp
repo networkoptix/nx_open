@@ -300,6 +300,12 @@ void QnSingleCameraSettingsWidget::updateMotionWidgetSensitivity() {
         m_motionWidget->setMotionSensitivity(ui->sensitivitySlider->value());
 }
 
+bool QnSingleCameraSettingsWidget::isValidMotionRegion(){
+    if (!m_motionWidget) 
+        return true;
+    return m_motionWidget->isValidMotionRegion();
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
