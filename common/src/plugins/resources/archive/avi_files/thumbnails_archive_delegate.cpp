@@ -86,13 +86,18 @@ QnAbstractMediaDataPtr QnThumbnailsArchiveDelegate::getNextData()
     }
     while (result && result->dataType != QnAbstractMediaData::VIDEO && result->dataType != QnAbstractMediaData::EMPTY_DATA);
 
+    if (result->timestamp <= m_lastMediaTime) {
+        m_currentPos = DATETIME_NOW; // we always got last frame for archive EOF. check it
+        return QnAbstractMediaDataPtr();
+    }
+
     if (result && !delegateForMediaStep) {
-        m_lastMediaTime = result->timestamp;
         if (holeDetected)
             result->flags |= QnAbstractMediaData::MediaFlags_BOF;
         else
             result->flags &= ~QnAbstractMediaData::MediaFlags_BOF;
     }
+    m_lastMediaTime = result->timestamp;
 
     if (!delegateForMediaStep)
         m_currentPos += m_frameStep;

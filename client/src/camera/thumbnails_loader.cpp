@@ -379,13 +379,14 @@ void QnThumbnailsLoader::process() {
         QnCompressedVideoDataPtr frame = client->getNextData().dynamicCast<QnCompressedVideoData>();
         if (frame) 
         {
-            if (!camera)
-                frame->flags &= ~QnAbstractMediaData::MediaFlags_BOF;
             CLFFmpegVideoDecoder decoder(frame->compressionType, frame, false);
             CLVideoDecoderOutput outFrame;
             outFrame.setUseExternalData(false);
 
             while (frame) {
+                if (!camera)
+                    frame->flags &= ~QnAbstractMediaData::MediaFlags_BOF;
+
                 timingsQueue << frame->timestamp;
                 frameFlags << frame->flags;
                 if (decoder.decode(frame, &outFrame)) 
