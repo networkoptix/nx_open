@@ -42,7 +42,7 @@
 #include <ui/graphics/items/image_button_widget.h>
 #include <ui/graphics/items/grid_item.h>
 
-#include "ui/graphics/opengl/gl_hardware_check.h"
+#include <ui/graphics/opengl/gl_hardware_checker.h>
 
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
