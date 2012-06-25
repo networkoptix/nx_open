@@ -86,7 +86,22 @@ void QnOnvifStreamReader::openStream()
         return;
     }
 
-    QString streamUrl = updateCameraAndFetchStreamUrl();
+    QString streamUrlFull = updateCameraAndFetchStreamUrl();
+
+    QUrl url(streamUrlFull);
+
+    QString streamUrl = url.path();
+    int port = url.port();
+
+    if (port > 0)
+    {
+        streamUrl = QString(":") + QString::number(port) + streamUrl;
+    }
+        
+
+
+    
+
     if (streamUrl.isEmpty()) {
         qCritical() << "QnOnvifStreamReader::openStream: can't fetch stream URL for resource with UniqueId: " << m_onvifRes->getUniqueId();
         return;
@@ -233,24 +248,6 @@ void QnOnvifStreamReader::updateStreamParamsBasedOnFps()
         pleaseReOpen();
 }
 
-//Deleting protocol, host and port from URL assuming that input URLs cannot be without
-//protocol, but with host specified.
-const QString QnOnvifStreamReader::normalizeStreamSrcUrl(const std::string& src) const
-{
-    qDebug() << "QnOnvifStreamReader::normalizeStreamSrcUrl: initial URL: '" << src.c_str() << "'";
-
-    QString result(QString::fromStdString(src));
-    int pos = result.indexOf("://");
-    if (pos != -1) {
-        pos += sizeof("://");
-        pos = result.indexOf("/", pos);
-        result = pos != -1? result.right(result.size() - pos - 1): QString();
-    }
-
-    qDebug() << "QnOnvifStreamReader::normalizeStreamSrcUrl: normalized URL: '" << result << "'";
-    return result;
-}
-
 void QnOnvifStreamReader::printProfile(const Profile& profile, bool isPrimary) const
 {
     qDebug() << "ONVIF device (UniqueId: " << m_onvifRes->getUniqueId() << ") has the following "
@@ -341,7 +338,8 @@ const QString QnOnvifStreamReader::fetchStreamUrl(MediaSoapWrapper& soapWrapper,
 
     qDebug() << "URL of ONVIF device stream (UniqueId: " << m_onvifRes->getUniqueId()
         << ") successfully fetched: " << response.MediaUri->Uri.c_str();
-    return QString(normalizeStreamSrcUrl(response.MediaUri->Uri));
+
+    return QString::fromStdString(response.MediaUri->Uri);
 }
 
 VideoEncoder* QnOnvifStreamReader::fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper, VideoConfigsResp& response, bool isPrimary) const
