@@ -86,11 +86,11 @@ static void fillAddr(const QString &address, unsigned short port,
     hints.ai_next = NULL;
 
     addrinfo *addressInfo;
-    if (getaddrinfo(address.toAscii(), 0, 0, &addressInfo) != 0) {
+    if (getaddrinfo(address.toAscii(), 0, &hints, &addressInfo) != 0) {
         throw SocketException("Failed to resolve name (getaddrinfo())");
     }
 
-    addr.sin_addr.s_addr = *((quint32 *) addressInfo->ai_addr);
+    addr.sin_addr.s_addr = *((quint32 *) addressInfo->ai_addr->sa_data);
     addr.sin_port = htons(port);     // Assign port in network byte order
 
     freeaddrinfo(addressInfo);
