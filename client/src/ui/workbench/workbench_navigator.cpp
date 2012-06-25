@@ -567,8 +567,10 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     updateCurrentWidgetFlags();
     updateLines();
 
-    if(!((m_currentWidgetFlags & WidgetSupportsSync) && (previousWidgetFlags & WidgetSupportsSync) && display()->isStreamsSynchronized()) && m_currentWidget)
+    if(!((m_currentWidgetFlags & WidgetSupportsSync) && (previousWidgetFlags & WidgetSupportsSync) && display()->isStreamsSynchronized()) && m_currentWidget) {
         m_sliderDataInvalid = true;
+        m_sliderWindowInvalid = (m_currentWidgetFlags & WidgetUsesUTC) != (previousWidgetFlags & WidgetUsesUTC);
+    }
     updateSliderFromReader(false);
     m_timeSlider->finishAnimations();
 
@@ -652,9 +654,10 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
         updateTargetPeriod();
 
         if(m_sliderDataInvalid) {
-            setCurrentSliderData(m_localDataByWidget.value(m_currentWidget), m_currentWidgetFlags & WidgetUsesUTC);
+            setCurrentSliderData(m_localDataByWidget.value(m_currentWidget), !m_sliderWindowInvalid);
             m_timeSlider->finishAnimations();
             m_sliderDataInvalid = false;
+            m_sliderWindowInvalid = false;
         }
     }
 }
