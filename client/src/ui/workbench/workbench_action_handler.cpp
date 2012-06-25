@@ -180,6 +180,10 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::ExportLayoutAction),                     SIGNAL(triggered()),    this,   SLOT(at_exportLayoutAction_triggered()));
     connect(action(Qn::SetCurrentLayoutAspectRatio4x3Action),   SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutAspectRatio4x3Action_triggered()));
     connect(action(Qn::SetCurrentLayoutAspectRatio16x9Action),  SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutAspectRatio16x9Action_triggered()));
+    connect(action(Qn::SetCurrentLayoutItemSpacing0Action),     SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing0Action_triggered()));
+    connect(action(Qn::SetCurrentLayoutItemSpacing10Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing10Action_triggered()));
+    connect(action(Qn::SetCurrentLayoutItemSpacing20Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing20Action_triggered()));
+    connect(action(Qn::SetCurrentLayoutItemSpacing30Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing30Action_triggered()));
 
     /* Run handlers that update state. */
     at_eventManager_connectionClosed();
@@ -1708,6 +1712,22 @@ void QnWorkbenchActionHandler::at_setCurrentLayoutAspectRatio4x3Action_triggered
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutAspectRatio16x9Action_triggered() {
     workbench()->currentLayout()->resource()->setCellAspectRatio(16.0 / 9.0);
+}
+
+void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing0Action_triggered() {
+    workbench()->currentLayout()->resource()->setCellSpacing(QSizeF(0.0, 0.0));
+}
+
+void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing10Action_triggered() {
+    workbench()->currentLayout()->resource()->setCellSpacing(QSizeF(0.1, 0.1));
+}
+
+void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing20Action_triggered() {
+    workbench()->currentLayout()->resource()->setCellSpacing(QSizeF(0.2, 0.2));
+}
+
+void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing30Action_triggered() {
+    workbench()->currentLayout()->resource()->setCellSpacing(QSizeF(0.3, 0.3));
 }
 
 void QnWorkbenchActionHandler::at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle) {

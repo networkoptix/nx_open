@@ -402,6 +402,26 @@ namespace Qn {
          */
         SetCurrentLayoutAspectRatio4x3Action,
 
+        /**
+         * Sets spacing of current layout's cells to 0%.
+         */
+        SetCurrentLayoutItemSpacing0Action,
+
+        /**
+         * Sets spacing of current layout's cells to 10%.
+         */
+        SetCurrentLayoutItemSpacing10Action,
+
+        /**
+         * Sets spacing of current layout's cells to 20%.
+         */
+        SetCurrentLayoutItemSpacing20Action,
+
+        /**
+         * Sets spacing of current layout's cells to 30%.
+         */
+        SetCurrentLayoutItemSpacing30Action,
+
 
 
         /* Slider actions. */

@@ -128,6 +128,10 @@ void QnLayoutResource::setCellSpacing(const QSizeF &cellSpacing) {
     emit cellSpacingChanged();
 }
 
+void QnLayoutResource::setCellSpacing(qreal horizontalSpacing, qreal verticalSpacing) {
+    setCellSpacing(QSizeF(horizontalSpacing, verticalSpacing));
+}
+
 void QnLayoutResource::addItemUnderLock(const QnLayoutItemData &item) {
     if(m_itemByUuid.contains(item.uuid)) {
         qnWarning("Item with UUID %1 is already in this layout resource.", item.uuid.toString());
@@ -222,3 +226,5 @@ QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
     layout->addFlags(QnResource::local_media);
     return layout;
 }
+
+

@@ -41,6 +41,8 @@ public:
 
     void setCellSpacing(const QSizeF &cellSpacing);
 
+    void setCellSpacing(qreal horizontalSpacing, qreal verticalSpacing);
+
     /*
     * Deserialize layout resource from file
     */
