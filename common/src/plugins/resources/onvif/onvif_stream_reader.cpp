@@ -86,8 +86,9 @@ void QnOnvifStreamReader::openStream()
         return;
     }
 
-    QString streamUrlFull = updateCameraAndFetchStreamUrl();
+    QString streamUrl = updateCameraAndFetchStreamUrl();
 
+    /*
     QUrl url(streamUrlFull);
 
     QString streamUrl = url.path();
@@ -97,7 +98,7 @@ void QnOnvifStreamReader::openStream()
     {
         streamUrl = QString(":") + QString::number(port) + streamUrl;
     }
-        
+    */  
 
 
     
@@ -106,6 +107,7 @@ void QnOnvifStreamReader::openStream()
         qCritical() << "QnOnvifStreamReader::openStream: can't fetch stream URL for resource with UniqueId: " << m_onvifRes->getUniqueId();
         return;
     }
+
 
     m_multiCodec.setRequest(streamUrl);
     m_multiCodec.openStream();
