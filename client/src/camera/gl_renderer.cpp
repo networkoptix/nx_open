@@ -39,20 +39,6 @@ namespace {
 
         return result;
     }
-
-    static bool qn_openGlInfoWrittenOut = false;
-
-    class OpenGlErrorMessageDisplay: public QObject {
-    public:
-        virtual ~OpenGlErrorMessageDisplay() {
-            const QString message = tr("We have detected that your video card drivers may be not installed or out of date.\n"
-                "Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.\n"
-                "For easy instructions on how to install or update your video driver, follow instruction at http://tribaltrouble.com/driversupport.php");
-
-            QMessageBox::critical(NULL, tr("Important Performance Tip"), message, QMessageBox::Ok);
-        }
-    };
-
 } // anonymous namespace
 
 
@@ -75,38 +61,6 @@ public:
         QByteArray version = reinterpret_cast<const char *>(glGetString(GL_VERSION));
         QByteArray renderer = reinterpret_cast<const char *>(glGetString(GL_RENDERER));
         QByteArray vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
-
-        /* Write out OpenGL info. */
-        if(!qn_openGlInfoWrittenOut) {
-            qn_openGlInfoWrittenOut = true;
-
-            cl_log.log(QString(QLatin1String("OpenGL extensions: %1.")).arg(QLatin1String(extensions.constData())), cl_logINFO);
-            cl_log.log(QString(QLatin1String("OpenGL version: %1.")).arg(QLatin1String(version.constData())), cl_logINFO);
-            cl_log.log(QString(QLatin1String("OpenGL renderer: %1.")).arg(QLatin1String(renderer.constData())), cl_logINFO);
-            cl_log.log(QString(QLatin1String("OpenGL vendor: %1.")).arg(QLatin1String(vendor.constData())), cl_logINFO);
-
-            bool showMessageBox = false;
-
-            if (!(features() & QnGlFunctions::OpenGL1_3)) {
-                qnWarning("Multitexturing is not supported.");
-                showMessageBox = true;
-            }
-
-            if (version <= QByteArray("1.1.0")) {
-                qnWarning("OpenGL version %1 is not supported.", version);
-                showMessageBox = true;
-            }
-
-            if (!(features() & QnGlFunctions::ArbPrograms)) {
-                qnWarning("OpenGL ARB shaders not supported, using software YUV to RGB conversion.");
-                showMessageBox = true;
-            }
-
-            if(showMessageBox) {
-                OpenGlErrorMessageDisplay *messageDisplay = new OpenGlErrorMessageDisplay();
-                messageDisplay->deleteLater(); /* Message will be shown in destructor, close to the event loop. */
-            }
-        }
 
         if(!(features() & QnGlFunctions::ArbPrograms))
             status = QnGLRenderer::NOT_SUPPORTED; /* In this first revision we do not support software color transform. */

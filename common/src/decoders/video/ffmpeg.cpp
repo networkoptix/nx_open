@@ -380,9 +380,10 @@ bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, CLVideoDe
 
     AVFrame* copyFromFrame = m_frame;
 
-    // sometimes ffmpeg can't decode JPEG files. Try to decode in QT
+    // sometimes ffmpeg can't decode image files. Try to decode in QT
     m_usedQtImage = false;
-    if (m_context->codec_id == CODEC_ID_MJPEG && !got_picture) {
+    if (!got_picture && (data->flags & QnAbstractMediaData::MediaFlags_StillImage))
+    {
         m_tmpImg.loadFromData(avpkt.data, avpkt.size);
         if (m_tmpImg.width() > 0 && m_tmpImg.height() > 0) {
             got_picture = 1;
@@ -392,8 +393,8 @@ bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, CLVideoDe
             m_tmpQtFrame.data[1] = m_tmpQtFrame.data[2] = m_tmpQtFrame.data[3] = 0;
             m_tmpQtFrame.linesize[0] = m_tmpImg.bytesPerLine();
             m_tmpQtFrame.linesize[1] = m_tmpQtFrame.linesize[2] = m_tmpQtFrame.linesize[3] = 0;
-            m_tmpQtFrame.width = m_tmpImg.width();
-            m_tmpQtFrame.height = m_tmpImg.height();
+            m_context->width = m_tmpQtFrame.width = m_tmpImg.width();
+            m_context->height = m_tmpQtFrame.height = m_tmpImg.height();
             m_tmpQtFrame.pkt_dts = data->timestamp;
             copyFromFrame = &m_tmpQtFrame;
             m_usedQtImage = true;
