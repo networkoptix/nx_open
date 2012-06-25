@@ -802,6 +802,8 @@ bool QnPlOnvifResource::fetchAndSetDualStreaming(MediaSoapWrapper& /*soapWrapper
 
 bool QnPlOnvifResource::fetchAndSetAudioEncoderOptions(MediaSoapWrapper& soapWrapper)
 {
+    setAudioEnabled(false);
+
     AudioOptionsReq request;
     request.ConfigurationToken = NULL;
     request.ProfileToken = NULL;
@@ -876,6 +878,7 @@ bool QnPlOnvifResource::fetchAndSetAudioEncoderOptions(MediaSoapWrapper& soapWra
     }
 
     setAudioEncoderOptions(*options);
+    setAudioEnabled(true);
 
     return true;
 }
