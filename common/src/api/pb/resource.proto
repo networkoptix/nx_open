@@ -11,16 +11,17 @@ message Resource {
     }
 
     enum Status {
-       Offline      = 0;
-       Unauthorized = 1;
-       Online       = 2;
-       Disabled     = 3;
-       Recording    = 4;
+        Offline      = 0;
+        Unauthorized = 1;
+        Online       = 2;
+        Disabled     = 3;
+        Recording    = 4;
     }
 
     message Property {
-      required string name   = 1;
-      required string value  = 2;
+        required string name   = 1;
+        required string value  = 2;
+        optional int32  id     = 3;
     }
 
     required Type type = 1;

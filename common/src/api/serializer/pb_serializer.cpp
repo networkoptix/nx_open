@@ -327,6 +327,8 @@ void parseResourceTypes(QList<QnResourceTypePtr>& resourceTypes, const PbResourc
                 param->name = QString::fromUtf8(pb_propertyType.name().c_str());
                 param->type = (QnParamType::DataType)pb_propertyType.type();
 
+                param->id = pb_propertyType.id();
+
                 if (pb_propertyType.has_min())
                     param->min_val = pb_propertyType.min();
 
@@ -464,6 +466,7 @@ void serializeCamera_i(pb::Resource& pb_cameraResource, const QnVirtualCameraRes
         {
             pb::Resource_Property& pb_property = *pb_cameraResource.add_property();
 
+            pb_property.set_id(params[key].paramTypeId().toInt());
             pb_property.set_name(key.toUtf8().constData());
             pb_property.set_value(params[key].value().toString().toUtf8().constData());
         }
