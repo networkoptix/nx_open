@@ -47,7 +47,7 @@ int QnRecordedChunkListHandler::executeGet(const QString& path, const QnRequestP
         {
             parseRegionList(motionRegions, params[i].second);
         }
-        if (params[i].first == "physicalId")
+        if (params[i].first == "physicalId" || params[i].first == "mac") // use 'mac' name for compatibility with previous client version
         {
             urlFound = true;
             QString physicalId = params[i].second.trimmed();
