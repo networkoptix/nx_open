@@ -23,8 +23,6 @@ public:
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
 
-    virtual bool hasDualStreaming() const override { return true; }
-
     bool isInitialized() const;
 
     QByteArray getMaxResolution() const;

@@ -20,7 +20,6 @@ public:
     virtual QString manufacture() const override;
     virtual void setIframeDistance(int frames, int timems) override; // sets the distance between I frames
 
-    virtual bool hasDualStreaming() const override;
 
     virtual QHostAddress getHostAddress() const override;
     virtual bool setHostAddress(const QHostAddress &ip, QnDomain domain) override;

@@ -109,6 +109,10 @@ public:
     AUDIO_CODECS getAudioCodec() const;
 
 protected:
+
+    void setCodec(CODECS c);
+    void setAudioCodec(AUDIO_CODECS c);
+
     bool initInternal() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 

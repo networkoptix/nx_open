@@ -129,8 +129,10 @@ void parseCameras(QnVirtualCameraResourceList& cameras, const PbResourceList& pb
 
         QnVirtualCameraResourcePtr camera;
         parseCamera(camera, pb_cameraResource, resourceFactory);
-
-        cameras.append(camera);
+        if (camera)
+            cameras.append(camera);
+        else
+            cl_log.log("Can't create resource with id=", ci->id(), cl_logWARNING);
     }
 }
 
@@ -196,7 +198,10 @@ void parseServers(QnVideoServerResourceList &servers, const PbResourceList &pb_s
 
         QnVideoServerResourcePtr server;
         parseServer(server, pb_serverResource, resourceFactory);
-        servers.append(server);
+        if (server)
+            servers.append(server);
+        else
+            cl_log.log("Can't create resource with id=", ci->id(), cl_logWARNING);
     }
 }
 
@@ -251,7 +256,10 @@ void parseLayouts(QnLayoutResourceList& layouts, const PbResourceList& pb_layout
         const pb::Resource& pb_layoutResource = *ci;
         QnLayoutResourcePtr layout;
         parseLayout(layout, pb_layoutResource);
-        layouts.append(layout);
+        if (layout)
+            layouts.append(layout);
+        else
+            cl_log.log("Can't create resource with id=", ci->id(), cl_logWARNING);
     }
 }
 
@@ -276,7 +284,10 @@ void parseUsers(QnUserResourceList& users, const PbResourceList& pb_users)
         const pb::Resource& pb_userResource = *ci;
         QnUserResourcePtr user;
         parseUser(user, pb_userResource);
-        users.append(user);
+        if (user)
+            users.append(user);
+        else
+            cl_log.log("Can't create resource with id=", ci->id(), cl_logWARNING);
     }
 }
 
@@ -288,7 +299,10 @@ void parseResources(QnResourceList& resources, const PbResourceList& pb_resource
 
         QnResourcePtr resource;
         parseResource(resource, pb_resource, resourceFactory);
-        resources.append(resource);
+        if (resource)
+            resources.append(resource);
+        else
+            cl_log.log("Can't create resource with id=", ci->id(), cl_logWARNING);
     }
 }
 
@@ -326,6 +340,8 @@ void parseResourceTypes(QList<QnResourceTypePtr>& resourceTypes, const PbResourc
                 QnParamTypePtr param(new QnParamType());
                 param->name = QString::fromUtf8(pb_propertyType.name().c_str());
                 param->type = (QnParamType::DataType)pb_propertyType.type();
+
+                param->id = pb_propertyType.id();
 
                 if (pb_propertyType.has_min())
                     param->min_val = pb_propertyType.min();
@@ -464,6 +480,7 @@ void serializeCamera_i(pb::Resource& pb_cameraResource, const QnVirtualCameraRes
         {
             pb::Resource_Property& pb_property = *pb_cameraResource.add_property();
 
+            pb_property.set_id(params[key].paramTypeId().toInt());
             pb_property.set_name(key.toUtf8().constData());
             pb_property.set_value(params[key].value().toString().toUtf8().constData());
         }

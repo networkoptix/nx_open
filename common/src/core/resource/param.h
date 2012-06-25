@@ -5,6 +5,7 @@
 #include <QtCore/QList>
 #include <QtCore/QSharedPointer>
 #include <QtCore/QVariant>
+#include "utils/common/qnid.h"
 
 enum QN_EXPORT QnDomain
 {
@@ -22,6 +23,7 @@ struct QN_EXPORT QnParamType
 
     DataType type;
 
+    QnId id;
     QString name;
     QVariant default_value;
 
@@ -75,6 +77,7 @@ struct QN_EXPORT QnParam
     bool isPhysical() const { return m_paramType->isPhysical; }
     const bool isReadOnly() const { return m_paramType->isReadOnly; }
     const QString netHelper() const { return m_paramType->paramNetHelper; }
+    const QnId& paramTypeId() const { return m_paramType->id; }
 
 private:
     QnParamTypePtr m_paramType;

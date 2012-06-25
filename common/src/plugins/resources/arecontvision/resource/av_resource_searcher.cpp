@@ -174,11 +174,7 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
                 resource->setMAC(mac);
 
 #ifdef Q_OS_LINUX
-                s = getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in), host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
-                if (s != 0) {
-                    cl_log.log(cl_logWARNING, "QnPlArecontResourceSearcher::findResources(): getnameinfo() failed: %s", strerror(errno));
-                }
-                resource->setDiscoveryAddr(QHostAddress(host));
+                resource->setDiscoveryAddr(QHostAddress(((sockaddr_in*)ifa->ifa_addr)->sin_addr.s_addr));
 #elif defined Q_OS_WIN
                 resource->setDiscoveryAddr(ipaddrs.at(i));
 #endif

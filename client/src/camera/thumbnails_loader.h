@@ -16,9 +16,9 @@
 
 class CLVideoDecoderOutput;
 class QnRtspClientArchiveDelegate;
+class QnThumbnailsLoaderHelper;
 struct SwsContext;
 
-typedef QSharedPointer<QPixmap> QPixmapPtr;
 
 
 class QnThumbnailsLoader: public CLLongRunnable {
@@ -111,8 +111,6 @@ private:
     QnThumbnailsLoaderHelper *m_helper;
     int m_generation;
 };
-
-Q_DECLARE_METATYPE(QPixmapPtr)
 
 #endif // __THUMBNAILS_LOADER_H__
 

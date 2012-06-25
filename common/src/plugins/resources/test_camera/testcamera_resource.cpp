@@ -43,10 +43,6 @@ void QnTestCameraResource::setCropingPhysical(QRect /*croping*/)
 
 }
 
-bool QnTestCameraResource::hasDualStreaming() const
-{
-    return true;
-}
 
 QHostAddress QnTestCameraResource::getHostAddress() const
 {
