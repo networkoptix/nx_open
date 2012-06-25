@@ -21,7 +21,6 @@ public:
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
 
-    bool hasDualStreaming() const override {return false;}
 
 protected:
     bool initInternal() override;
