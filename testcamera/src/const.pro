@@ -67,6 +67,7 @@ CONFIG(release, debug|release) {
 QMAKE_CXXFLAGS += -I$$EVETOOLS_DIR/include
 
 win32 {
+    LIBS += -L$$PWD/../../common/contrib/openssl/bin -llibeay32 -ssleay32
     LIBS += -llibprotobuf
 
     # Define QN_EXPORT only if common build is not static
@@ -97,7 +98,7 @@ win32 {
     # Don't warn for deprecated POSIX functions.
     DEFINES += _CRT_NONSTDC_NO_DEPRECATE 
 
-    INCLUDEPATH += ../contrib/ffmpeg-misc-headers-win32
+    INCLUDEPATH += $$PWD/../../common/contrib/ffmpeg-misc-headers-win32
   }
 
   LIBS += -lws2_32 -lIphlpapi -lOle32

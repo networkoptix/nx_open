@@ -7,7 +7,8 @@ QnThumbnailsArchiveDelegate::QnThumbnailsArchiveDelegate(QnAbstractArchiveDelega
     m_rangeStart(AV_NOPTS_VALUE),
     m_rangeEnd(AV_NOPTS_VALUE),
     m_frameStep(0),
-    m_baseDelegate(baseDelegate)
+    m_baseDelegate(baseDelegate),
+    m_lastMediaTime(0)
 {
 }
 
@@ -22,6 +23,7 @@ void QnThumbnailsArchiveDelegate::setRange(qint64 startTime, qint64 endTime, qin
 bool QnThumbnailsArchiveDelegate::open(QnResourcePtr resource)
 
 {
+    m_lastMediaTime = 0;
     bool rez = m_baseDelegate->open(resource);
     if (rez)
         m_currentPos = m_rangeStart;
@@ -66,7 +68,7 @@ QnAbstractMediaDataPtr QnThumbnailsArchiveDelegate::getNextData()
     if (m_rangeStart == AV_NOPTS_VALUE)
         return QnAbstractMediaDataPtr();
 
-    if (m_currentPos > m_rangeEnd || m_currentPos == DATETIME_NOW || m_rangeStart == DATETIME_NOW)
+    if (m_lastMediaTime > m_rangeEnd || m_currentPos == DATETIME_NOW || m_rangeStart == DATETIME_NOW)
         return QnAbstractMediaDataPtr();
 
     bool delegateForMediaStep = m_baseDelegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanProcessMediaStep;
@@ -85,6 +87,7 @@ QnAbstractMediaDataPtr QnThumbnailsArchiveDelegate::getNextData()
     while (result && result->dataType != QnAbstractMediaData::VIDEO && result->dataType != QnAbstractMediaData::EMPTY_DATA);
 
     if (result && !delegateForMediaStep) {
+        m_lastMediaTime = result->timestamp;
         if (holeDetected)
             result->flags |= QnAbstractMediaData::MediaFlags_BOF;
         else
