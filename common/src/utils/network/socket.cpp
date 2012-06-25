@@ -90,7 +90,7 @@ static void fillAddr(const QString &address, unsigned short port,
         throw SocketException("Failed to resolve name (getaddrinfo())");
     }
 
-    addr.sin_addr.s_addr = *((quint32 *) addressInfo->ai_addr->sa_data);
+    addr.sin_addr.s_addr = ((struct sockaddr_in *) (addressInfo->ai_addr))->sin_addr.s_addr;
     addr.sin_port = htons(port);     // Assign port in network byte order
 
     freeaddrinfo(addressInfo);
