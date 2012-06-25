@@ -174,7 +174,7 @@ Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnResourceLis
 
 Qn::ActionVisibility QnLayoutItemRemovalActionCondition::check(const QnLayoutItemIndexList &layoutItems) {
     foreach(const QnLayoutItemIndex &item, layoutItems)
-        if(!(accessController()->permissions(item.layout()) & Qn::WritePermission))
+        if(!accessController()->hasPermissions(item.layout(), Qn::WritePermission | Qn::AddRemoveItemsPermission))
             return Qn::DisabledAction;
 
     return Qn::EnabledAction;

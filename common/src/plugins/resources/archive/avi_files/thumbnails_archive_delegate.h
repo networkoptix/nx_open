@@ -24,6 +24,7 @@ private:
     qint64 m_frameStep;
     qint64 m_rangeStart;
     qint64 m_rangeEnd;
+    qint64 m_lastMediaTime;
     QnAbstractArchiveDelegatePtr m_baseDelegate;
 };
 

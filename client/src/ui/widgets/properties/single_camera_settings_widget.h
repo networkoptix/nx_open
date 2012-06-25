@@ -42,6 +42,9 @@ public:
     void updateFromResource();
     void submitToResource();
 
+    /** Check if motion region is valid */
+    bool isValidMotionRegion();
+
 signals:
     void hasChangesChanged();
     void moreLicensesRequested();
