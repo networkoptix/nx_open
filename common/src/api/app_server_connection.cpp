@@ -574,7 +574,10 @@ void QnAppServerConnectionFactory::setDefaultFactory(QnResourceFactory* resource
 
 QnAppServerConnectionPtr QnAppServerConnectionFactory::createConnection(const QUrl& url)
 {
-    cl_log.log(QLatin1String("Creating connection to the Enterprise Controller ") + url.toString(), cl_logDEBUG2);
+    QUrl urlNoPassword (url);
+    urlNoPassword.setPassword("");
+
+    cl_log.log(QLatin1String("Creating connection to the Enterprise Controller ") + urlNoPassword.toString(), cl_logDEBUG2);
 
     return QnAppServerConnectionPtr(new QnAppServerConnection(url,
                                                               *(theAppServerConnectionFactory()->m_resourceFactory),

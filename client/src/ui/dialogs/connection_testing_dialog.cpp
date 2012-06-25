@@ -17,7 +17,9 @@ QnConnectionTestingDialog::QnConnectionTestingDialog(const QUrl &url, QWidget *p
     m_timeoutTimer(this),
     m_url(url)
 {
-    qnDebug("Testing connectivity for URL '%1'.", url.toString());
+    QUrl urlNoPassword(url);
+    urlNoPassword.setPassword("");
+    qnDebug("Testing connectivity for URL '%1'.", urlNoPassword.toString());
 
     ui->setupUi(this);
 

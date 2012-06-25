@@ -20,6 +20,8 @@ const int QnPlOnvifResource::DEFAULT_IFRAME_DISTANCE = 20;
 const QString& QnPlOnvifResource::MEDIA_URL_PARAM_NAME = *(new QString("MediaUrl"));
 const QString& QnPlOnvifResource::DEVICE_URL_PARAM_NAME = *(new QString("DeviceUrl"));
 const QString& QnPlOnvifResource::MAX_FPS_PARAM_NAME = *(new QString("MaxFPS"));
+const QString& QnPlOnvifResource::AUDIO_SUPPORTED_PARAM_NAME = *(new QString("isAudioSupported"));
+const QString& QnPlOnvifResource::DUAL_STREAMING_PARAM_NAME = *(new QString("hasDualStreaming"));
 const float QnPlOnvifResource::QUALITY_COEF = 0.2f;
 const char* QnPlOnvifResource::PROFILE_NAME_PRIMARY = "Netoptix Primary";
 const char* QnPlOnvifResource::PROFILE_NAME_SECONDARY = "Netoptix Secondary";
@@ -487,7 +489,12 @@ bool QnPlOnvifResource::fetchAndSetResourceOptions()
     }
 
     //If failed - ignore
-    fetchAndSetAudioEncoderOptions(soapWrapper);
+    if (fetchAndSetAudioEncoderOptions(soapWrapper)) {
+        setParam(AUDIO_SUPPORTED_PARAM_NAME, 1, QnDomainDatabase);
+    } else {
+        setParam(AUDIO_SUPPORTED_PARAM_NAME, 0, QnDomainDatabase);
+    }
+
     fetchAndSetVideoSourceOptions(soapWrapper);
 
     updateResourceCapabilities();
@@ -845,16 +852,18 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
 
 bool QnPlOnvifResource::fetchAndSetDualStreaming(MediaSoapWrapper& /*soapWrapper*/)
 {
-    QMutexLocker lock(&m_mutex);
-    m_hasDual = m_secondaryResolution != EMPTY_RESOLUTION_PAIR && !m_secondaryVideoEncoderId.isEmpty();
+    {
+        QMutexLocker lock(&m_mutex);
+        m_hasDual = m_secondaryResolution != EMPTY_RESOLUTION_PAIR && !m_secondaryVideoEncoderId.isEmpty();
+    }
+
+    setParam(DUAL_STREAMING_PARAM_NAME, hasDualStreaming() ? 1 : 0, QnDomainDatabase);
 
     return true;
 }
 
 bool QnPlOnvifResource::fetchAndSetAudioEncoderOptions(MediaSoapWrapper& soapWrapper)
 {
-    setAudioEnabled(false);
-
     AudioOptionsReq request;
     request.ConfigurationToken = NULL;
     request.ProfileToken = NULL;
@@ -927,7 +936,6 @@ bool QnPlOnvifResource::fetchAndSetAudioEncoderOptions(MediaSoapWrapper& soapWra
     setAudioCodec(codec);
 
     setAudioEncoderOptions(*options);
-    setAudioEnabled(true);
 
     return true;
 }

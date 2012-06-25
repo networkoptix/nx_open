@@ -95,7 +95,7 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
         if (ifa->ifa_addr->sa_family != AF_INET)
             continue;
 
-        QHostAddress localAddress(((sockaddr_in*)ifa->ifa_addr)->sin_addr.s_addr);
+        QHostAddress localAddress(ntohl(((sockaddr_in*)ifa->ifa_addr)->sin_addr.s_addr));
         if (localAddress == QHostAddress::LocalHost)
             continue;
 
