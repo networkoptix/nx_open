@@ -462,14 +462,12 @@ qint64 QnRtspClientArchiveDelegate::seek(qint64 time, bool findIFrame)
     //deleteContexts(); // context is going to create again on first data after SEEK, so ignore rest of data before seek
     m_lastSeekTime = m_position = time;
     QnResourcePtr newResource;
-    if (m_isMultiserverAllowed) {
-        newResource = getResourceOnTime(m_resource, m_position/1000);
-        if (newResource)
-        {
-            if (newResource != m_resource)
-                close();
-            m_resource = newResource;
-        }
+    newResource = getResourceOnTime(m_resource, m_position/1000);
+    if (newResource)
+    {
+        if (newResource != m_resource)
+            close();
+        m_resource = newResource;
     }
 
     if (!m_opened && m_resource) {
