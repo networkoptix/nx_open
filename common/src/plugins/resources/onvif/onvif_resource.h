@@ -63,6 +63,8 @@ public:
     static const QString& MEDIA_URL_PARAM_NAME;
     static const QString& DEVICE_URL_PARAM_NAME;
     static const QString& MAX_FPS_PARAM_NAME;
+    static const QString& AUDIO_SUPPORTED_PARAM_NAME;
+    static const QString& DUAL_STREAMING_PARAM_NAME;
 	static const float QUALITY_COEF;
     static const double MAX_SECONDARY_RESOLUTION_SQUARE;
     static const char* PROFILE_NAME_PRIMARY;
