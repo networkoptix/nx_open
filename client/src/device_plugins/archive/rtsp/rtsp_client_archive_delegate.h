@@ -18,6 +18,7 @@ public:
     QnRtspClientArchiveDelegate();
     virtual ~QnRtspClientArchiveDelegate();
 
+    void setResource(QnResourcePtr resource);
     virtual bool open(QnResourcePtr resource);
     virtual void close();
     virtual qint64 startTime();

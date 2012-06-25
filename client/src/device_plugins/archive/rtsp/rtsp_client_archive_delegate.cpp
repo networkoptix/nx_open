@@ -44,6 +44,13 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate():
     m_flags |= Flag_CanProcessMediaStep;
 }
 
+void QnRtspClientArchiveDelegate::setResource(QnResourcePtr resource)
+{
+    if (m_isMultiserverAllowed)
+        resource = getResourceOnTime(resource, m_position != DATETIME_NOW ? m_position/1000 : m_position);
+    m_resource = resource;
+}
+
 void QnRtspClientArchiveDelegate::setProxyAddr(const QString& addr, int port)
 {
     m_proxyAddr = addr;

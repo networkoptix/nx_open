@@ -351,8 +351,8 @@ void QnThumbnailsLoader::process() {
             QnRtspClientArchiveDelegatePtr rtspDelegate(new QnRtspClientArchiveDelegate());
             rtspDelegate->setMultiserverAllowed(false);
             QnThumbnailsArchiveDelegatePtr thumbnailDelegate(new QnThumbnailsArchiveDelegate(rtspDelegate));
-            if (thumbnailDelegate->open(cameras[i]))
-                delegates << thumbnailDelegate;
+            rtspDelegate->setResource(cameras[i]);
+            delegates << thumbnailDelegate;
         }
     }
     else {
