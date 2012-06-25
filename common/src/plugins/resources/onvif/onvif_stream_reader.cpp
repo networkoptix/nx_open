@@ -366,33 +366,19 @@ VideoEncoder* QnOnvifStreamReader::fetchUpdateVideoEncoder(MediaSoapWrapper& soa
 VideoEncoder* QnOnvifStreamReader::fetchUpdateVideoEncoder(VideoConfigsResp& response, bool isPrimary) const
 {
     std::vector<VideoEncoder*>::const_iterator iter = response.Configurations.begin();
-    VideoEncoder* result = 0;
-    VideoEncoder* filteredResult = 0;
-    const char* name = isPrimary? NETOPTIX_PRIMARY_NAME: NETOPTIX_SECONDARY_NAME;
-    const char* filteredName = isPrimary? NETOPTIX_SECONDARY_NAME: NETOPTIX_PRIMARY_NAME;
+    QString id = isPrimary ? m_onvifRes->getPrimaryVideoEncoderId() : m_onvifRes->getSecondaryVideoEncoderId();
 
     while (iter != response.Configurations.end()) {
         VideoEncoder* conf = *iter;
 
-        if (conf) {
-
-            if (conf->Name == name) {
-                return conf;
-            }
-
-            if (conf->Name == filteredName) {
-                filteredResult = conf;
-            } else {
-                result = conf;
-            }
-
+        if (conf && id == conf->token.c_str()) {
+            return conf;
         }
 
         ++iter;
     }
 
-    //If there is only one encoder for secondary, will use it for primary
-    return !result && isPrimary? filteredResult: result;
+    return 0;
 }
 
 ProfilePair QnOnvifStreamReader::fetchUpdateProfile(MediaSoapWrapper& soapWrapper, ProfilesResp& response, bool isPrimary) const
@@ -776,32 +762,23 @@ AudioEncoder* QnOnvifStreamReader::fetchUpdateAudioEncoder(AudioConfigsResp& res
 {
     std::vector<AudioEncoder*>::const_iterator iter = response.Configurations.begin();
     AudioEncoder* result = 0;
-    AudioEncoder* filteredResult = 0;
-    const char* name = isPrimary? NETOPTIX_PRIMARY_NAME: NETOPTIX_SECONDARY_NAME;
-    const char* filteredName = isPrimary? NETOPTIX_SECONDARY_NAME: NETOPTIX_PRIMARY_NAME;
+    const char* name = NETOPTIX_PRIMARY_NAME;
 
     while (iter != response.Configurations.end()) {
         AudioEncoder* conf = *iter;
 
         if (conf) {
 
-            if (conf->Name == filteredName) {
-                filteredResult = conf;
-            } else {
-                result = conf;
-            }
-
             if (conf->Name == name) {
                 return conf;
             }
-
+            result = conf;
         }
 
         ++iter;
     }
 
-    //If there is only one encoder for secondary, lets use it for primary
-    return !result && isPrimary? filteredResult: result;
+    return result;
 }
 
 void QnOnvifStreamReader::updateAudioEncoder(AudioEncoder& encoder, bool isPrimary) const
@@ -893,6 +870,7 @@ AudioSource* QnOnvifStreamReader::fetchUpdateAudioSource(AudioSrcConfigsResp& re
 
     while (it != response.Configurations.end()) {
         if (!(*it)) {
+            ++it;
             continue;
         }
 

@@ -58,7 +58,7 @@ static void updateActivity()
 #define CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE 15
 
 static const int DEFAULT_AUDIO_BUFF_SIZE = 1000 * 4;
-static const int REALTIME_AUDIO_BUFFER_SIZE = 128; // at ms, prebuffer is half buffer
+static const int REALTIME_AUDIO_BUFFER_SIZE = 150; // at ms, prebuffer is half buffer
 
 static const qint64 MIN_VIDEO_DETECT_JUMP_INTERVAL = 300 * 1000; // 300ms
 //static const qint64 MIN_AUDIO_DETECT_JUMP_INTERVAL = MIN_VIDEO_DETECT_JUMP_INTERVAL + AUDIO_BUFF_SIZE*1000;
@@ -1069,10 +1069,6 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
         //3) video and audio playing
         else
         {
-            // New av sync algorithm required MT decoding
-            if (!m_useMtDecoding)
-                setMTDecoding(true);
-
             QnCompressedVideoDataPtr incoming;
             if (m_audioDisplay->msInBuffer() < m_audioBufferSize )
                 incoming = vd; // process packet
@@ -1081,8 +1077,13 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
             }
 
             vd = nextInOutVideodata(incoming, channel);
+
             incoming = QnCompressedVideoDataPtr();
             if (vd) {
+                // New av sync algorithm required MT decoding
+                if (!m_useMtDecoding && !(vd->flags & QnAbstractMediaData::MediaFlags_LIVE))
+                    setMTDecoding(true);
+
                 bool ignoreVideo = vd->flags & QnAbstractMediaData::MediaFlags_Ignore;
                 if (!ignoreVideo) {
                     QMutexLocker lock(&m_timeMutex);

@@ -515,8 +515,12 @@ void QnResourceWidget::ensureMotionMask()
     if(m_motionMaskValid)
         return;
 
-    if (QnSecurityCamResourcePtr camera = m_resource.dynamicCast<QnSecurityCamResource>())
+    if (QnSecurityCamResourcePtr camera = m_resource.dynamicCast<QnSecurityCamResource>()) {
         m_motionRegionList = camera->getMotionRegionList();
+
+        while(m_motionRegionList.size() < CL_MAX_CHANNELS)
+            m_motionRegionList.push_back(QnMotionRegion()); /* Just to feel safe. */
+    }
     m_motionMaskValid = true;
 }
 
@@ -592,6 +596,8 @@ void QnResourceWidget::addToMotionSelection(const QRect &gridRect)
 {
     QList<QRegion> prevSelection;
     QList<QRegion> newSelection;
+
+    ensureMotionMask();
 
     for (int i = 0; i < m_channelState.size(); ++i)
     {

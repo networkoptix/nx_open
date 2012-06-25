@@ -109,7 +109,7 @@ protected:
     void removeSyncedWidget(QnResourceWidget *widget);
     
     SliderUserData currentSliderData() const;
-    void setCurrentSliderData(const SliderUserData &localData);
+    void setCurrentSliderData(const SliderUserData &localData, bool preferToPreserveWindow = false);
 
     void setPlayingTemporary(bool playing);
 
@@ -122,7 +122,7 @@ protected:
 protected slots:
     void updateCentralWidget();
     void updateCurrentWidget();
-    void updateSliderFromReader();
+    void updateSliderFromReader(bool keepInWindow = true);
     void updateSliderOptions();
     void updateScrollBarFromSlider();
     void updateSliderFromScrollBar();
@@ -188,6 +188,7 @@ private:
     WidgetFlags m_currentWidgetFlags;
     bool m_currentWidgetLoaded;
     bool m_currentWidgetIsCentral;
+    bool m_sliderDataInvalid;
 
     bool m_updatingSliderFromReader;
     bool m_updatingSliderFromScrollBar;
