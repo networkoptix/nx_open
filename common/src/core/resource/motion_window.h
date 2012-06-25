@@ -21,15 +21,20 @@ struct QnMotionWindow
 class QnMotionRegion
 {
 public:
+    enum RegionValid{VALID, WINDOWS, MASKS, SENS};
+
     QnMotionRegion();
 
     static const int MIN_SENSITIVITY = 0; // equal motion mask
     static const int MAX_SENSITIVITY = 9; // max motion sensitivity
 
-    /**
-     * Returns false if any region in range [1..MAX] contain too many rects (> maxRectCount). For motionMask region (index 0) no any limits.
+    /** 
+    * \returns WINDOWS if sum of rects in all regions in range [1..MAX] greater than maxRectCount
+    * \returns MASKS if sum of rects in motionMask region (index 0) greater than maxMaskRects OR
+    * \returns SENS number of regions with at least 1 rect is greater than maxMotionSens
+    * \returns VALID otherwise
      */
-    bool isValid(int maxMotionRects, int maxMaskRects) const;
+    RegionValid isValid(int maxMotionRects, int maxMaskRects, int maxMotionSens) const;
 
     bool operator==(const QnMotionRegion& other) const;
     bool operator!=(const QnMotionRegion& other) const;
@@ -49,6 +54,7 @@ public:
 
     int getMotionRectCount() const;
     int getMaskRectCount() const;
+    int getMotionSensCount() const;
 
     void removeDefaultMotion();
 private:

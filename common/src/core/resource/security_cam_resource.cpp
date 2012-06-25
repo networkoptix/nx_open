@@ -221,7 +221,7 @@ MotionType QnSecurityCamResource::getDefaultMotionType() const
     }
 }
 
-int QnSecurityCamResource::motionWindowCnt() const
+int QnSecurityCamResource::motionWindowCount() const
 {
     QVariant val;
     QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
@@ -232,11 +232,22 @@ int QnSecurityCamResource::motionWindowCnt() const
     return 0;
 }
 
-int QnSecurityCamResource::motionMaskWindowCnt() const
+int QnSecurityCamResource::motionMaskWindowCount() const
 {
     QVariant val;
     QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
     if (this_casted->getParam("motionMaskWindowCnt", val, QnDomainMemory))
+    {
+        return val.toInt();
+    }
+    return 0;
+}
+
+int QnSecurityCamResource::motionSensWindowCount() const
+{
+    QVariant val;
+    QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
+    if (this_casted->getParam("motionSensWindowCnt", val, QnDomainMemory))
     {
         return val.toInt();
     }

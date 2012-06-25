@@ -39,6 +39,9 @@ public:
 
     void setNeedControlMaxRects(bool value);
 
+    /** Check if motion region is valid */
+    bool isValidMotionRegion();
+
 signals:
     void motionRegionListChanged();
 
@@ -54,7 +57,7 @@ protected slots:
 private:
     void init();
     int gridPosToChannelPos(QPoint &pos);
-    void showTooManyWindowsMessage(const QnMotionRegion &region);
+    void showTooManyWindowsMessage(const QnMotionRegion &region, const QnMotionRegion::RegionValid kind);
 
 private:
     QnVirtualCameraResourcePtr m_camera;
