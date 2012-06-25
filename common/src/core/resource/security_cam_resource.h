@@ -25,6 +25,7 @@ public:
 
     MotionTypeFlags supportedMotionType() const;
     bool isAudioSupported() const;
+    MotionType getCameraBasedMotionType() const;
     MotionType getDefaultMotionType() const;
     int motionWindowCount() const;
     int motionMaskWindowCount() const;
