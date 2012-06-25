@@ -198,7 +198,16 @@ const QnScheduleTaskList &QnSecurityCamResource::getScheduleTasks() const
 
 bool QnSecurityCamResource::hasDualStreaming() const
 {
-    return true;
+    if (!hasSuchParam("hasDualStreaming"))
+    {
+        //Q_ASSERT(false);
+        return false;
+    }
+
+    QVariant val;
+    QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
+    this_casted->getParam("hasDualStreaming", val, QnDomainMemory);
+    return val.toInt();
 }
 
 MotionType QnSecurityCamResource::getDefaultMotionType() const

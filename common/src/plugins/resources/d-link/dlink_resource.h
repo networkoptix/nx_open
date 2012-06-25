@@ -56,8 +56,6 @@ public:
 
     QnDlink_cam_info getCamInfo() const;
 
-    bool hasDualStreaming() const override;
-
     
     virtual void setMotionMaskPhysical(int channel) override;
 
