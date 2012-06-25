@@ -735,22 +735,22 @@ QnActionManager::QnActionManager(QObject *parent):
         factory(Qn::SetCurrentLayoutItemSpacing0Action).
             flags(Qn::Scene | Qn::NoTarget).
             requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
-            text(tr("0%"));
+            text(tr("None"));
 
         factory(Qn::SetCurrentLayoutItemSpacing10Action).
             flags(Qn::Scene | Qn::NoTarget).
             requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
-            text(tr("10%"));
+            text(tr("Small"));
 
         factory(Qn::SetCurrentLayoutItemSpacing20Action).
             flags(Qn::Scene | Qn::NoTarget).
             requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
-            text(tr("20%"));
+            text(tr("Medium"));
 
         factory(Qn::SetCurrentLayoutItemSpacing30Action).
             flags(Qn::Scene | Qn::NoTarget).
             requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
-            text(tr("30%"));
+            text(tr("Large"));
 
     } factory.leaveSubMenu();
 
