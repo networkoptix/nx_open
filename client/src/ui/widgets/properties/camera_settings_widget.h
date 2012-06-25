@@ -46,6 +46,8 @@ public:
 
     Mode mode() const;
 
+    /** Check if motion region is valid */
+    bool isValidMotionRegion();
 signals:
     void hasChangesChanged();
     void modeChanged();

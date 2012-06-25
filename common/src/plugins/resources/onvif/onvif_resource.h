@@ -109,8 +109,8 @@ protected:
     virtual void updateResourceCapabilities(){};
 private:
 
-    QString getDeviceUrl() const { return m_deviceUrl; }
-    void setDeviceUrl(const QString& src) { m_deviceUrl = src; }
+    QString getDeviceOnvifUrl() const;
+    void setDeviceOnvifUrl(const QString& src);
 
     bool fetchAndSetDeviceInformation();
     bool fetchAndSetResourceOptions();
@@ -150,7 +150,7 @@ private:
     int m_maxQuality;
     bool m_hasDual;
     QString m_mediaUrl;
-    QString m_deviceUrl;
+    QString m_deviceOnvifUrl;
     bool m_reinitDeviceInfo;
     CODECS m_codec;
     AUDIO_CODECS m_audioCodec;
