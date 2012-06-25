@@ -161,9 +161,15 @@ QnMotionRegion::RegionValid QnMotionRegion::isValid(int maxMotionRects, int maxM
     }
     if (maxMaskRects > 0 && getRectsBySens(0).size() > maxMaskRects)
         return MASKS;
-    if (maxMotionSens > 0 && sens_count > maxMotionSens)
-        return SENS;
-    if(count < maxMotionRects)
+
+    if (maxMotionSens > 0) {
+        if (sens_count > maxMotionSens)
+            return SENS;
+        return VALID;
+    }
+
+    /** only if maxMotionSens == 0 */
+    if(count > maxMotionRects)
         return WINDOWS;
     return VALID;
 }
