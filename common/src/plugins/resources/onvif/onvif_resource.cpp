@@ -308,10 +308,8 @@ ResolutionPair QnPlOnvifResource::getNearestResolution(const ResolutionPair& res
         tmp.second = qPower2Ceil(static_cast<unsigned int>(m_resolutionList[i].second), 8);
         float ar2 = getResolutionAspectRatio(tmp);
 
-        float arMin = ar1 < ar2 ? ar1 : ar2;
-        float arMax = ar1 < ar2 ? ar2 : ar1;
-
-        if (aspectRatio < arMin || aspectRatio > arMax) {
+        if (!qBetween(aspectRatio, qMin(ar1,ar2), qMax(ar1,ar2)))
+        {
             continue;
         }
 
