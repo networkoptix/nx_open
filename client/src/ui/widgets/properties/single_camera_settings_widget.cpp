@@ -168,8 +168,6 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         m_cameraSupportsMotion = false;
         ui->motionSettingsGroupBox->setEnabled(false);
         ui->motionAvailableLabel->setVisible(true);
-
-        
     } else {
         QString webPageAddress = QString(QLatin1String("http://%1")).arg(m_camera->getHostAddress().toString());
 
@@ -328,6 +326,8 @@ void QnSingleCameraSettingsWidget::showEvent(QShowEvent *event) {
     }
 
     at_tabWidget_currentChanged(); /* Re-create motion widget if needed. */
+
+    updateFromResource();
 }
 
 void QnSingleCameraSettingsWidget::at_motionTypeChanged() {

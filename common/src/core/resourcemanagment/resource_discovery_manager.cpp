@@ -20,8 +20,8 @@ namespace {
 QnResourceDiscoveryManager::QnResourceDiscoveryManager():
     m_server(false),
     m_foundSmth(true),
-    m_ready(false),
-    m_lastDiscoveryCycle(0)
+    m_ready(false)
+
 {
 }
 
@@ -112,7 +112,6 @@ void QnResourceDiscoveryManager::run()
         searchersList = m_searchersList;
     }
 
-    m_lastDiscoveryCycle = 0;
 
     foreach (QnAbstractResourceSearcher *searcher, searchersList)
     {
@@ -160,7 +159,7 @@ void QnResourceDiscoveryManager::run()
             m_resourceProcessor->processResources(result);
         }
 
-        int global_delay_between_search = 10000;
+        int global_delay_between_search = 1000;
         smartSleep(global_delay_between_search);
         ++m_runNumber;
     }
@@ -215,6 +214,8 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
         QMutexLocker locker(&m_searchersListMutex);
         searchersList = m_searchersList;
     }
+
+    m_discoveredResources.clear();
 
     foreach (QnAbstractResourceSearcher *searcher, searchersList)
     {
@@ -291,7 +292,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
             ++it; // new resource => shouls keep it
     }
 
-    //==========if resource is not discover last minute and we do not record it and do not see live => readers not runing 
+    //==========if resource is not discovered last minute and we do not record it and do not see live => readers not runing 
     markOfflineIfNeeded();
     //======================
 
@@ -549,6 +550,7 @@ struct check_if_accessible_STRUCT
     }
 };
 
+
 void QnResourceDiscoveryManager::markOfflineIfNeeded()
 {
     QnResourceList resources = qnResPool->getResources();
@@ -568,12 +570,29 @@ void QnResourceDiscoveryManager::markOfflineIfNeeded()
         QDateTime ldt = netRes->getLastDiscoveredTime();
         QDateTime currentT = qnSyncTime->currentDateTime();
 
+        //check if resource was discovered
+        if (!m_discoveredResources.contains(res->getUniqueId()))
+        {
+            // resource is not found
+            m_resourceDiscoveryCounter[res->getUniqueId()]++;
+
+            if (m_resourceDiscoveryCounter[res->getUniqueId()] >= 2 && !netRes->hasRunningLiveProvider())
+            {
+                res->setStatus(QnResource::Offline);
+                m_resourceDiscoveryCounter[res->getUniqueId()] = 0;
+            }
+        }
+     
+
+        /*
         if (ldt.secsTo(currentT) > 120 && !netRes->hasRunningLiveProvider()) // if resource is not discovered last 30 sec
         {
 			res->setStatus(QnResource::Offline);
         }
+        /**/
 
     }
+
     
 }
 
@@ -597,7 +616,7 @@ void QnResourceDiscoveryManager::updateResourceStatus(QnResourcePtr res)
                 rpNetRes->setStatus(QnResource::Online);
         }
 
-
+        m_discoveredResources.insert(rpNetRes->getUniqueId());
         rpNetRes->setLastDiscoveredTime(qnSyncTime->currentDateTime());
     }
 
