@@ -75,6 +75,8 @@ private:
 
     QScopedPointer<Ui::ServerSettingsDialog> ui;
     QnVideoServerResourcePtr m_server;
+
+    bool m_hasStorageChanges;
 };
 
 #endif // SERVER_SETTINGS_DIALOG_H
