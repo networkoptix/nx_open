@@ -70,19 +70,9 @@ QnResourceList QnMdnsResourceSearcher::findResources()
     foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
     {
         QUdpSocket sock;
-#ifdef Q_OS_LINUX
-        sock.bind(0);
 
-        int res = setsockopt(sock.socketDescriptor(), SOL_SOCKET, SO_BINDTODEVICE, iface.name.constData(), iface.name.length());
-        if (res != 0)
-        {
-            cl_log.log(cl_logWARNING, "QnMdnsResourceSearcher::findResources(): Can't bind to interface %s: %s", iface.name.constData(), strerror(errno));
+        if (!bindToInterface(sock, iface))
             continue;
-        }
-#else // lif defined Q_OS_WIN
-        if (!sock.bind(iface.address, 0))
-           continue;
-#endif
 
         QHostAddress groupAddress(QLatin1String("224.0.0.251"));
 

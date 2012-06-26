@@ -10,14 +10,6 @@
 #include "utils/common/sleep.h"
 #include "core/resource/camera_resource.h"
 
-#ifdef Q_OS_LINUX
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <ifaddrs.h>
-#include <unistd.h>
-#endif
-
 #define CL_BROAD_CAST_RETRY 1
 
 QnPlArecontResourceSearcher::QnPlArecontResourceSearcher()
@@ -40,19 +32,9 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
     foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
     {
         QUdpSocket sock;
-#ifdef Q_OS_LINUX
-        sock.bind(0);
 
-        int res = setsockopt(sock.socketDescriptor(), SOL_SOCKET, SO_BINDTODEVICE, iface.name.constData(), iface.name.length());
-        if (res != 0)
-        {
-            cl_log.log(cl_logWARNING, "QnPlArecontResourceSearcher::findResources(): Can't bind to interface %s: %s", iface.name.constData(), strerror(errno));
+        if (!bindToInterface(sock, iface))
             continue;
-        }
-#else // lif defined Q_OS_WIN
-        if (!sock.bind(iface.address, 0))
-           continue;
-#endif
 
         // sending broadcast
         QByteArray datagram = "Arecont_Vision-AV2000\1";

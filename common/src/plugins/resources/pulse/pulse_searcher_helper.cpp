@@ -5,14 +5,6 @@
 #include "utils/network/mac_address.h"
 #include "../pulse/pulse_resource.h"
 
-#ifdef Q_OS_LINUX
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <ifaddrs.h>
-#include <unistd.h>
-#endif
-
 extern bool multicastJoinGroup(QUdpSocket& udpSocket, QHostAddress groupAddress, QHostAddress localAddress);
 extern bool multicastLeaveGroup(QUdpSocket& udpSocket, QHostAddress groupAddress);
 
@@ -33,19 +25,9 @@ QList<QnPlPulseSearcherHelper::WSResult> QnPlPulseSearcherHelper::findResources(
     foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
     {
         QUdpSocket socket;
-#ifdef Q_OS_LINUX
-        socket.bind(0);
 
-        int res = setsockopt(socket.socketDescriptor(), SOL_SOCKET, SO_BINDTODEVICE, iface.name.constData(), iface.name.length());
-        if (res != 0)
-        {
-            cl_log.log(cl_logWARNING, "QnPlPulseSearcherHelper::findResources(): Can't bind to interface %s: %s", iface.name.constData(), strerror(errno));
+        if (!bindToInterface(socket, iface))
             continue;
-        }
-#else // lif defined Q_OS_WIN
-        if (!socket.bind(iface.address, 0))
-           continue;
-#endif
 
         QHostAddress groupAddress(QLatin1String("224.111.111.1"));
         if (!multicastJoinGroup(socket, groupAddress, iface.address)) continue;

@@ -3,6 +3,34 @@
 #include "netstate.h"
 #include "../common/log.h"
 
+#ifdef Q_OS_LINUX
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <ifaddrs.h>
+#include <unistd.h>
+#endif
+
+bool bindToInterface(QUdpSocket& sock, const QnInterfaceAndAddr& iface)
+{
+    int res;
+
+#ifdef Q_OS_LINUX
+    sock.bind(0);
+    res = setsockopt(sock.socketDescriptor(), SOL_SOCKET, SO_BINDTODEVICE, iface.name.toAscii().constData(), iface.name.length());
+#else
+    res = !sock.bind(iface.address, 0);
+#endif
+
+    if (res)
+    {
+        cl_log.log(cl_logWARNING, "bindToInterface(): Can't bind to interface %s: %s", iface.name.toAscii().constData(), strerror(errno));
+        return false;
+    }
+
+    return true;
+}
+
 QList<QnInterfaceAndAddr> getAllIPv4Interfaces()
 {
     static QList<QnInterfaceAndAddr> lastResult;

@@ -4,14 +4,6 @@
 #include "utils/network/nettools.h"
 #include "utils/common/sleep.h"
 
-#ifdef Q_OS_LINUX
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <ifaddrs.h>
-#include <unistd.h>
-#endif
-
 unsigned char request[] = {0xfd, 0xfd, 0x06, 0x00, 0xa1, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00};
 QByteArray barequest(reinterpret_cast<char *>(request), sizeof(request));
 
@@ -66,19 +58,9 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
     foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
     {
         QUdpSocket sock;
-#ifdef Q_OS_LINUX
-        sock.bind(0);
 
-        int res = setsockopt(sock.socketDescriptor(), SOL_SOCKET, SO_BINDTODEVICE, iface.name.constData(), iface.name.length());
-        if (res != 0)
-        {
-            cl_log.log(cl_logWARNING, "QnPlDlinkResourceSearcher::findResources(): Can't bind to interface %s: %s", iface.name.constData(), strerror(errno));
+        if (!bindToInterface(sock, iface))
             continue;
-        }
-#else // lif defined Q_OS_WIN
-        if (!sock.bind(iface.address, 0))
-           continue;
-#endif
 
         // sending broadcast
 

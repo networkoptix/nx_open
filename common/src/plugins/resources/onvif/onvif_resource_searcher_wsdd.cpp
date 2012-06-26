@@ -26,14 +26,6 @@
 //#include "utils/common/rand.h"
 //#include "../sony/sony_resource.h"
 
-#ifdef Q_OS_LINUX
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <ifaddrs.h>
-#include <unistd.h>
-#endif
-
 
 extern bool multicastJoinGroup(QUdpSocket& udpSocket, QHostAddress groupAddress, QHostAddress localAddress);
 extern bool multicastLeaveGroup(QUdpSocket& udpSocket, QHostAddress groupAddress);
@@ -211,19 +203,8 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
 
         QUdpSocket qSocket;
 
-#ifdef Q_OS_LINUX
-        int res = setsockopt(qSocket.socketDescriptor(), SOL_SOCKET, SO_BINDTODEVICE, iface.name.constData(), iface.name.length());
-        if (res != 0) {
-            qWarning() << "OnvifResourceSearcherWsdd::findResources(): Can't bind to interface " << iface.name << ": " << strerror(errno);
+        if (!bindToInterface(qSocket, iface))
             continue;
-        }
-#else
-        if (!qSocket.bind(iface.address, 0)) 
-        {
-            qWarning() << "OnvifResourceSearcherWsdd::findEndpoints: QUdpSocket.bind failed. Interface: " << iface.address.toString();
-            continue;
-        }
-#endif
 
         QStringList addrPrefixes = getAddrPrefixes(iface.address.toString());
         wsddProxy soapWsddProxy(SOAP_IO_UDP);
