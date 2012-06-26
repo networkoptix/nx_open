@@ -83,6 +83,8 @@ private:
     unsigned int m_runNumber;
 
     QList<QHostAddress> m_allLocalAddresses;
+
+    quint64 m_lastDiscoveryCycle;
 };
 
 #endif //QN_RESOURCE_DISCOVERY_MANAGER_H
