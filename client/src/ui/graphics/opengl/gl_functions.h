@@ -36,6 +36,11 @@ public:
     Features features() const;
 
     /**
+     * \returns                         Set of features supported by the current OpenGL context. Estimated BEFORE context initializing.
+     */
+    static Features estimatedFeatures();
+
+    /**
      * \param enable                    Whether warnings related to unsupported function calls are to be enabled.
      */
     static void enableWarnings(bool enable);
