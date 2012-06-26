@@ -118,7 +118,7 @@ protected:
 
     virtual void setCropingPhysical(QRect croping);
 
-    virtual void updateResourceCapabilities(){};
+    virtual void updateResourceCapabilities();
 private:
 
     QString getDeviceOnvifUrl() const;
