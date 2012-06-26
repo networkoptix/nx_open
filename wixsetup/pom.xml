@@ -343,7 +343,8 @@
 								</goals>
 								<configuration>
 									<executable>${project.build.directory}/test.bat</executable>
-									<workingDirectory>${project.build.directory}</workingDirectory>						
+									<workingDirectory>${project.build.directory}</workingDirectory>
+									<skip>${skiptest}<skip>						
 								</configuration>	
 							</execution>
 						</executions> 
