@@ -1483,12 +1483,12 @@ Do you want to continue?"),
             this->widget(), 
             tr("Export Layout As..."),
             previousDir + QDir::separator() + suggestion,
-            tr("Layout media file (*.layout)"),
+            tr("Network optix media file (*.nov)"),
             &selectedFilter,
             QFileDialog::DontUseNativeDialog
             );
 
-        selectedExtension = ".layout";
+        selectedExtension = ".nov";
         if (fileName.isEmpty())
             return;
 
