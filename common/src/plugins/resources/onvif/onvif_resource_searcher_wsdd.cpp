@@ -526,7 +526,16 @@ void OnvifResourceSearcherWsdd::addEndpointToHash(EndpointInfoHash& hash, const 
     QString name = getName(source);
     QString manufacturer = getManufacturer(source, name);
     QString mac = getMac(source, header);
-    QString uniqId = !mac.isEmpty()? mac: getEndpointAddress(source);
+
+    QString endpointId = getEndpointAddress(source);
+    endpointId.replace(":", "_");
+    endpointId.replace("{", "_");
+    endpointId.replace("}", "_");
+    endpointId.replace("/", "_");
+    endpointId.replace("\\", "_");
+
+
+    QString uniqId = !mac.isEmpty()? mac: endpointId;
 
     hash.insert(appropriateAddr, EndpointAdditionalInfo(name, manufacturer, mac, uniqId, host));
 }
