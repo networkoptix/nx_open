@@ -69,14 +69,12 @@ QnResourceList QnMdnsResourceSearcher::findResources()
 
     foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
     {
-        QUdpSocket sock;
-
-        if (!bindToInterface(sock, iface))
-            continue;
-
         QHostAddress groupAddress(QLatin1String("224.0.0.251"));
 
         QUdpSocket sendSocket, recvSocket;
+
+        if (!bindToInterface(sendSocket, iface))
+            continue;
 
         bool bindSucceeded = recvSocket.bind(QHostAddress::Any, MDNS_PORT, QUdpSocket::ReuseAddressHint | QUdpSocket::ShareAddress);
         if (!bindSucceeded)
