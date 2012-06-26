@@ -31,7 +31,7 @@ inline QString replaceCharacters(const QString &string, const char *symbols, con
 }
 
 inline QString replaceNonFileNameCharacters(const QString &string, const QChar &replacement) {
-    return replaceAll(string, "\\/:*?\"<>|", replacement);
+    return replaceCharacters(string, "\\/:*?\"<>|", replacement);
 }
 
 #endif // QN_STRING_H
