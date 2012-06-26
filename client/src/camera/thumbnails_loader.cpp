@@ -263,8 +263,8 @@ void QnThumbnailsLoader::updateProcessingLocked() {
         processingEnd = currentTime + defaultUpdateInterval;
 
     /* Adjust for the chunks near live that could not be loaded at the last request. */
-    if(m_processingStart < m_maxLoadedTime && m_maxLoadedTime < m_processingEnd && processingStart > m_maxLoadedTime) {
-        processingStart = m_maxLoadedTime + m_timeStep;
+    if(m_processingStart < m_maxLoadedTime && m_maxLoadedTime < m_processingEnd && processingEnd > m_maxLoadedTime) {
+        processingStart = qMin(processingStart, m_maxLoadedTime + m_timeStep);
         m_processingEnd = m_maxLoadedTime;
     }
 
