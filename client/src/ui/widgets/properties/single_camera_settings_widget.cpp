@@ -168,8 +168,6 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         m_cameraSupportsMotion = false;
         ui->motionSettingsGroupBox->setEnabled(false);
         ui->motionAvailableLabel->setVisible(true);
-
-        
     } else {
         QString webPageAddress = QString(QLatin1String("http://%1")).arg(m_camera->getHostAddress().toString());
 
@@ -181,6 +179,12 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         ui->webPageLabel->setText(tr("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
         ui->loginEdit->setText(m_camera->getAuth().user());
         ui->passwordEdit->setText(m_camera->getAuth().password());
+
+        ui->softwareMotionButton->setEnabled(m_camera->supportedMotionType() & MT_SoftwareGrid);
+        if (m_camera->supportedMotionType() & (MT_HardwareGrid | MT_MotionWindow))
+            ui->cameraMotionButton->setText(tr("Hardware (Camera built-in)"));
+        else
+            ui->cameraMotionButton->setText(tr("Do not record motion"));
 
         updateMaxFPS();
 
@@ -200,12 +204,6 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
             ui->cameraScheduleWidget->setFps(currentCameraFps);
         else
             ui->cameraScheduleWidget->setFps(ui->cameraScheduleWidget->getMaxFps()/2);
-
-        ui->softwareMotionButton->setEnabled(m_camera->supportedMotionType() & MT_SoftwareGrid);
-        if (m_camera->supportedMotionType() & (MT_HardwareGrid | MT_MotionWindow))
-            ui->cameraMotionButton->setText(tr("Hardware (Camera built-in)"));
-        else
-            ui->cameraMotionButton->setText(tr("Do not record motion"));
 
         ui->motionWebPageLabel->setText(webPageAddress); // TODO: wrong, need to get camera-specific web page
         ui->cameraMotionButton->setChecked(m_camera->getMotionType() != MT_SoftwareGrid);
@@ -328,6 +326,8 @@ void QnSingleCameraSettingsWidget::showEvent(QShowEvent *event) {
     }
 
     at_tabWidget_currentChanged(); /* Re-create motion widget if needed. */
+
+    updateFromResource();
 }
 
 void QnSingleCameraSettingsWidget::at_motionTypeChanged() {
@@ -342,12 +342,13 @@ void QnSingleCameraSettingsWidget::updateMaxFPS() {
         return; /* Do not show message twice. */
 
     m_inUpdateMaxFps = true;
-    if (ui->softwareMotionButton->isChecked() || ui->cameraScheduleWidget->isSecondaryStreamReserver()) {
+    if ((ui->softwareMotionButton->isEnabled() &&  ui->softwareMotionButton->isChecked())
+        || ui->cameraScheduleWidget->isSecondaryStreamReserver()) {
         float maxFps = m_camera->getMaxFps()-2;
         float currentMaxFps = ui->cameraScheduleWidget->getGridMaxFps();
         if (currentMaxFps > maxFps)
         {
-            QMessageBox::warning(this, tr("Too big fps"), 
+            QMessageBox::warning(this, tr("Warning. FPS value is too high"), 
                 tr("For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps dropped down to %2").arg(currentMaxFps).arg(maxFps));
         }
         ui->cameraScheduleWidget->setMaxFps(maxFps);

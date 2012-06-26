@@ -113,8 +113,9 @@ void QnStorageManager::addStorage(QnStorageResourcePtr storage)
     storage->setIndex(detectStorageIndex(storage->getUrl()));
     QMutexLocker lock(&m_mutex);
     
-    removeStorage(storage); // remove existing storage record if exists
+    cl_log.log(QString(QLatin1String("Adding storage. Path: %1. SpaceLimit: %2MiB. Currently avaiable: %3MiB")).arg(storage->getUrl()).arg(storage->getSpaceLimit() / 1024 / 1024).arg(storage->getFreeSpace() / 1024 / 1024), cl_logINFO);
 
+    removeStorage(storage); // remove existing storage record if exists
     m_storageRoots.insert(storage->getIndex(), storage);
     if (storage->isStorageAvailable())
         storage->setStatus(QnResource::Online);

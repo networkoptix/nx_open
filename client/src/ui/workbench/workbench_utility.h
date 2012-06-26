@@ -109,7 +109,6 @@ inline QSize bestSingleBoundedSize(QnWorkbenchGridMapper *mapper, int bound, Qt:
         gridSize2.setHeight(qMax(gridSize2.height() - 1, 1));
     }
 
-    qreal aspectRatio0 = QnGeometry::aspectRatio(mapper->mapFromGrid(gridSize0));
     qreal aspectRatio1 = QnGeometry::aspectRatio(mapper->mapFromGrid(gridSize1));
     qreal aspectRatio2 = QnGeometry::aspectRatio(mapper->mapFromGrid(gridSize2));
 
