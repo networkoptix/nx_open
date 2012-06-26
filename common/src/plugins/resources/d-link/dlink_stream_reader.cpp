@@ -31,6 +31,7 @@ struct ACS_VideoHeader
 
 PlDlinkStreamReader::PlDlinkStreamReader(QnResourcePtr res):
 CLServerPushStreamreader(res),
+QnLiveStreamProvider(res),
 mHttpClient(0),
 m_h264(false),
 m_mpeg4(false),

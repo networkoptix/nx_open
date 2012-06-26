@@ -123,6 +123,7 @@ QnNetworkResourcePtr QnPlAxisResourceSearcher::processPacket(QnResourceList& res
     resource->setTypeId(rt);
     resource->setName(name);
     resource->setMAC(smac);
+    resource->setPhysicalId(smac + ":gggTest");
 
     return resource;
 

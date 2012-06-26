@@ -66,6 +66,7 @@ const char* QnOnvifStreamReader::NETOPTIX_SECONDARY_TOKEN = "netoptixS";
 
 QnOnvifStreamReader::QnOnvifStreamReader(QnResourcePtr res):
     CLServerPushStreamreader(res),
+    QnLiveStreamProvider(res),
     m_multiCodec(res)
 {
     m_onvifRes = getResource().dynamicCast<QnPlOnvifResource>();

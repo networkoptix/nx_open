@@ -46,6 +46,7 @@ int contain_subst(char *data, int datalen, int start_index ,  char *subdata, int
 
 QnPlDroidIpWebCamReader::QnPlDroidIpWebCamReader(QnResourcePtr res)
 :CLServerPushStreamreader(res),
+QnLiveStreamProvider(res),
 mHttpClient(0)
 
 {
