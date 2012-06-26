@@ -19,12 +19,14 @@ namespace Ui {
     class LoginDialog;
 }
 
-class LoginDialog : public QDialog
-{
+class LoginDialog : public QDialog {
     Q_OBJECT
 public:
     explicit LoginDialog(QnWorkbenchContext *context, QWidget *parent = 0);
     virtual ~LoginDialog();
+
+    QUrl currentUrl() const;
+    QnConnectInfoPtr currentInfo() const;
 
 public slots:
     virtual void accept() override;
@@ -33,8 +35,6 @@ public slots:
 
 protected:
     virtual void changeEvent(QEvent *event) override;
-
-    QUrl currentUrl();
 
     void updateStoredConnections();
 
@@ -57,6 +57,7 @@ private:
     QStandardItemModel *m_connectionsModel;
     QDataWidgetMapper *m_dataWidgetMapper;
     int m_requestHandle;
+    QnConnectInfoPtr m_connectInfo;
 
     QnRenderingWidget* m_renderingWidget;
 };
