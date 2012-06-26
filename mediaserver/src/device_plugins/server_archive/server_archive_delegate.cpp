@@ -225,6 +225,8 @@ begin_label:
                     data = QnAbstractMediaDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, 0));
                     data->timestamp = INT64_MAX; // EOF reached
                 }
+                if (data)
+                    data->timestamp +=m_currentChunk.startTimeMs*1000;
                 return data;
             }
         } while (!switchToChunk(chunk, chunkCatalog));
