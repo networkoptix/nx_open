@@ -185,15 +185,16 @@ bool QnLiveStreamProvider::isMaxFps() const
 bool QnLiveStreamProvider::needMetaData() 
 {
     // I assume this function is called once per video frame 
+    QnAbstractMediaStreamDataProvider* ap = dynamic_cast<QnAbstractMediaStreamDataProvider*>(this);
+    QnPhysicalCameraResourcePtr res = ap->getResource().dynamicCast<QnPhysicalCameraResource>();
     if (m_layout == 0)
     {
-        QnAbstractMediaStreamDataProvider* ap = dynamic_cast<QnAbstractMediaStreamDataProvider*>(this);
-        QnPhysicalCameraResourcePtr res = ap->getResource().dynamicCast<QnPhysicalCameraResource>();
         m_layout = res->getVideoLayout();
     }
 
     if (getRole() == QnResource::Role_SecondaryLiveVideo) 
     {
+        // For secondary stream returns software motion if available
         if (m_softwareMotion) 
         {
             for (int i = 0; i < m_layout->numberOfChannels(); ++i)
@@ -212,6 +213,11 @@ bool QnLiveStreamProvider::needMetaData()
 
     if (m_softwareMotion || m_framesSinceLastMetaData == 0)
         return false;
+
+    // get camera motion
+
+    if (res->getMotionType() == MT_NoMotion)
+        return false; // no camera motion is available
 
     bool result = (m_framesSinceLastMetaData > 10 || m_timeSinceLastMetaData.elapsed() > META_DATA_DURATION_MS);
 
