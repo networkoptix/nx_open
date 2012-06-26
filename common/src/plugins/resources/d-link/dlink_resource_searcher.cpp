@@ -4,14 +4,6 @@
 #include "utils/network/nettools.h"
 #include "utils/common/sleep.h"
 
-#ifdef Q_OS_LINUX
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <ifaddrs.h>
-#include <unistd.h>
-#endif
-
 unsigned char request[] = {0xfd, 0xfd, 0x06, 0x00, 0xa1, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00};
 QByteArray barequest(reinterpret_cast<char *>(request), sizeof(request));
 
@@ -63,44 +55,12 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
 {
     QnResourceList result;
 
-    QList<QHostAddress> ipaddrs = getAllIPv4Addresses();
-
-#ifdef Q_OS_LINUX
-    struct ifaddrs *ifaddr, *ifa;
-    int family, s;
-    char host[NI_MAXHOST];
-
-    if (getifaddrs(&ifaddr) == -1)
-    {
-        cl_log.log(cl_logWARNING, "QnPlDlinkResourceSearcher::findResources(): Can't get interfaces list: %s", strerror(errno));
-        return result;
-    }
-
-    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
-    {
-        family = ifa->ifa_addr->sa_family;
-
-        if (family != AF_INET)
-            continue;
-
-        QUdpSocket sock;
-        sock.bind(0);
-
-        int res = setsockopt(sock.socketDescriptor(), SOL_SOCKET, SO_BINDTODEVICE, ifa->ifa_name, strlen(ifa->ifa_name));
-        if (res != 0)
-        {
-            cl_log.log(cl_logWARNING, "QnPlDlinkResourceSearcher::findResources(): Can't bind to interface %s: %s", ifa->ifa_name, strerror(errno));
-            continue;
-        }
-
-#else // lif defined Q_OS_WIN
-    for (int i = 0; i < ipaddrs.size();++i)
+    foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
     {
         QUdpSocket sock;
 
-        if (!sock.bind(ipaddrs.at(i), 0))
-           continue;
-#endif
+        if (!bindToInterface(sock, iface))
+            continue;
 
         // sending broadcast
 
@@ -180,11 +140,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             resource->setMAC(smac);
             resource->setHostAddress(sender, QnDomainMemory);
 
-#ifdef Q_OS_LINUX
-            resource->setDiscoveryAddr(QHostAddress(ntohl(((sockaddr_in*)ifa->ifa_addr)->sin_addr.s_addr)));
-#elif defined Q_OS_WIN
-            resource->setDiscoveryAddr(ipaddrs.at(i));
-#endif
+            resource->setDiscoveryAddr(iface.address);
 
             result.push_back(resource);
 

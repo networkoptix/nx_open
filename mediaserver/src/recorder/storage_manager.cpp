@@ -114,6 +114,18 @@ void QnStorageManager::addStorage(QnStorageResourcePtr storage)
     QMutexLocker lock(&m_mutex);
     
     cl_log.log(QString(QLatin1String("Adding storage. Path: %1. SpaceLimit: %2MiB. Currently avaiable: %3MiB")).arg(storage->getUrl()).arg(storage->getSpaceLimit() / 1024 / 1024).arg(storage->getFreeSpace() / 1024 / 1024), cl_logINFO);
+
+    removeStorage(storage); // remove existing storage record if exists
+    m_storageRoots.insert(storage->getIndex(), storage);
+    if (storage->isStorageAvailable())
+        storage->setStatus(QnResource::Online);
+    connect(storage.data(), SIGNAL(archiveRangeChanged(qint64, qint64)), this, SLOT(at_archiveRangeChanged(qint64, qint64)), Qt::DirectConnection);
+}
+
+void QnStorageManager::removeStorage(QnStorageResourcePtr storage)
+{
+    QMutexLocker lock(&m_mutex);
+
     // remove existing storage record if exists
     for (StorageMap::iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
     {
@@ -122,11 +134,28 @@ void QnStorageManager::addStorage(QnStorageResourcePtr storage)
             break;
         }
     }
+}
 
-    m_storageRoots.insert(storage->getIndex(), storage);
-    if (storage->isStorageAvailable())
-        storage->setStatus(QnResource::Online);
-    connect(storage.data(), SIGNAL(archiveRangeChanged(qint64, qint64)), this, SLOT(at_archiveRangeChanged(qint64, qint64)), Qt::DirectConnection);
+bool QnStorageManager::existsStorageWithID(const QnAbstractStorageResourceList& storages, QnId id) const
+{
+    foreach(const QnAbstractStorageResourcePtr& storage, storages)
+    {
+        if (storage->getId() == id)
+            return true;
+    }
+    return false;
+}
+
+void QnStorageManager::removeAbsentStorages(QnAbstractStorageResourceList newStorages)
+{
+    QMutexLocker lock(&m_mutex);
+    for (StorageMap::iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end();)
+    {
+        if (!existsStorageWithID(newStorages, itr.value()->getId()))
+            itr = m_storageRoots.erase(itr);
+        else
+            ++itr;
+    }
 }
 
 QnStorageManager::~QnStorageManager()

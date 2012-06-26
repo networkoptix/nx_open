@@ -3,8 +3,9 @@
 #include "../resource/av_resource.h"
 #include "utils/common/rand.h"
 
-QnPlAVClinetPullStreamReader::QnPlAVClinetPullStreamReader(QnResourcePtr res)
-    : QnClientPullMediaStreamProvider(res),
+QnPlAVClinetPullStreamReader::QnPlAVClinetPullStreamReader(QnResourcePtr res):
+    QnClientPullMediaStreamProvider(res),
+    QnLiveStreamProvider(res),
     m_videoFrameBuff(CL_MEDIA_ALIGNMENT, 1024*1024)
 {
     QnSecurityCamResourcePtr ceqResource = getResource().dynamicCast<QnSecurityCamResource>();

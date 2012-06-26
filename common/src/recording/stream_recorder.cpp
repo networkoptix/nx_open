@@ -407,6 +407,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
         m_formatCtx->pb = m_ioContext = m_storage->createFfmpegIOContext(url, QIODevice::WriteOnly);
         if (m_ioContext == 0)
         {
+            avformat_close_input(&m_formatCtx);
             m_lastErrMessage = QString("Can't create output file '%1'").arg(url);
             cl_log.log(m_lastErrMessage, cl_logERROR);
             return false;

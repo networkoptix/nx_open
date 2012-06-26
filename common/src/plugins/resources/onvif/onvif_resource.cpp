@@ -1088,3 +1088,23 @@ void QnPlOnvifResource::setVideoSourceOptions(const VideoSrcOptions& options)
         m_physicalWindowSize.height = height;
     }
 }
+
+void QnPlOnvifResource::updateResourceCapabilities()
+{
+    QMutexLocker lock(&m_mutex);
+
+    if (!m_physicalWindowSize.isValid()) {
+        return;
+    }
+
+    QList<ResolutionPair>::iterator it = m_resolutionList.begin();
+    while (it != m_resolutionList.end())
+    {
+        if (it->first > m_physicalWindowSize.width || it->second > m_physicalWindowSize.height)
+        {
+            it = m_resolutionList.erase(it);
+        } else {
+            return;
+        }
+    }
+}
