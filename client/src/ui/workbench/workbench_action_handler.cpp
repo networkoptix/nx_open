@@ -108,6 +108,25 @@ void detail::QnResourceReplyProcessor::at_replyReceived(int status, const QByteA
 
 
 // -------------------------------------------------------------------------- //
+// QnConnectReplyProcessor
+// -------------------------------------------------------------------------- //
+detail::QnConnectReplyProcessor::QnConnectReplyProcessor(QObject *parent): 
+    QObject(parent),
+    m_handle(0),
+    m_status(0)
+{}
+
+void detail::QnConnectReplyProcessor::at_replyReceived(int status, const QByteArray &errorString, const QnConnectInfoPtr &connectInfo, int handle) {
+    m_status = status;
+    m_errorString = errorString;
+    m_connectInfo = connectInfo;
+    m_handle = handle;
+
+    emit finished(status, errorString, connectInfo, handle);
+}
+
+
+// -------------------------------------------------------------------------- //
 // QnWorkbenchActionHandler
 // -------------------------------------------------------------------------- //
 QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
@@ -935,18 +954,44 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     if (!dialog->exec())
         return;
 
-    menu()->trigger(Qn::ReconnectAction);
+    QnConnectionData connectionData;
+    connectionData.url = dialog->currentUrl();
+    qnSettings->setLastUsedConnection(connectionData);
+
+    menu()->trigger(Qn::ReconnectAction, QnActionParameters().withArgument(Qn::ConnectInfoParameter, dialog->currentInfo()));
 }
 
 void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
-    const QnConnectionData connection = qnSettings->lastUsedConnection();
-    if (!connection.isValid()) 
+    QnActionParameters parameters = menu()->currentParameters(sender());
+
+    const QnConnectionData connectionData = qnSettings->lastUsedConnection();
+    if (!connectionData.isValid()) 
         return;
     
+    QnConnectInfoPtr connectionInfo = parameters.argument<QnConnectInfoPtr>(Qn::ConnectInfoParameter);
+    if(connectionInfo.isNull()) {
+        QnAppServerConnectionPtr connection = QnAppServerConnectionFactory::createConnection(connectionData.url);
+        
+        QScopedPointer<detail::QnConnectReplyProcessor> processor(new detail::QnConnectReplyProcessor());
+        QScopedPointer<QEventLoop> loop(new QEventLoop());
+        connect(processor.data(), SIGNAL(finished(int, const QByteArray &, const QnConnectInfoPtr &, int)), loop.data(), SLOT(quit()));
+        connection->connectAsync(processor.data(), SLOT(at_replyReceived(int, const QByteArray &, const QnConnectInfoPtr &, int)));
+        loop->exec();
+
+        if(processor->status() != 0)
+            return;
+
+        connectionInfo = processor->info();
+    }
+
+    // TODO: maybe we need to check server-client compatibility here?
+
+    QnAppServerConnectionFactory::setDefaultMediaProxyPort(connectionInfo->proxyPort);
+
     QnClientMessageProcessor::instance()->stop(); // TODO: blocks gui thread.
     QnSessionManager::instance()->stop();
 
-    QnAppServerConnectionFactory::setDefaultUrl(connection.url);
+    QnAppServerConnectionFactory::setDefaultUrl(connectionData.url);
 
     // repopulate the resource pool
     QnResource::stopCommandProc();
@@ -975,7 +1020,7 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     QnResourceDiscoveryManager::instance().setReady(true);
     QnResource::startCommandProc();
 
-    context()->setUserName(connection.url.userName());
+    context()->setUserName(connectionData.url.userName());
 
     at_eventManager_connectionOpened();
 }

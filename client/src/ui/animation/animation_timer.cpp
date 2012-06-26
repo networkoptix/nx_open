@@ -189,7 +189,9 @@ void AnimationTimer::listenerStoppedListening(AnimationTimerListener *listener) 
 }
 
 
-
+// -------------------------------------------------------------------------- //
+// QAnimationTimer
+// -------------------------------------------------------------------------- //
 QAnimationTimer::QAnimationTimer(QObject *parent): 
     QAbstractAnimation(parent)
 {}

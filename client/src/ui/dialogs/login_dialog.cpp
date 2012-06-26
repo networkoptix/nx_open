@@ -130,8 +130,7 @@ void LoginDialog::updateFocus()
         widget->setFocus();
 }
 
-QUrl LoginDialog::currentUrl()
-{
+QUrl LoginDialog::currentUrl() const {
     const int row = ui->connectionsComboBox->currentIndex();
 
     QUrl url;
@@ -144,8 +143,11 @@ QUrl LoginDialog::currentUrl()
     return url;
 }
 
-void LoginDialog::accept()
-{
+QnConnectInfoPtr LoginDialog::currentInfo() const {
+    return m_connectInfo;
+}
+
+void LoginDialog::accept() {
     /* Widget data may not be written out to the model yet. Force it. */
     m_dataWidgetMapper->submit();
 
@@ -173,8 +175,7 @@ void LoginDialog::accept()
     updateUsability();
 }
 
-void LoginDialog::reject() 
-{
+void LoginDialog::reject() {
     if(m_requestHandle == -1) {
         QDialog::reject();
         return;
@@ -184,8 +185,7 @@ void LoginDialog::reject()
     updateUsability();
 }
 
-void LoginDialog::reset()
-{
+void LoginDialog::reset() {
     ui->hostnameLineEdit->clear();
     ui->portSpinBox->setValue(0);
     ui->loginLineEdit->clear();
@@ -194,8 +194,7 @@ void LoginDialog::reset()
     updateStoredConnections();
 }
 
-void LoginDialog::changeEvent(QEvent *event)
-{
+void LoginDialog::changeEvent(QEvent *event) {
     QDialog::changeEvent(event);
 
     switch (event->type()) {
@@ -207,8 +206,7 @@ void LoginDialog::changeEvent(QEvent *event)
     }
 }
 
-void LoginDialog::updateStoredConnections()
-{
+void LoginDialog::updateStoredConnections() {
     m_connectionsModel->removeRows(0, m_connectionsModel->rowCount());
 
     QnConnectionDataList connections = qnSettings->customConnections();
@@ -236,8 +234,7 @@ void LoginDialog::updateStoredConnections()
     ui->connectionsComboBox->setCurrentIndex(0); /* At last used connection. */
 }
 
-void LoginDialog::updateAcceptibility() 
-{
+void LoginDialog::updateAcceptibility() {
     bool acceptable = 
         !ui->passwordLineEdit->text().isEmpty() &&
         !ui->loginLineEdit->text().trimmed().isEmpty() &&
@@ -268,12 +265,10 @@ void LoginDialog::updateUsability() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void LoginDialog::at_oldHttpConnectFinished(int status, QByteArray errorString, QByteArray data, int handle)
-{
+void LoginDialog::at_oldHttpConnectFinished(int status, QByteArray errorString, QByteArray data, int handle) {
 	Q_UNUSED(handle);
 
-	if (status == 204)
-	{
+	if (status == 204) 	{
 		m_requestHandle = -1;
 
 		updateUsability();
@@ -286,8 +281,7 @@ void LoginDialog::at_oldHttpConnectFinished(int status, QByteArray errorString, 
 	}
 }
 
-void LoginDialog::at_connectFinished(int status, const QByteArray &/*errorString*/, QnConnectInfoPtr connectInfo, int requestHandle)
-{
+void LoginDialog::at_connectFinished(int status, const QByteArray &/*errorString*/, QnConnectInfoPtr connectInfo, int requestHandle) {
     if(m_requestHandle != requestHandle) 
         return;
     m_requestHandle = -1;
@@ -304,18 +298,17 @@ void LoginDialog::at_connectFinished(int status, const QByteArray &/*errorString
         return;
     }
 
-
     QnCompatibilityChecker remoteChecker(connectInfo->compatibilityItems);
     QnCompatibilityChecker localChecker(localCompatibilityItems());
 
     QnCompatibilityChecker* compatibilityChecker;
-    if (remoteChecker.size() > localChecker.size())
+    if (remoteChecker.size() > localChecker.size()) {
         compatibilityChecker = &remoteChecker;
-    else
+    } else {
         compatibilityChecker = &localChecker;
+    }
 
-    if (!compatibilityChecker->isCompatible("Client", qApp->applicationVersion(), "ECS", connectInfo->version))
-    {
+    if (!compatibilityChecker->isCompatible(QLatin1String("Client"), qApp->applicationVersion(), QLatin1String("ECS"), connectInfo->version)) {
         QMessageBox::warning(
             this,
             tr("Could not connect to Enterprise Controller"),
@@ -325,26 +318,18 @@ void LoginDialog::at_connectFinished(int status, const QByteArray &/*errorString
         return;
     }
 
-    QnAppServerConnectionFactory::setDefaultMediaProxyPort(connectInfo->proxyPort);
-
-    QnConnectionData connectionData;
-    connectionData.url = currentUrl();
-    qnSettings->setLastUsedConnection(connectionData);
-
+    m_connectInfo = connectInfo;
     QDialog::accept();
 }
 
-void LoginDialog::at_connectionsComboBox_currentIndexChanged(int index)
-{
+void LoginDialog::at_connectionsComboBox_currentIndexChanged(int index) {
     m_dataWidgetMapper->setCurrentModelIndex(m_connectionsModel->index(index, 0));
 }
 
-void LoginDialog::at_testButton_clicked()
-{
+void LoginDialog::at_testButton_clicked() {
     QUrl url = currentUrl();
 
-    if (!url.isValid())
-    {
+    if (!url.isValid()) {
         QMessageBox::warning(this, tr("Invalid parameters"), tr("The information you have entered is not valid."));
         return;
     }
@@ -356,8 +341,7 @@ void LoginDialog::at_testButton_clicked()
     updateFocus();
 }
 
-void LoginDialog::at_configureConnectionsButton_clicked()
-{
+void LoginDialog::at_configureConnectionsButton_clicked() {
     QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(m_context.data(), this));
     dialog->setCurrentPage(QnPreferencesDialog::PageConnections);
 
