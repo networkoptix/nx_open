@@ -25,6 +25,7 @@
 //#include "../brickcom/brickcom_resource.h"
 //#include "utils/common/rand.h"
 //#include "../sony/sony_resource.h"
+#include "utils/common/string.h"
 
 
 extern bool multicastJoinGroup(QUdpSocket& udpSocket, QHostAddress groupAddress, QHostAddress localAddress);
@@ -490,15 +491,8 @@ void OnvifResourceSearcherWsdd::addEndpointToHash(EndpointInfoHash& hash, const 
     QString manufacturer = getManufacturer(source, name);
     QString mac = getMac(source, header);
 
-    QString endpointId = getEndpointAddress(source);
-    endpointId.replace(":", "_");
-    endpointId.replace("{", "_");
-    endpointId.replace("}", "_");
-    endpointId.replace("/", "_");
-    endpointId.replace("\\", "_");
-
-
-    QString uniqId = !mac.isEmpty()? mac: endpointId;
+    QString endpointId = replaceNonFileNameCharacters(getEndpointAddress(source), QChar('_'));
+    QString uniqId = !mac.isEmpty() ? mac : endpointId;
 
     hash.insert(appropriateAddr, EndpointAdditionalInfo(name, manufacturer, mac, uniqId, host));
 }
