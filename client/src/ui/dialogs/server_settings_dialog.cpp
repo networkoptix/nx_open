@@ -37,7 +37,8 @@ namespace {
 QnServerSettingsDialog::QnServerSettingsDialog(const QnVideoServerResourcePtr &server, QWidget *parent):
     base_type(parent),
     ui(new Ui::ServerSettingsDialog),
-    m_server(server)
+    m_server(server),
+    m_hasStorageChanges(false)
 {
     ui->setupUi(this);
     ui->storagesTable->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -66,10 +67,8 @@ void QnServerSettingsDialog::accept() {
     setEnabled(false);
     setCursor(Qt::WaitCursor);
 
-    QString errorString;
-    if (!validateStorages(tableStorages(), &errorString)) {
-        QMessageBox::warning(this, tr("Warning"), errorString, QMessageBox::Ok);
-    } else {
+    bool valid = m_hasStorageChanges ? validateStorages(tableStorages(), NULL) : true;
+    if (valid) {
         submitToResources(); 
 
         base_type::accept();
@@ -138,6 +137,8 @@ void QnServerSettingsDialog::updateFromResources() {
     ui->rtspPortEdit->setText(QString::number(QUrl(m_server->getUrl()).port()));
 
     setTableStorages(m_server->getStorages());
+
+    m_hasStorageChanges = false;
 }
 
 void QnServerSettingsDialog::submitToResources() {
@@ -156,12 +157,14 @@ void QnServerSettingsDialog::submitToResources() {
 bool QnServerSettingsDialog::validateStorages(const QnAbstractStorageResourceList &storages, QString *errorString) {
     foreach (const QnAbstractStorageResourcePtr &storage, storages) {
         if (storage->getUrl().isEmpty()) {
-            *errorString = "Storage path must not be empty.";
+            if(errorString)
+                *errorString = "Storage path must not be empty.";
             return false;
         }
 
         if (storage->getSpaceLimit() < 0) {
-            *errorString = "Space limit must be a non-negative integer.";
+            if(errorString)
+                *errorString = "Space limit must be a non-negative integer.";
             return false;
         }
     }
@@ -229,6 +232,8 @@ void QnServerSettingsDialog::updateSpaceLimitCell(int row, bool force) {
 // -------------------------------------------------------------------------- //
 void QnServerSettingsDialog::at_addStorageButton_clicked() {
     addTableRow(0, QString(), defaultSpaceLimitGb);
+
+    m_hasStorageChanges = true;
 }
 
 void QnServerSettingsDialog::at_removeStorageButton_clicked() {
@@ -239,6 +244,8 @@ void QnServerSettingsDialog::at_removeStorageButton_clicked() {
     qSort(rows.begin(), rows.end(), std::greater<int>()); /* Sort in descending order. */
     foreach(int row, rows)
         ui->storagesTable->removeRow(row);
+
+    m_hasStorageChanges = true;
 }
 
 void QnServerSettingsDialog::at_storagesTable_cellChanged(int row, int column) {
@@ -246,4 +253,6 @@ void QnServerSettingsDialog::at_storagesTable_cellChanged(int row, int column) {
         return;
     
     updateSpaceLimitCell(row);
+
+    m_hasStorageChanges = true;
 }

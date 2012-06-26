@@ -265,11 +265,11 @@ void QnWorkbench::at_layout_itemAdded(QnWorkbenchItem *item) {
 }
 
 void QnWorkbench::at_layout_itemRemoved(QnWorkbenchItem *item) {
-    updateSingleRoleItem();
-
     for(int i = 0; i < Qn::ItemRoleCount; i++)
         if(item == m_itemByRole[i])
             setItem(static_cast<Qn::ItemRole>(i), NULL);
+
+    updateSingleRoleItem();
 
     emit itemRemoved(item);
 }
