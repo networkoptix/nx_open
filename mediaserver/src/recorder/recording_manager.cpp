@@ -304,6 +304,7 @@ void QnRecordingManager::onNewResource(QnResourcePtr res)
 void QnRecordingManager::at_updateStorage()
 {
     QnVideoServerResource* videoServer = dynamic_cast<QnVideoServerResource*> (sender());
+    qnStorageMan->removeAbsentStorages(videoServer->getStorages());
     foreach(QnAbstractStorageResourcePtr storage, videoServer->getStorages())
     {
         QnStorageResourcePtr physicalStorage = qSharedPointerDynamicCast<QnStorageResource>(storage);
@@ -315,6 +316,12 @@ void QnRecordingManager::at_updateStorage()
 void QnRecordingManager::onRemoveResource(QnResourcePtr res)
 {
     QMutexLocker lock(&m_mutex);
+
+    QnStorageResourcePtr physicalStorage = qSharedPointerDynamicCast<QnStorageResource>(res);
+    if (physicalStorage) {
+        qnStorageMan->removeStorage(physicalStorage);
+        return;
+    }
 
     QMap<QnResourcePtr, Recorders>::iterator itr = m_recordMap.find(res);
     if (itr == m_recordMap.end())
