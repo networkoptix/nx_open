@@ -45,13 +45,19 @@ const char OnvifResourceSearcherWsdd::PROBE_TYPE[] = "onvifDiscovery:NetworkVide
 const char OnvifResourceSearcherWsdd::WSA_ADDRESS[] = "http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous";
 const char OnvifResourceSearcherWsdd::WSDD_ADDRESS[] = "urn:schemas-xmlsoap-org:ws:2005:04:discovery";
 const char OnvifResourceSearcherWsdd::WSDD_ACTION[] = "http://schemas.xmlsoap.org/ws/2005/04/discovery/Probe";
-const char OnvifResourceSearcherWsdd::WSDD_MULTICAST_ADDRESS[] = "soap.udp://239.255.255.250:3702";
+const char OnvifResourceSearcherWsdd::WSDD_GSOAP_MULTICAST_ADDRESS[] = "soap.udp://239.255.255.250:3702";
+
+int WSDD_MULTICAST_PORT = 3702;
+const char WSDD_MULTICAST_ADDRESS[] = "239.255.255.250";
+QHostAddress WSDD_GROUP_ADDRESS(WSDD_MULTICAST_ADDRESS);
 
 
 OnvifResourceSearcherWsdd::OnvifResourceSearcherWsdd():
-    onvifFetcher(OnvifResourceInformationFetcher::instance())
+    m_onvifFetcher(OnvifResourceInformationFetcher::instance()),
+    m_recvSocketList(),
+    m_mutex()
 {
-
+    updateInterfacesListenSockets();
 }
 
 OnvifResourceSearcherWsdd& OnvifResourceSearcherWsdd::instance()
@@ -75,8 +81,124 @@ int nullGsoapFdisconnect(struct soap*)
 int gsoapFsend(struct soap *soap, const char *s, size_t n)
 {
     QUdpSocket& qSocket = *reinterpret_cast<QUdpSocket*>(soap->user);
-    qSocket.writeDatagram(QByteArray(s, n), QHostAddress("239.255.255.250"), 3702);
+    qSocket.writeDatagram(QByteArray(s, n), WSDD_GROUP_ADDRESS, WSDD_MULTICAST_PORT);
     return SOAP_OK;
+}
+
+void OnvifResourceSearcherWsdd::updateInterfacesListenSockets() const
+{
+    QMutexLocker lock(&m_mutex);
+
+    QList<QHostAddress> localAddresses = getAllIPv4Addresses();
+
+    //Remove outdated
+    QHash<QString, QUdpSocketPtr>::iterator it = m_recvSocketList.begin();
+    while (it != m_recvSocketList.end()) {
+        bool found = false;
+        foreach(QHostAddress localAddress, localAddresses)
+        {
+            if (m_recvSocketList.contains(localAddress.toString())) {
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            multicastLeaveGroup(*(it.value()), WSDD_GROUP_ADDRESS);
+            it = m_recvSocketList.erase(it);
+        } else {
+            ++it;
+        }
+    }
+
+    //Add new
+    foreach(QHostAddress localAddress, localAddresses)
+    {
+        QString key = localAddress.toString();
+
+        QHash<QString, QUdpSocketPtr>::iterator it = m_recvSocketList.find(key);
+        if (it != m_recvSocketList.end()) {
+            continue;
+        }
+
+        it = m_recvSocketList.insert(key, QUdpSocketPtr(new QUdpSocket()));
+        bool bindSucceeded = it.value()->bind(QHostAddress::Any, WSDD_MULTICAST_PORT, 
+            QUdpSocket::ReuseAddressHint | QUdpSocket::ShareAddress);
+
+        if (!bindSucceeded) {
+            qWarning() << "OnvifResourceSearcherWsdd::updateInterfacesListenSockets: faild to bind. Address: " << key;
+            continue;
+        }
+
+        if (!multicastJoinGroup(*(it.value()), WSDD_GROUP_ADDRESS, localAddress)) {
+            qWarning() << "OnvifResourceSearcherWsdd::updateInterfacesListenSockets: multicast join group failed. Address: " << key;
+            continue;
+        }
+    }
+}
+
+void OnvifResourceSearcherWsdd::findHelloEndpoints(EndpointInfoHash& result) const
+{
+    QMutexLocker lock(&m_mutex);
+
+    wsddProxy soapWsddProxy(SOAP_IO_UDP);
+    soapWsddProxy.soap->recv_timeout = 1;
+    soapWsddProxy.soap->fconnect = nullGsoapFconnect;
+    soapWsddProxy.soap->fdisconnect = nullGsoapFdisconnect;
+    soapWsddProxy.soap->fclose = NULL;
+    soapWsddProxy.soap->fopen = NULL;
+
+    QHash<QString, QUdpSocketPtr>::iterator it = m_recvSocketList.begin();
+    for (; it != m_recvSocketList.end(); ++it)
+    {
+        QStringList addrPrefixes = getAddrPrefixes(it.key());
+        QUdpSocket& socket = *(it.value().data());
+
+        soapWsddProxy.soap->socket = socket.socketDescriptor();
+        soapWsddProxy.soap->master = socket.socketDescriptor();
+
+        //Receiving all ProbeMatches
+        while (true) 
+        {
+            __wsdd__Hello wsddHello;
+            wsddHello.wsdd__Hello = NULL;
+
+            int soapRes = soapWsddProxy.recv_Hello(wsddHello);
+            if (soapRes != SOAP_OK) 
+            {
+                if (soapRes == SOAP_EOF) 
+                {
+                    qDebug() << "OnvifResourceSearcherWsdd::findHelloEndpoints: All devices found. Interface: " << it.key();
+                    soap_end(soapWsddProxy.soap);
+                    break;
+                } 
+                else 
+                {
+                    //SOAP_NO_METHOD - The dispatcher did not find a matching operation for the request
+                    //So, this is not error, silently ignore
+                    if (soapRes != SOAP_NO_METHOD) {
+                        qWarning() << "OnvifResourceSearcherWsdd::findHelloEndpoints: SOAP failed. GSoap error code: "
+                            << soapRes << SoapErrorHelper::fetchDescription(soapWsddProxy.soap_fault())
+                            << ". Interface: " << it.key();
+                    }
+
+                    soap_end(soapWsddProxy.soap);
+                    continue;
+                }
+            }
+
+            addEndpointToHash(result, wsddHello.wsdd__Hello, soapWsddProxy.soap->header, addrPrefixes, it.key());
+
+            if (cl_log.logLevel() >= cl_logDEBUG1) {
+                printProbeMatches(wsddHello.wsdd__Hello, soapWsddProxy.soap->header);
+            }
+
+            soap_end(soapWsddProxy.soap);
+        }
+
+        soapWsddProxy.soap->socket = SOAP_INVALID_SOCKET;
+        soapWsddProxy.soap->master = SOAP_INVALID_SOCKET;
+    }
 }
 
 void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
@@ -96,7 +218,7 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
             continue;
         }
 #else
-        if (!qSocket.bind(localAddress, 0))
+        if (!qSocket.bind(localAddress, 0)) 
         {
             qWarning() << "OnvifResourceSearcherWsdd::findEndpoints: QUdpSocket.bind failed. Interface: " << interface.address.toString();
             continue;
@@ -105,7 +227,7 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
 
         QStringList addrPrefixes = getAddrPrefixes(interface.address.toString());
         wsddProxy soapWsddProxy(SOAP_IO_UDP);
-        soapWsddProxy.soap->recv_timeout = -1000000;
+        soapWsddProxy.soap->recv_timeout = 1;
         soapWsddProxy.soap->user = &qSocket;
         soapWsddProxy.soap->fconnect = nullGsoapFconnect;
         soapWsddProxy.soap->fdisconnect = nullGsoapFdisconnect;
@@ -126,7 +248,7 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
         soapWsddProxy.soap_header(NULL, messageID, NULL, NULL, &replyTo, NULL,
             const_cast<char*>(WSDD_ADDRESS), const_cast<char*>(WSDD_ACTION), NULL);
 
-        int soapRes = soapWsddProxy.send_Probe(WSDD_MULTICAST_ADDRESS, NULL, &wsddProbe);
+        int soapRes = soapWsddProxy.send_Probe(WSDD_GSOAP_MULTICAST_ADDRESS, NULL, &wsddProbe);
 
         if (soapRes != SOAP_OK) 
         {
@@ -164,10 +286,11 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
                 }
             }
 
-            addEndpointToHash(result, wsddProbeMatches.wsdd__ProbeMatches, soapWsddProxy.soap->header, addrPrefixes, interface.address.toString());
+            addEndpointToHash(result, wsddProbeMatches.wsdd__ProbeMatches, soapWsddProxy.soap->header, addrPrefixes, localAddress.toString());
 
             if (cl_log.logLevel() >= cl_logDEBUG1) {
-                printProbeMatches(wsddProbeMatches.wsdd__ProbeMatches, soapWsddProxy.soap->header);
+                    printProbeMatches(wsddProbeMatches.wsdd__ProbeMatches->ProbeMatch, soapWsddProxy.soap->header);
+                }
             }
 
             soap_end(soapWsddProxy.soap);
@@ -182,6 +305,10 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
 void OnvifResourceSearcherWsdd::findResources(QnResourceList& result) const
 {
     EndpointInfoHash endpoints;
+
+    updateInterfacesListenSockets();
+    findHelloEndpoints(endpoints);
+
     findEndpoints(endpoints);
 
     //ToDo: delete
@@ -196,7 +323,7 @@ void OnvifResourceSearcherWsdd::findResources(QnResourceList& result) const
         ++endpIter;
     }
 
-    onvifFetcher.findResources(endpoints, result);
+    m_onvifFetcher.findResources(endpoints, result);
 }
 
 QStringList OnvifResourceSearcherWsdd::getAddrPrefixes(const QString& host) const
@@ -221,17 +348,17 @@ QStringList OnvifResourceSearcherWsdd::getAddrPrefixes(const QString& host) cons
     return result;
 }
 
-QString OnvifResourceSearcherWsdd::getAppropriateAddress(
-        const wsdd__ProbeMatchesType* probeMatches, const QStringList& prefixes) const
+template <class T>
+QString OnvifResourceSearcherWsdd::getAppropriateAddress(const T* source, const QStringList& prefixes) const
 {
     QString appropriateAddr;
 
-    if (!probeMatches || !probeMatches->ProbeMatch || !probeMatches->ProbeMatch->XAddrs) {
+    if (!source || !source->XAddrs) {
         return appropriateAddr;
     }
 
     int relevantLevel = 0;
-    QString addrListStr(probeMatches->ProbeMatch->XAddrs);
+    QString addrListStr(source->XAddrs);
     QStringList addrList = addrListStr.split(" ");
     foreach (const QString addrStr, addrList) {
         if (addrStr.startsWith(prefixes[2])) {
@@ -253,13 +380,14 @@ QString OnvifResourceSearcherWsdd::getAppropriateAddress(
     return appropriateAddr;
 }
 
-QString OnvifResourceSearcherWsdd::getMac(const wsdd__ProbeMatchesType* probeMatches, const SOAP_ENV__Header* header) const
+template <class T>
+QString OnvifResourceSearcherWsdd::getMac(const T* source, const SOAP_ENV__Header* header) const
 {
-    if (!probeMatches || !probeMatches->ProbeMatch || !header) {
+    if (!source || !header) {
         return QString();
     }
 
-    QString endpoint = probeMatches->ProbeMatch->wsa__EndpointReference.Address;
+    QString endpoint = source->wsa__EndpointReference.Address;
     QString messageId = header->wsa__MessageID;
 
     int pos = endpoint.lastIndexOf("-");
@@ -289,23 +417,24 @@ QString OnvifResourceSearcherWsdd::getMac(const wsdd__ProbeMatchesType* probeMat
     return QString();
 }
 
-QString OnvifResourceSearcherWsdd::getEndpointAddress(const wsdd__ProbeMatchesType* probeMatches) const
+template <class T>
+QString OnvifResourceSearcherWsdd::getEndpointAddress(const T* source) const
 {
-    if (!probeMatches || !probeMatches->ProbeMatch) {
+    if (!source) {
         return QString();
     }
 
-    return QString(probeMatches->ProbeMatch->wsa__EndpointReference.Address);
+    return QString(source->wsa__EndpointReference.Address);
 }
 
-QString OnvifResourceSearcherWsdd::getManufacturer(const wsdd__ProbeMatchesType* probeMatches, const QString& name) const
+template <class T>
+QString OnvifResourceSearcherWsdd::getManufacturer(const T* source, const QString& name) const
 {
-    if (!probeMatches || !probeMatches->ProbeMatch ||
-            !probeMatches->ProbeMatch->Scopes || !probeMatches->ProbeMatch->Scopes->__item) {
+    if (!source || !source->Scopes || !source->Scopes->__item) {
         return QString();
     }
 
-    QString scopes(probeMatches->ProbeMatch->Scopes->__item);
+    QString scopes(source->Scopes->__item);
     int posStart = scopes.indexOf(SCOPES_NAME_PREFIX);
     if (posStart == -1) {
         return QString();
@@ -320,14 +449,14 @@ QString OnvifResourceSearcherWsdd::getManufacturer(const wsdd__ProbeMatchesType*
     return QUrl::fromPercentEncoding(QByteArray(percentEncodedValue.toStdString().c_str())).trimmed();
 }
 
-QString OnvifResourceSearcherWsdd::getName(const wsdd__ProbeMatchesType* probeMatches) const
+template <class T>
+QString OnvifResourceSearcherWsdd::getName(const T* source) const
 {
-    if (!probeMatches || !probeMatches->ProbeMatch ||
-        !probeMatches->ProbeMatch->Scopes || !probeMatches->ProbeMatch->Scopes->__item) {
+    if (!source || !source->Scopes || !source->Scopes->__item) {
             return QString();
     }
 
-    QString scopes(probeMatches->ProbeMatch->Scopes->__item);
+    QString scopes(source->Scopes->__item);
     int posStart = scopes.indexOf(SCOPES_HARDWARE_PREFIX);
     if (posStart == -1) {
         return QString();
@@ -360,29 +489,29 @@ void OnvifResourceSearcherWsdd::fillWsddStructs(wsdd__ProbeType& probe, wsa__End
     endpoint.__anyAttribute = NULL;
 }
 
-void OnvifResourceSearcherWsdd::addEndpointToHash(EndpointInfoHash& hash, const wsdd__ProbeMatchesType* probeMatches,
+template <class T> 
+void OnvifResourceSearcherWsdd::addEndpointToHash(EndpointInfoHash& hash, const T* source,
     const SOAP_ENV__Header* header, const QStringList& addrPrefixes, const QString& host) const
 {
-    if (!probeMatches || !probeMatches->ProbeMatch) {
+    if (!source) {
         return;
     }
 
-    QString appropriateAddr = getAppropriateAddress(probeMatches, addrPrefixes);
+    QString appropriateAddr = getAppropriateAddress(source, addrPrefixes);
     if (appropriateAddr.isEmpty() || hash.contains(appropriateAddr)) {
         return;
     }
 
-    QString name = getName(probeMatches);
-    QString manufacturer = getManufacturer(probeMatches, name);
-    QString mac = getMac(probeMatches, header);
-    QString uniqId = !mac.isEmpty()? mac: getEndpointAddress(probeMatches);
-    
+    QString name = getName(source);
+    QString manufacturer = getManufacturer(source, name);
+    QString mac = getMac(source, header);
+    QString uniqId = !mac.isEmpty()? mac: getEndpointAddress(source);
 
     hash.insert(appropriateAddr, EndpointAdditionalInfo(name, manufacturer, mac, uniqId, host));
 }
 
-void OnvifResourceSearcherWsdd::printProbeMatches(const wsdd__ProbeMatchesType* probeMatches,
-    const SOAP_ENV__Header* header) const
+template <class T>
+void OnvifResourceSearcherWsdd::printProbeMatches(const T* source, const SOAP_ENV__Header* header) const
 {
     qDebug() << "OnvifResourceSearcherWsdd::printProbeMatches";
 
@@ -422,26 +551,26 @@ void OnvifResourceSearcherWsdd::printProbeMatches(const wsdd__ProbeMatchesType* 
     }
 
     qDebug() << "  Body: ";
-    if (probeMatches && probeMatches->ProbeMatch) {
+    if (source) {
 
-        if (probeMatches->ProbeMatch->MetadataVersion) {
-            qDebug() << "    MetadataVersion: " << probeMatches->ProbeMatch->MetadataVersion;
+        if (source->MetadataVersion) {
+            qDebug() << "    MetadataVersion: " << source->MetadataVersion;
         }
 
-        if (probeMatches->ProbeMatch->Types) {
-            qDebug() << "    Types: " << probeMatches->ProbeMatch->Types;
+        if (source->Types) {
+            qDebug() << "    Types: " << source->Types;
         }
 
-        if (probeMatches->ProbeMatch->wsa__EndpointReference.Address) {
-            qDebug() << "    Address: " << probeMatches->ProbeMatch->wsa__EndpointReference.Address;
+        if (source->wsa__EndpointReference.Address) {
+            qDebug() << "    Address: " << source->wsa__EndpointReference.Address;
         }
 
-        if (probeMatches->ProbeMatch->Scopes && probeMatches->ProbeMatch->Scopes->__item) {
-            qDebug() << "    Scopes: " << probeMatches->ProbeMatch->Scopes->__item;
+        if (source->Scopes && source->Scopes->__item) {
+            qDebug() << "    Scopes: " << source->Scopes->__item;
         }
 
-        if (probeMatches->ProbeMatch->XAddrs) {
-            qDebug() << "    XAddrs: " << probeMatches->ProbeMatch->XAddrs;
+        if (source->XAddrs) {
+            qDebug() << "    XAddrs: " << source->XAddrs;
         }
 
     } else {

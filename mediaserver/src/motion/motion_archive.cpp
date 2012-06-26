@@ -198,6 +198,7 @@ QnTimePeriodList QnMotionArchive::mathPeriod(const QRegion& region, qint64 msSta
 {
     if (minTime() != AV_NOPTS_VALUE)
         msStartTime = qMax(minTime(), msStartTime);
+	msEndTime = qMin(msEndTime, m_maxMotionTime);
 
     QnTimePeriodList rez;
     QFile motionFile, indexFile;
@@ -212,16 +213,17 @@ QnTimePeriodList QnMotionArchive::mathPeriod(const QRegion& region, qint64 msSta
 
     while (msStartTime < msEndTime)
     {
+		qint64 minTime, maxTime;
+		dateBounds(msStartTime, minTime, maxTime);
+
         QVector<IndexRecord> index;
         IndexHeader indexHeader;
         fillFileNames(msStartTime, &motionFile, 0);
         if (!motionFile.open(QFile::ReadOnly) || !loadIndexFile(index, indexHeader, msStartTime)) {
-            qFreeAligned(buffer);
-            return rez;
+			msStartTime = maxTime + 1;
+            continue;
         }
 
-        qint64 minTime, maxTime;
-        dateBounds(msStartTime, minTime, maxTime);
 
         QVector<IndexRecord>::iterator startItr = index.begin();
         QVector<IndexRecord>::iterator endItr = index.end();

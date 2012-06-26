@@ -61,6 +61,7 @@ private:
 
     void resovle_conflicts(QnResourceList& device_list, const CLIPList& busy_list, bool *ip_finished);
 
+    
     void markOfflineIfNeeded();
 
     void updateResourceStatus(QnResourcePtr res);
@@ -84,7 +85,10 @@ private:
 
     QList<QHostAddress> m_allLocalAddresses;
 
-    quint64 m_lastDiscoveryCycle;
+
+    QSet<QString> m_discoveredResources;
+    QMap<QString, int> m_resourceDiscoveryCounter;
+
 };
 
 #endif //QN_RESOURCE_DISCOVERY_MANAGER_H
