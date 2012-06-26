@@ -36,7 +36,7 @@ QList<QnPlPulseSearcherHelper::WSResult> QnPlPulseSearcherHelper::findResources(
 #ifdef Q_OS_LINUX
         socket.bind(0);
 
-        int res = setsockopt(socket.socketDescriptor(), SOL_SOCKET, SO_BINDTODEVICE, interface.name.constData(), iface.name.length());
+        int res = setsockopt(socket.socketDescriptor(), SOL_SOCKET, SO_BINDTODEVICE, iface.name.constData(), iface.name.length());
         if (res != 0)
         {
             cl_log.log(cl_logWARNING, "QnPlPulseSearcherHelper::findResources(): Can't bind to interface %s: %s", iface.name.constData(), strerror(errno));

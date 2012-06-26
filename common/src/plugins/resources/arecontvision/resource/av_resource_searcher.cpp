@@ -46,7 +46,7 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
         int res = setsockopt(sock.socketDescriptor(), SOL_SOCKET, SO_BINDTODEVICE, iface.name.constData(), iface.name.length());
         if (res != 0)
         {
-            cl_log.log(cl_logWARNING, "QnPlArecontResourceSearcher::findResources(): Can't bind to interface %s: %s", interface.name.constData(), strerror(errno));
+            cl_log.log(cl_logWARNING, "QnPlArecontResourceSearcher::findResources(): Can't bind to interface %s: %s", iface.name.constData(), strerror(errno));
             continue;
         }
 #else // lif defined Q_OS_WIN
