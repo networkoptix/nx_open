@@ -421,9 +421,6 @@ void QnThumbnailsLoader::process() {
                     thumbnail = generateThumbnail(outFrame, boundingSize, timeStep, generation);
                     time = processThumbnail(thumbnail, time, thumbnail.time(), frameFlags.dequeue() & QnAbstractMediaData::MediaFlags_BOF);
                 }
-
-                /* Fill remaining time values with thumbnails. */
-                processThumbnail(thumbnail, time, period.endTimeMs(), false);
             }
         }
         client->close();
