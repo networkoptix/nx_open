@@ -3,9 +3,9 @@
 #include "netstate.h"
 #include "../common/log.h"
 
-QList<QHostAddress> getAllIPv4Addresses()
+QList<QnInterfaceAndAddr> getAllIPv4Interfaces()
 {
-    static QList<QHostAddress> lastResult;
+    static QList<QnInterfaceAndAddr> lastResult;
     static QTime timer;
     static QMutex mutex;
 
@@ -16,46 +16,53 @@ QList<QHostAddress> getAllIPv4Addresses()
             return lastResult;
     }
 
-    QList<QHostAddress> ipaddrs = QNetworkInterface::allAddresses();
-    QList<QHostAddress> result;
+    QList<QnInterfaceAndAddr> result;
 
-    for (int i = 0; i < ipaddrs.size(); ++i)
+    foreach(QNetworkInterface interface, QNetworkInterface::allInterfaces())
     {
-        if (QAbstractSocket::IPv4Protocol == ipaddrs.at(i).protocol() && ipaddrs.at(i)!=QHostAddress::LocalHost)
+        QList<QNetworkAddressEntry> addresses = interface.addressEntries();
+        foreach (const QNetworkAddressEntry& address, addresses)
         {
-            static bool allowedInterfaceReady = false;
-            static QList<QHostAddress> allowedInterfaces;
-            if (!allowedInterfaceReady)
+            if (address.ip().protocol() == QAbstractSocket::IPv4Protocol && address.ip() != QHostAddress::LocalHost)
             {
-                for (int j = 1; j < qApp->argc(); ++j)
+                static bool allowedInterfaceReady = false;
+                static QList<QHostAddress> allowedInterfaces;
+                if (!allowedInterfaceReady)
                 {
-                    QString arg = qApp->argv()[j];
-                    arg = arg.toLower();
-                    while (arg.startsWith('-'))
-                        arg = arg.mid(1);
-                    if (arg.startsWith("if=")) {
-                        QStringList tmp = arg.split('=')[1].split(';');
-                        foreach(QString s, tmp)
-                            allowedInterfaces << QHostAddress(s);
+                    for (int j = 1; j < qApp->argc(); ++j)
+                    {
+                        QString arg = qApp->argv()[j];
+                        arg = arg.toLower();
+                        while (arg.startsWith('-'))
+                            arg = arg.mid(1);
+                        if (arg.startsWith("if=")) {
+                            QStringList tmp = arg.split('=')[1].split(';');
+                            foreach(QString s, tmp)
+                                allowedInterfaces << QHostAddress(s);
+                        }
                     }
+
+                    // check registry
+                    if (allowedInterfaces.isEmpty())
+                    {
+                        QSettings settings;
+                        QStringList tmp = settings.value("if").toString().split(';');
+                        foreach(QString s, tmp) {
+                            if (!s.isEmpty())
+                                allowedInterfaces << QHostAddress(s);
+                        }
+                    }
+                    if (!allowedInterfaces.isEmpty())
+                        qWarning() << "Using net IF filter:" << allowedInterfaces;
+                    allowedInterfaceReady = true;
                 }
 
-                // check registry
-                if (allowedInterfaces.isEmpty())
+                if (allowedInterfaces.isEmpty() || allowedInterfaces.contains(address.ip()))
                 {
-                    QSettings settings;
-                    QStringList tmp = settings.value("if").toString().split(';');
-                    foreach(QString s, tmp) {
-                        if (!s.isEmpty())
-                            allowedInterfaces << QHostAddress(s);
-                    }
+                    result.append(QnInterfaceAndAddr(interface.name(), address.ip()));
+                    break;
                 }
-                if (!allowedInterfaces.isEmpty())
-                    qWarning() << "Using net IF filter:" << allowedInterfaces;
-                allowedInterfaceReady = true;
             }
-            if (allowedInterfaces.isEmpty() || allowedInterfaces.contains(ipaddrs.at(i)))
-                result.push_back(ipaddrs.at(i));
         }
     }
 
@@ -71,16 +78,14 @@ QList<QHostAddress> allLocalAddresses()
     QList<QHostAddress> rez;
 
     // if nothing else works use first enabled hostaddr
-    QList<QHostAddress> ipaddrs = getAllIPv4Addresses();
-
-    for (int i = 0; i < ipaddrs.size();++i)
+    foreach(const QnInterfaceAndAddr& interface, getAllIPv4Interfaces())
     {
-        QString addr = ipaddrs.at(i).toString();
-        bool isLocalAddress = addr == "localhost" || addr == "127.0.0.1";
-        if (isLocalAddress || !QUdpSocket().bind(ipaddrs.at(i), 0))
+        if (!QUdpSocket().bind(interface.address, 0))
             continue;
-        rez << ipaddrs.at(i);
+
+        rez << interface.address;
     }
+
     if (rez.isEmpty())
         rez << QHostAddress("127.0.0.1");
 

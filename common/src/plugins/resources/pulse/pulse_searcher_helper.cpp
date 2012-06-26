@@ -30,50 +30,25 @@ QList<QnPlPulseSearcherHelper::WSResult> QnPlPulseSearcherHelper::findResources(
 {
     QMap<QString, WSResult> result;
 
-    QList<QHostAddress> localAddresses = getAllIPv4Addresses();
-
-#ifdef Q_OS_LINUX
-    struct ifaddrs *ifaddr, *ifa;
-    int family, s;
-    char host[NI_MAXHOST];
-
-    if (getifaddrs(&ifaddr) == -1)
+    foreach (QnInterfaceAndAddr interface, getAllIPv4Interfaces())
     {
-        cl_log.log(cl_logWARNING, "QnPlPulseSearcherHelper::findResources(): Can't get interfaces list: %s", strerror(errno));
-        return result.values();
-    }
-
-    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
-    {
-        family = ifa->ifa_addr->sa_family;
-
-        if (family != AF_INET)
-            continue;
-
         QUdpSocket socket;
+#ifdef Q_OS_LINUX
         socket.bind(0);
 
-        int res = setsockopt(socket.socketDescriptor(), SOL_SOCKET, SO_BINDTODEVICE, ifa->ifa_name, strlen(ifa->ifa_name));
+        int res = setsockopt(socket.socketDescriptor(), SOL_SOCKET, SO_BINDTODEVICE, interface.name.constData(), interface.name.length());
         if (res != 0)
         {
-            cl_log.log(cl_logWARNING, "QnPlPulseSearcherHelper::findResources(): Can't bind to interface %s: %s", ifa->ifa_name, strerror(errno));
+            cl_log.log(cl_logWARNING, "QnPlPulseSearcherHelper::findResources(): Can't bind to interface %s: %s", interface.name.constData(), strerror(errno));
             continue;
         }
-
-        QHostAddress localAddress(ifa->ifa_addr);
-
 #else // lif defined Q_OS_WIN
-    foreach(QHostAddress localAddress, localAddresses)
-    {
-        QUdpSocket socket;
-
-        bool bindSucceeded = socket.bind(localAddress, 0);
-        if (!bindSucceeded)
-            continue;
+        if (!socket.bind(interface.address, 0))
+           continue;
 #endif
 
         QHostAddress groupAddress(QLatin1String("224.111.111.1"));
-        if (!multicastJoinGroup(socket, groupAddress, localAddress)) continue;
+        if (!multicastJoinGroup(socket, groupAddress, interface.address)) continue;
 
 		QByteArray requestDatagram;
 		requestDatagram.resize(43);
@@ -99,7 +74,7 @@ QList<QnPlPulseSearcherHelper::WSResult> QnPlPulseSearcherHelper::findResources(
             if (res.mac!="")
             {
                 res.ip = sender.toString();
-                res.disc_ip = localAddress.toString();
+                res.disc_ip = interface.address.toString();
                 result[res.mac] = res;
             }
 

@@ -20,11 +20,11 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
     QSet<QHostAddress> foundDevSet; // to avoid duplicates
     QMap<QString, QnResourcePtr> resources;
 
-    QList<QHostAddress> ipaddrs = getAllIPv4Addresses();
+    QList<QnInterfaceAndAddr> ipaddrs = getAllIPv4Interfaces();
     for (int i = 0; i < ipaddrs.size();++i)
     {
         QUdpSocket sock;
-        if (!sock.bind(ipaddrs.at(i), 0))
+        if (!sock.bind(ipaddrs.at(i).address, 0))
             continue;
         sock.writeDatagram(TestCamConst::TEST_CAMERA_FIND_MSG, strlen(TestCamConst::TEST_CAMERA_FIND_MSG), QHostAddress::Broadcast, TestCamConst::DISCOVERY_PORT);
         QnSleep::msleep(150);
@@ -56,7 +56,7 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
                 resource->setName(resName);
                 QString mac(params[j]);
                 resource->setMAC(mac);
-                resource->setDiscoveryAddr(ipaddrs.at(i));
+                resource->setDiscoveryAddr(ipaddrs.at(i).address);
                 resource->setUrl(QString("tcp://") + sender.toString() + QString(':') + QString::number(videoPort) + QString("/") + QString(params[j]));
                 resources.insert(mac, resource);
             }

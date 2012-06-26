@@ -63,42 +63,20 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
 {
     QnResourceList result;
 
-    QList<QHostAddress> ipaddrs = getAllIPv4Addresses();
-
-#ifdef Q_OS_LINUX
-    struct ifaddrs *ifaddr, *ifa;
-    int family, s;
-    char host[NI_MAXHOST];
-
-    if (getifaddrs(&ifaddr) == -1)
+    foreach (QnInterfaceAndAddr interface, getAllIPv4Interfaces())
     {
-        cl_log.log(cl_logWARNING, "QnPlDlinkResourceSearcher::findResources(): Can't get interfaces list: %s", strerror(errno));
-        return result;
-    }
-
-    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
-    {
-        family = ifa->ifa_addr->sa_family;
-
-        if (family != AF_INET)
-            continue;
-
         QUdpSocket sock;
+#ifdef Q_OS_LINUX
         sock.bind(0);
 
-        int res = setsockopt(sock.socketDescriptor(), SOL_SOCKET, SO_BINDTODEVICE, ifa->ifa_name, strlen(ifa->ifa_name));
+        int res = setsockopt(sock.socketDescriptor(), SOL_SOCKET, SO_BINDTODEVICE, interface.name.constData(), interface.name.length());
         if (res != 0)
         {
-            cl_log.log(cl_logWARNING, "QnPlDlinkResourceSearcher::findResources(): Can't bind to interface %s: %s", ifa->ifa_name, strerror(errno));
+            cl_log.log(cl_logWARNING, "QnPlDlinkResourceSearcher::findResources(): Can't bind to interface %s: %s", interface.name.constData(), strerror(errno));
             continue;
         }
-
 #else // lif defined Q_OS_WIN
-    for (int i = 0; i < ipaddrs.size();++i)
-    {
-        QUdpSocket sock;
-
-        if (!sock.bind(ipaddrs.at(i), 0))
+        if (!sock.bind(interface.address, 0))
            continue;
 #endif
 
@@ -180,11 +158,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             resource->setMAC(smac);
             resource->setHostAddress(sender, QnDomainMemory);
 
-#ifdef Q_OS_LINUX
-            resource->setDiscoveryAddr(QHostAddress(ntohl(((sockaddr_in*)ifa->ifa_addr)->sin_addr.s_addr)));
-#elif defined Q_OS_WIN
-            resource->setDiscoveryAddr(ipaddrs.at(i));
-#endif
+            resource->setDiscoveryAddr(interface.address);
 
             result.push_back(resource);
 

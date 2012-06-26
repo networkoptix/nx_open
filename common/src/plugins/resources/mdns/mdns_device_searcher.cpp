@@ -67,40 +67,32 @@ QnResourceList QnMdnsResourceSearcher::findResources()
 {
     QnResourceList result;
 
-    QList<QHostAddress> localAddresses = getAllIPv4Addresses();
-#if 0
-    CL_LOG(cl_logDEBUG1)
+    foreach (QnInterfaceAndAddr interface, getAllIPv4Interfaces())
     {
-        QString log;
-        QTextStream(&log) << "QnMdnsResourceSearcher::findDevices  found " << localAddresses.size() << " adapter(s) with IPV4";
-        cl_log.log(log, cl_logDEBUG1);
+        QUdpSocket sock;
+#ifdef Q_OS_LINUX
+        sock.bind(0);
 
-        for (int i = 0; i < localAddresses.size();++i)
+        int res = setsockopt(sock.socketDescriptor(), SOL_SOCKET, SO_BINDTODEVICE, interface.name.constData(), interface.name.length());
+        if (res != 0)
         {
-            QString slog;
-            QTextStream(&slog) << localAddresses.at(i).toString();
-            cl_log.log(slog, cl_logDEBUG1);
+            cl_log.log(cl_logWARNING, "QnMdnsResourceSearcher::findResources(): Can't bind to interface %s: %s", interface.name.constData(), strerror(errno));
+            continue;
         }
-    }
+#else // lif defined Q_OS_WIN
+        if (!sock.bind(interface.address, 0))
+           continue;
 #endif
 
-
-    foreach(QHostAddress localAddress, localAddresses)
-    {
         QHostAddress groupAddress(QLatin1String("224.0.0.251"));
 
         QUdpSocket sendSocket, recvSocket;
 
-        bool bindSucceeded = sendSocket.bind(localAddress, 0);
+        bool bindSucceeded = recvSocket.bind(QHostAddress::Any, MDNS_PORT, QUdpSocket::ReuseAddressHint | QUdpSocket::ShareAddress);
         if (!bindSucceeded)
             continue;
 
-        bindSucceeded = recvSocket.bind(QHostAddress::Any, MDNS_PORT, QUdpSocket::ReuseAddressHint | QUdpSocket::ShareAddress);
-        
-        if (!bindSucceeded)
-            continue;
-
-        if (!multicastJoinGroup(recvSocket, groupAddress, localAddress))      continue;
+        if (!multicastJoinGroup(recvSocket, groupAddress, interface.address))      continue;
 
         MDNSPacket request;
         MDNSPacket response;
@@ -117,8 +109,8 @@ QnResourceList QnMdnsResourceSearcher::findResources()
 
         while(time.elapsed() < 200)
         {
-            checkSocket(recvSocket, result, localAddress);
-            checkSocket(sendSocket, result, localAddress);
+            checkSocket(recvSocket, result, interface.address);
+            checkSocket(sendSocket, result, interface.address);
             QnSleep::msleep(10); // to avoid 100% cpu usage
       
         }

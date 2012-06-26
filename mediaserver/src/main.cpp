@@ -148,12 +148,12 @@ QString defaultLocalAddress(const QHostAddress& target)
 
     {
         // if nothing else works use first enabled hostaddr
-        QList<QHostAddress> ipaddrs = getAllIPv4Addresses();
+        QList<QnInterfaceAndAddr> interfaces = getAllIPv4Interfaces();
 
-        for (int i = 0; i < ipaddrs.size();++i)
+        for (int i = 0; i < interfaces.size();++i)
         {
             QUdpSocket socket;
-            if (!socket.bind(ipaddrs.at(i), 0))
+            if (!socket.bind(interfaces.at(i).address, 0))
                 continue;
 
             QString result = socket.localAddress().toString();

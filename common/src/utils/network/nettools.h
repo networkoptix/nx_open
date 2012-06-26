@@ -10,13 +10,25 @@ struct CLSubNetState;
 
 typedef QList<quint32> CLIPList;
 
+struct QnInterfaceAndAddr
+{
+    QnInterfaceAndAddr(QString name_, QHostAddress address_)
+        : name(name_),
+          address(address_)
+    {
+    }
+
+    QString name;
+    QHostAddress address;
+};
+
 QN_EXPORT QString MACToString (const unsigned char* mac);
 
 QN_EXPORT unsigned char* MACsToByte(const QString& macs, unsigned char* pbyAddress);
 QN_EXPORT unsigned char* MACsToByte2(const QString& macs, unsigned char* pbyAddress);
 
-// returns list of IPv4 addresses of current machine
-QN_EXPORT QList<QHostAddress> getAllIPv4Addresses();
+// returns list of interfaces which has at least one IPv4 addresse on current machine
+QList<QnInterfaceAndAddr> getAllIPv4Interfaces();
 
 // returns list of IPv4 addresses of current machine. Skip 127.0.0.1 and addresses we can't bind to.
 QList<QHostAddress> allLocalAddresses();

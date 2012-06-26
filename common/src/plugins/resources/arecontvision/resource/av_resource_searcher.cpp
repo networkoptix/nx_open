@@ -37,60 +37,22 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
 {
     QnResourceList result;
 
-    QList<QHostAddress> ipaddrs = getAllIPv4Addresses();
-#if 0
-    CL_LOG(cl_logDEBUG1)
+    foreach (QnInterfaceAndAddr interface, getAllIPv4Interfaces())
     {
-        QString log;
-        QTextStream(&log) << "CLAreconVisionDevice::findDevices  found " << ipaddrs.size() << " adapter(s) with IPV4";
-        cl_log.log(log, cl_logDEBUG1);
-
-        for (int i = 0; i < ipaddrs.size();++i)
-        {
-            QString slog;
-            QTextStream(&slog) << ipaddrs.at(i).toString();
-            cl_log.log(slog, cl_logDEBUG1);
-        }
-    }
-#endif
-
-#ifdef Q_OS_LINUX
-    struct ifaddrs *ifaddr, *ifa;
-    int family, s;
-    char host[NI_MAXHOST];
-
-    if (getifaddrs(&ifaddr) == -1)
-    {
-        cl_log.log(cl_logWARNING, "QnPlArecontResourceSearcher::findResources(): Can't get interfaces list: %s", strerror(errno));
-        return result;
-    }
-
-    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
-    {
-        family = ifa->ifa_addr->sa_family;
-
-        if (family != AF_INET)
-            continue;
-
         QUdpSocket sock;
+#ifdef Q_OS_LINUX
         sock.bind(0);
 
-        int res = setsockopt(sock.socketDescriptor(), SOL_SOCKET, SO_BINDTODEVICE, ifa->ifa_name, strlen(ifa->ifa_name));
+        int res = setsockopt(sock.socketDescriptor(), SOL_SOCKET, SO_BINDTODEVICE, interface.name.constData(), interface.name.length());
         if (res != 0)
         {
-            cl_log.log(cl_logWARNING, "QnPlArecontResourceSearcher::findResources(): Can't bind to interface %s: %s", ifa->ifa_name, strerror(errno));
+            cl_log.log(cl_logWARNING, "QnPlArecontResourceSearcher::findResources(): Can't bind to interface %s: %s", interface.name.constData(), strerror(errno));
             continue;
         }
-
-#else // elif defined Q_OS_WIN
-    for (int i = 0; i < ipaddrs.size();++i)
-    {
-        QUdpSocket sock;
-
-        if (!sock.bind(ipaddrs.at(i), 0))
+#else // lif defined Q_OS_WIN
+        if (!sock.bind(interface.address, 0))
            continue;
 #endif
-
 
         // sending broadcast
         QByteArray datagram = "Arecont_Vision-AV2000\1";
@@ -172,13 +134,7 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
 
                 resource->setHostAddress(sender, QnDomainMemory);
                 resource->setMAC(mac);
-
-#ifdef Q_OS_LINUX
-                resource->setDiscoveryAddr(QHostAddress(ntohl(((sockaddr_in*)ifa->ifa_addr)->sin_addr.s_addr)));
-#elif defined Q_OS_WIN
-                resource->setDiscoveryAddr(ipaddrs.at(i));
-#endif
-
+                resource->setDiscoveryAddr(interface.address);
                 resource->setName("ArecontVision_Abstract");
 
 

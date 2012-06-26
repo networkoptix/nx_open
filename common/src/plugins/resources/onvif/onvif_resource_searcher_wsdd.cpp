@@ -81,41 +81,29 @@ int gsoapFsend(struct soap *soap, const char *s, size_t n)
 
 void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
 {
-#ifdef Q_OS_LINUX
-    struct ifaddrs *ifaddr, *ifa;
-    char hostBuf[NI_MAXHOST + 1];
-
-    if (getifaddrs(&ifaddr) == -1) {
-        qWarning() << "OnvifResourceSearcherWsdd::findEndpoints(): Can't get interfaces list: " << strerror(errno);
-        return;
-    }
-
-    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
+    foreach(QnInterfaceAndAddr interface, getAllIPv4Interfaces())
     {
-        if (ifa->ifa_addr->sa_family != AF_INET)
-            continue;
+        QString host(interface.address.toString());
 
-        QHostAddress localAddress(ntohl(((sockaddr_in*)ifa->ifa_addr)->sin_addr.s_addr));
-        if (localAddress == QHostAddress::LocalHost)
-            continue;
-
-#elif defined Q_OS_WIN
-    QList<QHostAddress> localAddresses = getAllIPv4Addresses();
-
-    foreach(QHostAddress localAddress, localAddresses)
-    {
-        QString host(localAddress.toString());
-#endif
-        qDebug() << "OnvifResourceSearcherWsdd::findEndpoints(): Binding to Interface: " << localAddress.toString();
+        qDebug() << "OnvifResourceSearcherWsdd::findEndpoints(): Binding to Interface: " << interface.address.toString();
 
         QUdpSocket qSocket;
-        if (!qSocket.bind(localAddress, 0)) 
-        {
-            qWarning() << "OnvifResourceSearcherWsdd::findEndpoints: QUdpSocket.bind failed. Interface: " << localAddress.toString();
+
+#ifdef Q_OS_LINUX
+        int res = setsockopt(qSocket.socketDescriptor(), SOL_SOCKET, SO_BINDTODEVICE, interface.name.constData(), interface.name.length());
+        if (res != 0) {
+            qWarning() << "OnvifResourceSearcherWsdd::findResources(): Can't bind to interface " << interface.name << ": " << strerror(errno);
             continue;
         }
+#else
+        if (!qSocket.bind(localAddress, 0))
+        {
+            qWarning() << "OnvifResourceSearcherWsdd::findEndpoints: QUdpSocket.bind failed. Interface: " << interface.address.toString();
+            continue;
+        }
+#endif
 
-        QStringList addrPrefixes = getAddrPrefixes(localAddress.toString());
+        QStringList addrPrefixes = getAddrPrefixes(interface.address.toString());
         wsddProxy soapWsddProxy(SOAP_IO_UDP);
         soapWsddProxy.soap->recv_timeout = -1000000;
         soapWsddProxy.soap->user = &qSocket;
@@ -126,20 +114,12 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
         soapWsddProxy.soap->socket = qSocket.socketDescriptor();
         soapWsddProxy.soap->master = qSocket.socketDescriptor();
 
-#ifdef Q_OS_LINUX
-        int res = setsockopt(qSocket.socketDescriptor(), SOL_SOCKET, SO_BINDTODEVICE, ifa->ifa_name, strlen(ifa->ifa_name));
-        if (res != 0) {
-            qWarning() << "QnPlDlinkResourceSearcher::findResources(): Can't bind to interface " << ifa->ifa_name << ": " << strerror(errno);
-            continue;
-        }
-#endif
-
         wsdd__ProbeType wsddProbe;
         wsa__EndpointReferenceType replyTo;
         fillWsddStructs(wsddProbe, replyTo);
 
         char* messageID = const_cast<char*>(soap_wsa_rand_uuid(soapWsddProxy.soap));
-        qDebug() << "OnvifResourceSearcherWsdd::findEndpoints: MessageID: " << messageID << ". Interface: " << localAddress.toString();
+        qDebug() << "OnvifResourceSearcherWsdd::findEndpoints: MessageID: " << messageID << ". Interface: " << interface.address.toString();
 
         //String should not be changed (possibly, declaration of char* instead of const char*,- gsoap bug
         //So const_cast should be safety
@@ -152,7 +132,7 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
         {
             qWarning() << "OnvifResourceSearcherWsdd::findEndpoints: (Send) SOAP failed. GSoap error code: "
                        << soapRes << SoapErrorHelper::fetchDescription(soapWsddProxy.soap_fault())
-                       << ". Interface: " << localAddress.toString();
+                       << ". Interface: " << interface.address.toString();
             soap_end(soapWsddProxy.soap);
             continue;
         }
@@ -170,7 +150,7 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
             {
                 if (soapRes == SOAP_EOF) 
                 {
-                    qDebug() << "OnvifResourceSearcherWsdd::findEndpoints: All devices found. Interface: " << localAddress.toString();
+                    qDebug() << "OnvifResourceSearcherWsdd::findEndpoints: All devices found. Interface: " << interface.address.toString();
                     soap_end(soapWsddProxy.soap);
                     break;
                 } 
@@ -178,13 +158,13 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
                 {
                     qWarning() << "OnvifResourceSearcherWsdd::findEndpoints: SOAP failed. GSoap error code: "
                                << soapRes << SoapErrorHelper::fetchDescription(soapWsddProxy.soap_fault())
-                               << ". Interface: " << localAddress.toString();
+                               << ". Interface: " << interface.address.toString();
                     soap_end(soapWsddProxy.soap);
                     continue;
                 }
             }
 
-            addEndpointToHash(result, wsddProbeMatches.wsdd__ProbeMatches, soapWsddProxy.soap->header, addrPrefixes, localAddress.toString());
+            addEndpointToHash(result, wsddProbeMatches.wsdd__ProbeMatches, soapWsddProxy.soap->header, addrPrefixes, interface.address.toString());
 
             if (cl_log.logLevel() >= cl_logDEBUG1) {
                 printProbeMatches(wsddProbeMatches.wsdd__ProbeMatches, soapWsddProxy.soap->header);
