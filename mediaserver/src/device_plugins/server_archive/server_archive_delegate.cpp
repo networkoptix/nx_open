@@ -111,7 +111,7 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
 
     DeviceFileCatalog::FindMethod findMethod = m_reverseMode ? DeviceFileCatalog::OnRecordHole_PrevChunk : DeviceFileCatalog::OnRecordHole_NextChunk;
     m_dialQualityHelper.findDataForTime(timeMs, newChunk, newChunkCatalog, findMethod);
-    if (!m_reverseMode && newChunk.endTimeMs() < time)
+    if (!m_reverseMode && newChunk.endTimeMs() < timeMs)
     {
         m_eof = true;
         return time;
