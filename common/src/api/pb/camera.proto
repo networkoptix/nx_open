@@ -11,8 +11,8 @@ message Camera {
        Default      = 0;
        HardwareGrid = 1;
        SoftwareGrid = 2;
-       MotionGrid   = 3;
-       NoMotion     = 4;
+       MotionWindow = 4;
+       NoMotion     = 8;
     }
 
     enum Quality {
