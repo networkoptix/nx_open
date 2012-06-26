@@ -45,6 +45,7 @@ private slots:
     void at_cameraScheduleWidget_scheduleTasksChanged();
     void at_cameraScheduleWidget_scheduleEnabledChanged();
     void at_enableAudioCheckBox_clicked();
+    void updateMaxFPS();
 private:
     void setHasChanges(bool hasChanges);
 
@@ -57,6 +58,7 @@ private:
     bool m_hasScheduleChanges;
     bool m_hasScheduleEnabledChanges;
     bool m_readOnly;
+    bool m_inUpdateMaxFps;
 };
 
 #endif // QN_MULTIPLE_CAMERA_SETTINGS_DIALOG_H

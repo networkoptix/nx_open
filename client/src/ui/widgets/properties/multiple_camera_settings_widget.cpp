@@ -18,7 +18,8 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
     ui(new Ui::MultipleCameraSettingsWidget),
     m_hasChanges(false),
     m_hasScheduleChanges(false),
-    m_readOnly(false)
+    m_readOnly(false),
+    m_inUpdateMaxFps(false)
 {
     ui->setupUi(this);
 
@@ -26,6 +27,7 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
     connect(ui->checkBoxEnableAudio,    SIGNAL(stateChanged(int)),              this,   SLOT(at_dataChanged()));
     connect(ui->checkBoxEnableAudio,    SIGNAL(clicked()),                  this,       SLOT(at_enableAudioCheckBox_clicked()));
     connect(ui->passwordEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dataChanged()));
+    connect(ui->cameraScheduleWidget,   SIGNAL(gridParamsChanged()),            this,   SLOT(updateMaxFPS()));
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleTasksChanged()),         this,   SLOT(at_cameraScheduleWidget_scheduleTasksChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleEnabledChanged()),       this,   SLOT(at_cameraScheduleWidget_scheduleEnabledChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(moreLicensesRequested()),        this,   SIGNAL(moreLicensesRequested()));
@@ -138,7 +140,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
         /* Aggregate camera parameters first. */
 
         QSet<QString> logins, passwords;
-        int maxFps = std::numeric_limits<int>::max();
+        
         ui->checkBoxEnableAudio->setEnabled(true);
     
         bool firstCamera = true;
@@ -146,7 +148,6 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
         {
             logins.insert(camera->getAuth().user());
             passwords.insert(camera->getAuth().password());
-            maxFps = qMin(maxFps, camera->getMaxFps());
 
             if (!camera->isAudioSupported())
                 ui->checkBoxEnableAudio->setEnabled(false);
@@ -159,6 +160,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
 
             firstCamera = false;
         }
+        updateMaxFPS();
 
         bool isScheduleEqual = true;
         QList<QnScheduleTask::Data> scheduleTasksData;
@@ -193,8 +195,6 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
             ui->passwordEdit->setText(QString());
             ui->passwordEdit->setPlaceholderText(tr("<multiple values>", "PasswordEdit"));
         }
-
-        ui->cameraScheduleWidget->setMaxFps(maxFps);
 
         ui->cameraScheduleWidget->setChangesDisabled(!isScheduleEqual);
         if(isScheduleEqual) {
@@ -265,4 +265,33 @@ void QnMultipleCameraSettingsWidget::at_enableAudioCheckBox_clicked()
     ui->checkBoxEnableAudio->setTristate(false);
     if (state == Qt::PartiallyChecked)
         ui->checkBoxEnableAudio->setCheckState(Qt::Checked);
+}
+
+void QnMultipleCameraSettingsWidget::updateMaxFPS(){
+    if(m_cameras.empty())
+        return;
+
+    if (m_inUpdateMaxFps)
+        return; /* Do not show message twice. */
+
+    m_inUpdateMaxFps = true;
+
+    int maxFps = std::numeric_limits<int>::max();
+    foreach (QnVirtualCameraResourcePtr camera, m_cameras) 
+    {
+        int cameraFps =camera->getMaxFps();
+        if ((camera->supportedMotionType() & MT_SoftwareGrid)
+            || ui->cameraScheduleWidget->isSecondaryStreamReserver())
+            cameraFps -= 2;
+        maxFps = qMin(maxFps, cameraFps);
+    }
+    float currentMaxFps = ui->cameraScheduleWidget->getGridMaxFps();
+    if (currentMaxFps > maxFps)
+    {
+        QMessageBox::warning(this, tr("Warning. FPS value is too high"), 
+            tr("For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps dropped down to %2").arg(currentMaxFps).arg(maxFps));
+    }
+    ui->cameraScheduleWidget->setMaxFps(maxFps);
+
+    m_inUpdateMaxFps = false;
 }
