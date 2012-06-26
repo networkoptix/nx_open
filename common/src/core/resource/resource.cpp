@@ -99,6 +99,15 @@ void QnResource::update(QnResourcePtr other)
 	setDisabled(other->m_disabled);
     emit resourceChanged();
 
+    QnParamList paramList = other->getResourceParamList();
+    foreach(QnParam param, paramList.list())
+    {
+        if (param.domain() == QnDomainDatabase)
+        {
+            setParam(param.name(), param.value(), QnDomainDatabase);
+        }
+    }
+
     foreach (QnResourceConsumer *consumer, m_consumers)
         consumer->afterUpdate();
 }
