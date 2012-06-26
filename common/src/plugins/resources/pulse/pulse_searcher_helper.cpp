@@ -30,25 +30,25 @@ QList<QnPlPulseSearcherHelper::WSResult> QnPlPulseSearcherHelper::findResources(
 {
     QMap<QString, WSResult> result;
 
-    foreach (QnInterfaceAndAddr interface, getAllIPv4Interfaces())
+    foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
     {
         QUdpSocket socket;
 #ifdef Q_OS_LINUX
         socket.bind(0);
 
-        int res = setsockopt(socket.socketDescriptor(), SOL_SOCKET, SO_BINDTODEVICE, interface.name.constData(), interface.name.length());
+        int res = setsockopt(socket.socketDescriptor(), SOL_SOCKET, SO_BINDTODEVICE, interface.name.constData(), iface.name.length());
         if (res != 0)
         {
-            cl_log.log(cl_logWARNING, "QnPlPulseSearcherHelper::findResources(): Can't bind to interface %s: %s", interface.name.constData(), strerror(errno));
+            cl_log.log(cl_logWARNING, "QnPlPulseSearcherHelper::findResources(): Can't bind to interface %s: %s", iface.name.constData(), strerror(errno));
             continue;
         }
 #else // lif defined Q_OS_WIN
-        if (!socket.bind(interface.address, 0))
+        if (!socket.bind(iface.address, 0))
            continue;
 #endif
 
         QHostAddress groupAddress(QLatin1String("224.111.111.1"));
-        if (!multicastJoinGroup(socket, groupAddress, interface.address)) continue;
+        if (!multicastJoinGroup(socket, groupAddress, iface.address)) continue;
 
 		QByteArray requestDatagram;
 		requestDatagram.resize(43);
@@ -74,7 +74,7 @@ QList<QnPlPulseSearcherHelper::WSResult> QnPlPulseSearcherHelper::findResources(
             if (res.mac!="")
             {
                 res.ip = sender.toString();
-                res.disc_ip = interface.address.toString();
+                res.disc_ip = iface.address.toString();
                 result[res.mac] = res;
             }
 

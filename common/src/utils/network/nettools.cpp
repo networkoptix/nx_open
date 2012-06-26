@@ -12,15 +12,15 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces()
     {
         // speed optimization
         QMutexLocker lock(&mutex);
-        if (!lastResult.isEmpty() & timer.elapsed() < 5000)
+        if (!lastResult.isEmpty() && timer.elapsed() < 5000)
             return lastResult;
     }
 
     QList<QnInterfaceAndAddr> result;
 
-    foreach(QNetworkInterface interface, QNetworkInterface::allInterfaces())
+    foreach(QNetworkInterface iface, QNetworkInterface::allInterfaces())
     {
-        QList<QNetworkAddressEntry> addresses = interface.addressEntries();
+        QList<QNetworkAddressEntry> addresses = iface.addressEntries();
         foreach (const QNetworkAddressEntry& address, addresses)
         {
             if (address.ip().protocol() == QAbstractSocket::IPv4Protocol && address.ip() != QHostAddress::LocalHost)
@@ -59,7 +59,7 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces()
 
                 if (allowedInterfaces.isEmpty() || allowedInterfaces.contains(address.ip()))
                 {
-                    result.append(QnInterfaceAndAddr(interface.name(), address.ip()));
+                    result.append(QnInterfaceAndAddr(iface.name(), address.ip()));
                     break;
                 }
             }
@@ -78,12 +78,12 @@ QList<QHostAddress> allLocalAddresses()
     QList<QHostAddress> rez;
 
     // if nothing else works use first enabled hostaddr
-    foreach(const QnInterfaceAndAddr& interface, getAllIPv4Interfaces())
+    foreach(const QnInterfaceAndAddr& iface, getAllIPv4Interfaces())
     {
-        if (!QUdpSocket().bind(interface.address, 0))
+        if (!QUdpSocket().bind(iface.address, 0))
             continue;
 
-        rez << interface.address;
+        rez << iface.address;
     }
 
     if (rez.isEmpty())

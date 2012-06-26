@@ -89,15 +89,15 @@ void OnvifResourceSearcherWsdd::updateInterfacesListenSockets() const
 {
     QMutexLocker lock(&m_mutex);
 
-    QList<QHostAddress> localAddresses = getAllIPv4Addresses();
+    QList<QnInterfaceAndAddr> interfaces = getAllIPv4Interfaces();
 
     //Remove outdated
     QHash<QString, QUdpSocketPtr>::iterator it = m_recvSocketList.begin();
     while (it != m_recvSocketList.end()) {
         bool found = false;
-        foreach(QHostAddress localAddress, localAddresses)
+        foreach(QnInterfaceAndAddr iface, interfaces)
         {
-            if (m_recvSocketList.contains(localAddress.toString())) {
+            if (m_recvSocketList.contains(iface.address.toString())) {
                 found = true;
                 break;
             }
@@ -112,9 +112,9 @@ void OnvifResourceSearcherWsdd::updateInterfacesListenSockets() const
     }
 
     //Add new
-    foreach(QHostAddress localAddress, localAddresses)
+    foreach(QnInterfaceAndAddr iface, interfaces)
     {
-        QString key = localAddress.toString();
+        QString key = iface.address.toString();
 
         QHash<QString, QUdpSocketPtr>::iterator it = m_recvSocketList.find(key);
         if (it != m_recvSocketList.end()) {
@@ -130,7 +130,7 @@ void OnvifResourceSearcherWsdd::updateInterfacesListenSockets() const
             continue;
         }
 
-        if (!multicastJoinGroup(*(it.value()), WSDD_GROUP_ADDRESS, localAddress)) {
+        if (!multicastJoinGroup(*(it.value()), WSDD_GROUP_ADDRESS, iface.address)) {
             qWarning() << "OnvifResourceSearcherWsdd::updateInterfacesListenSockets: multicast join group failed. Address: " << key;
             continue;
         }
@@ -203,29 +203,29 @@ void OnvifResourceSearcherWsdd::findHelloEndpoints(EndpointInfoHash& result) con
 
 void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
 {
-    foreach(QnInterfaceAndAddr interface, getAllIPv4Interfaces())
+    foreach(QnInterfaceAndAddr iface, getAllIPv4Interfaces())
     {
-        QString host(interface.address.toString());
+        QString host(iface.address.toString());
 
-        qDebug() << "OnvifResourceSearcherWsdd::findEndpoints(): Binding to Interface: " << interface.address.toString();
+        qDebug() << "OnvifResourceSearcherWsdd::findEndpoints(): Binding to Interface: " << iface.address.toString();
 
         QUdpSocket qSocket;
 
 #ifdef Q_OS_LINUX
-        int res = setsockopt(qSocket.socketDescriptor(), SOL_SOCKET, SO_BINDTODEVICE, interface.name.constData(), interface.name.length());
+        int res = setsockopt(qSocket.socketDescriptor(), SOL_SOCKET, SO_BINDTODEVICE, iface.name.constData(), iface.name.length());
         if (res != 0) {
-            qWarning() << "OnvifResourceSearcherWsdd::findResources(): Can't bind to interface " << interface.name << ": " << strerror(errno);
+            qWarning() << "OnvifResourceSearcherWsdd::findResources(): Can't bind to interface " << iface.name << ": " << strerror(errno);
             continue;
         }
 #else
-        if (!qSocket.bind(localAddress, 0)) 
+        if (!qSocket.bind(iface.address, 0)) 
         {
-            qWarning() << "OnvifResourceSearcherWsdd::findEndpoints: QUdpSocket.bind failed. Interface: " << interface.address.toString();
+            qWarning() << "OnvifResourceSearcherWsdd::findEndpoints: QUdpSocket.bind failed. Interface: " << iface.address.toString();
             continue;
         }
 #endif
 
-        QStringList addrPrefixes = getAddrPrefixes(interface.address.toString());
+        QStringList addrPrefixes = getAddrPrefixes(iface.address.toString());
         wsddProxy soapWsddProxy(SOAP_IO_UDP);
         soapWsddProxy.soap->recv_timeout = 1;
         soapWsddProxy.soap->user = &qSocket;
@@ -241,7 +241,7 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
         fillWsddStructs(wsddProbe, replyTo);
 
         char* messageID = const_cast<char*>(soap_wsa_rand_uuid(soapWsddProxy.soap));
-        qDebug() << "OnvifResourceSearcherWsdd::findEndpoints: MessageID: " << messageID << ". Interface: " << interface.address.toString();
+        qDebug() << "OnvifResourceSearcherWsdd::findEndpoints: MessageID: " << messageID << ". Interface: " << iface.address.toString();
 
         //String should not be changed (possibly, declaration of char* instead of const char*,- gsoap bug
         //So const_cast should be safety
@@ -254,7 +254,7 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
         {
             qWarning() << "OnvifResourceSearcherWsdd::findEndpoints: (Send) SOAP failed. GSoap error code: "
                        << soapRes << SoapErrorHelper::fetchDescription(soapWsddProxy.soap_fault())
-                       << ". Interface: " << interface.address.toString();
+                       << ". Interface: " << iface.address.toString();
             soap_end(soapWsddProxy.soap);
             continue;
         }
@@ -272,7 +272,7 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
             {
                 if (soapRes == SOAP_EOF) 
                 {
-                    qDebug() << "OnvifResourceSearcherWsdd::findEndpoints: All devices found. Interface: " << interface.address.toString();
+                    qDebug() << "OnvifResourceSearcherWsdd::findEndpoints: All devices found. Interface: " << iface.address.toString();
                     soap_end(soapWsddProxy.soap);
                     break;
                 } 
@@ -280,15 +280,18 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
                 {
                     qWarning() << "OnvifResourceSearcherWsdd::findEndpoints: SOAP failed. GSoap error code: "
                                << soapRes << SoapErrorHelper::fetchDescription(soapWsddProxy.soap_fault())
-                               << ". Interface: " << interface.address.toString();
+                               << ". Interface: " << iface.address.toString();
                     soap_end(soapWsddProxy.soap);
                     continue;
                 }
             }
 
-            addEndpointToHash(result, wsddProbeMatches.wsdd__ProbeMatches, soapWsddProxy.soap->header, addrPrefixes, localAddress.toString());
+            if (wsddProbeMatches.wsdd__ProbeMatches)
+            {
+                addEndpointToHash(result, wsddProbeMatches.wsdd__ProbeMatches->ProbeMatch, soapWsddProxy.soap->header, addrPrefixes, iface.address.toString());
 
-            if (cl_log.logLevel() >= cl_logDEBUG1) {
+                if (cl_log.logLevel() >= cl_logDEBUG1)
+                {
                     printProbeMatches(wsddProbeMatches.wsdd__ProbeMatches->ProbeMatch, soapWsddProxy.soap->header);
                 }
             }

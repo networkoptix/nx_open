@@ -63,20 +63,20 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
 {
     QnResourceList result;
 
-    foreach (QnInterfaceAndAddr interface, getAllIPv4Interfaces())
+    foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
     {
         QUdpSocket sock;
 #ifdef Q_OS_LINUX
         sock.bind(0);
 
-        int res = setsockopt(sock.socketDescriptor(), SOL_SOCKET, SO_BINDTODEVICE, interface.name.constData(), interface.name.length());
+        int res = setsockopt(sock.socketDescriptor(), SOL_SOCKET, SO_BINDTODEVICE, iface.name.constData(), iface.name.length());
         if (res != 0)
         {
-            cl_log.log(cl_logWARNING, "QnPlDlinkResourceSearcher::findResources(): Can't bind to interface %s: %s", interface.name.constData(), strerror(errno));
+            cl_log.log(cl_logWARNING, "QnPlDlinkResourceSearcher::findResources(): Can't bind to interface %s: %s", iface.name.constData(), strerror(errno));
             continue;
         }
 #else // lif defined Q_OS_WIN
-        if (!sock.bind(interface.address, 0))
+        if (!sock.bind(iface.address, 0))
            continue;
 #endif
 
@@ -158,7 +158,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             resource->setMAC(smac);
             resource->setHostAddress(sender, QnDomainMemory);
 
-            resource->setDiscoveryAddr(interface.address);
+            resource->setDiscoveryAddr(iface.address);
 
             result.push_back(resource);
 
