@@ -67,40 +67,22 @@ QnResourceList QnMdnsResourceSearcher::findResources()
 {
     QnResourceList result;
 
-    QList<QHostAddress> localAddresses = getAllIPv4Addresses();
-#if 0
-    CL_LOG(cl_logDEBUG1)
+    foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
     {
-        QString log;
-        QTextStream(&log) << "QnMdnsResourceSearcher::findDevices  found " << localAddresses.size() << " adapter(s) with IPV4";
-        cl_log.log(log, cl_logDEBUG1);
+        QUdpSocket sock;
 
-        for (int i = 0; i < localAddresses.size();++i)
-        {
-            QString slog;
-            QTextStream(&slog) << localAddresses.at(i).toString();
-            cl_log.log(slog, cl_logDEBUG1);
-        }
-    }
-#endif
+        if (!bindToInterface(sock, iface))
+            continue;
 
-
-    foreach(QHostAddress localAddress, localAddresses)
-    {
         QHostAddress groupAddress(QLatin1String("224.0.0.251"));
 
         QUdpSocket sendSocket, recvSocket;
 
-        bool bindSucceeded = sendSocket.bind(localAddress, 0);
+        bool bindSucceeded = recvSocket.bind(QHostAddress::Any, MDNS_PORT, QUdpSocket::ReuseAddressHint | QUdpSocket::ShareAddress);
         if (!bindSucceeded)
             continue;
 
-        bindSucceeded = recvSocket.bind(QHostAddress::Any, MDNS_PORT, QUdpSocket::ReuseAddressHint | QUdpSocket::ShareAddress);
-        
-        if (!bindSucceeded)
-            continue;
-
-        if (!multicastJoinGroup(recvSocket, groupAddress, localAddress))      continue;
+        if (!multicastJoinGroup(recvSocket, groupAddress, iface.address))      continue;
 
         MDNSPacket request;
         MDNSPacket response;
@@ -117,8 +99,8 @@ QnResourceList QnMdnsResourceSearcher::findResources()
 
         while(time.elapsed() < 200)
         {
-            checkSocket(recvSocket, result, localAddress);
-            checkSocket(sendSocket, result, localAddress);
+            checkSocket(recvSocket, result, iface.address);
+            checkSocket(sendSocket, result, iface.address);
             QnSleep::msleep(10); // to avoid 100% cpu usage
       
         }
