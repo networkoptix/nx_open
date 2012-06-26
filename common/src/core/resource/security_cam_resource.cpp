@@ -238,7 +238,7 @@ MotionType QnSecurityCamResource::getDefaultMotionType() const
             else if (s1 == QString("motionwindow"))
                 return MT_MotionWindow;
         }
-        return MT_NoMotion;
+        return MT_HardwareGrid; // it is hack! change to MT_NoMotion!!! //MT_NoMotion;
     }
     else {
         return MT_MotionWindow;

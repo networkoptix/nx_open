@@ -20,7 +20,8 @@ namespace {
 QnResourceDiscoveryManager::QnResourceDiscoveryManager():
     m_server(false),
     m_foundSmth(true),
-    m_ready(false)
+    m_ready(false),
+    m_lastDiscoveryCycle(0)
 {
 }
 
@@ -110,6 +111,8 @@ void QnResourceDiscoveryManager::run()
         QMutexLocker locker(&m_searchersListMutex);
         searchersList = m_searchersList;
     }
+
+    m_lastDiscoveryCycle = 0;
 
     foreach (QnAbstractResourceSearcher *searcher, searchersList)
     {
