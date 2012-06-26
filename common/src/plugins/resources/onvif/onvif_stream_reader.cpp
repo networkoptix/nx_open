@@ -8,6 +8,49 @@
 #include "utils/network/tcp_connection_priv.h"
 
 //
+// LocalVideoEncoder
+//
+
+class LocalVideoEncoder: public VideoEncoder
+{
+    /*Resolution = new onvifXsd__VideoResolution();
+    RateControl = new onvifXsd__VideoRateControl();
+    MPEG4 = NULL;
+    H264 = NULL;
+    Multicast = NULL;
+    std::string SessionTimeout;
+    std::vector<char * >__any;
+    char *__anyAttribute;*/
+};
+
+//
+// LocalVideoSource
+//
+
+class LocalVideoSource: public VideoSource
+{
+
+};
+
+//
+// LocalAudioEncoder
+//
+
+class LocalAudioEncoder: public AudioEncoder
+{
+
+};
+
+//
+// LocalAudioSource
+//
+
+class LocalAudioSource: public AudioSource
+{
+
+};
+
+//
 // struct CameraInfo
 //
 
@@ -746,7 +789,7 @@ AudioEncoder* QnOnvifStreamReader::fetchUpdateAudioEncoder(MediaSoapWrapper& soa
 
     int soapRes = soapWrapper.getAudioEncoderConfigurations(request, response);
     if (soapRes != SOAP_OK) {
-        qCritical() << "QnOnvifStreamReader::fetchUpdateAudioEncoder: can't get video encoders from camera (" 
+        qCritical() << "QnOnvifStreamReader::fetchUpdateAudioEncoder: can't get audio encoders from camera (" 
             << (isPrimary? "primary": "secondary") 
             << "). URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << m_onvifRes->getUniqueId();
         return 0;
