@@ -559,6 +559,9 @@ void QnResourceDiscoveryManager::markOfflineIfNeeded()
         if (res->checkFlags(QnResource::server_live_cam)) // if this is camera from mediaserver on the client
             continue;
 
+        if (res->isDisabled()) // if this is camera from other mediaserver 
+            continue;
+
         QDateTime ldt = netRes->getLastDiscoveredTime();
         QDateTime currentT = qnSyncTime->currentDateTime();
 
