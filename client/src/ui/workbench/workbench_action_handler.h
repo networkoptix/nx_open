@@ -33,7 +33,7 @@ namespace detail {
 		QnResourceStatusReplyProcessor(QnWorkbenchActionHandler *handler, const QnVirtualCameraResourceList &resources, const QList<int> &oldDisabledFlags);
 
     public slots:
-        void at_replyReceived(int status, const QByteArray& errorString, const QnResourceList &resources, int handle);
+        void at_replyReceived(int status, const QByteArray &errorString, const QnResourceList &resources, int handle);
 
     private:
         QWeakPointer<QnWorkbenchActionHandler> m_handler;
@@ -63,15 +63,49 @@ namespace detail {
         }
 
     signals:
-        void finished(int status, const QByteArray& errorString, const QnResourceList &resources, int handle);
+        void finished(int status, const QByteArray &errorString, const QnResourceList &resources, int handle);
 
     public slots:
-        void at_replyReceived(int status, const QByteArray& errorString, const QnResourceList &resources, int handle);
+        void at_replyReceived(int status, const QByteArray &errorString, const QnResourceList &resources, int handle);
 
     private:
         int m_status;
         QByteArray m_errorString;
         QnResourceList m_resources;
+        int m_handle;
+    };
+
+    class QnConnectReplyProcessor: public QObject {
+        Q_OBJECT;
+    public:
+        QnConnectReplyProcessor(QObject *parent = NULL);
+
+        int status() const {
+            return m_status;
+        }
+
+        const QByteArray &errorString() const {
+            return m_errorString;
+        }
+
+        const QnConnectInfoPtr &info() const {
+            return m_connectInfo;
+        }
+
+        int handle() const {
+            return m_handle;
+        }
+
+    signals:
+        void finished(int status, const QByteArray &errorString, const QnConnectInfoPtr &connectInfo, int handle);
+
+    public slots:
+        void at_replyReceived(int status, const QByteArray &errorString, const QnConnectInfoPtr &connectInfo, int handle);
+
+    private:
+        int m_status;
+        QByteArray m_errorString;
+        QnConnectInfoPtr m_connectInfo;
         int m_handle;
     };
 

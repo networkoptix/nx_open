@@ -17,6 +17,7 @@ class Class##Private; \
 class Class##Private; \
     Q_DECLARE_PRIVATE(Class);
 
+// TODO: what the hell these typedefs are doing here? this is an include for base-derived defines!
 typedef QPair<QString, QString> QnRequestParam;
 typedef QList<QnRequestParam> QnRequestParamList;
 
