@@ -73,8 +73,7 @@ QnAbstractMediaDataPtr QnThumbnailsArchiveDelegate::getNextData()
 
     bool delegateForMediaStep = m_baseDelegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanProcessMediaStep;
     bool holeDetected = false;
-    if (!delegateForMediaStep) 
-    {
+    if (!delegateForMediaStep) {
         qint64 seekRez = m_baseDelegate->seek(m_currentPos, true);
         holeDetected = seekRez > m_currentPos;
         m_currentPos = qMax(m_currentPos, seekRez);
@@ -91,13 +90,15 @@ QnAbstractMediaDataPtr QnThumbnailsArchiveDelegate::getNextData()
         return QnAbstractMediaDataPtr();
     }
 
-    if (result && !delegateForMediaStep) {
-        if (holeDetected)
-            result->flags |= QnAbstractMediaData::MediaFlags_BOF;
-        else
-            result->flags &= ~QnAbstractMediaData::MediaFlags_BOF;
+    if (result) {
+        if (!delegateForMediaStep) {
+            if (holeDetected)
+                result->flags |= QnAbstractMediaData::MediaFlags_BOF;
+            else
+                result->flags &= ~QnAbstractMediaData::MediaFlags_BOF;
+        }
+        m_lastMediaTime = result->timestamp;
     }
-    m_lastMediaTime = result->timestamp;
 
     if (!delegateForMediaStep)
         m_currentPos += m_frameStep;
