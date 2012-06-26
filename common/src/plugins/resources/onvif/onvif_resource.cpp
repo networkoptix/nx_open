@@ -7,12 +7,13 @@
 #include "onvif_stream_reader.h"
 #include "onvif_helper.h"
 #include "utils/common/synctime.h"
+#include "utils/common/math.h"
 #include "onvif/soapDeviceBindingProxy.h"
 #include "onvif/soapMediaBindingProxy.h"
 #include "api/app_server_connection.h"
 
 const char* QnPlOnvifResource::MANUFACTURE = "OnvifDevice";
-static const float MAX_EPS = 0.02f;
+static const float MAX_EPS = 0.01f;
 static const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
 const char* QnPlOnvifResource::ONVIF_PROTOCOL_PREFIX = "http://";
 const char* QnPlOnvifResource::ONVIF_URL_SUFFIX = ":80/onvif/device_service";
@@ -297,8 +298,20 @@ ResolutionPair QnPlOnvifResource::getNearestResolution(const ResolutionPair& res
     double bestMatchCoeff = maxResolutionSquare > MAX_EPS ? (maxResolutionSquare / requestSquare) : INT_MAX;
 
     for (int i = 0; i < m_resolutionList.size(); ++i) {
-        float ar = getResolutionAspectRatio(m_resolutionList[i]);
-        if (qAbs(ar - aspectRatio) > MAX_EPS) {
+        ResolutionPair tmp;
+
+        tmp.first = qPower2Ceil(static_cast<unsigned int>(m_resolutionList[i].first), 8);
+        tmp.second = qPower2Floor(static_cast<unsigned int>(m_resolutionList[i].second), 8);
+        float ar1 = getResolutionAspectRatio(tmp);
+
+        tmp.first = qPower2Floor(static_cast<unsigned int>(m_resolutionList[i].first), 8);
+        tmp.second = qPower2Ceil(static_cast<unsigned int>(m_resolutionList[i].second), 8);
+        float ar2 = getResolutionAspectRatio(tmp);
+
+        float arMin = ar1 < ar2 ? ar1 : ar2;
+        float arMax = ar1 < ar2 ? ar2 : ar1;
+
+        if (aspectRatio < arMin || aspectRatio > arMax) {
             continue;
         }
 
