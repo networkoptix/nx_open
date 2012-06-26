@@ -180,10 +180,16 @@ void QnMulticodecRtpReader::openStream()
     QString url;
     if (m_request.length() > 0)
     {
-        if (m_request.startsWith(":"))
-            QTextStream(&url) << "rtsp://" << nres->getHostAddress().toString() << m_request;
-        else
-            QTextStream(&url) << "rtsp://" << nres->getHostAddress().toString() << "/" << m_request;
+        if (m_request.startsWith("rtsp://")) {
+            url = m_request;
+        }
+        else 
+        {
+            QTextStream(&url) << "rtsp://" << nres->getHostAddress().toString();
+            if (!m_request.startsWith('/'))
+                url += "/";
+            url += m_request;;
+        }
     }
     else
         QTextStream(&url) << "rtsp://" << nres->getHostAddress().toString();

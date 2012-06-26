@@ -702,6 +702,9 @@ QSize CLVideoStreamDisplay::getFrameSize() const {
     if (m_decoder.isEmpty())
         return QSize();
     QnAbstractVideoDecoder* dec = m_decoder.begin().value();
+    if(!dec)
+        return QSize();
+
     QMutexLocker mutex(&m_mtx);
     const AVFrame* lastFrame = dec->lastFrame();
     if(lastFrame)

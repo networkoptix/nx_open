@@ -135,7 +135,7 @@ void QnSingleCameraSettingsWidget::submitToResource() {
     }
 
     if (ui->cameraMotionButton->isChecked())
-        m_camera->setMotionType(m_camera->getDefaultMotionType());
+        m_camera->setMotionType(m_camera->getCameraBasedMotionType());
     else
         m_camera->setMotionType(MT_SoftwareGrid);
 

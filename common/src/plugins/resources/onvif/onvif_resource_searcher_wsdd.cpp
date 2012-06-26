@@ -95,20 +95,9 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
         if (ifa->ifa_addr->sa_family != AF_INET)
             continue;
 
-        int s = getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in), hostBuf, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
-        hostBuf[NI_MAXHOST] = '\0';
-        if (s != 0) {
-            qWarning() << "OnvifResourceSearcherWsdd::findEndpoints(): getnameinfo() failed: " << strerror(errno);
+        QHostAddress localAddress(ntohl(((sockaddr_in*)ifa->ifa_addr)->sin_addr.s_addr));
+        if (localAddress == QHostAddress::LocalHost)
             continue;
-        }
-
-        QString host(hostBuf);
-
-        if (host == LOCAL_ADDR) {
-            continue;
-        }
-
-        QHostAddress localAddress(host);
 
 #elif defined Q_OS_WIN
     QList<QHostAddress> localAddresses = getAllIPv4Addresses();
@@ -117,16 +106,16 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
     {
         QString host(localAddress.toString());
 #endif
-        qDebug() << "OnvifResourceSearcherWsdd::findEndpoints(): Binding to Interface: " << host;
+        qDebug() << "OnvifResourceSearcherWsdd::findEndpoints(): Binding to Interface: " << localAddress.toString();
 
         QUdpSocket qSocket;
         if (!qSocket.bind(localAddress, 0)) 
         {
-            qWarning() << "OnvifResourceSearcherWsdd::findEndpoints: QUdpSocket.bind failed. Interface: " << host;
+            qWarning() << "OnvifResourceSearcherWsdd::findEndpoints: QUdpSocket.bind failed. Interface: " << localAddress.toString();
             continue;
         }
 
-        QStringList addrPrefixes = getAddrPrefixes(host);
+        QStringList addrPrefixes = getAddrPrefixes(localAddress.toString());
         wsddProxy soapWsddProxy(SOAP_IO_UDP);
         soapWsddProxy.soap->recv_timeout = -1000000;
         soapWsddProxy.soap->user = &qSocket;
@@ -150,7 +139,7 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
         fillWsddStructs(wsddProbe, replyTo);
 
         char* messageID = const_cast<char*>(soap_wsa_rand_uuid(soapWsddProxy.soap));
-        qDebug() << "OnvifResourceSearcherWsdd::findEndpoints: MessageID: " << messageID << ". Interface: " << host;;
+        qDebug() << "OnvifResourceSearcherWsdd::findEndpoints: MessageID: " << messageID << ". Interface: " << localAddress.toString();
 
         //String should not be changed (possibly, declaration of char* instead of const char*,- gsoap bug
         //So const_cast should be safety
@@ -163,7 +152,7 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
         {
             qWarning() << "OnvifResourceSearcherWsdd::findEndpoints: (Send) SOAP failed. GSoap error code: "
                        << soapRes << SoapErrorHelper::fetchDescription(soapWsddProxy.soap_fault())
-                       << ". Interface: " << host;
+                       << ". Interface: " << localAddress.toString();
             soap_end(soapWsddProxy.soap);
             continue;
         }
@@ -181,7 +170,7 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
             {
                 if (soapRes == SOAP_EOF) 
                 {
-                    qDebug() << "OnvifResourceSearcherWsdd::findEndpoints: All devices found. Interface: " << host;
+                    qDebug() << "OnvifResourceSearcherWsdd::findEndpoints: All devices found. Interface: " << localAddress.toString();
                     soap_end(soapWsddProxy.soap);
                     break;
                 } 
@@ -189,13 +178,13 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
                 {
                     qWarning() << "OnvifResourceSearcherWsdd::findEndpoints: SOAP failed. GSoap error code: "
                                << soapRes << SoapErrorHelper::fetchDescription(soapWsddProxy.soap_fault())
-                               << ". Interface: " << host;
+                               << ". Interface: " << localAddress.toString();
                     soap_end(soapWsddProxy.soap);
                     continue;
                 }
             }
 
-            addEndpointToHash(result, wsddProbeMatches.wsdd__ProbeMatches, soapWsddProxy.soap->header, addrPrefixes, host);
+            addEndpointToHash(result, wsddProbeMatches.wsdd__ProbeMatches, soapWsddProxy.soap->header, addrPrefixes, localAddress.toString());
 
             if (cl_log.logLevel() >= cl_logDEBUG1) {
                 printProbeMatches(wsddProbeMatches.wsdd__ProbeMatches, soapWsddProxy.soap->header);

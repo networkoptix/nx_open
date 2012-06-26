@@ -11,10 +11,6 @@ QnArecontPanoramicResource::QnArecontPanoramicResource(const QString& name)
     setName(name);
 }
 
-bool QnArecontPanoramicResource::hasDualStreaming() const
-{
-    return false;
-}
 
 bool QnArecontPanoramicResource::getDescription()
 {

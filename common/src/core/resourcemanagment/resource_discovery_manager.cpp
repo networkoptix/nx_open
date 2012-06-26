@@ -490,8 +490,8 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
                 }
             }
 
-            Q_ASSERT(false);
-
+            ++it;
+            continue;
 
         }
         else

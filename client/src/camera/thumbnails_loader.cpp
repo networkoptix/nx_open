@@ -351,8 +351,8 @@ void QnThumbnailsLoader::process() {
             QnRtspClientArchiveDelegatePtr rtspDelegate(new QnRtspClientArchiveDelegate());
             rtspDelegate->setMultiserverAllowed(false);
             QnThumbnailsArchiveDelegatePtr thumbnailDelegate(new QnThumbnailsArchiveDelegate(rtspDelegate));
-            if (thumbnailDelegate->open(cameras[i]))
-                delegates << thumbnailDelegate;
+            rtspDelegate->setResource(cameras[i]);
+            delegates << thumbnailDelegate;
         }
     }
     else {
@@ -379,13 +379,14 @@ void QnThumbnailsLoader::process() {
         QnCompressedVideoDataPtr frame = client->getNextData().dynamicCast<QnCompressedVideoData>();
         if (frame) 
         {
-            if (!camera)
-                frame->flags &= ~QnAbstractMediaData::MediaFlags_BOF;
             CLFFmpegVideoDecoder decoder(frame->compressionType, frame, false);
             CLVideoDecoderOutput outFrame;
             outFrame.setUseExternalData(false);
 
             while (frame) {
+                if (!camera)
+                    frame->flags &= ~QnAbstractMediaData::MediaFlags_BOF;
+
                 timingsQueue << frame->timestamp;
                 frameFlags << frame->flags;
                 if (decoder.decode(frame, &outFrame)) 
@@ -450,7 +451,7 @@ void QnThumbnailsLoader::addThumbnail(const QnThumbnail &thumbnail) {
 }
 
 void QnThumbnailsLoader::ensureScaleContextLocked(int lineSize, const QSize &sourceSize, const QSize &boundingSize, int format) {
-    bool needsReallocation = true;
+    bool needsReallocation = false;
     
     if(m_scaleSourceSize != sourceSize) {
         m_scaleSourceSize = sourceSize;
@@ -461,10 +462,12 @@ void QnThumbnailsLoader::ensureScaleContextLocked(int lineSize, const QSize &sou
         m_mutex.unlock();
         emit sourceSizeChanged();
         m_mutex.lock();
+
+        needsReallocation = true;
     }
 
-    if(m_scaleSourceLine == lineSize && m_scaleSourceSize == sourceSize && m_scaleSourceFormat == format && m_targetSize == m_scaleTargetSize)
-        needsReallocation = false;
+    if(m_scaleSourceLine != lineSize || m_scaleSourceSize != sourceSize || m_scaleSourceFormat != format || m_targetSize == m_scaleTargetSize)
+        needsReallocation = true;
 
     if(!m_scaleContext)
         needsReallocation = true;

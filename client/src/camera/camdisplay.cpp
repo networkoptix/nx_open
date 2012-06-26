@@ -163,7 +163,7 @@ CLCamDisplay::~CLCamDisplay()
 void CLCamDisplay::pause()
 {
     QnAbstractDataConsumer::pause();
-
+    m_isRealTimeSource = false;
     m_audioDisplay->suspend();
 }
 
@@ -677,6 +677,8 @@ void CLCamDisplay::onNextFrameOccured()
 void CLCamDisplay::setSingleShotMode(bool single)
 {
     m_singleShotMode = single;
+    if (m_singleShotMode)
+        m_isRealTimeSource = false;
 }
 
 float CLCamDisplay::getSpeed() const
@@ -799,7 +801,7 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
 
     m_timeMutex.lock();
     if (mediaIsLive != m_isRealTimeSource && !m_buffering)
-        onRealTimeStreamHint(mediaIsLive);
+        onRealTimeStreamHint(mediaIsLive && !m_singleShotMode);
     m_timeMutex.unlock();
 
     float speed = m_speed;

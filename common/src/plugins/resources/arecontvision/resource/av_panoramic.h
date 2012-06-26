@@ -10,8 +10,6 @@ public:
     QnArecontPanoramicResource(const QString& name);
     bool getDescription();
 
-    virtual bool hasDualStreaming() const override;
-
     bool getParamPhysical(int cannel, const QString& name, QVariant &val);
 protected:
     bool initInternal() override;

@@ -198,7 +198,27 @@ const QnScheduleTaskList &QnSecurityCamResource::getScheduleTasks() const
 
 bool QnSecurityCamResource::hasDualStreaming() const
 {
-    return true;
+    if (!hasSuchParam("hasDualStreaming"))
+    {
+        //Q_ASSERT(false);
+        return false;
+    }
+
+    QVariant val;
+    QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
+    this_casted->getParam("hasDualStreaming", val, QnDomainMemory);
+    return val.toInt();
+}
+
+MotionType QnSecurityCamResource::getCameraBasedMotionType() const
+{
+    MotionTypeFlags rez = supportedMotionType();
+    if (rez & MT_HardwareGrid)
+        return MT_HardwareGrid;
+    else if (rez & MT_MotionWindow)
+        return MT_MotionWindow;
+    else
+        return MT_NoMotion;
 }
 
 MotionType QnSecurityCamResource::getDefaultMotionType() const
@@ -208,13 +228,17 @@ MotionType QnSecurityCamResource::getDefaultMotionType() const
     if (this_casted->getParam("supportedMotion", val, QnDomainMemory))
     {
         QStringList vals = val.toString().split(',');
-        QString s1 = vals[0].toLower();
-        if (s1 == QString("hardwaregrid"))
-            return MT_HardwareGrid;
-        else if (s1 == QString("softwaregrid"))
-            return MT_SoftwareGrid;
-        else if (s1 == QString("motionwindow"))
-            return MT_MotionWindow;
+        for (int i = 0; i < vals.size(); ++i)
+        {
+            QString s1 = vals[i].toLower();
+            if (s1 == QString("hardwaregrid"))
+                return MT_HardwareGrid;
+            else if (s1 == QString("softwaregrid") && hasDualStreaming())
+                return MT_SoftwareGrid;
+            else if (s1 == QString("motionwindow"))
+                return MT_MotionWindow;
+        }
+        return MT_NoMotion;
     }
     else {
         return MT_MotionWindow;
