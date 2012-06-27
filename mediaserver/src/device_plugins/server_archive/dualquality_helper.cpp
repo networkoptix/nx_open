@@ -34,8 +34,8 @@ void QnDialQualityHelper::findDataForTime(const qint64 time, DeviceFileCatalog::
         if (timeDistance - timeDistanceAlt > SECOND_STREAM_FIND_EPS) 
         {
             // alternate quality matched better
-            if (altChunk.containsTime(chunk.startTimeMs))
-                altChunk.truncate(chunk.startTimeMs);
+            if (timeDistance != INT_MAX && altChunk.containsTime(chunk.startTimeMs))
+                altChunk.truncate(chunk.startTimeMs); // truncate to start of the next chunk of the required quality (if next chunk of requested quality is exists)
 
             catalog = catalogAlt;
             chunk = altChunk;
