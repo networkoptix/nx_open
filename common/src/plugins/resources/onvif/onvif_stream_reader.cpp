@@ -13,6 +13,7 @@
 
 class LocalVideoEncoder: public VideoEncoder
 {
+public:
     LocalVideoEncoder()
     {
         Resolution = new onvifXsd__VideoResolution();
@@ -62,6 +63,7 @@ class LocalVideoEncoder: public VideoEncoder
 
 class LocalVideoSource: public VideoSource
 {
+public:
     LocalVideoSource()
     {
         Bounds = new onvifXsd__IntRectangle();
@@ -98,6 +100,7 @@ class LocalVideoSource: public VideoSource
 
 class LocalAudioEncoder: public AudioEncoder
 {
+public:
     LocalAudioEncoder()
     {
         Multicast = NULL;
@@ -132,6 +135,7 @@ class LocalAudioEncoder: public AudioEncoder
 
 class LocalAudioSource: public AudioSource
 {
+public:
     LocalAudioSource()
     {
         __anyAttribute = NULL;
