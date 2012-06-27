@@ -12,8 +12,8 @@
 
 #include <QtGlobal>
 
-const int SOAP_RECEIVE_TIMEOUT = -200000; // "+" in seconds, "-" in mseconds
-const int SOAP_SEND_TIMEOUT = -200000; // + in seconds, "-" in mseconds
+const int SOAP_RECEIVE_TIMEOUT = 1; // "+" in seconds, "-" in mseconds
+const int SOAP_SEND_TIMEOUT = 1; // + in seconds, "-" in mseconds
 const std::string DEFAULT_ONVIF_LOGIN = "admin";
 const std::string DEFAULT_ONVIF_PASSWORD = "admin";
 

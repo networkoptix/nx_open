@@ -160,7 +160,7 @@ void OnvifResourceInformationFetcher::createResource(const QString& manufacturer
         return;
     }
 
-    QnNetworkResourcePtr resource = createOnvifResourceByManufacture(manufacturer);
+    QnPlOnvifResourcePtr resource = createOnvifResourceByManufacture(manufacturer);
     if (!resource)
         return;
 
@@ -178,8 +178,8 @@ void OnvifResourceInformationFetcher::createResource(const QString& manufacturer
     if (!mac.size())
         resource->setPhysicalId(uniqId);
 
-    resource->setParam(QnPlOnvifResource::MEDIA_URL_PARAM_NAME, mediaUrl, QnDomainDatabase);
-    resource->setParam(QnPlOnvifResource::DEVICE_URL_PARAM_NAME, deviceUrl, QnDomainDatabase);
+    resource->setMediaUrl(mediaUrl);
+    resource->setDeviceOnvifUrl(deviceUrl);
 
     if (login) {
         qDebug() << "OnvifResourceInformationFetcher::createResource: Setting login = " << login << ", password = " << passwd;
@@ -221,13 +221,13 @@ const QString OnvifResourceInformationFetcher::fetchSerial(const DeviceInfoResp&
         (response.SerialNumber.empty()? QString(): QString(response.SerialNumber.c_str()));
 }
 
-QnNetworkResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManufacture(const QString& manufacture)
+QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManufacture(const QString& manufacture)
 {
-    QnNetworkResourcePtr resource;
+    QnPlOnvifResourcePtr resource;
     if (manufacture.toLower().contains("digital watchdog"))
-        resource = QnNetworkResourcePtr(new QnPlWatchDogResource());
+        resource = QnPlOnvifResourcePtr(new QnPlWatchDogResource());
     else
-        resource = QnNetworkResourcePtr(new QnPlOnvifResource());
+        resource = QnPlOnvifResourcePtr(new QnPlOnvifResource());
 
     return resource;
 }

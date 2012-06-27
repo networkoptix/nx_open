@@ -1,5 +1,5 @@
-Package: networkoptix-entcontroller-VERSION
-Source: networkoptix-entcontroller-VERSION
+Package: networkoptix-entcontroller
+Source: networkoptix-entcontroller
 Version: VERSION
 Installed-Size: INSTALLED_SIZE
 Architecture: ARCHITECTURE
@@ -8,8 +8,8 @@ Pre-Depends: debconf
 Depends: libstdc++6 (>= 4.1.1), zlib1g (>= 1:1.1.4), debconf (>= 0.5) | debconf-2.0, upstart-job, psmisc, upstart (>= 0.6.5-8)
 Recommends: 
 Suggests: 
-Conflicts: networkoptix-entcontroller (<< VERSION)
-Replaces: networkoptix-entcontroller (<< VERSION)
+Conflicts: networkoptix-entcontroller-1.1 (<< VERSION)
+Replaces: networkoptix-entcontroller-1.1 (<< VERSION)
 Provides: networkoptix-entcontroller
 Section: database
 Priority: optional
