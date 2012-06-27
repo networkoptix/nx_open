@@ -19,18 +19,17 @@ New Features:
  - It is possible to change grid cells' aspect ratio on Scene. It can be useful for 16:9 cameras
  
 Bugs Fixed:
- - If view a video in full screen top panel the video was overriden by top panel and 'info' and 'close' buttons were inaccessible. Now the fullscreen video can be zoomed out a bit
+ - If view a video in full screen buttons (info and close) were overriden by top panel and thus inaccessible. Now the fullscreen video can be zoomed out a bit and those buttons can be pressed
  - Panoramic cameras are resized correctly
  - If fps is greater than 100 it was displayed as 1.1E+02 on the info panel. Fixed
- - Default value on motion sensitivity slider should be the same as default sensitivity for camera (8)		
- - Camera motion window selection does *VERY* strange things
+ - Camera motion window selection is redesigned
  - If change media storage the old one is still using
- - Incorrect zoom in lower playback scroll panel if archive is greater than 1 month
+ - Incorrect zoom could occur in lower playback scroll panel if archive was greater than 1 month
  - Smart search could work incorrectly sometimes if an archive was longer than 1 month
 !If media files are not indexed they are not deleted
-!Run Linux Services as User not as Root	
-! Sometimes tree items appear at the root of the tree	
-!Linux Server doesn't detect Pulse - Smart search doesn't work sometimes if an archive is longer than 1 month		
+!Run Linux Services as User not as Root
+ - Linux Server did't detect Pulse cameras. Fixed
+ - Smart search did't work sometimes if an archive is longer than 1 month. Fixed
 
 ----------------------------------------------- 1.1 -----------------------------------------------
 
