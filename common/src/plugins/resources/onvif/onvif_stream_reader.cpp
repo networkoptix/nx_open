@@ -116,6 +116,11 @@ public:
     LocalVideoSource()
     {
         Bounds = new onvifXsd__IntRectangle();
+        Bounds->x = -1;
+        Bounds->y = -1;
+        Bounds->width = -1;
+        Bounds->height = -1;
+
         Extension = NULL;
         __anyAttribute = NULL;
     }
@@ -595,8 +600,8 @@ bool QnOnvifStreamReader::fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper,
     int soapRes = soapWrapper.getVideoEncoderConfigurations(request, response);
     if (soapRes != SOAP_OK) {
         qCritical() << "QnOnvifStreamReader::fetchUpdateVideoEncoder: can't get video encoders from camera (" 
-            << (isPrimary? "primary": "secondary") 
-            << "). URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << m_onvifRes->getUniqueId();
+            << (isPrimary? "primary": "secondary") << ") Gsoap error: " << soapRes << ". Description: " << soapWrapper.getLastError()
+            << ". URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << m_onvifRes->getUniqueId();
         return false;
     }
 
@@ -640,8 +645,8 @@ bool QnOnvifStreamReader::fetchUpdateProfile(MediaSoapWrapper& soapWrapper, Came
     int soapRes = soapWrapper.getProfiles(request, response);
     if (soapRes != SOAP_OK) {
         qCritical() << "QnOnvifStreamReader::fetchUpdateProfile: can't get profiles from camera (" 
-            << (isPrimary? "primary": "secondary") 
-            << "). URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << m_onvifRes->getUniqueId();
+            << (isPrimary? "primary": "secondary") << "). Gsoap error: " << soapRes << ". Description: " << soapWrapper.getLastError()
+            << ". URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << m_onvifRes->getUniqueId();
         return false;
     }
 
