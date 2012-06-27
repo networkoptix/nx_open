@@ -277,7 +277,7 @@ void QnRecordingManager::at_cameraUpdated()
 
 void QnRecordingManager::at_cameraStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus)
 {
-    if (oldStatus == QnResource::Offline && newStatus == QnResource::Online)
+	if ((oldStatus == QnResource::Offline || oldStatus == QnResource::Unauthorized) && newStatus == QnResource::Online)
     {
         QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource> (dynamic_cast<QnSecurityCamResource*>(sender())->toSharedPointer());
         if (camera)

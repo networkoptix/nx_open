@@ -6,6 +6,7 @@
 #include "abstractrenderer.h"
 #include "gl_renderer.h"
 #include "buffered_frame_displayer.h"
+#include "ui/graphics/opengl/gl_functions.h"
 
 static const int MAX_REVERSE_QUEUE_SIZE = 1024*1024 * 300; // at bytes
 static const double FPS_EPS = 1e-6;
@@ -130,7 +131,7 @@ QnFrameScaler::downscale_factor CLVideoStreamDisplay::determineScaleFactor(int c
     // If there is no scaling needed check if size is greater than maximum allowed image size (maximum texture size for opengl).
     int newWidth = srcWidth / rez;
     int newHeight = srcHeight / rez;
-    int maxTextureSize = QnGLRenderer::maxTextureSize();
+    int maxTextureSize = QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE);
     while (maxTextureSize > 0 && newWidth > maxTextureSize || newHeight > maxTextureSize)
     {
         rez = QnFrameScaler::downscale_factor ((int)rez * 2);
