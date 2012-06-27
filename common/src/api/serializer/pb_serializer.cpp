@@ -421,7 +421,7 @@ void parserCameraServerItems(QnCameraHistoryList& cameraServerItems, const PbCam
     {
         const pb::CameraServerItem& pb_item = *ci;
 
-        history[pb_item.mac().c_str()][pb_item.timestamp()] = pb_item.serverguid().c_str();
+        history[pb_item.physicalid().c_str()][pb_item.timestamp()] = pb_item.serverguid().c_str();
     }
 
     for(HistoryType::const_iterator ci = history.begin(); ci != history.end(); ++ci)
@@ -506,7 +506,7 @@ void serializeCamera_i(pb::Resource& pb_cameraResource, const QnVirtualCameraRes
 
 void serializeCameraServerItem_i(pb::CameraServerItem& pb_cameraServerItem, const QnCameraHistoryItem& cameraServerItem)
 {
-    pb_cameraServerItem.set_mac(cameraServerItem.physicalId.toStdString());
+    pb_cameraServerItem.set_physicalid(cameraServerItem.physicalId.toStdString());
     pb_cameraServerItem.set_timestamp(cameraServerItem.timestamp);
     pb_cameraServerItem.set_serverguid(cameraServerItem.videoServerGuid.toStdString());
 }
@@ -854,7 +854,7 @@ void parseLicense(QnLicensePtr& license, const pb::License& pb_license)
 void parseCameraServerItem(QnCameraHistoryItemPtr& historyItem, const pb::CameraServerItem& pb_cameraServerItem)
 {
     historyItem = QnCameraHistoryItemPtr(new QnCameraHistoryItem(
-                                            pb_cameraServerItem.mac().c_str(),
+                                            pb_cameraServerItem.physicalid().c_str(),
                                             pb_cameraServerItem.timestamp(),
                                             pb_cameraServerItem.serverguid().c_str()
                                         ));
