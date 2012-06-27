@@ -246,6 +246,7 @@ bool QnAviArchiveDelegate::open(QnResourcePtr resource)
     m_resource = resource;
     if (m_formatContext == 0)
     {
+        m_eofReached = false;
         QString url = m_resource->getUrl(); // "c:/00-1A-07-03-BD-09.mkv"; //
         if (m_storage == 0)
             m_storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(url));
