@@ -21,8 +21,6 @@ typedef onvifXsd__VideoSourceConfiguration VideoSource;
 typedef onvifXsd__AudioEncoderConfiguration AudioEncoder;
 typedef onvifXsd__AudioSourceConfiguration AudioSource;
 
-typedef QSharedPointer<Profile> ProfilePtr;
-
 class QnOnvifStreamReader: public CLServerPushStreamreader , public QnLiveStreamProvider
 {
     static const char* NETOPTIX_PRIMARY_NAME;
@@ -58,11 +56,11 @@ private:
     const QString updateCameraAndFetchStreamUrl(bool isPrimary) const;
 
     //Returned pointers are valid while response object is living. (For all functions in the following block)
-    VideoEncoder* fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper, VideoConfigsResp& response, bool isPrimary) const;
-    AudioEncoder* fetchUpdateAudioEncoder(MediaSoapWrapper& soapWrapper, AudioConfigsResp& response, bool isPrimary) const;
-    ProfilePair fetchUpdateProfile(MediaSoapWrapper& soapWrapper, ProfilesResp& response, bool isPrimary) const;
-    VideoSource* fetchUpdateVideoSource(MediaSoapWrapper& soapWrapper, VideoSrcConfigsResp& response, bool isPrimary) const;
-    AudioSource* fetchUpdateAudioSource(MediaSoapWrapper& soapWrapper, AudioSrcConfigsResp& response, bool isPrimary) const;
+    bool fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper, CameraInfo& info, bool isPrimary) const;
+    bool fetchUpdateAudioEncoder(MediaSoapWrapper& soapWrapper, CameraInfo& info, bool isPrimary) const;
+    bool fetchUpdateProfile(MediaSoapWrapper& soapWrapper, CameraInfo& info, bool isPrimary) const;
+    bool fetchUpdateVideoSource(MediaSoapWrapper& soapWrapper, CameraInfo& info, bool isPrimary) const;
+    bool fetchUpdateAudioSource(MediaSoapWrapper& soapWrapper, CameraInfo& info, bool isPrimary) const;
 
     //Returned pointers are valid while response object is living. (For all functions in the following block)
     VideoEncoder* fetchUpdateVideoEncoder(VideoConfigsResp& response, bool isPrimary) const;
