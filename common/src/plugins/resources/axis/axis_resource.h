@@ -2,7 +2,6 @@
 #define axis_resource_h_2215
 
 #include <QMap>
-#include <QSharedPointer>
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
 #include "utils/network/simple_http_client.h"
@@ -55,7 +54,5 @@ private:
     QMap<int, QRect> m_motionMask;
     qint64 m_lastMotionReadTime;
 };
-
-typedef QSharedPointer<QnPlAxisResource> QnPlAxisResourcePtr;
 
 #endif //axis_resource_h_2215

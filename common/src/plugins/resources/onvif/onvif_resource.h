@@ -184,6 +184,4 @@ private:
 
 };
 
-typedef QSharedPointer<QnPlOnvifResource> QnPlOnvifResourcePtr;
-
 #endif //onvif_resource_h

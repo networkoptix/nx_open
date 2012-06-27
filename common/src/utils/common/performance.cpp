@@ -1,6 +1,8 @@
 #include "performance.h"
 #include <QtGlobal>
 
+#if 0
+
 #ifdef Q_OS_WIN
 #   define NOMINMAX
 #   include <Windows.h>
@@ -81,3 +83,5 @@ qint64 QnPerformance::currentCpuFrequency() {
     return -1;
 #endif
 }
+
+#endif

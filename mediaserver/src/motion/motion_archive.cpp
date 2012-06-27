@@ -9,7 +9,7 @@
 #endif
 
 static const char version = 1;
-static const quint16 DETAILED_AGGREGATE_INTERVAL = 5; // at seconds
+static const quint16 DETAILED_AGGREGATE_INTERVAL = 3; // at seconds
 static const quint16 COARSE_AGGREGATE_INTERVAL = 3600; // at seconds
 
 bool operator < (const IndexRecord& first, const IndexRecord& other) { return first.start < other.start; }
