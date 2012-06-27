@@ -599,7 +599,7 @@ bool QnOnvifStreamReader::fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper,
         return false;
     }
 
-    VideoEncoder* result = fetchUpdateVideoEncoder(response, isPrimary);
+    VideoEncoder* result = fetchVideoEncoder(response, isPrimary);
 
     if (result) {
         info.videoEncoderLocal.setValues(*result);
@@ -613,7 +613,7 @@ bool QnOnvifStreamReader::fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper,
     return false;
 }
 
-VideoEncoder* QnOnvifStreamReader::fetchUpdateVideoEncoder(VideoConfigsResp& response, bool isPrimary) const
+VideoEncoder* QnOnvifStreamReader::fetchVideoEncoder(VideoConfigsResp& response, bool isPrimary) const
 {
     std::vector<VideoEncoder*>::const_iterator iter = response.Configurations.begin();
     QString id = isPrimary ? m_onvifRes->getPrimaryVideoEncoderId() : m_onvifRes->getSecondaryVideoEncoderId();
@@ -644,7 +644,7 @@ bool QnOnvifStreamReader::fetchUpdateProfile(MediaSoapWrapper& soapWrapper, Came
         return false;
     }
 
-    ProfilePair profiles = fetchUpdateProfile(response, isPrimary);
+    ProfilePair profiles = fetchProfile(response, isPrimary);
 
     bool result = false;
     if (profiles.netoptix) {
@@ -662,7 +662,7 @@ bool QnOnvifStreamReader::fetchUpdateProfile(MediaSoapWrapper& soapWrapper, Came
     return result;
 }
 
-ProfilePair QnOnvifStreamReader::fetchUpdateProfile(ProfilesResp& response, bool isPrimary) const
+ProfilePair QnOnvifStreamReader::fetchProfile(ProfilesResp& response, bool isPrimary) const
 {
     std::vector<Profile*>::const_iterator iter = response.Profiles.begin();
     ProfilePair result;
@@ -737,7 +737,7 @@ bool QnOnvifStreamReader::fetchUpdateVideoSource(MediaSoapWrapper& soapWrapper, 
         return false;
     }
 
-    VideoSource* result = fetchUpdateVideoSource(response, isPrimary);
+    VideoSource* result = fetchVideoSource(response, isPrimary);
 
     if (result) {
         info.videoSourceLocal.setValues(*result);
@@ -751,7 +751,7 @@ bool QnOnvifStreamReader::fetchUpdateVideoSource(MediaSoapWrapper& soapWrapper, 
     return false;
 }
 
-VideoSource* QnOnvifStreamReader::fetchUpdateVideoSource(VideoSrcConfigsResp& response, bool /*isPrimary*/) const
+VideoSource* QnOnvifStreamReader::fetchVideoSource(VideoSrcConfigsResp& response, bool /*isPrimary*/) const
 {
     unsigned long square = 0;
     std::vector<VideoSource*>::const_iterator it = response.Configurations.begin();
@@ -997,7 +997,7 @@ bool QnOnvifStreamReader::fetchUpdateAudioEncoder(MediaSoapWrapper& soapWrapper,
         return false;
     }
 
-    AudioEncoder* result = fetchUpdateAudioEncoder(response, isPrimary);
+    AudioEncoder* result = fetchAudioEncoder(response, isPrimary);
 
     if (result) {
         info.audioEncoderLocal.setValues(*result);
@@ -1011,7 +1011,7 @@ bool QnOnvifStreamReader::fetchUpdateAudioEncoder(MediaSoapWrapper& soapWrapper,
     return false;
 }
 
-AudioEncoder* QnOnvifStreamReader::fetchUpdateAudioEncoder(AudioConfigsResp& response, bool isPrimary) const
+AudioEncoder* QnOnvifStreamReader::fetchAudioEncoder(AudioConfigsResp& response, bool isPrimary) const
 {
     std::vector<AudioEncoder*>::const_iterator iter = response.Configurations.begin();
     AudioEncoder* result = 0;
@@ -1107,7 +1107,7 @@ bool QnOnvifStreamReader::fetchUpdateAudioSource(MediaSoapWrapper& soapWrapper, 
         return false;
     }
 
-    AudioSource* result = fetchUpdateAudioSource(response, isPrimary);
+    AudioSource* result = fetchAudioSource(response, isPrimary);
 
     if (result) {
         info.audioSourceLocal.setValues(*result);
@@ -1121,7 +1121,7 @@ bool QnOnvifStreamReader::fetchUpdateAudioSource(MediaSoapWrapper& soapWrapper, 
     return false;
 }
 
-AudioSource* QnOnvifStreamReader::fetchUpdateAudioSource(AudioSrcConfigsResp& response, bool isPrimary) const
+AudioSource* QnOnvifStreamReader::fetchAudioSource(AudioSrcConfigsResp& response, bool isPrimary) const
 {
     std::vector<AudioSource*>::const_iterator it = response.Configurations.begin();
     AudioSource* result = 0;

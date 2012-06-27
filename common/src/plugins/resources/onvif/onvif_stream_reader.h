@@ -63,11 +63,11 @@ private:
     bool fetchUpdateAudioSource(MediaSoapWrapper& soapWrapper, CameraInfo& info, bool isPrimary) const;
 
     //Returned pointers are valid while response object is living. (For all functions in the following block)
-    VideoEncoder* fetchUpdateVideoEncoder(VideoConfigsResp& response, bool isPrimary) const;
-    AudioEncoder* fetchUpdateAudioEncoder(AudioConfigsResp& response, bool isPrimary) const;
-    ProfilePair fetchUpdateProfile(ProfilesResp& response, bool isPrimary) const;
-    VideoSource* fetchUpdateVideoSource(VideoSrcConfigsResp& response, bool isPrimary) const;
-    AudioSource* fetchUpdateAudioSource(AudioSrcConfigsResp& response, bool isPrimary) const;
+    VideoEncoder* fetchVideoEncoder(VideoConfigsResp& response, bool isPrimary) const;
+    AudioEncoder* fetchAudioEncoder(AudioConfigsResp& response, bool isPrimary) const;
+    ProfilePair fetchProfile(ProfilesResp& response, bool isPrimary) const;
+    VideoSource* fetchVideoSource(VideoSrcConfigsResp& response, bool isPrimary) const;
+    AudioSource* fetchAudioSource(AudioSrcConfigsResp& response, bool isPrimary) const;
 
     void updateVideoEncoder(VideoEncoder& encoder, bool isPrimary) const;
     void updateAudioEncoder(AudioEncoder& encoder, bool isPrimary) const;
