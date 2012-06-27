@@ -231,7 +231,7 @@ Qn::ActionVisibility QnTimePeriodActionCondition::check(const QnActionParameters
         return Qn::InvisibleAction;
 
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodParameter);
-    if(m_periodType != period.type()) {
+    if(!(m_periodTypes & period.type())) {
         return m_nonMatchingVisibility;
     } else {
         return Qn::EnabledAction;
