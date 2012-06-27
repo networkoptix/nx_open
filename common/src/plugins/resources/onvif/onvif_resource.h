@@ -60,11 +60,11 @@ public:
     };
 
     static const char* MANUFACTURE;
-    static const QString& MEDIA_URL_PARAM_NAME;
-    static const QString& DEVICE_URL_PARAM_NAME;
-    static const QString& MAX_FPS_PARAM_NAME;
-    static const QString& AUDIO_SUPPORTED_PARAM_NAME;
-    static const QString& DUAL_STREAMING_PARAM_NAME;
+    static QString MEDIA_URL_PARAM_NAME;
+    static QString ONVIF_URL_PARAM_NAME;
+    static QString MAX_FPS_PARAM_NAME;
+    static QString AUDIO_SUPPORTED_PARAM_NAME;
+    static QString DUAL_STREAMING_PARAM_NAME;
 	static const float QUALITY_COEF;
     static const double MAX_SECONDARY_RESOLUTION_SQUARE;
     static const char* PROFILE_NAME_PRIMARY;
@@ -109,6 +109,8 @@ public:
     QString getMediaUrl() const;
     void setMediaUrl(const QString& src);
 
+    void setDeviceOnvifUrl(const QString& src);
+
     CODECS getCodec() const;
     AUDIO_CODECS getAudioCodec() const;
 
@@ -123,10 +125,15 @@ protected:
     virtual void setCropingPhysical(QRect croping);
 
     virtual void updateResourceCapabilities();
+
+    
+
 private:
 
     QString getDeviceOnvifUrl() const;
-    void setDeviceOnvifUrl(const QString& src);
+    
+
+    void setMaxFps(int f);
 
     bool fetchAndSetDeviceInformation();
     bool fetchAndSetResourceOptions();
@@ -160,13 +167,10 @@ private:
     QMap<int, QRect> m_motionWindows;
     QMap<int, QRect> m_motionMask;
 
-    int m_maxFps;
+
     int m_iframeDistance;
     int m_minQuality;
     int m_maxQuality;
-    bool m_hasDual;
-    QString m_mediaUrl;
-    QString m_deviceOnvifUrl;
     bool m_reinitDeviceInfo;
     CODECS m_codec;
     AUDIO_CODECS m_audioCodec;
