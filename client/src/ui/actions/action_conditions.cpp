@@ -215,7 +215,11 @@ Qn::ActionVisibility QnTakeScreenshotActionCondition::check(const QnResourceWidg
     if(widgets.size() != 1)
         return Qn::InvisibleAction;
 
-    Qn::RenderStatus renderStatus = widgets[0]->currentRenderStatus();
+    QnResourceWidget *widget = widgets[0];
+    if(widget->resource()->flags() & QnResource::still_image)
+        return Qn::InvisibleAction;
+
+    Qn::RenderStatus renderStatus = widget->currentRenderStatus();
     if(renderStatus == Qn::NothingRendered || renderStatus == Qn::CannotRender)
         return Qn::DisabledAction;
 
@@ -227,7 +231,7 @@ Qn::ActionVisibility QnTimePeriodActionCondition::check(const QnActionParameters
         return Qn::InvisibleAction;
 
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodParameter);
-    if(m_periodType != period.type()) {
+    if(!(m_periodTypes & period.type())) {
         return m_nonMatchingVisibility;
     } else {
         return Qn::EnabledAction;

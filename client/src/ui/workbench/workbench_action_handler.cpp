@@ -16,6 +16,7 @@
 #include <utils/common/delete_later.h>
 #include <utils/common/mime_data.h>
 #include <utils/common/event_processors.h>
+#include <utils/common/string.h>
 
 #include <core/resourcemanagment/resource_discovery_manager.h>
 #include <core/resourcemanagment/resource_pool_user_watcher.h>
@@ -1334,14 +1335,14 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
 
     // TODO: move out, common code
     QString timeString;
-    qint64 time = display->camDisplay()->getCurrentTime();
+    qint64 time = display->camDisplay()->getCurrentTime() / 1000;
     if(widget->resource()->flags() & QnResource::utc) {
         timeString = QDateTime::fromMSecsSinceEpoch(time).toString(QLatin1String("yyyy-MMM-dd_hh.mm.ss"));
     } else {
         timeString = QTime().addMSecs(time).toString(QLatin1String("hh.mm.ss"));
     }
 
-    QString suggetion = widget->resource()->getName() + QLatin1String("_") + timeString; // TODO: remove non-filename chars
+    QString suggetion = replaceNonFileNameCharacters(widget->resource()->getName(), QChar('_')) + QLatin1String("_") + timeString; 
 
     QSettings settings;
     settings.beginGroup(QLatin1String("screenshots"));

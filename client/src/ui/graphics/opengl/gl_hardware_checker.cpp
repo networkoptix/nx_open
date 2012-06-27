@@ -13,7 +13,7 @@ namespace {
     class OpenGlDriversErrorMessageDisplay: public QObject {
     public:
         virtual ~OpenGlDriversErrorMessageDisplay() {
-            const QString message = tr("We have detected that your video card drivers may be not installed or out of date.\n"
+            const QString message = tr("We have detected that your video card drivers may be not installed or are out of date.\n"
                 "Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.\n"
                 "For easy instructions on how to install or update your video driver, follow instruction at http://tribaltrouble.com/driversupport.php");
             QMessageBox::critical(NULL, tr("Important Performance Tip"), message, QMessageBox::Ok);
@@ -23,8 +23,8 @@ namespace {
     class OpenGlHardwareErrorMessageDisplay: public QObject {
     public:
         virtual ~OpenGlHardwareErrorMessageDisplay() {
-            const QString message = tr("We have detected that your video card is no supported. You can use our software at your own risk.\n"
-                "Installing and/or updating your video drivers can resolve this problem but we have no guarantee that it will help.\n"
+            const QString message = tr("We have detected that your video card is not supported. You can proceed at your own risk.\n"
+                "Installing and/or updating your video drivers may resolve the problem but we cannot guarantee that it will help.\n"
                 "For easy instructions on how to install or update your video driver, follow instruction at http://tribaltrouble.com/driversupport.php");
 
             QMessageBox::critical(NULL, tr("Critical Performance Tip"), message, QMessageBox::Ok);

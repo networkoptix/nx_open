@@ -9,11 +9,11 @@ class QnTimePeriodList;
 
 namespace Qn {
     enum TimePeriodType {
-        NullTimePeriod,     /**< No period. */
-        EmptyTimePeriod,    /**< Period of zero length. */
-        NormalTimePeriod,   /**< Normal period with non-zero length. */
-        TimePeriodTypeCount
+        NullTimePeriod      = 0x1,  /**< No period. */
+        EmptyTimePeriod     = 0x2,  /**< Period of zero length. */
+        NormalTimePeriod    = 0x4,  /**< Normal period with non-zero length. */
     };
+    Q_DECLARE_FLAGS(TimePeriodTypes, TimePeriodType);
 
     enum TimePeriodRole {
         RecordingRole,
@@ -151,9 +151,11 @@ bool operator < (const QnTimePeriod& first, const QnTimePeriod& other);
 bool operator < (qint64 first, const QnTimePeriod& other);
 bool operator < (const QnTimePeriod& other, qint64 first);
 
+Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::TimePeriodTypes);
 
 Q_DECLARE_TYPEINFO(QnTimePeriod, Q_MOVABLE_TYPE);
 
+Q_DECLARE_METATYPE(Qn::TimePeriodTypes);
 Q_DECLARE_METATYPE(Qn::TimePeriodType);
 Q_DECLARE_METATYPE(Qn::TimePeriodRole);
 Q_DECLARE_METATYPE(QnTimePeriod);

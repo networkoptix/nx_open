@@ -13,14 +13,48 @@
 
 class LocalVideoEncoder: public VideoEncoder
 {
-    /*Resolution = new onvifXsd__VideoResolution();
-    RateControl = new onvifXsd__VideoRateControl();
-    MPEG4 = NULL;
-    H264 = NULL;
-    Multicast = NULL;
-    std::string SessionTimeout;
-    std::vector<char * >__any;
-    char *__anyAttribute;*/
+public:
+    LocalVideoEncoder()
+    {
+        Resolution = new onvifXsd__VideoResolution();
+        RateControl = new onvifXsd__VideoRateControl();
+        MPEG4 = NULL;
+        H264 = NULL;
+        Multicast = NULL;
+        __anyAttribute = NULL;
+    }
+
+    ~LocalVideoEncoder()
+    {
+        delete Resolution;
+        delete RateControl;
+    }
+
+    void setValues(const VideoEncoder& src)
+    {
+        if (src.MPEG4) {
+            MPEG4 = src.MPEG4;
+        }
+
+        if (src.H264) {
+            H264 = src.H264;
+        }
+
+        if (src.Multicast) {
+            Multicast = src.Multicast;
+        }
+
+        if (src.__anyAttribute) {
+            __anyAttribute = src.__anyAttribute;
+        }
+
+        Encoding = src.Encoding;
+        SessionTimeout = src.SessionTimeout;
+        __any = src.__any;
+        Name = src.Name;
+        UseCount = src.UseCount;
+        token = src.token;
+    }
 };
 
 //
@@ -29,7 +63,35 @@ class LocalVideoEncoder: public VideoEncoder
 
 class LocalVideoSource: public VideoSource
 {
+public:
+    LocalVideoSource()
+    {
+        Bounds = new onvifXsd__IntRectangle();
+        Extension = NULL;
+        __anyAttribute = NULL;
+    }
 
+    ~LocalVideoSource()
+    {
+        delete Bounds;
+    }
+
+    void setValues(const VideoSource& src)
+    {
+        if (src.Extension) {
+            Extension = src.Extension;
+        }
+
+        if (src.__anyAttribute) {
+            __anyAttribute = src.__anyAttribute;
+        }
+
+        SourceToken = src.SourceToken;
+        __any = src.__any;
+        Name = src.Name;
+        UseCount = src.UseCount;
+        token = src.token;
+    }
 };
 
 //
@@ -38,6 +100,32 @@ class LocalVideoSource: public VideoSource
 
 class LocalAudioEncoder: public AudioEncoder
 {
+public:
+    LocalAudioEncoder()
+    {
+        Multicast = NULL;
+        __anyAttribute = NULL;
+    }
+
+    void setValues(const AudioEncoder& src)
+    {
+        if (src.Multicast) {
+            Multicast = src.Multicast;
+        }
+
+        if (src.__anyAttribute) {
+            __anyAttribute = src.__anyAttribute;
+        }
+
+        Encoding = src.Encoding;
+        Bitrate = src.Bitrate;
+        SampleRate = src.SampleRate;
+        SessionTimeout = src.SessionTimeout;
+        __any = src.__any;
+        Name = src.Name;
+        UseCount = src.UseCount;
+        token = src.token;
+    }
 
 };
 
@@ -47,7 +135,24 @@ class LocalAudioEncoder: public AudioEncoder
 
 class LocalAudioSource: public AudioSource
 {
+public:
+    LocalAudioSource()
+    {
+        __anyAttribute = NULL;
+    }
 
+    void setValues(const VideoSource& src)
+    {
+        if (src.__anyAttribute) {
+            __anyAttribute = src.__anyAttribute;
+        }
+
+        SourceToken = src.SourceToken;
+        __any = src.__any;
+        Name = src.Name;
+        UseCount = src.UseCount;
+        token = src.token;
+    }
 };
 
 //
@@ -82,6 +187,12 @@ struct CameraInfo
     Profile* finalProfile;
 
     bool profileAbsent;
+
+    //Local Structures:
+    LocalVideoEncoder videoEncoderLocal;
+    LocalVideoSource videoSourceLocal;
+    LocalAudioEncoder audioEncoderLocal;
+    LocalAudioSource audioSourceLocal;
 
 
     CameraInfo():

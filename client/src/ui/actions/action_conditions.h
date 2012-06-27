@@ -216,16 +216,16 @@ public:
  */
 class QnTimePeriodActionCondition: public QnActionCondition {
 public:
-    QnTimePeriodActionCondition(Qn::TimePeriodType periodType, Qn::ActionVisibility nonMatchingVisibility, QObject *parent = NULL):
+    QnTimePeriodActionCondition(Qn::TimePeriodTypes periodTypes, Qn::ActionVisibility nonMatchingVisibility, QObject *parent = NULL):
         QnActionCondition(parent),
-        m_periodType(periodType),
+        m_periodTypes(periodTypes),
         m_nonMatchingVisibility(nonMatchingVisibility)
     {}
 
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 
 private:
-    Qn::TimePeriodType m_periodType;
+    Qn::TimePeriodTypes m_periodTypes;
     Qn::ActionVisibility m_nonMatchingVisibility;
 };
 

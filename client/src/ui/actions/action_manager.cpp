@@ -771,7 +771,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::ClearTimeSelectionAction).
         flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Clear Selection")).
-        condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::InvisibleAction, this));
+        condition(new QnTimePeriodActionCondition(Qn::EmptyTimePeriod | Qn::NormalTimePeriod, Qn::InvisibleAction, this));
 
     factory(Qn::ExportTimeSelectionAction).
         flags(Qn::Slider | Qn::SingleTarget).
