@@ -148,6 +148,31 @@ const QString QnPlOnvifResource::fetchMacAddress(const NetIfacesResp& response,
     return someMacAddress.toUpper().replace(":", "-");
 }
 
+bool QnPlOnvifResource::setHostAddress(const QHostAddress &ip, QnDomain domain)
+{
+    //QnPhysicalCameraResource::se
+    {
+        QMutexLocker lock(&m_mutex);
+
+        if (!m_mediaUrl.isEmpty())
+        {
+            QUrl url(m_mediaUrl);
+            url.setHost(ip.toString());
+            m_mediaUrl = url.toString();
+        }
+
+        if (!m_deviceOnvifUrl.isEmpty())
+        {
+            QUrl url(m_deviceOnvifUrl);
+            url.setHost(ip.toString());
+            m_deviceOnvifUrl= url.toString();
+        }
+    }
+
+    return QnPhysicalCameraResource::setHostAddress(ip, domain);
+
+}
+
 const QString QnPlOnvifResource::createOnvifEndpointUrl(const QString& ipAddress) {
     return ONVIF_PROTOCOL_PREFIX + ipAddress + ONVIF_URL_SUFFIX;
 }
