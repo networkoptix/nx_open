@@ -24,7 +24,7 @@ bool bindToInterface(QUdpSocket& sock, const QnInterfaceAndAddr& iface)
 
     if (res)
     {
-        cl_log.log(cl_logWARNING, "bindToInterface(): Can't bind to interface %s: %s", iface.name.toAscii().constData(), strerror(errno));
+        cl_log.log(cl_logDEBUG1, "bindToInterface(): Can't bind to interface %s: %s", iface.address.toString().toAscii().constData(), strerror(errno));
         return false;
     }
 
