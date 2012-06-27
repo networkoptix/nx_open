@@ -71,6 +71,7 @@ private:
     void submitMotionWidgetToResource();
 
     void updateMotionWidgetNeedControlMaxRect();
+    void updateMotionAvailability();
 
     void disconnectFromMotionWidget();
     void connectToMotionWidget();

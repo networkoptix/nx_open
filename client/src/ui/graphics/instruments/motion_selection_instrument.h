@@ -85,6 +85,7 @@ private:
     bool m_clearingBlocked;
     Qt::KeyboardModifiers m_selectionModifiers;
     Qt::KeyboardModifiers m_multiSelectionModifiers;
+    QRect m_gridRect;
 };
 
 

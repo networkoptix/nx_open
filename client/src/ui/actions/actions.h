@@ -313,6 +313,11 @@ namespace Qn {
         StopSmartSearchAction,
 
         /**
+         * Clears motion selection on a widget.
+         */
+        ClearMotionSelectionAction,
+
+        /**
          * Toggles item's smart search mode.
          */
         ToggleSmartSearchAction,

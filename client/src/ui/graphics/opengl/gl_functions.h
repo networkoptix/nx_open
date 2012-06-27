@@ -41,6 +41,13 @@ public:
     static Features estimatedFeatures();
 
     /**
+     * \param target                    Value to estimate. Only <tt>GL_MAX_TEXTURE_SIZE</tt> is currently supported.
+     * \returns                         Estimated value. It is not guaranteed to be equal to the real value obtained 
+     *                                  via <tt>glGetIntegerv</tt> function, but it will be safe to use.
+     */
+    static GLint estimatedInteger(GLenum target);
+
+    /**
      * \param enable                    Whether warnings related to unsupported function calls are to be enabled.
      */
     static void enableWarnings(bool enable);

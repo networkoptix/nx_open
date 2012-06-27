@@ -363,6 +363,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(action(Qn::StartSmartSearchAction), SIGNAL(triggered()),                                                                this,                           SLOT(at_startSmartSearchAction_triggered()));
     connect(action(Qn::StopSmartSearchAction), SIGNAL(triggered()),                                                                 this,                           SLOT(at_stopSmartSearchAction_triggered()));
     connect(action(Qn::ToggleSmartSearchAction), SIGNAL(triggered()),                                                               this,                           SLOT(at_toggleSmartSearchAction_triggered()));
+    connect(action(Qn::ClearMotionSelectionAction), SIGNAL(triggered()),                                                            this,                           SLOT(at_clearMotionSelectionAction_triggered()));
     connect(action(Qn::CheckFileSignatureAction), SIGNAL(triggered()),                                                              this,                           SLOT(at_checkFileSignatureAction_triggered()));
     connect(action(Qn::MaximizeItemAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_maximizeItemAction_triggered()));
     connect(action(Qn::UnmaximizeItemAction), SIGNAL(triggered()),                                                                  this,                           SLOT(at_unmaximizeItemAction_triggered()));
@@ -1223,6 +1224,13 @@ void QnWorkbenchController::at_toggleSmartSearchAction_triggered() {
     } else {
         at_stopSmartSearchAction_triggered();
     }
+}
+
+void QnWorkbenchController::at_clearMotionSelectionAction_triggered() {
+    QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
+
+    foreach(QnResourceWidget *widget, widgets)
+        widget->clearMotionSelection();
 }
 
 void QnWorkbenchController::at_maximizeItemAction_triggered() {

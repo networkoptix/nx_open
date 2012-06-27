@@ -116,6 +116,11 @@ public:
     LocalVideoSource()
     {
         Bounds = new onvifXsd__IntRectangle();
+        Bounds->x = -1;
+        Bounds->y = -1;
+        Bounds->width = -1;
+        Bounds->height = -1;
+
         Extension = NULL;
         __anyAttribute = NULL;
     }
@@ -515,6 +520,15 @@ void QnOnvifStreamReader::updateVideoEncoder(VideoEncoder& encoder, bool isPrima
     QnStreamQuality quality = getQuality();
     ResolutionPair resolution = isPrimary? m_onvifRes->getPrimaryResolution(): m_onvifRes->getSecondaryResolution();
 
+    if (!encoder.H264)
+    {
+        qWarning() << "QnOnvifStreamReader::updateVideoEncoderParams: H264 object is NULL. UniqueId: " << m_onvifRes->getUniqueId();
+    } else 
+    {
+        encoder.H264->GovLength = m_onvifRes->getGovLength();
+        encoder.H264->H264Profile = isPrimary ? onvifXsd__H264Profile__High : onvifXsd__H264Profile__Baseline;
+    }
+
     if (!encoder.RateControl) 
     {
         qWarning() << "QnOnvifStreamReader::updateVideoEncoderParams: RateControl is NULL. UniqueId: " << m_onvifRes->getUniqueId();
@@ -595,8 +609,8 @@ bool QnOnvifStreamReader::fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper,
     int soapRes = soapWrapper.getVideoEncoderConfigurations(request, response);
     if (soapRes != SOAP_OK) {
         qCritical() << "QnOnvifStreamReader::fetchUpdateVideoEncoder: can't get video encoders from camera (" 
-            << (isPrimary? "primary": "secondary") 
-            << "). URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << m_onvifRes->getUniqueId();
+            << (isPrimary? "primary": "secondary") << ") Gsoap error: " << soapRes << ". Description: " << soapWrapper.getLastError()
+            << ". URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << m_onvifRes->getUniqueId();
         return false;
     }
 
@@ -640,8 +654,8 @@ bool QnOnvifStreamReader::fetchUpdateProfile(MediaSoapWrapper& soapWrapper, Came
     int soapRes = soapWrapper.getProfiles(request, response);
     if (soapRes != SOAP_OK) {
         qCritical() << "QnOnvifStreamReader::fetchUpdateProfile: can't get profiles from camera (" 
-            << (isPrimary? "primary": "secondary") 
-            << "). URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << m_onvifRes->getUniqueId();
+            << (isPrimary? "primary": "secondary") << "). Gsoap error: " << soapRes << ". Description: " << soapWrapper.getLastError()
+            << ". URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << m_onvifRes->getUniqueId();
         return false;
     }
 
@@ -820,9 +834,10 @@ bool QnOnvifStreamReader::sendConfigToCamera(MediaSoapWrapper& soapWrapper, Came
     //possibility, that desired encoders / sources attached to predefined profile, so ignore
     //and try to get stream url further
     //ToDo: think more about this situation
-    //if (!result) {
-    //    return false;
-    //}
+    if (!result) {
+        //return false;
+        info.finalProfile = &info.predefinedProfile;
+    }
 
     if (!sendVideoEncoderToCamera(soapWrapper, info, *info.finalProfile))
     {

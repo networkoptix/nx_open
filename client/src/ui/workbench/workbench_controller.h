@@ -144,6 +144,7 @@ protected slots:
     void at_startSmartSearchAction_triggered();
     void at_stopSmartSearchAction_triggered();
     void at_toggleSmartSearchAction_triggered();
+    void at_clearMotionSelectionAction_triggered();
     void at_maximizeItemAction_triggered();
     void at_unmaximizeItemAction_triggered();
     void at_recordingAction_triggered(bool checked);

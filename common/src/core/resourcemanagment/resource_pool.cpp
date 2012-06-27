@@ -213,12 +213,18 @@ void QnResourcePool::handleStatusChange()
 {
     const QnResourcePtr resource = toSharedPointer(checked_cast<QnResource *>(sender()));
 
+    if (!resource)
+        return;
+
     emit statusChanged(resource);
 }
 
 void QnResourcePool::handleResourceChange()
 {
     const QnResourcePtr resource = toSharedPointer(checked_cast<QnResource *>(sender()));
+
+    if (!resource)
+        return;
 
     emit resourceChanged(resource);
 }

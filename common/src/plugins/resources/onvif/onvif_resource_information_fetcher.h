@@ -4,6 +4,7 @@
 #include "core/resourcemanagment/resource_searcher.h"
 #include "onvif_helper.h"
 #include "soap_wrapper.h"
+#include "onvif_resource.h"
 
 struct EndpointAdditionalInfo
 {
@@ -41,7 +42,7 @@ public:
     static OnvifResourceInformationFetcher& instance();
 
     void findResources(const EndpointInfoHash& endpointInfo, QnResourceList& result) const;
-    static QnNetworkResourcePtr createOnvifResourceByManufacture (const QString& manufacture);
+    static QnPlOnvifResourcePtr createOnvifResourceByManufacture (const QString& manufacture);
 private:
 
     OnvifResourceInformationFetcher();

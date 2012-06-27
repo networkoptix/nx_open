@@ -115,6 +115,13 @@ private:
     bool m_requiredGridDisplayValue;
 };
 
+class QnClearMotionSelectionActionCondition: public QnActionCondition {
+public:
+    QnClearMotionSelectionActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+
+    virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;
+};
+
 class QnCheckFileSignatureActionCondition: public QnActionCondition {
 public:
     QnCheckFileSignatureActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
