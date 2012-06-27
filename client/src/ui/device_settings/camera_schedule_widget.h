@@ -35,19 +35,25 @@ public:
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
 
+    void setMotionAvailable(bool available);
+    bool isMotionAvailable();
+
     const QnVirtualCameraResourceList &cameras() const;
     void setCameras(const QnVirtualCameraResourceList &cameras);
     int getGridMaxFps();
     bool isSecondaryStreamReserver() const;
+
 signals:
     void scheduleTasksChanged();
     void scheduleEnabledChanged();
     void moreLicensesRequested();
     void gridParamsChanged();
+
 private slots:
     void updateGridParams(bool fromUserInput = false);
     void updateGridEnabledState();
     void updateLicensesLabelText();
+    void updateMotionButtons();
 
     void at_gridWidget_cellActivated(const QPoint &cell);
     void at_enableRecordingCheckBox_clicked();
@@ -67,6 +73,7 @@ private:
     QScopedPointer<Ui::CameraScheduleWidget> ui;
     QnVirtualCameraResourceList m_cameras;
     bool m_disableUpdateGridParams;
+    bool m_motionAvailable;
     bool m_changesDisabled;
     bool m_readOnly;
 };

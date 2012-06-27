@@ -14,7 +14,8 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     ui(new Ui::CameraScheduleWidget),
     m_disableUpdateGridParams(false),
     m_changesDisabled(false),
-    m_readOnly(false)
+    m_readOnly(false),
+    m_motionAvailable(true)
 {
     ui->setupUi(this);
 
@@ -57,6 +58,7 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     
     updateGridEnabledState();
     updateLicensesLabelText();
+    updateMotionButtons();
 }
 
 QnCameraScheduleWidget::~QnCameraScheduleWidget() {
@@ -170,7 +172,7 @@ QList<QnScheduleTask::Data> QnCameraScheduleWidget::scheduleTasks() const
             }
             QnStreamQuality streamQuality = QnQualityHighest;
             {
-                QString shortQuality(ui->gridWidget->cellValue(cell, QnScheduleGridWidget::SecondParam).toString());
+                QString shortQuality(ui->gridWidget->cellValue(cell, QnScheduleGridWidget::SecondParam).toString()); // TODO: Oh crap. This string-switching is totally evil.
                 if (shortQuality == QLatin1String("Lo"))
                     streamQuality = QnQualityLow;
                 else if (shortQuality == QLatin1String("Md"))
@@ -420,6 +422,20 @@ int QnCameraScheduleWidget::activeCameraCount() const
     }
 }
 
+void QnCameraScheduleWidget::setMotionAvailable(bool available) {
+    if(m_motionAvailable == available)
+        return;
+
+    m_motionAvailable = available;
+
+    updateMotionButtons();
+}
+
+bool QnCameraScheduleWidget::isMotionAvailable() {
+    return m_motionAvailable;
+}
+
+
 void QnCameraScheduleWidget::updateGridEnabledState() 
 {
     bool enabled = ui->enableRecordingCheckBox->checkState() == Qt::Checked;
@@ -454,6 +470,43 @@ void QnCameraScheduleWidget::updateLicensesLabelText()
                 arg(tr("Requires %n license(s)", NULL, m_cameras.size() - alreadyActive)).
                 arg(tr("%n license(s) are used out of %1", NULL, used).arg(total))
         );
+    }
+}
+
+void QnCameraScheduleWidget::updateMotionButtons() {
+    ui->recordMotionButton->setEnabled(m_motionAvailable);
+    ui->recordMotionPlusLQButton->setEnabled(m_motionAvailable);
+
+    if(!m_motionAvailable) {
+        if(ui->recordMotionButton->isChecked() || ui->recordMotionPlusLQButton->isChecked())
+            ui->recordAlwaysButton->setChecked(true); /* This will uncheck other buttons. */
+
+        for (int row = 0; row < ui->gridWidget->rowCount(); ++row) {
+            for (int col = 0; col < ui->gridWidget->columnCount(); ++col) {
+                const QPoint cell(col, row);
+
+                // TODO: swordsmanship skills must be used here.
+                QnScheduleTask::RecordingType recordType = QnScheduleTask::RecordingType_Run;
+                {
+                    QColor color(ui->gridWidget->cellValue(cell, QnScheduleGridWidget::ColorParam).toUInt());
+                    if (color == ui->recordAlwaysButton->color())
+                        recordType = QnScheduleTask::RecordingType_Run;
+                    else if (color == ui->recordMotionButton->color())
+                        recordType = QnScheduleTask::RecordingType_MotionOnly;
+                    else if (color == ui->recordMotionPlusLQButton->color())
+                        recordType = QnScheduleTask::RecordingType_MotionPlusLQ;
+                    else if (color == ui->noRecordButton->color())
+                        recordType = QnScheduleTask::RecordingType_Never;
+                    else
+                        qWarning("ColorParam wasn't acknowledged. fallback to 'Always'");
+                }
+
+                if(recordType == QnScheduleTask::RecordingType_MotionOnly || recordType == QnScheduleTask::RecordingType_MotionPlusLQ) {
+                    ui->gridWidget->setCellValue(cell, QnScheduleGridWidget::ColorParam, ui->recordAlwaysButton->color().rgba());
+                    ui->gridWidget->setCellValue(cell, QnScheduleGridWidget::ColorInsideParam, ui->recordAlwaysButton->color().rgba());
+                }
+            }
+        }
     }
 }
 

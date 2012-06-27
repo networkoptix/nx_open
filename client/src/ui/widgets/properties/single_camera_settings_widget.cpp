@@ -293,6 +293,14 @@ void QnSingleCameraSettingsWidget::updateMotionWidgetNeedControlMaxRect() {
     m_motionWidget->setNeedControlMaxRects(m_cameraSupportsMotion && !ui->softwareMotionButton->isChecked());
 }
 
+void QnSingleCameraSettingsWidget::updateMotionAvailability() {
+    bool motionAvailable = true;
+    if(ui->cameraMotionButton->isChecked())
+        motionAvailable = m_camera->getCameraBasedMotionType() != MT_NoMotion;
+
+    ui->cameraScheduleWidget->setMotionAvailable(motionAvailable);
+}
+
 void QnSingleCameraSettingsWidget::updateMotionWidgetSensitivity() {
     if(m_motionWidget)
         m_motionWidget->setMotionSensitivity(ui->sensitivitySlider->value());
@@ -335,6 +343,7 @@ void QnSingleCameraSettingsWidget::at_motionTypeChanged() {
 
     updateMotionWidgetNeedControlMaxRect();
     updateMaxFPS();
+    updateMotionAvailability();
 }
 
 void QnSingleCameraSettingsWidget::updateMaxFPS() {
