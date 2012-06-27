@@ -825,9 +825,10 @@ bool QnOnvifStreamReader::sendConfigToCamera(MediaSoapWrapper& soapWrapper, Came
     //possibility, that desired encoders / sources attached to predefined profile, so ignore
     //and try to get stream url further
     //ToDo: think more about this situation
-    //if (!result) {
-    //    return false;
-    //}
+    if (!result) {
+        //return false;
+        info.finalProfile = &info.predefinedProfile;
+    }
 
     if (!sendVideoEncoderToCamera(soapWrapper, info, *info.finalProfile))
     {
