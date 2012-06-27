@@ -3,6 +3,7 @@
 
 #include <QtGlobal>
 
+#if 0
 class QnPerformance {
 public:
     static qint64 currentThreadTimeMSecs();
@@ -22,5 +23,6 @@ public:
     static qint64 currentCpuFrequency();
 };
 
+#endif 
 
 #endif // QN_PERFORMANCE_H
