@@ -9,12 +9,12 @@
 	<parent>
 		<artifactId>cpp</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>1.2</version>
+		<version>1.2.0</version>
 		<relativePath>../cpp</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>1.2</version>
+	<version>1.2.0</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>traytool</artifactId>
 	<packaging>pom</packaging>
