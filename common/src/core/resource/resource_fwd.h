@@ -70,6 +70,11 @@ typedef QnList<QnLocalVideoServerResourcePtr> QnLocalVideoServerResourceList;
 class QnPlColdStoreStorage;
 typedef QnSharedResourcePointer<QnPlColdStoreStorage> QnPlColdStoreStoragePtr;
 
+class QnPlAxisResource;
+typedef QnSharedResourcePointer<QnPlAxisResource> QnPlAxisResourcePtr;
+
+class QnPlOnvifResource;
+typedef QnSharedResourcePointer<QnPlOnvifResource> QnPlOnvifResourcePtr;
 
 
 #endif // QN_RESOURCE_FWD_H
