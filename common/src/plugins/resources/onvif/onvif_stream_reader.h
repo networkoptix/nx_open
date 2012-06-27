@@ -65,7 +65,7 @@ private:
     //Returned pointers are valid while response object is living. (For all functions in the following block)
     VideoEncoder* fetchVideoEncoder(VideoConfigsResp& response, bool isPrimary) const;
     AudioEncoder* fetchAudioEncoder(AudioConfigsResp& response, bool isPrimary) const;
-    ProfilePair fetchProfile(ProfilesResp& response, bool isPrimary) const;
+    void fetchProfile(ProfilesResp& response, ProfilePair& profiles, bool isPrimary) const;
     VideoSource* fetchVideoSource(VideoSrcConfigsResp& response, bool isPrimary) const;
     AudioSource* fetchAudioSource(AudioSrcConfigsResp& response, bool isPrimary) const;
 

@@ -135,7 +135,7 @@ void OnvifResourceSearcherWsdd::findHelloEndpoints(EndpointInfoHash& result) con
     QMutexLocker lock(&m_mutex);
 
     wsddProxy soapWsddProxy(SOAP_IO_UDP);
-    soapWsddProxy.soap->recv_timeout = 1;
+    soapWsddProxy.soap->recv_timeout = -200000;
     soapWsddProxy.soap->fconnect = nullGsoapFconnect;
     soapWsddProxy.soap->fdisconnect = nullGsoapFdisconnect;
     soapWsddProxy.soap->fclose = NULL;
@@ -209,7 +209,7 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
 
         QStringList addrPrefixes = getAddrPrefixes(iface.address.toString());
         wsddProxy soapWsddProxy(SOAP_IO_UDP);
-        soapWsddProxy.soap->recv_timeout = 1;
+        soapWsddProxy.soap->recv_timeout = -200000;
         soapWsddProxy.soap->user = &qSocket;
         soapWsddProxy.soap->fconnect = nullGsoapFconnect;
         soapWsddProxy.soap->fdisconnect = nullGsoapFdisconnect;
