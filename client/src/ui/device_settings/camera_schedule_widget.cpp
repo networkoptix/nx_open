@@ -120,23 +120,8 @@ void QnCameraScheduleWidget::setCameras(const QnVirtualCameraResourceList &camer
     m_cameras = cameras;
 
     int enabledCount = 0, disabledCount = 0;
-    ui->recordMotionButton->setEnabled(true);
-    ui->recordMotionPlusLQButton->setEnabled(true);
-    ui->labelMotionOnly->setEnabled(true);
-    ui->labelMotionPlusLQ->setEnabled(true);
-    foreach (QnVirtualCameraResourcePtr camera, m_cameras) {
+    foreach (QnVirtualCameraResourcePtr camera, m_cameras)
         (camera->isScheduleDisabled() ? disabledCount : enabledCount)++;
-        if (camera->supportedMotionType() == MT_NoMotion) {
-            ui->recordMotionButton->setEnabled(false);
-            ui->recordMotionPlusLQButton->setEnabled(false);
-            ui->labelMotionOnly->setEnabled(false);
-            ui->labelMotionPlusLQ->setEnabled(false);
-        }
-        else if (!camera->hasDualStreaming()) {
-            ui->recordMotionPlusLQButton->setEnabled(false);
-            ui->labelMotionPlusLQ->setEnabled(false);
-        }
-    }
 
     if(enabledCount > 0 && disabledCount > 0) {
         ui->enableRecordingCheckBox->setCheckState(Qt::PartiallyChecked);
@@ -144,6 +129,7 @@ void QnCameraScheduleWidget::setCameras(const QnVirtualCameraResourceList &camer
         ui->enableRecordingCheckBox->setCheckState(enabledCount > 0 ? Qt::Checked : Qt::Unchecked);
     }
 
+    updateMotionButtons();
     updateLicensesLabelText();
 }
 
@@ -474,13 +460,24 @@ void QnCameraScheduleWidget::updateLicensesLabelText()
 }
 
 void QnCameraScheduleWidget::updateMotionButtons() {
-    ui->recordMotionButton->setEnabled(m_motionAvailable);
-    ui->recordMotionPlusLQButton->setEnabled(m_motionAvailable);
+    bool hasDualStreaming = false;
+    bool hasMotion = false;
+    foreach(const QnVirtualCameraResourcePtr &camera, m_cameras) {
+        hasDualStreaming |= camera->hasDualStreaming();
+        hasMotion |= camera->supportedMotionType() != MT_NoMotion;
+    }
+
+    ui->recordMotionButton->setEnabled(m_motionAvailable && hasMotion);
+    ui->labelMotionOnly->setEnabled(ui->recordMotionButton->isEnabled());
+    ui->recordMotionPlusLQButton->setEnabled(m_motionAvailable && hasDualStreaming && hasMotion);
+    ui->labelMotionPlusLQ->setEnabled(ui->recordMotionPlusLQButton->isEnabled());
+
+    if(ui->recordMotionButton->isChecked() && !ui->recordMotionButton->isEnabled())
+        ui->recordAlwaysButton->setChecked(true);
+    if(ui->recordMotionPlusLQButton->isChecked() && !ui->recordMotionPlusLQButton->isEnabled())
+        ui->recordAlwaysButton->setChecked(true);
 
     if(!m_motionAvailable) {
-        if(ui->recordMotionButton->isChecked() || ui->recordMotionPlusLQButton->isChecked())
-            ui->recordAlwaysButton->setChecked(true); /* This will uncheck other buttons. */
-
         for (int row = 0; row < ui->gridWidget->rowCount(); ++row) {
             for (int col = 0; col < ui->gridWidget->columnCount(); ++col) {
                 const QPoint cell(col, row);

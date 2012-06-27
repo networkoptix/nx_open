@@ -215,6 +215,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
     }
 
     updateMotionWidgetFromResource();
+    updateMotionAvailability();
 
     setHasChanges(false);
 }
@@ -296,7 +297,7 @@ void QnSingleCameraSettingsWidget::updateMotionWidgetNeedControlMaxRect() {
 void QnSingleCameraSettingsWidget::updateMotionAvailability() {
     bool motionAvailable = true;
     if(ui->cameraMotionButton->isChecked())
-        motionAvailable = m_camera->getCameraBasedMotionType() != MT_NoMotion;
+        motionAvailable = m_camera && (m_camera->getCameraBasedMotionType() != MT_NoMotion);
 
     ui->cameraScheduleWidget->setMotionAvailable(motionAvailable);
 }
