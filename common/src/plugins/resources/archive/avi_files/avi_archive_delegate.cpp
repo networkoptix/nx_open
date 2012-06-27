@@ -120,7 +120,8 @@ QnAviArchiveDelegate::QnAviArchiveDelegate():
     m_startTime(0),
     m_useAbsolutePos(true),
     m_duration(AV_NOPTS_VALUE),
-    m_ioContext(0)
+    m_ioContext(0),
+    m_eofReached(false)
 {
     close();
     m_audioLayout = new QnAviAudioLayout(this);
@@ -166,7 +167,7 @@ QnMediaContextPtr QnAviArchiveDelegate::getCodecContext(AVStream* stream)
 
 QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
 {
-    if (!findStreams())
+    if (!findStreams() && m_eofReached)
         return QnAbstractMediaDataPtr();
 
     AVPacket packet;
@@ -229,6 +230,10 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
 
 qint64 QnAviArchiveDelegate::seek(qint64 time, bool findIFrame)
 {
+    m_eofReached = time > endTime();
+    if (m_eofReached)
+        return time;
+
     time = qMax(time-m_startTime, 0ll);
     if (!findStreams())
         return -1;
@@ -241,6 +246,7 @@ bool QnAviArchiveDelegate::open(QnResourcePtr resource)
     m_resource = resource;
     if (m_formatContext == 0)
     {
+        m_eofReached = false;
         QString url = m_resource->getUrl(); // "c:/00-1A-07-03-BD-09.mkv"; //
         if (m_storage == 0)
             m_storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(url));

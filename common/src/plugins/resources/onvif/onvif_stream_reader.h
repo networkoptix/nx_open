@@ -21,8 +21,6 @@ typedef onvifXsd__VideoSourceConfiguration VideoSource;
 typedef onvifXsd__AudioEncoderConfiguration AudioEncoder;
 typedef onvifXsd__AudioSourceConfiguration AudioSource;
 
-typedef QSharedPointer<Profile> ProfilePtr;
-
 class QnOnvifStreamReader: public CLServerPushStreamreader , public QnLiveStreamProvider
 {
     static const char* NETOPTIX_PRIMARY_NAME;
@@ -58,18 +56,18 @@ private:
     const QString updateCameraAndFetchStreamUrl(bool isPrimary) const;
 
     //Returned pointers are valid while response object is living. (For all functions in the following block)
-    VideoEncoder* fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper, VideoConfigsResp& response, bool isPrimary) const;
-    AudioEncoder* fetchUpdateAudioEncoder(MediaSoapWrapper& soapWrapper, AudioConfigsResp& response, bool isPrimary) const;
-    ProfilePair fetchUpdateProfile(MediaSoapWrapper& soapWrapper, ProfilesResp& response, bool isPrimary) const;
-    VideoSource* fetchUpdateVideoSource(MediaSoapWrapper& soapWrapper, VideoSrcConfigsResp& response, bool isPrimary) const;
-    AudioSource* fetchUpdateAudioSource(MediaSoapWrapper& soapWrapper, AudioSrcConfigsResp& response, bool isPrimary) const;
+    bool fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper, CameraInfo& info, bool isPrimary) const;
+    bool fetchUpdateAudioEncoder(MediaSoapWrapper& soapWrapper, CameraInfo& info, bool isPrimary) const;
+    bool fetchUpdateProfile(MediaSoapWrapper& soapWrapper, CameraInfo& info, bool isPrimary) const;
+    bool fetchUpdateVideoSource(MediaSoapWrapper& soapWrapper, CameraInfo& info, bool isPrimary) const;
+    bool fetchUpdateAudioSource(MediaSoapWrapper& soapWrapper, CameraInfo& info, bool isPrimary) const;
 
     //Returned pointers are valid while response object is living. (For all functions in the following block)
-    VideoEncoder* fetchUpdateVideoEncoder(VideoConfigsResp& response, bool isPrimary) const;
-    AudioEncoder* fetchUpdateAudioEncoder(AudioConfigsResp& response, bool isPrimary) const;
-    ProfilePair fetchUpdateProfile(ProfilesResp& response, bool isPrimary) const;
-    VideoSource* fetchUpdateVideoSource(VideoSrcConfigsResp& response, bool isPrimary) const;
-    AudioSource* fetchUpdateAudioSource(AudioSrcConfigsResp& response, bool isPrimary) const;
+    VideoEncoder* fetchVideoEncoder(VideoConfigsResp& response, bool isPrimary) const;
+    AudioEncoder* fetchAudioEncoder(AudioConfigsResp& response, bool isPrimary) const;
+    ProfilePair fetchProfile(ProfilesResp& response, bool isPrimary) const;
+    VideoSource* fetchVideoSource(VideoSrcConfigsResp& response, bool isPrimary) const;
+    AudioSource* fetchAudioSource(AudioSrcConfigsResp& response, bool isPrimary) const;
 
     void updateVideoEncoder(VideoEncoder& encoder, bool isPrimary) const;
     void updateAudioEncoder(AudioEncoder& encoder, bool isPrimary) const;

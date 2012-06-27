@@ -300,12 +300,12 @@ ResolutionPair QnPlOnvifResource::getNearestResolution(const ResolutionPair& res
     for (int i = 0; i < m_resolutionList.size(); ++i) {
         ResolutionPair tmp;
 
-        tmp.first = qPower2Ceil(static_cast<unsigned int>(m_resolutionList[i].first), 8);
-        tmp.second = qPower2Floor(static_cast<unsigned int>(m_resolutionList[i].second), 8);
+        tmp.first = qPower2Ceil(static_cast<unsigned int>(m_resolutionList[i].first + 1), 8);
+        tmp.second = qPower2Floor(static_cast<unsigned int>(m_resolutionList[i].second - 1), 8);
         float ar1 = getResolutionAspectRatio(tmp);
 
-        tmp.first = qPower2Floor(static_cast<unsigned int>(m_resolutionList[i].first), 8);
-        tmp.second = qPower2Ceil(static_cast<unsigned int>(m_resolutionList[i].second), 8);
+        tmp.first = qPower2Floor(static_cast<unsigned int>(m_resolutionList[i].first - 1), 8);
+        tmp.second = qPower2Ceil(static_cast<unsigned int>(m_resolutionList[i].second + 1), 8);
         float ar2 = getResolutionAspectRatio(tmp);
 
         if (!qBetween(aspectRatio, qMin(ar1,ar2), qMax(ar1,ar2)))
