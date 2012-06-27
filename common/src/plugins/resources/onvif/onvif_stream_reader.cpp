@@ -221,6 +221,7 @@ public:
         Extension = NULL;
         fixed = NULL;
         __anyAttribute = NULL;
+        __item = NULL;
     }
 
     void setValues(const Profile& src)
@@ -644,7 +645,8 @@ bool QnOnvifStreamReader::fetchUpdateProfile(MediaSoapWrapper& soapWrapper, Came
         return false;
     }
 
-    ProfilePair profiles = fetchProfile(response, isPrimary);
+    ProfilePair profiles;
+    fetchProfile(response, profiles, isPrimary);
 
     bool result = false;
     if (profiles.netoptix) {
@@ -662,10 +664,9 @@ bool QnOnvifStreamReader::fetchUpdateProfile(MediaSoapWrapper& soapWrapper, Came
     return result;
 }
 
-ProfilePair QnOnvifStreamReader::fetchProfile(ProfilesResp& response, bool isPrimary) const
+void QnOnvifStreamReader::fetchProfile(ProfilesResp& response, ProfilePair& profiles, bool isPrimary) const
 {
     std::vector<Profile*>::const_iterator iter = response.Profiles.begin();
-    ProfilePair result;
     Profile* additionalProfile = 0;
 
     const char* token = isPrimary? NETOPTIX_PRIMARY_TOKEN: NETOPTIX_SECONDARY_TOKEN;
@@ -681,15 +682,15 @@ ProfilePair QnOnvifStreamReader::fetchProfile(ProfilesResp& response, bool isPri
         if (profile && profile->token != filteredToken) {
 
             if (profile->token == token) {
-                result.netoptix = profile;
-                return result;
+                profiles.netoptix = profile;
+                return;
             }
 
             bool finish = false;
             if (profile->VideoEncoderConfiguration)
             {
                 if (encoderToken == profile->VideoEncoderConfiguration->token.c_str()) {
-                    result.predefined = profile;
+                    profiles.predefined = profile;
                 } else if (filteredEncoderToken == profile->VideoEncoderConfiguration->token.c_str()) {
                     finish = true;
                 }
@@ -706,17 +707,15 @@ ProfilePair QnOnvifStreamReader::fetchProfile(ProfilesResp& response, bool isPri
         ++iter;
     }
 
-    if (!result.predefined) {
-        result.predefined = additionalProfile;
+    if (!profiles.predefined) {
+        profiles.predefined = additionalProfile;
     }
 
     //Netoptix profile not found. Trying to create it.
-    result.profileAbsent = true;
+    profiles.profileAbsent = true;
 
-    result.netoptix = &result.tmp;
-    result.netoptix->token = isPrimary? NETOPTIX_PRIMARY_TOKEN: NETOPTIX_SECONDARY_TOKEN;
-
-    return result;
+    profiles.netoptix = &profiles.tmp;
+    profiles.netoptix->token = isPrimary? NETOPTIX_PRIMARY_TOKEN: NETOPTIX_SECONDARY_TOKEN;
 }
 
 void QnOnvifStreamReader::updateProfile(Profile& profile, bool isPrimary) const
