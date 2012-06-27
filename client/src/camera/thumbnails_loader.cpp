@@ -10,6 +10,7 @@
 
 #include <utils/common/math.h>
 #include <utils/common/synctime.h>
+#include <utils/common/performance.h>
 
 #include "core/resource/camera_resource.h"
 #include "core/resource/camera_history.h"
@@ -32,9 +33,12 @@ namespace {
 
     const int maxStackSize = 1024;
 
+    const int maxThumbnailCacheSize = 20 * 1024 * 1024; /* 20 megabytes per loader. */
+
     const qint64 invalidProcessingTime = std::numeric_limits<qint64>::min() / 2;
 }
 
+#define QN_THUMBNAILS_LOADER_DEBUG
 
 QnThumbnailsLoader::QnThumbnailsLoader(QnResourcePtr resource):
     m_mutex(QMutex::NonRecursive),
@@ -244,10 +248,16 @@ void QnThumbnailsLoader::updateProcessingLocked() {
 
     bool processingPeriodValid = m_processingStart >= 0 && m_processingEnd >= 0;
 
-    /* Discard old loaded period if it cannot be used to extend then new one. */
+    /* Discard old loaded period if it cannot be used to extend the new one. */
     if(processingPeriodValid && (m_requestStart > m_processingEnd + m_timeStep || m_requestEnd < m_processingStart - m_timeStep)) {
         invalidateThumbnailsLocked();
-        return;
+        return; /* We'll be called again from the event loop. */
+    }
+
+    // TODO: there probably is a better place for checking size restrictions.
+    if(m_thumbnailByTime.size() * m_scaleTargetSize.width() * m_scaleTargetSize.width() * 4 > maxThumbnailCacheSize) {
+        invalidateThumbnailsLocked();
+        return; /* We'll be called again from the event loop. */
     }
 
     /* Add margins. */
@@ -300,7 +310,7 @@ void QnThumbnailsLoader::enqueueForProcessingLocked(qint64 startTime, qint64 end
     while(m_processingStack.size() > maxStackSize)
         m_processingStack.pop();
 
-    if(m_processingStack.size() == 1)
+    // if(m_processingStack.size() == 1) // TODO: for some reason, this doesn't work in some cases.
         emit processingRequested();
 }
 
@@ -341,7 +351,11 @@ void QnThumbnailsLoader::process() {
         generation = m_generation;
     }
 
-    qDebug() << "QnThumbnailsLoader::process [" << period.startTimeMs << "," << period.endTimeMs() + timeStep << ")";
+#ifdef QN_THUMBNAILS_LOADER_DEBUG
+    qDebug() << "QnThumbnailsLoader::process START [" << period.startTimeMs << "," << period.endTimeMs() + timeStep << ")";
+    qint64 startRealTime = qnSyncTime->currentMSecsSinceEpoch();
+    qint64 startCpuTime = QnPerformance::currentThreadTimeMSecs();
+#endif
 
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(m_resource);
     if (camera) {
@@ -428,6 +442,12 @@ void QnThumbnailsLoader::process() {
         if(invalidated)
             break;
     }
+
+#ifdef QN_THUMBNAILS_LOADER_DEBUG
+    qint64 totalRealTime = qnSyncTime->currentMSecsSinceEpoch() - startRealTime;
+    qint64 totalCpuTime = QnPerformance::currentThreadTimeMSecs() - startCpuTime;
+    qDebug() << "QnThumbnailsLoader::process END [" << period.startTimeMs << "," << period.endTimeMs() + timeStep << ") IN " << totalCpuTime << "/" << totalRealTime << "ms cpu/real time";
+#endif
 
     /* Go on with processing. */
     QMetaObject::invokeMethod(m_helper, "process", Qt::QueuedConnection); // TODO: use connections.
