@@ -11,6 +11,8 @@ class QnPlWatchDogResource : public QnPlOnvifResource
 {
 public:
     QnPlWatchDogResource();
+
+    virtual int suggestBitrateKbps(QnStreamQuality q, QSize resolution, int fps) const override;
 protected:
     bool initInternal() override;
 private:

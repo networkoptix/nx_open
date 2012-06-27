@@ -54,3 +54,24 @@ bool QnPlWatchDogResource::initInternal()
         return QnPlOnvifResource::initInternal();
     }
 }
+
+
+int QnPlWatchDogResource::suggestBitrateKbps(QnStreamQuality q, QSize resolution, int fps) const
+{
+    // I assume for a QnQualityHighest quality 30 fps for 1080 we need 10 mbps
+    // I assume for a QnQualityLowest quality 30 fps for 1080 we need 1 mbps
+
+    int hiEnd = 1024*11;
+    int lowEnd = 1024*1.8;
+
+    float resolutionFactor = resolution.width()*resolution.height()/1920.0/1080;
+    resolutionFactor = pow(resolutionFactor, (float)0.5);
+
+    float frameRateFactor = fps/30.0;
+    frameRateFactor = pow(resolutionFactor, (float)0.4);
+
+    int result = lowEnd + (hiEnd - lowEnd) * (q - QnQualityLowest) / (QnQualityHighest - QnQualityLowest);
+    result *= (resolutionFactor * frameRateFactor);
+
+    return result;
+}
