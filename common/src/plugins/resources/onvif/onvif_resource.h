@@ -78,6 +78,8 @@ public:
 
     static const QString createOnvifEndpointUrl(const QString& ipAddress);
 
+    virtual bool setHostAddress(const QHostAddress &ip, QnDomain domain = QnDomainMemory) override;
+
 
     virtual bool isResourceAccessible() override;
     virtual bool updateMACAddress() override;
@@ -87,6 +89,8 @@ public:
     virtual void setIframeDistance(int /*frames*/, int /*timems*/) override {}
     virtual bool hasDualStreaming() const override;
     virtual bool shoudResolveConflicts() const override;
+
+    
 
     int innerQualityToOnvif(QnStreamQuality quality) const;
     const QString createOnvifEndpointUrl() const { return createOnvifEndpointUrl(getHostAddress().toString()); }

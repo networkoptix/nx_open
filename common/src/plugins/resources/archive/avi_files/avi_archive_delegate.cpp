@@ -167,7 +167,7 @@ QnMediaContextPtr QnAviArchiveDelegate::getCodecContext(AVStream* stream)
 
 QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
 {
-    if (!findStreams() && m_eofReached)
+    if (!findStreams() || m_eofReached)
         return QnAbstractMediaDataPtr();
 
     AVPacket packet;

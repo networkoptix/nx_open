@@ -478,8 +478,11 @@
             <property name="suffix">
              <string> s</string>
             </property>
+            <property name="minimum">
+             <number>3</number>
+            </property>
             <property name="maximum">
-             <number>45</number>
+             <number>20</number>
             </property>
             <property name="value">
              <number>10</number>
@@ -504,8 +507,11 @@
             <property name="suffix">
              <string> s</string>
             </property>
+            <property name="minimum">
+             <number>3</number>
+            </property>
             <property name="maximum">
-             <number>45</number>
+             <number>20</number>
             </property>
             <property name="value">
              <number>10</number>

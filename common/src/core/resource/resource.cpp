@@ -351,7 +351,9 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
     getResourceParamList();
     if (!m_resourceParamList.contains(name))
     {
-        qWarning() << "Can't get parameter. Parameter" << name << "does not exists for resource" << getName();
+        if (!name.contains("VideoLayout"))
+            qWarning() << "Can't get parameter. Parameter" << name << "does not exists for resource" << getName();
+
         return false;
     }
 

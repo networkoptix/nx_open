@@ -148,6 +148,31 @@ const QString QnPlOnvifResource::fetchMacAddress(const NetIfacesResp& response,
     return someMacAddress.toUpper().replace(":", "-");
 }
 
+bool QnPlOnvifResource::setHostAddress(const QHostAddress &ip, QnDomain domain)
+{
+    //QnPhysicalCameraResource::se
+    {
+        QMutexLocker lock(&m_mutex);
+
+        if (!m_mediaUrl.isEmpty())
+        {
+            QUrl url(m_mediaUrl);
+            url.setHost(ip.toString());
+            m_mediaUrl = url.toString();
+        }
+
+        if (!m_deviceOnvifUrl.isEmpty())
+        {
+            QUrl url(m_deviceOnvifUrl);
+            url.setHost(ip.toString());
+            m_deviceOnvifUrl= url.toString();
+        }
+    }
+
+    return QnPhysicalCameraResource::setHostAddress(ip, domain);
+
+}
+
 const QString QnPlOnvifResource::createOnvifEndpointUrl(const QString& ipAddress) {
     return ONVIF_PROTOCOL_PREFIX + ipAddress + ONVIF_URL_SUFFIX;
 }
@@ -300,12 +325,12 @@ ResolutionPair QnPlOnvifResource::getNearestResolution(const ResolutionPair& res
     for (int i = 0; i < m_resolutionList.size(); ++i) {
         ResolutionPair tmp;
 
-        tmp.first = qPower2Ceil(static_cast<unsigned int>(m_resolutionList[i].first), 8);
-        tmp.second = qPower2Floor(static_cast<unsigned int>(m_resolutionList[i].second), 8);
+        tmp.first = qPower2Ceil(static_cast<unsigned int>(m_resolutionList[i].first + 1), 8);
+        tmp.second = qPower2Floor(static_cast<unsigned int>(m_resolutionList[i].second - 1), 8);
         float ar1 = getResolutionAspectRatio(tmp);
 
-        tmp.first = qPower2Floor(static_cast<unsigned int>(m_resolutionList[i].first), 8);
-        tmp.second = qPower2Ceil(static_cast<unsigned int>(m_resolutionList[i].second), 8);
+        tmp.first = qPower2Floor(static_cast<unsigned int>(m_resolutionList[i].first - 1), 8);
+        tmp.second = qPower2Ceil(static_cast<unsigned int>(m_resolutionList[i].second + 1), 8);
         float ar2 = getResolutionAspectRatio(tmp);
 
         if (!qBetween(aspectRatio, qMin(ar1,ar2), qMax(ar1,ar2)))
