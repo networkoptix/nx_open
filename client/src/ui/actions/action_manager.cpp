@@ -618,6 +618,11 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Alt+G")).
         condition(new QnSmartSearchActionCondition(true, this));
 
+    factory(Qn::ClearMotionSelectionAction).
+        flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
+        text(tr("Clear Motion Selection")).
+        condition(new QnClearMotionSelectionActionCondition(this));
+
     factory(Qn::ToggleSmartSearchAction).
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::HotkeyOnly).
         text(tr("Toggle Smart Search")).

@@ -60,9 +60,8 @@ Qn::ActionVisibility QnItemZoomedActionCondition::check(const QnResourceWidgetLi
 
 
 Qn::ActionVisibility QnSmartSearchActionCondition::check(const QnResourceWidgetList &widgets) {
-    foreach(QGraphicsItem *item, widgets) {
-        QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
-        if(widget == NULL)
+    foreach(QnResourceWidget *widget, widgets) {
+        if(!widget)
             continue;
 
         bool isCamera = widget->resource()->flags() & QnResource::network;
@@ -78,6 +77,25 @@ Qn::ActionVisibility QnSmartSearchActionCondition::check(const QnResourceWidgetL
     }
 
     return Qn::InvisibleAction;
+}
+
+Qn::ActionVisibility QnClearMotionSelectionActionCondition::check(const QnResourceWidgetList &widgets) {
+    bool hasDisplayedGrid = false;
+
+    foreach(QnResourceWidget *widget, widgets) {
+        if(!widget)
+            continue;
+
+        if(widget->isMotionGridDisplayed()) {
+            hasDisplayedGrid = true;
+
+            foreach(const QRegion &region, widget->motionSelection())
+                if(!region.isEmpty())
+                    return Qn::EnabledAction;
+        }
+    }
+
+    return hasDisplayedGrid ? Qn::DisabledAction : Qn::InvisibleAction;
 }
 
 Qn::ActionVisibility QnCheckFileSignatureActionCondition::check(const QnResourceWidgetList &widgets) {
