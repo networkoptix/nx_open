@@ -1140,3 +1140,10 @@ void QnPlOnvifResource::updateResourceCapabilities()
         }
     }
 }
+
+int QnPlOnvifResource::getGovLength() const
+{
+    QMutexLocker lock(&m_mutex);
+
+    return m_iframeDistance;
+}
