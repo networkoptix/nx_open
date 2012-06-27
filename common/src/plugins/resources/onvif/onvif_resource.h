@@ -95,6 +95,7 @@ public:
     int innerQualityToOnvif(QnStreamQuality quality) const;
     const QString createOnvifEndpointUrl() const { return createOnvifEndpointUrl(getHostAddress().toString()); }
 
+    int getGovLength() const;
     int getAudioBitrate() const;
     int getAudioSamplerate() const;
     ResolutionPair getPrimaryResolution() const;
