@@ -17,7 +17,10 @@ m_timeout(timeout)
 	//m_wish_blk_size = double_blk_size;
 	m_wish_blk_size  = blk_size;
     m_sock.setReadTimeOut(max(m_timeout,1000)); // minimum timeout is 1000 ms
-    m_sock.setDestAddr(m_ip, SERVER_TFTP_PORT);
+    if (!m_sock.setDestAddr(m_ip, SERVER_TFTP_PORT))
+    {
+        qWarning() << "CLSimpleTFTPClient::CLSimpleTFTPClient: setDestAddr() failed: " << m_sock.lastError();
+    }
 }
 
 int CLSimpleTFTPClient::read( const QString& fn, CLByteArray& data)
