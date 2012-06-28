@@ -160,7 +160,6 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
 
             firstCamera = false;
         }
-        updateMaxFPS();
 
         bool isScheduleEqual = true;
         QList<QnScheduleTask::Data> scheduleTasksData;
@@ -176,6 +175,14 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
                 break;
             }
         }
+        ui->cameraScheduleWidget->setChangesDisabled(!isScheduleEqual);
+        if(isScheduleEqual) {
+            ui->cameraScheduleWidget->setScheduleTasks(m_cameras.front()->getScheduleTasks());
+        } else {
+            ui->cameraScheduleWidget->setScheduleTasks(QnScheduleTaskList());
+        }
+
+        updateMaxFPS();
 
 
         /* Write camera parameters out. */
@@ -194,13 +201,6 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
         } else {
             ui->passwordEdit->setText(QString());
             ui->passwordEdit->setPlaceholderText(tr("<multiple values>", "PasswordEdit"));
-        }
-
-        ui->cameraScheduleWidget->setChangesDisabled(!isScheduleEqual);
-        if(isScheduleEqual) {
-            ui->cameraScheduleWidget->setScheduleTasks(m_cameras.front()->getScheduleTasks());
-        } else {
-            ui->cameraScheduleWidget->setScheduleTasks(QnScheduleTaskList());
         }
     }
 
