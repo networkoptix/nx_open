@@ -538,7 +538,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::OpenInFolderAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-        text(tr("Open in Containing Folder")).
+        text(tr("Open Containing Folder")).
         shortcut(tr("Ctrl+Enter")).
         shortcut(tr("Ctrl+Return")).
         autoRepeat(false).
