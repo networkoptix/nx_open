@@ -65,6 +65,19 @@ int QnSecurityCamResource::getMaxFps()
     return val.toInt();
 }
 
+int QnSecurityCamResource::reservedSecondStreamFps() const
+{
+    if (!hasSuchParam("reservedSecondStreamFps"))
+    {
+        //Q_ASSERT(false);
+        return 2;
+    }
+
+    QVariant val;
+    getParam("reservedSecondStreamFps", val, QnDomainMemory);
+    return val.toInt();
+}
+
 QSize QnSecurityCamResource::getMaxSensorSize()
 {
 

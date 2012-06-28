@@ -45,6 +45,8 @@ public:
 
     virtual int getMaxFps(); // in fact this is const function;
 
+    virtual int reservedSecondStreamFps() const; 
+
     virtual QSize getMaxSensorSize(); // in fact this is const function;
 
     virtual void setIframeDistance(int frames, int timems) = 0; // sets the distance between I frames

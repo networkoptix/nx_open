@@ -12,7 +12,7 @@ public:
     QnVirtualCameraResource();
 
     virtual void updateInner(QnResourcePtr other) override;
-    virtual int getMaxFps() override {return QnSecurityCamResource::getMaxFps();}
+
 
     void setScheduleDisabled(bool blocked);
     bool isScheduleDisabled() const;
@@ -38,8 +38,6 @@ public:
     int getPrimaryStreamRealFps() const;
 
     void onPrimaryFpsUpdated(int newFps);
-
-    virtual int getMaxFps() override {return QnVirtualCameraResource::getMaxFps();}
 
     virtual int suggestBitrateKbps(QnStreamQuality q, QSize resolution, int fps) const;
 
