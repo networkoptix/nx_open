@@ -90,7 +90,11 @@ bool Socket::fillAddr(const QString &address, unsigned short port,
     addrinfo *addressInfo;
     int status = getaddrinfo(address.toAscii(), 0, &hints, &addressInfo);
     if (status != 0) {
+#ifdef UNICODE
         m_lastError = QString("Couldn't resolve %1: %2").arg(address).arg(QString::fromWCharArray(gai_strerror(status)));
+#else
+        m_lastError = QString("Couldn't resolve %1: %2").arg(address).arg(gai_strerror(status));
+#endif  /* UNICODE */
         return false;
     }
 
