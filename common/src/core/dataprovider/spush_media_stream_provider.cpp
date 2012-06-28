@@ -16,6 +16,12 @@ m_cameraAudioEnabled(false)
         m_cameraAudioEnabled = camera->isAudioEnabled();
 }
 
+bool CLServerPushStreamreader::canChangeStatus() const
+{
+    const QnLiveStreamProvider* liveProvider = dynamic_cast<const QnLiveStreamProvider*>(this);
+    return liveProvider && liveProvider->getRole() == QnResource::Role_LiveVideo && getResource().dynamicCast<QnPhysicalCameraResource>();
+}
+
 void CLServerPushStreamreader::run()
 {
     setPriority(QThread::HighPriority);
@@ -45,9 +51,8 @@ void CLServerPushStreamreader::run()
 
                 if (mFramesLost >= MAX_LOST_FRAME) // if we lost 2 frames => connection is lost for sure (2)
                 {
-                    if (getResource().dynamicCast<QnPhysicalCameraResource>())
-						getResource()->setStatus(QnResource::Offline);
-
+                    if (canChangeStatus())
+                        getResource()->setStatus(QnResource::Offline);
                     m_stat[0].onLostConnection();
                 }
 
@@ -73,7 +78,7 @@ void CLServerPushStreamreader::run()
 
 			if (mFramesLost == MAX_LOST_FRAME) // if we lost 2 frames => connection is lost for sure (2)
             {
-				if (getResource().dynamicCast<QnPhysicalCameraResource>())
+				if (canChangeStatus())
 					getResource()->setStatus(QnResource::Offline);
 
                 m_stat[0].onLostConnection();
@@ -87,7 +92,7 @@ void CLServerPushStreamreader::run()
 
         checkTime(data);
 
-        if (getResource().dynamicCast<QnPhysicalCameraResource>())
+        if (canChangeStatus())
         {
             if (getResource()->getStatus() == QnResource::Unauthorized || getResource()->getStatus() == QnResource::Offline)
 				getResource()->setStatus(QnResource::Online);

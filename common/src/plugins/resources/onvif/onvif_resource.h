@@ -105,6 +105,9 @@ public:
     const CameraPhysicalWindowSize getPhysicalWindowSize() const;
     const QString getPrimaryVideoEncoderId() const;
     const QString getSecondaryVideoEncoderId() const;
+    const QString getAudioEncoderId() const;
+    const QString getVideoSourceId() const;
+    const QString getAudioSourceId() const;
 
 
     QString getMediaUrl() const;
@@ -143,6 +146,9 @@ private:
     bool fetchAndSetAudioEncoderOptions(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetVideoSourceOptions(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetDualStreaming(MediaSoapWrapper& soapWrapper);
+    bool fetchAndSetAudioEncoder(MediaSoapWrapper& soapWrapper);
+    bool fetchAndSetVideoSource(MediaSoapWrapper& soapWrapper);
+    bool fetchAndSetAudioSource(MediaSoapWrapper& soapWrapper);
 
     void setVideoEncoderOptions(const VideoOptionsResp& response);
     void setVideoEncoderOptionsH264(const VideoOptionsResp& response);
@@ -182,6 +188,9 @@ private:
     CameraPhysicalWindowSize m_physicalWindowSize;
     QString m_primaryVideoEncoderId;
     QString m_secondaryVideoEncoderId;
+    QString m_audioEncoderId;
+    QString m_videoSourceId;
+    QString m_audioSourceId;
 
 };
 

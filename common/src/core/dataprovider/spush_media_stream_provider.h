@@ -26,6 +26,7 @@ protected:
 private:
 	void run(); // in a loop: takes data from device and puts into queue
     virtual void beforeRun() override;
+    bool canChangeStatus() const;
 private:
     bool m_needReopen;
     bool m_cameraAudioEnabled;
