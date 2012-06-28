@@ -168,9 +168,10 @@ void OnvifResourceSearcherWsdd::findHelloEndpoints(EndpointInfoHash& result) con
                 if (soapRes == SOAP_EOF || SOAP_NO_METHOD)
                 {
                     qDebug() << "OnvifResourceSearcherWsdd::findHelloEndpoints: All devices found. Interface: " << it.key();
+                    soap_destroy(soapWsddProxy.soap);
                     soap_end(soapWsddProxy.soap);
                     break;
-                } 
+                }
                 else 
                 {
                     //SOAP_NO_METHOD - The dispatcher did not find a matching operation for the request
@@ -179,6 +180,7 @@ void OnvifResourceSearcherWsdd::findHelloEndpoints(EndpointInfoHash& result) con
                         << soapRes << SoapErrorHelper::fetchDescription(soapWsddProxy.soap_fault())
                         << ". Interface: " << it.key();
 
+                    soap_destroy(soapWsddProxy.soap);
                     soap_end(soapWsddProxy.soap);
                     continue;
                 }
@@ -190,6 +192,7 @@ void OnvifResourceSearcherWsdd::findHelloEndpoints(EndpointInfoHash& result) con
                 printProbeMatches(wsddHello.wsdd__Hello, soapWsddProxy.soap->header);
             }
 
+            soap_destroy(soapWsddProxy.soap);
             soap_end(soapWsddProxy.soap);
         }
 
@@ -244,10 +247,12 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
             qWarning() << "OnvifResourceSearcherWsdd::findEndpoints: (Send) SOAP failed. GSoap error code: "
                        << soapRes << SoapErrorHelper::fetchDescription(soapWsddProxy.soap_fault())
                        << ". Interface: " << iface.address.toString();
+            soap_destroy(soapWsddProxy.soap);
             soap_end(soapWsddProxy.soap);
             continue;
         }
 
+        soap_destroy(soapWsddProxy.soap);
         soap_end(soapWsddProxy.soap);
 
         //Receiving all ProbeMatches. Timeout = 500 ms, as written in ONVIF spec
@@ -262,6 +267,7 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
                 if (soapRes == SOAP_EOF) 
                 {
                     qDebug() << "OnvifResourceSearcherWsdd::findEndpoints: All devices found. Interface: " << iface.address.toString();
+                    soap_destroy(soapWsddProxy.soap);
                     soap_end(soapWsddProxy.soap);
                     break;
                 } 
@@ -270,6 +276,7 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
                     qWarning() << "OnvifResourceSearcherWsdd::findEndpoints: SOAP failed. GSoap error code: "
                                << soapRes << SoapErrorHelper::fetchDescription(soapWsddProxy.soap_fault())
                                << ". Interface: " << iface.address.toString();
+                    soap_destroy(soapWsddProxy.soap);
                     soap_end(soapWsddProxy.soap);
                     continue;
                 }
@@ -285,6 +292,7 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
                 }
             }
 
+            soap_destroy(soapWsddProxy.soap);
             soap_end(soapWsddProxy.soap);
         }
 

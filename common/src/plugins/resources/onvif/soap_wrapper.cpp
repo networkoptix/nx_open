@@ -44,7 +44,11 @@ SoapWrapper<T>::SoapWrapper(const std::string& endpoint, const std::string& logi
 template <class T>
 SoapWrapper<T>::~SoapWrapper()
 {
-    if (invoked) soap_end(m_soapProxy->soap);
+    if (invoked) 
+    {
+        soap_destroy(m_soapProxy->soap);
+        soap_end(m_soapProxy->soap);
+    }
 
     cleanLoginPassword();
 
@@ -92,9 +96,14 @@ template <class T>
 void SoapWrapper<T>::beforeMethodInvocation()
 {
     if (invoked)
+    {
+        soap_destroy(m_soapProxy->soap);
         soap_end(m_soapProxy->soap);
+    }
     else
+    {
         invoked = true;
+    }
 
     if (m_login) soap_wsse_add_UsernameTokenDigest(m_soapProxy->soap, "Id", m_login, m_passwd);
 }
