@@ -90,7 +90,7 @@ bool Socket::fillAddr(const QString &address, unsigned short port,
     addrinfo *addressInfo;
     int status = getaddrinfo(address.toAscii(), 0, &hints, &addressInfo);
     if (status != 0) {
-        m_lastError = QString("Couldn't resolve ") + address.toAscii() + ": " + gai_strerror(status);
+        m_lastError = QString("Couldn't resolve %1: %2").arg(address).arg(QString::fromWCharArray(gai_strerror(status)));
         return false;
     }
 
@@ -678,11 +678,11 @@ bool UDPSocket::hasData() const
     timeout.tv_usec = 0;
     switch( ::select(FD_SETSIZE, &read_set, NULL, NULL, &timeout))
     {
-    case 0:				// timeout expired
+    case 0:             // timeout expired
     {
         return false;
     }
-    case SOCKET_ERROR: 	// error occured
+    case SOCKET_ERROR:  // error occured
     {
         return false;
     }
