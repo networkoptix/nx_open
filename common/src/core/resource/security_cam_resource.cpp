@@ -65,7 +65,7 @@ int QnSecurityCamResource::getMaxFps()
     return val.toInt();
 }
 
-int QnSecurityCamResource::reservedSecondStreamFps() const
+int QnSecurityCamResource::reservedSecondStreamFps()
 {
     if (!hasSuchParam("reservedSecondStreamFps"))
     {

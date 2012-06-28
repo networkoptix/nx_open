@@ -45,7 +45,7 @@ public:
 
     virtual int getMaxFps(); // in fact this is const function;
 
-    virtual int reservedSecondStreamFps() const; 
+    virtual int reservedSecondStreamFps();  // in fact this is const function;
 
     virtual QSize getMaxSensorSize(); // in fact this is const function;
 
