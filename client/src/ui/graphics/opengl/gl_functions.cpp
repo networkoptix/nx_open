@@ -217,10 +217,7 @@ namespace {
         while (EnumDisplayDevices(0, dev, &dd, 0))
         {
             if (dd.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE){
-
-                /** TODO: reinterpret_cast is required because
-                 ** QT is compiled with 'Treat wchar_t as Built-in Type' set to No.*/
-                QString v = QString::fromUtf16(reinterpret_cast<const ushort*>(dd.DeviceString));
+                QString v = QString::fromWCharArray(dd.DeviceString);
                 if (v.contains("Intel(R) HD Graphics 3000"))
                     result |= QnGlFunctions::OpenGLBroken;
                 else
