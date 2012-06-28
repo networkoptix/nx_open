@@ -88,8 +88,10 @@ void RTPIODevice::processRtcpData()
         {
             if (!m_rtcpSocket->isConnected())
             {
-
-                m_rtcpSocket->setDestAddr(lastReceivedAddr, lastReceivedPort);
+                if (!m_rtcpSocket->setDestAddr(lastReceivedAddr, lastReceivedPort))
+                {
+                    qWarning() << "RTPIODevice::processRtcpData(): setDestAddr() failed: " << m_rtcpSocket->lastError();
+                }
             }
             m_statistic = m_owner->parseServerRTCPReport(rtcpBuffer, readed);
             int outBufSize = m_owner->buildClientRTCPReport(sendBuffer);
