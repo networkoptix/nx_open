@@ -33,6 +33,7 @@ SoapWrapper<T>::SoapWrapper(const std::string& endpoint, const std::string& logi
     m_soapProxy = new T();
     m_soapProxy->soap->send_timeout = SOAP_SEND_TIMEOUT;
     m_soapProxy->soap->recv_timeout = SOAP_RECEIVE_TIMEOUT;
+    m_soapProxy->soap->connect_timeout = 1;
 
     soap_register_plugin(m_soapProxy->soap, soap_wsse);
 }

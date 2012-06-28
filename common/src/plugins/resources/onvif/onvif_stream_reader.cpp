@@ -8,249 +8,12 @@
 #include "utils/network/tcp_connection_priv.h"
 
 //
-// LocalVideoEncoder
-//
-
-class LocalVideoEncoder: public VideoEncoder
-{
-public:
-    LocalVideoEncoder()
-    {
-        Resolution = new onvifXsd__VideoResolution();
-        RateControl = new onvifXsd__VideoRateControl();
-        MPEG4 = NULL;
-        H264 = NULL;
-        Multicast = NULL;
-        __anyAttribute = NULL;
-    }
-
-    ~LocalVideoEncoder()
-    {
-        delete Resolution;
-        delete RateControl;
-        if (MPEG4) delete MPEG4;
-        if (H264) delete H264;
-        if (Multicast)
-        {
-            if (Multicast->Address)
-            {
-                if (Multicast->Address->IPv4Address) {
-                    delete Multicast->Address->IPv4Address;
-                }
-
-                if (Multicast->Address->IPv6Address) {
-                    delete Multicast->Address->IPv6Address;
-                }
-
-                delete Multicast->Address;
-            }
-            delete Multicast;
-        }
-    }
-
-    void setValues(const VideoEncoder& src)
-    {
-        if (src.MPEG4) {
-            MPEG4 = new onvifXsd__Mpeg4Configuration();
-
-            MPEG4->GovLength = src.MPEG4->GovLength;
-            MPEG4->Mpeg4Profile = src.MPEG4->Mpeg4Profile;
-            MPEG4->__item = NULL;
-        }
-
-        if (src.H264) {
-            H264 = new onvifXsd__H264Configuration();
-
-            H264->GovLength = src.H264->GovLength;
-            H264->H264Profile = src.H264->H264Profile;
-            H264->__item = NULL;
-        }
-
-        if (src.Multicast) {
-            Multicast = new onvifXsd__MulticastConfiguration();
-
-            if (src.Multicast->Address) {
-                Multicast->Address = new onvifXsd__IPAddress();
-                Multicast->Address->Type = src.Multicast->Address->Type;
-                Multicast->Address->__item = NULL;
-                Multicast->Address->IPv4Address = NULL;
-                Multicast->Address->IPv6Address = NULL;
-
-                if (src.Multicast->Address->IPv4Address) {
-                    Multicast->Address->IPv4Address = new std::string();
-                    *(Multicast->Address->IPv4Address) = *(src.Multicast->Address->IPv4Address);
-                }
-
-                if (src.Multicast->Address->IPv6Address) {
-                    Multicast->Address->IPv6Address = new std::string();
-                    *(Multicast->Address->IPv6Address) = *(src.Multicast->Address->IPv6Address);
-                }
-            }
-
-            Multicast->Port = src.Multicast->Port;
-            Multicast->TTL = src.Multicast->TTL;
-            Multicast->AutoStart = src.Multicast->AutoStart;
-            Multicast->__anyAttribute = NULL;
-        }
-
-        //if (src.__anyAttribute) {
-        //    __anyAttribute = src.__anyAttribute;
-        //}
-
-        Encoding = src.Encoding;
-        SessionTimeout = src.SessionTimeout;
-        __any = src.__any;
-        Name = src.Name;
-        UseCount = src.UseCount;
-        token = src.token;
-    }
-};
-
-//
-// LocalVideoSource
-//
-
-class LocalVideoSource: public VideoSource
-{
-public:
-    LocalVideoSource()
-    {
-        Bounds = new onvifXsd__IntRectangle();
-        Bounds->x = -1;
-        Bounds->y = -1;
-        Bounds->width = -1;
-        Bounds->height = -1;
-
-        Extension = NULL;
-        __anyAttribute = NULL;
-    }
-
-    ~LocalVideoSource()
-    {
-        delete Bounds;
-    }
-
-    void setValues(const VideoSource& src)
-    {
-        /*if (src.Extension) {
-            Extension = src.Extension;
-        }
-
-        if (src.__anyAttribute) {
-            __anyAttribute = src.__anyAttribute;
-        }*/
-
-        SourceToken = src.SourceToken;
-        Name = src.Name;
-        UseCount = src.UseCount;
-        token = src.token;
-    }
-};
-
-//
-// LocalAudioEncoder
-//
-
-class LocalAudioEncoder: public AudioEncoder
-{
-public:
-    LocalAudioEncoder()
-    {
-        Multicast = NULL;
-        __anyAttribute = NULL;
-    }
-
-    void setValues(const AudioEncoder& src)
-    {
-        /*if (src.Multicast) {
-            Multicast = src.Multicast;
-        }
-
-        if (src.__anyAttribute) {
-            __anyAttribute = src.__anyAttribute;
-        }*/
-
-        Encoding = src.Encoding;
-        Bitrate = src.Bitrate;
-        SampleRate = src.SampleRate;
-        SessionTimeout = src.SessionTimeout;
-        Name = src.Name;
-        UseCount = src.UseCount;
-        token = src.token;
-    }
-
-};
-
-//
-// LocalAudioSource
-//
-
-class LocalAudioSource: public AudioSource
-{
-public:
-    LocalAudioSource()
-    {
-        __anyAttribute = NULL;
-    }
-
-    void setValues(const AudioSource& src)
-    {
-        /*if (src.__anyAttribute) {
-            __anyAttribute = src.__anyAttribute;
-        }*/
-
-        SourceToken = src.SourceToken;
-        __any = src.__any;
-        Name = src.Name;
-        UseCount = src.UseCount;
-        token = src.token;
-    }
-};
-
-//
-// LocalProfile
-//
-
-class LocalProfile: public Profile
-{
-public:
-    LocalProfile()
-    {
-        VideoSourceConfiguration = NULL;
-        AudioSourceConfiguration = NULL;
-        VideoEncoderConfiguration = NULL;
-        AudioEncoderConfiguration = NULL;
-        VideoAnalyticsConfiguration = NULL;
-        PTZConfiguration = NULL;
-        MetadataConfiguration = NULL;
-        Extension = NULL;
-        fixed = NULL;
-        __anyAttribute = NULL;
-        __item = NULL;
-    }
-
-    void setValues(const Profile& src)
-    {
-        /*if (src.__anyAttribute) {
-            __anyAttribute = src.__anyAttribute;
-        }
-
-        if (src.fixed) {
-            fixed = src.fixed;
-        }*/
-
-        Name = src.Name;
-        token = src.token;
-    }
-};
-
-//
 // struct ProfilePair
 //
 
 struct ProfilePair
 {
-    LocalProfile tmp; //if we will not find our profile in camera, netoptix ptr should point to this var
+    Profile tmp; //if we will not find our profile in camera, netoptix ptr should point to this var
     bool profileAbsent;
     Profile* netoptix;
     Profile* predefined;
@@ -264,47 +27,15 @@ struct ProfilePair
 
 struct CameraInfo
 {
-    LocalProfile predefinedProfile;
-    LocalProfile netoptixProfile;
-    LocalVideoEncoder videoEncoderLocal;
-    LocalVideoSource videoSourceLocal;
-    LocalAudioEncoder audioEncoderLocal;
-    LocalAudioSource audioSourceLocal;
+    QString predefinedProfileId;
+    QString netoptixProfileId;
+    QString videoEncoderId;
+    QString videoSourceId;
+    QString audioEncoderId;
+    QString audioSourceId;
 
-    LocalProfile* finalProfile; //Ptr to predefined or netoptix (if creation was successful) profile
+    QString finalProfileId; //Ptr to predefined or netoptix (if creation was successful) profile
     bool profileAbsent; //Create netoptix profile or not
-
-
-    CameraInfo():
-        finalProfile(0),
-        profileAbsent(false)
-    {
-        
-    }
-
-    void setAudioEncoderToProfiles()
-    {
-        predefinedProfile.AudioEncoderConfiguration = &audioEncoderLocal;
-        netoptixProfile.AudioEncoderConfiguration = &audioEncoderLocal;
-    }
-
-    void setAudioSourceToProfiles()
-    {
-        predefinedProfile.AudioSourceConfiguration = &audioSourceLocal;
-        netoptixProfile.AudioSourceConfiguration = &audioSourceLocal;
-    }
-
-    void setVideoEncoderToProfiles()
-    {
-        predefinedProfile.VideoEncoderConfiguration = &videoEncoderLocal;
-        netoptixProfile.VideoEncoderConfiguration = &videoEncoderLocal;
-    }
-
-    void setVideoSourceToProfiles()
-    {
-        predefinedProfile.VideoSourceConfiguration = &videoSourceLocal;
-        netoptixProfile.VideoSourceConfiguration = &videoSourceLocal;
-    }
 };
 
 //
@@ -405,16 +136,12 @@ const QString QnOnvifStreamReader::updateCameraAndFetchStreamUrl(bool isPrimary)
         return QString();
     }
 
-    if (!sendConfigToCamera(soapWrapper, info)) {
-        return QString();
-    }
+    ////Printing chosen profile
+    //if (cl_log.logLevel() >= cl_logDEBUG1) {
+    //    printProfile(*info.finalProfile, isPrimary);
+    //}
 
-    //Printing chosen profile
-    if (cl_log.logLevel() >= cl_logDEBUG1) {
-        printProfile(*info.finalProfile, isPrimary);
-    }
-
-    return fetchStreamUrl(soapWrapper, info.finalProfile->token, isPrimary);
+    return fetchStreamUrl(soapWrapper, info.finalProfileId, isPrimary);
 }
 
 void QnOnvifStreamReader::closeStream()
@@ -565,7 +292,7 @@ void QnOnvifStreamReader::updateVideoEncoder(VideoEncoder& encoder, bool isPrima
     }
 }
 
-const QString QnOnvifStreamReader::fetchStreamUrl(MediaSoapWrapper& soapWrapper, const std::string& profileToken, bool isPrimary) const
+const QString QnOnvifStreamReader::fetchStreamUrl(MediaSoapWrapper& soapWrapper, const QString& profileToken, bool isPrimary) const
 {
     StreamUriResp response;
     StreamUriReq request;
@@ -577,7 +304,7 @@ const QString QnOnvifStreamReader::fetchStreamUrl(MediaSoapWrapper& soapWrapper,
     request.StreamSetup->Stream = onvifXsd__StreamType__RTP_Unicast;
     request.StreamSetup->Transport->Tunnel = 0;
     request.StreamSetup->Transport->Protocol = onvifXsd__TransportProtocol__RTSP;
-    request.ProfileToken = profileToken;
+    request.ProfileToken = profileToken.toStdString();
 
     int soapRes = soapWrapper.getStreamUri(request, response);
     if (soapRes != SOAP_OK) {
@@ -617,12 +344,9 @@ bool QnOnvifStreamReader::fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper,
     VideoEncoder* result = fetchVideoEncoder(response, isPrimary);
 
     if (result) {
-        info.videoEncoderLocal.setValues(*result);
-        info.setVideoEncoderToProfiles();
-
-        updateVideoEncoder(info.videoEncoderLocal, isPrimary);
-
-        return true;
+        info.videoEncoderId = result->token.c_str();
+        updateVideoEncoder(*result, isPrimary);
+        return sendVideoEncoderToCamera(*result);
     }
 
     return false;
@@ -664,14 +388,21 @@ bool QnOnvifStreamReader::fetchUpdateProfile(MediaSoapWrapper& soapWrapper, Came
 
     bool result = false;
     if (profiles.netoptix) {
-        info.netoptixProfile.setValues(*profiles.netoptix);
-        updateProfile(info.netoptixProfile, isPrimary);
-        result = true;
+        info.netoptixProfileId = profiles.netoptix->token.c_str();
+        info.finalProfileId = info.netoptixProfileId;
+        updateProfile(*profiles.netoptix, isPrimary);
+        result = sendProfileToCamera(info, *profiles.netoptix, profiles.profileAbsent);
     }
 
-    if (profiles.predefined) {
-        info.netoptixProfile.setValues(*profiles.predefined);
+    if (!result && profiles.predefined) {
+        info.netoptixProfileId = profiles.predefined->token.c_str();
+        info.finalProfileId = info.netoptixProfileId;
         updateProfile(*profiles.predefined, isPrimary);
+
+        //result = false if we failed to add encoders / sources to profile, but there is a big
+        //possibility, that desired encoders / sources attached to predefined profile, so ignore
+        //and try to get stream url further
+        sendProfileToCamera(info, *profiles.predefined, false);
         result = true;
     }
 
@@ -753,12 +484,9 @@ bool QnOnvifStreamReader::fetchUpdateVideoSource(MediaSoapWrapper& soapWrapper, 
     VideoSource* result = fetchVideoSource(response, isPrimary);
 
     if (result) {
-        info.videoSourceLocal.setValues(*result);
-        info.setVideoSourceToProfiles();
-
-        updateVideoSource(info.videoSourceLocal, isPrimary);
-
-        return true;
+        info.videoSourceId = result->token.c_str();
+        updateVideoSource(*result, isPrimary);
+        return sendVideoSourceToCamera(*result);
     }
 
     return false;
@@ -766,32 +494,20 @@ bool QnOnvifStreamReader::fetchUpdateVideoSource(MediaSoapWrapper& soapWrapper, 
 
 VideoSource* QnOnvifStreamReader::fetchVideoSource(VideoSrcConfigsResp& response, bool /*isPrimary*/) const
 {
-    unsigned long square = 0;
-    std::vector<VideoSource*>::const_iterator it = response.Configurations.begin();
-    VideoSource* result = 0;
-    //One name for 2 streams
-    const char* name = NETOPTIX_PRIMARY_NAME;
+    QString id = m_onvifRes->getVideoSourceId();
+    if (id.isEmpty()) {
+        return 0;
+    }
 
+    std::vector<onvifXsd__VideoSourceConfiguration*>::const_iterator it = response.Configurations.begin();
     for (;it != response.Configurations.end(); ++it) 
     {
-        if (!(*it) || !(*it)->Bounds)
-        {
-            continue;
-        }
-
-        if ((*it)->Name == name) 
-        {
+        if (*it && id == (*it)->token.c_str()) {
             return *it;
-        }
-
-        unsigned long curSquare = (*it)->Bounds->height * (*it)->Bounds->width;
-        if (curSquare > square) {
-            square = curSquare;
-            result = *it;
         }
     }
 
-    return result;
+    return 0;
 }
 
 void QnOnvifStreamReader::updateVideoSource(VideoSource& source, bool /*isPrimary*/) const
@@ -815,45 +531,11 @@ void QnOnvifStreamReader::updateVideoSource(VideoSource& source, bool /*isPrimar
     source.Bounds->width = size.width;
 }
 
-bool QnOnvifStreamReader::sendConfigToCamera(MediaSoapWrapper& soapWrapper, CameraInfo& info) const
+bool QnOnvifStreamReader::sendProfileToCamera(CameraInfo& info, Profile& profile, bool create) const
 {
-    bool result = false;
-    if (!info.netoptixProfile.token.empty() &&
-        sendProfileToCamera(soapWrapper, info, info.netoptixProfile, info.profileAbsent))
-    {
-        result = true;
-        info.finalProfile = &info.netoptixProfile;
-    }
+    QAuthenticator auth(m_onvifRes->getAuth());
+    MediaSoapWrapper soapWrapper(m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString());
 
-    if (!result && !info.predefinedProfile.token.empty()) {
-        result = sendProfileToCamera(soapWrapper, info, info.predefinedProfile, false);
-        info.finalProfile = &info.predefinedProfile;
-    }
-
-    //result = false if we failed to add encoders / sources to profile, but there is a big
-    //possibility, that desired encoders / sources attached to predefined profile, so ignore
-    //and try to get stream url further
-    //ToDo: think more about this situation
-    if (!result) {
-        //return false;
-        info.finalProfile = &info.predefinedProfile;
-    }
-
-    if (!sendVideoEncoderToCamera(soapWrapper, info, *info.finalProfile))
-    {
-        return false;
-    }
-
-    //This block of functions: is not critical if failed
-    sendVideoSourceToCamera(soapWrapper, info, *info.finalProfile);
-    sendAudioEncoderToCamera(soapWrapper, info, *info.finalProfile);
-    sendAudioSourceToCamera(soapWrapper, info, *info.finalProfile);
-
-    return true;
-}
-
-bool QnOnvifStreamReader::sendProfileToCamera(MediaSoapWrapper& soapWrapper, CameraInfo& /*info*/, Profile& profile, bool create) const
-{
     if (create) {
         CreateProfileReq request;
         CreateProfileResp response;
@@ -871,13 +553,13 @@ bool QnOnvifStreamReader::sendProfileToCamera(MediaSoapWrapper& soapWrapper, Cam
     }
 
     //Adding video encoder
-    if (profile.VideoEncoderConfiguration)
+    if (!info.videoEncoderId.isEmpty())
     {
         AddVideoConfigReq request;
         AddVideoConfigResp response;
 
         request.ProfileToken = profile.token;
-        request.ConfigurationToken = profile.VideoEncoderConfiguration->token;
+        request.ConfigurationToken = info.videoEncoderId.toStdString();
 
         int soapRes = soapWrapper.addVideoEncoderConfiguration(request, response);
         if (soapRes != SOAP_OK) {
@@ -892,13 +574,13 @@ bool QnOnvifStreamReader::sendProfileToCamera(MediaSoapWrapper& soapWrapper, Cam
     }
 
     //Adding video source
-    if (profile.VideoSourceConfiguration)
+    if (!info.videoSourceId.isEmpty())
     {
         AddVideoSrcConfigReq request;
         AddVideoSrcConfigResp response;
 
         request.ProfileToken = profile.token;
-        request.ConfigurationToken = profile.VideoSourceConfiguration->token;
+        request.ConfigurationToken = info.videoSourceId.toStdString();
 
         int soapRes = soapWrapper.addVideoSourceConfiguration(request, response);
         if (soapRes != SOAP_OK) {
@@ -913,13 +595,13 @@ bool QnOnvifStreamReader::sendProfileToCamera(MediaSoapWrapper& soapWrapper, Cam
     }
 
     //Adding audio encoder
-    if (profile.AudioEncoderConfiguration)
+    if (!info.audioEncoderId.isEmpty())
     {
         AddAudioConfigReq request;
         AddAudioConfigResp response;
 
         request.ProfileToken = profile.token;
-        request.ConfigurationToken = profile.AudioEncoderConfiguration->token;
+        request.ConfigurationToken = info.audioEncoderId.toStdString();
 
         int soapRes = soapWrapper.addAudioEncoderConfiguration(request, response);
         if (soapRes != SOAP_OK) {
@@ -937,13 +619,13 @@ bool QnOnvifStreamReader::sendProfileToCamera(MediaSoapWrapper& soapWrapper, Cam
     }
 
     //Adding audio source
-    if (profile.AudioSourceConfiguration)
+    if (!info.audioSourceId.isEmpty())
     {
         AddAudioSrcConfigReq request;
         AddAudioSrcConfigResp response;
 
         request.ProfileToken = profile.token;
-        request.ConfigurationToken = profile.AudioSourceConfiguration->token;
+        request.ConfigurationToken = info.audioSourceId.toStdString();
 
         int soapRes = soapWrapper.addAudioSourceConfiguration(request, response);
         if (soapRes != SOAP_OK) {
@@ -962,11 +644,14 @@ bool QnOnvifStreamReader::sendProfileToCamera(MediaSoapWrapper& soapWrapper, Cam
     return true;
 }
 
-bool QnOnvifStreamReader::sendVideoEncoderToCamera(MediaSoapWrapper& soapWrapper, CameraInfo& info, Profile& /*profile*/) const
+bool QnOnvifStreamReader::sendVideoEncoderToCamera(VideoEncoder& encoder) const
 {
+    QAuthenticator auth(m_onvifRes->getAuth());
+    MediaSoapWrapper soapWrapper(m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString());
+
     SetVideoConfigReq request;
     SetVideoConfigResp response;
-    request.Configuration = &info.videoEncoderLocal;
+    request.Configuration = &encoder;
     request.ForcePersistence = false;
 
     int soapRes = soapWrapper.setVideoEncoderConfiguration(request, response);
@@ -980,11 +665,14 @@ bool QnOnvifStreamReader::sendVideoEncoderToCamera(MediaSoapWrapper& soapWrapper
     return true;
 }
 
-bool QnOnvifStreamReader::sendVideoSourceToCamera(MediaSoapWrapper& soapWrapper, CameraInfo& info, Profile& /*profile*/) const
+bool QnOnvifStreamReader::sendVideoSourceToCamera(VideoSource& source) const
 {
+    QAuthenticator auth(m_onvifRes->getAuth());
+    MediaSoapWrapper soapWrapper(m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString());
+
     SetVideoSrcConfigReq request;
     SetVideoSrcConfigResp response;
-    request.Configuration = &info.videoSourceLocal;
+    request.Configuration = &source;
     request.ForcePersistence = false;
 
     int soapRes = soapWrapper.setVideoSourceConfiguration(request, response);
@@ -1014,38 +702,29 @@ bool QnOnvifStreamReader::fetchUpdateAudioEncoder(MediaSoapWrapper& soapWrapper,
     AudioEncoder* result = fetchAudioEncoder(response, isPrimary);
 
     if (result) {
-        info.audioEncoderLocal.setValues(*result);
-        info.setAudioEncoderToProfiles();
-
-        updateAudioEncoder(info.audioEncoderLocal, isPrimary);
-
-        return true;
+        info.audioEncoderId = result->token.c_str();
+        updateAudioEncoder(*result, isPrimary);
+        return sendAudioEncoderToCamera(*result);
     }
 
     return false;
 }
 
-AudioEncoder* QnOnvifStreamReader::fetchAudioEncoder(AudioConfigsResp& response, bool isPrimary) const
+AudioEncoder* QnOnvifStreamReader::fetchAudioEncoder(AudioConfigsResp& response, bool /*isPrimary*/) const
 {
-    std::vector<AudioEncoder*>::const_iterator iter = response.Configurations.begin();
-    AudioEncoder* result = 0;
-    const char* name = NETOPTIX_PRIMARY_NAME;
-
-    while (iter != response.Configurations.end()) {
-        AudioEncoder* conf = *iter;
-
-        if (conf) {
-
-            if (conf->Name == name) {
-                return conf;
-            }
-            result = conf;
-        }
-
-        ++iter;
+    QString id = m_onvifRes->getAudioEncoderId();
+    if (id.isEmpty()) {
+        return 0;
     }
 
-    return result;
+    std::vector<onvifXsd__AudioEncoderConfiguration*>::const_iterator iter = response.Configurations.end();
+    for (; iter != response.Configurations.end(); ++iter) {
+        if (*iter && id == (*iter)->token.c_str()) {
+            return *iter;
+        }
+    }
+
+    return 0;
 }
 
 void QnOnvifStreamReader::updateAudioEncoder(AudioEncoder& encoder, bool isPrimary) const
@@ -1090,11 +769,14 @@ void QnOnvifStreamReader::updateAudioEncoder(AudioEncoder& encoder, bool isPrima
     }
 }
 
-bool QnOnvifStreamReader::sendAudioEncoderToCamera(MediaSoapWrapper& soapWrapper, CameraInfo& info, Profile& /*profile*/) const
+bool QnOnvifStreamReader::sendAudioEncoderToCamera(AudioEncoder& encoder) const
 {
+    QAuthenticator auth(m_onvifRes->getAuth());
+    MediaSoapWrapper soapWrapper(m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString());
+
     SetAudioConfigReq request;
     SetAudioConfigResp response;
-    request.Configuration = &info.audioEncoderLocal;
+    request.Configuration = &encoder;
     request.ForcePersistence = false;
 
     int soapRes = soapWrapper.setAudioEncoderConfiguration(request, response);
@@ -1124,52 +806,45 @@ bool QnOnvifStreamReader::fetchUpdateAudioSource(MediaSoapWrapper& soapWrapper, 
     AudioSource* result = fetchAudioSource(response, isPrimary);
 
     if (result) {
-        info.audioSourceLocal.setValues(*result);
-        info.setAudioSourceToProfiles();
-
-        updateAudioSource(info.audioSourceLocal, isPrimary);
-
-        return true;
+        info.audioSourceId = result->token.c_str();
+        updateAudioSource(*result, isPrimary);
+        return sendAudioSourceToCamera(*result);
     }
 
     return false;
 }
 
-AudioSource* QnOnvifStreamReader::fetchAudioSource(AudioSrcConfigsResp& response, bool isPrimary) const
+AudioSource* QnOnvifStreamReader::fetchAudioSource(AudioSrcConfigsResp& response, bool /*isPrimary*/) const
 {
-    std::vector<AudioSource*>::const_iterator it = response.Configurations.begin();
-    AudioSource* result = 0;
-    //One name for 2 streams
-    const char* name = NETOPTIX_PRIMARY_NAME;
-
-    while (it != response.Configurations.end()) {
-        if (!(*it)) {
-            ++it;
-            continue;
-        }
-
-        if ((*it)->Name == name) {
-            return *it;
-        }
-
-        result = *it;
-        ++it;
+    QString id = m_onvifRes->getAudioSourceId();
+    if (id.isEmpty()) {
+        return 0;
     }
 
-    return result;
+    std::vector<AudioSource*>::const_iterator it = response.Configurations.begin();
+    for (; it != response.Configurations.end(); ++it) {
+        if (*it && id == (*it)->token.c_str()) {
+            return *it;
+        }
+    }
+
+    return 0;
 }
 
-void QnOnvifStreamReader::updateAudioSource(AudioSource& source, bool isPrimary) const
+void QnOnvifStreamReader::updateAudioSource(AudioSource& source, bool /*isPrimary*/) const
 {
     //One name for 2 streams
     source.Name = NETOPTIX_PRIMARY_NAME;
 }
 
-bool QnOnvifStreamReader::sendAudioSourceToCamera(MediaSoapWrapper& soapWrapper, CameraInfo& info, Profile& /*profile*/) const
+bool QnOnvifStreamReader::sendAudioSourceToCamera(AudioSource& source) const
 {
+    QAuthenticator auth(m_onvifRes->getAuth());
+    MediaSoapWrapper soapWrapper(m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString());
+
     SetAudioSrcConfigReq request;
     SetAudioSrcConfigResp response;
-    request.Configuration = &info.audioSourceLocal;
+    request.Configuration = &source;
     request.ForcePersistence = false;
 
     int soapRes = soapWrapper.setAudioSourceConfiguration(request, response);
@@ -1182,3 +857,24 @@ bool QnOnvifStreamReader::sendAudioSourceToCamera(MediaSoapWrapper& soapWrapper,
 
     return true;
 }
+
+/*
+for (;it != response.Configurations.end(); ++it) 
+{
+if (!(*it) || !(*it)->Bounds)
+{
+continue;
+}
+
+if ((*it)->Name == name) 
+{
+return *it;
+}
+
+unsigned long curSquare = (*it)->Bounds->height * (*it)->Bounds->width;
+if (curSquare > square) {
+square = curSquare;
+result = *it;
+}
+}
+*/

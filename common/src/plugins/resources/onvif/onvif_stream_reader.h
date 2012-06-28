@@ -75,14 +75,13 @@ private:
     void updateVideoSource(VideoSource& source, bool isPrimary) const;
     void updateAudioSource(AudioSource& source, bool isPrimary) const;
 
-    bool sendConfigToCamera(MediaSoapWrapper& soapWrapper, CameraInfo& info) const;
-    bool sendProfileToCamera(MediaSoapWrapper& soapWrapper, CameraInfo& info, Profile& profile, bool create = false) const;
-    bool sendVideoEncoderToCamera(MediaSoapWrapper& soapWrapper, CameraInfo& info, Profile& profile) const;
-    bool sendVideoSourceToCamera(MediaSoapWrapper& soapWrapper, CameraInfo& info, Profile& profile) const;
-    bool sendAudioEncoderToCamera(MediaSoapWrapper& soapWrapper, CameraInfo& info, Profile& profile) const;
-    bool sendAudioSourceToCamera(MediaSoapWrapper& soapWrapper, CameraInfo& info, Profile& profile) const;
+    bool sendProfileToCamera(CameraInfo& info, Profile& profile, bool create = false) const;
+    bool sendVideoEncoderToCamera(VideoEncoder& encoder) const;
+    bool sendVideoSourceToCamera(VideoSource& source) const;
+    bool sendAudioEncoderToCamera(AudioEncoder& encoder) const;
+    bool sendAudioSourceToCamera(AudioSource& source) const;
 
-    const QString fetchStreamUrl(MediaSoapWrapper& soapWrapper, const std::string& profileToken, bool isPrimary) const;
+    const QString fetchStreamUrl(MediaSoapWrapper& soapWrapper, const QString& profileToken, bool isPrimary) const;
 
     void updateVideoEncoderParams(onvifXsd__VideoEncoderConfiguration* config, bool isPrimary) const;
 
