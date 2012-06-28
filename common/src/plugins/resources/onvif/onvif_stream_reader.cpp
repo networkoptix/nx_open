@@ -721,7 +721,7 @@ AudioEncoder* QnOnvifStreamReader::fetchAudioEncoder(AudioConfigsResp& response,
         return 0;
     }
 
-    std::vector<onvifXsd__AudioEncoderConfiguration*>::const_iterator iter = response.Configurations.end();
+    std::vector<onvifXsd__AudioEncoderConfiguration*>::const_iterator iter = response.Configurations.begin();
     for (; iter != response.Configurations.end(); ++iter) {
         if (*iter && id == (*iter)->token.c_str()) {
             return *iter;
