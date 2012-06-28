@@ -27,6 +27,7 @@
 //#include "../sony/sony_resource.h"
 #include "utils/common/string.h"
 
+const int SOAP_DISCOVERY_TIMEOUT = 1; // "+" in seconds, "-" in mseconds
 
 extern bool multicastJoinGroup(QUdpSocket& udpSocket, QHostAddress groupAddress, QHostAddress localAddress);
 extern bool multicastLeaveGroup(QUdpSocket& udpSocket, QHostAddress groupAddress);
@@ -135,8 +136,10 @@ void OnvifResourceSearcherWsdd::findHelloEndpoints(EndpointInfoHash& result) con
     QMutexLocker lock(&m_mutex);
 
     wsddProxy soapWsddProxy(SOAP_IO_UDP);
-    soapWsddProxy.soap->recv_timeout = -200000;
-    soapWsddProxy.soap->connect_timeout = 1;
+    soapWsddProxy.soap->send_timeout = SOAP_DISCOVERY_TIMEOUT;
+    soapWsddProxy.soap->recv_timeout = SOAP_DISCOVERY_TIMEOUT;
+    soapWsddProxy.soap->connect_timeout = SOAP_DISCOVERY_TIMEOUT;
+    soapWsddProxy.soap->accept_timeout = SOAP_DISCOVERY_TIMEOUT;
     soapWsddProxy.soap->fconnect = nullGsoapFconnect;
     soapWsddProxy.soap->fdisconnect = nullGsoapFdisconnect;
     soapWsddProxy.soap->fclose = NULL;
@@ -210,8 +213,10 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
 
         QStringList addrPrefixes = getAddrPrefixes(iface.address.toString());
         wsddProxy soapWsddProxy(SOAP_IO_UDP);
-        soapWsddProxy.soap->recv_timeout = -200000;
-        soapWsddProxy.soap->connect_timeout = 1;
+        soapWsddProxy.soap->send_timeout = SOAP_DISCOVERY_TIMEOUT;
+        soapWsddProxy.soap->recv_timeout = SOAP_DISCOVERY_TIMEOUT;
+        soapWsddProxy.soap->connect_timeout = SOAP_DISCOVERY_TIMEOUT;
+        soapWsddProxy.soap->accept_timeout = SOAP_DISCOVERY_TIMEOUT;
         soapWsddProxy.soap->user = &qSocket;
         soapWsddProxy.soap->fconnect = nullGsoapFconnect;
         soapWsddProxy.soap->fdisconnect = nullGsoapFdisconnect;

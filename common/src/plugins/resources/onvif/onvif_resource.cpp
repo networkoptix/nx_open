@@ -1233,7 +1233,7 @@ bool QnPlOnvifResource::fetchAndSetVideoSource(MediaSoapWrapper& soapWrapper)
         if (conf) {
             QMutexLocker lock(&m_mutex);
 
-            m_audioEncoderId = conf->token.c_str();
+            m_videoSourceId = conf->token.c_str();
         }
     }
 
@@ -1268,7 +1268,7 @@ bool QnPlOnvifResource::fetchAndSetAudioSource(MediaSoapWrapper& soapWrapper)
         if (conf) {
             QMutexLocker lock(&m_mutex);
 
-            m_audioEncoderId = conf->token.c_str();
+            m_audioSourceId = conf->token.c_str();
         }
     }
 

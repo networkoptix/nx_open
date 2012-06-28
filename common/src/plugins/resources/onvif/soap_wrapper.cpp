@@ -12,8 +12,10 @@
 
 #include <QtGlobal>
 
-const int SOAP_RECEIVE_TIMEOUT = 1; // "+" in seconds, "-" in mseconds
-const int SOAP_SEND_TIMEOUT = 1; // + in seconds, "-" in mseconds
+const int SOAP_RECEIVE_TIMEOUT = 2; // "+" in seconds, "-" in mseconds
+const int SOAP_SEND_TIMEOUT = 2; // "+" in seconds, "-" in mseconds
+const int SOAP_CONNECT_TIMEOUT = 2; // "+" in seconds, "-" in mseconds
+const int SOAP_ACCEPT_TIMEOUT = 2; // "+" in seconds, "-" in mseconds
 const std::string DEFAULT_ONVIF_LOGIN = "admin";
 const std::string DEFAULT_ONVIF_PASSWORD = "admin";
 
@@ -33,7 +35,8 @@ SoapWrapper<T>::SoapWrapper(const std::string& endpoint, const std::string& logi
     m_soapProxy = new T();
     m_soapProxy->soap->send_timeout = SOAP_SEND_TIMEOUT;
     m_soapProxy->soap->recv_timeout = SOAP_RECEIVE_TIMEOUT;
-    m_soapProxy->soap->connect_timeout = 2;
+    m_soapProxy->soap->connect_timeout = SOAP_CONNECT_TIMEOUT;
+    m_soapProxy->soap->accept_timeout = SOAP_ACCEPT_TIMEOUT;
 
     soap_register_plugin(m_soapProxy->soap, soap_wsse);
 }

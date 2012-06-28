@@ -389,24 +389,24 @@ bool QnOnvifStreamReader::fetchUpdateProfile(MediaSoapWrapper& soapWrapper, Came
     bool result = false;
     if (profiles.netoptix) {
         info.netoptixProfileId = profiles.netoptix->token.c_str();
-        info.finalProfileId = info.netoptixProfileId;
         updateProfile(*profiles.netoptix, isPrimary);
         result = sendProfileToCamera(info, *profiles.netoptix, profiles.profileAbsent);
+        info.finalProfileId = result? info.netoptixProfileId : QString();
     }
 
     if (!result && profiles.predefined) {
-        info.netoptixProfileId = profiles.predefined->token.c_str();
-        info.finalProfileId = info.netoptixProfileId;
+        info.predefinedProfileId = profiles.predefined->token.c_str();
         updateProfile(*profiles.predefined, isPrimary);
         result = sendProfileToCamera(info, *profiles.predefined, false);
+        info.finalProfileId = result? info.predefinedProfileId : QString();
     }
 
     //result = false if we failed to add encoders / sources to profile, but there is a big
     //possibility, that desired encoders / sources attached to previously created profile, so ignore
     //and try to get stream url further
-    if (!profiles.profileAbsent) {
+    if (!result) {
         result = true;
-        info.finalProfileId = info.netoptixProfileId.isEmpty() ? info.predefinedProfileId : info.netoptixProfileId;
+        info.finalProfileId = info.predefinedProfileId.isEmpty() ? info.netoptixProfileId : info.predefinedProfileId;
     }
 
     return result;
@@ -424,14 +424,14 @@ void QnOnvifStreamReader::fetchProfile(ProfilesResp& response, ProfilePair& prof
     QString filteredEncoderToken = isPrimary? m_onvifRes->getSecondaryVideoEncoderId(): m_onvifRes->getPrimaryVideoEncoderId();
 
     //Trying to find our and some predefined profile
-    while (iter != response.Profiles.end()) {
+    for (; iter != response.Profiles.end(); ++iter) {
         Profile* profile = *iter;
 
         if (profile && profile->token != filteredToken) {
 
             if (profile->token == token) {
                 profiles.netoptix = profile;
-                return;
+                continue;
             }
 
             bool finish = false;
@@ -451,8 +451,6 @@ void QnOnvifStreamReader::fetchProfile(ProfilesResp& response, ProfilePair& prof
                 additionalProfile = profile;
             }
         }
-
-        ++iter;
     }
 
     if (!profiles.predefined) {
@@ -460,10 +458,12 @@ void QnOnvifStreamReader::fetchProfile(ProfilesResp& response, ProfilePair& prof
     }
 
     //Netoptix profile not found. Trying to create it.
-    profiles.profileAbsent = true;
+    if (!profiles.netoptix) {
+        profiles.profileAbsent = true;
 
-    profiles.netoptix = &profiles.tmp;
-    profiles.netoptix->token = isPrimary? NETOPTIX_PRIMARY_TOKEN: NETOPTIX_SECONDARY_TOKEN;
+        profiles.netoptix = &profiles.tmp;
+        profiles.netoptix->token = isPrimary? NETOPTIX_PRIMARY_TOKEN: NETOPTIX_SECONDARY_TOKEN;
+    }
 }
 
 void QnOnvifStreamReader::updateProfile(Profile& profile, bool isPrimary) const
