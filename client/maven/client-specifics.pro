@@ -9,8 +9,6 @@ CONFIG(debug, debug|release) {
 
 win32 {
   QMAKE_LFLAGS += /MACHINE:${arch}
-  QMAKE_CXXFLAGS += -Zc:wchar_t
-  QMAKE_CXXFLAGS -= -Zc:wchar_t- 
 }
 
 mac {
