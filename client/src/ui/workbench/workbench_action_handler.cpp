@@ -1348,6 +1348,10 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
     settings.beginGroup(QLatin1String("screenshots"));
 
     QString previousDir = settings.value(QLatin1String("previousDir")).toString();
+    if (!previousDir.length()){
+        previousDir = qnSettings->mediaFolder();
+    }
+
     QString selectedFilter;
     QString filePath = QFileDialog::getSaveFileName(
         this->widget(), 
@@ -1474,6 +1478,10 @@ Do you want to continue?"),
     QSettings settings;
     settings.beginGroup(QLatin1String("export"));
     QString previousDir = settings.value(QLatin1String("previousDir")).toString();
+    if (!previousDir.length()){
+        previousDir = qnSettings->mediaFolder();
+    }
+
     QString suggestion = layout->getName();
 
     QString fileName;
@@ -1664,6 +1672,10 @@ Do you want to continue?"),
     QSettings settings;
     settings.beginGroup(QLatin1String("export"));
     QString previousDir = settings.value(QLatin1String("previousDir")).toString();
+    if (!previousDir.length()){
+        previousDir = qnSettings->mediaFolder();
+    }
+
     QString dateFormat = cameraResource ? tr("dd-mmm-yyyy hh-mm-ss") : tr("hh-mm-ss");
 	QString suggestion = networkResource ? networkResource->getPhysicalId() : QString();
 
