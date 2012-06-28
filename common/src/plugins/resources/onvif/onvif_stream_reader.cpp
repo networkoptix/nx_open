@@ -398,12 +398,15 @@ bool QnOnvifStreamReader::fetchUpdateProfile(MediaSoapWrapper& soapWrapper, Came
         info.netoptixProfileId = profiles.predefined->token.c_str();
         info.finalProfileId = info.netoptixProfileId;
         updateProfile(*profiles.predefined, isPrimary);
+        result = sendProfileToCamera(info, *profiles.predefined, false);
+    }
 
-        //result = false if we failed to add encoders / sources to profile, but there is a big
-        //possibility, that desired encoders / sources attached to predefined profile, so ignore
-        //and try to get stream url further
-        sendProfileToCamera(info, *profiles.predefined, false);
+    //result = false if we failed to add encoders / sources to profile, but there is a big
+    //possibility, that desired encoders / sources attached to previously created profile, so ignore
+    //and try to get stream url further
+    if (!profiles.profileAbsent) {
         result = true;
+        info.finalProfileId = info.netoptixProfileId.isEmpty() ? info.predefinedProfileId : info.netoptixProfileId;
     }
 
     return result;
@@ -573,6 +576,7 @@ bool QnOnvifStreamReader::sendProfileToCamera(CameraInfo& info, Profile& profile
         return false;
     }
 
+    bool result  = true;
     //Adding video source
     if (!info.videoSourceId.isEmpty())
     {
@@ -588,10 +592,10 @@ bool QnOnvifStreamReader::sendProfileToCamera(CameraInfo& info, Profile& profile
                 << soapRes << ", description: " << soapWrapper.getLastError() 
                 << ". URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << m_onvifRes->getUniqueId();
             
-            return false;
+            result = false;
         }
     } else {
-        return false;
+        result = false;
     }
 
     //Adding audio encoder
@@ -610,12 +614,12 @@ bool QnOnvifStreamReader::sendProfileToCamera(CameraInfo& info, Profile& profile
                 << ". URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << m_onvifRes->getUniqueId();
 
             //Sound can be absent, so ignoring;
-            //return false;
+            //result = false;
 
         }
     } else {
         //Sound can be absent, so ignoring;
-        //return false;
+        //result = false;
     }
 
     //Adding audio source
@@ -634,14 +638,14 @@ bool QnOnvifStreamReader::sendProfileToCamera(CameraInfo& info, Profile& profile
                 << ". URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << m_onvifRes->getUniqueId();
 
             //Sound can be absent, so ignoring;
-            //return false;
+            //result = false;
         }
     } else {
         //Sound can be absent, so ignoring;
-        //return false;
+        //result = false;
     }
 
-    return true;
+    return result;
 }
 
 bool QnOnvifStreamReader::sendVideoEncoderToCamera(VideoEncoder& encoder) const
