@@ -45,7 +45,7 @@ CONFIG(release, debug|release) {
 
 win* {
   !contains(BUILDLIB, staticlib) {
-    RC_FILE = ${project.build.directory}/hdwitness.rc
+    RC_FILE = hdwitness.rc
   }
   
   CONFIG += ${arch}

@@ -589,6 +589,10 @@ void QnResource::setLastDiscoveredTime(const QDateTime &time)
 
 QnId QnResource::getId() const
 {
+	if (this == 0)
+	{
+		int gg = 4;
+	}
     QMutexLocker mutexLocker(&m_mutex);
     return m_id;
 }
