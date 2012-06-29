@@ -145,6 +145,22 @@ void QnLayoutTabBar::contextMenuEvent(QContextMenuEvent *event) {
     menu->exec(event->globalPos());
 }
 
+void QnLayoutTabBar::mousePressEvent(QMouseEvent *event){
+    if (event->button() == Qt::MiddleButton){
+        m_midClickedTab = tabAt(event->pos());
+    } else
+        QTabBar::mousePressEvent(event);   
+}
+
+void QnLayoutTabBar::mouseReleaseEvent(QMouseEvent *event){
+    /** mouseReleaseEvent is ALWAYS preceded by corresponding mousePressEvent */
+    if (event->button() == Qt::MiddleButton){
+        if (m_midClickedTab >= 0 && m_midClickedTab == tabAt(event->pos())) 
+            emit tabCloseRequested(m_midClickedTab);
+    }
+    QTabBar::mouseReleaseEvent(event);
+}
+
 void QnLayoutTabBar::at_workbench_layoutsChanged() {
     if(!m_update)
         return;
