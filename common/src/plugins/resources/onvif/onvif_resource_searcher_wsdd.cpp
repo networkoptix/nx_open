@@ -27,6 +27,9 @@
 //#include "../sony/sony_resource.h"
 #include "utils/common/string.h"
 
+static const int SOAP_DISCOVERY_TIMEOUT = 1; // "+" in seconds, "-" in mseconds
+static const int SOAP_HELLO_CHECK_TIMEOUT = -1; // "+" in seconds, "-" in mseconds
+static const int CHECK_HELLO_RETRY_COUNT = 50;
 
 extern bool multicastJoinGroup(QUdpSocket& udpSocket, QHostAddress groupAddress, QHostAddress localAddress);
 extern bool multicastLeaveGroup(QUdpSocket& udpSocket, QHostAddress groupAddress);
@@ -109,13 +112,11 @@ void OnvifResourceSearcherWsdd::updateInterfacesListenSockets() const
     {
         QString key = iface.address.toString();
 
-        QHash<QString, QUdpSocketPtr>::iterator it = m_recvSocketList.find(key);
-        if (it != m_recvSocketList.end()) {
+        if (m_recvSocketList.contains(key)) 
             continue;
-        }
 
-        it = m_recvSocketList.insert(key, QUdpSocketPtr(new QUdpSocket()));
-        bool bindSucceeded = it.value()->bind(QHostAddress::Any, WSDD_MULTICAST_PORT, 
+        QUdpSocketPtr socket(new QUdpSocket());
+        bool bindSucceeded = socket->bind(QHostAddress::Any, WSDD_MULTICAST_PORT,
             QUdpSocket::ReuseAddressHint | QUdpSocket::ShareAddress);
 
         if (!bindSucceeded) {
@@ -123,10 +124,12 @@ void OnvifResourceSearcherWsdd::updateInterfacesListenSockets() const
             continue;
         }
 
-        if (!multicastJoinGroup(*(it.value()), WSDD_GROUP_ADDRESS, iface.address)) {
+        if (!multicastJoinGroup(*socket, WSDD_GROUP_ADDRESS, iface.address)) {
             qWarning() << "OnvifResourceSearcherWsdd::updateInterfacesListenSockets: multicast join group failed. Address: " << key;
             continue;
         }
+
+        m_recvSocketList.insert(key, socket);
     }
 }
 
@@ -135,8 +138,10 @@ void OnvifResourceSearcherWsdd::findHelloEndpoints(EndpointInfoHash& result) con
     QMutexLocker lock(&m_mutex);
 
     wsddProxy soapWsddProxy(SOAP_IO_UDP);
-    soapWsddProxy.soap->recv_timeout = -200000;
-    soapWsddProxy.soap->connect_timeout = 1;
+    soapWsddProxy.soap->send_timeout = SOAP_HELLO_CHECK_TIMEOUT;
+    soapWsddProxy.soap->recv_timeout = SOAP_HELLO_CHECK_TIMEOUT;
+    soapWsddProxy.soap->connect_timeout = SOAP_HELLO_CHECK_TIMEOUT;
+    soapWsddProxy.soap->accept_timeout = SOAP_HELLO_CHECK_TIMEOUT;
     soapWsddProxy.soap->fconnect = nullGsoapFconnect;
     soapWsddProxy.soap->fdisconnect = nullGsoapFdisconnect;
     soapWsddProxy.soap->fclose = NULL;
@@ -152,7 +157,7 @@ void OnvifResourceSearcherWsdd::findHelloEndpoints(EndpointInfoHash& result) con
         soapWsddProxy.soap->master = socket.socketDescriptor();
 
         //Receiving all ProbeMatches
-        while (true) 
+        for (int i = 0; i < CHECK_HELLO_RETRY_COUNT; ++i) 
         {
             __wsdd__Hello wsddHello;
             wsddHello.wsdd__Hello = NULL;
@@ -160,22 +165,22 @@ void OnvifResourceSearcherWsdd::findHelloEndpoints(EndpointInfoHash& result) con
             int soapRes = soapWsddProxy.recv_Hello(wsddHello);
             if (soapRes != SOAP_OK) 
             {
-                if (soapRes == SOAP_EOF) 
+                if (soapRes == SOAP_EOF || SOAP_NO_METHOD)
                 {
                     qDebug() << "OnvifResourceSearcherWsdd::findHelloEndpoints: All devices found. Interface: " << it.key();
+                    soap_destroy(soapWsddProxy.soap);
                     soap_end(soapWsddProxy.soap);
                     break;
-                } 
+                }
                 else 
                 {
                     //SOAP_NO_METHOD - The dispatcher did not find a matching operation for the request
                     //So, this is not error, silently ignore
-                    if (soapRes != SOAP_NO_METHOD) {
-                        qWarning() << "OnvifResourceSearcherWsdd::findHelloEndpoints: SOAP failed. GSoap error code: "
-                            << soapRes << SoapErrorHelper::fetchDescription(soapWsddProxy.soap_fault())
-                            << ". Interface: " << it.key();
-                    }
+                    qWarning() << "OnvifResourceSearcherWsdd::findHelloEndpoints: SOAP failed. GSoap error code: "
+                        << soapRes << SoapErrorHelper::fetchDescription(soapWsddProxy.soap_fault())
+                        << ". Interface: " << it.key();
 
+                    soap_destroy(soapWsddProxy.soap);
                     soap_end(soapWsddProxy.soap);
                     continue;
                 }
@@ -187,6 +192,7 @@ void OnvifResourceSearcherWsdd::findHelloEndpoints(EndpointInfoHash& result) con
                 printProbeMatches(wsddHello.wsdd__Hello, soapWsddProxy.soap->header);
             }
 
+            soap_destroy(soapWsddProxy.soap);
             soap_end(soapWsddProxy.soap);
         }
 
@@ -210,8 +216,10 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
 
         QStringList addrPrefixes = getAddrPrefixes(iface.address.toString());
         wsddProxy soapWsddProxy(SOAP_IO_UDP);
-        soapWsddProxy.soap->recv_timeout = -200000;
-        soapWsddProxy.soap->connect_timeout = 1;
+        soapWsddProxy.soap->send_timeout = SOAP_DISCOVERY_TIMEOUT;
+        soapWsddProxy.soap->recv_timeout = SOAP_DISCOVERY_TIMEOUT;
+        soapWsddProxy.soap->connect_timeout = SOAP_DISCOVERY_TIMEOUT;
+        soapWsddProxy.soap->accept_timeout = SOAP_DISCOVERY_TIMEOUT;
         soapWsddProxy.soap->user = &qSocket;
         soapWsddProxy.soap->fconnect = nullGsoapFconnect;
         soapWsddProxy.soap->fdisconnect = nullGsoapFdisconnect;
@@ -239,10 +247,12 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
             qWarning() << "OnvifResourceSearcherWsdd::findEndpoints: (Send) SOAP failed. GSoap error code: "
                        << soapRes << SoapErrorHelper::fetchDescription(soapWsddProxy.soap_fault())
                        << ". Interface: " << iface.address.toString();
+            soap_destroy(soapWsddProxy.soap);
             soap_end(soapWsddProxy.soap);
             continue;
         }
 
+        soap_destroy(soapWsddProxy.soap);
         soap_end(soapWsddProxy.soap);
 
         //Receiving all ProbeMatches. Timeout = 500 ms, as written in ONVIF spec
@@ -257,6 +267,7 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
                 if (soapRes == SOAP_EOF) 
                 {
                     qDebug() << "OnvifResourceSearcherWsdd::findEndpoints: All devices found. Interface: " << iface.address.toString();
+                    soap_destroy(soapWsddProxy.soap);
                     soap_end(soapWsddProxy.soap);
                     break;
                 } 
@@ -265,6 +276,7 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
                     qWarning() << "OnvifResourceSearcherWsdd::findEndpoints: SOAP failed. GSoap error code: "
                                << soapRes << SoapErrorHelper::fetchDescription(soapWsddProxy.soap_fault())
                                << ". Interface: " << iface.address.toString();
+                    soap_destroy(soapWsddProxy.soap);
                     soap_end(soapWsddProxy.soap);
                     continue;
                 }
@@ -280,6 +292,7 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
                 }
             }
 
+            soap_destroy(soapWsddProxy.soap);
             soap_end(soapWsddProxy.soap);
         }
 

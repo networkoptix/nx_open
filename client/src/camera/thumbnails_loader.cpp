@@ -483,7 +483,7 @@ void QnThumbnailsLoader::ensureScaleContextLocked(int lineSize, const QSize &sou
         needsReallocation = true;
     }
 
-    if(m_scaleSourceLine != lineSize || m_scaleSourceSize != sourceSize || m_scaleSourceFormat != format || m_targetSize == m_scaleTargetSize)
+    if(m_scaleSourceLine != lineSize || m_scaleSourceSize != sourceSize || m_scaleSourceFormat != format || m_targetSize != m_scaleTargetSize)
         needsReallocation = true;
 
     if(!m_scaleContext)
@@ -505,7 +505,7 @@ void QnThumbnailsLoader::ensureScaleContextLocked(int lineSize, const QSize &sou
 
         int numBytes = avpicture_get_size(PIX_FMT_RGBA, qPower2Ceil(static_cast<quint32>(m_scaleTargetSize.width()), 8), m_scaleTargetSize.height());
         m_scaleBuffer = static_cast<quint8 *>(qMallocAligned(numBytes, 32));
-        m_scaleContext = sws_getContext(m_scaleSourceSize.width(), m_scaleSourceSize.height(), static_cast<PixelFormat>(m_scaleSourceFormat), m_scaleTargetSize.width(), m_scaleTargetSize.height(), PIX_FMT_BGRA, SWS_POINT, NULL, NULL, NULL);
+        m_scaleContext = sws_getContext(m_scaleSourceSize.width(), m_scaleSourceSize.height(), static_cast<PixelFormat>(m_scaleSourceFormat), m_scaleTargetSize.width(), m_scaleTargetSize.height(), PIX_FMT_BGRA, SWS_BICUBIC, NULL, NULL, NULL);
     }
 }
 

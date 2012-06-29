@@ -527,7 +527,9 @@ int QnScheduleGridWidget::getMaxFps()
 {
     int fps = 0;
     for (int x = 0; x < columnCount(); ++x)
-        for (int y = 0; y < rowCount(); ++y)
-            fps = qMax(fps, m_gridParams[x][y][FirstParam].toInt());
+		for (int y = 0; y < rowCount(); ++y) {
+			if (m_gridParams[x][y][ColorParam] != qnGlobals->noRecordColor().rgba())
+				fps = qMax(fps, m_gridParams[x][y][FirstParam].toInt());
+		}
     return fps;
 }

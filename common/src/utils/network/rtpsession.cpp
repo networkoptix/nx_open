@@ -333,13 +333,17 @@ bool RTPSession::open(const QString& url)
     m_tcpSock.setReadTimeOut(m_tcpTimeout);
     m_tcpSock.setWriteTimeOut(m_tcpTimeout);
 
-    if (!sendDescribe())
+	if (!sendDescribe()) {
+		m_tcpSock.close();
         return false;
+	}
 
     QByteArray response;
 
-    if (!readTextResponce(response))
+	if (!readTextResponce(response)) {
+		m_tcpSock.close();
         return false;
+	}
 
     QString tmp = extractRTSPParam(response, "Range:");
     if (!tmp.isEmpty())
@@ -354,14 +358,18 @@ bool RTPSession::open(const QString& url)
 
     int sdp_index = response.indexOf("\r\n\r\n");
 
-    if (sdp_index  < 0 || sdp_index+4 >= response.size())
+	if (sdp_index  < 0 || sdp_index+4 >= response.size()) {
+		m_tcpSock.close();
         return false;
+	}
 
     m_sdp = response.mid(sdp_index+4);
     parseSDP();
 
-    if (m_sdpTracks.size()<=0)
+	if (m_sdpTracks.size()<=0) {
+		m_tcpSock.close();
         return false;
+	}
 
     return true;
 }
