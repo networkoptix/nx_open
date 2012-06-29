@@ -22,7 +22,7 @@ m_audioIO(0)
     if (netRes)
         m_RtpSession.setTCPTimeout(netRes->getNetworkTimeout());
     else
-        m_RtpSession.setTCPTimeout(1000 * 3);
+        m_RtpSession.setTCPTimeout(1000 * 2);
     QnMediaResourcePtr mr = qSharedPointerDynamicCast<QnMediaResource>(res);
     m_numberOfVideoChannels = mr->getVideoLayout()->numberOfChannels();
     
@@ -58,7 +58,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
     QTime dataTimer;
     dataTimer.restart();
 
-    while (m_RtpSession.isOpened() && m_lastVideoData.isEmpty() && m_lastAudioData.isEmpty() && dataTimer.elapsed() <= MAX_FRAME_DURATION*2)
+    while (m_RtpSession.isOpened() && m_lastVideoData.isEmpty() && m_lastAudioData.isEmpty() && dataTimer.elapsed() <= MAX_FRAME_DURATION)
     {
         int nfds = 0;
         FD_ZERO(&read_set);
@@ -215,8 +215,6 @@ void QnMulticodecRtpReader::openStream()
 
         initIO(&m_videoIO, m_videoParser, "video");
         initIO(&m_audioIO, m_audioParser, "audio");
-		if (!m_videoIO && !m_audioIO)
-			m_RtpSession.stop();
     }
 }
 

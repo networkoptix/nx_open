@@ -346,7 +346,7 @@ bool QnOnvifStreamReader::fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper,
     if (result) {
         info.videoEncoderId = result->token.c_str();
         updateVideoEncoder(*result, isPrimary);
-        //return sendVideoEncoderToCamera(*result);
+        return sendVideoEncoderToCamera(*result);
     }
 
     return false;
