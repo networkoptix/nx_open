@@ -104,6 +104,7 @@ protected:
     void displayMotionGrid(const QList<QnResourceWidget *> &widgets, bool display);
 
     void moveCursor(const QPoint &direction);
+    void showContextMenuAt(const QPoint &pos);
 
 protected slots:
     void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);

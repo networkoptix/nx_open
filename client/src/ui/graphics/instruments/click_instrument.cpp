@@ -55,6 +55,10 @@ ClickInstrument::~ClickInstrument() {
     ensureUninstalled();
 }
 
+void ClickInstrument::emulate(const QPoint &pos){
+
+}
+
 void ClickInstrument::aboutToBeDisabledNotify() {
     killClickTimer();
     

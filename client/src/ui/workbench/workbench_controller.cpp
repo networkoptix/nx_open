@@ -510,6 +510,13 @@ void QnWorkbenchController::moveCursor(const QPoint &direction) {
     m_cursorItem = bestItem;
 }
 
+void QnWorkbenchController::showContextMenuAt(const QPoint &pos){
+    QScopedPointer<QMenu> menu(this->menu()->newMenu(Qn::SceneScope, display()->scene()->selectedItems()));
+    if(menu->isEmpty())
+        return;
+
+    menu->exec(pos);
+}
 
 
 // -------------------------------------------------------------------------- //
@@ -725,6 +732,22 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
     case Qt::Key_PageUp:
     case Qt::Key_PageDown:
         break; /* Don't let the view handle these and scroll. */
+    case Qt::Key_Menu:{
+        QWidget *view = display()->view();        
+        QList<QGraphicsItem *> items = display()->scene()->selectedItems();
+        QPoint offset = view->mapToGlobal(QPoint(0, 0));
+        if (items.count() == 0)
+            showContextMenuAt(offset);
+        else{ 
+            QRectF rect = items[0]->boundingRect();
+//            gluProject(rect.x(), rect.y, 0, )
+            QRect rect2 = mapper()->mapToGrid(rect);
+            QnResourceWidget* item = dynamic_cast<QnResourceWidget *>(items[0]);
+            QPoint pos = offset;
+            showContextMenuAt(pos);
+        }
+        }
+        break;
     default:
         event->ignore(); /* Wasn't recognized? Ignore. */
         break;
@@ -1028,12 +1051,7 @@ void QnWorkbenchController::at_item_rightClicked(QGraphicsView *view, QGraphicsI
         widget->scene()->clearSelection();
         widget->setSelected(true);
     }
-
-    QScopedPointer<QMenu> menu(this->menu()->newMenu(Qn::SceneScope, display()->scene()->selectedItems()));
-    if(menu->isEmpty())
-        return;
-
-    menu->exec(info.screenPos());
+    showContextMenuAt(info.screenPos());
 }
 
 void QnWorkbenchController::at_item_middleClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &) {

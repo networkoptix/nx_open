@@ -50,6 +50,7 @@ public:
     ClickInstrument(Qt::MouseButtons buttons, int clickDelayMSec, WatchedType watchedType, QObject *parent = NULL);
     virtual ~ClickInstrument();
 
+    void emulate(const QPoint &pos);
 signals:
     /** 
      * This signal is emitted when the mouse is pressed over an item.
