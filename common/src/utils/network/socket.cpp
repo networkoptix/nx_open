@@ -70,8 +70,10 @@ const char *SocketException::what() const throw() {
 }
 
 // Function to fill in address structure given an address and port
-static void fillAddr(const QString &address, unsigned short port,
+bool Socket::fillAddr(const QString &address, unsigned short port,
                      sockaddr_in &addr) {
+
+    m_lastError.clear();
     memset(&addr, 0, sizeof(addr));  // Zero out address structure
     addr.sin_family = AF_INET;       // Internet address
 
@@ -86,14 +88,22 @@ static void fillAddr(const QString &address, unsigned short port,
     hints.ai_next = NULL;
 
     addrinfo *addressInfo;
-    if (getaddrinfo(address.toAscii(), 0, &hints, &addressInfo) != 0) {
-        throw SocketException("Failed to resolve name (getaddrinfo())");
+    int status = getaddrinfo(address.toAscii(), 0, &hints, &addressInfo);
+    if (status != 0) {
+#ifdef UNICODE
+        m_lastError = QString("Couldn't resolve %1: %2").arg(address).arg(QString::fromWCharArray(gai_strerror(status)));
+#else
+        m_lastError = QString("Couldn't resolve %1: %2").arg(address).arg(gai_strerror(status));
+#endif  /* UNICODE */
+        return false;
     }
 
     addr.sin_addr.s_addr = ((struct sockaddr_in *) (addressInfo->ai_addr))->sin_addr.s_addr;
     addr.sin_port = htons(port);     // Assign port in network byte order
 
     freeaddrinfo(addressInfo);
+
+    return true;
 }
 
 // Socket Code
@@ -129,6 +139,11 @@ Socket::Socket(int sockDesc) {
 
 Socket::~Socket() {
     close();
+}
+
+QString Socket::lastError() const
+{
+    return m_lastError;
 }
 
 void Socket::close()
@@ -213,15 +228,21 @@ bool Socket::setLocalPort(unsigned short localPort)  {
     return true;
 }
 
-void Socket::setLocalAddressAndPort(const QString &localAddress,
+bool Socket::setLocalAddressAndPort(const QString &localAddress,
                                     unsigned short localPort)  {
+    m_lastError.clear();
+
     // Get the address of the requested host
     sockaddr_in localAddr;
-    fillAddr(localAddress, localPort, localAddr);
+    if (!fillAddr(localAddress, localPort, localAddr))
+        return false;
 
     if (bind(sockDesc, (sockaddr *) &localAddr, sizeof(sockaddr_in)) < 0) {
-        throw SocketException("Set of local address and port failed (bind())", true);
+        m_lastError = "Set of local address and port failed (bind())";
+        return false;
     }
+
+    return true;
 }
 
 void Socket::cleanUp()  {
@@ -271,11 +292,14 @@ void CommunicatingSocket::close()
 bool CommunicatingSocket::connect(const QString &foreignAddress,
                                   unsigned short foreignPort)
 {
+    m_lastError.clear();
+
     // Get the address of the requested host
     mConnected = false;
 
     sockaddr_in destAddr;
-    fillAddr(foreignAddress, foreignPort, destAddr);
+    if (!fillAddr(foreignAddress, foreignPort, destAddr))
+        return false;
 
     u_long iMode = 1;
 #ifdef _WIN32
@@ -289,7 +313,7 @@ bool CommunicatingSocket::connect(const QString &foreignAddress,
 #ifndef _WIN32
     if (connectResult != 0)
     {
-        //throw SocketException("Connect failed (connect())", true);
+        m_lastError = "Connect failed (connect())";
         return false;
     }
 #else
@@ -468,7 +492,12 @@ TCPServerSocket::TCPServerSocket(const QString &localAddress,
                                  unsigned short localPort, int queueLen, bool reuseAddr)
     : Socket(SOCK_STREAM, IPPROTO_TCP) {
     setReuseAddrFlag(reuseAddr);
-    setLocalAddressAndPort(localAddress, localPort);
+    if (!setLocalAddressAndPort(localAddress, localPort))
+    {
+        qWarning() << "TCPServerSocket::TCPServerSocket(): Can't create socket: " << m_lastError;
+        return;
+    }
+
     setListen(queueLen);
 }
 
@@ -530,7 +559,12 @@ UDPSocket::UDPSocket(unsigned short localPort)   :
 UDPSocket::UDPSocket(const QString &localAddress, unsigned short localPort)
     : CommunicatingSocket(SOCK_DGRAM, IPPROTO_UDP)
 {
-    setLocalAddressAndPort(localAddress, localPort);
+    if (!setLocalAddressAndPort(localAddress, localPort))
+    {
+        qWarning() << "TCPServerSocket::TCPServerSocket(): Can't create socket: " << m_lastError;
+        return;
+    }
+
     setBroadcast();
     m_destAddr = new sockaddr_in();
     int buff_size = 1024*512;
@@ -575,9 +609,9 @@ void UDPSocket::setDestPort(unsigned short foreignPort)
     m_destAddr->sin_port = htons(foreignPort);
 }
 
-void UDPSocket::setDestAddr(const QString &foreignAddress, unsigned short foreignPort)
+bool UDPSocket::setDestAddr(const QString &foreignAddress, unsigned short foreignPort)
 {
-    fillAddr(foreignAddress, foreignPort, *m_destAddr);
+    return fillAddr(foreignAddress, foreignPort, *m_destAddr);
 }
 
 bool UDPSocket::sendTo(const void *buffer, int bufferLen)
@@ -648,11 +682,11 @@ bool UDPSocket::hasData() const
     timeout.tv_usec = 0;
     switch( ::select(FD_SETSIZE, &read_set, NULL, NULL, &timeout))
     {
-    case 0:				// timeout expired
+    case 0:             // timeout expired
     {
         return false;
     }
-    case SOCKET_ERROR: 	// error occured
+    case SOCKET_ERROR:  // error occured
     {
         return false;
     }

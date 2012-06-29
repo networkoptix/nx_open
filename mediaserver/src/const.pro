@@ -106,9 +106,6 @@ unix {
 QMAKE_CXXFLAGS += -I$$EVETOOLS_DIR/include
 
 win32 {
-    QMAKE_CXXFLAGS += -Zc:wchar_t
-    QMAKE_CXXFLAGS -= -Zc:wchar_t-
-
     LIBS += -llibprotobuf
 
     # Define QN_EXPORT only if common build is not static

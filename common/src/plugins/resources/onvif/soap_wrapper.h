@@ -212,4 +212,6 @@ private:
     MediaSoapWrapper(const MediaSoapWrapper&);
 };
 
+typedef QSharedPointer<MediaSoapWrapper> MediaSoapWrapperPtr;
+
 #endif //onvif_soap_wrapper_h

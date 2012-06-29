@@ -830,7 +830,14 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
         return false;
     }
 
+    std::string login = soapWrapper.getLogin()? soapWrapper.getLogin() : "";
+    std::string password = soapWrapper.getPassword()? soapWrapper.getPassword() : "";
+    std::string endpoint = soapWrapper.getEndpointUrl().toStdString();
+
+    VideoOptionsReq optRequest;
+
     QList<VideoOptionsLocal> optionsList;
+    QList<MediaSoapWrapperPtr> soapWrappersList;
 
     std::vector<onvifXsd__VideoEncoderConfiguration*>::const_iterator encIt = confResponse.Configurations.begin();
     while (encIt != confResponse.Configurations.end())
@@ -840,19 +847,21 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
             continue;
         }
 
+        MediaSoapWrapperPtr soapWrapperPtr(new MediaSoapWrapper(endpoint, login, password));
+        soapWrappersList.append(soapWrapperPtr);
+
         optionsList.append(VideoOptionsLocal());
         VideoOptionsLocal& currVideoOpts = optionsList.back();
 
-        VideoOptionsReq optRequest;
         optRequest.ConfigurationToken = &(*encIt)->token;
         optRequest.ProfileToken = NULL;
 
-        soapRes = soapWrapper.getVideoEncoderConfigurationOptions(optRequest, currVideoOpts.optionsResp);
+        soapRes = soapWrapperPtr->getVideoEncoderConfigurationOptions(optRequest, currVideoOpts.optionsResp);
         if (soapRes != SOAP_OK || !currVideoOpts.optionsResp.Options) {
 
             qCritical() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: can't receive options (or data is empty) for video encoder '" 
-                << optRequest.ConfigurationToken << "' from camera (URL: "  << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId()
-                << "). Root cause: SOAP request failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
+                << optRequest.ConfigurationToken << "' from camera (URL: "  << soapWrapperPtr->getEndpointUrl() << ", UniqueId: " << getUniqueId()
+                << "). Root cause: SOAP request failed. GSoap error code: " << soapRes << ". " << soapWrapperPtr->getLastError();
             return false;
 
         }
@@ -860,7 +869,7 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
         if (!currVideoOpts.optionsResp.Options->H264 && !currVideoOpts.optionsResp.Options->JPEG)
         {
             qWarning() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: video encoder '" << optRequest.ConfigurationToken 
-                << "' contains no data for H264/JPEG (URL: "  << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId() << ").";
+                << "' contains no data for H264/JPEG (URL: "  << soapWrapperPtr->getEndpointUrl() << ", UniqueId: " << getUniqueId() << ").";
 
             optionsList.pop_back();
 
@@ -1233,7 +1242,7 @@ bool QnPlOnvifResource::fetchAndSetVideoSource(MediaSoapWrapper& soapWrapper)
         if (conf) {
             QMutexLocker lock(&m_mutex);
 
-            m_audioEncoderId = conf->token.c_str();
+            m_videoSourceId = conf->token.c_str();
         }
     }
 
@@ -1268,7 +1277,7 @@ bool QnPlOnvifResource::fetchAndSetAudioSource(MediaSoapWrapper& soapWrapper)
         if (conf) {
             QMutexLocker lock(&m_mutex);
 
-            m_audioEncoderId = conf->token.c_str();
+            m_audioSourceId = conf->token.c_str();
         }
     }
 
