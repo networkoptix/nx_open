@@ -4,11 +4,14 @@ New Cameras and Recorders Supported:
  - All Onvif-supported devices are supported now
 
 New Features:
- - Thumbnails are introduced. They are displayed on the top of Pan-temporal Timeline
+ - Thumbnails are introduced. They are displayed on the top of Pan-temporal Timeline. Available for local files too
  - It is possible to record audio from cameras that support this feature and have the microphone
  - New recording type is introduced. Now it is possible to record in low quality everytime but swith to high quality when motion occurs
  - Software Motion detection is much more accurate
- - Smart Search is redesigned: a quick button appears on the video to enable/disable smart search mode. Smart Search region selection is much more intuitive now
+ - Smart Search and Motion Detection Configuration is redesigned: 
+   - a quick button appears on the video to enable/disable smart search mode
+   - Smart Search region selection is much more intuitive now
+   - Motion Detection configuration works much more intuitive now
  - If mediaserver changes its IP address it is detected without restart
  - Port selection algorithm is changed: now the sequential ports are suggested. It allows to simplify port forwarding: now it is possible to make a single port forwarding rule for the port range
  - Security fixes:
@@ -16,20 +19,26 @@ New Features:
    - EC Passwords are hidden in the installer screens (it is suggested to enter it twice)
  - At the end of install process it is suggested to run the client
  - Context menu from the lower scroll panel is removed
- - It is possible to change grid cells' aspect ratio on Scene. It can be useful for 16:9 cameras
+ - It is possible to change grid cells' aspect ratio on Scene. It can be useful for 16:9 cameras. Also it is possible to adjust items' distance using Context Menu
+
  
 Bugs Fixed:
  - If view a video in full screen buttons (info and close) were overriden by top panel and thus inaccessible. Now the fullscreen video can be zoomed out a bit and those buttons can be pressed
  - Panoramic cameras are resized correctly
- - If fps is greater than 100 it was displayed as 1.1E+02 on the info panel. Fixed
- - Camera motion window selection is redesigned
- - If change media storage the old one is still using
- - Incorrect zoom could occur in lower playback scroll panel if archive was greater than 1 month
+ - Cameras' Info Panel fixes:
+   - If fps is greater than 100 it was displayed as 1.1E+02 on the info panel. Fixed
+   - it is possible to see the current camera's resolution on camera's info panel   
+ - Archive (green chunks) can be shown incorrectly on Pan-Temporal Time Line if a camera was swapped between servers. Fixed.
+ - In some cases recording by motion might not work on cameras if software motion detection is selected. Fixed
+ - If change media storage the old one could be using as well. Fixed.
+ - Pan-Temporal Time Line zoom could could work incorrectly in long archive (several months). Fixed.
  - Smart search could work incorrectly sometimes if an archive was longer than 1 month
-!If media files are not indexed they are not deleted
-!Run Linux Services as User not as Root
+ - Unicode Names (on native alphabets) were displayed incorrectly in license information. Fixed
+ - Sometimes tree items appeared at the root of the tree. Fixed
+ - Linux Media Server determines free space correctly
  - Linux Server did't detect Pulse cameras. Fixed
  - Smart search did't work sometimes if an archive is longer than 1 month. Fixed
+ 
 
 ----------------------------------------------- 1.1 -----------------------------------------------
 
