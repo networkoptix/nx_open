@@ -483,7 +483,7 @@ void QnThumbnailsLoader::ensureScaleContextLocked(int lineSize, const QSize &sou
         needsReallocation = true;
     }
 
-    if(m_scaleSourceLine != lineSize || m_scaleSourceSize != sourceSize || m_scaleSourceFormat != format || m_targetSize == m_scaleTargetSize)
+    if(m_scaleSourceLine != lineSize || m_scaleSourceSize != sourceSize || m_scaleSourceFormat != format || m_targetSize != m_scaleTargetSize)
         needsReallocation = true;
 
     if(!m_scaleContext)
