@@ -6,6 +6,12 @@
 #include "api/serializer/serializer.h"
 #include "fs_checker.h"
 
+QnFsHelperHandler::QnFsHelperHandler(bool detectAvailableOnly):
+	m_detectAvailableOnly(detectAvailableOnly)
+{
+
+}
+
 int QnFsHelperHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result)
 {
     QString pathStr;
@@ -46,7 +52,19 @@ int QnFsHelperHandler::executeGet(const QString& path, const QnRequestParamList&
 
     pathStr = pathStr.mid(prefix.length());
     storage->setUrl(pathStr);
-    QString rezStr = storage->isStorageAvailableForWriting() ? "OK" : "FAIL";
+    QString rezStr;
+	if (storage->isStorageAvailableForWriting()) {
+		if (m_detectAvailableOnly)
+			rezStr = "OK";
+		else
+			rezStr = QByteArray::number(storage->getFreeSpace());
+	}
+	else {
+		if (m_detectAvailableOnly)
+			rezStr = "FAIL";
+		else
+			rezStr = "-1";
+	}
 
     result.append("<root>\n");
     result.append(rezStr);
@@ -65,8 +83,17 @@ int QnFsHelperHandler::executePost(const QString& path, const QnRequestParamList
 QString QnFsHelperHandler::description(TCPSocket* tcpSocket) const
 {
     QString rez;
-    rez += "Returns 'OK' if specified folder may be used for writing on mediaServer. Otherwise returns 'FAIL' \n";
-    rez += "<BR>Param <b>path</b> - Folder.";
-    rez += "<BR><b>Return</b> XML</b> - with 'OK' or 'FAIL' message";
+	if (m_detectAvailableOnly) 
+	{
+		rez += "Returns 'OK' if specified folder may be used for writing on mediaServer. Otherwise returns 'FAIL' \n";
+		rez += "<BR>Param <b>path</b> - Folder.";
+		rez += "<BR><b>Return</b> XML - with 'OK' or 'FAIL' message";
+	}
+	else 
+	{
+		rez += "Returns storage free space in bytes. if specified folder can not be used for writing or not available returns -1.\n";
+		rez += "<BR>Param <b>path</b> - Folder.";
+		rez += "<BR><b>Return</b> XML - free space in bytes or -1";
+	}
     return rez;
 }
