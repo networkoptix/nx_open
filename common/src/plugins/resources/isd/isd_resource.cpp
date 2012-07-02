@@ -56,6 +56,7 @@ bool QnPlIsdResource::initInternal()
 {
     return false;
 
+    /*
     CLHttpStatus status;
     QByteArray reslst = downloadFile(status, "api/param.cgi?req=VideoInput.1.h264.1.ResolutionList",  getHostAddress(), 80, 3000, getAuth());
 
@@ -142,6 +143,7 @@ bool QnPlIsdResource::initInternal()
     }
     /**/
 
+    /*
     QByteArray fpses = downloadFile(status, "api/param.cgi?req=VideoInput.1.h264.1.FrameRateList",  getHostAddress(), 80, 3000, getAuth());
 
     if (status == CL_HTTP_AUTH_REQUIRED)
@@ -150,6 +152,7 @@ bool QnPlIsdResource::initInternal()
         return false;
     }
 
+    /**/
     
 
 
