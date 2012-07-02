@@ -58,7 +58,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         return;
     }
 
-    if (camersNamesData.isSupported(info.name)) {
+    if (camersNamesData.isManufacturerSupported(info.manufacturer) && camersNamesData.isSupported(info.name)) {
         qDebug() << "OnvifResourceInformationFetcher::findResources: skipping camera " << info.name;
         return;
     }
@@ -70,20 +70,6 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
 
     soapWrapper.fetchLoginPassword(info.manufacturer);
     qDebug() << "OnvifResourceInformationFetcher::findResources: Initial login = " << soapWrapper.getLogin() << ", password = " << soapWrapper.getPassword();
-
-    //Trying to get MAC
-    {
-        NetIfacesReq request;
-        NetIfacesResp response;
-        soapWrapper.getNetworkInterfaces(request, response);
-        QString tmp = QnPlOnvifResource::fetchMacAddress(response, sender.toString());
-        qDebug() << "Fetched MAC: " << tmp << " for endpoint: " << endpoint;
-        if (!tmp.isEmpty() && mac != tmp) {
-            mac = tmp;
-            if (isMacAlreadyExists(info.uniqId, result))
-                return;
-        }
-    }
 
     //some cameras returns by default not specific names; for example vivoteck returns "networkcamera" -> just in case we request params one more time.
 
@@ -107,7 +93,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
             if (!tmpName.isEmpty() && name != tmpName) {
                 name = tmpName;
 
-                if (camersNamesData.isSupported(QString(name).replace(manufacturer, ""))) {
+                if (camersNamesData.isManufacturerSupported(manufacturer) && camersNamesData.isSupported(QString(name).replace(manufacturer, ""))) {
                     qDebug() << "OnvifResourceInformationFetcher::findResources: (later step) skipping camera " << name;
                     return;
                 }
@@ -141,9 +127,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         if (deviceUrl.isEmpty()) {
             deviceUrl = endpoint;
         }
-        if (mediaUrl.isEmpty()) {
-            mediaUrl = endpoint;
-        }
+        //If media url is empty it will be filled in resource init method
     }
 
     qDebug() << "OnvifResourceInformationFetcher::createResource: Found new camera: endpoint: " << endpoint
