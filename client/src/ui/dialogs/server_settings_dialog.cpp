@@ -206,7 +206,7 @@ bool QnServerSettingsDialog::validateStorages(const QnAbstractStorageResourceLis
 		}
 
 		/*
-		QMessageBox::warning(this, tr("Not enought disk space"), 
+		QMessageBox::warning(this, tr("Not enough disk space"), 
 			tr("For storage '%1' required at least %2Gb space. Current disk free space is %3Gb, current video folder size is %4Gb. Required addition %5Gb").
 			arg(storage->getUrl()).
 			arg(formatGbStr(needRecordingSpace)).
@@ -218,7 +218,7 @@ bool QnServerSettingsDialog::validateStorages(const QnAbstractStorageResourceLis
 		qint64 avalableSace = itr.value().freeSpace + itr.value().usedSpace - storage->getSpaceLimit();
 		if (avalableSace < 0)
 		{
-			QMessageBox::critical(this, tr("Not enought disk space"),
+			QMessageBox::critical(this, tr("Not enough disk space"),
 				tr("Storage '%1'\nYou have less storage space available than reserved free space value. Required %2Gb additional disk space")
 				.arg(storage->getUrl())
 				.arg(formatGbStr(MIN_RECORD_FREE_SPACE - avalableSace)));
