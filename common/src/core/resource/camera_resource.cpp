@@ -8,6 +8,11 @@ QnVirtualCameraResource::QnVirtualCameraResource()
 {
 }
 
+QnPhysicalCameraResource::QnPhysicalCameraResource(): QnVirtualCameraResource()
+{
+	setFlags(local_live_cam);
+}
+
 int QnPhysicalCameraResource::getPrimaryStreamDesiredFps() const
 {
 #ifdef _DEBUG
