@@ -19,7 +19,7 @@ public:
     QnStorageManager();
     virtual ~QnStorageManager();
     static QnStorageManager* instance();
-    void removeStorage(QnStorageResourcePtr storage);
+    QnStorageResourcePtr removeStorage(QnStorageResourcePtr storage);
 
     /*
     * Remove storage if storage is absent in specified list
@@ -30,7 +30,7 @@ public:
 
     QString getFileName(const qint64& fileDate, const QnNetworkResourcePtr netResource, const QString& prefix, QnStorageResourcePtr& storage);
     bool fileStarted(const qint64& startDateMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider);
-    bool fileFinished(int durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider);
+    bool fileFinished(int durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider,  qint64 fileSize);
 
     static QString dateTimeStr(qint64 dateTimeMs);
     QnStorageResourcePtr getStorageByUrl(const QString& fileName);

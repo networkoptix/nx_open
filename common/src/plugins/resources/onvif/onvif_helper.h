@@ -93,6 +93,7 @@ public:
     static NameHelper& instance();
 
     bool isSupported(const QString& cameraName) const;
+    bool isManufacturerSupported(const QString& manufacturer) const;
 };
 
 #endif // onvif_helper_h
