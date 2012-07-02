@@ -219,15 +219,17 @@ bool QnServerSettingsDialog::validateStorages(const QnAbstractStorageResourceLis
 		if (avalableSace < 0)
 		{
 			QMessageBox::critical(this, tr("Not enought disk space"),
-				tr("You have less storage space available than reserved free space value. Required %1Gb additional disk space").
-				arg(formatGbStr(MIN_RECORD_FREE_SPACE - avalableSace)));
+				tr("Storage '%1'\nYou have less storage space available than reserved free space value. Required %2Gb additional disk space")
+				.arg(storage->getUrl())
+				.arg(formatGbStr(MIN_RECORD_FREE_SPACE - avalableSace)));
 			return false;
 		}
 		else if (avalableSace < MIN_RECORD_FREE_SPACE)
 		{
 			QMessageBox::warning(this, tr("Low space for archive"),
-				tr("You have only %1Gb space for archive.").
-				arg(formatGbStr(avalableSace)));
+				tr("Storage '%1'\nYou have only %2Gb space for archive.")
+				.arg(storage->getUrl())
+				.arg(formatGbStr(avalableSace)));
 		}
 	}
 
