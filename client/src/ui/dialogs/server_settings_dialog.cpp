@@ -102,7 +102,7 @@ int QnServerSettingsDialog::addTableRow(int id, const QString &url, int spaceLim
 }
 
 void QnServerSettingsDialog::setTableStorages(const QnAbstractStorageResourceList &storages) {
-    ui->storagesTable->clear();
+	ui->storagesTable->setRowCount(0);
     ui->storagesTable->setColumnCount(2);
 
     foreach (const QnAbstractStorageResourcePtr &storage, storages)

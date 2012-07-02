@@ -38,8 +38,10 @@ int QnFsHelperHandler::executeGet(const QString& path, const QnRequestParamList&
         return CODE_INVALID_PARAMETER;
     }
 
-    //QnStorageResource* storage = QnStoragePluginFactory::instance()->createStorage(pathStr, false);
 	QnStorageResourcePtr storage = qnStorageMan->getStorageByUrl(pathStr);
+    if (storage == 0) 
+        storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(pathStr, false));
+
     int prefixPos = pathStr.indexOf("://");
     QString prefix;
     if (prefixPos != -1)
