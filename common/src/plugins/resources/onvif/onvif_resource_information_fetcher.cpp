@@ -58,7 +58,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         return;
     }
 
-    if (camersNamesData.isSupported(info.name)) {
+    if (camersNamesData.isManufacturerSupported(info.manufacturer) && camersNamesData.isSupported(info.name)) {
         qDebug() << "OnvifResourceInformationFetcher::findResources: skipping camera " << info.name;
         return;
     }
@@ -93,7 +93,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
             if (!tmpName.isEmpty() && name != tmpName) {
                 name = tmpName;
 
-                if (camersNamesData.isSupported(QString(name).replace(manufacturer, ""))) {
+                if (camersNamesData.isManufacturerSupported(manufacturer) && camersNamesData.isSupported(QString(name).replace(manufacturer, ""))) {
                     qDebug() << "OnvifResourceInformationFetcher::findResources: (later step) skipping camera " << name;
                     return;
                 }
