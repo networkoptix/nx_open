@@ -291,10 +291,10 @@ QString QnServerStreamRecorder::fillFileName(QnAbstractMediaStreamDataProvider* 
     }
 }
 
-void QnServerStreamRecorder::fileFinished(qint64 durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider)
+void QnServerStreamRecorder::fileFinished(qint64 durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider, qint64 fileSize)
 {
     if (m_truncateInterval != 0)
-        qnStorageMan->fileFinished(durationMs, fileName, provider);
+        qnStorageMan->fileFinished(durationMs, fileName, provider, fileSize);
 };
 
 void QnServerStreamRecorder::fileStarted(qint64 startTimeMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider)

@@ -424,7 +424,7 @@ QnStorageResourcePtr QnStorageManager::getStorageByUrl(const QString& fileName)
     return QnStorageResourcePtr();
 }
 
-bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider)
+bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider, qint64 fileSize)
 {
     QMutexLocker lock(&m_mutex);
     int storageIndex;
@@ -433,6 +433,7 @@ bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnA
     if (storageIndex == -1)
         return false;
     storage->releaseBitrate(provider);
+    storage->addWritedSpace(fileSize);
     DeviceFileCatalogPtr catalog = getFileCatalog(mac, quality);
     if (catalog == 0)
         return false;

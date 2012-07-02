@@ -36,7 +36,7 @@ namespace detail {
         void at_replyReceived(int status, const QByteArray &reply, const QByteArray &errorString,int handle);
 
     signals:
-        void finished(int status, qint64 result, int handle);
+        void finished(int status, qint64 freeSpace, qint64 usedSpace, int handle);
     };
 }
 

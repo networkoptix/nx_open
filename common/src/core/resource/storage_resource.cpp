@@ -86,9 +86,11 @@ float QnAbstractStorageResource::getAvarageWritingUsage() const
 
 // ------------------------------ QnStorageResource -------------------------------
 
-QnStorageResource::QnStorageResource()
+QnStorageResource::QnStorageResource():
+	m_writedSpace(0)
 {
 }
+
 QnStorageResource::~QnStorageResource()
 {
 }
@@ -161,6 +163,16 @@ AVIOContext* QnStorageResource::createFfmpegIOContext(const QString& url, QIODev
     return ffmpegIOContext;
 }
 
+qint64 QnStorageResource::getFileSizeByIOContext(AVIOContext* ioContext)
+{
+	if (ioContext)
+	{
+		QIODevice* ioDevice = (QIODevice*) ioContext->opaque;
+		return ioDevice->size();
+	}
+	return 0;
+}
+
 void QnStorageResource::closeFfmpegIOContext(AVIOContext* ioContext)
 {
     if (ioContext)
@@ -170,6 +182,16 @@ void QnStorageResource::closeFfmpegIOContext(AVIOContext* ioContext)
         ioContext->opaque = 0;
         avio_close(ioContext);
     }
+}
+
+qint64 QnStorageResource::getWritedSpace() const
+{
+	return m_writedSpace;
+}
+
+void QnStorageResource::addWritedSpace(qint64 value)
+{
+	m_writedSpace += value;
 }
 
 // ---------------------------- QnStoragePluginFactory ------------------------------

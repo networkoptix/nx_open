@@ -159,6 +159,7 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk)
                 storage->removeFile(info.absoluteFilePath()); // // delete broken file
                 return false; 
             }
+            storage->addWritedSpace(info.size());
             break;
         }
     }
@@ -415,6 +416,7 @@ bool DeviceFileCatalog::deleteFirstRecord()
         QnStorageResourcePtr storage = qnStorageMan->storageRoot(m_chunks[m_firstDeleteCount].storageIndex);
         QString delFileName = fullFileName(m_chunks[m_firstDeleteCount]);
 
+        storage->addWritedSpace(-storage->getFileSize(delFileName));
         storage->removeFile(delFileName);
         bool isLastChunkOfMonth = true;
         QDate curDate = QDateTime::fromMSecsSinceEpoch(m_chunks[m_firstDeleteCount].startTimeMs).date();

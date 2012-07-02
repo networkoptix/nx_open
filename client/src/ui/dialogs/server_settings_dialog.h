@@ -12,26 +12,37 @@ namespace Ui {
 }
 
 namespace detail {
-    class CheckFreeSpaceReplyProcessor: public QObject {
+	struct FreeSpaceInfo 
+	{
+		FreeSpaceInfo(): freeSpace(0), usedSpace(0) {}
+		FreeSpaceInfo(qint64 _freeSpace, qint64 _usedSpace): freeSpace(_freeSpace), usedSpace(_usedSpace) {}
+		qint64 freeSpace;
+		qint64 usedSpace;
+	};
+	typedef QMap<int, FreeSpaceInfo> FreeSpaceMap;
+
+    class CheckFreeSpaceReplyProcessor: public QObject 
+	{
         Q_OBJECT;
     public:
+
         CheckFreeSpaceReplyProcessor(QObject *parent = NULL): QObject(parent) {}
 
-		QMap<int, qint64> freeSpaceInfo() const {
+		FreeSpaceMap freeSpaceInfo() const {
 			return m_freeSpace;
 		}
 
     signals:
-        void replyReceived(int status, qint64 freeSpace, int handle);
+        void replyReceived(int status, qint64 freeSpace, qint64 usedSpace, int handle);
 
     public slots:
-        void processReply(int status, qint64 freeSpace, int handle) {
-			m_freeSpace.insert(handle, freeSpace);
-            emit replyReceived(status, freeSpace, handle);
+        void processReply(int status, qint64 freeSpace, qint64 usedSpace,  int handle) {
+			m_freeSpace.insert(handle, FreeSpaceInfo(freeSpace, usedSpace));
+            emit replyReceived(status, freeSpace, usedSpace, handle);
         }
 
     private:
-		QMap<int, qint64> m_freeSpace;
+		FreeSpaceMap m_freeSpace;
     };
 
 } // namespace detail

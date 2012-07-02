@@ -300,6 +300,11 @@ QFileInfoList QnPlColdStoreStorage::getFileList(const QString& dirName)
 
 }
 
+qint64 QnPlColdStoreStorage::getFileSize(const QString& fillName) const
+{
+	return 0;
+}
+
 bool QnPlColdStoreStorage::isNeedControlFreeSpace() 
 {
     return false;

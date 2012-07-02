@@ -5,6 +5,7 @@
 #include "utils/common/util.h"
 #include "api/serializer/serializer.h"
 #include "fs_checker.h"
+#include "recorder/storage_manager.h"
 
 QnFsHelperHandler::QnFsHelperHandler(bool detectAvailableOnly):
 	m_detectAvailableOnly(detectAvailableOnly)
@@ -37,7 +38,8 @@ int QnFsHelperHandler::executeGet(const QString& path, const QnRequestParamList&
         return CODE_INVALID_PARAMETER;
     }
 
-    QnStorageResource* storage = QnStoragePluginFactory::instance()->createStorage(pathStr, false);
+    //QnStorageResource* storage = QnStoragePluginFactory::instance()->createStorage(pathStr, false);
+	QnStorageResourcePtr storage = qnStorageMan->getStorageByUrl(pathStr);
     int prefixPos = pathStr.indexOf("://");
     QString prefix;
     if (prefixPos != -1)
@@ -56,8 +58,14 @@ int QnFsHelperHandler::executeGet(const QString& path, const QnRequestParamList&
 	if (storage->isStorageAvailableForWriting()) {
 		if (m_detectAvailableOnly)
 			rezStr = "OK";
-		else
-			rezStr = QByteArray::number(storage->getFreeSpace());
+		else {
+			rezStr.append("<freeSpace>\n");
+			rezStr.append(QByteArray::number(storage->getFreeSpace()));
+			rezStr.append("</freeSpace>\n");
+			rezStr.append("<usedSpace>\n");
+			rezStr.append(QByteArray::number(storage->getWritedSpace()));
+			rezStr.append("</usedSpace>\n");
+		}
 	}
 	else {
 		if (m_detectAvailableOnly)
@@ -69,8 +77,6 @@ int QnFsHelperHandler::executeGet(const QString& path, const QnRequestParamList&
     result.append("<root>\n");
     result.append(rezStr);
     result.append("</root>\n");
-
-    delete storage;
 
     return CODE_OK;
 }
@@ -91,7 +97,7 @@ QString QnFsHelperHandler::description(TCPSocket* tcpSocket) const
 	}
 	else 
 	{
-		rez += "Returns storage free space in bytes. if specified folder can not be used for writing or not available returns -1.\n";
+		rez += "Returns storage free space and current usage in bytes. if specified folder can not be used for writing or not available returns -1.\n";
 		rez += "<BR>Param <b>path</b> - Folder.";
 		rez += "<BR><b>Return</b> XML - free space in bytes or -1";
 	}
