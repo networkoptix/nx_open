@@ -141,9 +141,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         if (deviceUrl.isEmpty()) {
             deviceUrl = endpoint;
         }
-        if (mediaUrl.isEmpty()) {
-            mediaUrl = endpoint;
-        }
+        //If media url is empty it will be filled in resource init method
     }
 
     qDebug() << "OnvifResourceInformationFetcher::createResource: Found new camera: endpoint: " << endpoint

@@ -156,7 +156,6 @@ private:
     void setAudioEncoderOptions(const AudioOptions& options);
     void setVideoSourceOptions(const VideoSrcOptions& options);
     void setMinMaxQuality(int min, int max);
-    void setOnvifUrls();
 
     void save();
 	
@@ -178,7 +177,6 @@ private:
     int m_iframeDistance;
     int m_minQuality;
     int m_maxQuality;
-    bool m_reinitDeviceInfo;
     CODECS m_codec;
     AUDIO_CODECS m_audioCodec;
     ResolutionPair m_primaryResolution;
