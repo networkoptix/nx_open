@@ -71,20 +71,6 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     soapWrapper.fetchLoginPassword(info.manufacturer);
     qDebug() << "OnvifResourceInformationFetcher::findResources: Initial login = " << soapWrapper.getLogin() << ", password = " << soapWrapper.getPassword();
 
-    //Trying to get MAC
-    {
-        NetIfacesReq request;
-        NetIfacesResp response;
-        soapWrapper.getNetworkInterfaces(request, response);
-        QString tmp = QnPlOnvifResource::fetchMacAddress(response, sender.toString());
-        qDebug() << "Fetched MAC: " << tmp << " for endpoint: " << endpoint;
-        if (!tmp.isEmpty() && mac != tmp) {
-            mac = tmp;
-            if (isMacAlreadyExists(info.uniqId, result))
-                return;
-        }
-    }
-
     //some cameras returns by default not specific names; for example vivoteck returns "networkcamera" -> just in case we request params one more time.
 
     //Trying to get name and manufacturer
