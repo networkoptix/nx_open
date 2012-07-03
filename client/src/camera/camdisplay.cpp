@@ -138,6 +138,7 @@ void CLCamDisplay::setAudioBufferSize(int bufferSize)
 {
     m_audioBufferSize = bufferSize;
     m_minAudioDetectJumpInterval = MIN_VIDEO_DETECT_JUMP_INTERVAL + m_audioBufferSize*1000;
+    QMutexLocker lock(&m_audioChangeMutex);
     delete m_audioDisplay;
     m_audioDisplay = new CLAudioStreamDisplay(m_audioBufferSize);
 }
@@ -164,6 +165,7 @@ void CLCamDisplay::pause()
 {
     QnAbstractDataConsumer::pause();
     m_isRealTimeSource = false;
+    QMutexLocker lock(&m_audioChangeMutex);
     m_audioDisplay->suspend();
 }
 
@@ -171,7 +173,10 @@ void CLCamDisplay::resume()
 {
     m_delay.afterdelay();
     m_singleShotMode = false;
-    m_audioDisplay->resume();
+    {
+        QMutexLocker lock(&m_audioChangeMutex);
+        m_audioDisplay->resume();
+    }
     QnAbstractDataConsumer::resume();
 }
 
@@ -945,6 +950,7 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
     {
         if (audioParamsChanged)
         {
+            QMutexLocker lock(&m_audioChangeMutex);
             delete m_audioDisplay;
             m_audioBufferSize = expectedBufferSize;
             m_audioDisplay = new CLAudioStreamDisplay(m_audioBufferSize);
@@ -1126,11 +1132,6 @@ void CLCamDisplay::setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val)
     m_lightCpuMode = val;
 }
 
-void CLCamDisplay::pauseAudio()
-{
-    m_audioDisplay->suspend();
-}
-
 void CLCamDisplay::playAudio(bool play)
 {
     if (m_playAudio == play)
@@ -1138,10 +1139,13 @@ void CLCamDisplay::playAudio(bool play)
 
     m_needChangePriority = true;
     m_playAudio = play;
-    if (!m_playAudio)
-        m_audioDisplay->clearDeviceBuffer();
-    else
-        m_audioDisplay->resume();
+    {
+        QMutexLocker lock(&m_audioChangeMutex);
+        if (!m_playAudio)
+            m_audioDisplay->clearDeviceBuffer();
+        else
+            m_audioDisplay->resume();
+    }
     if (!play)
         setMTDecoding(false);
 }
