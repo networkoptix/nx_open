@@ -103,9 +103,7 @@ void QnClientMessageProcessor::at_messageReceived(QnMessage message)
     QByteArray debugStr;
     QTextStream stream(&debugStr);
 
-    // stream << "Got message: " << event.xtype << " " << event.objectName << " " << event.objectId << event.resourceGuid;
-
-	if (message.eventType == Message_Type_ResourceDisabledChange)
+    if (message.eventType == Message_Type_ResourceDisabledChange)
         stream << "disabled: " << message.resourceDisabled;
 
     if(message.eventType == Message_Type_ResourceStatusChange)
@@ -150,11 +148,17 @@ void QnClientMessageProcessor::at_messageReceived(QnMessage message)
     }
 	else if (message.eventType == Message_Type_ResourceChange)
     {
+        if (!message.resource)
+        {
+            qWarning() << "Got Message_Type_ResourceChange with empty resource in it";
+            return;
+        }
+
         QnResourcePtr ownResource;
     
-		QString guid = message.resourceGuid;
+        QString guid = message.resource->getGuid();
 		if (!guid.isEmpty())
-			ownResource = qnResPool->getResourceByGuid(guid);
+            ownResource = qnResPool->getResourceByGuid(guid);
         else
 			ownResource = qnResPool->getResourceById(message.resource->getId());
 
