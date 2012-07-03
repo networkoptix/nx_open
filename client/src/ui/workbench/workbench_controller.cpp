@@ -733,18 +733,18 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
     case Qt::Key_PageDown:
         break; /* Don't let the view handle these and scroll. */
     case Qt::Key_Menu:{
-        QWidget *view = display()->view();        
+        QGraphicsView *view = display()->view();        
         QList<QGraphicsItem *> items = display()->scene()->selectedItems();
         QPoint offset = view->mapToGlobal(QPoint(0, 0));
         if (items.count() == 0)
             showContextMenuAt(offset);
         else{ 
-            QRectF rect = items[0]->boundingRect();
-//            gluProject(rect.x(), rect.y, 0, )
-            QRect rect2 = mapper()->mapToGrid(rect);
+            //items[0]->boundingRect();
+            QRectF rect = items[0]->mapToScene(items[0]->boundingRect()).boundingRect();
             QnResourceWidget* item = dynamic_cast<QnResourceWidget *>(items[0]);
-            QPoint pos = offset;
-            showContextMenuAt(pos);
+            QnSceneTransformations t;
+            QRect testRect = t.mapRectFromScene(view, rect); /* Where is the static analogue? */ 
+            showContextMenuAt(offset + testRect.bottomRight());
         }
         }
         break;
