@@ -14,7 +14,7 @@ class CLAudioStreamDisplay : public QObject
 {
 	Q_OBJECT
 public:
-	CLAudioStreamDisplay(int buffMs);
+	CLAudioStreamDisplay(int buffMs, int prebufferMs);
 	~CLAudioStreamDisplay();
 
     void putData(QnCompressedAudioDataPtr data, qint64 minTime);
@@ -47,8 +47,6 @@ public:
 
     int getAudioBufferSize() const;
 private:
-    // returns amount of ms which buffered before start playing 
-    int playAfterMs() const;
     int msInQueue() const;
 
 	static QnCodecAudioFormat downmix(CLByteArray& audio, QnCodecAudioFormat format);
@@ -65,6 +63,7 @@ private:
 //	CLAbstractAudioDecoder* m_decoder[CL_VARIOUSE_DECODERS];
 
     int m_bufferMs;
+    int m_prebufferMs;
     CLByteArray m_decodedAudioBuffer;
     bool m_tooFewDataDetected;
     bool m_isFormatSupported;
