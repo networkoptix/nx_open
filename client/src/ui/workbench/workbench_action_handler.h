@@ -236,6 +236,11 @@ protected slots:
     void at_setCurrentLayoutItemSpacing20Action_triggered();
     void at_setCurrentLayoutItemSpacing30Action_triggered();
 
+    void at_rotate0Action_triggered();
+    void at_rotate90Action_triggered();
+    void at_rotate180Action_triggered();
+    void at_rotate270Action_triggered();
+
     void at_exportTimeSelectionAction_triggered();
     void at_exportLayoutAction_triggered();
     void at_camera_exportFinished(QString fileName);

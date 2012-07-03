@@ -204,6 +204,10 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::SetCurrentLayoutItemSpacing10Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing10Action_triggered()));
     connect(action(Qn::SetCurrentLayoutItemSpacing20Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing20Action_triggered()));
     connect(action(Qn::SetCurrentLayoutItemSpacing30Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing30Action_triggered()));
+    connect(action(Qn::Rotate0Action),                          SIGNAL(triggered()),    this,   SLOT(at_rotate0Action_triggered()));
+    connect(action(Qn::Rotate90Action),                         SIGNAL(triggered()),    this,   SLOT(at_rotate90Action_triggered()));
+    connect(action(Qn::Rotate180Action),                        SIGNAL(triggered()),    this,   SLOT(at_rotate180Action_triggered()));
+    connect(action(Qn::Rotate270Action),                        SIGNAL(triggered()),    this,   SLOT(at_rotate270Action_triggered()));
 
     /* Run handlers that update state. */
     at_eventManager_connectionClosed();
@@ -1787,6 +1791,38 @@ void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing20Action_triggered(
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing30Action_triggered() {
     workbench()->currentLayout()->resource()->setCellSpacing(QSizeF(0.3, 0.3));
+}
+
+void QnWorkbenchActionHandler::at_rotate0Action_triggered(){
+    QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
+    if(!widgets.empty()) {
+        foreach(const QnResourceWidget *widget, widgets)
+            widget->item()->setRotation(0);
+    }
+}
+
+void QnWorkbenchActionHandler::at_rotate90Action_triggered(){
+    QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
+    if(!widgets.empty()) {
+        foreach(const QnResourceWidget *widget, widgets)
+            widget->item()->setRotation(90);
+    }
+}
+
+void QnWorkbenchActionHandler::at_rotate180Action_triggered(){
+    QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
+    if(!widgets.empty()) {
+        foreach(const QnResourceWidget *widget, widgets)
+            widget->item()->setRotation(180);
+    }
+}
+
+void QnWorkbenchActionHandler::at_rotate270Action_triggered(){
+    QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
+    if(!widgets.empty()) {
+        foreach(const QnResourceWidget *widget, widgets)
+            widget->item()->setRotation(270);
+    }
 }
 
 void QnWorkbenchActionHandler::at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle) {
