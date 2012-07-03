@@ -233,6 +233,10 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent, QnWorkbenchContext *
     ui->resourceTreeView->setProperty(Qn::ItemViewItemBackgroundOpacity, 0.5);
     ui->searchTreeView->setProperty(Qn::ItemViewItemBackgroundOpacity, 0.5);
 
+    QPalette pp(ui->filterLineEdit->palette());
+    pp.setColor(QPalette::Background, pp.color(QPalette::Background));  // I hate this way of development..
+    ui->filterLineEdit->setPalette(pp);                                 // ..but this really works somehow
+
     m_renameAction = new QAction(this);
 
     connect(ui->typeComboBox,       SIGNAL(currentIndexChanged(int)),   this,               SLOT(updateFilter()));
@@ -488,6 +492,9 @@ void QnResourceTreeWidget::mousePressEvent(QMouseEvent *event) {
 void QnResourceTreeWidget::keyPressEvent(QKeyEvent *event) {
     event->accept();
     if (event->key() == Qt::Key_Menu){
+        if (ui->filterLineEdit->hasFocus())
+            return;
+
         QnTreeView* treeView = ui->searchTab->isActiveWindow() 
             ? ui->searchTreeView 
             : ui->resourceTreeView; 
