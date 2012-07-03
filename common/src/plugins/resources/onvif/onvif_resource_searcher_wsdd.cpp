@@ -49,11 +49,11 @@ QHostAddress WSDD_GROUP_ADDRESS(WSDD_MULTICAST_ADDRESS);
 
 
 OnvifResourceSearcherWsdd::OnvifResourceSearcherWsdd():
-    m_onvifFetcher(OnvifResourceInformationFetcher::instance()),
+    m_onvifFetcher(OnvifResourceInformationFetcher::instance())/*,
     m_recvSocketList(),
-    m_mutex()
+    m_mutex()*/
 {
-    updateInterfacesListenSockets();
+    //updateInterfacesListenSockets();
 }
 
 OnvifResourceSearcherWsdd& OnvifResourceSearcherWsdd::instance()
@@ -81,7 +81,7 @@ int gsoapFsend(struct soap *soap, const char *s, size_t n)
     return SOAP_OK;
 }
 
-void OnvifResourceSearcherWsdd::updateInterfacesListenSockets() const
+/*void OnvifResourceSearcherWsdd::updateInterfacesListenSockets() const
 {
     QMutexLocker lock(&m_mutex);
 
@@ -199,7 +199,7 @@ void OnvifResourceSearcherWsdd::findHelloEndpoints(EndpointInfoHash& result) con
         soapWsddProxy.soap->socket = SOAP_INVALID_SOCKET;
         soapWsddProxy.soap->master = SOAP_INVALID_SOCKET;
     }
-}
+}*/
 
 void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
 {
@@ -306,8 +306,8 @@ void OnvifResourceSearcherWsdd::findResources(QnResourceList& result) const
 {
     EndpointInfoHash endpoints;
 
-    updateInterfacesListenSockets();
-    findHelloEndpoints(endpoints);
+    //updateInterfacesListenSockets();
+    //findHelloEndpoints(endpoints);
 
     findEndpoints(endpoints);
 
