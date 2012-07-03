@@ -1,5 +1,6 @@
 #include "isd_resource.h"
 #include "../onvif/dataprovider/rtp_stream_provider.h"
+#include "utils/common/math.h"
 
 
 const char* QnPlIsdResource::MANUFACTURE = "ISD";
@@ -23,7 +24,13 @@ static bool sizeCompare(const QSize &s1, const QSize &s2)
     return s1.width() > s2.width();
 }
 
+static float getResolutionAspectRatio(QSize s)
+{
+    if (s.height()==0)
+        return 0;
 
+    return float(s.width()) / s.height();
+}
 //==================================================================
 
 
@@ -54,9 +61,6 @@ void QnPlIsdResource::setIframeDistance(int /*frames*/, int /*timems*/)
 
 bool QnPlIsdResource::initInternal()
 {
-    return false;
-
-    /*
     CLHttpStatus status;
     QByteArray reslst = downloadFile(status, "api/param.cgi?req=VideoInput.1.h264.1.ResolutionList",  getHostAddress(), 80, 3000, getAuth());
 
@@ -85,6 +89,7 @@ bool QnPlIsdResource::initInternal()
         return false;
 
 
+
     qSort(resolutions.begin(), resolutions.end(), sizeCompare);
 
     {
@@ -93,38 +98,47 @@ bool QnPlIsdResource::initInternal()
         m_resolution2 = QSize(0,0);
 
 
-        double requestSquare = m_resolution1.width() * m_resolution1.height();
+        double maxResolutionSquare = m_resolution1.width() * m_resolution1.height();
+        double requestSquare = 320 * 240;
 
-        if (requestSquare < MAX_EPS || requestSquare > maxResolutionSquare) return EMPTY_RESOLUTION_PAIR;
+
 
         int bestIndex = -1;
-        double bestMatchCoeff = maxResolutionSquare > MAX_EPS ? (maxResolutionSquare / requestSquare) : INT_MAX;
+        double bestMatchCoeff = maxResolutionSquare / requestSquare;
 
-        for (int i = 0; i < m_resolutionList.size(); ++i) {
-            ResolutionPair tmp;
+        float bestAspectRatio = getResolutionAspectRatio(m_resolution1);
 
-            tmp.first = qPower2Ceil(static_cast<unsigned int>(m_resolutionList[i].first + 1), 8);
-            tmp.second = qPower2Floor(static_cast<unsigned int>(m_resolutionList[i].second - 1), 8);
+        for (int i = 0; i < resolutions.size(); ++i) 
+        {
+            QSize tmp;
+
+            tmp.setWidth( qPower2Ceil(static_cast<unsigned int>(resolutions[i].width()+ 1), 8) );
+            tmp.setHeight( qPower2Floor(static_cast<unsigned int>(resolutions[i].height() - 1), 8) );
             float ar1 = getResolutionAspectRatio(tmp);
 
-            tmp.first = qPower2Floor(static_cast<unsigned int>(m_resolutionList[i].first - 1), 8);
-            tmp.second = qPower2Ceil(static_cast<unsigned int>(m_resolutionList[i].second + 1), 8);
+            tmp.setWidth( qPower2Floor(static_cast<unsigned int>(resolutions[i].width() - 1), 8) );
+            tmp.setHeight( qPower2Ceil(static_cast<unsigned int>(resolutions[i].height() + 1), 8) );
             float ar2 = getResolutionAspectRatio(tmp);
 
-            if (!qBetween(aspectRatio, qMin(ar1,ar2), qMax(ar1,ar2)))
+            if (!qBetween(bestAspectRatio, qMin(ar1,ar2), qMax(ar1,ar2)))
             {
                 continue;
             }
 
-            double square = m_resolutionList[i].first * m_resolutionList[i].second;
-            if (square < MAX_EPS) continue;
+            double square = resolutions[i].width() * resolutions[i].height();
+            
 
             double matchCoeff = qMax(requestSquare, square) / qMin(requestSquare, square);
-            if (matchCoeff <= bestMatchCoeff + MAX_EPS) {
+
+            if (matchCoeff <= bestMatchCoeff + 0.002) 
+            {
                 bestIndex = i;
                 bestMatchCoeff = matchCoeff;
             }
         }
+
+        if (resolutions[bestIndex].width() * resolutions[bestIndex].height() < 1920*1080)
+            m_resolution2 = resolutions[bestIndex];
 
     }
     
@@ -134,7 +148,7 @@ bool QnPlIsdResource::initInternal()
 
 
     /*
-    QByteArray reslst2 = downloadFile(status, "api/param.cgi?req=VideoInput.1.h264.1.ResolutionList",  getHostAddress(), 80, 3000, getAuth());
+    QByteArray reslst2 = downloadFile(status, "api/param.cgi?req=VideoInput.1.h264.2.ResolutionList",  getHostAddress(), 80, 3000, getAuth());
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
@@ -143,7 +157,7 @@ bool QnPlIsdResource::initInternal()
     }
     /**/
 
-    /*
+
     QByteArray fpses = downloadFile(status, "api/param.cgi?req=VideoInput.1.h264.1.FrameRateList",  getHostAddress(), 80, 3000, getAuth());
 
     if (status == CL_HTTP_AUTH_REQUIRED)
@@ -155,7 +169,25 @@ bool QnPlIsdResource::initInternal()
     /**/
     
 
+    QString line2(fpses);
+    vals = getValues(line2);
 
+    QList<int> fpsList;
+    foreach(QString fpsS, vals)
+    {
+        fpsList.push_back(fpsS.trimmed().toInt());
+    }
+
+    qSort(fpsList.begin(),fpsList.end(), qGreater<int>());
+
+    if (fpsList.size()<1)
+        return false;
+
+    {
+        //QMutexLocker lock(&m_mutex);
+        //m_MaxFps
+    }
+    
 
     return true;
 
