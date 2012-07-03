@@ -29,6 +29,7 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/workbench_display.h>
 
 #include "ui_resource_tree_widget.h"
 #include "ui/style/proxy_style.h"
@@ -487,8 +488,16 @@ void QnResourceTreeWidget::mousePressEvent(QMouseEvent *event) {
 void QnResourceTreeWidget::keyPressEvent(QKeyEvent *event) {
     event->accept();
     if (event->key() == Qt::Key_Menu){
-        QModelIndex selected = ui->resourceTreeView->selectionModel()->selectedRows().back();
-        showContextMenuAt(mapToGlobal(ui->resourceTreeView->visualRect(selected).bottomRight()));
+        QModelIndexList selectedRows = ui->resourceTreeView->selectionModel()->selectedRows();
+        if (selectedRows.isEmpty())
+            return;
+        
+        QModelIndex selected = selectedRows.back();
+        QPoint pos = ui->resourceTreeView->visualRect(selected).bottomRight();
+      
+        // mapToGlobal works incorrectly here, using two-step transformation
+        pos = ui->resourceTreeView->mapToGlobal(pos);
+        showContextMenuAt(display()->view()->mapToGlobal(pos));
     }
 }
 
