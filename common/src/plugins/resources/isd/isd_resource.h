@@ -35,7 +35,7 @@ protected:
     QSize m_resolution1;
     QSize m_resolution2;
 
-    int m_MaxFps;
+    
 
 };
 
