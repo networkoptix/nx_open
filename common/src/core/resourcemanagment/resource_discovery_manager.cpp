@@ -278,6 +278,32 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
                     ++it;
                     continue;
                 }
+                else
+                {
+                    if (rpNetRes->areResourcesNeededToBeMerged(newNetRes))
+                    {
+                        rpNetRes->merge(newNetRes);
+
+                        if (isServer())
+                        {
+                            // not stand alone
+                            QnVirtualCameraResourcePtr cameraResource = rpNetRes.dynamicCast<QnVirtualCameraResource>();
+                            if (cameraResource)
+                            {
+                                QByteArray errorString;
+                                QnVirtualCameraResourceList cameras;
+                                QnAppServerConnectionPtr connect = QnAppServerConnectionFactory::createConnection();
+                                if (connect->addCamera(cameraResource, cameras, errorString) != 0)
+                                {
+                                    qCritical() << "QnResourceDiscoveryManager::findNewResources(): Can't add camera. Reason: " << errorString;
+                                }
+                            }
+
+                        }
+
+                    }
+
+                }
             }
 
             // seems like resource is in the pool and has OK ip
