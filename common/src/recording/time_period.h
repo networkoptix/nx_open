@@ -145,6 +145,20 @@ public:
             ++itr;
         return itr;
     }
+
+    /**
+     * Returns true if timePeriodList intersect period
+     */
+    bool containPeriod(const QnTimePeriod& period) const
+    {
+        const_iterator itrStart = findNearestPeriod(period.startTimeMs, true);
+        const_iterator itrEnd = findNearestPeriod(period.endTimeMs(), true);
+        for (const_iterator itr = itrStart; itr != itrEnd; ++itr) {
+            if (!itr->intersect(period).isEmpty())
+                return true;
+        }
+        return itrEnd != end() && !itrEnd->intersect(period).isEmpty();
+    }
 };
 
 bool operator < (const QnTimePeriod& first, const QnTimePeriod& other);

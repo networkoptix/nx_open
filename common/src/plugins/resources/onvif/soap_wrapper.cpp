@@ -138,6 +138,12 @@ bool SoapWrapper<T>::isNotAuthenticated()
     return PasswordHelper::isNotAuthenticated(m_soapProxy->soap_fault());
 }
 
+template <class T>
+bool SoapWrapper<T>::isConflictError()
+{
+    return PasswordHelper::isConflictError(m_soapProxy->soap_fault());
+}
+
 //
 // DeviceSoapWrapper
 //
@@ -373,6 +379,12 @@ int MediaSoapWrapper::getVideoSourceConfigurationOptions(VideoSrcOptionsReq& req
     return m_soapProxy->GetVideoSourceConfigurationOptions(m_endpoint, NULL, &request, &response);
 }
 
+int MediaSoapWrapper::getVideoEncoderConfiguration(VideoConfigReq& request, VideoConfigResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->GetVideoEncoderConfiguration(m_endpoint, NULL, &request, &response);
+}
+
 //
 // Explicit instantiating
 //
@@ -383,6 +395,7 @@ template const char* SoapWrapper<DeviceBindingProxy>::getPassword();
 template const QString SoapWrapper<DeviceBindingProxy>::getLastError();
 template const QString SoapWrapper<DeviceBindingProxy>::getEndpointUrl();
 template bool SoapWrapper<DeviceBindingProxy>::isNotAuthenticated();
+template bool SoapWrapper<DeviceBindingProxy>::isConflictError();
 
 template soap* SoapWrapper<MediaBindingProxy>::getSoap();
 template const char* SoapWrapper<MediaBindingProxy>::getLogin();
@@ -390,3 +403,4 @@ template const char* SoapWrapper<MediaBindingProxy>::getPassword();
 template const QString SoapWrapper<MediaBindingProxy>::getLastError();
 template const QString SoapWrapper<MediaBindingProxy>::getEndpointUrl();
 template bool SoapWrapper<MediaBindingProxy>::isNotAuthenticated();
+template bool SoapWrapper<MediaBindingProxy>::isConflictError();

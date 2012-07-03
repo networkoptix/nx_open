@@ -58,7 +58,9 @@ static void updateActivity()
 #define CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE 15
 
 static const int DEFAULT_AUDIO_BUFF_SIZE = 1000 * 4;
-static const int REALTIME_AUDIO_BUFFER_SIZE = 150; // at ms, prebuffer is half buffer
+
+static const int REALTIME_AUDIO_BUFFER_SIZE = 300; // at ms, max buffer 
+static const int REALTIME_AUDIO_PREBUFFER = 75; // at ms, prebuffer 
 
 static const qint64 MIN_VIDEO_DETECT_JUMP_INTERVAL = 300 * 1000; // 300ms
 //static const qint64 MIN_AUDIO_DETECT_JUMP_INTERVAL = MIN_VIDEO_DETECT_JUMP_INTERVAL + AUDIO_BUFF_SIZE*1000;
@@ -127,20 +129,21 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
         m_nextReverseTime[i] = AV_NOPTS_VALUE;
     }
     int expectedBufferSize = m_isRealTimeSource ? REALTIME_AUDIO_BUFFER_SIZE : DEFAULT_AUDIO_BUFF_SIZE;
-    setAudioBufferSize(expectedBufferSize);
+    int expectedPrebuferSize = m_isRealTimeSource ? REALTIME_AUDIO_PREBUFFER : DEFAULT_AUDIO_BUFF_SIZE/2;
+    setAudioBufferSize(expectedBufferSize, expectedPrebuferSize);
 
     QMutexLocker lock(&m_qualityMutex);
     m_allCamDisplay << this;
     m_ignoreTime = AV_NOPTS_VALUE;
 }
 
-void CLCamDisplay::setAudioBufferSize(int bufferSize)
+void CLCamDisplay::setAudioBufferSize(int bufferSize, int prebufferSize)
 {
     m_audioBufferSize = bufferSize;
     m_minAudioDetectJumpInterval = MIN_VIDEO_DETECT_JUMP_INTERVAL + m_audioBufferSize*1000;
     QMutexLocker lock(&m_audioChangeMutex);
     delete m_audioDisplay;
-    m_audioDisplay = new CLAudioStreamDisplay(m_audioBufferSize);
+    m_audioDisplay = new CLAudioStreamDisplay(m_audioBufferSize, prebufferSize);
 }
 
 CLCamDisplay::~CLCamDisplay()
@@ -950,10 +953,11 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
     {
         if (audioParamsChanged)
         {
+            int audioPrebufferSize = m_isRealTimeSource ? REALTIME_AUDIO_PREBUFFER : DEFAULT_AUDIO_BUFF_SIZE/2;
             QMutexLocker lock(&m_audioChangeMutex);
             delete m_audioDisplay;
             m_audioBufferSize = expectedBufferSize;
-            m_audioDisplay = new CLAudioStreamDisplay(m_audioBufferSize);
+            m_audioDisplay = new CLAudioStreamDisplay(m_audioBufferSize, audioPrebufferSize);
             m_playingFormat = currentAudioFormat;
         }
 
