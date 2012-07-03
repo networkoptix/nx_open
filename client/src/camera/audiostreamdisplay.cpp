@@ -52,8 +52,9 @@ static void down_mix_to_stereo(T *data, int channels, int len)
     }
 }
 
-CLAudioStreamDisplay::CLAudioStreamDisplay(int bufferMs) :
+CLAudioStreamDisplay::CLAudioStreamDisplay(int bufferMs, int prebufferMs) :
     m_bufferMs(bufferMs),
+    m_prebufferMs(prebufferMs),
     m_tooFewDataDetected(true),
     m_isFormatSupported(true),
     m_audioSound(0),
@@ -231,7 +232,7 @@ void CLAudioStreamDisplay::putData(QnCompressedAudioDataPtr data, qint64 minTime
     }
 
 
-    if (bufferSize >= m_tooFewDataDetected*playAfterMs() || m_audioQueue.size() >= MAX_BUFFER_LEN)
+    if (bufferSize >= m_tooFewDataDetected * m_prebufferMs || m_audioQueue.size() >= MAX_BUFFER_LEN)
     {
         playCurrentBuffer();
     }
@@ -396,11 +397,6 @@ QnCodecAudioFormat CLAudioStreamDisplay::float2int32(CLByteArray& audio, QnCodec
     }
     format.setSampleType(QnAudioFormat::SignedInt);
     return format;
-}
-
-int CLAudioStreamDisplay::playAfterMs() const
-{
-    return m_bufferMs / 2;
 }
 
 int CLAudioStreamDisplay::msInQueue() const

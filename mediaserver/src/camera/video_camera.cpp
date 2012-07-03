@@ -57,17 +57,17 @@ bool channelCheckFunctor(const QnAbstractDataPacketPtr& data, QVariant channelNu
 
 void QnVideoCameraGopKeeper::putData(QnAbstractDataPacketPtr data)
 {
-    QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
-    if (!media)
+    QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
+    if (!video)
         return;
     QMutexLocker lock(&m_queueMtx);
-    if (media->flags & AV_PKT_FLAG_KEY) {
-        m_lastKeyFrameChannel = media->channelNumber;
-        m_dataQueue.removeDataByCondition(channelCheckFunctor, media->channelNumber);
+    if (video->flags & AV_PKT_FLAG_KEY) {
+        m_lastKeyFrameChannel = video->channelNumber;
+        m_dataQueue.removeDataByCondition(channelCheckFunctor, video->channelNumber);
     }
     if (m_dataQueue.size() < m_dataQueue.maxSize()) {
-        media->flags |= QnAbstractMediaData::MediaFlags_LIVE;
-        QnAbstractDataConsumer::putData(data);
+        video->flags |= QnAbstractMediaData::MediaFlags_LIVE;
+        QnAbstractDataConsumer::putData(video);
     }
 }
 

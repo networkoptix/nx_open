@@ -110,7 +110,7 @@ private:
 
     qint64 getDisplayedMax() const;
     qint64 getDisplayedMin() const;
-    void setAudioBufferSize(int bufferSize);
+    void setAudioBufferSize(int bufferSize, int prebufferMs);
 protected:
     CLVideoStreamDisplay* m_display[CL_MAX_CHANNELS];
 	QQueue<QnCompressedVideoDataPtr> m_videoQueue[CL_MAX_CHANNELS];
