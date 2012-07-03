@@ -5,12 +5,17 @@
 
 class QnFsHelperHandler: public QnRestRequestHandler
 {
+public:
+	QnFsHelperHandler(bool detectAvailableOnly);
+protected:
     virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result);
     virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result);
     virtual QString description(TCPSocket* tcpSocket) const;
 private:
     qint64 parseDateTime(const QString& dateTime);
     QRect deserializeMotionRect(const QString& rectStr);
+private:
+	bool m_detectAvailableOnly;
 };
 
 #endif // __FS_CHECKER_H__

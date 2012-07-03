@@ -77,7 +77,7 @@ protected:
 
     virtual bool saveMotion(QnAbstractMediaDataPtr media);
 
-    virtual void fileFinished(qint64 /*durationMs*/, const QString& /*fileName*/, QnAbstractMediaStreamDataProvider*) {}
+    virtual void fileFinished(qint64 /*durationMs*/, const QString& /*fileName*/, QnAbstractMediaStreamDataProvider*,  qint64 fileSize) {}
     virtual void fileStarted(qint64 /*startTimeMs*/, const QString& /*fileName*/, QnAbstractMediaStreamDataProvider*) {}
     virtual QString fillFileName(QnAbstractMediaStreamDataProvider*);
 

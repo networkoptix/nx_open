@@ -123,7 +123,7 @@ QString QnRecordedChunkListHandler::description(TCPSocket* tcpSocket) const
     rez += "<BR>Param <b>motionRect</b> - Match motion on a video by specified rect. Params can be used several times.";
     rez += "<BR>Param <b>detail</b> - Chunk detail level, in microseconds. Time periods/chunks that are shorter than the detail level are discarded. You can use detail level as amount of microseconds per screen pixel.";
 
-    rez += "<BR><b>Return</b> XML</b> - with chunks merged for all cameras. Returned time and duration in microseconds. <a href=\"";
+    rez += "<BR><b>Return</b> XML - with chunks merged for all cameras. Returned time and duration in microseconds.";
     // rez += getXsdUrl(tcpSocket);
     return rez;
 }

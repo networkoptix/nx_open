@@ -12,28 +12,42 @@ namespace Ui {
 }
 
 namespace detail {
-    class CheckPathReplyProcessor: public QObject {
+	static const int INVALID_PATH = -1;
+	static const int SERVER_ERROR = -2;
+	struct FreeSpaceInfo 
+	{
+		FreeSpaceInfo(): freeSpace(0), usedSpace(0), errorCode(0) {}
+		FreeSpaceInfo(qint64 _freeSpace, qint64 _usedSpace, int _errorCode): freeSpace(_freeSpace), usedSpace(_usedSpace), errorCode(_errorCode) {}
+		qint64 freeSpace;
+		qint64 usedSpace;
+		int errorCode;
+	};
+	typedef QMap<int, FreeSpaceInfo> FreeSpaceMap;
+
+    class CheckFreeSpaceReplyProcessor: public QObject 
+	{
         Q_OBJECT;
     public:
-        CheckPathReplyProcessor(QObject *parent = NULL): QObject(parent) {}
 
-        const QList<int> &invalidHandles() const {
-            return m_invalidHandles;
-        }
+        CheckFreeSpaceReplyProcessor(QObject *parent = NULL): QObject(parent) {}
+
+		FreeSpaceMap freeSpaceInfo() const {
+			return m_freeSpace;
+		}
 
     signals:
-        void replyReceived(int status, bool result, int handle);
+        void replyReceived(int status, qint64 freeSpace, qint64 usedSpace, int handle);
 
     public slots:
-        void processReply(int status, bool result, int handle) {
-            if(status != 0 || !result)
-                m_invalidHandles.push_back(handle);
-
-            emit replyReceived(status, result, handle);
+        void processReply(int status, qint64 freeSpace, qint64 usedSpace,  int handle) 
+		{
+			int errCode = status == 0 ? (freeSpace > 0 ? 0 : INVALID_PATH) : SERVER_ERROR;
+			m_freeSpace.insert(handle, FreeSpaceInfo(freeSpace, usedSpace, errCode));
+            emit replyReceived(status, freeSpace, usedSpace, handle);
         }
 
     private:
-        QList<int> m_invalidHandles;
+		FreeSpaceMap m_freeSpace;
     };
 
 } // namespace detail

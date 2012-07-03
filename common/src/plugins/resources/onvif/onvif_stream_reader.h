@@ -31,7 +31,7 @@ class QnOnvifStreamReader: public CLServerPushStreamreader , public QnLiveStream
 public:
     QnOnvifStreamReader(QnResourcePtr res);
     virtual ~QnOnvifStreamReader();
-
+    const QnResourceAudioLayout* getDPAudioLayout() const;
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
     virtual void openStream() override;

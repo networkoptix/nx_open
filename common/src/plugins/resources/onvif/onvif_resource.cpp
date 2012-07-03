@@ -182,7 +182,6 @@ QnPlOnvifResource::QnPlOnvifResource() :
     m_iframeDistance(-1),
     m_minQuality(0),
     m_maxQuality(0),
-    m_reinitDeviceInfo(false),
     m_codec(H264),
     m_audioCodec(AUDIO_NONE),
     m_primaryResolution(EMPTY_RESOLUTION_PAIR),
@@ -269,19 +268,24 @@ bool QnPlOnvifResource::initInternal()
 {
     setCodec(H264);
 
-    setOnvifUrls();
+    if (getDeviceOnvifUrl().isEmpty()) {
+        qCritical() << "QnPlOnvifResource::initInternal: Can't do anything: ONVIF device url is absent. Id: " << getPhysicalId();
+        return false;
+    }
 
     if (!isSoapAuthorized()) 
     {
-        m_reinitDeviceInfo = true;
         setStatus(QnResource::Unauthorized);
         return false;
     }
 
-    if (m_reinitDeviceInfo && fetchAndSetDeviceInformation())
+    if (getMediaUrl().isEmpty() || getName().contains("Unknown") || getMAC().isEmpty())
     {
-        setOnvifUrls();
-        m_reinitDeviceInfo = false;
+        if (!fetchAndSetDeviceInformation() && getMediaUrl().isEmpty())
+        {
+            qCritical() << "QnPlOnvifResource::initInternal: ONVIF media url is absent. Id: " << getPhysicalId();
+            return false;
+        }
     }
 
     if (!fetchAndSetResourceOptions()) 
@@ -758,22 +762,6 @@ QString QnPlOnvifResource::getMediaUrl() const
 void QnPlOnvifResource::setMediaUrl(const QString& src) 
 {
     setParam(MEDIA_URL_PARAM_NAME, src, QnDomainDatabase);
-}
-
-
-void QnPlOnvifResource::setOnvifUrls()
-{
-    if (getDeviceOnvifUrl().isEmpty()) 
-    {
-        setDeviceOnvifUrl(createOnvifEndpointUrl());
-        qDebug() << "QnPlOnvifResource::setOnvifUrls: m_deviceOnvifUrl = " << getDeviceOnvifUrl();
-    }
-
-    if (getMediaUrl().isEmpty()) 
-    {
-        setMediaUrl(createOnvifEndpointUrl());
-        qDebug() << "QnPlOnvifResource::setOnvifUrls: m_mediaUrl = " << getMediaUrl();
-    }
 }
 
 void QnPlOnvifResource::save()
@@ -1282,4 +1270,17 @@ bool QnPlOnvifResource::fetchAndSetAudioSource(MediaSoapWrapper& soapWrapper)
     }
 
     return true;
+}
+
+const QnResourceAudioLayout* QnPlOnvifResource::getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
+{
+    if (isAudioEnabled()) {
+        const QnOnvifStreamReader* onvifReader = dynamic_cast<const QnOnvifStreamReader*>(dataProvider);
+        if (onvifReader && onvifReader->getDPAudioLayout())
+            return onvifReader->getDPAudioLayout();
+        else
+            return QnPhysicalCameraResource::getAudioLayout(dataProvider);
+    }
+    else
+        return QnPhysicalCameraResource::getAudioLayout(dataProvider);
 }
