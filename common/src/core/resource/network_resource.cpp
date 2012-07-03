@@ -223,15 +223,11 @@ bool QnNetworkResource::shoudResolveConflicts() const
     return true;
 }
 
-bool QnNetworkResource::areResourcesNeededToBeMerged(QnNetworkResourcePtr source) const
+bool QnNetworkResource::mergeResourcesIfNeeded( QnNetworkResourcePtr source )
 {
     return false;
 }
 
-void QnNetworkResource::merge(QnNetworkResourcePtr source) 
-{
-    
-}
 
 
 bool QnNetworkResource::conflicting()
