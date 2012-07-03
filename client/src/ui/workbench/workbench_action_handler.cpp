@@ -1132,7 +1132,7 @@ void QnWorkbenchActionHandler::at_deleteFromDiskAction_triggered() {
         resources.toList(),
         tr("Delete Files"), 
         tr("Are you sure you want to permanently delete these %n file(s)?", 0, resources.size()), 
-        QDialogButtonBox::Yes | QDialogButtonBox::Cancel
+        QDialogButtonBox::Yes | QDialogButtonBox::No
     );
     if(button != QDialogButtonBox::Yes)
         return;
@@ -1236,7 +1236,7 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
             resources, 
             tr("Delete Resources"), 
             tr("Do you really want to delete the following %n item(s)?", NULL, resources.size()), 
-            QDialogButtonBox::Yes | QDialogButtonBox::Cancel
+            QDialogButtonBox::Yes | QDialogButtonBox::No
         );
         okToDelete = button == QMessageBox::Yes;
     }
