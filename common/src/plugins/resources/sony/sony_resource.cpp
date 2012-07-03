@@ -38,7 +38,7 @@ bool QnPlSonyResource::updateResourceCapabilities()
         return false;
     }
 
-    typedef QSharedPointer<QList<ResolutionPair>> ResolutionListPtr;
+    typedef QSharedPointer<QList<ResolutionPair> > ResolutionListPtr;
     ResolutionListPtr resolutionListPtr(0);
     {
         QMutexLocker lock(&m_mutex);
