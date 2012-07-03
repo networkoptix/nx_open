@@ -488,15 +488,19 @@ void QnResourceTreeWidget::mousePressEvent(QMouseEvent *event) {
 void QnResourceTreeWidget::keyPressEvent(QKeyEvent *event) {
     event->accept();
     if (event->key() == Qt::Key_Menu){
-        QModelIndexList selectedRows = ui->resourceTreeView->selectionModel()->selectedRows();
+        QnTreeView* treeView = ui->searchTab->isActiveWindow() 
+            ? ui->searchTreeView 
+            : ui->resourceTreeView; 
+
+        QModelIndexList selectedRows = treeView->selectionModel()->selectedRows();
         if (selectedRows.isEmpty())
             return;
         
         QModelIndex selected = selectedRows.back();
-        QPoint pos = ui->resourceTreeView->visualRect(selected).bottomRight();
+        QPoint pos = treeView->visualRect(selected).bottomRight();
       
         // mapToGlobal works incorrectly here, using two-step transformation
-        pos = ui->resourceTreeView->mapToGlobal(pos);
+        pos = treeView->mapToGlobal(pos);
         showContextMenuAt(display()->view()->mapToGlobal(pos));
     }
 }
