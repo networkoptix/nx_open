@@ -236,6 +236,8 @@ void RTPSession::parseSDP()
                 for (; i < lineRest.size() && !(lineRest[i] >= '0' && lineRest[i] <= '9'); ++i);
                 setupURL = lineRest.left(i);
                 trackNum = lineRest.mid(i).toUInt();
+                if (lineRest.mid(i).isEmpty() && mapNum > 0)
+                    trackNum = mapNum;
             }
             else if (lineLower.startsWith("a=control:rtsp"))
             {
