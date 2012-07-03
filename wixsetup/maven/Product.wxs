@@ -214,7 +214,7 @@
                       Execute="deferred" Return="ignore" Impersonate="no" />
       
         <CustomAction Id="LaunchTrayTool" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="traytool.exe" ExeCommand=""/>
-        <CustomAction Id="LaunchClient" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="${product.name}.exe" ExeCommand=""/>
+        <CustomAction Id="LaunchClient" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="client.exe" ExeCommand=""/>
         
         <CustomAction Id="NoDowngrade" Error="NoDowngrade" /> 
         
@@ -496,7 +496,7 @@
                         
                         <Directory Id="VmsClientDir" Name="Client">
                             <Component Id="ClientExecutable" Guid="{7AAC7815-50A6-4dc9-ADD2-BDD9B7EE8FEF}">
-                                <File Id="${product.name}.exe" Name="${product.name}.exe" Source="client/client.exe" KeyPath="yes">
+                                <File Id="client.exe" Name="${product.name}.exe" Source="client/client.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionClient" Name="${product.name}" Scope="any" IgnoreFailure="yes"/>
                                     
                                     <Shortcut Id="StartmenuClient" Directory="ProgramMenuDir" Name="${product.name}"
