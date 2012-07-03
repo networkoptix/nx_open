@@ -1,5 +1,5 @@
-#ifndef isd_resource_h_1934
-#define isd_resource_h_1934
+#ifndef sony_resource_h_1934
+#define sony_resource_h_1934
 
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
@@ -9,14 +9,16 @@
 
 class QnPlSonyResource : public QnPlOnvifResource
 {
+    static int MAX_RESOLUTION_DECREASES_NUM;
+
 public:
     QnPlSonyResource();
 protected:
-    virtual void updateResourceCapabilities() override;
+    virtual bool updateResourceCapabilities() override;
 private:
 
 };
 
 typedef QnSharedResourcePointer<QnPlSonyResource> QnPlSonyResourcePtr;
 
-#endif //isd_resource_h_1934
+#endif //sony_resource_h_1934

@@ -129,7 +129,7 @@ protected:
 
     virtual void setCropingPhysical(QRect croping);
 
-    virtual void updateResourceCapabilities();
+    virtual bool updateResourceCapabilities();
 
     
 
@@ -165,12 +165,15 @@ private:
     ResolutionPair getNearestResolution(const ResolutionPair& resolution, float aspectRatio, double maxResolutionSquare) const;
     float getResolutionAspectRatio(const ResolutionPair& resolution) const;
     int findClosestRateFloor(const std::vector<int>& values, int threshold) const;
+
+protected:
+    QList<ResolutionPair> m_resolutionList; //Sorted desc
+
 private:
     static const char* ONVIF_PROTOCOL_PREFIX;
     static const char* ONVIF_URL_SUFFIX;
     static const int DEFAULT_IFRAME_DISTANCE;
 
-    QList<ResolutionPair> m_resolutionList; //Sorted desc
     QMap<int, QRect> m_motionWindows;
     QMap<int, QRect> m_motionMask;
 

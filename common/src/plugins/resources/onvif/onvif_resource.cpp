@@ -569,7 +569,9 @@ bool QnPlOnvifResource::fetchAndSetResourceOptions()
 
     fetchAndSetVideoSourceOptions(soapWrapper);
 
-    updateResourceCapabilities();
+    if (!updateResourceCapabilities()) {
+        return false;
+    }
 
     //All VideoEncoder options are set, so we can calculate resolutions for the streams
     fetchAndSetPrimarySecondaryResolution();
@@ -1140,12 +1142,12 @@ void QnPlOnvifResource::setVideoSourceOptions(const VideoSrcOptions& options)
     }
 }
 
-void QnPlOnvifResource::updateResourceCapabilities()
+bool QnPlOnvifResource::updateResourceCapabilities()
 {
     QMutexLocker lock(&m_mutex);
 
     if (!m_physicalWindowSize.isValid()) {
-        return;
+        return true;
     }
 
     QList<ResolutionPair>::iterator it = m_resolutionList.begin();
@@ -1155,9 +1157,11 @@ void QnPlOnvifResource::updateResourceCapabilities()
         {
             it = m_resolutionList.erase(it);
         } else {
-            return;
+            return true;
         }
     }
+
+    return true;
 }
 
 int QnPlOnvifResource::getGovLength() const

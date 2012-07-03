@@ -84,6 +84,19 @@ bool PasswordHelper::isNotAuthenticated(const SOAP_ENV__Fault* faultInfo)
     return false;
 }
 
+bool PasswordHelper::isConflictError(const SOAP_ENV__Fault* faultInfo)
+{
+    if (faultInfo && faultInfo->SOAP_ENV__Reason && faultInfo->SOAP_ENV__Reason->SOAP_ENV__Text)
+    {
+        QString reasonValue(faultInfo->SOAP_ENV__Reason->SOAP_ENV__Text);
+        reasonValue = reasonValue.toLower();
+
+        return reasonValue.indexOf("conflict") != -1;
+    }
+
+    return false;
+}
+
 PasswordHelper::PasswordHelper()
 {
     setPasswordInfo(ACTI_MANUFACTURER, ADMIN1, PASSWD1);

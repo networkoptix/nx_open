@@ -51,6 +51,8 @@ class _onvifMedia__GetStreamUri;
 class _onvifMedia__GetStreamUriResponse;
 class _onvifMedia__GetVideoEncoderConfigurationOptions;
 class _onvifMedia__GetVideoEncoderConfigurationOptionsResponse;
+class _onvifMedia__GetVideoEncoderConfiguration;
+class _onvifMedia__GetVideoEncoderConfigurationResponse;
 class _onvifMedia__GetVideoEncoderConfigurations;
 class _onvifMedia__GetVideoEncoderConfigurationsResponse;
 class _onvifMedia__GetVideoSourceConfigurationOptions;
@@ -90,6 +92,8 @@ typedef _onvifMedia__GetStreamUri StreamUriReq;
 typedef _onvifMedia__GetStreamUriResponse StreamUriResp;
 typedef _onvifMedia__GetVideoEncoderConfigurationOptions VideoOptionsReq;
 typedef _onvifMedia__GetVideoEncoderConfigurationOptionsResponse VideoOptionsResp;
+typedef _onvifMedia__GetVideoEncoderConfiguration VideoConfigReq;
+typedef _onvifMedia__GetVideoEncoderConfigurationResponse VideoConfigResp;
 typedef _onvifMedia__GetVideoEncoderConfigurations VideoConfigsReq;
 typedef _onvifMedia__GetVideoEncoderConfigurationsResponse VideoConfigsResp;
 typedef _onvifMedia__GetVideoSourceConfigurationOptions VideoSrcOptionsReq;
@@ -133,6 +137,7 @@ public:
     const QString getLastError();
     const QString getEndpointUrl();
     bool isNotAuthenticated();
+    bool isConflictError();
 
 private:
     SoapWrapper();
@@ -191,6 +196,7 @@ public:
     int getProfiles(ProfilesReq& request, ProfilesResp& response);
     int getStreamUri(StreamUriReq& request, StreamUriResp& response);
     int getVideoEncoderConfigurationOptions(VideoOptionsReq& request, VideoOptionsResp& response);
+    int getVideoEncoderConfiguration(VideoConfigReq& request, VideoConfigResp& response);
     int getVideoEncoderConfigurations(VideoConfigsReq& request, VideoConfigsResp& response);
     int getVideoSourceConfigurationOptions(VideoSrcOptionsReq& request, VideoSrcOptionsResp& response);
     int getVideoSourceConfigurations(VideoSrcConfigsReq& request, VideoSrcConfigsResp& response);

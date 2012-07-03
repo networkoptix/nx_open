@@ -1,16 +1,8 @@
-//#ifdef WIN32
-//#include "openssl/evp.h"
-//#else
-//#include "evp.h"
-//#endif
-
 #include "onvif_resource_information_fetcher.h"
-//#include "core/resource/camera_resource.h"
 #include "onvif_resource.h"
-//#include "onvif/Onvif.nsmap"
 #include "onvif/soapDeviceBindingProxy.h"
-//#include "onvif/wsseapi.h"
 #include "../digitalwatchdog/digital_watchdog_resource.h"
+#include "../sony/sony_resource.h"
 
 const char* OnvifResourceInformationFetcher::ONVIF_RT = "ONVIF";
 std::string& OnvifResourceInformationFetcher::STD_ONVIF_USER = *(new std::string("admin"));
@@ -210,6 +202,8 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManuf
     QnPlOnvifResourcePtr resource;
     if (manufacture.toLower().contains("digital watchdog"))
         resource = QnPlOnvifResourcePtr(new QnPlWatchDogResource());
+    else if (manufacture.toLower().contains("sony"))
+        resource = QnPlOnvifResourcePtr(new QnPlSonyResource());
     else
         resource = QnPlOnvifResourcePtr(new QnPlOnvifResource());
 

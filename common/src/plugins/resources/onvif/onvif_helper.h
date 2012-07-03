@@ -61,7 +61,8 @@ public:
 
     static PasswordHelper& instance();
 
-    static bool isNotAuthenticated(const SOAP_ENV__Fault* faultInfo);;
+    static bool isNotAuthenticated(const SOAP_ENV__Fault* faultInfo);
+    static bool isConflictError(const SOAP_ENV__Fault* faultInfo);
 
     const PasswordList& getPasswordsByManufacturer(const QString& mdnsPacketData) const;
 
