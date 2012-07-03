@@ -593,7 +593,7 @@ void QnMain::run()
     m_restServer = new QnRestServer(QHostAddress::Any, apiUrl.port());
     m_restServer->registerHandler("api/RecordedTimePeriods", new QnRecordedChunkListHandler());
     m_restServer->registerHandler("api/CheckPath", new QnFsHelperHandler(true));
-	m_restServer->registerHandler("api/getFreeSpace", new QnFsHelperHandler(false));
+	m_restServer->registerHandler("api/GetFreeSpace", new QnFsHelperHandler(false));
     m_restServer->registerHandler("api/statistics", new QnGetStatisticsHandler());
 
     foreach (QnAbstractStorageResourcePtr storage, m_videoServer->getStorages())

@@ -12,28 +12,26 @@ namespace Ui {
 }
 
 namespace detail {
-    class CheckPathReplyProcessor: public QObject {
+    class CheckFreeSpaceReplyProcessor: public QObject {
         Q_OBJECT;
     public:
-        CheckPathReplyProcessor(QObject *parent = NULL): QObject(parent) {}
+        CheckFreeSpaceReplyProcessor(QObject *parent = NULL): QObject(parent) {}
 
-        const QList<int> &invalidHandles() const {
-            return m_invalidHandles;
-        }
+		QMap<int, qint64> freeSpaceInfo() const {
+			return m_freeSpace;
+		}
 
     signals:
-        void replyReceived(int status, bool result, int handle);
+        void replyReceived(int status, qint64 freeSpace, int handle);
 
     public slots:
-        void processReply(int status, bool result, int handle) {
-            if(status != 0 || !result)
-                m_invalidHandles.push_back(handle);
-
-            emit replyReceived(status, result, handle);
+        void processReply(int status, qint64 freeSpace, int handle) {
+			m_freeSpace.insert(handle, freeSpace);
+            emit replyReceived(status, freeSpace, handle);
         }
 
     private:
-        QList<int> m_invalidHandles;
+		QMap<int, qint64> m_freeSpace;
     };
 
 } // namespace detail

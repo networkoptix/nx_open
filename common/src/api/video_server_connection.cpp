@@ -174,14 +174,14 @@ int QnVideoServerConnection::asyncRecordedTimePeriods(const QnNetworkResourceLis
     return asyncRecordedTimePeriods(createParamList(list, startTimeMs, endTimeMs, detail, motionRegions), processor, SLOT(at_replyReceived(int, const QnTimePeriodList&, int)));
 }
 
-int QnVideoServerConnection::asyncCheckPath(const QString& path, QObject *target, const char *slot)
+int QnVideoServerConnection::asyncGetFreeSpace(const QString& path, QObject *target, const char *slot)
 {
-    detail::VideoServerSessionManagerPathRequestReplyProcessor *processor = new detail::VideoServerSessionManagerPathRequestReplyProcessor();
-    connect(processor, SIGNAL(finished(int, bool, int)), target, slot);
+    detail::VideoServerSessionManagerFreeSpaceRequestReplyProcessor *processor = new detail::VideoServerSessionManagerFreeSpaceRequestReplyProcessor();
+    connect(processor, SIGNAL(finished(int, qint64, int)), target, slot);
 
     QnRequestParamList params;
     params << QnRequestParam("path", path);
-    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, "CheckPath", params, processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
+    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, "GetFreeSpace", params, processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
 
 }
 
@@ -205,9 +205,10 @@ void detail::VideoServerSessionManagerReplyProcessor::at_replyReceived(int statu
     deleteLater();
 }
 
-void detail::VideoServerSessionManagerPathRequestReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray& /*errorString*/, int handle)
+void detail::VideoServerSessionManagerFreeSpaceRequestReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray& /*errorString*/, int handle)
 {
-    bool result = false;
+    qint64 result = -1;
+
     if(status == 0)
     {
         int bodyStart = reply.indexOf("<root>");
@@ -215,8 +216,7 @@ void detail::VideoServerSessionManagerPathRequestReplyProcessor::at_replyReceive
             bodyStart += QString("<root>").length();
         int bodyEnd = reply.indexOf("</root>");
         QByteArray message = reply.mid(bodyStart, bodyEnd - bodyStart).trimmed();
-        if (message == "OK")
-            result = true;
+		result = message.toLongLong();
     }
 
     emit finished(status, result, handle);

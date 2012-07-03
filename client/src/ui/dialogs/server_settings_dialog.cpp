@@ -16,6 +16,8 @@
 #include <core/resource/storage_resource.h>
 #include <core/resource/video_server.h>
 
+static const qint64 MIN_RECORD_FREE_SPACE = 1000ll * 1000ll * 1000ll * 5;
+
 namespace {
     const int defaultSpaceLimitGb = 5;
     const qint64 BILLION = 1000000000LL;
@@ -154,6 +156,11 @@ void QnServerSettingsDialog::submitToResources() {
     m_server->setApiUrl(apiUrl.toString());
 }
 
+QString formatGbStr(qint64 value)
+{
+	return QString::number(value/1000000000.0, 'f', 2);
+}
+
 bool QnServerSettingsDialog::validateStorages(const QnAbstractStorageResourceList &storages, QString *errorString) {
     foreach (const QnAbstractStorageResourcePtr &storage, storages) {
         if (storage->getUrl().isEmpty()) {
@@ -173,22 +180,43 @@ bool QnServerSettingsDialog::validateStorages(const QnAbstractStorageResourceLis
     QScopedPointer<QEventLoop> eventLoop(new QEventLoop());
     connect(counter.data(), SIGNAL(reachedZero()), eventLoop.data(), SLOT(quit()));
 
-    QScopedPointer<detail::CheckPathReplyProcessor> processor(new detail::CheckPathReplyProcessor());
-    connect(processor.data(), SIGNAL(replyReceived(int, bool, int)), counter.data(), SLOT(decrement()));
+    QScopedPointer<detail::CheckFreeSpaceReplyProcessor> processor(new detail::CheckFreeSpaceReplyProcessor());
+    connect(processor.data(), SIGNAL(replyReceived(int, qint64, int)), counter.data(), SLOT(decrement()));
 
     QnVideoServerConnectionPtr serverConnection = m_server->apiConnection();
     QHash<int, QnAbstractStorageResourcePtr> storageByHandle;
     foreach (const QnAbstractStorageResourcePtr &storage, storages) {
-        int handle = serverConnection->asyncCheckPath(storage->getUrl(), processor.data(), SLOT(processReply(int, bool, int)));
+        int handle = serverConnection->asyncGetFreeSpace(storage->getUrl(), processor.data(), SLOT(processReply(int, qint64, int)));
         storageByHandle[handle] = storage;
     }
 
     eventLoop->exec();
 
-    if(!processor->invalidHandles().empty()) {
-        QMessageBox::warning(this, tr("Invalid storage path"), tr("Storage path '%1' is invalid or not accessible for writing.").arg(storageByHandle.value(*processor->invalidHandles().begin())->getUrl()));
-        return false;
-    }
+	QMap<int, qint64> freeSpaceInfo = processor->freeSpaceInfo();
+	for (QMap<int, qint64>::const_iterator itr = freeSpaceInfo.constBegin(); itr != freeSpaceInfo.constEnd(); ++itr)
+	{
+		QnAbstractStorageResourcePtr storage = storageByHandle.value(itr.key());
+		if (!storage)
+			continue;
+
+		if (itr.value() <= 0) {
+			QMessageBox::warning(this, tr("Invalid storage path"), 
+				tr("Storage path '%1' is invalid or not accessible for writing.").arg(storage ->getUrl()));
+			return false;
+		}
+
+		qint64 needRecordingSpace = storage->getSpaceLimit()+MIN_RECORD_FREE_SPACE;
+		if (itr.value() <= needRecordingSpace)
+		{
+			QMessageBox::warning(this, tr("Not enought disk space"), 
+				tr("Storage '%1' has only %2Gb free space. Required at least %3Gb free space").
+				arg(storage->getUrl()).
+				arg(formatGbStr(itr.value())).
+				arg(formatGbStr(needRecordingSpace)));
+			return false;
+
+		}
+	}
 
     return true;
 }
@@ -249,9 +277,6 @@ void QnServerSettingsDialog::at_removeStorageButton_clicked() {
 }
 
 void QnServerSettingsDialog::at_storagesTable_cellChanged(int row, int column) {
-    if(column != 0)
-        return;
-    
     updateSpaceLimitCell(row);
 
     m_hasStorageChanges = true;

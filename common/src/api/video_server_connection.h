@@ -26,17 +26,17 @@ namespace detail {
         void finished(int status, const QnTimePeriodList& timePeriods, int handle);
     };
 
-    class VideoServerSessionManagerPathRequestReplyProcessor: public QObject
+    class VideoServerSessionManagerFreeSpaceRequestReplyProcessor: public QObject
     {
         Q_OBJECT;
     public:
-        VideoServerSessionManagerPathRequestReplyProcessor(QObject *parent = NULL): QObject(parent) {}
+        VideoServerSessionManagerFreeSpaceRequestReplyProcessor(QObject *parent = NULL): QObject(parent) {}
 
     public slots:
         void at_replyReceived(int status, const QByteArray &reply, const QByteArray &errorString,int handle);
 
     signals:
-        void finished(int status, bool result, int handle);
+        void finished(int status, qint64 result, int handle);
     };
 }
 
@@ -51,7 +51,7 @@ public:
 
     int asyncRecordedTimePeriods(const QnNetworkResourceList& list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, QList<QRegion> motionRegions, QObject *target, const char *slot);
 
-    int asyncCheckPath(const QString& path, QObject *target, const char *slot);
+    int asyncGetFreeSpace(const QString& path, QObject *target, const char *slot);
 
     static void setProxyAddr(const QString& addr, int port);
     static int getProxyPort() { return m_proxyPort; }
