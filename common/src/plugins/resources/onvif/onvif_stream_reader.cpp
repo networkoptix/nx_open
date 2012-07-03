@@ -862,6 +862,11 @@ bool QnOnvifStreamReader::sendAudioSourceToCamera(AudioSource& source) const
     return true;
 }
 
+const QnResourceAudioLayout* QnOnvifStreamReader::getDPAudioLayout() const
+{
+    return m_multiCodec.getAudioLayout();
+}
+
 /*
 for (;it != response.Configurations.end(); ++it) 
 {

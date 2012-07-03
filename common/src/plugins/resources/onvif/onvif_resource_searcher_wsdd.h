@@ -25,8 +25,8 @@ class OnvifResourceSearcherWsdd
     static const char WSDD_GSOAP_MULTICAST_ADDRESS[];
 
     OnvifResourceInformationFetcher& m_onvifFetcher;
-    mutable QHash<QString, QUdpSocketPtr> m_recvSocketList;
-    mutable QMutex m_mutex;
+    //mutable QHash<QString, QUdpSocketPtr> m_recvSocketList;
+    //mutable QMutex m_mutex;
 
 public:
     static OnvifResourceSearcherWsdd& instance();
@@ -35,8 +35,8 @@ public:
 
 private:
 
-    void updateInterfacesListenSockets() const;
-    void findHelloEndpoints(EndpointInfoHash& result) const;
+    //void updateInterfacesListenSockets() const;
+    //void findHelloEndpoints(EndpointInfoHash& result) const;
     void findEndpoints(EndpointInfoHash& result) const;
     QStringList getAddrPrefixes(const QString& host) const;
     void fillWsddStructs(wsdd__ProbeType& probe, wsa__EndpointReferenceType& endpoint) const;

@@ -118,6 +118,7 @@ public:
     CODECS getCodec() const;
     AUDIO_CODECS getAudioCodec() const;
 
+    const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider);
 protected:
 
     void setCodec(CODECS c);

@@ -8,6 +8,7 @@
 #include "core/resource/resource_media_layout.h"
 #include "utils/media/ffmpeg_helper.h"
 #include "core/resource/storage_resource.h"
+#include "plugins/storage/file_storage/layout_storage_resource.h"
 
 extern QMutex global_ffmpeg_mutex;
 static const qint64 UTC_TIME_DETECTION_THRESHOLD = 1000000ll * 3600*24*100;
@@ -334,8 +335,10 @@ QnVideoResourceLayout* QnAviArchiveDelegate::getVideoLayout()
                 AVDictionaryEntry* start_time = av_dict_get(m_formatContext->metadata,getTagName(Tag_startTime, format), 0, 0);
                 if (start_time) {
                     m_startTime = QString(start_time->value).toLongLong()*1000ll;
-                    if (m_startTime >= UTC_TIME_DETECTION_THRESHOLD)
-                        m_resource->addFlags(QnResource::utc);
+					if (m_startTime >= UTC_TIME_DETECTION_THRESHOLD) {
+						if (qSharedPointerDynamicCast<QnLayoutFileStorageResource>(m_storage))
+							m_resource->addFlags(QnResource::utc); // use sync for exported layout only
+					}
                 }
             }
         }

@@ -325,11 +325,9 @@ bool NameHelper::isManufacturerSupported(const QString& manufacturer) const
 {
     QString tmp = manufacturer.toLower().replace(UNNEEDED_CHARACTERS, "");
     if (tmp == "sony" ||
-        tmp == "pulse" ||
         tmp == "brickcom" ||
         tmp == "digitalwatchdog")
     {
-
         return false;
     }
 

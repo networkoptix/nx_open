@@ -164,7 +164,6 @@ void QnResourceDisplay::pause() {
     m_archiveReader->setSingleShotMode(true);
     m_archiveReader->pauseDataProcessors();
 
-    //m_camera->getCamDisplay()->pauseAudio();
 }
 
 bool QnResourceDisplay::isPaused() {

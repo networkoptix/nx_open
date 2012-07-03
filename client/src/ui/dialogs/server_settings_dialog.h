@@ -12,12 +12,15 @@ namespace Ui {
 }
 
 namespace detail {
+	static const int INVALID_PATH = -1;
+	static const int SERVER_ERROR = -2;
 	struct FreeSpaceInfo 
 	{
-		FreeSpaceInfo(): freeSpace(0), usedSpace(0) {}
-		FreeSpaceInfo(qint64 _freeSpace, qint64 _usedSpace): freeSpace(_freeSpace), usedSpace(_usedSpace) {}
+		FreeSpaceInfo(): freeSpace(0), usedSpace(0), errorCode(0) {}
+		FreeSpaceInfo(qint64 _freeSpace, qint64 _usedSpace, int _errorCode): freeSpace(_freeSpace), usedSpace(_usedSpace), errorCode(_errorCode) {}
 		qint64 freeSpace;
 		qint64 usedSpace;
+		int errorCode;
 	};
 	typedef QMap<int, FreeSpaceInfo> FreeSpaceMap;
 
@@ -36,8 +39,10 @@ namespace detail {
         void replyReceived(int status, qint64 freeSpace, qint64 usedSpace, int handle);
 
     public slots:
-        void processReply(int status, qint64 freeSpace, qint64 usedSpace,  int handle) {
-			m_freeSpace.insert(handle, FreeSpaceInfo(freeSpace, usedSpace));
+        void processReply(int status, qint64 freeSpace, qint64 usedSpace,  int handle) 
+		{
+			int errCode = status == 0 ? (freeSpace > 0 ? 0 : INVALID_PATH) : SERVER_ERROR;
+			m_freeSpace.insert(handle, FreeSpaceInfo(freeSpace, usedSpace, errCode));
             emit replyReceived(status, freeSpace, usedSpace, handle);
         }
 
