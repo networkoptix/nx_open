@@ -603,7 +603,7 @@ bool initResourceTypes(QnAppServerConnectionPtr appServerConnection)
         return false;
     }
 
-    qnResTypePool->addResourceTypeList(resourceTypeList);
+    qnResTypePool->replaceResourceTypeList(resourceTypeList);
 
     return true;
 }
