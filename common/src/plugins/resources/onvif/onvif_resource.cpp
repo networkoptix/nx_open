@@ -1271,3 +1271,16 @@ bool QnPlOnvifResource::fetchAndSetAudioSource(MediaSoapWrapper& soapWrapper)
 
     return true;
 }
+
+const QnResourceAudioLayout* QnPlOnvifResource::getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
+{
+    if (isAudioEnabled()) {
+        const QnOnvifStreamReader* onvifReader = dynamic_cast<const QnOnvifStreamReader*>(dataProvider);
+        if (onvifReader && onvifReader->getDPAudioLayout())
+            return onvifReader->getDPAudioLayout();
+        else
+            return QnPhysicalCameraResource::getAudioLayout(dataProvider);
+    }
+    else
+        return QnPhysicalCameraResource::getAudioLayout(dataProvider);
+}
