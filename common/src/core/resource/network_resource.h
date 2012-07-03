@@ -90,6 +90,10 @@ public:
 
     virtual bool shoudResolveConflicts() const;
 
+    // in some cases I just want to update couple of field from just discovered resource
+    virtual bool areResourcesNeededToBeMerged(QnNetworkResourcePtr source) const;
+    virtual void merge(QnNetworkResourcePtr source);
+
 private:
     QAuthenticator m_auth;
     bool m_authenticated;

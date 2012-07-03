@@ -569,7 +569,9 @@ bool QnPlOnvifResource::fetchAndSetResourceOptions()
 
     fetchAndSetVideoSourceOptions(soapWrapper);
 
-    updateResourceCapabilities();
+    if (!updateResourceCapabilities()) {
+        return false;
+    }
 
     //All VideoEncoder options are set, so we can calculate resolutions for the streams
     fetchAndSetPrimarySecondaryResolution();
@@ -804,6 +806,49 @@ bool QnPlOnvifResource::shoudResolveConflicts() const
 {
     return false;
 }
+
+bool QnPlOnvifResource::areResourcesNeededToBeMerged(QnNetworkResourcePtr source) const
+{
+    QnPlOnvifResourcePtr onvifR = source.dynamicCast<QnPlOnvifResource>();
+    if (!onvifR)
+        return false;
+
+    QString onvifUrlSource = onvifR->getDeviceOnvifUrl();
+    QString mediaUrlSource = onvifR->getMediaUrl();
+
+    if (onvifUrlSource.size() == 0 || mediaUrlSource.size() == 0)
+        return false;
+
+    QUrl url1(onvifUrlSource);
+    QUrl url2(mediaUrlSource);
+
+    QString host1 = url1.host();
+    QString host2 = url2.host();
+
+    if (host1.size()==0 || host2.size()==0)
+        return false;
+
+    if (getDeviceOnvifUrl() != onvifUrlSource || getMediaUrl() != mediaUrlSource )
+        return true;
+
+    return false;
+        
+
+}
+
+void QnPlOnvifResource::merge(QnNetworkResourcePtr source)
+{
+    if (!areResourcesNeededToBeMerged(source))
+        return;
+
+    QnPlOnvifResourcePtr onvifR = source.dynamicCast<QnPlOnvifResource>();
+    if (!onvifR)
+        return;
+
+    setMediaUrl(onvifR->getMediaUrl());
+    setDeviceOnvifUrl(onvifR->getDeviceOnvifUrl());
+}
+
 
 bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper)
 {
@@ -1140,12 +1185,12 @@ void QnPlOnvifResource::setVideoSourceOptions(const VideoSrcOptions& options)
     }
 }
 
-void QnPlOnvifResource::updateResourceCapabilities()
+bool QnPlOnvifResource::updateResourceCapabilities()
 {
     QMutexLocker lock(&m_mutex);
 
     if (!m_physicalWindowSize.isValid()) {
-        return;
+        return true;
     }
 
     QList<ResolutionPair>::iterator it = m_resolutionList.begin();
@@ -1155,9 +1200,11 @@ void QnPlOnvifResource::updateResourceCapabilities()
         {
             it = m_resolutionList.erase(it);
         } else {
-            return;
+            return true;
         }
     }
+
+    return true;
 }
 
 int QnPlOnvifResource::getGovLength() const

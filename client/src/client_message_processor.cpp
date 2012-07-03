@@ -150,6 +150,12 @@ void QnClientMessageProcessor::at_messageReceived(QnMessage message)
     }
 	else if (message.eventType == Message_Type_ResourceChange)
     {
+        if (!message.resource)
+        {
+            qWarning() << "Got Message_Type_ResourceChange with empty resource in it";
+            return;
+        }
+
         QnResourcePtr ownResource;
     
 		QString guid = message.resourceGuid;
