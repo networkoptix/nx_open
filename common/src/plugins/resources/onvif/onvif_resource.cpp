@@ -299,6 +299,9 @@ bool QnPlOnvifResource::initInternal()
         return false;
     }
 
+    if (!hasDualStreaming())
+        setMotionType(MT_NoMotion);
+
     save();
 
     return true;
