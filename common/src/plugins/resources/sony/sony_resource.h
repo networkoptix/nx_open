@@ -1,5 +1,5 @@
-#ifndef isd_resource_h_1934
-#define isd_resource_h_1934
+#ifndef sony_resource_h_1855
+#define sony_resource_h_1855
 
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
@@ -19,4 +19,4 @@ private:
 
 typedef QnSharedResourcePointer<QnPlSonyResource> QnPlSonyResourcePtr;
 
-#endif //isd_resource_h_1934
+#endif //sony_resource_h_1855
