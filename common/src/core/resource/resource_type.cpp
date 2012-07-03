@@ -145,7 +145,7 @@ void QnResourceTypePool::addResourceTypeList(const QList<QnResourceTypePtr>& res
         m_resourceTypeMap.insert(resourceType->getId(), resourceType);
 }
 
-void QnResourceTypePool::replaceResourceTypeList(const QList<QnResourceTypePtr> &resourceType)
+void QnResourceTypePool::replaceResourceTypeList(const QList<QnResourceTypePtr> &resourceTypeList)
 {
     QMutexLocker lock(&m_mutex);
 
