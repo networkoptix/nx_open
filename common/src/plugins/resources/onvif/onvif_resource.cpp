@@ -187,7 +187,8 @@ QnPlOnvifResource::QnPlOnvifResource() :
     m_primaryResolution(EMPTY_RESOLUTION_PAIR),
     m_secondaryResolution(EMPTY_RESOLUTION_PAIR),
     m_audioBitrate(0),
-    m_audioSamplerate(0)
+    m_audioSamplerate(0),
+    m_needUpdateOnvifUrl(false)
 {
 }
 
@@ -279,17 +280,22 @@ bool QnPlOnvifResource::initInternal()
         return false;
     }
 
-    if (getMediaUrl().isEmpty() || getName().contains("Unknown") || getMAC().isEmpty())
+    if (getMediaUrl().isEmpty() || getName().contains("Unknown") || getMAC().isEmpty() || m_needUpdateOnvifUrl)
     {
         if (!fetchAndSetDeviceInformation() && getMediaUrl().isEmpty())
         {
             qCritical() << "QnPlOnvifResource::initInternal: ONVIF media url is absent. Id: " << getPhysicalId();
             return false;
         }
+        else
+            m_needUpdateOnvifUrl = false;
+
+        
     }
 
     if (!fetchAndSetResourceOptions()) 
     {
+        m_needUpdateOnvifUrl = true;
         return false;
     }
 
@@ -807,7 +813,7 @@ bool QnPlOnvifResource::shoudResolveConflicts() const
     return false;
 }
 
-bool QnPlOnvifResource::areResourcesNeededToBeMerged(QnNetworkResourcePtr source) const
+bool QnPlOnvifResource::mergeResourcesIfNeeded(QnNetworkResourcePtr source)
 {
     QnPlOnvifResourcePtr onvifR = source.dynamicCast<QnPlOnvifResource>();
     if (!onvifR)
@@ -816,37 +822,22 @@ bool QnPlOnvifResource::areResourcesNeededToBeMerged(QnNetworkResourcePtr source
     QString onvifUrlSource = onvifR->getDeviceOnvifUrl();
     QString mediaUrlSource = onvifR->getMediaUrl();
 
-    if (onvifUrlSource.size() == 0 || mediaUrlSource.size() == 0)
-        return false;
+    bool result = false;
 
-    QUrl url1(onvifUrlSource);
-    QUrl url2(mediaUrlSource);
+    if (onvifUrlSource.size() != 0 && QUrl(onvifUrlSource).host().size() != 0 && getDeviceOnvifUrl() != onvifUrlSource)
+    {
+        setDeviceOnvifUrl(onvifUrlSource);
+        result = true;
+    }
 
-    QString host1 = url1.host();
-    QString host2 = url2.host();
+    if (mediaUrlSource.size() != 0 && QUrl(mediaUrlSource).host().size() != 0 && getMediaUrl() != mediaUrlSource)
+    {
+        setMediaUrl(mediaUrlSource);
+        result = true;
+    }
 
-    if (host1.size()==0 || host2.size()==0)
-        return false;
 
-    if (getDeviceOnvifUrl() != onvifUrlSource || getMediaUrl() != mediaUrlSource )
-        return true;
-
-    return false;
-        
-
-}
-
-void QnPlOnvifResource::merge(QnNetworkResourcePtr source)
-{
-    if (!areResourcesNeededToBeMerged(source))
-        return;
-
-    QnPlOnvifResourcePtr onvifR = source.dynamicCast<QnPlOnvifResource>();
-    if (!onvifR)
-        return;
-
-    setMediaUrl(onvifR->getMediaUrl());
-    setDeviceOnvifUrl(onvifR->getDeviceOnvifUrl());
+    return result;
 }
 
 

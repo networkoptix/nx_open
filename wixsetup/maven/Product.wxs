@@ -192,8 +192,8 @@
         <CustomAction Id="AssignServerAppServerPort" Property="SERVER_APPSERVER_PORT" Value="[APPSERVER_PORT]"/>
         <CustomAction Id="AssignClientAppServerPort" Property="CLIENT_APPSERVER_PORT" Value="[APPSERVER_PORT]"/>
         
-        <CustomAction Id="AssignServerFolder" Property="SERVER_DIRECTORY" Value="[ROOTDRIVE]\HDWitness" />
-        <CustomAction Id="AssignClientFolder" Property="CLIENT_DIRECTORY" Value="[MOVIESFOLDER]\HD Witness Client Media" />
+        <CustomAction Id="AssignServerFolder" Property="SERVER_DIRECTORY" Value="[ROOTDRIVE]\${product.name}" />
+        <CustomAction Id="AssignClientFolder" Property="CLIENT_DIRECTORY" Value="[MOVIESFOLDER]\${product.name} Client Media" />
         
         <CustomAction Id="ResetServerFolder" Property="SERVER_DIRECTORY" Value="[SERVER_DIRECTORY_REG]" />
         <CustomAction Id="ResetClientFolder" Property="CLIENT_DIRECTORY" Value="[CLIENT_DIRECTORY_REG]" />
@@ -214,7 +214,7 @@
                       Execute="deferred" Return="ignore" Impersonate="no" />
       
         <CustomAction Id="LaunchTrayTool" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="traytool.exe" ExeCommand=""/>
-        <CustomAction Id="LaunchClient" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="HDWitness.exe" ExeCommand=""/>
+        <CustomAction Id="LaunchClient" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="${product.name}.exe" ExeCommand=""/>
         
         <CustomAction Id="NoDowngrade" Error="NoDowngrade" /> 
         
@@ -496,8 +496,8 @@
                         
                         <Directory Id="VmsClientDir" Name="Client">
                             <Component Id="ClientExecutable" Guid="{7AAC7815-50A6-4dc9-ADD2-BDD9B7EE8FEF}">
-                                <File Id="HDWitness.exe" Name="HDWitness.exe" Source="client/client.exe" KeyPath="yes">
-                                    <fire:FirewallException Id="FirewallExceptionClient" Name="HD Witness" Scope="any" IgnoreFailure="yes"/>
+                                <File Id="${product.name}.exe" Name="${product.name}.exe" Source="client/client.exe" KeyPath="yes">
+                                    <fire:FirewallException Id="FirewallExceptionClient" Name="${product.name}" Scope="any" IgnoreFailure="yes"/>
                                     
                                     <Shortcut Id="StartmenuClient" Directory="ProgramMenuDir" Name="${product.name}"
                                               WorkingDirectory='VmsClientDir' Advertise="yes" Icon="icon_menu.exe" >
@@ -525,7 +525,7 @@
                             </Component>
                             
                            <Component Id="ClientConfigurationPassword" Guid="{C6565C10-1BB5-417d-8EEA-F2CC8362374F}">
-                               <RemoveRegistryValue Root="HKCU" Key="Software\[Manufacturer]\Network Optix HD Witness Client" Name="appserverPassword"/>
+                               <RemoveRegistryValue Root="HKCU" Key="Software\[Manufacturer]\${company.name} ${product.name} Client" Name="appserverPassword"/>
                            </Component>
                            
                             <Directory Id="ImageFormats" Name="imageformats">
