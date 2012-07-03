@@ -876,7 +876,7 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
     if(m_timeSlider->isSelectionValid()) {
         selection = QnTimePeriod(m_timeSlider->selectionStart(), m_timeSlider->selectionEnd() - m_timeSlider->selectionStart());
         QnTimePeriodList existsPeriods = m_timeSlider->timePeriods(CurrentLine, Qn::RecordingRole);
-        if (!existsPeriods.containPeriod(selection))
+        if (!existsPeriods.intersectPeriod(selection))
             selection.clear();
     }
 

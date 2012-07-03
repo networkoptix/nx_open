@@ -149,7 +149,7 @@ public:
     /**
      * Returns true if timePeriodList intersect period
      */
-    bool containPeriod(const QnTimePeriod& period) const
+    bool intersectPeriod(const QnTimePeriod& period) const
     {
         const_iterator itrStart = findNearestPeriod(period.startTimeMs, true);
         const_iterator itrEnd = findNearestPeriod(period.endTimeMs(), true);
