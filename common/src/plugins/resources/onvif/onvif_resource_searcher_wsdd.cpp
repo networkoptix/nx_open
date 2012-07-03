@@ -129,7 +129,7 @@ void OnvifResourceSearcherWsdd::updateInterfacesListenSockets() const
             continue;
         }
 
-        it = m_recvSocketList.insert(key, socket);
+        m_recvSocketList.insert(key, socket);
     }
 }
 
