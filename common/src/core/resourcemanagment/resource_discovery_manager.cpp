@@ -280,9 +280,8 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
                 }
                 else
                 {
-                    if (rpNetRes->areResourcesNeededToBeMerged(newNetRes))
+                    if (rpNetRes->mergeResourcesIfNeeded(newNetRes))
                     {
-                        rpNetRes->merge(newNetRes);
 
                         if (isServer())
                         {

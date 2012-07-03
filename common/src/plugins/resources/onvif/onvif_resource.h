@@ -90,8 +90,7 @@ public:
     virtual bool hasDualStreaming() const override;
     virtual bool shoudResolveConflicts() const override;
 
-    virtual bool areResourcesNeededToBeMerged(QnNetworkResourcePtr source) const override;
-    virtual void merge(QnNetworkResourcePtr source) override;
+    virtual bool mergeResourcesIfNeeded(QnNetworkResourcePtr source) override;
     
 
     int innerQualityToOnvif(QnStreamQuality quality) const;
@@ -195,6 +194,8 @@ private:
     QString m_audioEncoderId;
     QString m_videoSourceId;
     QString m_audioSourceId;
+
+    bool m_needUpdateOnvifUrl;
 
 };
 

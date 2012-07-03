@@ -89,7 +89,6 @@ private:
 
         QN_DECLARE_R_PROPERTY(QColor,   selectionOpacityDelta,          SELECTION_OPACITY_DELTA,                QColor(0, 0, 0, 0x80));
         QN_DECLARE_R_PROPERTY(QColor,   selectionBorderDelta,           SELECTION_BORDER_DELTA,                 QColor(48, 48, 48, 0));
-
         QN_DECLARE_R_PROPERTY(QColor,   backgroundGradientColor,        BACKGROUD_GRADIENT_COLOR,               QColor(5, 5, 50));
     QN_END_PROPERTY_STORAGE();
 };

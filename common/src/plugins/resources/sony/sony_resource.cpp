@@ -75,6 +75,10 @@ bool QnPlSonyResource::updateResourceCapabilities()
         break;
     }
 
+    if (soapRes != SOAP_OK) {
+        return false;
+    }
+
     if (triesNumLeft == MAX_RESOLUTION_DECREASES_NUM) {
         return true;
     }
