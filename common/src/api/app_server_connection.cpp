@@ -591,9 +591,6 @@ QnAppServerConnectionPtr QnAppServerConnectionFactory::createConnection()
 
 bool initResourceTypes(QnAppServerConnectionPtr appServerConnection)
 {
-    if (!qnResTypePool->isEmpty())
-        return true;
-
     QList<QnResourceTypePtr> resourceTypeList;
 
     QByteArray errorString;
@@ -603,7 +600,7 @@ bool initResourceTypes(QnAppServerConnectionPtr appServerConnection)
         return false;
     }
 
-    qnResTypePool->addResourceTypeList(resourceTypeList);
+    qnResTypePool->replaceResourceTypeList(resourceTypeList);
 
     return true;
 }

@@ -70,6 +70,7 @@ public:
     QnResourceTypePtr getResourceType(QnId id) const;
     void addResourceType(QnResourceTypePtr resourceType);
     void addResourceTypeList(const QList<QnResourceTypePtr>& resourceType);
+    void replaceResourceTypeList(const QList<QnResourceTypePtr>& resourceType);
 
     QnId getResourceTypeId(const QString& manufacture, const QString& name) const;
     QnResourceTypeMap getResourceTypeMap() const;
