@@ -3,9 +3,10 @@
 
 #include "core/resource/resource.h"
 #include "core/resource/storage_resource.h"
+#include "core/resource/media_resource.h"
 #include "api/video_server_connection.h"
 
-class QnLocalVideoServerResource : public QnResource
+class QnLocalVideoServerResource : public QnMediaResource
 {
     Q_OBJECT
 
@@ -19,7 +20,7 @@ protected:
 };
 
 
-class QnVideoServerResource : public QnResource
+class QnVideoServerResource : public QnMediaResource
 {
     Q_OBJECT
     Q_PROPERTY(QString apiUrl READ getApiUrl WRITE setApiUrl)
@@ -48,6 +49,8 @@ public:
 
     void setReserve(bool reserve = true);
     bool getReserve() const;
+
+    virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
 signals:
     void serverIFFound(QString);
 protected:

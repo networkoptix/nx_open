@@ -4,6 +4,11 @@
 #include "utils/common/delete_later.h"
 #include "api/session_manager.h"
 
+#include "plugins/resources/archive/avi_files/avi_archive_delegate.h"
+#include "plugins/resources/archive/archive_stream_reader.h"
+#include "plugins/resources/archive/filetypesupport.h"
+#include "plugins/resources/archive/single_shot_file_reader.h"
+
 QnLocalVideoServerResource::QnLocalVideoServerResource()
     : QnResource()
 {
@@ -96,6 +101,32 @@ QnAbstractStorageResourceList QnVideoServerResource::getStorages() const
 void QnVideoServerResource::setStorages(const QnAbstractStorageResourceList &storages)
 {
     m_storages = storages;
+}
+
+QnAbstractStreamDataProvider* QnVideoServerResource::createDataProviderInternal(ConnectionRole ){
+    if (FileTypeSupport::isImageFileExt(getUrl())) {
+        return new QnSingleShotFileStreamreader(toSharedPointer());
+    }
+
+    qDebug() << "server url" << getUrl();
+    qDebug() << "server api url" << getApiUrl();
+    qDebug() << "server api connection" << apiConnection();
+    QnNetworkResourceList testList;
+    QnTimePeriodList periods = apiConnection()->recordedTimePeriods(testList);
+    for (int i = 0; i < periods.size(); ++i)
+    {
+        qDebug() << periods[i].startTimeMs << ' ' << periods[i].durationMs;
+    }
+
+    QnArchiveStreamReader* result = new QnArchiveStreamReader(toSharedPointer());
+    QnAviArchiveDelegate* aviDelegate = new QnAviArchiveDelegate();
+//    if (m_storage)
+//        aviDelegate->setStorage(m_storage);
+    result->setArchiveDelegate(aviDelegate);
+    if (checkFlags(still_image))
+        result->setCycleMode(false);
+
+    return result;
 }
 
 
