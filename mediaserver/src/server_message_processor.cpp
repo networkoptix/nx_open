@@ -106,10 +106,13 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage event)
     {
 		QnResourcePtr resource = qnResPool->getResourceById(event.resourceId);
 
-        if (resource)
+        // nobody controls statuses om server 
+        /*
+        if (resource && false) 
         {
             resource->setStatus(event.resourceStatus);
         }
+        /**/
 	} else if (event.eventType == Message_Type_ResourceDisabledChange)
 	{
 		QnResourcePtr resource = qnResPool->getResourceById(event.resourceId);
@@ -117,6 +120,8 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage event)
 		if (resource)
 		{
 			resource->setDisabled(event.resourceDisabled);
+            if (event.resourceDisabled) // we always ignore status changes 
+                resource->setStatus(QnResource::Offline); 
 		}
 	} else if (event.eventType == Message_Type_ResourceDelete)
     {
