@@ -56,7 +56,8 @@ QnThumbnailsLoader::QnThumbnailsLoader(QnResourcePtr resource):
     m_scaleSourceLine(0),
     m_scaleSourceFormat(0),
     m_helper(NULL),
-    m_generation(0)
+    m_generation(0),
+    m_cachedAspectRatio(0.0)
 {
     static volatile bool metaTypesInitialized = false;
     if (!metaTypesInitialized) {
@@ -203,11 +204,23 @@ void QnThumbnailsLoader::pleaseStop() {
     base_type::pleaseStop();
 }
 
+qreal QnThumbnailsLoader::getAspectRatio()
+{
+    // do not change aspect ratio for resource during loading data. If aspect ratio is changed (for difference points of archive), QnThumbnailsLoader goes to infinity loop!
+    // todo: need update aspect ratio in future
+
+    if (m_scaleSourceSize.isEmpty())
+        return QnGeometry::aspectRatio(m_scaleSourceSize);
+    if (m_cachedAspectRatio == 0) 
+        m_cachedAspectRatio = QnGeometry::aspectRatio(m_scaleSourceSize);
+    return m_cachedAspectRatio;
+}
+
 void QnThumbnailsLoader::updateTargetSizeLocked(bool invalidate) {
     QSize targetSize;
 
     if(!m_scaleSourceSize.isEmpty() && !m_boundingSize.isEmpty())
-        targetSize = QnGeometry::expanded(QnGeometry::aspectRatio(m_scaleSourceSize), m_boundingSize, Qt::KeepAspectRatio).toSize();
+        targetSize = QnGeometry::expanded(getAspectRatio(), m_boundingSize, Qt::KeepAspectRatio).toSize();
 
     if(m_targetSize == targetSize)
         return;
