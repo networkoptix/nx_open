@@ -231,8 +231,6 @@ void RTPSession::parseSDP()
         else if (lineLower.startsWith("a=control:"))
         {
             setupURL = line.mid(QByteArray("a=control:").length());
-            if (setupURL.indexOf('?') != -1)
-                setupURL = setupURL.left(setupURL.indexOf('?'));
         }
     }
     if (mapNum >= 0) {
