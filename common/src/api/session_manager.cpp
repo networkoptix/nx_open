@@ -280,7 +280,6 @@ void QnSessionManager::doSendAsyncPostRequest(SessionManagerReplyProcessor* repl
 
     QNetworkRequest request;
     request.setUrl(createApiUrl(url, objectName, params));
-    //request.setRawHeader("Connection", "close");
     request.setRawHeader("Authorization", "Basic " + url.userInfo().toLatin1().toBase64());
     request.setHeader(QNetworkRequest::ContentTypeHeader, "text/xml");
 
