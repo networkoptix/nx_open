@@ -30,6 +30,8 @@ public:
 private:
     QnRtpStreamParser* createParser(const QString& codecName);
     void initIO(RTPIODevice** ioDevice, QnRtpStreamParser* parser, const QString& mediaType);
+    void setNeedKeyData();
+    void checkIfNeedKeyData();
 private:
     
     RTPSession m_RtpSession;
@@ -44,6 +46,7 @@ private:
     QList<QnAbstractMediaDataPtr> m_lastAudioData;
     int m_numberOfVideoChannels;
     QnRtspTimeHelper m_timeHelper;
+    QVector<int> m_gotKeyData;
 };
 
 #endif //__MULTI_CODEC_RTP_READER__

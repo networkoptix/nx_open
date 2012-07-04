@@ -69,8 +69,8 @@ public:
 
     struct SDPTrackInfo
     {
-        SDPTrackInfo(const QString& _codecName, const QString& _codecType, const QString& _setupURL, int _mapNum, RTPSession* owner, bool useTCP):
-            codecName(_codecName), codecType(_codecType), setupURL(_setupURL), mapNum(_mapNum)
+        SDPTrackInfo(const QString& _codecName, const QString& _codecType, const QString& _setupURL, int _mapNum, int _trackNum, RTPSession* owner, bool useTCP):
+            codecName(_codecName), codecType(_codecType), setupURL(_setupURL), mapNum(_mapNum), trackNum(_trackNum)
         {
             ioDevice = new RTPIODevice(owner, useTCP);
         }
@@ -80,11 +80,13 @@ public:
         QString codecType;
         QString setupURL;
         int mapNum;
+        int trackNum;
 
         RTPIODevice* ioDevice;
     };
 
-    typedef QMap<int, QSharedPointer<SDPTrackInfo> > TrackMap;
+    //typedef QMap<int, QSharedPointer<SDPTrackInfo> > TrackMap;
+    typedef QList<QSharedPointer<SDPTrackInfo> > TrackMap;
 
     RTPSession();
     ~RTPSession();
@@ -115,8 +117,7 @@ public:
     bool sendKeepAliveIfNeeded();
 
     void setTransport(const QString& transport);
-    QString getTrackFormat(int trackNum) const;
-    QString getTrackType(int trackNum) const;
+    QString getTrackFormatByRtpChannelNum(int channelNum);
 
     qint64 startTime() const;
     qint64 endTime() const;
@@ -156,6 +157,8 @@ signals:
 private:
     qint64 m_startTime;
     qint64 m_endTime;
+
+    QString getTrackFormat(int trackNum) const;
     int readRAWData();
     bool sendDescribe();
     bool sendOptions();

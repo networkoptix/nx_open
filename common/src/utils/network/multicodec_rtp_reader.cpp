@@ -25,7 +25,7 @@ m_audioIO(0)
         m_RtpSession.setTCPTimeout(1000 * 3);
     QnMediaResourcePtr mr = qSharedPointerDynamicCast<QnMediaResource>(res);
     m_numberOfVideoChannels = mr->getVideoLayout()->numberOfChannels();
-    
+    m_gotKeyData.resize(m_numberOfVideoChannels);
 }
 
 QnMulticodecRtpReader::~QnMulticodecRtpReader()
@@ -37,6 +37,35 @@ QnMulticodecRtpReader::~QnMulticodecRtpReader()
 void QnMulticodecRtpReader::setRequest(const QString& request)
 {
     m_request = request;
+}
+
+void QnMulticodecRtpReader::setNeedKeyData()
+{
+    for (int i = 0; i < m_gotKeyData.size(); ++i)
+        m_gotKeyData[i] = false;
+}
+
+void QnMulticodecRtpReader::checkIfNeedKeyData()
+{
+    for (int i = 0; i < m_lastVideoData.size();)
+    {
+        QnAbstractMediaDataPtr video = m_lastVideoData[i];
+        
+        Q_ASSERT_X(video->channelNumber < m_gotKeyData.size(), Q_FUNC_INFO, "Invalid channel number");
+        if (video->channelNumber < m_gotKeyData.size())
+        {
+            if (video->flags & AV_PKT_FLAG_KEY)
+                m_gotKeyData[video->channelNumber] = true;
+             if (!m_gotKeyData[video->channelNumber])
+                 m_lastVideoData.removeAt(i);
+             else {
+                 ++i;
+             }
+        }
+        else {
+            ++i;
+        }
+    }
 }
 
 QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
@@ -81,11 +110,16 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
             readed = m_videoIO->read( (char*) rtpBuffer, sizeof(rtpBuffer));
             if (readed < 1)
                 break;
-            if (!m_videoParser->processData(rtpBuffer, readed, m_videoIO->getStatistic(), m_lastVideoData)) {
+            if (!m_videoParser->processData(rtpBuffer, readed, m_videoIO->getStatistic(), m_lastVideoData)) 
+            {
+                setNeedKeyData();
                 if (++videoRetryCount > RTSP_RETRY_COUNT) {
                     closeStream();
                     return QnAbstractMediaDataPtr(0);
                 }
+            }
+            else {
+                checkIfNeedKeyData();
             }
         }
 
