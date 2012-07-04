@@ -111,13 +111,8 @@ QnAbstractStreamDataProvider* QnVideoServerResource::createDataProviderInternal(
     qDebug() << "server url" << getUrl();
     qDebug() << "server api url" << getApiUrl();
     qDebug() << "server api connection" << apiConnection();
-    QnNetworkResourceList testList;
-    QnTimePeriodList periods = apiConnection()->recordedTimePeriods(testList);
-    for (int i = 0; i < periods.size(); ++i)
-    {
-        qDebug() << periods[i].startTimeMs << ' ' << periods[i].durationMs;
-    }
 
+    apiConnection()->asyncGetStatistics(this, SLOT(processStatisticsReply(QString)));
     QnArchiveStreamReader* result = new QnArchiveStreamReader(toSharedPointer());
     QnAviArchiveDelegate* aviDelegate = new QnAviArchiveDelegate();
 //    if (m_storage)
@@ -127,6 +122,10 @@ QnAbstractStreamDataProvider* QnVideoServerResource::createDataProviderInternal(
         result->setCycleMode(false);
 
     return result;
+}
+
+void QnVideoServerResource::processStatisticsReply(QString reply){
+    qDebug() << reply;
 }
 
 

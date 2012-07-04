@@ -38,6 +38,24 @@ namespace detail {
     signals:
         void finished(int status, qint64 freeSpace, qint64 usedSpace, int handle);
     };
+
+    class VideoServerSessionManagerStatisticsRequestReplyProcessor: public QObject
+    {
+        Q_OBJECT;
+    public:
+        VideoServerSessionManagerStatisticsRequestReplyProcessor(QObject *parent = NULL): QObject(parent) {}
+
+    public slots:
+        void at_replyReceived(int status, const QByteArray &reply, const QByteArray &errorString,int handle){
+            qDebug() << "reply" << reply;
+            qDebug() << "errorString" << errorString;
+            QString reply_parsed(reply);
+            emit finished(reply_parsed); 
+        }
+
+    signals:
+        void finished(QString reply);
+    };
 }
 
 class QN_EXPORT QnVideoServerConnection: public QObject
@@ -56,6 +74,8 @@ public:
     static void setProxyAddr(const QString& addr, int port);
     static int getProxyPort() { return m_proxyPort; }
     static QString getProxyHost() { return m_proxyAddr; }
+
+    int asyncGetStatistics(QObject *target, const char *slot);
 
 private:
     int recordedTimePeriods(const QnRequestParamList& params, QnTimePeriodList& timePeriodList, QByteArray& errorString);
