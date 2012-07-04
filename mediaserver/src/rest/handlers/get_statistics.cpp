@@ -6,6 +6,7 @@
 #include "api/serializer/serializer.h"
 #include "get_statistics.h"
 #include "recorder/storage_manager.h"
+#include "utils/common/performance.h"
 
 int QnGetStatisticsHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& resultByteArray)
 {
@@ -23,8 +24,12 @@ int QnGetStatisticsHandler::executeGet(const QString& path, const QnRequestParam
     result.append("</storages>\n");
 
     result.append("<misc>\n");
-    // todo: determine CPU params here
-    result.append(QString("<cpuInfo model=\"%1\" cores=\"%2\" clock=\"%3\" usage=\"%4\" />\n").arg("Sandy bridge").arg("4").arg("3.5Ghz").arg("50%"));
+    
+	// todo: determine CPU params in linux
+    result.append(QString("<cpuInfo model=\"%1\" cores=\"%2\" usage=\"%3\" />\n")
+		.arg(QnPerformance::getCpuBrand())	
+		.arg(QnPerformance::getCpuCores())	
+		.arg(QnPerformance::currentCpuUsage()));
     result.append("</misc>\n");
 
 
