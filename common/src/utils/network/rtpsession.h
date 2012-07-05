@@ -152,6 +152,8 @@ public:
     QList<QByteArray> getSdpByType(const QString& trackType) const;
 
     int getLastResponseCode() const;
+
+    void setAudioEnabled(bool value);
 signals:
     void gotTextResponse(QByteArray text);
 private:
@@ -212,6 +214,7 @@ private:
     int m_proxyPort;
     QString m_contentBase;
     int m_responseCode;
+    bool m_isAudioEnabled;
 };
 
 #endif //rtp_session_h_1935_h

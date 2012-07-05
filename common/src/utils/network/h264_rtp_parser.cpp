@@ -18,7 +18,8 @@ CLH264RtpParser::CLH264RtpParser():
         m_lastTimeStamp(0),
         m_firstSeqNum(0),
         m_packetPerNal(0),
-        m_videoBuffer(CL_MEDIA_ALIGNMENT, 1024*128)
+        m_videoBuffer(CL_MEDIA_ALIGNMENT, 1024*128),
+        m_prevSequenceNum(-1)
 {
 }
 
@@ -200,11 +201,22 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStati
     RtpHeader* rtpHeader = (RtpHeader*) rtpBuffer;
     quint8* curPtr = rtpBuffer + RtpHeader::RTP_HEADER_SIZE;
     quint8* bufferEnd = rtpBuffer + readed;
+    quint16 sequenceNum = ntohs(rtpHeader->sequence);
+
+    
+    bool packetLostDetected = m_prevSequenceNum != -1 && quint16(m_prevSequenceNum) != quint16(sequenceNum-1);
+    if (packetLostDetected) {
+        qWarning() << "RTP Packet lost detected!!!!";
+        clearInternalBuffer();
+    }
+    m_prevSequenceNum = sequenceNum;
 
     if (rtpHeader->padding)
         --bufferEnd;
 
     int packetType = *curPtr++ & 0x1f;
+
+    m_packetPerNal++;
 
     switch (packetType)
     {
@@ -232,22 +244,24 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStati
             updateNalFlags(nalUnitType);
             if (*curPtr  & 0x80) // FU_A first packet
             {
-                m_firstSeqNum = ntohs(rtpHeader->sequence);
+                m_firstSeqNum = sequenceNum;
                 m_packetPerNal = 0;
                 m_videoBuffer.write(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
                 nalUnitType += 0x40;
                 m_videoBuffer.write( (const char*) &nalUnitType, 1);
             }
-            else
-                m_packetPerNal++;
+            else {
+                // if packet lost occured in the middle of FU packet, reset flag.
+                // packet lost will be reported on the last FU packet. So, do not report problem twice
+                packetLostDetected = false; 
+            }
+
             if (*curPtr  & 0x40) // FU_A last packet
             {
-                if ((quint16) (ntohs(rtpHeader->sequence) - m_firstSeqNum) != m_packetPerNal)
-                {
-                    qWarning() << "RTP Packet lost detected!!";
+                if (quint16(sequenceNum - m_firstSeqNum) != m_packetPerNal)
                     return clearInternalBuffer(); // packet lost detected
-                }
             }
+            
             curPtr++;
             if (packetType == FU_B_PACKET)
             {
@@ -269,6 +283,9 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStati
             updateNalFlags(nalUnitType);
             break; // ignore unknown data
         }
+
+    if (packetLostDetected && !m_keyDataExists)
+        return clearInternalBuffer();
 
     if (rtpHeader->marker) 
     {   // last packet

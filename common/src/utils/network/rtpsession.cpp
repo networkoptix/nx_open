@@ -153,7 +153,8 @@ RTPSession::RTPSession():
     m_scale(1.0),
     m_tcpTimeout(50 * 1000 * 1000),
     m_proxyPort(0),
-    m_responseCode(CODE_OK)
+    m_responseCode(CODE_OK),
+    m_isAudioEnabled(true)
 {
     m_responseBuffer = new quint8[RTSP_BUFFER_LEN];
     m_responseBufferLen = 0;
@@ -500,7 +501,7 @@ bool RTPSession::sendSetup()
 
         if (trackInfo->codecType == "audio")
         {
-            if (audioNum++ != m_selectedAudioChannel)
+            if (!m_isAudioEnabled || audioNum++ != m_selectedAudioChannel)
                 continue;
         }
         else if (trackInfo->codecType != "video")
@@ -1179,6 +1180,12 @@ void RTPSession::setAuth(const QAuthenticator& auth)
 QAuthenticator RTPSession::getAuth() const
 {
     return m_auth;
+}
+
+
+void RTPSession::setAudioEnabled(bool value)
+{
+    m_isAudioEnabled = value;
 }
 
 void RTPSession::setProxyAddr(const QString& addr, int port)

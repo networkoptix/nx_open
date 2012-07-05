@@ -38,7 +38,7 @@ bool QnPlWatchDogResource::isDualStreamingEnabled()
 
 bool QnPlWatchDogResource::initInternal() 
 {
-    if (!isDualStreamingEnabled()) 
+    if (!isDualStreamingEnabled() && getStatus() != QnResource::Unauthorized) 
     {
         // The camera most likely is going to reset after enabling dual streaming
         CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth());
