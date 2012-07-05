@@ -4,10 +4,7 @@
 #include "utils/common/delete_later.h"
 #include "api/session_manager.h"
 
-#include "plugins/resources/archive/avi_files/avi_archive_delegate.h"
-#include "plugins/resources/archive/archive_stream_reader.h"
-#include "plugins/resources/archive/filetypesupport.h"
-#include "plugins/resources/archive/single_shot_file_reader.h"
+#include "plugins/resources/archive/statistics_reader.h"
 
 QnLocalVideoServerResource::QnLocalVideoServerResource()
     : QnResource()
@@ -104,29 +101,17 @@ void QnVideoServerResource::setStorages(const QnAbstractStorageResourceList &sto
 }
 
 QnAbstractStreamDataProvider* QnVideoServerResource::createDataProviderInternal(ConnectionRole ){
-    if (FileTypeSupport::isImageFileExt(getUrl())) {
-        return new QnSingleShotFileStreamreader(toSharedPointer());
-    }
-
     qDebug() << "server url" << getUrl();
     qDebug() << "server api url" << getApiUrl();
     qDebug() << "server api connection" << apiConnection();
 
-    apiConnection()->asyncGetStatistics(this, SLOT(processStatisticsReply(QString)));
-    QnArchiveStreamReader* result = new QnArchiveStreamReader(toSharedPointer());
-    QnAviArchiveDelegate* aviDelegate = new QnAviArchiveDelegate();
-//    if (m_storage)
-//        aviDelegate->setStorage(m_storage);
-    result->setArchiveDelegate(aviDelegate);
-    if (checkFlags(still_image))
-        result->setCycleMode(false);
-
+    QnStatisticsReader* result = new QnStatisticsReader(toSharedPointer());
     return result;
 }
 
-void QnVideoServerResource::processStatisticsReply(QString reply){
-    qDebug() << reply;
-}
+void QnVideoServerResource::processStatisticsReply(const QByteArray &reply){
+    qDebug() << "got something" << reply;
+} 
 
 
 // --------------------------------------------------

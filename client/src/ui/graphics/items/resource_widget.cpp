@@ -274,7 +274,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     Q_ASSERT(m_videoLayout);
     m_channelCount = m_videoLayout->numberOfChannels();
 
-    m_renderer = new QnResourceWidgetRenderer(m_channelCount);
+    m_renderer = initRenderer(m_channelCount);
     connect(m_renderer, SIGNAL(sourceSizeChanged(const QSize &)), this, SLOT(at_sourceSizeChanged(const QSize &)));
     m_display->addRenderer(m_renderer);
 
@@ -437,6 +437,10 @@ QRectF QnResourceWidget::channelRect(int channel) const {
         w,
         h
     );
+}
+
+QnResourceWidgetRenderer* QnResourceWidget::initRenderer(const int channelCount){
+    return new QnResourceWidgetRenderer(channelCount);
 }
 
 void QnResourceWidget::showActivityDecorations() {

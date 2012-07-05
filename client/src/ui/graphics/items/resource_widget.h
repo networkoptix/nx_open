@@ -313,6 +313,8 @@ protected:
     virtual QSizeF constrainedSize(const QSizeF constraint) const override;
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint) const override;
 
+    virtual QnResourceWidgetRenderer* initRenderer(const int channelCount);
+
     void updateShadowZ();
     void updateShadowPos();
     void updateShadowOpacity();

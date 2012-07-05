@@ -52,7 +52,7 @@ public:
 
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
 public slots:
-    void processStatisticsReply(QString reply);
+    void processStatisticsReply(const QByteArray &reply);
 signals:
     void serverIFFound(QString);
 protected:

@@ -187,8 +187,7 @@ int QnVideoServerConnection::asyncGetFreeSpace(const QString& path, QObject *tar
 
 int QnVideoServerConnection::asyncGetStatistics(QObject *target, const char *slot){
     detail::VideoServerSessionManagerStatisticsRequestReplyProcessor *processor = new detail::VideoServerSessionManagerStatisticsRequestReplyProcessor();
-    connect(processor, SIGNAL(finished(QString)), target, slot);
-
+    connect(processor, SIGNAL(finished(const QByteArray &)), target, slot);
     return QnSessionManager::instance()->sendAsyncGetRequest(m_url, "api/statistics", processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
 }
 
