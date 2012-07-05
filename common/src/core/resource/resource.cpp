@@ -560,7 +560,7 @@ void QnResource::setStatus(QnResource::Status newStatus, bool silenceMode)
     if (newStatus == Offline || newStatus == Unauthorized)
         m_initialized = false;
 
-    if (newStatus == Online)
+    if (oldStatus == Offline && newStatus == Online)
         init();
 
     emit statusChanged(oldStatus, m_status);
