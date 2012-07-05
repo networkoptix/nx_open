@@ -48,6 +48,7 @@ bool QnPlSonyResource::updateResourceCapabilities()
     MediaSoapWrapper soapWrapper(endpoint.c_str(), login, password);
     SetVideoConfigReq request;
     request.Configuration = confResponse.Configuration;
+    request.Configuration->Encoding = getCodec() == H264 ? onvifXsd__VideoEncoding__H264 : onvifXsd__VideoEncoding__JPEG;
     request.ForcePersistence = false;
     SetVideoConfigResp response;
 
@@ -62,6 +63,8 @@ bool QnPlSonyResource::updateResourceCapabilities()
         soapRes = soapWrapper.setVideoEncoderConfiguration(request, response);
         if (soapRes != SOAP_OK) {
             if (soapWrapper.isConflictError()) {
+                qDebug() << "QnPlSonyResource::updateResourceCapabilities: resolution " << it->first 
+                    << " x " << it->second << " dropped. UniqueId: " << getUniqueId();
                 it = resolutionListPtr->erase(it);
                 continue;
             }

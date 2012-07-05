@@ -357,7 +357,14 @@ bool QnOnvifStreamReader::fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper,
     if (result) {
         info.videoEncoderId = result->token.c_str();
         updateVideoEncoder(*result, isPrimary);
-        return sendVideoEncoderToCamera(*result);
+
+        int triesLeft = m_onvifRes->getMaxOnvifRequestTries();
+        bool bResult = false;
+        while (!bResult && --triesLeft >= 0) {
+            bResult = sendVideoEncoderToCamera(*result);
+        }
+
+        return bResult;
     }
 
     return false;
@@ -671,7 +678,7 @@ bool QnOnvifStreamReader::sendVideoEncoderToCamera(VideoEncoder& encoder) const
 
     int soapRes = soapWrapper.setVideoEncoderConfiguration(request, response);
     if (soapRes != SOAP_OK) {
-        qWarning() << "QnOnvifStreamReader::sendVideoEncoderToCamera: can't set required values into ONVIF physical device (URL: " 
+        qCritical() << "QnOnvifStreamReader::sendVideoEncoderToCamera: can't set required values into ONVIF physical device (URL: " 
             << soapWrapper.getEndpointUrl() << ", UniqueId: " << m_onvifRes->getUniqueId() 
             << "). Root cause: SOAP failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
         return false;
