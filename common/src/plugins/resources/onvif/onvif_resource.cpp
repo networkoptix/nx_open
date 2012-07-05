@@ -505,9 +505,10 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
 
             result = false;
         } 
-        else 
+        else
         {
-            setName((response.Manufacturer + " - " + response.Model).c_str());
+            // TODO: Sergey G. Don't change camera name! User is possible changed it already by hand.
+            // setName((response.Manufacturer + " - " + response.Model).c_str());
         }
     }
 
