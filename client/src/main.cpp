@@ -183,6 +183,8 @@ void initAppServerConnection()
     if(!appServerUrl.isValid())
         appServerUrl = qnSettings->defaultConnection().url;
 
+    // TODO: Ivan. Enable it when removing all places on receiving messages.
+    // QnAppServerConnectionFactory::setClientGuid(QUuid::createUuid().toString());
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(&QnServerCameraFactory::instance());
 }

@@ -109,12 +109,13 @@ void conn_detail::ReplyProcessor::finished(int status, const QByteArray &result,
     }
 }
 
-QnAppServerConnection::QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory, QnApiSerializer& serializer)
+QnAppServerConnection::QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory, QnApiSerializer& serializer, const QString &guid)
     : m_url(url),
       m_resourceFactory(resourceFactory),
       m_serializer(serializer)
 {
     m_requestParams.append(QnRequestParam("format", m_serializer.format()));
+    m_requestParams.append(QnRequestParam("guid", guid));
 }
 
 int QnAppServerConnection::addObject(const QString& objectName, const QByteArray& data, QByteArray& reply, QByteArray& errorString)
@@ -543,14 +544,29 @@ int QnAppServerConnection::getCameraHistoryList(QnCameraHistoryList &cameraHisto
 
 Q_GLOBAL_STATIC(QnAppServerConnectionFactory, theAppServerConnectionFactory)
 
+QString QnAppServerConnectionFactory::clientGuid()
+{
+    if (QnAppServerConnectionFactory *factory = theAppServerConnectionFactory()) {
+        return factory->m_clientGuid;
+    }
+
+    return QString();
+}
+
 QUrl QnAppServerConnectionFactory::defaultUrl()
 {
     if (QnAppServerConnectionFactory *factory = theAppServerConnectionFactory()) {
-//        QMutexLocker locker(&factory->m_mutex);
         return factory->m_defaultUrl;
     }
 
     return QUrl();
+}
+
+void QnAppServerConnectionFactory::setClientGuid(const QString &guid)
+{
+    if (QnAppServerConnectionFactory *factory = theAppServerConnectionFactory()) {
+        factory->m_clientGuid = guid;
+    }
 }
 
 void QnAppServerConnectionFactory::setDefaultUrl(const QUrl &url)
@@ -559,7 +575,6 @@ void QnAppServerConnectionFactory::setDefaultUrl(const QUrl &url)
     Q_ASSERT_X(!url.isRelative(), "QnAppServerConnectionFactory::initialize()", "relative urls aren't supported");
 
     if (QnAppServerConnectionFactory *factory = theAppServerConnectionFactory()) {
-//        QMutexLocker locker(&factory->m_mutex);
         factory->m_defaultUrl = url;
     }
 }
@@ -567,7 +582,6 @@ void QnAppServerConnectionFactory::setDefaultUrl(const QUrl &url)
 void QnAppServerConnectionFactory::setDefaultFactory(QnResourceFactory* resourceFactory)
 {
     if (QnAppServerConnectionFactory *factory = theAppServerConnectionFactory()) {
-        //        QMutexLocker locker(&factory->m_mutex);
         factory->m_resourceFactory = resourceFactory;
     }
 }
@@ -581,7 +595,8 @@ QnAppServerConnectionPtr QnAppServerConnectionFactory::createConnection(const QU
 
     return QnAppServerConnectionPtr(new QnAppServerConnection(url,
                                                               *(theAppServerConnectionFactory()->m_resourceFactory),
-                                                               theAppServerConnectionFactory()->m_serializer));
+                                                               theAppServerConnectionFactory()->m_serializer,
+                                                              theAppServerConnectionFactory()->m_clientGuid));
 }
 
 QnAppServerConnectionPtr QnAppServerConnectionFactory::createConnection()
@@ -716,7 +731,7 @@ qint64 QnAppServerConnection::getCurrentTime()
 
 int QnAppServerConnection::setResourceStatusAsync(const QnId &resourceId, QnResource::Status status, QObject *target, const char *slot)
 {
-    QnRequestParamList requestParams;
+    QnRequestParamList requestParams(m_requestParams);
     requestParams.append(QnRequestParam("id", resourceId.toString()));
     requestParams.append(QnRequestParam("status", QString::number(status)));
 
@@ -725,7 +740,7 @@ int QnAppServerConnection::setResourceStatusAsync(const QnId &resourceId, QnReso
 
 int QnAppServerConnection::setResourceDisabledAsync(const QnId &resourceId, bool disabled, QObject *target, const char *slot)
 {
-    QnRequestParamList requestParams;
+    QnRequestParamList requestParams(m_requestParams);
     requestParams.append(QnRequestParam("id", resourceId.toString()));
     requestParams.append(QnRequestParam("disabled", QString::number((int)disabled)));
 
@@ -734,7 +749,7 @@ int QnAppServerConnection::setResourceDisabledAsync(const QnId &resourceId, bool
 
 int QnAppServerConnection::setResourcesStatusAsync(const QnResourceList &resources, QObject *target, const char *slot)
 {
-    QnRequestParamList requestParams;
+    QnRequestParamList requestParams(m_requestParams);
 
     int n = 1;
     foreach (const QnResourcePtr resource, resources)
@@ -750,7 +765,7 @@ int QnAppServerConnection::setResourcesStatusAsync(const QnResourceList &resourc
 
 int QnAppServerConnection::setResourceStatus(const QnId &resourceId, QnResource::Status status, QByteArray &errorString)
 {
-    QnRequestParamList requestParams;
+    QnRequestParamList requestParams(m_requestParams);
     requestParams.append(QnRequestParam("id", resourceId.toString()));
     requestParams.append(QnRequestParam("status", QString::number(status)));
 
@@ -760,7 +775,7 @@ int QnAppServerConnection::setResourceStatus(const QnId &resourceId, QnResource:
 
 int QnAppServerConnection::setResourcesDisabledAsync(const QnResourceList &resources, QObject *target, const char *slot)
 {
-    QnRequestParamList requestParams;
+    QnRequestParamList requestParams(m_requestParams);
 
     int n = 1;
     foreach (const QnResourcePtr resource, resources)

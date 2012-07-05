@@ -601,7 +601,7 @@ void QnResourceDiscoveryManager::markOfflineIfNeeded()
             // resource is not found
             m_resourceDiscoveryCounter[res->getUniqueId()]++;
 
-            if (m_resourceDiscoveryCounter[res->getUniqueId()] >= 10 && !netRes->hasRunningLiveProvider())
+            if (m_resourceDiscoveryCounter[res->getUniqueId()] >= 16 && !netRes->hasRunningLiveProvider())
             {
                 res->setStatus(QnResource::Offline);
                 m_resourceDiscoveryCounter[res->getUniqueId()] = 0;

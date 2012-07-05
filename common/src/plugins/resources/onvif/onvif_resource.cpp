@@ -302,6 +302,9 @@ bool QnPlOnvifResource::initInternal()
     if (!hasDualStreaming())
         setMotionType(MT_NoMotion);
 
+    //if (getStatus() == QnResource::Offline || getStatus() == QnResource::Unauthorized)
+    //    setStatus(QnResource::Online, true); // to avoid infinit status loop in this version
+
     save();
 
     return true;
@@ -839,6 +842,29 @@ bool QnPlOnvifResource::mergeResourcesIfNeeded(QnNetworkResourcePtr source)
         result = true;
     }
 
+    if (getDeviceOnvifUrl().size()!=0 && QUrl(getDeviceOnvifUrl()).host().size()==0)
+    {
+        // trying to introduce fix for dw cam 
+        QString temp = getDeviceOnvifUrl();
+
+        QUrl newUrl(getDeviceOnvifUrl());
+        newUrl.setHost(getHostAddress().toString());
+        setDeviceOnvifUrl(newUrl.toString());
+        qCritical() << "pure URL(error) " << temp<< " Trying to fix: " << getDeviceOnvifUrl();
+        result = true;
+    }
+
+    if (getMediaUrl().size() != 0 && QUrl(getMediaUrl()).host().size()==0)
+    {
+        // trying to introduce fix for dw cam 
+        QString temp = getMediaUrl();
+        QUrl newUrl(getMediaUrl());
+        newUrl.setHost(getHostAddress().toString());
+        setMediaUrl(newUrl.toString());
+        qCritical() << "pure URL(error) " << temp<< " Trying to fix: " << getMediaUrl();
+        result = true;
+    }
+
 
     return result;
 }
@@ -887,7 +913,7 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
         if (soapRes != SOAP_OK || !currVideoOpts.optionsResp.Options) {
 
             qCritical() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: can't receive options (or data is empty) for video encoder '" 
-                << optRequest.ConfigurationToken << "' from camera (URL: "  << soapWrapperPtr->getEndpointUrl() << ", UniqueId: " << getUniqueId()
+                << QString::fromStdString(*(optRequest.ConfigurationToken)) << "' from camera (URL: "  << soapWrapperPtr->getEndpointUrl() << ", UniqueId: " << getUniqueId()
                 << "). Root cause: SOAP request failed. GSoap error code: " << soapRes << ". " << soapWrapperPtr->getLastError();
             return false;
 

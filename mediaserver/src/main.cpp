@@ -349,6 +349,7 @@ void initAppServerConnection(const QSettings &settings)
     QUrl urlNoPassword(appServerUrl);
     urlNoPassword.setPassword("");
     cl_log.log("Connect to enterprise controller server ", urlNoPassword.toString(), cl_logINFO);
+    QnAppServerConnectionFactory::setClientGuid(serverGuid());
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(&QnResourceDiscoveryManager::instance());
 }
@@ -365,6 +366,7 @@ void initAppServerEventConnection(const QSettings &settings, const QnVideoServer
     appServerEventsUrl.setPassword(settings.value("appserverPassword", QLatin1String("123")).toString());
     appServerEventsUrl.setPath("/events/");
     appServerEventsUrl.addQueryItem("id", mediaServer->getId().toString());
+    appServerEventsUrl.addQueryItem("guid", QnAppServerConnectionFactory::clientGuid());
 	appServerEventsUrl.addQueryItem("format", "pb");
 
     static const int EVENT_RECONNECT_TIMEOUT = 3000;

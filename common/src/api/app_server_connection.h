@@ -125,7 +125,7 @@ public:
     static int getMediaProxyPort();
 
 private:
-    QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory, QnApiSerializer& serializer);
+    QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory, QnApiSerializer& serializer, const QString& guid);
 
     int connectAsync_i(const QnRequestParamList& params, QObject* target, const char *slot);
 
@@ -155,10 +155,12 @@ typedef QSharedPointer<QnAppServerConnection> QnAppServerConnectionPtr;
 class QN_EXPORT QnAppServerConnectionFactory
 {
 public:
+    static QString clientGuid();
     static QUrl defaultUrl();
     static int defaultMediaProxyPort();
 	static QnResourceFactory* defaultFactory();
 
+    static void setClientGuid(const QString &guid);
     static void setDefaultUrl(const QUrl &url);
     static void setDefaultFactory(QnResourceFactory*);
     static void setDefaultMediaProxyPort(int port);
@@ -168,6 +170,7 @@ public:
 
 private:
     QMutex m_mutex;
+    QString m_clientGuid;
     QUrl m_defaultUrl;
     int m_defaultMediaProxyPort;
     QnResourceFactory* m_resourceFactory;
