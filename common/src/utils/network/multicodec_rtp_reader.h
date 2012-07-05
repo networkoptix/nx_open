@@ -32,6 +32,9 @@ private:
     void initIO(RTPIODevice** ioDevice, QnRtpStreamParser* parser, const QString& mediaType);
     void setNeedKeyData();
     void checkIfNeedKeyData();
+    QnAbstractMediaDataPtr getNextDataUDP();
+    QnAbstractMediaDataPtr getNextDataTCP();
+    void processTcpRtcp(RTPIODevice* ioDevice, quint8* buffer, int bufferSize);
 private:
     
     RTPSession m_RtpSession;

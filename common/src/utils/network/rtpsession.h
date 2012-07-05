@@ -47,8 +47,10 @@ public:
     virtual qint64 read(char * data, qint64 maxSize );
     
     const RtspStatistic& getStatistic() { return m_statistic;}
+    void setStatistic(RtspStatistic& value) { m_statistic = value; }
     CommunicatingSocket* getMediaSocket();
     UDPSocket* getRtcpSocket() const { return m_rtcpSocket; }
+    void setTcpMode(bool value) { m_tcpMode = value; }
 private:
     void processRtcpData();
 private:
@@ -117,7 +119,9 @@ public:
     bool sendKeepAliveIfNeeded();
 
     void setTransport(const QString& transport);
+    QString getTransport() const;
     QString getTrackFormatByRtpChannelNum(int channelNum);
+    QString getTrackTypeByRtpChannelNum(int channelNum);
 
     qint64 startTime() const;
     qint64 endTime() const;
@@ -154,6 +158,12 @@ public:
     int getLastResponseCode() const;
 
     void setAudioEnabled(bool value);
+
+    int readBinaryResponce(quint8 *data, int maxDataSize);
+    void sendBynaryResponse(quint8* buffer, int size);
+
+    RtspStatistic parseServerRTCPReport(quint8* srcBuffer, int srcBufferSize);
+    int buildClientRTCPReport(quint8 *dstBuffer);
 signals:
     void gotTextResponse(QByteArray text);
 private:
@@ -161,14 +171,15 @@ private:
     qint64 m_endTime;
 
     QString getTrackFormat(int trackNum) const;
+    QString getTrackType(int trackNum) const;
     int readRAWData();
     bool sendDescribe();
     bool sendOptions();
     bool sendSetup();
+    bool sendSetupInternal(const QString& transport);
     bool sendKeepAlive();
 
     bool readTextResponce(QByteArray &responce);
-    int readBinaryResponce(quint8 *data, int maxDataSize);
     void addAuth(QByteArray& request);
 
 
@@ -176,8 +187,6 @@ private:
     void updateTransportHeader(QByteArray &responce);
 
     void parseSDP();
-    RtspStatistic parseServerRTCPReport(quint8* srcBuffer, int srcBufferSize);
-    int buildClientRTCPReport(quint8 *dstBuffer);
     void addAdditionAttrs(QByteArray& request);
     void updateResponseStatus(const QByteArray& response);
 private:

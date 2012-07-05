@@ -67,9 +67,6 @@ qint64 RTPIODevice::read(char *data, qint64 maxSize)
         readed = m_owner->readBinaryResponce((quint8*) data, maxSize); // demux binary data from TCP socket
     else
         readed = m_mediaSocket->recv(data, maxSize);
-    if (readed > 0)
-    {
-    }
     m_owner->sendKeepAliveIfNeeded();
     if (!m_tcpMode)
         processRtcpData();
@@ -493,6 +490,14 @@ QList<QByteArray> RTPSession::getSdpByType(const QString& trackType) const
 
 bool RTPSession::sendSetup()
 {
+    QString transport = m_transport;
+    if (transport == "AUTO")
+        transport = "TCP"; // try TCP mode first
+    return sendSetupInternal(transport);
+}
+
+bool RTPSession::sendSetupInternal(const QString& transport)
+{
     int audioNum = 0;
 
     for (int i = 0; i < m_sdpTracks.size(); ++i)
@@ -536,9 +541,9 @@ bool RTPSession::sendSetup()
         request += "\r\n";
         addAuth(request);
         request += "User-Agent: Network Optix\r\n";
-        request += QString("Transport: RTP/AVP/") + m_transport + QString(";unicast;");
+        request += QString("Transport: RTP/AVP/") + transport + QString(";unicast;");
 
-        if (m_transport == "UDP")
+        if (transport == "UDP")
         {
             request += "client_port=";
             request += QString::number(trackInfo->ioDevice->getMediaSocket()->getLocalPort());
@@ -573,7 +578,10 @@ bool RTPSession::sendSetup()
 
         if (!responce.startsWith("RTSP/1.0 200"))
         {
-            return false;
+            if (m_transport == "AUTO" && transport == "TCP")
+                return sendSetupInternal("UDP"); // try UDP transport
+            else
+                return false;
         }
         m_TimeOut = 0; // default timeout 0 ( do not send keep alive )
 
@@ -601,6 +609,11 @@ bool RTPSession::sendSetup()
 
         updateTransportHeader(responce);
     }
+
+    bool tcpMode = (transport == "TCP");
+    for (int i = 0; i < m_sdpTracks.size(); ++i)
+        m_sdpTracks[i]->ioDevice->setTcpMode(tcpMode);
+
     return true;
 }
 
@@ -945,6 +958,11 @@ int RTPSession::readRAWData()
     return readed;
 }
 
+void RTPSession::sendBynaryResponse(quint8* buffer, int size)
+{
+    m_tcpSock.send(buffer, size);
+}
+
 // demux binary data only
 int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
 {
@@ -1123,6 +1141,12 @@ void RTPSession::setTransport(const QString& transport)
     m_transport = transport;
 }
 
+QString RTPSession::getTransport() const
+{
+    return m_transport;
+}
+
+
 QString RTPSession::getTrackFormatByRtpChannelNum(int channelNum)
 {
     return getTrackFormat(channelNum / SDP_TRACK_STEP);
@@ -1133,6 +1157,23 @@ QString RTPSession::getTrackFormat(int trackNum) const
 
     if (trackNum < m_sdpTracks.size())
         return m_sdpTracks[trackNum]->codecName;
+    else
+        return QString();
+}
+
+QString RTPSession::getTrackTypeByRtpChannelNum(int channelNum)
+{
+    QString rez = getTrackType(channelNum / SDP_TRACK_STEP);
+    if (channelNum % SDP_TRACK_STEP)
+        rez += "-rtcp";
+    return rez;
+}
+
+QString RTPSession::getTrackType(int trackNum) const
+{
+
+    if (trackNum < m_sdpTracks.size())
+        return m_sdpTracks[trackNum]->codecType;
     else
         return QString();
 }
