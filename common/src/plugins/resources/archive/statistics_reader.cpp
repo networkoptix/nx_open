@@ -14,7 +14,31 @@ QnAbstractMediaDataPtr QnStatisticsReader::getNextData()
     if (m_api_connection){
         m_api_connection->syncGetStatistics(this, SLOT(at_statistics_received(QByteArray)));
     }
-    return QnAbstractMediaDataPtr();
+
+    int w(600);
+    int h(800);
+    QPixmap pixmap(w, h);
+ 
+    QPainter* painter = new QPainter;
+    painter->begin(&pixmap);
+    drawStatistics(w, h, painter);
+    painter->end();    
+
+    QByteArray srcData;
+    QBuffer buffer( &srcData );
+    buffer.open(  QIODevice::WriteOnly );
+    pixmap.save( &buffer, "PNG" );
+
+    QnCompressedVideoDataPtr outData(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, srcData.size()));
+    outData->data.write(srcData);
+
+    outData->compressionType = CODEC_ID_PNG;
+    outData->flags |= AV_PKT_FLAG_KEY | QnAbstractMediaData::MediaFlags_StillImage;
+    outData->timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;
+    outData->dataProvider = this;
+    outData->channelNumber = 0;
+
+    return outData;
 }
 
 void QnStatisticsReader::at_statistics_received(const QByteArray &reply){
@@ -47,4 +71,10 @@ void QnStatisticsReader::run()
 
 void QnStatisticsReader::setApiConnection(QnVideoServerConnectionPtr connection){
     m_api_connection = connection;
+}
+
+void QnStatisticsReader::drawStatistics(int width, int height, QPainter *painter){
+    QRectF rect(0, 0, width, height);
+    painter->setBrush(QBrush(Qt::blue));
+    painter->fillRect(rect, Qt::blue);
 }

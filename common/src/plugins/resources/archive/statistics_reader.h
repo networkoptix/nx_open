@@ -22,6 +22,8 @@ protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
     virtual void run() override;
 private:
+    void drawStatistics(int width, int height, QPainter *painter);
+
     QnVideoServerConnectionPtr m_api_connection;
 };
 

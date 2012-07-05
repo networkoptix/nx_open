@@ -277,9 +277,6 @@ public:
 
     bool isMotionRegionsEmpty() const;
 
-    /** Creates corresponding renderer and adds it to display object */
-    virtual void initRenderer();
-
 public slots:
     void showActivityDecorations();
     void hideActivityDecorations();
@@ -332,15 +329,6 @@ protected:
     int motionGridWidth() const;
     int motionGridHeight() const;
     void drawMotionSensitivity(QPainter *painter, const QRectF &rect, const QnMotionRegion& region, int channel);
-
-    /** Number of media channels. */
-    int m_channelCount;
-
-    /** Associated renderer. */
-    QnResourceWidgetRenderer *m_renderer;
-
-    /** Display. */
-    QnResourceDisplay *m_display;
 
 signals:
     void updateOverlayTextLater();
@@ -410,11 +398,20 @@ private:
     /** Resource associated with this widget. */
     QnResourcePtr m_resource;
 
+    /** Display. */
+    QnResourceDisplay *m_display;
+
     /* Display flags. */
     DisplayFlags m_displayFlags;
 
     /** Resource layout of this display widget. */
     const QnVideoResourceLayout *m_videoLayout;
+
+    /** Number of media channels. */
+    int m_channelCount;
+
+    /** Associated renderer. */
+    QnResourceWidgetRenderer *m_renderer;
 
     /** Paused painter. */
     QSharedPointer<QnPausedPainter> m_pausedPainter;
