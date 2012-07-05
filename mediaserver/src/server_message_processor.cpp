@@ -84,8 +84,6 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage event)
         if (isCamera && resource->getParentId() != ownVideoServer->getId())
             return;
 
-        QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
-
         QByteArray errorString;
         QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId());
         if (ownResource)
@@ -97,23 +95,7 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage event)
             qnResPool->addResource(resource);
             ownResource = resource;
         }
-
-        QnSecurityCamResourcePtr ownSecurityCamera = ownResource.dynamicCast<QnSecurityCamResource>();
-        if (ownSecurityCamera)
-            QnRecordingManager::instance()->updateCamera(ownSecurityCamera);
-    }
-    else if (event.eventType == Message_Type_ResourceStatusChange)
-    {
-		QnResourcePtr resource = qnResPool->getResourceById(event.resourceId);
-
-        // nobody controls statuses om server 
-        /*
-        if (resource && false) 
-        {
-            resource->setStatus(event.resourceStatus);
-        }
-        /**/
-	} else if (event.eventType == Message_Type_ResourceDisabledChange)
+    } else if (event.eventType == Message_Type_ResourceDisabledChange)
 	{
 		QnResourcePtr resource = qnResPool->getResourceById(event.resourceId);
 

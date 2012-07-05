@@ -264,6 +264,8 @@ void QnRecordingManager::at_cameraUpdated()
                 camera->setStatus(QnResource::Online);
         }
 
+        updateCamera(camera);
+
         QMap<QnResourcePtr, Recorders>::iterator itr = m_recordMap.find(camera); // && m_recordMap.value(camera).recorderHiRes->isRunning();
         if (itr != m_recordMap.end()) 
         {
