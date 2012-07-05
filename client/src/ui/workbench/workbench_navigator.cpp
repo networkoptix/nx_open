@@ -561,6 +561,7 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     }
 
     m_currentWidget = widget;
+    m_pausedOverride = false;
     m_currentWidgetLoaded = false;
     m_currentWidgetIsCentral = isCentral;
 

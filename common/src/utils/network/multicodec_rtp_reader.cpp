@@ -10,7 +10,7 @@
 #include "mjpeg_rtp_parser.h"
 #include "core/resource/camera_resource.h"
 
-static const int RTSP_RETRY_COUNT = 3;
+static const int RTSP_RETRY_COUNT = 6;
 
 QnMulticodecRtpReader::QnMulticodecRtpReader(QnResourcePtr res):
 QnResourceConsumer(res),
