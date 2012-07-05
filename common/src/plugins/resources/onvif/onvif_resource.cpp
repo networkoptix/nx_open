@@ -302,8 +302,8 @@ bool QnPlOnvifResource::initInternal()
     if (!hasDualStreaming())
         setMotionType(MT_NoMotion);
 
-    if (getStatus() == QnResource::Offline || getStatus() == QnResource::Unauthorized)
-        setStatus(QnResource::Online, true); // to avoid infinit status loop in this version
+    //if (getStatus() == QnResource::Offline || getStatus() == QnResource::Unauthorized)
+    //    setStatus(QnResource::Online, true); // to avoid infinit status loop in this version
 
     save();
 
@@ -913,7 +913,7 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
         if (soapRes != SOAP_OK || !currVideoOpts.optionsResp.Options) {
 
             qCritical() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: can't receive options (or data is empty) for video encoder '" 
-                << optRequest.ConfigurationToken << "' from camera (URL: "  << soapWrapperPtr->getEndpointUrl() << ", UniqueId: " << getUniqueId()
+                << *(optRequest.ConfigurationToken) << "' from camera (URL: "  << soapWrapperPtr->getEndpointUrl() << ", UniqueId: " << getUniqueId()
                 << "). Root cause: SOAP request failed. GSoap error code: " << soapRes << ". " << soapWrapperPtr->getLastError();
             return false;
 

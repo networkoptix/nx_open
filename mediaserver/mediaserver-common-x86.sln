@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mediaserver", "x86\mediaserver-x86.vcproj", "{93A0D83D-4035-34BC-B310-A50288C13714}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0A3463EA-5BB2-30C5-8E29-597845243ACE} = {0A3463EA-5BB2-30C5-8E29-597845243ACE}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common", "..\common\x86\common-x86.vcproj", "{0A3463EA-5BB2-30C5-8E29-597845243ACE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{93A0D83D-4035-34BC-B310-A50288C13714}.Debug|Win32.ActiveCfg = Debug|Win32
+		{93A0D83D-4035-34BC-B310-A50288C13714}.Debug|Win32.Build.0 = Debug|Win32
+		{93A0D83D-4035-34BC-B310-A50288C13714}.Release|Win32.ActiveCfg = Release|Win32
+		{93A0D83D-4035-34BC-B310-A50288C13714}.Release|Win32.Build.0 = Release|Win32
+		{0A3463EA-5BB2-30C5-8E29-597845243ACE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0A3463EA-5BB2-30C5-8E29-597845243ACE}.Debug|Win32.Build.0 = Debug|Win32
+		{0A3463EA-5BB2-30C5-8E29-597845243ACE}.Release|Win32.ActiveCfg = Release|Win32
+		{0A3463EA-5BB2-30C5-8E29-597845243ACE}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
