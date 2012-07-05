@@ -36,8 +36,6 @@ public:
     void stop();
     bool isCameraRecoring(QnResourcePtr camera);
 
-    void updateCamera(QnSecurityCamResourcePtr camera);
-
     Recorders findRecorders(QnResourcePtr res) const;
 private slots:
     void onNewResource(QnResourcePtr res);
@@ -46,7 +44,10 @@ private slots:
     void at_updateStorage();
     void at_cameraStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
     void at_cameraUpdated();
+
 private:
+    void updateCamera(QnSecurityCamResourcePtr camera);
+
     QnServerStreamRecorder* createRecorder(QnResourcePtr res, QnVideoCamera* camera, QnResource::ConnectionRole role);
     void startOrStopRecording(QnResourcePtr res, QnVideoCamera* camera, QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes);
     bool isResourceDisabled(QnResourcePtr res) const;
