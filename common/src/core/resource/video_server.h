@@ -51,8 +51,6 @@ public:
     bool getReserve() const;
 
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
-public slots:
-    void processStatisticsReply(const QByteArray &reply);
 signals:
     void serverIFFound(QString);
 protected:

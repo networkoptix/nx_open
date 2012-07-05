@@ -101,18 +101,10 @@ void QnVideoServerResource::setStorages(const QnAbstractStorageResourceList &sto
 }
 
 QnAbstractStreamDataProvider* QnVideoServerResource::createDataProviderInternal(ConnectionRole ){
-    qDebug() << "server url" << getUrl();
-    qDebug() << "server api url" << getApiUrl();
-    qDebug() << "server api connection" << apiConnection();
-
     QnStatisticsReader* result = new QnStatisticsReader(toSharedPointer());
+    result->setApiConnection(apiConnection());
     return result;
 }
-
-void QnVideoServerResource::processStatisticsReply(const QByteArray &reply){
-    qDebug() << "got something" << reply;
-} 
-
 
 // --------------------------------------------------
 
