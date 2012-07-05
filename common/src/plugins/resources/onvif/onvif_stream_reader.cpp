@@ -325,7 +325,18 @@ const QString QnOnvifStreamReader::fetchStreamUrl(MediaSoapWrapper& soapWrapper,
     qDebug() << "URL of ONVIF device stream (UniqueId: " << m_onvifRes->getUniqueId()
         << ") successfully fetched: " << response.MediaUri->Uri.c_str();
 
-    return QString::fromStdString(response.MediaUri->Uri);
+    
+    QUrl relutUrl(QString::fromStdString(response.MediaUri->Uri));
+    
+
+    if (relutUrl.host().size()==0)
+    {
+        QString temp = relutUrl.toString();
+        relutUrl.setHost(m_onvifRes->getHostAddress().toString());
+        qCritical() << "pure URL(error) " << temp<< " Trying to fix: " << relutUrl.toString();
+    }
+
+    return relutUrl.toString();
 }
 
 bool QnOnvifStreamReader::fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper, CameraInfo& info, bool isPrimary) const
