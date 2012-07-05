@@ -187,8 +187,20 @@ int QnVideoServerConnection::asyncGetFreeSpace(const QString& path, QObject *tar
 
 int QnVideoServerConnection::asyncGetStatistics(QObject *target, const char *slot){
     detail::VideoServerSessionManagerStatisticsRequestReplyProcessor *processor = new detail::VideoServerSessionManagerStatisticsRequestReplyProcessor();
-    connect(processor, SIGNAL(finished(const QByteArray &)), target, slot);
+    connect(processor, SIGNAL(finished(const QByteArray &)), target, slot, Qt::DirectConnection);
     return QnSessionManager::instance()->sendAsyncGetRequest(m_url, "api/statistics", processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
+}
+
+int QnVideoServerConnection::syncGetStatistics(QObject *target, const char *slot){
+    QByteArray reply;
+    QByteArray errorString;
+    int status = QnSessionManager::instance()->sendGetRequest(m_url, "api/statistics", reply, errorString);
+
+    detail::VideoServerSessionManagerStatisticsRequestReplyProcessor *processor = new detail::VideoServerSessionManagerStatisticsRequestReplyProcessor();
+    connect(processor, SIGNAL(finished(const QByteArray &)), target, slot, Qt::DirectConnection);
+    processor->at_replyReceived(status, reply, errorString, 0);
+
+    return status;
 }
 
 void detail::VideoServerSessionManagerReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray& /*errorString*/, int handle)

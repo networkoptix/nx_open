@@ -44,7 +44,6 @@ namespace detail {
         Q_OBJECT;
     public:
         VideoServerSessionManagerStatisticsRequestReplyProcessor(QObject *parent = NULL): QObject(parent) {}
-
     public slots:
         void at_replyReceived(int /*status*/, const QByteArray &reply, const QByteArray &errorString,int /*handle*/){
             qDebug() << "reply" << reply;
@@ -78,7 +77,11 @@ public:
     static int getProxyPort() { return m_proxyPort; }
     static QString getProxyHost() { return m_proxyAddr; }
 
+    /** Returns request handle */
     int asyncGetStatistics(QObject *target, const char *slot);
+
+    /** Returns status */
+    int syncGetStatistics(QObject *target, const char *slot);
 private:
     int recordedTimePeriods(const QnRequestParamList& params, QnTimePeriodList& timePeriodList, QByteArray& errorString);
 

@@ -12,7 +12,7 @@ QnStatisticsReader::QnStatisticsReader(QnResourcePtr resource):
 QnAbstractMediaDataPtr QnStatisticsReader::getNextData()
 {
     if (m_api_connection){
-        m_api_connection->asyncGetStatistics(this, SLOT(at_statistics_received(QByteArray)));
+        m_api_connection->syncGetStatistics(this, SLOT(at_statistics_received(QByteArray)));
     }
     return QnAbstractMediaDataPtr();
 }

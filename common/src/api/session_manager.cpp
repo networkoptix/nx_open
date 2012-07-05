@@ -317,6 +317,7 @@ QByteArray QnSessionManager::formatNetworkError(int error)
 }
 
 void QnSessionManager::processReply(int status, const QByteArray &, const QByteArray &, int) {
+    qDebug() << "reply received";
     emit replyReceived(status);
 }
 
