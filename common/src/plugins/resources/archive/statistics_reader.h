@@ -17,7 +17,7 @@ public:
 	~QnStatisticsReader(){stop();}
     void setApiConnection(QnVideoServerConnectionPtr connection);
 public slots:
-    void at_statistics_received(const QByteArray &reply);
+    void at_statistics_received(int usage);
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
     virtual void run() override;
@@ -25,6 +25,7 @@ private:
     void drawStatistics(int width, int height, QPainter *painter);
 
     QnVideoServerConnectionPtr m_api_connection;
+    QList<int> m_history;
 };
 
 /**/

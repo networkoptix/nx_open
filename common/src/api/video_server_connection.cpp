@@ -197,14 +197,14 @@ int QnVideoServerConnection::syncGetStatistics(QObject *target, const char *slot
     int status = QnSessionManager::instance()->sendGetRequest(m_url, "api/statistics", reply, errorString);
 
     detail::VideoServerSessionManagerStatisticsRequestReplyProcessor *processor = new detail::VideoServerSessionManagerStatisticsRequestReplyProcessor();
-    connect(processor, SIGNAL(finished(const QByteArray &)), target, slot, Qt::DirectConnection);
+    connect(processor, SIGNAL(finished(int)), target, slot, Qt::DirectConnection);
     processor->at_replyReceived(status, reply, errorString, 0);
 
     return status;
 }
 
 void detail::VideoServerSessionManagerReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray& /*errorString*/, int handle)
-{
+    {
     QnTimePeriodList result;
     if(status == 0)
     {
@@ -301,3 +301,14 @@ void QnVideoServerConnection::setProxyAddr(const QString& addr, int port)
     //QNetworkProxyQuery proxyQuery("http://?/RecordedTimePeriods")
 }
 
+void detail::VideoServerSessionManagerStatisticsRequestReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray ,int ){
+    if(status == 0)
+    {
+        QByteArray root = extractXmlBody(reply, "root");
+        QByteArray misc = extractXmlBody(root, "misc");
+        int usage = qrand() % 101;
+        qDebug() << "cpuInfo" << usage;
+        emit finished(usage); 
+    }
+    deleteLater();
+}

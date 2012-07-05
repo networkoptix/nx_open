@@ -45,18 +45,9 @@ namespace detail {
     public:
         VideoServerSessionManagerStatisticsRequestReplyProcessor(QObject *parent = NULL): QObject(parent) {}
     public slots:
-        void at_replyReceived(int /*status*/, const QByteArray &reply, const QByteArray &errorString,int /*handle*/){
-            qDebug() << "reply" << reply;
-            qDebug() << "errorString" << errorString;
-            QString reply_parsed(reply);
-            qDebug() << "parsed" << reply_parsed;
-
-            emit finished(reply); 
-
-            deleteLater();
-        }
+        void at_replyReceived(int status, const QByteArray &reply, const QByteArray /* &errorString */ , int /*handle*/);
     signals:
-        void finished(const QByteArray &reply);
+        void finished(int);
     };
 }
 
