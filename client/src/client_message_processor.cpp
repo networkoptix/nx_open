@@ -26,6 +26,7 @@ void QnClientMessageProcessor::init()
     QUrl appServerEventsUrl = QnAppServerConnectionFactory::defaultUrl();
     appServerEventsUrl.setPath("/events/");
 	appServerEventsUrl.addQueryItem("format", "pb");
+    appServerEventsUrl.addQueryItem("guid", QnAppServerConnectionFactory::clientGuid());
     init(appServerEventsUrl, EVENT_RECONNECT_TIMEOUT);
 }
 
