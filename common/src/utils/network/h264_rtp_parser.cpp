@@ -204,11 +204,10 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStati
     quint16 sequenceNum = ntohs(rtpHeader->sequence);
 
     
-
-    if (m_prevSequenceNum != -1 && quint16(m_prevSequenceNum) != quint16(sequenceNum-1)) {
-        m_prevSequenceNum = sequenceNum;
-        qWarning() << "RTP Packet lost detected!";
-        return clearInternalBuffer();
+    bool packetLostDetected = m_prevSequenceNum != -1 && quint16(m_prevSequenceNum) != quint16(sequenceNum-1);
+    if (packetLostDetected) {
+        qWarning() << "RTP Packet lost detected!!!!";
+        clearInternalBuffer();
     }
     m_prevSequenceNum = sequenceNum;
 
@@ -251,14 +250,18 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStati
                 nalUnitType += 0x40;
                 m_videoBuffer.write( (const char*) &nalUnitType, 1);
             }
+            else {
+                // if packet lost occured in the middle of FU packet, reset flag.
+                // packet lost will be reported on the last FU packet. So, do not report problem twice
+                packetLostDetected = false; 
+            }
+
             if (*curPtr  & 0x40) // FU_A last packet
             {
                 if (quint16(sequenceNum - m_firstSeqNum) != m_packetPerNal)
-                {
-                    clearInternalBuffer();
-                    return true; // packet lost detected. wait more data (return no error because of packet lost already reported)
-                }
+                    return clearInternalBuffer(); // packet lost detected
             }
+            
             curPtr++;
             if (packetType == FU_B_PACKET)
             {
@@ -280,6 +283,9 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStati
             updateNalFlags(nalUnitType);
             break; // ignore unknown data
         }
+
+    if (packetLostDetected && !m_keyDataExists)
+        return clearInternalBuffer();
 
     if (rtpHeader->marker) 
     {   // last packet

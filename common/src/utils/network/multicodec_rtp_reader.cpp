@@ -114,6 +114,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
             {
                 setNeedKeyData();
                 if (++videoRetryCount > RTSP_RETRY_COUNT) {
+                    qWarning() << "Too many RTP errors for camera " << getResource()->getName() << ". Reopen stream";
                     closeStream();
                     return QnAbstractMediaDataPtr(0);
                 }
@@ -152,6 +153,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
         return result;
     }
 
+    qWarning() << "RTP read timeout for camera " << getResource()->getName() << ". Reopen stream";
     return result;
 }
 
