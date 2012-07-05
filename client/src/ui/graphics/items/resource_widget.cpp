@@ -274,11 +274,6 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     Q_ASSERT(m_videoLayout);
     m_channelCount = m_videoLayout->numberOfChannels();
 
-    m_renderer = initRenderer(m_channelCount);
-    connect(m_renderer, SIGNAL(sourceSizeChanged(const QSize &)), this, SLOT(at_sourceSizeChanged(const QSize &)));
-    m_display->addRenderer(m_renderer);
-
-
     /* Init static text. */
     m_noDataStaticText.setText(tr("NO DATA"));
     m_noDataStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
@@ -294,10 +289,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
         m_sensStaticText[i].setPerformanceHint(QStaticText::AggressiveCaching);
     }
 
-
     /* Set up per-channel state. */
     m_channelState.resize(m_channelCount);
-
 
     /* Run handlers. */
     at_resource_nameChanged();
@@ -439,8 +432,10 @@ QRectF QnResourceWidget::channelRect(int channel) const {
     );
 }
 
-QnResourceWidgetRenderer* QnResourceWidget::initRenderer(const int channelCount){
-    return new QnResourceWidgetRenderer(channelCount);
+void QnResourceWidget::initRenderer(){
+    m_renderer = new QnResourceWidgetRenderer(m_channelCount);
+    connect(m_renderer, SIGNAL(sourceSizeChanged(const QSize &)), this, SLOT(at_sourceSizeChanged(const QSize &)));
+    m_display->addRenderer(m_renderer);
 }
 
 void QnResourceWidget::showActivityDecorations() {
