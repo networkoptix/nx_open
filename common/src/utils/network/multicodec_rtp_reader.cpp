@@ -8,6 +8,7 @@
 #include "core/resource/media_resource.h"
 #include "simpleaudio_rtp_parser.h"
 #include "mjpeg_rtp_parser.h"
+#include "core/resource/camera_resource.h"
 
 static const int RTSP_RETRY_COUNT = 3;
 
@@ -240,6 +241,11 @@ void QnMulticodecRtpReader::openStream()
 
     if (m_RtpSession.open(url))
     {
+
+        QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(getResource());
+        if (camera)
+            m_RtpSession.setAudioEnabled(camera->isAudioEnabled());
+
         m_RtpSession.play(AV_NOPTS_VALUE, AV_NOPTS_VALUE, 1.0);
         
         m_videoParser = createParser(m_RtpSession.getCodecNameByType("video").toUpper());
