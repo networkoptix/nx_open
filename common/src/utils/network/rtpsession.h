@@ -47,7 +47,7 @@ public:
     virtual qint64 read(char * data, qint64 maxSize );
     
     const RtspStatistic& getStatistic() { return m_statistic;}
-    void setStatistic(RtspStatistic& value) { m_statistic = value; }
+    void setStatistic(const RtspStatistic& value) { m_statistic = value; }
     CommunicatingSocket* getMediaSocket();
     UDPSocket* getRtcpSocket() const { return m_rtcpSocket; }
     void setTcpMode(bool value);
