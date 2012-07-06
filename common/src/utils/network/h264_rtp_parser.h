@@ -31,6 +31,7 @@ private:
     quint64 m_lastTimeStamp;
     quint16 m_firstSeqNum;
     quint16 m_packetPerNal;
+    int m_prevSequenceNum;
 
     QnCompressedVideoDataPtr m_videoData;
     CLByteArray m_videoBuffer;

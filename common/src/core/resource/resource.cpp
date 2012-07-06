@@ -557,7 +557,7 @@ void QnResource::setStatus(QnResource::Status newStatus, bool silenceMode)
 	qDebug() << "Change status. oldValue=" << oldStatus << " new value=" << newStatus << " id=" << m_id << " name=" << getName();
 #endif
 
-    if (newStatus == Offline)
+    if (newStatus == Offline || newStatus == Unauthorized)
         m_initialized = false;
 
     if (oldStatus == Offline && newStatus == Online)

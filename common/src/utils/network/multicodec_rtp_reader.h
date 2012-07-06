@@ -29,7 +29,12 @@ public:
     int getLastResponseCode() const;
 private:
     QnRtpStreamParser* createParser(const QString& codecName);
-    void initIO(RTPIODevice** ioDevice, QnRtpStreamParser* parser, const QString& mediaType);
+    void initIO(RTPIODevice** ioDevice, QnRtpStreamParser* parser, RTPSession::TrackType mediaType);
+    void setNeedKeyData();
+    void checkIfNeedKeyData();
+    QnAbstractMediaDataPtr getNextDataUDP();
+    QnAbstractMediaDataPtr getNextDataTCP();
+    void processTcpRtcp(RTPIODevice* ioDevice, quint8* buffer, int bufferSize);
 private:
     
     RTPSession m_RtpSession;
@@ -44,6 +49,7 @@ private:
     QList<QnAbstractMediaDataPtr> m_lastAudioData;
     int m_numberOfVideoChannels;
     QnRtspTimeHelper m_timeHelper;
+    QVector<int> m_gotKeyData;
 };
 
 #endif //__MULTI_CODEC_RTP_READER__

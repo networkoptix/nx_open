@@ -222,7 +222,7 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
             endTime = m_forcedEndTime;
 
         m_rtspSession.play(m_position, endTime, m_rtspSession.getScale());
-        m_rtpData = m_rtspSession.getTrackIoByType("video");
+        m_rtpData = m_rtspSession.getTrackIoByType(RTPSession::TT_VIDEO);
         if (!m_rtpData)
             m_rtspSession.stop();
     }
@@ -383,7 +383,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
         else {
             rtpChannelNum = m_rtpData->getMediaSocket()->getLocalPort();
         }
-        const QString format = m_rtspSession.getTrackFormat(rtpChannelNum).toLower();
+        const QString format = m_rtspSession.getTrackFormatByRtpChannelNum(rtpChannelNum).toLower();
         if (format.isEmpty()) {
             //qWarning() << Q_FUNC_INFO << __LINE__ << "RTP track" << rtpChannelNum << "not found";
         }

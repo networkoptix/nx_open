@@ -85,7 +85,7 @@ private:
     void setTimePeriodLocked(qint64 startTime, qint64 endTime);
 
     bool isProcessingPeriodValid() const;
-
+    qreal getAspectRatio();
 private:
     friend class QnThumbnailsLoaderHelper;
 
@@ -110,6 +110,7 @@ private:
     QStack<QnTimePeriod> m_processingStack;
     QnThumbnailsLoaderHelper *m_helper;
     int m_generation;
+    qreal m_cachedAspectRatio;
 };
 
 #endif // __THUMBNAILS_LOADER_H__

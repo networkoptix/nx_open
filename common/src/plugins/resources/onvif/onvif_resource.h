@@ -91,7 +91,8 @@ public:
     virtual bool shoudResolveConflicts() const override;
 
     virtual bool mergeResourcesIfNeeded(QnNetworkResourcePtr source) override;
-    
+
+    virtual int getMaxOnvifRequestTries() const { return 1; };
 
     int innerQualityToOnvif(QnStreamQuality quality) const;
     const QString createOnvifEndpointUrl() const { return createOnvifEndpointUrl(getHostAddress().toString()); }
