@@ -222,7 +222,7 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
             endTime = m_forcedEndTime;
 
         m_rtspSession.play(m_position, endTime, m_rtspSession.getScale());
-        m_rtpData = m_rtspSession.getTrackIoByType("video");
+        m_rtpData = m_rtspSession.getTrackIoByType(RTPSession::TT_VIDEO);
         if (!m_rtpData)
             m_rtspSession.stop();
     }

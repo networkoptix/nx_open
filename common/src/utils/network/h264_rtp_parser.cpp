@@ -212,7 +212,7 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStati
     m_prevSequenceNum = sequenceNum;
 
     if (rtpHeader->padding)
-        --bufferEnd;
+        bufferEnd -= bufferEnd[-1];
 
     int packetType = *curPtr++ & 0x1f;
 

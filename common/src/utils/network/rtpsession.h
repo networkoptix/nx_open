@@ -47,8 +47,10 @@ public:
     virtual qint64 read(char * data, qint64 maxSize );
     
     const RtspStatistic& getStatistic() { return m_statistic;}
+    void setStatistic(RtspStatistic& value) { m_statistic = value; }
     CommunicatingSocket* getMediaSocket();
     UDPSocket* getRtcpSocket() const { return m_rtcpSocket; }
+    void setTcpMode(bool value);
 private:
     void processRtcpData();
 private:
@@ -67,23 +69,41 @@ public:
 
     //typedef QMap<int, QScopedPointer<RTPIODevice> > RtpIoTracks;
 
+    enum TrackType {TT_VIDEO, TT_VIDEO_RTCP, TT_AUDIO, TT_AUDIO_RTCP, TT_METADATA, TT_METADATA_RTCP, TT_UNKNOWN};
+
     struct SDPTrackInfo
     {
-        SDPTrackInfo(const QString& _codecName, const QString& _codecType, const QString& _setupURL, int _mapNum, int _trackNum, RTPSession* owner, bool useTCP):
-            codecName(_codecName), codecType(_codecType), setupURL(_setupURL), mapNum(_mapNum), trackNum(_trackNum)
+        SDPTrackInfo(const QString& _codecName, QString trackTypeStr, const QString& _setupURL, int _mapNum, int _trackNum, RTPSession* owner, bool useTCP):
+            codecName(_codecName), setupURL(_setupURL), mapNum(_mapNum), trackNum(_trackNum)
         {
+            trackTypeStr = trackTypeStr.toLower();
+            if (trackTypeStr == "audio")
+                trackType = TT_AUDIO;
+            else if (trackTypeStr == "audio-rtcp")
+                trackType = TT_AUDIO_RTCP;
+            else if (trackTypeStr == "video")
+                trackType = TT_VIDEO;
+            else if (trackTypeStr == "video-rtcp")
+                trackType = TT_VIDEO_RTCP;
+            else if (trackTypeStr == "metadata")
+                trackType = TT_METADATA;
+            else
+                trackType == TT_UNKNOWN;
+
             ioDevice = new RTPIODevice(owner, useTCP);
         }
         ~SDPTrackInfo() { delete ioDevice; }
 
         QString codecName;
-        QString codecType;
+        TrackType trackType;
         QString setupURL;
         int mapNum;
         int trackNum;
 
         RTPIODevice* ioDevice;
     };
+
+    static QString mediaTypeToStr(TrackType tt);
 
     //typedef QMap<int, QSharedPointer<SDPTrackInfo> > TrackMap;
     typedef QList<QSharedPointer<SDPTrackInfo> > TrackMap;
@@ -117,7 +137,9 @@ public:
     bool sendKeepAliveIfNeeded();
 
     void setTransport(const QString& transport);
+    QString getTransport() const;
     QString getTrackFormatByRtpChannelNum(int channelNum);
+    TrackType getTrackTypeByRtpChannelNum(int channelNum);
 
     qint64 startTime() const;
     qint64 endTime() const;
@@ -146,14 +168,20 @@ public:
     /*
     * Find track by type ('video', 'audio' e t.c.) and returns track IO device. Returns 0 if track not found.
     */
-    RTPIODevice* getTrackIoByType(const QString& trackType);
+    RTPIODevice* getTrackIoByType(TrackType trackType);
 
-    QString getCodecNameByType(const QString& trackType);
-    QList<QByteArray> getSdpByType(const QString& trackType) const;
+    QString getCodecNameByType(TrackType trackType);
+    QList<QByteArray> getSdpByType(TrackType trackType) const;
 
     int getLastResponseCode() const;
 
     void setAudioEnabled(bool value);
+
+    int readBinaryResponce(quint8 *data, int maxDataSize);
+    void sendBynaryResponse(quint8* buffer, int size);
+
+    RtspStatistic parseServerRTCPReport(quint8* srcBuffer, int srcBufferSize);
+    int buildClientRTCPReport(quint8 *dstBuffer);
 signals:
     void gotTextResponse(QByteArray text);
 private:
@@ -161,6 +189,7 @@ private:
     qint64 m_endTime;
 
     QString getTrackFormat(int trackNum) const;
+    TrackType getTrackType(int trackNum) const;
     int readRAWData();
     bool sendDescribe();
     bool sendOptions();
@@ -168,7 +197,6 @@ private:
     bool sendKeepAlive();
 
     bool readTextResponce(QByteArray &responce);
-    int readBinaryResponce(quint8 *data, int maxDataSize);
     void addAuth(QByteArray& request);
 
 
@@ -176,8 +204,6 @@ private:
     void updateTransportHeader(QByteArray &responce);
 
     void parseSDP();
-    RtspStatistic parseServerRTCPReport(quint8* srcBuffer, int srcBufferSize);
-    int buildClientRTCPReport(quint8 *dstBuffer);
     void addAdditionAttrs(QByteArray& request);
     void updateResponseStatus(const QByteArray& response);
 private:
@@ -215,6 +241,7 @@ private:
     QString m_contentBase;
     int m_responseCode;
     bool m_isAudioEnabled;
+    QString m_prefferedTransport;
 };
 
 #endif //rtp_session_h_1935_h
