@@ -73,6 +73,23 @@ qint64 RTPIODevice::read(char *data, qint64 maxSize)
     return readed;
 }
 
+CommunicatingSocket* RTPIODevice::getMediaSocket()
+{ 
+    if (m_tcpMode) 
+        return &m_owner->m_tcpSock;
+    else
+        return m_mediaSocket; 
+}
+
+void RTPIODevice::setTcpMode(bool value)
+{ 
+    m_tcpMode = value; 
+    if (m_tcpMode) {
+        m_mediaSocket->close();
+        m_rtcpSocket->close();
+    }
+}
+
 void RTPIODevice::processRtcpData()
 {
     quint8 rtcpBuffer[MAX_RTCP_PACKET_SIZE];
@@ -354,6 +371,9 @@ bool RTPSession::open(const QString& url)
 
 RTPSession::TrackMap RTPSession::play(qint64 positionStart, qint64 positionEnd, double scale)
 {
+    m_prefferedTransport = m_transport;
+    if (m_prefferedTransport == "AUTO")
+        m_prefferedTransport = "TCP";
     if (!sendSetup() || m_sdpTracks.isEmpty())
         return TrackMap();
 
@@ -441,27 +461,27 @@ bool RTPSession::sendOptions()
 
 }
 
-RTPIODevice* RTPSession::getTrackIoByType(const QString& trackType)
+RTPIODevice* RTPSession::getTrackIoByType(TrackType trackType)
 {
     for (int i = 0; i < m_sdpTracks.size(); ++i)
     {
-        if (m_sdpTracks[i]->codecType == trackType)
+        if (m_sdpTracks[i]->trackType == trackType)
             return m_sdpTracks[i]->ioDevice;
     }
     return 0;
 }
 
-QString RTPSession::getCodecNameByType(const QString& trackType)
+QString RTPSession::getCodecNameByType(TrackType trackType)
 {
     for (int i = 0; i < m_sdpTracks.size(); ++i)
     {
-        if (m_sdpTracks[i]->codecType == trackType)
+        if (m_sdpTracks[i]->trackType == trackType)
             return m_sdpTracks[i]->codecName;
     }
     return QString();
 }
 
-QList<QByteArray> RTPSession::getSdpByType(const QString& trackType) const
+QList<QByteArray> RTPSession::getSdpByType(TrackType trackType) const
 {
     QList<QByteArray> rez;
     QList<QByteArray> tmp = m_sdp.split('\n');
@@ -469,7 +489,7 @@ QList<QByteArray> RTPSession::getSdpByType(const QString& trackType) const
     int mapNum = -1;
     for (int i = 0; i < m_sdpTracks.size(); ++i)
     {
-        if (m_sdpTracks[i]->codecType == trackType)
+        if (m_sdpTracks[i]->trackType == trackType)
             mapNum = m_sdpTracks[i]->mapNum;
     }
     if (mapNum == -1)
@@ -490,26 +510,18 @@ QList<QByteArray> RTPSession::getSdpByType(const QString& trackType) const
 
 bool RTPSession::sendSetup()
 {
-    QString transport = m_transport;
-    if (transport == "AUTO")
-        transport = "TCP"; // try TCP mode first
-    return sendSetupInternal(transport);
-}
-
-bool RTPSession::sendSetupInternal(const QString& transport)
-{
     int audioNum = 0;
 
     for (int i = 0; i < m_sdpTracks.size(); ++i)
     {
         QSharedPointer<SDPTrackInfo> trackInfo = m_sdpTracks[i];
 
-        if (trackInfo->codecType == "audio")
+        if (trackInfo->trackType == TT_AUDIO)
         {
             if (!m_isAudioEnabled || audioNum++ != m_selectedAudioChannel)
                 continue;
         }
-        else if (trackInfo->codecType != "video")
+        else if (trackInfo->trackType != TT_VIDEO)
         {
             continue; // skip metadata e.t.c
         }
@@ -541,9 +553,9 @@ bool RTPSession::sendSetupInternal(const QString& transport)
         request += "\r\n";
         addAuth(request);
         request += "User-Agent: Network Optix\r\n";
-        request += QString("Transport: RTP/AVP/") + transport + QString(";unicast;");
+        request += QString("Transport: RTP/AVP/") + m_prefferedTransport + QString(";unicast;");
 
-        if (transport == "UDP")
+        if (m_prefferedTransport == "UDP")
         {
             request += "client_port=";
             request += QString::number(trackInfo->ioDevice->getMediaSocket()->getLocalPort());
@@ -578,8 +590,10 @@ bool RTPSession::sendSetupInternal(const QString& transport)
 
         if (!responce.startsWith("RTSP/1.0 200"))
         {
-            if (m_transport == "AUTO" && transport == "TCP")
-                return sendSetupInternal("UDP"); // try UDP transport
+            if (m_transport == "AUTO" && m_prefferedTransport == "TCP") {
+                m_prefferedTransport = "UDP";
+                return sendSetup(); // try UDP transport
+            }
             else
                 return false;
         }
@@ -610,7 +624,7 @@ bool RTPSession::sendSetupInternal(const QString& transport)
         updateTransportHeader(responce);
     }
 
-    bool tcpMode = (transport == "TCP");
+    bool tcpMode = (m_prefferedTransport == "TCP");
     for (int i = 0; i < m_sdpTracks.size(); ++i)
         m_sdpTracks[i]->ioDevice->setTcpMode(tcpMode);
 
@@ -1161,21 +1175,21 @@ QString RTPSession::getTrackFormat(int trackNum) const
         return QString();
 }
 
-QString RTPSession::getTrackTypeByRtpChannelNum(int channelNum)
+RTPSession::TrackType RTPSession::getTrackTypeByRtpChannelNum(int channelNum)
 {
-    QString rez = getTrackType(channelNum / SDP_TRACK_STEP);
+    TrackType rez = getTrackType(channelNum / SDP_TRACK_STEP);
     if (channelNum % SDP_TRACK_STEP)
-        rez += "-rtcp";
+        rez = RTPSession::TrackType(int(rez)+1);
     return rez;
 }
 
-QString RTPSession::getTrackType(int trackNum) const
+RTPSession::TrackType RTPSession::getTrackType(int trackNum) const
 {
 
     if (trackNum < m_sdpTracks.size())
-        return m_sdpTracks[trackNum]->codecType;
+        return m_sdpTracks[trackNum]->trackType;
     else
-        return QString();
+        return TT_UNKNOWN;
 }
 
 qint64 RTPSession::startTime() const
@@ -1235,10 +1249,18 @@ void RTPSession::setProxyAddr(const QString& addr, int port)
     m_proxyPort = port;
 }
 
-CommunicatingSocket* RTPIODevice::getMediaSocket()
-{ 
-    if (m_tcpMode) 
-        return &m_owner->m_tcpSock;
+QString RTPSession::mediaTypeToStr(TrackType trackType)
+{
+    if (trackType == TT_AUDIO)
+        return "audio";
+    else if (trackType == TT_AUDIO_RTCP)
+        return "audio-rtcp";
+    else if (trackType == TT_VIDEO)
+        return "video";
+    else if (trackType == TT_VIDEO_RTCP)
+        return "video-rtcp";
+    else if (trackType == TT_METADATA)
+        return "metadata";
     else
-        return m_mediaSocket; 
+        return "TT_UNKNOWN";
 }

@@ -29,7 +29,7 @@ public:
     int getLastResponseCode() const;
 private:
     QnRtpStreamParser* createParser(const QString& codecName);
-    void initIO(RTPIODevice** ioDevice, QnRtpStreamParser* parser, const QString& mediaType);
+    void initIO(RTPIODevice** ioDevice, QnRtpStreamParser* parser, RTPSession::TrackType mediaType);
     void setNeedKeyData();
     void checkIfNeedKeyData();
     QnAbstractMediaDataPtr getNextDataUDP();
