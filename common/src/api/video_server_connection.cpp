@@ -8,6 +8,7 @@
 #include "video_server_connection_p.h"
 #include "session_manager.h"
 #include "api/serializer/serializer.h"
+#include "utils/common/rand.h"
 
 QString QnVideoServerConnection::m_proxyAddr;
 int QnVideoServerConnection::m_proxyPort = 0;
@@ -131,8 +132,6 @@ QnVideoServerConnection::QnVideoServerConnection(const QUrl &url, QObject *paren
     m_url(url)
 {
     QnNetworkProxyFactory::instance()->addToProxyList(m_url);
-    QTime time = QTime::currentTime();
-    qsrand((uint)time.msec());
 }
 
 QnVideoServerConnection::~QnVideoServerConnection() {}
@@ -308,7 +307,7 @@ void detail::VideoServerSessionManagerStatisticsRequestReplyProcessor::at_replyR
     {
         QByteArray root = extractXmlBody(reply, "root");
         QByteArray misc = extractXmlBody(root, "misc");
-        int usage = qrand() % 101;
+        int usage = cl_get_random_val(0, 100);
         qDebug() << "cpuInfo" << usage;
         emit finished(usage); 
     }

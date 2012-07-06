@@ -26,6 +26,7 @@ private:
 
     QnVideoServerConnectionPtr m_api_connection;
     QList<int> m_history;
+    QList<int> m_steps;
 };
 
 /**/
