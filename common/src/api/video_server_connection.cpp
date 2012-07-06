@@ -131,6 +131,8 @@ QnVideoServerConnection::QnVideoServerConnection(const QUrl &url, QObject *paren
     m_url(url)
 {
     QnNetworkProxyFactory::instance()->addToProxyList(m_url);
+    QTime time = QTime::currentTime();
+    qsrand((uint)time.msec());
 }
 
 QnVideoServerConnection::~QnVideoServerConnection() {}
