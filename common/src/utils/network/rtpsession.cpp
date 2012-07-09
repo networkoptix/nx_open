@@ -84,7 +84,7 @@ CommunicatingSocket* RTPIODevice::getMediaSocket()
 void RTPIODevice::setTcpMode(bool value)
 { 
     m_tcpMode = value; 
-    if (m_tcpMode) {
+    if (m_tcpMode && m_mediaSocket) {
         m_mediaSocket->close();
         m_rtcpSocket->close();
     }
