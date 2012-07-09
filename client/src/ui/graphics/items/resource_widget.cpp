@@ -914,9 +914,8 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     }
 
     if(m_pausedPainter.isNull()) {
-        m_pausedPainter = qn_pausedPainterStorage()->get();
-        m_loadingProgressPainter = qn_loadingProgressPainterStorage()->get();
-        //m_noDataPainter = qn_noDataPainterStorage()->get();
+        m_pausedPainter = qn_pausedPainterStorage()->get(QGLContext::currentContext());
+        m_loadingProgressPainter = qn_loadingProgressPainterStorage()->get(QGLContext::currentContext());
     }
 
     QnScopedPainterPenRollback penRollback(painter);

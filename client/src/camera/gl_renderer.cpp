@@ -1,7 +1,6 @@
 #include "gl_renderer.h"
 #include <cassert>
 #include <QCoreApplication> /* For Q_DECLARE_TR_FUNCTIONS. */
-#include <QMessageBox>
 #include <QErrorMessage>
 #include <QScopedPointer>
 #include <QMutex>
@@ -139,6 +138,7 @@ public:
     ~QnGlRendererTexture() {
         //glDeleteTextures(3, m_textures);
 
+        // TODO
         // I do not know why but if I glDeleteTextures here some items on the other view might become green( especially if we animate them a lot )
         // not sure I i do something wrong with opengl or it's bug of QT. for now can not spend much time on it. but it needs to be fixed.
         if(m_allocated)

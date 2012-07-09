@@ -21,14 +21,16 @@ public:
      * Constructor.
      * 
      * \param context                   OpenGL context that this functions instance will work with. 
-     *                                  If NULL, current context will be used.
      */
-    QnGlFunctions(const QGLContext *context = NULL);
+    QnGlFunctions(const QGLContext *context);
 
     /**
      * Virtual destructor.
      */
     virtual ~QnGlFunctions();
+
+
+    QGLContext *context() const;
 
     /**
      * \returns                         Set of features supported by the current OpenGL context.
