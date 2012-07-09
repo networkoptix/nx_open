@@ -233,9 +233,8 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent, QnWorkbenchContext *
     ui->resourceTreeView->setProperty(Qn::ItemViewItemBackgroundOpacity, 0.5);
     ui->searchTreeView->setProperty(Qn::ItemViewItemBackgroundOpacity, 0.5);
 
-    QPalette pp(ui->filterLineEdit->palette());
-    pp.setColor(QPalette::Background, pp.color(QPalette::Background));  // I hate this way of development..
-    ui->filterLineEdit->setPalette(pp);                                 // ..but this really works somehow
+    /* This is needed so that filter edit's context menu is not embedded into the scene. */
+    ui->filterLineEdit->setWindowFlags(ui->filterLineEdit->windowFlags() | Qt::BypassGraphicsProxyWidget);
 
     m_renameAction = new QAction(this);
 
