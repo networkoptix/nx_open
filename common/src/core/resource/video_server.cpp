@@ -2,9 +2,8 @@
 
 #include <QtCore/QUrl>
 #include "utils/common/delete_later.h"
+#include "core/dataprovider/media_streamdataprovider.h"
 #include "api/session_manager.h"
-
-#include "plugins/resources/archive/statistics_reader.h"
 
 QnLocalVideoServerResource::QnLocalVideoServerResource()
     : QnResource()
@@ -100,10 +99,18 @@ void QnVideoServerResource::setStorages(const QnAbstractStorageResourceList &sto
     m_storages = storages;
 }
 
+class QnEmptyDataProvider: public QnAbstractMediaStreamDataProvider{
+public:
+    QnEmptyDataProvider(QnResourcePtr resource): QnAbstractMediaStreamDataProvider(resource){}
+protected:
+    virtual QnAbstractMediaDataPtr getNextData() override{
+        QnAbstractMediaDataPtr data(new QnAbstractMediaData(0, 1));
+        return data;}
+};
+
+
 QnAbstractStreamDataProvider* QnVideoServerResource::createDataProviderInternal(ConnectionRole ){
-    QnStatisticsReader* result = new QnStatisticsReader(toSharedPointer());
-    result->setApiConnection(apiConnection());
-    return result;
+    return new QnEmptyDataProvider(toSharedPointer());
 }
 
 // --------------------------------------------------

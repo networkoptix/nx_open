@@ -37,6 +37,7 @@
 #include <ui/graphics/instruments/focus_listener_instrument.h>
 
 #include <ui/graphics/items/resource_widget.h>
+#include <ui/graphics/items/resource_server_widget.h>
 #include <ui/graphics/items/resource_widget_renderer.h>
 #include <ui/graphics/items/curtain_item.h>
 #include <ui/graphics/items/image_button_widget.h>
@@ -726,7 +727,12 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
         return false;
     }
 
-    QnResourceWidget *widget = new QnResourceWidget(context(), item);
+    QnResourceWidget *widget;
+    if (resource->checkFlags(QnResource::server))
+        widget = new QnResourceServerWidget(context(), item);
+    else
+        widget = new QnResourceWidget(context(), item);
+
     widget->setParent(this); /* Just to feel totally safe and not to leak memory no matter what happens. */
     widget->setAttribute(Qt::WA_DeleteOnClose);
     widget->setFrameOpacity(m_frameOpacity);

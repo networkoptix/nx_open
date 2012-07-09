@@ -298,6 +298,9 @@ signals:
 
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+
+    void assertPainters(); 
+
     virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual Qt::WindowFrameSection windowFrameSectionAt(const QPointF &pos) const override;
     virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override;
@@ -342,7 +345,7 @@ private slots:
     void at_resource_nameChanged();
     void at_searchButton_toggled(bool checked);
 
-private:
+protected:
     /**
      * \param channel                   Channel number.
      * \returns                         Rectangle in local coordinates where given channel is to be drawn.
@@ -390,8 +393,7 @@ private:
     void drawFilledRegion(QPainter *painter, const QRectF &rect, const QRegion &selection, const QColor& color, const QColor& penColor);
 
     void drawFlashingText(QPainter *painter, const QStaticText &text, qreal textSize, const QPointF &offset = QPointF());
-
-private:
+protected:
     /** Layout item. */
     QWeakPointer<QnWorkbenchItem> m_item;
 

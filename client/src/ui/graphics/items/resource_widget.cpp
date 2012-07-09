@@ -902,6 +902,14 @@ void QnResourceWidget::drawFlashingText(QPainter *painter, const QStaticText &te
     painter->setOpacity(opacity);
 }
 
+void QnResourceWidget::assertPainters(){
+    if(m_pausedPainter.isNull()) {
+        m_pausedPainter = qn_pausedPainterStorage()->get();
+        m_loadingProgressPainter = qn_loadingProgressPainterStorage()->get();
+        //m_noDataPainter = qn_noDataPainterStorage()->get();
+    }
+}
+
 void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/) {
     if (painter->paintEngine() == NULL) {
         qnWarning("No OpenGL-compatible paint engine was found.");
@@ -912,12 +920,8 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
         qnWarning("Painting with the paint engine of type '%1' is not supported", static_cast<int>(painter->paintEngine()->type()));
         return;
     }
+    assertPainters();
 
-    if(m_pausedPainter.isNull()) {
-        m_pausedPainter = qn_pausedPainterStorage()->get();
-        m_loadingProgressPainter = qn_loadingProgressPainterStorage()->get();
-        //m_noDataPainter = qn_noDataPainterStorage()->get();
-    }
 
     QnScopedPainterPenRollback penRollback(painter);
     QnScopedPainterBrushRollback brushRollback(painter);
