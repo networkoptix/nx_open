@@ -60,22 +60,31 @@ bool QnPlSonyResource::updateResourceCapabilities()
         request.Configuration->Resolution->Width = it->first;
         request.Configuration->Resolution->Height = it->second;
 
-        soapRes = soapWrapper.setVideoEncoderConfiguration(request, response);
-        if (soapRes != SOAP_OK) {
-            if (soapWrapper.isConflictError()) {
-                qDebug() << "QnPlSonyResource::updateResourceCapabilities: resolution " << it->first 
-                    << " x " << it->second << " dropped. UniqueId: " << getUniqueId();
-                it = resolutionListPtr->erase(it);
-                continue;
-            }
+        int retryCount = getMaxOnvifRequestTries();
+        soapRes = SOAP_ERR;
 
-            qWarning() << "QnPlSonyResource::updateResourceCapabilities: can't set video encoder options (token="
-                << confToken.c_str() << ") from camera (URL: " << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId()
-                << "). GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
-            return false;
+        while (soapRes != SOAP_OK && --retryCount >= 0)
+        {
+            soapRes = soapWrapper.setVideoEncoderConfiguration(request, response);
+            if (soapRes != SOAP_OK) {
+                if (soapWrapper.isConflictError()) {
+                    continue;
+                }
+
+                qWarning() << "QnPlSonyResource::updateResourceCapabilities: can't set video encoder options (token="
+                    << confToken.c_str() << ") from camera (URL: " << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId()
+                    << "). GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
+                return false;
+            }
         }
 
-        break;
+        if (soapRes == SOAP_OK) {
+            break;
+        }
+
+        qWarning() << "QnPlSonyResource::updateResourceCapabilities: resolution " << it->first 
+            << " x " << it->second << " dropped. UniqueId: " << getUniqueId();
+        it = resolutionListPtr->erase(it);
     }
 
     if (soapRes != SOAP_OK) {
