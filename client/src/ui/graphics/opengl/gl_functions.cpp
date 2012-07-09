@@ -158,12 +158,10 @@ Q_GLOBAL_STATIC(QnGlFunctionsPrivateStorage, qn_glFunctionsPrivateStorage);
 // QnGlFunctions
 // -------------------------------------------------------------------------- //
 QnGlFunctions::QnGlFunctions(const QGLContext *context) {
-    if(context == NULL)
-        context = QGLContext::currentContext();
-
     QnGlFunctionsPrivateStorage *storage = qn_glFunctionsPrivateStorage();
     if(storage)
         d = qn_glFunctionsPrivateStorage()->get(context);
+    
     if(d.isNull()) /* Application is being shut down. */
         d = QSharedPointer<QnGlFunctionsPrivate>(new QnGlFunctionsPrivate(NULL));
 }
