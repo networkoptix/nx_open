@@ -875,7 +875,7 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
     VideoConfigsReq confRequest;
     VideoConfigsResp confResponse;
 
-    int soapRes = soapWrapper.getVideoEncoderConfigurations(confRequest, confResponse);
+    int soapRes = soapWrapper.getVideoEncoderConfigurations(confRequest, confResponse); // get encoder list
     if (soapRes != SOAP_OK) {
         qCritical() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: can't get list of video encoders from camera (URL: "
             << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId() << "). GSoap error code: "
@@ -914,7 +914,7 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
 
         while (soapRes != SOAP_OK && --retryCount >= 0)
         {
-            soapRes = soapWrapperPtr->getVideoEncoderConfigurationOptions(optRequest, currVideoOpts.optionsResp);
+            soapRes = soapWrapperPtr->getVideoEncoderConfigurationOptions(optRequest, currVideoOpts.optionsResp); // get options per encoder
             if (soapRes != SOAP_OK || !currVideoOpts.optionsResp.Options) {
 
                 qCritical() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: can't receive options (or data is empty) for video encoder '" 
