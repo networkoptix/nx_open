@@ -223,8 +223,8 @@ void QnImageButtonWidget::click() {
 
 void QnImageButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *widget) {
     if(m_shader.isNull()) {
-        m_shader = qn_textureTransitionShaderProgramStorage()->get();
-        m_gl.reset(new QnGlFunctions());
+        m_shader = qn_textureTransitionShaderProgramStorage()->get(QGLContext::currentContext());
+        m_gl.reset(new QnGlFunctions(QGLContext::currentContext()));
     }
 
     StateFlags hoverState = m_state | HOVERED;

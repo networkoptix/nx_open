@@ -32,6 +32,11 @@ T linearCombine(qreal a, const T &x, qreal b, const T &y) {
     return T();
 }
 
+template<class T>
+T linearCombine(qreal a, const T &x) {
+    return linearCombine(a, x, 0.0, T());
+}
+
 
 class LinearCombinator {
 public:

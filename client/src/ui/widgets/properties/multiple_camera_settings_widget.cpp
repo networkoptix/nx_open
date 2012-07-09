@@ -136,6 +136,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
         ui->cameraScheduleWidget->setScheduleEnabled(Qt::PartiallyChecked);
         ui->cameraScheduleWidget->setScheduleTasks(QnScheduleTaskList());
         ui->cameraScheduleWidget->setChangesDisabled(true);
+        ui->cameraScheduleWidget->setMotionAvailable(false);
     } else {
         /* Aggregate camera parameters first. */
 
@@ -184,6 +185,10 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
 
         updateMaxFPS();
 
+        bool isMotionAvailable = true;
+        foreach (QnVirtualCameraResourcePtr camera, m_cameras) 
+            isMotionAvailable &= camera->getMotionType() != MT_NoMotion;
+
 
         /* Write camera parameters out. */
 
@@ -202,6 +207,8 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
             ui->passwordEdit->setText(QString());
             ui->passwordEdit->setPlaceholderText(tr("<multiple values>", "PasswordEdit"));
         }
+
+        ui->cameraScheduleWidget->setMotionAvailable(isMotionAvailable);
     }
 
     ui->cameraScheduleWidget->setCameras(m_cameras);

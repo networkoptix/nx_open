@@ -460,11 +460,11 @@ void QnCameraScheduleWidget::updateLicensesLabelText()
 }
 
 void QnCameraScheduleWidget::updateMotionButtons() {
-    bool hasDualStreaming = false;
-    bool hasMotion = false;
+    bool hasDualStreaming = !m_cameras.isEmpty();
+    bool hasMotion = !m_cameras.isEmpty();
     foreach(const QnVirtualCameraResourcePtr &camera, m_cameras) {
-        hasDualStreaming |= camera->hasDualStreaming();
-        hasMotion |= camera->supportedMotionType() != MT_NoMotion;
+        hasDualStreaming &= camera->hasDualStreaming();
+        hasMotion &= camera->supportedMotionType() != MT_NoMotion;
     }
 
     ui->recordMotionButton->setEnabled(m_motionAvailable && hasMotion);
