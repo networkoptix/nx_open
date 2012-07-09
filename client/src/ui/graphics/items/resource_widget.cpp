@@ -904,8 +904,8 @@ void QnResourceWidget::drawFlashingText(QPainter *painter, const QStaticText &te
 
 void QnResourceWidget::assertPainters(){
     if(m_pausedPainter.isNull()) {
-        m_pausedPainter = qn_pausedPainterStorage()->get();
-        m_loadingProgressPainter = qn_loadingProgressPainterStorage()->get();
+        m_pausedPainter = qn_pausedPainterStorage()->get(QGLContext::currentContext());
+        m_loadingProgressPainter = qn_loadingProgressPainterStorage()->get(QGLContext::currentContext());
         //m_noDataPainter = qn_noDataPainterStorage()->get();
     }
 }
