@@ -279,12 +279,12 @@
 								</goals>
 								<configuration>
 									<executable>qmake</executable>
-									<workingDirectory>${environment.dir}/qt/bin/</workingDirectory>		
+									<workingDirectory>${project.build.directory}</workingDirectory>		
 									<arguments>
 										<commandlineArgs>-tp</commandlineArgs>
 										<commandlineArgs>vc</commandlineArgs>
 										<commandlineArgs>-o</commandlineArgs>
-										<commandlineArgs>${project.build.directory}/${project.artifactId}-${arch}.vcproj</commandlineArgs>
+										<commandlineArgs>${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcproj</commandlineArgs>
 										<commandlineArgs>${project.build.directory}/${project.artifactId}.pro</commandlineArgs>
 									</arguments>
 								</configuration>
@@ -556,7 +556,7 @@
 								</configuration>
 							</execution>
 						</executions>
-					</plugin>						
+					</plugin>					
 				</plugins>
 			</build>
 		</profile> 
