@@ -188,7 +188,8 @@ QnPlOnvifResource::QnPlOnvifResource() :
     m_secondaryResolution(EMPTY_RESOLUTION_PAIR),
     m_audioBitrate(0),
     m_audioSamplerate(0),
-    m_needUpdateOnvifUrl(false)
+    m_needUpdateOnvifUrl(false),
+    m_forceCodecFromPrimaryEncoder(false)
 {
 }
 
@@ -376,6 +377,12 @@ void QnPlOnvifResource::fetchAndSetPrimarySecondaryResolution()
 
     m_primaryResolution = m_resolutionList.front();
     float currentAspect = getResolutionAspectRatio(m_primaryResolution);
+
+    // SD NTCS/PAL resolutions have non standart SAR. fix it
+    if (m_primaryResolution.first == 720 && (m_primaryResolution.second == 480 || m_primaryResolution.second == 576))
+    {
+        currentAspect = 4.0 / 3.0;
+    }
     m_secondaryResolution = getNearestResolutionForSecondary(SECONDARY_STREAM_DEFAULT_RESOLUTION, currentAspect);
 
     if (m_secondaryResolution != EMPTY_RESOLUTION_PAIR) {
@@ -875,6 +882,7 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
     VideoConfigsReq confRequest;
     VideoConfigsResp confResponse;
 
+    m_forceCodecFromPrimaryEncoder = false;
     int soapRes = soapWrapper.getVideoEncoderConfigurations(confRequest, confResponse); // get encoder list
     if (soapRes != SOAP_OK) {
         qCritical() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: can't get list of video encoders from camera (URL: "
@@ -893,15 +901,17 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
     QList<MediaSoapWrapperPtr> soapWrappersList;
 
     std::vector<onvifXsd__VideoEncoderConfiguration*>::const_iterator encIt = confResponse.Configurations.begin();
-    while (encIt != confResponse.Configurations.end())
+    for (;encIt != confResponse.Configurations.end(); ++encIt)
     {
-        if (!*encIt) {
-            ++encIt;
+        if (!*encIt) 
             continue;
-        }
+
+        onvifXsd__VideoEncoderConfiguration* configuration = *encIt;
 
         MediaSoapWrapperPtr soapWrapperPtr(new MediaSoapWrapper(endpoint, login, password));
         soapWrappersList.append(soapWrapperPtr);
+
+        qWarning() << "camera" << soapWrapperPtr->getEndpointUrl() << "get params from configuration" << configuration->Name.c_str();
 
         optionsList.append(VideoOptionsLocal());
         VideoOptionsLocal& currVideoOpts = optionsList.back();
@@ -911,8 +921,9 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
 
         int retryCount = getMaxOnvifRequestTries();
         soapRes = SOAP_ERR;
+        bool encodersFound = false;
 
-        while (soapRes != SOAP_OK && --retryCount >= 0)
+        for (;soapRes != SOAP_OK && retryCount >= 0; --retryCount)
         {
             soapRes = soapWrapperPtr->getVideoEncoderConfigurationOptions(optRequest, currVideoOpts.optionsResp); // get options per encoder
             if (soapRes != SOAP_OK || !currVideoOpts.optionsResp.Options) {
@@ -920,26 +931,30 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
                 qCritical() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: can't receive options (or data is empty) for video encoder '" 
                     << QString::fromStdString(*(optRequest.ConfigurationToken)) << "' from camera (URL: "  << soapWrapperPtr->getEndpointUrl() << ", UniqueId: " << getUniqueId()
                     << "). Root cause: SOAP request failed. GSoap error code: " << soapRes << ". " << soapWrapperPtr->getLastError();
-                return false;
-
+                //return false;
             }
 
             if (!currVideoOpts.optionsResp.Options->H264 && !currVideoOpts.optionsResp.Options->JPEG)
             {
-                qWarning() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: video encoder '" << optRequest.ConfigurationToken 
-                    << "' contains no data for H264/JPEG (URL: "  << soapWrapperPtr->getEndpointUrl() << ", UniqueId: " << getUniqueId() << ").";
-                soapRes = SOAP_ERR;
+                qWarning() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: video encoder '" << optRequest.ConfigurationToken->c_str()
+                    << "' contains no data for H264/JPEG (URL: "  << soapWrapperPtr->getEndpointUrl() << ", UniqueId: " << getUniqueId() << ")." << "Ignoring and use default codec list";
+                if (!optionsList.isEmpty())
+                {
+                    // no codec info for secondary encoder
+                    m_forceCodecFromPrimaryEncoder = true;
+                }
             }
         }
 
+
+        
         if (soapRes != SOAP_OK) {
+            qWarning() << "camera" << soapWrapperPtr->getEndpointUrl() << "got soap error for configuration" << configuration->Name.c_str() << "skip configuration";
             optionsList.pop_back();
-            ++encIt;
             continue;
         }
 
         currVideoOpts.id = optRequest.ConfigurationToken->c_str();
-        ++encIt;
     }
 
     qSort(optionsList.begin(), optionsList.end(), videoOptsGreaterThan);
@@ -1358,4 +1373,9 @@ const QnResourceAudioLayout* QnPlOnvifResource::getAudioLayout(const QnAbstractM
     }
     else
         return QnPhysicalCameraResource::getAudioLayout(dataProvider);
+}
+
+bool QnPlOnvifResource::forcePrimaryEncoderCodec() const
+{
+    return m_forceCodecFromPrimaryEncoder;
 }

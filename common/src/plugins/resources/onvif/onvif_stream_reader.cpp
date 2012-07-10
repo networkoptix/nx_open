@@ -362,6 +362,8 @@ bool QnOnvifStreamReader::fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper,
         bool bResult = false;
         while (!bResult && --triesLeft >= 0) {
             bResult = sendVideoEncoderToCamera(*result);
+            if (!bResult)
+                msleep(300);
         }
 
         return bResult;
@@ -373,12 +375,17 @@ bool QnOnvifStreamReader::fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper,
 VideoEncoder* QnOnvifStreamReader::fetchVideoEncoder(VideoConfigsResp& response, bool isPrimary) const
 {
     std::vector<VideoEncoder*>::const_iterator iter = response.Configurations.begin();
-    QString id = isPrimary ? m_onvifRes->getPrimaryVideoEncoderId() : m_onvifRes->getSecondaryVideoEncoderId();
+    QString id = (isPrimary || m_onvifRes->forcePrimaryEncoderCodec()) ? m_onvifRes->getPrimaryVideoEncoderId() : m_onvifRes->getSecondaryVideoEncoderId();
 
     while (iter != response.Configurations.end()) {
         VideoEncoder* conf = *iter;
 
         if (conf && id == conf->token.c_str()) {
+            if (!isPrimary && m_onvifRes->forcePrimaryEncoderCodec()) 
+            {
+                // get codec list from primary encoder, but use ID of secondary encoder
+                conf->token = m_onvifRes->getSecondaryVideoEncoderId().toStdString();
+            }
             return conf;
         }
 
