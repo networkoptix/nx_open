@@ -305,12 +305,9 @@ void QnVideoServerConnection::setProxyAddr(const QString& addr, int port)
 void detail::VideoServerSessionManagerStatisticsRequestReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray ,int ){
     if(status == 0)
     {
-        QByteArray root = extractXmlBody(reply, "root");
         QByteArray usagestr = extractXmlBody(reply, "usage");
-
-        qDebug() << "cpuInfo misc" << usagestr.toShort();
-        int usage = cl_get_random_val(0, 100);
-        qDebug() << "cpuInfo" << usage;
+        int usage =  usagestr.toShort();
+        //int usage =  cl_get_random_val(0, 80);
         emit finished(usage); 
     }
     deleteLater();
