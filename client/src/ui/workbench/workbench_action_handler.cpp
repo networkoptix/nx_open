@@ -473,6 +473,14 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog() {
     connection()->saveAsync(cameras, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
 }
 
+void QnWorkbenchActionHandler::rotateItems(int degrees){
+    QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
+    if(!widgets.empty()) {
+        foreach(const QnResourceWidget *widget, widgets)
+            widget->item()->setRotation(degrees);
+    }
+}
+
 void QnWorkbenchActionHandler::updateCameraSettingsEditibility() {
     if(!cameraSettingsDialog())
         return;
@@ -1794,35 +1802,19 @@ void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing30Action_triggered(
 }
 
 void QnWorkbenchActionHandler::at_rotate0Action_triggered(){
-    QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
-    if(!widgets.empty()) {
-        foreach(const QnResourceWidget *widget, widgets)
-            widget->item()->setRotation(0);
-    }
+    rotateItems(0);
 }
 
 void QnWorkbenchActionHandler::at_rotate90Action_triggered(){
-    QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
-    if(!widgets.empty()) {
-        foreach(const QnResourceWidget *widget, widgets)
-            widget->item()->setRotation(90);
-    }
+    rotateItems(90);
 }
 
 void QnWorkbenchActionHandler::at_rotate180Action_triggered(){
-    QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
-    if(!widgets.empty()) {
-        foreach(const QnResourceWidget *widget, widgets)
-            widget->item()->setRotation(180);
-    }
+    rotateItems(180);
 }
 
 void QnWorkbenchActionHandler::at_rotate270Action_triggered(){
-    QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
-    if(!widgets.empty()) {
-        foreach(const QnResourceWidget *widget, widgets)
-            widget->item()->setRotation(270);
-    }
+    rotateItems(270);
 }
 
 void QnWorkbenchActionHandler::at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle) {

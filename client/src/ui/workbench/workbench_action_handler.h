@@ -157,6 +157,8 @@ protected:
     void openNewWindow(const QStringList &args);
 
     void saveCameraSettingsFromDialog();
+
+    void rotateItems(int degrees);
     
     QnCameraSettingsDialog *cameraSettingsDialog() const {
         return m_cameraSettingsDialog.data();
