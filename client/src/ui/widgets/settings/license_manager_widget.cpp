@@ -185,7 +185,7 @@ void QnLicenseManagerWidget::at_gridLicenses_currentChanged() {
     ui->detailsButton->setEnabled(ui->gridLicenses->selectionModel()->currentIndex().isValid());
 }
 
-void QnLicenseManagerWidget::at_gridLicenses_itemDoubleClicked(QTreeWidgetItem *item, int){
+void QnLicenseManagerWidget::at_gridLicenses_itemDoubleClicked(QTreeWidgetItem *item, int) {
     const QnLicensePtr license = m_licenses.licenses().at(ui->gridLicenses->indexOfTopLevelItem(item));
     showLicenseDetails(license);
 }

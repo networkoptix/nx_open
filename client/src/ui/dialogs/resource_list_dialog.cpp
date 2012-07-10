@@ -57,8 +57,6 @@ QString QnResourceListDialog::bottomText() const {
 
 void QnResourceListDialog::setStandardButtons(QDialogButtonBox::StandardButtons standardButtons) {
     ui->buttonBox->setStandardButtons(standardButtons);
-    if (QPushButton* noButton = ui->buttonBox->button(QDialogButtonBox::No))
-        noButton->setFocus();
 }
 
 QDialogButtonBox::StandardButtons QnResourceListDialog::standardButtons() const {
