@@ -6,7 +6,7 @@
 
 QnLoadingProgressPainter::QnLoadingProgressPainter(qreal innerRadius, int sectorCount, qreal sectorFill, const QColor &startColor, const QColor &endColor):
     m_sectorCount(sectorCount),
-    m_program(new QnColorShaderProgram())
+    m_program(new QnColorShaderProgram(QGLContext::currentContext()))
 {
     /* Create display list. */
     m_list = glGenLists(1);

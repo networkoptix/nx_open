@@ -1,7 +1,7 @@
 #include "color_shader_program.h"
 
-QnColorShaderProgram::QnColorShaderProgram(QObject *parent):
-    QGLShaderProgram(parent)
+QnColorShaderProgram::QnColorShaderProgram(const QGLContext *context, QObject *parent):
+    QGLShaderProgram(context, parent)
 {
     addShaderFromSourceCode(QGLShader::Vertex, "                                \
         void main() {                                                           \

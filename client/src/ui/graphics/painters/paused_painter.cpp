@@ -3,7 +3,7 @@
 #include <ui/graphics/shaders/color_shader_program.h>
 
 QnPausedPainter::QnPausedPainter():
-    m_program(new QnColorShaderProgram()) 
+    m_program(new QnColorShaderProgram(QGLContext::currentContext())) 
 {
     /* Create display list. */
     m_list = glGenLists(1);

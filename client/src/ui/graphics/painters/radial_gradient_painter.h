@@ -1,13 +1,14 @@
 #ifndef QN_RADIAL_GRADIENT_PAINTER_H
 #define QN_RADIAL_GRADIENT_PAINTER_H
 
-#include <QScopedPointer>
+#include <QtCore/QScopedPointer>
+#include <QtGui/QColor>
 
 class QnColorShaderProgram;
 
 class QnRadialGradientPainter {
 public:
-    QnRadialGradientPainter(int sectorCount, const QColor &innerColor, const QColor &outerColor);
+    QnRadialGradientPainter(int sectorCount, const QColor &innerColor, const QColor &outerColor, const QGLContext *context);
 
     ~QnRadialGradientPainter();
 

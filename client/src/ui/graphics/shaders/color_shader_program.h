@@ -6,7 +6,7 @@
 class QnColorShaderProgram: public QGLShaderProgram {
     Q_OBJECT;
 public:
-    QnColorShaderProgram(QObject *parent = NULL);
+    QnColorShaderProgram(const QGLContext *context, QObject *parent = NULL);
 
     template<class T>
     void setColorMultiplier(const T &value) {
