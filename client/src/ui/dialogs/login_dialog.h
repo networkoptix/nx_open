@@ -2,6 +2,7 @@
 #define LOGINDIALOG_H
 
 #include <QtGui/QDialog>
+#include "connectinfo.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 
 class QDataWidgetMapper;
@@ -18,24 +19,22 @@ namespace Ui {
     class LoginDialog;
 }
 
-class LoginDialog : public QDialog
-{
+class LoginDialog : public QDialog {
     Q_OBJECT
 public:
     explicit LoginDialog(QnWorkbenchContext *context, QWidget *parent = 0);
     virtual ~LoginDialog();
 
+    QUrl currentUrl() const;
+    QnConnectInfoPtr currentInfo() const;
+
 public slots:
     virtual void accept() override;
     virtual void reject() override;
     void reset();
-    void perform();
-    void cancelProgress();
 
 protected:
     virtual void changeEvent(QEvent *event) override;
-
-    QUrl currentUrl();
 
     void updateStoredConnections();
 
@@ -47,7 +46,8 @@ private slots:
     void at_configureConnectionsButton_clicked();
     void at_testButton_clicked();
     void at_connectionsComboBox_currentIndexChanged(int index);
-    void at_testFinished(int status, const QByteArray &data, const QByteArray &errorString, int requestHandle);
+	void at_oldHttpConnectFinished(int status, QByteArray errorString, QByteArray data, int handle);
+    void at_connectFinished(int status, const QByteArray &errorString, QnConnectInfoPtr connectInfo, int requestHandle);
 
 private:
     Q_DISABLE_COPY(LoginDialog)
@@ -57,12 +57,9 @@ private:
     QStandardItemModel *m_connectionsModel;
     QDataWidgetMapper *m_dataWidgetMapper;
     int m_requestHandle;
+    QnConnectInfoPtr m_connectInfo;
 
     QnRenderingWidget* m_renderingWidget;
-
-    QProgressDialog* pd;
-    QTimer* t;
-    int steps;
 };
 
 #endif // LOGINDIALOG_H

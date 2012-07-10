@@ -339,7 +339,8 @@ bool QnNoptixStyle::drawProgressBarControl(const QStyleOption *option, QPainter 
     const bool busy = pb->maximum == pb->minimum;
     int x,y,l,t;
     pb->rect.getRect(&x,&y,&l,&t);
- /*   if (vertical) // swap width & height...
+
+ /*   if (vertical) // swap width & height... //TODO: make vertical progress bar
     { int h = x; x = y; y = h; l = pb->rect.height(); t = pb->rect.width(); }*/
 
     float anim_val = .0;
@@ -359,14 +360,14 @@ bool QnNoptixStyle::drawProgressBarControl(const QStyleOption *option, QPainter 
 
     painter->setPen(Qt::NoPen);
     if (val > 0.0){ // draw Contents
-        const QColor f1(4, 154, 116);
+        const QColor f1(4, 154, 116); //TODO: take color from config?
         const QColor f2 = pb->palette.color(QPalette::WindowText);
         const int offset = l * val;
         const int mid = (y + t) / 2;
         const int space = l * (val * .125);
 
         //QLinearGradient gradient(x - space, mid, x + offset + space, mid);
-         QLinearGradient gradient(x - space, mid, x + l + space, mid);
+        QLinearGradient gradient(x - space, mid, x + l + space, mid);
         if (anim_val < .08){
             float second_focus = .9 + anim_val*1.25;
             gradient.setColorAt(second_focus, f2);

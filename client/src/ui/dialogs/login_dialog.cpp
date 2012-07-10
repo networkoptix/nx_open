@@ -23,6 +23,8 @@
 
 #include "connection_testing_dialog.h"
 
+#include "connectinfo.h"
+
 namespace {
     void setEnabled(const QObjectList &objects, QObject *exclude, bool enabled) {
         foreach(QObject *object, objects)
@@ -105,9 +107,9 @@ void LoginDialog::updateFocus()
 {
     int size = m_dataWidgetMapper->model()->columnCount();
 
-    int i;
-    for(i = 0; i < size; i++) {
-        QWidget *widget = m_dataWidgetMapper->mappedWidgetAt(i);
+    QWidget *widget = NULL;
+    for(int i = 0; i < size; i++) {
+        widget = m_dataWidgetMapper->mappedWidgetAt(i);
         if(!widget)
             continue;
 
@@ -122,13 +124,13 @@ void LoginDialog::updateFocus()
         if((value.userType() == QVariant::Int || value.userType() == QVariant::LongLong) && value.toInt() == 0)
             break;
     }
-
-    if(i < size)
-        m_dataWidgetMapper->mappedWidgetAt(i)->setFocus();
+    
+    /* Set focus on the last widget in list if every widget is filled. */
+    if(widget)
+        widget->setFocus();
 }
 
-QUrl LoginDialog::currentUrl()
-{
+QUrl LoginDialog::currentUrl() const {
     const int row = ui->connectionsComboBox->currentIndex();
 
     QUrl url;
@@ -141,8 +143,11 @@ QUrl LoginDialog::currentUrl()
     return url;
 }
 
-void LoginDialog::accept()
-{
+QnConnectInfoPtr LoginDialog::currentInfo() const {
+    return m_connectInfo;
+}
+
+void LoginDialog::accept() {
     /* Widget data may not be written out to the model yet. Force it. */
     m_dataWidgetMapper->submit();
 
@@ -153,13 +158,24 @@ void LoginDialog::accept()
     }
 
     QnAppServerConnectionPtr connection = QnAppServerConnectionFactory::createConnection(url);
-    m_requestHandle = connection->testConnectionAsync(this, SLOT(at_testFinished(int, const QByteArray &, const QByteArray &, int)));
+    m_requestHandle = connection->connectAsync(this, SLOT(at_connectFinished(int, const QByteArray &, QnConnectInfoPtr, int)));
+
+	{
+		// Temporary 1.0/1.1 version check.
+		// Let's remove it 1.3/1.4.
+		QUrl httpUrl;
+		httpUrl.setHost(url.host());
+		httpUrl.setPort(url.port());
+		httpUrl.setScheme("http");
+		httpUrl.setUserName("");
+		httpUrl.setPassword("");
+		QnSessionManager::instance()->sendAsyncGetRequest(httpUrl, "resourceEx", this, SLOT(at_oldHttpConnectFinished(int,QByteArray,QByteArray,int)));
+	}
 
     updateUsability();
 }
 
-void LoginDialog::reject() 
-{
+void LoginDialog::reject() {
     if(m_requestHandle == -1) {
         QDialog::reject();
         return;
@@ -169,8 +185,7 @@ void LoginDialog::reject()
     updateUsability();
 }
 
-void LoginDialog::reset()
-{
+void LoginDialog::reset() {
     ui->hostnameLineEdit->clear();
     ui->portSpinBox->setValue(0);
     ui->loginLineEdit->clear();
@@ -179,8 +194,7 @@ void LoginDialog::reset()
     updateStoredConnections();
 }
 
-void LoginDialog::changeEvent(QEvent *event)
-{
+void LoginDialog::changeEvent(QEvent *event) {
     QDialog::changeEvent(event);
 
     switch (event->type()) {
@@ -192,8 +206,7 @@ void LoginDialog::changeEvent(QEvent *event)
     }
 }
 
-void LoginDialog::updateStoredConnections()
-{
+void LoginDialog::updateStoredConnections() {
     m_connectionsModel->removeRows(0, m_connectionsModel->rowCount());
 
     QnConnectionDataList connections = qnSettings->customConnections();
@@ -221,8 +234,7 @@ void LoginDialog::updateStoredConnections()
     ui->connectionsComboBox->setCurrentIndex(0); /* At last used connection. */
 }
 
-void LoginDialog::updateAcceptibility() 
-{
+void LoginDialog::updateAcceptibility() {
     bool acceptable = 
         !ui->passwordLineEdit->text().isEmpty() &&
         !ui->loginLineEdit->text().trimmed().isEmpty() &&
@@ -253,8 +265,23 @@ void LoginDialog::updateUsability() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void LoginDialog::at_testFinished(int status, const QByteArray &/*data*/, const QByteArray &/*errorString*/, int requestHandle)
-{
+void LoginDialog::at_oldHttpConnectFinished(int status, QByteArray errorString, QByteArray data, int handle) {
+	Q_UNUSED(handle);
+
+	if (status == 204) 	{
+		m_requestHandle = -1;
+
+		updateUsability();
+
+        QMessageBox::warning(
+            this,
+            tr("Could not connect to Enterprise Controller"),
+            tr("Connection could not be established.\nThe Enterprise Controller is incompatible. Please upgrade your enterprise controller or contact VMS administrator.")
+        );
+	}
+}
+
+void LoginDialog::at_connectFinished(int status, const QByteArray &/*errorString*/, QnConnectInfoPtr connectInfo, int requestHandle) {
     if(m_requestHandle != requestHandle) 
         return;
     m_requestHandle = -1;
@@ -267,38 +294,42 @@ void LoginDialog::at_testFinished(int status, const QByteArray &/*data*/, const 
             tr("Could not connect to Enterprise Controller"), 
             tr("Connection to the Enterprise Controller could not be established.\nConnection details that you have entered are incorrect, please try again.\n\nIf this error persists, please contact your VMS administrator.")
         );
+        updateFocus();
         return;
     }
 
-    QnConnectionData connectionData;
-    connectionData.url = currentUrl();
-    qnSettings->setLastUsedConnection(connectionData);
+    QnCompatibilityChecker remoteChecker(connectInfo->compatibilityItems);
+    QnCompatibilityChecker localChecker(localCompatibilityItems());
 
+    QnCompatibilityChecker* compatibilityChecker;
+    if (remoteChecker.size() > localChecker.size()) {
+        compatibilityChecker = &remoteChecker;
+    } else {
+        compatibilityChecker = &localChecker;
+    }
+
+    if (!compatibilityChecker->isCompatible(QLatin1String("Client"), qApp->applicationVersion(), QLatin1String("ECS"), connectInfo->version)) {
+        QMessageBox::warning(
+            this,
+            tr("Could not connect to Enterprise Controller"),
+            tr("Connection could not be established.\nThe Enterprise Controller is incompatible with this client. Please upgrade your client or contact your VMS administrator.")
+        );
+        updateFocus();
+        return;
+    }
+
+    m_connectInfo = connectInfo;
     QDialog::accept();
 }
 
-void LoginDialog::at_connectionsComboBox_currentIndexChanged(int index)
-{
+void LoginDialog::at_connectionsComboBox_currentIndexChanged(int index) {
     m_dataWidgetMapper->setCurrentModelIndex(m_connectionsModel->index(index, 0));
 }
 
-void LoginDialog::at_testButton_clicked()
-{
-    steps = 0;
-    pd = new QProgressDialog("Operation in progress.", "Cancel", 0, 100);
-    pd->setWindowModality(Qt::WindowModal);
-    //  connect(pd, SIGNAL(canceled()), this, SLOT(cancel()));
-    t = new QTimer(this);
-    connect(t, SIGNAL(timeout()), this, SLOT(perform()));
-    connect(pd, SIGNAL(canceled()), this, SLOT(cancelProgress()));
-    t->start(500);
-    pd->show();
-    return;
-
+void LoginDialog::at_testButton_clicked() {
     QUrl url = currentUrl();
 
-    if (!url.isValid())
-    {
+    if (!url.isValid()) {
         QMessageBox::warning(this, tr("Invalid parameters"), tr("The information you have entered is not valid."));
         return;
     }
@@ -306,26 +337,14 @@ void LoginDialog::at_testButton_clicked()
     QScopedPointer<QnConnectionTestingDialog> dialog(new QnConnectionTestingDialog(url, this));
     dialog->setModal(true);
     dialog->exec();
+
+    updateFocus();
 }
 
-void LoginDialog::at_configureConnectionsButton_clicked()
-{
+void LoginDialog::at_configureConnectionsButton_clicked() {
     QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(m_context.data(), this));
     dialog->setCurrentPage(QnPreferencesDialog::PageConnections);
 
     if (dialog->exec() == QDialog::Accepted)
         updateStoredConnections();
-}
-
-void LoginDialog::perform()
-{
-    pd->setValue(steps);
-    //... perform one percent of the operation
-    steps++;
-    if (steps > pd->maximum() - 1)
-        t->stop();
-}
-
-void LoginDialog::cancelProgress(){
-    exit(0);
 }
