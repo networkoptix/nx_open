@@ -1,12 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mediaserver", "x86\mediaserver-x86.vcproj", "{93A0D83D-4035-34BC-B310-A50288C13714}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mediaserver", "src\mediaserver-x86.vcproj", "{ABB046B0-926B-341E-93E1-09E3AE0FF1A3}"
 	ProjectSection(ProjectDependencies) = postProject
-		{0A3463EA-5BB2-30C5-8E29-597845243ACE} = {0A3463EA-5BB2-30C5-8E29-597845243ACE}
+		{6FF36EC2-D034-3D07-9965-E766A460BFAE} = {6FF36EC2-D034-3D07-9965-E766A460BFAE}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common", "..\common\x86\common-x86.vcproj", "{0A3463EA-5BB2-30C5-8E29-597845243ACE}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common", "..\common\src\common.vcproj", "{6FF36EC2-D034-3D07-9965-E766A460BFAE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -14,14 +14,14 @@ Global
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{93A0D83D-4035-34BC-B310-A50288C13714}.Debug|Win32.ActiveCfg = Debug|Win32
-		{93A0D83D-4035-34BC-B310-A50288C13714}.Debug|Win32.Build.0 = Debug|Win32
-		{93A0D83D-4035-34BC-B310-A50288C13714}.Release|Win32.ActiveCfg = Release|Win32
-		{93A0D83D-4035-34BC-B310-A50288C13714}.Release|Win32.Build.0 = Release|Win32
-		{0A3463EA-5BB2-30C5-8E29-597845243ACE}.Debug|Win32.ActiveCfg = Debug|Win32
-		{0A3463EA-5BB2-30C5-8E29-597845243ACE}.Debug|Win32.Build.0 = Debug|Win32
-		{0A3463EA-5BB2-30C5-8E29-597845243ACE}.Release|Win32.ActiveCfg = Release|Win32
-		{0A3463EA-5BB2-30C5-8E29-597845243ACE}.Release|Win32.Build.0 = Release|Win32
+		{ABB046B0-926B-341E-93E1-09E3AE0FF1A3}.Debug|Win32.ActiveCfg = Debug|Win32
+		{ABB046B0-926B-341E-93E1-09E3AE0FF1A3}.Debug|Win32.Build.0 = Debug|Win32
+		{ABB046B0-926B-341E-93E1-09E3AE0FF1A3}.Release|Win32.ActiveCfg = Release|Win32
+		{ABB046B0-926B-341E-93E1-09E3AE0FF1A3}.Release|Win32.Build.0 = Release|Win32
+		{6FF36EC2-D034-3D07-9965-E766A460BFAE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6FF36EC2-D034-3D07-9965-E766A460BFAE}.Debug|Win32.Build.0 = Debug|Win32
+		{6FF36EC2-D034-3D07-9965-E766A460BFAE}.Release|Win32.ActiveCfg = Release|Win32
+		{6FF36EC2-D034-3D07-9965-E766A460BFAE}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
