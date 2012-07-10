@@ -7,8 +7,8 @@
 #include "desktop_file_encoder.h"
 //#include "dsp_effects/denoiser.h"
 
-static const int DEFAULT_VIDEO_STREAM_ID = 4113;
-static const int DEFAULT_AUDIO_STREAM_ID = 4351;
+static const int DEFAULT_VIDEO_STREAM_ID = 0;
+static const int DEFAULT_AUDIO_STREAM_ID = 1;
 static const int AUDIO_QUEUE_MAX_SIZE = 256;
 static const int AUDIO_CAUPTURE_FREQUENCY = 44100;
 static const int BASE_BITRATE = 1000 * 1000 * 10; // bitrate for best quality for fullHD mode;
@@ -485,7 +485,7 @@ bool DesktopFileEncoder::init()
     m_formatCtx = avformat_alloc_context();
     initIOContext();
     m_formatCtx->pb = m_iocontext;
-    m_outputCtx = av_guess_format("mpegts",NULL,NULL);
+    m_outputCtx = av_guess_format("avi",NULL,NULL);
 
     m_outputCtx->video_codec = videoCodec->id;
 
@@ -516,6 +516,7 @@ bool DesktopFileEncoder::init()
     m_videoCodecCtx->pix_fmt = m_grabber->format();
     m_videoCodecCtx->width = m_grabber->width();
     m_videoCodecCtx->height = m_grabber->height();
+    m_videoCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
 
 
     m_videoCodecCtx->bit_rate = calculateBitrate();
@@ -622,6 +623,7 @@ bool DesktopFileEncoder::init()
         AVRational audioRational = {1, m_audioCodecCtx->sample_rate};
         m_audioCodecCtx->time_base	 = audioRational;
         m_audioCodecCtx->bit_rate = 64000 * m_audioCodecCtx->channels;
+        m_audioCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
 
         if (avcodec_open(m_audioCodecCtx, audioCodec) < 0)
         {
