@@ -639,13 +639,13 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
             display()->view(),
             tr("Save Recording As..."),
             previousDir + QLatin1Char('/') + suggetion,
-            tr("Transport Stream (*.ts)"),
+            tr("AVI (Audio/Video Interleaved) (*.avi)"),
             &selectedFilter,
             QFileDialog::DontUseNativeDialog
         );
 
         if (!filePath.isEmpty()) {
-            if (!filePath.endsWith(QLatin1String(".ts"), Qt::CaseInsensitive))
+            if (!filePath.endsWith(QLatin1String(".avi"), Qt::CaseInsensitive))
                 filePath += selectedFilter.mid(selectedFilter.indexOf(QLatin1Char('.')), 3);
 
             QFile::remove(filePath);
