@@ -1,17 +1,21 @@
 #include "gradient_background_painter.h"
+
 #include <cmath> /* For std::fmod. */
-#include <QRect>
-#include <QRadialGradient>
+
+#include <QtCore/QRect>
+#include <QtGui/QRadialGradient>
+
 #include <ui/common/linear_combination.h>
 #include <ui/graphics/painters/radial_gradient_painter.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
+#include <ui/graphics/opengl/gl_functions.h>
+
 #include "utils/settings.h"
 
 Q_GLOBAL_STATIC_WITH_ARGS(QnRadialGradientPainter, radialGradientPainter, (32, QColor(255, 255, 255, 255), QColor(255, 255, 255, 0)));
 
 QnGradientBackgroundPainter::QnGradientBackgroundPainter(qreal cycleIntervalSecs):
     m_cycleIntervalSecs(cycleIntervalSecs),
-    m_colorCombinator(LinearCombinator::forType(qMetaTypeId<QColor>())),
     m_settings(qnSettings)
 {
     m_timer.start();
@@ -44,14 +48,22 @@ void QnGradientBackgroundPainter::installedNotify() {
     QnLayerPainter::installedNotify();
 }
 
-void QnGradientBackgroundPainter::drawLayer(QPainter * painter, const QRectF & rect)
-{
-    if(!m_settings->isBackgroundAnimated())
-        return;
+QColor QnGradientBackgroundPainter::backgroundColor() const {
+    if(!m_settings)
+        return QColor(0, 0, 0, 0);
+
+    return m_settings.data()->backgroundColor();
+}
+
+void QnGradientBackgroundPainter::drawLayer(QPainter * painter, const QRectF & rect) {
+    if(!m_gl) 
+        m_gl.reset(new QnGlFunctions(QGLContext::currentContext()));
+    if(!(m_gl->features() & QnGlFunctions::ArbPrograms))
+        return; /* Don't draw anything on old OpenGL versions. */
 
     qreal pos = position();
 
-    QColor color = m_colorCombinator->combine(1.0 + 0.5 * pos, m_settings->backgroundColor()).value<QColor>();
+    QColor color = linearCombine(1.0 + 0.5 * pos, backgroundColor());
 
     QPointF center1(rect.center().x() - pos * rect.width() / 2, rect.center().y());
     QPointF center2(rect.center().x() + pos * rect.width() / 2, rect.center().y());

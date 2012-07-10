@@ -188,16 +188,16 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
 
         updateMaxFPS();
 
+        QnVirtualCameraResourceList cameras;
+        cameras.push_back(m_camera);
+        ui->cameraScheduleWidget->setCameras(cameras);
+
         QList<QnScheduleTask::Data> scheduleTasks;
         foreach (const QnScheduleTask& scheduleTaskData, m_camera->getScheduleTasks())
             scheduleTasks.append(scheduleTaskData.getData());
         ui->cameraScheduleWidget->setScheduleTasks(scheduleTasks);
         
         ui->cameraScheduleWidget->setScheduleEnabled(!m_camera->isScheduleDisabled());
-
-        QnVirtualCameraResourceList cameras;
-        cameras.push_back(m_camera);
-        ui->cameraScheduleWidget->setCameras(cameras);
 
         int currentCameraFps = ui->cameraScheduleWidget->getGridMaxFps();
         if (currentCameraFps > 0)
