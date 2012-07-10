@@ -133,3 +133,4 @@ cpp/x86/version.h
 common/compatibility_info.cpp
 client/src/compatibility_info.cpp
 mediaserver/src/compatibility_info.cpp
+*.vcproj
