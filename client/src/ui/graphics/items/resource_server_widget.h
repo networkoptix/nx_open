@@ -45,9 +45,13 @@ protected:
 private:
     void drawStatistics(int width, int height, QPainter *painter);
 
-    QnVideoServerConnectionPtr m_api_connection;
+    /** History of last responses */
     QList<int> m_history;
-    QList<int> m_steps;
+
+    /** Total number of responses received */ 
+    uint m_counter;
+
+    /** Timer for server requests scheduling */
     QTimer* m_timer;
 
     /** Status of the frame history */
