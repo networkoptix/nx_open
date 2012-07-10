@@ -73,5 +73,5 @@ int QnPlWatchDogResource::suggestBitrateKbps(QnStreamQuality q, QSize resolution
     int result = lowEnd + (hiEnd - lowEnd) * (q - QnQualityLowest) / (QnQualityHighest - QnQualityLowest);
     result *= (resolutionFactor * frameRateFactor);
 
-    return result;
+    return qMax(128,result);
 }

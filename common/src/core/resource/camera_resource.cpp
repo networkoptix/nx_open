@@ -58,7 +58,7 @@ int QnPhysicalCameraResource::suggestBitrateKbps(QnStreamQuality q, QSize resolu
     int result = lowEnd + (hiEnd - lowEnd) * (q - QnQualityLowest) / (QnQualityHighest - QnQualityLowest);
     result *= (resolutionFactor * frameRateFactor);
 
-    return result;
+    return qMax(128,result);
 }
 
 void QnPhysicalCameraResource::onPrimaryFpsUpdated(int newFps)

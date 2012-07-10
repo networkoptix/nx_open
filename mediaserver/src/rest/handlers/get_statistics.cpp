@@ -26,8 +26,8 @@ int QnGetStatisticsHandler::executeGet(const QString& path, const QnRequestParam
 
     result.append("<cpuinfo>\n");
     
-    result.append(QString("<model>%1</model>\n").arg(QnPerformance::getCpuBrand()));
-    result.append(QString("<cores>%1</cores>\n").arg(QnPerformance::getCpuCores()));
+    result.append(QString("<model>%1</model>\n").arg(QnPerformance::cpuBrand()));
+    result.append(QString("<cores>%1</cores>\n").arg(QnPerformance::cpuCoreCount()));
     result.append(QString("<usage>%1</usage>\n").arg(QnPerformance::currentCpuUsage()));
     result.append("</cpuinfo>\n");
 

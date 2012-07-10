@@ -30,12 +30,12 @@ public:
     /**
     * \returns                          Brandstring includes manufacturer, model and clockspeed
     */
-    static QString getCpuBrand();
+    static QString cpuBrand();
 
     /**
     * \returns                          Number of CPU cores
     */
-    static int getCpuCores();
+    static int cpuCoreCount();
 };
 
 
