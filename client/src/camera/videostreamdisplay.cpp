@@ -456,7 +456,7 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompress
     m_mtx.unlock();
     m_imageSize = QSize(decodeToFrame->width*dec->getSampleAspectRatio(), decodeToFrame->height);
 
-    if (qAbs(decodeToFrame->pkt_dts-data->timestamp) > 200*1000) {
+    if (qAbs(decodeToFrame->pkt_dts-data->timestamp) > 500*1000) {
         // prevent large difference after seek or EOF
         outFrame->pkt_dts = data->timestamp;
     }

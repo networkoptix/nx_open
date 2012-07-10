@@ -637,8 +637,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
     qint64 startTimeUSec = reader->startTime();                       /* vvvvv  If nothing is recorded, set minimum to end - 10s. */
     qint64 startTimeMSec = startTimeUSec == DATETIME_NOW ? endTimeMSec - 10000 : (startTimeUSec == AV_NOPTS_VALUE ? m_timeSlider->minimum() : startTimeUSec / 1000); 
 
-    m_timeSlider->setMinimum(startTimeMSec);
-    m_timeSlider->setMaximum(endTimeMSec);
+    m_timeSlider->setRange(startTimeMSec, endTimeMSec);
 
     if(!m_pausedOverride) {
         qint64 timeUSec = m_currentWidget->display()->camDisplay()->isRealTimeSource() ? DATETIME_NOW : m_currentWidget->display()->camera()->getCurrentTime();

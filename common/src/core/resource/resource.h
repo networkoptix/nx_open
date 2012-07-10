@@ -110,7 +110,8 @@ public:
 
     // this function is called if resourse changes state from offline to online or so 
     void init();
-
+    void initAsync();
+    
     // flags like network media and so on
     Flags flags() const;
     inline bool checkFlags(Flags flags) const { return (this->flags() & flags) == flags; }
@@ -200,7 +201,7 @@ signals:
     void flagsChanged();
 
     void resourceChanged();
-
+    void initAsyncFinished(QnResourcePtr resource, bool initialized);
 public:
     // this is thread to process commands like setparam
     static void startCommandProc();
@@ -231,7 +232,9 @@ private:
     void addConsumer(QnResourceConsumer *consumer);
     void removeConsumer(QnResourceConsumer *consumer);
     void disconnectAllConsumers();
+    void initAndEmit();
 
+    friend class InitAsyncTask;
 private:
     /* Private API for QnSharedResourcePointer. */
 
