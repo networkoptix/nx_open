@@ -290,8 +290,8 @@ void QnSingleCameraSettingsWidget::connectToMotionWidget() {
 void QnSingleCameraSettingsWidget::updateMotionWidgetNeedControlMaxRect() {
     if(!m_motionWidget)
         return;
-
-    m_motionWidget->setNeedControlMaxRects(m_cameraSupportsMotion && !ui->softwareMotionButton->isChecked());
+    bool hwMotion = m_camera && (m_camera->supportedMotionType() & (MT_HardwareGrid | MT_MotionWindow));
+    m_motionWidget->setNeedControlMaxRects(m_cameraSupportsMotion && hwMotion && !ui->softwareMotionButton->isChecked());
 }
 
 void QnSingleCameraSettingsWidget::updateMotionAvailability() {
