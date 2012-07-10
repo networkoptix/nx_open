@@ -493,38 +493,40 @@ qint64 QnPerformance::currentThreadTimeNSecs() {
 #endif
 }
 
-BOOL getQueryThreadCycleTimeDefault(HANDLE , PULONG64 ){
-    return false;
+#ifdef Q_OS_WIN
+BOOL getQueryThreadCycleTimeDefault(HANDLE , PULONG64) {
+    return FALSE;
 }
 
-class Performance{
+class PerformanceFunctions {
     typedef BOOL (*PtrQueryThreadCycleTime)(HANDLE ThreadHandle, PULONG64 CycleTime);
 
 public:
-    Performance::Performance(){
-#ifdef Q_OS_WIN
+    PerformanceFunctions() {
         QLibrary Kernel32Lib(QString::fromAscii("Kernel32"));    
         PtrQueryThreadCycleTime result = (PtrQueryThreadCycleTime) Kernel32Lib.resolve("QueryThreadCycleTime");
         if (result)
             queryThreadCycleTime = result;
-        queryThreadCycleTime = getQueryThreadCycleTimeDefault;
-#else
-        queryThreadCycleTime = getQueryThreadCycleTimeDefault;
-#endif
+        else
+            queryThreadCycleTime = &getQueryThreadCycleTimeDefault;
     }
+
     PtrQueryThreadCycleTime queryThreadCycleTime;
 };
 
-Q_GLOBAL_STATIC(Performance, performanceInstance);
-
+Q_GLOBAL_STATIC(PerformanceFunctions, performanceInstance);
+#endif // Q_OS_WIN
 
 qint64 QnPerformance::currentThreadCycles() {
+#ifdef Q_OS_WIN
     ULONG64 time;
-    
     BOOL status = performanceInstance()->queryThreadCycleTime(GetCurrentThread(), &time);
     if(!SUCCEEDED(status))
         return -1;
     return time;
+#else
+    return -1;
+#endif
 }
 
 qint64 QnPerformance::currentCpuFrequency() {
