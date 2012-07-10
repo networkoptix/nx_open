@@ -3,7 +3,9 @@
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 
-#include "core/resource/video_server.h"
+#include <core/resource/video_server.h>
+
+#include <ui/style/globals.h>
 
 #define LIMIT 60
 #define REQUEST_TIME 2000
@@ -20,7 +22,7 @@ QnResourceServerWidget::QnResourceServerWidget(QnWorkbenchContext *context, QnWo
         connect(m_timer, SIGNAL(timeout()), this, SLOT(at_timer_update()));
         m_timer->start(REQUEST_TIME);
 
-        m_background_gradient.setColorAt(0.0, QColor(0, 0, 195, 100));
+        m_background_gradient.setColorAt(0.0, qnGlobals->systemHealthColorBackground());
         m_background_gradient.setColorAt(1, QColor(0, 0, 0, 0));
 
 }
@@ -123,7 +125,7 @@ void QnResourceServerWidget::drawStatistics(int width, int height, QPainter *pai
     }
 
     QPen main_pen;{
-        main_pen.setColor(QColor(116, 151, 255));
+        main_pen.setColor(qnGlobals->systemHealthColorMain());
         main_pen.setWidthF(pen_width * 2);
         main_pen.setJoinStyle(Qt::RoundJoin);
         main_pen.setCapStyle(Qt::RoundCap);
@@ -139,10 +141,9 @@ void QnResourceServerWidget::drawStatistics(int width, int height, QPainter *pai
 
     if (grid_enabled){
         QPen grid;
-        grid.setColor(QColor(0, 75, 190, 100));
+        grid.setColor(qnGlobals->systemHealthColorGrid());
         grid.setWidthF(pen_width);
 
-        //const qreal step = ow / 20.0;
         QPainterPath grid_path;
         for (qreal i = offset - (x_step * (elapsed_step + m_counter%4)); i < ow + offset; i += x_step*4){
             grid_path.moveTo(i, offset);
@@ -195,9 +196,9 @@ void QnResourceServerWidget::drawStatistics(int width, int height, QPainter *pai
     QPainterPath result_path = scalePath(path, offset, oh);
     if (gradient_fill){
         QLinearGradient gradient(width / 2, offset + oh, width / 2,  offset);
-        gradient.setColorAt(0.0, QColor(0, 0, 255, 70));
-        gradient.setColorAt(0.5, QColor(255, 255, 0, 70));
-        gradient.setColorAt(1.0, QColor(255, 0, 0, 70));
+        gradient.setColorAt(0.0, qnGlobals->systemHealthColorGradientLow());
+        gradient.setColorAt(0.5, qnGlobals->systemHealthColorGradientMid());
+        gradient.setColorAt(1.0, qnGlobals->systemHealthColorGradientHigh());
         painter->setBrush(gradient);
         painter->drawPath(result_path);
     }
