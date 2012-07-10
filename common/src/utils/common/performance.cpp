@@ -13,6 +13,7 @@
 #   include <Windows.h>
 #   include <comdef.h>
 #   include <Wbemidl.h>
+#   include <QLibrary>
 #   pragma comment(lib, "wbemuuid.lib")
 #elif defined(Q_OS_LINUX)
 #   include <time.h>
@@ -492,16 +493,37 @@ qint64 QnPerformance::currentThreadTimeNSecs() {
 #endif
 }
 
-qint64 QnPerformance::currentThreadCycles() {
+typedef BOOL (*PtrQueryThreadCycleTime)(HANDLE ThreadHandle, PULONG64 CycleTime);
+
+BOOL getQueryThreadCycleTime(HANDLE ThreadHandle, PULONG64 CycleTime){
+    return QueryThreadCycleTime(ThreadHandle, CycleTime);
+}
+
+BOOL getQueryThreadCycleTimeDefault(HANDLE , PULONG64 ){
+    return false;
+}
+
+
+PtrQueryThreadCycleTime estimateQueryThreadCycleTime() {
 #ifdef Q_OS_WIN
+    QLibrary Kernel32Lib(QString::fromAscii("Kernel32"));    
+    PtrQueryThreadCycleTime result = (PtrQueryThreadCycleTime) Kernel32Lib.resolve("QueryThreadCycleTime");
+    if (result)
+        return getQueryThreadCycleTime;
+    return getQueryThreadCycleTimeDefault;
+#else
+    return getQueryThreadCycleTimeDefault;
+#endif
+}
+
+Q_GLOBAL_STATIC_WITH_INITIALIZER(PtrQueryThreadCycleTime, qn_QueryThreadCycleTime, { *x = estimateQueryThreadCycleTime(); });
+
+qint64 QnPerformance::currentThreadCycles() {
     ULONG64 time;
-    BOOL status = QueryThreadCycleTime(GetCurrentThread(), &time);
+    BOOL status = (*qn_QueryThreadCycleTime())(GetCurrentThread(), &time);
     if(!SUCCEEDED(status))
         return -1;
     return time;
-#else
-    return -1;
-#endif
 }
 
 qint64 QnPerformance::currentCpuFrequency() {
