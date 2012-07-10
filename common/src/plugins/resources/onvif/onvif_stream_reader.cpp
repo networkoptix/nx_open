@@ -101,21 +101,7 @@ void QnOnvifStreamReader::openStream()
 
 const QString QnOnvifStreamReader::updateCameraAndFetchStreamUrl() const
 {
-    QnResource::ConnectionRole role = getRole();
-
-    if (role == QnResource::Role_LiveVideo)
-    {
-        return updateCameraAndFetchStreamUrl(true);
-    }
-
-    if (role == QnResource::Role_SecondaryLiveVideo) {
-        return updateCameraAndFetchStreamUrl(false);
-    }
-
-    qCritical() << "QnOnvifStreamReader::updateCameraAndfetchStreamUrl: got unexpected role: " << role 
-        << ". UniqueId: " << m_onvifRes->getUniqueId() << ")";
-
-    return QString();
+    return updateCameraAndFetchStreamUrl(getRole() == QnResource::Role_LiveVideo);
 }
 
 const QString QnOnvifStreamReader::updateCameraAndFetchStreamUrl(bool isPrimary) const
@@ -377,9 +363,9 @@ VideoEncoder* QnOnvifStreamReader::fetchVideoEncoder(VideoConfigsResp& response,
     std::vector<VideoEncoder*>::const_iterator iter = response.Configurations.begin();
     QString id = (isPrimary || m_onvifRes->forcePrimaryEncoderCodec()) ? m_onvifRes->getPrimaryVideoEncoderId() : m_onvifRes->getSecondaryVideoEncoderId();
 
-    while (iter != response.Configurations.end()) {
+    for (;iter != response.Configurations.end(); ++iter) 
+    {
         VideoEncoder* conf = *iter;
-
         if (conf && id == conf->token.c_str()) {
             if (!isPrimary && m_onvifRes->forcePrimaryEncoderCodec()) 
             {
@@ -388,8 +374,6 @@ VideoEncoder* QnOnvifStreamReader::fetchVideoEncoder(VideoConfigsResp& response,
             }
             return conf;
         }
-
-        ++iter;
     }
 
     return 0;
@@ -580,30 +564,9 @@ bool QnOnvifStreamReader::sendProfileToCamera(CameraInfo& info, Profile& profile
         }
     }
 
-    //Adding video encoder
-    if (!info.videoEncoderId.isEmpty())
-    {
-        AddVideoConfigReq request;
-        AddVideoConfigResp response;
-
-        request.ProfileToken = profile.token;
-        request.ConfigurationToken = info.videoEncoderId.toStdString();
-
-        int soapRes = soapWrapper.addVideoEncoderConfiguration(request, response);
-        if (soapRes != SOAP_OK) {
-            qCritical() << "QnOnvifStreamReader::addVideoEncoderConfiguration: can't add video encoder to profile. Gsoap error: " 
-                << soapRes << ", description: " << soapWrapper.getLastError() 
-                << ". URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << m_onvifRes->getUniqueId();
-
-            return false;
-        }
-    } else {
-        return false;
-    }
-
-    bool result  = true;
+    bool result  = !info.videoSourceId.isEmpty();
     //Adding video source
-    if (!info.videoSourceId.isEmpty())
+    if (result && (profile.VideoSourceConfiguration == 0 || profile.VideoSourceConfiguration->token != info.videoSourceId.toStdString()))
     {
         AddVideoSrcConfigReq request;
         AddVideoSrcConfigResp response;
@@ -619,12 +582,58 @@ bool QnOnvifStreamReader::sendProfileToCamera(CameraInfo& info, Profile& profile
             
             result = false;
         }
-    } else {
-        result = false;
     }
 
+    //Adding video encoder
+    if (!info.videoEncoderId.isEmpty())
+    {
+        if (profile.VideoEncoderConfiguration == 0 || profile.VideoEncoderConfiguration->token != info.videoEncoderId.toStdString())
+        {
+            AddVideoConfigReq request;
+            AddVideoConfigResp response;
+
+            request.ProfileToken = profile.token;
+            request.ConfigurationToken = info.videoEncoderId.toStdString();
+
+            int soapRes = soapWrapper.addVideoEncoderConfiguration(request, response);
+            if (soapRes != SOAP_OK) {
+                qCritical() << "QnOnvifStreamReader::addVideoEncoderConfiguration: can't add video encoder to profile. Gsoap error: " 
+                    << soapRes << ", description: " << soapWrapper.getLastError() 
+                    << ". URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << m_onvifRes->getUniqueId();
+
+                return false;
+            }
+        }
+    } else {
+        return false;
+    }
+
+    //Adding audio source
+    if (!info.audioSourceId.isEmpty() && (profile.AudioSourceConfiguration == 0 || profile.AudioSourceConfiguration->token != info.audioSourceId.toStdString()))
+    {
+        AddAudioSrcConfigReq request;
+        AddAudioSrcConfigResp response;
+
+        request.ProfileToken = profile.token;
+        request.ConfigurationToken = info.audioSourceId.toStdString();
+
+        int soapRes = soapWrapper.addAudioSourceConfiguration(request, response);
+        if (soapRes != SOAP_OK) {
+            qCritical() << "QnOnvifStreamReader::addAudioSourceConfiguration: can't add audio source to profile. Gsoap error: " 
+                << soapRes << ", description: " << soapWrapper.getLastError() 
+                << ". URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << m_onvifRes->getUniqueId();
+
+            //Sound can be absent, so ignoring;
+            //result = false;
+        }
+    } else {
+        //Sound can be absent, so ignoring;
+        //result = false;
+    }
+
+
     //Adding audio encoder
-    if (!info.audioEncoderId.isEmpty())
+    if (!info.audioEncoderId.isEmpty() && (profile.AudioEncoderConfiguration == 0 || profile.AudioEncoderConfiguration->token != info.audioEncoderId.toStdString()))
     {
         AddAudioConfigReq request;
         AddAudioConfigResp response;
@@ -641,29 +650,6 @@ bool QnOnvifStreamReader::sendProfileToCamera(CameraInfo& info, Profile& profile
             //Sound can be absent, so ignoring;
             //result = false;
 
-        }
-    } else {
-        //Sound can be absent, so ignoring;
-        //result = false;
-    }
-
-    //Adding audio source
-    if (!info.audioSourceId.isEmpty())
-    {
-        AddAudioSrcConfigReq request;
-        AddAudioSrcConfigResp response;
-
-        request.ProfileToken = profile.token;
-        request.ConfigurationToken = info.audioSourceId.toStdString();
-
-        int soapRes = soapWrapper.addAudioSourceConfiguration(request, response);
-        if (soapRes != SOAP_OK) {
-            qCritical() << "QnOnvifStreamReader::addAudioSourceConfiguration: can't add audio source to profile. Gsoap error: " 
-                << soapRes << ", description: " << soapWrapper.getLastError() 
-                << ". URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << m_onvifRes->getUniqueId();
-
-            //Sound can be absent, so ignoring;
-            //result = false;
         }
     } else {
         //Sound can be absent, so ignoring;
