@@ -1,7 +1,6 @@
 #include "performance.h"
 #include <QtCore/QtGlobal>
 
-#if 0
 
 // timer step in seconds
 #define CPU_USAGE_REFRESH 1
@@ -528,4 +527,3 @@ int QnPerformance::getCpuCores(){
     return *qn_estimatedCpuCores();
 }
 
-#endif

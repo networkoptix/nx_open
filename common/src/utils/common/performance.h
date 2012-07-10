@@ -3,7 +3,6 @@
 
 #include <QtGlobal>
 
-#if 0
 class QnPerformance {
 public:
     static qint64 currentThreadTimeMSecs();
@@ -39,6 +38,5 @@ public:
     static int getCpuCores();
 };
 
-#endif 
 
 #endif // QN_PERFORMANCE_H
