@@ -1,9 +1,10 @@
 #include "performance.h"
+
 #include <QtCore/QtGlobal>
+#include <QtCore/QCoreApplication>
+#include <QtCore/QThread>
 
-
-// timer step in seconds
-#define CPU_USAGE_REFRESH 1
+#include "warnings.h"
 
 
 #if defined(Q_OS_WIN)
@@ -20,14 +21,17 @@
 #   define SIG_CODE SIGRTMIN
 #endif
 
-#include "warnings.h"
 
-    // cpu_usage block
+/** CPU usage update timer, in seconds. */
+#define CPU_USAGE_REFRESH 1
+
+    
 #if defined(Q_OS_WIN)
+
 namespace {
+
     class CpuUsageRefresher {
     public:
-
         CpuUsageRefresher() {
             m_locator = NULL;
             m_service = NULL;
@@ -37,8 +41,8 @@ namespace {
             m_initialized = init();
         }
 
-        ~CpuUsageRefresher(){
-            if(m_initialized){
+        ~CpuUsageRefresher() {
+            if(m_initialized) {
                 m_service->Release(); 
                 m_locator->Release();     
                 CoUninitialize();
@@ -96,12 +100,11 @@ namespace {
             }
         }
 
-        bool init(){
-            if (QSysInfo::windowsVersion() <= QSysInfo::WV_2000){
+        bool init() {
+            if (QSysInfo::windowsVersion() <= QSysInfo::WV_2000) {
                 qnWarning("Windows version too low to use WMI");
                 return false;
             }
-            
 
             HRESULT hres;
 
@@ -201,8 +204,8 @@ namespace {
             return true;
         }
 
-        // possibly will be used in other WMI requests
-        IEnumWbemClassObject* query(char* query_str){
+        
+        IEnumWbemClassObject *query(char *query_str) {
             IEnumWbemClassObject* enumerator = NULL;
             HRESULT hres;
             hres = m_service->ExecQuery(
@@ -221,37 +224,40 @@ namespace {
         }
 
     private:
-        /** Flag of successful initialization */
+        /** Flag of successful initialization. */
         bool m_initialized;
 
-        /** WMI namespace locator interface*/
+        /** WMI namespace locator interface. */
         IWbemLocator *m_locator;
 
-        /** WMI services provider interface */ 
+        /** WMI services provider interface. */ 
         IWbemServices *m_service;
 
-        /** Previous value of raw WMI PercentProcessorTime stat */
+        /** Previous value of raw WMI PercentProcessorTime stat. */
         quint64 m_cpu;
 
-        /** Previous value of raw WMI Timestamp_Sys100NS stat */
+        /** Previous value of raw WMI Timestamp_Sys100NS stat. */
         quint64 m_ts;
 
-        /** Processor usage percent for the last CPU_USAGE_REFRESH seconds */
+        /** Processor usage percent for the last CPU_USAGE_REFRESH seconds. */
         uint m_usage;
 
-        /** System timer for processor usage calculating */
+        /** System timer for processor usage calculating. */
         UINT_PTR m_timer;
     };
 
     Q_GLOBAL_STATIC(CpuUsageRefresher, refresherInstance);
     // initializer for Q_GLOBAL_STATIC singleton
-    CpuUsageRefresher* dummy = refresherInstance();
+    CpuUsageRefresher *dummy = refresherInstance();
 
     VOID CALLBACK CpuUsageRefresher::timerCallback(HWND /*hwnd*/, UINT /*uMsg*/, UINT_PTR /*idEvent*/, DWORD /*dwTime*/) {
         refresherInstance()->refresh();
     }
+
 } // anonymous namespace
+
 #elif defined(Q_OS_LINUX)
+
 namespace{
 // very useful function, I'd move it to any shared linux util class
     static QString getSystemOutput(QString cmds)
@@ -287,9 +293,9 @@ namespace{
 
     static void timerCallback(int sig, siginfo_t *si, void *uc);
 
-    class CpuUsageRefresher{
+    class CpuUsageRefresher {
     public:
-        CpuUsageRefresher(){
+        CpuUsageRefresher() {
             m_cpu = 0;
             m_process_cpu = 0;
             m_usage = 0;
@@ -297,20 +303,20 @@ namespace{
             m_initialized = init();
         }
 
-        ~CpuUsageRefresher(){
+        ~CpuUsageRefresher() {
             if (m_timer)
                 timer_delete(m_timer);
         }
 
-        uint usage(){
+        uint usage() {
             return m_usage;
         }
 
-        void** getTimerId(){
+        void** getTimerId() {
             return &m_timer;
         }
 
-        void refresh(){
+        void refresh() {
             qulonglong cpu = getCpu();
             qulonglong process_cpu = getProcessCpu();
             if (process_cpu > 0 && m_cpu > 0){
@@ -321,7 +327,7 @@ namespace{
         }
 
     private:
-        bool init(){
+        bool init() {
             /* Establish handler for timer signal */
             struct sigaction sa;
             sa.sa_flags = SA_SIGINFO;
@@ -357,7 +363,7 @@ namespace{
         }
 
         /** Calculate total cpu jiffies */
-        qulonglong getCpu(){
+        qulonglong getCpu() {
             qulonglong result = 0;
 
             QString proc_stat = getSystemOutput("cat /proc/stat | grep \"cpu \"").mid(5);
@@ -368,7 +374,7 @@ namespace{
             return result;
         }
 
-        qulonglong getProcessCpu(){
+        qulonglong getProcessCpu() {
             QString request = QString("cat /proc/%1/stat").arg(QCoreApplication::applicationPid ());
             QStringList proc_stat = getSystemOutput(request).split(' ', QString::SkipEmptyParts);
             if (proc_stat.count() > 14){
@@ -392,7 +398,7 @@ namespace{
     // initializer for Q_GLOBAL_STATIC singleton
     CpuUsageRefresher* dummy = refresherInstance();
 
-    static void timerCallback(int, siginfo_t *si, void*){
+    static void timerCallback(int, siginfo_t *si, void*) {
         CpuUsageRefresher *refresher = refresherInstance();
         if (si->si_value.sival_ptr == refresher->getTimerId()){
             refresher->refresh();
@@ -437,7 +443,7 @@ Q_GLOBAL_STATIC_WITH_INITIALIZER(qint64, qn_estimatedCpuFrequency, { *x = estima
 
 QString estimateCpuBrand() {
 #if defined(Q_OS_WIN)
-    int oCPUInfo[4] = {-1}; // TODO: class names start with a Capital letter, variable names - with a lowercase.
+    int oCPUInfo[4] = {-1}; 
     unsigned nExIds, i =  0;
     char brandString[0x40];
     // Get the information associated with each extended ID.
@@ -459,18 +465,11 @@ QString estimateCpuBrand() {
     // 13 - const length of 'model name : ' string with tabs - standard output of /proc/cpuinfo
     return getSystemOutput("grep \"model name\" /proc/cpuinfo | head -1").mid(13);
 #else
-    qnWarning("Essential define not found");
-    return "Unknown CPU"
+    return QLatin1String("Unknown CPU");
 #endif
 }
 
-
-int estimateCpuCores() {
-    return QThread::idealThreadCount();
-}
-
 Q_GLOBAL_STATIC_WITH_INITIALIZER(QString, qn_estimatedCpuBrand, { *x = estimateCpuBrand(); });
-Q_GLOBAL_STATIC_WITH_INITIALIZER(int, qn_estimatedCpuCores, { *x = estimateCpuCores(); });
 
 qint64 QnPerformance::currentThreadTimeMSecs() {
     qint64 result = currentThreadTimeNSecs();
@@ -511,7 +510,7 @@ qint64 QnPerformance::currentCpuFrequency() {
 #endif
 }
 
-qint64 QnPerformance::currentCpuUsage(){
+qint64 QnPerformance::currentCpuUsage() {
 #if defined(Q_OS_WIN) || defined(Q_OS_LINUX)
     return refresherInstance()->usage();
 #else
@@ -519,11 +518,11 @@ qint64 QnPerformance::currentCpuUsage(){
 #endif
 }
 
-QString QnPerformance::getCpuBrand(){
+QString QnPerformance::getCpuBrand() {
     return *qn_estimatedCpuBrand();
 }
 
-int QnPerformance::getCpuCores(){
-    return *qn_estimatedCpuCores();
+int QnPerformance::getCpuCores() {
+    return QThread::idealThreadCount();
 }
 
