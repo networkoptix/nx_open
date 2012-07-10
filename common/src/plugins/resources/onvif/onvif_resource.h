@@ -121,6 +121,8 @@ public:
     AUDIO_CODECS getAudioCodec() const;
 
     const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider);
+
+    bool forcePrimaryEncoderCodec() const;
 protected:
 
     void setCodec(CODECS c);
@@ -132,8 +134,6 @@ protected:
     virtual void setCropingPhysical(QRect croping);
 
     virtual bool updateResourceCapabilities();
-
-    
 
 private:
 
@@ -197,6 +197,7 @@ private:
     QString m_audioSourceId;
 
     bool m_needUpdateOnvifUrl;
+    bool m_forceCodecFromPrimaryEncoder;
 
 };
 
