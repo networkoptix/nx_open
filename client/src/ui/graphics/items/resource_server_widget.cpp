@@ -1,9 +1,12 @@
 #include "resource_server_widget.h"
 
 #include <utils/common/warnings.h>
+#include <utils/common/scoped_painter_rollback.h>
+
 #include "core/resource/video_server.h"
 
 #define LIMIT 60
+#define REQUEST_TIME 2000
 
 QnResourceServerWidget::QnResourceServerWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent /* = NULL */):
     QnResourceWidget(context, item, parent),
@@ -32,7 +35,7 @@ QnResourceServerWidget::QnResourceServerWidget(QnWorkbenchContext *context, QnWo
 
         m_timer = new QTimer(this);
         connect(m_timer, SIGNAL(timeout()), this, SLOT(at_timer_update()));
-        m_timer->start(2000);
+        m_timer->start(REQUEST_TIME);
 
         m_background_gradient.setColorAt(0.0, QColor(0, 0, 195, 100));
         m_background_gradient.setColorAt(1, QColor(0, 0, 0, 0));
@@ -79,14 +82,13 @@ void QnResourceServerWidget::at_timer_update(){
         if (m_redrawStatus != Qn::CannotLoad)
             m_redrawStatus = Qn::LoadingFrame;
     }
-    else{
-        m_alreadyUpdating = true;
-        m_api_connection->asyncGetStatistics(this, SLOT(at_statistics_received(int)));
-    }
+    m_alreadyUpdating = true;
+    QnVideoServerResourcePtr server = resource().dynamicCast<QnVideoServerResource>();
+    Q_ASSERT(server);
+    int handle = server->apiConnection()->asyncGetStatistics(this, SLOT(at_statistics_received(int)));
 }
 
 void QnResourceServerWidget::at_statistics_received(int usage){
-    qDebug() << "received stats " << usage;
     m_alreadyUpdating = false;
     m_redrawStatus = Qn::NewFrame;
     m_history.push_back(usage);
@@ -108,28 +110,17 @@ QPainterPath scalePath(const QPainterPath &source, qreal scaleFactor, qreal offs
     return path;
 }
 
-
-QPainterPath scalePathXY(const QPainterPath &source, qreal scaleFactorX, qreal scaleFactorY, qreal offsetX, qreal offsetY){
-    QPainterPath path;
-    path.addPath(source);
-    //   qreal flip = m_intensity / qreal(100);
-    for (int i=0; i<path.elementCount(); ++i)  {
-        const QPainterPath::Element &e = path.elementAt(i);
-        qreal x = e.x * scaleFactorX + offsetX;
-        qreal y = e.y * scaleFactorY + offsetY;
-        path.setElementPositionAt(i, x, y);
-    }
-    return path;
-}
-
 void QnResourceServerWidget::drawStatistics(int width, int height, QPainter *painter){
-   //painter->setOpacity(.5);
+    QnScopedPainterPenRollback penRollback(painter);
+    QnScopedPainterBrushRollback brushRollback(painter);
+    QnScopedPainterFontRollback fontRollback(painter);
 
+   //painter->setOpacity(.5);
     qreal min = qMin(width, height);
 
     bool stretch_y = false;
     bool grid_enabled = true;
-    bool background_enabled = false;
+    bool background_enabled = true;
     qreal offset = min / 20.0;
     qreal pen_width = width / 500.0;
 
@@ -196,13 +187,16 @@ void QnResourceServerWidget::drawStatistics(int width, int height, QPainter *pai
  //   painter->setPen(usage);
 
     QPainterPath path;
-    int max_value = stretch_y ? 0 : 100;
+    int max_value = -1;
+    int prev_value = 0;
+    int last_value = 0;
+    qreal elapsed_step = qMin(m_elapsed_timer.elapsed(), (qint64)REQUEST_TIME) * 1.0 / REQUEST_TIME;
 
     {
         qreal x1, y1;
         const qreal x_step = (qreal)ow*1.0/(LIMIT - 2);
         const qreal x_step2 = x_step / 2;
-        x1 = offset - (x_step * qMin(m_elapsed_timer.elapsed(), (qint64)2000) / 2000);
+        x1 = offset - (x_step * elapsed_step);
         qreal value(0.0);
         bool first(true);
 
@@ -210,14 +204,16 @@ void QnResourceServerWidget::drawStatistics(int width, int height, QPainter *pai
         QListIterator<int> iter(m_history);
         while (iter.hasNext()){
             int i_value = iter.next();
+            prev_value = last_value;
+            last_value = i_value;
+
             max_value = qMax(max_value, i_value);
             value = i_value / 100.0;
             if (i_value < 0)
                 value = 0;
-            else if (i_value == 0)
-                value = .0001;
+//            else if (i_value == 0)
+//                value = .0001;
             if (first){ 
-                //x1 = offset - x_step;
                 path.lineTo(x1, value);
                 first = false;
                 y1 = value;
@@ -232,7 +228,7 @@ void QnResourceServerWidget::drawStatistics(int width, int height, QPainter *pai
         path.lineTo(offset + ow, 0.0);
     }
 
-    if (stretch_y){
+    if (stretch_y && max_value >= 0){
         QListIterator<int> step(m_steps);
         int value = 1;
         while (step.hasNext()){
@@ -246,9 +242,6 @@ void QnResourceServerWidget::drawStatistics(int width, int height, QPainter *pai
 
     
     QPainterPath result_path = scalePath(path, scale_factor, offset, oh);
- //   QPainterPath shifted_path = shiftPath(result_path, 0, -20);
- //   result_path += shifted_path;
-
     if (background_enabled){
         QLinearGradient gradient(width / 2, offset + oh, width / 2,  offset + (1.0 - scale_factor)*oh);
         gradient.setColorAt(0.0, QColor(0, 255, 0, 70));
@@ -261,10 +254,19 @@ void QnResourceServerWidget::drawStatistics(int width, int height, QPainter *pai
         painter->strokePath(result_path, usage);
     painter->setClipping(false);
 
-    QFont f("times new roman,utopia");
+
+    QFont f;
     f.setStyleStrategy(QFont::ForceOutline);
-    f.setPointSizeF(offset * 0.5);
+    f.setPointSizeF(offset * 0.3);
     f.setStyleHint(QFont::Times);
     painter->setFont(f);
-    painter->drawText(2, offset, QString::number(max_value)+"%");
+    if (stretch_y){
+        painter->drawText(offset + ow, offset, QString::number(max_value >= 0 ? max_value : 100)+"%");
+    }
+    if (last_value >= 0){
+        int x = offset + ow;
+        qreal inter_value = ((last_value - prev_value)*elapsed_step + prev_value);
+        int y = offset + oh * (1.0 - inter_value * 0.01 * scale_factor);
+        painter->drawText(x, y, QString::number(qRound(inter_value))+"%");
+    }
 }
