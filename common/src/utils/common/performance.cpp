@@ -25,7 +25,9 @@
 /** CPU usage update timer, in seconds. */
 #define CPU_USAGE_REFRESH 1
 
-    
+// -------------------------------------------------------------------------- //
+// CPU Usage
+// -------------------------------------------------------------------------- //
 #if defined(Q_OS_WIN)
 
 namespace {
@@ -93,7 +95,7 @@ namespace {
                 pEnumerator->Release();
 
                 if (m_ts > 0){
-                    m_usage = ((cpu - m_cpu) * 100) / ((ts - m_ts) * QnPerformance::getCpuCores());
+                    m_usage = ((cpu - m_cpu) * 100) / ((ts - m_ts) * QnPerformance::cpuCoreCount());
                 }
                 m_cpu = cpu;
                 m_ts = ts;
@@ -518,11 +520,11 @@ qint64 QnPerformance::currentCpuUsage() {
 #endif
 }
 
-QString QnPerformance::getCpuBrand() {
+QString QnPerformance::cpuBrand() {
     return *qn_estimatedCpuBrand();
 }
 
-int QnPerformance::getCpuCores() {
+int QnPerformance::cpuCoreCount() {
     return QThread::idealThreadCount();
 }
 

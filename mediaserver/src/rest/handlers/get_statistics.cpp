@@ -27,8 +27,8 @@ int QnGetStatisticsHandler::executeGet(const QString& path, const QnRequestParam
     
 	// todo: determine CPU params in linux
     result.append(QString("<cpuInfo model=\"%1\" cores=\"%2\" usage=\"%3\" />\n")
-		.arg(QnPerformance::getCpuBrand())	
-		.arg(QnPerformance::getCpuCores())	
+		.arg(QnPerformance::cpuBrand())	
+		.arg(QnPerformance::cpuCoreCount())	
 		.arg(QnPerformance::currentCpuUsage()));
     result.append("</misc>\n");
 
