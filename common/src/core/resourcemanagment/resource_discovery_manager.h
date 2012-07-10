@@ -50,7 +50,8 @@ protected:
 
 signals:
     void localInterfacesChanged();
-
+private slots:
+    void onInitAsyncFinished(QnResourcePtr res, bool initialized);
 private:
     void updateLocalNetworkInterfaces();
 
