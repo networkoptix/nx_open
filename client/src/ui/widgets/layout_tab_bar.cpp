@@ -22,7 +22,8 @@ QnLayoutTabBar::QnLayoutTabBar(QWidget *parent, QnWorkbenchContext *context):
     QTabBar(parent),
     QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent),
     m_submit(false),
-    m_update(false)
+    m_update(false),
+    m_midClickedTab(-1)
 {
     /* Set up defaults. */
     setMovable(true);
@@ -146,18 +147,19 @@ void QnLayoutTabBar::contextMenuEvent(QContextMenuEvent *event) {
 }
 
 void QnLayoutTabBar::mousePressEvent(QMouseEvent *event){
-    if (event->button() == Qt::MiddleButton){
+    if (event->button() == Qt::MiddleButton)
         m_midClickedTab = tabAt(event->pos());
-    } else
-        QTabBar::mousePressEvent(event);   
+
+    QTabBar::mousePressEvent(event);
 }
 
 void QnLayoutTabBar::mouseReleaseEvent(QMouseEvent *event){
-    /** mouseReleaseEvent is ALWAYS preceded by corresponding mousePressEvent */
-    if (event->button() == Qt::MiddleButton){
+    if (event->button() == Qt::MiddleButton) {
         if (m_midClickedTab >= 0 && m_midClickedTab == tabAt(event->pos())) 
             emit tabCloseRequested(m_midClickedTab);
+        m_midClickedTab = -1;
     }
+
     QTabBar::mouseReleaseEvent(event);
 }
 
