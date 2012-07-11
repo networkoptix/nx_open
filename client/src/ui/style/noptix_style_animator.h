@@ -37,7 +37,7 @@ public:
         pos->running = false;
     }
 
-    float value(const QWidget *widget, qreal defaultValue = 0.0) const {
+    qreal value(const QWidget *widget, qreal defaultValue = 0.0) const {
         QHash<const QWidget *, Animation>::const_iterator pos = m_animationByWidget.find(widget);
         if(pos == m_animationByWidget.end())
             return defaultValue;
@@ -48,7 +48,7 @@ public:
         m_animationByWidget[widget].value = value;
     }
 
-    bool connected(const QWidget *widget){
+    bool connected(const QWidget *widget) {
         return m_animationByWidget.contains(widget);
     }
 

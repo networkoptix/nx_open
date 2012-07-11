@@ -1,4 +1,7 @@
 #include "noptix_style.h"
+
+#include <cmath> /* For std::fmod. */
+
 #include <QApplication>
 #include <QPainter>
 #include <QStyleOption>
@@ -11,10 +14,13 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/variant.h>
 
+#include <ui/common/text_pixmap_cache.h>
+#include <ui/common/linear_combination.h>
+
 #include "noptix_style_animator.h"
 #include "globals.h"
 #include "skin.h"
-#include "../common/text_pixmap_cache.h"
+#include "utils/common/util.h"
 
 namespace {
     const char *qn_hoveredPropertyName = "_qn_hovered";
@@ -128,6 +134,7 @@ void QnNoptixStyle::drawControl(ControlElement element, const QStyleOption *opti
     case CE_ProgressBar:
         if(drawProgressBarControl(option, painter, widget))
             return;
+        break;
     default:
         break;
     }
@@ -313,7 +320,7 @@ bool QnNoptixStyle::drawItemViewItemControl(const QStyleOption *option, QPainter
     if(editor == NULL)
         return false;
 
-    /* If an editor is opened, don't draw item's text. 
+    /* If an editor is opened, don'h draw item's text. 
      * Editor's background may be transparent, and item text will shine through. */
 
     QStyleOptionViewItemV4 *localOption = const_cast<QStyleOptionViewItemV4 *>(itemOption);
@@ -331,90 +338,81 @@ bool QnNoptixStyle::drawProgressBarControl(const QStyleOption *option, QPainter 
     if (!pb)
         return false;
 
-    bool hover = (option->state & State_Enabled) && (option->state & State_MouseOver);
-    bool reverse = pb->direction == Qt::RightToLeft;
+    bool hovered = (option->state & State_Enabled) && (option->state & State_MouseOver);
+    bool reversed = pb->direction == Qt::RightToLeft;
     if (pb->invertedAppearance)
-        reverse = !reverse;
-    const bool vertical = (pb->orientation == Qt::Vertical);
+        reversed = !reversed;
+    const bool vertical = (pb->orientation == Qt::Vertical); // TODO: Not supported for now.
     const bool busy = pb->maximum == pb->minimum;
-    int x,y,l,t;
-    pb->rect.getRect(&x,&y,&l,&t);
+    
+    const qreal progress = busy ? 1.0 : pb->progress / static_cast<qreal>(pb->maximum - pb->minimum);
+    
+    int x,y,w,h;
+    pb->rect.getRect(&x, &y, &w, &h);
 
- /*   if (vertical) // swap width & height... //TODO: make vertical progress bar
-    { int h = x; x = y; y = h; l = pb->rect.height(); t = pb->rect.width(); }*/
-
-    float anim_val = .0;
-    if (!m_animator->connected(widget)){
-        m_animator->start(widget, .5, anim_val);
+    qreal animationProgress = 0.0;
+    if (!m_animator->connected(widget)) {
+        m_animator->start(widget, 0.5, animationProgress);
     } else {
-        anim_val = m_animator->value(widget);
-        if (anim_val >= 1.0){
-            anim_val = .0;
-            m_animator->setValue(widget, anim_val);
+        animationProgress = m_animator->value(widget);
+        if (animationProgress >= 1.0){
+            animationProgress = std::fmod(animationProgress, 1.0);
+            m_animator->setValue(widget, animationProgress);
         }
     }
 
     painter->save();
-
-    const double val = busy ? 1.0 : pb->progress / double(pb->maximum - pb->minimum);
-
     painter->setPen(Qt::NoPen);
-    if (val > 0.0){ // draw Contents
-        const QColor f1(4, 154, 116); //TODO: take color from config?
+
+    /* Draw progress indicator. */
+    if (progress > 0.0) { 
+        const QColor f1(4, 154, 116); // TODO: take color from config?
         const QColor f2 = pb->palette.color(QPalette::WindowText);
-        const int offset = l * val;
-        const int mid = (y + t) / 2;
-        const int space = l * (val * .125);
 
-        //QLinearGradient gradient(x - space, mid, x + offset + space, mid);
-        QLinearGradient gradient(x - space, mid, x + l + space, mid);
-        if (anim_val < .08){
-            float second_focus = .9 + anim_val*1.25;
-            gradient.setColorAt(second_focus, f2);
-            gradient.setColorAt(second_focus - .1, f1);
-        } else
-        if (anim_val > .92){
-            float second_focus = .1 - (1.0 - anim_val)*1.25;
-            gradient.setColorAt(second_focus, f2);
-            gradient.setColorAt(second_focus + .1, f1);
-        }
+        QLinearGradient gradient(x, y, x + w, y);
   
+        const qreal radius = 0.1;
+        const qreal center = animationProgress * (1.0 + radius * 2) - radius;
+        const qreal points[] = {0.0, center - radius, center, center + radius, 1.0};
+        for(int i = 0; i < arraysize(points); i++) {
+            qreal position = points[i];
+            if(position < 0.0 || position > 1.0)
+                continue;
 
-        float focus = .1 + anim_val * .8;
-        gradient.setColorAt(focus, f2);
-        gradient.setColorAt(focus - .1, f1);
-        gradient.setColorAt(focus + .1, f1);
+            qreal alpha = qMin(qAbs(position - center) / radius, 1.0);
+            gradient.setColorAt(position, linearCombine(alpha, f1, 1.0 - alpha, f2));
+        }
 
         painter->setBrush(gradient);
         painter->setOpacity(1);
-        if (l * val > 12) 
-            painter->drawRoundedRect(x, y, l* val, y + t, 6, 6);
-        else{
-            painter->setClipRegion(QRegion(x, y, 12, y+t, QRegion::Ellipse));
-            painter->drawRoundedRect(x - 12, y, 12 + l*val, y + t, 6, 6);
+        if (w * progress > 12) {
+            painter->drawRoundedRect(x, y, w * progress, y + h, 6, 6);
+        } else {
+            painter->setClipRegion(QRegion(x, y, 12, y + h, QRegion::Ellipse));
+            painter->drawRoundedRect(x - 12, y, 12 + w * progress, y + h, 6, 6);
             painter->setClipping(false);
         }
     }
 
-    /* Draw groove */
-    QLinearGradient gradient((x + l)/ 2, 0 , (x + l) / 2, y + t);
-    gradient.setColorAt(0, pb->palette.color(QPalette::Window));
-    gradient.setColorAt(.2, pb->palette.color(QPalette::Highlight));
-    gradient.setColorAt(.4, pb->palette.color(QPalette::Highlight));
-    gradient.setColorAt(.5, QColor(4, 67, 154));
-    gradient.setColorAt(1,  pb->palette.color(QPalette::Button));
+    /* Draw groove. */
+    QLinearGradient gradient(x, 0, x, y + h);
+    gradient.setColorAt(0, pb->palette.color(QPalette::Button).lighter());
+    gradient.setColorAt(0.2, pb->palette.color(QPalette::Button));
+    gradient.setColorAt(0.4, pb->palette.color(QPalette::Button));
+    gradient.setColorAt(0.5, pb->palette.color(QPalette::Button).darker()); //QColor(4, 67, 154)
+    gradient.setColorAt(1,  pb->palette.color(QPalette::Button).lighter());
     painter->setBrush(gradient);
-    painter->setOpacity(.5);
-    painter->drawRoundedRect(x, y, l, t, 6, 6);
+    painter->setOpacity(0.5);
+    painter->drawRoundedRect(x, y, w, h, 6, 6);
 
     painter->setOpacity(1);
     painter->setPen(pb->palette.color(QPalette::Window));
     painter->setBrush(Qt::NoBrush);
-    painter->drawRoundedRect(x, y, l, t, 6, 6);
+    painter->drawRoundedRect(x, y, w, h, 6, 6);
 
 
     // label? =========
-    if (/*hover &&*/ pb->textVisible){
+    if (pb->textVisible) {
         QRect rect = pb->rect;
         if (pb->orientation == Qt::Vertical)
         {   // vertical progresses have text rotated by 90 or 270
@@ -434,8 +432,6 @@ bool QnNoptixStyle::drawProgressBarControl(const QStyleOption *option, QPainter 
         QnTextPixmapCache* cache = QnTextPixmapCache::instance();
         QPixmap text = cache->pixmap(pb->text, painter->font(), pb->palette.color(QPalette::WindowText));
         painter->drawPixmap(tr, text);
-//        painter->setPen( pb->palette.color(QPalette::WindowText));
-//        painter->drawText(rect, flags, pb->text);
     }
 
     painter->restore();
@@ -488,7 +484,7 @@ bool QnNoptixStyle::drawSliderComplexControl(const QStyleOptionComplex *option, 
 bool QnNoptixStyle::drawTabClosePrimitive(const QStyleOption *option, QPainter *painter, const QWidget *widget) const {
     QStyleOptionToolButton buttonOption;
     buttonOption.QStyleOption::operator=(*option);
-    buttonOption.state &= ~State_Selected; /* We don't want 'selected' state overriding 'active'. */
+    buttonOption.state &= ~State_Selected; /* We don'h want 'selected' state overriding 'active'. */
     buttonOption.subControls = 0;
     buttonOption.activeSubControls = 0;
     buttonOption.icon = m_closeTab;
@@ -532,7 +528,7 @@ bool QnNoptixStyle::drawToolButtonComplexControl(const QStyleOptionComplex *opti
         return false;
 
     if (buttonOption->features & QStyleOptionToolButton::Arrow)
-        return false; /* We don't handle arrow tool buttons,... */
+        return false; /* We don'h handle arrow tool buttons,... */
 
     if (qobject_cast<QToolBar *>(widget->parent()))
         return false; /* ...toolbar buttons,... */
