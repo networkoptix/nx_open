@@ -236,27 +236,38 @@ QRectF QnGeometry::expanded(qreal aspectRatio, const QRectF &minRect, Qt::Aspect
     return aligned(expanded(aspectRatio, minRect.size(), mode), minRect, alignment);
 }
 
+namespace {
+    template<class Size, class Rect>
+    Rect alignedInternal(const Size &size, const Rect &rect, Qt::Alignment alignment) {
+        Rect result;
+        result.setSize(size);
+
+        if(alignment & Qt::AlignHCenter) {
+            result.moveLeft(rect.left() + (rect.width() - size.width()) / 2);
+        } else if(alignment & Qt::AlignRight) {
+            result.moveRight(rect.right());
+        } else {
+            result.moveLeft(rect.left());
+        }
+
+        if(alignment & Qt::AlignVCenter) {
+            result.moveTop(rect.top() + (rect.height() - size.height()) / 2);
+        } else if(alignment & Qt::AlignBottom) {
+            result.moveBottom(rect.bottom());
+        } else {
+            result.moveTop(rect.top());
+        }
+
+        return result;
+    }
+} // anonymous namespace
+
 QRectF QnGeometry::aligned(const QSizeF &size, const QRectF &rect, Qt::Alignment alignment) {
-    QRectF result;
-    result.setSize(size);
+    return alignedInternal(size, rect, alignment);
+}
 
-    if(alignment & Qt::AlignHCenter) {
-        result.moveLeft(rect.left() + (rect.width() - size.width()) / 2);
-    } else if(alignment & Qt::AlignRight) {
-        result.moveRight(rect.right());
-    } else {
-        result.moveLeft(rect.left());
-    }
-
-    if(alignment & Qt::AlignVCenter) {
-        result.moveTop(rect.top() + (rect.height() - size.height()) / 2);
-    } else if(alignment & Qt::AlignBottom) {
-        result.moveBottom(rect.bottom());
-    } else {
-        result.moveTop(rect.top());
-    }
-
-    return result;
+QRect QnGeometry::aligned(const QSize &size, const QRect &rect, Qt::Alignment alignment) {
+    return alignedInternal(size, rect, alignment);
 }
 
 QRectF QnGeometry::dilated(const QRectF &rect, const QSizeF &amount) {
