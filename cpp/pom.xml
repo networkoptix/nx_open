@@ -19,6 +19,7 @@
 		<convert-only>true</convert-only>
 		<ffmpeg.version>2012-04-10-N-39672-g40b7a27</ffmpeg.version>
 		<openssl.version>1.0.0j</openssl.version>
+		<onvif.version>2.1.1-ptz-SNAPSHOT</onvif.version>
 		<buildLib/>
 		<qtlib1/>
 		<qtlib2/>
