@@ -21,38 +21,44 @@ struct QnMotionWindow
 class QnMotionRegion
 {
 public:
+    enum RegionValid{VALID, WINDOWS, MASKS, SENS};
+
     QnMotionRegion();
 
     static const int MIN_SENSITIVITY = 0; // equal motion mask
     static const int MAX_SENSITIVITY = 9; // max motion sensitivity
 
-    /* 
-    * Returns false if any region in range [1..MAX] contain too many rects (> maxRectCount). For motionMask region (index 0) no any limits.
-    */
-    bool isValid(int maxMotionRects, int maxMaskRects) const;
+    /** 
+    * \returns WINDOWS if sum of rects in all regions in range [1..MAX] greater than maxRectCount
+    * \returns MASKS if sum of rects in motionMask region (index 0) greater than maxMaskRects OR
+    * \returns SENS number of regions with at least 1 rect is greater than maxMotionSens
+    * \returns VALID otherwise
+     */
+    RegionValid isValid(int maxMotionRects, int maxMaskRects, int maxMotionSens) const;
 
     bool operator==(const QnMotionRegion& other) const;
     bool operator!=(const QnMotionRegion& other) const;
     bool isEmpty() const;
 
     void addRect(int sensitivity, const QRect& rect);
-    QRegion getMotionMask() const; // return info with zerro sensitivity only
+    QRegion getMotionMask() const; // return info with zero sensitivity only
     QRegion getRegionBySens(int value) const;
     QMultiMap<int, QRect> getAllMotionRects() const;
 
-    /* 
-    * Returns simplified version of region's rects
-    */
+    /**
+     * Returns simplified version of region's rects
+     */
     QVector<QRect> getRectsBySens(int value) const;
 
     bool updateSensitivityAt(const QPoint& pos, int sens);
 
     int getMotionRectCount() const;
     int getMaskRectCount() const;
+    int getMotionSensCount() const;
 
     void removeDefaultMotion();
 private:
-    QRegion m_data[MAX_SENSITIVITY - MIN_SENSITIVITY+1];
+    QRegion m_data[MAX_SENSITIVITY - MIN_SENSITIVITY + 1];
 };
 
 

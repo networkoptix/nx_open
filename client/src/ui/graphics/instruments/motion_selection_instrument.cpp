@@ -55,16 +55,30 @@ public:
     }
 
     virtual QRectF boundingRect() const override {
-        return QRectF(m_origin, m_corner).normalized();
+        return QRectF(m_origin, m_corner).normalized().united(QRectF(m_mouseOrigin, m_mouseCorner).normalized());
     }
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *widget) override {
         if (widget != m_viewport)
             return; /* Draw it on source viewport only. */
 
-        QnScopedPainterPenRollback penRollback(painter, m_colors[MotionSelectionInstrument::Border]);
-        QnScopedPainterBrushRollback brushRollback(painter, m_colors[MotionSelectionInstrument::Base]);
-        painter->drawRect(boundingRect());
+        QnScopedPainterPenRollback penRollback(painter);
+        QnScopedPainterBrushRollback brushRollback(painter);
+
+        /* Draw selection on cells */
+        QRectF rect = QRectF(m_origin, m_corner).normalized();
+        if(!rect.isEmpty()) {
+            painter->setPen(m_colors[MotionSelectionInstrument::Border]);
+            painter->setBrush(m_colors[MotionSelectionInstrument::Base]);
+            painter->drawRect(rect);
+        }
+
+#ifdef QN_SHOW_MOTION_SELECTION_FRAME
+        /* Draw mouse rubber band */
+        painter->setPen(m_colors[MotionSelectionInstrument::MouseBorder]);
+        painter->setBrush(Qt::NoBrush);
+        painter->drawRect(QRectF(m_mouseOrigin, m_mouseCorner).normalized());
+#endif
     }
 
     /**
@@ -86,27 +100,33 @@ public:
         return m_viewport;
     }
 
-    void setOrigin(const QPointF &origin) {
+    /**
+     * Sets this item's rect. 
+     * This is the rect that will be drawn on the parent item.
+     * 
+     * \param origin                    Origin in parent coordinates.
+     * \param corner                    Corner in parent coordinates.
+     */
+    void setGridRect(const QPointF &origin, const QPointF &corner) {
         prepareGeometryChange();
         m_origin = origin;
-    }
-
-    void setCorner(const QPointF &corner) {
-        prepareGeometryChange();
         m_corner = corner;
     }
 
-    const QPointF &origin() const {
-        return m_origin;
-    }
-
-    const QPointF &corner() const {
-        return m_corner;
+    /**
+     * Sets this item's mouse rubber band selection.
+     * 
+     * \param mouseOrigin               Origin in parent coordinates
+     * \param mouseCorner               Corner in parent coordinates
+     */
+    void setMouseRect(const QPointF &mouseOrigin, const QPointF &mouseCorner) {
+        prepareGeometryChange();
+        m_mouseOrigin = mouseOrigin;
+        m_mouseCorner = mouseCorner;
     }
 
     void setColor(MotionSelectionInstrument::ColorRole role, const QColor &color) {
         m_colors[role] = color;
-
         update();
     }
 
@@ -119,6 +139,12 @@ private:
 
     /** Second corner of the selection item, in parent coordinates. */
     QPointF m_corner;
+
+    /** Origin of the mouse rubber band, in parent coordinates. */
+    QPointF m_mouseOrigin;
+
+    /** Second corner of the mouse rubber band, in parent coordinates. */
+    QPointF m_mouseCorner;
 
     /** Colors for drawing the selection rect. */
     QColor m_colors[MotionSelectionInstrument::RoleCount];
@@ -137,6 +163,12 @@ MotionSelectionInstrument::MotionSelectionInstrument(QObject *parent):
     m_colors[Base] = QColor(
         qMin(highlight.red() / 2 + 110, 255),
         qMin(highlight.green() / 2 + 110, 255),
+        qMin(highlight.blue() / 2 + 110, 255),
+        127
+    );
+    m_colors[MouseBorder] = QColor(
+        qMin(highlight.red() / 2 + 110, 255),
+        255,
         qMin(highlight.blue() / 2 + 110, 255),
         127
     );
@@ -210,8 +242,9 @@ void MotionSelectionInstrument::ensureSelectionItem() {
 
     m_selectionItem = new MotionSelectionItem();
     selectionItem()->setVisible(false);
-    selectionItem()->setColor(Base,     m_colors[Base]);
-    selectionItem()->setColor(Border,   m_colors[Border]);
+    selectionItem()->setColor(Base,         m_colors[Base]);
+    selectionItem()->setColor(Border,       m_colors[Border]);
+    selectionItem()->setColor(MouseBorder,  m_colors[MouseBorder]);
     if(scene() != NULL)
         scene()->addItem(selectionItem());
 }
@@ -220,7 +253,7 @@ Qt::KeyboardModifiers MotionSelectionInstrument::selectionModifiers(QnResourceWi
     if(!target)
         return m_selectionModifiers;
 
-    return qvariant_cast<int>(target->property(Qn::MotionSelectionModifiers), m_selectionModifiers);
+    return static_cast<Qt::KeyboardModifiers>(qvariant_cast<int>(target->property(Qn::MotionSelectionModifiers), m_selectionModifiers));
 }
 
 bool MotionSelectionInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
@@ -261,6 +294,7 @@ void MotionSelectionInstrument::startDragProcess(DragInfo *info) {
 void MotionSelectionInstrument::startDrag(DragInfo *info) {
     m_isClick = false;
     m_selectionStartedEmitted = false;
+    m_gridRect = QRect();
 
     if(target() == NULL) {
         /* Whoops, already destroyed. */
@@ -273,11 +307,9 @@ void MotionSelectionInstrument::startDrag(DragInfo *info) {
 
     ensureSelectionItem();
     selectionItem()->setParentItem(target());
-    QPointF itemPos = target()->mapFromScene(info->mousePressScenePos());
-    QPoint gridPos = target()->mapToMotionGrid(itemPos);
-    selectionItem()->setOrigin(target()->mapFromMotionGrid(gridPos));
     selectionItem()->setViewport(info->view()->viewport());
     selectionItem()->setVisible(true);
+    /* Everything else will be initialized in the first call to drag(). */
 
     emit selectionStarted(info->view(), target());
     m_selectionStartedEmitted = true;
@@ -288,42 +320,46 @@ void MotionSelectionInstrument::dragMove(DragInfo *info) {
         dragProcessor()->reset();
         return;
     }
-    
     ensureSelectionItem();
-    QPointF itemPos = target()->mapFromScene(info->mousePressScenePos());
-    QPoint gridOrigin = target()->mapToMotionGrid(itemPos);
-    QPoint gridCorner = target()->mapToMotionGrid(target()->mapFromScene(info->mouseScenePos()));
-    
-    if ((info->mouseScreenPos() - info->mousePressScreenPos()).manhattanLength() >= QApplication::startDragDistance())
-    {
-        if (gridCorner.x() >= gridOrigin.x())
-            gridCorner += QPoint(1, 0);
-        else 
-            gridOrigin += QPoint(1, 0);
-        if (gridCorner.y() >= gridOrigin.y())
-            gridCorner += QPoint(0, 1);
-        else 
-            gridOrigin += QPoint(0, 1);
-    }
 
-    selectionItem()->setOrigin(target()->mapFromMotionGrid(gridOrigin));
-    selectionItem()->setCorner(target()->mapFromMotionGrid(gridCorner));
+    QPointF mouseOrigin = target()->mapFromScene(info->mousePressScenePos());
+    QPointF mouseCorner = target()->mapFromScene(info->mouseScenePos());
+    selectionItem()->setMouseRect(mouseOrigin, mouseCorner);
+
+    QPointF gridStep = target()->mapFromMotionGrid(QPoint(1, 1)) - target()->mapFromMotionGrid(QPoint(0, 0));
+    QPointF mouseDelta = mouseOrigin - mouseCorner;
+    if(qAbs(mouseDelta.x()) < qAbs(gridStep.x()) / 2 && qAbs(mouseDelta.y()) < qAbs(gridStep.y()) / 2) {
+        selectionItem()->setGridRect(QPointF(0, 0), QPointF(0, 0)); /* Ignore small deltas. */
+        m_gridRect = QRect();
+    } else {
+        QPoint gridOrigin = target()->mapToMotionGrid(mouseOrigin);
+        QPoint gridCorner = target()->mapToMotionGrid(mouseCorner) + QPoint(1, 1); 
+
+        if (gridCorner.x() <= gridOrigin.x()) {
+            gridCorner -= QPoint(1, 0);
+            gridOrigin += QPoint(1, 0);
+        }
+
+        if (gridCorner.y() <= gridOrigin.y()) {
+            gridCorner -= QPoint(0, 1);
+            gridOrigin += QPoint(0, 1);
+        }
+
+        QPointF origin = target()->mapFromMotionGrid(gridOrigin);
+        QPointF corner = target()->mapFromMotionGrid(gridCorner);
+        selectionItem()->setGridRect(origin, corner);
+
+        m_gridRect = QRect(gridOrigin, gridCorner).normalized().adjusted(0, 0, -1, -1);
+    }
 }
 
 void MotionSelectionInstrument::finishDrag(DragInfo *info) {
     ensureSelectionItem();
     if(target() != NULL) {
-        /* Qt handles QRect borders in totally inhuman way, so we have to do everything by hand. */
-        QPoint o = target()->mapToMotionGrid(selectionItem()->origin());
-        QPoint c = target()->mapToMotionGrid(selectionItem()->corner());
-
         emit motionRegionSelected(
             info->view(), 
             target(), 
-            QRect(
-                QPoint(qMin(o.x(), c.x()), qMin(o.y(), c.y())),
-                QSize(qAbs(o.x() - c.x()), qAbs(o.y() - c.y()))
-            )
+            m_gridRect
         );
     }
 
@@ -335,6 +371,7 @@ void MotionSelectionInstrument::finishDrag(DragInfo *info) {
 }
 
 void MotionSelectionInstrument::finishDragProcess(DragInfo *info) {
+#if 0
     if (m_isClick && !m_clearingBlocked && target()) {
         Qt::KeyboardModifiers selectionModifiers = this->selectionModifiers(target());
         if((info->modifiers() & selectionModifiers) == selectionModifiers && (info->modifiers() & m_multiSelectionModifiers) != m_multiSelectionModifiers) {
@@ -342,6 +379,7 @@ void MotionSelectionInstrument::finishDragProcess(DragInfo *info) {
             m_isClick = false;
         }
     }
+#endif
 
     emit selectionProcessFinished(info->view(), target());
 }

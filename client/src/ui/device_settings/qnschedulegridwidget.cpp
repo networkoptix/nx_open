@@ -449,6 +449,20 @@ void QnScheduleGridWidget::setCellValueInternal(const QPoint &cell, const CellPa
     emit cellValueChanged(cell);
 }
 
+void QnScheduleGridWidget::setCellValueInternal(const QPoint &cell, ParamType type, const QVariant &value) 
+{
+    assert(isValidCell(cell));
+    assert(type >= 0 && type < ParamType_Count);
+
+    CellParams &localValue = m_gridParams[cell.x()][cell.y()];
+    if(localValue[type] == value)
+        return;
+
+    localValue[type] = value;
+
+    emit cellValueChanged(cell);
+}
+
 void QnScheduleGridWidget::resetCellValues()
 {
     CellParams emptyParams;
@@ -496,12 +510,16 @@ bool QnScheduleGridWidget::isValidColumn(int column) const {
     return column >= 0 && column < columnCount();
 }
 
-void QnScheduleGridWidget::setMaxFps(int fps)
+void QnScheduleGridWidget::setMaxFps(int maxFps)
 {
     for (int x = 0; x < columnCount(); ++x)
     {
         for (int y = 0; y < rowCount(); ++y)
-            m_gridParams[x][y][FirstParam] = qMin(fps, m_gridParams[x][y][FirstParam].toInt());
+        {
+            int fps = m_gridParams[x][y][FirstParam].toInt();
+            if(fps > maxFps) 
+                setCellValueInternal(QPoint(x, y), FirstParam, maxFps);
+        }
     }
 }
 
@@ -509,9 +527,9 @@ int QnScheduleGridWidget::getMaxFps()
 {
     int fps = 0;
     for (int x = 0; x < columnCount(); ++x)
-    {
-        for (int y = 0; y < rowCount(); ++y)
-            fps = qMax(fps, m_gridParams[x][y][FirstParam].toInt());
-    }
+		for (int y = 0; y < rowCount(); ++y) {
+			if (m_gridParams[x][y][ColorParam] != qnGlobals->noRecordColor().rgba())
+				fps = qMax(fps, m_gridParams[x][y][FirstParam].toInt());
+		}
     return fps;
 }

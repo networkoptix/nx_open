@@ -40,10 +40,6 @@ public:
         return *pos;
     }
 
-    QSharedPointer<T> get() {
-        return get(QGLContext::currentContext());
-    }
-
 private:
     QMutex m_mutex;
     Factory m_factory;

@@ -5,6 +5,13 @@
 #include "utils/common/util.h"
 #include "api/serializer/serializer.h"
 #include "fs_checker.h"
+#include "recorder/storage_manager.h"
+
+QnFsHelperHandler::QnFsHelperHandler(bool detectAvailableOnly):
+	m_detectAvailableOnly(detectAvailableOnly)
+{
+
+}
 
 int QnFsHelperHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result)
 {
@@ -31,7 +38,10 @@ int QnFsHelperHandler::executeGet(const QString& path, const QnRequestParamList&
         return CODE_INVALID_PARAMETER;
     }
 
-    QnStorageResource* storage = QnStoragePluginFactory::instance()->createStorage(pathStr, false);
+	QnStorageResourcePtr storage = qnStorageMan->getStorageByUrl(pathStr);
+    if (storage == 0) 
+        storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(pathStr, false));
+
     int prefixPos = pathStr.indexOf("://");
     QString prefix;
     if (prefixPos != -1)
@@ -46,13 +56,29 @@ int QnFsHelperHandler::executeGet(const QString& path, const QnRequestParamList&
 
     pathStr = pathStr.mid(prefix.length());
     storage->setUrl(pathStr);
-    QString rezStr = storage->isStorageAvailableForWriting() ? "OK" : "FAIL";
+    QString rezStr;
+	if (storage->isStorageAvailableForWriting()) {
+		if (m_detectAvailableOnly)
+			rezStr = "OK";
+		else {
+			rezStr.append("<freeSpace>\n");
+			rezStr.append(QByteArray::number(storage->getFreeSpace()));
+			rezStr.append("</freeSpace>\n");
+			rezStr.append("<usedSpace>\n");
+			rezStr.append(QByteArray::number(storage->getWritedSpace()));
+			rezStr.append("</usedSpace>\n");
+		}
+	}
+	else {
+		if (m_detectAvailableOnly)
+			rezStr = "FAIL";
+		else
+			rezStr = "-1";
+	}
 
     result.append("<root>\n");
     result.append(rezStr);
     result.append("</root>\n");
-
-    delete storage;
 
     return CODE_OK;
 }
@@ -65,8 +91,17 @@ int QnFsHelperHandler::executePost(const QString& path, const QnRequestParamList
 QString QnFsHelperHandler::description(TCPSocket* tcpSocket) const
 {
     QString rez;
-    rez += "Returns 'OK' if specified folder may be used for writing on mediaServer. Otherwise returns 'FAIL' \n";
-    rez += "<BR>Param <b>path</b> - Folder.";
-    rez += "<BR><b>Return</b> XML</b> - with 'OK' or 'FAIL' message";
+	if (m_detectAvailableOnly) 
+	{
+		rez += "Returns 'OK' if specified folder may be used for writing on mediaServer. Otherwise returns 'FAIL' \n";
+		rez += "<BR>Param <b>path</b> - Folder.";
+		rez += "<BR><b>Return</b> XML - with 'OK' or 'FAIL' message";
+	}
+	else 
+	{
+		rez += "Returns storage free space and current usage in bytes. if specified folder can not be used for writing or not available returns -1.\n";
+		rez += "<BR>Param <b>path</b> - Folder.";
+		rez += "<BR><b>Return</b> XML - free space in bytes or -1";
+	}
     return rez;
 }

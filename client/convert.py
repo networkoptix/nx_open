@@ -17,11 +17,12 @@ import re
 sys.path.insert(0, os.path.join('..', 'common'))
 
 from convert import index_dirs, setup_ffmpeg, gen_filetypes_h, rmtree, instantiate_pro, BUILDLIB
-from convert import qt_path, copy_files, setup_tools, setup_qjson, setup_openssl, platform, gen_env_sh
+from convert import qt_path, copy_files, setup_tools, setup_openssl, platform, gen_env_sh
 from convert import convert as convert_common
 from common_version import *
 
 from filetypes import all_filetypes, video_filetypes, image_filetypes
+from gencomp import gencomp_cpp
 
 APPLICATION_NAME = 'Network Optix HD Witness Client'
 
@@ -123,7 +124,6 @@ ffmpeg_path, ffmpeg_path_debug, ffmpeg_path_release = setup_ffmpeg()
 openal_path = setup_openal()
 openssl_path = setup_openssl()
 tools_path = setup_tools()
-qjson_path = setup_qjson()
 
 if os.path.exists('bin'):
     rmtree('bin')
@@ -138,8 +138,9 @@ os.mkdir('bin/debug-test')
 os.mkdir('bin/release-test')
 
 os.mkdir('build')
+os.mkdir('build/generated')
 
-if platform() == 'mac':
+if platform() != 'win32':
     ldpath_debug = ''
     ldpath_release = ''
 
@@ -148,12 +149,13 @@ if platform() == 'win32':
     copy_files(ffmpeg_path_debug + '/bin/*-[0-9][0-9].dll', 'bin/debug')
     copy_files(ffmpeg_path_release + '/bin/*-[0-9].dll', 'bin/release')
     copy_files(ffmpeg_path_release + '/bin/*-[0-9][0-9].dll', 'bin/release')
-elif platform() == 'mac':
+else:
     ldpath_debug += ffmpeg_path_debug + '/lib'
     ldpath_release += ffmpeg_path_release + '/lib'
 
-copy_files(openal_path + '/*.dll', 'bin/release')
-copy_files(openal_path + '/*.dll', 'bin/debug')
+if platform() == 'win32':
+    copy_files(openal_path + '/*.dll', 'bin/release')
+    copy_files(openal_path + '/*.dll', 'bin/debug')
 
 if platform() == 'win32':
     copy_files('contrib/qtcolorpicker/lib/QtSolutions_ColorPicker-2.6.dll', 'bin/release')
@@ -165,37 +167,23 @@ if platform() == 'win32':
 
     copy_files(tools_path + '/bin/*.dll', 'bin/release')
     copy_files(tools_path + '/bin/*.dll', 'bin/debug')
-elif platform() == 'mac':
+else:
     ldpath_debug += ':' + tools_path + '/lib'
     ldpath_release += ':' + tools_path + '/lib'
 
-if platform() == 'win32':
-    copy_files(qjson_path + '/release/qjson.dll', 'bin/release')
-    copy_files(qjson_path + '/debug/qjson.dll', 'bin/debug')
-elif platform() == 'mac':
-    ldpath_debug += ':' + os.path.abspath(qjson_path)
-    ldpath_release += ':' + os.path.abspath(qjson_path)
-elif platform() == 'linux':
-    copy_files(qjson_path + '/libqjson.so.0', 'bin/release')
-    copy_files(qjson_path + '/libqjson.so.0', 'bin/debug')
-
-if platform() == 'mac':
+if platform() != 'win32':
     ldpath_debug += ':' + os.path.abspath('../common/bin/debug')
     ldpath_release += ':' + os.path.abspath('../common/bin/release')
 
-os.mkdir('bin/debug/arecontvision')
-os.mkdir('bin/release/arecontvision')
-
-copy_files('resource/arecontvision/*', 'bin/debug/arecontvision')
-copy_files('resource/arecontvision/*', 'bin/release/arecontvision')
-
-if platform() == 'mac':
-    gen_env_sh('bin/debug/env.sh', ldpath_debug, {'FFMPEG_PATH' : ffmpeg_path_debug, 'QJSON_PATH' : os.path.abspath(qjson_path)})
-    gen_env_sh('bin/release/env.sh', ldpath_release, {'FFMPEG_PATH' : ffmpeg_path_release, 'QJSON_PATH' : os.path.abspath(qjson_path)})
+if platform() != 'win32':
+    gen_env_sh('bin/debug/env.sh', ldpath_debug, {'FFMPEG_PATH' : ffmpeg_path_debug})
+    gen_env_sh('bin/release/env.sh', ldpath_release, {'FFMPEG_PATH' : ffmpeg_path_release})
 
 gen_version_h()
 
 genskin()
+
+gencomp_cpp(open('build/generated/compatibility_info.cpp', 'w'))
 
 index_dirs(('src',), 'src/const.pro', 'src/client.pro', exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
 instantiate_pro('src/client.pro', {'BUILDLIB' : BUILDLIB, 'FFMPEG' : ffmpeg_path, 'EVETOOLS_DIR' : tools_path})

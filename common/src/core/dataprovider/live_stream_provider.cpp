@@ -3,55 +3,20 @@
 #include "cpull_media_stream_provider.h"
 #include "core/resource/camera_resource.h"
 
-int bestBitrateKbps(QnStreamQuality q, QSize resolution, int fps)
-{
-    // I assume for a good quality 30 fps for 640x480 we need 800kbps 
 
-    int kbps = 400;
-
-    switch (q)
-    {
-    case QnQualityHighest:
-        kbps = 800;
-    	break;
-
-    case QnQualityHigh:
-        kbps = 600;
-        break;
-
-    case QnQualityNormal:
-        kbps = 450;
-        break;
-
-    case QnQualityLow:
-        kbps = 300;
-        break;
-
-    case QnQualityLowest:
-        kbps = 100;
-        break;
-    }
-
-    float resolutionFactor = resolution.width()*resolution.height()/640.0/480.0;
-    float frameRateFactor = fps/30.0;
-
-    return kbps*resolutionFactor*frameRateFactor;
-}
-
-
-QnLiveStreamProvider::QnLiveStreamProvider():
+QnLiveStreamProvider::QnLiveStreamProvider(QnResourcePtr res):
 m_quality(QnQualityNormal),
 m_fps(-1.0),
 m_framesSinceLastMetaData(0),
 m_livemutex(QMutex::Recursive),
 m_role(QnResource::Role_LiveVideo),
-m_softwareMotion(false),
 m_softMotionLastChannel(0)
 {
-    //m_softwareMotion = true;
-
     m_timeSinceLastMetaData.restart();
     m_layout = 0;
+    m_cameraRes = res.dynamicCast<QnPhysicalCameraResource>();
+    Q_ASSERT(m_cameraRes);
+    m_layout = m_cameraRes->getVideoLayout();
 }
 
 QnLiveStreamProvider::~QnLiveStreamProvider()
@@ -66,6 +31,7 @@ void QnLiveStreamProvider::setRole(QnResource::ConnectionRole role)
     {
         QMutexLocker mtx(&m_livemutex);
         m_role = role;
+        updateSoftwareMotion();
 
         if (role == QnResource::Role_SecondaryLiveVideo)
         {
@@ -74,6 +40,17 @@ void QnLiveStreamProvider::setRole(QnResource::ConnectionRole role)
                 m_quality = QnQualityLowest;
                 needUpdate = true;
             }
+
+            int oldFps = m_fps;
+            int newFps = qMin(5, m_cameraRes->getMaxFps());
+            newFps = qMax(1, newFps);
+
+            if (newFps != oldFps)
+            {
+                needUpdate = true;
+            }
+
+            m_fps = newFps;
         }
 
     }
@@ -115,21 +92,11 @@ QnStreamQuality QnLiveStreamProvider::getQuality() const
 
 void QnLiveStreamProvider::updateSoftwareMotion()
 {
-    QnAbstractMediaStreamDataProvider* ap = dynamic_cast<QnAbstractMediaStreamDataProvider*>(this);
-    Q_ASSERT(ap);
-
-    QnPhysicalCameraResourcePtr res = ap->getResource().dynamicCast<QnPhysicalCameraResource>();
-    Q_ASSERT(res);
-
-    if (m_layout == 0)
-        m_layout = res->getVideoLayout();
-
-    setUseSoftwareMotion(res->getMotionType() == MT_SoftwareGrid);
-    if (getRole() == QnResource::Role_SecondaryLiveVideo && res->getMotionType() == MT_SoftwareGrid)
+    if (getRole() == QnResource::Role_SecondaryLiveVideo && m_cameraRes->getMotionType() == MT_SoftwareGrid)
     {
         for (int i = 0; i < m_layout->numberOfChannels(); ++i)
         {
-            QnMotionRegion region = res->getMotionRegion(i);
+            QnMotionRegion region = m_cameraRes->getMotionRegion(i);
             m_motionEstimation[i].setMotionMask(region);
         }
     }
@@ -138,13 +105,6 @@ void QnLiveStreamProvider::updateSoftwareMotion()
 // for live providers only
 void QnLiveStreamProvider::setFps(float f)
 {
-
-    QnAbstractMediaStreamDataProvider* ap = dynamic_cast<QnAbstractMediaStreamDataProvider*>(this);
-    Q_ASSERT(ap);
-
-    QnPhysicalCameraResourcePtr res = ap->getResource().dynamicCast<QnPhysicalCameraResource>();
-    Q_ASSERT(res);
-
     {
         QMutexLocker mtx(&m_livemutex);
 
@@ -152,7 +112,7 @@ void QnLiveStreamProvider::setFps(float f)
             return; // same fps?
 
 
-        m_fps = qMin((int)f, res->getMaxFps());
+        m_fps = qMin((int)f, m_cameraRes->getMaxFps());
         f = m_fps;
 
     }
@@ -160,7 +120,7 @@ void QnLiveStreamProvider::setFps(float f)
     if (getRole() != QnResource::Role_SecondaryLiveVideo)
     {
         // must be primary, so should inform secondary
-        res->onPrimaryFpsUpdated(f);
+        m_cameraRes->onPrimaryFpsUpdated(f);
     }
 
 
@@ -178,16 +138,10 @@ float QnLiveStreamProvider::getFps() const
 {
     QMutexLocker mtx(&m_livemutex);
 
-    const QnAbstractMediaStreamDataProvider* ap = dynamic_cast<const QnAbstractMediaStreamDataProvider*>(this);
-    Q_ASSERT(ap);
-
-    QnPhysicalCameraResourcePtr res = ap->getResource().dynamicCast<QnPhysicalCameraResource>();
-    Q_ASSERT(res);
-
     if (m_fps < 0) // setfps never been called
-        m_fps = res->getMaxFps() - 4;
+        m_fps = m_cameraRes->getMaxFps() - 4;
 
-    m_fps = qMin((int)m_fps, res->getMaxFps());
+    m_fps = qMin((int)m_fps, m_cameraRes->getMaxFps());
     m_fps = qMax((int)m_fps, 1);
 
     return m_fps;
@@ -202,49 +156,38 @@ bool QnLiveStreamProvider::isMaxFps() const
 bool QnLiveStreamProvider::needMetaData() 
 {
     // I assume this function is called once per video frame 
-    if (m_layout == 0)
-    {
-        QnAbstractMediaStreamDataProvider* ap = dynamic_cast<QnAbstractMediaStreamDataProvider*>(this);
-        QnPhysicalCameraResourcePtr res = ap->getResource().dynamicCast<QnPhysicalCameraResource>();
-        m_layout = res->getVideoLayout();
-    }
 
-    if (getRole() == QnResource::Role_SecondaryLiveVideo) 
+    if (getRole() == QnResource::Role_SecondaryLiveVideo && m_cameraRes->getMotionType() == MT_SoftwareGrid)
     {
-        if (m_softwareMotion) 
+        for (int i = 0; i < m_layout->numberOfChannels(); ++i)
         {
-            for (int i = 0; i < m_layout->numberOfChannels(); ++i)
-            {
-                bool rez = m_motionEstimation[i].existsMetadata();
-                if (rez) {
-                    m_softMotionLastChannel = i;
-                    return rez;
-                }
+            bool rez = m_motionEstimation[i].existsMetadata();
+            if (rez) {
+                m_softMotionLastChannel = i;
+                return rez;
             }
-            return false;
         }
-        else
-            return false;
-    }
-
-    if (m_softwareMotion || m_framesSinceLastMetaData == 0)
         return false;
-
-    bool result = (m_framesSinceLastMetaData > 10 || m_timeSinceLastMetaData.elapsed() > META_DATA_DURATION_MS);
-
-    if (result)
-    {
-        m_framesSinceLastMetaData = 0;
-        m_timeSinceLastMetaData.restart();
     }
-    return result;
+    else if (getRole() == QnResource::Role_LiveVideo && (m_cameraRes->getMotionType() == MT_HardwareGrid || m_cameraRes->getMotionType() == MT_MotionWindow))
+    {
+        bool result = (m_framesSinceLastMetaData > 10 || m_timeSinceLastMetaData.elapsed() > META_DATA_DURATION_MS);
+        if (result)
+        {
+            m_framesSinceLastMetaData = 0;
+            m_timeSinceLastMetaData.restart();
+        }
+        return result;
+    }
+    
+    return false; // not motion configured
 }
 
 void QnLiveStreamProvider::onGotVideoFrame(QnCompressedVideoDataPtr videoData)
 {
     m_framesSinceLastMetaData++;
 
-    if (m_role == QnResource::Role_SecondaryLiveVideo && m_softwareMotion)
+    if (m_role == QnResource::Role_SecondaryLiveVideo && m_cameraRes->getMotionType() == MT_SoftwareGrid)
         m_motionEstimation[videoData->channelNumber].analizeFrame(videoData);
 }
 
@@ -272,7 +215,7 @@ void QnLiveStreamProvider::onPrimaryFpsUpdated(int newFps)
 
 QnMetaDataV1Ptr QnLiveStreamProvider::getMetaData()
 {
-    if (m_softwareMotion)
+    if (m_cameraRes->getMotionType() == MT_SoftwareGrid)
         return m_motionEstimation[m_softMotionLastChannel].getMotion();
     else
         return getCameraMetadata();
@@ -283,14 +226,4 @@ QnMetaDataV1Ptr QnLiveStreamProvider::getCameraMetadata()
     QnMetaDataV1Ptr result(new QnMetaDataV1(1));
     result->m_duration = 1000*1000*1000; // 1000 sec 
     return result;
-}
-
-bool QnLiveStreamProvider::isSoftwareMotion() const
-{
-    return m_softwareMotion;
-}
-
-void QnLiveStreamProvider::setUseSoftwareMotion(bool value)
-{
-    m_softwareMotion = value;
 }

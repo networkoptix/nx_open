@@ -29,7 +29,7 @@ private slots:
     void at_resourcesReceived(int status, const QByteArray& errorString, QnResourceList resources, int handle);
     void at_licensesReceived(int status, const QByteArray& errorString, QnLicenseList licenses, int handle);
 
-    void at_messageReceived(QnMessage event);
+    void at_messageReceived(QnMessage message);
     void at_connectionClosed(QString errorString);
     void at_connectionOpened();
     void at_connectionReset();

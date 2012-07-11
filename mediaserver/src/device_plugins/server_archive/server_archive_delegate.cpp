@@ -75,8 +75,8 @@ bool QnServerArchiveDelegate::open(QnResourcePtr resource)
     Q_ASSERT(netResource != 0);
     m_dialQualityHelper.setResource(netResource);
 
-    m_catalogHi = qnStorageMan->getFileCatalog(netResource->getMAC().toString(), QnResource::Role_LiveVideo);
-    m_catalogLow = qnStorageMan->getFileCatalog(netResource->getMAC().toString(), QnResource::Role_SecondaryLiveVideo);
+    m_catalogHi = qnStorageMan->getFileCatalog(netResource->getPhysicalId(), QnResource::Role_LiveVideo);
+    m_catalogLow = qnStorageMan->getFileCatalog(netResource->getPhysicalId(), QnResource::Role_SecondaryLiveVideo);
 
     m_currentChunkCatalog = m_quality == MEDIA_Quality_High ? m_catalogHi : m_catalogLow;
 
@@ -111,6 +111,11 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
 
     DeviceFileCatalog::FindMethod findMethod = m_reverseMode ? DeviceFileCatalog::OnRecordHole_PrevChunk : DeviceFileCatalog::OnRecordHole_NextChunk;
     m_dialQualityHelper.findDataForTime(timeMs, newChunk, newChunkCatalog, findMethod);
+    if (!m_reverseMode && newChunk.endTimeMs() < timeMs)
+    {
+        m_eof = true;
+        return time;
+    }
 
 
     qint64 chunkOffset = 0;
@@ -225,6 +230,8 @@ begin_label:
                     data = QnAbstractMediaDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, 0));
                     data->timestamp = INT64_MAX; // EOF reached
                 }
+                if (data)
+                    data->timestamp +=m_currentChunk.startTimeMs*1000;
                 return data;
             }
         } while (!switchToChunk(chunk, chunkCatalog));

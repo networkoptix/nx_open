@@ -121,7 +121,7 @@ void QnScreenRecorder::startRecording(QGLWidget *appWidget) {
     }
 
 #ifdef Q_OS_WIN
-    QString filePath = getTempRecordingDir() + QLatin1String("/video_recording.ts");
+    QString filePath = getTempRecordingDir() + QLatin1String("/video_recording.avi");
 
     QnVideoRecorderSettings recorderSettings;
     QAudioDeviceInfo audioDevice = recorderSettings.primaryAudioDevice();

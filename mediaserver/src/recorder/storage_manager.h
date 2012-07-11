@@ -19,12 +19,18 @@ public:
     QnStorageManager();
     virtual ~QnStorageManager();
     static QnStorageManager* instance();
+    QnStorageResourcePtr removeStorage(QnStorageResourcePtr storage);
+
+    /*
+    * Remove storage if storage is absent in specified list
+    */
+    void removeAbsentStorages(QnAbstractStorageResourceList newStorages);
     void addStorage(QnStorageResourcePtr storage);
 
 
     QString getFileName(const qint64& fileDate, const QnNetworkResourcePtr netResource, const QString& prefix, QnStorageResourcePtr& storage);
     bool fileStarted(const qint64& startDateMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider);
-    bool fileFinished(int durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider);
+    bool fileFinished(int durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider,  qint64 fileSize);
 
     static QString dateTimeStr(qint64 dateTimeMs);
     QnStorageResourcePtr getStorageByUrl(const QString& fileName);
@@ -53,6 +59,7 @@ private:
     void loadFullFileCatalogInternal(QnResource::ConnectionRole role);
     QnStorageResourcePtr extractStorageFromFileName(int& storageIndex, const QString& fileName, QString& mac, QString& quality);
     void getTimePeriodInternal(QVector<QnTimePeriodList>& cameras, QnNetworkResourcePtr camera, qint64 startTime, qint64 endTime, qint64 detailLevel, DeviceFileCatalogPtr catalog);
+    bool existsStorageWithID(const QnAbstractStorageResourceList& storages, QnId id) const;
 private:
     StorageMap m_storageRoots;
     typedef QMap<QString, DeviceFileCatalogPtr> FileCatalogMap;

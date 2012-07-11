@@ -305,7 +305,7 @@ protected:
     Q_SIGNAL void geometryAdjustmentRequested(QnWorkbenchItem *item, bool animate = true);
 
     qreal layerFrontZValue(Qn::ItemLayer layer) const;
-    Qn::ItemLayer synchronizedLayer(QnWorkbenchItem *item) const;
+    Qn::ItemLayer synchronizedLayer(QnResourceWidget *widget) const;
     Qn::ItemLayer shadowLayer(Qn::ItemLayer itemLayer) const;
 
     bool addItemInternal(QnWorkbenchItem *item, bool animate = true);
@@ -318,6 +318,8 @@ protected:
 
     qreal widgetsFrameOpacity() const;
     void setWidgetsFrameOpacity(qreal opacity);
+
+    void setWidget(Qn::ItemRole role, QnResourceWidget *widget);
 
 protected slots:
     void synchronizeSceneBoundsExtension();
@@ -391,7 +393,7 @@ private:
     qreal m_frontZ;
 
     /** Current items by role. */
-    QnWorkbenchItem *m_itemByRole[Qn::ItemRoleCount];
+    QnResourceWidget *m_widgetByRole[Qn::ItemRoleCount];
 
     /** Grid item. */
     QWeakPointer<QnGridItem> m_gridItem;

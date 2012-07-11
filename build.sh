@@ -13,7 +13,7 @@ case `uname -s` in
     "Linux")
         PLATFORM=linux
         NPROCESSORS=$[$(cat /proc/cpuinfo | grep ^processor | wc -l)]
-        PRODUCTS="common mediaserver mediaproxy"
+        PRODUCTS="common mediaserver mediaproxy client"
         ;;
     "Darwin")
         PLATFORM=mac

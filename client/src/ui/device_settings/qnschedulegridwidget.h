@@ -18,7 +18,7 @@ public:
     explicit QnScheduleGridWidget(QWidget *parent = 0);
     virtual ~QnScheduleGridWidget();
 
-    enum ParamType{ FirstParam, SecondParam, ColorParam, ColorInsideParam, ParamType_Count };
+    enum ParamType { FirstParam, SecondParam, ColorParam, ColorInsideParam, ParamType_Count };
 
     void setDefaultParam(ParamType number, const QVariant& value);
     void setShowFirstParam(bool value);
@@ -39,8 +39,9 @@ public:
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
 
-    void setMaxFps(int value);
+    void setMaxFps(int maxFps);
     int getMaxFps();
+
 signals:
     void cellActivated(const QPoint &cell);
     void cellValueChanged(const QPoint &cell);
@@ -57,6 +58,7 @@ private:
     typedef QVariant CellParams[ParamType_Count];
 
     void setCellValueInternal(const QPoint &cell, const CellParams &value);
+    void setCellValueInternal(const QPoint &cell, ParamType type, const QVariant &value);
     void updateCellValueInternal(const QPoint &cell);
 
     QPoint mapToGrid(const QPoint &pos, bool doTruncate) const;

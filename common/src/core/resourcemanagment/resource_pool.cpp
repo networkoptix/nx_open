@@ -8,6 +8,7 @@
 #include "core/resource/layout_resource.h"
 #include "core/resource/user_resource.h"
 #include "core/resource/camera_resource.h"
+#include "plugins/resources/archive/avi_files/avi_resource.h"
 
 #ifdef QN_RESOURCE_POOL_DEBUG
 #   define TRACE(...) qDebug << __VA_ARGS__;
@@ -92,6 +93,36 @@ void QnResourcePool::addResources(const QnResourceList &resources)
             else
             {
                 resource->setId(QnId::generateSpecialId());
+            }
+        }
+
+        /* Fix up items that are stored in layout. */
+        if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
+            foreach(QnLayoutItemData data, layout->getItems()) {
+                if(!data.resource.id.isValid()) {
+                    QnResourcePtr resource = qnResPool->getResourceByUniqId(data.resource.path);
+                    if(!resource) {
+                        if(data.resource.path.isEmpty()) {
+                            qnWarning("Invalid item with empty id and path in layout '%1'.", layout->getName());
+                        } else {
+                            resource = QnResourcePtr(new QnAviResource(data.resource.path));
+                            qnResPool->addResource(resource);
+                        }
+                    }
+
+                    if(resource) {
+                        data.resource.id = resource->getId();
+                        layout->updateItem(data.uuid, data);
+                    }
+                } else if(data.resource.path.isEmpty()) {
+                    QnResourcePtr resource = qnResPool->getResourceById(data.resource.id);
+                    if(!resource) {
+                        qnWarning("Invalid resource id '%1'.", data.resource.id.toString());
+                    } else {
+                        data.resource.path = resource->getUniqueId();
+                        layout->updateItem(data.uuid, data);
+                    }
+                }
             }
         }
 
@@ -182,12 +213,18 @@ void QnResourcePool::handleStatusChange()
 {
     const QnResourcePtr resource = toSharedPointer(checked_cast<QnResource *>(sender()));
 
+    if (!resource)
+        return;
+
     emit statusChanged(resource);
 }
 
 void QnResourcePool::handleResourceChange()
 {
     const QnResourcePtr resource = toSharedPointer(checked_cast<QnResource *>(sender()));
+
+    if (!resource)
+        return;
 
     emit resourceChanged(resource);
 }
@@ -221,33 +258,33 @@ QnResourcePtr QnResourcePool::getResourceByUrl(const QString &url) const
     return QnResourcePtr(0);
 }
 
-QnNetworkResourcePtr QnResourcePool::getNetResourceByMac(const QString &mac) const
+QnNetworkResourcePtr QnResourcePool::getNetResourceByPhysicalId(const QString &physicalId) const
 {
     QMutexLocker locker(&m_resourcesMtx);
     foreach (const QnResourcePtr &resource, m_resources) {
         QnNetworkResourcePtr netResource = resource.dynamicCast<QnNetworkResource>();
-        if (netResource != 0 && netResource->getMAC().toString() == mac)
+        if (netResource != 0 && netResource->getPhysicalId() == physicalId)
             return netResource;
     }
 
     return QnNetworkResourcePtr(0);
 }
 
-QnNetworkResourceList QnResourcePool::getAllNetResourceByMac(const QString &mac) const
+QnNetworkResourceList QnResourcePool::getAllNetResourceByPhysicalId(const QString &physicalId) const
 {
     QnNetworkResourceList result;
     QMutexLocker locker(&m_resourcesMtx);
     foreach (const QnResourcePtr &resource, m_resources) {
         QnNetworkResourcePtr netResource = resource.dynamicCast<QnNetworkResource>();
-        if (netResource != 0 && netResource->getMAC().toString() == mac)
+        if (netResource != 0 && netResource->getPhysicalId() == physicalId)
             result << netResource;
     }
 
     return result;
 }
 
-QnNetworkResourcePtr QnResourcePool::getEnabledResourceByMac(const QString &mac) const {
-    foreach(const QnNetworkResourcePtr &resource, getAllNetResourceByMac(mac))
+QnNetworkResourcePtr QnResourcePool::getEnabledResourceByPhysicalId(const QString &physicalId) const {
+    foreach(const QnNetworkResourcePtr &resource, getAllNetResourceByPhysicalId(physicalId))
         if(!resource->isDisabled())
             return resource;
     return QnNetworkResourcePtr();
@@ -262,7 +299,7 @@ QnResourcePtr QnResourcePool::getEnabledResourceByUniqueId(const QString &unique
     if(!networkResource)
         return QnResourcePtr();
 
-    return getEnabledResourceByMac(networkResource->getMAC().toString());
+    return getEnabledResourceByPhysicalId(networkResource->getPhysicalId());
 }
 
 QnResourcePtr QnResourcePool::getResourceByUniqId(const QString &id) const

@@ -50,7 +50,8 @@ protected:
 
 signals:
     void localInterfacesChanged();
-
+private slots:
+    void onInitAsyncFinished(QnResourcePtr res, bool initialized);
 private:
     void updateLocalNetworkInterfaces();
 
@@ -61,6 +62,7 @@ private:
 
     void resovle_conflicts(QnResourceList& device_list, const CLIPList& busy_list, bool *ip_finished);
 
+    
     void markOfflineIfNeeded();
 
     void updateResourceStatus(QnResourcePtr res);
@@ -83,6 +85,11 @@ private:
     unsigned int m_runNumber;
 
     QList<QHostAddress> m_allLocalAddresses;
+
+
+    QSet<QString> m_discoveredResources;
+    QMap<QString, int> m_resourceDiscoveryCounter;
+
 };
 
 #endif //QN_RESOURCE_DISCOVERY_MANAGER_H

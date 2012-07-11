@@ -1,7 +1,7 @@
-package proto.pb;
+package pb;
 
 message CameraServerItem {
-    required string  mac         = 1;
+    required string  physicalId  = 1;
     required string  serverGuid  = 2;
     required int64   timestamp   = 3;
 }

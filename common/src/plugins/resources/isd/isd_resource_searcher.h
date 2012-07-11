@@ -2,9 +2,10 @@
 #define isd_device_server_h_1936
 
 #include "core/resourcemanagment/resource_searcher.h"
-#include "../onvif_old/onvif_device_searcher.h"
+#include "../mdns/mdns_device_searcher.h"
 
-class QnPlISDResourceSearcher : public OnvifResourceSearcherOld
+
+class QnPlISDResourceSearcher : public QnMdnsResourceSearcher
 {
     QnPlISDResourceSearcher();
 

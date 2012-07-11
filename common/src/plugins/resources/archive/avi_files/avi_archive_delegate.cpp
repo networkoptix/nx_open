@@ -8,6 +8,7 @@
 #include "core/resource/resource_media_layout.h"
 #include "utils/media/ffmpeg_helper.h"
 #include "core/resource/storage_resource.h"
+#include "plugins/storage/file_storage/layout_storage_resource.h"
 
 extern QMutex global_ffmpeg_mutex;
 static const qint64 UTC_TIME_DETECTION_THRESHOLD = 1000000ll * 3600*24*100;
@@ -120,7 +121,8 @@ QnAviArchiveDelegate::QnAviArchiveDelegate():
     m_startTime(0),
     m_useAbsolutePos(true),
     m_duration(AV_NOPTS_VALUE),
-    m_ioContext(0)
+    m_ioContext(0),
+    m_eofReached(false)
 {
     close();
     m_audioLayout = new QnAviAudioLayout(this);
@@ -166,7 +168,7 @@ QnMediaContextPtr QnAviArchiveDelegate::getCodecContext(AVStream* stream)
 
 QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
 {
-    if (!findStreams())
+    if (!findStreams() || m_eofReached)
         return QnAbstractMediaDataPtr();
 
     AVPacket packet;
@@ -229,22 +231,32 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
 
 qint64 QnAviArchiveDelegate::seek(qint64 time, bool findIFrame)
 {
+	if (!findStreams())
+		return -1;
+
+	m_eofReached = time > endTime();
+    if (m_eofReached)
+        return time;
+
     time = qMax(time-m_startTime, 0ll);
-    if (!findStreams())
-        return -1;
     avformat_seek_file(m_formatContext, -1, 0, time + m_startMksec, LLONG_MAX, findIFrame ? AVSEEK_FLAG_BACKWARD : AVSEEK_FLAG_ANY);
     return time;
 }
 
 bool QnAviArchiveDelegate::open(QnResourcePtr resource)
 {
+    QMutexLocker lock(&m_openMutex); // need refactor. Now open may be called from UI thread!!!
+
     m_resource = resource;
     if (m_formatContext == 0)
     {
+        m_eofReached = false;
         QString url = m_resource->getUrl(); // "c:/00-1A-07-03-BD-09.mkv"; //
-        if (m_storage == 0)
+        if (m_storage == 0) {
             m_storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(url));
-
+            if(!m_storage)
+                return false;
+        }
 
         m_formatContext = avformat_alloc_context();
         m_formatContext->pb = m_ioContext = m_storage->createFfmpegIOContext(url, QIODevice::ReadOnly);
@@ -323,8 +335,10 @@ QnVideoResourceLayout* QnAviArchiveDelegate::getVideoLayout()
                 AVDictionaryEntry* start_time = av_dict_get(m_formatContext->metadata,getTagName(Tag_startTime, format), 0, 0);
                 if (start_time) {
                     m_startTime = QString(start_time->value).toLongLong()*1000ll;
-                    if (m_startTime >= UTC_TIME_DETECTION_THRESHOLD)
-                        m_resource->addFlags(QnResource::utc);
+					if (m_startTime >= UTC_TIME_DETECTION_THRESHOLD) {
+						if (qSharedPointerDynamicCast<QnLayoutFileStorageResource>(m_storage))
+							m_resource->addFlags(QnResource::utc); // use sync for exported layout only
+					}
                 }
             }
         }

@@ -24,7 +24,9 @@
 #include "ui/workbench/workbench_controller.h"
 #include "ui/workbench/workbench_layout.h"
 #include "ui/workbench/workbench_context.h"
+#include "camera/resource_display.h" // TODO: remove
 #include "ui/style/globals.h"
+#include <limits>
 
 
 QnCameraMotionMaskWidget::QnCameraMotionMaskWidget(QWidget *parent): 
@@ -80,6 +82,7 @@ void QnCameraMotionMaskWidget::init()
     m_motionSelectionInstrument->setMultiSelectionModifiers(Qt::NoModifier);
 	m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Base, qnGlobals->motionMaskRubberBandColor());
 	m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Border, qnGlobals->motionMaskRubberBandBorderColor());
+    m_motionSelectionInstrument->setColor(MotionSelectionInstrument::MouseBorder, qnGlobals->motionMaskMouseFrameColor());
     display->instrumentManager()->installInstrument(m_motionSelectionInstrument);
 
     m_clickInstrument = new ClickInstrument(Qt::LeftButton, 0, Instrument::Item, this);
@@ -138,6 +141,8 @@ const QnResourcePtr &QnCameraMotionMaskWidget::camera() const {
 void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
 {
     QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+    if(m_camera == camera)
+        return;
 
 	m_camera = camera;
 
@@ -145,6 +150,7 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
 
     if(!m_camera) {
         m_resourceWidget = 0;
+        m_motionSensitivity = QnMotionRegion::MIN_SENSITIVITY;
     } else {
         /* Add single item to the layout. */
         QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid(), this);
@@ -157,61 +163,89 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
         m_resourceWidget = m_context->display()->widget(item);
         m_resourceWidget->setDrawMotionWindows(QnResourceWidget::DrawAllMotionInfo);
         m_resourceWidget->setDisplayFlag(QnResourceWidget::DisplayButtons, false);
-        m_resourceWidget->setDisplayFlag(QnResourceWidget::DisplayMotionGrid, true);
+        m_resourceWidget->setDisplayFlag(QnResourceWidget::DisplayMotion, true);
+
+        /* Find best value for sensitivity. */
+        int counts[QnMotionRegion::MAX_SENSITIVITY - QnMotionRegion::MIN_SENSITIVITY + 1];
+        memset(counts, 0, sizeof(counts));
+
+        int channelCount = m_resourceWidget->display()->videoLayout()->numberOfChannels(); // TODO: WHAT THE HELL???? We shouldn't be needing this shit here.
+        
+        for(int channel = 0; channel < channelCount; channel++)
+            for(int sensitivity = QnMotionRegion::MIN_SENSITIVITY; sensitivity <= QnMotionRegion::MAX_SENSITIVITY; sensitivity++)
+                foreach(const QRect &rect, m_resourceWidget->getMotionRegionList()[channel].getRectsBySens(sensitivity))
+                    counts[sensitivity - QnMotionRegion::MIN_SENSITIVITY] += rect.width() * rect.height();
+
+        int bestCount = std::numeric_limits<int>::min();
+        int bestSensitivity = 0;
+        for(int sensitivity = QnMotionRegion::MIN_SENSITIVITY; sensitivity <= QnMotionRegion::MAX_SENSITIVITY; sensitivity++) {
+            if(counts[sensitivity - QnMotionRegion::MIN_SENSITIVITY] > bestCount) {
+                bestCount = counts[sensitivity - QnMotionRegion::MIN_SENSITIVITY];
+                bestSensitivity = sensitivity;
+            }
+        }
+
+        m_motionSensitivity = bestSensitivity;
     }
 
     /* Consider motion mask list changed. */
     emit motionRegionListChanged();
 }
 
-void QnCameraMotionMaskWidget::showTooManyWindowsMessage(const QnMotionRegion &region)
+void QnCameraMotionMaskWidget::showTooManyWindowsMessage(const QnMotionRegion &region, const QnMotionRegion::RegionValid kind)
 {
-    int maxWndCnt = region.getMotionRectCount();
-    int maxMaskCnt = region.getMaskRectCount();
-
-    if (maxWndCnt > m_camera->motionWindowCnt()) {
-        QMessageBox::warning(
-            this, 
-            tr("Too many motion windows"), 
-            tr("Maximum amount of motion windows for current camera is %1, but %2 motion windows are currently selected.").arg(m_camera->motionWindowCnt()).arg(maxWndCnt)
-            );
-    }
-    else if (maxMaskCnt > m_camera->motionMaskWindowCnt()) {
-        QMessageBox::warning(
-            this, 
-            tr("Too many motion windows"), 
-            tr("Maximum amount of motion mask windows for current camera is %1, but %2 motion mask windows are currently selected.").arg(m_camera->motionMaskWindowCnt()).arg(maxMaskCnt)
-            );
+    switch(kind){
+        case QnMotionRegion::WINDOWS:
+            QMessageBox::warning(
+                this, 
+                tr("Too many motion windows"), 
+                tr("Maximum amount of motion windows for current camera is %1, but %2 motion windows are currently selected.")
+                .arg(m_camera->motionWindowCount())
+                .arg(region.getMotionRectCount())
+                );
+            break;
+        case QnMotionRegion::SENS:
+            QMessageBox::warning(
+                this, 
+                tr("Too many motion windows"), 
+                tr("Maximum amount of different motion sensitivities for current camera is %1, but %2 motion sensitivities are currently selected.")
+                .arg(m_camera->motionSensWindowCount())
+                .arg(region.getMotionSensCount())
+                );
+            break;
+        case QnMotionRegion::MASKS:
+            QMessageBox::warning(
+                this, 
+                tr("Too many motion windows"), 
+                tr("Maximum amount of motion mask windows for current camera is %1, but %2 motion mask windows are currently selected.")
+                .arg(m_camera->motionMaskWindowCount())
+                .arg(region.getMaskRectCount())
+                );
+            break;
     }
 }
 
 void QnCameraMotionMaskWidget::setNeedControlMaxRects(bool value)
 {
     m_needControlMaxRects = value;
-    if (m_resourceWidget && m_needControlMaxRects) 
-    {
-        const QList<QnMotionRegion> &regions = m_resourceWidget->getMotionRegionList();
-        for (int i = 0; i < regions.size(); ++i) {
-            if (!regions[i].isValid(m_camera->motionWindowCnt(), m_camera->motionMaskWindowCnt())) {
-                showTooManyWindowsMessage(regions[i]);
-                break;
-            }
-        }
-    }
 };
 
-void QnCameraMotionMaskWidget::setMotionSensitivity(int value)
+int QnCameraMotionMaskWidget::motionSensitivity() const 
 {
-    m_motionSensitivity = value;
+    return m_motionSensitivity;
 }
 
-void QnCameraMotionMaskWidget::clearMotion()
+void QnCameraMotionMaskWidget::setMotionSensitivity(int motionSensitivity) 
+{
+    m_motionSensitivity = motionSensitivity;
+}
+
+void QnCameraMotionMaskWidget::clearMotion() 
 {
     at_motionRegionCleared();
 }
 
-int QnCameraMotionMaskWidget::gridPosToChannelPos(QPoint &pos)
-{
+int QnCameraMotionMaskWidget::gridPosToChannelPos(QPoint &pos) {
     const QnVideoResourceLayout* layout = m_camera->getVideoLayout();
     for (int i = 0; i < layout->numberOfChannels(); ++i)
     {
@@ -223,6 +257,22 @@ int QnCameraMotionMaskWidget::gridPosToChannelPos(QPoint &pos)
         }
     }
     return 0;
+}
+
+bool QnCameraMotionMaskWidget::isValidMotionRegion(){
+    if (m_resourceWidget && m_needControlMaxRects) 
+    {
+        const QList<QnMotionRegion> &regions = m_resourceWidget->getMotionRegionList();
+        for (int i = 0; i < regions.size(); ++i) {
+            QnMotionRegion::RegionValid kind = regions[i].isValid(m_camera->motionWindowCount(),
+                m_camera->motionMaskWindowCount(), m_camera->motionSensWindowCount());
+            if (kind != QnMotionRegion::VALID) {
+                showTooManyWindowsMessage(regions[i], kind);
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 
@@ -254,14 +304,8 @@ void QnCameraMotionMaskWidget::at_motionRegionSelected(QGraphicsView *, QnResour
         {
             QnMotionRegion newRegion = widget->getMotionRegionList()[i];
             newRegion.addRect(m_motionSensitivity, r);
-            if (!m_needControlMaxRects || newRegion.isValid(m_camera->motionWindowCnt(), m_camera->motionMaskWindowCnt())) 
-            {
-                widget->addToMotionRegion(m_motionSensitivity, r, i);
-                changed = true;
-            }
-            else {
-                showTooManyWindowsMessage(newRegion);
-            }
+            widget->addToMotionRegion(m_motionSensitivity, r, i);
+            changed = true;
         }
     }
     

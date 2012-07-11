@@ -1,14 +1,14 @@
 #ifndef QN_GRADIENT_BACKROUND_PAINTER_H
 #define QN_GRADIENT_BACKROUND_PAINTER_H
 
-#include <QElapsedTimer>
-#include <QScopedPointer>
+#include <QtCore/QElapsedTimer>
+#include <QtCore/QScopedPointer>
+#include <QtCore/QWeakPointer>
+
 #include "graphics_view.h" /* For QnLayerPainter. */
 
 class QnSettings;
-
-class LinearCombinator;
-
+class QnGlFunctions;
 
 class QnGradientBackgroundPainter: public QnLayerPainter {
 public:
@@ -31,8 +31,11 @@ protected:
     qreal position();
 
 private:
-    LinearCombinator *m_colorCombinator;
-    QnSettings *m_settings;
+    QColor backgroundColor() const;
+
+private:
+    QScopedPointer<QnGlFunctions> m_gl;
+    QWeakPointer<QnSettings> m_settings;
     QElapsedTimer m_timer;
     qreal m_cycleIntervalSecs;
 };

@@ -178,7 +178,7 @@ static bool sizeCompare(const QSize &s1, const QSize &s2)
     return s1.width() > s2.width();
 }
 
-void QnPlDlinkResource::initInternal()
+bool QnPlDlinkResource::initInternal()
 {
 
     CLHttpStatus status;
@@ -187,12 +187,12 @@ void QnPlDlinkResource::initInternal()
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
 		setStatus(Unauthorized);
-        return;
+        return false;
     }
 
 
     if (cam_info_file.size()==0)
-        return;
+        return false;
 
 
     QMutexLocker mutexLocker(&m_mutex);
@@ -294,7 +294,7 @@ void QnPlDlinkResource::initInternal()
 
     //=======remove elements with diff aspect ratio
     if (m_camInfo.resolutions.size() < 2)
-        return;
+        return false;
 
 
     int w_0 = m_camInfo.resolutions.at(0).width();
@@ -325,6 +325,8 @@ void QnPlDlinkResource::initInternal()
         else
             ++it;
     }
+
+    return true;
 
 }
 
@@ -434,8 +436,4 @@ void QnPlDlinkResource::setMotionMaskPhysical(int channel)
         return;
     }
 
-}
-bool QnPlDlinkResource::hasDualStreaming() const
-{
-    return false;
 }

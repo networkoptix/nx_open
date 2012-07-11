@@ -60,6 +60,7 @@ int contain_subst(char *data, int datalen, char *subdata, int subdatalen)
 
 MJPEGtreamreader::MJPEGtreamreader(QnResourcePtr res, const QString& requst)
 :CLServerPushStreamreader(res),
+QnLiveStreamProvider(res),
 mHttpClient(0),
 m_request(requst)
 {

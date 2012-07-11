@@ -8,6 +8,8 @@ struct wsdd__ProbeType;
 struct wsa__EndpointReferenceType;
 struct SOAP_ENV__Header;
 
+typedef QSharedPointer<QUdpSocket> QUdpSocketPtr;
+
 
 class OnvifResourceSearcherWsdd
 {
@@ -20,9 +22,11 @@ class OnvifResourceSearcherWsdd
     static const char WSA_ADDRESS[];
     static const char WSDD_ADDRESS[];
     static const char WSDD_ACTION[];
-    static const char WSDD_MULTICAST_ADDRESS[];
+    static const char WSDD_GSOAP_MULTICAST_ADDRESS[];
 
-    OnvifResourceInformationFetcher& onvifFetcher;
+    OnvifResourceInformationFetcher& m_onvifFetcher;
+    //mutable QHash<QString, QUdpSocketPtr> m_recvSocketList;
+    //mutable QMutex m_mutex;
 
 public:
     static OnvifResourceSearcherWsdd& instance();
@@ -31,16 +35,19 @@ public:
 
 private:
 
+    //void updateInterfacesListenSockets() const;
+    //void findHelloEndpoints(EndpointInfoHash& result) const;
     void findEndpoints(EndpointInfoHash& result) const;
-    const QStringList getAddrPrefixes(const QString& host) const;
-    const QString getAppropriateAddress(const wsdd__ProbeMatchesType* probeMatches, const QStringList& prefixes) const;
-    const QString getName(const wsdd__ProbeMatchesType* probeMatches) const;
-    const QString getManufacturer(const wsdd__ProbeMatchesType* probeMatches, const QString& name) const;
-    const QString getMac(const wsdd__ProbeMatchesType* probeMatches, const SOAP_ENV__Header* header) const;
-    const QString getEndpointAddress(const wsdd__ProbeMatchesType* probeMatches) const;
+    QStringList getAddrPrefixes(const QString& host) const;
     void fillWsddStructs(wsdd__ProbeType& probe, wsa__EndpointReferenceType& endpoint) const;
-    void printProbeMatches(const wsdd__ProbeMatchesType* probeMatches, const SOAP_ENV__Header* header) const;
-    void addEndpointToHash(EndpointInfoHash& hash, const wsdd__ProbeMatchesType* probeMatches,
+
+    template <class T> QString getAppropriateAddress(const T* source, const QStringList& prefixes) const;
+    template <class T> QString getName(const T* source) const;
+    template <class T> QString getManufacturer(const T* source, const QString& name) const;
+    template <class T> QString getMac(const T* source, const SOAP_ENV__Header* header) const;
+    template <class T> QString getEndpointAddress(const T* source) const;
+    template <class T> void printProbeMatches(const T* source, const SOAP_ENV__Header* header) const;
+    template <class T> void addEndpointToHash(EndpointInfoHash& hash, const T* probeMatches,
         const SOAP_ENV__Header* header, const QStringList& addrPrefixes, const QString& host) const;
 };
 

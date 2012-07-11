@@ -113,19 +113,53 @@ void QnStorageManager::addStorage(QnStorageResourcePtr storage)
     storage->setIndex(detectStorageIndex(storage->getUrl()));
     QMutexLocker lock(&m_mutex);
     
-    // remove existing storage record if exists
-    for (StorageMap::iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
-    {
-        if (itr.value()->getId() == storage->getId()) {
-            m_storageRoots.erase(itr);
-            break;
-        }
-    }
+    cl_log.log(QString(QLatin1String("Adding storage. Path: %1. SpaceLimit: %2MiB. Currently avaiable: %3MiB")).arg(storage->getUrl()).arg(storage->getSpaceLimit() / 1024 / 1024).arg(storage->getFreeSpace() / 1024 / 1024), cl_logINFO);
 
+    QnStorageResourcePtr oldStorage = removeStorage(storage); // remove existing storage record if exists
+    if (oldStorage)
+        storage->addWritedSpace(oldStorage->getWritedSpace());
     m_storageRoots.insert(storage->getIndex(), storage);
     if (storage->isStorageAvailable())
         storage->setStatus(QnResource::Online);
     connect(storage.data(), SIGNAL(archiveRangeChanged(qint64, qint64)), this, SLOT(at_archiveRangeChanged(qint64, qint64)), Qt::DirectConnection);
+}
+
+QnStorageResourcePtr QnStorageManager::removeStorage(QnStorageResourcePtr storage)
+{
+    QMutexLocker lock(&m_mutex);
+
+    // remove existing storage record if exists
+    for (StorageMap::iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
+    {
+        if (itr.value()->getId() == storage->getId()) {
+            QnStorageResourcePtr oldStorage = itr.value();
+            m_storageRoots.erase(itr);
+            return oldStorage;
+        }
+    }
+    return QnStorageResourcePtr();
+}
+
+bool QnStorageManager::existsStorageWithID(const QnAbstractStorageResourceList& storages, QnId id) const
+{
+    foreach(const QnAbstractStorageResourcePtr& storage, storages)
+    {
+        if (storage->getId() == id)
+            return true;
+    }
+    return false;
+}
+
+void QnStorageManager::removeAbsentStorages(QnAbstractStorageResourceList newStorages)
+{
+    QMutexLocker lock(&m_mutex);
+    for (StorageMap::iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end();)
+    {
+        if (!existsStorageWithID(newStorages, itr.value()->getId()))
+            itr = m_storageRoots.erase(itr);
+        else
+            ++itr;
+    }
 }
 
 QnStorageManager::~QnStorageManager()
@@ -179,9 +213,9 @@ QnTimePeriodList QnStorageManager::getRecordedPeriods(QnResourceList resList, qi
     {
         QnNetworkResourcePtr camera = qSharedPointerDynamicCast<QnNetworkResource> (resList[i]);
         if (camera) {
-            QString mac = camera->getMAC().toString();
-            getTimePeriodInternal(cameras, camera, startTime, endTime, detailLevel, getFileCatalog(mac, QnResource::Role_LiveVideo));
-            getTimePeriodInternal(cameras, camera, startTime, endTime, detailLevel, getFileCatalog(mac, QnResource::Role_SecondaryLiveVideo));
+            QString physicalId = camera->getPhysicalId();
+            getTimePeriodInternal(cameras, camera, startTime, endTime, detailLevel, getFileCatalog(physicalId, QnResource::Role_LiveVideo));
+            getTimePeriodInternal(cameras, camera, startTime, endTime, detailLevel, getFileCatalog(physicalId, QnResource::Role_SecondaryLiveVideo));
         }
     }
 
@@ -329,8 +363,8 @@ QString QnStorageManager::getFileName(const qint64& dateTime, const QnNetworkRes
     if (!prefix.isEmpty())
         base += prefix + "/";
 
-    QString text = base + camera->getMAC().toString();
-    Q_ASSERT(!camera->getMAC().toString().isEmpty());
+    QString text = base + camera->getPhysicalId();
+    Q_ASSERT(!camera->getPhysicalId().isEmpty());
     text += QString("/") + dateTimeStr(dateTime);
     QList<QFileInfo> list = storage->getFileList(text);
     QList<QString> baseNameList;
@@ -394,7 +428,7 @@ QnStorageResourcePtr QnStorageManager::getStorageByUrl(const QString& fileName)
     return QnStorageResourcePtr();
 }
 
-bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider)
+bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider, qint64 fileSize)
 {
     QMutexLocker lock(&m_mutex);
     int storageIndex;
@@ -403,6 +437,7 @@ bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnA
     if (storageIndex == -1)
         return false;
     storage->releaseBitrate(provider);
+    storage->addWritedSpace(fileSize);
     DeviceFileCatalogPtr catalog = getFileCatalog(mac, quality);
     if (catalog == 0)
         return false;

@@ -5,17 +5,20 @@
 
 #include <recording/time_period.h>
 
+#include <ui/common/functors.h>
 #include <ui/processors/kinetic_process_handler.h>
 #include <ui/processors/drag_process_handler.h>
 #include <ui/animation/animation_timer_listener.h>
 #include <ui/animation/animated.h>
 
 #include "time_step.h"
+#include "camera/thumbnail.h"
 
 class QTimer;
 
 class QnThumbnailsLoader;
 class QnTimeSliderPixmapCache;
+
 
 class QnTimeSlider: public Animated<QnToolTipSlider>, protected KineticProcessHandler, protected DragProcessHandler, protected AnimationTimerListener {
     Q_OBJECT;
@@ -108,6 +111,15 @@ public:
 
     void setWindow(qint64 start, qint64 end);
 
+    bool windowContains(qint64 position);
+    void ensureWindowContains(qint64 position);
+
+    using base_type::setSliderPosition;
+    void setSliderPosition(qint64 position, bool keepInWindow);
+
+    using base_type::setValue;
+    void setValue(qint64 value, bool keepInWindow);
+
     qint64 selectionStart() const;
     void setSelectionStart(qint64 selectionStart);
 
@@ -181,48 +193,6 @@ private:
         CreateSelectionMarker
     };
 
-    Marker markerFromPosition(const QPointF &pos, qreal maxDistance = 1.0) const;
-    QPointF positionFromMarker(Marker marker) const;
-
-    QRectF thumbnailsRect() const;
-    QRectF rulerRect() const;
-    qreal effectiveLineStretch(int line) const;
-
-    void setMarkerSliderPosition(Marker marker, qint64 position);
-
-    bool isAnimatingWindow() const;
-
-    bool scaleWindow(qreal factor, qint64 anchor);
-
-    void drawPeriodsBar(QPainter *painter, QnTimePeriodList &recorded, QnTimePeriodList &motion, const QRectF &rect);
-    void drawTickmarks(QPainter *painter, const QRectF &rect);
-    void drawSolidBackground(QPainter *painter, const QRectF &rect);
-    void drawMarker(QPainter *painter, qint64 pos, const QColor &color);
-    void drawSelection(QPainter *painter);
-    void drawSeparator(QPainter *painter, const QRectF &rect);
-    void drawDates(QPainter *painter, const QRectF &rect);
-    void drawThumbnails(QPainter *painter, const QRectF &rect);
-
-    void updateVisibleLineCount();
-    void updateToolTipVisibility();
-    void updateToolTipText();
-    void updateSteps();
-    void updateMSecsPerPixel();
-    void updateMinimalWindow();
-    void updateStepAnimationTargets();
-    void updateLineCommentPixmap(int line);
-    void updateLineCommentPixmaps();
-    void updateAggregationValue();
-    void updateAggregatedPeriods(int line, Qn::TimePeriodRole type);
-    void updateTotalLineStretch();
-    void updateThumbnailsLater();
-    Q_SLOT void updateThumbnails();
-
-    void animateStepValues(int deltaMSecs);
-
-private:
-    Q_DECLARE_PRIVATE(GraphicsSlider);
-
     struct TimeStepData {
         TimeStepData(): currentHeight(0.0), targetHeight(0.0), currentLineOpacity(0.0), targetLineOpacity(0.0), currentTextOpacity(0.0), targetTextOpacity(0.0) {}
 
@@ -248,6 +218,75 @@ private:
         qreal stretch;
     };
 
+    struct ThumbnailData {
+        ThumbnailData(): pos(0.0), opacity(0.0), hiding(false), selection(0.0), selecting(false) {}
+        ThumbnailData(const QnThumbnail &thumbnail): thumbnail(thumbnail), pos(0.0), opacity(0.0), hiding(false), selection(0.0), selecting(false) {}
+
+        QnThumbnail thumbnail;
+        qreal pos;
+        qreal opacity;
+        qreal selection;
+        bool hiding;
+        bool selecting;
+    };
+
+private:
+    Marker markerFromPosition(const QPointF &pos, qreal maxDistance = 1.0) const;
+    QPointF positionFromMarker(Marker marker) const;
+
+    qreal quickPositionFromValue(qint64 logicalValue, bool bound = true) const;
+
+    QRectF thumbnailsRect() const;
+    QRectF rulerRect() const;
+    qreal effectiveLineStretch(int line) const;
+
+    void setMarkerSliderPosition(Marker marker, qint64 position);
+
+    bool isAnimatingWindow() const;
+
+    bool scaleWindow(qreal factor, qint64 anchor);
+
+    void drawPeriodsBar(QPainter *painter, QnTimePeriodList &recorded, QnTimePeriodList &motion, const QRectF &rect);
+    void drawTickmarks(QPainter *painter, const QRectF &rect);
+    void drawSolidBackground(QPainter *painter, const QRectF &rect);
+    void drawMarker(QPainter *painter, qint64 pos, const QColor &color);
+    void drawSelection(QPainter *painter);
+    void drawSeparator(QPainter *painter, const QRectF &rect);
+    void drawDates(QPainter *painter, const QRectF &rect);
+    void drawThumbnails(QPainter *painter, const QRectF &rect);
+    void drawThumbnail(QPainter *painter, const ThumbnailData &data, const QRectF &targetRect, const QRectF &boundingRect);
+
+    void updateVisibleLineCount();
+    void updateToolTipVisibility();
+    void updateToolTipText();
+    void updateSteps();
+    void updateMSecsPerPixel();
+    void updateMinimalWindow();
+    void updateStepAnimationTargets();
+    void updateLineCommentPixmap(int line);
+    void updateLineCommentPixmaps();
+    void updateAggregationValue();
+    void updateAggregatedPeriods(int line, Qn::TimePeriodRole type);
+    void updateTotalLineStretch();
+    void updateThumbnailsStepSize(bool instant, bool forced = false);
+    void updateThumbnailsPeriod();
+    void updateThumbnailsStepSizeLater();
+    Q_SLOT void updateThumbnailsStepSizeTimer();
+    Q_SLOT void updateThumbnailsStepSizeForced();
+
+    Q_SLOT void addThumbnail(const QnThumbnail &thumbnail);
+    Q_SLOT void clearThumbnails();
+
+    void animateStepValues(int deltaMSecs);
+    void animateThumbnails(int deltaMSecs);
+    bool animateThumbnail(qreal dt, ThumbnailData &data);
+    void freezeThumbnails();
+
+    void setThumbnailSelecting(qint64 time, bool selecting);
+
+private:
+    Q_DECLARE_PRIVATE(GraphicsSlider);
+
     qint64 m_windowStart, m_windowEnd;
     qint64 m_minimalWindow;
 
@@ -257,6 +296,9 @@ private:
     qint64 m_oldMinimum, m_oldMaximum;
     Options m_options;
     QString m_toolTipFormat;
+
+    QnLinearFunction m_unboundMapper;
+    QnBoundedLinearFunction m_boundMapper;
 
     qint64 m_zoomAnchor;
     bool m_unzooming;
@@ -279,7 +321,12 @@ private:
 
     QWeakPointer<QnThumbnailsLoader> m_thumbnailsLoader;
     QTimer *m_thumbnailsUpdateTimer;
+    qint64 m_lastThumbnailsUpdateTime;
     QPixmap m_noThumbnailsPixmap;
+    QMap<qint64, ThumbnailData> m_thumbnailData;
+    QList<ThumbnailData> m_oldThumbnailData;
+    QRectF m_thumbnailsPaintRect;
+    qint64 m_lastHoverThumbnail;
 
     qreal m_rulerHeight;
     qreal m_prefferedHeight;

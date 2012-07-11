@@ -1,8 +1,6 @@
 TEMPLATE = lib
 
 win32 {
-  QMAKE_CXXFLAGS += -Zc:wchar_t
-  QMAKE_CXXFLAGS -= -Zc:wchar_t- 
   pb.commands = ${project.build.directory}/build/bin/protoc --proto_path=${project.build.sourceDirectory}/api/pb --cpp_out=$${MOC_DIR} ${project.build.sourceDirectory}/api/pb/${QMAKE_FILE_BASE}.proto
 }
 

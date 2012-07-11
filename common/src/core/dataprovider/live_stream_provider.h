@@ -6,15 +6,15 @@
 #include "core/datapacket/mediadatapacket.h"
 #include "motion/motion_estimation.h"
 #include "../resource/motion_window.h"
+#include "core/resource/resource_fwd.h"
 
 #define META_DATA_DURATION_MS 300
 
-int bestBitrateKbps(QnStreamQuality q, QSize resolution, int fps);
 
 class QnLiveStreamProvider
 {
 public:
-    QnLiveStreamProvider();
+    QnLiveStreamProvider(QnResourcePtr res);
     virtual ~QnLiveStreamProvider();
 
     void setRole(QnResource::ConnectionRole role);
@@ -36,7 +36,6 @@ public:
 
     void onGotVideoFrame(QnCompressedVideoDataPtr videoData);
 
-    bool isSoftwareMotion() const;
     void setUseSoftwareMotion(bool value);
 
     void updateSoftwareMotion();
@@ -62,9 +61,9 @@ private:
 
     QnResource::ConnectionRole m_role;
     QnMotionEstimation m_motionEstimation[CL_MAX_CHANNELS];
-    bool m_softwareMotion;
     int m_softMotionLastChannel;
     const QnVideoResourceLayout* m_layout;
+    QnPhysicalCameraResourcePtr m_cameraRes;
 };
 
 #endif //live_strem_provider_h_1508

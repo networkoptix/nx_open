@@ -12,10 +12,11 @@ from string import Template
 
 sys.path.insert(0, '../common')
 
-from convert import index_dirs, rmtree, setup_ffmpeg, setup_qjson, setup_openssl, instantiate_pro, copy_files, BUILDLIB, setup_tools, platform
+from convert import index_dirs, rmtree, setup_ffmpeg, setup_openssl, instantiate_pro, copy_files, BUILDLIB, setup_tools, platform
 from convert import gen_env_sh
 from convert import convert as convert_common
 from common_version import *
+from gencomp import gencomp_cpp
 
 APPLICATION_NAME = 'Network Optix Media Server'
 FFMPEG_VERSION = '2011-08-29'
@@ -36,7 +37,7 @@ def gen_version_h():
     print >> version_h, 'static const char* APPLICATION_NAME="%s";' % APPLICATION_NAME
     print >> version_h, 'static const char* APPLICATION_VERSION="%s.%s";' % (APPLICATION_VERSION, BUILD_NUMBER)
     print >> version_h, 'const char* const APPLICATION_REVISION="%s";' % REVISION
-    print >> version_h, 'const char* const FFMPEG_VERSION="%s";' % FFMPEG_VERSION	
+    print >> version_h, 'const char* const FFMPEG_VERSION="%s";' % FFMPEG_VERSION   
     print >> version_h, ''
 
     print >> version_h, '// There constans are here for windows resouce file.'
@@ -65,7 +66,6 @@ if len(sys.argv) == 2 and sys.argv[1] == '-parents':
 
 ffmpeg_path, ffmpeg_path_debug, ffmpeg_path_release = setup_ffmpeg()
 tools_path = setup_tools()
-qjson_path = setup_qjson()
 openssl_path = setup_openssl()
 
 if os.path.exists('bin'):
@@ -81,6 +81,7 @@ os.mkdir('bin/debug-test')
 os.mkdir('bin/release-test')
 
 os.mkdir('build')
+os.mkdir('build/generated')
 
 if platform() != 'win32':
     ldpath_debug = ''
@@ -103,13 +104,6 @@ else:
     ldpath_release += ':' + tools_path + '/lib'
 
 if platform() == 'win32':
-    copy_files(qjson_path + '/release/qjson.dll', 'bin/release')
-    copy_files(qjson_path + '/debug/qjson.dll', 'bin/debug')
-else:
-    ldpath_debug += ':' + os.path.abspath(qjson_path)
-    ldpath_release += ':' + os.path.abspath(qjson_path)
-
-if platform() == 'win32':
     copy_files(openssl_path + '/bin/*.dll', 'bin/debug')
     copy_files(openssl_path + '/bin/*.dll', 'bin/release')
 
@@ -118,10 +112,11 @@ if platform() != 'win32':
     ldpath_release += ':' + os.path.abspath('../common/bin/release')
 
 if platform() != 'win32':
-    gen_env_sh('bin/debug/env.sh', ldpath_debug, {'FFMPEG_PATH' : ffmpeg_path_debug, 'QJSON_PATH' : os.path.abspath(qjson_path)})
-    gen_env_sh('bin/release/env.sh', ldpath_release, {'FFMPEG_PATH' : ffmpeg_path_release, 'QJSON_PATH' : os.path.abspath(qjson_path)})
+    gen_env_sh('bin/debug/env.sh', ldpath_debug, {'FFMPEG_PATH' : ffmpeg_path_debug})
+    gen_env_sh('bin/release/env.sh', ldpath_release, {'FFMPEG_PATH' : ffmpeg_path_release})
 
 gen_version_h()
+gencomp_cpp(open('build/generated/compatibility_info.cpp', 'w'))
 
 index_dirs(('src',), 'src/const.pro', 'src/server.pro', exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
 instantiate_pro('src/server.pro', {'BUILDLIB' : BUILDLIB, 'FFMPEG' : ffmpeg_path, 'EVETOOLS_DIR' : tools_path})

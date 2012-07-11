@@ -23,8 +23,8 @@
         <?define VmsChanging=" (Installed AND REMOVE <> "ALL") "?>
         <?define VmsRemoving=" (Installed AND REMOVE = "ALL") "?>
         <?define VmsRepairing=" (REINSTALLMODE) " ?>
-		
-		<?define LaunchClientChecBoxText="Launch ${product.name} when setup exits." ?>
+        
+        <?define LaunchClientChecBoxText="Launch ${product.name} when setup exits." ?>
         
         <SetProperty Id="REBOOT" Value="reallysuppress" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
         <SetProperty Id="PREVIOUSVERSIONSINSTALLED" Value="[MIGRATE]" After="FindRelatedProducts"/>
@@ -42,8 +42,8 @@
         
         <Property Id="MSIRESTARTMANAGERCONTROL" Value="Disable" Secure="yes"/>
 
-		<Property Id="LAUNCHAPPONEXIT" Secure="yes" />
-    	<Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(var.LaunchClientChecBoxText)" />
+        <Property Id="LAUNCHAPPONEXIT" Secure="yes" />
+        <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(var.LaunchClientChecBoxText)" />
        
         <!-- Properties -->
         <Property Id="WelcomeDlg_Title" Value="${product.name} Installer Setup" />
@@ -96,7 +96,7 @@
         
         <Property Id="APPSERVER_LOGIN" Secure="yes" Value="admin"/>
         <Property Id="APPSERVER_PASSWORD" Secure="yes"/>
-		<Property Id="APPSERVER_PASSWORD_CONFIRM" Secure="yes"/>
+        <Property Id="APPSERVER_PASSWORD_CONFIRM" Secure="yes"/>
         
         <!-- MediaServer properties-->
         <Property Id="SERVER_APPSERVER_HOST" Secure="yes" Value="localhost"/>
@@ -192,8 +192,8 @@
         <CustomAction Id="AssignServerAppServerPort" Property="SERVER_APPSERVER_PORT" Value="[APPSERVER_PORT]"/>
         <CustomAction Id="AssignClientAppServerPort" Property="CLIENT_APPSERVER_PORT" Value="[APPSERVER_PORT]"/>
         
-        <CustomAction Id="AssignServerFolder" Property="SERVER_DIRECTORY" Value="[ROOTDRIVE]\HDWitness" />
-        <CustomAction Id="AssignClientFolder" Property="CLIENT_DIRECTORY" Value="[MOVIESFOLDER]\HD Witness Client Media" />
+        <CustomAction Id="AssignServerFolder" Property="SERVER_DIRECTORY" Value="[ROOTDRIVE]\${product.name}" />
+        <CustomAction Id="AssignClientFolder" Property="CLIENT_DIRECTORY" Value="[MOVIESFOLDER]\${product.name} Client Media" />
         
         <CustomAction Id="ResetServerFolder" Property="SERVER_DIRECTORY" Value="[SERVER_DIRECTORY_REG]" />
         <CustomAction Id="ResetClientFolder" Property="CLIENT_DIRECTORY" Value="[CLIENT_DIRECTORY_REG]" />
@@ -344,19 +344,25 @@
                                 </RegistryKey>
                             </Component>
                             
-                            <Component Id="AppServerConfiguration" Guid="{46C18E7E-D25C-4250-AF5F-0237EEFAA80E}" Permanent="yes">
-                                <Condition>
-                                    NOT PREVIOUSVERSIONSINSTALLED
-                                </Condition>
-                                
+                            <Component Id="AppServerConfiguration" Guid="{46C18E7E-D25C-4250-AF5F-0237EEFAA80E}">
                                 <RegistryKey Root="HKLM"
                                              Key="Software\[Manufacturer]\${appserver.name}" Action="create">
                                     <RegistryValue Type="string" Name="port" Value="[APPSERVER_PORT]"/>
                                     <RegistryValue Type="string" Name="proxyPort" Value="[PROXY_PORT]"/>
                                     <RegistryValue Type="string" Name="login" Value="[APPSERVER_LOGIN]"/>
-                                    <RegistryValue Type="string" Name="password" Value="[APPSERVER_PASSWORD]"/>
                                 </RegistryKey>
                             </Component>
+                       
+                           <Component Id="AppServerConfigurationPassword" Guid="{DF889354-8330-4b69-A2EA-47061E9AF1B0}" Permanent="yes">
+                                <Condition>
+                                    NOT PREVIOUSVERSIONSINSTALLED
+                                </Condition>
+                               
+                                <RegistryKey Root="HKLM"
+                                             Key="Software\[Manufacturer]\Enterprise Controller" Action="create">
+                                    <RegistryValue Type="string" Name="password" Value="[APPSERVER_PASSWORD]"/>
+                                </RegistryKey>
+                           </Component>
                         </Directory>
                         
                         <Directory Id="VmsTrayToolDir" Name="TrayTool">
@@ -378,6 +384,10 @@
                                 <File Id="TrayToolQtGui$(var.suffix)4.dll" Name="QtGui$(var.suffix)4.dll" Source="traytool\QtGui$(var.suffix)4.dll"  />
                                 <File Id="TrayToolQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="traytool\QtNetwork$(var.suffix)4.dll"  />
                             </Component>
+                            <Component Id="TrayToolOpenSSL" Guid="{9C379C95-1EDE-49b0-8C6C-7B55ADE60599}">
+                                <File Id="TrayToollibeay32.dll" Name="libeay32.dll" Source="traytool\libeay32.dll"/>
+                                <File Id="TrayToolssleay32.dll" Name="ssleay32.dll" Source="traytool\ssleay32.dll"/>
+                            </Component>							
                         </Directory>
                         
                         <Directory Id="VmsProxyServerDir" Name="MediaProxy">
@@ -407,6 +417,10 @@
                                 <File Id="ProxyQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="mediaproxy\QtNetwork$(var.suffix)4.dll" />
                                 <File Id="ProxyQtXml$(var.suffix)4.dll" Name="QtXml$(var.suffix)4.dll" Source="mediaproxy\QtXml$(var.suffix)4.dll" />
                             </Component>
+                            <Component Id="ProxyOpenSSL" Guid="{B2CFCF46-4618-44a9-9BB5-7C832AA10652}">
+                                <File Id="Proxylibeay32.dll" Name="libeay32.dll" Source="mediaproxy\libeay32.dll"/>
+                                <File Id="Proxyssleay32.dll" Name="ssleay32.dll" Source="mediaproxy\ssleay32.dll"/>
+                            </Component>							
                         </Directory>
                         
                         <Directory Id="VmsMediaServerDir" Name="MediaServer">
@@ -478,16 +492,12 @@
                                 <File Id="Serverlibeay32.dll" Name="libeay32.dll" Source="mediaserver\libeay32.dll"/>
                                 <File Id="Serverssleay32.dll" Name="ssleay32.dll" Source="mediaserver\ssleay32.dll"/>
                             </Component>
-                            
-                            <Component Id="ServerQjson" Guid="{809F73F7-A313-4190-8DF5-389D6B57064B}">
-                                <File Id="ServerQjsonDll" Name="qjson.dll" Source="mediaserver/qjson.dll"/>
-                            </Component>
                         </Directory>
                         
                         <Directory Id="VmsClientDir" Name="Client">
                             <Component Id="ClientExecutable" Guid="{7AAC7815-50A6-4dc9-ADD2-BDD9B7EE8FEF}">
-                                <File Id="client.exe" Name="client.exe" Source="client/client.exe" KeyPath="yes">
-                                    <fire:FirewallException Id="FirewallExceptionClient" Name="HD Witness" Scope="any" IgnoreFailure="yes"/>
+                                <File Id="client.exe" Name="${product.name}.exe" Source="client/client.exe" KeyPath="yes">
+                                    <fire:FirewallException Id="FirewallExceptionClient" Name="${product.name}" Scope="any" IgnoreFailure="yes"/>
                                     
                                     <Shortcut Id="StartmenuClient" Directory="ProgramMenuDir" Name="${product.name}"
                                               WorkingDirectory='VmsClientDir' Advertise="yes" Icon="icon_menu.exe" >
@@ -514,6 +524,10 @@
                                 </RegistryKey>
                             </Component>
                             
+                           <Component Id="ClientConfigurationPassword" Guid="{C6565C10-1BB5-417d-8EEA-F2CC8362374F}">
+                               <RemoveRegistryValue Root="HKCU" Key="Software\[Manufacturer]\${company.name} ${product.name} Client" Name="appserverPassword"/>
+                           </Component>
+                           
                             <Directory Id="ImageFormats" Name="imageformats">
                                 <Component Id="ImageFormats" Guid="{74793EF7-61C1-4e9c-81D6-A120E85D984F}">
                                     <File Id="qgif4.dll" Name="qgif4.dll" Source="client\imageformats\qgif$(var.suffix)4.dll" />
@@ -550,10 +564,6 @@
                             <Component Id="ClientOpenSSL" Guid="{D7E994B3-B437-4993-A04E-C15AF9DF8312}">
                                 <File Id="Clientlibeay32.dll" Name="libeay32.dll" Source="client\libeay32.dll"/>
                                 <File Id="Clientssleay32.dll" Name="ssleay32.dll" Source="client\ssleay32.dll"/>
-                            </Component>
-                            
-                            <Component Id="ClientQjson" Guid="{E22DFDE7-0917-4feb-971D-74457D2DAD71}">
-                                <File Id="ClientQjsonDll" Name="qjson.dll" Source="client/qjson.dll"/>
                             </Component>
                             
                             <Component Id="ClientQtColorPicker" Guid="{A8E0F358-198A-4D79-A6F0-607D60F524EE}">
@@ -608,10 +618,12 @@
             <ComponentRef Id="AppServerExecutable" />
             <ComponentRef Id="ecs.log" />           
             <ComponentRef Id="AppServerConfiguration"/>
+           <ComponentRef Id="AppServerConfigurationPassword"/>
             <ComponentRef Id="AppServerConfigurationGuid"/>
             
             <ComponentRef Id="ProxyExecutable" />
             <ComponentRef Id="ProxyQTLibraries" />
+			<ComponentRef Id="ProxyOpenSSL" />
         </Feature>
         
         <Feature Id="TrayToolFeature" Title="Tray Tool" AllowAdvertise="no" Display="hidden" Level="1">
@@ -619,6 +631,7 @@
             
             <ComponentRef Id="traytool.exe"/>
             <ComponentRef Id="TrayToolQTLibraries"/>
+			<ComponentRef Id="TrayToolOpenSSL"/>
             <ComponentRef Id="UninstallProgramMenuFolder"/>
         </Feature>
         
@@ -634,21 +647,22 @@
             <ComponentRef Id="ServerFFmpegLibraries"/>
             <ComponentRef Id="ServerQTLibraries" />
             <ComponentRef Id="ServerOpenSSL"/>
-            <ComponentRef Id="ServerQjson"/>
         </Feature>
         
         <Feature Id="ClientFeature" Title="${product.name} Client" Level="1"
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
 <!--            <Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !ClientFeature <> 3 ]]> </Condition>-->
             
+            <ComponentRef Id="NovFileAssociation"/>
+ 
             <ComponentRef Id="ClientExecutable" />
             <ComponentRef Id="ClientConfiguration" />
+            <ComponentRef Id="ClientConfigurationPassword" />
             <ComponentRef Id="ClientFFmpegLibraries"/>
             <ComponentRef Id="ClientQTLibraries" />
             <ComponentRef Id="ImageFormats" />
             <ComponentRef Id="ClientOpenAL" />
             <ComponentRef Id="ClientOpenSSL" />
-            <ComponentRef Id="ClientQjson"/>
             <ComponentRef Id="ClientQtColorPicker"/>
             <ComponentRef Id="bespin" />
             
@@ -722,15 +736,15 @@
             <Publish Dialog="InstallTypeDlg" Control="Next" Property="CLIENT_APPSERVER_HOST" Value="localhost" Order="4"><![CDATA[ INSTALLTYPE=0 ]]></Publish>
             <Publish Dialog="InstallTypeDlg" Control="Next" Property="CLIENT_APPSERVER_PORT" Value="[APPSERVER_PORT]" Order="4"><![CDATA[ INSTALLTYPE=0 ]]></Publish>
             <Publish Dialog="InstallTypeDlg" Control="Next" Property="CLIENT_APPSERVER_LOGIN" Value="[APPSERVER_LOGIN]" Order="4"><![CDATA[ INSTALLTYPE=0 ]]></Publish>
-			
-			<?define EcsPasswordsEqual="(APPSERVER_PASSWORD = APPSERVER_PASSWORD_CONFIRM)" ?>
+            
+            <?define EcsPasswordsEqual="(APPSERVER_PASSWORD = APPSERVER_PASSWORD_CONFIRM)" ?>
            
             <Publish Dialog="PasswordDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg">1</Publish>
             <Publish Dialog="PasswordDlg" Control="Next" Event="SpawnDialog" Value="EmptyPasswordDlg">NOT APPSERVER_PASSWORD</Publish>
             <Publish Dialog="PasswordDlg" Control="Next" Property="SERVER_APPSERVER_PASSWORD" Value="[APPSERVER_PASSWORD]">APPSERVER_PASSWORD</Publish>
-			<Publish Dialog="PasswordDlg" Control="Next" Event="SpawnDialog" Value="PasswordShouldMatchDlg" Order="2"><![CDATA[ NOT $(var.EcsPasswordsEqual) ]]></Publish>
-			<Publish Dialog="PasswordDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">$(var.EcsPasswordsEqual) AND APPSERVER_PASSWORD</Publish>
-			
+            <Publish Dialog="PasswordDlg" Control="Next" Event="SpawnDialog" Value="PasswordShouldMatchDlg" Order="2"><![CDATA[ NOT $(var.EcsPasswordsEqual) ]]></Publish>
+            <Publish Dialog="PasswordDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">$(var.EcsPasswordsEqual) AND APPSERVER_PASSWORD</Publish>
+            
             <Publish Dialog="AdvancedTypeDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg">1</Publish>
             <Publish Dialog="AdvancedTypeDlg" Control="Next" Event="NewDialog" Value="MyFeaturesDlg">1</Publish>
             
@@ -767,7 +781,7 @@
             <Publish Dialog="MyFeaturesDlg" Control="Next" Property="CLIENT_APPSERVER_PORT" Value="{}" Order="4"><![CDATA[ NOT $(var.AppServerInstallingClient) ]]></Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Property="CLIENT_APPSERVER_LOGIN" Value="{}" Order="4"><![CDATA[ NOT $(var.AppServerInstallingClient) ]]></Publish>
 			<Publish Dialog="MyFeaturesDlg" Control="Next" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="{}"><![CDATA[ &ClientFeature <> 3 ]]></Publish>
-        	<Publish Dialog="MyFeaturesDlg" Control="Next" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(var.LaunchClientChecBoxText)"><![CDATA[ &ClientFeature = 3 ]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(var.LaunchClientChecBoxText)"><![CDATA[ &ClientFeature = 3 ]]></Publish>
             
             <Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg">1</Publish>
             <Publish Dialog="InstallDirDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
@@ -782,12 +796,12 @@
             <Publish Dialog="AppServerDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg">1</Publish>
 
 			<?define EcsPortsDiffer="(APPSERVER_PORT <> PROXY_PORT)" ?>
-        	<?define EcsNeedCheckPorts="(APPSERVER_PORT <> OLD_APPSERVER_PORT OR PROXY_PORT <> OLD_PROXY_PORT)" ?>			
+            <?define EcsNeedCheckPorts="(APPSERVER_PORT <> OLD_APPSERVER_PORT OR PROXY_PORT <> OLD_PROXY_PORT)" ?>        
             
             <Publish Dialog="AppServerDlg" Control="Next" Property="BUSYPORT" Value="{}">1</Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Property="PORTSTOTEST" Value="[APPSERVER_PORT] [PROXY_PORT]" Order="1">1</Publish>
 			<Publish Dialog="AppServerDlg" Control="Next" Event="SpawnDialog" Value="PortDuplicateDlg" Order="2"><![CDATA[ NOT $(var.EcsPortsDiffer) ]]></Publish>
-        	<Publish Dialog="AppServerDlg" Control="Next" Event="SpawnDialog" Value="PasswordShouldMatchDlg" Order="2"><![CDATA[ $(var.EcsPortsDiffer) AND NOT $(var.EcsPasswordsEqual) ]]></Publish>
+            <Publish Dialog="AppServerDlg" Control="Next" Event="SpawnDialog" Value="PasswordShouldMatchDlg" Order="2"><![CDATA[ $(var.EcsPortsDiffer) AND NOT $(var.EcsPasswordsEqual) ]]></Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Event="DoAction" Value="CheckPorts" Order="2"><![CDATA[ $(var.EcsPortsDiffer) AND $(var.EcsPasswordsEqual) AND $(var.EcsNeedCheckPorts) ]]></Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Event="NewDialog" Value="PortIsBusyDlg" Order="3"><![CDATA[ $(var.EcsPortsDiffer) AND $(var.EcsPasswordsEqual) AND BUSYPORT ]]></Publish>
             
@@ -806,7 +820,6 @@
             <Publish Dialog="AppServerDlg" Control="Next" Property="CLIENT_APPSERVER_HOST" Value="localhost" Order="4">1</Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Property="CLIENT_APPSERVER_PORT" Value="[APPSERVER_PORT]" Order="4">1</Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Property="CLIENT_APPSERVER_LOGIN" Value="[APPSERVER_LOGIN]" Order="4">1</Publish>
-            <Publish Dialog="AppServerDlg" Control="Next" Property="CLIENT_APPSERVER_PASSWORD" Value="[APPSERVER_PASSWORD]" Order="4">1</Publish>
             
             <Publish Dialog="AppServerDlg" Control="Next" Property="PORT_DIALOG_BACK" Value="AppServerDlg">1</Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Property="PORT_DIALOG_NEXT" Value="MediaServerDlg"><![CDATA[(NOT BUSYPORT AND &ServerFeature=3)]]></Publish>

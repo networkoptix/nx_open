@@ -10,11 +10,11 @@ QnDialQualityHelper::QnDialQualityHelper()
 
 void QnDialQualityHelper::setResource(QnNetworkResourcePtr netResource)
 {
-    m_catalogHi = qnStorageMan->getFileCatalog(netResource->getMAC().toString(), QnResource::Role_LiveVideo);
-    m_catalogLow = qnStorageMan->getFileCatalog(netResource->getMAC().toString(), QnResource::Role_SecondaryLiveVideo);
+    m_catalogHi = qnStorageMan->getFileCatalog(netResource->getPhysicalId(), QnResource::Role_LiveVideo);
+    m_catalogLow = qnStorageMan->getFileCatalog(netResource->getPhysicalId(), QnResource::Role_SecondaryLiveVideo);
 }
 
-void QnDialQualityHelper::findDataForTime(const qint64 time, DeviceFileCatalog::Chunk& chunk, DeviceFileCatalogPtr& catalog, DeviceFileCatalog::FindMethod findMethod)
+void QnDialQualityHelper::findDataForTime(const qint64 time, DeviceFileCatalog::Chunk& chunk, DeviceFileCatalogPtr& catalog, DeviceFileCatalog::FindMethod findMethod) const
 {
     catalog = (m_quality == MEDIA_Quality_High ? m_catalogHi : m_catalogLow);
     chunk = catalog->chunkAt(catalog->findFileIndex(time, findMethod));
@@ -34,8 +34,8 @@ void QnDialQualityHelper::findDataForTime(const qint64 time, DeviceFileCatalog::
         if (timeDistance - timeDistanceAlt > SECOND_STREAM_FIND_EPS) 
         {
             // alternate quality matched better
-            if (altChunk.containsTime(chunk.startTimeMs))
-                altChunk.truncate(chunk.startTimeMs);
+            if (timeDistance != INT_MAX && altChunk.containsTime(chunk.startTimeMs))
+                altChunk.truncate(chunk.startTimeMs); // truncate to start of the next chunk of the required quality (if next chunk of requested quality is exists)
 
             catalog = catalogAlt;
             chunk = altChunk;

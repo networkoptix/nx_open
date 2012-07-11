@@ -5,13 +5,14 @@
 #include <QtGui/QMessageBox>
 #include <QtGui/QDesktopServices>
 
-#include "core/resource/resource.h"
-#include "core/resource/camera_resource.h"
-#include "core/resourcemanagment/resource_pool.h"
-#include "ui/common/read_only.h"
-#include "ui/device_settings/camera_schedule_widget.h"
-#include "ui/device_settings/camera_motion_mask_widget.h"
-#include "ui/graphics/items/resource_widget.h"
+#include <core/resource/resource.h>
+#include <core/resource/camera_resource.h>
+#include <core/resourcemanagment/resource_pool.h>
+
+#include <ui/common/read_only.h>
+#include <ui/device_settings/camera_schedule_widget.h>
+#include <ui/device_settings/camera_motion_mask_widget.h>
+#include <ui/graphics/items/resource_widget.h>
 
 QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     QWidget(parent),
@@ -20,7 +21,8 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     m_hasChanges(false),
     m_hasScheduleChanges(false),
     m_readOnly(false),
-    m_inUpdateMaxFps(false)
+    m_inUpdateMaxFps(false),
+    m_cameraSupportsMotion(false)
 {
     ui->setupUi(this);
 
@@ -43,7 +45,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
 
     connect(ui->cameraMotionButton,     SIGNAL(clicked(bool)),                  this,   SLOT(at_motionTypeChanged()));
     connect(ui->softwareMotionButton,   SIGNAL(clicked(bool)),                  this,   SLOT(at_motionTypeChanged()));
-    connect(ui->sensitivitySlider,      SIGNAL(valueChanged(int)),              this,   SLOT(at_motionSensitivityChanged(int)));
+    connect(ui->sensitivitySlider,      SIGNAL(valueChanged(int)),              this,   SLOT(updateMotionWidgetSensitivity()));
     connect(ui->resetMotionRegionsButton, SIGNAL(clicked()),                    this,   SLOT(at_motionSelectionCleared()));
 
     updateFromResource();
@@ -58,63 +60,11 @@ const QnVirtualCameraResourcePtr &QnSingleCameraSettingsWidget::camera() const {
 }
 
 void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &camera) {
-    // TODO: re-introduce camera equality check (if (camera == m_camera) return; ), 
-    // move out motionwidget-related code.
+    if(m_camera == camera)
+        return;
 
     m_camera = camera;
     
-    if (m_camera)
-    {
-        ui->softwareMotionButton->setEnabled(camera->supportedMotionType() & MT_SoftwareGrid);
-        if (camera->supportedMotionType() & (MT_HardwareGrid | MT_MotionWindow))
-            ui->cameraMotionButton->setText("Hardware (Camera built-in)");
-        else
-            ui->cameraMotionButton->setText("Do not record motion");
-
-        QVariant val;
-        QString webPageAddress = QString("<A HREF=\"http://%1/%2\">http://%1/%2</A>").arg(m_camera->getHostAddress().toString()).arg(val.toString());
-        ui->motionWebPageLabel->setText(tr("%1").arg(webPageAddress));
-        if(m_motionWidget) 
-            m_motionWidget->setCamera(m_camera);
-        ui->cameraMotionButton->setChecked(m_camera->getMotionType() != MT_SoftwareGrid);
-        ui->softwareMotionButton->setChecked(m_camera->getMotionType() == MT_SoftwareGrid);
-        //updateMaxMotionRect();
-
-        bool mEnabled = m_camera->supportedMotionType() != MT_NoMotion;
-        ui->motionSettingsGroupBox->setEnabled(mEnabled);
-       
-        if (m_motionWidget) {
-            m_motionWidget->setVisible(mEnabled);
-            ui->motionAvailableLabel->setVisible(!mEnabled);
-            m_motionWidget->setNeedControlMaxRects(mEnabled && !ui->softwareMotionButton->isChecked());
-        }
-
-
-        /*
-        if (m_camera->getParam("motionEditURL", val, QnDomainMemory))
-        {
-            // motion editing is not supported. Place only reference to WEB page
-            ui->motionWEBPageLink->setText(tr("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
-            if(m_motionWidget) {
-                m_motionWidget->hide();
-                ui->motionWEBPageLink->show();
-                ui->motionWebPageLabel->show();
-                m_motionWidget->setCamera(QnResourcePtr());
-            }
-
-        }
-        else 
-        {
-            ui->motionWEBPageLink->setText(tr("%1").arg(webPageAddress));
-            if(m_motionWidget) {
-                m_motionWidget->setCamera(m_camera);
-                m_motionWidget->show();
-                //ui->motionWEBPageLink->hide();
-                //ui->motionWebPageLabel->hide();
-            }
-        }
-        */
-    }
     updateFromResource();
 }
 
@@ -175,7 +125,6 @@ void QnSingleCameraSettingsWidget::submitToResource() {
     m_camera->setAudioEnabled(ui->checkBoxEnableAudio->isChecked());
     m_camera->setUrl(ui->ipAddressEdit->text());
     m_camera->setAuth(ui->loginEdit->text(), ui->passwordEdit->text());
-
     m_camera->setScheduleDisabled(ui->cameraScheduleWidget->activeCameraCount() == 0);
 
     if (m_hasScheduleChanges) {
@@ -185,12 +134,12 @@ void QnSingleCameraSettingsWidget::submitToResource() {
         m_camera->setScheduleTasks(scheduleTasks);
     }
 
-    if(m_motionWidget)
-	    m_camera->setMotionRegionList(m_motionWidget->motionRegionList(), QnDomainMemory);
     if (ui->cameraMotionButton->isChecked())
-        m_camera->setMotionType(m_camera->getDefaultMotionType());
+        m_camera->setMotionType(m_camera->getCameraBasedMotionType());
     else
         m_camera->setMotionType(MT_SoftwareGrid);
+
+    submitMotionWidgetToResource();
 
     setHasChanges(false);
 }
@@ -207,45 +156,93 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
 
         ui->cameraScheduleWidget->setScheduleTasks(QnScheduleTaskList());
         ui->cameraScheduleWidget->setScheduleEnabled(false);
-        
-        /* Do not block editing by default if schedule task list is empty. */
-        ui->cameraScheduleWidget->setChangesDisabled(false);
-
+        ui->cameraScheduleWidget->setChangesDisabled(false); /* Do not block editing by default if schedule task list is empty. */
         ui->cameraScheduleWidget->setCameras(QnVirtualCameraResourceList());
+
+        ui->softwareMotionButton->setEnabled(false);
+        ui->cameraMotionButton->setText(QString());
+        ui->motionWebPageLabel->setText(QString());
+        ui->cameraMotionButton->setChecked(false);
+        ui->softwareMotionButton->setChecked(false);
+        
+        m_cameraSupportsMotion = false;
+        ui->motionSettingsGroupBox->setEnabled(false);
+        ui->motionAvailableLabel->setVisible(true);
     } else {
         QString webPageAddress = QString(QLatin1String("http://%1")).arg(m_camera->getHostAddress().toString());
 
         ui->nameEdit->setText(m_camera->getName());
         ui->checkBoxEnableAudio->setChecked(m_camera->isAudioEnabled());
         ui->checkBoxEnableAudio->setEnabled(m_camera->isAudioSupported());
-
 		ui->macAddressEdit->setText(m_camera->getMAC().toString());
         ui->ipAddressEdit->setText(m_camera->getUrl());
         ui->webPageLabel->setText(tr("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
         ui->loginEdit->setText(m_camera->getAuth().user());
         ui->passwordEdit->setText(m_camera->getAuth().password());
 
+        ui->softwareMotionButton->setEnabled(m_camera->supportedMotionType() & MT_SoftwareGrid);
+        if (m_camera->supportedMotionType() & (MT_HardwareGrid | MT_MotionWindow))
+            ui->cameraMotionButton->setText(tr("Hardware (Camera built-in)"));
+        else
+            ui->cameraMotionButton->setText(tr("Do not record motion"));
+
         updateMaxFPS();
+
+        QnVirtualCameraResourceList cameras;
+        cameras.push_back(m_camera);
+        ui->cameraScheduleWidget->setCameras(cameras);
 
         QList<QnScheduleTask::Data> scheduleTasks;
         foreach (const QnScheduleTask& scheduleTaskData, m_camera->getScheduleTasks())
             scheduleTasks.append(scheduleTaskData.getData());
         ui->cameraScheduleWidget->setScheduleTasks(scheduleTasks);
-
+        
         ui->cameraScheduleWidget->setScheduleEnabled(!m_camera->isScheduleDisabled());
-
-        QnVirtualCameraResourceList cameras;
-        cameras.push_back(m_camera);
-        ui->cameraScheduleWidget->setCameras(cameras);
 
         int currentCameraFps = ui->cameraScheduleWidget->getGridMaxFps();
         if (currentCameraFps > 0)
             ui->cameraScheduleWidget->setFps(currentCameraFps);
         else
             ui->cameraScheduleWidget->setFps(ui->cameraScheduleWidget->getMaxFps()/2);
+
+        ui->motionWebPageLabel->setText(webPageAddress); // TODO: wrong, need to get camera-specific web page
+        ui->cameraMotionButton->setChecked(m_camera->getMotionType() != MT_SoftwareGrid);
+        ui->softwareMotionButton->setChecked(m_camera->getMotionType() == MT_SoftwareGrid);
+
+        m_cameraSupportsMotion = m_camera->supportedMotionType() != MT_NoMotion;
+        ui->motionSettingsGroupBox->setEnabled(m_cameraSupportsMotion);
+        ui->motionAvailableLabel->setVisible(!m_cameraSupportsMotion);
     }
 
+    updateMotionWidgetFromResource();
+    updateMotionAvailability();
+
     setHasChanges(false);
+}
+
+void QnSingleCameraSettingsWidget::updateMotionWidgetFromResource() {
+    if(!m_motionWidget)
+        return;
+
+    disconnectFromMotionWidget();
+
+    m_motionWidget->setCamera(m_camera);
+    if(!m_camera) {
+        m_motionWidget->setVisible(false);
+    } else {
+        m_motionWidget->setVisible(m_cameraSupportsMotion);
+    }
+    updateMotionWidgetNeedControlMaxRect();
+    ui->sensitivitySlider->setValue(m_motionWidget->motionSensitivity());
+
+    connectToMotionWidget();
+}
+
+void QnSingleCameraSettingsWidget::submitMotionWidgetToResource() {
+    if(!m_motionWidget || !m_camera)
+        return;
+
+    m_camera->setMotionRegionList(m_motionWidget->motionRegionList(), QnDomainMemory);
 }
 
 bool QnSingleCameraSettingsWidget::isReadOnly() const {
@@ -278,6 +275,44 @@ void QnSingleCameraSettingsWidget::setHasChanges(bool hasChanges) {
     emit hasChangesChanged();
 }
 
+void QnSingleCameraSettingsWidget::disconnectFromMotionWidget() {
+    assert(m_motionWidget);
+
+    disconnect(m_motionWidget, NULL, this, NULL);
+}
+
+void QnSingleCameraSettingsWidget::connectToMotionWidget() {
+    assert(m_motionWidget);
+
+    connect(m_motionWidget, SIGNAL(motionRegionListChanged()), this, SLOT(at_dataChanged()), Qt::UniqueConnection);
+}
+
+void QnSingleCameraSettingsWidget::updateMotionWidgetNeedControlMaxRect() {
+    if(!m_motionWidget)
+        return;
+
+    m_motionWidget->setNeedControlMaxRects(m_cameraSupportsMotion && !ui->softwareMotionButton->isChecked());
+}
+
+void QnSingleCameraSettingsWidget::updateMotionAvailability() {
+    bool motionAvailable = true;
+    if(ui->cameraMotionButton->isChecked())
+        motionAvailable = m_camera && (m_camera->getCameraBasedMotionType() != MT_NoMotion);
+
+    ui->cameraScheduleWidget->setMotionAvailable(motionAvailable);
+}
+
+void QnSingleCameraSettingsWidget::updateMotionWidgetSensitivity() {
+    if(m_motionWidget)
+        m_motionWidget->setMotionSensitivity(ui->sensitivitySlider->value());
+}
+
+bool QnSingleCameraSettingsWidget::isValidMotionRegion(){
+    if (!m_motionWidget) 
+        return true;
+    return m_motionWidget->isValidMotionRegion();
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -286,46 +321,48 @@ void QnSingleCameraSettingsWidget::hideEvent(QHideEvent *event) {
     base_type::hideEvent(event);
 
     if(m_motionWidget) {
-        delete m_motionWidget;
-        m_motionWidget = NULL;
+        disconnectFromMotionWidget();
+        m_motionWidget->setCamera(QnResourcePtr());
     }
 }
 
 void QnSingleCameraSettingsWidget::showEvent(QShowEvent *event) {
     base_type::showEvent(event);
     
-    at_tabWidget_currentChanged(); /* Re-create motion widget if needed. */
-}
+    if(m_motionWidget) {
+        updateMotionWidgetFromResource();
+        connectToMotionWidget();
+    }
 
-void QnSingleCameraSettingsWidget::at_motionSensitivityChanged(int value) {
-    if(m_motionWidget)
-        m_motionWidget->setMotionSensitivity(value);
+    at_tabWidget_currentChanged(); /* Re-create motion widget if needed. */
+
+    updateFromResource();
 }
 
 void QnSingleCameraSettingsWidget::at_motionTypeChanged() {
     at_dataChanged();
-    if (m_camera && m_motionWidget)
-        m_motionWidget->setNeedControlMaxRects(!ui->softwareMotionButton->isChecked());
+
+    updateMotionWidgetNeedControlMaxRect();
     updateMaxFPS();
+    updateMotionAvailability();
 }
 
-void QnSingleCameraSettingsWidget::updateMaxFPS()
-{
+void QnSingleCameraSettingsWidget::updateMaxFPS() {
     if (m_inUpdateMaxFps)
-        return; // do not show message twice
+        return; /* Do not show message twice. */
+
     m_inUpdateMaxFps = true;
-    if (ui->softwareMotionButton->isChecked() || ui->cameraScheduleWidget->isSecondaryStreamReserver())
-    {
+    if ((ui->softwareMotionButton->isEnabled() &&  ui->softwareMotionButton->isChecked())
+        || ui->cameraScheduleWidget->isSecondaryStreamReserver()) {
         float maxFps = m_camera->getMaxFps()-2;
         float currentMaxFps = ui->cameraScheduleWidget->getGridMaxFps();
         if (currentMaxFps > maxFps)
         {
-            QMessageBox::warning(this, tr("Too big fps"), 
+            QMessageBox::warning(this, tr("Warning. FPS value is too high"), 
                 tr("For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps dropped down to %2").arg(currentMaxFps).arg(maxFps));
         }
         ui->cameraScheduleWidget->setMaxFps(maxFps);
-    }
-    else {
+    } else {
         ui->cameraScheduleWidget->setMaxFps(m_camera->getMaxFps());
     }
     m_inUpdateMaxFps = false;
@@ -355,14 +392,14 @@ void QnSingleCameraSettingsWidget::at_tabWidget_currentChanged() {
         return;
 
     m_motionWidget = new QnCameraMotionMaskWidget(this);
-    setCamera(m_camera); // TODO: find the one who wrote this line and use your mad swordsmanship skillz on him.
+    updateMotionWidgetFromResource();
     
     using ::setReadOnly;
     setReadOnly(m_motionWidget, m_readOnly);
     
     m_motionLayout->addWidget(m_motionWidget);
 
-    connect(m_motionWidget, SIGNAL(motionRegionListChanged()), this, SLOT(at_dataChanged()));
+    connectToMotionWidget();
 }
 
 void QnSingleCameraSettingsWidget::at_dataChanged() {

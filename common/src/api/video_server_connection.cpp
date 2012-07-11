@@ -140,7 +140,7 @@ QnRequestParamList QnVideoServerConnection::createParamList(const QnNetworkResou
     QnRequestParamList result;
 
     foreach(QnNetworkResourcePtr netResource, list)
-        result << QnRequestParam("mac", netResource->getMAC().toString());
+        result << QnRequestParam("physicalId", netResource->getPhysicalId());
     result << QnRequestParam("startTime", QString::number(startTimeUSec));
     result << QnRequestParam("endTime", QString::number(endTimeUSec));
     result << QnRequestParam("detail", QString::number(detail));
@@ -174,14 +174,14 @@ int QnVideoServerConnection::asyncRecordedTimePeriods(const QnNetworkResourceLis
     return asyncRecordedTimePeriods(createParamList(list, startTimeMs, endTimeMs, detail, motionRegions), processor, SLOT(at_replyReceived(int, const QnTimePeriodList&, int)));
 }
 
-int QnVideoServerConnection::asyncCheckPath(const QString& path, QObject *target, const char *slot)
+int QnVideoServerConnection::asyncGetFreeSpace(const QString& path, QObject *target, const char *slot)
 {
-    detail::VideoServerSessionManagerPathRequestReplyProcessor *processor = new detail::VideoServerSessionManagerPathRequestReplyProcessor();
-    connect(processor, SIGNAL(finished(int, bool, int)), target, slot);
+    detail::VideoServerSessionManagerFreeSpaceRequestReplyProcessor *processor = new detail::VideoServerSessionManagerFreeSpaceRequestReplyProcessor();
+    connect(processor, SIGNAL(finished(int, qint64, qint64, int)), target, slot);
 
     QnRequestParamList params;
     params << QnRequestParam("path", path);
-    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, "CheckPath", params, processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
+    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, "GetFreeSpace", params, processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
 
 }
 
@@ -205,21 +205,34 @@ void detail::VideoServerSessionManagerReplyProcessor::at_replyReceived(int statu
     deleteLater();
 }
 
-void detail::VideoServerSessionManagerPathRequestReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray& /*errorString*/, int handle)
+// very simple parser. Used for parsing own created XML
+QByteArray extractXmlBody(const QByteArray& body, const QByteArray tagName)
 {
-    bool result = false;
+	QByteArray tagStart = QByteArray("<") + tagName + QByteArray(">");
+	int bodyStart = body.indexOf(tagStart);
+	if (bodyStart >= 0)
+		bodyStart += tagStart.length();
+	QByteArray tagEnd = QByteArray("</") + tagName + QByteArray(">");
+	int bodyEnd = body.indexOf(tagEnd);
+	if (bodyStart >= 0 && bodyEnd >= 0)
+		return body.mid(bodyStart, bodyEnd - bodyStart).trimmed();
+	else
+		return QByteArray();
+}
+
+void detail::VideoServerSessionManagerFreeSpaceRequestReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray& /*errorString*/, int handle)
+{
+    qint64 freeSpace = -1;
+	qint64 usedSpace = -1;
+
     if(status == 0)
     {
-        int bodyStart = reply.indexOf("<root>");
-        if (bodyStart >= 0)
-            bodyStart += QString("<root>").length();
-        int bodyEnd = reply.indexOf("</root>");
-        QByteArray message = reply.mid(bodyStart, bodyEnd - bodyStart).trimmed();
-        if (message == "OK")
-            result = true;
+		QByteArray message = extractXmlBody(reply, "root");
+		freeSpace = extractXmlBody(message, "freeSpace").toLongLong();
+		usedSpace = extractXmlBody(message, "usedSpace").toLongLong();
     }
 
-    emit finished(status, result, handle);
+    emit finished(status, freeSpace, usedSpace, handle);
 
     deleteLater();
 }

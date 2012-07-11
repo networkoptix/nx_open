@@ -21,22 +21,21 @@ public:
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
 
-    bool hasDualStreaming() const override {return false;}
 
     virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider) override;
 protected:
-
-    void initInternal() override;
-
+    bool initInternal() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
-
     virtual void setCropingPhysical(QRect croping);
+
+private:
+    
 
 protected:
     QSize m_resolution1;
     QSize m_resolution2;
 
-    int m_MaxFps;
+    
 
 };
 

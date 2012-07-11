@@ -183,6 +183,8 @@ void initAppServerConnection()
     if(!appServerUrl.isValid())
         appServerUrl = qnSettings->defaultConnection().url;
 
+    // TODO: Ivan. Enable it when removing all places on receiving messages.
+    // QnAppServerConnectionFactory::setClientGuid(QUuid::createUuid().toString());
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(&QnServerCameraFactory::instance());
 }
@@ -416,11 +418,15 @@ int main(int argc, char *argv[])
     /* Process pending events before executing actions. */
     qApp->processEvents();
 
-    /* Open connection settings dialog. */
-    if(!authentication.isValid()) {
-        context->menu()->trigger(Qn::ConnectToServerAction);
-    } else {
-        context->menu()->trigger(Qn::ReconnectAction);
+    /* Really argc==1. */
+    if (argc <= 1)
+    {
+        /* Open connection settings dialog. */
+        if(!authentication.isValid()) {
+            context->menu()->trigger(Qn::ConnectToServerAction);
+        } else {
+            context->menu()->trigger(Qn::ReconnectAction);
+        }
     }
 
     /* Drop resources if needed. */

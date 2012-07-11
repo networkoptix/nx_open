@@ -399,7 +399,7 @@ QnActionManager::QnActionManager(QObject *parent):
             icon(qnSkin->icon("folder.png"));
 
         factory(Qn::OpenLayoutAction).
-            flags(Qn::Main | Qn::Scene).
+            //flags(Qn::Main | Qn::Scene). // TODO
             forbiddenPermissions(Qn::CurrentLayoutParameter, Qn::AddRemoveItemsPermission).
             text(tr("Layout(s)...")).
             autoRepeat(false);
@@ -606,27 +606,32 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(new QnItemZoomedActionCondition(true, this));
 
-    factory(Qn::ShowMotionAction).
+    factory(Qn::StartSmartSearchAction).
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
-        text(tr("Show Motion Grid")).
+        text(tr("Show Motion/Smart Search")).
         shortcut(tr("Alt+G")).
-        condition(new QnMotionGridDisplayActionCondition(false, this));
+        condition(new QnSmartSearchActionCondition(false, this));
 
-    factory(Qn::HideMotionAction).
+    factory(Qn::StopSmartSearchAction).
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
-        text(tr("Hide Motion Grid")).
+        text(tr("Hide Motion/Smart Search")).
         shortcut(tr("Alt+G")).
-        condition(new QnMotionGridDisplayActionCondition(true, this));
+        condition(new QnSmartSearchActionCondition(true, this));
 
-    factory(Qn::ToggleMotionAction).
+    factory(Qn::ClearMotionSelectionAction).
+        flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
+        text(tr("Clear Motion Selection")).
+        condition(new QnClearMotionSelectionActionCondition(this));
+
+    factory(Qn::ToggleSmartSearchAction).
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::HotkeyOnly).
-        text(tr("Toggle Motion Grid Display")).
+        text(tr("Toggle Smart Search")).
         shortcut(tr("Alt+G")).
-        condition(new QnMotionGridDisplayActionCondition(this));
+        condition(new QnSmartSearchActionCondition(this));
 
     factory(Qn::CheckFileSignatureAction).
         flags(Qn::Scene | Qn::SingleTarget).
-        text(tr("Check file watermark")).
+        text(tr("Check File Watermark")).
         shortcut(tr("Alt+C")).
         autoRepeat(false).
         condition(new QnCheckFileSignatureActionCondition(this));
@@ -727,7 +732,32 @@ QnActionManager::QnActionManager(QObject *parent):
             text(tr("16:9"));
     } factory.leaveSubMenu();
 
+    factory().
+        flags(Qn::Scene | Qn::NoTarget).
+        text(tr("Change Cell Spacing"));
 
+    factory.enterSubMenu(); {
+        factory(Qn::SetCurrentLayoutItemSpacing0Action).
+            flags(Qn::Scene | Qn::NoTarget).
+            requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
+            text(tr("None"));
+
+        factory(Qn::SetCurrentLayoutItemSpacing10Action).
+            flags(Qn::Scene | Qn::NoTarget).
+            requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
+            text(tr("Small"));
+
+        factory(Qn::SetCurrentLayoutItemSpacing20Action).
+            flags(Qn::Scene | Qn::NoTarget).
+            requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
+            text(tr("Medium"));
+
+        factory(Qn::SetCurrentLayoutItemSpacing30Action).
+            flags(Qn::Scene | Qn::NoTarget).
+            requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
+            text(tr("Large"));
+
+    } factory.leaveSubMenu();
 
     factory(Qn::StartTimeSelectionAction).
         flags(Qn::Slider | Qn::SingleTarget).
@@ -746,7 +776,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::ClearTimeSelectionAction).
         flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Clear Selection")).
-        condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::InvisibleAction, this));
+        condition(new QnTimePeriodActionCondition(Qn::EmptyTimePeriod | Qn::NormalTimePeriod, Qn::InvisibleAction, this));
 
     factory(Qn::ExportTimeSelectionAction).
         flags(Qn::Slider | Qn::SingleTarget).
@@ -754,8 +784,8 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::DisabledAction, this));
 
     factory(Qn::ExportLayoutAction).
-        flags(Qn::Slider | Qn::SingleTarget).
-        text(tr("Export Selected as Layout...")).
+        // flags(Qn::Slider | Qn::SingleTarget). // TODO
+        text(tr("Export Selection as Multi-Stream...")).
         condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::DisabledAction, this));
 
     factory().

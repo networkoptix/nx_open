@@ -55,14 +55,14 @@ void QnStreamRecorder::close()
 {
     if (m_formatCtx) 
     {
+		if (m_packetWrited)
+			av_write_trailer(m_formatCtx);
+
         if (m_startDateTime != AV_NOPTS_VALUE)
         {
-            qint64 fileLength = m_startDateTime != AV_NOPTS_VALUE  ? (m_endDateTime - m_startDateTime)/1000 : 0;
-            fileFinished(fileLength, m_fileName, m_mediaProvider);
+            qint64 fileDuration = m_startDateTime != AV_NOPTS_VALUE  ? (m_endDateTime - m_startDateTime)/1000 : 0;
+            fileFinished(fileDuration, m_fileName, m_mediaProvider, m_storage->getFileSizeByIOContext(m_ioContext));
         }
-
-        if (m_packetWrited)
-            av_write_trailer(m_formatCtx);
 
         QMutexLocker mutex(&global_ffmpeg_mutex);
         for (unsigned i = 0; i < m_formatCtx->nb_streams; ++i)
@@ -407,6 +407,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
         m_formatCtx->pb = m_ioContext = m_storage->createFfmpegIOContext(url, QIODevice::WriteOnly);
         if (m_ioContext == 0)
         {
+            avformat_close_input(&m_formatCtx);
             m_lastErrMessage = QString("Can't create output file '%1'").arg(url);
             cl_log.log(m_lastErrMessage, cl_logERROR);
             return false;

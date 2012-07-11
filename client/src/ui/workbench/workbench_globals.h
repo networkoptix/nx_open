@@ -13,7 +13,8 @@ namespace Qn {
         SingleSelectedRole, /**< Item is the only selected item on a workbench. */
         RaisedRole,         /**< Item is raised. */
         ZoomedRole,         /**< Item is zoomed. */
-        CentralRole,        /**< Item is 'central' --- zoomed, raised, or single selected. */
+        SingleRole,         /**< Item is the only item on a workbench. */
+        CentralRole,        /**< Item is 'central' --- zoomed, raised, single selected, or single. */
         ItemRoleCount
     };
     

@@ -43,10 +43,6 @@ void QnDroidResource::setCropingPhysical(QRect /*croping*/)
 
 }
 
-bool QnDroidResource::hasDualStreaming() const
-{
-    return false;
-}
 
 QHostAddress QnDroidResource::getHostAddress() const
 {

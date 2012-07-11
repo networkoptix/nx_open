@@ -17,6 +17,7 @@ public:
     enum ColorRole {
         Base,       /**< Color of the selection rect. */
         Border,     /**< Color of the selection rect's border. */
+        MouseBorder,/**< Color of the mouse rect's border. */
         RoleCount
     };
 
@@ -84,6 +85,7 @@ private:
     bool m_clearingBlocked;
     Qt::KeyboardModifiers m_selectionModifiers;
     Qt::KeyboardModifiers m_multiSelectionModifiers;
+    QRect m_gridRect;
 };
 
 

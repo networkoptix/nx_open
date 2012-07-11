@@ -36,9 +36,10 @@ bool QnPlWatchDogResource::isDualStreamingEnabled()
     return false;
 }
 
-void QnPlWatchDogResource::initInternal() 
+bool QnPlWatchDogResource::initInternal() 
 {
-    if (!isDualStreamingEnabled()) {
+    if (!isDualStreamingEnabled() && getStatus() != QnResource::Unauthorized) 
+    {
         // The camera most likely is going to reset after enabling dual streaming
         CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth());
         QByteArray request;
@@ -46,8 +47,31 @@ void QnPlWatchDogResource::initInternal()
         request.append("onvif_use_discovery=true&onvif_use_security=true&onvif_security_opts=63&onvif_use_sa=true&reboot=true");
         CLHttpStatus status = http.doPOST(QByteArray("/cgi-bin/onvifsetup.cgi"), request);
         setStatus(Offline);
+        return false;
     }
-    else {
-        QnPlOnvifResource::initInternal();
+    else 
+    {
+        return QnPlOnvifResource::initInternal();
     }
+}
+
+
+int QnPlWatchDogResource::suggestBitrateKbps(QnStreamQuality q, QSize resolution, int fps) const
+{
+    // I assume for a QnQualityHighest quality 30 fps for 1080 we need 10 mbps
+    // I assume for a QnQualityLowest quality 30 fps for 1080 we need 1 mbps
+
+    int hiEnd = 1024*11;
+    int lowEnd = 1024*1.8;
+
+    float resolutionFactor = resolution.width()*resolution.height()/1920.0/1080;
+    resolutionFactor = pow(resolutionFactor, (float)0.5);
+
+    float frameRateFactor = fps/30.0;
+    frameRateFactor = pow(resolutionFactor, (float)0.4);
+
+    int result = lowEnd + (hiEnd - lowEnd) * (q - QnQualityLowest) / (QnQualityHighest - QnQualityLowest);
+    result *= (resolutionFactor * frameRateFactor);
+
+    return qMax(128,result);
 }

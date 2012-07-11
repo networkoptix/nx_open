@@ -136,6 +136,10 @@ QFileInfoList QnLayoutFileStorageResource::getFileList(const QString& dirName)
     return dir.entryInfoList(QDir::Files);
 }
 
+qint64 QnLayoutFileStorageResource::getFileSize(const QString& fillName) const
+{
+	return 0; // not implemented
+}
 
 bool QnLayoutFileStorageResource::isStorageAvailable()
 {

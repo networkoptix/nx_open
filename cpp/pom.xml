@@ -3,12 +3,12 @@
 	<parent>
 		<artifactId>hdwitness</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>1.1</version>
+		<version>1.2.0</version>
 		<relativePath>..</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>1.1</version>
+	<version>1.2.0</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>cpp</artifactId>
 	<packaging>pom</packaging>
@@ -31,6 +31,16 @@
 		<qtlib9/>	
 	</properties>
 
+	<dependencies>
+		<dependency>
+			<groupId>org</groupId>
+			<artifactId>openssl</artifactId>
+			<version>${openssl.version}</version>
+			<type>zip</type>
+			<classifier>${platform}-${arch}</classifier>
+		</dependency>
+	</dependencies>		
+	
 	<build>
 		<directory>${arch}</directory>
 		<outputDirectory>${arch}</outputDirectory>
@@ -269,12 +279,12 @@
 								</goals>
 								<configuration>
 									<executable>qmake</executable>
-									<workingDirectory>${environment.dir}/qt/bin/</workingDirectory>		
+									<workingDirectory>${project.build.directory}</workingDirectory>		
 									<arguments>
 										<commandlineArgs>-tp</commandlineArgs>
 										<commandlineArgs>vc</commandlineArgs>
 										<commandlineArgs>-o</commandlineArgs>
-										<commandlineArgs>${project.build.directory}/${project.artifactId}-${arch}.vcproj</commandlineArgs>
+										<commandlineArgs>${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcproj</commandlineArgs>
 										<commandlineArgs>${project.build.directory}/${project.artifactId}.pro</commandlineArgs>
 									</arguments>
 								</configuration>
@@ -546,7 +556,7 @@
 								</configuration>
 							</execution>
 						</executions>
-					</plugin>						
+					</plugin>					
 				</plugins>
 			</build>
 		</profile> 

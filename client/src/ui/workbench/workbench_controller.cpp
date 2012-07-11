@@ -357,12 +357,13 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     /* Set up context menu. */
     QWidget *window = display()->view()->window();
     window->addAction(action(Qn::ScreenRecordingAction));
-    window->addAction(action(Qn::ToggleMotionAction));
+    window->addAction(action(Qn::ToggleSmartSearchAction));
 
     connect(action(Qn::SelectAllAction), SIGNAL(triggered()),                                                                       this,                           SLOT(at_selectAllAction_triggered()));
-    connect(action(Qn::ShowMotionAction), SIGNAL(triggered()),                                                                      this,                           SLOT(at_showMotionAction_triggered()));
-    connect(action(Qn::HideMotionAction), SIGNAL(triggered()),                                                                      this,                           SLOT(at_hideMotionAction_triggered()));
-    connect(action(Qn::ToggleMotionAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_toggleMotionAction_triggered()));
+    connect(action(Qn::StartSmartSearchAction), SIGNAL(triggered()),                                                                this,                           SLOT(at_startSmartSearchAction_triggered()));
+    connect(action(Qn::StopSmartSearchAction), SIGNAL(triggered()),                                                                 this,                           SLOT(at_stopSmartSearchAction_triggered()));
+    connect(action(Qn::ToggleSmartSearchAction), SIGNAL(triggered()),                                                               this,                           SLOT(at_toggleSmartSearchAction_triggered()));
+    connect(action(Qn::ClearMotionSelectionAction), SIGNAL(triggered()),                                                            this,                           SLOT(at_clearMotionSelectionAction_triggered()));
     connect(action(Qn::CheckFileSignatureAction), SIGNAL(triggered()),                                                              this,                           SLOT(at_checkFileSignatureAction_triggered()));
     connect(action(Qn::MaximizeItemAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_maximizeItemAction_triggered()));
     connect(action(Qn::UnmaximizeItemAction), SIGNAL(triggered()),                                                                  this,                           SLOT(at_unmaximizeItemAction_triggered()));
@@ -434,7 +435,7 @@ void QnWorkbenchController::displayMotionGrid(const QList<QnResourceWidget *> &w
         if(!(widget->resource()->flags() & QnResource::network))
             continue;
 
-        widget->setDisplayFlag(QnResourceWidget::DisplayMotionGrid, display);
+        widget->setDisplayFlag(QnResourceWidget::DisplayMotion, display);
     }
 }
 
@@ -638,13 +639,13 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
             display()->view(),
             tr("Save Recording As..."),
             previousDir + QLatin1Char('/') + suggetion,
-            tr("Transport Stream (*.ts)"),
+            tr("AVI (Audio/Video Interleaved) (*.avi)"),
             &selectedFilter,
             QFileDialog::DontUseNativeDialog
         );
 
         if (!filePath.isEmpty()) {
-            if (!filePath.endsWith(QLatin1String(".ts"), Qt::CaseInsensitive))
+            if (!filePath.endsWith(QLatin1String(".avi"), Qt::CaseInsensitive))
                 filePath += selectedFilter.mid(selectedFilter.indexOf(QLatin1Char('.')), 3);
 
             QFile::remove(filePath);
@@ -980,7 +981,7 @@ void QnWorkbenchController::at_motionSelectionProcessStarted(QGraphicsView *, Qn
         return;
     }
 
-    widget->setDisplayFlag(QnResourceWidget::DisplayMotionGrid, true);
+    widget->setDisplayFlag(QnResourceWidget::DisplayMotion, true);
     foreach(QnResourceWidget *otherWidget, display()->widgets())
         if(otherWidget != widget)
             otherWidget->clearMotionSelection();
@@ -1189,11 +1190,11 @@ void QnWorkbenchController::at_selectAllAction_triggered() {
         display()->scene()->setFocusItem(NULL);
 }
 
-void QnWorkbenchController::at_hideMotionAction_triggered() {
+void QnWorkbenchController::at_stopSmartSearchAction_triggered() {
     displayMotionGrid(menu()->currentParameters(sender()).widgets(), false);
 }
 
-void QnWorkbenchController::at_showMotionAction_triggered() {
+void QnWorkbenchController::at_startSmartSearchAction_triggered() {
     displayMotionGrid(menu()->currentParameters(sender()).widgets(), true);
 }
 
@@ -1210,19 +1211,26 @@ void QnWorkbenchController::at_checkFileSignatureAction_triggered()
     dialog->exec();
 }
 
-void QnWorkbenchController::at_toggleMotionAction_triggered() {
+void QnWorkbenchController::at_toggleSmartSearchAction_triggered() {
     QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
 
     bool hidden = false;
     foreach(QnResourceWidget *widget, widgets)
-        if((widget->resource()->flags() & QnResource::network) && !(widget->displayFlags() & QnResourceWidget::DisplayMotionGrid))
+        if((widget->resource()->flags() & QnResource::network) && !(widget->displayFlags() & QnResourceWidget::DisplayMotion))
             hidden = true;
 
     if(hidden) {
-        at_showMotionAction_triggered();
+        at_startSmartSearchAction_triggered();
     } else {
-        at_hideMotionAction_triggered();
+        at_stopSmartSearchAction_triggered();
     }
+}
+
+void QnWorkbenchController::at_clearMotionSelectionAction_triggered() {
+    QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
+
+    foreach(QnResourceWidget *widget, widgets)
+        widget->clearMotionSelection();
 }
 
 void QnWorkbenchController::at_maximizeItemAction_triggered() {

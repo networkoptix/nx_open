@@ -95,7 +95,7 @@ namespace {
 
 Q_GLOBAL_STATIC(QnLicensePoolInstance, globalLicensePool)
 
-QnLicense::QnLicense(const QByteArray& name, const QByteArray& key, int cameraCount, const QByteArray& hwid, const QByteArray& signature)
+QnLicense::QnLicense(const QString& name, const QByteArray& key, int cameraCount, const QByteArray& hwid, const QByteArray& signature)
     : m_name(name),
       m_key(key),
       m_cameraCount(cameraCount),
@@ -106,7 +106,7 @@ QnLicense::QnLicense(const QByteArray& name, const QByteArray& key, int cameraCo
 {
 }
 
-const QByteArray& QnLicense::name() const
+const QString &QnLicense::name() const
 {
     return m_name;
 }
@@ -141,7 +141,7 @@ bool QnLicense::isValid() const
         if (!m_signature.isEmpty())
         {
             QByteArray licenseString;
-            licenseString += "NAME=" + m_name + "\n";
+            licenseString += "NAME=" + m_name.toUtf8() + "\n";
             licenseString += "SERIAL=" + m_key + "\n";
             licenseString += "HWID=" + m_hardwareId + "\n";
             licenseString += "COUNT=" + QString::number(m_cameraCount) + "\n";
@@ -159,7 +159,7 @@ QByteArray QnLicense::toString() const
     QByteArray licenseString;
     if (isValid())
     {
-        licenseString += "NAME=" + m_name + "\n";
+        licenseString += "NAME=" + m_name.toUtf8() + "\n";
         licenseString += "SERIAL=" + m_key + "\n";
         licenseString += "HWID=" + m_hardwareId + "\n";
         licenseString += "COUNT=" + QString::number(m_cameraCount) + "\n";
@@ -171,7 +171,7 @@ QByteArray QnLicense::toString() const
 
 QnLicense QnLicense::fromString(const QByteArray &licenseString)
 {
-    QByteArray name;
+    QString name;
     QByteArray key;
     qint32 cameraCount;
     QByteArray hwid;
@@ -190,7 +190,7 @@ QnLicense QnLicense::fromString(const QByteArray &licenseString)
             const QByteArray avalue = line.mid(eqPos + 1);
 
             if (aname == "NAME")
-                name = avalue;
+                name = QString::fromUtf8(avalue);
             else if (aname == "SERIAL")
                 key = avalue;
             else if (aname == "HWID")

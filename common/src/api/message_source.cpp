@@ -1,7 +1,9 @@
 #include <QtNetwork>
+#include <QtEndian>
 #include "message_source.h"
 #include "api/app_server_connection.h"
 #include <utils/common/warnings.h>
+#include "message.pb.h"
 
 #define QN_EVENT_SOURCE_DEBUG
 
@@ -13,68 +15,54 @@
  */
 static const int PING_INTERVAL = 60000;
 
-
 // -------------------------------------------------------------------------- //
-// QnJsonStreamParser
+// QbPbStreamParser
 // -------------------------------------------------------------------------- //
-class QnJsonStreamParser
+class QnPbStreamParser
 {
 public:
+    void reset();
     void addData(const QByteArray& data);
-    bool nextMessage(QVariant& parsed);
+    bool nextMessage(pb::Message& parsed);
 
 private:
     QQueue<QByteArray> blocks;
     QByteArray incomplete;
-
-    QJson::Parser parser;
 };
 
-void QnJsonStreamParser::addData(const QByteArray& data)
+void QnPbStreamParser::reset()
 {
-    if (!incomplete.isEmpty())
-    {
-        incomplete += data;
+    incomplete.clear();
+}
 
-        if (incomplete.endsWith('\n'))
-        {
-            foreach(QByteArray block, incomplete.trimmed().split('\n'))
-            {
-                blocks.enqueue(block);
-            }
-            incomplete.clear();
-        }
-    } else
+void QnPbStreamParser::addData(const QByteArray& data)
+{
+    incomplete += data;
+
+    qint32 messageSize;
+
+    while(incomplete.length() >= 4 && (messageSize = qFromBigEndian<qint32>(reinterpret_cast<const uchar*>(incomplete.constData()))) <= incomplete.length() - 4)
     {
-        if (data.endsWith('\n'))
-        {
-            foreach(QByteArray block, data.trimmed().split('\n'))
-            {
-                blocks.enqueue(block);
-            }
-        } else
-        {
-            incomplete = data;
-        }
+        blocks.append(QByteArray(incomplete.data() + 4, messageSize));
+        incomplete = incomplete.right(incomplete.length() - messageSize - 4);
     }
 }
 
-bool QnJsonStreamParser::nextMessage(QVariant& parsed)
+bool QnPbStreamParser::nextMessage(pb::Message& parsed)
 {
     if (blocks.isEmpty())
         return false;
 
     QByteArray block = blocks.dequeue();
 
-    bool ok;
-    parsed = parser.parse(block, &ok);
+    if (!parsed.ParseFromArray(block.data(), block.size()))
+    {
+        qnWarning("Error parsing PB block: %1.", block);
+        return false;
+    }
 
-    if (!ok)
-        qnWarning("Error parsing JSON block: %1.", block);
-
-    return ok;
+    return true;
 }
-
 
 // -------------------------------------------------------------------------- //
 // QnMessageSource
@@ -84,7 +72,7 @@ QnMessageSource::QnMessageSource(QUrl url, int retryTimeout):
     m_retryTimeout(retryTimeout),
     m_reply(NULL),
     m_seqNumber(0),
-    m_streamParser(new QnJsonStreamParser())
+    m_streamParser(new QnPbStreamParser())
 {
     static volatile bool metaTypesInitialized = false;
     if (!metaTypesInitialized) {
@@ -122,6 +110,8 @@ void QnMessageSource::doStop()
 
 void QnMessageSource::startRequest()
 {
+    m_streamParser->reset();
+
     m_reply = m_manager.post(QNetworkRequest(m_url), "");
     connect(m_reply, SIGNAL(finished()),
             this, SLOT(httpFinished()));
@@ -158,15 +148,11 @@ void QnMessageSource::httpFinished()
 
 void QnMessageSource::httpReadyRead()
 {
-    QByteArray data = m_reply->readAll().data();
-
-#ifdef QN_EVENT_SOURCE_DEBUG
-    qDebug() << "Event data: " << data;
-#endif
+    QByteArray data = m_reply->readAll();
 
     m_streamParser->addData(data);
 
-    QVariant parsed;
+    pb::Message parsed;
     while (m_streamParser->nextMessage(parsed))
     {
         // Restart timer for any event
@@ -176,7 +162,7 @@ void QnMessageSource::httpReadyRead()
         if (!event.load(parsed))
             continue;
 
-        if (event.eventType == QN_MESSAGE_EMPTY)
+        if (event.eventType == pb::Message_Type_Initial)
         {
             if (m_seqNumber == 0)
             {
@@ -192,25 +178,8 @@ void QnMessageSource::httpReadyRead()
                 emit connectionReset();
             }
 
-            if (event.dict.contains("proxyPort"))
-                QnAppServerConnectionFactory::setDefaultMediaProxyPort(event.dict["proxyPort"].toInt());
-
-#if 0
-            // Here we can check component versions
-            if (event.dict.contains("version"))
-            {
-                // If we're connecting to old AS
-                if (compareVersions(qApp->applicationVersion(), event.dict["version"].toString()) > 0)
-                {
-                    qWarning() << "Version mismatch. This enterprise controller requires";
-                }
-            }
-
-            QnAppServerConnectionFactory::setDefaultMediaProxyPort(event.dict["version"].toInt());
-#endif
-
             emit connectionOpened();
-        } else if (event.eventType != QN_MESSAGE_PING)
+        } else if (event.eventType != pb::Message_Type_Ping)
         {
             emit messageReceived(event);
         }

@@ -16,6 +16,7 @@
 #include <utils/common/delete_later.h>
 #include <utils/common/mime_data.h>
 #include <utils/common/event_processors.h>
+#include <utils/common/string.h>
 
 #include <core/resourcemanagment/resource_discovery_manager.h>
 #include <core/resourcemanagment/resource_pool_user_watcher.h>
@@ -108,6 +109,25 @@ void detail::QnResourceReplyProcessor::at_replyReceived(int status, const QByteA
 
 
 // -------------------------------------------------------------------------- //
+// QnConnectReplyProcessor
+// -------------------------------------------------------------------------- //
+detail::QnConnectReplyProcessor::QnConnectReplyProcessor(QObject *parent): 
+    QObject(parent),
+    m_handle(0),
+    m_status(0)
+{}
+
+void detail::QnConnectReplyProcessor::at_replyReceived(int status, const QByteArray &errorString, const QnConnectInfoPtr &connectInfo, int handle) {
+    m_status = status;
+    m_errorString = errorString;
+    m_connectInfo = connectInfo;
+    m_handle = handle;
+
+    emit finished(status, errorString, connectInfo, handle);
+}
+
+
+// -------------------------------------------------------------------------- //
 // QnWorkbenchActionHandler
 // -------------------------------------------------------------------------- //
 QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
@@ -180,6 +200,10 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::ExportLayoutAction),                     SIGNAL(triggered()),    this,   SLOT(at_exportLayoutAction_triggered()));
     connect(action(Qn::SetCurrentLayoutAspectRatio4x3Action),   SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutAspectRatio4x3Action_triggered()));
     connect(action(Qn::SetCurrentLayoutAspectRatio16x9Action),  SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutAspectRatio16x9Action_triggered()));
+    connect(action(Qn::SetCurrentLayoutItemSpacing0Action),     SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing0Action_triggered()));
+    connect(action(Qn::SetCurrentLayoutItemSpacing10Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing10Action_triggered()));
+    connect(action(Qn::SetCurrentLayoutItemSpacing20Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing20Action_triggered()));
+    connect(action(Qn::SetCurrentLayoutItemSpacing30Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing30Action_triggered()));
 
     /* Run handlers that update state. */
     at_eventManager_connectionClosed();
@@ -423,6 +447,10 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog() {
     QnVirtualCameraResourceList cameras = cameraSettingsDialog()->widget()->cameras();
     if(cameras.empty())
         return;
+    
+    /* Dialog will be shown inside */
+    if (!cameraSettingsDialog()->widget()->isValidMotionRegion())
+        return; 
 
     /* Limit the number of active cameras. */
     int activeCameras = resourcePool()->activeCameras() + cameraSettingsDialog()->widget()->activeCameraCount();
@@ -435,7 +463,7 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog() {
         QMessageBox::warning(widget(), tr("Could not Enable Recording"), message);
         cameraSettingsDialog()->widget()->setCamerasActive(false);
     }
-
+    
     /* Submit and save it. */
     cameraSettingsDialog()->widget()->submitToResources();
     connection()->saveAsync(cameras, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
@@ -773,11 +801,11 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
         if(!sourceCamera)
             continue;
 
-		QnMacAddress mac = sourceCamera->getMAC();
+		QString physicalId = sourceCamera->getPhysicalId();
 
         QnVirtualCameraResourcePtr replacedCamera;
         foreach(const QnVirtualCameraResourcePtr &otherCamera, serverCameras) {
-            if(otherCamera->getMAC() == mac) {
+            if(otherCamera->getPhysicalId() == physicalId) {
                 replacedCamera = otherCamera;
                 break;
             }
@@ -788,6 +816,7 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
             replacedCamera->setScheduleDisabled(sourceCamera->isScheduleDisabled());
             replacedCamera->setScheduleTasks(sourceCamera->getScheduleTasks());
             replacedCamera->setAuth(sourceCamera->getAuth());
+            replacedCamera->setAudioEnabled(sourceCamera->isAudioEnabled());
             replacedCamera->setMotionRegionList(sourceCamera->getMotionRegionList(), QnDomainMemory);
             replacedCamera->setName(sourceCamera->getName());
             replacedCamera->setDisabled(false);
@@ -862,10 +891,11 @@ void QnWorkbenchActionHandler::at_openFileAction_triggered() {
     dialog->setOption(QFileDialog::DontUseNativeDialog, true);
     dialog->setFileMode(QFileDialog::ExistingFiles);
     QStringList filters;
-    filters << tr("All Supported (*.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff *.layout)");
+    //filters << tr("All Supported (*.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff *.layout)");
+    filters << tr("All Supported (*.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)");
     filters << tr("Video (*.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)");
     filters << tr("Pictures (*.jpg *.png *.gif *.bmp *.tiff)");
-    filters << tr("Layouts (*.layout)");
+    //filters << tr("Layouts (*.layout)"); // TODO
     filters << tr("All files (*.*)");
     dialog->setNameFilters(filters);
     
@@ -926,18 +956,44 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     if (!dialog->exec())
         return;
 
-    menu()->trigger(Qn::ReconnectAction);
+    QnConnectionData connectionData;
+    connectionData.url = dialog->currentUrl();
+    qnSettings->setLastUsedConnection(connectionData);
+
+    menu()->trigger(Qn::ReconnectAction, QnActionParameters().withArgument(Qn::ConnectInfoParameter, dialog->currentInfo()));
 }
 
 void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
-    const QnConnectionData connection = qnSettings->lastUsedConnection();
-    if (!connection.isValid()) 
+    QnActionParameters parameters = menu()->currentParameters(sender());
+
+    const QnConnectionData connectionData = qnSettings->lastUsedConnection();
+    if (!connectionData.isValid()) 
         return;
     
+    QnConnectInfoPtr connectionInfo = parameters.argument<QnConnectInfoPtr>(Qn::ConnectInfoParameter);
+    if(connectionInfo.isNull()) {
+        QnAppServerConnectionPtr connection = QnAppServerConnectionFactory::createConnection(connectionData.url);
+        
+        QScopedPointer<detail::QnConnectReplyProcessor> processor(new detail::QnConnectReplyProcessor());
+        QScopedPointer<QEventLoop> loop(new QEventLoop());
+        connect(processor.data(), SIGNAL(finished(int, const QByteArray &, const QnConnectInfoPtr &, int)), loop.data(), SLOT(quit()));
+        connection->connectAsync(processor.data(), SLOT(at_replyReceived(int, const QByteArray &, const QnConnectInfoPtr &, int)));
+        loop->exec();
+
+        if(processor->status() != 0)
+            return;
+
+        connectionInfo = processor->info();
+    }
+
+    // TODO: maybe we need to check server-client compatibility here?
+
+    QnAppServerConnectionFactory::setDefaultMediaProxyPort(connectionInfo->proxyPort);
+
     QnClientMessageProcessor::instance()->stop(); // TODO: blocks gui thread.
     QnSessionManager::instance()->stop();
 
-    QnAppServerConnectionFactory::setDefaultUrl(connection.url);
+    QnAppServerConnectionFactory::setDefaultUrl(connectionData.url);
 
     // repopulate the resource pool
     QnResource::stopCommandProc();
@@ -966,7 +1022,7 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     QnResourceDiscoveryManager::instance().setReady(true);
     QnResource::startCommandProc();
 
-    context()->setUserName(connection.url.userName());
+    context()->setUserName(connectionData.url.userName());
 
     at_eventManager_connectionOpened();
 }
@@ -984,8 +1040,10 @@ void QnWorkbenchActionHandler::at_editTagsAction_triggered() {
 void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
     QnResourceList resources = QnResourceCriterion::filter<QnVirtualCameraResource, QnResourceList>(menu()->currentParameters(sender()).resources());
 
+    bool newlyCreated = false;
     if(!cameraSettingsDialog()) {
         m_cameraSettingsDialog = new QnCameraSettingsDialog(widget());
+        newlyCreated = true;
         
         connect(cameraSettingsDialog(), SIGNAL(buttonClicked(QDialogButtonBox::StandardButton)), this, SLOT(at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton)));
     }
@@ -995,7 +1053,7 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
             QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
                 widget(), 
                 QnResourceList(cameraSettingsDialog()->widget()->resources()),
-                tr("Cameras Not Saved"), 
+                tr("Camera(s) not Saved"), 
                 tr("Save changes to the following %n camera(s)?", NULL, cameraSettingsDialog()->widget()->resources().size()),
                 QDialogButtonBox::Yes | QDialogButtonBox::No
             );
@@ -1006,7 +1064,10 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
     cameraSettingsDialog()->widget()->setResources(resources);
     updateCameraSettingsEditibility();
 
+    QRect oldGeometry = cameraSettingsDialog()->geometry();
     cameraSettingsDialog()->show();
+    if(!newlyCreated)
+        cameraSettingsDialog()->setGeometry(oldGeometry);
 }
 
 void QnWorkbenchActionHandler::at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton button) {
@@ -1272,7 +1333,16 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
         return;
     }
 
-    QString suggetion = tr("screenshot");
+    // TODO: move out, common code
+    QString timeString;
+    qint64 time = display->camDisplay()->getCurrentTime() / 1000;
+    if(widget->resource()->flags() & QnResource::utc) {
+        timeString = QDateTime::fromMSecsSinceEpoch(time).toString(QLatin1String("yyyy-MMM-dd_hh.mm.ss"));
+    } else {
+        timeString = QTime().addMSecs(time).toString(QLatin1String("hh.mm.ss"));
+    }
+
+    QString suggetion = replaceNonFileNameCharacters(widget->resource()->getName(), QChar('_')) + QLatin1String("_") + timeString; 
 
     QSettings settings;
     settings.beginGroup(QLatin1String("screenshots"));
@@ -1414,12 +1484,12 @@ Do you want to continue?"),
             this->widget(), 
             tr("Export Layout As..."),
             previousDir + QDir::separator() + suggestion,
-            tr("Layout media file (*.layout)"),
+            tr("Network optix media file (*.nov)"),
             &selectedFilter,
             QFileDialog::DontUseNativeDialog
             );
 
-        selectedExtension = ".layout";
+        selectedExtension = ".nov";
         if (fileName.isEmpty())
             return;
 
@@ -1595,7 +1665,7 @@ Do you want to continue?"),
     settings.beginGroup(QLatin1String("export"));
     QString previousDir = settings.value(QLatin1String("previousDir")).toString();
     QString dateFormat = cameraResource ? tr("dd-mmm-yyyy hh-mm-ss") : tr("hh-mm-ss");
-	QString suggestion = networkResource ? networkResource->getMAC().toString() : QString();
+	QString suggestion = networkResource ? networkResource->getPhysicalId() : QString();
 
     QString fileName;
     QString selectedExtension;
@@ -1689,6 +1759,22 @@ void QnWorkbenchActionHandler::at_setCurrentLayoutAspectRatio4x3Action_triggered
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutAspectRatio16x9Action_triggered() {
     workbench()->currentLayout()->resource()->setCellAspectRatio(16.0 / 9.0);
+}
+
+void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing0Action_triggered() {
+    workbench()->currentLayout()->resource()->setCellSpacing(QSizeF(0.0, 0.0));
+}
+
+void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing10Action_triggered() {
+    workbench()->currentLayout()->resource()->setCellSpacing(QSizeF(0.1, 0.1));
+}
+
+void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing20Action_triggered() {
+    workbench()->currentLayout()->resource()->setCellSpacing(QSizeF(0.2, 0.2));
+}
+
+void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing30Action_triggered() {
+    workbench()->currentLayout()->resource()->setCellSpacing(QSizeF(0.3, 0.3));
 }
 
 void QnWorkbenchActionHandler::at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle) {

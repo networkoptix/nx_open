@@ -29,7 +29,8 @@ public:
     enum Flag 
     { 
         Flag_SlowSource = 1, 
-        Flag_CanProcessNegativeSpeed = 2 // flag inform that delegate is going to process negative speed. If flag is not setted, ArchiveReader is going to process negative speed
+        Flag_CanProcessNegativeSpeed = 2, // flag inform that delegate is going to process negative speed. If flag is not setted, ArchiveReader is going to process negative speed
+        Flag_CanProcessMediaStep = 4      // flag inform that delegate is going to process media step itself.
     };
     Q_DECLARE_FLAGS(Flags, Flag);
 
@@ -67,8 +68,13 @@ public:
     /** This function calls from reader */
     virtual void beforeChangeReverseMode(bool /*reverseMode*/) {}
 
+    /** This function used for thumbnails loader. Get data with specified media step from specified time interval*/
+    virtual void setRange(qint64 startTime, qint64 endTime, qint64 frameStep) {}
+
 protected:
     Flags m_flags;
 };
+
+typedef QSharedPointer<QnAbstractArchiveDelegate> QnAbstractArchiveDelegatePtr;
 
 #endif

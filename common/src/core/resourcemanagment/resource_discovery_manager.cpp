@@ -21,6 +21,7 @@ QnResourceDiscoveryManager::QnResourceDiscoveryManager():
     m_server(false),
     m_foundSmth(true),
     m_ready(false)
+
 {
 }
 
@@ -111,6 +112,7 @@ void QnResourceDiscoveryManager::run()
         searchersList = m_searchersList;
     }
 
+
     foreach (QnAbstractResourceSearcher *searcher, searchersList)
     {
         searcher->setShouldBeUsed(true);
@@ -157,7 +159,7 @@ void QnResourceDiscoveryManager::run()
             m_resourceProcessor->processResources(result);
         }
 
-        int global_delay_between_search = 10000;
+        int global_delay_between_search = 1000;
         smartSleep(global_delay_between_search);
         ++m_runNumber;
     }
@@ -212,6 +214,8 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
         QMutexLocker locker(&m_searchersListMutex);
         searchersList = m_searchersList;
     }
+
+    m_discoveredResources.clear();
 
     foreach (QnAbstractResourceSearcher *searcher, searchersList)
     {
@@ -274,6 +278,31 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
                     ++it;
                     continue;
                 }
+                else
+                {
+                    if (rpNetRes->mergeResourcesIfNeeded(newNetRes))
+                    {
+
+                        if (isServer())
+                        {
+                            // not stand alone
+                            QnVirtualCameraResourcePtr cameraResource = rpNetRes.dynamicCast<QnVirtualCameraResource>();
+                            if (cameraResource)
+                            {
+                                QByteArray errorString;
+                                QnVirtualCameraResourceList cameras;
+                                QnAppServerConnectionPtr connect = QnAppServerConnectionFactory::createConnection();
+                                if (connect->addCamera(cameraResource, cameras, errorString) != 0)
+                                {
+                                    qCritical() << "QnResourceDiscoveryManager::findNewResources(): Can't add camera. Reason: " << errorString;
+                                }
+                            }
+
+                        }
+
+                    }
+
+                }
             }
 
             // seems like resource is in the pool and has OK ip
@@ -288,7 +317,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
             ++it; // new resource => shouls keep it
     }
 
-    //==========if resource is not discover last minute and we do not record it and do not see live => readers not runing 
+    //==========if resource is not discovered last minute and we do not record it and do not see live => readers not runing 
     markOfflineIfNeeded();
     //======================
 
@@ -490,8 +519,8 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
                 }
             }
 
-            Q_ASSERT(false);
-
+            ++it;
+            continue;
 
         }
         else
@@ -546,6 +575,7 @@ struct check_if_accessible_STRUCT
     }
 };
 
+
 void QnResourceDiscoveryManager::markOfflineIfNeeded()
 {
     QnResourceList resources = qnResPool->getResources();
@@ -559,15 +589,35 @@ void QnResourceDiscoveryManager::markOfflineIfNeeded()
         if (res->checkFlags(QnResource::server_live_cam)) // if this is camera from mediaserver on the client
             continue;
 
+        if (res->isDisabled()) // if this is camera from other mediaserver 
+            continue;
+
         QDateTime ldt = netRes->getLastDiscoveredTime();
         QDateTime currentT = qnSyncTime->currentDateTime();
 
+        //check if resource was discovered
+        if (!m_discoveredResources.contains(res->getUniqueId()))
+        {
+            // resource is not found
+            m_resourceDiscoveryCounter[res->getUniqueId()]++;
+
+            if (m_resourceDiscoveryCounter[res->getUniqueId()] >= 5 && !netRes->hasRunningLiveProvider())
+            {
+                res->setStatus(QnResource::Offline);
+                m_resourceDiscoveryCounter[res->getUniqueId()] = 0;
+            }
+        }
+     
+
+        /*
         if (ldt.secsTo(currentT) > 120 && !netRes->hasRunningLiveProvider()) // if resource is not discovered last 30 sec
         {
 			res->setStatus(QnResource::Offline);
         }
+        /**/
 
     }
+
     
 }
 
@@ -578,17 +628,39 @@ void QnResourceDiscoveryManager::updateResourceStatus(QnResourcePtr res)
 
     if (rpNetRes)
     {
+        disconnect(rpNetRes.data(), SIGNAL(initAsyncFinished(QnResourcePtr, bool)), this, SLOT(onInitAsyncFinished(QnResourcePtr, bool)));
+        connect(rpNetRes.data(), SIGNAL(initAsyncFinished(QnResourcePtr, bool)), this, SLOT(onInitAsyncFinished(QnResourcePtr, bool)));
+
         if (rpNetRes->getStatus() == QnResource::Offline) 
         {
             if (rpNetRes->getLastStatusUpdateTime().msecsTo(qnSyncTime->currentDateTime()) > 30) // if resource with OK ip seems to be found; I do it coz if there is no readers and camera was offline and now online => status needs to be changed
-				rpNetRes->setStatus(QnResource::Online);
+            {
+                rpNetRes->initAsync();
+				//rpNetRes->setStatus(QnResource::Online);
+            }
 
         }
+        else if (!rpNetRes->isInitialized())
+        {
+            rpNetRes->initAsync(); // Resource already in resource pool. Try to init resource if resource is not authorized or not initialized by other reason
+            //if (rpNetRes->isInitialized() && rpNetRes->getStatus() == QnResource::Unauthorized)
+            //    rpNetRes->setStatus(QnResource::Online);
+        }
 
-
+        m_discoveredResources.insert(rpNetRes->getUniqueId());
         rpNetRes->setLastDiscoveredTime(qnSyncTime->currentDateTime());
     }
 
+}
+
+void QnResourceDiscoveryManager::onInitAsyncFinished(QnResourcePtr res, bool initialized)
+{
+    QnNetworkResourcePtr rpNetRes = res.dynamicCast<QnNetworkResource>();
+    if (initialized && rpNetRes)
+    {
+        if (rpNetRes->getStatus() == QnResource::Offline || rpNetRes->getStatus() == QnResource::Unauthorized)
+            rpNetRes->setStatus(QnResource::Online);
+    }
 }
 
 void QnResourceDiscoveryManager::pingResources(QnResourcePtr res)

@@ -219,6 +219,8 @@ private slots:
     void at_layout_cellAspectRatioChanged();
     void at_layout_cellSpacingChanged();
 
+    void updateSingleRoleItem();
+
 private:
     /** Current layout. */
     QnWorkbenchLayout *m_currentLayout;

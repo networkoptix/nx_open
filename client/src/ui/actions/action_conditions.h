@@ -94,15 +94,15 @@ private:
 };
 
 
-class QnMotionGridDisplayActionCondition: public QnActionCondition {
+class QnSmartSearchActionCondition: public QnActionCondition {
 public:
-    QnMotionGridDisplayActionCondition(bool requiredGridDisplayValue, QObject *parent = NULL): 
+    QnSmartSearchActionCondition(bool requiredGridDisplayValue, QObject *parent = NULL): 
         QnActionCondition(parent),
         m_hasRequiredGridDisplayValue(true),
         m_requiredGridDisplayValue(requiredGridDisplayValue)
     {}
 
-    QnMotionGridDisplayActionCondition(QObject *parent = NULL):
+    QnSmartSearchActionCondition(QObject *parent = NULL):
         QnActionCondition(parent),
         m_hasRequiredGridDisplayValue(false),
         m_requiredGridDisplayValue(false)
@@ -113,6 +113,13 @@ public:
 private:
     bool m_hasRequiredGridDisplayValue;
     bool m_requiredGridDisplayValue;
+};
+
+class QnClearMotionSelectionActionCondition: public QnActionCondition {
+public:
+    QnClearMotionSelectionActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+
+    virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;
 };
 
 class QnCheckFileSignatureActionCondition: public QnActionCondition {
@@ -216,16 +223,16 @@ public:
  */
 class QnTimePeriodActionCondition: public QnActionCondition {
 public:
-    QnTimePeriodActionCondition(Qn::TimePeriodType periodType, Qn::ActionVisibility nonMatchingVisibility, QObject *parent = NULL):
+    QnTimePeriodActionCondition(Qn::TimePeriodTypes periodTypes, Qn::ActionVisibility nonMatchingVisibility, QObject *parent = NULL):
         QnActionCondition(parent),
-        m_periodType(periodType),
+        m_periodTypes(periodTypes),
         m_nonMatchingVisibility(nonMatchingVisibility)
     {}
 
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 
 private:
-    Qn::TimePeriodType m_periodType;
+    Qn::TimePeriodTypes m_periodTypes;
     Qn::ActionVisibility m_nonMatchingVisibility;
 };
 

@@ -61,7 +61,8 @@ public:
 
     static PasswordHelper& instance();
 
-    static bool isNotAuthenticated(const SOAP_ENV__Fault* faultInfo);;
+    static bool isNotAuthenticated(const SOAP_ENV__Fault* faultInfo);
+    static bool isConflictError(const SOAP_ENV__Fault* faultInfo);
 
     const PasswordList& getPasswordsByManufacturer(const QString& mdnsPacketData) const;
 
@@ -93,6 +94,7 @@ public:
     static NameHelper& instance();
 
     bool isSupported(const QString& cameraName) const;
+    bool isManufacturerSupported(const QString& manufacturer) const;
 };
 
 #endif // onvif_helper_h

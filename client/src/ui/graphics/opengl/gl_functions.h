@@ -12,7 +12,8 @@ public:
     enum Feature {
         ArbPrograms = 0x1,          /**< Supports ARB shader programs. */
         OpenGL1_3 = 0x2,            /**< Implements OpenGL1.3 spec. */
-        ShadersBroken = 0x4         /**< Vendor has messed something up, and shaders are not supported. */
+        ShadersBroken = 0x4,        /**< Vendor has messed something up, and shaders are not supported. */
+        OpenGLBroken = 0x8          /**< Vendor has messed something up, and videodriver dies using OpenGL. */
     };
     Q_DECLARE_FLAGS(Features, Feature);
 
@@ -20,19 +21,33 @@ public:
      * Constructor.
      * 
      * \param context                   OpenGL context that this functions instance will work with. 
-     *                                  If NULL, current context will be used.
      */
-    QnGlFunctions(const QGLContext *context = NULL);
+    QnGlFunctions(const QGLContext *context);
 
     /**
      * Virtual destructor.
      */
     virtual ~QnGlFunctions();
 
+
+    QGLContext *context() const;
+
     /**
      * \returns                         Set of features supported by the current OpenGL context.
      */
     Features features() const;
+
+    /**
+     * \returns                         Set of features supported by the current OpenGL context. Estimated BEFORE context initializing.
+     */
+    static Features estimatedFeatures();
+
+    /**
+     * \param target                    Value to estimate. Only <tt>GL_MAX_TEXTURE_SIZE</tt> is currently supported.
+     * \returns                         Estimated value. It is not guaranteed to be equal to the real value obtained 
+     *                                  via <tt>glGetIntegerv</tt> function, but it will be safe to use.
+     */
+    static GLint estimatedInteger(GLenum target);
 
     /**
      * \param enable                    Whether warnings related to unsupported function calls are to be enabled.

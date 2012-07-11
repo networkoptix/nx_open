@@ -14,6 +14,7 @@ namespace Qn {
     inline QLatin1String qn_currentUserParameter()          { return QLatin1String("_qn_currentUserParameter"); }
     inline QLatin1String qn_serializedResourcesParameter()  { return QLatin1String("_qn_serializedResourcesParameter"); }
     inline QLatin1String qn_timePeriodParameter()           { return QLatin1String("_qn_timePeriodParameter"); }
+    inline QLatin1String qn_connectInfoParameter()          { return QLatin1String("_qn_connectInfoParameter"); }
 
 #define GridPositionParameter qn_gridPositionParameter()
 #define UserParameter qn_userParameter()
@@ -24,6 +25,7 @@ namespace Qn {
 #define CurrentUserParameter qn_currentUserParameter()
 #define SerializedResourcesParameter qn_serializedResourcesParameter()
 #define TimePeriodParameter qn_timePeriodParameter()
+#define ConnectInfoParameter qn_connectInfoParameter()
 
     /**
      * Enum of all menu actions.
@@ -42,7 +44,13 @@ namespace Qn {
         GetMoreLicensesAction,
 
         /**
-         * Reconnects to the Enterprise Controller.
+         * Reconnects to the Enterprise Controller using the last used URL
+         * set in <tt>QnSettings</tt>.
+         * 
+         * Parameters.
+         * <tt>QnConnectInfoPtr ConnectInfoParameter</tt> --- a connection info
+         * to use. If not provided, action handler will try to send a connect
+         * request first.
          */
         ReconnectAction,
 
@@ -295,19 +303,24 @@ namespace Qn {
         UnmaximizeItemAction,
 
         /**
-         * Shows motion search grid on an item.
+         * Shows motion on an item and turns on smart search mode.
          */
-        ShowMotionAction,
+        StartSmartSearchAction,
 
         /**
-         * Hides motion search grid on an item.
+         * Hides motion on an item and turns off smart search mode.
          */
-        HideMotionAction,
+        StopSmartSearchAction,
 
         /**
-         * Hides motion search grid on an item.
+         * Clears motion selection on a widget.
          */
-        ToggleMotionAction,
+        ClearMotionSelectionAction,
+
+        /**
+         * Toggles item's smart search mode.
+         */
+        ToggleSmartSearchAction,
 
         /**
          * Check file signature (for local files only)
@@ -401,6 +414,26 @@ namespace Qn {
          * Sets aspect ratio of current layout's cells to 4x3.
          */
         SetCurrentLayoutAspectRatio4x3Action,
+
+        /**
+         * Sets spacing of current layout's cells to 0%.
+         */
+        SetCurrentLayoutItemSpacing0Action,
+
+        /**
+         * Sets spacing of current layout's cells to 10%.
+         */
+        SetCurrentLayoutItemSpacing10Action,
+
+        /**
+         * Sets spacing of current layout's cells to 20%.
+         */
+        SetCurrentLayoutItemSpacing20Action,
+
+        /**
+         * Sets spacing of current layout's cells to 30%.
+         */
+        SetCurrentLayoutItemSpacing30Action,
 
 
 

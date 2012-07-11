@@ -12,13 +12,14 @@ public:
     QnVirtualCameraResource();
 
     virtual void updateInner(QnResourcePtr other) override;
-    virtual int getMaxFps() override {return QnSecurityCamResource::getMaxFps();}
+
 
     void setScheduleDisabled(bool blocked);
     bool isScheduleDisabled() const;
 
     bool isAudioEnabled() const;
     void setAudioEnabled(bool value);
+
 
 private:
     bool m_scheduleDisabled;
@@ -30,6 +31,8 @@ class QN_EXPORT QnPhysicalCameraResource : virtual public QnVirtualCameraResourc
 {
     Q_OBJECT
 public:
+	QnPhysicalCameraResource();
+
     // returns 0 if primary stream does not exist
     int getPrimaryStreamDesiredFps() const;
 
@@ -38,7 +41,7 @@ public:
 
     void onPrimaryFpsUpdated(int newFps);
 
-    virtual int getMaxFps() override {return QnVirtualCameraResource::getMaxFps();}
+    virtual int suggestBitrateKbps(QnStreamQuality q, QSize resolution, int fps) const;
 
 #ifdef _DEBUG
     void debugCheck() const;

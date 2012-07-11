@@ -41,6 +41,8 @@ public:
 
     void setCellSpacing(const QSizeF &cellSpacing);
 
+    void setCellSpacing(qreal horizontalSpacing, qreal verticalSpacing);
+
     /*
     * Deserialize layout resource from file
     */
@@ -53,7 +55,6 @@ signals:
     void cellSpacingChanged();
 
 protected:
-    void initInternal() override {}
     virtual void updateInner(QnResourcePtr other) override;
 
 private:

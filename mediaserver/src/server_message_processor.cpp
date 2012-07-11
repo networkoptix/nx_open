@@ -46,99 +46,68 @@ void QnServerMessageProcessor::at_connectionReset()
 
 void QnServerMessageProcessor::at_messageReceived(QnMessage event)
 {
-    qDebug() << "Got event: " << event.eventType << " " << event.objectName << " " << event.objectId;
+    // qDebug() << "Got event: " << event.eventType << " " << event.objectName << " " << event.objectId;
 
-    if (event.eventType == QN_MESSAGE_LICENSE_CHANGE)
+	if (event.eventType == Message_Type_License)
     {
-        QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
-
-        QnLicenseList licenses;
-        QByteArray errorString;
-
-        if (appServerConnection->getLicenses(licenses, errorString) == 0)
-        {
-            foreach (QnLicensePtr license, licenses.licenses())
-            {
-                // Someone wants to steal our software
-                if (!license->isValid())
-                {
-                    QnLicenseList dummy;
-                    dummy.setHardwareId("invalid");
-                    qnLicensePool->replaceLicenses(dummy);
-                    break;
-                }
-            }
-
-            qnLicensePool->replaceLicenses(licenses);
-        }
+		// New license added
+		if (event.license->isValid())
+			qnLicensePool->addLicense(event.license);
     }
-    else if (event.eventType == QN_MESSAGE_CAMERA_SERVER_ITEM)
+	else if (event.eventType == Message_Type_CameraServerItem)
     {
-        QString mac = event.dict["mac"].toString();
+/*        QString mac = event.dict["mac"].toString();
         QString serverGuid = event.dict["server_guid"].toString();
         qint64 timestamp_ms = event.dict["timestamp"].toLongLong();
 
-        QnCameraHistoryItem historyItem(mac, timestamp_ms, serverGuid);
+        QnCameraHistoryItem historyItem(mac, timestamp_ms, serverGuid);*/
 
-        QnCameraHistoryPool::instance()->addCameraHistoryItem(historyItem);
+        QnCameraHistoryPool::instance()->addCameraHistoryItem(*event.cameraServerItem);
     }
-    else if (event.eventType == QN_MESSAGE_RES_CHANGE)
+	else if (event.eventType == Message_Type_ResourceChange)
     {
-        if (event.objectName != "Camera" && event.objectName != "Server")
-            return;
+		QnResourcePtr resource = event.resource;
 
         QnVideoServerResourcePtr ownVideoServer = qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnVideoServerResource>();
-        if (event.objectName == "Server" && event.resourceGuid != serverGuid())
-            return;
-        else if (event.objectName == "Camera" && event.parentId != ownVideoServer->getId())
+
+        bool isServer = resource.dynamicCast<QnVideoServerResource>();
+        bool isCamera = resource.dynamicCast<QnVirtualCameraResource>();
+
+        if (!isServer && !isCamera)
             return;
 
-        QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
+        // If the resource is mediaServer then egnore if not this server
+        if (isServer && resource->getGuid() != serverGuid())
+            return;
+
+        // If camera from other server - ignore 
+        if (isCamera && resource->getParentId() != ownVideoServer->getId())
+            return;
 
         QByteArray errorString;
-        QnResourcePtr resource;
-        if (appServerConnection->getResource(event.objectId, resource, errorString) == 0)
+        QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId());
+        if (ownResource)
         {
-            QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId());
-            if (ownResource)
-            {
-                ownResource->update(resource);
-            }
-            else
-            {
-                qnResPool->addResource(resource);
-                ownResource = resource;
-            }
-
-            QnSecurityCamResourcePtr ownSecurityCamera = ownResource.dynamicCast<QnSecurityCamResource>();
-            if (ownSecurityCamera)
-                QnRecordingManager::instance()->updateCamera(ownSecurityCamera);
-        } else
-        {
-            qDebug()  << "QnEventManager::messageReceived(): Can't get resource from appserver. Reason: "
-                      << errorString << ", Skipping event: " << event.eventType << " " << event.objectName << " " << event.objectId;
+            ownResource->update(resource);
         }
-    }
-    else if (event.eventType == QN_MESSAGE_RES_STATUS_CHANGE)
-    {
-        QnResourcePtr resource = qnResPool->getResourceById(event.objectId);
-
-        if (resource)
+        else
         {
-            QnResource::Status status = (QnResource::Status)event.data.toInt();
-            resource->setStatus(status);
+            qnResPool->addResource(resource);
+            ownResource = resource;
         }
-    } else if (event.eventType == QN_MESSAGE_RES_DISABLED_CHANGE)
+    } else if (event.eventType == Message_Type_ResourceDisabledChange)
 	{
-		QnResourcePtr resource = qnResPool->getResourceById(event.objectId);
+		QnResourcePtr resource = qnResPool->getResourceById(event.resourceId);
 
 		if (resource)
 		{
-			resource->setDisabled(event.data.toInt());
+			resource->setDisabled(event.resourceDisabled);
+            if (event.resourceDisabled) // we always ignore status changes 
+                resource->setStatus(QnResource::Offline); 
 		}
-    } else if (event.eventType == QN_MESSAGE_RES_DELETE)
+	} else if (event.eventType == Message_Type_ResourceDelete)
     {
-        QnResourcePtr resource = qnResPool->getResourceById(event.objectId);
+        QnResourcePtr resource = qnResPool->getResourceById(event.resourceId);
 
         if (resource)
         {

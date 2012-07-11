@@ -246,7 +246,7 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
         }
         m_dataQueue.unlock();
     }
-    while(m_dataQueue.size() > 100)
+    while(m_dataQueue.size() > 120) // queue to large
     {
         QnAbstractDataPacketPtr tmp;
         m_dataQueue.pop(tmp);

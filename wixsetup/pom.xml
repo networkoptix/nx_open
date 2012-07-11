@@ -9,12 +9,12 @@
 	<parent>
 		<artifactId>hdwitness</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>1.1</version>
+		<version>1.2.0</version>
 		<relativePath>..</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>1.1</version>
+	<version>1.2.0</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>wixsetup</artifactId>
 	<packaging>pom</packaging>
@@ -244,6 +244,7 @@
 										<argument>WixUIExtension.dll</argument>
 										<argument>-ext</argument> 
 										<argument>WixUtilExtension.dll</argument>
+										<argument>Associations.wxs</argument>
 										<argument>PasswordShouldMatchDlg.wxs</argument>
 										<argument>UpgradeDlg.wxs</argument> 
 										<argument>PasswordDlg.wxs</argument>
@@ -342,7 +343,8 @@
 								</goals>
 								<configuration>
 									<executable>${project.build.directory}/test.bat</executable>
-									<workingDirectory>${project.build.directory}</workingDirectory>						
+									<workingDirectory>${project.build.directory}</workingDirectory>
+									<skip>${skiptest}</skip>						
 								</configuration>	
 							</execution>
 						</executions> 

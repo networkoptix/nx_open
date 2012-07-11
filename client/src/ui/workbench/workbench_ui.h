@@ -152,7 +152,7 @@ protected:
     void updateTreeGeometry();
     void updateHelpGeometry();
     void updateFpsGeometry();
-    void updateSliderResizerGeometry();
+    Q_SLOT void updateSliderResizerGeometry();
 
     QRectF updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
     QRectF updatedHelpGeometry(const QRectF &helpGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
@@ -164,7 +164,7 @@ protected:
     void setHelpOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
 
     bool isThumbnailsVisible() const;
-    void setThumbnailsVisible(bool visible) const;
+    void setThumbnailsVisible(bool visible);
 
 protected slots:
     void updateHelpContext();
@@ -282,6 +282,7 @@ private:
     QGraphicsWidget *m_sliderEaterItem;
 
     bool m_ignoreSliderResizerGeometryChanges;
+    bool m_ignoreSliderResizerGeometryChanges2;
 
     /** Hover processor that is used to change slider opacity when mouse is hovered over it. */
     HoverFocusProcessor *m_sliderOpacityProcessor;
@@ -293,6 +294,7 @@ private:
 
     AnimatorGroup *m_sliderOpacityAnimatorGroup;
 
+    qreal m_lastThumbnailsHeight;
 
 
     /* Tree-related state. */
@@ -382,6 +384,7 @@ private:
     bool m_helpPinned;
 
     QnWorkbenchMotionDisplayWatcher *m_motionDisplayWatcher;
+
 
 
     /* Freespace-related state. */

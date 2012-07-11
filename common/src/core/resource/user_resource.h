@@ -22,7 +22,6 @@ public:
     void setAdmin(bool admin = true);
 
 protected:
-    void initInternal() override {}
     virtual void updateInner(QnResourcePtr other) override;
 
 private:

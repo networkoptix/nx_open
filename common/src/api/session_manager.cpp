@@ -111,11 +111,6 @@ void QnSessionManager::doStop()
     }
 }
 
-int QnSessionManager::testConnectionAsync(const QUrl& url, QObject* receiver, const char *slot)
-{
-    return sendAsyncGetRequest(url, "ping", receiver, slot);
-}
-
 QUrl QnSessionManager::createApiUrl(const QUrl& baseUrl, const QString &objectName, const QnRequestParamList &params) const
 {
     QUrl url(baseUrl);
@@ -285,7 +280,6 @@ void QnSessionManager::doSendAsyncPostRequest(SessionManagerReplyProcessor* repl
 
     QNetworkRequest request;
     request.setUrl(createApiUrl(url, objectName, params));
-    //request.setRawHeader("Connection", "close");
     request.setRawHeader("Authorization", "Basic " + url.userInfo().toLatin1().toBase64());
     request.setHeader(QNetworkRequest::ContentTypeHeader, "text/xml");
 

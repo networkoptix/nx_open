@@ -17,6 +17,7 @@ signals:
 protected:
     virtual bool canAcceptData() const override;
     virtual bool processData(QnAbstractDataPacketPtr data) override;
+    void finilizeSign();
 private:
     EVP_MD_CTX* m_mdctx;
     EVP_MD_CTX* m_tmpMdCtx;

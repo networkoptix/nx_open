@@ -58,9 +58,11 @@ static void updateActivity()
 #define CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE 15
 
 static const int DEFAULT_AUDIO_BUFF_SIZE = 1000 * 4;
-static const int REALTIME_AUDIO_BUFFER_SIZE = 128; // at ms, prebuffer is half buffer
 
-static const qint64 MIN_VIDEO_DETECT_JUMP_INTERVAL = 100 * 1000; // 100ms
+static const int REALTIME_AUDIO_BUFFER_SIZE = 300; // at ms, max buffer 
+static const int REALTIME_AUDIO_PREBUFFER = 75; // at ms, prebuffer 
+
+static const qint64 MIN_VIDEO_DETECT_JUMP_INTERVAL = 300 * 1000; // 300ms
 //static const qint64 MIN_AUDIO_DETECT_JUMP_INTERVAL = MIN_VIDEO_DETECT_JUMP_INTERVAL + AUDIO_BUFF_SIZE*1000;
 //static const int MAX_VALID_SLEEP_TIME = 1000*1000*5;
 static const int MAX_VALID_SLEEP_LIVE_TIME = 1000 * 500; // 5 seconds as most long sleep time
@@ -118,7 +120,8 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_executingChangeSpeed(false),
       m_eofSignalSended(false),
       m_lastLiveIsLowQuality(false),
-      m_audioDisplay(0)
+      m_audioDisplay(0),
+      m_videoQueueDuration(0)
 {
     m_storedMaxQueueSize = m_dataQueue.maxSize();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
@@ -126,19 +129,21 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
         m_nextReverseTime[i] = AV_NOPTS_VALUE;
     }
     int expectedBufferSize = m_isRealTimeSource ? REALTIME_AUDIO_BUFFER_SIZE : DEFAULT_AUDIO_BUFF_SIZE;
-    setAudioBufferSize(expectedBufferSize);
+    int expectedPrebuferSize = m_isRealTimeSource ? REALTIME_AUDIO_PREBUFFER : DEFAULT_AUDIO_BUFF_SIZE/2;
+    setAudioBufferSize(expectedBufferSize, expectedPrebuferSize);
 
     QMutexLocker lock(&m_qualityMutex);
     m_allCamDisplay << this;
     m_ignoreTime = AV_NOPTS_VALUE;
 }
 
-void CLCamDisplay::setAudioBufferSize(int bufferSize)
+void CLCamDisplay::setAudioBufferSize(int bufferSize, int prebufferSize)
 {
     m_audioBufferSize = bufferSize;
     m_minAudioDetectJumpInterval = MIN_VIDEO_DETECT_JUMP_INTERVAL + m_audioBufferSize*1000;
+    QMutexLocker lock(&m_audioChangeMutex);
     delete m_audioDisplay;
-    m_audioDisplay = new CLAudioStreamDisplay(m_audioBufferSize);
+    m_audioDisplay = new CLAudioStreamDisplay(m_audioBufferSize, prebufferSize);
 }
 
 CLCamDisplay::~CLCamDisplay()
@@ -162,7 +167,8 @@ CLCamDisplay::~CLCamDisplay()
 void CLCamDisplay::pause()
 {
     QnAbstractDataConsumer::pause();
-
+    m_isRealTimeSource = false;
+    QMutexLocker lock(&m_audioChangeMutex);
     m_audioDisplay->suspend();
 }
 
@@ -170,7 +176,10 @@ void CLCamDisplay::resume()
 {
     m_delay.afterdelay();
     m_singleShotMode = false;
-    m_audioDisplay->resume();
+    {
+        QMutexLocker lock(&m_audioChangeMutex);
+        m_audioDisplay->resume();
+    }
     QnAbstractDataConsumer::resume();
 }
 
@@ -186,6 +195,10 @@ void CLCamDisplay::addVideoChannel(int index, QnAbstractRenderer* vw, bool canDo
 QImage CLCamDisplay::getScreenshot(int channel)
 {
     return m_display[channel]->getScreenshot();
+}
+
+QSize CLCamDisplay::getFrameSize(int channel) const {
+    return m_display[channel]->getFrameSize();
 }
 
 void CLCamDisplay::hurryUpCheck(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime)
@@ -672,6 +685,8 @@ void CLCamDisplay::onNextFrameOccured()
 void CLCamDisplay::setSingleShotMode(bool single)
 {
     m_singleShotMode = single;
+    if (m_singleShotMode)
+        m_isRealTimeSource = false;
 }
 
 float CLCamDisplay::getSpeed() const
@@ -794,7 +809,7 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
 
     m_timeMutex.lock();
     if (mediaIsLive != m_isRealTimeSource && !m_buffering)
-        onRealTimeStreamHint(mediaIsLive);
+        onRealTimeStreamHint(mediaIsLive && !m_singleShotMode);
     m_timeMutex.unlock();
 
     float speed = m_speed;
@@ -938,9 +953,11 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
     {
         if (audioParamsChanged)
         {
+            int audioPrebufferSize = m_isRealTimeSource ? REALTIME_AUDIO_PREBUFFER : DEFAULT_AUDIO_BUFF_SIZE/2;
+            QMutexLocker lock(&m_audioChangeMutex);
             delete m_audioDisplay;
             m_audioBufferSize = expectedBufferSize;
-            m_audioDisplay = new CLAudioStreamDisplay(m_audioBufferSize);
+            m_audioDisplay = new CLAudioStreamDisplay(m_audioBufferSize, audioPrebufferSize);
             m_playingFormat = currentAudioFormat;
         }
 
@@ -1019,7 +1036,7 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
         // three are 3 possible scenarios:
 
         //1) we do not have audio playing;
-        if (!haveAudio(speed))
+        if (!haveAudio(speed) || isAudioHoleDetected(vd))
         {
             qint64 m_videoDuration = m_videoQueue[0].size() * m_lastNonZerroDuration;
             if (vd && m_videoDuration >  1000 * 1000)
@@ -1064,10 +1081,6 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
         //3) video and audio playing
         else
         {
-            // New av sync algorithm required MT decoding
-            if (!m_useMtDecoding)
-                setMTDecoding(true);
-
             QnCompressedVideoDataPtr incoming;
             if (m_audioDisplay->msInBuffer() < m_audioBufferSize )
                 incoming = vd; // process packet
@@ -1076,8 +1089,13 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
             }
 
             vd = nextInOutVideodata(incoming, channel);
+
             incoming = QnCompressedVideoDataPtr();
             if (vd) {
+                // New av sync algorithm required MT decoding
+                if (!m_useMtDecoding && !(vd->flags & QnAbstractMediaData::MediaFlags_LIVE))
+                    setMTDecoding(true);
+
                 bool ignoreVideo = vd->flags & QnAbstractMediaData::MediaFlags_Ignore;
                 if (!ignoreVideo) {
                     QMutexLocker lock(&m_timeMutex);
@@ -1118,11 +1136,6 @@ void CLCamDisplay::setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val)
     m_lightCpuMode = val;
 }
 
-void CLCamDisplay::pauseAudio()
-{
-    m_audioDisplay->suspend();
-}
-
 void CLCamDisplay::playAudio(bool play)
 {
     if (m_playAudio == play)
@@ -1130,10 +1143,13 @@ void CLCamDisplay::playAudio(bool play)
 
     m_needChangePriority = true;
     m_playAudio = play;
-    if (!m_playAudio)
-        m_audioDisplay->clearDeviceBuffer();
-    else
-        m_audioDisplay->resume();
+    {
+        QMutexLocker lock(&m_audioChangeMutex);
+        if (!m_playAudio)
+            m_audioDisplay->clearDeviceBuffer();
+        else
+            m_audioDisplay->resume();
+    }
     if (!play)
         setMTDecoding(false);
 }
@@ -1154,7 +1170,7 @@ QnCompressedVideoDataPtr CLCamDisplay::nextInOutVideodata(QnCompressedVideoDataP
         enqueueVideo(incoming);
 
     // queue is not empty
-    return m_videoQueue[channel].dequeue();
+    return dequeueVideo(channel);
 }
 
 quint64 CLCamDisplay::nextVideoImageTime(QnCompressedVideoDataPtr incoming, int channel) const
@@ -1185,15 +1201,44 @@ void CLCamDisplay::clearVideoQueue()
             m_videoQueue[i].dequeue();
     }
     m_videoBufferOverflow = false;
+    m_videoQueueDuration = 0;
+}
+
+bool CLCamDisplay::isAudioHoleDetected(QnCompressedVideoDataPtr vd)
+{
+    if (!vd)
+        return false;
+    bool isVideoCamera = qSharedPointerDynamicCast<QnVirtualCameraResource>(vd->dataProvider->getResource()) != 0;
+    if (!isVideoCamera)
+        return false; // do not change behaviour for local files
+    if (m_videoQueue->isEmpty())
+        return false;
+    //return m_videoQueue->last()->timestamp - m_videoQueue->first()->timestamp >= MAX_FRAME_DURATION*1000ll;
+    return m_videoQueueDuration > m_audioDisplay->getAudioBufferSize() * 2 * 1000;
+}
+
+QnCompressedVideoDataPtr CLCamDisplay::dequeueVideo(int channel)
+{
+    if (m_videoQueue[channel].size() > 1) {
+        qint64 timeDiff = m_videoQueue[channel].at(1)->timestamp - m_videoQueue[channel].front()->timestamp;
+        if (timeDiff <= MAX_FRAME_DURATION*1000ll) // ignore data holes
+            m_videoQueueDuration -= timeDiff;
+    }
+    return m_videoQueue[channel].dequeue();
 }
 
 void CLCamDisplay::enqueueVideo(QnCompressedVideoDataPtr vd)
 {
+    if (!m_videoQueue[vd->channelNumber].isEmpty()) {
+        qint64 timeDiff = vd->timestamp - m_videoQueue[vd->channelNumber].last()->timestamp;
+        if (timeDiff <= MAX_FRAME_DURATION*1000ll) // ignore data holes
+            m_videoQueueDuration += timeDiff; 
+    }
     m_videoQueue[vd->channelNumber].enqueue(vd);
     if (m_videoQueue[vd->channelNumber].size() > 60 * 6) // I assume we are not gonna buffer
     {
         cl_log.log(QLatin1String("Video buffer overflow!"), cl_logWARNING);
-        m_videoQueue[vd->channelNumber].dequeue();
+        dequeueVideo(vd->channelNumber);
         // some protection for very large difference between video and audio tracks. Need to improve sync logic for this case (now a lot of glithces)
         m_videoBufferOverflow = true;
     }

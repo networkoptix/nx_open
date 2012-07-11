@@ -36,7 +36,7 @@ int QnRecordedChunkListHandler::executeGet(const QString& path, const QnRequestP
     qint64 startTime = -1, endTime = 1, detailLevel = -1;
     QList<QnResourcePtr> resList;
     QByteArray errStr;
-    QByteArray errStrMac;
+    QByteArray errStrPhysicalId;
     bool urlFound = false;
     bool useBinary = false;
     QList<QRegion> motionRegions;
@@ -47,13 +47,13 @@ int QnRecordedChunkListHandler::executeGet(const QString& path, const QnRequestP
         {
             parseRegionList(motionRegions, params[i].second);
         }
-        if (params[i].first == "mac")
+        if (params[i].first == "physicalId" || params[i].first == "mac") // use 'mac' name for compatibility with previous client version
         {
             urlFound = true;
-            QString mac = params[i].second.trimmed();
-            QnResourcePtr res = qnResPool->getNetResourceByMac(mac);
+            QString physicalId = params[i].second.trimmed();
+            QnResourcePtr res = qnResPool->getNetResourceByPhysicalId(physicalId);
             if (res == 0)
-                errStrMac += QByteArray("Resource with mac '") + mac.toUtf8() + QByteArray("' not found. \n");
+                errStrPhysicalId += QByteArray("Resource with physicalId '") + physicalId.toUtf8() + QByteArray("' not found. \n");
             else 
                 resList << res;
         }
@@ -70,7 +70,7 @@ int QnRecordedChunkListHandler::executeGet(const QString& path, const QnRequestP
             useBinary = params[i].second == "bin";
     }
     if (!urlFound)
-        errStr += "Parameter mac must be provided. \n";
+        errStr += "Parameter physicalId must be provided. \n";
     if (startTime < 0)
         errStr += "Parameter startTime must be provided. \n";
     if (endTime < 0)
@@ -79,7 +79,7 @@ int QnRecordedChunkListHandler::executeGet(const QString& path, const QnRequestP
         errStr += "Parameter detail must be provided. \n";
 
     if (resList.isEmpty())
-        errStr += errStrMac;
+        errStr += errStrPhysicalId;
 
     if (!errStr.isEmpty())
     {
@@ -117,13 +117,13 @@ QString QnRecordedChunkListHandler::description(TCPSocket* tcpSocket) const
 {
     QString rez;
     rez += "Return recorded chunk info by specified cameras\n";
-    rez += "<BR>Param <b>mac</b> - camera mac. Param can be repeated several times for many cameras.";
+    rez += "<BR>Param <b>physicalId</b> - camera physicalId. Param can be repeated several times for many cameras.";
     rez += "<BR>Param <b>startTime</b> - Time interval start. Microseconds since 1970 UTC or string in format 'YYYY-MM-DDThh24:mi:ss.zzz'. format is auto detected.";
     rez += "<BR>Param <b>endTime</b> - Time interval end (same format, see above).";
     rez += "<BR>Param <b>motionRect</b> - Match motion on a video by specified rect. Params can be used several times.";
     rez += "<BR>Param <b>detail</b> - Chunk detail level, in microseconds. Time periods/chunks that are shorter than the detail level are discarded. You can use detail level as amount of microseconds per screen pixel.";
 
-    rez += "<BR><b>Return</b> XML</b> - with chunks merged for all cameras. Returned time and duration in microseconds. <a href=\"";
+    rez += "<BR><b>Return</b> XML - with chunks merged for all cameras. Returned time and duration in microseconds.";
     // rez += getXsdUrl(tcpSocket);
     return rez;
 }

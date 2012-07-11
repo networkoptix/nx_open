@@ -5,7 +5,7 @@
 #include "utils/common/synctime.h"
 
 
-extern int bestBitrateKbps(QnStreamQuality q, QSize resolution, int fps);
+
 extern int getIntParam(const char* pos);
 extern QString getValueFromString(const QString& line);
 
@@ -31,6 +31,7 @@ struct ACS_VideoHeader
 
 PlDlinkStreamReader::PlDlinkStreamReader(QnResourcePtr res):
 CLServerPushStreamreader(res),
+QnLiveStreamProvider(res),
 mHttpClient(0),
 m_h264(false),
 m_mpeg4(false),
@@ -240,7 +241,7 @@ QString PlDlinkStreamReader::composeVideoProfile()
     {
         // just CBR fo mpeg so far
         t << "qualitymode=CBR" << "&";
-        t << "bitrate=" <<  info.bitrateCloseTo(bestBitrateKbps(getQuality(), resolution, fps));
+        t << "bitrate=" <<  info.bitrateCloseTo(res->suggestBitrateKbps(getQuality(), resolution, fps));
     }
     else
     {

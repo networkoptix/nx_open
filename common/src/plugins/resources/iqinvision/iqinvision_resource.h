@@ -21,10 +21,9 @@ public:
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
 
-    bool hasDualStreaming() const override {return false;}
 
 protected:
-    void initInternal() override;
+    bool initInternal() override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
     virtual void setCropingPhysical(QRect croping);

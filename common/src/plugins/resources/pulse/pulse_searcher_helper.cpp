@@ -22,20 +22,15 @@ QList<QnPlPulseSearcherHelper::WSResult> QnPlPulseSearcherHelper::findResources(
 {
     QMap<QString, WSResult> result;
 
-    QList<QHostAddress> localAddresses = getAllIPv4Addresses();
-
-    foreach(QHostAddress localAddress, localAddresses)
+    foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
     {
-        
-
         QUdpSocket socket;
 
-        bool bindSucceeded = socket.bind(localAddress, 0);
-        if (!bindSucceeded)
+        if (!bindToInterface(socket, iface))
             continue;
 
         QHostAddress groupAddress(QLatin1String("224.111.111.1"));
-        if (!multicastJoinGroup(socket, groupAddress, localAddress)) continue;
+        if (!multicastJoinGroup(socket, groupAddress, iface.address)) continue;
 
 		QByteArray requestDatagram;
 		requestDatagram.resize(43);
@@ -61,7 +56,7 @@ QList<QnPlPulseSearcherHelper::WSResult> QnPlPulseSearcherHelper::findResources(
             if (res.mac!="")
             {
                 res.ip = sender.toString();
-                res.disc_ip = localAddress.toString();
+                res.disc_ip = iface.address.toString();
                 result[res.mac] = res;
             }
 

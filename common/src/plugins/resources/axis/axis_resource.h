@@ -2,7 +2,6 @@
 #define axis_resource_h_2215
 
 #include <QMap>
-#include <QSharedPointer>
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
 #include "utils/network/simple_http_client.h"
@@ -23,8 +22,6 @@ public:
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
 
-    virtual bool hasDualStreaming() const override { return true; }
-
     bool isInitialized() const;
 
     QByteArray getMaxResolution() const;
@@ -33,12 +30,12 @@ public:
 
     QRect getMotionWindow(int num) const;
     QMap<int, QRect>  getMotionWindows() const;
-    void readMotionInfo();
+    bool readMotionInfo();
 
     virtual void setMotionMaskPhysical(int channel) override;
     virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider) override;
 protected:
-    void initInternal() override;
+    bool initInternal() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 
     virtual void setCropingPhysical(QRect croping);
@@ -57,7 +54,5 @@ private:
     QMap<int, QRect> m_motionMask;
     qint64 m_lastMotionReadTime;
 };
-
-typedef QSharedPointer<QnPlAxisResource> QnPlAxisResourcePtr;
 
 #endif //axis_resource_h_2215

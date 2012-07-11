@@ -16,6 +16,8 @@
 #include <core/resource/storage_resource.h>
 #include <core/resource/video_server.h>
 
+static const qint64 MIN_RECORD_FREE_SPACE = 1000ll * 1000ll * 1000ll * 5;
+
 namespace {
     const int defaultSpaceLimitGb = 5;
     const qint64 BILLION = 1000000000LL;
@@ -37,7 +39,8 @@ namespace {
 QnServerSettingsDialog::QnServerSettingsDialog(const QnVideoServerResourcePtr &server, QWidget *parent):
     base_type(parent),
     ui(new Ui::ServerSettingsDialog),
-    m_server(server)
+    m_server(server),
+    m_hasStorageChanges(false)
 {
     ui->setupUi(this);
     ui->storagesTable->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -66,10 +69,8 @@ void QnServerSettingsDialog::accept() {
     setEnabled(false);
     setCursor(Qt::WaitCursor);
 
-    QString errorString;
-    if (!validateStorages(tableStorages(), &errorString)) {
-        QMessageBox::warning(this, tr("Warning"), errorString, QMessageBox::Ok);
-    } else {
+    bool valid = m_hasStorageChanges ? validateStorages(tableStorages(), NULL) : true;
+    if (valid) {
         submitToResources(); 
 
         base_type::accept();
@@ -83,11 +84,12 @@ void QnServerSettingsDialog::reject() {
     base_type::reject();
 }
 
-int QnServerSettingsDialog::addTableRow(const QString &url, int spaceLimitGb) {
+int QnServerSettingsDialog::addTableRow(int id, const QString &url, int spaceLimitGb) {
     int row = ui->storagesTable->rowCount();
     ui->storagesTable->insertRow(row);
 
     QTableWidgetItem *urlItem = new QTableWidgetItem(url);
+    urlItem->setData(Qt::UserRole, id);
     QTableWidgetItem *spaceItem = new QTableWidgetItem();
     spaceItem->setData(Qt::DisplayRole, spaceLimitGb);
 
@@ -100,11 +102,11 @@ int QnServerSettingsDialog::addTableRow(const QString &url, int spaceLimitGb) {
 }
 
 void QnServerSettingsDialog::setTableStorages(const QnAbstractStorageResourceList &storages) {
-    ui->storagesTable->clear();
+	ui->storagesTable->setRowCount(0);
     ui->storagesTable->setColumnCount(2);
 
     foreach (const QnAbstractStorageResourcePtr &storage, storages)
-        addTableRow(storage->getUrl(), storage->getSpaceLimit() / BILLION);
+        addTableRow(storage->getId().toInt(), storage->getUrl(), storage->getSpaceLimit() / BILLION);
 }
 
 QnAbstractStorageResourceList QnServerSettingsDialog::tableStorages() const {
@@ -112,10 +114,13 @@ QnAbstractStorageResourceList QnServerSettingsDialog::tableStorages() const {
 
     int rowCount = ui->storagesTable->rowCount();
     for (int row = 0; row < rowCount; ++row) {
+        int id = ui->storagesTable->item(row, 0)->data(Qt::UserRole).toInt();
         QString path = ui->storagesTable->item(row, 0)->text();
         int spaceLimit = ui->storagesTable->item(row, 1)->data(Qt::DisplayRole).toInt();
 
         QnAbstractStorageResourcePtr storage(new QnAbstractStorageResource());
+        if (id)
+            storage->setId(id);
         storage->setName(QUuid::createUuid().toString());
         storage->setParentId(m_server->getId());
         storage->setUrl(path.trimmed());
@@ -134,6 +139,8 @@ void QnServerSettingsDialog::updateFromResources() {
     ui->rtspPortEdit->setText(QString::number(QUrl(m_server->getUrl()).port()));
 
     setTableStorages(m_server->getStorages());
+
+    m_hasStorageChanges = false;
 }
 
 void QnServerSettingsDialog::submitToResources() {
@@ -149,15 +156,22 @@ void QnServerSettingsDialog::submitToResources() {
     m_server->setApiUrl(apiUrl.toString());
 }
 
+QString formatGbStr(qint64 value)
+{
+	return QString::number(value/1000000000.0, 'f', 2);
+}
+
 bool QnServerSettingsDialog::validateStorages(const QnAbstractStorageResourceList &storages, QString *errorString) {
     foreach (const QnAbstractStorageResourcePtr &storage, storages) {
         if (storage->getUrl().isEmpty()) {
-            *errorString = "Storage path must not be empty.";
+            if(errorString)
+                *errorString = "Storage path must not be empty.";
             return false;
         }
 
         if (storage->getSpaceLimit() < 0) {
-            *errorString = "Space limit must be a non-negative integer.";
+            if(errorString)
+                *errorString = "Space limit must be a non-negative integer.";
             return false;
         }
     }
@@ -166,22 +180,62 @@ bool QnServerSettingsDialog::validateStorages(const QnAbstractStorageResourceLis
     QScopedPointer<QEventLoop> eventLoop(new QEventLoop());
     connect(counter.data(), SIGNAL(reachedZero()), eventLoop.data(), SLOT(quit()));
 
-    QScopedPointer<detail::CheckPathReplyProcessor> processor(new detail::CheckPathReplyProcessor());
-    connect(processor.data(), SIGNAL(replyReceived(int, bool, int)), counter.data(), SLOT(decrement()));
+    QScopedPointer<detail::CheckFreeSpaceReplyProcessor> processor(new detail::CheckFreeSpaceReplyProcessor());
+    connect(processor.data(), SIGNAL(replyReceived(int, qint64, qint64, int)), counter.data(), SLOT(decrement()));
 
     QnVideoServerConnectionPtr serverConnection = m_server->apiConnection();
     QHash<int, QnAbstractStorageResourcePtr> storageByHandle;
     foreach (const QnAbstractStorageResourcePtr &storage, storages) {
-        int handle = serverConnection->asyncCheckPath(storage->getUrl(), processor.data(), SLOT(processReply(int, bool, int)));
+        int handle = serverConnection->asyncGetFreeSpace(storage->getUrl(), processor.data(), SLOT(processReply(int, qint64, qint64, int)));
         storageByHandle[handle] = storage;
     }
 
     eventLoop->exec();
 
-    if(!processor->invalidHandles().empty()) {
-        QMessageBox::warning(this, tr("Invalid storage path"), tr("Storage path '%1' is invalid or not accessible for writing.").arg(storageByHandle.value(*processor->invalidHandles().begin())->getUrl()));
-        return false;
-    }
+	detail::FreeSpaceMap freeSpaceMap = processor->freeSpaceInfo();
+	for (detail::FreeSpaceMap::const_iterator itr = freeSpaceMap.constBegin(); itr != freeSpaceMap.constEnd(); ++itr)
+	{
+		QnAbstractStorageResourcePtr storage = storageByHandle.value(itr.key());
+		if (!storage)
+			continue;
+
+		/*
+		QMessageBox::warning(this, tr("Not enough disk space"), 
+			tr("For storage '%1' required at least %2Gb space. Current disk free space is %3Gb, current video folder size is %4Gb. Required addition %5Gb").
+			arg(storage->getUrl()).
+			arg(formatGbStr(needRecordingSpace)).
+			arg(formatGbStr(itr.value().freeSpace)).
+			arg(formatGbStr(itr.value().usedSpace)).
+			arg(formatGbStr(needRecordingSpace - (itr.value().freeSpace + itr.value().usedSpace))));
+		*/
+
+		qint64 avalableSace = itr.value().freeSpace + itr.value().usedSpace - storage->getSpaceLimit();
+		if (itr.value().errorCode == detail::INVALID_PATH)
+		{
+			QMessageBox::warning(this, tr("Invalid storage path"), tr("Storage path '%1' is invalid or not accessible for writing.").arg(storage->getUrl()));
+			return false;
+		}
+		if (itr.value().errorCode == detail::SERVER_ERROR)
+		{
+			QMessageBox::critical(this, tr("Can't verify storage path"), tr("Can't verify storage path '%1'. Media server does not response").arg(storage->getUrl()));
+			return false;
+		}
+		else if (avalableSace < 0)
+		{
+			QMessageBox::critical(this, tr("Not enough disk space"),
+				tr("Storage '%1'\nYou have less storage space available than reserved free space value. Required %2Gb additional disk space")
+				.arg(storage->getUrl())
+				.arg(formatGbStr(MIN_RECORD_FREE_SPACE - avalableSace)));
+			return false;
+		}
+		else if (avalableSace < MIN_RECORD_FREE_SPACE)
+		{
+			QMessageBox::warning(this, tr("Low space for archive"),
+				tr("Storage '%1'\nYou have only %2Gb space for archive.")
+				.arg(storage->getUrl())
+				.arg(formatGbStr(avalableSace)));
+		}
+	}
 
     return true;
 }
@@ -224,7 +278,9 @@ void QnServerSettingsDialog::updateSpaceLimitCell(int row, bool force) {
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnServerSettingsDialog::at_addStorageButton_clicked() {
-    addTableRow(QString(), defaultSpaceLimitGb);
+    addTableRow(0, QString(), defaultSpaceLimitGb);
+
+    m_hasStorageChanges = true;
 }
 
 void QnServerSettingsDialog::at_removeStorageButton_clicked() {
@@ -235,11 +291,12 @@ void QnServerSettingsDialog::at_removeStorageButton_clicked() {
     qSort(rows.begin(), rows.end(), std::greater<int>()); /* Sort in descending order. */
     foreach(int row, rows)
         ui->storagesTable->removeRow(row);
+
+    m_hasStorageChanges = true;
 }
 
 void QnServerSettingsDialog::at_storagesTable_cellChanged(int row, int column) {
-    if(column != 0)
-        return;
-    
     updateSpaceLimitCell(row);
+
+    m_hasStorageChanges = true;
 }

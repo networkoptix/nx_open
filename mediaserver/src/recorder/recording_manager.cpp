@@ -110,19 +110,19 @@ bool QnRecordingManager::isResourceDisabled(QnResourcePtr res) const
 bool QnRecordingManager::updateCameraHistory(QnResourcePtr res)
 {
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(res);
-    QString macAddress = netRes->getMAC().toString();
+    QString physicalId = netRes->getPhysicalId();
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
     if (QnCameraHistoryPool::instance()->getMinTime(netRes) == AV_NOPTS_VALUE)
     {
         // it is first record for camera
-        DeviceFileCatalogPtr catalogHi = qnStorageMan->getFileCatalog(macAddress, QnResource::Role_LiveVideo);
+        DeviceFileCatalogPtr catalogHi = qnStorageMan->getFileCatalog(physicalId, QnResource::Role_LiveVideo);
         qint64 archiveMinTime = catalogHi->minTime();
         if (archiveMinTime != AV_NOPTS_VALUE)
             currentTime = qMin(currentTime,  archiveMinTime);
     }
 
     QnVideoServerResourcePtr server = qSharedPointerDynamicCast<QnVideoServerResource>(qnResPool->getResourceById(res->getParentId()));
-    QnCameraHistoryItem cameraHistoryItem(netRes->getMAC().toString(), currentTime, server->getGuid());
+    QnCameraHistoryItem cameraHistoryItem(netRes->getPhysicalId(), currentTime, server->getGuid());
     QByteArray errStr;
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
     if (appServerConnection->addCameraHistoryItem(cameraHistoryItem, errStr) != 0) {
@@ -258,6 +258,14 @@ void QnRecordingManager::at_cameraUpdated()
 {
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource> (dynamic_cast<QnVirtualCameraResource*>(sender())->toSharedPointer());
     if (camera) {
+        if (!camera->isInitialized()) {
+            camera->init();
+            if (camera->isInitialized() && camera->getStatus() == QnResource::Unauthorized)
+                camera->setStatus(QnResource::Online);
+        }
+
+        updateCamera(camera);
+
         QMap<QnResourcePtr, Recorders>::iterator itr = m_recordMap.find(camera); // && m_recordMap.value(camera).recorderHiRes->isRunning();
         if (itr != m_recordMap.end()) 
         {
@@ -271,7 +279,7 @@ void QnRecordingManager::at_cameraUpdated()
 
 void QnRecordingManager::at_cameraStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus)
 {
-    if (oldStatus == QnResource::Offline && newStatus == QnResource::Online)
+	if ((oldStatus == QnResource::Offline || oldStatus == QnResource::Unauthorized) && newStatus == QnResource::Online)
     {
         QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource> (dynamic_cast<QnSecurityCamResource*>(sender())->toSharedPointer());
         if (camera)
@@ -298,6 +306,7 @@ void QnRecordingManager::onNewResource(QnResourcePtr res)
 void QnRecordingManager::at_updateStorage()
 {
     QnVideoServerResource* videoServer = dynamic_cast<QnVideoServerResource*> (sender());
+    qnStorageMan->removeAbsentStorages(videoServer->getStorages());
     foreach(QnAbstractStorageResourcePtr storage, videoServer->getStorages())
     {
         QnStorageResourcePtr physicalStorage = qSharedPointerDynamicCast<QnStorageResource>(storage);
@@ -309,6 +318,12 @@ void QnRecordingManager::at_updateStorage()
 void QnRecordingManager::onRemoveResource(QnResourcePtr res)
 {
     QMutexLocker lock(&m_mutex);
+
+    QnStorageResourcePtr physicalStorage = qSharedPointerDynamicCast<QnStorageResource>(res);
+    if (physicalStorage) {
+        qnStorageMan->removeStorage(physicalStorage);
+        return;
+    }
 
     QMap<QnResourcePtr, Recorders>::iterator itr = m_recordMap.find(res);
     if (itr == m_recordMap.end())

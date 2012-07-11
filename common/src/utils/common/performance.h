@@ -20,6 +20,22 @@ public:
     static qint64 currentThreadCycles();
 
     static qint64 currentCpuFrequency();
+
+    /**
+     * \returns                         Percent of CPU time (both user and kernel) consumed 
+     *                                  by the current process in last few seconds.
+     */
+    static qint64 currentCpuUsage();
+
+    /**
+    * \returns                          Brandstring includes manufacturer, model and clockspeed
+    */
+    static QString cpuBrand();
+
+    /**
+    * \returns                          Number of CPU cores
+    */
+    static int cpuCoreCount();
 };
 
 

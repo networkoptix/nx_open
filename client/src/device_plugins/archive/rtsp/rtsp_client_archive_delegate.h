@@ -18,6 +18,7 @@ public:
     QnRtspClientArchiveDelegate();
     virtual ~QnRtspClientArchiveDelegate();
 
+    void setResource(QnResourcePtr resource);
     virtual bool open(QnResourcePtr resource);
     virtual void close();
     virtual qint64 startTime();
@@ -48,10 +49,13 @@ public:
     static void setProxyAddr(const QString& addr, int port);
 
     void setAdditionalAttribute(const QByteArray& name, const QByteArray& value);
+    virtual void setRange(qint64 startTime, qint64 endTime, qint64 frameStep) override;
 
+    void setMultiserverAllowed(bool value);
 private:
     QnAbstractDataPacketPtr processFFmpegRtpPayload(const quint8* data, int dataSize);
     void processMetadata(const quint8* data, int dataSize);
+    bool openInternal(QnResourcePtr resource);
     void reopen();
 
     // determine camera's video server on specified time
@@ -93,6 +97,9 @@ private:
     static QString m_proxyAddr;
     static int m_proxyPort;
     qint64 m_forcedEndTime;
+    bool m_isMultiserverAllowed;
 };
+
+typedef QSharedPointer<QnRtspClientArchiveDelegate> QnRtspClientArchiveDelegatePtr;
 
 #endif

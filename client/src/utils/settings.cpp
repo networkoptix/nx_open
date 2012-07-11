@@ -123,6 +123,8 @@ QVariant QnSettings::updateValueFromSettings(QSettings *settings, int id, const 
     case BACKGROUND_COLOR:
         return qnGlobals->backgroundGradientColor();
 #endif
+    case DEBUG_COUNTER:
+        return defaultValue; /* Not to be read from settings. */
     default:
         return base_type::updateValueFromSettings(settings, id, defaultValue);
         break;
@@ -162,6 +164,8 @@ void QnSettings::submitValueToSettings(QSettings *settings, int id, const QVaria
     case BACKGROUND_COLOR:
         break;
 #endif
+    case DEBUG_COUNTER:
+        break; /* Not to be saved to settings. */
     default:
         base_type::submitValueToSettings(settings, id, value);
         break;

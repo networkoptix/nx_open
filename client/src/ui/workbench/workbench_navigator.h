@@ -109,17 +109,20 @@ protected:
     void removeSyncedWidget(QnResourceWidget *widget);
     
     SliderUserData currentSliderData() const;
-    void setCurrentSliderData(const SliderUserData &localData);
+    void setCurrentSliderData(const SliderUserData &localData, bool preferToPreserveWindow = false);
 
     void setPlayingTemporary(bool playing);
 
     QnCachingTimePeriodLoader *loader(const QnResourcePtr &resource);
     QnCachingTimePeriodLoader *loader(QnResourceWidget *widget);
 
+    QnThumbnailsLoader *thumbnailLoader(const QnResourcePtr &resource);
+    QnThumbnailsLoader *thumbnailLoader(QnResourceWidget *widget);
+
 protected slots:
     void updateCentralWidget();
     void updateCurrentWidget();
-    void updateSliderFromReader();
+    void updateSliderFromReader(bool keepInWindow = true);
     void updateSliderOptions();
     void updateScrollBarFromSlider();
     void updateSliderFromScrollBar();
@@ -185,6 +188,8 @@ private:
     WidgetFlags m_currentWidgetFlags;
     bool m_currentWidgetLoaded;
     bool m_currentWidgetIsCentral;
+    bool m_sliderDataInvalid;
+    bool m_sliderWindowInvalid;
 
     bool m_updatingSliderFromReader;
     bool m_updatingSliderFromScrollBar;
@@ -207,7 +212,7 @@ private:
 
     QHash<QnResourcePtr, QnCachingTimePeriodLoader *> m_loaderByResource;
     
-    QScopedPointer<QnThumbnailsLoader, QnRunnableCleanup> m_thumbnailsLoader;
+    QHash<QnResourcePtr, QnThumbnailsLoader *> m_thumbnailLoaderByResource;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchNavigator::WidgetFlags);

@@ -20,6 +20,7 @@
 QnResource::QnResource(): 
     QObject(),
     m_mutex(QMutex::Recursive),
+    m_initMutex(QMutex::Recursive),
     m_flags(0),
 	m_disabled(false),
     m_status(Offline),
@@ -97,6 +98,15 @@ void QnResource::update(QnResourcePtr other)
     setStatus(other->m_status);
 	setDisabled(other->m_disabled);
     emit resourceChanged();
+
+    QnParamList paramList = other->getResourceParamList();
+    foreach(QnParam param, paramList.list())
+    {
+        if (param.domain() == QnDomainDatabase)
+        {
+            setParam(param.name(), param.value(), QnDomainDatabase);
+        }
+    }
 
     foreach (QnResourceConsumer *consumer, m_consumers)
         consumer->afterUpdate();
@@ -341,7 +351,9 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
     getResourceParamList();
     if (!m_resourceParamList.contains(name))
     {
-        qWarning() << "Can't get parameter. Parameter" << name << "does not exists for resource" << getName();
+        if (!name.contains("VideoLayout"))
+            qWarning() << "Can't get parameter. Parameter" << name << "does not exists for resource" << getName();
+
         return false;
     }
 
@@ -545,13 +557,13 @@ void QnResource::setStatus(QnResource::Status newStatus, bool silenceMode)
 	qDebug() << "Change status. oldValue=" << oldStatus << " new value=" << newStatus << " id=" << m_id << " name=" << getName();
 #endif
 
-    if (newStatus == Offline)
+    if (newStatus == Offline || newStatus == Unauthorized)
         m_initialized = false;
 
     if (oldStatus == Offline && newStatus == Online)
         init();
 
-    emit statusChanged(oldStatus, newStatus);
+    emit statusChanged(oldStatus, m_status);
 
     QMutexLocker mutexLocker(&m_mutex);
     m_lastStatusUpdateTime = qnSyncTime->currentDateTime();
@@ -755,10 +767,37 @@ void QnResource::setDisabled(bool disabled)
 
 void QnResource::init()
 {
-    if (!m_initialized) {
-        m_initialized = true;
-        initInternal();
+        QMutexLocker lock(&m_initMutex);
+        if (!m_initialized) 
+        {
+            m_initialized = initInternal();
+            if (!m_initialized && (getStatus() == Online || getStatus() == Recording))
+                setStatus(Offline);
+        }
+}
+
+void QnResource::initAndEmit()
+{
+    init();
+    emit initAsyncFinished(toSharedPointer(), isInitialized());
+}
+
+class InitAsyncTask: public QRunnable
+{
+public:
+    InitAsyncTask(QnResourcePtr resource): m_resource(resource) {}
+    void run()
+    {
+        m_resource->initAndEmit();
     }
+private:
+    QnResourcePtr m_resource;
+};
+
+void QnResource::initAsync()
+{
+    InitAsyncTask *task = new InitAsyncTask(toSharedPointer());
+    QThreadPool::globalInstance()->start(task);
 }
 
 bool QnResource::isInitialized() const

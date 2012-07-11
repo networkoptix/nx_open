@@ -56,13 +56,11 @@ public:
 
     QnDlink_cam_info getCamInfo() const;
 
-    bool hasDualStreaming() const override;
-
     
     virtual void setMotionMaskPhysical(int channel) override;
 
 protected:
-    void initInternal() override; // does a lot of physical work 
+    bool initInternal() override; // does a lot of physical work 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual void setCropingPhysical(QRect croping);
 

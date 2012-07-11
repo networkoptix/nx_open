@@ -14,7 +14,7 @@ DEFINES += __STDC_CONSTANT_MACROS
 LIBS += ${global.libs}
 DEFINES += ${global.defines}
 
-QT *= ${qtlib1} ${qtlib2} ${qtlib3} ${qtlib4} ${qtlib5} ${qtlib6} ${qtlib7} ${qtlib8} ${qtlib9}
+QT += ${qtlib1} ${qtlib2} ${qtlib3} ${qtlib4} ${qtlib5} ${qtlib6} ${qtlib7} ${qtlib8} ${qtlib9}
 
 INCLUDEPATH += ${project.build.sourceDirectory} ${project.build.directory}  ${basedir}/../common/src ${project.build.directory}/build/include
 PRECOMPILED_HEADER = ${project.build.sourceDirectory}/StdAfx.h

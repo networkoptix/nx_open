@@ -57,10 +57,10 @@ public:
 
     QnResourcePtr getResourceByUrl(const QString &url) const;
 
-    QnNetworkResourcePtr getNetResourceByMac(const QString &mac) const;
+    QnNetworkResourcePtr getNetResourceByPhysicalId(const QString &physicalId) const;
 
-    QnNetworkResourceList getAllNetResourceByMac(const QString &mac) const;
-    QnNetworkResourcePtr getEnabledResourceByMac(const QString &mac) const;
+    QnNetworkResourceList getAllNetResourceByPhysicalId(const QString &mac) const;
+    QnNetworkResourcePtr getEnabledResourceByPhysicalId(const QString &mac) const;
     QnResourcePtr getEnabledResourceByUniqueId(const QString &uniqueId) const;
 
     // returns list of resources with such flag

@@ -9,6 +9,7 @@
 #include <QDebug>
 #include "utils/network/socket.h"
 #include "utils/common/synctime.h"
+#include "utils/common/math.h"
 
 static const unsigned char BitReverseTable256[] = 
 {
@@ -203,13 +204,13 @@ void getFrame_avgY_array_8_x(const CLVideoDecoderOutput* frame, const CLVideoDec
 {
     //saveFrame(frame->data[0], frame->width, frame->height, frame->linesize[0], "c:/src_orig.bmp");
 
-    Q_ASSERT(frame->width % 16 == 0);
+    Q_ASSERT(frame->width % 8 == 0);
     Q_ASSERT(frame->linesize[0] % 16 == 0);
 
     const __m128i* curLinePtr = (const __m128i*) frame->data[0];
     const __m128i* curLinePtrPrev = (const __m128i*) prevFrame->data[0];
     int lineSize = frame->linesize[0] / 16;
-    int xSteps = frame->width/16;
+    int xSteps = qPower2Ceil((unsigned)frame->width,16)/16;
     int linesInStep = (frame->height*65536)/ MD_HEIGHT;
     int ySteps = MD_HEIGHT;
 
@@ -258,12 +259,12 @@ void getFrame_avgY_array_8_x_mc(const CLVideoDecoderOutput* frame, quint8* dst)
 {
     //saveFrame(frame->data[0], frame->width, frame->height, frame->linesize[0], "c:/src_orig.bmp");
 
-    Q_ASSERT(frame->width % 16 == 0);
+    Q_ASSERT(frame->width % 8 == 0);
     Q_ASSERT(frame->linesize[0] % 16 == 0);
 
     const __m128i* curLinePtr = (const __m128i*) frame->data[0];
     int lineSize = frame->linesize[0] / 16;
-    int xSteps = frame->width/16;
+    int xSteps = qPower2Ceil((unsigned)frame->width,16)/16;
     int linesInStep = (frame->height*65536)/ MD_HEIGHT;
     int ySteps = MD_HEIGHT;
 
@@ -302,15 +303,28 @@ void getFrame_avgY_array_8_x_mc(const CLVideoDecoderOutput* frame, quint8* dst)
     //saveFrame(frame->data[0], frame->width, frame->height, frame->linesize[0], "c:/src_orig.bmp");
 }
 
+void fillRightEdge8(const CLVideoDecoderOutput* frame)
+{
+    Q_ASSERT(frame->linesize[0] >= frame->width + 8);
+    quint64* dataPtr = (quint64*) (frame->data[0]+frame->width);
+    for (int i = 0; i < frame->height; ++i) {
+        dataPtr[0] = dataPtr[-1]; // replicate most right 8 pixels
+        dataPtr += frame->linesize[0]/sizeof(quint64);
+    }
+}
+
 void getFrame_avgY_array_16_x(const CLVideoDecoderOutput* frame, const CLVideoDecoderOutput* prevFrame, quint8* dst)
 {
-    Q_ASSERT(frame->width % 16 == 0);
+    Q_ASSERT(frame->width % 8 == 0);
     Q_ASSERT(frame->linesize[0] % 16 == 0);
 
     const __m128i* curLinePtr = (const __m128i*) frame->data[0];
     const __m128i* prevLinePtr = (const __m128i*) prevFrame->data[0];
     int lineSize = frame->linesize[0] / 16;
-    int xSteps = frame->width/16;
+    int xSteps = qPower2Ceil((unsigned)frame->width,16)/16;
+    if (frame->width % 16)
+        fillRightEdge8(frame);
+
     int linesInStep = (frame->height*65536)/ MD_HEIGHT;
     int ySteps = MD_HEIGHT;
 
@@ -354,12 +368,12 @@ void getFrame_avgY_array_16_x(const CLVideoDecoderOutput* frame, const CLVideoDe
 
 void getFrame_avgY_array_16_x_mc(const CLVideoDecoderOutput* frame, quint8* dst)
 {
-    Q_ASSERT(frame->width % 16 == 0);
+    Q_ASSERT(frame->width % 8 == 0);
     Q_ASSERT(frame->linesize[0] % 16 == 0);
 
     const __m128i* curLinePtr = (const __m128i*) frame->data[0];
     int lineSize = frame->linesize[0] / 16;
-    int xSteps = frame->width/16;
+    int xSteps = qPower2Ceil((unsigned)frame->width,16)/16;
     int linesInStep = (frame->height*65536)/ MD_HEIGHT;
     int ySteps = MD_HEIGHT;
 
@@ -430,15 +444,10 @@ void getFrame_avgY_array_x_x(const CLVideoDecoderOutput* frame, const CLVideoDec
     squareStep = 0;\
     squareSum = 0;\
     dstCurLine += MD_HEIGHT;\
-    gggMatrixCnt = 0; \
 }
-    quint8 gggMatrix[48*48];
-    int gggMatrixCnt = 0;
-
-
     quint8* dstOrig = dst;
 
-    Q_ASSERT(frame->width % 16 == 0);
+    Q_ASSERT(frame->width % 8 == 0);
     Q_ASSERT(frame->linesize[0] % 16 == 0);
     Q_ASSERT(sqWidth % 8 == 0);
     
@@ -447,7 +456,10 @@ void getFrame_avgY_array_x_x(const CLVideoDecoderOutput* frame, const CLVideoDec
     const __m128i* curLinePtr = (const __m128i*) frame->data[0];
     const __m128i* prevLinePtr = (const __m128i*) prevFrame->data[0];
     int lineSize = frame->linesize[0] / 16;
-    int xSteps = frame->width/16;
+    if (frame->width % 16)
+        fillRightEdge8(frame);
+
+    int xSteps = qPower2Ceil((unsigned)frame->width,16)/16;
     int linesInStep = (frame->height*65536)/ MD_HEIGHT;
     int ySteps = MD_HEIGHT;
 
@@ -471,12 +483,6 @@ void getFrame_avgY_array_x_x(const CLVideoDecoderOutput* frame, const CLVideoDec
             {
                 //__m128i partSum = _mm_sad_epu8(*src, *src2); // src 16 bytes sum // SSE2
                 __m128i partSum = advanced_sad(*src, *src2);
-                for (int k = 0; k < 16; ++k)
-                {
-                    const quint8* src1GG = (const quint8*) src;
-                    const quint8* src2GG = (const quint8*) src2;
-                    gggMatrix[gggMatrixCnt++] = qMax(*src2GG, *src1GG) - qMin(*src2GG, *src1GG);
-                }
                 src += lineSize;
                 src2 += lineSize;
                 blockSum = _mm_add_epi32(blockSum, partSum); // SSE2
@@ -516,14 +522,14 @@ void getFrame_avgY_array_x_x_mc(const CLVideoDecoderOutput* frame, quint8* dst, 
     squareSum = 0;\
     dstCurLine += MD_HEIGHT;\
 }
-    Q_ASSERT(frame->width % 16 == 0);
+    Q_ASSERT(frame->width % 8 == 0);
     Q_ASSERT(frame->linesize[0] % 16 == 0);
     Q_ASSERT(sqWidth % 8 == 0);
     sqWidth /= 8;
 
     const __m128i* curLinePtr = (const __m128i*) frame->data[0];
     int lineSize = frame->linesize[0] / 16;
-    int xSteps = frame->width/16;
+    int xSteps = qPower2Ceil((unsigned)frame->width,16)/16;
     int linesInStep = (frame->height*65536)/ MD_HEIGHT;
     int ySteps = MD_HEIGHT;
 
@@ -627,18 +633,19 @@ QnMotionEstimation::~QnMotionEstimation()
 // rescale motion mask width (mask rotated, so actually remove or duplicate some lines)
 void QnMotionEstimation::scaleMask(quint8* mask, quint8* scaledMask)
 {
-    float lineStep = m_scaledWidth / (float) MD_WIDTH;
+    float lineStep = (m_scaledWidth-1) / float(MD_WIDTH-1);
     float scaledLineNum = 0;
     int prevILineNum = -1;
     for (int y = 0; y < MD_WIDTH; ++y)
     {
         int iLineNum = (int) (scaledLineNum+0.5);
+        Q_ASSERT(iLineNum < m_scaledWidth);
         __m128i* dst = (__m128i*) (scaledMask + MD_HEIGHT*iLineNum);
         __m128i* src = (__m128i*) (mask + MD_HEIGHT*y);
         if (iLineNum > prevILineNum) 
         {
-            for (int i = 0; i < iLineNum - prevILineNum; ++i)
-                memcpy(dst + i*MD_HEIGHT , src + i*MD_HEIGHT, MD_HEIGHT);
+            for (int i = 0; i < iLineNum - prevILineNum; ++i) 
+                memcpy(dst - i*MD_HEIGHT/sizeof(__m128i) , src, MD_HEIGHT);
         }
         else {
             dst[0] = _mm_min_epu8(dst[0], src[0]); // SSE2
@@ -672,14 +679,16 @@ void QnMotionEstimation::reallocateMask(int width, int height)
     m_scaledWidth = m_lastImgWidth / m_xStep;
     if (m_lastImgWidth > m_scaledWidth*m_xStep)
         m_scaledWidth++;
-    m_scaledMask = (quint8*) qMallocAligned(MD_HEIGHT * m_scaledWidth, 32);
-    m_linkedNums = (int*) qMallocAligned(MD_HEIGHT * m_scaledWidth * sizeof(int), 32);
-    m_motionSensScaledMask = (quint8*) qMallocAligned(MD_HEIGHT * m_scaledWidth, 32);
-    m_frameBuffer[0] = (quint8*) qMallocAligned(MD_HEIGHT * m_scaledWidth, 32);
-    m_frameBuffer[1] = (quint8*) qMallocAligned(MD_HEIGHT * m_scaledWidth, 32);
-    m_filteredFrame = (quint8*) qMallocAligned(MD_HEIGHT * m_scaledWidth, 32);
-    m_resultMotion = new quint32[MD_HEIGHT/4 * m_scaledWidth];
-    memset(m_resultMotion, 0, MD_HEIGHT * m_scaledWidth);
+
+    int swUp = m_scaledWidth+1; // reserve one extra column because of analize_frame function for x8 width can write 1 extra byte
+    m_scaledMask = (quint8*) qMallocAligned(MD_HEIGHT * swUp, 32);
+    m_linkedNums = (int*) qMallocAligned(MD_HEIGHT * swUp * sizeof(int), 32);
+    m_motionSensScaledMask = (quint8*) qMallocAligned(MD_HEIGHT * swUp, 32);
+    m_frameBuffer[0] = (quint8*) qMallocAligned(MD_HEIGHT * swUp, 32);
+    m_frameBuffer[1] = (quint8*) qMallocAligned(MD_HEIGHT * swUp, 32);
+    m_filteredFrame = (quint8*) qMallocAligned(MD_HEIGHT * swUp, 32);
+    m_resultMotion = new quint32[MD_HEIGHT/4 * swUp];
+    memset(m_resultMotion, 0, MD_HEIGHT * swUp);
 
     // scale motion mask to scaled size
     if (m_scaledWidth != MD_WIDTH) {

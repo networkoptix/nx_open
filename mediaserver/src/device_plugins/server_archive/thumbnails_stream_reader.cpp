@@ -1,7 +1,7 @@
 #include "thumbnails_stream_reader.h"
 #include "plugins/resources/archive/avi_files/avi_archive_delegate.h"
-#include "device_plugins/server_archive/server_archive_delegate.h"
 #include "utils/common/util.h"
+#include "plugins/resources/archive/avi_files/thumbnails_archive_delegate.h"
 
 
 // used in reverse mode.
@@ -13,13 +13,11 @@ static const int FFMPEG_PROBE_BUFFER_SIZE = 1024 * 512;
 static const qint64 LIVE_SEEK_OFFSET = 1000000ll * 10;
 
 QnThumbnailsStreamReader::QnThumbnailsStreamReader(QnResourcePtr dev ) :
-    QnAbstractMediaStreamDataProvider(dev)
+    QnAbstractMediaStreamDataProvider(dev),
+    m_archiveDelegate(new QnServerArchiveDelegate)
 {
-    m_delegate = new QnServerArchiveDelegate();
-    m_delegate->setQuality(MEDIA_Quality_Low, true);
-    m_startTime = AV_NOPTS_VALUE;
-    m_endTime = AV_NOPTS_VALUE;
-    m_frameStep = 0;
+    m_archiveDelegate->setQuality(MEDIA_Quality_Low, true);
+    m_delegate = new QnThumbnailsArchiveDelegate(m_archiveDelegate);
     m_cseq = 0;
 }
 
@@ -31,10 +29,7 @@ QnThumbnailsStreamReader::~QnThumbnailsStreamReader()
 void QnThumbnailsStreamReader::setRange(qint64 startTime, qint64 endTime, qint64 frameStep, int cseq)
 {
     QMutexLocker lock(&m_mutex);
-    m_startTime = startTime;
-    m_endTime = endTime;
-    m_frameStep = frameStep;
-    m_currentPos = AV_NOPTS_VALUE;
+    m_delegate->setRange(startTime, endTime, frameStep);
     m_cseq = cseq;
 }
 
@@ -49,42 +44,11 @@ QnAbstractMediaDataPtr QnThumbnailsStreamReader::createEmptyPacket()
 
 QnAbstractMediaDataPtr QnThumbnailsStreamReader::getNextData()
 {
-    qint64 currentPos;
-    {
-        QMutexLocker lock(&m_mutex);
-        if (!m_runing || m_startTime == AV_NOPTS_VALUE)
-            return QnAbstractMediaDataPtr();
-
-        if (m_currentPos >= m_endTime || m_currentPos == DATETIME_NOW || m_startTime == DATETIME_NOW)
-            return createEmptyPacket();
-
-        if (m_currentPos == AV_NOPTS_VALUE)
-        {
-            if (m_delegate->open(m_resource))
-                m_currentPos = m_startTime;
-            else 
-                return QnAbstractMediaDataPtr();
-        }
-        currentPos = m_currentPos;
-    }
-
-    currentPos = qMax(currentPos, m_delegate->seek(currentPos, true));
     QnAbstractMediaDataPtr result = m_delegate->getNextData();
-    currentPos += m_frameStep;
-
-    QMutexLocker lock(&m_mutex);
-    if (m_currentPos != AV_NOPTS_VALUE)
-        m_currentPos = currentPos;
-    if (result) {
-        result->opaque = m_cseq;
-        if (qSharedPointerDynamicCast<QnEmptyMediaData>(result))
-            m_currentPos = DATETIME_NOW;
-    }
-    else {
-        m_currentPos = m_endTime;
+    if (result) 
+        return result;
+    else 
         return createEmptyPacket();
-    }
-    return result;
 }
 
 void QnThumbnailsStreamReader::run()
@@ -92,6 +56,8 @@ void QnThumbnailsStreamReader::run()
     CL_LOG(cl_logINFO) cl_log.log(QLatin1String("QnThumbnailsStreamReader started."), cl_logINFO);
 
     beforeRun();
+
+    m_delegate->open(getResource());
 
     while(!needToStop())
     {
@@ -138,8 +104,10 @@ void QnThumbnailsStreamReader::run()
                 continue; // need key data but got not key data
         }
 
-        if(data)
+        if(data) {
             data->dataProvider = this;
+            data->opaque = m_cseq;
+        }
 
         if (videoData)
             m_stat[videoData->channelNumber].onData(videoData->data.size());

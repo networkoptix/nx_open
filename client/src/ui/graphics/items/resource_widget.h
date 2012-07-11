@@ -56,10 +56,10 @@ class QnResourceWidget: public Instrumented<GraphicsWidget>, public QnWorkbenchC
 
 public:
     enum DisplayFlag {
-        DisplayActivityOverlay      = 0x1, /**< Whether the paused overlay icon should be displayed. */
-        DisplaySelectionOverlay     = 0x2, /**< Whether selected / not selected state should be displayed. */
-        DisplayMotionGrid           = 0x4, /**< Whether a grid with motion detection is to be displayed. */
-        DisplayButtons              = 0x8, /**< Whether item buttons are to be displayed. */
+        DisplayActivityOverlay      = 0x1,  /**< Whether the paused overlay icon should be displayed. */
+        DisplaySelectionOverlay     = 0x2,  /**< Whether selected / not selected state should be displayed. */
+        DisplayMotion               = 0x4,  /**< Whether motion is to be displayed. */                              // TODO: this flag also handles smart search, separate!
+        DisplayButtons              = 0x8,  /**< Whether item buttons are to be displayed. */
         DisplayMotionSensitivity    = 0x10, /**< Whether a grid with motion region sensitivity is to be displayed. */
     };
     Q_DECLARE_FLAGS(DisplayFlags, DisplayFlag)
@@ -220,7 +220,7 @@ public:
      *                                  displayed over a video.
      */
     bool isMotionGridDisplayed() const {
-        return m_displayFlags & DisplayMotionGrid;
+        return m_displayFlags & DisplayMotion;
     }
 
     /**
@@ -466,7 +466,7 @@ private:
     QVector<ChannelState> m_channelState;
 
     /** Image region where motion is currently present, in parrots. */
-    QList<QnMotionRegion> m_motionRegionList;
+    QList<QnMotionRegion> m_motionRegionList; // TODO: WHY THE HELL THIS ONE IS OF SIZE 4?????????? Find the one who did it and use your swordsmanship skillz on him.
 
     /** Whether the motion mask is valid. */
     bool m_motionMaskValid;

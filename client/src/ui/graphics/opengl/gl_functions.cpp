@@ -33,6 +33,50 @@ namespace QnGl {
 #undef WARN
 } // namespace QnGl
 
+// -------------------------------------------------------------------------- //
+// QnGlFunctionsGlobal
+// -------------------------------------------------------------------------- //
+class QnGlFunctionsGlobal {
+public:
+    QnGlFunctionsGlobal(): 
+        m_initialized(false),
+        m_maxTextureSize(1024)  /* A sensible default supported by most modern GPUs. */
+    {}
+
+    GLint maxTextureSize() const {
+        return m_maxTextureSize;
+    }
+
+    void initialize(const QGLContext *context) {
+        QMutexLocker locker(&m_mutex);
+        if(m_initialized)
+            return;
+
+        if(!QGLContext::currentContext()) {
+            if(!context) {
+                qnWarning("No OpenGL context in scope, initialization failed.");
+                return;
+            }
+            
+            /* Nothing bad could come out of this call, so const_cast is OK. */
+            const_cast<QGLContext *>(context)->makeCurrent();
+        }
+
+        m_initialized = true;
+        locker.unlock();
+
+        glGetIntegerv(GL_MAX_TEXTURE_SIZE, &m_maxTextureSize);
+    }
+    
+
+private:
+    QMutex m_mutex;
+    bool m_initialized;
+    GLint m_maxTextureSize;
+};
+
+Q_GLOBAL_STATIC(QnGlFunctionsGlobal, qn_glFunctionsGlobal);
+
 
 // -------------------------------------------------------------------------- //
 // QnGlFunctionsPrivate
@@ -43,6 +87,8 @@ public:
         m_context(context),
         m_features(0)
     {
+        qn_glFunctionsGlobal()->initialize(context);
+
         bool status;
 
         status = true;
@@ -64,6 +110,8 @@ public:
         QByteArray vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
         if (vendor.contains("Tungsten Graphics") && renderer.contains("Gallium 0.1, Poulsbo on EMGD"))
             m_features |= QnGlFunctions::ShadersBroken; /* Shaders are declared but don't work. */
+        if (vendor.contains("Intel") && renderer.contains("Intel(R) HD Graphics 3000"))
+            m_features |= QnGlFunctions::OpenGLBroken; /* OpenGL is declared but don't work. */
     }
 
     virtual ~QnGlFunctionsPrivate() {}
@@ -110,12 +158,10 @@ Q_GLOBAL_STATIC(QnGlFunctionsPrivateStorage, qn_glFunctionsPrivateStorage);
 // QnGlFunctions
 // -------------------------------------------------------------------------- //
 QnGlFunctions::QnGlFunctions(const QGLContext *context) {
-    if(context == NULL)
-        context = QGLContext::currentContext();
-
     QnGlFunctionsPrivateStorage *storage = qn_glFunctionsPrivateStorage();
     if(storage)
         d = qn_glFunctionsPrivateStorage()->get(context);
+    
     if(d.isNull()) /* Application is being shut down. */
         d = QSharedPointer<QnGlFunctionsPrivate>(new QnGlFunctionsPrivate(NULL));
 }
@@ -157,3 +203,50 @@ void QnGlFunctions::glProgramLocalParameter4fARB(GLenum target, GLuint index, GL
 void QnGlFunctions::glActiveTexture(GLenum texture) {
     d->glActiveTexture(texture);
 }
+
+#ifdef Q_OS_WIN
+namespace {
+    QnGlFunctions::Features estimateFeatures() {
+        QnGlFunctions::Features result(0);
+
+        DISPLAY_DEVICE dd; 
+        dd.cb = sizeof(dd); 
+        DWORD dev = 0; 
+        while (EnumDisplayDevices(0, dev, &dd, 0))
+        {
+            if (dd.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE){
+                QString v = QString::fromWCharArray(dd.DeviceString);
+                if (v.contains("Intel(R) HD Graphics 3000"))
+                    result |= QnGlFunctions::OpenGLBroken;
+                else
+                if (v.contains("Gallium 0.1, Poulsbo on EMGD"))
+                    result |= QnGlFunctions::ShadersBroken;
+                break;
+            }
+            ZeroMemory(&dd, sizeof(dd));
+            dd.cb = sizeof(dd);
+            dev++; 
+        }
+        return result;
+    }
+    Q_GLOBAL_STATIC_WITH_INITIALIZER(QnGlFunctions::Features, qn_estimatedFeatures, { *x = estimateFeatures(); });
+}
+#endif
+
+QnGlFunctions::Features QnGlFunctions::estimatedFeatures() {
+#ifdef Q_OS_WIN
+    return *qn_estimatedFeatures();
+#else
+    return QnGlFunctions::Features(0);
+#endif
+}
+
+GLint QnGlFunctions::estimatedInteger(GLenum target) {
+    if(target != GL_MAX_TEXTURE_SIZE) {
+        qnWarning("Target '%1' is not supported.", target);
+        return 0;
+    }
+
+    return qn_glFunctionsGlobal()->maxTextureSize();
+}
+

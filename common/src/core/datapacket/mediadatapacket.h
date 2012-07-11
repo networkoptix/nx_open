@@ -50,7 +50,8 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
                      MediaFlags_LowQuality = 256,
                      MediaFlags_StillImage = 512,
 
-                     MediaFlags_NewServer = 1024 // swith archive to a new media server
+                     MediaFlags_NewServer = 1024, // swith archive to a new media server
+                     MediaFlags_DecodeTwice = 2048
                     };
 
 	QnAbstractMediaData(unsigned int alignment, unsigned int capacity)

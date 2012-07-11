@@ -13,7 +13,7 @@ Q_DECLARE_METATYPE(QAuthenticator);
 QnNetworkResource::QnNetworkResource()
     : QnResource(),
       m_networkStatus(0),
-      m_networkTimeout(2000),
+      m_networkTimeout(3000),
       m_authenticated(true),
       m_probablyNeedToUpdateStatus(false)
 {
@@ -37,12 +37,15 @@ void QnNetworkResource::deserialize(const QnResourceParameters& parameters)
     QnResource::deserialize(parameters);
 
     const char* MAC = "mac";
-    //const char* URL = "url";
+    const char* PHYSICALID = "physicalId";
     const char* LOGIN = "login";
     const char* PASSWORD = "password";
 
     if (parameters.contains(QLatin1String(MAC)))
         setMAC(parameters[QLatin1String(MAC)]);
+
+    if (parameters.contains(QLatin1String(PHYSICALID)))
+        setPhysicalId(parameters[QLatin1String(PHYSICALID)]);
 
     if (parameters.contains(QLatin1String(LOGIN)) && parameters.contains(QLatin1String(PASSWORD)))
         setAuth(parameters[QLatin1String(LOGIN)], parameters[QLatin1String(PASSWORD)]);
@@ -50,17 +53,9 @@ void QnNetworkResource::deserialize(const QnResourceParameters& parameters)
 
 QString QnNetworkResource::getUniqueId() const
 {
-    return getMAC().toString();
+    return getPhysicalId();
 }
 
-bool QnNetworkResource::equalsTo(const QnResourcePtr other) const
-{
-    QnNetworkResourcePtr nr = other.dynamicCast<QnNetworkResource>();
-    if (!nr)
-        return false;
-
-    return (getHostAddress() == nr->getHostAddress() && getMAC() == nr->getMAC());
-}
 
 QHostAddress QnNetworkResource::getHostAddress() const
 {
@@ -87,6 +82,21 @@ void  QnNetworkResource::setMAC(const QnMacAddress &mac)
 {
     QMutexLocker mutexLocker(&m_mutex);
     m_macAddress = mac;
+
+    if (getPhysicalId().size()==0)
+        setPhysicalId(mac.toString());
+}
+
+QString QnNetworkResource::getPhysicalId() const
+{
+    QMutexLocker mutexLocker(&m_mutex);
+    return m_physicalId;
+}
+
+void QnNetworkResource::setPhysicalId(const QString &physicalId)
+{
+    QMutexLocker mutexLocker(&m_mutex);
+    m_physicalId = physicalId;
 }
 
 void QnNetworkResource::setAuth(const QAuthenticator &auth)
@@ -139,7 +149,7 @@ QString QnNetworkResource::toString() const
 QString QnNetworkResource::toSearchString() const
 {
     QString result;
-    QTextStream(&result) << QnResource::toSearchString() << " " << getMAC().toString();
+    QTextStream(&result) << QnResource::toSearchString() << " " << getPhysicalId();
     return result;
 }
 
@@ -212,6 +222,13 @@ bool QnNetworkResource::shoudResolveConflicts() const
 {
     return true;
 }
+
+bool QnNetworkResource::mergeResourcesIfNeeded( QnNetworkResourcePtr source )
+{
+    return false;
+}
+
+
 
 bool QnNetworkResource::conflicting()
 {

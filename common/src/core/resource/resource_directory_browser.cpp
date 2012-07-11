@@ -169,11 +169,11 @@ QnResourcePtr QnResourceDirectoryBrowser::createArchiveResource(const QString& x
         return rez;
     }
 
-    if (FileTypeSupport::isLayoutFileExt(xfile))
+    /*if (FileTypeSupport::isLayoutFileExt(xfile))
     {
         QnLayoutResourcePtr layout = QnLayoutResource::fromFile(xfile);
         return layout;
-    }
+    }*/ // TODO
 
     return QnResourcePtr(0);
 }

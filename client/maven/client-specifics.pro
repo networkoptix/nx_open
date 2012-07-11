@@ -9,12 +9,9 @@ CONFIG(debug, debug|release) {
 
 win32 {
   QMAKE_LFLAGS += /MACHINE:${arch}
-  QMAKE_CXXFLAGS += -Zc:wchar_t
-  QMAKE_CXXFLAGS -= -Zc:wchar_t- 
 }
 
 mac {
-  LIBS += -L../../common/contrib/qjson/lib/mac
   DEFINES += QN_EXPORT=
 
   PRIVATE_FRAMEWORKS.files = ../resource/arecontvision
@@ -22,7 +19,7 @@ mac {
   QMAKE_BUNDLE_DATA += PRIVATE_FRAMEWORKS
 
   QMAKE_POST_LINK += mkdir -p `dirname $(TARGET)`/arecontvision; cp -f $$PWD/../resource/arecontvision/devices.xml `dirname $(TARGET)`/arecontvision
-		
+        
   #  QMAKE_CXXFLAGS += -DAPI_TEST_MAIN
   #  TARGET = consoleapp
 }

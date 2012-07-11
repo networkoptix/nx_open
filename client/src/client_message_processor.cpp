@@ -24,7 +24,9 @@ QnClientMessageProcessor* QnClientMessageProcessor::instance()
 void QnClientMessageProcessor::init()
 {
     QUrl appServerEventsUrl = QnAppServerConnectionFactory::defaultUrl();
-    appServerEventsUrl.setPath("/events");
+    appServerEventsUrl.setPath("/events/");
+	appServerEventsUrl.addQueryItem("format", "pb");
+    appServerEventsUrl.addQueryItem("guid", QnAppServerConnectionFactory::clientGuid());
     init(appServerEventsUrl, EVENT_RECONNECT_TIMEOUT);
 }
 
@@ -97,66 +99,77 @@ void QnClientMessageProcessor::at_licensesReceived(int status, const QByteArray 
     qnLicensePool->replaceLicenses(licenses);
 }
 
-void QnClientMessageProcessor::at_messageReceived(QnMessage event)
+void QnClientMessageProcessor::at_messageReceived(QnMessage message)
 {
     QByteArray debugStr;
     QTextStream stream(&debugStr);
 
-    stream << "Got event: " << event.eventType << " " << event.objectName << " " << event.objectId << event.resourceGuid;
+    if (message.eventType == Message_Type_ResourceDisabledChange)
+        stream << "disabled: " << message.resourceDisabled;
 
-    if (event.eventType == QN_MESSAGE_RES_DISABLED_CHANGE || event.eventType == QN_MESSAGE_RES_STATUS_CHANGE)
-        stream << "data: " << event.data.toInt();
+    if(message.eventType == Message_Type_ResourceStatusChange)
+        stream << "status: " << (int)message.resourceStatus;
 
     qDebug() << debugStr;
 
-    if (event.eventType == QN_MESSAGE_LICENSE_CHANGE)
+	if (message.eventType == Message_Type_License)
     {
-        QnAppServerConnectionFactory::createConnection()->getLicensesAsync(this, SLOT(at_licensesReceived(int,QByteArray,QnLicenseList,int)));
+		if (message.license->isValid())
+			qnLicensePool->addLicense(message.license);
     }
-	else if (event.eventType == QN_MESSAGE_RES_DISABLED_CHANGE)
+	else if (message.eventType == Message_Type_ResourceDisabledChange)
 	{
 		QnResourcePtr resource;
-		if (!event.resourceGuid.isEmpty())
-			resource = qnResPool->getResourceByGuid(event.resourceGuid);
+		if (!message.resourceGuid.isEmpty())
+			resource = qnResPool->getResourceByGuid(message.resourceGuid);
 		else
-			resource = qnResPool->getResourceById(event.objectId);
+			resource = qnResPool->getResourceById(message.resourceId);
 
 		if (resource)
 		{
-			resource->setDisabled(event.data.toInt());
+			resource->setDisabled(message.resourceDisabled);
 		}
 	}
-    else if (event.eventType == QN_MESSAGE_RES_STATUS_CHANGE)
+    else if (message.eventType == Message_Type_ResourceStatusChange)
     {
-        QnResourcePtr resource;
-        if (!event.resourceGuid.isEmpty())
-            resource = qnResPool->getResourceByGuid(event.resourceGuid);
-        else
-            resource = qnResPool->getResourceById(event.objectId);
+		QnResourcePtr resource;
+		if (!message.resourceGuid.isEmpty())
+			resource = qnResPool->getResourceByGuid(message.resourceGuid);
+		else
+			resource = qnResPool->getResourceById(message.resourceId);
 
         if (resource)
         {
-            QnResource::Status status = (QnResource::Status)event.data.toInt();
-            resource->setStatus(status);
+			resource->setStatus(message.resourceStatus);
         }
     }
-    else if (event.eventType == QN_MESSAGE_CAMERA_SERVER_ITEM)
+	else if (message.eventType == Message_Type_CameraServerItem)
     {
-        QString mac = event.dict["mac"].toString();
-        QString serverGuid = event.dict["server_guid"].toString();
-        qint64 timestamp_ms = event.dict["timestamp"].toLongLong();
-
-        QnCameraHistoryItem historyItem(mac, timestamp_ms, serverGuid);
-
-        QnCameraHistoryPool::instance()->addCameraHistoryItem(historyItem);
+		QnCameraHistoryPool::instance()->addCameraHistoryItem(*message.cameraServerItem);
     }
-    else if (event.eventType == QN_MESSAGE_RES_CHANGE)
+	else if (message.eventType == Message_Type_ResourceChange)
     {
-        QnAppServerConnectionFactory::createConnection()->
-                getResourcesAsync(QString("id=%1").arg(event.objectId), event.objectNameLower(), this, SLOT(at_resourcesReceived(int,QByteArray,QnResourceList,int)));
-    } else if (event.eventType == QN_MESSAGE_RES_DELETE)
+        if (!message.resource)
+        {
+            qWarning() << "Got Message_Type_ResourceChange with empty resource in it";
+            return;
+        }
+
+        QnResourcePtr ownResource;
+    
+        QString guid = message.resource->getGuid();
+		if (!guid.isEmpty())
+            ownResource = qnResPool->getResourceByGuid(guid);
+        else
+			ownResource = qnResPool->getResourceById(message.resource->getId());
+
+		if (ownResource.isNull())
+			qnResPool->addResource(message.resource);
+		else
+			ownResource->update(message.resource);
+	} else if (message.eventType == Message_Type_ResourceDelete)
     {
-        QnResourcePtr ownResource = qnResPool->getResourceById(event.objectId);
+        QnResourcePtr ownResource = qnResPool->getResourceById(message.resourceId);
         qnResPool->removeResource(ownResource);
     }
 }
@@ -178,5 +191,5 @@ void QnClientMessageProcessor::at_connectionOpened()
 void QnClientMessageProcessor::at_connectionReset()
 {
     QnAppServerConnectionFactory::createConnection()->
-            getResourcesAsync("", "resourceEx", this, SLOT(at_resourcesReceived(int,QByteArray,QnResourceList,int)));
+            getResourcesAsync("", "resource", this, SLOT(at_resourcesReceived(int,QByteArray,QnResourceList,int)));
 }

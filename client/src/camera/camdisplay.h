@@ -35,7 +35,6 @@ public:
 
 	bool display(QnCompressedVideoDataPtr vd, bool sleep, float speed);
 	void playAudio(bool play);
-    void pauseAudio();
     void setSpeed(float speed);
     float getSpeed() const;
 
@@ -56,6 +55,7 @@ public:
 
     void setSingleShotMode(bool single);
 
+    QSize getFrameSize(int channel) const;
     QImage getScreenshot(int channel);
     bool isRealTimeSource() const;
 
@@ -94,6 +94,8 @@ protected:
 
 	void clearVideoQueue();
     void enqueueVideo(QnCompressedVideoDataPtr vd);
+    QnCompressedVideoDataPtr dequeueVideo(int channel);
+    bool isAudioHoleDetected(QnCompressedVideoDataPtr vd);
     void afterJump(QnAbstractMediaDataPtr media);
     void processNewSpeed(float speed);
     bool useSync(QnCompressedVideoDataPtr vd);
@@ -108,7 +110,7 @@ private:
 
     qint64 getDisplayedMax() const;
     qint64 getDisplayedMin() const;
-    void setAudioBufferSize(int bufferSize);
+    void setAudioBufferSize(int bufferSize, int prebufferMs);
 protected:
     CLVideoStreamDisplay* m_display[CL_MAX_CHANNELS];
 	QQueue<QnCompressedVideoDataPtr> m_videoQueue[CL_MAX_CHANNELS];
@@ -194,6 +196,7 @@ protected:
     bool m_lastLiveIsLowQuality;
     int m_audioBufferSize;
     qint64 m_minAudioDetectJumpInterval;
+    qint64 m_videoQueueDuration;
 };
 
 #endif //clcam_display_h_1211

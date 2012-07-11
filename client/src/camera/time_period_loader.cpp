@@ -121,20 +121,26 @@ void QnTimePeriodLoader::at_replyReceived(int status, const QnTimePeriodList &ti
         if (m_loading[i].handle == requstHandle)
         {
             if (status == 0) {
-                QVector<QnTimePeriodList> periods;
+                QVector<QnTimePeriodList> allPeriods;
                 if (!timePeriods.isEmpty() && !m_loadedData.isEmpty() && m_loadedData.last().durationMs == -1) 
                 {
                     if (timePeriods.last().startTimeMs >= m_loadedData.last().startTimeMs)
                         m_loadedData.last().durationMs = 0;
                 }
-                periods << m_loadedData << timePeriods;
-                m_loadedData = QnTimePeriod::mergeTimePeriods(periods); // union data
+                allPeriods << m_loadedData << timePeriods;
+                m_loadedData = QnTimePeriod::mergeTimePeriods(allPeriods); // union data
 
-                periods.clear();
-                QnTimePeriodList tmp;
-                tmp << m_loading[i].period;
-                periods << m_loadedPeriods << tmp;
-                m_loadedPeriods = QnTimePeriod::mergeTimePeriods(periods); // union loaded time range info 
+                QnTimePeriod loadedPeriod = m_loading[i].period;
+                loadedPeriod.durationMs = qMax(0ll, loadedPeriod.durationMs - 60 * 1000); /* Cut off the last one minute as it may not contain the valid data yet. */ // TODO: cut off near live only
+                if(loadedPeriod.durationMs > 0) {
+                    QnTimePeriodList loadedPeriods;
+                    loadedPeriods.push_back(loadedPeriod);
+
+                    QVector<QnTimePeriodList> allLoadedPeriods;
+                    allLoadedPeriods << m_loadedPeriods << loadedPeriods;
+
+                    m_loadedPeriods = QnTimePeriod::mergeTimePeriods(allLoadedPeriods); // union loaded time range info 
+                }
 
                 // reduce right edge of loaded period info if last period under writing now
                 if (!m_loadedPeriods.isEmpty() && !m_loadedData.isEmpty() && m_loadedData.last().durationMs == -1)

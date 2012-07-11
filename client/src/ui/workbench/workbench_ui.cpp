@@ -186,7 +186,9 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_flags(0),
     m_ignoreClickEvent(false),
     m_inFreespace(false),
-    m_ignoreSliderResizerGeometryChanges(false)
+    m_ignoreSliderResizerGeometryChanges(false),
+    m_ignoreSliderResizerGeometryChanges2(false),
+    m_lastThumbnailsHeight(48.0)
 {
     memset(m_widgetByRole, 0, sizeof(m_widgetByRole));
 
@@ -907,7 +909,7 @@ void QnWorkbenchUi::updateHelpOpacity(bool animate) {
 }
 
 void QnWorkbenchUi::updateControlsVisibility(bool animate) {
-    bool sliderVisible = navigator()->currentWidget() != NULL && !navigator()->currentWidget()->display()->isStillImage();
+    bool sliderVisible = navigator()->currentWidget() != NULL && !navigator()->currentWidget()->display()->isStillImage() && !(navigator()->currentWidget()->resource()->flags() & QnResource::still_image);
 
     if(m_inactive) {
         bool hovered = m_sliderOpacityProcessor->isHovered() || m_treeOpacityProcessor->isHovered() || m_titleOpacityProcessor->isHovered() || m_helpOpacityProcessor->isHovered();
@@ -1050,6 +1052,11 @@ void QnWorkbenchUi::updateFpsGeometry() {
 }
 
 void QnWorkbenchUi::updateSliderResizerGeometry() {
+    if(m_ignoreSliderResizerGeometryChanges2) {
+        QMetaObject::invokeMethod(this, "updateSliderResizerGeometry", Qt::QueuedConnection);
+        return;
+    }
+
     QnTimeSlider *timeSlider = m_sliderItem->timeSlider();
     QRectF timeSliderRect = timeSlider->rect();
 
@@ -1061,6 +1068,8 @@ void QnWorkbenchUi::updateSliderResizerGeometry() {
     sliderResizerGeometry.setHeight(16);
     
     if(!qFuzzyCompare(sliderResizerGeometry, m_sliderResizerItem->geometry())) {
+        QnScopedValueRollback<bool> guard(&m_ignoreSliderResizerGeometryChanges2, true);
+
         m_sliderResizerItem->setGeometry(sliderResizerGeometry);
 
         /* This one is needed here as we're in a handler and thus geometry change doesn't adjust position =(. */
@@ -1192,14 +1201,19 @@ bool QnWorkbenchUi::isThumbnailsVisible() const {
     return !qFuzzyCompare(m_sliderItem->geometry().height(), m_sliderItem->effectiveSizeHint(Qt::MinimumSize).height());
 }
 
-void QnWorkbenchUi::setThumbnailsVisible(bool visible) const {
+void QnWorkbenchUi::setThumbnailsVisible(bool visible) {
     if(visible == isThumbnailsVisible())
         return;
 
-    qreal height = m_sliderItem->effectiveSizeHint(Qt::MinimumSize).height() + (visible ? 48.0 : 0.0);
-    
+    qreal sliderHeight = m_sliderItem->effectiveSizeHint(Qt::MinimumSize).height();
+    if(!visible) {
+        m_lastThumbnailsHeight = m_sliderItem->geometry().height() - sliderHeight;
+    } else {
+        sliderHeight += m_lastThumbnailsHeight;
+    }
+
     QRectF geometry = m_sliderItem->geometry();
-    geometry.setHeight(height);
+    geometry.setHeight(sliderHeight);
     m_sliderItem->setGeometry(geometry);
 }
 
@@ -1360,6 +1374,9 @@ void QnWorkbenchUi::at_toggleThumbnailsAction_toggled(bool checked) {
 }
 
 void QnWorkbenchUi::at_sliderResizerItem_geometryChanged() {
+    if(m_ignoreSliderResizerGeometryChanges)
+        return;
+
     QRectF sliderGeometry = m_sliderItem->geometry();
 
     qreal targetHeight = sliderGeometry.bottom() - m_sliderResizerItem->geometry().center().y();

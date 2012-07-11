@@ -34,9 +34,13 @@ public:
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
 
-    void setMotionSensitivity(int value);
+    int motionSensitivity() const;
+    void setMotionSensitivity(int motionSensitivity);
 
     void setNeedControlMaxRects(bool value);
+
+    /** Check if motion region is valid */
+    bool isValidMotionRegion();
 
 signals:
     void motionRegionListChanged();
@@ -53,7 +57,7 @@ protected slots:
 private:
     void init();
     int gridPosToChannelPos(QPoint &pos);
-    void showTooManyWindowsMessage(const QnMotionRegion &region);
+    void showTooManyWindowsMessage(const QnMotionRegion &region, const QnMotionRegion::RegionValid kind);
 
 private:
     QnVirtualCameraResourcePtr m_camera;

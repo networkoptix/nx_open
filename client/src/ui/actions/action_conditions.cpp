@@ -59,10 +59,9 @@ Qn::ActionVisibility QnItemZoomedActionCondition::check(const QnResourceWidgetLi
 }
 
 
-Qn::ActionVisibility QnMotionGridDisplayActionCondition::check(const QnResourceWidgetList &widgets) {
-    foreach(QGraphicsItem *item, widgets) {
-        QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
-        if(widget == NULL)
+Qn::ActionVisibility QnSmartSearchActionCondition::check(const QnResourceWidgetList &widgets) {
+    foreach(QnResourceWidget *widget, widgets) {
+        if(!widget)
             continue;
 
         bool isCamera = widget->resource()->flags() & QnResource::network;
@@ -80,14 +79,33 @@ Qn::ActionVisibility QnMotionGridDisplayActionCondition::check(const QnResourceW
     return Qn::InvisibleAction;
 }
 
+Qn::ActionVisibility QnClearMotionSelectionActionCondition::check(const QnResourceWidgetList &widgets) {
+    bool hasDisplayedGrid = false;
+
+    foreach(QnResourceWidget *widget, widgets) {
+        if(!widget)
+            continue;
+
+        if(widget->isMotionGridDisplayed()) {
+            hasDisplayedGrid = true;
+
+            foreach(const QRegion &region, widget->motionSelection())
+                if(!region.isEmpty())
+                    return Qn::EnabledAction;
+        }
+    }
+
+    return hasDisplayedGrid ? Qn::DisabledAction : Qn::InvisibleAction;
+}
+
 Qn::ActionVisibility QnCheckFileSignatureActionCondition::check(const QnResourceWidgetList &widgets) {
     foreach(QGraphicsItem *item, widgets) {
         QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
         if(widget == NULL)
             continue;
 
-        bool isCamera = widget->resource()->flags() & QnResource::network;
-        if(isCamera)
+        bool isUnsupported = widget->resource()->flags() & (QnResource::network | QnResource::still_image);
+        if(isUnsupported)
             return Qn::InvisibleAction;
     }
     return Qn::EnabledAction;
@@ -174,7 +192,7 @@ Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnResourceLis
 
 Qn::ActionVisibility QnLayoutItemRemovalActionCondition::check(const QnLayoutItemIndexList &layoutItems) {
     foreach(const QnLayoutItemIndex &item, layoutItems)
-        if(!(accessController()->permissions(item.layout()) & Qn::WritePermission))
+        if(!accessController()->hasPermissions(item.layout(), Qn::WritePermission | Qn::AddRemoveItemsPermission))
             return Qn::DisabledAction;
 
     return Qn::EnabledAction;
@@ -215,7 +233,11 @@ Qn::ActionVisibility QnTakeScreenshotActionCondition::check(const QnResourceWidg
     if(widgets.size() != 1)
         return Qn::InvisibleAction;
 
-    Qn::RenderStatus renderStatus = widgets[0]->currentRenderStatus();
+    QnResourceWidget *widget = widgets[0];
+    if(widget->resource()->flags() & QnResource::still_image)
+        return Qn::InvisibleAction;
+
+    Qn::RenderStatus renderStatus = widget->currentRenderStatus();
     if(renderStatus == Qn::NothingRendered || renderStatus == Qn::CannotRender)
         return Qn::DisabledAction;
 
@@ -227,7 +249,7 @@ Qn::ActionVisibility QnTimePeriodActionCondition::check(const QnActionParameters
         return Qn::InvisibleAction;
 
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodParameter);
-    if(m_periodType != period.type()) {
+    if(!(m_periodTypes & period.type())) {
         return m_nonMatchingVisibility;
     } else {
         return Qn::EnabledAction;

@@ -15,6 +15,7 @@
 #include "core/misc/scheduleTask.h"
 #include "core/resource/user_resource.h"
 #include "licensing/license.h"
+#include "connectinfo.h"
 
 #include "api/serializer/pb_serializer.h"
 
@@ -41,31 +42,11 @@ namespace conn_detail
 
     signals:
         void finished(int status, const QByteArray& errorString, QnResourceList resources, int handle);
+        void finishedLicense(int status, const QByteArray& errorString, QnLicenseList resources, int handle);
+        void finishedConnect(int status, const QByteArray &errorString, QnConnectInfoPtr connectInfo, int requestHandle);
 
     private:
         QnResourceFactory& m_resourceFactory;
-        QnApiSerializer& m_serializer;
-        QString m_objectName;
-    };
-
-    class LicenseReplyProcessor : public QObject
-    {
-        Q_OBJECT
-
-    public:
-        LicenseReplyProcessor(QnApiSerializer& serializer, const QString& objectName)
-              : m_serializer(serializer),
-                m_objectName(objectName)
-        {
-        }
-
-    public slots:
-        void finished(int status, const QByteArray &result, const QByteArray &errorString, int handle);
-
-    signals:
-        void finished(int status, const QByteArray& errorString, QnLicenseList resources, int handle);
-
-    private:
         QnApiSerializer& m_serializer;
         QString m_objectName;
     };
@@ -77,6 +58,9 @@ public:
     ~QnAppServerConnection();
 
     int testConnectionAsync(QObject* target, const char* slot);
+    int connectAsync(QObject* target, const char *slot);
+
+    int connect(QnConnectInfoPtr& connectInfo, QByteArray &errorString);
 
     int getResourceTypes(QnResourceTypeList& resourceTypes, QByteArray& errorString);
 
@@ -141,7 +125,9 @@ public:
     static int getMediaProxyPort();
 
 private:
-    QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory, QnApiSerializer& serializer);
+    QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory, QnApiSerializer& serializer, const QString& guid);
+
+    int connectAsync_i(const QnRequestParamList& params, QObject* target, const char *slot);
 
     int getObjectsAsync(const QString& objectName, const QString& args, QObject* target, const char* slot);
     int getObjects(const QString& objectName, const QString& args, QByteArray& data, QByteArray& errorString);
@@ -169,8 +155,12 @@ typedef QSharedPointer<QnAppServerConnection> QnAppServerConnectionPtr;
 class QN_EXPORT QnAppServerConnectionFactory
 {
 public:
+    static QString clientGuid();
     static QUrl defaultUrl();
     static int defaultMediaProxyPort();
+	static QnResourceFactory* defaultFactory();
+
+    static void setClientGuid(const QString &guid);
     static void setDefaultUrl(const QUrl &url);
     static void setDefaultFactory(QnResourceFactory*);
     static void setDefaultMediaProxyPort(int port);
@@ -180,6 +170,7 @@ public:
 
 private:
     QMutex m_mutex;
+    QString m_clientGuid;
     QUrl m_defaultUrl;
     int m_defaultMediaProxyPort;
     QnResourceFactory* m_resourceFactory;

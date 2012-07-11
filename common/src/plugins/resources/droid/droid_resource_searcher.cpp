@@ -29,11 +29,11 @@ QnResourceList QnPlDroidResourceSearcher::findResources(void)
     if (time - m_lastReadSocketTime > READ_IF_TIMEOUT)
     {
         m_socketList.clear();
-        QList<QHostAddress> ipaddrs = getAllIPv4Addresses();
+        QList<QnInterfaceAndAddr> ipaddrs = getAllIPv4Interfaces();
         for (int i = 0; i < ipaddrs.size();++i)
         {
             QSharedPointer<QUdpSocket> sock(new QUdpSocket());
-            if (sock->bind(ipaddrs.at(i), androidRecvPort))
+            if (sock->bind(ipaddrs.at(i).address, androidRecvPort))
                 m_socketList << sock;
             m_lastReadSocketTime = time;
         }

@@ -155,7 +155,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 
     m_infoButton = new QnImageButtonWidget();
     m_infoButton->setParent(this);
-    m_infoButton->setIcon(qnSkin->icon("decorations/info.png"));
+    m_infoButton->setIcon(qnSkin->icon("decorations/item_info.png"));
     m_infoButton->setPreferredSize(headerButtonSize);
     m_infoButton->setCheckable(true);
     m_infoButton->setProperty(Qn::NoBlockMotionSelection, true);
@@ -163,7 +163,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 
     m_closeButton = new QnImageButtonWidget();
     m_closeButton->setParent(this);
-    m_closeButton->setIcon(qnSkin->icon("decorations/close_item.png"));
+    m_closeButton->setIcon(qnSkin->icon("decorations/item_close.png"));
     m_closeButton->setPreferredSize(headerButtonSize);
     m_closeButton->setProperty(Qn::NoBlockMotionSelection, true);
     connect(m_closeButton, SIGNAL(clicked()), this, SLOT(close()));
@@ -171,7 +171,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     
     m_rotateButton = new QnImageButtonWidget();
     m_rotateButton->setParent(this);
-    m_rotateButton->setIcon(qnSkin->icon("decorations/rotate_item.png"));
+    m_rotateButton->setIcon(qnSkin->icon("decorations/item_rotate.png"));
     m_rotateButton->setPreferredSize(headerButtonSize);
     m_rotateButton->setProperty(Qn::NoBlockMotionSelection, true);
     connect(m_rotateButton, SIGNAL(pressed()), this, SIGNAL(rotationStartRequested()));
@@ -179,7 +179,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 
     m_searchButton = new QnImageButtonWidget();
     m_searchButton->setParent(this);
-    m_searchButton->setIcon(qnSkin->icon("decorations/search.png"));
+    m_searchButton->setIcon(qnSkin->icon("decorations/item_search.png"));
     m_searchButton->setPreferredSize(headerButtonSize);
     m_searchButton->setCheckable(true);
     m_searchButton->setProperty(Qn::NoBlockMotionSelection, true);
@@ -503,9 +503,8 @@ bool QnResourceWidget::setMotionRegionSensitivity(int sensitivity, const QPoint 
 }
 
 void QnResourceWidget::clearMotionRegions() {
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
         m_motionRegionList[i] = QnMotionRegion();
-    }
     m_motionMaskValid = true;
 
     invalidateMotionMaskBinData();
@@ -516,8 +515,12 @@ void QnResourceWidget::ensureMotionMask()
     if(m_motionMaskValid)
         return;
 
-    if (QnSecurityCamResourcePtr camera = m_resource.dynamicCast<QnSecurityCamResource>())
+    if (QnSecurityCamResourcePtr camera = m_resource.dynamicCast<QnSecurityCamResource>()) {
         m_motionRegionList = camera->getMotionRegionList();
+
+        while(m_motionRegionList.size() < CL_MAX_CHANNELS)
+            m_motionRegionList.push_back(QnMotionRegion()); /* Just to feel safe. */
+    }
     m_motionMaskValid = true;
 }
 
@@ -582,7 +585,7 @@ QPoint QnResourceWidget::mapToMotionGrid(const QPointF &itemPos)
     QPointF gridPosF(cwiseDiv(itemPos, toPoint(cwiseDiv(size(), QSizeF(motionGridWidth(), motionGridHeight())))));
     QPoint gridPos(qFuzzyFloor(gridPosF.x()), qFuzzyFloor(gridPosF.y()));
 
-    return bounded(gridPos, QRect(0, 0, motionGridWidth() + 1, motionGridHeight() + 1));
+    return bounded(gridPos, QRect(0, 0, motionGridWidth(), motionGridHeight()));
 }
 
 QPointF QnResourceWidget::mapFromMotionGrid(const QPoint &gridPos) {
@@ -593,6 +596,8 @@ void QnResourceWidget::addToMotionSelection(const QRect &gridRect)
 {
     QList<QRegion> prevSelection;
     QList<QRegion> newSelection;
+
+    ensureMotionMask();
 
     for (int i = 0; i < m_channelState.size(); ++i)
     {
@@ -646,10 +651,18 @@ void QnResourceWidget::setDisplayFlags(DisplayFlags flags) {
     DisplayFlags changedFlags = m_displayFlags ^ flags;
     m_displayFlags = flags;
 
-    if(changedFlags & DisplayMotionGrid) {
+    if(changedFlags & DisplayMotion) {
         QnAbstractArchiveReader *reader = m_display->archiveReader();
         if (reader)
-            reader->setSendMotion(flags & DisplayMotionGrid);
+            reader->setSendMotion(flags & DisplayMotion);
+
+        m_searchButton->setChecked(flags & DisplayMotion);
+
+        if(flags & DisplayMotion) {
+            setProperty(Qn::MotionSelectionModifiers, 0);
+        } else {
+            setProperty(Qn::MotionSelectionModifiers, QVariant()); /* Use defaults. */
+        }
     }
 
     if(changedFlags & DisplayButtons)
@@ -671,11 +684,15 @@ void QnResourceWidget::updateOverlayText() {
         mbps += statistics->getBitrate();
     }
 
+    QSize size = m_display->camDisplay()->getFrameSize(0); // TODO: roma, check implementation.
+    if(size.isEmpty())
+        size = QSize(0, 0);
+
     QString codecName;
     QnMediaContextPtr codec = m_display->mediaProvider()->getCodecContext();
-    if (codec && codec->ctx()) 
+    if (codec && codec->ctx())
         codecName = codecIDToString(codec->ctx()->codec_id);
-    m_footerStatusLabel->setText(tr("%1fps @ %2Mbps (%3) - %4").arg(fps, 0, 'g', 2).arg(mbps, 0, 'g', 2).arg(codecName).arg(m_renderer->isLowQualityImage(0) ? "LQ" : "HQ"));
+    m_footerStatusLabel->setText(tr("%1x%2 %3fps @ %4Mbps (%5)").arg(size.width()).arg(size.height()).arg(fps, 0, 'f', 2).arg(mbps, 0, 'f', 2).arg(codecName));
 }
 
 void QnResourceWidget::updateButtonsVisibility() {
@@ -864,12 +881,7 @@ void QnResourceWidget::at_resource_nameChanged() {
 }
 
 void QnResourceWidget::at_searchButton_toggled(bool checked) {
-    if(checked) {
-        setDisplayFlag(DisplayMotionGrid, true);
-        setProperty(Qn::MotionSelectionModifiers, 0);
-    } else {
-        setProperty(Qn::MotionSelectionModifiers, QVariant());
-    }
+    setDisplayFlag(DisplayMotion, checked);
 }
 
 // -------------------------------------------------------------------------- //
@@ -902,9 +914,8 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     }
 
     if(m_pausedPainter.isNull()) {
-        m_pausedPainter = qn_pausedPainterStorage()->get();
-        m_loadingProgressPainter = qn_loadingProgressPainterStorage()->get();
-        //m_noDataPainter = qn_noDataPainterStorage()->get();
+        m_pausedPainter = qn_pausedPainterStorage()->get(QGLContext::currentContext());
+        m_loadingProgressPainter = qn_loadingProgressPainterStorage()->get(QGLContext::currentContext());
     }
 
     QnScopedPainterPenRollback penRollback(painter);
@@ -983,7 +994,7 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     }
 
     /* Draw motion grid. */
-    if (m_displayFlags & DisplayMotionGrid) {
+    if (m_displayFlags & DisplayMotion) {
         for(int i = 0; i < m_channelCount; i++) 
         {
             QRectF rect = channelRect(i);
@@ -1083,11 +1094,12 @@ void QnResourceWidget::drawOverlayIcon(int channel, const QRectF &rect) {
 }
 
 void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, const QnMetaDataV1Ptr &motion, int channel) {
-    double xStep = rect.width() / (double) MD_WIDTH;
-    double yStep = rect.height() / (double) MD_HEIGHT;
+    qreal xStep = rect.width() / MD_WIDTH;
+    qreal yStep = rect.height() / MD_HEIGHT;
 
     ensureMotionMask();
 
+#if 1
     QVector<QPointF> gridLines;
 
     for (int x = 0; x < MD_WIDTH; ++x)
@@ -1121,9 +1133,10 @@ void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, con
     }
 
     QnScopedPainterTransformRollback transformRollback(painter);
-    painter->setPen(QPen(QColor(255, 255, 255, 40)));
+    painter->setPen(QPen(QColor(255, 255, 255, 16)));
     painter->translate(rect.topLeft());
     painter->drawLines(gridLines);
+#endif
 
     if (!motion || motion->channelNumber != channel)
         return;
@@ -1135,10 +1148,10 @@ void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, con
     for (int y = 0; y < MD_HEIGHT; ++y)
         for (int x = 0; x < MD_WIDTH; ++x)
             if(motion->isMotionAt(x, y))
-                motionPath.addRect(QRectF(QPointF(x*xStep, y*yStep), QPointF((x+1)*xStep, (y+1)*yStep)));
-    QPen pen(QColor(0xff, 0, 0, 128));
+                motionPath.addRect(QRectF(QPointF(x * xStep, y * yStep), QPointF((x + 1) * xStep, (y + 1) * yStep)));
+    QPen pen(QColor(255, 0, 0, 128));
     qreal unit = qnGlobals->workbenchUnitSize();
-    pen.setWidth(unit*0.003);
+    pen.setWidth(unit * 0.003);
     painter->setPen(pen);
     painter->drawPath(motionPath);
 }

@@ -39,6 +39,10 @@ Qn::Permissions QnWorkbenchAccessController::permissions(const QnResourcePtr &re
     return m_dataByResource.value(resource).permissions;
 }
 
+bool QnWorkbenchAccessController::hasPermissions(const QnResourcePtr &resource, Qn::Permissions requiredPermissions) const {
+    return (permissions(resource) & requiredPermissions) == requiredPermissions;
+}
+
 QnWorkbenchPermissionsNotifier *QnWorkbenchAccessController::notifier(const QnResourcePtr &resource) const {
     if(!m_dataByResource.contains(resource))
         return NULL;

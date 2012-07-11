@@ -25,9 +25,11 @@ public:
 
     MotionTypeFlags supportedMotionType() const;
     bool isAudioSupported() const;
+    MotionType getCameraBasedMotionType() const;
     MotionType getDefaultMotionType() const;
-    int motionWindowCnt() const; // TODO: 'cnt' reads as 'cunt', and adequate people normally don't want cunts in their code. Rename.
-    int motionMaskWindowCnt() const;
+    int motionWindowCount() const;
+    int motionMaskWindowCount() const;
+    int motionSensWindowCount() const;
 
 
     MotionType getMotionType();
@@ -42,6 +44,8 @@ public:
 
 
     virtual int getMaxFps(); // in fact this is const function;
+
+    virtual int reservedSecondStreamFps();  // in fact this is const function;
 
     virtual QSize getMaxSensorSize(); // in fact this is const function;
 

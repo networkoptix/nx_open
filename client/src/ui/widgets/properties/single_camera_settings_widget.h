@@ -42,6 +42,9 @@ public:
     void updateFromResource();
     void submitToResource();
 
+    /** Check if motion region is valid */
+    bool isValidMotionRegion();
+
 signals:
     void hasChangesChanged();
     void moreLicensesRequested();
@@ -56,18 +59,30 @@ private slots:
     void at_cameraScheduleWidget_scheduleTasksChanged();
     void at_linkActivated(const QString &urlString);
     void at_motionTypeChanged();
-    void at_motionSensitivityChanged(int value);
     void at_motionSelectionCleared();
+    
     void updateMaxFPS();
+    void updateMotionWidgetSensitivity();
+
 private:
     void setHasChanges(bool hasChanges);
-    void updateMaxMotionRect();
+
+    void updateMotionWidgetFromResource();
+    void submitMotionWidgetToResource();
+
+    void updateMotionWidgetNeedControlMaxRect();
+    void updateMotionAvailability();
+
+    void disconnectFromMotionWidget();
+    void connectToMotionWidget();
 
 private:
     Q_DISABLE_COPY(QnSingleCameraSettingsWidget);
 
     QScopedPointer<Ui::SingleCameraSettingsWidget> ui;
     QnVirtualCameraResourcePtr m_camera;
+    bool m_cameraSupportsMotion;
+
     bool m_hasChanges;
     bool m_hasScheduleChanges;
     bool m_readOnly;

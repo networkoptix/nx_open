@@ -11,10 +11,6 @@ QnArecontPanoramicResource::QnArecontPanoramicResource(const QString& name)
     setName(name);
 }
 
-bool QnArecontPanoramicResource::hasDualStreaming() const
-{
-    return false;
-}
 
 bool QnArecontPanoramicResource::getDescription()
 {
@@ -131,10 +127,13 @@ bool QnArecontPanoramicResource::setSpecialParam(const QString& name, const QVar
     return false;
 }
 
-void QnArecontPanoramicResource::initInternal()
+bool QnArecontPanoramicResource::initInternal()
 {
-    QnPlAreconVisionResource::initInternal();
+    if (!QnPlAreconVisionResource::initInternal())
+        return false;
+
     setRegister(3, 100, 10); // sets I frame frequency to 10
+    return true;
 }
 
 //=======================================================================

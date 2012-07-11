@@ -25,15 +25,16 @@ public:
 
     void deserialize(const QnResourceParameters& parameters);
 
-    virtual bool equalsTo(const QnResourcePtr other) const;
-
-    QString getUniqueId() const;
+    virtual QString getUniqueId() const;
 
     virtual QHostAddress getHostAddress() const;
     virtual bool setHostAddress(const QHostAddress &ip, QnDomain domain = QnDomainMemory);
 
     QnMacAddress getMAC() const;
     void setMAC(const QnMacAddress &mac);
+
+    QString getPhysicalId() const;
+    void setPhysicalId(const QString& physicalId);
 
     inline void setAuth(const QString &user, const QString &password)
     { QAuthenticator auth; auth.setUser(user); auth.setPassword(password); setAuth(auth); }
@@ -89,13 +90,17 @@ public:
 
     virtual bool shoudResolveConflicts() const;
 
+    // in some cases I just want to update couple of field from just discovered resource
+    virtual bool mergeResourcesIfNeeded(QnNetworkResourcePtr source) ;
+
+
 private:
     QAuthenticator m_auth;
     bool m_authenticated;
 
     //QHostAddress m_hostAddr;
     QnMacAddress m_macAddress;
-
+    QString m_physicalId;
 
     QHostAddress m_localAddress; // address used to discover this resource ( in case if machine has more than one NIC/address
 

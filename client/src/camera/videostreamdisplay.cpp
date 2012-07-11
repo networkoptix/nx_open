@@ -6,6 +6,7 @@
 #include "abstractrenderer.h"
 #include "gl_renderer.h"
 #include "buffered_frame_displayer.h"
+#include "ui/graphics/opengl/gl_functions.h"
 
 static const int MAX_REVERSE_QUEUE_SIZE = 1024*1024 * 300; // at bytes
 static const double FPS_EPS = 1e-6;
@@ -130,7 +131,7 @@ QnFrameScaler::downscale_factor CLVideoStreamDisplay::determineScaleFactor(int c
     // If there is no scaling needed check if size is greater than maximum allowed image size (maximum texture size for opengl).
     int newWidth = srcWidth / rez;
     int newHeight = srcHeight / rez;
-    int maxTextureSize = QnGLRenderer::maxTextureSize();
+    int maxTextureSize = QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE);
     while (maxTextureSize > 0 && newWidth > maxTextureSize || newHeight > maxTextureSize)
     {
         rez = QnFrameScaler::downscale_factor ((int)rez * 2);
@@ -373,6 +374,7 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompress
         dec->resetDecoder(data);
         m_prevReverseMode = reverseMode;
         m_needResetDecoder = false;
+        //data->flags |= QnAbstractMediaData::MediaFlags_DecodeTwice;
     }
 
     QnFrameScaler::downscale_factor scaleFactor = QnFrameScaler::factor_unknown;
@@ -454,7 +456,7 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompress
     m_mtx.unlock();
     m_imageSize = QSize(decodeToFrame->width*dec->getSampleAspectRatio(), decodeToFrame->height);
 
-    if (qAbs(decodeToFrame->pkt_dts-data->timestamp) > 200*1000) {
+    if (qAbs(decodeToFrame->pkt_dts-data->timestamp) > 500*1000) {
         // prevent large difference after seek or EOF
         outFrame->pkt_dts = data->timestamp;
     }
@@ -695,6 +697,21 @@ void CLVideoStreamDisplay::clearReverseQueue()
     m_reverseQueue.clear();
     m_realReverseSize = 0;
     m_lastDisplayedFrame = 0;
+}
+
+QSize CLVideoStreamDisplay::getFrameSize() const {
+    if (m_decoder.isEmpty())
+        return QSize();
+    QnAbstractVideoDecoder* dec = m_decoder.begin().value();
+    if(!dec)
+        return QSize();
+
+    QMutexLocker mutex(&m_mtx);
+    const AVFrame* lastFrame = dec->lastFrame();
+    if(lastFrame)
+        return QSize(lastFrame->width, lastFrame->height);
+
+    return QSize();
 }
 
 QImage CLVideoStreamDisplay::getScreenshot()

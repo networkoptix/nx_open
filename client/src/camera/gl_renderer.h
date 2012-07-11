@@ -29,7 +29,6 @@ public:
     void beforeDestroy();
 
     static void clearGarbage();
-    static int maxTextureSize();
     static bool isPixelFormatSupported(PixelFormat pixfmt);
 
     void draw(CLVideoDecoderOutput *image);
@@ -59,6 +58,8 @@ private:
     bool usingShaderYuvToRgb() const;
 
     void ensureGlInitialized();
+
+    static int maxTextureSize();
 
 private:
     static QList<GLuint> m_garbage;

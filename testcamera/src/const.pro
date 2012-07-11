@@ -1,7 +1,5 @@
 INCLUDEPATH += ../../common/src
 
-INCLUDEPATH += ../../common/contrib/qjson/include
-
 QT = core gui network xml opengl multimedia webkit
 CONFIG += console precompile_header
 CONFIG -= flat app_bundle
@@ -59,16 +57,17 @@ CONFIG(release, debug|release) {
 
 CONFIG(debug, debug|release) {
   INCLUDEPATH += $$FFMPEG-debug/include
-  LIBS += -L$$FFMPEG-debug/bin -L$$FFMPEG-debug/lib -L$$PWD/../../common/bin/debug -lcommon -L../../common/contrib/qjson/lib/win32/debug -L$$EVETOOLS_DIR/lib/debug
+  LIBS += -L$$FFMPEG-debug/bin -L$$FFMPEG-debug/lib -L$$PWD/../../common/bin/debug -lcommon -L$$EVETOOLS_DIR/lib/debug
 }
 CONFIG(release, debug|release) {
   INCLUDEPATH += $$FFMPEG-release/include
-  LIBS += -L$$FFMPEG-release/bin -L$$FFMPEG-release/lib -L$$PWD/../../common/bin/release -lcommon -L../../common/contrib/qjson/lib/win32/release -L$$EVETOOLS_DIR/lib/release
+  LIBS += -L$$FFMPEG-release/bin -L$$FFMPEG-release/lib -L$$PWD/../../common/bin/release -lcommon -L$$EVETOOLS_DIR/lib/release
 }
 
 QMAKE_CXXFLAGS += -I$$EVETOOLS_DIR/include
 
 win32 {
+    LIBS += -L$$PWD/../../common/contrib/openssl/bin -llibeay32 -ssleay32
     LIBS += -llibprotobuf
 
     # Define QN_EXPORT only if common build is not static
@@ -77,17 +76,17 @@ win32 {
 }
 
 mac {
-    LIBS += -L../../common/contrib/qjson/lib/mac -lprotobuf
+    LIBS += -lprotobuf
     DEFINES += QN_EXPORT=
 }
 
 unix:!mac {
-    LIBS += -L../../common/contrib/qjson/lib/linux -lprotobuf
+    LIBS += -lprotobuf
 }
 
 LIBS += -L$$EVETOOLS_DIR/lib
 
-LIBS += -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lqjson
+LIBS += -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale
 
 win32 {
   win32-msvc* {
@@ -99,7 +98,7 @@ win32 {
     # Don't warn for deprecated POSIX functions.
     DEFINES += _CRT_NONSTDC_NO_DEPRECATE 
 
-    INCLUDEPATH += ../contrib/ffmpeg-misc-headers-win32
+    INCLUDEPATH += $$PWD/../../common/contrib/ffmpeg-misc-headers-win32
   }
 
   LIBS += -lws2_32 -lIphlpapi -lOle32

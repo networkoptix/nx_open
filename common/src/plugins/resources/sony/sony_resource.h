@@ -1,35 +1,27 @@
-#ifndef sony_resource_h_329
-#define sony_resource_h_329
+#ifndef sony_resource_h_1855
+#define sony_resource_h_1855
 
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
 #include "utils/network/simple_http_client.h"
 #include "core/datapacket/mediadatapacket.h"
+#include "../onvif/onvif_resource.h"
 
-class QnPlSonyResource : public QnPhysicalCameraResource
+class QnPlSonyResource : public QnPlOnvifResource
 {
-public:
-    static const char* MANUFACTURE;
+    static int MAX_RESOLUTION_DECREASES_NUM;
 
+public:
     QnPlSonyResource();
 
-    virtual bool isResourceAccessible();
-
-    virtual bool updateMACAddress();
-
-    virtual QString manufacture() const;
-
-    virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
-
-    bool hasDualStreaming() const override {return false;}
+    virtual int getMaxOnvifRequestTries() const override { return 5; };
 
 protected:
+    virtual bool updateResourceCapabilities() override;
+private:
 
-    void initInternal() override {}
-
-    virtual QnAbstractStreamDataProvider* createLiveDataProvider();
-
-    virtual void setCropingPhysical(QRect croping);
 };
 
-#endif //sony_resource_h_329
+typedef QnSharedResourcePointer<QnPlSonyResource> QnPlSonyResourcePtr;
+
+#endif //sony_resource_h_1855

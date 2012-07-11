@@ -25,8 +25,6 @@ public:
 
     int httpPort() const override;
 
-    bool hasDualStreaming() const override {return false;}
-
     bool shoudResolveConflicts() const override
     {
         return false;
@@ -34,8 +32,6 @@ public:
 
 
 protected:
-
-    void initInternal() override {}
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 

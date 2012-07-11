@@ -1,6 +1,5 @@
 
 INCLUDEPATH += ../../common/src
-INCLUDEPATH += ../../common/contrib/qjson/include
 INCLUDEPATH += ../../common/contrib/qt
 
 win* {
@@ -93,13 +92,13 @@ win* {
 
     INCLUDEPATH += $$PWD/../../common/contrib/openssl/include
 
-	win32-msvc2010 {
-		LIBS += -L$$PWD/../../common/contrib/openssl/bin/win32-msvc2010
-	}
-	win32-msvc2008 {
-		LIBS += -L$$PWD/../../common/contrib/openssl/bin
-	}
-	LIBS += -llibeay32
+    win32-msvc2010 {
+        LIBS += -L$$PWD/../../common/contrib/openssl/bin/win32-msvc2010
+    }
+    win32-msvc2008 {
+        LIBS += -L$$PWD/../../common/contrib/openssl/bin
+    }
+    LIBS += -llibeay32
 }
 
 mac {
@@ -121,17 +120,11 @@ unix {
 }
 
 mac {
-    LIBS += -L../../common/contrib/qjson/lib/mac -lprotobuf
+    LIBS += -lprotobuf
 }
 
 unix:!mac {
     LIBS += -lprotobuf -lopenal
-    HARDWARE_PLATFORM = $$system(uname -i)
-    contains( HARDWARE_PLATFORM, x86_64 ) {
-        LIBS += -L../../common/contrib/qjson/lib/linux-64 
-    } else {
-        LIBS += -L../../common/contrib/qjson/lib/linux-32
-    }
 }
 
 DEFINES += __STDC_CONSTANT_MACROS
@@ -151,7 +144,7 @@ CONFIG(debug, debug|release) {
   LIBS = -L$$FFMPEG-debug/bin -L$$FFMPEG-debug/lib -L$$PWD/../../common/bin/debug -lcommon -L$$EVETOOLS_DIR/lib/debug $$LIBS
 
   win32 {
-      LIBS += -lQtSolutions_ColorPicker-2.6d -L../../common/contrib/qjson/lib/win32/debug
+      LIBS += -lQtSolutions_ColorPicker-2.6d
   }
 
   unix {
@@ -163,7 +156,7 @@ CONFIG(release, debug|release) {
   LIBS = -L$$FFMPEG-release/bin -L$$FFMPEG-release/lib -L$$PWD/../../common/bin/release -lcommon -L$$EVETOOLS_DIR/lib/release $$LIBS
 
   win32 {
-      LIBS += -lQtSolutions_ColorPicker-2.6 -L../../common/contrib/qjson/lib/win32/release
+      LIBS += -lQtSolutions_ColorPicker-2.6
   }
 
   unix {
@@ -171,7 +164,7 @@ CONFIG(release, debug|release) {
   }
 }
 
-LIBS += -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lqjson
+LIBS += -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale
 
 win32 {
   win32-msvc* {
@@ -250,3 +243,5 @@ DEFINES += $$OVERRIDE_DEFINITION
 
 # Uncomment to enable background color adjustment
 # DEFINES += QN_HAS_BACKGROUND_COLOR_ADJUSTMENT
+
+SOURCES += $$PWD/../build/generated/compatibility_info.cpp

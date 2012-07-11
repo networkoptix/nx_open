@@ -29,6 +29,8 @@ public:
     virtual bool isNeedControlFreeSpace() override;
 
     virtual QFileInfoList getFileList(const QString& dirName) override;
+    virtual qint64 getFileSize(const QString& fillName) const override;
+
     virtual bool removeFile(const QString& url) override;
     virtual bool renameFile(const QString& oldName, const QString& newName) override;
     virtual bool removeDir(const QString& url) override;
@@ -42,7 +44,6 @@ public:
     void onWrite(const QByteArray& ba, const QString& fn);
 
 protected:
-    void initInternal() override {}    
     
 private:
 

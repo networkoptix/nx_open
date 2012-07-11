@@ -17,7 +17,9 @@ QnConnectionTestingDialog::QnConnectionTestingDialog(const QUrl &url, QWidget *p
     m_timeoutTimer(this),
     m_url(url)
 {
-    qnDebug("Testing connectivity for URL '%1'.", url.toString());
+    QUrl urlNoPassword(url);
+    urlNoPassword.setPassword("");
+    qnDebug("Testing connectivity for URL '%1'.", urlNoPassword.toString());
 
     ui->setupUi(this);
 
@@ -52,9 +54,23 @@ void QnConnectionTestingDialog::timeout()
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
 }
 
-void QnConnectionTestingDialog::testResults(int status, const QByteArray &data, const QByteArray& errorString, int requestHandle)
+void QnConnectionTestingDialog::oldHttpTestResults(int status, QByteArray errorString, QByteArray data, int handle)
 {
-    Q_UNUSED(data)
+	Q_UNUSED(handle);
+
+	if (status == 204)
+	{
+		if (m_timeoutTimer.isActive())
+			m_timeoutTimer.stop();
+		else
+			return;
+
+		ui->statusLabel->setText("Failed");
+	}
+}
+
+void QnConnectionTestingDialog::testResults(int status, const QByteArray &errorString, QnConnectInfoPtr connectInfo, int requestHandle)
+{
     Q_UNUSED(requestHandle)
 	Q_UNUSED(errorString)
 
@@ -64,8 +80,17 @@ void QnConnectionTestingDialog::testResults(int status, const QByteArray &data, 
         return;
     }
 
+    QnCompatibilityChecker remoteChecker(connectInfo->compatibilityItems);
+    QnCompatibilityChecker localChecker(localCompatibilityItems());
+
+    QnCompatibilityChecker* compatibilityChecker;
+    if (remoteChecker.size() > localChecker.size())
+        compatibilityChecker = &remoteChecker;
+    else
+        compatibilityChecker = &localChecker;
+
     ui->progressBar->setValue(ui->progressBar->maximum());
-    if (status) {
+    if (status || !compatibilityChecker->isCompatible("Client", qApp->applicationVersion(), "ECS", connectInfo->version)) {
         ui->statusLabel->setText("Failed");
     } else {
         ui->statusLabel->setText("Success");
@@ -77,7 +102,15 @@ void QnConnectionTestingDialog::testResults(int status, const QByteArray &data, 
 void QnConnectionTestingDialog::testSettings()
 {
     m_connection = QnAppServerConnectionFactory::createConnection(m_url);
-    m_connection->testConnectionAsync(this, SLOT(testResults(int,QByteArray,QByteArray,int)));
+    m_connection->testConnectionAsync(this, SLOT(testResults(int,QByteArray,QnConnectInfoPtr,int)));
+
+	QUrl httpUrl;
+	httpUrl.setHost(m_url.host());
+	httpUrl.setPort(m_url.port());
+	httpUrl.setScheme("http");
+	httpUrl.setUserName("");
+	httpUrl.setPassword("");
+	QnSessionManager::instance()->sendAsyncGetRequest(httpUrl, "resourceEx", this, SLOT(oldHttpTestResults(int,QByteArray,QByteArray,int)));
 }
 
 void QnConnectionTestingDialog::accept()
