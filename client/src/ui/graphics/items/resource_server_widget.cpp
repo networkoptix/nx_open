@@ -6,6 +6,8 @@
 #include <core/resource/video_server.h>
 
 #include <ui/style/globals.h>
+#include <ui/graphics/items/viewport_bound_widget.h>
+#include <ui/graphics/items/standard/graphics_label.h>
 
 #define LIMIT 60
 #define REQUEST_TIME 2000
@@ -14,6 +16,7 @@ QnResourceServerWidget::QnResourceServerWidget(QnWorkbenchContext *context, QnWo
     QnResourceWidget(context, item, parent),
     m_alreadyUpdating(false),
     m_counter(0),
+    m_model(tr("Unknown")),
     m_redrawStatus(Qn::LoadingFrame){
         for (int i = 0; i < LIMIT; i++)
             m_history.append(-1);
@@ -54,6 +57,13 @@ void QnResourceServerWidget::paint(QPainter *painter, const QStyleOptionGraphics
     glDisable(GL_BLEND);
     //glPopAttrib();
     painter->endNativePainting();
+
+    if(m_footerOverlayWidget->isVisible() && !qFuzzyIsNull(m_footerOverlayWidget->opacity())) 
+        emit updateOverlayTextLater();
+}
+
+void QnResourceServerWidget::updateOverlayText(){
+    m_footerStatusLabel->setText(tr("CPU Model: %1").arg(m_model));
 }
 
 void QnResourceServerWidget::at_timer_update(){
@@ -64,13 +74,14 @@ void QnResourceServerWidget::at_timer_update(){
     m_alreadyUpdating = true;
     QnVideoServerResourcePtr server = resource().dynamicCast<QnVideoServerResource>();
     Q_ASSERT(server);
-    server->apiConnection()->asyncGetStatistics(this, SLOT(at_statistics_received(int)));
+    server->apiConnection()->asyncGetStatistics(this, SLOT(at_statistics_received(int, const QByteArray &)));
 }
 
-void QnResourceServerWidget::at_statistics_received(int usage){
+void QnResourceServerWidget::at_statistics_received(int usage, const QByteArray &model){
     m_alreadyUpdating = false;
     m_redrawStatus = Qn::NewFrame;
     m_history.push_back(usage);
+    m_model = model;
     m_elapsed_timer.restart();
     m_counter++;
     if (m_history.count() > LIMIT)

@@ -47,7 +47,7 @@ namespace detail {
     public slots:
         void at_replyReceived(int status, const QByteArray &reply, const QByteArray /* &errorString */ , int /*handle*/);
     signals:
-        void finished(int);
+        void finished(int /* usage */ , const QByteArray & /* model */);
     };
 }
 

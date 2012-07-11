@@ -38,15 +38,20 @@ public:
      */
     virtual ~QnResourceServerWidget(){}
 public slots:
-    void at_statistics_received(int usage);
+    void at_statistics_received(int usage, const QByteArray &model);
     void at_timer_update();
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+protected slots:
+    virtual void updateOverlayText() override;
 private:
     void drawStatistics(int width, int height, QPainter *painter);
 
     /** History of last responses */
     QList<int> m_history;
+
+    /** Cpu model */
+    QString m_model;
 
     /** Total number of responses received */ 
     uint m_counter;

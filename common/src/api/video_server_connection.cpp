@@ -188,7 +188,7 @@ int QnVideoServerConnection::asyncGetFreeSpace(const QString& path, QObject *tar
 
 int QnVideoServerConnection::asyncGetStatistics(QObject *target, const char *slot){
     detail::VideoServerSessionManagerStatisticsRequestReplyProcessor *processor = new detail::VideoServerSessionManagerStatisticsRequestReplyProcessor();
-    connect(processor, SIGNAL(finished(int)), target, slot, Qt::QueuedConnection);
+    connect(processor, SIGNAL(finished(int, QByteArray)), target, slot, Qt::QueuedConnection);
     return QnSessionManager::instance()->sendAsyncGetRequest(m_url, "api/statistics", processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
 }
 
@@ -306,9 +306,10 @@ void detail::VideoServerSessionManagerStatisticsRequestReplyProcessor::at_replyR
     if(status == 0)
     {
         //QByteArray usagestr = extractXmlBody(reply, "usage"); // usage of the current process
-        QByteArray usagestr = extractXmlBody(reply, "load"); // total cpu load of the current machine
-        int usage =  usagestr.toShort();
-        emit finished(usage); 
+        QByteArray usageStr = extractXmlBody(reply, "load"); // total cpu load of the current machine
+        int usage =  usageStr.toShort();
+        QByteArray modelStr = extractXmlBody(reply, "model");
+        emit finished(usage, modelStr); 
     }
     deleteLater();
 }

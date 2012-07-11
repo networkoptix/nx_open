@@ -336,8 +336,8 @@ protected:
 signals:
     void updateOverlayTextLater();
 
-private slots:
-    void updateOverlayText();
+protected slots:
+    virtual void updateOverlayText();
     void updateButtonsVisibility();
 
     void at_sourceSizeChanged(const QSize &size);
