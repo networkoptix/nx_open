@@ -447,7 +447,7 @@ namespace{
         bool m_initialized;
         quint64 m_cpu;
         quint64 m_processCpu;
-        quint64 m_busyCpu
+        quint64 m_busyCpu;
         uint m_usage;
         uint m_totalUsage;
         timer_t m_timer;
