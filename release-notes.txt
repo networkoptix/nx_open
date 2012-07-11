@@ -1,3 +1,10 @@
+----------------------------------------------- 1.2.1 Beta -----------------------------------------------
+
+ - Onvif Engine is greatly improved (especially for Sony cameras)
+ - It is possible to set up media server to use RTP over TCP/RTP over UDP in traytool settings. TCP is set by default (used to be UDP). If using UDP in some network adapters media packet loss was detected regardless of UDP socket buffer size. If switch to TCP this can be solved
+ - Screen Recording is saved in AVI format that cam be played almost everywhere
+ - Audio and Video synchronization is improved for local files
+
 ----------------------------------------------- 1.2 -----------------------------------------------
 
 New Cameras and Recorders Supported:
