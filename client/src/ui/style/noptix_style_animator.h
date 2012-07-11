@@ -48,8 +48,11 @@ public:
         m_animationByWidget[widget].value = value;
     }
 
-    bool connected(const QWidget *widget) {
-        return m_animationByWidget.contains(widget);
+    bool isRunning(const QWidget *widget) {
+        QHash<const QWidget *, Animation>::const_iterator pos = m_animationByWidget.find(widget);
+        if(pos == m_animationByWidget.end())
+            return false;
+        return pos->running;
     }
 
 protected:

@@ -353,7 +353,7 @@ bool QnNoptixStyle::drawProgressBarControl(const QStyleOption *option, QPainter 
     pb->rect.getRect(&x, &y, &w, &h);
 
     qreal animationProgress = 0.0;
-    if (!m_animator->connected(widget)) {
+    if (!m_animator->isRunning(widget)) {
         m_animator->start(widget, 0.5, animationProgress);
     } else {
         animationProgress = m_animator->value(widget);
