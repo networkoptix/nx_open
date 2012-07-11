@@ -335,9 +335,11 @@ namespace{
     class CpuUsageRefresher {
     public:
         CpuUsageRefresher() {
+            m_cpu = 0;
             m_processCpu = 0;
-            m_process_cpu = 0;
+            m_busyCpu = 0;
             m_usage = 0;
+            m_totalUsage = 0;
             m_timer = 0;
             m_initialized = init();
         }
@@ -351,18 +353,27 @@ namespace{
             return m_usage;
         }
 
+        uint totalUsage() {
+            return m_totalUsage;
+        }
+
         void** getTimerId() {
             return &m_timer;
         }
 
         void refresh() {
-            qulonglong cpu = getCpu();
+            qulonglong cpu, busy;
+            getCpu(cpu, busy);
             qulonglong process_cpu = getProcessCpu();
-            if (process_cpu > 0 && m_processCpu > 0){
-                m_usage = ((process_cpu - m_process_cpu) * 100) / (cpu - m_processCpu);
+            if (process_cpu && m_processCpu){
+                m_usage = ((process_cpu - m_processCpu) * 100) / (cpu - m_cpu);
             }
-            m_processCpu = cpu;
-            m_process_cpu = process_cpu;
+            if (busy && m_processCpu){
+                m_totalUsage = ((busy - m_busyCpu) * 100) / (cpu - m_cpu);
+            }
+            m_cpu = cpu;
+            m_processCpu = process_cpu;
+            m_busyCpu = busy;
         }
 
     private:
@@ -402,15 +413,22 @@ namespace{
         }
 
         /** Calculate total cpu jiffies */
-        qulonglong getCpu() {
-            qulonglong result = 0;
+        void getCpu(qulonglong &busy, qulonglong &total){
+            busy = 0;
+            total = 0;
 
             QString proc_stat = getSystemOutput("cat /proc/stat | grep \"cpu \"").mid(5);
             QStringList list = proc_stat.split(' ', QString::SkipEmptyParts);
             QStringListIterator iter(list);
-            while (iter.hasNext())
-                result += iter.next().toULongLong();
-            return result;
+            int counter = 0;
+            while (iter.hasNext()){
+                qulonglong value = iter.next().toULongLong();
+                total += value;
+                /** user,nice,system = the first 3 values */
+                if (counter < 3)
+                    busy += value;
+                counter++;
+            }
         }
 
         qulonglong getProcessCpu() {
@@ -427,9 +445,11 @@ namespace{
         }
 
         bool m_initialized;
+        quint64 m_cpu;
         quint64 m_processCpu;
-        quint64 m_process_cpu;
+        quint64 m_busyCpu
         uint m_usage;
+        uint m_totalUsage;
         timer_t m_timer;
     };
 
