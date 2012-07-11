@@ -54,8 +54,8 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnVideoServerResourcePtr &s
 
     setButtonBox(ui->buttonBox);
 
-    connect(ui->addStorageButton,       SIGNAL(clicked()),              this,   SLOT(at_addStorageButton_clicked()));
-    connect(ui->removeStorageButton,    SIGNAL(clicked()),              this,   SLOT(at_removeStorageButton_clicked()));
+    connect(ui->storageAddButton,       SIGNAL(clicked()),              this,   SLOT(at_storageAddButton_clicked()));
+    connect(ui->storageRemoveButton,    SIGNAL(clicked()),              this,   SLOT(at_storageRemoveButton_clicked()));
     connect(ui->storagesTable,          SIGNAL(cellChanged(int, int)),  this,   SLOT(at_storagesTable_cellChanged(int, int)));
 
     updateFromResources();
@@ -133,10 +133,10 @@ QnAbstractStorageResourceList QnServerSettingsDialog::tableStorages() const {
 }
 
 void QnServerSettingsDialog::updateFromResources() {
-    ui->nameEdit->setText(m_server->getName());
-    ui->ipAddressEdit->setText(QUrl(m_server->getUrl()).host());
-    ui->apiPortEdit->setText(QString::number(QUrl(m_server->getApiUrl()).port()));
-    ui->rtspPortEdit->setText(QString::number(QUrl(m_server->getUrl()).port()));
+    ui->nameLineEdit->setText(m_server->getName());
+    ui->ipAddressLineEdit->setText(QUrl(m_server->getUrl()).host());
+    ui->apiPortLineEdit->setText(QString::number(QUrl(m_server->getApiUrl()).port()));
+    ui->rtspPortLineEdit->setText(QString::number(QUrl(m_server->getUrl()).port()));
 
     setTableStorages(m_server->getStorages());
 
@@ -145,15 +145,7 @@ void QnServerSettingsDialog::updateFromResources() {
 
 void QnServerSettingsDialog::submitToResources() {
     m_server->setStorages(tableStorages());
-    m_server->setName(ui->nameEdit->text());
-
-    QUrl url(m_server->getUrl());
-    url.setPort(ui->rtspPortEdit->text().toInt());
-    m_server->setUrl(url.toString());
-
-    QUrl apiUrl(m_server->getApiUrl());
-    apiUrl.setPort(ui->apiPortEdit->text().toInt());
-    m_server->setApiUrl(apiUrl.toString());
+    m_server->setName(ui->nameLineEdit->text());
 }
 
 QString formatGbStr(qint64 value)
@@ -277,13 +269,13 @@ void QnServerSettingsDialog::updateSpaceLimitCell(int row, bool force) {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnServerSettingsDialog::at_addStorageButton_clicked() {
+void QnServerSettingsDialog::at_storageAddButton_clicked() {
     addTableRow(0, QString(), defaultSpaceLimitGb);
 
     m_hasStorageChanges = true;
 }
 
-void QnServerSettingsDialog::at_removeStorageButton_clicked() {
+void QnServerSettingsDialog::at_storageRemoveButton_clicked() {
     QList<int> rows;
     foreach (QModelIndex index, ui->storagesTable->selectionModel()->selectedRows())
         rows.push_back(index.row());

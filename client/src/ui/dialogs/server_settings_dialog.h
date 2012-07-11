@@ -80,8 +80,8 @@ private:
     void updateSpaceLimitCell(int row, bool force = false);
 
 private slots: 
-    void at_addStorageButton_clicked();
-    void at_removeStorageButton_clicked();
+    void at_storageAddButton_clicked();
+    void at_storageRemoveButton_clicked();
     void at_storagesTable_cellChanged(int row, int column);
 
 private:
