@@ -29,6 +29,7 @@ int QnGetStatisticsHandler::executeGet(const QString& path, const QnRequestParam
     result.append(QString("<model>%1</model>\n").arg(QnPerformance::cpuBrand()));
     result.append(QString("<cores>%1</cores>\n").arg(QnPerformance::cpuCoreCount()));
     result.append(QString("<usage>%1</usage>\n").arg(QnPerformance::currentCpuUsage()));
+    result.append(QString("<load>%1</load>\n").arg(QnPerformance::currentCpuTotalUsage()));
     result.append("</cpuinfo>\n");
 
     result.append("</root>\n");
