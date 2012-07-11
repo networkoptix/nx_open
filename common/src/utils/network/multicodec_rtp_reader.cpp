@@ -10,6 +10,8 @@
 #include "mjpeg_rtp_parser.h"
 #include "core/resource/camera_resource.h"
 
+
+extern QSettings qSettings;
 static const int RTSP_RETRY_COUNT = 6;
 
 QnMulticodecRtpReader::QnMulticodecRtpReader(QnResourcePtr res):
@@ -27,7 +29,6 @@ m_audioIO(0)
     QnMediaResourcePtr mr = qSharedPointerDynamicCast<QnMediaResource>(res);
     m_numberOfVideoChannels = mr->getVideoLayout()->numberOfChannels();
     m_gotKeyData.resize(m_numberOfVideoChannels);
-    m_RtpSession.setTransport("AUTO");
 }
 
 QnMulticodecRtpReader::~QnMulticodecRtpReader()
@@ -305,6 +306,12 @@ void QnMulticodecRtpReader::openStream()
     if (isStreamOpened())
         return;
     m_timeHelper.reset();
+
+    QString transport = qSettings.value("rtspTransport", "AUTO").toString().toUpper();
+    if (transport != "AUTO" && transport != "UDP" && transport != "TCP")
+        transport = "AUTO";
+    m_RtpSession.setTransport(transport);
+
 
     QnNetworkResourcePtr nres = getResource().dynamicCast<QnNetworkResource>();
 

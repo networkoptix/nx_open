@@ -604,6 +604,15 @@ void QnSystrayWindow::onSettingsAction()
     ui->appServerLogin->setText(m_mServerSettings.value("appserverLogin").toString());
     ui->appServerPassword->setText(m_mServerSettings.value("appserverPassword").toString());
     ui->rtspPortLineEdit->setText(m_mServerSettings.value("rtspPort").toString());
+
+    QString rtspTransport = m_mServerSettings.value("rtspTransport", "AUTO").toString().toUpper();
+    if (rtspTransport == "UDP")
+        ui->rtspTransportComboBox->setCurrentIndex(1);
+    else if (rtspTransport == "TCP")
+        ui->rtspTransportComboBox->setCurrentIndex(2);
+    else
+        ui->rtspTransportComboBox->setCurrentIndex(0);
+
     ui->apiPortLineEdit->setText(m_mServerSettings.value("apiPort").toString());
     ui->appServerPortLineEdit->setText(m_appServerSettings.value("port").toString());
     ui->proxyPortLineEdit->setText(m_appServerSettings.value("proxyPort", DEFAUT_PROXY_PORT).toString());
@@ -764,6 +773,9 @@ void QnSystrayWindow::saveData()
     m_mServerSettings.setValue("appserverPassword",ui->appServerPassword->text());
     m_mServerSettings.setValue("rtspPort", ui->rtspPortLineEdit->text());
     m_mServerSettings.setValue("apiPort", ui->apiPortLineEdit->text());
+
+    m_mServerSettings.setValue("rtspTransport", ui->rtspTransportComboBox->currentText());
+
     m_appServerSettings.setValue("port", ui->appServerPortLineEdit->text());
     m_appServerSettings.setValue("proxyPort", ui->proxyPortLineEdit->text());
 
