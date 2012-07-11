@@ -20,7 +20,8 @@ public:
     virtual QnResourceList findResources();
 
 protected:
-    virtual QnNetworkResourcePtr processPacket(QnResourceList& result, QByteArray& responseData) = 0;
+    virtual QnNetworkResourcePtr processPacket(QnResourceList& result, QByteArray& responseData, const QHostAddress& discoveryAddress) = 0;
+    bool isNewDiscoveryAddressBetter(const QString& host, const QString& newAddress, const QString& oldAddress);
 private:
     void checkSocket(QUdpSocket& sock, QnResourceList& result, QHostAddress localAddress);
 };

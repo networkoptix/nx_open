@@ -332,6 +332,8 @@ public:
      *
      */
     bool sendTo(const void *buffer, int bufferLen);
+    bool sendTo(const void *buffer, int bufferLen, const QString &foreignAddress, unsigned short foreignPort);
+
 
     /**
      *   Read read up to bufferLen bytes data from this socket.  The given buffer
