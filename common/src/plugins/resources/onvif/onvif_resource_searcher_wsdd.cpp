@@ -81,6 +81,42 @@ int gsoapFsend(struct soap *soap, const char *s, size_t n)
     return SOAP_OK;
 }
 
+static const char STATIC_DISCOVERY_MESSAGE[] = "\
+<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:a=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\">\
+<s:Header>\
+<a:Action s:mustUnderstand=\"1\">\
+http://schemas.xmlsoap.org/ws/2005/04/discovery/Probe\
+</a:Action>\
+<a:MessageID>%1</a:MessageID>\
+<a:ReplyTo>\
+<a:Address>\
+http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous\
+</a:Address>\
+</a:ReplyTo>\
+<a:To s:mustUnderstand=\"1\">urn:schemas-xmlsoap-org:ws:2005:04:discovery</a:To>\
+</s:Header>\
+<s:Body>\
+<Probe xmlns=\"http://schemas.xmlsoap.org/ws/2005/04/discovery\">\
+<d:Types xmlns:d=\"http://schemas.xmlsoap.org/ws/2005/04/discovery\" xmlns:dp0=\"http://www.onvif.org/ver10/network/wsdl\">dp0:NetworkVideoTransmitter</d:Types>\
+</Probe>\
+</s:Body>\
+</s:Envelope>";
+
+//Socket send through QUdpSocket
+int gsoapFsendSmall(struct soap *soap, const char *s, size_t n)
+{
+    QString msgId;
+    QUdpSocket& qSocket = *reinterpret_cast<QUdpSocket*>(soap->user);
+
+    QString guid = QUuid::createUuid().toString();
+    guid = QString("uuid:") + guid.mid(1, guid.length()-2);
+    QByteArray data = QString(STATIC_DISCOVERY_MESSAGE).arg(guid).toLocal8Bit();
+
+    qSocket.writeDatagram(data, WSDD_GROUP_ADDRESS, WSDD_MULTICAST_PORT);
+    return SOAP_OK;
+}
+
+
 /*void OnvifResourceSearcherWsdd::updateInterfacesListenSockets() const
 {
     QMutexLocker lock(&m_mutex);
@@ -223,7 +259,7 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
         soapWsddProxy.soap->user = &qSocket;
         soapWsddProxy.soap->fconnect = nullGsoapFconnect;
         soapWsddProxy.soap->fdisconnect = nullGsoapFdisconnect;
-        soapWsddProxy.soap->fsend = gsoapFsend;
+        soapWsddProxy.soap->fsend = gsoapFsendSmall;
         soapWsddProxy.soap->fopen = NULL;
         soapWsddProxy.soap->socket = qSocket.socketDescriptor();
         soapWsddProxy.soap->master = qSocket.socketDescriptor();
@@ -241,6 +277,7 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
             const_cast<char*>(WSDD_ADDRESS), const_cast<char*>(WSDD_ACTION), NULL);
 
         int soapRes = soapWsddProxy.send_Probe(WSDD_GSOAP_MULTICAST_ADDRESS, NULL, &wsddProbe);
+        soapRes = soapWsddProxy.send_Probe(WSDD_GSOAP_MULTICAST_ADDRESS, NULL, &wsddProbe);
 
         if (soapRes != SOAP_OK) 
         {

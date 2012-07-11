@@ -601,7 +601,7 @@ void QnResourceDiscoveryManager::markOfflineIfNeeded()
             // resource is not found
             m_resourceDiscoveryCounter[res->getUniqueId()]++;
 
-            if (m_resourceDiscoveryCounter[res->getUniqueId()] >= 16 && !netRes->hasRunningLiveProvider())
+            if (m_resourceDiscoveryCounter[res->getUniqueId()] >= 5 && !netRes->hasRunningLiveProvider())
             {
                 res->setStatus(QnResource::Offline);
                 m_resourceDiscoveryCounter[res->getUniqueId()] = 0;
@@ -628,23 +628,39 @@ void QnResourceDiscoveryManager::updateResourceStatus(QnResourcePtr res)
 
     if (rpNetRes)
     {
+        disconnect(rpNetRes.data(), SIGNAL(initAsyncFinished(QnResourcePtr, bool)), this, SLOT(onInitAsyncFinished(QnResourcePtr, bool)));
+        connect(rpNetRes.data(), SIGNAL(initAsyncFinished(QnResourcePtr, bool)), this, SLOT(onInitAsyncFinished(QnResourcePtr, bool)));
+
         if (rpNetRes->getStatus() == QnResource::Offline) 
         {
             if (rpNetRes->getLastStatusUpdateTime().msecsTo(qnSyncTime->currentDateTime()) > 30) // if resource with OK ip seems to be found; I do it coz if there is no readers and camera was offline and now online => status needs to be changed
-				rpNetRes->setStatus(QnResource::Online);
+            {
+                rpNetRes->initAsync();
+				//rpNetRes->setStatus(QnResource::Online);
+            }
 
         }
         else if (!rpNetRes->isInitialized())
         {
-            rpNetRes->init(); // Resource already in resource pool. Try to init resource if resource is not authorized or not initialized by other reason
-            if (rpNetRes->isInitialized() && rpNetRes->getStatus() == QnResource::Unauthorized)
-                rpNetRes->setStatus(QnResource::Online);
+            rpNetRes->initAsync(); // Resource already in resource pool. Try to init resource if resource is not authorized or not initialized by other reason
+            //if (rpNetRes->isInitialized() && rpNetRes->getStatus() == QnResource::Unauthorized)
+            //    rpNetRes->setStatus(QnResource::Online);
         }
 
         m_discoveredResources.insert(rpNetRes->getUniqueId());
         rpNetRes->setLastDiscoveredTime(qnSyncTime->currentDateTime());
     }
 
+}
+
+void QnResourceDiscoveryManager::onInitAsyncFinished(QnResourcePtr res, bool initialized)
+{
+    QnNetworkResourcePtr rpNetRes = res.dynamicCast<QnNetworkResource>();
+    if (initialized && rpNetRes)
+    {
+        if (rpNetRes->getStatus() == QnResource::Offline || rpNetRes->getStatus() == QnResource::Unauthorized)
+            rpNetRes->setStatus(QnResource::Online);
+    }
 }
 
 void QnResourceDiscoveryManager::pingResources(QnResourcePtr res)

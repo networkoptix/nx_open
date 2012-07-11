@@ -774,8 +774,30 @@ void QnResource::init()
             if (!m_initialized && (getStatus() == Online || getStatus() == Recording))
                 setStatus(Offline);
         }
+}
 
+void QnResource::initAndEmit()
+{
+    init();
+    emit initAsyncFinished(toSharedPointer(), isInitialized());
+}
 
+class InitAsyncTask: public QRunnable
+{
+public:
+    InitAsyncTask(QnResourcePtr resource): m_resource(resource) {}
+    void run()
+    {
+        m_resource->initAndEmit();
+    }
+private:
+    QnResourcePtr m_resource;
+};
+
+void QnResource::initAsync()
+{
+    InitAsyncTask *task = new InitAsyncTask(toSharedPointer());
+    QThreadPool::globalInstance()->start(task);
 }
 
 bool QnResource::isInitialized() const
