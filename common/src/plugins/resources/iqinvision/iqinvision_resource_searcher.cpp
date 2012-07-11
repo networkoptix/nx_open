@@ -54,7 +54,7 @@ QnResourcePtr QnPlIqResourceSearcher::checkHostAddr(QHostAddress addr)
     return QnResourcePtr(0);
 }
 
-QnNetworkResourcePtr QnPlIqResourceSearcher::processPacket(QnResourceList& result, QByteArray& responseData)
+QnNetworkResourcePtr QnPlIqResourceSearcher::processPacket(QnResourceList& result, QByteArray& responseData, const QHostAddress& discoveryAddress)
 {
 
     QString smac;
@@ -112,7 +112,11 @@ QnNetworkResourcePtr QnPlIqResourceSearcher::processPacket(QnResourceList& resul
         QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
     
         if (net_res->getMAC().toString() == smac)
+        {
+            if (isNewDiscoveryAddressBetter(net_res->getHostAddress().toString(), discoveryAddress.toString(), net_res->getDiscoveryAddr().toString()))
+                net_res->setDiscoveryAddr(discoveryAddress);
             return QnNetworkResourcePtr(0); // already found;
+        }
     }
 
 

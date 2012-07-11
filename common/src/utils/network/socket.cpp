@@ -426,7 +426,8 @@ QString CommunicatingSocket::getForeignAddress()
     unsigned int addr_len = sizeof(addr);
 
     if (getpeername(sockDesc, (sockaddr *) &addr,(socklen_t *) &addr_len) < 0) {
-        throw SocketException("Fetch of foreign address failed (getpeername())", true);
+        qWarning() << "Fetch of foreign address failed (getpeername())";
+        return QString();
     }
     return inet_ntoa(addr.sin_addr);
 }
@@ -613,6 +614,13 @@ bool UDPSocket::setDestAddr(const QString &foreignAddress, unsigned short foreig
 {
     return fillAddr(foreignAddress, foreignPort, *m_destAddr);
 }
+
+bool UDPSocket::sendTo(const void *buffer, int bufferLen, const QString &foreignAddress, unsigned short foreignPort)
+{
+    setDestAddr(foreignAddress, foreignPort);
+    return sendTo(buffer, bufferLen);
+}
+
 
 bool UDPSocket::sendTo(const void *buffer, int bufferLen)
 {

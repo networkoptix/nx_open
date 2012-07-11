@@ -5,8 +5,38 @@
 #include "utils/network/mac_address.h"
 #include "../pulse/pulse_resource.h"
 
-extern bool multicastJoinGroup(QUdpSocket& udpSocket, QHostAddress groupAddress, QHostAddress localAddress);
-extern bool multicastLeaveGroup(QUdpSocket& udpSocket, QHostAddress groupAddress);
+// These functions added temporary as in Qt 4.8 they are already in QUdpSocket
+bool multicastJoinGroup(QUdpSocket& udpSocket, QHostAddress groupAddress, QHostAddress localAddress)
+{
+    struct ip_mreq imr;
+
+    memset(&imr, 0, sizeof(imr));
+
+    imr.imr_multiaddr.s_addr = htonl(groupAddress.toIPv4Address());
+    imr.imr_interface.s_addr = htonl(localAddress.toIPv4Address());
+
+    int res = setsockopt(udpSocket.socketDescriptor(), IPPROTO_IP, IP_ADD_MEMBERSHIP, (const char *)&imr, sizeof(struct ip_mreq));
+    if (res == -1)
+        return false;
+
+    return true;
+}
+
+bool multicastLeaveGroup(QUdpSocket& udpSocket, QHostAddress groupAddress)
+{
+    struct ip_mreq imr;
+
+    imr.imr_multiaddr.s_addr = htonl(groupAddress.toIPv4Address());
+    imr.imr_interface.s_addr = INADDR_ANY;
+
+    int res = setsockopt(udpSocket.socketDescriptor(), IPPROTO_IP, IP_DROP_MEMBERSHIP, (const char *)&imr, sizeof(struct ip_mreq));
+    if (res == -1)
+        return false;
+
+    return true;
+}
+
+
 
 QnPlPulseSearcherHelper::QnPlPulseSearcherHelper()
 {
