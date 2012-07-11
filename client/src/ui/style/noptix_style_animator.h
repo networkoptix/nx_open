@@ -37,7 +37,7 @@ public:
         pos->running = false;
     }
 
-    float value(const QWidget *widget, qreal defaultValue = 0.0) const {
+    qreal value(const QWidget *widget, qreal defaultValue = 0.0) const {
         QHash<const QWidget *, Animation>::const_iterator pos = m_animationByWidget.find(widget);
         if(pos == m_animationByWidget.end())
             return defaultValue;
@@ -46,6 +46,13 @@ public:
 
     void setValue(const QWidget *widget, qreal value) {
         m_animationByWidget[widget].value = value;
+    }
+
+    bool isRunning(const QWidget *widget) {
+        QHash<const QWidget *, Animation>::const_iterator pos = m_animationByWidget.find(widget);
+        if(pos == m_animationByWidget.end())
+            return false;
+        return pos->running;
     }
 
 protected:

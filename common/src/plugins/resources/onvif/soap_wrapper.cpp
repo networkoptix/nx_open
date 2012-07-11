@@ -8,6 +8,7 @@
 #include "onvif/Onvif.nsmap"
 #include "onvif/soapDeviceBindingProxy.h"
 #include "onvif/soapMediaBindingProxy.h"
+#include "onvif/soapPTZBindingProxy.h"
 #include "onvif/wsseapi.h"
 
 #include <QtGlobal>
@@ -386,6 +387,22 @@ int MediaSoapWrapper::getVideoEncoderConfiguration(VideoConfigReq& request, Vide
 }
 
 //
+// PtzSoapWrapper
+//
+
+PtzSoapWrapper::PtzSoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd):
+    SoapWrapper<PTZBindingProxy>(endpoint, login, passwd),
+    passwordsData(PasswordHelper::instance())
+{
+
+}
+
+PtzSoapWrapper::~PtzSoapWrapper()
+{
+
+}
+
+//
 // Explicit instantiating
 //
 
@@ -404,3 +421,11 @@ template const QString SoapWrapper<MediaBindingProxy>::getLastError();
 template const QString SoapWrapper<MediaBindingProxy>::getEndpointUrl();
 template bool SoapWrapper<MediaBindingProxy>::isNotAuthenticated();
 template bool SoapWrapper<MediaBindingProxy>::isConflictError();
+
+template soap* SoapWrapper<PTZBindingProxy>::getSoap();
+template const char* SoapWrapper<PTZBindingProxy>::getLogin();
+template const char* SoapWrapper<PTZBindingProxy>::getPassword();
+template const QString SoapWrapper<PTZBindingProxy>::getLastError();
+template const QString SoapWrapper<PTZBindingProxy>::getEndpointUrl();
+template bool SoapWrapper<PTZBindingProxy>::isNotAuthenticated();
+template bool SoapWrapper<PTZBindingProxy>::isConflictError();

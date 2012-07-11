@@ -88,7 +88,7 @@ public:
             else if (trackTypeStr == "metadata")
                 trackType = TT_METADATA;
             else
-                trackType == TT_UNKNOWN;
+                trackType = TT_UNKNOWN;
 
             ioDevice = new RTPIODevice(owner, useTCP);
         }

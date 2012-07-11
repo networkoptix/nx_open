@@ -36,6 +36,7 @@ public:
 protected:
     bool drawMenuItemControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
     bool drawItemViewItemControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
+    bool drawProgressBarControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
     bool drawSliderComplexControl(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const;
     bool drawToolButtonComplexControl(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const;
     bool drawTabClosePrimitive(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
@@ -48,6 +49,9 @@ private:
     void setHoverProgress(const QWidget *widget, qreal value) const;
     qreal hoverProgress(const QStyleOption *option, const QWidget *widget, qreal speed) const;
     void stopHoverTracking(const QWidget *widget) const;
+    void drawProgressBarGroove(const QStyleOptionProgressBarV2 *pb, QPainter *painter, const QWidget *widget) const;
+    void drawProgressBarContents(const QStyleOptionProgressBarV2 *pb, QPainter *painter, const QWidget *widget) const;
+    void drawProgressBarLabel(const QStyleOptionProgressBarV2 *pb, QPainter *painter, const QWidget *widget) const;
 
 private:
     QnNoptixStyleAnimator *m_animator;

@@ -6,6 +6,7 @@
 struct soap;
 class DeviceBindingProxy;
 class MediaBindingProxy;
+class PTZBindingProxy;
 
 class _onvifDevice__CreateUsers;
 class _onvifDevice__CreateUsersResponse;
@@ -219,5 +220,25 @@ private:
 };
 
 typedef QSharedPointer<MediaSoapWrapper> MediaSoapWrapperPtr;
+
+//
+// PtzSoapWrapper
+//
+
+class PtzSoapWrapper: public SoapWrapper<PTZBindingProxy>
+{
+    PasswordHelper& passwordsData;
+
+public:
+
+    PtzSoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd);
+    virtual ~PtzSoapWrapper();
+
+private:
+    PtzSoapWrapper();
+    PtzSoapWrapper(const PtzSoapWrapper&);
+};
+
+typedef QSharedPointer<PtzSoapWrapper> PtzSoapWrapperPtr;
 
 #endif //onvif_soap_wrapper_h
