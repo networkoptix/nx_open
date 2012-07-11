@@ -25,7 +25,7 @@ QnLayoutTabBar::QnLayoutTabBar(QWidget *parent, QnWorkbenchContext *context):
     m_update(false)
 {
     /* Set up defaults. */
-    setMovable(true);
+    setMovable(false);
     setSelectionBehaviorOnRemove(QTabBar::SelectPreviousTab);
     setDrawBase(false);
     setShape(QTabBar::RoundedNorth);
@@ -224,6 +224,7 @@ void QnLayoutTabBar::tabInserted(int index) {
 
     guard.rollback();
     checkInvariants();
+    setMovable(count() > 1);
 }
 
 void QnLayoutTabBar::tabRemoved(int index) {
@@ -240,6 +241,7 @@ void QnLayoutTabBar::tabRemoved(int index) {
 
     guard.rollback();
     checkInvariants();
+    setMovable(count() > 1);
 }
 
 void QnLayoutTabBar::at_tabMoved(int from, int to) {
