@@ -202,6 +202,8 @@ public:
 
     static QRectF aligned(const QSizeF &size, const QRectF &rect, Qt::Alignment alignment = Qt::AlignCenter);
 
+    static QRect aligned(const QSize &size, const QRect &rect, Qt::Alignment alignment = Qt::AlignCenter);
+
     /**
      * Dilates the given rectangle by the given amount.
      * 
