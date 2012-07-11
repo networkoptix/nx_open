@@ -13,14 +13,16 @@
 
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/variant.h>
+#include <utils/common/util.h>
 
 #include <ui/common/text_pixmap_cache.h>
 #include <ui/common/linear_combination.h>
+#include <ui/common/color_transformations.h>
+#include <ui/common/geometry.h>
 
 #include "noptix_style_animator.h"
 #include "globals.h"
 #include "skin.h"
-#include "utils/common/util.h"
 
 namespace {
     const char *qn_hoveredPropertyName = "_qn_hovered";
@@ -366,8 +368,8 @@ bool QnNoptixStyle::drawProgressBarControl(const QStyleOption *option, QPainter 
 
     /* Draw progress indicator. */
     if (progress > 0.0) { 
-        const QColor f1(4, 154, 116); // TODO: take color from config?
-        const QColor f2 = pb->palette.color(QPalette::WindowText);
+        const QColor baseColor(4, 154, 116); // TODO: take color from config?
+        const QColor glareColor = pb->palette.color(QPalette::WindowText);
 
         QLinearGradient gradient(x, y, x + w, y);
   
@@ -379,12 +381,11 @@ bool QnNoptixStyle::drawProgressBarControl(const QStyleOption *option, QPainter 
             if(position < 0.0 || position > 1.0)
                 continue;
 
-            qreal alpha = qMin(qAbs(position - center) / radius, 1.0);
-            gradient.setColorAt(position, linearCombine(alpha, f1, 1.0 - alpha, f2));
+            qreal alpha = 0.5 + 0.5 * qMin(qAbs(position - center) / radius, 1.0);
+            gradient.setColorAt(position, linearCombine(alpha, baseColor, 1.0 - alpha, glareColor));
         }
 
         painter->setBrush(gradient);
-        painter->setOpacity(1);
         if (w * progress > 12) {
             painter->drawRoundedRect(x, y, w * progress, y + h, 6, 6);
         } else {
@@ -396,42 +397,37 @@ bool QnNoptixStyle::drawProgressBarControl(const QStyleOption *option, QPainter 
 
     /* Draw groove. */
     QLinearGradient gradient(x, 0, x, y + h);
-    gradient.setColorAt(0, pb->palette.color(QPalette::Button).lighter());
-    gradient.setColorAt(0.2, pb->palette.color(QPalette::Button));
-    gradient.setColorAt(0.4, pb->palette.color(QPalette::Button));
-    gradient.setColorAt(0.5, pb->palette.color(QPalette::Button).darker()); //QColor(4, 67, 154)
-    gradient.setColorAt(1,  pb->palette.color(QPalette::Button).lighter());
+    gradient.setColorAt(0,      toTransparent(pb->palette.color(QPalette::Button).lighter(), 0.5));
+    gradient.setColorAt(0.2,    toTransparent(pb->palette.color(QPalette::Button), 0.5));
+    gradient.setColorAt(0.4,    toTransparent(pb->palette.color(QPalette::Button), 0.5));
+    gradient.setColorAt(0.5,    toTransparent(pb->palette.color(QPalette::Button).darker(), 0.5));
+    gradient.setColorAt(1,      toTransparent(pb->palette.color(QPalette::Button).lighter(), 0.5));
     painter->setBrush(gradient);
-    painter->setOpacity(0.5);
-    painter->drawRoundedRect(x, y, w, h, 6, 6);
-
-    painter->setOpacity(1);
     painter->setPen(pb->palette.color(QPalette::Window));
-    painter->setBrush(Qt::NoBrush);
     painter->drawRoundedRect(x, y, w, h, 6, 6);
 
-
-    // label? =========
+    /* Draw label. */
     if (pb->textVisible) {
         QRect rect = pb->rect;
-        if (pb->orientation == Qt::Vertical)
-        {   // vertical progresses have text rotated by 90 or 270
-            QMatrix m;
-            int h = rect.height(); rect.setHeight(rect.width()); rect.setWidth(h);
-            if (pb->bottomToTop)
-            { m.translate(0.0, pb->rect.height()); m.rotate(-90); }
-            else
-            { m.translate(pb->rect.width(), 0.0); m.rotate(90); }
-            painter->setMatrix(m);
-        }
-        int flags = Qt::AlignCenter | Qt::TextSingleLine;
-        QRect tr = painter->boundingRect(rect, flags, pb->text);
-        if (!tr.isValid())
-        { painter->restore(); return true; }
+        if (pb->orientation == Qt::Vertical) {
+            /* Vertical progress bar have text rotated by 90 or 270 degrees. */
+            rect.setHeight(w); 
+            rect.setWidth(h);
 
-        QnTextPixmapCache* cache = QnTextPixmapCache::instance();
-        QPixmap text = cache->pixmap(pb->text, painter->font(), pb->palette.color(QPalette::WindowText));
-        painter->drawPixmap(tr, text);
+            QMatrix m;
+            if (pb->bottomToTop) { 
+                m.translate(0.0, pb->rect.height()); 
+                m.rotate(-90); 
+            } else { 
+                m.translate(pb->rect.width(), 0.0); 
+                m.rotate(90); 
+            }
+            painter->setMatrix(m, true);
+        }
+
+        QnTextPixmapCache *cache = QnTextPixmapCache::instance();
+        QPixmap textPixmap = cache->pixmap(pb->text, painter->font(), pb->palette.color(QPalette::WindowText));
+        painter->drawPixmap(QnGeometry::aligned(textPixmap.size(), rect, Qt::AlignCenter), textPixmap);
     }
 
     painter->restore();
