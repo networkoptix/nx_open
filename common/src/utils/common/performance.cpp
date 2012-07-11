@@ -363,7 +363,7 @@ namespace{
 
         void refresh() {
             qulonglong cpu, busy;
-            getCpu(cpu, busy);
+            getCpu(busy, cpu);
             qulonglong process_cpu = getProcessCpu();
             if (process_cpu && m_processCpu){
                 m_usage = ((process_cpu - m_processCpu) * 100) / (cpu - m_cpu);
