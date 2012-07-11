@@ -113,7 +113,7 @@ namespace {
 
             // Step 1: --------------------------------------------------
             // Initialize COM. ------------------------------------------
-            hres =  CoInitializeEx(0, COINIT_MULTITHREADED); 
+            hres =  CoInitializeEx(0, COINIT_APARTMENTTHREADED); 
             if (FAILED(hres))
             {
                 qnWarning("WMI: Failed to initialize COM library. Error code = 0x%1", QString::number(hres, 16));
