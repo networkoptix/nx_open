@@ -99,6 +99,8 @@ public:
     bool setLocalAddressAndPort(const QString &localAddress,
                                 unsigned short localPort = 0) ;
 
+    bool bindToInterface(const QString& iface);
+
     /**
      *   If WinSock, unload the WinSock DLLs; otherwise do nothing.  We ignore
      *   this in our sample client code but include it in the library for

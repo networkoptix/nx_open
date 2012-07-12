@@ -57,6 +57,9 @@ static int strEqualAmount(const char* str1, const char* str2)
 
 QString QnMdnsListener::getBestLocalAddress(const QString& removeAddress)
 {
+    if (m_localAddressList.isEmpty())
+        return QString();
+
     int bestEq = -1;
     int bestIndex = 0;
     for (int i = 0; i < m_localAddressList.size(); ++i)
@@ -121,7 +124,7 @@ void QnMdnsListener::updateSocketList()
     {
         UDPSocket* socket = new UDPSocket();
         QString localAddress = iface.address.toString();
-        if (socket->setLocalAddressAndPort(localAddress, 0))
+        if (socket->bindToInterface(localAddress))
         {
             socket->setMulticastIF(localAddress);
             m_socketList << socket;
