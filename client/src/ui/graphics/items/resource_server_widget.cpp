@@ -119,7 +119,7 @@ void QnResourceServerWidget::drawStatistics(int width, int height, QPainter *pai
     qreal oh = height - offset*2;
     qreal ow = width - offset*2;
 
-    QRectF inner(offset, offset, ow, oh);
+    QRectF inner(offset, offset, ow, oh); 
 
     painter->fillRect(rect, Qt::black);
     painter->setRenderHint(QPainter::Antialiasing);
@@ -165,6 +165,7 @@ void QnResourceServerWidget::drawStatistics(int width, int height, QPainter *pai
             grid_path.lineTo(ow + offset, i);
         }
 
+        // TODO: better use QPainter::drawLines
         painter->strokePath(grid_path, grid);
     }
 
@@ -218,7 +219,7 @@ void QnResourceServerWidget::drawStatistics(int width, int height, QPainter *pai
     painter->setClipping(false);
 
     QFont font;
-    font.setStyleHint(QFont::SansSerif, QFont::ForceOutline);
+    font.setStyleHint(QFont::SansSerif, QFont::ForceOutline); // TODO: Why don't just use widget's font? QGraphicsWidget::font()
     font.setPointSizeF(offset * 0.3);
     painter->setFont(font);
     {
