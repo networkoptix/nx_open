@@ -563,7 +563,6 @@ bool CLFFmpegVideoDecoder::getLastDecodedFrame(CLVideoDecoderOutput* outFrame)
         return false;
 
     outFrame->setUseExternalData(false);
-    AVFrame* copyFromFrame = m_frame;
     outFrame->reallocate(m_context->width, m_context->height, m_context->pix_fmt, m_frame->linesize[0]);
 
     if (m_frame->interlaced_frame && m_mtDecoding)

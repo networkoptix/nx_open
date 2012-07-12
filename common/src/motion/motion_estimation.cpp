@@ -445,8 +445,6 @@ void getFrame_avgY_array_x_x(const CLVideoDecoderOutput* frame, const CLVideoDec
     squareSum = 0;\
     dstCurLine += MD_HEIGHT;\
 }
-    quint8* dstOrig = dst;
-
     Q_ASSERT(frame->width % 8 == 0);
     Q_ASSERT(frame->linesize[0] % 16 == 0);
     Q_ASSERT(sqWidth % 8 == 0);
@@ -510,6 +508,7 @@ void getFrame_avgY_array_x_x(const CLVideoDecoderOutput* frame, const CLVideoDec
         prevLinePtr += lineSize*rowCnt;
         dst++;
     }
+#undef flushData
 }
 
 void getFrame_avgY_array_x_x_mc(const CLVideoDecoderOutput* frame, quint8* dst, int sqWidth)
@@ -572,6 +571,7 @@ void getFrame_avgY_array_x_x_mc(const CLVideoDecoderOutput* frame, quint8* dst, 
         curLinePtr += lineSize*rowCnt;
         dst++;
     }
+#undef flushData
 }
 
 

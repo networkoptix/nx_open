@@ -46,6 +46,8 @@ bool QnPlWatchDogResource::initInternal()
         request.append("onvif_stream_number=2&onvif_use_service=true&onvif_service_port=8032&");
         request.append("onvif_use_discovery=true&onvif_use_security=true&onvif_security_opts=63&onvif_use_sa=true&reboot=true");
         CLHttpStatus status = http.doPOST(QByteArray("/cgi-bin/onvifsetup.cgi"), request);
+        Q_UNUSED(status);
+
         setStatus(Offline);
         return false;
     }
