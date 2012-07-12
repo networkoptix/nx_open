@@ -63,7 +63,7 @@ void QnResourceServerWidget::paint(QPainter *painter, const QStyleOptionGraphics
 }
 
 void QnResourceServerWidget::updateOverlayText(){
-    m_footerStatusLabel->setText(tr("CPU Model: %1").arg(m_model));
+    m_footerLeftLabel->setText(tr("CPU Model: %1").arg(m_model));
 }
 
 void QnResourceServerWidget::at_timer_update(){

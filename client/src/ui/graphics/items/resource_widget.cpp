@@ -95,18 +95,13 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     base_type(parent),
     QnWorkbenchContextAware(context),
     m_item(item),
-    m_videoLayout(NULL),
-    m_channelCount(0),
-    m_renderer(NULL),
+    m_contentLayout(NULL),
     m_aspectRatio(-1.0),
     m_enclosingAspectRatio(1.0),
     m_frameWidth(-1.0),
     m_frameOpacity(1.0),
     m_aboutToBeDestroyedEmitted(false),
-    m_displayFlags(DisplaySelectionOverlay | DisplayButtons),
-    m_motionMaskValid(false),
-    m_motionMaskBinDataValid(false),
-    m_motionDrawType(DrawMaskOnly)
+    m_displayFlags(DisplaySelectionOverlay | DisplayButtons)
 {
     setAcceptHoverEvents(true);
 
@@ -114,16 +109,13 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     shadowItem()->setColor(qnGlobals->shadowColor());
     setShadowDisplacement(defaultShadowDisplacement);
 
-
     /* Set up frame. */
     setFrameWidth(0.0);
-
 
     /* Set up overlay widgets. */
     QFont font = this->font();
     font.setPixelSize(20);
     setFont(font);
-
     {
         QPalette palette = this->palette();
         palette.setColor(QPalette::WindowText, overlayTextColor);
@@ -131,9 +123,9 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     }
 
     /* Header overlay. */
-    m_headerTitleLabel = new GraphicsLabel();
-    m_headerTitleLabel->setAcceptedMouseButtons(0);
-    m_headerTitleLabel->setPerformanceHint(QStaticText::AggressiveCaching);
+    m_headerLabel = new GraphicsLabel();
+    m_headerLabel->setAcceptedMouseButtons(0);
+    m_headerLabel->setPerformanceHint(QStaticText::AggressiveCaching);
 
     qreal buttonSize = 24; /* In pixels. */
 
@@ -182,7 +174,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_headerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     m_headerLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
     m_headerLayout->setSpacing(2.0);
-    m_headerLayout->addItem(m_headerTitleLabel);
+    m_headerLayout->addItem(m_headerLabel);
     m_headerLayout->addStretch(0x1000); /* Set large enough stretch for the buttons to be placed at the right end of the layout. */
     m_headerLayout->addItem(m_searchButton);
     m_headerLayout->addItem(m_rotateButton);
@@ -210,17 +202,17 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_headerOverlayWidget->setOpacity(0.0);
 
     /* Footer overlay. */
-    m_footerStatusLabel = new GraphicsLabel();
-    m_footerStatusLabel->setAcceptedMouseButtons(0);
+    m_footerLeftLabel = new GraphicsLabel();
+    m_footerLeftLabel->setAcceptedMouseButtons(0);
 
-    m_footerTimeLabel = new GraphicsLabel();
-    m_footerTimeLabel->setAcceptedMouseButtons(0);
+    m_footerRightLabel = new GraphicsLabel();
+    m_footerRightLabel->setAcceptedMouseButtons(0);
 
     QGraphicsLinearLayout *footerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     footerLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-    footerLayout->addItem(m_footerStatusLabel);
+    footerLayout->addItem(m_footerLeftLabel);
     footerLayout->addStretch(0x1000);
-    footerLayout->addItem(m_footerTimeLabel);
+    footerLayout->addItem(m_footerRightLabel);
 
     m_footerWidget = new QGraphicsWidget();
     m_footerWidget->setLayout(footerLayout);
@@ -264,9 +256,9 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     connect(m_display->camDisplay(), SIGNAL(stillImageChanged()), this, SLOT(updateButtonsVisibility()));
 
     Q_ASSERT(m_display);
-    m_videoLayout = m_display->videoLayout();
-    Q_ASSERT(m_videoLayout);
-    m_channelCount = m_videoLayout->numberOfChannels();
+    m_contentLayout = m_display->videoLayout();
+    Q_ASSERT(m_contentLayout);
+    m_channelCount = m_contentLayout->numberOfChannels();
 
     m_renderer = new QnResourceWidgetRenderer(m_channelCount);
     connect(m_renderer, SIGNAL(sourceSizeChanged(const QSize &)), this, SLOT(at_sourceSizeChanged(const QSize &)));
@@ -301,15 +293,6 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 
 QnResourceWidget::~QnResourceWidget() {
     ensureAboutToBeDestroyedEmitted();
-
-    delete m_display;
-
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-        qFreeAligned(m_motionMaskBinData[i]);
-}
-
-const QnResourcePtr &QnResourceWidget::resource() const {
-    return m_display->resource();
 }
 
 void QnResourceWidget::setFrameWidth(qreal frameWidth) {
@@ -353,6 +336,35 @@ void QnResourceWidget::setGeometry(const QRectF &geometry) {
     m_footerOverlayWidget->setDesiredSize(size());
 }
 
+QString QnResourceWidget::titleText() const {
+    return m_headerLabel->text();
+}
+
+void QnResourceWidget::setTitleText(const QString &titleText) {
+    m_headerLabel->setText(titleText);
+}
+
+QString QnResourceWidget::infoText() {
+    QString leftText = m_footerLeftLabel->text();
+    QString rightText = m_footerRightLabel->text();
+    
+    return rightText.isEmpty() ? leftText : (leftText + QLatin1Char('\t') + rightText);
+}
+
+void QnResourceWidget::setInfoText(const QString &infoText) {
+    QString leftText = infoText;
+    QString rightText;
+
+    int index = leftText.indexOf(QLatin1Char('\t'));
+    if(index != -1) {
+        rightText = leftText.mid(index + 1);
+        leftText = leftText.mid(0, index);
+    }
+
+    m_footerLeftLabel->setText(leftText);
+    m_footerRightLabel->setText(rightText);
+}
+
 QSizeF QnResourceWidget::constrainedSize(const QSizeF constraint) const {
     if(!hasAspectRatio())
         return constraint;
@@ -372,17 +384,19 @@ QSizeF QnResourceWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) 
     return result;
 }
 
+
+
 QRectF QnResourceWidget::channelRect(int channel) const {
-    if (m_channelCount == 1)
+    if (m_contentLayout->numberOfChannels() == 1)
         return QRectF(QPointF(0.0, 0.0), size());
 
     QSizeF size = this->size();
-    qreal w = size.width() / m_videoLayout->width();
-    qreal h = size.height() / m_videoLayout->height();
+    qreal w = size.width() / m_contentLayout->width();
+    qreal h = size.height() / m_contentLayout->height();
 
     return QRectF(
-        w * m_videoLayout->h_position(channel),
-        h * m_videoLayout->v_position(channel),
+        w * m_contentLayout->h_position(channel),
+        h * m_contentLayout->v_position(channel),
         w,
         h
     );
@@ -424,76 +438,13 @@ void QnResourceWidget::fadeInfo(bool fadeIn) {
     }
 }
 
-void QnResourceWidget::invalidateMotionMask() {
-    m_motionMaskValid = false;
-}
-
-void QnResourceWidget::addToMotionRegion(int sensitivity, const QRect& rect, int channel) {
-    ensureMotionMask();
-
-    m_motionRegionList[channel].addRect(sensitivity, rect);
-
-    /*
-    QnMotionRegion newRegion = m_motionRegionList[channel];
-    newRegion.addRect(sens, rect);
-    if (newRegion.isValid()) 
-    {
-        m_motionRegionList[channel] = newRegion;
-        invalidateMotionMaskBinData();
-    }
-    return newRegion.isValid();
-    */
-}
-
-bool QnResourceWidget::setMotionRegionSensitivity(int sensitivity, const QPoint &gridPos, int channel) {
-    ensureMotionMask();
-
-    return m_motionRegionList[channel].updateSensitivityAt(gridPos, sensitivity);
-}
-
-void QnResourceWidget::clearMotionRegions() {
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-        m_motionRegionList[i] = QnMotionRegion();
-    m_motionMaskValid = true;
-
-    invalidateMotionMaskBinData();
-}
-
-void QnResourceWidget::ensureMotionMask()
-{
-    if(m_motionMaskValid)
-        return;
-
-    if (QnSecurityCamResourcePtr camera = m_resource.dynamicCast<QnSecurityCamResource>()) {
-        m_motionRegionList = camera->getMotionRegionList();
-
-        while(m_motionRegionList.size() < CL_MAX_CHANNELS)
-            m_motionRegionList.push_back(QnMotionRegion()); /* Just to feel safe. */
-    }
-    m_motionMaskValid = true;
-}
-
-void QnResourceWidget::ensureMotionMaskBinData() {
-    if(m_motionMaskBinDataValid)
-        return;
-
-    ensureMotionMask();
-    Q_ASSERT(((unsigned long)m_motionMaskBinData[0])%16 == 0);
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-        QnMetaDataV1::createMask(m_motionRegionList[i].getMotionMask(), (char*)m_motionMaskBinData[i]);
-}
-
-void QnResourceWidget::invalidateMotionMaskBinData() {
-    m_motionMaskBinDataValid = false;
-}
-
 void QnResourceWidget::setOverlayIcon(int channel, OverlayIcon icon) {
     ChannelState &state = m_channelState[channel];
     if(state.icon == icon)
         return;
 
     state.iconFadeInNeeded = state.icon == NO_ICON;
-    state.iconChangeTimeMSec = qnSyncTime->currentMSecsSinceEpoch();
+    state.iconChangeTimeMSec = QDateTime::currentMSecsSinceEpoch();
     state.icon = icon;
 }
 
@@ -517,80 +468,6 @@ void QnResourceWidget::ensureAboutToBeDestroyedEmitted() {
 
     m_aboutToBeDestroyedEmitted = true;
     emit aboutToBeDestroyed();
-}
-
-int QnResourceWidget::motionGridWidth() const
-{
-    return MD_WIDTH * m_videoLayout->width();
-}
-
-int QnResourceWidget::motionGridHeight() const
-{
-    return MD_HEIGHT * m_videoLayout->height();
-}
-
-QPoint QnResourceWidget::mapToMotionGrid(const QPointF &itemPos)
-{
-    QPointF gridPosF(cwiseDiv(itemPos, toPoint(cwiseDiv(size(), QSizeF(motionGridWidth(), motionGridHeight())))));
-    QPoint gridPos(qFuzzyFloor(gridPosF.x()), qFuzzyFloor(gridPosF.y()));
-
-    return bounded(gridPos, QRect(0, 0, motionGridWidth(), motionGridHeight()));
-}
-
-QPointF QnResourceWidget::mapFromMotionGrid(const QPoint &gridPos) {
-    return cwiseMul(gridPos, toPoint(cwiseDiv(size(), QSizeF(motionGridWidth(), motionGridHeight()))));
-}
-
-void QnResourceWidget::addToMotionSelection(const QRect &gridRect) 
-{
-    QList<QRegion> prevSelection;
-    QList<QRegion> newSelection;
-
-    ensureMotionMask();
-
-    for (int i = 0; i < m_channelState.size(); ++i)
-    {
-        prevSelection << m_channelState[i].motionSelection;
-
-        QRect r(0, 0, MD_WIDTH, MD_HEIGHT);
-        r.translate(m_videoLayout->h_position(i)*MD_WIDTH, m_videoLayout->v_position(i)*MD_HEIGHT);
-        r = gridRect.intersected(r);
-
-        if (r.width() > 0 && r.height() > 0) 
-        {
-            QRegion r1(r);
-            r1.translate(-m_videoLayout->h_position(i)*MD_WIDTH, -m_videoLayout->v_position(i)*MD_HEIGHT);
-            r1 -= m_motionRegionList[i].getMotionMask();
-
-            m_channelState[i].motionSelection += r1;
-        }
-
-        newSelection << m_channelState[i].motionSelection;
-    }
-
-    if(prevSelection != newSelection)
-        emit motionSelectionChanged();
-}
-
-void QnResourceWidget::clearMotionSelection() 
-{
-    bool allEmpty = true;
-    foreach(const ChannelState &state, m_channelState)
-        allEmpty &= state.motionSelection.isEmpty();
-    if (allEmpty)
-        return;
-
-    for (int i = 0; i < m_channelState.size(); ++i)
-        m_channelState[i].motionSelection = QRegion();
-
-    emit motionSelectionChanged();
-}
-
-QList<QRegion> QnResourceWidget::motionSelection() const {
-    QList<QRegion> result;
-    foreach(const ChannelState &state, m_channelState)
-        result.push_back(state.motionSelection);
-    return result;
 }
 
 void QnResourceWidget::setDisplayFlags(DisplayFlags flags) {
@@ -620,28 +497,12 @@ void QnResourceWidget::setDisplayFlags(DisplayFlags flags) {
     emit displayFlagsChanged();
 }
 
-void QnResourceWidget::updateOverlayText() {
-    qint64 time = m_renderer->lastDisplayedTime(0);
-    if (time > 1000000ll * 3600 * 24) /* Do not show time for regular media files. */ // TODO: try to avoid time comparison hacks.
-        m_footerTimeLabel->setText(QDateTime::fromMSecsSinceEpoch(time/1000).toString(tr("hh:mm:ss.zzz")));
+const QSize &QnResourceWidget::channelScreenSize() const {
+    return m_channelScreenSize;
+}
 
-    qreal fps = 0.0;
-    qreal mbps = 0.0;
-    for(int i = 0; i < m_channelCount; i++) {
-        const QnStatistics *statistics = m_display->mediaProvider()->getStatistics(i);
-        fps = qMax(fps, static_cast<qreal>(statistics->getFrameRate()));
-        mbps += statistics->getBitrate();
-    }
-
-    QSize size = m_display->camDisplay()->getFrameSize(0); // TODO: roma, check implementation.
-    if(size.isEmpty())
-        size = QSize(0, 0);
-
-    QString codecName;
-    QnMediaContextPtr codec = m_display->mediaProvider()->getCodecContext();
-    if (codec && codec->ctx())
-        codecName = codecIDToString(codec->ctx()->codec_id);
-    m_footerStatusLabel->setText(tr("%1x%2 %3fps @ %4Mbps (%5)").arg(size.width()).arg(size.height()).arg(fps, 0, 'f', 2).arg(mbps, 0, 'f', 2).arg(codecName));
+void QnResourceWidget::updateChannelScreenSize(const QSize &channelScreenSize) {
+    m_channelScreenSize = channelScreenSize;
 }
 
 void QnResourceWidget::updateButtonsVisibility() {
@@ -718,7 +579,7 @@ void QnResourceWidget::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
 
 void QnResourceWidget::at_sourceSizeChanged(const QSize &size) {
     qreal oldAspectRatio = m_aspectRatio;
-    qreal newAspectRatio = static_cast<qreal>(size.width() * m_videoLayout->width()) / (size.height() * m_videoLayout->height());
+    qreal newAspectRatio = static_cast<qreal>(size.width() * m_contentLayout->width()) / (size.height() * m_contentLayout->height());
     if(qFuzzyCompare(oldAspectRatio, newAspectRatio))
         return;
 
@@ -731,17 +592,14 @@ void QnResourceWidget::at_sourceSizeChanged(const QSize &size) {
     emit aspectRatioChanged(oldAspectRatio, newAspectRatio);
 }
 
-void QnResourceWidget::at_resource_resourceChanged() {
-    invalidateMotionMask();
-}
-
 void QnResourceWidget::at_resource_nameChanged() {
-    m_headerTitleLabel->setText(m_resource->getName());
+    m_headerLabel->setText(m_resource->getName());
 }
 
 void QnResourceWidget::at_searchButton_toggled(bool checked) {
     setDisplayFlag(DisplayMotion, checked);
 }
+
 
 // -------------------------------------------------------------------------- //
 // Painting
@@ -756,7 +614,7 @@ void QnResourceWidget::drawFlashingText(QPainter *painter, const QStaticText &te
     QnScopedPainterPenRollback penRollback(painter, QPen(QColor(255, 208, 208, 196)));
     
     qreal opacity = painter->opacity();
-    painter->setOpacity(opacity * qAbs(sin(qnSyncTime->currentMSecsSinceEpoch() / qreal(TEXT_FLASHING_PERIOD * 2) * M_PI)));
+    painter->setOpacity(opacity * qAbs(sin(QDateTime::currentMSecsSinceEpoch() / qreal(TEXT_FLASHING_PERIOD * 2) * M_PI)));
     painter->drawStaticText(rect().center() - toPoint(text.size() / 2) + offset * unit, text);
     painter->setOpacity(opacity);
 }
@@ -765,7 +623,6 @@ void QnResourceWidget::assertPainters(){
     if(m_pausedPainter.isNull()) {
         m_pausedPainter = qn_pausedPainterStorage()->get(QGLContext::currentContext());
         m_loadingProgressPainter = qn_loadingProgressPainterStorage()->get(QGLContext::currentContext());
-        //m_noDataPainter = qn_noDataPainterStorage()->get();
     }
 }
 
@@ -779,8 +636,8 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
         qnWarning("Painting with the paint engine of type '%1' is not supported", static_cast<int>(painter->paintEngine()->type()));
         return;
     }
-    assertPainters();
 
+    assertPainters();
 
     QnScopedPainterPenRollback penRollback(painter);
     QnScopedPainterBrushRollback brushRollback(painter);
@@ -788,22 +645,22 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
     /* Update screen size of a single channel. */
     QSizeF itemScreenSize = painter->combinedTransform().mapRect(boundingRect()).size();
-    QSize channelScreenSize = QSizeF(itemScreenSize.width() / m_videoLayout->width(), itemScreenSize.height() / m_videoLayout->height()).toSize();
-    if(channelScreenSize != m_channelScreenSize) {
-        m_channelScreenSize = channelScreenSize;
-        m_renderer->setChannelScreenSize(m_channelScreenSize);
-    }
+    QSize channelScreenSize = QSizeF(itemScreenSize.width() / m_contentLayout->width(), itemScreenSize.height() / m_contentLayout->height()).toSize();
+    if(channelScreenSize != m_channelScreenSize)
+        updateChannelScreenSize(channelScreenSize);
 
-    qint64 currentTimeMSec = qnSyncTime->currentMSecsSinceEpoch();
+    qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
+    
+    
     painter->beginNativePainting();
     //glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    for(int i = 0; i < m_channelCount; i++) {
+    for(int i = 0; i < m_contentLayout->numberOfChannels(); i++) {
         /* Draw content. */
         QRectF rect = channelRect(i);
-        m_renderStatus = m_renderer->paint(i, rect, effectiveOpacity());
+        m_renderStatus = paintChannel(painter, i, rect)// m_renderer->paint(i, rect, effectiveOpacity());
 
         /* Draw black rectangle if nothing was drawn. */
         if(m_renderStatus != Qn::OldFrameRendered && m_renderStatus != Qn::NewFrameRendered) {
@@ -918,7 +775,7 @@ void QnResourceWidget::drawOverlayIcon(int channel, const QRectF &rect) {
     if(state.icon == NO_ICON)
         return;
 
-    qint64 currentTimeMSec = qnSyncTime->currentMSecsSinceEpoch();
+    qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
     qreal opacityMultiplier = effectiveOpacity() * (state.iconFadeInNeeded ? qBound(0.0, static_cast<qreal>(currentTimeMSec - state.iconChangeTimeMSec) / defaultOverlayFadeInDurationMSec, 1.0) : 1.0);
 
     glColor4f(0.0, 0.0, 0.0, 0.5 * opacityMultiplier);
@@ -1066,7 +923,7 @@ void QnResourceWidget::drawMotionSensitivity(QPainter *painter, const QRectF &re
 void QnResourceWidget::drawMotionMask(QPainter *painter, const QRectF &rect, int channel)
 {
     ensureMotionMask();
-    if (m_motionDrawType == DrawAllMotionInfo) 
+    if (m_displayFlags & DisplayMotionSensitivity) 
     {
         QnMotionRegion& r = m_motionRegionList[channel];
         QRegion reg;
@@ -1084,11 +941,6 @@ void QnResourceWidget::drawMotionMask(QPainter *painter, const QRectF &rect, int
     else {
         drawFilledRegion(painter, rect, m_motionRegionList[channel].getMotionMask(), qnGlobals->motionMaskColor(), qnGlobals->motionMaskColor());
     }
-}
-
-void QnResourceWidget::setDrawMotionWindows(MotionDrawType value)
-{
-    m_motionDrawType = value;   
 }
 
 const QList<QnMotionRegion> &QnResourceWidget::motionRegionList()

@@ -1,7 +1,7 @@
 #ifndef device_video_layout_h_2143
 #define device_video_layout_h_2143
 
-#define CL_MAX_CHANNELS 4
+#define CL_MAX_CHANNELS 4 // TODO: get rid of this definition
 #include <QVector>
 #include <QStringList>
 #include "core/datapacket/mediadatapacket.h"
@@ -10,7 +10,7 @@ class QN_EXPORT QnDeviceLayout
 {
 public:
     //returns number of audio or video channels device has
-    virtual int numberOfChannels() const = 0;
+    virtual int numberOfChannels() const = 0; // TODO: rename to channelCount()
 };
 
 class QnResourceAudioLayout: public QnDeviceLayout
@@ -18,10 +18,9 @@ class QnResourceAudioLayout: public QnDeviceLayout
 public:
     struct AudioTrack
     {
-        AudioTrack() {} //: codec(CODEC_ID_NONE) {}
+        AudioTrack() {} 
 
         QnMediaContextPtr codecContext;
-        //CodecID codec;
         QString description;
     };
 
@@ -65,6 +64,8 @@ public:
         return 1;
     }
 
+    // TODO: use QSize here
+
     virtual int width() const override
     {
         return 1;
@@ -74,6 +75,8 @@ public:
     {
         return 1;
     }
+
+    // TODO: use QPoint here.
 
     virtual int h_position(int /*channel*/) const override
     {
