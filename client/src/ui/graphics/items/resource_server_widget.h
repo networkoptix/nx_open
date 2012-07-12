@@ -23,6 +23,7 @@ namespace Qn {
 
 } // namespace Qn
 
+// TODO: rename to QnServerResourceWidget (we have QnServerResource => QnServerResource + Widget = QnServerResourceWidget)
 class QnResourceServerWidget: public QnResourceWidget {
     Q_OBJECT;
 public:
