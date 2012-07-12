@@ -18,8 +18,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/graphics/instruments/instrumented.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
-
-#include "polygonal_shadow_item.h"
+#include <ui/graphics/items/shadow/shaded.h>
 
 class QGraphicsLinearLayout;
 
@@ -28,7 +27,6 @@ class QnResourceWidgetRenderer;
 class QnVideoResourceLayout;
 class QnWorkbenchItem;
 class QnResourceDisplay;
-class QnPolygonalShadowItem;
 class QnAbstractArchiveReader;
 
 class QnLoadingProgressPainter;
@@ -43,7 +41,7 @@ class Instrument;
 #   undef NO_DATA
 #endif
 
-class QnResourceWidget: public Instrumented<GraphicsWidget>, public QnWorkbenchContextAware, public QnPolygonalShapeProvider, public ConstrainedResizable, public FrameSectionQuearyable, protected QnGeometry {
+class QnResourceWidget: public Shaded<Instrumented<GraphicsWidget> >, public QnWorkbenchContextAware, public ConstrainedResizable, public FrameSectionQuearyable, protected QnGeometry {
     Q_OBJECT;
     Q_PROPERTY(qreal frameOpacity READ frameOpacity WRITE setFrameOpacity);
     Q_PROPERTY(qreal frameWidth READ frameWidth WRITE setFrameWidth);
@@ -52,7 +50,7 @@ class QnResourceWidget: public Instrumented<GraphicsWidget>, public QnWorkbenchC
     Q_PROPERTY(qreal enclosingAspectRatio READ enclosingAspectRatio WRITE setEnclosingAspectRatio);
     Q_FLAGS(DisplayFlags DisplayFlag);
 
-    typedef Instrumented<GraphicsWidget> base_type;
+    typedef Shaded<Instrumented<GraphicsWidget> > base_type;
 
 public:
     enum DisplayFlag {
@@ -64,12 +62,11 @@ public:
     };
     Q_DECLARE_FLAGS(DisplayFlags, DisplayFlag)
 
-    // TODO: remove QnWorkbenchItem from constructor.
-    
     /**
      * Constructor.
      *
-     * \param item                      Workbench item that this resource widget will represent.
+     * \param context                   Context in which this resource widget operates.
+     * \param item                      Workbench item that this widget represents.
      * \param parent                    Parent item.
      */
     QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent = NULL);
@@ -106,13 +103,6 @@ public:
     }
 
     /**
-     * \returns                         Shadow item associated with this widget.
-     */
-    QnPolygonalShadowItem *shadow() const {
-        return m_shadow.data();
-    }
-
-    /**
      * \returns                         Frame opacity of this widget.
      */
     qreal frameOpacity() const {
@@ -137,21 +127,6 @@ public:
      * \param frameWidth                New frame width for this widget.
      */
     void setFrameWidth(qreal frameWidth);
-
-    /**
-     * \returns                         Shadow displacement of this widget.
-     */
-    const QPointF &shadowDisplacement() const {
-        return m_shadowDisplacement;
-    }
-
-    /**
-     * Shadow will be drawn with the given displacement in scene coordinates
-     * relative to this widget.
-     *
-     * \param displacement              New shadow displacement for this widget.
-     */
-    void setShadowDisplacement(const QPointF &displacement);
 
     virtual void setGeometry(const QRectF &geometry) override;
 
@@ -306,23 +281,13 @@ protected:
     virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual Qt::WindowFrameSection windowFrameSectionAt(const QPointF &pos) const override;
     virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override;
-    virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
-    virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override;
     virtual bool windowFrameEvent(QEvent *event) override;
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
     virtual void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
 
-    virtual QPolygonF provideShape() override;
-
     virtual QSizeF constrainedSize(const QSizeF constraint) const override;
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint) const override;
-
-    void updateShadowZ();
-    void updateShadowPos();
-    void updateShadowOpacity();
-    void updateShadowVisibility();
-    void invalidateShadowShape();
 
     void ensureAboutToBeDestroyedEmitted();
 
@@ -432,14 +397,8 @@ protected:
     /** Cached size of a single media channel, in screen coordinates. */
     QSize m_channelScreenSize;
 
-    /** Shadow item. */
-    QWeakPointer<QnPolygonalShadowItem> m_shadow;
-
     /** Frame opacity. */
     qreal m_frameOpacity;
-
-    /** Shadow displacement. */
-    QPointF m_shadowDisplacement;
 
     /** Frame width. */
     qreal m_frameWidth;

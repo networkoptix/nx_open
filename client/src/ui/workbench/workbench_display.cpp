@@ -488,7 +488,7 @@ void QnWorkbenchDisplay::setLayer(QGraphicsItem *item, Qn::ItemLayer layer) {
 
     QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
     if(widget)
-        widget->shadow()->setZValue(shadowLayer(layer) * layerZSize);
+        widget->shadowItem()->setZValue(shadowLayer(layer) * layerZSize);
 }
 
 void QnWorkbenchDisplay::setLayer(const QList<QGraphicsItem *> &items, Qn::ItemLayer layer) {

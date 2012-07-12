@@ -1,12 +1,13 @@
-#include "polygonal_shadow_item.h"
+#include "shadow_item.h"
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/common/geometry.h>
 
-QnPolygonalShadowItem::QnPolygonalShadowItem(QGraphicsItem *parent):
+QnShadowItem::QnShadowItem(QGraphicsItem *parent):
     QGraphicsObject(parent),
-    m_softWidth(0.0),
     m_color(QColor(Qt::black)),
-    m_shapeValid(true),
+    m_softWidth(0.0),
+    m_shapeProvider(NULL),
+    m_shapeValid(false),
     m_parametersValid(false)
 {
     setAcceptedMouseButtons(0);
@@ -15,14 +16,87 @@ QnPolygonalShadowItem::QnPolygonalShadowItem(QGraphicsItem *parent):
      * (and probably other events too). Looks like a Qt bug. */
 }
 
-QRectF QnPolygonalShadowItem::boundingRect() const {
-    ensureParameters();
+QnShadowItem::~QnShadowItem() {
+    setShapeProvider(NULL);
+}
+
+QnShadowShapeProvider *QnShadowItem::shapeProvider() const {
+    return m_shapeProvider;
+}
+
+void QnShadowItem::setShapeProvider(QnShadowShapeProvider *provider) {
+    if(m_shapeProvider == provider)
+        return;
+
+    if(m_shapeProvider)
+        m_shapeProvider->m_item = NULL;
+
+    m_shapeProvider = provider;
+
+    if(m_shapeProvider) {
+        if(m_shapeProvider->m_item)
+            m_shapeProvider->m_item->setShapeProvider(NULL);
+        m_shapeProvider->m_item = this;
+    }
+
+    invalidateShadowShape();
+}
+
+qreal QnShadowItem::softWidth() const {
+    return m_softWidth;
+}
+
+void QnShadowItem::setSoftWidth(qreal softWidth) {
+    m_softWidth = softWidth;
+
+    m_parametersValid = false;
+}
+
+const QColor &QnShadowItem::color() const {
+    return m_color;
+}
+
+void QnShadowItem::setColor(const QColor &color) {
+    m_color = color;
+}
+
+void QnShadowItem::invalidateShadowShape() {
+    m_shapeValid = false;
+    m_parametersValid = false;
+}
+
+void QnShadowItem::ensureShadowShape() const {
+    if(m_shapeValid)
+        return;
+
+    if(m_shapeProvider) {
+        m_shadowShape = m_shapeProvider->calculateShadowShape();
+    } else {
+        m_shadowShape = QPolygonF();
+    }
+    m_shapeValid = true;
+}
+
+void QnShadowItem::ensureShadowParameters() const {
+    if(m_parametersValid)
+        return;
+
+    ensureShadowShape();
+
+    m_painterPath = QPainterPath();
+    m_painterPath.addPolygon(m_shadowShape);
+    m_boundingRect = m_shadowShape.boundingRect();
+    m_parametersValid = true;
+}
+
+QRectF QnShadowItem::boundingRect() const {
+    ensureShadowParameters();
 
     return m_boundingRect;
 }
 
-QPainterPath QnPolygonalShadowItem::shape() const {
-    ensureParameters();
+QPainterPath QnShadowItem::shape() const {
+    ensureShadowParameters();
 
     return m_painterPath;
 }
@@ -51,8 +125,8 @@ namespace {
     }
 }
 
-void QnPolygonalShadowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
-    ensureParameters();
+void QnShadowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
+    ensureShadowShape();
 
     /* Color for drawing the shadow. */
     QColor color = m_color;
@@ -69,7 +143,7 @@ void QnPolygonalShadowItem::paint(QPainter *painter, const QStyleOptionGraphicsI
     /* Draw shadowed rect. */
     glBegin(GL_TRIANGLE_FAN);
     glColor(color);
-    glVertices(m_shape);
+    glVertices(m_shadowShape);
     glEnd();
 
     /* Draw soft band. */
@@ -93,46 +167,4 @@ void QnPolygonalShadowItem::paint(QPainter *painter, const QStyleOptionGraphicsI
     glDisable(GL_BLEND); 
     //glPopAttrib();
     painter->endNativePainting();
-}
-
-void QnPolygonalShadowItem::invalidateShape() {
-    m_shapeValid = false;
-    m_parametersValid = false;
-}
-
-void QnPolygonalShadowItem::ensureParameters() const {
-    if(!m_shapeValid && m_shapeProvider != NULL) {
-        m_shape = m_shapeProvider->provideShape();
-        m_shapeValid = true;
-    }
-
-    if(!m_parametersValid) {
-        m_painterPath = QPainterPath();
-        m_painterPath.addPolygon(m_shape);
-        m_boundingRect = m_shape.boundingRect();
-        m_parametersValid = true;
-    }
-}
-
-void QnPolygonalShadowItem::setShapeProvider(QnPolygonalShapeProvider *provider) {
-    m_shapeProvider = provider;
-
-    ensureParameters();
-}
-
-void QnPolygonalShadowItem::setShape(const QPolygonF &shape) {
-    m_shape = shape;
-
-    m_shapeValid = true;
-    m_parametersValid = false;
-}
-
-void QnPolygonalShadowItem::setSoftWidth(qreal softWidth) {
-    m_softWidth = softWidth;
-
-    m_parametersValid = false;
-}
-
-void QnPolygonalShadowItem::setColor(const QColor &color) {
-    m_color = color;
 }

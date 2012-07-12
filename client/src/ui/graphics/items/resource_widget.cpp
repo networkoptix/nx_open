@@ -23,6 +23,7 @@
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/items/standard/graphics_label.h>
+
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -33,7 +34,6 @@
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
 
 #include "camera/camdisplay.h"
-#include "polygonal_shadow_item.h"
 #include "resource_widget_renderer.h"
 #include "utils/settings.h"
 #include "math.h"
@@ -111,14 +111,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     setAcceptHoverEvents(true);
 
     /* Set up shadow. */
-    m_shadow = new QnPolygonalShadowItem();
-    QnPolygonalShadowItem *shadow = m_shadow.data();
-    shadow->setParent(this);
-    shadow->setColor(qnGlobals->shadowColor());
-    shadow->setShapeProvider(this);
-    setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);
+    shadowItem()->setColor(qnGlobals->shadowColor());
     setShadowDisplacement(defaultShadowDisplacement);
-    invalidateShadowShape();
 
 
     /* Set up frame. */
@@ -310,11 +304,6 @@ QnResourceWidget::~QnResourceWidget() {
 
     delete m_display;
 
-    if(!m_shadow.isNull()) {
-        m_shadow.data()->setShapeProvider(NULL);
-        delete m_shadow.data();
-    }
-
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
         qFreeAligned(m_motionMaskBinData[i]);
 }
@@ -334,8 +323,8 @@ void QnResourceWidget::setFrameWidth(qreal frameWidth) {
     setWindowFrameMargins(extendedFrameWidth, extendedFrameWidth, extendedFrameWidth, extendedFrameWidth);
 
     invalidateShadowShape();
-    if(m_shadow.data() != NULL)
-        m_shadow.data()->setSoftWidth(m_frameWidth);
+    if(shadowItem())
+        shadowItem()->setSoftWidth(m_frameWidth);
 }
 
 void QnResourceWidget::setEnclosingAspectRatio(qreal enclosingAspectRatio) {
@@ -727,98 +716,8 @@ void QnResourceWidget::updateButtonsVisibility() {
 
 
 // -------------------------------------------------------------------------- //
-// Shadow
-// -------------------------------------------------------------------------- //
-void QnResourceWidget::setShadowDisplacement(const QPointF &displacement) {
-    m_shadowDisplacement = displacement;
-
-    updateShadowPos();
-}
-
-QPolygonF QnResourceWidget::provideShape() {
-    QTransform transform = sceneTransform();
-    QPointF zero = transform.map(QPointF());
-    transform = transform * QTransform::fromTranslate(-zero.x(), -zero.y());
-
-    qreal fw2 = m_frameWidth / 2;
-    return transform.map(QPolygonF(QRectF(QPointF(0, 0), size()).adjusted(-fw2, -fw2, fw2, fw2)));
-}
-
-void QnResourceWidget::invalidateShadowShape() {
-    if(m_shadow.isNull())
-        return;
-
-    m_shadow.data()->invalidateShape();
-}
-
-void QnResourceWidget::updateShadowZ() {
-    if(!m_shadow.isNull()) {
-        /* Shadow Z value is managed by workbench display. */
-        // m_shadow.data()->setZValue(zValue());
-        m_shadow.data()->stackBefore(this);
-    }
-}
-
-void QnResourceWidget::updateShadowPos() {
-    if(!m_shadow.isNull())
-        m_shadow.data()->setPos(mapToScene(0.0, 0.0) + m_shadowDisplacement);
-}
-
-void QnResourceWidget::updateShadowOpacity() {
-    if(!m_shadow.isNull())
-        m_shadow.data()->setOpacity(opacity());
-}
-
-void QnResourceWidget::updateShadowVisibility() {
-    if(!m_shadow.isNull())
-        m_shadow.data()->setVisible(isVisible());
-}
-
-
-// -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-QVariant QnResourceWidget::itemChange(GraphicsItemChange change, const QVariant &value) {
-    switch(change) {
-    case ItemPositionHasChanged:
-        updateShadowPos();
-        break;
-    case ItemTransformHasChanged:
-    case ItemRotationHasChanged:
-    case ItemScaleHasChanged:
-    case ItemTransformOriginPointHasChanged:
-        invalidateShadowShape();
-        updateShadowPos();
-        break;
-    case ItemSceneHasChanged:
-        if(scene() && !m_shadow.isNull()) {
-            scene()->addItem(m_shadow.data());
-            updateShadowZ();
-            updateShadowPos();
-        }
-        break;
-    case ItemOpacityHasChanged:
-        updateShadowOpacity();
-        break;
-    case ItemZValueHasChanged:
-        updateShadowZ();
-        break;
-    case ItemVisibleHasChanged:
-        updateShadowVisibility();
-        break;
-    default:
-        break;
-    }
-
-    return base_type::itemChange(change, value);
-}
-
-void QnResourceWidget::resizeEvent(QGraphicsSceneResizeEvent *event) {
-    invalidateShadowShape();
-
-    base_type::resizeEvent(event);
-}
-
 bool QnResourceWidget::windowFrameEvent(QEvent *event) {
     bool result = base_type::windowFrameEvent(event);
 
