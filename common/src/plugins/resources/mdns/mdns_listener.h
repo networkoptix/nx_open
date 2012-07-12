@@ -37,8 +37,11 @@ private:
     void updateSocketList();
     void readDataFromSocket();
     void deleteSocketList();
+    QString getBestLocalAddress(const QString& removeAddress);
+    void readSocketInternal(UDPSocket* socket, QString localAddress);
 private:
     QList<UDPSocket*> m_socketList;
+    UDPSocket* m_receiveSocket;
     QTime m_socketLifeTime;
     ConsumersMap m_data;
     QStringList m_localAddressList;

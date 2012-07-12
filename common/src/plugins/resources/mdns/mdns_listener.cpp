@@ -9,43 +9,13 @@
 
 static quint16 MDNS_PORT = 5353;
 static const int UPDATE_IF_LIST_INTERVAL = 1000 * 60;
-static QHostAddress groupAddress(QLatin1String("224.0.0.251"));
-static QString groupAddressStr(groupAddress.toString());
+static QString groupAddress(QLatin1String("224.0.0.251"));
 
-// These functions added temporary as in Qt 4.8 they are already in QUdpSocket
-bool multicastJoinGroup(UDPSocket* udpSocket, QHostAddress groupAddress, QHostAddress localAddress)
-{
-    struct ip_mreq imr;
-
-    memset(&imr, 0, sizeof(imr));
-
-    imr.imr_multiaddr.s_addr = htonl(groupAddress.toIPv4Address());
-    imr.imr_interface.s_addr = htonl(localAddress.toIPv4Address());
-
-    int res = setsockopt(udpSocket->handle(), IPPROTO_IP, IP_ADD_MEMBERSHIP, (const char *)&imr, sizeof(struct ip_mreq));
-    if (res == -1)
-        return false;
-
-    return true;
-}
-
-bool multicastLeaveGroup(UDPSocket* udpSocket, QHostAddress groupAddress)
-{
-    struct ip_mreq imr;
-
-    imr.imr_multiaddr.s_addr = htonl(groupAddress.toIPv4Address());
-    imr.imr_interface.s_addr = INADDR_ANY;
-
-    int res = setsockopt(udpSocket->handle(), IPPROTO_IP, IP_DROP_MEMBERSHIP, (const char *)&imr, sizeof(struct ip_mreq));
-    if (res == -1)
-        return false;
-
-    return true;
-}
 
 // -------------- QnMdnsListener ------------
 
-QnMdnsListener::QnMdnsListener()
+QnMdnsListener::QnMdnsListener():
+    m_receiveSocket(0)
 {
     updateSocketList();
     readDataFromSocket();
@@ -73,9 +43,38 @@ QnMdnsListener::ConsumerDataList QnMdnsListener::getData(long handle)
     return rez;
 }
 
+static int strEqualAmount(const char* str1, const char* str2)
+{
+    int rez = 0;
+    while (*str1 && *str1 == *str2)
+    {
+        rez++;
+        str1++;
+        str2++;
+    }
+    return rez;
+}
+
+QString QnMdnsListener::getBestLocalAddress(const QString& removeAddress)
+{
+    int bestEq = -1;
+    int bestIndex = 0;
+    for (int i = 0; i < m_localAddressList.size(); ++i)
+    {
+        int eq = strEqualAmount(m_localAddressList[i].toLocal8Bit().constData(), removeAddress.toLocal8Bit().constData());
+        if (eq > bestEq) {
+            bestEq = eq;
+            bestIndex = i;
+        }
+    }
+    return m_localAddressList[bestIndex];
+}
+
 void QnMdnsListener::readDataFromSocket()
 {
-    quint8 tmpBuffer[1024*16];
+    for (int i = 0; i < m_socketList.size(); ++i)
+        readSocketInternal(m_socketList[i], m_localAddressList[i]);
+    readSocketInternal(m_receiveSocket, QString());
 
     if (m_socketLifeTime.elapsed() > UPDATE_IF_LIST_INTERVAL)
         updateSocketList();
@@ -83,30 +82,35 @@ void QnMdnsListener::readDataFromSocket()
     for (int i = 0; i < m_socketList.size(); ++i)
     {
         UDPSocket* sock = m_socketList[i];
-        while (sock->hasData())
-        {
-            QString removeAddress;
-            quint16 removePort;
-            int datagramSize = sock->recvFrom(tmpBuffer, sizeof(tmpBuffer), removeAddress, removePort);
-            if (datagramSize > 0) {
-                QByteArray responseData((const char*) tmpBuffer, datagramSize);
-                QString localAddress = sock->getLocalAddress();
-                    if (m_localAddressList.contains(removeAddress))
-                        continue; // ignore own packets
-                for (ConsumersMap::iterator itr = m_data.begin(); itr != m_data.end(); ++itr) {
-                    itr.value().append(ConsumerData(responseData, localAddress, removeAddress));
-                }
-            }
-        }
-
         
         // send request for next read
-
         MDNSPacket request;
         request.addQuery();
         QByteArray datagram;
         request.toDatagram(datagram);
-        sock->sendTo(datagram.data(), datagram.size(), groupAddressStr, MDNS_PORT);
+        sock->sendTo(datagram.data(), datagram.size(), groupAddress, MDNS_PORT);
+    }
+}
+
+void QnMdnsListener::readSocketInternal(UDPSocket* socket, QString localAddress)
+{
+    quint8 tmpBuffer[1024*16];
+    while (socket->hasData())
+    {
+        QString removeAddress;
+        quint16 removePort;
+        int datagramSize = socket->recvFrom(tmpBuffer, sizeof(tmpBuffer), removeAddress, removePort);
+        if (datagramSize > 0) {
+            QByteArray responseData((const char*) tmpBuffer, datagramSize);
+            if (m_localAddressList.contains(removeAddress))
+                continue; // ignore own packets
+            if (localAddress.isEmpty())
+                localAddress = getBestLocalAddress(removeAddress);
+            for (ConsumersMap::iterator itr = m_data.begin(); itr != m_data.end(); ++itr) 
+            {
+                itr.value().append(ConsumerData(responseData, localAddress, removeAddress));
+            }
+        }
     }
 }
 
@@ -116,15 +120,23 @@ void QnMdnsListener::updateSocketList()
     foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
     {
         UDPSocket* socket = new UDPSocket();
-        if (socket->setLocalAddressAndPort(iface.address.toString(), MDNS_PORT) && multicastJoinGroup(socket, groupAddress, iface.address))
+        QString localAddress = iface.address.toString();
+        if (socket->setLocalAddressAndPort(localAddress, 0))
         {
+            socket->setMulticastIF(localAddress);
             m_socketList << socket;
-            m_localAddressList << socket->getLocalAddress();
+            m_localAddressList << localAddress;
         }
         else {
             delete socket;
         }
     }
+
+    m_receiveSocket = new UDPSocket();
+    m_receiveSocket->setReuseAddrFlag(true);
+    m_receiveSocket->setLocalPort(MDNS_PORT);
+    m_receiveSocket->joinGroup(groupAddress);
+
     m_socketLifeTime.restart();
 }
 
@@ -132,11 +144,16 @@ void QnMdnsListener::deleteSocketList()
 {
     for (int i = 0; i < m_socketList.size(); ++i)
     {
-        multicastLeaveGroup(m_socketList[i], groupAddress);
         delete m_socketList[i];
     }
     m_socketList.clear();
     m_localAddressList.clear();
+
+    if (m_receiveSocket) {
+        m_receiveSocket->leaveGroup(groupAddress);
+        delete m_receiveSocket;
+    }
+    m_receiveSocket = 0;
 }
 
 QStringList QnMdnsListener::getLocalAddressList() const
