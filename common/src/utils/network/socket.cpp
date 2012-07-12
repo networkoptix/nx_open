@@ -649,14 +649,28 @@ int UDPSocket::recvFrom(void *buffer, int bufferLen, QString &sourceAddress,
     return rtn;
 }
 
-void UDPSocket::setMulticastTTL(unsigned char multicastTTL)  {
+bool UDPSocket::setMulticastTTL(unsigned char multicastTTL)  {
     if (setsockopt(sockDesc, IPPROTO_IP, IP_MULTICAST_TTL,
                    (raw_type *) &multicastTTL, sizeof(multicastTTL)) < 0) {
-        throw SocketException("Multicast TTL set failed (setsockopt())", true);
+        qWarning() << "Multicast TTL set failed (setsockopt())";
+        return false;
     }
+    return true;
 }
 
-void UDPSocket::joinGroup(const QString &multicastGroup)  {
+bool UDPSocket::setMulticastIF(const QString& multicastIF)
+{
+    struct in_addr localInterface;
+    localInterface.s_addr = inet_addr(multicastIF.toLocal8Bit().data());
+    if (setsockopt(sockDesc, IPPROTO_IP, IP_MULTICAST_IF, (raw_type *) &localInterface, sizeof(localInterface)) < 0) 
+    {
+        qWarning() << "Multicast TTL set failed (setsockopt())";
+        return false;
+    }
+    return true;
+}
+
+bool UDPSocket::joinGroup(const QString &multicastGroup)  {
     struct ip_mreq multicastRequest;
 
     multicastRequest.imr_multiaddr.s_addr = inet_addr(multicastGroup.toAscii());
@@ -664,11 +678,13 @@ void UDPSocket::joinGroup(const QString &multicastGroup)  {
     if (setsockopt(sockDesc, IPPROTO_IP, IP_ADD_MEMBERSHIP,
                    (raw_type *) &multicastRequest,
                    sizeof(multicastRequest)) < 0) {
-        throw SocketException("Multicast group join failed (setsockopt())", true);
+        qWarning() << "Multicast group join failed (setsockopt())";
+        return false;
     }
+    return true;
 }
 
-void UDPSocket::leaveGroup(const QString &multicastGroup)  {
+bool UDPSocket::leaveGroup(const QString &multicastGroup)  {
     struct ip_mreq multicastRequest;
 
     multicastRequest.imr_multiaddr.s_addr = inet_addr(multicastGroup.toAscii());
@@ -676,8 +692,10 @@ void UDPSocket::leaveGroup(const QString &multicastGroup)  {
     if (setsockopt(sockDesc, IPPROTO_IP, IP_DROP_MEMBERSHIP,
                    (raw_type *) &multicastRequest,
                    sizeof(multicastRequest)) < 0) {
-        throw SocketException("Multicast group leave failed (setsockopt())", true);
+        qWarning() << "Multicast group leave failed (setsockopt())";
+        return false;
     }
+    return true;
 }
 
 bool UDPSocket::hasData() const

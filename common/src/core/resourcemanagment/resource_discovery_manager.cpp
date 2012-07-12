@@ -596,16 +596,20 @@ void QnResourceDiscoveryManager::markOfflineIfNeeded()
         QDateTime currentT = qnSyncTime->currentDateTime();
 
         //check if resource was discovered
-        if (!m_discoveredResources.contains(res->getUniqueId()))
+        QString uniqId = res->getUniqueId();
+        if (!m_discoveredResources.contains(uniqId))
         {
             // resource is not found
-            m_resourceDiscoveryCounter[res->getUniqueId()]++;
+            m_resourceDiscoveryCounter[uniqId]++;
 
-            if (m_resourceDiscoveryCounter[res->getUniqueId()] >= 5 && !netRes->hasRunningLiveProvider())
+            if (m_resourceDiscoveryCounter[uniqId] >= 5 && !netRes->hasRunningLiveProvider())
             {
                 res->setStatus(QnResource::Offline);
-                m_resourceDiscoveryCounter[res->getUniqueId()] = 0;
+                m_resourceDiscoveryCounter[uniqId] = 0;
             }
+        }
+        else {
+            m_resourceDiscoveryCounter[uniqId] = 0;
         }
      
 
