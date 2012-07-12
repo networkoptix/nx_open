@@ -663,6 +663,34 @@ bool Socket::bindToInterface(const QString& iface)
     return res;
 }
 
+bool Socket::bindToInterface(const QString& iface)
+{
+#ifdef Q_OS_LINUX
+    setLocalPort(0);
+    bool res = setsockopt(handle(), SOL_SOCKET, SO_BINDTODEVICE, iface.toAscii().constData(), iface.length()) >= 0;
+#else
+    bool res = setLocalAddressAndPort(iface, 0);
+#endif
+
+    if (!res)
+        qDebug() << "bindToInterface(): Can't bind to interface" << iface << "error code=" << strerror(errno);
+    return res;
+}
+
+bool Socket::bindToInterface(const QnInterfaceAndAddr& iface)
+{
+#ifdef Q_OS_LINUX
+    setLocalPort(0);
+    bool res = setsockopt(handle(), SOL_SOCKET, SO_BINDTODEVICE, iface.name.toAscii().constData(), iface.name.length()) >= 0;
+#else
+    bool res = setLocalAddressAndPort(iface.address.toString(), 0);
+#endif
+
+    if (!res)
+        qDebug() << "bindToInterface(): Can't bind to interface" << iface.address << "error code=" << strerror(errno);
+    return res;
+}
+
 bool UDPSocket::setMulticastTTL(unsigned char multicastTTL)  {
     if (setsockopt(sockDesc, IPPROTO_IP, IP_MULTICAST_TTL,
                    (raw_type *) &multicastTTL, sizeof(multicastTTL)) < 0) {

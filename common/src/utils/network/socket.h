@@ -12,6 +12,7 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #endif
+#include "nettools.h"
 
 #define MAX_ERROR_MSG_LENGTH 1024
 
@@ -100,6 +101,10 @@ public:
                                 unsigned short localPort = 0) ;
 
     bool bindToInterface(const QString& iface);
+
+    bool bindToInterface(const QString& iface);
+
+    bool bindToInterface(const QnInterfaceAndAddr& iface);
 
     /**
      *   If WinSock, unload the WinSock DLLs; otherwise do nothing.  We ignore
