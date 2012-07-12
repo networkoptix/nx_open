@@ -124,7 +124,7 @@ void QnMdnsListener::updateSocketList()
     {
         UDPSocket* socket = new UDPSocket();
         QString localAddress = iface.address.toString();
-        if (socket->bindToInterface(localAddress))
+        if (socket->bindToInterface(iface))
         {
             socket->setMulticastIF(localAddress);
             m_socketList << socket;
