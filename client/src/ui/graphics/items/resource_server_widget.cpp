@@ -36,15 +36,15 @@ void QnResourceServerWidget::paint(QPainter *painter, const QStyleOptionGraphics
     switch (m_redrawStatus)
     {
     case Qn::NewFrame:
-        setOverlayIcon(0, NO_ICON);
+        setChannelOverlay(0, EmptyOverlay);
     	break;
     case Qn::OldFrame:
         break;
     case Qn::LoadingFrame:
-        setOverlayIcon(0, LOADING);
+        setChannelOverlay(0, LoadingOverlay);
         break;
     case Qn::CannotLoad:
-        setOverlayIcon(0, NO_DATA);
+        setChannelOverlay(0, NoDataOverlay);
         break;
     }
     drawStatistics(rect().width(), rect().height(), painter);
@@ -53,7 +53,7 @@ void QnResourceServerWidget::paint(QPainter *painter, const QStyleOptionGraphics
     //glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    drawOverlayIcon(0, rect());
+    paintOverlay(0, rect());
     glDisable(GL_BLEND);
     //glPopAttrib();
     painter->endNativePainting();

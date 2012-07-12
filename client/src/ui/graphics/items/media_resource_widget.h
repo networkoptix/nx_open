@@ -74,16 +74,23 @@ public signals:
     void motionSelectionChanged();
 
 protected:
+    virtual Qn::RenderStatus paintChannel(QPainter *painter, int channel, const QRectF &rect) override;
+    virtual void updateChannelScreenSize(const QSize &channelScreenSize) override;
+
     int motionGridWidth() const;
     int motionGridHeight() const;
     void drawMotionSensitivity(QPainter *painter, const QRectF &rect, const QnMotionRegion& region, int channel);
+
+    void drawMotionGrid(QPainter *painter, const QRectF &rect, const QnMetaDataV1Ptr &motion, int channel);
+
+    void drawMotionMask(QPainter *painter, const QRectF& rect, int channel);
+
+    void drawFilledRegion(QPainter *painter, const QRectF &rect, const QRegion &selection, const QColor& color, const QColor& penColor);
 
     void ensureMotionMask();
     void invalidateMotionMask();
     void ensureMotionMaskBinData();
     void invalidateMotionMaskBinData();
-
-    virtual void updateChannelScreenSize(const QSize &channelScreenSize) override;
 
 private:
     /** Display. */

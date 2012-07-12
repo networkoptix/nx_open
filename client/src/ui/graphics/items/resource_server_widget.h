@@ -7,8 +7,8 @@
 #include <api/video_server_connection.h>
 
 /* Get rid of stupid win32 defines. */
-#ifdef NO_DATA
-#   undef NO_DATA
+#ifdef NoDataOverlay
+#   undef NoDataOverlay
 #endif
 
 namespace Qn {

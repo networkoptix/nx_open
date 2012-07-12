@@ -180,8 +180,10 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     connect(resizeSignalingInstrument,      SIGNAL(activated(QWidget *, QEvent *)),                     this,                   SLOT(synchronizeSceneBoundsExtension()));
     connect(resizeSignalingInstrument,      SIGNAL(activated(QWidget *, QEvent *)),                     this,                   SLOT(fitInView()));
     connect(m_beforePaintInstrument,        SIGNAL(activated(QWidget *, QEvent *)),                     this,                   SLOT(updateFrameWidths()));
-    connect(m_curtainActivityInstrument,    SIGNAL(activityStopped()),                                  this,                   SLOT(at_activityStopped()));
-    connect(m_curtainActivityInstrument,    SIGNAL(activityResumed()),                                  this,                   SLOT(at_activityStarted()));
+    connect(m_curtainActivityInstrument,    SIGNAL(activityStopped()),                                  this,                   SLOT(at_curtainActivityInstrument_activityStopped()));
+    connect(m_curtainActivityInstrument,    SIGNAL(activityResumed()),                                  this,                   SLOT(at_curtainActivityInstrument_activityStarted()));
+    connect(m_widgetActivityInstrument,     SIGNAL(activityStopped()),                                  this,                   SLOT(at_widgetActivityInstrument_activityStopped()));
+    connect(m_widgetActivityInstrument,     SIGNAL(activityResumed()),                                  this,                   SLOT(at_widgetActivityInstrument_activityStarted()));
 
     /* Create zoomed toggle. */
     m_zoomedToggle = new QnToggle(false, this);
@@ -780,8 +782,6 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
         adjustGeometryLater(item, animate); /* Changing item flags here may confuse the callee, so we do it through the event loop. */
 
     connect(widget,                     SIGNAL(aboutToBeDestroyed()),   this,   SLOT(at_widget_aboutToBeDestroyed()));
-    connect(m_widgetActivityInstrument, SIGNAL(activityStopped()),      widget, SLOT(showActivityDecorations()));
-    connect(m_widgetActivityInstrument, SIGNAL(activityResumed()),      widget, SLOT(hideActivityDecorations()));
     if(widgets(widget->resource()).size() == 1)
         connect(widget->resource().data(),  SIGNAL(disabledChanged(bool, bool)), this, SLOT(at_resource_disabledChanged()), Qt::QueuedConnection);
 
@@ -1338,12 +1338,22 @@ void QnWorkbenchDisplay::at_item_flagChanged(Qn::ItemFlag flag, bool value) {
     }
 }
 
-void QnWorkbenchDisplay::at_activityStopped() {
+void QnWorkbenchDisplay::at_curtainActivityInstrument_activityStopped() {
     m_curtainAnimator->curtain(m_widgetByRole[Qn::ZoomedRole]);
 }
 
-void QnWorkbenchDisplay::at_activityStarted() {
+void QnWorkbenchDisplay::at_curtainActivityInstrument_activityStarted() {
     m_curtainAnimator->uncurtain();
+}
+
+void QnWorkbenchDisplay::at_widgetActivityInstrument_activityStopped() {
+    foreach(QnResourceWidget *widget, m_widgetByRenderer) 
+        widget->setDisplayFlag(QnResourceWidget::DisplayActivityOverlay, true);
+}
+
+void QnWorkbenchDisplay::at_widgetActivityInstrument_activityStarted() {
+    foreach(QnResourceWidget *widget, m_widgetByRenderer) 
+        widget->setDisplayFlag(QnResourceWidget::DisplayActivityOverlay, false);
 }
 
 void QnWorkbenchDisplay::at_curtained() {

@@ -37,8 +37,8 @@ class GraphicsLabel;
 class Instrument;
 
 /* Get rid of stupid win32 defines. */
-#ifdef NO_DATA
-#   undef NO_DATA
+#ifdef NoDataOverlay
+#   undef NoDataOverlay
 #endif
 
 class QnResourceWidget: public Shaded<Instrumented<GraphicsWidget> >, public QnWorkbenchContextAware, public ConstrainedResizable, public FrameSectionQuearyable, protected QnGeometry {
@@ -208,16 +208,13 @@ public:
      */
     void setInfoText(const QString &infoText);
 
-    using base_type::mapRectToScene;
+    bool isDecorationsVisible() const;
+    Q_SLOT void setDecorationsVisible(bool visible, bool animate = true);
 
-public slots:
-    void showActivityDecorations();
-    void hideActivityDecorations();
-    void fadeOutOverlay();
-    void fadeInOverlay();
-    void fadeOutInfo();
-    void fadeInInfo();
-    void fadeInfo(bool fadeIn);
+    bool isInfoVisible() const;
+    Q_SLOT void setInfoVisible(bool visible, bool animate = true);
+
+    using base_type::mapRectToScene;
 
 signals:
     void aspectRatioChanged(qreal oldAspectRatio, qreal newAspectRatio);
@@ -227,9 +224,21 @@ signals:
     void rotationStopRequested();
 
 protected:
+    enum Overlay {
+        EmptyOverlay,
+        PausedOverlay,
+        LoadingOverlay,
+        NoDataOverlay,
+        OfflineOverlay,
+        UnauthorizedOverlay
+    };
+
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual Qn::RenderStatus paintChannel(QPainter *painter, int channel, const QRectF &rect) = 0;
+    virtual void paintOverlay(QPainter *painter, const QRectF &rect, Overlay overlay, qreal opacity);
+    
+    void paintSelection(QPainter *painter, const QRectF &rect);
 
     void assertPainters(); 
 
@@ -263,52 +272,36 @@ protected slots:
     void at_searchButton_toggled(bool checked);
 
 protected:
+    struct ChannelState {
+        ChannelState(): overlay(EmptyOverlay), changeTimeMSec(0), fadeInNeeded(false), lastNewFrameTimeMSec(0) {}
+
+        /** Current overlay. */
+        Overlay overlay;
+
+        /** Time when the last icon change has occurred, in milliseconds since epoch. */
+        qint64 changeTimeMSec;
+
+        /** Whether the icon should fade in on change. */
+        bool fadeInNeeded;
+
+        /** Last time when new frame was rendered, in milliseconds since epoch. */
+        qint64 lastNewFrameTimeMSec;
+    };
+
+    void setChannelOverlay(int channel, Overlay overlay);
+
+    void paintFlashingText(QPainter *painter, const QStaticText &text, qreal textSize, const QPointF &offset = QPointF());
+
+
+private:
     /**
      * \param channel                   Channel number.
      * \returns                         Rectangle in local coordinates where given channel is to be drawn.
      */
     QRectF channelRect(int channel) const;
 
-    enum OverlayIcon {
-        NO_ICON,
-        PAUSED,
-        LOADING,
-        NO_DATA,
-        OFFLINE,
-        UNAUTHORIZED
-    };
 
-    struct ChannelState {
-        ChannelState(): icon(NO_ICON), iconChangeTimeMSec(0), iconFadeInNeeded(false), lastNewFrameTimeMSec(0) {}
-
-        /** Current overlay icon. */
-        OverlayIcon icon;
-
-        /** Time when the last icon change has occurred, in milliseconds since epoch. */
-        qint64 iconChangeTimeMSec;
-
-        /** Whether the icon should fade in on change. */
-        bool iconFadeInNeeded;
-
-        /** Last time when new frame was rendered, in milliseconds since epoch. */
-        qint64 lastNewFrameTimeMSec;
-    };
-
-    void setOverlayIcon(int channel, OverlayIcon icon);
-
-    void drawSelection(const QRectF &rect);
-
-    void drawOverlayIcon(int channel, const QRectF &rect);
-
-    void drawMotionGrid(QPainter *painter, const QRectF &rect, const QnMetaDataV1Ptr &motion, int channel);
-
-    void drawMotionMask(QPainter *painter, const QRectF& rect, int channel);
-
-    void drawFilledRegion(QPainter *painter, const QRectF &rect, const QRegion &selection, const QColor& color, const QColor& penColor);
-
-    void drawFlashingText(QPainter *painter, const QStaticText &text, qreal textSize, const QPointF &offset = QPointF());
-
-protected:
+private:
     /** Paused painter. */
     QSharedPointer<QnPausedPainter> m_pausedPainter;
 

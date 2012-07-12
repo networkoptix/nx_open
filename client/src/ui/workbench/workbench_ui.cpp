@@ -1283,7 +1283,7 @@ void QnWorkbenchUi::at_activityStopped() {
     updateControlsVisibility(true);
 
     foreach(QnResourceWidget *widget, display()->widgets())
-        widget->fadeOutOverlay();
+        widget->fadeOutDecorations();
 }
 
 void QnWorkbenchUi::at_activityStarted() {
