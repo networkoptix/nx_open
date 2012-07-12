@@ -193,14 +193,6 @@ public:
     void setDisplayFlags(DisplayFlags flags);
 
     /**
-     * \returns                         Whether a grid with motion detection is
-     *                                  displayed over a video.
-     */
-    bool isMotionGridDisplayed() const {
-        return m_displayFlags & DisplayMotion;
-    }
-
-    /**
      * \param itemPos                   Point in item coordinates to map to grid coordinates.
      * \returns                         Coordinates of the motion cell that the given point belongs to.
      *                                  Note that motion grid is finite, so even if the
@@ -250,7 +242,7 @@ public:
         DrawAllMotionInfo
     };
 
-    const QList<QnMotionRegion> &getMotionRegionList();
+    const QList<QnMotionRegion> &motionRegionList();
 
     bool isMotionRegionsEmpty() const;
 

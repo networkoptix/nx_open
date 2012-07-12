@@ -346,46 +346,6 @@ void QnResourceWidget::setEnclosingGeometry(const QRectF &enclosingGeometry) {
 }
 
 void QnResourceWidget::setGeometry(const QRectF &geometry) {
-    /* Unfortunately, widgets with constant aspect ratio cannot be implemented
-     * using size hints. So here is one of the workarounds. */
-
-#if 0
-    if(!hasAspectRatio()) {
-        base_type::setGeometry(geometry);
-        return;
-    }
-
-    qreal aspectRatio = geometry.width() / geometry.height();
-    if(qFuzzyCompare(m_aspectRatio, aspectRatio)) {
-        base_type::setGeometry(geometry);
-        return;
-    }
-
-    /* Calculate actual new size. */
-    QSizeF newSize = constrainedSize(geometry.size());
-
-    /* Find anchor point and calculate new position. */
-    QRectF oldGeometry = this->geometry();
-
-    qreal newLeft;
-    if(qFuzzyCompare(oldGeometry.right(), geometry.right())) {
-        newLeft = oldGeometry.right() - newSize.width();
-    } else {
-        newLeft = geometry.left();
-    }
-
-    qreal newTop;
-    if(qFuzzyCompare(oldGeometry.bottom(), geometry.bottom())) {
-        newTop = oldGeometry.bottom() - newSize.height();
-    } else {
-        newTop = geometry.top();
-    }
-
-    base_type::setGeometry(QRectF(QPointF(newLeft, newTop), newSize));
-#endif
-
-    QSizeF oldSize = size();
-
     base_type::setGeometry(geometry);
     setTransformOriginPoint(rect().center());
 
@@ -1131,7 +1091,7 @@ void QnResourceWidget::setDrawMotionWindows(MotionDrawType value)
     m_motionDrawType = value;   
 }
 
-const QList<QnMotionRegion> &QnResourceWidget::getMotionRegionList()
+const QList<QnMotionRegion> &QnResourceWidget::motionRegionList()
 {
     ensureMotionMask();
     return m_motionRegionList;

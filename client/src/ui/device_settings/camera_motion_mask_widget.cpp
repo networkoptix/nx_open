@@ -129,7 +129,7 @@ void QnCameraMotionMaskWidget::setReadOnly(bool readOnly)
 const QList<QnMotionRegion>& QnCameraMotionMaskWidget::motionRegionList() const
 {
     if (m_resourceWidget)
-        return m_resourceWidget->getMotionRegionList();
+        return m_resourceWidget->motionRegionList();
     else
         return QList<QnMotionRegion>();
 }
@@ -173,7 +173,7 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
         
         for(int channel = 0; channel < channelCount; channel++)
             for(int sensitivity = QnMotionRegion::MIN_SENSITIVITY; sensitivity <= QnMotionRegion::MAX_SENSITIVITY; sensitivity++)
-                foreach(const QRect &rect, m_resourceWidget->getMotionRegionList()[channel].getRectsBySens(sensitivity))
+                foreach(const QRect &rect, m_resourceWidget->motionRegionList()[channel].getRectsBySens(sensitivity))
                     counts[sensitivity - QnMotionRegion::MIN_SENSITIVITY] += rect.width() * rect.height();
 
         int bestCount = std::numeric_limits<int>::min();
@@ -263,7 +263,7 @@ bool QnCameraMotionMaskWidget::isValidMotionRegion(){
     if (m_resourceWidget && m_needControlMaxRects) 
     {
         const QnVideoResourceLayout* layout = m_camera->getVideoLayout();
-        const QList<QnMotionRegion> &regions = m_resourceWidget->getMotionRegionList();
+        const QList<QnMotionRegion> &regions = m_resourceWidget->motionRegionList();
         for (int i = 0; i < qMin(regions.size(), layout->numberOfChannels()); ++i) {
             QnMotionRegion::RegionValid kind = regions[i].isValid(m_camera->motionWindowCount(),
                 m_camera->motionMaskWindowCount(), m_camera->motionSensWindowCount());
@@ -303,7 +303,7 @@ void QnCameraMotionMaskWidget::at_motionRegionSelected(QGraphicsView *, QnResour
 
         if (!r.isEmpty()) 
         {
-            QnMotionRegion newRegion = widget->getMotionRegionList()[i];
+            QnMotionRegion newRegion = widget->motionRegionList()[i];
             newRegion.addRect(m_motionSensitivity, r);
             widget->addToMotionRegion(m_motionSensitivity, r, i);
             changed = true;
@@ -320,7 +320,7 @@ void QnCameraMotionMaskWidget::at_motionRegionCleared()
         return;
     bool changed = false;
 
-    const QList<QnMotionRegion> &regions = m_resourceWidget->getMotionRegionList();
+    const QList<QnMotionRegion> &regions = m_resourceWidget->motionRegionList();
     for (int i = 0; i < regions.size(); ++i) {
         if(!regions[i].isEmpty()) {
             changed = true;
