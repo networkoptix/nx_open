@@ -47,29 +47,29 @@ public:
     virtual QnVideoResourceLayout* getVideoLayout() = 0;
     virtual QnResourceAudioLayout* getAudioLayout() = 0;
 
-    virtual AVCodecContext* setAudioChannel(int /*num*/) { return 0; }
+    virtual AVCodecContext* setAudioChannel(int num) { Q_UNUSED(num); return 0; }
     
     // this call inform delegate that reverse mode on/off
-    virtual void onReverseMode(qint64 /*displayTime*/, bool /*value*/) {}
+    virtual void onReverseMode(qint64 displayTime, bool value) { Q_UNUSED(displayTime); Q_UNUSED(value); }
 
     // for optimization. Inform delegate to pause after sending 1 frame
-    virtual void setSingleshotMode(bool /*value*/) {}
+    virtual void setSingleshotMode(bool value) { Q_UNUSED(value); }
 
     // MediaStreamQuality. By default, this function is not implemented. Return: true if need seek for change quality
-    virtual bool setQuality(MediaQuality /*quality*/, bool /*fastSwitch*/) { return false; }
+    virtual bool setQuality(MediaQuality quality, bool fastSwitch) { Q_UNUSED(quality); Q_UNUSED(fastSwitch); return false; }
 
     Flags getFlags() const { return m_flags; }
     virtual bool isRealTimeSource() const { return false; }
     virtual void beforeClose() {}
 
     /** This function calls from reader */
-    virtual void beforeSeek(qint64 /*time*/) {}
+    virtual void beforeSeek(qint64 time) { Q_UNUSED(time); }
 
     /** This function calls from reader */
-    virtual void beforeChangeReverseMode(bool /*reverseMode*/) {}
+    virtual void beforeChangeReverseMode(bool reverseMode) { Q_UNUSED(reverseMode); }
 
     /** This function used for thumbnails loader. Get data with specified media step from specified time interval*/
-    virtual void setRange(qint64 startTime, qint64 endTime, qint64 frameStep) {}
+    virtual void setRange(qint64 startTime, qint64 endTime, qint64 frameStep) { Q_UNUSED(startTime); Q_UNUSED(endTime); Q_UNUSED(frameStep); }
 
 protected:
     Flags m_flags;

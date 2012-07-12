@@ -35,7 +35,6 @@ void QnPlAxisResource::setIframeDistance(int /*frames*/, int /*timems*/)
 
 QnAbstractStreamDataProvider* QnPlAxisResource::createLiveDataProvider()
 {
-    //return new MJPEGtreamreader(toSharedPointer(), "mjpg/video.mjpg");
     return new QnAxisStreamReader(toSharedPointer());
 }
 
@@ -356,7 +355,7 @@ int QnPlAxisResource::toAxisMotionSensitivity(int sensitivity)
     return sens[sensitivity];
 }
 
-void QnPlAxisResource::setMotionMaskPhysical(int channel)
+void QnPlAxisResource::setMotionMaskPhysical(int /*channel*/)
 {
     m_mutex.lock();
 
