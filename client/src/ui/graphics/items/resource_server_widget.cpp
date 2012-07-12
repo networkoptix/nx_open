@@ -17,17 +17,17 @@ QnResourceServerWidget::QnResourceServerWidget(QnWorkbenchContext *context, QnWo
     m_alreadyUpdating(false),
     m_counter(0),
     m_model(tr("Unknown")),
-    m_redrawStatus(Qn::LoadingFrame){
-        for (int i = 0; i < LIMIT; i++)
-            m_history.append(-1);
+    m_redrawStatus(Qn::LoadingFrame)
+{
+    for (int i = 0; i < LIMIT; i++)
+        m_history.append(-1);
 
-        m_timer = new QTimer(this);
-        connect(m_timer, SIGNAL(timeout()), this, SLOT(at_timer_update()));
-        m_timer->start(REQUEST_TIME);
+    m_timer = new QTimer(this);
+    connect(m_timer, SIGNAL(timeout()), this, SLOT(at_timer_update()));
+    m_timer->start(REQUEST_TIME);
 
-        m_background_gradient.setColorAt(0.0, qnGlobals->systemHealthColorBackground());
-        m_background_gradient.setColorAt(1, QColor(0, 0, 0, 0));
-
+    m_background_gradient.setColorAt(0.0, qnGlobals->systemHealthColorBackground());
+    m_background_gradient.setColorAt(1, QColor(0, 0, 0, 0));
 }
 
 void QnResourceServerWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/) {

@@ -64,6 +64,8 @@ public:
     };
     Q_DECLARE_FLAGS(DisplayFlags, DisplayFlag)
 
+    // TODO: remove QnWorkbenchItem from constructor.
+    
     /**
      * Constructor.
      *
