@@ -602,10 +602,6 @@ void QnTimeSlider::setValue(qint64 value, bool keepInWindow) {
     }
 }
 
-qint64 QnTimeSlider::getValue() const {
-    return value();
-}
-
 qint64 QnTimeSlider::selectionStart() const {
     return m_selectionStart;
 }

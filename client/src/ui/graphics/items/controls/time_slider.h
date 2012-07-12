@@ -120,9 +120,6 @@ public:
     using base_type::setValue;
     void setValue(qint64 value, bool keepInWindow);
 
-    using base_type::value;
-    qint64 getValue() const;
-
     qint64 selectionStart() const;
     void setSelectionStart(qint64 selectionStart);
 
