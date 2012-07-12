@@ -63,7 +63,11 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_pausedOverride(false),
     m_lastSpeed(0.0),
     m_lastMinimalSpeed(0.0),
-    m_lastMaximalSpeed(0.0)
+    m_lastMaximalSpeed(0.0),
+    m_lastUpdateSlider(0),
+    m_lastCameraTime(0),
+    m_lastSliderTime(0),
+    m_lastCameraOffset(0)
 {}
     
 QnWorkbenchNavigator::~QnWorkbenchNavigator() {
@@ -643,7 +647,33 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
         qint64 timeUSec = m_currentWidget->display()->camDisplay()->isRealTimeSource() ? DATETIME_NOW : m_currentWidget->display()->camera()->getCurrentTime();
         qint64 timeMSec = timeUSec == DATETIME_NOW ? endTimeMSec : (timeUSec == AV_NOPTS_VALUE ? m_timeSlider->value() : timeUSec / 1000);
 
+        QString d = "msec %1 upd by %2 value %3";
+
+        if (timeUSec != DATETIME_NOW && timeUSec != AV_NOPTS_VALUE){
+            d = d.arg(timeMSec % 100000);
+            qint64 now = QDateTime::currentDateTimeUtc().toMSecsSinceEpoch();
+            if (m_lastUpdateSlider && m_lastCameraTime == timeMSec){
+                d = d.arg((now - m_lastUpdateSlider) * this->speed());
+                m_lastCameraOffset /= 2;
+                timeMSec += (now - m_lastUpdateSlider) * this->speed() - m_lastCameraOffset;
+            } else {
+                m_lastCameraOffset = m_lastSliderTime ? m_lastSliderTime - timeMSec : 0;
+                if (m_lastCameraOffset > 0 && m_lastCameraOffset < 100) //TODO: 25 = const THRESHOLD
+                    timeMSec = m_lastCameraTime;
+                else
+                    m_lastCameraOffset = 0;
+
+                m_lastCameraTime = timeMSec;
+                m_lastUpdateSlider = now;
+                d = d.arg(0);
+            }
+        } else
+            d = d.arg(0).arg(0);
+
+        m_lastSliderTime = timeMSec;
         m_timeSlider->setValue(timeMSec, keepInWindow);
+        d = d.arg(timeMSec % 100000);
+        qDebug() << d;
 
         if(timeUSec != AV_NOPTS_VALUE)
             updateLive();

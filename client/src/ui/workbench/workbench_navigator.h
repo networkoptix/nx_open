@@ -205,6 +205,11 @@ private:
     qreal m_lastMinimalSpeed;
     qreal m_lastMaximalSpeed;
 
+    qint64 m_lastUpdateSlider;
+    qint64 m_lastCameraTime;
+    qint64 m_lastSliderTime;
+    qint64 m_lastCameraOffset;
+
     QAction *m_startSelectionAction, *m_endSelectionAction, *m_clearSelectionAction;
 
     /** Widget to per-widget slider data mapping. */
