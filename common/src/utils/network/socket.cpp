@@ -649,34 +649,6 @@ int UDPSocket::recvFrom(void *buffer, int bufferLen, QString &sourceAddress,
     return rtn;
 }
 
-bool Socket::bindToInterface(const QString& iface)
-{
-#ifdef Q_OS_LINUX
-    setLocalPort(0);
-    bool res = setsockopt(handle(), SOL_SOCKET, SO_BINDTODEVICE, iface.toAscii().constData(), iface.length()) >= 0;
-#else
-    bool res = setLocalAddressAndPort(iface, 0);
-#endif
-
-    if (!res)
-        qDebug() << "bindToInterface(): Can't bind to interface" << iface << "error code=" << strerror(errno);
-    return res;
-}
-
-bool Socket::bindToInterface(const QString& iface)
-{
-#ifdef Q_OS_LINUX
-    setLocalPort(0);
-    bool res = setsockopt(handle(), SOL_SOCKET, SO_BINDTODEVICE, iface.toAscii().constData(), iface.length()) >= 0;
-#else
-    bool res = setLocalAddressAndPort(iface, 0);
-#endif
-
-    if (!res)
-        qDebug() << "bindToInterface(): Can't bind to interface" << iface << "error code=" << strerror(errno);
-    return res;
-}
-
 bool Socket::bindToInterface(const QnInterfaceAndAddr& iface)
 {
 #ifdef Q_OS_LINUX
