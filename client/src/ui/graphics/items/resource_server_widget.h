@@ -13,6 +13,7 @@
 
 namespace Qn {
 
+    // TODO: remove this?
     enum RedrawStatus {
         NewFrame,     /**< New frame needs to be rendered. */
         OldFrame,     /**< No new frames available, old frame needs to be rendered. */
@@ -36,14 +37,18 @@ public:
     /**
      * Virtual destructor.
      */
-    virtual ~QnResourceServerWidget(){}
+    virtual ~QnResourceServerWidget() {}
+
 public slots:
     void at_statistics_received(int usage, const QByteArray &model);
     void at_timer_update();
+
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+
 protected slots:
     virtual void updateOverlayText() override;
+
 private:
     void drawStatistics(int width, int height, QPainter *painter);
 

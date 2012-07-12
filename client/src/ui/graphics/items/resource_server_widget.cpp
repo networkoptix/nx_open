@@ -88,7 +88,7 @@ void QnResourceServerWidget::at_statistics_received(int usage, const QByteArray 
         m_history.pop_front();
 }
 
-QPainterPath scalePath(const QPainterPath &source, qreal offset, qreal height){
+QPainterPath scalePath(const QPainterPath &source, qreal offset, qreal height){ // TODO: use QTransform instead
     QPainterPath path;
     path.addPath(source);
     for (int i=0; i<path.elementCount(); ++i)  {
@@ -144,7 +144,7 @@ void QnResourceServerWidget::drawStatistics(int width, int height, QPainter *pai
     painter->setPen(main_pen);
 
     painter->drawRect(inner);
-    painter->setClipRect(inner);
+    painter->setClipRect(inner); // TODO: it's better to avoid clipping.
 
     const qreal x_step = (qreal)ow*1.0/(LIMIT - 2);
     const qreal x_step2 = x_step / 2;
