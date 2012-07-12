@@ -214,7 +214,7 @@ void QnResourceServerWidget::drawStatistics(int width, int height, QPainter *pai
         painter->setBrush(gradient);
         painter->drawPath(result_path);
     }
-    else
+    else // TODO: code style. if 'if' part has {}, then 'else' part should also have them.
         painter->strokePath(result_path, main_pen);
     painter->setClipping(false);
 
