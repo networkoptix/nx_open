@@ -2,12 +2,12 @@
 #define QN_MATH_H
 
 #include <cmath>
+#include <cfloat>
 
 #include <QtCore/QtGlobal>
 #include <QtCore/qnumeric.h>
 
 #include "fuzzy.h"
-#include "float.h"
 
 
 #ifndef M_E
@@ -76,6 +76,10 @@ inline static quint64 htonll(quint64 x) { return x;}
 inline static quint64 ntohll(quint64 x)  { return x;}
 #endif
 
+template<class T>
+inline bool qIsPower2(T value) {
+    return (value & (value - 1)) == 0;
+}
 
 /**
  * \param value                         Value to round up.
@@ -131,6 +135,7 @@ template<class T>
 T qRound(T value, T step) {
     return qCeil(value - step / 2, step);
 }
+
 
 
 /**

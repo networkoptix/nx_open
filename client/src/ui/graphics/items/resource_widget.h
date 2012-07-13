@@ -51,6 +51,13 @@ public:
     };
     Q_DECLARE_FLAGS(DisplayFlags, DisplayFlag)
 
+    enum Button {
+        CloseButton                 = 0x1,
+        InfoButton                  = 0x2,
+        RotateButton                = 0x4,
+    };
+    Q_DECLARE_FLAGS(Buttons, Button);
+
     /**
      * Constructor.
      *
@@ -357,6 +364,7 @@ private:
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::DisplayFlags);
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::Buttons);
 Q_DECLARE_METATYPE(QnResourceWidget *)
 
 #endif // QN_RESOURCE_WIDGET_H

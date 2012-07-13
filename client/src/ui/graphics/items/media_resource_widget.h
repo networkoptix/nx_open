@@ -16,8 +16,12 @@ class QnMediaResourceWidget: public QnResourceWidget {
     typedef QnResourceWidget base_type;
 
 public:
+    static const Button MotionSearchButton = 0x8;
+#define MotionSearchButton MotionSearchButton
+
     QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent = NULL);
     virtual ~QnMediaResourceWidget();
+
 
     /**
      * \returns                         Resource associated with this widget.
