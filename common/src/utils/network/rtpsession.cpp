@@ -521,9 +521,13 @@ bool RTPSession::sendSetup()
             if (!m_isAudioEnabled || audioNum++ != m_selectedAudioChannel)
                 continue;
         }
-        else if (trackInfo->trackType != TT_VIDEO)
+        else if (trackInfo->trackType == TT_VIDEO)
         {
-            continue; // skip metadata e.t.c
+            ;
+        }
+        else if (trackInfo->codecName != "ffmpeg-metadata")
+        {
+            continue; // skip unknown metadata e.t.c
         }
 
         QByteArray request;

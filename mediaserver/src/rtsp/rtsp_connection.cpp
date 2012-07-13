@@ -254,10 +254,19 @@ void QnRtspConnectionProcessor::sendResponse(int code)
     QnTCPConnectionProcessor::sendResponse("RTSP", code, "application/sdp");
 }
 
-int QnRtspConnectionProcessor::getMetadataChannelNum() const
+int QnRtspConnectionProcessor::getMetadataTcpChannel() const
 {
     Q_D(const QnRtspConnectionProcessor);
-    return d->metadataChannelNum;
+    return getAVTcpChannel(d->metadataChannelNum);
+}
+
+int QnRtspConnectionProcessor::getAVTcpChannel(int trackNum) const
+{
+    Q_D(const QnRtspConnectionProcessor);
+    if (d->trackPorts.contains(trackNum))
+        return d->trackPorts.value(trackNum).first;
+    else
+        return -1;
 }
 
 int QnRtspConnectionProcessor::numOfVideoChannels()

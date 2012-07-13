@@ -28,7 +28,8 @@ public:
     bool isSecondaryLiveDPSupported() const;
     QHostAddress getPeerAddress() const;
     QString getRangeHeaderIfChanged();
-    int getMetadataChannelNum() const;
+    int getMetadataTcpChannel() const;
+    int getAVTcpChannel(int trackNum) const;
 protected:
     virtual void run();
     void addResponseRangeHeader();
