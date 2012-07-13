@@ -1,7 +1,10 @@
 #include "resource_widget.h"
+
 #include <cassert>
-#include <QPainter>
-#include <QGraphicsLinearLayout>
+#include <cmath>
+
+#include <QtGui/QPainter>
+#include <QtGui/QGraphicsLinearLayout>
 
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -23,23 +26,14 @@
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/items/standard/graphics_label.h>
-
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 
-#include <camera/resource_display.h>
-#include <plugins/resources/archive/abstract_archive_stream_reader.h>
-
-#include "camera/camdisplay.h"
-#include "resource_widget_renderer.h"
-#include "utils/settings.h"
-#include "math.h"
 #include "image_button_widget.h"
 #include "viewport_bound_widget.h"
-#include "utils/media/ffmpeg_helper.h"
 
 namespace {
 
@@ -81,11 +75,13 @@ namespace {
     };
 
     typedef QnGlContextData<QnLoadingProgressPainter, QnLoadingProgressPainterFactory> QnLoadingProgressPainterStorage;
-    Q_GLOBAL_STATIC(QnLoadingProgressPainterStorage, qn_loadingProgressPainterStorage);
+    Q_GLOBAL_STATIC(QnLoadingProgressPainterStorage, qn_resourceWidget_loadingProgressPainterStorage);
 
-    /** Paused painter storage. */
-    Q_GLOBAL_STATIC(QnGlContextData<QnPausedPainter>, qn_pausedPainterStorage);
-}
+    Q_GLOBAL_STATIC(QnGlContextData<QnPausedPainter>, qn_resourceWidget_pausedPainterStorage);
+
+    Q_GLOBAL_STATIC(QnDefaultDeviceVideoLayout, qn_resourceWidget_defaultContentLayout);
+
+} // anonymous namespace
 
 
 // -------------------------------------------------------------------------- //
@@ -235,34 +231,13 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_footerOverlayWidget->setAcceptedMouseButtons(0);
     m_footerOverlayWidget->setOpacity(0.0);
 
-    connect(this, SIGNAL(updateOverlayTextLater()), this, SLOT(updateOverlayText()), Qt::QueuedConnection);
 
-
-    /* Set up motion-related stuff. */
-    m_motionMaskBinData.resize(CL_MAX_CHANNELS);
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
-        m_motionMaskBinData[i] = (__m128i*) qMallocAligned(MD_WIDTH * MD_HEIGHT/8, 32);
-        memset(m_motionMaskBinData[i], 0, MD_WIDTH * MD_HEIGHT/8);
-    }
-
-
-    /* Set up video rendering. */
+    /* Initialize resource. */
     m_resource = qnResPool->getEnabledResourceByUniqueId(item->resourceUid());
     if(!m_resource)
         m_resource = qnResPool->getResourceByUniqId(item->resourceUid());
-    m_display = new QnResourceDisplay(m_resource, this);
-    connect(m_resource.data(), SIGNAL(resourceChanged()), this, SLOT(at_resource_resourceChanged()));
-    connect(m_resource.data(), SIGNAL(nameChanged()), this, SLOT(at_resource_nameChanged()));
-    connect(m_display->camDisplay(), SIGNAL(stillImageChanged()), this, SLOT(updateButtonsVisibility()));
-
-    Q_ASSERT(m_display);
-    m_contentLayout = m_display->videoLayout();
-    Q_ASSERT(m_contentLayout);
-    m_channelCount = m_contentLayout->numberOfChannels();
-
-    m_renderer = new QnResourceWidgetRenderer(m_channelCount);
-    connect(m_renderer, SIGNAL(sourceSizeChanged(const QSize &)), this, SLOT(at_sourceSizeChanged(const QSize &)));
-    m_display->addRenderer(m_renderer);
+    connect(m_resource.data(), SIGNAL(nameChanged()), this, SLOT(updateTitleText()));
+    setContentLayout(qn_resourceWidget_defaultContentLayout());
 
 
     /* Init static text. */
@@ -275,18 +250,9 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_unauthorizedStaticText2.setText(tr("Please check authentication information in camera settings"));
     m_unauthorizedStaticText2.setPerformanceHint(QStaticText::AggressiveCaching);
 
-    for (int i = 0; i < 10; ++i) {
-        m_sensStaticText[i].setText(QString::number(i));
-        m_sensStaticText[i].setPerformanceHint(QStaticText::AggressiveCaching);
-    }
-
-
-    /* Set up per-channel state. */
-    m_channelState.resize(m_channelCount);
-
 
     /* Run handlers. */
-    at_resource_nameChanged();
+    updateTitleText();
     updateButtonsVisibility();
 }
 
@@ -344,6 +310,14 @@ void QnResourceWidget::setTitleText(const QString &titleText) {
     m_headerLabel->setText(titleText);
 }
 
+QString QnResourceWidget::calculateTitleText() const {
+    return m_resource->getName();
+}
+
+void QnResourceWidget::updateTitleText() {
+    setTitleText(calculateTitleText());
+}
+
 QString QnResourceWidget::infoText() {
     QString leftText = m_footerLeftLabel->text();
     QString rightText = m_footerRightLabel->text();
@@ -365,6 +339,14 @@ void QnResourceWidget::setInfoText(const QString &infoText) {
     m_footerRightLabel->setText(rightText);
 }
 
+QString QnResourceWidget::calculateInfoText() const {
+    return QString();
+}
+
+void QnResourceWidget::updateInfoText() {
+    setInfoText(calculateInfoText());
+}
+
 QSizeF QnResourceWidget::constrainedSize(const QSizeF constraint) const {
     if(!hasAspectRatio())
         return constraint;
@@ -383,8 +365,6 @@ QSizeF QnResourceWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) 
 
     return result;
 }
-
-
 
 QRectF QnResourceWidget::channelRect(int channel) const {
     if (m_contentLayout->numberOfChannels() == 1)
@@ -561,25 +541,24 @@ QnResourceWidget::Overlay QnResourceWidget::calculateChannelOverlay(int channel)
     }
 }
 
+void QnResourceWidget::updateChannelOverlay(int channel) {
+    setChannelOverlay(channel, calculateChannelOverlay(channel));
+}
+
+const QnVideoResourceLayout *QnResourceWidget::contentLayout() const {
+    return m_contentLayout;
+}
+
+void QnResourceWidget::setContentLayout(const QnVideoResourceLayout *contentLayout) {
+    m_contentLayout = contentLayout;
+
+    m_channelState.resize(m_contentLayout->numberOfChannels());
+}
+
 
 // -------------------------------------------------------------------------- //
 // Painting
 // -------------------------------------------------------------------------- //
-void QnResourceWidget::paintFlashingText(QPainter *painter, const QStaticText &text, qreal textSize, const QPointF &offset) {
-    qreal unit = channelRect(0).width();
-
-    QFont font;
-    font.setPointSizeF(textSize * unit);
-    font.setStyleHint(QFont::SansSerif, QFont::ForceOutline);
-    QnScopedPainterFontRollback fontRollback(painter, font);
-    QnScopedPainterPenRollback penRollback(painter, QPen(QColor(255, 208, 208, 196)));
-
-    qreal opacity = painter->opacity();
-    painter->setOpacity(opacity * qAbs(sin(QDateTime::currentMSecsSinceEpoch() / qreal(TEXT_FLASHING_PERIOD * 2) * M_PI)));
-    painter->drawStaticText(rect().center() - toPoint(text.size() / 2) + offset * unit, text);
-    painter->setOpacity(opacity);
-}
-
 void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/) {
     if (painter->paintEngine() == NULL) {
         qnWarning("No OpenGL-compatible paint engine was found.");
@@ -592,8 +571,8 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     }
 
     if(m_pausedPainter.isNull()) {
-        m_pausedPainter = qn_pausedPainterStorage()->get(QGLContext::currentContext());
-        m_loadingProgressPainter = qn_loadingProgressPainterStorage()->get(QGLContext::currentContext());
+        m_pausedPainter = qn_resourceWidget_pausedPainterStorage()->get(QGLContext::currentContext());
+        m_loadingProgressPainter = qn_resourceWidget_loadingProgressPainterStorage()->get(QGLContext::currentContext());
     }
 
     QnScopedPainterPenRollback penRollback(painter);
@@ -633,7 +612,7 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
         m_channelState[i].renderStatus = renderStatus;
         if(renderStatus == Qn::NewFrameRendered)
             m_channelState[i].lastNewFrameTimeMSec = currentTimeMSec;
-        setChannelOverlay(i, calculateChannelOverlay(i));
+        updateChannelOverlay(i);
 
 #if 0
         updateOverlay(i);
@@ -688,6 +667,21 @@ void QnResourceWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGra
     painter->fillRect(QRectF(-fw,     h,       w + fw * 2,  fw), color);
     painter->fillRect(QRectF(-fw,     0,       fw,          h),  color);
     painter->fillRect(QRectF(w,       0,       fw,          h),  color);
+}
+
+void QnResourceWidget::paintFlashingText(QPainter *painter, const QStaticText &text, qreal textSize, const QPointF &offset) {
+    qreal unit = channelRect(0).width();
+
+    QFont font;
+    font.setPointSizeF(textSize * unit);
+    font.setStyleHint(QFont::SansSerif, QFont::ForceOutline);
+    QnScopedPainterFontRollback fontRollback(painter, font);
+    QnScopedPainterPenRollback penRollback(painter, QPen(QColor(255, 208, 208, 196)));
+
+    qreal opacity = painter->opacity();
+    painter->setOpacity(opacity * qAbs(std::sin(QDateTime::currentMSecsSinceEpoch() / qreal(TEXT_FLASHING_PERIOD * 2) * M_PI)));
+    painter->drawStaticText(rect().center() - toPoint(text.size() / 2) + offset * unit, text);
+    painter->setOpacity(opacity);
 }
 
 void QnResourceWidget::paintSelection(QPainter *painter, const QRectF &rect) {
@@ -810,10 +804,6 @@ void QnResourceWidget::at_sourceSizeChanged(const QSize &size) {
     setGeometry(expanded(m_aspectRatio, enclosingGeometry, Qt::KeepAspectRatio));
 
     emit aspectRatioChanged(oldAspectRatio, newAspectRatio);
-}
-
-void QnResourceWidget::at_resource_nameChanged() {
-    m_headerLabel->setText(m_resource->getName());
 }
 
 void QnResourceWidget::at_searchButton_toggled(bool checked) {

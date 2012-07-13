@@ -93,6 +93,9 @@ protected:
     void invalidateMotionMaskBinData();
 
 private:
+    /** Media resource. */
+    QnMediaResourcePtr m_resource;
+
     /** Display. */
     QnResourceDisplay *m_display;
 
@@ -113,6 +116,9 @@ private:
 
     /** Whether motion mask binary data is valid. */
     bool m_motionMaskBinDataValid;
+
+
+    QStaticText m_sensStaticText[10];
 
 };
 

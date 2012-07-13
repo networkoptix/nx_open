@@ -1,6 +1,10 @@
 #include "media_resource_widget.h"
 
+#include <utils/common/warnings.h>
+
 #include <camera/resource_display.h>
+#include <camera/camdisplay.h>
+
 
 #include "resource_widget_renderer.h"
 
@@ -8,11 +12,38 @@
 QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent):
     QnResourceWidget(context, item, parent)
 {
-    
+    m_resource = base_type::resource().dynamicCast<QnMediaResource>();
+    if(!m_resource) 
+        qnCritical("Media resource widget was created with a non-media resource.");
+
+    /* Set up motion-related stuff. */
+    m_motionMaskBinData.resize(CL_MAX_CHANNELS);
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
+        m_motionMaskBinData[i] = (__m128i*) qMallocAligned(MD_WIDTH * MD_HEIGHT/8, 32);
+        memset(m_motionMaskBinData[i], 0, MD_WIDTH * MD_HEIGHT/8);
+    }
+
+    /* Set up video rendering. */
+    m_display = new QnResourceDisplay(m_resource, this);
+    connect(m_resource.data(), SIGNAL(resourceChanged()), this, SLOT(at_resource_resourceChanged()));
+    connect(m_display->camDisplay(), SIGNAL(stillImageChanged()), this, SLOT(updateButtonsVisibility()));
+
+    m_contentLayout = m_display->videoLayout();
+    m_channelCount = m_contentLayout->numberOfChannels();
+
+    m_renderer = new QnResourceWidgetRenderer(m_channelCount);
+    connect(m_renderer, SIGNAL(sourceSizeChanged(const QSize &)), this, SLOT(at_sourceSizeChanged(const QSize &)));
+    m_display->addRenderer(m_renderer);
+
+
+    for (int i = 0; i < 10; ++i) {
+        m_sensStaticText[i].setText(QString::number(i));
+        m_sensStaticText[i].setPerformanceHint(QStaticText::AggressiveCaching);
+    }
+
 }
 
 QnMediaResourceWidget::~QnMediaResourceWidget() {
-
     delete m_display;
 
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)

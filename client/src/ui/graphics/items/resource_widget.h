@@ -36,11 +36,6 @@ class QnImageButtonWidget;
 class GraphicsLabel;
 class Instrument;
 
-/* Get rid of stupid win32 defines. */
-#ifdef NoDataOverlay
-#   undef NoDataOverlay
-#endif
-
 class QnResourceWidget: public Shaded<Instrumented<GraphicsWidget> >, public QnWorkbenchContextAware, public ConstrainedResizable, public FrameSectionQuearyable, protected QnGeometry {
     Q_OBJECT;
     Q_PROPERTY(qreal frameOpacity READ frameOpacity WRITE setFrameOpacity);
@@ -182,7 +177,7 @@ public:
      * \returns                         Status of the last rendering operation.
      */
     Qn::RenderStatus currentRenderStatus() const {
-        return m_renderStatus;
+        return m_channelState[0].renderStatus;
     }
 
     /**
@@ -233,20 +228,21 @@ protected:
         UnauthorizedOverlay
     };
 
+    virtual Qt::WindowFrameSection windowFrameSectionAt(const QPointF &pos) const override;
+    virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override;
+
+    virtual bool windowFrameEvent(QEvent *event) override;
+    virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
+    virtual void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
+    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
+
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual Qn::RenderStatus paintChannel(QPainter *painter, int channel, const QRectF &rect) = 0;
     virtual void paintOverlay(QPainter *painter, const QRectF &rect, Overlay overlay, qreal opacity);
     
     void paintSelection(QPainter *painter, const QRectF &rect);
-
-    virtual Qt::WindowFrameSection windowFrameSectionAt(const QPointF &pos) const override;
-    virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override;
-    
-    virtual bool windowFrameEvent(QEvent *event) override;
-    virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
-    virtual void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
-    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
+    void paintFlashingText(QPainter *painter, const QStaticText &text, qreal textSize, const QPointF &offset = QPointF());
 
     virtual QSizeF constrainedSize(const QSizeF constraint) const override;
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint) const override;
@@ -258,19 +254,24 @@ protected:
     Overlay channelOverlay(int channel) const;
     void setChannelOverlay(int channel, Overlay overlay);
     virtual Overlay calculateChannelOverlay(int channel) const;
+    Q_SLOT void updateChannelOverlay(int channel);
+
+    virtual QString calculateTitleText() const;
+    Q_SLOT void updateTitleText();
+
+    virtual QString calculateInfoText() const;
+    Q_SLOT void updateInfoText();
+
+    const QnVideoResourceLayout *contentLayout() const;
+    void setContentLayout(const QnVideoResourceLayout *contentLayout);
 
     void ensureAboutToBeDestroyedEmitted();
 
-signals:
-    void updateOverlayTextLater();
-
 protected slots:
-    virtual void updateOverlayText();
     void updateButtonsVisibility();
 
     void at_sourceSizeChanged(const QSize &size);
     void at_resource_resourceChanged();
-    void at_resource_nameChanged();
     void at_searchButton_toggled(bool checked);
 
 protected:
@@ -292,10 +293,6 @@ protected:
         /** Last render status. */
         Qn::RenderStatus renderStatus;
     };
-
-    void setChannelOverlay(int channel, Overlay overlay);
-
-    void paintFlashingText(QPainter *painter, const QStaticText &text, qreal textSize, const QPointF &offset = QPointF());
 
 
 private:
@@ -365,7 +362,6 @@ private:
     QStaticText m_offlineStaticText;
     QStaticText m_unauthorizedStaticText;
     QStaticText m_unauthorizedStaticText2;
-    QStaticText m_sensStaticText[10];
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::DisplayFlags);
