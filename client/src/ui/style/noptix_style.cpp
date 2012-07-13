@@ -340,17 +340,26 @@ bool QnNoptixStyle::drawProgressBarControl(const QStyleOption *option, QPainter 
     if (!pb)
         return false;
 
-    bool hovered = (option->state & State_Enabled) && (option->state & State_MouseOver);
-    bool reversed = pb->direction == Qt::RightToLeft;
-    if (pb->invertedAppearance)
-        reversed = !reversed;
-    const bool vertical = (pb->orientation == Qt::Vertical); // TODO: Not supported for now.
-    const bool busy = pb->maximum == pb->minimum;
-    
-    const qreal progress = busy ? 1.0 : pb->progress / static_cast<qreal>(pb->maximum - pb->minimum);
-    
     int x,y,w,h;
     pb->rect.getRect(&x, &y, &w, &h);
+
+    const bool vertical = (pb->orientation == Qt::Vertical);
+
+    painter->save();
+    if (vertical){
+        QTransform transform(painter->transform());
+        if (pb->bottomToTop)
+            painter->setTransform(transform.translate(0.0, h).rotate(-90));
+        else
+            painter->setTransform(transform.translate(w, 0.0).rotate(90));
+        int t = w;
+        w = h;
+        h = t;
+    }
+
+    const bool busy = pb->maximum == pb->minimum;
+    
+    const qreal progress = busy ? 1.0 : pb->progress / qreal(pb->maximum - pb->minimum);
 
     qreal animationProgress = 0.0;
     if (!m_animator->isRunning(widget)) {
@@ -363,7 +372,7 @@ bool QnNoptixStyle::drawProgressBarControl(const QStyleOption *option, QPainter 
         }
     }
 
-    painter->save();
+   
     painter->setPen(Qt::NoPen);
 
     /* Draw progress indicator. */
@@ -408,23 +417,7 @@ bool QnNoptixStyle::drawProgressBarControl(const QStyleOption *option, QPainter 
 
     /* Draw label. */
     if (pb->textVisible) {
-        QRect rect = pb->rect;
-        if (pb->orientation == Qt::Vertical) {
-            /* Vertical progress bar have text rotated by 90 or 270 degrees. */
-            rect.setHeight(w); 
-            rect.setWidth(h);
-
-            QMatrix m;
-            if (pb->bottomToTop) { 
-                m.translate(0.0, pb->rect.height()); 
-                m.rotate(-90); 
-            } else { 
-                m.translate(pb->rect.width(), 0.0); 
-                m.rotate(90); 
-            }
-            painter->setMatrix(m, true);
-        }
-
+        QRect rect(x, y, w, h);
         QnTextPixmapCache *cache = QnTextPixmapCache::instance();
         QPixmap textPixmap = cache->pixmap(pb->text, painter->font(), pb->palette.color(QPalette::WindowText));
         painter->drawPixmap(QnGeometry::aligned(textPixmap.size(), rect, Qt::AlignCenter), textPixmap);
