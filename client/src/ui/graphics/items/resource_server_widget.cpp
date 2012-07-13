@@ -31,7 +31,7 @@ QnResourceServerWidget::QnResourceServerWidget(QnWorkbenchContext *context, QnWo
 }
 
 void QnResourceServerWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/) {
-    assertPainters();
+    //assertPainters();
 
     switch (m_redrawStatus)
     {
@@ -53,18 +53,18 @@ void QnResourceServerWidget::paint(QPainter *painter, const QStyleOptionGraphics
     //glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    paintOverlay(0, rect());
+    //paintOverlay(0, rect());
     glDisable(GL_BLEND);
     //glPopAttrib();
     painter->endNativePainting();
 
-    if(m_footerOverlayWidget->isVisible() && !qFuzzyIsNull(m_footerOverlayWidget->opacity())) 
-        emit updateOverlayTextLater();
+    /*if(m_footerOverlayWidget->isVisible() && !qFuzzyIsNull(m_footerOverlayWidget->opacity())) 
+        emit updateOverlayTextLater();*/
 }
 
-void QnResourceServerWidget::updateOverlayText(){
+/*void QnResourceServerWidget::updateOverlayText(){
     m_footerLeftLabel->setText(tr("CPU Model: %1").arg(m_model));
-}
+}*/
 
 void QnResourceServerWidget::at_timer_update(){
     if (m_alreadyUpdating){

@@ -208,7 +208,7 @@ public:
     using base_type::mapRectToScene;
 
 signals:
-    void aspectRatioChanged(qreal oldAspectRatio, qreal newAspectRatio);
+    void aspectRatioChanged();
     void aboutToBeDestroyed();
     void displayFlagsChanged();
     void rotationStartRequested();
@@ -262,6 +262,8 @@ protected:
     void setChannelLayout(const QnVideoResourceLayout *channelLayout);
     virtual void channelLayoutChangedNotify() {}
     
+    virtual void displayFlagsChangedNotify(DisplayFlags changedFlags) { Q_UNUSED(changedFlags); }
+
     int channelCount() const;
 
     QRectF channelRect(int channel) const;

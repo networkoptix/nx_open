@@ -62,7 +62,7 @@ public:
     /**
      * \returns                         Current motion selection regions.
      */
-    QList<QRegion> motionSelection() const;
+    const QList<QRegion> &motionSelection() const;
 
 
     // TODO: what channel does here? WTF????
@@ -72,7 +72,7 @@ public:
 
     void clearMotionSensitivity();
 
-    QList<QnMotionRegion> motionSensitivity() const;
+    const QList<QnMotionRegion> &motionSensitivity() const;
 
     bool isMotionSensitivityEmpty() const;
 
@@ -86,6 +86,7 @@ public slots:
 protected:
     virtual void channelLayoutChangedNotify() override;
     virtual void channelScreenSizeChangedNotify() override;
+    virtual void displayFlagsChangedNotify(DisplayFlags changedFlags) override;
 
     virtual QString calculateInfoText() const override;
 

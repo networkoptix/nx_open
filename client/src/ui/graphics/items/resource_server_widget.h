@@ -48,7 +48,7 @@ protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
 protected slots:
-    virtual void updateOverlayText() override;
+    //virtual void updateOverlayText() override;
 
 private:
     void drawStatistics(int width, int height, QPainter *painter);

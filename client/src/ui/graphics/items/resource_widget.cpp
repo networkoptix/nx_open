@@ -23,8 +23,6 @@
 #include <ui/graphics/painters/loading_progress_painter.h>
 #include <ui/graphics/painters/paused_painter.h>
 #include <ui/graphics/instruments/transform_listener_instrument.h>
-#include <ui/graphics/instruments/motion_selection_instrument.h>
-#include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
@@ -122,8 +120,6 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_headerLabel = new GraphicsLabel();
     m_headerLabel->setAcceptedMouseButtons(0);
     m_headerLabel->setPerformanceHint(QStaticText::AggressiveCaching);
-
-    qreal buttonSize = 24; /* In pixels. */
 
 #if 0
     QnImageButtonWidget *togglePinButton = new QnImageButtonWidget();
@@ -277,18 +273,16 @@ void QnResourceWidget::setFrameWidth(qreal frameWidth) {
 }
 
 void QnResourceWidget::setAspectRatio(qreal aspectRatio) {
-    qreal oldAspectRatio = m_aspectRatio;
-    qreal newAspectRatio = aspectRatio;
-    if(qFuzzyCompare(oldAspectRatio, newAspectRatio))
+    if(qFuzzyCompare(m_aspectRatio, aspectRatio))
         return;
 
     QRectF enclosingGeometry = this->enclosingGeometry();
-    m_aspectRatio = newAspectRatio;
+    m_aspectRatio = aspectRatio;
 
     updateGeometry(); /* Discard cached size hints. */
     setGeometry(expanded(m_aspectRatio, enclosingGeometry, Qt::KeepAspectRatio));
 
-    emit aspectRatioChanged(oldAspectRatio, newAspectRatio);
+    emit aspectRatioChanged();
 }
 
 void QnResourceWidget::setEnclosingAspectRatio(qreal enclosingAspectRatio) {
@@ -466,23 +460,13 @@ void QnResourceWidget::setDisplayFlags(DisplayFlags flags) {
     DisplayFlags changedFlags = m_displayFlags ^ flags;
     m_displayFlags = flags;
 
-    if(changedFlags & DisplayMotion) {
-        QnAbstractArchiveReader *reader = m_display->archiveReader();
-        if (reader)
-            reader->setSendMotion(flags & DisplayMotion);
-
-        m_searchButton->setChecked(flags & DisplayMotion);
-
-        if(flags & DisplayMotion) {
-            setProperty(Qn::MotionSelectionModifiers, 0);
-        } else {
-            setProperty(Qn::MotionSelectionModifiers, QVariant()); /* Use defaults. */
-        }
-    }
 
     if(changedFlags & DisplayButtons)
         m_headerOverlayWidget->setVisible(flags & DisplayButtons);
 
+
+
+    displayFlagsChangedNotify(flags);
     emit displayFlagsChanged();
 }
 

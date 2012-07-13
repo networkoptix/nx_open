@@ -2,6 +2,8 @@
 
 #include <QtGui/QPainter>
 
+#include <plugins/resources/archive/abstract_archive_stream_reader.h>
+
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 
@@ -11,6 +13,7 @@
 #include <camera/resource_display.h>
 #include <camera/camdisplay.h>
 
+#include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/common/color_transformations.h>
 #include <ui/style/globals.h>
 
@@ -89,7 +92,7 @@ QPoint QnMediaResourceWidget::channelGridOffset(int channel) const {
     return QPoint(channelLayout()->h_position(channel) * MD_WIDTH, channelLayout()->v_position(channel) * MD_HEIGHT);
 }
 
-QList<QRegion> QnMediaResourceWidget::motionSelection() const {
+const QList<QRegion> &QnMediaResourceWidget::motionSelection() const {
     return m_motionSelection;
 }
 
@@ -183,7 +186,7 @@ void QnMediaResourceWidget::clearMotionSensitivity() {
     invalidateBinaryMotionMask();
 }
 
-QList<QnMotionRegion> QnMediaResourceWidget::motionSensitivity() const {
+const QList<QnMotionRegion> &QnMediaResourceWidget::motionSensitivity() const {
     ensureMotionSensitivity();
 
     return m_motionSensitivity;
@@ -360,6 +363,21 @@ void QnMediaResourceWidget::channelScreenSizeChangedNotify() {
     m_renderer->setChannelScreenSize(channelScreenSize());
 }
 
+void QnMediaResourceWidget::displayFlagsChangedNotify(DisplayFlags changedFlags) {
+    if(changedFlags & DisplayMotion) {
+        if (QnAbstractArchiveReader *reader = m_display->archiveReader())
+            reader->setSendMotion(displayFlags() & DisplayMotion);
+
+        m_searchButton->setChecked(flags & DisplayMotion);
+
+        if(displayFlags() & DisplayMotion) {
+            setProperty(Qn::MotionSelectionModifiers, 0);
+        } else {
+            setProperty(Qn::MotionSelectionModifiers, QVariant()); /* Use defaults. */
+        }
+    }
+}
+
 QString QnMediaResourceWidget::calculateInfoText() const {
     qreal fps = 0.0;
     qreal mbps = 0.0;
@@ -394,3 +412,4 @@ void QnMediaResourceWidget::at_resource_resourceChanged() {
 void QnMediaResourceWidget::at_renderer_sourceSizeChanged(const QSize &size) {
     setAspectRatio(static_cast<qreal>(size.width() * channelLayout()->width()) / (size.height() * channelLayout()->height()));
 }
+

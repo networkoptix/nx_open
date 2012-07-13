@@ -1,5 +1,7 @@
 #include "camera_motion_mask_widget.h"
 
+#include <limits>
+
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QMessageBox>
 
@@ -16,7 +18,7 @@
 #include "ui/graphics/instruments/resizing_instrument.h"
 #include "ui/graphics/instruments/forwarding_instrument.h"
 #include "ui/graphics/instruments/rubber_band_instrument.h"
-#include "ui/graphics/items/resource_widget.h"
+#include "ui/graphics/items/media_resource_widget.h"
 #include "ui/workbench/workbench_item.h"
 #include "ui/workbench/workbench.h"
 #include "ui/workbench/workbench_grid_mapper.h"
@@ -24,9 +26,7 @@
 #include "ui/workbench/workbench_controller.h"
 #include "ui/workbench/workbench_layout.h"
 #include "ui/workbench/workbench_context.h"
-#include "camera/resource_display.h" // TODO: remove
 #include "ui/style/globals.h"
-#include <limits>
 
 
 QnCameraMotionMaskWidget::QnCameraMotionMaskWidget(QWidget *parent): 
@@ -37,8 +37,7 @@ QnCameraMotionMaskWidget::QnCameraMotionMaskWidget(QWidget *parent):
 	init();
 }
 
-void QnCameraMotionMaskWidget::init()
-{
+void QnCameraMotionMaskWidget::init() {
     m_motionSensitivity = 0;
 
     /* Set up scene & view. */
@@ -103,17 +102,15 @@ void QnCameraMotionMaskWidget::init()
     setLayout(layout);
 }
 
-QnCameraMotionMaskWidget::~QnCameraMotionMaskWidget()
-{
+QnCameraMotionMaskWidget::~QnCameraMotionMaskWidget() {
+    return;
 }
 
-bool QnCameraMotionMaskWidget::isReadOnly() const 
-{
+bool QnCameraMotionMaskWidget::isReadOnly() const {
     return m_readOnly;
 }
 
-void QnCameraMotionMaskWidget::setReadOnly(bool readOnly) 
-{
+void QnCameraMotionMaskWidget::setReadOnly(bool readOnly) {
     if(m_readOnly == readOnly)
         return;
 
@@ -126,10 +123,9 @@ void QnCameraMotionMaskWidget::setReadOnly(bool readOnly)
     m_readOnly = readOnly;
 }
 
-const QList<QnMotionRegion>& QnCameraMotionMaskWidget::motionRegionList() const
-{
+const QList<QnMotionRegion> &QnCameraMotionMaskWidget::motionRegionList() const {
     if (m_resourceWidget)
-        return m_resourceWidget->motionRegionList();
+        return m_resourceWidget->motionSensitivity();
     else
         return QList<QnMotionRegion>();
 }
@@ -138,8 +134,7 @@ const QnResourcePtr &QnCameraMotionMaskWidget::camera() const {
     return m_camera; // TODO: returning temporary here.
 }
 
-void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
-{
+void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource) {
     QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
     if(m_camera == camera)
         return;
@@ -160,7 +155,7 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
         m_context->workbench()->setItem(Qn::ZoomedRole, item);
 
         /* Set up the corresponding widget. */
-        m_resourceWidget = m_context->display()->widget(item);
+        m_resourceWidget = dynamic_cast<QnMediaResourceWidget *>(m_context->display()->widget(item)); // TODO: check for NULL
         m_resourceWidget->setDisplayFlag(QnResourceWidget::DisplayMotionSensitivity, true);
         m_resourceWidget->setDisplayFlag(QnResourceWidget::DisplayButtons, false);
         m_resourceWidget->setDisplayFlag(QnResourceWidget::DisplayMotion, true);
@@ -169,11 +164,9 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
         int counts[QnMotionRegion::MAX_SENSITIVITY - QnMotionRegion::MIN_SENSITIVITY + 1];
         memset(counts, 0, sizeof(counts));
 
-        int channelCount = m_resourceWidget->display()->videoLayout()->numberOfChannels(); // TODO: WHAT THE HELL???? We shouldn't be needing this shit here.
-        
-        for(int channel = 0; channel < channelCount; channel++)
-            for(int sensitivity = QnMotionRegion::MIN_SENSITIVITY; sensitivity <= QnMotionRegion::MAX_SENSITIVITY; sensitivity++)
-                foreach(const QRect &rect, m_resourceWidget->motionRegionList()[channel].getRectsBySens(sensitivity))
+        for(int sensitivity = QnMotionRegion::MIN_SENSITIVITY; sensitivity <= QnMotionRegion::MAX_SENSITIVITY; sensitivity++)
+            foreach(const QnMotionRegion &motionRegion, m_resourceWidget->motionSensitivity())
+                foreach(const QRect &rect, motionRegion.getRectsBySens(sensitivity))
                     counts[sensitivity - QnMotionRegion::MIN_SENSITIVITY] += rect.width() * rect.height();
 
         int bestCount = std::numeric_limits<int>::min();
@@ -200,27 +193,29 @@ void QnCameraMotionMaskWidget::showTooManyWindowsMessage(const QnMotionRegion &r
                 this, 
                 tr("Too many motion windows"), 
                 tr("Maximum amount of motion windows for current camera is %1, but %2 motion windows are currently selected.")
-                .arg(m_camera->motionWindowCount())
-                .arg(region.getMotionRectCount())
-                );
+                    .arg(m_camera->motionWindowCount())
+                    .arg(region.getMotionRectCount())
+            );
             break;
         case QnMotionRegion::SENS:
             QMessageBox::warning(
                 this, 
                 tr("Too many motion windows"), 
                 tr("Maximum amount of different motion sensitivities for current camera is %1, but %2 motion sensitivities are currently selected.")
-                .arg(m_camera->motionSensWindowCount())
-                .arg(region.getMotionSensCount())
-                );
+                    .arg(m_camera->motionSensWindowCount())
+                    .arg(region.getMotionSensCount())
+            );
             break;
         case QnMotionRegion::MASKS:
             QMessageBox::warning(
                 this, 
                 tr("Too many motion windows"), 
                 tr("Maximum amount of motion mask windows for current camera is %1, but %2 motion mask windows are currently selected.")
-                .arg(m_camera->motionMaskWindowCount())
-                .arg(region.getMaskRectCount())
-                );
+                    .arg(m_camera->motionMaskWindowCount())
+                    .arg(region.getMaskRectCount())
+            );
+            break;
+        default:
             break;
     }
 }
@@ -247,11 +242,9 @@ void QnCameraMotionMaskWidget::clearMotion()
 
 int QnCameraMotionMaskWidget::gridPosToChannelPos(QPoint &pos) {
     const QnVideoResourceLayout* layout = m_camera->getVideoLayout();
-    for (int i = 0; i < layout->numberOfChannels(); ++i)
-    {
-        QRect r(layout->h_position(i)*MD_WIDTH, layout->v_position(i)*MD_HEIGHT, MD_WIDTH, MD_HEIGHT);
-        if (r.contains(pos)) 
-        {
+    for (int i = 0; i < layout->numberOfChannels(); ++i) {
+        QRect r(layout->h_position(i) * MD_WIDTH, layout->v_position(i) * MD_HEIGHT, MD_WIDTH, MD_HEIGHT);
+        if (r.contains(pos)) {
             pos -= r.topLeft();
             return i;
         }
@@ -259,11 +252,10 @@ int QnCameraMotionMaskWidget::gridPosToChannelPos(QPoint &pos) {
     return 0;
 }
 
-bool QnCameraMotionMaskWidget::isValidMotionRegion(){
-    if (m_resourceWidget && m_needControlMaxRects) 
-    {
-        const QnVideoResourceLayout* layout = m_camera->getVideoLayout();
-        const QList<QnMotionRegion> &regions = m_resourceWidget->motionRegionList();
+bool QnCameraMotionMaskWidget::isValidMotionRegion() {
+    if (m_resourceWidget && m_needControlMaxRects) {
+        const QnVideoResourceLayout *layout = m_camera->getVideoLayout();
+        const QList<QnMotionRegion> &regions = m_resourceWidget->motionSensitivity();
         for (int i = 0; i < qMin(regions.size(), layout->numberOfChannels()); ++i) {
             QnMotionRegion::RegionValid kind = regions[i].isValid(m_camera->motionWindowCount(),
                 m_camera->motionMaskWindowCount(), m_camera->motionSensWindowCount());
@@ -284,8 +276,7 @@ void QnCameraMotionMaskWidget::at_viewport_resized() {
     m_context->display()->fitInView(false);
 }
 
-void QnCameraMotionMaskWidget::at_motionRegionSelected(QGraphicsView *, QnResourceWidget *widget, const QRect &gridRect)
-{
+void QnCameraMotionMaskWidget::at_motionRegionSelected(QGraphicsView *, QnMediaResourceWidget *widget, const QRect &gridRect) {
     if (!m_resourceWidget)
         return;
 
@@ -294,18 +285,17 @@ void QnCameraMotionMaskWidget::at_motionRegionSelected(QGraphicsView *, QnResour
 
     int numChannels = layout->numberOfChannels();
     
-    for (int i = 0; i < numChannels; ++i)
-    {
+    // TODO: code that hacks around with channels does not belong here. move to widget.
+    for (int i = 0; i < numChannels; ++i) {
         QRect r(0, 0, MD_WIDTH, MD_HEIGHT);
         r.translate(layout->h_position(i)*MD_WIDTH, layout->v_position(i)*MD_HEIGHT);
         r = gridRect.intersected(r);
         r.translate(-layout->h_position(i)*MD_WIDTH, -layout->v_position(i)*MD_HEIGHT);
 
-        if (!r.isEmpty()) 
-        {
-            QnMotionRegion newRegion = widget->motionRegionList()[i];
+        if (!r.isEmpty()) {
+            QnMotionRegion newRegion = widget->motionSensitivity()[i];
             newRegion.addRect(m_motionSensitivity, r);
-            widget->addToMotionRegion(m_motionSensitivity, r, i);
+            widget->addToMotionSensitivity(i, r, m_motionSensitivity);
             changed = true;
         }
     }
@@ -314,33 +304,31 @@ void QnCameraMotionMaskWidget::at_motionRegionSelected(QGraphicsView *, QnResour
         emit motionRegionListChanged();
 }
 
-void QnCameraMotionMaskWidget::at_motionRegionCleared()
-{
+void QnCameraMotionMaskWidget::at_motionRegionCleared() {
     if (!m_resourceWidget)
         return;
     bool changed = false;
 
-    const QList<QnMotionRegion> &regions = m_resourceWidget->motionRegionList();
+    const QList<QnMotionRegion> &regions = m_resourceWidget->motionSensitivity();
     for (int i = 0; i < regions.size(); ++i) {
         if(!regions[i].isEmpty()) {
             changed = true;
         }
     }
-    m_resourceWidget->clearMotionRegions();
+    m_resourceWidget->clearMotionSensitivity();
 
     if(changed)
         emit motionRegionListChanged();
 }
 
-void QnCameraMotionMaskWidget::at_itemClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info)
-{
+void QnCameraMotionMaskWidget::at_itemClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info) {
     if (!m_resourceWidget)
         return;
 
     QPointF pos = info.scenePos() - item->pos();
     QPoint gridPos = m_resourceWidget->mapToMotionGrid(pos);
     int channel = gridPosToChannelPos(gridPos);
-    if (m_resourceWidget->setMotionRegionSensitivity(m_motionSensitivity, gridPos, channel))
+    if (m_resourceWidget->setMotionSensitivityFilled(channel, gridPos, m_motionSensitivity))
         emit motionRegionListChanged();
 }
 
