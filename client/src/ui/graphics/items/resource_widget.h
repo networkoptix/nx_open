@@ -5,12 +5,10 @@
 #include <QtCore/QVector>
 #include <QtCore/QMetaType>
 #include <QtGui/QStaticText>
-#include <QtGui/QGraphicsWidget>
+
+#include <core/resource/resource_fwd.h>
 
 #include <camera/render_status.h>
-#include <core/resource/motion_window.h>
-#include <core/resource/resource_consumer.h>
-#include <core/datapacket/mediadatapacket.h> /* For QnMetaDataV1Ptr. */
 
 #include <ui/common/constrained_resizable.h>
 #include <ui/common/geometry.h>
@@ -23,18 +21,14 @@
 class QGraphicsLinearLayout;
 
 class QnViewportBoundWidget;
-class QnResourceWidgetRenderer;
 class QnVideoResourceLayout;
 class QnWorkbenchItem;
-class QnResourceDisplay;
-class QnAbstractArchiveReader;
 
 class QnLoadingProgressPainter;
 class QnPausedPainter;
 class QnImageButtonWidget;
 
 class GraphicsLabel;
-class Instrument;
 
 class QnResourceWidget: public Shaded<Instrumented<GraphicsWidget> >, public QnWorkbenchContextAware, public ConstrainedResizable, public FrameSectionQuearyable, protected QnGeometry {
     Q_OBJECT;
@@ -264,17 +258,18 @@ protected:
 
     const QnVideoResourceLayout *contentLayout() const;
     void setContentLayout(const QnVideoResourceLayout *contentLayout);
+    virtual void contentLayoutChangedNotify() {}
+
+    QRectF channelRect(int channel) const;
 
     void ensureAboutToBeDestroyedEmitted();
 
 protected slots:
     void updateButtonsVisibility();
 
-    void at_sourceSizeChanged(const QSize &size);
-    void at_resource_resourceChanged();
     void at_searchButton_toggled(bool checked);
 
-protected:
+private:
     struct ChannelState {
         ChannelState(): overlay(EmptyOverlay), changeTimeMSec(0), fadeInNeeded(false), lastNewFrameTimeMSec(0), renderStatus(Qn::NothingRendered) {}
 
@@ -293,15 +288,6 @@ protected:
         /** Last render status. */
         Qn::RenderStatus renderStatus;
     };
-
-
-private:
-    /**
-     * \param channel                   Channel number.
-     * \returns                         Rectangle in local coordinates where given channel is to be drawn.
-     */
-    QRectF channelRect(int channel) const;
-
 
 private:
     /** Paused painter. */

@@ -3,7 +3,12 @@
 
 #include "resource_widget.h"
 
+#include <core/datapacket/mediadatapacket.h> /* For QnMetaDataV1Ptr. */
+#include <core/resource/motion_window.h>
+
 class QnResourceDisplay;
+class QnResourceWidgetRenderer;
+
 
 class QnMediaResourceWidget: public QnResourceWidget {
     Q_OBJECT;
@@ -25,7 +30,6 @@ public:
     QnResourceDisplay *display() const {
         return m_display;
     }
-
 
     /**
      * \param itemPos                   Point in item coordinates to map to grid coordinates.
@@ -70,15 +74,18 @@ public:
 
     bool isMotionRegionsEmpty() const;
 
-public signals:
+signals:
     void motionSelectionChanged();
 
+public slots:
+    void at_sourceSizeChanged(const QSize &size);
+
 protected:
-    virtual Qn::RenderStatus paintChannel(QPainter *painter, int channel, const QRectF &rect) override;
+    virtual void contentLayoutChangedNotify() override;
     virtual void channelScreenSizeChangedNotify() override;
 
-    int motionGridWidth() const;
-    int motionGridHeight() const;
+    virtual Qn::RenderStatus paintChannel(QPainter *painter, int channel, const QRectF &rect) override;
+
     void drawMotionSensitivity(QPainter *painter, const QRectF &rect, const QnMotionRegion& region, int channel);
 
     void drawMotionGrid(QPainter *painter, const QRectF &rect, const QnMetaDataV1Ptr &motion, int channel);
@@ -89,8 +96,12 @@ protected:
 
     void ensureMotionMask();
     void invalidateMotionMask();
+
     void ensureMotionMaskBinData();
     void invalidateMotionMaskBinData();
+
+    int motionGridWidth() const;
+    int motionGridHeight() const;
 
 private:
     /** Media resource. */
@@ -106,16 +117,16 @@ private:
     QList<QRegion> m_motionSelection;
 
     /** Image region where motion is currently present, in parrots. */
-    QList<QnMotionRegion> m_motionRegionList; // TODO: WHY THE HELL THIS ONE IS OF SIZE 4?????????? Find the one who did it and use your swordsmanship skillz on him.
+    QList<QnMotionRegion> m_motionSensitivity;
 
-    /** Whether the motion mask is valid. */
-    bool m_motionMaskValid;
+    /** Whether the motion sensitivity is valid. */
+    bool m_motionSensitivityValid;
 
     /** Binary mask for the current motion region. */
-    QVector<__m128i *> m_motionMaskBinData;
+    QList<__m128i *> m_binaryMotionMask;
 
     /** Whether motion mask binary data is valid. */
-    bool m_motionMaskBinDataValid;
+    bool m_binaryMotionMaskValid;
 
 
     QStaticText m_sensStaticText[10];

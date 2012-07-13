@@ -550,9 +550,13 @@ const QnVideoResourceLayout *QnResourceWidget::contentLayout() const {
 }
 
 void QnResourceWidget::setContentLayout(const QnVideoResourceLayout *contentLayout) {
+    if(m_contentLayout == contentLayout)
+        return;
+
     m_contentLayout = contentLayout;
 
     m_channelState.resize(m_contentLayout->numberOfChannels());
+    contentLayoutChangedNotify();
 }
 
 
@@ -580,10 +584,7 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     QnScopedPainterFontRollback fontRollback(painter);
 
     /* Update screen size of a single channel. */
-    QSizeF itemScreenSize = painter->combinedTransform().mapRect(boundingRect()).size();
-    QSize channelScreenSize = QSizeF(itemScreenSize.width() / m_contentLayout->width(), itemScreenSize.height() / m_contentLayout->height()).toSize();
-    if(channelScreenSize != m_channelScreenSize)
-        updateChannelScreenSize(channelScreenSize);
+    setChannelScreenSize(painter->combinedTransform().mapRect(channelRect(0)).size());
 
     qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
 
@@ -647,8 +648,8 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     //glPopAttrib();
     //painter->endNativePainting();
 
-    if(m_footerOverlayWidget->isVisible() && !qFuzzyIsNull(m_footerOverlayWidget->opacity())) 
-        emit updateOverlayTextLater();
+    //if(m_footerOverlayWidget->isVisible() && !qFuzzyIsNull(m_footerOverlayWidget->opacity())) 
+        //emit updateOverlayTextLater();
 }
 
 void QnResourceWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
@@ -789,21 +790,6 @@ void QnResourceWidget::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
         setDecorationsVisible(false);
 
     base_type::hoverLeaveEvent(event);
-}
-
-void QnResourceWidget::at_sourceSizeChanged(const QSize &size) {
-    qreal oldAspectRatio = m_aspectRatio;
-    qreal newAspectRatio = static_cast<qreal>(size.width() * m_contentLayout->width()) / (size.height() * m_contentLayout->height());
-    if(qFuzzyCompare(oldAspectRatio, newAspectRatio))
-        return;
-
-    QRectF enclosingGeometry = this->enclosingGeometry();
-    m_aspectRatio = newAspectRatio;
-
-    updateGeometry(); /* Discard cached size hints. */
-    setGeometry(expanded(m_aspectRatio, enclosingGeometry, Qt::KeepAspectRatio));
-
-    emit aspectRatioChanged(oldAspectRatio, newAspectRatio);
 }
 
 void QnResourceWidget::at_searchButton_toggled(bool checked) {

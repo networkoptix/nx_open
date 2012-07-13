@@ -2,11 +2,25 @@
 
 #include <utils/common/warnings.h>
 
+#include <core/resource/media_resource.h>
+
 #include <camera/resource_display.h>
 #include <camera/camdisplay.h>
 
 
 #include "resource_widget_renderer.h"
+
+namespace {
+    template<class T>
+    void resizeList(QList<T> &list, int size) {
+        while(list.size() < size)
+            list.push_back(T());
+        while(list.size() > size)
+            list.pop_back();
+    }
+
+} // anonymous namespace
+
 
 
 QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent):
@@ -16,57 +30,44 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     if(!m_resource) 
         qnCritical("Media resource widget was created with a non-media resource.");
 
-    /* Set up motion-related stuff. */
-    m_motionMaskBinData.resize(CL_MAX_CHANNELS);
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
-        m_motionMaskBinData[i] = (__m128i*) qMallocAligned(MD_WIDTH * MD_HEIGHT/8, 32);
-        memset(m_motionMaskBinData[i], 0, MD_WIDTH * MD_HEIGHT/8);
-    }
-
     /* Set up video rendering. */
     m_display = new QnResourceDisplay(m_resource, this);
     connect(m_resource.data(), SIGNAL(resourceChanged()), this, SLOT(at_resource_resourceChanged()));
     connect(m_display->camDisplay(), SIGNAL(stillImageChanged()), this, SLOT(updateButtonsVisibility()));
+    setContentLayout(m_display->videoLayout());
 
-    m_contentLayout = m_display->videoLayout();
-    m_channelCount = m_contentLayout->numberOfChannels();
-
-    m_renderer = new QnResourceWidgetRenderer(m_channelCount);
+    m_renderer = new QnResourceWidgetRenderer(contentLayout()->numberOfChannels());
     connect(m_renderer, SIGNAL(sourceSizeChanged(const QSize &)), this, SLOT(at_sourceSizeChanged(const QSize &)));
     m_display->addRenderer(m_renderer);
 
-
+    /* Set up static text. */
     for (int i = 0; i < 10; ++i) {
         m_sensStaticText[i].setText(QString::number(i));
         m_sensStaticText[i].setPerformanceHint(QStaticText::AggressiveCaching);
     }
-
 }
 
 QnMediaResourceWidget::~QnMediaResourceWidget() {
     delete m_display;
 
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-        qFreeAligned(m_motionMaskBinData[i]);
-
+    foreach(__m128i *data, m_binaryMotionMask)
+        qFreeAligned(data);
+    m_binaryMotionMask.clear();
 }
 
-QnResourcePtr QnMediaResourceWidget::resource() const {
-    return m_display->resource();
+QnMediaResourcePtr QnMediaResourceWidget::resource() const {
+    return m_resource;
 }
 
-int QnMediaResourceWidget::motionGridWidth() const
-{
-    return MD_WIDTH * m_contentLayout->width();
+int QnMediaResourceWidget::motionGridWidth() const {
+    return MD_WIDTH * contentLayout()->numberOfChannels();
 }
 
-int QnMediaResourceWidget::motionGridHeight() const
-{
-    return MD_HEIGHT * m_contentLayout->height();
+int QnMediaResourceWidget::motionGridHeight() const {
+    return MD_HEIGHT * contentLayout()->numberOfChannels();
 }
 
-QPoint QnMediaResourceWidget::mapToMotionGrid(const QPointF &itemPos)
-{
+QPoint QnMediaResourceWidget::mapToMotionGrid(const QPointF &itemPos) {
     QPointF gridPosF(cwiseDiv(itemPos, toPoint(cwiseDiv(size(), QSizeF(motionGridWidth(), motionGridHeight())))));
     QPoint gridPos(qFuzzyFloor(gridPosF.x()), qFuzzyFloor(gridPosF.y()));
 
@@ -77,8 +78,7 @@ QPointF QnMediaResourceWidget::mapFromMotionGrid(const QPoint &gridPos) {
     return cwiseMul(gridPos, toPoint(cwiseDiv(size(), QSizeF(motionGridWidth(), motionGridHeight()))));
 }
 
-void QnMediaResourceWidget::addToMotionSelection(const QRect &gridRect) 
-{
+void QnMediaResourceWidget::addToMotionSelection(const QRect &gridRect) {
     QList<QRegion> prevSelection;
     QList<QRegion> newSelection;
 
@@ -96,7 +96,7 @@ void QnMediaResourceWidget::addToMotionSelection(const QRect &gridRect)
         {
             QRegion r1(r);
             r1.translate(-m_contentLayout->h_position(i)*MD_WIDTH, -m_contentLayout->v_position(i)*MD_HEIGHT);
-            r1 -= m_motionRegionList[i].getMotionMask();
+            r1 -= m_motionSensitivity[i].getMotionMask();
 
             m_channelState[i].motionSelection += r1;
         }
@@ -136,14 +136,14 @@ void QnMediaResourceWidget::invalidateMotionMask() {
 void QnMediaResourceWidget::addToMotionRegion(int sensitivity, const QRect& rect, int channel) {
     ensureMotionMask();
 
-    m_motionRegionList[channel].addRect(sensitivity, rect);
+    m_motionSensitivity[channel].addRect(sensitivity, rect);
 
     /*
-    QnMotionRegion newRegion = m_motionRegionList[channel];
+    QnMotionRegion newRegion = m_motionSensitivity[channel];
     newRegion.addRect(sens, rect);
     if (newRegion.isValid()) 
     {
-        m_motionRegionList[channel] = newRegion;
+        m_motionSensitivity[channel] = newRegion;
         invalidateMotionMaskBinData();
     }
     return newRegion.isValid();
@@ -153,12 +153,12 @@ void QnMediaResourceWidget::addToMotionRegion(int sensitivity, const QRect& rect
 bool QnMediaResourceWidget::setMotionRegionSensitivity(int sensitivity, const QPoint &gridPos, int channel) {
     ensureMotionMask();
 
-    return m_motionRegionList[channel].updateSensitivityAt(gridPos, sensitivity);
+    return m_motionSensitivity[channel].updateSensitivityAt(gridPos, sensitivity);
 }
 
 void QnMediaResourceWidget::clearMotionRegions() {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-        m_motionRegionList[i] = QnMotionRegion();
+        m_motionSensitivity[i] = QnMotionRegion();
     m_motionMaskValid = true;
 
     invalidateMotionMaskBinData();
@@ -170,26 +170,26 @@ void QnMediaResourceWidget::ensureMotionMask()
         return;
 
     if (QnSecurityCamResourcePtr camera = m_resource.dynamicCast<QnSecurityCamResource>()) {
-        m_motionRegionList = camera->getMotionRegionList();
+        m_motionSensitivity = camera->getMotionRegionList();
 
-        while(m_motionRegionList.size() < CL_MAX_CHANNELS)
-            m_motionRegionList.push_back(QnMotionRegion()); /* Just to feel safe. */
+        while(m_motionSensitivity.size() < CL_MAX_CHANNELS)
+            m_motionSensitivity.push_back(QnMotionRegion()); /* Just to feel safe. */
     }
     m_motionMaskValid = true;
 }
 
 void QnMediaResourceWidget::ensureMotionMaskBinData() {
-    if(m_motionMaskBinDataValid)
+    if(m_binaryMotionMaskValid)
         return;
 
     ensureMotionMask();
-    Q_ASSERT(((unsigned long)m_motionMaskBinData[0])%16 == 0);
+    Q_ASSERT(((unsigned long)m_binaryMotionMask[0])%16 == 0);
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-        QnMetaDataV1::createMask(m_motionRegionList[i].getMotionMask(), (char*)m_motionMaskBinData[i]);
+        QnMetaDataV1::createMask(m_motionSensitivity[i].getMotionMask(), (char*)m_binaryMotionMask[i]);
 }
 
 void QnMediaResourceWidget::invalidateMotionMaskBinData() {
-    m_motionMaskBinDataValid = false;
+    m_binaryMotionMaskValid = false;
 }
 
 
@@ -225,12 +225,6 @@ void QnMediaResourceWidget::at_resource_resourceChanged() {
     invalidateMotionMask();
 }
 
-
-void QnMediaResourceWidget::channelScreenSizeChangedNotify() {
-    base_type::channelScreenSizeChangedNotify();
-
-    m_renderer->setChannelScreenSize(channelScreenSize());
-}
 
 Qn::RenderStatus QnMediaResourceWidget::paintChannel(QPainter *painter, int channel, const QRectF &rect) {
     painter->beginNativePainting();
@@ -401,4 +395,48 @@ bool QnResourceWidget::isMotionSelectionEmpty() const { // TODO: create a separa
         if(!region.isEmpty())
             return false;
     return true;
+}
+
+
+void QnResourceWidget::at_sourceSizeChanged(const QSize &size) {
+    qreal oldAspectRatio = m_aspectRatio;
+    qreal newAspectRatio = static_cast<qreal>(size.width() * m_contentLayout->width()) / (size.height() * m_contentLayout->height());
+    if(qFuzzyCompare(oldAspectRatio, newAspectRatio))
+        return;
+
+    QRectF enclosingGeometry = this->enclosingGeometry();
+    m_aspectRatio = newAspectRatio;
+
+    updateGeometry(); /* Discard cached size hints. */
+    setGeometry(expanded(m_aspectRatio, enclosingGeometry, Qt::KeepAspectRatio));
+
+    emit aspectRatioChanged(oldAspectRatio, newAspectRatio);
+}
+
+
+// -------------------------------------------------------------------------- //
+// Handlers
+// -------------------------------------------------------------------------- //
+void QnMediaResourceWidget::contentLayoutChangedNotify() {
+    base_type::contentLayoutChangedNotify();
+
+    int channelCount = contentLayout()->numberOfChannels();
+
+    resizeList(m_motionSelection, channelCount);
+    resizeList(m_motionSensitivity, channelCount);
+
+    while(m_binaryMotionMask.size() > channelCount) {
+        qFreeAligned(m_binaryMotionMask.back());
+        m_binaryMotionMask.pop_back();
+    }
+    while(m_binaryMotionMask.size() < channelCount) {
+        m_binaryMotionMask.push_back(static_cast<__m128i *>(qMallocAligned(MD_WIDTH * MD_HEIGHT / 8, 32)));
+        memset(m_binaryMotionMask.back(), 0, MD_WIDTH * MD_HEIGHT / 8);
+    }
+}
+
+void QnMediaResourceWidget::channelScreenSizeChangedNotify() {
+    base_type::channelScreenSizeChangedNotify();
+
+    m_renderer->setChannelScreenSize(channelScreenSize());
 }
