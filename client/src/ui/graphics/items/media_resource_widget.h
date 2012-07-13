@@ -75,7 +75,7 @@ public signals:
 
 protected:
     virtual Qn::RenderStatus paintChannel(QPainter *painter, int channel, const QRectF &rect) override;
-    virtual void updateChannelScreenSize(const QSize &channelScreenSize) override;
+    virtual void channelScreenSizeChangedNotify() override;
 
     int motionGridWidth() const;
     int motionGridHeight() const;

@@ -240,8 +240,6 @@ protected:
     
     void paintSelection(QPainter *painter, const QRectF &rect);
 
-    void assertPainters(); 
-
     virtual Qt::WindowFrameSection windowFrameSectionAt(const QPointF &pos) const override;
     virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override;
     
@@ -253,11 +251,15 @@ protected:
     virtual QSizeF constrainedSize(const QSizeF constraint) const override;
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint) const override;
 
-    void ensureAboutToBeDestroyedEmitted();
-
     const QSize &channelScreenSize() const;
-    virtual void updateChannelScreenSize(const QSize &channelScreenSize);
+    void setChannelScreenSize(const QSize &size);
+    virtual void channelScreenSizeChangedNotify() {};
 
+    Overlay channelOverlay(int channel) const;
+    void setChannelOverlay(int channel, Overlay overlay);
+    virtual Overlay calculateChannelOverlay(int channel) const;
+
+    void ensureAboutToBeDestroyedEmitted();
 
 signals:
     void updateOverlayTextLater();
@@ -273,7 +275,7 @@ protected slots:
 
 protected:
     struct ChannelState {
-        ChannelState(): overlay(EmptyOverlay), changeTimeMSec(0), fadeInNeeded(false), lastNewFrameTimeMSec(0) {}
+        ChannelState(): overlay(EmptyOverlay), changeTimeMSec(0), fadeInNeeded(false), lastNewFrameTimeMSec(0), renderStatus(Qn::NothingRendered) {}
 
         /** Current overlay. */
         Overlay overlay;
@@ -286,6 +288,9 @@ protected:
 
         /** Last time when new frame was rendered, in milliseconds since epoch. */
         qint64 lastNewFrameTimeMSec;
+
+        /** Last render status. */
+        Qn::RenderStatus renderStatus;
     };
 
     void setChannelOverlay(int channel, Overlay overlay);
@@ -355,9 +360,6 @@ private:
 
     /** Additional per-channel state. */
     QVector<ChannelState> m_channelState;
-
-    /** Status of the last painting operation. */
-    Qn::RenderStatus m_renderStatus;
 
     QStaticText m_noDataStaticText;
     QStaticText m_offlineStaticText;

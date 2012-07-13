@@ -495,8 +495,13 @@ const QSize &QnResourceWidget::channelScreenSize() const {
     return m_channelScreenSize;
 }
 
-void QnResourceWidget::updateChannelScreenSize(const QSize &channelScreenSize) {
-    m_channelScreenSize = channelScreenSize;
+void QnResourceWidget::setChannelScreenSize(const QSize &size) {
+    if(size == m_channelScreenSize)
+        return;
+
+    m_channelScreenSize = size;
+
+    channelScreenSizeChangedNotify();
 }
 
 void QnResourceWidget::updateButtonsVisibility() {
@@ -529,69 +534,31 @@ void QnResourceWidget::updateButtonsVisibility() {
     }
 }
 
+QnResourceWidget::Overlay QnResourceWidget::channelOverlay(int channel) const {
+    return m_channelState[channel].overlay;
+}
 
-// -------------------------------------------------------------------------- //
-// Handlers
-// -------------------------------------------------------------------------- //
-bool QnResourceWidget::windowFrameEvent(QEvent *event) {
-    bool result = base_type::windowFrameEvent(event);
+void QnResourceWidget::setChannelOverlay(int channel, Overlay overlay) {
+    m_channelState[channel].overlay = overlay;
+}
 
-    if(event->type() == QEvent::GraphicsSceneHoverMove) {
-        QGraphicsSceneHoverEvent *e = static_cast<QGraphicsSceneHoverEvent *>(event);
+QnResourceWidget::Overlay QnResourceWidget::calculateChannelOverlay(int channel) const {
+    QnResource::Status resourceStatus = m_resource->getStatus();
 
-        /* Qt does not unset a cursor unless mouse pointer leaves widget's frame.
-         *
-         * As this widget may not have a frame section associated with some parts of
-         * its frame, cursor must be unset manually. */
-        Qt::WindowFrameSection section = windowFrameSectionAt(e->pos());
-        if(section == Qt::NoSection)
-            unsetCursor();
+    if (resourceStatus == QnResource::Offline) {
+        return OfflineOverlay;
+    } else if (resourceStatus == QnResource::Unauthorized) {
+        return UnauthorizedOverlay;
+    } else {
+        Qn::RenderStatus renderStatus = m_channelState[channel].renderStatus;
+        qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
+
+        if(renderStatus != Qn::NewFrameRendered && (renderStatus != Qn::OldFrameRendered || currentTimeMSec - m_channelState[channel].lastNewFrameTimeMSec >= defaultLoadingTimeoutMSec)) {
+            return LoadingOverlay;
+        } else {
+            return EmptyOverlay;
+        }
     }
-
-    return result;
-}
-
-void QnResourceWidget::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
-    fadeInDecorations();
-
-    base_type::hoverEnterEvent(event);
-}
-
-void QnResourceWidget::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
-    if(qFuzzyIsNull(m_headerOverlayWidget->opacity()))
-        fadeInDecorations();
-
-    base_type::hoverMoveEvent(event);
-}
-
-void QnResourceWidget::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
-    if(!m_infoButton->isChecked())
-        fadeOutDecorations();
-
-    base_type::hoverLeaveEvent(event);
-}
-
-void QnResourceWidget::at_sourceSizeChanged(const QSize &size) {
-    qreal oldAspectRatio = m_aspectRatio;
-    qreal newAspectRatio = static_cast<qreal>(size.width() * m_contentLayout->width()) / (size.height() * m_contentLayout->height());
-    if(qFuzzyCompare(oldAspectRatio, newAspectRatio))
-        return;
-
-    QRectF enclosingGeometry = this->enclosingGeometry();
-    m_aspectRatio = newAspectRatio;
-
-    updateGeometry(); /* Discard cached size hints. */
-    setGeometry(expanded(m_aspectRatio, enclosingGeometry, Qt::KeepAspectRatio));
-
-    emit aspectRatioChanged(oldAspectRatio, newAspectRatio);
-}
-
-void QnResourceWidget::at_resource_nameChanged() {
-    m_headerLabel->setText(m_resource->getName());
-}
-
-void QnResourceWidget::at_searchButton_toggled(bool checked) {
-    setDisplayFlag(DisplayMotion, checked);
 }
 
 
@@ -606,18 +573,11 @@ void QnResourceWidget::paintFlashingText(QPainter *painter, const QStaticText &t
     font.setStyleHint(QFont::SansSerif, QFont::ForceOutline);
     QnScopedPainterFontRollback fontRollback(painter, font);
     QnScopedPainterPenRollback penRollback(painter, QPen(QColor(255, 208, 208, 196)));
-    
+
     qreal opacity = painter->opacity();
     painter->setOpacity(opacity * qAbs(sin(QDateTime::currentMSecsSinceEpoch() / qreal(TEXT_FLASHING_PERIOD * 2) * M_PI)));
     painter->drawStaticText(rect().center() - toPoint(text.size() / 2) + offset * unit, text);
     painter->setOpacity(opacity);
-}
-
-void QnResourceWidget::assertPainters() {
-    if(m_pausedPainter.isNull()) {
-        m_pausedPainter = qn_pausedPainterStorage()->get(QGLContext::currentContext());
-        m_loadingProgressPainter = qn_loadingProgressPainterStorage()->get(QGLContext::currentContext());
-    }
 }
 
 void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/) {
@@ -631,7 +591,10 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
         return;
     }
 
-    assertPainters();
+    if(m_pausedPainter.isNull()) {
+        m_pausedPainter = qn_pausedPainterStorage()->get(QGLContext::currentContext());
+        m_loadingProgressPainter = qn_loadingProgressPainterStorage()->get(QGLContext::currentContext());
+    }
 
     QnScopedPainterPenRollback penRollback(painter);
     QnScopedPainterBrushRollback brushRollback(painter);
@@ -644,8 +607,8 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
         updateChannelScreenSize(channelScreenSize);
 
     qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
-    
-    
+
+
     //painter->beginNativePainting();
     //glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
     //glEnable(GL_BLEND);
@@ -654,10 +617,10 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     for(int i = 0; i < m_contentLayout->numberOfChannels(); i++) {
         /* Draw content. */
         QRectF rect = channelRect(i);
-        m_renderStatus = paintChannel(painter, i, rect);
+        Qn::RenderStatus renderStatus = paintChannel(painter, i, rect);
 
         /* Draw black rectangle if nothing was drawn. */
-        if(m_renderStatus != Qn::OldFrameRendered && m_renderStatus != Qn::NewFrameRendered) {
+        if(renderStatus != Qn::OldFrameRendered && renderStatus != Qn::NewFrameRendered) {
             painter->beginNativePainting();
             glColor4f(0.0, 0.0, 0.0, effectiveOpacity());
             glBegin(GL_QUADS);
@@ -667,10 +630,13 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
         }
 
         /* Update channel state. */
-        if(m_renderStatus == Qn::NewFrameRendered)
+        m_channelState[i].renderStatus = renderStatus;
+        if(renderStatus == Qn::NewFrameRendered)
             m_channelState[i].lastNewFrameTimeMSec = currentTimeMSec;
+        setChannelOverlay(i, calculateChannelOverlay(i));
 
-        /* Set overlay icon. */
+#if 0
+        updateOverlay(i);
         if (m_display->camDisplay()->isStillImage()) {
             setChannelOverlay(i, EmptyOverlay);
         } else if(m_display->isPaused() && (m_displayFlags & DisplayActivityOverlay)) {
@@ -686,6 +652,7 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
         } else {
             setChannelOverlay(i, EmptyOverlay);
         }
+#endif
 
         /* Draw overlay icon. */
         qreal overlayOpacity = effectiveOpacity();
@@ -696,7 +663,7 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
         /* Draw selected / not selected overlay. */
         paintSelection(painter, rect);
     }
-    
+
     //glDisable(GL_BLEND);
     //glPopAttrib();
     //painter->endNativePainting();
@@ -787,3 +754,70 @@ void QnResourceWidget::paintOverlay(QPainter *painter, const QRectF &rect, Overl
     }
 
 }
+
+
+// -------------------------------------------------------------------------- //
+// Handlers
+// -------------------------------------------------------------------------- //
+bool QnResourceWidget::windowFrameEvent(QEvent *event) {
+    bool result = base_type::windowFrameEvent(event);
+
+    if(event->type() == QEvent::GraphicsSceneHoverMove) {
+        QGraphicsSceneHoverEvent *e = static_cast<QGraphicsSceneHoverEvent *>(event);
+
+        /* Qt does not unset a cursor unless mouse pointer leaves widget's frame.
+         *
+         * As this widget may not have a frame section associated with some parts of
+         * its frame, cursor must be unset manually. */
+        Qt::WindowFrameSection section = windowFrameSectionAt(e->pos());
+        if(section == Qt::NoSection)
+            unsetCursor();
+    }
+
+    return result;
+}
+
+void QnResourceWidget::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
+    setDecorationsVisible(true);
+
+    base_type::hoverEnterEvent(event);
+}
+
+void QnResourceWidget::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
+    if(!isDecorationsVisible())
+        setDecorationsVisible(true);
+
+    base_type::hoverMoveEvent(event);
+}
+
+void QnResourceWidget::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
+    if(!m_infoButton->isChecked())
+        setDecorationsVisible(false);
+
+    base_type::hoverLeaveEvent(event);
+}
+
+void QnResourceWidget::at_sourceSizeChanged(const QSize &size) {
+    qreal oldAspectRatio = m_aspectRatio;
+    qreal newAspectRatio = static_cast<qreal>(size.width() * m_contentLayout->width()) / (size.height() * m_contentLayout->height());
+    if(qFuzzyCompare(oldAspectRatio, newAspectRatio))
+        return;
+
+    QRectF enclosingGeometry = this->enclosingGeometry();
+    m_aspectRatio = newAspectRatio;
+
+    updateGeometry(); /* Discard cached size hints. */
+    setGeometry(expanded(m_aspectRatio, enclosingGeometry, Qt::KeepAspectRatio));
+
+    emit aspectRatioChanged(oldAspectRatio, newAspectRatio);
+}
+
+void QnResourceWidget::at_resource_nameChanged() {
+    m_headerLabel->setText(m_resource->getName());
+}
+
+void QnResourceWidget::at_searchButton_toggled(bool checked) {
+    setDisplayFlag(DisplayMotion, checked);
+}
+
+

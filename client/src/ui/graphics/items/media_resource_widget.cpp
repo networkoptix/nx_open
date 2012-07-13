@@ -195,10 +195,10 @@ void QnMediaResourceWidget::at_resource_resourceChanged() {
 }
 
 
-void QnMediaResourceWidget::updateChannelScreenSize(const QSize &channelScreenSize) {
-    base_type::updateChannelScreenSize(channelScreenSize);
+void QnMediaResourceWidget::channelScreenSizeChangedNotify() {
+    base_type::channelScreenSizeChangedNotify();
 
-    m_renderer->setChannelScreenSize(channelScreenSize);
+    m_renderer->setChannelScreenSize(channelScreenSize());
 }
 
 Qn::RenderStatus QnMediaResourceWidget::paintChannel(QPainter *painter, int channel, const QRectF &rect) {
