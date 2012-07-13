@@ -118,6 +118,9 @@ void QnResourceServerWidget::drawStatistics(int width, int height, QPainter *pai
     QRectF rect(0, 0, width, height);
     qreal oh = height - offset*2;
     qreal ow = width - offset*2;
+    
+    if (ow <= 0 || oh <= 0)
+        return;
 
     QRectF inner(offset, offset, ow, oh); 
 
