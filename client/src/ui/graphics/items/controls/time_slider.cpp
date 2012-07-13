@@ -532,9 +532,6 @@ void QnTimeSlider::setWindow(qint64 start, qint64 end) {
     start = qBound(minimum(), start, maximum());
     end = qMax(start, qBound(minimum(), end, maximum()));
 
-    if(start == minimum() && end == maximum())
-        int a = 10;
-
     if(end - start < m_minimalWindow) {
         qint64 delta = (m_minimalWindow - (end - start) + 1) / 2;
         start -= delta;
