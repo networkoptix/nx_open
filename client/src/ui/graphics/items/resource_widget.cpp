@@ -91,7 +91,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     base_type(parent),
     QnWorkbenchContextAware(context),
     m_item(item),
-    m_contentLayout(NULL),
+    m_channelsLayout(NULL),
     m_aspectRatio(-1.0),
     m_enclosingAspectRatio(1.0),
     m_frameWidth(-1.0),
@@ -237,7 +237,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     if(!m_resource)
         m_resource = qnResPool->getResourceByUniqId(item->resourceUid());
     connect(m_resource.data(), SIGNAL(nameChanged()), this, SLOT(updateTitleText()));
-    setContentLayout(qn_resourceWidget_defaultContentLayout());
+    setChannelLayout(qn_resourceWidget_defaultContentLayout());
 
 
     /* Init static text. */
@@ -274,6 +274,21 @@ void QnResourceWidget::setFrameWidth(qreal frameWidth) {
     invalidateShadowShape();
     if(shadowItem())
         shadowItem()->setSoftWidth(m_frameWidth);
+}
+
+void QnResourceWidget::setAspectRatio(qreal aspectRatio) {
+    qreal oldAspectRatio = m_aspectRatio;
+    qreal newAspectRatio = aspectRatio;
+    if(qFuzzyCompare(oldAspectRatio, newAspectRatio))
+        return;
+
+    QRectF enclosingGeometry = this->enclosingGeometry();
+    m_aspectRatio = newAspectRatio;
+
+    updateGeometry(); /* Discard cached size hints. */
+    setGeometry(expanded(m_aspectRatio, enclosingGeometry, Qt::KeepAspectRatio));
+
+    emit aspectRatioChanged(oldAspectRatio, newAspectRatio);
 }
 
 void QnResourceWidget::setEnclosingAspectRatio(qreal enclosingAspectRatio) {
@@ -367,16 +382,16 @@ QSizeF QnResourceWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) 
 }
 
 QRectF QnResourceWidget::channelRect(int channel) const {
-    if (m_contentLayout->numberOfChannels() == 1)
+    if (m_channelsLayout->numberOfChannels() == 1)
         return QRectF(QPointF(0.0, 0.0), size());
 
     QSizeF size = this->size();
-    qreal w = size.width() / m_contentLayout->width();
-    qreal h = size.height() / m_contentLayout->height();
+    qreal w = size.width() / m_channelsLayout->width();
+    qreal h = size.height() / m_channelsLayout->height();
 
     return QRectF(
-        w * m_contentLayout->h_position(channel),
-        h * m_contentLayout->v_position(channel),
+        w * m_channelsLayout->h_position(channel),
+        h * m_channelsLayout->v_position(channel),
         w,
         h
     );
@@ -545,18 +560,22 @@ void QnResourceWidget::updateChannelOverlay(int channel) {
     setChannelOverlay(channel, calculateChannelOverlay(channel));
 }
 
-const QnVideoResourceLayout *QnResourceWidget::contentLayout() const {
-    return m_contentLayout;
+const QnVideoResourceLayout *QnResourceWidget::channelLayout() const {
+    return m_channelsLayout;
 }
 
-void QnResourceWidget::setContentLayout(const QnVideoResourceLayout *contentLayout) {
-    if(m_contentLayout == contentLayout)
+void QnResourceWidget::setChannelLayout(const QnVideoResourceLayout *channelLayout) {
+    if(m_channelsLayout == channelLayout)
         return;
 
-    m_contentLayout = contentLayout;
+    m_channelsLayout = channelLayout;
 
-    m_channelState.resize(m_contentLayout->numberOfChannels());
-    contentLayoutChangedNotify();
+    m_channelState.resize(m_channelsLayout->numberOfChannels());
+    channelLayoutChangedNotify();
+}
+
+int QnResourceWidget::channelCount() const {
+    return m_channelsLayout->numberOfChannels();
 }
 
 
@@ -594,7 +613,7 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     //glEnable(GL_BLEND);
     //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    for(int i = 0; i < m_contentLayout->numberOfChannels(); i++) {
+    for(int i = 0; i < channelCount(); i++) {
         /* Draw content. */
         QRectF rect = channelRect(i);
         Qn::RenderStatus renderStatus = paintChannel(painter, i, rect);

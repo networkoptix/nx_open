@@ -114,6 +114,8 @@ public:
         return m_aspectRatio;
     }
 
+    void setAspectRatio(qreal aspectRatio);
+
     /**
      * \returns                         Whether this widget has an aspect ratio.
      */
@@ -256,9 +258,11 @@ protected:
     virtual QString calculateInfoText() const;
     Q_SLOT void updateInfoText();
 
-    const QnVideoResourceLayout *contentLayout() const;
-    void setContentLayout(const QnVideoResourceLayout *contentLayout);
-    virtual void contentLayoutChangedNotify() {}
+    const QnVideoResourceLayout *channelLayout() const;
+    void setChannelLayout(const QnVideoResourceLayout *channelLayout);
+    virtual void channelLayoutChangedNotify() {}
+    
+    int channelCount() const;
 
     QRectF channelRect(int channel) const;
 
@@ -305,8 +309,8 @@ private:
     /* Display flags. */
     DisplayFlags m_displayFlags;
 
-    /** Layout of this widget's contents. */
-    const QnVideoResourceLayout *m_contentLayout;
+    /** Layout of this widget's channels. */
+    const QnVideoResourceLayout *m_channelsLayout;
 
     /** Aspect ratio. Negative value means that aspect ratio is not enforced. */
     qreal m_aspectRatio;

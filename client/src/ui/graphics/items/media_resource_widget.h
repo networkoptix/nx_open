@@ -64,44 +64,47 @@ public:
      */
     QList<QRegion> motionSelection() const;
 
-    void addToMotionRegion(int sensitivity, const QRect &rect, int channel);
 
-    bool setMotionRegionSensitivity(int sensitivity, const QPoint &gridPos, int channel);
+    // TODO: what channel does here? WTF????
+    void addToMotionSensitivity(int channel, const QRect &rect, int sensitivity);
 
-    void clearMotionRegions();
+    bool setMotionSensitivityFilled(int channel, const QPoint &gridPos, int sensitivity);
 
-    const QList<QnMotionRegion> &motionRegionList();
+    void clearMotionSensitivity();
 
-    bool isMotionRegionsEmpty() const;
+    QList<QnMotionRegion> motionSensitivity() const;
+
+    bool isMotionSensitivityEmpty() const;
 
 signals:
     void motionSelectionChanged();
 
 public slots:
-    void at_sourceSizeChanged(const QSize &size);
+    void at_renderer_sourceSizeChanged(const QSize &size);
+    void at_resource_resourceChanged();
 
 protected:
-    virtual void contentLayoutChangedNotify() override;
+    virtual void channelLayoutChangedNotify() override;
     virtual void channelScreenSizeChangedNotify() override;
 
+    virtual QString calculateInfoText() const override;
+
     virtual Qn::RenderStatus paintChannel(QPainter *painter, int channel, const QRectF &rect) override;
+    void paintMotionSensitivityIndicators(QPainter *painter, int channel, const QRectF &rect, const QnMotionRegion &region);
+    void paintMotionGrid(QPainter *painter, int channel, const QRectF &rect, const QnMetaDataV1Ptr &motion);
+    void paintMotionSensitivity(QPainter *painter, int channel, const QRectF &rect);
+    void paintFilledRegion(QPainter *painter, const QRectF &rect, const QRegion &selection, const QColor &color, const QColor &penColor);
 
-    void drawMotionSensitivity(QPainter *painter, const QRectF &rect, const QnMotionRegion& region, int channel);
+    void ensureMotionSensitivity() const;
+    void invalidateMotionSensitivity();
 
-    void drawMotionGrid(QPainter *painter, const QRectF &rect, const QnMetaDataV1Ptr &motion, int channel);
-
-    void drawMotionMask(QPainter *painter, const QRectF& rect, int channel);
-
-    void drawFilledRegion(QPainter *painter, const QRectF &rect, const QRegion &selection, const QColor& color, const QColor& penColor);
-
-    void ensureMotionMask();
-    void invalidateMotionMask();
-
-    void ensureMotionMaskBinData();
-    void invalidateMotionMaskBinData();
+    void ensureBinaryMotionMask() const;
+    void invalidateBinaryMotionMask();
 
     int motionGridWidth() const;
     int motionGridHeight() const;
+
+    QPoint channelGridOffset(int channel) const;
 
 private:
     /** Media resource. */
@@ -117,16 +120,16 @@ private:
     QList<QRegion> m_motionSelection;
 
     /** Image region where motion is currently present, in parrots. */
-    QList<QnMotionRegion> m_motionSensitivity;
+    mutable QList<QnMotionRegion> m_motionSensitivity;
 
     /** Whether the motion sensitivity is valid. */
-    bool m_motionSensitivityValid;
+    mutable bool m_motionSensitivityValid;
 
     /** Binary mask for the current motion region. */
-    QList<__m128i *> m_binaryMotionMask;
+    mutable QList<__m128i *> m_binaryMotionMask;
 
     /** Whether motion mask binary data is valid. */
-    bool m_binaryMotionMaskValid;
+    mutable bool m_binaryMotionMaskValid;
 
 
     QStaticText m_sensStaticText[10];

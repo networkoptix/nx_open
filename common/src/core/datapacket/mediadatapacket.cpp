@@ -52,7 +52,12 @@ AVCodecContext* QnMediaContext::ctx() const
     return m_ctx;
 }
 
-bool QnMediaContext::equalTo(QnMediaContext* other) const
+QString QnMediaContext::codecName() const 
+{
+    return m_ctx ? codecIDToString(m_ctx->codec_id) : QString();
+}
+
+bool QnMediaContext::equalTo(QnMediaContext *other) const
 {
     // I've add new condition bits_per_coded_sample for G726 audio codec
     return m_ctx->codec_id == other->m_ctx->codec_id && m_ctx->bits_per_coded_sample == other->m_ctx->bits_per_coded_sample;
