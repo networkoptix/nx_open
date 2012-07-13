@@ -363,6 +363,12 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     ssrc += media->subChannelNumber*2;
     int subChannelNumber = media->subChannelNumber;
 
+	int rtpTcpChannel = m_owner->getAVTcpChannel(rtspChannelNum);
+    if (rtpTcpChannel == -1) {
+        m_mutex.unlock();
+        return true; // skip data (for example audio is disabled)
+    }
+
     m_owner->clearBuffer();
     if (!metadata && media->compressionType)
     {
@@ -379,7 +385,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
             ctxData[subChannelNumber] = currentContext;
             QByteArray codecCtxData;
             QnFfmpegHelper::serializeCodecContext(currentContext->ctx(), &codecCtxData);
-            buildRtspTcpHeader(rtspChannelNum, ssrc + 1, codecCtxData.size(), true, 0, RTP_FFMPEG_GENERIC_CODE); // ssrc+1 - switch data subchannel to context subchannel
+            buildRtspTcpHeader(rtpTcpChannel, ssrc + 1, codecCtxData.size(), true, 0, RTP_FFMPEG_GENERIC_CODE); // ssrc+1 - switch data subchannel to context subchannel
             m_owner->bufferData(m_rtspTcpHeader, rtpHeaderSize);
             Q_ASSERT(!codecCtxData.isEmpty());
             m_owner->bufferData(codecCtxData);
@@ -410,7 +416,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         }
 
         sendLen = qMin(MAX_RTSP_DATA_LEN - ffHeaderSize, dataRest);
-        buildRtspTcpHeader(rtspChannelNum, ssrc, sendLen + ffHeaderSize, sendLen >= dataRest ? 1 : 0, media->timestamp, RTP_FFMPEG_GENERIC_CODE);
+        buildRtspTcpHeader(rtpTcpChannel, ssrc, sendLen + ffHeaderSize, sendLen >= dataRest ? 1 : 0, media->timestamp, RTP_FFMPEG_GENERIC_CODE);
         //QMutexLocker lock(&m_owner->getSockMutex());
         m_owner->bufferData(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
         if (ffHeaderSize) 
@@ -448,11 +454,14 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     if (!newRange.isEmpty())
     {
         sendLen = newRange.size();
-        buildRtspTcpHeader(m_owner->getMetadataChannelNum(), METADATA_SSRC, sendLen, 0, qnSyncTime->currentMSecsSinceEpoch(), RTP_METADATA_CODE);
-        m_owner->bufferData(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
-        m_owner->bufferData(newRange);
-        m_owner->sendBuffer();
-        m_owner->clearBuffer();
+        int metadataTcpChannel = m_owner->getMetadataTcpChannel();
+        if (metadataTcpChannel >= 0) {
+            buildRtspTcpHeader(metadataTcpChannel, METADATA_SSRC, sendLen, 0, qnSyncTime->currentMSecsSinceEpoch(), RTP_METADATA_CODE);
+            m_owner->bufferData(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
+            m_owner->bufferData(newRange);
+            m_owner->sendBuffer();
+            m_owner->clearBuffer();
+        }
     }
 
     if (m_packetSended++ == MAX_PACKETS_AT_SINGLE_SHOT)
