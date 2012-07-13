@@ -286,7 +286,8 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     m_rulerHeight(0.0),
     m_prefferedHeight(0.0),
     m_lastThumbnailsUpdateTime(0),
-    m_lastHoverThumbnail(-1)
+    m_lastHoverThumbnail(-1),
+    m_thumbnailsVisible(false)
 {
     m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("NO THUMBNAILS\nAVAILABLE"), 16, QColor(255, 255, 255, 255));
 
@@ -325,7 +326,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
 
     setWindowStart(minimum());
     setWindowEnd(maximum());
-    setOptions(StickToMinimum | StickToMaximum | UpdateToolTip | SelectionEditable | AdjustWindowToPosition | SnapZoomToSides | UnzoomOnDoubleClick);
+    setOptions(StickToMinimum | StickToMaximum | PreserveWindowSize | UpdateToolTip | SelectionEditable | AdjustWindowToPosition | SnapZoomToSides | UnzoomOnDoubleClick);
 
     setToolTipFormat(tr("hh:mm:ss", "DEFAULT_TOOL_TIP_FORMAT"));
     setRulerHeight(60.0);
@@ -626,7 +627,7 @@ void QnTimeSlider::setSelection(qint64 start, qint64 end) {
         m_selectionStart = start;
         m_selectionEnd = end;
 
-        emit selectionChanged(m_windowStart, m_windowEnd);
+        emit selectionChanged(m_selectionStart, m_selectionEnd);
     }
 }
 
@@ -817,6 +818,10 @@ QRectF QnTimeSlider::rulerRect() const {
     return QRectF(rect.left(), rect.top() + thumbnailsHeight(), rect.width(), rulerHeight());
 }
 
+bool QnTimeSlider::isThumbnailsVisible() const {
+    return m_thumbnailsVisible;
+}
+
 qreal QnTimeSlider::thumbnailsHeight() const {
     return size().height() - m_rulerHeight;
 }
@@ -834,6 +839,7 @@ void QnTimeSlider::setRulerHeight(qreal rulerHeight) {
 
     updateGeometry();
     updateThumbnailsStepSize(false);
+    updateThumbnailsVisibility();
 }
 
 void QnTimeSlider::addThumbnail(const QnThumbnail &thumbnail) {
@@ -1182,6 +1188,16 @@ void QnTimeSlider::setThumbnailSelecting(qint64 time, bool selecting) {
     }
     for(ipos = pos + 1; ipos != m_thumbnailData.end() && ipos->thumbnail.actualTime() == actualTime; ipos++)
         ipos->selecting = selecting;
+}
+
+void QnTimeSlider::updateThumbnailsVisibility() {
+    bool visible = thumbnailsHeight() >= thumbnailHeightForDrawing;
+    if(m_thumbnailsVisible == visible)
+        return;
+
+    m_thumbnailsVisible = visible;
+
+    emit thumbnailsVisibilityChanged();
 }
 
 
@@ -1720,12 +1736,14 @@ void QnTimeSlider::sliderChange(SliderChange change) {
         qint64 windowEnd = m_windowEnd;
 
         if((m_options & StickToMaximum) && windowEnd == m_oldMaximum) {
-            windowStart += maximum() - windowEnd;
+            if(m_options & PreserveWindowSize)
+                windowStart += maximum() - windowEnd;
             windowEnd = maximum();
         }
 
         if((m_options & StickToMinimum) && windowStart == m_oldMinimum) {
-            windowEnd += minimum() - windowStart;
+            if(m_options & PreserveWindowSize)
+                windowEnd += minimum() - windowStart;
             windowStart = minimum();
         }
 
@@ -1793,6 +1811,7 @@ void QnTimeSlider::resizeEvent(QGraphicsSceneResizeEvent *event) {
     updateLineCommentPixmaps();
     updateMinimalWindow();
     updateThumbnailsStepSize(false);
+    updateThumbnailsVisibility();
 }
 
 void QnTimeSlider::kineticMove(const QVariant &degrees) {
