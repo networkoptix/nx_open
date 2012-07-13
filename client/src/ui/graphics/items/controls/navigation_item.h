@@ -44,6 +44,7 @@ private slots:
     void updateSpeedSliderParametersFromNavigator();
     void updatePlaybackButtonsPressed();
     void updatePlayButtonChecked();
+    
 
     bool at_speedSlider_wheelEvent(QGraphicsSceneWheelEvent *event);
     void at_liveButton_clicked();

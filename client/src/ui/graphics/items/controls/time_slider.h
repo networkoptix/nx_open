@@ -41,11 +41,16 @@ public:
          */
         StickToMaximum = 0x2,
 
+        /**
+         * Whether window size is to be preserved when auto-adjusting window sides.
+         */
+        PreserveWindowSize = 0x4,
+
         /** 
          * Whether slider's tooltip is to be autoupdated using the provided
          * tool tip format. 
          */
-        UpdateToolTip = 0x4,
+        UpdateToolTip = 0x8,
 
         /**
          * Whether slider's value is considered to be a number of milliseconds that 
@@ -54,13 +59,13 @@ public:
          * If this flag is not set, slider's value is simply a number of 
          * milliseconds, with no connection to real dates.
          */
-        UseUTC = 0x8,
+        UseUTC = 0x10,
 
         /**
          * Whether the user can edit current selection with '[' and ']' buttons,
          * and with mouse.
          */
-        SelectionEditable = 0x10,
+        SelectionEditable = 0x20,
 
         /**
          * Whether the window should be auto-adjusted to contain the current
@@ -142,6 +147,7 @@ public:
     virtual QPointF positionFromValue(qint64 logicalValue, bool bound = true) const override;
     virtual qint64 valueFromPosition(const QPointF &position, bool bound = true) const override;
 
+    bool isThumbnailsVisible() const;
     qreal thumbnailsHeight() const;
     qreal rulerHeight() const;
     void setRulerHeight(qreal rulerHeight);
@@ -155,6 +161,7 @@ signals:
     void customContextMenuRequested(const QPointF &pos, const QPoint &screenPos);
     void selectionPressed();
     void selectionReleased();
+    void thumbnailsVisibilityChanged();
 
 protected:
     virtual void sliderChange(SliderChange change) override;
@@ -271,6 +278,7 @@ private:
     void updateThumbnailsStepSize(bool instant, bool forced = false);
     void updateThumbnailsPeriod();
     void updateThumbnailsStepSizeLater();
+    void updateThumbnailsVisibility();
     Q_SLOT void updateThumbnailsStepSizeTimer();
     Q_SLOT void updateThumbnailsStepSizeForced();
 
@@ -327,6 +335,7 @@ private:
     QList<ThumbnailData> m_oldThumbnailData;
     QRectF m_thumbnailsPaintRect;
     qint64 m_lastHoverThumbnail;
+    bool m_thumbnailsVisible;
 
     qreal m_rulerHeight;
     qreal m_prefferedHeight;
