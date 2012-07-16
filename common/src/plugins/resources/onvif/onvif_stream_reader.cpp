@@ -239,7 +239,7 @@ void QnOnvifStreamReader::updateVideoEncoder(VideoEncoder& encoder, bool isPrima
     } else 
     {
         encoder.H264->GovLength = m_onvifRes->getGovLength();
-        encoder.H264->H264Profile = isPrimary ? onvifXsd__H264Profile__High : onvifXsd__H264Profile__Baseline;
+        //encoder.H264->H264Profile = isPrimary ? onvifXsd__H264Profile__High : onvifXsd__H264Profile__Baseline;
     }
 
     if (!encoder.RateControl) 
