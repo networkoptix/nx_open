@@ -25,7 +25,13 @@ static const int SDP_TRACK_STEP = 2;
 
 //#define DEBUG_RTSP
 
-extern QString getValueFromString(const QString& line);
+static QString getValueFromString(const QString& line)
+{
+    int index = line.indexOf("=");
+    if (index < 1)
+        return QString();
+    return line.mid(index+1);
+}
 
 // --------------------- RTPIODevice --------------------------
 
