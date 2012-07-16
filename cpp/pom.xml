@@ -172,6 +172,7 @@
 
 								<fileset id="headers_path" dir="${project.build.sourceDirectory}" erroronmissingdir="false">
 									<include name="**/*.h" />
+									<exclude name="**/version.h" />
 								</fileset>
 								<pathconvert pathsep="${line.separator}" property="headers" refid="headers_path">
 									<map from="" to="HEADERS += "/>

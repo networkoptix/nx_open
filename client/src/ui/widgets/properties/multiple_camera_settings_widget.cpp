@@ -286,9 +286,11 @@ void QnMultipleCameraSettingsWidget::updateMaxFPS(){
     int maxFps = std::numeric_limits<int>::max();
     foreach (QnVirtualCameraResourcePtr camera, m_cameras) 
     {
+        
+
         int cameraFps =camera->getMaxFps();
-        if ((camera->supportedMotionType() & MT_SoftwareGrid)
-            || ui->cameraScheduleWidget->isSecondaryStreamReserver())
+        if ((camera->getMotionType() & MT_SoftwareGrid)/*
+            || ui->cameraScheduleWidget->isSecondaryStreamReserver()*/)
             cameraFps -= 2;
         maxFps = qMin(maxFps, cameraFps);
     }
