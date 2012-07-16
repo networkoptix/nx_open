@@ -50,7 +50,7 @@ public:
     }
 
     static QByteArray basicAuth(const QAuthenticator& auth);
-
+    static QString digestAccess(const QAuthenticator& auth, const QString& realm, const QString& nonce, const QString& method, const QString& url);
 
     QString mRealm;
     QString mNonce;

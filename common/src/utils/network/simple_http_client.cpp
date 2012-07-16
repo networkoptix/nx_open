@@ -355,15 +355,15 @@ QByteArray CLSimpleHTTPClient::basicAuth() const
     return basicAuth(m_auth);
 }
 
-QString CLSimpleHTTPClient::digestAccess(const QString& request) const
+QString CLSimpleHTTPClient::digestAccess(const QAuthenticator& auth, const QString& realm, const QString& nonce, const QString& method, const QString& url)
 {
-    QString HA1= m_auth.user() + QLatin1Char(':') + mRealm + QLatin1Char(':') + m_auth.password();
+    QString HA1= auth.user() + QLatin1Char(':') + realm + QLatin1Char(':') + auth.password();
     HA1 = QString::fromAscii(QCryptographicHash::hash(HA1.toAscii(), QCryptographicHash::Md5).toHex().constData());
 
-    QString HA2 = QLatin1String("GET:/") + request;
+    QString HA2 = method + QString(':') + url;
     HA2 = QString::fromAscii(QCryptographicHash::hash(HA2.toAscii(), QCryptographicHash::Md5).toHex().constData());
 
-    QString response = HA1 + QLatin1Char(':') + mNonce + QLatin1Char(':') + HA2;
+    QString response = HA1 + QLatin1Char(':') + nonce + QLatin1Char(':') + HA2;
 
     response = QString::fromAscii(QCryptographicHash::hash(response.toAscii(), QCryptographicHash::Md5).toHex().constData());
 
@@ -371,9 +371,15 @@ QString CLSimpleHTTPClient::digestAccess(const QString& request) const
     QString result;
     QTextStream str(&result);
 
-    str << "Authorization: Digest username=\"" << m_auth.user() << "\",realm=\"" << mRealm << "\",nonce=\"" << mNonce << "\",uri=\"/" << request << "\",response=\"" << response << "\"\r\n";
+    str << "Authorization: Digest username=\"" << auth.user() << "\",realm=\"" << realm << "\",nonce=\"" << nonce << "\",uri=\"" << url << "\",response=\"" << response << "\"\r\n";
 
     return result;
+
+}
+
+QString CLSimpleHTTPClient::digestAccess(const QString& request) const
+{
+    return digestAccess(m_auth, mRealm, mNonce, QLatin1String("GET"), QString('/') + request);
 }
 
 
