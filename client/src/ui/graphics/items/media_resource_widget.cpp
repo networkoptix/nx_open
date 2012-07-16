@@ -45,13 +45,13 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         qnCritical("Media resource widget was created with a non-media resource.");
 
     /* Set up buttons. */
-    QnImageButtonWidget *searchButton = new QnImageButtonWidget();
-    searchButton->setIcon(qnSkin->icon("decorations/item_search.png"));
-    searchButton->setCheckable(true);
-    searchButton->setProperty(Qn::NoBlockMotionSelection, true);
-    connect(searchButton, SIGNAL(toggled(bool)), this, SLOT(at_searchButton_toggled(bool)));
+    m_searchButton = new QnImageButtonWidget();
+    m_searchButton->setIcon(qnSkin->icon("decorations/item_search.png"));
+    m_searchButton->setCheckable(true);
+    m_searchButton->setProperty(Qn::NoBlockMotionSelection, true);
+    connect(m_searchButton, SIGNAL(toggled(bool)), this, SLOT(at_searchButton_toggled(bool)));
 
-    buttonBar()->addButton(MotionSearchButton, searchButton);
+    buttonBar()->addButton(MotionSearchButton, m_searchButton);
 
     /* Set up video rendering. */
     m_display = new QnResourceDisplay(m_resource, this);
@@ -381,7 +381,7 @@ void QnMediaResourceWidget::displayFlagsChangedNotify(DisplayFlags changedFlags)
         if (QnAbstractArchiveReader *reader = m_display->archiveReader())
             reader->setSendMotion(displayFlags() & DisplayMotion);
 
-        searchButton->setChecked(flags & DisplayMotion);
+        m_searchButton->setChecked(displayFlags() & DisplayMotion);
 
         if(displayFlags() & DisplayMotion) {
             setProperty(Qn::MotionSelectionModifiers, 0);
@@ -426,6 +426,8 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
 
     if(m_resource.dynamicCast<QnSecurityCamResource>())
         result |= MotionSearchButton;
+
+    return result;
 }
 
 void QnMediaResourceWidget::at_resource_resourceChanged() {

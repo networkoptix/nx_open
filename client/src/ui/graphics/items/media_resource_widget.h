@@ -138,6 +138,7 @@ private:
     /** Whether motion mask binary data is valid. */
     mutable bool m_binaryMotionMaskValid;
 
+    QnImageButtonWidget *m_searchButton;
 
     QStaticText m_sensStaticText[10];
 

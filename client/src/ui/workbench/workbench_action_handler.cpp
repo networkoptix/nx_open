@@ -26,6 +26,8 @@
 
 #include <device_plugins/server_camera/appserver.h>
 
+#include <plugins/storage/file_storage/layout_storage_resource.h>
+
 #include <camera/resource_display.h>
 #include <camera/camdisplay.h>
 #include <camera/camera.h>
@@ -50,6 +52,7 @@
 #include <youtube/youtubeuploaddialog.h>
 
 #include <ui/graphics/items/resource_widget.h>
+#include <ui/graphics/items/media_resource_widget.h>
 
 #include <utils/settings.h>
 
@@ -65,7 +68,6 @@
 #include "workbench_layout_snapshot_manager.h"
 #include "workbench_resource.h"
 #include "workbench_access_controller.h"
-#include "plugins/storage/file_storage/layout_storage_resource.h"
 
 
 // -------------------------------------------------------------------------- //
@@ -1323,7 +1325,7 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
     QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
     if(widgets.size() != 1)
         return;
-    QnResourceWidget *widget = widgets[0];
+    QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(widgets[0]); // TODO: check
     QnResourceDisplay *display = widget->display();
     const QnVideoResourceLayout *layout = display->videoLayout();
 
@@ -1643,11 +1645,11 @@ void QnWorkbenchActionHandler::at_exportTimeSelectionAction_triggered() {
         return;
     parameters.setItems(provider->currentTarget(Qn::SceneScope));
 
-    QnResourceWidget *widget = NULL;
+    QnMediaResourceWidget *widget = NULL;
 
     if(parameters.size() != 1) {
         if(parameters.size() == 0 && display()->widgets().size() == 1) {
-            widget = display()->widgets().front();
+            widget = dynamic_cast<QnMediaResourceWidget *>(display()->widgets().front());
         } else {
             QMessageBox::critical(
                 this->widget(), 
@@ -1658,7 +1660,7 @@ void QnWorkbenchActionHandler::at_exportTimeSelectionAction_triggered() {
             return;
         }
     } else {
-        widget = parameters.widget();
+        widget = dynamic_cast<QnMediaResourceWidget *>(parameters.widget());
     }
     if(!widget)
         return;

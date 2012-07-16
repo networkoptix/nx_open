@@ -410,16 +410,6 @@ void QnResourceWidget::setInfoVisible(bool visible, bool animate) {
     }
 }
 
-void QnResourceWidget::setChannelOverlay(int channel, Overlay overlay) {
-    ChannelState &state = m_channelState[channel];
-    if(state.overlay == overlay)
-        return;
-
-    state.fadeInNeeded = state.overlay == EmptyOverlay;
-    state.changeTimeMSec = QDateTime::currentMSecsSinceEpoch();
-    state.overlay = overlay;
-}
-
 Qt::WindowFrameSection QnResourceWidget::windowFrameSectionAt(const QPointF &pos) const {
     return Qn::toQtFrameSection(static_cast<Qn::WindowFrameSection>(static_cast<int>(windowFrameSectionsAt(QRectF(pos, QSizeF(0.0, 0.0))))));
 }
@@ -525,7 +515,13 @@ QnResourceWidget::Overlay QnResourceWidget::channelOverlay(int channel) const {
 }
 
 void QnResourceWidget::setChannelOverlay(int channel, Overlay overlay) {
-    m_channelState[channel].overlay = overlay;
+    ChannelState &state = m_channelState[channel];
+    if(state.overlay == overlay)
+        return;
+
+    state.fadeInNeeded = state.overlay == EmptyOverlay;
+    state.changeTimeMSec = QDateTime::currentMSecsSinceEpoch();
+    state.overlay = overlay;
 }
 
 QnResourceWidget::Overlay QnResourceWidget::calculateChannelOverlay(int channel) const {
@@ -594,7 +590,7 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     QnScopedPainterFontRollback fontRollback(painter);
 
     /* Update screen size of a single channel. */
-    setChannelScreenSize(painter->combinedTransform().mapRect(channelRect(0)).size());
+    setChannelScreenSize(painter->combinedTransform().mapRect(channelRect(0)).size().toSize());
 
     qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
 
@@ -796,7 +792,7 @@ void QnResourceWidget::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
 }
 
 void QnResourceWidget::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
-    if(!m_infoButton->isChecked())
+    if(!isInfoVisible())
         setDecorationsVisible(false);
 
     base_type::hoverLeaveEvent(event);

@@ -73,7 +73,7 @@ public:
      * \param widget              Whether camera streams on the scene should
      *                                  be synchronized.
      */
-    void setStreamsSynchronized(QnResourceWidget* widget);
+    void setStreamsSynchronized(QnResourceWidget *widget);
     void setStreamsSynchronized(bool synchronized, qint64 currentTime, float speed);
 
 

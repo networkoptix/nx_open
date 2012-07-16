@@ -38,6 +38,7 @@
 
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/graphics/items/resource_server_widget.h>
+#include <ui/graphics/items/media_resource_widget.h>
 #include <ui/graphics/items/resource_widget_renderer.h>
 #include <ui/graphics/items/curtain_item.h>
 #include <ui/graphics/items/image_button_widget.h>
@@ -254,15 +255,16 @@ void QnWorkbenchDisplay::setStreamsSynchronized(bool synchronized, qint64 curren
     emit streamsSynchronizedChanged();
 }
 
-void QnWorkbenchDisplay::setStreamsSynchronized(QnResourceWidget* widget)
-{
+void QnWorkbenchDisplay::setStreamsSynchronized(QnResourceWidget *widget) {
     bool synchronized = widget != 0;
     qint64 currentTime = AV_NOPTS_VALUE;
     float speed = 1.0;
-    if (widget) {
-        currentTime = widget->display()->currentTimeUSec();
-        speed = widget->display()->camDisplay()->getSpeed();
+    
+    if (QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
+        currentTime = mediaWidget->display()->currentTimeUSec();
+        speed = mediaWidget->display()->camDisplay()->getSpeed();
     }
+
     setStreamsSynchronized(synchronized, currentTime, speed);
 }
 
@@ -584,13 +586,13 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
             workbench()->setItem(Qn::RaisedRole, NULL);
 
         /* Update media quality. */
-        if(oldWidget)
-            if (oldWidget->display()->archiveReader())
-                oldWidget->display()->archiveReader()->enableQualityChange();
-        if(newWidget) {
-            if (newWidget->display()->archiveReader()) {
-                newWidget->display()->archiveReader()->setQuality(MEDIA_Quality_High, true);
-                newWidget->display()->archiveReader()->disableQualityChange();
+        if(QnMediaResourceWidget *oldMediaWidget = dynamic_cast<QnMediaResourceWidget *>(oldWidget))
+            if (oldMediaWidget->display()->archiveReader())
+                oldMediaWidget->display()->archiveReader()->enableQualityChange();
+        if(QnMediaResourceWidget *newMediaWidget = dynamic_cast<QnMediaResourceWidget *>(newWidget)) {
+            if (newMediaWidget->display()->archiveReader()) {
+                newMediaWidget->display()->archiveReader()->setQuality(MEDIA_Quality_High, true);
+                newMediaWidget->display()->archiveReader()->disableQualityChange();
             }
         }
 
@@ -609,13 +611,17 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
     }
     case Qn::CentralRole: {
         /* Update audio playback. */
-        CLCamDisplay *oldCamDisplay = oldWidget ? oldWidget->display()->camDisplay() : NULL;
-        if(oldCamDisplay != NULL)
-            oldCamDisplay->playAudio(false);
+        if(QnMediaResourceWidget *oldMediaWidget = dynamic_cast<QnMediaResourceWidget *>(oldWidget)) {
+            CLCamDisplay *oldCamDisplay = oldMediaWidget ? oldMediaWidget->display()->camDisplay() : NULL;
+            if(oldCamDisplay)
+                oldCamDisplay->playAudio(false);
+        }
 
-        CLCamDisplay *newCamDisplay = newWidget ? newWidget->display()->camDisplay() : NULL;
-        if(newCamDisplay != NULL)
-            newCamDisplay->playAudio(true);
+        if(QnMediaResourceWidget *newMediaWidget = dynamic_cast<QnMediaResourceWidget *>(newWidget)) { 
+            CLCamDisplay *newCamDisplay = newMediaWidget ? newMediaWidget->display()->camDisplay() : NULL;
+            if(newCamDisplay)
+                newCamDisplay->playAudio(true);
+        }
 
         break;
     }
@@ -635,7 +641,7 @@ QList<QnResourceWidget *> QnWorkbenchDisplay::widgets(const QnResourcePtr &resou
 }
 
 QnResourceDisplay *QnWorkbenchDisplay::display(QnWorkbenchItem *item) const {
-    if(QnResourceWidget *widget = this->widget(item))
+    if(QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(this->widget(item)))
         return widget->display();
     return NULL;
 }

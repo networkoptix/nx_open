@@ -40,6 +40,7 @@ class QnWorkbenchDisplay;
 class QnWorkbenchLayout;
 class QnWorkbench;
 class QnResourceWidget;
+class QnMediaResourceWidget;
 class QnWorkbenchItem;
 class QnWorkbenchGridMapper;
 class QnScreenRecorder;
@@ -118,9 +119,9 @@ protected slots:
     void at_rotationStarted(QGraphicsView *view, QGraphicsWidget *widget);
     void at_rotationFinished(QGraphicsView *view, QGraphicsWidget *widget);
 
-    void at_motionSelectionProcessStarted(QGraphicsView *view, QnResourceWidget *widget);
-    void at_motionRegionCleared(QGraphicsView *view, QnResourceWidget *widget);
-    void at_motionRegionSelected(QGraphicsView *view, QnResourceWidget *widget, const QRect &region);
+    void at_motionSelectionProcessStarted(QGraphicsView *view, QnMediaResourceWidget *widget);
+    void at_motionRegionCleared(QGraphicsView *view, QnMediaResourceWidget *widget);
+    void at_motionRegionSelected(QGraphicsView *view, QnMediaResourceWidget *widget, const QRect &region);
 
     void at_item_leftClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
     void at_item_rightClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
