@@ -167,6 +167,7 @@ protected slots:
     void at_timeSlider_selectionPressed();
     void at_timeSlider_selectionChanged();
     void at_timeSlider_customContextMenuRequested(const QPointF &pos, const QPoint &screenPos);
+    void updateTimeSliderWindowSizePolicy();
     void at_timeSlider_destroyed();
 
     void at_timeScrollBar_sliderPressed();
@@ -204,6 +205,9 @@ private:
     qreal m_lastSpeed;
     qreal m_lastMinimalSpeed;
     qreal m_lastMaximalSpeed;
+
+    qint64 m_lastUpdateSlider;
+    qint64 m_lastCameraTime;
 
     QAction *m_startSelectionAction, *m_endSelectionAction, *m_clearSelectionAction;
 

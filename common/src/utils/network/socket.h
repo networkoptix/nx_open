@@ -12,6 +12,7 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #endif
+#include "nettools.h"
 
 #define MAX_ERROR_MSG_LENGTH 1024
 
@@ -99,6 +100,8 @@ public:
     bool setLocalAddressAndPort(const QString &localAddress,
                                 unsigned short localPort = 0) ;
 
+    bool bindToInterface(const QnInterfaceAndAddr& iface);
+
     /**
      *   If WinSock, unload the WinSock DLLs; otherwise do nothing.  We ignore
      *   this in our sample client code but include it in the library for
@@ -125,16 +128,16 @@ public:
 
     int handle() const { return sockDesc; }
 
-protected:
-    bool fillAddr(const QString &address, unsigned short port, sockaddr_in &addr);
-
-    void createSocket(int type, int protocol);
-
     /**
      * Set SO_REUSEADDR flag to allow socket to start listening
      * even if port is busy (in TIME_WAIT state).
      */
     void setReuseAddrFlag(bool reuseAddr = true);
+
+protected:
+    bool fillAddr(const QString &address, unsigned short port, sockaddr_in &addr);
+
+    void createSocket(int type, int protocol);
 
 private:
     // Prevent the user from trying to use value semantics on this object
@@ -332,6 +335,8 @@ public:
      *
      */
     bool sendTo(const void *buffer, int bufferLen);
+    bool sendTo(const void *buffer, int bufferLen, const QString &foreignAddress, unsigned short foreignPort);
+
 
     /**
      *   Read read up to bufferLen bytes data from this socket.  The given buffer
@@ -349,23 +354,26 @@ public:
     /**
      *   Set the multicast TTL
      *   @param multicastTTL multicast TTL
-     *   @exception SocketException thrown if unable to set TTL
      */
-    void setMulticastTTL(unsigned char multicastTTL) ;
+    bool setMulticastTTL(unsigned char multicastTTL) ;
+
+    /**
+     *   Set the multicast send interface
+     *   @param multicastIF multicast interface for sending packets
+     */
+    bool setMulticastIF(const QString& multicastIF);
 
     /**
      *   Join the specified multicast group
      *   @param multicastGroup multicast group address to join
-     *   @exception SocketException thrown if unable to join group
      */
-    void joinGroup(const QString &multicastGroup) ;
+    bool joinGroup(const QString &multicastGroup) ;
 
     /**
      *   Leave the specified multicast group
      *   @param multicastGroup multicast group address to leave
-     *   @exception SocketException thrown if unable to leave group
      */
-    void leaveGroup(const QString &multicastGroup) ;
+    bool leaveGroup(const QString &multicastGroup) ;
 
     bool hasData() const;
 

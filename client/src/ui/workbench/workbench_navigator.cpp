@@ -63,7 +63,9 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_pausedOverride(false),
     m_lastSpeed(0.0),
     m_lastMinimalSpeed(0.0),
-    m_lastMaximalSpeed(0.0)
+    m_lastMaximalSpeed(0.0),
+    m_lastUpdateSlider(0),
+    m_lastCameraTime(0)
 {}
     
 QnWorkbenchNavigator::~QnWorkbenchNavigator() {
@@ -146,6 +148,7 @@ void QnWorkbenchNavigator::initialize() {
     connect(m_timeSlider,                       SIGNAL(selectionChanged(qint64, qint64)),           this,   SLOT(at_timeSlider_selectionChanged()));
     connect(m_timeSlider,                       SIGNAL(customContextMenuRequested(const QPointF &, const QPoint &)), this, SLOT(at_timeSlider_customContextMenuRequested(const QPointF &, const QPoint &)));
     connect(m_timeSlider,                       SIGNAL(selectionPressed()),                         this,   SLOT(at_timeSlider_selectionPressed()));
+    connect(m_timeSlider,                       SIGNAL(thumbnailsVisibilityChanged()),              this,   SLOT(updateTimeSliderWindowSizePolicy()));
     m_timeSlider->setLineCount(SliderLineCount);
     m_timeSlider->setLineStretch(CurrentLine, 1.5);
     m_timeSlider->setLineStretch(SyncedLine, 1.0);
@@ -160,6 +163,7 @@ void QnWorkbenchNavigator::initialize() {
 
     updateLines();
     updateScrollBarFromSlider();
+    updateTimeSliderWindowSizePolicy();
 } 
 
 void QnWorkbenchNavigator::deinitialize() {
@@ -643,6 +647,16 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
         qint64 timeUSec = m_currentWidget->display()->camDisplay()->isRealTimeSource() ? DATETIME_NOW : m_currentWidget->display()->camera()->getCurrentTime();
         qint64 timeMSec = timeUSec == DATETIME_NOW ? endTimeMSec : (timeUSec == AV_NOPTS_VALUE ? m_timeSlider->value() : timeUSec / 1000);
 
+        if (timeUSec != DATETIME_NOW && timeUSec != AV_NOPTS_VALUE){
+            qint64 now = QDateTime::currentDateTimeUtc().toMSecsSinceEpoch();
+            if (m_lastUpdateSlider && m_lastCameraTime == timeMSec){
+                timeMSec += (now - m_lastUpdateSlider) * this->speed();
+            } else {
+                m_lastCameraTime = timeMSec;
+                m_lastUpdateSlider = now;
+            }
+        }
+
         m_timeSlider->setValue(timeMSec, keepInWindow);
 
         if(timeUSec != AV_NOPTS_VALUE)
@@ -848,6 +862,10 @@ void QnWorkbenchNavigator::updateThumbnailsLoader() {
     } else if(!m_timeSlider->thumbnailsLoader() || m_timeSlider->thumbnailsLoader()->resource() != resource) {
         m_timeSlider->setThumbnailsLoader(thumbnailLoader(resource));
     }
+}
+
+void QnWorkbenchNavigator::updateTimeSliderWindowSizePolicy() {
+    m_timeSlider->setOption(QnTimeSlider::PreserveWindowSize, m_timeSlider->isThumbnailsVisible());
 }
 
 

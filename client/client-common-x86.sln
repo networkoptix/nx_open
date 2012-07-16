@@ -1,12 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client", "src\client-x86.vcproj", "{7D98C414-9AB0-3A50-B85B-168D76B79107}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client", "src\client-x86.vcproj", "{257C5D47-677B-3C2D-AA2E-61D687C8427E}"
 	ProjectSection(ProjectDependencies) = postProject
-		{E3D389E1-87C6-36B6-A3A6-63DDB0F1F746} = {E3D389E1-87C6-36B6-A3A6-63DDB0F1F746}
+		{F31DD87B-F702-362F-BAD0-E2567CFDB86F} = {F31DD87B-F702-362F-BAD0-E2567CFDB86F}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common", "..\common\src\common-x86.vcproj", "{E3D389E1-87C6-36B6-A3A6-63DDB0F1F746}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common", "..\common\src\common-x86.vcproj", "{F31DD87B-F702-362F-BAD0-E2567CFDB86F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -14,14 +14,14 @@ Global
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{7D98C414-9AB0-3A50-B85B-168D76B79107}.Debug|Win32.ActiveCfg = Debug|Win32
-		{7D98C414-9AB0-3A50-B85B-168D76B79107}.Debug|Win32.Build.0 = Debug|Win32
-		{7D98C414-9AB0-3A50-B85B-168D76B79107}.Release|Win32.ActiveCfg = Release|Win32
-		{7D98C414-9AB0-3A50-B85B-168D76B79107}.Release|Win32.Build.0 = Release|Win32
-		{E3D389E1-87C6-36B6-A3A6-63DDB0F1F746}.Debug|Win32.ActiveCfg = Debug|Win32
-		{E3D389E1-87C6-36B6-A3A6-63DDB0F1F746}.Debug|Win32.Build.0 = Debug|Win32
-		{E3D389E1-87C6-36B6-A3A6-63DDB0F1F746}.Release|Win32.ActiveCfg = Release|Win32
-		{E3D389E1-87C6-36B6-A3A6-63DDB0F1F746}.Release|Win32.Build.0 = Release|Win32
+		{257C5D47-677B-3C2D-AA2E-61D687C8427E}.Debug|Win32.ActiveCfg = Debug|Win32
+		{257C5D47-677B-3C2D-AA2E-61D687C8427E}.Debug|Win32.Build.0 = Debug|Win32
+		{257C5D47-677B-3C2D-AA2E-61D687C8427E}.Release|Win32.ActiveCfg = Release|Win32
+		{257C5D47-677B-3C2D-AA2E-61D687C8427E}.Release|Win32.Build.0 = Release|Win32
+		{F31DD87B-F702-362F-BAD0-E2567CFDB86F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F31DD87B-F702-362F-BAD0-E2567CFDB86F}.Debug|Win32.Build.0 = Debug|Win32
+		{F31DD87B-F702-362F-BAD0-E2567CFDB86F}.Release|Win32.ActiveCfg = Release|Win32
+		{F31DD87B-F702-362F-BAD0-E2567CFDB86F}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

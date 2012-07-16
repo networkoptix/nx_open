@@ -426,7 +426,8 @@ QString CommunicatingSocket::getForeignAddress()
     unsigned int addr_len = sizeof(addr);
 
     if (getpeername(sockDesc, (sockaddr *) &addr,(socklen_t *) &addr_len) < 0) {
-        throw SocketException("Fetch of foreign address failed (getpeername())", true);
+        qWarning() << "Fetch of foreign address failed (getpeername())";
+        return QString();
     }
     return inet_ntoa(addr.sin_addr);
 }
@@ -614,6 +615,13 @@ bool UDPSocket::setDestAddr(const QString &foreignAddress, unsigned short foreig
     return fillAddr(foreignAddress, foreignPort, *m_destAddr);
 }
 
+bool UDPSocket::sendTo(const void *buffer, int bufferLen, const QString &foreignAddress, unsigned short foreignPort)
+{
+    setDestAddr(foreignAddress, foreignPort);
+    return sendTo(buffer, bufferLen);
+}
+
+
 bool UDPSocket::sendTo(const void *buffer, int bufferLen)
 {
 
@@ -641,14 +649,42 @@ int UDPSocket::recvFrom(void *buffer, int bufferLen, QString &sourceAddress,
     return rtn;
 }
 
-void UDPSocket::setMulticastTTL(unsigned char multicastTTL)  {
-    if (setsockopt(sockDesc, IPPROTO_IP, IP_MULTICAST_TTL,
-                   (raw_type *) &multicastTTL, sizeof(multicastTTL)) < 0) {
-        throw SocketException("Multicast TTL set failed (setsockopt())", true);
-    }
+bool Socket::bindToInterface(const QnInterfaceAndAddr& iface)
+{
+#ifdef Q_OS_LINUX
+    setLocalPort(0);
+    bool res = setsockopt(handle(), SOL_SOCKET, SO_BINDTODEVICE, iface.name.toAscii().constData(), iface.name.length()) >= 0;
+#else
+    bool res = setLocalAddressAndPort(iface.address.toString(), 0);
+#endif
+
+    if (!res)
+        qDebug() << "bindToInterface(): Can't bind to interface" << iface.address << "error code=" << strerror(errno);
+    return res;
 }
 
-void UDPSocket::joinGroup(const QString &multicastGroup)  {
+bool UDPSocket::setMulticastTTL(unsigned char multicastTTL)  {
+    if (setsockopt(sockDesc, IPPROTO_IP, IP_MULTICAST_TTL,
+                   (raw_type *) &multicastTTL, sizeof(multicastTTL)) < 0) {
+        qWarning() << "Multicast TTL set failed (setsockopt())";
+        return false;
+    }
+    return true;
+}
+
+bool UDPSocket::setMulticastIF(const QString& multicastIF)
+{
+    struct in_addr localInterface;
+    localInterface.s_addr = inet_addr(multicastIF.toLocal8Bit().data());
+    if (setsockopt(sockDesc, IPPROTO_IP, IP_MULTICAST_IF, (raw_type *) &localInterface, sizeof(localInterface)) < 0) 
+    {
+        qWarning() << "Multicast TTL set failed (setsockopt())";
+        return false;
+    }
+    return true;
+}
+
+bool UDPSocket::joinGroup(const QString &multicastGroup)  {
     struct ip_mreq multicastRequest;
 
     multicastRequest.imr_multiaddr.s_addr = inet_addr(multicastGroup.toAscii());
@@ -656,11 +692,13 @@ void UDPSocket::joinGroup(const QString &multicastGroup)  {
     if (setsockopt(sockDesc, IPPROTO_IP, IP_ADD_MEMBERSHIP,
                    (raw_type *) &multicastRequest,
                    sizeof(multicastRequest)) < 0) {
-        throw SocketException("Multicast group join failed (setsockopt())", true);
+        qWarning() << "Multicast group join failed (setsockopt())";
+        return false;
     }
+    return true;
 }
 
-void UDPSocket::leaveGroup(const QString &multicastGroup)  {
+bool UDPSocket::leaveGroup(const QString &multicastGroup)  {
     struct ip_mreq multicastRequest;
 
     multicastRequest.imr_multiaddr.s_addr = inet_addr(multicastGroup.toAscii());
@@ -668,8 +706,10 @@ void UDPSocket::leaveGroup(const QString &multicastGroup)  {
     if (setsockopt(sockDesc, IPPROTO_IP, IP_DROP_MEMBERSHIP,
                    (raw_type *) &multicastRequest,
                    sizeof(multicastRequest)) < 0) {
-        throw SocketException("Multicast group leave failed (setsockopt())", true);
+        qWarning() << "Multicast group leave failed (setsockopt())";
+        return false;
     }
+    return true;
 }
 
 bool UDPSocket::hasData() const

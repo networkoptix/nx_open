@@ -31,8 +31,8 @@ static const int SOAP_DISCOVERY_TIMEOUT = 1; // "+" in seconds, "-" in mseconds
 static const int SOAP_HELLO_CHECK_TIMEOUT = -1; // "+" in seconds, "-" in mseconds
 static const int CHECK_HELLO_RETRY_COUNT = 50;
 
-extern bool multicastJoinGroup(QUdpSocket& udpSocket, QHostAddress groupAddress, QHostAddress localAddress);
-extern bool multicastLeaveGroup(QUdpSocket& udpSocket, QHostAddress groupAddress);
+//extern bool multicastJoinGroup(QUdpSocket& udpSocket, QHostAddress groupAddress, QHostAddress localAddress);
+//extern bool multicastLeaveGroup(QUdpSocket& udpSocket, QHostAddress groupAddress);
 
 QString& OnvifResourceSearcherWsdd::LOCAL_ADDR = *new QString("127.0.0.1");
 const char OnvifResourceSearcherWsdd::SCOPES_NAME_PREFIX[] = "onvif://www.onvif.org/name/";

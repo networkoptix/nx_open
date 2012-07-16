@@ -922,7 +922,6 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
 
         int retryCount = getMaxOnvifRequestTries();
         soapRes = SOAP_ERR;
-        bool encodersFound = false;
 
         for (;soapRes != SOAP_OK && retryCount >= 0; --retryCount)
         {

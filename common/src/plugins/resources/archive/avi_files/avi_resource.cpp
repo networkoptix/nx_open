@@ -1,8 +1,12 @@
 #include "avi_resource.h"
 #include "avi_archive_delegate.h"
+
+#include <core/resource/storage_resource.h>
+
 #include "../archive_stream_reader.h"
 #include "../filetypesupport.h"
 #include "../single_shot_file_reader.h"
+
 
 QnAviResource::QnAviResource(const QString& file)
 {
