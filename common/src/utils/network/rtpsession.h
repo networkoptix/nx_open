@@ -206,6 +206,10 @@ private:
     void parseSDP();
     void addAdditionAttrs(QByteArray& request);
     void updateResponseStatus(const QByteArray& response);
+
+    // in case of error return false
+    bool checkIfDigestAuthIsneeded(const QByteArray& response);
+
 private:
     enum { RTSP_BUFFER_LEN = 1024 * 64 * 16 };
 
@@ -242,6 +246,11 @@ private:
     int m_responseCode;
     bool m_isAudioEnabled;
     QString m_prefferedTransport;
+
+    bool m_useDigestAuth;
+    QString m_realm;
+    QString m_nonce;
+
 };
 
 #endif //rtp_session_h_1935_h

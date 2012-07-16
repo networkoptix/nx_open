@@ -20,6 +20,7 @@ New Features:
    - Smart Search region selection is much more intuitive now
    - Motion Detection configuration works much more intuitive now
  - If mediaserver changes its IP address it is detected without restart
+ - If adding or changing a storage on Media Server the amount of free space is checked too
  - Port selection algorithm is changed: now the sequential ports are suggested. It allows to simplify port forwarding: now it is possible to make a single port forwarding rule for the port range
  - Security fixes:
    - All system components are using SSL

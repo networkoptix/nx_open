@@ -25,6 +25,8 @@ static const int SDP_TRACK_STEP = 2;
 
 //#define DEBUG_RTSP
 
+extern QString getValueFromString(const QString& line);
+
 // --------------------- RTPIODevice --------------------------
 
 RTPIODevice::RTPIODevice(RTPSession* owner, bool useTCP):
@@ -168,7 +170,8 @@ RTPSession::RTPSession():
     m_tcpTimeout(50 * 1000 * 1000),
     m_proxyPort(0),
     m_responseCode(CODE_OK),
-    m_isAudioEnabled(true)
+    m_isAudioEnabled(true),
+    m_useDigestAuth(false)
 {
     m_responseBuffer = new quint8[RTSP_BUFFER_LEN];
     m_responseBufferLen = 0;
@@ -300,6 +303,47 @@ void RTPSession::updateResponseStatus(const QByteArray& response)
     }
 }
 
+// in case of error return false
+bool RTPSession::checkIfDigestAuthIsneeded(const QByteArray& response)
+{
+    QString wwwAuth = extractRTSPParam(response, "WWW-Authenticate:");
+
+    if (wwwAuth.toLower().contains("digest"))
+    {
+        QStringList params = wwwAuth.split(',');
+        if (params.size()<2)
+            return false;
+
+        m_realm = "";
+        m_nonce = "";
+
+        foreach(QString val, params)
+        {
+            if (val.contains("realm"))
+                m_realm = getValueFromString(val);
+            else if (val.contains("nonce"))
+                m_nonce = getValueFromString(val);
+        }
+
+        m_realm.remove('"');
+        m_nonce.remove('"');
+
+
+        if (m_realm.isEmpty() || m_nonce.isEmpty())
+            return false;
+
+
+        m_useDigestAuth = true;
+    }
+    else
+    {
+        m_useDigestAuth = false;
+    }
+
+
+    return true;
+}
+
 bool RTPSession::open(const QString& url)
 {
     m_SessionId.clear();
@@ -307,6 +351,9 @@ bool RTPSession::open(const QString& url)
     mUrl = url;
     m_contentBase = mUrl.toString();
     m_responseBufferLen = 0;
+    m_useDigestAuth = false;
+
+
 
     //unsigned int port = DEFAULT_RTP_PORT;
 
@@ -339,6 +386,27 @@ bool RTPSession::open(const QString& url)
 		m_tcpSock.close();
         return false;
 	}
+
+    // check digest authentication here
+    if (!checkIfDigestAuthIsneeded(response))
+    {
+        m_tcpSock.close();
+        return false;
+    }
+        
+
+    // if digest authentication is nedded need to resend describe 
+    if (m_useDigestAuth)
+    {
+        response.clear();
+        if (!sendDescribe() || !readTextResponce(response)) 
+        {
+            m_tcpSock.close();
+            return false;
+        }
+
+    }
+
 
     QString tmp = extractRTSPParam(response, "Range:");
     if (!tmp.isEmpty())
@@ -412,7 +480,16 @@ void RTPSession::addAuth(QByteArray& request)
 {
     if (m_auth.isNull())
         return;
-    request.append(CLSimpleHTTPClient::basicAuth(m_auth));
+    if (m_useDigestAuth)
+    {
+        QByteArray firstLine = request.left(request.indexOf('\n'));
+        QList<QByteArray> methodAndUri = firstLine.split(' ');
+        if (methodAndUri.size() >= 2)
+            request.append(CLSimpleHTTPClient::digestAccess(m_auth, m_realm, m_nonce, QString(methodAndUri[0]), QString(methodAndUri[1]) ));
+    }
+    else {
+        request.append(CLSimpleHTTPClient::basicAuth(m_auth));
+    }
     request.append("\r\n");
 }   
 
