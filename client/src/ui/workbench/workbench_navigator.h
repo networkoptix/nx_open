@@ -21,6 +21,7 @@ class QnWorkbenchDisplay;
 class QnTimeSlider;
 class QnTimeScrollBar;
 class QnResourceWidget;
+class QnMediaResourceWidget;
 class QnAbstractArchiveReader;
 class QnCachingTimePeriodLoader;
 class QnThumbnailsLoader;
@@ -185,7 +186,7 @@ private:
     QSet<QnResourceWidget *> m_motionIgnoreWidgets;
 
     QnResourceWidget *m_centralWidget;
-    QnResourceWidget *m_currentWidget;
+    QnMediaResourceWidget *m_currentWidget;
     WidgetFlags m_currentWidgetFlags;
     bool m_currentWidgetLoaded;
     bool m_currentWidgetIsCentral;

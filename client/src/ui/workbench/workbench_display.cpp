@@ -797,7 +797,8 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
         if(item == workbench()->item(static_cast<Qn::ItemRole>(i)))
             setWidget(static_cast<Qn::ItemRole>(i), widget);
 
-    widget->display()->start();
+    if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
+        mediaWidget->display()->start();
 
     return true;
 }
@@ -1247,7 +1248,7 @@ void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate) {
     }
 
     /* Assume 4:3 AR of a single channel. In most cases, it will work fine. */
-    const QnVideoResourceLayout *videoLayout = widget->display()->videoLayout();
+    const QnVideoResourceLayout *videoLayout = widget->channelLayout();
     const qreal estimatedAspectRatio = (4.0 * videoLayout->width()) / (3.0 * videoLayout->height());
     const Qt::Orientation orientation = estimatedAspectRatio > 1.0 ? Qt::Vertical : Qt::Horizontal;
     const QSize size = bestSingleBoundedSize(workbench()->mapper(), 1, orientation, estimatedAspectRatio);

@@ -85,6 +85,10 @@ public:
         return m_item.data();
     }
 
+    const QnVideoResourceLayout *channelLayout() const {
+        return m_channelsLayout;
+    }
+    
     /**
      * \returns                         Frame opacity of this widget.
      */
@@ -270,7 +274,6 @@ protected:
     virtual Buttons calculateButtonsVisibility() const;
     Q_SLOT void updateButtonsVisibility();
 
-    const QnVideoResourceLayout *channelLayout() const;
     void setChannelLayout(const QnVideoResourceLayout *channelLayout);
     virtual void channelLayoutChangedNotify() {}
     

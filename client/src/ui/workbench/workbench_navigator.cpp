@@ -24,6 +24,7 @@
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameter_types.h>
 #include <ui/graphics/items/resource_widget.h>
+#include <ui/graphics/items/media_resource_widget.h>
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/graphics/items/controls/time_scroll_bar.h>
 #include <ui/graphics/instruments/signaling_instrument.h>

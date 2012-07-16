@@ -547,10 +547,6 @@ void QnResourceWidget::updateChannelOverlay(int channel) {
     setChannelOverlay(channel, calculateChannelOverlay(channel));
 }
 
-const QnVideoResourceLayout *QnResourceWidget::channelLayout() const {
-    return m_channelsLayout;
-}
-
 void QnResourceWidget::setChannelLayout(const QnVideoResourceLayout *channelLayout) {
     if(m_channelsLayout == channelLayout)
         return;
