@@ -35,6 +35,10 @@ public:
         return m_display;
     }
 
+    QnResourceWidgetRenderer *renderer() const {
+        return m_renderer;
+    }
+
     /**
      * \param itemPos                   Point in item coordinates to map to grid coordinates.
      * \returns                         Coordinates of the motion cell that the given point belongs to.

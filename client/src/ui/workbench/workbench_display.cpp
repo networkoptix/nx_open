@@ -739,7 +739,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
     if (resource->checkFlags(QnResource::server))
         widget = new QnResourceServerWidget(context(), item);
     else
-        widget = new QnResourceWidget(context(), item);
+        widget = new QnMediaResourceWidget(context(), item);
 
     widget->setParent(this); /* Just to feel totally safe and not to leak memory no matter what happens. */
     widget->setAttribute(Qt::WA_DeleteOnClose);
@@ -778,8 +778,8 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
 
     m_widgetByItem.insert(item, widget);
     m_widgetsByResource[widget->resource()].push_back(widget);
-    if(widget->renderer() != NULL)
-        m_widgetByRenderer.insert(widget->renderer(), widget);
+    if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
+        m_widgetByRenderer.insert(mediaWidget->renderer(), widget);
 
     synchronize(widget, false);
     bringToFront(widget);
@@ -824,8 +824,8 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
 
     m_widgetByItem.remove(item);
     m_widgetsByResource[widget->resource()].removeOne(widget);
-    if(widget->renderer() != NULL)
-        m_widgetByRenderer.remove(widget->renderer());
+    if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
+        m_widgetByRenderer.remove(mediaWidget->renderer());
 
     if(destroyWidget) {
         widget->hide();

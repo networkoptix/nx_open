@@ -47,6 +47,8 @@ public slots:
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
+    virtual Qn::RenderStatus paintChannel(QPainter *,int,const QRectF &) override { return Qn::NothingRendered; }
+
 protected slots:
     //virtual void updateOverlayText() override;
 
