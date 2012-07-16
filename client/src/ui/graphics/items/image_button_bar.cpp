@@ -44,6 +44,8 @@ void QnImageButtonBar::addButton(int mask, QnImageButtonWidget *button) {
 
     m_maskByButton[button] = mask;
     m_buttonByMask[mask] = button;
+
+    updateButtons();
 }
 
 void QnImageButtonBar::removeButton(QnImageButtonWidget *button) {
@@ -53,6 +55,8 @@ void QnImageButtonBar::removeButton(QnImageButtonWidget *button) {
     int mask = m_maskByButton.value(button);
     m_maskByButton.remove(button);
     m_buttonByMask.remove(mask);
+
+    updateButtons();
 }
 
 QnImageButtonWidget *QnImageButtonBar::button(int mask) const {
@@ -63,11 +67,13 @@ int QnImageButtonBar::buttonsVisibility() const {
     return m_buttonsVisibility;
 }
 
-void QnImageButtonBar::setButtonsVisibility(int mask) {
-    if(m_buttonsVisibility == mask)
+void QnImageButtonBar::setButtonsVisibility(int buttonsVisibility) {
+    if(m_buttonsVisibility == buttonsVisibility)
         return;
 
-    m_buttonsVisibility = mask;
+    m_buttonsVisibility = buttonsVisibility;
+
+    updateButtons();
 
     emit buttonsVisibilityChanged();
 }
@@ -76,3 +82,19 @@ void QnImageButtonBar::setButtonVisible(int mask, bool visible) {
     setButtonsVisibility(visible ? (m_buttonsVisibility | mask) : (m_buttonsVisibility & ~mask));
 }
 
+void QnImageButtonBar::updateButtons() {
+    foreach(QnImageButtonWidget *button, m_buttonByMask) {
+        m_layout->removeItem(button);
+        button->setVisible(false);
+    }
+
+    foreach(QnImageButtonWidget *button, m_buttonByMask) {
+        int mask = m_maskByButton.value(button);
+        if(!(mask & m_buttonsVisibility))
+            continue;
+
+        m_layout->insertItem(0, button);
+        button->setVisible(true);
+    }
+
+}

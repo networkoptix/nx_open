@@ -1,7 +1,12 @@
 #ifndef QN_IMAGE_BUTTON_BAR_H
 #define QN_IMAGE_BUTTON_BAR_H
 
+#include <QtCore/QHash>
+#include <QtCore/QMap>
+
 #include <ui/graphics/items/standard/graphics_widget.h>
+
+class QGraphicsLinearLayout;
 
 class QnImageButtonWidget;
 
@@ -11,7 +16,7 @@ class QnImageButtonBar: public GraphicsWidget {
     typedef GraphicsWidget base_type;
 
 public:
-    QnImageButtonBar(QGraphicsItem *parent, Qt::WindowFlags windowFlags = 0);
+    QnImageButtonBar(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
     virtual ~QnImageButtonBar();
 
     void addButton(int mask, QnImageButtonWidget *button);
@@ -19,14 +24,17 @@ public:
     QnImageButtonWidget *button(int mask) const;
     
     int buttonsVisibility() const;
-    void setButtonsVisibility(int mask);
+    void setButtonsVisibility(int buttonsVisibility);
     void setButtonVisible(int mask, bool visible);
 
 signals:
     void buttonsVisibilityChanged();
 
 private:
-    QHash<int, QnImageButtonWidget *> m_buttonByMask;
+    void updateButtons();
+
+private:
+    QMap<int, QnImageButtonWidget *> m_buttonByMask;
     QHash<QnImageButtonWidget *, int> m_maskByButton;
     int m_buttonsVisibility;
 

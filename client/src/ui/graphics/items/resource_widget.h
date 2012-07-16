@@ -27,6 +27,7 @@ class QnWorkbenchItem;
 class QnLoadingProgressPainter;
 class QnPausedPainter;
 class QnImageButtonWidget;
+class QnImageButtonBar;
 
 class GraphicsLabel;
 
@@ -265,6 +266,10 @@ protected:
     virtual QString calculateInfoText() const;
     Q_SLOT void updateInfoText();
 
+    QnImageButtonBar *buttonBar();
+    virtual Buttons calculateButtonsVisibility() const;
+    Q_SLOT void updateButtonsVisibility();
+
     const QnVideoResourceLayout *channelLayout() const;
     void setChannelLayout(const QnVideoResourceLayout *channelLayout);
     virtual void channelLayoutChangedNotify() {}
@@ -272,15 +277,9 @@ protected:
     virtual void displayFlagsChangedNotify(DisplayFlags changedFlags) { Q_UNUSED(changedFlags); }
 
     int channelCount() const;
-
     QRectF channelRect(int channel) const;
 
     void ensureAboutToBeDestroyedEmitted();
-
-protected slots:
-    void updateButtonsVisibility();
-
-    void at_searchButton_toggled(bool checked);
 
 private:
     struct ChannelState {
@@ -338,13 +337,9 @@ private:
 
     /* Widgets for overlaid stuff. */
     QnViewportBoundWidget *m_headerOverlayWidget;
-    QGraphicsLinearLayout *m_headerLayout;
+    QGraphicsWidget *m_headerWidget;
     GraphicsLabel *m_headerLabel;
-
-    QnImageButtonWidget *m_infoButton;
-    QnImageButtonWidget *m_closeButton;
-    QnImageButtonWidget *m_rotateButton;
-    QnImageButtonWidget *m_searchButton;
+    QnImageButtonBar *m_buttonBar;
 
     QnViewportBoundWidget *m_footerOverlayWidget;
     QGraphicsWidget *m_footerWidget;

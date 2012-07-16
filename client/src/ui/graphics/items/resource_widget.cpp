@@ -22,7 +22,7 @@
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/painters/loading_progress_painter.h>
 #include <ui/graphics/painters/paused_painter.h>
-#include <ui/graphics/instruments/transform_listener_instrument.h>
+#include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
@@ -31,6 +31,7 @@
 #include <ui/style/skin.h>
 
 #include "image_button_widget.h"
+#include "image_button_bar.h"
 #include "viewport_bound_widget.h"
 
 namespace {
@@ -131,61 +132,49 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     headerLayout->addItem(togglePinButton);
 #endif
 
-    m_infoButton = new QnImageButtonWidget();
-    m_infoButton->setParent(this);
-    m_infoButton->setIcon(qnSkin->icon("decorations/item_info.png"));
-    m_infoButton->setPreferredSize(headerButtonSize);
-    m_infoButton->setCheckable(true);
-    m_infoButton->setProperty(Qn::NoBlockMotionSelection, true);
-    connect(m_infoButton, SIGNAL(toggled(bool)), this, SLOT(setInfoVisible(bool)));
-
-    m_closeButton = new QnImageButtonWidget();
-    m_closeButton->setParent(this);
-    m_closeButton->setIcon(qnSkin->icon("decorations/item_close.png"));
-    m_closeButton->setPreferredSize(headerButtonSize);
-    m_closeButton->setProperty(Qn::NoBlockMotionSelection, true);
-    connect(m_closeButton, SIGNAL(clicked()), this, SLOT(close()));
+    QnImageButtonWidget *closeButton = new QnImageButtonWidget();
+    closeButton->setIcon(qnSkin->icon("decorations/item_close.png"));
+    closeButton->setProperty(Qn::NoBlockMotionSelection, true);
+    connect(closeButton, SIGNAL(clicked()), this, SLOT(close()));
     connect(accessController()->notifier(item->layout()->resource()), SIGNAL(permissionsChanged(const QnResourcePtr &)), this, SLOT(updateButtonsVisibility()));
+
+    QnImageButtonWidget *infoButton = new QnImageButtonWidget();
+    infoButton->setIcon(qnSkin->icon("decorations/item_info.png"));
+    infoButton->setCheckable(true);
+    infoButton->setProperty(Qn::NoBlockMotionSelection, true);
+    connect(infoButton, SIGNAL(toggled(bool)), this, SLOT(setInfoVisible(bool)));
     
-    m_rotateButton = new QnImageButtonWidget();
-    m_rotateButton->setParent(this);
-    m_rotateButton->setIcon(qnSkin->icon("decorations/item_rotate.png"));
-    m_rotateButton->setPreferredSize(headerButtonSize);
-    m_rotateButton->setProperty(Qn::NoBlockMotionSelection, true);
-    connect(m_rotateButton, SIGNAL(pressed()), this, SIGNAL(rotationStartRequested()));
-    connect(m_rotateButton, SIGNAL(released()), this, SIGNAL(rotationStopRequested()));
+    QnImageButtonWidget *rotateButton = new QnImageButtonWidget();
+    rotateButton->setIcon(qnSkin->icon("decorations/item_rotate.png"));
+    rotateButton->setProperty(Qn::NoBlockMotionSelection, true);
+    connect(rotateButton, SIGNAL(pressed()), this, SIGNAL(rotationStartRequested()));
+    connect(rotateButton, SIGNAL(released()), this, SIGNAL(rotationStopRequested()));
 
-    m_searchButton = new QnImageButtonWidget();
-    m_searchButton->setParent(this);
-    m_searchButton->setIcon(qnSkin->icon("decorations/item_search.png"));
-    m_searchButton->setPreferredSize(headerButtonSize);
-    m_searchButton->setCheckable(true);
-    m_searchButton->setProperty(Qn::NoBlockMotionSelection, true);
-    connect(m_searchButton, SIGNAL(toggled(bool)), this, SLOT(at_searchButton_toggled(bool)));
+    m_buttonBar = new QnImageButtonBar();
+    m_buttonBar->addButton(CloseButton, closeButton);
+    m_buttonBar->addButton(InfoButton, infoButton);
+    m_buttonBar->addButton(RotateButton, rotateButton);
 
-    m_headerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-    m_headerLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-    m_headerLayout->setSpacing(2.0);
-    m_headerLayout->addItem(m_headerLabel);
-    m_headerLayout->addStretch(0x1000); /* Set large enough stretch for the buttons to be placed at the right end of the layout. */
-    m_headerLayout->addItem(m_searchButton);
-    m_headerLayout->addItem(m_rotateButton);
-    m_headerLayout->addItem(m_infoButton);
-    m_headerLayout->addItem(m_closeButton);
+    QGraphicsLinearLayout *headerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+    headerLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    headerLayout->setSpacing(2.0);
+    headerLayout->addItem(m_headerLabel);
+    headerLayout->addStretch(0x1000); /* Set large enough stretch for the buttons to be placed at the right end of the layout. */
+    headerLayout->addItem(m_buttonBar);
 
-    QGraphicsWidget *headerWidget = new QGraphicsWidget();
-    headerWidget->setLayout(m_headerLayout);
-    headerWidget->setAcceptedMouseButtons(0);
-    headerWidget->setAutoFillBackground(true);
+    m_headerWidget = new QGraphicsWidget();
+    m_headerWidget->setLayout(headerLayout);
+    m_headerWidget->setAcceptedMouseButtons(0);
+    m_headerWidget->setAutoFillBackground(true);
     {
-        QPalette palette = headerWidget->palette();
+        QPalette palette = m_headerWidget->palette();
         palette.setColor(QPalette::Window, overlayBackgroundColor);
-        headerWidget->setPalette(palette);
+        m_headerWidget->setPalette(palette);
     }
 
     QGraphicsLinearLayout *headerOverlayLayout = new QGraphicsLinearLayout(Qt::Vertical);
     headerOverlayLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-    headerOverlayLayout->addItem(headerWidget);
+    headerOverlayLayout->addItem(m_headerWidget);
     headerOverlayLayout->addStretch(0x1000);
 
     m_headerOverlayWidget = new QnViewportBoundWidget(this);
@@ -483,7 +472,20 @@ void QnResourceWidget::setChannelScreenSize(const QSize &size) {
     channelScreenSizeChangedNotify();
 }
 
-void QnResourceWidget::updateButtonsVisibility() {
+QnResourceWidget::Buttons QnResourceWidget::calculateButtonsVisibility() const {
+    Buttons result = InfoButton | RotateButton;
+
+    if(item() && item()->layout()) {
+        Qn::Permissions requiredPermissions = Qn::WritePermission | Qn::AddRemoveItemsPermission;
+        if((accessController()->permissions(item()->layout()->resource()) & requiredPermissions) == requiredPermissions)
+            result |= CloseButton;
+    }
+
+    return result;
+
+    /* Rotate B */
+
+    /*
     bool closeButtonVisible = false;
     if(item() && item()->layout()) {
         Qn::Permissions requiredPermissions = Qn::WritePermission | Qn::AddRemoveItemsPermission;
@@ -491,27 +493,32 @@ void QnResourceWidget::updateButtonsVisibility() {
     }
 
     bool infoButtonVisible = !display()->camDisplay()->isStillImage();
-    bool searchButtonVisible = m_resource.dynamicCast<QnSecurityCamResource>();
 
-    if(m_closeButton->isVisible() != closeButtonVisible || m_infoButton->isVisible() != infoButtonVisible || m_searchButton->isVisible() != searchButtonVisible) {
+    if(closeButton->isVisible() != closeButtonVisible || m_infoButton->isVisible() != infoButtonVisible || searchButton->isVisible() != searchButtonVisible) {
         m_infoButton->setVisible(infoButtonVisible);
-        m_closeButton->setVisible(closeButtonVisible);
-        m_searchButton->setVisible(searchButtonVisible);
-        
-        m_headerLayout->removeItem(m_searchButton);
-        m_headerLayout->removeItem(m_rotateButton);
-        m_headerLayout->removeItem(m_infoButton);
-        m_headerLayout->removeItem(m_closeButton);
+        closeButton->setVisible(closeButtonVisible);
+        searchButton->setVisible(searchButtonVisible);
+
+        headerLayout->removeItem(searchButton);
+        headerLayout->removeItem(rotateButton);
+        headerLayout->removeItem(m_infoButton);
+        headerLayout->removeItem(closeButton);
 
         if(searchButtonVisible)
-            m_headerLayout->addItem(m_searchButton);
-        m_headerLayout->addItem(m_rotateButton);
+            headerLayout->addItem(searchButton);
+        headerLayout->addItem(rotateButton);
         if(infoButtonVisible)
-            m_headerLayout->addItem(m_infoButton);
+            headerLayout->addItem(m_infoButton);
         if(closeButtonVisible)
-            m_headerLayout->addItem(m_closeButton);
+            headerLayout->addItem(closeButton);
     }
+    }*/
 }
+
+void QnResourceWidget::updateButtonsVisibility() {
+    m_buttonBar->setButtonsVisibility(calculateButtonsVisibility());
+}
+
 
 QnResourceWidget::Overlay QnResourceWidget::channelOverlay(int channel) const {
     return m_channelState[channel].overlay;
@@ -795,8 +802,5 @@ void QnResourceWidget::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
     base_type::hoverLeaveEvent(event);
 }
 
-void QnResourceWidget::at_searchButton_toggled(bool checked) {
-    setDisplayFlag(DisplayMotion, checked);
-}
 
 

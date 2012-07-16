@@ -16,8 +16,12 @@
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/common/color_transformations.h>
 #include <ui/style/globals.h>
+#include <ui/style/skin.h>
 
 #include "resource_widget_renderer.h"
+#include "image_button_widget.h"
+#include "image_button_bar.h"
+#include "resource_widget.h"
 
 
 namespace {
@@ -39,6 +43,15 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     m_resource = base_type::resource().dynamicCast<QnMediaResource>();
     if(!m_resource) 
         qnCritical("Media resource widget was created with a non-media resource.");
+
+    /* Set up buttons. */
+    QnImageButtonWidget *searchButton = new QnImageButtonWidget();
+    searchButton->setIcon(qnSkin->icon("decorations/item_search.png"));
+    searchButton->setCheckable(true);
+    searchButton->setProperty(Qn::NoBlockMotionSelection, true);
+    connect(searchButton, SIGNAL(toggled(bool)), this, SLOT(at_searchButton_toggled(bool)));
+
+    buttonBar()->addButton(MotionSearchButton, searchButton);
 
     /* Set up video rendering. */
     m_display = new QnResourceDisplay(m_resource, this);
@@ -368,7 +381,7 @@ void QnMediaResourceWidget::displayFlagsChangedNotify(DisplayFlags changedFlags)
         if (QnAbstractArchiveReader *reader = m_display->archiveReader())
             reader->setSendMotion(displayFlags() & DisplayMotion);
 
-        m_searchButton->setChecked(flags & DisplayMotion);
+        searchButton->setChecked(flags & DisplayMotion);
 
         if(displayFlags() & DisplayMotion) {
             setProperty(Qn::MotionSelectionModifiers, 0);
@@ -405,6 +418,16 @@ QString QnMediaResourceWidget::calculateInfoText() const {
     return result;
 }
 
+QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() const {
+    Buttons result = base_type::calculateButtonsVisibility() & ~InfoButton;
+
+    if(!display()->camDisplay()->isStillImage())
+        result |= InfoButton;
+
+    if(m_resource.dynamicCast<QnSecurityCamResource>())
+        result |= MotionSearchButton;
+}
+
 void QnMediaResourceWidget::at_resource_resourceChanged() {
     invalidateMotionSensitivity();
 }
@@ -413,3 +436,6 @@ void QnMediaResourceWidget::at_renderer_sourceSizeChanged(const QSize &size) {
     setAspectRatio(static_cast<qreal>(size.width() * channelLayout()->width()) / (size.height() * channelLayout()->height()));
 }
 
+void QnMediaResourceWidget::at_searchButton_toggled(bool checked) {
+    setDisplayFlag(DisplayMotion, checked);
+}

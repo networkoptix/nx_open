@@ -16,7 +16,7 @@ class QnMediaResourceWidget: public QnResourceWidget {
     typedef QnResourceWidget base_type;
 
 public:
-    static const Button MotionSearchButton = 0x8;
+    static const Button MotionSearchButton = static_cast<Button>(0x8);
 #define MotionSearchButton MotionSearchButton
 
     QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent = NULL);
@@ -83,9 +83,10 @@ public:
 signals:
     void motionSelectionChanged();
 
-public slots:
+private slots:
     void at_renderer_sourceSizeChanged(const QSize &size);
     void at_resource_resourceChanged();
+    void at_searchButton_toggled(bool checked);
 
 protected:
     virtual void channelLayoutChangedNotify() override;
@@ -93,6 +94,7 @@ protected:
     virtual void displayFlagsChangedNotify(DisplayFlags changedFlags) override;
 
     virtual QString calculateInfoText() const override;
+    virtual Buttons calculateButtonsVisibility() const override;
 
     virtual Qn::RenderStatus paintChannel(QPainter *painter, int channel, const QRectF &rect) override;
     void paintMotionSensitivityIndicators(QPainter *painter, int channel, const QRectF &rect, const QnMotionRegion &region);
