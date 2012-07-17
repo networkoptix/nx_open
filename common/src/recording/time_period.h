@@ -173,5 +173,6 @@ Q_DECLARE_METATYPE(Qn::TimePeriodTypes);
 Q_DECLARE_METATYPE(Qn::TimePeriodType);
 Q_DECLARE_METATYPE(Qn::TimePeriodRole);
 Q_DECLARE_METATYPE(QnTimePeriod);
+Q_DECLARE_METATYPE(QnTimePeriodList);
 
 #endif // QN_TIME_PERIOD_H
