@@ -96,10 +96,12 @@ QString QnRtspClientArchiveDelegate::getUrl(QnResourcePtr resource)
 
 qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(QnResourcePtr resource)
 {
+    /*
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
     if (currentTime - m_lastMinTimeTime < 5*60*1000ll)
         return AV_NOPTS_VALUE;
     m_lastMinTimeTime = currentTime;
+    */
 
     QnVideoServerResourcePtr currentVideoServer = qSharedPointerDynamicCast<QnVideoServerResource> (qnResPool->getResourceById(resource->getParentId()));
     if (!currentVideoServer) 
@@ -121,7 +123,7 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(QnResourcePtr re
         if (!otherVideoServer)
             continue;
         if (firstServer && otherVideoServer == currentVideoServer && m_rtspSession.startTime() != DATETIME_NOW)
-            return m_rtspSession.startTime(); // archive starts with current server and archive is not empty
+            return 0; // archive starts with current server and archive is not empty
         firstServer = false;
         if (otherVideoServer != currentVideoServer && m_rtspSession.startTime() != AV_NOPTS_VALUE)
         {
@@ -211,11 +213,19 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
 
     m_rtspSession.setProxyAddr(m_proxyAddr, m_proxyPort);
     m_rtpData = 0;
+
+    bool globalTimeBlocked = false;
+    if (m_globalMinArchiveTime == 0 && m_rtspSession.startTime() != AV_NOPTS_VALUE) {
+        m_globalMinArchiveTime = m_rtspSession.startTime(); // block multiserver archive left point as current server left point (zerro velue mean: read value from current server)
+        globalTimeBlocked = true;
+    }
     if (m_rtspSession.open(getUrl(resource))) 
     {
         qint64 globalMinTime = checkMinTimeFromOtherServer(resource);
         if (globalMinTime !=AV_NOPTS_VALUE)
             m_globalMinArchiveTime = globalMinTime;
+        else if (globalTimeBlocked)
+            m_globalMinArchiveTime = 0; // unblock min time value. So, get value from current server (left point can be changed because of server delete some files)
 
         qint64 endTime = m_position;
         if (m_forcedEndTime)
