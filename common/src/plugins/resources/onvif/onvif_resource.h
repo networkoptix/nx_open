@@ -102,6 +102,8 @@ public:
     int getAudioSamplerate() const;
     ResolutionPair getPrimaryResolution() const;
     ResolutionPair getSecondaryResolution() const;
+    int getPrimaryH264Profile() const;
+    int getSecondaryH264Profile() const;
     ResolutionPair getMaxResolution() const;
     bool isSoapAuthorized() const;
     const CameraPhysicalWindowSize getPhysicalWindowSize() const;
@@ -167,7 +169,7 @@ private:
     ResolutionPair getNearestResolution(const ResolutionPair& resolution, float aspectRatio, double maxResolutionSquare) const;
     float getResolutionAspectRatio(const ResolutionPair& resolution) const;
     int findClosestRateFloor(const std::vector<int>& values, int threshold) const;
-
+    int getH264StreamProfile(const VideoOptionsResp& response);
 protected:
     QList<ResolutionPair> m_resolutionList; //Sorted desc
 
@@ -198,7 +200,8 @@ private:
 
     bool m_needUpdateOnvifUrl;
     bool m_forceCodecFromPrimaryEncoder;
-
+    int  m_primaryH264Profile;
+    int m_secondaryH264Profile;
 };
 
 #endif //onvif_resource_h

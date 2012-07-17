@@ -690,10 +690,24 @@ bool UDPSocket::joinGroup(const QString &multicastGroup)  {
     multicastRequest.imr_multiaddr.s_addr = inet_addr(multicastGroup.toAscii());
     multicastRequest.imr_interface.s_addr = htonl(INADDR_ANY);
     if (setsockopt(sockDesc, IPPROTO_IP, IP_ADD_MEMBERSHIP,
-                   (raw_type *) &multicastRequest,
-                   sizeof(multicastRequest)) < 0) {
-        qWarning() << "Multicast group join failed (setsockopt())";
-        return false;
+        (raw_type *) &multicastRequest,
+        sizeof(multicastRequest)) < 0) {
+            qWarning() << "Multicast group join failed (setsockopt())";
+            return false;
+    }
+    return true;
+}
+
+bool UDPSocket::joinGroup(const QString &multicastGroup, const QString& multicastIF)  {
+    struct ip_mreq multicastRequest;
+
+    multicastRequest.imr_multiaddr.s_addr = inet_addr(multicastGroup.toAscii());
+    multicastRequest.imr_interface.s_addr = inet_addr(multicastIF.toAscii());
+    if (setsockopt(sockDesc, IPPROTO_IP, IP_ADD_MEMBERSHIP,
+        (raw_type *) &multicastRequest,
+        sizeof(multicastRequest)) < 0) {
+            qWarning() << "Multicast group join failed (setsockopt())";
+            return false;
     }
     return true;
 }
@@ -704,13 +718,28 @@ bool UDPSocket::leaveGroup(const QString &multicastGroup)  {
     multicastRequest.imr_multiaddr.s_addr = inet_addr(multicastGroup.toAscii());
     multicastRequest.imr_interface.s_addr = htonl(INADDR_ANY);
     if (setsockopt(sockDesc, IPPROTO_IP, IP_DROP_MEMBERSHIP,
-                   (raw_type *) &multicastRequest,
-                   sizeof(multicastRequest)) < 0) {
-        qWarning() << "Multicast group leave failed (setsockopt())";
-        return false;
+        (raw_type *) &multicastRequest,
+        sizeof(multicastRequest)) < 0) {
+            qWarning() << "Multicast group leave failed (setsockopt())";
+            return false;
     }
     return true;
 }
+
+bool UDPSocket::leaveGroup(const QString &multicastGroup, const QString& multicastIF)  {
+    struct ip_mreq multicastRequest;
+
+    multicastRequest.imr_multiaddr.s_addr = inet_addr(multicastGroup.toAscii());
+    multicastRequest.imr_interface.s_addr = inet_addr(multicastIF.toAscii());
+    if (setsockopt(sockDesc, IPPROTO_IP, IP_DROP_MEMBERSHIP,
+        (raw_type *) &multicastRequest,
+        sizeof(multicastRequest)) < 0) {
+            qWarning() << "Multicast group leave failed (setsockopt())";
+            return false;
+    }
+    return true;
+}
+
 
 bool UDPSocket::hasData() const
 {
@@ -734,13 +763,13 @@ bool UDPSocket::hasData() const
     return true;
 }
 
-void Socket::setReuseAddrFlag(bool reuseAddr)
+bool Socket::setReuseAddrFlag(bool reuseAddr)
 {
     int reuseAddrVal = reuseAddr;
 
     if (::setsockopt(sockDesc, SOL_SOCKET, SO_REUSEADDR, (const char*)&reuseAddrVal, sizeof(reuseAddrVal))) {
-        QString message = QString("Can't set SO_REUSEADDR flag to socket: %1").arg(::strerror(errno));
-        throw SocketException(message, true);
+        qWarning() << "Can't set SO_REUSEADDR flag to socket:" << ::strerror(errno);
+        return false;
     }
+    return true;
 }
-

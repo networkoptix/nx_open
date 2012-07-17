@@ -186,6 +186,8 @@ QnPlOnvifResource::QnPlOnvifResource() :
     m_audioCodec(AUDIO_NONE),
     m_primaryResolution(EMPTY_RESOLUTION_PAIR),
     m_secondaryResolution(EMPTY_RESOLUTION_PAIR),
+    m_primaryH264Profile(-1),
+    m_secondaryH264Profile(-1),
     m_audioBitrate(0),
     m_audioSamplerate(0),
     m_needUpdateOnvifUrl(false),
@@ -428,6 +430,18 @@ ResolutionPair QnPlOnvifResource::getSecondaryResolution() const
 {
     QMutexLocker lock(&m_mutex);
     return m_secondaryResolution;
+}
+
+int QnPlOnvifResource::getPrimaryH264Profile() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_primaryH264Profile;
+}
+
+int QnPlOnvifResource::getSecondaryH264Profile() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_secondaryH264Profile;
 }
 
 void QnPlOnvifResource::setMaxFps(int f)
@@ -877,6 +891,17 @@ bool QnPlOnvifResource::mergeResourcesIfNeeded(QnNetworkResourcePtr source)
     return result;
 }
 
+int  QnPlOnvifResource::getH264StreamProfile(const VideoOptionsResp& response)
+{
+    if (!response.Options || !response.Options->H264)
+        return -1; // inform do not change profile
+
+    QVector<onvifXsd__H264Profile> profiles = QVector<onvifXsd__H264Profile>::fromStdVector(response.Options->H264->H264ProfilesSupported);
+    if (profiles.isEmpty())
+        return -1;
+    qSort(profiles);
+    return (int) profiles[0];
+}
 
 bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper)
 {
@@ -960,7 +985,7 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
     qSort(optionsList.begin(), optionsList.end(), videoOptsGreaterThan);
 
     QList<VideoOptionsLocal>::const_iterator optIt = optionsList.begin();
-    if (optIt == optionsList.end())
+    if (optionsList.isEmpty())
     {
         qCritical() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: all video options are empty. (URL: "
             << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId() << ").";
@@ -971,6 +996,7 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
     if (optIt->optionsResp.Options->H264) 
     {
         setCodec(H264);
+        m_primaryH264Profile = getH264StreamProfile(optIt->optionsResp);
     } 
     else if (optIt->optionsResp.Options->JPEG) 
     {
@@ -986,6 +1012,7 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
 
         if (++optIt != optionsList.end()) {
             m_secondaryVideoEncoderId = optIt->id;
+            m_secondaryH264Profile = getH264StreamProfile(optIt->optionsResp);
         }
     }
 
