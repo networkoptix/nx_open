@@ -35,6 +35,7 @@ private:
 
     QnCompressedVideoDataPtr m_videoData;
     CLByteArray m_videoBuffer;
+    bool m_frameExists;
 private:
     void serializeSpsPps(CLByteArray& dst);
     void decodeSpsInfo(const QByteArray& data);

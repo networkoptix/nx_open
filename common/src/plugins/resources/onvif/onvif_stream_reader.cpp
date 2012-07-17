@@ -184,8 +184,8 @@ QnAbstractMediaDataPtr QnOnvifStreamReader::getNextData()
             //ToDo: if (videoData)
             //    parseMotionInfo(videoData);
             
-            if (!videoData || isGotFrame(videoData))
-                break;
+            //if (!videoData || isGotFrame(videoData))
+            break;
         }
         else {
             errorCount++;
