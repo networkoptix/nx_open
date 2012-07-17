@@ -10,6 +10,8 @@
 
 int QnGetStatisticsHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& resultByteArray)
 {
+    Q_UNUSED(params)
+    Q_UNUSED(path)
     QnStorageManager::StorageMap storages = qnStorageMan->getAllStorages();
     QString result;
     result.append("<?xml version=\"1.0\"?>\n");
@@ -19,8 +21,10 @@ int QnGetStatisticsHandler::executeGet(const QString& path, const QnRequestParam
     result.append("<storages>\n");
     foreach(QnStorageResourcePtr storage, storages)
     {
-        int usageInPersent = storage->getAvarageWritingUsage() * 100 + 0.5;
-        result.append(QString("<storage url=\"%1\" usage=\"%2\" />\n").arg(storage->getUrl()).arg(usageInPersent));
+        result.append("<storage>\n");
+        result.append(QString("<url>%1</url>\n").arg(storage->getUrl()));
+        result.append(QString("<usage>%1</usage>\n").arg(int(storage->getAvarageWritingUsage() * 100 + 0.5)));
+        result.append("</storage>\n");
     }
     result.append("</storages>\n");
 
@@ -41,11 +45,13 @@ int QnGetStatisticsHandler::executeGet(const QString& path, const QnRequestParam
 
 int QnGetStatisticsHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result)
 {
+    Q_UNUSED(body)
     return executeGet(path, params, result);
 }
 
 QString QnGetStatisticsHandler::description(TCPSocket* tcpSocket) const
 {
+    Q_UNUSED(tcpSocket)
     QString rez;
     rez += "Returns server info: CPU usage, HDD usage e.t.c \n";
     return rez;
