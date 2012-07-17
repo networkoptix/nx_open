@@ -34,7 +34,7 @@ QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     m_lastProgress(-1),
     m_EofDateTime(AV_NOPTS_VALUE),
     m_needCalcSignature(false),
-    m_mdctx(0),
+    m_mdctx(EXPORT_SIGN_METHOD),
     m_container("matroska"),
     m_videoChannels(0),
     m_ioContext(0),
@@ -48,7 +48,6 @@ QnStreamRecorder::~QnStreamRecorder()
 {
     stop();
 	close();
-    delete m_mdctx;
 }
 
 void QnStreamRecorder::close()
@@ -482,32 +481,14 @@ void QnStreamRecorder::setNeedCalcSignature(bool value)
         return;
     if (value)
     {
-        const EVP_MD *md = EVP_get_digestbyname(EXPORT_SIGN_METHOD);
-        if (md)
-        {
-            m_needCalcSignature = value;
-            m_mdctx = new EVP_MD_CTX;
-            EVP_MD_CTX_init(m_mdctx);
-            EVP_DigestInit_ex(m_mdctx, md, NULL);
-
-            EVP_DigestUpdate(m_mdctx, EXPORT_SIGN_MAGIC, sizeof(EXPORT_SIGN_MAGIC));
-        }
-        else {
-            qCritical() << "Can't sign file because of '" << EXPORT_SIGN_METHOD << "' not found";
-        }
-    }
-    else {
-        delete m_mdctx;
-        m_mdctx = 0;
+        m_mdctx.reset();
+        m_mdctx.addData(EXPORT_SIGN_MAGIC, sizeof(EXPORT_SIGN_MAGIC));
     }
 }
 
 QByteArray QnStreamRecorder::getSignature() const
 {
-    quint8 md_value[EVP_MAX_MD_SIZE];
-    quint32 md_len = 0;
-    EVP_DigestFinal_ex(m_mdctx, md_value, &md_len);
-    return QByteArray((const char*)md_value, md_len);
+    return m_mdctx.result();
 }
 
 bool QnStreamRecorder::addSignatureFrame(QString &/*errorString*/)

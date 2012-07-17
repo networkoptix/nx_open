@@ -56,7 +56,6 @@
 #include "plugins/resources/isd/isd_resource_searcher.h"
 //#include "plugins/resources/onvif/onvif_ws_searcher.h"
 #include "utils/network/socket.h"
-#include <openssl/evp.h>
 
 #include "plugins/storage/file_storage/qtfile_storage_resource.h"
 #include "plugins/storage/file_storage/layout_storage_resource.h"
@@ -313,7 +312,6 @@ int main(int argc, char *argv[])
 
     QnResourcePool::instance(); // to initialize net state;
     ffmpegInit();
-    OpenSSL_add_all_digests(); // open SSL init
 
     //===========================================================================
 

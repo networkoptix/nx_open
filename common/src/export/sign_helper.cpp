@@ -49,10 +49,10 @@ QnSignHelper::QnSignHelper():
     m_signBackground = Qt::white;
 }
 
-void QnSignHelper::updateDigest(AVCodecContext* srcCodec, EVP_MD_CTX* mdctx, const quint8* data, int size)
+void QnSignHelper::updateDigest(AVCodecContext* srcCodec, QnCryptographicHash &ctx, const quint8* data, int size)
 {
     if (srcCodec == 0 || srcCodec->codec_id != CODEC_ID_H264) {
-        EVP_DigestUpdate(mdctx, (const char*) data, size);
+        ctx.addData((const char*) data, size);
         return;
     }
 
@@ -72,7 +72,8 @@ void QnSignHelper::updateDigest(AVCodecContext* srcCodec, EVP_MD_CTX* mdctx, con
                 curSize = (curSize << 8) + curNal[i];
             curNal += reqUnitSize;
             curSize = qMin(curSize, (int)(dataEnd - curNal));
-            EVP_DigestUpdate(mdctx, (const char*) curNal, curSize);
+            ctx.addData((const char*) curNal, curSize);
+
             curNal += curSize;
         }
     }
@@ -82,7 +83,8 @@ void QnSignHelper::updateDigest(AVCodecContext* srcCodec, EVP_MD_CTX* mdctx, con
         while(curNal < dataEnd)
         {
             const quint8* nextNal = NALUnit::findNALWithStartCode(curNal, dataEnd, true);
-            EVP_DigestUpdate(mdctx, (const char*) curNal, nextNal - curNal);
+            ctx.addData((const char*) curNal, nextNal - curNal);
+
             curNal = NALUnit::findNextNAL(nextNal, dataEnd);
         }
     }

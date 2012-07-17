@@ -1,13 +1,15 @@
 #ifndef __SIGN_FRAME_HELPER__
 #define __SIGN_FRAME_HELPER__
 
-#include <QByteArray>
-#include "core/datapacket/mediadatapacket.h"
-#include "utils/media/nalUnits.h"
-#include <openssl/evp.h>
+#include <QtCore/QByteArray>
 
-static const char EXPORT_SIGN_METHOD[] = "md5";
+#include <utils/common/cryptographic_hash.h>
+#include <utils/media/nalUnits.h>
+
+#include <core/datapacket/mediadatapacket.h>
+
 static const char EXPORT_SIGN_MAGIC[] = "RhjrjLbkMxTujHI!";
+static const QnCryptographicHash::Algorithm EXPORT_SIGN_METHOD = QnCryptographicHash::Md5;
 
 class QnSignHelper
 {
@@ -21,7 +23,7 @@ public:
     void draw(QPainter& painter, const QSize& paintSize, bool drawText);
     void drawTextLine(QPainter& painter, const QSize& paintSize,int lineNum, const QString& text);
     QFontMetrics updateFontSize(QPainter& painter, const QSize& paintSize);
-    static void updateDigest(AVCodecContext* srcCodec, EVP_MD_CTX* mdctx, const quint8* data, int size);
+    static void updateDigest(AVCodecContext* srcCodec, QnCryptographicHash &ctx, const quint8* data, int size);
     void setSignOpacity(float opacity, QColor color);
 
 private:
