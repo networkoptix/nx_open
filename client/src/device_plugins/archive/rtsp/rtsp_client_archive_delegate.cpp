@@ -121,7 +121,7 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(QnResourcePtr re
         if (!otherVideoServer)
             continue;
         if (firstServer && otherVideoServer == currentVideoServer && m_rtspSession.startTime() != DATETIME_NOW)
-            return 0; // archive starts with current server and archive is not empty
+            return m_rtspSession.startTime(); // archive starts with current server and archive is not empty
         firstServer = false;
         if (otherVideoServer != currentVideoServer && m_rtspSession.startTime() != AV_NOPTS_VALUE)
         {
