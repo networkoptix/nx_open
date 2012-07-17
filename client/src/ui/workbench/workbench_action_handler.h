@@ -212,6 +212,7 @@ protected slots:
     void at_userSettingsAction_triggered();
     void at_cameraSettingsAction_triggered();
     void at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton button);
+    void at_cameraSettingsDialog_rejected();
     void at_selectionChangeAction_triggered();
     void at_serverSettingsAction_triggered();
     void at_youtubeUploadAction_triggered();

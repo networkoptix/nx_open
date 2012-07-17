@@ -140,6 +140,8 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
     } else {
         /* Aggregate camera parameters first. */
 
+        ui->cameraScheduleWidget->setCameras(QnVirtualCameraResourceList());
+
         QSet<QString> logins, passwords;
         
         ui->checkBoxEnableAudio->setEnabled(true);
@@ -154,10 +156,11 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
                 ui->checkBoxEnableAudio->setEnabled(false);
 
             Qt::CheckState audioState = camera->isAudioEnabled() ? Qt::Checked : Qt::Unchecked;
-            if (firstCamera)
+            if (firstCamera) {
                 ui->checkBoxEnableAudio->setCheckState(audioState);
-            else if (audioState != ui->checkBoxEnableAudio->checkState())
+            } else if (audioState != ui->checkBoxEnableAudio->checkState()) {
                 ui->checkBoxEnableAudio->setCheckState(Qt::PartiallyChecked);
+            }
 
             firstCamera = false;
         }
