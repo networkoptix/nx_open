@@ -1045,7 +1045,8 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
         m_cameraSettingsDialog = new QnCameraSettingsDialog(widget());
         newlyCreated = true;
         
-        connect(cameraSettingsDialog(), SIGNAL(buttonClicked(QDialogButtonBox::StandardButton)), this, SLOT(at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton)));
+        connect(cameraSettingsDialog(), SIGNAL(buttonClicked(QDialogButtonBox::StandardButton)),    this, SLOT(at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton)));
+        connect(cameraSettingsDialog(), SIGNAL(rejected()),                                         this, SLOT(at_cameraSettingsDialog_rejected()));
     }
 
     if(cameraSettingsDialog()->widget()->resources() != resources) {
@@ -1082,6 +1083,10 @@ void QnWorkbenchActionHandler::at_cameraSettingsDialog_buttonClicked(QDialogButt
     default:
         break;
     }
+}
+
+void QnWorkbenchActionHandler::at_cameraSettingsDialog_rejected() {
+    cameraSettingsDialog()->widget()->updateFromResources();
 }
 
 void QnWorkbenchActionHandler::at_selectionChangeAction_triggered() {
