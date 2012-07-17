@@ -4,6 +4,8 @@
 #include <QtGui/QGraphicsWidget>
 
 #include <ui/graphics/items/resource_widget.h>
+#include <ui/graphics/painters/radial_gradient_painter.h>
+
 #include <api/video_server_connection.h>
 
 /* Get rid of stupid win32 defines. */
@@ -41,7 +43,7 @@ public:
     virtual ~QnResourceServerWidget() {}
 
 public slots:
-    void at_statistics_received(int usage, const QByteArray &model);
+    void at_statistics_received(int cpuUsage, const QByteArray &model, const QnHddUsageVector &hddUsage);
     void at_timer_update();
 
 protected:
@@ -51,10 +53,15 @@ protected slots:
     virtual void updateOverlayText() override;
 
 private:
-    void drawStatistics(int width, int height, QPainter *painter);
+    QPainterPath createGraph(QList<int> *values, const qreal x_step, int &prev_value, int &last_value);
 
-    /** History of last responses */
-    QList<int> m_history;
+    void drawStatistics(const QRectF &rect, QPainter *painter);
+
+    /** History of last cpu usage responses */
+    QList<int> m_cpuUsageHistory;
+
+    /** History of last hdd usage responses */
+    QList< QList <int>  > m_hddUsageHistory;
 
     /** Cpu model */
     QString m_model;
@@ -76,6 +83,8 @@ private:
 
     /** Gradient for background drawing */
     QRadialGradient m_background_gradient;
+
+    QnRadialGradientPainter m_backgroundGradientPainter;
 };
 
 Q_DECLARE_METATYPE(QnResourceServerWidget *)

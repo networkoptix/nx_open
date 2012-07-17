@@ -188,7 +188,7 @@ int QnVideoServerConnection::asyncGetFreeSpace(const QString& path, QObject *tar
 
 int QnVideoServerConnection::asyncGetStatistics(QObject *target, const char *slot){
     detail::VideoServerSessionManagerStatisticsRequestReplyProcessor *processor = new detail::VideoServerSessionManagerStatisticsRequestReplyProcessor();
-    connect(processor, SIGNAL(finished(int, QByteArray)), target, slot, Qt::QueuedConnection);
+    connect(processor, SIGNAL(finished(int /* cpu usage */ , const QByteArray & /* model */, const QnHddUsageVector &/* hdd usage */)), target, slot, Qt::QueuedConnection);
     return QnSessionManager::instance()->sendAsyncGetRequest(m_url, "api/statistics", processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
 }
 
@@ -225,14 +225,14 @@ void detail::VideoServerSessionManagerReplyProcessor::at_replyReceived(int statu
 }
 
 // very simple parser. Used for parsing own created XML
-QByteArray extractXmlBody(const QByteArray& body, const QByteArray tagName)
+QByteArray extractXmlBody(const QByteArray& body, const QByteArray tagName, int from = 0)
 {
 	QByteArray tagStart = QByteArray("<") + tagName + QByteArray(">");
-	int bodyStart = body.indexOf(tagStart);
+	int bodyStart = body.indexOf(tagStart, from);
 	if (bodyStart >= 0)
 		bodyStart += tagStart.length();
 	QByteArray tagEnd = QByteArray("</") + tagName + QByteArray(">");
-	int bodyEnd = body.indexOf(tagEnd);
+	int bodyEnd = body.indexOf(tagEnd, bodyStart);
 	if (bodyStart >= 0 && bodyEnd >= 0)
 		return body.mid(bodyStart, bodyEnd - bodyStart).trimmed();
 	else
@@ -309,7 +309,21 @@ void detail::VideoServerSessionManagerStatisticsRequestReplyProcessor::at_replyR
         QByteArray usageStr = extractXmlBody(reply, "load"); // total cpu load of the current machine
         int usage =  usageStr.toShort();
         QByteArray modelStr = extractXmlBody(reply, "model");
-        emit finished(usage, modelStr); 
+
+        QnHddUsageVector hddUsage;
+        QByteArray storages = extractXmlBody(reply, "storages");
+        QByteArray storage;
+        int from = 0;
+        do 
+        {
+            storage = extractXmlBody(storages, "storage", from);
+            if (storage.length() == 0)
+                break;
+
+            from += storage.length();
+            hddUsage.append(extractXmlBody(storage, "usage").toShort());
+        } while (storage.length() > 0);
+        emit finished(usage, modelStr, hddUsage); 
     }
     deleteLater();
 }
