@@ -51,11 +51,11 @@ def gen_strings():
 # Generate CustomStrings.wxl
 gen_strings()
 
-WXS_FILES = "Associations.wxs PasswordShouldMatchDlg.wxs UpgradeDlg.wxs PasswordDlg.wxs EmptyPasswordDlg.wxs AllFieldsAreMandatoryDlg.wxs InstallTypeDlg.wxs AdvancedTypeDlg.wxs PortDuplicateDlg.wxs PortIsBusyDlg.wxs InvalidPasswordDlg.wxs MediaDirDlg.wxs MediaServerDlg.wxs MyFeaturesDlg.wxs SelectionWarning.wxs DowngradeWarningDlg.wxs Product.wxs AppServerFiles.wxs AppServerDlg.wxs"
+WXS_FILES = "UninstallOptionsDlg.wxs Associations.wxs PasswordShouldMatchDlg.wxs UpgradeDlg.wxs PasswordDlg.wxs EmptyPasswordDlg.wxs AllFieldsAreMandatoryDlg.wxs InstallTypeDlg.wxs AdvancedTypeDlg.wxs PortDuplicateDlg.wxs PortIsBusyDlg.wxs InvalidPasswordDlg.wxs MediaDirDlg.wxs MediaServerDlg.wxs MyFeaturesDlg.wxs SelectionWarning.wxs DowngradeWarningDlg.wxs Product.wxs AppServerFiles.wxs AppServerDlg.wxs"
 os.system(r'heat dir ..\appserver\setup\build\exe.win32-2.7 -wixvar -nologo -sfrag -suid -sreg -ag -srd -dir WebHelp -out AppServerFiles.wxs -cg AppServerFilesComponent -dr VmsAppServerDir -var var.AppServerSourceDir -wixvar')
 fixasfiles()
 
-os.system(r'candle -dAppServerSourceDir="../appserver/setup/build/exe.win32-2.7" -out obj\%s\ -ext WixFirewallExtension.dll -ext WixUIExtension.dll -ext WixUtilExtension.dll %s' % (CONFIG, WXS_FILES))
+os.system(r'candle -dAppServerSourceDir="../appserver/setup/build/exe.win32-2.7" -out obj\%s\ -ext wixext\WixSystemToolsExtension.dll -ext WixFirewallExtension.dll -ext WixUIExtension.dll -ext WixUtilExtension.dll %s' % (CONFIG, WXS_FILES))
 
 if CONFIG == 'Debug':
     output_file_base = 'bin/HDWitness-%s.%s-Debug' % (APPLICATION_VERSION, BUILD_NUMBER)
@@ -75,7 +75,7 @@ try:
 except OSError, e:
     pass
 
-os.system(r'light -cultures:en-US -loc CustomStrings.wxl -ext WixFirewallExtension.dll -ext WixUIExtension.dll -ext WixUtilExtension.dll -out %s -pdbout bin\%s\EVEMediaPlayerSetup.wixpdb obj\%s\*.wixobj' % (output_file_msi, CONFIG, CONFIG))
+os.system(r'light -cultures:en-US -loc CustomStrings.wxl -ext wixext\WixSystemToolsExtension.dll -ext WixFirewallExtension.dll -ext WixUIExtension.dll -ext WixUtilExtension.dll -out %s -pdbout bin\%s\EVEMediaPlayerSetup.wixpdb obj\%s\*.wixobj' % (output_file_msi, CONFIG, CONFIG))
 
 os.system(r'cscript FixExitDialog.js %s' % output_file_msi)
 # os.system(r'setupbld -out %s -ms %s -setup setup.exe' % (output_file_exe, output_file_msi))
