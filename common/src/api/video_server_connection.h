@@ -12,7 +12,8 @@
 
 class VideoServerSessionManager;
 
-typedef QVector<int> QnHddUsageVector;
+typedef QPair<QString, int> QnStatisticsData;
+typedef QVector< QnStatisticsData > QnStatisticsDataVector;
 
 namespace detail {
     class VideoServerSessionManagerReplyProcessor: public QObject
@@ -46,12 +47,12 @@ namespace detail {
         Q_OBJECT;
     public:
         VideoServerSessionManagerStatisticsRequestReplyProcessor(QObject *parent = NULL): QObject(parent) {
-            qRegisterMetaType<QnHddUsageVector>("QnHddUsageVector");
+            qRegisterMetaType<QnStatisticsDataVector>("QnStatisticsDataVector");
         }
     public slots:
         void at_replyReceived(int status, const QByteArray &reply, const QByteArray /* &errorString */ , int /*handle*/);
     signals:
-        void finished(int /* cpu usage */ , const QByteArray & /* model */, const QnHddUsageVector &/* hdd usage */);
+        void finished(const QnStatisticsDataVector &/* usage data */);
     };
 }
 

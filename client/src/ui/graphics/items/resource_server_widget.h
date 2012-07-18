@@ -22,8 +22,9 @@ namespace Qn {
         LoadingFrame, /**< No frames to render, so nothing needs to be rendered. */
         CannotLoad    /**< Something went wrong. */
     };
-
 } // namespace Qn
+
+typedef QPair<QString, QList <int>> QnStatisticsHistoryData;
 
 // TODO: rename to QnServerResourceWidget (we have QnServerResource => QnServerResource + Widget = QnServerResourceWidget)
 class QnResourceServerWidget: public QnResourceWidget {
@@ -43,7 +44,7 @@ public:
     virtual ~QnResourceServerWidget() {}
 
 public slots:
-    void at_statistics_received(int cpuUsage, const QByteArray &model, const QnHddUsageVector &hddUsage);
+    void at_statistics_received(const QnStatisticsDataVector &data);
     void at_timer_update();
 
 protected:
@@ -53,18 +54,12 @@ protected slots:
     virtual void updateOverlayText() override;
 
 private:
-    QPainterPath createGraph(QList<int> *values, const qreal x_step, int &prev_value, int &last_value);
+    QPainterPath createGraph(QList<int> *values, const qreal x_step, const qreal scale, int &prev_value, int &last_value);
 
     void drawStatistics(const QRectF &rect, QPainter *painter);
 
-    /** History of last cpu usage responses */
-    QList<int> m_cpuUsageHistory;
-
-    /** History of last hdd usage responses */
-    QList< QList <int>  > m_hddUsageHistory;
-
-    /** Cpu model */
-    QString m_model;
+    /** History of last usage responses */
+    QList< QnStatisticsHistoryData  > m_history;
 
     /** Total number of responses received */ 
     uint m_counter;
@@ -80,9 +75,6 @@ private:
 
     /** Elapsed timer for smooth scroll */
     QElapsedTimer m_elapsed_timer;
-
-    /** Gradient for background drawing */
-    QRadialGradient m_background_gradient;
 
     QnRadialGradientPainter m_backgroundGradientPainter;
 };

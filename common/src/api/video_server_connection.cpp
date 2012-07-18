@@ -188,7 +188,7 @@ int QnVideoServerConnection::asyncGetFreeSpace(const QString& path, QObject *tar
 
 int QnVideoServerConnection::asyncGetStatistics(QObject *target, const char *slot){
     detail::VideoServerSessionManagerStatisticsRequestReplyProcessor *processor = new detail::VideoServerSessionManagerStatisticsRequestReplyProcessor();
-    connect(processor, SIGNAL(finished(int /* cpu usage */ , const QByteArray & /* model */, const QnHddUsageVector &/* hdd usage */)), target, slot, Qt::QueuedConnection);
+    connect(processor, SIGNAL(finished(const QnStatisticsDataVector &/* data */)), target, slot, Qt::QueuedConnection);
     return QnSessionManager::instance()->sendAsyncGetRequest(m_url, "api/statistics", processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
 }
 
@@ -310,7 +310,9 @@ void detail::VideoServerSessionManagerStatisticsRequestReplyProcessor::at_replyR
         int usage =  usageStr.toShort();
         QByteArray modelStr = extractXmlBody(reply, "model");
 
-        QnHddUsageVector hddUsage;
+        QnStatisticsDataVector data;
+        data.append(QnStatisticsData(modelStr, usage));
+
         QByteArray storages = extractXmlBody(reply, "storages");
         QByteArray storage;
         int from = 0;
@@ -321,9 +323,11 @@ void detail::VideoServerSessionManagerStatisticsRequestReplyProcessor::at_replyR
                 break;
 
             from += storage.length();
-            hddUsage.append(extractXmlBody(storage, "usage").toShort());
+            QString url = extractXmlBody(storage, "url");
+            usage = extractXmlBody(storage, "usage").toShort();
+            data.append(QnStatisticsData(url, usage));
         } while (storage.length() > 0);
-        emit finished(usage, modelStr, hddUsage); 
+        emit finished(data); 
     }
     deleteLater();
 }

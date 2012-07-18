@@ -20,19 +20,12 @@ QnResourceServerWidget::QnResourceServerWidget(QnWorkbenchContext *context, QnWo
     QnResourceWidget(context, item, parent),
     m_alreadyUpdating(false),
     m_counter(0),
-    m_model(tr("Unknown")),
     m_redrawStatus(Qn::LoadingFrame),
     m_backgroundGradientPainter(32, QColor(255, 255, 255, 255), QColor(255, 255, 255, 0))
 {
-    for (int i = 0; i < LIMIT; i++)
-        m_cpuUsageHistory.append(0);
-
     m_timer = new QTimer(this);
     connect(m_timer, SIGNAL(timeout()), this, SLOT(at_timer_update()));
     m_timer->start(REQUEST_TIME);
-
-    m_background_gradient.setColorAt(0.0, qnGlobals->systemHealthColorBackground());
-    m_background_gradient.setColorAt(1, QColor(0, 0, 0, 0));
 }
 
 void QnResourceServerWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/) {
@@ -66,7 +59,12 @@ void QnResourceServerWidget::paint(QPainter *painter, const QStyleOptionGraphics
 }
 
 void QnResourceServerWidget::updateOverlayText(){
-    m_footerStatusLabel->setText(tr("CPU Model: %1").arg(m_model));
+    if (m_history.length() == 0)
+        return;
+
+    QnStatisticsHistoryData cpu = m_history[0];
+
+    m_footerStatusLabel->setText(tr("CPU Model: %1").arg(cpu.first));
 }
 
 void QnResourceServerWidget::at_timer_update(){
@@ -77,47 +75,49 @@ void QnResourceServerWidget::at_timer_update(){
     m_alreadyUpdating = true;
     QnVideoServerResourcePtr server = resource().dynamicCast<QnVideoServerResource>();
     Q_ASSERT(server);
-    server->apiConnection()->asyncGetStatistics(this, SLOT(at_statistics_received(int /* cpu usage */ , const QByteArray & /* model */, const QnHddUsageVector &/* hdd usage */)));
+    server->apiConnection()->asyncGetStatistics(this, SLOT(at_statistics_received(const QnStatisticsDataVector &/* data */)));
 }
 
-void QnResourceServerWidget::at_statistics_received(int cpuUsage, const QByteArray &model, const QnHddUsageVector &hddUsage){
+QString getDataId(int id){
+    if (id == 0)
+        return "CPU";
+    return QString("HDD%1").arg(id+1);
+}
+
+QColor getColorById(int id){
+    switch(id){
+        case 0: return qnGlobals->systemHealthColorMain();
+        case 1: return Qt::red;
+        case 2: return Qt::green;
+    }
+    return Qt::yellow;
+}
+
+void QnResourceServerWidget::at_statistics_received(const QnStatisticsDataVector &data){
     m_alreadyUpdating = false;
     m_redrawStatus = Qn::NewFrame;
-    m_cpuUsageHistory.push_back(cpuUsage);
 
-    for (int i = 0; i < hddUsage.size(); i++){
-        if (m_hddUsageHistory.length() < i + 1){
-            QList<int> hdd_next;
+    for (int i = 0; i < data.size(); i++){
+        if (m_history.length() < i + 1){
+            QList<int> dummy;
             for (int j = 0; j < LIMIT; j++)
-                hdd_next.append(0);
-            m_hddUsageHistory.append(hdd_next);
+                dummy.append(0);
+            QnStatisticsHistoryData dummyItem(getDataId(i), dummy);
+            m_history.append(dummyItem);
         }
-        QList<int> *hdd = &(m_hddUsageHistory[i]);
-        hdd->append(hddUsage[i]);
-        if (hdd->count() > LIMIT)
-            hdd->pop_front();
+
+        QnStatisticsHistoryData *item = &(m_history[i]);
+        QnStatisticsData next_data = data[i];
+        item->second.append(next_data.second);
+        if (item->second.count() > LIMIT)
+            item->second.pop_front();
     }
 
-    m_model = model;
     m_elapsed_timer.restart();
     m_counter++;
-    if (m_cpuUsageHistory.count() > LIMIT)
-        m_cpuUsageHistory.pop_front();
 }
 
-QPainterPath scalePath(const QPainterPath &source, qreal offset, qreal height, qreal dx){ // TODO: use QTransform instead
-    QPainterPath path;
-    path.addPath(source);
-    for (int i=0; i<path.elementCount(); ++i)  {
-        const QPainterPath::Element &e = path.elementAt(i);
-        qreal x = e.x + dx;
-        qreal y = offset + height * (1.0 - e.y);
-        path.setElementPositionAt(i, x, y);
-    }
-    return path;
-}
-
-QPainterPath QnResourceServerWidget::createGraph(QList<int> *values, qreal x_step, int &prev_value, int &last_value){
+QPainterPath QnResourceServerWidget::createGraph(QList<int> *values, qreal x_step, const qreal scale, int &prev_value, int &last_value){
     QPainterPath path;
     int max_value = -1;
     prev_value = 0;
@@ -139,13 +139,13 @@ QPainterPath QnResourceServerWidget::createGraph(QList<int> *values, qreal x_ste
             max_value = qMax(max_value, i_value);
             value = i_value / 100.0;
             if (first){ 
-                path.lineTo(x1, value);
+                y1 = value * scale;
+                path.lineTo(x1, y1);
                 first = false;
-                y1 = value;
                 continue;
             }
 
-            qreal y2 = value;
+            qreal y2 = value * scale;
 
             if (y2 > y1){
                 path.arcTo(x1 - x_step2, y1, x_step, (y2 - y1), 90, -90);
@@ -157,21 +157,17 @@ QPainterPath QnResourceServerWidget::createGraph(QList<int> *values, qreal x_ste
                 path.lineTo(x1 + x_step, y2);
             }
             x1 += x_step;
-            y1 = value;
+            y1 = y2;
         }
     }
     return path;
 }
 
 void QnResourceServerWidget::drawStatistics(const QRectF &rect, QPainter *painter){
-    QnScopedPainterPenRollback penRollback(painter);
-    QnScopedPainterBrushRollback brushRollback(painter);
-    QnScopedPainterFontRollback fontRollback(painter);
-
+    
     qreal width = rect.width();
     qreal height = rect.height();
 
-   //painter->setOpacity(.5);
     qreal min = qMin(width, height);
 
     const bool grid_enabled = true;
@@ -189,7 +185,9 @@ void QnResourceServerWidget::drawStatistics(const QRectF &rect, QPainter *painte
     QRectF inner(offset, offset, ow, oh); 
 
     painter->fillRect(rect, Qt::black);
-    //painter->setRenderHint(QPainter::Antialiasing);
+
+    /** Trying to get some cpu */
+    // painter->setRenderHint(QPainter::Antialiasing); 
 
     if (background_circle){
         painter->beginNativePainting();
@@ -212,9 +210,14 @@ void QnResourceServerWidget::drawStatistics(const QRectF &rect, QPainter *painte
     QPen main_pen;{
         main_pen.setColor(qnGlobals->systemHealthColorMain());
         main_pen.setWidthF(pen_width * 2);
-  //      main_pen.setJoinStyle(Qt::RoundJoin);
-  //      main_pen.setCapStyle(Qt::RoundCap);
+
+        /** Trying to get some cpu */
+        //main_pen.setJoinStyle(Qt::RoundJoin);
+        //main_pen.setCapStyle(Qt::RoundCap);
+        main_pen.setJoinStyle(Qt::BevelJoin);
+        main_pen.setCapStyle(Qt::FlatCap);
     }
+    QnScopedPainterPenRollback penRollback(painter);
     painter->setPen(main_pen);
 
     painter->drawRect(inner);
@@ -243,30 +246,56 @@ void QnResourceServerWidget::drawStatistics(const QRectF &rect, QPainter *painte
 
     int prev_value = 0;
     int last_value = 0;
-    QPainterPath path = createGraph(&m_cpuUsageHistory, x_step, prev_value, last_value);
-    QPainterPath result_path = scalePath(path, offset, oh, offset - (x_step * elapsed_step));
-    painter->strokePath(result_path, main_pen);
+    qreal y_scale = -1.0 * oh;
 
-    for (int i = 0; i < m_hddUsageHistory.length(); i++){
-        int hdd_prev_value = 0;
-        int hdd_last_value = 0;
-        QPainterPath hddpath = createGraph(&(m_hddUsageHistory[i]), x_step, hdd_prev_value, hdd_last_value);
-        QPainterPath hdd_result_path = scalePath(hddpath, offset, oh, offset - (x_step * elapsed_step));
-        main_pen.setColor(Qt::red);
-        painter->strokePath(hdd_result_path, main_pen);
+    {
+        QnScopedPainterTransformRollback transformRollback(painter);
+        QTransform graphTransform = painter->transform();
+        graphTransform.translate(offset - (x_step * elapsed_step), oh + offset);
+
+        painter->setTransform(graphTransform);
+
+        for (int i = 0; i < m_history.length(); i++){
+            QPainterPath hddpath = createGraph(&(m_history[i].second), x_step, y_scale, prev_value, last_value);
+
+            main_pen.setColor(getColorById(i));
+            painter->strokePath(hddpath, main_pen);
+        }
     }
 
     painter->setClipping(false);
 
-    QFont font(this->font());
-    font.setPointSizeF(offset * 0.3);
-    painter->setFont(font);
     {
-        qreal inter_value = 0;
-        if (last_value >= 0 && prev_value >= 0)
-            inter_value = ((last_value - prev_value)*elapsed_step + prev_value);
-        int x = offset*1.1 + ow;
-        int y = offset + oh * (1.0 - inter_value * 0.01);
-        painter->drawText(x, y, QString::number(qRound(inter_value))+"%");
+        QnScopedPainterFontRollback fontRollback(painter);
+        QFont font(this->font());
+        font.setPointSizeF(offset * 0.3);
+        painter->setFont(font);
+        {
+            qreal inter_value = ((last_value - prev_value)*elapsed_step + prev_value);
+            int x = offset*1.1 + ow;
+            int y = offset + oh * (1.0 - inter_value * 0.01);
+            painter->drawText(x, y, QString::number(qRound(inter_value))+"%");
+        }
+
+        /** Draw legend */
+        {
+            QnScopedPainterTransformRollback transformRollback(painter);
+            QTransform legendTransform = painter->transform();
+            QPainterPath legend;
+            legend.lineTo(offset * .2, 0.0);
+            legendTransform.translate(0.0, oh + offset * 0.5);
+            painter->setTransform(legendTransform);
+            for (int i = 0; i < m_history.length(); i++){
+                main_pen.setColor(getColorById(i));
+                painter->setPen(main_pen);
+                painter->strokePath(legend, main_pen);
+                painter->drawText(0.2 * offset, 0.0, m_history[i].first);
+                legendTransform.translate(0.4 * offset, 0.0);
+                painter->setTransform(legendTransform);
+            }
+        }
     }
+    
+
+
 }
