@@ -12,6 +12,8 @@
 
 #include "version.h"
 #include "utils/common/util.h"
+#include "utils/common/performance.h"
+
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "core/resourcemanagment/resource_discovery_manager.h"
 #include "core/resourcemanagment/resource_pool.h"
@@ -53,7 +55,6 @@
 #include "main.h"
 #include "rest/handlers/fs_checker.h"
 #include "rest/handlers/get_statistics.h"
-
 
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
@@ -707,6 +708,9 @@ protected:
 
         serverMain(app->argc(), app->argv());
         m_main.start();
+
+        /** Cpu usage timer MUST be initialized from the main thread */
+        Q_UNUSED(QnPerformance::currentCpuUsage())
     }
 
     void stop()
