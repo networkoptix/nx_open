@@ -414,7 +414,11 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
         }
 
         int rez = avformat_write_header(m_formatCtx, 0);
-        if (rez < 0) {
+        if (rez < 0) 
+        {
+            m_storage->closeFfmpegIOContext(m_ioContext);
+            m_ioContext = 0;
+            m_formatCtx->pb = 0;
             avformat_close_input(&m_formatCtx);
             m_lastErrMessage = QString("Video or audio codec is incompatible with %1 format. Try other format").arg(m_container);
             cl_log.log(m_lastErrMessage, cl_logERROR);
