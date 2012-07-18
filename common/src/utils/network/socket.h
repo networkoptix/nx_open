@@ -132,7 +132,7 @@ public:
      * Set SO_REUSEADDR flag to allow socket to start listening
      * even if port is busy (in TIME_WAIT state).
      */
-    void setReuseAddrFlag(bool reuseAddr = true);
+    bool setReuseAddrFlag(bool reuseAddr = true);
 
 protected:
     bool fillAddr(const QString &address, unsigned short port, sockaddr_in &addr);
@@ -367,13 +367,15 @@ public:
      *   Join the specified multicast group
      *   @param multicastGroup multicast group address to join
      */
-    bool joinGroup(const QString &multicastGroup) ;
+    bool joinGroup(const QString &multicastGroup);
+    bool joinGroup(const QString &multicastGroup, const QString& multicastIF);
 
     /**
      *   Leave the specified multicast group
      *   @param multicastGroup multicast group address to leave
      */
-    bool leaveGroup(const QString &multicastGroup) ;
+    bool leaveGroup(const QString &multicastGroup);
+    bool leaveGroup(const QString &multicastGroup, const QString& multicastIF);
 
     bool hasData() const;
 

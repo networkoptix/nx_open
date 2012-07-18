@@ -186,8 +186,6 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         else
             ui->cameraMotionButton->setText(tr("Do not record motion"));
 
-        updateMaxFPS();
-
         QnVirtualCameraResourceList cameras;
         cameras.push_back(m_camera);
         ui->cameraScheduleWidget->setCameras(cameras);
@@ -204,6 +202,8 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
             ui->cameraScheduleWidget->setFps(currentCameraFps);
         else
             ui->cameraScheduleWidget->setFps(ui->cameraScheduleWidget->getMaxFps()/2);
+
+        updateMaxFPS();
 
         ui->motionWebPageLabel->setText(webPageAddress); // TODO: wrong, need to get camera-specific web page
         ui->cameraMotionButton->setChecked(m_camera->getMotionType() != MT_SoftwareGrid);
@@ -290,8 +290,8 @@ void QnSingleCameraSettingsWidget::connectToMotionWidget() {
 void QnSingleCameraSettingsWidget::updateMotionWidgetNeedControlMaxRect() {
     if(!m_motionWidget)
         return;
-
-    m_motionWidget->setNeedControlMaxRects(m_cameraSupportsMotion && !ui->softwareMotionButton->isChecked());
+    bool hwMotion = m_camera && (m_camera->supportedMotionType() & (MT_HardwareGrid | MT_MotionWindow));
+    m_motionWidget->setNeedControlMaxRects(m_cameraSupportsMotion && hwMotion && !ui->softwareMotionButton->isChecked());
 }
 
 void QnSingleCameraSettingsWidget::updateMotionAvailability() {

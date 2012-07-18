@@ -6,6 +6,7 @@
 static const char H264_NAL_PREFIX[4] = {0x00, 0x00, 0x00, 0x01};
 static const char H264_NAL_SHORT_PREFIX[3] = {0x00, 0x00, 0x01};
 static const int DEFAULT_SLICE_SIZE = 1024 * 1024;
+static const int MAX_ALLOWED_FRAME_SIZE = 1024*1024*10;
 
 CLH264RtpParser::CLH264RtpParser():
         QnRtpStreamParser(),
@@ -14,6 +15,7 @@ CLH264RtpParser::CLH264RtpParser():
         m_builtinSpsFound(false),
         m_builtinPpsFound(false),
         m_keyDataExists(false),
+        m_frameExists(false),
         m_timeCycles(0),
         m_lastTimeStamp(0),
         m_firstSeqNum(0),
@@ -176,6 +178,7 @@ bool CLH264RtpParser::clearInternalBuffer()
 {
     m_videoBuffer.clear();
     m_keyDataExists = m_builtinPpsFound = m_builtinSpsFound = false;
+    m_frameExists = false;
     m_packetPerNal = INT_MIN;
     return false;
 }
@@ -185,6 +188,7 @@ void CLH264RtpParser::updateNalFlags(int nalUnitType)
     m_builtinSpsFound |= nalUnitType == nuSPS;
     m_builtinPpsFound |= nalUnitType == nuPPS;
     m_keyDataExists   |= nalUnitType == nuSliceIDR;
+    m_frameExists     |= nalUnitType >= nuSliceNonIDR && nalUnitType <= nuSliceIDR;
 }
 
 bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStatistic& statistics, QList<QnAbstractMediaDataPtr>& result)
@@ -205,6 +209,13 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStati
 
     
     bool packetLostDetected = m_prevSequenceNum != -1 && quint16(m_prevSequenceNum) != quint16(sequenceNum-1);
+    if (m_videoBuffer.size() > MAX_ALLOWED_FRAME_SIZE)
+    {
+        qWarning() << "Too large RTP/H.264 frame. Truncate video buffer";
+        clearInternalBuffer();
+        packetLostDetected = true;
+    }
+
     if (packetLostDetected) {
         qWarning() << "RTP Packet lost detected!!!!";
         clearInternalBuffer();
@@ -289,7 +300,7 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStati
 
     if (rtpHeader->marker) 
     {   // last packet
-        if (m_videoBuffer.size() > 0)
+        if (m_videoBuffer.size() > 0 && m_frameExists)
             result << createVideoData(ntohl(rtpHeader->timestamp), statistics);
     }
 
