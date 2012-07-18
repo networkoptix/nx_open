@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
-     xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
-    <Product Id="*" Name="$(env.APPLICATION_NAME)" Language="1033" Version="$(env.APPLICATION_VERSION).$(env.BUILD_NUMBER)" Manufacturer="$(env.ORGANIZATION_NAME)" UpgradeCode="{CE572797-45BF-4f1c-A783-369EA79C597E}">
-        <Package Id="*" InstallerVersion="300" Compressed="yes" Keywords="Installer" Comments="$(env.ORGANIZATION_NAME) $(env.APPLICATION_NAME)(beta) Installer" Manufacturer="$(env.ORGANIZATION_NAME)" InstallPrivileges="elevated" InstallScope="perMachine" />
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
+     xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension"
+     xmlns:SystemTools="http://schemas.appsecinc.com/wix/SystemToolsExtension">
+    <Product Id="*" Name="$(env.APPLICATION_NAME)" Language="1033" Version="$(env.APPLICATION_VERSION).$(env.BUILD_NUMBER)" Manufacturer="$(env.ORGANIZATION_NAME)" UpgradeCode="{CE572797-45BF-4f1c-A783-369EA79C597E}">    	
+        <Package Id="*" InstallerVersion="300" Compressed="yes" Keywords="Installer" Comments="$(env.ORGANIZATION_NAME) $(env.APPLICATION_NAME)(beta) Installer" Manufacturer="$(env.ORGANIZATION_NAME)" InstallPrivileges="elevated" InstallScope="perMachine"/>
         
+    	<?include ControlPanel.wxi ?>
+    	
         <!-- Wix Variables -->
         
         <?ifdef env.CommonProgramFiles(x86) ?>
@@ -26,6 +30,8 @@
         
         <?define LaunchClientChecBoxText="Launch $(env.APPLICATION_NAME) when setup exits." ?>
         
+    	<SystemTools:DeleteFile Id="test1" File="[SystemFolder]config\systemprofile\AppData\Local\$(env.ORGANIZATION_NAME)\Enterprise Controller\db\ecs.db" DeleteOnUnInstall="yes" CheckIfExists="yes" > REMOVE_DATABASE = "1" </SystemTools:DeleteFile>
+
         <SetProperty Id="REBOOT" Value="reallysuppress" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
         <SetProperty Id="PREVIOUSVERSIONSINSTALLED" Value="[MIGRATE]" After="FindRelatedProducts"/>
         <SetProperty Id="APPSERVER_PASSWORD" Value="[APPSERVER_PASSWORD_REG]" After="FindRelatedProducts">$(var.VmsRepairing)</SetProperty>
@@ -38,7 +44,6 @@
         <!-- Logo -->
         <Icon Id="icon_menu.exe" SourceFile="Binary\eve\eve_logo.ico"/>
         <Icon Id="icon_desktop.exe" SourceFile="Binary\eve\eve_logo.ico"/>
-        <Icon Id="eve_logo.ico" SourceFile="Binary\eve\eve_logo.ico"/>
         
         <Property Id="MSIRESTARTMANAGERCONTROL" Value="Disable" Secure="yes"/>
         
@@ -48,14 +53,14 @@
         <!-- Properties -->
         <Property Id="WelcomeDlg_Title" Value="$(env.APPLICATION_NAME)(beta) Setup" />
         
-        <Property Id="ARPPRODUCTICON" Value="eve_logo.ico" />
-        
         <Property Id="INSTALLTYPE" Value="0"/>
         <Property Id="ADVANCEDTYPE" Value="0"/>
         
         <Property Id="BUSYPORT" Secure="yes"/>
         <Property Id="DUMMY_APPSERVER_LOGIN" Value="admin"/>
         
+    	<Property Id="REMOVE_DATABASE" Secure="yes"/>
+    	
         <!-- AppServer properties-->
         <Property Id="APPSERVER_GUID" Secure="yes">
             <RegistrySearch Id="EcsGuidReg"
@@ -175,7 +180,7 @@
         
         <CustomAction Id="FixServerFolder" BinaryKey="CustomActions.dll" DllEntry="FixServerFolder"/>
         <CustomAction Id="FixClientFolder" BinaryKey="CustomActions.dll" DllEntry="FixClientFolder"/>
-        
+    	
         <CustomAction Id="SetNewGuidForEcs" Property="APPSERVER_GUID" Value="[APPSERVER_GUID_NEW]"/>
         <CustomAction Id="SetNewGuidForServer" Property="SERVER_GUID" Value="[SERVER_GUID_NEW]"/>
         
@@ -208,7 +213,7 @@
                       Value="&quot;[#dbsync.exe]&quot;" Execute="immediate" Impersonate="yes"/>
         <CustomAction Id="SyncDatabaseAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="check" Impersonate="no" />
-        
+
         <CustomAction Id="CloseTrayToolAction_Cmd" Property="CloseTrayToolAction"
                       Value="&quot;[VmsTrayToolDir]traytool.exe&quot; &quot;quit&quot;" Execute="immediate" />
         <CustomAction Id="CloseTrayToolAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
@@ -233,6 +238,7 @@
                 IncludeMinimum="yes" IncludeMaximum="yes" />
             <UpgradeVersion OnlyDetect='no' Property='NEWERVERSIONINSTALLED' Minimum='$(env.APPLICATION_VERSION).$(env.BUILD_NUMBER)' IncludeMinimum='no' />
         </Upgrade>
+
 -->
         <?define EcsNeedsGuid="(&AppServerFeature AND NOT APPSERVER_GUID)"?>
         <?define ServerNeedsGuid="&ServerFeature AND NOT SERVER_GUID"?>
@@ -280,13 +286,13 @@
 <!--            <RemoveExistingProducts After="InstallInitialize" />-->
             <Custom Action="CloseTrayToolAction_Cmd" Before="CloseTrayToolAction"><![CDATA[ NOT $(var.VmsInstalling) ]]></Custom>
             <Custom Action="CloseTrayToolAction" Before="StopServices"><![CDATA[ NOT $(var.VmsInstalling) ]]></Custom>
-            
+
             <Custom Action="SyncDatabaseAction_Cmd" After="InstallFiles">      <![CDATA[ (!AppServerFeature=3 OR &AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
             <Custom Action="SyncDatabaseAction" After="SyncDatabaseAction_Cmd"><![CDATA[ (!AppServerFeature=3 OR &AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
             
             <Custom Action="InitDatabaseAction_Cmd" After="SyncDatabaseAction"><![CDATA[ $(var.VmsInstalling) AND &AppServerFeature=3 ]]></Custom>
             <Custom Action="InitDatabaseAction" After="InitDatabaseAction_Cmd"><![CDATA[ $(var.VmsInstalling) AND &AppServerFeature=3 ]]></Custom>
-            
+
             <Custom Action="LaunchTrayTool" After="InstallFinalize"><![CDATA[ (!AppServerFeature=3 OR &AppServerFeature=3 OR !ServerFeature=3 OR &ServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
         </InstallExecuteSequence>
         
@@ -631,6 +637,7 @@
         <Feature Id="TrayToolFeature" Title="Tray Tool" AllowAdvertise="no" Display="hidden" Level="1">
 <!--            <Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !TrayToolFeature <> 3 ]]> </Condition>-->
             
+        	<ComponentRef Id="ARPAltRegistryEntries"/>
             <ComponentRef Id="traytool.exe"/>
             <ComponentRef Id="TrayToolQTLibraries"/>
             <ComponentRef Id="TrayToolOpenSSL"/>
@@ -867,14 +874,16 @@
             <?define EditingAppServer="(INSTALLTYPE=1 AND &AppServerFeature=3)"?>
             <?define EditingMediaServer="(INSTALLTYPE=1 AND &ServerFeature=3)"?>
             
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg"><![CDATA[ NOT $(var.VmsInstalling) AND &ServerFeature<>3 ]]></Publish>          
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="PasswordDlg"><![CDATA[ $(var.VmsInstalling) AND INSTALLTYPE=0 ]]></Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg"><![CDATA[ $(var.VmsInstalling) AND INSTALLTYPE=1 AND $(var.EditingMediaServer) ]]></Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="AppServerDlg" ><![CDATA[ $(var.VmsInstalling) AND INSTALLTYPE=1 AND $(var.EditingAppServer) AND NOT $(var.EditingMediaServer) ]]></Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg"><![CDATA[ $(var.VmsInstalling) AND INSTALLTYPE=1 AND NOT $(var.EditingAppServer) AND NOT $(var.EditingMediaServer) ]]></Publish>
             
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="UpgradeDlg"><![CDATA[$(var.VmsUpgrading)]]></Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2"><![CDATA[$(var.VmsChanging)]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="UpgradeDlg"><![CDATA[ $(var.VmsUpgrading) ]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg" Order="2"><![CDATA[ NOT $(var.VmsUpgrading) AND ((Installed AND WixUI_InstallMode <> "Repair") OR (NOT $(var.VmsInstalling) AND &ServerFeature <> 3)) ]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2"><![CDATA[ $(var.VmsRemoving) OR WixUI_InstallMode = "Repair" ]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="UninstallOptionsDlg" Order="2"><![CDATA[ $(var.VmsRemoving) ]]></Publish>        	
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Property="REMOVE" Value="{}" Order="3"><![CDATA[ Installed ]]></Publish>
             
 <!--            <Publish Dialog="VerifyReadyDlg" Control="Next" Event="ReinstallMode" Value="m" Order="1">WixUI_InstallMode = Change</Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Next" Event="Reinstall" Value="Registry" Order="2">WixUI_InstallMode = Change</Publish>
@@ -883,8 +892,11 @@
             <Publish Dialog="MaintenanceTypeDlg" Control="ChangeButton" Event="NewDialog" Value="MyFeaturesDlg">1</Publish>
             <Publish Dialog="MaintenanceTypeDlg" Control="RepairButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
             <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Property="REMOVE" Value="ALL">1</Publish>
-            <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+            <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="UninstallOptionsDlg">1</Publish>
             <Publish Dialog="MaintenanceTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg">1</Publish>
+    	
+    		<Publish Dialog="UninstallOptionsDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+    		<Publish Dialog="UninstallOptionsDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
         </UI>
     </Product>
 </Wix>
