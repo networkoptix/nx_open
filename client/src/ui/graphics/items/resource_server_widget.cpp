@@ -55,28 +55,10 @@ void QnResourceServerWidget::paint(QPainter *painter, const QStyleOptionGraphics
     drawStatistics(rect(), painter);
 
     painter->beginNativePainting();
-    //glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-
-    QRectF rect = this->rect();
-    qreal radius = rect.height() * .5;
-    glPushMatrix();
-    glTranslatef(rect.center().x(), rect.center().y(), 1.0);
-    glScale(radius, radius);
-    QRectF bgplace(rect.center().x() - radius*.5, rect.center().y() - radius*.5, radius, radius);
-    glColor4f(0.5, 0.5, 0.0, 0.5);
-    glBegin(GL_QUADS);
-    glVertices(bgplace);
-    glEnd();
-
-    // m_backgroundGradientPainter.paint();
-    glPopMatrix();
-
-    drawOverlayIcon(0, this->rect());
+    drawOverlayIcon(0, rect());
     glDisable(GL_BLEND);
-    //glPopAttrib();
     painter->endNativePainting();
 
     if(m_footerOverlayWidget->isVisible() && !qFuzzyIsNull(m_footerOverlayWidget->opacity())) 
@@ -193,12 +175,11 @@ void QnResourceServerWidget::drawStatistics(const QRectF &rect, QPainter *painte
     qreal min = qMin(width, height);
 
     const bool grid_enabled = true;
-    const bool background_circle = false;
+    const bool background_circle = true;
 
     qreal offset = min / 20.0;
     qreal pen_width = width / 500.0;
 
-    QRectF painter_rect(0, 0, width, height);
     qreal oh = height - offset*2;
     qreal ow = width - offset*2;
     
@@ -207,36 +188,24 @@ void QnResourceServerWidget::drawStatistics(const QRectF &rect, QPainter *painte
 
     QRectF inner(offset, offset, ow, oh); 
 
-    painter->fillRect(painter_rect, Qt::black);
+    painter->fillRect(rect, Qt::black);
     //painter->setRenderHint(QPainter::Antialiasing);
 
     if (background_circle){
-        qreal radius = min * 0.5;
-
         painter->beginNativePainting();
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        {
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        glPushMatrix();
-        glTranslatef(rect.center().x(), rect.center().y(), 1.0);
-        glScale(radius, radius);
+            glPushMatrix();
+            glTranslatef(inner.center().x(), inner.center().y(), 1.0);
+            qreal radius = min * 0.5 - offset;
+            glScale(radius, radius);
+            m_backgroundGradientPainter.paint(qnGlobals->backgroundGradientColor());
+            glPopMatrix();
 
-        QRectF bgplace(rect.center().x() - radius*.5, rect.center().y() - radius*.5, radius, radius);
-        glColor4f(0.5, 0.5, 0.0, 0.5);
-        glBegin(GL_QUADS);
-        glVertices(rect);
-        glEnd();
-
-        m_backgroundGradientPainter.paint();
-        glPopMatrix();
-        glDisable(GL_BLEND);
-
-/*        m_background_gradient.setCenter(center);
-        m_background_gradient.setFocalPoint(center);
-        m_background_gradient.setRadius(radius);
-        painter->setBrush(m_background_gradient);
-        painter->setPen(Qt::NoPen);
-        painter->drawEllipse(QPointF(width/2, height/2), radius, radius);*/
+            glDisable(GL_BLEND);
+        }
         painter->endNativePainting();
     }
 
