@@ -489,8 +489,10 @@ void QnStreamRecorder::setNeedCalcSignature(bool value)
 {
     if (m_needCalcSignature == value)
         return;
-    if (value)
-    {
+
+    m_needCalcSignature = value;
+
+    if (value) {
         m_mdctx.reset();
         m_mdctx.addData(EXPORT_SIGN_MAGIC, sizeof(EXPORT_SIGN_MAGIC));
     }
