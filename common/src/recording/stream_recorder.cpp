@@ -412,7 +412,13 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
             return false;
         }
 
-        avformat_write_header(m_formatCtx, 0);
+        int rez = avformat_write_header(m_formatCtx, 0);
+        if (rez < 0) {
+            avformat_close_input(&m_formatCtx);
+            m_lastErrMessage = QString("Video or audio codec is incompatible with %1 format. Try other format").arg(m_container);
+            cl_log.log(m_lastErrMessage, cl_logERROR);
+            return false;
+        }
     }
     fileStarted(m_startDateTime/1000, m_fileName, m_mediaProvider);
 
