@@ -1,14 +1,15 @@
 #ifndef _STREAM_RECORDER_H__
 #define _STREAM_RECORDER_H__
 
-#include "core/dataconsumer/dataconsumer.h"
-#include "core/datapacket/mediadatapacket.h"
-#include "core/resource/resource.h"
-#include "core/resource/resource_media_layout.h"
-#include <openssl/evp.h>
-#include <QPixmap>
+#include <QtGui/QPixmap>
 
-#include "core/resource/storage_resource.h"
+#include <utils/common/cryptographic_hash.h>
+
+#include <core/dataconsumer/dataconsumer.h>
+#include <core/datapacket/mediadatapacket.h>
+#include <core/resource/resource.h>
+#include <core/resource/resource_media_layout.h>
+#include <core/resource/storage_resource.h>
 
 class QnAbstractMediaStreamDataProvider;
 
@@ -117,7 +118,7 @@ private:
     QnAbstractMediaStreamDataProvider* m_mediaProvider;
     
     Role m_role;
-    EVP_MD_CTX* m_mdctx;
+    QnCryptographicHash m_mdctx;
     QPixmap m_logo;
     QString m_container;
     int m_videoChannels;

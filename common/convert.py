@@ -197,6 +197,8 @@ def index_dirs(xdirs, template_file, output_file, exclude_dirs=(), exclude_files
                     headers.append(os.path.join(parent, f))
                 elif f.endswith('.cpp'):
                     sources.append(os.path.join(parent, f))
+                elif f.endswith('.c'):
+                    sources.append(os.path.join(parent, f))
 
     uniclient_pro = open(output_file, 'a')
 
