@@ -18,7 +18,7 @@
 		<assembly-skip>false</assembly-skip>
 		<convert-only>true</convert-only>
 		<ffmpeg.version>2012-04-10-N-39672-g40b7a27</ffmpeg.version>
-		<openssl.version>1.0.0j</openssl.version>
+		<openssl.version>1.0.0j-custom</openssl.version>
 		<onvif.version>2.1.1-ptz-SNAPSHOT</onvif.version>
 		<buildLib/>
 		<qtlib1/>
@@ -173,12 +173,21 @@
 
 								<fileset id="headers_path" dir="${project.build.sourceDirectory}" erroronmissingdir="false">
 									<include name="**/*.h" />
+									<exclude name="**/version.h" />
 								</fileset>
 								<pathconvert pathsep="${line.separator}" property="headers" refid="headers_path">
 									<map from="" to="HEADERS += "/>
 								</pathconvert>									
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${headers}</echo>
 
+								<!--<fileset id="libs_headers_path" dir="${project.build.directory}" erroronmissingdir="false">
+									<include name="**/*.c" />
+								</fileset>
+								<pathconvert pathsep="${line.separator}" property="libs_headers" refid="libs_headers_path">
+									<map from="" to="HEADERS += "/>
+								</pathconvert>									
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${libs_headers}</echo>		-->						
+								
 								<fileset id="sources_path" dir="${project.build.sourceDirectory}" erroronmissingdir="false">
 									<include name="**/*.cpp" />
 									<include name="**/*.cc" />
@@ -189,7 +198,7 @@
 								</pathconvert>
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${sources}</echo>
 
-								<fileset id="add_sources_path" dir="${project.build.directory}/build/include" erroronmissingdir="false">
+								<!-- <fileset id="add_sources_path" dir="${project.build.directory}/build/include" erroronmissingdir="false">
 									<include name="**/*.cpp" />
 									<include name="**/*.cc" />
 									<include name="**/*.c" />
@@ -197,7 +206,7 @@
 								<pathconvert pathsep="${line.separator}" property="add_sources" refid="add_sources_path">
 									<map from="" to="SOURCES += "/>
 								</pathconvert>
-								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${add_sources}</echo>
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${add_sources}</echo> -->
 
 								<fileset id="qrc_path" dir="${project.build.directory}" erroronmissingdir="false">
 									<include name="**/*.qrc" />
