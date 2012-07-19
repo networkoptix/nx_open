@@ -50,9 +50,6 @@ public slots:
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
-protected slots:
-    virtual void updateOverlayText() override;
-
 private:
     QPainterPath createGraph(QList<int> *values, const qreal x_step, const qreal scale, int &prev_value, int &last_value);
 

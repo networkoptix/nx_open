@@ -53,18 +53,6 @@ void QnResourceServerWidget::paint(QPainter *painter, const QStyleOptionGraphics
     drawOverlayIcon(0, rect());
     glDisable(GL_BLEND);
     painter->endNativePainting();
-
-    if(m_footerOverlayWidget->isVisible() && !qFuzzyIsNull(m_footerOverlayWidget->opacity())) 
-        emit updateOverlayTextLater();
-}
-
-void QnResourceServerWidget::updateOverlayText(){
-    if (m_history.length() == 0)
-        return;
-
-    QnStatisticsHistoryData cpu = m_history[0];
-
-    m_footerStatusLabel->setText(tr("CPU Model: %1").arg(cpu.first));
 }
 
 void QnResourceServerWidget::at_timer_update(){
@@ -81,7 +69,7 @@ void QnResourceServerWidget::at_timer_update(){
 QString getDataId(int id){
     if (id == 0)
         return "CPU";
-    return QString("HDD%1").arg(id+1);
+    return QString("HDD%1").arg(id - 1);
 }
 
 QColor getColorById(int id){
@@ -184,16 +172,17 @@ void QnResourceServerWidget::drawStatistics(const QRectF &rect, QPainter *painte
 
     QRectF inner(offset, offset, ow, oh); 
 
-    painter->fillRect(rect, Qt::black);
-
-    /** Trying to get some cpu */
-    // painter->setRenderHint(QPainter::Antialiasing); 
-
+    /** Draw background */
     if (background_circle){
         painter->beginNativePainting();
         {
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+            glColor4f(0.0, 0.0, 0.0, 1.0);
+            glBegin(GL_QUADS);
+            glVertices(rect);
+            glEnd();
 
             glPushMatrix();
             glTranslatef(inner.center().x(), inner.center().y(), 1.0);
@@ -205,27 +194,22 @@ void QnResourceServerWidget::drawStatistics(const QRectF &rect, QPainter *painte
             glDisable(GL_BLEND);
         }
         painter->endNativePainting();
+    } else {
+        painter->fillRect(rect, Qt::black);
     }
+
 
     QPen main_pen;{
         main_pen.setColor(qnGlobals->systemHealthColorMain());
         main_pen.setWidthF(pen_width * 2);
-
-        /** Trying to get some cpu */
-        //main_pen.setJoinStyle(Qt::RoundJoin);
-        //main_pen.setCapStyle(Qt::RoundCap);
-        main_pen.setJoinStyle(Qt::BevelJoin);
-        main_pen.setCapStyle(Qt::FlatCap);
+        main_pen.setJoinStyle(Qt::RoundJoin);
+        main_pen.setCapStyle(Qt::RoundCap);
     }
-    QnScopedPainterPenRollback penRollback(painter);
-    painter->setPen(main_pen);
-
-    painter->drawRect(inner);
-    painter->setClipRect(inner); // TODO: it's better to avoid clipping.
 
     const qreal x_step = (qreal)ow*1.0/(LIMIT - 2);
     qreal elapsed_step = (qreal)qMin(m_elapsed_timer.elapsed(), (qint64)REQUEST_TIME) / (qreal)REQUEST_TIME;
 
+    /** Draw grid */
     if (grid_enabled){
         QPen grid;
         QVector<QPoint> pointPairs;
@@ -233,21 +217,24 @@ void QnResourceServerWidget::drawStatistics(const QRectF &rect, QPainter *painte
         grid.setWidthF(pen_width);
 
         QPainterPath grid_path;
-        for (qreal i = offset - (x_step * (elapsed_step + m_counter%4)); i < ow + offset; i += x_step*4){
+        for (qreal i = offset - (x_step * (elapsed_step + m_counter%4 - 4)); i < ow + offset; i += x_step*4){
             grid_path.moveTo(i, offset);
             grid_path.lineTo(i, oh + offset);
         }
-        for (qreal i = x_step*2; i < oh; i += x_step*4){
+        for (qreal i = x_step*2 + offset; i < oh; i += x_step*4){
             grid_path.moveTo(offset, i);
             grid_path.lineTo(ow + offset, i);
         }
         painter->strokePath(grid_path, grid);
     }
 
-    int prev_value = 0;
-    int last_value = 0;
-    qreal y_scale = -1.0 * oh;
+    QnScopedPainterPenRollback penRollback(painter);
+    painter->setPen(main_pen);
+    painter->drawRect(inner);
+    painter->setClipRect(inner); // TODO: it's better to avoid clipping.
 
+    QList<qreal> values;
+    /** Draw graph lines */
     {
         QnScopedPainterTransformRollback transformRollback(painter);
         QTransform graphTransform = painter->transform();
@@ -256,7 +243,11 @@ void QnResourceServerWidget::drawStatistics(const QRectF &rect, QPainter *painte
         painter->setTransform(graphTransform);
 
         for (int i = 0; i < m_history.length(); i++){
-            QPainterPath hddpath = createGraph(&(m_history[i].second), x_step, y_scale, prev_value, last_value);
+            int prev_value = 0;
+            int last_value = 0;
+            QPainterPath hddpath = createGraph(&(m_history[i].second), x_step, -1.0 * oh, prev_value, last_value);
+            qreal inter_value = ((last_value - prev_value)*elapsed_step + prev_value);
+            values.append(inter_value);
 
             main_pen.setColor(getColorById(i));
             painter->strokePath(hddpath, main_pen);
@@ -270,11 +261,17 @@ void QnResourceServerWidget::drawStatistics(const QRectF &rect, QPainter *painte
         QFont font(this->font());
         font.setPointSizeF(offset * 0.3);
         painter->setFont(font);
+
+        /** Draw text values */
         {
-            qreal inter_value = ((last_value - prev_value)*elapsed_step + prev_value);
             int x = offset*1.1 + ow;
-            int y = offset + oh * (1.0 - inter_value * 0.01);
-            painter->drawText(x, y, QString::number(qRound(inter_value))+"%");
+            for (int i = 0; i < values.length(); i++){
+                qreal inter_value = values[i];
+                main_pen.setColor(getColorById(i));
+                painter->setPen(main_pen);
+                int y = offset + oh * (1.0 - inter_value * 0.01);
+                painter->drawText(x, y, QString::number(qRound(inter_value))+"%");
+            }
         }
 
         /** Draw legend */
@@ -282,15 +279,17 @@ void QnResourceServerWidget::drawStatistics(const QRectF &rect, QPainter *painte
             QnScopedPainterTransformRollback transformRollback(painter);
             QTransform legendTransform = painter->transform();
             QPainterPath legend;
-            legend.lineTo(offset * .2, 0.0);
-            legendTransform.translate(0.0, oh + offset * 0.5);
+         
+            legend.addRect(0.0, 0.0, -offset*0.2, -offset*0.2);
+
+            legendTransform.translate(width * 0.5 - offset * m_history.length(), oh + offset * 1.5);
             painter->setTransform(legendTransform);
             for (int i = 0; i < m_history.length(); i++){
                 main_pen.setColor(getColorById(i));
                 painter->setPen(main_pen);
                 painter->strokePath(legend, main_pen);
-                painter->drawText(0.2 * offset, 0.0, m_history[i].first);
-                legendTransform.translate(0.4 * offset, 0.0);
+                painter->drawText(offset*0.1, offset*0.1, m_history[i].first);
+                legendTransform.translate(offset * 2, 0.0);
                 painter->setTransform(legendTransform);
             }
         }
