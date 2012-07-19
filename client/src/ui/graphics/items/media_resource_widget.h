@@ -72,11 +72,9 @@ public:
      */
     const QList<QRegion> &motionSelection() const;
 
+    bool addToMotionSensitivity(const QRect &gridRect, int sensitivity);
 
-    // TODO: what channel does here? WTF????
-    void addToMotionSensitivity(int channel, const QRect &rect, int sensitivity);
-
-    bool setMotionSensitivityFilled(int channel, const QPoint &gridPos, int sensitivity);
+    bool setMotionSensitivityFilled(const QPoint &gridPos, int sensitivity);
 
     void clearMotionSensitivity();
 
