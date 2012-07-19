@@ -4,12 +4,9 @@
 #include <QtGui/QGraphicsWidget>
 
 #include <ui/graphics/items/resource_widget.h>
-#include <api/video_server_connection.h>
+#include <ui/graphics/painters/radial_gradient_painter.h>
 
-/* Get rid of stupid win32 defines. */
-#ifdef NoDataOverlay
-#   undef NoDataOverlay
-#endif
+#include <api/video_server_connection.h>
 
 namespace Qn {
 
@@ -20,8 +17,9 @@ namespace Qn {
         LoadingFrame, /**< No frames to render, so nothing needs to be rendered. */
         CannotLoad    /**< Something went wrong. */
     };
-
 } // namespace Qn
+
+typedef QPair<QString, QList <int>> QnStatisticsHistoryData;
 
 // TODO: rename to QnServerResourceWidget (we have QnServerResource => QnServerResource + Widget = QnServerResourceWidget)
 class QnResourceServerWidget: public QnResourceWidget {
@@ -41,7 +39,7 @@ public:
     virtual ~QnResourceServerWidget() {}
 
 public slots:
-    void at_statistics_received(int usage, const QByteArray &model);
+    void at_statistics_received(const QnStatisticsDataVector &data);
     void at_timer_update();
 
 protected:
@@ -49,17 +47,13 @@ protected:
 
     virtual Qn::RenderStatus paintChannel(QPainter *,int,const QRectF &) override { return Qn::NothingRendered; }
 
-protected slots:
-    //virtual void updateOverlayText() override;
-
 private:
-    void drawStatistics(int width, int height, QPainter *painter);
+    QPainterPath createGraph(QList<int> *values, const qreal x_step, const qreal scale, qreal &current_value, const qreal elapsed_step);
 
-    /** History of last responses */
-    QList<int> m_history;
+    void drawStatistics(const QRectF &rect, QPainter *painter);
 
-    /** Cpu model */
-    QString m_model;
+    /** History of last usage responses */
+    QList< QnStatisticsHistoryData  > m_history;
 
     /** Total number of responses received */ 
     uint m_counter;
@@ -76,8 +70,7 @@ private:
     /** Elapsed timer for smooth scroll */
     QElapsedTimer m_elapsed_timer;
 
-    /** Gradient for background drawing */
-    QRadialGradient m_background_gradient;
+    QnRadialGradientPainter m_backgroundGradientPainter;
 };
 
 Q_DECLARE_METATYPE(QnResourceServerWidget *)

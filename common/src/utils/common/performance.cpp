@@ -94,6 +94,7 @@ namespace {
         void refresh() {
 
             char q_str[100];
+            const quint64 max = 100;
             const qint64 appPid = QCoreApplication::applicationPid();
             sprintf(q_str, "SELECT * FROM Win32_PerfRawData_PerfProc_Process WHERE IdProcess>0"); // WHERE IdProcess=%d", 
             IEnumWbemClassObject* pEnumerator = query(q_str);
@@ -122,10 +123,10 @@ namespace {
                 }
                 pEnumerator->Release();
 
-                if (m_timeStamp){
+                if (m_timeStamp && ts){
                     qulonglong timespan = ((ts - m_timeStamp) * QnPerformance::cpuCoreCount());
-                    m_usage = ((cpu - m_processCpu) * 100) / timespan;
-                    m_totalUsage = ((total - m_totalCpu) * 100) / timespan;
+                    m_usage = qMin(max, ((cpu - m_processCpu) * 100) / timespan);
+                    m_totalUsage = qMin(max, ((total - m_totalCpu) * 100) / timespan);
                 }
                 m_totalCpu = total;
                 m_processCpu = cpu;
