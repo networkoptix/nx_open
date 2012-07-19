@@ -151,6 +151,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     connect(rotateButton, SIGNAL(released()), this, SIGNAL(rotationStopRequested()));
 
     m_buttonBar = new QnImageButtonBar();
+    m_buttonBar->setUniformButtonSize(QSizeF(24.0, 24.0));
     m_buttonBar->addButton(CloseButton, closeButton);
     m_buttonBar->addButton(InfoButton, infoButton);
     m_buttonBar->addButton(RotateButton, rotateButton);

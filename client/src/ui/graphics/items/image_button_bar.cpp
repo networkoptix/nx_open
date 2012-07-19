@@ -11,6 +11,8 @@ QnImageButtonBar::QnImageButtonBar(QGraphicsItem *parent, Qt::WindowFlags window
     base_type(parent, windowFlags),
     m_buttonsVisibility(0)
 {
+    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+
     m_layout = new QGraphicsLinearLayout(Qt::Horizontal);
     m_layout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
     m_layout->setSpacing(0.0);
@@ -46,6 +48,7 @@ void QnImageButtonBar::addButton(int mask, QnImageButtonWidget *button) {
     m_buttonByMask[mask] = button;
 
     updateButtons();
+    updateButtonSize(button);
 }
 
 void QnImageButtonBar::removeButton(QnImageButtonWidget *button) {
@@ -82,6 +85,20 @@ void QnImageButtonBar::setButtonVisible(int mask, bool visible) {
     setButtonsVisibility(visible ? (m_buttonsVisibility | mask) : (m_buttonsVisibility & ~mask));
 }
 
+const QSizeF &QnImageButtonBar::uniformButtonSize() const {
+    return m_uniformButtonSize;
+}
+
+void QnImageButtonBar::setUniformButtonSize(const QSizeF &uniformButtonSize) {
+    if(m_uniformButtonSize == uniformButtonSize)
+        return;
+
+    m_uniformButtonSize = uniformButtonSize;
+
+    foreach(QnImageButtonWidget *button, m_buttonByMask) 
+        updateButtonSize(button);
+}
+
 void QnImageButtonBar::updateButtons() {
     foreach(QnImageButtonWidget *button, m_buttonByMask) {
         m_layout->removeItem(button);
@@ -98,3 +115,9 @@ void QnImageButtonBar::updateButtons() {
     }
 
 }
+
+void QnImageButtonBar::updateButtonSize(QnImageButtonWidget *button) {
+    button->setMaximumSize(m_uniformButtonSize);
+    button->setMinimumSize(m_uniformButtonSize);
+}
+

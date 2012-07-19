@@ -27,16 +27,22 @@ public:
     void setButtonsVisibility(int buttonsVisibility);
     void setButtonVisible(int mask, bool visible);
 
+    const QSizeF &uniformButtonSize() const;
+    void setUniformButtonSize(const QSizeF &uniformButtonSize);
+
 signals:
     void buttonsVisibilityChanged();
 
 private:
     void updateButtons();
+    void updateButtonSize(QnImageButtonWidget *button);
 
 private:
     QMap<int, QnImageButtonWidget *> m_buttonByMask;
     QHash<QnImageButtonWidget *, int> m_maskByButton;
     int m_buttonsVisibility;
+
+    QSizeF m_uniformButtonSize;
 
     QGraphicsLinearLayout *m_layout;
 };
