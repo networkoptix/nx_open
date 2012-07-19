@@ -174,6 +174,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_treePinned(false),
     m_inactive(false),
     m_titleUsed(false),
+    m_windowButtonsUsed(true),
     m_titleOpened(false),
     m_treeOpened(false),
     m_sliderOpened(false),
@@ -359,8 +360,21 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     m_mainMenuButton = newActionButton(action(Qn::LightMainMenuAction), 1.5);
 
-    QGraphicsLinearLayout *titleLayout = new QGraphicsLinearLayout();
+    QGraphicsLinearLayout * windowButtonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+    windowButtonsLayout->setContentsMargins(0, 0, 0, 0);
+    windowButtonsLayout->setSpacing(2);
+    QGraphicsWidget *titleSpacerWidget = new QGraphicsWidget();
+    titleSpacerWidget->setMinimumSize(QSizeF(6.0, 6.0));
+    titleSpacerWidget->setMaximumSize(titleSpacerWidget->minimumSize());
+    windowButtonsLayout->addItem(titleSpacerWidget);
+    windowButtonsLayout->addItem(newActionButton(action(Qn::MinimizeAction)));
+    windowButtonsLayout->addItem(newActionButton(action(Qn::FullscreenAction)));
+    windowButtonsLayout->addItem(newActionButton(action(Qn::ExitAction)));
+    
+    m_windowButtonsWidget = new QGraphicsWidget();
+    m_windowButtonsWidget->setLayout(windowButtonsLayout);
 
+    QGraphicsLinearLayout *titleLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     titleLayout->setSpacing(2);
     titleLayout->setContentsMargins(4, 0, 4, 0);
     QGraphicsLinearLayout *titleLeftButtonsLayout = new QGraphicsLinearLayout();
@@ -370,20 +384,14 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     titleLayout->addItem(titleLeftButtonsLayout);
     titleLayout->addItem(m_tabBarItem);
     titleLayout->setAlignment(m_tabBarItem, Qt::AlignBottom);
-    QGraphicsLinearLayout *titleRightButtonsLayout = new QGraphicsLinearLayout();
-    titleRightButtonsLayout->setSpacing(2);
-    titleRightButtonsLayout->setContentsMargins(0, 4, 0, 0);
-    titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenNewTabAction)));
-    titleRightButtonsLayout->addStretch(0x1000);
-    titleRightButtonsLayout->addItem(newActionButton(action(Qn::ConnectToServerAction)));
-    QGraphicsWidget *titleSpacerWidget = new QGraphicsWidget();
-    titleSpacerWidget->setMinimumSize(QSizeF(6.0, 6.0));
-    titleSpacerWidget->setMaximumSize(titleSpacerWidget->minimumSize());
-    titleRightButtonsLayout->addItem(titleSpacerWidget);
-    titleRightButtonsLayout->addItem(newActionButton(action(Qn::MinimizeAction)));
-    titleRightButtonsLayout->addItem(newActionButton(action(Qn::FullscreenAction)));
-    titleRightButtonsLayout->addItem(newActionButton(action(Qn::ExitAction)));
-    titleLayout->addItem(titleRightButtonsLayout);
+    m_titleRightButtonsLayout = new QGraphicsLinearLayout();
+    m_titleRightButtonsLayout->setSpacing(2);
+    m_titleRightButtonsLayout->setContentsMargins(0, 4, 0, 0);
+    m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenNewTabAction)));
+    m_titleRightButtonsLayout->addStretch(0x1000);
+    m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::ConnectToServerAction)));
+    m_titleRightButtonsLayout->addItem(m_windowButtonsWidget);
+    titleLayout->addItem(m_titleRightButtonsLayout);
     m_titleItem->setLayout(titleLayout);
     titleLayout->activate(); /* So that it would set title's size. */
 
@@ -791,6 +799,21 @@ void QnWorkbenchUi::setTitleUsed(bool used) {
         m_titleItem->setPos(0.0, -m_titleItem->size().height() - 1.0);
 
         m_titleUsed = used;
+    }
+}
+
+void QnWorkbenchUi::setWindowButtonsUsed(bool windowButtonsUsed) {
+    if(m_windowButtonsUsed == windowButtonsUsed)
+        return;
+
+    m_windowButtonsUsed = windowButtonsUsed;
+
+    if(m_windowButtonsUsed) {
+        m_titleRightButtonsLayout->addItem(m_windowButtonsWidget);
+        m_windowButtonsWidget->setVisible(true);
+    } else {
+        m_titleRightButtonsLayout->removeItem(m_windowButtonsWidget);
+        m_windowButtonsWidget->setVisible(false);
     }
 }
 
