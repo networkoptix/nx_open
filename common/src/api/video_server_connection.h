@@ -12,6 +12,9 @@
 
 class VideoServerSessionManager;
 
+typedef QPair<QString, int> QnStatisticsData;
+typedef QVector< QnStatisticsData > QnStatisticsDataVector;
+
 namespace detail {
     class VideoServerSessionManagerReplyProcessor: public QObject
     {
@@ -38,6 +41,19 @@ namespace detail {
     signals:
         void finished(int status, qint64 freeSpace, qint64 usedSpace, int handle);
     };
+
+    class VideoServerSessionManagerStatisticsRequestReplyProcessor: public QObject
+    {
+        Q_OBJECT;
+    public:
+        VideoServerSessionManagerStatisticsRequestReplyProcessor(QObject *parent = NULL): QObject(parent) {
+            qRegisterMetaType<QnStatisticsDataVector>("QnStatisticsDataVector");
+        }
+    public slots:
+        void at_replyReceived(int status, const QByteArray &reply, const QByteArray /* &errorString */ , int /*handle*/);
+    signals:
+        void finished(const QnStatisticsDataVector &/* usage data */);
+    };
 }
 
 class QN_EXPORT QnVideoServerConnection: public QObject
@@ -57,6 +73,11 @@ public:
     static int getProxyPort() { return m_proxyPort; }
     static QString getProxyHost() { return m_proxyAddr; }
 
+    /** Returns request handle */
+    int asyncGetStatistics(QObject *target, const char *slot);
+
+    /** Returns status */
+    int syncGetStatistics(QObject *target, const char *slot);
 private:
     int recordedTimePeriods(const QnRequestParamList& params, QnTimePeriodList& timePeriodList, QByteArray& errorString);
 

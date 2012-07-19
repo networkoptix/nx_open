@@ -26,6 +26,8 @@
 
 #include <device_plugins/server_camera/appserver.h>
 
+#include <plugins/storage/file_storage/layout_storage_resource.h>
+
 #include <camera/resource_display.h>
 #include <camera/camdisplay.h>
 #include <camera/camera.h>
@@ -50,6 +52,7 @@
 #include <youtube/youtubeuploaddialog.h>
 
 #include <ui/graphics/items/resource_widget.h>
+#include <ui/graphics/items/media_resource_widget.h>
 
 #include <utils/settings.h>
 
@@ -65,7 +68,6 @@
 #include "workbench_layout_snapshot_manager.h"
 #include "workbench_resource.h"
 #include "workbench_access_controller.h"
-#include "plugins/storage/file_storage/layout_storage_resource.h"
 
 
 // -------------------------------------------------------------------------- //
@@ -204,6 +206,10 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::SetCurrentLayoutItemSpacing10Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing10Action_triggered()));
     connect(action(Qn::SetCurrentLayoutItemSpacing20Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing20Action_triggered()));
     connect(action(Qn::SetCurrentLayoutItemSpacing30Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing30Action_triggered()));
+    connect(action(Qn::Rotate0Action),                          SIGNAL(triggered()),    this,   SLOT(at_rotate0Action_triggered()));
+    connect(action(Qn::Rotate90Action),                         SIGNAL(triggered()),    this,   SLOT(at_rotate90Action_triggered()));
+    connect(action(Qn::Rotate180Action),                        SIGNAL(triggered()),    this,   SLOT(at_rotate180Action_triggered()));
+    connect(action(Qn::Rotate270Action),                        SIGNAL(triggered()),    this,   SLOT(at_rotate270Action_triggered()));
 
     /* Run handlers that update state. */
     at_eventManager_connectionClosed();
@@ -467,6 +473,14 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog() {
     /* Submit and save it. */
     cameraSettingsDialog()->widget()->submitToResources();
     connection()->saveAsync(cameras, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+}
+
+void QnWorkbenchActionHandler::rotateItems(int degrees){
+    QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
+    if(!widgets.empty()) {
+        foreach(const QnResourceWidget *widget, widgets)
+            widget->item()->setRotation(degrees);
+    }
 }
 
 void QnWorkbenchActionHandler::updateCameraSettingsEditibility() {
@@ -1137,7 +1151,7 @@ void QnWorkbenchActionHandler::at_deleteFromDiskAction_triggered() {
         resources.toList(),
         tr("Delete Files"), 
         tr("Are you sure you want to permanently delete these %n file(s)?", 0, resources.size()), 
-        QDialogButtonBox::Yes | QDialogButtonBox::Cancel
+        QDialogButtonBox::Yes | QDialogButtonBox::No
     );
     if(button != QDialogButtonBox::Yes)
         return;
@@ -1241,7 +1255,7 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
             resources, 
             tr("Delete Resources"), 
             tr("Do you really want to delete the following %n item(s)?", NULL, resources.size()), 
-            QDialogButtonBox::Yes | QDialogButtonBox::Cancel
+            QDialogButtonBox::Yes | QDialogButtonBox::No
         );
         okToDelete = button == QMessageBox::Yes;
     }
@@ -1316,7 +1330,7 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
     QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
     if(widgets.size() != 1)
         return;
-    QnResourceWidget *widget = widgets[0];
+    QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(widgets[0]); // TODO: check
     QnResourceDisplay *display = widget->display();
     const QnVideoResourceLayout *layout = display->videoLayout();
 
@@ -1353,6 +1367,10 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
     settings.beginGroup(QLatin1String("screenshots"));
 
     QString previousDir = settings.value(QLatin1String("previousDir")).toString();
+    if (!previousDir.length()){
+        previousDir = qnSettings->mediaFolder();
+    }
+
     QString selectedFilter;
     QString filePath = QFileDialog::getSaveFileName(
         this->widget(), 
@@ -1479,6 +1497,10 @@ Do you want to continue?"),
     QSettings settings;
     settings.beginGroup(QLatin1String("export"));
     QString previousDir = settings.value(QLatin1String("previousDir")).toString();
+    if (!previousDir.length()){
+        previousDir = qnSettings->mediaFolder();
+    }
+
     QString suggestion = layout->getName();
 
     QString fileName;
@@ -1628,11 +1650,11 @@ void QnWorkbenchActionHandler::at_exportTimeSelectionAction_triggered() {
         return;
     parameters.setItems(provider->currentTarget(Qn::SceneScope));
 
-    QnResourceWidget *widget = NULL;
+    QnMediaResourceWidget *widget = NULL;
 
     if(parameters.size() != 1) {
         if(parameters.size() == 0 && display()->widgets().size() == 1) {
-            widget = display()->widgets().front();
+            widget = dynamic_cast<QnMediaResourceWidget *>(display()->widgets().front());
         } else {
             QMessageBox::critical(
                 this->widget(), 
@@ -1643,7 +1665,7 @@ void QnWorkbenchActionHandler::at_exportTimeSelectionAction_triggered() {
             return;
         }
     } else {
-        widget = parameters.widget();
+        widget = dynamic_cast<QnMediaResourceWidget *>(parameters.widget());
     }
     if(!widget)
         return;
@@ -1669,6 +1691,10 @@ Do you want to continue?"),
     QSettings settings;
     settings.beginGroup(QLatin1String("export"));
     QString previousDir = settings.value(QLatin1String("previousDir")).toString();
+    if (!previousDir.length()){
+        previousDir = qnSettings->mediaFolder();
+    }
+
     QString dateFormat = cameraResource ? tr("dd-mmm-yyyy hh-mm-ss") : tr("hh-mm-ss");
 	QString suggestion = networkResource ? networkResource->getPhysicalId() : QString();
 
@@ -1780,6 +1806,22 @@ void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing20Action_triggered(
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing30Action_triggered() {
     workbench()->currentLayout()->resource()->setCellSpacing(QSizeF(0.3, 0.3));
+}
+
+void QnWorkbenchActionHandler::at_rotate0Action_triggered(){
+    rotateItems(0);
+}
+
+void QnWorkbenchActionHandler::at_rotate90Action_triggered(){
+    rotateItems(90);
+}
+
+void QnWorkbenchActionHandler::at_rotate180Action_triggered(){
+    rotateItems(180);
+}
+
+void QnWorkbenchActionHandler::at_rotate270Action_triggered(){
+    rotateItems(270);
 }
 
 void QnWorkbenchActionHandler::at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle) {

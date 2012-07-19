@@ -11,7 +11,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/variant.h>
 
-#include <ui/graphics/items/resource_widget.h>
+#include <ui/graphics/items/media_resource_widget.h>
 
 namespace {
 
@@ -25,7 +25,7 @@ namespace {
             if(!(item->acceptedMouseButtons() & Qt::LeftButton))
                 return false; /* Skip to next item. */
                 
-            if(item->isWidget() && dynamic_cast<QnResourceWidget *>(item))
+            if(item->isWidget() && dynamic_cast<QnMediaResourceWidget *>(item))
                 return true;
 
             if(item->toGraphicsObject() && item->toGraphicsObject()->property(Qn::NoBlockMotionSelection).toBool()) {
@@ -249,7 +249,7 @@ void MotionSelectionInstrument::ensureSelectionItem() {
         scene()->addItem(selectionItem());
 }
 
-Qt::KeyboardModifiers MotionSelectionInstrument::selectionModifiers(QnResourceWidget *target) const {
+Qt::KeyboardModifiers MotionSelectionInstrument::selectionModifiers(QnMediaResourceWidget *target) const {
     if(!target)
         return m_selectionModifiers;
 
@@ -261,7 +261,7 @@ bool MotionSelectionInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *
         return false;
 
     QGraphicsView *view = this->view(viewport);
-    QnResourceWidget *target = dynamic_cast<QnResourceWidget *>(this->item(view, event->pos(), BlocksMotionSelection(&m_clearingBlocked)));
+    QnMediaResourceWidget *target = dynamic_cast<QnMediaResourceWidget *>(this->item(view, event->pos(), BlocksMotionSelection(&m_clearingBlocked)));
     if(!target)
         return false;
 

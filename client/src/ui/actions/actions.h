@@ -369,7 +369,25 @@ namespace Qn {
          */
         OpenInFolderAction,
 
+        /**
+         * Rotates item to normal orientation
+         */
+        Rotate0Action,
 
+        /**
+         * Rotates item to 90 degrees clockwise
+         */
+        Rotate90Action,
+
+        /**
+         * Rotates item to 180 degrees clockwise
+         */
+        Rotate180Action,
+
+        /**
+         * Rotates item to 270 degrees clockwise
+         */
+        Rotate270Action,
 
         /* Layout actions. */
 

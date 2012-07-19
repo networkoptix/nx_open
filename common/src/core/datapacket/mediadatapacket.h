@@ -28,6 +28,8 @@ public:
     QnMediaContext(const quint8* payload, int dataSize);
     ~QnMediaContext();
     AVCodecContext* ctx() const;
+    QString codecName() const;
+
     bool equalTo(QnMediaContext* other) const;
 private:
     AVCodecContext* m_ctx;

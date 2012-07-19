@@ -29,6 +29,7 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/workbench_display.h>
 
 #include "ui_resource_tree_widget.h"
 #include "ui/style/proxy_style.h"
@@ -232,6 +233,9 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent, QnWorkbenchContext *
     ui->resourceTreeView->setProperty(Qn::ItemViewItemBackgroundOpacity, 0.5);
     ui->searchTreeView->setProperty(Qn::ItemViewItemBackgroundOpacity, 0.5);
 
+    /* This is needed so that filter edit's context menu is not embedded into the scene. */
+    ui->filterLineEdit->setWindowFlags(ui->filterLineEdit->windowFlags() | Qt::BypassGraphicsProxyWidget);
+
     m_renameAction = new QAction(this);
 
     connect(ui->typeComboBox,       SIGNAL(currentIndexChanged(int)),   this,               SLOT(updateFilter()));
@@ -342,6 +346,31 @@ void QnResourceTreeWidget::killSearchTimer() {
     m_filterTimerId = 0; 
 }
 
+void QnResourceTreeWidget::showContextMenuAt(const QPoint &pos){
+    if(!context() || !context()->menu()) {
+        qnWarning("Requesting context menu for a tree widget while no menu manager instance is available.");
+        return;
+    }
+    QnActionManager *manager = context()->menu();
+
+    QScopedPointer<QMenu> menu(manager->newMenu(Qn::TreeScope, QnActionParameters(currentTarget(Qn::TreeScope))));
+
+    /* Add tree-local actions to the menu. */
+    manager->redirectAction(menu.data(), Qn::RenameAction, m_renameAction);
+    if(currentSelectionModel()->currentIndex().data(Qn::NodeTypeRole) != Qn::UsersNode || !currentSelectionModel()->selection().contains(currentSelectionModel()->currentIndex()))
+        manager->redirectAction(menu.data(), Qn::NewUserAction, NULL); /* Show 'New User' item only when clicking on 'Users' node. */
+
+    if(menu->isEmpty())
+        return;
+
+    /* Run menu. */
+    QAction *action = menu->exec(pos);
+
+    /* Process tree-local actions. */
+    if(action == m_renameAction)
+        currentItemView()->edit(currentSelectionModel()->currentIndex());
+}
+
 QTreeView *QnResourceTreeWidget::currentItemView() const {
     if (ui->tabWidget->currentIndex() == ResourcesTab) {
         return ui->resourceTreeView;
@@ -443,31 +472,12 @@ void QnResourceTreeWidget::expandAll() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *event) {
-    if(!context() || !context()->menu()) {
-        qnWarning("Requesting context menu for a tree widget while no menu manager instance is available.");
-        return;
-    }
-    QnActionManager *manager = context()->menu();
-
-    QScopedPointer<QMenu> menu(manager->newMenu(Qn::TreeScope, QnActionParameters(currentTarget(Qn::TreeScope))));
-
-    /* Add tree-local actions to the menu. */
-    manager->redirectAction(menu.data(), Qn::RenameAction, m_renameAction);
-    if(currentSelectionModel()->currentIndex().data(Qn::NodeTypeRole) != Qn::UsersNode || !currentSelectionModel()->selection().contains(currentSelectionModel()->currentIndex()))
-        manager->redirectAction(menu.data(), Qn::NewUserAction, NULL); /* Show 'New User' item only when clicking on 'Users' node. */
-
-    if(menu->isEmpty())
-        return;
-
-    /* Run menu. 
-     * Note that we cannot use evet->globalPos() here as it doesn't work when
-     * the widget is embedded into graphics scene. */
-    QAction *action = menu->exec(QCursor::pos());
-
-    /* Process tree-local actions. */
-    if(action == m_renameAction)
-        currentItemView()->edit(currentSelectionModel()->currentIndex());
+void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *) {
+    /** 
+    * Note that we cannot use event->globalPos() here as it doesn't work when
+    * the widget is embedded into graphics scene.
+    */
+    showContextMenuAt(QCursor::pos());
 }
 
 void QnResourceTreeWidget::wheelEvent(QWheelEvent *event) {
@@ -480,6 +490,25 @@ void QnResourceTreeWidget::mousePressEvent(QMouseEvent *event) {
 
 void QnResourceTreeWidget::keyPressEvent(QKeyEvent *event) {
     event->accept();
+    if (event->key() == Qt::Key_Menu){
+        if (ui->filterLineEdit->hasFocus())
+            return;
+
+        QnTreeView* treeView = ui->searchTab->isActiveWindow() 
+            ? ui->searchTreeView 
+            : ui->resourceTreeView; 
+
+        QModelIndexList selectedRows = treeView->selectionModel()->selectedRows();
+        if (selectedRows.isEmpty())
+            return;
+        
+        QModelIndex selected = selectedRows.back();
+        QPoint pos = treeView->visualRect(selected).bottomRight();
+      
+        // mapToGlobal works incorrectly here, using two-step transformation
+        pos = treeView->mapToGlobal(pos);
+        showContextMenuAt(display()->view()->mapToGlobal(pos));
+    }
 }
 
 void QnResourceTreeWidget::keyReleaseEvent(QKeyEvent *event) {

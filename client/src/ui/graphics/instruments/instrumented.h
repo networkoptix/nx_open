@@ -1,7 +1,7 @@
 #ifndef QN_INSTRUMENTED_H
 #define QN_INSTRUMENTED_H
 
-#include <QGraphicsItem>
+#include <QtGui/QGraphicsItem>
 
 #include <utils/common/forward.h>
 

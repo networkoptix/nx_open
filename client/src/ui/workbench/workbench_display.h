@@ -73,7 +73,7 @@ public:
      * \param widget              Whether camera streams on the scene should
      *                                  be synchronized.
      */
-    void setStreamsSynchronized(QnResourceWidget* widget);
+    void setStreamsSynchronized(QnResourceWidget *widget);
     void setStreamsSynchronized(bool synchronized, qint64 currentTime, float speed);
 
 
@@ -345,8 +345,10 @@ protected slots:
     void at_item_rotationChanged();
     void at_item_flagChanged(Qn::ItemFlag flag, bool value);
 
-    void at_activityStopped();
-    void at_activityStarted();
+    void at_curtainActivityInstrument_activityStopped();
+    void at_curtainActivityInstrument_activityStarted();
+    void at_widgetActivityInstrument_activityStopped();
+    void at_widgetActivityInstrument_activityStarted();
 
     void at_curtained();
     void at_uncurtained();

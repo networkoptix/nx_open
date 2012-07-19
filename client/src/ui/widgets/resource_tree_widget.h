@@ -67,7 +67,7 @@ signals:
     void selectionChanged();
 
 protected:
-    virtual void contextMenuEvent(QContextMenuEvent *event) override;
+    virtual void contextMenuEvent(QContextMenuEvent *) override;
     virtual void wheelEvent(QWheelEvent *event) override;
     virtual void mousePressEvent(QMouseEvent *event) override;
     virtual void keyPressEvent(QKeyEvent *event) override;
@@ -84,6 +84,7 @@ protected:
     void setLayoutFilter(QnWorkbenchLayout *layout, const QString &filter) const;
 
     void killSearchTimer();
+    void showContextMenuAt(const QPoint &pos);
 
 private slots:
     void expandAll();

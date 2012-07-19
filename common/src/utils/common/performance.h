@@ -28,6 +28,12 @@ public:
     static qint64 currentCpuUsage();
 
     /**
+     * \returns                         Percent of CPU time (both user and kernel) consumed 
+     *                                  by all running processes in last few seconds.
+     */
+    static qint64 currentCpuTotalUsage();
+
+    /**
     * \returns                          Brandstring includes manufacturer, model and clockspeed
     */
     static QString cpuBrand();

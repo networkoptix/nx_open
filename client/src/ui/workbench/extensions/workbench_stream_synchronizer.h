@@ -10,6 +10,7 @@
 class QnCounter;
 class QnWorkbenchDisplay;
 class QnResourceWidget;
+class QnMediaResourceWidget;
 class QnArchiveSyncPlayWrapper;
 class QnWorkbenchRenderWatcher;
 
@@ -75,7 +76,7 @@ private:
     /** Workbench display that this stream synchronizer was created for. */
     QWeakPointer<QnWorkbenchDisplay> m_display;
 
-    QSet<QnResourceWidget *> m_queuedWidgets;
+    QSet<QnMediaResourceWidget *> m_queuedWidgets;
 };
 
 #endif // QN_WORKBENCH_STREAM_SYNCHRONIZER_H

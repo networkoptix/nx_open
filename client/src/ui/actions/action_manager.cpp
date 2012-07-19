@@ -538,7 +538,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::OpenInFolderAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-        text(tr("Open in Containing Folder")).
+        text(tr("Open Containing Folder")).
         shortcut(tr("Ctrl+Enter")).
         shortcut(tr("Ctrl+Return")).
         autoRepeat(false).
@@ -643,11 +643,31 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(new QnTakeScreenshotActionCondition(this));
 
+    factory().
+        flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
+         text(tr("Rotate to..."));
+
+    factory.enterSubMenu();{
+        factory(Qn::Rotate0Action).
+            flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
+            text(tr("0 degrees"));
+
+        factory(Qn::Rotate90Action).
+            flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
+            text(tr("90 degrees"));
+
+        factory(Qn::Rotate180Action).
+            flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
+            text(tr("180 degrees"));
+
+        factory(Qn::Rotate270Action).
+            flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
+            text(tr("270 degrees"));
+    } factory.leaveSubMenu();
 
     factory().
         flags(Qn::Scene | Qn::Tree).
         separator();
-
 
     factory(Qn::RemoveLayoutItemAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::LayoutItemTarget | Qn::IntentionallyAmbiguous).

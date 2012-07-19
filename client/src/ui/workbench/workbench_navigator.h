@@ -21,6 +21,7 @@ class QnWorkbenchDisplay;
 class QnTimeSlider;
 class QnTimeScrollBar;
 class QnResourceWidget;
+class QnMediaResourceWidget;
 class QnAbstractArchiveReader;
 class QnCachingTimePeriodLoader;
 class QnThumbnailsLoader;
@@ -105,8 +106,8 @@ protected:
     void deinitialize();
     bool isValid();
 
-    void addSyncedWidget(QnResourceWidget *widget);
-    void removeSyncedWidget(QnResourceWidget *widget);
+    void addSyncedWidget(QnMediaResourceWidget *widget);
+    void removeSyncedWidget(QnMediaResourceWidget *widget);
     
     SliderUserData currentSliderData() const;
     void setCurrentSliderData(const SliderUserData &localData, bool preferToPreserveWindow = false);
@@ -150,7 +151,7 @@ protected slots:
     void at_display_widgetAdded(QnResourceWidget *widget);
     void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
 
-    void at_widget_motionSelectionChanged(QnResourceWidget *widget);
+    void at_widget_motionSelectionChanged(QnMediaResourceWidget *widget);
     void at_widget_motionSelectionChanged();
     void at_widget_displayFlagsChanged(QnResourceWidget *widget);
     void at_widget_displayFlagsChanged();
@@ -179,13 +180,13 @@ private:
     QnTimeSlider *m_timeSlider;
     QnTimeScrollBar *m_timeScrollBar;
 
-    QSet<QnResourceWidget *> m_syncedWidgets;
+    QSet<QnMediaResourceWidget *> m_syncedWidgets;
     QMultiHash<QnResourcePtr, QHashDummyValue> m_syncedResources;
 
     QSet<QnResourceWidget *> m_motionIgnoreWidgets;
 
-    QnResourceWidget *m_centralWidget;
-    QnResourceWidget *m_currentWidget;
+    QnMediaResourceWidget *m_centralWidget;
+    QnMediaResourceWidget *m_currentWidget;
     WidgetFlags m_currentWidgetFlags;
     bool m_currentWidgetLoaded;
     bool m_currentWidgetIsCentral;
