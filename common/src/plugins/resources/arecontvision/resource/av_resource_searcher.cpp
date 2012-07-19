@@ -10,6 +10,8 @@
 #include "utils/common/sleep.h"
 #include "core/resource/camera_resource.h"
 
+#include "plugins/resources/mdns/mdns_device_searcher.h"
+
 #define CL_BROAD_CAST_RETRY 1
 
 QnPlArecontResourceSearcher::QnPlArecontResourceSearcher()
@@ -125,6 +127,10 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
                 {
                     if (res->getUniqueId() == resource->getUniqueId())
                     {
+						QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
+						if (isNewDiscoveryAddressBetter(net_res->getHostAddress().toString(), iface.address.toString(), net_res->getDiscoveryAddr().toString()))
+							net_res->setDiscoveryAddr(iface.address);
+					
                         need_to_continue = true; //already has such
                         break;
                     }
@@ -142,7 +148,6 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
         }
 
     }
-
     return result;
 
 }

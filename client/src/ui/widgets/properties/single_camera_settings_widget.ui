@@ -281,7 +281,7 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QTextTicksSlider" name="sensitivitySlider">
+           <widget class="QnTextTickSlider" name="sensitivitySlider">
             <property name="minimumSize">
              <size>
               <width>0</width>
@@ -410,9 +410,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QTextTicksSlider</class>
+   <class>QnTextTickSlider</class>
    <extends>QSlider</extends>
-   <header>ui/widgets/properties/qtextticksslider.h</header>
+   <header>ui/widgets/properties/text_tick_slider.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
