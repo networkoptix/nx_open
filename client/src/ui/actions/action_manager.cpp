@@ -801,7 +801,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::ExportTimeSelectionAction).
         flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Export Selection...")).
-        condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::DisabledAction, this));
+        condition(new QnExportActionCondition(this));
 
     factory(Qn::ExportLayoutAction).
         // flags(Qn::Slider | Qn::SingleTarget). // TODO

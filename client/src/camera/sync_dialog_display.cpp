@@ -3,45 +3,29 @@
 #include "utils/common/synctime.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 
-QnSignDialogDisplay::QnSignDialogDisplay(): CLCamDisplay(false) 
+QnSignDialogDisplay::QnSignDialogDisplay(): 
+    CLCamDisplay(false),
+    m_mdctx(EXPORT_SIGN_METHOD)
 {
     m_firstFrameDisplayed = false;
-    m_mdctx = 0;
     m_lastDisplayTime = 0;
     m_lastDisplayTime2 = 0;
     m_eofProcessed = false;
-    const EVP_MD *md = EVP_get_digestbyname(EXPORT_SIGN_METHOD);
-    if (md)
-    {
-        m_mdctx = new EVP_MD_CTX;
-        EVP_MD_CTX_init(m_mdctx);
-        EVP_DigestInit_ex(m_mdctx, md, NULL);
 
-        m_tmpMdCtx = new EVP_MD_CTX;
-        EVP_MD_CTX_init(m_tmpMdCtx);
-        EVP_DigestInit_ex(m_mdctx, md, NULL);
-
-        EVP_DigestUpdate(m_mdctx, EXPORT_SIGN_MAGIC, sizeof(EXPORT_SIGN_MAGIC));
-    }
+    m_mdctx.addData(EXPORT_SIGN_MAGIC, sizeof(EXPORT_SIGN_MAGIC));
 }
 
 QnSignDialogDisplay::~QnSignDialogDisplay()
-{
-    delete m_mdctx;
-    delete m_tmpMdCtx;
-}
+{}
 
 void QnSignDialogDisplay::finilizeSign()
 {
     QSharedPointer<CLVideoDecoderOutput> lastFrame = m_display[0]->flush(QnFrameScaler::factor_any, 0);
 
-    quint8 md_value[EVP_MAX_MD_SIZE];
-    quint32 md_len = 0;
-    EVP_DigestFinal_ex(m_mdctx, md_value, &md_len);
-    QByteArray calculatedSign((const char*)md_value, md_len);
+    QByteArray calculatedSign = m_mdctx.result();
 
     QnSignHelper signHelper;
-    QByteArray signFromPicture = signHelper.getSign(lastFrame.data(), md_len);
+    QByteArray signFromPicture = signHelper.getSign(lastFrame.data(), calculatedSign.size());
     emit calcSignInProgress(calculatedSign, 100);
     emit gotSignature(calculatedSign, signFromPicture);
 }
@@ -77,7 +61,7 @@ bool QnSignDialogDisplay::processData(QnAbstractDataPacketPtr data)
     else if (video) 
     {
         video->channelNumber = 0; // ignore layout info
-        if (m_mdctx && m_prevFrame && m_prevFrame->data.size() > 4) {
+        if (m_prevFrame && m_prevFrame->data.size() > 4) {
             const quint8* data = (const quint8*) m_prevFrame->data.data();
             QnSignHelper::updateDigest(m_prevFrame->context->ctx(), m_mdctx, data, m_prevFrame->data.size());
         }
@@ -97,12 +81,8 @@ bool QnSignDialogDisplay::processData(QnAbstractDataPacketPtr data)
         }
         if (qnSyncTime->currentMSecsSinceEpoch() - m_lastDisplayTime2 > 100) // max display rate 10 fps
         {
-            quint8 md_value[EVP_MAX_MD_SIZE];
-            quint32 md_len = 0;
-            EVP_MD_CTX_copy_ex(m_tmpMdCtx, m_mdctx);
-            EVP_DigestFinal_ex(m_tmpMdCtx, md_value, &md_len);
-
-            QByteArray calculatedSign((const char*)md_value, md_len);
+            QnCryptographicHash tmpctx = m_mdctx;
+            QByteArray calculatedSign = tmpctx.result();
             QnArchiveStreamReader* reader = dynamic_cast<QnArchiveStreamReader*> (video->dataProvider);
             int progress = 100;
             if (reader)

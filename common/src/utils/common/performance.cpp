@@ -286,8 +286,6 @@ namespace {
     };
 
     Q_GLOBAL_STATIC(CpuUsageRefresher, refresherInstance);
-    // initializer for Q_GLOBAL_STATIC singleton
-    CpuUsageRefresher *dummy = refresherInstance();
 
     VOID CALLBACK CpuUsageRefresher::timerCallback(HWND /*hwnd*/, UINT /*uMsg*/, UINT_PTR /*idEvent*/, DWORD /*dwTime*/) {
         refresherInstance()->refresh();

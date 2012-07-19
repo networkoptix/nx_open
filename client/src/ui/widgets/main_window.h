@@ -35,6 +35,7 @@ class QnMainWindow: public QWidget, public QnWorkbenchContextAware {
 public:
     enum Option {
         TitleBarDraggable = 0x1,    /**< Window can be moved by dragging the title bar. */
+        WindowButtonsVisible = 0x2, /**< Window has default title bar buttons. That is, close, maximize and minimize buttons. */
     };
     Q_DECLARE_FLAGS(Options, Option);
 
@@ -71,6 +72,7 @@ protected:
 
 protected slots:
     void setTitleVisible(bool visible);
+    void setWindowButtonsVisible(bool visible);
     void setFullScreen(bool fullScreen);
     void minimize();
 
@@ -86,6 +88,10 @@ protected slots:
     void at_tabBar_closeRequested(QnWorkbenchLayout *layout);
     void at_mainMenuAction_triggered();
 
+    void test() {
+        setOptions(m_options ^ WindowButtonsVisible);
+    }
+
 private:
     QScopedPointer<QnGradientBackgroundPainter> m_backgroundPainter;
     QnWorkbenchController *m_controller;
@@ -97,6 +103,7 @@ private:
     QToolButton *m_mainMenuButton;
 
     QBoxLayout *m_titleLayout;
+    QBoxLayout *m_windowButtonsLayout;
     QBoxLayout *m_viewLayout;
     QBoxLayout *m_globalLayout;
 

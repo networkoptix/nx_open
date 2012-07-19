@@ -13,6 +13,7 @@
 
 class QGraphicsProxyWidget;
 class QGraphicsWidget;
+class QGraphicsLinearLayout;
 
 class CLVideoCamera;
 
@@ -73,6 +74,10 @@ public:
 
     void setFlags(Flags flags);
 
+    bool isWindowButtonsUsed() const {
+        return m_windowButtonsUsed;
+    }
+
     bool isTitleUsed() const {
         return m_titleUsed;
     }
@@ -117,6 +122,7 @@ public slots:
     void disableProxyUpdates() { setProxyUpdatesEnabled(false); }
 
     void setTitleUsed(bool titleUsed = true);
+    void setWindowButtonsUsed(bool windowButtonsUsed = true);
     void setFpsVisible(bool fpsVisible = true);
 
     void setTreeVisible(bool visible = true, bool animate = true);
@@ -265,6 +271,8 @@ private:
 
     bool m_titleUsed;
 
+    bool m_windowButtonsUsed;
+
     bool m_inactive;
 
     GraphicsLabel *m_fpsItem;
@@ -357,6 +365,9 @@ private:
 
     HoverFocusProcessor *m_titleOpacityProcessor;
 
+    QGraphicsLinearLayout *m_titleRightButtonsLayout;
+
+    QGraphicsWidget *m_windowButtonsWidget;
 
 
     /* Help window-related state. */

@@ -14,6 +14,7 @@ namespace Qn {
     inline QLatin1String qn_currentUserParameter()          { return QLatin1String("_qn_currentUserParameter"); }
     inline QLatin1String qn_serializedResourcesParameter()  { return QLatin1String("_qn_serializedResourcesParameter"); }
     inline QLatin1String qn_timePeriodParameter()           { return QLatin1String("_qn_timePeriodParameter"); }
+    inline QLatin1String qn_timePeriodsParameter()          { return QLatin1String("_qn_timePeriodsParameter"); }
     inline QLatin1String qn_connectInfoParameter()          { return QLatin1String("_qn_connectInfoParameter"); }
 
 #define GridPositionParameter qn_gridPositionParameter()
@@ -25,6 +26,7 @@ namespace Qn {
 #define CurrentUserParameter qn_currentUserParameter()
 #define SerializedResourcesParameter qn_serializedResourcesParameter()
 #define TimePeriodParameter qn_timePeriodParameter()
+#define TimePeriodsParameter qn_timePeriodsParameter()
 #define ConnectInfoParameter qn_connectInfoParameter()
 
     /**

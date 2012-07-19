@@ -891,16 +891,17 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
     QnActionManager *manager = context()->menu();
 
     QnTimePeriod selection;
-    if(m_timeSlider->isSelectionValid()) {
+    if(m_timeSlider->isSelectionValid())
         selection = QnTimePeriod(m_timeSlider->selectionStart(), m_timeSlider->selectionEnd() - m_timeSlider->selectionStart());
-        QnTimePeriodList existsPeriods = m_timeSlider->timePeriods(CurrentLine, Qn::RecordingRole);
+        /*QnTimePeriodList existsPeriods = m_timeSlider->timePeriods(CurrentLine, Qn::RecordingRole);
         if (!existsPeriods.intersectPeriod(selection))
-            selection.clear();
-    }
+            selection.clear();*/
 
     QScopedPointer<QMenu> menu(manager->newMenu(
         Qn::SliderScope, 
-        QnActionParameters(currentTarget(Qn::SliderScope)).withArgument(Qn::TimePeriodParameter, selection)
+        QnActionParameters(currentTarget(Qn::SliderScope)).
+            withArgument(Qn::TimePeriodParameter, selection).
+            withArgument(Qn::TimePeriodsParameter, m_timeSlider->timePeriods(CurrentLine, Qn::RecordingRole)) // TODO: move this out into global scope?
     ));
     if(menu->isEmpty())
         return;

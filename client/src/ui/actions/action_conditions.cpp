@@ -258,3 +258,20 @@ Qn::ActionVisibility QnTimePeriodActionCondition::check(const QnActionParameters
     }
 }
 
+Qn::ActionVisibility QnExportActionCondition::check(const QnActionParameters &parameters) {
+    if(!parameters.hasArgument(Qn::TimePeriodParameter))
+        return Qn::InvisibleAction;
+
+    QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodParameter);
+    if(!(Qn::NormalTimePeriod & period.type()))
+        return Qn::DisabledAction;
+
+    QnResourcePtr resource = parameters.resource();
+    if(resource->flags() & QnResource::utc) {
+        QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsParameter);
+        if(!periods.intersectPeriod(period))
+            return Qn::DisabledAction;
+    }
+    
+    return Qn::EnabledAction;
+}

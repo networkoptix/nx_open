@@ -113,7 +113,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
         palette.setColor(QPalette::Window, Qt::black);
         setPalette(palette);
     }
-    setOptions(TitleBarDraggable);
 
 
     /* Set up scene & view. */
@@ -204,6 +203,14 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     connect(m_mainMenuButton,               SIGNAL(pressed()),                              m_mainMenuButton->defaultAction(),      SLOT(trigger()));
     connect(m_mainMenuButton,               SIGNAL(pressed()),                              m_mainMenuButton,                       SLOT(_q_buttonPressed()));
 
+    /* Layout for window buttons that can be removed from the title bar. */
+    m_windowButtonsLayout = new QHBoxLayout();
+    m_windowButtonsLayout->setContentsMargins(0, 0, 0, 0);
+    m_windowButtonsLayout->setSpacing(2);
+    m_windowButtonsLayout->addSpacing(6);
+    m_windowButtonsLayout->addWidget(newActionButton(action(Qn::MinimizeAction)));
+    m_windowButtonsLayout->addWidget(newActionButton(action(Qn::FullscreenAction)));
+    m_windowButtonsLayout->addWidget(newActionButton(action(Qn::ExitAction)));
 
     /* Title layout. We cannot create a widget for title bar since there appears to be
      * no way to make it transparent for non-client area windows messages. */
@@ -215,10 +222,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_titleLayout->addWidget(newActionButton(action(Qn::OpenNewTabAction)));
     m_titleLayout->addStretch(0x1000);
     m_titleLayout->addWidget(newActionButton(action(Qn::ConnectToServerAction)));
-    m_titleLayout->addSpacing(6);
-    m_titleLayout->addWidget(newActionButton(action(Qn::MinimizeAction)));
-    m_titleLayout->addWidget(newActionButton(action(Qn::FullscreenAction)));
-    m_titleLayout->addWidget(newActionButton(action(Qn::ExitAction)));
+    m_titleLayout->addLayout(m_windowButtonsLayout);
 
     /* Layouts. */
     m_viewLayout = new QVBoxLayout();
@@ -234,11 +238,15 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_globalLayout->setStretchFactor(m_viewLayout, 0x1000);
     setLayout(m_globalLayout);
 
-    /* Update state. */
+    /* Post-initialize. */
     updateDwmState();
+    setOptions(TitleBarDraggable | WindowButtonsVisible);
 
     /* Open single tab. */
     action(Qn::OpenNewTabAction)->trigger();
+
+
+    connect(action(Qn::IncrementDebugCounterAction), SIGNAL(triggered()), this, SLOT(test()));
 }
 
 QnMainWindow::~QnMainWindow() {
@@ -260,6 +268,21 @@ void QnMainWindow::setTitleVisible(bool visible) {
     }
 
     updateDwmState();
+}
+
+void QnMainWindow::setWindowButtonsVisible(bool visible) {
+    bool currentVisibility = m_windowButtonsLayout->parent() != NULL;
+    if(currentVisibility == visible)
+        return;
+
+    if(visible) {
+        m_titleLayout->addLayout(m_windowButtonsLayout);
+        setVisibleRecursively(m_windowButtonsLayout, true);
+    } else {
+        m_titleLayout->takeAt(m_titleLayout->count() - 1);
+        m_windowButtonsLayout->setParent(NULL);
+        setVisibleRecursively(m_windowButtonsLayout, false);
+    }
 }
 
 void QnMainWindow::setFullScreen(bool fullScreen) {
@@ -302,6 +325,8 @@ void QnMainWindow::setOptions(Options options) {
     m_options = options;
 
     updateTitleBarDraggable();
+    setWindowButtonsVisible(m_options & WindowButtonsVisible);
+    m_ui->setWindowButtonsUsed(m_options & WindowButtonsVisible);
 }
 
 void QnMainWindow::updateFullScreenState() {

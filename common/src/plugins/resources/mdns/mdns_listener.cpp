@@ -138,7 +138,9 @@ void QnMdnsListener::updateSocketList()
     m_receiveSocket = new UDPSocket();
     m_receiveSocket->setReuseAddrFlag(true);
     m_receiveSocket->setLocalPort(MDNS_PORT);
-    m_receiveSocket->joinGroup(groupAddress);
+
+    for (int i = 0; i < m_localAddressList.size(); ++i)
+        m_receiveSocket->joinGroup(groupAddress, m_localAddressList[i]);
 
     m_socketLifeTime.restart();
 }
@@ -148,14 +150,13 @@ void QnMdnsListener::deleteSocketList()
     for (int i = 0; i < m_socketList.size(); ++i)
     {
         delete m_socketList[i];
+        if (m_receiveSocket) 
+            m_receiveSocket->leaveGroup(groupAddress, m_localAddressList[i]);
     }
     m_socketList.clear();
     m_localAddressList.clear();
 
-    if (m_receiveSocket) {
-        m_receiveSocket->leaveGroup(groupAddress);
-        delete m_receiveSocket;
-    }
+    delete m_receiveSocket;
     m_receiveSocket = 0;
 }
 
