@@ -1,20 +1,18 @@
-#include "qtextticksslider.h"
-#include "utils/common/scoped_painter_rollback.h"
-#include "ui/common/color_transformations.h"
+#include "text_tick_slider.h"
 
-QTextTicksSlider::QTextTicksSlider(QWidget *parent): 
+QnTextTickSlider::QnTextTickSlider(QWidget *parent): 
     QSlider(parent)
 {}
 
-QTextTicksSlider::QTextTicksSlider(Qt::Orientation orientation, QWidget *parent): 
+QnTextTickSlider::QnTextTickSlider(Qt::Orientation orientation, QWidget *parent): 
     QSlider(orientation, parent)
 {}
 
-QTextTicksSlider::~QTextTicksSlider() {
+QnTextTickSlider::~QnTextTickSlider() {
     return;
 }
 
-QSize QTextTicksSlider::minimumSizeHint() const {
+QSize QnTextTickSlider::minimumSizeHint() const {
     QSize result = base_type::minimumSizeHint();
     if(result.isEmpty())
         result = QSize(0, 0); /* So that we don't end up with an invalid size on the next step. */
@@ -25,14 +23,14 @@ QSize QTextTicksSlider::minimumSizeHint() const {
     return result;
 }
 
-void QTextTicksSlider::changeEvent(QEvent *event) {
+void QnTextTickSlider::changeEvent(QEvent *event) {
     if(event->type() == QEvent::FontChange)
         updateGeometry(); 
 
     base_type::changeEvent(event);
 }
 
-void QTextTicksSlider::paintEvent(QPaintEvent *event) {
+void QnTextTickSlider::paintEvent(QPaintEvent *event) {
     base_type::paintEvent(event);
 
     QStyleOptionSlider opt;
