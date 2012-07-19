@@ -13,7 +13,7 @@
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_functions.h>
 
-#define LIMIT 10
+#define LIMIT 60
 #define REQUEST_TIME 2000
 
 QnResourceServerWidget::QnResourceServerWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent /* = NULL */):
@@ -111,41 +111,42 @@ qreal degrees( qreal radian ){
 }
 
 QPainterPath QnResourceServerWidget::createGraph(QList<int> *values, qreal x_step, 
-                                                 const qreal scale, int &prev_value, int &last_value,
+                                                 const qreal scale, qreal &current_value,
                                                  const qreal elapsed_step){
     QPainterPath path;
     int max_value = -1;
-    prev_value = 0;
-    last_value = 0;
+    int prev_value = 0;
+    int last_value = 0;
     const qreal x_step2 = x_step*.5;
     {
         qreal x1, y1;
         x1 = -x_step * elapsed_step;
-        qreal value(0.0);
+
+        qreal angle = elapsed_step >= 0.5 ? degrees(qAcos(2 * (1 - elapsed_step))) : degrees(qAcos(2 * elapsed_step));
+
         bool first(true);
 
         QListIterator<int> iter(*values);
-        while (iter.hasNext()){
+        bool last = !iter.hasNext();
+        while (!last){
             int i_value = iter.next();
+            last = !iter.hasNext();
+
             prev_value = last_value;
             last_value = i_value;
 
             max_value = qMax(max_value, i_value);
-            value = i_value / 100.0;
             if (first){ 
-                y1 = value * scale;
+                y1 = i_value * scale * 0.01;
                 path.moveTo(x1, y1);
                 first = false;
                 continue;
             }
 
-            qreal y2 = value * scale;
-            
+            qreal y2 = i_value * scale * 0.01;
+
             if (x1 + x_step2 < 0.0)
             {
-                Q_ASSERT(elapsed_step >= 0.5);
-                qreal angle = degrees(qAcos(2 * (1 - elapsed_step)));
-
                 if (y2 > y1){
                     path.arcMoveTo(x1 + x_step2, y1, x_step, (y2 - y1), 180 + angle);
                     if (angle < 90.0)
@@ -162,9 +163,6 @@ QPainterPath QnResourceServerWidget::createGraph(QList<int> *values, qreal x_ste
             }
             else if (x1 < 0.0)
             { // x1 + x_step2 >= 0
-                Q_ASSERT(elapsed_step <= 0.5);
-                qreal angle = degrees(qAcos(2 * elapsed_step));
-
                 if (y2 > y1){
                     path.arcMoveTo(x1 - x_step2, y1, x_step, (y2 - y1), angle);
                     path.arcTo(x1 - x_step2, y1, x_step, (y2 - y1), angle, -angle);
@@ -179,7 +177,7 @@ QPainterPath QnResourceServerWidget::createGraph(QList<int> *values, qreal x_ste
                 }
 
             }
-            else
+            else if (!last)
             {   /** Usual drawing */
                 if (y2 > y1){
                     path.arcTo(x1 - x_step2, y1, x_step, (y2 - y1), 90, -90);
@@ -191,10 +189,35 @@ QPainterPath QnResourceServerWidget::createGraph(QList<int> *values, qreal x_ste
                     path.lineTo(x1 + x_step, y2);
                 }
             }
+            else if (elapsed_step >= 0.5) /** Last item */
+            {
+                if (y2 > y1){
+                    path.arcTo(x1 - x_step2, y1, x_step, (y2 - y1), 90, -90);
+                    path.arcTo(x1 + x_step2, y1, x_step, (y2 - y1), 180, angle);
+                } else if (y2 < y1){
+                    path.arcTo(x1 - x_step2, y2, x_step, (y1 - y2), -90, 90);
+                    path.arcTo(x1 + x_step2, y2, x_step, (y1 - y2), 180, -angle);
+                } else { // y2 == y1
+                    path.lineTo(x1 + x_step * elapsed_step, y2);
+                }
+
+            } 
+            else /** Last item, elapsed_step < 0.5 */
+            {
+                if (y2 > y1){
+                    path.arcTo(x1 - x_step2, y1, x_step, (y2 - y1), 90, -90 + angle);
+                } else if (y2 < y1){
+                    path.arcTo(x1 - x_step2, y2, x_step, (y1 - y2), -90, 90 - angle);
+                } else { // y2 == y1
+                    path.lineTo(x1 + x_step * elapsed_step, y2);
+                }
+            }
             x1 += x_step;
             y1 = y2;
         }
     }
+
+    current_value = ((last_value - prev_value)*elapsed_step + prev_value);
     return path;
 }
 
@@ -279,28 +302,24 @@ void QnResourceServerWidget::drawStatistics(const QRectF &rect, QPainter *painte
     painter->setPen(main_pen);
     painter->drawRect(inner);
 
-  //  painter->setClipRect(inner); // TODO: it's better to avoid clipping.
     QList<qreal> values;
     /** Draw graph lines */
     {
         QnScopedPainterTransformRollback transformRollback(painter);
         QTransform graphTransform = painter->transform();
-        graphTransform.translate(offset/* - (x_step * elapsed_step)*/, oh + offset);
+        graphTransform.translate(offset, oh + offset);
 
         painter->setTransform(graphTransform);
 
         for (int i = 0; i < m_history.length(); i++){
-            int prev_value = 0;
-            int last_value = 0;
-            QPainterPath hddpath = createGraph(&(m_history[i].second), x_step, -1.0 * oh, prev_value, last_value, elapsed_step);
-            qreal inter_value = ((last_value - prev_value)*elapsed_step + prev_value);
-            values.append(inter_value);
+            qreal current_value = 0;
+            QPainterPath path = createGraph(&(m_history[i].second), x_step, -1.0 * oh, current_value, elapsed_step);
+            values.append(current_value);
 
             main_pen.setColor(getColorById(i));
-            painter->strokePath(hddpath, main_pen);
+            painter->strokePath(path, main_pen);
         }
     }
-  //  painter->setClipping(false);
 
     {
         QnScopedPainterFontRollback fontRollback(painter);
