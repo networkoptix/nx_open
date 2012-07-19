@@ -100,6 +100,7 @@ protected:
     virtual QString calculateInfoText() const override;
     virtual Buttons calculateButtonsVisibility() const override;
 
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual Qn::RenderStatus paintChannel(QPainter *painter, int channel, const QRectF &rect) override;
     void paintMotionSensitivityIndicators(QPainter *painter, int channel, const QRectF &rect, const QnMotionRegion &region);
     void paintMotionGrid(QPainter *painter, int channel, const QRectF &rect, const QnMetaDataV1Ptr &motion);

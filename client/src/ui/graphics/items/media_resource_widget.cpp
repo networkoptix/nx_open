@@ -223,6 +223,12 @@ void QnMediaResourceWidget::invalidateBinaryMotionMask() {
 // -------------------------------------------------------------------------- //
 // Painting
 // -------------------------------------------------------------------------- //
+void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+    base_type::paint(painter, option, widget);
+
+    updateInfoText();
+}
+
 Qn::RenderStatus QnMediaResourceWidget::paintChannel(QPainter *painter, int channel, const QRectF &rect) {
     painter->beginNativePainting();
     Qn::RenderStatus result = m_renderer->paint(channel, rect, effectiveOpacity());
