@@ -562,14 +562,8 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
         Qn::RenderStatus renderStatus = paintChannel(painter, i, rect);
 
         /* Draw black rectangle if nothing was drawn. */
-        if(renderStatus != Qn::OldFrameRendered && renderStatus != Qn::NewFrameRendered) {
-            painter->beginNativePainting();
-            glColor4f(0.0, 0.0, 0.0, effectiveOpacity());
-            glBegin(GL_QUADS);
-            glVertices(rect);
-            glEnd();
-            painter->endNativePainting();
-        }
+        if(renderStatus != Qn::OldFrameRendered && renderStatus != Qn::NewFrameRendered)
+            painter->fillRect(rect, Qt::black);
 
         /* Update channel state. */
         m_channelState[i].renderStatus = renderStatus;
@@ -578,10 +572,14 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
         updateChannelOverlay(i);
 
         /* Draw overlay icon. */
-        qreal overlayOpacity = effectiveOpacity();
+        qreal overlayOpacity = 1.0;
         if(m_channelState[i].fadeInNeeded)
             overlayOpacity *= qBound(0.0, static_cast<qreal>(currentTimeMSec - m_channelState[i].changeTimeMSec) / defaultOverlayFadeInDurationMSec, 1.0);
-        paintOverlay(painter, rect, m_channelState[i].overlay, overlayOpacity);
+        
+        qreal opacity = painter->opacity();
+        painter->setOpacity(opacity * overlayOpacity);
+        paintOverlay(painter, rect, m_channelState[i].overlay);
+        painter->setOpacity(opacity);
 
         /* Draw selected / not selected overlay. */
         paintSelection(painter, rect);
@@ -628,37 +626,22 @@ void QnResourceWidget::paintSelection(QPainter *painter, const QRectF &rect) {
     if(!(m_displayFlags & DisplaySelectionOverlay))
         return;
 
-    painter->beginNativePainting();
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    QColor color = qnGlobals->selectionColor();
-    color.setAlpha(color.alpha() * effectiveOpacity());
-    glColor(color);
-    glBegin(GL_QUADS);
-    glVertices(rect);
-    glEnd();
-
-    glDisable(GL_BLEND);
-    painter->endNativePainting();
+    painter->fillRect(rect, qnGlobals->selectionColor());
 }
 
-void QnResourceWidget::paintOverlay(QPainter *painter, const QRectF &rect, Overlay overlay, qreal opacity) {
+void QnResourceWidget::paintOverlay(QPainter *painter, const QRectF &rect, Overlay overlay) {
     if(overlay == EmptyOverlay)
         return;
 
-    qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
-
-    painter->beginNativePainting();
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    glColor4f(0.0, 0.0, 0.0, 0.5 * opacity);
-    glBegin(GL_QUADS);
-    glVertices(rect);
-    glEnd();
+    painter->fillRect(rect, QColor(0, 0, 0, 128));
 
     if(overlay == LoadingOverlay || overlay == PausedOverlay) {
+        qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
+
+        painter->beginNativePainting();
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         QRectF overlayRect = expanded(
             1.0,
             QRectF(
@@ -674,16 +657,16 @@ void QnResourceWidget::paintOverlay(QPainter *painter, const QRectF &rect, Overl
         if(overlay == LoadingOverlay) {
             m_loadingProgressPainter->paint(
                 static_cast<qreal>(currentTimeMSec % defaultProgressPeriodMSec) / defaultProgressPeriodMSec,
-                opacity
+                painter->opacity()
             );
         } else if(overlay == PausedOverlay) {
-            m_pausedPainter->paint(0.5 * opacity);
+            m_pausedPainter->paint(0.5 * painter->opacity());
         }
         glPopMatrix();
-    }
 
-    glDisable(GL_BLEND);
-    painter->endNativePainting();
+        glDisable(GL_BLEND);
+        painter->endNativePainting();
+    }
 
     if (overlay == NoDataOverlay) {
         paintFlashingText(painter, m_noDataStaticText, 0.1);

@@ -249,7 +249,7 @@ protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual Qn::RenderStatus paintChannel(QPainter *painter, int channel, const QRectF &rect) = 0;
-    virtual void paintOverlay(QPainter *painter, const QRectF &rect, Overlay overlay, qreal opacity);
+    virtual void paintOverlay(QPainter *painter, const QRectF &rect, Overlay overlay);
     
     void paintSelection(QPainter *painter, const QRectF &rect);
     void paintFlashingText(QPainter *painter, const QStaticText &text, qreal textSize, const QPointF &offset = QPointF());
