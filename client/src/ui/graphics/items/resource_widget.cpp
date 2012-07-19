@@ -692,12 +692,17 @@ void QnResourceWidget::paintSelection(QPainter *painter, const QRectF &rect) {
         return;
 
     painter->beginNativePainting();
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     QColor color = qnGlobals->selectionColor();
     color.setAlpha(color.alpha() * effectiveOpacity());
     glColor(color);
     glBegin(GL_QUADS);
     glVertices(rect);
     glEnd();
+
+    glDisable(GL_BLEND);
     painter->endNativePainting();
 }
 
