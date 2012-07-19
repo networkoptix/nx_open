@@ -190,7 +190,7 @@ void QnMediaResourceWidget::addToMotionSensitivity(int channel, const QRect &rec
         invalidateBinaryMotionMask();
 }
 
-bool QnMediaResourceWidget::setMotionSensitivityFilled(int sensitivity, const QPoint &gridPos, int channel) {
+bool QnMediaResourceWidget::setMotionSensitivityFilled(int channel, const QPoint &gridPos, int sensitivity) {
     ensureMotionSensitivity();
 
     return m_motionSensitivity[channel].updateSensitivityAt(gridPos, sensitivity);
