@@ -1,4 +1,6 @@
-#include "resource_server_widget.h"
+#include "server_resource_widget.h"
+
+#include <utils/common/math.h> /* For M_PI. */
 
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -16,11 +18,20 @@
 #define LIMIT 60
 #define REQUEST_TIME 2000
 
-QnResourceServerWidget::QnResourceServerWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent /* = NULL */):
+namespace {
+
+    qreal radiansToDegrees(qreal radian) {
+        return (180 * radian) / M_PI;
+    }
+
+} // anonymous namespace
+
+
+QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent /* = NULL */):
     QnResourceWidget(context, item, parent),
     m_alreadyUpdating(false),
     m_counter(0),
-    m_redrawStatus(Qn::LoadingFrame),
+    m_renderStatus(Qn::NothingRendered),
     m_backgroundGradientPainter(32, QColor(255, 255, 255, 255), QColor(255, 255, 255, 0))
 {
     m_timer = new QTimer(this);
@@ -28,51 +39,31 @@ QnResourceServerWidget::QnResourceServerWidget(QnWorkbenchContext *context, QnWo
     m_timer->start(REQUEST_TIME);
 }
 
-void QnResourceServerWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/) {
-    //assertPainters();
+Qn::RenderStatus QnServerResourceWidget::paintChannel(QPainter *painter, int channel, const QRectF &rect) {
+    drawStatistics(rect, painter);
 
-    switch (m_redrawStatus)
-    {
-    case Qn::NewFrame:
-        setChannelOverlay(0, EmptyOverlay);
-    	break;
-    case Qn::OldFrame:
-        break;
-    case Qn::LoadingFrame:
-        setChannelOverlay(0, LoadingOverlay);
-        break;
-    case Qn::CannotLoad:
-        setChannelOverlay(0, NoDataOverlay);
-        break;
-    }
-    drawStatistics(rect(), painter);
-
-    painter->beginNativePainting();
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    //paintOverlay(0, rect());
-    glDisable(GL_BLEND);
-    painter->endNativePainting();
+    return m_renderStatus;
 }
 
-void QnResourceServerWidget::at_timer_update(){
-    if (m_alreadyUpdating){
-        if (m_redrawStatus != Qn::CannotLoad)
-            m_redrawStatus = Qn::LoadingFrame;
+void QnServerResourceWidget::at_timer_update() {
+    if (m_alreadyUpdating) {
+        if (m_renderStatus != Qn::CannotRender)
+            m_renderStatus = Qn::OldFrameRendered;
     }
+
     m_alreadyUpdating = true;
     QnVideoServerResourcePtr server = resource().dynamicCast<QnVideoServerResource>();
     Q_ASSERT(server);
     server->apiConnection()->asyncGetStatistics(this, SLOT(at_statistics_received(const QnStatisticsDataVector &/* data */)));
 }
 
-QString getDataId(int id){
+QString getDataId(int id) {
     if (id == 0)
         return "CPU";
     return QString("HDD%1").arg(id - 1);
 }
 
-QColor getColorById(int id){
+QColor getColorById(int id) {
     switch(id){
         case 0: return qnGlobals->systemHealthColorMain();
         case 1: return Qt::red;
@@ -81,9 +72,9 @@ QColor getColorById(int id){
     return Qt::yellow;
 }
 
-void QnResourceServerWidget::at_statistics_received(const QnStatisticsDataVector &data){
+void QnServerResourceWidget::at_statistics_received(const QnStatisticsDataVector &data) {
     m_alreadyUpdating = false;
-    m_redrawStatus = Qn::NewFrame;
+    m_renderStatus = Qn::NewFrameRendered;
 
     for (int i = 0; i < data.size(); i++){
         if (m_history.length() < i + 1){
@@ -105,12 +96,7 @@ void QnResourceServerWidget::at_statistics_received(const QnStatisticsDataVector
     m_counter++;
 }
 
-qreal degrees( qreal radian ){
-    const qreal Pi = 3.1415926f;
-    return ( 180*radian ) / Pi;
-}
-
-QPainterPath QnResourceServerWidget::createGraph(QList<int> *values, qreal x_step, 
+QPainterPath QnServerResourceWidget::createGraph(QList<int> *values, qreal x_step, 
                                                  const qreal scale, qreal &current_value,
                                                  const qreal elapsed_step){
     QPainterPath path;
@@ -122,7 +108,7 @@ QPainterPath QnResourceServerWidget::createGraph(QList<int> *values, qreal x_ste
         qreal x1, y1;
         x1 = -x_step * elapsed_step;
 
-        qreal angle = elapsed_step >= 0.5 ? degrees(qAcos(2 * (1 - elapsed_step))) : degrees(qAcos(2 * elapsed_step));
+        qreal angle = elapsed_step >= 0.5 ? radiansToDegrees(qAcos(2 * (1 - elapsed_step))) : radiansToDegrees(qAcos(2 * elapsed_step));
 
         bool first(true);
 
@@ -221,7 +207,7 @@ QPainterPath QnResourceServerWidget::createGraph(QList<int> *values, qreal x_ste
     return path;
 }
 
-void QnResourceServerWidget::drawStatistics(const QRectF &rect, QPainter *painter){
+void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painter){
     
     qreal width = rect.width();
     qreal height = rect.height();

@@ -1,5 +1,5 @@
-#ifndef QN_RESOURCE_SERVER_WIDGET_H
-#define QN_RESOURCE_SERVER_WIDGET_H
+#ifndef QN_SERVER_RESOURCE_WIDGET_H
+#define QN_SERVER_RESOURCE_WIDGET_H
 
 #include <QtGui/QGraphicsWidget>
 
@@ -8,21 +8,9 @@
 
 #include <api/video_server_connection.h>
 
-namespace Qn {
-
-    // TODO: remove this?
-    enum RedrawStatus {
-        NewFrame,     /**< New frame needs to be rendered. */
-        OldFrame,     /**< No new frames available, old frame needs to be rendered. */
-        LoadingFrame, /**< No frames to render, so nothing needs to be rendered. */
-        CannotLoad    /**< Something went wrong. */
-    };
-} // namespace Qn
-
 typedef QPair<QString, QList <int>> QnStatisticsHistoryData;
 
-// TODO: rename to QnServerResourceWidget (we have QnServerResource => QnServerResource + Widget = QnServerResourceWidget)
-class QnResourceServerWidget: public QnResourceWidget {
+class QnServerResourceWidget: public QnResourceWidget {
     Q_OBJECT;
 public:
     /**
@@ -31,21 +19,19 @@ public:
      * \param item                      Workbench item that this resource widget will represent.
      * \param parent                    Parent item.
      */
-    QnResourceServerWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent = NULL);
+    QnServerResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent = NULL);
 
     /**
      * Virtual destructor.
      */
-    virtual ~QnResourceServerWidget() {}
+    virtual ~QnServerResourceWidget() {}
 
 public slots:
     void at_statistics_received(const QnStatisticsDataVector &data);
     void at_timer_update();
 
 protected:
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-
-    virtual Qn::RenderStatus paintChannel(QPainter *,int,const QRectF &) override { return Qn::NothingRendered; }
+    virtual Qn::RenderStatus paintChannel(QPainter *painter, int channel, const QRectF &rect) override;
 
 private:
     QPainterPath createGraph(QList<int> *values, const qreal x_step, const qreal scale, qreal &current_value, const qreal elapsed_step);
@@ -62,7 +48,7 @@ private:
     QTimer* m_timer;
 
     /** Status of the frame history */
-    Qn::RedrawStatus m_redrawStatus;
+    Qn::RenderStatus m_renderStatus;
 
     /** Status of the update request */
     bool m_alreadyUpdating;
@@ -73,6 +59,6 @@ private:
     QnRadialGradientPainter m_backgroundGradientPainter;
 };
 
-Q_DECLARE_METATYPE(QnResourceServerWidget *)
+Q_DECLARE_METATYPE(QnServerResourceWidget *)
 
-#endif // QN_RESOURCE_SERVER_WIDGET_H
+#endif // QN_SERVER_RESOURCE_WIDGET_H

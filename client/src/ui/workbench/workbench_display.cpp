@@ -37,7 +37,7 @@
 #include <ui/graphics/instruments/focus_listener_instrument.h>
 
 #include <ui/graphics/items/resource_widget.h>
-#include <ui/graphics/items/resource_server_widget.h>
+#include <ui/graphics/items/server_resource_widget.h>
 #include <ui/graphics/items/media_resource_widget.h>
 #include <ui/graphics/items/resource_widget_renderer.h>
 #include <ui/graphics/items/curtain_item.h>
@@ -737,7 +737,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
 
     QnResourceWidget *widget;
     if (resource->checkFlags(QnResource::server))
-        widget = new QnResourceServerWidget(context(), item);
+        widget = new QnServerResourceWidget(context(), item);
     else
         widget = new QnMediaResourceWidget(context(), item);
 
