@@ -76,7 +76,9 @@ public:
     /**
      * \returns                         Resource associated with this widget.
      */
-    QnResourcePtr resource() const;
+    QnResourcePtr resource() const {
+        return m_resource;
+    }
 
     /**
      * \returns                         Workbench item associated with this widget. Never returns NULL.
@@ -270,7 +272,10 @@ protected:
     virtual QString calculateInfoText() const;
     Q_SLOT void updateInfoText();
 
-    QnImageButtonBar *buttonBar();
+    QnImageButtonBar *buttonBar() {
+        return m_buttonBar;
+    }
+
     virtual Buttons calculateButtonsVisibility() const;
     Q_SLOT void updateButtonsVisibility();
 

@@ -241,7 +241,6 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     updateButtonsVisibility();
 }
 
-
 QnResourceWidget::~QnResourceWidget() {
     ensureAboutToBeDestroyedEmitted();
 }
