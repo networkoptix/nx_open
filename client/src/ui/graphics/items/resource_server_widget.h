@@ -51,7 +51,7 @@ protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
 private:
-    QPainterPath createGraph(QList<int> *values, const qreal x_step, const qreal scale, int &prev_value, int &last_value);
+    QPainterPath createGraph(QList<int> *values, const qreal x_step, const qreal scale, int &prev_value, int &last_value, const qreal elapsed_step);
 
     void drawStatistics(const QRectF &rect, QPainter *painter);
 

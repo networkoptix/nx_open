@@ -13,7 +13,7 @@
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_functions.h>
 
-#define LIMIT 60
+#define LIMIT 10
 #define REQUEST_TIME 2000
 
 QnResourceServerWidget::QnResourceServerWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent /* = NULL */):
@@ -105,7 +105,14 @@ void QnResourceServerWidget::at_statistics_received(const QnStatisticsDataVector
     m_counter++;
 }
 
-QPainterPath QnResourceServerWidget::createGraph(QList<int> *values, qreal x_step, const qreal scale, int &prev_value, int &last_value){
+qreal degrees( qreal radian ){
+    const qreal Pi = 3.1415926f;
+    return ( 180*radian ) / Pi;
+}
+
+QPainterPath QnResourceServerWidget::createGraph(QList<int> *values, qreal x_step, 
+                                                 const qreal scale, int &prev_value, int &last_value,
+                                                 const qreal elapsed_step){
     QPainterPath path;
     int max_value = -1;
     prev_value = 0;
@@ -113,11 +120,10 @@ QPainterPath QnResourceServerWidget::createGraph(QList<int> *values, qreal x_ste
     const qreal x_step2 = x_step*.5;
     {
         qreal x1, y1;
-        x1 = 0.0;
+        x1 = -x_step * elapsed_step;
         qreal value(0.0);
         bool first(true);
 
-        path.moveTo(x1, 0.0);
         QListIterator<int> iter(*values);
         while (iter.hasNext()){
             int i_value = iter.next();
@@ -128,21 +134,61 @@ QPainterPath QnResourceServerWidget::createGraph(QList<int> *values, qreal x_ste
             value = i_value / 100.0;
             if (first){ 
                 y1 = value * scale;
-                path.lineTo(x1, y1);
+                path.moveTo(x1, y1);
                 first = false;
                 continue;
             }
 
             qreal y2 = value * scale;
+            
+            if (x1 + x_step2 < 0.0)
+            {
+                qreal angle = degrees(qAcos( (x1 + x_step) / x_step2));
 
-            if (y2 > y1){
-                path.arcTo(x1 - x_step2, y1, x_step, (y2 - y1), 90, -90);
-                path.arcTo(x1 + x_step2, y1, x_step, (y2 - y1), 180, 90);
-            } else if (y2 < y1){
-                path.arcTo(x1 - x_step2, y2, x_step, (y1 - y2), -90, 90);
-                path.arcTo(x1 + x_step2, y2, x_step, (y1 - y2), 180, -90);
-            } else { // y2 == y1
-                path.lineTo(x1 + x_step, y2);
+                if (y2 > y1){
+                    path.arcMoveTo(x1 + x_step2, y1, x_step, (y2 - y1), 180 + angle);
+                    if (angle < 90.0)
+                        path.arcTo(x1 + x_step2, y1, x_step, (y2 - y1), 180 + angle, 90 - angle);
+                } else if (y2 < y1){
+                    path.arcMoveTo(x1 + x_step2, y2, x_step, (y1 - y2), 180 - angle);
+                    if (angle < 90.0)
+                        path.arcTo(x1 + x_step2, y2, x_step, (y1 - y2), 180 - angle, -90 + angle);
+                } else { // y2 == y1
+                    path.moveTo(0.0, y1);
+                    path.lineTo(x1 + x_step, y2);
+                }
+
+            }
+            else if (x1 < 0.0)
+            { // x1 + x_step2 >= 0
+
+                qreal angle = degrees(qAcos(-x1 / x_step2));
+
+                if (y2 > y1){
+                    path.arcMoveTo(x1 - x_step2, y1, x_step, (y2 - y1), angle);
+                    path.arcTo(x1 - x_step2, y1, x_step, (y2 - y1), angle, -angle);
+                    path.arcTo(x1 + x_step2, y1, x_step, (y2 - y1), 180, 90);
+                } else if (y2 < y1){
+                    path.arcMoveTo(x1 - x_step2, y2, x_step, (y1 - y2), -angle);
+                    path.arcTo(x1 - x_step2, y2, x_step, (y1 - y2), -angle, angle);
+                    path.arcTo(x1 + x_step2, y2, x_step, (y1 - y2), 180, -90);
+                } else { // y2 == y1
+                    path.moveTo(0.0, y1);
+                    path.lineTo(x1 + x_step, y2);
+                }
+
+            }
+            else
+            {   /** Usual drawing */
+                if (y2 > y1){
+                    path.arcTo(x1 - x_step2, y1, x_step, (y2 - y1), 90, -90);
+                    path.arcTo(x1 + x_step2, y1, x_step, (y2 - y1), 180, 90);
+                } else if (y2 < y1){
+                    path.arcTo(x1 - x_step2, y2, x_step, (y1 - y2), -90, 90);
+                    path.arcTo(x1 + x_step2, y2, x_step, (y1 - y2), 180, -90);
+                } else { // y2 == y1
+                    path.lineTo(x1 + x_step, y2);
+                }
             }
             x1 += x_step;
             y1 = y2;
@@ -231,21 +277,21 @@ void QnResourceServerWidget::drawStatistics(const QRectF &rect, QPainter *painte
     QnScopedPainterPenRollback penRollback(painter);
     painter->setPen(main_pen);
     painter->drawRect(inner);
-    painter->setClipRect(inner); // TODO: it's better to avoid clipping.
 
+  //  painter->setClipRect(inner); // TODO: it's better to avoid clipping.
     QList<qreal> values;
     /** Draw graph lines */
     {
         QnScopedPainterTransformRollback transformRollback(painter);
         QTransform graphTransform = painter->transform();
-        graphTransform.translate(offset - (x_step * elapsed_step), oh + offset);
+        graphTransform.translate(offset/* - (x_step * elapsed_step)*/, oh + offset);
 
         painter->setTransform(graphTransform);
 
         for (int i = 0; i < m_history.length(); i++){
             int prev_value = 0;
             int last_value = 0;
-            QPainterPath hddpath = createGraph(&(m_history[i].second), x_step, -1.0 * oh, prev_value, last_value);
+            QPainterPath hddpath = createGraph(&(m_history[i].second), x_step, -1.0 * oh, prev_value, last_value, elapsed_step);
             qreal inter_value = ((last_value - prev_value)*elapsed_step + prev_value);
             values.append(inter_value);
 
@@ -253,8 +299,7 @@ void QnResourceServerWidget::drawStatistics(const QRectF &rect, QPainter *painte
             painter->strokePath(hddpath, main_pen);
         }
     }
-
-    painter->setClipping(false);
+  //  painter->setClipping(false);
 
     {
         QnScopedPainterFontRollback fontRollback(painter);
