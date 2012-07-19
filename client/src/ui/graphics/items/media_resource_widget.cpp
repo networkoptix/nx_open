@@ -44,15 +44,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     if(!m_resource) 
         qnCritical("Media resource widget was created with a non-media resource.");
 
-    /* Set up buttons. */
-    m_searchButton = new QnImageButtonWidget();
-    m_searchButton->setIcon(qnSkin->icon("decorations/item_search.png"));
-    m_searchButton->setCheckable(true);
-    m_searchButton->setProperty(Qn::NoBlockMotionSelection, true);
-    connect(m_searchButton, SIGNAL(toggled(bool)), this, SLOT(at_searchButton_toggled(bool)));
-
-    buttonBar()->addButton(MotionSearchButton, m_searchButton);
-
     /* Set up video rendering. */
     m_display = new QnResourceDisplay(m_resource, this);
     connect(m_resource.data(), SIGNAL(resourceChanged()), this, SLOT(at_resource_resourceChanged()));
@@ -63,15 +54,25 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     connect(m_renderer, SIGNAL(sourceSizeChanged(const QSize &)), this, SLOT(at_renderer_sourceSizeChanged(const QSize &)));
     m_display->addRenderer(m_renderer);
 
-    /* Set up info updates. */
-    connect(this, SIGNAL(updateInfoTextLater()), this, SLOT(updateInfoText()), Qt::QueuedConnection);
-    updateInfoText();
-
     /* Set up static text. */
     for (int i = 0; i < 10; ++i) {
         m_sensStaticText[i].setText(QString::number(i));
         m_sensStaticText[i].setPerformanceHint(QStaticText::AggressiveCaching);
     }
+
+    /* Set up info updates. */
+    connect(this, SIGNAL(updateInfoTextLater()), this, SLOT(updateInfoText()), Qt::QueuedConnection);
+    updateInfoText();
+
+    /* Set up buttons. */
+    m_searchButton = new QnImageButtonWidget();
+    m_searchButton->setIcon(qnSkin->icon("decorations/item_search.png"));
+    m_searchButton->setCheckable(true);
+    m_searchButton->setProperty(Qn::NoBlockMotionSelection, true);
+    connect(m_searchButton, SIGNAL(toggled(bool)), this, SLOT(at_searchButton_toggled(bool)));
+
+    buttonBar()->addButton(MotionSearchButton, m_searchButton);
+    updateButtonsVisibility();
 }
 
 QnMediaResourceWidget::~QnMediaResourceWidget() {

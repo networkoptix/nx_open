@@ -439,13 +439,10 @@ void QnResourceWidget::setDisplayFlags(DisplayFlags flags) {
     DisplayFlags changedFlags = m_displayFlags ^ flags;
     m_displayFlags = flags;
 
-
     if(changedFlags & DisplayButtons)
         m_headerOverlayWidget->setVisible(flags & DisplayButtons);
 
-
-
-    displayFlagsChangedNotify(flags);
+    displayFlagsChangedNotify(changedFlags);
     emit displayFlagsChanged();
 }
 

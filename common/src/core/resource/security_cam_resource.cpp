@@ -174,11 +174,10 @@ void QnSecurityCamResource::setMotionRegionList(const QList<QnMotionRegion>& mas
 {
     {
         QMutexLocker mutexLocker(&m_mutex);
-        bool sameMask = true;
-        for (int i = 0; i < CL_MAX_CHANNELS; ++i) 
-        {
-            sameMask &= m_motionMaskList[i] == maskList[i];
-        }
+        bool sameMask = maskList.size() == m_motionMaskList.size();
+        if(sameMask)
+            for (int i = 0; i < maskList.size(); ++i) 
+                sameMask &= m_motionMaskList[i] == maskList[i];
         if (sameMask)
             return;
         m_motionMaskList = maskList;
