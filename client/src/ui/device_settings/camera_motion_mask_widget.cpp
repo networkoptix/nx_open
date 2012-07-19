@@ -240,18 +240,6 @@ void QnCameraMotionMaskWidget::clearMotion()
     at_motionRegionCleared();
 }
 
-int QnCameraMotionMaskWidget::gridPosToChannelPos(QPoint &pos) {
-    const QnVideoResourceLayout* layout = m_camera->getVideoLayout();
-    for (int i = 0; i < layout->numberOfChannels(); ++i) {
-        QRect r(layout->h_position(i) * MD_WIDTH, layout->v_position(i) * MD_HEIGHT, MD_WIDTH, MD_HEIGHT);
-        if (r.contains(pos)) {
-            pos -= r.topLeft();
-            return i;
-        }
-    }
-    return 0;
-}
-
 bool QnCameraMotionMaskWidget::isValidMotionRegion() {
     if (m_resourceWidget && m_needControlMaxRects) {
         const QnVideoResourceLayout *layout = m_camera->getVideoLayout();
@@ -280,26 +268,7 @@ void QnCameraMotionMaskWidget::at_motionRegionSelected(QGraphicsView *, QnMediaR
     if (!m_resourceWidget)
         return;
 
-    const QnVideoResourceLayout* layout = m_camera->getVideoLayout();
-    bool changed = false;
-
-    int numChannels = layout->numberOfChannels();
-    
-    // TODO: code that hacks around with channels does not belong here. move to widget.
-    for (int i = 0; i < numChannels; ++i) {
-        QRect r(0, 0, MD_WIDTH, MD_HEIGHT);
-        r.translate(layout->h_position(i)*MD_WIDTH, layout->v_position(i)*MD_HEIGHT);
-        r = gridRect.intersected(r);
-        r.translate(-layout->h_position(i)*MD_WIDTH, -layout->v_position(i)*MD_HEIGHT);
-
-        if (!r.isEmpty()) {
-            QnMotionRegion newRegion = widget->motionSensitivity()[i];
-            newRegion.addRect(m_motionSensitivity, r);
-            widget->addToMotionSensitivity(i, r, m_motionSensitivity);
-            changed = true;
-        }
-    }
-    
+    bool changed = widget->addToMotionSensitivity(gridRect, m_motionSensitivity);
     if(changed)
         emit motionRegionListChanged();
 }
@@ -327,8 +296,7 @@ void QnCameraMotionMaskWidget::at_itemClicked(QGraphicsView *view, QGraphicsItem
 
     QPointF pos = info.scenePos() - item->pos();
     QPoint gridPos = m_resourceWidget->mapToMotionGrid(pos);
-    int channel = gridPosToChannelPos(gridPos);
-    if (m_resourceWidget->setMotionSensitivityFilled(channel, gridPos, m_motionSensitivity))
+    if (m_resourceWidget->setMotionSensitivityFilled(gridPos, m_motionSensitivity))
         emit motionRegionListChanged();
 }
 

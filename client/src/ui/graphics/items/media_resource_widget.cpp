@@ -181,19 +181,49 @@ void QnMediaResourceWidget::ensureMotionSensitivity() const {
     m_motionSensitivityValid = true;
 }
 
-void QnMediaResourceWidget::addToMotionSensitivity(int channel, const QRect &rect, int sensitivity) {
+bool QnMediaResourceWidget::addToMotionSensitivity(const QRect &gridRect, int sensitivity) {
     ensureMotionSensitivity();
 
-    m_motionSensitivity[channel].addRect(sensitivity, rect);
+    bool changed = false;
+    if (QnSecurityCamResourcePtr camera = m_resource.dynamicCast<QnSecurityCamResource>()) {
+        const QnVideoResourceLayout* layout = camera->getVideoLayout();
+
+        for (int i = 0; i < layout->numberOfChannels(); ++i) {
+            QRect r(0, 0, MD_WIDTH, MD_HEIGHT);
+            r.translate(layout->h_position(i)*MD_WIDTH, layout->v_position(i)*MD_HEIGHT);
+            r = gridRect.intersected(r);
+            r.translate(-layout->h_position(i)*MD_WIDTH, -layout->v_position(i)*MD_HEIGHT);
+            if (!r.isEmpty()) {
+                m_motionSensitivity[i].addRect(sensitivity, r);
+                changed = true;
+            }
+        }
+    }
 
     if(sensitivity == 0)
         invalidateBinaryMotionMask();
+
+    return changed;
 }
 
-bool QnMediaResourceWidget::setMotionSensitivityFilled(int channel, const QPoint &gridPos, int sensitivity) {
+bool QnMediaResourceWidget::setMotionSensitivityFilled(const QPoint &gridPos, int sensitivity) {
     ensureMotionSensitivity();
 
-    return m_motionSensitivity[channel].updateSensitivityAt(gridPos, sensitivity);
+    int channel =0;
+    QPoint channelPos = gridPos;
+    if (QnSecurityCamResourcePtr camera = m_resource.dynamicCast<QnSecurityCamResource>()) {
+        const QnVideoResourceLayout* layout = camera->getVideoLayout();
+
+        for (int i = 0; i < layout->numberOfChannels(); ++i) {
+            QRect r(layout->h_position(i) * MD_WIDTH, layout->v_position(i) * MD_HEIGHT, MD_WIDTH, MD_HEIGHT);
+            if (r.contains(channelPos)) {
+                channelPos -= r.topLeft();
+                channel = i;
+                break;
+            }
+        }
+    }
+    return m_motionSensitivity[channel].updateSensitivityAt(channelPos, sensitivity);
 }
 
 void QnMediaResourceWidget::clearMotionSensitivity() {

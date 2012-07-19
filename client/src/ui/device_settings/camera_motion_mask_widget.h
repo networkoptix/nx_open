@@ -56,7 +56,6 @@ protected slots:
 
 private:
     void init();
-    int gridPosToChannelPos(QPoint &pos);
     void showTooManyWindowsMessage(const QnMotionRegion &region, const QnMotionRegion::RegionValid kind);
 
 private:
