@@ -469,37 +469,6 @@ QnResourceWidget::Buttons QnResourceWidget::calculateButtonsVisibility() const {
     }
 
     return result;
-
-    /* Rotate B */
-
-    /*
-    bool closeButtonVisible = false;
-    if(item() && item()->layout()) {
-        Qn::Permissions requiredPermissions = Qn::WritePermission | Qn::AddRemoveItemsPermission;
-        closeButtonVisible = (accessController()->permissions(item()->layout()->resource()) & requiredPermissions) == requiredPermissions;
-    }
-
-    bool infoButtonVisible = !display()->camDisplay()->isStillImage();
-
-    if(closeButton->isVisible() != closeButtonVisible || m_infoButton->isVisible() != infoButtonVisible || searchButton->isVisible() != searchButtonVisible) {
-        m_infoButton->setVisible(infoButtonVisible);
-        closeButton->setVisible(closeButtonVisible);
-        searchButton->setVisible(searchButtonVisible);
-
-        headerLayout->removeItem(searchButton);
-        headerLayout->removeItem(rotateButton);
-        headerLayout->removeItem(m_infoButton);
-        headerLayout->removeItem(closeButton);
-
-        if(searchButtonVisible)
-            headerLayout->addItem(searchButton);
-        headerLayout->addItem(rotateButton);
-        if(infoButtonVisible)
-            headerLayout->addItem(m_infoButton);
-        if(closeButtonVisible)
-            headerLayout->addItem(closeButton);
-    }
-    }*/
 }
 
 void QnResourceWidget::updateButtonsVisibility() {
@@ -587,12 +556,6 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
     qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
 
-
-    //painter->beginNativePainting();
-    //glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
-    //glEnable(GL_BLEND);
-    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
     for(int i = 0; i < channelCount(); i++) {
         /* Draw content. */
         QRectF rect = channelRect(i);
@@ -614,25 +577,6 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
             m_channelState[i].lastNewFrameTimeMSec = currentTimeMSec;
         updateChannelOverlay(i);
 
-#if 0
-        updateOverlay(i);
-        if (m_display->camDisplay()->isStillImage()) {
-            setChannelOverlay(i, EmptyOverlay);
-        } else if(m_display->isPaused() && (m_displayFlags & DisplayActivityOverlay)) {
-            setChannelOverlay(i, PausedOverlay);
-        } else if (m_display->camDisplay()->isRealTimeSource() && m_display->resource()->getStatus() == QnResource::Offline) {
-            setChannelOverlay(i, OfflineOverlay);
-        } else if (m_display->camDisplay()->isRealTimeSource() && m_display->resource()->getStatus() == QnResource::Unauthorized) {
-            setChannelOverlay(i, UnauthorizedOverlay);
-        } else if (m_display->camDisplay()->isNoData()) {
-            setChannelOverlay(i, NoDataOverlay); 
-        } else if(m_renderStatus != Qn::NewFrameRendered && (m_renderStatus != Qn::OldFrameRendered || currentTimeMSec - m_channelState[i].lastNewFrameTimeMSec >= defaultLoadingTimeoutMSec) && !m_display->isPaused()) {
-            setChannelOverlay(i, LoadingOverlay);
-        } else {
-            setChannelOverlay(i, EmptyOverlay);
-        }
-#endif
-
         /* Draw overlay icon. */
         qreal overlayOpacity = effectiveOpacity();
         if(m_channelState[i].fadeInNeeded)
@@ -642,10 +586,6 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
         /* Draw selected / not selected overlay. */
         paintSelection(painter, rect);
     }
-
-    //glDisable(GL_BLEND);
-    //glPopAttrib();
-    //painter->endNativePainting();
 }
 
 void QnResourceWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {

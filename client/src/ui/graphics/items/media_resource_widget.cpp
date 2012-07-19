@@ -444,6 +444,24 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
     return result;
 }
 
+QnResourceWidget::Overlay QnMediaResourceWidget::calculateChannelOverlay(int channel) const {
+    if (m_display->camDisplay()->isStillImage()) {
+        return EmptyOverlay;
+    } else if(m_display->isPaused() && (displayFlags() & DisplayActivityOverlay)) {
+        return PausedOverlay;
+    } else if (m_display->camDisplay()->isRealTimeSource() && m_display->resource()->getStatus() == QnResource::Offline) {
+        return OfflineOverlay;
+    } else if (m_display->camDisplay()->isRealTimeSource() && m_display->resource()->getStatus() == QnResource::Unauthorized) {
+        return UnauthorizedOverlay;
+    } else if (m_display->camDisplay()->isNoData()) {
+        return NoDataOverlay;
+    } else if(m_display->isPaused()) {
+        return EmptyOverlay;
+    } else {
+        return base_type::calculateChannelOverlay(channel);
+    }
+}
+
 void QnMediaResourceWidget::at_resource_resourceChanged() {
     invalidateMotionSensitivity();
 }

@@ -99,6 +99,7 @@ protected:
 
     virtual QString calculateInfoText() const override;
     virtual Buttons calculateButtonsVisibility() const override;
+    virtual Overlay calculateChannelOverlay(int channel) const override;
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual Qn::RenderStatus paintChannel(QPainter *painter, int channel, const QRectF &rect) override;

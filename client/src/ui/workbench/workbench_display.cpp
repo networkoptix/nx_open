@@ -813,7 +813,6 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
     }
 
     disconnect(widget, NULL, this, NULL);
-    disconnect(m_widgetActivityInstrument, NULL, widget, NULL);
     if(widgets(widget->resource()).size() == 1)
         disconnect(widget->resource().data(), NULL, this, NULL);
 
