@@ -143,7 +143,8 @@ QPainterPath QnResourceServerWidget::createGraph(QList<int> *values, qreal x_ste
             
             if (x1 + x_step2 < 0.0)
             {
-                qreal angle = degrees(qAcos( (x1 + x_step) / x_step2));
+                Q_ASSERT(elapsed_step >= 0.5);
+                qreal angle = degrees(qAcos(2 * (1 - elapsed_step)));
 
                 if (y2 > y1){
                     path.arcMoveTo(x1 + x_step2, y1, x_step, (y2 - y1), 180 + angle);
@@ -161,8 +162,8 @@ QPainterPath QnResourceServerWidget::createGraph(QList<int> *values, qreal x_ste
             }
             else if (x1 < 0.0)
             { // x1 + x_step2 >= 0
-
-                qreal angle = degrees(qAcos(-x1 / x_step2));
+                Q_ASSERT(elapsed_step <= 0.5);
+                qreal angle = degrees(qAcos(2 * elapsed_step));
 
                 if (y2 > y1){
                     path.arcMoveTo(x1 - x_step2, y1, x_step, (y2 - y1), angle);
