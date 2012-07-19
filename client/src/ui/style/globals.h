@@ -7,6 +7,9 @@
 
 #include <utils/common/property_storage.h>
 
+typedef QVector<QColor> QnColorVector;
+Q_DECLARE_METATYPE(QnColorVector)
+
 /**
  * Global style settings.
  * 
@@ -52,12 +55,8 @@ public:
 
         BACKGROUD_GRADIENT_COLOR,
 
-        SYSTEM_HEALTH_COLOR_MAIN,
         SYSTEM_HEALTH_COLOR_GRID,
-        SYSTEM_HEALTH_COLOR_BACKGROUND,
-        SYSTEM_HEALTH_COLOR_GRADIENT_LOW,
-        SYSTEM_HEALTH_COLOR_GRADIENT_MID,
-        SYSTEM_HEALTH_COLOR_GRADIENT_HIGH,
+        SYSTEM_HEALTH_COLORS,
 
         VARIABLE_COUNT
     };
@@ -72,6 +71,8 @@ protected:
     virtual QVariant updateValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) override;
 
 private:
+    QnColorVector initSystemHealthColors();
+
     QN_BEGIN_PROPERTY_STORAGE(VARIABLE_COUNT);
         QN_DECLARE_R_PROPERTY(QFont,    settingsFont,                   SETTINGS_FONT,                          QFont());
         QN_DECLARE_R_PROPERTY(QColor,   shadowColor,                    SHADOW_COLOR,                           QColor(0, 0, 0, 128));
@@ -98,12 +99,8 @@ private:
         QN_DECLARE_R_PROPERTY(QColor,   selectionBorderDelta,           SELECTION_BORDER_DELTA,                 QColor(48, 48, 48, 0));
         QN_DECLARE_R_PROPERTY(QColor,   backgroundGradientColor,        BACKGROUD_GRADIENT_COLOR,               QColor(5, 5, 50));
 
-        QN_DECLARE_R_PROPERTY(QColor,   systemHealthColorMain,          SYSTEM_HEALTH_COLOR_MAIN,               QColor(116, 151, 255));
         QN_DECLARE_R_PROPERTY(QColor,   systemHealthColorGrid,          SYSTEM_HEALTH_COLOR_GRID,               QColor(0, 75, 190, 100));
-        QN_DECLARE_R_PROPERTY(QColor,   systemHealthColorBackground,    SYSTEM_HEALTH_COLOR_BACKGROUND,         QColor(0, 0, 195, 100));
-        QN_DECLARE_R_PROPERTY(QColor,   systemHealthColorGradientLow,   SYSTEM_HEALTH_COLOR_GRADIENT_LOW,       QColor(0, 0, 255, 70));
-        QN_DECLARE_R_PROPERTY(QColor,   systemHealthColorGradientMid,   SYSTEM_HEALTH_COLOR_GRADIENT_MID,       QColor(255, 255, 0, 70));
-        QN_DECLARE_R_PROPERTY(QColor,   systemHealthColorGradientHigh,  SYSTEM_HEALTH_COLOR_GRADIENT_HIGH,      QColor(255, 0, 0, 70));
+        QN_DECLARE_R_PROPERTY(QnColorVector,   systemHealthColors,      SYSTEM_HEALTH_COLORS,                   initSystemHealthColors());
     QN_END_PROPERTY_STORAGE();
 };
 

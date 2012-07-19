@@ -34,8 +34,7 @@ protected:
     virtual Qn::RenderStatus paintChannel(QPainter *painter, int channel, const QRectF &rect) override;
 
 private:
-    QPainterPath createGraph(QList<int> *values, const qreal x_step, const qreal scale, qreal &current_value, const qreal elapsed_step);
-
+    /** Main painting function */
     void drawStatistics(const QRectF &rect, QPainter *painter);
 
     /** History of last usage responses */
@@ -56,6 +55,7 @@ private:
     /** Elapsed timer for smooth scroll */
     QElapsedTimer m_elapsed_timer;
 
+    /** Helper for the background painting */
     QnRadialGradientPainter m_backgroundGradientPainter;
 };
 
