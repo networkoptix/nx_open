@@ -708,6 +708,9 @@ void QnResourceWidget::paintOverlay(QPainter *painter, const QRectF &rect, Overl
     qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
 
     painter->beginNativePainting();
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     glColor4f(0.0, 0.0, 0.0, 0.5 * opacity);
     glBegin(GL_QUADS);
     glVertices(rect);
@@ -736,6 +739,8 @@ void QnResourceWidget::paintOverlay(QPainter *painter, const QRectF &rect, Overl
         }
         glPopMatrix();
     }
+
+    glDisable(GL_BLEND);
     painter->endNativePainting();
 
     if (overlay == NoDataOverlay) {
