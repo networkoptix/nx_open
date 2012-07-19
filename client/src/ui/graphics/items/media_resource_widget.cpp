@@ -63,6 +63,10 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     connect(m_renderer, SIGNAL(sourceSizeChanged(const QSize &)), this, SLOT(at_renderer_sourceSizeChanged(const QSize &)));
     m_display->addRenderer(m_renderer);
 
+    /* Set up info updates. */
+    connect(this, SIGNAL(updateInfoTextLater()), this, SLOT(updateInfoText()), Qt::QueuedConnection);
+    updateInfoText();
+
     /* Set up static text. */
     for (int i = 0; i < 10; ++i) {
         m_sensStaticText[i].setText(QString::number(i));
@@ -226,7 +230,8 @@ void QnMediaResourceWidget::invalidateBinaryMotionMask() {
 void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
     base_type::paint(painter, option, widget);
 
-    updateInfoText();
+    if(isDecorationsVisible() && isInfoVisible())
+        updateInfoTextLater();
 }
 
 Qn::RenderStatus QnMediaResourceWidget::paintChannel(QPainter *painter, int channel, const QRectF &rect) {
@@ -410,7 +415,9 @@ QString QnMediaResourceWidget::calculateInfoText() const {
     if(size.isEmpty())
         size = QSize(0, 0);
 
-    QString codecName = m_display->mediaProvider()->getCodecContext()->codecName();
+    QString codecName;
+    if(QnMediaContextPtr codecContext = m_display->mediaProvider()->getCodecContext())
+        codecName = codecContext->codecName();
     
     QString result = tr("%1x%2 %3fps @ %4Mbps (%5)").arg(size.width()).arg(size.height()).arg(fps, 0, 'f', 2).arg(mbps, 0, 'f', 2).arg(codecName);
 

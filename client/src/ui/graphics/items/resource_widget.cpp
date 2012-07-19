@@ -649,9 +649,6 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     //glDisable(GL_BLEND);
     //glPopAttrib();
     //painter->endNativePainting();
-
-    //if(m_footerOverlayWidget->isVisible() && !qFuzzyIsNull(m_footerOverlayWidget->opacity())) 
-        //emit updateOverlayTextLater();
 }
 
 void QnResourceWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {

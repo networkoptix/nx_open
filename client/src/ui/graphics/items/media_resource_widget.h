@@ -118,6 +118,8 @@ protected:
 
     QPoint channelGridOffset(int channel) const;
 
+    Q_SIGNAL void updateInfoTextLater();
+
 private:
     /** Media resource. */
     QnMediaResourcePtr m_resource;
