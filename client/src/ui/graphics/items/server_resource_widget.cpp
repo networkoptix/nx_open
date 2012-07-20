@@ -168,44 +168,7 @@ Qn::RenderStatus QnServerResourceWidget::paintChannel(QPainter *painter, int cha
     return m_renderStatus;
 }
 
-void QnServerResourceWidget::at_timer_update() {
-    if (m_alreadyUpdating) {
-        if (m_renderStatus != Qn::CannotRender)
-            m_renderStatus = Qn::OldFrameRendered;
-    }
-
-    m_alreadyUpdating = true;
-    QnVideoServerResourcePtr server = resource().dynamicCast<QnVideoServerResource>();
-    Q_ASSERT(server);
-    server->apiConnection()->asyncGetStatistics(this, SLOT(at_statistics_received(const QnStatisticsDataVector &/* data */)));
-}
-
-void QnServerResourceWidget::at_statistics_received(const QnStatisticsDataVector &data) {
-    m_alreadyUpdating = false;
-    m_renderStatus = Qn::NewFrameRendered;
-
-    for (int i = 0; i < data.size(); i++) {
-        if (m_history.length() < i + 1) {
-            QList<int> dummy;
-            for (int j = 0; j < LIMIT; j++)
-                dummy.append(0);
-            QnStatisticsHistoryData dummyItem(getDataId(i), dummy);
-            m_history.append(dummyItem);
-        }
-
-        QnStatisticsHistoryData *item = &(m_history[i]);
-        QnStatisticsData next_data = data[i];
-        item->second.append(next_data.second);
-        if (item->second.count() > LIMIT)
-            item->second.pop_front();
-    }
-
-    m_elapsed_timer.restart();
-    m_counter++;
-}
-
 void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painter) {
-
     qreal width = rect.width();
     qreal height = rect.height();
 
@@ -338,4 +301,44 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
             }
         }
     }
+}
+
+
+// -------------------------------------------------------------------------- //
+// Handlers
+// -------------------------------------------------------------------------- //
+void QnServerResourceWidget::at_timer_update() {
+    if (m_alreadyUpdating) {
+        if (m_renderStatus != Qn::CannotRender)
+            m_renderStatus = Qn::OldFrameRendered;
+    }
+
+    m_alreadyUpdating = true;
+    QnVideoServerResourcePtr server = resource().dynamicCast<QnVideoServerResource>();
+    Q_ASSERT(server);
+    server->apiConnection()->asyncGetStatistics(this, SLOT(at_statistics_received(const QnStatisticsDataVector &)));
+}
+
+void QnServerResourceWidget::at_statistics_received(const QnStatisticsDataVector &data) {
+    m_alreadyUpdating = false;
+    m_renderStatus = Qn::NewFrameRendered;
+
+    for (int i = 0; i < data.size(); i++) {
+        if (m_history.length() < i + 1) {
+            QList<int> dummy;
+            for (int j = 0; j < LIMIT; j++)
+                dummy.append(0);
+            QnStatisticsHistoryData dummyItem(getDataId(i), dummy);
+            m_history.append(dummyItem);
+        }
+
+        QnStatisticsHistoryData *item = &(m_history[i]);
+        QnStatisticsData next_data = data[i];
+        item->second.append(next_data.second);
+        if (item->second.count() > LIMIT)
+            item->second.pop_front();
+    }
+
+    m_elapsed_timer.restart();
+    m_counter++;
 }

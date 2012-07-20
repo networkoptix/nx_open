@@ -231,7 +231,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_noDataStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
     m_offlineStaticText.setText(tr("NO SIGNAL"));
     m_offlineStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
-    m_unauthorizedStaticText.setText(tr("UnauthorizedOverlay"));
+    m_unauthorizedStaticText.setText(tr("Unauthorized"));
     m_unauthorizedStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
     m_unauthorizedStaticText2.setText(tr("Please check authentication information in camera settings"));
     m_unauthorizedStaticText2.setPerformanceHint(QStaticText::AggressiveCaching);
