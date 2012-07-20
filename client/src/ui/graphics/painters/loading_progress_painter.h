@@ -1,8 +1,8 @@
 #ifndef QN_LOADING_PROGRESS_PAINTER_H
 #define QN_LOADING_PROGRESS_PAINTER_H
 
-#include <QColor>
-#include <QScopedPointer>
+#include <QtCore/QSharedPointer>
+#include <QtGui/QColor>
 
 class QnColorShaderProgram;
 
@@ -14,8 +14,9 @@ public:
      * \param sectorFill            Number in [0, 1] defining the relative size of the part of the sector that will be filled.
      * \param startColor            Start fill color.
      * \param endColor              End fill color.
+     * \param context               OpenGL context in which this painter will be created.
      */
-    QnLoadingProgressPainter(qreal innerRadius, int sectorCount, qreal sectorFill, const QColor &startColor, const QColor &endColor);
+    QnLoadingProgressPainter(qreal innerRadius, int sectorCount, qreal sectorFill, const QColor &startColor, const QColor &endColor, const QGLContext *context);
 
     ~QnLoadingProgressPainter();
 
@@ -26,7 +27,7 @@ public:
 private:
     int m_sectorCount;
     unsigned m_list;
-    QScopedPointer<QnColorShaderProgram> m_program;
+    QSharedPointer<QnColorShaderProgram> m_program;
 };
 
 #endif // QN_LOADING_PROGRESS_PAINTER_H

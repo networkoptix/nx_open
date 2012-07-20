@@ -14,16 +14,14 @@
 
 QnGradientBackgroundPainter::QnGradientBackgroundPainter(qreal cycleIntervalSecs):
     m_cycleIntervalSecs(cycleIntervalSecs),
-    m_settings(qnSettings),
-    m_gradientPainter(NULL)
+    m_settings(qnSettings)
 {
     m_timer.start();
 }
 
 QnGradientBackgroundPainter::~QnGradientBackgroundPainter() {}
 
-qreal QnGradientBackgroundPainter::position()
-{
+qreal QnGradientBackgroundPainter::position() {
     qreal t = std::fmod(m_timer.elapsed() / 1000.0, m_cycleIntervalSecs) / m_cycleIntervalSecs;
 
     /* t interval    | Position change 

@@ -68,8 +68,8 @@ namespace {
 
     class QnLoadingProgressPainterFactory {
     public:
-        QnLoadingProgressPainter *operator()(const QGLContext *) {
-            return new QnLoadingProgressPainter(0.5, 12, 0.5, QColor(255, 255, 255, 0), QColor(255, 255, 255, 255));
+        QnLoadingProgressPainter *operator()(const QGLContext *context) {
+            return new QnLoadingProgressPainter(0.5, 12, 0.5, QColor(255, 255, 255, 0), QColor(255, 255, 255, 255), context);
         }
     };
 

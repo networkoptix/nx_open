@@ -33,9 +33,14 @@ namespace QnGl {
 #undef WARN
 } // namespace QnGl
 
+
 // -------------------------------------------------------------------------- //
 // QnGlFunctionsGlobal
 // -------------------------------------------------------------------------- //
+/**
+ * A global object that contains state that is shared between all OpenGL functions
+ * instances.
+ */
 class QnGlFunctionsGlobal {
 public:
     QnGlFunctionsGlobal(): 

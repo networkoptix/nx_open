@@ -1,9 +1,10 @@
 #include "paused_painter.h"
+
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/shaders/color_shader_program.h>
 
-QnPausedPainter::QnPausedPainter():
-    m_program(new QnColorShaderProgram(QGLContext::currentContext())) 
+QnPausedPainter::QnPausedPainter(const QGLContext *context):
+    m_program(QnColorShaderProgram::instance(context)) 
 {
     /* Create display list. */
     m_list = glGenLists(1);

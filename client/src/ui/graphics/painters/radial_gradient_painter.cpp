@@ -6,7 +6,7 @@
 #include <ui/graphics/shaders/color_shader_program.h>
 
 QnRadialGradientPainter::QnRadialGradientPainter(int sectorCount, const QColor &innerColor, const QColor &outerColor, const QGLContext *context):
-    m_shader(new QnColorShaderProgram(context)) 
+    m_shader(QnColorShaderProgram::instance(context)) 
 {
     if(context != QGLContext::currentContext())
         qnWarning("Invalid current OpenGL context.");

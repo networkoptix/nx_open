@@ -11,9 +11,9 @@
 
 #include <ui/graphics/items/viewport_bound_widget.h>
 #include <ui/graphics/items/standard/graphics_label.h>
-
 #include <ui/graphics/opengl/gl_shortcuts.h>
-#include <ui/graphics/opengl/gl_functions.h>
+#include <ui/graphics/opengl/gl_context_data.h>
+#include <ui/graphics/painters/radial_gradient_painter.h>
 
 /** How many points are shown on the screen simultaneously */
 #define LIMIT 60
@@ -146,6 +146,15 @@ namespace {
         return path;
     }
 
+    class QnBackgroundGradientPainterFactory {
+    public:
+        QnRadialGradientPainter *operator()(const QGLContext *context) {
+            return new QnRadialGradientPainter(32, QColor(255, 255, 255, 255), QColor(255, 255, 255, 0), context);
+        }
+    };
+
+    typedef QnGlContextData<QnRadialGradientPainter, QnBackgroundGradientPainterFactory> QnBackgroundGradientPainterStorage;
+    Q_GLOBAL_STATIC(QnBackgroundGradientPainterStorage, qn_serverResourceWidget_backgroundGradientPainterStorage);
 
 } // anonymous namespace
 
@@ -154,17 +163,22 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     QnResourceWidget(context, item, parent),
     m_alreadyUpdating(false),
     m_counter(0),
-    m_renderStatus(Qn::NothingRendered),
-    m_backgroundGradientPainter(32, QColor(255, 255, 255, 255), QColor(255, 255, 255, 0))
+    m_renderStatus(Qn::NothingRendered)
 {
-    m_timer = new QTimer(this);
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(at_timer_update()));
-    m_timer->start(REQUEST_TIME);
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(at_timer_timeout()));
+    timer->start(REQUEST_TIME);
+}
+
+QnServerResourceWidget::~QnServerResourceWidget() {
+    return;
 }
 
 Qn::RenderStatus QnServerResourceWidget::paintChannel(QPainter *painter, int channel, const QRectF &rect) {
-    Q_UNUSED(channel)
+    Q_UNUSED(channel);
+
     drawStatistics(rect, painter);
+
     return m_renderStatus;
 }
 
@@ -186,6 +200,9 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
     QRectF inner(offset, offset, ow, oh); 
 
     /** Draw background */
+    if(!m_backgroundGradientPainter)
+        m_backgroundGradientPainter = qn_serverResourceWidget_backgroundGradientPainterStorage()->get(QGLContext::currentContext());
+
     painter->beginNativePainting();
     {
         glEnable(GL_BLEND);
@@ -200,7 +217,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
         glTranslatef(inner.center().x(), inner.center().y(), 1.0);
         qreal radius = min * 0.5 - offset;
         glScale(radius, radius);
-        m_backgroundGradientPainter.paint(qnGlobals->backgroundGradientColor());
+        m_backgroundGradientPainter->paint(qnGlobals->backgroundGradientColor());
         glPopMatrix();
 
         glDisable(GL_BLEND);
@@ -208,7 +225,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
     painter->endNativePainting();
 
     const qreal x_step = (qreal)ow*1.0/(LIMIT - 2);
-    qreal elapsed_step = (qreal)qMin(m_elapsed_timer.elapsed(), (qint64)REQUEST_TIME) / (qreal)REQUEST_TIME;
+    qreal elapsed_step = (qreal)qMin(m_elapsedTimer.elapsed(), (qint64)REQUEST_TIME) / (qreal)REQUEST_TIME;
 
     /** Draw grid */
     {
@@ -307,7 +324,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnServerResourceWidget::at_timer_update() {
+void QnServerResourceWidget::at_timer_timeout() {
     if (m_alreadyUpdating) {
         if (m_renderStatus != Qn::CannotRender)
             m_renderStatus = Qn::OldFrameRendered;
@@ -339,6 +356,6 @@ void QnServerResourceWidget::at_statistics_received(const QnStatisticsDataVector
             item->second.pop_front();
     }
 
-    m_elapsed_timer.restart();
+    m_elapsedTimer.restart();
     m_counter++;
 }
