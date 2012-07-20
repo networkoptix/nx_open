@@ -9,6 +9,9 @@
 class QnPlIsdResource : public QnPhysicalCameraResource
 {
 public:
+
+    static QString MAX_FPS_PARAM_NAME;
+
     static const char* MANUFACTURE;
 
     QnPlIsdResource();
@@ -16,6 +19,11 @@ public:
     virtual bool isResourceAccessible();
 
     virtual bool updateMACAddress();
+
+    virtual int getMaxFps() override;
+
+    QSize getPrimaryResolution() const;
+    QSize getSecondaryResolution() const;
 
     virtual QString manufacture() const;
 
@@ -29,7 +37,8 @@ protected:
     virtual void setCropingPhysical(QRect croping);
 
 private:
-    
+    void setMaxFps(int f);
+    void save();
 
 protected:
     QSize m_resolution1;
