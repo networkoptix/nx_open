@@ -85,7 +85,14 @@
             <artifactId>qtservice</artifactId>
             <version>4.7.4</version>
             <type>zip</type>
-        </dependency>       
+        </dependency>
+        <dependency>
+            <groupId>com.digitalwatchdog</groupId>
+            <artifactId>dvr</artifactId>
+            <version>${dvr.version}</version>
+            <type>zip</type>
+            <classifier>${platform}-${arch}</classifier>
+        </dependency>
     </dependencies>     
 
     <build>

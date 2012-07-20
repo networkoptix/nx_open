@@ -161,7 +161,7 @@ void QnResourceTypePool::addResourceType(QnResourceTypePtr resourceType)
     m_resourceTypeMap.insert(resourceType->getId(), resourceType);
 }
 
-QnId QnResourceTypePool::getResourceTypeId(const QString& manufacture, const QString& name) const
+QnId QnResourceTypePool::getResourceTypeId(const QString& manufacture, const QString& name, bool showWarning) const
 {
     QMutexLocker lock(&m_mutex);
     foreach(QnResourceTypePtr rt, m_resourceTypeMap)
@@ -172,7 +172,8 @@ QnId QnResourceTypePool::getResourceTypeId(const QString& manufacture, const QSt
             return rt->getId();
     }
 
-    cl_log.log("Cannot find such resource type!!!!: ", manufacture + QString(" ") + name, cl_logERROR);
+    if (showWarning)
+        qWarning() << "Cannot find such resource type!!!!: " << manufacture << name;
 
     // Q_ASSERT(false);
     return QnId();

@@ -20,6 +20,7 @@
 		<ffmpeg.version>2012-04-10-N-39672-g40b7a27</ffmpeg.version>
 		<openssl.version>1.0.0j-custom</openssl.version>
 		<onvif.version>2.1.1-ptz-SNAPSHOT</onvif.version>
+        <dvr.version>openAPI_19_2.5.8.35-SNAPSHOT</dvr.version>
 		<buildLib/>
 		<qtlib1/>
 		<qtlib2/>
