@@ -15,6 +15,9 @@ typedef QPair<QString, QList <int>> QnStatisticsHistoryData;
 
 class QnServerResourceWidget: public QnResourceWidget {
     Q_OBJECT;
+
+    typedef QnResourceWidget base_type;
+
 public:
     /**
      * Constructor.
@@ -29,11 +32,17 @@ public:
      */
     virtual ~QnServerResourceWidget();
 
+    /**
+     * \returns                         Resource associated with this widget.
+     */
+    QnVideoServerResourcePtr resource() const;
+
 protected:
     virtual Qn::RenderStatus paintChannel(QPainter *painter, int channel, const QRectF &rect) override;
+    virtual Buttons calculateButtonsVisibility() const override;
 
 private slots:
-    void at_statistics_received(const QnStatisticsDataVector &data);
+    void at_statisticsReceived(const QnStatisticsDataVector &data);
     void at_timer_timeout();
 
 private:
@@ -41,6 +50,9 @@ private:
     void drawStatistics(const QRectF &rect, QPainter *painter);
 
 private:
+    /** Video server resource. */
+    QnVideoServerResourcePtr m_resource;
+
     /** History of last usage responses. */
     QList<QnStatisticsHistoryData> m_history;
 

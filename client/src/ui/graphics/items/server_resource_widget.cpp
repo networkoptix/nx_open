@@ -165,6 +165,10 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     m_counter(0),
     m_renderStatus(Qn::NothingRendered)
 {
+    m_resource = base_type::resource().dynamicCast<QnVideoServerResource>();
+    if(!m_resource) 
+        qnCritical("Server resource widget was created with a non-server resource.");
+
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(at_timer_timeout()));
     timer->start(REQUEST_TIME);
@@ -172,6 +176,10 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
 
 QnServerResourceWidget::~QnServerResourceWidget() {
     return;
+}
+
+QnVideoServerResourcePtr QnServerResourceWidget::resource() const {
+    return m_resource;
 }
 
 Qn::RenderStatus QnServerResourceWidget::paintChannel(QPainter *painter, int channel, const QRectF &rect) {
@@ -324,6 +332,10 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+QnResourceWidget::Buttons QnServerResourceWidget::calculateButtonsVisibility() const {
+    return base_type::calculateButtonsVisibility() & (CloseButton | RotateButton);
+}
+
 void QnServerResourceWidget::at_timer_timeout() {
     if (m_alreadyUpdating) {
         if (m_renderStatus != Qn::CannotRender)
@@ -331,12 +343,10 @@ void QnServerResourceWidget::at_timer_timeout() {
     }
 
     m_alreadyUpdating = true;
-    QnVideoServerResourcePtr server = resource().dynamicCast<QnVideoServerResource>();
-    Q_ASSERT(server);
-    server->apiConnection()->asyncGetStatistics(this, SLOT(at_statistics_received(const QnStatisticsDataVector &)));
+    m_resource->apiConnection()->asyncGetStatistics(this, SLOT(at_statisticsReceived(const QnStatisticsDataVector &)));
 }
 
-void QnServerResourceWidget::at_statistics_received(const QnStatisticsDataVector &data) {
+void QnServerResourceWidget::at_statisticsReceived(const QnStatisticsDataVector &data) {
     m_alreadyUpdating = false;
     m_renderStatus = Qn::NewFrameRendered;
 
