@@ -6,6 +6,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <core/resource/video_server.h>
+#include <api/video_server_connection.h>
 
 #include <ui/style/globals.h>
 
@@ -25,13 +26,6 @@ namespace {
     /** Convert angle from radians to degrees */
     qreal radiansToDegrees(qreal radian) {
         return (180 * radian) / M_PI;
-    }
-
-    /** Get legend text */
-    QString getDataId(int id) {
-        if (id == 0)
-            return "CPU";
-        return QString("HDD%1").arg(id - 1);
     }
 
     /** Get corresponding color from config */
@@ -156,6 +150,20 @@ namespace {
     typedef QnGlContextData<QnRadialGradientPainter, QnBackgroundGradientPainterFactory> QnBackgroundGradientPainterStorage;
     Q_GLOBAL_STATIC(QnBackgroundGradientPainterStorage, qn_serverResourceWidget_backgroundGradientPainterStorage);
 
+    QnStatisticsHistoryData::QnStatisticsHistoryData(QString id, QString description):
+    Id(id),
+    Description(description){
+        for (int i = 0; i < LIMIT; i++)
+            History.append(0);
+    }
+
+    void QnStatisticsHistoryData::append(int value) {
+        History.append(value);
+        if (History.count() > LIMIT)
+            History.pop_front();
+    }
+
+
 } // anonymous namespace
 
 
@@ -269,7 +277,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
 
         for (int i = 0; i < m_history.length(); i++){
             qreal current_value = 0;
-            QPainterPath path = createChartPath(&(m_history[i].second), x_step, -1.0 * oh, current_value, elapsed_step);
+            QPainterPath path = createChartPath(&(m_history[i].History), x_step, -1.0 * oh, current_value, elapsed_step);
             values.append(current_value);
 
             graphPen.setColor(getColorById(i));
@@ -320,7 +328,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
                 main_pen.setColor(getColorById(i));
                 painter->setPen(main_pen);
                 painter->strokePath(legend, main_pen);
-                painter->drawText(offset*0.1, offset*0.1, m_history[i].first);
+                painter->drawText(offset*0.1, offset*0.1, m_history[i].Id);
                 legendTransform.translate(offset * 2, 0.0);
                 painter->setTransform(legendTransform);
             }
@@ -350,20 +358,21 @@ void QnServerResourceWidget::at_statisticsReceived(const QnStatisticsDataVector 
     m_alreadyUpdating = false;
     m_renderStatus = Qn::NewFrameRendered;
 
+    int cpuCounter = 0;
+    int hddCounter = 0;
+    
     for (int i = 0; i < data.size(); i++) {
+        QnStatisticsData next_data = data[i];
+
         if (m_history.length() < i + 1) {
-            QList<int> dummy;
-            for (int j = 0; j < LIMIT; j++)
-                dummy.append(0);
-            QnStatisticsHistoryData dummyItem(getDataId(i), dummy);
-            m_history.append(dummyItem);
+            QString id = next_data.Device == QnStatisticsData::CPU 
+                ? tr("CPU") + QString::number(cpuCounter++)
+                : tr("HDD") + QString::number(hddCounter++);
+            m_history.append(QnStatisticsHistoryData(id, next_data.Description));
         }
 
         QnStatisticsHistoryData *item = &(m_history[i]);
-        QnStatisticsData next_data = data[i];
-        item->second.append(next_data.second);
-        if (item->second.count() > LIMIT)
-            item->second.pop_front();
+        item->append(next_data.Value);
     }
 
     m_elapsedTimer.restart();

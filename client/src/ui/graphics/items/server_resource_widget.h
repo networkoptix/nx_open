@@ -5,13 +5,22 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QMetaType>
 
-#include <api/video_server_connection.h>
+#include <api/video_server_statistics.h>
 
 #include "resource_widget.h"
 
 class QnRadialGradientPainter;
 
-typedef QPair<QString, QList <int>> QnStatisticsHistoryData;
+namespace{
+    struct QnStatisticsHistoryData{
+        QString Id;
+        QString Description;
+        QList<int> History;
+
+        QnStatisticsHistoryData(QString id, QString description);
+        void append(int value);
+    };
+}
 
 class QnServerResourceWidget: public QnResourceWidget {
     Q_OBJECT;

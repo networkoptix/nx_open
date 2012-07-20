@@ -7,7 +7,10 @@
 #include "video_server_connection.h"
 #include "video_server_connection_p.h"
 #include "session_manager.h"
-#include "api/serializer/serializer.h"
+
+#include <api/serializer/serializer.h>
+#include <api/video_server_statistics.h>
+
 #include "utils/common/rand.h"
 
 QString QnVideoServerConnection::m_proxyAddr;
@@ -311,7 +314,7 @@ void detail::VideoServerSessionManagerStatisticsRequestReplyProcessor::at_replyR
         QByteArray modelStr = extractXmlBody(reply, "model");
 
         QnStatisticsDataVector data;
-        data.append(QnStatisticsData(modelStr, usage));
+        data.append(QnStatisticsData(modelStr, usage, QnStatisticsData::CPU));
 
         QByteArray storages = extractXmlBody(reply, "storages");
         QByteArray storage;
@@ -325,7 +328,7 @@ void detail::VideoServerSessionManagerStatisticsRequestReplyProcessor::at_replyR
             from += storage.length();
             QString url = extractXmlBody(storage, "url");
             usage = extractXmlBody(storage, "usage").toShort();
-            data.append(QnStatisticsData(url, usage));
+            data.append(QnStatisticsData(url, usage, QnStatisticsData::HDD));
         } while (storage.length() > 0);
         emit finished(data); 
     }

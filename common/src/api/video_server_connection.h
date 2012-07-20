@@ -10,10 +10,9 @@
 #include "utils/common/util.h"
 #include "recording/time_period.h"
 
-class VideoServerSessionManager;
+#include <api/video_server_statistics.h>
 
-typedef QPair<QString, int> QnStatisticsData;
-typedef QVector<QnStatisticsData> QnStatisticsDataVector;
+class VideoServerSessionManager;
 
 namespace detail {
     class VideoServerSessionManagerReplyProcessor: public QObject
