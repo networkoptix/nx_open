@@ -167,7 +167,7 @@ int CLSimpleHTTPClient::readHeaders()
     for (int i = 1; i < lines.size(); ++i)
     {
         QByteArray& line = lines[i];
-        int delimPos = line.indexOf('=');
+        int delimPos = line.indexOf(':');
         if (delimPos == -1)
             m_header.insert(line.trimmed(), QByteArray());
         else 
@@ -220,7 +220,7 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
         }
         else if (m_auth.password().length()>0 && !mNonce.isEmpty())
         {
-            request.append(digestAccess(request));
+            request.append(digestAccess(requestStr));
         }
 
         request.append("\r\n");
@@ -333,9 +333,29 @@ int CLSimpleHTTPClient::read(char* data, int max_len)
 //===================================================================================
 void CLSimpleHTTPClient::getAuthInfo()
 {
-    mRealm = m_header.value("realm");
-    mNonce = m_header.value("nonce");
-    mQop = m_header.value("qop");
+    QByteArray wwwAuth = m_header.value("WWW-Authenticate");
+    if (!wwwAuth.toLower().startsWith("digest"))
+        return;
+    wwwAuth = wwwAuth.mid(QByteArray("digest").length());
+
+    QList<QByteArray> authParams = wwwAuth.split(',');
+    for (int i = 0; i < authParams.size(); ++i)
+    {
+        QList<QByteArray> param = authParams[i].split('=');
+        if (param.size() > 1) 
+        {
+            param[0] = param[0].trimmed();
+            param[1] = param[1].trimmed();
+            param[1] = param[1].mid(1, param[1].length()-2);
+            if (param[0] == "realm")
+                mRealm = param[1];
+            else if (param[0] == "nonce")
+                mNonce = param[1];
+            else if (param[0] == "qop")
+                mQop = param[1];
+        }
+        if (param.startsWith("digest"));
+    }
 }
 
 QByteArray CLSimpleHTTPClient::basicAuth(const QAuthenticator& auth) 

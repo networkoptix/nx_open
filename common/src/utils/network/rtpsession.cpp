@@ -495,8 +495,8 @@ void RTPSession::addAuth(QByteArray& request)
     }
     else {
         request.append(CLSimpleHTTPClient::basicAuth(m_auth));
+        request.append("\r\n");
     }
-    request.append("\r\n");
 }   
 
 
