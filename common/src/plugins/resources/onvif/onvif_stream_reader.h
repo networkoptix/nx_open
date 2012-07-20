@@ -43,8 +43,8 @@ protected:
     virtual void updateStreamParamsBasedOnFps() override;
 private:
 
-    QnAbstractMediaDataPtr getNextDataMPEG(CodecID ci);
-    QnAbstractMediaDataPtr getNextDataMJPEG();
+    
+    
     virtual QnMetaDataV1Ptr getCameraMetadata() override;
 
     QStringList getRTPurls() const;
