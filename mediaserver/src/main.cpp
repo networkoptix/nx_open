@@ -55,6 +55,7 @@
 #include "main.h"
 #include "rest/handlers/fs_checker.h"
 #include "rest/handlers/get_statistics.h"
+#include "plugins/resources/digitalwatchdog/dvr/dw_dvr_resource_searcher.h"
 
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
@@ -632,6 +633,8 @@ void QnMain::run()
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlISDResourceSearcher::instance());
     //Onvif searcher should be the last:
     QnResourceDiscoveryManager::instance().addDeviceServer(&OnvifResourceSearcher::instance());
+
+    //QnResourceDiscoveryManager::instance().addDeviceServer(&DwDvrResourceSearcher::instance());
 
     //
 

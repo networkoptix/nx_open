@@ -76,7 +76,14 @@
             <version>2.4.1</version>
             <type>zip</type>
             <classifier>${platform}-${arch}</classifier>
-        </dependency>                           
+        </dependency>
+        <dependency>
+            <groupId>com.digitalwatchdog</groupId>
+            <artifactId>dvr</artifactId>
+            <version>${dvr.version}</version>
+            <type>zip</type>
+            <classifier>${platform}-${arch}</classifier>
+        </dependency>
     </dependencies>
 
     <build>
