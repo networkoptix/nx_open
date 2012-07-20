@@ -24,6 +24,7 @@
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameter_types.h>
 #include <ui/graphics/items/resource_widget.h>
+#include <ui/graphics/items/media_resource_widget.h>
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/graphics/items/controls/time_scroll_bar.h>
 #include <ui/graphics/instruments/signaling_instrument.h>
@@ -315,7 +316,7 @@ qreal QnWorkbenchNavigator::maximalSpeed() const {
     return 1.0;
 }
 
-void QnWorkbenchNavigator::addSyncedWidget(QnResourceWidget *widget) {
+void QnWorkbenchNavigator::addSyncedWidget(QnMediaResourceWidget *widget) {
     if (widget == NULL) {
         qnNullWarning(widget);
         return;
@@ -328,7 +329,7 @@ void QnWorkbenchNavigator::addSyncedWidget(QnResourceWidget *widget) {
     updateSyncedPeriods();
 }
 
-void QnWorkbenchNavigator::removeSyncedWidget(QnResourceWidget *widget) {
+void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget) {
     if(!m_syncedWidgets.remove(widget))
         return;
 
@@ -337,9 +338,8 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnResourceWidget *widget) {
     m_syncedResources.erase(m_syncedResources.find(widget->resource()));
     m_motionIgnoreWidgets.remove(widget);
 
-    if(!widget->isMotionSelectionEmpty())
-        if(QnCachingTimePeriodLoader *loader = this->loader(widget->resource()))
-            loader->setMotionRegions(QList<QRegion>());
+    if(QnCachingTimePeriodLoader *loader = this->loader(widget->resource()))
+        loader->setMotionRegions(QList<QRegion>());
 
     updateCurrentWidget();
     updateSyncedPeriods();
@@ -520,7 +520,7 @@ void QnWorkbenchNavigator::setPlayingTemporary(bool playing) {
 // Updaters
 // -------------------------------------------------------------------------- //
 void QnWorkbenchNavigator::updateCentralWidget() {
-    QnResourceWidget *centralWidget = display()->widget(Qn::CentralRole);
+    QnMediaResourceWidget *centralWidget = dynamic_cast<QnMediaResourceWidget *>(display()->widget(Qn::CentralRole));
     if(m_centralWidget == centralWidget)
         return;
 
@@ -531,7 +531,7 @@ void QnWorkbenchNavigator::updateCentralWidget() {
 }
 
 void QnWorkbenchNavigator::updateCurrentWidget() {
-    QnResourceWidget *widget = NULL;
+    QnMediaResourceWidget *widget = NULL;
     bool isCentral = false;
     if (m_centralWidget != NULL || !display()->isStreamsSynchronized()) {
         widget = m_centralWidget;
@@ -728,7 +728,7 @@ void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodRole type) {
     QnTimePeriodList periods = QnTimePeriod::mergeTimePeriods(periodsList);
 
     if (type == Qn::MotionRole) {
-        foreach(QnResourceWidget *widget, m_syncedWidgets) {
+        foreach(QnMediaResourceWidget *widget, m_syncedWidgets) {
             QnAbstractArchiveReader  *archiveReader = widget->display()->archiveReader();
             if (archiveReader)
                 archiveReader->setPlaybackMask(periods);
@@ -1041,7 +1041,8 @@ void QnWorkbenchNavigator::at_display_widgetChanged(Qn::ItemRole role) {
 
 void QnWorkbenchNavigator::at_display_widgetAdded(QnResourceWidget *widget) {
     if(widget->resource()->flags() & QnResource::utc)
-        addSyncedWidget(widget);
+        if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
+            addSyncedWidget(mediaWidget);
 
     connect(widget, SIGNAL(motionSelectionChanged()), this, SLOT(at_widget_motionSelectionChanged()));
     connect(widget, SIGNAL(displayFlagsChanged()), this, SLOT(at_widget_displayFlagsChanged()));
@@ -1053,14 +1054,15 @@ void QnWorkbenchNavigator::at_display_widgetAboutToBeRemoved(QnResourceWidget *w
     disconnect(widget->resource().data(), NULL, this, NULL);
 
     if(widget->resource()->flags() & QnResource::utc)
-        removeSyncedWidget(widget);
+        if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
+            removeSyncedWidget(mediaWidget);
 }
 
 void QnWorkbenchNavigator::at_widget_motionSelectionChanged() {
-    at_widget_motionSelectionChanged(checked_cast<QnResourceWidget *>(sender()));
+    at_widget_motionSelectionChanged(checked_cast<QnMediaResourceWidget *>(sender()));
 }
 
-void QnWorkbenchNavigator::at_widget_motionSelectionChanged(QnResourceWidget *widget) {
+void QnWorkbenchNavigator::at_widget_motionSelectionChanged(QnMediaResourceWidget *widget) {
     /* We check that the loader can be created (i.e. that the resource is camera) 
      * just to feel safe. */
     if(QnCachingTimePeriodLoader *loader = this->loader(widget->resource()))

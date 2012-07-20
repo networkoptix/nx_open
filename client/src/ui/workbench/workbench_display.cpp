@@ -37,6 +37,8 @@
 #include <ui/graphics/instruments/focus_listener_instrument.h>
 
 #include <ui/graphics/items/resource_widget.h>
+#include <ui/graphics/items/server_resource_widget.h>
+#include <ui/graphics/items/media_resource_widget.h>
 #include <ui/graphics/items/resource_widget_renderer.h>
 #include <ui/graphics/items/curtain_item.h>
 #include <ui/graphics/items/image_button_widget.h>
@@ -179,8 +181,10 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     connect(resizeSignalingInstrument,      SIGNAL(activated(QWidget *, QEvent *)),                     this,                   SLOT(synchronizeSceneBoundsExtension()));
     connect(resizeSignalingInstrument,      SIGNAL(activated(QWidget *, QEvent *)),                     this,                   SLOT(fitInView()));
     connect(m_beforePaintInstrument,        SIGNAL(activated(QWidget *, QEvent *)),                     this,                   SLOT(updateFrameWidths()));
-    connect(m_curtainActivityInstrument,    SIGNAL(activityStopped()),                                  this,                   SLOT(at_activityStopped()));
-    connect(m_curtainActivityInstrument,    SIGNAL(activityResumed()),                                  this,                   SLOT(at_activityStarted()));
+    connect(m_curtainActivityInstrument,    SIGNAL(activityStopped()),                                  this,                   SLOT(at_curtainActivityInstrument_activityStopped()));
+    connect(m_curtainActivityInstrument,    SIGNAL(activityResumed()),                                  this,                   SLOT(at_curtainActivityInstrument_activityStarted()));
+    connect(m_widgetActivityInstrument,     SIGNAL(activityStopped()),                                  this,                   SLOT(at_widgetActivityInstrument_activityStopped()));
+    connect(m_widgetActivityInstrument,     SIGNAL(activityResumed()),                                  this,                   SLOT(at_widgetActivityInstrument_activityStarted()));
 
     /* Create zoomed toggle. */
     m_zoomedToggle = new QnToggle(false, this);
@@ -251,15 +255,16 @@ void QnWorkbenchDisplay::setStreamsSynchronized(bool synchronized, qint64 curren
     emit streamsSynchronizedChanged();
 }
 
-void QnWorkbenchDisplay::setStreamsSynchronized(QnResourceWidget* widget)
-{
+void QnWorkbenchDisplay::setStreamsSynchronized(QnResourceWidget *widget) {
     bool synchronized = widget != 0;
     qint64 currentTime = AV_NOPTS_VALUE;
     float speed = 1.0;
-    if (widget) {
-        currentTime = widget->display()->currentTimeUSec();
-        speed = widget->display()->camDisplay()->getSpeed();
+    
+    if (QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
+        currentTime = mediaWidget->display()->currentTimeUSec();
+        speed = mediaWidget->display()->camDisplay()->getSpeed();
     }
+
     setStreamsSynchronized(synchronized, currentTime, speed);
 }
 
@@ -487,7 +492,7 @@ void QnWorkbenchDisplay::setLayer(QGraphicsItem *item, Qn::ItemLayer layer) {
 
     QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
     if(widget)
-        widget->shadow()->setZValue(shadowLayer(layer) * layerZSize);
+        widget->shadowItem()->setZValue(shadowLayer(layer) * layerZSize);
 }
 
 void QnWorkbenchDisplay::setLayer(const QList<QGraphicsItem *> &items, Qn::ItemLayer layer) {
@@ -581,13 +586,13 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
             workbench()->setItem(Qn::RaisedRole, NULL);
 
         /* Update media quality. */
-        if(oldWidget)
-            if (oldWidget->display()->archiveReader())
-                oldWidget->display()->archiveReader()->enableQualityChange();
-        if(newWidget) {
-            if (newWidget->display()->archiveReader()) {
-                newWidget->display()->archiveReader()->setQuality(MEDIA_Quality_High, true);
-                newWidget->display()->archiveReader()->disableQualityChange();
+        if(QnMediaResourceWidget *oldMediaWidget = dynamic_cast<QnMediaResourceWidget *>(oldWidget))
+            if (oldMediaWidget->display()->archiveReader())
+                oldMediaWidget->display()->archiveReader()->enableQualityChange();
+        if(QnMediaResourceWidget *newMediaWidget = dynamic_cast<QnMediaResourceWidget *>(newWidget)) {
+            if (newMediaWidget->display()->archiveReader()) {
+                newMediaWidget->display()->archiveReader()->setQuality(MEDIA_Quality_High, true);
+                newMediaWidget->display()->archiveReader()->disableQualityChange();
             }
         }
 
@@ -606,13 +611,17 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
     }
     case Qn::CentralRole: {
         /* Update audio playback. */
-        CLCamDisplay *oldCamDisplay = oldWidget ? oldWidget->display()->camDisplay() : NULL;
-        if(oldCamDisplay != NULL)
-            oldCamDisplay->playAudio(false);
+        if(QnMediaResourceWidget *oldMediaWidget = dynamic_cast<QnMediaResourceWidget *>(oldWidget)) {
+            CLCamDisplay *oldCamDisplay = oldMediaWidget ? oldMediaWidget->display()->camDisplay() : NULL;
+            if(oldCamDisplay)
+                oldCamDisplay->playAudio(false);
+        }
 
-        CLCamDisplay *newCamDisplay = newWidget ? newWidget->display()->camDisplay() : NULL;
-        if(newCamDisplay != NULL)
-            newCamDisplay->playAudio(true);
+        if(QnMediaResourceWidget *newMediaWidget = dynamic_cast<QnMediaResourceWidget *>(newWidget)) { 
+            CLCamDisplay *newCamDisplay = newMediaWidget ? newMediaWidget->display()->camDisplay() : NULL;
+            if(newCamDisplay)
+                newCamDisplay->playAudio(true);
+        }
 
         break;
     }
@@ -632,7 +641,7 @@ QList<QnResourceWidget *> QnWorkbenchDisplay::widgets(const QnResourcePtr &resou
 }
 
 QnResourceDisplay *QnWorkbenchDisplay::display(QnWorkbenchItem *item) const {
-    if(QnResourceWidget *widget = this->widget(item))
+    if(QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(this->widget(item)))
         return widget->display();
     return NULL;
 }
@@ -726,7 +735,12 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
         return false;
     }
 
-    QnResourceWidget *widget = new QnResourceWidget(context(), item);
+    QnResourceWidget *widget;
+    if (resource->checkFlags(QnResource::server))
+        widget = new QnServerResourceWidget(context(), item);
+    else
+        widget = new QnMediaResourceWidget(context(), item);
+
     widget->setParent(this); /* Just to feel totally safe and not to leak memory no matter what happens. */
     widget->setAttribute(Qt::WA_DeleteOnClose);
     widget->setFrameOpacity(m_frameOpacity);
@@ -764,8 +778,8 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
 
     m_widgetByItem.insert(item, widget);
     m_widgetsByResource[widget->resource()].push_back(widget);
-    if(widget->renderer() != NULL)
-        m_widgetByRenderer.insert(widget->renderer(), widget);
+    if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
+        m_widgetByRenderer.insert(mediaWidget->renderer(), widget);
 
     synchronize(widget, false);
     bringToFront(widget);
@@ -774,8 +788,6 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
         adjustGeometryLater(item, animate); /* Changing item flags here may confuse the callee, so we do it through the event loop. */
 
     connect(widget,                     SIGNAL(aboutToBeDestroyed()),   this,   SLOT(at_widget_aboutToBeDestroyed()));
-    connect(m_widgetActivityInstrument, SIGNAL(activityStopped()),      widget, SLOT(showActivityDecorations()));
-    connect(m_widgetActivityInstrument, SIGNAL(activityResumed()),      widget, SLOT(hideActivityDecorations()));
     if(widgets(widget->resource()).size() == 1)
         connect(widget->resource().data(),  SIGNAL(disabledChanged(bool, bool)), this, SLOT(at_resource_disabledChanged()), Qt::QueuedConnection);
 
@@ -785,7 +797,8 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
         if(item == workbench()->item(static_cast<Qn::ItemRole>(i)))
             setWidget(static_cast<Qn::ItemRole>(i), widget);
 
-    widget->display()->start();
+    if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
+        mediaWidget->display()->start();
 
     return true;
 }
@@ -800,7 +813,6 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
     }
 
     disconnect(widget, NULL, this, NULL);
-    disconnect(m_widgetActivityInstrument, NULL, widget, NULL);
     if(widgets(widget->resource()).size() == 1)
         disconnect(widget->resource().data(), NULL, this, NULL);
 
@@ -812,8 +824,8 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
 
     m_widgetByItem.remove(item);
     m_widgetsByResource[widget->resource()].removeOne(widget);
-    if(widget->renderer() != NULL)
-        m_widgetByRenderer.remove(widget->renderer());
+    if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
+        m_widgetByRenderer.remove(mediaWidget->renderer());
 
     if(destroyWidget) {
         widget->hide();
@@ -1235,7 +1247,7 @@ void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate) {
     }
 
     /* Assume 4:3 AR of a single channel. In most cases, it will work fine. */
-    const QnVideoResourceLayout *videoLayout = widget->display()->videoLayout();
+    const QnVideoResourceLayout *videoLayout = widget->channelLayout();
     const qreal estimatedAspectRatio = (4.0 * videoLayout->width()) / (3.0 * videoLayout->height());
     const Qt::Orientation orientation = estimatedAspectRatio > 1.0 ? Qt::Vertical : Qt::Horizontal;
     const QSize size = bestSingleBoundedSize(workbench()->mapper(), 1, orientation, estimatedAspectRatio);
@@ -1332,12 +1344,22 @@ void QnWorkbenchDisplay::at_item_flagChanged(Qn::ItemFlag flag, bool value) {
     }
 }
 
-void QnWorkbenchDisplay::at_activityStopped() {
+void QnWorkbenchDisplay::at_curtainActivityInstrument_activityStopped() {
     m_curtainAnimator->curtain(m_widgetByRole[Qn::ZoomedRole]);
 }
 
-void QnWorkbenchDisplay::at_activityStarted() {
+void QnWorkbenchDisplay::at_curtainActivityInstrument_activityStarted() {
     m_curtainAnimator->uncurtain();
+}
+
+void QnWorkbenchDisplay::at_widgetActivityInstrument_activityStopped() {
+    foreach(QnResourceWidget *widget, m_widgetByRenderer) 
+        widget->setDisplayFlag(QnResourceWidget::DisplayActivityOverlay, true);
+}
+
+void QnWorkbenchDisplay::at_widgetActivityInstrument_activityStarted() {
+    foreach(QnResourceWidget *widget, m_widgetByRenderer) 
+        widget->setDisplayFlag(QnResourceWidget::DisplayActivityOverlay, false);
 }
 
 void QnWorkbenchDisplay::at_curtained() {

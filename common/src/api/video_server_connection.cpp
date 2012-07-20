@@ -8,6 +8,7 @@
 #include "video_server_connection_p.h"
 #include "session_manager.h"
 #include "api/serializer/serializer.h"
+#include "utils/common/rand.h"
 
 QString QnVideoServerConnection::m_proxyAddr;
 int QnVideoServerConnection::m_proxyPort = 0;
@@ -185,8 +186,26 @@ int QnVideoServerConnection::asyncGetFreeSpace(const QString& path, QObject *tar
 
 }
 
+int QnVideoServerConnection::asyncGetStatistics(QObject *target, const char *slot){
+    detail::VideoServerSessionManagerStatisticsRequestReplyProcessor *processor = new detail::VideoServerSessionManagerStatisticsRequestReplyProcessor();
+    connect(processor, SIGNAL(finished(const QnStatisticsDataVector &/* data */)), target, slot, Qt::QueuedConnection);
+    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, "api/statistics", processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
+}
+
+int QnVideoServerConnection::syncGetStatistics(QObject *target, const char *slot){
+    QByteArray reply;
+    QByteArray errorString;
+    int status = QnSessionManager::instance()->sendGetRequest(m_url, "api/statistics", reply, errorString);
+
+    detail::VideoServerSessionManagerStatisticsRequestReplyProcessor *processor = new detail::VideoServerSessionManagerStatisticsRequestReplyProcessor();
+    connect(processor, SIGNAL(finished(int)), target, slot, Qt::DirectConnection);
+    processor->at_replyReceived(status, reply, errorString, 0);
+
+    return status;
+}
+
 void detail::VideoServerSessionManagerReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray& /*errorString*/, int handle)
-{
+    {
     QnTimePeriodList result;
     if(status == 0)
     {
@@ -206,14 +225,14 @@ void detail::VideoServerSessionManagerReplyProcessor::at_replyReceived(int statu
 }
 
 // very simple parser. Used for parsing own created XML
-QByteArray extractXmlBody(const QByteArray& body, const QByteArray tagName)
+QByteArray extractXmlBody(const QByteArray& body, const QByteArray tagName, int from = 0)
 {
 	QByteArray tagStart = QByteArray("<") + tagName + QByteArray(">");
-	int bodyStart = body.indexOf(tagStart);
+	int bodyStart = body.indexOf(tagStart, from);
 	if (bodyStart >= 0)
 		bodyStart += tagStart.length();
 	QByteArray tagEnd = QByteArray("</") + tagName + QByteArray(">");
-	int bodyEnd = body.indexOf(tagEnd);
+	int bodyEnd = body.indexOf(tagEnd, bodyStart);
 	if (bodyStart >= 0 && bodyEnd >= 0)
 		return body.mid(bodyStart, bodyEnd - bodyStart).trimmed();
 	else
@@ -283,3 +302,32 @@ void QnVideoServerConnection::setProxyAddr(const QString& addr, int port)
     //QNetworkProxyQuery proxyQuery("http://?/RecordedTimePeriods")
 }
 
+void detail::VideoServerSessionManagerStatisticsRequestReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray ,int ){
+    if(status == 0)
+    {
+        //QByteArray usagestr = extractXmlBody(reply, "usage"); // usage of the current process
+        QByteArray usageStr = extractXmlBody(reply, "load"); // total cpu load of the current machine
+        int usage =  usageStr.toShort();
+        QByteArray modelStr = extractXmlBody(reply, "model");
+
+        QnStatisticsDataVector data;
+        data.append(QnStatisticsData(modelStr, usage));
+
+        QByteArray storages = extractXmlBody(reply, "storages");
+        QByteArray storage;
+        int from = 0;
+        do 
+        {
+            storage = extractXmlBody(storages, "storage", from);
+            if (storage.length() == 0)
+                break;
+
+            from += storage.length();
+            QString url = extractXmlBody(storage, "url");
+            usage = extractXmlBody(storage, "usage").toShort();
+            data.append(QnStatisticsData(url, usage));
+        } while (storage.length() > 0);
+        emit finished(data); 
+    }
+    deleteLater();
+}

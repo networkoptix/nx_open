@@ -1,18 +1,18 @@
 #ifndef QN_CLICKABLE_WIDGET_H
 #define QN_CLICKABLE_WIDGET_H
 
-#include <QGraphicsWidget>
 #include <ui/processors/clickable.h>
+#include <ui/graphics/items/standard/graphics_widget.h>
 
 /**
  * Graphics widget that provides signals for mouse click and double click events.
  * 
  * Note that the signal is emitted when the mouse button is released.
  */
-class QnClickableWidget: public Clickable<QGraphicsWidget> {
+class QnClickableWidget: public Clickable<GraphicsWidget> {
     Q_OBJECT;
 
-    typedef Clickable<QGraphicsWidget> base_type;
+    typedef Clickable<GraphicsWidget> base_type;
 
 public:
     QnClickableWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags wFlags = 0): base_type(parent, wFlags) {}

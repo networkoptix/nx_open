@@ -1,12 +1,15 @@
 #include "workbench_render_watcher.h"
+
+#include <utils/common/warnings.h>
+
+#include <camera/abstractrenderer.h>
+
 #include <ui/workbench/workbench_display.h>
 #include <ui/graphics/items/resource_widget_renderer.h>
-#include <ui/graphics/items/resource_widget.h>
+#include <ui/graphics/items/media_resource_widget.h>
 #include <ui/graphics/instruments/signaling_instrument.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/instruments/forwarding_instrument.h>
-#include <camera/abstractrenderer.h>
-#include <utils/common/warnings.h>
 
 QnWorkbenchRenderWatcher::QnWorkbenchRenderWatcher(QnWorkbenchDisplay *display, QObject *parent):
     QObject(parent) 
@@ -19,8 +22,8 @@ QnWorkbenchRenderWatcher::QnWorkbenchRenderWatcher(QnWorkbenchDisplay *display, 
     /* Connect to display. */
     connect(display,                            SIGNAL(widgetAdded(QnResourceWidget *)),            this,   SLOT(at_display_widgetAdded(QnResourceWidget *)));
     connect(display,                            SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)), this,   SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
-    connect(display->beforePaintInstrument(),   SIGNAL(activated(QWidget *, QEvent *)),             this, SLOT(startDisplay()));
-    connect(display->afterPaintInstrument(),    SIGNAL(activated(QWidget *, QEvent *)),             this, SLOT(finishDisplay()));
+    connect(display->beforePaintInstrument(),   SIGNAL(activated(QWidget *, QEvent *)),             this,   SLOT(startDisplay()));
+    connect(display->afterPaintInstrument(),    SIGNAL(activated(QWidget *, QEvent *)),             this,   SLOT(finishDisplay()));
 }
 
 QnWorkbenchRenderWatcher::QnWorkbenchRenderWatcher(QObject *parent): 
@@ -91,16 +94,24 @@ void QnWorkbenchRenderWatcher::finishDisplay() {
 }
 
 void QnWorkbenchRenderWatcher::at_display_widgetAdded(QnResourceWidget *widget) {
-    if(widget->renderer() == NULL) 
+    QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
+    if(!mediaWidget)
         return;
 
-    registerRenderer(widget->renderer(), widget->renderer());
+    if(mediaWidget->renderer() == NULL) 
+        return;
+
+    registerRenderer(mediaWidget->renderer(), mediaWidget->renderer());
 }
 
 void QnWorkbenchRenderWatcher::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {
-    if(widget->renderer() == NULL) 
+    QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
+    if(!mediaWidget)
         return;
 
-    unregisterRenderer(widget->renderer());
+    if(mediaWidget->renderer() == NULL) 
+        return;
+
+    unregisterRenderer(mediaWidget->renderer());
 }
 

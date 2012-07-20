@@ -1,16 +1,23 @@
 #include "workbench_stream_synchronizer.h"
+
 #include <utils/common/warnings.h>
 #include <utils/common/counter.h>
 #include <utils/common/checked_cast.h>
+
 #include <core/resource/resource.h>
+#include <core/resource/security_cam_resource.h>
+
+#include <plugins/resources/archive/syncplay_wrapper.h>
+
 #include <camera/resource_display.h>
 #include <camera/camdisplay.h>
 #include <camera/camera.h>
+
 #include <ui/workbench/workbench_display.h>
 #include <ui/graphics/items/resource_widget.h>
-#include <plugins/resources/archive/syncplay_wrapper.h>
+#include <ui/graphics/items/media_resource_widget.h>
+
 #include "workbench_render_watcher.h"
-#include "core/resource/security_cam_resource.h"
 
 QnWorkbenchStreamSynchronizer::QnWorkbenchStreamSynchronizer(QnWorkbenchDisplay *display, QnWorkbenchRenderWatcher *renderWatcher, QObject *parent):
     QObject(parent),
@@ -65,46 +72,54 @@ bool QnWorkbenchStreamSynchronizer::isEffective() const {
 }
 
 void QnWorkbenchStreamSynchronizer::at_display_widgetAdded(QnResourceWidget *widget) {
-    connect(widget->resource().data(), SIGNAL(flagsChanged()), this, SLOT(at_resource_flagsChanged()));
+    QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
+    if(!mediaWidget)
+        return;
 
-    if(!widget->resource()->checkFlags(QnResource::utc)) {
-        m_queuedWidgets.insert(widget);
+    connect(mediaWidget->resource().data(), SIGNAL(flagsChanged()), this, SLOT(at_resource_flagsChanged()));
+
+    if(!mediaWidget->resource()->checkFlags(QnResource::utc)) {
+        m_queuedWidgets.insert(mediaWidget);
         return;
     }
 
-    if(widget->display()->archiveReader() == NULL) 
+    if(mediaWidget->display()->archiveReader() == NULL) 
         return;
     
-    CLVideoCamera *camera = widget->display()->camera();
-    m_syncPlay->addArchiveReader(widget->display()->archiveReader(), camera->getCamDisplay());
+    CLVideoCamera *camera = mediaWidget->display()->camera();
+    m_syncPlay->addArchiveReader(mediaWidget->display()->archiveReader(), camera->getCamDisplay());
     camera->setExternalTimeSource(m_syncPlay);
     camera->getCamDisplay()->setExternalTimeSource(m_syncPlay);
 
     m_counter->increment();
-    connect(widget->display()->archiveReader(), SIGNAL(destroyed()), m_counter, SLOT(decrement()));
+    connect(mediaWidget->display()->archiveReader(), SIGNAL(destroyed()), m_counter, SLOT(decrement()));
 
     m_widgetCount++;
     if(m_widgetCount == 1) 
     {
-        if(!widget->resource().dynamicCast<QnSecurityCamResource>())
-            widget->display()->archiveReader()->jumpTo(0, 0); // change current position from live to left edge if it is not camera
+        if(!mediaWidget->resource().dynamicCast<QnSecurityCamResource>())
+            mediaWidget->display()->archiveReader()->jumpTo(0, 0); // change current position from live to left edge if it is not camera
 
         emit effectiveChanged();
     }
 }
 
 void QnWorkbenchStreamSynchronizer::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {
-    disconnect(widget->resource().data(), NULL, this, NULL);
-
-    m_queuedWidgets.remove(widget);
-
-    if(!widget->resource()->checkFlags(QnResource::utc))
+    QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
+    if(!mediaWidget)
         return;
 
-    if(widget->display()->archiveReader() == NULL) 
+    disconnect(mediaWidget->resource().data(), NULL, this, NULL);
+
+    m_queuedWidgets.remove(mediaWidget);
+
+    if(!mediaWidget->resource()->checkFlags(QnResource::utc))
         return;
 
-    m_syncPlay->removeArchiveReader(widget->display()->archiveReader());
+    if(mediaWidget->display()->archiveReader() == NULL) 
+        return;
+
+    m_syncPlay->removeArchiveReader(mediaWidget->display()->archiveReader());
 
     m_widgetCount--;
     if(m_widgetCount == 0)
@@ -115,11 +130,11 @@ void QnWorkbenchStreamSynchronizer::at_renderWatcher_displayingStateChanged(QnAb
     if(m_display.isNull())
         return;
 
-    QnResourceWidget *widget = m_display.data()->widget(renderer);
-    if(widget == NULL)
+    QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(m_display.data()->widget(renderer));
+    if(mediaWidget == NULL)
         return;
 
-    m_syncPlay->onConsumerBlocksReader(widget->display()->dataProvider(), !displaying);
+    m_syncPlay->onConsumerBlocksReader(mediaWidget->display()->dataProvider(), !displaying);
 }
 
 void QnWorkbenchStreamSynchronizer::at_resource_flagsChanged() {
@@ -133,7 +148,7 @@ void QnWorkbenchStreamSynchronizer::at_resource_flagsChanged(const QnResourcePtr
     if(!(resource->flags() & QnResource::utc))
         return; // TODO: implement reverse handling?
 
-    foreach(QnResourceWidget *widget, m_queuedWidgets) {
+    foreach(QnMediaResourceWidget *widget, m_queuedWidgets) {
         if(widget->resource() == resource) {
             m_queuedWidgets.remove(widget);
 

@@ -15,7 +15,7 @@ class QnWorkbenchDisplay;
 class QnWorkbenchController;
 class QnWorkbenchItem;
 class QnWorkbenchContext;
-class QnResourceWidget;
+class QnMediaResourceWidget;
 
 class QnCameraMotionMaskWidget: public QWidget
 {
@@ -50,13 +50,12 @@ public slots:
 
 protected slots:
     void at_viewport_resized();
-    void at_motionRegionSelected(QGraphicsView *, QnResourceWidget *, const QRect &);
+    void at_motionRegionSelected(QGraphicsView *, QnMediaResourceWidget *, const QRect &);
     void at_motionRegionCleared();
     void at_itemClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &);
 
 private:
     void init();
-    int gridPosToChannelPos(QPoint &pos);
     void showTooManyWindowsMessage(const QnMotionRegion &region, const QnMotionRegion::RegionValid kind);
 
 private:
@@ -72,8 +71,8 @@ private:
     QScopedPointer<QnWorkbenchController> m_controller;
 
     MotionSelectionInstrument *m_motionSelectionInstrument;
-    ClickInstrument* m_clickInstrument;
-    QnResourceWidget* m_resourceWidget;
+    ClickInstrument *m_clickInstrument;
+    QnMediaResourceWidget *m_resourceWidget;
 
     bool m_readOnly;
     int m_motionSensitivity;

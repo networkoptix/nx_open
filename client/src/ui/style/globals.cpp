@@ -93,3 +93,12 @@ QVariant QnGlobals::updateValueFromSettings(QSettings *settings, int id, const Q
     }
 }
 
+QnColorVector QnGlobals::initSystemHealthColors(){
+    QnColorVector result;
+    // TODO: get some beautiful colors
+    result.append(QColor(116, 151, 255));
+    result.append(Qt::green);
+    result.append(Qt::red);
+    return result;
+}
+

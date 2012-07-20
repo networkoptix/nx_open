@@ -35,12 +35,14 @@ namespace {
 
     class CpuUsageRefresher {
     public:
-        CpuUsageRefresher() {
-            m_locator = NULL;
-            m_service = NULL;
-            m_cpu = 0;
-            m_ts = 0;
-            m_usage = 0;
+        CpuUsageRefresher():
+           m_locator(NULL),
+           m_service(NULL),
+           m_processCpu(0),
+           m_totalCpu(0),
+           m_timeStamp(0),
+           m_usage(0),
+           m_totalUsage(0){
             m_initialized = init();
         }
 
@@ -60,46 +62,75 @@ namespace {
             return m_usage;
         }
 
+        uint totalUsage(){
+            return m_totalUsage;
+        }
+
     private:
         static VOID CALLBACK timerCallback(HWND /*hwnd*/, UINT /*uMsg*/, UINT_PTR /*idEvent*/, DWORD /*dwTime*/);
 
+        qulonglong getWbemLongLong(IWbemClassObject *pclsObj, LPCWSTR wszName, qulonglong def = 0){
+            VARIANT vtProc;
+            pclsObj->Get(wszName,0, &vtProc, 0, 0);
+            qulonglong result = def;
+            if (vtProc.vt == VT_BSTR){
+                QString qstr((QChar*)vtProc.bstrVal, ::SysStringLen(vtProc.bstrVal));
+                result = qstr.toULongLong();
+            }
+            VariantClear(&vtProc);
+            return result;
+        }
+
+        int getWbemInt(IWbemClassObject *pclsObj, LPCWSTR wszName, int def = -1){
+            VARIANT vtProc;
+            pclsObj->Get(wszName,0, &vtProc, 0, 0);
+            int result = def;
+            if (vtProc.vt == VT_I4)
+                result = vtProc.intVal;
+            VariantClear(&vtProc);
+            return result;
+        }
+
         void refresh() {
+
             char q_str[100];
-            sprintf(q_str, "SELECT * FROM Win32_PerfRawData_PerfProc_Thread WHERE IdProcess=%d", QCoreApplication::applicationPid());
+            const quint64 max = 100;
+            const qint64 appPid = QCoreApplication::applicationPid();
+            sprintf(q_str, "SELECT * FROM Win32_PerfRawData_PerfProc_Process WHERE IdProcess>0"); // WHERE IdProcess=%d", 
             IEnumWbemClassObject* pEnumerator = query(q_str);
             if (pEnumerator){
                 IWbemClassObject *pclsObj;
                 ULONG uReturn = 0;
                 quint64 cpu = 0;
+                quint64 total = 0;
                 quint64 ts = 0;
 
                 pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
                 while (uReturn != 0)
                 {
-                    VARIANT vtProc;
+                    int pid = getWbemInt(pclsObj, L"IDProcess");
+                    qulonglong percProcTime = getWbemLongLong(pclsObj, L"PercentProcessorTime");
+                    total += percProcTime;
+                    if (appPid == pid)
+                        cpu+= percProcTime;
 
-                    pclsObj->Get(L"PercentProcessorTime", 0, &vtProc, 0, 0);
-                    QString qstr((QChar*)vtProc.bstrVal, ::SysStringLen(vtProc.bstrVal)); // TODO: check VARIANT type (vtProc.vt), or maybe write a more generic variant-to-longlong conversion function.
-                    cpu = cpu + qstr.toULongLong();
-                    VariantClear(&vtProc);
-
-                    if (ts == 0){
-                        pclsObj->Get(L"Timestamp_Sys100NS",0, &vtProc, 0, 0);
-                        QString qstr((QChar*)vtProc.bstrVal, ::SysStringLen(vtProc.bstrVal));
-                        ts = qstr.toULongLong();
-                    }
-                    VariantClear(&vtProc);
+                    /** Requesting timestamp only once */
+                    if (!ts)
+                        ts = getWbemLongLong(pclsObj, L"Timestamp_Sys100NS");
                     pclsObj->Release();
 
                     pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
                 }
                 pEnumerator->Release();
 
-                if (m_ts > 0){
-                    m_usage = ((cpu - m_cpu) * 100) / ((ts - m_ts) * QnPerformance::cpuCoreCount());
+                if (m_timeStamp && ts){
+                    qulonglong timespan = ((ts - m_timeStamp) * QnPerformance::cpuCoreCount());
+                    m_usage = qMin(max, ((cpu - m_processCpu) * 100) / timespan);
+                    m_totalUsage = qMin(max, ((total - m_totalCpu) * 100) / timespan);
                 }
-                m_cpu = cpu;
-                m_ts = ts;
+                m_totalCpu = total;
+                m_processCpu = cpu;
+                m_timeStamp = ts;
             }
         }
 
@@ -236,14 +267,20 @@ namespace {
         /** WMI services provider interface. */ 
         IWbemServices *m_service;
 
-        /** Previous value of raw WMI PercentProcessorTime stat. */
-        quint64 m_cpu;
+        /** Previous value of raw WMI PercentProcessorTime stat for our process. */
+        quint64 m_processCpu;
+
+        /** Previous value of raw WMI PercentProcessorTime stat for all processes. */
+        quint64 m_totalCpu;
 
         /** Previous value of raw WMI Timestamp_Sys100NS stat. */
-        quint64 m_ts;
+        quint64 m_timeStamp;
 
-        /** Processor usage percent for the last CPU_USAGE_REFRESH seconds. */
+        /** Processor usage percent by our process for the last CPU_USAGE_REFRESH seconds. */
         uint m_usage;
+
+        /** Total processor usage percent for the last CPU_USAGE_REFRESH seconds. */
+        uint m_totalUsage;
 
         /** System timer for processor usage calculating. */
         UINT_PTR m_timer;
@@ -298,8 +335,10 @@ namespace{
     public:
         CpuUsageRefresher() {
             m_cpu = 0;
-            m_process_cpu = 0;
+            m_processCpu = 0;
+            m_busyCpu = 0;
             m_usage = 0;
+            m_totalUsage = 0;
             m_timer = 0;
             m_initialized = init();
         }
@@ -313,18 +352,27 @@ namespace{
             return m_usage;
         }
 
+        uint totalUsage() {
+            return m_totalUsage;
+        }
+
         void** getTimerId() {
             return &m_timer;
         }
 
         void refresh() {
-            qulonglong cpu = getCpu();
+            qulonglong cpu, busy;
+            getCpu(busy, cpu);
             qulonglong process_cpu = getProcessCpu();
-            if (process_cpu > 0 && m_cpu > 0){
-                m_usage = ((process_cpu - m_process_cpu) * 100) / (cpu - m_cpu);
+            if (process_cpu && m_processCpu){
+                m_usage = ((process_cpu - m_processCpu) * 100) / (cpu - m_cpu);
+            }
+            if (busy && m_processCpu){
+                m_totalUsage = ((busy - m_busyCpu) * 100) / (cpu - m_cpu);
             }
             m_cpu = cpu;
-            m_process_cpu = process_cpu;
+            m_processCpu = process_cpu;
+            m_busyCpu = busy;
         }
 
     private:
@@ -364,15 +412,22 @@ namespace{
         }
 
         /** Calculate total cpu jiffies */
-        qulonglong getCpu() {
-            qulonglong result = 0;
+        void getCpu(qulonglong &busy, qulonglong &total){
+            busy = 0;
+            total = 0;
 
             QString proc_stat = getSystemOutput("cat /proc/stat | grep \"cpu \"").mid(5);
             QStringList list = proc_stat.split(' ', QString::SkipEmptyParts);
             QStringListIterator iter(list);
-            while (iter.hasNext())
-                result += iter.next().toULongLong();
-            return result;
+            int counter = 0;
+            while (iter.hasNext()){
+                qulonglong value = iter.next().toULongLong();
+                total += value;
+                /** user,nice,system = the first 3 values */
+                if (counter < 3)
+                    busy += value;
+                counter++;
+            }
         }
 
         qulonglong getProcessCpu() {
@@ -390,8 +445,10 @@ namespace{
 
         bool m_initialized;
         quint64 m_cpu;
-        quint64 m_process_cpu;
+        quint64 m_processCpu;
+        quint64 m_busyCpu;
         uint m_usage;
+        uint m_totalUsage;
         timer_t m_timer;
     };
 
@@ -538,6 +595,14 @@ qint64 QnPerformance::currentCpuFrequency() {
 qint64 QnPerformance::currentCpuUsage() {
 #if defined(Q_OS_WIN) || defined(Q_OS_LINUX)
     return refresherInstance()->usage();
+#else
+    return -1;
+#endif
+}
+
+qint64 QnPerformance::currentCpuTotalUsage() {
+#if defined(Q_OS_WIN) || defined(Q_OS_LINUX)
+    return refresherInstance()->totalUsage();
 #else
     return -1;
 #endif

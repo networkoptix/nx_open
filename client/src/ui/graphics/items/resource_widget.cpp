@@ -1,7 +1,10 @@
 #include "resource_widget.h"
+
 #include <cassert>
-#include <QPainter>
-#include <QGraphicsLinearLayout>
+#include <cmath>
+
+#include <QtGui/QPainter>
+#include <QtGui/QGraphicsLinearLayout>
 
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -19,9 +22,7 @@
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/painters/loading_progress_painter.h>
 #include <ui/graphics/painters/paused_painter.h>
-#include <ui/graphics/instruments/transform_listener_instrument.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
-#include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
@@ -29,17 +30,9 @@
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 
-#include <camera/resource_display.h>
-#include <plugins/resources/archive/abstract_archive_stream_reader.h>
-
-#include "camera/camdisplay.h"
-#include "polygonal_shadow_item.h"
-#include "resource_widget_renderer.h"
-#include "utils/settings.h"
-#include "math.h"
 #include "image_button_widget.h"
+#include "image_button_bar.h"
 #include "viewport_bound_widget.h"
-#include "utils/media/ffmpeg_helper.h"
 
 namespace {
 
@@ -81,11 +74,13 @@ namespace {
     };
 
     typedef QnGlContextData<QnLoadingProgressPainter, QnLoadingProgressPainterFactory> QnLoadingProgressPainterStorage;
-    Q_GLOBAL_STATIC(QnLoadingProgressPainterStorage, qn_loadingProgressPainterStorage);
+    Q_GLOBAL_STATIC(QnLoadingProgressPainterStorage, qn_resourceWidget_loadingProgressPainterStorage);
 
-    /** Paused painter storage. */
-    Q_GLOBAL_STATIC(QnGlContextData<QnPausedPainter>, qn_pausedPainterStorage);
-}
+    Q_GLOBAL_STATIC(QnGlContextData<QnPausedPainter>, qn_resourceWidget_pausedPainterStorage);
+
+    Q_GLOBAL_STATIC(QnDefaultDeviceVideoLayout, qn_resourceWidget_defaultContentLayout);
+
+} // anonymous namespace
 
 
 // -------------------------------------------------------------------------- //
@@ -95,41 +90,27 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     base_type(parent),
     QnWorkbenchContextAware(context),
     m_item(item),
-    m_videoLayout(NULL),
-    m_channelCount(0),
-    m_renderer(NULL),
+    m_channelsLayout(NULL),
     m_aspectRatio(-1.0),
     m_enclosingAspectRatio(1.0),
     m_frameWidth(-1.0),
     m_frameOpacity(1.0),
     m_aboutToBeDestroyedEmitted(false),
-    m_displayFlags(DisplaySelectionOverlay | DisplayButtons),
-    m_motionMaskValid(false),
-    m_motionMaskBinDataValid(false),
-    m_motionDrawType(DrawMaskOnly)
+    m_displayFlags(DisplaySelectionOverlay | DisplayButtons)
 {
     setAcceptHoverEvents(true);
 
     /* Set up shadow. */
-    m_shadow = new QnPolygonalShadowItem();
-    QnPolygonalShadowItem *shadow = m_shadow.data();
-    shadow->setParent(this);
-    shadow->setColor(qnGlobals->shadowColor());
-    shadow->setShapeProvider(this);
-    setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);
+    shadowItem()->setColor(qnGlobals->shadowColor());
     setShadowDisplacement(defaultShadowDisplacement);
-    invalidateShadowShape();
-
 
     /* Set up frame. */
     setFrameWidth(0.0);
-
 
     /* Set up overlay widgets. */
     QFont font = this->font();
     font.setPixelSize(20);
     setFont(font);
-
     {
         QPalette palette = this->palette();
         palette.setColor(QPalette::WindowText, overlayTextColor);
@@ -137,11 +118,9 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     }
 
     /* Header overlay. */
-    m_headerTitleLabel = new GraphicsLabel();
-    m_headerTitleLabel->setAcceptedMouseButtons(0);
-    m_headerTitleLabel->setPerformanceHint(QStaticText::AggressiveCaching);
-
-    qreal buttonSize = 24; /* In pixels. */
+    m_headerLabel = new GraphicsLabel();
+    m_headerLabel->setAcceptedMouseButtons(0);
+    m_headerLabel->setPerformanceHint(QStaticText::AggressiveCaching);
 
 #if 0
     QnImageButtonWidget *togglePinButton = new QnImageButtonWidget();
@@ -153,61 +132,50 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     headerLayout->addItem(togglePinButton);
 #endif
 
-    m_infoButton = new QnImageButtonWidget();
-    m_infoButton->setParent(this);
-    m_infoButton->setIcon(qnSkin->icon("decorations/item_info.png"));
-    m_infoButton->setPreferredSize(headerButtonSize);
-    m_infoButton->setCheckable(true);
-    m_infoButton->setProperty(Qn::NoBlockMotionSelection, true);
-    connect(m_infoButton, SIGNAL(toggled(bool)), this, SLOT(fadeInfo(bool)));
-
-    m_closeButton = new QnImageButtonWidget();
-    m_closeButton->setParent(this);
-    m_closeButton->setIcon(qnSkin->icon("decorations/item_close.png"));
-    m_closeButton->setPreferredSize(headerButtonSize);
-    m_closeButton->setProperty(Qn::NoBlockMotionSelection, true);
-    connect(m_closeButton, SIGNAL(clicked()), this, SLOT(close()));
+    QnImageButtonWidget *closeButton = new QnImageButtonWidget();
+    closeButton->setIcon(qnSkin->icon("decorations/item_close.png"));
+    closeButton->setProperty(Qn::NoBlockMotionSelection, true);
+    connect(closeButton, SIGNAL(clicked()), this, SLOT(close()));
     connect(accessController()->notifier(item->layout()->resource()), SIGNAL(permissionsChanged(const QnResourcePtr &)), this, SLOT(updateButtonsVisibility()));
+
+    QnImageButtonWidget *infoButton = new QnImageButtonWidget();
+    infoButton->setIcon(qnSkin->icon("decorations/item_info.png"));
+    infoButton->setCheckable(true);
+    infoButton->setProperty(Qn::NoBlockMotionSelection, true);
+    connect(infoButton, SIGNAL(toggled(bool)), this, SLOT(setInfoVisible(bool)));
     
-    m_rotateButton = new QnImageButtonWidget();
-    m_rotateButton->setParent(this);
-    m_rotateButton->setIcon(qnSkin->icon("decorations/item_rotate.png"));
-    m_rotateButton->setPreferredSize(headerButtonSize);
-    m_rotateButton->setProperty(Qn::NoBlockMotionSelection, true);
-    connect(m_rotateButton, SIGNAL(pressed()), this, SIGNAL(rotationStartRequested()));
-    connect(m_rotateButton, SIGNAL(released()), this, SIGNAL(rotationStopRequested()));
+    QnImageButtonWidget *rotateButton = new QnImageButtonWidget();
+    rotateButton->setIcon(qnSkin->icon("decorations/item_rotate.png"));
+    rotateButton->setProperty(Qn::NoBlockMotionSelection, true);
+    connect(rotateButton, SIGNAL(pressed()), this, SIGNAL(rotationStartRequested()));
+    connect(rotateButton, SIGNAL(released()), this, SIGNAL(rotationStopRequested()));
 
-    m_searchButton = new QnImageButtonWidget();
-    m_searchButton->setParent(this);
-    m_searchButton->setIcon(qnSkin->icon("decorations/item_search.png"));
-    m_searchButton->setPreferredSize(headerButtonSize);
-    m_searchButton->setCheckable(true);
-    m_searchButton->setProperty(Qn::NoBlockMotionSelection, true);
-    connect(m_searchButton, SIGNAL(toggled(bool)), this, SLOT(at_searchButton_toggled(bool)));
+    m_buttonBar = new QnImageButtonBar();
+    m_buttonBar->setUniformButtonSize(QSizeF(24.0, 24.0));
+    m_buttonBar->addButton(CloseButton, closeButton);
+    m_buttonBar->addButton(InfoButton, infoButton);
+    m_buttonBar->addButton(RotateButton, rotateButton);
 
-    m_headerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-    m_headerLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-    m_headerLayout->setSpacing(2.0);
-    m_headerLayout->addItem(m_headerTitleLabel);
-    m_headerLayout->addStretch(0x1000); /* Set large enough stretch for the buttons to be placed at the right end of the layout. */
-    m_headerLayout->addItem(m_searchButton);
-    m_headerLayout->addItem(m_rotateButton);
-    m_headerLayout->addItem(m_infoButton);
-    m_headerLayout->addItem(m_closeButton);
+    QGraphicsLinearLayout *headerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+    headerLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    headerLayout->setSpacing(2.0);
+    headerLayout->addItem(m_headerLabel);
+    headerLayout->addStretch(0x1000); /* Set large enough stretch for the buttons to be placed at the right end of the layout. */
+    headerLayout->addItem(m_buttonBar);
 
-    QGraphicsWidget *headerWidget = new QGraphicsWidget();
-    headerWidget->setLayout(m_headerLayout);
-    headerWidget->setAcceptedMouseButtons(0);
-    headerWidget->setAutoFillBackground(true);
+    m_headerWidget = new QGraphicsWidget();
+    m_headerWidget->setLayout(headerLayout);
+    m_headerWidget->setAcceptedMouseButtons(0);
+    m_headerWidget->setAutoFillBackground(true);
     {
-        QPalette palette = headerWidget->palette();
+        QPalette palette = m_headerWidget->palette();
         palette.setColor(QPalette::Window, overlayBackgroundColor);
-        headerWidget->setPalette(palette);
+        m_headerWidget->setPalette(palette);
     }
 
     QGraphicsLinearLayout *headerOverlayLayout = new QGraphicsLinearLayout(Qt::Vertical);
     headerOverlayLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-    headerOverlayLayout->addItem(headerWidget);
+    headerOverlayLayout->addItem(m_headerWidget);
     headerOverlayLayout->addStretch(0x1000);
 
     m_headerOverlayWidget = new QnViewportBoundWidget(this);
@@ -216,17 +184,17 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_headerOverlayWidget->setOpacity(0.0);
 
     /* Footer overlay. */
-    m_footerStatusLabel = new GraphicsLabel();
-    m_footerStatusLabel->setAcceptedMouseButtons(0);
+    m_footerLeftLabel = new GraphicsLabel();
+    m_footerLeftLabel->setAcceptedMouseButtons(0);
 
-    m_footerTimeLabel = new GraphicsLabel();
-    m_footerTimeLabel->setAcceptedMouseButtons(0);
+    m_footerRightLabel = new GraphicsLabel();
+    m_footerRightLabel->setAcceptedMouseButtons(0);
 
     QGraphicsLinearLayout *footerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     footerLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-    footerLayout->addItem(m_footerStatusLabel);
+    footerLayout->addItem(m_footerLeftLabel);
     footerLayout->addStretch(0x1000);
-    footerLayout->addItem(m_footerTimeLabel);
+    footerLayout->addItem(m_footerRightLabel);
 
     m_footerWidget = new QGraphicsWidget();
     m_footerWidget->setLayout(footerLayout);
@@ -249,34 +217,13 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_footerOverlayWidget->setAcceptedMouseButtons(0);
     m_footerOverlayWidget->setOpacity(0.0);
 
-    connect(this, SIGNAL(updateOverlayTextLater()), this, SLOT(updateOverlayText()), Qt::QueuedConnection);
 
-
-    /* Set up motion-related stuff. */
-    m_motionMaskBinData.resize(CL_MAX_CHANNELS);
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
-        m_motionMaskBinData[i] = (__m128i*) qMallocAligned(MD_WIDTH * MD_HEIGHT/8, 32);
-        memset(m_motionMaskBinData[i], 0, MD_WIDTH * MD_HEIGHT/8);
-    }
-
-
-    /* Set up video rendering. */
+    /* Initialize resource. */
     m_resource = qnResPool->getEnabledResourceByUniqueId(item->resourceUid());
     if(!m_resource)
         m_resource = qnResPool->getResourceByUniqId(item->resourceUid());
-    m_display = new QnResourceDisplay(m_resource, this);
-    connect(m_resource.data(), SIGNAL(resourceChanged()), this, SLOT(at_resource_resourceChanged()));
-    connect(m_resource.data(), SIGNAL(nameChanged()), this, SLOT(at_resource_nameChanged()));
-    connect(m_display->camDisplay(), SIGNAL(stillImageChanged()), this, SLOT(updateButtonsVisibility()));
-
-    Q_ASSERT(m_display);
-    m_videoLayout = m_display->videoLayout();
-    Q_ASSERT(m_videoLayout);
-    m_channelCount = m_videoLayout->numberOfChannels();
-
-    m_renderer = new QnResourceWidgetRenderer(m_channelCount);
-    connect(m_renderer, SIGNAL(sourceSizeChanged(const QSize &)), this, SLOT(at_sourceSizeChanged(const QSize &)));
-    m_display->addRenderer(m_renderer);
+    connect(m_resource.data(), SIGNAL(nameChanged()), this, SLOT(updateTitleText()));
+    setChannelLayout(qn_resourceWidget_defaultContentLayout());
 
 
     /* Init static text. */
@@ -284,43 +231,19 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_noDataStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
     m_offlineStaticText.setText(tr("NO SIGNAL"));
     m_offlineStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
-    m_unauthorizedStaticText.setText(tr("UNAUTHORIZED"));
+    m_unauthorizedStaticText.setText(tr("UnauthorizedOverlay"));
     m_unauthorizedStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
     m_unauthorizedStaticText2.setText(tr("Please check authentication information in camera settings"));
     m_unauthorizedStaticText2.setPerformanceHint(QStaticText::AggressiveCaching);
 
-    for (int i = 0; i < 10; ++i) {
-        m_sensStaticText[i].setText(QString::number(i));
-        m_sensStaticText[i].setPerformanceHint(QStaticText::AggressiveCaching);
-    }
-
-
-    /* Set up per-channel state. */
-    m_channelState.resize(m_channelCount);
-
 
     /* Run handlers. */
-    at_resource_nameChanged();
+    updateTitleText();
     updateButtonsVisibility();
 }
 
-
 QnResourceWidget::~QnResourceWidget() {
     ensureAboutToBeDestroyedEmitted();
-
-    delete m_display;
-
-    if(!m_shadow.isNull()) {
-        m_shadow.data()->setShapeProvider(NULL);
-        delete m_shadow.data();
-    }
-
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-        qFreeAligned(m_motionMaskBinData[i]);
-}
-
-const QnResourcePtr &QnResourceWidget::resource() const {
-    return m_display->resource();
 }
 
 void QnResourceWidget::setFrameWidth(qreal frameWidth) {
@@ -334,8 +257,21 @@ void QnResourceWidget::setFrameWidth(qreal frameWidth) {
     setWindowFrameMargins(extendedFrameWidth, extendedFrameWidth, extendedFrameWidth, extendedFrameWidth);
 
     invalidateShadowShape();
-    if(m_shadow.data() != NULL)
-        m_shadow.data()->setSoftWidth(m_frameWidth);
+    if(shadowItem())
+        shadowItem()->setSoftWidth(m_frameWidth);
+}
+
+void QnResourceWidget::setAspectRatio(qreal aspectRatio) {
+    if(qFuzzyCompare(m_aspectRatio, aspectRatio))
+        return;
+
+    QRectF enclosingGeometry = this->enclosingGeometry();
+    m_aspectRatio = aspectRatio;
+
+    updateGeometry(); /* Discard cached size hints. */
+    setGeometry(expanded(m_aspectRatio, enclosingGeometry, Qt::KeepAspectRatio));
+
+    emit aspectRatioChanged();
 }
 
 void QnResourceWidget::setEnclosingAspectRatio(qreal enclosingAspectRatio) {
@@ -357,51 +293,56 @@ void QnResourceWidget::setEnclosingGeometry(const QRectF &enclosingGeometry) {
 }
 
 void QnResourceWidget::setGeometry(const QRectF &geometry) {
-    /* Unfortunately, widgets with constant aspect ratio cannot be implemented
-     * using size hints. So here is one of the workarounds. */
-
-#if 0
-    if(!hasAspectRatio()) {
-        base_type::setGeometry(geometry);
-        return;
-    }
-
-    qreal aspectRatio = geometry.width() / geometry.height();
-    if(qFuzzyCompare(m_aspectRatio, aspectRatio)) {
-        base_type::setGeometry(geometry);
-        return;
-    }
-
-    /* Calculate actual new size. */
-    QSizeF newSize = constrainedSize(geometry.size());
-
-    /* Find anchor point and calculate new position. */
-    QRectF oldGeometry = this->geometry();
-
-    qreal newLeft;
-    if(qFuzzyCompare(oldGeometry.right(), geometry.right())) {
-        newLeft = oldGeometry.right() - newSize.width();
-    } else {
-        newLeft = geometry.left();
-    }
-
-    qreal newTop;
-    if(qFuzzyCompare(oldGeometry.bottom(), geometry.bottom())) {
-        newTop = oldGeometry.bottom() - newSize.height();
-    } else {
-        newTop = geometry.top();
-    }
-
-    base_type::setGeometry(QRectF(QPointF(newLeft, newTop), newSize));
-#endif
-
-    QSizeF oldSize = size();
-
     base_type::setGeometry(geometry);
     setTransformOriginPoint(rect().center());
 
     m_headerOverlayWidget->setDesiredSize(size());
     m_footerOverlayWidget->setDesiredSize(size());
+}
+
+QString QnResourceWidget::titleText() const {
+    return m_headerLabel->text();
+}
+
+void QnResourceWidget::setTitleText(const QString &titleText) {
+    m_headerLabel->setText(titleText);
+}
+
+QString QnResourceWidget::calculateTitleText() const {
+    return m_resource->getName();
+}
+
+void QnResourceWidget::updateTitleText() {
+    setTitleText(calculateTitleText());
+}
+
+QString QnResourceWidget::infoText() {
+    QString leftText = m_footerLeftLabel->text();
+    QString rightText = m_footerRightLabel->text();
+    
+    return rightText.isEmpty() ? leftText : (leftText + QLatin1Char('\t') + rightText);
+}
+
+void QnResourceWidget::setInfoText(const QString &infoText) {
+    QString leftText = infoText;
+    QString rightText;
+
+    int index = leftText.indexOf(QLatin1Char('\t'));
+    if(index != -1) {
+        rightText = leftText.mid(index + 1);
+        leftText = leftText.mid(0, index);
+    }
+
+    m_footerLeftLabel->setText(leftText);
+    m_footerRightLabel->setText(rightText);
+}
+
+QString QnResourceWidget::calculateInfoText() const {
+    return QString();
+}
+
+void QnResourceWidget::updateInfoText() {
+    setInfoText(calculateInfoText());
 }
 
 QSizeF QnResourceWidget::constrainedSize(const QSizeF constraint) const {
@@ -424,128 +365,49 @@ QSizeF QnResourceWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) 
 }
 
 QRectF QnResourceWidget::channelRect(int channel) const {
-    if (m_channelCount == 1)
+    if (m_channelsLayout->numberOfChannels() == 1)
         return QRectF(QPointF(0.0, 0.0), size());
 
     QSizeF size = this->size();
-    qreal w = size.width() / m_videoLayout->width();
-    qreal h = size.height() / m_videoLayout->height();
+    qreal w = size.width() / m_channelsLayout->width();
+    qreal h = size.height() / m_channelsLayout->height();
 
     return QRectF(
-        w * m_videoLayout->h_position(channel),
-        h * m_videoLayout->v_position(channel),
+        w * m_channelsLayout->h_position(channel),
+        h * m_channelsLayout->v_position(channel),
         w,
         h
     );
 }
 
-void QnResourceWidget::showActivityDecorations() {
-    setDisplayFlag(DisplayActivityOverlay, true);
+bool QnResourceWidget::isDecorationsVisible() const {
+    return !qFuzzyIsNull(m_headerOverlayWidget->opacity()); /* Note that it's OK to check only header opacity here. */
 }
 
-void QnResourceWidget::hideActivityDecorations() {
-    setDisplayFlag(DisplayActivityOverlay, false);
-}
+void QnResourceWidget::setDecorationsVisible(bool visible, bool animate) {
+    qreal opacity = visible ? 1.0 : 0.0;
 
-void QnResourceWidget::fadeOutOverlay() {
-    opacityAnimator(m_footerOverlayWidget, 1.0)->animateTo(0.0);
-    opacityAnimator(m_headerOverlayWidget, 1.0)->animateTo(0.0);
-}
-
-void QnResourceWidget::fadeInOverlay() {
-    opacityAnimator(m_footerOverlayWidget, 1.0)->animateTo(1.0);
-    opacityAnimator(m_headerOverlayWidget, 1.0)->animateTo(1.0);
-}
-
-void QnResourceWidget::fadeOutInfo() {
-    opacityAnimator(m_footerWidget, 1.0)->animateTo(0.0);
-}
-
-void QnResourceWidget::fadeInInfo() {
-    updateOverlayText();
-    
-    opacityAnimator(m_footerWidget, 1.0)->animateTo(1.0);
-}
-
-void QnResourceWidget::fadeInfo(bool fadeIn) {
-    if(fadeIn) {
-        fadeInInfo();
+    if(animate) {
+        opacityAnimator(m_footerOverlayWidget, 1.0)->animateTo(opacity);
+        opacityAnimator(m_headerOverlayWidget, 1.0)->animateTo(opacity);
     } else {
-        fadeOutInfo();
+        m_footerOverlayWidget->setOpacity(opacity);
+        m_headerOverlayWidget->setOpacity(opacity);
     }
 }
 
-void QnResourceWidget::invalidateMotionMask() {
-    m_motionMaskValid = false;
+bool QnResourceWidget::isInfoVisible() const {
+    return !qFuzzyIsNull(m_footerWidget->opacity());
 }
 
-void QnResourceWidget::addToMotionRegion(int sensitivity, const QRect& rect, int channel) {
-    ensureMotionMask();
+void QnResourceWidget::setInfoVisible(bool visible, bool animate) {
+    qreal opacity = visible ? 1.0 : 0.0;
 
-    m_motionRegionList[channel].addRect(sensitivity, rect);
-
-    /*
-    QnMotionRegion newRegion = m_motionRegionList[channel];
-    newRegion.addRect(sens, rect);
-    if (newRegion.isValid()) 
-    {
-        m_motionRegionList[channel] = newRegion;
-        invalidateMotionMaskBinData();
+    if(animate) {
+        opacityAnimator(m_footerWidget, 1.0)->animateTo(opacity);
+    } else {
+        m_footerWidget->setOpacity(opacity);
     }
-    return newRegion.isValid();
-    */
-}
-
-bool QnResourceWidget::setMotionRegionSensitivity(int sensitivity, const QPoint &gridPos, int channel) {
-    ensureMotionMask();
-
-    return m_motionRegionList[channel].updateSensitivityAt(gridPos, sensitivity);
-}
-
-void QnResourceWidget::clearMotionRegions() {
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-        m_motionRegionList[i] = QnMotionRegion();
-    m_motionMaskValid = true;
-
-    invalidateMotionMaskBinData();
-}
-
-void QnResourceWidget::ensureMotionMask()
-{
-    if(m_motionMaskValid)
-        return;
-
-    if (QnSecurityCamResourcePtr camera = m_resource.dynamicCast<QnSecurityCamResource>()) {
-        m_motionRegionList = camera->getMotionRegionList();
-
-        while(m_motionRegionList.size() < CL_MAX_CHANNELS)
-            m_motionRegionList.push_back(QnMotionRegion()); /* Just to feel safe. */
-    }
-    m_motionMaskValid = true;
-}
-
-void QnResourceWidget::ensureMotionMaskBinData() {
-    if(m_motionMaskBinDataValid)
-        return;
-
-    ensureMotionMask();
-    Q_ASSERT(((unsigned long)m_motionMaskBinData[0])%16 == 0);
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-        QnMetaDataV1::createMask(m_motionRegionList[i].getMotionMask(), (char*)m_motionMaskBinData[i]);
-}
-
-void QnResourceWidget::invalidateMotionMaskBinData() {
-    m_motionMaskBinDataValid = false;
-}
-
-void QnResourceWidget::setOverlayIcon(int channel, OverlayIcon icon) {
-    ChannelState &state = m_channelState[channel];
-    if(state.icon == icon)
-        return;
-
-    state.iconFadeInNeeded = state.icon == NO_ICON;
-    state.iconChangeTimeMSec = qnSyncTime->currentMSecsSinceEpoch();
-    state.icon = icon;
 }
 
 Qt::WindowFrameSection QnResourceWidget::windowFrameSectionAt(const QPointF &pos) const {
@@ -570,80 +432,6 @@ void QnResourceWidget::ensureAboutToBeDestroyedEmitted() {
     emit aboutToBeDestroyed();
 }
 
-int QnResourceWidget::motionGridWidth() const
-{
-    return MD_WIDTH * m_videoLayout->width();
-}
-
-int QnResourceWidget::motionGridHeight() const
-{
-    return MD_HEIGHT * m_videoLayout->height();
-}
-
-QPoint QnResourceWidget::mapToMotionGrid(const QPointF &itemPos)
-{
-    QPointF gridPosF(cwiseDiv(itemPos, toPoint(cwiseDiv(size(), QSizeF(motionGridWidth(), motionGridHeight())))));
-    QPoint gridPos(qFuzzyFloor(gridPosF.x()), qFuzzyFloor(gridPosF.y()));
-
-    return bounded(gridPos, QRect(0, 0, motionGridWidth(), motionGridHeight()));
-}
-
-QPointF QnResourceWidget::mapFromMotionGrid(const QPoint &gridPos) {
-    return cwiseMul(gridPos, toPoint(cwiseDiv(size(), QSizeF(motionGridWidth(), motionGridHeight()))));
-}
-
-void QnResourceWidget::addToMotionSelection(const QRect &gridRect) 
-{
-    QList<QRegion> prevSelection;
-    QList<QRegion> newSelection;
-
-    ensureMotionMask();
-
-    for (int i = 0; i < m_channelState.size(); ++i)
-    {
-        prevSelection << m_channelState[i].motionSelection;
-
-        QRect r(0, 0, MD_WIDTH, MD_HEIGHT);
-        r.translate(m_videoLayout->h_position(i)*MD_WIDTH, m_videoLayout->v_position(i)*MD_HEIGHT);
-        r = gridRect.intersected(r);
-
-        if (r.width() > 0 && r.height() > 0) 
-        {
-            QRegion r1(r);
-            r1.translate(-m_videoLayout->h_position(i)*MD_WIDTH, -m_videoLayout->v_position(i)*MD_HEIGHT);
-            r1 -= m_motionRegionList[i].getMotionMask();
-
-            m_channelState[i].motionSelection += r1;
-        }
-
-        newSelection << m_channelState[i].motionSelection;
-    }
-
-    if(prevSelection != newSelection)
-        emit motionSelectionChanged();
-}
-
-void QnResourceWidget::clearMotionSelection() 
-{
-    bool allEmpty = true;
-    foreach(const ChannelState &state, m_channelState)
-        allEmpty &= state.motionSelection.isEmpty();
-    if (allEmpty)
-        return;
-
-    for (int i = 0; i < m_channelState.size(); ++i)
-        m_channelState[i].motionSelection = QRegion();
-
-    emit motionSelectionChanged();
-}
-
-QList<QRegion> QnResourceWidget::motionSelection() const {
-    QList<QRegion> result;
-    foreach(const ChannelState &state, m_channelState)
-        result.push_back(state.motionSelection);
-    return result;
-}
-
 void QnResourceWidget::setDisplayFlags(DisplayFlags flags) {
     if(m_displayFlags == flags)
         return;
@@ -651,257 +439,98 @@ void QnResourceWidget::setDisplayFlags(DisplayFlags flags) {
     DisplayFlags changedFlags = m_displayFlags ^ flags;
     m_displayFlags = flags;
 
-    if(changedFlags & DisplayMotion) {
-        QnAbstractArchiveReader *reader = m_display->archiveReader();
-        if (reader)
-            reader->setSendMotion(flags & DisplayMotion);
-
-        m_searchButton->setChecked(flags & DisplayMotion);
-
-        if(flags & DisplayMotion) {
-            setProperty(Qn::MotionSelectionModifiers, 0);
-        } else {
-            setProperty(Qn::MotionSelectionModifiers, QVariant()); /* Use defaults. */
-        }
-    }
-
     if(changedFlags & DisplayButtons)
         m_headerOverlayWidget->setVisible(flags & DisplayButtons);
 
+    displayFlagsChangedNotify(changedFlags);
     emit displayFlagsChanged();
 }
 
-void QnResourceWidget::updateOverlayText() {
-    qint64 time = m_renderer->lastDisplayedTime(0);
-    if (time > 1000000ll * 3600 * 24) /* Do not show time for regular media files. */ // TODO: try to avoid time comparison hacks.
-        m_footerTimeLabel->setText(QDateTime::fromMSecsSinceEpoch(time/1000).toString(tr("hh:mm:ss.zzz")));
-
-    qreal fps = 0.0;
-    qreal mbps = 0.0;
-    for(int i = 0; i < m_channelCount; i++) {
-        const QnStatistics *statistics = m_display->mediaProvider()->getStatistics(i);
-        fps = qMax(fps, static_cast<qreal>(statistics->getFrameRate()));
-        mbps += statistics->getBitrate();
-    }
-
-    QSize size = m_display->camDisplay()->getFrameSize(0); // TODO: roma, check implementation.
-    if(size.isEmpty())
-        size = QSize(0, 0);
-
-    QString codecName;
-    QnMediaContextPtr codec = m_display->mediaProvider()->getCodecContext();
-    if (codec && codec->ctx())
-        codecName = codecIDToString(codec->ctx()->codec_id);
-    m_footerStatusLabel->setText(tr("%1x%2 %3fps @ %4Mbps (%5)").arg(size.width()).arg(size.height()).arg(fps, 0, 'f', 2).arg(mbps, 0, 'f', 2).arg(codecName));
+const QSize &QnResourceWidget::channelScreenSize() const {
+    return m_channelScreenSize;
 }
 
-void QnResourceWidget::updateButtonsVisibility() {
-    bool closeButtonVisible = false;
-    if(item() && item()->layout()) {
-        Qn::Permissions requiredPermissions = Qn::WritePermission | Qn::AddRemoveItemsPermission;
-        closeButtonVisible = (accessController()->permissions(item()->layout()->resource()) & requiredPermissions) == requiredPermissions;
-    }
-
-    bool infoButtonVisible = !display()->camDisplay()->isStillImage();
-    bool searchButtonVisible = m_resource.dynamicCast<QnSecurityCamResource>();
-
-    if(m_closeButton->isVisible() != closeButtonVisible || m_infoButton->isVisible() != infoButtonVisible || m_searchButton->isVisible() != searchButtonVisible) {
-        m_infoButton->setVisible(infoButtonVisible);
-        m_closeButton->setVisible(closeButtonVisible);
-        m_searchButton->setVisible(searchButtonVisible);
-        
-        m_headerLayout->removeItem(m_searchButton);
-        m_headerLayout->removeItem(m_rotateButton);
-        m_headerLayout->removeItem(m_infoButton);
-        m_headerLayout->removeItem(m_closeButton);
-
-        if(searchButtonVisible)
-            m_headerLayout->addItem(m_searchButton);
-        m_headerLayout->addItem(m_rotateButton);
-        if(infoButtonVisible)
-            m_headerLayout->addItem(m_infoButton);
-        if(closeButtonVisible)
-            m_headerLayout->addItem(m_closeButton);
-    }
-}
-
-
-// -------------------------------------------------------------------------- //
-// Shadow
-// -------------------------------------------------------------------------- //
-void QnResourceWidget::setShadowDisplacement(const QPointF &displacement) {
-    m_shadowDisplacement = displacement;
-
-    updateShadowPos();
-}
-
-QPolygonF QnResourceWidget::provideShape() {
-    QTransform transform = sceneTransform();
-    QPointF zero = transform.map(QPointF());
-    transform = transform * QTransform::fromTranslate(-zero.x(), -zero.y());
-
-    qreal fw2 = m_frameWidth / 2;
-    return transform.map(QPolygonF(QRectF(QPointF(0, 0), size()).adjusted(-fw2, -fw2, fw2, fw2)));
-}
-
-void QnResourceWidget::invalidateShadowShape() {
-    if(m_shadow.isNull())
+void QnResourceWidget::setChannelScreenSize(const QSize &size) {
+    if(size == m_channelScreenSize)
         return;
 
-    m_shadow.data()->invalidateShape();
+    m_channelScreenSize = size;
+
+    channelScreenSizeChangedNotify();
 }
 
-void QnResourceWidget::updateShadowZ() {
-    if(!m_shadow.isNull()) {
-        /* Shadow Z value is managed by workbench display. */
-        // m_shadow.data()->setZValue(zValue());
-        m_shadow.data()->stackBefore(this);
-    }
-}
+QnResourceWidget::Buttons QnResourceWidget::calculateButtonsVisibility() const {
+    Buttons result = InfoButton | RotateButton;
 
-void QnResourceWidget::updateShadowPos() {
-    if(!m_shadow.isNull())
-        m_shadow.data()->setPos(mapToScene(0.0, 0.0) + m_shadowDisplacement);
-}
-
-void QnResourceWidget::updateShadowOpacity() {
-    if(!m_shadow.isNull())
-        m_shadow.data()->setOpacity(opacity());
-}
-
-void QnResourceWidget::updateShadowVisibility() {
-    if(!m_shadow.isNull())
-        m_shadow.data()->setVisible(isVisible());
-}
-
-
-// -------------------------------------------------------------------------- //
-// Handlers
-// -------------------------------------------------------------------------- //
-QVariant QnResourceWidget::itemChange(GraphicsItemChange change, const QVariant &value) {
-    switch(change) {
-    case ItemPositionHasChanged:
-        updateShadowPos();
-        break;
-    case ItemTransformHasChanged:
-    case ItemRotationHasChanged:
-    case ItemScaleHasChanged:
-    case ItemTransformOriginPointHasChanged:
-        invalidateShadowShape();
-        updateShadowPos();
-        break;
-    case ItemSceneHasChanged:
-        if(scene() && !m_shadow.isNull()) {
-            scene()->addItem(m_shadow.data());
-            updateShadowZ();
-            updateShadowPos();
-        }
-        break;
-    case ItemOpacityHasChanged:
-        updateShadowOpacity();
-        break;
-    case ItemZValueHasChanged:
-        updateShadowZ();
-        break;
-    case ItemVisibleHasChanged:
-        updateShadowVisibility();
-        break;
-    default:
-        break;
-    }
-
-    return base_type::itemChange(change, value);
-}
-
-void QnResourceWidget::resizeEvent(QGraphicsSceneResizeEvent *event) {
-    invalidateShadowShape();
-
-    base_type::resizeEvent(event);
-}
-
-bool QnResourceWidget::windowFrameEvent(QEvent *event) {
-    bool result = base_type::windowFrameEvent(event);
-
-    if(event->type() == QEvent::GraphicsSceneHoverMove) {
-        QGraphicsSceneHoverEvent *e = static_cast<QGraphicsSceneHoverEvent *>(event);
-
-        /* Qt does not unset a cursor unless mouse pointer leaves widget's frame.
-         *
-         * As this widget may not have a frame section associated with some parts of
-         * its frame, cursor must be unset manually. */
-        Qt::WindowFrameSection section = windowFrameSectionAt(e->pos());
-        if(section == Qt::NoSection)
-            unsetCursor();
+    if(item() && item()->layout()) {
+        Qn::Permissions requiredPermissions = Qn::WritePermission | Qn::AddRemoveItemsPermission;
+        if((accessController()->permissions(item()->layout()->resource()) & requiredPermissions) == requiredPermissions)
+            result |= CloseButton;
     }
 
     return result;
 }
 
-void QnResourceWidget::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
-    fadeInOverlay();
-
-    base_type::hoverEnterEvent(event);
+void QnResourceWidget::updateButtonsVisibility() {
+    m_buttonBar->setButtonsVisibility(calculateButtonsVisibility());
 }
 
-void QnResourceWidget::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
-    if(qFuzzyIsNull(m_headerOverlayWidget->opacity()))
-        fadeInOverlay();
 
-    base_type::hoverMoveEvent(event);
+QnResourceWidget::Overlay QnResourceWidget::channelOverlay(int channel) const {
+    return m_channelState[channel].overlay;
 }
 
-void QnResourceWidget::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
-    if(!m_infoButton->isChecked())
-        fadeOutOverlay();
-
-    base_type::hoverLeaveEvent(event);
-}
-
-void QnResourceWidget::at_sourceSizeChanged(const QSize &size) {
-    qreal oldAspectRatio = m_aspectRatio;
-    qreal newAspectRatio = static_cast<qreal>(size.width() * m_videoLayout->width()) / (size.height() * m_videoLayout->height());
-    if(qFuzzyCompare(oldAspectRatio, newAspectRatio))
+void QnResourceWidget::setChannelOverlay(int channel, Overlay overlay) {
+    ChannelState &state = m_channelState[channel];
+    if(state.overlay == overlay)
         return;
 
-    QRectF enclosingGeometry = this->enclosingGeometry();
-    m_aspectRatio = newAspectRatio;
-
-    updateGeometry(); /* Discard cached size hints. */
-    setGeometry(expanded(m_aspectRatio, enclosingGeometry, Qt::KeepAspectRatio));
-
-    emit aspectRatioChanged(oldAspectRatio, newAspectRatio);
+    state.fadeInNeeded = state.overlay == EmptyOverlay;
+    state.changeTimeMSec = QDateTime::currentMSecsSinceEpoch();
+    state.overlay = overlay;
 }
 
-void QnResourceWidget::at_resource_resourceChanged() {
-    invalidateMotionMask();
+QnResourceWidget::Overlay QnResourceWidget::calculateChannelOverlay(int channel) const {
+    QnResource::Status resourceStatus = m_resource->getStatus();
+
+    if (resourceStatus == QnResource::Offline) {
+        return OfflineOverlay;
+    } else if (resourceStatus == QnResource::Unauthorized) {
+        return UnauthorizedOverlay;
+    } else {
+        Qn::RenderStatus renderStatus = m_channelState[channel].renderStatus;
+        qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
+
+        if(renderStatus != Qn::NewFrameRendered && (renderStatus != Qn::OldFrameRendered || currentTimeMSec - m_channelState[channel].lastNewFrameTimeMSec >= defaultLoadingTimeoutMSec)) {
+            return LoadingOverlay;
+        } else {
+            return EmptyOverlay;
+        }
+    }
 }
 
-void QnResourceWidget::at_resource_nameChanged() {
-    m_headerTitleLabel->setText(m_resource->getName());
+void QnResourceWidget::updateChannelOverlay(int channel) {
+    setChannelOverlay(channel, calculateChannelOverlay(channel));
 }
 
-void QnResourceWidget::at_searchButton_toggled(bool checked) {
-    setDisplayFlag(DisplayMotion, checked);
+void QnResourceWidget::setChannelLayout(const QnVideoResourceLayout *channelLayout) {
+    if(m_channelsLayout == channelLayout)
+        return;
+
+    m_channelsLayout = channelLayout;
+
+    m_channelState.resize(m_channelsLayout->numberOfChannels());
+    channelLayoutChangedNotify();
 }
+
+int QnResourceWidget::channelCount() const {
+    return m_channelsLayout->numberOfChannels();
+}
+
 
 // -------------------------------------------------------------------------- //
 // Painting
 // -------------------------------------------------------------------------- //
-void QnResourceWidget::drawFlashingText(QPainter *painter, const QStaticText &text, qreal textSize, const QPointF &offset) {
-    qreal unit = qnGlobals->workbenchUnitSize();
-
-    QFont font;
-    font.setPointSizeF(textSize * unit);
-    font.setStyleHint(QFont::SansSerif, QFont::ForceOutline);
-    QnScopedPainterFontRollback fontRollback(painter, font);
-    QnScopedPainterPenRollback penRollback(painter, QPen(QColor(255, 208, 208, 196)));
-    
-    qreal opacity = painter->opacity();
-    painter->setOpacity(opacity * qAbs(sin(qnSyncTime->currentMSecsSinceEpoch() / qreal(TEXT_FLASHING_PERIOD * 2) * M_PI)));
-    painter->drawStaticText(rect().center() - toPoint(text.size() / 2) + offset * unit, text);
-    painter->setOpacity(opacity);
-}
-
 void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/) {
     if (painter->paintEngine() == NULL) {
         qnWarning("No OpenGL-compatible paint engine was found.");
@@ -914,8 +543,8 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     }
 
     if(m_pausedPainter.isNull()) {
-        m_pausedPainter = qn_pausedPainterStorage()->get(QGLContext::currentContext());
-        m_loadingProgressPainter = qn_loadingProgressPainterStorage()->get(QGLContext::currentContext());
+        m_pausedPainter = qn_resourceWidget_pausedPainterStorage()->get(QGLContext::currentContext());
+        m_loadingProgressPainter = qn_resourceWidget_loadingProgressPainterStorage()->get(QGLContext::currentContext());
     }
 
     QnScopedPainterPenRollback penRollback(painter);
@@ -923,97 +552,38 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     QnScopedPainterFontRollback fontRollback(painter);
 
     /* Update screen size of a single channel. */
-    QSizeF itemScreenSize = painter->combinedTransform().mapRect(boundingRect()).size();
-    QSize channelScreenSize = QSizeF(itemScreenSize.width() / m_videoLayout->width(), itemScreenSize.height() / m_videoLayout->height()).toSize();
-    if(channelScreenSize != m_channelScreenSize) {
-        m_channelScreenSize = channelScreenSize;
-        m_renderer->setChannelScreenSize(m_channelScreenSize);
-    }
+    setChannelScreenSize(painter->combinedTransform().mapRect(channelRect(0)).size().toSize());
 
-    qint64 currentTimeMSec = qnSyncTime->currentMSecsSinceEpoch();
-    painter->beginNativePainting();
-    //glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
 
-    for(int i = 0; i < m_channelCount; i++) {
+    for(int i = 0; i < channelCount(); i++) {
         /* Draw content. */
         QRectF rect = channelRect(i);
-        m_renderStatus = m_renderer->paint(i, rect, effectiveOpacity());
+        Qn::RenderStatus renderStatus = paintChannel(painter, i, rect);
 
         /* Draw black rectangle if nothing was drawn. */
-        if(m_renderStatus != Qn::OldFrameRendered && m_renderStatus != Qn::NewFrameRendered) {
-            glColor4f(0.0, 0.0, 0.0, effectiveOpacity());
-            glBegin(GL_QUADS);
-            glVertices(rect);
-            glEnd();
-        }
+        if(renderStatus != Qn::OldFrameRendered && renderStatus != Qn::NewFrameRendered)
+            painter->fillRect(rect, Qt::black);
 
         /* Update channel state. */
-        if(m_renderStatus == Qn::NewFrameRendered)
+        m_channelState[i].renderStatus = renderStatus;
+        if(renderStatus == Qn::NewFrameRendered)
             m_channelState[i].lastNewFrameTimeMSec = currentTimeMSec;
-
-        /* Set overlay icon. */
-        if (m_display->camDisplay()->isStillImage()) {
-            setOverlayIcon(i, NO_ICON);
-        } else if(m_display->isPaused() && (m_displayFlags & DisplayActivityOverlay)) {
-            setOverlayIcon(i, PAUSED);
-        } else if (m_display->camDisplay()->isRealTimeSource() && m_display->resource()->getStatus() == QnResource::Offline) {
-            setOverlayIcon(i, OFFLINE);
-        } else if (m_display->camDisplay()->isRealTimeSource() && m_display->resource()->getStatus() == QnResource::Unauthorized) {
-            setOverlayIcon(i, UNAUTHORIZED);
-        } else if (m_display->camDisplay()->isNoData()) {
-            setOverlayIcon(i, NO_DATA); 
-        } else if(m_renderStatus != Qn::NewFrameRendered && (m_renderStatus != Qn::OldFrameRendered || currentTimeMSec - m_channelState[i].lastNewFrameTimeMSec >= defaultLoadingTimeoutMSec) && !m_display->isPaused()) {
-            setOverlayIcon(i, LOADING);
-        } else {
-            setOverlayIcon(i, NO_ICON);
-        }
+        updateChannelOverlay(i);
 
         /* Draw overlay icon. */
-        drawOverlayIcon(i, rect);
+        qreal overlayOpacity = 1.0;
+        if(m_channelState[i].fadeInNeeded)
+            overlayOpacity *= qBound(0.0, static_cast<qreal>(currentTimeMSec - m_channelState[i].changeTimeMSec) / defaultOverlayFadeInDurationMSec, 1.0);
+        
+        qreal opacity = painter->opacity();
+        painter->setOpacity(opacity * overlayOpacity);
+        paintOverlay(painter, rect, m_channelState[i].overlay);
+        painter->setOpacity(opacity);
 
         /* Draw selected / not selected overlay. */
-        drawSelection(rect);
+        paintSelection(painter, rect);
     }
-    
-    glDisable(GL_BLEND);
-    //glPopAttrib();
-    painter->endNativePainting();
-
-    for(int i = 0; i < m_channelCount; i++) 
-    {
-        if (m_channelState[i].icon == NO_DATA) {
-            drawFlashingText(painter, m_noDataStaticText, 0.1);
-        } else if (m_channelState[i].icon == OFFLINE) {
-            drawFlashingText(painter, m_offlineStaticText, 0.1);
-        } else if (m_channelState[i].icon == UNAUTHORIZED) {
-            drawFlashingText(painter, m_unauthorizedStaticText, 0.1);
-            drawFlashingText(painter, m_unauthorizedStaticText2, 0.025, QPointF(0.0, 0.1));
-        }
-    }
-
-    /* Draw motion grid. */
-    if (m_displayFlags & DisplayMotion) {
-        for(int i = 0; i < m_channelCount; i++) 
-        {
-            QRectF rect = channelRect(i);
-
-            drawMotionGrid(painter, rect, m_renderer->lastFrameMetadata(i), i);
-
-            drawMotionMask(painter, rect, i);
-
-            /* Selection. */
-            if(!m_channelState[i].motionSelection.isEmpty()) {
-				//drawFilledRegion(painter, rect, m_channelState[i].motionSelection, subColor(qnGlobals->mrsColor(), qnGlobals->selectionOpacityDelta()));
-                QColor clr = subColor(qnGlobals->mrsColor(), QColor(0,0,0, 0xa0));
-                drawFilledRegion(painter, rect, m_channelState[i].motionSelection, clr, clr);
-            }
-        }
-    }
-
-    if(m_footerOverlayWidget->isVisible() && !qFuzzyIsNull(m_footerOverlayWidget->opacity())) 
-        emit updateOverlayTextLater();
 }
 
 void QnResourceWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
@@ -1034,208 +604,122 @@ void QnResourceWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGra
     painter->fillRect(QRectF(w,       0,       fw,          h),  color);
 }
 
-void QnResourceWidget::drawSelection(const QRectF &rect) {
+void QnResourceWidget::paintFlashingText(QPainter *painter, const QStaticText &text, qreal textSize, const QPointF &offset) {
+    qreal unit = channelRect(0).width();
+
+    QFont font;
+    font.setPointSizeF(textSize * unit);
+    font.setStyleHint(QFont::SansSerif, QFont::ForceOutline);
+    QnScopedPainterFontRollback fontRollback(painter, font);
+    QnScopedPainterPenRollback penRollback(painter, QPen(QColor(255, 208, 208, 196)));
+
+    qreal opacity = painter->opacity();
+    painter->setOpacity(opacity * qAbs(std::sin(QDateTime::currentMSecsSinceEpoch() / qreal(TEXT_FLASHING_PERIOD * 2) * M_PI)));
+    painter->drawStaticText(rect().center() - toPoint(text.size() / 2) + offset * unit, text);
+    painter->setOpacity(opacity);
+}
+
+void QnResourceWidget::paintSelection(QPainter *painter, const QRectF &rect) {
     if(!isSelected())
         return;
 
     if(!(m_displayFlags & DisplaySelectionOverlay))
         return;
 
-    QColor color = qnGlobals->selectionColor();
-    color.setAlpha(color.alpha() * effectiveOpacity());
-    glColor(color);
-    glBegin(GL_QUADS);
-    glVertices(rect);
-    glEnd();
+    painter->fillRect(rect, qnGlobals->selectionColor());
 }
 
-void QnResourceWidget::drawOverlayIcon(int channel, const QRectF &rect) {
-    ChannelState &state = m_channelState[channel];
-    if(state.icon == NO_ICON)
+void QnResourceWidget::paintOverlay(QPainter *painter, const QRectF &rect, Overlay overlay) {
+    if(overlay == EmptyOverlay)
         return;
 
-    qint64 currentTimeMSec = qnSyncTime->currentMSecsSinceEpoch();
-    qreal opacityMultiplier = effectiveOpacity() * (state.iconFadeInNeeded ? qBound(0.0, static_cast<qreal>(currentTimeMSec - state.iconChangeTimeMSec) / defaultOverlayFadeInDurationMSec, 1.0) : 1.0);
+    painter->fillRect(rect, QColor(0, 0, 0, 128));
 
-    glColor4f(0.0, 0.0, 0.0, 0.5 * opacityMultiplier);
-    glBegin(GL_QUADS);
-    glVertices(rect);
-    glEnd();
+    if(overlay == LoadingOverlay || overlay == PausedOverlay) {
+        qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
 
-    if(state.icon == NO_DATA)
-        return;
+        painter->beginNativePainting();
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    QRectF iconRect = expanded(
-        1.0,
-        QRectF(
-            rect.center() - toPoint(rect.size()) / 8,
-            rect.size() / 4
-        ),
-        Qt::KeepAspectRatio
-    );
-
-    glPushMatrix();
-    glTranslatef(iconRect.center().x(), iconRect.center().y(), 1.0);
-    glScalef(iconRect.width() / 2, iconRect.height() / 2, 1.0);
-    switch(state.icon) {
-    case LOADING:
-        m_loadingProgressPainter->paint(
-            static_cast<qreal>(currentTimeMSec % defaultProgressPeriodMSec) / defaultProgressPeriodMSec,
-            opacityMultiplier
+        QRectF overlayRect = expanded(
+            1.0,
+            QRectF(
+                rect.center() - toPoint(rect.size()) / 8,
+                rect.size() / 4
+            ),
+            Qt::KeepAspectRatio
         );
-        break;
-    case PAUSED:
-        m_pausedPainter->paint(0.5 * opacityMultiplier);
-        break;
-    default:
-        break;
-    }
-    glPopMatrix();
-}
 
-void QnResourceWidget::drawMotionGrid(QPainter *painter, const QRectF& rect, const QnMetaDataV1Ptr &motion, int channel) {
-    qreal xStep = rect.width() / MD_WIDTH;
-    qreal yStep = rect.height() / MD_HEIGHT;
-
-    ensureMotionMask();
-
-#if 1
-    QVector<QPointF> gridLines;
-
-    for (int x = 0; x < MD_WIDTH; ++x)
-    {
-        if (m_motionRegionList[channel].isEmpty())
-        {
-            gridLines << QPointF(x*xStep, 0.0) << QPointF(x*xStep, rect.height());
+        glPushMatrix();
+        glTranslatef(overlayRect.center().x(), overlayRect.center().y(), 1.0);
+        glScalef(overlayRect.width() / 2, overlayRect.height() / 2, 1.0);
+        if(overlay == LoadingOverlay) {
+            m_loadingProgressPainter->paint(
+                static_cast<qreal>(currentTimeMSec % defaultProgressPeriodMSec) / defaultProgressPeriodMSec,
+                painter->opacity()
+            );
+        } else if(overlay == PausedOverlay) {
+            m_pausedPainter->paint(0.5 * painter->opacity());
         }
-        else {
-            QRegion lineRect(x, 0, 1, MD_HEIGHT+1);
-            QRegion drawRegion = lineRect - m_motionRegionList[channel].getMotionMask().intersect(lineRect);
-            foreach(const QRect& r, drawRegion.rects())
-            {
-                gridLines << QPointF(x*xStep, r.top()*yStep) << QPointF(x*xStep, qMin(rect.height(),(r.top()+r.height())*yStep));
-            }
-        }
+        glPopMatrix();
+
+        glDisable(GL_BLEND);
+        painter->endNativePainting();
     }
 
-    for (int y = 0; y < MD_HEIGHT; ++y) {
-        if (m_motionRegionList[channel].isEmpty()) {
-            gridLines << QPointF(0.0, y*yStep) << QPointF(rect.width(), y*yStep);
-        }
-        else {
-            QRegion lineRect(0, y, MD_WIDTH+1, 1);
-            QRegion drawRegion = lineRect - m_motionRegionList[channel].getMotionMask().intersect(lineRect);
-            foreach(const QRect& r, drawRegion.rects())
-            {
-                gridLines << QPointF(r.left()*xStep, y*yStep) << QPointF(qMin(rect.width(), (r.left()+r.width())*xStep), y*yStep);
-            }
-        }
+    if (overlay == NoDataOverlay) {
+        paintFlashingText(painter, m_noDataStaticText, 0.1);
+    } else if (overlay == OfflineOverlay) {
+        paintFlashingText(painter, m_offlineStaticText, 0.1);
+    } else if (overlay == UnauthorizedOverlay) {
+        paintFlashingText(painter, m_unauthorizedStaticText, 0.1);
+        paintFlashingText(painter, m_unauthorizedStaticText2, 0.025, QPointF(0.0, 0.1));
     }
 
-    QnScopedPainterTransformRollback transformRollback(painter);
-    painter->setPen(QPen(QColor(255, 255, 255, 16)));
-    painter->translate(rect.topLeft());
-    painter->drawLines(gridLines);
-#endif
-
-    if (!motion || motion->channelNumber != channel)
-        return;
-
-    ensureMotionMaskBinData();
-
-    QPainterPath motionPath;
-    motion->removeMotion(m_motionMaskBinData[motion->channelNumber]);
-    for (int y = 0; y < MD_HEIGHT; ++y)
-        for (int x = 0; x < MD_WIDTH; ++x)
-            if(motion->isMotionAt(x, y))
-                motionPath.addRect(QRectF(QPointF(x * xStep, y * yStep), QPointF((x + 1) * xStep, (y + 1) * yStep)));
-    QPen pen(QColor(255, 0, 0, 128));
-    qreal unit = qnGlobals->workbenchUnitSize();
-    pen.setWidth(unit * 0.003);
-    painter->setPen(pen);
-    painter->drawPath(motionPath);
 }
 
-void QnResourceWidget::drawFilledRegion(QPainter *painter, const QRectF &rect, const QRegion &selection, const QColor &color, const QColor &penColor) {
-    QPainterPath path;
-    path.addRegion(selection);
-    path = path.simplified(); // TODO: this is slow.
 
-    QnScopedPainterTransformRollback transformRollback(painter);
-    QnScopedPainterBrushRollback brushRollback(painter, color);
-    painter->translate(rect.topLeft());
-    painter->scale(rect.width() / MD_WIDTH, rect.height() / MD_HEIGHT);
-    painter->setPen(QPen(penColor));
-    painter->drawPath(path);
-}
+// -------------------------------------------------------------------------- //
+// Handlers
+// -------------------------------------------------------------------------- //
+bool QnResourceWidget::windowFrameEvent(QEvent *event) {
+    bool result = base_type::windowFrameEvent(event);
 
-void QnResourceWidget::drawMotionSensitivity(QPainter *painter, const QRectF &rect, const QnMotionRegion& region, int channel)
-{
-    double xStep = rect.width() / (double) MD_WIDTH;
-    double yStep = rect.height() / (double) MD_HEIGHT;
+    if(event->type() == QEvent::GraphicsSceneHoverMove) {
+        QGraphicsSceneHoverEvent *e = static_cast<QGraphicsSceneHoverEvent *>(event);
 
-    painter->setPen(Qt::black);
-    QFont font;
-    qreal unit = qnGlobals->workbenchUnitSize();
-    font.setPointSizeF(0.03 * unit);
-    painter->setFont(font);
-
-    for (int sens = QnMotionRegion::MIN_SENSITIVITY+1; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens)
-    {
-        foreach(const QRect& rect, region.getRectsBySens(sens))
-        {
-            if (rect.width() < 2 || rect.height() < 2)
-                continue;
-            for (int x = rect.left(); x <= rect.right(); ++x)
-            {
-                for (int y = rect.top(); y <= rect.bottom(); ++y)
-                {
-                    painter->drawStaticText(x*xStep + xStep*0.1, y*yStep + yStep*0.1, m_sensStaticText[sens]);
-                    break;
-                }
-                break;
-            }
-        }
+        /* Qt does not unset a cursor unless mouse pointer leaves widget's frame.
+         *
+         * As this widget may not have a frame section associated with some parts of
+         * its frame, cursor must be unset manually. */
+        Qt::WindowFrameSection section = windowFrameSectionAt(e->pos());
+        if(section == Qt::NoSection)
+            unsetCursor();
     }
+
+    return result;
 }
 
-void QnResourceWidget::drawMotionMask(QPainter *painter, const QRectF &rect, int channel)
-{
-    ensureMotionMask();
-    if (m_motionDrawType == DrawAllMotionInfo) 
-    {
-        QnMotionRegion& r = m_motionRegionList[channel];
-        QRegion reg;
-        for (int i = 0; i < 10; ++i) 
-        {
-            QColor clr = i > 0 ? QColor(100 +  i*3, 16*(10-i), 0, 96+i*2) : qnGlobals->motionMaskColor();
-            QRegion reg = m_motionRegionList[channel].getRegionBySens(i);
-            if (i > 0)
-                reg -= m_motionRegionList[channel].getRegionBySens(0);
-            drawFilledRegion(painter, rect, reg, clr, Qt::black);
-        }
+void QnResourceWidget::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
+    setDecorationsVisible(true);
 
-        drawMotionSensitivity(painter, rect, m_motionRegionList[channel], channel);
-    }
-    else {
-        drawFilledRegion(painter, rect, m_motionRegionList[channel].getMotionMask(), qnGlobals->motionMaskColor(), qnGlobals->motionMaskColor());
-    }
+    base_type::hoverEnterEvent(event);
 }
 
-void QnResourceWidget::setDrawMotionWindows(MotionDrawType value)
-{
-    m_motionDrawType = value;   
+void QnResourceWidget::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
+    if(!isDecorationsVisible())
+        setDecorationsVisible(true);
+
+    base_type::hoverMoveEvent(event);
 }
 
-const QList<QnMotionRegion> &QnResourceWidget::getMotionRegionList()
-{
-    ensureMotionMask();
-    return m_motionRegionList;
+void QnResourceWidget::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
+    if(!isInfoVisible())
+        setDecorationsVisible(false);
+
+    base_type::hoverLeaveEvent(event);
 }
 
-bool QnResourceWidget::isMotionSelectionEmpty() const { // TODO: create a separate class for a list of motion regions.
-    foreach(const QRegion &region, motionSelection())
-        if(!region.isEmpty())
-            return false;
-    return true;
-}
+
+

@@ -3,6 +3,7 @@
 #include <core/dataprovider/media_streamdataprovider.h>
 #include <core/resource/resource_media_layout.h>
 #include <core/resource/media_resource.h>
+#include <core/resource/video_server.h>
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
 #include <camera/camdisplay.h>
 #include <camera/camera.h>
@@ -175,6 +176,8 @@ bool QnResourceDisplay::isPaused() {
 }
 
 bool QnResourceDisplay::isStillImage() const {
+    if (resource().dynamicCast<QnVideoServerResource>())
+        return true;
     return m_camera->getCamDisplay()->isStillImage();
 }
 

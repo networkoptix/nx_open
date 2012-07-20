@@ -1,4 +1,4 @@
-#include "qnschedulegridwidget.h"
+#include "schedule_grid_widget.h"
 
 #include <cassert>
 

@@ -29,6 +29,7 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     connect(ui->detailsButton,                  SIGNAL(clicked()),                                                  this,   SLOT(at_licenseDetailsButton_clicked()));
     connect(qnLicensePool,                      SIGNAL(licensesChanged()),                                          this,   SLOT(updateLicenses()));
     connect(ui->gridLicenses->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),   this,   SLOT(at_gridLicenses_currentChanged()));
+    connect(ui->gridLicenses,                   SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)),                  this,   SLOT(at_gridLicenses_itemDoubleClicked(QTreeWidgetItem *, int)));
     connect(ui->licenseWidget,                  SIGNAL(stateChanged()),                                             this,   SLOT(at_licenseWidget_stateChanged()));
 
     updateLicenses();
@@ -117,6 +118,20 @@ void QnLicenseManagerWidget::validateLicense(const QnLicensePtr &license) {
     }
 }
 
+void QnLicenseManagerWidget::showLicenseDetails(const QnLicensePtr &license){
+    QString details = tr("<b>Generic:</b><br />\n"
+        "License Owner: %1<br />\n"
+        "Serial Key: %2<br />\n"
+        "Locked to Hardware ID: %3<br />\n"
+        "<br />\n"
+        "<b>Features:</b><br />\n"
+        "Archive Streams Allowed: %4")
+        .arg(license->name().toUtf8().constData())
+        .arg(license->key().constData())
+        .arg(license->hardwareId().constData())
+        .arg(license->cameraCount());
+    QMessageBox::information(this, tr("License Details"), details);
+}
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -130,7 +145,7 @@ void QnLicenseManagerWidget::at_licensesReceived(int status, const QByteArray &/
     }
 
     QnLicensePtr license = licenses.licenses().front();
-    QString message = m_licenses.haveLicenseKey(license->key()) ? tr("This license is already activated.") : tr("License was succesfully activated.");
+    QString message = m_licenses.haveLicenseKey(license->key()) ? tr("This license is already activated.") : tr("License was successfully activated.");
 
     m_licenses.append(license);
     qnLicensePool->addLicense(license);
@@ -170,21 +185,14 @@ void QnLicenseManagerWidget::at_gridLicenses_currentChanged() {
     ui->detailsButton->setEnabled(ui->gridLicenses->selectionModel()->currentIndex().isValid());
 }
 
+void QnLicenseManagerWidget::at_gridLicenses_itemDoubleClicked(QTreeWidgetItem *item, int) {
+    const QnLicensePtr license = m_licenses.licenses().at(ui->gridLicenses->indexOfTopLevelItem(item));
+    showLicenseDetails(license);
+}
+
 void QnLicenseManagerWidget::at_licenseDetailsButton_clicked() {
     const QnLicensePtr license = m_licenses.licenses().at(ui->gridLicenses->selectionModel()->selectedRows().front().row());
-
-    QString details = tr("<b>Generic:</b><br />\n"
-        "License Owner: %1<br />\n"
-        "Serial Key: %2<br />\n"
-        "Locked to Hardware ID: %3<br />\n"
-        "<br />\n"
-        "<b>Features:</b><br />\n"
-        "Archive Streams Allowed: %4")
-        .arg(license->name().toUtf8().constData())
-        .arg(license->key().constData())
-        .arg(license->hardwareId().constData())
-        .arg(license->cameraCount());
-    QMessageBox::information(this, tr("License Details"), details);
+    showLicenseDetails(license);
 }
 
 void QnLicenseManagerWidget::at_licenseWidget_stateChanged() {

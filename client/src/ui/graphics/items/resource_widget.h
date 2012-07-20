@@ -5,12 +5,10 @@
 #include <QtCore/QVector>
 #include <QtCore/QMetaType>
 #include <QtGui/QStaticText>
-#include <QtGui/QGraphicsWidget>
+
+#include <core/resource/resource_fwd.h>
 
 #include <camera/render_status.h>
-#include <core/resource/motion_window.h>
-#include <core/resource/resource_consumer.h>
-#include <core/datapacket/mediadatapacket.h> /* For QnMetaDataV1Ptr. */
 
 #include <ui/common/constrained_resizable.h>
 #include <ui/common/geometry.h>
@@ -18,32 +16,22 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/graphics/instruments/instrumented.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
-
-#include "polygonal_shadow_item.h"
+#include <ui/graphics/items/shadow/shaded.h>
 
 class QGraphicsLinearLayout;
 
 class QnViewportBoundWidget;
-class QnResourceWidgetRenderer;
 class QnVideoResourceLayout;
 class QnWorkbenchItem;
-class QnResourceDisplay;
-class QnPolygonalShadowItem;
-class QnAbstractArchiveReader;
 
 class QnLoadingProgressPainter;
 class QnPausedPainter;
 class QnImageButtonWidget;
+class QnImageButtonBar;
 
 class GraphicsLabel;
-class Instrument;
 
-/* Get rid of stupid win32 defines. */
-#ifdef NO_DATA
-#   undef NO_DATA
-#endif
-
-class QnResourceWidget: public Instrumented<GraphicsWidget>, public QnWorkbenchContextAware, public QnPolygonalShapeProvider, public ConstrainedResizable, public FrameSectionQuearyable, protected QnGeometry {
+class QnResourceWidget: public Shaded<Instrumented<GraphicsWidget> >, public QnWorkbenchContextAware, public ConstrainedResizable, public FrameSectionQuearyable, protected QnGeometry {
     Q_OBJECT;
     Q_PROPERTY(qreal frameOpacity READ frameOpacity WRITE setFrameOpacity);
     Q_PROPERTY(qreal frameWidth READ frameWidth WRITE setFrameWidth);
@@ -52,7 +40,7 @@ class QnResourceWidget: public Instrumented<GraphicsWidget>, public QnWorkbenchC
     Q_PROPERTY(qreal enclosingAspectRatio READ enclosingAspectRatio WRITE setEnclosingAspectRatio);
     Q_FLAGS(DisplayFlags DisplayFlag);
 
-    typedef Instrumented<GraphicsWidget> base_type;
+    typedef Shaded<Instrumented<GraphicsWidget> > base_type;
 
 public:
     enum DisplayFlag {
@@ -64,10 +52,18 @@ public:
     };
     Q_DECLARE_FLAGS(DisplayFlags, DisplayFlag)
 
+    enum Button {
+        CloseButton                 = 0x1,
+        InfoButton                  = 0x2,
+        RotateButton                = 0x4,
+    };
+    Q_DECLARE_FLAGS(Buttons, Button);
+
     /**
      * Constructor.
      *
-     * \param item                      Workbench item that this resource widget will represent.
+     * \param context                   Context in which this resource widget operates.
+     * \param item                      Workbench item that this widget represents.
      * \param parent                    Parent item.
      */
     QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent = NULL);
@@ -80,13 +76,8 @@ public:
     /**
      * \returns                         Resource associated with this widget.
      */
-    const QnResourcePtr &resource() const;
-
-    /**
-     * \returns                         Associated renderer, if any.
-     */
-    QnResourceWidgetRenderer *renderer() const {
-        return m_renderer;
+    QnResourcePtr resource() const {
+        return m_resource;
     }
 
     /**
@@ -96,20 +87,10 @@ public:
         return m_item.data();
     }
 
-    /**
-     * \returns                         Display associated with this widget.
-     */
-    QnResourceDisplay *display() const {
-        return m_display;
+    const QnVideoResourceLayout *channelLayout() const {
+        return m_channelsLayout;
     }
-
-    /**
-     * \returns                         Shadow item associated with this widget.
-     */
-    QnPolygonalShadowItem *shadow() const {
-        return m_shadow.data();
-    }
-
+    
     /**
      * \returns                         Frame opacity of this widget.
      */
@@ -136,21 +117,6 @@ public:
      */
     void setFrameWidth(qreal frameWidth);
 
-    /**
-     * \returns                         Shadow displacement of this widget.
-     */
-    const QPointF &shadowDisplacement() const {
-        return m_shadowDisplacement;
-    }
-
-    /**
-     * Shadow will be drawn with the given displacement in scene coordinates
-     * relative to this widget.
-     *
-     * \param displacement              New shadow displacement for this widget.
-     */
-    void setShadowDisplacement(const QPointF &displacement);
-
     virtual void setGeometry(const QRectF &geometry) override;
 
     /**
@@ -161,6 +127,8 @@ public:
     qreal aspectRatio() const {
         return m_aspectRatio;
     }
+
+    void setAspectRatio(qreal aspectRatio);
 
     /**
      * \returns                         Whether this widget has an aspect ratio.
@@ -216,208 +184,149 @@ public:
     void setDisplayFlags(DisplayFlags flags);
 
     /**
-     * \returns                         Whether a grid with motion detection is
-     *                                  displayed over a video.
+     * \returns                         Status of the last rendering operation.
      */
-    bool isMotionGridDisplayed() const {
-        return m_displayFlags & DisplayMotion;
+    Qn::RenderStatus currentRenderStatus() const {
+        return m_channelState[0].renderStatus;
     }
 
     /**
-     * \param itemPos                   Point in item coordinates to map to grid coordinates.
-     * \returns                         Coordinates of the motion cell that the given point belongs to.
-     *                                  Note that motion grid is finite, so even if the
-     *                                  passed coordinate lies outside the item boundary,
-     *                                  returned joint will lie inside it.
+     * \returns                         Text of this window's title.
      */
-    QPoint mapToMotionGrid(const QPointF &itemPos);
+    QString titleText() const;
 
     /**
-     * \param gridPos                   Coordinate of the motion grid cell.
-     * \returns                         Position in scene coordinates of the top left corner of the grid cell.
+     * \param titleText                 New title text for this window.
      */
-    QPointF mapFromMotionGrid(const QPoint &gridPos);
+    void setTitleText(const QString &titleText);
 
     /**
-     * \param gridRect                  Rectangle in grid coordinates to add to
-     *                                  selected motion region of this widget.
+     * \returns                         Information text that is displayed in this widget's footer.
      */
-    void addToMotionSelection(const QRect &gridRect);
+    QString infoText();
 
     /**
-     * Clears this widget's motion selection region.
+     * \param infoText                  New text to be displayed in this widget's footer. 
+     *                                  If <tt>'\t'</tt> symbol is used in the text, 
+     *                                  it will be split in two parts at the position of this symbol,
+     *                                  and these parts will be aligned to the sides of the footer.
      */
-    void clearMotionSelection();
+    void setInfoText(const QString &infoText);
 
-    bool isMotionSelectionEmpty() const;
+    bool isDecorationsVisible() const;
+    Q_SLOT void setDecorationsVisible(bool visible, bool animate = true);
 
-    /**
-     * \returns                         Current motion selection regions.
-     */
-    QList<QRegion> motionSelection() const;
-
-    void addToMotionRegion(int sensitivity, const QRect &rect, int channel);
-
-    bool setMotionRegionSensitivity(int sensitivity, const QPoint &gridPos, int channel);
-
-    void clearMotionRegions();
+    bool isInfoVisible() const;
+    Q_SLOT void setInfoVisible(bool visible, bool animate = true);
 
     using base_type::mapRectToScene;
 
-    Qn::RenderStatus currentRenderStatus() const {
-        return m_renderStatus;
-    }
-
-    enum MotionDrawType {
-        DrawMaskOnly,
-        DrawAllMotionInfo
-    };
-
-    const QList<QnMotionRegion> &getMotionRegionList();
-
-    bool isMotionRegionsEmpty() const;
-
-public slots:
-    void showActivityDecorations();
-    void hideActivityDecorations();
-    void fadeOutOverlay();
-    void fadeInOverlay();
-    void fadeOutInfo();
-    void fadeInInfo();
-    void fadeInfo(bool fadeIn);
-
-    void setDrawMotionWindows(MotionDrawType value);
-
 signals:
-    void aspectRatioChanged(qreal oldAspectRatio, qreal newAspectRatio);
+    void aspectRatioChanged();
     void aboutToBeDestroyed();
     void displayFlagsChanged();
-    void motionSelectionChanged();
     void rotationStartRequested();
     void rotationStopRequested();
 
 protected:
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    enum Overlay {
+        EmptyOverlay,
+        PausedOverlay,
+        LoadingOverlay,
+        NoDataOverlay,
+        OfflineOverlay,
+        UnauthorizedOverlay
+    };
+
     virtual Qt::WindowFrameSection windowFrameSectionAt(const QPointF &pos) const override;
     virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override;
-    virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
-    virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override;
+
     virtual bool windowFrameEvent(QEvent *event) override;
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
     virtual void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
 
-    virtual QPolygonF provideShape() override;
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    virtual Qn::RenderStatus paintChannel(QPainter *painter, int channel, const QRectF &rect) = 0;
+    virtual void paintOverlay(QPainter *painter, const QRectF &rect, Overlay overlay);
+    
+    void paintSelection(QPainter *painter, const QRectF &rect);
+    void paintFlashingText(QPainter *painter, const QStaticText &text, qreal textSize, const QPointF &offset = QPointF());
 
     virtual QSizeF constrainedSize(const QSizeF constraint) const override;
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint) const override;
 
-    void updateShadowZ();
-    void updateShadowPos();
-    void updateShadowOpacity();
-    void updateShadowVisibility();
-    void invalidateShadowShape();
+    const QSize &channelScreenSize() const;
+    void setChannelScreenSize(const QSize &size);
+    virtual void channelScreenSizeChangedNotify() {};
+
+    Overlay channelOverlay(int channel) const;
+    void setChannelOverlay(int channel, Overlay overlay);
+    virtual Overlay calculateChannelOverlay(int channel) const;
+    Q_SLOT void updateChannelOverlay(int channel);
+
+    virtual QString calculateTitleText() const;
+    Q_SLOT void updateTitleText();
+
+    virtual QString calculateInfoText() const;
+    Q_SLOT void updateInfoText();
+
+    QnImageButtonBar *buttonBar() {
+        return m_buttonBar;
+    }
+
+    virtual Buttons calculateButtonsVisibility() const;
+    Q_SLOT void updateButtonsVisibility();
+
+    void setChannelLayout(const QnVideoResourceLayout *channelLayout);
+    virtual void channelLayoutChangedNotify() {}
+    
+    virtual void displayFlagsChangedNotify(DisplayFlags changedFlags) { Q_UNUSED(changedFlags); }
+
+    int channelCount() const;
+    QRectF channelRect(int channel) const;
 
     void ensureAboutToBeDestroyedEmitted();
 
-    void ensureMotionMask();
-    void invalidateMotionMask();
-    void ensureMotionMaskBinData();
-    void invalidateMotionMaskBinData();
-
-    int motionGridWidth() const;
-    int motionGridHeight() const;
-    void drawMotionSensitivity(QPainter *painter, const QRectF &rect, const QnMotionRegion& region, int channel);
-
-signals:
-    void updateOverlayTextLater();
-
-private slots:
-    void updateOverlayText();
-    void updateButtonsVisibility();
-
-    void at_sourceSizeChanged(const QSize &size);
-    void at_resource_resourceChanged();
-    void at_resource_nameChanged();
-    void at_searchButton_toggled(bool checked);
-
 private:
-    /**
-     * \param channel                   Channel number.
-     * \returns                         Rectangle in local coordinates where given channel is to be drawn.
-     */
-    QRectF channelRect(int channel) const;
-
-    enum OverlayIcon {
-        NO_ICON,
-        PAUSED,
-        LOADING,
-        NO_DATA,
-        OFFLINE,
-        UNAUTHORIZED
-    };
-
     struct ChannelState {
-        ChannelState(): icon(NO_ICON), iconChangeTimeMSec(0), iconFadeInNeeded(false), lastNewFrameTimeMSec(0) {}
+        ChannelState(): overlay(EmptyOverlay), changeTimeMSec(0), fadeInNeeded(false), lastNewFrameTimeMSec(0), renderStatus(Qn::NothingRendered) {}
 
-        /** Current overlay icon. */
-        OverlayIcon icon;
+        /** Current overlay. */
+        Overlay overlay;
 
         /** Time when the last icon change has occurred, in milliseconds since epoch. */
-        qint64 iconChangeTimeMSec;
+        qint64 changeTimeMSec;
 
         /** Whether the icon should fade in on change. */
-        bool iconFadeInNeeded;
+        bool fadeInNeeded;
 
         /** Last time when new frame was rendered, in milliseconds since epoch. */
         qint64 lastNewFrameTimeMSec;
 
-        /** Selected region for search-by-motion, in parrots. */
-        QRegion motionSelection;
+        /** Last render status. */
+        Qn::RenderStatus renderStatus;
     };
 
-    void setOverlayIcon(int channel, OverlayIcon icon);
-
-    void drawSelection(const QRectF &rect);
-
-    void drawOverlayIcon(int channel, const QRectF &rect);
-
-    void drawMotionGrid(QPainter *painter, const QRectF &rect, const QnMetaDataV1Ptr &motion, int channel);
-
-    void drawMotionMask(QPainter *painter, const QRectF& rect, int channel);
-
-    void drawFilledRegion(QPainter *painter, const QRectF &rect, const QRegion &selection, const QColor& color, const QColor& penColor);
-
-    void drawFlashingText(QPainter *painter, const QStaticText &text, qreal textSize, const QPointF &offset = QPointF());
-
 private:
+    /** Paused painter. */
+    QSharedPointer<QnPausedPainter> m_pausedPainter;
+
+    /** Loading progress painter. */
+    QSharedPointer<QnLoadingProgressPainter> m_loadingProgressPainter;
+
     /** Layout item. */
     QWeakPointer<QnWorkbenchItem> m_item;
 
     /** Resource associated with this widget. */
     QnResourcePtr m_resource;
 
-    /** Display. */
-    QnResourceDisplay *m_display;
-
     /* Display flags. */
     DisplayFlags m_displayFlags;
 
-    /** Resource layout of this display widget. */
-    const QnVideoResourceLayout *m_videoLayout;
-
-    /** Number of media channels. */
-    int m_channelCount;
-
-    /** Associated renderer. */
-    QnResourceWidgetRenderer *m_renderer;
-
-    /** Paused painter. */
-    QSharedPointer<QnPausedPainter> m_pausedPainter;
-
-    /** Loading progress painter. */
-    QSharedPointer<QnLoadingProgressPainter> m_loadingProgressPainter;
+    /** Layout of this widget's channels. */
+    const QnVideoResourceLayout *m_channelsLayout;
 
     /** Aspect ratio. Negative value means that aspect ratio is not enforced. */
     qreal m_aspectRatio;
@@ -428,36 +337,22 @@ private:
     /** Cached size of a single media channel, in screen coordinates. */
     QSize m_channelScreenSize;
 
-    /** Shadow item. */
-    QWeakPointer<QnPolygonalShadowItem> m_shadow;
-
     /** Frame opacity. */
     qreal m_frameOpacity;
-
-    /** Shadow displacement. */
-    QPointF m_shadowDisplacement;
 
     /** Frame width. */
     qreal m_frameWidth;
 
     /* Widgets for overlaid stuff. */
     QnViewportBoundWidget *m_headerOverlayWidget;
+    QGraphicsWidget *m_headerWidget;
+    GraphicsLabel *m_headerLabel;
+    QnImageButtonBar *m_buttonBar;
 
     QnViewportBoundWidget *m_footerOverlayWidget;
-
     QGraphicsWidget *m_footerWidget;
-
-    GraphicsLabel *m_headerTitleLabel;
-
-    GraphicsLabel *m_footerStatusLabel;
-
-    GraphicsLabel *m_footerTimeLabel;
-
-    QGraphicsLinearLayout *m_headerLayout;
-    QnImageButtonWidget *m_infoButton;
-    QnImageButtonWidget *m_closeButton;
-    QnImageButtonWidget *m_rotateButton;
-    QnImageButtonWidget *m_searchButton;
+    GraphicsLabel *m_footerLeftLabel;
+    GraphicsLabel *m_footerRightLabel;
 
     /** Whether aboutToBeDestroyed signal has already been emitted. */
     bool m_aboutToBeDestroyedEmitted;
@@ -465,30 +360,14 @@ private:
     /** Additional per-channel state. */
     QVector<ChannelState> m_channelState;
 
-    /** Image region where motion is currently present, in parrots. */
-    QList<QnMotionRegion> m_motionRegionList; // TODO: WHY THE HELL THIS ONE IS OF SIZE 4?????????? Find the one who did it and use your swordsmanship skillz on him.
-
-    /** Whether the motion mask is valid. */
-    bool m_motionMaskValid;
-
-    /** Binary mask for the current motion region. */
-    QVector<__m128i *> m_motionMaskBinData;
-
-    /** Whether motion mask binary data is valid. */
-    bool m_motionMaskBinDataValid;
-
-    /** Status of the last painting operation. */
-    Qn::RenderStatus m_renderStatus;
-
     QStaticText m_noDataStaticText;
     QStaticText m_offlineStaticText;
     QStaticText m_unauthorizedStaticText;
     QStaticText m_unauthorizedStaticText2;
-    MotionDrawType m_motionDrawType;
-    QStaticText m_sensStaticText[10];
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::DisplayFlags);
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::Buttons);
 Q_DECLARE_METATYPE(QnResourceWidget *)
 
 #endif // QN_RESOURCE_WIDGET_H

@@ -544,7 +544,7 @@
   <customwidget>
    <class>QnScheduleGridWidget</class>
    <extends>QWidget</extends>
-   <header>ui/device_settings/qnschedulegridwidget.h</header>
+   <header>ui/device_settings/schedule_grid_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

@@ -5,6 +5,7 @@
 #include <recording/time_period.h>
 
 #include <ui/graphics/items/resource_widget.h>
+#include <ui/graphics/items/media_resource_widget.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
@@ -69,7 +70,7 @@ Qn::ActionVisibility QnSmartSearchActionCondition::check(const QnResourceWidgetL
             continue;
 
         if(m_hasRequiredGridDisplayValue) {
-            if(widget->isMotionGridDisplayed() == m_requiredGridDisplayValue)
+            if(static_cast<bool>(widget->displayFlags() & QnResourceWidget::DisplayMotion) == m_requiredGridDisplayValue)
                 return Qn::EnabledAction;
         } else {
             return Qn::EnabledAction;
@@ -86,12 +87,13 @@ Qn::ActionVisibility QnClearMotionSelectionActionCondition::check(const QnResour
         if(!widget)
             continue;
 
-        if(widget->isMotionGridDisplayed()) {
+        if(widget->displayFlags() & QnResourceWidget::DisplayMotion) {
             hasDisplayedGrid = true;
 
-            foreach(const QRegion &region, widget->motionSelection())
-                if(!region.isEmpty())
-                    return Qn::EnabledAction;
+            if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
+                foreach(const QRegion &region, mediaWidget->motionSelection())
+                    if(!region.isEmpty())
+                        return Qn::EnabledAction;
         }
     }
 
