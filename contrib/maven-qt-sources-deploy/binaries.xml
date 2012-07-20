@@ -7,7 +7,7 @@
 	<fileSets>
 		<fileSet>
 			<directory>src</directory>
-			<outputDirectory>../pri</outputDirectory>
+			<outputDirectory>../build/pri</outputDirectory>
 			<!--<excludes>
 				<exclude>binaries.xml</exclude>
 				<exclude>**/.hidden</exclude>
