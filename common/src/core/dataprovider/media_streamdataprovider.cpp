@@ -162,9 +162,9 @@ void QnAbstractMediaStreamDataProvider::checkTime(QnAbstractMediaDataPtr data)
         {
             qint64 timeDiff = video->timestamp - m_lastVideoTime[video->channelNumber];
             // if timeDiff < -N it may be time correction or dayling time change
-            if (timeDiff >= -1000ll*1000 && timeDiff < MIN_FRAME_DURATION*1000)
+            if (timeDiff >= -1000ll*1000 && timeDiff < MIN_FRAME_DURATION)
             {
-                video->timestamp = m_lastVideoTime[video->channelNumber] + MIN_FRAME_DURATION*1000ll;
+                video->timestamp = m_lastVideoTime[video->channelNumber] + MIN_FRAME_DURATION;
             }
             m_lastVideoTime[video->channelNumber] = video->timestamp;
         }

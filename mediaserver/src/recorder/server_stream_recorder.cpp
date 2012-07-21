@@ -174,7 +174,7 @@ bool QnServerStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
         if (media->timestamp - m_endDateTime < MAX_FRAME_DURATION*1000)
             m_endDateTime = media->timestamp;
         else
-            m_endDateTime += MIN_FRAME_DURATION*1000;
+            m_endDateTime += MIN_FRAME_DURATION;
         close();
     }
     return rez;

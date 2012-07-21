@@ -375,7 +375,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
             }
             videoCodecCtx->bit_rate = 1000000 * 6;
             videoCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
-            AVRational defaultFrameRate = {1, 30};
+            AVRational defaultFrameRate = {1, 60};
             videoCodecCtx->time_base = defaultFrameRate;
 
             videoCodecCtx->sample_aspect_ratio.num = 1;
