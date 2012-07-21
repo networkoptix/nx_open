@@ -3,9 +3,9 @@
      xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.nokia.qt</groupId>
-	<artifactId>qtcore</artifactId>
-	<version>4.7.4-SNAPSHOT</version>
+	<groupId>com.digitalwatchdog</groupId>
+	<artifactId>dvr</artifactId>
+	<version>openAPI_19_2.5.8.35-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<distributionManagement>
