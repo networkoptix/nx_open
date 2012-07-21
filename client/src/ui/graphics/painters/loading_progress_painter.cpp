@@ -1,18 +1,22 @@
 #include "loading_progress_painter.h"
-#include <cmath> /* For std::fmod. */
-#include <ui/graphics/opengl/gl_shortcuts.h>
-#include <ui/common/linear_combination.h>
-#include <ui/graphics/shaders/color_shader_program.h>
 
-QnLoadingProgressPainter::QnLoadingProgressPainter(qreal innerRadius, int sectorCount, qreal sectorFill, const QColor &startColor, const QColor &endColor):
+#include <cmath> /* For std::fmod. */
+
+#include <ui/graphics/opengl/gl_shortcuts.h>
+#include <ui/graphics/shaders/color_shader_program.h>
+#include <ui/common/linear_combination.h>
+
+QnLoadingProgressPainter::QnLoadingProgressPainter(qreal innerRadius, int sectorCount, qreal sectorFill, const QColor &startColor, const QColor &endColor, const QGLContext *context):
     m_sectorCount(sectorCount),
-    m_program(new QnColorShaderProgram())
+    m_program(QnColorShaderProgram::instance(context))
 {
+    if(context != QGLContext::currentContext())
+        qnWarning("Invalid current OpenGL context.");
+
     /* Create display list. */
     m_list = glGenLists(1);
 
     /* Compile the display list. */
-    LinearCombinator *combinator = LinearCombinator::forType(QMetaType::QColor);
     glNewList(m_list, GL_COMPILE);
     glBegin(GL_QUADS);
     for(int i = 0; i < sectorCount; i++) {
@@ -22,7 +26,7 @@ QnLoadingProgressPainter::QnLoadingProgressPainter(qreal innerRadius, int sector
         qreal r1 = 1;
 
         qreal k = static_cast<qreal>(i) / (sectorCount - 1);
-        glColor(combinator->combine(1 - k, startColor, k, endColor).value<QColor>());
+        glColor(linearCombine(1 - k, startColor, k, endColor));
         glVertexPolar(a0, r0);
         glVertexPolar(a1, r0);
         glVertexPolar(a1, r1);

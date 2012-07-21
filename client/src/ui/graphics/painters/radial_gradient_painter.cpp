@@ -1,10 +1,16 @@
 #include "radial_gradient_painter.h"
+
+#include <utils/common/warnings.h>
+
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/shaders/color_shader_program.h>
 
-QnRadialGradientPainter::QnRadialGradientPainter(int sectorCount, const QColor &innerColor, const QColor &outerColor):
-    m_shader(new QnColorShaderProgram()) 
+QnRadialGradientPainter::QnRadialGradientPainter(int sectorCount, const QColor &innerColor, const QColor &outerColor, const QGLContext *context):
+    m_shader(QnColorShaderProgram::instance(context)) 
 {
+    if(context != QGLContext::currentContext())
+        qnWarning("Invalid current OpenGL context.");
+
     /* Create display list. */
     m_list = glGenLists(1);
 
@@ -16,9 +22,8 @@ QnRadialGradientPainter::QnRadialGradientPainter(int sectorCount, const QColor &
     glVertex(0.0, 0.0);
 
     glColor(outerColor);
-    for(int i = 0; i <= sectorCount; i++) {
+    for(int i = 0; i <= sectorCount; i++)
         glVertexPolar(2 * M_PI * i / sectorCount, 1.0);
-    }
 
     glEnd();
     glEndList();

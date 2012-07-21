@@ -1,17 +1,32 @@
 #ifndef QN_SERVER_RESOURCE_WIDGET_H
 #define QN_SERVER_RESOURCE_WIDGET_H
 
-#include <QtGui/QGraphicsWidget>
+#include <QtCore/QSharedPointer>
+#include <QtCore/QElapsedTimer>
+#include <QtCore/QMetaType>
 
-#include <ui/graphics/items/resource_widget.h>
-#include <ui/graphics/painters/radial_gradient_painter.h>
+#include <api/video_server_statistics.h>
 
-#include <api/video_server_connection.h>
+#include "resource_widget.h"
 
-typedef QPair<QString, QList <int>> QnStatisticsHistoryData;
+class QnRadialGradientPainter;
+
+namespace{
+    struct QnStatisticsHistoryData{
+        QString Id;
+        QString Description;
+        QList<int> History;
+
+        QnStatisticsHistoryData(QString id, QString description);
+        void append(int value);
+    };
+}
 
 class QnServerResourceWidget: public QnResourceWidget {
     Q_OBJECT;
+
+    typedef QnResourceWidget base_type;
+
 public:
     /**
      * Constructor.
@@ -24,39 +39,46 @@ public:
     /**
      * Virtual destructor.
      */
-    virtual ~QnServerResourceWidget() {}
+    virtual ~QnServerResourceWidget();
 
-public slots:
-    void at_statistics_received(const QnStatisticsDataVector &data);
-    void at_timer_update();
+    /**
+     * \returns                         Resource associated with this widget.
+     */
+    QnVideoServerResourcePtr resource() const;
 
 protected:
     virtual Qn::RenderStatus paintChannel(QPainter *painter, int channel, const QRectF &rect) override;
+    virtual Buttons calculateButtonsVisibility() const override;
+
+private slots:
+    void at_statisticsReceived(const QnStatisticsDataVector &data);
+    void at_timer_timeout();
 
 private:
-    /** Main painting function */
+    /** Main painting function. */
     void drawStatistics(const QRectF &rect, QPainter *painter);
 
-    /** History of last usage responses */
-    QList< QnStatisticsHistoryData  > m_history;
+private:
+    /** Video server resource. */
+    QnVideoServerResourcePtr m_resource;
 
-    /** Total number of responses received */ 
+    /** History of last usage responses. */
+    QList<QnStatisticsHistoryData> m_history;
+
+    /** Total number of responses received. */ 
     uint m_counter;
 
-    /** Timer for server requests scheduling */
-    QTimer* m_timer;
-
-    /** Status of the frame history */
+    /** Status of the frame history. */
     Qn::RenderStatus m_renderStatus;
 
-    /** Status of the update request */
+    /** Status of the update request. */
     bool m_alreadyUpdating;
 
-    /** Elapsed timer for smooth scroll */
-    QElapsedTimer m_elapsed_timer;
+    /** Elapsed timer for smooth scroll. */
+    QElapsedTimer m_elapsedTimer;
 
-    /** Helper for the background painting */
-    QnRadialGradientPainter m_backgroundGradientPainter;
+    /** Helper for the background painting. */
+    QSharedPointer<QnRadialGradientPainter> m_backgroundGradientPainter;
 };
 
 Q_DECLARE_METATYPE(QnServerResourceWidget *)

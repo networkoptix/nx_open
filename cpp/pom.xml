@@ -20,6 +20,7 @@
 		<ffmpeg.version>2012-04-10-N-39672-g40b7a27</ffmpeg.version>
 		<openssl.version>1.0.0j-custom</openssl.version>
 		<onvif.version>2.1.1-ptz-SNAPSHOT</onvif.version>
+        <dvr.version>openAPI_19_2.5.8.35-SNAPSHOT</dvr.version>
 		<buildLib/>
 		<qtlib1/>
 		<qtlib2/>
@@ -239,7 +240,7 @@
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${includes_pri}</echo>	
 
 								<fileset id="pri_path" dir="${project.build.directory}/build/pri" erroronmissingdir="false">
-									<include name="**/src/*.pri" />
+									<include name="**/*/*.pri" />
 								</fileset>
 								<pathconvert pathsep="${line.separator}" property="pri" refid="pri_path">
 									<map from="" to="include("/>

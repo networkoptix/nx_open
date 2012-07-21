@@ -18,7 +18,9 @@
 #endif
 
 // ffmpeg headers
+#if defined __cplusplus
 extern "C" {
+#endif
 	#include <libavcodec/avcodec.h>
 	#include <libavformat/avformat.h>
 	#ifdef _USE_DXVA
@@ -26,11 +28,15 @@ extern "C" {
 	#endif
 	#include <libswscale/swscale.h>
 	#include <libavutil/avstring.h>
+#if defined __cplusplus
 }
+#endif
+
+
+#if defined __cplusplus
 
 #include "utils/media/sse_helper.h"
 
-#if defined __cplusplus
 // stl headers
 #include <algorithm>
 #include <functional>

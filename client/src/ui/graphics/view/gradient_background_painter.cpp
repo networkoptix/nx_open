@@ -12,8 +12,6 @@
 
 #include "utils/settings.h"
 
-Q_GLOBAL_STATIC_WITH_ARGS(QnRadialGradientPainter, radialGradientPainter, (32, QColor(255, 255, 255, 255), QColor(255, 255, 255, 0)));
-
 QnGradientBackgroundPainter::QnGradientBackgroundPainter(qreal cycleIntervalSecs):
     m_cycleIntervalSecs(cycleIntervalSecs),
     m_settings(qnSettings)
@@ -23,8 +21,7 @@ QnGradientBackgroundPainter::QnGradientBackgroundPainter(qreal cycleIntervalSecs
 
 QnGradientBackgroundPainter::~QnGradientBackgroundPainter() {}
 
-qreal QnGradientBackgroundPainter::position()
-{
+qreal QnGradientBackgroundPainter::position() {
     qreal t = std::fmod(m_timer.elapsed() / 1000.0, m_cycleIntervalSecs) / m_cycleIntervalSecs;
 
     /* t interval    | Position change 
@@ -87,7 +84,8 @@ void QnGradientBackgroundPainter::drawLayer(QPainter * painter, const QRectF & r
 #else
     painter->beginNativePainting();
     {
-        QnRadialGradientPainter *gradientPainter = radialGradientPainter();
+        if(!m_gradientPainter)
+            m_gradientPainter.reset(new QnRadialGradientPainter(32, QColor(255, 255, 255, 255), QColor(255, 255, 255, 0), QGLContext::currentContext()));
 
         //glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
         glEnable(GL_BLEND);
@@ -96,13 +94,13 @@ void QnGradientBackgroundPainter::drawLayer(QPainter * painter, const QRectF & r
         glPushMatrix();
         glTranslate(center1);
         glScale(radius, radius);
-        gradientPainter->paint(color);
+        m_gradientPainter->paint(color);
         glPopMatrix();
 
         glPushMatrix();
         glTranslate(center2);
         glScale(radius, radius);
-        gradientPainter->paint(color);
+        m_gradientPainter->paint(color);
         glPopMatrix();
 
         glDisable(GL_BLEND);

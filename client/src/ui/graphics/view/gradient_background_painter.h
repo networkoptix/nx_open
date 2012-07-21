@@ -7,8 +7,9 @@
 
 #include "graphics_view.h" /* For QnLayerPainter. */
 
-class QnSettings;
 class QnGlFunctions;
+class QnSettings;
+class QnRadialGradientPainter;
 
 class QnGradientBackgroundPainter: public QnLayerPainter {
 public:
@@ -38,6 +39,7 @@ private:
     QWeakPointer<QnSettings> m_settings;
     QElapsedTimer m_timer;
     qreal m_cycleIntervalSecs;
+    QScopedPointer<QnRadialGradientPainter> m_gradientPainter;
 };
 
 #endif // QN_GRADIENT_BACKROUND_PAINTER_H

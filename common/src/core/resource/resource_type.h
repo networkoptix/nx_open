@@ -72,7 +72,7 @@ public:
     void addResourceTypeList(const QList<QnResourceTypePtr>& resourceType);
     void replaceResourceTypeList(const QList<QnResourceTypePtr>& resourceType);
 
-    QnId getResourceTypeId(const QString& manufacture, const QString& name) const;
+    QnId getResourceTypeId(const QString& manufacture, const QString& name, bool showWarning = true) const;
     QnResourceTypeMap getResourceTypeMap() const;
 
     bool isEmpty() const;

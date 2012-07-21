@@ -6,14 +6,15 @@
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <core/resource/video_server.h>
+#include <api/video_server_connection.h>
 
 #include <ui/style/globals.h>
 
 #include <ui/graphics/items/viewport_bound_widget.h>
 #include <ui/graphics/items/standard/graphics_label.h>
-
 #include <ui/graphics/opengl/gl_shortcuts.h>
-#include <ui/graphics/opengl/gl_functions.h>
+#include <ui/graphics/opengl/gl_context_data.h>
+#include <ui/graphics/painters/radial_gradient_painter.h>
 
 /** How many points are shown on the screen simultaneously */
 #define LIMIT 60
@@ -25,13 +26,6 @@ namespace {
     /** Convert angle from radians to degrees */
     qreal radiansToDegrees(qreal radian) {
         return (180 * radian) / M_PI;
-    }
-
-    /** Get legend text */
-    QString getDataId(int id) {
-        if (id == 0)
-            return "CPU";
-        return QString("HDD%1").arg(id - 1);
     }
 
     /** Get corresponding color from config */
@@ -146,6 +140,29 @@ namespace {
         return path;
     }
 
+    class QnBackgroundGradientPainterFactory {
+    public:
+        QnRadialGradientPainter *operator()(const QGLContext *context) {
+            return new QnRadialGradientPainter(32, QColor(255, 255, 255, 255), QColor(255, 255, 255, 0), context);
+        }
+    };
+
+    typedef QnGlContextData<QnRadialGradientPainter, QnBackgroundGradientPainterFactory> QnBackgroundGradientPainterStorage;
+    Q_GLOBAL_STATIC(QnBackgroundGradientPainterStorage, qn_serverResourceWidget_backgroundGradientPainterStorage);
+
+    QnStatisticsHistoryData::QnStatisticsHistoryData(QString id, QString description):
+    Id(id),
+    Description(description){
+        for (int i = 0; i < LIMIT; i++)
+            History.append(0);
+    }
+
+    void QnStatisticsHistoryData::append(int value) {
+        History.append(value);
+        if (History.count() > LIMIT)
+            History.pop_front();
+    }
+
 
 } // anonymous namespace
 
@@ -154,58 +171,34 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     QnResourceWidget(context, item, parent),
     m_alreadyUpdating(false),
     m_counter(0),
-    m_renderStatus(Qn::NothingRendered),
-    m_backgroundGradientPainter(32, QColor(255, 255, 255, 255), QColor(255, 255, 255, 0))
+    m_renderStatus(Qn::NothingRendered)
 {
-    m_timer = new QTimer(this);
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(at_timer_update()));
-    m_timer->start(REQUEST_TIME);
+    m_resource = base_type::resource().dynamicCast<QnVideoServerResource>();
+    if(!m_resource) 
+        qnCritical("Server resource widget was created with a non-server resource.");
+
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(at_timer_timeout()));
+    timer->start(REQUEST_TIME);
+}
+
+QnServerResourceWidget::~QnServerResourceWidget() {
+    return;
+}
+
+QnVideoServerResourcePtr QnServerResourceWidget::resource() const {
+    return m_resource;
 }
 
 Qn::RenderStatus QnServerResourceWidget::paintChannel(QPainter *painter, int channel, const QRectF &rect) {
-    Q_UNUSED(channel)
+    Q_UNUSED(channel);
+
     drawStatistics(rect, painter);
+
     return m_renderStatus;
 }
 
-void QnServerResourceWidget::at_timer_update() {
-    if (m_alreadyUpdating) {
-        if (m_renderStatus != Qn::CannotRender)
-            m_renderStatus = Qn::OldFrameRendered;
-    }
-
-    m_alreadyUpdating = true;
-    QnVideoServerResourcePtr server = resource().dynamicCast<QnVideoServerResource>();
-    Q_ASSERT(server);
-    server->apiConnection()->asyncGetStatistics(this, SLOT(at_statistics_received(const QnStatisticsDataVector &/* data */)));
-}
-
-void QnServerResourceWidget::at_statistics_received(const QnStatisticsDataVector &data) {
-    m_alreadyUpdating = false;
-    m_renderStatus = Qn::NewFrameRendered;
-
-    for (int i = 0; i < data.size(); i++) {
-        if (m_history.length() < i + 1) {
-            QList<int> dummy;
-            for (int j = 0; j < LIMIT; j++)
-                dummy.append(0);
-            QnStatisticsHistoryData dummyItem(getDataId(i), dummy);
-            m_history.append(dummyItem);
-        }
-
-        QnStatisticsHistoryData *item = &(m_history[i]);
-        QnStatisticsData next_data = data[i];
-        item->second.append(next_data.second);
-        if (item->second.count() > LIMIT)
-            item->second.pop_front();
-    }
-
-    m_elapsed_timer.restart();
-    m_counter++;
-}
-
 void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painter) {
-
     qreal width = rect.width();
     qreal height = rect.height();
 
@@ -223,6 +216,9 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
     QRectF inner(offset, offset, ow, oh); 
 
     /** Draw background */
+    if(!m_backgroundGradientPainter)
+        m_backgroundGradientPainter = qn_serverResourceWidget_backgroundGradientPainterStorage()->get(QGLContext::currentContext());
+
     painter->beginNativePainting();
     {
         glEnable(GL_BLEND);
@@ -237,7 +233,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
         glTranslatef(inner.center().x(), inner.center().y(), 1.0);
         qreal radius = min * 0.5 - offset;
         glScale(radius, radius);
-        m_backgroundGradientPainter.paint(qnGlobals->backgroundGradientColor());
+        m_backgroundGradientPainter->paint(qnGlobals->backgroundGradientColor());
         glPopMatrix();
 
         glDisable(GL_BLEND);
@@ -245,7 +241,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
     painter->endNativePainting();
 
     const qreal x_step = (qreal)ow*1.0/(LIMIT - 2);
-    qreal elapsed_step = (qreal)qMin(m_elapsed_timer.elapsed(), (qint64)REQUEST_TIME) / (qreal)REQUEST_TIME;
+    qreal elapsed_step = (qreal)qMin(m_elapsedTimer.elapsed(), (qint64)REQUEST_TIME) / (qreal)REQUEST_TIME;
 
     /** Draw grid */
     {
@@ -281,7 +277,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
 
         for (int i = 0; i < m_history.length(); i++){
             qreal current_value = 0;
-            QPainterPath path = createChartPath(&(m_history[i].second), x_step, -1.0 * oh, current_value, elapsed_step);
+            QPainterPath path = createChartPath(&(m_history[i].History), x_step, -1.0 * oh, current_value, elapsed_step);
             values.append(current_value);
 
             graphPen.setColor(getColorById(i));
@@ -332,10 +328,53 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
                 main_pen.setColor(getColorById(i));
                 painter->setPen(main_pen);
                 painter->strokePath(legend, main_pen);
-                painter->drawText(offset*0.1, offset*0.1, m_history[i].first);
+                painter->drawText(offset*0.1, offset*0.1, m_history[i].Id);
                 legendTransform.translate(offset * 2, 0.0);
                 painter->setTransform(legendTransform);
             }
         }
     }
+}
+
+
+// -------------------------------------------------------------------------- //
+// Handlers
+// -------------------------------------------------------------------------- //
+QnResourceWidget::Buttons QnServerResourceWidget::calculateButtonsVisibility() const {
+    return base_type::calculateButtonsVisibility() & (CloseButton | RotateButton);
+}
+
+void QnServerResourceWidget::at_timer_timeout() {
+    if (m_alreadyUpdating) {
+        if (m_renderStatus != Qn::CannotRender)
+            m_renderStatus = Qn::OldFrameRendered;
+    }
+
+    m_alreadyUpdating = true;
+    m_resource->apiConnection()->asyncGetStatistics(this, SLOT(at_statisticsReceived(const QnStatisticsDataVector &)));
+}
+
+void QnServerResourceWidget::at_statisticsReceived(const QnStatisticsDataVector &data) {
+    m_alreadyUpdating = false;
+    m_renderStatus = Qn::NewFrameRendered;
+
+    int cpuCounter = 0;
+    int hddCounter = 0;
+    
+    for (int i = 0; i < data.size(); i++) {
+        QnStatisticsData next_data = data[i];
+
+        if (m_history.length() < i + 1) {
+            QString id = next_data.Device == QnStatisticsData::CPU 
+                ? tr("CPU") + QString::number(cpuCounter++)
+                : tr("HDD") + QString::number(hddCounter++);
+            m_history.append(QnStatisticsHistoryData(id, next_data.Description));
+        }
+
+        QnStatisticsHistoryData *item = &(m_history[i]);
+        item->append(next_data.Value);
+    }
+
+    m_elapsedTimer.restart();
+    m_counter++;
 }

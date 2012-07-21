@@ -1,12 +1,19 @@
 #ifndef QN_COLOR_SHADER_PROGRAM_H
 #define QN_COLOR_SHADER_PROGRAM_H
 
-#include <QGLShaderProgram>
+#include <QtCore/QSharedPointer>
+#include <QtOpenGL/QGLShaderProgram>
 
 class QnColorShaderProgram: public QGLShaderProgram {
     Q_OBJECT;
 public:
-    QnColorShaderProgram(QObject *parent = NULL);
+    QnColorShaderProgram(const QGLContext *context, QObject *parent = NULL);
+
+    /**
+     * \param context                   OpenGL context to get an instance of this shader for.
+     * \returns                         Shared instance of this shader that can be used with the given OpenGL context.
+     */
+    static QSharedPointer<QnColorShaderProgram> instance(const QGLContext *context);
 
     template<class T>
     void setColorMultiplier(const T &value) {
