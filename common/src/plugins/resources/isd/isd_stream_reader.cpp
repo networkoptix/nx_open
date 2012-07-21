@@ -52,6 +52,7 @@ void QnISDStreamReader::openStream()
     
     request.append(result.toLatin1());
     CLHttpStatus status = http.doPOST(QByteArray("/api/param.cgi"), request);
+    QnSleep::msleep(3000);
 
     
 
@@ -70,7 +71,6 @@ void QnISDStreamReader::openStream()
 
 void QnISDStreamReader::closeStream()
 {
-    CLLongRunnable::pleaseStop();
     m_rtpStreamParser.closeStream();
 }
 
