@@ -22,7 +22,6 @@ public:
     QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent = NULL);
     virtual ~QnMediaResourceWidget();
 
-
     /**
      * \returns                         Resource associated with this widget.
      */

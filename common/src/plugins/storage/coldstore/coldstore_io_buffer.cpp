@@ -12,6 +12,7 @@ m_fileName(fn)
 
 QnColdStoreIOBuffer::~QnColdStoreIOBuffer()
 {
+    close();
     disconnectFromResource();
 }
 

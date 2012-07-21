@@ -52,7 +52,7 @@ namespace {
         glEnd();
     }
 
-    typedef QnGlContextData<QnTextureTransitionShaderProgram> QnTextureTransitionShaderProgramStorage;
+    typedef QnGlContextData<QnTextureTransitionShaderProgram, QnGlContextDataForwardingFactory<QnTextureTransitionShaderProgram> > QnTextureTransitionShaderProgramStorage;
     Q_GLOBAL_STATIC(QnTextureTransitionShaderProgramStorage, qn_textureTransitionShaderProgramStorage);
 
 } // anonymous namespace

@@ -4,8 +4,9 @@
 #include "utils/common/sleep.h"
 #include "utils/common/synctime.h"
 #include "utils/media/nalUnits.h"
+#include "utils/network/simple_http_client.h"
 
-
+extern QString getValueFromString(const QString& line);
 
 QnISDStreamReader::QnISDStreamReader(QnResourcePtr res):
     CLServerPushStreamreader(res),
@@ -52,25 +53,43 @@ void QnISDStreamReader::openStream()
     
     request.append(result.toLatin1());
     CLHttpStatus status = http.doPOST(QByteArray("/api/param.cgi"), request);
+    QnSleep::msleep(3000);
 
-    
-
+    QString urlrequest = "api/param.cgi?req=VideoInput.1.h264.1.Rtsp.AbsolutePath";
     if (role == QnResource::Role_SecondaryLiveVideo)
+        urlrequest = "api/param.cgi?req=VideoInput.1.h264.2.Rtsp.AbsolutePath";
+
+
+
+    QByteArray reslst = downloadFile(status, urlrequest,  res->getHostAddress(), 80, 3000, res->getAuth());
+    if (status == CL_HTTP_AUTH_REQUIRED)
     {
-        m_rtpStreamParser.setRequest("api/param.cgi?req=VideoInput.1.h264.2.Rtsp.AbsolutePath");
-    }
-    else
-    {
-        m_rtpStreamParser.setRequest("api/param.cgi?req=VideoInput.1.h264.1.Rtsp.AbsolutePath");
+        res->setStatus(QnResource::Unauthorized);
+        return;
     }
 
+
+    QString reslstS(reslst);
+
+    QString url = getValueFromString(reslstS);
+
+    QStringList urlLst = url.split('\r', QString::SkipEmptyParts);
+    if(urlLst.size() < 1)
+        return;
+
+    url = urlLst.at(0);
     
+
+    if (url.isEmpty())
+        return;
+
+
+    m_rtpStreamParser.setRequest(url);
     m_rtpStreamParser.openStream();
 }
 
 void QnISDStreamReader::closeStream()
 {
-    CLLongRunnable::pleaseStop();
     m_rtpStreamParser.closeStream();
 }
 

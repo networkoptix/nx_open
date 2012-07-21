@@ -140,7 +140,7 @@ bool QnPlIsdResource::initInternal()
             }
         }
 
-        if (resolutions[bestIndex].width() * resolutions[bestIndex].height() < 1920*1080)
+        if (resolutions[bestIndex].width() * resolutions[bestIndex].height() < 640*480)
             m_resolution2 = resolutions[bestIndex];
 
     }
@@ -187,8 +187,8 @@ bool QnPlIsdResource::initInternal()
         return false;
 
     {
-        //QMutexLocker lock(&m_mutex);
-        //m_MaxFps
+        
+        setMaxFps(fpsList.at(0));
     }
 
     save();

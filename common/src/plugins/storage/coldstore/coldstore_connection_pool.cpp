@@ -187,7 +187,7 @@ bool QnColdStoreConnection::write(const char* data, int len)
         &returned_data_length
         )  != Veracity::ISFS::STATUS_SUCCESS )
     {
-        Q_ASSERT(false);
+        //Q_ASSERT(false);
         return false;
     }
 
