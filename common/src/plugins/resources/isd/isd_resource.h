@@ -29,7 +29,7 @@ public:
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
 
-    bool hasDualStreaming() const {return false;}
+    //bool hasDualStreaming() const {return false;}
 
 
     virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider) override;
