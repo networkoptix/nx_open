@@ -85,14 +85,14 @@ void QnCameraMotionMaskWidget::init() {
     display->instrumentManager()->installInstrument(m_motionSelectionInstrument);
 
     m_clickInstrument = new ClickInstrument(Qt::LeftButton, 0, Instrument::Item, this);
-    connect(m_clickInstrument,  SIGNAL(clicked(QGraphicsView*, QGraphicsItem*, const ClickInfo&)),                                  this,                           SLOT(at_itemClicked(QGraphicsView*, QGraphicsItem*, const ClickInfo&)));
+    connect(m_clickInstrument,  SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                               this,                           SLOT(at_itemClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     display->instrumentManager()->installInstrument(m_clickInstrument);
 
     ForwardingInstrument *itemMouseForwardingInstrument = m_controller->itemMouseForwardingInstrument();
-	connect(m_motionSelectionInstrument,  SIGNAL(motionRegionSelected(QGraphicsView *, QnResourceWidget *, const QRect &)),         this,                           SLOT(at_motionRegionSelected(QGraphicsView *, QnResourceWidget *, const QRect &)));
-	connect(m_motionSelectionInstrument,  SIGNAL(motionRegionCleared(QGraphicsView *, QnResourceWidget *)),                         this,                           SLOT(at_motionRegionCleared()));
-    connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessStarted(QGraphicsView *, QnResourceWidget *)),                     itemMouseForwardingInstrument,  SLOT(recursiveDisable()));
-    connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessFinished(QGraphicsView *, QnResourceWidget *)),                    itemMouseForwardingInstrument,  SLOT(recursiveEnable()));
+	connect(m_motionSelectionInstrument,  SIGNAL(motionRegionSelected(QGraphicsView *, QnMediaResourceWidget *, const QRect &)),    this,                           SLOT(at_motionRegionSelected(QGraphicsView *, QnMediaResourceWidget *, const QRect &)));
+	connect(m_motionSelectionInstrument,  SIGNAL(motionRegionCleared(QGraphicsView *, QnMediaResourceWidget *)),                    this,                           SLOT(at_motionRegionCleared()));
+    connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *)),                itemMouseForwardingInstrument,  SLOT(recursiveDisable()));
+    connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessFinished(QGraphicsView *, QnMediaResourceWidget *)),               itemMouseForwardingInstrument,  SLOT(recursiveEnable()));
 
     /* Set up UI. */
     QVBoxLayout *layout = new QVBoxLayout();
@@ -290,7 +290,7 @@ void QnCameraMotionMaskWidget::at_motionRegionCleared() {
         emit motionRegionListChanged();
 }
 
-void QnCameraMotionMaskWidget::at_itemClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info) {
+void QnCameraMotionMaskWidget::at_itemClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &info) {
     if (!m_resourceWidget)
         return;
 

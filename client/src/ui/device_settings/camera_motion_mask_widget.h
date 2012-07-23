@@ -50,9 +50,9 @@ public slots:
 
 protected slots:
     void at_viewport_resized();
-    void at_motionRegionSelected(QGraphicsView *, QnMediaResourceWidget *, const QRect &);
+    void at_motionRegionSelected(QGraphicsView *view, QnMediaResourceWidget *widget, const QRect &gridRect);
     void at_motionRegionCleared();
-    void at_itemClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &);
+    void at_itemClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
 
 private:
     void init();
