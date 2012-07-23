@@ -190,7 +190,7 @@ QnVideoServerResourcePtr QnServerResourceWidget::resource() const {
     return m_resource;
 }
 
-Qn::RenderStatus QnServerResourceWidget::paintChannel(QPainter *painter, int channel, const QRectF &rect) {
+Qn::RenderStatus QnServerResourceWidget::paintChannelBackground(QPainter *painter, int channel, const QRectF &rect) {
     Q_UNUSED(channel);
 
     drawStatistics(rect, painter);

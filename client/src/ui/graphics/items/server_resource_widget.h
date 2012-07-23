@@ -47,7 +47,7 @@ public:
     QnVideoServerResourcePtr resource() const;
 
 protected:
-    virtual Qn::RenderStatus paintChannel(QPainter *painter, int channel, const QRectF &rect) override;
+    virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &rect) override;
     virtual Buttons calculateButtonsVisibility() const override;
 
 private slots:

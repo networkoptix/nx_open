@@ -267,7 +267,7 @@ void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
         updateInfoTextLater();
 }
 
-Qn::RenderStatus QnMediaResourceWidget::paintChannel(QPainter *painter, int channel, const QRectF &rect) {
+Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter, int channel, const QRectF &rect) {
     painter->beginNativePainting();
     Qn::RenderStatus result = m_renderer->paint(channel, rect, effectiveOpacity());
     painter->endNativePainting();
@@ -275,23 +275,20 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannel(QPainter *painter, int chan
     if(result != Qn::NewFrameRendered && result != Qn::OldFrameRendered)
         painter->fillRect(rect, Qt::black);
 
-    /* Draw motion grid. */
+    return result;
+}
+
+void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channel, const QRectF &rect) {
     if (displayFlags() & DisplayMotion) {
-        for(int i = 0; i < channelCount(); i++)  {
-            QRectF rect = channelRect(i);
+        paintMotionGrid(painter, channel, rect, m_renderer->lastFrameMetadata(channel));
+        paintMotionSensitivity(painter, channel, rect);
 
-            paintMotionGrid(painter, i, rect, m_renderer->lastFrameMetadata(i));
-            paintMotionSensitivity(painter, i, rect);
-
-            /* Selection. */
-            if(!m_motionSelection[i].isEmpty()) {
-                QColor color = toTransparent(qnGlobals->mrsColor(), 0.2);
-                paintFilledRegion(painter, rect, m_motionSelection[i], color, color);
-            }
+        /* Motion selection. */
+        if(!m_motionSelection[channel].isEmpty()) {
+            QColor color = toTransparent(qnGlobals->mrsColor(), 0.2);
+            paintFilledRegion(painter, rect, m_motionSelection[channel], color, color);
         }
     }
-
-    return result;
 }
 
 void QnMediaResourceWidget::paintMotionGrid(QPainter *painter, int channel, const QRectF &rect, const QnMetaDataV1Ptr &motion) {

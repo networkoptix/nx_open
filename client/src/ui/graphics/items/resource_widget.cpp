@@ -559,7 +559,7 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     for(int i = 0; i < channelCount(); i++) {
         /* Draw content. */
         QRectF rect = channelRect(i);
-        Qn::RenderStatus renderStatus = paintChannel(painter, i, rect);
+        Qn::RenderStatus renderStatus = paintChannelBackground(painter, i, rect);
 
         /* Update channel state. */
         m_channelState[i].renderStatus = renderStatus;
@@ -577,9 +577,16 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
         paintOverlay(painter, rect, m_channelState[i].overlay);
         painter->setOpacity(opacity);
 
+        /* Draw foreground. */
+        paintChannelForeground(painter, i, rect);
+
         /* Draw selected / not selected overlay. */
         paintSelection(painter, rect);
     }
+}
+
+void QnResourceWidget::paintChannelForeground(QPainter *, int, const QRectF &) {
+    return;
 }
 
 void QnResourceWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {

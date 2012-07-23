@@ -99,7 +99,8 @@ protected:
     virtual Overlay calculateChannelOverlay(int channel) const override;
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    virtual Qn::RenderStatus paintChannel(QPainter *painter, int channel, const QRectF &rect) override;
+    virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &rect) override;
+    virtual void paintChannelForeground(QPainter *painter, int channel, const QRectF &rect) override;
     void paintMotionSensitivityIndicators(QPainter *painter, int channel, const QRectF &rect, const QnMotionRegion &region);
     void paintMotionGrid(QPainter *painter, int channel, const QRectF &rect, const QnMetaDataV1Ptr &motion);
     void paintMotionSensitivity(QPainter *painter, int channel, const QRectF &rect);

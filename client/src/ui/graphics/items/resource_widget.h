@@ -248,7 +248,8 @@ protected:
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    virtual Qn::RenderStatus paintChannel(QPainter *painter, int channel, const QRectF &rect) = 0;
+    virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &rect) = 0;
+    virtual void paintChannelForeground(QPainter *painter, int channel, const QRectF &rect);
     virtual void paintOverlay(QPainter *painter, const QRectF &rect, Overlay overlay);
     
     void paintSelection(QPainter *painter, const QRectF &rect);
