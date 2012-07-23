@@ -90,27 +90,29 @@ public:
 
 };
 
-class QnCustomDeviceVideoLayout : public QnVideoResourceLayout
-{
+class QnCustomDeviceVideoLayout : public QnVideoResourceLayout {
 public:
-    static QnCustomDeviceVideoLayout* fromString(const QString& value)
+    static QnCustomDeviceVideoLayout *fromString(const QString& value)
     {
-        QStringList params = value.split(';');
+        QStringList params = value.split(QLatin1Char(';'));
         int width = 1;
         int height = 1;
         QStringList sensors;
         for (int i = 0; i < params.size(); ++i)
         {
-            QStringList values = params[i].split('=');
+            QStringList values = params[i].split(QLatin1Char('='));
             if (values.size() < 2)
                 continue;
-            if (values[0] == "width")
+
+            if (values[0] == QLatin1String("width")) {
                 width = values[1].toInt();
-            else if (values[0] == "height")
+            } else if (values[0] == QLatin1String("height")) {
                 height = values[1].toInt();
-            else if (values[0] == "sensors") 
-                sensors = values[1].split(',');
+            } else if (values[0] == QLatin1String("sensors")) {
+                sensors = values[1].split(QLatin1Char(','));
+            }
         }
+
         QnCustomDeviceVideoLayout* result = new QnCustomDeviceVideoLayout(width, height);
         for (int i = 0; i < sensors.size(); ++i)
             result->setChannel(i, sensors[i].toInt());
@@ -121,13 +123,14 @@ public:
         m_width(width),
         m_height(height)
     {
-        m_channels.resize(width*height);
+        m_channels.resize(width * height);
     }
-    virtual ~QnCustomDeviceVideoLayout(){}
+
+    virtual ~QnCustomDeviceVideoLayout() {}
 
     virtual int numberOfChannels() const override
     {
-        return m_width*m_height;
+        return m_width * m_height;
     }
 
     virtual int width() const override
@@ -143,19 +146,19 @@ public:
     virtual void setWidth(int value) 
     {
         m_width = value;
-        m_channels.resize(m_width*m_height);
+        m_channels.resize(m_width * m_height);
     }
 
     virtual void setHeight(int value)
     {
         m_height = value;
-        m_channels.resize(m_width*m_height);
+        m_channels.resize(m_width * m_height);
     }
 
     void setChannel(int h_pos, int v_pos, int channel)
     {
-        int index = v_pos*m_width + h_pos;
-        if (index>=m_width*m_height)
+        int index = v_pos * m_width + h_pos;
+        if (index >= m_width * m_height)
             return;
 
         m_channels[index] = channel;
@@ -163,17 +166,17 @@ public:
 
     void setChannel(int index, int channel)
     {
-        if (index>=m_width*m_height)
+        if (index >= m_width * m_height)
             return;
         m_channels[index] = channel;
     }
 
     virtual int h_position(int channel) const override
     {
-        for (int i = 0; i < m_width*m_height; ++i)
+        for (int i = 0; i < m_width * m_height; ++i)
         {
-            if (m_channels[i]==channel)
-                return i%m_width;
+            if (m_channels[i] == channel)
+                return i % m_width;
         }
 
         return 0;
@@ -181,10 +184,10 @@ public:
 
     virtual int v_position(int channel) const override
     {
-        for (int i = 0; i < m_width*m_height; ++i)
+        for (int i = 0; i < m_width * m_height; ++i)
         {
-            if (m_channels[i]==channel)
-                return i/m_width;
+            if (m_channels[i] == channel)
+                return i / m_width;
         }
 
         return 0;

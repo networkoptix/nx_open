@@ -3,13 +3,14 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
-#include <QtNetwork/QNetworkAccessManager>
-#include <QtNetwork/QNetworkReply>
 #include <QtCore/QMutex>
 #include <QtCore/QWaitCondition>
 #include <QtCore/QSet>
 #include <QtCore/QTimer>
-#include "utils/common/base.h"
+#include <QtNetwork/QNetworkAccessManager>
+#include <QtNetwork/QNetworkReply>
+
+#include "utils/common/request_param.h"
 #include "utils/common/longrunnable.h"
 
 

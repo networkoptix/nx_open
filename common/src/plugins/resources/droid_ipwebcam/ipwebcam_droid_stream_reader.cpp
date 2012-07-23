@@ -1,5 +1,6 @@
 #include "core/resource/network_resource.h"
 #include "utils/common/synctime.h"
+#include "utils/common/base.h"
 #include "ipwebcam_droid_stream_reader.h"
 
 char jpeg_start[2] = {'\xff', '\xd8'};

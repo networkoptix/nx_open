@@ -5,6 +5,7 @@
 #include "../tools/AVJpegHeader.h"
 #include "core/resource/resource_media_layout.h"
 #include "utils/common/synctime.h"
+#include "utils/common/base.h"
 #include "../resource/av_panoramic.h"
 
 //======================================================

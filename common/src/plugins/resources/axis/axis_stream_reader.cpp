@@ -40,7 +40,7 @@ int QnAxisStreamReader::toAxisQuality(QnStreamQuality quality)
             return 20;
         case QnQualityHighest:
             return 15;
-        case QnQualityPreSeted:
+        case QnQualityPreSet:
             return -1;
     }
     return -1;
@@ -122,7 +122,7 @@ void QnAxisStreamReader::openStream()
         paramsStr.append("&resolution=").append(resolution);
     //paramsStr.append("&text=0"); // do not use onscreen text message (fps e.t.c)
     paramsStr.append("&fps=").append(QByteArray::number(fps));
-    if (quality != QnQualityPreSeted)
+    if (quality != QnQualityPreSet)
         paramsStr.append("&compression=").append(QByteArray::number(toAxisQuality(quality)));
     paramsStr.append("&audio=").append(res->isAudioEnabled() ? "1" : "0");
 

@@ -19,7 +19,16 @@ class QnAbstractStreamDataProvider;
 class QnResourceConsumer;
 class QnResourcePool;
 
-typedef QMap<QString, QString> QnResourceParameters;
+class QnResourceParameters: public QMap<QString, QString> {
+    typedef QMap<QString, QString> base_type;
+
+public:
+    using base_type::operator[];
+
+    QString &operator[](const char *key) {
+        return base_type::operator[](QLatin1String(key));
+    }
+};
 
 class QN_EXPORT QnResource : public QObject
 {

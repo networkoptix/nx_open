@@ -254,7 +254,7 @@ void QnOnvifStreamReader::updateVideoEncoder(VideoEncoder& encoder, bool isPrima
     }
 
     
-    if (quality != QnQualityPreSeted) 
+    if (quality != QnQualityPreSet) 
     {
         encoder.Quality = m_onvifRes->innerQualityToOnvif(quality);
     }

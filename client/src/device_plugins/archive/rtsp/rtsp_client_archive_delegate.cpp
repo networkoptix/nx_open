@@ -8,6 +8,7 @@
 #include "utils/common/util.h"
 #include "utils/common/sleep.h"
 #include "utils/common/synctime.h"
+#include "utils/common/base.h"
 #include "core/resource/camera_history.h"
 #include "core/resource/video_server.h"
 

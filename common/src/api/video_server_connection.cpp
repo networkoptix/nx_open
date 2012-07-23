@@ -51,8 +51,8 @@ protected:
         }
         QString host = query.peerHostName();
         QUrl url = query.url();
-        url.setPath("");
-        url.setUserInfo("");
+        url.setPath(QString());
+        url.setUserInfo(QString());
         url.setQueryItems(QList<QPair<QString, QString> >());
         QSet<QUrl>::const_iterator itr = m_proxyInfo.find(url);
         if (itr == m_proxyInfo.end())
@@ -185,20 +185,20 @@ int QnVideoServerConnection::asyncGetFreeSpace(const QString& path, QObject *tar
 
     QnRequestParamList params;
     params << QnRequestParam("path", path);
-    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, "GetFreeSpace", params, processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
+    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("GetFreeSpace"), params, processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
 
 }
 
 int QnVideoServerConnection::asyncGetStatistics(QObject *target, const char *slot){
     detail::VideoServerSessionManagerStatisticsRequestReplyProcessor *processor = new detail::VideoServerSessionManagerStatisticsRequestReplyProcessor();
     connect(processor, SIGNAL(finished(const QnStatisticsDataVector &/* data */)), target, slot, Qt::QueuedConnection);
-    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, "api/statistics", processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
+    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("api/statistics"), processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
 }
 
 int QnVideoServerConnection::syncGetStatistics(QObject *target, const char *slot){
     QByteArray reply;
     QByteArray errorString;
-    int status = QnSessionManager::instance()->sendGetRequest(m_url, "api/statistics", reply, errorString);
+    int status = QnSessionManager::instance()->sendGetRequest(m_url, QLatin1String("api/statistics"), reply, errorString);
 
     detail::VideoServerSessionManagerStatisticsRequestReplyProcessor *processor = new detail::VideoServerSessionManagerStatisticsRequestReplyProcessor();
     connect(processor, SIGNAL(finished(int)), target, slot, Qt::DirectConnection);
@@ -263,7 +263,7 @@ int QnVideoServerConnection::recordedTimePeriods(const QnRequestParamList& param
 {
     QByteArray reply;
 
-    if(QnSessionManager::instance()->sendGetRequest(m_url, "RecordedTimePeriods", params, reply, errorString))
+    if(QnSessionManager::instance()->sendGetRequest(m_url, QLatin1String("RecordedTimePeriods"), params, reply, errorString))
         return 1;
 
     if (reply.startsWith("BIN"))
@@ -282,7 +282,7 @@ int QnVideoServerConnection::asyncRecordedTimePeriods(const QnRequestParamList& 
     detail::VideoServerSessionManagerReplyProcessor *processor = new detail::VideoServerSessionManagerReplyProcessor();
     connect(processor, SIGNAL(finished(int, const QnTimePeriodList&, int)), target, slot);
 
-    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, "RecordedTimePeriods", params, processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
+    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("RecordedTimePeriods"), params, processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
 }
 
 void QnVideoServerConnection::setProxyAddr(const QString& addr, int port)
@@ -314,7 +314,7 @@ void detail::VideoServerSessionManagerStatisticsRequestReplyProcessor::at_replyR
         QByteArray modelStr = extractXmlBody(reply, "model");
 
         QnStatisticsDataVector data;
-        data.append(QnStatisticsData(modelStr, usage, QnStatisticsData::CPU));
+        data.append(QnStatisticsData(QLatin1String(modelStr), usage, QnStatisticsData::CPU));
 
         QByteArray storages = extractXmlBody(reply, "storages");
         QByteArray storage;
@@ -326,7 +326,7 @@ void detail::VideoServerSessionManagerStatisticsRequestReplyProcessor::at_replyR
                 break;
 
             from += storage.length();
-            QString url = extractXmlBody(storage, "url");
+            QString url = QLatin1String(extractXmlBody(storage, "url"));
             usage = extractXmlBody(storage, "usage").toShort();
             data.append(QnStatisticsData(url, usage, QnStatisticsData::HDD));
         } while (storage.length() > 0);

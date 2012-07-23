@@ -2,10 +2,10 @@
 
 void parseRegion(QRegion& region, const QString& regionString)
 {
-    foreach (QString rectString, regionString.split(';'))
+    foreach (QString rectString, regionString.split(QLatin1Char(';')))
     {
         QRect rect;
-        QStringList rectList = rectString.split(',');
+        QStringList rectList = rectString.split(QLatin1Char(','));
 
         if (rectList.size() == 4)
         {
@@ -20,7 +20,7 @@ void parseRegion(QRegion& region, const QString& regionString)
 
 void parseRegionList(QList<QRegion>& regions, const QString& regionsString)
 {
-    QStringList regList = regionsString.split(':');
+    QStringList regList = regionsString.split(QLatin1Char(':'));
     regions.clear();
     foreach(const QString& regionStr, regList)
     {
@@ -33,9 +33,9 @@ void parseRegionList(QList<QRegion>& regions, const QString& regionsString)
 
 void parseMotionRegionList(QList<QnMotionRegion>& regions, const QString& regionsString)
 {
-    QStringList regList = regionsString.split(':');
+    QStringList regList = regionsString.split(QLatin1Char(':'));
     regions.clear();
-    // for compatibiliti with previous version. By default screen filled medium sensitivity motion window
+    // for compatibility with previous version. By default screen filled medium sensitivity motion window
     for (int i = 0; i < regList.size(); ++i)
     {
         QnMotionRegion region;
@@ -51,9 +51,9 @@ void parseMotionRegion(QnMotionRegion& region, const QString& regionString)
 {
     QList<QRect> motionMask;
     bool firstRect = true;
-    foreach (QString rectString, regionString.split(';'))
+    foreach (QString rectString, regionString.split(QLatin1Char(';')))
     {
-        QStringList rectList = rectString.split(',');
+        QStringList rectList = rectString.split(QLatin1Char(','));
         QRect r;
         int sensitivity = 0;
         if (rectList.size() == 4)
@@ -98,12 +98,12 @@ QString serializeMotionRegion(const QnMotionRegion& region)
             {
                 QStringList rectList;
                 rectList << QString::number(i) << QString::number(rect.left()) << QString::number(rect.top()) << QString::number(rect.width()) << QString::number(rect.height());
-                regionList << rectList.join(",");
+                regionList << rectList.join(QLatin1String(","));
             }
         }            
     }
 
-    return regionList.join(";");
+    return regionList.join(QLatin1String(";"));
 }
 
 QString serializeRegion(const QRegion& region)
@@ -114,10 +114,10 @@ QString serializeRegion(const QRegion& region)
     {
         QStringList rectList;
         rectList << QString::number(rect.left()) << QString::number(rect.top()) << QString::number(rect.width()) << QString::number(rect.height());
-        regionList << rectList.join(",");
+        regionList << rectList.join(QLatin1String(","));
     }
 
-    return regionList.join(";");
+    return regionList.join(QLatin1String(";"));
 }
 
 QString serializeRegionList(const QList<QRegion>& regions)
@@ -127,7 +127,7 @@ QString serializeRegionList(const QList<QRegion>& regions)
     {
         QString regStr = serializeRegion(regions[i]);
         if (i > 0)
-            result += ':';
+            result += QLatin1Char(':');
         result += regStr;
     }
     return result;
@@ -140,7 +140,7 @@ QString serializeMotionRegionList(const QList<QnMotionRegion>& regions)
     {
         QString regStr = serializeMotionRegion(regions[i]);
         if (i > 0)
-            result += ':';
+            result += QLatin1Char(':');
         result += regStr;
     }
     return result;

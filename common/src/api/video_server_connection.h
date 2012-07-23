@@ -10,6 +10,7 @@
 #include "utils/common/util.h"
 #include "recording/time_period.h"
 
+#include <utils/common/request_param.h>
 #include <api/video_server_statistics.h>
 
 class VideoServerSessionManager;

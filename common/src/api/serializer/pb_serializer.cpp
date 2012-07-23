@@ -25,7 +25,7 @@ QString serializeNetAddrList(const QList<QHostAddress>& netAddrList)
 {
     QStringList addListStrings;
     std::transform(netAddrList.begin(), netAddrList.end(), std::back_inserter(addListStrings), std::mem_fun_ref(&QHostAddress::toString));
-    return addListStrings.join(";");
+    return addListStrings.join(QLatin1String(";"));
 }
 
 QHostAddress stringToAddr(const QString& hostStr)
@@ -35,7 +35,7 @@ QHostAddress stringToAddr(const QString& hostStr)
 
 void deserializeNetAddrList(QList<QHostAddress>& netAddrList, const QString& netAddrListString)
 {
-    QStringList addListStrings = netAddrListString.split(";");
+    QStringList addListStrings = netAddrListString.split(QLatin1Char(';'));
     std::transform(addListStrings.begin(), addListStrings.end(), std::back_inserter(netAddrList), stringToAddr);
 }
 
@@ -70,7 +70,7 @@ void parseCamera(QnVirtualCameraResourcePtr& camera, const pb::Resource& pb_came
     {
         const pb::Resource_Property& pb_property = pb_cameraResource.property(j);
 
-        camera->setParam(pb_property.name().c_str(), pb_property.value().c_str(), QnDomainDatabase);
+        camera->setParam(QString::fromStdString(pb_property.name()), QString::fromStdString(pb_property.value()), QnDomainDatabase);
     }
 
     camera->setScheduleDisabled(pb_camera.scheduledisabled());
@@ -78,7 +78,7 @@ void parseCamera(QnVirtualCameraResourcePtr& camera, const pb::Resource& pb_came
         camera->setAudioEnabled(pb_camera.audioenabled());
 
     if (pb_camera.has_physicalid())
-        camera->setPhysicalId(pb_camera.physicalid().c_str());
+        camera->setPhysicalId(QString::fromStdString(pb_camera.physicalid()));
 
     camera->setAuth(QString::fromUtf8(pb_camera.login().c_str()), QString::fromUtf8(pb_camera.password().c_str()));
     camera->setMotionType(static_cast<MotionType>(pb_camera.motiontype()));
@@ -86,7 +86,7 @@ void parseCamera(QnVirtualCameraResourcePtr& camera, const pb::Resource& pb_came
     if (pb_camera.has_region())
     {
         QList<QnMotionRegion> regions;
-        parseMotionRegionList(regions, pb_camera.region().c_str());
+        parseMotionRegionList(regions, QString::fromStdString(pb_camera.region()));
         while (regions.size() < CL_MAX_CHANNELS)
             regions << QnMotionRegion();
 
@@ -144,7 +144,7 @@ void parseServer(QnVideoServerResourcePtr &server, const pb::Resource &pb_server
     server->setId(pb_serverResource.id());
     server->setName(QString::fromUtf8(pb_serverResource.name().c_str()));
     server->setUrl(QString::fromUtf8(pb_serverResource.url().c_str()));
-    server->setGuid(pb_serverResource.guid().c_str());
+    server->setGuid(QString::fromStdString(pb_serverResource.guid()));
     server->setApiUrl(QString::fromUtf8(pb_server.apiurl().c_str()));
 
     if (pb_serverResource.has_status())
@@ -215,7 +215,7 @@ void parseLayout(QnLayoutResourcePtr& layout, const pb::Resource& pb_layoutResou
         layout->setId(pb_layoutResource.id());
 
     if (pb_layoutResource.has_guid())
-        layout->setGuid(pb_layoutResource.guid().c_str());
+        layout->setGuid(QString::fromStdString(pb_layoutResource.guid()));
 
     layout->setParentId(pb_layoutResource.parentid());
     layout->setName(QString::fromUtf8(pb_layoutResource.name().c_str()));
@@ -274,7 +274,7 @@ void parseUser(QnUserResourcePtr& user, const pb::Resource& pb_userResource)
 
     user->setName(QString::fromUtf8(pb_userResource.name().c_str()));
     user->setAdmin(pb_user.isadmin());
-    user->setGuid(pb_userResource.guid().c_str());
+    user->setGuid(QString::fromStdString(pb_userResource.guid()));
 }
 
 void parseUsers(QnUserResourceList& users, const PbResourceList& pb_users)

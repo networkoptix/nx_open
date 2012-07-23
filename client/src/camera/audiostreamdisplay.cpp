@@ -1,6 +1,7 @@
 #include "audiostreamdisplay.h"
 #include "decoders/audio/audio_struct.h"
 #include "decoders/audio/abstractaudiodecoder.h"
+#include "utils/common/base.h"
 
 #include "utils/settings.h"
 

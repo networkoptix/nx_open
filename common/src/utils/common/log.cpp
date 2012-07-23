@@ -5,20 +5,18 @@
 
 char *cl_log_msg[] = {"UNKNOWN", "ALWAYS", "ERROR", "WARNING", "INFO", "DEBUG", "DEBUG2" };
 
-QnLogLevel QnLog::logLevelFromString(const QString& value)
-{
+QnLogLevel QnLog::logLevelFromString(const QString &value) {
     QString str = value.toUpper().trimmed();
-    for (int i = 0; i < sizeof(cl_log_msg)/sizeof(char*); ++i)
-    {
-        if (str == cl_log_msg[i])
+    for (int i = 0; i < sizeof(cl_log_msg)/sizeof(char*); ++i) {
+        if (str == QLatin1String(cl_log_msg[i]))
             return QnLogLevel(i);
     }
+
     return cl_logUNKNOWN;
 }
 
-QString QnLog::logLevelToString(QnLogLevel value)
-{
-    return cl_log_msg[value];
+QString QnLog::logLevelToString(QnLogLevel value) {
+    return QLatin1String(cl_log_msg[value]);
 }
 
 // -------------------------------------------------------------------------- //
@@ -155,117 +153,35 @@ QnLog QnLog::instance() {
     return QnLog(qn_logPrivateInstance());
 }
 
-bool QnLog::create(const QString& baseName, quint32 maxFileSize, quint8 maxBackupFiles, QnLogLevel logLevel)
-{
+bool QnLog::create(const QString& baseName, quint32 maxFileSize, quint8 maxBackupFiles, QnLogLevel logLevel) {
     if(!d)
         return false;
 
     return d->create(baseName, maxFileSize, maxBackupFiles, logLevel);
 }
 
-void QnLog::setLogLevel(QnLogLevel loglevel)
-{
+void QnLog::setLogLevel(QnLogLevel logLevel) {
     if(!d)
         return;
 
-    d->setLogLevel(loglevel);
+    d->setLogLevel(logLevel);
 }
 
-QnLogLevel QnLog::logLevel() const 
-{
+QnLogLevel QnLog::logLevel() const {
     if(!d)
         return cl_logERROR;
 
     return d->logLevel();
 }
 
-void QnLog::log(const QString& msg, int val, QnLogLevel loglevel)
-{
+void QnLog::log(const QString& msg, QnLogLevel logLevel) {
     if(!d)
         return;
 
-    if (loglevel > d->logLevel())
-        return;
-
-    QString str;
-    QTextStream(&str) << msg << val;
-
-    d->log(str, loglevel);
+    d->log(msg, logLevel);
 }
 
-void QnLog::log(const QString& msg, qint64 val, QnLogLevel loglevel)
-{
-    if(!d)
-        return;
-
-    if (loglevel > d->logLevel())
-        return;
-
-    QString str;
-    QTextStream(&str) << msg << val;
-
-    d->log(str, loglevel);
-}
-
-
-void QnLog::log(const QString& msg1, const QString& msg2, QnLogLevel loglevel)
-{
-    if(!d)
-        return;
-
-    if (loglevel > d->logLevel())
-        return;
-
-    QString str;
-    QTextStream(&str) << msg1 << msg2;
-
-    d->log(str, loglevel);
-}
-
-void QnLog::log(const QString& msg1, int val, const QString& msg2, QnLogLevel loglevel)
-{
-    if(!d)
-        return;
-
-    if (loglevel > d->logLevel())
-        return;
-
-    QString str;
-    QTextStream(&str) << msg1 << val << msg2;
-
-    d->log(str, loglevel);
-}
-
-void QnLog::log(const QString& msg1, int val, const QString& msg2, int val2, QnLogLevel loglevel)
-{
-    if(!d)
-        return;
-
-    if (loglevel > d->logLevel())
-        return;
-
-    QString str;
-    QTextStream(&str) << msg1 << val << msg2 << val2;
-
-    d->log(str, loglevel);
-}
-
-void QnLog::log(const QString& msg, qreal val, QnLogLevel loglevel)
-{
-    if(!d)
-        return;
-
-    if (loglevel > d->logLevel())
-        return;
-
-    QString str;
-    QTextStream(&str) << msg << val;
-
-    d->log(str, loglevel);
-}
-
-void QnLog::log(QnLogLevel logLevel, const char* format, ...) 
-{
+void QnLog::log(QnLogLevel logLevel, const char* format, ...) {
     if(!d)
         return;
 
@@ -288,16 +204,7 @@ void QnLog::log(QnLogLevel logLevel, const char* format, ...)
     va_end(args);
 }
 
-void QnLog::log(const QString& msg, QnLogLevel loglevel) 
-{
-    if(!d)
-        return;
-
-    d->log(msg, loglevel);
-}
-
-void qnLogMsgHandler(QtMsgType type, const char *msg) 
-{
+void qnLogMsgHandler(QtMsgType type, const char *msg) {
     QnLogLevel logLevel;
     switch (type) {
     case QtFatalMsg:
@@ -319,8 +226,7 @@ void qnLogMsgHandler(QtMsgType type, const char *msg)
 }
 
 
-void QnLog::initLog(const QString& logLevelStr)
-{
+void QnLog::initLog(const QString& logLevelStr) {
     bool needWarnLogLevel = false;
     QnLogLevel logLevel = cl_logDEBUG1;
 #ifndef _DEBUG
@@ -336,11 +242,9 @@ void QnLog::initLog(const QString& logLevelStr)
     }
     cl_log.setLogLevel(logLevel);
 
-    CL_LOG(cl_logALWAYS)
-    {
+    CL_LOG(cl_logALWAYS) {
         cl_log.log(QLatin1String("================================================================================="), cl_logALWAYS);
         if (needWarnLogLevel) 
             cl_log.log("Unknown log level specified. Using level ", QnLog::logLevelToString(logLevel), cl_logALWAYS);
     }
-
 }

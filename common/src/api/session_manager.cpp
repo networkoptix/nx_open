@@ -202,7 +202,7 @@ void QnSessionManager::doSendAsyncGetRequest(SessionManagerReplyProcessor* reply
     QNetworkRequest request;
     request.setUrl(createApiUrl(url, objectName, params));
     request.setRawHeader("Authorization", "Basic " + url.userInfo().toLatin1().toBase64());
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "text/xml");
+    request.setHeader(QNetworkRequest::ContentTypeHeader, QLatin1String("text/xml"));
 
     QNetworkReply* reply = m_accessManager->get(request);
     connect(reply, SIGNAL(finished()), replyProcessor, SLOT(at_replyReceived()));
@@ -224,7 +224,7 @@ void QnSessionManager::doSendAsyncDeleteRequest(SessionManagerReplyProcessor* re
     QNetworkRequest request;
     request.setUrl(createApiUrl(url, objectName, QnRequestParamList() << QnRequestParam("id", QString::number(id))));
     request.setRawHeader("Authorization", "Basic " + url.userInfo().toLatin1().toBase64());
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "text/xml");
+    request.setHeader(QNetworkRequest::ContentTypeHeader, QLatin1String("text/xml"));
 
     QNetworkReply* reply = m_accessManager->deleteResource(request);
     connect(reply, SIGNAL(finished()), replyProcessor, SLOT(at_replyReceived()));
@@ -281,7 +281,7 @@ void QnSessionManager::doSendAsyncPostRequest(SessionManagerReplyProcessor* repl
     QNetworkRequest request;
     request.setUrl(createApiUrl(url, objectName, params));
     request.setRawHeader("Authorization", "Basic " + url.userInfo().toLatin1().toBase64());
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "text/xml");
+    request.setHeader(QNetworkRequest::ContentTypeHeader, QLatin1String("text/xml"));
 
     QNetworkReply* reply = m_accessManager->post(request, data);
     connect(reply, SIGNAL(finished()), replyProcessor, SLOT(at_replyReceived()));

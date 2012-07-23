@@ -1,6 +1,7 @@
 #include "testcamera_stream_reader.h"
 #include "testcamera_resource.h"
 #include "utils/common/synctime.h"
+#include "utils/common/base.h"
 
 static const int TESTCAM_TIMEOUT = 1 * 1000;
 

@@ -7,6 +7,7 @@
 #include <libavformat/avformat.h>
 #include "core/resource/resource_media_layout.h"
 #include "utils/media/ffmpeg_helper.h"
+#include "utils/common/base.h"
 #include "core/resource/storage_resource.h"
 #include "plugins/storage/file_storage/layout_storage_resource.h"
 

@@ -139,7 +139,7 @@ void QnMessageSource::httpFinished()
     } else {
         // Connection closed normally by the server. Reconnect immediately.
         QTimer::singleShot(0, this, SLOT(startRequest()));
-        emit connectionClosed("OK");
+        emit connectionClosed(QLatin1String("OK"));
     }
 
     m_reply->deleteLater();
@@ -190,8 +190,8 @@ void QnMessageSource::httpReadyRead()
 
 void QnMessageSource::slotAuthenticationRequired(QNetworkReply*,QAuthenticator *authenticator)
 {
-    authenticator->setUser("xxxuser");
-    authenticator->setPassword("xxxpassword");
+    authenticator->setUser(QLatin1String("xxxuser"));
+    authenticator->setPassword(QLatin1String("xxxpassword"));
 }
 
 void QnMessageSource::onPingTimer()
@@ -200,7 +200,7 @@ void QnMessageSource::onPingTimer()
     {
         doStop();
 
-        emit connectionClosed("Timeout");
+        emit connectionClosed(QLatin1String("Timeout"));
     }
 }
 
@@ -210,7 +210,7 @@ void QnMessageSource::sslErrors(QNetworkReply*,const QList<QSslError> &errors)
     QString errorString;
     foreach (const QSslError &error, errors) {
         if (!errorString.isEmpty())
-            errorString += ", ";
+            errorString += QLatin1String(", ");
         errorString += error.errorString();
     }
     qnWarning("SSL errors: %1.", errorString);

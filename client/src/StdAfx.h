@@ -1,3 +1,5 @@
+//#define QT_NO_CAST_FROM_ASCII
+
 #ifdef _WIN32
 #undef __STDC_CONSTANT_MACROS
 #define __STDC_CONSTANT_MACROS

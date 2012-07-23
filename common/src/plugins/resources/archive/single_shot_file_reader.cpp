@@ -1,6 +1,7 @@
 #include "single_shot_file_reader.h"
 #include "filetypesupport.h"
 #include "utils/common/synctime.h"
+#include "utils/common/base.h"
 #include "core/resource/storage_resource.h"
 
 QnSingleShotFileStreamreader::QnSingleShotFileStreamreader(QnResourcePtr resource):

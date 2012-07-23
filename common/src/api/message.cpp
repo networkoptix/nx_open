@@ -25,7 +25,7 @@ bool QnMessage::load(const pb::Message &message)
 		{
 			const pb::ResourceMessage& resourceMessage = message.GetExtension(pb::ResourceMessage::message);
 			resourceId = resourceMessage.resource().id();
-			resourceGuid = resourceMessage.resource().guid().c_str();
+			resourceGuid = QString::fromStdString(resourceMessage.resource().guid());
 			resourceDisabled = resourceMessage.resource().disabled();
 			break;
 		}
@@ -33,7 +33,7 @@ bool QnMessage::load(const pb::Message &message)
 		{
 			const pb::ResourceMessage& resourceMessage = message.GetExtension(pb::ResourceMessage::message);
 			resourceId = resourceMessage.resource().id();
-			resourceGuid = resourceMessage.resource().guid().c_str();
+			resourceGuid = QString::fromStdString(resourceMessage.resource().guid());
 			resourceStatus = static_cast<QnResource::Status>(resourceMessage.resource().status());
 			break;
 		}
@@ -41,7 +41,7 @@ bool QnMessage::load(const pb::Message &message)
         {
 			const pb::ResourceMessage& resourceMessage = message.GetExtension(pb::ResourceMessage::message);
 			resourceId = resourceMessage.resource().id();
-			resourceGuid = resourceMessage.resource().guid().c_str();
+			resourceGuid = QString::fromStdString(resourceMessage.resource().guid());
             break;
         }
         case pb::Message_Type_License:
