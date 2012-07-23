@@ -272,6 +272,9 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannel(QPainter *painter, int chan
     Qn::RenderStatus result = m_renderer->paint(channel, rect, effectiveOpacity());
     painter->endNativePainting();
 
+    if(result != Qn::NewFrameRendered && result != Qn::OldFrameRendered)
+        painter->fillRect(rect, Qt::black);
+
     /* Draw motion grid. */
     if (displayFlags() & DisplayMotion) {
         for(int i = 0; i < channelCount(); i++)  {

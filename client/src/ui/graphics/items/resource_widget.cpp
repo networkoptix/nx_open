@@ -561,10 +561,6 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
         QRectF rect = channelRect(i);
         Qn::RenderStatus renderStatus = paintChannel(painter, i, rect);
 
-        /* Draw black rectangle if nothing was drawn. */
-        if(renderStatus != Qn::OldFrameRendered && renderStatus != Qn::NewFrameRendered)
-            painter->fillRect(rect, Qt::black);
-
         /* Update channel state. */
         m_channelState[i].renderStatus = renderStatus;
         if(renderStatus == Qn::NewFrameRendered)
