@@ -104,8 +104,7 @@ unix:!mac {
 
 DEFINES += __STDC_CONSTANT_MACROS
 
-
-QMAKE_CXXFLAGS += -I$$EVETOOLS_DIR/include 
+INCLUDEPATH += $$EVETOOLS_DIR/include $$EVETOOLS_DIR/include/dvr
 LIBS += -L$$EVETOOLS_DIR/lib
 
 PROTOC_FILE = $$EVETOOLS_DIR/bin/protoc
