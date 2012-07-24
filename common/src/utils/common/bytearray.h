@@ -132,10 +132,8 @@ public:
 
     /* Deprecated functions follow. */
 
+    // TODO: this function breaks data alignment.
     void ignore_first_bytes(int bytes_to_ignore);
-
-    /*char *prepareToWrite(unsigned int size) { startWriting(size); }
-    void done(unsigned int size) { finishWriting(size); }*/
 
 protected:
     bool reallocate(unsigned int capacity);

@@ -94,7 +94,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
                 !m_streamParam.contains("image_right") || !m_streamParam.contains("image_bottom") ||
                 (h264 && !m_streamParam.contains("streamID")))
             {
-                cl_log.log("Erorr!!! parameter is missing in stream params.", cl_logERROR);
+                cl_log.log("Error!!! parameter is missing in stream params.", cl_logERROR);
                 //return QnAbstractMediaDataPtr(0);
             }
 
@@ -199,7 +199,6 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
         if (bitrate)
             request += QLatin1String("bitrate=") + QString::number(bitrate) + QLatin1Char(';');
     }
-    /**/
 
     QnPlAreconVisionResourcePtr netRes = getResource().dynamicCast<QnPlAreconVisionResource>();
     if (m_tftp_client == 0 || m_tftp_client->getHostAddress() != netRes->getHostAddress()) {
@@ -353,12 +352,12 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 
             dst = img.data();
             memcpy(dst, h264header, header_size);
-            dst+= header_size;
+            dst += header_size;
         }
         else
         {
             img.ignore_first_bytes(expectable_header_size); // if you decoder needs compressed data alignment, just do not do it. ffmpeg will delay one frame if do not do it.
-            dst+=expectable_header_size;
+            dst += expectable_header_size;
         }
 
         // we also need to put very begining of SH
@@ -377,7 +376,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
     }
 
 
-    QnCompressedVideoDataPtr videoData ( new QnCompressedVideoData(CL_MEDIA_ALIGNMENT,m_videoFrameBuff.size()) );
+    QnCompressedVideoDataPtr videoData(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT,m_videoFrameBuff.size()));
 
     QnByteArray& imgToSend = videoData->data;
     imgToSend.write(m_videoFrameBuff);
@@ -400,7 +399,6 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 QnMetaDataV1Ptr AVClientPullSSTFTPStreamreader::getCameraMetadata()
 {
     QnMetaDataV1Ptr motion(new QnMetaDataV1());
-    //Andy Tau & Touch Enable feat. Louisa Allen - Sorry (Sean Truby Remix)
     QVariant mdresult;
     if (!getResource()->getParam("MdResult", mdresult, QnDomainPhysical))
         return QnMetaDataV1Ptr(0);

@@ -38,7 +38,6 @@ char *QnByteArray::data()
     return m_data + m_ignore;
 }
 
-// ### consider deprecating ignore_first_bytes() as it could break data alignment
 void QnByteArray::ignore_first_bytes(int bytes_to_ignore)
 {
     m_ignore = bytes_to_ignore;
