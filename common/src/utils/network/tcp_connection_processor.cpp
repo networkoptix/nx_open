@@ -102,14 +102,14 @@ void QnTCPConnectionProcessor::parseRequest()
                 if (v.length() > 1)
                     minor = v[1].toInt();
             }
-            d->requestHeaders = QHttpRequestHeader(params[0], params[1], major, minor);
+            d->requestHeaders = QHttpRequestHeader(QLatin1String(params[0]), QLatin1String(params[1]), major, minor);
             firstLine = false;
         }
         else
         {
             QList<QByteArray> params = line.split(':');
             if (params.size() > 1)
-                d->requestHeaders.addValue(params[0].trimmed(), params[1].trimmed());
+                d->requestHeaders.addValue(QLatin1String(params[0].trimmed()), QLatin1String(params[1].trimmed()));
         }
     }
     QByteArray delimiter = "\n";
@@ -120,7 +120,7 @@ void QnTCPConnectionProcessor::parseRequest()
         delimiter = "\r\n";
     QByteArray dblDelim = delimiter + delimiter;
     int bodyStart = d->clientRequest.indexOf(dblDelim);
-    if (bodyStart >= 0 && d->requestHeaders.value("content-length").toInt() > 0)
+    if (bodyStart >= 0 && d->requestHeaders.value(QLatin1String("content-length")).toInt() > 0)
         d->requestBody = d->clientRequest.mid(bodyStart + dblDelim.length());
 }
 
@@ -163,10 +163,10 @@ QString QnTCPConnectionProcessor::extractPath() const
 {
     Q_D(const QnTCPConnectionProcessor);
     QString path = d->requestHeaders.path();
-    int pos = path.indexOf("://");
+    int pos = path.indexOf(QLatin1String("://"));
     if (pos == -1)
         return QString();
-    pos = path.indexOf('/', pos+3);
+    pos = path.indexOf(QLatin1Char('/'), pos+3);
     if (pos == -1)
         return QString();
     return path.mid(pos+1);
@@ -180,7 +180,7 @@ void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int cod
     {
         d->responseHeaders.setContentLength(d->responseBody.length());
         //d->responseHeaders.setContentType("application/sdp");
-        d->responseHeaders.setContentType(contentType);
+        d->responseHeaders.setContentType(QLatin1String(contentType));
     }
 
     QByteArray response = d->responseHeaders.toString().toUtf8();
@@ -202,15 +202,15 @@ QString QnTCPConnectionProcessor::codeToMessage(int code)
     switch(code)
     {
     case CODE_OK:
-        return "OK";
+        return tr("OK");
     case CODE_NOT_FOUND:
-        return "Not Found";
+        return tr("Not Found");
     case CODE_NOT_IMPLEMETED:
-        return "Not Implemented";
+        return tr("Not Implemented");
     case CODE_INTERNAL_ERROR:
-        return "Internal Server Error";
+        return tr("Internal Server Error");
     case CODE_INVALID_PARAMETER:
-        return "Invalid Parameter";
+        return tr("Invalid Parameter");
     }
     return QString ();
 }

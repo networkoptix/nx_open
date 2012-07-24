@@ -1,4 +1,4 @@
-//#define QT_NO_CAST_FROM_ASCII
+#define QT_NO_CAST_FROM_ASCII
 
 #ifdef _WIN32
 #undef __STDC_CONSTANT_MACROS

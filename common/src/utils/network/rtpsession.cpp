@@ -27,7 +27,7 @@ static const int SDP_TRACK_STEP = 2;
 
 static QString getValueFromString(const QString& line)
 {
-    int index = line.indexOf("=");
+    int index = line.indexOf(QLatin1Char('='));
     if (index < 1)
         return QString();
     return line.mid(index+1);

@@ -64,13 +64,13 @@
 #  define QT_QTSOAP_EXPORT
 #endif
 
-#define SOAPv11_ENVELOPE    "http://schemas.xmlsoap.org/soap/envelope/"
-#define SOAPv11_ENCODING    "http://schemas.xmlsoap.org/soap/encoding/"
-#define SOAPv11_ACTORNEXT   "http://schemas.xmlsoap.org/soap/actor/next"
+#define SOAPv11_ENVELOPE    QLatin1String("http://schemas.xmlsoap.org/soap/envelope/")
+#define SOAPv11_ENCODING    QLatin1String("http://schemas.xmlsoap.org/soap/encoding/")
+#define SOAPv11_ACTORNEXT   QLatin1String("http://schemas.xmlsoap.org/soap/actor/next")
 
-#define XML_SCHEMA          "http://www.w3.org/1999/XMLSchema"
-#define XML_SCHEMA_INSTANCE "http://www.w3.org/1999/XMLSchema-instance"
-#define XML_NAMESPACE       "http://www.w3.org/XML/1998/namespace"
+#define XML_SCHEMA          QLatin1String("http://www.w3.org/1999/XMLSchema")
+#define XML_SCHEMA_INSTANCE QLatin1String("http://www.w3.org/1999/XMLSchema-instance")
+#define XML_NAMESPACE       QLatin1String("http://www.w3.org/XML/1998/namespace")
 
 template <class T>
 class QtSmartPtr
@@ -176,6 +176,7 @@ bool operator <(const QtSoapQName &n1, const QtSoapQName &n2);
 
 class QT_QTSOAP_EXPORT QtSoapType
 {
+    Q_DECLARE_TR_FUNCTIONS(QtSoapType)
 public:
     enum Type {
 	Duration, DateTime, Time, Date, GYearMonth, GYear, GMonthDay,
