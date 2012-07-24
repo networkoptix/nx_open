@@ -22,6 +22,11 @@ syntax: glob
 Debug
 Release
 
+contrib/maven-artifacts-deploy/include
+contrib/maven-artifacts-deploy/linux
+contrib/maven-artifacts-deploy/target
+contrib/maven-artifacts-deploy/windows
+
 common/bin
 client/bin
 mediaserver/bin
