@@ -76,6 +76,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
 }
 
 QnMediaResourceWidget::~QnMediaResourceWidget() {
+    ensureAboutToBeDestroyedEmitted();
+
     delete m_display;
 
     foreach(__m128i *data, m_binaryMotionMask)

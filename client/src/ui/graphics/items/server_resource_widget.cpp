@@ -183,7 +183,7 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
 }
 
 QnServerResourceWidget::~QnServerResourceWidget() {
-    return;
+    ensureAboutToBeDestroyedEmitted();
 }
 
 QnVideoServerResourcePtr QnServerResourceWidget::resource() const {
