@@ -10,7 +10,7 @@
 static const int CONNECTION_TIMEOUT = 60 * 1000;
 static const int MAX_REQUEST_SIZE = 1024*1024*15;
 
-struct QnRestConnectionProcessor::QnRestConnectionProcessorPrivate: public QnTCPConnectionProcessor::QnTCPConnectionProcessorPrivate
+class QnRestConnectionProcessor::QnRestConnectionProcessorPrivate: public QnTCPConnectionProcessor::QnTCPConnectionProcessorPrivate
 {
 };
 

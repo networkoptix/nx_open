@@ -6,6 +6,7 @@
 #include <QString>
 #include <QList>
 #include <QByteArray>
+#include "utils/common/request_param.h"
 #include "utils/common/base.h"
 
 

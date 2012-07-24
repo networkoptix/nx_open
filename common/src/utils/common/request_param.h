@@ -14,6 +14,6 @@ public:
     QnRequestParam(const QString &first, const char *second): base_type(first, QLatin1String(second)) {}
 };
 
-typedef QList<QnRequestParam> QnRequestParamList;
+typedef QList<QPair<QString, QString> > QnRequestParamList;
 
 #endif // QN_REQUEST_PARAM_H

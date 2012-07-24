@@ -1,8 +1,8 @@
 #include <QDebug>
 #include "request_handler.h"
 
-struct QnRestGUIRequestHandler::QnRestGUIRequestHandlerPrivate
-{
+class QnRestGUIRequestHandler::QnRestGUIRequestHandlerPrivate {
+public:
     QnRestGUIRequestHandlerPrivate(): result(0), body(0), code(0) {}
 
     QnRequestParamList params;
