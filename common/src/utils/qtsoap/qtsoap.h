@@ -415,6 +415,7 @@ protected:
 
 class QT_QTSOAP_EXPORT QtSoapMessage
 {
+    Q_DECLARE_TR_FUNCTIONS(QtSoapMessage)
     friend class QtSoapHttpServer;
 
 public:
@@ -537,6 +538,7 @@ private:
 
 class QT_QTSOAP_EXPORT QtSoapTypeFactory
 {
+    Q_DECLARE_TR_FUNCTIONS(QtSoapTypeFactory)
 private:
     QtSoapTypeFactory();
 

@@ -1790,17 +1790,13 @@ bool QtSoapStruct::parse(QDomNode node)
         if (n.isComment())
             continue;
 	if (!n.isElement()){
-	    errorStr = "In the struct element " + e.tagName();
-	    errorStr += ", the " + QString::number(i) + "th child ";
-	    errorStr += "is not an element.";
+        errorStr = tr("In the struct element %1, the %2th child is not an element.").arg(e.tagName()).arg(QString::number(i));
 	    return false;
 	}
 
 	QtSmartPtr<QtSoapType> type = QtSoapTypeFactory::instance().soapType(n.toElement());
 	if (!type.ptr()) {
-	    errorStr = "In the struct element " + e.tagName();
-	    errorStr += ", child #" + QString::number(i) + ", ";
-	    errorStr += n.toElement().tagName() + ", was not recognized as a SOAP type.";
+        errorStr = tr("In the struct element %1, the %2th child was not recognized as a SOAP type.").arg(e.tagName()).arg(QString::number(i));
 	    return false;
 	}
 
@@ -1850,7 +1846,7 @@ const QtSoapType &QtSoapStruct::operator [](const QtSoapQName &key) const
 */
 QtSoapType &QtSoapStruct::operator [](const QString &key)
 {
-    return at(QtSoapQName(key, ""));
+    return at(QtSoapQName(key, QString()));
 }
 
 /*!
@@ -1862,7 +1858,7 @@ QtSoapType &QtSoapStruct::operator [](const QString &key)
 */
 const QtSoapType &QtSoapStruct::operator [](const QString &key) const
 {
-    return at(QtSoapQName(key, ""));
+    return at(QtSoapQName(key, QString()));
 }
 
 /*!
@@ -2097,12 +2093,12 @@ void QtSoapSimpleType::clear()
 QDomElement QtSoapSimpleType::toDomElement(QDomDocument doc) const
 {
     QString prefix = QtSoapNamespaces::instance().prefixFor(n.uri());
-    QDomElement a = n.uri() == ""
+    QDomElement a = n.uri() == QString()
 		    ? doc.createElement(n.name())
-		    : doc.createElementNS(n.uri(), prefix + ":" + n.name());
+            : doc.createElementNS(n.uri(), prefix + QLatin1Char(':') + n.name());
 
     QString schemaprefix = QtSoapNamespaces::instance().prefixFor(XML_SCHEMA_INSTANCE);
-    a.setAttributeNS(XML_SCHEMA_INSTANCE, schemaprefix + ":type", "xsd:" + typeName());
+    a.setAttributeNS(XML_SCHEMA_INSTANCE, schemaprefix + QLatin1String(":type"), QLatin1String("xsd:") + typeName());
     a.appendChild(doc.createTextNode(v.toString()));
 
     return a;
@@ -2143,8 +2139,8 @@ bool QtSoapSimpleType::parse(QDomNode node)
 
     QDomElement e = node.toElement();
 
-    QDomAttr typeattr = e.attributeNode("type");
-    QString type = typeattr.isNull() ? QString("string") : localName(typeattr.value()).toLower();
+    QDomAttr typeattr = e.attributeNode(QLatin1String("type"));
+    QString type = typeattr.isNull() ? QLatin1String("string") : localName(typeattr.value()).toLower();
 
     t = QtSoapType::nameToType(type);
     switch (t) {
@@ -2194,19 +2190,19 @@ bool QtSoapSimpleType::parse(QDomNode node)
     case UnsignedInt:
     case UnsignedShort:
     case UnsignedByte:
-	if (e.text() == "" || (e.text() != "" && (e.text()[0].isNumber() || e.text()[0] == '-')))
+        if (e.text().size() == 0 || (e.text().size() > 0 && (e.text()[0].isNumber() || e.text()[0] == QLatin1Char('-'))))
 	    v = QVariant(e.text().toInt());
 	else {
-	    errorStr = "Type error at element \"" + e.tagName() + "\"";
+	    errorStr = tr("Type error at element \"%1\"").arg(e.tagName());
 	    return false;
 	}
 
 	break;
     case Boolean: {
 	QString val = e.text().trimmed().toLower();
-	if (val == "false")
+	if (val == QLatin1String("false"))
 	    v = QVariant(false);
-	else if (val == "true")
+	else if (val == QLatin1String("true"))
 	    v = QVariant(true);
     }
 	break;
@@ -2347,7 +2343,7 @@ QVariant QtSoapSimpleType::value() const
     Envelope element, with no header and no body.
 */
 QtSoapMessage::QtSoapMessage()
-    : type(OtherType), envelope(QtSoapQName("Envelope", SOAPv11_ENVELOPE))
+: type(OtherType), envelope(QtSoapQName(QLatin1String("Envelope"), SOAPv11_ENVELOPE))
 {
     init();
 }
@@ -2375,10 +2371,10 @@ QtSoapMessage::~QtSoapMessage()
 */
 void QtSoapMessage::init()
 {
-    QtSoapNamespaces::instance().registerNamespace("SOAP-ENV", SOAPv11_ENVELOPE);
-    QtSoapNamespaces::instance().registerNamespace("SOAP-ENC", SOAPv11_ENCODING);
-    QtSoapNamespaces::instance().registerNamespace("xsi", XML_SCHEMA_INSTANCE);
-    QtSoapNamespaces::instance().registerNamespace("xsd", XML_SCHEMA);
+    QtSoapNamespaces::instance().registerNamespace(QLatin1String("SOAP-ENV"), SOAPv11_ENVELOPE);
+    QtSoapNamespaces::instance().registerNamespace(QLatin1String("SOAP-ENC"), SOAPv11_ENCODING);
+    QtSoapNamespaces::instance().registerNamespace(QLatin1String("xsi"), XML_SCHEMA_INSTANCE);
+    QtSoapNamespaces::instance().registerNamespace(QLatin1String("xsd"), XML_SCHEMA);
 }
 
 /*!
@@ -2390,7 +2386,7 @@ void QtSoapMessage::clear()
     envelope.clear();
     m = QtSoapQName();
     margs.clear();
-    errorStr = "Unknown error";
+    errorStr = tr("Unknown error");
 }
 
 /*!
@@ -2451,8 +2447,8 @@ bool QtSoapMessage::setContent(const QByteArray &buffer)
 	s.sprintf("%s at line %i, column %i", errorMsg.toLatin1().constData(),
 		  errorLine, errorColumn);
 	setFaultCode(VersionMismatch);
-	setFaultString("XML parse error");
-	addFaultDetail(new QtSoapSimpleType(QtSoapQName("ParseError"), s));
+	setFaultString(tr("XML parse error"));
+	addFaultDetail(new QtSoapSimpleType(QtSoapQName(QLatin1String("ParseError")), s));
 	return false;
     }
 
@@ -2491,43 +2487,43 @@ bool QtSoapMessage::isValidSoapMessage(const QDomDocument &candidate)
 
     QDomElement tmpe = tmp.toElement();
 
-    if (localName(tmpe.tagName()).toUpper() != "ENVELOPE") {
+    if (localName(tmpe.tagName()).toUpper() != QLatin1String("ENVELOPE")) {
 	setFaultCode(VersionMismatch);
-	setFaultString("SOAP structure invalid");
-	addFaultDetail(new QtSoapSimpleType(QtSoapQName("extra"), "root element \"" + tmpe.localName()
-					+ "\"/\"" + tmpe.tagName() + "\" is not envelope"));
+	setFaultString(tr("SOAP structure invalid"));
+	addFaultDetail(new QtSoapSimpleType(QtSoapQName(QLatin1String("extra")),
+        tr("root element \"%1\"/\"%2\" is not envelope").arg(tmpe.localName()).arg(tmpe.tagName())));
 	return false;
     }
 
     tmp = tmp.firstChild();
     if (tmp.isNull() || !tmp.isElement()) {
 	setFaultCode(VersionMismatch);
-	setFaultString("SOAP structure invalid");
-	addFaultDetail(new QtSoapSimpleType(QtSoapQName("extra"), "mandatory body element missing"));
+	setFaultString(tr("SOAP structure invalid"));
+	addFaultDetail(new QtSoapSimpleType(QtSoapQName(QLatin1String("extra")), tr("mandatory body element missing")));
 	return false;
     }
 
     QDomElement tmpe2 = tmp.toElement();
 
     bool foundHeader = false;
-    if (localName(tmpe2.tagName()).toUpper() == "HEADER") {
+    if (localName(tmpe2.tagName()).toUpper() == QLatin1String("HEADER")) {
 	foundHeader = true;
 	tmp = tmp.nextSibling();
     }
 
     if (!foundHeader && (tmp.isNull() || !tmp.isElement())) {
 	setFaultCode(VersionMismatch);
-	setFaultString("SOAP structure invalid");
-	addFaultDetail(new QtSoapSimpleType(QtSoapQName("extra"), "mandatory body element missing"));
+	setFaultString(tr("SOAP structure invalid"));
+	addFaultDetail(new QtSoapSimpleType(QtSoapQName(QLatin1String("extra")), tr("mandatory body element missing")));
 	return false;
     }
 
     QDomElement tmpe3 = tmp.toElement();
 
-    if (localName(tmpe3.tagName()).toUpper() != "BODY") {
+    if (localName(tmpe3.tagName()).toUpper() != QLatin1String("BODY")) {
 	setFaultCode(VersionMismatch);
-	setFaultString("SOAP structure invalid");
-	addFaultDetail(new QtSoapSimpleType(QtSoapQName("extra"), "mandatory body element missing"));
+	setFaultString(tr("SOAP structure invalid"));
+	addFaultDetail(new QtSoapSimpleType(QtSoapQName(QLatin1String("extra")), tr("mandatory body element missing")));
 	return false;
     }
 
@@ -2535,8 +2531,8 @@ bool QtSoapMessage::isValidSoapMessage(const QDomDocument &candidate)
     // correct.
     if (tmpe.namespaceURI() != SOAPv11_ENVELOPE) {
 	setFaultCode(VersionMismatch);
-	setFaultString("SOAP structure invalid");
-	addFaultDetail(new QtSoapSimpleType(QtSoapQName("extra"), "Unsupported namespace for envelope element"));
+	setFaultString(tr("SOAP structure invalid"));
+	addFaultDetail(new QtSoapSimpleType(QtSoapQName(QLatin1String("extra")), tr("Unsupported namespace for envelope element")));
 	return false;
     }
 
@@ -2550,7 +2546,7 @@ bool QtSoapMessage::isValidSoapMessage(const QDomDocument &candidate)
 QString QtSoapMessage::toXmlString(int indent) const
 {
     QDomImplementation impl;
-    QDomDocument doc = impl.createDocument(QString(), QString("placeholder"),
+    QDomDocument doc = impl.createDocument(QString(), QLatin1String("placeholder"),
                                            QDomDocumentType());
     doc.removeChild(doc.firstChild());
     doc.appendChild(envelope.toDomElement(doc));
@@ -2558,10 +2554,10 @@ QString QtSoapMessage::toXmlString(int indent) const
     QDomElement env = doc.firstChild().toElement();
 
     env.setAttribute(QtSoapNamespaces::instance().prefixFor(SOAPv11_ENVELOPE)
-		     + ":" + "encodingStyle",
+        + QLatin1Char(':') + QLatin1String("encodingStyle"),
 		     SOAPv11_ENCODING);
 
-    env.setAttribute("xmlns:" + QtSoapNamespaces::instance().prefixFor(XML_SCHEMA),
+    env.setAttribute(QLatin1String("xmlns:") + QtSoapNamespaces::instance().prefixFor(XML_SCHEMA),
 		     XML_SCHEMA);
 
     return doc.toString(indent);
@@ -2591,11 +2587,11 @@ void QtSoapMessage::addBodyItem(QtSoapType *item)
 */
 void QtSoapMessage::addHeaderItem(QtSoapType *item)
 {
-    QtSoapType &headerTmp = envelope[QtSoapQName("Header", SOAPv11_ENVELOPE)];
+    QtSoapType &headerTmp = envelope[QtSoapQName(QLatin1String("Header"), SOAPv11_ENVELOPE)];
     if (!headerTmp.isValid())
-	envelope.insert(new QtSoapStruct(QtSoapQName("Header", SOAPv11_ENVELOPE)));
+	envelope.insert(new QtSoapStruct(QtSoapQName(QLatin1String("Header"), SOAPv11_ENVELOPE)));
 
-    QtSoapStruct &header = (QtSoapStruct &)envelope[QtSoapQName("Header", SOAPv11_ENVELOPE)];
+    QtSoapStruct &header = (QtSoapStruct &)envelope[QtSoapQName(QLatin1String("Header"), SOAPv11_ENVELOPE)];
     header.insert(item);
 }
 /*!
@@ -2624,7 +2620,7 @@ const QtSoapType &QtSoapMessage::returnValue() const
 */
 const QtSoapType &QtSoapMessage::faultDetail() const
 {
-    return body()[QtSoapQName("Fault", SOAPv11_ENVELOPE)][QtSoapQName("Detail")];
+    return body()[QtSoapQName(QLatin1String("Fault"), SOAPv11_ENVELOPE)][QtSoapQName(QLatin1String("Detail"))];
 }
 
 /*!
@@ -2632,7 +2628,7 @@ const QtSoapType &QtSoapMessage::faultDetail() const
 */
 const QtSoapType &QtSoapMessage::faultString() const
 {
-    return body()[QtSoapQName("Fault", SOAPv11_ENVELOPE)][QtSoapQName("Faultstring")];
+    return body()[QtSoapQName(QLatin1String("Fault"), SOAPv11_ENVELOPE)][QtSoapQName(QLatin1String("Faultstring"))];
 }
 
 /*!
@@ -2649,7 +2645,7 @@ bool QtSoapMessage::isFault() const
 */
 QtSoapMessage::FaultCode QtSoapMessage::faultCode() const
 {
-    QtSoapType &code = body()[QtSoapQName("Fault")][QtSoapQName("Faultcode")];
+    QtSoapType &code = body()[QtSoapQName(QLatin1String("Fault"))][QtSoapQName(QLatin1String("Faultcode"))];
     if (!code.isValid() || (code.type() != QtSoapType::String
                             && code.type() != QtSoapType::QName))
 	return Other;
@@ -2659,19 +2655,19 @@ QtSoapMessage::FaultCode QtSoapMessage::faultCode() const
 
     // Only test string before first .
     int pos;
-    if ((pos = fcodestr.indexOf('.')) != -1)
+    if ((pos = fcodestr.indexOf(QLatin1Char('.'))) != -1)
         fcodestr.truncate(pos);
 
-    if (localName(fcodestr.toLower()) == "versionmismatch")
+    if (localName(fcodestr.toLower()) == QLatin1String("versionmismatch"))
 	return VersionMismatch;
 
-    if (localName(fcodestr.toLower()) == "mustunderstand")
+    if (localName(fcodestr.toLower()) == QLatin1String("mustunderstand"))
 	return MustUnderstand;
 
-    if (localName(fcodestr.toLower()) == "client")
+    if (localName(fcodestr.toLower()) == QLatin1String("client"))
 	return Client;
 
-    if (localName(fcodestr.toLower()) == "server")
+    if (localName(fcodestr.toLower()) == QLatin1String("server"))
 	return Server;
 
     return Other;
@@ -2682,7 +2678,7 @@ QtSoapMessage::FaultCode QtSoapMessage::faultCode() const
 */
 QtSoapStruct &QtSoapMessage::body() const
 {
-    const QtSoapQName bodyName("Body", SOAPv11_ENVELOPE);
+    const QtSoapQName bodyName(QLatin1String("Body"), SOAPv11_ENVELOPE);
 
     QtSoapType &bodyTmp = envelope[bodyName];
     if (!bodyTmp.isValid())
@@ -2696,7 +2692,7 @@ QtSoapStruct &QtSoapMessage::body() const
 */
 QtSoapStruct &QtSoapMessage::header() const
 {
-    const QtSoapQName headerName("Header", SOAPv11_ENVELOPE);
+    const QtSoapQName headerName(QLatin1String("Header"), SOAPv11_ENVELOPE);
 
     QtSoapType &headerTmp = envelope[headerName];
     if (!headerTmp.isValid())
@@ -2715,31 +2711,31 @@ void QtSoapMessage::setFaultCode(FaultCode code)
 	type = Fault;
     }
 
-    if (!body()[QtSoapQName("Fault", SOAPv11_ENVELOPE)].isValid())
-	addBodyItem(new QtSoapStruct(QtSoapQName("Fault", SOAPv11_ENVELOPE)));
+    if (!body()[QtSoapQName(QLatin1String("Fault"), SOAPv11_ENVELOPE)].isValid())
+	addBodyItem(new QtSoapStruct(QtSoapQName(QLatin1String("Fault"), SOAPv11_ENVELOPE)));
 
     QString codeStr;
     switch (code) {
     case VersionMismatch:
-	codeStr = "SOAP-ENV:VersionMismatch";
+	codeStr = QLatin1String("SOAP-ENV:VersionMismatch");
 	break;
     case MustUnderstand:
-	codeStr = "SOAP-ENV:MustUnderstand";
+	codeStr = QLatin1String("SOAP-ENV:MustUnderstand");
 	break;
     case Client:
-	codeStr = "SOAP-ENV:Client";
+	codeStr = QLatin1String("SOAP-ENV:Client");
 	break;
     case Server:
-	codeStr = "SOAP-ENV:Server";
+	codeStr = QLatin1String("SOAP-ENV:Server");
 	break;
     case Other:
-	codeStr = "Other";
+	codeStr = QLatin1String("Other");
 	break;
     }
 
-    QtSoapType &node = body()[QtSoapQName("Fault", SOAPv11_ENVELOPE)];
+    QtSoapType &node = body()[QtSoapQName(QLatin1String("Fault"), SOAPv11_ENVELOPE)];
     QtSoapStruct &fault = reinterpret_cast<QtSoapStruct &>(node);
-    fault.insert(new QtSoapSimpleType(QtSoapQName("Faultcode"), codeStr));
+    fault.insert(new QtSoapSimpleType(QtSoapQName(QLatin1String("Faultcode")), codeStr));
 }
 
 /*!
@@ -2752,12 +2748,12 @@ void QtSoapMessage::setFaultString(const QString &s)
 	type = Fault;
     }
 
-    if (!body()[QtSoapQName("Fault", SOAPv11_ENVELOPE)].isValid())
-	addBodyItem(new QtSoapStruct(QtSoapQName("Fault", SOAPv11_ENVELOPE)));
+    if (!body()[QtSoapQName(QLatin1String("Fault"), SOAPv11_ENVELOPE)].isValid())
+	addBodyItem(new QtSoapStruct(QtSoapQName(QLatin1String("Fault"), SOAPv11_ENVELOPE)));
 
-    QtSoapType &node = body()[QtSoapQName("Fault", SOAPv11_ENVELOPE)];
+    QtSoapType &node = body()[QtSoapQName(QLatin1String("Fault"), SOAPv11_ENVELOPE)];
     QtSoapStruct &fault = reinterpret_cast<QtSoapStruct &>(node);
-    fault.insert(new QtSoapSimpleType(QtSoapQName("Faultstring"), s));
+    fault.insert(new QtSoapSimpleType(QtSoapQName(QLatin1String("Faultstring")), s));
 }
 
 /*!
@@ -2771,15 +2767,15 @@ void QtSoapMessage::addFaultDetail(QtSoapType *detail)
 	type = Fault;
     }
 
-    if (!body()[QtSoapQName("Fault", SOAPv11_ENVELOPE)].isValid())
-	addBodyItem(new QtSoapStruct(QtSoapQName("Fault", SOAPv11_ENVELOPE)));
+    if (!body()[QtSoapQName(QLatin1String("Fault"), SOAPv11_ENVELOPE)].isValid())
+	addBodyItem(new QtSoapStruct(QtSoapQName(QLatin1String("Fault"), SOAPv11_ENVELOPE)));
 
-    QtSoapType &node = body()[QtSoapQName("Fault", SOAPv11_ENVELOPE)];
+    QtSoapType &node = body()[QtSoapQName(QLatin1String("Fault"), SOAPv11_ENVELOPE)];
     QtSoapStruct &fault = reinterpret_cast<QtSoapStruct &>(node);
-    if (!fault[QtSoapQName("Faultdetail", SOAPv11_ENVELOPE)].isValid())
-	fault.insert(new QtSoapStruct(QtSoapQName("Faultdetail", SOAPv11_ENVELOPE)));
+    if (!fault[QtSoapQName(QLatin1String("Faultdetail"), SOAPv11_ENVELOPE)].isValid())
+	fault.insert(new QtSoapStruct(QtSoapQName(QLatin1String("Faultdetail"), SOAPv11_ENVELOPE)));
 
-    QtSoapType &node2 = fault[QtSoapQName("Faultdetail", SOAPv11_ENVELOPE)];
+    QtSoapType &node2 = fault[QtSoapQName(QLatin1String("Faultdetail"), SOAPv11_ENVELOPE)];
     QtSoapStruct &fdetail = reinterpret_cast<QtSoapStruct &>(node2);
 
     fdetail.insert(detail);
@@ -2893,37 +2889,37 @@ QtSoapTypeFactory::QtSoapTypeFactory()
     QtSoapTypeConstructor<QtSoapSimpleType> *basicTypeConstructor = new QtSoapTypeConstructor<QtSoapSimpleType>();
     deleteList.append(basicTypeConstructor);
 
-    registerHandler("struct", structConstructor);
-    registerHandler("array", arrayConstructor);
-    registerHandler("string", basicTypeConstructor);
-    registerHandler("normalizedstring", basicTypeConstructor);
-    registerHandler("token", basicTypeConstructor);
-    registerHandler("language", basicTypeConstructor);
-    registerHandler("name", basicTypeConstructor);
-    registerHandler("ncname", basicTypeConstructor);
-    registerHandler("id", basicTypeConstructor);
-    registerHandler("idref", basicTypeConstructor);
-    registerHandler("entity", basicTypeConstructor);
-    registerHandler("nmtoken", basicTypeConstructor);
-    registerHandler("nmtokens", basicTypeConstructor);
-    registerHandler("boolean", basicTypeConstructor);
-    registerHandler("decimal", basicTypeConstructor);
-    registerHandler("integer", basicTypeConstructor);
-    registerHandler("nonpositiveinteger", basicTypeConstructor);
-    registerHandler("negativeinteger", basicTypeConstructor);
-    registerHandler("int", basicTypeConstructor);
-    registerHandler("long", basicTypeConstructor);
-    registerHandler("short", basicTypeConstructor);
-    registerHandler("byte", basicTypeConstructor);
-    registerHandler("nonnegativeinteger", basicTypeConstructor);
-    registerHandler("unsignedlong", basicTypeConstructor);
-    registerHandler("unsignedint", basicTypeConstructor);
-    registerHandler("unsignedshort", basicTypeConstructor);
-    registerHandler("unsignedbyte", basicTypeConstructor);
-    registerHandler("positiveinteger", basicTypeConstructor);
-    registerHandler("float", basicTypeConstructor);
-    registerHandler("double", basicTypeConstructor);
-    registerHandler("other", structConstructor);
+    registerHandler(QLatin1String("struct"), structConstructor);
+    registerHandler(QLatin1String("array"), arrayConstructor);
+    registerHandler(QLatin1String("string"), basicTypeConstructor);
+    registerHandler(QLatin1String("normalizedstring"), basicTypeConstructor);
+    registerHandler(QLatin1String("token"), basicTypeConstructor);
+    registerHandler(QLatin1String("language"), basicTypeConstructor);
+    registerHandler(QLatin1String("name"), basicTypeConstructor);
+    registerHandler(QLatin1String("ncname"), basicTypeConstructor);
+    registerHandler(QLatin1String("id"), basicTypeConstructor);
+    registerHandler(QLatin1String("idref"), basicTypeConstructor);
+    registerHandler(QLatin1String("entity"), basicTypeConstructor);
+    registerHandler(QLatin1String("nmtoken"), basicTypeConstructor);
+    registerHandler(QLatin1String("nmtokens"), basicTypeConstructor);
+    registerHandler(QLatin1String("boolean"), basicTypeConstructor);
+    registerHandler(QLatin1String("decimal"), basicTypeConstructor);
+    registerHandler(QLatin1String("integer"), basicTypeConstructor);
+    registerHandler(QLatin1String("nonpositiveinteger"), basicTypeConstructor);
+    registerHandler(QLatin1String("negativeinteger"), basicTypeConstructor);
+    registerHandler(QLatin1String("int"), basicTypeConstructor);
+    registerHandler(QLatin1String("long"), basicTypeConstructor);
+    registerHandler(QLatin1String("short"), basicTypeConstructor);
+    registerHandler(QLatin1String("byte"), basicTypeConstructor);
+    registerHandler(QLatin1String("nonnegativeinteger"), basicTypeConstructor);
+    registerHandler(QLatin1String("unsignedlong"), basicTypeConstructor);
+    registerHandler(QLatin1String("unsignedint"), basicTypeConstructor);
+    registerHandler(QLatin1String("unsignedshort"), basicTypeConstructor);
+    registerHandler(QLatin1String("unsignedbyte"), basicTypeConstructor);
+    registerHandler(QLatin1String("positiveinteger"), basicTypeConstructor);
+    registerHandler(QLatin1String("float"), basicTypeConstructor);
+    registerHandler(QLatin1String("double"), basicTypeConstructor);
+    registerHandler(QLatin1String("other"), structConstructor);
 }
 
 /*!
@@ -2954,7 +2950,7 @@ QtSoapTypeFactory &QtSoapTypeFactory::instance()
 bool QtSoapTypeFactory::registerHandler(const QString &name, QtSoapTypeConstructorBase *handler)
 {
     if (typeHandlers.find(name) != typeHandlers.end()) {
-	errorStr = "A handler for " + name + " is already registered.";
+	errorStr = tr("A handler for %1 is already registered.").arg(name);
 	return false;
     }
 
@@ -2971,7 +2967,7 @@ QtSmartPtr<QtSoapType> QtSoapTypeFactory::soapType(QDomNode node) const
 
     QDomElement elem = node.toElement();
 
-    QDomAttr attr = elem.attributeNode("type");
+    QDomAttr attr = elem.attributeNode(QLatin1String("type"));
     QtSoapTypeConstructorBase *constructor = 0;
     if (!attr.isNull()) {
         QHash<QString, QtSoapTypeConstructorBase *>::ConstIterator it;
@@ -2983,12 +2979,12 @@ QtSmartPtr<QtSoapType> QtSoapTypeFactory::soapType(QDomNode node) const
     if (attr.isNull() || !constructor) {
         QHash<QString, QtSoapTypeConstructorBase *>::ConstIterator it;
 	if (node.firstChild().isElement()) {
-            if (localName(node.nodeName().toLower()) == "array") {
-                it = typeHandlers.find("array");
+            if (localName(node.nodeName().toLower()) == QLatin1String("array")) {
+                it = typeHandlers.find(QLatin1String("array"));
             } else
-                it = typeHandlers.find("struct");
+                it = typeHandlers.find(QLatin1String("struct"));
         } else
-	    it = typeHandlers.find("string");
+	    it = typeHandlers.find(QLatin1String("string"));
         if (it != typeHandlers.end())
             constructor = *it;
     }
@@ -3225,7 +3221,7 @@ void QtSoapHttpTransport::readResponse(QNetworkReply *reply)
     default:
         {
             soapResponse.setFaultCode(QtSoapMessage::Client);
-            soapResponse.setFaultString(QString("Network transport error (%1): %2").arg(reply->error()).arg(reply->errorString()));
+            soapResponse.setFaultString(tr("Network transport error (%1): %2").arg(reply->error()).arg(reply->errorString()));
         }
         break;
     }

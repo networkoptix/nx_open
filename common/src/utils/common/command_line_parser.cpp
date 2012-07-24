@@ -67,7 +67,7 @@ bool QnCommandLineParser::parse(int &argc, char **argv) {
         QString stringValue;
 
         /* Extract name. */
-        QStringList paramInfo = QString(argv[pos]).split('=');
+        QStringList paramInfo = QString(QLatin1String(argv[pos])).split(QLatin1Char('='));
         QString name = paramInfo[0];
 
         int index = m_indexByName.value(name, -1);
