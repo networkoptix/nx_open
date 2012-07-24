@@ -74,7 +74,7 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
 
 	enum DataType {VIDEO, AUDIO, CONTAINER, META_V1, EMPTY_DATA};
 
-	CLByteArray data;
+	QnByteArray data;
 	DataType dataType;
 	CodecID compressionType;
     //quint8 containerFormat[5]; // used for container dataType only instead compressionType;

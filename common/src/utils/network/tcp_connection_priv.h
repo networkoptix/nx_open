@@ -55,6 +55,6 @@ public:
     QMutex sockMutex;
     quint8* tcpReadBuffer;
     QnTcpListener* owner;
-    CLByteArray sendBuffer;
+    QnByteArray sendBuffer;
     int socketTimeout;
 };

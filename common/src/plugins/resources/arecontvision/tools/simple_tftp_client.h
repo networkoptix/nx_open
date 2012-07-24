@@ -3,7 +3,7 @@
 #include <QString>
 #include "utils/network/socket.h"
 
-class CLByteArray;
+class QnByteArray;
 
 // this class is designed just to be friendly with AV cams;( I doubd it can be usefull with smth else)
 class CLSimpleTFTPClient
@@ -23,7 +23,7 @@ public:
 
     const QHostAddress& getHostAddress() const { return m_hostAddress; }
 
-	int read(const QString& fn, CLByteArray& data);
+	int read(const QString& fn, QnByteArray& data);
 	const unsigned char* getLastPacket(int& size) const
 	{
 		size = m_last_packet_size;

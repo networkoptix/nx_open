@@ -123,18 +123,18 @@ QnAbstractMediaDataPtr  AVClientPullSSHTTPStreamreader::getNextData()
         return QnAbstractMediaDataPtr(0);
 
     QnCompressedVideoDataPtr videoData ( new QnCompressedVideoData(CL_MEDIA_ALIGNMENT,forecast_size) );
-    CLByteArray& img = videoData->data;
+    QnByteArray& img = videoData->data;
 
     while(http_client.isOpened())
     {
-        int readed = http_client.read(img.prepareToWrite(2000), 2000);
+        int readed = http_client.read(img.startWriting(2000), 2000);
 
         if (readed<0) // error
         {
             return QnAbstractMediaDataPtr(0);
         }
 
-        img.done(readed);
+        img.finishWriting(readed);
 
         if (img.size()>CL_MAX_DATASIZE)
         {
@@ -143,7 +143,7 @@ QnAbstractMediaDataPtr  AVClientPullSSHTTPStreamreader::getNextData()
         }
     }
 
-    img.removeZerosAtTheEnd();
+    img.removeTrailingZeros();
 
     //unit delimetr
     if (h264)

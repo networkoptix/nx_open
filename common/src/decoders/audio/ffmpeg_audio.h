@@ -10,7 +10,7 @@ class CLFFmpegAudioDecoder : public CLAbstractAudioDecoder
 {
 public:
 	CLFFmpegAudioDecoder(QnCompressedAudioDataPtr data);
-	bool decode(QnCompressedAudioDataPtr& data, CLByteArray& result);
+	bool decode(QnCompressedAudioDataPtr& data, QnByteArray& result);
 	~CLFFmpegAudioDecoder();
 
     static AVSampleFormat audioFormatQtToFfmpeg(const QnAudioFormat& fmt);

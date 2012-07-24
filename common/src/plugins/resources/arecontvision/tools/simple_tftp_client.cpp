@@ -23,7 +23,7 @@ m_timeout(timeout)
     }
 }
 
-int CLSimpleTFTPClient::read( const QString& fn, CLByteArray& data)
+int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
 {
     try
     {

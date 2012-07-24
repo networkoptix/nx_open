@@ -107,7 +107,7 @@ CLFFmpegAudioDecoder::~CLFFmpegAudioDecoder(void)
 
 //The input buffer must be FF_INPUT_BUFFER_PADDING_SIZE larger than the actual read bytes because some optimized bit stream readers read 32 or 64 bits at once and could read over the end.
 //The end of the input buffer buf should be set to 0 to ensure that no over reading happens for damaged MPEG streams.
-bool CLFFmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, CLByteArray& result)
+bool CLFFmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, QnByteArray& result)
 {
     result.clear();
 
@@ -130,7 +130,7 @@ bool CLFFmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, CLByteArray& r
 		if (outbuf_len + out_size > result.capacity())
 		{
             //Q_ASSERT_X(false, Q_FUNC_INFO, "Too small output buffer for audio decoding!");
-            result.reallocate(result.capacity()*2);
+            result.reserve(result.capacity() * 2);
             outbuf = (quint8*) result.data() + outbuf_len;
 		}
 
@@ -152,6 +152,6 @@ bool CLFFmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, CLByteArray& r
 		inbuf_ptr += len;
 
 	}
-    result.done(outbuf_len);
+    result.finishWriting(outbuf_len);
 	return true;
 }

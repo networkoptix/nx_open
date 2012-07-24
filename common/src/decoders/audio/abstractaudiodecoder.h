@@ -12,7 +12,7 @@ public:
 	explicit CLAbstractAudioDecoder(){}
 	virtual ~CLAbstractAudioDecoder(){};
 
-	virtual bool decode(QnCompressedAudioDataPtr& data, CLByteArray& result) = 0;
+	virtual bool decode(QnCompressedAudioDataPtr& data, QnByteArray& result) = 0;
 
 private:
 	CLAbstractAudioDecoder(const CLAbstractAudioDecoder&) {}
