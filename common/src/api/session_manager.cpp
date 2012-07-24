@@ -118,9 +118,10 @@ QUrl QnSessionManager::createApiUrl(const QUrl& baseUrl, const QString &objectNa
     QString path = QLatin1String("api/") + objectName + QLatin1Char('/');
     url.setPath(path);
 
-    foreach (const QnRequestParam &param, params)
+    for (int i = 0; i < params.count(); i++){
+        QPair<QString, QString> param = params[i];
         url.addQueryItem(param.first, param.second);
-
+    }
     return url;
 }
 
