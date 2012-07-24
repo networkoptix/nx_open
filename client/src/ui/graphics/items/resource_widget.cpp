@@ -608,7 +608,7 @@ void QnResourceWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGra
 }
 
 void QnResourceWidget::paintFlashingText(QPainter *painter, const QStaticText &text, qreal textSize, const QPointF &offset) {
-    qreal unit = channelRect(0).width();
+    qreal unit = qnGlobals->workbenchUnitSize(); //channelRect(0).width();
 
     QFont font;
     font.setPointSizeF(textSize * unit);
