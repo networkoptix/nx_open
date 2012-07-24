@@ -94,6 +94,8 @@ mediaproxy/bin/release
 mediaproxy/src/mediaproxy.pro
 mediaproxy/x86
 mediaproxy/x64
+mediaproxy/src/mediaproxy.mak*
+
 
 testcamera/src/testCamera.pro
 testcamera/src/testCamera.vcproj
@@ -102,6 +104,7 @@ testcamera/bin/release
 testcamera/x86
 testcamera/x64
 testcamera/src/version.h
+testcamera/src/testcamera.mak*
 
 winbuild/msvc2010/setup.bat
 
