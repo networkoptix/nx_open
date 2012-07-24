@@ -328,7 +328,7 @@
 								</goals>
 								<configuration>
 									<includes>
-										<include>${arch}/${project.artifactId}-x64.vcproj</include>
+										<include>**/${project.artifactId}-x64.vcproj</include>
 									</includes>
 									<replacements>
 										<replacement>
