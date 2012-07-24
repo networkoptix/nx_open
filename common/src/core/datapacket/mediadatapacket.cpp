@@ -4,7 +4,6 @@
 #include "utils/media/ffmpeg_helper.h"
 #include "utils/media/sse_helper.h"
 #include "utils/common/synctime.h"
-#include "utils/common/base.h"
 
 #ifdef Q_OS_MAC
 #include <smmintrin.h>

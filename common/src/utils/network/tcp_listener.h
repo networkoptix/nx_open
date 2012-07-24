@@ -5,7 +5,7 @@
 #include <QHttpRequestHeader>
 #include <QNetworkInterface>
 #include "utils/common/longrunnable.h"
-#include "utils/common/base.h"
+#include "utils/common/pimpl.h"
 
 class TCPSocket;
 class QnTCPConnectionProcessor;

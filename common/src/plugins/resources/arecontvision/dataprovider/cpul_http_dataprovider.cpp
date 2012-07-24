@@ -1,7 +1,6 @@
 #include "cpul_http_dataprovider.h"
 #include "../resource/av_resource.h"
 #include "utils/common/synctime.h"
-#include "utils/common/base.h"
 
 
 AVClientPullSSHTTPStreamreader::AVClientPullSSHTTPStreamreader(QnResourcePtr res):

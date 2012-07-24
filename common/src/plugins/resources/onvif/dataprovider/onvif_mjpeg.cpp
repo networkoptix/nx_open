@@ -1,7 +1,6 @@
 #include "onvif_mjpeg.h"
 #include "core/resource/network_resource.h"
 #include "utils/common/synctime.h"
-#include "utils/common/base.h"
 
 /*
 inline static int findJPegStartCode(const char *data, int datalen)

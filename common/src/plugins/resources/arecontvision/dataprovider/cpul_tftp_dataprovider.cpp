@@ -6,7 +6,6 @@
 #include <QMutex>
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "utils/common/util.h"
-#include "utils/common/base.h"
 #include "utils/common/synctime.h"
 
 //======================================================

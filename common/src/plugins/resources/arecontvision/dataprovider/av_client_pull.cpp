@@ -2,7 +2,6 @@
 
 #include "../resource/av_resource.h"
 #include "utils/common/rand.h"
-#include "utils/common/base.h"
 
 QnPlAVClinetPullStreamReader::QnPlAVClinetPullStreamReader(QnResourcePtr res):
     QnClientPullMediaStreamProvider(res),

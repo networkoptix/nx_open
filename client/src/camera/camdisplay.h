@@ -117,7 +117,7 @@ protected:
 
 	CLAudioStreamDisplay* m_audioDisplay;
 
-	CLAdaptiveSleep m_delay;
+	QnAdaptiveSleep m_delay;
 
 	bool m_playAudioSet;
     float m_speed;

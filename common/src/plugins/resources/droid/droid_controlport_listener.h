@@ -1,6 +1,5 @@
 #include "utils/network/tcp_listener.h"
 #include "utils/network/tcp_connection_processor.h"
-#include "utils/common/base.h"
 
 static const int DROID_CONTROL_TCP_SERVER_PORT = 5690;
 
