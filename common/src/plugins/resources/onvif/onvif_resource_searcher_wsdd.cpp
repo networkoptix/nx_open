@@ -34,7 +34,7 @@ static const int CHECK_HELLO_RETRY_COUNT = 50;
 //extern bool multicastJoinGroup(QUdpSocket& udpSocket, QHostAddress groupAddress, QHostAddress localAddress);
 //extern bool multicastLeaveGroup(QUdpSocket& udpSocket, QHostAddress groupAddress);
 
-QString& OnvifResourceSearcherWsdd::LOCAL_ADDR = *new QString("127.0.0.1");
+QString& OnvifResourceSearcherWsdd::LOCAL_ADDR = *new QString(QLatin1String("127.0.0.1"));
 const char OnvifResourceSearcherWsdd::SCOPES_NAME_PREFIX[] = "onvif://www.onvif.org/name/";
 const char OnvifResourceSearcherWsdd::SCOPES_HARDWARE_PREFIX[] = "onvif://www.onvif.org/hardware/";
 const char OnvifResourceSearcherWsdd::PROBE_TYPE[] = "onvifDiscovery:NetworkVideoTransmitter";
@@ -45,7 +45,8 @@ const char OnvifResourceSearcherWsdd::WSDD_GSOAP_MULTICAST_ADDRESS[] = "soap.udp
 
 int WSDD_MULTICAST_PORT = 3702;
 const char WSDD_MULTICAST_ADDRESS[] = "239.255.255.250";
-QHostAddress WSDD_GROUP_ADDRESS(WSDD_MULTICAST_ADDRESS);
+
+#define WSDD_GROUP_ADDRESS QHostAddress(QLatin1String(WSDD_MULTICAST_ADDRESS))
 
 
 OnvifResourceSearcherWsdd::OnvifResourceSearcherWsdd():
@@ -105,12 +106,14 @@ http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous\
 //Socket send through QUdpSocket
 int gsoapFsendSmall(struct soap *soap, const char *s, size_t n)
 {
+    Q_UNUSED(s)
+    Q_UNUSED(n)
     QString msgId;
     QUdpSocket& qSocket = *reinterpret_cast<QUdpSocket*>(soap->user);
 
     QString guid = QUuid::createUuid().toString();
-    guid = QString("uuid:") + guid.mid(1, guid.length()-2);
-    QByteArray data = QString(STATIC_DISCOVERY_MESSAGE).arg(guid).toLocal8Bit();
+    guid = QLatin1String("uuid:") + guid.mid(1, guid.length()-2);
+    QByteArray data = QString(QLatin1String(STATIC_DISCOVERY_MESSAGE)).arg(guid).toLocal8Bit();
 
     qSocket.writeDatagram(data, WSDD_GROUP_ADDRESS, WSDD_MULTICAST_PORT);
     return SOAP_OK;
@@ -367,19 +370,19 @@ QStringList OnvifResourceSearcherWsdd::getAddrPrefixes(const QString& host) cons
 {
     QStringList result;
 
-    QStringList segments = host.split(".");
+    QStringList segments = host.split(QLatin1Char('.');
     if (segments.size() != 4) {
         qCritical() << "OnvifResourceSearcherWsdd::getAddrPrefixes: is not IPv4 address: " << host;
         return result;
     }
 
-    QString currPrefix = "http://" + segments[0] + ".";
+    QString currPrefix = QLatin1String("http://") + segments[0] + QLatin1Char('.');
     result.push_front(currPrefix);
 
-    currPrefix += segments[1] + ".";
+    currPrefix += segments[1] + QLatin1Char('.');
     result.push_front(currPrefix);
 
-    currPrefix += segments[2] + ".";
+    currPrefix += segments[2] + QLatin1Char('.');
     result.push_front(currPrefix);
 
     return result;

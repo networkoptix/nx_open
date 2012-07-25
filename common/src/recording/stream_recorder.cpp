@@ -35,7 +35,7 @@ QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     m_EofDateTime(AV_NOPTS_VALUE),
     m_needCalcSignature(false),
     m_mdctx(EXPORT_SIGN_METHOD),
-    m_container("matroska"),
+    m_container(QLatin1String("matroska")),
     m_videoChannels(0),
     m_ioContext(0),
     m_needReopen(false),
@@ -240,7 +240,7 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
     //if (md->dataType == QnAbstractMediaData::AUDIO)
     //    streamIndex += m_videoChannels;
 
-    if (streamIndex >= m_formatCtx->nb_streams)
+    if ((uint)streamIndex >= m_formatCtx->nb_streams)
         return true; // skip packet
 
     AVPacket avPkt;
@@ -293,17 +293,17 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
     AVOutputFormat * outputCtx = av_guess_format(m_container.toLatin1().data(), NULL, NULL);
     if (outputCtx == 0)
     {
-        m_lastErrMessage = QString("No %1 container in FFMPEG library").arg(m_container);
+        m_lastErrMessage = tr("No %1 container in FFMPEG library").arg(m_container);
         cl_log.log(m_lastErrMessage, cl_logERROR);
         return false;
     }
 
-    QString fileExt = QString(outputCtx->extensions).split(',')[0];
+    QString fileExt = QString(QLatin1String(outputCtx->extensions)).split(QLatin1Char(','))[0];
     m_fileName = fillFileName(m_mediaProvider);
     if (m_fileName.isEmpty()) 
         return false;
 
-    QString dFileExt = QString(".") + fileExt;
+    QString dFileExt = QLatin1Char('.') + fileExt;
     if (!m_fileName.endsWith(dFileExt, Qt::CaseInsensitive))
         m_fileName += dFileExt;
     QString url = m_fileName; 
@@ -313,7 +313,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
     global_ffmpeg_mutex.unlock();
 
     if (err < 0) {
-        m_lastErrMessage = QString("Can't create output file '") + m_fileName + QString("' for video recording.");
+        m_lastErrMessage = tr("Can't create output file '%1' for video recording.").arg(m_fileName);
         cl_log.log(m_lastErrMessage, cl_logERROR);
         return false;
     }
@@ -334,12 +334,12 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
 
         m_videoChannels = layout->numberOfChannels();
 
-        for (unsigned int i = 0; i < m_videoChannels; ++i) 
+        for (int i = 0; i < m_videoChannels; ++i) 
         {
             AVStream* videoStream = av_new_stream(m_formatCtx, DEFAULT_VIDEO_STREAM_ID+i);
             if (videoStream == 0)
             {
-                m_lastErrMessage = "Can't allocate output stream for recording.";
+                m_lastErrMessage = tr("Can't allocate output stream for recording.");
                 cl_log.log(m_lastErrMessage, cl_logERROR);
                 return false;
             }
@@ -387,13 +387,13 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
 
         const QnResourceAudioLayout* audioLayout = mediaDev->getAudioLayout(m_mediaProvider);
         m_isAudioPresent = false;
-        for (unsigned int i = 0; i < audioLayout->numberOfChannels(); ++i) 
+        for (int i = 0; i < audioLayout->numberOfChannels(); ++i) 
         {
             m_isAudioPresent = true;
             AVStream* audioStream = av_new_stream(m_formatCtx, DEFAULT_AUDIO_STREAM_ID+i);
             if (audioStream == 0)
             {
-                m_lastErrMessage = "Can't allocate output audio stream";
+                m_lastErrMessage = tr("Can't allocate output audio stream");
                 cl_log.log(m_lastErrMessage, cl_logERROR);
                 return false;
             }
@@ -407,7 +407,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
         if (m_ioContext == 0)
         {
             avformat_close_input(&m_formatCtx);
-            m_lastErrMessage = QString("Can't create output file '%1'").arg(url);
+            m_lastErrMessage = tr("Can't create output file '%1'").arg(url);
             cl_log.log(m_lastErrMessage, cl_logERROR);
             return false;
         }
@@ -419,7 +419,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
             m_ioContext = 0;
             m_formatCtx->pb = 0;
             avformat_close_input(&m_formatCtx);
-            m_lastErrMessage = QString("Video or audio codec is incompatible with %1 format. Try other format").arg(m_container);
+            m_lastErrMessage = tr("Video or audio codec is incompatible with %1 format. Try other format").arg(m_container);
             cl_log.log(m_lastErrMessage, cl_logERROR);
             return false;
         }
@@ -514,7 +514,7 @@ bool QnStreamRecorder::addSignatureFrame(QString &/*errorString*/)
 
     if (generatedFrame == 0)
     {
-        m_lastErrMessage = QString("Error during generate watermark for file ") + m_fileName;
+        m_lastErrMessage = tr("Error during generate watermark for file '%1'").arg(m_fileName);
         qWarning() << m_lastErrMessage;
         return false;
     }
@@ -552,8 +552,8 @@ void QnStreamRecorder::setContainer(const QString& container)
 {
     m_container = container;
     // convert short file ext to ffmpeg container name
-    if (m_container == QString("mkv"))
-        m_container = "matroska";
+    if (m_container == QLatin1String("mkv"))
+        m_container = QLatin1String("matroska");
 }
 
 void QnStreamRecorder::setNeedReopen()

@@ -118,7 +118,7 @@ void QnTestCameraStreamReader::openStream()
     m_tcpSock.setReadTimeOut(TESTCAM_TIMEOUT);
     m_tcpSock.setWriteTimeOut(TESTCAM_TIMEOUT);
 
-    if (!m_tcpSock.connect(url.host().toLatin1().data(), url.port()))
+    if (!m_tcpSock.connect(url.host(), url.port()))
     {
         closeStream();
         return;
