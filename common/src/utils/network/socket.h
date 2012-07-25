@@ -1,17 +1,20 @@
 #ifndef __PRACTICALSOCKET_INCLUDED__
 #define __PRACTICALSOCKET_INCLUDED__
 
-#include <QString>
-#include <string>            // For QString
-#include <exception>         // For exception class
+#include <string>
+#include <exception>
+
+#include <QtCore/QString>
+#include <QtCore/QCoreApplication> /* For Q_DECLARE_TR_FUNCTIONS. */
 
 #ifdef Q_OS_WIN
-#  include <winsock2.h>
+#   include <winsock2.h>
 #else
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <netinet/in.h>
+#   include <sys/socket.h>
+#   include <sys/types.h>
+#   include <netinet/in.h>
 #endif
+
 #include "nettools.h"
 
 #define MAX_ERROR_MSG_LENGTH 1024
@@ -382,6 +385,7 @@ public:
 
 private:
     void setBroadcast();
+
 private:
     sockaddr_in* m_destAddr;
 };
