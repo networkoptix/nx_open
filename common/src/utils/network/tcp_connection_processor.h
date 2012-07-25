@@ -5,7 +5,7 @@
 
 #include "utils/common/longrunnable.h"
 #include "utils/network/socket.h"
-#include "utils/common/base.h"
+#include "utils/common/pimpl.h"
 
 class QnTcpListener;
 
@@ -15,12 +15,13 @@ public:
     QnTCPConnectionProcessor(TCPSocket* socket, QnTcpListener* owner);
     virtual ~QnTCPConnectionProcessor();
 
-    /*
-    * Check for request or response is completed: finished with /r/n/r/n or contains full content len data
-    */
+    /**
+     * Check for request or response is completed: finished with /r/n/r/n or contains full content len data
+     */
     static int isFullMessage(const QByteArray& message);
 
     int getSocketTimeout();
+
 protected:
     virtual void pleaseStop();
     virtual void parseRequest();

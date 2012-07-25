@@ -7,7 +7,7 @@
 #include <QList>
 #include <QByteArray>
 #include "utils/common/request_param.h"
-#include "utils/common/base.h"
+#include "utils/common/pimpl.h"
 
 
 class TCPSocket;

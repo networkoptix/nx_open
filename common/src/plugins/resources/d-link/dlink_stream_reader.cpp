@@ -3,7 +3,6 @@
 #include "dlink_resource.h"
 #include "utils/common/sleep.h"
 #include "utils/common/synctime.h"
-#include "utils/common/base.h"
 
 
 
@@ -343,8 +342,8 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMPEG(CodecID ci)
 
     QnCompressedVideoDataPtr videoData(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, dataLeft+FF_INPUT_BUFFER_PADDING_SIZE));
     char* curPtr = videoData->data.data();
-    videoData->data.prepareToWrite(dataLeft); // this call does nothing 
-    videoData->data.done(dataLeft);
+    videoData->data.startWriting(dataLeft); // this call does nothing 
+    videoData->data.finishWriting(dataLeft);
 
     while (dataLeft > 0)
     {
@@ -404,7 +403,7 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMJPEG()
 
     int dataLeft = contentLen - videoData->data.size();
     char* curPtr = videoData->data.data() + videoData->data.size();
-    videoData->data.done(dataLeft);
+    videoData->data.finishWriting(dataLeft);
 
     while (dataLeft > 0)
     {
@@ -416,7 +415,7 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMJPEG()
     }
     // sometime 1 more bytes in the buffer end. Looks like it is a DLink bug caused by 16-bit word alignment
     if (contentLen > 2 && !(curPtr[-2] == (char)0xff && curPtr[-1] == (char)0xd9))
-        videoData->data.done(-1);
+        videoData->data.finishWriting(-1);
 
     videoData->compressionType = CODEC_ID_MJPEG;
     videoData->width = 1920;

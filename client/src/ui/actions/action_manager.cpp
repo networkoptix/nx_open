@@ -808,6 +808,11 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Export Selection as Multi-Stream...")).
         condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::DisabledAction, this));
 
+    factory(Qn::QuickSearchAction).
+        flags(Qn::Slider | Qn::SingleTarget).
+        text(tr("Quick Search...")).
+        condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::DisabledAction, this));
+
     factory().
         flags(Qn::Slider).
         separator();

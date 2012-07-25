@@ -24,6 +24,8 @@ public:
 
     bool isInitialized() const;
 
+    virtual bool shoudResolveConflicts() const override;
+
     QByteArray getMaxResolution() const;
     QString getNearestResolution(const QByteArray& resolution, float aspectRatio) const;
     float getResolutionAspectRatio(const QByteArray& resolution) const;
@@ -34,6 +36,10 @@ public:
 
     virtual void setMotionMaskPhysical(int channel) override;
     virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider) override;
+
+
+    int getChannelNum() const;
+
 protected:
     bool initInternal() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();

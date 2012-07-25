@@ -4,7 +4,6 @@
 #include "utils/media/ffmpeg_helper.h"
 #include "utils/media/sse_helper.h"
 #include "utils/common/synctime.h"
-#include "utils/common/base.h"
 
 #ifdef Q_OS_MAC
 #include <smmintrin.h>
@@ -79,9 +78,9 @@ QnMetaDataV1::QnMetaDataV1(int initialValue):
     m_firstTimestamp = AV_NOPTS_VALUE;
     timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;
     if (initialValue)
-        data.fill(0xff, data.capacity());
+        data.writeFiller(0xff, data.capacity());
     else
-        data.fill(0, data.capacity());
+        data.writeFiller(0, data.capacity());
 }
 
 void QnMetaDataV1::addMotion(QnMetaDataV1Ptr data)

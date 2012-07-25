@@ -3,6 +3,7 @@
 
 #include <QtCore/QMutex>
 #include <QtCore/QFile>
+#include <QtCore/QTextStream>
 
 enum QnLogLevel { cl_logUNKNOWN, cl_logALWAYS, cl_logERROR, cl_logWARNING, cl_logINFO, cl_logDEBUG1, cl_logDEBUG2 };
 

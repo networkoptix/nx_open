@@ -114,7 +114,7 @@ int CLH264RtpParser::getSpsPpsSize() const
     return result;
 }
 
-void CLH264RtpParser::serializeSpsPps(CLByteArray& dst)
+void CLH264RtpParser::serializeSpsPps(QnByteArray& dst)
 {
     for (int i = 0; i < m_sdpSpsPps.size(); ++i)
         dst.write(m_sdpSpsPps[i]);

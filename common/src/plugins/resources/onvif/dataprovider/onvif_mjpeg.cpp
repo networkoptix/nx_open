@@ -1,7 +1,6 @@
 #include "onvif_mjpeg.h"
 #include "core/resource/network_resource.h"
 #include "utils/common/synctime.h"
-#include "utils/common/base.h"
 
 /*
 inline static int findJPegStartCode(const char *data, int datalen)
@@ -115,7 +114,7 @@ QnAbstractMediaDataPtr MJPEGtreamreader::getNextData()
 
     int dataLeft = contentLen - videoData->data.size();
     char* curPtr = videoData->data.data() + videoData->data.size();
-    videoData->data.done(dataLeft);
+    videoData->data.finishWriting(dataLeft);
 
     while (dataLeft > 0)
     {
@@ -127,7 +126,7 @@ QnAbstractMediaDataPtr MJPEGtreamreader::getNextData()
     }
     // sometime 1 more bytes in the buffer end. Looks like it is a DLink bug caused by 16-bit word alignment
     if (contentLen > 2 && !(curPtr[-2] == (char)0xff && curPtr[-1] == (char)0xd9))
-        videoData->data.done(-1);
+        videoData->data.finishWriting(-1);
 
     videoData->compressionType = CODEC_ID_MJPEG;
     videoData->width = 1920;

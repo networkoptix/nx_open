@@ -1,5 +1,7 @@
 #define QT_NO_CAST_FROM_ASCII
 
+#include "utils/common/config.h"
+
 #ifdef _WIN32
 #define NOMINMAX 
 #include <winsock2.h>

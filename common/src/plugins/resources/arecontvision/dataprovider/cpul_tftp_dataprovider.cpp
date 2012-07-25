@@ -6,7 +6,6 @@
 #include <QMutex>
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "utils/common/util.h"
-#include "utils/common/base.h"
 #include "utils/common/synctime.h"
 
 //======================================================
@@ -94,7 +93,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
                 !m_streamParam.contains("image_right") || !m_streamParam.contains("image_bottom") ||
                 (h264 && !m_streamParam.contains("streamID")))
             {
-                cl_log.log("Erorr!!! parameter is missing in stream params.", cl_logERROR);
+                cl_log.log("Error!!! parameter is missing in stream params.", cl_logERROR);
                 //return QnAbstractMediaDataPtr(0);
             }
 
@@ -199,7 +198,6 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
         if (bitrate)
             request += QLatin1String("bitrate=") + QString::number(bitrate) + QLatin1Char(';');
     }
-    /**/
 
     QnPlAreconVisionResourcePtr netRes = getResource().dynamicCast<QnPlAreconVisionResource>();
     if (m_tftp_client == 0 || m_tftp_client->getHostAddress() != netRes->getHostAddress()) {
@@ -209,7 +207,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 
     m_videoFrameBuff.clear();
     
-    CLByteArray& img = m_videoFrameBuff;
+    QnByteArray& img = m_videoFrameBuff;
 
     //==========================================
     int expectable_header_size;
@@ -223,8 +221,8 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 
         unsigned char h264header[50];
         expectable_header_size = create_sps_pps(m_last_cam_width , m_last_cam_height, 0, h264header, sizeof(h264header));
-        img.prepareToWrite(expectable_header_size + 5 ); // 5: from cam in tftp mode we receive data starts from second byte of slice header; so we need to put start code and first byte
-        img.done(expectable_header_size + 5 );
+        img.startWriting(expectable_header_size + 5 ); // 5: from cam in tftp mode we receive data starts from second byte of slice header; so we need to put start code and first byte
+        img.finishWriting(expectable_header_size + 5 );
 
         // please note that we did not write a single byte to img, we just move position...
         // we will write header based on last packet information
@@ -232,8 +230,8 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
     else
     {
         // in jpeg image header size has constant len
-        img.prepareToWrite(AVJpeg::Header::GetHeaderSize()-2);
-        img.done(AVJpeg::Header::GetHeaderSize()-2); //  for some reason first 2 bytes from cam is trash
+        img.startWriting(AVJpeg::Header::GetHeaderSize()-2);
+        img.finishWriting(AVJpeg::Header::GetHeaderSize()-2); //  for some reason first 2 bytes from cam is trash
 
         // please note that we did not write a single byte to img, we just move position...
         // we will write header based on last packet information
@@ -248,7 +246,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
         return QnCompressedVideoDataPtr(0);
     }
 
-    img.removeZerosAtTheEnd();
+    img.removeTrailingZeros();
 
     int lp_size;
     const unsigned char* last_packet = m_tftp_client->getLastPacket(lp_size);
@@ -343,29 +341,29 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
             {
                 int diff = header_size - expectable_header_size;
                 if (diff>0)
-                    img.prepareToWrite(diff);
+                    img.startWriting(diff);
 
                 cl_log.log("Perfomance hint: AVClientPullSSTFTP streamreader moved received data", cl_logINFO);
 
                 memmove(img.data() + 5 + header_size, img.data() + 5 + expectable_header_size, img.size() - (5 + expectable_header_size));
-                img.done(diff);
+                img.finishWriting(diff);
             }
 
             dst = img.data();
             memcpy(dst, h264header, header_size);
-            dst+= header_size;
+            dst += header_size;
         }
         else
         {
             img.ignore_first_bytes(expectable_header_size); // if you decoder needs compressed data alignment, just do not do it. ffmpeg will delay one frame if do not do it.
-            dst+=expectable_header_size;
+            dst += expectable_header_size;
         }
 
         // we also need to put very begining of SH
         dst[0] = dst[1] = dst[2] = 0; dst[3] = 1;
         dst[4] = (iFrame) ? 0x65 : 0x41;
 
-        img.prepareToWrite(8);
+        img.startWriting(8);
         dst = img.data() + img.size();
         dst[0] = dst[1] = dst[2] = dst[3] = dst[4] = dst[5] =  dst[6] = dst[7] = 0;
 
@@ -377,9 +375,9 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
     }
 
 
-    QnCompressedVideoDataPtr videoData ( new QnCompressedVideoData(CL_MEDIA_ALIGNMENT,m_videoFrameBuff.size()) );
+    QnCompressedVideoDataPtr videoData(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT,m_videoFrameBuff.size()));
 
-    CLByteArray& imgToSend = videoData->data;
+    QnByteArray& imgToSend = videoData->data;
     imgToSend.write(m_videoFrameBuff);
     
 
@@ -400,7 +398,6 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 QnMetaDataV1Ptr AVClientPullSSTFTPStreamreader::getCameraMetadata()
 {
     QnMetaDataV1Ptr motion(new QnMetaDataV1());
-    //Andy Tau & Touch Enable feat. Louisa Allen - Sorry (Sean Truby Remix)
     QVariant mdresult;
     if (!getResource()->getParam(QLatin1String("MdResult"), mdresult, QnDomainPhysical))
         return QnMetaDataV1Ptr(0);

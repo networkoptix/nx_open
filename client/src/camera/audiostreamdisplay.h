@@ -5,7 +5,6 @@
 #include "openal/qtvsound.h"
 #include "openal/qtvaudiodevice.h"
 #include "core/datapacket/mediadatapacket.h"
-#include "utils/common/aligned_data.h"
 
 class CLAbstractAudioDecoder;
 struct QnCompressedAudioData;
@@ -49,10 +48,10 @@ public:
 private:
     int msInQueue() const;
 
-	static QnCodecAudioFormat downmix(CLByteArray& audio, QnCodecAudioFormat format);
-	static QnCodecAudioFormat float2int16(CLByteArray& audio, QnCodecAudioFormat format);
-	static QnCodecAudioFormat float2int32(CLByteArray& audio, QnCodecAudioFormat format);
-    static QnCodecAudioFormat int32Toint16(CLByteArray& audio, QnCodecAudioFormat format);
+	static QnCodecAudioFormat downmix(QnByteArray& audio, QnCodecAudioFormat format);
+	static QnCodecAudioFormat float2int16(QnByteArray& audio, QnCodecAudioFormat format);
+	static QnCodecAudioFormat float2int32(QnByteArray& audio, QnCodecAudioFormat format);
+    static QnCodecAudioFormat int32Toint16(QnByteArray& audio, QnCodecAudioFormat format);
 	bool initFormatConvertRule(QnAudioFormat format);
 private:
     QMutex m_guiSync;
@@ -64,7 +63,7 @@ private:
 
     int m_bufferMs;
     int m_prebufferMs;
-    CLByteArray m_decodedAudioBuffer;
+    QnByteArray m_decodedAudioBuffer;
     bool m_tooFewDataDetected;
     bool m_isFormatSupported;
     QtvSound* m_audioSound;

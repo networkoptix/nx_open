@@ -76,6 +76,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
 }
 
 QnMediaResourceWidget::~QnMediaResourceWidget() {
+    ensureAboutToBeDestroyedEmitted();
+
     delete m_display;
 
     foreach(__m128i *data, m_binaryMotionMask)
@@ -269,7 +271,10 @@ void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
 
 Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter, int channel, const QRectF &rect) {
     painter->beginNativePainting();
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     Qn::RenderStatus result = m_renderer->paint(channel, rect, effectiveOpacity());
+    glDisable(GL_BLEND);
     painter->endNativePainting();
 
     if(result != Qn::NewFrameRendered && result != Qn::OldFrameRendered)

@@ -31,7 +31,7 @@ protected:
     // in av cameras you do not know the size of the frame in advance; 
     //so we can save a lot of memory by receiving all frames in this buff 
     // but will slow down a bit coz of extra memcpy ( I think not much )
-    CLByteArray m_videoFrameBuff; 
+    QnByteArray m_videoFrameBuff; 
 
 };
 

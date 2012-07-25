@@ -64,7 +64,7 @@ void QnResourceDirectoryBrowser::cleanup()
 
 QnResourceList QnResourceDirectoryBrowser::findResources()
 {
-    if (m_resourceReady)
+    if (m_resourceReady) // TODO: if path check list is changed, this check will prevent us from re-updating the resource list.
     {
         return QnResourceList();
     }

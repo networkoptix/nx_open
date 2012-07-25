@@ -1,8 +1,6 @@
 #include "audiostreamdisplay.h"
 #include "decoders/audio/audio_struct.h"
 #include "decoders/audio/abstractaudiodecoder.h"
-#include "utils/common/base.h"
-
 #include "utils/settings.h"
 
 #define DEFAULT_AUDIO_FRAME_SIZE (AVCODEC_MAX_AUDIO_FRAME_SIZE*2)
@@ -323,7 +321,7 @@ void CLAudioStreamDisplay::playCurrentBuffer()
 }
 
 //=======================================================================
-QnCodecAudioFormat CLAudioStreamDisplay::downmix(CLByteArray& audio, QnCodecAudioFormat format)
+QnCodecAudioFormat CLAudioStreamDisplay::downmix(QnByteArray& audio, QnCodecAudioFormat format)
 {
     if (format.channels() > 2)
     {
@@ -343,7 +341,7 @@ QnCodecAudioFormat CLAudioStreamDisplay::downmix(CLByteArray& audio, QnCodecAudi
     return format;
 }
 
-QnCodecAudioFormat CLAudioStreamDisplay::float2int16(CLByteArray& audio, QnCodecAudioFormat format)
+QnCodecAudioFormat CLAudioStreamDisplay::float2int16(QnByteArray& audio, QnCodecAudioFormat format)
 {
     Q_ASSERT(sizeof(float) == 4); // not sure about sizeof(float) in 64 bit version
 
@@ -364,7 +362,7 @@ QnCodecAudioFormat CLAudioStreamDisplay::float2int16(CLByteArray& audio, QnCodec
     return format;
 }
 
-QnCodecAudioFormat CLAudioStreamDisplay::int32Toint16(CLByteArray& audio, QnCodecAudioFormat format)
+QnCodecAudioFormat CLAudioStreamDisplay::int32Toint16(QnByteArray& audio, QnCodecAudioFormat format)
 {
     Q_ASSERT(sizeof(float) == 4); // not sure about sizeof(float) in 64 bit version
 
@@ -384,7 +382,7 @@ QnCodecAudioFormat CLAudioStreamDisplay::int32Toint16(CLByteArray& audio, QnCode
     return format;
 }
 
-QnCodecAudioFormat CLAudioStreamDisplay::float2int32(CLByteArray& audio, QnCodecAudioFormat format)
+QnCodecAudioFormat CLAudioStreamDisplay::float2int32(QnByteArray& audio, QnCodecAudioFormat format)
 {
     Q_ASSERT(sizeof(float) == 4); // not sure about sizeof(float) in 64 bit version
 

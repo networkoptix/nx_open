@@ -1,7 +1,6 @@
 #include "testcamera_stream_reader.h"
 #include "testcamera_resource.h"
 #include "utils/common/synctime.h"
-#include "utils/common/base.h"
 
 static const int TESTCAM_TIMEOUT = 1 * 1000;
 
@@ -77,7 +76,7 @@ QnAbstractMediaDataPtr QnTestCameraStreamReader::getNextData()
     QnAbstractMediaDataPtr rez(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, size, m_context));
     rez->compressionType = (CodecID) codec;
 
-    rez->data.done(size);
+    rez->data.finishWriting(size);
     rez->timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;
     if (isKeyData)
         rez->flags |= AV_PKT_FLAG_KEY;

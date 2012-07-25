@@ -5,7 +5,6 @@
 #include "../tools/AVJpegHeader.h"
 #include "core/resource/resource_media_layout.h"
 #include "utils/common/synctime.h"
-#include "utils/common/base.h"
 #include "../resource/av_panoramic.h"
 
 //======================================================
@@ -183,7 +182,7 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
     }
 
     m_videoFrameBuff.clear();
-    CLByteArray& img = m_videoFrameBuff;
+    QnByteArray& img = m_videoFrameBuff;
 
     //==========================================
     int expectable_header_size;
@@ -197,8 +196,8 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 
         unsigned char h264header[50];
         expectable_header_size = create_sps_pps(resolutionFULL ? width : width/2, resolutionFULL ? height: height/2, 0, h264header, sizeof(h264header));
-        img.prepareToWrite(expectable_header_size + 5 ); // 5: from cam in tftp mode we receive data starts from second byte of slice header; so we need to put start code and first byte
-        img.done(expectable_header_size + 5 );
+        img.startWriting(expectable_header_size + 5 ); // 5: from cam in tftp mode we receive data starts from second byte of slice header; so we need to put start code and first byte
+        img.finishWriting(expectable_header_size + 5 );
 
         // please note that we did not write a single byte to img, we just move position...
         // we will write header based on last packet information
@@ -206,8 +205,8 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
     else
     {
         // in jpeg image header size has constant len
-        img.prepareToWrite(AVJpeg::Header::GetHeaderSize()-2);
-        img.done(AVJpeg::Header::GetHeaderSize()-2); //  for some reason first 2 bytes from cam is trash
+        img.startWriting(AVJpeg::Header::GetHeaderSize()-2);
+        img.finishWriting(AVJpeg::Header::GetHeaderSize()-2); //  for some reason first 2 bytes from cam is trash
 
         // please note that we did not write a single byte to img, we just move position...
         // we will write header based on last packet information
@@ -222,7 +221,7 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
         return QnAbstractMediaDataPtr(0);
     }
 
-    img.removeZerosAtTheEnd();
+    img.removeTrailingZeros();
 
     int lp_size;
     const unsigned char* last_packet = m_tftp_client->getLastPacket(lp_size);
@@ -306,12 +305,12 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
             {
                 int diff = header_size - expectable_header_size;
                 if (diff>0)
-                    img.prepareToWrite(diff);
+                    img.startWriting(diff);
 
                 cl_log.log("Perfomance hint: AVPanoramicClientPullSSTFTP Streamreader moved received data", cl_logINFO);
 
                 memmove(img.data() + 5 + header_size, img.data() + 5 + expectable_header_size, img.size() - (5 + expectable_header_size));
-                img.done(diff);
+                img.finishWriting(diff);
             }
 
             dst = img.data();
@@ -330,7 +329,7 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
         dst[0] = dst[1] = dst[2] = 0; dst[3] = 1;
         dst[4] = (iFrame) ? 0x65 : 0x41;
 
-        img.prepareToWrite(8);
+        img.startWriting(8);
         dst = img.data() + img.size();
         dst[0] = dst[1] = dst[2] = dst[3] = dst[4] = dst[5] =  dst[6] = dst[7] = 0;
 

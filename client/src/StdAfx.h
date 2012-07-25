@@ -1,5 +1,7 @@
 #define QT_NO_CAST_FROM_ASCII
 
+#include "config.h"
+
 #ifdef _WIN32
 #undef __STDC_CONSTANT_MACROS
 #define __STDC_CONSTANT_MACROS
@@ -32,7 +34,8 @@ extern "C" {
 	#include <libavutil/avstring.h>
 }
 
-#if defined __cplusplus
+#ifdef __cplusplus
+
 // stl headers
 #include <algorithm>
 #include <functional>
@@ -139,8 +142,5 @@ extern "C" {
 #include <QtGui>
 #include <QtOpenGL/QGLWidget>
 #include <QFileSystemWatcher>
-
-// our headers
-#include "config.h"
 
 #endif

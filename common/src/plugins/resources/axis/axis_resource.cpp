@@ -4,7 +4,7 @@
 #include "utils/common/synctime.h"
 
 const char* QnPlAxisResource::MANUFACTURE = "Axis";
-static const float MAX_AR_EPS = 0.02f;
+static const float MAX_AR_EPS = 0.04f;
 static const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
 
 QnPlAxisResource::QnPlAxisResource()
@@ -36,6 +36,11 @@ void QnPlAxisResource::setIframeDistance(int /*frames*/, int /*timems*/)
 QnAbstractStreamDataProvider* QnPlAxisResource::createLiveDataProvider()
 {
     return new QnAxisStreamReader(toSharedPointer());
+}
+
+bool QnPlAxisResource::shoudResolveConflicts() const 
+{
+    return false;
 }
 
 void QnPlAxisResource::setCropingPhysical(QRect /*croping*/)
@@ -215,19 +220,19 @@ bool QnPlAxisResource::initInternal()
 
         
         if (m_resolutionList[i]=="qcif")
-            m_resolutionList[i] = "176x120";
+            m_resolutionList[i] = "176x144";
 
         else if (m_resolutionList[i]=="cif")
-            m_resolutionList[i] = "352x240";
+            m_resolutionList[i] = "352x288";
 
         else if (m_resolutionList[i]=="2cif")
-            m_resolutionList[i] = "704x240";
+            m_resolutionList[i] = "704x288";
 
         else if (m_resolutionList[i]=="4cif")
-            m_resolutionList[i] = "704x480";
+            m_resolutionList[i] = "704x576";
 
         else if (m_resolutionList[i]=="d1")
-            m_resolutionList[i] = "720x480";
+            m_resolutionList[i] = "720x576";
 
     }
 
@@ -419,4 +424,23 @@ const QnResourceAudioLayout* QnPlAxisResource::getAudioLayout(const QnAbstractMe
     }
     else
         return QnPhysicalCameraResource::getAudioLayout(dataProvider);
+}
+
+
+int QnPlAxisResource::getChannelNum() const
+{
+    QString phId = getPhysicalId();
+
+    int index = phId.indexOf("_channel_");
+    if (index<0)
+        return 1;
+
+    index += 9;
+
+    if (index >= phId.length() )
+        return 1;
+
+    int result = phId.mid(index).toInt();
+
+    return result;
 }

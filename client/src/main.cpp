@@ -221,24 +221,18 @@ int main(int argc, char *argv[])
     QApplication::setApplicationVersion(QLatin1String(APPLICATION_VERSION));
 
 
-    /* Pre-parse command line. */
+    /* Parse command line. */
     QnAutoTester autoTester(argc, argv);
 
+    qnSettings->updateFromCommandLine(argc, argv, stderr);
+
     QnCommandLineParser commandLinePreParser;
-    commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::Flag, "--no-single-application", NULL, NULL));
-    commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::String, "--auth", NULL, NULL));
-    commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::Integer, "--screen", NULL, NULL));
-    commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::String, "--delayed-drop", NULL, NULL));
-    commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::String, "--log-level", NULL, NULL));
-    commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::Flag, "--soft-yuv", NULL, NULL));
-    commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::Flag, "--open-layouts-on-login", NULL, NULL));
-    commandLinePreParser.parse(argc, argv);
-
-    if(commandLinePreParser.value("--soft-yuv").toBool())
-        qnSettings->setSoftwareYuv(true);
-
-    if(commandLinePreParser.value("--open-layouts-on-login").toBool())
-        qnSettings->setLayoutsOpenedOnLogin(true);
+    commandLinePreParser.addParameter(QMetaType::Bool,      "--no-single-application",  NULL, QString(),    true);
+    commandLinePreParser.addParameter(QMetaType::QString,   "--auth",                   NULL, QString());
+    commandLinePreParser.addParameter(QMetaType::Int,       "--screen",                 NULL, QString());
+    commandLinePreParser.addParameter(QMetaType::QString,   "--delayed-drop",           NULL, QString());
+    commandLinePreParser.addParameter(QMetaType::QString,   "--log-level",              NULL, QString());
+    commandLinePreParser.parse(argc, argv, stderr);
 
     /* Set authentication parameters from command line. */
     QUrl authentication = QUrl::fromUserInput(commandLinePreParser.value("--auth").toString());

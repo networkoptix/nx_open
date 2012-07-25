@@ -1,15 +1,13 @@
 #ifndef cl_adaptive_sleep_137
 #define cl_adaptive_sleep_137
 
-#include "utils/common/sleep.h"
-#include <QMutex>
-#include <QWaitCondition>
+#include <QtCore/QMutex>
+#include <QtCore/QWaitCondition>
+#include "sleep.h"
 
+#define MAX_VALID_SLEEP_TIME 5000000
 
-const int MAX_VALID_SLEEP_TIME = 5000000;
-
-class CLAdaptiveSleep
-{
+class QnAdaptiveSleep {
 public:
     /**
      * Constructor.
@@ -24,7 +22,7 @@ public:
      * \param maxOverdraftUSec          Maximal difference between expected and
      *                                  actual time slept, in microseconds. 
      */
-    CLAdaptiveSleep(int maxOverdraftUSec):
+    QnAdaptiveSleep(int maxOverdraftUSec):
         m_firstTime(true),
         m_maxOverdraft(maxOverdraftUSec)
     {};
@@ -55,7 +53,7 @@ public:
                 afterdelay();
             return havetowait;
         }
-        //cl_log.log("sleep time=", havetowait/1000000.0, cl_logALWAYS);
+
         if (havetowait < MAX_VALID_SLEEP_TIME)
             QnSleep::msleep(qMin(havetowait / 1000, maxSleepTime / 1000));
         else
@@ -114,7 +112,6 @@ public:
         return havetowait;
     }
 
-
     void afterdelay()
     {
         m_firstTime = true;
@@ -126,7 +123,6 @@ private:
     qint64 m_maxOverdraft;
     qint64 m_totalTime;
     
-    // used for terminated sleep
     QMutex m_mutex;
     QWaitCondition m_waitCond;
 };

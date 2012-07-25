@@ -491,7 +491,7 @@ void QnWorkbenchDisplay::setLayer(QGraphicsItem *item, Qn::ItemLayer layer) {
     item->setZValue(layer * layerZSize + std::fmod(item->zValue(), layerZSize));
 
     QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
-    if(widget)
+    if(widget && widget->shadowItem()) /* Shadow may already be destroyed. */
         widget->shadowItem()->setZValue(shadowLayer(layer) * layerZSize);
 }
 

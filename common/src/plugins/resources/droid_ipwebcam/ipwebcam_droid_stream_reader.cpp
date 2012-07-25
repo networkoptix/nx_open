@@ -1,6 +1,5 @@
 #include "core/resource/network_resource.h"
 #include "utils/common/synctime.h"
-#include "utils/common/base.h"
 #include "ipwebcam_droid_stream_reader.h"
 
 char jpeg_start[2] = {'\xff', '\xd8'};
@@ -66,7 +65,7 @@ QnAbstractMediaDataPtr QnPlDroidIpWebCamReader::getNextData()
         return QnAbstractMediaDataPtr(0);
 
     QnCompressedVideoDataPtr videoData(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, 3*1024*1024+FF_INPUT_BUFFER_PADDING_SIZE));
-    CLByteArray& img = videoData->data;
+    QnByteArray& img = videoData->data;
 
 
     bool getting_image = false;
@@ -94,9 +93,9 @@ QnAbstractMediaDataPtr QnPlDroidIpWebCamReader::getNextData()
             if (image_index>=0)
             {
                 getting_image = true;
-                char *to = img.prepareToWrite(readed - image_index); // I assume any image is bigger than BLOCK_SIZE
+                char *to = img.startWriting(readed - image_index); // I assume any image is bigger than BLOCK_SIZE
                 memcpy(to, mData + image_index, readed - image_index);
-                img.done(readed - image_index);
+                img.finishWriting(readed - image_index);
             }
             else
             {

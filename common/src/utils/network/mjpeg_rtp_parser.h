@@ -43,7 +43,7 @@ private:
     quint8* m_lummaTablePos;
     quint8* m_chromaTablePos;
 
-    CLByteArray m_frameData;
+    QnByteArray m_frameData;
 };
 
 #endif

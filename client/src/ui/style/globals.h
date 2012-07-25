@@ -68,7 +68,7 @@ public:
 
 
 protected:
-    virtual QVariant updateValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) override;
+    virtual QVariant readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) override;
 
 private:
     QnColorVector initSystemHealthColors();
