@@ -91,10 +91,12 @@ bool Socket::fillAddr(const QString &address, unsigned short port,
     int status = getaddrinfo(address.toAscii(), 0, &hints, &addressInfo);
     if (status != 0) {
 #ifdef UNICODE
-        m_lastError = tr("Couldn't resolve %1: %2").arg(address).arg(QString::fromWCharArray(gai_strerror(status)));
+        QString errorMessage = QString::fromWCharArray(gai_strerror(status));
 #else
-        m_lastError = tr("Couldn't resolve %1: %2").arg(address).arg(gai_strerror(status));
+        QString errorMessage = QString::fromLocal8Bit(gai_strerror(status));
 #endif  /* UNICODE */
+
+        m_lastError = tr("Couldn't resolve %1: %2").arg(address).arg(errorMessage);
         return false;
     }
 
@@ -313,7 +315,7 @@ bool CommunicatingSocket::connect(const QString &foreignAddress,
 #ifndef _WIN32
     if (connectResult != 0)
     {
-        m_lastError = "Connect failed (connect())";
+        m_lastError = tr("Connect failed (connect())");
         return false;
     }
 #else
@@ -596,10 +598,11 @@ void UDPSocket::disconnect()  {
     // Try to disconnect
     if (::connect(sockDesc, (sockaddr *) &nullAddr, sizeof(nullAddr)) < 0) {
 #ifdef WIN32
-        if (errno != WSAEAFNOSUPPORT) {
+        if (errno != WSAEAFNOSUPPORT)
 #else
-        if (errno != EAFNOSUPPORT) {
+        if (errno != EAFNOSUPPORT)
 #endif
+        {
             throw SocketException(tr("Disconnect failed (connect())"), true);
         }
     }

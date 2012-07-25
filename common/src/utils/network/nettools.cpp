@@ -511,7 +511,7 @@ QString getMacByIP(const QHostAddress& ip, bool /*net*/)
             /* complete ARP entry */
             cl_log.log(cl_logDEBUG1, "%d ? %d", ip.toIPv4Address(), ntohl(sinarp->sin_addr.s_addr));
             if (ip.toIPv4Address() == ntohl(sinarp->sin_addr.s_addr))
-            {
+            
                 free(buf);
                 return MACToString((unsigned char*)LLADDR(sdl));
             }

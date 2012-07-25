@@ -93,9 +93,9 @@ namespace {
     class QnLicensePoolInstance: public QnLicensePool {};
 }
 
-Q_GLOBAL_STATIC(QnLicensePoolInstance, globalLicensePool)
+Q_GLOBAL_STATIC(QnLicensePoolInstance, qn_licensePool_instance)
 
-QnLicense::QnLicense(const QString& name, const QByteArray& key, int cameraCount, const QByteArray& hwid, const QByteArray& signature)
+QnLicense::QnLicense(const QString &name, const QByteArray &key, int cameraCount, const QByteArray &hwid, const QByteArray &signature)
     : m_name(name),
       m_key(key),
       m_cameraCount(cameraCount),
@@ -111,12 +111,12 @@ const QString &QnLicense::name() const
     return m_name;
 }
 
-const QByteArray& QnLicense::key() const
+const QByteArray &QnLicense::key() const
 {
     return m_key;
 }
 
-const qint32 QnLicense::cameraCount() const
+qint32 QnLicense::cameraCount() const
 {
     return m_cameraCount;
 }
@@ -126,7 +126,7 @@ const QByteArray &QnLicense::hardwareId() const
     return m_hardwareId;
 }
 
-const QByteArray& QnLicense::signature() const
+const QByteArray &QnLicense::signature() const
 {
     return m_signature;
 }
@@ -205,19 +205,19 @@ QnLicense QnLicense::fromString(const QByteArray &licenseString)
     return QnLicense(name, key, cameraCount, hwid, signature);
 }
 
-QnLicensePool* QnLicensePool::instance()
+QnLicensePool *QnLicensePool::instance()
 {
-    return globalLicensePool();
+    return qn_licensePool_instance();
 }
 
-const QnLicenseList& QnLicensePool::getLicenses() const
+const QnLicenseList &QnLicensePool::getLicenses() const
 {
     QMutexLocker locker(&m_mutex);
 
     return m_licenses;
 }
 
-void QnLicensePool::addLicenses(const QnLicenseList& licenses)
+void QnLicensePool::addLicenses(const QnLicenseList &licenses)
 {
     QMutexLocker locker(&m_mutex);
 
@@ -226,7 +226,7 @@ void QnLicensePool::addLicenses(const QnLicenseList& licenses)
     emit licensesChanged();
 }
 
-void QnLicensePool::replaceLicenses(const QnLicenseList& licenses)
+void QnLicensePool::replaceLicenses(const QnLicenseList &licenses)
 {
     QMutexLocker locker(&m_mutex);
 
@@ -236,7 +236,7 @@ void QnLicensePool::replaceLicenses(const QnLicenseList& licenses)
     emit licensesChanged();
 }
 
-void QnLicensePool::addLicense(const QnLicensePtr& license)
+void QnLicensePool::addLicense(const QnLicensePtr &license)
 {
     QMutexLocker locker(&m_mutex);
 
