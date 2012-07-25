@@ -153,7 +153,8 @@ void parseServer(QnVideoServerResourcePtr &server, const pb::Resource &pb_server
     if (pb_server.has_netaddrlist())
     {
         QList<QHostAddress> netAddrList;
-        deserializeNetAddrList(netAddrList, pb_server.netaddrlist().c_str());
+        //TODO:UTF unuse std::string
+        deserializeNetAddrList(netAddrList, QString::fromStdString(pb_server.netaddrlist()));
         server->setNetAddrList(netAddrList);
     }
 
@@ -180,7 +181,7 @@ void parseServer(QnVideoServerResourcePtr &server, const pb::Resource &pb_server
             parameters["url"] = QString::fromUtf8(pb_storage.url().c_str());
             parameters["spaceLimit"] = QString::number(pb_storage.spacelimit());
 
-            QnResourcePtr st = resourceFactory.createResource(qnResTypePool->getResourceTypeByName("Storage")->getId(), parameters);
+            QnResourcePtr st = resourceFactory.createResource(qnResTypePool->getResourceTypeByName(QLatin1String("Storage"))->getId(), parameters);
             storage = qSharedPointerDynamicCast<QnAbstractStorageResource> (st);
 
             storages.append(storage);
@@ -420,8 +421,8 @@ void parserCameraServerItems(QnCameraHistoryList& cameraServerItems, const PbCam
     for (PbCameraServerItemList::const_iterator ci = pb_cameraServerItems.begin(); ci != pb_cameraServerItems.end(); ++ci)
     {
         const pb::CameraServerItem& pb_item = *ci;
-
-        history[pb_item.physicalid().c_str()][pb_item.timestamp()] = pb_item.serverguid().c_str();
+        //TODO:UTF unuse std::string
+        history[QString::fromStdString(pb_item.physicalid())][pb_item.timestamp()] = QString::fromStdString(pb_item.serverguid());
     }
 
     for(HistoryType::const_iterator ci = history.begin(); ci != history.end(); ++ci)
@@ -666,14 +667,17 @@ void QnApiPbSerializer::deserializeConnectInfo(QnConnectInfoPtr& connectInfo, co
         throw QnSerializeException(errorString);
     }
 
-    connectInfo->version = pb_connectInfo.version().c_str();
+    //TODO:UTF unuse std::string
+    connectInfo->version = QString::fromStdString(pb_connectInfo.version());
 
     typedef google::protobuf::RepeatedPtrField<pb::CompatibilityItem> PbCompatibilityItemList;
     PbCompatibilityItemList items = pb_connectInfo.compatibilityitems().item();
 
     for (PbCompatibilityItemList::const_iterator ci = items.begin(); ci != items.end(); ++ci)
     {
-        connectInfo->compatibilityItems.append(QnCompatibilityItem(ci->ver1().c_str(), ci->comp1().c_str(), ci->ver2().c_str()));
+        //TODO:UTF unuse std::string
+        connectInfo->compatibilityItems.append(QnCompatibilityItem(QString::fromStdString(ci->ver1()), 
+            QString::fromStdString(ci->comp1()), QString::fromStdString(ci->ver2())));
     }
     connectInfo->proxyPort = pb_connectInfo.proxyport();
 }
@@ -853,10 +857,11 @@ void parseLicense(QnLicensePtr& license, const pb::License& pb_license)
 
 void parseCameraServerItem(QnCameraHistoryItemPtr& historyItem, const pb::CameraServerItem& pb_cameraServerItem)
 {
+    //TODO:UTF unuse std::string
     historyItem = QnCameraHistoryItemPtr(new QnCameraHistoryItem(
-                                            pb_cameraServerItem.physicalid().c_str(),
+                                            QString::fromStdString(pb_cameraServerItem.physicalid()),
                                             pb_cameraServerItem.timestamp(),
-                                            pb_cameraServerItem.serverguid().c_str()
+                                            QString::fromStdString(pb_cameraServerItem.serverguid())
                                         ));
 
 }

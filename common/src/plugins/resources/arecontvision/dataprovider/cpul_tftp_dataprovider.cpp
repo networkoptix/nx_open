@@ -239,7 +239,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 
     //==========================================
 
-    int readed = m_tftp_client->read(request.toLatin1().data(), img);
+    int readed = m_tftp_client->read(request, img);
 
     if (readed == 0) // cannot read data
     {
@@ -296,7 +296,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
         arr[0] & 4 ? resolutionFULL = true: false;
         size = ExtractSize(&arr[2]);
 
-        if(!size.width && m_name.contains("3100"))
+        if(!size.width && m_name.contains(QLatin1String("3100")))
             size.width = 2048;
 
         if(!resolutionFULL)
@@ -399,7 +399,7 @@ QnMetaDataV1Ptr AVClientPullSSTFTPStreamreader::getCameraMetadata()
 {
     QnMetaDataV1Ptr motion(new QnMetaDataV1());
     QVariant mdresult;
-    if (!getResource()->getParam("MdResult", mdresult, QnDomainPhysical))
+    if (!getResource()->getParam(QLatin1String("MdResult"), mdresult, QnDomainPhysical))
         return QnMetaDataV1Ptr(0);
 
     if (mdresult.toString() == QLatin1String("no motion"))
@@ -415,7 +415,7 @@ QnMetaDataV1Ptr AVClientPullSSTFTPStreamreader::getCameraMetadata()
 
 
     QVariant zone_size;
-    if (!getResource()->getParam("Zone size", zone_size, QnDomainMemory))
+    if (!getResource()->getParam(QLatin1String("Zone size"), zone_size, QnDomainMemory))
         return QnMetaDataV1Ptr(0);
 
     int pixelZoneSize = zone_size.toInt() * 32;
@@ -423,8 +423,8 @@ QnMetaDataV1Ptr AVClientPullSSTFTPStreamreader::getCameraMetadata()
 
     QVariant maxSensorWidth;
     QVariant maxSensorHight;
-    getResource()->getParam("MaxSensorWidth", maxSensorWidth, QnDomainMemory);
-    getResource()->getParam("MaxSensorHeight", maxSensorHight, QnDomainMemory);
+    getResource()->getParam(QLatin1String("MaxSensorWidth"), maxSensorWidth, QnDomainMemory);
+    getResource()->getParam(QLatin1String("MaxSensorHeight"), maxSensorHight, QnDomainMemory);
 
 
     QRect imageRect(0, 0, maxSensorWidth.toInt(), maxSensorHight.toInt());
@@ -438,7 +438,7 @@ QnMetaDataV1Ptr AVClientPullSSTFTPStreamreader::getCameraMetadata()
             QString m = md.at(index) ;
 
 
-            if (m == "00" || m == "0")
+            if (m == QLatin1String("00") || m == QLatin1String("0"))
                 continue;
 
             QRect currZoneRect = zeroZoneRect.translated(x*pixelZoneSize, y*pixelZoneSize);

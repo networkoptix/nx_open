@@ -159,7 +159,7 @@ void QnPlDroidIpWebCamReader::openStream()
 
     QnNetworkResourcePtr nres = getResource().dynamicCast<QnNetworkResource>();
     mHttpClient = new CLSimpleHTTPClient(nres->getHostAddress(), nres->httpPort() , 2000, nres->getAuth());
-    mHttpClient->doGET(QString("videofeed"));
+    mHttpClient->doGET(QLatin1String("videofeed"));
 
     mDataRemainedBeginIndex = -1;
 }

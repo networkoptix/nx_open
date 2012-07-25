@@ -53,7 +53,7 @@ QnMetaDataV1Ptr AVPanoramicClientPullSSTFTPStreamreader::getCameraMetadata()
 
     QnArecontPanoramicResourcePtr res = getResource().dynamicCast<QnArecontPanoramicResource>();
 
-    if (!res->getParamPhysical(m_motionData + 1, "MdResult", mdresult))
+    if (!res->getParamPhysical(m_motionData + 1, QLatin1String("MdResult"), mdresult))
         return QnMetaDataV1Ptr(0);
 
     if (mdresult.toString() == QLatin1String("no motion"))
@@ -72,7 +72,7 @@ QnMetaDataV1Ptr AVPanoramicClientPullSSTFTPStreamreader::getCameraMetadata()
 
 
     QVariant zone_size;
-    if (!getResource()->getParam("Zone size", zone_size, QnDomainMemory))
+    if (!getResource()->getParam(QLatin1String("Zone size"), zone_size, QnDomainMemory))
         return QnMetaDataV1Ptr(0);
 
     int pixelZoneSize = zone_size.toInt() * 32;
@@ -80,8 +80,8 @@ QnMetaDataV1Ptr AVPanoramicClientPullSSTFTPStreamreader::getCameraMetadata()
 
     QVariant maxSensorWidth;
     QVariant maxSensorHight;
-    getResource()->getParam("MaxSensorWidth", maxSensorWidth, QnDomainMemory);
-    getResource()->getParam("MaxSensorHeight", maxSensorHight, QnDomainMemory);
+    getResource()->getParam(QLatin1String("MaxSensorWidth"), maxSensorWidth, QnDomainMemory);
+    getResource()->getParam(QLatin1String("MaxSensorHeight"), maxSensorHight, QnDomainMemory);
 
 
     QRect imageRect(0, 0, maxSensorWidth.toInt(), maxSensorHight.toInt());
@@ -95,7 +95,7 @@ QnMetaDataV1Ptr AVPanoramicClientPullSSTFTPStreamreader::getCameraMetadata()
             QString m = md.at(index) ;
 
 
-            if (m == "00" || m == "0")
+            if (m == QLatin1String("00") || m == QLatin1String("0"))
                 continue;
 
             QRect currZoneRect = zeroZoneRect.translated(x*pixelZoneSize, y*pixelZoneSize);
@@ -214,7 +214,7 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 
     //==========================================
 
-    int readed = m_tftp_client->read(request, img);
+    int readed = m_tftp_client->read(QLatin1String(request), img);
 
     if (readed == 0) // cannot read data
     {

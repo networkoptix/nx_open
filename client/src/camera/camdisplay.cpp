@@ -223,8 +223,10 @@ bool CLCamDisplay::canSwitchToHighQuality()
     m_lastQualitySwitchTime = currentTime;
     return true;
 }
+
 void CLCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime)
 {
+    Q_UNUSED(needToSleep)
     if (vd->flags & QnAbstractMediaData::MediaFlags_LIVE) 
     {
         bool isLow = vd->flags & QnAbstractMediaData::MediaFlags_LowQuality;

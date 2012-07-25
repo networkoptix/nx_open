@@ -54,8 +54,8 @@ void QnMulticodecRtpReader::checkIfNeedKeyData()
     {
         QnAbstractMediaDataPtr video = m_lastVideoData[i];
         
-        Q_ASSERT_X(video->channelNumber < m_gotKeyData.size(), Q_FUNC_INFO, "Invalid channel number");
-        if (video->channelNumber < m_gotKeyData.size())
+        Q_ASSERT_X(video->channelNumber < (quint32)m_gotKeyData.size(), Q_FUNC_INFO, "Invalid channel number");
+        if (video->channelNumber < (quint32)m_gotKeyData.size())
         {
             if (video->flags & AV_PKT_FLAG_KEY)
                 m_gotKeyData[video->channelNumber] = true;
@@ -76,7 +76,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
     if (!isStreamOpened())
         return QnAbstractMediaDataPtr(0);
 
-    if (m_RtpSession.getTransport() == "UDP")
+    if (m_RtpSession.getTransport() == QLatin1String("UDP"))
         return getNextDataUDP();
     else
         return getNextDataTCP();
@@ -98,7 +98,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
 {
     QnAbstractMediaDataPtr result;
     quint8 rtpBuffer[MAX_RTP_PACKET_SIZE];
-    int readed;
+    // int readed;
     int audioRetryCount = 0;
     int videoRetryCount = 0;
 
@@ -255,25 +255,25 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
 
 QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
 {
-    if (codecName == "H264")
+    if (codecName == QLatin1String("H264"))
         return new CLH264RtpParser;
-    else if (codecName == "JPEG")
+    else if (codecName == QLatin1String("JPEG"))
         return new QnMjpegRtpParser;
-    else if (codecName == "MPEG4-GENERIC")
+    else if (codecName == QLatin1String("MPEG4-GENERIC"))
         return new QnAacRtpParser;
-    else if (codecName == "PCMU") {
+    else if (codecName == QLatin1String("PCMU")) {
         QnSimpleAudioRtpParser* result = new QnSimpleAudioRtpParser;
         result->setCodecId(CODEC_ID_PCM_MULAW);
         return result;
     }
-    else if (codecName == "PCMA") {
+    else if (codecName == QLatin1String("PCMA")) {
         QnSimpleAudioRtpParser* result = new QnSimpleAudioRtpParser;
         result->setCodecId(CODEC_ID_PCM_ALAW);
         return result;
     }
-    else if (codecName.startsWith("G726")) // g726-24, g726-32 e.t.c
+    else if (codecName.startsWith(QLatin1String("G726"))) // g726-24, g726-32 e.t.c
     { 
-        int bitRatePos = codecName.indexOf('-');
+        int bitRatePos = codecName.indexOf(QLatin1Char('-'));
         if (bitRatePos == -1)
             return 0;
         QString bitsPerSample = codecName.mid(bitRatePos+1);
@@ -297,7 +297,7 @@ void QnMulticodecRtpReader::initIO(RTPIODevice** ioDevice, QnRtpStreamParser* pa
     }
     else {
         if (!m_RtpSession.getCodecNameByType(mediaType).isEmpty())
-            qWarning() << "Unsupported RTSP " + m_RtpSession.mediaTypeToStr(mediaType) + QString(" codec") << m_RtpSession.getCodecNameByType(mediaType);
+            qWarning() << "Unsupported RTSP " << m_RtpSession.mediaTypeToStr(mediaType) << " codec" << m_RtpSession.getCodecNameByType(mediaType);
     }
 }
 
@@ -307,9 +307,9 @@ void QnMulticodecRtpReader::openStream()
         return;
     m_timeHelper.reset();
 
-    QString transport = qSettings.value("rtspTransport", "AUTO").toString().toUpper();
-    if (transport != "AUTO" && transport != "UDP" && transport != "TCP")
-        transport = "AUTO";
+    QString transport = qSettings.value(QLatin1String("rtspTransport"), QLatin1String("AUTO")).toString().toUpper();
+    if (transport != QLatin1String("AUTO") && transport != QLatin1String("UDP") && transport != QLatin1String("TCP"))
+        transport = QLatin1String("AUTO");
     m_RtpSession.setTransport(transport);
 
 
@@ -318,14 +318,14 @@ void QnMulticodecRtpReader::openStream()
     QString url;
     if (m_request.length() > 0)
     {
-        if (m_request.startsWith("rtsp://")) {
+        if (m_request.startsWith(QLatin1String("rtsp://"))) {
             url = m_request;
         }
         else 
         {
             QTextStream(&url) << "rtsp://" << nres->getHostAddress().toString();
-            if (!m_request.startsWith('/'))
-                url += "/";
+            if (!m_request.startsWith(QLatin1Char('/')))
+                url += QLatin1Char('/');
             url += m_request;;
         }
     }

@@ -11,7 +11,7 @@ using namespace std;
 CLSimpleTFTPClient::CLSimpleTFTPClient(const QHostAddress& hostAddress, unsigned int timeout, unsigned int retry):
 m_retry(retry),
 m_hostAddress(hostAddress),
-m_ip(hostAddress.toString().toLatin1().data()),
+m_ip(hostAddress.toString()),
 m_timeout(timeout)
 {
 	//m_wish_blk_size = double_blk_size;

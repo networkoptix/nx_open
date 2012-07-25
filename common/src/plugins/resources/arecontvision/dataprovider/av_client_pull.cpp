@@ -27,8 +27,8 @@ QnPlAVClinetPullStreamReader::QnPlAVClinetPullStreamReader(QnResourcePtr res):
 
     m_streamParam.insert("streamID", (int)cl_get_random_val(1, 32000));
 
-    m_streamParam.insert("resolution", "full");
-    m_streamParam.insert("Quality", "11");
+    m_streamParam.insert("resolution", QLatin1String("full"));
+    m_streamParam.insert("Quality", QLatin1String("11"));
 
     /**/
 
@@ -50,48 +50,48 @@ void QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnQuality()
     {
     case QnQualityHighest:
         if (avRes->isPanoramic())
-            avRes->setParamAsync("resolution", "full", QnDomainPhysical);
+            avRes->setParamAsync(QLatin1String("resolution"), QLatin1String("full"), QnDomainPhysical);
         else
             m_streamParam.insert("resolution", QLatin1String("full"));
 
         if (avRes->isPanoramic())
-            avRes->setParamAsync("Quality", "19", QnDomainPhysical); // panoramic
+            avRes->setParamAsync(QLatin1String("Quality"), QLatin1String("19"), QnDomainPhysical); // panoramic
         else
             m_streamParam.insert("Quality", 19);
         break;
 
     case QnQualityHigh:
         if (avRes->isPanoramic())
-            avRes->setParamAsync("resolution", "full", QnDomainPhysical);
+            avRes->setParamAsync(QLatin1String("resolution"), QLatin1String("full"), QnDomainPhysical);
         else
             m_streamParam.insert("resolution", QLatin1String("full"));
 
         if (avRes->isPanoramic())
-            avRes->setParamAsync("Quality", "16", QnDomainPhysical); // panoramic
+            avRes->setParamAsync(QLatin1String("Quality"), QLatin1String("16"), QnDomainPhysical); // panoramic
         else
             m_streamParam.insert("Quality", 16);
         break;
 
     case QnQualityNormal:
         if (avRes->isPanoramic())
-            avRes->setParamAsync("resolution", "full", QnDomainPhysical);
+            avRes->setParamAsync(QLatin1String("resolution"), QLatin1String("full"), QnDomainPhysical);
         else
             m_streamParam.insert("resolution", QLatin1String("full"));
 
         if (avRes->isPanoramic())
-            avRes->setParamAsync("Quality", "13", QnDomainPhysical); // panoramic
+            avRes->setParamAsync(QLatin1String("Quality"), QLatin1String("13"), QnDomainPhysical); // panoramic
         else
             m_streamParam.insert("Quality", 13);
         break;
 
     case QnQualityLow:
         if (avRes->isPanoramic())
-            avRes->setParam("resolution", "half", QnDomainPhysical);
+            avRes->setParamAsync(QLatin1String("resolution"), QLatin1String("half"), QnDomainPhysical);
         else
             m_streamParam.insert("resolution", QLatin1String("half"));
 
         if (avRes->isPanoramic())
-            avRes->setParamAsync("Quality", "15", QnDomainPhysical); // panoramic
+            avRes->setParamAsync(QLatin1String("Quality"), QLatin1String("15"), QnDomainPhysical); // panoramic
         else
             m_streamParam.insert("Quality", 15);
         break;
@@ -99,12 +99,12 @@ void QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnQuality()
 
     case QnQualityLowest:
         if (avRes->isPanoramic())
-            avRes->setParamAsync("resolution", "half", QnDomainPhysical);
+            avRes->setParamAsync(QLatin1String("resolution"), QLatin1String("half"), QnDomainPhysical);
         else
             m_streamParam.insert("resolution", QLatin1String("half"));
 
         if (avRes->isPanoramic())
-            avRes->setParamAsync("Quality", "1", QnDomainPhysical); // panoramic
+            avRes->setParamAsync(QLatin1String("Quality"), QLatin1String("1"), QnDomainPhysical); // panoramic
         else
             m_streamParam.insert("Quality", 1);
         break;
@@ -117,20 +117,20 @@ void QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnQuality()
 
 int QnPlAVClinetPullStreamReader::getBitrate() const
 {
-    if (!getResource()->hasSuchParam("Bitrate"))
+    if (!getResource()->hasSuchParam(QLatin1String("Bitrate")))
         return 0;
 
     QVariant val;
-    getResource()->getParam("Bitrate", val, QnDomainMemory);
+    getResource()->getParam(QLatin1String("Bitrate"), val, QnDomainMemory);
     return val.toInt();
 }
 
 bool QnPlAVClinetPullStreamReader::isH264() const
 {
-    if (!getResource()->hasSuchParam("Codec"))
+    if (!getResource()->hasSuchParam(QLatin1String("Codec")))
         return false;
 
     QVariant val;
-    getResource()->getParam("Codec", val, QnDomainMemory);
+    getResource()->getParam(QLatin1String("Codec"), val, QnDomainMemory);
     return val==QLatin1String("H.264");
 }

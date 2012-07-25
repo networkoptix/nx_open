@@ -26,7 +26,7 @@ bool CLArecontSingleSensorResource::getDescription()
 			break;
 	}
 
-	m_description = buff;
+	m_description = QLatin1String(buff);
 
 	return true;
 }

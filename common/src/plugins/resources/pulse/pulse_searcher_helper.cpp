@@ -83,7 +83,7 @@ QList<QnPlPulseSearcherHelper::WSResult> QnPlPulseSearcherHelper::findResources(
             socket.readDatagram(reply.data(), reply.size(),	&sender, &senderPort);
             			
             WSResult res = parseReply(reply);
-            if (res.mac!="")
+            if (!res.mac.isEmpty())
             {
                 res.ip = sender.toString();
                 res.disc_ip = iface.address.toString();
@@ -112,7 +112,7 @@ QnPlPulseSearcherHelper::WSResult QnPlPulseSearcherHelper::parseReply(QByteArray
         return result;
     }
 
-    result.manufacture = QnPlPulseResource::MANUFACTURE;
+    result.manufacture = QLatin1String(QnPlPulseResource::MANUFACTURE);
 
     int mac_index = datagram.indexOf("IPCAMERA");
     if (mac_index<0)
@@ -130,7 +130,7 @@ QnPlPulseSearcherHelper::WSResult QnPlPulseSearcherHelper::parseReply(QByteArray
     result.mac = mac.toString();
 
     
-    result.name = "PFD-2000DV";
+    result.name = QLatin1String("PFD-2000DV");
 
     return result;
 }

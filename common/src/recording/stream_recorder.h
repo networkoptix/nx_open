@@ -78,8 +78,12 @@ protected:
 
     virtual bool saveMotion(QnAbstractMediaDataPtr media);
 
-    virtual void fileFinished(qint64 /*durationMs*/, const QString& /*fileName*/, QnAbstractMediaStreamDataProvider*,  qint64 fileSize) {}
-    virtual void fileStarted(qint64 /*startTimeMs*/, const QString& /*fileName*/, QnAbstractMediaStreamDataProvider*) {}
+    virtual void fileFinished(qint64 durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider *provider, qint64 fileSize) {
+        Q_UNUSED(durationMs) Q_UNUSED(fileName) Q_UNUSED(provider) Q_UNUSED(fileSize)
+    }
+    virtual void fileStarted(qint64 startTimeMs, const QString& fileName, QnAbstractMediaStreamDataProvider *provider) {
+        Q_UNUSED(startTimeMs) Q_UNUSED(fileName) Q_UNUSED(provider)
+    }
     virtual QString fillFileName(QnAbstractMediaStreamDataProvider*);
 
     bool addSignatureFrame(QString& errorString);

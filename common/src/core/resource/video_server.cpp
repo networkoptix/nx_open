@@ -24,7 +24,7 @@ QnVideoServerResource::QnVideoServerResource():
     QnResource()
     //,m_rtspListener(0)
 {
-    setTypeId(qnResTypePool->getResourceTypeId("", QLatin1String("Server")));
+    setTypeId(qnResTypePool->getResourceTypeId(QString(), QLatin1String("Server")));
     addFlags(server | remote);
     m_primaryIFSelected = false;
 }
@@ -123,7 +123,7 @@ public:
     {
         QByteArray reply;
         QByteArray errorString;
-        QnSessionManager::instance()->sendGetRequest(m_url.toString(), "RecordedTimePeriods", QnRequestParamList(), reply, errorString);
+        QnSessionManager::instance()->sendGetRequest(m_url.toString(), QLatin1String("RecordedTimePeriods"), QnRequestParamList(), reply, errorString);
         if (reply.contains("Parameter startTime must be provided"))
         {
             // server OK
@@ -150,7 +150,7 @@ void QnVideoServerResource::setPrimaryIF(const QString& primaryIF)
     url.setHost(primaryIF);
     setUrl(url.toString());
     if (getName().isEmpty())
-        setName(QString("Server ") + primaryIF);
+        setName(QLatin1String("Server ") + primaryIF);
 
     emit serverIFFound(primaryIF);
 }

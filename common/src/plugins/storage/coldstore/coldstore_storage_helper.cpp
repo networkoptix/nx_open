@@ -96,13 +96,13 @@ void QnColdStoreMetaData::fromByteArray(const QByteArray& ba)
     if (lst.size()==0)
         return;
 
-    QString version = QString(lst.at(0));
+    QString version = QLatin1String(lst.at(0));
 
     for (int i = 1; i < lst.size() - 3; i+=3 )
     {
-        QString fn = QString ( lst.at(i+0) );
-        quint64 shift = QString ( lst.at(i+1) ).toLongLong(0, 16);
-        quint64 len = QString ( lst.at(i+2) ).toLongLong(0, 16);
+        QString fn = QLatin1String( lst.at(i+0) );
+        quint64 shift = QString(QLatin1String( lst.at(i+1) )).toLongLong(0, 16);
+        quint64 len = QString(QLatin1String( lst.at(i+2) )).toLongLong(0, 16);
 
         m_hash.insert(fn, QnCSFileInfo(shift, len));
     }
@@ -158,7 +158,7 @@ QnColdStoreMetaDataPtr QnColdStoreMetaDataPool::getStoreMetaData(const QString& 
 
         //if (connection.open(csFn, QIODevice::ReadOnly, CS_META_DATA_CHANNEL))
 
-        if (connection.open(csFn + QString("_md"), QIODevice::ReadOnly, 0))
+        if (connection.open(csFn + QLatin1String("_md"), QIODevice::ReadOnly, 0))
         {
             md = QnColdStoreMetaDataPtr (new QnColdStoreMetaData() );
 
@@ -251,7 +251,7 @@ void QnCsTimeunitConnectionHelper::close()
     
     QnColdStoreConnection conn(m_addr);
 
-    if (conn.open(m_connect->getFilename() + QString("_md"), QIODevice::WriteOnly, 0))
+    if (conn.open(m_connect->getFilename() + QLatin1String("_md"), QIODevice::WriteOnly, 0))
     {
         QByteArray ba = m_metaData->toByteArray();
         conn.write(ba.data(), ba.size());
@@ -259,7 +259,7 @@ void QnCsTimeunitConnectionHelper::close()
 
     conn.close();
 
-    qWarning() << "CS closing file " << m_connect->getFilename() + QString("_md") << " dataFile=" << m_csFileName;
+    qWarning() << "CS closing file " << m_connect->getFilename() + QLatin1String("_md") << " dataFile=" << m_csFileName;
 
 
     m_connect->close();

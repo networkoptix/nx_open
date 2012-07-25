@@ -157,13 +157,13 @@ bool QnServerSettingsDialog::validateStorages(const QnAbstractStorageResourceLis
     foreach (const QnAbstractStorageResourcePtr &storage, storages) {
         if (storage->getUrl().isEmpty()) {
             if(errorString)
-                *errorString = "Storage path must not be empty.";
+                *errorString = tr("Storage path must not be empty.");
             return false;
         }
 
         if (storage->getSpaceLimit() < 0) {
             if(errorString)
-                *errorString = "Space limit must be a non-negative integer.";
+                *errorString = tr("Space limit must be a non-negative integer.");
             return false;
         }
     }
@@ -240,7 +240,7 @@ void QnServerSettingsDialog::updateSpaceLimitCell(int row, bool force) {
 
     QString url = urlItem->data(Qt::DisplayRole).toString();
 
-    bool newSupportsSpaceLimit = !url.trimmed().startsWith("coldstore://"); // TODO: evil hack, move out the check somewhere into storage factory.
+    bool newSupportsSpaceLimit = !url.trimmed().startsWith(QLatin1String("coldstore://")); // TODO: evil hack, move out the check somewhere into storage factory.
     bool oldSupportsSpaceLimit = spaceItem->flags() & Qt::ItemIsEditable;
     if(newSupportsSpaceLimit != oldSupportsSpaceLimit || force) {
         spaceItem->setFlags(newSupportsSpaceLimit ? (spaceItem->flags() | Qt::ItemIsEditable) : (spaceItem->flags() & ~Qt::ItemIsEditable));
@@ -288,6 +288,7 @@ void QnServerSettingsDialog::at_storageRemoveButton_clicked() {
 }
 
 void QnServerSettingsDialog::at_storagesTable_cellChanged(int row, int column) {
+    Q_UNUSED(column)
     updateSpaceLimitCell(row);
 
     m_hasStorageChanges = true;

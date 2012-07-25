@@ -8,7 +8,7 @@ const char* QnPlPulseResource::MANUFACTURE = "Pulse";
 
 QnPlPulseResource::QnPlPulseResource()
 {
-    setAuth("admin", "admin");
+    setAuth(QLatin1String("admin"), QLatin1String("admin"));
 }
 
 bool QnPlPulseResource::isResourceAccessible()
@@ -23,7 +23,7 @@ bool QnPlPulseResource::updateMACAddress()
 
 QString QnPlPulseResource::manufacture() const
 {
-    return MANUFACTURE;
+    return QLatin1String(MANUFACTURE);
 }
 
 void QnPlPulseResource::setIframeDistance(int /*frames*/, int /*timems*/)
@@ -33,7 +33,7 @@ void QnPlPulseResource::setIframeDistance(int /*frames*/, int /*timems*/)
 
 QnAbstractStreamDataProvider* QnPlPulseResource::createLiveDataProvider()
 {
-    QString request = "0";
+    QString request = QLatin1Char('0');
     return new QnRtpStreamReader(toSharedPointer(), request);
 }
 

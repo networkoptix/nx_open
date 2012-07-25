@@ -130,7 +130,7 @@ const QString SoapWrapper<T>::getLastError()
 template <class T>
 const QString SoapWrapper<T>::getEndpointUrl()
 {
-    return m_endpoint;
+    return QLatin1String(m_endpoint);
 }
 
 template <class T>

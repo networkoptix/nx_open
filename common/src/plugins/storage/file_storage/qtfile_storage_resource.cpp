@@ -72,13 +72,14 @@ QFileInfoList QnQtFileStorageResource::getFileList(const QString& dirName)
 
 qint64 QnQtFileStorageResource::getFileSize(const QString& fillName) const
 {
+    Q_UNUSED(fillName)
 	return 0; // not implemented
 }
 
 
 bool QnQtFileStorageResource::isStorageAvailable()
 {
-    QString tmpDir = closeDirPath(getUrl()) + QString("tmp") + QString::number(rand());
+    QString tmpDir = closeDirPath(getUrl()) + QLatin1String("tmp") + QString::number(rand());
     QDir dir(tmpDir);
     if (dir.exists()) {
         dir.remove(tmpDir);
@@ -104,7 +105,7 @@ int QnQtFileStorageResource::getChunkLen() const
 
 QString QnQtFileStorageResource::removeProtocolPrefix(const QString& url)
 {
-    int prefix = url.indexOf("://");
+    int prefix = url.indexOf(QLatin1String("://"));
     return prefix == -1 ? url : url.mid(prefix + 3);
 }
 

@@ -26,7 +26,7 @@ static QnDefaultDeviceVideoLayout defaultVideoLayout;
 const QnVideoResourceLayout* QnMediaResource::getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
 {
     QVariant val;
-    getParam("VideoLayout", val, QnDomainMemory);
+    getParam(QLatin1String("VideoLayout"), val, QnDomainMemory);
     QString strVal = val.toString();
     if (strVal.isEmpty())
     {

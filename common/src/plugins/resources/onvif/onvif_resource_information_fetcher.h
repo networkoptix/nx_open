@@ -30,6 +30,7 @@ typedef QHash<QString, EndpointAdditionalInfo> EndpointInfoHash;
 
 class OnvifResourceInformationFetcher
 {
+    Q_DECLARE_TR_FUNCTIONS(OnvifResourceInformationFetcher)
     static const char* ONVIF_RT;
 	static std::string& STD_ONVIF_USER;
 	static std::string& STD_ONVIF_PASSWORD;

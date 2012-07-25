@@ -43,7 +43,7 @@ QnResourcePtr QnPlAxisResourceSearcher::createResource(QnId resourceTypeId, cons
 
 QString QnPlAxisResourceSearcher::manufacture() const
 {
-    return QnPlAxisResource::MANUFACTURE;
+    return QLatin1String(QnPlAxisResource::MANUFACTURE);
 }
 
 
@@ -75,9 +75,9 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(QnResourceLi
         name += QLatin1Char(responseData[i]);
     }
 
-    name.replace(QString(" "), QString()); // remove spaces
-    name.replace(QString("-"), QString()); // remove spaces
-    name.replace(QString("\t"), QString()); // remove tabs
+    name.replace(QLatin1Char(' '), QString()); // remove spaces
+    name.replace(QLatin1Char('-'), QString()); // remove spaces
+    name.replace(QLatin1Char('\t'), QString()); // remove tabs
 
     if (macpos+12 > responseData.size())
         return local_results;
@@ -136,17 +136,17 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(QnResourceLi
 
     int channesl = 1;
 
-    if (resource->hasSuchParam("channelsAmount"))
+    if (resource->hasSuchParam(QLatin1String("channelsAmount")))
     {
         QVariant val;
-        resource->getParam("channelsAmount", val, QnDomainMemory);
+        resource->getParam(QLatin1String("channelsAmount"), val, QnDomainMemory);
         channesl = val.toUInt();
     }
 
     if (channesl > 1) //
     {
 
-        resource->setPhysicalId(resource->getPhysicalId() + QString("_channel_") + QString::number(1));
+        resource->setPhysicalId(resource->getPhysicalId() + QLatin1String("_channel_") + QString::number(1));
 
         for (int i = 2; i <= channesl; ++i)
         {
@@ -160,7 +160,7 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(QnResourceLi
             resource->setName(name);
             resource->setMAC(smac);
 
-            resource->setPhysicalId(resource->getPhysicalId() + QString("_channel_") + QString::number(i));
+            resource->setPhysicalId(resource->getPhysicalId() + QLatin1String("_channel_") + QString::number(i));
 
             local_results.push_back(resource);
 

@@ -22,7 +22,7 @@ bool QnResourceType::isCamera() const
     if (m_isCameraSet)
         return m_isCamera;
 
-    if (m_name == "Camera")
+    if (m_name == QLatin1String("Camera"))
     {
         m_isCamera = true;
         m_isCameraSet = true;

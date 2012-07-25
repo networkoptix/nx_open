@@ -53,8 +53,8 @@ throw() {
 
     QString userMessage(message);
     if (inclSysMsg) {
-        userMessage.append(": ");
-        userMessage.append(strerror(errno));
+        userMessage.append(QLatin1String(": "));
+        userMessage.append(QLatin1String(strerror(errno)));
     }
 
     QByteArray data = userMessage.toAscii();
@@ -91,9 +91,9 @@ bool Socket::fillAddr(const QString &address, unsigned short port,
     int status = getaddrinfo(address.toAscii(), 0, &hints, &addressInfo);
     if (status != 0) {
 #ifdef UNICODE
-        m_lastError = QString("Couldn't resolve %1: %2").arg(address).arg(QString::fromWCharArray(gai_strerror(status)));
+        m_lastError = tr("Couldn't resolve %1: %2").arg(address).arg(QString::fromWCharArray(gai_strerror(status)));
 #else
-        m_lastError = QString("Couldn't resolve %1: %2").arg(address).arg(gai_strerror(status));
+        m_lastError = tr("Couldn't resolve %1: %2").arg(address).arg(gai_strerror(status));
 #endif  /* UNICODE */
         return false;
     }
@@ -121,7 +121,7 @@ void Socket::createSocket(int type, int protocol)
 
         wVersionRequested = MAKEWORD(2, 0);              // Request WinSock v2.0
         if (WSAStartup(wVersionRequested, &wsaData) != 0) {  // Load WinSock DLL
-            throw SocketException("Unable to load WinSock DLL");
+            throw SocketException(tr("Unable to load WinSock DLL"));
         }
         initialized = true;
     }
@@ -129,7 +129,7 @@ void Socket::createSocket(int type, int protocol)
 
     // Make a new socket
     if ((sockDesc = socket(PF_INET, type, protocol)) < 0) {
-        throw SocketException("Socket creation failed (socket())", true);
+        throw SocketException(tr("Socket creation failed (socket())"), true);
     }
 }
 
@@ -169,10 +169,10 @@ QString Socket::getLocalAddress() const
 
     if (getsockname(sockDesc, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0)
     {
-        return "";
+        return QString();
     }
 
-    return inet_ntoa(addr.sin_addr);
+    return QLatin1String(inet_ntoa(addr.sin_addr));
 }
 
 QString Socket::getPeerAddress() const
@@ -182,10 +182,10 @@ QString Socket::getPeerAddress() const
 
     if (getpeername(sockDesc, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0)
     {
-        return "";
+        return QString();
     }
 
-    return inet_ntoa(addr.sin_addr);
+    return QLatin1String(inet_ntoa(addr.sin_addr));
 }
 
 quint32 Socket::getPeerAddressUint() const
@@ -238,7 +238,7 @@ bool Socket::setLocalAddressAndPort(const QString &localAddress,
         return false;
 
     if (bind(sockDesc, (sockaddr *) &localAddr, sizeof(sockaddr_in)) < 0) {
-        m_lastError = "Set of local address and port failed (bind())";
+        m_lastError = tr("Set of local address and port failed (bind())");
         return false;
     }
 
@@ -248,7 +248,7 @@ bool Socket::setLocalAddressAndPort(const QString &localAddress,
 void Socket::cleanUp()  {
 #ifdef WIN32
     if (WSACleanup() != 0) {
-        throw SocketException("WSACleanup() failed");
+        throw SocketException(tr("WSACleanup() failed"));
     }
 #endif
 }
@@ -429,7 +429,7 @@ QString CommunicatingSocket::getForeignAddress()
         qWarning() << "Fetch of foreign address failed (getpeername())";
         return QString();
     }
-    return inet_ntoa(addr.sin_addr);
+    return QLatin1String(inet_ntoa(addr.sin_addr));
 }
 
 unsigned short CommunicatingSocket::getForeignPort()  {
@@ -526,7 +526,7 @@ TCPSocket *TCPServerSocket::accept()  {
 
 void TCPServerSocket::setListen(int queueLen)  {
     if (listen(sockDesc, queueLen) < 0) {
-        throw SocketException("Set listening socket failed (listen())", true);
+        throw SocketException(tr("Set listening socket failed (listen())"), true);
     }
 }
 
@@ -600,7 +600,7 @@ void UDPSocket::disconnect()  {
 #else
         if (errno != EAFNOSUPPORT) {
 #endif
-            throw SocketException("Disconnect failed (connect())", true);
+            throw SocketException(tr("Disconnect failed (connect())"), true);
         }
     }
 }
@@ -643,7 +643,7 @@ int UDPSocket::recvFrom(void *buffer, int bufferLen, QString &sourceAddress,
     socklen_t addrLen = sizeof(clntAddr);
     int rtn = recvfrom(sockDesc, (raw_type *) buffer, bufferLen, 0, (sockaddr *) &clntAddr, (socklen_t *) &addrLen);
     if (rtn >= 0) {
-        sourceAddress = inet_ntoa(clntAddr.sin_addr);
+        sourceAddress = QLatin1String(inet_ntoa(clntAddr.sin_addr));
         sourcePort = ntohs(clntAddr.sin_port);
     }
     return rtn;
