@@ -326,7 +326,7 @@ namespace{
         if (!prev->waitForFinished())
             return QString();
 
-        return QString(prev->readAll());
+        return QString::fromUtf8(prev->readAll());
     }
 
     static void timerCallback(int sig, siginfo_t *si, void *uc);
