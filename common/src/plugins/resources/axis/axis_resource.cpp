@@ -38,6 +38,11 @@ QnAbstractStreamDataProvider* QnPlAxisResource::createLiveDataProvider()
     return new QnAxisStreamReader(toSharedPointer());
 }
 
+bool QnPlAxisResource::shoudResolveConflicts() const 
+{
+    return false;
+}
+
 void QnPlAxisResource::setCropingPhysical(QRect /*croping*/)
 {
 

@@ -24,6 +24,8 @@ public:
 
     bool isInitialized() const;
 
+    virtual bool shoudResolveConflicts() const override;
+
     QByteArray getMaxResolution() const;
     QString getNearestResolution(const QByteArray& resolution, float aspectRatio) const;
     float getResolutionAspectRatio(const QByteArray& resolution) const;
