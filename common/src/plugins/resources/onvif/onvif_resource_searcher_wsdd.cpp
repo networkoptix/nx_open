@@ -398,8 +398,8 @@ QString OnvifResourceSearcherWsdd::getAppropriateAddress(const T* source, const 
     }
 
     int relevantLevel = 0;
-    QString addrListStr(source->XAddrs);
-    QStringList addrList = addrListStr.split(" ");
+    QString addrListStr = QLatin1String(source->XAddrs);
+    QStringList addrList = addrListStr.split(QLatin1Char(' '));
     foreach (const QString addrStr, addrList) {
         if (addrStr.startsWith(prefixes[2])) {
             if (addrStr.startsWith(prefixes[0])) {
@@ -427,16 +427,16 @@ QString OnvifResourceSearcherWsdd::getMac(const T* source, const SOAP_ENV__Heade
         return QString();
     }
 
-    QString endpoint = source->wsa__EndpointReference.Address;
-    QString messageId = header->wsa__MessageID;
+    QString endpoint = QLatin1String(source->wsa__EndpointReference.Address);
+    QString messageId = QLatin1String(header->wsa__MessageID);
 
-    int pos = endpoint.lastIndexOf("-");
+    int pos = endpoint.lastIndexOf(QLatin1Char('-'));
     if (pos == -1) {
         return QString();
     }
     QString macFromEndpoint = endpoint.right(endpoint.size() - pos - 1).trimmed();
 
-    pos = messageId.lastIndexOf("-");
+    pos = messageId.lastIndexOf(QLatin1Char('-'));
     if (pos == -1) {
         return QString();
     }
@@ -446,7 +446,7 @@ QString OnvifResourceSearcherWsdd::getMac(const T* source, const SOAP_ENV__Heade
         QString result;
         for (int i = 1; i < 12; i += 2) {
             int ind = i + i / 2;
-            if (i < 11) result[ind + 1] = '-';
+            if (i < 11) result[ind + 1] = QLatin1Char('-');
             result[ind] = macFromEndpoint[i];
             result[ind - 1] = macFromEndpoint[i - 1];
         }
@@ -464,7 +464,7 @@ QString OnvifResourceSearcherWsdd::getEndpointAddress(const T* source) const
         return QString();
     }
 
-    return QString(source->wsa__EndpointReference.Address);
+    return QLatin1String(source->wsa__EndpointReference.Address);
 }
 
 template <class T>
@@ -474,19 +474,19 @@ QString OnvifResourceSearcherWsdd::getManufacturer(const T* source, const QStrin
         return QString();
     }
 
-    QString scopes(source->Scopes->__item);
+    QByteArray scopes = source->Scopes->__item;
     int posStart = scopes.indexOf(SCOPES_NAME_PREFIX);
     if (posStart == -1) {
         return QString();
     }
 
-    int posEnd = posStart != -1? scopes.indexOf(" ", posStart): -1;
+    int posEnd = posStart != -1? scopes.indexOf(' ', posStart): -1;
     posEnd = posEnd != -1? posEnd: scopes.size();
 
     int skipSize = sizeof(SCOPES_NAME_PREFIX) - 1;
-    QString percentEncodedValue = scopes.mid(posStart + skipSize, posEnd - posStart - skipSize).replace(name, "");
+    QByteArray percentEncodedValue = scopes.mid(posStart + skipSize, posEnd - posStart - skipSize).replace(name, "");
 
-    return QUrl::fromPercentEncoding(QByteArray(percentEncodedValue.toStdString().c_str())).trimmed();
+    return QUrl::fromPercentEncoding(percentEncodedValue).trimmed();
 }
 
 template <class T>
@@ -496,13 +496,13 @@ QString OnvifResourceSearcherWsdd::getName(const T* source) const
             return QString();
     }
 
-    QString scopes(source->Scopes->__item);
-    int posStart = scopes.indexOf(SCOPES_HARDWARE_PREFIX);
+    QString scopes = QLatin1String(source->Scopes->__item);
+    int posStart = scopes.indexOf(QLatin1String(SCOPES_HARDWARE_PREFIX));
     if (posStart == -1) {
         return QString();
     }
 
-    int posEnd = posStart != -1? scopes.indexOf(" ", posStart): -1;
+    int posEnd = posStart != -1? scopes.indexOf(QLatin1Char(' '), posStart): -1;
     posEnd = posEnd != -1? posEnd: scopes.size();
 
     int skipSize = sizeof(SCOPES_HARDWARE_PREFIX) - 1;

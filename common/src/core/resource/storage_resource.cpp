@@ -38,7 +38,7 @@ int QnAbstractStorageResource::getMaxStoreTime() const
 
 QString QnAbstractStorageResource::getUniqueId() const
 {
-    return QString("storage://") + getUrl();
+    return QLatin1String("storage://") + getUrl();
 }
 
 void QnAbstractStorageResource::setIndex(quint16 value)
@@ -140,7 +140,7 @@ void QnStorageResource::setUrl(const QString& value)
 
 AVIOContext* QnStorageResource::createFfmpegIOContext(const QString& url, QIODevice::OpenMode openMode, int IO_BLOCK_SIZE)
 {
-    int prefix = url.indexOf("://");
+    int prefix = url.indexOf(QLatin1String("://"));
     QString path = prefix == -1 ? url : url.mid(prefix+3);
 
     quint8* ioBuffer;
@@ -222,7 +222,7 @@ void QnStoragePluginFactory::registerStoragePlugin(const QString& name, StorageT
 
 QnStorageResource* QnStoragePluginFactory::createStorage(const QString& storageType, bool useDefaultForUnknownPrefix)
 {
-    int prefix = storageType.indexOf("://");
+    int prefix = storageType.indexOf(QLatin1String("://"));
     if (prefix == -1)
         return m_defaultStoragePlugin();
     QString protocol = storageType.left(prefix);

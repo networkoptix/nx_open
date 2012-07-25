@@ -364,7 +364,7 @@ void QnResourceCriterionGroup::setPattern(const QString &pattern) {
 
     /* Normalize pattern. */
     QString normalizedPattern = pattern;
-    normalizedPattern.replace(QChar('"'), QString());
+    normalizedPattern.replace(QLatin1Char('"'), QString());
 
     /* It may have become empty as a result of normalization. */
     if(normalizedPattern.isEmpty())
@@ -380,11 +380,11 @@ void QnResourceCriterionGroup::setPattern(const QString &pattern) {
     for(int i = 0, size = normalizedPattern.size(); i <= size; i++) {
         QChar c;
         if(i == size) {
-            c = '+'; /* So that chunk parsing logic is triggered. */
+            c = QLatin1Char('+'); /* So that chunk parsing logic is triggered. */
         } else {
             c = normalizedPattern[i];
         }
-        if(c != '\\' && c != '+')
+        if(c != QLatin1Char('\\') && c != QLatin1Char('+'))
             continue;
 
         QnResourceCriterionGroup group = QnResourceCriterionGroup(Next, Next);
@@ -396,7 +396,7 @@ void QnResourceCriterionGroup::setPattern(const QString &pattern) {
             QString key;
             QString pattern;
             
-            int index = chunk.indexOf(QChar(':'));
+            int index = chunk.indexOf(QLatin1Char(':'));
             if(index != -1) {
                 key = chunk.left(index);
                 pattern = chunk.mid(index + 1);
@@ -420,11 +420,11 @@ void QnResourceCriterionGroup::setPattern(const QString &pattern) {
             } else if (key == QLatin1String("type")) {
                 propertyName = QnResourceProperty::flags;
 
-                if(pattern == "camera") {
+                if(pattern == QLatin1String("camera")) {
                     targetValue = static_cast<int>(QnResource::live);
-                } else if(pattern == "image") {
+                } else if(pattern == QLatin1String("image")) {
                     targetValue = static_cast<int>(QnResource::still_image);
-                } else if(pattern == "video") {
+                } else if(pattern == QLatin1String("video")) {
                     targetValue = static_cast<int>(QnResource::local | QnResource::video);
                 } else {
                     targetValue = 0xFFFFFFFF;
@@ -440,7 +440,7 @@ void QnResourceCriterionGroup::setPattern(const QString &pattern) {
         if(!group.criteria().empty())
             addCriterion(group);
 
-        positive = c == '+';
+        positive = c == QLatin1Char('+');
     }
 }
 

@@ -34,9 +34,9 @@ QnResourcePtr QnResourceDirectoryBrowser::createResource(QnId resourceTypeId, co
         return result;
     }
 
-    if (parameters.contains("file"))
+    if (parameters.contains(QLatin1String("file")))
     {
-        result = createArchiveResource(parameters["file"]);
+        result = createArchiveResource(parameters[QLatin1String("file")]);
         result->setTypeId(resourceTypeId);
         result->deserialize(parameters);
     }

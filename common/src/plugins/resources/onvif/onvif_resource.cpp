@@ -122,7 +122,7 @@ const QString QnPlOnvifResource::fetchMacAddress(const NetIfacesResp& response,
                     return QString::fromStdString(ifacePtr->Info->HwAddress).toUpper().replace(QLatin1Char(':'), QLatin1Char('-'));
                 }
                 if (someMacAddress.isEmpty()) {
-                    someMacAddress = QString::fromStdString(ifacePtr->Info->HwAddress.c_str);
+                    someMacAddress = QString::fromStdString(ifacePtr->Info->HwAddress);
                 }
             }
 
@@ -176,7 +176,7 @@ bool QnPlOnvifResource::setHostAddress(const QHostAddress &ip, QnDomain domain)
 }
 
 const QString QnPlOnvifResource::createOnvifEndpointUrl(const QString& ipAddress) {
-    return ONVIF_PROTOCOL_PREFIX + ipAddress + ONVIF_URL_SUFFIX;
+    return QLatin1String(ONVIF_PROTOCOL_PREFIX) + ipAddress + QLatin1String(ONVIF_URL_SUFFIX);
 }
 
 QnPlOnvifResource::QnPlOnvifResource() :
@@ -208,7 +208,7 @@ bool QnPlOnvifResource::updateMACAddress()
 
 QString QnPlOnvifResource::manufacture() const
 {
-    return MANUFACTURE;
+    return QLatin1String(MANUFACTURE);
 }
 
 bool QnPlOnvifResource::hasDualStreaming() const
@@ -284,7 +284,7 @@ bool QnPlOnvifResource::initInternal()
         return false;
     }
 
-    if (getMediaUrl().isEmpty() || getName().contains("Unknown") || getMAC().isEmpty() || m_needUpdateOnvifUrl)
+    if (getMediaUrl().isEmpty() || getName().contains(QLatin1String("Unknown")) || getMAC().isEmpty() || m_needUpdateOnvifUrl)
     {
         if (!fetchAndSetDeviceInformation() && getMediaUrl().isEmpty())
         {
@@ -384,7 +384,7 @@ void QnPlOnvifResource::fetchAndSetPrimarySecondaryResolution()
     // SD NTCS/PAL resolutions have non standart SAR. fix it
     if (m_primaryResolution.first == 720 && (m_primaryResolution.second == 480 || m_primaryResolution.second == 576))
     {
-        currentAspect = 4.0 / 3.0;
+        currentAspect = float(4.0 / 3.0);
     }
     m_secondaryResolution = getNearestResolutionForSecondary(SECONDARY_STREAM_DEFAULT_RESOLUTION, currentAspect);
 
@@ -550,13 +550,14 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
 
         if (response.Capabilities) 
         {
+            //TODO:UTF unuse std::string
             if (response.Capabilities->Media) 
             {
-                setMediaUrl(response.Capabilities->Media->XAddr.c_str());
+                setMediaUrl(QString::fromStdString(response.Capabilities->Media->XAddr));
             }
             if (response.Capabilities->Device) 
             {
-                setDeviceOnvifUrl(response.Capabilities->Device->XAddr.c_str());
+                setDeviceOnvifUrl(QString::fromStdString(response.Capabilities->Device->XAddr));
             }
         }
     }
@@ -981,7 +982,8 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
             continue;
         }
 
-        currVideoOpts.id = optRequest.ConfigurationToken->c_str();
+        //TODO:UTF unuse std::string
+        currVideoOpts.id = QString::fromStdString(*optRequest.ConfigurationToken);
     }
 
     qSort(optionsList.begin(), optionsList.end(), videoOptsGreaterThan);
@@ -1313,8 +1315,8 @@ bool QnPlOnvifResource::fetchAndSetAudioEncoder(MediaSoapWrapper& soapWrapper)
 
         if (conf) {
             QMutexLocker lock(&m_mutex);
-
-            m_audioEncoderId = conf->token.c_str();
+            //TODO:UTF unuse std::string
+            m_audioEncoderId = QString::fromStdString(conf->token);
         }
     }
 
@@ -1348,8 +1350,8 @@ bool QnPlOnvifResource::fetchAndSetVideoSource(MediaSoapWrapper& soapWrapper)
 
         if (conf) {
             QMutexLocker lock(&m_mutex);
-
-            m_videoSourceId = conf->token.c_str();
+            //TODO:UTF unuse std::string
+            m_videoSourceId = QString::fromStdString(conf->token);
         }
     }
 
@@ -1383,8 +1385,8 @@ bool QnPlOnvifResource::fetchAndSetAudioSource(MediaSoapWrapper& soapWrapper)
 
         if (conf) {
             QMutexLocker lock(&m_mutex);
-
-            m_audioSourceId = conf->token.c_str();
+            //TODO:UTF unuse std::string
+            m_audioSourceId = QString::fromStdString(conf->token);
         }
     }
 
