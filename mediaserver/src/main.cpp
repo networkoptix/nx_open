@@ -313,7 +313,7 @@ int serverMain(int argc, char *argv[])
 
     QnCommandLineParser commandLinePreParser;
     commandLinePreParser.addParameter(QMetaType::QString, "--log-level", NULL, QString());
-    commandLinePreParser.parse(argc, argv, true);
+    commandLinePreParser.parse(argc, argv, stderr);
 
     QnLog::initLog(commandLinePreParser.value("--log-level").toString());
     cl_log.log(APPLICATION_NAME, " started", cl_logALWAYS);

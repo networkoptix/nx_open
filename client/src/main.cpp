@@ -231,7 +231,7 @@ int main(int argc, char *argv[])
     commandLinePreParser.addParameter(QMetaType::QString,   "--log-level",              NULL, QString());
     commandLinePreParser.addParameter(QMetaType::Bool,      "--soft-yuv",               NULL, QString(),    true);
     commandLinePreParser.addParameter(QMetaType::Bool,      "--open-layouts-on-login",  NULL, QString(),    true);
-    commandLinePreParser.parse(argc, argv, true);
+    commandLinePreParser.parse(argc, argv, stderr);
 
     if(commandLinePreParser.value("--soft-yuv").toBool())
         qnSettings->setSoftwareYuv(true);

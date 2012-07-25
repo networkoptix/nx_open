@@ -11,20 +11,20 @@ class QTextStream;
 
 class QN_EXPORT QnCommandLineParameter {
 public:
-    QnCommandLineParameter(int type, const QString &name, const QString &shortName, const QString &description, const QVariant &impliedValue = QVariant()):
-        m_type(type), m_name(name), m_shortName(shortName), m_description(description), m_impliedValue(impliedValue)
+    QnCommandLineParameter(int type, const QString &longName, const QString &shortName, const QString &description, const QVariant &impliedValue = QVariant()):
+        m_type(type), m_longName(longName), m_shortName(shortName), m_description(description), m_impliedValue(impliedValue)
     {}
 
-    QnCommandLineParameter(int type, const char *name, const char *shortName, const QString &description, const QVariant &impliedValue = QVariant()):
-        m_type(type), m_name(QLatin1String(name)), m_shortName(QLatin1String(shortName)), m_description(description), m_impliedValue(impliedValue)
+    QnCommandLineParameter(int type, const char *longName, const char *shortName, const QString &description, const QVariant &impliedValue = QVariant()):
+        m_type(type), m_longName(QLatin1String(longName)), m_shortName(QLatin1String(shortName)), m_description(description), m_impliedValue(impliedValue)
     {}
 
     int type() const {
         return m_type;
     }
 
-    const QString &name() const {
-        return m_name;
+    const QString &longName() const {
+        return m_longName;
     }
 
     const QString &shortName() const {
@@ -41,7 +41,7 @@ public:
 
 private:
     int m_type;
-    QString m_name;
+    QString m_longName;
     QString m_shortName;
     QString m_description;
     QVariant m_impliedValue;
@@ -54,7 +54,8 @@ public:
     QnCommandLineParser() {}
 
     void addParameter(const QnCommandLineParameter &parameter);
-    void addParameter(int type, const char *name, const char *shortName, const QString &description, const QVariant &impliedValue = QVariant());
+    void addParameter(int type, const QString &longName, const QString &shortName, const QString &description, const QVariant &impliedValue = QVariant());
+    void addParameter(int type, const char *longName, const char *shortName, const QString &description, const QVariant &impliedValue = QVariant());
 
     void print(QTextStream &stream) const;
 
@@ -63,7 +64,11 @@ public:
 
     void clear();
 
-    bool parse(int &argc, char **argv, bool checkTypes);
+    bool parse(int &argc, char **argv, FILE *errorFile);
+    bool parse(int &argc, char **argv, QTextStream *errorStream);
+
+private:
+    void addName(int index, const QString &name);
 
 private:
     QList<QnCommandLineParameter> m_parameters;

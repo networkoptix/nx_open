@@ -29,7 +29,7 @@ QnAutoTester::QnAutoTester(int &argc, char **argv, QObject *parent):
     parser.addParameter(QMetaType::QString, "--test-resource-substring",    NULL, tr("Substring that must be present in one of the resources."));
     parser.addParameter(QMetaType::Bool,    "--test-help",                  NULL, tr("Show this help screen."), true);
 
-    bool valid = parser.parse(argc, argv, true);
+    bool valid = parser.parse(argc, argv, stderr);
     bool showHelp = false;
     if(valid) {
         m_timeout = parser.value("--test-timeout", m_timeout).toLongLong();

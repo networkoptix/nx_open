@@ -1,6 +1,7 @@
 #include "command_line_parser.h"
 
 #include <QtCore/QMetaType>
+#include <QtCore/QStringList>
 
 #include <utils/common/warnings.h>
 
@@ -9,14 +10,28 @@ void QnCommandLineParser::addParameter(const QnCommandLineParameter &parameter) 
     m_parameters.push_back(parameter);
     m_values.push_back(QVariant());
 
-    if(!parameter.name().isEmpty())
-        m_indexByName[parameter.name()] = index;
+    if(!parameter.longName().isEmpty())
+        addName(index, parameter.longName());
     if(!parameter.shortName().isEmpty())
-        m_indexByName[parameter.shortName()] = index;
+        addName(index, parameter.shortName());
 }
 
-void QnCommandLineParser::addParameter(int type, const char *name, const char *shortName, const QString &description, const QVariant &impliedValue) {
-    addParameter(QnCommandLineParameter(type, name, shortName, description, impliedValue));
+void QnCommandLineParser::addName(int index, const QString &name) {
+    int currentIndex = m_indexByName.value(name, -1);
+    if(currentIndex != -1 && currentIndex != index) {
+        qnWarning("Given parameter name '%1' is already registered with this command line parser. This may lead to unexpected behavior when parsing command line.", name);
+        return;
+    }
+
+    m_indexByName[name] = index;
+}
+
+void QnCommandLineParser::addParameter(int type, const QString &longName, const QString &shortName, const QString &description, const QVariant &impliedValue) {
+    addParameter(QnCommandLineParameter(type, longName, shortName, description, impliedValue));
+}
+
+void QnCommandLineParser::addParameter(int type, const char *longName, const char *shortName, const QString &description, const QVariant &impliedValue) {
+    addParameter(QnCommandLineParameter(type, longName, shortName, description, impliedValue));
 }
 
 QVariant QnCommandLineParser::value(const QString &name, const QVariant &defaultValue) {
@@ -44,7 +59,7 @@ void QnCommandLineParser::print(QTextStream &stream) const {
     int longNameWidth = 0;
     foreach(const QnCommandLineParameter &parameter, m_parameters) {
         shortNameWidth = qMax(shortNameWidth, parameter.shortName().size());
-        longNameWidth = qMax(longNameWidth, parameter.name().size());
+        longNameWidth = qMax(longNameWidth, parameter.longName().size());
     }
     if(longNameWidth > 0)
         longNameWidth++; /* So that there is a single space between long & short names. */
@@ -56,7 +71,7 @@ void QnCommandLineParser::print(QTextStream &stream) const {
         stream << parameter.shortName();
         
         stream.setFieldWidth(longNameWidth);
-        stream << parameter.name();
+        stream << parameter.longName();
 
         stream.setFieldWidth(0);
         stream << " " << parameter.description();
@@ -65,10 +80,18 @@ void QnCommandLineParser::print(QTextStream &stream) const {
     }
 }
 
-bool QnCommandLineParser::parse(int &argc, char **argv, bool checkTypes) {
-    int pos = 0, skipped = 0;
+bool QnCommandLineParser::parse(int &argc, char **argv, FILE *errorFile) {
+    if(errorFile) {
+        QTextStream errorStream(errorFile);
+        return parse(argc, argv, &errorStream);
+    } else {
+        return parse(argc, argv, static_cast<QTextStream *>(NULL));
+    }
+}
 
-    QTextStream err(stderr); 
+bool QnCommandLineParser::parse(int &argc, char **argv, QTextStream *errorStream) {
+    bool result = true;
+    int pos = 0, skipped = 0;
 
     while(pos < argc) {
         /* Extract name. */
@@ -95,22 +118,23 @@ bool QnCommandLineParser::parse(int &argc, char **argv, bool checkTypes) {
         } else {
             pos++;
             if(pos >= argc) {
-                err << tr("No value provided for the '%1' parameter.").arg(name) << endl;
-                return false;
+                if(errorStream)
+                    *errorStream << tr("No value provided for the '%1' argument.").arg(name) << endl;
+                result = false;
             } else {
                 value = QLatin1String(argv[pos]);
             }
         }
 
         /* Convert to typed value. */
-        if(checkTypes) {
-            QVariant typedValue = value;
-            bool success = typedValue.convert(static_cast<QVariant::Type>(parameter.type()));
-            if(!success) {
-                err << tr("Invalid value for '%1' parameter - expected %2, provided '%3'.").arg(name).arg(QMetaType::typeName(parameter.type())).arg(value.toString()) << endl;
-            } else {
-                value = typedValue;
-            }
+        QVariant typedValue = value;
+        bool success = typedValue.convert(static_cast<QVariant::Type>(parameter.type()));
+        if(!success) {
+            if(errorStream)
+                *errorStream << tr("Invalid value for '%1' argument - expected %2, provided '%3'.").arg(name).arg(QMetaType::typeName(parameter.type())).arg(value.toString()) << endl;
+            result = false;
+        } else {
+            value = typedValue;
         }
 
         /* Store value. */
@@ -120,5 +144,5 @@ bool QnCommandLineParser::parse(int &argc, char **argv, bool checkTypes) {
     }
 
     argc = skipped;
-    return true;
+    return result;
 }

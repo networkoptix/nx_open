@@ -77,7 +77,7 @@ protected:
     virtual QVariant readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) override;
     virtual void writeValueToSettings(QSettings *settings, int id, const QVariant &value) const override;
 
-    virtual bool updateValue(int id, const QVariant &value) override;
+    virtual UpdateStatus updateValue(int id, const QVariant &value) override;
 
 private:
     QN_BEGIN_PROPERTY_STORAGE(VARIABLE_COUNT);

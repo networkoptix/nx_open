@@ -4,9 +4,12 @@
 #include <QtCore/QObject>
 #include <QtCore/QVariant>
 #include <QtCore/QScopedPointer>
+#include <QtCore/QSet>
+#include <QtCore/QStringList>
 
 class QSettings;
 class QMutex;
+class QTextStream;
 
 class QnPropertyStorageLocker;
 
@@ -49,10 +52,10 @@ public:
     QString name(int id) const;
     void setName(int id, const QString &name);
 
-    void setArgumentNames(int id, const char *longArgumentName, const char *shortArgumentName);
-    void setArgumentNames(int id, const QString &longArgumentName, const QString &shortArgumentName);
-    QString longArgumentName(int id) const;
-    QString shortArgumentName(int id) const;
+    void addArgumentName(int id, const char *argumentName);
+    void addArgumentName(int id, const QString &argumentName);
+    void setArgumentNames(int id, const QStringList &argumentNames);
+    QStringList argumentNames(int id) const;
 
     int type(int id) const;
     void setType(int id, int type);
@@ -66,18 +69,24 @@ public:
     void updateFromSettings(QSettings *settings);
     void submitToSettings(QSettings *settings) const;
 
-    void updateFromCommandLine(int &argc, char **argv);
+    bool updateFromCommandLine(int &argc, char **argv, QTextStream *errorStream);
 
 signals:
     void valueChanged(int id);
 
 protected:
+    enum UpdateStatus {
+        Changed,    /**< Value was changed. */
+        Skipped,    /**< Value didn't change. */
+        Failed,     /**< An error has occurred. */
+    };
+
     virtual void updateValuesFromSettings(QSettings *settings, const QList<int> &ids);
     virtual void submitValuesToSettings(QSettings *settings, const QList<int> &ids) const;
     virtual QVariant readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue);
     virtual void writeValueToSettings(QSettings *settings, int id, const QVariant &value) const;
 
-    virtual bool updateValue(int id, const QVariant &value);
+    virtual UpdateStatus updateValue(int id, const QVariant &value);
 
 #define QN_BEGIN_PROPERTY_STORAGE(LAST_ID)                                      \
 private:                                                                        \
@@ -121,6 +130,8 @@ private:
     void unlock() const;
     void notify(int id) const;
 
+    bool isWritableLocked(int id) const;
+
 private:
     bool m_threadSafe;
     QScopedPointer<QMutex> m_mutex;
@@ -129,8 +140,7 @@ private:
 
     QHash<int, QVariant> m_valueById;
     QHash<int, QString> m_nameById;
-    QHash<int, QString> m_shortArgumentNameById;
-    QHash<int, QString> m_longArgumentNameById;
+    QHash<int, QStringList> m_argumentNamesById;
     QHash<int, int> m_typeById;
     QHash<int, bool> m_writeableById;
     mutable QHash<int, QnPropertyNotifier *> m_notifiers;

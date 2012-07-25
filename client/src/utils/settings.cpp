@@ -56,6 +56,11 @@ QnSettings::QnSettings():
     setName(DOWNMIX_AUDIO,          QLatin1String("downmixAudio"));
     setName(OPEN_LAYOUTS_ON_LOGIN,  QLatin1String("openLayoutsOnLogin"));
 
+    /* Set command line switch names. */
+    addArgumentName(SOFTWARE_YUV,          "--soft-yuv",               NULL);
+    addArgumentName(OPEN_LAYOUTS_ON_LOGIN, "--open-layouts-on-login",  NULL);
+    addArgumentName(MAX_VIDEO_ITEMS,       "--max-video-items",        NULL);
+
     /* Load from settings. */
     load();
 
@@ -169,14 +174,14 @@ void QnSettings::updateValuesFromSettings(QSettings *settings, const QList<int> 
     base_type::updateValuesFromSettings(settings, ids);
 }
 
-bool QnSettings::updateValue(int id, const QVariant &value) {
-    bool changed = base_type::updateValue(id, value);
+QnPropertyStorage::UpdateStatus QnSettings::updateValue(int id, const QVariant &value) {
+    UpdateStatus status = base_type::updateValue(id, value);
 
     /* Settings are to be written out right away. */
-    if(!m_loading && changed)
+    if(!m_loading && status == Changed)
         writeValueToSettings(m_settings, id, this->value(id));
 
-    return changed;
+    return status;
 }
 
 void QnSettings::load() {
