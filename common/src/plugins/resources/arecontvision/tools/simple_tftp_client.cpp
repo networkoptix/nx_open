@@ -140,7 +140,7 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
                             goto LAST_PACKET;
                         }
 
-                        data.write((char*)buff_recv+4, data_len, (blk_cam_sending-1)*m_curr_blk_size + data_size0);
+                        data.writeAt((char*)buff_recv+4, data_len, (blk_cam_sending-1)*m_curr_blk_size + data_size0);
 
                         len+=data_len;
                         if (len>CL_MAX_DATASIZE)

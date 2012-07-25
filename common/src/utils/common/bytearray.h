@@ -79,7 +79,7 @@ public:
      * \param filler                    Byte to use for filling the array that will be appended.
      * \param size                      Size of the array that will be appended.
      */
-    void write(quint8 filler, int size);
+    void writeFiller(quint8 filler, int size);
 
     /**
      * Overwrites the contents of this array starting at the given position
@@ -89,7 +89,7 @@ public:
      * \param size                      Size of the data.
      * \param pos                       Position to overwrite.
      */
-    unsigned int write(const char *data, unsigned int size, int pos);
+    unsigned int writeAt(const char *data, unsigned int size, int pos);
 
     /**
      * Reserves given amount of bytes in this array and returns a pointer to 

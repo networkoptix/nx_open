@@ -64,7 +64,7 @@ unsigned int QnByteArray::write(const char *data, unsigned int size)
     return size;
 }
 
-unsigned int QnByteArray::write(const char *data, unsigned int size, int pos)
+unsigned int QnByteArray::writeAt(const char *data, unsigned int size, int pos)
 {
     reserve(pos + size);
 
@@ -76,7 +76,7 @@ unsigned int QnByteArray::write(const char *data, unsigned int size, int pos)
     return size;
 }
 
-void QnByteArray::write(quint8 filler, int size)
+void QnByteArray::writeFiller(quint8 filler, int size)
 {
     reserve(m_size + size);
 

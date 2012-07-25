@@ -68,8 +68,6 @@ public:
 
     static QnSettings *instance();
 
-    virtual void updateFromSettings(QSettings *settings) override;
-
     void load();
     void save();
 
@@ -83,13 +81,12 @@ signals:
     void lastUsedConnectionChanged();
 
 protected:
-    virtual QVariant updateValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) override;
-    virtual void submitValueToSettings(QSettings *settings, int id, const QVariant &value) const override;
+    virtual void updateValuesFromSettings(QSettings *settings, const QList<int> &ids) override;
+
+    virtual QVariant readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) override;
+    virtual void writeValueToSettings(QSettings *settings, int id, const QVariant &value) const override;
 
     virtual bool updateValue(int id, const QVariant &value) override;
-
-    virtual void lock() const override;
-    virtual void unlock() const override;
 
 private:
     QN_BEGIN_PROPERTY_STORAGE(VARIABLE_COUNT);
@@ -108,7 +105,6 @@ private:
     QN_END_PROPERTY_STORAGE();
 
 private:
-    mutable QMutex m_mutex;
     QSettings *m_settings;
     bool m_loading;
 };

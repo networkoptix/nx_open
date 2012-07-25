@@ -78,9 +78,9 @@ QnMetaDataV1::QnMetaDataV1(int initialValue):
     m_firstTimestamp = AV_NOPTS_VALUE;
     timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;
     if (initialValue)
-        data.write(0xff, data.capacity());
+        data.writeFiller(0xff, data.capacity());
     else
-        data.write(0, data.capacity());
+        data.writeFiller(0, data.capacity());
 }
 
 void QnMetaDataV1::addMotion(QnMetaDataV1Ptr data)

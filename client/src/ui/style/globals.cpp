@@ -84,12 +84,12 @@ QnGlobals *QnGlobals::instance() {
     return qn_globalsInstance();
 }
 
-QVariant QnGlobals::updateValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) {
+QVariant QnGlobals::readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) {
     int type = this->type(id);
     if(type == QMetaType::QColor) {
         return parseColor(settings->value(name(id)), defaultValue.value<QColor>());
     } else {
-        return base_type::updateValueFromSettings(settings, id, defaultValue);
+        return base_type::readValueFromSettings(settings, id, defaultValue);
     }
 }
 

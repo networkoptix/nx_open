@@ -35,7 +35,6 @@ namespace {
 Q_GLOBAL_STATIC(QnSettings, qn_settings)
 
 QnSettings::QnSettings():
-    m_mutex(QMutex::Recursive),
     m_settings(new QSettings(this)),
     m_loading(true)
 {
@@ -57,10 +56,12 @@ QnSettings::QnSettings():
     setName(DOWNMIX_AUDIO,          QLatin1String("downmixAudio"));
     setName(OPEN_LAYOUTS_ON_LOGIN,  QLatin1String("openLayoutsOnLogin"));
 
-    connect(notifier(LAST_USED_CONNECTION), SIGNAL(valueChanged(int)), this, SIGNAL(lastUsedConnectionChanged()));
+    connect(notifier(LAST_USED_CONNECTION), SIGNAL(valueChanged(int)), this, SIGNAL(lastUsedConnectionChanged())); // TODO: remove
 
     /* Load from settings. */
     load();
+
+    setThreadSafe(true);
 
     m_loading = false;
 }
@@ -73,15 +74,7 @@ QnSettings *QnSettings::instance() {
     return qn_settings();
 }
 
-void QnSettings::lock() const {
-    m_mutex.lock();
-}
-
-void QnSettings::unlock() const {
-    m_mutex.unlock();
-}
-
-QVariant QnSettings::updateValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) {
+QVariant QnSettings::readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) {
     switch(id) {
     case DEFAULT_CONNECTION: {
         QnConnectionData result;
@@ -126,12 +119,12 @@ QVariant QnSettings::updateValueFromSettings(QSettings *settings, int id, const 
     case DEBUG_COUNTER:
         return defaultValue; /* Not to be read from settings. */
     default:
-        return base_type::updateValueFromSettings(settings, id, defaultValue);
+        return base_type::readValueFromSettings(settings, id, defaultValue);
         break;
     }
 }
 
-void QnSettings::submitValueToSettings(QSettings *settings, int id, const QVariant &value) const {
+void QnSettings::writeValueToSettings(QSettings *settings, int id, const QVariant &value) const {
     switch(id) {
     case LAST_USED_CONNECTION:
         settings->beginGroup(QLatin1String("AppServerConnections"));
@@ -157,7 +150,7 @@ void QnSettings::submitValueToSettings(QSettings *settings, int id, const QVaria
         settings->endArray();
 
         /* Write out last used connection as it has been cleared. */
-        submitValueToSettings(settings, LAST_USED_CONNECTION, QVariant::fromValue<QnConnectionData>(lastUsedConnection()));
+        writeValueToSettings(settings, LAST_USED_CONNECTION, QVariant::fromValue<QnConnectionData>(lastUsedConnection()));
         break;
     }
 #ifndef QN_HAS_BACKGROUND_COLOR_ADJUSTMENT
@@ -167,16 +160,15 @@ void QnSettings::submitValueToSettings(QSettings *settings, int id, const QVaria
     case DEBUG_COUNTER:
         break; /* Not to be saved to settings. */
     default:
-        base_type::submitValueToSettings(settings, id, value);
+        base_type::writeValueToSettings(settings, id, value);
         break;
     }
 }
 
-void QnSettings::updateFromSettings(QSettings *settings) {
-    QMutexLocker locker(&m_mutex);
+void QnSettings::updateValuesFromSettings(QSettings *settings, const QList<int> &ids) {
     QnScopedValueRollback<bool> guard(&m_loading, true);
 
-    base_type::updateFromSettings(settings);
+    base_type::updateValuesFromSettings(settings, ids);
 }
 
 bool QnSettings::updateValue(int id, const QVariant &value) {
@@ -184,7 +176,7 @@ bool QnSettings::updateValue(int id, const QVariant &value) {
 
     /* Settings are to be written out right away. */
     if(!m_loading && changed)
-        submitValueToSettings(m_settings, id, this->value(id));
+        writeValueToSettings(m_settings, id, this->value(id));
 
     return changed;
 }
