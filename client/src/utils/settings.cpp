@@ -56,8 +56,6 @@ QnSettings::QnSettings():
     setName(DOWNMIX_AUDIO,          QLatin1String("downmixAudio"));
     setName(OPEN_LAYOUTS_ON_LOGIN,  QLatin1String("openLayoutsOnLogin"));
 
-    connect(notifier(LAST_USED_CONNECTION), SIGNAL(valueChanged(int)), this, SIGNAL(lastUsedConnectionChanged())); // TODO: remove
-
     /* Load from settings. */
     load();
 
