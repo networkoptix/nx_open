@@ -34,6 +34,10 @@ public:
 
     virtual void setMotionMaskPhysical(int channel) override;
     virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider) override;
+
+
+    int getChannelNum() const;
+
 protected:
     bool initInternal() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
