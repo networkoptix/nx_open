@@ -11,21 +11,15 @@ class QTextStream;
 
 class QN_EXPORT QnCommandLineParameter {
 public:
-    enum Type {
-        String,
-        Integer,
-        Flag,
-    };
-
-    QnCommandLineParameter(Type type, const QString &name, const QString &shortName, const QString &description):
+    QnCommandLineParameter(int type, const QString &name, const QString &shortName, const QString &description):
         m_type(type), m_name(name), m_shortName(shortName), m_description(description)
     {}
 
-    QnCommandLineParameter(Type type, const char *name, const char *shortName, const QString &description):
+    QnCommandLineParameter(int type, const char *name, const char *shortName, const QString &description):
         m_type(type), m_name(QLatin1String(name)), m_shortName(QLatin1String(shortName)), m_description(description)
     {}
 
-    Type type() const {
+    int type() const {
         return m_type;
     }
 
@@ -42,11 +36,11 @@ public:
     }
 
     bool hasValue() const {
-        return m_type != Flag;
+        return m_type != QMetaType::Bool;
     }
 
 private:
-    Type m_type;
+    int m_type;
     QString m_name;
     QString m_shortName;
     QString m_description;

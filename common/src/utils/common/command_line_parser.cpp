@@ -67,7 +67,7 @@ bool QnCommandLineParser::parse(int &argc, char **argv) {
         QString stringValue;
 
         /* Extract name. */
-        QStringList paramInfo = QString(argv[pos]).split('=');
+        QStringList paramInfo = QString(QLatin1String(argv[pos])).split('=');
         QString name = paramInfo[0];
 
         int index = m_indexByName.value(name, -1);
@@ -82,9 +82,9 @@ bool QnCommandLineParser::parse(int &argc, char **argv) {
         const QnCommandLineParameter &parameter = m_parameters[index];
 
         /* Extract string value if needed. */
-        if (paramInfo.size() > 1)
+        if (paramInfo.size() > 1) {
             stringValue = paramInfo[1];
-        else if(parameter.hasValue()) {
+        } else if(parameter.hasValue()) {
             pos++;
             if(pos >= argc) {
                 err << tr("No value provided for the '%1' parameter.").arg(name) << endl;
@@ -110,7 +110,7 @@ bool QnCommandLineParser::parse(int &argc, char **argv) {
                 value = intValue;
             }
             break;
-                                              }
+        }
         case QnCommandLineParameter::Flag:
             value = true;
             break;
