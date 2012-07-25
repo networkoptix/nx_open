@@ -1,9 +1,12 @@
 #include "isd_resource.h"
 #include "../onvif/dataprovider/rtp_stream_provider.h"
 #include "utils/common/math.h"
+#include "api/app_server_connection.h"
+#include "isd_stream_reader.h"
 
 
 const char* QnPlIsdResource::MANUFACTURE = "ISD";
+QString QnPlIsdResource::MAX_FPS_PARAM_NAME = QString("MaxFPS");
 
 static QStringList getValues(const QString& line)
 {
@@ -137,7 +140,7 @@ bool QnPlIsdResource::initInternal()
             }
         }
 
-        if (resolutions[bestIndex].width() * resolutions[bestIndex].height() < 1920*1080)
+        if (resolutions[bestIndex].width() * resolutions[bestIndex].height() < 640*480)
             m_resolution2 = resolutions[bestIndex];
 
     }
@@ -184,19 +187,34 @@ bool QnPlIsdResource::initInternal()
         return false;
 
     {
-        //QMutexLocker lock(&m_mutex);
-        //m_MaxFps
+        
+        setMaxFps(fpsList.at(0));
     }
-    
+
+    save();
 
     return true;
 
 }
 
+QSize QnPlIsdResource::getPrimaryResolution() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_resolution1;
+
+}
+
+QSize QnPlIsdResource::getSecondaryResolution() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_resolution2;
+}
+
+
 QnAbstractStreamDataProvider* QnPlIsdResource::createLiveDataProvider()
 {
 
-    return new QnRtpStreamReader(toSharedPointer(), "stream1");
+    return new QnISDStreamReader(toSharedPointer());
 }
 
 void QnPlIsdResource::setCropingPhysical(QRect /*croping*/)
@@ -214,4 +232,34 @@ const QnResourceAudioLayout* QnPlIsdResource::getAudioLayout(const QnAbstractMed
     }
     else
         return QnPhysicalCameraResource::getAudioLayout(dataProvider);
+}
+
+
+void QnPlIsdResource::setMaxFps(int f)
+{
+    setParam(MAX_FPS_PARAM_NAME, f, QnDomainDatabase);
+}
+
+int QnPlIsdResource::getMaxFps()
+{
+    QVariant mediaVariant;
+    QnSecurityCamResource* this_casted = const_cast<QnPlIsdResource*>(this);
+
+    if (!hasSuchParam(MAX_FPS_PARAM_NAME))
+    {
+        return QnPhysicalCameraResource::getMaxFps();
+    }
+
+    this_casted->getParam(MAX_FPS_PARAM_NAME, mediaVariant, QnDomainMemory);
+    return mediaVariant.toInt();
+}
+
+void QnPlIsdResource::save()
+{
+    QByteArray errorStr;
+    QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
+    if (conn->saveSync(toSharedPointer().dynamicCast<QnVirtualCameraResource>(), errorStr) != 0) {
+        qCritical() << "QnPlOnvifResource::init: can't save resource params to Enterprise Controller. Resource physicalId: "
+            << getPhysicalId() << ". Description: " << errorStr;
+    }
 }

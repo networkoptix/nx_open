@@ -9,6 +9,9 @@
 class QnPlIsdResource : public QnPhysicalCameraResource
 {
 public:
+
+    static QString MAX_FPS_PARAM_NAME;
+
     static const char* MANUFACTURE;
 
     QnPlIsdResource();
@@ -17,9 +20,16 @@ public:
 
     virtual bool updateMACAddress();
 
+    virtual int getMaxFps() override;
+
+    QSize getPrimaryResolution() const;
+    QSize getSecondaryResolution() const;
+
     virtual QString manufacture() const;
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
+
+    //bool hasDualStreaming() const {return false;}
 
 
     virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider) override;
@@ -29,7 +39,8 @@ protected:
     virtual void setCropingPhysical(QRect croping);
 
 private:
-    
+    void setMaxFps(int f);
+    void save();
 
 protected:
     QSize m_resolution1;

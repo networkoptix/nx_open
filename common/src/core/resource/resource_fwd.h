@@ -76,5 +76,7 @@ typedef QnSharedResourcePointer<QnPlAxisResource> QnPlAxisResourcePtr;
 class QnPlOnvifResource;
 typedef QnSharedResourcePointer<QnPlOnvifResource> QnPlOnvifResourcePtr;
 
+class QnPlIsdResource;
+typedef QnSharedResourcePointer<QnPlIsdResource> QnPlIsdResourcePtr;
 
 #endif // QN_RESOURCE_FWD_H

@@ -57,17 +57,34 @@ void QnAxisStreamReader::openStream()
     QnResource::ConnectionRole role = getRole();
     QnPlAxisResourcePtr res = getResource().dynamicCast<QnPlAxisResource>();
 
+    int channels = 1;
+    if (res->hasSuchParam("channelsAmount"))
+    {
+        QVariant val;
+        res->getParam("channelsAmount", val, QnDomainMemory);
+        channels = val.toUInt();
+    }
+
+
     QByteArray profileNumber("S");
     QByteArray profileName;
     QByteArray profileDescription;
     QByteArray action = "add";
+
+    QByteArray profileSufix;
+    if (channels > 1)
+    {
+        // multiple channel encoder
+        profileSufix = QByteArray::number(res->getChannelNum());
+    }
+
     if (role == QnResource::Role_LiveVideo)
     {
-        profileName = "netOptixPrimary";
+        profileName = "netOptixPrimary" + profileSufix;
         profileDescription = "Network Optix Primary Stream";
     }
     else {
-        profileName = "netOptixSecondary";
+        profileName = "netOptixSecondary" + profileSufix;
         profileDescription = "Network Optix Secondary Stream";
     }
 
@@ -155,9 +172,20 @@ void QnAxisStreamReader::openStream()
         res->setMotionMaskPhysical(0);
     }
 
+    QString request;
+    QTextStream stream(&request);
+    stream << "axis-media/media.amp?streamprofile=" << profileName;
+
+
+    if (channels > 1)
+    {
+        stream << "&camera=" << res->getChannelNum();
+    }
+
+    
 
     // ============== requesting a video ==========================
-    m_rtpStreamParser.setRequest(QString("axis-media/media.amp?streamprofile=") + profileName);
+    m_rtpStreamParser.setRequest(request);
     m_rtpStreamParser.openStream();
 }
 
@@ -262,6 +290,7 @@ void QnAxisStreamReader::parseMotionInfo(QnCompressedVideoDataPtr videoData)
         }
     }
 }
+
 
 bool QnAxisStreamReader::isGotFrame(QnCompressedVideoDataPtr videoData)
 {
