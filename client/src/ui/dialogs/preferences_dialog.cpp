@@ -114,6 +114,11 @@ void QnPreferencesDialog::submitToSettings() {
     m_settings->setMaxVideoItems(ui->maxVideoItemsSpinBox->value());
     m_settings->setAudioDownmixed(ui->downmixAudioCheckBox->isChecked());
 
+    QStringList extraMediaFolders;
+    for(int i = 0; i < ui->extraMediaFoldersList->count(); i++)
+        extraMediaFolders.push_back(ui->extraMediaFoldersList->item(i)->text());
+    m_settings->setExtraMediaFolders(extraMediaFolders);
+
     if (m_connectionsSettingsWidget) {
         QnConnectionData defaultConnection = qnSettings->defaultConnection();
 
