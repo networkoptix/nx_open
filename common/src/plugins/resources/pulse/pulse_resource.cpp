@@ -33,7 +33,7 @@ void QnPlPulseResource::setIframeDistance(int /*frames*/, int /*timems*/)
 
 QnAbstractStreamDataProvider* QnPlPulseResource::createLiveDataProvider()
 {
-    QString request = QLatin1Char('0');
+    QString request = QLatin1String("0");
     return new QnRtpStreamReader(toSharedPointer(), request);
 }
 
