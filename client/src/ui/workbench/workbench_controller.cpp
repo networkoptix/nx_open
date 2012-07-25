@@ -740,11 +740,8 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
         if (items.count() == 0)
             showContextMenuAt(offset);
         else{ 
-            //items[0]->boundingRect();
             QRectF rect = items[0]->mapToScene(items[0]->boundingRect()).boundingRect();
-            QnResourceWidget* item = dynamic_cast<QnResourceWidget *>(items[0]);
-            QnSceneTransformations t;
-            QRect testRect = t.mapRectFromScene(view, rect); /* Where is the static analogue? */ 
+            QRect testRect = QnSceneTransformations::mapRectFromScene(view, rect); /* Where is the static analogue? */ 
             showContextMenuAt(offset + testRect.bottomRight());
         }
         }
@@ -770,6 +767,7 @@ void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget 
 }
 
 void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, const ResizingInfo &info) {
+    Q_UNUSED(info)
     if(m_resizedWidget != item || item == NULL)
         return;
 
@@ -1041,6 +1039,7 @@ void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *
 }
 
 void QnWorkbenchController::at_item_rightClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info) {
+    Q_UNUSED(view)
     TRACE("ITEM RCLICKED");
 
     QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;

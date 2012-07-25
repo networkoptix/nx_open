@@ -25,6 +25,10 @@ public:
         m_type(type), m_name(QLatin1String(name)), m_shortName(QLatin1String(shortName)), m_description(description)
     {}
 
+    QnCommandLineParameter(Type type, const char *name, const char *shortName, const char *description):
+        m_type(type), m_name(QLatin1String(name)), m_shortName(QLatin1String(shortName)), m_description(QLatin1String(description))
+    {}
+
     Type type() const {
         return m_type;
     }

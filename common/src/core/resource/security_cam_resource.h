@@ -52,7 +52,7 @@ public:
     virtual void setIframeDistance(int frames, int timems) = 0; // sets the distance between I frames
 
     virtual QRect getCroping(QnDomain domain); // TODO: 'cropping' is spelled with double 'p'. Rename
-    virtual void setCroping(QRect croping, QnDomain domain); // sets croping. rect is in the percents from 0 to 100
+    virtual void setCroping(QRect croping, QnDomain domain); // sets cropping. rect is in the percents from 0 to 100
 
     void setDataProviderFactory(QnDataProviderFactory* dpFactory);
 

@@ -23,7 +23,9 @@ public:
     void draw(QImage& img, bool drawText);
     void draw(QPainter& painter, const QSize& paintSize, bool drawText);
     //void drawTextLine(QPainter& painter, const QSize& paintSize,int lineNum, const QString& text);
-    QFontMetrics updateFontSize(QPainter& painter, const QSize& paintSize, const QString& versionStr);
+    
+    /** TODO: remove magic const from the function */
+    QFontMetrics updateFontSize(QPainter& painter, const QSize& paintSize);
     static void updateDigest(AVCodecContext* srcCodec, QnCryptographicHash &ctx, const quint8* data, int size);
     void setSignOpacity(float opacity, QColor color);
 

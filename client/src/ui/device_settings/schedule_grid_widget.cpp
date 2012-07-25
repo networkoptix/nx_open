@@ -33,7 +33,7 @@ QnScheduleGridWidget::QnScheduleGridWidget(QWidget *parent)
     QDate date(2010,1,1);
     date = date.addDays(1 - date.dayOfWeek());
     for (int i = 0; i < 7; ++i) {
-        m_weekDays << date.toString("ddd");
+        m_weekDays << date.toString(QLatin1String("ddd"));
         date = date.addDays(1);
     }
 

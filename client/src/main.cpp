@@ -92,9 +92,9 @@ void ffmpegInit()
     av_register_all();
 
     // client uses ordinary QT file to access file system, server uses buffering access implemented inside QnFileStorageResource
-    QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnQtFileStorageResource::instance, true);
-    QnStoragePluginFactory::instance()->registerStoragePlugin("qtfile", QnQtFileStorageResource::instance);
-    QnStoragePluginFactory::instance()->registerStoragePlugin("layout", QnLayoutFileStorageResource::instance);
+    QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("file"), QnQtFileStorageResource::instance, true);
+    QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("qtfile"), QnQtFileStorageResource::instance);
+    QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("layout"), QnLayoutFileStorageResource::instance);
 
     /*
     extern URLProtocol ufile_protocol;
@@ -109,6 +109,7 @@ void ffmpegInit()
 
 void addTestFile(const QString& fileName, const QString& resId)
 {
+    Q_UNUSED(resId)
     QnAviResourcePtr resource(new QnAviResource(fileName));
     qnResPool->addResource(QnResourcePtr(resource));
 }

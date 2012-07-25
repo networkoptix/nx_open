@@ -160,7 +160,7 @@ void QnUserSettingsDialog::updateFromResource() {
         ui->confirmPasswordEdit->setPlaceholderText(QString());
         ui->accessRightsComboBox->setCurrentIndex(-1);
     } else {
-        QString placeholder(m_user->getPassword().size(), QChar('*'));
+        QString placeholder(m_user->getPassword().size(), QLatin1Char('*'));
 
         ui->loginEdit->setText(m_user->getName());
         ui->currentPasswordEdit->clear();

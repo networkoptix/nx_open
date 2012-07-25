@@ -481,6 +481,7 @@ void QnThumbnailsLoader::addThumbnail(const QnThumbnail &thumbnail) {
 }
 
 void QnThumbnailsLoader::ensureScaleContextLocked(int lineSize, const QSize &sourceSize, const QSize &boundingSize, int format) {
+    Q_UNUSED(boundingSize)
     bool needsReallocation = false;
     
     if(m_scaleSourceSize != sourceSize) {

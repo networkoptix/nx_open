@@ -14,7 +14,7 @@ namespace {
         connection.name = settings->value(QLatin1String("name")).toString();
         connection.url = settings->value(QLatin1String("url")).toString();
         connection.url.setScheme(QLatin1String("https"));
-        connection.readOnly = (settings->value(QLatin1String("readOnly")).toString() == "true");
+        connection.readOnly = (settings->value(QLatin1String("readOnly")).toString() == QLatin1String("true"));
 
         return connection;
     }
@@ -86,9 +86,9 @@ QVariant QnSettings::updateValueFromSettings(QSettings *settings, int id, const 
     case DEFAULT_CONNECTION: {
         QnConnectionData result;
         result.url.setScheme(QLatin1String("https"));
-        result.url.setHost(settings->value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString());
-        result.url.setPort(settings->value("appserverPort", DEFAULT_APPSERVER_PORT).toInt());
-        result.url.setUserName(settings->value("appserverLogin", QLatin1String("admin")).toString());
+        result.url.setHost(settings->value(QLatin1String("appserverHost"), QLatin1String(DEFAULT_APPSERVER_HOST)).toString());
+        result.url.setPort(settings->value(QLatin1String("appserverPort"), DEFAULT_APPSERVER_PORT).toInt());
+        result.url.setUserName(settings->value(QLatin1String("appserverLogin"), QLatin1String("admin")).toString());
         result.name = QLatin1String("default");
         result.readOnly = true;
 

@@ -140,8 +140,9 @@ QByteArray QnSignHelper::getSign(const AVFrame* frame, int signLen)
     return QByteArray((const char*)signArray, signLen);
 }
 
-QFontMetrics QnSignHelper::updateFontSize(QPainter& painter, const QSize& paintSize, const QString& versionStr)
+QFontMetrics QnSignHelper::updateFontSize(QPainter& painter, const QSize& paintSize)
 {
+    QString versionStr = qApp->applicationName().append(QLatin1String(" v")).append(qApp->applicationVersion());
     if (m_lastPaintSize == paintSize)
     {
         painter.setFont(m_cachedFont);
@@ -214,7 +215,7 @@ void QnSignHelper::draw(QPainter& painter, const QSize& paintSize, bool drawText
     if (drawText)
     {
         QString versionStr = qApp->applicationName().append(QLatin1String(" v")).append(qApp->applicationVersion());
-        QFontMetrics metric = updateFontSize(painter, paintSize, versionStr);
+        QFontMetrics metric = updateFontSize(painter, paintSize);
 
         //painter.drawText(QPoint(text_x_offs, text_y_offs), qApp->organizationName());
         painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()), versionStr);

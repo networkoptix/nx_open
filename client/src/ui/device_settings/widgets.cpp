@@ -184,7 +184,7 @@ SettingsButtonWidget::SettingsButtonWidget(const QnParam &param, QWidget *parent
 
 void SettingsButtonWidget::onClicked()
 {
-    setParamValue("");
+    setParamValue(QString());
 }
 
 void SettingsButtonWidget::updateParam(const QVariant &/*value*/)

@@ -48,10 +48,10 @@ namespace {
 
     void decompose(const QString &path, QString *prefix, QString *suffix) {
         QFileInfo info(path);
-        *prefix = info.path() + QChar('/') + info.baseName();
+        *prefix = info.path() + QLatin1Char('/') + info.baseName();
         *suffix = info.completeSuffix();
         if(!suffix->isEmpty())
-            *suffix = QChar('.') + *suffix;
+            *suffix = QLatin1Char('.') + *suffix;
     }
 
 } // anonymous namespace

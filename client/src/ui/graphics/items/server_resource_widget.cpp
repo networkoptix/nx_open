@@ -310,7 +310,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
                 main_pen.setColor(getColorById(i));
                 painter->setPen(main_pen);
                 int y = offset + oh * (1.0 - inter_value * 0.01);
-                painter->drawText(x, y, QString::number(qRound(inter_value))+"%");
+                painter->drawText(x, y, QString::number(qRound(inter_value))+QLatin1Char('%'));
             }
         }
 

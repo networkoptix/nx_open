@@ -86,7 +86,7 @@ QString QnRtspClientArchiveDelegate::getUrl(QnResourcePtr resource)
     QnResourcePtr server = qnResPool->getResourceById(resource->getParentId());
     if (!server)
         return QString();
-    QString url = server->getUrl() + QString('/');
+    QString url = server->getUrl() + QLatin1Char('/');
     QnNetworkResourcePtr netResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
     if (netResource != 0)
 		url += netResource->getPhysicalId();
@@ -210,7 +210,7 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
 
     
 
-    m_rtspSession.setTransport("TCP");
+    m_rtspSession.setTransport(QLatin1String("TCP"));
 
     m_rtspSession.setProxyAddr(m_proxyAddr, m_proxyPort);
     m_rtpData = 0;
@@ -562,11 +562,11 @@ QnResourceAudioLayout* QnRtspClientArchiveDelegate::getAudioLayout()
 
 void QnRtspClientArchiveDelegate::processMetadata(const quint8* data, int dataSize)
 {
-    RtpHeader* rtpHeader = (RtpHeader*) data;
+   // RtpHeader* rtpHeader = (RtpHeader*) data;
     const quint8* payload = data + RtpHeader::RTP_HEADER_SIZE;
     QByteArray ba((const char*)payload, data + dataSize - payload);
     if (ba.startsWith("npt="))
-        m_rtspSession.parseRangeHeader(ba);
+        m_rtspSession.parseRangeHeader(QLatin1String(ba));
 }
 
 QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(const quint8* data, int dataSize)

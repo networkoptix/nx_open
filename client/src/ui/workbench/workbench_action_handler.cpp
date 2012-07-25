@@ -429,7 +429,7 @@ void QnWorkbenchActionHandler::openNewWindow(const QStringList &args) {
     QStringList arguments = args;
     arguments << QLatin1String("--no-single-application");
     arguments << QLatin1String("--auth");
-    arguments << qnSettings->lastUsedConnection().url.toEncoded();
+    arguments << QLatin1String(qnSettings->lastUsedConnection().url.toEncoded());
 
     /* For now, simply open it at another screen. Don't account for 3+ monitor setups. */
     if(widget()) {
@@ -1361,7 +1361,7 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
         timeString = QTime().addMSecs(time).toString(QLatin1String("hh.mm.ss"));
     }
 
-    QString suggetion = replaceNonFileNameCharacters(widget->resource()->getName(), QChar('_')) + QLatin1String("_") + timeString; 
+    QString suggetion = replaceNonFileNameCharacters(widget->resource()->getName(), QLatin1Char('_')) + QLatin1Char('_') + timeString; 
 
     QSettings settings;
     settings.beginGroup(QLatin1String("screenshots"));
@@ -1516,7 +1516,7 @@ Do you want to continue?"),
             QFileDialog::DontUseNativeDialog
             );
 
-        selectedExtension = ".nov";
+        selectedExtension = QLatin1String(".nov");
         if (fileName.isEmpty())
             return;
 
@@ -1586,11 +1586,11 @@ Do you want to continue?"),
         }
     }
     QFile::remove(fileName);
-    fileName = QString("layout://") + fileName;
+    fileName = QLatin1String("layout://") + fileName;
 
     m_exportStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(fileName));
     m_exportStorage->setUrl(fileName);
-    QIODevice* device = m_exportStorage->open("layout.pb", QIODevice::WriteOnly);
+    QIODevice* device = m_exportStorage->open(QLatin1String("layout.pb"), QIODevice::WriteOnly);
     if (device)
     {
         QnApiPbSerializer serializer;
@@ -1619,7 +1619,7 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
         m_layoutExportCamera->setExportProgressOffset(m_layoutExportCamera->getExportProgressOffset() + 100);
         QnMediaResourcePtr mediaRes = m_layoutExportResources.dequeue();
         m_layoutExportCamera->setResource(mediaRes);
-        m_layoutExportCamera->exportMediaPeriodToFile(m_exportPeriod.startTimeMs * 1000ll, (m_exportPeriod.startTimeMs + m_exportPeriod.durationMs) * 1000ll, mediaRes->getUniqueId(), "mkv", m_exportStorage);
+        m_layoutExportCamera->exportMediaPeriodToFile(m_exportPeriod.startTimeMs * 1000ll, (m_exportPeriod.startTimeMs + m_exportPeriod.durationMs) * 1000ll, mediaRes->getUniqueId(), QLatin1String("mkv"), m_exportStorage);
 
         QnLayoutResourcePtr layout =  QnLayoutResource::fromFile(m_layoutFileName);
         if (layout) {
@@ -1716,7 +1716,7 @@ Do you want to continue?"),
             return;
 
         if (!fileName.toLower().endsWith(QLatin1String(".mkv")) && !fileName.toLower().endsWith(QLatin1String(".avi"))) {
-            fileName += QChar('.') + selectedExtension;
+            fileName += QLatin1Char('.') + selectedExtension;
 
             if (QFile::exists(fileName)) {
                 QMessageBox::StandardButton button = QMessageBox::information(

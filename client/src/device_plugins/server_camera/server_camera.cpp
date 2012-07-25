@@ -23,7 +23,7 @@ void QnServerCameraProcessor::processResources(const QnResourceList &resources)
             // set proxy. If some media server IF will be found, proxy address will be cleared
             QString url = QnAppServerConnectionFactory::defaultUrl().host();
             if (url.isEmpty())
-                url = "127.0.0.1";
+                url = QLatin1String("127.0.0.1");
             int port = QnAppServerConnectionFactory::defaultMediaProxyPort();
             QnRtspClientArchiveDelegate::setProxyAddr(url, port);
             QnVideoServerConnection::setProxyAddr(url, port);
@@ -50,27 +50,30 @@ bool QnServerCamera::updateMACAddress()
 
 QString QnServerCamera::manufacture() const
 {
-    return "Server camera";
+    return QLatin1String("Server camera"); //all other manufacture are also untranslated and should not be translated
 }
 
 void QnServerCamera::setIframeDistance(int frames, int timems)
 {
-
+    Q_UNUSED(frames)
+    Q_UNUSED(timems)
 }
 
 void QnServerCamera::setCropingPhysical(QRect croping)
 {
-
+    Q_UNUSED(croping)
 }
 
 const QnVideoResourceLayout* QnServerCamera::getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
 {
+    Q_UNUSED(dataProvider)
     // todo: layout must be loaded in resourceParams
     return QnMediaResource::getVideoLayout();
 }
 
 const QnResourceAudioLayout* QnServerCamera::getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
 {
+    Q_UNUSED(dataProvider)
     // todo: layout must be loaded in resourceParams
     return QnMediaResource::getAudioLayout();
 }
@@ -99,7 +102,7 @@ QnResourcePtr QnServerCameraFactory::createResource(QnId resourceTypeId, const Q
     if (resourceType.isNull())
         return resource;
 
-    if (resourceType->getName() == "Storage")
+    if (resourceType->getName() == QLatin1String("Storage"))
     {
         //  storage = QnAbstractStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(pb_storage.url().c_str()));
         resource =  QnAbstractStorageResourcePtr(new QnAbstractStorageResource());

@@ -27,6 +27,7 @@ int QnTestCameraStreamReader::receiveData(quint8* buffer, int size)
             return readed;
         done += readed;
     }
+    return done;
 }
 
 QnAbstractMediaDataPtr QnTestCameraStreamReader::getNextData()
