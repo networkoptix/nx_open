@@ -431,7 +431,7 @@ int QnPlAxisResource::getChannelNum() const
 {
     QString phId = getPhysicalId();
 
-    int index = phId.indexOf("_channel_");
+    int index = phId.indexOf(QLatin1String("_channel_"));
     if (index<0)
         return 1;
 

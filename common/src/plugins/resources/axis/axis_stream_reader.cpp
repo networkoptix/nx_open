@@ -58,10 +58,10 @@ void QnAxisStreamReader::openStream()
     QnPlAxisResourcePtr res = getResource().dynamicCast<QnPlAxisResource>();
 
     int channels = 1;
-    if (res->hasSuchParam("channelsAmount"))
+    if (res->hasSuchParam(QLatin1String("channelsAmount")))
     {
         QVariant val;
-        res->getParam("channelsAmount", val, QnDomainMemory);
+        res->getParam(QLatin1String("channelsAmount"), val, QnDomainMemory);
         channels = val.toUInt();
     }
 

@@ -131,7 +131,10 @@ bool QnCommandLineParser::parse(int &argc, char **argv, QTextStream *errorStream
         bool success = typedValue.convert(static_cast<QVariant::Type>(parameter.type()));
         if(!success) {
             if(errorStream)
-                *errorStream << tr("Invalid value for '%1' argument - expected %2, provided '%3'.").arg(name).arg(QMetaType::typeName(parameter.type())).arg(value.toString()) << endl;
+                *errorStream << tr("Invalid value for '%1' argument - expected %2, provided '%3'.")
+                    .arg(name)
+                    .arg(QLatin1String(QMetaType::typeName(parameter.type())))
+                    .arg(value.toString()) << endl;
             result = false;
         } else {
             value = typedValue;
