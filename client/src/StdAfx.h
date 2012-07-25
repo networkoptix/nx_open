@@ -34,7 +34,8 @@ extern "C" {
 	#include <libavutil/avstring.h>
 }
 
-#if defined __cplusplus
+#ifdef __cplusplus
+
 // stl headers
 #include <algorithm>
 #include <functional>
