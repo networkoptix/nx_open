@@ -152,6 +152,8 @@ void CLVideoCamera::setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val)
 
 void CLVideoCamera::setQuality(QnStreamQuality q, bool increase)
 {
+    Q_UNUSED(q)
+    Q_UNUSED(increase)
     /*
 	if (increase && m_reader->getQuality() >= q)
 		return;
@@ -185,7 +187,7 @@ void CLVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, co
         if (m_exportReader == 0)
         {
             delete tmpReader;
-            emit recordingFailed("Invalid resource type for export data");
+            emit recordingFailed(tr("Invalid resource type for export data"));
             return;
         }
 

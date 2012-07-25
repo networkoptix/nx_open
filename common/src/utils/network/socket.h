@@ -48,6 +48,7 @@ private:
  *   Base class representing basic communication endpoint
  */
 class Socket {
+    Q_DECLARE_TR_FUNCTIONS(Socket)
 public:
     /**
      *   Close and deallocate this socket
@@ -124,7 +125,7 @@ public:
      *   @param protocol protocol of service to resolve.  Default is "tcp".
      */
     static unsigned short resolveService(const QString &service,
-                                         const QString &protocol = "tcp");
+                                         const QString &protocol = QLatin1String("tcp"));
 
     int handle() const { return sockDesc; }
 

@@ -10,7 +10,7 @@ QnContextHelp::QnContextHelp():
     m_currentId(ContextId_Invalid),
     m_autoShowNeeded(true)
 {
-    installHelpContext("en");
+    installHelpContext(QLatin1String("en"));
     
     m_settings.beginGroup(QLatin1String("helpContext"));
     deserializeShownContext();
@@ -28,19 +28,19 @@ QnContextHelp::~QnContextHelp()
 
 void QnContextHelp::deserializeShownContext()
 {
-    QVariant value = m_settings.value("autoShowNeeded");
+    QVariant value = m_settings.value(QLatin1String("autoShowNeeded"));
     if(value.isValid())
         m_autoShowNeeded = value.toBool();
 }
 
 void QnContextHelp::serializeShownContext()
 {
-    m_settings.setValue("autoShowNeeded", m_autoShowNeeded);
+    m_settings.setValue(QLatin1String("autoShowNeeded"), m_autoShowNeeded);
 }
 
 void QnContextHelp::installHelpContext(const QString& lang)
 {
-    QString trFileName = QString(":/help/context_help_") + lang + QString(".qm");
+    QString trFileName = QLatin1String(":/help/context_help_") + lang + QLatin1String(".qm");
     QFile file(trFileName);
     if (file.open(QFile::ReadOnly))
     {

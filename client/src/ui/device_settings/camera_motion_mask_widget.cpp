@@ -127,6 +127,7 @@ const QList<QnMotionRegion> &QnCameraMotionMaskWidget::motionRegionList() const 
     if (m_resourceWidget)
         return m_resourceWidget->motionSensitivity();
     else
+        // TODO: returning temporary here.
         return QList<QnMotionRegion>();
 }
 

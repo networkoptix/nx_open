@@ -13,7 +13,7 @@ QnAviResource::QnAviResource(const QString& file)
     //setUrl(QDir::cleanPath(file));
     setUrl(file);
     QString shortName = QFileInfo(file).fileName();
-    setName(shortName.mid(shortName.indexOf('?')+1));
+    setName(shortName.mid(shortName.indexOf(QLatin1Char('?'))+1));
 }
 
 QnAviResource::~QnAviResource()

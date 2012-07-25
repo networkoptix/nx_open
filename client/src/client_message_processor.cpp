@@ -24,9 +24,9 @@ QnClientMessageProcessor* QnClientMessageProcessor::instance()
 void QnClientMessageProcessor::init()
 {
     QUrl appServerEventsUrl = QnAppServerConnectionFactory::defaultUrl();
-    appServerEventsUrl.setPath("/events/");
-	appServerEventsUrl.addQueryItem("format", "pb");
-    appServerEventsUrl.addQueryItem("guid", QnAppServerConnectionFactory::clientGuid());
+    appServerEventsUrl.setPath(QLatin1String("/events/"));
+	appServerEventsUrl.addQueryItem(QLatin1String("format"), QLatin1String("pb"));
+    appServerEventsUrl.addQueryItem(QLatin1String("guid"), QnAppServerConnectionFactory::clientGuid());
     init(appServerEventsUrl, EVENT_RECONNECT_TIMEOUT);
 }
 
@@ -59,6 +59,7 @@ void QnClientMessageProcessor::stop()
 
 void QnClientMessageProcessor::at_resourcesReceived(int status, const QByteArray& errorString, QnResourceList resources, int handle)
 {
+    Q_UNUSED(handle)
 	if (status != 0)
 	{
 		qDebug() << "QnEventManager::resourcesReceived(): Can't get resource from appserver. Reason: " << errorString;
@@ -84,6 +85,9 @@ void QnClientMessageProcessor::at_resourcesReceived(int status, const QByteArray
 
 void QnClientMessageProcessor::at_licensesReceived(int status, const QByteArray &errorString, QnLicenseList licenses, int handle)
 {
+    Q_UNUSED(handle)
+    Q_UNUSED(errorString)
+    Q_UNUSED(status)
     foreach (QnLicensePtr license, licenses.licenses())
     {
         // Someone wants to steal our software
@@ -191,5 +195,5 @@ void QnClientMessageProcessor::at_connectionOpened()
 void QnClientMessageProcessor::at_connectionReset()
 {
     QnAppServerConnectionFactory::createConnection()->
-            getResourcesAsync("", "resource", this, SLOT(at_resourcesReceived(int,QByteArray,QnResourceList,int)));
+            getResourcesAsync(QLatin1String(""), QLatin1String("resource"), this, SLOT(at_resourcesReceived(int,QByteArray,QnResourceList,int)));
 }

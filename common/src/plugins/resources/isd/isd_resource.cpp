@@ -6,20 +6,20 @@
 
 
 const char* QnPlIsdResource::MANUFACTURE = "ISD";
-QString QnPlIsdResource::MAX_FPS_PARAM_NAME = QString("MaxFPS");
+QString QnPlIsdResource::MAX_FPS_PARAM_NAME = QLatin1String("MaxFPS");
 
 static QStringList getValues(const QString& line)
 {
     QStringList result;
 
-    int index = line.indexOf("=");
+    int index = line.indexOf(QLatin1Char('='));
 
     if (index < 0)
         return result;
 
     QString values = line.mid(index+1);
 
-    return values.split(",");
+    return values.split(QLatin1Char(','));
 }
 
 static bool sizeCompare(const QSize &s1, const QSize &s2)
@@ -39,7 +39,7 @@ static float getResolutionAspectRatio(QSize s)
 
 QnPlIsdResource::QnPlIsdResource()
 {
-    setAuth("root", "admin");
+    setAuth(QLatin1String("root"), QLatin1String("admin"));
     
 }
 
@@ -55,7 +55,7 @@ bool QnPlIsdResource::updateMACAddress()
 
 QString QnPlIsdResource::manufacture() const
 {
-    return MANUFACTURE;
+    return QLatin1String(MANUFACTURE);
 }
 
 void QnPlIsdResource::setIframeDistance(int /*frames*/, int /*timems*/)
@@ -65,7 +65,7 @@ void QnPlIsdResource::setIframeDistance(int /*frames*/, int /*timems*/)
 bool QnPlIsdResource::initInternal()
 {
     CLHttpStatus status;
-    QByteArray reslst = downloadFile(status, "api/param.cgi?req=VideoInput.1.h264.1.ResolutionList",  getHostAddress(), 80, 3000, getAuth());
+    QByteArray reslst = downloadFile(status, QLatin1String("api/param.cgi?req=VideoInput.1.h264.1.ResolutionList"),  getHostAddress(), 80, 3000, getAuth());
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
@@ -73,15 +73,14 @@ bool QnPlIsdResource::initInternal()
         return false;
     }
 
-    QString line(reslst);
-    QStringList vals = getValues(line);
+    QStringList vals = getValues(QLatin1String(reslst));
 
 
     QList<QSize> resolutions;
 
     foreach(const QString& val,  vals)
     {
-        QStringList wh_s = val.split("x");
+        QStringList wh_s = val.split(QLatin1Char('x'));
         if (wh_s.size()<2)
             continue;
 
@@ -161,7 +160,7 @@ bool QnPlIsdResource::initInternal()
     /**/
 
 
-    QByteArray fpses = downloadFile(status, "api/param.cgi?req=VideoInput.1.h264.1.FrameRateList",  getHostAddress(), 80, 3000, getAuth());
+    QByteArray fpses = downloadFile(status, QLatin1String("api/param.cgi?req=VideoInput.1.h264.1.FrameRateList"),  getHostAddress(), 80, 3000, getAuth());
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
@@ -172,8 +171,7 @@ bool QnPlIsdResource::initInternal()
     /**/
     
 
-    QString line2(fpses);
-    vals = getValues(line2);
+    vals = getValues(QLatin1String(fpses));
 
     QList<int> fpsList;
     foreach(QString fpsS, vals)

@@ -243,7 +243,7 @@ bool QnNetworkResource::conflicting()
 
 //#ifndef _WIN32
     // If mac is empty or resolution is not implemented
-    if (mac == "")
+    if (mac.isEmpty())
         return false;
 //#endif
 
@@ -268,13 +268,13 @@ bool QnNetworkResource::conflicting()
 
 
 
-    if (mac!=m_macAddress.toString() && mac!="00-00-00-00-00-00")// someone else has this IP
+    if (mac!=m_macAddress.toString() && mac!=QLatin1String("00-00-00-00-00-00"))// someone else has this IP
     {
         addNetworkStatus(QnNetworkResource::BadHostAddr);
         return true;
     }
 
-    if (mac=="00-00-00-00-00-00")
+    if (mac==QLatin1String("00-00-00-00-00-00"))
     {
         CL_LOG(cl_logERROR) cl_log.log("00-00-00-00-00-00 mac record in OS arp( got it once on WIN7) table?!", cl_logERROR);
     }

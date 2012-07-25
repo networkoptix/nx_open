@@ -52,14 +52,12 @@ void QnISDStreamReader::openStream()
 
     
     request.append(result.toLatin1());
-    CLHttpStatus status = http.doPOST(QByteArray("/api/param.cgi"), request);
+    CLHttpStatus status = http.doPOST(QByteArray("/api/param.cgi"), QLatin1String(request));
     QnSleep::msleep(3000);
 
-    QString urlrequest = "api/param.cgi?req=VideoInput.1.h264.1.Rtsp.AbsolutePath";
-    if (role == QnResource::Role_SecondaryLiveVideo)
-        urlrequest = "api/param.cgi?req=VideoInput.1.h264.2.Rtsp.AbsolutePath";
-
-
+    QString urlrequest = (role == QnResource::Role_SecondaryLiveVideo)
+        ? QLatin1String("api/param.cgi?req=VideoInput.1.h264.2.Rtsp.AbsolutePath")
+        : QLatin1String("api/param.cgi?req=VideoInput.1.h264.1.Rtsp.AbsolutePath");
 
     QByteArray reslst = downloadFile(status, urlrequest,  res->getHostAddress(), 80, 3000, res->getAuth());
     if (status == CL_HTTP_AUTH_REQUIRED)
@@ -68,12 +66,9 @@ void QnISDStreamReader::openStream()
         return;
     }
 
+    QString url = getValueFromString(QLatin1String(reslst));
 
-    QString reslstS(reslst);
-
-    QString url = getValueFromString(reslstS);
-
-    QStringList urlLst = url.split('\r', QString::SkipEmptyParts);
+    QStringList urlLst = url.split(QLatin1Char('\r'), QString::SkipEmptyParts);
     if(urlLst.size() < 1)
         return;
 

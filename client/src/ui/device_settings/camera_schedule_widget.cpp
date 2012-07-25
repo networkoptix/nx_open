@@ -247,7 +247,7 @@ void QnCameraScheduleWidget::setScheduleTasks(const QList<QnScheduleTask::Data> 
             break;
         }
 
-        QString shortQuality("-");
+        QString shortQuality = QLatin1String("-");
         if (task.m_recordType != QnScheduleTask::RecordingType_Never)
         {
             switch (task.m_streamQuality) 
@@ -263,7 +263,7 @@ void QnCameraScheduleWidget::setScheduleTasks(const QList<QnScheduleTask::Data> 
         }
 
         //int fps = task.m_fps;
-        QString fps("-");
+        QString fps = QLatin1String("-");
         if (task.m_recordType != QnScheduleTask::RecordingType_Never)
             fps = QString::number(task.m_fps);
 

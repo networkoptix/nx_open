@@ -30,7 +30,7 @@ DesktopDeviceServer::~DesktopDeviceServer()
 
 QString DesktopDeviceServer::manufacture() const
 {
-    return "NetworkOptix";
+    return QLatin1String("NetworkOptix");
 }
 
 QnResourceList DesktopDeviceServer::findResources()
@@ -59,11 +59,14 @@ QnResourceList DesktopDeviceServer::findResources()
 
 bool DesktopDeviceServer::isResourceTypeSupported(QnId resourceTypeId) const
 {
+    Q_UNUSED(resourceTypeId)
     return false;
 }
 
 QnResourcePtr DesktopDeviceServer::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
 {
+    Q_UNUSED(resourceTypeId)
+    Q_UNUSED(parameters)
     return QnResourcePtr(0);
 }
 

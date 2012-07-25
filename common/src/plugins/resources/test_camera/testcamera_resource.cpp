@@ -25,7 +25,7 @@ bool QnTestCameraResource::updateMACAddress()
 
 QString QnTestCameraResource::manufacture() const
 {
-    return MANUFACTURE;
+    return QLatin1String(MANUFACTURE);
 }
 
 void QnTestCameraResource::setIframeDistance(int /*frames*/, int /*timems*/)
@@ -47,8 +47,8 @@ void QnTestCameraResource::setCropingPhysical(QRect /*croping*/)
 QHostAddress QnTestCameraResource::getHostAddress() const
 {
     QString url = getUrl();
-    int start = QString("tcp://").length();
-    int end = url.indexOf(':', start);
+    int start = QString(QLatin1String("tcp://")).length();
+    int end = url.indexOf(QLatin1Char(':'), start);
     if (start >= 0 && end > start)
         return QHostAddress(url.mid(start, end-start));
     else

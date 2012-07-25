@@ -319,22 +319,22 @@ QnVideoResourceLayout* QnAviArchiveDelegate::getVideoLayout()
         m_videoLayout = new QnCustomDeviceVideoLayout(1, 1);
 
         // prevent standart tag name parsing in 'avi' format
-        QString format = QString(m_formatContext->iformat->name).split(',')[0];
+        QString format = QString(QLatin1String(m_formatContext->iformat->name)).split(QLatin1Char(','))[0];
 
         AVDictionaryEntry* software = av_dict_get(m_formatContext->metadata, getTagName(Tag_Software, format), 0, 0);
-        bool allowTags = format != QString("avi") || (software && QString(software->value) == QString("Network Optix"));
+        bool allowTags = format != QLatin1String("avi") || (software && QString(QLatin1String(software->value)) == QLatin1String("Network Optix"));
 
         if (allowTags)
         {
             AVDictionaryEntry* layoutInfo = av_dict_get(m_formatContext->metadata,getTagName(Tag_LayoutInfo, format), 0, 0);
             if (layoutInfo)
-                deserializeLayout(m_videoLayout, layoutInfo->value);
+                deserializeLayout(m_videoLayout, QLatin1String(layoutInfo->value));
 
             if (m_useAbsolutePos)
             {
                 AVDictionaryEntry* start_time = av_dict_get(m_formatContext->metadata,getTagName(Tag_startTime, format), 0, 0);
                 if (start_time) {
-                    m_startTime = QString(start_time->value).toLongLong()*1000ll;
+                    m_startTime = QString(QLatin1String(start_time->value)).toLongLong()*1000ll;
 					if (m_startTime >= UTC_TIME_DETECTION_THRESHOLD) {
 						if (qSharedPointerDynamicCast<QnLayoutFileStorageResource>(m_storage))
 							m_resource->addFlags(QnResource::utc); // use sync for exported layout only
@@ -438,10 +438,10 @@ qint64 QnAviArchiveDelegate::packetTimestamp(const AVPacket& packet)
 
 bool QnAviArchiveDelegate::deserializeLayout(QnCustomDeviceVideoLayout* layout, const QString& layoutStr)
 {
-    QStringList info = layoutStr.split(';');
+    QStringList info = layoutStr.split(QLatin1Char(';'));
     for (int i = 0; i < info.size(); ++i)
     {
-        QStringList params = info[i].split(',');
+        QStringList params = info[i].split(QLatin1Char(','));
         if (params.size() != 2) {
             cl_log.log("Invalid layout string stored at file metadata. Ignored.", cl_logWARNING);
             return false;
@@ -512,7 +512,7 @@ void QnAviArchiveDelegate::setStorage(const QnStorageResourcePtr &storage)
 
 const char* QnAviArchiveDelegate::getTagName(Tag tag, const QString& formatName)
 {
-    if (formatName == QString("avi"))
+    if (formatName == QLatin1String("avi"))
     {
         switch(tag)
         {

@@ -6,6 +6,7 @@
 
 class QnTestCameraResourceSearcher : public QnAbstractNetworkResourceSearcher
 {
+    Q_DECLARE_TR_FUNCTIONS(QnTestCameraResourceSearcher)
     QnTestCameraResourceSearcher();
 public:
     static QnTestCameraResourceSearcher& instance();

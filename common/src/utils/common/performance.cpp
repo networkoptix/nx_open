@@ -518,7 +518,7 @@ QString estimateCpuBrand() {
         else if  (i == 0x80000004)
             memcpy(brandString + 32, oCPUInfo, sizeof(oCPUInfo));
     }
-    return brandString;
+    return QLatin1String(brandString);
 #elif defined(Q_OS_LINUX)
     // 13 - const length of 'model name : ' string with tabs - standard output of /proc/cpuinfo
     return getSystemOutput("grep \"model name\" /proc/cpuinfo | head -1").mid(13);

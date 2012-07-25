@@ -172,7 +172,7 @@ QString QnArchiveStreamReader::serializeLayout(const QnVideoResourceLayout* layo
     QString rez;
     QTextStream ost(&rez);
     ost << layout->width() << ',' << layout->height();
-    for (unsigned i = 0; i < layout->numberOfChannels(); ++i) {
+    for (int i = 0; i < layout->numberOfChannels(); ++i) {
         ost << ';' << layout->h_position(i) << ',' << layout->v_position(i);
     }
     ost.flush();
@@ -913,7 +913,7 @@ bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
         return m_navDelegate->jumpTo(mksec, skipTime);
     }
 
-    qDebug() << "jumpTo(" << QDateTime::fromMSecsSinceEpoch(mksec / 1000).toString("hh:mm:ss.zzz") << "," << (mksec == skipTime ? "precise" : "rough") << ")";
+    qDebug() << "jumpTo(" << QDateTime::fromMSecsSinceEpoch(mksec / 1000).toString(QLatin1String("hh:mm:ss.zzz")) << "," << (mksec == skipTime ? "precise" : "rough") << ")";
 
     qint64 newTime = mksec;
     m_playbackMaskSync.lock();

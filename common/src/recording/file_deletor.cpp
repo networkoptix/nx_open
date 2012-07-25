@@ -17,20 +17,20 @@ void QnFileDeletor::init(const QString& tmpRoot)
 {
     m_firstTime = true;
     m_mediaRoot = closeDirPath(tmpRoot);
-    m_deleteCatalog.setFileName(m_mediaRoot +  "delete_latter.csv");
+    m_deleteCatalog.setFileName(m_mediaRoot +  QLatin1String("delete_latter.csv"));
 }
 
 bool QnFileDeletor::internalDeleteFile(const QString& fileName)
 {
     if (!QFile::remove(fileName))
         return false;
-    QString dirName = fileName.left(fileName.lastIndexOf('/'));
+    QString dirName = fileName.left(fileName.lastIndexOf(QLatin1Char('/')));
     while(1) 
     {
         QDir dir (dirName);
         if (!dir.rmdir(dirName))
             break;
-        dirName = dirName.left(dirName.lastIndexOf('/'));
+        dirName = dirName.left(dirName.lastIndexOf(QLatin1Char('/')));
     }
     return true;
 }
@@ -106,7 +106,7 @@ void QnFileDeletor::processPostponedFiles()
         return;
     }
 
-    QFile tmpFile(m_mediaRoot + "tmp.csv");
+    QFile tmpFile(m_mediaRoot + QLatin1String("tmp.csv"));
     if (!tmpFile.open(QFile::WriteOnly | QFile::Truncate))
         return;
     foreach(QString fileName, newList)

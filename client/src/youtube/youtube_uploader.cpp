@@ -223,9 +223,9 @@ void YouTubeUploader::readCategoryList()
     QNetworkRequest request;
     QLocale locale;
     QString langStr = locale.name();
-    langStr = langStr.replace('_', '-');
-    request.setUrl(QUrl(QString("http://gdata.youtube.com/schemas/2007/categories.cat?hl=") + langStr));
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
+    langStr = langStr.replace(QLatin1Char('_'), QLatin1Char('-'));
+    request.setUrl(QUrl(QLatin1String("http://gdata.youtube.com/schemas/2007/categories.cat?hl=") + langStr));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, QLatin1String("application/x-www-form-urlencoded"));
 
     m_categoryReply = m_manager->get(request);
     connect(m_categoryReply, SIGNAL(error(QNetworkReply::NetworkError)),
@@ -235,8 +235,8 @@ void YouTubeUploader::readCategoryList()
 void YouTubeUploader::login()
 {
     QNetworkRequest request;
-    request.setUrl(QUrl("https://www.google.com/accounts/ClientLogin"));
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
+    request.setUrl(QUrl(QLatin1String("https://www.google.com/accounts/ClientLogin")));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, QLatin1String("application/x-www-form-urlencoded"));
 
     QByteArray postData;
     postData.append("Email=" + QUrl::toPercentEncoding(m_login));
@@ -276,7 +276,7 @@ void YouTubeUploader::uploadFile(const QString& filename, const QString& title, 
 void YouTubeUploader::upload()
 {
     QNetworkRequest request;
-    request.setUrl(QUrl("http://uploads.gdata.youtube.com/feeds/api/users/default/uploads"));
+    request.setUrl(QUrl(QLatin1String("http://uploads.gdata.youtube.com/feeds/api/users/default/uploads")));
     request.setRawHeader("Host","uploads.gdata.youtube.com");
     request.setRawHeader("Authorization","GoogleLogin auth=" + m_auth);
     request.setRawHeader("GData-Version","2");

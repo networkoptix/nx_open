@@ -222,7 +222,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_fpsItem = new GraphicsLabel(m_controlsWidget);
     m_fpsItem->setAcceptedMouseButtons(0);
     m_fpsItem->setAcceptsHoverEvents(false);
-    m_fpsItem->setFont(QFont("Courier New", 10));
+    m_fpsItem->setFont(QFont(QLatin1String("Courier New"), 10));
     {
         QPalette palette = m_fpsItem->palette();
         palette.setColor(QPalette::Window, QColor(0, 0, 0, 0));
@@ -1316,7 +1316,7 @@ void QnWorkbenchUi::at_activityStarted() {
 }
 
 void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role) {
-    QnResourceWidget *oldWidget = m_widgetByRole[role];
+    //QnResourceWidget *oldWidget = m_widgetByRole[role];
     QnResourceWidget *newWidget = display()->widget(role);
     m_widgetByRole[role] = newWidget;
 

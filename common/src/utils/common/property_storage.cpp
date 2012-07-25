@@ -238,7 +238,7 @@ bool QnPropertyStorage::updateFromCommandLine(int &argc, char **argv, QTextStrea
             if(errorStream) {
                 QString message = tr("Invalid value for '%1' argument - expected %2, provided '%3'.").
                     arg(name).
-                    arg(QMetaType::typeName(m_typeById.value(id, QMetaType::Void))).
+                    arg(QLatin1String(QMetaType::typeName(m_typeById.value(id, QMetaType::Void)))).
                     arg(value.toString());
 
                 *errorStream << message << endl;

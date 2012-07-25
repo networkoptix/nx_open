@@ -52,13 +52,13 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
     /* Don't allow to save passwords, at least for now. */
     //ui->savePasswordCheckBox->hide();
 
-    QDir dir(":/skin");
-    QStringList	introList = dir.entryList(QStringList() << "intro.*");
-    QString resourceName = ":/skin/intro";
+    QDir dir(QLatin1String(":/skin"));
+    QStringList	introList = dir.entryList(QStringList() << QLatin1String("intro.*"));
+    QString resourceName = QLatin1String(":/skin/intro");
     if (!introList.isEmpty())
-        resourceName = QString(":/skin/") + introList.first();
+        resourceName = QLatin1String(":/skin/") + introList.first();
 
-    QnAviResourcePtr resource = QnAviResourcePtr(new QnAviResource(QString("qtfile://") + resourceName));
+    QnAviResourcePtr resource = QnAviResourcePtr(new QnAviResource(QLatin1String("qtfile://") + resourceName));
     if (FileTypeSupport::isImageFileExt(resourceName))
         resource->addFlags(QnResource::still_image);
 
@@ -134,7 +134,7 @@ QUrl LoginDialog::currentUrl() const {
     const int row = ui->connectionsComboBox->currentIndex();
 
     QUrl url;
-    url.setScheme("https");
+    url.setScheme(QLatin1String("https"));
     url.setHost(m_connectionsModel->item(row, 1)->text());
     url.setPort(m_connectionsModel->item(row, 2)->text().toInt());
     url.setUserName(m_connectionsModel->item(row, 3)->text());
@@ -166,10 +166,10 @@ void LoginDialog::accept() {
 		QUrl httpUrl;
 		httpUrl.setHost(url.host());
 		httpUrl.setPort(url.port());
-		httpUrl.setScheme("http");
-		httpUrl.setUserName("");
-		httpUrl.setPassword("");
-		QnSessionManager::instance()->sendAsyncGetRequest(httpUrl, "resourceEx", this, SLOT(at_oldHttpConnectFinished(int,QByteArray,QByteArray,int)));
+		httpUrl.setScheme(QLatin1String("http"));
+		httpUrl.setUserName(QString());
+		httpUrl.setPassword(QString());
+		QnSessionManager::instance()->sendAsyncGetRequest(httpUrl, QLatin1String("resourceEx"), this, SLOT(at_oldHttpConnectFinished(int,QByteArray,QByteArray,int)));
 	}
 
     updateUsability();

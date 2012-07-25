@@ -126,9 +126,9 @@ void QnLicenseManagerWidget::showLicenseDetails(const QnLicensePtr &license){
         "<br />\n"
         "<b>Features:</b><br />\n"
         "Archive Streams Allowed: %4")
-        .arg(license->name().toUtf8().constData())
-        .arg(license->key().constData())
-        .arg(license->hardwareId().constData())
+        .arg(license->name())
+        .arg(QLatin1String(license->key()))
+        .arg(QLatin1String(license->hardwareId()))
         .arg(license->cameraCount());
     QMessageBox::information(this, tr("License Details"), details);
 }
@@ -200,7 +200,7 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged() {
         return;
 
     if (ui->licenseWidget->isOnline()) {
-        updateFromServer(ui->licenseWidget->serialKey(), m_licenses.hardwareId());
+        updateFromServer(ui->licenseWidget->serialKey(), QLatin1String(m_licenses.hardwareId()));
     } else {
         validateLicense(QnLicensePtr(new QnLicense(QnLicense::fromString(ui->licenseWidget->activationKey()))));
         ui->licenseWidget->setState(LicenseWidget::Normal);

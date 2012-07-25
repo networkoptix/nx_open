@@ -362,6 +362,7 @@ void QnMediaResourceWidget::paintFilledRegion(QPainter *painter, const QRectF &r
 }
 
 void QnMediaResourceWidget::paintMotionSensitivityIndicators(QPainter *painter, int channel, const QRectF &rect, const QnMotionRegion &region) {
+    Q_UNUSED(channel)
     qreal xStep = rect.width() / MD_WIDTH;
     qreal yStep = rect.height() / MD_HEIGHT;
 

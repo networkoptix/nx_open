@@ -50,7 +50,7 @@ CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QStr
     {
         if (!m_connected)
         {
-            if (!m_sock->connect(m_host.toString().toLatin1().data(), m_port))
+            if (!m_sock->connect(m_host.toString(), m_port))
             {
                 return CL_TRANSPORT_ERROR;
             }
@@ -74,7 +74,7 @@ CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QStr
         }
         else if (m_auth.password().length()>0 && !mNonce.isEmpty())
         {
-            request.append(digestAccess(request));
+            request.append(digestAccess(QLatin1String(request)));
         }
 
         request.append("Content-Length: ");
@@ -198,7 +198,7 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
     {
         if (!m_connected)
         {
-            if (!m_sock->connect(m_host.toString().toLatin1().data(), m_port))
+            if (!m_sock->connect(m_host.toString(), m_port))
             {
                 return CL_TRANSPORT_ERROR;
             }
@@ -220,7 +220,7 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
         }
         else if (m_auth.password().length()>0 && !mNonce.isEmpty())
         {
-            request.append(digestAccess(requestStr));
+            request.append(digestAccess(QLatin1String(requestStr)));
         }
 
         request.append("\r\n");
@@ -347,14 +347,14 @@ void CLSimpleHTTPClient::getAuthInfo()
             param[0] = param[0].trimmed();
             param[1] = param[1].trimmed();
             param[1] = param[1].mid(1, param[1].length()-2);
-            if (param[0] == "realm")
-                mRealm = param[1];
-            else if (param[0] == "nonce")
-                mNonce = param[1];
-            else if (param[0] == "qop")
-                mQop = param[1];
+            if (param[0] == QByteArray("realm"))
+                mRealm = QLatin1String(param[1]);
+            else if (param[0] == QByteArray("nonce"))
+                mNonce = QLatin1String(param[1]);
+            else if (param[0] == QByteArray("qop"))
+                mQop = QLatin1String(param[1]);
         }
-        if (param.startsWith("digest"));
+       // if (param.startsWith("digest")); /** Empty statement? */
     }
 }
 
@@ -380,7 +380,7 @@ QString CLSimpleHTTPClient::digestAccess(const QAuthenticator& auth, const QStri
     QString HA1= auth.user() + QLatin1Char(':') + realm + QLatin1Char(':') + auth.password();
     HA1 = QString::fromAscii(QCryptographicHash::hash(HA1.toAscii(), QCryptographicHash::Md5).toHex().constData());
 
-    QString HA2 = method + QString(':') + url;
+    QString HA2 = method + QLatin1Char(':') + url;
     HA2 = QString::fromAscii(QCryptographicHash::hash(HA2.toAscii(), QCryptographicHash::Md5).toHex().constData());
 
     QString response = HA1 + QLatin1Char(':') + nonce + QLatin1Char(':') + HA2;
@@ -399,7 +399,7 @@ QString CLSimpleHTTPClient::digestAccess(const QAuthenticator& auth, const QStri
 
 QString CLSimpleHTTPClient::digestAccess(const QString& request) const
 {
-    return digestAccess(m_auth, mRealm, mNonce, QLatin1String("GET"), QString('/') + request);
+    return digestAccess(m_auth, mRealm, mNonce, QLatin1String("GET"), QLatin1Char('/') + request);
 }
 
 

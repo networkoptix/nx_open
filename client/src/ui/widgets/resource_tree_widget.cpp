@@ -449,7 +449,7 @@ void QnResourceTreeWidget::updateFilter(bool force) {
         return;
 
     if(!force) {
-        int pos = qMax(filter.lastIndexOf(QChar('+')), filter.lastIndexOf(QChar('\\'))) + 1;
+        int pos = qMax(filter.lastIndexOf(QLatin1Char('+')), filter.lastIndexOf(QLatin1Char('\\'))) + 1;
         
         /* Estimate size of the last term in filter expression. */
         int size = 0;
