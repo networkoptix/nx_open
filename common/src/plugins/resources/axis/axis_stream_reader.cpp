@@ -177,9 +177,8 @@ void QnAxisStreamReader::openStream()
     stream << "axis-media/media.amp?streamprofile=" << profileName;
 
 
-    if (channels > 1) //
+    if (channels > 1)
     {
-        qWarning() << "starting axis channel " << res->getChannelNum();
         stream << "&camera=" << res->getChannelNum();
     }
 

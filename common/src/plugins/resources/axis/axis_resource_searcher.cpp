@@ -146,8 +146,6 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(QnResourceLi
     if (channesl > 1) //
     {
 
-        qWarning() << "found resource " << name << " with " << channesl << " channels";
-
         resource->setPhysicalId(resource->getPhysicalId() + QString("_channel_") + QString::number(1));
 
         for (int i = 2; i <= channesl; ++i)
