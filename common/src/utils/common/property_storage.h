@@ -69,6 +69,7 @@ public:
     void updateFromSettings(QSettings *settings);
     void submitToSettings(QSettings *settings) const;
 
+    bool updateFromCommandLine(int &argc, char **argv, FILE *errorFile);
     bool updateFromCommandLine(int &argc, char **argv, QTextStream *errorStream);
 
 signals:
