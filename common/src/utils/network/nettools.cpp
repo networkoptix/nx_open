@@ -529,7 +529,7 @@ void removeARPrecord(const QHostAddress& /*ip*/) {}
 
 QString getMacByIP(const QHostAddress& ip, bool /*net*/)
 {
-    return "";
+    return QString();
 }
 
 #endif

@@ -135,7 +135,7 @@ namespace {
             x1 += x_step;
             y1 = y2;
         }
-        /** Value that will be shown */
+        /** value that will be shown */
         current_value = ((last_value - prev_value)*elapsed_step + prev_value);
         return path;
     }
@@ -365,14 +365,14 @@ void QnServerResourceWidget::at_statisticsReceived(const QnStatisticsDataVector 
         QnStatisticsData next_data = data[i];
 
         if (m_history.length() < i + 1) {
-            QString id = next_data.Device == QnStatisticsData::CPU 
+            QString id = next_data.device == QnStatisticsData::CPU 
                 ? tr("CPU") + QString::number(cpuCounter++)
                 : tr("HDD") + QString::number(hddCounter++);
-            m_history.append(QnStatisticsHistoryData(id, next_data.Description));
+            m_history.append(QnStatisticsHistoryData(id, next_data.description));
         }
 
         QnStatisticsHistoryData *item = &(m_history[i]);
-        item->append(next_data.Value);
+        item->append(next_data.value);
     }
 
     m_elapsedTimer.restart();
