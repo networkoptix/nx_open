@@ -49,6 +49,11 @@ public:
     QString name(int id) const;
     void setName(int id, const QString &name);
 
+    void setArgumentNames(int id, const char *longArgumentName, const char *shortArgumentName);
+    void setArgumentNames(int id, const QString &longArgumentName, const QString &shortArgumentName);
+    QString longArgumentName(int id) const;
+    QString shortArgumentName(int id) const;
+
     int type(int id) const;
     void setType(int id, int type);
 
@@ -60,6 +65,8 @@ public:
 
     void updateFromSettings(QSettings *settings);
     void submitToSettings(QSettings *settings) const;
+
+    void updateFromCommandLine(int &argc, char **argv);
 
 signals:
     void valueChanged(int id);
@@ -122,6 +129,8 @@ private:
 
     QHash<int, QVariant> m_valueById;
     QHash<int, QString> m_nameById;
+    QHash<int, QString> m_shortArgumentNameById;
+    QHash<int, QString> m_longArgumentNameById;
     QHash<int, int> m_typeById;
     QHash<int, bool> m_writeableById;
     mutable QHash<int, QnPropertyNotifier *> m_notifiers;

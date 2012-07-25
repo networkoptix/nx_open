@@ -4,6 +4,7 @@
 
 #include <QtCore/QMetaType>
 #include <QtCore/QSettings>
+#include <QtCore/QMutex>
 
 #include "warnings.h"
 
@@ -96,6 +97,29 @@ void QnPropertyStorage::setName(int id, const QString &name) {
     m_nameById[id] = name;
 }
 
+void QnPropertyStorage::setArgumentNames(int id, const char *longArgumentName, const char *shortArgumentName) {
+    setArgumentNames(id, QLatin1String(longArgumentName), QLatin1String(shortArgumentName));
+}
+
+void QnPropertyStorage::setArgumentNames(int id, const QString &longArgumentName, const QString &shortArgumentName) {
+    QnPropertyStorageLocker locker(this);
+
+    m_longArgumentNameById[id] = longArgumentName;
+    m_shortArgumentNameById[id] = shortArgumentName;
+}
+
+QString QnPropertyStorage::longArgumentName(int id) const {
+    QnPropertyStorageLocker locker(this);
+
+    return m_longArgumentNameById.value(id);
+}
+
+QString QnPropertyStorage::shortArgumentName(int id) const {
+    QnPropertyStorageLocker locker(this);
+
+    return m_shortArgumentNameById.value(id);
+}
+
 int QnPropertyStorage::type(int id) const {
     QnPropertyStorageLocker locker(this);
 
@@ -155,6 +179,10 @@ void QnPropertyStorage::submitToSettings(QSettings *settings) const {
 
     QnPropertyStorageLocker locker(this);
     submitValuesToSettings(settings, m_nameById.keys());
+}
+
+void QnPropertyStorage::updateFromCommandLine(int &argc, char **argv) {
+    return;
 }
 
 void QnPropertyStorage::lock() const {
