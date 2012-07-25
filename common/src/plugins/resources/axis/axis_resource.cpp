@@ -4,12 +4,12 @@
 #include "utils/common/synctime.h"
 
 const char* QnPlAxisResource::MANUFACTURE = "Axis";
-static const float MAX_AR_EPS = 0.02;
+static const float MAX_AR_EPS = 0.02f;
 static const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
 
 QnPlAxisResource::QnPlAxisResource()
 {
-    setAuth("root", "root");
+    setAuth(QLatin1String("root"), QLatin1String("root"));
     m_lastMotionReadTime = 0;
 }
 
@@ -25,7 +25,7 @@ bool QnPlAxisResource::updateMACAddress()
 
 QString QnPlAxisResource::manufacture() const
 {
-    return MANUFACTURE;
+    return QLatin1String(MANUFACTURE);
 }
 
 void QnPlAxisResource::setIframeDistance(int /*frames*/, int /*timems*/)
@@ -269,7 +269,7 @@ QString QnPlAxisResource::getNearestResolution(const QByteArray& resolution, flo
     }
     float requestSquare = dimensions[0].toInt() * dimensions[1].toInt();
     int bestIndex = -1;
-    float bestMatchCoeff = INT_MAX;
+    float bestMatchCoeff = (float)INT_MAX;
     for (int i = 0; i < m_resolutionList.size(); ++ i)
     {
         float ar = getResolutionAspectRatio(m_resolutionList[i]);
@@ -286,7 +286,7 @@ QString QnPlAxisResource::getNearestResolution(const QByteArray& resolution, flo
             bestMatchCoeff = matchCoeff;
         }
     }
-    return bestIndex >= 0 ? m_resolutionList[bestIndex] : resolution;
+    return bestIndex >= 0 ? QLatin1String(m_resolutionList[bestIndex]) : QLatin1String(resolution);
 }
 
 QRect QnPlAxisResource::getMotionWindow(int num) const
@@ -306,7 +306,7 @@ bool QnPlAxisResource::removeMotionWindow(int wndNum)
     //QMutexLocker lock(&m_mutex);
 
     CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth());
-    CLHttpStatus status = http.doGET(QString("axis-cgi/param.cgi?action=remove&group=Motion.M%1").arg(wndNum));
+    CLHttpStatus status = http.doGET(QString(QLatin1String("axis-cgi/param.cgi?action=remove&group=Motion.M%1")).arg(wndNum));
     return status == CL_HTTP_SUCCESS;
 }
 
@@ -315,7 +315,7 @@ int QnPlAxisResource::addMotionWindow()
     //QMutexLocker lock(&m_mutex);
 
     CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth());
-    CLHttpStatus status = http.doGET(QString("axis-cgi/param.cgi?action=add&group=Motion&template=motion&Motion.M.WindowType=include&Motion.M.ImageSource=0"));
+    CLHttpStatus status = http.doGET(QLatin1String("axis-cgi/param.cgi?action=add&group=Motion&template=motion&Motion.M.WindowType=include&Motion.M.ImageSource=0"));
     if (status != CL_HTTP_SUCCESS)
         return -1;
     QByteArray data;
@@ -329,9 +329,9 @@ bool QnPlAxisResource::updateMotionWindow(int wndNum, int sensitivity, const QRe
     //QMutexLocker lock(&m_mutex);
 
     CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth());
-    CLHttpStatus status = http.doGET(QString("axis-cgi/param.cgi?action=update&group=Motion&\
+    CLHttpStatus status = http.doGET(QString(QLatin1String("axis-cgi/param.cgi?action=update&group=Motion&\
 Motion.M%1.Name=HDWitnessWindow%1&Motion.M%1.ImageSource=0&Motion.M%1.WindowType=include&\
-Motion.M%1.Left=%2&Motion.M%1.Right=%3&Motion.M%1.Top=%4&Motion.M%1.Bottom=%5&Motion.M%1.Sensitivity=%6")
+Motion.M%1.Left=%2&Motion.M%1.Right=%3&Motion.M%1.Top=%4&Motion.M%1.Bottom=%5&Motion.M%1.Sensitivity=%6"))
 .arg(wndNum).arg(rect.left()).arg(rect.right()).arg(rect.top()).arg(rect.bottom()).arg(sensitivity));
 return status == CL_HTTP_SUCCESS;
 }

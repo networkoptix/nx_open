@@ -370,7 +370,7 @@ QStringList OnvifResourceSearcherWsdd::getAddrPrefixes(const QString& host) cons
 {
     QStringList result;
 
-    QStringList segments = host.split(QLatin1Char('.');
+    QStringList segments = host.split(QLatin1Char('.'));
     if (segments.size() != 4) {
         qCritical() << "OnvifResourceSearcherWsdd::getAddrPrefixes: is not IPv4 address: " << host;
         return result;
@@ -546,7 +546,7 @@ void OnvifResourceSearcherWsdd::addEndpointToHash(EndpointInfoHash& hash, const 
     QString manufacturer = getManufacturer(source, name);
     QString mac = getMac(source, header);
 
-    QString endpointId = replaceNonFileNameCharacters(getEndpointAddress(source), QChar('_'));
+    QString endpointId = replaceNonFileNameCharacters(getEndpointAddress(source), QLatin1Char('_'));
     QString uniqId = !mac.isEmpty() ? mac : endpointId;
 
     hash.insert(appropriateAddr, EndpointAdditionalInfo(name, manufacturer, mac, uniqId, host));

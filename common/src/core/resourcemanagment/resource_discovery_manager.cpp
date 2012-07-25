@@ -70,10 +70,10 @@ QnResourcePtr QnResourceDiscoveryManager::createResource(QnId resourceTypeId, co
 
     if (resourceType.isNull())
         return result;
-    if (resourceType->getName() == "Storage")
+    if (resourceType->getName() == QLatin1String("Storage"))
     {
 
-        result = QnResourcePtr(QnStoragePluginFactory::instance()->createStorage(parameters["url"]));
+        result = QnResourcePtr(QnStoragePluginFactory::instance()->createStorage(parameters[QLatin1String("url")]));
         result->deserialize(parameters);
     }
     else {
@@ -187,7 +187,7 @@ void printInLogNetResources(const QnResourceList& resources)
         if (!netRes)
             continue;
 
-        cl_log.log(netRes->getHostAddress().toString() + QString(" "), netRes->getName(), cl_logINFO);
+        cl_log.log(netRes->getHostAddress().toString() + QLatin1String(" "), netRes->getName(), cl_logINFO);
     }
 
 }
@@ -567,9 +567,9 @@ struct check_if_accessible_STRUCT
             resourceNet->addNetworkStatus(QnNetworkResource::BadHostAddr);
 
             if (m_isSameSubnet)
-                cl_log.log(resourceNet->getHostAddress().toString() + QString("  name = ") +  resourceNet->getName(), " has bad IP(same subnet)", cl_logWARNING);
+                cl_log.log(resourceNet->getHostAddress().toString() + QLatin1String("  name = ") +  resourceNet->getName(), " has bad IP(same subnet)", cl_logWARNING);
             else
-                cl_log.log(resourceNet->getHostAddress().toString() + QString("  name = ") +  resourceNet->getName(), " has bad IP(diff subnet)", cl_logWARNING);
+                cl_log.log(resourceNet->getHostAddress().toString() + QLatin1String("  name = ") +  resourceNet->getName(), " has bad IP(diff subnet)", cl_logWARNING);
         }
 
     }

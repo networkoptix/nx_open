@@ -23,7 +23,7 @@ QnPlArecontResourceSearcher::QnPlArecontResourceSearcher()
 
 QString QnPlArecontResourceSearcher::manufacture() const
 {
-    return QnPlAreconVisionResource::MANUFACTURE;
+    return QLatin1String(QnPlAreconVisionResource::MANUFACTURE);
 }
 
 // returns all available devices
@@ -111,7 +111,7 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
                 // in any case let's HTTP do it's job at very end of discovery
                 QnNetworkResourcePtr resource( new QnPlAreconVisionResource() );
                 //resource->setName("AVUNKNOWN");
-                resource->setTypeId(qnResTypePool->getResourceTypeId(QnPlAreconVisionResource::MANUFACTURE, "ArecontVision_Abstract"));
+                resource->setTypeId(qnResTypePool->getResourceTypeId(QLatin1String(QnPlAreconVisionResource::MANUFACTURE), QLatin1String("ArecontVision_Abstract")));
 
                 if (resource==0)
                     continue;
@@ -119,7 +119,7 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
                 resource->setHostAddress(sender, QnDomainMemory);
                 resource->setMAC(mac);
                 resource->setDiscoveryAddr(iface.address);
-                resource->setName("ArecontVision_Abstract");
+                resource->setName(QLatin1String("ArecontVision_Abstract"));
 
 
                 bool need_to_continue = false;

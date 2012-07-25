@@ -43,7 +43,7 @@ QnResourcePtr QnPlAxisResourceSearcher::createResource(QnId resourceTypeId, cons
 
 QString QnPlAxisResourceSearcher::manufacture() const
 {
-    return QnPlAxisResource::MANUFACTURE;
+    return QLatin1String(QnPlAxisResource::MANUFACTURE);
 }
 
 
@@ -73,9 +73,9 @@ QnNetworkResourcePtr QnPlAxisResourceSearcher::processPacket(QnResourceList& res
         name += QLatin1Char(responseData[i]);
     }
 
-    name.replace(QString(" "), QString()); // remove spaces
-    name.replace(QString("-"), QString()); // remove spaces
-    name.replace(QString("\t"), QString()); // remove tabs
+    name.replace(QLatin1Char(' '), QString()); // remove spaces
+    name.replace(QLatin1Char('-'), QString()); // remove spaces
+    name.replace(QLatin1Char('\t'), QString()); // remove tabs
 
     if (macpos+12 > responseData.size())
         return QnNetworkResourcePtr(0);

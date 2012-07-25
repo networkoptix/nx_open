@@ -111,7 +111,9 @@ void QnAxisStreamReader::openStream()
     // ------------------- determine stream parameters ----------------------------
     float fps = getFps();
     float ar = res->getResolutionAspectRatio(res->getMaxResolution());
-    QString resolution = (role == QnResource::Role_LiveVideo) ? res->getMaxResolution() : res->getNearestResolution("320x240", ar);
+    QString resolution = (role == QnResource::Role_LiveVideo) 
+        ? QLatin1String(res->getMaxResolution()) 
+        : res->getNearestResolution("320x240", ar);
     if (resolution.isEmpty()) 
         qWarning() << "Can't determine max resolution for axis camera " << res->getName() << "use default resolution";
     QnStreamQuality quality = getQuality();
@@ -135,8 +137,8 @@ void QnAxisStreamReader::openStream()
     str << "&template=streamprofile";
     str << "&group=StreamProfile";
     str << "&StreamProfile." << profileNumber << ".Name=" << profileName;
-    str << "&StreamProfile." << profileNumber << ".Description=" << QUrl::toPercentEncoding(profileDescription);
-    str << "&StreamProfile." << profileNumber << ".Parameters=" << QUrl::toPercentEncoding(paramsStr);
+    str << "&StreamProfile." << profileNumber << ".Description=" << QUrl::toPercentEncoding(QLatin1String(profileDescription));
+    str << "&StreamProfile." << profileNumber << ".Parameters=" << QUrl::toPercentEncoding(QLatin1String(paramsStr));
     str.flush();
 
     CLSimpleHTTPClient http (res->getHostAddress(), QUrl(res->getUrl()).port(80), res->getNetworkTimeout(), res->getAuth());
@@ -157,7 +159,7 @@ void QnAxisStreamReader::openStream()
 
 
     // ============== requesting a video ==========================
-    m_rtpStreamParser.setRequest(QString("axis-media/media.amp?streamprofile=") + profileName);
+    m_rtpStreamParser.setRequest(QLatin1String("axis-media/media.amp?streamprofile=" + profileName));
     m_rtpStreamParser.openStream();
 }
 

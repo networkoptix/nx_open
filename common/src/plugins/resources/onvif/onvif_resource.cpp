@@ -18,11 +18,11 @@ static const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
 const char* QnPlOnvifResource::ONVIF_PROTOCOL_PREFIX = "http://";
 const char* QnPlOnvifResource::ONVIF_URL_SUFFIX = ":80/onvif/device_service";
 const int QnPlOnvifResource::DEFAULT_IFRAME_DISTANCE = 20;
-QString QnPlOnvifResource::MEDIA_URL_PARAM_NAME = QString("MediaUrl");
-QString QnPlOnvifResource::ONVIF_URL_PARAM_NAME = QString("DeviceUrl");
-QString QnPlOnvifResource::MAX_FPS_PARAM_NAME = QString("MaxFPS");
-QString QnPlOnvifResource::AUDIO_SUPPORTED_PARAM_NAME = QString("isAudioSupported");
-QString QnPlOnvifResource::DUAL_STREAMING_PARAM_NAME = QString("hasDualStreaming");
+QString QnPlOnvifResource::MEDIA_URL_PARAM_NAME = QLatin1String("MediaUrl");
+QString QnPlOnvifResource::ONVIF_URL_PARAM_NAME = QLatin1String("DeviceUrl");
+QString QnPlOnvifResource::MAX_FPS_PARAM_NAME = QLatin1String("MaxFPS");
+QString QnPlOnvifResource::AUDIO_SUPPORTED_PARAM_NAME = QLatin1String("isAudioSupported");
+QString QnPlOnvifResource::DUAL_STREAMING_PARAM_NAME = QLatin1String("hasDualStreaming");
 const float QnPlOnvifResource::QUALITY_COEF = 0.2f;
 const char* QnPlOnvifResource::PROFILE_NAME_PRIMARY = "Netoptix Primary";
 const char* QnPlOnvifResource::PROFILE_NAME_SECONDARY = "Netoptix Secondary";
@@ -117,11 +117,12 @@ const QString QnPlOnvifResource::fetchMacAddress(const NetIfacesResp& response,
             onvifXsd__IPv4Configuration* conf = ifacePtr->IPv4->Config;
 
             if (conf->DHCP && conf->FromDHCP) {
-                if (senderIpAddress == conf->FromDHCP->Address.c_str()) {
-                    return QString(ifacePtr->Info->HwAddress.c_str()).toUpper().replace(":", "-");
+                //TODO:UTF unuse std::string
+                if (senderIpAddress == QString::fromStdString(conf->FromDHCP->Address)) {
+                    return QString::fromStdString(ifacePtr->Info->HwAddress).toUpper().replace(QLatin1Char(':'), QLatin1Char('-'));
                 }
                 if (someMacAddress.isEmpty()) {
-                    someMacAddress = QString(ifacePtr->Info->HwAddress.c_str());
+                    someMacAddress = QString::fromStdString(ifacePtr->Info->HwAddress.c_str);
                 }
             }
 
@@ -130,12 +131,12 @@ const QString QnPlOnvifResource::fetchMacAddress(const NetIfacesResp& response,
 
             while (addrPtrIter != addresses.end()) {
                 onvifXsd__PrefixedIPv4Address* addrPtr = *addrPtrIter;
-
-                if (senderIpAddress == addrPtr->Address.c_str()) {
-                    return QString(ifacePtr->Info->HwAddress.c_str()).toUpper().replace(":", "-");
+                //TODO:UTF unuse std::string
+                if (senderIpAddress == QString::fromStdString(addrPtr->Address)) {
+                    return QString::fromStdString(ifacePtr->Info->HwAddress).toUpper().replace(QLatin1Char(':'), QLatin1Char('-'));
                 }
                 if (someMacAddress.isEmpty()) {
-                    someMacAddress = QString(ifacePtr->Info->HwAddress.c_str());
+                    someMacAddress = QString::fromStdString(ifacePtr->Info->HwAddress);
                 }
 
                 ++addrPtrIter;
@@ -145,7 +146,7 @@ const QString QnPlOnvifResource::fetchMacAddress(const NetIfacesResp& response,
         ++ifacePtrIter;
     }
 
-    return someMacAddress.toUpper().replace(":", "-");
+    return someMacAddress.toUpper().replace(QLatin1Char(':'), QLatin1Char('-'));
 }
 
 bool QnPlOnvifResource::setHostAddress(const QHostAddress &ip, QnDomain domain)

@@ -55,30 +55,32 @@ QnResourcePtr DwDvrResourceSearcher::createResource(QnId resourceTypeId, const Q
 
 QString DwDvrResourceSearcher::manufacture() const
 {
-    return QnDwDvrResource::MANUFACTURE;
+    return QLatin1String(QnDwDvrResource::MANUFACTURE);
 }
 
 QnResourceList DwDvrResourceSearcher::findResources()
 {
     QnResourceList result;
-    getCamerasFromDvr(result, "10.10.10.55", 2000, "user1", "123");
+    getCamerasFromDvr(result, QLatin1String("10.10.10.55"), 2000, QLatin1String("user1"), QLatin1String("123"));
     return result;
 }
 
 void DwDvrResourceSearcher::getCamerasFromDvr(QnResourceList& resources, const QString& host, int port, const QString& login, const QString& password)
 {
+    Q_UNUSED(resources)
     HANDLE dvrHandle = DVROpenConnection();
     if (dvrHandle == 0)
         return;
 
     DVRSetInstallCode(dvrHandle, -1, 0);
 
-    LPCSTR hostStr =  (LPCSTR) host.data();
-    DVRRESULT result = DVRConnectSite(dvrHandle, host.toUtf8(), port, login.toUtf8(), password.toUtf8(), CONNECTION_TIMEOUT);
-    switch (result)
+    /*LPCSTR hostStr = (LPCSTR) host.data();
+    DVRRESULT result =*/
+    DVRConnectSite(dvrHandle, host.toUtf8(), port, login.toUtf8(), password.toUtf8(), CONNECTION_TIMEOUT);
+    /*switch (result)
     {
 
-    }
+    }*/
 }
 
 QnResourcePtr DwDvrResourceSearcher::checkHostAddr(QHostAddress addr)

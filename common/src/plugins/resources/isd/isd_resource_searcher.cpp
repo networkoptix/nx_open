@@ -44,7 +44,7 @@ QnResourcePtr QnPlISDResourceSearcher::createResource(QnId resourceTypeId, const
 
 QString QnPlISDResourceSearcher::manufacture() const
 {
-    return QnPlIsdResource::MANUFACTURE;
+    return QLatin1String(QnPlIsdResource::MANUFACTURE);
 }
 
 
@@ -69,22 +69,22 @@ QnNetworkResourcePtr QnPlISDResourceSearcher::processPacket(QnResourceList& resu
     if (macpos < 0)
         return QnNetworkResourcePtr(0);
 
-    macpos += QString("macaddress=").length();
+    macpos += QString(QLatin1String("macaddress=")).length();
     if (macpos + 12 > responseData.size())
         return QnNetworkResourcePtr(0);
 
 
     //name = responseData.mid();
-    name = "ISDcam";
+    name = QLatin1String("ISDcam");
 //
 //    for (int i = iqpos; i < macpos; i++)
 //    {
 //        name += QLatin1Char(responseData[i]);
 //    }
 //
-    name.replace(QString(" "), QString()); // remove spaces
-    name.replace(QString("-"), QString()); // remove spaces
-    name.replace(QString("\t"), QString()); // remove tabs
+    name.replace(QLatin1Char(' '), QString()); // remove spaces
+    name.replace(QLatin1Char('-'), QString()); // remove spaces
+    name.replace(QLatin1Char('\t'), QString()); // remove tabs
 
     //macpos++; // -
 //

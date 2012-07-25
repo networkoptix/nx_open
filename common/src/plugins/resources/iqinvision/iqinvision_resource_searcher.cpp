@@ -45,7 +45,7 @@ QnResourcePtr QnPlIqResourceSearcher::createResource(QnId resourceTypeId, const 
 
 QString QnPlIqResourceSearcher::manufacture() const
 {
-    return QnPlIqResource::MANUFACTURE;
+    return QLatin1String(QnPlIqResource::MANUFACTURE);
 }
 
 
@@ -75,9 +75,9 @@ QnNetworkResourcePtr QnPlIqResourceSearcher::processPacket(QnResourceList& resul
         name += QLatin1Char(responseData[i]);
     }
 
-    name.replace(QString(" "), QString()); // remove spaces
-    name.replace(QString("-"), QString()); // remove spaces
-    name.replace(QString("\t"), QString()); // remove tabs
+    name.replace(QLatin1Char(' '), QString()); // remove spaces
+    name.replace(QLatin1Char('-'), QString()); // remove spaces
+    name.replace(QLatin1Char('\t'), QString()); // remove tabs
 
     if (macpos+12 > responseData.size())
         return QnNetworkResourcePtr(0);
@@ -126,7 +126,7 @@ QnNetworkResourcePtr QnPlIqResourceSearcher::processPacket(QnResourceList& resul
     if (!rt.isValid())
     {
         // try with default camera name
-        name = "IQA32N";
+        name = QLatin1String("IQA32N");
         rt = qnResTypePool->getResourceTypeId(manufacture(), name);
 
         if (!rt.isValid())

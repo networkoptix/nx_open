@@ -13,6 +13,7 @@ static const QnCryptographicHash::Algorithm EXPORT_SIGN_METHOD = QnCryptographic
 
 class QnSignHelper
 {
+    Q_DECLARE_TR_FUNCTIONS(QnSignHelper)
 public:
     QnSignHelper();
     void setLogo(QPixmap logo);
@@ -21,8 +22,8 @@ public:
     void setSign(const QByteArray& sign);
     void draw(QImage& img, bool drawText);
     void draw(QPainter& painter, const QSize& paintSize, bool drawText);
-    void drawTextLine(QPainter& painter, const QSize& paintSize,int lineNum, const QString& text);
-    QFontMetrics updateFontSize(QPainter& painter, const QSize& paintSize);
+    //void drawTextLine(QPainter& painter, const QSize& paintSize,int lineNum, const QString& text);
+    QFontMetrics updateFontSize(QPainter& painter, const QSize& paintSize, const QString& versionStr);
     static void updateDigest(AVCodecContext* srcCodec, QnCryptographicHash &ctx, const quint8* data, int size);
     void setSignOpacity(float opacity, QColor color);
 

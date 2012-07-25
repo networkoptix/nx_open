@@ -14,7 +14,7 @@ QnArecontPanoramicResource::QnArecontPanoramicResource(const QString& name)
 
 bool QnArecontPanoramicResource::getDescription()
 {
-    m_description = "";
+    m_description = QString();
     return true;
 }
 
@@ -44,7 +44,7 @@ bool QnArecontPanoramicResource::getParamPhysical(int channel, const QString& na
 
     
 
-    QString request = QString("get") + QString::number(channel) + QString("?") + param.netHelper();
+    QString request = QLatin1String("get") + QString::number(channel) + QLatin1String("?") + param.netHelper();
 
     CLHttpStatus status = connection.doGET(request);
     if (status == CL_HTTP_AUTH_REQUIRED)
@@ -69,7 +69,7 @@ bool QnArecontPanoramicResource::getParamPhysical(int channel, const QString& na
 
     QByteArray rarray = response.mid(index+1);
 
-    val = QString(rarray.data());
+    val = QLatin1String(rarray.data());
 
     return true;
 }

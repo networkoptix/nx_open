@@ -41,8 +41,8 @@ static inline QByteArray genMachineHardwareId()
 #endif
 
 #ifdef Q_OS_WIN
-    QSettings settings("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Cryptography", QSettings::NativeFormat);
-    hwid = settings.value("MachineGuid").toByteArray();
+    QSettings settings(QLatin1String("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Cryptography"), QSettings::NativeFormat);
+    hwid = settings.value(QLatin1String("MachineGuid")).toByteArray();
 #endif
 
     hwid = hwid.trimmed();
@@ -51,11 +51,11 @@ static inline QByteArray genMachineHardwareId()
     if (hwid.isEmpty())
     {
         QSettings settings;
-        hwid = settings.value("install-id").toByteArray();
+        hwid = settings.value(QLatin1String("install-id")).toByteArray();
         if (hwid.isEmpty())
         {
             hwid = QUuid::createUuid().toString().toAscii();
-            settings.setValue("install-id", hwid);
+            settings.setValue(QLatin1String("install-id"), hwid);
         }
     }
 
@@ -144,7 +144,7 @@ bool QnLicense::isValid() const
             licenseString += "NAME=" + m_name.toUtf8() + "\n";
             licenseString += "SERIAL=" + m_key + "\n";
             licenseString += "HWID=" + m_hardwareId + "\n";
-            licenseString += "COUNT=" + QString::number(m_cameraCount) + "\n";
+            licenseString += "COUNT=" + QString::number(m_cameraCount).toUtf8() + "\n";
 
             if (isSignatureMatch(licenseString, QByteArray::fromBase64(m_signature), QByteArray(networkOptixRSAPublicKey)))
                 m_validLicense = 1;
@@ -162,7 +162,7 @@ QByteArray QnLicense::toString() const
         licenseString += "NAME=" + m_name.toUtf8() + "\n";
         licenseString += "SERIAL=" + m_key + "\n";
         licenseString += "HWID=" + m_hardwareId + "\n";
-        licenseString += "COUNT=" + QString::number(m_cameraCount) + "\n";
+        licenseString += "COUNT=" + QString::number(m_cameraCount).toUtf8() + "\n";
         licenseString += "SIGNATURE=" + m_signature + "\n";
     }
 
