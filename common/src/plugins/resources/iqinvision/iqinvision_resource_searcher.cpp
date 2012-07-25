@@ -54,21 +54,23 @@ QnResourcePtr QnPlIqResourceSearcher::checkHostAddr(QHostAddress addr)
     return QnResourcePtr(0);
 }
 
-QnNetworkResourcePtr QnPlIqResourceSearcher::processPacket(QnResourceList& result, QByteArray& responseData, const QHostAddress& discoveryAddress)
+QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(QnResourceList& result, QByteArray& responseData, const QHostAddress& discoveryAddress)
 {
 
     QString smac;
     QString name;
 
+    QList<QnNetworkResourcePtr> local_results;
+
     int iqpos = responseData.indexOf("IQ");
 
 
     if (iqpos<0)
-        return QnNetworkResourcePtr(0);
+        return local_results;
 
     int macpos = responseData.indexOf("00", iqpos);
     if (macpos < 0)
-        return QnNetworkResourcePtr(0);
+        return local_results;
 
     for (int i = iqpos; i < macpos; i++)
     {
@@ -80,7 +82,7 @@ QnNetworkResourcePtr QnPlIqResourceSearcher::processPacket(QnResourceList& resul
     name.replace(QString("\t"), QString()); // remove tabs
 
     if (macpos+12 > responseData.size())
-        return QnNetworkResourcePtr(0);
+        return local_results;
 
 
     //macpos++; // -
@@ -90,7 +92,7 @@ QnNetworkResourcePtr QnPlIqResourceSearcher::processPacket(QnResourceList& resul
 
 
     if (macpos+12 > responseData.size())
-        return QnNetworkResourcePtr(0);
+        return local_results;
 
 
 
@@ -115,7 +117,7 @@ QnNetworkResourcePtr QnPlIqResourceSearcher::processPacket(QnResourceList& resul
         {
             if (isNewDiscoveryAddressBetter(net_res->getHostAddress().toString(), discoveryAddress.toString(), net_res->getDiscoveryAddr().toString()))
                 net_res->setDiscoveryAddr(discoveryAddress);
-            return QnNetworkResourcePtr(0); // already found;
+            return local_results; // already found;
         }
     }
 
@@ -130,14 +132,14 @@ QnNetworkResourcePtr QnPlIqResourceSearcher::processPacket(QnResourceList& resul
         rt = qnResTypePool->getResourceTypeId(manufacture(), name);
 
         if (!rt.isValid())
-            return QnNetworkResourcePtr(0);
+            return local_results;
     }
 
     resource->setTypeId(rt);
     resource->setName(name);
     resource->setMAC(smac);
 
-    return resource;
+    local_results.push_back(resource);
 
-
+    return local_results;
 }
