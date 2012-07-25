@@ -57,9 +57,9 @@ QnSettings::QnSettings():
     setName(OPEN_LAYOUTS_ON_LOGIN,  QLatin1String("openLayoutsOnLogin"));
 
     /* Set command line switch names. */
-    addArgumentName(SOFTWARE_YUV,          "--soft-yuv",               NULL);
-    addArgumentName(OPEN_LAYOUTS_ON_LOGIN, "--open-layouts-on-login",  NULL);
-    addArgumentName(MAX_VIDEO_ITEMS,       "--max-video-items",        NULL);
+    addArgumentName(SOFTWARE_YUV,          "--soft-yuv");
+    addArgumentName(OPEN_LAYOUTS_ON_LOGIN, "--open-layouts-on-login");
+    addArgumentName(MAX_VIDEO_ITEMS,       "--max-video-items");
 
     /* Load from settings. */
     load();
