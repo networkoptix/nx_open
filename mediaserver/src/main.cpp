@@ -311,11 +311,13 @@ int serverMain(int argc, char *argv[])
         return 0;
     }
 
-    QnCommandLineParser commandLinePreParser;
-    commandLinePreParser.addParameter(QMetaType::QString, "--log-level", NULL, QString());
-    commandLinePreParser.parse(argc, argv, stderr);
+    QString logLevel;
 
-    QnLog::initLog(commandLinePreParser.value("--log-level").toString());
+    QnCommandLineParser commandLineParser;
+    commandLineParser.addParameter(&logLevel, "--log-level", NULL, QString());
+    commandLineParser.parse(argc, argv, stderr);
+
+    QnLog::initLog(logLevel);
     cl_log.log(APPLICATION_NAME, " started", cl_logALWAYS);
     cl_log.log("Software version: ", APPLICATION_VERSION, cl_logALWAYS);
 	cl_log.log("Software revision: ", APPLICATION_REVISION, cl_logALWAYS);

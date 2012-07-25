@@ -225,27 +225,29 @@ int main(int argc, char *argv[])
 
     qnSettings->updateFromCommandLine(argc, argv, stderr);
 
-    QnCommandLineParser commandLinePreParser;
-    commandLinePreParser.addParameter(QMetaType::Bool,      "--no-single-application",  NULL, QString(),    true);
-    commandLinePreParser.addParameter(QMetaType::QString,   "--auth",                   NULL, QString());
-    commandLinePreParser.addParameter(QMetaType::Int,       "--screen",                 NULL, QString());
-    commandLinePreParser.addParameter(QMetaType::QString,   "--delayed-drop",           NULL, QString());
-    commandLinePreParser.addParameter(QMetaType::QString,   "--log-level",              NULL, QString());
-    commandLinePreParser.parse(argc, argv, stderr);
+    bool noSingleApplication = false;
+    int screen = -1;
+    QString authenticationString, delayedDrop, logLevel;
+    
+    QnCommandLineParser commandLineParser;
+    commandLineParser.addParameter(&noSingleApplication,     "--no-single-application",  NULL, QString(),    true);
+    commandLineParser.addParameter(&authenticationString,    "--auth",                   NULL, QString());
+    commandLineParser.addParameter(&screen,                  "--screen",                 NULL, QString());
+    commandLineParser.addParameter(&delayedDrop,             "--delayed-drop",           NULL, QString());
+    commandLineParser.addParameter(&logLevel,                "--log-level",              NULL, QString());
+    commandLineParser.parse(argc, argv, stderr);
 
     /* Set authentication parameters from command line. */
-    QUrl authentication = QUrl::fromUserInput(commandLinePreParser.value("--auth").toString());
+    QUrl authentication = QUrl::fromUserInput(authenticationString);
     if(authentication.isValid()) {
         out << QObject::tr("Using authentication parameters from command line: %1.").arg(authentication.toString()) << endl;
         qnSettings->setLastUsedConnection(QnConnectionData(QString(), authentication));
     }
 
-    /* Set other options from command line. */
-
     /* Create application instance. */
     QtSingleApplication *singleApplication = NULL;
     QScopedPointer<QApplication> application;
-    if(commandLinePreParser.value("--no-single-application").toBool()) {
+    if(noSingleApplication) {
         application.reset(new QApplication(argc, argv));
     } else {
         singleApplication = new QtSingleApplication(argc, argv);
@@ -287,7 +289,7 @@ int main(int argc, char *argv[])
         return 0;
 
 
-    QnLog::initLog(commandLinePreParser.value("--log-level").toString());
+    QnLog::initLog(logLevel);
     cl_log.log(APPLICATION_NAME, " started", cl_logALWAYS);
     cl_log.log("Software version: ", APPLICATION_VERSION, cl_logALWAYS);
     cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
@@ -378,14 +380,12 @@ int main(int argc, char *argv[])
     QScopedPointer<QnMainWindow> mainWindow(new QnMainWindow(context.data()));
     mainWindow->setAttribute(Qt::WA_QuitOnClose);
 
-    QVariant screen = commandLinePreParser.value("--screen");
-    if(screen.isValid()) {
-        int screenNumber = screen.toInt();
+    if(screen != -1) {
         QDesktopWidget *desktop = qApp->desktop();
-        if(screenNumber >= 0 && screenNumber < desktop->screenCount()) {
+        if(screen >= 0 && screen < desktop->screenCount()) {
             QPoint screenDelta = mainWindow->pos() - desktop->screenGeometry(mainWindow.data()).topLeft();
 
-            mainWindow->move(desktop->screenGeometry(screenNumber).topLeft() + screenDelta);
+            mainWindow->move(desktop->screenGeometry(screen).topLeft() + screenDelta);
         }
     }
 
@@ -410,10 +410,8 @@ int main(int argc, char *argv[])
     /* Process pending events before executing actions. */
     qApp->processEvents();
 
-    /* Really argc==1. */
-    if (argc <= 1)
-    {
-        /* Open connection settings dialog. */
+    if (argc <= 1) {
+        /* If no input files were supplied --- open connection settings dialog. */
         if(!authentication.isValid()) {
             context->menu()->trigger(Qn::ConnectToServerAction);
         } else {
@@ -422,11 +420,10 @@ int main(int argc, char *argv[])
     }
 
     /* Drop resources if needed. */
-    QString droppedResources = commandLinePreParser.value("--delayed-drop").toString();
-    if(!droppedResources.isEmpty()) {
+    if(!delayedDrop.isEmpty()) {
         qnSettings->setLayoutsOpenedOnLogin(false);
 
-        QByteArray data = QByteArray::fromBase64(droppedResources.toLatin1());
+        QByteArray data = QByteArray::fromBase64(delayedDrop.toLatin1());
         context->menu()->trigger(Qn::DelayedDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedResourcesParameter, data));
     }
 

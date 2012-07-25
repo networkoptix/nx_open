@@ -1,5 +1,7 @@
 #include "command_line_parser.h"
 
+#include <cassert>
+
 #include <QtCore/QMetaType>
 #include <QtCore/QStringList>
 
@@ -139,6 +141,13 @@ bool QnCommandLineParser::parse(int &argc, char **argv, QTextStream *errorStream
 
         /* Store value. */
         m_values[index] = value;
+
+        /* Write value out if needed. */
+        if(parameter.target() && parameter.targetHandler() && result) {
+            assert(value.userType() == parameter.type());
+
+            parameter.targetHandler()->copy(value.data(), parameter.target());
+        }
 
         pos++;
     }

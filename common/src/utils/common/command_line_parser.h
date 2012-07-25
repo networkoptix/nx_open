@@ -6,18 +6,40 @@
 #include <QtCore/QVariant>
 #include <QtCore/QHash>
 #include <QtCore/QList>
+#include <QtCore/QMetaType>
+#include <QtCore/QSharedPointer>
+
+#include "meta_handler.h"
 
 class QTextStream;
 
 class QN_EXPORT QnCommandLineParameter {
 public:
+    template<class T>
+    QnCommandLineParameter(T *target, const QString &longName, const QString &shortName, const QString &description, const QVariant &impliedValue = QVariant()):
+        m_target(target), m_targetHandler(new QnTypedMetaHandler<T>()), m_type(qMetaTypeId<T>()), m_longName(longName), m_shortName(shortName), m_description(description), m_impliedValue(impliedValue)
+    {}
+
+    template<class T>
+    QnCommandLineParameter(T *target, const char *longName, const char *shortName, const QString &description, const QVariant &impliedValue = QVariant()):
+        m_target(target), m_targetHandler(new QnTypedMetaHandler<T>()), m_type(qMetaTypeId<T>()), m_longName(QLatin1String(longName)), m_shortName(QLatin1String(shortName)), m_description(description), m_impliedValue(impliedValue)
+    {}
+
     QnCommandLineParameter(int type, const QString &longName, const QString &shortName, const QString &description, const QVariant &impliedValue = QVariant()):
-        m_type(type), m_longName(longName), m_shortName(shortName), m_description(description), m_impliedValue(impliedValue)
+        m_target(NULL), m_type(type), m_longName(longName), m_shortName(shortName), m_description(description), m_impliedValue(impliedValue)
     {}
 
     QnCommandLineParameter(int type, const char *longName, const char *shortName, const QString &description, const QVariant &impliedValue = QVariant()):
-        m_type(type), m_longName(QLatin1String(longName)), m_shortName(QLatin1String(shortName)), m_description(description), m_impliedValue(impliedValue)
+        m_target(NULL), m_type(type), m_longName(QLatin1String(longName)), m_shortName(QLatin1String(shortName)), m_description(description), m_impliedValue(impliedValue)
     {}
+
+    void *target() const {
+        return m_target;
+    }
+
+    QnMetaHandler *targetHandler() const {
+        return m_targetHandler.data();
+    }
 
     int type() const {
         return m_type;
@@ -40,6 +62,8 @@ public:
     }
 
 private:
+    void *m_target;
+    QSharedPointer<QnMetaHandler> m_targetHandler;
     int m_type;
     QString m_longName;
     QString m_shortName;
@@ -56,6 +80,11 @@ public:
     void addParameter(const QnCommandLineParameter &parameter);
     void addParameter(int type, const QString &longName, const QString &shortName, const QString &description, const QVariant &impliedValue = QVariant());
     void addParameter(int type, const char *longName, const char *shortName, const QString &description, const QVariant &impliedValue = QVariant());
+
+    template<class T>
+    void addParameter(T *target, const char *longName, const char *shortName, const QString &description, const QVariant &impliedValue = QVariant()) {
+        addParameter(QnCommandLineParameter(target, longName, shortName, description, impliedValue));
+    }
 
     void print(QTextStream &stream) const;
 

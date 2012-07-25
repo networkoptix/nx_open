@@ -24,19 +24,15 @@ QnAutoTester::QnAutoTester(int &argc, char **argv, QObject *parent):
     m_timer(NULL),
     m_succeeded(false)
 {
+    bool showHelp = false;
+
     QnCommandLineParser parser;
-    parser.addParameter(QMetaType::Int,     "--test-timeout",               NULL, tr("Time to wait before finishing the test, in milliseconds. Default is %1.").arg(defaultAutoTesterTimeout));
-    parser.addParameter(QMetaType::QString, "--test-resource-substring",    NULL, tr("Substring that must be present in one of the resources."));
-    parser.addParameter(QMetaType::Bool,    "--test-help",                  NULL, tr("Show this help screen."), true);
+    parser.addParameter(&m_timeout,                 "--test-timeout",               NULL, tr("Time to wait before finishing the test, in milliseconds. Default is %1.").arg(defaultAutoTesterTimeout));
+    parser.addParameter(&m_resourceSearchString,    "--test-resource-substring",    NULL, tr("Substring that must be present in one of the resources."));
+    parser.addParameter(&showHelp,                  "--test-help",                  NULL, tr("Show this help screen."), true);
 
     bool valid = parser.parse(argc, argv, stderr);
-    bool showHelp = false;
     if(valid) {
-        m_timeout = parser.value("--test-timeout", m_timeout).toLongLong();
-
-        showHelp = parser.value("--test-help", false).toBool();
-
-        m_resourceSearchString = parser.value("--test-resource-substring", m_resourceSearchString).toString();
         if(!m_resourceSearchString.isEmpty())
             m_allTests |= RESOURCE_SUBSTRING;
     } else {
