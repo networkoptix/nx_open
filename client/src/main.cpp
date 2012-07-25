@@ -224,14 +224,14 @@ int main(int argc, char *argv[])
     QnAutoTester autoTester(argc, argv);
 
     QnCommandLineParser commandLinePreParser;
-    commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::Flag, "--no-single-application", NULL, NULL));
-    commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::String, "--auth", NULL, NULL));
-    commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::Integer, "--screen", NULL, NULL));
-    commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::String, "--delayed-drop", NULL, NULL));
-    commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::String, "--log-level", NULL, NULL));
-    commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::Flag, "--soft-yuv", NULL, NULL));
-    commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::Flag, "--open-layouts-on-login", NULL, NULL));
-    commandLinePreParser.parse(argc, argv);
+    commandLinePreParser.addParameter(QMetaType::Bool,      "--no-single-application",  NULL, QString(),    true);
+    commandLinePreParser.addParameter(QMetaType::QString,   "--auth",                   NULL, QString());
+    commandLinePreParser.addParameter(QMetaType::Int,       "--screen",                 NULL, QString());
+    commandLinePreParser.addParameter(QMetaType::QString,   "--delayed-drop",           NULL, QString());
+    commandLinePreParser.addParameter(QMetaType::QString,   "--log-level",              NULL, QString());
+    commandLinePreParser.addParameter(QMetaType::Bool,      "--soft-yuv",               NULL, QString(),    true);
+    commandLinePreParser.addParameter(QMetaType::Bool,      "--open-layouts-on-login",  NULL, QString(),    true);
+    commandLinePreParser.parse(argc, argv, true);
 
     if(commandLinePreParser.value("--soft-yuv").toBool())
         qnSettings->setSoftwareYuv(true);
