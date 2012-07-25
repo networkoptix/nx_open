@@ -1141,7 +1141,7 @@ void QtSoapArray::insert(int pos0, int pos1, int pos2, int pos3, int pos4,
 */
 QString QtSoapArray::arraySizeString() const
 {
-    QString arraySize = QLatin1Char('[');
+    QString arraySize = QLatin1String("[");
     if (siz0 != -1) {
 	arraySize += QString::number(siz0);
 	if (order > 1) arraySize += QLatin1Char(',') + QString::number(siz1);
