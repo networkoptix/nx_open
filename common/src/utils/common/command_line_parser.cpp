@@ -1,4 +1,7 @@
 #include "command_line_parser.h"
+
+#include <QtCore/QMetaType>
+
 #include <utils/common/warnings.h>
 
 void QnCommandLineParser::addParameter(const QnCommandLineParameter &parameter) {
@@ -10,6 +13,10 @@ void QnCommandLineParser::addParameter(const QnCommandLineParameter &parameter) 
         m_indexByName[parameter.name()] = index;
     if(!parameter.shortName().isEmpty())
         m_indexByName[parameter.shortName()] = index;
+}
+
+void QnCommandLineParser::addParameter(int type, const char *name, const char *shortName, const QString &description, const QVariant &impliedValue) {
+    addParameter(QnCommandLineParameter(type, name, shortName, description, impliedValue));
 }
 
 QVariant QnCommandLineParser::value(const QString &name, const QVariant &defaultValue) {
@@ -58,16 +65,14 @@ void QnCommandLineParser::print(QTextStream &stream) const {
     }
 }
 
-bool QnCommandLineParser::parse(int &argc, char **argv) {
+bool QnCommandLineParser::parse(int &argc, char **argv, bool checkTypes) {
     int pos = 0, skipped = 0;
 
     QTextStream err(stderr); 
 
     while(pos < argc) {
-        QString stringValue;
-
         /* Extract name. */
-        QStringList paramInfo = QString(argv[pos]).split('=');
+        QStringList paramInfo = QString(QLatin1String(argv[pos])).split('=');
         QString name = paramInfo[0];
 
         int index = m_indexByName.value(name, -1);
@@ -81,42 +86,31 @@ bool QnCommandLineParser::parse(int &argc, char **argv) {
 
         const QnCommandLineParameter &parameter = m_parameters[index];
 
-        /* Extract string value if needed. */
-        if (paramInfo.size() > 1)
-            stringValue = paramInfo[1];
-        else if(parameter.hasValue()) {
+        /* Extract value. */
+        QVariant value;
+        if (paramInfo.size() > 1) {
+            value = paramInfo[1];
+        } else if(parameter.impliedValue().isValid()) {
+            value = parameter.impliedValue();
+        } else {
             pos++;
             if(pos >= argc) {
                 err << tr("No value provided for the '%1' parameter.").arg(name) << endl;
                 return false;
             } else {
-                stringValue = QLatin1String(argv[pos]);
+                value = QLatin1String(argv[pos]);
             }
         }
 
         /* Convert to typed value. */
-        QVariant value;
-        switch(parameter.type()) {
-        case QnCommandLineParameter::String:
-            value = stringValue;
-            break;
-        case QnCommandLineParameter::Integer: {
-            bool ok;
-            qint64 intValue = stringValue.toLongLong(&ok);
-            if(!ok) {
-                err << tr("Invalid value for '%1' parameter - expected integer, provided '%2'.").arg(name).arg(stringValue) << endl;
-                return false;
+        if(checkTypes) {
+            QVariant typedValue = value;
+            bool success = typedValue.convert(static_cast<QVariant::Type>(parameter.type()));
+            if(!success) {
+                err << tr("Invalid value for '%1' parameter - expected %2, provided '%3'.").arg(name).arg(QMetaType::typeName(parameter.type())).arg(value.toString()) << endl;
             } else {
-                value = intValue;
+                value = typedValue;
             }
-            break;
-                                              }
-        case QnCommandLineParameter::Flag:
-            value = true;
-            break;
-        default:
-            qnWarning("Invalid command line parameter type '%1'.", static_cast<int>(parameter.type()));
-            break;
         }
 
         /* Store value. */

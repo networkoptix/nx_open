@@ -1,31 +1,25 @@
 #ifndef QN_COMMAND_LINE_PARSER_H
 #define QN_COMMAND_LINE_PARSER_H
 
-#include <QString>
-#include <QApplication> /* For Q_DECLARE_TR_FUNCTIONS. */
-#include <QVariant>
-#include <QHash>
-#include <QList>
+#include <QtCore/QString>
+#include <QtCore/QCoreApplication> /* For Q_DECLARE_TR_FUNCTIONS. */
+#include <QtCore/QVariant>
+#include <QtCore/QHash>
+#include <QtCore/QList>
 
 class QTextStream;
 
 class QN_EXPORT QnCommandLineParameter {
 public:
-    enum Type {
-        String,
-        Integer,
-        Flag,
-    };
-
-    QnCommandLineParameter(Type type, const QString &name, const QString &shortName, const QString &description):
-        m_type(type), m_name(name), m_shortName(shortName), m_description(description)
+    QnCommandLineParameter(int type, const QString &name, const QString &shortName, const QString &description, const QVariant &impliedValue = QVariant()):
+        m_type(type), m_name(name), m_shortName(shortName), m_description(description), m_impliedValue(impliedValue)
     {}
 
-    QnCommandLineParameter(Type type, const char *name, const char *shortName, const QString &description):
-        m_type(type), m_name(QLatin1String(name)), m_shortName(QLatin1String(shortName)), m_description(description)
+    QnCommandLineParameter(int type, const char *name, const char *shortName, const QString &description, const QVariant &impliedValue = QVariant()):
+        m_type(type), m_name(QLatin1String(name)), m_shortName(QLatin1String(shortName)), m_description(description), m_impliedValue(impliedValue)
     {}
 
-    Type type() const {
+    int type() const {
         return m_type;
     }
 
@@ -41,15 +35,16 @@ public:
         return m_description;
     }
 
-    bool hasValue() const {
-        return m_type != Flag;
+    QVariant impliedValue() const {
+        return m_impliedValue;
     }
 
 private:
-    Type m_type;
+    int m_type;
     QString m_name;
     QString m_shortName;
     QString m_description;
+    QVariant m_impliedValue;
 };
 
 
@@ -59,16 +54,16 @@ public:
     QnCommandLineParser() {}
 
     void addParameter(const QnCommandLineParameter &parameter);
+    void addParameter(int type, const char *name, const char *shortName, const QString &description, const QVariant &impliedValue = QVariant());
 
     void print(QTextStream &stream) const;
 
     QVariant value(const QString &name, const QVariant &defaultValue = QVariant());
-
     QVariant value(const char *name, const QVariant &defaultValue = QVariant());
 
     void clear();
 
-    bool parse(int &argc, char **argv);
+    bool parse(int &argc, char **argv, bool checkTypes);
 
 private:
     QList<QnCommandLineParameter> m_parameters;
