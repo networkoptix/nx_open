@@ -300,11 +300,11 @@ namespace{
 // very useful function, I'd move it to any shared linux util class
     static QString getSystemOutput(QString cmds)
     {
-        QStringList list = cmds.split('|');
+        QStringList list = cmds.split(QLatin1Char('|'));
         QStringListIterator iter(list);
 
         if (!iter.hasNext())
-            return "";
+            return QString();
         QString cmd = iter.next();
         QProcess *prev = new QProcess();
 
@@ -313,18 +313,18 @@ namespace{
             prev->setStandardOutputProcess(next);
             prev->start(cmd);
             if (!prev->waitForStarted())
-                return "";
+                return QString();
             if (!prev->waitForFinished())
-                return "";
+                return QString();
 
             prev = next;
             cmd = iter.next();
         }
         prev->start(cmd);
         if (!prev->waitForStarted())
-            return "";
+            return QString();
         if (!prev->waitForFinished())
-            return "";
+            return QString();
 
         return QString(prev->readAll());
     }
@@ -416,8 +416,8 @@ namespace{
             busy = 0;
             total = 0;
 
-            QString proc_stat = getSystemOutput("cat /proc/stat | grep \"cpu \"").mid(5);
-            QStringList list = proc_stat.split(' ', QString::SkipEmptyParts);
+            QString proc_stat = getSystemOutput(QLatin1String("cat /proc/stat | grep \"cpu \"")).mid(5);
+            QStringList list = proc_stat.split(QLatin1Char(' '), QString::SkipEmptyParts);
             QStringListIterator iter(list);
             int counter = 0;
             while (iter.hasNext()){
@@ -431,8 +431,8 @@ namespace{
         }
 
         qulonglong getProcessCpu() {
-            QString request = QString("cat /proc/%1/stat").arg(QCoreApplication::applicationPid ());
-            QStringList proc_stat = getSystemOutput(request).split(' ', QString::SkipEmptyParts);
+            QString request = QString(QLatin1String("cat /proc/%1/stat")).arg(QCoreApplication::applicationPid());
+            QStringList proc_stat = getSystemOutput(request).split(QLatin1Char(' '), QString::SkipEmptyParts);
             if (proc_stat.count() > 14){
                 return (proc_stat[13]).toULongLong() +
                         proc_stat[14].toULongLong();
@@ -521,7 +521,7 @@ QString estimateCpuBrand() {
     return QLatin1String(brandString);
 #elif defined(Q_OS_LINUX)
     // 13 - const length of 'model name : ' string with tabs - standard output of /proc/cpuinfo
-    return getSystemOutput("grep \"model name\" /proc/cpuinfo | head -1").mid(13);
+    return getSystemOutput(QLatin1String("grep \"model name\" /proc/cpuinfo | head -1")).mid(13);
 #else
     return QLatin1String("Unknown CPU");
 #endif
@@ -558,7 +558,7 @@ class PerformanceFunctions {
 
 public:
     PerformanceFunctions() {
-        QLibrary Kernel32Lib(QString::fromAscii("Kernel32"));    
+        QLibrary Kernel32Lib(QLatin1String("Kernel32"));    
         PtrQueryThreadCycleTime result = (PtrQueryThreadCycleTime) Kernel32Lib.resolve("QueryThreadCycleTime");
         if (result)
             queryThreadCycleTime = result;
