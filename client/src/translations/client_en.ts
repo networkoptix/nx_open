@@ -2288,6 +2288,7 @@ AVAILABLE</source>
         <source>Are you sure you want to permanently delete these %n file(s)?</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -2297,6 +2298,7 @@ AVAILABLE</source>
     <message numerus="yes">
         <source>Are you sure you want to remove these %n item(s) from layout?</source>
         <translation type="unfinished">
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>

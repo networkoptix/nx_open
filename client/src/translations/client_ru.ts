@@ -4,17 +4,17 @@
 <context>
     <name>AVSettingsDlg</name>
     <message>
-        <location filename="../ui/device_settings/plugins/arecontvision/arecont_dlg.cpp" line="49"/>
+        <location filename="../ui/widgets/settings/specific/plugins/arecontvision/arecont_dlg.cpp" line="49"/>
         <source>Suggestions...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/device_settings/plugins/arecontvision/arecont_dlg.cpp" line="235"/>
+        <location filename="../ui/widgets/settings/specific/plugins/arecontvision/arecont_dlg.cpp" line="235"/>
         <source>To reduce the bandwidth try to set Light Mode on Exposure tab to HightSpeed and set Short Exposure to 30ms.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/device_settings/plugins/arecontvision/arecont_dlg.cpp" line="236"/>
+        <location filename="../ui/widgets/settings/specific/plugins/arecontvision/arecont_dlg.cpp" line="236"/>
         <source>Suggestion</source>
         <translation type="unfinished"></translation>
     </message>
@@ -47,22 +47,22 @@
 <context>
     <name>CLAbstractDeviceSettingsDlg</name>
     <message>
-        <location filename="../ui/device_settings/device_settings_dlg.cpp" line="17"/>
+        <location filename="../ui/widgets/settings/specific/device_settings_dlg.cpp" line="17"/>
         <source>Camera settings: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/device_settings/device_settings_dlg.cpp" line="98"/>
+        <location filename="../ui/widgets/settings/specific/device_settings_dlg.cpp" line="98"/>
         <source>General</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/device_settings/device_settings_dlg.cpp" line="137"/>
+        <location filename="../ui/widgets/settings/specific/device_settings_dlg.cpp" line="137"/>
         <source>Unable to save changes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/device_settings/device_settings_dlg.cpp" line="137"/>
+        <location filename="../ui/widgets/settings/specific/device_settings_dlg.cpp" line="137"/>
         <source>Please try save changes later.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -78,113 +78,113 @@
 <context>
     <name>CameraScheduleWidget</name>
     <message>
-        <location filename="../ui/device_settings/camera_schedule_widget.ui" line="14"/>
+        <location filename="../ui/widgets/properties/camera_schedule_widget.ui" line="14"/>
         <source>Camera schedule editor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/device_settings/camera_schedule_widget.ui" line="22"/>
+        <location filename="../ui/widgets/properties/camera_schedule_widget.ui" line="22"/>
         <source>Enable recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/device_settings/camera_schedule_widget.ui" line="45"/>
+        <location filename="../ui/widgets/properties/camera_schedule_widget.ui" line="45"/>
         <source>...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/device_settings/camera_schedule_widget.ui" line="52"/>
+        <location filename="../ui/widgets/properties/camera_schedule_widget.ui" line="52"/>
         <source>Get More Licenses...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/device_settings/camera_schedule_widget.ui" line="61"/>
+        <location filename="../ui/widgets/properties/camera_schedule_widget.ui" line="61"/>
         <source>Schedule grid</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/device_settings/camera_schedule_widget.ui" line="78"/>
+        <location filename="../ui/widgets/properties/camera_schedule_widget.ui" line="78"/>
         <source>Display quality on grid</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/device_settings/camera_schedule_widget.ui" line="104"/>
+        <location filename="../ui/widgets/properties/camera_schedule_widget.ui" line="104"/>
         <source>Display fps on grid</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/device_settings/camera_schedule_widget.ui" line="159"/>
+        <location filename="../ui/widgets/properties/camera_schedule_widget.ui" line="159"/>
         <source>Schedule settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/device_settings/camera_schedule_widget.ui" line="167"/>
+        <location filename="../ui/widgets/properties/camera_schedule_widget.ui" line="167"/>
         <source>fps</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/device_settings/camera_schedule_widget.ui" line="190"/>
+        <location filename="../ui/widgets/properties/camera_schedule_widget.ui" line="190"/>
         <source>quality</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/device_settings/camera_schedule_widget.ui" line="201"/>
+        <location filename="../ui/widgets/properties/camera_schedule_widget.ui" line="201"/>
         <source>Low</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/device_settings/camera_schedule_widget.ui" line="206"/>
+        <location filename="../ui/widgets/properties/camera_schedule_widget.ui" line="206"/>
         <source>Medium</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/device_settings/camera_schedule_widget.ui" line="211"/>
+        <location filename="../ui/widgets/properties/camera_schedule_widget.ui" line="211"/>
         <source>High</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/device_settings/camera_schedule_widget.ui" line="216"/>
+        <location filename="../ui/widgets/properties/camera_schedule_widget.ui" line="216"/>
         <source>Best</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/device_settings/camera_schedule_widget.ui" line="276"/>
+        <location filename="../ui/widgets/properties/camera_schedule_widget.ui" line="276"/>
         <source>Record always</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/device_settings/camera_schedule_widget.ui" line="330"/>
+        <location filename="../ui/widgets/properties/camera_schedule_widget.ui" line="330"/>
         <source>Motion only</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/device_settings/camera_schedule_widget.ui" line="381"/>
+        <location filename="../ui/widgets/properties/camera_schedule_widget.ui" line="381"/>
         <source>Motion+ low quality always</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/device_settings/camera_schedule_widget.ui" line="432"/>
+        <location filename="../ui/widgets/properties/camera_schedule_widget.ui" line="432"/>
         <source>Do not record</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/device_settings/camera_schedule_widget.ui" line="452"/>
+        <location filename="../ui/widgets/properties/camera_schedule_widget.ui" line="452"/>
         <source>Motion recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/device_settings/camera_schedule_widget.ui" line="472"/>
+        <location filename="../ui/widgets/properties/camera_schedule_widget.ui" line="472"/>
         <source>Record before motion</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/device_settings/camera_schedule_widget.ui" line="479"/>
-        <location filename="../ui/device_settings/camera_schedule_widget.ui" line="508"/>
+        <location filename="../ui/widgets/properties/camera_schedule_widget.ui" line="479"/>
+        <location filename="../ui/widgets/properties/camera_schedule_widget.ui" line="508"/>
         <source> s</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/device_settings/camera_schedule_widget.ui" line="501"/>
+        <location filename="../ui/widgets/properties/camera_schedule_widget.ui" line="501"/>
         <source>Record after motion</source>
         <translation type="unfinished"></translation>
     </message>
@@ -363,7 +363,7 @@
         <translation type="obsolete">Русский</translation>
     </message>
     <message>
-        <location filename="../ui/dialogs/preferences_dialog.cpp" line="111"/>
+        <location filename="../ui/dialogs/preferences_dialog.cpp" line="113"/>
         <source>Language Name</source>
         <translation>Русский</translation>
     </message>
@@ -777,7 +777,7 @@ For easy instructions on how to install or update your video driver, follow inst
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../main.cpp" line="244"/>
+        <location filename="../main.cpp" line="243"/>
         <source>Using authentication parameters from command line: %1.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1508,24 +1508,24 @@ For easy instructions on how to install or update your video driver, follow inst
 <context>
     <name>QnCameraMotionMaskWidget</name>
     <message>
-        <location filename="../ui/device_settings/camera_motion_mask_widget.cpp" line="195"/>
-        <location filename="../ui/device_settings/camera_motion_mask_widget.cpp" line="204"/>
-        <location filename="../ui/device_settings/camera_motion_mask_widget.cpp" line="213"/>
+        <location filename="../ui/widgets/properties/camera_motion_mask_widget.cpp" line="195"/>
+        <location filename="../ui/widgets/properties/camera_motion_mask_widget.cpp" line="204"/>
+        <location filename="../ui/widgets/properties/camera_motion_mask_widget.cpp" line="213"/>
         <source>Too many motion windows</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/device_settings/camera_motion_mask_widget.cpp" line="196"/>
+        <location filename="../ui/widgets/properties/camera_motion_mask_widget.cpp" line="196"/>
         <source>Maximum amount of motion windows for current camera is %1, but %2 motion windows are currently selected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/device_settings/camera_motion_mask_widget.cpp" line="205"/>
+        <location filename="../ui/widgets/properties/camera_motion_mask_widget.cpp" line="205"/>
         <source>Maximum amount of different motion sensitivities for current camera is %1, but %2 motion sensitivities are currently selected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/device_settings/camera_motion_mask_widget.cpp" line="214"/>
+        <location filename="../ui/widgets/properties/camera_motion_mask_widget.cpp" line="214"/>
         <source>Maximum amount of motion mask windows for current camera is %1, but %2 motion mask windows are currently selected.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1533,22 +1533,22 @@ For easy instructions on how to install or update your video driver, follow inst
 <context>
     <name>QnCameraScheduleWidget</name>
     <message>
-        <location filename="../ui/device_settings/camera_schedule_widget.cpp" line="452"/>
+        <location filename="../ui/widgets/properties/camera_schedule_widget.cpp" line="452"/>
         <source>%n license(s) are used out of %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/device_settings/camera_schedule_widget.cpp" line="455"/>
+        <location filename="../ui/widgets/properties/camera_schedule_widget.cpp" line="455"/>
         <source>%1. %2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/device_settings/camera_schedule_widget.cpp" line="456"/>
+        <location filename="../ui/widgets/properties/camera_schedule_widget.cpp" line="456"/>
         <source>Requires %n license(s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/device_settings/camera_schedule_widget.cpp" line="457"/>
+        <location filename="../ui/widgets/properties/camera_schedule_widget.cpp" line="457"/>
         <source>%n license(s) are used out of %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1706,12 +1706,12 @@ Try to activate your License manually.</source>
 <context>
     <name>QnMediaResourceWidget</name>
     <message>
-        <location filename="../ui/graphics/items/media_resource_widget.cpp" line="461"/>
+        <location filename="../ui/graphics/items/resource/media_resource_widget.cpp" line="461"/>
         <source>%1x%2 %3fps @ %4Mbps (%5)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/graphics/items/media_resource_widget.cpp" line="467"/>
+        <location filename="../ui/graphics/items/resource/media_resource_widget.cpp" line="467"/>
         <source>hh:mm:ss.zzz</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1967,33 +1967,33 @@ Try to activate your License manually.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/dialogs/preferences_dialog.cpp" line="123"/>
-        <location filename="../ui/dialogs/preferences_dialog.cpp" line="126"/>
+        <location filename="../ui/dialogs/preferences_dialog.cpp" line="125"/>
+        <location filename="../ui/dialogs/preferences_dialog.cpp" line="128"/>
         <source>Information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/dialogs/preferences_dialog.cpp" line="123"/>
+        <location filename="../ui/dialogs/preferences_dialog.cpp" line="125"/>
         <source>The language change will take effect after a restart of the application.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/dialogs/preferences_dialog.cpp" line="126"/>
+        <location filename="../ui/dialogs/preferences_dialog.cpp" line="128"/>
         <source>Very powerful machine is required for BestQuality and Native resolution.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/dialogs/preferences_dialog.cpp" line="180"/>
+        <location filename="../ui/dialogs/preferences_dialog.cpp" line="182"/>
         <source>IP Address: %1, Network Mask: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/dialogs/preferences_dialog.cpp" line="227"/>
+        <location filename="../ui/dialogs/preferences_dialog.cpp" line="229"/>
         <source>Folder is already added</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/dialogs/preferences_dialog.cpp" line="227"/>
+        <location filename="../ui/dialogs/preferences_dialog.cpp" line="229"/>
         <source>This folder is already added.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2041,22 +2041,22 @@ Try to activate your License manually.</source>
 <context>
     <name>QnResourceWidget</name>
     <message>
-        <location filename="../ui/graphics/items/resource_widget.cpp" line="230"/>
+        <location filename="../ui/graphics/items/resource/resource_widget.cpp" line="229"/>
         <source>NO DATA</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/graphics/items/resource_widget.cpp" line="232"/>
+        <location filename="../ui/graphics/items/resource/resource_widget.cpp" line="231"/>
         <source>NO SIGNAL</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/graphics/items/resource_widget.cpp" line="234"/>
+        <location filename="../ui/graphics/items/resource/resource_widget.cpp" line="233"/>
         <source>Unauthorized</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/graphics/items/resource_widget.cpp" line="236"/>
+        <location filename="../ui/graphics/items/resource/resource_widget.cpp" line="235"/>
         <source>Please check authentication information in camera settings</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2064,12 +2064,12 @@ Try to activate your License manually.</source>
 <context>
     <name>QnServerResourceWidget</name>
     <message>
-        <location filename="../ui/graphics/items/server_resource_widget.cpp" line="369"/>
+        <location filename="../ui/graphics/items/resource/server_resource_widget.cpp" line="369"/>
         <source>CPU</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/graphics/items/server_resource_widget.cpp" line="370"/>
+        <location filename="../ui/graphics/items/resource/server_resource_widget.cpp" line="370"/>
         <source>HDD</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2605,6 +2605,8 @@ AVAILABLE</source>
         <source>Are you sure you want to permanently delete these %n file(s)?</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -2616,6 +2618,8 @@ AVAILABLE</source>
         <location filename="../ui/workbench/workbench_action_handler.cpp" line="1170"/>
         <source>Are you sure you want to remove these %n item(s) from layout?</source>
         <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>

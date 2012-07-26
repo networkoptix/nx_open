@@ -43,10 +43,10 @@ def genskin():
   
   skin_qrc.close()		
 
-def genhelp():
+def gentranslations():
   os.path = posixpath
 
-  translations_qrc = open('build/translations.qrc', 'w')
+  translations_qrc = open('build/client_translations.qrc', 'w')
 
   print >> translations_qrc, """
   <!DOCTYPE RCC>
@@ -64,16 +64,6 @@ def genhelp():
       if f.endswith('.qm'):
         print >> translations_qrc, '<file alias="%s">%s</file>' % (os.path.join(parent, f).lower(), os.path.join(root, f).lower())
 
-  translations_system_dir = '${environment.dir}/qt/translations'
-  for root, dirs, files in os.walk(translations_system_dir):
-    parent = root[len(translations_system_dir) + 1:]
-    if '.svn' in dirs:
-      dirs.remove('.svn')  # don't visit SVN directories
-
-    for f in files:
-      if f.endswith('.qm'):
-        print >> translations_qrc, '<file alias="%s">%s</file>' % (os.path.join(parent, f).lower(), os.path.join(root, f).lower())
-
   print >> translations_qrc, """
   </qresource>
   </RCC>
@@ -84,6 +74,6 @@ def genhelp():
 if __name__ == '__main__':
   genskin()
   os.system('${environment.dir}/qt/bin/lrelease ${project.build.directory}/${project.artifactId}-specifics.pro')
-  genhelp()
+  gentranslations()
   if platform() == 'linux':
     os.system('unzip -a -u *.zip')

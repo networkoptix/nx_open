@@ -101,18 +101,18 @@ void QnPreferencesDialog::initColorPicker() {
 void QnPreferencesDialog::initLanguages(){
     QDir qmDir(QLatin1String(":/translations"));
     QStringList fileNames =
-        qmDir.entryList(QStringList(QLatin1String("*.qm")));
+        qmDir.entryList(QStringList(QLatin1String("client_*.qm")));
 
     for (int i = 0; i < fileNames.size(); ++i) {
         QString filename = fileNames[i];
-        if (filename.startsWith(QLatin1String("qt_")))
-            continue;
 
         QTranslator translator;
         translator.load(filename, qmDir.absolutePath());
-        QString language = translator.translate("Language", "Language Name"); // This should be translated by all means!
+        QString language = translator.translate("Language", "Language Name");   // This should be translated by all means!
 
-        filename.chop(3); // remove ".qm"
+        
+        filename.remove(0, filename.indexOf(QLatin1Char('_')) + 1);             // remove "client_"
+        filename.chop(3);                                                       // remove ".qm"
         ui->languageComboBox->addItem(language, filename);
     }
 
