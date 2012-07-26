@@ -18,7 +18,6 @@
 #include "decoders/video/ipp_h264_decoder.h"
 
 #include <utils/common/command_line_parser.h>
-#include "ui/device_settings/dlg_factory.h"
 #include "ui/workbench/workbench_context.h"
 #include "ui/actions/action_manager.h"
 #include "ui/style/skin.h"
@@ -360,8 +359,6 @@ int main(int argc, char *argv[])
 //    QnResourceDiscoveryManager::instance().addDeviceServer(&DesktopDeviceServer::instance());
 #endif // Q_OS_WIN
     QnResourceDiscoveryManager::instance().start();
-
-    CLDeviceSettingsDlgFactory::initialize();
 
     qApp->setStyle(qnSkin->style());
 
