@@ -219,6 +219,7 @@ protected slots:
     void at_serverSettingsAction_triggered();
     void at_youtubeUploadAction_triggered();
     void at_editTagsAction_triggered();
+    void at_quickSearchAction_triggered();
 
     void at_openInFolderAction_triggered();
     void at_deleteFromDiskAction_triggered();

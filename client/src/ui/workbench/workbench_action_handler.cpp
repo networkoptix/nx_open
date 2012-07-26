@@ -200,6 +200,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::ExitAction),                             SIGNAL(triggered()),    this,   SLOT(at_exitAction_triggered()));
     connect(action(Qn::ExportTimeSelectionAction),              SIGNAL(triggered()),    this,   SLOT(at_exportTimeSelectionAction_triggered()));
     connect(action(Qn::ExportLayoutAction),                     SIGNAL(triggered()),    this,   SLOT(at_exportLayoutAction_triggered()));
+    connect(action(Qn::QuickSearchAction),                      SIGNAL(triggered()),    this,   SLOT(at_quickSearchAction_triggered()));
     connect(action(Qn::SetCurrentLayoutAspectRatio4x3Action),   SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutAspectRatio4x3Action_triggered()));
     connect(action(Qn::SetCurrentLayoutAspectRatio16x9Action),  SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutAspectRatio16x9Action_triggered()));
     connect(action(Qn::SetCurrentLayoutItemSpacing0Action),     SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing0Action_triggered()));
@@ -1043,12 +1044,22 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
 
 void QnWorkbenchActionHandler::at_editTagsAction_triggered() {
     QnResourcePtr resource = menu()->currentParameters(sender()).resource();
-    if(resource.isNull())
+    if(!resource)
         return;
 
     QScopedPointer<TagsEditDialog> dialog(new TagsEditDialog(QStringList() << resource->getUniqueId(), widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
+}
+
+void QnWorkbenchActionHandler::at_quickSearchAction_triggered() {
+    QnActionParameters parameters = menu()->currentParameters(sender());
+
+    QnResourcePtr resource = parameters.resource();
+    if(!resource)
+        return;
+
+    QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodParameter);
 }
 
 void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
