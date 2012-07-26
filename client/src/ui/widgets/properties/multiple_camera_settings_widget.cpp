@@ -9,8 +9,8 @@
 #include "core/resource/resource.h"
 #include "core/resource/camera_resource.h"
 #include "ui/common/read_only.h"
-#include "ui/device_settings/camera_schedule_widget.h"
-#include "ui/device_settings/camera_motion_mask_widget.h"
+#include "ui/widgets/properties/camera_schedule_widget.h"
+#include "ui/widgets/properties/camera_motion_mask_widget.h"
 #include "ui/graphics/items/resource/resource_widget.h"
 
 QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent): 

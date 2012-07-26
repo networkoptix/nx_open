@@ -6,9 +6,6 @@
 #include <QtGui/QPushButton>
 #include <QtGui/QRadioButton>
 
-#include "camera_motion_mask_widget.h"
-#include "camera_schedule_widget.h"
-
 #include "utils/settings.h"
 #include "ui/style/globals.h"
 
@@ -197,7 +194,7 @@ void SettingsButtonWidget::updateParam(const QVariant &/*value*/)
 SettingsEditorFactory::SettingsEditorFactory() : QItemEditorFactory()
 {
     //registerEditor(QVariant::Type(qMetaTypeId<QRegion>()), new QStandardItemEditorCreator<QnCameraMotionMaskWidget>());
-    registerEditor(QVariant::Type(qMetaTypeId<QnScheduleTaskList>()), new QStandardItemEditorCreator<QnCameraScheduleWidget>());
+    //registerEditor(QVariant::Type(qMetaTypeId<QnScheduleTaskList>()), new QStandardItemEditorCreator<QnCameraScheduleWidget>());
 }
 
 QWidget *SettingsEditorFactory::createEditor(const QnParam &param, QWidget *parent) const
