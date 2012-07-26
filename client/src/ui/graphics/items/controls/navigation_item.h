@@ -1,7 +1,7 @@
 #ifndef NAVIGATIONITEM_H
 #define NAVIGATIONITEM_H
 
-#include <ui/graphics/items/simple_frame_widget.h>
+#include <ui/graphics/items/generic/simple_frame_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnSpeedSlider;

@@ -14,13 +14,13 @@
 #include <camera/camdisplay.h>
 
 #include <ui/graphics/instruments/motion_selection_instrument.h>
+#include <ui/graphics/items/generic/image_button_widget.h>
+#include <ui/graphics/items/generic/image_button_bar.h>
 #include <ui/common/color_transformations.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 
 #include "resource_widget_renderer.h"
-#include "image_button_widget.h"
-#include "image_button_bar.h"
 #include "resource_widget.h"
 
 

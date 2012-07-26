@@ -36,13 +36,13 @@
 #include <ui/graphics/instruments/selection_overlay_hack_instrument.h>
 #include <ui/graphics/instruments/focus_listener_instrument.h>
 
-#include <ui/graphics/items/resource_widget.h>
-#include <ui/graphics/items/server_resource_widget.h>
-#include <ui/graphics/items/media_resource_widget.h>
-#include <ui/graphics/items/resource_widget_renderer.h>
-#include <ui/graphics/items/curtain_item.h>
-#include <ui/graphics/items/image_button_widget.h>
-#include <ui/graphics/items/grid_item.h>
+#include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/graphics/items/resource/server_resource_widget.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/graphics/items/resource/resource_widget_renderer.h>
+#include <ui/graphics/items/grid/curtain_item.h>
+#include <ui/graphics/items/generic/image_button_widget.h>
+#include <ui/graphics/items/grid/grid_item.h>
 
 #include <ui/graphics/opengl/gl_hardware_checker.h>
 

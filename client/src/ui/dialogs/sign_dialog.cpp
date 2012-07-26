@@ -9,7 +9,7 @@
 #include "camera/camdisplay.h"
 #include "camera/sync_dialog_display.h"
 
-#include "ui/graphics/items/resource_widget_renderer.h"
+#include "ui/graphics/items/resource/resource_widget_renderer.h"
 
 #include "decoders/video/ffmpeg.h"
 #include "export/sign_helper.h"

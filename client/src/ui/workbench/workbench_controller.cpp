@@ -64,9 +64,9 @@
 #include <ui/graphics/instruments/selection_overlay_hack_instrument.h>
 #include <ui/graphics/instruments/grid_adjustment_instrument.h>
 
-#include <ui/graphics/items/resource_widget.h>
-#include <ui/graphics/items/media_resource_widget.h>
-#include <ui/graphics/items/grid_item.h>
+#include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/graphics/items/grid/grid_item.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_target_provider.h>

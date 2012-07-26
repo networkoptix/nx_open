@@ -5,8 +5,8 @@
 #include <camera/abstractrenderer.h>
 
 #include <ui/workbench/workbench_display.h>
-#include <ui/graphics/items/resource_widget_renderer.h>
-#include <ui/graphics/items/media_resource_widget.h>
+#include <ui/graphics/items/resource/resource_widget_renderer.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/instruments/signaling_instrument.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/instruments/forwarding_instrument.h>

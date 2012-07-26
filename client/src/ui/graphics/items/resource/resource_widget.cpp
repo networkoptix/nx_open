@@ -24,15 +24,14 @@
 #include <ui/graphics/painters/paused_painter.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/standard/graphics_label.h>
+#include <ui/graphics/items/generic/image_button_widget.h>
+#include <ui/graphics/items/generic/image_button_bar.h>
+#include <ui/graphics/items/generic/viewport_bound_widget.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
-
-#include "image_button_widget.h"
-#include "image_button_bar.h"
-#include "viewport_bound_widget.h"
 
 namespace {
 

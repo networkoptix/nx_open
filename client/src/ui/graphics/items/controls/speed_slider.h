@@ -1,10 +1,9 @@
 #ifndef QN_SPEED_SLIDER_H
 #define QN_SPEED_SLIDER_H
 
-#include "tool_tip_slider.h"
-
 #include <QtCore/QBasicTimer>
 
+#include <ui/graphics/items/generic/tool_tip_slider.h>
 #include <ui/animation/animated.h>
 
 class VariantAnimator;

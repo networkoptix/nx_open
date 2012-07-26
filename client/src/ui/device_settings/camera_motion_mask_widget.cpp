@@ -18,7 +18,7 @@
 #include "ui/graphics/instruments/resizing_instrument.h"
 #include "ui/graphics/instruments/forwarding_instrument.h"
 #include "ui/graphics/instruments/rubber_band_instrument.h"
-#include "ui/graphics/items/media_resource_widget.h"
+#include "ui/graphics/items/resource/media_resource_widget.h"
 #include "ui/workbench/workbench_item.h"
 #include "ui/workbench/workbench.h"
 #include "ui/workbench/workbench_grid_mapper.h"

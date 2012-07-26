@@ -22,11 +22,11 @@
 #include <ui/style/noptix_style.h>
 #include <ui/style/globals.h>
 #include <ui/graphics/items/standard/graphics_slider_p.h>
+#include <ui/graphics/items/generic/tool_tip_item.h>
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
 #include <ui/processors/kinetic_cutting_processor.h>
 #include <ui/processors/drag_processor.h>
 
-#include "tool_tip_item.h"
 #include "time_slider_pixmap_cache.h"
 
 namespace {

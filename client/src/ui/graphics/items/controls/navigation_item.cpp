@@ -1,10 +1,10 @@
 #include "navigation_item.h"
 
-#include <QEvent>
-#include <QCoreApplication>
-#include <QAction>
-#include <QGraphicsLinearLayout>
-#include <QMessageBox>
+#include <QtCore/QEvent>
+#include <QtCore/QCoreApplication>
+#include <QtGui/QAction>
+#include <QtGui/QGraphicsLinearLayout>
+#include <QtGui/QMessageBox>
 
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
 #include <utils/common/util.h>
@@ -16,8 +16,8 @@
 #include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/graphics/items/controls/speed_slider.h>
 #include <ui/graphics/items/controls/volume_slider.h>
-#include <ui/graphics/items/controls/tool_tip_item.h>
-#include <ui/graphics/items/image_button_widget.h>
+#include <ui/graphics/items/generic/tool_tip_item.h>
+#include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_context.h>

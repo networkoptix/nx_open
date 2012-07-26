@@ -1,11 +1,10 @@
 #ifndef QN_TIME_SLIDER_H
 #define QN_TIME_SLIDER_H
 
-#include "tool_tip_slider.h"
-
 #include <recording/time_period.h>
 
 #include <ui/common/functors.h>
+#include <ui/graphics/items/generic/tool_tip_slider.h>
 #include <ui/processors/kinetic_process_handler.h>
 #include <ui/processors/drag_process_handler.h>
 #include <ui/animation/animation_timer_listener.h>

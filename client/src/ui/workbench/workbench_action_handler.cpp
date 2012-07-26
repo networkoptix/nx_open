@@ -51,8 +51,8 @@
 #include <ui/dialogs/preferences_dialog.h>
 #include <youtube/youtubeuploaddialog.h>
 
-#include <ui/graphics/items/resource_widget.h>
-#include <ui/graphics/items/media_resource_widget.h>
+#include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
 
 #include <utils/settings.h>
 

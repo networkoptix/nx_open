@@ -4,8 +4,8 @@
 #include <core/resourcemanagment/resource_criterion.h>
 #include <recording/time_period.h>
 
-#include <ui/graphics/items/resource_widget.h>
-#include <ui/graphics/items/media_resource_widget.h>
+#include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>

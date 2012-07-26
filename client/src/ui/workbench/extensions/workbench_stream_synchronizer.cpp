@@ -14,8 +14,8 @@
 #include <camera/camera.h>
 
 #include <ui/workbench/workbench_display.h>
-#include <ui/graphics/items/resource_widget.h>
-#include <ui/graphics/items/media_resource_widget.h>
+#include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
 
 #include "workbench_render_watcher.h"
 

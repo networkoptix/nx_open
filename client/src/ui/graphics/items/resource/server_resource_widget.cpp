@@ -10,7 +10,7 @@
 
 #include <ui/style/globals.h>
 
-#include <ui/graphics/items/viewport_bound_widget.h>
+#include <ui/graphics/items/generic/viewport_bound_widget.h>
 #include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_context_data.h>

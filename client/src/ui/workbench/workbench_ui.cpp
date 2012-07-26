@@ -38,15 +38,15 @@
 #include <ui/graphics/instruments/focus_listener_instrument.h>
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
-#include <ui/graphics/items/image_button_widget.h>
-#include <ui/graphics/items/resource_widget.h>
-#include <ui/graphics/items/masked_proxy_widget.h>
-#include <ui/graphics/items/clickable_widget.h>
-#include <ui/graphics/items/simple_frame_widget.h>
+#include <ui/graphics/items/generic/image_button_widget.h>
+#include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/graphics/items/generic/masked_proxy_widget.h>
+#include <ui/graphics/items/generic/clickable_widget.h>
+#include <ui/graphics/items/generic/simple_frame_widget.h>
 #include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/graphics/items/controls/navigation_item.h>
 #include <ui/graphics/items/controls/time_slider.h>
-#include <ui/graphics/items/controls/tool_tip_item.h>
+#include <ui/graphics/items/generic/tool_tip_item.h>
 
 #include <ui/processors/hover_processor.h>
 
