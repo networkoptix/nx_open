@@ -276,8 +276,11 @@ int main(int argc, char *argv[])
 
     /* Initialize application instance. */
     application->setStartDragDistance(20);
-    
 
+    QTranslator appTranslator;
+    if (appTranslator.load(QLatin1String(":/help/context_help_ru.qm")))
+        application->installTranslator(&appTranslator);
+    
     QnToolTip::instance();
 
     QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
