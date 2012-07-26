@@ -237,7 +237,7 @@
     <message>
         <location filename="../ui/widgets/settings/connections_settings_widget.ui" line="183"/>
         <source>&amp;Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Пароль</translation>
     </message>
     <message>
         <location filename="../ui/widgets/settings/connections_settings_widget.ui" line="208"/>
@@ -354,6 +354,18 @@
         <location filename="../ui/widgets/help_widget.ui" line="61"/>
         <source>Do not show again</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Language</name>
+    <message>
+        <source>English</source>
+        <translation type="obsolete">Русский</translation>
+    </message>
+    <message>
+        <location filename="../ui/dialogs/preferences_dialog.cpp" line="111"/>
+        <source>Language Name</source>
+        <translation>Русский</translation>
     </message>
 </context>
 <context>
@@ -718,22 +730,22 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <location filename="../ui/dialogs/preferences_dialog.ui" line="159"/>
-        <source>Maximum video items on the scene (*)</source>
+        <source>Maximum video items on the scene (*):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/dialogs/preferences_dialog.ui" line="197"/>
+        <source>Animate background:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/dialogs/preferences_dialog.ui" line="211"/>
+        <source>Background animation color:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../ui/dialogs/preferences_dialog.ui" line="178"/>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/dialogs/preferences_dialog.ui" line="197"/>
-        <source>Animate background</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/dialogs/preferences_dialog.ui" line="211"/>
-        <source>Background animation color</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -747,12 +759,17 @@ For easy instructions on how to install or update your video driver, follow inst
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/dialogs/preferences_dialog.ui" line="259"/>
+        <location filename="../ui/dialogs/preferences_dialog.ui" line="267"/>
+        <source>Language:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/dialogs/preferences_dialog.ui" line="292"/>
         <source>Downmix the Audio from 5.1 to 2.1 channels (restart required)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/dialogs/preferences_dialog.ui" line="269"/>
+        <location filename="../ui/dialogs/preferences_dialog.ui" line="302"/>
         <source>Network Interfaces</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1598,22 +1615,22 @@ For easy instructions on how to install or update your video driver, follow inst
 <context>
     <name>QnContextHelp</name>
     <message>
-        <location filename="qncontext_help.cpp" line="90"/>
+        <location filename="../help/qncontext_help.cpp" line="67"/>
         <source>ContextId_Scene</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="qncontext_help.cpp" line="93"/>
+        <location filename="../help/qncontext_help.cpp" line="70"/>
         <source>ContextId_MotionGrid</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="qncontext_help.cpp" line="96"/>
+        <location filename="../help/qncontext_help.cpp" line="73"/>
         <source>ContextId_Slider</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="qncontext_help.cpp" line="99"/>
+        <location filename="../help/qncontext_help.cpp" line="76"/>
         <source>ContextId_Tree</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1870,107 +1887,113 @@ Try to activate your License manually.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/dialogs/preferences_dialog.cpp" line="81"/>
+        <location filename="../ui/dialogs/preferences_dialog.cpp" line="83"/>
         <source>White</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/dialogs/preferences_dialog.cpp" line="82"/>
+        <location filename="../ui/dialogs/preferences_dialog.cpp" line="84"/>
         <source>Red</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/dialogs/preferences_dialog.cpp" line="83"/>
+        <location filename="../ui/dialogs/preferences_dialog.cpp" line="85"/>
         <source>Dark red</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/dialogs/preferences_dialog.cpp" line="84"/>
+        <location filename="../ui/dialogs/preferences_dialog.cpp" line="86"/>
         <source>Green</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/dialogs/preferences_dialog.cpp" line="85"/>
+        <location filename="../ui/dialogs/preferences_dialog.cpp" line="87"/>
         <source>Dark green</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/dialogs/preferences_dialog.cpp" line="86"/>
+        <location filename="../ui/dialogs/preferences_dialog.cpp" line="88"/>
         <source>Blue</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/dialogs/preferences_dialog.cpp" line="87"/>
+        <location filename="../ui/dialogs/preferences_dialog.cpp" line="89"/>
         <source>Dark blue</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/dialogs/preferences_dialog.cpp" line="88"/>
+        <location filename="../ui/dialogs/preferences_dialog.cpp" line="90"/>
         <source>Cyan</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/dialogs/preferences_dialog.cpp" line="89"/>
+        <location filename="../ui/dialogs/preferences_dialog.cpp" line="91"/>
         <source>Dark cyan</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/dialogs/preferences_dialog.cpp" line="90"/>
+        <location filename="../ui/dialogs/preferences_dialog.cpp" line="92"/>
         <source>Magenta</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/dialogs/preferences_dialog.cpp" line="91"/>
+        <location filename="../ui/dialogs/preferences_dialog.cpp" line="93"/>
         <source>Dark magenta</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/dialogs/preferences_dialog.cpp" line="92"/>
+        <location filename="../ui/dialogs/preferences_dialog.cpp" line="94"/>
         <source>Yellow</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/dialogs/preferences_dialog.cpp" line="93"/>
+        <location filename="../ui/dialogs/preferences_dialog.cpp" line="95"/>
         <source>Dark yellow</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/dialogs/preferences_dialog.cpp" line="94"/>
+        <location filename="../ui/dialogs/preferences_dialog.cpp" line="96"/>
         <source>Gray</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/dialogs/preferences_dialog.cpp" line="95"/>
+        <location filename="../ui/dialogs/preferences_dialog.cpp" line="97"/>
         <source>Dark gray</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/dialogs/preferences_dialog.cpp" line="96"/>
+        <location filename="../ui/dialogs/preferences_dialog.cpp" line="98"/>
         <source>Light gray</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/dialogs/preferences_dialog.cpp" line="103"/>
+        <location filename="../ui/dialogs/preferences_dialog.cpp" line="123"/>
+        <location filename="../ui/dialogs/preferences_dialog.cpp" line="126"/>
         <source>Information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/dialogs/preferences_dialog.cpp" line="103"/>
+        <location filename="../ui/dialogs/preferences_dialog.cpp" line="123"/>
+        <source>The language change will take effect after a restart of the application.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/dialogs/preferences_dialog.cpp" line="126"/>
         <source>Very powerful machine is required for BestQuality and Native resolution.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/dialogs/preferences_dialog.cpp" line="155"/>
+        <location filename="../ui/dialogs/preferences_dialog.cpp" line="180"/>
         <source>IP Address: %1, Network Mask: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/dialogs/preferences_dialog.cpp" line="198"/>
+        <location filename="../ui/dialogs/preferences_dialog.cpp" line="227"/>
         <source>Folder is already added</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/dialogs/preferences_dialog.cpp" line="198"/>
+        <location filename="../ui/dialogs/preferences_dialog.cpp" line="227"/>
         <source>This folder is already added.</source>
         <translation type="unfinished"></translation>
     </message>

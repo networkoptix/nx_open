@@ -34,7 +34,6 @@ signals:
     void helpContextChanged(QnContextHelp::ContextId id);
 
 private:
-    void installHelpContext(const QString& lang);
     void deserializeShownContext();
     void serializeShownContext();
 

@@ -289,6 +289,17 @@
     </message>
 </context>
 <context>
+    <name>Language</name>
+    <message>
+        <source>English</source>
+        <translation type="obsolete">English</translation>
+    </message>
+    <message>
+        <source>Language Name</source>
+        <translation>English</translation>
+    </message>
+</context>
+<context>
     <name>LicenseManagerWidget</name>
     <message>
         <source>Form</source>
@@ -581,19 +592,7 @@ For easy instructions on how to install or update your video driver, follow inst
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Maximum video items on the scene (*)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Animate background</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Background animation color</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -610,6 +609,22 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Network Interfaces</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum video items on the scene (*):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Animate background:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Background animation color:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Language:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1829,6 +1844,10 @@ Try to activate your License manually.</source>
         <source>This folder is already added.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>The language change will take effect after a restart of the application.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnRecordingSettingsWidget</name>
@@ -2269,7 +2288,6 @@ AVAILABLE</source>
         <source>Are you sure you want to permanently delete these %n file(s)?</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -2279,7 +2297,6 @@ AVAILABLE</source>
     <message numerus="yes">
         <source>Are you sure you want to remove these %n item(s) from layout?</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>

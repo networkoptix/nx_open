@@ -67,6 +67,8 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     connect(ui->buttonBox,                              SIGNAL(accepted()),                                         this, SLOT(accept()));
     connect(ui->buttonBox,                              SIGNAL(rejected()),                                         this, SLOT(reject()));
 
+    initLanguages();
+
     updateFromSettings();
 }
 
@@ -96,8 +98,31 @@ void QnPreferencesDialog::initColorPicker() {
     w->insertColor(Qt::lightGray,     tr("Light gray"));
 }
 
+void QnPreferencesDialog::initLanguages(){
+    QDir qmDir(QLatin1String(":/translations"));
+    QStringList fileNames =
+        qmDir.entryList(QStringList(QLatin1String("*.qm")));
+
+    for (int i = 0; i < fileNames.size(); ++i) {
+        QString filename = fileNames[i];
+        if (filename.startsWith(QLatin1String("qt_")))
+            continue;
+
+        QTranslator translator;
+        translator.load(filename, qmDir.absolutePath());
+        QString language = translator.translate("Language", "Language Name"); // This should be translated by all means!
+
+        filename.chop(3); // remove ".qm"
+        ui->languageComboBox->addItem(language, filename);
+    }
+
+}
+
 void QnPreferencesDialog::accept() {
+    QString oldLanguage = m_settings->language();
     submitToSettings();
+    if (oldLanguage != m_settings->language())
+        QMessageBox::information(this, tr("Information"), tr("The language change will take effect after a restart of the application."));
 
     if (m_recordingSettingsWidget && m_recordingSettingsWidget->decoderQuality() == Qn::BestQuality && m_recordingSettingsWidget->resolution() == Qn::NativeResolution)
         QMessageBox::information(this, tr("Information"), tr("Very powerful machine is required for BestQuality and Native resolution."));
@@ -136,6 +161,8 @@ void QnPreferencesDialog::submitToSettings() {
     checkLst.push_back(QDir::toNativeSeparators(m_settings->mediaFolder()));
     QnResourceDirectoryBrowser::instance().setPathCheckList(checkLst); // TODO: re-check if it is needed here.
 
+    m_settings->setLanguage(ui->languageComboBox->itemData(ui->languageComboBox->currentIndex()).toString());
+
     m_settings->save();
 }
 
@@ -160,6 +187,10 @@ void QnPreferencesDialog::updateFromSettings() {
 
     if(m_recordingSettingsWidget)
         m_recordingSettingsWidget->updateFromSettings();
+
+    int id = ui->languageComboBox->findData(m_settings->language());
+    if (id >= 0)
+        ui->languageComboBox->setCurrentIndex(id);
 }
 
 void QnPreferencesDialog::setCurrentPage(QnPreferencesDialog::SettingsPage page)

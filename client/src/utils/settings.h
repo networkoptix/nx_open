@@ -60,6 +60,8 @@ public:
 
         DEBUG_COUNTER,
 
+        LANGUAGE,
+
         VARIABLE_COUNT
     };
     
@@ -93,6 +95,7 @@ private:
         QN_DECLARE_RW_PROPERTY(QnConnectionData,        lastUsedConnection,     setLastUsedConnection,      LAST_USED_CONNECTION,       QnConnectionData());
         QN_DECLARE_RW_PROPERTY(QnConnectionDataList,    customConnections,      setCustomConnections,       CUSTOM_CONNECTIONS,         QnConnectionDataList());
         QN_DECLARE_RW_PROPERTY(int,                     debugCounter,           setDebugCounter,            DEBUG_COUNTER,              0);
+        QN_DECLARE_RW_PROPERTY(QString,                 language,               setLanguage,                LANGUAGE,                   QLatin1String("en"));
     QN_END_PROPERTY_STORAGE();
 
 private:

@@ -46,30 +46,40 @@ def genskin():
 def genhelp():
   os.path = posixpath
 
-  help_qrc = open('build/help.qrc', 'w')
+  translations_qrc = open('build/translations.qrc', 'w')
 
-  print >> help_qrc, """
+  print >> translations_qrc, """
   <!DOCTYPE RCC>
   <RCC version="1.0">
-  <qresource prefix="/help">
+  <qresource prefix="/translations">
   """
 
-  help_dir = '${project.build.sourceDirectory}/help'
-  for root, dirs, files in os.walk(help_dir):
-    parent = root[len(help_dir) + 1:]
+  translations_project_dir = '${project.build.sourceDirectory}/translations'
+  for root, dirs, files in os.walk(translations_project_dir):
+    parent = root[len(translations_project_dir) + 1:]
     if '.svn' in dirs:
       dirs.remove('.svn')  # don't visit SVN directories
 
     for f in files:
       if f.endswith('.qm'):
-        print >> help_qrc, '<file alias="%s">%s</file>' % (os.path.join(parent, f).lower(), os.path.join(root, f).lower())  
+        print >> translations_qrc, '<file alias="%s">%s</file>' % (os.path.join(parent, f).lower(), os.path.join(root, f).lower())
 
-  print >> help_qrc, """
+  translations_system_dir = '${environment.dir}/qt/translations'
+  for root, dirs, files in os.walk(translations_system_dir):
+    parent = root[len(translations_system_dir) + 1:]
+    if '.svn' in dirs:
+      dirs.remove('.svn')  # don't visit SVN directories
+
+    for f in files:
+      if f.endswith('.qm'):
+        print >> translations_qrc, '<file alias="%s">%s</file>' % (os.path.join(parent, f).lower(), os.path.join(root, f).lower())
+
+  print >> translations_qrc, """
   </qresource>
   </RCC>
   """  
   
-  help_qrc.close()		  
+  translations_qrc.close()		  
 
 if __name__ == '__main__':
   genskin()

@@ -1,6 +1,0 @@
-<RCC>
-    <qresource prefix="/help">
-        <file>context_help_en.qm</file>
-        <file>context_help_ru.qm</file>
-    </qresource>
-</RCC> 

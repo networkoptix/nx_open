@@ -277,9 +277,14 @@ int main(int argc, char *argv[])
     /* Initialize application instance. */
     application->setStartDragDistance(20);
 
+    QString language = qnSettings->language();
     QTranslator appTranslator;
-    if (appTranslator.load(QLatin1String(":/help/context_help_ru.qm")))
+    if (appTranslator.load(QLatin1String(":/translations/") + language + QLatin1String(".qm")))
         application->installTranslator(&appTranslator);
+
+    QTranslator qtTranslator;
+    if (qtTranslator.load(QLatin1String(":/translations/qt_") + language + QLatin1String(".qm")))
+        application->installTranslator(&qtTranslator);
     
     QnToolTip::instance();
 

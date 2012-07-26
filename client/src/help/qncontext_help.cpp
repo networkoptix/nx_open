@@ -10,8 +10,6 @@ QnContextHelp::QnContextHelp():
     m_currentId(ContextId_Invalid),
     m_autoShowNeeded(true)
 {
-    installHelpContext(QLatin1String("en"));
-    
     m_settings.beginGroup(QLatin1String("helpContext"));
     deserializeShownContext();
 }
@@ -36,27 +34,6 @@ void QnContextHelp::deserializeShownContext()
 void QnContextHelp::serializeShownContext()
 {
     m_settings.setValue(QLatin1String("autoShowNeeded"), m_autoShowNeeded);
-}
-
-void QnContextHelp::installHelpContext(const QString& lang)
-{
-    QString trFileName = QLatin1String(":/help/context_help_") + lang + QLatin1String(".qm");
-    QFile file(trFileName);
-    if (file.open(QFile::ReadOnly))
-    {
-        if (m_translator) {
-            QCoreApplication::removeTranslator(m_translator);
-            delete m_translator;
-        }
-        m_translator = new QTranslator();
-        if (m_translator->load(trFileName))
-            qApp->installTranslator(m_translator);
-        else
-            qWarning() << "Invalid translation file" << trFileName;
-    }
-    else {
-        qWarning() << "Can not find context help for language" << lang;
-    }
 }
 
 bool QnContextHelp::isAutoShowNeeded() const
