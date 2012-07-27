@@ -125,7 +125,7 @@ const QnTimePeriod &QnCachingTimePeriodLoader::loadedPeriod() const {
 }
 
 void QnCachingTimePeriodLoader::setTargetPeriod(const QnTimePeriod &targetPeriod) {
-    if(m_loadedPeriod.containPeriod(targetPeriod)) 
+    if(m_loadedPeriod.contains(targetPeriod)) 
         return;
     
     m_loadedPeriod = addLoadingMargins(targetPeriod);

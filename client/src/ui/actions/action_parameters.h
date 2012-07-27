@@ -3,6 +3,7 @@
 
 #include <QtCore/QVariant>
 
+#include <utils/common/mpl.h>
 #include <core/resource/resource_fwd.h>
 
 #include "action_fwd.h"
@@ -71,6 +72,11 @@ public:
         return argument(key).value<T>();
     }
 
+    template<class T>
+    T argument() const {
+        return argument<T>(argumentKey<T>());
+    }
+
     bool hasArgument(const QString &key) const {
         return m_arguments.contains(key);
     }
@@ -85,14 +91,14 @@ public:
     }
 
     QnActionParameters &withArgument(const QString &key, const QVariant &value) {
-        m_arguments[key] = value;
+        setArgument(key, value);
 
         return *this;
     }
 
     template<class T>
     QnActionParameters &withArgument(const QString &key, const T &value) {
-        m_arguments[key] = QVariant::fromValue<T>(value);
+        setArgument(key, value);
 
         return *this;
     }

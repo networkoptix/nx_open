@@ -1364,7 +1364,7 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, QnTimePeriodList &recorded,
     for(int i = 0; i < Qn::TimePeriodRoleCount; i++) {
          pos[i] = periods[i].findNearestPeriod(minimumValue, false);
          end[i] = periods[i].findNearestPeriod(maximumValue, true);
-         if(end[i] != periods[i].end() && end[i]->containTime(maximumValue))
+         if(end[i] != periods[i].end() && end[i]->contains(maximumValue))
              end[i]++;
     }
 
@@ -1372,7 +1372,7 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, QnTimePeriodList &recorded,
 
     bool inside[Qn::TimePeriodRoleCount];
     for(int i = 0; i < Qn::TimePeriodRoleCount; i++)
-        inside[i] = pos[i] == end[i] ? false : pos[i]->containTime(value);
+        inside[i] = pos[i] == end[i] ? false : pos[i]->contains(value);
 
     while(value != maximumValue) {
         qint64 nextValue[Qn::TimePeriodRoleCount] = {maximumValue, maximumValue};
