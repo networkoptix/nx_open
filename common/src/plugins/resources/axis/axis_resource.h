@@ -56,6 +56,9 @@ private:
     int toAxisMotionSensitivity(int sensitivity);
 private:
     QList<QByteArray> m_resolutionList;
+    bool m_palntscRes;
+
+
     QMap<int, QRect> m_motionWindows;
     QMap<int, QRect> m_motionMask;
     qint64 m_lastMotionReadTime;

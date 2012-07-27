@@ -213,6 +213,8 @@ bool QnPlAxisResource::initInternal()
         return false;
     }
 
+    m_palntscRes = false;
+
     m_resolutionList = body.mid(paramValuePos+1).split(',');
     for (int i = 0; i < m_resolutionList.size(); ++i)
     {
@@ -220,19 +222,34 @@ bool QnPlAxisResource::initInternal()
 
         
         if (m_resolutionList[i]=="qcif")
+        {
             m_resolutionList[i] = "176x144";
+            m_palntscRes = true;
+        }
 
         else if (m_resolutionList[i]=="cif")
+        {
             m_resolutionList[i] = "352x288";
+            m_palntscRes = true;
+        }
 
         else if (m_resolutionList[i]=="2cif")
+        {
             m_resolutionList[i] = "704x288";
+            m_palntscRes = true;
+        }
 
         else if (m_resolutionList[i]=="4cif")
+        {
             m_resolutionList[i] = "704x576";
+            m_palntscRes = true;
+        }
 
         else if (m_resolutionList[i]=="d1")
+        {
             m_resolutionList[i] = "720x576";
+            m_palntscRes = true;
+        }
 
     }
 
@@ -248,6 +265,10 @@ bool QnPlAxisResource::initInternal()
 QByteArray QnPlAxisResource::getMaxResolution() const
 {
     QMutexLocker lock(&m_mutex);
+
+    if (m_palntscRes)
+        return QByteArray("D1");
+
     return !m_resolutionList.isEmpty() ? m_resolutionList[0] : QByteArray();
 }
 
@@ -266,6 +287,12 @@ float QnPlAxisResource::getResolutionAspectRatio(const QByteArray& resolution) c
 QString QnPlAxisResource::getNearestResolution(const QByteArray& resolution, float aspectRatio) const
 {
     QMutexLocker lock(&m_mutex);
+
+    if (m_palntscRes)
+        return QLatin1String("CIF");
+
+
+
     QList<QByteArray> dimensions = resolution.split('x');
     if (dimensions.size() != 2)
     {
