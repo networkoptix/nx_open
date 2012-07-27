@@ -277,10 +277,16 @@ int main(int argc, char *argv[])
     /* Initialize application instance. */
     application->setStartDragDistance(20);
 
+    Q_INIT_RESOURCE(common_translations);
+
     QString language = qnSettings->language();
     QTranslator appTranslator;
-    if (appTranslator.load(QLatin1String(":/translations/") + language + QLatin1String(".qm")))
+    if (appTranslator.load(QLatin1String(":/translations/client_") + language + QLatin1String(".qm")))
         application->installTranslator(&appTranslator);
+
+    QTranslator commonTranslator;
+    if (commonTranslator.load(QLatin1String(":/translations/common_") + language + QLatin1String(".qm")))
+        application->installTranslator(&commonTranslator);
 
     QTranslator qtTranslator;
     if (qtTranslator.load(QLatin1String(":/translations/qt_") + language + QLatin1String(".qm")))

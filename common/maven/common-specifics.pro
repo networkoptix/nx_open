@@ -14,3 +14,6 @@ pb.output = $${MOC_DIR}/${QMAKE_FILE_BASE}.pb.cc
 pb.CONFIG += target_predeps
 pb.variable_out = GENERATED_SOURCES
 QMAKE_EXTRA_COMPILERS += pb
+
+TRANSLATIONS += ${project.build.sourceDirectory}/translations/common_en.ts \
+				${project.build.sourceDirectory}/translations/common_ru.ts

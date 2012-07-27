@@ -1,91 +1,103 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <!--
+	<!--
     Example pom for delegating maven goals to msbuild so it builds the "solution"
  
     A solution can be a group of projects, but here we only have one.
     It should also be possible to have one maven project per solution project, 
     and have a parent pom to deletegate the build.
   -->
-    <parent>
-        <artifactId>cpp</artifactId>
-        <groupId>com.networkoptix.hdwitness</groupId>
-        <version>1.2.0</version>
-        <relativePath>../cpp</relativePath>
-    </parent>
+	<parent>
+		<artifactId>cpp</artifactId>
+		<groupId>com.networkoptix.hdwitness</groupId>
+		<version>1.2.0</version>
+		<relativePath>../cpp</relativePath>
+	</parent>
 
-    <groupId>com.networkoptix.hdwitness</groupId>
-    <version>1.2.0</version>
-    <modelVersion>4.0.0</modelVersion>
-    <artifactId>common</artifactId>
-    <packaging>pom</packaging>
-    <name>HD Witness Common Lib</name>
+	<groupId>com.networkoptix.hdwitness</groupId>
+	<version>1.2.0</version>
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>common</artifactId>
+	<packaging>pom</packaging>
+	<name>HD Witness Common Lib</name>
 
-    <properties>
-        <assembly-skip>true</assembly-skip>
-        <rename-skip>true</rename-skip>
-        <buildLib>staticlib</buildLib>
-        <!--QT libs used-->
-        <qtlib1>network</qtlib1>
-        <qtlib2>xml</qtlib2>
-<!--        <qtlib3/>
+	<properties>
+		<assembly-skip>true</assembly-skip>
+		<rename-skip>true</rename-skip>
+		<buildLib>staticlib</buildLib>
+		<!--QT libs used-->
+		<qtlib1>network</qtlib1>
+		<qtlib2>xml</qtlib2>
+		<!--        <qtlib3/>
         <qtlib4/>
         <qtlib5/>
         <qtlib6/>
         <qtlib7/>
         <qtlib8/>
         <qtlib9/> -->
-        <!--Global libs-->
-        <global.libs/>      
-        <!--Specific os libs used-->
-        <windows.oslibs>-lws2_32 -lIphlpapi -lOle32</windows.oslibs>
-        <linux.oslibs>-lz -lbz2</linux.oslibs>
-        <mac.oslibs>-framework IOKit</mac.oslibs>
-        <!--Global defines-->
-        <global.defines/>
-        <!--Specific os defines-->
-        <windows.defines/>
-        <linux.defines/>
-        <mac.defines/>      
-    </properties>   
+		<!--Global libs-->
+		<global.libs/>      
+		<!--Specific os libs used-->
+		<windows.oslibs>-lws2_32 -lIphlpapi -lOle32</windows.oslibs>
+		<linux.oslibs>-lz -lbz2</linux.oslibs>
+		<mac.oslibs>-framework IOKit</mac.oslibs>
+		<!--Global defines-->
+		<global.defines/>
+		<!--Specific os defines-->
+		<windows.defines/>
+		<linux.defines/>
+		<mac.defines/>      
+	</properties>   
 
-    <dependencies>
-        <dependency>
-            <groupId>com.nokia.qt</groupId>
-            <artifactId>qtcore</artifactId>
-            <version>4.7.4-SNAPSHOT</version>
-            <type>zip</type>
+	<dependencies>
+		<dependency>
+			<groupId>com.nokia.qt</groupId>
+			<artifactId>qtcore</artifactId>
+			<version>4.7.4-SNAPSHOT</version>
+			<type>zip</type>
 			<classifier>noarch</classifier>
-        </dependency>                                       
-        <dependency>
-            <groupId>org</groupId>
-            <artifactId>onvif</artifactId>
-            <version>${onvif.version}</version>
-            <type>zip</type>
-            <classifier>${platform}-${arch}</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.ffmpeg</groupId>
-            <artifactId>ffmpeg</artifactId>
-            <version>${ffmpeg.version}</version>
-            <type>zip</type>
-            <classifier>${platform}-${arch}</classifier>
-        </dependency>
-        <dependency>
-            <groupId>com.google</groupId>
-            <artifactId>protobuf</artifactId>
-            <version>2.4.1</version>
-            <type>zip</type>
-            <classifier>${platform}-${arch}</classifier>
-        </dependency>
-        <dependency>
-            <groupId>com.digitalwatchdog</groupId>
-            <artifactId>dvr</artifactId>
-            <version>${dvr.version}</version>
-            <type>zip</type>
-            <classifier>${platform}-${arch}</classifier>
-        </dependency>
-    </dependencies>
+		</dependency>                                       
+		<dependency>
+			<groupId>org</groupId>
+			<artifactId>onvif</artifactId>
+			<version>${onvif.version}</version>
+			<type>zip</type>
+			<classifier>${platform}-${arch}</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.ffmpeg</groupId>
+			<artifactId>ffmpeg</artifactId>
+			<version>${ffmpeg.version}</version>
+			<type>zip</type>
+			<classifier>${platform}-${arch}</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.google</groupId>
+			<artifactId>protobuf</artifactId>
+			<version>2.4.1</version>
+			<type>zip</type>
+			<classifier>${platform}-${arch}</classifier>
+		</dependency>
+	</dependencies>
 
-    <build>
-    </build>    
+	<build>
+	</build>    
+	<profiles>
+		<profile>
+			<id>convert-clean-windows</id>
+			<activation>
+				<os>
+					<family>Windows</family>
+				</os>
+			</activation>	
+			<dependencies>
+				<dependency>
+					<groupId>com.digitalwatchdog</groupId>
+					<artifactId>dvr</artifactId>
+					<version>${dvr.version}</version>
+					<type>zip</type>
+					<classifier>${platform}-${arch}</classifier>
+				</dependency>	
+			</dependencies>				
+		</profile> 
+	</profiles>	
 </project>
