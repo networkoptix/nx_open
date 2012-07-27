@@ -59,5 +59,6 @@ def gen_filetypes_h():
     print >> filetypes_h, '#endif // UNICLIENT_FILETYPES_H_'
 
 if __name__ == '__main__':
+  os.system('mkdir build')
   gen_filetypes_h()
   gentranslations()
