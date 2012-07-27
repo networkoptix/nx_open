@@ -1069,7 +1069,35 @@ void QnWorkbenchActionHandler::at_quickSearchAction_triggered() {
     if(periods.isEmpty()) {
         periods.push_back(period);
     } else {
-        //periods = periods.intersects()
+        periods = periods.intersected(period);
+    }
+
+    const int matrixWidth = 3, matrixHeight = 3;
+    const int itemCount = matrixWidth * matrixHeight;
+
+    /* Construct and add a new layout first. */
+    QnWorkbenchLayout *layout = new QnWorkbenchLayout();
+    QList<QnWorkbenchItem *> items;
+    for(int i = 0; i < itemCount; i++) {
+        QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid());
+        item->setFlag(Qn::Pinned, true);
+        item->setGeometry(QRect(i % matrixWidth, i / matrixWidth, 1, 1));
+        layout->addItem(item);
+        items.push_back(item);
+    }
+    workbench()->setCurrentLayout(layout);
+    
+    /* Then navigate. */
+    display()->setStreamsSynchronized(NULL);
+    qint64 d = periods.duration() / itemCount;
+    QnTimePeriodListTimeIterator pos = periods.timeBegin();
+    foreach(QnWorkbenchItem *item, items) {
+        QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(display()->widget(item));
+        if(!widget)
+            continue;
+
+        widget->display()->setCurrentTimeUSec(*pos * 1000);
+        pos += d;
     }
 }
 
