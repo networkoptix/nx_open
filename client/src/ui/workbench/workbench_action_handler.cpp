@@ -32,6 +32,8 @@
 #include <camera/camdisplay.h>
 #include <camera/camera.h>
 
+#include <recording/time_period_list.h>
+
 #include <ui/style/skin.h>
 
 #include <ui/actions/action_manager.h>
@@ -1060,6 +1062,15 @@ void QnWorkbenchActionHandler::at_quickSearchAction_triggered() {
         return;
 
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodParameter);
+    if(period.isEmpty())
+        return;
+
+    QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsParameter);
+    if(periods.isEmpty()) {
+        periods.push_back(period);
+    } else {
+        //periods = periods.intersects()
+    }
 }
 
 void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {

@@ -205,7 +205,7 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
     if (!m_schedule.isEmpty())
     {
         //bool isEmptyPeriod = m_skipDataToTime != AV_NOPTS_VALUE && timeMs < m_skipDataToTime;
-        if (!m_lastSchedulePeriod.containTime(timeMs))
+        if (!m_lastSchedulePeriod.contains(timeMs))
         {
             // find new schedule
             QDateTime packetDateTime = QDateTime::fromMSecsSinceEpoch(timeMs);
