@@ -272,6 +272,7 @@
 				</os>
 			</activation>
 			<properties>
+                <compiler>msvc2008</compiler>
 				<arch>x86</arch>
 				<platform>windows</platform>
 			</properties>
@@ -372,6 +373,7 @@
 				</os>		
 			</activation>
 			<properties>
+                <compiler>gcc</compiler>
 				<rename-skip>false</rename-skip>
 			</properties>
 			<build>	
