@@ -13,7 +13,7 @@ from filetypes import all_filetypes, video_filetypes, image_filetypes
 def gentranslations():
   os.path = posixpath
 
-  translations_qrc = open('build/common_translations.qrc', 'w')
+  translations_qrc = open('build/${project.artifactId}_translations.qrc', 'w')
 
   print >> translations_qrc, """
   <!DOCTYPE RCC>
@@ -60,5 +60,6 @@ def gen_filetypes_h():
 
 if __name__ == '__main__':
   os.system('mkdir build')
+  os.system('${environment.dir}/qt/bin/lrelease ${project.build.directory}/${project.artifactId}-specifics.pro')  
   gen_filetypes_h()
   gentranslations()
