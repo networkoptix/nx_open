@@ -1,8 +1,6 @@
 #ifndef QN_ACTION_PARAMETERS_H
 #define QN_ACTION_PARAMETERS_H
 
-#include <typeinfo>
-
 #include <QtCore/QVariant>
 
 #include <utils/common/mpl.h>
@@ -20,10 +18,6 @@ class QGraphicsItem;
  * or <tt>argument(QString())</tt>. This parameter is expected to be of one of
  * the types convertible to <tt>Qn::ResourceType</tt>. It is normally passed
  * as the first argument to the <tt>QnActionParameters</tt>'s constructor.
- * 
- * Parameter pack also presents an interface to access per-type arguments. 
- * Such arguments are identified by their type, and therefore only one such
- * argument per C++ type can be present in a parameter pack.
  */
 class QnActionParameters {
 public:
@@ -87,11 +81,6 @@ public:
         return m_arguments.contains(key);
     }
 
-    template<class T>
-    bool hasArgument() const {
-        return m_arguments.contains(argumentKey<T>());
-    }
-
     void setArguments(const QVariantMap &arguments);
 
     void setArgument(const QString &key, const QVariant &value);
@@ -99,11 +88,6 @@ public:
     template<class T>
     void setArgument(const QString &key, const T &value) {
         setArgument(key, QVariant::fromValue<T>(value));
-    }
-
-    template<class T>
-    void setArgument(const typename identity<T>::type &value) {
-        setArgument(argumentKey<T>(), value);
     }
 
     QnActionParameters &withArgument(const QString &key, const QVariant &value) {
@@ -117,18 +101,6 @@ public:
         setArgument(key, value);
 
         return *this;
-    }
-
-    template<class T>
-    QnActionParameters &withArgument(const typename identity<T>::type &value) {
-        setArgument<T>(value);
-
-        return *this;
-    }
-
-    template<class T>
-    static QString argumentKey() {
-        return QLatin1String(typeid(T).name());
     }
 
 private:
