@@ -134,10 +134,8 @@ void CLAbstractDeviceSettingsDlg::saveSuccess()
 
 void CLAbstractDeviceSettingsDlg::saveError()
 {
-    if (QMessageBox::warning(this, tr("Unable to save changes"), tr("Please try save changes later."),
-                             QMessageBox::Ok | QMessageBox::Close, QMessageBox::Ok) == QMessageBox::Close) {
+    if (QMessageBox::warning(this, tr("Unable to save changes"), tr("Please try to save changes later."), QMessageBox::Ok | QMessageBox::Close, QMessageBox::Ok) == QMessageBox::Close)
         reject();
-    }
 }
 
 QList<CLDeviceSettingsTab *> CLAbstractDeviceSettingsDlg::tabs() const

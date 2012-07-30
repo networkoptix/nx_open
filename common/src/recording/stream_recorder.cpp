@@ -293,7 +293,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
     AVOutputFormat * outputCtx = av_guess_format(m_container.toLatin1().data(), NULL, NULL);
     if (outputCtx == 0)
     {
-        m_lastErrMessage = tr("No %1 container in FFMPEG library").arg(m_container);
+        m_lastErrMessage = tr("No %1 container in FFMPEG library.").arg(m_container);
         cl_log.log(m_lastErrMessage, cl_logERROR);
         return false;
     }
@@ -393,7 +393,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
             AVStream* audioStream = av_new_stream(m_formatCtx, DEFAULT_AUDIO_STREAM_ID+i);
             if (audioStream == 0)
             {
-                m_lastErrMessage = tr("Can't allocate output audio stream");
+                m_lastErrMessage = tr("Can't allocate output audio stream.");
                 cl_log.log(m_lastErrMessage, cl_logERROR);
                 return false;
             }
@@ -407,7 +407,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
         if (m_ioContext == 0)
         {
             avformat_close_input(&m_formatCtx);
-            m_lastErrMessage = tr("Can't create output file '%1'").arg(url);
+            m_lastErrMessage = tr("Can't create output file '%1'.").arg(url);
             cl_log.log(m_lastErrMessage, cl_logERROR);
             return false;
         }
@@ -419,7 +419,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
             m_ioContext = 0;
             m_formatCtx->pb = 0;
             avformat_close_input(&m_formatCtx);
-            m_lastErrMessage = tr("Video or audio codec is incompatible with %1 format. Try other format").arg(m_container);
+            m_lastErrMessage = tr("Video or audio codec is incompatible with %1 format. Try another format.").arg(m_container);
             cl_log.log(m_lastErrMessage, cl_logERROR);
             return false;
         }
@@ -514,7 +514,7 @@ bool QnStreamRecorder::addSignatureFrame(QString &/*errorString*/)
 
     if (generatedFrame == 0)
     {
-        m_lastErrMessage = tr("Error during generate watermark for file '%1'").arg(m_fileName);
+        m_lastErrMessage = tr("Error during watermark generation for file '%1'.").arg(m_fileName);
         qWarning() << m_lastErrMessage;
         return false;
     }

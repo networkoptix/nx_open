@@ -629,7 +629,7 @@ void QnWorkbenchController::at_screenRecorder_recordingStarted() {
 void QnWorkbenchController::at_screenRecorder_error(const QString &errorMessage) {
     action(Qn::ScreenRecordingAction)->setChecked(false);
 
-    QMessageBox::warning(display()->view(), tr("Warning"), tr("Can't start recording due to following error: %1").arg(errorMessage));
+    QMessageBox::warning(display()->view(), tr("Warning"), tr("Can't start recording due to the following error: %1").arg(errorMessage));
 }
 
 void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &recordedFileName) {

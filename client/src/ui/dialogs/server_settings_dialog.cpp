@@ -201,31 +201,31 @@ bool QnServerSettingsDialog::validateStorages(const QnAbstractStorageResourceLis
 			arg(formatGbStr(needRecordingSpace - (itr.value().freeSpace + itr.value().usedSpace))));
 		*/
 
-		qint64 avalableSace = itr.value().freeSpace + itr.value().usedSpace - storage->getSpaceLimit();
+		qint64 availableSpace = itr.value().freeSpace + itr.value().usedSpace - storage->getSpaceLimit();
 		if (itr.value().errorCode == detail::INVALID_PATH)
 		{
-			QMessageBox::warning(this, tr("Invalid storage path"), tr("Storage path '%1' is invalid or not accessible for writing.").arg(storage->getUrl()));
+			QMessageBox::warning(this, tr("Invalid storage path"), tr("Storage path '%1' is invalid or is not accessible for writing.").arg(storage->getUrl()));
 			return false;
 		}
 		if (itr.value().errorCode == detail::SERVER_ERROR)
 		{
-			QMessageBox::critical(this, tr("Can't verify storage path"), tr("Can't verify storage path '%1'. Media server does not response").arg(storage->getUrl()));
+			QMessageBox::critical(this, tr("Can't verify storage path"), tr("Cannot verify storage path '%1'. Cannot establish connection to the media server.").arg(storage->getUrl()));
 			return false;
 		}
-		else if (avalableSace < 0)
+		else if (availableSpace < 0)
 		{
 			QMessageBox::critical(this, tr("Not enough disk space"),
-				tr("Storage '%1'\nYou have less storage space available than reserved free space value. Required %2Gb additional disk space")
+				tr("Storage '%1'\nYou have less storage space available than reserved free space value. Additional %2Gb are required.")
 				.arg(storage->getUrl())
-				.arg(formatGbStr(MIN_RECORD_FREE_SPACE - avalableSace)));
+				.arg(formatGbStr(MIN_RECORD_FREE_SPACE - availableSpace)));
 			return false;
 		}
-		else if (avalableSace < MIN_RECORD_FREE_SPACE)
+		else if (availableSpace < MIN_RECORD_FREE_SPACE)
 		{
 			QMessageBox::warning(this, tr("Low space for archive"),
-				tr("Storage '%1'\nYou have only %2Gb space for archive.")
+				tr("Storage '%1'\nYou have only %2Gb left for video archive.")
 				.arg(storage->getUrl())
-				.arg(formatGbStr(avalableSace)));
+				.arg(formatGbStr(availableSpace)));
 		}
 	}
 

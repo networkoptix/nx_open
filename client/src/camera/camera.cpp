@@ -187,7 +187,7 @@ void CLVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, co
         if (m_exportReader == 0)
         {
             delete tmpReader;
-            emit recordingFailed(tr("Invalid resource type for export data"));
+            emit recordingFailed(tr("Invalid resource type for data export."));
             return;
         }
 
