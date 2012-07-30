@@ -962,7 +962,7 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
                 //return false;
             }
 
-            if (!currVideoOpts.optionsResp.Options->H264 && !currVideoOpts.optionsResp.Options->JPEG)
+            else if (!currVideoOpts.optionsResp.Options->H264 && !currVideoOpts.optionsResp.Options->JPEG)
             {
                 qWarning() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: video encoder '" << optRequest.ConfigurationToken->c_str()
                     << "' contains no data for H264/JPEG (URL: "  << soapWrapperPtr->getEndpointUrl() << ", UniqueId: " << getUniqueId() << ")." << "Ignoring and use default codec list";

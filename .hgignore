@@ -140,3 +140,4 @@ debsetup/mediaserver/x64
 debsetup/appserver/package
 debsetup/appserver/x86
 debsetup/appserver/x64
+*.java
