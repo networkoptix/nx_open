@@ -1,5 +1,8 @@
 package pb;
 
+option java_package = "com.networkoptix.hdwitness.protobuf";
+option java_outer_classname = "RecordedTimePeriodProtos";
+
 message RecordedTimePeriod {
     required int64 startTime = 1;
     required int64 duration = 2;
