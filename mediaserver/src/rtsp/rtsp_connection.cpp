@@ -511,6 +511,7 @@ void QnRtspConnectionProcessor::at_cameraUpdated()
 
 void QnRtspConnectionProcessor::at_cameraDisabledChanged(bool oldValue, bool newValue)
 {
+    Q_UNUSED(oldValue)
     Q_D(QnRtspConnectionProcessor);
 	QMutexLocker lock(&d->mutex);
     if (newValue) {

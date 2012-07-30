@@ -729,6 +729,7 @@ private:
 
 void stopServer(int signal)
 {
+    Q_UNUSED(signal)
     qApp->quit();
 }
 
