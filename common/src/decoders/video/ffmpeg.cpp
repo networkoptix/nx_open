@@ -348,11 +348,16 @@ bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, CLVideoDe
     if (m_checkH264ResolutionChange && avpkt.size > 4 && dataWithNalPrefixes)
     {
         int nalLen = avpkt.data[2] == 0x01 ? 3 : 4;
-        if ((avpkt.data[nalLen]&0x1f) == nuSPS)
+        const quint8* dataEnd = avpkt.data + avpkt.size;
+        const quint8* curPtr = avpkt.data;
+        if ((curPtr[nalLen]&0x1f) == nuDelimiter)
+            curPtr = NALUnit::findNALWithStartCode(curPtr+nalLen, dataEnd, true);
+
+        if (dataEnd - curPtr > nalLen && (curPtr[nalLen]&0x1f) == nuSPS)
         {
             SPSUnit sps;
-            const quint8* end = NALUnit::findNALWithStartCode(avpkt.data+nalLen, avpkt.data + avpkt.size, true);
-            sps.decodeBuffer(avpkt.data + nalLen, end);
+            const quint8* end = NALUnit::findNALWithStartCode(curPtr+nalLen, dataEnd, true);
+            sps.decodeBuffer(curPtr + nalLen, end);
             sps.deserialize();
             if (m_currentWidth == -1) {
                 m_currentWidth = sps.getWidth();
