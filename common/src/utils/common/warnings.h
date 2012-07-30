@@ -40,6 +40,10 @@ namespace detail {
             return s.arg(QLatin1String(arg));
         }
 
+        inline QString operator<<(const QString &s, char *arg) {
+            return s.arg(QLatin1String(arg));
+        }
+
         inline QString operator<<(const QString &s, const QByteArray &arg) {
             return s.arg(QLatin1String(arg.data()));
         }
