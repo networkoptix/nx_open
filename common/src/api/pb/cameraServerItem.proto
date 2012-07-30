@@ -1,5 +1,8 @@
 package pb;
 
+option java_package = "com.networkoptix.hdwitness.protobuf";
+option java_outer_classname = "CameraServerItemProtos";
+
 message CameraServerItem {
     required string  physicalId  = 1;
     required string  serverGuid  = 2;
