@@ -94,20 +94,6 @@
             <classifier>${platform}-${arch}</classifier>
         </dependency>
         <dependency>
-            <groupId>com.microsoft.directx</groupId>
-            <artifactId>d3d9</artifactId>
-            <version>JUN2010</version>
-            <type>zip</type>
-            <classifier>${platform}-${arch}</classifier>
-        </dependency>   
-        <dependency>
-            <groupId>com.microsoft.directx</groupId>
-            <artifactId>d3dx9</artifactId>
-            <version>JUN2010</version>
-            <type>zip</type>
-            <classifier>${platform}-${arch}</classifier>
-        </dependency>   
-        <dependency>
             <groupId>com.nokia.qt</groupId>
             <artifactId>qtsingleapplication</artifactId>
             <version>4.7.4</version>
@@ -118,4 +104,32 @@
     <build>
 
     </build>    
+    
+    <profiles>
+		<profile>
+			<id>convert-clean-windows</id>
+			<activation>
+				<os>
+					<family>Windows</family>
+				</os>
+			</activation>	
+			<dependencies>
+                <dependency>
+                    <groupId>com.microsoft.directx</groupId>
+                    <artifactId>d3d9</artifactId>
+                    <version>JUN2010</version>
+                    <type>zip</type>
+                    <classifier>${platform}-${arch}</classifier>
+                </dependency>   
+                <dependency>
+                    <groupId>com.microsoft.directx</groupId>
+                    <artifactId>d3dx9</artifactId>
+                    <version>JUN2010</version>
+                    <type>zip</type>
+                    <classifier>${platform}-${arch}</classifier>
+                </dependency>   
+			</dependencies>				
+		</profile> 
+	</profiles>		
+
 </project>
