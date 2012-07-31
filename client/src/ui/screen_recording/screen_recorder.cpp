@@ -22,7 +22,7 @@ namespace {
     int screenToAdapter(int screen)
     {
         IDirect3D9* pD3D;
-        if((pD3D=Direct3DCreate9(D3D_SDK_VERSION))==NULL)
+        if((pD3D = Direct3DCreate9(D3D_SDK_VERSION)) == NULL)
             return 0;
 
         QRect rect = qApp->desktop()->screenGeometry(screen);
@@ -31,12 +31,10 @@ namespace {
         monInfo.cbSize = sizeof(monInfo);
         int rez = 0;
 
-        for (int i = 0; i < qApp->desktop()->screenCount(); ++i)
-        {
+        for (int i = 0; i < qApp->desktop()->screenCount(); ++i) {
             if (!GetMonitorInfo(pD3D->GetAdapterMonitor(i), &monInfo))
                 break;
-            if (monInfo.rcMonitor.left == rect.left() && monInfo.rcMonitor.top == rect.top())
-            {
+            if (monInfo.rcMonitor.left == rect.left() && monInfo.rcMonitor.top == rect.top()) {
                 rez = i;
                 break;
             }
@@ -73,14 +71,14 @@ namespace {
     }
 
 #ifdef Q_OS_WIN
-    CLScreenGrabber::CaptureMode settingsToGrabberCaptureMode(Qn::CaptureMode captureMode) {
+    QnScreenGrabber::CaptureMode settingsToGrabberCaptureMode(Qn::CaptureMode captureMode) {
         switch(captureMode) {
-        case Qn::WindowMode:             return CLScreenGrabber::CaptureMode_Application;
-        case Qn::FullScreenMode:         return CLScreenGrabber::CaptureMode_DesktopWithAero;
-        case Qn::FullScreenNoeroMode:    return CLScreenGrabber::CaptureMode_DesktopWithoutAero;
+        case Qn::WindowMode:             return QnScreenGrabber::CaptureMode_Application;
+        case Qn::FullScreenMode:         return QnScreenGrabber::CaptureMode_DesktopWithAero;
+        case Qn::FullScreenNoeroMode:    return QnScreenGrabber::CaptureMode_DesktopWithoutAero;
         default:
             qnWarning("Invalid capture mode value '%1', treating as window mode.", static_cast<int>(captureMode));
-            return CLScreenGrabber::CaptureMode_Application;
+            return QnScreenGrabber::CaptureMode_Application;
         }
     }
 #endif
@@ -130,7 +128,7 @@ void QnScreenRecorder::startRecording(QGLWidget *appWidget) {
     bool captureCursor = recorderSettings.captureCursor();
     QSize encodingSize = resolutionToSize(recorderSettings.resolution());
     float encodingQuality = qualityToNumeric(recorderSettings.decoderQuality());
-    CLScreenGrabber::CaptureMode captureMode = settingsToGrabberCaptureMode(recorderSettings.captureMode());
+    QnScreenGrabber::CaptureMode captureMode = settingsToGrabberCaptureMode(recorderSettings.captureMode());
 
     QPixmap logo;
 #if defined(CL_TRIAL_MODE) || defined(CL_FORCE_LOGO)

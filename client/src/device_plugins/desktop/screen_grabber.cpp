@@ -1,5 +1,7 @@
 #include "screen_grabber.h"
 
+#ifdef Q_OS_WIN
+
 #include <QScreen>
 #include <QtCore/QLibrary>
 #include "utils/common/log.h"
@@ -11,8 +13,6 @@ extern "C" {
 #include <libavformat/avformat.h>
 #include <libavcodec/avcodec.h>
 }
-
-
 
 #ifndef DWM_EC_DISABLECOMPOSITION
 #  define DWM_EC_DISABLECOMPOSITION 0
@@ -40,10 +40,10 @@ static void toggleAero(bool enable)
 }
 
 
-QMutex CLScreenGrabber::m_instanceMutex;
-int CLScreenGrabber::m_aeroInstanceCounter;
+QMutex QnScreenGrabber::m_instanceMutex;
+int QnScreenGrabber::m_aeroInstanceCounter;
 
-CLScreenGrabber::CLScreenGrabber(int displayNumber, int poolSize, CaptureMode mode, bool captureCursor, const QSize& captureResolution, QWidget* widget):
+QnScreenGrabber::QnScreenGrabber(int displayNumber, int poolSize, CaptureMode mode, bool captureCursor, const QSize& captureResolution, QWidget* widget):
     m_pD3D(0),
     m_pd3dDevice(0),
     m_displayNumber(displayNumber),
@@ -77,7 +77,7 @@ CLScreenGrabber::CLScreenGrabber(int displayNumber, int poolSize, CaptureMode mo
     m_timer.start();
 }
 
-CLScreenGrabber::~CLScreenGrabber()
+QnScreenGrabber::~QnScreenGrabber()
 {
     for (int i = 0; i < m_openGLData.size(); ++i)
         delete [] m_openGLData[i];
@@ -116,7 +116,7 @@ CLScreenGrabber::~CLScreenGrabber()
     }
 }
 
-HRESULT	CLScreenGrabber::InitD3D(HWND hWnd)
+HRESULT	QnScreenGrabber::InitD3D(HWND hWnd)
 {
     D3DPRESENT_PARAMETERS	d3dpp;
 
@@ -214,7 +214,7 @@ HRESULT	CLScreenGrabber::InitD3D(HWND hWnd)
     return S_OK;
 }
 
-void CLScreenGrabber::allocateTmpFrame(int width, int height, PixelFormat format)
+void QnScreenGrabber::allocateTmpFrame(int width, int height, PixelFormat format)
 {
     m_tmpFrameWidth = width;
     m_tmpFrameHeight = height;
@@ -239,7 +239,7 @@ void CLScreenGrabber::allocateTmpFrame(int width, int height, PixelFormat format
         SWS_BICUBLIN, NULL, NULL, NULL);
 }
 
-void CLScreenGrabber::captureFrameOpenGL(void* opaque)
+void QnScreenGrabber::captureFrameOpenGL(void* opaque)
 {
     CaptureInfo* data = (CaptureInfo*) opaque;
     glReadBuffer(GL_FRONT);
@@ -260,7 +260,7 @@ void CLScreenGrabber::captureFrameOpenGL(void* opaque)
     glReadPixels(0, 0, data->w, data->h, GL_BGRA_EXT, GL_UNSIGNED_BYTE, data->opaque);
 }
 
-CLScreenGrabber::CaptureInfo CLScreenGrabber::captureFrame()
+QnScreenGrabber::CaptureInfo QnScreenGrabber::captureFrame()
 {
     CaptureInfo rez;
 
@@ -308,7 +308,7 @@ static inline void xorPixel(quint32* data, int stride, int x, int y, quint32* sr
     data[y*stride+x] ^= *srcPixel;
 }
 
-void CLScreenGrabber::drawLogo(quint8* data, int width, int height)
+void QnScreenGrabber::drawLogo(quint8* data, int width, int height)
 {
     if (m_logo.width() == 0)
         return;
@@ -321,7 +321,7 @@ void CLScreenGrabber::drawLogo(quint8* data, int width, int height)
     painter.drawPixmap(QPoint(left, top), m_logo);
 }
 
-void CLScreenGrabber::drawCursor(quint32* data, int width, int height, int leftOffset, int topOffset, bool flip) const
+void QnScreenGrabber::drawCursor(quint32* data, int width, int height, int leftOffset, int topOffset, bool flip) const
 {
     static const int MAX_CURSOR_SIZE = 64;
     CURSORINFO  pci;
@@ -518,7 +518,7 @@ void CLScreenGrabber::drawCursor(quint32* data, int width, int height, int leftO
     }
 }
 
-bool CLScreenGrabber::direct3DDataToFrame(void* opaque, AVFrame* pFrame)
+bool QnScreenGrabber::direct3DDataToFrame(void* opaque, AVFrame* pFrame)
 {
     IDirect3DSurface9* pSurface = (IDirect3DSurface9*) opaque;
 
@@ -554,7 +554,7 @@ bool CLScreenGrabber::direct3DDataToFrame(void* opaque, AVFrame* pFrame)
     return rez;
 }
 
-bool CLScreenGrabber::dataToFrame(quint8* data, int width, int height, AVFrame* pFrame)
+bool QnScreenGrabber::dataToFrame(quint8* data, int width, int height, AVFrame* pFrame)
 {
     drawLogo((quint8*) data, width, height);
     int roundWidth = width & ~7;
@@ -613,7 +613,7 @@ bool CLScreenGrabber::dataToFrame(quint8* data, int width, int height, AVFrame* 
    return true;
 }
 
-bool CLScreenGrabber::capturedDataToFrame(const CaptureInfo& captureInfo, AVFrame* pFrame)
+bool QnScreenGrabber::capturedDataToFrame(const CaptureInfo& captureInfo, AVFrame* pFrame)
 {
     bool rez = false;
     if (m_mode == CaptureMode_Application)
@@ -624,22 +624,22 @@ bool CLScreenGrabber::capturedDataToFrame(const CaptureInfo& captureInfo, AVFram
     return rez;
 }
 
-qint64 CLScreenGrabber::currentTime() const
+qint64 QnScreenGrabber::currentTime() const
 {
     return m_timer.elapsed();
 }
 
-int CLScreenGrabber::width() const
+int QnScreenGrabber::width() const
 {
     return m_outWidth;
 }
 
-int CLScreenGrabber::height() const
+int QnScreenGrabber::height() const
 {
     return m_outHeight;
 }
 
-void CLScreenGrabber::setLogo(const QPixmap& logo)
+void QnScreenGrabber::setLogo(const QPixmap& logo)
 {
     if (m_mode == CaptureMode_Application)
         m_logo = QPixmap::fromImage(logo.toImage().mirrored(false, true));
@@ -648,12 +648,14 @@ void CLScreenGrabber::setLogo(const QPixmap& logo)
     m_logo = m_logo.scaledToWidth(screenWidth() * 0.085, Qt::SmoothTransformation);
 }
 
-int CLScreenGrabber::screenWidth() const
+int QnScreenGrabber::screenWidth() const
 {
     return m_ddm.Width;
 }
 
-int CLScreenGrabber::screenHeight() const
+int QnScreenGrabber::screenHeight() const
 {
     return m_ddm.Height;
 }
+
+#endif // Q_OS_WIN

@@ -22,7 +22,7 @@ protected:
 private:
     bool init();
 private:
-    CLBufferedScreenGrabber* m_grabber;
+    QnBufferedScreenGrabber* m_grabber;
     quint8* m_videoBuf;
     int m_videoBufSize;
     AVCodecContext* m_videoCodecCtx;

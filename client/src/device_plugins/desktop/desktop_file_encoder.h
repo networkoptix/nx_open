@@ -27,7 +27,7 @@ public:
                         int desktopNum,           // = 0,
                         const QAudioDeviceInfo* audioDevice,
                         const QAudioDeviceInfo* audioDevice2,
-                        CLScreenGrabber::CaptureMode mode,
+                        QnScreenGrabber::CaptureMode mode,
                         bool captureCursor,
                         const QSize& captureResolution,
                         float encodeQualuty, // in range 0.0 .. 1.0
@@ -92,7 +92,7 @@ private:
     };
 
     int m_encodedFrames;
-    CLBufferedScreenGrabber* m_grabber;
+    QnBufferedScreenGrabber* m_grabber;
     quint8* m_videoBuf;
     int m_videoBufSize;
     AVCodecContext* m_videoCodecCtx;
@@ -123,7 +123,7 @@ private:
     int m_maxAudioJitter;
     QVector <EncodedAudioInfo*> m_audioInfo;
 
-    CLScreenGrabber::CaptureMode m_captureMode;
+    QnScreenGrabber::CaptureMode m_captureMode;
     bool m_captureCursor;
     QSize m_captureResolution;
     float m_encodeQualuty;

@@ -361,7 +361,7 @@ DesktopFileEncoder::DesktopFileEncoder (
                    int desktopNum,
                    const QAudioDeviceInfo* audioDevice,
                    const QAudioDeviceInfo* audioDevice2,
-                   CLScreenGrabber::CaptureMode captureMode,
+                   QnScreenGrabber::CaptureMode captureMode,
                    bool captureCursor,
                    const QSize& captureResolution,
                    float encodeQualuty, // in range 0.0 .. 1.0
@@ -447,10 +447,10 @@ int DesktopFileEncoder::calculateBitrate()
 
 bool DesktopFileEncoder::init()
 {
-    m_grabber = new CLBufferedScreenGrabber(
+    m_grabber = new QnBufferedScreenGrabber(
             m_desktopNum,
-            CLBufferedScreenGrabber::DEFAULT_QUEUE_SIZE,
-            CLBufferedScreenGrabber::DEFAULT_FRAME_RATE,
+            QnBufferedScreenGrabber::DEFAULT_QUEUE_SIZE,
+            QnBufferedScreenGrabber::DEFAULT_FRAME_RATE,
             m_captureMode,
             m_captureCursor,
             m_captureResolution,
@@ -797,7 +797,7 @@ void DesktopFileEncoder::run()
             m_capturingStopped = true;
         }
 
-        CLScreenGrabber::CaptureInfo capturedData = m_grabber->getNextFrame();
+        QnScreenGrabber::CaptureInfo capturedData = m_grabber->getNextFrame();
         if (!capturedData.opaque)
             continue;
         m_grabber->capturedDataToFrame(capturedData, m_frame);

@@ -34,7 +34,7 @@ CLDesktopStreamreader::CLDesktopStreamreader(QnResourcePtr dev):
     int idx = num.length()-1;
     while (idx >= 0 && num[idx].unicode() >= '0' && num[idx].unicode() <= '9')
         idx--;
-    m_grabber = new CLBufferedScreenGrabber(num.right(num.length()-idx-1).toInt()-1);
+    m_grabber = new QnBufferedScreenGrabber(num.right(num.length()-idx-1).toInt()-1);
     m_encoderCodecName = "mpeg2video";
     m_grabber->start(QThread::HighestPriority);
     //m_encoderCodecName = "mpeg4";
@@ -97,7 +97,7 @@ QnAbstractMediaDataPtr CLDesktopStreamreader::getNextData()
         return QnAbstractMediaDataPtr();
     while (!m_needStop)
     {
-        CLScreenGrabber::CaptureInfo capturedData = m_grabber->getNextFrame();
+        QnScreenGrabber::CaptureInfo capturedData = m_grabber->getNextFrame();
         if (!capturedData.opaque)
             continue;
         m_grabber->capturedDataToFrame(capturedData, m_frame);
