@@ -15,6 +15,7 @@ QnFsHelperHandler::QnFsHelperHandler(bool detectAvailableOnly):
 
 int QnFsHelperHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result)
 {
+    Q_UNUSED(path)
     QString pathStr;
     QString errStr;
 
@@ -85,11 +86,13 @@ int QnFsHelperHandler::executeGet(const QString& path, const QnRequestParamList&
 
 int QnFsHelperHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result)
 {
+    Q_UNUSED(body)
     return executeGet(path, params, result);
 }
 
 QString QnFsHelperHandler::description(TCPSocket* tcpSocket) const
 {
+    Q_UNUSED(tcpSocket)
     QString rez;
 	if (m_detectAvailableOnly) 
 	{

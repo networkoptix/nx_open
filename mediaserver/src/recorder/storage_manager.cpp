@@ -278,6 +278,7 @@ void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
 
 void QnStorageManager::at_archiveRangeChanged(qint64 newStartTimeMs, qint64 newEndTimeMs)
 {
+    Q_UNUSED(newEndTimeMs)
     QnStorageResource* storage = qobject_cast<QnStorageResource*> (sender());
     if (!storage)
         return;
@@ -293,10 +294,11 @@ void QnStorageManager::at_archiveRangeChanged(qint64 newStartTimeMs, qint64 newE
 
 QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStreamDataProvider* provider)
 {
+    Q_UNUSED(provider)
     QMutexLocker lock(&m_mutex);
     QnStorageResourcePtr result;
     qint64 maxFreeSpace = 0;
-    float minBitrate = INT_MAX;
+    float minBitrate = (float)INT_MAX;
 
     // balance storages evenly by bitrate
     bool balanceByBitrate = true;
