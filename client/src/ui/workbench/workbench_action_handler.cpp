@@ -174,6 +174,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::OpenSingleLayoutAction),                 SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
     connect(action(Qn::OpenMultipleLayoutsAction),              SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
     connect(action(Qn::OpenAnyNumberOfLayoutsAction),           SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
+    connect(action(Qn::OpenNewWindowLayoutsAction),             SIGNAL(triggered()),    this,   SLOT(at_openNewWindowLayoutsAction_triggered()));
     connect(action(Qn::OpenNewTabAction),                       SIGNAL(triggered()),    this,   SLOT(at_openNewTabAction_triggered()));
     connect(action(Qn::OpenNewWindowAction),                    SIGNAL(triggered()),    this,   SLOT(at_openNewWindowAction_triggered()));
     connect(action(Qn::SaveLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_saveLayoutAction_triggered()));
@@ -526,7 +527,13 @@ void QnWorkbenchActionHandler::submitDelayedDrops() {
         data.toMimeData(&mimeData);
 
         QnResourceList resources = QnWorkbenchResource::deserializeResources(&mimeData);
-        menu()->trigger(Qn::OpenInCurrentLayoutAction, resources);
+        QnResourceList layouts = QnResourceCriterion::filter<QnLayoutResource, QnResourceList>(resources);
+        if (!layouts.isEmpty()){
+            workbench()->clear();
+            menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
+        } else {
+            menu()->trigger(Qn::OpenInCurrentLayoutAction, resources);
+        }
     }
 
     m_delayedDrops.clear();
@@ -677,6 +684,28 @@ void QnWorkbenchActionHandler::at_openLayoutsAction_triggered() {
         workbench()->setCurrentLayout(layout);
     }
 }
+
+void QnWorkbenchActionHandler::at_openNewWindowLayoutsAction_triggered() {
+    QnResourceList medias = QnResourceCriterion::filter<QnLayoutResource, QnResourceList>(menu()->currentParameters(sender()).resources());
+    if(medias.isEmpty()) 
+        return;
+
+    QMimeData mimeData;
+    QnWorkbenchResource::serializeResources(medias, QnWorkbenchResource::resourceMimeTypes(), &mimeData);
+    QnMimeData data(&mimeData);
+    QByteArray serializedData;
+    QDataStream stream(&serializedData, QIODevice::WriteOnly);
+    stream << data;
+
+    QStringList arguments;
+    arguments << QLatin1String("--delayed-drop");
+    arguments << QLatin1String(serializedData.toBase64().data());
+
+    qDebug() << "args";
+    qDebug() << arguments[1];
+    openNewWindow(arguments);
+}
+
 
 void QnWorkbenchActionHandler::at_openNewTabAction_triggered() {
     QnWorkbenchLayout *layout = new QnWorkbenchLayout(this);

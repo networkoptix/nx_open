@@ -563,12 +563,17 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::OpenSingleLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
-        text(tr("Open Layout")).
+        text(tr("Open Layout in a new Tab")).
         condition(hasFlags(QnResource::layout));
 
     factory(Qn::OpenMultipleLayoutsAction).
         flags(Qn::Tree | Qn::MultiTarget | Qn::ResourceTarget).
         text(tr("Open Layouts")).
+        condition(hasFlags(QnResource::layout));
+
+    factory(Qn::OpenNewWindowLayoutsAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
+        text(tr("Open Layout(s) in a new Window")).
         condition(hasFlags(QnResource::layout));
 
     factory(Qn::OpenAnyNumberOfLayoutsAction).

@@ -286,6 +286,12 @@ namespace Qn {
          */
         OpenAnyNumberOfLayoutsAction,
 
+
+        /**
+         * Opens selected layouts in a new window.
+         */
+        OpenNewWindowLayoutsAction,
+
         /**
          * Saves selected layout.
          */
