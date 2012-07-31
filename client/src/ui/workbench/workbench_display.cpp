@@ -731,7 +731,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
         return false;
     }
 
-    if (!resource->checkFlags(QnResource::media)) { // TODO: unsupported for now
+    if (!resource->checkFlags(QnResource::media) && !resource->checkFlags(QnResource::server)) { // TODO: unsupported for now
         qnDeleteLater(item);
         return false;
     }
