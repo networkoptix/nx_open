@@ -33,6 +33,7 @@ QRect QnRecordedChunkListHandler::deserializeMotionRect(const QString& rectStr)
 
 int QnRecordedChunkListHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result)
 {
+    Q_UNUSED(path)
     qint64 startTime = -1, endTime = 1, detailLevel = -1;
     QList<QnResourcePtr> resList;
     QByteArray errStr;
@@ -110,11 +111,13 @@ int QnRecordedChunkListHandler::executeGet(const QString& path, const QnRequestP
 
 int QnRecordedChunkListHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result)
 {
+    Q_UNUSED(body)
     return executeGet(path, params, result);
 }
 
 QString QnRecordedChunkListHandler::description(TCPSocket* tcpSocket) const
 {
+    Q_UNUSED(tcpSocket)
     QString rez;
     rez += "Return recorded chunk info by specified cameras\n";
     rez += "<BR>Param <b>physicalId</b> - camera physicalId. Param can be repeated several times for many cameras.";
@@ -130,6 +133,7 @@ QString QnRecordedChunkListHandler::description(TCPSocket* tcpSocket) const
 
 int QnXsdHelperHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result)
 {
+    Q_UNUSED(params)
     //QString method = path.mid(path.lastIndexOf('/')+1);
     QString method = QFileInfo(path).baseName();
 
@@ -149,5 +153,6 @@ int QnXsdHelperHandler::executeGet(const QString& path, const QnRequestParamList
 
 int QnXsdHelperHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result)
 {
+    Q_UNUSED(body)
     return executeGet(path, params, result);
 }

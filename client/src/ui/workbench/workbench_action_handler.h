@@ -8,6 +8,8 @@
 
 #include <api/app_server_connection.h>
 #include <ui/actions/actions.h>
+#include <ui/actions/action_parameters.h>
+
 #include "workbench_context_aware.h"
 
 class QAction;
@@ -155,6 +157,7 @@ protected:
     void setLayoutAspectRatio(const QnLayoutResourcePtr &resource, double aspectRatio);
 
     void openNewWindow(const QStringList &args);
+    void openInCurrentLayout(QnActionParameters &parameters);
 
     void saveCameraSettingsFromDialog();
 
@@ -183,6 +186,7 @@ protected slots:
     void at_nextLayoutAction_triggered();
     void at_previousLayoutAction_triggered();
     void at_openLayoutsAction_triggered();
+    void at_openNewWindowLayoutsAction_triggered();
     void at_openNewTabAction_triggered();
     void at_openInLayoutAction_triggered();
     void at_openInCurrentLayoutAction_triggered();

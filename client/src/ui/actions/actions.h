@@ -252,6 +252,26 @@ namespace Qn {
         OpenInNewWindowAction,
 
         /**
+         * Opens monitoring of the selected server in current layout.
+         * 
+         * Parameters:
+         * 
+         * <tt>QPointF GridPositionParameter</tt> --- drop position, in grid coordinates. 
+         * If not provided, Items will be dropped at the center of the layout.
+         */ 
+        MonitorInCurrentLayoutAction,
+
+        /**
+         * Opens monitoring of the selected server in a new layout.
+         */
+        MonitorInNewLayoutAction,
+
+        /**
+         * Opens monitoring of the selected server in a new window.
+         */
+        MonitorInNewWindowAction,
+
+        /**
          * Opens selected layout.
          */
         OpenSingleLayoutAction,
@@ -265,6 +285,12 @@ namespace Qn {
          * Opens selected layouts.
          */
         OpenAnyNumberOfLayoutsAction,
+
+
+        /**
+         * Opens selected layouts in a new window.
+         */
+        OpenNewWindowLayoutsAction,
 
         /**
          * Saves selected layout.

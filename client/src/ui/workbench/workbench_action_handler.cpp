@@ -168,9 +168,13 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::OpenInCurrentLayoutAction),              SIGNAL(triggered()),    this,   SLOT(at_openInCurrentLayoutAction_triggered()));
     connect(action(Qn::OpenInNewLayoutAction),                  SIGNAL(triggered()),    this,   SLOT(at_openInNewLayoutAction_triggered()));
     connect(action(Qn::OpenInNewWindowAction),                  SIGNAL(triggered()),    this,   SLOT(at_openInNewWindowAction_triggered()));
+    connect(action(Qn::MonitorInCurrentLayoutAction),           SIGNAL(triggered()),    this,   SLOT(at_openInCurrentLayoutAction_triggered()));
+    connect(action(Qn::MonitorInNewLayoutAction),               SIGNAL(triggered()),    this,   SLOT(at_openInNewLayoutAction_triggered()));
+    connect(action(Qn::MonitorInNewWindowAction),               SIGNAL(triggered()),    this,   SLOT(at_openInNewWindowAction_triggered()));
     connect(action(Qn::OpenSingleLayoutAction),                 SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
     connect(action(Qn::OpenMultipleLayoutsAction),              SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
     connect(action(Qn::OpenAnyNumberOfLayoutsAction),           SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
+    connect(action(Qn::OpenNewWindowLayoutsAction),             SIGNAL(triggered()),    this,   SLOT(at_openNewWindowLayoutsAction_triggered()));
     connect(action(Qn::OpenNewTabAction),                       SIGNAL(triggered()),    this,   SLOT(at_openNewTabAction_triggered()));
     connect(action(Qn::OpenNewWindowAction),                    SIGNAL(triggered()),    this,   SLOT(at_openNewWindowAction_triggered()));
     connect(action(Qn::SaveLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_saveLayoutAction_triggered()));
@@ -446,6 +450,11 @@ void QnWorkbenchActionHandler::openNewWindow(const QStringList &args) {
     QProcess::startDetached(qApp->applicationFilePath(), arguments);
 }
 
+void QnWorkbenchActionHandler::openInCurrentLayout(QnActionParameters &parameters){
+    parameters.setArgument(Qn::LayoutParameter, workbench()->currentLayout()->resource());
+    menu()->trigger(Qn::OpenInLayoutAction, parameters);
+}
+
 void QnWorkbenchActionHandler::saveCameraSettingsFromDialog() {
     if(!cameraSettingsDialog())
         return;
@@ -523,7 +532,13 @@ void QnWorkbenchActionHandler::submitDelayedDrops() {
         data.toMimeData(&mimeData);
 
         QnResourceList resources = QnWorkbenchResource::deserializeResources(&mimeData);
-        menu()->trigger(Qn::OpenInCurrentLayoutAction, resources);
+        QnResourceList layouts = QnResourceCriterion::filter<QnLayoutResource, QnResourceList>(resources);
+        if (!layouts.isEmpty()){
+            workbench()->clear();
+            menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
+        } else {
+            openInCurrentLayout(QnActionParameters(resources));
+        }
     }
 
     m_delayedDrops.clear();
@@ -621,7 +636,7 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
         return;
     }
 
-    QnMediaResourceList resources = QnResourceCriterion::filter<QnMediaResource>(parameters.resources());
+    QnResourceList resources = QnResourceCriterion::filter<QnResource>(parameters.resources());
     if(!resources.isEmpty()) {
         addToLayout(layout, resources, !position.isNull(), position);
         return;
@@ -631,17 +646,16 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
 void QnWorkbenchActionHandler::at_openInCurrentLayoutAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
     parameters.setArgument(Qn::LayoutParameter, workbench()->currentLayout()->resource());
-
     menu()->trigger(Qn::OpenInLayoutAction, parameters);
 };
 
 void QnWorkbenchActionHandler::at_openInNewLayoutAction_triggered() {
     menu()->trigger(Qn::OpenNewTabAction);
-    menu()->trigger(Qn::OpenInCurrentLayoutAction, menu()->currentParameters(sender()));
+    openInCurrentLayout(menu()->currentParameters(sender()));
 }
 
 void QnWorkbenchActionHandler::at_openInNewWindowAction_triggered() {
-    QnResourceList medias = QnResourceCriterion::filter<QnMediaResource, QnResourceList>(menu()->currentParameters(sender()).resources());
+    QnResourceList medias = QnResourceCriterion::filter<QnResource, QnResourceList>(menu()->currentParameters(sender()).resources());
     if(medias.isEmpty()) 
         return;
     
@@ -674,6 +688,28 @@ void QnWorkbenchActionHandler::at_openLayoutsAction_triggered() {
         workbench()->setCurrentLayout(layout);
     }
 }
+
+void QnWorkbenchActionHandler::at_openNewWindowLayoutsAction_triggered() {
+    QnResourceList medias = QnResourceCriterion::filter<QnLayoutResource, QnResourceList>(menu()->currentParameters(sender()).resources());
+    if(medias.isEmpty()) 
+        return;
+
+    QMimeData mimeData;
+    QnWorkbenchResource::serializeResources(medias, QnWorkbenchResource::resourceMimeTypes(), &mimeData);
+    QnMimeData data(&mimeData);
+    QByteArray serializedData;
+    QDataStream stream(&serializedData, QIODevice::WriteOnly);
+    stream << data;
+
+    QStringList arguments;
+    arguments << QLatin1String("--delayed-drop");
+    arguments << QLatin1String(serializedData.toBase64().data());
+
+    qDebug() << "args";
+    qDebug() << arguments[1];
+    openNewWindow(arguments);
+}
+
 
 void QnWorkbenchActionHandler::at_openNewTabAction_triggered() {
     QnWorkbenchLayout *layout = new QnWorkbenchLayout(this);
@@ -872,11 +908,12 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
 
     QnResourceList layouts = QnResourceCriterion::filter<QnLayoutResource, QnResourceList>(parameters.resources());
+    QnResourceList servers = QnResourceCriterion::filter<QnVideoServerResource, QnResourceList>(parameters.resources());
     if(!layouts.empty()) {
         menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
     } else {
         /* No layouts? Just open dropped media. */
-        menu()->trigger(Qn::OpenInCurrentLayoutAction, parameters);
+        openInCurrentLayout(menu()->currentParameters(sender()));
     }
 }
 

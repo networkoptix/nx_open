@@ -9,7 +9,8 @@ QnLocalVideoServerResource::QnLocalVideoServerResource()
     : QnResource()
 {
     //setTypeId(qnResTypePool->getResourceTypeId("", QLatin1String("LocalServer"))); // ###
-    addFlags(server | local);
+    addFlags(QnResource::server | QnResource::local);
+    removeFlags(QnResource::media);
     setName(QLatin1String("Local"));
     setStatus(Online);
 }
@@ -25,7 +26,8 @@ QnVideoServerResource::QnVideoServerResource():
     //,m_rtspListener(0)
 {
     setTypeId(qnResTypePool->getResourceTypeId(QString(), QLatin1String("Server")));
-    addFlags(server | remote);
+    addFlags(QnResource::server | QnResource::remote);
+    removeFlags(QnResource::media);
     m_primaryIFSelected = false;
 }
 

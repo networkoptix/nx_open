@@ -216,7 +216,7 @@ QnAbstractMediaDataPtr QnServerArchiveDelegate::getNextData()
         return rez;
     }
 
-    int waitMotionCnt = 0;
+    //int waitMotionCnt = 0;
 begin_label:
     QnAbstractMediaDataPtr data = m_aviDelegate->getNextData();
     if (!data || m_currentChunk.durationMs != -1 && data->timestamp >= m_currentChunk.durationMs*1000)

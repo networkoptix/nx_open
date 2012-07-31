@@ -31,9 +31,9 @@ def genskin():
 
     for f in files:
       if f.endswith('.png'):
-        print >> skin_qrc, '<file alias="%s">%s</file>' % (os.path.join(parent, f).lower(), os.path.join(root, f).lower())
+        print >> skin_qrc, '<file alias="%s">%s</file>' % (os.path.join(parent, f), os.path.join(root, f))
       if f.endswith('.mkv'):
-        print >> skin_qrc, '<file alias="%s">%s</file>' % (os.path.join(parent, f).lower(), os.path.join(root, f).lower())
+        print >> skin_qrc, '<file alias="%s">%s</file>' % (os.path.join(parent, f), os.path.join(root, f))
   
   print >> skin_qrc, '<file alias="globals.ini">${project.build.directory}/globals.ini</file>'
   print >> skin_qrc, """
@@ -62,7 +62,7 @@ def gentranslations():
 
     for f in files:
       if f.endswith('.qm'):
-        print >> translations_qrc, '<file alias="%s">%s</file>' % (os.path.join(parent, f).lower(), os.path.join(root, f).lower())
+        print >> translations_qrc, '<file alias="%s">%s</file>' % (os.path.join(parent, f), os.path.join(root, f))
 
   print >> translations_qrc, """
   </qresource>

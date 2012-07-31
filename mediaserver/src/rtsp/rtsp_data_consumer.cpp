@@ -299,7 +299,7 @@ QnMediaContextPtr QnRtspDataConsumer::getGeneratedContext(CodecID compressionTyp
     if (itr != m_generatedContext.end())
         return itr.value();
     QnMediaContextPtr result(new QnMediaContext(compressionType));
-    AVCodecContext* ctx = result->ctx();
+    //AVCodecContext* ctx = result->ctx();
     m_generatedContext.insert(compressionType, result);
     return result;
 }

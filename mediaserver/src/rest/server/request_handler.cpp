@@ -25,6 +25,7 @@ QnRestGUIRequestHandler::~QnRestGUIRequestHandler()
 
 int QnRestGUIRequestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result)
 {
+    Q_UNUSED(path)
     Q_D(QnRestGUIRequestHandler);
     d->params = params;
     d->result = &result;
