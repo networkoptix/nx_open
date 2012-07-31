@@ -108,20 +108,20 @@ void QnClientMessageProcessor::at_messageReceived(QnMessage message)
     QByteArray debugStr;
     QTextStream stream(&debugStr);
 
-    if (message.eventType == Message_Type_ResourceDisabledChange)
+    if (message.eventType == Qn::Message_Type_ResourceDisabledChange)
         stream << "disabled: " << message.resourceDisabled;
 
-    if(message.eventType == Message_Type_ResourceStatusChange)
+    if(message.eventType == Qn::Message_Type_ResourceStatusChange)
         stream << "status: " << (int)message.resourceStatus;
 
     qDebug() << debugStr;
 
-	if (message.eventType == Message_Type_License)
+	if (message.eventType == Qn::Message_Type_License)
     {
 		if (message.license->isValid())
 			qnLicensePool->addLicense(message.license);
     }
-	else if (message.eventType == Message_Type_ResourceDisabledChange)
+	else if (message.eventType == Qn::Message_Type_ResourceDisabledChange)
 	{
 		QnResourcePtr resource;
 		if (!message.resourceGuid.isEmpty())
@@ -134,7 +134,7 @@ void QnClientMessageProcessor::at_messageReceived(QnMessage message)
 			resource->setDisabled(message.resourceDisabled);
 		}
 	}
-    else if (message.eventType == Message_Type_ResourceStatusChange)
+    else if (message.eventType == Qn::Message_Type_ResourceStatusChange)
     {
 		QnResourcePtr resource;
 		if (!message.resourceGuid.isEmpty())
@@ -147,11 +147,11 @@ void QnClientMessageProcessor::at_messageReceived(QnMessage message)
 			resource->setStatus(message.resourceStatus);
         }
     }
-	else if (message.eventType == Message_Type_CameraServerItem)
+	else if (message.eventType == Qn::Message_Type_CameraServerItem)
     {
 		QnCameraHistoryPool::instance()->addCameraHistoryItem(*message.cameraServerItem);
     }
-	else if (message.eventType == Message_Type_ResourceChange)
+	else if (message.eventType == Qn::Message_Type_ResourceChange)
     {
         if (!message.resource)
         {
@@ -171,7 +171,7 @@ void QnClientMessageProcessor::at_messageReceived(QnMessage message)
 			qnResPool->addResource(message.resource);
 		else
 			ownResource->update(message.resource);
-	} else if (message.eventType == Message_Type_ResourceDelete)
+	} else if (message.eventType == Qn::Message_Type_ResourceDelete)
     {
         QnResourcePtr ownResource = qnResPool->getResourceById(message.resourceId);
         qnResPool->removeResource(ownResource);

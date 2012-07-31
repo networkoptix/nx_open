@@ -60,16 +60,13 @@ private:
     static int hwcounter;
 	AVCodec *m_codec;
 	AVCodecContext *m_context;
-    FrameTypeExtractor* m_frameTypeExtractor;
+
 	AVFrame *m_frame;
     QImage m_tmpImg;
     CLVideoDecoderOutput m_tmpQtFrame;
-    bool m_usedQtImage;
 
 	
-	quint8* m_deinterlaceBuffer;
 	AVFrame *m_deinterlacedFrame;
-    bool m_checkH264ResolutionChange;
 
 #ifdef _USE_DXVA
     DecoderContext m_decoderContext;
@@ -85,9 +82,13 @@ private:
 	QnAbstractVideoDecoder::DecodeMode m_newDecodeMode;
 
 	unsigned int m_lightModeFrameCounter;
+    FrameTypeExtractor* m_frameTypeExtractor;
+	quint8* m_deinterlaceBuffer;
+    bool m_usedQtImage;
 
     int m_currentWidth;
     int m_currentHeight;
+    bool m_checkH264ResolutionChange;
 
     int m_forceSliceDecoding;
     typedef QVector<QPair<qint64, QnMetaDataV1Ptr> > MotionMap; // I have used vector instead map because of 2-3 elements is tipical size

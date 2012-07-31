@@ -10,10 +10,11 @@ void parseCameraServerItem(QnCameraHistoryItemPtr& historyItem, const pb::Camera
 
 bool QnMessage::load(const pb::Message &message)
 {
-    eventType = (Message_Type)message.type();
+    eventType = (Qn::Message_Type)message.type();
+    pb::Message_Type msgType = message.type();
     seqNumber = message.seqnumber();
 
-    switch (eventType)
+    switch (msgType)
     {
         case pb::Message_Type_ResourceChange:
         {
@@ -56,6 +57,10 @@ bool QnMessage::load(const pb::Message &message)
 			parseCameraServerItem(cameraServerItem, cameraServerItemMessage.cameraserveritem());
             break;
         }
+        case pb::Message_Type_Initial:
+            break;
+        case pb::Message_Type_Ping:
+            break;
     }
 
     return true;

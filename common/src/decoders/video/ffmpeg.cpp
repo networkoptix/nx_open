@@ -38,6 +38,7 @@ struct FffmpegLog
 
 CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CodecID codec_id, const QnCompressedVideoDataPtr data, bool mtDecoding):
 m_passedContext(0),
+m_context(0),
 m_width(0),
 m_height(0),
 m_codecId(codec_id),
@@ -51,7 +52,6 @@ m_usedQtImage(false),
 m_currentWidth(-1),
 m_currentHeight(-1),
 m_checkH264ResolutionChange(false),
-m_context(0),
 m_forceSliceDecoding(-1)
 {
     m_mtDecoding = mtDecoding;
@@ -59,7 +59,7 @@ m_forceSliceDecoding(-1)
     QMutexLocker mutex(&global_ffmpeg_mutex);
 	if (data->context)
 	{
-		m_passedContext = avcodec_alloc_context();
+		m_passedContext = avcodec_alloc_context3(findCodec(m_codecId));
 		avcodec_copy_context(m_passedContext, data->context->ctx());
 	}
     
@@ -157,7 +157,7 @@ void CLFFmpegVideoDecoder::openDecoder(const QnCompressedVideoDataPtr data)
 {
     m_codec = findCodec(m_codecId);
 
-    m_context = avcodec_alloc_context();
+    m_context = avcodec_alloc_context3(m_codec);
 
     if (m_passedContext) {
         avcodec_copy_context(m_context, m_passedContext);
@@ -192,7 +192,7 @@ void CLFFmpegVideoDecoder::openDecoder(const QnCompressedVideoDataPtr data)
 
     cl_log.log(QLatin1String("Creating ") + QLatin1String(m_mtDecoding ? "FRAME threaded decoder" : "SLICE threaded decoder"), cl_logDEBUG2);
     // TODO: check return value
-    if (avcodec_open(m_context, m_codec) < 0)
+    if (avcodec_open2(m_context, m_codec, NULL) < 0)
     {
         m_codec = 0;
         Q_ASSERT_X(1, Q_FUNC_INFO, "Can't open decoder");
@@ -234,7 +234,7 @@ void CLFFmpegVideoDecoder::resetDecoder(QnCompressedVideoDataPtr data)
         avcodec_close(m_context);
 
     av_free(m_context);
-    m_context = avcodec_alloc_context();
+    m_context = avcodec_alloc_context3(m_codec);
 
     if (m_passedContext) {
         avcodec_copy_context(m_context, m_passedContext);
@@ -244,7 +244,7 @@ void CLFFmpegVideoDecoder::resetDecoder(QnCompressedVideoDataPtr data)
     //m_context->thread_type = m_mtDecoding ? FF_THREAD_FRAME : FF_THREAD_SLICE;
     // ensure that it is H.264 with nal prefixes
     m_checkH264ResolutionChange = m_mtDecoding && m_context->codec_id == CODEC_ID_H264 && (!m_context->extradata_size || m_context->extradata[0] == 0); 
-    avcodec_open(m_context, m_codec);
+    avcodec_open2(m_context, m_codec, NULL);
     //m_context->debug |= FF_DEBUG_THREADS;
     //m_context->flags2 |= CODEC_FLAG2_FAST;
     m_motionMap.clear();
@@ -281,7 +281,7 @@ bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, CLVideoDe
 
 		if (data->compressionType == CODEC_ID_MJPEG)
 		{
-            int period = m_decodeMode == DecodeMode_Fast ? LIGHT_CPU_MODE_FRAME_PERIOD : LIGHT_CPU_MODE_FRAME_PERIOD*2;
+            uint period = m_decodeMode == DecodeMode_Fast ? LIGHT_CPU_MODE_FRAME_PERIOD : LIGHT_CPU_MODE_FRAME_PERIOD*2;
 			if (m_lightModeFrameCounter < period)
 			{
 				++m_lightModeFrameCounter;
@@ -453,7 +453,7 @@ bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, CLVideoDe
                     av_picture_copy((AVPicture*) outFrame, (AVPicture*) (m_frame), m_context->pix_fmt, m_context->width, m_context->height);
                 }
 
-                outFrame->pkt_dts = m_frame->pkt_dts != AV_NOPTS_VALUE ? m_frame->pkt_dts : m_frame->pkt_pts;
+                outFrame->pkt_dts = (quint64)m_frame->pkt_dts != AV_NOPTS_VALUE ? m_frame->pkt_dts : m_frame->pkt_pts;
             }
         }
 
@@ -524,8 +524,9 @@ PixelFormat CLFFmpegVideoDecoder::GetPixelFormat()
         return PIX_FMT_YUV422P;
     case PIX_FMT_YUVJ444P:
         return PIX_FMT_YUV444P;
+    default:
+        return m_context->pix_fmt;
     }
-    return m_context->pix_fmt;
 }
 
 void CLFFmpegVideoDecoder::setLightCpuMode(QnAbstractVideoDecoder::DecodeMode val)
