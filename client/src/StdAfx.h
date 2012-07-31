@@ -2,51 +2,53 @@
 
 #include "config.h"
 
+/* Windows headers. */
 #ifdef _WIN32
-#undef __STDC_CONSTANT_MACROS
-#define __STDC_CONSTANT_MACROS
-#define NOMINMAX 
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <iphlpapi.h>
+#   include <winsock2.h>
+#   include <ws2tcpip.h>
+#   include <iphlpapi.h>
 
-// DXVA headers (should be included before ffmpeg headers)
-#ifdef _USE_DXVA
-#include <d3d9.h>
-#include <dxva2api.h>
-#include <windows.h>
-#include <windowsx.h>
-#include <ole2.h>
-#include <commctrl.h>
-#include <shlwapi.h>
-#include <Strsafe.h>
-#endif
+/* DXVA headers (should be included before ffmpeg headers). */
+#   ifdef _USE_DXVA
+#       include <d3d9.h>
+#       include <dxva2api.h>
+#       include <windows.h>
+#       include <windowsx.h>
+#       include <ole2.h>
+#       include <commctrl.h>
+#       include <shlwapi.h>
+#       include <Strsafe.h>
+#   endif
 #endif
 
-// ffmpeg headers
+/* FFMPEG headers. */
+#ifdef __cplusplus
 extern "C" {
-	#include <libavcodec/avcodec.h>
-	#include <libavformat/avformat.h>
-	#ifdef _USE_DXVA
-	#include <libavcodec/dxva2.h>
-	#endif
-	#include <libswscale/swscale.h>
-	#include <libavutil/avstring.h>
+#endif
+#   include <libavcodec/avcodec.h>
+#   include <libavformat/avformat.h>
+#   ifdef _USE_DXVA
+#       include <libavcodec/dxva2.h>
+#   endif
+#   include <libswscale/swscale.h>
+#   include <libavutil/avstring.h>
+#ifdef __cplusplus
 }
+#endif
 
 #ifdef __cplusplus
 
-// stl headers
+/* STL headers. */
 #include <algorithm>
 #include <functional>
 
-// QT headers
+/* QT headers. */
 #include <QAction>
 
 #ifdef Q_OS_WIN
-#include <QAudio>
-#include <QAudioFormat>
-#include <QAudioOutput>
+#   include <QAudio>
+#   include <QAudioFormat>
+#   include <QAudioOutput>
 #endif
 
 #include <QAuthenticator>
