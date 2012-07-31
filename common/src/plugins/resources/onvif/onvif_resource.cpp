@@ -513,7 +513,8 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
     QAuthenticator auth(getAuth());
     //TODO:UTF unuse StdString
     DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), auth.user().toStdString(), auth.password().toStdString());
-    
+    ImagingSoapWrapper soapWrapper2(getDeviceOnvifUrl().toStdString(), auth.user().toStdString(), auth.password().toStdString());
+
     //Trying to get name
     {
         DeviceInfoReq request;
@@ -1409,4 +1410,9 @@ const QnResourceAudioLayout* QnPlOnvifResource::getAudioLayout(const QnAbstractM
 bool QnPlOnvifResource::forcePrimaryEncoderCodec() const
 {
     return m_forceCodecFromPrimaryEncoder;
+}
+
+bool QnPlOnvifResource::setSpecialParam(const QString& name, const QVariant& val, QnDomain domain)
+{
+    return false;
 }
