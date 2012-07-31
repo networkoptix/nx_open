@@ -5,10 +5,6 @@
 #include <smmintrin.h>
 #endif
 
-#ifdef Q_OS_UNIX
-#include <tmmintrin.h>
-#endif
-
 #include "utils/media/sse_helper.h"
 #include "utils/common/math.h"
 
@@ -156,8 +152,8 @@ void downscalePlate_factor8_sse41_intr(unsigned char * dst, const unsigned int d
         {
             __m128i s00 = _mm_and_si128(_mm_loadu_si128(src1), sse_00ffw_intrs); /* SSE2. */
             __m128i s10 = _mm_and_si128(_mm_loadu_si128(src2), sse_00ffw_intrs); /* SSE2. */
-            s00 = _mm_packus_epi32(s00, color_const_intrs); /* SSE2. */
-            s10 = _mm_packus_epi32(s10, color_const_intrs); /* SSE2. */
+            s00 = _mm_packus_epi32(s00, color_const_intrs); /* SSE4. */
+            s10 = _mm_packus_epi32(s10, color_const_intrs); /* SSE4. */
 
             __m128i rez1 = _mm_srli_epi16(_mm_avg_epu16(_mm_hadd_epi16(s00, color_const_intrs), _mm_hadd_epi16(s10, color_const_intrs)),1); /* SSSE3. */
             __m128i tmp = _mm_packus_epi16(rez1, color_const_intrs); /* SSE2. */
