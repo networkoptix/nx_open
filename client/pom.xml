@@ -28,8 +28,8 @@
         <qtlib3>network</qtlib3>
         <qtlib4>opengl</qtlib4>
         <qtlib5>xml</qtlib5>
-        <!--<qtlib6/>
-        <qtlib7/>
+        <qtlib6>multimedia</qtlib6>
+        <!--<qtlib7/>
         <qtlib8/>
         <qtlib9/> -->
         <!--QT plugins used-->      
