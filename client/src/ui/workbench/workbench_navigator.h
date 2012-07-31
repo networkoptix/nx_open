@@ -185,8 +185,9 @@ private:
 
     QSet<QnResourceWidget *> m_motionIgnoreWidgets;
 
-    QnMediaResourceWidget *m_centralWidget;
-    QnMediaResourceWidget *m_currentWidget;
+    QnResourceWidget *m_centralWidget;
+    QnResourceWidget *m_currentWidget;
+    QnMediaResourceWidget *m_currentMediaWidget;
     WidgetFlags m_currentWidgetFlags;
     bool m_currentWidgetLoaded;
     bool m_currentWidgetIsCentral;

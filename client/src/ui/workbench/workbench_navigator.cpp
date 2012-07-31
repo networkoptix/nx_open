@@ -47,6 +47,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_timeScrollBar(NULL),
     m_centralWidget(NULL),
     m_currentWidget(NULL),
+    m_currentMediaWidget(NULL),
     m_updatingSliderFromReader(false),
     m_updatingSliderFromScrollBar(false),
     m_updatingScrollBarFromSlider(false),
@@ -223,27 +224,34 @@ bool QnWorkbenchNavigator::setLive(bool live) {
 }
 
 bool QnWorkbenchNavigator::isPlayingSupported() const {
-    return m_currentWidget && m_currentWidget->display()->archiveReader();
+    if (m_currentMediaWidget) 
+        return m_currentMediaWidget->display()->archiveReader();
+    return false;
 }
 
 bool QnWorkbenchNavigator::isPlaying() const {
     if(!isPlayingSupported())
         return false;
+    if (!m_currentMediaWidget)
+        return false;
 
-    return !m_currentWidget->display()->archiveReader()->isMediaPaused();
+    return !m_currentMediaWidget->display()->archiveReader()->isMediaPaused();
 }
 
 bool QnWorkbenchNavigator::setPlaying(bool playing) {
     if(playing == isPlaying())
         return true;
+    
+    if (!m_currentMediaWidget)
+        return false;
 
     if(!isPlayingSupported())
         return false;
 
     m_pausedOverride = false;
 
-    QnAbstractArchiveReader *reader = m_currentWidget->display()->archiveReader();
-    CLCamDisplay *camDisplay = m_currentWidget->display()->camDisplay();
+    QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader();
+    CLCamDisplay *camDisplay = m_currentMediaWidget->display()->camDisplay();
     if(playing) {
         if (reader->isRealTimeSource()) {
             /* Media was paused while on live. Jump to archive when resumed. */
@@ -270,10 +278,10 @@ bool QnWorkbenchNavigator::setPlaying(bool playing) {
 }
 
 qreal QnWorkbenchNavigator::speed() const {
-    if(!m_currentWidget || m_currentWidget->display()->isStillImage())
+    if(!m_currentMediaWidget || m_currentMediaWidget->display()->isStillImage())
         return 0.0;
 
-    if(QnAbstractArchiveReader *reader = m_currentWidget->display()->archiveReader())
+    if(QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader())
         return reader->getSpeed();
 
     return 1.0;
@@ -284,10 +292,10 @@ void QnWorkbenchNavigator::setSpeed(qreal speed) {
     if(qFuzzyCompare(speed, this->speed()))
         return;
 
-    if(!m_currentWidget)
+    if(!m_currentMediaWidget)
         return;
 
-    if(QnAbstractArchiveReader *reader = m_currentWidget->display()->archiveReader()) {
+    if(QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader()) {
         reader->setSpeed(speed);
 
         setPlaying(!qFuzzyIsNull(speed));
@@ -297,20 +305,20 @@ void QnWorkbenchNavigator::setSpeed(qreal speed) {
 }
 
 qreal QnWorkbenchNavigator::minimalSpeed() const {
-    if(!m_currentWidget || m_currentWidget->display()->isStillImage())
+    if(!m_currentMediaWidget || m_currentMediaWidget->display()->isStillImage())
         return 0.0;
 
-    if(QnAbstractArchiveReader *reader = m_currentWidget->display()->archiveReader())
+    if(QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader())
         return reader->isNegativeSpeedSupported() ? -16.0 : 0.0;
 
     return 1.0;
 }
 
 qreal QnWorkbenchNavigator::maximalSpeed() const {
-    if(!m_currentWidget || m_currentWidget->display()->isStillImage())
+    if(!m_currentMediaWidget || m_currentMediaWidget->display()->isStillImage())
         return 0.0;
 
-    if(QnAbstractArchiveReader *reader = m_currentWidget->display()->archiveReader())
+    if(QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader())
         return 16.0;
 
     return 1.0;
@@ -416,22 +424,22 @@ QnThumbnailsLoader *QnWorkbenchNavigator::thumbnailLoader(QnResourceWidget *widg
 }
 
 void QnWorkbenchNavigator::jumpBackward() {
-    if(!m_currentWidget)
+    if(!m_currentMediaWidget)
         return;
 
-    QnAbstractArchiveReader *reader = m_currentWidget->display()->archiveReader();
+    QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader();
     if(!reader)
         return;
 
     m_pausedOverride = false;
 
     qint64 pos;
-    if(QnCachingTimePeriodLoader *loader = this->loader(m_currentWidget)) {
+    if(QnCachingTimePeriodLoader *loader = this->loader(m_currentMediaWidget)) {
         const QnTimePeriodList fullPeriods = loader->periods(loader->isMotionRegionsEmpty() ? Qn::RecordingRole : Qn::MotionRole);
         const QnTimePeriodList periods = QnTimePeriod::aggregateTimePeriods(fullPeriods, MAX_FRAME_DURATION);
         
         if (!periods.isEmpty()) {
-            qint64 currentTime = m_currentWidget->display()->camera()->getCurrentTime();
+            qint64 currentTime = m_currentMediaWidget->display()->camera()->getCurrentTime();
 
             if (currentTime == DATETIME_NOW) {
                 pos = periods.last().startTimeMs * 1000;
@@ -450,10 +458,10 @@ void QnWorkbenchNavigator::jumpBackward() {
 }
 
 void QnWorkbenchNavigator::jumpForward() {
-    if (!m_currentWidget)
+    if (!m_currentMediaWidget)
         return;
 
-    QnAbstractArchiveReader *reader = m_currentWidget->display()->archiveReader();
+    QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader();
     if(!reader)
         return;
 
@@ -463,11 +471,11 @@ void QnWorkbenchNavigator::jumpForward() {
     if(!(m_currentWidgetFlags & WidgetSupportsPeriods)) {
         pos = reader->endTime();
     } else {
-        QnCachingTimePeriodLoader *loader = this->loader(m_currentWidget);
+        QnCachingTimePeriodLoader *loader = this->loader(m_currentMediaWidget);
         const QnTimePeriodList fullPeriods = loader->periods(loader->isMotionRegionsEmpty() ? Qn::RecordingRole : Qn::MotionRole);
         const QnTimePeriodList periods = QnTimePeriod::aggregateTimePeriods(fullPeriods, MAX_FRAME_DURATION);
 
-        QnTimePeriodList::const_iterator itr = qUpperBound(periods.begin(), periods.end(), m_currentWidget->display()->camera()->getCurrentTime() / 1000);
+        QnTimePeriodList::const_iterator itr = qUpperBound(periods.begin(), periods.end(), m_currentMediaWidget->display()->camera()->getCurrentTime() / 1000);
         if (itr == periods.end() || reader->isReverseMode() && itr->durationMs == -1) {
             pos = DATETIME_NOW;
         } else {
@@ -478,30 +486,30 @@ void QnWorkbenchNavigator::jumpForward() {
 }
 
 void QnWorkbenchNavigator::stepBackward() {
-    if(!m_currentWidget)
+    if(!m_currentMediaWidget)
         return;
 
-    QnAbstractArchiveReader *reader = m_currentWidget->display()->archiveReader();
+    QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader();
     if(!reader)
         return;
 
     m_pausedOverride = false;
 
     if (!reader->isSkippingFrames() && reader->currentTime() > reader->startTime()) {
-        quint64 currentTime = m_currentWidget->display()->camera()->getCurrentTime();
+        quint64 currentTime = m_currentMediaWidget->display()->camera()->getCurrentTime();
 
         if (reader->isSingleShotMode())
-            m_currentWidget->display()->camDisplay()->playAudio(false); // TODO: wtf?
+            m_currentMediaWidget->display()->camDisplay()->playAudio(false); // TODO: wtf?
 
         reader->previousFrame(currentTime);
     }
 }
 
 void QnWorkbenchNavigator::stepForward() {
-    if(!m_currentWidget)
+    if(!m_currentMediaWidget)
         return;
 
-    QnAbstractArchiveReader *reader = m_currentWidget->display()->archiveReader();
+    QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader();
     if(!reader)
         return;
 
@@ -511,8 +519,11 @@ void QnWorkbenchNavigator::stepForward() {
 }
 
 void QnWorkbenchNavigator::setPlayingTemporary(bool playing) {
-    m_currentWidget->display()->archiveReader()->setSingleShotMode(!playing);
-    m_currentWidget->display()->camDisplay()->playAudio(playing);
+    if (!m_currentMediaWidget)
+        return;
+
+    m_currentMediaWidget->display()->archiveReader()->setSingleShotMode(!playing);
+    m_currentMediaWidget->display()->camDisplay()->playAudio(playing);
 }
 
 
@@ -520,7 +531,7 @@ void QnWorkbenchNavigator::setPlayingTemporary(bool playing) {
 // Updaters
 // -------------------------------------------------------------------------- //
 void QnWorkbenchNavigator::updateCentralWidget() {
-    QnMediaResourceWidget *centralWidget = dynamic_cast<QnMediaResourceWidget *>(display()->widget(Qn::CentralRole));
+    QnResourceWidget *centralWidget = display()->widget(Qn::CentralRole);
     if(m_centralWidget == centralWidget)
         return;
 
@@ -531,13 +542,13 @@ void QnWorkbenchNavigator::updateCentralWidget() {
 }
 
 void QnWorkbenchNavigator::updateCurrentWidget() {
-    QnMediaResourceWidget *widget = NULL;
+    QnResourceWidget *widget = NULL;
     bool isCentral = false;
     if (m_centralWidget != NULL || !display()->isStreamsSynchronized()) {
         widget = m_centralWidget;
         isCentral = true;
-    } else if(m_syncedWidgets.contains(m_currentWidget)) {
-        widget = m_currentWidget;
+    } else if(m_syncedWidgets.contains(m_currentMediaWidget)) {
+        widget = m_currentMediaWidget;
     } else if (m_syncedWidgets.empty()) {
         widget = NULL;
     } else {
@@ -558,13 +569,15 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     WidgetFlags previousWidgetFlags = m_currentWidgetFlags;
     m_localDataByWidget[m_currentWidget] = currentSliderData();
 
-    if(m_currentWidget) {
-        QnAbstractArchiveReader  *archiveReader = m_currentWidget->display()->archiveReader();
+    if(m_currentMediaWidget) {
+        QnAbstractArchiveReader  *archiveReader = m_currentMediaWidget->display()->archiveReader();
         if (archiveReader)
             archiveReader->setPlaybackMask(QnTimePeriodList());
     }
 
     m_currentWidget = widget;
+    m_currentMediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
+
     m_pausedOverride = false;
     m_currentWidgetLoaded = false;
     m_currentWidgetIsCentral = isCentral;
@@ -623,13 +636,13 @@ void QnWorkbenchNavigator::updateSliderOptions() {
 }
 
 void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
-    if (!m_currentWidget)
+    if (!m_currentMediaWidget)
         return;
 
     if (m_timeSlider->isSliderDown())
         return;
 
-    QnAbstractArchiveReader *reader = m_currentWidget->display()->archiveReader();
+    QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader();
     if (!reader)
         return;
 
@@ -644,7 +657,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
     m_timeSlider->setRange(startTimeMSec, endTimeMSec);
 
     if(!m_pausedOverride) {
-        qint64 timeUSec = m_currentWidget->display()->camDisplay()->isRealTimeSource() ? DATETIME_NOW : m_currentWidget->display()->camera()->getCurrentTime();
+        qint64 timeUSec = m_currentMediaWidget->display()->camDisplay()->isRealTimeSource() ? DATETIME_NOW : m_currentMediaWidget->display()->camera()->getCurrentTime();
         qint64 timeMSec = timeUSec == DATETIME_NOW ? endTimeMSec : (timeUSec == AV_NOPTS_VALUE ? m_timeSlider->value() : timeUSec / 1000);
 
         if (timeUSec != DATETIME_NOW && timeUSec != AV_NOPTS_VALUE){
@@ -668,7 +681,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
         updateTargetPeriod();
 
         if(m_sliderDataInvalid) {
-            setCurrentSliderData(m_localDataByWidget.value(m_currentWidget), !m_sliderWindowInvalid);
+            setCurrentSliderData(m_localDataByWidget.value(m_currentMediaWidget), !m_sliderWindowInvalid);
             m_timeSlider->finishAnimations();
             m_sliderDataInvalid = false;
             m_sliderWindowInvalid = false;
@@ -852,7 +865,7 @@ void QnWorkbenchNavigator::updateThumbnailsLoader() {
         if(QnCachingTimePeriodLoader *loader = this->loader(m_centralWidget)) {
             if(!loader->periods(Qn::RecordingRole).isEmpty())
                 resource = m_centralWidget->resource();
-        } else if(!m_currentWidget->display()->isStillImage()) {
+        } else if(m_currentMediaWidget && !m_currentMediaWidget->display()->isStillImage()) {
             resource = m_centralWidget->resource();
         }
     }
@@ -969,8 +982,8 @@ void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value) {
     }
 
     /* Update reader position. */
-    if(!m_updatingSliderFromReader) {
-        QnAbstractArchiveReader *reader = m_currentWidget->display()->archiveReader();
+    if(m_currentMediaWidget && !m_updatingSliderFromReader) {
+        QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader();
         if (value == DATETIME_NOW) {
             reader->jumpToPreviousFrame(DATETIME_NOW);
         } else {
