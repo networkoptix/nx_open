@@ -1,5 +1,7 @@
 #include "desktop_stream_reader.h"
 
+#ifdef Q_OS_WIN
+
 extern QMutex global_ffmpeg_mutex;
 
 struct FffmpegLog
@@ -23,7 +25,7 @@ struct FffmpegLog
 };
 
 
-CLDesktopStreamreader::CLDesktopStreamreader(QnResourcePtr dev):
+QnDesktopStreamreader::QnDesktopStreamreader(QnResourcePtr dev):
     CLServerPushStreamreader(dev),
     m_videoBuf(0),
     m_videoBufSize(0),
@@ -40,12 +42,12 @@ CLDesktopStreamreader::CLDesktopStreamreader(QnResourcePtr dev):
     //m_encoderCodecName = "mpeg4";
 }
 
-CLDesktopStreamreader::~CLDesktopStreamreader()
+QnDesktopStreamreader::~QnDesktopStreamreader()
 {
     closeStream();
 }
 
-bool CLDesktopStreamreader::init()
+bool QnDesktopStreamreader::init()
 {
     QMutexLocker mutex(&global_ffmpeg_mutex);
 
@@ -91,7 +93,7 @@ bool CLDesktopStreamreader::init()
     return true;
 }
 
-QnAbstractMediaDataPtr CLDesktopStreamreader::getNextData()
+QnAbstractMediaDataPtr QnDesktopStreamreader::getNextData()
 {
     if (!m_initialized)
         return QnAbstractMediaDataPtr();
@@ -121,13 +123,13 @@ QnAbstractMediaDataPtr CLDesktopStreamreader::getNextData()
     return QnAbstractMediaDataPtr();
 }
 
-void CLDesktopStreamreader::openStream()
+void QnDesktopStreamreader::openStream()
 {
     if (init())
         m_initialized = true;
 }
 
-void CLDesktopStreamreader::closeStream()
+void QnDesktopStreamreader::closeStream()
 {
     delete m_grabber;
     m_grabber = 0;
@@ -147,7 +149,10 @@ void CLDesktopStreamreader::closeStream()
     m_initialized = false;
 }
 
-bool CLDesktopStreamreader::isStreamOpened() const
+bool QnDesktopStreamreader::isStreamOpened() const
 {
     return m_initialized;
 }
+
+#endif // Q_OS_WIN
+

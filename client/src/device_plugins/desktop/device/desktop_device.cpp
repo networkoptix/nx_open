@@ -1,12 +1,7 @@
 #include "desktop_device.h"
+#include "../streamreader/desktop_stream_reader.h"
 
-#ifdef Q_OS_WIN
-#  include "../streamreader/desktop_stream_reader.h"
-#endif
-
-CLDesktopDevice::CLDesktopDevice(int index)
-    : QnResource()
-{
+QnDesktopDevice::QnDesktopDevice(int index): QnResource() {
     addFlags(local_live_cam);
 
     const QString name = QLatin1String("Desktop") + QString::number(index + 1);
@@ -14,26 +9,18 @@ CLDesktopDevice::CLDesktopDevice(int index)
     setUrl(name);
 }
 
-QString CLDesktopDevice::toString() const
-{
+QString QnDesktopDevice::toString() const {
     return getUniqueId();
 }
 
-QnAbstractStreamDataProvider* CLDesktopDevice::createDataProviderInternal(ConnectionRole /*role*/)
-{
+QnAbstractStreamDataProvider *QnDesktopDevice::createDataProviderInternal(ConnectionRole /*role*/) {
 #ifdef Q_OS_WIN
-    return new CLDesktopStreamreader(toSharedPointer());
+    return new QnDesktopStreamreader(toSharedPointer());
 #else
     return 0;
 #endif
 }
 
-bool CLDesktopDevice::unknownDevice() const
-{
-    return false;
-}
-
-QString CLDesktopDevice::getUniqueId() const
-{
+QString QnDesktopDevice::getUniqueId() const {
     return getUrl();
 }
