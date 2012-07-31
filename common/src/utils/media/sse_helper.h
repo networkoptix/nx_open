@@ -6,7 +6,7 @@
 #include <emmintrin.h>
 
 
-#if defined(Q_CC_GNU)
+#if defined(Q_CC_GNU) && !defined(Q_OS_MAC)
 
 /* We cannot include GCC intrinsic headers cause they cause compilation errors.
  * Instead, we place the definitions for the functions we're interested in here.
@@ -16,7 +16,7 @@
  * http://opensource.apple.com/source/gcc/gcc-5664/gcc/config/i386/tmmintrin.h
  */
 
-#define __always_inline__ __always_inline__, __nodebug__
+#define __always_inline__ __always_inline__
 
 #undef __STATIC_INLINE
 #ifdef __GNUC_STDC_INLINE__
@@ -27,8 +27,6 @@
 
 #define sse4_attribute __attribute__ ((__target__ ("sse4.1")))
 #define ssse3_attribute __attribute__ ((__target__ ("ssse3")))
-
-#ifndef Q_OS_MAC /* These are already defined on MAC. */
 
 __STATIC_INLINE int __attribute__((__always_inline__)) sse4_attribute
 _mm_testz_si128 (__m128i __M, __m128i __V)
@@ -48,11 +46,10 @@ _mm_hadd_epi16 (__m128i __X, __m128i __Y)
     return (__m128i) __builtin_ia32_phaddw128 ((__v8hi)__X, (__v8hi)__Y);
 }
 
-#endif
-
 #else
 #include <smmintrin.h>
 #define sse4_attribute 
+#define ssse3_attribute
 #endif
 
 
