@@ -72,11 +72,6 @@ public:
         return argument(key).value<T>();
     }
 
-    template<class T>
-    T argument() const {
-        return argument<T>(argumentKey<T>());
-    }
-
     bool hasArgument(const QString &key) const {
         return m_arguments.contains(key);
     }
