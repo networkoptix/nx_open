@@ -137,7 +137,7 @@ void QnScreenRecorder::startRecording(QGLWidget *appWidget) {
     logo = qnSkin->pixmap(logoName); // hint: comment this line to remove logo
 #endif
     delete m_encoder;
-    m_encoder = new DesktopFileEncoder(
+    m_encoder = new QnDesktopFileEncoder(
         filePath,
         screen,
         audioDevice.isNull() ? 0 : &audioDevice,

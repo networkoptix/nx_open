@@ -5,7 +5,7 @@
 #include <QScopedPointer>
 
 class QGLWidget;
-class DesktopFileEncoder;
+class QnDesktopFileEncoder;
 
 class QnScreenRecorder: public QObject {
     Q_OBJECT;
@@ -52,7 +52,7 @@ signals:
 
 private:
     bool m_recording;
-    DesktopFileEncoder* m_encoder;
+    QnDesktopFileEncoder* m_encoder;
 };
 
 #endif // QN_SCREEN_RECORDER_H

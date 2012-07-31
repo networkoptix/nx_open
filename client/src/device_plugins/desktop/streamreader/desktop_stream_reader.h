@@ -1,5 +1,5 @@
-#ifndef __DESKTOP_H264_STREAM_READER_H
-#define __DESKTOP_H264_STREAM_READER_H
+#ifndef QN_DESKTOP_FILE_ENCODER_H
+#define QN_DESKTOP_FILE_ENCODER_H
 #ifdef Q_OS_WIN
 
 
@@ -33,4 +33,4 @@ private:
 
 #endif // Q_OS_WIN
 
-#endif //__DESKTOP_H264_STREAM_READER_H
+#endif //QN_DESKTOP_FILE_ENCODER_H

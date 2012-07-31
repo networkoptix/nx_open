@@ -1,12 +1,16 @@
-#ifndef __DESKTOP_H264_STREAM_READER_H
-#define __DESKTOP_H264_STREAM_READER_H
+#ifndef QN_DESKTOP_FILE_ENCODER_H
+#define QN_DESKTOP_FILE_ENCODER_H
 
-#include <QIODevice>
-#include <QAudioDeviceInfo>
-#include <QAudioInput>
+#include <QtCore/QtGlobal>
+
+#ifdef Q_OS_WIN
+
+#include <QtCore/QIODevice>
+#include <QtMultimedia/QAudioDeviceInfo>
+#include <QtMultimedia/QAudioInput>
+
 #include <windows.h>
 #include <mmsystem.h>
-
 
 #include <dsp_effects/speex/speex_preprocess.h>
 #include "core/datapacket/mediadatapacket.h"
@@ -16,14 +20,14 @@
 
 class CaptureAudioStream;
 
-class DesktopFileEncoder: public CLLongRunnable
+class QnDesktopFileEncoder: public CLLongRunnable
 {
     Q_OBJECT
 
 private:
     enum {BLOCK_SIZE = 1460};
 public:
-    DesktopFileEncoder( const QString& fileName,
+    QnDesktopFileEncoder( const QString& fileName,
                         int desktopNum,           // = 0,
                         const QAudioDeviceInfo* audioDevice,
                         const QAudioDeviceInfo* audioDevice2,
@@ -34,7 +38,7 @@ public:
                         QWidget* glWidget,  // used in application capture mode only
                         const QPixmap& logo       // logo over video
                        );
-    virtual ~DesktopFileEncoder();
+    virtual ~QnDesktopFileEncoder();
     bool start();
     void stop();
     QString fileName() const { return m_fileName; }
@@ -64,7 +68,7 @@ private:
     {
     public:
         static const int AUDIO_BUFFERS_COUNT = 2;
-        EncodedAudioInfo(DesktopFileEncoder* owner);
+        EncodedAudioInfo(QnDesktopFileEncoder* owner);
         ~EncodedAudioInfo();
         // doubled audio objects
         QAudioDeviceInfo m_audioDevice;
@@ -84,7 +88,7 @@ private:
         void gotData();
         void clearBuffers();
     private:
-        DesktopFileEncoder* m_owner;
+        QnDesktopFileEncoder* m_owner;
         HWAVEIN hWaveIn;
         QQueue<WAVEHDR*> m_buffers;
         QMutex m_mtx;
@@ -135,4 +139,6 @@ private:
     friend void QT_WIN_CALLBACK waveInProc(HWAVEIN hWaveIn, UINT uMsg, DWORD dwInstance,  DWORD dwParam1, DWORD dwParam2);
 };
 
-#endif //__DESKTOP_H264_STREAM_READER_H
+#endif // Q_OS_WIN
+
+#endif //QN_DESKTOP_FILE_ENCODER_H
