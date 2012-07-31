@@ -342,9 +342,9 @@ QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHost
 
     CL_LOG(cl_logDEBUG1)
     {
-        cl_log.log(QLatin1String("ping results..."), cl_logALWAYS);
+        cl_log.log(QLatin1String("ping results..."), cl_logDEBUG1);
         foreach(QHostAddress addr, result)
-            cl_log.log(addr.toString(), cl_logALWAYS);
+            cl_log.log(addr.toString(), cl_logDEBUG1);
     }
 
 

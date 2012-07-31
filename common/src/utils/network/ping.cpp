@@ -21,6 +21,7 @@ CLPing::CLPing()
 #ifdef Q_OS_WIN
 bool CLPing::ping(const QString& ip, int retry, int timeoutPerRetry, int packetSize)
 {
+    Q_UNUSED(packetSize)
 	// Declare and initialize variables
 
 	HANDLE hIcmpFile;

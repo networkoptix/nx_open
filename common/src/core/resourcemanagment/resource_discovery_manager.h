@@ -78,9 +78,9 @@ private:
 
     CLNetState m_netState;
 
-    volatile bool m_ready;
     bool m_server;
     bool m_foundSmth; // minor just to minimize lof output
+    volatile bool m_ready;
 
     unsigned int m_runNumber;
 

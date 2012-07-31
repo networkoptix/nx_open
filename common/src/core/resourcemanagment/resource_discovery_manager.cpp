@@ -117,7 +117,7 @@ void QnResourceDiscoveryManager::run()
     {
         searcher->setShouldBeUsed(true);
 
-        if (QnResourceDirectoryBrowser* ds = dynamic_cast<QnResourceDirectoryBrowser*>(searcher))
+        if (dynamic_cast<QnResourceDirectoryBrowser*>(searcher))
         {
             QnResourceList lst = searcher->search();
             m_resourceProcessor->processResources(lst);
@@ -152,7 +152,7 @@ void QnResourceDiscoveryManager::run()
         bool ip_finished;
         QnResourceList result = findNewResources(&ip_finished);
         if (ip_finished)
-            CL_LOG(cl_logWARNING) cl_log.log(QLatin1String("Cannot get available IP address."), cl_logWARNING);
+            cl_log.log(QLatin1String("Cannot get available IP address."), cl_logWARNING);
 
         if (!result.isEmpty())
         {
@@ -618,7 +618,7 @@ void QnResourceDiscoveryManager::markOfflineIfNeeded()
         {
 			res->setStatus(QnResource::Offline);
         }
-        /**/
+        */
 
     }
 
