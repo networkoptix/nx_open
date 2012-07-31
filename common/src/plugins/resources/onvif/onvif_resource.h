@@ -80,6 +80,7 @@ public:
 
     virtual bool setHostAddress(const QHostAddress &ip, QnDomain domain = QnDomainMemory) override;
 
+    virtual bool setSpecialParam(const QString& name, const QVariant& val, QnDomain domain) override;
 
     virtual bool isResourceAccessible() override;
     virtual bool updateMACAddress() override;
