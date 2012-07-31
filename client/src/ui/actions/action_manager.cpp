@@ -140,6 +140,16 @@ public:
         return *this;
     }
 
+    QnActionBuilder conditionalText(const QString &text, QnActionCondition *condition){
+        m_action->addConditionalText(condition, text);
+        return *this;
+    }
+
+    QnActionBuilder conditionalText(const QString &text, const QnResourceCriterion &criterion, Qn::MatchMode matchMode = Qn::All){
+        m_action->addConditionalText(new QnResourceActionCondition(criterion, matchMode, m_manager), text);
+        return *this;
+    }
+
     void showCheckBoxInMenu(bool show) {
         m_action->setProperty(Qn::HideCheckBoxInMenu, !show);
     }
@@ -524,16 +534,19 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission | Qn::AddRemoveItemsPermission).
         text(tr("Open")).
+        conditionalText(tr("Monitor"), hasFlags(QnResource::server), Qn::All).
         condition(hasFlags(QnResource::media) || hasFlags(QnResource::server), Qn::Any);
 
     factory(Qn::OpenInNewLayoutAction).
         flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         text(tr("Open in a New Tab")).
+        conditionalText(tr("Monitor in a New Tab"), hasFlags(QnResource::server), Qn::All).
         condition(hasFlags(QnResource::media) || hasFlags(QnResource::server), Qn::Any);
 
     factory(Qn::OpenInNewWindowAction).
         flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         text(tr("Open in a New Window")).
+        conditionalText(tr("Monitor in a New Window"), hasFlags(QnResource::server), Qn::All).
         condition(hasFlags(QnResource::media) || hasFlags(QnResource::server), Qn::Any);
 
     factory(Qn::OpenInFolderAction).
@@ -959,6 +972,9 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
         } else {
             newAction = action;
         }
+
+        if (action->hasConditionalTexts())
+            newAction->setText(action->checkConditionalText(parameters));
 
         if(visibility != Qn::InvisibleAction)
             result->addAction(newAction);
