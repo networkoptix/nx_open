@@ -72,6 +72,7 @@ def gentranslations():
   translations_qrc.close()		  
 
 if __name__ == '__main__':
+  os.system('mkdir build')
   genskin()
   os.system('${environment.dir}/qt/bin/lrelease ${project.build.directory}/${project.artifactId}-specifics.pro')
   gentranslations()
