@@ -524,34 +524,17 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission | Qn::AddRemoveItemsPermission).
         text(tr("Open")).
-        condition(hasFlags(QnResource::media), Qn::Any);
+        condition(hasFlags(QnResource::media) || hasFlags(QnResource::server), Qn::Any);
 
     factory(Qn::OpenInNewLayoutAction).
         flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         text(tr("Open in a New Tab")).
-        condition(hasFlags(QnResource::media), Qn::Any);
+        condition(hasFlags(QnResource::media) || hasFlags(QnResource::server), Qn::Any);
 
     factory(Qn::OpenInNewWindowAction).
         flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         text(tr("Open in a New Window")).
-        condition(hasFlags(QnResource::media), Qn::Any);
-
-
-    factory(Qn::MonitorInCurrentLayoutAction).
-        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
-        requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission | Qn::AddRemoveItemsPermission).
-        text(tr("Monitor")).
-        condition(hasFlags(QnResource::server), Qn::Any);
-
-    factory(Qn::MonitorInNewLayoutAction).
-        flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
-        text(tr("Monitor in a New Tab")).
-        condition(hasFlags(QnResource::server), Qn::Any);
-
-    factory(Qn::MonitorInNewWindowAction).
-        flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
-        text(tr("Monitor in a New Window")).
-        condition(hasFlags(QnResource::server), Qn::Any);
+        condition(hasFlags(QnResource::media) || hasFlags(QnResource::server), Qn::Any);
 
     factory(Qn::OpenInFolderAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).

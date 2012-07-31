@@ -8,7 +8,6 @@
 
 #include <api/app_server_connection.h>
 #include <ui/actions/actions.h>
-#include <ui/actions/action_parameters.h>
 
 #include "workbench_context_aware.h"
 
@@ -157,7 +156,6 @@ protected:
     void setLayoutAspectRatio(const QnLayoutResourcePtr &resource, double aspectRatio);
 
     void openNewWindow(const QStringList &args);
-    void openInCurrentLayout(const QnActionParameters &parameters);
 
     void saveCameraSettingsFromDialog();
 
