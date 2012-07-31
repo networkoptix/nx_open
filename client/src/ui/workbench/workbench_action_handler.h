@@ -157,7 +157,7 @@ protected:
     void setLayoutAspectRatio(const QnLayoutResourcePtr &resource, double aspectRatio);
 
     void openNewWindow(const QStringList &args);
-    void openInCurrentLayout(QnActionParameters &parameters);
+    void openInCurrentLayout(const QnActionParameters &parameters);
 
     void saveCameraSettingsFromDialog();
 

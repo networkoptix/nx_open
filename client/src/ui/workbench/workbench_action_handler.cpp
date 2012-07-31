@@ -450,9 +450,10 @@ void QnWorkbenchActionHandler::openNewWindow(const QStringList &args) {
     QProcess::startDetached(qApp->applicationFilePath(), arguments);
 }
 
-void QnWorkbenchActionHandler::openInCurrentLayout(QnActionParameters &parameters){
-    parameters.setArgument(Qn::LayoutParameter, workbench()->currentLayout()->resource());
-    menu()->trigger(Qn::OpenInLayoutAction, parameters);
+void QnWorkbenchActionHandler::openInCurrentLayout(const QnActionParameters &parameters) {
+    QnActionParameters localParameters = parameters;
+    localParameters.setArgument(Qn::LayoutParameter, workbench()->currentLayout()->resource());
+    menu()->trigger(Qn::OpenInLayoutAction, localParameters);
 }
 
 void QnWorkbenchActionHandler::saveCameraSettingsFromDialog() {
