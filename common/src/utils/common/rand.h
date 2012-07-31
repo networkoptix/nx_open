@@ -16,4 +16,4 @@ static unsigned int cl_get_random_val(unsigned int minVal, unsigned int maxVal)
 
 }
 
-#endif //cl_sleep_100
+#endif //cl_rand_12_06

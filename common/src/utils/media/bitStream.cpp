@@ -26,7 +26,7 @@ void updateBits(const quint8* buffer, int bitOffset, int bitLen, int value)
 	bitWriter.putBits(bitLen, value);
 
 	if (endBitsPostfix < 8) {
-		int postfix = *ptr_end & ( 1 << endBitsPostfix)-1;
+		int postfix = *ptr_end & (( 1 << endBitsPostfix) - 1);
 		bitWriter.putBits(endBitsPostfix, postfix);
 	}
 	bitWriter.flushBits();
@@ -56,7 +56,7 @@ void moveBits(quint8* buffer, int oldBitOffset, int newBitOffset, int len)
 		src++;
 	}
 
-	for (; len >= INT_BIT; len -= INT_BIT) {
+	for (; len >= (int)INT_BIT; len -= INT_BIT) {
 		writer.putBits(INT_BIT, ntohl(*((unsigned*)src)));
 		src += sizeof(unsigned);
 	}
