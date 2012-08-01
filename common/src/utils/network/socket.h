@@ -159,8 +159,8 @@ protected:
 /**
  *   Socket which is able to connect, send, and receive
  */
-class CommunicatingSocket : public Socket
-{
+class CommunicatingSocket : public Socket {
+    Q_DECLARE_TR_FUNCTIONS(CommunicatingSocket)
 public:
     /**
      *   Establish a socket connection with the given foreign
@@ -223,6 +223,7 @@ protected:
  *   TCP socket for communication with other TCP sockets
  */
 class TCPSocket : public CommunicatingSocket {
+    Q_DECLARE_TR_FUNCTIONS(TCPSocket)
 public:
     /**
      *   Construct a TCP socket with no connection
@@ -252,6 +253,7 @@ private:
  *   TCP socket class for servers
  */
 class TCPServerSocket : public Socket {
+    Q_DECLARE_TR_FUNCTIONS(TCPServerSocket)
 public:
     /**
      *   Construct a TCP socket for use with a server, accepting connections
@@ -292,6 +294,7 @@ private:
   *   UDP socket class
   */
 class UDPSocket : public CommunicatingSocket {
+    Q_DECLARE_TR_FUNCTIONS(UDPSocket)
 public:
     /**
      *   Construct a UDP socket

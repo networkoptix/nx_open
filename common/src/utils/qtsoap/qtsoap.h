@@ -245,6 +245,7 @@ class QtSoapArrayIterator;
 
 class QT_QTSOAP_EXPORT QtSoapArray : public QtSoapType
 {
+    Q_DECLARE_TR_FUNCTIONS(QtSoapArray)
 public:
     QtSoapArray();
     QtSoapArray(const QtSoapQName &name, QtSoapType::Type type = Other,
@@ -331,6 +332,7 @@ class QtSoapStructIterator;
 
 class QT_QTSOAP_EXPORT QtSoapStruct : public QtSoapType
 {
+    Q_DECLARE_TR_FUNCTIONS(QtSoapStruct)
 public:
     QtSoapStruct();
     QtSoapStruct(const QtSoapQName &name);
@@ -387,6 +389,7 @@ private:
 
 class QT_QTSOAP_EXPORT QtSoapSimpleType : public QtSoapType
 {
+    Q_DECLARE_TR_FUNCTIONS(QtSoapSimpleType)
 public:
     QtSoapSimpleType();
     QtSoapSimpleType(const QtSoapQName &name);
