@@ -5,7 +5,7 @@
     <name>CommunicatingSocket</name>
     <message>
         <location filename="../utils/network/socket.cpp" line="318"/>
-        <source>Connect failed (connect())</source>
+        <source>Connect failed (connect()).</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -83,7 +83,7 @@
     <name>QnStreamRecorder</name>
     <message>
         <location filename="../recording/stream_recorder.cpp" line="296"/>
-        <source>No %1 container in FFMPEG library</source>
+        <source>No %1 container in FFMPEG library.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -98,22 +98,22 @@
     </message>
     <message>
         <location filename="../recording/stream_recorder.cpp" line="396"/>
-        <source>Can&apos;t allocate output audio stream</source>
+        <source>Can&apos;t allocate output audio stream.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../recording/stream_recorder.cpp" line="410"/>
-        <source>Can&apos;t create output file &apos;%1&apos;</source>
+        <source>Can&apos;t create output file &apos;%1&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../recording/stream_recorder.cpp" line="422"/>
-        <source>Video or audio codec is incompatible with %1 format. Try other format</source>
+        <source>Video or audio codec is incompatible with %1 format. Try another format.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../recording/stream_recorder.cpp" line="517"/>
-        <source>Error during generate watermark for file &apos;%1&apos;</source>
+        <source>Error during watermark generation for file &apos;%1&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -242,27 +242,27 @@
     <name>Socket</name>
     <message>
         <location filename="../utils/network/socket.cpp" line="99"/>
-        <source>Couldn&apos;t resolve %1: %2</source>
+        <source>Couldn&apos;t resolve %1: %2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../utils/network/socket.cpp" line="126"/>
-        <source>Unable to load WinSock DLL</source>
+        <source>Unable to load WinSock DLL.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../utils/network/socket.cpp" line="134"/>
-        <source>Socket creation failed (socket())</source>
+        <source>Socket creation failed (socket()).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../utils/network/socket.cpp" line="243"/>
-        <source>Set of local address and port failed (bind())</source>
+        <source>Set of local address and port failed (bind()).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../utils/network/socket.cpp" line="253"/>
-        <source>WSACleanup() failed</source>
+        <source>WSACleanup() failed.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -270,7 +270,7 @@
     <name>TCPServerSocket</name>
     <message>
         <location filename="../utils/network/socket.cpp" line="531"/>
-        <source>Set listening socket failed (listen())</source>
+        <source>Set listening socket failed (listen()).</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -278,7 +278,7 @@
     <name>UDPSocket</name>
     <message>
         <location filename="../utils/network/socket.cpp" line="606"/>
-        <source>Disconnect failed (connect())</source>
+        <source>Disconnect failed (connect()).</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
