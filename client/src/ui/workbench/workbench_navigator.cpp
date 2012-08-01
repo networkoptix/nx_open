@@ -8,6 +8,7 @@
 #include <QtGui/QMenu>
 #include <QtGui/QGraphicsSceneContextMenuEvent>
 #include <QtGui/QApplication>
+#include <QtGui/QCalendarWidget>
 
 #include <utils/common/util.h>
 #include <utils/common/synctime.h>
@@ -48,6 +49,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_centralWidget(NULL),
     m_currentWidget(NULL),
     m_currentMediaWidget(NULL),
+    m_calendar(NULL),
     m_updatingSliderFromReader(false),
     m_updatingSliderFromScrollBar(false),
     m_updatingScrollBarFromSlider(false),
@@ -125,8 +127,33 @@ void QnWorkbenchNavigator::setTimeScrollBar(QnTimeScrollBar *scrollBar) {
     }
 }
 
+QCalendarWidget *QnWorkbenchNavigator::calendar() const{
+    return m_calendar;
+}
+
+void QnWorkbenchNavigator::setCalendar(QCalendarWidget *calendar){
+    if(m_calendar == calendar)
+        return;
+
+    if(m_calendar) {
+        disconnect(m_calendar, NULL, this, NULL);
+
+        if(isValid())
+            deinitialize();
+    }
+
+    m_calendar = calendar;
+
+    if(m_calendar) {
+        connect(m_calendar, SIGNAL(destroyed()), this, SLOT(at_calendar_destroyed()));
+
+        if(isValid())
+            initialize();
+    }
+}
+
 bool QnWorkbenchNavigator::isValid() {
-    return m_timeSlider && m_timeScrollBar;
+    return m_timeSlider && m_timeScrollBar && m_calendar;
 }
 
 void QnWorkbenchNavigator::initialize() {
@@ -162,6 +189,8 @@ void QnWorkbenchNavigator::initialize() {
     connect(m_timeScrollBar,                    SIGNAL(sliderPressed()),                            this,   SLOT(at_timeScrollBar_sliderPressed()));
     connect(m_timeScrollBar,                    SIGNAL(sliderReleased()),                           this,   SLOT(at_timeScrollBar_sliderReleased()));
     m_timeScrollBar->installEventFilter(this);
+
+    connect(m_calendar,                         SIGNAL(selectionChanged()),                         this,   SLOT(at_calendar_selectionChanged()));
 
     updateLines();
     updateScrollBarFromSlider();
@@ -655,6 +684,8 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
     qint64 startTimeMSec = startTimeUSec == DATETIME_NOW ? endTimeMSec - 10000 : (startTimeUSec == AV_NOPTS_VALUE ? m_timeSlider->minimum() : startTimeUSec / 1000); 
 
     m_timeSlider->setRange(startTimeMSec, endTimeMSec);
+    m_calendar->setMinimumDate(QDateTime::fromMSecsSinceEpoch(startTimeMSec).date());
+    m_calendar->setMaximumDate(QDateTime::fromMSecsSinceEpoch(endTimeMSec).date());
 
     if(!m_pausedOverride) {
         qint64 timeUSec = m_currentMediaWidget->display()->camDisplay()->isRealTimeSource() ? DATETIME_NOW : m_currentMediaWidget->display()->camera()->getCurrentTime();
@@ -1125,6 +1156,10 @@ void QnWorkbenchNavigator::at_timeScrollBar_destroyed() {
     setTimeScrollBar(NULL);
 }
 
+void QnWorkbenchNavigator::at_calendar_destroyed() {
+    setCalendar(NULL);
+}
+
 void QnWorkbenchNavigator::at_timeScrollBar_sliderPressed() {
     m_timeSlider->setOption(QnTimeSlider::AdjustWindowToPosition, false);
 }
@@ -1133,4 +1168,11 @@ void QnWorkbenchNavigator::at_timeScrollBar_sliderReleased() {
     m_timeSlider->setOption(QnTimeSlider::AdjustWindowToPosition, true);
 }
 
+void QnWorkbenchNavigator::at_calendar_selectionChanged(){
+    QDateTime dt(m_calendar->selectedDate());
+    qint64 startMSec = dt.toMSecsSinceEpoch();
+    qint64 endMSec = dt.addDays(1).toMSecsSinceEpoch();
+    m_timeSlider->setValue(startMSec);
+    m_timeSlider->setWindow(startMSec, endMSec);
+}
 
