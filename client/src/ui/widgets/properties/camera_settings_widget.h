@@ -36,7 +36,8 @@ public:
     int activeCameraCount() const;
     void setCamerasActive(bool active);
 
-    bool hasChanges() const;
+    bool hasDbChanges() const;
+    bool hasCameraChanges() const;
 
     bool isReadOnly() const;
     void setReadOnly(bool readOnly) const;

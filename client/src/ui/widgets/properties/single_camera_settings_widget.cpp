@@ -18,7 +18,8 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     QWidget(parent),
     ui(new Ui::SingleCameraSettingsWidget),
     m_motionWidget(NULL),
-    m_hasChanges(false),
+    m_hasCameraChanges(false),
+    m_hasDbChanges(false),
     m_hasScheduleChanges(false),
     m_readOnly(false),
     m_inUpdateMaxFps(false),
@@ -47,6 +48,8 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->softwareMotionButton,   SIGNAL(clicked(bool)),                  this,   SLOT(at_motionTypeChanged()));
     connect(ui->sensitivitySlider,      SIGNAL(valueChanged(int)),              this,   SLOT(updateMotionWidgetSensitivity()));
     connect(ui->resetMotionRegionsButton, SIGNAL(clicked()),                    this,   SLOT(at_motionSelectionCleared()));
+
+    connect(ui->advancedCheckBox1,      SIGNAL(stateChanged(int)),              this,   SLOT(updateAdvancedCheckboxValue()));
 
     updateFromResource();
 }
@@ -81,6 +84,8 @@ Qn::CameraSettingsTab QnSingleCameraSettingsWidget::currentTab() const {
         return Qn::RecordingSettingsTab;
     } else if(tab == ui->tabMotion) {
         return Qn::MotionSettingsTab;
+    } else if(tab == ui->tabAdvanced) {
+        return Qn::AdvancedSettingsTab;
     } else {
         qnWarning("Current tab with index %1 was not recognized.", ui->tabWidget->currentIndex());
         return Qn::GeneralSettingsTab;
@@ -103,6 +108,9 @@ void QnSingleCameraSettingsWidget::setCurrentTab(Qn::CameraSettingsTab tab) {
     case Qn::MotionSettingsTab:
         ui->tabWidget->setCurrentWidget(ui->tabMotion);
         break;
+    case Qn::AdvancedSettingsTab:
+        ui->tabWidget->setCurrentWidget(ui->tabAdvanced);
+        break;
     default:
         qnWarning("Invalid camera settings tab '%1'.", static_cast<int>(tab));
         break;
@@ -121,27 +129,37 @@ void QnSingleCameraSettingsWidget::submitToResource() {
     if(!m_camera)
         return;
 
-    m_camera->setName(ui->nameEdit->text());
-    m_camera->setAudioEnabled(ui->checkBoxEnableAudio->isChecked());
-    m_camera->setUrl(ui->ipAddressEdit->text());
-    m_camera->setAuth(ui->loginEdit->text(), ui->passwordEdit->text());
-    m_camera->setScheduleDisabled(ui->cameraScheduleWidget->activeCameraCount() == 0);
+    if (hasDbChanges()) {
+        m_camera->setName(ui->nameEdit->text());
+        m_camera->setAudioEnabled(ui->checkBoxEnableAudio->isChecked());
+        m_camera->setUrl(ui->ipAddressEdit->text());
+        m_camera->setAuth(ui->loginEdit->text(), ui->passwordEdit->text());
+        m_camera->setScheduleDisabled(ui->cameraScheduleWidget->activeCameraCount() == 0);
 
-    if (m_hasScheduleChanges) {
-        QnScheduleTaskList scheduleTasks;
-        foreach (const QnScheduleTask::Data& scheduleTaskData, ui->cameraScheduleWidget->scheduleTasks())
-            scheduleTasks.append(QnScheduleTask(scheduleTaskData));
-        m_camera->setScheduleTasks(scheduleTasks);
+        if (m_hasScheduleChanges) {
+            QnScheduleTaskList scheduleTasks;
+            foreach (const QnScheduleTask::Data& scheduleTaskData, ui->cameraScheduleWidget->scheduleTasks())
+                scheduleTasks.append(QnScheduleTask(scheduleTaskData));
+            m_camera->setScheduleTasks(scheduleTasks);
+        }
+
+        if (ui->cameraMotionButton->isChecked())
+            m_camera->setMotionType(m_camera->getCameraBasedMotionType());
+        else
+            m_camera->setMotionType(MT_SoftwareGrid);
+
+        m_camera->setAdvancedWorking(ui->advancedCheckBox1->isChecked());
+
+        submitMotionWidgetToResource();
+
+        setHasDbChanges(false);
     }
 
-    if (ui->cameraMotionButton->isChecked())
-        m_camera->setMotionType(m_camera->getCameraBasedMotionType());
-    else
-        m_camera->setMotionType(MT_SoftwareGrid);
+    if (hasCameraChanges()) {
+        m_camera->setAdvancedWorking(ui->advancedCheckBox1->isChecked());
 
-    submitMotionWidgetToResource();
-
-    setHasChanges(false);
+        setHasCameraChanges(false);
+    }
 }
 
 void QnSingleCameraSettingsWidget::updateFromResource() {
@@ -168,6 +186,8 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         m_cameraSupportsMotion = false;
         ui->motionSettingsGroupBox->setEnabled(false);
         ui->motionAvailableLabel->setVisible(true);
+
+        ui->advancedCheckBox1->setChecked(false);
     } else {
         QString webPageAddress = QString(QLatin1String("http://%1")).arg(m_camera->getHostAddress().toString());
 
@@ -212,12 +232,15 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         m_cameraSupportsMotion = m_camera->supportedMotionType() != MT_NoMotion;
         ui->motionSettingsGroupBox->setEnabled(m_cameraSupportsMotion);
         ui->motionAvailableLabel->setVisible(!m_cameraSupportsMotion);
+
+        ui->advancedCheckBox1->setChecked(m_camera->isAdvancedWorking());
     }
 
     updateMotionWidgetFromResource();
     updateMotionAvailability();
 
-    setHasChanges(false);
+    setHasDbChanges(false);
+    setHasCameraChanges(false);
 }
 
 void QnSingleCameraSettingsWidget::updateMotionWidgetFromResource() {
@@ -264,12 +287,23 @@ void QnSingleCameraSettingsWidget::setReadOnly(bool readOnly) {
     m_readOnly = readOnly;
 }
 
-void QnSingleCameraSettingsWidget::setHasChanges(bool hasChanges) {
-    if(m_hasChanges == hasChanges)
+void QnSingleCameraSettingsWidget::setHasDbChanges(bool hasChanges) {
+    if(m_hasDbChanges == hasChanges)
         return;
 
-    m_hasChanges = hasChanges;
-    if(!m_hasChanges)
+    m_hasDbChanges = hasChanges;
+    if(!m_hasDbChanges && !hasCameraChanges())
+        m_hasScheduleChanges = false;
+
+    emit hasChangesChanged();
+}
+
+void QnSingleCameraSettingsWidget::setHasCameraChanges(bool hasChanges) {
+    if(m_hasCameraChanges == hasChanges)
+        return;
+
+    m_hasCameraChanges = hasChanges;
+    if(!m_hasCameraChanges && !hasDbChanges())
         m_hasScheduleChanges = false;
 
     emit hasChangesChanged();
@@ -313,6 +347,11 @@ bool QnSingleCameraSettingsWidget::isValidMotionRegion(){
     return m_motionWidget->isValidMotionRegion();
 }
 
+void QnSingleCameraSettingsWidget::updateAdvancedCheckboxValue() {
+    bool result = ui->advancedCheckBox1->isChecked();
+    at_cameraDataChanged();
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -340,7 +379,7 @@ void QnSingleCameraSettingsWidget::showEvent(QShowEvent *event) {
 }
 
 void QnSingleCameraSettingsWidget::at_motionTypeChanged() {
-    at_dataChanged();
+    at_dbDataChanged();
 
     updateMotionWidgetNeedControlMaxRect();
     updateMaxFPS();
@@ -402,12 +441,17 @@ void QnSingleCameraSettingsWidget::at_tabWidget_currentChanged() {
     connectToMotionWidget();
 }
 
-void QnSingleCameraSettingsWidget::at_dataChanged() {
-    setHasChanges(true);
+void QnSingleCameraSettingsWidget::at_dbDataChanged() {
+    setHasDbChanges(true);
+}
+
+void QnSingleCameraSettingsWidget::at_cameraDataChanged() {
+    setHasCameraChanges(true);
 }
 
 void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleTasksChanged() {
-    at_dataChanged();
+    at_dbDataChanged();
+    at_cameraDataChanged();
 
     m_hasScheduleChanges = true;
 }

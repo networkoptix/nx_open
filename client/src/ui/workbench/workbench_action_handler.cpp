@@ -451,8 +451,12 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog() {
     if(!cameraSettingsDialog())
         return;
 
-    if(!cameraSettingsDialog()->widget()->hasChanges())
+    bool hasDbChanges = cameraSettingsDialog()->widget()->hasDbChanges();
+    bool hasCameraChanges = cameraSettingsDialog()->widget()->hasCameraChanges();
+
+    if (!hasDbChanges && !hasCameraChanges) {
         return;
+    }
 
     QnVirtualCameraResourceList cameras = cameraSettingsDialog()->widget()->cameras();
     if(cameras.empty())
@@ -473,10 +477,18 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog() {
         QMessageBox::warning(widget(), tr("Could not Enable Recording"), message);
         cameraSettingsDialog()->widget()->setCamerasActive(false);
     }
-    
+
     /* Submit and save it. */
     cameraSettingsDialog()->widget()->submitToResources();
-    connection()->saveAsync(cameras, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+
+    if (hasDbChanges) {
+        connection()->saveAsync(cameras, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+    }
+
+    if (hasCameraChanges) {
+        //ToDo: change to appropriate saveAsync function
+        connection()->saveAsync(cameras, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+    }
 }
 
 void QnWorkbenchActionHandler::rotateItems(int degrees){
@@ -1142,7 +1154,9 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
     }
 
     if(cameraSettingsDialog()->widget()->resources() != resources) {
-        if(cameraSettingsDialog()->isVisible() && cameraSettingsDialog()->widget()->hasChanges()) {
+        if(cameraSettingsDialog()->isVisible() && (
+           cameraSettingsDialog()->widget()->hasDbChanges() || cameraSettingsDialog()->widget()->hasCameraChanges()))
+        {
             QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
                 widget(), 
                 QnResourceList(cameraSettingsDialog()->widget()->resources()),

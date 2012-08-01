@@ -32,8 +32,11 @@ public:
     bool isCameraActive() const;
     void setCameraActive(bool active);
 
-    bool hasChanges() const {
-        return m_hasChanges;
+    bool hasCameraChanges() const {
+        return m_hasCameraChanges;
+    }
+    bool hasDbChanges() const {
+        return m_hasDbChanges;
     }
 
     bool isReadOnly() const;
@@ -55,17 +58,21 @@ protected:
 
 private slots:
     void at_tabWidget_currentChanged();
-    void at_dataChanged();
+    void at_dbDataChanged();
+    void at_cameraDataChanged();
     void at_cameraScheduleWidget_scheduleTasksChanged();
     void at_linkActivated(const QString &urlString);
     void at_motionTypeChanged();
     void at_motionSelectionCleared();
-    
+
     void updateMaxFPS();
     void updateMotionWidgetSensitivity();
 
+    void updateAdvancedCheckboxValue();
+
 private:
-    void setHasChanges(bool hasChanges);
+    void setHasCameraChanges(bool hasChanges);
+    void setHasDbChanges(bool hasChanges);
 
     void updateMotionWidgetFromResource();
     void submitMotionWidgetToResource();
@@ -83,7 +90,8 @@ private:
     QnVirtualCameraResourcePtr m_camera;
     bool m_cameraSupportsMotion;
 
-    bool m_hasChanges;
+    bool m_hasCameraChanges;
+    bool m_hasDbChanges;
     bool m_hasScheduleChanges;
     bool m_readOnly;
 

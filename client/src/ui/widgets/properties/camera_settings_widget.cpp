@@ -137,10 +137,18 @@ void QnCameraSettingsWidget::setCamerasActive(bool active) {
     }
 }
 
-bool QnCameraSettingsWidget::hasChanges() const {
+bool QnCameraSettingsWidget::hasDbChanges() const {
     switch(mode()) {
-    case SingleMode: return m_singleWidget->hasChanges();
-    case MultiMode: return m_multiWidget->hasChanges();
+    case SingleMode: return m_singleWidget->hasDbChanges();
+    case MultiMode: return m_multiWidget->hasDbChanges();
+    default: return false;
+    }
+}
+
+bool QnCameraSettingsWidget::hasCameraChanges() const {
+    switch(mode()) {
+    case SingleMode: return m_singleWidget->hasCameraChanges();
+    case MultiMode: return false;
     default: return false;
     }
 }
@@ -185,7 +193,7 @@ void QnCameraSettingsWidget::setMode(Mode mode) {
     if(mode == oldMode)
         return;
 
-    bool oldHasChanges = hasChanges();
+    bool oldHasChanges = hasDbChanges() || hasCameraChanges();
     Qn::CameraSettingsTab oldTab = currentTab();
 
     if(m_stackedWidget->currentIndex() == SingleMode || m_stackedWidget->currentIndex() == MultiMode)
@@ -209,7 +217,7 @@ void QnCameraSettingsWidget::setMode(Mode mode) {
     if(m_stackedWidget->currentIndex() == SingleMode || m_stackedWidget->currentIndex() == MultiMode)
         connect(m_stackedWidget->currentWidget(), SIGNAL(hasChangesChanged()), this, SIGNAL(hasChangesChanged()));
 
-    bool newHasChanges = hasChanges();
+    bool newHasChanges = hasDbChanges() || hasCameraChanges();
     if(oldHasChanges != newHasChanges)
         emit hasChangesChanged();
 

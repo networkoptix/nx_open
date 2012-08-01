@@ -29,8 +29,8 @@ public:
     void updateFromResources();
     void submitToResources();
 
-    bool hasChanges() const {
-        return m_hasChanges;
+    bool hasDbChanges() const {
+        return m_hasDbChanges;
     }
 
     bool isReadOnly() const;
@@ -41,20 +41,20 @@ signals:
     void moreLicensesRequested();
 
 private slots:
-    void at_dataChanged();
+    void at_dbDataChanged();
     void at_cameraScheduleWidget_scheduleTasksChanged();
     void at_cameraScheduleWidget_scheduleEnabledChanged();
     void at_enableAudioCheckBox_clicked();
     void updateMaxFPS();
 private:
-    void setHasChanges(bool hasChanges);
+    void setHasDbChanges(bool hasChanges);
 
 private:
     Q_DISABLE_COPY(QnMultipleCameraSettingsWidget);
 
     QScopedPointer<Ui::MultipleCameraSettingsWidget> ui;
     QnVirtualCameraResourceList m_cameras;
-    bool m_hasChanges;
+    bool m_hasDbChanges;
     bool m_hasScheduleChanges;
     bool m_hasScheduleEnabledChanges;
     bool m_readOnly;
