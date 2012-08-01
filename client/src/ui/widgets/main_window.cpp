@@ -381,7 +381,7 @@ void QnMainWindow::updateDwmState() {
 
         m_titleLayout->setContentsMargins(0, 0, 0, 0);
         m_viewLayout->setContentsMargins(0, 0, 0, 0);
-    } else if(false/*m_dwm->isCompositionEnabled()*/) {
+    } else if(m_dwm->isCompositionEnabled()) {
         /* Windowed with aero glass. */
 
         m_drawCustomFrame = false;
@@ -461,8 +461,6 @@ void QnMainWindow::updateTitleBarDraggable() {
 // -------------------------------------------------------------------------- //
 bool QnMainWindow::event(QEvent *event) {
     bool result = base_type::event(event);
-
-    qDebug() << event->type();
 
     switch(event->type()) {
     case QnSystemMenuEvent::SystemMenu:
