@@ -180,17 +180,17 @@ const bool OnvifResourceInformationFetcher::isMacAlreadyExists(const QString& ma
     return false;
 }
 
-const QString OnvifResourceInformationFetcher::fetchName(const DeviceInfoResp& response) const
+QString OnvifResourceInformationFetcher::fetchName(const DeviceInfoResp& response) const
 {
     return QString::fromStdString(response.Model);
 }
 
-const QString OnvifResourceInformationFetcher::fetchManufacturer(const DeviceInfoResp& response) const
+QString OnvifResourceInformationFetcher::fetchManufacturer(const DeviceInfoResp& response) const
 {
     return QString::fromStdString(response.Manufacturer);
 }
 
-const QString OnvifResourceInformationFetcher::fetchSerial(const DeviceInfoResp& response) const
+QString OnvifResourceInformationFetcher::fetchSerial(const DeviceInfoResp& response) const
 {
     //TODO:UTF unuse std::string
     return response.HardwareId.empty()
