@@ -13,12 +13,12 @@ OnvifResourceInformationFetcher::OnvifResourceInformationFetcher():
     /*passwordsData(PasswordHelper::instance()),*/
     camersNamesData(NameHelper::instance())
 {
-	QnResourceTypePtr typePtr(qnResTypePool->getResourceTypeByName(QLatin1String(ONVIF_RT)));
-	if (!typePtr.isNull()) {
-		onvifTypeId = typePtr->getId();
-	} else {
-		qCritical() << "Can't find " << ONVIF_RT << " resource type in resource type pool";
-	}
+    QnResourceTypePtr typePtr(qnResTypePool->getResourceTypeByName(QLatin1String(ONVIF_RT)));
+    if (!typePtr.isNull()) {
+        onvifTypeId = typePtr->getId();
+    } else {
+        qCritical() << "Can't find " << ONVIF_RT << " resource type in resource type pool";
+    }
 }
 
 OnvifResourceInformationFetcher& OnvifResourceInformationFetcher::instance()

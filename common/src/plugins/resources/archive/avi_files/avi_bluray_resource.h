@@ -8,10 +8,10 @@ class QnAviBlurayResource : public QnAviResource
     Q_OBJECT;
 
 public:
-	QnAviBlurayResource(const QString& file);
-	virtual ~QnAviBlurayResource();
+    QnAviBlurayResource(const QString& file);
+    virtual ~QnAviBlurayResource();
 
-	virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
+    virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
     static bool isAcceptedUrl(const QString& url);
 
 protected:

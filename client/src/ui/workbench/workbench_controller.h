@@ -67,7 +67,7 @@ public:
     QnWorkbenchGridMapper *mapper() const;
 
     MotionSelectionInstrument *motionSelectionInstrument() const {
-	    return m_motionSelectionInstrument;
+        return m_motionSelectionInstrument;
     }
 
     ClickInstrument *itemRightClickInstrument() const {

@@ -85,7 +85,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             QHostAddress sender;
             quint16 senderPort;
 
-            sock.readDatagram(datagram.data(), datagram.size(),	&sender, &senderPort);
+            sock.readDatagram(datagram.data(), datagram.size(),    &sender, &senderPort);
 
             if (senderPort != 62976 || datagram.size() < 32) // minimum response size
                 continue;

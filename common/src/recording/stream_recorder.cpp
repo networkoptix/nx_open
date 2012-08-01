@@ -41,21 +41,21 @@ QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     m_needReopen(false),
     m_isAudioPresent(false)
 {
-	memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
+    memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
 }
 
 QnStreamRecorder::~QnStreamRecorder()
 {
     stop();
-	close();
+    close();
 }
 
 void QnStreamRecorder::close()
 {
     if (m_formatCtx) 
     {
-		if (m_packetWrited)
-			av_write_trailer(m_formatCtx);
+        if (m_packetWrited)
+            av_write_trailer(m_formatCtx);
 
         if (m_startDateTime != AV_NOPTS_VALUE)
         {
@@ -87,7 +87,7 @@ void QnStreamRecorder::close()
     m_endDateTime = m_startDateTime = AV_NOPTS_VALUE;
 
     markNeedKeyData();
-	m_firstTime = true;
+    m_firstTime = true;
 }
 
 void QnStreamRecorder::markNeedKeyData()
@@ -278,7 +278,7 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
 
 void QnStreamRecorder::endOfRun()
 {
-	close();
+    close();
 }
 
 bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)

@@ -231,10 +231,10 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
 
 qint64 QnAviArchiveDelegate::seek(qint64 time, bool findIFrame)
 {
-	if (!findStreams())
-		return -1;
+    if (!findStreams())
+        return -1;
 
-	m_eofReached = time > endTime();
+    m_eofReached = time > endTime();
     if (m_eofReached)
         return time;
 
@@ -335,10 +335,10 @@ QnVideoResourceLayout* QnAviArchiveDelegate::getVideoLayout()
                 AVDictionaryEntry* start_time = av_dict_get(m_formatContext->metadata,getTagName(Tag_startTime, format), 0, 0);
                 if (start_time) {
                     m_startTime = QString(QLatin1String(start_time->value)).toLongLong()*1000ll;
-					if (m_startTime >= UTC_TIME_DETECTION_THRESHOLD) {
-						if (qSharedPointerDynamicCast<QnLayoutFileStorageResource>(m_storage))
-							m_resource->addFlags(QnResource::utc); // use sync for exported layout only
-					}
+                    if (m_startTime >= UTC_TIME_DETECTION_THRESHOLD) {
+                        if (qSharedPointerDynamicCast<QnLayoutFileStorageResource>(m_storage))
+                            m_resource->addFlags(QnResource::utc); // use sync for exported layout only
+                    }
                 }
             }
         }

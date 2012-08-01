@@ -5,49 +5,49 @@ namespace {
 
     qreal qt_smoothBeginEndMixFactor(qreal value)
     {
-	    return qMin(qMax(1 - value * 2 + qreal(0.3), qreal(0.0)), qreal(1.0));
+        return qMin(qMax(1 - value * 2 + qreal(0.3), qreal(0.0)), qreal(1.0));
     }
 
     qreal ln_normal(qreal value)
     {
-	    // assume that value [0;1];
-	    //value = value*3.0+1.0; //[1;4]
+        // assume that value [0;1];
+        //value = value*3.0+1.0; //[1;4]
 
-	    const qreal _2ln4 = 2.7725887222397812376689284858327;
+        const qreal _2ln4 = 2.7725887222397812376689284858327;
 
-	    return log(value*3.0+1.0)/_2ln4 + qreal(0.5); // [0;ln4]/2ln4+0.5 => result [0.5; 1]
+        return log(value*3.0+1.0)/_2ln4 + qreal(0.5); // [0;ln4]/2ln4+0.5 => result [0.5; 1]
 
     }
 
     qreal exp_normal(qreal value)
     {
-	    // assume that value [0;1];
-	    value = (value-1.0/3)*3.0;//[-1;2]
+        // assume that value [0;1];
+        value = (value-1.0/3)*3.0;//[-1;2]
 
-	    static const qreal exp_1 = exp(-1.0); 
-	    static const qreal exp_3 = exp(3.0); 
-	    static const qreal exp_3_m_1 = exp_3 - exp_1; 
+        static const qreal exp_1 = exp(-1.0); 
+        static const qreal exp_3 = exp(3.0); 
+        static const qreal exp_3_m_1 = exp_3 - exp_1; 
 
-	    value = exp(value)-exp_1; // [0; exp_m_3-exp_m_1]
+        value = exp(value)-exp_1; // [0; exp_m_3-exp_m_1]
 
-	    return value/exp_3_m_1; //[0;0.5]
+        return value/exp_3_m_1; //[0;0.5]
     }
 
     //===================================================
     qreal slow_end( qreal value ) 
     {
-	    const qreal lnprogress = ln_normal(value);
-	    const qreal linearProgress = value;
-	    const qreal mix = qt_smoothBeginEndMixFactor(value);
-	    return  linearProgress * mix + lnprogress* (1-mix) ;
+        const qreal lnprogress = ln_normal(value);
+        const qreal linearProgress = value;
+        const qreal mix = qt_smoothBeginEndMixFactor(value);
+        return  linearProgress * mix + lnprogress* (1-mix) ;
     }
 
     qreal slow_start( qreal value ) 
     {
-	    const qreal expprogress = exp_normal(value);
-	    const qreal linearProgress = value;
-	    const qreal mix = qt_smoothBeginEndMixFactor(value);
-	    return   expprogress * mix + linearProgress* (1-mix) ;
+        const qreal expprogress = exp_normal(value);
+        const qreal linearProgress = value;
+        const qreal mix = qt_smoothBeginEndMixFactor(value);
+        return   expprogress * mix + linearProgress* (1-mix) ;
     }
 
 

@@ -52,7 +52,7 @@ public:
      *                                  microseconds.
      */
     virtual qint64 currentTime() const = 0;
-	virtual bool isSkippingFrames() const = 0;
+    virtual bool isSkippingFrames() const = 0;
 
     /**
      * \returns                         Length of archive, in microseconds.

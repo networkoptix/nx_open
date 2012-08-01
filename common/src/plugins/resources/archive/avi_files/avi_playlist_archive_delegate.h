@@ -12,8 +12,8 @@ class QnAVIPlaylistArchiveDelegate : public QnAviArchiveDelegate
     Q_OBJECT;
 
 public:
-	QnAVIPlaylistArchiveDelegate();
-	virtual ~QnAVIPlaylistArchiveDelegate();
+    QnAVIPlaylistArchiveDelegate();
+    virtual ~QnAVIPlaylistArchiveDelegate();
 
     virtual bool open(QnResourcePtr resource);
     virtual void close();

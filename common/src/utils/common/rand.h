@@ -5,14 +5,14 @@
 
 static unsigned int cl_get_random_val(unsigned int minVal, unsigned int maxVal)
 {
-	static bool first = true;
-	if (first)
-	{
-		srand((unsigned)time(0)); 
-		first = false;
-	}
+    static bool first = true;
+    if (first)
+    {
+        srand((unsigned)time(0)); 
+        first = false;
+    }
 
-	return minVal + rand()%(maxVal - minVal);
+    return minVal + rand()%(maxVal - minVal);
 
 }
 

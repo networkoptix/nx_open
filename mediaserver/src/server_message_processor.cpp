@@ -48,13 +48,13 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage event)
 {
     // qDebug() << "Got event: " << event.eventType << " " << event.objectName << " " << event.objectId;
 
-    if (event.eventType == Qn::Message_Type_License)
+    if (event.eventType == Message_Type_License)
     {
-		// New license added
-		if (event.license->isValid())
-			qnLicensePool->addLicense(event.license);
+        // New license added
+        if (event.license->isValid())
+            qnLicensePool->addLicense(event.license);
     }
-	else if (event.eventType == Qn::Message_Type_CameraServerItem)
+    else if (event.eventType == Message_Type_CameraServerItem)
     {
 /*        QString mac = event.dict["mac"].toString();
         QString serverGuid = event.dict["server_guid"].toString();
@@ -64,9 +64,9 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage event)
 
         QnCameraHistoryPool::instance()->addCameraHistoryItem(*event.cameraServerItem);
     }
-	else if (event.eventType == Qn::Message_Type_ResourceChange)
+    else if (event.eventType == Message_Type_ResourceChange)
     {
-		QnResourcePtr resource = event.resource;
+        QnResourcePtr resource = event.resource;
 
         QnVideoServerResourcePtr ownVideoServer = qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnVideoServerResource>();
 
@@ -95,17 +95,17 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage event)
             qnResPool->addResource(resource);
             ownResource = resource;
         }
-    } else if (event.eventType == Qn::Message_Type_ResourceDisabledChange)
-	{
-		QnResourcePtr resource = qnResPool->getResourceById(event.resourceId);
+    } else if (event.eventType == Message_Type_ResourceDisabledChange)
+    {
+        QnResourcePtr resource = qnResPool->getResourceById(event.resourceId);
 
-		if (resource)
-		{
-			resource->setDisabled(event.resourceDisabled);
+        if (resource)
+        {
+            resource->setDisabled(event.resourceDisabled);
             if (event.resourceDisabled) // we always ignore status changes 
                 resource->setStatus(QnResource::Offline); 
-		}
-	} else if (event.eventType == Qn::Message_Type_ResourceDelete)
+        }
+    } else if (event.eventType == Message_Type_ResourceDelete)
     {
         QnResourcePtr resource = qnResPool->getResourceById(event.resourceId);
 

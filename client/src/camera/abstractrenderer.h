@@ -42,7 +42,7 @@ public:
      * This function may be called from any thread.
      * It is called just before this object is destroyed.
      */
-	virtual void beforeDestroy() = 0;
+    virtual void beforeDestroy() = 0;
 
     /**
      * This function is supposed to be called from <i>decoding</i> thread.
@@ -50,7 +50,7 @@ public:
      * \param channel                   Channel number.
      * \returns                         Size of the given channel on rendering device.
      */
-	virtual QSize sizeOnScreen(unsigned int channel) const = 0;
+    virtual QSize sizeOnScreen(unsigned int channel) const = 0;
 
     /**
      * This function is supposed to be called from <i>decoding</t> thread.

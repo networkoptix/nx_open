@@ -10,8 +10,8 @@
 class QnSingleShotFileStreamreader : public QnAbstractMediaStreamDataProvider
 {
 public:
-	QnSingleShotFileStreamreader(QnResourcePtr resource);
-	~QnSingleShotFileStreamreader(){stop();}
+    QnSingleShotFileStreamreader(QnResourcePtr resource);
+    ~QnSingleShotFileStreamreader(){stop();}
     void setStorage(QnStorageResourcePtr storage);
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;

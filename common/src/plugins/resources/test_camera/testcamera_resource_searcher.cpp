@@ -36,7 +36,7 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
 
             QHostAddress sender;
             quint16 senderPort;
-            sock.readDatagram(responseData.data(), responseData.size(),	&sender, &senderPort);
+            sock.readDatagram(responseData.data(), responseData.size(),    &sender, &senderPort);
 
             QList<QByteArray> params = responseData.split(';');
             if (params[0] != TestCamConst::TEST_CAMERA_ID_MSG || params.size() < 3)

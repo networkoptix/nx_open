@@ -230,28 +230,28 @@ void detail::VideoServerSessionManagerReplyProcessor::at_replyReceived(int statu
 // very simple parser. Used for parsing own created XML
 QByteArray extractXmlBody(const QByteArray& body, const QByteArray tagName, int from = 0)
 {
-	QByteArray tagStart = QByteArray("<") + tagName + QByteArray(">");
-	int bodyStart = body.indexOf(tagStart, from);
-	if (bodyStart >= 0)
-		bodyStart += tagStart.length();
-	QByteArray tagEnd = QByteArray("</") + tagName + QByteArray(">");
-	int bodyEnd = body.indexOf(tagEnd, bodyStart);
-	if (bodyStart >= 0 && bodyEnd >= 0)
-		return body.mid(bodyStart, bodyEnd - bodyStart).trimmed();
-	else
-		return QByteArray();
+    QByteArray tagStart = QByteArray("<") + tagName + QByteArray(">");
+    int bodyStart = body.indexOf(tagStart, from);
+    if (bodyStart >= 0)
+        bodyStart += tagStart.length();
+    QByteArray tagEnd = QByteArray("</") + tagName + QByteArray(">");
+    int bodyEnd = body.indexOf(tagEnd, bodyStart);
+    if (bodyStart >= 0 && bodyEnd >= 0)
+        return body.mid(bodyStart, bodyEnd - bodyStart).trimmed();
+    else
+        return QByteArray();
 }
 
 void detail::VideoServerSessionManagerFreeSpaceRequestReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray& /*errorString*/, int handle)
 {
     qint64 freeSpace = -1;
-	qint64 usedSpace = -1;
+    qint64 usedSpace = -1;
 
     if(status == 0)
     {
-		QByteArray message = extractXmlBody(reply, "root");
-		freeSpace = extractXmlBody(message, "freeSpace").toLongLong();
-		usedSpace = extractXmlBody(message, "usedSpace").toLongLong();
+        QByteArray message = extractXmlBody(reply, "root");
+        freeSpace = extractXmlBody(message, "freeSpace").toLongLong();
+        usedSpace = extractXmlBody(message, "usedSpace").toLongLong();
     }
 
     emit finished(status, freeSpace, usedSpace, handle);

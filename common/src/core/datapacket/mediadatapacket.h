@@ -66,7 +66,7 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
         EMPTY_DATA
     };
 
-	QnAbstractMediaData(unsigned int alignment, unsigned int capacity): 
+    QnAbstractMediaData(unsigned int alignment, unsigned int capacity): 
         data(alignment, capacity),
         dataType(EMPTY_DATA),
         compressionType(CODEC_ID_NONE),
@@ -75,16 +75,16 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
         subChannelNumber(0),
         context(0),
         opaque(0)
-	{
-	}
+    {
+    }
 
-	virtual ~QnAbstractMediaData()
-	{
-	}
+    virtual ~QnAbstractMediaData()
+    {
+    }
 
-	QnByteArray data;
-	DataType dataType;
-	CodecID compressionType;
+    QnByteArray data;
+    DataType dataType;
+    CodecID compressionType;
     unsigned flags;
     quint32 channelNumber;     // video or audio channel number; some devices might have more that one sensor.
     quint32 subChannelNumber; // video camera can provide combination of different context at single channel (H.264 hi-res and low-res for example)
@@ -92,7 +92,7 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
     int opaque;
 
 private:
-	QnAbstractMediaData(): data(0, 1) {};
+    QnAbstractMediaData(): data(0, 1) {};
 };
 typedef QSharedPointer<QnAbstractMediaData> QnAbstractMediaDataPtr;
 
@@ -112,23 +112,23 @@ typedef QSharedPointer<QnMetaDataV1> QnMetaDataV1Ptr;
 
 struct QnCompressedVideoData : public QnAbstractMediaData
 {
-	QnCompressedVideoData(unsigned int alignment, unsigned int capacity, QnMediaContextPtr ctx = QnMediaContextPtr(0))
+    QnCompressedVideoData(unsigned int alignment, unsigned int capacity, QnMediaContextPtr ctx = QnMediaContextPtr(0))
         : QnAbstractMediaData(alignment, qMin(capacity, (unsigned int)10 * 1024 * 1024))
-	{
-		dataType = VIDEO;
-		//useTwice = false;
-		context = ctx;
-		//ignore = false;
+    {
+        dataType = VIDEO;
+        //useTwice = false;
+        context = ctx;
+        //ignore = false;
         flags = 0;
         width = height = -1;
-	}
+    }
 
 
-	int width;
-	int height;
-	//bool keyFrame;
+    int width;
+    int height;
+    //bool keyFrame;
     //int flags;
-	//bool ignore;
+    //bool ignore;
     QnMetaDataV1Ptr motion;
     
 };
@@ -271,13 +271,13 @@ public:
 
 struct QnCompressedAudioData : public QnAbstractMediaData
 {
-	QnCompressedAudioData (unsigned int alignment, unsigned int capacity, QnMediaContextPtr ctx = QnMediaContextPtr(0))
+    QnCompressedAudioData (unsigned int alignment, unsigned int capacity, QnMediaContextPtr ctx = QnMediaContextPtr(0))
         : QnAbstractMediaData(alignment, capacity)
-	{
-		dataType = AUDIO;
+    {
+        dataType = AUDIO;
         duration = 0;
         context = ctx;
-	}
+    }
     //QnCodecAudioFormat format;
     quint64 duration;
 };

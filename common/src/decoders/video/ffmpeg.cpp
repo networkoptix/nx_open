@@ -57,17 +57,17 @@ m_forceSliceDecoding(-1)
     m_mtDecoding = mtDecoding;
 
     QMutexLocker mutex(&global_ffmpeg_mutex);
-	if (data->context)
-	{
-		m_passedContext = avcodec_alloc_context3(findCodec(m_codecId));
-		avcodec_copy_context(m_passedContext, data->context->ctx());
-	}
+    if (data->context)
+    {
+        m_passedContext = avcodec_alloc_context3(findCodec(m_codecId));
+        avcodec_copy_context(m_passedContext, data->context->ctx());
+    }
     
 
     // XXX Debug, should be passed in constructor
     m_tryHardwareAcceleration = false; //hwcounter % 2;
 
-	openDecoder(data);
+    openDecoder(data);
 }
 void CLFFmpegVideoDecoder::flush()
 {
@@ -99,11 +99,11 @@ void CLFFmpegVideoDecoder::closeDecoder()
     m_decoderContext.close();
 #endif
 
-	av_free(m_frame);
+    av_free(m_frame);
     if (m_deinterlaceBuffer)
-	    av_free(m_deinterlaceBuffer);
-	av_free(m_deinterlacedFrame);
-	av_free(m_context);
+        av_free(m_deinterlaceBuffer);
+    av_free(m_deinterlacedFrame);
+    av_free(m_context);
     delete m_frameTypeExtractor;
     m_motionMap.clear();
 }
@@ -176,12 +176,12 @@ void CLFFmpegVideoDecoder::openDecoder(const QnCompressedVideoDataPtr data)
     }
 #endif
 
-	m_frame = avcodec_alloc_frame();
-	m_deinterlacedFrame = avcodec_alloc_frame();
+    m_frame = avcodec_alloc_frame();
+    m_deinterlacedFrame = avcodec_alloc_frame();
 
-	//if(m_codec->capabilities&CODEC_CAP_TRUNCATED)	c->flags|= CODEC_FLAG_TRUNCATED;
+    //if(m_codec->capabilities&CODEC_CAP_TRUNCATED)    c->flags|= CODEC_FLAG_TRUNCATED;
 
-	//c->debug_mv = 1;
+    //c->debug_mv = 1;
     //m_context->debug |= FF_DEBUG_THREADS + FF_DEBUG_PICT_INFO;
     //av_log_set_callback(FffmpegLog::av_log_default_callback_impl);
 
@@ -200,20 +200,20 @@ void CLFFmpegVideoDecoder::openDecoder(const QnCompressedVideoDataPtr data)
     Q_ASSERT(m_context->codec);
 
     int roundWidth = qPower2Ceil((unsigned) m_context->width, 32);
-	int numBytes = avpicture_get_size(PIX_FMT_YUV420P, roundWidth, m_context->height);
+    int numBytes = avpicture_get_size(PIX_FMT_YUV420P, roundWidth, m_context->height);
     if (numBytes > 0) {
-	    m_deinterlaceBuffer = (quint8*)av_malloc(numBytes * sizeof(quint8));
-	    avpicture_fill((AVPicture *)m_deinterlacedFrame, m_deinterlaceBuffer, PIX_FMT_YUV420P, roundWidth, m_context->height);
+        m_deinterlaceBuffer = (quint8*)av_malloc(numBytes * sizeof(quint8));
+        avpicture_fill((AVPicture *)m_deinterlacedFrame, m_deinterlaceBuffer, PIX_FMT_YUV420P, roundWidth, m_context->height);
     }
 
-//	avpicture_fill((AVPicture *)picture, m_buffer, PIX_FMT_YUV420P, c->width, c->height);
+//    avpicture_fill((AVPicture *)picture, m_buffer, PIX_FMT_YUV420P, c->width, c->height);
 }
 
 CLFFmpegVideoDecoder::~CLFFmpegVideoDecoder(void)
 {
     QMutexLocker mutex(&global_ffmpeg_mutex);
 
-	closeDecoder();
+    closeDecoder();
 
     if (m_passedContext && m_passedContext->codec)
     {
@@ -269,36 +269,36 @@ bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, CLVideoDe
         return false;
     }
 
-	if (m_newDecodeMode != DecodeMode_NotDefined && (data->flags & AV_PKT_FLAG_KEY))
-	{
+    if (m_newDecodeMode != DecodeMode_NotDefined && (data->flags & AV_PKT_FLAG_KEY))
+    {
         m_decodeMode = m_newDecodeMode;
-		m_newDecodeMode = DecodeMode_NotDefined;
-		m_lightModeFrameCounter = 0;
-	}
+        m_newDecodeMode = DecodeMode_NotDefined;
+        m_lightModeFrameCounter = 0;
+    }
 
-	if ((m_decodeMode > DecodeMode_Full || (data->flags & QnAbstractMediaData::MediaFlags_Ignore)) && data->data.data())
-	{
+    if ((m_decodeMode > DecodeMode_Full || (data->flags & QnAbstractMediaData::MediaFlags_Ignore)) && data->data.data())
+    {
 
-		if (data->compressionType == CODEC_ID_MJPEG)
-		{
+        if (data->compressionType == CODEC_ID_MJPEG)
+        {
             uint period = m_decodeMode == DecodeMode_Fast ? LIGHT_CPU_MODE_FRAME_PERIOD : LIGHT_CPU_MODE_FRAME_PERIOD*2;
-			if (m_lightModeFrameCounter < period)
-			{
-				++m_lightModeFrameCounter;
-				return false;
-			}
-			else
-				m_lightModeFrameCounter = 0;
+            if (m_lightModeFrameCounter < period)
+            {
+                ++m_lightModeFrameCounter;
+                return false;
+            }
+            else
+                m_lightModeFrameCounter = 0;
 
-		}
-		else if (!(data->flags & AV_PKT_FLAG_KEY))
-		{
-			if (m_decodeMode == DecodeMode_Fastest)
-				return false;
+        }
+        else if (!(data->flags & AV_PKT_FLAG_KEY))
+        {
+            if (m_decodeMode == DecodeMode_Fastest)
+                return false;
             else if (m_frameTypeExtractor->getFrameType((quint8*) data->data.data(), data->data.size()) == FrameTypeExtractor::B_Frame)
                 return false;
-		}
-	}
+        }
+    }
 
 #ifdef _USE_DXVA
     bool needResetCodec = false;
@@ -423,8 +423,8 @@ bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, CLVideoDe
             outFrame->reallocate(m_context->width, m_context->height, m_context->pix_fmt, m_frame->linesize[0]);
         }
 
-		if (m_frame->interlaced_frame && m_mtDecoding)
-		{
+        if (m_frame->interlaced_frame && m_mtDecoding)
+        {
             if (outFrame->isExternalData())
             {
                 if (avpicture_deinterlace((AVPicture*)m_deinterlacedFrame, (AVPicture*) m_frame, m_context->pix_fmt, m_context->width, m_context->height) == 0) {
@@ -436,7 +436,7 @@ bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, CLVideoDe
                 avpicture_deinterlace((AVPicture*) outFrame, (AVPicture*) m_frame, m_context->pix_fmt, m_context->width, m_context->height);
                 outFrame->pkt_dts = m_frame->pkt_dts;
             }
-		}
+        }
         else {
             if (!outFrame->isExternalData()) 
             {
@@ -462,32 +462,32 @@ bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, CLVideoDe
             m_decoderContext.extract(m_frame);
 #endif
 
-		m_context->debug_mv = 0;
-		if (m_showmotion)
-		{
-			m_context->debug_mv = 1;
-			//c->debug |=  FF_DEBUG_QP | FF_DEBUG_SKIP | FF_DEBUG_MB_TYPE | FF_DEBUG_VIS_QP | FF_DEBUG_VIS_MB_TYPE;
-			//c->debug |=  FF_DEBUG_VIS_MB_TYPE;
-			//ff_print_debug_info((MpegEncContext*)(c->priv_data), picture);
-		}
+        m_context->debug_mv = 0;
+        if (m_showmotion)
+        {
+            m_context->debug_mv = 1;
+            //c->debug |=  FF_DEBUG_QP | FF_DEBUG_SKIP | FF_DEBUG_MB_TYPE | FF_DEBUG_VIS_QP | FF_DEBUG_VIS_MB_TYPE;
+            //c->debug |=  FF_DEBUG_VIS_MB_TYPE;
+            //ff_print_debug_info((MpegEncContext*)(c->priv_data), picture);
+        }
 
         if (outFrame->isExternalData())
         {
-		    outFrame->width = m_context->width;
-		    outFrame->height = m_context->height;
+            outFrame->width = m_context->width;
+            outFrame->height = m_context->height;
 
-		    outFrame->data[0] = copyFromFrame->data[0];
-		    outFrame->data[1] = copyFromFrame->data[1];
-		    outFrame->data[2] = copyFromFrame->data[2];
+            outFrame->data[0] = copyFromFrame->data[0];
+            outFrame->data[1] = copyFromFrame->data[1];
+            outFrame->data[2] = copyFromFrame->data[2];
 
-		    outFrame->linesize[0] = copyFromFrame->linesize[0];
-		    outFrame->linesize[1] = copyFromFrame->linesize[1];
-		    outFrame->linesize[2] = copyFromFrame->linesize[2];
+            outFrame->linesize[0] = copyFromFrame->linesize[0];
+            outFrame->linesize[1] = copyFromFrame->linesize[1];
+            outFrame->linesize[2] = copyFromFrame->linesize[2];
             outFrame->pkt_dts = copyFromFrame->pkt_dts;
         }
         outFrame->format = GetPixelFormat();
-		return m_context->pix_fmt != PIX_FMT_NONE;
-	}
+        return m_context->pix_fmt != PIX_FMT_NONE;
+    }
     return false; // no picture decoded at current step
 }
 
@@ -534,21 +534,21 @@ void CLFFmpegVideoDecoder::setLightCpuMode(QnAbstractVideoDecoder::DecodeMode va
     if (m_decodeMode == val)
         return;
     //cl_log.log("set cpu mode:", val, cl_logALWAYS);
-	if (val >= m_decodeMode || m_decodeMode < DecodeMode_Fastest)
-	{
+    if (val >= m_decodeMode || m_decodeMode < DecodeMode_Fastest)
+    {
         m_decodeMode = val;
-		m_newDecodeMode = DecodeMode_NotDefined;
-		m_lightModeFrameCounter = 0;
-	}
-	else
-	{
-		m_newDecodeMode = val;
-	}
+        m_newDecodeMode = DecodeMode_NotDefined;
+        m_lightModeFrameCounter = 0;
+    }
+    else
+    {
+        m_newDecodeMode = val;
+    }
 }
 
 void CLFFmpegVideoDecoder::showMotion(bool show)
 {
-		m_showmotion = show;
+        m_showmotion = show;
 }
 
 void CLFFmpegVideoDecoder::setMTDecoding(bool value)

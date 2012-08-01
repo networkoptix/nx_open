@@ -15,7 +15,7 @@ namespace Qn {
         LeftSection =           1 << Qt::LeftSection,
         TopLeftSection =        1 << Qt::TopLeftSection,
         TopSection =            1 << Qt::TopSection,
-        TopRightSection	=       1 << Qt::TopRightSection,
+        TopRightSection =       1 << Qt::TopRightSection,
         RightSection =          1 << Qt::RightSection,
         BottomRightSection =    1 << Qt::BottomRightSection,
         BottomSection =         1 << Qt::BottomSection,

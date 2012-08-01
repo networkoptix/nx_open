@@ -629,7 +629,7 @@ void QnPlOnvifResource::setVideoEncoderOptions(const VideoOptionsResp& response)
     }
 
     if (response.Options->QualityRange) {
-		setMinMaxQuality(response.Options->QualityRange->Min, response.Options->QualityRange->Max);
+        setMinMaxQuality(response.Options->QualityRange->Min, response.Options->QualityRange->Max);
 
         qDebug() << "ONVIF quality range [" << m_minQuality << ", " << m_maxQuality << "]";
     } else {
@@ -815,26 +815,26 @@ void QnPlOnvifResource::save()
 
 void QnPlOnvifResource::setMinMaxQuality(int min, int max)
 {
-	int netoptixDelta = QnQualityHighest - QnQualityLowest;
+    int netoptixDelta = QnQualityHighest - QnQualityLowest;
     int onvifDelta = max - min;
 
-	if (netoptixDelta < 0 || onvifDelta < 0) {
-		qWarning() << "QnPlOnvifResource::setMinMaxQuality: incorrect values: min > max: onvif ["
-			       << min << ", " << max << "] netoptix [" << QnQualityLowest << ", " << QnQualityHighest << "]";
-		return;
-	}
+    if (netoptixDelta < 0 || onvifDelta < 0) {
+        qWarning() << "QnPlOnvifResource::setMinMaxQuality: incorrect values: min > max: onvif ["
+                   << min << ", " << max << "] netoptix [" << QnQualityLowest << ", " << QnQualityHighest << "]";
+        return;
+    }
 
-	float coef = (1 - ((float)netoptixDelta) / onvifDelta) * 0.5;
-	coef = coef <= 0? 0.0: (coef <= QUALITY_COEF? coef: QUALITY_COEF);
-	int shift = round(onvifDelta * coef);
+    float coef = (1 - ((float)netoptixDelta) / onvifDelta) * 0.5;
+    coef = coef <= 0? 0.0: (coef <= QUALITY_COEF? coef: QUALITY_COEF);
+    int shift = round(onvifDelta * coef);
 
-	m_minQuality = min + shift;
-	m_maxQuality = max - shift;
+    m_minQuality = min + shift;
+    m_maxQuality = max - shift;
 }
 
 int QnPlOnvifResource::round(float value)
 {
-	float floorVal = floorf(value);
+    float floorVal = floorf(value);
     return floorVal - value < 0.5? (int)value: (int)value + 1;
 }
 

@@ -291,10 +291,10 @@ void DeviceFileCatalog::deserializeTitleFile()
             }
 
             if (lastFileDuplicateName()) {
-				if (m_chunks.isEmpty())
-					m_chunks << chunk;
-				else
-					m_chunks.last() = chunk;
+                if (m_chunks.isEmpty())
+                    m_chunks << chunk;
+                else
+                    m_chunks.last() = chunk;
                 needRewriteCatalog = true;
             }       
             else 
