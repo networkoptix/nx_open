@@ -22,10 +22,8 @@
 #include <api/session_manager.h>
 
 #include "ui/actions/action_manager.h"
-
 #include "ui/graphics/view/graphics_view.h"
 #include "ui/graphics/view/gradient_background_painter.h"
-
 #include "ui/workbench/workbench_controller.h"
 #include "ui/workbench/workbench_grid_mapper.h"
 #include "ui/workbench/workbench_layout.h"
@@ -35,11 +33,10 @@
 #include "ui/workbench/workbench_action_handler.h"
 #include "ui/workbench/workbench_context.h"
 #include "ui/workbench/workbench_resource.h"
-
+#include "ui/processors/drag_processor.h"
 #include "ui/style/skin.h"
 #include "ui/style/globals.h"
 #include "ui/style/proxy_style.h"
-
 #include "ui/events/system_menu_event.h"
 
 #include "file_processor.h"
@@ -101,6 +98,10 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_dwm = new QnDwm(this);
 
     connect(m_dwm,                          SIGNAL(compositionChanged(bool)),               this,                                   SLOT(updateDwmState()));
+
+    /* Set up dragging. */
+    m_dragProcessor = new DragProcessor(this);
+    m_dragProcessor->setHandler(this);
 
     /* Set up properties. */
     setWindowTitle(QApplication::applicationName());
@@ -400,7 +401,8 @@ void QnMainWindow::updateDwmState() {
         m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 0));
         m_dwm->enableBlurBehindWindow(); /* For reasons unknown, this call is needed to prevent display artifacts. */
 
-        m_dwm->enableFrameEmulation();
+        m_dwm->disableFrameEmulation();
+        /*m_dwm->enableFrameEmulation();
         m_dwm->setEmulatedFrameMargins(frameMargins);
         m_dwm->setEmulatedTitleBarHeight(0x1000); /* So that the window is click-draggable no matter where the user clicked. */
 
@@ -414,7 +416,7 @@ void QnMainWindow::updateDwmState() {
             frameMargins.bottom()
         );
     } else {
-        /* Windowed without aero glass. */
+        /* Windowed without aero glass, all handlers are implemented using Qt. */
 
         m_drawCustomFrame = true;
 
@@ -429,9 +431,7 @@ void QnMainWindow::updateDwmState() {
         m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 0));
         m_dwm->disableBlurBehindWindow();
 
-        m_dwm->enableFrameEmulation();
-        m_dwm->setEmulatedFrameMargins(frameMargins);
-        m_dwm->setEmulatedTitleBarHeight(0x1000);
+        m_dwm->disableFrameEmulation();
 
         setContentsMargins(0, 0, 0, 0);
 
@@ -451,7 +451,8 @@ void QnMainWindow::updateTitleBarDraggable() {
     if(isFullScreen()) {
         m_dwm->disableTitleBarDrag();
     } else {
-        m_dwm->enableTitleBarDrag(m_options & TitleBarDraggable);
+        m_dwm->disableTitleBarDrag();
+        //m_dwm->enableTitleBarDrag(m_options & TitleBarDraggable);
     }
 }
 
@@ -466,19 +467,8 @@ bool QnMainWindow::isTabBar(const QPoint &pos) const {
 bool QnMainWindow::event(QEvent *event) {
     bool result = base_type::event(event);
 
-    switch(event->type()) {
-    case QnSystemMenuEvent::SystemMenu:
+    if(event->type() == QnSystemMenuEvent::SystemMenu)
         menu()->trigger(Qn::MainMenuAction);
-        return true;
-    case QEvent::NonClientAreaMouseButtonRelease:
-        mouseReleaseEvent(static_cast<QMouseEvent *>(event));
-        break;
-    case QEvent::NonClientAreaMouseButtonDblClick:
-        mouseDoubleClickEvent(static_cast<QMouseEvent *>(event));
-        break;
-    default:
-        break;
-    }
 
     if(m_dwm != NULL)
         result |= m_dwm->widgetEvent(event);
@@ -486,10 +476,25 @@ bool QnMainWindow::event(QEvent *event) {
     return result;
 }
 
-void QnMainWindow::mouseReleaseEvent(QMouseEvent *event) {
+void QnMainWindow::mousePressEvent(QMouseEvent *event) {
     base_type::mousePressEvent(event);
 
-    if(event->button() == Qt::RightButton && isTabBar(event->pos()) && !childAt(event->pos())) {
+    if(event->button() == Qt::LeftButton) {
+        m_dragProcessor->widgetMousePressEvent(this, event);
+        event->accept();
+    }
+}
+
+void QnMainWindow::mouseMoveEvent(QMouseEvent *event) {
+    base_type::mouseMoveEvent(event);
+    m_dragProcessor->widgetMouseMoveEvent(this, event);
+}
+
+void QnMainWindow::mouseReleaseEvent(QMouseEvent *event) {
+    base_type::mouseReleaseEvent(event);
+    m_dragProcessor->widgetMouseReleaseEvent(this, event);
+
+    if(event->button() == Qt::RightButton && isTabBar(event->pos())) {
         QContextMenuEvent e(QContextMenuEvent::Mouse, m_tabBar->mapFrom(this, event->pos()), event->globalPos(), event->modifiers());
         QApplication::sendEvent(m_tabBar, &e);
         event->accept();
@@ -499,9 +504,8 @@ void QnMainWindow::mouseReleaseEvent(QMouseEvent *event) {
 void QnMainWindow::mouseDoubleClickEvent(QMouseEvent *event) {
     base_type::mouseDoubleClickEvent(event);
 
-    if(event->button() == Qt::LeftButton && isTabBar(event->pos()) && !childAt(event->pos())) {
+    if(event->button() == Qt::LeftButton && isTabBar(event->pos())) {
         toggleFullScreen();
-
         event->accept();
     }
 }
@@ -577,6 +581,10 @@ bool QnMainWindow::winEvent(MSG *message, long *result)
     return base_type::winEvent(message, result);
 }
 #endif
+
+void QnMainWindow::dragMove(DragInfo *info) {
+    move(pos() + info->mouseScreenPos() - info->lastMouseScreenPos());
+}
 
 void QnMainWindow::at_fileOpenSignalizer_activated(QObject *, QEvent *event) {
     if(event->type() != QEvent::FileOpen) {

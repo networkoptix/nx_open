@@ -6,6 +6,7 @@
 #include <core/resource/resource_fwd.h>
 #include <ui/actions/actions.h>
 #include <ui/workbench/workbench_context_aware.h>
+#include <ui/processors/drag_process_handler.h>
 
 class QTabBar;
 class QBoxLayout;
@@ -27,7 +28,7 @@ class QnWorkbenchDisplay;
 class QnWorkbenchLayout;
 class QnWorkbenchActionHandler;
 
-class QnMainWindow: public QWidget, public QnWorkbenchContextAware {
+class QnMainWindow: public QWidget, public QnWorkbenchContextAware, public DragProcessHandler {
     Q_OBJECT;
 
     typedef QWidget base_type;
@@ -61,8 +62,12 @@ protected:
     virtual void dragMoveEvent(QDragMoveEvent *event) override;
     virtual void dragLeaveEvent(QDragLeaveEvent *event) override;
     virtual void dropEvent(QDropEvent *event) override;
+    virtual void mousePressEvent(QMouseEvent *event) override;
+    virtual void mouseMoveEvent(QMouseEvent *event) override;
     virtual void mouseReleaseEvent(QMouseEvent *event) override;
     virtual void mouseDoubleClickEvent(QMouseEvent *event) override;
+
+    virtual void dragMove(DragInfo *info) override;
 
 #ifdef Q_OS_WIN
     virtual bool winEvent(MSG *message, long *result) override;
@@ -115,6 +120,8 @@ private:
     bool m_drawCustomFrame;
 
     Options m_options;
+
+    DragProcessor *m_dragProcessor;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnMainWindow::Options);
