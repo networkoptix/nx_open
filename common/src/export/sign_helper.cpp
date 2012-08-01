@@ -544,7 +544,7 @@ QnCompressedVideoDataPtr QnSignHelper::createSgnatureFrame(AVCodecContext* srcCo
     QnCompressedVideoDataPtr generatedFrame;
     QByteArray srcCodecExtraData((const char*) srcCodec->extradata, srcCodec->extradata_size);
 
-    AVCodecContext* videoCodecCtx = avcodec_alloc_context(); //m_formatCtx->streams[0]->codec;
+    AVCodecContext* videoCodecCtx = avcodec_alloc_context3(srcCodec->codec); //m_formatCtx->streams[0]->codec;
     videoCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
     videoCodecCtx->codec_id = srcCodec->codec_id;
     videoCodecCtx->width = srcCodec->width;
@@ -590,6 +590,7 @@ QnCompressedVideoDataPtr QnSignHelper::createSgnatureFrame(AVCodecContext* srcCo
             goto error_label;
         }
 
+        // TODO: use avcodec_encode_video2 instead
         out_size = avcodec_encode_video(videoCodecCtx, videoBuf, videoBufSize, frame);
         if (out_size == 0)
             out_size = avcodec_encode_video(videoCodecCtx, videoBuf, videoBufSize, 0); // flush encoder buffer

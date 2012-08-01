@@ -158,6 +158,7 @@ protected:
     void updateTreeGeometry();
     void updateHelpGeometry();
     void updateFpsGeometry();
+    void updateCalendarGeometry();
     Q_SLOT void updateSliderResizerGeometry();
 
     QRectF updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
@@ -172,6 +173,8 @@ protected:
     bool isThumbnailsVisible() const;
     void setThumbnailsVisible(bool visible);
 
+    bool isCalendarVisible() const;
+    void setCalendarVisible(bool visible);
 protected slots:
     void updateHelpContext();
     
@@ -200,6 +203,7 @@ protected slots:
     void at_sliderResizerItem_geometryChanged();
     void at_sliderShowButton_toggled(bool checked);
     void at_toggleThumbnailsAction_toggled(bool checked);
+    void at_toggleCalendarAction_toggled(bool checked);
 
     void at_treeWidget_activated(const QnResourcePtr &resource);
     void at_treeItem_paintGeometryChanged();
@@ -400,6 +404,9 @@ private:
 
     /* Freespace-related state. */
     bool m_inFreespace;
+
+    /** Calendar state */
+    QGraphicsProxyWidget *m_calendarWidget;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchUi::Flags);

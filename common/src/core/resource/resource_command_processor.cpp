@@ -38,12 +38,12 @@ void QnResourceCommand::beforeDisconnectFromResource()
 QnResourceCommandProcessor::QnResourceCommandProcessor():
     QnAbstractDataConsumer(1000)
 {
-	//start(); This is static singleton and run() uses log (another singleton). Jusst in case I will start it with first device created.
+    //start(); This is static singleton and run() uses log (another singleton). Jusst in case I will start it with first device created.
 }
 
 QnResourceCommandProcessor::~QnResourceCommandProcessor()
 {
-	stop();
+    stop();
 }
 
 void QnResourceCommandProcessor::putData(QnAbstractDataPacketPtr data)
@@ -55,7 +55,7 @@ void QnResourceCommandProcessor::putData(QnAbstractDataPacketPtr data)
 
 bool QnResourceCommandProcessor::processData(QnAbstractDataPacketPtr data)
 {
-	QnResourceCommandPtr command = data.staticCast<QnResourceCommand>();
+    QnResourceCommandPtr command = data.staticCast<QnResourceCommand>();
 
     bool result = command->execute();
 

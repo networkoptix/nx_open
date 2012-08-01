@@ -846,7 +846,7 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
         if(!sourceCamera)
             continue;
 
-		QString physicalId = sourceCamera->getPhysicalId();
+                QString physicalId = sourceCamera->getPhysicalId();
 
         QnVirtualCameraResourcePtr replacedCamera;
         foreach(const QnVirtualCameraResourcePtr &otherCamera, serverCameras) {
@@ -1774,7 +1774,7 @@ Do you want to continue?"),
     }
 
     QString dateFormat = cameraResource ? tr("dd-mmm-yyyy hh-mm-ss") : tr("hh-mm-ss");
-	QString suggestion = networkResource ? networkResource->getPhysicalId() : QString();
+        QString suggestion = networkResource ? networkResource->getPhysicalId() : QString();
 
     QString fileName;
     QString selectedExtension;

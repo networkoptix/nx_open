@@ -12,9 +12,9 @@ Q_DECLARE_METATYPE(QAuthenticator);
 
 QnNetworkResource::QnNetworkResource()
     : QnResource(),
+      m_authenticated(true),
       m_networkStatus(0),
       m_networkTimeout(3000),
-      m_authenticated(true),
       m_probablyNeedToUpdateStatus(false)
 {
     static volatile bool metaTypesInitialized = false;
@@ -225,6 +225,7 @@ bool QnNetworkResource::shoudResolveConflicts() const
 
 bool QnNetworkResource::mergeResourcesIfNeeded( QnNetworkResourcePtr source )
 {
+    Q_UNUSED(source)
     return false;
 }
 
@@ -318,4 +319,4 @@ void QnNetworkResource::getDevicesBasicInfo(QnResourceMap& lst, int threads)
     }
 
 }
-/**/
+*/

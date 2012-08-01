@@ -80,7 +80,7 @@ protected:
     void setCurrentTime(qint64 value);
     virtual void pleaseStop();
     QnAbstractMediaDataPtr createEmptyPacket(bool isReverseMode);
-	void beforeJumpInternal(qint64 mksec);
+    void beforeJumpInternal(qint64 mksec);
 protected:
     qint64 m_currentTime;
     qint64 m_topIFrameTime;

@@ -49,7 +49,7 @@ QnResourceList QnPlDroidResourceSearcher::findResources(void)
             QHostAddress sender;
             quint16 senderPort;
 
-            m_socketList[i]->readDatagram(responseData.data(), responseData.size(),	&sender, &senderPort);
+            m_socketList[i]->readDatagram(responseData.data(), responseData.size(),    &sender, &senderPort);
 
             QString response = QLatin1String(responseData);
 

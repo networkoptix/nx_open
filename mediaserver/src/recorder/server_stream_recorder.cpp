@@ -102,16 +102,16 @@ void QnServerStreamRecorder::beforeProcessData(QnAbstractMediaDataPtr media)
     }
 
     bool isRecording = m_currentScheduleTask.getRecordingType() != QnScheduleTask::RecordingType_Never;
-	if (!m_device->isDisabled()) {
-		if (isRecording) {
-			if(m_device->getStatus() == QnResource::Online)
-				m_device->setStatus(QnResource::Recording);
-		}
-		else {
-			if(m_device->getStatus() == QnResource::Recording)
-				m_device->setStatus(QnResource::Online);
-		}
-	}
+    if (!m_device->isDisabled()) {
+        if (isRecording) {
+            if(m_device->getStatus() == QnResource::Online)
+                m_device->setStatus(QnResource::Recording);
+        }
+        else {
+            if(m_device->getStatus() == QnResource::Recording)
+                m_device->setStatus(QnResource::Online);
+        }
+    }
 
     if (!isMotionRec(m_currentScheduleTask.getRecordingType()))
         return;
@@ -308,7 +308,7 @@ void QnServerStreamRecorder::endOfRun()
 {
     QnStreamRecorder::endOfRun();
     if(m_device->getStatus() == QnResource::Recording)
-		m_device->setStatus(QnResource::Online);
+        m_device->setStatus(QnResource::Online);
 }
 
 void QnServerStreamRecorder::setDualStreamingHelper(QnDualStreamingHelperPtr helper)

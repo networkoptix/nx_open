@@ -149,6 +149,5 @@ void QnRestConnectionProcessor::run()
 
 void QnRestConnectionProcessor::parseRequest()
 {
-    Q_D(QnRestConnectionProcessor);
     QnTCPConnectionProcessor::parseRequest();
 }

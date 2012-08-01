@@ -10,7 +10,7 @@ QnVirtualCameraResource::QnVirtualCameraResource()
 
 QnPhysicalCameraResource::QnPhysicalCameraResource(): QnVirtualCameraResource()
 {
-	setFlags(local_live_cam);
+    setFlags(local_live_cam);
 }
 
 int QnPhysicalCameraResource::getPrimaryStreamDesiredFps() const

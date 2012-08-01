@@ -54,7 +54,7 @@ public:
     int screenHeight() const;
 
 private:
-    HRESULT	InitD3D(HWND hWnd);
+    HRESULT        InitD3D(HWND hWnd);
     bool dataToFrame(quint8* data, int width, int height, AVFrame* pFrame);
     bool direct3DDataToFrame(void* opaque, AVFrame* pFrame);
     Q_INVOKABLE void captureFrameOpenGL(void* opaque);
@@ -66,13 +66,13 @@ private:
     QPixmap m_logo;
     int m_displayNumber;
 
-    IDirect3D9*			m_pD3D;
-    IDirect3DDevice9*	m_pd3dDevice;
-    QVector<IDirect3DSurface9*>	m_pSurface;
-    QVector<quint8*>	m_openGLData;
-    RECT		m_rect;
+    IDirect3D9*                        m_pD3D;
+    IDirect3DDevice9*        m_pd3dDevice;
+    QVector<IDirect3DSurface9*>        m_pSurface;
+    QVector<quint8*>        m_openGLData;
+    RECT                m_rect;
     HRESULT m_initialized;
-    D3DDISPLAYMODE	m_ddm;
+    D3DDISPLAYMODE        m_ddm;
     QTime m_timer;
     unsigned m_frameNum;
     int m_currentIndex;

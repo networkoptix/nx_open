@@ -62,13 +62,13 @@ QList<QnPlPulseSearcherHelper::WSResult> QnPlPulseSearcherHelper::findResources(
         QHostAddress groupAddress(QLatin1String("224.111.111.1"));
         if (!multicastJoinGroup(socket, groupAddress, iface.address)) continue;
 
-		QByteArray requestDatagram;
-		requestDatagram.resize(43);
-		requestDatagram.fill(0);
-		requestDatagram.insert(0, QByteArray("grandstream"));
-		requestDatagram.insert(12, 2);
+        QByteArray requestDatagram;
+        requestDatagram.resize(43);
+        requestDatagram.fill(0);
+        requestDatagram.insert(0, QByteArray("grandstream"));
+        requestDatagram.insert(12, 2);
         requestDatagram.insert(13, QByteArray("127.0.0.1"));
- 		requestDatagram.resize(43);
+         requestDatagram.resize(43);
 
         socket.writeDatagram(requestDatagram.data(), requestDatagram.size(), groupAddress, 6789);
 
@@ -80,8 +80,8 @@ QList<QnPlPulseSearcherHelper::WSResult> QnPlPulseSearcherHelper::findResources(
 
             QHostAddress sender;
             quint16 senderPort;
-            socket.readDatagram(reply.data(), reply.size(),	&sender, &senderPort);
-            			
+            socket.readDatagram(reply.data(), reply.size(),    &sender, &senderPort);
+                        
             WSResult res = parseReply(reply);
             if (!res.mac.isEmpty())
             {

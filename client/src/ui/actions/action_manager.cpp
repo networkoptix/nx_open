@@ -841,6 +841,11 @@ QnActionManager::QnActionManager(QObject *parent):
         toggledText(tr("Hide Thumbnails")).
         icon(qnSkin->icon("thumbnails.png"));
 
+    factory(Qn::ToggleCalendarAction).
+        flags(Qn::Slider | Qn::SingleTarget).
+        text(tr("Show Calendar")).
+        toggledText(tr("Hide Calendar")).
+        icon(qnSkin->icon("thumbnails.png"));
 
     factory(Qn::IncrementDebugCounterAction).
         flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::NoTarget).

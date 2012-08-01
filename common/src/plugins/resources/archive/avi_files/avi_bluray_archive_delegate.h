@@ -11,8 +11,8 @@ class QnAVIBlurayArchiveDelegate : public QnAVIPlaylistArchiveDelegate
     Q_OBJECT;
 
 public:
-	QnAVIBlurayArchiveDelegate();
-	virtual ~QnAVIBlurayArchiveDelegate();
+    QnAVIBlurayArchiveDelegate();
+    virtual ~QnAVIBlurayArchiveDelegate();
 protected:
     virtual QStringList getPlaylist(const QString& url);
     virtual void fillAdditionalInfo(CLFileInfo* fi);

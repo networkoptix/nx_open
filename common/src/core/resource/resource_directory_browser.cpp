@@ -15,7 +15,8 @@
 namespace {
     class QnResourceDirectoryBrowserInstance: public QnResourceDirectoryBrowser {};
 
-    Q_GLOBAL_STATIC(QnResourceDirectoryBrowserInstance, qnResourceDirectoryBrowserInstance);
+   // defined but never used
+   // Q_GLOBAL_STATIC(QnResourceDirectoryBrowserInstance, qnResourceDirectoryBrowserInstance);
 }
 
 

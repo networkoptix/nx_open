@@ -83,7 +83,8 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
     m_syncButton->setCheckable(true);
 
     m_thumbnailsButton = new QnImageButtonWidget(this);
-    m_thumbnailsButton->setDefaultAction(action(Qn::ToggleThumbnailsAction));
+    //m_thumbnailsButton->setDefaultAction(action(Qn::ToggleThumbnailsAction));
+      m_thumbnailsButton->setDefaultAction(action(Qn::ToggleCalendarAction));
     m_thumbnailsButton->setPreferredSize(96, 24);
 
 

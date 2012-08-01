@@ -14,8 +14,8 @@ class QnAVIDvdArchiveDelegate : public QnAVIPlaylistArchiveDelegate
     Q_OBJECT;
 
 public:
-	QnAVIDvdArchiveDelegate();
-	virtual ~QnAVIDvdArchiveDelegate();
+    QnAVIDvdArchiveDelegate();
+    virtual ~QnAVIDvdArchiveDelegate();
     void setChapterNum(int chupter);
     static QStringList getTitleList(const QString& url);
 

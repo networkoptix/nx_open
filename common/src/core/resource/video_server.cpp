@@ -121,6 +121,7 @@ class TestConnectionTask: public QRunnable
 {
 public:
     TestConnectionTask(QnVideoServerResource* owner, const QUrl& url): m_owner(owner), m_url(url) {}
+
     void run()
     {
         QByteArray reply;
@@ -133,8 +134,8 @@ public:
         }
     }
 private:
-    QUrl m_url;
     QnVideoServerResource* m_owner;
+    QUrl m_url;
 };
 
 void QnVideoServerResource::setPrimaryIF(const QString& primaryIF)
@@ -212,5 +213,5 @@ void QnVideoServerResource::updateInner(QnResourcePtr other)
         setStorages(otherStorages);
         determineOptimalNetIF();
     }
-	determineOptimalNetIF();
+    determineOptimalNetIF();
 }

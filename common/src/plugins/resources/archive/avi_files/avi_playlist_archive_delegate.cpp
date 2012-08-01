@@ -36,12 +36,10 @@ void ff_read_frame_flush(AVFormatContext *s)
 #define RELATIVE_TS_BASE (INT64_MAX - (1LL<<48))
 
     AVStream *st;
-    int i, j;
-
     flush_packet_queue(s);
 
     /* for each stream, reset read state */
-    for(i = 0; i < s->nb_streams; i++) {
+    for(uint i = 0; i < s->nb_streams; i++) {
         st = s->streams[i];
 
         //if (st->parser) {
@@ -55,7 +53,7 @@ void ff_read_frame_flush(AVFormatContext *s)
 
         st->probe_packets = MAX_PROBE_PACKETS;
 
-        for(j=0; j<MAX_REORDER_DELAY+1; j++)
+        for(uint j=0; j<MAX_REORDER_DELAY+1; j++)
             st->pts_buffer[j]= AV_NOPTS_VALUE;
     }
 }
@@ -68,8 +66,8 @@ QnAVIPlaylistArchiveDelegate::QnAVIPlaylistArchiveDelegate() :
     QnAviArchiveDelegate(),
     m_ffmpegIOContext(0),
     m_currentFileIndex(-1),
-    m_inSeek(false),
     m_ioBuffer(0),
+    m_inSeek(false),
     m_totalContentLength(0)
 {
 }
@@ -157,7 +155,7 @@ bool QnAVIPlaylistArchiveDelegate::findStreams()
 
         fi->m_formatContext->pb = getIOContext();
         if (!inCtx || avformat_open_input(&fi->m_formatContext, "", 0, 0) < 0 ||
-            av_find_stream_info(fi->m_formatContext) < 0)
+            avformat_find_stream_info(fi->m_formatContext, NULL) < 0)
         {
             deleteFileInfo(fi);
             m_fileList.remove(m_fileList.size() - 1);
@@ -189,7 +187,7 @@ qint64 QnAVIPlaylistArchiveDelegate::findFileIndexByTime(quint64 mksec)
     int newFileIndex = 0;
     foreach(CLFileInfo* fi, m_fileList)
     {
-       if (mksec < fi->m_formatContext->duration)
+       if (mksec < (quint64)fi->m_formatContext->duration)
            break;
        mksec -= fi->m_formatContext->duration;
        newFileIndex++;
@@ -213,16 +211,15 @@ qint64 QnAVIPlaylistArchiveDelegate::seek(qint64 mksec)
         return -1; // error seeking
 
     m_startMksec = m_fileList[m_currentFileIndex]->m_formatContext->start_time;
-    if (m_startMksec != AV_NOPTS_VALUE)
+    if ((quint64)m_startMksec != AV_NOPTS_VALUE)
         relativeMksec += m_startMksec;
-    int rez;
     m_inSeek = true;
     if (directSeekToPosition(relativeMksec))
     {
         ff_read_frame_flush(m_formatContext);
     } else
     {
-        rez = avformat_seek_file(m_formatContext, -1, 0, relativeMksec, LLONG_MAX, AVSEEK_FLAG_BACKWARD);
+        avformat_seek_file(m_formatContext, -1, 0, relativeMksec, LLONG_MAX, AVSEEK_FLAG_BACKWARD);
     }
 
     m_inSeek = false;
@@ -234,7 +231,7 @@ qint64 QnAVIPlaylistArchiveDelegate::packetTimestamp(const AVPacket& packet)
     AVStream* stream = m_fileList[m_currentFileIndex]->m_formatContext->streams[packet.stream_index];
     static AVRational r = {1, 1000000};
     qint64 packetTime = av_rescale_q(packet.dts, stream->time_base, r);
-    qint64 st = m_fileList[m_currentFileIndex]->m_formatContext->start_time;
+    quint64 st = m_fileList[m_currentFileIndex]->m_formatContext->start_time;
     if (st != AV_NOPTS_VALUE)
         return packetTime - st + m_fileList[m_currentFileIndex]->m_offsetInMks;
     else

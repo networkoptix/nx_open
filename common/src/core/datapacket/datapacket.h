@@ -11,7 +11,7 @@ struct QnAbstractDataPacket
 {
     QnAbstractDataPacket(): dataProvider(0), timestamp(AV_NOPTS_VALUE) {}
     virtual ~QnAbstractDataPacket() {}
-	QnAbstractStreamDataProvider* dataProvider;
+    QnAbstractStreamDataProvider* dataProvider;
     qint64 timestamp; // mksec // 10^-6
 };
 

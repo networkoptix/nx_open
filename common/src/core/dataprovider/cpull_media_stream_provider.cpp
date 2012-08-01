@@ -31,7 +31,7 @@ bool QnClientPullMediaStreamProvider::isMaxFps() const
 void QnClientPullMediaStreamProvider::run()
 {
     setPriority(QThread::HighPriority);
-	qDebug() << "stream reader started.";
+    qDebug() << "stream reader started.";
 
     int numberOfChnnels = 1;
 
@@ -42,47 +42,47 @@ void QnClientPullMediaStreamProvider::run()
 
     beforeRun();
 
-	while(!needToStop())
-	{
-		pauseDelay(); // pause if needed;
-		if (needToStop()) // extra check after pause
-			break;
+    while(!needToStop())
+    {
+        pauseDelay(); // pause if needed;
+        if (needToStop()) // extra check after pause
+            break;
 
-		// check queue sizes
+        // check queue sizes
 
-		if (!dataCanBeAccepted())
-		{
-			QnSleep::msleep(5);
-			continue;
-		}
+        if (!dataCanBeAccepted())
+        {
+            QnSleep::msleep(5);
+            continue;
+        }
 
 
-		if (getResource()->hasUnprocessedCommands()) // if command processor has something in the queue for this resource let it go first
-		{
-			QnSleep::msleep(5);
-			continue;
-		}
+        if (getResource()->hasUnprocessedCommands()) // if command processor has something in the queue for this resource let it go first
+        {
+            QnSleep::msleep(5);
+            continue;
+        }
 
-		QnAbstractMediaDataPtr data = getNextData();
+        QnAbstractMediaDataPtr data = getNextData();
 
-		if (data==0)
-		{
+        if (data==0)
+        {
             if (m_needStop)
                 continue;
 
-			setNeedKeyData();
-			mFramesLost++;
-			m_stat[0].onData(0);
-			m_stat[0].onEvent(CL_STAT_FRAME_LOST);
+            setNeedKeyData();
+            mFramesLost++;
+            m_stat[0].onData(0);
+            m_stat[0].onEvent(CL_STAT_FRAME_LOST);
 
-			if (mFramesLost % MAX_LOST_FRAME == 0) // if we lost MAX_LOST_FRAME frames => connection is lost for sure 
+            if (mFramesLost % MAX_LOST_FRAME == 0) // if we lost MAX_LOST_FRAME frames => connection is lost for sure 
             {
                 if (getResource().dynamicCast<QnPhysicalCameraResource>())
                 {
-					getResource()->setStatus(QnResource::Offline);
+                    getResource()->setStatus(QnResource::Offline);
                 }
 
-				m_stat[0].onLostConnection();
+                m_stat[0].onLostConnection();
             }
 
             /*
@@ -95,8 +95,8 @@ void QnClientPullMediaStreamProvider::run()
                 QnSleep::msleep(30);
             }
 
-			continue;
-		}
+            continue;
+        }
 
         
         
@@ -109,44 +109,44 @@ void QnClientPullMediaStreamProvider::run()
         if (getResource().dynamicCast<QnPhysicalCameraResource>())
         {
             if (getResource()->getStatus() == QnResource::Unauthorized || getResource()->getStatus() == QnResource::Offline)
-				getResource()->setStatus(QnResource::Online);
+                getResource()->setStatus(QnResource::Online);
         }
 
-		QnCompressedVideoDataPtr videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
+        QnCompressedVideoDataPtr videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
         
 
-		if (mFramesLost>0) // we are alive again
-		{
-			if (mFramesLost >= MAX_LOST_FRAME)
-			{
-				m_stat[0].onEvent(CL_STAT_CAMRESETED);
-			}
+        if (mFramesLost>0) // we are alive again
+        {
+            if (mFramesLost >= MAX_LOST_FRAME)
+            {
+                m_stat[0].onEvent(CL_STAT_CAMRESETED);
+            }
 
-			mFramesLost = 0;
-		}
+            mFramesLost = 0;
+        }
 
-		if (videoData && needKeyData())
-		{
-			// I do not like; need to do smth with it
-			if (videoData->flags & AV_PKT_FLAG_KEY)
-			{
-				if (videoData->channelNumber>CL_MAX_CHANNEL_NUMBER-1)
-				{
-					Q_ASSERT(false);
-					continue;
-				}
+        if (videoData && needKeyData())
+        {
+            // I do not like; need to do smth with it
+            if (videoData->flags & AV_PKT_FLAG_KEY)
+            {
+                if (videoData->channelNumber>CL_MAX_CHANNEL_NUMBER-1)
+                {
+                    Q_ASSERT(false);
+                    continue;
+                }
 
-				m_gotKeyFrame[videoData->channelNumber]++;
-			}
-			else
-			{
-				// need key data but got not key data
-				continue;
-			}
-		}
+                m_gotKeyFrame[videoData->channelNumber]++;
+            }
+            else
+            {
+                // need key data but got not key data
+                continue;
+            }
+        }
 
         if(data)
-		    data->dataProvider = this;
+            data->dataProvider = this;
 
         if (videoData)
         {
@@ -156,16 +156,16 @@ void QnClientPullMediaStreamProvider::run()
         }
 
 
-		putData(data);
+        putData(data);
 
         if (videoData && !isMaxFps())
             m_fpsSleep.sleep(1000*1000/getFps()/numberOfChnnels);
 
-	}
+    }
 
     afterRun();
 
-	CL_LOG(cl_logINFO) cl_log.log(QLatin1String("stream reader stopped."), cl_logINFO);
+    CL_LOG(cl_logINFO) cl_log.log(QLatin1String("stream reader stopped."), cl_logINFO);
 }
 
 void QnClientPullMediaStreamProvider::beforeRun()

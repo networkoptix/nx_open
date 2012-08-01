@@ -56,23 +56,23 @@ void QnConnectionTestingDialog::timeout()
 
 void QnConnectionTestingDialog::oldHttpTestResults(int status, QByteArray errorString, QByteArray data, int handle)
 {
-	Q_UNUSED(handle);
+    Q_UNUSED(handle);
 
-	if (status == 204)
-	{
-		if (m_timeoutTimer.isActive())
-			m_timeoutTimer.stop();
-		else
-			return;
+    if (status == 204)
+    {
+        if (m_timeoutTimer.isActive())
+            m_timeoutTimer.stop();
+        else
+            return;
 
-		ui->statusLabel->setText(tr("Failed"));
-	}
+        ui->statusLabel->setText(tr("Failed"));
+    }
 }
 
 void QnConnectionTestingDialog::testResults(int status, const QByteArray &errorString, QnConnectInfoPtr connectInfo, int requestHandle)
 {
     Q_UNUSED(requestHandle)
-	Q_UNUSED(errorString)
+    Q_UNUSED(errorString)
 
     if (m_timeoutTimer.isActive()) {
         m_timeoutTimer.stop();
@@ -104,13 +104,13 @@ void QnConnectionTestingDialog::testSettings()
     m_connection = QnAppServerConnectionFactory::createConnection(m_url);
     m_connection->testConnectionAsync(this, SLOT(testResults(int,QByteArray,QnConnectInfoPtr,int)));
 
-	QUrl httpUrl;
-	httpUrl.setHost(m_url.host());
-	httpUrl.setPort(m_url.port());
-	httpUrl.setScheme(QLatin1String("http"));
-	httpUrl.setUserName(QString());
-	httpUrl.setPassword(QString());
-	QnSessionManager::instance()->sendAsyncGetRequest(httpUrl, QLatin1String("resourceEx"), this, SLOT(oldHttpTestResults(int,QByteArray,QByteArray,int)));
+    QUrl httpUrl;
+    httpUrl.setHost(m_url.host());
+    httpUrl.setPort(m_url.port());
+    httpUrl.setScheme(QLatin1String("http"));
+    httpUrl.setUserName(QString());
+    httpUrl.setPassword(QString());
+    QnSessionManager::instance()->sendAsyncGetRequest(httpUrl, QLatin1String("resourceEx"), this, SLOT(oldHttpTestResults(int,QByteArray,QByteArray,int)));
 }
 
 void QnConnectionTestingDialog::accept()

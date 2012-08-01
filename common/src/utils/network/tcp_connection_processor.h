@@ -9,8 +9,9 @@
 
 class QnTcpListener;
 
-class QnTCPConnectionProcessor: public CLLongRunnable
-{
+class QnTCPConnectionProcessor: public CLLongRunnable {
+    Q_OBJECT;
+
 public:
     QnTCPConnectionProcessor(TCPSocket* socket, QnTcpListener* owner);
     virtual ~QnTCPConnectionProcessor();

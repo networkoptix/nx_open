@@ -618,7 +618,7 @@ bool QnDesktopFileEncoder::init()
         m_audioCodecCtx->channels = m_audioInfo.size() > 1 ? 2 : m_audioInfo[0]->m_audioFormat.channels();
         m_audioCodecCtx->sample_rate = m_audioInfo[0]->m_audioFormat.frequency();
         AVRational audioRational = {1, m_audioCodecCtx->sample_rate};
-        m_audioCodecCtx->time_base	 = audioRational;
+        m_audioCodecCtx->time_base         = audioRational;
         m_audioCodecCtx->bit_rate = 64000 * m_audioCodecCtx->channels;
         m_audioCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
 

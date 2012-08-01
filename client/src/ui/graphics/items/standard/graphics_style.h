@@ -53,7 +53,7 @@ public:
     QStyle::SubControl hitTestComplexControl(QStyle::ComplexControl control, const QStyleOptionComplex *option, const QPoint &position, const QGraphicsWidget *widget = 0) const;
     int pixelMetric(QStyle::PixelMetric metric, const QStyleOption *option = 0, const QGraphicsWidget *widget = 0) const;
     QSize sizeFromContents(QStyle::ContentsType type, const QStyleOption *option, const QSize &contentsSize, const QGraphicsWidget *widget = 0) const;
-    int	styleHint(QStyle::StyleHint hint, const QStyleOption *option = 0, const QGraphicsWidget *widget = 0, QStyleHintReturn *returnData = 0) const;
+    int styleHint(QStyle::StyleHint hint, const QStyleOption *option = 0, const QGraphicsWidget *widget = 0, QStyleHintReturn *returnData = 0) const;
     QRect subControlRect(QStyle::ComplexControl control, const QStyleOptionComplex *option, QStyle::SubControl subControl, const QGraphicsWidget *widget = 0) const;
     QRect subElementRect(QStyle::SubElement element, const QStyleOption *option, const QGraphicsWidget *widget = 0) const;
 

@@ -342,9 +342,9 @@ QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHost
 
     CL_LOG(cl_logDEBUG1)
     {
-        cl_log.log(QLatin1String("ping results..."), cl_logALWAYS);
+        cl_log.log(QLatin1String("ping results..."), cl_logDEBUG1);
         foreach(QHostAddress addr, result)
-            cl_log.log(addr.toString(), cl_logALWAYS);
+            cl_log.log(addr.toString(), cl_logDEBUG1);
     }
 
 
@@ -510,8 +510,7 @@ QString getMacByIP(const QHostAddress& ip, bool /*net*/)
         {
             /* complete ARP entry */
             cl_log.log(cl_logDEBUG1, "%d ? %d", ip.toIPv4Address(), ntohl(sinarp->sin_addr.s_addr));
-            if (ip.toIPv4Address() == ntohl(sinarp->sin_addr.s_addr))
-            
+            if (ip.toIPv4Address() == ntohl(sinarp->sin_addr.s_addr)) {
                 free(buf);
                 return MACToString((unsigned char*)LLADDR(sdl));
             }

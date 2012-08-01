@@ -14,7 +14,7 @@ extern QMutex global_ffmpeg_mutex;
 QnMediaContext::QnMediaContext(AVCodecContext* ctx)
 {
     QMutexLocker mutex(&global_ffmpeg_mutex);
-    m_ctx = avcodec_alloc_context();
+    m_ctx = avcodec_alloc_context3(NULL);
     avcodec_copy_context(m_ctx, ctx);
 }
 
@@ -23,9 +23,9 @@ QnMediaContext::QnMediaContext(CodecID codecId)
     if (codecId != CODEC_ID_NONE)
     {
         QMutexLocker mutex(&global_ffmpeg_mutex);
-        m_ctx = avcodec_alloc_context();
         AVCodec* codec = avcodec_find_decoder(codecId);
-        avcodec_open(m_ctx, codec);
+        m_ctx = avcodec_alloc_context3(codec);
+        avcodec_open2(m_ctx, codec, NULL);
     } else {
         m_ctx = 0;
     }
@@ -133,7 +133,7 @@ bool QnMetaDataV1::isEmpty() const
 
 void QnMetaDataV1::addMotion(const quint8* image, qint64 timestamp)
 {
-    if (m_firstTimestamp == AV_NOPTS_VALUE)
+    if ((quint64)m_firstTimestamp == AV_NOPTS_VALUE)
         m_firstTimestamp = timestamp;
     else 
         m_duration = qMax(m_duration, timestamp - m_firstTimestamp);

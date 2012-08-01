@@ -394,7 +394,7 @@ void QnArchiveSyncPlayWrapper::reinitTime(qint64 newTime)
         if (d->lastJumpTime != DATETIME_NOW)
             d->lastJumpTime = getDisplayedTimeInternal();
     }
-		
+        
     //qDebug() << "reinitTime=" << QDateTime::fromMSecsSinceEpoch(d->lastJumpTime/1000).toString("hh:mm:ss.zzz");
 
     d->timer.restart();
@@ -547,18 +547,18 @@ void QnArchiveSyncPlayWrapper::onEofReached(QnlTimeSource* source, bool value)
             break;
         }
     }
-	if (value)
-	{
-		bool allReady = d->speed > 0;
-		for (QList<ReaderInfo>::iterator i = d->readers.begin(); i < d->readers.end(); ++i)
-		{
-			if (i->enabled)
-				allReady &= (i->isEOF || i->reader->isRealTimeSource());
-		}
+    if (value)
+    {
+        bool allReady = d->speed > 0;
+        for (QList<ReaderInfo>::iterator i = d->readers.begin(); i < d->readers.end(); ++i)
+        {
+            if (i->enabled)
+                allReady &= (i->isEOF || i->reader->isRealTimeSource());
+        }
 
-		if (allReady)
-			jumpTo(DATETIME_NOW, 0);
-	}
+        if (allReady)
+            jumpTo(DATETIME_NOW, 0);
+    }
 }
 
 qint64 QnArchiveSyncPlayWrapper::expectedTime() const
@@ -601,11 +601,11 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTime() const
     if (d->speed >= 0 && nextTime != AV_NOPTS_VALUE && nextTime > expectTime + MAX_FRAME_DURATION*1000)
     {
         QnArchiveSyncPlayWrapper* nonConstThis = const_cast<QnArchiveSyncPlayWrapper*>(this);
-		
-		/*
+        
+        /*
         qDebug() << "reinitTimeTo=" << QDateTime::fromMSecsSinceEpoch(nextTime/1000).toString("hh:mm:ss.zzz") << 
                "expected time=" << QDateTime::fromMSecsSinceEpoch(expectTime/1000).toString("hh:mm:ss.zzz");
-		*/
+        */
 
         nonConstThis->reinitTime(nextTime);
         expectTime = expectedTime();

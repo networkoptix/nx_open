@@ -116,9 +116,9 @@ QnScreenGrabber::~QnScreenGrabber()
     }
 }
 
-HRESULT	QnScreenGrabber::InitD3D(HWND hWnd)
+HRESULT        QnScreenGrabber::InitD3D(HWND hWnd)
 {
-    D3DPRESENT_PARAMETERS	d3dpp;
+    D3DPRESENT_PARAMETERS        d3dpp;
 
     if((m_pD3D=Direct3DCreate9(D3D_SDK_VERSION))==NULL)
     {
@@ -284,7 +284,7 @@ QnScreenGrabber::CaptureInfo QnScreenGrabber::captureFrame()
         }
         if (m_captureCursor)
         {
-            D3DLOCKED_RECT	lockedRect;
+            D3DLOCKED_RECT        lockedRect;
             if(m_pSurface[m_currentIndex]->LockRect(&lockedRect, &m_rect, D3DLOCK_NO_DIRTY_UPDATE|D3DLOCK_NOSYSLOCK|D3DLOCK_READONLY) == D3D_OK)
             {
                 drawCursor((quint32*) lockedRect.pBits, m_ddm.Width, m_ddm.Height, m_monInfo.rcMonitor.left, m_monInfo.rcMonitor.top, false);
@@ -522,7 +522,7 @@ bool QnScreenGrabber::direct3DDataToFrame(void* opaque, AVFrame* pFrame)
 {
     IDirect3DSurface9* pSurface = (IDirect3DSurface9*) opaque;
 
-    D3DLOCKED_RECT	lockedRect;
+    D3DLOCKED_RECT        lockedRect;
 
     if(FAILED(pSurface->LockRect(&lockedRect, 0, D3DLOCK_NO_DIRTY_UPDATE|D3DLOCK_NOSYSLOCK|D3DLOCK_READONLY)))
     {

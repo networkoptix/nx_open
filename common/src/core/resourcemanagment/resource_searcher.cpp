@@ -1,9 +1,9 @@
 #include "resource_searcher.h"
 
 QnAbstractResourceSearcher::QnAbstractResourceSearcher():
-    m_shouldStop(false),
     m_shouldbeUsed(true),
-    m_localResources(false)
+    m_localResources(false),
+    m_shouldStop(false)
 {}
 
 QnAbstractResourceSearcher::~QnAbstractResourceSearcher()

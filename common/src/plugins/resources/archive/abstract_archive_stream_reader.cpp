@@ -4,10 +4,10 @@
 
 QnAbstractArchiveReader::QnAbstractArchiveReader(QnResourcePtr dev ) :
     QnAbstractMediaStreamDataProvider(dev),
+    m_cycleMode(true),
     m_needToSleep(0),
     m_delegate(0),
-    m_navDelegate(0),
-    m_cycleMode(true)
+    m_navDelegate(0)
 {
 }
 

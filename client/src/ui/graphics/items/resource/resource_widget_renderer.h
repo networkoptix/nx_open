@@ -22,13 +22,13 @@ public:
 
     virtual ~QnResourceWidgetRenderer();
 
-	virtual void draw(CLVideoDecoderOutput *image) override;
+    virtual void draw(CLVideoDecoderOutput *image) override;
 
     virtual void waitForFrameDisplayed(int channel) override;
 
-	virtual void beforeDestroy() override;
+    virtual void beforeDestroy() override;
 
-	virtual QSize sizeOnScreen(unsigned int channel) const override;
+    virtual QSize sizeOnScreen(unsigned int channel) const override;
 
     virtual bool constantDownscaleFactor() const override;
 

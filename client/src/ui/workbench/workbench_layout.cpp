@@ -193,7 +193,7 @@ void QnWorkbenchLayout::removeItem(QnWorkbenchItem *item) {
 void QnWorkbenchLayout::clear()
 {
     foreach (QnWorkbenchItem *item, m_items)
-		delete item;
+        delete item;
     m_items.clear();
 }
 

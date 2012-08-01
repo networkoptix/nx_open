@@ -7,21 +7,21 @@ CLVideoDecoderFactory::CLCodecManufacture CLVideoDecoderFactory::m_codecManufact
 QnAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder(const QnCompressedVideoDataPtr data, bool mtDecoding)
 {
 
-	// h264 
-	switch(m_codecManufacture)
-	{
+    // h264 
+    switch(m_codecManufacture)
+    {
 #ifdef Q_OS_WIN
-	case INTELIPP:
-		return new IPPH264Decoder();
-	    break;
+    case INTELIPP:
+        return new IPPH264Decoder();
+        break;
 #endif
-	case FFMPEG:
-	default:
-		return new CLFFmpegVideoDecoder(data->compressionType, data, mtDecoding);
-	    break;
-	}
+    case FFMPEG:
+    default:
+        return new CLFFmpegVideoDecoder(data->compressionType, data, mtDecoding);
+        break;
+    }
 
-	return 0;
+    return 0;
 }
 
 void QnAbstractVideoDecoder::setTryHardwareAcceleration(bool tryHardwareAcceleration)

@@ -5,6 +5,8 @@
 
 #include <core/datapacket/mediadatapacket.h> /* For QnMetaDataV1Ptr. */
 #include <core/resource/motion_window.h>
+#include <core/resource/media_resource.h>
+
 
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
