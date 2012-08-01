@@ -5,8 +5,6 @@
 #include "../sony/sony_resource.h"
 
 const char* OnvifResourceInformationFetcher::ONVIF_RT = "ONVIF";
-std::string& OnvifResourceInformationFetcher::STD_ONVIF_USER = *(new std::string("admin"));
-std::string& OnvifResourceInformationFetcher::STD_ONVIF_PASSWORD = *(new std::string("admin"));
 
 
 OnvifResourceInformationFetcher::OnvifResourceInformationFetcher():
@@ -182,17 +180,17 @@ const bool OnvifResourceInformationFetcher::isMacAlreadyExists(const QString& ma
     return false;
 }
 
-const QString OnvifResourceInformationFetcher::fetchName(const DeviceInfoResp& response) const
+QString OnvifResourceInformationFetcher::fetchName(const DeviceInfoResp& response) const
 {
     return QString::fromStdString(response.Model);
 }
 
-const QString OnvifResourceInformationFetcher::fetchManufacturer(const DeviceInfoResp& response) const
+QString OnvifResourceInformationFetcher::fetchManufacturer(const DeviceInfoResp& response) const
 {
     return QString::fromStdString(response.Manufacturer);
 }
 
-const QString OnvifResourceInformationFetcher::fetchSerial(const DeviceInfoResp& response) const
+QString OnvifResourceInformationFetcher::fetchSerial(const DeviceInfoResp& response) const
 {
     //TODO:UTF unuse std::string
     return response.HardwareId.empty()

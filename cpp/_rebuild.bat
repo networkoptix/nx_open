@@ -8,4 +8,4 @@ if not [%1] == [] set CUSTOMIZATION=-Dcustomization=%INPUT%
 
 @echo on
 
-mvn clean install %CUSTOMIZATION%
+mvn clean install -U %CUSTOMIZATION%
