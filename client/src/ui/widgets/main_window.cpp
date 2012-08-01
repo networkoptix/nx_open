@@ -455,6 +455,10 @@ void QnMainWindow::updateTitleBarDraggable() {
     }
 }
 
+bool QnMainWindow::isTabBar(const QPoint &pos) const {
+    return pos.y() <= m_tabBar->mapTo(const_cast<QnMainWindow *>(this), m_tabBar->rect().bottomRight()).y();
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -469,10 +473,10 @@ bool QnMainWindow::event(QEvent *event) {
         menu()->trigger(Qn::MainMenuAction);
         return true;
     case QEvent::NonClientAreaMouseButtonRelease:
-        ncMouseReleaseEvent(static_cast<QMouseEvent *>(event));
+        mouseReleaseEvent(static_cast<QMouseEvent *>(event));
         break;
     case QEvent::NonClientAreaMouseButtonDblClick:
-        ncMouseDoubleClickEvent(static_cast<QMouseEvent *>(event));
+        mouseDoubleClickEvent(static_cast<QMouseEvent *>(event));
         break;
     default:
         break;
@@ -484,25 +488,24 @@ bool QnMainWindow::event(QEvent *event) {
     return result;
 }
 
-void QnMainWindow::ncMouseReleaseEvent(QMouseEvent *event) {
-    if(event->button() != Qt::RightButton)
-        return;
+void QnMainWindow::mouseReleaseEvent(QMouseEvent *event) {
+    base_type::mousePressEvent(event);
 
-    if(event->pos().y() > m_tabBar->mapTo(this, m_tabBar->rect().bottomRight()).y())
-        return;
-
-    QContextMenuEvent e(QContextMenuEvent::Mouse, m_tabBar->mapFrom(this, event->pos()), event->globalPos(), event->modifiers());
-    QApplication::sendEvent(m_tabBar, &e);
+    if(event->button() == Qt::RightButton && isTabBar(event->pos()) && !childAt(event->pos())) {
+        QContextMenuEvent e(QContextMenuEvent::Mouse, m_tabBar->mapFrom(this, event->pos()), event->globalPos(), event->modifiers());
+        QApplication::sendEvent(m_tabBar, &e);
+        event->accept();
+    }
 }
 
-void QnMainWindow::ncMouseDoubleClickEvent(QMouseEvent *event) {
-    if(event->button() != Qt::LeftButton)
-        return;
+void QnMainWindow::mouseDoubleClickEvent(QMouseEvent *event) {
+    base_type::mouseDoubleClickEvent(event);
 
-    if(event->pos().y() > m_tabBar->mapTo(this, m_tabBar->rect().bottomRight()).y())
-        return;
+    if(event->button() == Qt::LeftButton && isTabBar(event->pos()) && !childAt(event->pos())) {
+        toggleFullScreen();
 
-    toggleFullScreen();
+        event->accept();
+    }
 }
 
 void QnMainWindow::changeEvent(QEvent *event) {

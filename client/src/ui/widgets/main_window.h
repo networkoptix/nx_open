@@ -61,15 +61,14 @@ protected:
     virtual void dragMoveEvent(QDragMoveEvent *event) override;
     virtual void dragLeaveEvent(QDragLeaveEvent *event) override;
     virtual void dropEvent(QDropEvent *event) override;
-
-    void ncMouseReleaseEvent(QMouseEvent *event);
-    void ncMouseDoubleClickEvent(QMouseEvent *event);
+    virtual void mouseReleaseEvent(QMouseEvent *event) override;
+    virtual void mouseDoubleClickEvent(QMouseEvent *event) override;
 
 #ifdef Q_OS_WIN
     virtual bool winEvent(MSG *message, long *result) override;
 #endif
 
-    bool canAutoDelete(const QnResourcePtr &resource) const;
+    bool isTabBar(const QPoint &pos) const;
 
 protected slots:
     void setTitleVisible(bool visible);
