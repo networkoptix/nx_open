@@ -311,6 +311,8 @@ bool QnPlOnvifResource::initInternal()
 
     save();
 
+    testCameraSettings();
+
     return true;
 }
 
@@ -513,7 +515,6 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
     QAuthenticator auth(getAuth());
     //TODO:UTF unuse StdString
     DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), auth.user().toStdString(), auth.password().toStdString());
-    ImagingSoapWrapper soapWrapper2(getDeviceOnvifUrl().toStdString(), auth.user().toStdString(), auth.password().toStdString());
 
     //Trying to get name
     {
@@ -1415,4 +1416,45 @@ bool QnPlOnvifResource::forcePrimaryEncoderCodec() const
 bool QnPlOnvifResource::setSpecialParam(const QString& name, const QVariant& val, QnDomain domain)
 {
     return false;
+}
+
+void QnPlOnvifResource::testCameraSettings() const
+{
+    QString capabilitiesUrl;
+    QAuthenticator auth(getAuth());
+
+    {
+        DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString());
+
+        CapabilitiesReq request;
+        CapabilitiesResp response;
+
+        int soapRes = soapWrapper.getCapabilities(request, response);
+        if (soapRes != SOAP_OK) {
+            qDebug() << "OnvifResourceInformationFetcher::findResources: can't fetch media and device URLs. Reason: SOAP to endpoint "
+                << soapWrapper.getEndpointUrl() << " failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
+
+        } else if (response.Capabilities && response.Capabilities->Imaging) {
+            capabilitiesUrl = QString::fromStdString(response.Capabilities->Imaging->XAddr);
+        }
+    }
+
+    if (capabilitiesUrl.isEmpty()) {
+        capabilitiesUrl = QLatin1String("http://192.168.0.123:8032/onvif/imaging_service");
+        //return;
+    }
+
+    {
+        ImagingSoapWrapper soapWrapper(capabilitiesUrl.toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString());
+
+        ImagingOptionsReq request;
+        //request.VideoSourceToken = getVideoSourceId().toStdString();
+        ImagingOptionsResp response;
+
+        int soapRes = soapWrapper.getOptions(request, response);
+        if (soapRes != SOAP_OK) {
+            qDebug() << "OnvifResourceInformationFetcher::testCameraSettings: can't fetch imaging options. Reason: SOAP to endpoint "
+                << soapWrapper.getEndpointUrl() << " failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
+        }
+    }
 }

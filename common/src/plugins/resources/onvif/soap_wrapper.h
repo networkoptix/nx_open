@@ -112,6 +112,13 @@ typedef _onvifMedia__SetVideoSourceConfiguration SetVideoSrcConfigReq;
 typedef _onvifMedia__SetVideoSourceConfigurationResponse SetVideoSrcConfigResp;
 
 
+class _onvifImg__GetOptions;
+class _onvifImg__GetOptionsResponse;
+
+typedef _onvifImg__GetOptions ImagingOptionsReq;
+typedef _onvifImg__GetOptionsResponse ImagingOptionsResp;
+
+
 //
 // SoapWrapper
 //
@@ -255,6 +262,8 @@ public:
 
     ImagingSoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd);
     virtual ~ImagingSoapWrapper();
+
+    int getOptions(ImagingOptionsReq& request, ImagingOptionsResp& response);
 
 private:
     ImagingSoapWrapper();

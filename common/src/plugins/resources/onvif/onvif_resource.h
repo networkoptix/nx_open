@@ -164,7 +164,8 @@ private:
     void setMinMaxQuality(int min, int max);
 
     void save();
-	
+    void testCameraSettings() const;
+
 	int round(float value);
     ResolutionPair getNearestResolutionForSecondary(const ResolutionPair& resolution, float aspectRatio) const;
     ResolutionPair getNearestResolution(const ResolutionPair& resolution, float aspectRatio, double maxResolutionSquare) const;

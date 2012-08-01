@@ -419,6 +419,13 @@ ImagingSoapWrapper::~ImagingSoapWrapper()
 
 }
 
+int ImagingSoapWrapper::getOptions(ImagingOptionsReq& request, ImagingOptionsResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->GetOptions(m_endpoint, NULL, &request, &response);
+}
+
+
 //
 // Explicit instantiating
 //
