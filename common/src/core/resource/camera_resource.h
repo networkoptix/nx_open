@@ -31,7 +31,7 @@ class QN_EXPORT QnPhysicalCameraResource : virtual public QnVirtualCameraResourc
 {
     Q_OBJECT
 public:
-	QnPhysicalCameraResource();
+    QnPhysicalCameraResource();
 
     // returns 0 if primary stream does not exist
     int getPrimaryStreamDesiredFps() const;

@@ -198,29 +198,29 @@ bool QnArchiveStreamReader::init()
 {
     setCurrentTime(0);
 
-	m_jumpMtx.lock();
-	qint64 requiredJumpTime = m_requiredJumpTime;
-	m_jumpMtx.unlock();
+    m_jumpMtx.lock();
+    qint64 requiredJumpTime = m_requiredJumpTime;
+    m_jumpMtx.unlock();
     if (requiredJumpTime != AV_NOPTS_VALUE) 
-	{
-		while (1)
-		{
-			if (m_delegate->seek(requiredJumpTime, false) > 0) 
-			{
-				m_jumpMtx.lock();
-				if (m_requiredJumpTime == requiredJumpTime) {
-					m_requiredJumpTime = AV_NOPTS_VALUE;
-					m_jumpMtx.unlock();
-					emit jumpOccured(requiredJumpTime);
-				}
-				else {
-					requiredJumpTime = m_requiredJumpTime;
-					m_jumpMtx.unlock();
-					continue; // race condition, jump to new position again
-				}
-			}
-			break;
-		}
+    {
+        while (1)
+        {
+            if (m_delegate->seek(requiredJumpTime, false) > 0) 
+            {
+                m_jumpMtx.lock();
+                if (m_requiredJumpTime == requiredJumpTime) {
+                    m_requiredJumpTime = AV_NOPTS_VALUE;
+                    m_jumpMtx.unlock();
+                    emit jumpOccured(requiredJumpTime);
+                }
+                else {
+                    requiredJumpTime = m_requiredJumpTime;
+                    m_jumpMtx.unlock();
+                    continue; // race condition, jump to new position again
+                }
+            }
+            break;
+        }
     }
 
     if (!m_delegate->open(m_resource))
@@ -365,8 +365,8 @@ begin_label:
             qint64 displayTime = determineDisplayTime(reverseMode);
             if (displayTime != AV_NOPTS_VALUE) {
                 beforeJumpInternal(displayTime);
-				if (!exactJumpToSpecifiedFrame && channelCount > 1)
-                	setNeedKeyData();
+                if (!exactJumpToSpecifiedFrame && channelCount > 1)
+                    setNeedKeyData();
                 internalJumpTo(displayTime);
                 setSkipFramesToTime(displayTime, false);
 
@@ -515,7 +515,7 @@ begin_label:
                 m_eof = false;
             }
 
-			// Limitation for duration of the first GOP after reverse mode activation
+            // Limitation for duration of the first GOP after reverse mode activation
             if (m_afterBOFCounter != -1)
             {
                 if (m_afterBOFCounter == 0 && m_currentTime == INT64_MAX) 
@@ -935,7 +935,7 @@ bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
     if (needJump)
     {
         QMutexLocker mutex(&m_jumpMtx);
-		beforeJumpInternal(newTime);
+        beforeJumpInternal(newTime);
         channeljumpToUnsync(newTime, 0, skipTime);
     }
 
@@ -946,10 +946,10 @@ bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
 
 void QnArchiveStreamReader::beforeJumpInternal(qint64 mksec)
 {
-	if (m_requiredJumpTime != AV_NOPTS_VALUE)
-		emit jumpCanceled(m_requiredJumpTime);
-	emit beforeJump(mksec);
-	m_delegate->beforeSeek(mksec);
+    if (m_requiredJumpTime != AV_NOPTS_VALUE)
+        emit jumpCanceled(m_requiredJumpTime);
+    emit beforeJump(mksec);
+    m_delegate->beforeSeek(mksec);
 }
 
 bool QnArchiveStreamReader::setSendMotion(bool value)

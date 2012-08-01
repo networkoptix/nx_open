@@ -281,7 +281,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     m_dragIsClick(false),
     m_selecting(false),
     m_dragMarker(NoMarker),
-	m_lineCount(0),
+    m_lineCount(0),
     m_totalLineStretch(0.0),
     m_rulerHeight(0.0),
     m_prefferedHeight(0.0),

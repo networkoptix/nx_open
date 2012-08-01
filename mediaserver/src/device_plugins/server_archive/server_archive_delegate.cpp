@@ -194,10 +194,10 @@ bool QnServerArchiveDelegate::getNextChunk(DeviceFileCatalog::Chunk& chunk, Devi
 {
     if (m_currentChunk.durationMs == -1)
         m_currentChunkCatalog->updateChunkDuration(m_currentChunk); // may be opened chunk already closed. Update duration if needed
-	if (m_currentChunk.durationMs == -1) {
-		m_eof = true;
+    if (m_currentChunk.durationMs == -1) {
+        m_eof = true;
         return false;
-	}
+    }
     m_skipFramesToTime = m_currentChunk.endTimeMs()*1000;
     m_dialQualityHelper.findDataForTime(m_currentChunk.endTimeMs(), chunk, chunkCatalog, DeviceFileCatalog::OnRecordHole_NextChunk);
     return chunk.startTimeMs > m_currentChunk.startTimeMs || 

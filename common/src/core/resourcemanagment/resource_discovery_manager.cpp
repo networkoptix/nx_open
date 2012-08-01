@@ -616,7 +616,7 @@ void QnResourceDiscoveryManager::markOfflineIfNeeded()
         /*
         if (ldt.secsTo(currentT) > 120 && !netRes->hasRunningLiveProvider()) // if resource is not discovered last 30 sec
         {
-			res->setStatus(QnResource::Offline);
+            res->setStatus(QnResource::Offline);
         }
         /**/
 
@@ -640,7 +640,7 @@ void QnResourceDiscoveryManager::updateResourceStatus(QnResourcePtr res)
             if (rpNetRes->getLastStatusUpdateTime().msecsTo(qnSyncTime->currentDateTime()) > 30) // if resource with OK ip seems to be found; I do it coz if there is no readers and camera was offline and now online => status needs to be changed
             {
                 rpNetRes->initAsync();
-				//rpNetRes->setStatus(QnResource::Online);
+                //rpNetRes->setStatus(QnResource::Online);
             }
 
         }
@@ -735,7 +735,7 @@ void QnResourceDiscoveryManager::resovle_conflicts(QnResourceList& resourceList,
 
         if (!getNextAvailableAddr(subnet, busy_list))
         {
-            *ip_finished = true;			// no more FREE ip left ?
+            *ip_finished = true;            // no more FREE ip left ?
             cl_log.log("No more available IP!!", cl_logERROR);
             break;
         }

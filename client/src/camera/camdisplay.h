@@ -22,19 +22,19 @@ class CLCamDisplay : public QnAbstractDataConsumer, public QnlTimeSource
 {
     Q_OBJECT
 public:
-	CLCamDisplay(bool generateEndOfStreamSignal);
-	~CLCamDisplay();
+    CLCamDisplay(bool generateEndOfStreamSignal);
+    ~CLCamDisplay();
 
-	void addVideoChannel(int index, QnAbstractRenderer* vw, bool can_downsacle);
-	virtual bool processData(QnAbstractDataPacketPtr data);
+    void addVideoChannel(int index, QnAbstractRenderer* vw, bool can_downsacle);
+    virtual bool processData(QnAbstractDataPacketPtr data);
 
-	void pause();
-	void resume();
+    void pause();
+    void resume();
 
-	void setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val);
+    void setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val);
 
-	bool display(QnCompressedVideoDataPtr vd, bool sleep, float speed);
-	void playAudio(bool play);
+    bool display(QnCompressedVideoDataPtr vd, bool sleep, float speed);
+    void playAudio(bool play);
     void setSpeed(float speed);
     float getSpeed() const;
 
@@ -42,9 +42,9 @@ public:
     // schedule - coz I do not want to introduce mutexes
     //I assume that first incoming frame after jump is keyframe
 
-	/**
-	 * \returns                         Current time in microseconds.
-	 */
+    /**
+     * \returns                         Current time in microseconds.
+     */
 
     virtual qint64 getCurrentTime() const;
     virtual qint64 getDisplayedTime() const;
@@ -82,17 +82,17 @@ signals:
     void stillImageChanged();
 
 protected:
-	bool haveAudio(float speed) const;
+    bool haveAudio(float speed) const;
 
-	// puts in in queue and returns first in queue
-	QnCompressedVideoDataPtr nextInOutVideodata(QnCompressedVideoDataPtr incoming, int channel);
+    // puts in in queue and returns first in queue
+    QnCompressedVideoDataPtr nextInOutVideodata(QnCompressedVideoDataPtr incoming, int channel);
 
     // this function doest not changes any quues; it just returns time of next frame been displayed
     quint64 nextVideoImageTime(QnCompressedVideoDataPtr incoming, int channel) const;
 
     quint64 nextVideoImageTime(int channel) const;
 
-	void clearVideoQueue();
+    void clearVideoQueue();
     void enqueueVideo(QnCompressedVideoDataPtr vd);
     QnCompressedVideoDataPtr dequeueVideo(int channel);
     bool isAudioHoleDetected(QnCompressedVideoDataPtr vd);
@@ -113,17 +113,17 @@ private:
     void setAudioBufferSize(int bufferSize, int prebufferMs);
 protected:
     CLVideoStreamDisplay* m_display[CL_MAX_CHANNELS];
-	QQueue<QnCompressedVideoDataPtr> m_videoQueue[CL_MAX_CHANNELS];
+    QQueue<QnCompressedVideoDataPtr> m_videoQueue[CL_MAX_CHANNELS];
 
-	CLAudioStreamDisplay* m_audioDisplay;
+    CLAudioStreamDisplay* m_audioDisplay;
 
-	QnAdaptiveSleep m_delay;
+    QnAdaptiveSleep m_delay;
 
-	bool m_playAudioSet;
+    bool m_playAudioSet;
     float m_speed;
     float m_prevSpeed;
 
-	bool m_playAudio;
+    bool m_playAudio;
     bool m_needChangePriority;
 
     /**
@@ -153,8 +153,8 @@ protected:
     bool mGenerateEndOfStreamSignal;
 
     bool m_isRealTimeSource;
-	QnAudioFormat m_expectedAudioFormat;
-	QMutex m_audioChangeMutex;
+    QnAudioFormat m_expectedAudioFormat;
+    QMutex m_audioChangeMutex;
     bool m_videoBufferOverflow;
     bool m_singleShotMode;
     bool m_singleShotQuantProcessed;

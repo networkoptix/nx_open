@@ -21,13 +21,13 @@ struct MpegEncContext;
 class CLFFmpegVideoDecoder : public QnAbstractVideoDecoder
 {
 public:
-	CLFFmpegVideoDecoder(CodecID codec, const QnCompressedVideoDataPtr data, bool mtDecoding);
+    CLFFmpegVideoDecoder(CodecID codec, const QnCompressedVideoDataPtr data, bool mtDecoding);
     bool decode(const QnCompressedVideoDataPtr data, CLVideoDecoderOutput* outFrame);
-	~CLFFmpegVideoDecoder();
+    ~CLFFmpegVideoDecoder();
 
-	void showMotion(bool show);
+    void showMotion(bool show);
 
-	virtual void setLightCpuMode(DecodeMode val);
+    virtual void setLightCpuMode(DecodeMode val);
 
     static bool isHardwareAccellerationPossible(CodecID codecId, int width, int height)
     {
@@ -58,32 +58,32 @@ private:
     AVCodecContext *m_passedContext;
 
     static int hwcounter;
-	AVCodec *m_codec;
-	AVCodecContext *m_context;
+    AVCodec *m_codec;
+    AVCodecContext *m_context;
 
-	AVFrame *m_frame;
+    AVFrame *m_frame;
     QImage m_tmpImg;
     CLVideoDecoderOutput m_tmpQtFrame;
 
-	
-	AVFrame *m_deinterlacedFrame;
+    
+    AVFrame *m_deinterlacedFrame;
 
 #ifdef _USE_DXVA
     DecoderContext m_decoderContext;
 #endif
 
-	int m_width;
-	int m_height;
+    int m_width;
+    int m_height;
 
-	static bool m_first_instance;
-	CodecID m_codecId;
-	bool m_showmotion;
-	QnAbstractVideoDecoder::DecodeMode m_decodeMode;
-	QnAbstractVideoDecoder::DecodeMode m_newDecodeMode;
+    static bool m_first_instance;
+    CodecID m_codecId;
+    bool m_showmotion;
+    QnAbstractVideoDecoder::DecodeMode m_decodeMode;
+    QnAbstractVideoDecoder::DecodeMode m_newDecodeMode;
 
-	unsigned int m_lightModeFrameCounter;
+    unsigned int m_lightModeFrameCounter;
     FrameTypeExtractor* m_frameTypeExtractor;
-	quint8* m_deinterlaceBuffer;
+    quint8* m_deinterlaceBuffer;
     bool m_usedQtImage;
 
     int m_currentWidth;

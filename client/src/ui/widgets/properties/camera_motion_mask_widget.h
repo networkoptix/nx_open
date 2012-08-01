@@ -27,7 +27,7 @@ public:
     virtual ~QnCameraMotionMaskWidget();
 
     const QnResourcePtr &camera() const;
-	void setCamera(const QnResourcePtr &resource);
+    void setCamera(const QnResourcePtr &resource);
 
     const QList<QnMotionRegion> &motionRegionList() const;
 

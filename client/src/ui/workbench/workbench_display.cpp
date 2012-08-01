@@ -138,7 +138,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_curtainAnimator(NULL),
     m_frontZ(0.0),
     m_dummyScene(new QGraphicsScene(this)),
-	m_streamSynchronizer(NULL),
+    m_streamSynchronizer(NULL),
     m_frameOpacity(1.0),
     m_frameWidthsDirty(false),
     m_zoomedMarginFlags(0),

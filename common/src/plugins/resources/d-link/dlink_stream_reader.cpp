@@ -72,7 +72,7 @@ void PlDlinkStreamReader::openStream()
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
-		getResource()->setStatus(QnResource::Unauthorized);
+        getResource()->setStatus(QnResource::Unauthorized);
         return;
     }
 
@@ -440,7 +440,7 @@ QnMetaDataV1Ptr PlDlinkStreamReader::getCameraMetadata()
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
-		res->setStatus(QnResource::Unauthorized);
+        res->setStatus(QnResource::Unauthorized);
         return QnMetaDataV1Ptr(0);
     }
 

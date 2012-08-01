@@ -381,17 +381,17 @@ bool RTPSession::open(const QString& url)
     m_tcpSock.setReadTimeOut(m_tcpTimeout);
     m_tcpSock.setWriteTimeOut(m_tcpTimeout);
 
-	if (!sendDescribe()) {
-		m_tcpSock.close();
+    if (!sendDescribe()) {
+        m_tcpSock.close();
         return false;
-	}
+    }
 
     QByteArray response;
 
-	if (!readTextResponce(response)) {
-		m_tcpSock.close();
+    if (!readTextResponce(response)) {
+        m_tcpSock.close();
         return false;
-	}
+    }
 
     // check digest authentication here
     if (!checkIfDigestAuthIsneeded(response))
@@ -427,18 +427,18 @@ bool RTPSession::open(const QString& url)
 
     int sdp_index = response.indexOf(QLatin1String("\r\n\r\n"));
 
-	if (sdp_index  < 0 || sdp_index+4 >= response.size()) {
-		m_tcpSock.close();
+    if (sdp_index  < 0 || sdp_index+4 >= response.size()) {
+        m_tcpSock.close();
         return false;
-	}
+    }
 
     m_sdp = response.mid(sdp_index+4);
     parseSDP();
 
-	if (m_sdpTracks.size()<=0) {
-		m_tcpSock.close();
+    if (m_sdpTracks.size()<=0) {
+        m_tcpSock.close();
         return false;
-	}
+    }
 
     return true;
 }

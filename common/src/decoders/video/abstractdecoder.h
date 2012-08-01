@@ -11,9 +11,9 @@ public:
     // for movies: full = IPB, fast == IP only, fastest = I only
     enum DecodeMode {DecodeMode_NotDefined, DecodeMode_Full, DecodeMode_Fast, DecodeMode_Fastest};
 
-	explicit QnAbstractVideoDecoder();
+    explicit QnAbstractVideoDecoder();
 
-	virtual ~QnAbstractVideoDecoder(){};
+    virtual ~QnAbstractVideoDecoder(){};
 
     virtual PixelFormat GetPixelFormat() { return PIX_FMT_NONE; }
 
@@ -23,9 +23,9 @@ public:
       */
     virtual bool decode(const QnCompressedVideoDataPtr data, CLVideoDecoderOutput* outFrame) = 0;
 
-	virtual void showMotion(bool show ) = 0;
+    virtual void showMotion(bool show ) = 0;
 
-	virtual void setLightCpuMode(DecodeMode val) = 0;
+    virtual void setLightCpuMode(DecodeMode val) = 0;
 
     virtual void setMTDecoding(bool value)
     {
@@ -52,8 +52,8 @@ public:
     virtual const AVFrame* lastFrame() { return 0; }
     virtual void resetDecoder(QnCompressedVideoDataPtr data) {}
 private:
-	QnAbstractVideoDecoder(const QnAbstractVideoDecoder&) {}
-	QnAbstractVideoDecoder& operator=(const QnAbstractVideoDecoder&) { return *this; }
+    QnAbstractVideoDecoder(const QnAbstractVideoDecoder&) {}
+    QnAbstractVideoDecoder& operator=(const QnAbstractVideoDecoder&) { return *this; }
 
 protected:
     bool m_tryHardwareAcceleration;
@@ -66,14 +66,14 @@ protected:
 class CLVideoDecoderFactory
 {
 public:
-	enum CLCodecManufacture{FFMPEG, INTELIPP};
-	static QnAbstractVideoDecoder* createDecoder(const QnCompressedVideoDataPtr data, bool mtDecoding);
-	static void setCodecManufacture(CLCodecManufacture codecman)
-	{
-		m_codecManufacture = codecman;
-	}
+    enum CLCodecManufacture{FFMPEG, INTELIPP};
+    static QnAbstractVideoDecoder* createDecoder(const QnCompressedVideoDataPtr data, bool mtDecoding);
+    static void setCodecManufacture(CLCodecManufacture codecman)
+    {
+        m_codecManufacture = codecman;
+    }
 private:
-	static CLCodecManufacture m_codecManufacture;
+    static CLCodecManufacture m_codecManufacture;
 };
 
 #endif //clabstractdecoder_h_2155

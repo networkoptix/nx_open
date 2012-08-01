@@ -155,7 +155,7 @@ void QnResourcePool::addResources(const QnResourceList &resources)
     {
         connect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)), this, SLOT(handleStatusChange()), Qt::QueuedConnection);
         connect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)), this, SLOT(handleResourceChange()), Qt::QueuedConnection);
-		connect(resource.data(), SIGNAL(disabledChanged(bool, bool)), this, SLOT(handleResourceChange()), Qt::QueuedConnection);
+        connect(resource.data(), SIGNAL(disabledChanged(bool, bool)), this, SLOT(handleResourceChange()), Qt::QueuedConnection);
         connect(resource.data(), SIGNAL(resourceChanged()), this, SLOT(handleResourceChange()), Qt::QueuedConnection);
 
         if (resource->getStatus() != QnResource::Offline && !resource->isDisabled())
@@ -374,7 +374,7 @@ int QnResourcePool::activeCameras() const
         if (!camera)
             continue;
 
-		if (!camera->isDisabled() && !camera->isScheduleDisabled())
+        if (!camera->isDisabled() && !camera->isScheduleDisabled())
             count++;
     }
 

@@ -39,9 +39,9 @@ public:
         return hasPixmap(QLatin1String(name));
     }
 
-    QPixmap	pixmap(const QIcon &icon, const QSize &size, QIcon::Mode mode = Normal, QIcon::State state = Off) const;
-    QPixmap	pixmap(const QIcon &icon, int w, int h, QIcon::Mode mode = Normal, QIcon::State state = Off) const;
-    QPixmap	pixmap(const QIcon &icon, int extent, QIcon::Mode mode = Normal, QIcon::State state = Off) const;
+    QPixmap pixmap(const QIcon &icon, const QSize &size, QIcon::Mode mode = Normal, QIcon::State state = Off) const;
+    QPixmap pixmap(const QIcon &icon, int w, int h, QIcon::Mode mode = Normal, QIcon::State state = Off) const;
+    QPixmap pixmap(const QIcon &icon, int extent, QIcon::Mode mode = Normal, QIcon::State state = Off) const;
 
     QStyle *style();
 

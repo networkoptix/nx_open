@@ -14,7 +14,7 @@ protected:
 public:
     
 
-	~QnMdnsResourceSearcher();
+    ~QnMdnsResourceSearcher();
 
     bool isProxy() const;
 

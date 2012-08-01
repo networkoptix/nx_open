@@ -62,7 +62,7 @@ public:
 
     /* We don't really satisfy the requirements of a random access iterator, 
      * but we implement the interface. */
-    typedef	std::random_access_iterator_tag     iterator_category; 
+    typedef std::random_access_iterator_tag     iterator_category; 
 
     typedef qint64                              value_type;
     typedef qint64                              difference_type;
