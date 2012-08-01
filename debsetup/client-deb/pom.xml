@@ -9,7 +9,7 @@
 	<parent>
 		<artifactId>debsetup</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>1.2.0</version>
+		<version>1.2.2</version>
 		<relativePath>..</relativePath>
 	</parent>
 
