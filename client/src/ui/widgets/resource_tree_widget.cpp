@@ -621,7 +621,7 @@ void QnResourceTreeWidget::at_treeView_doubleClicked(const QModelIndex &index) {
 
     if (resource && 
         !(resource->flags() & QnResource::layout) &&    /* Layouts cannot be activated by double clicking. */
-        !(resource->flags() && QnResource::server))     /* Bug #1009: Servers should not be activated by double clicking. */
+        !(resource->flags() & QnResource::server))      /* Bug #1009: Servers should not be activated by double clicking. */
         emit activated(resource);
 }
 
