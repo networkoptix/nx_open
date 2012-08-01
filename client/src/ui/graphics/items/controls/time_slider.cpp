@@ -1132,6 +1132,9 @@ void QnTimeSlider::updateThumbnailsStepSize(bool instant, bool forced) {
     
     /* Calculate new bounding size. */
     int boundingHeigth = qRound(thumbnailsHeight());
+    if(boundingHeigth < thumbnailHeightForDrawing)
+        boundingHeigth = 0;
+
     QSize boundingSize = QSize(boundingHeigth * 256, boundingHeigth);
     bool boundingSizeChanged = thumbnailsLoader()->boundingSize() != boundingSize;
 

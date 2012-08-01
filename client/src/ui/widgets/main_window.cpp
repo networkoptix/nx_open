@@ -101,7 +101,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_dwm = new QnDwm(this);
 
     connect(m_dwm,                          SIGNAL(compositionChanged(bool)),               this,                                   SLOT(updateDwmState()));
-    connect(m_dwm,                          SIGNAL(titleBarDoubleClicked()),                this,                                   SLOT(toggleFullScreen()));
 
     /* Set up properties. */
     setWindowTitle(QApplication::applicationName());
@@ -367,7 +366,6 @@ void QnMainWindow::updateDwmState() {
         m_dwm->extendFrameIntoClientArea(QMargins(0, 0, 0, 0));
         m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 0));
         m_dwm->disableBlurBehindWindow();
-        m_dwm->enableDoubleClickProcessing();
 
         m_dwm->enableFrameEmulation();
         m_dwm->setEmulatedFrameMargins(QMargins(0, 0, 0, 0));
@@ -401,7 +399,6 @@ void QnMainWindow::updateDwmState() {
         m_dwm->extendFrameIntoClientArea();
         m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 0));
         m_dwm->enableBlurBehindWindow(); /* For reasons unknown, this call is needed to prevent display artifacts. */
-        m_dwm->enableDoubleClickProcessing();
 
         m_dwm->enableFrameEmulation();
         m_dwm->setEmulatedFrameMargins(frameMargins);
@@ -431,7 +428,6 @@ void QnMainWindow::updateDwmState() {
         m_dwm->extendFrameIntoClientArea(QMargins(0, 0, 0, 0));
         m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 0));
         m_dwm->disableBlurBehindWindow();
-        m_dwm->enableDoubleClickProcessing();
 
         m_dwm->enableFrameEmulation();
         m_dwm->setEmulatedFrameMargins(frameMargins);
@@ -466,11 +462,18 @@ void QnMainWindow::updateTitleBarDraggable() {
 bool QnMainWindow::event(QEvent *event) {
     bool result = base_type::event(event);
 
-    if(event->type() == QnSystemMenuEvent::SystemMenu) {
+    switch(event->type()) {
+    case QnSystemMenuEvent::SystemMenu:
         menu()->trigger(Qn::MainMenuAction);
         return true;
-    } else if(event->type() == QEvent::NonClientAreaMouseButtonRelease) {
+    case QEvent::NonClientAreaMouseButtonRelease:
         ncMouseReleaseEvent(static_cast<QMouseEvent *>(event));
+        break;
+    case QEvent::NonClientAreaMouseButtonDblClick:
+        ncMouseDoubleClickEvent(static_cast<QMouseEvent *>(event));
+        break;
+    default:
+        break;
     }
 
     if(m_dwm != NULL)
@@ -488,6 +491,16 @@ void QnMainWindow::ncMouseReleaseEvent(QMouseEvent *event) {
 
     QContextMenuEvent e(QContextMenuEvent::Mouse, m_tabBar->mapFrom(this, event->pos()), event->globalPos(), event->modifiers());
     QApplication::sendEvent(m_tabBar, &e);
+}
+
+void QnMainWindow::ncMouseDoubleClickEvent(QMouseEvent *event) {
+    if(event->button() != Qt::LeftButton)
+        return;
+
+    if(event->pos().y() > m_tabBar->mapTo(this, m_tabBar->rect().bottomRight()).y())
+        return;
+
+    toggleFullScreen();
 }
 
 void QnMainWindow::changeEvent(QEvent *event) {

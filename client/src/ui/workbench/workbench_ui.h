@@ -175,6 +175,7 @@ protected:
 
     bool isCalendarVisible() const;
     void setCalendarVisible(bool visible);
+
 protected slots:
     void updateHelpContext();
     
@@ -400,13 +401,8 @@ private:
 
     QnWorkbenchMotionDisplayWatcher *m_motionDisplayWatcher;
 
-
-
     /* Freespace-related state. */
     bool m_inFreespace;
-
-    /** Calendar state */
-    QGraphicsProxyWidget *m_calendarWidget;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchUi::Flags);

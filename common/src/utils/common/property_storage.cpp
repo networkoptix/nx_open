@@ -298,7 +298,10 @@ void QnPropertyStorage::submitValuesToSettings(QSettings *settings, const QList<
 }
 
 QVariant QnPropertyStorage::readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) {
-    return settings->value(name(id), defaultValue);
+    /* In some cases QSettings::value returns invalid QVariant even when supplied 
+     * an adequate default value. So we check it manually. */
+    QVariant value = settings->value(name(id));
+    return value.isValid() ? value : defaultValue; 
 }
 
 void QnPropertyStorage::writeValueToSettings(QSettings *settings, int id, const QVariant &value) const {
