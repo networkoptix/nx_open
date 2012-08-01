@@ -175,6 +175,7 @@ protected:
 
     bool isCalendarVisible() const;
     void setCalendarVisible(bool visible);
+
 protected slots:
     void updateHelpContext();
     

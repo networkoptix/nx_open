@@ -142,20 +142,6 @@ public:
     int emulatedTitleBarHeight() const;
 
     /**
-     * Enables or disable processing of double clicks on title bar.
-     * When enabled, double clicks can be tracked by connecting to the 
-     * <tt>titleBarDoubleClicked</tt> signal.
-     * 
-     * \param enable                    Whether double click processing is to be enabled.
-     * \returns                         Whether double click processing mode was successfully changed.
-     */
-    bool enableDoubleClickProcessing(bool enable = true);
-
-    bool disableDoubleClickProcessing(bool disable = true) {
-        return enableDoubleClickProcessing(!disable);
-    }
-
-    /**
      * Enables or disables window dragging by clicking on a title bar.
      * 
      * \param enable                    Whether dragging is to be enabled.
@@ -193,12 +179,6 @@ signals:
      * \param enabled                   Whether composition mode is enabled.
      */
     void compositionChanged(bool enabled);
-
-    /**
-     * This signal is emitted whenever the user double-clicks on widget title bar.
-     * Double click processing must be enabled.
-     */
-    void titleBarDoubleClicked();
 
 private:
     friend class QnDwmPrivate;
