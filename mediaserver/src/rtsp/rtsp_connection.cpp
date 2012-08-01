@@ -425,7 +425,7 @@ int QnRtspConnectionProcessor::composeSetup()
 
 int QnRtspConnectionProcessor::composePause()
 {
-    Q_D(QnRtspConnectionProcessor);
+    //Q_D(QnRtspConnectionProcessor);
     //if (!d->dataProvider)
     //    return CODE_NOT_FOUND;
     
@@ -456,7 +456,6 @@ qint64 QnRtspConnectionProcessor::getRtspTime()
 
 void QnRtspConnectionProcessor::extractNptTime(const QString& strValue, qint64* dst)
 {
-    Q_D(QnRtspConnectionProcessor);
     if (strValue == "now")
     {
         //*dst = getRtspTime();
