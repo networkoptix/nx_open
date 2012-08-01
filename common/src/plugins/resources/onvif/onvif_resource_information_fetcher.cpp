@@ -5,8 +5,6 @@
 #include "../sony/sony_resource.h"
 
 const char* OnvifResourceInformationFetcher::ONVIF_RT = "ONVIF";
-std::string& OnvifResourceInformationFetcher::STD_ONVIF_USER = *(new std::string("admin"));
-std::string& OnvifResourceInformationFetcher::STD_ONVIF_PASSWORD = *(new std::string("admin"));
 
 
 OnvifResourceInformationFetcher::OnvifResourceInformationFetcher():
