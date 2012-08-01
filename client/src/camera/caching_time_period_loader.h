@@ -6,6 +6,8 @@
 #include <core/resource/resource_fwd.h>
 
 #include <recording/time_period.h>
+#include <recording/time_period_list.h>
+
 
 class QnTimePeriodLoader;
 class QnMultiCameraTimePeriodLoader;

@@ -9,7 +9,8 @@ QnLocalVideoServerResource::QnLocalVideoServerResource()
     : QnResource()
 {
     //setTypeId(qnResTypePool->getResourceTypeId("", QLatin1String("LocalServer"))); // ###
-    addFlags(server | local);
+    addFlags(QnResource::server | QnResource::local);
+    removeFlags(QnResource::media);
     setName(QLatin1String("Local"));
     setStatus(Online);
 }
@@ -25,7 +26,8 @@ QnVideoServerResource::QnVideoServerResource():
     //,m_rtspListener(0)
 {
     setTypeId(qnResTypePool->getResourceTypeId(QString(), QLatin1String("Server")));
-    addFlags(server | remote);
+    addFlags(QnResource::server | QnResource::remote);
+    removeFlags(QnResource::media);
     m_primaryIFSelected = false;
 }
 
@@ -119,6 +121,7 @@ class TestConnectionTask: public QRunnable
 {
 public:
     TestConnectionTask(QnVideoServerResource* owner, const QUrl& url): m_owner(owner), m_url(url) {}
+
     void run()
     {
         QByteArray reply;
@@ -131,8 +134,8 @@ public:
         }
     }
 private:
-    QUrl m_url;
     QnVideoServerResource* m_owner;
+    QUrl m_url;
 };
 
 void QnVideoServerResource::setPrimaryIF(const QString& primaryIF)
@@ -210,5 +213,5 @@ void QnVideoServerResource::updateInner(QnResourcePtr other)
         setStorages(otherStorages);
         determineOptimalNetIF();
     }
-	determineOptimalNetIF();
+    determineOptimalNetIF();
 }

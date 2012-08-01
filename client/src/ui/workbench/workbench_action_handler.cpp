@@ -32,6 +32,8 @@
 #include <camera/camdisplay.h>
 #include <camera/camera.h>
 
+#include <recording/time_period_list.h>
+
 #include <ui/style/skin.h>
 
 #include <ui/actions/action_manager.h>
@@ -169,6 +171,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::OpenSingleLayoutAction),                 SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
     connect(action(Qn::OpenMultipleLayoutsAction),              SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
     connect(action(Qn::OpenAnyNumberOfLayoutsAction),           SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
+    connect(action(Qn::OpenNewWindowLayoutsAction),             SIGNAL(triggered()),    this,   SLOT(at_openNewWindowLayoutsAction_triggered()));
     connect(action(Qn::OpenNewTabAction),                       SIGNAL(triggered()),    this,   SLOT(at_openNewTabAction_triggered()));
     connect(action(Qn::OpenNewWindowAction),                    SIGNAL(triggered()),    this,   SLOT(at_openNewWindowAction_triggered()));
     connect(action(Qn::SaveLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_saveLayoutAction_triggered()));
@@ -200,6 +203,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::ExitAction),                             SIGNAL(triggered()),    this,   SLOT(at_exitAction_triggered()));
     connect(action(Qn::ExportTimeSelectionAction),              SIGNAL(triggered()),    this,   SLOT(at_exportTimeSelectionAction_triggered()));
     connect(action(Qn::ExportLayoutAction),                     SIGNAL(triggered()),    this,   SLOT(at_exportLayoutAction_triggered()));
+    connect(action(Qn::QuickSearchAction),                      SIGNAL(triggered()),    this,   SLOT(at_quickSearchAction_triggered()));
     connect(action(Qn::SetCurrentLayoutAspectRatio4x3Action),   SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutAspectRatio4x3Action_triggered()));
     connect(action(Qn::SetCurrentLayoutAspectRatio16x9Action),  SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutAspectRatio16x9Action_triggered()));
     connect(action(Qn::SetCurrentLayoutItemSpacing0Action),     SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing0Action_triggered()));
@@ -520,7 +524,13 @@ void QnWorkbenchActionHandler::submitDelayedDrops() {
         data.toMimeData(&mimeData);
 
         QnResourceList resources = QnWorkbenchResource::deserializeResources(&mimeData);
-        menu()->trigger(Qn::OpenInCurrentLayoutAction, resources);
+        QnResourceList layouts = QnResourceCriterion::filter<QnLayoutResource, QnResourceList>(resources);
+        if (!layouts.isEmpty()){
+            workbench()->clear();
+            menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
+        } else {
+            menu()->trigger(Qn::OpenInCurrentLayoutAction, resources);
+        }
     }
 
     m_delayedDrops.clear();
@@ -618,7 +628,7 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
         return;
     }
 
-    QnMediaResourceList resources = QnResourceCriterion::filter<QnMediaResource>(parameters.resources());
+    QnResourceList resources = QnResourceCriterion::filter<QnResource>(parameters.resources());
     if(!resources.isEmpty()) {
         addToLayout(layout, resources, !position.isNull(), position);
         return;
@@ -628,7 +638,6 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
 void QnWorkbenchActionHandler::at_openInCurrentLayoutAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
     parameters.setArgument(Qn::LayoutParameter, workbench()->currentLayout()->resource());
-
     menu()->trigger(Qn::OpenInLayoutAction, parameters);
 };
 
@@ -638,7 +647,7 @@ void QnWorkbenchActionHandler::at_openInNewLayoutAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_openInNewWindowAction_triggered() {
-    QnResourceList medias = QnResourceCriterion::filter<QnMediaResource, QnResourceList>(menu()->currentParameters(sender()).resources());
+    QnResourceList medias = QnResourceCriterion::filter<QnResource, QnResourceList>(menu()->currentParameters(sender()).resources());
     if(medias.isEmpty()) 
         return;
     
@@ -671,6 +680,28 @@ void QnWorkbenchActionHandler::at_openLayoutsAction_triggered() {
         workbench()->setCurrentLayout(layout);
     }
 }
+
+void QnWorkbenchActionHandler::at_openNewWindowLayoutsAction_triggered() {
+    QnResourceList medias = QnResourceCriterion::filter<QnLayoutResource, QnResourceList>(menu()->currentParameters(sender()).resources());
+    if(medias.isEmpty()) 
+        return;
+
+    QMimeData mimeData;
+    QnWorkbenchResource::serializeResources(medias, QnWorkbenchResource::resourceMimeTypes(), &mimeData);
+    QnMimeData data(&mimeData);
+    QByteArray serializedData;
+    QDataStream stream(&serializedData, QIODevice::WriteOnly);
+    stream << data;
+
+    QStringList arguments;
+    arguments << QLatin1String("--delayed-drop");
+    arguments << QLatin1String(serializedData.toBase64().data());
+
+    qDebug() << "args";
+    qDebug() << arguments[1];
+    openNewWindow(arguments);
+}
+
 
 void QnWorkbenchActionHandler::at_openNewTabAction_triggered() {
     QnWorkbenchLayout *layout = new QnWorkbenchLayout(this);
@@ -815,7 +846,7 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
         if(!sourceCamera)
             continue;
 
-		QString physicalId = sourceCamera->getPhysicalId();
+                QString physicalId = sourceCamera->getPhysicalId();
 
         QnVirtualCameraResourcePtr replacedCamera;
         foreach(const QnVirtualCameraResourcePtr &otherCamera, serverCameras) {
@@ -1043,12 +1074,59 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
 
 void QnWorkbenchActionHandler::at_editTagsAction_triggered() {
     QnResourcePtr resource = menu()->currentParameters(sender()).resource();
-    if(resource.isNull())
+    if(!resource)
         return;
 
     QScopedPointer<TagsEditDialog> dialog(new TagsEditDialog(QStringList() << resource->getUniqueId(), widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
+}
+
+void QnWorkbenchActionHandler::at_quickSearchAction_triggered() {
+    QnActionParameters parameters = menu()->currentParameters(sender());
+
+    QnResourcePtr resource = parameters.resource();
+    if(!resource)
+        return;
+
+    QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodParameter);
+    if(period.isEmpty())
+        return;
+
+    QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsParameter);
+    if(periods.isEmpty()) {
+        periods.push_back(period);
+    } else {
+        periods = periods.intersected(period);
+    }
+
+    const int matrixWidth = 3, matrixHeight = 3;
+    const int itemCount = matrixWidth * matrixHeight;
+
+    /* Construct and add a new layout first. */
+    QnWorkbenchLayout *layout = new QnWorkbenchLayout();
+    QList<QnWorkbenchItem *> items;
+    for(int i = 0; i < itemCount; i++) {
+        QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid());
+        item->setFlag(Qn::Pinned, true);
+        item->setGeometry(QRect(i % matrixWidth, i / matrixWidth, 1, 1));
+        layout->addItem(item);
+        items.push_back(item);
+    }
+    workbench()->setCurrentLayout(layout);
+    
+    /* Then navigate. */
+    display()->setStreamsSynchronized(NULL);
+    qint64 d = periods.duration() / itemCount;
+    QnTimePeriodListTimeIterator pos = periods.timeBegin();
+    foreach(QnWorkbenchItem *item, items) {
+        QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(display()->widget(item));
+        if(!widget)
+            continue;
+
+        widget->display()->setCurrentTimeUSec(*pos * 1000);
+        pos += d;
+    }
 }
 
 void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
@@ -1696,7 +1774,7 @@ Do you want to continue?"),
     }
 
     QString dateFormat = cameraResource ? tr("dd-mmm-yyyy hh-mm-ss") : tr("hh-mm-ss");
-	QString suggestion = networkResource ? networkResource->getPhysicalId() : QString();
+        QString suggestion = networkResource ? networkResource->getPhysicalId() : QString();
 
     QString fileName;
     QString selectedExtension;

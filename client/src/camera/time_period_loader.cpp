@@ -58,7 +58,7 @@ int QnTimePeriodLoader::load(const QnTimePeriod &timePeriod, const QList<QRegion
     /* Check whether the requested data is already loaded. */
     foreach(const QnTimePeriod &loadedPeriod, m_loadedPeriods) 
     {
-        if (loadedPeriod.containPeriod(timePeriod)) 
+        if (loadedPeriod.contains(timePeriod)) 
         {
             /* Data already loaded. */
             int handle = qn_fakeHandle.fetchAndAddAcquire(1);
@@ -74,7 +74,7 @@ int QnTimePeriodLoader::load(const QnTimePeriod &timePeriod, const QList<QRegion
     /* Check whether requested data is currently being loaded. */
     for (int i = 0; i < m_loading.size(); ++i)
     {
-        if (m_loading[i].period.containPeriod(timePeriod)) 
+        if (m_loading[i].period.contains(timePeriod)) 
         {
             int handle = qn_fakeHandle.fetchAndAddAcquire(1);
 

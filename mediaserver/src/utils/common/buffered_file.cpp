@@ -142,7 +142,7 @@ QBufferedFile::~QBufferedFile()
     close();
     qFreeAligned(m_buffer);
 }
-qint64	QBufferedFile::size () const
+qint64    QBufferedFile::size () const
 {
     if (isWritable() && m_bufferSize > 0)
         return m_totalWrited + m_bufferLen;
@@ -207,7 +207,7 @@ void QBufferedFile::close()
     }
 }
 
-qint64	QBufferedFile::readData (char * data, qint64 len )
+qint64    QBufferedFile::readData (char * data, qint64 len )
 {
     qint64 rez = m_fileEngine.read(data, len);
     if (rez > 0)
@@ -215,7 +215,7 @@ qint64	QBufferedFile::readData (char * data, qint64 len )
     return rez;
 }
 
-qint64	QBufferedFile::writeData ( const char * data, qint64 len )
+qint64    QBufferedFile::writeData ( const char * data, qint64 len )
 {
     if (m_bufferSize == 0)
         return m_fileEngine.write((char*) data, len);
@@ -295,7 +295,7 @@ bool QBufferedFile::isWritable() const
     return m_openMode & QIODevice::WriteOnly;
 }
 
-qint64	QBufferedFile::pos() const
+qint64    QBufferedFile::pos() const
 {
     return m_filePos + m_bufferPos;
 }

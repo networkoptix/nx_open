@@ -1,7 +1,7 @@
 #ifndef QN_TIME_SLIDER_H
 #define QN_TIME_SLIDER_H
 
-#include <recording/time_period.h>
+#include <recording/time_period_list.h>
 
 #include <ui/common/functors.h>
 #include <ui/graphics/items/generic/tool_tip_slider.h>

@@ -14,8 +14,8 @@ m_hostAddress(hostAddress),
 m_ip(hostAddress.toString()),
 m_timeout(timeout)
 {
-	//m_wish_blk_size = double_blk_size;
-	m_wish_blk_size  = blk_size;
+    //m_wish_blk_size = double_blk_size;
+    m_wish_blk_size  = blk_size;
     m_sock.setReadTimeOut(max(m_timeout,1000)); // minimum timeout is 1000 ms
     if (!m_sock.setDestAddr(m_ip, SERVER_TFTP_PORT))
     {
@@ -208,36 +208,36 @@ LAST_PACKET:
 
 int CLSimpleTFTPClient::form_read_request(const QString& fn, char* buff)
 {
-	buff[0] = 0; buff[1] = 1; // read request;
-	int len = 2;
-	int req_len = fn.length();
+    buff[0] = 0; buff[1] = 1; // read request;
+    int len = 2;
+    int req_len = fn.length();
 
-	memcpy(buff+len, fn.toAscii(), req_len);	len+=req_len;
-	buff[len] = 0;	len++;
+    memcpy(buff+len, fn.toAscii(), req_len);    len+=req_len;
+    buff[len] = 0;    len++;
 
-	memcpy(buff+len, "netascii", 8); len+=8;
-	buff[len] = 0;	len++;
+    memcpy(buff+len, "netascii", 8); len+=8;
+    buff[len] = 0;    len++;
 
-	memcpy(buff+len, "blksize", 7); len+=7;
-	buff[len] = 0;	len++;
+    memcpy(buff+len, "blksize", 7); len+=7;
+    buff[len] = 0;    len++;
 
-	if (m_wish_blk_size == double_blk_size)
-		memcpy(buff+len, "2904", 4); 
-	else
-		memcpy(buff+len, "1450", 4); 
+    if (m_wish_blk_size == double_blk_size)
+        memcpy(buff+len, "2904", 4); 
+    else
+        memcpy(buff+len, "1450", 4); 
 
-	len+=4;
-	buff[len] = 0;	len++;
+    len+=4;
+    buff[len] = 0;    len++;
 
-	return len;
+    return len;
 
 }
 
 int CLSimpleTFTPClient::form_ack(unsigned short blk, char* buff)
 {
-	buff[0] = 0; buff[1] = 0x04; 
-	buff[2] = blk>>8; buff[3] = blk&0xff;
+    buff[0] = 0; buff[1] = 0x04; 
+    buff[2] = blk>>8; buff[3] = blk&0xff;
 
-	return 4;
+    return 4;
 }
 

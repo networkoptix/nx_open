@@ -266,6 +266,12 @@ namespace Qn {
          */
         OpenAnyNumberOfLayoutsAction,
 
+
+        /**
+         * Opens selected layouts in a new window.
+         */
+        OpenNewWindowLayoutsAction,
+
         /**
          * Saves selected layout.
          */
@@ -498,6 +504,11 @@ namespace Qn {
          * <tt>QnTimePeriod TimePeriodParameter</tt> --- time period for quick search.
          */
         QuickSearchAction,
+
+        /**
+         * Shows/hides calendar.
+         */
+        ToggleCalendarAction,
 
 
         /* Debug actions. */

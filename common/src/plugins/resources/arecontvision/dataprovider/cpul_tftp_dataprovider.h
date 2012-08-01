@@ -12,9 +12,9 @@ class QnAbstractMediaDataPacket;
 class AVClientPullSSTFTPStreamreader : public QnPlAVClinetPullStreamReader
 {
 public:
-	explicit AVClientPullSSTFTPStreamreader(QnResourcePtr res);
+    explicit AVClientPullSSTFTPStreamreader(QnResourcePtr res);
 
-	~AVClientPullSSTFTPStreamreader();
+    ~AVClientPullSSTFTPStreamreader();
 
 protected:
 
@@ -23,13 +23,13 @@ protected:
 
 protected:
 
-	int m_last_width;
-	int m_last_height;
-	int m_last_cam_width;
-	int m_last_cam_height;
-	bool m_last_resolution;
-	unsigned int m_timeout;
-	bool m_black_white; // for dual sensor only 
+    int m_last_width;
+    int m_last_height;
+    int m_last_cam_width;
+    int m_last_cam_height;
+    bool m_last_resolution;
+    unsigned int m_timeout;
+    bool m_black_white; // for dual sensor only 
 
     bool m_panoramic;
     bool m_dualsensor;

@@ -1,5 +1,8 @@
 package pb;
 
+option java_package = "com.networkoptix.hdwitness.protobuf";
+option java_outer_classname = "CompatibilityItemProtos";
+
 message CompatibilityItem {
     required string ver1  = 1;
     required string comp1 = 2;

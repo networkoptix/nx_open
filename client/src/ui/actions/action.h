@@ -164,6 +164,20 @@ public:
      */
     Qn::ActionVisibility checkCondition(Qn::ActionScopes scope, const QnActionParameters &parameters) const;
 
+    void addConditionalText(QnActionCondition *condition, const QString &text);
+
+    /**
+     * \returns true if there is at least one conditional text
+    */
+    bool hasConditionalTexts();
+
+    /**
+     * \param parameters                Parameters for action execution.
+     * \returns                         New text if condition is executed;
+     *                                  empty string otherwise.
+     */
+    QString checkConditionalText(const QnActionParameters &parameters) const;
+
 protected:
     virtual bool event(QEvent *event) override;
 
@@ -185,6 +199,7 @@ private:
     QWeakPointer<QnActionCondition> m_condition;
 
     QList<QnAction *> m_children;
+    QHash<QnActionCondition *, QString> m_textConditions;
 };
 
 #endif // QN_ACTION_H

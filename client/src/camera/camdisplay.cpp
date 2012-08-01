@@ -418,17 +418,17 @@ bool CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                     qint64 ct = m_extTimeSrc->getCurrentTime();
                     if (ct != DATETIME_NOW && speedSign *(displayedTime - ct) > 0)
                     {
-					    if (firstWait)
+                        if (firstWait)
                         {
                             m_isLongWaiting = speedSign*(displayedTime - ct) > MAX_FRAME_DURATION*1000;
                             if (m_jumpTime != DATETIME_NOW)
                                 m_isLongWaiting &= speedSign*(displayedTime - m_jumpTime)  > MAX_FRAME_DURATION*1000;
                             
-							/*
+                            /*
                             qDebug() << "displayedTime=" << QDateTime::fromMSecsSinceEpoch(displayedTime/1000).toString("hh:mm:ss.zzz")
                                      << " currentTime=" << QDateTime::fromMSecsSinceEpoch(ct/1000).toString("hh:mm:ss.zzz")
                                      << " wait=" << (displayedTime - ct)/1000.0;
-							*/
+                            */
                             
                             firstWait = false;
                         }
@@ -897,13 +897,13 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
             bool isLive = emptyData->flags & QnAbstractMediaData::MediaFlags_LIVE;
             bool isVideoCamera = qSharedPointerDynamicCast<QnVirtualCameraResource>(emptyData->dataProvider->getResource()) != 0;
             if (m_extTimeSrc && !isLive && isVideoCamera) {
-            	m_extTimeSrc->onEofReached(this, true); // jump to live if needed
+                m_extTimeSrc->onEofReached(this, true); // jump to live if needed
                 m_eofSignalSended = true;
             }
 
             /*
             // One camera from several sync cameras may reach BOF/EOF
-		    // move current time position to the edge to prevent other cameras blocking
+            // move current time position to the edge to prevent other cameras blocking
             m_nextReverseTime = m_lastDecodedTime = emptyData->timestamp;
             for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
                 m_display[i]->setLastDisplayedTime(m_lastDecodedTime);
@@ -931,7 +931,7 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
     else 
     {
         if (m_extTimeSrc && m_eofSignalSended) {
-        	m_extTimeSrc->onEofReached(this, false);
+            m_extTimeSrc->onEofReached(this, false);
             m_eofSignalSended = false;
         }
         m_emptyPacketCounter = 0;

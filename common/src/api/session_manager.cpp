@@ -106,6 +106,7 @@ void QnSessionManager::doStop()
 
     if (m_accessManager)
     {
+        m_accessManager->setParent(0);
         m_accessManager->deleteLater();
         m_accessManager = 0;
     }

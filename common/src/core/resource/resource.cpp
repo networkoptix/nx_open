@@ -20,12 +20,12 @@
 QnResource::QnResource(): 
     QObject(),
     m_mutex(QMutex::Recursive),
-    m_initMutex(QMutex::Recursive),
-    m_flags(0),
-	m_disabled(false),
-    m_status(Offline),
     m_resourcePool(NULL),
-    m_initialized(false)
+    m_flags(0),
+    m_disabled(false),
+    m_status(Offline),
+    m_initialized(false),
+    m_initMutex(QMutex::Recursive)
 {
     static volatile bool metaTypesInitialized = false;
     if (!metaTypesInitialized) {
@@ -96,7 +96,7 @@ void QnResource::update(QnResourcePtr other)
         updateInner(other); // this is virtual atomic operation; so mutexes shold be outside
     }
     setStatus(other->m_status);
-	setDisabled(other->m_disabled);
+    setDisabled(other->m_disabled);
     emit resourceChanged();
 
     QnParamList paramList = other->getResourceParamList();
@@ -136,8 +136,8 @@ void QnResource::deserialize(const QnResourceParameters& parameters)
     if (parameters.contains(QLatin1String("status")))
         m_status = (QnResource::Status)parameters[QLatin1String("status")].toInt();
 
-	if (parameters.contains(QLatin1String("disabled")))
-		m_disabled = parameters[QLatin1String("disabled")].toInt();
+    if (parameters.contains(QLatin1String("disabled")))
+        m_disabled = parameters[QLatin1String("disabled")].toInt();
 
     blockSignals(signalsBlocked);
 }
@@ -361,10 +361,10 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
     //QnParam &param = m_resourceParamList[name];
     //val = param.value();
     //m_mutex.unlock();
-	m_mutex.lock();
-	QnParam param = m_resourceParamList[name];
-	val = param.value();
-	m_mutex.unlock();
+    m_mutex.lock();
+    QnParam param = m_resourceParamList[name];
+    val = param.value();
+    m_mutex.unlock();
 
     if (domain == QnDomainMemory)
     {
@@ -378,7 +378,7 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
                 val = newValue;
                 m_mutex.lock();
                 //param.setValue(newValue);
-				m_resourceParamList[name].setValue(newValue);
+                m_resourceParamList[name].setValue(newValue);
                 m_mutex.unlock();
                 QMetaObject::invokeMethod(this, "parameterValueChanged", Qt::QueuedConnection, Q_ARG(QnParam, param));
             }
@@ -554,7 +554,7 @@ void QnResource::setStatus(QnResource::Status newStatus, bool silenceMode)
         return;
 
 #ifdef QN_RESOURCE_DEBUG
-	qDebug() << "Change status. oldValue=" << oldStatus << " new value=" << newStatus << " id=" << m_id << " name=" << getName();
+    qDebug() << "Change status. oldValue=" << oldStatus << " new value=" << newStatus << " id=" << m_id << " name=" << getName();
 #endif
 
     if (newStatus == Offline || newStatus == Unauthorized)
@@ -736,14 +736,14 @@ void QnResource::addCommandToProc(QnAbstractDataPacketPtr data)
 
 int QnResource::commandProcQueueSize()
 {
-	return commandProcessor()->queueSize();
+    return commandProcessor()->queueSize();
 }
 
 bool QnResource::isDisabled() const
 {
-	QMutexLocker mutexLocker(&m_mutex);
+    QMutexLocker mutexLocker(&m_mutex);
 
-	return m_disabled;
+    return m_disabled;
 }
 
 void QnResource::setDisabled(bool disabled)
@@ -761,7 +761,7 @@ void QnResource::setDisabled(bool disabled)
     }
 
     if (oldDisabled != disabled)
-		emit disabledChanged(oldDisabled, disabled);
+        emit disabledChanged(oldDisabled, disabled);
 
 }
 

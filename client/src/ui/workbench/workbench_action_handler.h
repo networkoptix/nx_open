@@ -8,6 +8,7 @@
 
 #include <api/app_server_connection.h>
 #include <ui/actions/actions.h>
+
 #include "workbench_context_aware.h"
 
 class QAction;
@@ -30,7 +31,7 @@ namespace detail {
     class QnResourceStatusReplyProcessor: public QObject {
         Q_OBJECT;
     public:
-		QnResourceStatusReplyProcessor(QnWorkbenchActionHandler *handler, const QnVirtualCameraResourceList &resources, const QList<int> &oldDisabledFlags);
+                QnResourceStatusReplyProcessor(QnWorkbenchActionHandler *handler, const QnVirtualCameraResourceList &resources, const QList<int> &oldDisabledFlags);
 
     public slots:
         void at_replyReceived(int status, const QByteArray &errorString, const QnResourceList &resources, int handle);
@@ -38,7 +39,7 @@ namespace detail {
     private:
         QWeakPointer<QnWorkbenchActionHandler> m_handler;
         QnVirtualCameraResourceList m_resources;
-		QList<int> m_oldDisabledFlags;
+                QList<int> m_oldDisabledFlags;
     };
 
     class QnResourceReplyProcessor: public QObject {
@@ -183,6 +184,7 @@ protected slots:
     void at_nextLayoutAction_triggered();
     void at_previousLayoutAction_triggered();
     void at_openLayoutsAction_triggered();
+    void at_openNewWindowLayoutsAction_triggered();
     void at_openNewTabAction_triggered();
     void at_openInLayoutAction_triggered();
     void at_openInCurrentLayoutAction_triggered();
@@ -219,6 +221,7 @@ protected slots:
     void at_serverSettingsAction_triggered();
     void at_youtubeUploadAction_triggered();
     void at_editTagsAction_triggered();
+    void at_quickSearchAction_triggered();
 
     void at_openInFolderAction_triggered();
     void at_deleteFromDiskAction_triggered();
@@ -251,7 +254,7 @@ protected slots:
 
     void at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle);
     void at_resource_deleted(int status, const QByteArray &data, const QByteArray &errorString, int handle);
-	void at_resources_statusSaved(int status, const QByteArray &errorString, const QnResourceList &resources, const QList<int> &oldDisabledFlags);
+        void at_resources_statusSaved(int status, const QByteArray &errorString, const QnResourceList &resources, const QList<int> &oldDisabledFlags);
 
     void at_layoutCamera_exportFinished(QString fileName);
     void at_cameraCamera_exportFailed(QString errorMessage);

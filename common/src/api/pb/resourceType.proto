@@ -1,5 +1,8 @@
 package pb;
 
+option java_package = "com.networkoptix.hdwitness.protobuf";
+option java_outer_classname = "ResourceTypeProtos";
+
 enum ParamType {
     Nope        = 0;
     Value       = 1;

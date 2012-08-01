@@ -59,7 +59,7 @@ CLFFmpegAudioDecoder::CLFFmpegAudioDecoder(QnCompressedAudioDataPtr data):
         return;
     }
 
-	c = avcodec_alloc_context();
+	c = avcodec_alloc_context3(codec);
 
     if (data->context)
     {
@@ -87,7 +87,7 @@ CLFFmpegAudioDecoder::CLFFmpegAudioDecoder(QnCompressedAudioDataPtr data):
         }
         */
     }
-	avcodec_open(c, codec);
+	avcodec_open2(c, codec, NULL);
 
 }
 
@@ -126,7 +126,7 @@ bool CLFFmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, QnByteArray& r
 
 		//cl_log.log("before dec",  cl_logALWAYS);
 
-		if (outbuf_len + out_size > result.capacity())
+		if (outbuf_len + out_size > (int)result.capacity())
 		{
             //Q_ASSERT_X(false, Q_FUNC_INFO, "Too small output buffer for audio decoding!");
             result.reserve(result.capacity() * 2);
@@ -138,6 +138,7 @@ bool CLFFmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, QnByteArray& r
         avpkt.data = (quint8*)inbuf_ptr;
         avpkt.size = size;
 
+        //TODO: use avcodec_decode_audio4 instead
         int len = avcodec_decode_audio3(c, (short *)outbuf, &out_size, &avpkt);
 
 		//cl_log.log("after dec",  cl_logALWAYS);

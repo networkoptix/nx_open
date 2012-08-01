@@ -46,5 +46,11 @@
 #endif
 
 
+/* Some windows-specific defines. */
+#ifdef _WIN32
+#   define __STDC_CONSTANT_MACROS
+#   define NOMINMAX 
+#endif
+
 
 #endif // QN_COMMON_CONFIG_H

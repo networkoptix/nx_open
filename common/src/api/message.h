@@ -10,33 +10,34 @@ namespace pb {
     class Message;
 }
 
-// Copied from message.pb.h
-// TODO: Ivan. Somehow avoid duplicaton of this enum
-enum Message_Type {
-  Message_Type_Initial = 0,
-  Message_Type_Ping = 1,
-  Message_Type_ResourceChange = 2,
-  Message_Type_ResourceDelete = 3,
-  Message_Type_ResourceStatusChange = 4,
-  Message_Type_ResourceDisabledChange = 5,
-  Message_Type_License = 6,
-  Message_Type_CameraServerItem = 7
-};
+namespace Qn{
+    enum Message_Type {
+        Message_Type_Initial = 0,
+        Message_Type_Ping = 1,
+        Message_Type_ResourceChange = 2,
+        Message_Type_ResourceDelete = 3,
+        Message_Type_ResourceStatusChange = 4,
+        Message_Type_ResourceDisabledChange = 5,
+        Message_Type_License = 6,
+        Message_Type_CameraServerItem = 7
+    };
+}
+
 
 struct QnMessage
 {
-    Message_Type eventType;
+    Qn::Message_Type eventType;
     quint32 seqNumber;
 
     QnResourcePtr resource;
 
-	// These fields are temporary and caused by
-	// heavy-weightness of QnResource
-	// TODO: Ivan. Replace resource with lightweight transfer object here
-	QnId resourceId;
-	QString resourceGuid;
-	bool resourceDisabled;
-	QnResource::Status resourceStatus;
+    // These fields are temporary and caused by
+    // heavy-weightness of QnResource
+    // TODO: Ivan. Replace resource with lightweight transfer object here
+    QnId resourceId;
+    QString resourceGuid;
+    bool resourceDisabled;
+    QnResource::Status resourceStatus;
 
     QnLicensePtr license;
     QnCameraHistoryItemPtr cameraServerItem;

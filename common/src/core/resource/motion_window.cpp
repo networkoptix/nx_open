@@ -109,7 +109,7 @@ bool QnMotionRegion::updateSensitivityAt(const QPoint& pos, int newSens)
         {
             if (sens == newSens)
                 return false;
-            QVector<QRect>	rects = m_data[sens].rects();
+            QVector<QRect> rects = m_data[sens].rects();
             QRegion linkedRects;
             for (int i = 0; i < rects.size(); ++i)
             {

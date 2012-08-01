@@ -87,7 +87,6 @@ public:
     bool compositionChangedEvent(MSG *message, long *result);
     bool activateEvent(MSG *message, long *result);
     bool ncPaintEvent(MSG *message, long *result);
-    bool ncLeftButtonDoubleClickEvent(MSG *message, long *result);
     bool sysCommandEvent(MSG *message, long *result);
     bool eraseBackground(MSG *message, long *result);
 #endif
@@ -124,7 +123,6 @@ public:
     bool overrideFrameMargins;
     bool systemPaintWindow;
     bool transparentErasing;
-    bool processDoubleClicks;
     bool titleBarDrag;
 #endif
 
@@ -177,7 +175,6 @@ void QnDwmPrivate::init(QWidget *widget) {
     overrideFrameMargins = false;
     systemPaintWindow = true;
     transparentErasing = false;
-    processDoubleClicks = false;
     titleBarDrag = true;
 #endif
 
@@ -419,21 +416,6 @@ int QnDwm::emulatedTitleBarHeight() const {
     return d->emulatedTitleBarHeight;
 }
 
-bool QnDwm::enableDoubleClickProcessing(bool enable) {
-    if(!d->hasApi)
-        return false;
-
-    if(d->emulateFrame == enable)
-        return true;
-
-#ifdef Q_OS_WIN
-    d->processDoubleClicks = enable;
-    return true;
-#else 
-    return false;
-#endif
-}
-
 bool QnDwm::enableTitleBarDrag(bool enable) {
     if(!d->hasApi)
         return false;
@@ -558,7 +540,6 @@ bool QnDwm::widgetWinEvent(MSG *message, long *result) {
     case WM_DWMCOMPOSITIONCHANGED:  return d->compositionChangedEvent(message, result);
     case WM_NCACTIVATE:             return d->activateEvent(message, result);
     case WM_NCPAINT:                return d->ncPaintEvent(message, result);
-    case WM_NCLBUTTONDBLCLK:        return d->ncLeftButtonDoubleClickEvent(message, result);
     case WM_SYSCOMMAND:             return d->sysCommandEvent(message, result);
     case WM_ERASEBKGND:             return d->eraseBackground(message, result);
     default:                        return false;
@@ -820,21 +801,6 @@ bool QnDwmPrivate::eraseBackground(MSG *message, long *result) {
     } else {
         return false;
     }
-}
-
-bool QnDwmPrivate::ncLeftButtonDoubleClickEvent(MSG *message, long *result) {
-    Q_UNUSED(result)
-
-    if(!processDoubleClicks)    
-        return false;
-
-    if(message->wParam == HTCAPTION) {
-        emit q->titleBarDoubleClicked();
-        *result = 0; /* If an application processes this message, it should return zero. */
-        return true;
-    }
-
-    return false;
 }
 
 bool QnDwmPrivate::sysCommandEvent(MSG *message, long *result) {

@@ -63,7 +63,7 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
                 QHostAddress sender;
                 quint16 senderPort;
 
-                sock.readDatagram(datagram.data(), datagram.size(),	&sender, &senderPort);
+                sock.readDatagram(datagram.data(), datagram.size(),    &sender, &senderPort);
 
                 if (senderPort!=69 || datagram.size() < 32) // minimum response size
                     continue;
@@ -127,10 +127,10 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
                 {
                     if (res->getUniqueId() == resource->getUniqueId())
                     {
-						QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
-						if (isNewDiscoveryAddressBetter(net_res->getHostAddress().toString(), iface.address.toString(), net_res->getDiscoveryAddr().toString()))
-							net_res->setDiscoveryAddr(iface.address);
-					
+                        QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
+                        if (isNewDiscoveryAddressBetter(net_res->getHostAddress().toString(), iface.address.toString(), net_res->getDiscoveryAddr().toString()))
+                            net_res->setDiscoveryAddr(iface.address);
+                    
                         need_to_continue = true; //already has such
                         break;
                     }

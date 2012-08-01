@@ -119,7 +119,7 @@ bool QnRtspDataConsumer::canSwitchToLowQuality()
     if (!m_owner->isSecondaryLiveDPSupported())
         return false;
 
-	return true;
+    return true;
 
     QMutexLocker lock(&m_allConsumersMutex);
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
@@ -299,7 +299,7 @@ QnMediaContextPtr QnRtspDataConsumer::getGeneratedContext(CodecID compressionTyp
     if (itr != m_generatedContext.end())
         return itr.value();
     QnMediaContextPtr result(new QnMediaContext(compressionType));
-    AVCodecContext* ctx = result->ctx();
+    //AVCodecContext* ctx = result->ctx();
     m_generatedContext.insert(compressionType, result);
     return result;
 }
@@ -363,7 +363,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     ssrc += media->subChannelNumber*2;
     int subChannelNumber = media->subChannelNumber;
 
-	int rtpTcpChannel = m_owner->getAVTcpChannel(rtspChannelNum);
+    int rtpTcpChannel = m_owner->getAVTcpChannel(rtspChannelNum);
     if (rtpTcpChannel == -1) {
         m_mutex.unlock();
         return true; // skip data (for example audio is disabled)

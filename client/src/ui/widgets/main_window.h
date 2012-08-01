@@ -63,6 +63,7 @@ protected:
     virtual void dropEvent(QDropEvent *event) override;
 
     void ncMouseReleaseEvent(QMouseEvent *event);
+    void ncMouseDoubleClickEvent(QMouseEvent *event);
 
 #ifdef Q_OS_WIN
     virtual bool winEvent(MSG *message, long *result) override;

@@ -2,7 +2,7 @@
 
 #include <utils/common/warnings.h>
 #include <core/resourcemanagment/resource_criterion.h>
-#include <recording/time_period.h>
+#include <recording/time_period_list.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -269,7 +269,7 @@ Qn::ActionVisibility QnExportActionCondition::check(const QnActionParameters &pa
     QnResourcePtr resource = parameters.resource();
     if(resource->flags() & QnResource::utc) {
         QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsParameter);
-        if(!periods.intersectPeriod(period))
+        if(!periods.intersects(period))
             return Qn::DisabledAction;
     }
     

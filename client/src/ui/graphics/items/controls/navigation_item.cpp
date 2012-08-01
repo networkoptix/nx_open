@@ -5,6 +5,8 @@
 #include <QtGui/QAction>
 #include <QtGui/QGraphicsLinearLayout>
 #include <QtGui/QMessageBox>
+#include <QtGui/QCalendarWidget>
+#include <QtGui/QGraphicsProxyWidget>
 
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
 #include <utils/common/util.h>
@@ -116,11 +118,15 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
 
     m_timeScrollBar = new QnTimeScrollBar(this);
     
+    m_calendar = new QGraphicsProxyWidget(parent);
+    QCalendarWidget *calendar = new QCalendarWidget();
+    m_calendar->setWidget(calendar);
+    m_calendar->setVisible(false);
 
     /* Initialize navigator. */
     navigator()->setTimeSlider(m_timeSlider);
     navigator()->setTimeScrollBar(m_timeScrollBar);
-
+    navigator()->setCalendar(calendar);
 
     /* Put it all into layouts. */
     QGraphicsLinearLayout *buttonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);

@@ -235,11 +235,11 @@ void CLAudioStreamDisplay::putData(QnCompressedAudioDataPtr data, qint64 minTime
     {
         playCurrentBuffer();
     }
-//		qint64 bytesInBuffer = m_audioOutput->bufferSize() - m_audioOutput->bytesFree();
-//		qint64 usInBuffer = ms_from_size(audio.format, bytesInBuffer);
-//		cl_log.log("ms in audio buff = ", (int)usInBuffer, cl_logALWAYS);
-        //cl_log.log("ms in ring buff = ", (int)ms_from_size(m_audio.format, m_ringbuff->bytesAvailable()), cl_logALWAYS);
-        /**/
+    //qint64 bytesInBuffer = m_audioOutput->bufferSize() - m_audioOutput->bytesFree();
+    //qint64 usInBuffer = ms_from_size(audio.format, bytesInBuffer);
+    //cl_log.log("ms in audio buff = ", (int)usInBuffer, cl_logALWAYS);
+    //cl_log.log("ms in ring buff = ", (int)ms_from_size(m_audio.format, m_ringbuff->bytesAvailable()), cl_logALWAYS);
+    /**/
 }
 
 void CLAudioStreamDisplay::playCurrentBuffer()

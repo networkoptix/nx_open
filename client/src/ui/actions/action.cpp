@@ -26,7 +26,11 @@ QnAction::QnAction(Qn::ActionId id, QObject *parent):
     m_flags(0)
 {}
 
-QnAction::~QnAction() {}
+QnAction::~QnAction() {
+    foreach (QnActionCondition *condition, m_textConditions.uniqueKeys())
+        delete condition;
+}
+
 
 void QnAction::setRequiredPermissions(Qn::Permissions requiredPermissions) {
     setRequiredPermissions(QString(), requiredPermissions);
@@ -192,3 +196,18 @@ void QnAction::updateText() {
     }
 }
 
+void QnAction::addConditionalText(QnActionCondition *condition, const QString &text){
+    m_textConditions[condition] = text;
+}
+
+bool QnAction::hasConditionalTexts(){
+    return !m_textConditions.isEmpty();
+}
+
+QString QnAction::checkConditionalText(const QnActionParameters &parameters) const{
+    foreach (QnActionCondition *condition, m_textConditions.uniqueKeys()){
+        if (condition->check(parameters))
+            return m_textConditions[condition];
+    }
+    return normalText();
+}

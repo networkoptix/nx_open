@@ -138,7 +138,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_curtainAnimator(NULL),
     m_frontZ(0.0),
     m_dummyScene(new QGraphicsScene(this)),
-	m_streamSynchronizer(NULL),
+    m_streamSynchronizer(NULL),
     m_frameOpacity(1.0),
     m_frameWidthsDirty(false),
     m_zoomedMarginFlags(0),
@@ -423,7 +423,8 @@ void QnWorkbenchDisplay::setView(QGraphicsView *view) {
             glFormat.setSwapInterval(1); /* Turn vsync on. */
 
             QGLWidget *glWidget = new QGLWidget(glFormat);
-            QnGlHardwareChecker* filter = new QnGlHardwareChecker(glWidget);
+            /*QnGlHardwareChecker* filter =*/
+            new QnGlHardwareChecker(glWidget);
             m_view->setViewport(glWidget);
         }
 
@@ -730,7 +731,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
         return false;
     }
 
-    if (!resource->checkFlags(QnResource::media)) { // TODO: unsupported for now
+    if (!resource->checkFlags(QnResource::media) && !resource->checkFlags(QnResource::server)) { // TODO: unsupported for now
         qnDeleteLater(item);
         return false;
     }

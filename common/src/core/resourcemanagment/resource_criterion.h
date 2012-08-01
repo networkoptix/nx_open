@@ -20,7 +20,7 @@ public:
         Next            /**< Criterion has nothing to say of whether the resource should be accepted or rejected. Next criterion should be invoked. */
     };
 
-	enum Type {
+    enum Type {
         Nothing,        /**< Match no resources. Target is ignored. */
         Equality,       /**< One of the resource's fields must equal provided value. */
         Containment,    /**< One of the resource's fields must contain provided value. */
@@ -31,7 +31,7 @@ public:
 
     typedef Operation (*CriterionFunction)(const QnResourcePtr &, const QVariant &value);
 
-	QnResourceCriterion(const QRegExp &regExp, const char *propertyName = QnResourceProperty::searchString, Operation matchOperation = Accept, Operation mismatchOperation = Next);
+    QnResourceCriterion(const QRegExp &regExp, const char *propertyName = QnResourceProperty::searchString, Operation matchOperation = Accept, Operation mismatchOperation = Next);
 
     QnResourceCriterion(int flags, const char *propertyName = QnResourceProperty::flags, Operation matchOperation = Accept, Operation mismatchOperation = Next);
 

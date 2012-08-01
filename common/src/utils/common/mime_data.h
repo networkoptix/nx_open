@@ -29,7 +29,7 @@ public:
         return m_data.value(mimeType);
     }
 
-    QStringList	formats() const {
+    QStringList formats() const {
         return m_data.keys();
     }
 

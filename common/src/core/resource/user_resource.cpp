@@ -11,7 +11,7 @@ QnUserResource::QnUserResource()
 
 QString QnUserResource::getUniqueId() const
 {
-	return getGuid();
+    return getGuid();
 }
 
 QString QnUserResource::getPassword() const

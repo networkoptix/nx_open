@@ -16,8 +16,8 @@ class QnMulticodecRtpReader : public QnResourceConsumer
 private:
     enum {BLOCK_SIZE = 1460};
 public:
-	QnMulticodecRtpReader(QnResourcePtr res);
-	virtual ~QnMulticodecRtpReader();
+    QnMulticodecRtpReader(QnResourcePtr res);
+    virtual ~QnMulticodecRtpReader();
 
 
     QnAbstractMediaDataPtr getNextData();

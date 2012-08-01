@@ -50,14 +50,14 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please try save changes later.</source>
+        <source>Please try to save changes later.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>CLVideoCamera</name>
     <message>
-        <source>Invalid resource type for export data</source>
+        <source>Invalid resource type for data export.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -953,10 +953,6 @@ For easy instructions on how to install or update your video driver, follow inst
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Open Layout</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Open Layouts</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1184,6 +1180,26 @@ For easy instructions on how to install or update your video driver, follow inst
         <source>Decrement Debug Counter</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Monitor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monitor in a New Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monitor in a New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Layout in a new Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Layout(s) in a new Window</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnAutoTester</name>
@@ -1217,15 +1233,15 @@ For easy instructions on how to install or update your video driver, follow inst
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Maximum amount of motion windows for current camera is %1, but %2 motion windows are currently selected.</source>
+        <source>Maximum number of motion windows for current camera is %1, but %2 motion windows are currently selected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Maximum amount of different motion sensitivities for current camera is %1, but %2 motion sensitivities are currently selected.</source>
+        <source>Maximum number of different motion sensitivities for current camera is %1, but %2 motion sensitivities are currently selected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Maximum amount of motion mask windows for current camera is %1, but %2 motion mask windows are currently selected.</source>
+        <source>Maximum number of motion mask windows for current camera is %1, but %2 motion mask windows are currently selected.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1635,11 +1651,11 @@ Try to activate your License manually.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Warning. FPS value is too high</source>
+        <source>FPS value is too high</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps dropped down to %2</source>
+        <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1845,7 +1861,7 @@ Try to activate your License manually.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The language change will take effect after a restart of the application.</source>
+        <source>The language change will take effect after application restart.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1924,15 +1940,7 @@ Try to activate your License manually.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Storage path &apos;%1&apos; is invalid or not accessible for writing.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Can&apos;t verify storage path</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Can&apos;t verify storage path &apos;%1&apos;. Media server does not response</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1940,17 +1948,25 @@ Try to activate your License manually.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Storage &apos;%1&apos;
-You have less storage space available than reserved free space value. Required %2Gb additional disk space</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Low space for archive</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Storage path &apos;%1&apos; is invalid or is not accessible for writing.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot verify storage path &apos;%1&apos;. Cannot establish connection to the media server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Storage &apos;%1&apos;
-You have only %2Gb space for archive.</source>
+You have less storage space available than reserved free space value. Additional %2Gb are required.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage &apos;%1&apos;
+You have only %2Gb left for video archive.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2486,10 +2502,6 @@ Error description: &apos;%2&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Can&apos;t start recording due to following error: %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>recorded_video</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2499,6 +2511,10 @@ Error description: &apos;%2&apos;</source>
     </message>
     <message>
         <source>AVI (Audio/Video Interleaved) (*.avi)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can&apos;t start recording due to the following error: %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

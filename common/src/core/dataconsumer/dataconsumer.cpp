@@ -3,23 +3,23 @@
 
 
 QnAbstractDataConsumer::QnAbstractDataConsumer(int maxQueueSize)
-	: m_dataQueue(maxQueueSize)
+    : m_dataQueue(maxQueueSize)
 {
 }
 
 bool QnAbstractDataConsumer::canAcceptData() const
 {
-	return (m_dataQueue.size() < m_dataQueue.maxSize());
+    return (m_dataQueue.size() < m_dataQueue.maxSize());
 }
 
 void QnAbstractDataConsumer::putData(QnAbstractDataPacketPtr data)
 {
-	m_dataQueue.push(data);
+    m_dataQueue.push(data);
 }
 
 void QnAbstractDataConsumer::clearUnprocessedData()
 {
-	m_dataQueue.clear();
+    m_dataQueue.clear();
 }
 
 void QnAbstractDataConsumer::endOfRun()
@@ -29,34 +29,34 @@ void QnAbstractDataConsumer::endOfRun()
 
 void QnAbstractDataConsumer::run()
 {
-//	const int timeoutMs = 100;
-	while(!needToStop())
-	{
-		pauseDelay();
+//    const int timeoutMs = 100;
+    while(!needToStop())
+    {
+        pauseDelay();
 
-		QnAbstractDataPacketPtr data;
-		bool get = m_dataQueue.pop(data, 200);
+        QnAbstractDataPacketPtr data;
+        bool get = m_dataQueue.pop(data, 200);
 
-		if (!get)
-		{
-			CL_LOG(cl_logDEBUG2) cl_log.log(QLatin1String("queue is empty "), (int)(long)(&m_dataQueue),cl_logDEBUG2);
-			QnSleep::msleep(10);
-			continue;
-		}
-		while(!needToStop())
-		{
-			if (processData(data))
-				break;
-			else
-				QnSleep::msleep(1);
-		}
-		//cl_log.log("queue size = ", m_dataQueue.size(),cl_logALWAYS);
-	}
+        if (!get)
+        {
+            CL_LOG(cl_logDEBUG2) cl_log.log(QLatin1String("queue is empty "), (int)(long)(&m_dataQueue),cl_logDEBUG2);
+            QnSleep::msleep(10);
+            continue;
+        }
+        while(!needToStop())
+        {
+            if (processData(data))
+                break;
+            else
+                QnSleep::msleep(1);
+        }
+        //cl_log.log("queue size = ", m_dataQueue.size(),cl_logALWAYS);
+    }
 
-	endOfRun();
+    endOfRun();
 }
 
 int QnAbstractDataConsumer::queueSize() const
 {
-	return m_dataQueue.size();
+    return m_dataQueue.size();
 }

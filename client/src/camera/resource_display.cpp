@@ -176,8 +176,6 @@ bool QnResourceDisplay::isPaused() {
 }
 
 bool QnResourceDisplay::isStillImage() const {
-    if (resource().dynamicCast<QnVideoServerResource>())
-        return true;
     return m_camera->getCamDisplay()->isStillImage();
 }
 

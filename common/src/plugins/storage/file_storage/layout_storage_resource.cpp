@@ -29,12 +29,12 @@ public:
         return m_file.pos() - m_fileOffset;
     }
 
-    virtual qint64	readData (char * data, qint64 maxSize ) override
+    virtual qint64 readData(char *data, qint64 maxSize) override
     {
         return m_file.read(data, qMin(m_fileSize - pos(), maxSize));
     }
 
-    virtual qint64	writeData (const char * data, qint64 maxSize ) override
+    virtual qint64 writeData(const char *data, qint64 maxSize) override
     {
         return m_file.write(data, maxSize);
     }
@@ -139,7 +139,7 @@ QFileInfoList QnLayoutFileStorageResource::getFileList(const QString& dirName)
 qint64 QnLayoutFileStorageResource::getFileSize(const QString& fillName) const
 {
     Q_UNUSED(fillName)
-	return 0; // not implemented
+    return 0; // not implemented
 }
 
 bool QnLayoutFileStorageResource::isStorageAvailable()

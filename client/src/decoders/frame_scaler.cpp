@@ -5,10 +5,6 @@
 #include <smmintrin.h>
 #endif
 
-#ifdef Q_OS_UNIX
-#include <tmmintrin.h>
-#endif
-
 #include "utils/media/sse_helper.h"
 #include "utils/common/math.h"
 
@@ -156,8 +152,8 @@ void downscalePlate_factor8_sse41_intr(unsigned char * dst, const unsigned int d
         {
             __m128i s00 = _mm_and_si128(_mm_loadu_si128(src1), sse_00ffw_intrs); /* SSE2. */
             __m128i s10 = _mm_and_si128(_mm_loadu_si128(src2), sse_00ffw_intrs); /* SSE2. */
-            s00 = _mm_packus_epi32(s00, color_const_intrs); /* SSE2. */
-            s10 = _mm_packus_epi32(s10, color_const_intrs); /* SSE2. */
+            s00 = _mm_packus_epi32(s00, color_const_intrs); /* SSE4. */
+            s10 = _mm_packus_epi32(s10, color_const_intrs); /* SSE4. */
 
             __m128i rez1 = _mm_srli_epi16(_mm_avg_epu16(_mm_hadd_epi16(s00, color_const_intrs), _mm_hadd_epi16(s10, color_const_intrs)),1); /* SSSE3. */
             __m128i tmp = _mm_packus_epi16(rez1, color_const_intrs); /* SSE2. */
@@ -202,41 +198,41 @@ void QnFrameScaler::downscale(const CLVideoDecoderOutput* src, CLVideoDecoderOut
     }
     else if (factor == factor_2)
     {
-		// perfomance test block
-		// last test result: sandy bridge 4.3Ghz. SSE faster than c code at 4-4.5 times for 1920x1080 source
+                // perfomance test block
+                // last test result: sandy bridge 4.3Ghz. SSE faster than c code at 4-4.5 times for 1920x1080 source
         /*
         QTime t1;
-		t1.start();
-		volatile int g = 0;
-		for (int i = 0; i < 10000; ++i)
-		{
+                t1.start();
+                volatile int g = 0;
+                for (int i = 0; i < 10000; ++i)
+                {
             downscalePlate_factor8_sse41_intr(dst->data[0], dst->linesize[0],   src->data[0], src_width, src->linesize[0], src_height, 0);
-			//downscalePlate_factor2_sse(dst->data[0], src_width/2,   src->data[0], src_width, src->linesize[0], src_height);
-			//downscalePlate_factor2_sse(dst->data[1], src_width/chroma_h_factor/2, src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h);
-			//downscalePlate_factor2_sse(dst->data[2], src_width/chroma_h_factor/2, src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h);
-			g+=i;
-		}
-		int e1 = t1.elapsed();
+                        //downscalePlate_factor2_sse(dst->data[0], src_width/2,   src->data[0], src_width, src->linesize[0], src_height);
+                        //downscalePlate_factor2_sse(dst->data[1], src_width/chroma_h_factor/2, src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h);
+                        //downscalePlate_factor2_sse(dst->data[2], src_width/chroma_h_factor/2, src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h);
+                        g+=i;
+                }
+                int e1 = t1.elapsed();
 
-		QTime t2;
-		t2.start();
-		for (int i = 0; i < 10000; ++i)
-		{
+                QTime t2;
+                t2.start();
+                for (int i = 0; i < 10000; ++i)
+                {
             downscalePlate_factor8_sse(dst->data[0], dst->linesize[0],   src->data[0], src_width, src->linesize[0], src_height);
-			//downscalePlate_factor2(dst->data[0], src->data[0], src_width, src->linesize[0], src_height);
-			//downscalePlate_factor2(dst->data[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h);
-			//downscalePlate_factor2(dst->data[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h);
-			g+=i;
-		}
-		int e2 = t2.elapsed();
+                        //downscalePlate_factor2(dst->data[0], src->data[0], src_width, src->linesize[0], src_height);
+                        //downscalePlate_factor2(dst->data[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h);
+                        //downscalePlate_factor2(dst->data[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h);
+                        g+=i;
+                }
+                int e2 = t2.elapsed();
         cl_log.log("scale factor 2. sse intr time:", e1, cl_logALWAYS);
-		cl_log.log("scale factor 2. sse time:", e2, cl_logALWAYS);
-		cl_log.log("-------------------------",  g, cl_logALWAYS);
-		*/
+                cl_log.log("scale factor 2. sse time:", e2, cl_logALWAYS);
+                cl_log.log("-------------------------",  g, cl_logALWAYS);
+                */
         if (useSSE2()) {
             downscalePlate_factor2_sse2_intr(dst->data[0], dst->linesize[0],   src->data[0], src_width, src->linesize[0], src_height, 0x00);
-		    downscalePlate_factor2_sse2_intr(dst->data[1], dst->linesize[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h, 0x80);
-		    downscalePlate_factor2_sse2_intr(dst->data[2], dst->linesize[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h, 0x80);
+                    downscalePlate_factor2_sse2_intr(dst->data[1], dst->linesize[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h, 0x80);
+                    downscalePlate_factor2_sse2_intr(dst->data[2], dst->linesize[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h, 0x80);
         }
         else {
             downscalePlate_factor2(dst->data[0], dst->linesize[0],   src->data[0], src_width, src->linesize[0], src_height);

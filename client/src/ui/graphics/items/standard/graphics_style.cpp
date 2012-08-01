@@ -75,7 +75,7 @@ QSize GraphicsStyle::sizeFromContents(QStyle::ContentsType type, const QStyleOpt
     return baseStyle()->sizeFromContents(type, option, contentsSize, NULL);
 }
 
-int	GraphicsStyle::styleHint(QStyle::StyleHint hint, const QStyleOption *option, const QGraphicsWidget *widget, QStyleHintReturn *returnData) const {
+int GraphicsStyle::styleHint(QStyle::StyleHint hint, const QStyleOption *option, const QGraphicsWidget *widget, QStyleHintReturn *returnData) const {
     QnScopedValueRollback<const QGraphicsWidget *> rollback(&m_graphicsWidget, widget);
 
     return baseStyle()->styleHint(hint, option, NULL, returnData);

@@ -75,7 +75,7 @@
 			<artifactId>protobuf</artifactId>
 			<version>2.4.1</version>
 			<type>zip</type>
-			<classifier>${platform}-${arch}</classifier>
+			<classifier>${platform}-${arch}-${compiler}</classifier>
 		</dependency>
 	</dependencies>
 
