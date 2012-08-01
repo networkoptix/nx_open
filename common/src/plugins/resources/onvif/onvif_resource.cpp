@@ -515,6 +515,7 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
     QAuthenticator auth(getAuth());
     //TODO:UTF unuse StdString
     DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), auth.user().toStdString(), auth.password().toStdString());
+    ImagingSoapWrapper soapWrapper2(getDeviceOnvifUrl().toStdString(), auth.user().toStdString(), auth.password().toStdString());
 
     //Trying to get name
     {
