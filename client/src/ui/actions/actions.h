@@ -505,6 +505,11 @@ namespace Qn {
          */
         QuickSearchAction,
 
+        /**
+         * Shows/hides calendar.
+         */
+        ToggleCalendarAction,
+
 
         /* Debug actions. */
 
