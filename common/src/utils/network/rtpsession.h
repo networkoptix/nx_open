@@ -54,12 +54,11 @@ public:
 private:
     void processRtcpData();
 private:
-    UDPSocket* m_mediaSocket;
-    UDPSocket* m_rtcpSocket;
-
     RTPSession* m_owner;
     bool m_tcpMode;
     RtspStatistic m_statistic;
+    UDPSocket* m_mediaSocket;
+    UDPSocket* m_rtcpSocket;
 };
 
 class RTPSession: public QObject
@@ -185,9 +184,6 @@ public:
 signals:
     void gotTextResponse(QByteArray text);
 private:
-    qint64 m_startTime;
-    qint64 m_endTime;
-
     QString getTrackFormat(int trackNum) const;
     TrackType getTrackType(int trackNum) const;
     int readRAWData();
@@ -213,6 +209,20 @@ private:
 private:
     enum { RTSP_BUFFER_LEN = 1024 * 64 * 16 };
 
+    // 'initialization in order' block
+    unsigned int m_csec;
+    QString m_transport;
+    int m_selectedAudioChannel;
+    qint64 m_startTime;
+    qint64 m_endTime;
+    float m_scale;
+    int m_tcpTimeout;
+    int m_proxyPort;
+    int m_responseCode;
+    bool m_isAudioEnabled;
+    bool m_useDigestAuth;
+    // end of initialized fields
+
     //unsigned char m_responseBuffer[MAX_RESPONCE_LEN];
     quint8* m_responseBuffer;
     int m_responseBufferLen;
@@ -220,11 +230,9 @@ private:
 
     TCPSocket m_tcpSock;
     //RtpIoTracks m_rtpIoTracks; // key: tracknum, value: track IO device
-    int m_selectedAudioChannel;
 
     QUrl mUrl;
 
-    unsigned int m_csec;
     QString m_SessionId;
     unsigned short m_ServerPort;
     // format: key - track number, value - codec name
@@ -233,21 +241,14 @@ private:
     unsigned int m_TimeOut;
 
     QTime m_keepAliveTime;
-    QString m_transport;
-    float m_scale;
 
     friend class RTPIODevice;
     QMap<QByteArray, QByteArray> m_additionAttrs;
-    int m_tcpTimeout;
     QAuthenticator m_auth;
     QString m_proxyAddr;
-    int m_proxyPort;
     QString m_contentBase;
-    int m_responseCode;
-    bool m_isAudioEnabled;
     QString m_prefferedTransport;
 
-    bool m_useDigestAuth;
     QString m_realm;
     QString m_nonce;
 
