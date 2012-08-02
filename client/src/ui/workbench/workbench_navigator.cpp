@@ -1172,6 +1172,7 @@ void QnWorkbenchNavigator::at_calendar_selectionChanged(){
     QDateTime dt(m_calendar->selectedDate());
     qint64 startMSec = dt.toMSecsSinceEpoch();
     qint64 endMSec = dt.addDays(1).toMSecsSinceEpoch();
+    m_timeSlider->finishAnimations();
     m_timeSlider->setValue(startMSec);
     m_timeSlider->setWindow(startMSec, endMSec);
 }
