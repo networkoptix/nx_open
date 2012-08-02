@@ -45,7 +45,7 @@ protected:
     virtual QList<QNetworkProxy> queryProxy(const QNetworkProxyQuery &query = QNetworkProxyQuery()) override
     {
         QList<QNetworkProxy> rez;
-        if (QnVideoServerConnection::getProxyPort() == 0 || query.url().queryItems().isEmpty()) {
+        if (QnVideoServerConnection::getProxyPort() == 0 || query.url().path().isEmpty() || query.url().path() == QLatin1String("api/ping/")) {
             rez << QNetworkProxy(QNetworkProxy::NoProxy);
             return rez;
         }
@@ -192,13 +192,13 @@ int QnVideoServerConnection::asyncGetFreeSpace(const QString& path, QObject *tar
 int QnVideoServerConnection::asyncGetStatistics(QObject *target, const char *slot){
     detail::VideoServerSessionManagerStatisticsRequestReplyProcessor *processor = new detail::VideoServerSessionManagerStatisticsRequestReplyProcessor();
     connect(processor, SIGNAL(finished(const QnStatisticsDataVector &/* data */)), target, slot, Qt::QueuedConnection);
-    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("api/statistics"), processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
+    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("statistics"), QnRequestParamList(), processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
 }
 
 int QnVideoServerConnection::syncGetStatistics(QObject *target, const char *slot){
     QByteArray reply;
     QByteArray errorString;
-    int status = QnSessionManager::instance()->sendGetRequest(m_url, QLatin1String("api/statistics"), reply, errorString);
+    int status = QnSessionManager::instance()->sendGetRequest(m_url, QLatin1String("statistics"), reply, errorString);
 
     detail::VideoServerSessionManagerStatisticsRequestReplyProcessor *processor = new detail::VideoServerSessionManagerStatisticsRequestReplyProcessor();
     connect(processor, SIGNAL(finished(int)), target, slot, Qt::DirectConnection);
