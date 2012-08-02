@@ -57,7 +57,6 @@ protected:
     virtual bool event(QEvent *event) override;
     virtual void changeEvent(QEvent *event) override;
     virtual void paintEvent(QPaintEvent *event) override;
-    virtual void resizeEvent(QResizeEvent *event) override;
     virtual void dragEnterEvent(QDragEnterEvent *event) override;
     virtual void dragMoveEvent(QDragMoveEvent *event) override;
     virtual void dragLeaveEvent(QDragLeaveEvent *event) override;
@@ -82,7 +81,6 @@ protected slots:
 
     void updateFullScreenState();
     void updateDwmState();
-    void updateTitleBarDraggable();
 
     void at_fileOpenSignalizer_activated(QObject *object, QEvent *event);
     void at_sessionManager_error(int error);

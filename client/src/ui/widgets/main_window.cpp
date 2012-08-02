@@ -321,7 +321,6 @@ void QnMainWindow::setOptions(Options options) {
 
     m_options = options;
 
-    updateTitleBarDraggable();
     setWindowButtonsVisible(m_options & WindowButtonsVisible);
     m_ui->setWindowButtonsUsed(m_options & WindowButtonsVisible);
 }
@@ -361,15 +360,9 @@ void QnMainWindow::updateDwmState() {
         setAttribute(Qt::WA_NoSystemBackground, false);
         setAttribute(Qt::WA_TranslucentBackground, false);
 
-        m_dwm->disableSystemWindowPainting();
-        m_dwm->disableTransparentErasing();
         m_dwm->extendFrameIntoClientArea(QMargins(0, 0, 0, 0));
         m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 0));
         m_dwm->disableBlurBehindWindow();
-
-        m_dwm->enableFrameEmulation();
-        m_dwm->setEmulatedFrameMargins(QMargins(0, 0, 0, 0));
-        m_dwm->setEmulatedTitleBarHeight(0x1000); /* So that the window is click-draggable no matter where the user clicked. */
 
         /* Can't set to (0, 0, 0, 0) on Windows as in fullScreen mode context menu becomes invisible.
          * Looks like Qt bug: http://bugreports.qt.nokia.com/browse/QTBUG-7556. */
@@ -394,16 +387,9 @@ void QnMainWindow::updateDwmState() {
         setAttribute(Qt::WA_NoSystemBackground, true);
         setAttribute(Qt::WA_TranslucentBackground, true);
 
-        m_dwm->disableSystemWindowPainting();
-        m_dwm->enableTransparentErasing();
         m_dwm->extendFrameIntoClientArea();
         m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 0));
-        m_dwm->enableBlurBehindWindow(); /* For reasons unknown, this call is needed to prevent display artifacts. */
-
-        m_dwm->disableFrameEmulation();
-        /*m_dwm->enableFrameEmulation();
-        m_dwm->setEmulatedFrameMargins(m_frameMargins);
-        m_dwm->setEmulatedTitleBarHeight(0x1000); /* So that the window is click-draggable no matter where the user clicked. */
+        m_dwm->enableBlurBehindWindow();
 
         setContentsMargins(0, 0, 0, 0);
 
@@ -415,7 +401,7 @@ void QnMainWindow::updateDwmState() {
             m_frameMargins.bottom()
         );
     } else {
-        /* Windowed without aero glass, all handlers are implemented using Qt. */
+        /* Windowed without aero glass. */
 
         m_drawCustomFrame = true;
 
@@ -424,13 +410,9 @@ void QnMainWindow::updateDwmState() {
         setAttribute(Qt::WA_NoSystemBackground, false);
         setAttribute(Qt::WA_TranslucentBackground, false);
 
-        m_dwm->disableSystemWindowPainting();
-        m_dwm->disableTransparentErasing();
         m_dwm->extendFrameIntoClientArea(QMargins(0, 0, 0, 0));
         m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 0));
         m_dwm->disableBlurBehindWindow();
-
-        m_dwm->disableFrameEmulation();
 
         m_titleLayout->setContentsMargins(m_frameMargins.left(), 2, m_frameMargins.right(), 0);
         m_viewLayout->setContentsMargins(
@@ -440,19 +422,7 @@ void QnMainWindow::updateDwmState() {
             m_frameMargins.bottom()
         );
     }
-
-    updateTitleBarDraggable();
 }
-
-void QnMainWindow::updateTitleBarDraggable() {
-    if(isFullScreen()) {
-        m_dwm->disableTitleBarDrag();
-    } else {
-        m_dwm->disableTitleBarDrag();
-        //m_dwm->enableTitleBarDrag(m_options & TitleBarDraggable);
-    }
-}
-
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -514,20 +484,6 @@ void QnMainWindow::paintEvent(QPaintEvent *event) {
     }
 }
 
-void QnMainWindow::resizeEvent(QResizeEvent *event) {
-    QRect rect = this->rect();
-    QRect viewGeometry = m_view->geometry();
-
-    m_dwm->setNonErasableContentMargins(QMargins(
-        viewGeometry.left(),
-        viewGeometry.top(),
-        rect.right() - viewGeometry.right(),
-        rect.bottom() - viewGeometry.bottom()
-    ));
-
-    base_type::resizeEvent(event);
-}
-
 void QnMainWindow::dragEnterEvent(QDragEnterEvent *event) {
     m_dropResources = QnWorkbenchResource::deserializeResources(event->mimeData());
     if (m_dropResources.empty())
@@ -565,7 +521,7 @@ bool QnMainWindow::winEvent(MSG *message, long *result)
 
 Qt::WindowFrameSection QnMainWindow::windowFrameSectionAt(const QPoint &pos) const {
     Qt::WindowFrameSection result = Qn::toNaturalQtFrameSection(Qn::calculateRectangularFrameSections(rect(), QnGeometry::eroded(rect(), m_frameMargins), QRect(pos, pos)));
-    if(result == Qt::NoSection && pos.y() <= m_tabBar->mapTo(const_cast<QnMainWindow *>(this), m_tabBar->rect().bottomRight()).y())
+    if((m_options & TitleBarDraggable) && result == Qt::NoSection && pos.y() <= m_tabBar->mapTo(const_cast<QnMainWindow *>(this), m_tabBar->rect().bottomRight()).y())
         result = Qt::TitleBarArea;
     return result;
 }
