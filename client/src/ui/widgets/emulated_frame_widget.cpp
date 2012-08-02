@@ -4,6 +4,18 @@
 
 #include <ui/common/frame_section.h>
 
+namespace {
+    void setCursorShape(QWidget *widget, Qt::CursorShape shape) {
+        /* There is no equality check in QWidget::setCursor, 
+         * and we don't want to trigger unnecessary change events. */
+
+        if(widget->cursor().shape() != shape)
+            widget->setCursor(shape);
+    }
+
+} // anonymous namespace
+
+
 QnEmulatedFrameWidget::QnEmulatedFrameWidget(QWidget *parent, Qt::WindowFlags windowFlags):
     QWidget(parent, windowFlags)
 {
@@ -25,20 +37,15 @@ bool QnEmulatedFrameWidget::event(QEvent *event) {
     case QEvent::HoverMove: {
         QHoverEvent *e = static_cast<QHoverEvent *>(event);
         if(childAt(e->pos())) {
-            unsetCursor();
+            setCursorShape(this, Qt::ArrowCursor);
         } else {
-            Qt::CursorShape cursorShape = Qn::calculateHoverCursorShape(windowFrameSectionAt(e->pos()));
-        
-            /* There is no equality check in QWidget::setCursor, 
-             * and we don't want to trigger unnecessary change events. */
-            if(cursor().shape() != cursorShape)
-                setCursor(cursorShape);
+            setCursorShape(this, Qn::calculateHoverCursorShape(windowFrameSectionAt(e->pos())));
         }
         event->accept();
         return true;
     }
     case QEvent::HoverLeave:
-        unsetCursor();
+        setCursorShape(this, Qt::ArrowCursor);
         event->accept();
         return true;
     default:

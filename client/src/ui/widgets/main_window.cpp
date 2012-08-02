@@ -338,7 +338,10 @@ void QnMainWindow::updateFullScreenState() {
 }
 
 void QnMainWindow::updateDwmState() {
+#if 0
     if(!m_dwm->isSupported()) {
+        /* Non-windows systems where DWM is not supported. */
+
         m_drawCustomFrame = false;
 
         setAttribute(Qt::WA_NoSystemBackground, false);
@@ -346,23 +349,22 @@ void QnMainWindow::updateDwmState() {
 
         m_titleLayout->setContentsMargins(0, 0, 0, 0);
         m_viewLayout->setContentsMargins(0, 0, 0, 0);
-
-        return; /* Do nothing on systems where our tricks are not supported. */
-    }
-
+    } else */
+#endif
+        
     if(isFullScreen()) {
         /* Full screen mode. */
-
         m_drawCustomFrame = false;
-
         m_frameMargins = QMargins(0, 0, 0, 0);
 
-        setAttribute(Qt::WA_NoSystemBackground, false);
-        setAttribute(Qt::WA_TranslucentBackground, false);
+        if(m_dwm->isSupported()) {
+            setAttribute(Qt::WA_NoSystemBackground, false);
+            setAttribute(Qt::WA_TranslucentBackground, false);
 
-        m_dwm->extendFrameIntoClientArea(QMargins(0, 0, 0, 0));
-        m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 0));
-        m_dwm->disableBlurBehindWindow();
+            m_dwm->extendFrameIntoClientArea(QMargins(0, 0, 0, 0));
+            m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 0));
+            m_dwm->disableBlurBehindWindow();
+        }
 
         /* Can't set to (0, 0, 0, 0) on Windows as in fullScreen mode context menu becomes invisible.
          * Looks like Qt bug: http://bugreports.qt.nokia.com/browse/QTBUG-7556. */
@@ -374,14 +376,9 @@ void QnMainWindow::updateDwmState() {
 
         m_titleLayout->setContentsMargins(0, 0, 0, 0);
         m_viewLayout->setContentsMargins(0, 0, 0, 0);
-    } else if(m_dwm->isCompositionEnabled()) {
+    } else if(m_dwm->isSupported() && m_dwm->isCompositionEnabled()) {
         /* Windowed with aero glass. */
-
         m_drawCustomFrame = false;
-
-        if(!m_dwm->isCompositionEnabled())
-            qnWarning("Transitioning to glass state when aero composition is disabled. Expect display artifacts.");
-
         m_frameMargins = m_dwm->themeFrameMargins();
 
         setAttribute(Qt::WA_NoSystemBackground, true);
@@ -402,17 +399,17 @@ void QnMainWindow::updateDwmState() {
         );
     } else {
         /* Windowed without aero glass. */
-
         m_drawCustomFrame = true;
+        m_frameMargins = m_dwm->isSupported() ? m_dwm->themeFrameMargins() : QMargins(8, 8, 8, 8);
 
-        m_frameMargins = m_dwm->themeFrameMargins();
+        if(m_dwm->isSupported()) {
+            setAttribute(Qt::WA_NoSystemBackground, false);
+            setAttribute(Qt::WA_TranslucentBackground, false);
 
-        setAttribute(Qt::WA_NoSystemBackground, false);
-        setAttribute(Qt::WA_TranslucentBackground, false);
-
-        m_dwm->extendFrameIntoClientArea(QMargins(0, 0, 0, 0));
-        m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 0));
-        m_dwm->disableBlurBehindWindow();
+            m_dwm->extendFrameIntoClientArea(QMargins(0, 0, 0, 0));
+            m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 0));
+            m_dwm->disableBlurBehindWindow();
+        }
 
         m_titleLayout->setContentsMargins(m_frameMargins.left(), 2, m_frameMargins.right(), 0);
         m_viewLayout->setContentsMargins(
@@ -423,6 +420,7 @@ void QnMainWindow::updateDwmState() {
         );
     }
 }
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
