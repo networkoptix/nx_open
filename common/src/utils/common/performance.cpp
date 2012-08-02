@@ -81,6 +81,18 @@ namespace {
             return result;
         }
 
+        QString getWbemString(IWbemClassObject *pclsObj, LPCWSTR wszName){
+            VARIANT vtProc;
+            pclsObj->Get(wszName,0, &vtProc, 0, 0);
+            QString result = QString();
+            if (vtProc.vt == VT_BSTR){
+                QString qstr((QChar*)vtProc.bstrVal, ::SysStringLen(vtProc.bstrVal));
+                result = qstr;
+            }
+            VariantClear(&vtProc);
+            return result;
+        }
+
         int getWbemInt(IWbemClassObject *pclsObj, LPCWSTR wszName, int def = -1){
             VARIANT vtProc;
             pclsObj->Get(wszName,0, &vtProc, 0, 0);
@@ -112,46 +124,25 @@ namespace {
 
         void refresh() {
             const quint64 max = 100;
-            quint64 ts = 0;
 
-            char q_str2[100];
-            sprintf(q_str2, "SELECT * FROM Win32_PerfRawData_PerfOS_Processor WHERE Name=""0"""); 
-            IEnumWbemClassObject* pEnumerator2 = query(q_str2);
-            if (pEnumerator2){
-                IWbemClassObject *pclsObj;
-                ULONG uReturn = 0;
-                quint64 idle = 0;
-
-                pEnumerator2->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
-                while (uReturn != 0)
-                {
-                    idle += getWbemLongLong(pclsObj, L"PercentIdleTime");
-                    ts = getWbemLongLong(pclsObj, L"Timestamp_Sys100NS");
-                    pclsObj->Release();
-                    pEnumerator2->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
-                }
-                pEnumerator2->Release();
-
-                if (m_timeStamp && ts){
-                    qulonglong timespan = ((ts - m_timeStamp));
-                    m_totalUsage = 100 - qMin(max, ((idle - m_totalIdle) * 100) / timespan);
-                }
-                m_totalIdle = idle;
-            }
-
-            ts = enumerateWbem(
-                QString::fromLatin1("SELECT * FROM Win32_PerfRawData_PerfOS_Processor WHERE Name=""0"""),
-                L"Timestamp_Sys100NS");
             quint64 cpu = enumerateWbem(
                 QString::fromLatin1("SELECT * FROM Win32_PerfRawData_PerfProc_Process WHERE IdProcess = %1").arg(QCoreApplication::applicationPid()),
                 L"PercentProcessorTime");
+            quint64 timeStamp = enumerateWbem(
+                QString::fromLatin1("SELECT * FROM Win32_PerfRawData_PerfProc_Process WHERE IdProcess = %1").arg(QCoreApplication::applicationPid()),
+                L"Timestamp_Sys100NS");
+            quint64 idle = enumerateWbem(
+                QString::fromLatin1("SELECT * FROM Win32_PerfRawData_PerfProc_Process WHERE Name = \"Idle\""),
+                L"PercentProcessorTime");
 
-            if (m_timeStamp && ts && cpu && m_processCpu){
-                qulonglong timespan = ((ts - m_timeStamp) * QnPerformance::cpuCoreCount());
+            if (m_timeStamp && timeStamp){
+                qulonglong timespan = (timeStamp - m_timeStamp) * QnPerformance::cpuCoreCount();
+                m_totalUsage = 100 - qMin(max, ((idle - m_totalIdle) * 100) / timespan);
                 m_usage = qMin(max, ((cpu - m_processCpu) * 100) / timespan);
             }
+            m_totalIdle = idle;
             m_processCpu = cpu;
-            m_timeStamp = ts;
+            m_timeStamp = timeStamp;
         }
 
         bool init() {
@@ -290,10 +281,10 @@ namespace {
         /** Previous value of raw WMI PercentProcessorTime stat for our process. */
         quint64 m_processCpu;
 
-        /** Previous value of raw WMI PercentProcessorIdle stat for all processors. */
+        /** Previous value of raw WMI PercentProcessorTime stat for the IDLE process. */
         quint64 m_totalIdle;
 
-        /** Previous value of raw WMI Timestamp_Sys100NS stat. */
+        /** Previous value of raw WMI Timestamp_Sys100NS stat for our process. */
         quint64 m_timeStamp;
 
         /** Processor usage percent by our process for the last CPU_USAGE_REFRESH seconds. */
