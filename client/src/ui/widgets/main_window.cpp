@@ -430,8 +430,6 @@ void QnMainWindow::updateDwmState() {
 bool QnMainWindow::event(QEvent *event) {
     bool result = base_type::event(event);
 
-    qDebug() << event->type();
-
     if(event->type() == QnSystemMenuEvent::SystemMenu)
         menu()->trigger(Qn::MainMenuAction);
 
