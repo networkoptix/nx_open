@@ -139,8 +139,6 @@ namespace {
                 {
                     quint64 data = getWbemLongLong(pclsObj, value);
                     dataList->append(data);
-                    QString name = getWbemString(pclsObj, L"Name");
-                    qDebug() << "name " << name;
                     pclsObj->Release();
                     pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
                 }
@@ -171,7 +169,6 @@ namespace {
                 m_hddUsage.clear();
                 for (int i = 0; i < qMin(hdds->count(), m_rawHddUsageIdle.count()); i++){
                     m_hddUsage.append(PERCENT_CAP - qMin(PERCENT_CAP, (hdds->at(i) - m_rawHddUsageIdle.at(i)) * PERCENT_CAP / timespan ));
-                    qDebug() << "HDD" << i << " USAGE " << m_hddUsage.at(i);
                 }
 
                 timespan *= QnPerformance::cpuCoreCount(); // cpu counters are relayed on this coeff
