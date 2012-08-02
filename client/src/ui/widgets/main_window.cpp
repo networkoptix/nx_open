@@ -21,6 +21,7 @@
 #include <api/app_server_connection.h>
 #include <api/session_manager.h>
 
+#include "ui/common/frame_section.h"
 #include "ui/actions/action_manager.h"
 #include "ui/graphics/view/graphics_view.h"
 #include "ui/graphics/view/gradient_background_painter.h"
@@ -78,7 +79,7 @@ namespace {
 
 
 QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowFlags flags): 
-    QWidget(parent, flags | Qt::CustomizeWindowHint),
+    base_type(parent, flags | Qt::CustomizeWindowHint),
     QnWorkbenchContextAware(context),
     m_controller(0),
     m_drawCustomFrame(false),
@@ -98,10 +99,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_dwm = new QnDwm(this);
 
     connect(m_dwm,                          SIGNAL(compositionChanged(bool)),               this,                                   SLOT(updateDwmState()));
-
-    /* Set up dragging. */
-    m_dragProcessor = new DragProcessor(this);
-    m_dragProcessor->setHandler(this);
 
     /* Set up properties. */
     setWindowTitle(QApplication::applicationName());
@@ -359,6 +356,8 @@ void QnMainWindow::updateDwmState() {
 
         m_drawCustomFrame = false;
 
+        m_frameMargins = QMargins(0, 0, 0, 0);
+
         setAttribute(Qt::WA_NoSystemBackground, false);
         setAttribute(Qt::WA_TranslucentBackground, false);
 
@@ -390,7 +389,7 @@ void QnMainWindow::updateDwmState() {
         if(!m_dwm->isCompositionEnabled())
             qnWarning("Transitioning to glass state when aero composition is disabled. Expect display artifacts.");
 
-        QMargins frameMargins = m_dwm->themeFrameMargins();
+        m_frameMargins = m_dwm->themeFrameMargins();
 
         setAttribute(Qt::WA_NoSystemBackground, true);
         setAttribute(Qt::WA_TranslucentBackground, true);
@@ -403,24 +402,24 @@ void QnMainWindow::updateDwmState() {
 
         m_dwm->disableFrameEmulation();
         /*m_dwm->enableFrameEmulation();
-        m_dwm->setEmulatedFrameMargins(frameMargins);
+        m_dwm->setEmulatedFrameMargins(m_frameMargins);
         m_dwm->setEmulatedTitleBarHeight(0x1000); /* So that the window is click-draggable no matter where the user clicked. */
 
         setContentsMargins(0, 0, 0, 0);
 
-        m_titleLayout->setContentsMargins(frameMargins.left(), 2, frameMargins.right(), 0);
+        m_titleLayout->setContentsMargins(m_frameMargins.left(), 2, m_frameMargins.right(), 0);
         m_viewLayout->setContentsMargins(
-            frameMargins.left(),
-            isTitleVisible() ? 0 : frameMargins.top(),
-            frameMargins.right(),
-            frameMargins.bottom()
+            m_frameMargins.left(),
+            isTitleVisible() ? 0 : m_frameMargins.top(),
+            m_frameMargins.right(),
+            m_frameMargins.bottom()
         );
     } else {
         /* Windowed without aero glass, all handlers are implemented using Qt. */
 
         m_drawCustomFrame = true;
 
-        QMargins frameMargins = m_dwm->themeFrameMargins();
+        m_frameMargins = m_dwm->themeFrameMargins();
 
         setAttribute(Qt::WA_NoSystemBackground, false);
         setAttribute(Qt::WA_TranslucentBackground, false);
@@ -433,14 +432,12 @@ void QnMainWindow::updateDwmState() {
 
         m_dwm->disableFrameEmulation();
 
-        setContentsMargins(0, 0, 0, 0);
-
-        m_titleLayout->setContentsMargins(frameMargins.left(), 2, frameMargins.right(), 0);
+        m_titleLayout->setContentsMargins(m_frameMargins.left(), 2, m_frameMargins.right(), 0);
         m_viewLayout->setContentsMargins(
-            frameMargins.left(),
-            isTitleVisible() ? 0 : frameMargins.top(),
-            frameMargins.right(),
-            frameMargins.bottom()
+            m_frameMargins.left(),
+            isTitleVisible() ? 0 : m_frameMargins.top(),
+            m_frameMargins.right(),
+            m_frameMargins.bottom()
         );
     }
 
@@ -456,16 +453,14 @@ void QnMainWindow::updateTitleBarDraggable() {
     }
 }
 
-bool QnMainWindow::isTabBar(const QPoint &pos) const {
-    return pos.y() <= m_tabBar->mapTo(const_cast<QnMainWindow *>(this), m_tabBar->rect().bottomRight()).y();
-}
-
 
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
 bool QnMainWindow::event(QEvent *event) {
     bool result = base_type::event(event);
+
+    qDebug() << event->type();
 
     if(event->type() == QnSystemMenuEvent::SystemMenu)
         menu()->trigger(Qn::MainMenuAction);
@@ -476,25 +471,11 @@ bool QnMainWindow::event(QEvent *event) {
     return result;
 }
 
-void QnMainWindow::mousePressEvent(QMouseEvent *event) {
-    base_type::mousePressEvent(event);
-
-    if(event->button() == Qt::LeftButton) {
-        m_dragProcessor->widgetMousePressEvent(this, event);
-        event->accept();
-    }
-}
-
-void QnMainWindow::mouseMoveEvent(QMouseEvent *event) {
-    base_type::mouseMoveEvent(event);
-    m_dragProcessor->widgetMouseMoveEvent(this, event);
-}
 
 void QnMainWindow::mouseReleaseEvent(QMouseEvent *event) {
     base_type::mouseReleaseEvent(event);
-    m_dragProcessor->widgetMouseReleaseEvent(this, event);
 
-    if(event->button() == Qt::RightButton && isTabBar(event->pos())) {
+    if(event->button() == Qt::RightButton && windowFrameSectionAt(event->pos()) == Qt::TitleBarArea) {
         QContextMenuEvent e(QContextMenuEvent::Mouse, m_tabBar->mapFrom(this, event->pos()), event->globalPos(), event->modifiers());
         QApplication::sendEvent(m_tabBar, &e);
         event->accept();
@@ -504,7 +485,7 @@ void QnMainWindow::mouseReleaseEvent(QMouseEvent *event) {
 void QnMainWindow::mouseDoubleClickEvent(QMouseEvent *event) {
     base_type::mouseDoubleClickEvent(event);
 
-    if(event->button() == Qt::LeftButton && isTabBar(event->pos())) {
+    if(event->button() == Qt::LeftButton && windowFrameSectionAt(event->pos()) == Qt::TitleBarArea) {
         toggleFullScreen();
         event->accept();
     }
@@ -582,8 +563,11 @@ bool QnMainWindow::winEvent(MSG *message, long *result)
 }
 #endif
 
-void QnMainWindow::dragMove(DragInfo *info) {
-    move(pos() + info->mouseScreenPos() - info->lastMouseScreenPos());
+Qt::WindowFrameSection QnMainWindow::windowFrameSectionAt(const QPoint &pos) const {
+    Qt::WindowFrameSection result = Qn::toNaturalQtFrameSection(Qn::calculateRectangularFrameSections(rect(), QnGeometry::eroded(rect(), m_frameMargins), QRect(pos, pos)));
+    if(result == Qt::NoSection && pos.y() <= m_tabBar->mapTo(const_cast<QnMainWindow *>(this), m_tabBar->rect().bottomRight()).y())
+        result = Qt::TitleBarArea;
+    return result;
 }
 
 void QnMainWindow::at_fileOpenSignalizer_activated(QObject *, QEvent *event) {

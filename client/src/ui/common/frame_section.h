@@ -33,6 +33,8 @@ namespace Qn {
 
     Qn::WindowFrameSections calculateRectangularFrameSections(const QRectF &frameRect, const QRectF &rect, const QRectF &query);
 
+    Qn::WindowFrameSections calculateRectangularFrameSections(const QRect &frameRect, const QRect &rect, const QRect &query);
+
     Qt::CursorShape calculateHoverCursorShape(Qt::WindowFrameSection section);
 
     QSizeF calculateSizeDelta(const QPointF &dragDelta, Qt::WindowFrameSection section);
