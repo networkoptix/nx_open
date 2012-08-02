@@ -228,16 +228,19 @@ void detail::VideoServerSessionManagerReplyProcessor::at_replyReceived(int statu
 }
 
 // very simple parser. Used for parsing own created XML
-QByteArray extractXmlBody(const QByteArray& body, const QByteArray tagName, int from = 0)
+QByteArray extractXmlBody(const QByteArray& body, const QByteArray& tagName, int *from = NULL)
 {
     QByteArray tagStart = QByteArray("<") + tagName + QByteArray(">");
-    int bodyStart = body.indexOf(tagStart, from);
+    int bodyStart = body.indexOf(tagStart, from ? *from : 0);
     if (bodyStart >= 0)
         bodyStart += tagStart.length();
     QByteArray tagEnd = QByteArray("</") + tagName + QByteArray(">");
     int bodyEnd = body.indexOf(tagEnd, bodyStart);
-    if (bodyStart >= 0 && bodyEnd >= 0)
+    if (bodyStart >= 0 && bodyEnd >= 0){
+        if (from)
+            *from = bodyEnd + tagEnd.length();
         return body.mid(bodyStart, bodyEnd - bodyStart).trimmed();
+    }
     else
         return QByteArray();
 }
@@ -321,11 +324,9 @@ void detail::VideoServerSessionManagerStatisticsRequestReplyProcessor::at_replyR
         int from = 0;
         do 
         {
-            storage = extractXmlBody(storages, "storage", from);
+            storage = extractXmlBody(storages, "storage", &from);
             if (storage.length() == 0)
                 break;
-
-            from += storage.length();
             QString url = QLatin1String(extractXmlBody(storage, "url"));
             usage = extractXmlBody(storage, "usage").toShort();
             data.append(QnStatisticsData(url, usage, QnStatisticsData::HDD));
