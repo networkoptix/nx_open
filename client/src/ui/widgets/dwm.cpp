@@ -205,7 +205,7 @@ QnDwm::~QnDwm() {
 }
 
 bool QnDwm::isSupported() {
-    return qn_dwm_isSupported();
+    return *qn_dwm_isSupported();
 }
 
 bool QnDwm::enableBlurBehindWindow(bool enable) {
