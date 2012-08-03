@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=HD Witness
+Comment=HD Witness Client
+Exec=/opt/networkoptix/client/bin/client
+Icon=hdwitness
+Terminal=false
+Type=Application
+StartupNotify=true
