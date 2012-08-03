@@ -6,6 +6,7 @@
 #include <core/resource/resource_fwd.h>
 #include <ui/actions/actions.h>
 #include <ui/workbench/workbench_context_aware.h>
+#include "emulated_frame_widget.h"
 
 class QTabBar;
 class QBoxLayout;
@@ -27,10 +28,10 @@ class QnWorkbenchDisplay;
 class QnWorkbenchLayout;
 class QnWorkbenchActionHandler;
 
-class QnMainWindow: public QWidget, public QnWorkbenchContextAware {
+class QnMainWindow: public QnEmulatedFrameWidget, public QnWorkbenchContextAware {
     Q_OBJECT;
 
-    typedef QWidget base_type;
+    typedef QnEmulatedFrameWidget base_type;
 
 public:
     enum Option {
@@ -56,20 +57,18 @@ protected:
     virtual bool event(QEvent *event) override;
     virtual void changeEvent(QEvent *event) override;
     virtual void paintEvent(QPaintEvent *event) override;
-    virtual void resizeEvent(QResizeEvent *event) override;
     virtual void dragEnterEvent(QDragEnterEvent *event) override;
     virtual void dragMoveEvent(QDragMoveEvent *event) override;
     virtual void dragLeaveEvent(QDragLeaveEvent *event) override;
     virtual void dropEvent(QDropEvent *event) override;
+    virtual void mouseReleaseEvent(QMouseEvent *event) override;
+    virtual void mouseDoubleClickEvent(QMouseEvent *event) override;
 
-    void ncMouseReleaseEvent(QMouseEvent *event);
-    void ncMouseDoubleClickEvent(QMouseEvent *event);
+    virtual Qt::WindowFrameSection windowFrameSectionAt(const QPoint &pos) const override;
 
 #ifdef Q_OS_WIN
     virtual bool winEvent(MSG *message, long *result) override;
 #endif
-
-    bool canAutoDelete(const QnResourcePtr &resource) const;
 
 protected slots:
     void setTitleVisible(bool visible);
@@ -82,7 +81,6 @@ protected slots:
 
     void updateFullScreenState();
     void updateDwmState();
-    void updateTitleBarDraggable();
 
     void at_fileOpenSignalizer_activated(QObject *object, QEvent *event);
     void at_sessionManager_error(int error);
@@ -116,6 +114,7 @@ private:
     bool m_drawCustomFrame;
 
     Options m_options;
+    QMargins m_frameMargins;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnMainWindow::Options);

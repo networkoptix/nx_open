@@ -267,7 +267,6 @@ int main(int argc, char *argv[])
         }
     }
 
-
     /* Initialize connections. */
     initAppServerConnection();
     qnSettings->save();
