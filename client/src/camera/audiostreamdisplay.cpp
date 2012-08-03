@@ -34,9 +34,14 @@ static void down_mix_to_stereo(T *data, int channels, int len)
         if (channels >= 6)
         {
             c =  input[2];
-            lfe = input[3]; //Postings on the Doom9 say that Dolby specifically says the LFE (.1) channel should usually be ignored during downmixing to Dolby ProLogic II, with quotes from official Dolby documentation.
+            lfe = input[3];
             rl = input[4];
             rr = input[5];
+
+            /* Postings on Doom9 say that Dolby specifically says the LFE (.1) 
+             * channel should usually be ignored during downmixing to Dolby ProLogic II, 
+             * with quotes from official Dolby documentation. */
+            Q_UNUSED(lfe);
 
             output[0] = clip_short(fl + (0.5 * rl) + (0.7 * c));
             output[1] = clip_short(fr + (0.5 * rr) + (0.7 * c));
@@ -51,7 +56,7 @@ static void down_mix_to_stereo(T *data, int channels, int len)
     }
 }
 
-CLAudioStreamDisplay::CLAudioStreamDisplay(int bufferMs, int prebufferMs) :
+QnAudioStreamDisplay::QnAudioStreamDisplay(int bufferMs, int prebufferMs):
     m_bufferMs(bufferMs),
     m_prebufferMs(prebufferMs),
     m_tooFewDataDetected(true),
@@ -62,11 +67,9 @@ CLAudioStreamDisplay::CLAudioStreamDisplay(int bufferMs, int prebufferMs) :
     m_sampleConvertMethod(SampleConvert_None),
     m_isConvertMethodInitialized(false),
     m_decodedAudioBuffer(CL_MEDIA_ALIGNMENT, AVCODEC_MAX_AUDIO_FRAME_SIZE)
-{
-    
-}
+{}
 
-CLAudioStreamDisplay::~CLAudioStreamDisplay()
+QnAudioStreamDisplay::~QnAudioStreamDisplay()
 {
     if (m_audioSound)
         QtvAudioDevice::instance()->removeSound(m_audioSound);
@@ -77,7 +80,7 @@ CLAudioStreamDisplay::~CLAudioStreamDisplay()
     }
 }
 
-int CLAudioStreamDisplay::msInBuffer() const
+int QnAudioStreamDisplay::msInBuffer() const
 {
     int internalBufferSize = (m_audioSound ? m_audioSound->playTimeElapsed()/1000.0 : 0);
 
@@ -88,7 +91,7 @@ int CLAudioStreamDisplay::msInBuffer() const
     return msInQueue() + internalBufferSize;
 }
 
-void CLAudioStreamDisplay::suspend()
+void QnAudioStreamDisplay::suspend()
 {
     QMutexLocker lock(&m_guiSync);
     if (m_audioSound) {
@@ -97,19 +100,19 @@ void CLAudioStreamDisplay::suspend()
     }
 }
 
-void CLAudioStreamDisplay::resume()
+void QnAudioStreamDisplay::resume()
 {
     QMutexLocker lock(&m_guiSync);
     if (m_audioSound)
         m_audioSound->resume();
 }
 
-bool CLAudioStreamDisplay::isBuffering() const
+bool QnAudioStreamDisplay::isBuffering() const
 {
     return m_tooFewDataDetected;
 }
 
-bool CLAudioStreamDisplay::isFormatSupported() const
+bool QnAudioStreamDisplay::isFormatSupported() const
 {
     if (!m_audioSound)
         return true; // it's not constructed yet
@@ -118,13 +121,13 @@ bool CLAudioStreamDisplay::isFormatSupported() const
     return m_isFormatSupported;
 }
 
-void CLAudioStreamDisplay::clearDeviceBuffer()
+void QnAudioStreamDisplay::clearDeviceBuffer()
 {
     if (m_audioSound)
         m_audioSound->clear();
 }
 
-void CLAudioStreamDisplay::clearAudioBuffer()
+void QnAudioStreamDisplay::clearAudioBuffer()
 {
     while (!m_audioQueue.isEmpty())
     {
@@ -135,7 +138,7 @@ void CLAudioStreamDisplay::clearAudioBuffer()
     m_tooFewDataDetected = true;
 }
 
-void CLAudioStreamDisplay::enqueueData(QnCompressedAudioDataPtr data, qint64 minTime)
+void QnAudioStreamDisplay::enqueueData(QnCompressedAudioDataPtr data, qint64 minTime)
 {
     m_audioQueue.enqueue(data);
 
@@ -153,7 +156,7 @@ void CLAudioStreamDisplay::enqueueData(QnCompressedAudioDataPtr data, qint64 min
     //    m_audioQueue.dequeue()->releaseRef();
 }
 
-bool CLAudioStreamDisplay::initFormatConvertRule(QnAudioFormat format)
+bool QnAudioStreamDisplay::initFormatConvertRule(QnAudioFormat format)
 {
     if (m_forceDownmix && format.channelCount() > 2)
     {
@@ -201,7 +204,7 @@ bool CLAudioStreamDisplay::initFormatConvertRule(QnAudioFormat format)
     return false; // conversion rule not found
 }
 
-void CLAudioStreamDisplay::putData(QnCompressedAudioDataPtr data, qint64 minTime)
+void QnAudioStreamDisplay::putData(QnCompressedAudioDataPtr data, qint64 minTime)
 {
     static const int MAX_BUFFER_LEN = 3000;
     if (data == 0 && !m_audioSound) // do not need to check audio device in case of data=0 and no audio device
@@ -242,7 +245,7 @@ void CLAudioStreamDisplay::putData(QnCompressedAudioDataPtr data, qint64 minTime
     /**/
 }
 
-void CLAudioStreamDisplay::playCurrentBuffer()
+void QnAudioStreamDisplay::playCurrentBuffer()
 {
     QnCompressedAudioDataPtr data;
     while (!m_audioQueue.isEmpty() )
@@ -265,7 +268,7 @@ void CLAudioStreamDisplay::playCurrentBuffer()
 
         if (data->compressionType == CODEC_ID_NONE)
         {
-            cl_log.log(QLatin1String("CLAudioStreamDisplay::putdata: unknown codec type..."), cl_logERROR);
+            cl_log.log(QLatin1String("QnAudioStreamDisplay::putdata: unknown codec type..."), cl_logERROR);
             return;
         }
 
@@ -321,7 +324,7 @@ void CLAudioStreamDisplay::playCurrentBuffer()
 }
 
 //=======================================================================
-QnCodecAudioFormat CLAudioStreamDisplay::downmix(QnByteArray& audio, QnCodecAudioFormat format)
+QnCodecAudioFormat QnAudioStreamDisplay::downmix(QnByteArray& audio, QnCodecAudioFormat format)
 {
     if (format.channels() > 2)
     {
@@ -341,7 +344,7 @@ QnCodecAudioFormat CLAudioStreamDisplay::downmix(QnByteArray& audio, QnCodecAudi
     return format;
 }
 
-QnCodecAudioFormat CLAudioStreamDisplay::float2int16(QnByteArray& audio, QnCodecAudioFormat format)
+QnCodecAudioFormat QnAudioStreamDisplay::float2int16(QnByteArray& audio, QnCodecAudioFormat format)
 {
     Q_ASSERT(sizeof(float) == 4); // not sure about sizeof(float) in 64 bit version
 
@@ -362,7 +365,7 @@ QnCodecAudioFormat CLAudioStreamDisplay::float2int16(QnByteArray& audio, QnCodec
     return format;
 }
 
-QnCodecAudioFormat CLAudioStreamDisplay::int32Toint16(QnByteArray& audio, QnCodecAudioFormat format)
+QnCodecAudioFormat QnAudioStreamDisplay::int32Toint16(QnByteArray& audio, QnCodecAudioFormat format)
 {
     Q_ASSERT(sizeof(float) == 4); // not sure about sizeof(float) in 64 bit version
 
@@ -382,7 +385,7 @@ QnCodecAudioFormat CLAudioStreamDisplay::int32Toint16(QnByteArray& audio, QnCode
     return format;
 }
 
-QnCodecAudioFormat CLAudioStreamDisplay::float2int32(QnByteArray& audio, QnCodecAudioFormat format)
+QnCodecAudioFormat QnAudioStreamDisplay::float2int32(QnByteArray& audio, QnCodecAudioFormat format)
 {
     Q_ASSERT(sizeof(float) == 4); // not sure about sizeof(float) in 64 bit version
 
@@ -398,7 +401,7 @@ QnCodecAudioFormat CLAudioStreamDisplay::float2int32(QnByteArray& audio, QnCodec
     return format;
 }
 
-int CLAudioStreamDisplay::msInQueue() const
+int QnAudioStreamDisplay::msInQueue() const
 {
     if (m_audioQueue.isEmpty())
         return 0;
@@ -412,13 +415,13 @@ int CLAudioStreamDisplay::msInQueue() const
     return diff / 1000;
 }
 
-void CLAudioStreamDisplay::setForceDownmix(bool value)
+void QnAudioStreamDisplay::setForceDownmix(bool value)
 {
     m_forceDownmix = value;
     m_isConvertMethodInitialized = false;
 }
 
-int CLAudioStreamDisplay::getAudioBufferSize() const
+int QnAudioStreamDisplay::getAudioBufferSize() const
 {
     return m_bufferMs;
 }

@@ -310,7 +310,7 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompress
     {
         if (!m_bufferedFrameDisplayer) {
             QMutexLocker lock(&m_timeMutex);
-            m_bufferedFrameDisplayer = new BufferedFrameDisplayer(m_drawer);
+            m_bufferedFrameDisplayer = new QnBufferedFrameDisplayer(m_drawer);
             m_queueWasFilled = false;
         }
     }

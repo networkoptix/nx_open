@@ -9,7 +9,7 @@
 
 class QnTcpListener;
 
-class QnTCPConnectionProcessor: public CLLongRunnable {
+class QnTCPConnectionProcessor: public QnLongRunnable {
     Q_OBJECT;
 
 public:

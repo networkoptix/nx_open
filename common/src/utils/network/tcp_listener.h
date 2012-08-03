@@ -10,7 +10,7 @@
 class TCPSocket;
 class QnTCPConnectionProcessor;
 
-class QnTcpListener: public CLLongRunnable
+class QnTcpListener: public QnLongRunnable
 {
 public:
     bool authenticate(const QHttpRequestHeader& headers, QHttpResponseHeader& responseHeaders) const;

@@ -83,7 +83,7 @@ private:
     bool m_forceSoftYUV;
 
     uchar* m_yuv2rgbBuffer;
-    size_t m_yuv2rgbBufferLen;
+    int m_yuv2rgbBufferLen;
 
     bool m_textureUploaded;
 

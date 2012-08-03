@@ -13,7 +13,7 @@ public:
         newPort = 0;
     }
     TCPServerSocket* serverSocket;
-    QMap<TCPSocket*, CLLongRunnable*> connections;
+    QMap<TCPSocket*, QnLongRunnable*> connections;
     QByteArray authDigest;
     QMutex portMutex;
     int newPort;
@@ -73,9 +73,9 @@ QnTcpListener::~QnTcpListener()
 void QnTcpListener::removeDisconnectedConnections()
 {
     Q_D(QnTcpListener);
-    for (QMap<TCPSocket*, CLLongRunnable*>::iterator itr = d->connections.begin(); itr != d->connections.end();)
+    for (QMap<TCPSocket*, QnLongRunnable*>::iterator itr = d->connections.begin(); itr != d->connections.end();)
     {
-        CLLongRunnable* processor = itr.value();
+        QnLongRunnable* processor = itr.value();
         if (!processor->isRunning()) {
             delete processor;
             itr = d->connections.erase(itr);
@@ -89,15 +89,15 @@ void QnTcpListener::removeAllConnections()
 {
     Q_D(QnTcpListener);
 
-    for (QMap<TCPSocket*, CLLongRunnable*>::iterator itr = d->connections.begin(); itr != d->connections.end(); ++itr)
+    for (QMap<TCPSocket*, QnLongRunnable*>::iterator itr = d->connections.begin(); itr != d->connections.end(); ++itr)
     {
-        CLLongRunnable* processor = itr.value();
+        QnLongRunnable* processor = itr.value();
         processor->pleaseStop();
     }
 
-    for (QMap<TCPSocket*, CLLongRunnable*>::iterator itr = d->connections.begin(); itr != d->connections.end(); ++itr)
+    for (QMap<TCPSocket*, QnLongRunnable*>::iterator itr = d->connections.begin(); itr != d->connections.end(); ++itr)
     {
-        CLLongRunnable* processor = itr.value();
+        QnLongRunnable* processor = itr.value();
         delete processor;
     }
     d->connections.clear();

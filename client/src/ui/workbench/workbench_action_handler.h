@@ -25,7 +25,7 @@ class QnWorkbenchActionHandler;
 class QnActionManager;
 class QnAction;
 class QnCameraSettingsDialog;
-class CLVideoCamera;
+class QnVideoCamera;
 
 namespace detail {
     class QnResourceStatusReplyProcessor: public QObject {
@@ -277,7 +277,7 @@ private:
      * the user logs in. */
     QList<QnMimeData> m_delayedDrops;
 
-    CLVideoCamera* m_layoutExportCamera;
+    QnVideoCamera* m_layoutExportCamera;
     QQueue<QnMediaResourcePtr> m_layoutExportResources;
     QString m_layoutFileName;
     QnTimePeriod m_exportPeriod;

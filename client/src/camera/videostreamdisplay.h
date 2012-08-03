@@ -8,7 +8,7 @@
 class QnAbstractVideoDecoder;
 struct QnCompressedVideoData;
 class QnAbstractRenderer;
-class BufferedFrameDisplayer;
+class QnBufferedFrameDisplayer;
 
 static const int MAX_FRAME_QUEUE_SIZE = 12;
 static const int MAX_QUEUE_TIME = 1000 * 200;
@@ -91,7 +91,7 @@ private:
     int m_realReverseSize;
     int m_maxReverseQueueSize;
     bool m_timeChangeEnabled;
-    BufferedFrameDisplayer* m_bufferedFrameDisplayer;
+    QnBufferedFrameDisplayer* m_bufferedFrameDisplayer;
     bool m_canUseBufferedFrameDisplayer;
 
 private:

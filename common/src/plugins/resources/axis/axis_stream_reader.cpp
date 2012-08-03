@@ -313,7 +313,7 @@ bool QnAxisStreamReader::isGotFrame(QnCompressedVideoDataPtr videoData)
 
 void QnAxisStreamReader::pleaseStop()
 {
-    CLLongRunnable::pleaseStop();
+    QnLongRunnable::pleaseStop();
     m_rtpStreamParser.closeStream();
 }
 

@@ -43,7 +43,7 @@ class QnWorkbenchContext;
 class QnWorkbenchStreamSynchronizer;
 class QnToggle;
 
-class CLVideoCamera;
+class QnVideoCamera;
 class CLCamDisplay;
 
 /**
@@ -190,7 +190,7 @@ public:
 
     QnResourceDisplay *display(QnWorkbenchItem *item) const;
 
-    CLVideoCamera *camera(QnWorkbenchItem *item) const;
+    QnVideoCamera *camera(QnWorkbenchItem *item) const;
 
     CLCamDisplay *camDisplay(QnWorkbenchItem *item) const;
 

@@ -102,7 +102,7 @@ QnMetaDataV1Ptr QnISDStreamReader::getCameraMetadata()
 
 void QnISDStreamReader::pleaseStop()
 {
-    CLLongRunnable::pleaseStop();
+    QnLongRunnable::pleaseStop();
     m_rtpStreamParser.closeStream();
 }
 

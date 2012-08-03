@@ -20,7 +20,7 @@
 
 class CaptureAudioStream;
 
-class QnDesktopFileEncoder: public CLLongRunnable
+class QnDesktopFileEncoder: public QnLongRunnable
 {
     Q_OBJECT
 
@@ -45,7 +45,7 @@ public:
 
     QString lastErrorStr() const { return m_lastErrorStr; }
 protected:
-    // CLLongRunnable runable
+    // QnLongRunnable runable
     virtual void run();
 private:
     bool init();

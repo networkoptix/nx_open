@@ -37,7 +37,7 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
 
         if(m_mediaProvider != NULL) {
             /* Camera will free media provider in its destructor. */
-            m_camera = new CLVideoCamera(m_mediaResource, false, m_mediaProvider);
+            m_camera = new QnVideoCamera(m_mediaResource, false, m_mediaProvider);
 
             connect(this,                           SIGNAL(destroyed()),    m_camera,   SLOT(beforeStopDisplay()));
 
@@ -61,7 +61,7 @@ QnResourceDisplay::~QnResourceDisplay() {
     disconnectFromResource();
 }
 
-void QnResourceDisplay::cleanUp(CLLongRunnable *runnable) const {
+void QnResourceDisplay::cleanUp(QnLongRunnable *runnable) const {
     if(runnable == NULL)
         return;
 

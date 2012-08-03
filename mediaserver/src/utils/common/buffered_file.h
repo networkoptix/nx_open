@@ -10,7 +10,7 @@
 
 class QBufferedFile;
 
-class QN_EXPORT QueueFileWriter: public CLLongRunnable
+class QN_EXPORT QueueFileWriter: public QnLongRunnable
 {
     Q_OBJECT;
 
