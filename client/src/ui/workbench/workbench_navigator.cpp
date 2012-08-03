@@ -8,7 +8,6 @@
 #include <QtGui/QMenu>
 #include <QtGui/QGraphicsSceneContextMenuEvent>
 #include <QtGui/QApplication>
-#include <QtGui/QCalendarWidget>
 
 #include <utils/common/util.h>
 #include <utils/common/synctime.h>
@@ -29,6 +28,7 @@
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/graphics/items/controls/time_scroll_bar.h>
 #include <ui/graphics/instruments/signaling_instrument.h>
+#include <ui/widgets/calendar_widget.h>
 
 #include "workbench.h"
 #include "workbench_display.h"
@@ -127,11 +127,11 @@ void QnWorkbenchNavigator::setTimeScrollBar(QnTimeScrollBar *scrollBar) {
     }
 }
 
-QCalendarWidget *QnWorkbenchNavigator::calendar() const{
+QnCalendarWidget *QnWorkbenchNavigator::calendar() const{
     return m_calendar;
 }
 
-void QnWorkbenchNavigator::setCalendar(QCalendarWidget *calendar){
+void QnWorkbenchNavigator::setCalendar(QnCalendarWidget *calendar){
     if(m_calendar == calendar)
         return;
 
@@ -684,8 +684,8 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
     qint64 startTimeMSec = startTimeUSec == DATETIME_NOW ? endTimeMSec - 10000 : (startTimeUSec == AV_NOPTS_VALUE ? m_timeSlider->minimum() : startTimeUSec / 1000); 
 
     m_timeSlider->setRange(startTimeMSec, endTimeMSec);
-    m_calendar->setMinimumDate(QDateTime::fromMSecsSinceEpoch(startTimeMSec).date());
-    m_calendar->setMaximumDate(QDateTime::fromMSecsSinceEpoch(endTimeMSec).date());
+    m_calendar->setDateRange(QDateTime::fromMSecsSinceEpoch(startTimeMSec).date(),
+        QDateTime::fromMSecsSinceEpoch(endTimeMSec).date());
 
     if(!m_pausedOverride) {
         qint64 timeUSec = m_currentMediaWidget->display()->camDisplay()->isRealTimeSource() ? DATETIME_NOW : m_currentMediaWidget->display()->camera()->getCurrentTime();
@@ -752,6 +752,7 @@ void QnWorkbenchNavigator::updateCurrentPeriods(Qn::TimePeriodRole type) {
     }
 
     m_timeSlider->setTimePeriods(CurrentLine, type, periods);
+    m_calendar->setCurrentTimePeriods(type, periods);
 }
 
 void QnWorkbenchNavigator::updateSyncedPeriods() {
@@ -780,6 +781,7 @@ void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodRole type) {
     }
 
     m_timeSlider->setTimePeriods(SyncedLine, type, periods);
+    m_calendar->setSyncedTimePeriods(type, periods);
 }
 
 void QnWorkbenchNavigator::updateLines() {
@@ -1173,7 +1175,8 @@ void QnWorkbenchNavigator::at_calendar_selectionChanged(){
     qint64 startMSec = dt.toMSecsSinceEpoch();
     qint64 endMSec = dt.addDays(1).toMSecsSinceEpoch();
     m_timeSlider->finishAnimations();
-    m_timeSlider->setValue(startMSec);
     m_timeSlider->setWindow(startMSec, endMSec);
+    // do not update value to avoid window scrolling if no data is recorded
+//  m_timeSlider->setValue(startMSec);
 }
 

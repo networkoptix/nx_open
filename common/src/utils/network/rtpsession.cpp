@@ -516,11 +516,7 @@ bool RTPSession::sendDescribe()
 
     //qDebug() << request;
 
-    if (!m_tcpSock.send(request.data(), request.size()))
-        false;
-
-    return true;
-
+    return (m_tcpSock.send(request.data(), request.size()));
 }
 
 bool RTPSession::sendOptions()
@@ -536,12 +532,7 @@ bool RTPSession::sendOptions()
     addAuth(request);
     request += "\r\n";
 
-
-    if (!m_tcpSock.send(request.data(), request.size()))
-        false;
-
-    return true;
-
+    return (m_tcpSock.send(request.data(), request.size()));
 }
 
 RTPIODevice* RTPSession::getTrackIoByType(TrackType trackType)
@@ -883,7 +874,6 @@ bool RTPSession::sendPause()
 
 bool RTPSession::sendTeardown()
 {
-
     QByteArray request;
     QByteArray responce;
     request += "TEARDOWN ";
@@ -898,18 +888,9 @@ bool RTPSession::sendTeardown()
     request += "\r\n\r\n";
 
     if (!m_tcpSock.send(request.data(), request.size()))
-        false;
-
-
-    if (!readTextResponce(responce) || !responce.startsWith("RTSP/1.0 200"))
-    {
         return false;
-    }
-    else
-    {
-        //d->lastSendTime.start();
-        return 0;
-    }
+
+    return (readTextResponce(responce) && responce.startsWith("RTSP/1.0 200"));
 }
 
 static const int RTCP_SENDER_REPORT = 200;
@@ -1033,19 +1014,10 @@ bool RTPSession::sendKeepAlive()
     request += "\r\n\r\n";
     //
 
-
     if (!m_tcpSock.send(request.data(), request.size()))
-        false;
-
-
-    if(!readTextResponce(responce) || !responce.startsWith("RTSP/1.0 200"))
-    {
         return false;
-    }
-    else
-    {
-        return true;
-    }
+
+    return (readTextResponce(responce) && responce.startsWith("RTSP/1.0 200"));
 }
 
 // read RAW: combination of text and binary data

@@ -5,7 +5,6 @@
 #include <QtGui/QAction>
 #include <QtGui/QGraphicsLinearLayout>
 #include <QtGui/QMessageBox>
-#include <QtGui/QCalendarWidget>
 #include <QtGui/QGraphicsProxyWidget>
 
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
@@ -20,6 +19,7 @@
 #include <ui/graphics/items/controls/volume_slider.h>
 #include <ui/graphics/items/generic/tool_tip_item.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
+#include <ui/widgets/calendar_widget.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_context.h>
@@ -119,7 +119,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
     m_timeScrollBar = new QnTimeScrollBar(this);
     
     m_calendar = new QGraphicsProxyWidget(parent);
-    QCalendarWidget *calendar = new QCalendarWidget();
+    QnCalendarWidget *calendar = new QnCalendarWidget();
     m_calendar->setWidget(calendar);
     m_calendar->setVisible(false);
 
