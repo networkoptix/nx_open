@@ -17,20 +17,20 @@ static const int MAX_QUEUE_TIME = 1000 * 200;
 /**
   * Display one video stream. Decode the video and pass it to video window.
   */
-class CLVideoStreamDisplay
+class QnVideoStreamDisplay
 {
 public:
     enum FrameDisplayStatus {Status_Displayed, Status_Skipped, Status_Buffered};
 
-    CLVideoStreamDisplay(bool can_downscale);
-    ~CLVideoStreamDisplay();
+    QnVideoStreamDisplay(bool can_downscale);
+    ~QnVideoStreamDisplay();
     void setDrawer(QnAbstractRenderer* draw);
     FrameDisplayStatus dispay(QnCompressedVideoDataPtr data, bool draw,
-                QnFrameScaler::downscale_factor force_factor = QnFrameScaler::factor_any);
+                QnFrameScaler::DownscaleFactor force_factor = QnFrameScaler::factor_any);
 
     void setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val);
 
-    QnFrameScaler::downscale_factor getCurrentDownscaleFactor() const;
+    QnFrameScaler::DownscaleFactor getCurrentDownscaleFactor() const;
 
     void setMTDecoding(bool value);
 
@@ -53,9 +53,9 @@ public:
     /**
       * Return last decoded frame
       */
-    QSharedPointer<CLVideoDecoderOutput> flush(QnFrameScaler::downscale_factor force_factor, int channelNum);
+    QSharedPointer<CLVideoDecoderOutput> flush(QnFrameScaler::DownscaleFactor force_factor, int channelNum);
+
 private:
-    bool m_needResetDecoder;
     mutable QMutex m_mtx;
     mutable QMutex m_timeMutex;
     QMap<CodecID, QnAbstractVideoDecoder*> m_decoder;
@@ -70,11 +70,11 @@ private:
     CLVideoDecoderOutput* m_prevFrameToDelete;
     int m_frameQueueIndex;
 
-    QnAbstractVideoDecoder::DecodeMode m_lightCPUmode;
+    QnAbstractVideoDecoder::DecodeMode m_decodeMode;
     bool m_canDownscale;
 
-    QnFrameScaler::downscale_factor m_prevFactor;
-    QnFrameScaler::downscale_factor m_scaleFactor;
+    QnFrameScaler::DownscaleFactor m_prevFactor;
+    QnFrameScaler::DownscaleFactor m_scaleFactor;
     QSize m_previousOnScreenSize;
 
     SwsContext *m_scaleContext;
@@ -95,21 +95,23 @@ private:
     bool m_canUseBufferedFrameDisplayer;
 
 private:
-    QSize m_imageSize;
-    CLVideoDecoderOutput* m_lastDisplayedFrame;
-    bool m_queueWasFilled;
     float m_speed;
+    bool m_queueWasFilled;
+    bool m_needResetDecoder;
+    CLVideoDecoderOutput* m_lastDisplayedFrame;
+    QSize m_imageSize;
+
     void reorderPrevFrames();
     bool allocScaleContext(const CLVideoDecoderOutput& outFrame, int newWidth, int newHeight);
     void freeScaleContext();
     bool rescaleFrame(const CLVideoDecoderOutput& srcFrame, CLVideoDecoderOutput& outFrame, int newWidth, int newHeight);
 
-    QnFrameScaler::downscale_factor findScaleFactor(int width, int height, int fitWidth, int fitHeight);
-    QnFrameScaler::downscale_factor determineScaleFactor(
+    QnFrameScaler::DownscaleFactor findScaleFactor(int width, int height, int fitWidth, int fitHeight);
+    QnFrameScaler::DownscaleFactor determineScaleFactor(
         int channelNumber, 
         int srcWidth, 
         int srcHeight, 
-        QnFrameScaler::downscale_factor force_factor);
+        QnFrameScaler::DownscaleFactor force_factor);
     bool processDecodedFrame(QnAbstractVideoDecoder* dec, CLVideoDecoderOutput* outFrame, bool enableFrameQueue, bool reverseMode);
     void checkQueueOverflow(QnAbstractVideoDecoder* dec);
     void clearReverseQueue();

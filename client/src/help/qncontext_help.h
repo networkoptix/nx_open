@@ -38,9 +38,9 @@ private:
     void serializeShownContext();
 
 private:
-    ContextId m_currentId;
-    QTranslator* m_translator;
     QSettings m_settings;
+    QTranslator *m_translator;
+    ContextId m_currentId;
     bool m_autoShowNeeded;
 };
 

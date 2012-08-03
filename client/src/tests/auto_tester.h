@@ -80,26 +80,26 @@ private:
     /** Current tester state. */
     State m_state;
 
-    /** All tests that have to be performed. */
-    Tests m_allTests;
-
-    /** Tests that succeeded. */
-    Tests m_successfulTests;
-
     /** Time when the auto tester was started, in milliseconds since epoch. */
     qint64 m_startTime;
 
     /** Auto tester timeout, in milliseconds. */
     qint64 m_timeout;
 
-    /** String that must be present in resources. */
-    QString m_resourceSearchString;
+    /** All tests that have to be performed. */
+    Tests m_allTests;
+
+    /** Tests that succeeded. */
+    Tests m_successfulTests;
 
     /** Timer used for testing. */
     QTimer *m_timer;
 
     /** Whether all tests succeeded. */
     bool m_succeeded;
+
+    /** String that must be present in resources. */
+    QString m_resourceSearchString;
 
     /** Textual description of the testing results. */
     QString m_message;

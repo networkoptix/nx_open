@@ -165,7 +165,7 @@ void downscalePlate_factor8_sse41_intr(unsigned char * dst, const unsigned int d
     }
 }
 
-void QnFrameScaler::downscale(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst, downscale_factor factor)
+void QnFrameScaler::downscale(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst, DownscaleFactor factor)
 {
     int src_width = src->width;
     int src_height = src->height;

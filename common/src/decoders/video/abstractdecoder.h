@@ -9,7 +9,12 @@ class QnAbstractVideoDecoder
 {
 public:
     // for movies: full = IPB, fast == IP only, fastest = I only
-    enum DecodeMode {DecodeMode_NotDefined, DecodeMode_Full, DecodeMode_Fast, DecodeMode_Fastest};
+    enum DecodeMode {
+        DecodeMode_NotDefined, 
+        DecodeMode_Full, 
+        DecodeMode_Fast, 
+        DecodeMode_Fastest
+    };
 
     explicit QnAbstractVideoDecoder();
 

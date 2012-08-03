@@ -104,7 +104,7 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal):
     m_playingBitrate(0),
     m_tooSlowCounter(0),
     m_lightCpuMode(QnAbstractVideoDecoder::DecodeMode_Full),
-    m_lastFrameDisplayed(CLVideoStreamDisplay::Status_Displayed),
+    m_lastFrameDisplayed(QnVideoStreamDisplay::Status_Displayed),
     m_realTimeHurryUp(0),
     m_delayedFrameCount(0),
     m_extTimeSrc(0),
@@ -188,7 +188,7 @@ void CLCamDisplay::addVideoChannel(int index, QnAbstractRenderer* vw, bool canDo
     Q_ASSERT(index < CL_MAX_CHANNELS);
 
     delete m_display[index];
-    m_display[index] = new CLVideoStreamDisplay(canDownscale);
+    m_display[index] = new QnVideoStreamDisplay(canDownscale);
     m_display[index]->setDrawer(vw);
 }
 
@@ -396,14 +396,14 @@ bool CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         needToSleep = 0;
     //=========
 
-    if (sleep && m_lastFrameDisplayed != CLVideoStreamDisplay::Status_Buffered)
+    if (sleep && m_lastFrameDisplayed != QnVideoStreamDisplay::Status_Buffered)
     {
         qint64 realSleepTime = 0;
         if (useSync(vd)) 
         {
             qint64 displayedTime = getCurrentTime();
             //bool isSingleShot = vd->flags & QnAbstractMediaData::MediaFlags_SingleShot;
-            if (speed != 0  && displayedTime != AV_NOPTS_VALUE && m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed &&
+            if (speed != 0  && displayedTime != AV_NOPTS_VALUE && m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed &&
                 !(vd->flags & QnAbstractMediaData::MediaFlags_BOF))
             {
                 Q_ASSERT(!(vd->flags & QnAbstractMediaData::MediaFlags_Ignore));
@@ -450,7 +450,7 @@ bool CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             }
         }
         else {
-            if (m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed) {
+            if (m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed) {
                 if (m_isRealTimeSource)
                     realSleepTime = m_delay.terminatedSleep(needToSleep, needToSleep*qAbs(speed)*2);
                 else
@@ -469,7 +469,7 @@ bool CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
     if (m_singleShotMode && m_singleShotQuantProcessed)
         return false;
 
-    QnFrameScaler::downscale_factor scaleFactor = QnFrameScaler::factor_any;
+    QnFrameScaler::DownscaleFactor scaleFactor = QnFrameScaler::factor_any;
     if (channel > 0 && m_display[0]) // if device has more than one channel
     {
         // this here to avoid situation where different channels have different down scale factor; it might lead to diffrent size
@@ -521,7 +521,7 @@ bool CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 
         m_lastFrameDisplayed = m_display[channel]->dispay(vd, draw, scaleFactor);
 
-        if (m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed)
+        if (m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed)
         {
             if (speed < 0)
                 m_nextReverseTime[channel] = m_display[channel]->nextReverseTime();
@@ -643,7 +643,7 @@ void CLCamDisplay::afterJump(QnAbstractMediaDataPtr media)
     m_lastAudioPacketTime = media->timestamp;
     m_lastVideoPacketTime = media->timestamp;
     m_previousVideoTime = media->timestamp;
-    m_lastFrameDisplayed = CLVideoStreamDisplay::Status_Skipped;
+    m_lastFrameDisplayed = QnVideoStreamDisplay::Status_Skipped;
     //m_previousVideoDisplayedTime = 0;
     m_totalFrames = 0;
     m_iFrames = 0;
@@ -1063,7 +1063,7 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
 
             if (!display(vd, !(vd->flags & QnAbstractMediaData::MediaFlags_Ignore), speed))
                 return false; // keep frame
-            if (m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed && !m_afterJump)
+            if (m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed && !m_afterJump)
                 m_singleShotQuantProcessed = true;
             return result;
         }
@@ -1110,7 +1110,7 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
                     m_syncAudioTime = m_lastAudioPacketTime; // sync audio time prevent stopping video, if audio track is disapearred
                 }                
                 display(vd, !ignoreVideo, speed);
-                if (m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed && !m_afterJump)
+                if (m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed && !m_afterJump)
                     m_singleShotQuantProcessed = true;
             }
 

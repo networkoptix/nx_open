@@ -11,12 +11,12 @@
 #include "utils/media/externaltimesource.h"
 
 class QnAbstractRenderer;
-class CLVideoStreamDisplay;
+class QnVideoStreamDisplay;
 class QnAudioStreamDisplay;
 struct QnCompressedVideoData;
 
 /**
-  * Stores CLVideoStreamDisplay for each channel/sensor
+  * Stores QnVideoStreamDisplay for each channel/sensor
   */
 class CLCamDisplay : public QnAbstractDataConsumer, public QnlTimeSource
 {
@@ -115,7 +115,7 @@ private:
     void setAudioBufferSize(int bufferSize, int prebufferMs);
 
 protected:
-    CLVideoStreamDisplay* m_display[CL_MAX_CHANNELS];
+    QnVideoStreamDisplay* m_display[CL_MAX_CHANNELS];
     QQueue<QnCompressedVideoDataPtr> m_videoQueue[CL_MAX_CHANNELS];
 
     QnAudioStreamDisplay* m_audioDisplay;
@@ -149,6 +149,8 @@ protected:
 
     bool m_afterJump;
 
+    bool m_bofReceived;
+
     int m_displayLasts;
 
     bool m_ignoringVideo;
@@ -168,7 +170,7 @@ protected:
     int m_tooSlowCounter;
     int m_storedMaxQueueSize;
     QnAbstractVideoDecoder::DecodeMode m_lightCpuMode;
-    CLVideoStreamDisplay::FrameDisplayStatus m_lastFrameDisplayed;
+    QnVideoStreamDisplay::FrameDisplayStatus m_lastFrameDisplayed;
     int m_realTimeHurryUp;
     int m_delayedFrameCount;
     QnlTimeSource* m_extTimeSrc;
@@ -181,7 +183,6 @@ protected:
     int m_skipPrevJumpSignal;
     int m_processedPackets;
     QnMetaDataV1Ptr m_lastMetadata[CL_MAX_CHANNELS];
-    bool m_bofReceived;
     qint64 m_nextReverseTime[CL_MAX_CHANNELS];
     float m_toLowQSpeed; // speed then switching to low quality for camera
     //QTime m_toLowQTimer; // try to change low to high quality (for normal playback speed every N seconds)

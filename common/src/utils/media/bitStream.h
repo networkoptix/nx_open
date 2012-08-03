@@ -103,7 +103,7 @@ public:
             m_bitLeft = INT_BIT - num + m_bitLeft;
         }
         m_totalBits -= num;
-        return prevVal + (m_curVal >> m_bitLeft) & m_masks[num];
+        return (prevVal + (m_curVal >> m_bitLeft)) & m_masks[num];
     }
     inline unsigned showBits(unsigned num)
     {
@@ -121,7 +121,7 @@ public:
             curVal = getCurVal(m_buffer+1);
             bitLeft = INT_BIT - num + bitLeft;
         }
-        return prevVal + (curVal >> bitLeft) & m_masks[num];
+        return (prevVal + (curVal >> bitLeft)) & m_masks[num];
     }
     inline unsigned getBit() {
         if (m_totalBits < 1)
