@@ -64,14 +64,14 @@ private slots:
     void at_menu_aboutToShow();
 
 private:
+    /** Root action data. Also contained in the maps. */
+    QnAction *m_root;
+
     /** Mapping from action id to action data. */ 
     QHash<Qn::ActionId, QnAction *> m_actionById;
 
     /** Mapping from action to action id. */
     QHash<QAction *, Qn::ActionId> m_idByAction;
-
-    /** Root action data. Also contained in the map above. */
-    QnAction *m_root;
 
     /** Mapping from a menu created by this manager to the parameters that were 
      * passed to it at construction time. NULL key is used for shortcut actions. */

@@ -18,19 +18,22 @@ namespace Ui {
     class SignDialog;
 }
 
-class SignDialog : public QDialog
-{
-    Q_OBJECT
+class SignDialog : public QDialog {
+    Q_OBJECT;
+
 public:
     explicit SignDialog(const QString& fileName, QWidget *parent = 0);
     virtual ~SignDialog();
 
     static QRect calcVideoRect(double windowWidth, double windowHeight, double textureWidth, double textureHeight);
+
 public slots:
     virtual void accept() override;
+
 private slots:
     void at_calcSignInProgress(QByteArray sign, int progress);
     void at_gotImageSize(int width, int height);
+
 protected:
     virtual void changeEvent(QEvent *event) override;
 
@@ -38,16 +41,16 @@ private:
     Q_DISABLE_COPY(SignDialog)
 
     QScopedPointer<Ui::SignDialog> ui;
-    QWeakPointer<QnWorkbenchContext> m_context;
-    QStandardItemModel *m_connectionsModel;
-    int m_requestHandle;
-
-    QnAviResourcePtr m_resource;
-    QnSignDialogGlWidget* m_glWindow;
-    QnAbstractArchiveReader* m_reader;
-    QnResourceWidgetRenderer* m_renderer;
-    CLCamDisplay* m_camDispay;
+    
     QString m_fileName;
+    QnAviResourcePtr m_resource;
+
+    CLCamDisplay *m_camDispay;
+    QnAbstractArchiveReader *m_reader;
+    QnResourceWidgetRenderer *m_renderer;
+    QnSignDialogGlWidget *m_glWindow;
+
+    int m_requestHandle;
 };
 
 #endif // SIGNDIALOG_H
