@@ -31,7 +31,7 @@ protected:
     void sendData(const char* data, int size);
     inline void sendData(const QByteArray& data) { sendData(data.constData(), data.size()); }
 
-    CLByteArray& getSendBuffer();
+    QnByteArray& getSendBuffer();
     void bufferData(const char* data, int size);
     inline void bufferData(const QByteArray& data) { bufferData(data.constData(), data.size()); }
     void sendBuffer();

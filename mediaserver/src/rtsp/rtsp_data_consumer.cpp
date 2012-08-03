@@ -310,7 +310,7 @@ QnMediaContextPtr QnRtspDataConsumer::getGeneratedContext(CodecID compressionTyp
     return result;
 }
 
-void QnRtspDataConsumer::createDataPacketTCP(CLByteArray& sendBuffer, QnAbstractMediaDataPtr media, int rtpTcpChannel)
+void QnRtspDataConsumer::createDataPacketTCP(QnByteArray& sendBuffer, QnAbstractMediaDataPtr media, int rtpTcpChannel)
 {
     quint16 flags = media->flags;
     int cseq = media->opaque;

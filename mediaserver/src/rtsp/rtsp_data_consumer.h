@@ -66,7 +66,7 @@ protected:
     bool canSwitchToLowQuality();
     void resetQualityStatistics();
 
-    void createDataPacketTCP(CLByteArray& sendBuffer, QnAbstractMediaDataPtr media, int rtpTcpChannel);
+    void createDataPacketTCP(QnByteArray& sendBuffer, QnAbstractMediaDataPtr media, int rtpTcpChannel);
 
     // delay streaming. Used for realtime mode streaming
     void doRealtimeDelay(QnAbstractMediaDataPtr media);
@@ -103,7 +103,7 @@ private:
     bool m_realtimeMode;
     qint64 m_rtStartTime; // used for realtime streaming mode
     qint64 m_lastRtTime; // used for realtime streaming mode
-    CLAdaptiveSleep m_adaptiveSleep;
+    QnAdaptiveSleep m_adaptiveSleep;
 };
 
 #endif // __RTSP_DATA_CONSUMER_H__
