@@ -125,7 +125,10 @@ int NALUnit::encodeNAL(quint8* srcBuffer, quint8* srcEnd, quint8* dstBuffer, siz
 		else
 			srcBuffer++;
 	}
-	if (dstBufferSize < srcEnd - srcStart)
+    
+    Q_ASSERT(srcEnd >= srcStart);
+    //conversion to uint possible cause srcEnd should always be greater then srcStart
+	if (dstBufferSize < uint(srcEnd - srcStart)) 
 		return -1;
 	memcpy(dstBuffer, srcStart, srcEnd - srcStart);
 	dstBuffer += srcEnd - srcStart;
@@ -165,7 +168,7 @@ int NALUnit::decodeNAL(const quint8* srcBuffer, const quint8* srcEnd, quint8* ds
 
 int NALUnit::extractUEGolombCode()
 {
-	int cnt = 0;
+	uint cnt = 0;
 	for ( ; bitReader.getBits(1) == 0; cnt++) {}
 	if (cnt > INT_BIT)
 		THROW_BITSTREAM_ERR;
@@ -497,13 +500,14 @@ int SPSUnit::deserialize()
 				for(int i = 0; i < 8; i++) 
 				{
 					seq_scaling_list_present_flag[i] = bitReader.getBits(1);
-					if( seq_scaling_list_present_flag[i])
+                    if( seq_scaling_list_present_flag[i]){
 						if( i < 6 ) 
 							scaling_list( ScalingList4x4[ i ], 16, 
 											   UseDefaultScalingMatrix4x4Flag[i]);
 						else
 							scaling_list( ScalingList8x8[ i - 6 ], 64,
 											   UseDefaultScalingMatrix8x8Flag[i-6]);
+                    }
 				}
 				
 			}
@@ -831,10 +835,10 @@ int SliceUnit::deserialize(quint8* buffer, quint8* end,
 
     if (nal_unit_type == nuSliceA ||  nal_unit_type == nuSliceB || nal_unit_type == nuSliceC)
     {
-        int slice_id = extractUEGolombCode();
+        /*int slice_id =*/ extractUEGolombCode();
         if (nal_unit_type == nuSliceB || nal_unit_type == nuSliceC)
             if( pps->redundant_pic_cnt_present_flag )
-                int redundant_pic_cnt = extractUEGolombCode();
+                /*int redundant_pic_cnt =*/ extractUEGolombCode();
     }
     m_fullHeaderLen = bitReader.getBitsCount() + 8;
     return 0;
@@ -905,6 +909,7 @@ bool SliceUnit::moveHeaderField(int fieldOffset, int newLen, int oldLen)
     }
     updateBits(fieldOffset-8, bitDiff, 0); // reader does not include first NAL bytes, so -8 bits
     m_fullHeaderLen += bitDiff; 
+    return true;
 }
 
 /*
@@ -997,7 +1002,7 @@ void NALUnit::updateBits(int bitOffset, int bitLen, int value)
 	bitWriter.putBits(bitLen, value);
 
 	if (endBitsPostfix < 8) {
-		int postfix = *ptr_end & ( 1 << endBitsPostfix)-1;
+		int postfix = *ptr_end & ( ( 1 << endBitsPostfix) - 1);
 		bitWriter.putBits(endBitsPostfix, postfix);
 	}
 	bitWriter.flushBits();
@@ -1183,7 +1188,7 @@ void SliceUnit::dec_ref_pic_marking()
 				dec_ref_pic_vector.push_back(memory_management_control_operation);
 				if (memory_management_control_operation != 0) {
 					quint32 tmp = extractUEGolombCode();
-					if( memory_management_control_operation  ==  1  ||
+					/*if( memory_management_control_operation  ==  1  ||
 						memory_management_control_operation  ==  3 )
 						int difference_of_pic_nums_minus1 = tmp;
 					if(memory_management_control_operation  ==  2  )
@@ -1192,7 +1197,7 @@ void SliceUnit::dec_ref_pic_marking()
 						memory_management_control_operation  ==  6 )
 						int long_term_frame_idx = tmp;
 					if( memory_management_control_operation  ==  4 )
-						int max_long_term_frame_idx_plus1 = tmp;
+						int max_long_term_frame_idx_plus1 = tmp;*/
 					dec_ref_pic_vector.push_back(tmp);
 				}
 			} while( memory_management_control_operation  !=  0 );
@@ -1275,34 +1280,34 @@ int SliceUnit::deserializeSliceData()
 	int CurrMbAddr = first_mb_in_slice * ( 1 + MbaffFrameFlag );
 	int moreDataFlag = 1;
 	int mb_skip_run = 0;
-	int mb_skip_flag = 0;
+	//int mb_skip_flag = 0;
 	int prevMbSkipped = 0;
-	int mb_field_decoding_flag = 0;
+	//int mb_field_decoding_flag = 0;
 	do {
-		if( slice_type  !=  I_TYPE  &&  slice_type  !=  SI_TYPE )
+        if( slice_type  !=  I_TYPE  &&  slice_type  !=  SI_TYPE ){
 			if( !pps->entropy_coding_mode_flag ) {
 				mb_skip_run = extractUEGolombCode(); // !!!!!!!!!!!!!
 				prevMbSkipped = ( mb_skip_run > 0 );
 				for(int i = 0; i<mb_skip_run; i++ )
 					CurrMbAddr = NextMbAddress( CurrMbAddr );
 				moreDataFlag = bitReader.getBitsLeft() >= 8;
-			} else {
-				/*
+			}/* else {
 				mb_skip_flag = extractCABAC();
 				moreDataFlag = mb_skip_flag == 0;
-				*/
-			}
+			}*/
+        }
 		if( moreDataFlag ) {
 			if( MbaffFrameFlag && ( CurrMbAddr % 2  ==  0  ||  
 				( CurrMbAddr % 2  ==  1  &&  prevMbSkipped ) ) ) {
-					mb_field_decoding_flag = bitReader.getBit(); // || ae(v) for CABAC
+					//mb_field_decoding_flag = bitReader.getBit(); // || ae(v) for CABAC
+                    bitReader.skipBit();
 			}
 			macroblock_layer();
 		}
 		if( !pps->entropy_coding_mode_flag )
 			moreDataFlag = bitReader.getBitsLeft() >= 8; //more_rbsp_data();
-		else {
-			/*
+		/*else {
+			
 			if( slice_type  !=  I  &&  slice_type  !=  SI )
 				prevMbSkipped = mb_skip_flag
 			if( MbaffFrameFlag  &&  CurrMbAddr % 2  ==  0 )
@@ -1311,8 +1316,8 @@ int SliceUnit::deserializeSliceData()
 				end_of_slice_flag
 				moreDataFlag = !end_of_slice_flag
 			}
-			*/
-		}
+			
+		}*/
 		CurrMbAddr = NextMbAddress( CurrMbAddr );
 	} while( moreDataFlag);
 	return 0;
@@ -1606,8 +1611,9 @@ int SEIUnit::updateSeiParam(SPSUnit& sps, bool removePulldown, int orig_hrd_para
 			else
 				tmpBufferLen -= 2; // skip this sei message
 		}
-		else if (payloadType == 0 && (orig_hrd_parameters_present_flag == 0
-			     && sps.vcl_hrd_parameters_present_flag == 0 || removePulldown)) 
+		else if (payloadType == 0 && (
+            (!orig_hrd_parameters_present_flag && !sps.vcl_hrd_parameters_present_flag) || removePulldown)
+            ) 
 		{ 
 			tmpBufferLen -= 2; // skip this sei message
 		}
