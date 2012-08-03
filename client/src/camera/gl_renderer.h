@@ -107,7 +107,7 @@ private:
     int m_videoWidth;
     int m_videoHeight;
     qint64 m_lastDisplayedTime;
-    QnMetaDataV1Ptr m_lastDisplayedMetadata[CL_MAX_CHANNELS];
+    QnMetaDataV1Ptr m_lastDisplayedMetadata[CL_MAX_CHANNELS]; // TODO: get rid of this
     unsigned m_lastDisplayedFlags;
 };
 

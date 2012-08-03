@@ -9,7 +9,7 @@ class QnAbstractArchiveReader;
 class QnAbstractMediaStreamDataProvider;
 class QnAbstractStreamDataProvider;
 class QnVideoResourceLayout;
-class CLCamDisplay;
+class QnCamDisplay;
 class QnLongRunnable;
 class QnAbstractRenderer;
 class QnVideoCamera;
@@ -96,7 +96,7 @@ public:
     /**
      * \returns                         Camdisplay for this display, if any.
      */
-    CLCamDisplay *camDisplay() const;
+    QnCamDisplay *camDisplay() const;
 
     /**
      * \returns                         Video resource layout, if any, 

@@ -1,4 +1,4 @@
-#include "qncontext_help.h"
+#include "context_help.h"
 #include <QTranslator>
 #include <QStringList>
 #include <QFile>

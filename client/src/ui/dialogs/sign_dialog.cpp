@@ -4,9 +4,9 @@
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 
-#include "camera/camera.h"
+#include "camera/video_camera.h"
 #include "camera/gl_renderer.h"
-#include "camera/camdisplay.h"
+#include "camera/cam_display.h"
 #include "camera/sync_dialog_display.h"
 
 #include "ui/graphics/items/resource/resource_widget_renderer.h"

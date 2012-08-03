@@ -19,7 +19,7 @@
 #include <camera/caching_time_period_loader.h>
 #include <camera/time_period_loader.h>
 #include <camera/resource_display.h>
-#include <camera/camera.h>
+#include <camera/video_camera.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameter_types.h>
@@ -280,7 +280,7 @@ bool QnWorkbenchNavigator::setPlaying(bool playing) {
     m_pausedOverride = false;
 
     QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader();
-    CLCamDisplay *camDisplay = m_currentMediaWidget->display()->camDisplay();
+    QnCamDisplay *camDisplay = m_currentMediaWidget->display()->camDisplay();
     if(playing) {
         if (reader->isRealTimeSource()) {
             /* Media was paused while on live. Jump to archive when resumed. */

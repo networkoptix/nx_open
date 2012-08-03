@@ -1,7 +1,7 @@
 #ifndef QN_VIDEO_CAMERA_H
 #define QN_VIDEO_CAMERA_H
 
-#include "camdisplay.h"
+#include "cam_display.h"
 #include "recording/stream_recorder.h"
 #include "decoders/video/abstractdecoder.h"
 #include "core/resource/media_resource.h"
@@ -34,7 +34,7 @@ public:
     QnAbstractStreamDataProvider* getStreamreader();
 
     const QnStatistics* getStatistics(int channel = 0);
-    CLCamDisplay* getCamDisplay();
+    QnCamDisplay* getCamDisplay();
 
     void setQuality(QnStreamQuality q, bool increase);
     qint64 getCurrentTime() const;
@@ -73,7 +73,7 @@ protected slots:
 
 private:
     QnMediaResourcePtr m_resource;
-    CLCamDisplay m_camdispay;
+    QnCamDisplay m_camdispay;
     QnStreamRecorder* m_recorder;
     QnAbstractMediaStreamDataProvider* m_reader;
 

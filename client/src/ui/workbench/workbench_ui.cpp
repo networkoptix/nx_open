@@ -59,9 +59,9 @@
 #include <ui/widgets/help_widget.h>
 #include <ui/style/skin.h>
 
-#include <help/qncontext_help.h>
+#include <help/context_help.h>
 
-#include "camera/camera.h"
+#include "camera/video_camera.h"
 #include "openal/qtvaudiodevice.h"
 #include "core/resourcemanagment/resource_pool.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"

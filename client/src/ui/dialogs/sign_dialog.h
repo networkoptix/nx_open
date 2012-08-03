@@ -12,7 +12,7 @@ class QnWorkbenchContext;
 class QnAbstractArchiveReader;
 class QnResourceWidgetRenderer;
 class QnSignDialogGlWidget;
-class CLCamDisplay;
+class QnCamDisplay;
 
 namespace Ui {
     class SignDialog;
@@ -45,7 +45,7 @@ private:
     QString m_fileName;
     QnAviResourcePtr m_resource;
 
-    CLCamDisplay *m_camDispay;
+    QnCamDisplay *m_camDispay;
     QnAbstractArchiveReader *m_reader;
     QnResourceWidgetRenderer *m_renderer;
     QnSignDialogGlWidget *m_glWindow;

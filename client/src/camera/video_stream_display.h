@@ -1,5 +1,5 @@
-#ifndef videostreamdisplay_h_2044
-#define videostreamdisplay_h_2044
+#ifndef QN_VIDEO_STREAM_DISPLAY_H
+#define QN_VIDEO_STREAM_DISPLAY_H
 
 
 #include "decoders/video/abstractdecoder.h"
@@ -117,4 +117,4 @@ private:
     void clearReverseQueue();
 };
 
-#endif //videostreamdisplay_h_2044
+#endif //QN_VIDEO_STREAM_DISPLAY_H
