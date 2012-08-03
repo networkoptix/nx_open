@@ -7,8 +7,8 @@ QnThumbnailsArchiveDelegate::QnThumbnailsArchiveDelegate(QnAbstractArchiveDelega
     m_rangeStart(AV_NOPTS_VALUE),
     m_rangeEnd(AV_NOPTS_VALUE),
     m_frameStep(0),
-    m_baseDelegate(baseDelegate),
-    m_lastMediaTime(0)
+    m_lastMediaTime(0),
+    m_baseDelegate(baseDelegate)
 {
 }
 

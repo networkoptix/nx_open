@@ -7,8 +7,8 @@ const char* QnPlDlinkResource::MANUFACTURE = "Dlink";
 
 QnDlink_cam_info::QnDlink_cam_info():
 hasMPEG4(false),
-numberOfVideoProfiles(0),
-hasFixedQuality(false)
+hasFixedQuality(false),
+numberOfVideoProfiles(0)
 {
 
 }

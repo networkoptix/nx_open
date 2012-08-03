@@ -114,10 +114,10 @@ private:
 
 QnAviArchiveDelegate::QnAviArchiveDelegate():
     m_formatContext(0),
-    m_videoLayout(0),
-    m_firstVideoIndex(0),
-    m_audioStreamIndex(-1),
     m_selectedAudioChannel(0),
+    m_audioStreamIndex(-1),
+    m_firstVideoIndex(0),
+    m_videoLayout(0),
     m_startTime(0),
     m_useAbsolutePos(true),
     m_duration(AV_NOPTS_VALUE),

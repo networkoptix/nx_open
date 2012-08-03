@@ -21,9 +21,9 @@ public:
     virtual void setRange(qint64 startTime, qint64 endTime, qint64 frameStep);
 private:
     qint64 m_currentPos;
-    qint64 m_frameStep;
     qint64 m_rangeStart;
     qint64 m_rangeEnd;
+    qint64 m_frameStep;
     qint64 m_lastMediaTime;
     QnAbstractArchiveDelegatePtr m_baseDelegate;
 };

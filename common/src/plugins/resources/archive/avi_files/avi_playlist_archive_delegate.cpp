@@ -64,9 +64,9 @@ static const int IO_BLOCK_SIZE = 1024 * 32;
 
 QnAVIPlaylistArchiveDelegate::QnAVIPlaylistArchiveDelegate() :
     QnAviArchiveDelegate(),
+    m_ioBuffer(0),
     m_ffmpegIOContext(0),
     m_currentFileIndex(-1),
-    m_ioBuffer(0),
     m_inSeek(false),
     m_totalContentLength(0)
 {

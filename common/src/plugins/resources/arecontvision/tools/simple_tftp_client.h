@@ -40,11 +40,11 @@ private:
     unsigned int m_last_packet_size;
 
     int m_retry;
-    int m_timeout;
-    int m_status;
-    QString m_ip;
     QHostAddress m_hostAddress;
+    QString m_ip;
+    int m_timeout;
 
+    int m_status;
     int m_wish_blk_size;
     int m_curr_blk_size;
 
