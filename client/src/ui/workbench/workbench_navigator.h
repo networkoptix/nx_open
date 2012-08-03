@@ -25,7 +25,7 @@ class QnMediaResourceWidget;
 class QnAbstractArchiveReader;
 class QnCachingTimePeriodLoader;
 class QnThumbnailsLoader;
-class QCalendarWidget;
+class QnCalendarWidget;
 
 class QnWorkbenchNavigator: public QObject, public QnWorkbenchContextAware, public QnActionTargetProvider {
     Q_OBJECT;
@@ -51,8 +51,8 @@ public:
     QnTimeScrollBar *timeScrollBar() const;
     void setTimeScrollBar(QnTimeScrollBar *scrollBar);
 
-    QCalendarWidget *calendar() const;
-    void setCalendar(QCalendarWidget *calendar);
+    QnCalendarWidget *calendar() const;
+    void setCalendar(QnCalendarWidget *calendar);
 
     bool isLive() const;
     Q_SLOT bool setLive(bool live);
@@ -185,7 +185,7 @@ protected slots:
 private:
     QnTimeSlider *m_timeSlider;
     QnTimeScrollBar *m_timeScrollBar;
-    QCalendarWidget *m_calendar;
+    QnCalendarWidget *m_calendar;
 
     QSet<QnMediaResourceWidget *> m_syncedWidgets;
     QMultiHash<QnResourcePtr, QHashDummyValue> m_syncedResources;
