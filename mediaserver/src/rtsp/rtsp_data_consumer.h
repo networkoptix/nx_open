@@ -8,9 +8,12 @@
 #include "core/datapacket/datapacket.h"
 #include "utils/network/rtpsession.h"
 #include "utils/media/externaltimesource.h"
+#include "rtsp_ffmpeg_encoder.h"
+#include "utils/common/adaptivesleep.h"
 
 class QnRtspConnectionProcessor;
 
+static const int MAX_RTP_CHANNELS = 32;
 static const int CLOCK_FREQUENCY = 1000000;
 static const quint8 RTP_FFMPEG_GENERIC_CODE = 102;
 static const QString RTP_FFMPEG_GENERIC_STR("FFMPEG");
@@ -54,21 +57,27 @@ public:
 
     // put data without mutex. Used for RTSP connection after lockDataQueue
     void addData(QnAbstractMediaDataPtr data);
+    void setUseRealTimeStreamingMode(bool value);
 protected:
     void buildRtspTcpHeader(quint8 channelNum, quint32 ssrc, quint16 len, int markerBit, quint32 timestamp, quint8 payloadType);
-    QnMediaContextPtr getGeneratedContext(CodecID compressionType);
+    //QnMediaContextPtr getGeneratedContext(CodecID compressionType);
     virtual bool processData(QnAbstractDataPacketPtr data);
     bool canSwitchToHiQuality();
     bool canSwitchToLowQuality();
     void resetQualityStatistics();
+
+    void createDataPacketTCP(CLByteArray& sendBuffer, QnAbstractMediaDataPtr media, int rtpTcpChannel);
+
+    // delay streaming. Used for realtime mode streaming
+    void doRealtimeDelay(QnAbstractMediaDataPtr media);
 private:
-    QMap<CodecID, QnMediaContextPtr> m_generatedContext;
+    //QMap<CodecID, QnMediaContextPtr> m_generatedContext;
     bool m_gotLivePacket;
     QByteArray m_codecCtxData;
-    QMap<int, QList<QnMediaContextPtr> > m_ctxSended;
     //QMap<int, QList<int> > m_ctxSended;
     QTime m_timer;
-    quint16 m_sequence[256];
+    quint16 m_sequence[MAX_RTP_CHANNELS];
+    qint64 m_firstRtpTime[MAX_RTP_CHANNELS];
     QnRtspConnectionProcessor* m_owner;
     qint64 m_lastSendTime;
     qint64 m_lastMediaTime; // same as m_lastSendTime, but show real timestamp for LIVE video (m_lastSendTime always returns DATETIME_NOW for live)
@@ -91,6 +100,10 @@ private:
     static QHash<QHostAddress, qint64> m_lastSwitchTime;
     static QSet<QnRtspDataConsumer*> m_allConsumers;
     static QMutex m_allConsumersMutex;
+    bool m_realtimeMode;
+    qint64 m_rtStartTime; // used for realtime streaming mode
+    qint64 m_lastRtTime; // used for realtime streaming mode
+    CLAdaptiveSleep m_adaptiveSleep;
 };
 
 #endif // __RTSP_DATA_CONSUMER_H__

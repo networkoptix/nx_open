@@ -7,6 +7,7 @@
 #include "utils/network/tcp_connection_processor.h"
 #include "core/resource/media_resource.h"
 #include "core/datapacket/mediadatapacket.h"
+#include "rtsp_encoder.h"
 
 class QnAbstractStreamDataProvider;
 
@@ -30,6 +31,7 @@ public:
     QString getRangeHeaderIfChanged();
     int getMetadataTcpChannel() const;
     int getAVTcpChannel(int trackNum) const;
+    QnRtspEncoderPtr getCodecEncoder(int trackNum) const;
 protected:
     virtual void run();
     void addResponseRangeHeader();
@@ -62,6 +64,8 @@ private:
     void connectToLiveDataProviders();
     //QnAbstractMediaStreamDataProvider* getLiveDp();
     void setQualityInternal(MediaQuality quality);
+    QnRtspEncoderPtr createEncoderByMediaData(QnAbstractMediaDataPtr media);
+    QnAbstractMediaDataPtr getCameraData(QnAbstractMediaData::DataType dataType);
 private:
     QN_DECLARE_PRIVATE_DERIVED(QnRtspConnectionProcessor);
     friend class QnRtspDataConsumer;

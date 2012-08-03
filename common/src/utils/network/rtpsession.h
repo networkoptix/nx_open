@@ -12,6 +12,7 @@ class RTPSession;
 static const int RTSP_FFMPEG_GENERIC_HEADER_SIZE = 8;
 static const int RTSP_FFMPEG_VIDEO_HEADER_SIZE = 3;
 static const int RTSP_FFMPEG_METADATA_HEADER_SIZE = 4;
+static const int RTSP_FFMPEG_MAX_HEADER_SIZE = RTSP_FFMPEG_GENERIC_HEADER_SIZE + RTSP_FFMPEG_METADATA_HEADER_SIZE;
 static const int MAX_RTP_PACKET_SIZE = 1024 * 16;
 
 class RtspStatistic 
@@ -250,7 +251,6 @@ private:
     bool m_useDigestAuth;
     QString m_realm;
     QString m_nonce;
-
 };
 
 #endif //rtp_session_h_1935_h

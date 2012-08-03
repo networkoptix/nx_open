@@ -3,12 +3,13 @@
 #include "dw_dvr_resource.h"
 #include "OpnDVRLib.h"
 
+#include <QAxObject>
+
 static const int CONNECTION_TIMEOUT = 2000*1000;
 
 DwDvrResourceSearcher::DwDvrResourceSearcher()
 {
-    bool isInitialized = DVRInitLibrary(false);
-    isInitialized = isInitialized;
+    //bool isInitialized = DVRInitLibrary(false);
 }
 
 DwDvrResourceSearcher::~DwDvrResourceSearcher()
@@ -61,12 +62,24 @@ QString DwDvrResourceSearcher::manufacture() const
 QnResourceList DwDvrResourceSearcher::findResources()
 {
     QnResourceList result;
-    getCamerasFromDvr(result, "10.10.10.55", 2000, "user1", "123");
+    getCamerasFromDvr(result, "10.10.10.53", 9000, "admin", "");
     return result;
 }
 
 void DwDvrResourceSearcher::getCamerasFromDvr(QnResourceList& resources, const QString& host, int port, const QString& login, const QString& password)
 {
+    static CLSID const clsid
+        = { 0x67815DA3, 0xEC08, 0x41E0, { 0xAE, 0x60, 0x92, 0xE5, 0x93, 0x5E, 0xE8, 0xFB } };
+
+    QAxObject object("{67815DA3-EC08-41E0-AE60-92E5935EE8FB}");
+    QVariant res = object.dynamicCall("connect(QString&, quint16, QString&, QString&, int)", host, port, login, password, 65535);
+    res = res;
+
+
+
+    /*
+    bool isInitialized = DVRInitLibrary(false);
+
     HANDLE dvrHandle = DVROpenConnection();
     if (dvrHandle == 0)
         return;
@@ -79,6 +92,7 @@ void DwDvrResourceSearcher::getCamerasFromDvr(QnResourceList& resources, const Q
     {
 
     }
+    */
 }
 
 QnResourcePtr DwDvrResourceSearcher::checkHostAddr(QHostAddress addr)

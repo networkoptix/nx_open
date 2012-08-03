@@ -130,6 +130,12 @@ void QnTCPConnectionProcessor::bufferData(const char* data, int size)
     d->sendBuffer.write(data, size);
 }
 
+CLByteArray& QnTCPConnectionProcessor::getSendBuffer()
+{
+    Q_D(QnTCPConnectionProcessor);
+    return d->sendBuffer;
+}
+
 void QnTCPConnectionProcessor::sendBuffer()
 {
     Q_D(QnTCPConnectionProcessor);
