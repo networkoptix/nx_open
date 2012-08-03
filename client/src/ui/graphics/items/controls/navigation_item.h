@@ -1,7 +1,7 @@
 #ifndef NAVIGATIONITEM_H
 #define NAVIGATIONITEM_H
 
-#include <ui/graphics/items/simple_frame_widget.h>
+#include <ui/graphics/items/generic/simple_frame_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnSpeedSlider;
@@ -11,6 +11,7 @@ class QnImageButtonWidget;
 class QnTimeSlider;
 class QnTimeScrollBar;
 class QnWorkbenchNavigator;
+class QGraphicsProxyWidget;
 
 class QnNavigationItem : public QnSimpleFrameWidget, public QnWorkbenchContextAware {
     Q_OBJECT;
@@ -27,6 +28,10 @@ public:
 
     QnTimeScrollBar *timeScrollBar() const {
         return m_timeScrollBar;
+    }
+
+    QGraphicsProxyWidget *calendar() const {
+        return m_calendar;
     }
 
     virtual bool eventFilter(QObject *watched, QEvent *event) override;
@@ -77,6 +82,7 @@ private:
     QnTimeScrollBar *m_timeScrollBar;
     QnSpeedSlider *m_speedSlider;
     QnVolumeSlider *m_volumeSlider;
+    QGraphicsProxyWidget *m_calendar;
 
     QnWorkbenchNavigator *m_navigator;
 };

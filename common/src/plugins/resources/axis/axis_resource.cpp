@@ -4,12 +4,12 @@
 #include "utils/common/synctime.h"
 
 const char* QnPlAxisResource::MANUFACTURE = "Axis";
-static const float MAX_AR_EPS = 0.02;
+static const float MAX_AR_EPS = 0.04f;
 static const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
 
 QnPlAxisResource::QnPlAxisResource()
 {
-    setAuth("root", "root");
+    setAuth(QLatin1String("root"), QLatin1String("root"));
     m_lastMotionReadTime = 0;
 }
 
@@ -25,7 +25,7 @@ bool QnPlAxisResource::updateMACAddress()
 
 QString QnPlAxisResource::manufacture() const
 {
-    return MANUFACTURE;
+    return QLatin1String(MANUFACTURE);
 }
 
 void QnPlAxisResource::setIframeDistance(int /*frames*/, int /*timems*/)
@@ -36,6 +36,11 @@ void QnPlAxisResource::setIframeDistance(int /*frames*/, int /*timems*/)
 QnAbstractStreamDataProvider* QnPlAxisResource::createLiveDataProvider()
 {
     return new QnAxisStreamReader(toSharedPointer());
+}
+
+bool QnPlAxisResource::shoudResolveConflicts() const 
+{
+    return false;
 }
 
 void QnPlAxisResource::setCropingPhysical(QRect /*croping*/)
@@ -208,6 +213,8 @@ bool QnPlAxisResource::initInternal()
         return false;
     }
 
+    m_palntscRes = false;
+
     m_resolutionList = body.mid(paramValuePos+1).split(',');
     for (int i = 0; i < m_resolutionList.size(); ++i)
     {
@@ -215,19 +222,34 @@ bool QnPlAxisResource::initInternal()
 
         
         if (m_resolutionList[i]=="qcif")
-            m_resolutionList[i] = "176x120";
+        {
+            m_resolutionList[i] = "176x144";
+            m_palntscRes = true;
+        }
 
         else if (m_resolutionList[i]=="cif")
-            m_resolutionList[i] = "352x240";
+        {
+            m_resolutionList[i] = "352x288";
+            m_palntscRes = true;
+        }
 
         else if (m_resolutionList[i]=="2cif")
-            m_resolutionList[i] = "704x240";
+        {
+            m_resolutionList[i] = "704x288";
+            m_palntscRes = true;
+        }
 
         else if (m_resolutionList[i]=="4cif")
-            m_resolutionList[i] = "704x480";
+        {
+            m_resolutionList[i] = "704x576";
+            m_palntscRes = true;
+        }
 
         else if (m_resolutionList[i]=="d1")
-            m_resolutionList[i] = "720x480";
+        {
+            m_resolutionList[i] = "720x576";
+            m_palntscRes = true;
+        }
 
     }
 
@@ -243,6 +265,10 @@ bool QnPlAxisResource::initInternal()
 QByteArray QnPlAxisResource::getMaxResolution() const
 {
     QMutexLocker lock(&m_mutex);
+
+    if (m_palntscRes)
+        return QByteArray("D1");
+
     return !m_resolutionList.isEmpty() ? m_resolutionList[0] : QByteArray();
 }
 
@@ -261,6 +287,12 @@ float QnPlAxisResource::getResolutionAspectRatio(const QByteArray& resolution) c
 QString QnPlAxisResource::getNearestResolution(const QByteArray& resolution, float aspectRatio) const
 {
     QMutexLocker lock(&m_mutex);
+
+    if (m_palntscRes)
+        return QLatin1String("CIF");
+
+
+
     QList<QByteArray> dimensions = resolution.split('x');
     if (dimensions.size() != 2)
     {
@@ -269,7 +301,7 @@ QString QnPlAxisResource::getNearestResolution(const QByteArray& resolution, flo
     }
     float requestSquare = dimensions[0].toInt() * dimensions[1].toInt();
     int bestIndex = -1;
-    float bestMatchCoeff = INT_MAX;
+    float bestMatchCoeff = (float)INT_MAX;
     for (int i = 0; i < m_resolutionList.size(); ++ i)
     {
         float ar = getResolutionAspectRatio(m_resolutionList[i]);
@@ -286,7 +318,7 @@ QString QnPlAxisResource::getNearestResolution(const QByteArray& resolution, flo
             bestMatchCoeff = matchCoeff;
         }
     }
-    return bestIndex >= 0 ? m_resolutionList[bestIndex] : resolution;
+    return bestIndex >= 0 ? QLatin1String(m_resolutionList[bestIndex]) : QLatin1String(resolution);
 }
 
 QRect QnPlAxisResource::getMotionWindow(int num) const
@@ -306,7 +338,7 @@ bool QnPlAxisResource::removeMotionWindow(int wndNum)
     //QMutexLocker lock(&m_mutex);
 
     CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth());
-    CLHttpStatus status = http.doGET(QString("axis-cgi/param.cgi?action=remove&group=Motion.M%1").arg(wndNum));
+    CLHttpStatus status = http.doGET(QString(QLatin1String("axis-cgi/param.cgi?action=remove&group=Motion.M%1")).arg(wndNum));
     return status == CL_HTTP_SUCCESS;
 }
 
@@ -315,7 +347,7 @@ int QnPlAxisResource::addMotionWindow()
     //QMutexLocker lock(&m_mutex);
 
     CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth());
-    CLHttpStatus status = http.doGET(QString("axis-cgi/param.cgi?action=add&group=Motion&template=motion&Motion.M.WindowType=include&Motion.M.ImageSource=0"));
+    CLHttpStatus status = http.doGET(QLatin1String("axis-cgi/param.cgi?action=add&group=Motion&template=motion&Motion.M.WindowType=include&Motion.M.ImageSource=0"));
     if (status != CL_HTTP_SUCCESS)
         return -1;
     QByteArray data;
@@ -329,9 +361,9 @@ bool QnPlAxisResource::updateMotionWindow(int wndNum, int sensitivity, const QRe
     //QMutexLocker lock(&m_mutex);
 
     CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth());
-    CLHttpStatus status = http.doGET(QString("axis-cgi/param.cgi?action=update&group=Motion&\
+    CLHttpStatus status = http.doGET(QString(QLatin1String("axis-cgi/param.cgi?action=update&group=Motion&\
 Motion.M%1.Name=HDWitnessWindow%1&Motion.M%1.ImageSource=0&Motion.M%1.WindowType=include&\
-Motion.M%1.Left=%2&Motion.M%1.Right=%3&Motion.M%1.Top=%4&Motion.M%1.Bottom=%5&Motion.M%1.Sensitivity=%6")
+Motion.M%1.Left=%2&Motion.M%1.Right=%3&Motion.M%1.Top=%4&Motion.M%1.Bottom=%5&Motion.M%1.Sensitivity=%6"))
 .arg(wndNum).arg(rect.left()).arg(rect.right()).arg(rect.top()).arg(rect.bottom()).arg(sensitivity));
 return status == CL_HTTP_SUCCESS;
 }
@@ -419,4 +451,23 @@ const QnResourceAudioLayout* QnPlAxisResource::getAudioLayout(const QnAbstractMe
     }
     else
         return QnPhysicalCameraResource::getAudioLayout(dataProvider);
+}
+
+
+int QnPlAxisResource::getChannelNum() const
+{
+    QString phId = getPhysicalId();
+
+    int index = phId.indexOf(QLatin1String("_channel_"));
+    if (index<0)
+        return 1;
+
+    index += 9;
+
+    if (index >= phId.length() )
+        return 1;
+
+    int result = phId.mid(index).toInt();
+
+    return result;
 }

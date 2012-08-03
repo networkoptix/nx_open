@@ -45,7 +45,7 @@ protected:
     virtual QList<QNetworkProxy> queryProxy(const QNetworkProxyQuery &query = QNetworkProxyQuery()) override
     {
         QList<QNetworkProxy> rez;
-        if (QnVideoServerConnection::getProxyPort() == 0 || query.url().queryItems().isEmpty()) {
+        if (QnVideoServerConnection::getProxyPort() == 0 || query.url().path().isEmpty() || query.url().path() == QLatin1String("api/ping/")) {
             rez << QNetworkProxy(QNetworkProxy::NoProxy);
             return rez;
         }
@@ -192,13 +192,13 @@ int QnVideoServerConnection::asyncGetFreeSpace(const QString& path, QObject *tar
 int QnVideoServerConnection::asyncGetStatistics(QObject *target, const char *slot){
     detail::VideoServerSessionManagerStatisticsRequestReplyProcessor *processor = new detail::VideoServerSessionManagerStatisticsRequestReplyProcessor();
     connect(processor, SIGNAL(finished(const QnStatisticsDataVector &/* data */)), target, slot, Qt::QueuedConnection);
-    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("api/statistics"), processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
+    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("statistics"), QnRequestParamList(), processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
 }
 
 int QnVideoServerConnection::syncGetStatistics(QObject *target, const char *slot){
     QByteArray reply;
     QByteArray errorString;
-    int status = QnSessionManager::instance()->sendGetRequest(m_url, QLatin1String("api/statistics"), reply, errorString);
+    int status = QnSessionManager::instance()->sendGetRequest(m_url, QLatin1String("statistics"), reply, errorString);
 
     detail::VideoServerSessionManagerStatisticsRequestReplyProcessor *processor = new detail::VideoServerSessionManagerStatisticsRequestReplyProcessor();
     connect(processor, SIGNAL(finished(int)), target, slot, Qt::DirectConnection);
@@ -228,30 +228,33 @@ void detail::VideoServerSessionManagerReplyProcessor::at_replyReceived(int statu
 }
 
 // very simple parser. Used for parsing own created XML
-QByteArray extractXmlBody(const QByteArray& body, const QByteArray tagName, int from = 0)
+QByteArray extractXmlBody(const QByteArray& body, const QByteArray& tagName, int *from = NULL)
 {
-	QByteArray tagStart = QByteArray("<") + tagName + QByteArray(">");
-	int bodyStart = body.indexOf(tagStart, from);
-	if (bodyStart >= 0)
-		bodyStart += tagStart.length();
-	QByteArray tagEnd = QByteArray("</") + tagName + QByteArray(">");
-	int bodyEnd = body.indexOf(tagEnd, bodyStart);
-	if (bodyStart >= 0 && bodyEnd >= 0)
-		return body.mid(bodyStart, bodyEnd - bodyStart).trimmed();
-	else
-		return QByteArray();
+    QByteArray tagStart = QByteArray("<") + tagName + QByteArray(">");
+    int bodyStart = body.indexOf(tagStart, from ? *from : 0);
+    if (bodyStart >= 0)
+        bodyStart += tagStart.length();
+    QByteArray tagEnd = QByteArray("</") + tagName + QByteArray(">");
+    int bodyEnd = body.indexOf(tagEnd, bodyStart);
+    if (bodyStart >= 0 && bodyEnd >= 0){
+        if (from)
+            *from = bodyEnd + tagEnd.length();
+        return body.mid(bodyStart, bodyEnd - bodyStart).trimmed();
+    }
+    else
+        return QByteArray();
 }
 
 void detail::VideoServerSessionManagerFreeSpaceRequestReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray& /*errorString*/, int handle)
 {
     qint64 freeSpace = -1;
-	qint64 usedSpace = -1;
+    qint64 usedSpace = -1;
 
     if(status == 0)
     {
-		QByteArray message = extractXmlBody(reply, "root");
-		freeSpace = extractXmlBody(message, "freeSpace").toLongLong();
-		usedSpace = extractXmlBody(message, "usedSpace").toLongLong();
+        QByteArray message = extractXmlBody(reply, "root");
+        freeSpace = extractXmlBody(message, "freeSpace").toLongLong();
+        usedSpace = extractXmlBody(message, "usedSpace").toLongLong();
     }
 
     emit finished(status, freeSpace, usedSpace, handle);
@@ -321,11 +324,9 @@ void detail::VideoServerSessionManagerStatisticsRequestReplyProcessor::at_replyR
         int from = 0;
         do 
         {
-            storage = extractXmlBody(storages, "storage", from);
+            storage = extractXmlBody(storages, "storage", &from);
             if (storage.length() == 0)
                 break;
-
-            from += storage.length();
             QString url = QLatin1String(extractXmlBody(storage, "url"));
             usage = extractXmlBody(storage, "usage").toShort();
             data.append(QnStatisticsData(url, usage, QnStatisticsData::HDD));

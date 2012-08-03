@@ -1,5 +1,6 @@
 #include "time_period.h"
 #include "utils/common/util.h"
+#include "time_period_list.h"
 
 
 bool operator < (const QnTimePeriod& first, const QnTimePeriod& other) 
@@ -31,17 +32,15 @@ qint64 QnTimePeriod::endTimeMs() const
         return startTimeMs + durationMs;
 }
 
-
-bool QnTimePeriod::containPeriod(const QnTimePeriod &timePeriod) const
+bool QnTimePeriod::contains(const QnTimePeriod &timePeriod) const
 {
     return startTimeMs <= timePeriod.startTimeMs && (startTimeMs + durationMs >= timePeriod.startTimeMs + timePeriod.durationMs);
 }
 
-bool QnTimePeriod::containTime(qint64 timeMs) const
+bool QnTimePeriod::contains(qint64 timeMs) const
 {
-    return qBetween(timeMs, startTimeMs, durationMs != -1 ? startTimeMs+durationMs : DATETIME_NOW);
+    return qBetween(timeMs, startTimeMs, durationMs != -1 ? startTimeMs + durationMs : DATETIME_NOW);
 }
-
 
 void QnTimePeriod::addPeriod(const QnTimePeriod &timePeriod)
 {
@@ -51,7 +50,7 @@ void QnTimePeriod::addPeriod(const QnTimePeriod &timePeriod)
     durationMs = qMax(endPoint1, endPoint2) - startTimeMs;
 }
 
-QnTimePeriod QnTimePeriod::intersect(const QnTimePeriod &other) const
+QnTimePeriod QnTimePeriod::intersected(const QnTimePeriod &other) const
 {
     if (durationMs == -1 || other.startTimeMs == -1)
         return QnTimePeriod(qMax(startTimeMs, other.startTimeMs), -1);

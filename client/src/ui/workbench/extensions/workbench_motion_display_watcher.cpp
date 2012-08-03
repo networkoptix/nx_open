@@ -2,7 +2,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
 #include <ui/workbench/workbench_display.h>
-#include <ui/graphics/items/resource_widget.h>
+#include <ui/graphics/items/resource/resource_widget.h>
 
 QnWorkbenchMotionDisplayWatcher::QnWorkbenchMotionDisplayWatcher(QnWorkbenchDisplay *display, QObject *parent):
     QObject(parent),

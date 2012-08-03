@@ -4,7 +4,9 @@
 #include "videostreamdisplay.h"
 #include "abstractrenderer.h"
 
-BufferedFrameDisplayer::BufferedFrameDisplayer(QnAbstractRenderer *drawer): m_queue(MAX_FRAME_QUEUE_SIZE-1), m_drawer(drawer)
+QnBufferedFrameDisplayer::QnBufferedFrameDisplayer(QnAbstractRenderer *drawer): 
+    m_queue(MAX_FRAME_QUEUE_SIZE - 1), 
+    m_drawer(drawer)
 {
     m_currentTime = AV_NOPTS_VALUE;
     m_expectedTime = AV_NOPTS_VALUE;
@@ -12,17 +14,17 @@ BufferedFrameDisplayer::BufferedFrameDisplayer(QnAbstractRenderer *drawer): m_qu
     start();
 }
 
-BufferedFrameDisplayer::~BufferedFrameDisplayer() {
+QnBufferedFrameDisplayer::~QnBufferedFrameDisplayer() {
     stop();
 }
 
-void BufferedFrameDisplayer::waitForFramesDisplayed()
+void QnBufferedFrameDisplayer::waitForFramesDisplayed()
 {
     while (m_queue.size() > 0)
         msleep(1);
 }
 
-qint64 BufferedFrameDisplayer::bufferedDuration() {
+qint64 QnBufferedFrameDisplayer::bufferedDuration() {
     QMutexLocker lock(&m_sync);
     if (m_queue.size() == 0)
         return 0;
@@ -30,7 +32,7 @@ qint64 BufferedFrameDisplayer::bufferedDuration() {
         return m_lastQueuedTime - m_queue.front()->pkt_dts;
 }
 
-bool BufferedFrameDisplayer::addFrame(CLVideoDecoderOutput* outFrame) 
+bool QnBufferedFrameDisplayer::addFrame(CLVideoDecoderOutput* outFrame) 
 {
     bool wasWaiting = false;
     bool needWait;
@@ -49,31 +51,31 @@ bool BufferedFrameDisplayer::addFrame(CLVideoDecoderOutput* outFrame)
     return wasWaiting;
 }
 
-void BufferedFrameDisplayer::setCurrentTime(qint64 time) {
+void QnBufferedFrameDisplayer::setCurrentTime(qint64 time) {
     QMutexLocker lock(&m_sync);
     m_currentTime = time;
     m_timer.restart();
 }
 
-void BufferedFrameDisplayer::clear() {
+void QnBufferedFrameDisplayer::clear() {
     stop();
     m_currentTime = m_expectedTime = AV_NOPTS_VALUE;
     start();
 }
 
-qint64 BufferedFrameDisplayer::getLastDisplayedTime() 
+qint64 QnBufferedFrameDisplayer::getLastDisplayedTime() 
 {
     QMutexLocker lock(&m_sync);
     return m_lastDisplayedTime;
 }
 
-void BufferedFrameDisplayer::setLastDisplayedTime(qint64 value)
+void QnBufferedFrameDisplayer::setLastDisplayedTime(qint64 value)
 {
     QMutexLocker lock(&m_sync);
     m_lastDisplayedTime = value;
 }
 
-void BufferedFrameDisplayer::run() 
+void QnBufferedFrameDisplayer::run() 
 {
     CLVideoDecoderOutput* frame;
     while (!m_needStop)

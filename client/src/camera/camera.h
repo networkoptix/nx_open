@@ -1,5 +1,5 @@
-#ifndef clcamera_h_1451
-#define clcamera_h_1451
+#ifndef QN_VIDEO_CAMERA_H
+#define QN_VIDEO_CAMERA_H
 
 #include "camdisplay.h"
 #include "recording/stream_recorder.h"
@@ -12,12 +12,11 @@ class QnResource;
 class QnStreamRecorder;
 class QnAbstractArchiveReader;
 
-class CLVideoCamera : public QObject 
-{
+class QnVideoCamera : public QObject {
     Q_OBJECT
 public:
-    CLVideoCamera(QnMediaResourcePtr resource, bool generateEndOfStreamSignal = false, QnAbstractMediaStreamDataProvider* reader = 0);
-    virtual ~CLVideoCamera();
+    QnVideoCamera(QnMediaResourcePtr resource, bool generateEndOfStreamSignal = false, QnAbstractMediaStreamDataProvider* reader = 0);
+    virtual ~QnVideoCamera();
 
     void startRecording();
     void stopRecording();
@@ -71,21 +70,20 @@ public slots:
 protected slots:
     void onReachedTheEnd();
     void at_exportProgress(int value);
+
 private:
-    bool m_isVisible;
     QnMediaResourcePtr m_resource;
     CLCamDisplay m_camdispay;
     QnStreamRecorder* m_recorder;
-
     QnAbstractMediaStreamDataProvider* m_reader;
 
-    //QnStatistics* m_stat;
-    bool m_GenerateEndOfStreamSignal;
+    bool m_generateEndOfStreamSignal;
+    
     QnlTimeSource* m_extTimeSrc;
-
+    bool m_isVisible;
     QnStreamRecorder* m_exportRecorder;
     QnAbstractArchiveReader* m_exportReader;
     int m_progressOffset;
 };
 
-#endif //clcamera_h_1451
+#endif //QN_VIDEO_CAMERA_H

@@ -85,10 +85,10 @@ bool CLVideoStreamDisplay::allocScaleContext(const CLVideoDecoderOutput& outFram
 
 void CLVideoStreamDisplay::freeScaleContext()
 {
-	if (m_scaleContext) {
-		sws_freeContext(m_scaleContext);
-		m_scaleContext = 0;
-	}
+    if (m_scaleContext) {
+        sws_freeContext(m_scaleContext);
+        m_scaleContext = 0;
+    }
 }
 
 QnFrameScaler::downscale_factor CLVideoStreamDisplay::determineScaleFactor(int channelNumber, 
@@ -98,34 +98,34 @@ QnFrameScaler::downscale_factor CLVideoStreamDisplay::determineScaleFactor(int c
     if (m_drawer->constantDownscaleFactor())
        force_factor = QnFrameScaler::factor_2;
 
-	if (force_factor==QnFrameScaler::factor_any) // if nobody pushing lets peek it
-	{
-		QSize on_screen = m_drawer->sizeOnScreen(channelNumber);
+    if (force_factor==QnFrameScaler::factor_any) // if nobody pushing lets peek it
+    {
+        QSize on_screen = m_drawer->sizeOnScreen(channelNumber);
 
-		m_scaleFactor = findScaleFactor(srcWidth, srcHeight, on_screen.width(), on_screen.height());
+        m_scaleFactor = findScaleFactor(srcWidth, srcHeight, on_screen.width(), on_screen.height());
 
-		if (m_scaleFactor < m_prevFactor)
-		{
-			// new factor is less than prev one; about to change factor => about to increase resource usage
-			if ( qAbs((qreal)on_screen.width() - m_previousOnScreenSize.width())/on_screen.width() < 0.05 &&
-				qAbs((qreal)on_screen.height() - m_previousOnScreenSize.height())/on_screen.height() < 0.05)
-			{
-				m_scaleFactor = m_prevFactor; // hold bigger factor ( smaller image )
-			}
+        if (m_scaleFactor < m_prevFactor)
+        {
+            // new factor is less than prev one; about to change factor => about to increase resource usage
+            if ( qAbs((qreal)on_screen.width() - m_previousOnScreenSize.width())/on_screen.width() < 0.05 &&
+                qAbs((qreal)on_screen.height() - m_previousOnScreenSize.height())/on_screen.height() < 0.05)
+            {
+                m_scaleFactor = m_prevFactor; // hold bigger factor ( smaller image )
+            }
 
-			// why?
-			// we need to do so ( introduce some histerezis )coz downscaling changes resolution not proportionally some time( cut vertical size a bit )
-			// so it may be a loop downscale => changed aspectratio => upscale => changed aspectratio => downscale.
-		}
+            // why?
+            // we need to do so ( introduce some histerezis )coz downscaling changes resolution not proportionally some time( cut vertical size a bit )
+            // so it may be a loop downscale => changed aspectratio => upscale => changed aspectratio => downscale.
+        }
 
-		if (m_scaleFactor != m_prevFactor)
-		{
-			m_previousOnScreenSize = on_screen;
-			m_prevFactor = m_scaleFactor;
-		}
-	}
-	else
-		m_scaleFactor = force_factor;
+        if (m_scaleFactor != m_prevFactor)
+        {
+            m_previousOnScreenSize = on_screen;
+            m_prevFactor = m_scaleFactor;
+        }
+    }
+    else
+        m_scaleFactor = force_factor;
 
     QnFrameScaler::downscale_factor rez = m_canDownscale ? qMax(m_scaleFactor, QnFrameScaler::factor_1) : QnFrameScaler::factor_1;
     // If there is no scaling needed check if size is greater than maximum allowed image size (maximum texture size for opengl).
@@ -310,7 +310,7 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompress
     {
         if (!m_bufferedFrameDisplayer) {
             QMutexLocker lock(&m_timeMutex);
-            m_bufferedFrameDisplayer = new BufferedFrameDisplayer(m_drawer);
+            m_bufferedFrameDisplayer = new QnBufferedFrameDisplayer(m_drawer);
             m_queueWasFilled = false;
         }
     }
@@ -349,19 +349,19 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompress
     CLVideoDecoderOutput m_tmpFrame;
     m_tmpFrame.setUseExternalData(true);
 
-	if (data->compressionType == CODEC_ID_NONE)
-	{
-		cl_log.log(QLatin1String("CLVideoStreamDisplay::dispay: unknown codec type..."), cl_logERROR);
+    if (data->compressionType == CODEC_ID_NONE)
+    {
+        cl_log.log(QLatin1String("CLVideoStreamDisplay::dispay: unknown codec type..."), cl_logERROR);
         return Status_Displayed; // true to prevent 100% cpu usage on unknown codec
-	}
+    }
 
     QnAbstractVideoDecoder* dec = m_decoder[data->compressionType];
-	if (dec == 0)
-	{
-		dec = CLVideoDecoderFactory::createDecoder(data, enableFrameQueue);
-		dec->setLightCpuMode(m_lightCPUmode);
+    if (dec == 0)
+    {
+        dec = CLVideoDecoderFactory::createDecoder(data, enableFrameQueue);
+        dec->setLightCpuMode(m_lightCPUmode);
         m_decoder.insert(data->compressionType, dec);
-	}
+    }
     if (dec == 0) {
         CL_LOG(cl_logDEBUG2) cl_log.log(QLatin1String("Can't find video decoder"), cl_logDEBUG2);
         return Status_Displayed;
@@ -429,8 +429,8 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompress
     }
 
     CLVideoDecoderOutput* decodeToFrame = useTmpFrame ? &m_tmpFrame : outFrame;
-	if (!dec || !dec->decode(data, decodeToFrame))
-	{
+    if (!dec || !dec->decode(data, decodeToFrame))
+    {
         m_mtx.unlock();
         if (m_lightCPUmode == QnAbstractVideoDecoder::DecodeMode_Fastest)
             return Status_Skipped;
@@ -451,8 +451,8 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompress
             return Status_Buffered;
         }
         else
-		    return Status_Skipped;
-	}
+            return Status_Skipped;
+    }
     m_mtx.unlock();
     m_imageSize = QSize(decodeToFrame->width*dec->getSampleAspectRatio(), decodeToFrame->height);
 
@@ -474,8 +474,8 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompress
         scaleFactor = determineScaleFactor(data->channelNumber, dec->getWidth(), dec->getHeight(), force_factor);
     }
 
-	if (!draw || !m_drawer)
-		return Status_Skipped;
+    if (!draw || !m_drawer)
+        return Status_Skipped;
 
     if (useTmpFrame)
     {
@@ -596,8 +596,8 @@ bool CLVideoStreamDisplay::rescaleFrame(const CLVideoDecoderOutput& srcFrame, CL
 
 void CLVideoStreamDisplay::setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val)
 {
-	m_lightCPUmode = val;
-	QMutexLocker mutex(&m_mtx);
+    m_lightCPUmode = val;
+    QMutexLocker mutex(&m_mtx);
 
     foreach(QnAbstractVideoDecoder* decoder, m_decoder)
     {

@@ -6,9 +6,10 @@
 #include <QScopedPointer>
 #include <QSharedPointer>
 #include <QAuthenticator>
+
 #include "core/resource/network_resource.h"
 #include "utils/common/util.h"
-#include "recording/time_period.h"
+#include "recording/time_period_list.h"
 
 #include <utils/common/request_param.h>
 #include <api/video_server_statistics.h>

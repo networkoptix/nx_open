@@ -1,11 +1,8 @@
-#include <QAudioInput>
-
-#ifndef Q_OS_LINUX
-#include <intrin.h>
-#endif
-
 #include "desktop_file_encoder.h"
-//#include "dsp_effects/denoiser.h"
+
+#ifdef Q_OS_WIN
+
+#include <intrin.h>
 
 static const int DEFAULT_VIDEO_STREAM_ID = 0;
 static const int DEFAULT_AUDIO_STREAM_ID = 1;
@@ -25,7 +22,6 @@ extern "C"
     int av_set_string3(void *obj, const char *name, const char *val, int alloc, const AVOption **o_out);
 }
 
-#include "utils/common/base.h"
 #include "core/datapacket/mediadatapacket.h"
 #include "win_audio_helper.h"
 #include "decoders/audio/ffmpeg_audio.h"
@@ -95,7 +91,7 @@ struct FffmpegLog
     }
 };
 
-int DesktopFileEncoder::initIOContext()
+int QnDesktopFileEncoder::initIOContext()
 {
     enum {
         MAX_READ_SIZE = 1024 * 4*2
@@ -104,19 +100,19 @@ int DesktopFileEncoder::initIOContext()
     struct IO_ffmpeg {
         static qint32 writePacket(void* opaque, quint8* buf, int bufSize)
         {
-            DesktopFileEncoder* stream = reinterpret_cast<DesktopFileEncoder *>(opaque);
+            QnDesktopFileEncoder* stream = reinterpret_cast<QnDesktopFileEncoder *>(opaque);
             return stream ? stream->writePacketImpl(buf, bufSize) : 0;
         }
         static qint32 readPacket(void *opaque, quint8* buf, int size)
         {
             Q_ASSERT(opaque && "NULL Pointer");
-            DesktopFileEncoder* stream = reinterpret_cast<DesktopFileEncoder *>(opaque);
+            QnDesktopFileEncoder* stream = reinterpret_cast<QnDesktopFileEncoder *>(opaque);
             return stream ? stream->readPacketImpl(buf, size) : 0;
         }
         static qint64 seek(void* opaque, qint64 offset, qint32 whence)
         {
             Q_ASSERT(opaque && "NULL Pointer");
-            DesktopFileEncoder* stream = reinterpret_cast<DesktopFileEncoder *>(opaque);
+            QnDesktopFileEncoder* stream = reinterpret_cast<QnDesktopFileEncoder *>(opaque);
             return stream ? stream->seekPacketImpl(offset, whence) : 0;
 
         }
@@ -125,18 +121,18 @@ int DesktopFileEncoder::initIOContext()
     m_iocontext = avio_alloc_context(&m_buffer[0], MAX_READ_SIZE, 1, this, &IO_ffmpeg::readPacket, &IO_ffmpeg::writePacket, &IO_ffmpeg::seek);
     return m_iocontext != 0;
 }
-qint32 DesktopFileEncoder::writePacketImpl(quint8* buf, qint32 bufSize)
+qint32 QnDesktopFileEncoder::writePacketImpl(quint8* buf, qint32 bufSize)
 {
     Q_ASSERT(buf && "NULL Pointer");
     return m_device ? m_device->write(reinterpret_cast<const char *>(buf), bufSize) : 0;
 }
-qint32 DesktopFileEncoder::readPacketImpl(quint8* buf, quint32 bufSize)
+qint32 QnDesktopFileEncoder::readPacketImpl(quint8* buf, quint32 bufSize)
 {
     Q_ASSERT(buf && "NULL Pointer");
     Q_UNUSED(bufSize);
     return 0;
 }
-qint64 DesktopFileEncoder::seekPacketImpl(qint64 offset, qint32 whence)
+qint64 QnDesktopFileEncoder::seekPacketImpl(qint64 offset, qint32 whence)
 {
     Q_UNUSED(whence);
     if (!m_device) {
@@ -165,7 +161,7 @@ qint64 DesktopFileEncoder::seekPacketImpl(qint64 offset, qint32 whence)
     return -1;
 }
 
-DesktopFileEncoder::EncodedAudioInfo::EncodedAudioInfo(DesktopFileEncoder* owner):
+QnDesktopFileEncoder::EncodedAudioInfo::EncodedAudioInfo(QnDesktopFileEncoder* owner):
     m_owner(owner),
     m_tmpAudioBuffer(CL_MEDIA_ALIGNMENT, FF_MIN_BUFFER_SIZE),
     m_speexPreprocess(0),
@@ -174,7 +170,7 @@ DesktopFileEncoder::EncodedAudioInfo::EncodedAudioInfo(DesktopFileEncoder* owner
 
 }
 
-DesktopFileEncoder::EncodedAudioInfo::~EncodedAudioInfo()
+QnDesktopFileEncoder::EncodedAudioInfo::~EncodedAudioInfo()
 {
     stop();
 
@@ -183,7 +179,7 @@ DesktopFileEncoder::EncodedAudioInfo::~EncodedAudioInfo()
     m_speexPreprocess = 0;
 }
 
-int DesktopFileEncoder::EncodedAudioInfo::nameToWaveIndex()
+int QnDesktopFileEncoder::EncodedAudioInfo::nameToWaveIndex()
 {
     int iNumDevs = waveInGetNumDevs();
     QString name(m_audioDevice.deviceName());
@@ -206,7 +202,7 @@ void QT_WIN_CALLBACK waveInProc(HWAVEIN /*hWaveIn*/,
                                 DWORD /*dwParam1*/,
                                 DWORD /*dwParam2*/)
 {
-    DesktopFileEncoder::EncodedAudioInfo* audio = (DesktopFileEncoder::EncodedAudioInfo*) dwInstance;
+    QnDesktopFileEncoder::EncodedAudioInfo* audio = (QnDesktopFileEncoder::EncodedAudioInfo*) dwInstance;
     switch(uMsg)
     {
         case WIM_OPEN:
@@ -221,7 +217,7 @@ void QT_WIN_CALLBACK waveInProc(HWAVEIN /*hWaveIn*/,
     }
 }
 
-void DesktopFileEncoder::EncodedAudioInfo::clearBuffers()
+void QnDesktopFileEncoder::EncodedAudioInfo::clearBuffers()
 {
     while (m_buffers.size() > 0)
     {
@@ -232,7 +228,7 @@ void DesktopFileEncoder::EncodedAudioInfo::clearBuffers()
     }
 }
 
-void DesktopFileEncoder::EncodedAudioInfo::gotData()
+void QnDesktopFileEncoder::EncodedAudioInfo::gotData()
 {
     if (m_terminated)
         return;
@@ -258,7 +254,7 @@ void DesktopFileEncoder::EncodedAudioInfo::gotData()
     }
 }
 
-bool DesktopFileEncoder::EncodedAudioInfo::addBuffer()
+bool QnDesktopFileEncoder::EncodedAudioInfo::addBuffer()
 {
     WAVEHDR* buffer = new WAVEHDR();
     HRESULT hr;
@@ -277,7 +273,7 @@ bool DesktopFileEncoder::EncodedAudioInfo::addBuffer()
     return true;
 }
 
-void DesktopFileEncoder::EncodedAudioInfo::stop()
+void QnDesktopFileEncoder::EncodedAudioInfo::stop()
 {
     m_terminated = true;
     QMutexLocker lock(&m_mtx);
@@ -286,17 +282,17 @@ void DesktopFileEncoder::EncodedAudioInfo::stop()
     clearBuffers();
 }
 
-bool DesktopFileEncoder::EncodedAudioInfo::start()
+bool QnDesktopFileEncoder::EncodedAudioInfo::start()
 {
     return waveInStart(hWaveIn) == S_OK;
 }
 
-int DesktopFileEncoder::EncodedAudioInfo::audioPacketSize()
+int QnDesktopFileEncoder::EncodedAudioInfo::audioPacketSize()
 {
     return m_owner->m_audioCodecCtx->frame_size * m_audioFormat.channels() * m_audioFormat.sampleSize()/8;
 }
 
-bool DesktopFileEncoder::EncodedAudioInfo::setupFormat(QString& errMessage)
+bool QnDesktopFileEncoder::EncodedAudioInfo::setupFormat(QString& errMessage)
 {
     m_audioFormat = m_audioDevice.preferredFormat();
     m_audioFormat.setSampleRate(AUDIO_CAUPTURE_FREQUENCY);
@@ -317,7 +313,7 @@ bool DesktopFileEncoder::EncodedAudioInfo::setupFormat(QString& errMessage)
     return true;
 }
 
-bool DesktopFileEncoder::EncodedAudioInfo::setupPostProcess()
+bool QnDesktopFileEncoder::EncodedAudioInfo::setupPostProcess()
 {
     int devId = nameToWaveIndex();
     WAVEFORMATEX wfx;
@@ -357,19 +353,19 @@ bool DesktopFileEncoder::EncodedAudioInfo::setupPostProcess()
     return true;
 }
 
-DesktopFileEncoder::DesktopFileEncoder (
+QnDesktopFileEncoder::QnDesktopFileEncoder (
                    const QString& fileName,
                    int desktopNum,
                    const QAudioDeviceInfo* audioDevice,
                    const QAudioDeviceInfo* audioDevice2,
-                   CLScreenGrabber::CaptureMode captureMode,
+                   QnScreenGrabber::CaptureMode captureMode,
                    bool captureCursor,
                    const QSize& captureResolution,
                    float encodeQualuty, // in range 0.0 .. 1.0
                    QWidget* glWidget,
                    const QPixmap& logo
                    ):
-    CLLongRunnable(),
+    QnLongRunnable(),
     m_videoBuf(0),
     m_videoBufSize(0),
     m_videoCodecCtx(0),
@@ -413,28 +409,28 @@ DesktopFileEncoder::DesktopFileEncoder (
     m_needStop = false;
 }
 
-bool DesktopFileEncoder::start()
+bool QnDesktopFileEncoder::start()
 {
     if (!init())
         return false;
     m_initialized = true;
-    CLLongRunnable::start();
+    QnLongRunnable::start();
     return true;
 }
 
-void DesktopFileEncoder::stop()
+void QnDesktopFileEncoder::stop()
 {
     m_needStop = true;
 }
 
-DesktopFileEncoder::~DesktopFileEncoder()
+QnDesktopFileEncoder::~QnDesktopFileEncoder()
 {
     m_needStop = true;
     wait();
     closeStream();
 }
 
-int DesktopFileEncoder::calculateBitrate()
+int QnDesktopFileEncoder::calculateBitrate()
 {
     double bitrate = BASE_BITRATE;
 
@@ -446,12 +442,12 @@ int DesktopFileEncoder::calculateBitrate()
     return bitrate;
 }
 
-bool DesktopFileEncoder::init()
+bool QnDesktopFileEncoder::init()
 {
-    m_grabber = new CLBufferedScreenGrabber(
+    m_grabber = new QnBufferedScreenGrabber(
             m_desktopNum,
-            CLBufferedScreenGrabber::DEFAULT_QUEUE_SIZE,
-            CLBufferedScreenGrabber::DEFAULT_FRAME_RATE,
+            QnBufferedScreenGrabber::DEFAULT_QUEUE_SIZE,
+            QnBufferedScreenGrabber::DEFAULT_FRAME_RATE,
             m_captureMode,
             m_captureCursor,
             m_captureResolution,
@@ -622,7 +618,7 @@ bool DesktopFileEncoder::init()
         m_audioCodecCtx->channels = m_audioInfo.size() > 1 ? 2 : m_audioInfo[0]->m_audioFormat.channels();
         m_audioCodecCtx->sample_rate = m_audioInfo[0]->m_audioFormat.frequency();
         AVRational audioRational = {1, m_audioCodecCtx->sample_rate};
-        m_audioCodecCtx->time_base	 = audioRational;
+        m_audioCodecCtx->time_base         = audioRational;
         m_audioCodecCtx->bit_rate = 64000 * m_audioCodecCtx->channels;
         m_audioCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
 
@@ -665,7 +661,7 @@ bool DesktopFileEncoder::init()
     return true;
 }
 
-int DesktopFileEncoder::processData(bool flush)
+int QnDesktopFileEncoder::processData(bool flush)
 {
     if (m_videoCodecCtx == 0)
         return -1;
@@ -788,7 +784,7 @@ int DesktopFileEncoder::processData(bool flush)
     return out_size;
 }
 
-void DesktopFileEncoder::run()
+void QnDesktopFileEncoder::run()
 {
     while (!m_needStop || m_grabber->dataExist())
     {
@@ -798,7 +794,7 @@ void DesktopFileEncoder::run()
             m_capturingStopped = true;
         }
 
-        CLScreenGrabber::CaptureInfo capturedData = m_grabber->getNextFrame();
+        QnScreenGrabber::CaptureInfo capturedData = m_grabber->getNextFrame();
         if (!capturedData.opaque)
             continue;
         m_grabber->capturedDataToFrame(capturedData, m_frame);
@@ -839,14 +835,14 @@ void DesktopFileEncoder::run()
     closeStream();
 }
 
-void DesktopFileEncoder::stopCapturing()
+void QnDesktopFileEncoder::stopCapturing()
 {
     foreach(EncodedAudioInfo* info, m_audioInfo)
         info->stop();
     m_grabber->stop();
 }
 
-void DesktopFileEncoder::closeStream()
+void QnDesktopFileEncoder::closeStream()
 {
     delete m_grabber;
     m_grabber = 0;
@@ -898,7 +894,9 @@ void DesktopFileEncoder::closeStream()
     m_audioInfo.clear();
 }
 
-qint64 DesktopFileEncoder::currentTime() const
+qint64 QnDesktopFileEncoder::currentTime() const
 {
     return m_grabber->currentTime();
 }
+
+#endif // Q_OS_WIN

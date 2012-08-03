@@ -7,7 +7,7 @@
 #include <QList>
 #include <QByteArray>
 #include "utils/common/request_param.h"
-#include "utils/common/base.h"
+#include "utils/common/pimpl.h"
 
 
 class TCPSocket;
@@ -18,7 +18,7 @@ public:
     virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result) = 0;
 
     // incoming connection socket
-    virtual QString description(TCPSocket* tcpSocket) const { return QString(); }
+    virtual QString description(TCPSocket* tcpSocket) const { Q_UNUSED(tcpSocket) return QString(); }
     friend class QnRestServer;
 protected:
     void setPath(const QString& path) { m_path = path; }

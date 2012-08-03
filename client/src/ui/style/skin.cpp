@@ -48,10 +48,10 @@ namespace {
 
     void decompose(const QString &path, QString *prefix, QString *suffix) {
         QFileInfo info(path);
-        *prefix = info.path() + QChar('/') + info.baseName();
+        *prefix = info.path() + QLatin1Char('/') + info.baseName();
         *suffix = info.completeSuffix();
         if(!suffix->isEmpty())
-            *suffix = QChar('.') + *suffix;
+            *suffix = QLatin1Char('.') + *suffix;
     }
 
 } // anonymous namespace
@@ -157,7 +157,7 @@ QPixmap QnSkin::pixmap(const QString &name, const QSize &size, Qt::AspectRatioMo
     return pixmap;
 }
 
-QPixmap	QnSkin::pixmap(const QIcon &icon, const QSize &size, QIcon::Mode mode, QIcon::State state) const {
+QPixmap QnSkin::pixmap(const QIcon &icon, const QSize &size, QIcon::Mode mode, QIcon::State state) const {
     if(mode == Pressed) {
         return m_pressedIconByKey.value(icon.cacheKey(), icon).pixmap(size, Normal, state);
     } else {
@@ -165,11 +165,11 @@ QPixmap	QnSkin::pixmap(const QIcon &icon, const QSize &size, QIcon::Mode mode, Q
     }
 }
 
-QPixmap	QnSkin::pixmap(const QIcon &icon, int w, int h, QIcon::Mode mode, QIcon::State state) const {
+QPixmap QnSkin::pixmap(const QIcon &icon, int w, int h, QIcon::Mode mode, QIcon::State state) const {
     return pixmap(icon, QSize(w, h), mode, state);
 }
 
-QPixmap	QnSkin::pixmap(const QIcon &icon, int extent, QIcon::Mode mode, QIcon::State state) const {
+QPixmap QnSkin::pixmap(const QIcon &icon, int extent, QIcon::Mode mode, QIcon::State state) const {
     return pixmap(icon, QSize(extent, extent), mode, state);
 }
 

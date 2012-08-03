@@ -48,9 +48,9 @@ QnThumbnailsLoader::QnThumbnailsLoader(QnResourcePtr resource):
     m_requestEnd(0),
     m_processingStart(invalidProcessingTime),
     m_processingEnd(invalidProcessingTime),
+    m_boundingSize(128, 96), /* That's 4:3 aspect ratio. */
     m_scaleContext(NULL),
     m_scaleBuffer(NULL),
-    m_boundingSize(128, 96), /* That's 4:3 aspect ratio. */
     m_scaleSourceSize(0, 0),
     m_scaleTargetSize(0, 0),
     m_scaleSourceLine(0),
@@ -481,6 +481,7 @@ void QnThumbnailsLoader::addThumbnail(const QnThumbnail &thumbnail) {
 }
 
 void QnThumbnailsLoader::ensureScaleContextLocked(int lineSize, const QSize &sourceSize, const QSize &boundingSize, int format) {
+    Q_UNUSED(boundingSize)
     bool needsReallocation = false;
     
     if(m_scaleSourceSize != sourceSize) {
@@ -519,6 +520,7 @@ void QnThumbnailsLoader::ensureScaleContextLocked(int lineSize, const QSize &sou
         int numBytes = avpicture_get_size(PIX_FMT_RGBA, qPower2Ceil(static_cast<quint32>(m_scaleTargetSize.width()), 8), m_scaleTargetSize.height());
         m_scaleBuffer = static_cast<quint8 *>(qMallocAligned(numBytes, 32));
         m_scaleContext = sws_getContext(m_scaleSourceSize.width(), m_scaleSourceSize.height(), static_cast<PixelFormat>(m_scaleSourceFormat), m_scaleTargetSize.width(), m_scaleTargetSize.height(), PIX_FMT_BGRA, SWS_BICUBIC, NULL, NULL, NULL);
+        // TODO: sws_getContext may fail and return NULL.
     }
 }
 

@@ -5,7 +5,7 @@
 #include <QSemaphore>
 #include "warnings.h"
 
-class QN_EXPORT CLLongRunnable : public QThread
+class QN_EXPORT QnLongRunnable : public QThread
 {
     Q_OBJECT
 signals:
@@ -36,9 +36,9 @@ public slots:
     }
 
 public:
-    CLLongRunnable() : m_runing(false), m_onPause(false) {}
+    QnLongRunnable() : m_runing(false), m_onPause(false) {}
     
-    virtual ~CLLongRunnable() 
+    virtual ~QnLongRunnable() 
     {
         if(m_runing)
             qnCritical("Runnable instance was destroyed without a call to stop().");
@@ -99,12 +99,12 @@ protected:
 
 
 /**
- * Helper cleanup class to use CLLongRunnable inside Qt smart pointers in a 
+ * Helper cleanup class to use QnLongRunnable inside Qt smart pointers in a 
  * non-blocking fashion.
  */
 struct QnRunnableCleanup
 {
-    static inline void cleanup(CLLongRunnable *runnable)
+    static inline void cleanup(QnLongRunnable *runnable)
     {
         if(!runnable)
             return;

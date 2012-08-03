@@ -1,18 +1,21 @@
-#include <INITGUID.H>
-#include <ks.h>
-#include <ksmedia.h>
-#include <Strsafe.h>
-#include <devpkey.h>
-#include <mmdeviceapi.h>
 #include "win_audio_helper.h"
 
-#include <dsound.h>
-#include <mmsystem.h>
+#ifdef Q_OS_WIN
+
+#include <InitGuid.h>
+#include <Ks.h>
+#include <KsMedia.h>
+#include <strsafe.h>
+#include <devpkey.h>
 #include <mmdeviceapi.h>
-#include <functiondiscoverykeys_devpkey.h>
+
+#include <dsound.h>
+#include <MMSystem.h>
+#include <mmdeviceapi.h>
+#include <FunctionDiscoveryKeys_devpkey.h>
+#include <Propvarutil.h>
 
 #include "utils/common/util.h"
-#include "Propvarutil.h"
 
 #if _MSC_VER < 1600
 DEFINE_PROPERTYKEY(PKEY_AudioEndpoint_JackSubType,0x1da5d803,0xd492,0x4edd,0x8c,0x23,0xe0,0xc0,0xff,0xee,0x7f,0x0e,8);
@@ -191,3 +194,5 @@ bool WinAudioExtendInfo::isMicrophone() const
     // device type unknown. try to check device name
     return m_fullName.toLower().contains(QLatin1String("microphone"));
 }
+
+#endif // Q_OS_WIN

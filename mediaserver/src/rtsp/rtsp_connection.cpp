@@ -90,13 +90,13 @@ public:
             archiveDP->removeDataProcessor(dataProcessor);
         if (thumbnailsDP)
             thumbnailsDP->removeDataProcessor(dataProcessor);
-		archiveDP.clear();
+        archiveDP.clear();
         delete dataProcessor;
         dataProcessor = 0;
 
         QnVideoCamera* camera = qnCameraPool->getVideoCamera(mediaRes);
-		if (camera)
-			camera->notInUse(this);
+        if (camera)
+            camera->notInUse(this);
     }
 
     ~QnRtspConnectionProcessorPrivate()
@@ -505,7 +505,7 @@ int QnRtspConnectionProcessor::composeSetup()
 
 int QnRtspConnectionProcessor::composePause()
 {
-    Q_D(QnRtspConnectionProcessor);
+    //Q_D(QnRtspConnectionProcessor);
     //if (!d->dataProvider)
     //    return CODE_NOT_FOUND;
     
@@ -528,15 +528,14 @@ void QnRtspConnectionProcessor::setRtspTime(qint64 time)
 qint64 QnRtspConnectionProcessor::getRtspTime()
 {
     Q_D(QnRtspConnectionProcessor);
-	if (d->dataProcessor)
-		return d->dataProcessor->getDisplayedTime();
-	else
-		return AV_NOPTS_VALUE;
+    if (d->dataProcessor)
+        return d->dataProcessor->getDisplayedTime();
+    else
+        return AV_NOPTS_VALUE;
 }
 
 void QnRtspConnectionProcessor::extractNptTime(const QString& strValue, qint64* dst)
 {
-    Q_D(QnRtspConnectionProcessor);
     if (strValue == "now")
     {
         //*dst = getRtspTime();
@@ -578,7 +577,7 @@ void QnRtspConnectionProcessor::parseRangeHeader(const QString& rangeStr, qint64
 void QnRtspConnectionProcessor::at_cameraUpdated()
 {
     Q_D(QnRtspConnectionProcessor);
-	QMutexLocker lock(&d->mutex);
+    QMutexLocker lock(&d->mutex);
 
     QnVirtualCameraResourcePtr cameraResource = qSharedPointerDynamicCast<QnVirtualCameraResource>(d->mediaRes);
     if (cameraResource) {
@@ -591,8 +590,9 @@ void QnRtspConnectionProcessor::at_cameraUpdated()
 
 void QnRtspConnectionProcessor::at_cameraDisabledChanged(bool oldValue, bool newValue)
 {
+    Q_UNUSED(oldValue)
     Q_D(QnRtspConnectionProcessor);
-	QMutexLocker lock(&d->mutex);
+    QMutexLocker lock(&d->mutex);
     if (newValue) {
         m_needStop = true;
         d->socket->shutdown();
@@ -603,31 +603,31 @@ void QnRtspConnectionProcessor::createDataProvider()
 {
     Q_D(QnRtspConnectionProcessor);
     QnVideoCamera* camera = qnCameraPool->getVideoCamera(d->mediaRes);
-	if (camera)	
-	{
-		camera->inUse(d);
-		if (!d->liveDpHi && !d->mediaRes->isDisabled()) {
-			d->liveDpHi = camera->getLiveReader(QnResource::Role_LiveVideo);
+    if (camera)    
+    {
+        camera->inUse(d);
+        if (!d->liveDpHi && !d->mediaRes->isDisabled()) {
+            d->liveDpHi = camera->getLiveReader(QnResource::Role_LiveVideo);
             if (d->liveDpHi) {
                 connect(d->liveDpHi->getResource().data(), SIGNAL(disabledChanged(bool, bool)), this, SLOT(at_cameraDisabledChanged(bool, bool)), Qt::DirectConnection);
                 connect(d->liveDpHi->getResource().data(), SIGNAL(resourceChanged()), this, SLOT(at_cameraUpdated()), Qt::DirectConnection);
-				d->liveDpHi->start();
+                d->liveDpHi->start();
             }
-		}
-		if (!d->liveDpLow && d->liveDpHi)
+        }
+        if (!d->liveDpLow && d->liveDpHi)
         {
             QnVirtualCameraResourcePtr cameraRes = qSharedPointerDynamicCast<QnVirtualCameraResource> (d->mediaRes);
             QSharedPointer<QnLiveStreamProvider> liveHiProvider = qSharedPointerDynamicCast<QnLiveStreamProvider> (d->liveDpHi);
             if (cameraRes && liveHiProvider && cameraRes->getMaxFps() - liveHiProvider->getFps() >= QnRecordingManager::MIN_SECONDARY_FPS)
             {
-			    d->liveDpLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
+                d->liveDpLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
                 if (d->liveDpLow)
                     d->liveDpLow->start();
             }
-		}
-	}
-	if (!d->archiveDP) 
-		d->archiveDP = QSharedPointer<QnArchiveStreamReader> (dynamic_cast<QnArchiveStreamReader*> (d->mediaRes->createDataProvider(QnResource::Role_Archive)));
+        }
+    }
+    if (!d->archiveDP) 
+        d->archiveDP = QSharedPointer<QnArchiveStreamReader> (dynamic_cast<QnArchiveStreamReader*> (d->mediaRes->createDataProvider(QnResource::Role_Archive)));
 
     if (!d->thumbnailsDP) 
         d->thumbnailsDP = QSharedPointer<QnThumbnailsStreamReader>(new QnThumbnailsStreamReader(d->mediaRes));
@@ -704,7 +704,7 @@ int QnRtspConnectionProcessor::composePlay()
         return CODE_NOT_FOUND;
 
 
-	QnResource::Status status = getResource()->getStatus();
+    QnResource::Status status = getResource()->getStatus();
 
     d->dataProcessor->setLiveMode(d->liveMode == Mode_Live);
     
@@ -714,7 +714,7 @@ int QnRtspConnectionProcessor::composePlay()
         d->dataProcessor->lockDataQueue();
 
         int copySize = 0;
-		if (!getResource()->isDisabled() && (status == QnResource::Online || status == QnResource::Recording)) {
+        if (!getResource()->isDisabled() && (status == QnResource::Online || status == QnResource::Recording)) {
             copySize = d->dataProcessor->copyLastGopFromCamera(d->quality == MEDIA_Quality_High, 0);
         }
 

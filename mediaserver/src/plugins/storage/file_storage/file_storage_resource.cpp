@@ -53,7 +53,7 @@ bool QnFileStorageResource::isNeedControlFreeSpace()
 
 bool QnFileStorageResource::removeFile(const QString& url)
 {
-	QFile file(url);
+    QFile file(url);
     qnFileDeletor->deleteFile(removeProtocolPrefix(url));
     return true;
 }
@@ -95,8 +95,8 @@ QFileInfoList QnFileStorageResource::getFileList(const QString& dirName)
 
 qint64 QnFileStorageResource::getFileSize(const QString& fillName) const
 {
-	QFile f(fillName);
-	return f.size();
+    QFile f(fillName);
+    return f.size();
 }
 
 bool QnFileStorageResource::isStorageAvailableForWriting()

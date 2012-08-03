@@ -7,8 +7,7 @@ const char* QnPlIqResource::MANUFACTURE = "IqEye";
 
 QnPlIqResource::QnPlIqResource()
 {
-    setAuth("root", "system");
-    
+    setAuth(QLatin1String("root"), QLatin1String("system"));
 }
 
 bool QnPlIqResource::isResourceAccessible()
@@ -23,7 +22,7 @@ bool QnPlIqResource::updateMACAddress()
 
 QString QnPlIqResource::manufacture() const
 {
-    return MANUFACTURE;
+    return QLatin1String(MANUFACTURE);
 }
 
 void QnPlIqResource::setIframeDistance(int /*frames*/, int /*timems*/)
@@ -56,7 +55,7 @@ QnAbstractStreamDataProvider* QnPlIqResource::createLiveDataProvider()
         return new QnRtpStreamReader(toSharedPointer());
         /**/
 
-    return new MJPEGtreamreader(toSharedPointer(), "now.jpg?snap=spush");
+    return new MJPEGtreamreader(toSharedPointer(), QLatin1String("now.jpg?snap=spush"));
 }
 
 void QnPlIqResource::setCropingPhysical(QRect /*croping*/)
@@ -66,16 +65,16 @@ void QnPlIqResource::setCropingPhysical(QRect /*croping*/)
 
 bool QnPlIqResource::initInternal() 
 {
-    return (setOID("1.2.6.5", "1") == CL_HTTP_SUCCESS); // Reset crop to maximum size
+    return (setOID(QLatin1String("1.2.6.5"), QLatin1String("1")) == CL_HTTP_SUCCESS); // Reset crop to maximum size
 }
 
 CLHttpStatus QnPlIqResource::readOID(const QString& oid, QString& result)
 {
-    QString request = QString("get.oid?") + oid;
+    QString request = QLatin1String("get.oid?") + oid;
 
     CLHttpStatus status;
     
-    result = QString(downloadFile(status, request,  getHostAddress(), 80, 1000, getAuth()));
+    result = QLatin1String(downloadFile(status, request,  getHostAddress(), 80, 1000, getAuth()));
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
@@ -99,7 +98,7 @@ CLHttpStatus QnPlIqResource::readOID(const QString& oid, int& result)
 
 CLHttpStatus QnPlIqResource::setOID(const QString& oid, const QString& val)
 {
-    QString request = QString("set.oid?OidTR") + oid + QString("=") + val;
+    QString request = QLatin1String("set.oid?OidTR") + oid + QLatin1String("=") + val;
     CLHttpStatus status;
 
     downloadFile(status, request,  getHostAddress(), 80, 1000, getAuth());

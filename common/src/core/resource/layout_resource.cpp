@@ -180,7 +180,7 @@ QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
     QnLayoutResourcePtr layout;
     QnLayoutFileStorageResource layoutStorage;
     layoutStorage.setUrl(xfile);
-    QIODevice* layoutFile = layoutStorage.open("layout.pb", QIODevice::ReadOnly);
+    QIODevice* layoutFile = layoutStorage.open(QLatin1String("layout.pb"), QIODevice::ReadOnly);
     if (layoutFile == 0)
         return layout;
     QByteArray layoutData = layoutFile->readAll();
@@ -196,7 +196,7 @@ QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
     layout->setGuid(QUuid::createUuid());
     layout->setParentId(0);
     layout->setId(QnId::generateSpecialId());
-    layout->setName(QFileInfo(xfile).fileName() + QString(" - ") + layout->getName());
+    layout->setName(QFileInfo(xfile).fileName() + QLatin1String(" - ") + layout->getName());
 
     layout->addFlags(QnResource::url);
     layout->setUrl(xfile);
@@ -210,11 +210,11 @@ QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
         QnLayoutItemData& item = itr.value();
         item.uuid = QUuid::createUuid();
         item.resource.id = QnId::generateSpecialId();
-        item.resource.path = QString("layout://") + xfile + QString('?') + item.resource.path + QString(".mkv");
+        item.resource.path = QLatin1String("layout://") + xfile + QLatin1Char('?') + item.resource.path + QLatin1String(".mkv");
         updatedItems.insert(item.uuid, item);
 
         QnStorageResourcePtr storage(new QnLayoutFileStorageResource());
-        storage->setUrl(QString("layout://") + xfile);
+        storage->setUrl(QLatin1String("layout://") + xfile);
 
         QnAviResourcePtr aviResource(new QnAviResource(item.resource.path));
         aviResource->setStorage(storage);

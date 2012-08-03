@@ -78,15 +78,15 @@ public:
             codecName(_codecName), setupURL(_setupURL), mapNum(_mapNum), trackNum(_trackNum)
         {
             trackTypeStr = trackTypeStr.toLower();
-            if (trackTypeStr == "audio")
+            if (trackTypeStr == QLatin1String("audio"))
                 trackType = TT_AUDIO;
-            else if (trackTypeStr == "audio-rtcp")
+            else if (trackTypeStr == QLatin1String("audio-rtcp"))
                 trackType = TT_AUDIO_RTCP;
-            else if (trackTypeStr == "video")
+            else if (trackTypeStr == QLatin1String("video"))
                 trackType = TT_VIDEO;
-            else if (trackTypeStr == "video-rtcp")
+            else if (trackTypeStr == QLatin1String("video-rtcp"))
                 trackType = TT_VIDEO_RTCP;
-            else if (trackTypeStr == "metadata")
+            else if (trackTypeStr == QLatin1String("metadata"))
                 trackType = TT_METADATA;
             else
                 trackType = TT_UNKNOWN;

@@ -3,11 +3,9 @@
 
 #include "core/resourcemanagment/resource_searcher.h"
 
-
-
 struct IDirect3D9;
 
-class DesktopDeviceServer : public QnAbstractResourceSearcher
+class DesktopDeviceServer : public QnAbstractResourceSearcher // TODO: rename to resource searcher
 {
     DesktopDeviceServer();
 
@@ -16,19 +14,14 @@ public:
 
     static DesktopDeviceServer& instance();
 
-    QString manufacture() const;
+    virtual QString manufacture() const override;
 
-    virtual bool isProxy() const { return false; }
-    // return the name of the server
-    virtual QString name() const { return QLatin1String("Desktop");}
+    virtual QnResourceList findResources() override;
 
-    // returns all available devices
-    virtual QnResourceList findResources();
-
-    virtual bool isResourceTypeSupported(QnId resourceTypeId) const;
+    virtual bool isResourceTypeSupported(QnId resourceTypeId) const override;
 
 protected:
-    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
+    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters) override;
 
 private:
     IDirect3D9 *m_pD3D;

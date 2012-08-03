@@ -4,6 +4,9 @@ import "resource.proto";
 import "license.proto";
 import "cameraServerItem.proto";
 
+option java_package = "com.networkoptix.hdwitness.protobuf";
+option java_outer_classname = "MessageProtos";
+
 message Message { 
     extensions 100 to max;
 

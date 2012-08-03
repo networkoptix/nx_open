@@ -26,7 +26,7 @@ private:
     void run(); // in a loop: takes images from camera and put into queue
     virtual void beforeRun() override;
 
-    CLAdaptiveSleep m_fpsSleep;
+    QnAdaptiveSleep m_fpsSleep;
 
     float m_fps; //used only for live providers
 };

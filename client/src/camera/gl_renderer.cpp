@@ -13,7 +13,6 @@
 #include <ui/graphics/shaders/yuy2_to_rgb_shader_program.h>
 #include <ui/graphics/shaders/yv12_to_rgb_shader_program.h>
 #include "utils/yuvconvert.h"
-#include "utils/common/base.h"
 #include "camera.h"
 
 #ifdef QN_GL_RENDERER_DEBUG_PERFORMANCE
@@ -54,8 +53,8 @@ public:
 
     QnGLRendererPrivate(const QGLContext *context):
         QnGlFunctions(context),
-        supportsNonPower2Textures(false),
-        status(QnGLRenderer::SUPPORTED)
+        status(QnGLRenderer::SUPPORTED),
+        supportsNonPower2Textures(false)
     {
         QByteArray extensions = reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS));
         QByteArray version = reinterpret_cast<const char *>(glGetString(GL_VERSION));
@@ -755,5 +754,5 @@ QnMetaDataV1Ptr QnGLRenderer::lastFrameMetadata(int channel) const
 
 bool QnGLRenderer::usingShaderYuvToRgb() const {
     return (d->features() & QnGlFunctions::ArbPrograms) && (d->features() & QnGlFunctions::OpenGL1_3) && !m_forceSoftYUV && isYuvFormat() && 
-		d->m_yv12ToRgbShaderProgram->isValid() && !(d->features() & QnGlFunctions::ShadersBroken);
+        d->m_yv12ToRgbShaderProgram->isValid() && !(d->features() & QnGlFunctions::ShadersBroken);
 }

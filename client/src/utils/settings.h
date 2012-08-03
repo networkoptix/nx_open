@@ -60,6 +60,8 @@ public:
 
         DEBUG_COUNTER,
 
+        LANGUAGE,
+
         VARIABLE_COUNT
     };
     
@@ -68,28 +70,16 @@ public:
 
     static QnSettings *instance();
 
-    virtual void updateFromSettings(QSettings *settings) override;
-
     void load();
     void save();
 
-signals:
-    /**
-     * This signal is emitted whenever last used connection changes.
-     *
-     * Note that due to implementation limitations, this signal may get emitted
-     * even if the actual connection parameters didn't change.
-     */
-    void lastUsedConnectionChanged();
-
 protected:
-    virtual QVariant updateValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) override;
-    virtual void submitValueToSettings(QSettings *settings, int id, const QVariant &value) const override;
+    virtual void updateValuesFromSettings(QSettings *settings, const QList<int> &ids) override;
 
-    virtual bool updateValue(int id, const QVariant &value) override;
+    virtual QVariant readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) override;
+    virtual void writeValueToSettings(QSettings *settings, int id, const QVariant &value) const override;
 
-    virtual void lock() const override;
-    virtual void unlock() const override;
+    virtual UpdateStatus updateValue(int id, const QVariant &value) override;
 
 private:
     QN_BEGIN_PROPERTY_STORAGE(VARIABLE_COUNT);
@@ -105,10 +95,10 @@ private:
         QN_DECLARE_RW_PROPERTY(QnConnectionData,        lastUsedConnection,     setLastUsedConnection,      LAST_USED_CONNECTION,       QnConnectionData());
         QN_DECLARE_RW_PROPERTY(QnConnectionDataList,    customConnections,      setCustomConnections,       CUSTOM_CONNECTIONS,         QnConnectionDataList());
         QN_DECLARE_RW_PROPERTY(int,                     debugCounter,           setDebugCounter,            DEBUG_COUNTER,              0);
+        QN_DECLARE_RW_PROPERTY(QString,                 language,               setLanguage,                LANGUAGE,                   QLatin1String("en"));
     QN_END_PROPERTY_STORAGE();
 
 private:
-    mutable QMutex m_mutex;
     QSettings *m_settings;
     bool m_loading;
 };

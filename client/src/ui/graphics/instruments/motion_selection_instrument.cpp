@@ -11,7 +11,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/variant.h>
 
-#include <ui/graphics/items/media_resource_widget.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
 
 namespace {
 

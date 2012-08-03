@@ -102,7 +102,7 @@ int QnServerSettingsDialog::addTableRow(int id, const QString &url, int spaceLim
 }
 
 void QnServerSettingsDialog::setTableStorages(const QnAbstractStorageResourceList &storages) {
-	ui->storagesTable->setRowCount(0);
+    ui->storagesTable->setRowCount(0);
     ui->storagesTable->setColumnCount(2);
 
     foreach (const QnAbstractStorageResourcePtr &storage, storages)
@@ -150,20 +150,20 @@ void QnServerSettingsDialog::submitToResources() {
 
 QString formatGbStr(qint64 value)
 {
-	return QString::number(value/1000000000.0, 'f', 2);
+    return QString::number(value/1000000000.0, 'f', 2);
 }
 
 bool QnServerSettingsDialog::validateStorages(const QnAbstractStorageResourceList &storages, QString *errorString) {
     foreach (const QnAbstractStorageResourcePtr &storage, storages) {
         if (storage->getUrl().isEmpty()) {
             if(errorString)
-                *errorString = "Storage path must not be empty.";
+                *errorString = tr("Storage path must not be empty.");
             return false;
         }
 
         if (storage->getSpaceLimit() < 0) {
             if(errorString)
-                *errorString = "Space limit must be a non-negative integer.";
+                *errorString = tr("Space limit must be a non-negative integer.");
             return false;
         }
     }
@@ -184,50 +184,50 @@ bool QnServerSettingsDialog::validateStorages(const QnAbstractStorageResourceLis
 
     eventLoop->exec();
 
-	detail::FreeSpaceMap freeSpaceMap = processor->freeSpaceInfo();
-	for (detail::FreeSpaceMap::const_iterator itr = freeSpaceMap.constBegin(); itr != freeSpaceMap.constEnd(); ++itr)
-	{
-		QnAbstractStorageResourcePtr storage = storageByHandle.value(itr.key());
-		if (!storage)
-			continue;
+    detail::FreeSpaceMap freeSpaceMap = processor->freeSpaceInfo();
+    for (detail::FreeSpaceMap::const_iterator itr = freeSpaceMap.constBegin(); itr != freeSpaceMap.constEnd(); ++itr)
+    {
+        QnAbstractStorageResourcePtr storage = storageByHandle.value(itr.key());
+        if (!storage)
+            continue;
 
-		/*
-		QMessageBox::warning(this, tr("Not enough disk space"), 
-			tr("For storage '%1' required at least %2Gb space. Current disk free space is %3Gb, current video folder size is %4Gb. Required addition %5Gb").
-			arg(storage->getUrl()).
-			arg(formatGbStr(needRecordingSpace)).
-			arg(formatGbStr(itr.value().freeSpace)).
-			arg(formatGbStr(itr.value().usedSpace)).
-			arg(formatGbStr(needRecordingSpace - (itr.value().freeSpace + itr.value().usedSpace))));
-		*/
+        /*
+        QMessageBox::warning(this, tr("Not enough disk space"), 
+            tr("For storage '%1' required at least %2Gb space. Current disk free space is %3Gb, current video folder size is %4Gb. Required addition %5Gb").
+            arg(storage->getUrl()).
+            arg(formatGbStr(needRecordingSpace)).
+            arg(formatGbStr(itr.value().freeSpace)).
+            arg(formatGbStr(itr.value().usedSpace)).
+            arg(formatGbStr(needRecordingSpace - (itr.value().freeSpace + itr.value().usedSpace))));
+        */
 
-		qint64 avalableSace = itr.value().freeSpace + itr.value().usedSpace - storage->getSpaceLimit();
-		if (itr.value().errorCode == detail::INVALID_PATH)
-		{
-			QMessageBox::warning(this, tr("Invalid storage path"), tr("Storage path '%1' is invalid or not accessible for writing.").arg(storage->getUrl()));
-			return false;
-		}
-		if (itr.value().errorCode == detail::SERVER_ERROR)
-		{
-			QMessageBox::critical(this, tr("Can't verify storage path"), tr("Can't verify storage path '%1'. Media server does not response").arg(storage->getUrl()));
-			return false;
-		}
-		else if (avalableSace < 0)
-		{
-			QMessageBox::critical(this, tr("Not enough disk space"),
-				tr("Storage '%1'\nYou have less storage space available than reserved free space value. Required %2Gb additional disk space")
-				.arg(storage->getUrl())
-				.arg(formatGbStr(MIN_RECORD_FREE_SPACE - avalableSace)));
-			return false;
-		}
-		else if (avalableSace < MIN_RECORD_FREE_SPACE)
-		{
-			QMessageBox::warning(this, tr("Low space for archive"),
-				tr("Storage '%1'\nYou have only %2Gb space for archive.")
-				.arg(storage->getUrl())
-				.arg(formatGbStr(avalableSace)));
-		}
-	}
+        qint64 availableSpace = itr.value().freeSpace + itr.value().usedSpace - storage->getSpaceLimit();
+        if (itr.value().errorCode == detail::INVALID_PATH)
+        {
+            QMessageBox::warning(this, tr("Invalid storage path"), tr("Storage path '%1' is invalid or is not accessible for writing.").arg(storage->getUrl()));
+            return false;
+        }
+        if (itr.value().errorCode == detail::SERVER_ERROR)
+        {
+            QMessageBox::critical(this, tr("Can't verify storage path"), tr("Cannot verify storage path '%1'. Cannot establish connection to the media server.").arg(storage->getUrl()));
+            return false;
+        }
+        else if (availableSpace < 0)
+        {
+            QMessageBox::critical(this, tr("Not enough disk space"),
+                tr("Storage '%1'\nYou have less storage space available than reserved free space value. Additional %2Gb are required.")
+                .arg(storage->getUrl())
+                .arg(formatGbStr(MIN_RECORD_FREE_SPACE - availableSpace)));
+            return false;
+        }
+        else if (availableSpace < MIN_RECORD_FREE_SPACE)
+        {
+            QMessageBox::warning(this, tr("Low space for archive"),
+                tr("Storage '%1'\nYou have only %2Gb left for video archive.")
+                .arg(storage->getUrl())
+                .arg(formatGbStr(availableSpace)));
+        }
+    }
 
     return true;
 }
@@ -240,7 +240,7 @@ void QnServerSettingsDialog::updateSpaceLimitCell(int row, bool force) {
 
     QString url = urlItem->data(Qt::DisplayRole).toString();
 
-    bool newSupportsSpaceLimit = !url.trimmed().startsWith("coldstore://"); // TODO: evil hack, move out the check somewhere into storage factory.
+    bool newSupportsSpaceLimit = !url.trimmed().startsWith(QLatin1String("coldstore://")); // TODO: evil hack, move out the check somewhere into storage factory.
     bool oldSupportsSpaceLimit = spaceItem->flags() & Qt::ItemIsEditable;
     if(newSupportsSpaceLimit != oldSupportsSpaceLimit || force) {
         spaceItem->setFlags(newSupportsSpaceLimit ? (spaceItem->flags() | Qt::ItemIsEditable) : (spaceItem->flags() & ~Qt::ItemIsEditable));
@@ -288,6 +288,7 @@ void QnServerSettingsDialog::at_storageRemoveButton_clicked() {
 }
 
 void QnServerSettingsDialog::at_storagesTable_cellChanged(int row, int column) {
+    Q_UNUSED(column)
     updateSpaceLimitCell(row);
 
     m_hasStorageChanges = true;

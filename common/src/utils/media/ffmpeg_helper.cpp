@@ -559,8 +559,10 @@ FrameTypeExtractor::FrameType FrameTypeExtractor::getFrameType(const quint8* dat
             return getVCFrameType(data, dataLen);
         case CODEC_ID_MPEG4:
             return getMpeg4FrameType(data, dataLen);
+        default:
+            return UnknownFrameType;
     }
-    return UnknownFrameType;
+    
 }
 
 void QnFfmpegHelper::appendCtxField(QByteArray *dst, QnFfmpegHelper::CodecCtxField field, const char* data, int size)

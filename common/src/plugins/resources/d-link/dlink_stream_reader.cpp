@@ -3,7 +3,6 @@
 #include "dlink_resource.h"
 #include "utils/common/sleep.h"
 #include "utils/common/synctime.h"
-#include "utils/common/base.h"
 
 
 
@@ -73,7 +72,7 @@ void PlDlinkStreamReader::openStream()
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
-		getResource()->setStatus(QnResource::Unauthorized);
+        getResource()->setStatus(QnResource::Unauthorized);
         return;
     }
 
@@ -118,7 +117,7 @@ void PlDlinkStreamReader::openStream()
 
         QString url = (role == QnResource::Role_SecondaryLiveVideo) ? info.videoProfileUrls[2] : info.videoProfileUrls[1];
 
-        if (url.length() > 1 && url.at(0)=='/')
+        if (url.length() > 1 && url.at(0)==QLatin1Char('/'))
             url = url.mid(1);
 
         mHttpClient = new CLSimpleHTTPClient(res->getHostAddress(), 80, 2000, res->getAuth());
@@ -182,7 +181,7 @@ QString PlDlinkStreamReader::composeVideoProfile()
     QnDlink_cam_info info = res->getCamInfo();
 
     if (!info.inited())
-        return "";
+        return QString();
 
     QnResource::ConnectionRole role = getRole();
 
@@ -218,9 +217,9 @@ QString PlDlinkStreamReader::composeVideoProfile()
     m_h264 = false;
 
     //bool hasSdp = false; 
-    bool hasSdp = info.videoProfileUrls.contains(3) && info.videoProfileUrls[4].toLower().contains("sdp"); //look_for_this_comment
+    bool hasSdp = info.videoProfileUrls.contains(3) && info.videoProfileUrls[4].toLower().contains(QLatin1String("sdp")); //look_for_this_comment
 
-    if (info.hasH264!="" && !hasSdp)
+    if (!info.hasH264.isEmpty() && !hasSdp)
     {
         t << info.hasH264 << "&";
         m_h264 = true;
@@ -289,7 +288,7 @@ QStringList PlDlinkStreamReader::getRTPurls() const
 
     QnPlDlinkResourcePtr res = getResource().dynamicCast<QnPlDlinkResource>();
 
-    QByteArray reply = downloadFile(status, "config/rtspurl.cgi",  res->getHostAddress(), 80, 1000, res->getAuth());
+    QByteArray reply = downloadFile(status, QLatin1String("config/rtspurl.cgi"),  res->getHostAddress(), 80, 1000, res->getAuth());
 
     if (status != CL_HTTP_SUCCESS)
     {
@@ -300,12 +299,12 @@ QStringList PlDlinkStreamReader::getRTPurls() const
     if (reply.size()==0)
         return result;
 
-    QString file_s(reply);
-    QStringList lines = file_s.split("\r\n", QString::SkipEmptyParts);
+    QString file_s = QLatin1String(reply);
+    QStringList lines = file_s.split(QLatin1String("\r\n"), QString::SkipEmptyParts);
 
     foreach(QString line, lines)
     {
-        if (line.toLower().contains("urlentry="))
+        if (line.toLower().contains(QLatin1String("urlentry=")))
         {
             result.push_back(getValueFromString(line));
         }
@@ -343,8 +342,8 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMPEG(CodecID ci)
 
     QnCompressedVideoDataPtr videoData(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, dataLeft+FF_INPUT_BUFFER_PADDING_SIZE));
     char* curPtr = videoData->data.data();
-    videoData->data.prepareToWrite(dataLeft); // this call does nothing 
-    videoData->data.done(dataLeft);
+    videoData->data.startWriting(dataLeft); // this call does nothing 
+    videoData->data.finishWriting(dataLeft);
 
     while (dataLeft > 0)
     {
@@ -404,7 +403,7 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMJPEG()
 
     int dataLeft = contentLen - videoData->data.size();
     char* curPtr = videoData->data.data() + videoData->data.size();
-    videoData->data.done(dataLeft);
+    videoData->data.finishWriting(dataLeft);
 
     while (dataLeft > 0)
     {
@@ -416,7 +415,7 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMJPEG()
     }
     // sometime 1 more bytes in the buffer end. Looks like it is a DLink bug caused by 16-bit word alignment
     if (contentLen > 2 && !(curPtr[-2] == (char)0xff && curPtr[-1] == (char)0xd9))
-        videoData->data.done(-1);
+        videoData->data.finishWriting(-1);
 
     videoData->compressionType = CODEC_ID_MJPEG;
     videoData->width = 1920;
@@ -437,11 +436,11 @@ QnMetaDataV1Ptr PlDlinkStreamReader::getCameraMetadata()
 
 
     CLHttpStatus status;
-    QByteArray cam_info_file = downloadFile(status, "config/notify.cgi",  res->getHostAddress(), 80, 1000, res->getAuth());
+    QByteArray cam_info_file = downloadFile(status, QLatin1String("config/notify.cgi"),  res->getHostAddress(), 80, 1000, res->getAuth());
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
-		res->setStatus(QnResource::Unauthorized);
+        res->setStatus(QnResource::Unauthorized);
         return QnMetaDataV1Ptr(0);
     }
 
@@ -449,8 +448,8 @@ QnMetaDataV1Ptr PlDlinkStreamReader::getCameraMetadata()
     if (cam_info_file.size()==0)
         return QnMetaDataV1Ptr(new QnMetaDataV1());
 
-    QString file_s(cam_info_file);
-    QStringList lines = file_s.split("\r\n", QString::SkipEmptyParts);
+    QString file_s = QLatin1String(cam_info_file);
+    QStringList lines = file_s.split(QLatin1String("\r\n"), QString::SkipEmptyParts);
 
     bool empty = true;
 
@@ -458,10 +457,10 @@ QnMetaDataV1Ptr PlDlinkStreamReader::getCameraMetadata()
     {
         QString line_low = line.toLower();
 
-        if (line_low.contains("md0") || line_low.contains("md1") || line_low.contains("md2"))
+        if (line_low.contains(QLatin1String("md0")) || line_low.contains(QLatin1String("md1")) || line_low.contains(QLatin1String("md2")))
         {
 
-            if (line_low.contains("on"))
+            if (line_low.contains(QLatin1String("on")))
                 empty = false;
         }
     }

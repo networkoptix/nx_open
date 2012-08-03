@@ -4,6 +4,9 @@
 #include <QtGlobal>
 #include <QMargins>
 
+/**
+ * A floating-point counterpart to <tt>QMargins</tt>.
+ */
 class MarginsF {
 public:
     MarginsF() {

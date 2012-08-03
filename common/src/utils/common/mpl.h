@@ -16,4 +16,9 @@ struct remove_pointer<T *const> {
     typedef T type;
 };
 
+template<class T>
+struct identity {
+    typedef T type;
+};
+
 #endif // QN_MPL_H

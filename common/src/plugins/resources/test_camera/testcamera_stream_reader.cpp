@@ -1,7 +1,6 @@
 #include "testcamera_stream_reader.h"
 #include "testcamera_resource.h"
 #include "utils/common/synctime.h"
-#include "utils/common/base.h"
 
 static const int TESTCAM_TIMEOUT = 1 * 1000;
 
@@ -27,6 +26,7 @@ int QnTestCameraStreamReader::receiveData(quint8* buffer, int size)
             return readed;
         done += readed;
     }
+    return done;
 }
 
 QnAbstractMediaDataPtr QnTestCameraStreamReader::getNextData()
@@ -76,7 +76,7 @@ QnAbstractMediaDataPtr QnTestCameraStreamReader::getNextData()
     QnAbstractMediaDataPtr rez(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, size, m_context));
     rez->compressionType = (CodecID) codec;
 
-    rez->data.done(size);
+    rez->data.finishWriting(size);
     rez->timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;
     if (isKeyData)
         rez->flags |= AV_PKT_FLAG_KEY;
@@ -118,7 +118,7 @@ void QnTestCameraStreamReader::openStream()
     m_tcpSock.setReadTimeOut(TESTCAM_TIMEOUT);
     m_tcpSock.setWriteTimeOut(TESTCAM_TIMEOUT);
 
-    if (!m_tcpSock.connect(url.host().toLatin1().data(), url.port()))
+    if (!m_tcpSock.connect(url.host(), url.port()))
     {
         closeStream();
         return;

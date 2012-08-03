@@ -10,9 +10,9 @@
 #include <core/resourcemanagment/resource_pool.h>
 
 #include <ui/common/read_only.h>
-#include <ui/device_settings/camera_schedule_widget.h>
-#include <ui/device_settings/camera_motion_mask_widget.h>
-#include <ui/graphics/items/resource_widget.h>
+#include <ui/widgets/properties/camera_schedule_widget.h>
+#include <ui/widgets/properties/camera_motion_mask_widget.h>
+#include <ui/graphics/items/resource/resource_widget.h>
 
 QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     QWidget(parent),
@@ -174,7 +174,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         ui->nameEdit->setText(m_camera->getName());
         ui->checkBoxEnableAudio->setChecked(m_camera->isAudioEnabled());
         ui->checkBoxEnableAudio->setEnabled(m_camera->isAudioSupported());
-		ui->macAddressEdit->setText(m_camera->getMAC().toString());
+        ui->macAddressEdit->setText(m_camera->getMAC().toString());
         ui->ipAddressEdit->setText(m_camera->getUrl());
         ui->webPageLabel->setText(tr("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
         ui->loginEdit->setText(m_camera->getAuth().user());

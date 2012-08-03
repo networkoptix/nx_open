@@ -1,7 +1,6 @@
 #include "single_shot_file_reader.h"
 #include "filetypesupport.h"
 #include "utils/common/synctime.h"
-#include "utils/common/base.h"
 #include "core/resource/storage_resource.h"
 
 QnSingleShotFileStreamreader::QnSingleShotFileStreamreader(QnResourcePtr resource):
@@ -11,7 +10,7 @@ QnSingleShotFileStreamreader::QnSingleShotFileStreamreader(QnResourcePtr resourc
 
 QnAbstractMediaDataPtr QnSingleShotFileStreamreader::getNextData()
 {
-	CodecID compressionType;
+    CodecID compressionType;
     QString lowerFileName = getResource()->getUrl().toLower();
 
 
@@ -35,17 +34,17 @@ QnAbstractMediaDataPtr QnSingleShotFileStreamreader::getNextData()
         return QnAbstractMediaDataPtr();
 
     QByteArray srcData = file->readAll();
-	QnCompressedVideoDataPtr outData(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, srcData.size()));
+    QnCompressedVideoDataPtr outData(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, srcData.size()));
     outData->data.write(srcData);
 
-	outData->compressionType = compressionType;
+    outData->compressionType = compressionType;
     outData->flags |= AV_PKT_FLAG_KEY | QnAbstractMediaData::MediaFlags_StillImage;
     outData->timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;
     outData->dataProvider = this;
-	outData->channelNumber = 0;
+    outData->channelNumber = 0;
 
     delete file;
-	return outData;
+    return outData;
 }
 
 void QnSingleShotFileStreamreader::run()

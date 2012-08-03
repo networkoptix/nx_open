@@ -33,7 +33,7 @@ public:
         QMutexLocker mutex(&m_cs);
 
         // we can have 2 threads independetlly put data at the same queue; so we need to put data any way. client is responsible for max size of the quue
-        //if ( m_queue.size()>=m_maxSize )	return false; <- wrong aproach
+        //if ( m_queue.size()>=m_maxSize )    return false; <- wrong aproach
 
         m_queue.enqueue(val); 
 

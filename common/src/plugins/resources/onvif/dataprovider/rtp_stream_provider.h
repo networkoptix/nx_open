@@ -9,7 +9,7 @@
 class QnRtpStreamReader: public CLServerPushStreamreader , public QnLiveStreamProvider
 {
 public:
-    QnRtpStreamReader(QnResourcePtr res, const QString& request = "");
+    QnRtpStreamReader(QnResourcePtr res, const QString& request = QString());
     virtual ~QnRtpStreamReader();
 
     void setRequest(const QString& request);

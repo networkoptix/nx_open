@@ -3,7 +3,7 @@
 #include <camera/resource_display.h>
 #include <camera/camdisplay.h>
 
-#include <ui/graphics/items/resource_widget_renderer.h>
+#include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/common/geometry.h>
 
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>

@@ -1,11 +1,11 @@
 #ifndef __SYNCPLAY_WRAPPER_H__
 #define __SYNCPLAY_WRAPPER_H__
 
-#include "utils/common/base.h"
 #include "utils/media/externaltimesource.h"
 #include "core/dataprovider/abstract_streamdataprovider.h"
 #include "abstract_archive_stream_reader.h"
 #include "recording/time_period.h"
+#include "utils/common/pimpl.h"
 
 class QnAbstractArchiveReader;
 class QnAbstractArchiveDelegate;

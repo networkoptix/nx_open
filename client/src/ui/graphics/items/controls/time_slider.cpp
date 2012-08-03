@@ -22,11 +22,11 @@
 #include <ui/style/noptix_style.h>
 #include <ui/style/globals.h>
 #include <ui/graphics/items/standard/graphics_slider_p.h>
+#include <ui/graphics/items/generic/tool_tip_item.h>
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
 #include <ui/processors/kinetic_cutting_processor.h>
 #include <ui/processors/drag_processor.h>
 
-#include "tool_tip_item.h"
 #include "time_slider_pixmap_cache.h"
 
 namespace {
@@ -281,7 +281,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     m_dragIsClick(false),
     m_selecting(false),
     m_dragMarker(NoMarker),
-	m_lineCount(0),
+    m_lineCount(0),
     m_totalLineStretch(0.0),
     m_rulerHeight(0.0),
     m_prefferedHeight(0.0),
@@ -1132,6 +1132,9 @@ void QnTimeSlider::updateThumbnailsStepSize(bool instant, bool forced) {
     
     /* Calculate new bounding size. */
     int boundingHeigth = qRound(thumbnailsHeight());
+    if(boundingHeigth < thumbnailHeightForDrawing)
+        boundingHeigth = 0;
+
     QSize boundingSize = QSize(boundingHeigth * 256, boundingHeigth);
     bool boundingSizeChanged = thumbnailsLoader()->boundingSize() != boundingSize;
 
@@ -1364,7 +1367,7 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, QnTimePeriodList &recorded,
     for(int i = 0; i < Qn::TimePeriodRoleCount; i++) {
          pos[i] = periods[i].findNearestPeriod(minimumValue, false);
          end[i] = periods[i].findNearestPeriod(maximumValue, true);
-         if(end[i] != periods[i].end() && end[i]->containTime(maximumValue))
+         if(end[i] != periods[i].end() && end[i]->contains(maximumValue))
              end[i]++;
     }
 
@@ -1372,7 +1375,7 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, QnTimePeriodList &recorded,
 
     bool inside[Qn::TimePeriodRoleCount];
     for(int i = 0; i < Qn::TimePeriodRoleCount; i++)
-        inside[i] = pos[i] == end[i] ? false : pos[i]->containTime(value);
+        inside[i] = pos[i] == end[i] ? false : pos[i]->contains(value);
 
     while(value != maximumValue) {
         qint64 nextValue[Qn::TimePeriodRoleCount] = {maximumValue, maximumValue};

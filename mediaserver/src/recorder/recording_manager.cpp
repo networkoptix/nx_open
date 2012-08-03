@@ -100,7 +100,7 @@ QnServerStreamRecorder* QnRecordingManager::createRecorder(QnResourcePtr res, Qn
 
 bool QnRecordingManager::isResourceDisabled(QnResourcePtr res) const
 {
-	if (res->isDisabled())
+    if (res->isDisabled())
         return true;
 
     QnVirtualCameraResourcePtr cameraRes = qSharedPointerDynamicCast<QnVirtualCameraResource>(res);
@@ -228,7 +228,7 @@ void QnRecordingManager::updateCamera(QnSecurityCamResourcePtr res)
 
             startOrStopRecording(res, camera, recorders.recorderHiRes, recorders.recorderLowRes);
         }
-		else if (!res->isDisabled())
+        else if (!res->isDisabled())
         {
             QnServerStreamRecorder* recorderHiRes = createRecorder(res, camera, QnResource::Role_LiveVideo);
             QnServerStreamRecorder* recorderLowRes = createRecorder(res, camera, QnResource::Role_SecondaryLiveVideo);
@@ -237,10 +237,10 @@ void QnRecordingManager::updateCamera(QnSecurityCamResourcePtr res)
                 return;
             
             QnDualStreamingHelperPtr dialStreamingHelper(new QnDualStreamingHelper());
-			if (recorderHiRes)
-				recorderHiRes->setDualStreamingHelper(dialStreamingHelper);
-			if (recorderLowRes)
-				recorderLowRes->setDualStreamingHelper(dialStreamingHelper);
+            if (recorderHiRes)
+                recorderHiRes->setDualStreamingHelper(dialStreamingHelper);
+            if (recorderLowRes)
+                recorderLowRes->setDualStreamingHelper(dialStreamingHelper);
 
             m_recordMap.insert(res, Recorders(recorderHiRes, recorderLowRes));
 
@@ -279,7 +279,7 @@ void QnRecordingManager::at_cameraUpdated()
 
 void QnRecordingManager::at_cameraStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus)
 {
-	if ((oldStatus == QnResource::Offline || oldStatus == QnResource::Unauthorized) && newStatus == QnResource::Online)
+    if ((oldStatus == QnResource::Offline || oldStatus == QnResource::Unauthorized) && newStatus == QnResource::Online)
     {
         QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource> (dynamic_cast<QnSecurityCamResource*>(sender())->toSharedPointer());
         if (camera)

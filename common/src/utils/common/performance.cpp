@@ -23,8 +23,8 @@
 #endif
 
 
-/** CPU usage update timer, in seconds. */
-#define CPU_USAGE_REFRESH 1
+/** statistics usage update timer, in seconds. */
+#define STATISTICS_USAGE_REFRESH 1
 
 // -------------------------------------------------------------------------- //
 // CPU Usage
@@ -39,7 +39,7 @@ namespace {
            m_locator(NULL),
            m_service(NULL),
            m_processCpu(0),
-           m_totalCpu(0),
+           m_totalIdle(0),
            m_timeStamp(0),
            m_usage(0),
            m_totalUsage(0){
@@ -66,6 +66,13 @@ namespace {
             return m_totalUsage;
         }
 
+        bool hddUsage(QList<int> *output){
+            output->clear();
+            foreach(int item, m_hddUsage)
+                output->append(item);
+            return !m_hddUsage.isEmpty();
+        }
+
     private:
         static VOID CALLBACK timerCallback(HWND /*hwnd*/, UINT /*uMsg*/, UINT_PTR /*idEvent*/, DWORD /*dwTime*/);
 
@@ -81,6 +88,18 @@ namespace {
             return result;
         }
 
+        QString getWbemString(IWbemClassObject *pclsObj, LPCWSTR wszName){
+            VARIANT vtProc;
+            pclsObj->Get(wszName,0, &vtProc, 0, 0);
+            QString result = QString();
+            if (vtProc.vt == VT_BSTR){
+                QString qstr((QChar*)vtProc.bstrVal, ::SysStringLen(vtProc.bstrVal));
+                result = qstr;
+            }
+            VariantClear(&vtProc);
+            return result;
+        }
+
         int getWbemInt(IWbemClassObject *pclsObj, LPCWSTR wszName, int def = -1){
             VARIANT vtProc;
             pclsObj->Get(wszName,0, &vtProc, 0, 0);
@@ -90,48 +109,81 @@ namespace {
             VariantClear(&vtProc);
             return result;
         }
-
-        void refresh() {
-
-            char q_str[100];
-            const quint64 max = 100;
-            const qint64 appPid = QCoreApplication::applicationPid();
-            sprintf(q_str, "SELECT * FROM Win32_PerfRawData_PerfProc_Process WHERE IdProcess>0"); // WHERE IdProcess=%d", 
-            IEnumWbemClassObject* pEnumerator = query(q_str);
+    
+        quint64 enumerateWbem(QString queryStr, LPCWSTR value){
+            qulonglong result = 0;
+            IEnumWbemClassObject* pEnumerator = query(queryStr.toLocal8Bit().data());
             if (pEnumerator){
                 IWbemClassObject *pclsObj;
                 ULONG uReturn = 0;
-                quint64 cpu = 0;
-                quint64 total = 0;
-                quint64 ts = 0;
-
                 pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
                 while (uReturn != 0)
                 {
-                    int pid = getWbemInt(pclsObj, L"IDProcess");
-                    qulonglong percProcTime = getWbemLongLong(pclsObj, L"PercentProcessorTime");
-                    total += percProcTime;
-                    if (appPid == pid)
-                        cpu+= percProcTime;
-
-                    /** Requesting timestamp only once */
-                    if (!ts)
-                        ts = getWbemLongLong(pclsObj, L"Timestamp_Sys100NS");
+                    qulonglong data = getWbemLongLong(pclsObj, value);
+                    result+= data;
                     pclsObj->Release();
-
                     pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
                 }
                 pEnumerator->Release();
-
-                if (m_timeStamp && ts){
-                    qulonglong timespan = ((ts - m_timeStamp) * QnPerformance::cpuCoreCount());
-                    m_usage = qMin(max, ((cpu - m_processCpu) * 100) / timespan);
-                    m_totalUsage = qMin(max, ((total - m_totalCpu) * 100) / timespan);
-                }
-                m_totalCpu = total;
-                m_processCpu = cpu;
-                m_timeStamp = ts;
             }
+            return result;
+        }
+
+        QList<quint64> *enumerateWbemSeparate(QString queryStr, LPCWSTR value, QList<quint64> *dataList){
+            IEnumWbemClassObject* pEnumerator = query(queryStr.toLocal8Bit().data());
+            if (pEnumerator){
+                IWbemClassObject *pclsObj;
+                ULONG uReturn = 0;
+                pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
+                while (uReturn != 0)
+                {
+                    quint64 data = getWbemLongLong(pclsObj, value);
+                    dataList->append(data);
+                    pclsObj->Release();
+                    pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
+                }
+                pEnumerator->Release();
+            }
+            return dataList;
+        }
+
+        void refresh() {
+            const quint64 PERCENT_CAP = 100;
+
+            quint64 cpu = enumerateWbem(
+                QString::fromLatin1("SELECT * FROM Win32_PerfRawData_PerfProc_Process WHERE IdProcess = %1").arg(QCoreApplication::applicationPid()),
+                L"PercentProcessorTime");
+            quint64 timeStamp = enumerateWbem(
+                QString::fromLatin1("SELECT * FROM Win32_PerfRawData_PerfProc_Process WHERE IdProcess = %1").arg(QCoreApplication::applicationPid()),
+                L"Timestamp_Sys100NS");
+            quint64 idle = enumerateWbem(
+                QString::fromLatin1("SELECT * FROM Win32_PerfRawData_PerfProc_Process WHERE Name = \"Idle\""),
+                L"PercentProcessorTime");
+             QList<quint64> *hdds = enumerateWbemSeparate(
+                QString::fromLatin1("SELECT * FROM Win32_PerfRawData_PerfDisk_PhysicalDisk WHERE Name !=\"_Total\" AND PercentDiskTime > 0"),
+                L"PercentIdleTime",
+                new QList<quint64>);
+
+            if (m_timeStamp && timeStamp){
+                qulonglong timespan = (timeStamp - m_timeStamp);
+                m_hddUsage.clear();
+                for (int i = 0; i < qMin(hdds->count(), m_rawHddUsageIdle.count()); i++){
+                    m_hddUsage.append(PERCENT_CAP - qMin(PERCENT_CAP, (hdds->at(i) - m_rawHddUsageIdle.at(i)) * PERCENT_CAP / timespan ));
+                }
+
+                timespan *= QnPerformance::cpuCoreCount(); // cpu counters are relayed on this coeff
+                m_totalUsage = PERCENT_CAP - qMin(PERCENT_CAP, ((idle - m_totalIdle) * PERCENT_CAP) / timespan);
+                m_usage = qMin(PERCENT_CAP, ((cpu - m_processCpu) * 100) / timespan);
+            }
+
+            m_rawHddUsageIdle.clear();
+            for(int i = 0; i < hdds->count(); i++)
+                m_rawHddUsageIdle.append(hdds->at(i));
+            delete hdds;
+
+            m_totalIdle = idle;
+            m_processCpu = cpu;
+            m_timeStamp = timeStamp;
         }
 
         bool init() {
@@ -234,7 +286,7 @@ namespace {
                 CoUninitialize();
                 return false;
             }
-            m_timer = SetTimer(0, 0, CPU_USAGE_REFRESH * 1000, timerCallback);
+            m_timer = SetTimer(0, 0, STATISTICS_USAGE_REFRESH * 1000, timerCallback);
             return true;
         }
 
@@ -270,17 +322,23 @@ namespace {
         /** Previous value of raw WMI PercentProcessorTime stat for our process. */
         quint64 m_processCpu;
 
-        /** Previous value of raw WMI PercentProcessorTime stat for all processes. */
-        quint64 m_totalCpu;
+        /** Previous value of raw WMI PercentProcessorTime stat for the IDLE process. */
+        quint64 m_totalIdle;
 
-        /** Previous value of raw WMI Timestamp_Sys100NS stat. */
+        /** Previous value of raw WMI Timestamp_Sys100NS stat for our process. */
         quint64 m_timeStamp;
 
-        /** Processor usage percent by our process for the last CPU_USAGE_REFRESH seconds. */
+        /** Previous values of raw WMI PercentIdleTime stat for all drives. */
+        QList<quint64> m_rawHddUsageIdle;
+
+        /** Processor usage percent by our process for the last STATISTICS_USAGE_REFRESH seconds. */
         uint m_usage;
 
-        /** Total processor usage percent for the last CPU_USAGE_REFRESH seconds. */
+        /** Total processor usage percent for the last STATISTICS_USAGE_REFRESH seconds. */
         uint m_totalUsage;
+
+        /** Total hdd usage percent for all drives for the last STATISTICS_USAGE_REFRESH seconds. */
+        QList<int> m_hddUsage;
 
         /** System timer for processor usage calculating. */
         UINT_PTR m_timer;
@@ -300,11 +358,11 @@ namespace{
 // very useful function, I'd move it to any shared linux util class
     static QString getSystemOutput(QString cmds)
     {
-        QStringList list = cmds.split('|');
+        QStringList list = cmds.split(QLatin1Char('|'));
         QStringListIterator iter(list);
 
         if (!iter.hasNext())
-            return "";
+            return QString();
         QString cmd = iter.next();
         QProcess *prev = new QProcess();
 
@@ -313,20 +371,20 @@ namespace{
             prev->setStandardOutputProcess(next);
             prev->start(cmd);
             if (!prev->waitForStarted())
-                return "";
+                return QString();
             if (!prev->waitForFinished())
-                return "";
+                return QString();
 
             prev = next;
             cmd = iter.next();
         }
         prev->start(cmd);
         if (!prev->waitForStarted())
-            return "";
+            return QString();
         if (!prev->waitForFinished())
-            return "";
+            return QString();
 
-        return QString(prev->readAll());
+        return QString::fromUtf8(prev->readAll());
     }
 
     static void timerCallback(int sig, siginfo_t *si, void *uc);
@@ -399,7 +457,7 @@ namespace{
 
             /* Start the timer */
             struct itimerspec its;
-            its.it_value.tv_sec = CPU_USAGE_REFRESH;
+            its.it_value.tv_sec = STATISTICS_USAGE_REFRESH;
             its.it_value.tv_nsec = 0;
             its.it_interval.tv_sec = its.it_value.tv_sec;
             its.it_interval.tv_nsec = its.it_value.tv_nsec;
@@ -416,8 +474,8 @@ namespace{
             busy = 0;
             total = 0;
 
-            QString proc_stat = getSystemOutput("cat /proc/stat | grep \"cpu \"").mid(5);
-            QStringList list = proc_stat.split(' ', QString::SkipEmptyParts);
+            QString proc_stat = getSystemOutput(QLatin1String("cat /proc/stat | grep \"cpu \"")).mid(5);
+            QStringList list = proc_stat.split(QLatin1Char(' '), QString::SkipEmptyParts);
             QStringListIterator iter(list);
             int counter = 0;
             while (iter.hasNext()){
@@ -431,8 +489,8 @@ namespace{
         }
 
         qulonglong getProcessCpu() {
-            QString request = QString("cat /proc/%1/stat").arg(QCoreApplication::applicationPid ());
-            QStringList proc_stat = getSystemOutput(request).split(' ', QString::SkipEmptyParts);
+            QString request = QString(QLatin1String("cat /proc/%1/stat")).arg(QCoreApplication::applicationPid());
+            QStringList proc_stat = getSystemOutput(request).split(QLatin1Char(' '), QString::SkipEmptyParts);
             if (proc_stat.count() > 14){
                 return (proc_stat[13]).toULongLong() +
                         proc_stat[14].toULongLong();
@@ -518,10 +576,10 @@ QString estimateCpuBrand() {
         else if  (i == 0x80000004)
             memcpy(brandString + 32, oCPUInfo, sizeof(oCPUInfo));
     }
-    return brandString;
+    return QLatin1String(brandString);
 #elif defined(Q_OS_LINUX)
     // 13 - const length of 'model name : ' string with tabs - standard output of /proc/cpuinfo
-    return getSystemOutput("grep \"model name\" /proc/cpuinfo | head -1").mid(13);
+    return getSystemOutput(QLatin1String("grep \"model name\" /proc/cpuinfo | head -1")).mid(13);
 #else
     return QLatin1String("Unknown CPU");
 #endif
@@ -558,7 +616,7 @@ class PerformanceFunctions {
 
 public:
     PerformanceFunctions() {
-        QLibrary Kernel32Lib(QString::fromAscii("Kernel32"));    
+        QLibrary Kernel32Lib(QLatin1String("Kernel32"));    
         PtrQueryThreadCycleTime result = (PtrQueryThreadCycleTime) Kernel32Lib.resolve("QueryThreadCycleTime");
         if (result)
             queryThreadCycleTime = result;
@@ -615,4 +673,13 @@ QString QnPerformance::cpuBrand() {
 int QnPerformance::cpuCoreCount() {
     return QThread::idealThreadCount();
 }
+
+bool QnPerformance::currentHddUsage(QList<int> *output){
+#if defined(Q_OS_WIN)
+    return refresherInstance()->hddUsage(output);
+#else
+    return false;
+#endif
+}
+
 

@@ -1,5 +1,6 @@
 #include "socket.h"
-#include "../common/log.h"
+
+#include <utils/common/warnings.h>
 
 #ifdef Q_OS_WIN
 #  include <ws2tcpip.h>
@@ -20,7 +21,6 @@ typedef char raw_type;       // Type used for raw data on this platform
 #include <netinet/in.h>      // For sockaddr_in
 #include <netinet/tcp.h>      // For TCP_NODELAY
 #include <fcntl.h>
-#include "../common/log.h"
 typedef void raw_type;       // Type used for raw data on this platform
 #endif
 
@@ -53,8 +53,8 @@ throw() {
 
     QString userMessage(message);
     if (inclSysMsg) {
-        userMessage.append(": ");
-        userMessage.append(strerror(errno));
+        userMessage.append(QLatin1String(": "));
+        userMessage.append(QLatin1String(strerror(errno)));
     }
 
     QByteArray data = userMessage.toAscii();
@@ -91,10 +91,12 @@ bool Socket::fillAddr(const QString &address, unsigned short port,
     int status = getaddrinfo(address.toAscii(), 0, &hints, &addressInfo);
     if (status != 0) {
 #ifdef UNICODE
-        m_lastError = QString("Couldn't resolve %1: %2").arg(address).arg(QString::fromWCharArray(gai_strerror(status)));
+        QString errorMessage = QString::fromWCharArray(gai_strerror(status));
 #else
-        m_lastError = QString("Couldn't resolve %1: %2").arg(address).arg(gai_strerror(status));
+        QString errorMessage = QString::fromLocal8Bit(gai_strerror(status));
 #endif  /* UNICODE */
+
+        m_lastError = tr("Couldn't resolve %1: %2.").arg(address).arg(errorMessage);
         return false;
     }
 
@@ -121,7 +123,7 @@ void Socket::createSocket(int type, int protocol)
 
         wVersionRequested = MAKEWORD(2, 0);              // Request WinSock v2.0
         if (WSAStartup(wVersionRequested, &wsaData) != 0) {  // Load WinSock DLL
-            throw SocketException("Unable to load WinSock DLL");
+            throw SocketException(tr("Unable to load WinSock DLL."));
         }
         initialized = true;
     }
@@ -129,7 +131,7 @@ void Socket::createSocket(int type, int protocol)
 
     // Make a new socket
     if ((sockDesc = socket(PF_INET, type, protocol)) < 0) {
-        throw SocketException("Socket creation failed (socket())", true);
+        throw SocketException(tr("Socket creation failed (socket())."), true);
     }
 }
 
@@ -169,10 +171,10 @@ QString Socket::getLocalAddress() const
 
     if (getsockname(sockDesc, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0)
     {
-        return "";
+        return QString();
     }
 
-    return inet_ntoa(addr.sin_addr);
+    return QLatin1String(inet_ntoa(addr.sin_addr));
 }
 
 QString Socket::getPeerAddress() const
@@ -182,10 +184,10 @@ QString Socket::getPeerAddress() const
 
     if (getpeername(sockDesc, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0)
     {
-        return "";
+        return QString();
     }
 
-    return inet_ntoa(addr.sin_addr);
+    return QLatin1String(inet_ntoa(addr.sin_addr));
 }
 
 quint32 Socket::getPeerAddressUint() const
@@ -238,7 +240,7 @@ bool Socket::setLocalAddressAndPort(const QString &localAddress,
         return false;
 
     if (bind(sockDesc, (sockaddr *) &localAddr, sizeof(sockaddr_in)) < 0) {
-        m_lastError = "Set of local address and port failed (bind())";
+        m_lastError = tr("Set of local address and port failed (bind()).");
         return false;
     }
 
@@ -248,7 +250,7 @@ bool Socket::setLocalAddressAndPort(const QString &localAddress,
 void Socket::cleanUp()  {
 #ifdef WIN32
     if (WSACleanup() != 0) {
-        throw SocketException("WSACleanup() failed");
+        throw SocketException(tr("WSACleanup() failed."));
     }
 #endif
 }
@@ -313,7 +315,7 @@ bool CommunicatingSocket::connect(const QString &foreignAddress,
 #ifndef _WIN32
     if (connectResult != 0)
     {
-        m_lastError = "Connect failed (connect())";
+        m_lastError = tr("Connect failed (connect()).");
         return false;
     }
 #else
@@ -374,7 +376,7 @@ void CommunicatingSocket::setReadTimeOut( unsigned int ms )
     if (::setsockopt(sockDesc, SOL_SOCKET, SO_RCVTIMEO,(const void *)&tv,sizeof(struct timeval)) < 0)
 #endif
     {
-        cl_log.log("Timeout function failed", cl_logALWAYS);
+        qnWarning("Timeout function failed.");
     }
 }
 
@@ -392,7 +394,7 @@ void CommunicatingSocket::setWriteTimeOut( unsigned int ms )
     if (::setsockopt(sockDesc, SOL_SOCKET, SO_SNDTIMEO,(const char *)&tv,sizeof(struct timeval)) < 0)
 #endif
     {
-        cl_log.log("Timeout function failed", cl_logALWAYS);
+        qnWarning("Timeout function failed.");
     }
 }
 
@@ -426,10 +428,10 @@ QString CommunicatingSocket::getForeignAddress()
     unsigned int addr_len = sizeof(addr);
 
     if (getpeername(sockDesc, (sockaddr *) &addr,(socklen_t *) &addr_len) < 0) {
-        qWarning() << "Fetch of foreign address failed (getpeername())";
+        qnWarning("Fetch of foreign address failed (getpeername()).");
         return QString();
     }
-    return inet_ntoa(addr.sin_addr);
+    return QLatin1String(inet_ntoa(addr.sin_addr));
 }
 
 unsigned short CommunicatingSocket::getForeignPort()  {
@@ -438,7 +440,7 @@ unsigned short CommunicatingSocket::getForeignPort()  {
 
     if (getpeername(sockDesc, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0)
     {
-        qWarning() << "Fetch of foreign port failed (getpeername())";
+        qnWarning("Fetch of foreign port failed (getpeername()).");
         return -1;
     }
     return ntohs(addr.sin_port);
@@ -495,7 +497,7 @@ TCPServerSocket::TCPServerSocket(const QString &localAddress,
     setReuseAddrFlag(reuseAddr);
     if (!setLocalAddressAndPort(localAddress, localPort))
     {
-        qWarning() << "TCPServerSocket::TCPServerSocket(): Can't create socket: " << m_lastError;
+        qnWarning("Can't create socket: %1.", m_lastError);
         return;
     }
 
@@ -526,7 +528,7 @@ TCPSocket *TCPServerSocket::accept()  {
 
 void TCPServerSocket::setListen(int queueLen)  {
     if (listen(sockDesc, queueLen) < 0) {
-        throw SocketException("Set listening socket failed (listen())", true);
+        throw SocketException(tr("Set listening socket failed (listen())."), true);
     }
 }
 
@@ -562,7 +564,7 @@ UDPSocket::UDPSocket(const QString &localAddress, unsigned short localPort)
 {
     if (!setLocalAddressAndPort(localAddress, localPort))
     {
-        qWarning() << "TCPServerSocket::TCPServerSocket(): Can't create socket: " << m_lastError;
+        qnWarning("Can't create socket: %1.", m_lastError);
         return;
     }
 
@@ -596,11 +598,12 @@ void UDPSocket::disconnect()  {
     // Try to disconnect
     if (::connect(sockDesc, (sockaddr *) &nullAddr, sizeof(nullAddr)) < 0) {
 #ifdef WIN32
-        if (errno != WSAEAFNOSUPPORT) {
+        if (errno != WSAEAFNOSUPPORT)
 #else
-        if (errno != EAFNOSUPPORT) {
+        if (errno != EAFNOSUPPORT)
 #endif
-            throw SocketException("Disconnect failed (connect())", true);
+        {
+            throw SocketException(tr("Disconnect failed (connect())."), true);
         }
     }
 }
@@ -643,7 +646,7 @@ int UDPSocket::recvFrom(void *buffer, int bufferLen, QString &sourceAddress,
     socklen_t addrLen = sizeof(clntAddr);
     int rtn = recvfrom(sockDesc, (raw_type *) buffer, bufferLen, 0, (sockaddr *) &clntAddr, (socklen_t *) &addrLen);
     if (rtn >= 0) {
-        sourceAddress = inet_ntoa(clntAddr.sin_addr);
+        sourceAddress = QLatin1String(inet_ntoa(clntAddr.sin_addr));
         sourcePort = ntohs(clntAddr.sin_port);
     }
     return rtn;
@@ -659,14 +662,14 @@ bool Socket::bindToInterface(const QnInterfaceAndAddr& iface)
 #endif
 
     if (!res)
-        qDebug() << "bindToInterface(): Can't bind to interface" << iface.address << "error code=" << strerror(errno);
+        qnDebug("Can't bind to interface %1. Error code %2.", iface.address.toString(), strerror(errno));
     return res;
 }
 
 bool UDPSocket::setMulticastTTL(unsigned char multicastTTL)  {
     if (setsockopt(sockDesc, IPPROTO_IP, IP_MULTICAST_TTL,
                    (raw_type *) &multicastTTL, sizeof(multicastTTL)) < 0) {
-        qWarning() << "Multicast TTL set failed (setsockopt())";
+        qnWarning("Multicast TTL set failed (setsockopt()).");
         return false;
     }
     return true;
@@ -678,7 +681,7 @@ bool UDPSocket::setMulticastIF(const QString& multicastIF)
     localInterface.s_addr = inet_addr(multicastIF.toLocal8Bit().data());
     if (setsockopt(sockDesc, IPPROTO_IP, IP_MULTICAST_IF, (raw_type *) &localInterface, sizeof(localInterface)) < 0) 
     {
-        qWarning() << "Multicast TTL set failed (setsockopt())";
+        qnWarning("Multicast TTL set failed (setsockopt()).");
         return false;
     }
     return true;
@@ -692,7 +695,7 @@ bool UDPSocket::joinGroup(const QString &multicastGroup)  {
     if (setsockopt(sockDesc, IPPROTO_IP, IP_ADD_MEMBERSHIP,
         (raw_type *) &multicastRequest,
         sizeof(multicastRequest)) < 0) {
-            qWarning() << "Multicast group join failed (setsockopt())";
+            qnWarning("Multicast group join failed (setsockopt()).");
             return false;
     }
     return true;
@@ -706,7 +709,7 @@ bool UDPSocket::joinGroup(const QString &multicastGroup, const QString& multicas
     if (setsockopt(sockDesc, IPPROTO_IP, IP_ADD_MEMBERSHIP,
         (raw_type *) &multicastRequest,
         sizeof(multicastRequest)) < 0) {
-            qWarning() << "Multicast group join failed (setsockopt())";
+            qnWarning("Multicast group join failed (setsockopt()).");
             return false;
     }
     return true;
@@ -720,7 +723,7 @@ bool UDPSocket::leaveGroup(const QString &multicastGroup)  {
     if (setsockopt(sockDesc, IPPROTO_IP, IP_DROP_MEMBERSHIP,
         (raw_type *) &multicastRequest,
         sizeof(multicastRequest)) < 0) {
-            qWarning() << "Multicast group leave failed (setsockopt())";
+            qnWarning("Multicast group leave failed (setsockopt()).");
             return false;
     }
     return true;
@@ -734,7 +737,7 @@ bool UDPSocket::leaveGroup(const QString &multicastGroup, const QString& multica
     if (setsockopt(sockDesc, IPPROTO_IP, IP_DROP_MEMBERSHIP,
         (raw_type *) &multicastRequest,
         sizeof(multicastRequest)) < 0) {
-            qWarning() << "Multicast group leave failed (setsockopt())";
+            qnWarning("Multicast group leave failed (setsockopt()).");
             return false;
     }
     return true;
@@ -768,7 +771,7 @@ bool Socket::setReuseAddrFlag(bool reuseAddr)
     int reuseAddrVal = reuseAddr;
 
     if (::setsockopt(sockDesc, SOL_SOCKET, SO_REUSEADDR, (const char*)&reuseAddrVal, sizeof(reuseAddrVal))) {
-        qWarning() << "Can't set SO_REUSEADDR flag to socket:" << ::strerror(errno);
+        qnWarning("Can't set SO_REUSEADDR flag to socket: %1.", strerror(errno));
         return false;
     }
     return true;

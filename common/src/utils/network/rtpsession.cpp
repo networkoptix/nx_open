@@ -27,7 +27,7 @@ static const int SDP_TRACK_STEP = 2;
 
 static QString getValueFromString(const QString& line)
 {
-    int index = line.indexOf("=");
+    int index = line.indexOf(QLatin1Char('='));
     if (index < 1)
         return QString();
     return line.mid(index+1);
@@ -168,7 +168,7 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& stati
 RTPSession::RTPSession():
     m_csec(2),
     //m_rtpIo(*this),
-    m_transport("UDP"),
+    m_transport(QLatin1String("UDP")),
     m_selectedAudioChannel(0),
     m_startTime(AV_NOPTS_VALUE),
     m_endTime(AV_NOPTS_VALUE),
@@ -201,10 +201,10 @@ QString findCodecById(int num)
 {
     switch (num)
     {
-        case 0: return "PCMU";
-        case 8: return "PCMA";
-        case 26: return "JPEG";
-        default: return "";
+        case 0: return QLatin1String("PCMU");
+        case 8: return QLatin1String("PCMA");
+        case 26: return QLatin1String("JPEG");
+        default: return QString();
     }
 }
 
@@ -227,12 +227,12 @@ void RTPSession::parseSDP()
             if (mapNum >= 0) {
                 if (codecName.isEmpty())
                     codecName = findCodecById(mapNum);
-                m_sdpTracks << QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(codecName, codecType, setupURL, mapNum, trackNumber, this, m_transport == "TCP"));
+                m_sdpTracks << QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(codecName, codecType, setupURL, mapNum, trackNumber, this, m_transport == QLatin1String("TCP")));
                 setupURL.clear();
                 trackNumber++;
             }
             QList<QByteArray> trackParams = lineLower.mid(2).split(' ');
-            codecType = trackParams[0];
+            codecType = QLatin1String(trackParams[0]);
             codecName.clear();
             mapNum = 0;
             if (trackParams.size() >= 4) {
@@ -249,36 +249,36 @@ void RTPSession::parseSDP()
             if (trackInfo.size() < 2 || codecInfo.size() < 2)
                 continue; // invalid data format. skip
             mapNum = trackInfo[1].toUInt();
-            codecName = codecInfo[0];
+            codecName = QLatin1String(codecInfo[0]);
         }
         //else if (lineLower.startsWith("a=control:track"))
         else if (lineLower.startsWith("a=control:"))
         {
-            setupURL = line.mid(QByteArray("a=control:").length());
+            setupURL = QLatin1String(line.mid(QByteArray("a=control:").length()));
         }
     }
     if (mapNum >= 0) {
         if (codecName.isEmpty())
             codecName = findCodecById(mapNum);
-        m_sdpTracks << QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(codecName, codecType, setupURL, mapNum, trackNumber, this, m_transport == "TCP"));
+        m_sdpTracks << QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(codecName, codecType, setupURL, mapNum, trackNumber, this, m_transport == QLatin1String("TCP")));
     }
 }
 
 void RTPSession::parseRangeHeader(const QString& rangeStr)
 {
-    QStringList rangeType = rangeStr.trimmed().split(QChar('='));
+    QStringList rangeType = rangeStr.trimmed().split(QLatin1Char('='));
     if (rangeType.size() < 2)
         return;
-    if (rangeType[0] == "npt")
+    if (rangeType[0] == QLatin1String("npt"))
     {
-        int index = rangeType[1].lastIndexOf(QChar('-'));
+        int index = rangeType[1].lastIndexOf(QLatin1Char('-'));
         QString start = rangeType[1].mid(0, index);
         QString end = rangeType[1].mid(index + 1);
-        if(start.endsWith(QChar('-'))) {
+        if(start.endsWith(QLatin1Char('-'))) {
             start = start.left(start.size() - 1);
-            end = QChar('-') + end;
+            end = QLatin1Char('-') + end;
         }
-        if (start == "now") {
+        if (start == QLatin1String("now")) {
             m_startTime= DATETIME_NOW;
         }
         else {
@@ -287,7 +287,7 @@ void RTPSession::parseRangeHeader(const QString& rangeStr)
         }
         if (index > 0) 
         {
-            if (end == "now") {
+            if (end == QLatin1String("now")) {
                 m_endTime = DATETIME_NOW;
             }
             else {
@@ -312,27 +312,27 @@ void RTPSession::updateResponseStatus(const QByteArray& response)
 // in case of error return false
 bool RTPSession::checkIfDigestAuthIsneeded(const QByteArray& response)
 {
-    QString wwwAuth = extractRTSPParam(response, "WWW-Authenticate:");
+    QString wwwAuth = extractRTSPParam(QLatin1String(response), QLatin1String("WWW-Authenticate:"));
 
-    if (wwwAuth.toLower().contains("digest"))
+    if (wwwAuth.toLower().contains(QLatin1String("digest")))
     {
-        QStringList params = wwwAuth.split(',');
+        QStringList params = wwwAuth.split(QLatin1Char(','));
         if (params.size()<2)
             return false;
 
-        m_realm = "";
-        m_nonce = "";
+        m_realm = QString();
+        m_nonce = QString();
 
         foreach(QString val, params)
         {
-            if (val.contains("realm"))
+            if (val.contains(QLatin1String("realm")))
                 m_realm = getValueFromString(val);
-            else if (val.contains("nonce"))
+            else if (val.contains(QLatin1String("nonce")))
                 m_nonce = getValueFromString(val);
         }
 
-        m_realm.remove('"');
-        m_nonce.remove('"');
+        m_realm.remove(QLatin1Char('"'));
+        m_nonce.remove(QLatin1Char('"'));
 
 
         if (m_realm.isEmpty() || m_nonce.isEmpty())
@@ -381,17 +381,17 @@ bool RTPSession::open(const QString& url)
     m_tcpSock.setReadTimeOut(m_tcpTimeout);
     m_tcpSock.setWriteTimeOut(m_tcpTimeout);
 
-	if (!sendDescribe()) {
-		m_tcpSock.close();
+    if (!sendDescribe()) {
+        m_tcpSock.close();
         return false;
-	}
+    }
 
     QByteArray response;
 
-	if (!readTextResponce(response)) {
-		m_tcpSock.close();
+    if (!readTextResponce(response)) {
+        m_tcpSock.close();
         return false;
-	}
+    }
 
     // check digest authentication here
     if (!checkIfDigestAuthIsneeded(response))
@@ -414,31 +414,31 @@ bool RTPSession::open(const QString& url)
     }
 
 
-    QString tmp = extractRTSPParam(response, "Range:");
+    QString tmp = extractRTSPParam(QLatin1String(response), QLatin1String("Range:"));
     if (!tmp.isEmpty())
         parseRangeHeader(tmp);
 
-    tmp = extractRTSPParam(response, "Content-Base:");
+    tmp = extractRTSPParam(QLatin1String(response), QLatin1String("Content-Base:"));
     if (!tmp.isEmpty())
         m_contentBase = tmp;
 
 
     updateResponseStatus(response);
 
-    int sdp_index = response.indexOf("\r\n\r\n");
+    int sdp_index = response.indexOf(QLatin1String("\r\n\r\n"));
 
-	if (sdp_index  < 0 || sdp_index+4 >= response.size()) {
-		m_tcpSock.close();
+    if (sdp_index  < 0 || sdp_index+4 >= response.size()) {
+        m_tcpSock.close();
         return false;
-	}
+    }
 
     m_sdp = response.mid(sdp_index+4);
     parseSDP();
 
-	if (m_sdpTracks.size()<=0) {
-		m_tcpSock.close();
+    if (m_sdpTracks.size()<=0) {
+        m_tcpSock.close();
         return false;
-	}
+    }
 
     return true;
 }
@@ -446,8 +446,8 @@ bool RTPSession::open(const QString& url)
 RTPSession::TrackMap RTPSession::play(qint64 positionStart, qint64 positionEnd, double scale)
 {
     m_prefferedTransport = m_transport;
-    if (m_prefferedTransport == "AUTO")
-        m_prefferedTransport = "TCP";
+    if (m_prefferedTransport == QLatin1String("AUTO"))
+        m_prefferedTransport = QLatin1String("TCP");
     if (!sendSetup() || m_sdpTracks.isEmpty())
         return TrackMap();
 
@@ -491,11 +491,11 @@ void RTPSession::addAuth(QByteArray& request)
         QByteArray firstLine = request.left(request.indexOf('\n'));
         QList<QByteArray> methodAndUri = firstLine.split(' ');
         if (methodAndUri.size() >= 2)
-            request.append(CLSimpleHTTPClient::digestAccess(m_auth, m_realm, m_nonce, QString(methodAndUri[0]), QString(methodAndUri[1]) ));
+            request.append(CLSimpleHTTPClient::digestAccess(m_auth, m_realm, m_nonce, QLatin1String(methodAndUri[0]), QLatin1String(methodAndUri[1]) ));
     }
     else {
         request.append(CLSimpleHTTPClient::basicAuth(m_auth));
-        request.append("\r\n");
+        request.append(QLatin1String("\r\n"));
     }
 }   
 
@@ -608,7 +608,7 @@ bool RTPSession::sendSetup()
         {
             ;
         }
-        else if (trackInfo->codecName != "ffmpeg-metadata")
+        else if (trackInfo->codecName != QLatin1String("ffmpeg-metadata"))
         {
             continue; // skip unknown metadata e.t.c
         }
@@ -616,7 +616,7 @@ bool RTPSession::sendSetup()
         QByteArray request;
         request += "SETUP ";
 
-        if (trackInfo->setupURL.startsWith("rtsp://"))
+        if (trackInfo->setupURL.startsWith(QLatin1String("rtsp://")))
         {
             // full track url in a prefix
             request += trackInfo->setupURL;
@@ -640,9 +640,9 @@ bool RTPSession::sendSetup()
         request += "\r\n";
         addAuth(request);
         request += "User-Agent: Network Optix\r\n";
-        request += QString("Transport: RTP/AVP/") + m_prefferedTransport + QString(";unicast;");
+        request += QLatin1String("Transport: RTP/AVP/") + m_prefferedTransport + QLatin1String(";unicast;");
 
-        if (m_prefferedTransport == "UDP")
+        if (m_prefferedTransport == QLatin1String("UDP"))
         {
             request += "client_port=";
             request += QString::number(trackInfo->ioDevice->getMediaSocket()->getLocalPort());
@@ -651,7 +651,7 @@ bool RTPSession::sendSetup()
         }
         else
         {
-            request += "interleaved=" + QString::number(trackInfo->trackNum*SDP_TRACK_STEP) + QString("-") + QString::number(trackInfo->trackNum*SDP_TRACK_STEP+1);
+            request += QLatin1String("interleaved=") + QString::number(trackInfo->trackNum*SDP_TRACK_STEP) + QLatin1Char('-') + QString::number(trackInfo->trackNum*SDP_TRACK_STEP+1);
         }
         request += "\r\n";
 
@@ -677,8 +677,8 @@ bool RTPSession::sendSetup()
 
         if (!responce.startsWith("RTSP/1.0 200"))
         {
-            if (m_transport == "AUTO" && m_prefferedTransport == "TCP") {
-                m_prefferedTransport = "UDP";
+            if (m_transport == QLatin1String("AUTO") && m_prefferedTransport == QLatin1String("TCP")) {
+                m_prefferedTransport = QLatin1String("UDP");
                 return sendSetup(); // try UDP transport
             }
             else
@@ -686,19 +686,19 @@ bool RTPSession::sendSetup()
         }
         m_TimeOut = 0; // default timeout 0 ( do not send keep alive )
 
-        QString tmp = extractRTSPParam(responce, "Session:");
+        QString tmp = extractRTSPParam(QLatin1String(responce), QLatin1String("Session:"));
 
         if (tmp.size() > 0)
         {
-            QStringList tmpList = tmp.split(';');
+            QStringList tmpList = tmp.split(QLatin1Char(';'));
             m_SessionId = tmpList[0];
 
             for (int i = 0; i < tmpList.size(); ++i)
             {
                 tmpList[i] = tmpList[i].trimmed().toLower();
-                if (tmpList[i].startsWith("timeout"))
+                if (tmpList[i].startsWith(QLatin1String("timeout")))
                 {
-                    QStringList tmpParams = tmpList[i].split('=');
+                    QStringList tmpParams = tmpList[i].split(QLatin1Char('='));
                     if (tmpParams.size() > 1) {
                         m_TimeOut = tmpParams[1].toInt();
                         if (m_TimeOut > 0 && m_TimeOut < 5000)
@@ -711,7 +711,7 @@ bool RTPSession::sendSetup()
         updateTransportHeader(responce);
     }
 
-    bool tcpMode = (m_prefferedTransport == "TCP");
+    bool tcpMode = (m_prefferedTransport == QLatin1String("TCP"));
     for (int i = 0; i < m_sdpTracks.size(); ++i)
         m_sdpTracks[i]->ioDevice->setTcpMode(tcpMode);
 
@@ -802,24 +802,24 @@ bool RTPSession::sendPlay(qint64 startPos, qint64 endPos, double scale)
     if (startPos != AV_NOPTS_VALUE)
     {
         if (startPos != DATETIME_NOW)
-            request += "Range: npt=" + QString::number(startPos);
+            request += QLatin1String("Range: npt=") + QString::number(startPos);
         else
-            request += "Range: npt=now";
-        request += "-";
+            request += QLatin1String("Range: npt=now");
+        request += '-';
         if (endPos != AV_NOPTS_VALUE)
         {
             if (endPos != DATETIME_NOW)
                 request += QString::number(endPos);
             else
-                request += "now";
+                request += QLatin1String("now");
         }
-        request += "\r\n";
+        request += QLatin1String("\r\n");
     }
 
-    request += "Scale: " + QString::number(scale) + QString("\r\n");
+    request += QLatin1String("Scale: ") + QString::number(scale) + QLatin1String("\r\n");
     addAdditionAttrs(request);
     
-    request += "\r\n";
+    request += QLatin1String("\r\n");
 
     if (!m_tcpSock.send(request.data(), request.size()))
         return false;
@@ -833,7 +833,7 @@ bool RTPSession::sendPlay(qint64 startPos, qint64 endPos, double scale)
     {
         updateTransportHeader(response);
 
-        QString tmp = extractRTSPParam(response, "Range:");
+        QString tmp = extractRTSPParam(QLatin1String(response), QLatin1String("Range:"));
         if (!tmp.isEmpty())
             parseRangeHeader(tmp);
 
@@ -918,7 +918,8 @@ static const int RTCP_SOURCE_DESCRIPTION = 202;
 
 RtspStatistic RTPSession::parseServerRTCPReport(quint8* srcBuffer, int srcBufferSize)
 {
-    static quint32 rtspTimeDiff = QDateTime::fromString("1900-01-01",Qt::ISODate).secsTo(QDateTime::fromString("1970-01-01",Qt::ISODate));
+    static quint32 rtspTimeDiff = QDateTime::fromString(QLatin1String("1900-01-01"), Qt::ISODate)
+        .secsTo(QDateTime::fromString(QLatin1String("1970-01-01"), Qt::ISODate));
 
     RtspStatistic stats;
     try {
@@ -1003,7 +1004,7 @@ bool RTPSession::sendKeepAliveIfNeeded()
     if (m_TimeOut==0)
         return true;
 
-    if (m_keepAliveTime.elapsed() < m_TimeOut - RESERVED_TIMEOUT_TIME)
+    if (m_keepAliveTime.elapsed() < (int) m_TimeOut - RESERVED_TIMEOUT_TIME)
         return true;
     else
     {
@@ -1091,7 +1092,7 @@ int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
             m_responseBufferLen = bEnd - curPtr;
             if (QnTCPConnectionProcessor::isFullMessage(textResponse)) 
             {
-                QString tmp = extractRTSPParam(textResponse, "Range:");
+                QString tmp = extractRTSPParam(QLatin1String(textResponse), QLatin1String("Range:"));
                 if (!tmp.isEmpty())
                     parseRangeHeader(tmp);
                 emit gotTextResponse(textResponse);
@@ -1204,9 +1205,9 @@ QString RTPSession::extractRTSPParam(const QString& buffer, const QString& param
         bool first = true;
         for (int i = pos + paramName.size() + 1; i < buffer.size(); i++)
         {
-            if (buffer[i] == ' ' && first)
+            if (buffer[i] == QLatin1Char(' ') && first)
                 continue;
-            else if (buffer[i] == '\r' || buffer[i] == '\n')
+            else if (buffer[i] == QLatin1Char('\r') || buffer[i] == QLatin1Char('\n'))
                 break;
             else {
                 rez += buffer[i];
@@ -1216,20 +1217,20 @@ QString RTPSession::extractRTSPParam(const QString& buffer, const QString& param
         return rez;
     }
     else
-        return "";
+        return QString();
 }
 
 void RTPSession::updateTransportHeader(QByteArray& responce)
 {
-    QString tmp = extractRTSPParam(responce, "Transport:");
+    QString tmp = extractRTSPParam(QLatin1String(responce), QLatin1String("Transport:"));
     if (tmp.size() > 0)
     {
-        QStringList tmpList = tmp.split(';');
+        QStringList tmpList = tmp.split(QLatin1Char(';'));
         for (int i = 0; i < tmpList.size(); ++i)
         {
-            if (tmpList[i].startsWith("port"))
+            if (tmpList[i].startsWith(QLatin1String("port")))
             {
-                QStringList tmpParams = tmpList[i].split('=');
+                QStringList tmpParams = tmpList[i].split(QLatin1Char('='));
                 if (tmpParams.size() > 1)
                     m_ServerPort = tmpParams[1].toInt();
             }
@@ -1339,15 +1340,15 @@ void RTPSession::setProxyAddr(const QString& addr, int port)
 QString RTPSession::mediaTypeToStr(TrackType trackType)
 {
     if (trackType == TT_AUDIO)
-        return "audio";
+        return QLatin1String("audio");
     else if (trackType == TT_AUDIO_RTCP)
-        return "audio-rtcp";
+        return QLatin1String("audio-rtcp");
     else if (trackType == TT_VIDEO)
-        return "video";
+        return QLatin1String("video");
     else if (trackType == TT_VIDEO_RTCP)
-        return "video-rtcp";
+        return QLatin1String("video-rtcp");
     else if (trackType == TT_METADATA)
-        return "metadata";
+        return QLatin1String("metadata");
     else
-        return "TT_UNKNOWN";
+        return QLatin1String("TT_UNKNOWN");
 }

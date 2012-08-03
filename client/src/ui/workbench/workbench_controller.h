@@ -17,7 +17,7 @@ class QMenu;
 class QLabel;
 class QPropertyAnimation;
 
-class CLVideoCamera;
+class QnVideoCamera;
 
 class InstrumentManager;
 class HandScrollInstrument;
@@ -67,7 +67,7 @@ public:
     QnWorkbenchGridMapper *mapper() const;
 
     MotionSelectionInstrument *motionSelectionInstrument() const {
-	    return m_motionSelectionInstrument;
+        return m_motionSelectionInstrument;
     }
 
     ClickInstrument *itemRightClickInstrument() const {

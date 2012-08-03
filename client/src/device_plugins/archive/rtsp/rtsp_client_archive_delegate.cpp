@@ -8,7 +8,6 @@
 #include "utils/common/util.h"
 #include "utils/common/sleep.h"
 #include "utils/common/synctime.h"
-#include "utils/common/base.h"
 #include "core/resource/camera_history.h"
 #include "core/resource/video_server.h"
 
@@ -69,7 +68,7 @@ QnResourcePtr QnRtspClientArchiveDelegate::getNextVideoServerFromTime(QnResource
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(resource);
     if (!netRes)
         return QnResourcePtr();
-	QString physicalId = netRes->getPhysicalId();
+    QString physicalId = netRes->getPhysicalId();
     QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(physicalId);
     if (!history)
         return QnResourcePtr();
@@ -86,10 +85,10 @@ QString QnRtspClientArchiveDelegate::getUrl(QnResourcePtr resource)
     QnResourcePtr server = qnResPool->getResourceById(resource->getParentId());
     if (!server)
         return QString();
-    QString url = server->getUrl() + QString('/');
+    QString url = server->getUrl() + QLatin1Char('/');
     QnNetworkResourcePtr netResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
     if (netResource != 0)
-		url += netResource->getPhysicalId();
+        url += netResource->getPhysicalId();
     else
         url += server->getUrl();
     return url;
@@ -111,7 +110,7 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(QnResourcePtr re
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(resource);
     if (!netRes)
         return 0;
-	QString physicalId = netRes->getPhysicalId();
+    QString physicalId = netRes->getPhysicalId();
     QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(physicalId);
     if (!history)
         return 0;
@@ -155,7 +154,7 @@ QnResourcePtr QnRtspClientArchiveDelegate::getResourceOnTime(QnResourcePtr resou
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(resource);
     if (!netRes)
         return resource;
-	QString physicalId = netRes->getPhysicalId();
+    QString physicalId = netRes->getPhysicalId();
 
     if (time == DATETIME_NOW)
     {
@@ -176,11 +175,11 @@ QnResourcePtr QnRtspClientArchiveDelegate::getResourceOnTime(QnResourcePtr resou
 
     // get camera resource from other server. Unique id is physicalId + serverID
     QnResourcePtr newResource = qnResPool->getResourceByUniqId(physicalId + videoServer->getId().toString());
-	if (newResource && newResource != resource) {
-		QnVideoServerResourcePtr videoServer = qSharedPointerDynamicCast<QnVideoServerResource> (qnResPool->getResourceById(resource->getParentId()));
-		if (videoServer)
-			qDebug() << "switch to media server " << videoServer->getUrl();
-	}
+    if (newResource && newResource != resource) {
+        QnVideoServerResourcePtr videoServer = qSharedPointerDynamicCast<QnVideoServerResource> (qnResPool->getResourceById(resource->getParentId()));
+        if (videoServer)
+            qDebug() << "switch to media server " << videoServer->getUrl();
+    }
     return newResource ? newResource : resource;
 }
 
@@ -210,7 +209,7 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
 
     
 
-    m_rtspSession.setTransport("TCP");
+    m_rtspSession.setTransport(QLatin1String("TCP"));
 
     m_rtspSession.setProxyAddr(m_proxyAddr, m_proxyPort);
     m_rtpData = 0;
@@ -311,30 +310,30 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
                       m_rtspSession.getScale() <  0 && timeMs < m_serverTimePeriod.startTimeMs;
     if (result == 0 || outOfRange || result->dataType == QnAbstractMediaData::EMPTY_DATA)
     {
-		qDebug() << "Reached the edge for archive in a current server. packetTime=" << QDateTime::fromMSecsSinceEpoch(timeMs).toString() <<
-			        "period: " << QDateTime::fromMSecsSinceEpoch(m_serverTimePeriod.startTimeMs).toString() << "-" << 
-					QDateTime::fromMSecsSinceEpoch(m_serverTimePeriod.endTimeMs()).toString();
+        qDebug() << "Reached the edge for archive in a current server. packetTime=" << QDateTime::fromMSecsSinceEpoch(timeMs).toString() <<
+                    "period: " << QDateTime::fromMSecsSinceEpoch(m_serverTimePeriod.startTimeMs).toString() << "-" << 
+                    QDateTime::fromMSecsSinceEpoch(m_serverTimePeriod.endTimeMs()).toString();
 
-		if (m_lastSeekTime == AV_NOPTS_VALUE)
-			m_lastSeekTime = qnSyncTime->currentMSecsSinceEpoch()*1000;
-		QnResourcePtr newResource = getNextVideoServerFromTime(m_resource, m_lastSeekTime/1000);
-		if (newResource) {
-			m_lastSeekTime = m_serverTimePeriod.startTimeMs*1000;
-			if (m_rtspSession.getScale() > 0)
-				m_position = m_serverTimePeriod.startTimeMs*1000;
-			else
-				m_position = (m_serverTimePeriod.endTimeMs()-1)*1000;
-			close();
-			openInternal(newResource);
+        if (m_lastSeekTime == AV_NOPTS_VALUE)
+            m_lastSeekTime = qnSyncTime->currentMSecsSinceEpoch()*1000;
+        QnResourcePtr newResource = getNextVideoServerFromTime(m_resource, m_lastSeekTime/1000);
+        if (newResource) {
+            m_lastSeekTime = m_serverTimePeriod.startTimeMs*1000;
+            if (m_rtspSession.getScale() > 0)
+                m_position = m_serverTimePeriod.startTimeMs*1000;
+            else
+                m_position = (m_serverTimePeriod.endTimeMs()-1)*1000;
+            close();
+            openInternal(newResource);
 
             result = getNextData();
             if (result)
                 result->flags |= QnAbstractMediaData::MediaFlags_NewServer;
-			return result;
-		}
-		else {
-			m_serverTimePeriod.clear();
-		}
+            return result;
+        }
+        else {
+            m_serverTimePeriod.clear();
+        }
     }
 
     return result;
@@ -562,11 +561,11 @@ QnResourceAudioLayout* QnRtspClientArchiveDelegate::getAudioLayout()
 
 void QnRtspClientArchiveDelegate::processMetadata(const quint8* data, int dataSize)
 {
-    RtpHeader* rtpHeader = (RtpHeader*) data;
+   // RtpHeader* rtpHeader = (RtpHeader*) data;
     const quint8* payload = data + RtpHeader::RTP_HEADER_SIZE;
     QByteArray ba((const char*)payload, data + dataSize - payload);
     if (ba.startsWith("npt="))
-        m_rtspSession.parseRangeHeader(ba);
+        m_rtspSession.parseRangeHeader(QLatin1String(ba));
 }
 
 QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(const quint8* data, int dataSize)
@@ -623,11 +622,11 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(con
             if (dataType == QnAbstractMediaData::EMPTY_DATA)
             {
                 nextPacket = QnEmptyMediaDataPtr(new QnEmptyMediaData());
-				if (dataSize != 0)
-				{
-					qWarning() << "Unexpected data size for EOF/BOF packet. got" << dataSize << "expected" << 0 << "bytes. Packet ignored.";
-					return result;
-				}
+                if (dataSize != 0)
+                {
+                    qWarning() << "Unexpected data size for EOF/BOF packet. got" << dataSize << "expected" << 0 << "bytes. Packet ignored.";
+                    return result;
+                }
             }
             else if (dataType == QnAbstractMediaData::META_V1)
             {

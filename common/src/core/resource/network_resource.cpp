@@ -12,9 +12,9 @@ Q_DECLARE_METATYPE(QAuthenticator);
 
 QnNetworkResource::QnNetworkResource()
     : QnResource(),
+      m_authenticated(true),
       m_networkStatus(0),
       m_networkTimeout(3000),
-      m_authenticated(true),
       m_probablyNeedToUpdateStatus(false)
 {
     static volatile bool metaTypesInitialized = false;
@@ -208,7 +208,7 @@ bool QnNetworkResource::hasRunningLiveProvider() const
         QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(consumer);
         if (lp)
         {
-            CLLongRunnable* lr = dynamic_cast<CLLongRunnable*>(lp);
+            QnLongRunnable* lr = dynamic_cast<QnLongRunnable*>(lp);
             if (lr && lr->isRunning())
                 return true;
         }
@@ -225,6 +225,7 @@ bool QnNetworkResource::shoudResolveConflicts() const
 
 bool QnNetworkResource::mergeResourcesIfNeeded( QnNetworkResourcePtr source )
 {
+    Q_UNUSED(source)
     return false;
 }
 
@@ -243,7 +244,7 @@ bool QnNetworkResource::conflicting()
 
 //#ifndef _WIN32
     // If mac is empty or resolution is not implemented
-    if (mac == "")
+    if (mac.isEmpty())
         return false;
 //#endif
 
@@ -268,13 +269,13 @@ bool QnNetworkResource::conflicting()
 
 
 
-    if (mac!=m_macAddress.toString() && mac!="00-00-00-00-00-00")// someone else has this IP
+    if (mac!=m_macAddress.toString() && mac!=QLatin1String("00-00-00-00-00-00"))// someone else has this IP
     {
         addNetworkStatus(QnNetworkResource::BadHostAddr);
         return true;
     }
 
-    if (mac=="00-00-00-00-00-00")
+    if (mac==QLatin1String("00-00-00-00-00-00"))
     {
         CL_LOG(cl_logERROR) cl_log.log("00-00-00-00-00-00 mac record in OS arp( got it once on WIN7) table?!", cl_logERROR);
     }
@@ -318,4 +319,4 @@ void QnNetworkResource::getDevicesBasicInfo(QnResourceMap& lst, int threads)
     }
 
 }
-/**/
+*/

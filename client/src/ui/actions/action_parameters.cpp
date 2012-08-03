@@ -81,6 +81,7 @@ Qn::ActionParameterType QnActionParameters::type(const QString &key) const {
 }
 
 int QnActionParameters::size(const QString &key) const {
+    Q_UNUSED(key)
     return QnActionParameterTypes::size(items());
 }
 
@@ -89,6 +90,7 @@ QnResourceList QnActionParameters::resources(const QString &key) const {
 }
 
 QnResourcePtr QnActionParameters::resource(const QString &key) const {
+    Q_UNUSED(key)
     QnResourceList resources = this->resources();
 
     if(resources.size() != 1)
@@ -106,6 +108,7 @@ QnWorkbenchLayoutList QnActionParameters::layouts(const QString &key) const {
 }
 
 QnResourceWidget *QnActionParameters::widget(const QString &key) const {
+    Q_UNUSED(key)
     QnResourceWidgetList widgets = this->widgets();
 
     if(widgets.size() != 1)

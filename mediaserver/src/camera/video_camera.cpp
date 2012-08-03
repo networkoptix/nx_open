@@ -273,7 +273,7 @@ void QnVideoCamera::notInUse(void* user)
 
 bool QnVideoCamera::isSomeActivity() const
 {
-	return !m_cameraUsers.isEmpty() && !m_resource->isDisabled();
+    return !m_cameraUsers.isEmpty() && !m_resource->isDisabled();
 }
 
 void QnVideoCamera::stopIfNoActivity()

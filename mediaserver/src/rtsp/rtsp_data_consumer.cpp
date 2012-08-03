@@ -124,7 +124,7 @@ bool QnRtspDataConsumer::canSwitchToLowQuality()
     if (!m_owner->isSecondaryLiveDPSupported())
         return false;
 
-	return true;
+    return true;
 
     QMutexLocker lock(&m_allConsumersMutex);
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();

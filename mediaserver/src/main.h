@@ -8,7 +8,7 @@ class QnAppserverResourceProcessor;
 class QnRtspListener;
 class QnRestServer;
 
-class QnMain : public CLLongRunnable
+class QnMain : public QnLongRunnable
 {
     Q_OBJECT
 

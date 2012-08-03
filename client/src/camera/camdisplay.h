@@ -12,7 +12,7 @@
 
 class QnAbstractRenderer;
 class CLVideoStreamDisplay;
-class CLAudioStreamDisplay;
+class QnAudioStreamDisplay;
 struct QnCompressedVideoData;
 
 /**
@@ -22,19 +22,19 @@ class CLCamDisplay : public QnAbstractDataConsumer, public QnlTimeSource
 {
     Q_OBJECT
 public:
-	CLCamDisplay(bool generateEndOfStreamSignal);
-	~CLCamDisplay();
+    CLCamDisplay(bool generateEndOfStreamSignal);
+    ~CLCamDisplay();
 
-	void addVideoChannel(int index, QnAbstractRenderer* vw, bool can_downsacle);
-	virtual bool processData(QnAbstractDataPacketPtr data);
+    void addVideoChannel(int index, QnAbstractRenderer* vw, bool can_downsacle);
+    virtual bool processData(QnAbstractDataPacketPtr data);
 
-	void pause();
-	void resume();
+    void pause();
+    void resume();
 
-	void setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val);
+    void setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val);
 
-	bool display(QnCompressedVideoDataPtr vd, bool sleep, float speed);
-	void playAudio(bool play);
+    bool display(QnCompressedVideoDataPtr vd, bool sleep, float speed);
+    void playAudio(bool play);
     void setSpeed(float speed);
     float getSpeed() const;
 
@@ -42,9 +42,9 @@ public:
     // schedule - coz I do not want to introduce mutexes
     //I assume that first incoming frame after jump is keyframe
 
-	/**
-	 * \returns                         Current time in microseconds.
-	 */
+    /**
+     * \returns                         Current time in microseconds.
+     */
 
     virtual qint64 getCurrentTime() const;
     virtual qint64 getDisplayedTime() const;
@@ -65,6 +65,7 @@ public:
     bool isNoData() const;
     bool isStillImage() const;
     virtual void putData(QnAbstractDataPacketPtr data) override;
+
 public slots:
     void onBeforeJump(qint64 time);
     void onJumpOccured(qint64 time);
@@ -82,17 +83,17 @@ signals:
     void stillImageChanged();
 
 protected:
-	bool haveAudio(float speed) const;
+    bool haveAudio(float speed) const;
 
-	// puts in in queue and returns first in queue
-	QnCompressedVideoDataPtr nextInOutVideodata(QnCompressedVideoDataPtr incoming, int channel);
+    // puts in in queue and returns first in queue
+    QnCompressedVideoDataPtr nextInOutVideodata(QnCompressedVideoDataPtr incoming, int channel);
 
     // this function doest not changes any quues; it just returns time of next frame been displayed
     quint64 nextVideoImageTime(QnCompressedVideoDataPtr incoming, int channel) const;
 
     quint64 nextVideoImageTime(int channel) const;
 
-	void clearVideoQueue();
+    void clearVideoQueue();
     void enqueueVideo(QnCompressedVideoDataPtr vd);
     QnCompressedVideoDataPtr dequeueVideo(int channel);
     bool isAudioHoleDetected(QnCompressedVideoDataPtr vd);
@@ -100,6 +101,7 @@ protected:
     void processNewSpeed(float speed);
     bool useSync(QnCompressedVideoDataPtr vd);
     int getBufferingMask();
+
 private:
     void hurryUpCheck(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime);
     void hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime);
@@ -111,24 +113,25 @@ private:
     qint64 getDisplayedMax() const;
     qint64 getDisplayedMin() const;
     void setAudioBufferSize(int bufferSize, int prebufferMs);
+
 protected:
     CLVideoStreamDisplay* m_display[CL_MAX_CHANNELS];
-	QQueue<QnCompressedVideoDataPtr> m_videoQueue[CL_MAX_CHANNELS];
+    QQueue<QnCompressedVideoDataPtr> m_videoQueue[CL_MAX_CHANNELS];
 
-	CLAudioStreamDisplay* m_audioDisplay;
+    QnAudioStreamDisplay* m_audioDisplay;
 
-	CLAdaptiveSleep m_delay;
+    QnAdaptiveSleep m_delay;
 
-	bool m_playAudioSet;
+    bool m_playAudioSet;
     float m_speed;
     float m_prevSpeed;
 
-	bool m_playAudio;
+    bool m_playAudio;
     bool m_needChangePriority;
 
     /**
-      * got at least one audio packet
-      */
+     * got at least one audio packet
+     */
     bool m_hadAudio;
 
     qint64 m_lastAudioPacketTime;
@@ -150,11 +153,11 @@ protected:
 
     bool m_ignoringVideo;
 
-    bool mGenerateEndOfStreamSignal;
+    bool m_generateEndOfStreamSignal;
 
     bool m_isRealTimeSource;
-	QnAudioFormat m_expectedAudioFormat;
-	QMutex m_audioChangeMutex;
+    QnAudioFormat m_expectedAudioFormat;
+    QMutex m_audioChangeMutex;
     bool m_videoBufferOverflow;
     bool m_singleShotMode;
     bool m_singleShotQuantProcessed;
@@ -167,7 +170,7 @@ protected:
     QnAbstractVideoDecoder::DecodeMode m_lightCpuMode;
     CLVideoStreamDisplay::FrameDisplayStatus m_lastFrameDisplayed;
     int m_realTimeHurryUp;
-    int m_delayedFrameCnt;
+    int m_delayedFrameCount;
     QnlTimeSource* m_extTimeSrc;
     
     //qint64 m_nextTime;
@@ -175,7 +178,7 @@ protected:
     bool m_useMtDecoding;
     int m_buffering;
     int m_executingJump;
-    int skipPrevJumpSignal;
+    int m_skipPrevJumpSignal;
     int m_processedPackets;
     QnMetaDataV1Ptr m_lastMetadata[CL_MAX_CHANNELS];
     bool m_bofReceived;
@@ -183,10 +186,10 @@ protected:
     float m_toLowQSpeed; // speed then switching to low quality for camera
     //QTime m_toLowQTimer; // try to change low to high quality (for normal playback speed every N seconds)
     int m_emptyPacketCounter;
+    int m_hiQualityRetryCounter;
     bool m_isStillImage;
     bool m_isLongWaiting;
     
-    int m_hiQualityRetryCounter;
 
     static QSet<CLCamDisplay*> m_allCamDisplay;
     static QMutex m_qualityMutex;

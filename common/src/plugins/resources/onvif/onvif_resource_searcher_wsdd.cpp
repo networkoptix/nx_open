@@ -34,7 +34,7 @@ static const int CHECK_HELLO_RETRY_COUNT = 50;
 //extern bool multicastJoinGroup(QUdpSocket& udpSocket, QHostAddress groupAddress, QHostAddress localAddress);
 //extern bool multicastLeaveGroup(QUdpSocket& udpSocket, QHostAddress groupAddress);
 
-QString& OnvifResourceSearcherWsdd::LOCAL_ADDR = *new QString("127.0.0.1");
+QString& OnvifResourceSearcherWsdd::LOCAL_ADDR = *new QString(QLatin1String("127.0.0.1"));
 const char OnvifResourceSearcherWsdd::SCOPES_NAME_PREFIX[] = "onvif://www.onvif.org/name/";
 const char OnvifResourceSearcherWsdd::SCOPES_HARDWARE_PREFIX[] = "onvif://www.onvif.org/hardware/";
 const char OnvifResourceSearcherWsdd::PROBE_TYPE[] = "onvifDiscovery:NetworkVideoTransmitter";
@@ -45,7 +45,8 @@ const char OnvifResourceSearcherWsdd::WSDD_GSOAP_MULTICAST_ADDRESS[] = "soap.udp
 
 int WSDD_MULTICAST_PORT = 3702;
 const char WSDD_MULTICAST_ADDRESS[] = "239.255.255.250";
-QHostAddress WSDD_GROUP_ADDRESS(WSDD_MULTICAST_ADDRESS);
+
+#define WSDD_GROUP_ADDRESS QHostAddress(QLatin1String(WSDD_MULTICAST_ADDRESS))
 
 
 OnvifResourceSearcherWsdd::OnvifResourceSearcherWsdd():
@@ -105,12 +106,14 @@ http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous\
 //Socket send through QUdpSocket
 int gsoapFsendSmall(struct soap *soap, const char *s, size_t n)
 {
+    Q_UNUSED(s)
+    Q_UNUSED(n)
     QString msgId;
     QUdpSocket& qSocket = *reinterpret_cast<QUdpSocket*>(soap->user);
 
     QString guid = QUuid::createUuid().toString();
-    guid = QString("uuid:") + guid.mid(1, guid.length()-2);
-    QByteArray data = QString(STATIC_DISCOVERY_MESSAGE).arg(guid).toLocal8Bit();
+    guid = QLatin1String("uuid:") + guid.mid(1, guid.length()-2);
+    QByteArray data = QString(QLatin1String(STATIC_DISCOVERY_MESSAGE)).arg(guid).toLocal8Bit();
 
     qSocket.writeDatagram(data, WSDD_GROUP_ADDRESS, WSDD_MULTICAST_PORT);
     return SOAP_OK;
@@ -367,19 +370,19 @@ QStringList OnvifResourceSearcherWsdd::getAddrPrefixes(const QString& host) cons
 {
     QStringList result;
 
-    QStringList segments = host.split(".");
+    QStringList segments = host.split(QLatin1Char('.'));
     if (segments.size() != 4) {
         qCritical() << "OnvifResourceSearcherWsdd::getAddrPrefixes: is not IPv4 address: " << host;
         return result;
     }
 
-    QString currPrefix = "http://" + segments[0] + ".";
+    QString currPrefix = QLatin1String("http://") + segments[0] + QLatin1Char('.');
     result.push_front(currPrefix);
 
-    currPrefix += segments[1] + ".";
+    currPrefix += segments[1] + QLatin1Char('.');
     result.push_front(currPrefix);
 
-    currPrefix += segments[2] + ".";
+    currPrefix += segments[2] + QLatin1Char('.');
     result.push_front(currPrefix);
 
     return result;
@@ -395,8 +398,8 @@ QString OnvifResourceSearcherWsdd::getAppropriateAddress(const T* source, const 
     }
 
     int relevantLevel = 0;
-    QString addrListStr(source->XAddrs);
-    QStringList addrList = addrListStr.split(" ");
+    QString addrListStr = QLatin1String(source->XAddrs);
+    QStringList addrList = addrListStr.split(QLatin1Char(' '));
     foreach (const QString addrStr, addrList) {
         if (addrStr.startsWith(prefixes[2])) {
             if (addrStr.startsWith(prefixes[0])) {
@@ -424,16 +427,16 @@ QString OnvifResourceSearcherWsdd::getMac(const T* source, const SOAP_ENV__Heade
         return QString();
     }
 
-    QString endpoint = source->wsa__EndpointReference.Address;
-    QString messageId = header->wsa__MessageID;
+    QString endpoint = QLatin1String(source->wsa__EndpointReference.Address);
+    QString messageId = QLatin1String(header->wsa__MessageID);
 
-    int pos = endpoint.lastIndexOf("-");
+    int pos = endpoint.lastIndexOf(QLatin1Char('-'));
     if (pos == -1) {
         return QString();
     }
     QString macFromEndpoint = endpoint.right(endpoint.size() - pos - 1).trimmed();
 
-    pos = messageId.lastIndexOf("-");
+    pos = messageId.lastIndexOf(QLatin1Char('-'));
     if (pos == -1) {
         return QString();
     }
@@ -443,7 +446,7 @@ QString OnvifResourceSearcherWsdd::getMac(const T* source, const SOAP_ENV__Heade
         QString result;
         for (int i = 1; i < 12; i += 2) {
             int ind = i + i / 2;
-            if (i < 11) result[ind + 1] = '-';
+            if (i < 11) result[ind + 1] = QLatin1Char('-');
             result[ind] = macFromEndpoint[i];
             result[ind - 1] = macFromEndpoint[i - 1];
         }
@@ -461,7 +464,7 @@ QString OnvifResourceSearcherWsdd::getEndpointAddress(const T* source) const
         return QString();
     }
 
-    return QString(source->wsa__EndpointReference.Address);
+    return QLatin1String(source->wsa__EndpointReference.Address);
 }
 
 template <class T>
@@ -471,19 +474,19 @@ QString OnvifResourceSearcherWsdd::getManufacturer(const T* source, const QStrin
         return QString();
     }
 
-    QString scopes(source->Scopes->__item);
+    QByteArray scopes = source->Scopes->__item;
     int posStart = scopes.indexOf(SCOPES_NAME_PREFIX);
     if (posStart == -1) {
         return QString();
     }
 
-    int posEnd = posStart != -1? scopes.indexOf(" ", posStart): -1;
+    int posEnd = posStart != -1? scopes.indexOf(' ', posStart): -1;
     posEnd = posEnd != -1? posEnd: scopes.size();
 
     int skipSize = sizeof(SCOPES_NAME_PREFIX) - 1;
-    QString percentEncodedValue = scopes.mid(posStart + skipSize, posEnd - posStart - skipSize).replace(name, "");
+    QByteArray percentEncodedValue = scopes.mid(posStart + skipSize, posEnd - posStart - skipSize).replace(name, "");
 
-    return QUrl::fromPercentEncoding(QByteArray(percentEncodedValue.toStdString().c_str())).trimmed();
+    return QUrl::fromPercentEncoding(percentEncodedValue).trimmed();
 }
 
 template <class T>
@@ -493,13 +496,13 @@ QString OnvifResourceSearcherWsdd::getName(const T* source) const
             return QString();
     }
 
-    QString scopes(source->Scopes->__item);
-    int posStart = scopes.indexOf(SCOPES_HARDWARE_PREFIX);
+    QString scopes = QLatin1String(source->Scopes->__item);
+    int posStart = scopes.indexOf(QLatin1String(SCOPES_HARDWARE_PREFIX));
     if (posStart == -1) {
         return QString();
     }
 
-    int posEnd = posStart != -1? scopes.indexOf(" ", posStart): -1;
+    int posEnd = posStart != -1? scopes.indexOf(QLatin1Char(' '), posStart): -1;
     posEnd = posEnd != -1? posEnd: scopes.size();
 
     int skipSize = sizeof(SCOPES_HARDWARE_PREFIX) - 1;
@@ -543,7 +546,7 @@ void OnvifResourceSearcherWsdd::addEndpointToHash(EndpointInfoHash& hash, const 
     QString manufacturer = getManufacturer(source, name);
     QString mac = getMac(source, header);
 
-    QString endpointId = replaceNonFileNameCharacters(getEndpointAddress(source), QChar('_'));
+    QString endpointId = replaceNonFileNameCharacters(getEndpointAddress(source), QLatin1Char('_'));
     QString uniqId = !mac.isEmpty() ? mac : endpointId;
 
     hash.insert(appropriateAddr, EndpointAdditionalInfo(name, manufacturer, mac, uniqId, host));

@@ -34,7 +34,7 @@ QnResourcePtr QnPlIpWebCamResourceSearcher::createResource(QnId resourceTypeId, 
         return result;
     }
 
-    if (parameters.value("url").contains("raw://"))
+    if (parameters.value(QLatin1String("url")).contains(QLatin1String("raw://")))
     {
         return result; // it is new droid resource
     }
@@ -51,7 +51,7 @@ QnResourcePtr QnPlIpWebCamResourceSearcher::createResource(QnId resourceTypeId, 
 
 QString QnPlIpWebCamResourceSearcher::manufacture() const
 {
-    return QnPlDriodIpWebCamResource::MANUFACTURE;
+    return QLatin1String(QnPlDriodIpWebCamResource::MANUFACTURE);
 }
 
 
@@ -78,7 +78,7 @@ struct AnDroidDev
         sock.setReadTimeOut(500);
         sock.setWriteTimeOut(500);
 
-        if (sock.connect(QHostAddress(ip).toString().toLatin1().data(), 8080))
+        if (sock.connect(QHostAddress(ip).toString(), 8080))
         {
             android = true;
             
@@ -151,7 +151,7 @@ QnResourceList QnPlIpWebCamResourceSearcher::findResources()
         QtConcurrent::blockingMap(alist, &AnDroidDev::checkIfItAndroid);
         for (int i = 0; i < threads; ++i )global->reserveThread();
 
-        QString name = "DroidLive";
+        QString name = QLatin1String("DroidLive");
 
         foreach(AnDroidDev ad, alist)
         {
@@ -169,9 +169,9 @@ QnResourceList QnPlIpWebCamResourceSearcher::findResources()
 
                 QString lastMac = QString::number(n, 16).toUpper();
                 if (lastMac.length()<2)
-                    lastMac = QString("0") + lastMac;
+                    lastMac = QLatin1String("0") + lastMac;
 
-                QString smac = QString("00-00-00-00-00-") + lastMac;
+                QString smac = QLatin1String("00-00-00-00-00-") + lastMac;
 
 
                 resource->setTypeId(rt);

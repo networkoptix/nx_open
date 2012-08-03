@@ -70,10 +70,10 @@ QnResourcePtr QnResourceDiscoveryManager::createResource(QnId resourceTypeId, co
 
     if (resourceType.isNull())
         return result;
-    if (resourceType->getName() == "Storage")
+    if (resourceType->getName() == QLatin1String("Storage"))
     {
 
-        result = QnResourcePtr(QnStoragePluginFactory::instance()->createStorage(parameters["url"]));
+        result = QnResourcePtr(QnStoragePluginFactory::instance()->createStorage(parameters[QLatin1String("url")]));
         result->deserialize(parameters);
     }
     else {
@@ -101,7 +101,7 @@ void QnResourceDiscoveryManager::pleaseStop()
             searcher->pleaseStop();
     }
 
-    CLLongRunnable::pleaseStop();
+    QnLongRunnable::pleaseStop();
 }
 
 void QnResourceDiscoveryManager::run()
@@ -117,7 +117,7 @@ void QnResourceDiscoveryManager::run()
     {
         searcher->setShouldBeUsed(true);
 
-        if (QnResourceDirectoryBrowser* ds = dynamic_cast<QnResourceDirectoryBrowser*>(searcher))
+        if (dynamic_cast<QnResourceDirectoryBrowser*>(searcher))
         {
             QnResourceList lst = searcher->search();
             m_resourceProcessor->processResources(lst);
@@ -152,7 +152,7 @@ void QnResourceDiscoveryManager::run()
         bool ip_finished;
         QnResourceList result = findNewResources(&ip_finished);
         if (ip_finished)
-            CL_LOG(cl_logWARNING) cl_log.log(QLatin1String("Cannot get available IP address."), cl_logWARNING);
+            cl_log.log(QLatin1String("Cannot get available IP address."), cl_logWARNING);
 
         if (!result.isEmpty())
         {
@@ -187,7 +187,7 @@ void printInLogNetResources(const QnResourceList& resources)
         if (!netRes)
             continue;
 
-        cl_log.log(netRes->getHostAddress().toString() + QString(" "), netRes->getName(), cl_logINFO);
+        cl_log.log(netRes->getHostAddress().toString() + QLatin1String(" "), netRes->getName(), cl_logINFO);
     }
 
 }
@@ -567,9 +567,9 @@ struct check_if_accessible_STRUCT
             resourceNet->addNetworkStatus(QnNetworkResource::BadHostAddr);
 
             if (m_isSameSubnet)
-                cl_log.log(resourceNet->getHostAddress().toString() + QString("  name = ") +  resourceNet->getName(), " has bad IP(same subnet)", cl_logWARNING);
+                cl_log.log(resourceNet->getHostAddress().toString() + QLatin1String("  name = ") +  resourceNet->getName(), " has bad IP(same subnet)", cl_logWARNING);
             else
-                cl_log.log(resourceNet->getHostAddress().toString() + QString("  name = ") +  resourceNet->getName(), " has bad IP(diff subnet)", cl_logWARNING);
+                cl_log.log(resourceNet->getHostAddress().toString() + QLatin1String("  name = ") +  resourceNet->getName(), " has bad IP(diff subnet)", cl_logWARNING);
         }
 
     }
@@ -616,9 +616,9 @@ void QnResourceDiscoveryManager::markOfflineIfNeeded()
         /*
         if (ldt.secsTo(currentT) > 120 && !netRes->hasRunningLiveProvider()) // if resource is not discovered last 30 sec
         {
-			res->setStatus(QnResource::Offline);
+            res->setStatus(QnResource::Offline);
         }
-        /**/
+        */
 
     }
 
@@ -640,7 +640,7 @@ void QnResourceDiscoveryManager::updateResourceStatus(QnResourcePtr res)
             if (rpNetRes->getLastStatusUpdateTime().msecsTo(qnSyncTime->currentDateTime()) > 30) // if resource with OK ip seems to be found; I do it coz if there is no readers and camera was offline and now online => status needs to be changed
             {
                 rpNetRes->initAsync();
-				//rpNetRes->setStatus(QnResource::Online);
+                //rpNetRes->setStatus(QnResource::Online);
             }
 
         }
@@ -735,7 +735,7 @@ void QnResourceDiscoveryManager::resovle_conflicts(QnResourceList& resourceList,
 
         if (!getNextAvailableAddr(subnet, busy_list))
         {
-            *ip_finished = true;			// no more FREE ip left ?
+            *ip_finished = true;            // no more FREE ip left ?
             cl_log.log("No more available IP!!", cl_logERROR);
             break;
         }

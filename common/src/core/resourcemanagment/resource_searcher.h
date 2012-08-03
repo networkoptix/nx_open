@@ -79,8 +79,8 @@ protected:
 
 private:
     bool m_shouldbeUsed;
-    volatile bool m_shouldStop;
     bool m_localResources;
+    volatile bool m_shouldStop;
 };
 
 

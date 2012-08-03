@@ -30,21 +30,14 @@ typedef QHash<QString, EndpointAdditionalInfo> EndpointInfoHash;
 
 class OnvifResourceInformationFetcher
 {
-    static const char* ONVIF_RT;
-	static std::string& STD_ONVIF_USER;
-	static std::string& STD_ONVIF_PASSWORD;
-    QnId onvifTypeId;
-    //PasswordHelper& passwordsData;
-    NameHelper& camersNamesData;
-
+    Q_DECLARE_TR_FUNCTIONS(OnvifResourceInformationFetcher)
 public:
-
     static OnvifResourceInformationFetcher& instance();
 
     void findResources(const EndpointInfoHash& endpointInfo, QnResourceList& result) const;
     static QnPlOnvifResourcePtr createOnvifResourceByManufacture (const QString& manufacture);
-private:
 
+private:
     OnvifResourceInformationFetcher();
 
     void findResources(const QString& endpoint, const EndpointAdditionalInfo& info, QnResourceList& result) const;
@@ -55,10 +48,15 @@ private:
         const QString& uniqId, const char* login, const char* passwd, const QString& mediaUrl, const QString& deviceUrl, QnResourceList& result) const;
 
     const bool isMacAlreadyExists(const QString& mac, const QnResourceList& resList) const;
-    const QString fetchName(const DeviceInfoResp& response) const;
-    const QString fetchManufacturer(const DeviceInfoResp& response) const;
-    const QString fetchSerial(const DeviceInfoResp& response) const;
+    QString fetchName(const DeviceInfoResp& response) const;
+    QString fetchManufacturer(const DeviceInfoResp& response) const;
+    QString fetchSerial(const DeviceInfoResp& response) const;
 
+private:
+    static const char *ONVIF_RT;
+    QnId onvifTypeId;
+    //PasswordHelper& passwordsData;
+    NameHelper &camersNamesData;
 };
 
 #endif // onvif_resource_information_fetcher_h

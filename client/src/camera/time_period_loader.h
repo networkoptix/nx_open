@@ -4,9 +4,9 @@
 #include <QtCore/QObject>
 #include <QtGui/QRegion>
 
-#include "api/video_server_connection.h"
-#include "recording/time_period.h"
-#include "core/resource/network_resource.h"
+#include <api/video_server_connection.h>
+#include <recording/time_period_list.h>
+#include <core/resource/network_resource.h>
 
 /**
  * Per-camera time period loader that caches loaded time periods. 

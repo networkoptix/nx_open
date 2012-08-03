@@ -139,7 +139,7 @@ void OnvifResourceSearcherMdns::checkSocket(QUdpSocket& sock, QHostAddress local
         QHostAddress sender;
         quint16 senderPort;
 
-        sock.readDatagram(responseData.data(), responseData.size(),	&sender, &senderPort);
+        sock.readDatagram(responseData.data(), responseData.size(),    &sender, &senderPort);
         //cl_log.log(cl_logALWAYS, "size: %d\n", responseData.size());
         if (sender == localAddress) continue;
 

@@ -3,12 +3,12 @@
 #include <QThread>
 #include <QDateTime>
 
-char *cl_log_msg[] = {"UNKNOWN", "ALWAYS", "ERROR", "WARNING", "INFO", "DEBUG", "DEBUG2" };
+const char *qn_logLevelNames[] = {"UNKNOWN", "ALWAYS", "ERROR", "WARNING", "INFO", "DEBUG", "DEBUG2"};
 
 QnLogLevel QnLog::logLevelFromString(const QString &value) {
     QString str = value.toUpper().trimmed();
-    for (int i = 0; i < sizeof(cl_log_msg)/sizeof(char*); ++i) {
-        if (str == QLatin1String(cl_log_msg[i]))
+    for (int i = 0; i < sizeof(qn_logLevelNames)/sizeof(char*); ++i) {
+        if (str == QLatin1String(qn_logLevelNames[i]))
             return QnLogLevel(i);
     }
 
@@ -16,7 +16,7 @@ QnLogLevel QnLog::logLevelFromString(const QString &value) {
 }
 
 QString QnLog::logLevelToString(QnLogLevel value) {
-    return QLatin1String(cl_log_msg[value]);
+    return QLatin1String(qn_logLevelNames[value]);
 }
 
 // -------------------------------------------------------------------------- //
@@ -69,7 +69,7 @@ public:
         QTextStream fstr(&m_file);
         fstr << QDateTime::currentDateTime().toString(QLatin1String("ddd MMM d yy  hh:mm:ss.zzz"))
             << QLatin1String(" Thread ") << th
-            << QLatin1String(" (") << QString::fromAscii(cl_log_msg[logLevel]) << QLatin1String("): ") << msg << QLatin1String("\r\n");
+            << QLatin1String(" (") << QString::fromAscii(qn_logLevelNames[logLevel]) << QLatin1String("): ") << msg << QLatin1String("\r\n");
         fstr.flush();
 
         if (m_file.size() >= m_maxFileSize)

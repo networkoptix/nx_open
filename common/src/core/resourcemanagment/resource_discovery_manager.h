@@ -13,7 +13,7 @@ class QnAbstractResourceSearcher;
 // this class just searches for new resources
 // it uses others plugins
 // it puts result into resource pool
-class QnResourceDiscoveryManager : public CLLongRunnable, public QnResourceFactory
+class QnResourceDiscoveryManager : public QnLongRunnable, public QnResourceFactory
 {
     Q_OBJECT;
 
@@ -78,9 +78,9 @@ private:
 
     CLNetState m_netState;
 
-    volatile bool m_ready;
     bool m_server;
     bool m_foundSmth; // minor just to minimize lof output
+    volatile bool m_ready;
 
     unsigned int m_runNumber;
 

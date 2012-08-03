@@ -38,7 +38,7 @@ int QnAbstractStorageResource::getMaxStoreTime() const
 
 QString QnAbstractStorageResource::getUniqueId() const
 {
-    return QString("storage://") + getUrl();
+    return QLatin1String("storage://") + getUrl();
 }
 
 void QnAbstractStorageResource::setIndex(quint16 value)
@@ -87,7 +87,7 @@ float QnAbstractStorageResource::getAvarageWritingUsage() const
 // ------------------------------ QnStorageResource -------------------------------
 
 QnStorageResource::QnStorageResource():
-	m_writedSpace(0)
+    m_writedSpace(0)
 {
 }
 
@@ -140,7 +140,7 @@ void QnStorageResource::setUrl(const QString& value)
 
 AVIOContext* QnStorageResource::createFfmpegIOContext(const QString& url, QIODevice::OpenMode openMode, int IO_BLOCK_SIZE)
 {
-    int prefix = url.indexOf("://");
+    int prefix = url.indexOf(QLatin1String("://"));
     QString path = prefix == -1 ? url : url.mid(prefix+3);
 
     quint8* ioBuffer;
@@ -165,12 +165,12 @@ AVIOContext* QnStorageResource::createFfmpegIOContext(const QString& url, QIODev
 
 qint64 QnStorageResource::getFileSizeByIOContext(AVIOContext* ioContext)
 {
-	if (ioContext)
-	{
-		QIODevice* ioDevice = (QIODevice*) ioContext->opaque;
-		return ioDevice->size();
-	}
-	return 0;
+    if (ioContext)
+    {
+        QIODevice* ioDevice = (QIODevice*) ioContext->opaque;
+        return ioDevice->size();
+    }
+    return 0;
 }
 
 void QnStorageResource::closeFfmpegIOContext(AVIOContext* ioContext)
@@ -186,12 +186,12 @@ void QnStorageResource::closeFfmpegIOContext(AVIOContext* ioContext)
 
 qint64 QnStorageResource::getWritedSpace() const
 {
-	return m_writedSpace;
+    return m_writedSpace;
 }
 
 void QnStorageResource::addWritedSpace(qint64 value)
 {
-	m_writedSpace += value;
+    m_writedSpace += value;
 }
 
 // ---------------------------- QnStoragePluginFactory ------------------------------
@@ -222,7 +222,7 @@ void QnStoragePluginFactory::registerStoragePlugin(const QString& name, StorageT
 
 QnStorageResource* QnStoragePluginFactory::createStorage(const QString& storageType, bool useDefaultForUnknownPrefix)
 {
-    int prefix = storageType.indexOf("://");
+    int prefix = storageType.indexOf(QLatin1String("://"));
     if (prefix == -1)
         return m_defaultStoragePlugin();
     QString protocol = storageType.left(prefix);

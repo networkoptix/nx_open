@@ -1,5 +1,5 @@
 static const int TCP_READ_BUFFER_SIZE = 65536;
-static const QString ENDL("\r\n");
+static const QByteArray ENDL("\r\n");
 
 #include <QHttpRequestHeader>
 #include "tcp_connection_processor.h"
@@ -55,6 +55,6 @@ public:
     QMutex sockMutex;
     quint8* tcpReadBuffer;
     QnTcpListener* owner;
-    CLByteArray sendBuffer;
+    QnByteArray sendBuffer;
     int socketTimeout;
 };

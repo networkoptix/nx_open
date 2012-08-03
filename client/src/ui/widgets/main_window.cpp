@@ -21,11 +21,10 @@
 #include <api/app_server_connection.h>
 #include <api/session_manager.h>
 
+#include "ui/common/frame_section.h"
 #include "ui/actions/action_manager.h"
-
 #include "ui/graphics/view/graphics_view.h"
 #include "ui/graphics/view/gradient_background_painter.h"
-
 #include "ui/workbench/workbench_controller.h"
 #include "ui/workbench/workbench_grid_mapper.h"
 #include "ui/workbench/workbench_layout.h"
@@ -35,11 +34,10 @@
 #include "ui/workbench/workbench_action_handler.h"
 #include "ui/workbench/workbench_context.h"
 #include "ui/workbench/workbench_resource.h"
-
+#include "ui/processors/drag_processor.h"
 #include "ui/style/skin.h"
 #include "ui/style/globals.h"
 #include "ui/style/proxy_style.h"
-
 #include "ui/events/system_menu_event.h"
 
 #include "file_processor.h"
@@ -81,7 +79,7 @@ namespace {
 
 
 QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowFlags flags): 
-    QWidget(parent, flags | Qt::CustomizeWindowHint),
+    base_type(parent, flags | Qt::CustomizeWindowHint),
     QnWorkbenchContextAware(context),
     m_controller(0),
     m_drawCustomFrame(false),
@@ -101,7 +99,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_dwm = new QnDwm(this);
 
     connect(m_dwm,                          SIGNAL(compositionChanged(bool)),               this,                                   SLOT(updateDwmState()));
-    connect(m_dwm,                          SIGNAL(titleBarDoubleClicked()),                this,                                   SLOT(toggleFullScreen()));
 
     /* Set up properties. */
     setWindowTitle(QApplication::applicationName());
@@ -134,7 +131,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
 
     /* Set up model & control machinery. */
-	display()->setStreamsSynchronized(true, DATETIME_NOW, 1.0);
+    display()->setStreamsSynchronized(true, DATETIME_NOW, 1.0);
     display()->setScene(scene);
     display()->setView(m_view);
     display()->setNormalMarginFlags(Qn::MarginsAffectSize | Qn::MarginsAffectPosition);
@@ -324,7 +321,6 @@ void QnMainWindow::setOptions(Options options) {
 
     m_options = options;
 
-    updateTitleBarDraggable();
     setWindowButtonsVisible(m_options & WindowButtonsVisible);
     m_ui->setWindowButtonsUsed(m_options & WindowButtonsVisible);
 }
@@ -342,7 +338,10 @@ void QnMainWindow::updateFullScreenState() {
 }
 
 void QnMainWindow::updateDwmState() {
+#if 0
     if(!m_dwm->isSupported()) {
+        /* Non-windows systems where DWM is not supported. */
+
         m_drawCustomFrame = false;
 
         setAttribute(Qt::WA_NoSystemBackground, false);
@@ -350,28 +349,22 @@ void QnMainWindow::updateDwmState() {
 
         m_titleLayout->setContentsMargins(0, 0, 0, 0);
         m_viewLayout->setContentsMargins(0, 0, 0, 0);
-
-        return; /* Do nothing on systems where our tricks are not supported. */
-    }
-
+    } else */
+#endif
+        
     if(isFullScreen()) {
         /* Full screen mode. */
-
         m_drawCustomFrame = false;
+        m_frameMargins = QMargins(0, 0, 0, 0);
 
-        setAttribute(Qt::WA_NoSystemBackground, false);
-        setAttribute(Qt::WA_TranslucentBackground, false);
+        if(m_dwm->isSupported()) {
+            setAttribute(Qt::WA_NoSystemBackground, false);
+            setAttribute(Qt::WA_TranslucentBackground, false);
 
-        m_dwm->disableSystemWindowPainting();
-        m_dwm->disableTransparentErasing();
-        m_dwm->extendFrameIntoClientArea(QMargins(0, 0, 0, 0));
-        m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 0));
-        m_dwm->disableBlurBehindWindow();
-        m_dwm->enableDoubleClickProcessing();
-
-        m_dwm->enableFrameEmulation();
-        m_dwm->setEmulatedFrameMargins(QMargins(0, 0, 0, 0));
-        m_dwm->setEmulatedTitleBarHeight(0x1000); /* So that the window is click-draggable no matter where the user clicked. */
+            m_dwm->extendFrameIntoClientArea(QMargins(0, 0, 0, 0));
+            m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 0));
+            m_dwm->disableBlurBehindWindow();
+        }
 
         /* Can't set to (0, 0, 0, 0) on Windows as in fullScreen mode context menu becomes invisible.
          * Looks like Qt bug: http://bugreports.qt.nokia.com/browse/QTBUG-7556. */
@@ -383,79 +376,48 @@ void QnMainWindow::updateDwmState() {
 
         m_titleLayout->setContentsMargins(0, 0, 0, 0);
         m_viewLayout->setContentsMargins(0, 0, 0, 0);
-    } else if(m_dwm->isCompositionEnabled()) {
+    } else if(m_dwm->isSupported() && m_dwm->isCompositionEnabled()) {
         /* Windowed with aero glass. */
-
         m_drawCustomFrame = false;
-
-        if(!m_dwm->isCompositionEnabled())
-            qnWarning("Transitioning to glass state when aero composition is disabled. Expect display artifacts.");
-
-        QMargins frameMargins = m_dwm->themeFrameMargins();
+        m_frameMargins = m_dwm->themeFrameMargins();
 
         setAttribute(Qt::WA_NoSystemBackground, true);
         setAttribute(Qt::WA_TranslucentBackground, true);
 
-        m_dwm->disableSystemWindowPainting();
-        m_dwm->enableTransparentErasing();
         m_dwm->extendFrameIntoClientArea();
         m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 0));
-        m_dwm->enableBlurBehindWindow(); /* For reasons unknown, this call is needed to prevent display artifacts. */
-        m_dwm->enableDoubleClickProcessing();
-
-        m_dwm->enableFrameEmulation();
-        m_dwm->setEmulatedFrameMargins(frameMargins);
-        m_dwm->setEmulatedTitleBarHeight(0x1000); /* So that the window is click-draggable no matter where the user clicked. */
+        m_dwm->enableBlurBehindWindow();
 
         setContentsMargins(0, 0, 0, 0);
 
-        m_titleLayout->setContentsMargins(frameMargins.left(), 2, frameMargins.right(), 0);
+        m_titleLayout->setContentsMargins(m_frameMargins.left(), 2, m_frameMargins.right(), 0);
         m_viewLayout->setContentsMargins(
-            frameMargins.left(),
-            isTitleVisible() ? 0 : frameMargins.top(),
-            frameMargins.right(),
-            frameMargins.bottom()
+            m_frameMargins.left(),
+            isTitleVisible() ? 0 : m_frameMargins.top(),
+            m_frameMargins.right(),
+            m_frameMargins.bottom()
         );
     } else {
         /* Windowed without aero glass. */
-
         m_drawCustomFrame = true;
+        m_frameMargins = m_dwm->isSupported() ? m_dwm->themeFrameMargins() : QMargins(8, 8, 8, 8);
 
-        QMargins frameMargins = m_dwm->themeFrameMargins();
+        if(m_dwm->isSupported()) {
+            setAttribute(Qt::WA_NoSystemBackground, false);
+            setAttribute(Qt::WA_TranslucentBackground, false);
 
-        setAttribute(Qt::WA_NoSystemBackground, false);
-        setAttribute(Qt::WA_TranslucentBackground, false);
+            m_dwm->extendFrameIntoClientArea(QMargins(0, 0, 0, 0));
+            m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 0));
+            m_dwm->disableBlurBehindWindow();
+        }
 
-        m_dwm->disableSystemWindowPainting();
-        m_dwm->disableTransparentErasing();
-        m_dwm->extendFrameIntoClientArea(QMargins(0, 0, 0, 0));
-        m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 0));
-        m_dwm->disableBlurBehindWindow();
-        m_dwm->enableDoubleClickProcessing();
-
-        m_dwm->enableFrameEmulation();
-        m_dwm->setEmulatedFrameMargins(frameMargins);
-        m_dwm->setEmulatedTitleBarHeight(0x1000);
-
-        setContentsMargins(0, 0, 0, 0);
-
-        m_titleLayout->setContentsMargins(frameMargins.left(), 2, frameMargins.right(), 0);
+        m_titleLayout->setContentsMargins(m_frameMargins.left(), 2, m_frameMargins.right(), 0);
         m_viewLayout->setContentsMargins(
-            frameMargins.left(),
-            isTitleVisible() ? 0 : frameMargins.top(),
-            frameMargins.right(),
-            frameMargins.bottom()
+            m_frameMargins.left(),
+            isTitleVisible() ? 0 : m_frameMargins.top(),
+            m_frameMargins.right(),
+            m_frameMargins.bottom()
         );
-    }
-
-    updateTitleBarDraggable();
-}
-
-void QnMainWindow::updateTitleBarDraggable() {
-    if(isFullScreen()) {
-        m_dwm->disableTitleBarDrag();
-    } else {
-        m_dwm->enableTitleBarDrag(m_options & TitleBarDraggable);
     }
 }
 
@@ -466,12 +428,8 @@ void QnMainWindow::updateTitleBarDraggable() {
 bool QnMainWindow::event(QEvent *event) {
     bool result = base_type::event(event);
 
-    if(event->type() == QnSystemMenuEvent::SystemMenu) {
+    if(event->type() == QnSystemMenuEvent::SystemMenu)
         menu()->trigger(Qn::MainMenuAction);
-        return true;
-    } else if(event->type() == QEvent::NonClientAreaMouseButtonRelease) {
-        ncMouseReleaseEvent(static_cast<QMouseEvent *>(event));
-    }
 
     if(m_dwm != NULL)
         result |= m_dwm->widgetEvent(event);
@@ -479,15 +437,24 @@ bool QnMainWindow::event(QEvent *event) {
     return result;
 }
 
-void QnMainWindow::ncMouseReleaseEvent(QMouseEvent *event) {
-    if(event->button() != Qt::RightButton)
-        return;
 
-    if(event->pos().y() > m_tabBar->mapTo(this, m_tabBar->rect().bottomRight()).y())
-        return;
+void QnMainWindow::mouseReleaseEvent(QMouseEvent *event) {
+    base_type::mouseReleaseEvent(event);
 
-    QContextMenuEvent e(QContextMenuEvent::Mouse, m_tabBar->mapFrom(this, event->pos()), event->globalPos(), event->modifiers());
-    QApplication::sendEvent(m_tabBar, &e);
+    if(event->button() == Qt::RightButton && windowFrameSectionAt(event->pos()) == Qt::TitleBarArea) {
+        QContextMenuEvent e(QContextMenuEvent::Mouse, m_tabBar->mapFrom(this, event->pos()), event->globalPos(), event->modifiers());
+        QApplication::sendEvent(m_tabBar, &e);
+        event->accept();
+    }
+}
+
+void QnMainWindow::mouseDoubleClickEvent(QMouseEvent *event) {
+    base_type::mouseDoubleClickEvent(event);
+
+    if(event->button() == Qt::LeftButton && windowFrameSectionAt(event->pos()) == Qt::TitleBarArea) {
+        toggleFullScreen();
+        event->accept();
+    }
 }
 
 void QnMainWindow::changeEvent(QEvent *event) {
@@ -511,20 +478,6 @@ void QnMainWindow::paintEvent(QPaintEvent *event) {
             height() - 1
         ));
     }
-}
-
-void QnMainWindow::resizeEvent(QResizeEvent *event) {
-    QRect rect = this->rect();
-    QRect viewGeometry = m_view->geometry();
-
-    m_dwm->setNonErasableContentMargins(QMargins(
-        viewGeometry.left(),
-        viewGeometry.top(),
-        rect.right() - viewGeometry.right(),
-        rect.bottom() - viewGeometry.bottom()
-    ));
-
-    base_type::resizeEvent(event);
 }
 
 void QnMainWindow::dragEnterEvent(QDragEnterEvent *event) {
@@ -561,6 +514,13 @@ bool QnMainWindow::winEvent(MSG *message, long *result)
     return base_type::winEvent(message, result);
 }
 #endif
+
+Qt::WindowFrameSection QnMainWindow::windowFrameSectionAt(const QPoint &pos) const {
+    Qt::WindowFrameSection result = Qn::toNaturalQtFrameSection(Qn::calculateRectangularFrameSections(rect(), QnGeometry::eroded(rect(), m_frameMargins), QRect(pos, pos)));
+    if((m_options & TitleBarDraggable) && result == Qt::NoSection && pos.y() <= m_tabBar->mapTo(const_cast<QnMainWindow *>(this), m_tabBar->rect().bottomRight()).y())
+        result = Qt::TitleBarArea;
+    return result;
+}
 
 void QnMainWindow::at_fileOpenSignalizer_activated(QObject *, QEvent *event) {
     if(event->type() != QEvent::FileOpen) {

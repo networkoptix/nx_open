@@ -14,13 +14,13 @@ protected:
 public:
     
 
-	~QnMdnsResourceSearcher();
+    ~QnMdnsResourceSearcher();
 
     bool isProxy() const;
 
     virtual QnResourceList findResources();
 protected:
-    virtual QnNetworkResourcePtr processPacket(QnResourceList& result, QByteArray& responseData, const QHostAddress& discoveryAddress) = 0;
+    virtual QList<QnNetworkResourcePtr> processPacket(QnResourceList& result, QByteArray& responseData, const QHostAddress& discoveryAddress) = 0;
 private:
     void checkSocket(QUdpSocket& sock, QnResourceList& result, QHostAddress localAddress);
 };

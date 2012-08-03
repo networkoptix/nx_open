@@ -1,5 +1,5 @@
 #include "selection_overlay_hack_instrument.h"
-#include <ui/graphics/items/resource_widget.h>
+#include <ui/graphics/items/resource/resource_widget.h>
 
 SelectionOverlayHackInstrument::SelectionOverlayHackInstrument(QObject *parent):
     Instrument(Instrument::Scene, makeSet(), parent)

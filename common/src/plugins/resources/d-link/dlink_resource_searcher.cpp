@@ -85,12 +85,12 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             QHostAddress sender;
             quint16 senderPort;
 
-            sock.readDatagram(datagram.data(), datagram.size(),	&sender, &senderPort);
+            sock.readDatagram(datagram.data(), datagram.size(),    &sender, &senderPort);
 
             if (senderPort != 62976 || datagram.size() < 32) // minimum response size
                 continue;
 
-            QString name  = "DCS-";
+            QString name  = QLatin1String("DCS-");
 
             int iqpos = datagram.indexOf("DCS-");
 
@@ -153,7 +153,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
 
 QString QnPlDlinkResourceSearcher::manufacture() const
 {
-    return QnPlDlinkResource::MANUFACTURE;
+    return QLatin1String(QnPlDlinkResource::MANUFACTURE);
 }
 
 
