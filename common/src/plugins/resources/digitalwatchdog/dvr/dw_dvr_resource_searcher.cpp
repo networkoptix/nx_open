@@ -56,13 +56,13 @@ QnResourcePtr DwDvrResourceSearcher::createResource(QnId resourceTypeId, const Q
 
 QString DwDvrResourceSearcher::manufacture() const
 {
-    return QnDwDvrResource::MANUFACTURE;
+    return QLatin1String(QnDwDvrResource::MANUFACTURE);
 }
 
 QnResourceList DwDvrResourceSearcher::findResources()
 {
     QnResourceList result;
-    getCamerasFromDvr(result, "10.10.10.53", 9000, "admin", "");
+    getCamerasFromDvr(result, QLatin1String("10.10.10.53"), 9000, QLatin1String("admin"), QLatin1String(""));
     return result;
 }
 
@@ -71,7 +71,7 @@ void DwDvrResourceSearcher::getCamerasFromDvr(QnResourceList& resources, const Q
     static CLSID const clsid
         = { 0x67815DA3, 0xEC08, 0x41E0, { 0xAE, 0x60, 0x92, 0xE5, 0x93, 0x5E, 0xE8, 0xFB } };
 
-    QAxObject object("{67815DA3-EC08-41E0-AE60-92E5935EE8FB}");
+    QAxObject object(QLatin1String("{67815DA3-EC08-41E0-AE60-92E5935EE8FB}"));
     QVariant res = object.dynamicCall("connect(QString&, quint16, QString&, QString&, int)", host, port, login, password, 65535);
     res = res;
 
