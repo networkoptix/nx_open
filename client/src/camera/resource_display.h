@@ -10,9 +10,9 @@ class QnAbstractMediaStreamDataProvider;
 class QnAbstractStreamDataProvider;
 class QnVideoResourceLayout;
 class CLCamDisplay;
-class CLLongRunnable;
+class QnLongRunnable;
 class QnAbstractRenderer;
-class CLVideoCamera;
+class QnVideoCamera;
 
 namespace detail {
     class QnRendererGuard: public QObject {
@@ -89,7 +89,7 @@ public:
     /**
      * \returns                         Video camera associated with this display, if any.
      */
-    CLVideoCamera *camera() const {
+    QnVideoCamera *camera() const {
         return m_camera;
     }
 
@@ -142,7 +142,7 @@ protected:
     virtual void disconnectFromResource() override;
 
 private:
-    void cleanUp(CLLongRunnable *runnable) const;
+    void cleanUp(QnLongRunnable *runnable) const;
 
 private:
     /** Media resource. */
@@ -158,7 +158,7 @@ private:
     QnAbstractArchiveReader *m_archiveReader;
 
     /** Video camera. */
-    CLVideoCamera *m_camera; // TODO: Compatibility layer. Remove.
+    QnVideoCamera *m_camera; // TODO: Compatibility layer. Remove.
 
     /** Whether this display was started. */
     bool m_started;

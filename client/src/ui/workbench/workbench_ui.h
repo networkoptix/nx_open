@@ -15,7 +15,7 @@ class QGraphicsProxyWidget;
 class QGraphicsWidget;
 class QGraphicsLinearLayout;
 
-class CLVideoCamera;
+class QnVideoCamera;
 
 class InstrumentManager;
 class UiElementsInstrument;

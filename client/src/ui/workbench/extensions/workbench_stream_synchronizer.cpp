@@ -86,7 +86,7 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAdded(QnResourceWidget *wid
     if(mediaWidget->display()->archiveReader() == NULL) 
         return;
     
-    CLVideoCamera *camera = mediaWidget->display()->camera();
+    QnVideoCamera *camera = mediaWidget->display()->camera();
     m_syncPlay->addArchiveReader(mediaWidget->display()->archiveReader(), camera->getCamDisplay());
     camera->setExternalTimeSource(m_syncPlay);
     camera->getCamDisplay()->setExternalTimeSource(m_syncPlay);

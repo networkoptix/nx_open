@@ -208,7 +208,7 @@ bool QnNetworkResource::hasRunningLiveProvider() const
         QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(consumer);
         if (lp)
         {
-            CLLongRunnable* lr = dynamic_cast<CLLongRunnable*>(lp);
+            QnLongRunnable* lr = dynamic_cast<QnLongRunnable*>(lp);
             if (lr && lr->isRunning())
                 return true;
         }

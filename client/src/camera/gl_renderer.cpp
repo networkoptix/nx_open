@@ -53,8 +53,8 @@ public:
 
     QnGLRendererPrivate(const QGLContext *context):
         QnGlFunctions(context),
-        supportsNonPower2Textures(false),
-        status(QnGLRenderer::SUPPORTED)
+        status(QnGLRenderer::SUPPORTED),
+        supportsNonPower2Textures(false)
     {
         QByteArray extensions = reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS));
         QByteArray version = reinterpret_cast<const char *>(glGetString(GL_VERSION));

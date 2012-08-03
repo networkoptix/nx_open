@@ -11,7 +11,7 @@ class QUrl;
 
 class QnWorkbenchContext;
 class QnAbstractArchiveReader;
-class CLVideoCamera;
+class QnVideoCamera;
 class QnResourceWidgetRenderer;
 class QnRenderingWidget;
 

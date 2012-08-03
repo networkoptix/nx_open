@@ -8,7 +8,7 @@ int MEDIA_PORT = 4985;
 
 // ---------------- QnCameraDiscovery -----------------
 
-class QnCameraDiscoveryListener: public CLLongRunnable
+class QnCameraDiscoveryListener: public QnLongRunnable
 {
 protected:
     virtual void run() override

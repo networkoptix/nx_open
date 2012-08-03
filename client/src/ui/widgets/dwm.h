@@ -24,21 +24,6 @@ public:
      */
     bool isCompositionEnabled() const;
 
-    bool enableTransparentErasing(bool enable = true);
-
-    bool disableTransparentErasing(bool disable = true) {
-        return enableTransparentErasing(!disable);
-    }
-
-    bool setNonErasableContentMargins(const QMargins &margins);
-
-
-    bool enableSystemWindowPainting(bool enable = true);
-
-    bool disableSystemWindowPainting(bool disable = true) {
-        return enableSystemWindowPainting(!disable);
-    }
-
     /**
      * Enables blur-behind on a widget.
      * 
@@ -95,63 +80,6 @@ public:
      *                                  current desktop theme, -1 on error.
      */
     int themeTitleBarHeight() const;
-
-    /**
-     * Enables or disables emulation of window frame in client area.
-     * Emulation is performed by feeding the proper frame sections to the OS even
-     * when frame section is queried for client area.
-     * 
-     * \param enable                    Whether window frame should be emulated.
-     * \returns                         Whether window frame emulation mode was successfully changed.
-     */
-    bool enableFrameEmulation(bool enable = true);
-
-    bool disableFrameEmulation(bool disable = true) {
-        return enableFrameEmulation(!disable);
-    }
-
-    /**
-     * \returns                         Whether window frame is emulated.
-     */
-    bool isFrameEmulated() const;
-
-    /**
-     * Sets emulated frame margins. Note that they DO NOT include title bar area, 
-     * which can be tuned separately.
-     *
-     * The effect of setting emulated margins is that it will become possible
-     * to resize the window even if it has no "real" frame.
-     *
-     * \param margins                   New emulated frame margins. 
-     */
-    void setEmulatedFrameMargins(const QMargins &margins);
-
-    /**
-     * \returns                         Currently set emulated frame margins.
-     */
-    QMargins emulatedFrameMargins() const;
-
-    /**
-     * \param height                    New emulated title bar height. 
-     */
-    void setEmulatedTitleBarHeight(int height);
-
-    /**
-     * \returns                         Currently set emulated title bar height.
-     */
-    int emulatedTitleBarHeight() const;
-
-    /**
-     * Enables or disables window dragging by clicking on a title bar.
-     * 
-     * \param enable                    Whether dragging is to be enabled.
-     * \returns                         Whether dragging mode was successfully changed.
-     */
-    bool enableTitleBarDrag(bool enable = true);
-
-    bool disableTitleBarDrag(bool disable = true) {
-        return enableTitleBarDrag(!disable);
-    }
 
     /**
      * This function is to be called at the end of widget's <tt>event</tt> handler.

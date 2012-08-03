@@ -10,7 +10,7 @@
 #include "utils/common/longrunnable.h"
 #include "utils/common/threadqueue.h"
 
-class QnBufferedScreenGrabber: public CLLongRunnable
+class QnBufferedScreenGrabber: public QnLongRunnable
 {
     Q_OBJECT;
 public:

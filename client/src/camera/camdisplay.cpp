@@ -71,57 +71,57 @@ static const double FPS_EPS = 0.0001;
 
 static const int DEFAULT_DELAY_OVERDRAFT = 100 * 1000;
 
-CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
-    : QnAbstractDataConsumer(CL_MAX_DISPLAY_QUEUE_SIZE),
-      m_delay(DEFAULT_DELAY_OVERDRAFT), // do not put a big value here to avoid cpu usage in case of zoom out
-      m_playAudio(false),
-      m_speed(1.0),
-      m_prevSpeed(1.0),
-      m_needChangePriority(false),
-      m_hadAudio(false),
-      m_lastAudioPacketTime(0),
-      m_syncAudioTime(AV_NOPTS_VALUE),
-      m_totalFrames(0),
-      m_iFrames(0),
-      m_lastVideoPacketTime(0),
-      m_lastDecodedTime(AV_NOPTS_VALUE),
-      m_previousVideoTime(0),
-      m_lastNonZerroDuration(0),
-      m_lastSleepInterval(0),
-      //m_previousVideoDisplayedTime(0),
-      m_afterJump(false),
-      m_bofReceived(false),
-      m_displayLasts(0),
-      m_ignoringVideo(false),
-      mGenerateEndOfStreamSignal(generateEndOfStreamSignal),
-      m_isRealTimeSource(true),
-      m_videoBufferOverflow(false),
-      m_singleShotMode(false),
-      m_singleShotQuantProcessed(false),
-      m_jumpTime(DATETIME_NOW),
-      m_playingCompress(0),
-      m_playingBitrate(0),
-      m_tooSlowCounter(0),
-      m_lightCpuMode(QnAbstractVideoDecoder::DecodeMode_Full),
-      m_lastFrameDisplayed(CLVideoStreamDisplay::Status_Displayed),
-      m_realTimeHurryUp(0),
-      m_extTimeSrc(0),
-      m_useMtDecoding(false),
-      m_buffering(0),
-      m_executingJump(0),
-      skipPrevJumpSignal(0),
-      m_processedPackets(0),
-      m_toLowQSpeed(1.0),
-      m_delayedFrameCnt(0),
-      m_emptyPacketCounter(0),
-      m_hiQualityRetryCounter(0),
-      m_isStillImage(false),
-      m_isLongWaiting(false),
-      m_executingChangeSpeed(false),
-      m_eofSignalSended(false),
-      m_lastLiveIsLowQuality(false),
-      m_audioDisplay(0),
-      m_videoQueueDuration(0)
+CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal): 
+    QnAbstractDataConsumer(CL_MAX_DISPLAY_QUEUE_SIZE),
+    m_audioDisplay(0),
+    m_delay(DEFAULT_DELAY_OVERDRAFT), // do not put a big value here to avoid cpu usage in case of zoom out
+    m_speed(1.0),
+    m_prevSpeed(1.0),
+    m_playAudio(false),
+    m_needChangePriority(false),
+    m_hadAudio(false),
+    m_lastAudioPacketTime(0),
+    m_syncAudioTime(AV_NOPTS_VALUE),
+    m_totalFrames(0),
+    m_iFrames(0),
+    m_lastVideoPacketTime(0),
+    m_lastDecodedTime(AV_NOPTS_VALUE),
+    m_previousVideoTime(0),
+    m_lastNonZerroDuration(0),
+    m_lastSleepInterval(0),
+    //m_previousVideoDisplayedTime(0),
+    m_afterJump(false),
+    m_bofReceived(false),
+    m_displayLasts(0),
+    m_ignoringVideo(false),
+    m_generateEndOfStreamSignal(generateEndOfStreamSignal),
+    m_isRealTimeSource(true),
+    m_videoBufferOverflow(false),
+    m_singleShotMode(false),
+    m_singleShotQuantProcessed(false),
+    m_jumpTime(DATETIME_NOW),
+    m_playingCompress(0),
+    m_playingBitrate(0),
+    m_tooSlowCounter(0),
+    m_lightCpuMode(QnAbstractVideoDecoder::DecodeMode_Full),
+    m_lastFrameDisplayed(QnVideoStreamDisplay::Status_Displayed),
+    m_realTimeHurryUp(0),
+    m_delayedFrameCount(0),
+    m_extTimeSrc(0),
+    m_useMtDecoding(false),
+    m_buffering(0),
+    m_executingJump(0),
+    m_skipPrevJumpSignal(0),
+    m_processedPackets(0),
+    m_toLowQSpeed(1.0),
+    m_emptyPacketCounter(0),
+    m_hiQualityRetryCounter(0),
+    m_isStillImage(false),
+    m_isLongWaiting(false),
+    m_executingChangeSpeed(false),
+    m_eofSignalSended(false),
+    m_lastLiveIsLowQuality(false),
+    m_videoQueueDuration(0)
 {
     m_storedMaxQueueSize = m_dataQueue.maxSize();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
@@ -143,7 +143,7 @@ void CLCamDisplay::setAudioBufferSize(int bufferSize, int prebufferSize)
     m_minAudioDetectJumpInterval = MIN_VIDEO_DETECT_JUMP_INTERVAL + m_audioBufferSize*1000;
     QMutexLocker lock(&m_audioChangeMutex);
     delete m_audioDisplay;
-    m_audioDisplay = new CLAudioStreamDisplay(m_audioBufferSize, prebufferSize);
+    m_audioDisplay = new QnAudioStreamDisplay(m_audioBufferSize, prebufferSize);
 }
 
 CLCamDisplay::~CLCamDisplay()
@@ -188,7 +188,7 @@ void CLCamDisplay::addVideoChannel(int index, QnAbstractRenderer* vw, bool canDo
     Q_ASSERT(index < CL_MAX_CHANNELS);
 
     delete m_display[index];
-    m_display[index] = new CLVideoStreamDisplay(canDownscale);
+    m_display[index] = new QnVideoStreamDisplay(canDownscale);
     m_display[index]->setDrawer(vw);
 }
 
@@ -247,9 +247,9 @@ void CLCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float spee
     {
         if (realSleepTime <= -1000*1000) 
         {
-            m_delayedFrameCnt = qMax(0, m_delayedFrameCnt);
-            m_delayedFrameCnt++;
-            if (m_delayedFrameCnt > 10 && reader->getQuality() != MEDIA_Quality_Low /*&& canSwitchQuality()*/)
+            m_delayedFrameCount = qMax(0, m_delayedFrameCount);
+            m_delayedFrameCount++;
+            if (m_delayedFrameCount > 10 && reader->getQuality() != MEDIA_Quality_Low /*&& canSwitchQuality()*/)
             {
                 bool fastSwitch = false; // m_dataQueue.size() >= m_dataQueue.maxSize()*0.75;
                 // if CPU is slow use fat switch, if problem with network - use slow switch to save already received data
@@ -260,11 +260,11 @@ void CLCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float spee
         }
         else if (realSleepTime >= 0)
         {
-            m_delayedFrameCnt = qMin(0, m_delayedFrameCnt);
-            m_delayedFrameCnt--;
-            if (m_delayedFrameCnt < -10 && m_dataQueue.size() >= m_dataQueue.size()*0.75)
+            m_delayedFrameCount = qMin(0, m_delayedFrameCount);
+            m_delayedFrameCount--;
+            if (m_delayedFrameCount < -10 && m_dataQueue.size() >= m_dataQueue.size()*0.75)
             {
-                if (qAbs(speed) < m_toLowQSpeed || m_toLowQSpeed < 0 && speed > 0)
+                if (qAbs(speed) < m_toLowQSpeed || (m_toLowQSpeed < 0 && speed > 0))
                 {
                     reader->setQuality(MEDIA_Quality_High, true); // speed decreased, try to Hi quality again
                 }
@@ -396,14 +396,14 @@ bool CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         needToSleep = 0;
     //=========
 
-    if (sleep && m_lastFrameDisplayed != CLVideoStreamDisplay::Status_Buffered)
+    if (sleep && m_lastFrameDisplayed != QnVideoStreamDisplay::Status_Buffered)
     {
         qint64 realSleepTime = 0;
         if (useSync(vd)) 
         {
             qint64 displayedTime = getCurrentTime();
             //bool isSingleShot = vd->flags & QnAbstractMediaData::MediaFlags_SingleShot;
-            if (speed != 0  && displayedTime != AV_NOPTS_VALUE && m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed &&
+            if (speed != 0  && displayedTime != AV_NOPTS_VALUE && m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed &&
                 !(vd->flags & QnAbstractMediaData::MediaFlags_BOF))
             {
                 Q_ASSERT(!(vd->flags & QnAbstractMediaData::MediaFlags_Ignore));
@@ -450,7 +450,7 @@ bool CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             }
         }
         else {
-            if (m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed) {
+            if (m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed) {
                 if (m_isRealTimeSource)
                     realSleepTime = m_delay.terminatedSleep(needToSleep, needToSleep*qAbs(speed)*2);
                 else
@@ -469,7 +469,7 @@ bool CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
     if (m_singleShotMode && m_singleShotQuantProcessed)
         return false;
 
-    QnFrameScaler::downscale_factor scaleFactor = QnFrameScaler::factor_any;
+    QnFrameScaler::DownscaleFactor scaleFactor = QnFrameScaler::factor_any;
     if (channel > 0 && m_display[0]) // if device has more than one channel
     {
         // this here to avoid situation where different channels have different down scale factor; it might lead to diffrent size
@@ -521,7 +521,7 @@ bool CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 
         m_lastFrameDisplayed = m_display[channel]->dispay(vd, draw, scaleFactor);
 
-        if (m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed)
+        if (m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed)
         {
             if (speed < 0)
                 m_nextReverseTime[channel] = m_display[channel]->nextReverseTime();
@@ -577,8 +577,8 @@ void CLCamDisplay::onBeforeJump(qint64 time)
     m_emptyPacketCounter = 0;
     clearUnprocessedData();
 
-    if (skipPrevJumpSignal > 0) {
-        skipPrevJumpSignal--;
+    if (m_skipPrevJumpSignal > 0) {
+        m_skipPrevJumpSignal--;
         return;
     }
     //setSingleShotMode(false);
@@ -622,12 +622,12 @@ void CLCamDisplay::onJumpOccured(qint64 time)
 
     m_executingJump--;
     m_processedPackets = 0;
-    m_delayedFrameCnt = 0;
+    m_delayedFrameCount = 0;
 }
 
 void CLCamDisplay::onJumpCanceled(qint64 /*time*/)
 {
-    skipPrevJumpSignal++;
+    m_skipPrevJumpSignal++;
 }
 
 void CLCamDisplay::afterJump(QnAbstractMediaDataPtr media)
@@ -643,7 +643,7 @@ void CLCamDisplay::afterJump(QnAbstractMediaDataPtr media)
     m_lastAudioPacketTime = media->timestamp;
     m_lastVideoPacketTime = media->timestamp;
     m_previousVideoTime = media->timestamp;
-    m_lastFrameDisplayed = CLVideoStreamDisplay::Status_Skipped;
+    m_lastFrameDisplayed = QnVideoStreamDisplay::Status_Skipped;
     //m_previousVideoDisplayedTime = 0;
     m_totalFrames = 0;
     m_iFrames = 0;
@@ -659,7 +659,7 @@ void CLCamDisplay::afterJump(QnAbstractMediaDataPtr media)
     }
     m_audioDisplay->clearAudioBuffer();
 
-    if (mGenerateEndOfStreamSignal)
+    if (m_generateEndOfStreamSignal)
         emit reachedTheEnd();
 }
 
@@ -733,7 +733,7 @@ void CLCamDisplay::processNewSpeed(float speed)
     if (speed < 0 && m_prevSpeed >= 0)
         m_buffering = getBufferingMask(); // decode first gop is required some time
 
-    if (speed >= 0 && m_prevSpeed < 0 || speed < 0 && m_prevSpeed >= 0)
+    if ((speed >= 0 && m_prevSpeed < 0) || (speed < 0 && m_prevSpeed >= 0))
     {
         m_dataQueue.clear();
         clearVideoQueue();
@@ -959,7 +959,7 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
             QMutexLocker lock(&m_audioChangeMutex);
             delete m_audioDisplay;
             m_audioBufferSize = expectedBufferSize;
-            m_audioDisplay = new CLAudioStreamDisplay(m_audioBufferSize, audioPrebufferSize);
+            m_audioDisplay = new QnAudioStreamDisplay(m_audioBufferSize, audioPrebufferSize);
             m_playingFormat = currentAudioFormat;
         }
 
@@ -1063,7 +1063,7 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
 
             if (!display(vd, !(vd->flags & QnAbstractMediaData::MediaFlags_Ignore), speed))
                 return false; // keep frame
-            if (m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed && !m_afterJump)
+            if (m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed && !m_afterJump)
                 m_singleShotQuantProcessed = true;
             return result;
         }
@@ -1110,7 +1110,7 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
                     m_syncAudioTime = m_lastAudioPacketTime; // sync audio time prevent stopping video, if audio track is disapearred
                 }                
                 display(vd, !ignoreVideo, speed);
-                if (m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed && !m_afterJump)
+                if (m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed && !m_afterJump)
                     m_singleShotQuantProcessed = true;
             }
 

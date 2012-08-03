@@ -17,7 +17,7 @@ class QMenu;
 class QLabel;
 class QPropertyAnimation;
 
-class CLVideoCamera;
+class QnVideoCamera;
 
 class InstrumentManager;
 class HandScrollInstrument;

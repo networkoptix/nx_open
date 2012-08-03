@@ -365,7 +365,7 @@ QnDesktopFileEncoder::QnDesktopFileEncoder (
                    QWidget* glWidget,
                    const QPixmap& logo
                    ):
-    CLLongRunnable(),
+    QnLongRunnable(),
     m_videoBuf(0),
     m_videoBufSize(0),
     m_videoCodecCtx(0),
@@ -414,7 +414,7 @@ bool QnDesktopFileEncoder::start()
     if (!init())
         return false;
     m_initialized = true;
-    CLLongRunnable::start();
+    QnLongRunnable::start();
     return true;
 }
 

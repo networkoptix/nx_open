@@ -1,5 +1,5 @@
-#ifndef audiostreamdisplay_h_1811
-#define audiostreamdisplay_h_1811
+#ifndef QN_AUDIO_STREAM_DISPLAY
+#define QN_AUDIO_STREAM_DISPLAY
 
 #include "decoders/audio/audio_struct.h"
 #include "openal/qtvsound.h"
@@ -9,12 +9,12 @@
 class CLAbstractAudioDecoder;
 struct QnCompressedAudioData;
 
-class CLAudioStreamDisplay : public QObject
+class QnAudioStreamDisplay : public QObject
 {
     Q_OBJECT
 public:
-    CLAudioStreamDisplay(int buffMs, int prebufferMs);
-    ~CLAudioStreamDisplay();
+    QnAudioStreamDisplay(int buffMs, int prebufferMs);
+    ~QnAudioStreamDisplay();
 
     void putData(QnCompressedAudioDataPtr data, qint64 minTime);
     void enqueueData(QnCompressedAudioDataPtr data, qint64 minTime);
@@ -45,6 +45,7 @@ public:
     void playCurrentBuffer();
 
     int getAudioBufferSize() const;
+
 private:
     int msInQueue() const;
 
@@ -53,26 +54,26 @@ private:
     static QnCodecAudioFormat float2int32(QnByteArray& audio, QnCodecAudioFormat format);
     static QnCodecAudioFormat int32Toint16(QnByteArray& audio, QnCodecAudioFormat format);
     bool initFormatConvertRule(QnAudioFormat format);
+
 private:
-    QMutex m_guiSync;
     enum SampleConvertMethod {SampleConvert_None, SampleConvert_Float2Int32, SampleConvert_Float2Int16, SampleConvert_Int32ToInt16};
 
+    QMutex m_guiSync;
     QMap<CodecID, CLAbstractAudioDecoder*> m_decoder;
-
-//    CLAbstractAudioDecoder* m_decoder[CL_VARIOUSE_DECODERS];
 
     int m_bufferMs;
     int m_prebufferMs;
-    QnByteArray m_decodedAudioBuffer;
     bool m_tooFewDataDetected;
     bool m_isFormatSupported;
     QtvSound* m_audioSound;
-    QQueue<QnCompressedAudioDataPtr> m_audioQueue;
 
     bool m_downmixing;    // do downmix.
     bool m_forceDownmix;  // force downmix, even if output device supports multichannel
     SampleConvertMethod m_sampleConvertMethod;
     bool m_isConvertMethodInitialized;
+
+    QQueue<QnCompressedAudioDataPtr> m_audioQueue;
+    QnByteArray m_decodedAudioBuffer;
 };
 
-#endif //audiostreamdisplay_h_1811
+#endif //QN_AUDIO_STREAM_DISPLAY

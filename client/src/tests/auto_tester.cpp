@@ -19,8 +19,8 @@ QnAutoTester::QnAutoTester(int &argc, char **argv, QObject *parent):
     m_state(INITIAL),
     m_startTime(0),
     m_timeout(defaultAutoTesterTimeout),
-    m_successfulTests(0),
     m_allTests(0),
+    m_successfulTests(0),
     m_timer(NULL),
     m_succeeded(false)
 {

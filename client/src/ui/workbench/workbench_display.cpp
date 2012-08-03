@@ -647,7 +647,7 @@ QnResourceDisplay *QnWorkbenchDisplay::display(QnWorkbenchItem *item) const {
     return NULL;
 }
 
-CLVideoCamera *QnWorkbenchDisplay::camera(QnWorkbenchItem *item) const {
+QnVideoCamera *QnWorkbenchDisplay::camera(QnWorkbenchItem *item) const {
     QnResourceDisplay *display = this->display(item);
     if(display == NULL)
         return NULL;
@@ -656,7 +656,7 @@ CLVideoCamera *QnWorkbenchDisplay::camera(QnWorkbenchItem *item) const {
 }
 
 CLCamDisplay *QnWorkbenchDisplay::camDisplay(QnWorkbenchItem *item) const {
-    CLVideoCamera *camera = this->camera(item);
+    QnVideoCamera *camera = this->camera(item);
     if(camera == NULL)
         return NULL;
 

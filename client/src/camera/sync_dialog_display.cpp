@@ -66,11 +66,11 @@ bool QnSignDialogDisplay::processData(QnAbstractDataPacketPtr data)
             QnSignHelper::updateDigest(m_prevFrame->context->ctx(), m_mdctx, data, m_prevFrame->data.size());
         }
 
-        if (!m_firstFrameDisplayed || (video->flags & AV_PKT_FLAG_KEY) && qnSyncTime->currentMSecsSinceEpoch() - m_lastDisplayTime > 100) // max display rate 10 fps
+        if (!m_firstFrameDisplayed || ((video->flags & AV_PKT_FLAG_KEY) && qnSyncTime->currentMSecsSinceEpoch() - m_lastDisplayTime > 100)) // max display rate 10 fps
         {
-            CLVideoStreamDisplay::FrameDisplayStatus status = m_display[0]->dispay(video, true, QnFrameScaler::factor_any);
+            QnVideoStreamDisplay::FrameDisplayStatus status = m_display[0]->dispay(video, true, QnFrameScaler::factor_any);
             if (!m_firstFrameDisplayed)
-                m_firstFrameDisplayed = status == CLVideoStreamDisplay::Status_Displayed;
+                m_firstFrameDisplayed = status == QnVideoStreamDisplay::Status_Displayed;
             QSize imageSize = m_display[0]->getImageSize();
             if (imageSize != m_prevImageSize)
             {

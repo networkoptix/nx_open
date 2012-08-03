@@ -9,7 +9,12 @@ class QnAbstractVideoDecoder
 {
 public:
     // for movies: full = IPB, fast == IP only, fastest = I only
-    enum DecodeMode {DecodeMode_NotDefined, DecodeMode_Full, DecodeMode_Fast, DecodeMode_Fastest};
+    enum DecodeMode {
+        DecodeMode_NotDefined, 
+        DecodeMode_Full, 
+        DecodeMode_Fast, 
+        DecodeMode_Fastest
+    };
 
     explicit QnAbstractVideoDecoder();
 
@@ -50,7 +55,8 @@ public:
     virtual PixelFormat getFormat() const { return PIX_FMT_YUV420P; }
     virtual void flush() {}
     virtual const AVFrame* lastFrame() { return 0; }
-    virtual void resetDecoder(QnCompressedVideoDataPtr data) {}
+    virtual void resetDecoder(QnCompressedVideoDataPtr data) { Q_UNUSED(data); }
+
 private:
     QnAbstractVideoDecoder(const QnAbstractVideoDecoder&) {}
     QnAbstractVideoDecoder& operator=(const QnAbstractVideoDecoder&) { return *this; }

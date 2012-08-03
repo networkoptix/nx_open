@@ -48,9 +48,9 @@ QnThumbnailsLoader::QnThumbnailsLoader(QnResourcePtr resource):
     m_requestEnd(0),
     m_processingStart(invalidProcessingTime),
     m_processingEnd(invalidProcessingTime),
+    m_boundingSize(128, 96), /* That's 4:3 aspect ratio. */
     m_scaleContext(NULL),
     m_scaleBuffer(NULL),
-    m_boundingSize(128, 96), /* That's 4:3 aspect ratio. */
     m_scaleSourceSize(0, 0),
     m_scaleTargetSize(0, 0),
     m_scaleSourceLine(0),

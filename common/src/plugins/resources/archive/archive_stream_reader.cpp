@@ -311,7 +311,7 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::getNextData()
         QMutexLocker mutex(&m_jumpMtx);
         while (m_singleShot && m_skipFramesToTime == 0 && m_singleQuantProcessed && m_requiredJumpTime == AV_NOPTS_VALUE && !m_needStop)
             m_singleShowWaitCond.wait(&m_jumpMtx);
-        //CLLongRunnable::pause();
+        //QnLongRunnable::pause();
     }
 
     bool singleShotMode = m_singleShot;
@@ -940,7 +940,7 @@ bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
     }
 
     if (isSingleShotMode())
-        CLLongRunnable::resume();
+        QnLongRunnable::resume();
     return needJump;
 }
 

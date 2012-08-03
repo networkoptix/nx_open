@@ -18,6 +18,7 @@ static const int MAX_RTSP_WRITE_BUFFER = 1024*1024;
 static const int MAX_PACKETS_AT_SINGLE_SHOT = 3;
 static const int HIGH_QUALITY_RETRY_COUNTER = 1;
 static const int QUALITY_SWITCH_INTERVAL = 1000 * 5; // delay between high quality switching attempts
+static const int MAX_CLIENT_BUFFER_SIZE_MS = 1000*2;
 
 QHash<QHostAddress, qint64> QnRtspDataConsumer::m_lastSwitchTime;
 QSet<QnRtspDataConsumer*> QnRtspDataConsumer::m_allConsumers;
@@ -28,20 +29,26 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
   QnAbstractDataConsumer(MAX_QUEUE_SIZE),
   m_owner(owner),
   m_lastSendTime(0),
+  m_rtStartTime(AV_NOPTS_VALUE),
+  m_lastRtTime(0),
   m_lastMediaTime(0),
   m_waitSCeq(0),
   m_liveMode(false),
   m_pauseNetwork(false),
-  m_gotLivePacket(false),
   m_singleShotMode(false),
   m_packetSended(false),
   m_prefferedProvider(0),
   m_currentDP(0),
   m_liveQuality(MEDIA_Quality_High),
   m_newLiveQuality(MEDIA_Quality_None),
-  m_hiQualityRetryCounter(0)
+  m_hiQualityRetryCounter(0),
+  m_realtimeMode(false),
+  m_adaptiveSleep(MAX_FRAME_DURATION*1000)
 {
     memset(m_sequence, 0, sizeof(m_sequence));
+    for (int i = 0; i < MAX_RTP_CHANNELS; ++i)
+        m_firstRtpTime[i] = -1;
+
     m_timer.start();
     QMutexLocker lock(&m_allConsumersMutex);
     m_allConsumers << this;
@@ -80,8 +87,6 @@ void QnRtspDataConsumer::setWaitCSeq(qint64 newTime, int sceq)
     QMutexLocker lock(&m_mutex);
     m_waitSCeq = sceq; 
     m_lastMediaTime = m_lastSendTime = newTime;
-    m_ctxSended.clear();
-    m_gotLivePacket = false;
 }
 
 qint64 QnRtspDataConsumer::getCurrentTime() const
@@ -287,92 +292,57 @@ void QnRtspDataConsumer::buildRtspTcpHeader(quint8 channelNum, quint32 ssrc, qui
     rtp->CSRCCount = 0;
     rtp->marker  =  markerBit;
     rtp->payloadType = payloadType;
-    rtp->sequence = htons(m_sequence[channelNum]++);
+    rtp->sequence = htons(m_sequence[channelNum]);
     //rtp->timestamp = htonl(m_timer.elapsed());
     rtp->timestamp = htonl(timestamp);
     rtp->ssrc = htonl(ssrc); // source ID
 }
 
+/*
 QnMediaContextPtr QnRtspDataConsumer::getGeneratedContext(CodecID compressionType)
 {
     QMap<CodecID, QnMediaContextPtr>::iterator itr = m_generatedContext.find(compressionType);
     if (itr != m_generatedContext.end())
         return itr.value();
     QnMediaContextPtr result(new QnMediaContext(compressionType));
-    //AVCodecContext* ctx = result->ctx();
+    AVCodecContext* ctx = result->ctx();
     m_generatedContext.insert(compressionType, result);
     return result;
 }
 
-bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
+void QnRtspDataConsumer::createDataPacketTCP(QnByteArray& sendBuffer, QnAbstractMediaDataPtr media, int rtpTcpChannel)
 {
-    if (m_pauseNetwork)
-        return false; // does not ready to process data. please wait
-
-    //msleep(500);
-
-    QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
-    if (!media)
-        return true;
-
-
-    QnMetaDataV1Ptr metadata = qSharedPointerDynamicCast<QnMetaDataV1>(data);
-
-    if (metadata == 0)
-    {
-        if (m_liveQuality == MEDIA_Quality_High && m_owner->isSecondaryLiveDP(media->dataProvider))
-            return true; // data for other live quality stream
-        else if (m_liveQuality == MEDIA_Quality_Low && m_owner->isPrimaryLiveDP(media->dataProvider))
-            return true; // data for other live quality stream
-    }
-
-    int cseq = media->opaque;
     quint16 flags = media->flags;
+    int cseq = media->opaque;
 
     if (m_owner->isLiveDP(media->dataProvider)) {
         flags |= QnAbstractMediaData::MediaFlags_LIVE;
         cseq = m_liveMarker;
     }
-
-    int rtspChannelNum = media->channelNumber;
-    //if (media->dataType == QnAbstractMediaData::AUDIO)
-    //    rtspChannelNum += m_owner->numOfVideoChannels();
-
-    //QMutexLocker lock(&m_mutex);
-    m_mutex.lock();
     if (flags & QnAbstractMediaData::MediaFlags_AfterEOF)
         m_ctxSended.clear();
 
-    if (m_waitSCeq && cseq != m_waitSCeq)
-    {
-        m_mutex.unlock();
-        return true; // ignore data
-    }
-    m_waitSCeq = 0;
-    if (m_owner->isLiveDP(media->dataProvider)) {
+    bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
+    if (isLive) {
         if (!m_gotLivePacket)
             flags |= QnAbstractMediaData::MediaFlags_BOF;
         m_gotLivePacket = true;
     }
 
+
     // one video channel may has several subchannels (video combined with frames from difference codecContext)
     // max amount of subchannels is MAX_CONTEXTS_AT_VIDEO. Each channel used 2 ssrc: for data and for CodecContext
-        
-    quint32 ssrc = BASIC_FFMPEG_SSRC + rtspChannelNum * MAX_CONTEXTS_AT_VIDEO*2;
+
+    quint32 ssrc = BASIC_FFMPEG_SSRC + media->channelNumber * MAX_CONTEXTS_AT_VIDEO*2;
 
     ssrc += media->subChannelNumber*2;
     int subChannelNumber = media->subChannelNumber;
 
-    int rtpTcpChannel = m_owner->getAVTcpChannel(rtspChannelNum);
-    if (rtpTcpChannel == -1) {
-        m_mutex.unlock();
-        return true; // skip data (for example audio is disabled)
-    }
+    QnMetaDataV1Ptr metadata = qSharedPointerDynamicCast<QnMetaDataV1>(media);
 
-    m_owner->clearBuffer();
     if (!metadata && media->compressionType)
     {
-        QList<QnMediaContextPtr>& ctxData = m_ctxSended[rtspChannelNum];
+        QList<QnMediaContextPtr>& ctxData = m_ctxSended[media->channelNumber];
         while (ctxData.size() <= subChannelNumber)
             ctxData << QnMediaContextPtr(0);
 
@@ -386,7 +356,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
             QByteArray codecCtxData;
             QnFfmpegHelper::serializeCodecContext(currentContext->ctx(), &codecCtxData);
             buildRtspTcpHeader(rtpTcpChannel, ssrc + 1, codecCtxData.size(), true, 0, RTP_FFMPEG_GENERIC_CODE); // ssrc+1 - switch data subchannel to context subchannel
-            m_owner->bufferData(m_rtspTcpHeader, rtpHeaderSize);
+            sendBuffer.write(m_rtspTcpHeader, rtpHeaderSize);
             Q_ASSERT(!codecCtxData.isEmpty());
             m_owner->bufferData(codecCtxData);
         }
@@ -448,18 +418,129 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         m_owner->sendBuffer();
         m_owner->clearBuffer();
     }
+}
+*/
+
+void QnRtspDataConsumer::setUseRealTimeStreamingMode(bool value)
+{
+    m_realtimeMode = value;
+}
+
+
+void QnRtspDataConsumer::doRealtimeDelay(QnAbstractMediaDataPtr media)
+{
+    if (m_rtStartTime == AV_NOPTS_VALUE) {
+        m_rtStartTime = media->timestamp;
+    }
+    else {
+        qint64 timeDiff = media->timestamp - m_lastRtTime;
+        if (timeDiff <= MAX_FRAME_DURATION*1000)
+            m_adaptiveSleep.terminatedSleep(timeDiff, MAX_FRAME_DURATION); // if diff too large, it is recording hole. do not calc delay for this case
+    }
+    m_lastRtTime = media->timestamp;
+}
+
+bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
+{
+    if (m_pauseNetwork)
+        return false; // does not ready to process data. please wait
+
+    //msleep(500);
+
+    QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
+    if (!media)
+        return true;
+
+
+    QnMetaDataV1Ptr metadata = qSharedPointerDynamicCast<QnMetaDataV1>(data);
+
+    if (metadata == 0)
+    {
+        if (m_liveQuality == MEDIA_Quality_High && m_owner->isSecondaryLiveDP(media->dataProvider))
+            return true; // data for other live quality stream
+        else if (m_liveQuality == MEDIA_Quality_Low && m_owner->isPrimaryLiveDP(media->dataProvider))
+            return true; // data for other live quality stream
+    }
+
+
+    int rtpTcpChannel = m_owner->getAVTcpChannel(media->channelNumber);
+    if (rtpTcpChannel == -1) 
+        return true; // skip data (for example audio is disabled)
+    QnRtspEncoderPtr codecEncoder = m_owner->getCodecEncoder(media->channelNumber);
+    if (codecEncoder == 0)
+        return true; // skip data (for example audio is disabled)
+
+    {
+        QMutexLocker lock(&m_mutex);
+        int cseq = media->opaque;
+        if (m_waitSCeq) {
+            if (cseq != m_waitSCeq)
+                return true; // ignore data
+            m_waitSCeq = 0;
+            m_rtStartTime = AV_NOPTS_VALUE;
+            m_adaptiveSleep.afterdelay(); // same as reset call
+            m_adaptiveSleep.addQuant(MAX_CLIENT_BUFFER_SIZE_MS); // allow to stream data faster at start streaming for some client prebuffer. value in ms
+
+            memset(m_sequence, 0, sizeof(m_sequence));
+            for (int i = 0; i < MAX_RTP_CHANNELS; ++i)
+                m_firstRtpTime[i] = -1;
+        }
+        if (m_lastSendTime != DATETIME_NOW)
+            m_lastSendTime = media->timestamp;
+        m_lastMediaTime = media->timestamp;
+    }
+    if (m_realtimeMode)
+        doRealtimeDelay(media);
+
+
+    bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
+    if (isLive) 
+        media->opaque = m_liveMarker;
+
+    codecEncoder->setDataPacket(media);
+    bool dataExists = true;
+    if (m_firstRtpTime[media->channelNumber] == -1)
+        m_firstRtpTime[media->channelNumber] = media->timestamp;
+    static AVRational r = {1, 1000000};
+    AVRational time_base = {1, codecEncoder->getFrequency() };
+    qint64 timeDiff = media->timestamp - m_firstRtpTime[media->channelNumber];
+    qint64 packetTime = av_rescale_q(timeDiff, r, time_base);
+
+
+    while(dataExists && !m_needStop) 
+    {
+        while (m_pauseNetwork && !m_needStop)
+            QnSleep::msleep(1);
+
+        m_owner->clearBuffer();
+
+        buildRtspTcpHeader(rtpTcpChannel, codecEncoder->getSSRC(), 0, codecEncoder->getRtpMarker(), packetTime, codecEncoder->getPayloadtype()); 
+        m_owner->bufferData(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
+        dataExists = codecEncoder->getNextPacket(m_owner->getSendBuffer());
+        if (dataExists) 
+        {
+            Q_ASSERT(m_owner->getSendBuffer().size() > 16);
+            quint16* lenPtr = (quint16*) (m_owner->getSendBuffer().data() + 2);
+            *lenPtr = htons(m_owner->getSendBuffer().size() - 4);
+            m_owner->sendBuffer();
+            m_sequence[rtpTcpChannel]++;
+        }
+    }
+    m_owner->clearBuffer();
+
 
     //m_owner->sendCurrentRangeIfUpdated();
     QByteArray newRange = m_owner->getRangeHeaderIfChanged().toUtf8();
     if (!newRange.isEmpty())
     {
-        sendLen = newRange.size();
+        int sendLen = newRange.size();
         int metadataTcpChannel = m_owner->getMetadataTcpChannel();
         if (metadataTcpChannel >= 0) {
             buildRtspTcpHeader(metadataTcpChannel, METADATA_SSRC, sendLen, 0, qnSyncTime->currentMSecsSinceEpoch(), RTP_METADATA_CODE);
             m_owner->bufferData(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
             m_owner->bufferData(newRange);
             m_owner->sendBuffer();
+            m_sequence[metadataTcpChannel]++;
             m_owner->clearBuffer();
         }
     }
