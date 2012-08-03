@@ -246,8 +246,8 @@ QString PlDlinkStreamReader::composeVideoProfile()
     else
     {
         t << "qualitymode=Fixquality" << "&";
-
-        int q = 60;
+        
+        int q;
         switch (getQuality())
         {
         case QnQualityHighest:
@@ -269,9 +269,13 @@ QString PlDlinkStreamReader::composeVideoProfile()
         case QnQualityLowest:
             q = 40;
             break;
-        }
 
-        t << "quality=" << 1;
+        default:
+            q = 60;
+            break;
+        }
+        
+        t << "quality=" << q;
     }
 
     t.flush();
