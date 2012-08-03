@@ -47,7 +47,7 @@ void ff_read_frame_flush(AVFormatContext *s)
         //    st->parser = NULL;
         // }
         st->last_IP_pts = AV_NOPTS_VALUE;
-        if(st->first_dts == AV_NOPTS_VALUE) st->cur_dts = RELATIVE_TS_BASE;
+        if(st->first_dts == qint64(AV_NOPTS_VALUE)) st->cur_dts = RELATIVE_TS_BASE;
         else                                st->cur_dts = AV_NOPTS_VALUE; /* we set the current DTS to an unspecified origin */
         st->reference_dts = AV_NOPTS_VALUE;
 

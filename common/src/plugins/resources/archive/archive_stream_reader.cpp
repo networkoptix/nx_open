@@ -201,7 +201,7 @@ bool QnArchiveStreamReader::init()
     m_jumpMtx.lock();
     qint64 requiredJumpTime = m_requiredJumpTime;
     m_jumpMtx.unlock();
-    if (requiredJumpTime != AV_NOPTS_VALUE) 
+    if (requiredJumpTime != qint64(AV_NOPTS_VALUE)) 
     {
         while (1)
         {
@@ -252,13 +252,13 @@ qint64 QnArchiveStreamReader::determineDisplayTime(bool reverseMode)
     }
 
     if (timeSource) {
-        if (rez != AV_NOPTS_VALUE)
+        if (rez != qint64(AV_NOPTS_VALUE))
             rez = qMax(rez, timeSource->getExternalTime());
         else
             rez = timeSource->getExternalTime();
     }
 
-    if(rez == AV_NOPTS_VALUE) 
+    if(rez == qint64(AV_NOPTS_VALUE)) 
     {
         if (reverseMode)
             return m_delegate->endTime();
@@ -309,7 +309,7 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::getNextData()
     //=================
     {
         QMutexLocker mutex(&m_jumpMtx);
-        while (m_singleShot && m_skipFramesToTime == 0 && m_singleQuantProcessed && m_requiredJumpTime == AV_NOPTS_VALUE && !m_needStop)
+        while (m_singleShot && m_skipFramesToTime == 0 && m_singleQuantProcessed && m_requiredJumpTime == qint64(AV_NOPTS_VALUE) && !m_needStop)
             m_singleShowWaitCond.wait(&m_jumpMtx);
         //QnLongRunnable::pause();
     }
@@ -360,10 +360,10 @@ begin_label:
     {
         // !m_delegate->isRealTimeSource()
         bool needSeek = m_delegate->setQuality(quality, qualityFastSwitch);
-        if (needSeek && jumpTime == AV_NOPTS_VALUE && reverseMode == m_prevReverseMode)
+        if (needSeek && jumpTime == qint64(AV_NOPTS_VALUE) && reverseMode == m_prevReverseMode)
         {
             qint64 displayTime = determineDisplayTime(reverseMode);
-            if (displayTime != AV_NOPTS_VALUE) {
+            if (displayTime != qint64(AV_NOPTS_VALUE)) {
                 beforeJumpInternal(displayTime);
                 if (!exactJumpToSpecifiedFrame && channelCount > 1)
                     setNeedKeyData();
@@ -378,7 +378,7 @@ begin_label:
 
 
     // jump command
-    if (jumpTime != AV_NOPTS_VALUE && reverseMode == m_prevReverseMode) // if reverse mode is changing, ignore seek, because of reverseMode generate seek operation
+    if (jumpTime != qint64(AV_NOPTS_VALUE) && reverseMode == m_prevReverseMode) // if reverse mode is changing, ignore seek, because of reverseMode generate seek operation
     {
         /*
         if (m_newDataMarker) {
@@ -405,8 +405,8 @@ begin_label:
     {
         m_bofReached = false;
         qint64 displayTime = currentTimeHint;
-        if (currentTimeHint == AV_NOPTS_VALUE)
-            displayTime = jumpTime !=  AV_NOPTS_VALUE ? jumpTime : determineDisplayTime(reverseMode);
+        if (currentTimeHint == qint64(AV_NOPTS_VALUE))
+            displayTime = jumpTime != qint64(AV_NOPTS_VALUE) ? jumpTime : determineDisplayTime(reverseMode);
 
         m_delegate->onReverseMode(displayTime, reverseMode);
         m_prevReverseMode = reverseMode;
@@ -424,7 +424,7 @@ begin_label:
         m_lastGopSeekTime = -1;
         m_BOF = true;
         m_afterBOFCounter = 0;
-        if (jumpTime != AV_NOPTS_VALUE)
+        if (jumpTime != qint64(AV_NOPTS_VALUE))
             emit jumpOccured(displayTime);
     }
     m_dataMarker = m_newDataMarker;
@@ -438,7 +438,7 @@ begin_label:
     }
     */
 
-    if (m_delegate->startTime() == AV_NOPTS_VALUE)
+    if (m_delegate->startTime() == qint64(AV_NOPTS_VALUE))
         return createEmptyPacket(reverseMode); // no data at archive
 
     QnCompressedVideoDataPtr videoData;
@@ -460,7 +460,7 @@ begin_label:
 
     videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(m_currentData);
 
-    if (m_currentData->timestamp != AV_NOPTS_VALUE) {
+    if (m_currentData->timestamp != qint64(AV_NOPTS_VALUE)) {
         setCurrentTime(m_currentData->timestamp);
     }
 
@@ -874,7 +874,7 @@ void QnArchiveStreamReader::channeljumpToUnsync(qint64 mksec, int /*channel*/, q
 
 void QnArchiveStreamReader::directJumpToNonKeyFrame(qint64 mksec)
 {
-    if (mksec == AV_NOPTS_VALUE)
+    if (mksec == qint64(AV_NOPTS_VALUE))
         return;
 
     if (m_navDelegate) {
@@ -946,7 +946,7 @@ bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
 
 void QnArchiveStreamReader::beforeJumpInternal(qint64 mksec)
 {
-    if (m_requiredJumpTime != AV_NOPTS_VALUE)
+    if (m_requiredJumpTime != qint64(AV_NOPTS_VALUE))
         emit jumpCanceled(m_requiredJumpTime);
     emit beforeJump(mksec);
     m_delegate->beforeSeek(mksec);

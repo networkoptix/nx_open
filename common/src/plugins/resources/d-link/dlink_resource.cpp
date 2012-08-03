@@ -416,7 +416,7 @@ void QnPlDlinkResource::setMotionMaskPhysical(int channel)
     QTextStream stream(&str);
     stream << "config/motion.cgi?enable=yes&motioncvalue=" << sensitivity << "&mbmask=";
 
-    for (int i = 0; i < sizeof(outData); ++i)
+    for (uint i = 0; i < sizeof(outData); ++i)
     {
         QString t = QString::number(outData[i], 16).toUpper();
         if (t.length() < 2)

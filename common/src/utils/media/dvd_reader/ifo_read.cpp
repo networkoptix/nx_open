@@ -957,7 +957,7 @@ int ifoRead_TT_SRPT(ifo_handle_t *ifofile) {
   CHECK_ZERO(tt_srpt->zero_1);
   CHECK_VALUE(tt_srpt->nr_of_srpts != 0);
   CHECK_VALUE(tt_srpt->nr_of_srpts < 100); // ??
-  CHECK_VALUE(tt_srpt->nr_of_srpts * sizeof(title_info_t) <= info_length);
+  CHECK_VALUE(tt_srpt->nr_of_srpts * sizeof(title_info_t) <= (uint)info_length);
   
   for(i = 0; i < tt_srpt->nr_of_srpts; i++) {
     CHECK_VALUE(tt_srpt->title[i].pb_ty.zero_1 == 0);
@@ -1499,7 +1499,7 @@ int ifoRead_C_ADT(ifo_handle_t *ifofile) {
 
 static int ifoRead_C_ADT_internal(ifo_handle_t *ifofile, 
                                   c_adt_t *c_adt, unsigned int sector) {
-  int i, info_length;
+  int info_length;
 
   if(!DVDFileSeek_(ifofile->file, sector * DVD_BLOCK_LEN))
     return 0;
@@ -1538,7 +1538,7 @@ static int ifoRead_C_ADT_internal(ifo_handle_t *ifofile,
     return 0;
   }
 
-  for(i = 0; i < info_length/sizeof(cell_adr_t); i++) {
+  for(uint i = 0; i < info_length/sizeof(cell_adr_t); i++) {
     B2N_16(c_adt->cell_adr_table[i].vob_id);
     B2N_32(c_adt->cell_adr_table[i].start_sector);
     B2N_32(c_adt->cell_adr_table[i].last_sector);

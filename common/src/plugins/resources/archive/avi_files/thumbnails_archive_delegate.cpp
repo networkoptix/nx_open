@@ -65,7 +65,7 @@ QnResourceAudioLayout* QnThumbnailsArchiveDelegate::getAudioLayout()
 
 QnAbstractMediaDataPtr QnThumbnailsArchiveDelegate::getNextData()
 {
-    if (m_rangeStart == AV_NOPTS_VALUE)
+    if (m_rangeStart == qint64(AV_NOPTS_VALUE))
         return QnAbstractMediaDataPtr();
 
     if (m_lastMediaTime > m_rangeEnd || m_currentPos == DATETIME_NOW || m_rangeStart == DATETIME_NOW)

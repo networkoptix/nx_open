@@ -318,7 +318,7 @@ QStringList PlDlinkStreamReader::getRTPurls() const
 QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMPEG(CodecID ci)
 {
     char headerBuffer[sizeof(ACS_VideoHeader)];
-    int gotInBuffer = 0;
+    uint gotInBuffer = 0;
     while (gotInBuffer < sizeof(ACS_VideoHeader))
     {
         int readed = mHttpClient->read(headerBuffer + gotInBuffer, sizeof(ACS_VideoHeader) - gotInBuffer);
@@ -373,7 +373,7 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMPEG(CodecID ci)
 QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMJPEG()
 {
     char headerBuffer[512+1];
-    int headerSize = 0;
+    uint headerSize = 0;
     char* headerBufferEnd = 0;
     char* realHeaderEnd = 0;
     while (headerSize < sizeof(headerBuffer)-1)

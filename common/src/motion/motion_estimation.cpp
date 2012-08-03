@@ -888,7 +888,7 @@ void QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
 
     if (!m_decoder->decode(videoData, m_frames[idx]))
         return;
-    if (m_firstFrameTime == AV_NOPTS_VALUE)
+    if (m_firstFrameTime == qint64(AV_NOPTS_VALUE))
         m_firstFrameTime = m_frames[idx]->pkt_dts;
     m_lastFrameTime = m_frames[idx]->pkt_dts;
 

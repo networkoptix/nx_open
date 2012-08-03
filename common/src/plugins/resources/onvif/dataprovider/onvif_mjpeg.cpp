@@ -86,7 +86,7 @@ QnAbstractMediaDataPtr MJPEGtreamreader::getNextData()
         return QnAbstractMediaDataPtr(0);
 
     char headerBuffer[512+1];
-    int headerSize = 0;
+    uint headerSize = 0;
     char* headerBufferEnd = 0;
     char* realHeaderEnd = 0;
     int readed;

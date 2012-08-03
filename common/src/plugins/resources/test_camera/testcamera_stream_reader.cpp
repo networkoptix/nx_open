@@ -42,7 +42,7 @@ QnAbstractMediaDataPtr QnTestCameraStreamReader::getNextData()
 
     quint8 header[6];
 
-    int readed = receiveData(header, sizeof(header));
+    quint32 readed = receiveData(header, sizeof(header));
     if (readed != sizeof(header)) {
         closeStream();
         return QnAbstractMediaDataPtr();
@@ -63,7 +63,7 @@ QnAbstractMediaDataPtr QnTestCameraStreamReader::getNextData()
     if (isCodecContext)
     {
         quint8* ctxData = new quint8[size];
-        int readed = receiveData(ctxData, size);
+        quint32 readed = receiveData(ctxData, size);
 
         if (readed == size)
         {

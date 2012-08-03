@@ -60,7 +60,7 @@ void CLH264RtpParser::setSDPInfo(QList<QByteArray> lines)
                 continue;
 
             QList<QByteArray> fmpParam = lines[i].left(valueIndex).split(':'); //values[0].split(':');
-            if (fmpParam.size() < 2 || fmpParam[1].toUInt() != m_rtpChannel)
+            if (fmpParam.size() < 2 || fmpParam[1].toUInt() != (uint)m_rtpChannel)
                 continue;
             //if (values.size() < 2)
             //    continue;
@@ -179,7 +179,7 @@ bool CLH264RtpParser::clearInternalBuffer()
     m_videoBuffer.clear();
     m_keyDataExists = m_builtinPpsFound = m_builtinSpsFound = false;
     m_frameExists = false;
-    m_packetPerNal = INT_MIN;
+    m_packetPerNal = 0;
     return false;
 }
 
@@ -209,7 +209,7 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStati
 
     
     bool packetLostDetected = m_prevSequenceNum != -1 && quint16(m_prevSequenceNum) != quint16(sequenceNum-1);
-    if (m_videoBuffer.size() > MAX_ALLOWED_FRAME_SIZE)
+    if (m_videoBuffer.size() > (uint)MAX_ALLOWED_FRAME_SIZE)
     {
         qWarning() << "Too large RTP/H.264 frame. Truncate video buffer";
         clearInternalBuffer();
