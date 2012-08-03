@@ -332,7 +332,7 @@ bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, CLVideoDe
     // 2) The end of the input buffer buf should be set to 0 to ensure that
     // no overreading happens for damaged MPEG streams.
 
-    // 1 is already guaranteed by CLByteArray, let's apply 2 here...
+    // 1 is already guaranteed by QnByteArray, let's apply 2 here...
     if (avpkt.data)
         memset(avpkt.data + avpkt.size, 0, FF_INPUT_BUFFER_PADDING_SIZE);
 

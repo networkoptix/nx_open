@@ -6,6 +6,7 @@
 #include "utils/common/longrunnable.h"
 #include "utils/network/socket.h"
 #include "utils/common/pimpl.h"
+#include "utils/common/bytearray.h"
 
 class QnTcpListener;
 
@@ -30,6 +31,7 @@ protected:
     void sendData(const char* data, int size);
     inline void sendData(const QByteArray& data) { sendData(data.constData(), data.size()); }
 
+    QnByteArray& getSendBuffer();
     void bufferData(const char* data, int size);
     inline void bufferData(const QByteArray& data) { bufferData(data.constData(), data.size()); }
     void sendBuffer();

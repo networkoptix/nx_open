@@ -12,7 +12,6 @@
 #include <QtGui/QStyle>
 #include <QtGui/QApplication>
 #include <QtGui/QMenu>
-#include <QtGui/QCalendarWidget>
 
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
@@ -54,6 +53,7 @@
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
 #include <ui/actions/action_parameter_types.h>
+#include <ui/widgets/calendar_widget.h>
 #include <ui/widgets/resource_tree_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/widgets/help_widget.h>
