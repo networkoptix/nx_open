@@ -81,7 +81,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
     bool resolutionFULL;
     int streamID;
 
-    int bitrate;
+    int bitrate = 0;
 
     bool h264 =  isH264();
 
@@ -210,7 +210,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
     QnByteArray& img = m_videoFrameBuff;
 
     //==========================================
-    int expectable_header_size;
+    int expectable_header_size = 0;
     if (h264)
     {
         // 0) in tftp mode cam do not send image header, we need to form it.

@@ -366,7 +366,8 @@ bool QnAviArchiveDelegate::findStreams()
             m_duration = m_formatContext->duration;
             if (m_formatContext->start_time != qint64(AV_NOPTS_VALUE))
                 m_startMksec = m_formatContext->start_time;
-            if ((m_startMksec == 0 || m_startMksec == AV_NOPTS_VALUE) && m_formatContext->streams > 0 && m_formatContext->streams[0]->first_dts != AV_NOPTS_VALUE)
+            if ((m_startMksec == 0 || m_startMksec == qint64(AV_NOPTS_VALUE)) &&
+                m_formatContext->streams > 0 && m_formatContext->streams[0]->first_dts != qint64(AV_NOPTS_VALUE))
             {
                 AVStream* stream = m_formatContext->streams[0];
                 double timeBase = av_q2d(stream->time_base) * 1000000;

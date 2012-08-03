@@ -189,5 +189,6 @@ QnResourcePtr QnPlArecontResourceSearcher::createResource(QnId resourceTypeId, c
 
 QnResourcePtr QnPlArecontResourceSearcher::checkHostAddr(QHostAddress addr)
 {
+    Q_UNUSED(addr)
     return QnResourcePtr(0);
 }

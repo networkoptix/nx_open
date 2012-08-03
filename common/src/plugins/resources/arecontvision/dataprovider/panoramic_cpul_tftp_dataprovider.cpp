@@ -131,8 +131,6 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 
     QByteArray request;
 
-    unsigned int forecast_size = 0;
-
     bool h264;
     int streamID = 0;
 
@@ -173,7 +171,7 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 
     }
 
-    forecast_size = (width*height)/2; // 0.5 meg per megapixel as maximum
+    //unsigned int forecast_size = (width*height)/2; // 0.5 meg per megapixel as maximum
 
     QnPlAreconVisionResourcePtr netRes = getResource().dynamicCast<QnPlAreconVisionResource>();
     if (m_tftp_client == 0 || m_tftp_client->getHostAddress() != netRes->getHostAddress()) {
@@ -185,7 +183,7 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
     QnByteArray& img = m_videoFrameBuff;
 
     //==========================================
-    int expectable_header_size;
+    int expectable_header_size = 0;
     if (h264)
     {
         // 0) in tftp mode cam do not send image header, we need to form it.
@@ -323,7 +321,7 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
             img.ignore_first_bytes(expectable_header_size); // if you decoder needs compressed data alignment, just do not do it. ffmpeg will delay one frame if do not do it.
             dst+=expectable_header_size;
         }
-        /**/
+        */
 
         // we also need to put very begining of SH
         dst[0] = dst[1] = dst[2] = 0; dst[3] = 1;
