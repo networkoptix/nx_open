@@ -1,0 +1,142 @@
+<cameras>
+
+  <camera name = "ONVIF"
+          description = "">
+
+    <group name = "Imaging"
+           description ="">
+
+      <param name = "Brightness"
+               description = ""
+               widget_type = "MinMaxStep"
+               query = ""/>
+
+      <param name = "Color Saturation"
+               description = ""
+               widget_type = "MinMaxStep"
+               query = ""/>
+
+      <param name = "Contrast"
+               description = ""
+               widget_type = "MinMaxStep"
+               query = ""/>
+
+      <param name = "Ir Cut Filter Modes"
+               description = ""
+               widget_type = "Enumeration"
+               query = ""/>
+
+      <param name = "Sharpness"
+               description = ""
+               widget_type = "MinMaxStep"
+               query = ""/>
+
+      <group name = "Backlight Compensation"
+             description ="">
+        <param name = "Mode"
+               description = ""
+               widget_type = "OnOff"
+               query = ""/>
+        <param name = "Level"
+               description = ""
+               widget_type = "MinMaxStep"
+               query = ""/>
+      </group>
+
+      <group name = "Wide Dynamic Range"
+             description ="">
+        <param name = "Mode"
+               description = ""
+               widget_type = "OnOff"
+               query = ""/>
+        <param name = "Level"
+               description = ""
+               widget_type = "MinMaxStep"
+               query = ""/>
+      </group>
+
+      <group name = "White Balance"
+             description ="">
+        <param name = "Mode"
+               description = ""
+               widget_type = "Enumeration"
+               query = ""/>
+        <param name = "Yr Gain"
+               description = ""
+               widget_type = "MinMaxStep"
+               query = ""/>
+        <param name = "Yb Gain"
+               description = ""
+               widget_type = "MinMaxStep"
+               query = ""/>
+      </group>
+
+      <group name = "Exposure"
+             description ="">
+        <param name = "Mode"
+               description = ""
+               widget_type = "Enumeration"
+               query = ""/>
+        <param name = "Priority"
+               description = ""
+               widget_type = "Enumeration"
+               query = ""/>
+        <param name = "Min Exposure Time"
+               description = ""
+               widget_type = "MinMaxStep"
+               query = ""/>
+        <param name = "Max Exposure Time"
+               description = ""
+               widget_type = "MinMaxStep"
+               query = ""/>
+        <param name = "Min Gain"
+               description = ""
+               widget_type = "MinMaxStep"
+               query = ""/>
+        <param name = "Max Gain"
+               description = ""
+               widget_type = "MinMaxStep"
+               query = ""/>
+        <param name = "Min Iris"
+               description = ""
+               widget_type = "MinMaxStep"
+               query = ""/>
+        <param name = "Max Iris"
+               description = ""
+               widget_type = "MinMaxStep"
+               query = ""/>
+        <param name = "Exposure Time"
+               description = ""
+               widget_type = "MinMaxStep"
+               query = ""/>
+        <param name = "Gain"
+               description = ""
+               widget_type = "MinMaxStep"
+               query = ""/>
+        <param name = "Iris"
+               description = ""
+               widget_type = "MinMaxStep"
+               query = ""/>
+      </group>
+
+    </group>
+
+    <group name = "Maintenance"
+         description ="">
+      <param name = "System Reboot"
+             description = ""
+             widget_type = "Button"
+             query = ""/>
+      <param name = "Soft System Factory Default"
+             description = ""
+             widget_type = "Button"
+             query = ""/>
+      <param name = "Hard System Factory Default"
+             description = ""
+             widget_type = "Button"
+             query = ""/>
+    </group>
+
+  </camera>
+
+</cameras>

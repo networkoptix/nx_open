@@ -4,6 +4,8 @@
 #include <QtGui/QWidget>
 #include <core/resource/resource_fwd.h>
 #include "camera_settings_tab.h"
+#include "camera_setting_widget.h"
+
 
 namespace Ui {
     class SingleCameraSettingsWidget;
@@ -83,6 +85,12 @@ private:
     void disconnectFromMotionWidget();
     void connectToMotionWidget();
 
+    void loadSettingsFromXml();
+    bool loadSettingsFromXml(const QString& filepath, QString& error);
+    bool parseCameraXml(const QDomElement &cameraXml, QString& error);
+    bool parseGroupXml(const QDomElement &elementXml, const QString parentId, QString& error);
+    bool parseElementXml(const QDomElement &elementXml, const QString parentId, QString& error);
+
 private:
     Q_DISABLE_COPY(QnSingleCameraSettingsWidget);
 
@@ -98,6 +106,9 @@ private:
     QnCameraMotionMaskWidget *m_motionWidget;
     QVBoxLayout *m_motionLayout;
     bool m_inUpdateMaxFps;
+
+    CameraSettings m_cameraSettings;
+    WidgetsById m_widgetsById;
 };
 
 #endif // CAMERA_SETTINGS_DIALOG_H
