@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include <QScopedPointer>
-#include <help/qncontext_help.h>
+#include <help/context_help.h>
 
 namespace Ui {
     class HelpWidget;

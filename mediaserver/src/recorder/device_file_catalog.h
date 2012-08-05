@@ -18,9 +18,9 @@ signals:
 public:
     struct Chunk
     {
-        Chunk(): startTimeMs(-1), storageIndex(0), fileIndex(0), durationMs(0) {}
+        Chunk(): startTimeMs(-1), durationMs(0), storageIndex(0), fileIndex(0) {}
         Chunk(qint64 _startTime, int _storageIndex, int _fileIndex, int _duration) : 
-            startTimeMs(_startTime), storageIndex(_storageIndex), fileIndex(_fileIndex), durationMs(_duration) 
+            startTimeMs(_startTime), durationMs(_duration), storageIndex(_storageIndex), fileIndex(_fileIndex)
         {
             Q_ASSERT_X(startTimeMs == -1 || startTimeMs > 0, Q_FUNC_INFO, "Invalid startTime value");
         }

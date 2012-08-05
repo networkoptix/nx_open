@@ -9,12 +9,12 @@
 	<parent>
 		<artifactId>hdwitness</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>1.2.0</version>
+		<version>1.2.2</version>
 		<relativePath>..</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>1.2.0</version>
+	<version>1.2.2</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>debsetup</artifactId>
 	<packaging>pom</packaging>
@@ -153,6 +153,7 @@
 										<include>debian/**</include>
 										<include>init/**</include>
 										<include>init.d/**</include>
+										<include>usr/**</include>
 									</includes>
 								</resource>		
 							</resources>              

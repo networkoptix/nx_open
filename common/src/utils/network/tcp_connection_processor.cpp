@@ -130,6 +130,12 @@ void QnTCPConnectionProcessor::bufferData(const char* data, int size)
     d->sendBuffer.write(data, size);
 }
 
+QnByteArray& QnTCPConnectionProcessor::getSendBuffer()
+{
+    Q_D(QnTCPConnectionProcessor);
+    return d->sendBuffer;
+}
+
 void QnTCPConnectionProcessor::sendBuffer()
 {
     Q_D(QnTCPConnectionProcessor);
@@ -220,7 +226,7 @@ void QnTCPConnectionProcessor::pleaseStop()
     Q_D(QnTCPConnectionProcessor);
     if (d->socket)
         d->socket->close();
-    CLLongRunnable::pleaseStop();
+    QnLongRunnable::pleaseStop();
 }
 
 int QnTCPConnectionProcessor::getSocketTimeout()

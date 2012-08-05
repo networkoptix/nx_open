@@ -1,19 +1,20 @@
 #include "dw_dvr_resource_searcher.h"
-#include "core/resource/camera_resource.h"
+
+#include <core/resource/camera_resource.h>
+
 #include "dw_dvr_resource.h"
 
 #ifdef Q_OS_WIN
+#   include <ActiveQt/QAxObject>
 #   include "OpnDVRLib.h"
 #endif
+
 
 static const int CONNECTION_TIMEOUT = 2000*1000;
 
 DwDvrResourceSearcher::DwDvrResourceSearcher()
 {
-#ifdef Q_OS_WIN
-    bool isInitialized = DVRInitLibrary(false);
-    isInitialized = isInitialized;
-#endif
+    //bool isInitialized = DVRInitLibrary(false);
 }
 
 DwDvrResourceSearcher::~DwDvrResourceSearcher()
@@ -68,27 +69,38 @@ QString DwDvrResourceSearcher::manufacture() const
 QnResourceList DwDvrResourceSearcher::findResources()
 {
     QnResourceList result;
-    getCamerasFromDvr(result, QLatin1String("10.10.10.55"), 2000, QLatin1String("user1"), QLatin1String("123"));
+    getCamerasFromDvr(result, QLatin1String("10.10.10.53"), 9000, QLatin1String("admin"), QLatin1String(""));
     return result;
 }
 
 void DwDvrResourceSearcher::getCamerasFromDvr(QnResourceList& resources, const QString& host, int port, const QString& login, const QString& password)
 {
-    Q_UNUSED(resources)
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_WIN
+    static CLSID const clsid
+        = { 0x67815DA3, 0xEC08, 0x41E0, { 0xAE, 0x60, 0x92, 0xE5, 0x93, 0x5E, 0xE8, 0xFB } };
+
+    QAxObject object(QLatin1String("{67815DA3-EC08-41E0-AE60-92E5935EE8FB}"));
+    QVariant res = object.dynamicCall("connect(QString&, quint16, QString&, QString&, int)", host, port, login, password, 65535);
+    res = res;
+
+
+
+    /*
+    bool isInitialized = DVRInitLibrary(false);
+
     HANDLE dvrHandle = DVROpenConnection();
     if (dvrHandle == 0)
         return;
 
     DVRSetInstallCode(dvrHandle, -1, 0);
 
-    /*LPCSTR hostStr = (LPCSTR) host.data();
-    DVRRESULT result =*/
-    DVRConnectSite(dvrHandle, host.toUtf8(), port, login.toUtf8(), password.toUtf8(), CONNECTION_TIMEOUT);
-    /*switch (result)
+    LPCSTR hostStr =  (LPCSTR) host.data();
+    DVRRESULT result = DVRConnectSite(dvrHandle, host.toUtf8(), port, login.toUtf8(), password.toUtf8(), CONNECTION_TIMEOUT);
+    switch (result)
     {
 
-    }*/
+    }
+    */
 #endif
 }
 

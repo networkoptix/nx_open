@@ -21,10 +21,10 @@ struct SwsContext;
 
 
 
-class QnThumbnailsLoader: public CLLongRunnable {
+class QnThumbnailsLoader: public QnLongRunnable {
     Q_OBJECT;
 
-    typedef CLLongRunnable base_type;
+    typedef QnLongRunnable base_type;
 
 public:
     QnThumbnailsLoader(QnResourcePtr resource);

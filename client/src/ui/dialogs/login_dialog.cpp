@@ -265,10 +265,8 @@ void LoginDialog::updateUsability() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void LoginDialog::at_oldHttpConnectFinished(int status, QByteArray errorString, QByteArray data, int handle) {
-    Q_UNUSED(handle);
-
-    if (status == 204)     {
+void LoginDialog::at_oldHttpConnectFinished(int status, QByteArray /*errorString*/, QByteArray /*data*/, int /*handle*/) {
+    if (status == 204) {
         m_requestHandle = -1;
 
         updateUsability();

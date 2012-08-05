@@ -11,7 +11,7 @@
 #include <core/resource/security_cam_resource.h>
 
 #include <camera/resource_display.h>
-#include <camera/camdisplay.h>
+#include <camera/cam_display.h>
 
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/generic/image_button_widget.h>

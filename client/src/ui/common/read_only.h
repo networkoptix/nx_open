@@ -6,4 +6,4 @@ class QWidget;
 void setReadOnly(QWidget *widget, bool readOnly);
 bool isReadOnly(const QWidget *widget);
 
-#endif QN_READ_ONLY_H
+#endif // QN_READ_ONLY_H

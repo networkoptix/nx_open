@@ -19,7 +19,7 @@
 #include <camera/caching_time_period_loader.h>
 #include <camera/time_period_loader.h>
 #include <camera/resource_display.h>
-#include <camera/camera.h>
+#include <camera/video_camera.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameter_types.h>
@@ -28,6 +28,7 @@
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/graphics/items/controls/time_scroll_bar.h>
 #include <ui/graphics/instruments/signaling_instrument.h>
+#include <ui/widgets/calendar_widget.h>
 
 #include "workbench.h"
 #include "workbench_display.h"
@@ -48,6 +49,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_centralWidget(NULL),
     m_currentWidget(NULL),
     m_currentMediaWidget(NULL),
+    m_calendar(NULL),
     m_updatingSliderFromReader(false),
     m_updatingSliderFromScrollBar(false),
     m_updatingScrollBarFromSlider(false),
@@ -125,8 +127,33 @@ void QnWorkbenchNavigator::setTimeScrollBar(QnTimeScrollBar *scrollBar) {
     }
 }
 
+QnCalendarWidget *QnWorkbenchNavigator::calendar() const{
+    return m_calendar;
+}
+
+void QnWorkbenchNavigator::setCalendar(QnCalendarWidget *calendar){
+    if(m_calendar == calendar)
+        return;
+
+    if(m_calendar) {
+        disconnect(m_calendar, NULL, this, NULL);
+
+        if(isValid())
+            deinitialize();
+    }
+
+    m_calendar = calendar;
+
+    if(m_calendar) {
+        connect(m_calendar, SIGNAL(destroyed()), this, SLOT(at_calendar_destroyed()));
+
+        if(isValid())
+            initialize();
+    }
+}
+
 bool QnWorkbenchNavigator::isValid() {
-    return m_timeSlider && m_timeScrollBar;
+    return m_timeSlider && m_timeScrollBar && m_calendar;
 }
 
 void QnWorkbenchNavigator::initialize() {
@@ -162,6 +189,8 @@ void QnWorkbenchNavigator::initialize() {
     connect(m_timeScrollBar,                    SIGNAL(sliderPressed()),                            this,   SLOT(at_timeScrollBar_sliderPressed()));
     connect(m_timeScrollBar,                    SIGNAL(sliderReleased()),                           this,   SLOT(at_timeScrollBar_sliderReleased()));
     m_timeScrollBar->installEventFilter(this);
+
+    connect(m_calendar,                         SIGNAL(selectionChanged()),                         this,   SLOT(at_calendar_selectionChanged()));
 
     updateLines();
     updateScrollBarFromSlider();
@@ -251,7 +280,7 @@ bool QnWorkbenchNavigator::setPlaying(bool playing) {
     m_pausedOverride = false;
 
     QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader();
-    CLCamDisplay *camDisplay = m_currentMediaWidget->display()->camDisplay();
+    QnCamDisplay *camDisplay = m_currentMediaWidget->display()->camDisplay();
     if(playing) {
         if (reader->isRealTimeSource()) {
             /* Media was paused while on live. Jump to archive when resumed. */
@@ -655,6 +684,8 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
     qint64 startTimeMSec = startTimeUSec == DATETIME_NOW ? endTimeMSec - 10000 : (startTimeUSec == AV_NOPTS_VALUE ? m_timeSlider->minimum() : startTimeUSec / 1000); 
 
     m_timeSlider->setRange(startTimeMSec, endTimeMSec);
+    m_calendar->setDateRange(QDateTime::fromMSecsSinceEpoch(startTimeMSec).date(),
+        QDateTime::fromMSecsSinceEpoch(endTimeMSec).date());
 
     if(!m_pausedOverride) {
         qint64 timeUSec = m_currentMediaWidget->display()->camDisplay()->isRealTimeSource() ? DATETIME_NOW : m_currentMediaWidget->display()->camera()->getCurrentTime();
@@ -721,6 +752,7 @@ void QnWorkbenchNavigator::updateCurrentPeriods(Qn::TimePeriodRole type) {
     }
 
     m_timeSlider->setTimePeriods(CurrentLine, type, periods);
+    m_calendar->setCurrentTimePeriods(type, periods);
 }
 
 void QnWorkbenchNavigator::updateSyncedPeriods() {
@@ -749,6 +781,7 @@ void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodRole type) {
     }
 
     m_timeSlider->setTimePeriods(SyncedLine, type, periods);
+    m_calendar->setSyncedTimePeriods(type, periods);
 }
 
 void QnWorkbenchNavigator::updateLines() {
@@ -1125,6 +1158,10 @@ void QnWorkbenchNavigator::at_timeScrollBar_destroyed() {
     setTimeScrollBar(NULL);
 }
 
+void QnWorkbenchNavigator::at_calendar_destroyed() {
+    setCalendar(NULL);
+}
+
 void QnWorkbenchNavigator::at_timeScrollBar_sliderPressed() {
     m_timeSlider->setOption(QnTimeSlider::AdjustWindowToPosition, false);
 }
@@ -1133,4 +1170,13 @@ void QnWorkbenchNavigator::at_timeScrollBar_sliderReleased() {
     m_timeSlider->setOption(QnTimeSlider::AdjustWindowToPosition, true);
 }
 
+void QnWorkbenchNavigator::at_calendar_selectionChanged(){
+    QDateTime dt(m_calendar->selectedDate());
+    qint64 startMSec = dt.toMSecsSinceEpoch();
+    qint64 endMSec = dt.addDays(1).toMSecsSinceEpoch();
+    m_timeSlider->finishAnimations();
+    m_timeSlider->setWindow(startMSec, endMSec);
+    // do not update value to avoid window scrolling if no data is recorded
+//  m_timeSlider->setValue(startMSec);
+}
 

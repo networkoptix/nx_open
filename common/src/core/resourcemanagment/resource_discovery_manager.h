@@ -13,7 +13,7 @@ class QnAbstractResourceSearcher;
 // this class just searches for new resources
 // it uses others plugins
 // it puts result into resource pool
-class QnResourceDiscoveryManager : public CLLongRunnable, public QnResourceFactory
+class QnResourceDiscoveryManager : public QnLongRunnable, public QnResourceFactory
 {
     Q_OBJECT;
 

@@ -33,9 +33,8 @@ private:
     QString m_name;
     QByteArray m_key;
     qint32 m_cameraCount;
-    QByteArray m_signature;
     QByteArray m_hardwareId;
-
+    QByteArray m_signature;
     mutable int m_validLicense;
 };
 

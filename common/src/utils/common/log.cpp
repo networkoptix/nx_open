@@ -7,7 +7,7 @@ const char *qn_logLevelNames[] = {"UNKNOWN", "ALWAYS", "ERROR", "WARNING", "INFO
 
 QnLogLevel QnLog::logLevelFromString(const QString &value) {
     QString str = value.toUpper().trimmed();
-    for (int i = 0; i < sizeof(qn_logLevelNames)/sizeof(char*); ++i) {
+    for (uint i = 0; i < sizeof(qn_logLevelNames)/sizeof(char*); ++i) {
         if (str == QLatin1String(qn_logLevelNames[i]))
             return QnLogLevel(i);
     }

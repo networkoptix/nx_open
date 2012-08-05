@@ -3,9 +3,9 @@
 
 #include <utils/common/cryptographic_hash.h>
 
-#include <camera/camdisplay.h>
+#include <camera/cam_display.h>
 
-class QnSignDialogDisplay: public CLCamDisplay
+class QnSignDialogDisplay: public QnCamDisplay
 {
     Q_OBJECT
 public:

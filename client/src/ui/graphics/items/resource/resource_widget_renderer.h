@@ -4,7 +4,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QMutex>
 
-#include <camera/abstractrenderer.h>
+#include <camera/abstract_renderer.h>
 #include <camera/render_status.h>
 
 class QThread;

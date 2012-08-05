@@ -114,10 +114,10 @@ private:
 
 QnAviArchiveDelegate::QnAviArchiveDelegate():
     m_formatContext(0),
-    m_videoLayout(0),
-    m_firstVideoIndex(0),
-    m_audioStreamIndex(-1),
     m_selectedAudioChannel(0),
+    m_audioStreamIndex(-1),
+    m_firstVideoIndex(0),
+    m_videoLayout(0),
     m_startTime(0),
     m_useAbsolutePos(true),
     m_duration(AV_NOPTS_VALUE),
@@ -149,7 +149,7 @@ qint64 QnAviArchiveDelegate::endTime()
 {
     //if (!m_streamsFound && !findStreams())
     //    return 0;
-    if (m_duration == AV_NOPTS_VALUE)
+    if (m_duration == qint64(AV_NOPTS_VALUE))
         return m_duration;
     else
         return m_duration + m_startTime;
@@ -364,9 +364,10 @@ bool QnAviArchiveDelegate::findStreams()
         if (m_streamsFound) 
         {
             m_duration = m_formatContext->duration;
-            if (m_formatContext->start_time != AV_NOPTS_VALUE)
+            if (m_formatContext->start_time != qint64(AV_NOPTS_VALUE))
                 m_startMksec = m_formatContext->start_time;
-            if ((m_startMksec == 0 || m_startMksec == AV_NOPTS_VALUE) && m_formatContext->streams > 0 && m_formatContext->streams[0]->first_dts != AV_NOPTS_VALUE)
+            if ((m_startMksec == 0 || m_startMksec == qint64(AV_NOPTS_VALUE)) &&
+                m_formatContext->streams > 0 && m_formatContext->streams[0]->first_dts != qint64(AV_NOPTS_VALUE))
             {
                 AVStream* stream = m_formatContext->streams[0];
                 double timeBase = av_q2d(stream->time_base) * 1000000;
@@ -428,10 +429,10 @@ qint64 QnAviArchiveDelegate::packetTimestamp(const AVPacket& packet)
     AVStream* stream = m_formatContext->streams[packet.stream_index];
     double timeBase = av_q2d(stream->time_base) * 1000000;
     qint64 firstDts = m_firstVideoIndex >= 0 ? m_formatContext->streams[m_firstVideoIndex]->first_dts : 0;
-    if (firstDts == AV_NOPTS_VALUE)
+    if (firstDts == qint64(AV_NOPTS_VALUE))
         firstDts = 0;
-    qint64 packetTime = packet.dts != AV_NOPTS_VALUE ? packet.dts : packet.pts;
-    if (packetTime == AV_NOPTS_VALUE)
+    qint64 packetTime = packet.dts != qint64(AV_NOPTS_VALUE) ? packet.dts : packet.pts;
+    if (packetTime == qint64(AV_NOPTS_VALUE))
         return AV_NOPTS_VALUE;
     return qMax(0ll, (qint64) (timeBase * (packetTime - firstDts))) +  m_startTime;
 }
@@ -466,7 +467,7 @@ AVCodecContext* QnAviArchiveDelegate::setAudioChannel(int num)
     // convert num to absolute track number
     m_audioStreamIndex = -1;
     int lastStreamID = -1;
-    unsigned currentAudioTrackNum = 0;
+    int currentAudioTrackNum = 0;
     for (unsigned i = 0; i < m_formatContext->nb_streams; i++)
     {
         AVStream *strm= m_formatContext->streams[i];

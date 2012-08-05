@@ -29,7 +29,7 @@
 #include <core/resourcemanagment/resource_pool.h>
 
 #include <camera/resource_display.h>
-#include <camera/camdisplay.h>
+#include <camera/cam_display.h>
 
 #include <ui/screen_recording/screen_recorder.h>
 #include <ui/style/globals.h>
@@ -80,7 +80,7 @@
 #include "workbench_context.h"
 #include "workbench.h"
 #include "workbench_display.h"
-#include "help/qncontext_help.h"
+#include "help/context_help.h"
 
 
 //#define QN_WORKBENCH_CONTROLLER_DEBUG

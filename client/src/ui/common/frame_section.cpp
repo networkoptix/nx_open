@@ -63,7 +63,7 @@ Qt::WindowFrameSection Qn::toQtFrameSection(Qn::WindowFrameSection section) {
 }
 
 namespace {
-    static const Qn::WindowFrameSection frameSectionTable[5][5] = {
+    const Qn::WindowFrameSection frameSectionTable[5][5] = {
         {Qn::NoSection, Qn::NoSection,          Qn::NoSection,      Qn::NoSection,          Qn::NoSection},
         {Qn::NoSection, Qn::TopLeftSection,     Qn::TopSection,     Qn::TopRightSection,    Qn::NoSection},
         {Qn::NoSection, Qn::LeftSection,        Qn::NoSection,      Qn::RightSection,       Qn::NoSection},
@@ -71,7 +71,8 @@ namespace {
         {Qn::NoSection, Qn::NoSection,          Qn::NoSection,      Qn::NoSection,          Qn::NoSection}
     };
 
-    inline int sweepIndex(qreal v, qreal v0, qreal v1, qreal v2, qreal v3) {
+    template<class T>
+    inline int sweepIndex(T v, T v0, T v1, T v2, T v3) {
         if(v < v1) {
             if(v < v0) {
                 return 0;
@@ -89,35 +90,47 @@ namespace {
         }
     }
 
+    template<class T, class Rect>
+    Qn::WindowFrameSections calculateRectangularFrameSectionsInternal(const Rect &frameRect, const Rect &rect, const Rect &query) {
+        /* Note that QRect::right & QRect::bottom return not what is expected (see Qt docs).
+         * This is why these methods are not used here. */
+
+        /* Shortcuts for position. */
+        T qx0 = query.left();
+        T qx1 = query.left() + query.width();
+        T qy0 = query.top();
+        T qy1 = query.top() + query.height();
+
+        /* Border shortcuts. */
+        T x0 = frameRect.left();
+        T x1 = rect.left();
+        T x2 = rect.left() + rect.width();
+        T x3 = frameRect.left() + frameRect.width();
+        T y0 = frameRect.top();
+        T y1 = rect.top();
+        T y2 = rect.top() + rect.height();
+        T y3 = frameRect.top() + frameRect.height();
+
+        int cl = qMax(1, sweepIndex<T>(qx0, x0, x1, x2, x3));
+        int ch = qMin(3, sweepIndex<T>(qx1, x0, x1, x2, x3));
+        int rl = qMax(1, sweepIndex<T>(qy0, y0, y1, y2, y3));
+        int rh = qMin(3, sweepIndex<T>(qy1, y0, y1, y2, y3));
+
+        Qn::WindowFrameSections result = Qn::NoSection;
+        for(int r = rl; r <= rh; r++)
+            for(int c = cl; c <= ch; c++)
+                result |= frameSectionTable[r][c];
+        return result;
+    }
+
 } // anonymous namespace
 
 Qn::WindowFrameSections Qn::calculateRectangularFrameSections(const QRectF &frameRect, const QRectF &rect, const QRectF &query) {
-    /* Shortcuts for position. */
-    qreal qx0 = query.left();
-    qreal qx1 = query.right();
-    qreal qy0 = query.top();
-    qreal qy1 = query.bottom();
+    return calculateRectangularFrameSectionsInternal<qreal, QRectF>(frameRect, rect, query);
+}
 
-    /* Border shortcuts. */
-    qreal x0 = frameRect.left();
-    qreal x1 = rect.left();
-    qreal x2 = rect.right();
-    qreal x3 = frameRect.right();
-    qreal y0 = frameRect.top();
-    qreal y1 = rect.top();
-    qreal y2 = rect.bottom();
-    qreal y3 = frameRect.bottom();
-
-    int cl = qMax(1, sweepIndex(qx0, x0, x1, x2, x3));
-    int ch = qMin(3, sweepIndex(qx1, x0, x1, x2, x3));
-    int rl = qMax(1, sweepIndex(qy0, y0, y1, y2, y3));
-    int rh = qMin(3, sweepIndex(qy1, y0, y1, y2, y3));
-
-    Qn::WindowFrameSections result = Qn::NoSection;
-    for(int r = rl; r <= rh; r++)
-        for(int c = cl; c <= ch; c++)
-            result |= frameSectionTable[r][c];
-    return result;
+Qn::WindowFrameSections Qn::calculateRectangularFrameSections(const QRect &frameRect, const QRect &rect, const QRect &query) {
+    return calculateRectangularFrameSectionsInternal<int, QRect>(frameRect, rect, query);
 }
 
 Qt::CursorShape Qn::calculateHoverCursorShape(Qt::WindowFrameSection section) {

@@ -29,8 +29,8 @@
 #include <plugins/storage/file_storage/layout_storage_resource.h>
 
 #include <camera/resource_display.h>
-#include <camera/camdisplay.h>
-#include <camera/camera.h>
+#include <camera/cam_display.h>
+#include <camera/video_camera.h>
 
 #include <recording/time_period_list.h>
 
@@ -1652,7 +1652,7 @@ Do you want to continue?"),
     exportProgressDialog->setMinimumDuration(1000);
     m_exportProgressDialog = exportProgressDialog;
 
-    m_layoutExportCamera = new CLVideoCamera(QnMediaResourcePtr(0)); // TODO: leaking memory here.
+    m_layoutExportCamera = new QnVideoCamera(QnMediaResourcePtr(0)); // TODO: leaking memory here.
     connect(exportProgressDialog,   SIGNAL(canceled()),                 m_layoutExportCamera,   SLOT(stopLayoutExport()));
     connect(exportProgressDialog,   SIGNAL(canceled()),                 exportProgressDialog,   SLOT(deleteLater()));
     connect(m_layoutExportCamera,   SIGNAL(exportProgress(int)),        exportProgressDialog,   SLOT(setValue(int)));
@@ -1728,7 +1728,7 @@ void QnWorkbenchActionHandler::at_cameraCamera_exportFailed(QString errorMessage
 {
     disconnect(sender(), NULL, this, NULL);
 
-    if(CLVideoCamera *camera = dynamic_cast<CLVideoCamera *>(sender()))
+    if(QnVideoCamera *camera = dynamic_cast<QnVideoCamera *>(sender()))
         camera->stopExport();
 
     QMessageBox::warning(widget(), tr("Could not export layout"), errorMessage, QMessageBox::Ok);
@@ -1843,7 +1843,7 @@ Do you want to continue?"),
     exportProgressDialog->setRange(0, 100);
     exportProgressDialog->setMinimumDuration(1000);
 
-    CLVideoCamera *camera = widget->display()->camera();
+    QnVideoCamera *camera = widget->display()->camera();
 
     connect(exportProgressDialog,   SIGNAL(canceled()),                 camera,                 SLOT(stopExport()));
     connect(exportProgressDialog,   SIGNAL(canceled()),                 exportProgressDialog,   SLOT(deleteLater()));
@@ -1870,7 +1870,7 @@ void QnWorkbenchActionHandler::at_camera_exportFinished(QString fileName) {
 void QnWorkbenchActionHandler::at_camera_exportFailed(QString errorMessage) {
     disconnect(sender(), NULL, this, NULL);
 
-    if(CLVideoCamera *camera = dynamic_cast<CLVideoCamera *>(sender()))
+    if(QnVideoCamera *camera = dynamic_cast<QnVideoCamera *>(sender()))
         camera->stopExport();
 
     QMessageBox::warning(widget(), tr("Could not export video"), errorMessage, QMessageBox::Ok);

@@ -16,6 +16,11 @@ public:
     QnAbstractMediaStreamDataProviderPtr getLiveReader(QnResource::ConnectionRole role);
     int copyLastGop(bool primaryLiveStream, qint64 skipTime, CLDataQueue& dstQueue);
 
+    //QnMediaContextPtr getVideoCodecContext(bool primaryLiveStream);
+    //QnMediaContextPtr getAudioCodecContext(bool primaryLiveStream);
+    QnCompressedVideoDataPtr getLastVideoFrame(bool primaryLiveStream);
+    QnCompressedAudioDataPtr getLastAudioFrame(bool primaryLiveStream);
+
     void beforeStop();
 
     bool isSomeActivity() const;
@@ -28,7 +33,6 @@ public:
 
     /* Unmark some camera activity (RTSP client connection for example) */
     void notInUse(void* user);
-
 private:
     void createReader(QnResource::ConnectionRole role);
 private:
@@ -41,6 +45,7 @@ private:
     QnVideoCameraGopKeeper* m_primaryGopKeeper;
     QnVideoCameraGopKeeper* m_secondaryGopKeeper;
     QSet<void*> m_cameraUsers;
+    QnCompressedAudioDataPtr m_lastAudioFrame;
 };
 
 #endif // __VIDEO_CAMERA_H__
