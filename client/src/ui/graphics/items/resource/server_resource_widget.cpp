@@ -17,6 +17,7 @@
 #include <ui/graphics/painters/radial_gradient_painter.h>
 
 /** How many points are shown on the screen simultaneously */
+// TODO: #GDM use more informative names please =). What kind of limit?
 #define LIMIT 60
 
 /** Data update period. For the best result should be equal to server's */
@@ -150,22 +151,21 @@ namespace {
     typedef QnGlContextData<QnRadialGradientPainter, QnBackgroundGradientPainterFactory> QnBackgroundGradientPainterStorage;
     Q_GLOBAL_STATIC(QnBackgroundGradientPainterStorage, qn_serverResourceWidget_backgroundGradientPainterStorage);
 
-    QnStatisticsHistoryData::QnStatisticsHistoryData(QString id, QString description):
-    Id(id),
-    Description(description){
-        for (int i = 0; i < LIMIT; i++)
-            History.append(0);
-    }
-
-    void QnStatisticsHistoryData::append(int value) {
-        History.append(value);
-        if (History.count() > LIMIT)
-            History.pop_front();
-    }
-
-
 } // anonymous namespace
 
+QnStatisticsHistoryData::QnStatisticsHistoryData(QString id, QString description):
+    Id(id),
+    Description(description)
+{
+    for (int i = 0; i < LIMIT; i++)
+        History.append(0);
+}
+
+void QnStatisticsHistoryData::append(int value) {
+    History.append(value);
+    if (History.count() > LIMIT)
+        History.pop_front();
+}
 
 QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent /* = NULL */):
     QnResourceWidget(context, item, parent),

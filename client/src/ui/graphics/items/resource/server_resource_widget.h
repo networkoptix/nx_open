@@ -12,7 +12,7 @@
 class QnRadialGradientPainter;
 
 struct QnStatisticsHistoryData {
-    QString Id;
+    QString Id; // TODO: #GDM classes start with Uppercase, fields with lowercase.
     QString Description;
     QList<int> History;
 
