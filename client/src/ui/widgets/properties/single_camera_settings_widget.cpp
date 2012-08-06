@@ -63,8 +63,8 @@ QnSingleCameraSettingsWidget::~QnSingleCameraSettingsWidget() {
 void QnSingleCameraSettingsWidget::loadSettingsFromXml()
 {
     QString error;
-    //if (loadSettingsFromXml(QCoreApplication::applicationDirPath() + QLatin1String("/plugins/resources/onvif/camera_settings/CameraSettings.xml"), error))
-    if (loadSettingsFromXml(QLatin1String("C:\\projects\\networkoptix\\netoptix_vms33\\common\\resource\\plugins\\resources\\onvif\\camera_settings\\CameraSettings.xml"), error))
+    //if (loadSettingsFromXml(QCoreApplication::applicationDirPath() + QLatin1String("/plugins/resources/camera_settings/CameraSettings.xml"), error))
+    if (loadSettingsFromXml(QLatin1String("C:\\projects\\networkoptix\\netoptix_vms33\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml"), error))
     {
         CL_LOG(cl_logINFO)
         {
