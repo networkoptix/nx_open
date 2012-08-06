@@ -8,9 +8,20 @@
 
 const static int MAX_VIDEO_FRAME = 1024 * 3;
 
-/*
-* Transcode input MediaPackets to specified format
-*/
+class QnFfmpegVideoTranscoder: public QnVideoTranscoder
+{
+public:
+    QnFfmpegVideoTranscoder();
+    ~QnFfmpegVideoTranscoder();
+
+    virtual int transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr& result) override;
+private:
+    CLFFmpegVideoDecoder* m_videoDecoder;
+    CLVideoDecoderOutput m_decodedVideoFrame;
+    quint8* m_videoEncodingBuffer;
+    QnMediaContextPtr m_encoderCtx;
+};
+
 class QnFfmpegTranscoder: public QnTranscoder
 {
 public:
@@ -19,43 +30,15 @@ public:
     QnFfmpegTranscoder();
     ~QnFfmpegTranscoder();
 
-    /*
-    * Set ffmpeg container by name
-    * @return Returns 0 if no error or error code
-    */
     int setContainer(const QString& value);
 
-    /*
-    * Set ffmpeg video codec and params
-    * @return Returns 0 if no error or error code
-    * @param codec codec to transcode
-    * @param directStreamCopy if true - do not transcode video data, only put it to destination container
-    * @param bitrate Bitrate after transcode. By default bitrate is autodetected
-    * @param addition codec params. Not used if directStreamCopy = true
-    */
     virtual bool setVideoCodec(CodecID codec, QnVideoTranscoderPtr vTranscoder = QnVideoTranscoderPtr()) override;
 
 
-    /*
-    * Set ffmpeg audio codec and params
-    * @return Returns 0 if no error or error code
-    * @param codec codec to transcode
-    * @param directStreamCopy if true - do not transcode audio data, only put it to destination container
-    * @param bitrate Bitrate after transcode. By default bitrate is autodetected
-    * @param addition codec params. Not used if directStreamCopy = true
-    */
     virtual bool setAudioCodec(CodecID codec, QnAudioTranscoderPtr aTranscoder = QnAudioTranscoderPtr()) override;
 
-    /*
-    * Transcode media data and write it to specified QnByteArray
-    * @param transcoded data block
-    * @return Returns 0 if no error or error code
-    */
     int transcodePacket(QnAbstractMediaDataPtr media, QnByteArray& result);
 
-    /*
-    * Return description of the last error code
-    */
     QString getLastErrorMessage() const;
 
     qint32 write(quint8* buf, int size);
@@ -67,11 +50,8 @@ private:
     AVIOContext* createFfmpegIOContext();
     void closeFfmpegContext();
 private:
-    CLFFmpegVideoDecoder* m_videoDecoder;
-    CLVideoDecoderOutput m_decodedVideoFrame;
     AVCodecContext* m_videoEncoderCodecCtx;
     AVCodecContext* m_audioEncoderCodecCtx;
-    quint8* m_videoEncodingBuffer;
     int m_videoBitrate;
     qint64 m_startDateTime;
     AVFormatContext* m_formatCtx;

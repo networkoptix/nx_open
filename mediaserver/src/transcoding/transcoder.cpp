@@ -1,5 +1,36 @@
 #include "transcoder.h"
 
+// ---------------------------- QnCodecTranscoder ------------------
+
+void QnCodecTranscoder::setParams(const Params& params)
+{
+    m_params = params;
+}
+
+void QnCodecTranscoder::setBitrate(int value)
+{
+    m_bitrate = value;
+}
+
+AVCodecContext* QnCodecTranscoder::getCodecContext()
+{
+    return 0;
+}
+
+// --------------------------- QnVideoTranscoder -----------------
+
+void QnVideoTranscoder::setSize(const QSize& size)
+{
+    m_size = size;
+}
+
+QSize QnVideoTranscoder::getSize() const
+{
+    return m_size;
+}
+
+// ---------------------- QnTranscoder -------------------------
+
 QnTranscoder::QnTranscoder():
     m_initialized(false),
     m_videoCodec(CODEC_ID_NONE),

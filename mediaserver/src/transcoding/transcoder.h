@@ -11,10 +11,21 @@ class QnCodecTranscoder
 public:
     typedef QMap<QString, QVariant> Params;
 
+    /*
+    * Function provide addition information about transcoded context.
+    * Function may be not implemented in derived classes and return 0
+    * In this case, all necessary information MUST be present in bitstream. For example, SPS/PPS blocks for H.264
+    */
+    virtual AVCodecContext* getCodecContext();
+
     void setParams(const Params& params);
     void setBitrate(int value);
 
-    virtual QnAbstractMediaDataPtr transcodePacket(QnAbstractMediaDataPtr media) = 0;
+    /*
+    * Transcode media packet and put data to 'result' variable
+    * @return Return error code or 0 if no error
+    */
+    virtual int transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr& result) = 0;
 private:
     Params m_params;
     int m_bitrate;
@@ -25,6 +36,7 @@ class QnVideoTranscoder: public QnCodecTranscoder
 {
 public:
     void setSize(const QSize& size);
+    QSize getSize() const;
 private:
     QSize m_size;
 };
@@ -97,8 +109,6 @@ protected:
     QnAudioTranscoderPtr m_aTranscoder;
     CodecID m_videoCodec;
     CodecID m_audioCodec;
-    bool m_videoStreamCopy;
-    bool m_audioStreamCopy;
 private:
     QString m_lastErrMessage;
     QQueue<QnCompressedVideoDataPtr> m_delayedVideoQueue;
