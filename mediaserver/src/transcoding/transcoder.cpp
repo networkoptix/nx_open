@@ -1,6 +1,12 @@
 #include "transcoder.h"
 
 // ---------------------------- QnCodecTranscoder ------------------
+QnCodecTranscoder::QnCodecTranscoder(CodecID codecId):
+    m_bitrate(-1)
+{
+    m_codecId = codecId;
+}
+
 
 void QnCodecTranscoder::setParams(const Params& params)
 {
@@ -17,7 +23,19 @@ AVCodecContext* QnCodecTranscoder::getCodecContext()
     return 0;
 }
 
+QString QnCodecTranscoder::getLastError() const
+{
+    return m_lastErrMessage;
+}
+
 // --------------------------- QnVideoTranscoder -----------------
+
+QnVideoTranscoder::QnVideoTranscoder(CodecID codecId):
+    QnCodecTranscoder(codecId)
+{
+
+}
+
 
 void QnVideoTranscoder::setSize(const QSize& size)
 {

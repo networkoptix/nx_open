@@ -4,7 +4,8 @@
 extern QMutex global_ffmpeg_mutex;
 static const int IO_BLOCK_SIZE = 1024*32;
 
-QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder():
+QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(CodecID codecId):
+    QnVideoTranscoder(codecId),
     m_videoDecoder(0)
 {
     m_videoEncodingBuffer = (quint8*) qMallocAligned(MAX_VIDEO_FRAME, 32);
@@ -18,10 +19,35 @@ QnFfmpegVideoTranscoder::~QnFfmpegVideoTranscoder()
 int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr& result)
 {
     QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(media);
-    if (!m_videoDecoder) 
+    if (!m_videoDecoder) {
         m_videoDecoder = new CLFFmpegVideoDecoder(video->compressionType, video, false);
+
+        AVCodec* avCodec = avcodec_find_decoder(m_codecId);
+        if (avCodec == 0)
+        {
+            m_lastErrMessage = QObject::tr("Transcoder error: can't find codec").arg(m_codecId);
+            return -2;
+        }
+        AVCodecContext* ctx = avcodec_alloc_context3(avCodec);
+        ctx->codec_type = AVMEDIA_TYPE_VIDEO;
+        ctx->codec_id = m_codecId;
+        ctx->width = m_size.width();
+        ctx->height = m_size.height();
+        ctx->pix_fmt = PIX_FMT_YUV420P;
+        ctx->flags |= CODEC_FLAG_GLOBAL_HEADER;
+
+        ctx->bit_rate = m_bitrate;
+        ctx->gop_size = 32;
+        ctx->time_base.num = 1;
+        ctx->time_base.den = 60;
+        m_encoderCtx = QnMediaContextPtr(new QnMediaContext(ctx));
+    }
     if (m_videoDecoder->decode(video, &m_decodedVideoFrame)) {
         int encoded = avcodec_encode_video(m_encoderCtx->ctx(), m_videoEncodingBuffer, MAX_VIDEO_FRAME, &m_decodedVideoFrame);
+        if (encoded < 0)
+        {
+            return -3;
+        }
         result = QnCompressedVideoDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, encoded, m_encoderCtx));
         return 0;
     }

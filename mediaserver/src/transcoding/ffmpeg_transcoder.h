@@ -11,7 +11,7 @@ const static int MAX_VIDEO_FRAME = 1024 * 3;
 class QnFfmpegVideoTranscoder: public QnVideoTranscoder
 {
 public:
-    QnFfmpegVideoTranscoder();
+    QnFfmpegVideoTranscoder(CodecID codecId);
     ~QnFfmpegVideoTranscoder();
 
     virtual int transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr& result) override;

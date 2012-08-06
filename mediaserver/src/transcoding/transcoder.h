@@ -11,6 +11,8 @@ class QnCodecTranscoder
 public:
     typedef QMap<QString, QVariant> Params;
 
+    QnCodecTranscoder(CodecID codecId);
+
     /*
     * Function provide addition information about transcoded context.
     * Function may be not implemented in derived classes and return 0
@@ -26,7 +28,10 @@ public:
     * @return Return error code or 0 if no error
     */
     virtual int transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr& result) = 0;
-private:
+    QString getLastError() const;
+protected:
+    QString m_lastErrMessage;
+    CodecID m_codecId;
     Params m_params;
     int m_bitrate;
 };
@@ -35,9 +40,10 @@ typedef QSharedPointer<QnCodecTranscoder> QnCodecTranscoderPtr;
 class QnVideoTranscoder: public QnCodecTranscoder
 {
 public:
+    QnVideoTranscoder(CodecID codecId);
     void setSize(const QSize& size);
     QSize getSize() const;
-private:
+protected:
     QSize m_size;
 };
 typedef QSharedPointer<QnVideoTranscoder> QnVideoTranscoderPtr;
@@ -45,6 +51,7 @@ typedef QSharedPointer<QnVideoTranscoder> QnVideoTranscoderPtr;
 class QnAudioTranscoder: public QnCodecTranscoder
 {
 public:
+    QnAudioTranscoder(CodecID codecId);
 };
 typedef QSharedPointer<QnAudioTranscoder> QnAudioTranscoderPtr;
 
