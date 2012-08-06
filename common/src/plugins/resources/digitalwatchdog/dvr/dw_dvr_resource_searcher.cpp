@@ -1,9 +1,14 @@
 #include "dw_dvr_resource_searcher.h"
-#include "core/resource/camera_resource.h"
-#include "dw_dvr_resource.h"
-#include "OpnDVRLib.h"
 
-#include <QAxObject>
+#include <core/resource/camera_resource.h>
+
+#include "dw_dvr_resource.h"
+
+#ifdef Q_OS_WIN
+#   include <ActiveQt/QAxObject>
+#   include "OpnDVRLib.h"
+#endif
+
 
 static const int CONNECTION_TIMEOUT = 2000*1000;
 
@@ -14,8 +19,10 @@ DwDvrResourceSearcher::DwDvrResourceSearcher()
 
 DwDvrResourceSearcher::~DwDvrResourceSearcher()
 {
+#ifdef Q_OS_WIN
     DVRCloseLibrary();
     DVRFreeLibrary();
+#endif
 }
 
 DwDvrResourceSearcher& DwDvrResourceSearcher::instance()
@@ -68,6 +75,7 @@ QnResourceList DwDvrResourceSearcher::findResources()
 
 void DwDvrResourceSearcher::getCamerasFromDvr(QnResourceList& resources, const QString& host, int port, const QString& login, const QString& password)
 {
+#ifdef Q_OS_WIN
     static CLSID const clsid
         = { 0x67815DA3, 0xEC08, 0x41E0, { 0xAE, 0x60, 0x92, 0xE5, 0x93, 0x5E, 0xE8, 0xFB } };
 
@@ -93,6 +101,7 @@ void DwDvrResourceSearcher::getCamerasFromDvr(QnResourceList& resources, const Q
 
     }
     */
+#endif
 }
 
 QnResourcePtr DwDvrResourceSearcher::checkHostAddr(QHostAddress addr)

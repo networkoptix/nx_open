@@ -153,6 +153,7 @@
 										<include>debian/**</include>
 										<include>init/**</include>
 										<include>init.d/**</include>
+										<include>usr/**</include>
 									</includes>
 								</resource>		
 							</resources>              

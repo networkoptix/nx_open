@@ -10,8 +10,8 @@
 #include <plugins/resources/archive/syncplay_wrapper.h>
 
 #include <camera/resource_display.h>
-#include <camera/camdisplay.h>
-#include <camera/camera.h>
+#include <camera/cam_display.h>
+#include <camera/video_camera.h>
 
 #include <ui/workbench/workbench_display.h>
 #include <ui/graphics/items/resource/resource_widget.h>

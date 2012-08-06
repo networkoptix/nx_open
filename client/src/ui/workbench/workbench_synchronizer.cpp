@@ -12,8 +12,8 @@
 QnWorkbenchSynchronizer::QnWorkbenchSynchronizer(QObject *parent):
     QObject(parent),
     QnWorkbenchContextAware(parent),
-    m_update(false),
-    m_submit(false)
+    m_submit(false),
+    m_update(false)
 {
     /* Clean workbench's layouts. */
     while(!workbench()->layouts().isEmpty())

@@ -49,6 +49,7 @@ QString QnPlAxisResourceSearcher::manufacture() const
 
 QnResourcePtr QnPlAxisResourceSearcher::checkHostAddr(QHostAddress addr)
 {
+    Q_UNUSED(addr)
     return QnResourcePtr(0);
 }
 

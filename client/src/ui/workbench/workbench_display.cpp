@@ -19,7 +19,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resourcemanagment/resource_pool.h>
 #include <camera/resource_display.h>
-#include <camera/camera.h>
+#include <camera/video_camera.h>
 
 #include <ui/animation/viewport_animator.h>
 #include <ui/animation/widget_animator.h>
@@ -613,13 +613,13 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
     case Qn::CentralRole: {
         /* Update audio playback. */
         if(QnMediaResourceWidget *oldMediaWidget = dynamic_cast<QnMediaResourceWidget *>(oldWidget)) {
-            CLCamDisplay *oldCamDisplay = oldMediaWidget ? oldMediaWidget->display()->camDisplay() : NULL;
+            QnCamDisplay *oldCamDisplay = oldMediaWidget ? oldMediaWidget->display()->camDisplay() : NULL;
             if(oldCamDisplay)
                 oldCamDisplay->playAudio(false);
         }
 
         if(QnMediaResourceWidget *newMediaWidget = dynamic_cast<QnMediaResourceWidget *>(newWidget)) { 
-            CLCamDisplay *newCamDisplay = newMediaWidget ? newMediaWidget->display()->camDisplay() : NULL;
+            QnCamDisplay *newCamDisplay = newMediaWidget ? newMediaWidget->display()->camDisplay() : NULL;
             if(newCamDisplay)
                 newCamDisplay->playAudio(true);
         }
@@ -655,7 +655,7 @@ QnVideoCamera *QnWorkbenchDisplay::camera(QnWorkbenchItem *item) const {
     return display->camera();
 }
 
-CLCamDisplay *QnWorkbenchDisplay::camDisplay(QnWorkbenchItem *item) const {
+QnCamDisplay *QnWorkbenchDisplay::camDisplay(QnWorkbenchItem *item) const {
     QnVideoCamera *camera = this->camera(item);
     if(camera == NULL)
         return NULL;

@@ -1,4 +1,4 @@
-#include "audiostreamdisplay.h"
+#include "audio_stream_display.h"
 #include "decoders/audio/audio_struct.h"
 #include "decoders/audio/abstractaudiodecoder.h"
 #include "utils/settings.h"

@@ -19,7 +19,7 @@
 #include <camera/caching_time_period_loader.h>
 #include <camera/time_period_loader.h>
 #include <camera/resource_display.h>
-#include <camera/camera.h>
+#include <camera/video_camera.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameter_types.h>
@@ -280,7 +280,7 @@ bool QnWorkbenchNavigator::setPlaying(bool playing) {
     m_pausedOverride = false;
 
     QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader();
-    CLCamDisplay *camDisplay = m_currentMediaWidget->display()->camDisplay();
+    QnCamDisplay *camDisplay = m_currentMediaWidget->display()->camDisplay();
     if(playing) {
         if (reader->isRealTimeSource()) {
             /* Media was paused while on live. Jump to archive when resumed. */
@@ -347,7 +347,7 @@ qreal QnWorkbenchNavigator::maximalSpeed() const {
     if(!m_currentMediaWidget || m_currentMediaWidget->display()->isStillImage())
         return 0.0;
 
-    if(QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader())
+    if(m_currentMediaWidget->display()->archiveReader() != NULL)
         return 16.0;
 
     return 1.0;
@@ -462,7 +462,7 @@ void QnWorkbenchNavigator::jumpBackward() {
 
     m_pausedOverride = false;
 
-    qint64 pos;
+    qint64 pos = reader->startTime();
     if(QnCachingTimePeriodLoader *loader = this->loader(m_currentMediaWidget)) {
         const QnTimePeriodList fullPeriods = loader->periods(loader->isMotionRegionsEmpty() ? Qn::RecordingRole : Qn::MotionRole);
         const QnTimePeriodList periods = QnTimePeriod::aggregateTimePeriods(fullPeriods, MAX_FRAME_DURATION);
@@ -480,8 +480,6 @@ void QnWorkbenchNavigator::jumpBackward() {
                     pos += itr->durationMs * 1000;
             }
         }
-    } else {
-        pos = reader->startTime();
     }
     reader->jumpTo(pos, 0);
 }
@@ -505,7 +503,7 @@ void QnWorkbenchNavigator::jumpForward() {
         const QnTimePeriodList periods = QnTimePeriod::aggregateTimePeriods(fullPeriods, MAX_FRAME_DURATION);
 
         QnTimePeriodList::const_iterator itr = qUpperBound(periods.begin(), periods.end(), m_currentMediaWidget->display()->camera()->getCurrentTime() / 1000);
-        if (itr == periods.end() || reader->isReverseMode() && itr->durationMs == -1) {
+        if (itr == periods.end() || (reader->isReverseMode() && itr->durationMs == -1)) {
             pos = DATETIME_NOW;
         } else {
             pos = (itr->startTimeMs + (reader->isReverseMode() ? itr->durationMs : 0)) * 1000;

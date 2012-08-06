@@ -7,9 +7,9 @@
 
 QnWorkbenchItem::QnWorkbenchItem(const QString &resourceUid, const QUuid &uuid, QObject *parent):
     QObject(parent),
+    m_layout(NULL),
     m_resourceUid(resourceUid),
     m_uuid(uuid),
-    m_layout(NULL),
     m_flags(0),
     m_rotation(0.0)
 {}

@@ -245,6 +245,10 @@ QnResourceWidget::~QnResourceWidget() {
     ensureAboutToBeDestroyedEmitted();
 }
 
+QnResourcePtr QnResourceWidget::resource() const {
+    return m_resource;
+}
+
 void QnResourceWidget::setFrameWidth(qreal frameWidth) {
     if(qFuzzyCompare(m_frameWidth, frameWidth))
         return;

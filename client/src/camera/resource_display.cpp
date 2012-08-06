@@ -5,9 +5,9 @@
 #include <core/resource/media_resource.h>
 #include <core/resource/video_server.h>
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
-#include <camera/camdisplay.h>
-#include <camera/camera.h>
-#include <camera/abstractrenderer.h>
+#include <camera/cam_display.h>
+#include <camera/video_camera.h>
+#include <camera/abstract_renderer.h>
 #include <utils/common/warnings.h>
 #include <utils/common/counter.h>
 
@@ -72,7 +72,7 @@ void QnResourceDisplay::cleanUp(QnLongRunnable *runnable) const {
     }
 }
 
-CLCamDisplay *QnResourceDisplay::camDisplay() const {
+QnCamDisplay *QnResourceDisplay::camDisplay() const {
     if(m_camera == NULL)
         return NULL;
 

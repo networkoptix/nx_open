@@ -4,7 +4,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QMutex>
 
-#include <camera/abstractrenderer.h>
+#include <camera/abstract_renderer.h>
 #include <camera/render_status.h>
 
 class QThread;
@@ -18,9 +18,9 @@ class QnResourceWidgetRenderer: public QObject, public QnAbstractRenderer {
 public:
     QnResourceWidgetRenderer(int channelCount, QObject *parent = NULL, const QGLContext *context = NULL);
 
-    void update();
-
     virtual ~QnResourceWidgetRenderer();
+
+    void update();
 
     virtual void draw(CLVideoDecoderOutput *image) override;
 

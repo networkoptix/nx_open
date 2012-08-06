@@ -193,7 +193,7 @@ void QnLayoutFileStorageResource::readIndexHeader()
 
 bool QnLayoutFileStorageResource::addFileEntry(const QString& fileName)
 {
-    if (m_index.entryCount >= MAX_FILES_AT_LAYOUT)
+    if (m_index.entryCount >= (quint32)MAX_FILES_AT_LAYOUT)
         return false;
 
     QFile file(removeProtocolPrefix(getUrl()));

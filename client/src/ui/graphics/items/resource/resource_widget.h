@@ -76,9 +76,7 @@ public:
     /**
      * \returns                         Resource associated with this widget.
      */
-    QnResourcePtr resource() const {
-        return m_resource;
-    }
+    QnResourcePtr resource() const;
 
     /**
      * \returns                         Workbench item associated with this widget. Never returns NULL.

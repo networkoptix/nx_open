@@ -62,9 +62,9 @@ static const int MIN_SQUARE_BY_SENS[10] =
 
 static quint16 sadTransformMatrix[256*256];
 static const int SAD_SCALED_BITS = 2;
-static const double SCALED_MAX_VALUE = 4000;
+//static const double SCALED_MAX_VALUE = 4000;
 static const int ZERR_THRESHOLD = 8;
-static double sad_yPow = log(SCALED_MAX_VALUE-1)/log(255.0);
+//static double sad_yPow = log(SCALED_MAX_VALUE-1)/log(255.0);
 class SadTransformInit
 {
 
@@ -888,7 +888,7 @@ void QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
 
     if (!m_decoder->decode(videoData, m_frames[idx]))
         return;
-    if (m_firstFrameTime == AV_NOPTS_VALUE)
+    if (m_firstFrameTime == qint64(AV_NOPTS_VALUE))
         m_firstFrameTime = m_frames[idx]->pkt_dts;
     m_lastFrameTime = m_frames[idx]->pkt_dts;
 

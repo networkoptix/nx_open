@@ -59,9 +59,9 @@
 #include <ui/widgets/help_widget.h>
 #include <ui/style/skin.h>
 
-#include <help/qncontext_help.h>
+#include <help/context_help.h>
 
-#include "camera/camera.h"
+#include "camera/video_camera.h"
 #include "openal/qtvaudiodevice.h"
 #include "core/resourcemanagment/resource_pool.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
@@ -172,21 +172,21 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     QObject(parent),
     QnWorkbenchContextAware(parent),
     m_instrumentManager(display()->instrumentManager()),
+    m_flags(0),
     m_treePinned(false),
-    m_inactive(false),
-    m_titleUsed(false),
-    m_windowButtonsUsed(true),
-    m_titleOpened(false),
     m_treeOpened(false),
-    m_sliderOpened(false),
-    m_titleVisible(false),
     m_treeVisible(false),
+    m_titleUsed(false),
+    m_titleOpened(false),
+    m_titleVisible(false),
+    m_sliderOpened(false),
     m_sliderVisible(false),
     m_helpPinned(false),
-    m_helpVisible(false),
     m_helpOpened(false),
-    m_flags(0),
+    m_helpVisible(false),
+    m_windowButtonsUsed(true),
     m_ignoreClickEvent(false),
+    m_inactive(false),
     m_inFreespace(false),
     m_ignoreSliderResizerGeometryChanges(false),
     m_ignoreSliderResizerGeometryChanges2(false),
