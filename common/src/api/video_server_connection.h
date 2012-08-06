@@ -185,6 +185,7 @@ private:
 typedef QSharedPointer<QnVideoServerConnection> QnVideoServerConnectionPtr;
 
 
+// TODO: what is the purpose of this class?
 class TestReceiver
 :
     public QObject
