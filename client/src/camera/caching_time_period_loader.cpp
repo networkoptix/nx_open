@@ -96,8 +96,11 @@ bool QnCachingTimePeriodLoader::createLoaders(const QnResourcePtr &resource, QnM
 
 QnCachingTimePeriodLoader *QnCachingTimePeriodLoader::newInstance(const QnResourcePtr &resource, QObject *parent) {
     QnMultiCameraTimePeriodLoader *loaders[Qn::TimePeriodRoleCount];
-    if(createLoaders(resource, loaders))
+    if(createLoaders(resource, loaders)) {
         return new QnCachingTimePeriodLoader(loaders, parent);
+    } else {
+        return NULL;
+    }
 }
 
 QnNetworkResourcePtr QnCachingTimePeriodLoader::resource() {

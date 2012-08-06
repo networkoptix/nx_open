@@ -62,7 +62,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void PrintKey        ( dvdcss_t, char *, quint8 const * );
+static void PrintKey        ( dvdcss_t, const char *, quint8 const * );
 
 static int  GetBusKey       ( dvdcss_t );
 static int  GetASF          ( dvdcss_t );
@@ -711,7 +711,7 @@ static int GetBusKey( dvdcss_t dvdcss )
 /*****************************************************************************
  * PrintKey : debug function that dumps a key value
  *****************************************************************************/
-static void PrintKey( dvdcss_t dvdcss, char *prefix, quint8 const *data )
+static void PrintKey( dvdcss_t dvdcss, const char *prefix, quint8 const *data )
 {
     print_debug( dvdcss, "%s%02x:%02x:%02x:%02x:%02x", prefix,
                  data[0], data[1], data[2], data[3], data[4] );

@@ -230,9 +230,9 @@ void QnArchiveSyncPlayWrapper::nextFrame()
     {
         if (info.enabled) {
             qint64 curTime = info.cam->getCurrentTime();
-            if (mintTime == AV_NOPTS_VALUE)
+            if (mintTime == qint64(AV_NOPTS_VALUE))
                 mintTime = curTime;
-            else if (curTime != AV_NOPTS_VALUE)
+            else if (curTime != qint64(AV_NOPTS_VALUE))
                 mintTime = qMin(mintTime, curTime);
         }
     }
@@ -240,7 +240,7 @@ void QnArchiveSyncPlayWrapper::nextFrame()
     {
         if (info.enabled) 
         {
-            if (mintTime == AV_NOPTS_VALUE || info.cam->getCurrentTime() <= mintTime+SYNC_FOR_FRAME_EPS)
+            if (mintTime == qint64(AV_NOPTS_VALUE) || info.cam->getCurrentTime() <= mintTime+SYNC_FOR_FRAME_EPS)
             {
                 info.reader->setNavDelegate(0);
                 info.reader->nextFrame();
@@ -284,7 +284,7 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveReader* reader,
     connect(reader, SIGNAL(jumpOccured(qint64)), this, SLOT(onJumpOccured(qint64)), Qt::DirectConnection);
     connect(reader, SIGNAL(jumpCanceled(qint64)), this, SLOT(onJumpCanceled(qint64)), Qt::DirectConnection);
 
-    if (d->enabled && currentTime != DATETIME_NOW && currentTime != AV_NOPTS_VALUE) {
+    if (d->enabled && currentTime != DATETIME_NOW && currentTime != qint64(AV_NOPTS_VALUE)) {
         reader->jumpToPreviousFrame(currentTime);
         reader->setSpeed(d->speed, currentTime);
         if (d->speed == 0)
@@ -337,9 +337,9 @@ qint64 QnArchiveSyncPlayWrapper::getNextTime() const
     {
         if (info.enabled && !info.isEOF) {
             qint64 time = info.cam->getNextTime();
-            if (displayTime == AV_NOPTS_VALUE)
+            if (displayTime == qint64(AV_NOPTS_VALUE))
                 displayTime = time;
-            else if (time != AV_NOPTS_VALUE)
+            else if (time != qint64(AV_NOPTS_VALUE))
                 displayTime = d->speed >= 0 ? qMin(time, displayTime) : qMax(time, displayTime);
         }
     }
@@ -374,9 +374,9 @@ qint64 QnArchiveSyncPlayWrapper::getDisplayedTimeInternal() const
             qint64 time = info.cam->getCurrentTime();
             //if (time == DATETIME_NOW)
             //    time = qnSyncTime->currentMSecsSinceEpoch()*1000;
-            if (displayTime == AV_NOPTS_VALUE)
+            if (displayTime == qint64(AV_NOPTS_VALUE))
                 displayTime = time;
-            else if (time != AV_NOPTS_VALUE)
+            else if (time != qint64(AV_NOPTS_VALUE))
                 displayTime = d->speed >= 0 ? qMin(time, displayTime) : qMax(time, displayTime);
         }
     }
@@ -387,7 +387,7 @@ void QnArchiveSyncPlayWrapper::reinitTime(qint64 newTime)
 {
     Q_D(QnArchiveSyncPlayWrapper);
 
-    if (newTime != AV_NOPTS_VALUE)
+    if (newTime != qint64(AV_NOPTS_VALUE))
         d->lastJumpTime = newTime;
     else {
         //d->lastJumpTime = getCurrentTime();
@@ -438,7 +438,7 @@ qint64 QnArchiveSyncPlayWrapper::minTime() const
     foreach(const ReaderInfo& info, d->readers) 
     {
         qint64 startTime = info.oldDelegate->startTime();
-        if(startTime != AV_NOPTS_VALUE) {
+        if(startTime != qint64(AV_NOPTS_VALUE)) {
             result = qMin(result, startTime);
             found = true;
         }
@@ -456,7 +456,7 @@ qint64 QnArchiveSyncPlayWrapper::endTime() const
     foreach(const ReaderInfo& info, d->readers) 
     {
         qint64 endTime = info.oldDelegate->endTime();
-        if(endTime != AV_NOPTS_VALUE) {
+        if(endTime != qint64(AV_NOPTS_VALUE)) {
             result = qMax(result, endTime);
             found = true;
         }
@@ -578,7 +578,7 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTime() const
     if (d->inJumpCount > 0)
         return d->lastJumpTime;
 
-    if (d->bufferingTime != AV_NOPTS_VALUE)
+    if (d->bufferingTime != qint64(AV_NOPTS_VALUE))
         return d->bufferingTime; // same as last jump time
 
     foreach(const ReaderInfo& info, d->readers) {
@@ -598,7 +598,7 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTime() const
 
 
     qint64 nextTime = getNextTime();
-    if (d->speed >= 0 && nextTime != AV_NOPTS_VALUE && nextTime > expectTime + MAX_FRAME_DURATION*1000)
+    if (d->speed >= 0 && nextTime != qint64(AV_NOPTS_VALUE) && nextTime > expectTime + MAX_FRAME_DURATION*1000)
     {
         QnArchiveSyncPlayWrapper* nonConstThis = const_cast<QnArchiveSyncPlayWrapper*>(this);
         
@@ -610,7 +610,7 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTime() const
         nonConstThis->reinitTime(nextTime);
         expectTime = expectedTime();
     }
-    else if (d->speed < 0 && nextTime != AV_NOPTS_VALUE && nextTime < expectTime - MAX_FRAME_DURATION*1000)
+    else if (d->speed < 0 && nextTime != qint64(AV_NOPTS_VALUE) && nextTime < expectTime - MAX_FRAME_DURATION*1000)
     {
         /*
         qDebug() << "nextTime=" << QDateTime::fromMSecsSinceEpoch(nextTime/1000).toString("hh:mm:ss.zzz") << 
@@ -623,7 +623,7 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTime() const
     }
 
     qint64 displayedTime =  getDisplayedTimeInternal();
-    if (displayedTime == AV_NOPTS_VALUE || displayedTime == DATETIME_NOW)
+    if (displayedTime == qint64(AV_NOPTS_VALUE) || displayedTime == DATETIME_NOW)
         return displayedTime;
     if (d->speed >= 0) 
         return qMin(expectTime, displayedTime + SYNC_EPS);
@@ -646,7 +646,7 @@ void QnArchiveSyncPlayWrapper::onConsumerBlocksReader(QnAbstractStreamDataProvid
                 d->readers[i].reader->setNavDelegate(0);
                 if (d->enabled) {
                     qint64 currentTime = getCurrentTime();
-                    if (currentTime != AV_NOPTS_VALUE) {
+                    if (currentTime != qint64(AV_NOPTS_VALUE)) {
                         setJumpTime(currentTime);
                         d->readers[i].reader->jumpToPreviousFrame(currentTime);
                         d->readers[i].reader->setSpeed(d->speed, currentTime);
@@ -700,7 +700,7 @@ void QnArchiveSyncPlayWrapper::enableSync(qint64 currentTime, float currentSpeed
 
     foreach(const ReaderInfo& info, d->readers) 
     {
-        if (currentTime != AV_NOPTS_VALUE) {
+        if (currentTime != qint64(AV_NOPTS_VALUE)) {
             setJumpTime(currentTime);
             info.reader->jumpToPreviousFrame(currentTime);
             info.reader->setSpeed(currentSpeed, currentTime);

@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>1.2.0</version>
+	<version>1.2.2</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>hdwitness</artifactId>
 	<packaging>pom</packaging>
@@ -23,6 +23,7 @@
 		<module>common</module>
 		<module>mediaserver</module>
 		<module>mediaproxy</module>
+		<module>client</module>
 		<module>testcamera</module>
 	</modules>
 	<build>
@@ -64,7 +65,6 @@
 				</os>
 			</activation>
 			<modules>
-				<module>client</module>
 				<module>traytool</module>	
 				<module>wixsetup</module>
 			</modules>
@@ -103,6 +103,7 @@
 				</os> 
 			</activation>
 			<modules>
+				<module>debsetup/client-deb</module>
 				<module>debsetup/mediaserver-deb</module>
 				<module>debsetup/appserver-deb</module>
 			</modules>

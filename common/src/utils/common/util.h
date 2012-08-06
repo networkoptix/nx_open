@@ -57,26 +57,24 @@ QN_EXPORT QString closeDirPath(const QString& value);
 
 QN_EXPORT qint64 getDiskFreeSpace(const QString& root);
 
-static const qint64 DATETIME_NOW = INT64_MAX;
-#define DATETIME_NOW DATETIME_NOW /* Get some syntax highlighting. */
+#define DATETIME_NOW INT64_MAX 
 
-static const char *DEFAULT_APPSERVER_HOST = "127.0.0.1";
-static const int DEFAULT_APPSERVER_PORT = 7001;
+#define DEFAULT_APPSERVER_HOST "127.0.0.1"
+#define DEFAULT_APPSERVER_PORT 7001
 
-static const int MAX_RTSP_DATA_LEN = 65535 - 16;
+#define MAX_RTSP_DATA_LEN (65535 - 16)
 
-//static const qint64 BACKWARD_SEEK_STEP =  2000 * 1000; 
-static const qint64 BACKWARD_SEEK_STEP =  1000 * 1000; 
+#define BACKWARD_SEEK_STEP (1000ll * 1000)
 
 // This constant limit duration of a first GOP. So, if jump to position X, and first I-frame has position X-N, data will be transfer for range
 // [X-N..X-N+MAX_FIRST_GOP_DURATION]. It prevent long preparing then reverse mode is activate.
 // I have increased constant because of camera with very low FPS may have long gop (30-60 seconds).
 //static const qint64 MAX_FIRST_GOP_DURATION = 1000 * 1000 * 10;
-static const qint64 MAX_FIRST_GOP_FRAMES = 250;
+#define MAX_FIRST_GOP_FRAMES 250ll
 
-static const qint64 MAX_FRAME_DURATION = 5 * 1000;
-static const qint64 MIN_FRAME_DURATION = 16667;
-static const qint64 MAX_AUDIO_FRAME_DURATION = 150;
+#define MAX_FRAME_DURATION (5ll * 1000)
+#define MIN_FRAME_DURATION 16667ll
+#define MAX_AUDIO_FRAME_DURATION 150ll
 
 quint64 QN_EXPORT getUsecTimer();
 

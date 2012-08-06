@@ -516,11 +516,7 @@ bool RTPSession::sendDescribe()
 
     //qDebug() << request;
 
-    if (!m_tcpSock.send(request.data(), request.size()))
-        false;
-
-    return true;
-
+    return (m_tcpSock.send(request.data(), request.size()));
 }
 
 bool RTPSession::sendOptions()
@@ -536,12 +532,7 @@ bool RTPSession::sendOptions()
     addAuth(request);
     request += "\r\n";
 
-
-    if (!m_tcpSock.send(request.data(), request.size()))
-        false;
-
-    return true;
-
+    return (m_tcpSock.send(request.data(), request.size()));
 }
 
 RTPIODevice* RTPSession::getTrackIoByType(TrackType trackType)
@@ -799,14 +790,14 @@ bool RTPSession::sendPlay(qint64 startPos, qint64 endPos, double scale)
     request += "Session: ";
     request += m_SessionId;
     request += "\r\n";
-    if (startPos != AV_NOPTS_VALUE)
+    if (startPos != qint64(AV_NOPTS_VALUE))
     {
         if (startPos != DATETIME_NOW)
             request += QLatin1String("Range: npt=") + QString::number(startPos);
         else
             request += QLatin1String("Range: npt=now");
         request += '-';
-        if (endPos != AV_NOPTS_VALUE)
+        if (endPos != qint64(AV_NOPTS_VALUE))
         {
             if (endPos != DATETIME_NOW)
                 request += QString::number(endPos);
@@ -883,7 +874,6 @@ bool RTPSession::sendPause()
 
 bool RTPSession::sendTeardown()
 {
-
     QByteArray request;
     QByteArray responce;
     request += "TEARDOWN ";
@@ -898,18 +888,9 @@ bool RTPSession::sendTeardown()
     request += "\r\n\r\n";
 
     if (!m_tcpSock.send(request.data(), request.size()))
-        false;
-
-
-    if (!readTextResponce(responce) || !responce.startsWith("RTSP/1.0 200"))
-    {
         return false;
-    }
-    else
-    {
-        //d->lastSendTime.start();
-        return 0;
-    }
+
+    return (readTextResponce(responce) && responce.startsWith("RTSP/1.0 200"));
 }
 
 static const int RTCP_SENDER_REPORT = 200;
@@ -1033,19 +1014,10 @@ bool RTPSession::sendKeepAlive()
     request += "\r\n\r\n";
     //
 
-
     if (!m_tcpSock.send(request.data(), request.size()))
-        false;
-
-
-    if(!readTextResponce(responce) || !responce.startsWith("RTSP/1.0 200"))
-    {
         return false;
-    }
-    else
-    {
-        return true;
-    }
+
+    return (readTextResponce(responce) && responce.startsWith("RTSP/1.0 200"));
 }
 
 // read RAW: combination of text and binary data

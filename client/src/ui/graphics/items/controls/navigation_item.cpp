@@ -5,6 +5,7 @@
 #include <QtGui/QAction>
 #include <QtGui/QGraphicsLinearLayout>
 #include <QtGui/QMessageBox>
+#include <QtGui/QGraphicsProxyWidget>
 
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
 #include <utils/common/util.h>
@@ -18,6 +19,7 @@
 #include <ui/graphics/items/controls/volume_slider.h>
 #include <ui/graphics/items/generic/tool_tip_item.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
+#include <ui/widgets/calendar_widget.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_context.h>
@@ -83,8 +85,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
     m_syncButton->setCheckable(true);
 
     m_thumbnailsButton = new QnImageButtonWidget(this);
-    //m_thumbnailsButton->setDefaultAction(action(Qn::ToggleThumbnailsAction));
-      m_thumbnailsButton->setDefaultAction(action(Qn::ToggleCalendarAction));
+    m_thumbnailsButton->setDefaultAction(action(Qn::ToggleThumbnailsAction));
     m_thumbnailsButton->setPreferredSize(96, 24);
 
 
@@ -117,11 +118,15 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
 
     m_timeScrollBar = new QnTimeScrollBar(this);
     
+    m_calendar = new QGraphicsProxyWidget(parent);
+    QnCalendarWidget *calendar = new QnCalendarWidget();
+    m_calendar->setWidget(calendar);
+    m_calendar->setVisible(false);
 
     /* Initialize navigator. */
     navigator()->setTimeSlider(m_timeSlider);
     navigator()->setTimeScrollBar(m_timeScrollBar);
-
+    navigator()->setCalendar(calendar);
 
     /* Put it all into layouts. */
     QGraphicsLinearLayout *buttonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);

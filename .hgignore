@@ -11,7 +11,6 @@ syntax: glob
 *.sln
 *.suo
 *.user
-*.vcproj
 *.vcproj.filters
 *.vcxproj
 *.vcxproj.filters
@@ -23,8 +22,15 @@ syntax: glob
 Debug
 Release
 
-My Amplifier XE Results*
-My Inspector XE Results*
+contrib/maven-artifacts-deploy/include
+contrib/maven-artifacts-deploy/linux
+contrib/maven-artifacts-deploy/target
+contrib/maven-artifacts-deploy/windows
+
+common/bin
+client/bin
+mediaserver/bin
+traytool/bin
 
 appserver/gen
 appserver/db/ecs.db
@@ -41,8 +47,10 @@ appserver/entcontroller.conf
 appserver/setup/build
 appserver/version_maven.py
 
+build
 client/src/version.h
-client/src/compatibility_info.cpp
+common/src/common.pri
+
 client/src/Info.plist
 client/src/client.pro
 client/src/common.pro
@@ -52,14 +60,13 @@ client/src/client.mak*
 client/src/ipch
 client/src/client.vcproj
 client/client.mak*
-client/build
 client/x86
 client/x64
-client/bin
 
 client/contrib/bespin/debug
 client/contrib/bespin/release
 client/contrib/bespin/Makefile*
+
 client/contrib/qtcolorpicker/Makefile*
 client/contrib/qtcolorpicker/buildlib
 client/contrib/qtcolorpicker/examples/Makefile*
@@ -69,70 +76,57 @@ client/contrib/qtcolorpicker/examples/simple/Makefile*
 client/contrib/qtcolorpicker/examples/simple/debug
 client/contrib/qtcolorpicker/lib/*.ilk
 
-common/compatibility_info.cpp
-common/src/version.h
-common/src/common.pri
 common/src/common.pro
 common/src/plugins/resources/archive/filetypes.h
 common/src/Makefile
 common/src/common.mak*
 common/src/common.vcproj
 common/common.mak*
-common/build
 common/x86
 common/x64
-common/bin
+common/src/version.h
 
 mediaserver/src/server.pro
 mediaserver/src/version.h
-mediaserver/src/compatibility_info.cpp
 mediaserver/src/Makefile
 mediaserver/src/server.mak*
 mediaserver/src/server.vcproj
-mediaserver/mediaserver.mak*
-mediaserver/build
 mediaserver/x86
 mediaserver/x64
-mediaserver/bin
 
 mediaproxy/src/version.h
 mediaproxy/src/mediaproxy.vcproj
+mediaproxy/bin/debug
+mediaproxy/bin/release
 mediaproxy/src/mediaproxy.pro
-mediaproxy/src/mediaproxy.mak*
-mediaproxy/mediaproxy.mak*
-mediaproxy/build
-mediaproxy/bin
 mediaproxy/x86
 mediaproxy/x64
 
 testcamera/src/testCamera.pro
 testcamera/src/testCamera.vcproj
-testcamera/src/version.h
-testcamera/src/testcamera.mak*
-testcamera/testcamera.mak*
-testcamera/bin
-testcamera/build
+testcamera/bin/debug
+testcamera/bin/release
 testcamera/x86
 testcamera/x64
+testcamera/src/version.h
+
+winbuild/msvc2010/setup.bat
 
 wixsetup/CustomStrings.wxl
 wixsetup/AppServerFiles.wxs
 wixsetup/version.bat
-wixsetup/build
 wixsetup/bin
 wixsetup/x86
 wixsetup/x64
 
+My Amplifier XE Results*
+My Inspector XE Results*
+
 traytool/src/traytool.pro
 traytool/src/version.h
 traytool/src/traytool.vcproj
-traytool/build
 traytool/x86
 traytool/x64
-traytool/bin
-
-cpp/x86
-cpp/x64
 
 debsetup/mediaserver/package
 debsetup/mediaserver/x86
@@ -140,4 +134,8 @@ debsetup/mediaserver/x64
 debsetup/appserver/package
 debsetup/appserver/x86
 debsetup/appserver/x64
-*.java
+cpp/x86/version.h
+common/compatibility_info.cpp
+client/src/compatibility_info.cpp
+mediaserver/src/compatibility_info.cpp
+*.vcproj

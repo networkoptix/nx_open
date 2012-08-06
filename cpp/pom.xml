@@ -3,12 +3,12 @@
 	<parent>
 		<artifactId>hdwitness</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>1.2.0</version>
+		<version>1.2.2</version>
 		<relativePath>..</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>1.2.0</version>
+	<version>1.2.2</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>cpp</artifactId>
 	<packaging>pom</packaging>
@@ -426,14 +426,8 @@
 									<goal>exec</goal>
 								</goals>
 								<configuration>
-									<executable>make</executable>
+									<executable>${project.build.directory}/build.sh</executable>
 									<workingDirectory>${project.build.directory}</workingDirectory>		
-									<arguments>
-										<commandlineArgs>-f</commandlineArgs>
-										<commandlineArgs>Makefile.${build.configuration}</commandlineArgs>
-										<commandlineArgs>-j</commandlineArgs>
-										<commandlineArgs>1</commandlineArgs>
-									</arguments>
 								</configuration>
 							</execution>
 

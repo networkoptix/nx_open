@@ -16,7 +16,7 @@ class QnAbstractDataConsumer;
 
 struct AVCodecContext;
 
-class QN_EXPORT QnAbstractStreamDataProvider : public CLLongRunnable, public QnResourceConsumer
+class QN_EXPORT QnAbstractStreamDataProvider : public QnLongRunnable, public QnResourceConsumer
 {
     Q_OBJECT
 public:

@@ -9,14 +9,14 @@
 class QnAbstractRenderer;
 class CLVideoDecoderOutput;
 
-class BufferedFrameDisplayer: public CLLongRunnable 
+class QnBufferedFrameDisplayer: public QnLongRunnable 
 {
     Q_OBJECT;
 
 public:
-    BufferedFrameDisplayer(QnAbstractRenderer *drawer);
+    QnBufferedFrameDisplayer(QnAbstractRenderer *drawer);
 
-    virtual ~BufferedFrameDisplayer();
+    virtual ~QnBufferedFrameDisplayer();
 
     void waitForFramesDisplayed();
 
@@ -36,15 +36,15 @@ protected:
     virtual void run() override;
 
 private:
+    CLThreadQueue<CLVideoDecoderOutput *> m_queue;
+    QnAbstractRenderer *m_drawer;
     qint64 m_lastQueuedTime;
     qint64 m_expectedTime;
     QTime m_timer;
     QTime m_alignedTimer;
-    QnAbstractRenderer *m_drawer;
     qint64 m_currentTime;
     QMutex m_sync;
     qint64 m_lastDisplayedTime;
-    CLThreadQueue<CLVideoDecoderOutput *> m_queue;
 };
 
 #endif // QN_BUFFERED_FRAME_DISPLAYER_H

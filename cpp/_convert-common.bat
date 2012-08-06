@@ -11,7 +11,7 @@ if not [%1] == [] set CUSTOMIZATION=-Dcustomization=%INPUT%
 SET CURRENTDIR=%cd%
 
 cd ..\common
-call mvn compile -P!convert-clean-windows,!convert-clean %CUSTOMIZATION%
+call mvn compile -U -P!convert-clean-windows,!convert-clean %CUSTOMIZATION%
 
 cd %CURRENTDIR%
-call mvn compile -P!convert-clean-windows,!convert-clean %CUSTOMIZATION%
+call mvn compile -U -P!convert-clean-windows,!convert-clean %CUSTOMIZATION%

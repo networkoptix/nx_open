@@ -57,9 +57,9 @@ void QnStreamRecorder::close()
         if (m_packetWrited)
             av_write_trailer(m_formatCtx);
 
-        if (m_startDateTime != AV_NOPTS_VALUE)
+        if (m_startDateTime != qint64(AV_NOPTS_VALUE))
         {
-            qint64 fileDuration = m_startDateTime != AV_NOPTS_VALUE  ? (m_endDateTime - m_startDateTime)/1000 : 0;
+            qint64 fileDuration = m_startDateTime != qint64(AV_NOPTS_VALUE)  ? (m_endDateTime - m_startDateTime)/1000 : 0;
             fileFinished(fileDuration, m_fileName, m_mediaProvider, m_storage->getFileSizeByIOContext(m_ioContext));
         }
 
@@ -120,7 +120,7 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
     if (!md)
         return true; // skip unknown data
 
-    if (m_EofDateTime != AV_NOPTS_VALUE && md->timestamp > m_EofDateTime)
+    if (m_EofDateTime != qint64(AV_NOPTS_VALUE) && md->timestamp > m_EofDateTime)
     {
         if (!m_endOfData) 
         {
@@ -154,7 +154,7 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
         m_waitEOF = false;
     }
 
-    if (m_EofDateTime != AV_NOPTS_VALUE && m_EofDateTime > m_startDateTime)
+    if (m_EofDateTime != qint64(AV_NOPTS_VALUE) && m_EofDateTime > m_startDateTime)
     {
         int progress = ((md->timestamp - m_startDateTime)*100ll) /(m_EofDateTime - m_startDateTime);
         if (progress != m_lastProgress) {
@@ -168,12 +168,12 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
 
 bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
 {
-    if (m_endDateTime != AV_NOPTS_VALUE && md->timestamp - m_endDateTime > MAX_FRAME_DURATION*2*1000ll && m_truncateInterval > 0) {
+    if (m_endDateTime != qint64(AV_NOPTS_VALUE) && md->timestamp - m_endDateTime > MAX_FRAME_DURATION*2*1000ll && m_truncateInterval > 0) {
         // if multifile recording allowed, recreate file if recording hole is detected
         qDebug() << "Data hole detected for camera" << m_device->getUniqueId() << ". Diff between packets=" << (md->timestamp - m_endDateTime)/1000 << "ms";
         close();
     }
-    else if (m_startDateTime != AV_NOPTS_VALUE && md->timestamp - m_startDateTime > m_truncateInterval*3 && m_truncateInterval > 0) {
+    else if (m_startDateTime != qint64(AV_NOPTS_VALUE) && md->timestamp - m_startDateTime > m_truncateInterval*3 && m_truncateInterval > 0) {
         // if multifile recording allowed, recreate file if recording hole is detected
         qDebug() << "Too long time when no I-frame detected (file length exceed " << (md->timestamp - m_startDateTime)/1000000 << "sec. Close file";
         close();

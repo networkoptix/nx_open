@@ -1,19 +1,25 @@
 #include "gl_renderer.h"
+
 #include <cassert>
-#include <QCoreApplication> /* For Q_DECLARE_TR_FUNCTIONS. */
-#include <QErrorMessage>
-#include <QScopedPointer>
-#include <QMutex>
+
+#include <QtCore/QCoreApplication> /* For Q_DECLARE_TR_FUNCTIONS. */
+#include <QtCore/QScopedPointer>
+#include <QtCore/QMutex>
+#include <QtGui/QErrorMessage>
+
 #include <utils/common/warnings.h>
 #include <utils/common/util.h>
 #include <utils/media/sse_helper.h>
+
+#include <utils/yuvconvert.h>
+
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_functions.h>
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/shaders/yuy2_to_rgb_shader_program.h>
 #include <ui/graphics/shaders/yv12_to_rgb_shader_program.h>
-#include "utils/yuvconvert.h"
-#include "camera.h"
+
+#include "video_camera.h"
 
 #ifdef QN_GL_RENDERER_DEBUG_PERFORMANCE
 #   include <utils/common/performance.h>
@@ -53,8 +59,8 @@ public:
 
     QnGLRendererPrivate(const QGLContext *context):
         QnGlFunctions(context),
-        supportsNonPower2Textures(false),
-        status(QnGLRenderer::SUPPORTED)
+        status(QnGLRenderer::SUPPORTED),
+        supportsNonPower2Textures(false)
     {
         QByteArray extensions = reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS));
         QByteArray version = reinterpret_cast<const char *>(glGetString(GL_VERSION));

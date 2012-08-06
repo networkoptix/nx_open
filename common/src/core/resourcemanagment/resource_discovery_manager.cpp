@@ -101,7 +101,7 @@ void QnResourceDiscoveryManager::pleaseStop()
             searcher->pleaseStop();
     }
 
-    CLLongRunnable::pleaseStop();
+    QnLongRunnable::pleaseStop();
 }
 
 void QnResourceDiscoveryManager::run()

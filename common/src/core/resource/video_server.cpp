@@ -126,8 +126,8 @@ public:
     {
         QByteArray reply;
         QByteArray errorString;
-        QnSessionManager::instance()->sendGetRequest(m_url.toString(), QLatin1String("RecordedTimePeriods"), QnRequestParamList(), reply, errorString);
-        if (reply.contains("Parameter startTime must be provided"))
+        QnSessionManager::instance()->sendGetRequest(m_url.toString(), QLatin1String("ping"), QnRequestParamList(), reply, errorString);
+        if (reply.contains("Requested method is absent"))
         {
             // server OK
             m_owner->setPrimaryIF(m_url.host());

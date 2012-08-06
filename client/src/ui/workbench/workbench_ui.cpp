@@ -12,7 +12,6 @@
 #include <QtGui/QStyle>
 #include <QtGui/QApplication>
 #include <QtGui/QMenu>
-#include <QtGui/QCalendarWidget>
 
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
@@ -54,14 +53,15 @@
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
 #include <ui/actions/action_parameter_types.h>
+#include <ui/widgets/calendar_widget.h>
 #include <ui/widgets/resource_tree_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/widgets/help_widget.h>
 #include <ui/style/skin.h>
 
-#include <help/qncontext_help.h>
+#include <help/context_help.h>
 
-#include "camera/camera.h"
+#include "camera/video_camera.h"
 #include "openal/qtvaudiodevice.h"
 #include "core/resourcemanagment/resource_pool.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
@@ -528,11 +528,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_sliderItem->setFrameColor(QColor(110, 110, 110, 255));
     m_sliderItem->setFrameWidth(0.5);
     m_sliderItem->timeSlider()->toolTipItem()->setParentItem(m_controlsWidget);
-
-    m_calendarWidget = new QGraphicsProxyWidget(m_controlsWidget);
-    QCalendarWidget *calendar = new QCalendarWidget();
-    m_calendarWidget->setWidget(calendar);
-    m_calendarWidget->setVisible(false);
 
     m_sliderShowButton = newShowHideButton(m_controlsWidget);
     {
@@ -1082,12 +1077,13 @@ void QnWorkbenchUi::updateFpsGeometry() {
 }
 
 void QnWorkbenchUi::updateCalendarGeometry(){
+    QGraphicsProxyWidget* calendar = m_sliderItem->calendar();
     QnTimeSlider *timeSlider = m_sliderItem->timeSlider();
     QRectF timeSliderRect = timeSlider->rect();
     QPointF bottomRight = m_controlsWidget->mapFromItem(timeSlider, timeSliderRect.topRight());
-    QRectF calendarGeometry = m_calendarWidget->geometry();
+    QRectF calendarGeometry = calendar->geometry();
     calendarGeometry.moveTo(bottomRight - QPointF(calendarGeometry.width(), calendarGeometry.height()));
-    m_calendarWidget->setGeometry(calendarGeometry);
+    calendar->setGeometry(calendarGeometry);
 }
 
 void QnWorkbenchUi::updateSliderResizerGeometry() {
@@ -1257,7 +1253,7 @@ void QnWorkbenchUi::setThumbnailsVisible(bool visible) {
 }
 
 bool QnWorkbenchUi::isCalendarVisible() const {
-    return m_calendarWidget->isVisible();
+    return m_sliderItem->calendar()->isVisible();
 }
 
 void QnWorkbenchUi::setCalendarVisible(bool visible) {
@@ -1265,7 +1261,7 @@ void QnWorkbenchUi::setCalendarVisible(bool visible) {
         return;
 
     updateCalendarGeometry();
-    m_calendarWidget->setVisible(visible);
+    m_sliderItem->calendar()->setVisible(visible);
 }
 
 // -------------------------------------------------------------------------- //

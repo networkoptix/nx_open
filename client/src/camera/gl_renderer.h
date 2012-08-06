@@ -83,7 +83,7 @@ private:
     bool m_forceSoftYUV;
 
     uchar* m_yuv2rgbBuffer;
-    size_t m_yuv2rgbBufferLen;
+    int m_yuv2rgbBufferLen;
 
     bool m_textureUploaded;
 
@@ -107,7 +107,7 @@ private:
     int m_videoWidth;
     int m_videoHeight;
     qint64 m_lastDisplayedTime;
-    QnMetaDataV1Ptr m_lastDisplayedMetadata[CL_MAX_CHANNELS];
+    QnMetaDataV1Ptr m_lastDisplayedMetadata[CL_MAX_CHANNELS]; // TODO: get rid of this
     unsigned m_lastDisplayedFlags;
 };
 

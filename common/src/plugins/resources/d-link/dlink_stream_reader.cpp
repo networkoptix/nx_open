@@ -32,10 +32,10 @@ struct ACS_VideoHeader
 PlDlinkStreamReader::PlDlinkStreamReader(QnResourcePtr res):
 CLServerPushStreamreader(res),
 QnLiveStreamProvider(res),
+m_rtpReader(res),
 mHttpClient(0),
 m_h264(false),
-m_mpeg4(false),
-m_rtpReader(res)
+m_mpeg4(false)
 {
     
 }
@@ -246,8 +246,8 @@ QString PlDlinkStreamReader::composeVideoProfile()
     else
     {
         t << "qualitymode=Fixquality" << "&";
-
-        int q = 60;
+        
+        int q;
         switch (getQuality())
         {
         case QnQualityHighest:
@@ -269,9 +269,13 @@ QString PlDlinkStreamReader::composeVideoProfile()
         case QnQualityLowest:
             q = 40;
             break;
-        }
 
-        t << "quality=" << 1;
+        default:
+            q = 60;
+            break;
+        }
+        
+        t << "quality=" << q;
     }
 
     t.flush();
@@ -318,7 +322,7 @@ QStringList PlDlinkStreamReader::getRTPurls() const
 QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMPEG(CodecID ci)
 {
     char headerBuffer[sizeof(ACS_VideoHeader)];
-    int gotInBuffer = 0;
+    uint gotInBuffer = 0;
     while (gotInBuffer < sizeof(ACS_VideoHeader))
     {
         int readed = mHttpClient->read(headerBuffer + gotInBuffer, sizeof(ACS_VideoHeader) - gotInBuffer);
@@ -373,7 +377,7 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMPEG(CodecID ci)
 QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMJPEG()
 {
     char headerBuffer[512+1];
-    int headerSize = 0;
+    uint headerSize = 0;
     char* headerBufferEnd = 0;
     char* realHeaderEnd = 0;
     while (headerSize < sizeof(headerBuffer)-1)
