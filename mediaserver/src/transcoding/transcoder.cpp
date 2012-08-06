@@ -1,4 +1,7 @@
 #include "transcoder.h"
+#include "ffmpeg_transcoder.h"
+#include "ffmpeg_video_transcoder.h"
+#include "quick_sync_transcoder.h"
 
 // ---------------------------- QnCodecTranscoder ------------------
 QnCodecTranscoder::QnCodecTranscoder(CodecID codecId):
@@ -62,18 +65,33 @@ QnTranscoder::~QnTranscoder()
 
 }
 
-bool QnTranscoder::setVideoCodec(CodecID codec, QnVideoTranscoderPtr vTranscoder)
+bool QnTranscoder::setVideoCodec(CodecID codec, TranscodeMethod method)
 {
     m_videoCodec = codec;
-    m_vTranscoder = vTranscoder;
+    switch (method)
+    {
+        case TM_DirectStreamCopy:
+            m_vTranscoder = QnVideoTranscoderPtr();
+            break;
+        case TM_FfmpegTranscode:
+            m_vTranscoder = QnVideoTranscoderPtr(new QnFfmpegVideoTranscoder(codec));
+            break;
+        case TM_QuickSyncTranscode:
+            m_vTranscoder = QnVideoTranscoderPtr(new QnQuickSyncTranscoder(codec));
+            break;
+        case TM_OpenCLTranscode:
+            m_lastErrMessage = "OpenCLTranscode is not implemented";
+            return false;
+    }
     return true;
 }
 
-bool QnTranscoder::setAudioCodec(CodecID codec, QnAudioTranscoderPtr aTranscoder)
+bool QnTranscoder::setAudioCodec(CodecID codec, TranscodeMethod method)
 {
-    m_aTranscoder = aTranscoder;
+    m_aTranscoder = QnAudioTranscoderPtr();
     m_audioCodec = codec;
-    return true;
+    m_lastErrMessage = "Audio transcoding is not implemented";
+    return false;
 }
 
 int QnTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnByteArray& result)

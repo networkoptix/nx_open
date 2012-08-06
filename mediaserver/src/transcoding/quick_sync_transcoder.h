@@ -16,12 +16,10 @@
     Supported output:\n
     - TODO
 */
-class QnQuickSyncTranscoder
-:
-    public QnVideoTranscoder
+class QnQuickSyncTranscoder: public QnVideoTranscoder
 {
 public:
-    QnQuickSyncTranscoder();
+    QnQuickSyncTranscoder(CodecID codecId);
 
     //!Implementation of QnCodecTranscoder::setParams
     /*!
@@ -38,7 +36,7 @@ public:
     virtual void setSize( const QSize& size );
 
     //!Implementation of QnCodecTranscoder::transcodePacket
-    virtual QnAbstractMediaDataPtr transcodePacket( QnAbstractMediaDataPtr media );
+    virtual int transcodePacket( QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr& result);
 };
 
 //!Transcodes video using Intel QuickSync API to h.264 format

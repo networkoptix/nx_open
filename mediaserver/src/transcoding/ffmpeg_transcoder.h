@@ -6,22 +6,6 @@
 #include "utils/media/frame_info.h"
 #include "decoders/video/ffmpeg.h"
 
-const static int MAX_VIDEO_FRAME = 1024 * 3;
-
-class QnFfmpegVideoTranscoder: public QnVideoTranscoder
-{
-public:
-    QnFfmpegVideoTranscoder(CodecID codecId);
-    ~QnFfmpegVideoTranscoder();
-
-    virtual int transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr& result) override;
-private:
-    CLFFmpegVideoDecoder* m_videoDecoder;
-    CLVideoDecoderOutput m_decodedVideoFrame;
-    quint8* m_videoEncodingBuffer;
-    QnMediaContextPtr m_encoderCtx;
-};
-
 class QnFfmpegTranscoder: public QnTranscoder
 {
 public:
@@ -31,11 +15,6 @@ public:
     ~QnFfmpegTranscoder();
 
     int setContainer(const QString& value);
-
-    virtual bool setVideoCodec(CodecID codec, QnVideoTranscoderPtr vTranscoder = QnVideoTranscoderPtr()) override;
-
-
-    virtual bool setAudioCodec(CodecID codec, QnAudioTranscoderPtr aTranscoder = QnAudioTranscoderPtr()) override;
 
     int transcodePacket(QnAbstractMediaDataPtr media, QnByteArray& result);
 

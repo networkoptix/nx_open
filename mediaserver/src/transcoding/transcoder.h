@@ -46,8 +46,8 @@ public:
     */
     virtual int transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr& result) = 0;
     QString getLastError() const;
-
-private:
+protected:
+    QString m_lastErrMessage;
     Params m_params;
     int m_bitrate;
     CodecID m_codecId;
@@ -68,7 +68,7 @@ public:
     //!Returns picture size (in pixels) of output video stream
     QSize getSize() const;
 
-private:
+protected:
     QSize m_size;
 };
 typedef QSharedPointer<QnVideoTranscoder> QnVideoTranscoderPtr;
@@ -91,6 +91,8 @@ public:
     QnTranscoder();
     virtual ~QnTranscoder();
 
+    enum TranscodeMethod {TM_DirectStreamCopy, TM_FfmpegTranscode, TM_QuickSyncTranscode, TM_OpenCLTranscode, TM_Dummy};
+
     /*
     * Set ffmpeg container by name
     * @return Returns 0 if no error or error code
@@ -105,7 +107,7 @@ public:
     * @param bitrate Bitrate after transcode. By default bitrate is autodetected
     * @param addition codec params. Not used if directStreamCopy = true
     */
-    virtual bool setVideoCodec(CodecID codec, QnVideoTranscoderPtr vTranscoder = QnVideoTranscoderPtr());
+    virtual bool setVideoCodec(CodecID codec, TranscodeMethod method);
 
 
     /*
@@ -116,7 +118,7 @@ public:
     * @param bitrate Bitrate after transcode. By default bitrate is autodetected
     * @param addition codec params. Not used if directStreamCopy = true
     */
-    virtual bool setAudioCodec(CodecID codec, QnAudioTranscoderPtr aTranscoder = QnAudioTranscoderPtr());
+    virtual bool setAudioCodec(CodecID codec, TranscodeMethod method);
 
     /*
     * Transcode media data and write it to specified QnByteArray

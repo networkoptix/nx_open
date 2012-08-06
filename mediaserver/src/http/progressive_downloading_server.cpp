@@ -1,11 +1,15 @@
 #include "progressive_downloading_server.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "utils/network/tcp_listener.h"
+#include "transcoding/transcoder.h"
+#include "transcoding/ffmpeg_transcoder.h"
 
 static const int CONNECTION_TIMEOUT = 1000 * 5;
 
 class QnProgressiveDownloadingProcessor::QnProgressiveDownloadingProcessorPrivate: public QnTCPConnectionProcessor::QnTCPConnectionProcessorPrivate
 {
+public:
+    QnFfmpegTranscoder transcoder;
 };
 
 QnProgressiveDownloadingProcessor::QnProgressiveDownloadingProcessor(TCPSocket* socket, QnTcpListener* _owner):
@@ -23,6 +27,9 @@ QnProgressiveDownloadingProcessor::~QnProgressiveDownloadingProcessor()
 void QnProgressiveDownloadingProcessor::run()
 {
     Q_D(QnProgressiveDownloadingProcessor);
+    d->transcoder.setContainer("matroska");
+    d->transcoder.setVideoCodec(CODEC_ID_H264, QnTranscoder::TM_FfmpegTranscode);
+
     if (readRequest())
     {
         parseRequest();

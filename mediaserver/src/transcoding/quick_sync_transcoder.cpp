@@ -6,7 +6,8 @@
 #include "quick_sync_transcoder.h"
 
 
-QnQuickSyncTranscoder::QnQuickSyncTranscoder()
+QnQuickSyncTranscoder::QnQuickSyncTranscoder(CodecID codecId):
+    QnVideoTranscoder(codecId)
 {
 }
 
@@ -31,8 +32,8 @@ void QnQuickSyncTranscoder::setSize( const QSize& size )
 }
 
 //!Implementation of QnCodecTranscoder::transcodePacket
-QnAbstractMediaDataPtr QnQuickSyncTranscoder::transcodePacket( QnAbstractMediaDataPtr media )
+int QnQuickSyncTranscoder::transcodePacket( QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr& result)
 {
     //TODO/IMPL
-    return NULL;
+    return -1;
 }
