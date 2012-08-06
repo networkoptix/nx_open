@@ -24,7 +24,7 @@ class QnWorkbenchItem;
  * necessary functions for moving items around.
  */
 class QnWorkbenchLayout: public QObject {
-    Q_OBJECT
+    Q_OBJECT;
 public:
     /**
      * Helper struct for obtaining detailed information on move operations. 
