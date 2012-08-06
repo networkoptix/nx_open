@@ -878,7 +878,6 @@ void QnWorkbenchController::at_move(QGraphicsView *, const QPointF &totalDelta) 
             QnWorkbenchItem *draggedWorkbenchItem = m_draggedWorkbenchItems[0];
 
             /* Find item that dragged item was dropped on. */
-            QPoint cursorPos = QCursor::pos();
             QSet<QnWorkbenchItem *> replacedWorkbenchItems = layout->items(draggedWorkbenchItem->geometry().adjusted(m_dragDelta.x(), m_dragDelta.y(), m_dragDelta.x(), m_dragDelta.y()));
             if(replacedWorkbenchItems.size() == 1) {
                 QnWorkbenchItem *replacedWorkbenchItem = *replacedWorkbenchItems.begin();

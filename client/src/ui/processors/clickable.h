@@ -72,4 +72,4 @@ private:
     Qt::MouseButtons m_clickableButtons;
 };
 
-#endif QN_CLICKABLE_H
+#endif // QN_CLICKABLE_H

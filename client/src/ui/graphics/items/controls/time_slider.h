@@ -224,7 +224,7 @@ private:
     };
 
     struct ThumbnailData {
-        ThumbnailData(): pos(0.0), opacity(0.0), hiding(false), selection(0.0), selecting(false) {}
+        ThumbnailData(): pos(0.0), opacity(0.0), selection(0.0), hiding(false), selecting(false) {}
         ThumbnailData(const QnThumbnail &thumbnail): thumbnail(thumbnail), pos(0.0), opacity(0.0), hiding(false), selection(0.0), selecting(false) {}
 
         QnThumbnail thumbnail;
