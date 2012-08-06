@@ -11,16 +11,14 @@
 
 class QnRadialGradientPainter;
 
-namespace{
-    struct QnStatisticsHistoryData{
-        QString Id;
-        QString Description;
-        QList<int> History;
+struct QnStatisticsHistoryData {
+    QString Id; // TODO: #GDM classes start with Uppercase, fields with lowercase.
+    QString Description;
+    QList<int> History;
 
-        QnStatisticsHistoryData(QString id, QString description);
-        void append(int value);
-    };
-}
+    QnStatisticsHistoryData(QString id, QString description);
+    void append(int value);
+};
 
 class QnServerResourceWidget: public QnResourceWidget {
     Q_OBJECT;

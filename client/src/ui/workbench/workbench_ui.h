@@ -255,34 +255,43 @@ private:
     /** Stored size of ui controls widget. */
     QRectF m_controlsWidgetRect;
 
+    /** Whether the tree is pinned. */
+    bool m_treePinned;
+
     /** Whether the tree is opened. */
     bool m_treeOpened;
 
-    /** Whether navigation slider is opened. */
-    bool m_sliderOpened;
+    bool m_treeVisible;
+
+    bool m_titleUsed;
 
     /** Whether title bar is opened. */
     bool m_titleOpened;
 
-    bool m_helpOpened;
+    bool m_titleVisible;
 
-    bool m_treeVisible;
+    /** Whether navigation slider is opened. */
+    bool m_sliderOpened;
 
     bool m_sliderVisible;
 
-    bool m_titleVisible;
+    bool m_helpPinned;
+
+    bool m_helpOpened;
 
     bool m_helpVisible;
 
-    bool m_titleUsed;
-
     bool m_windowButtonsUsed;
+
+    bool m_ignoreClickEvent;
 
     bool m_inactive;
 
     GraphicsLabel *m_fpsItem;
 
-    bool m_ignoreClickEvent;
+    /* In freespace mode? */
+    bool m_inFreespace;
+
 
 
     /* Slider-related state. */
@@ -326,9 +335,6 @@ private:
 
     /** Button to pin the tree. */
     QnImageButtonWidget *m_treePinButton;
-
-    /** Whether the tree is pinned. */
-    bool m_treePinned;
 
     /** Hover processor that is used to hide the tree when the mouse leaves it. */
     HoverFocusProcessor *m_treeHidingProcessor;
@@ -397,12 +403,7 @@ private:
 
     AnimatorGroup *m_helpOpacityAnimatorGroup;
 
-    bool m_helpPinned;
-
     QnWorkbenchMotionDisplayWatcher *m_motionDisplayWatcher;
-
-    /* Freespace-related state. */
-    bool m_inFreespace;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchUi::Flags);

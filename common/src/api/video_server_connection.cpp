@@ -128,6 +128,85 @@ void detail::QnVideoServerConnectionReplyProcessor::at_replyReceived(int status,
     deleteLater();
 }
 
+
+namespace detail
+{
+    ////////////////////////////////////////////////////////////////
+    // VideoServerGetParamReplyProcessor
+    ////////////////////////////////////////////////////////////////
+    const QList< QPair< QString, QVariant> >& VideoServerGetParamReplyProcessor::receivedParams() const
+    {
+        return m_receivedParams;
+    }
+
+    //!Parses response mesasge body and fills \a m_receivedParams
+    void VideoServerGetParamReplyProcessor::parseResponse( const QByteArray& responseMessageBody )
+    {
+        m_receivedParams.clear();
+
+        const QList<QByteArray>& paramPairs = responseMessageBody.split( '\n' );
+        for( QList<QByteArray>::const_iterator
+            it = paramPairs.begin();
+            it != paramPairs.end();
+            ++it )
+        {
+            int sepPos = it->indexOf( '=' );
+            if( sepPos == -1 )   //no param value
+                m_receivedParams.push_back( qMakePair( QString::fromUtf8(it->data(), it->size()), QVariant() ) );
+            else
+            {
+                const QByteArray& paramName = it->mid( 0, sepPos );
+                m_receivedParams.push_back( qMakePair( QString::fromUtf8(paramName.data(), paramName.size()), QVariant(it->mid( sepPos+1 )) ) );
+            }
+        }
+    }
+
+    void VideoServerGetParamReplyProcessor::at_replyReceived( int status, const QByteArray& reply, const QByteArray /* &errorString */ , int /*handle*/ )
+    {
+        parseResponse( reply );
+        emit finished( status, m_receivedParams );
+        deleteLater();
+    }
+
+
+    ////////////////////////////////////////////////////////////////
+    // VideoServerSetParamReplyProcessor
+    ////////////////////////////////////////////////////////////////
+    //!QList<QPair<paramName, operation result> >. Return value is actual only after response has been handled
+    const QList<QPair<QString, bool> >& VideoServerSetParamReplyProcessor::operationResult() const
+    {
+        return m_operationResult;
+    }
+
+    //!Parses response mesasge body and fills \a m_receivedParams
+    void VideoServerSetParamReplyProcessor::parseResponse( const QByteArray& responseMessageBody )
+    {
+        m_operationResult.clear();
+        const QList<QByteArray>& paramPairs = responseMessageBody.split( '\n' );
+        for( QList<QByteArray>::const_iterator
+            it = paramPairs.begin();
+            it != paramPairs.end();
+            ++it )
+        {
+            int sepPos = it->indexOf( ':' );
+            if( sepPos == -1 )   //wrongFormat
+                continue;
+
+            const QByteArray& paramName = it->mid( sepPos+1 );
+            m_operationResult.push_back( qMakePair(
+                QString::fromUtf8(paramName.data(), paramName.size()),
+                it->mid( 0, sepPos ) == "ok" ) );
+        }
+    }
+
+    void VideoServerSetParamReplyProcessor::at_replyReceived( int status, const QByteArray& reply, const QByteArray /* &errorString */ , int /*handle*/ )
+    {
+        parseResponse( reply );
+        emit finished( status, m_operationResult );
+        deleteLater();
+    }
+}
+
 // ---------------------------------- QnVideoServerConnection ---------------------
 
 QnVideoServerConnection::QnVideoServerConnection(const QUrl &url, QObject *parent):
@@ -178,6 +257,106 @@ int QnVideoServerConnection::asyncRecordedTimePeriods(const QnNetworkResourceLis
     return asyncRecordedTimePeriods(createParamList(list, startTimeMs, endTimeMs, detail, motionRegions), processor, SLOT(at_replyReceived(int, const QnTimePeriodList&, int)));
 }
 
+int QnVideoServerConnection::asyncGetParamList(const QnNetworkResourcePtr camera, const QStringList& params, QObject *target, const char *slot)
+{
+    detail::VideoServerGetParamReplyProcessor* processor = new detail::VideoServerGetParamReplyProcessor();
+    connect(
+        processor,
+        SIGNAL(finished( int, const QList< QPair< QString, QVariant> >& )),
+        target,
+        slot,
+        Qt::QueuedConnection );
+
+    QnRequestParamList requestParams;
+    requestParams << QnRequestParam( "res_id", camera->getPhysicalId() );
+    foreach( QString param, params )
+    {
+        requestParams << QnRequestParam( param, QString() );
+    }
+    return QnSessionManager::instance()->sendAsyncGetRequest(
+        m_url,
+        QLatin1String("getCameraParam"),
+        requestParams,
+        processor,
+        SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
+}
+
+int QnVideoServerConnection::getParamList(
+    const QnNetworkResourcePtr camera,
+    const QStringList& params,
+    QList< QPair< QString, QVariant> >* const paramValues )
+{
+    QByteArray reply;
+    QByteArray errorString;
+    QnRequestParamList requestParams;
+    requestParams << QnRequestParam( "res_id", camera->getPhysicalId() );
+    foreach( QString param, params )
+        requestParams << QnRequestParam( param, QString() );
+    int status = QnSessionManager::instance()->sendGetRequest( m_url, QLatin1String("getCameraParam"), requestParams, reply, errorString );
+
+    detail::VideoServerGetParamReplyProcessor processor;
+    processor.parseResponse( reply );
+    *paramValues = processor.receivedParams();
+
+    return status;
+}
+
+int QnVideoServerConnection::asyncSetParam(
+    const QnNetworkResourcePtr camera,
+    const QList< QPair< QString, QVariant> >& params,
+    QObject *target,
+    const char* slot )
+{
+    detail::VideoServerSetParamReplyProcessor* processor = new detail::VideoServerSetParamReplyProcessor();
+    connect(
+        processor,
+        SIGNAL(finished( int, const QList<QPair<QString, bool> >& )),
+        target,
+        slot,
+        Qt::QueuedConnection );
+
+    QnRequestParamList requestParams;
+    requestParams << QnRequestParam( "res_id", camera->getPhysicalId() );
+    for( QList< QPair< QString, QVariant> >::const_iterator
+        it = params.begin();
+        it != params.end();
+        ++it )
+    {
+        requestParams << QnRequestParam( it->first, it->second.toString() );
+    }
+    return QnSessionManager::instance()->sendAsyncGetRequest(
+        m_url,
+        QLatin1String("setCameraParam"),
+        requestParams,
+        processor,
+        SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
+}
+
+int QnVideoServerConnection::setParamList(
+    const QnNetworkResourcePtr camera,
+    const QList<QPair<QString, QVariant> >& params,
+    QList<QPair<QString, bool> >* const operationResult )
+{
+    QByteArray reply;
+    QByteArray errorString;
+    QnRequestParamList requestParams;
+    requestParams << QnRequestParam( "res_id", camera->getPhysicalId() );
+    for( QList< QPair< QString, QVariant> >::const_iterator
+        it = params.begin();
+        it != params.end();
+        ++it )
+    {
+        requestParams << QnRequestParam( it->first, it->second.toString() );
+    }
+    int status = QnSessionManager::instance()->sendGetRequest( m_url, QLatin1String("setCameraParam"), requestParams, reply, errorString );
+
+    detail::VideoServerSetParamReplyProcessor processor;
+    processor.parseResponse( reply );
+    *operationResult = processor.operationResult();
+
+    return status;
+}
+
 int QnVideoServerConnection::asyncGetFreeSpace(const QString& path, QObject *target, const char *slot)
 {
     detail::VideoServerSessionManagerFreeSpaceRequestReplyProcessor *processor = new detail::VideoServerSessionManagerFreeSpaceRequestReplyProcessor();
@@ -186,7 +365,6 @@ int QnVideoServerConnection::asyncGetFreeSpace(const QString& path, QObject *tar
     QnRequestParamList params;
     params << QnRequestParam("path", path);
     return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("GetFreeSpace"), params, processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
-
 }
 
 int QnVideoServerConnection::asyncGetStatistics(QObject *target, const char *slot){
@@ -336,3 +514,12 @@ void detail::VideoServerSessionManagerStatisticsRequestReplyProcessor::at_replyR
     deleteLater();
 }
 
+void TestReceiver::getParamsCompleted( int status, const QList< QPair< QString, QVariant> >& params )
+{
+    int x = 0;
+}
+
+void TestReceiver::setParamCompleted( int status )
+{
+    int x = 0;
+}

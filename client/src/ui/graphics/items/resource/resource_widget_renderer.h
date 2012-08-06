@@ -18,9 +18,9 @@ class QnResourceWidgetRenderer: public QObject, public QnAbstractRenderer {
 public:
     QnResourceWidgetRenderer(int channelCount, QObject *parent = NULL, const QGLContext *context = NULL);
 
-    void update();
-
     virtual ~QnResourceWidgetRenderer();
+
+    void update();
 
     virtual void draw(CLVideoDecoderOutput *image) override;
 

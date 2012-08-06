@@ -14,7 +14,13 @@ class TCPSocket;
 class QnRestRequestHandler: public QObject
 {
 public:
+	/*!
+		\return http statusCode
+	*/
     virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result) = 0;
+	/*!
+		\return http statusCode
+	*/
     virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result) = 0;
 
     // incoming connection socket
