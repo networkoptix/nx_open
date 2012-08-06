@@ -121,8 +121,8 @@ int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDa
                 avcodec_copy_context(m_videoEncoderCodecCtx, m_vTranscoder->getCodecContext());
             }
             else {
-                m_videoEncoderCodecCtx->width = m_vTranscoder->getSize().width();
-                m_videoEncoderCodecCtx->height = m_vTranscoder->getSize().height();
+                m_videoEncoderCodecCtx->width = m_vTranscoder->getResolution().width();
+                m_videoEncoderCodecCtx->height = m_vTranscoder->getResolution().height();
             }
         }
         else 

@@ -28,7 +28,7 @@ void QnProgressiveDownloadingProcessor::run()
 {
     Q_D(QnProgressiveDownloadingProcessor);
     d->transcoder.setContainer("matroska");
-    d->transcoder.setVideoCodec(CODEC_ID_H264, QnTranscoder::TM_FfmpegTranscode);
+    d->transcoder.setVideoCodec(CODEC_ID_H264, QnTranscoder::TM_FfmpegTranscode, QSize(640,480));
 
     if (readRequest())
     {

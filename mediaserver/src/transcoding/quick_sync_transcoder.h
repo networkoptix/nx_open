@@ -33,7 +33,7 @@ public:
     //!Implementation of QnCodecTranscoder::setBitrate
     virtual void setBitrate( int value );
     //!Implementation of QnVideoTranscoder::setBitrate
-    virtual void setSize( const QSize& size );
+    virtual void setResolution( const QSize& value );
 
     //!Implementation of QnCodecTranscoder::transcodePacket
     virtual int transcodePacket( QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr& result);

@@ -40,14 +40,14 @@ QnVideoTranscoder::QnVideoTranscoder(CodecID codecId):
 }
 
 
-void QnVideoTranscoder::setSize(const QSize& size)
+void QnVideoTranscoder::setResolution(const QSize& value)
 {
-    m_size = size;
+    m_resolution = value;
 }
 
-QSize QnVideoTranscoder::getSize() const
+QSize QnVideoTranscoder::getResolution() const
 {
-    return m_size;
+    return m_resolution;
 }
 
 // ---------------------- QnTranscoder -------------------------
@@ -65,7 +65,7 @@ QnTranscoder::~QnTranscoder()
 
 }
 
-bool QnTranscoder::setVideoCodec(CodecID codec, TranscodeMethod method)
+bool QnTranscoder::setVideoCodec(CodecID codec, TranscodeMethod method, const QSize& resolution, int bitrate, const QnCodecTranscoder::Params& params)
 {
     m_videoCodec = codec;
     switch (method)
@@ -82,6 +82,11 @@ bool QnTranscoder::setVideoCodec(CodecID codec, TranscodeMethod method)
         case TM_OpenCLTranscode:
             m_lastErrMessage = "OpenCLTranscode is not implemented";
             return false;
+    }
+    if (m_vTranscoder)
+    {
+        m_vTranscoder->setResolution(resolution);
+        m_vTranscoder->setBitrate(bitrate);
     }
     return true;
 }

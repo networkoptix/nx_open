@@ -26,9 +26,9 @@ void QnQuickSyncTranscoder::setBitrate( int value )
     QnCodecTranscoder::setBitrate( value );
 }
 
-void QnQuickSyncTranscoder::setSize( const QSize& size )
+void QnQuickSyncTranscoder::setResolution( const QSize& value )
 {
-    QnVideoTranscoder::setSize( size );
+    QnVideoTranscoder::setResolution( value );
 }
 
 //!Implementation of QnCodecTranscoder::transcodePacket

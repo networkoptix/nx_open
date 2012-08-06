@@ -64,12 +64,12 @@ public:
     /*!
         By default, output stream has the same picture size as input
     */
-    virtual void setSize( const QSize& size );
+    virtual void setResolution( const QSize& value );
     //!Returns picture size (in pixels) of output video stream
-    QSize getSize() const;
+    QSize getResolution() const;
 
 protected:
-    QSize m_size;
+    QSize m_resolution;
 };
 typedef QSharedPointer<QnVideoTranscoder> QnVideoTranscoderPtr;
 
@@ -103,11 +103,12 @@ public:
     * Set ffmpeg video codec and params
     * @return Returns 0 if no error or error code
     * @param codec codec to transcode
-    * @param directStreamCopy if true - do not transcode video data, only put it to destination container
-    * @param bitrate Bitrate after transcode. By default bitrate is autodetected
-    * @param addition codec params. Not used if directStreamCopy = true
+    * @param method how to transcode: no transcode, software, GPU e.t.c
+    * @resolution output resolution. Not used if transcode method TM_NoTranscode
+    * @param bitrate Bitrate after transcode. By default bitrate is autodetected. Not used if transcode method TM_NoTranscode
+    * @param addition codec params. Not used if transcode method TM_NoTranscode
     */
-    virtual bool setVideoCodec(CodecID codec, TranscodeMethod method);
+    virtual bool setVideoCodec(CodecID codec, TranscodeMethod method, const QSize& resolution = QSize(1024,768), int bitrate = -1, const QnCodecTranscoder::Params& params = QnCodecTranscoder::Params());
 
 
     /*
