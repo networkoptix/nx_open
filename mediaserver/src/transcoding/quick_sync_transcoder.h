@@ -14,20 +14,29 @@
     Supported input:\n
     - TODO
     Supported output:\n
-    - TODO
+    - h.264
 */
-class QnQuickSyncTranscoder: public QnVideoTranscoder
+class QnQuickSyncVideoTranscoder
+:
+    public QnVideoTranscoder
 {
 public:
-    QnQuickSyncTranscoder(CodecID codecId);
+    /*!
+        \param codecId
+    */
+    QnQuickSyncVideoTranscoder( CodecID codecId );
 
     //!Implementation of QnCodecTranscoder::setParams
     /*!
         Supported parameters:\n
         - gopSize. 25, by default
         - deinterlace. Produce progressive frames at output. false, by default
-        - bitrate control type.
-        - qp (Quantization Parameter).
+        - qp (Quantization Parameter). TODO
+        - bitrate control type. TODO
+
+        for h.264:\n
+        - profile. baseline, by default
+        - level. 3.1, by default
     */
     virtual void setParams( const Params& params );
     //!Implementation of QnCodecTranscoder::setBitrate
@@ -36,28 +45,7 @@ public:
     virtual void setResolution( const QSize& value );
 
     //!Implementation of QnCodecTranscoder::transcodePacket
-    virtual int transcodePacket( QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr& result);
-};
-
-//!Transcodes video using Intel QuickSync API to h.264 format
-/*!
-    Supported input:\n
-    - 
-*/
-class QnAVCQuickSyncTranscoder
-:
-    public QnQuickSyncTranscoder
-{
-public:
-    //!Implementation of QnCodecTranscoder::transcodePacket
-    virtual QnAbstractMediaDataPtr transcodePacket( QnAbstractMediaDataPtr media );
-    //!Implementation of QnCodecTranscoder::setParams
-    /*!
-        Supported parameters:\n
-        - profile. baseline, by default
-        - level. 3.1, by default
-    */
-    virtual void setParams( const Params& params );
+    virtual int transcodePacket( QnAbstractMediaDataPtr inputAU, QnAbstractMediaDataPtr& outputAU );
 };
 
 #endif  //QUICK_SYNC_TRANSCODER_H
