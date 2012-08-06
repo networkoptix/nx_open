@@ -1,11 +1,9 @@
 #include "transcoder.h"
 
 QnTranscoder::QnTranscoder():
-    m_videoStreamCopy(false),
-    m_audioStreamCopy(false),
-    m_isVideoPresent(false),
-    m_isAudioPresent(false),
-    m_initialized(false)
+    m_initialized(false),
+    m_videoCodec(CODEC_ID_NONE),
+    m_audioCodec(CODEC_ID_NONE)
 {
 
 }
@@ -15,17 +13,17 @@ QnTranscoder::~QnTranscoder()
 
 }
 
-bool QnTranscoder::setVideoCodec(CodecID codec, bool directStreamCopy, int width, int height, int bitrate, const Params& params)
+bool QnTranscoder::setVideoCodec(CodecID codec, QnVideoTranscoderPtr vTranscoder)
 {
-    m_videoStreamCopy = directStreamCopy;
-    m_isVideoPresent = true;
+    m_videoCodec = codec;
+    m_vTranscoder = vTranscoder;
     return true;
 }
 
-bool QnTranscoder::setAudioCodec(CodecID codec, bool directStreamCopy, int bitrate, const Params& params)
+bool QnTranscoder::setAudioCodec(CodecID codec, QnAudioTranscoderPtr aTranscoder)
 {
-    m_audioStreamCopy = directStreamCopy;
-    m_isAudioPresent = true;
+    m_aTranscoder = aTranscoder;
+    m_audioCodec = codec;
     return true;
 }
 
@@ -40,9 +38,9 @@ int QnTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnByteArray& res
             m_delayedVideoQueue << qSharedPointerDynamicCast<QnCompressedVideoData> (media);
         else
             m_delayedAudioQueue << qSharedPointerDynamicCast<QnCompressedAudioData> (media);
-        if (m_isVideoPresent && m_videoStreamCopy && m_delayedVideoQueue.isEmpty())
+        if (m_videoCodec != CODEC_ID_NONE && m_delayedVideoQueue.isEmpty())
             return 0; // not ready to init
-        if (m_isAudioPresent && m_audioStreamCopy && m_delayedAudioQueue.isEmpty())
+        if (m_audioCodec != CODEC_ID_NONE && m_delayedAudioQueue.isEmpty())
             return 0; // not ready to init
         int rez = open(m_delayedVideoQueue.isEmpty() ? QnCompressedVideoDataPtr() : m_delayedVideoQueue.first(), 
                        m_delayedAudioQueue.isEmpty() ? QnCompressedAudioDataPtr() : m_delayedAudioQueue.first());

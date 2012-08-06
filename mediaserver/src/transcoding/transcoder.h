@@ -2,9 +2,39 @@
 #define __TRANSCODER_H
 
 #include <QString>
-#include <QLocale>
+#include <QSharedPointer>
 #include "libavcodec/avcodec.h"
 #include "core/datapacket/mediadatapacket.h"
+
+class QnCodecTranscoder
+{
+public:
+    typedef QMap<QString, QVariant> Params;
+
+    void setParams(const Params& params);
+    void setBitrate(int value);
+
+    virtual QnAbstractMediaDataPtr transcodePacket(QnAbstractMediaDataPtr media) = 0;
+private:
+    Params m_params;
+    int m_bitrate;
+};
+typedef QSharedPointer<QnCodecTranscoder> QnCodecTranscoderPtr;
+
+class QnVideoTranscoder: public QnCodecTranscoder
+{
+public:
+    void setSize(const QSize& size);
+private:
+    QSize m_size;
+};
+typedef QSharedPointer<QnVideoTranscoder> QnVideoTranscoderPtr;
+
+class QnAudioTranscoder: public QnCodecTranscoder
+{
+public:
+};
+typedef QSharedPointer<QnAudioTranscoder> QnAudioTranscoderPtr;
 
 /*
 * Transcode input MediaPackets to specified format
@@ -12,8 +42,6 @@
 class QnTranscoder: public QObject
 {
 public:
-    typedef QMap<QString, QVariant> Params;
-
     QnTranscoder();
     virtual ~QnTranscoder();
 
@@ -31,7 +59,7 @@ public:
     * @param bitrate Bitrate after transcode. By default bitrate is autodetected
     * @param addition codec params. Not used if directStreamCopy = true
     */
-    virtual bool setVideoCodec(CodecID codec, bool directStreamCopy = false, int width = 1920, int height = 1080, int bitrate = -1, const Params& params = Params()) = 0;
+    virtual bool setVideoCodec(CodecID codec, QnVideoTranscoderPtr vTranscoder = QnVideoTranscoderPtr());
 
 
     /*
@@ -42,7 +70,7 @@ public:
     * @param bitrate Bitrate after transcode. By default bitrate is autodetected
     * @param addition codec params. Not used if directStreamCopy = true
     */
-    virtual bool setAudioCodec(CodecID codec, bool directStreamCopy = false, int bitrate = -1, const Params& params = Params());
+    virtual bool setAudioCodec(CodecID codec, QnAudioTranscoderPtr aTranscoder = QnAudioTranscoderPtr());
 
     /*
     * Transcode media data and write it to specified QnByteArray
@@ -65,10 +93,12 @@ protected:
 
     virtual int transcodePacketInternal(QnAbstractMediaDataPtr media, QnByteArray& result) = 0;
 protected:
+    QnVideoTranscoderPtr m_vTranscoder;
+    QnAudioTranscoderPtr m_aTranscoder;
+    CodecID m_videoCodec;
+    CodecID m_audioCodec;
     bool m_videoStreamCopy;
     bool m_audioStreamCopy;
-    bool m_isVideoPresent;
-    bool m_isAudioPresent;
 private:
     QString m_lastErrMessage;
     QQueue<QnCompressedVideoDataPtr> m_delayedVideoQueue;

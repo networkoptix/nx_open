@@ -33,7 +33,7 @@ public:
     * @param bitrate Bitrate after transcode. By default bitrate is autodetected
     * @param addition codec params. Not used if directStreamCopy = true
     */
-    bool setVideoCodec(CodecID codec, bool directStreamCopy = false, int width = 1920, int height = 1080, int bitrate = -1, const Params& params = Params());
+    virtual bool setVideoCodec(CodecID codec, QnVideoTranscoderPtr vTranscoder = QnVideoTranscoderPtr()) override;
 
 
     /*
@@ -44,7 +44,7 @@ public:
     * @param bitrate Bitrate after transcode. By default bitrate is autodetected
     * @param addition codec params. Not used if directStreamCopy = true
     */
-    bool setAudioCodec(CodecID codec, bool directStreamCopy = false, int bitrate = -1, const Params& params = Params());
+    virtual bool setAudioCodec(CodecID codec, QnAudioTranscoderPtr aTranscoder = QnAudioTranscoderPtr()) override;
 
     /*
     * Transcode media data and write it to specified QnByteArray

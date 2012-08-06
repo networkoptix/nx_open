@@ -95,45 +95,44 @@ int QnFfmpegTranscoder::setContainer(const QString& container)
     return 0;
 }
 
-bool QnFfmpegTranscoder::setVideoCodec(CodecID codec, bool directStreamCopy, int width, int height, int bitrate, const Params& params)
+bool QnFfmpegTranscoder::setVideoCodec(CodecID codec, QnVideoTranscoderPtr vTranscoder)
 {
-    QnTranscoder::setVideoCodec(codec, directStreamCopy, width, height, bitrate, params);
-    if (!directStreamCopy)
-    {
-        AVCodec* avCodec = avcodec_find_decoder(codec);
-        if (avCodec == 0)
-        {
-            m_lastErrMessage = tr("Transcoder error: can't find codec").arg(codec);
-            return false;
-        }
-
-        m_videoEncoderCodecCtx = avcodec_alloc_context3(avCodec);
-        m_videoEncoderCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
-        m_videoEncoderCodecCtx->codec_id = codec;
-        m_videoEncoderCodecCtx->width = width;
-        m_videoEncoderCodecCtx->height = height;
-        m_videoEncoderCodecCtx->pix_fmt = PIX_FMT_YUV420P;
-        m_videoEncoderCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
-        if (bitrate == -1)
-            bitrate = width*height*5; // auto fill bitrate. 10Mbit for full HD
-        m_videoEncoderCodecCtx->bit_rate = bitrate;
-        m_videoEncoderCodecCtx->gop_size = 30;
-        m_videoEncoderCodecCtx->time_base.num = 1;
-        m_videoEncoderCodecCtx->time_base.den = 60;
-    }
+    QnTranscoder::setVideoCodec(codec, vTranscoder);
     return true;
 }
 
-bool QnFfmpegTranscoder::setAudioCodec(CodecID codec, bool directStreamCopy, int bitrate, const Params& params)
+bool QnFfmpegTranscoder::setAudioCodec(CodecID codec, QnAudioTranscoderPtr aTranscoder)
 {
-    QnTranscoder::setAudioCodec(codec, directStreamCopy, bitrate, params);
+    QnTranscoder::setAudioCodec(codec, aTranscoder);
     return true;
 }
 
 int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDataPtr audio)
 {
-    if (m_isVideoPresent)
+    if (m_videoCodec != CODEC_ID_NONE)
     {
+        if (!m_vTranscoder)
+        {
+            AVCodec* avCodec = avcodec_find_decoder(m_videoCodec);
+            if (avCodec == 0)
+            {
+                m_lastErrMessage = tr("Transcoder error: can't find codec").arg(m_videoCodec);
+                return false;
+            }
+
+            m_videoEncoderCodecCtx = avcodec_alloc_context3(avCodec);
+            m_videoEncoderCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
+            m_videoEncoderCodecCtx->codec_id = m_videoCodec;
+            m_videoEncoderCodecCtx->width = video->width;
+            m_videoEncoderCodecCtx->height = video->height;
+            m_videoEncoderCodecCtx->pix_fmt = PIX_FMT_YUV420P;
+            m_videoEncoderCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
+            m_videoEncoderCodecCtx->bit_rate = video->width * video->height*5; // auto fill bitrate. 10Mbit for full HD
+            m_videoEncoderCodecCtx->gop_size = 30;
+            m_videoEncoderCodecCtx->time_base.num = 1;
+            m_videoEncoderCodecCtx->time_base.den = 60;
+        }
+
         AVStream* videoStream = av_new_stream(m_formatCtx, 0);
         if (videoStream == 0)
         {
@@ -149,7 +148,7 @@ int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDa
         videoStream->codec = m_videoEncoderCodecCtx;
     }
 
-    if (m_isAudioPresent)
+    if (m_audioCodec != CODEC_ID_NONE)
     {
         AVStream* audioStream = av_new_stream(m_formatCtx, 0);
         if (audioStream == 0)
@@ -159,7 +158,7 @@ int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDa
             return -1;
         }
 
-        if (m_audioStreamCopy) {
+        if (!m_aTranscoder) {
             AVCodecContext* srcContext = audio->context->ctx();
             avcodec_copy_context(m_audioEncoderCodecCtx, srcContext);
         }
@@ -194,9 +193,10 @@ int QnFfmpegTranscoder::transcodePacketInternal(QnAbstractMediaDataPtr media, Qn
     packet.size = media->data.size();
 
     QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(media);
+    /*
     if (video)
     {
-        if (!m_videoStreamCopy) 
+        if (m_vTranscoder )
         {
             if (!m_videoDecoder) 
                 m_videoDecoder = new CLFFmpegVideoDecoder(video->compressionType, video, false);
@@ -206,7 +206,7 @@ int QnFfmpegTranscoder::transcodePacketInternal(QnAbstractMediaDataPtr media, Qn
             packet.data = m_videoEncodingBuffer;
         }
     }
-
+    */
     if (av_write_frame(m_formatCtx, &packet) < 0) {
         qWarning() << QLatin1String("Transcoder error: can't write AV packet");
         //return -1; // ignore error and continue
