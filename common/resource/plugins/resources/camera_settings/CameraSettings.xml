@@ -24,6 +24,8 @@
       <param name = "Ir Cut Filter Modes"
                description = ""
                widget_type = "Enumeration"
+               min = "ON,OFF,AUTO"
+               max = "ON,OFF,AUTO"
                query = ""/>
 
       <param name = "Sharpness"
@@ -60,6 +62,8 @@
         <param name = "Mode"
                description = ""
                widget_type = "Enumeration"
+               min = "AUTO,MANUAL"
+               max = "AUTO,MANUAL"
                query = ""/>
         <param name = "Yr Gain"
                description = ""
@@ -76,10 +80,14 @@
         <param name = "Mode"
                description = ""
                widget_type = "Enumeration"
+               min = "AUTO,MANUAL"
+               max = "AUTO,MANUAL"
                query = ""/>
         <param name = "Priority"
                description = ""
                widget_type = "Enumeration"
+               min = "LowNoise,FrameRate"
+               max = "LowNoise,FrameRate"
                query = ""/>
         <param name = "Min Exposure Time"
                description = ""

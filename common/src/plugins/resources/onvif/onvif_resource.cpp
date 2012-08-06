@@ -311,7 +311,8 @@ bool QnPlOnvifResource::initInternal()
 
     save();
 
-    testCameraSettings();
+    //Additional camera settings
+    fetchAndSetCameraSettings();
 
     return true;
 }
@@ -557,6 +558,10 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
             if (response.Capabilities->Media) 
             {
                 setMediaUrl(QString::fromStdString(response.Capabilities->Media->XAddr));
+            }
+            if (response.Capabilities->Imaging)
+            {
+                setImagingUrl(QString::fromStdString(response.Capabilities->Imaging->XAddr));
             }
             if (response.Capabilities->Device) 
             {
@@ -804,6 +809,18 @@ QString QnPlOnvifResource::getMediaUrl() const
 void QnPlOnvifResource::setMediaUrl(const QString& src) 
 {
     setParam(MEDIA_URL_PARAM_NAME, src, QnDomainDatabase);
+}
+
+QString QnPlOnvifResource::getImagingUrl() const 
+{ 
+    m_mutex.lock();
+    return m_imagingUrl;
+}
+
+void QnPlOnvifResource::setImagingUrl(const QString& src) 
+{
+    m_mutex.lock();
+    m_imagingUrl = src;
 }
 
 void QnPlOnvifResource::save()
@@ -1419,43 +1436,268 @@ bool QnPlOnvifResource::setSpecialParam(const QString& name, const QVariant& val
     return false;
 }
 
-void QnPlOnvifResource::testCameraSettings() const
+bool QnPlOnvifResource::getParamPhysical(const QnParam &param, QVariant &val)
 {
-    QString capabilitiesUrl;
-    QAuthenticator auth(getAuth());
+    /*if (param.netHelper().isEmpty()) // check if we have paramNetHelper command for this param
+        return false;
 
+    CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
+
+    QString request = QLatin1String("get?") + param.netHelper();
+
+    CLHttpStatus status = connection.doGET(request);
+    if (status == CL_HTTP_AUTH_REQUIRED)
+        setStatus(QnResource::Unauthorized);
+
+    if (status != CL_HTTP_SUCCESS)
+        return false;
+
+
+    char c_response[MAX_RESPONSE_LEN];
+
+    int result_size =  connection.read(c_response,sizeof(c_response));
+
+    if (result_size <0)
+        return false;
+
+    QByteArray response = QByteArray::fromRawData(c_response, result_size); // QByteArray  will not copy data
+
+    int index = response.indexOf('=');
+    if (index==-1)
+        return false;
+
+    QByteArray rarray = response.mid(index+1);
+
+    val = QLatin1String(rarray.data());
+
+    return true;*/
+}
+
+bool QnPlOnvifResource::setParamPhysical(const QnParam &param, const QVariant& val )
+{
+    /*if (param.netHelper().isEmpty()) // check if we have paramNetHelper command for this param
+        return false;
+
+    CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
+
+    QString request = QLatin1String("set?") + param.netHelper();
+    if (param.type() != QnParamType::None && param.type() != QnParamType::Button)
+        request += QLatin1Char('=') + val.toString();
+
+    CLHttpStatus status = connection.doGET(request);
+    if (status != CL_HTTP_SUCCESS)
+        status = connection.doGET(request);
+
+    if (CL_HTTP_SUCCESS == status)
+        return true;
+
+    if (CL_HTTP_AUTH_REQUIRED == status)
     {
-        DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString());
+        setStatus(QnResource::Unauthorized);
+        return false;
+    }
 
-        CapabilitiesReq request;
-        CapabilitiesResp response;
+    return false;*/
+}
 
-        int soapRes = soapWrapper.getCapabilities(request, response);
+void QnPlOnvifResource::fetchAndSetCameraSettings()
+{
+    OnvifCameraSettingsResp settings;
+
+    QString imagingUrl = getImagingUrl();
+    if (imagingUrl.isEmpty()) {
+        qDebug() << "QnPlOnvifResource::fetchAndSetCameraSettings: imaging service is absent on device (URL: "
+            << getDeviceOnvifUrl() << ", UniqId: " << getUniqueId() << ").";
+        return;
+    } else {
+        QAuthenticator auth(getAuth());
+        ImagingSoapWrapper rangesSoapWrapper(imagingUrl.toLatin1().data(), auth.user().toStdString(), auth.password().toStdString());
+        ImagingOptionsReq rangesRequest;
+        rangesRequest.VideoSourceToken = getVideoSourceId().toStdString();
+
+        int soapRes = rangesSoapWrapper.getOptions(rangesRequest, settings.rangesResponse);
         if (soapRes != SOAP_OK) {
-            qDebug() << "OnvifResourceInformationFetcher::findResources: can't fetch media and device URLs. Reason: SOAP to endpoint "
-                << soapWrapper.getEndpointUrl() << " failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
+            qWarning() << "QnPlOnvifResource::fetchAndSetCameraSettings: can't fetch imaging options. Reason: SOAP to endpoint "
+                << rangesSoapWrapper.getEndpointUrl() << " failed. GSoap error code: " << soapRes << ". " << rangesSoapWrapper.getLastError();
+        }
 
-        } else if (response.Capabilities && response.Capabilities->Imaging) {
-            capabilitiesUrl = QString::fromStdString(response.Capabilities->Imaging->XAddr);
+
+        ImagingSoapWrapper valsSoapWrapper(imagingUrl.toLatin1().data(), auth.user().toStdString(), auth.password().toStdString());
+        ImagingSettingsReq valsRequest;
+        valsRequest.VideoSourceToken = getVideoSourceId().toStdString();
+
+        int soapRes = valsSoapWrapper.getImagingSettings(valsRequest, settings.valsResponse);
+        if (soapRes != SOAP_OK) {
+            qWarning() << "QnPlOnvifResource::fetchAndSetCameraSettings: can't fetch imaging settings. Reason: SOAP to endpoint "
+                << valsSoapWrapper.getEndpointUrl() << " failed. GSoap error code: " << soapRes << ". " << valsSoapWrapper.getLastError();
         }
     }
 
-    if (capabilitiesUrl.isEmpty()) {
-        capabilitiesUrl = QLatin1String("http://192.168.0.123:8032/onvif/imaging_service");
-        //return;
+    fetchAndSetCameraSettings(settings);
+}
+
+void QnPlOnvifResource::fetchAndSetCameraSettings(const OnvifCameraSettingsResp& onvifSettings)
+{
+    CameraSettings cameraSettings;
+    QString error;
+    QString filepath = QString.fromLatin1(QLatin1String("C:\\projects\\networkoptix\\netoptix_vms33\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml"));
+
+    if (!loadSettingsFromXml(onvifSettings, filepath, cameraSettings, error))
+    {
+        qWarning() << "QnPlOnvifResource::fetchAndSetCameraSettings. Can't load camera settings from xml. Details: " << error;
     }
 
+    if (!cameraSettings.isEmpty()) {
+        m_mutex.lock();
+        m_cameraSettings = cameraSettings;
+    }
+}
+
+bool QnPlOnvifResource::loadSettingsFromXml(const OnvifCameraSettingsResp& onvifSettings, const QString& filepath, CameraSettings& cameraSettings, QString& error)
+{
+    QFile file(filepath);
+
+    if (!file.exists())
     {
-        ImagingSoapWrapper soapWrapper(capabilitiesUrl.toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString());
+        error = QLatin1String("Cannot open file ");
+        error += filepath;
+        return false;
+    }
 
-        ImagingOptionsReq request;
-        //request.VideoSourceToken = getVideoSourceId().toStdString();
-        ImagingOptionsResp response;
+    QString errorStr;
+    int errorLine;
+    int errorColumn;
+    QDomDocument doc;
 
-        int soapRes = soapWrapper.getOptions(request, response);
-        if (soapRes != SOAP_OK) {
-            qDebug() << "OnvifResourceInformationFetcher::testCameraSettings: can't fetch imaging options. Reason: SOAP to endpoint "
-                << soapWrapper.getEndpointUrl() << " failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
+    if (!doc.setContent(&file, &errorStr, &errorLine, &errorColumn))
+    {
+        QTextStream str(&error);
+        str << QLatin1String("File ") << filepath << QLatin1String("; Parse error at line ") << errorLine << QLatin1String(" column ") << errorColumn << QLatin1String(" : ") << errorStr;
+        return false;
+    }
+
+    QDomElement root = doc.documentElement();
+    if (root.tagName() != QLatin1String("cameras"))
+        return false;
+
+    QDomNode node = root.firstChild();
+
+    while (!node.isNull())
+    {
+        if (node.toElement().tagName() == QLatin1String("camera"))
+        {
+            if (node.attributes().namedItem(QLatin1String("name")).nodeValue() != QLatin1String("ONVIF")) {
+                continue;
+            }
+            return parseCameraXml(onvifSettings, node.toElement(), cameraSettings, error);
+        }
+
+        node = node.nextSibling();
+    }
+
+    return true;
+}
+
+bool QnPlOnvifResource::parseCameraXml(const OnvifCameraSettingsResp& onvifSettings, const QDomElement &cameraXml, CameraSettings& cameraSettings, QString& error)
+{
+    if (!parseGroupXml(onvifSettings, cameraXml.firstChildElement(), QLatin1String(""), cameraSettings, error)) {
+        cameraSettings.clear();
+        return false;
+    }
+
+    return true;
+}
+
+bool QnPlOnvifResource::parseGroupXml(const OnvifCameraSettingsResp& onvifSettings, const QDomElement &groupXml, const QString parentId, CameraSettings& cameraSettings, QString& error)
+{
+    if (groupXml.isNull()) {
+        return true;
+    }
+
+    QString tagName = groupXml.nodeName();
+
+    if (tagName == QLatin1String("param") && !parseElementXml(onvifSettings, groupXml, parentId, cameraSettings, error)) {
+        return false;
+    }
+
+    if (tagName == QLatin1String("group"))
+    {
+        QString name = groupXml.attribute(QLatin1String("name"));
+        if (name.isEmpty()) {
+            error += QLatin1String("One of the tags '");
+            error += tagName;
+            error += QLatin1String("' doesn't have attribute 'name'");
+            return false;
+        }
+        QString id = parentId + QLatin1String("%%") + name;
+
+        if (onvifSettings.isEmpty() && id == "%%Imaging")
+        {
+            cameraSettings.insert(id, CameraSetting());
+        } else {
+            //By default it is assumed that setting that have no value is enabled
+            //cameraSettings.insert(...);
+
+            if (!parseGroupXml(onvifSettings, groupXml.firstChildElement(), id, cameraSettings, error)) {
+                return false;
+            }
         }
     }
+
+    if (!parseGroupXml(onvifSettings, groupXml.nextSiblingElement(), parentId, cameraSettings, error)) {
+        return false;
+    }
+
+    return true;
+}
+
+bool QnPlOnvifResource::parseElementXml(const OnvifCameraSettingsResp& onvifSettings, const QDomElement &elementXml, const QString parentId, CameraSettings& cameraSettings, QString& error)
+{
+    if (elementXml.isNull() || elementXml.nodeName() != QLatin1String("param")) {
+        return true;
+    }
+
+    //Maintenance contains only buttons, so do nothing
+    if (parentId.startsWith(QLatin1String("%%Maintenance"))) {
+        return true;
+    }
+
+    QString name = elementXml.attribute(QLatin1String("name"));
+    if (name.isEmpty()) {
+        error += QLatin1String("One of the tags 'param' doesn't have attribute 'name'");
+        return false;
+    }
+
+    QString id = parentId + QLatin1String("%%") + name;
+
+    QString widgetTypeStr = elementXml.attribute(QLatin1String("widget_type"));
+    if (widgetTypeStr.isEmpty()) {
+        error += QLatin1String("One of the tags 'param' doesn't have attribute 'widget_type'");
+        return false;
+    }
+    CameraSetting::WIDGET_TYPE widgetType = CameraSetting::typeFromStr(widgetTypeStr);
+
+    CameraSettingValue min = CameraSettingValue(elementXml.attribute(QLatin1String("min")));
+    CameraSettingValue max = CameraSettingValue(elementXml.attribute(QLatin1String("max")));
+    CameraSettingValue step = CameraSettingValue(elementXml.attribute(QLatin1String("step")));
+
+    switch(widgetType)
+    {
+    case CameraSetting::OnOff: case CameraSetting::MinMaxStep: case CameraSetting::Enumeration:
+        CameraSetting tmp(id, name, widgetType, min, max, step);
+        cameraSettings.insert(id, fetchOnOffType(id, name, onvifSettings, error));
+        break;
+
+    case CameraSetting::Button:
+        //If absent = enabled
+        //CameraSettingValue tmp(QLatin1String("ENABLED"));
+        //cameraSettings.insert(id, CameraSetting(id, name, widgetType, tmp, tmp, tmp, tmp));
+        break;
+
+    default:
+        error += QLatin1String("One of the tags 'param' has unexpected value of attribute 'widget_type': ") + widgetTypeStr;
+        return false;
+    }
+
+    return true;
 }

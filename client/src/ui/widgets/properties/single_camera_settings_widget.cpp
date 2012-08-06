@@ -130,8 +130,7 @@ bool QnSingleCameraSettingsWidget::loadSettingsFromXml(const QString& filepath, 
             if (node.attributes().namedItem(QLatin1String("name")).nodeValue() != QLatin1String("ONVIF")) {
                 continue;
             }
-            if (!parseCameraXml(node.toElement(), error))
-                return false;
+            return parseCameraXml(node.toElement(), error);
         }
 
         node = node.nextSibling();
@@ -233,13 +232,18 @@ bool QnSingleCameraSettingsWidget::parseElementXml(const QDomElement &elementXml
         return false;
     }
 
-    //CameraSettingValue min = CameraSettingValue(elementXml.attribute(QLatin1String("min")));
-    //CameraSettingValue max = CameraSettingValue(elementXml.attribute(QLatin1String("max")));
-    //CameraSettingValue step = CameraSettingValue(elementXml.attribute(QLatin1String("step")));
-    CameraSettingValue min = CameraSettingValue(QLatin1String("0"));
-    CameraSettingValue max = CameraSettingValue(QLatin1String("100"));
-    CameraSettingValue step = CameraSettingValue(QLatin1String("5"));
-    CameraSettingValue current = CameraSettingValue(QLatin1String("20"));
+    CameraSettingValue min = CameraSettingValue(elementXml.attribute(QLatin1String("min")));
+    CameraSettingValue max = CameraSettingValue(elementXml.attribute(QLatin1String("max")));
+    CameraSettingValue step = CameraSettingValue(elementXml.attribute(QLatin1String("step")));
+    CameraSettingValue current = CameraSettingValue();
+    //ToDo: remove following lines:
+    if (widgetType != CameraSetting::Enumeration)
+    {
+        min = CameraSettingValue(QLatin1String("0"));
+        max = CameraSettingValue(QLatin1String("100"));
+        step = CameraSettingValue(QLatin1String("5"));
+        current = CameraSettingValue(QLatin1String("20"));
+    }
 
     WidgetsById::ConstIterator parentIt = m_widgetsById.find(parentId);
     if (parentIt == m_widgetsById.end()) {

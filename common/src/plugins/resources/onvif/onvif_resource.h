@@ -41,8 +41,13 @@ struct CameraPhysicalWindowSize
     }
 };
 
+struct OnvifCameraSettingsResp;
+
 class QnPlOnvifResource : public QnPhysicalCameraResource
 {
+protected:
+    typedef QHash<QString, CameraSetting> CameraSettings;
+
 public:
     enum CODECS
     {
@@ -118,6 +123,9 @@ public:
     QString getMediaUrl() const;
     void setMediaUrl(const QString& src);
 
+    QString getImagingUrl() const;
+    void setImagingUrl(const QString& src);
+
     void setDeviceOnvifUrl(const QString& src);
 
     CODECS getCodec() const;
@@ -137,6 +145,11 @@ protected:
     virtual void setCropingPhysical(QRect croping);
 
     virtual bool updateResourceCapabilities();
+
+    virtual bool getParamPhysical(const QnParam &param, QVariant &val);
+    virtual bool setParamPhysical(const QnParam &param, const QVariant& val);
+
+    virtual void fetchAndSetCameraSettings();
 
 private:
 
@@ -164,8 +177,10 @@ private:
     void setMinMaxQuality(int min, int max);
 
     void save();
-    void testCameraSettings() const;
+
+    void fetchAndSetCameraSettings(const ImagingOptionsReq& request);
     
+
     int round(float value);
     ResolutionPair getNearestResolutionForSecondary(const ResolutionPair& resolution, float aspectRatio) const;
     ResolutionPair getNearestResolution(const ResolutionPair& resolution, float aspectRatio, double maxResolutionSquare) const;
@@ -174,6 +189,7 @@ private:
     int getH264StreamProfile(const VideoOptionsResp& response);
 protected:
     QList<ResolutionPair> m_resolutionList; //Sorted desc
+    CameraSettings m_cameraSettings;
 
 private:
     static const char* ONVIF_PROTOCOL_PREFIX;
@@ -202,8 +218,10 @@ private:
 
     bool m_needUpdateOnvifUrl;
     bool m_forceCodecFromPrimaryEncoder;
-    int  m_primaryH264Profile;
+    int m_primaryH264Profile;
     int m_secondaryH264Profile;
+
+    QString m_imagingUrl;
 };
 
 #endif //onvif_resource_h

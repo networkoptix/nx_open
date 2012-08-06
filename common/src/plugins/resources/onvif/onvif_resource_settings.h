@@ -1,88 +1,53 @@
-#ifndef onvif_resource_settings_h
-#define onvif_resource_settings_h
+#ifndef onvif_resource_settings_h_2250
+#define onvif_resource_settings_h_2250
 
-struct WhiteBalance
+#include "../camera_settings/camera_settings.h"
+
+struct OnvifCameraSettingsResp
 {
-    bool manual;
-    float rGain;
-    float bGain;
+    ImagingOptionsResp rangesResponse;
+    ImagingSettingsResp valsResponse;
 
-    WhiteBalance() :
-        manual(false),
-        rGain(-1),
-        bGain(-1)
-    {}
+    OnvifCameraSettings()
+    {
+        rangesResponse.ImagingOptions = 0;
+        valsResponse.ImagingSettings = 0;
+    }
+
+    bool isEmpty() const { return !rangesResponse.ImagingOptions || !valsResponse.ImagingSettings; }
 };
 
-struct Exposure
+class OnvifCameraSettingOperationAbstract
 {
-    bool manual;
-    bool lowNoisePriority;
-    float minExposureTime;
-    float maxExposureTime;
-    float minGain;
-    float maxGain;
-    float minIris;
-    float maxIris;
-    float exposureTime;
-    float gain;
-    float iris;
-
-    Exposure() :
-        manual(false),
-        lowNoisePriority(false),
-        minExposureTime(-1),
-        maxExposureTime(-1),
-        minGain(-1),
-        maxGain(-1),
-        minIris(-1),
-        maxIris(-1),
-        exposureTime(-1),
-        gain(-1),
-        iris(-1)
-    {}
-};
-
-class QnOnvifResourceSettings
-{
-    float m_brightness;
-    float m_sharpness;
-    float m_colorSaturation;
-    WhiteBalance m_whiteBalance;
-    Exposure m_exposure;
+    static const QHash<QString, OnvifCameraSettingOperationAbstract*> operations;
 
 public:
 
-    QnOnvifResourceSettings();
-
-    ~QnOnvifResourceSettings();
-
-    //Adjustment
-    bool setBrightness(float val);
-    float getBrightness();
-
-    bool setSharpness(float val);
-    float getSharpness();
-
-    bool setColorSaturation(float val);
-    float getColorSaturation();
-
-    //Colour
-    bool setWhiteBalance(WhiteBalance balance);
-    WhiteBalance setWhiteBalance();
-
-    //Exposure
-    bool setExposure(Exposure exp);
-    Exposure setExposure();
-
-    //Administration
-    bool reboot();
-    bool softReset();
-    bool hardReset();
-
-private:
-
-    QnOnvifResourceSettings(const QnOnvifResourceSettings&);
+    virtual void get(CameraSetting& out, const OnvifCameraSettingsResp& src) = 0;
+    virtual void set(CameraSetting& out, const OnvifCameraSettingsResp& src) = 0;
 };
 
-#endif //onvif_resource_settings_h
+class OnvifCameraSetting: public CameraSetting
+{
+public:
+
+    OnvifCameraSetting(const OnvifCameraSettingOperationAbstract& operation,
+        const QString& id,
+        const QString& name,
+        WIDGET_TYPE type,
+        const CameraSettingValue min = CameraSettingValue(),
+        const CameraSettingValue max = CameraSettingValue(),
+        const CameraSettingValue step = CameraSettingValue(),
+        const CameraSettingValue current = CameraSettingValue());
+
+private:
+    OnvifCameraSetting();
+
+protected:
+    virtual ~OnvifCameraSetting() {};
+
+private:
+    const OnvifCameraSettingOperationAbstract& m_operation;
+};
+
+#endif //onvif_resource_settings_h_2250

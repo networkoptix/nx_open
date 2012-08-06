@@ -150,22 +150,25 @@ QnSettingsEnumerationWidget::QnSettingsEnumerationWidget(QObject* handler, Camer
 
     QVBoxLayout *layout = new QVBoxLayout(groupBox);
 
-    //for (int i = 0; i < mParam.value.ui_possible_values.count();++i)
-    //{
-    //    QRadioButton *btn = new QRadioButton(mParam.value.ui_possible_values.at(i), groupBox);
-    //    layout->addWidget(btn);
-    //
-    //    QString val = mParam.value.possible_values.at(i);
-    //    if (val == mParam.value.value)
-    //        btn->setChecked(true);
-    //
-    //    btn->setObjectName(val);
-    //    btn->setFont(settings_font);
-    //
-    //    m_radioBtns.push_back(btn);
-    //
-    //    connect(btn , SIGNAL(clicked()), this, SLOT(onClicked()));
-    //}
+    QStringList values = static_cast<QString>(mParam.getMin()).split(QLatin1Char(','));
+    mParam.setCurrent(values[0].trimmed());//ToDo remove this line
+    for (int i = 0; i < values.length(); ++i)
+    {
+        QString val = values[i].trimmed();
+
+        QRadioButton *btn = new QRadioButton(val, groupBox);
+        layout->addWidget(btn);
+
+        if (val == mParam.getCurrent())
+            btn->setChecked(true);
+
+        btn->setObjectName(val);
+        //btn->setFont(settings_font);
+    
+        m_radioBtns.push_back(btn);
+
+        connect(btn , SIGNAL(clicked()), this, SLOT(onClicked()));
+    }
 }
 
 void QnSettingsEnumerationWidget::onClicked()
