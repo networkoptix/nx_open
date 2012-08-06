@@ -6,36 +6,68 @@
 #include "libavcodec/avcodec.h"
 #include "core/datapacket/mediadatapacket.h"
 
+
+//!Base class for all raw media stream transcoders
+/*!
+    Transcoder receives input stream coded picture at the input and provides output stream coded picture at output.
+    It is safe to change output stream parameters during transcoding
+*/
 class QnCodecTranscoder
 {
 public:
     typedef QMap<QString, QVariant> Params;
 
-    void setParams(const Params& params);
-    void setBitrate(int value);
+    virtual ~QnCodecTranscoder() {}
 
+    //!Set codec-specific params for output stream. For list of supported params please refer to derived class' doc
+    virtual void setParams(const Params& params);
+    //!Returns coded-specific params
+    const Params& getParams() const;
+    //!Set output stream bitrate (bps)
+    virtual void setBitrate(int value);
+    //!Get output bitrate bitrate (bps)
+    int getBitrate() const;
+
+    //!Transcode coded picture of input stream to output format
+    /*!
+        Transcoder is allowed to return NULL coded picture for non-NULL input and return coded output pictures with some delay from input.
+        To empty transcoder'a coded picture buffer one should provide NULL as input until receiving NULL at output.
+        \a media Coded picture of the input stream. May be NULL
+        \return Coded picture of the output stream. May be NULL
+    */
     virtual QnAbstractMediaDataPtr transcodePacket(QnAbstractMediaDataPtr media) = 0;
+
 private:
     Params m_params;
     int m_bitrate;
 };
 typedef QSharedPointer<QnCodecTranscoder> QnCodecTranscoderPtr;
 
+//!Base class for all video transcoders
 class QnVideoTranscoder: public QnCodecTranscoder
 {
 public:
-    void setSize(const QSize& size);
+    //!Set picture size (in pixels) of output video stream
+    /*!
+        By default, output stream has the same picture size as input
+    */
+    virtual void setSize( const QSize& size );
+    //!Returns picture size (in pixels) of output video stream
+    QSize getSize() const;
+
 private:
     QSize m_size;
 };
 typedef QSharedPointer<QnVideoTranscoder> QnVideoTranscoderPtr;
 
+//!Base class for all audio transcoders
 class QnAudioTranscoder: public QnCodecTranscoder
 {
 public:
 };
 typedef QSharedPointer<QnAudioTranscoder> QnAudioTranscoderPtr;
 
+//!Multiplexes one or more raw media streams into container format. Can apply transcoding to input media streams
 /*
 * Transcode input MediaPackets to specified format
 */
