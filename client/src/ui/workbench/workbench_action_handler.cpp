@@ -274,7 +274,7 @@ bool QnWorkbenchActionHandler::canAutoDelete(const QnResourcePtr &resource) cons
     if(!layoutResource)
         return false;
     
-    return snapshotManager()->flags(layoutResource) == Qn::LayoutIsLocal; /* Local, not changed and not being saved. */
+    return snapshotManager()->flags(layoutResource) == Qn::ResourceIsLocal; /* Local, not changed and not being saved. */
 }
 
 void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, bool usePosition, const QPointF &position) const {
@@ -331,9 +331,9 @@ bool QnWorkbenchActionHandler::closeLayouts(const QnLayoutResourceList &resource
     foreach(const QnLayoutResourcePtr &resource, resources) {
         bool changed, saveable, askable;
 
-        Qn::LayoutFlags flags = snapshotManager()->flags(resource);
-        askable = flags == (Qn::LayoutIsChanged | Qn::LayoutIsLocal); /* Changed, local, not being saved. */
-        changed = flags & Qn::LayoutIsChanged;
+        Qn::ResourceSavingFlags flags = snapshotManager()->flags(resource);
+        askable = flags == (Qn::ResourceIsChanged | Qn::ResourceIsLocal); /* Changed, local, not being saved. */
+        changed = flags & Qn::ResourceIsChanged;
         saveable = accessController()->permissions(resource) & Qn::SavePermission;
 
         if(askable && saveable)
@@ -423,8 +423,8 @@ void QnWorkbenchActionHandler::closeLayouts(const QnLayoutResourceList &resource
             delete layout;
         }
 
-        Qn::LayoutFlags flags = snapshotManager()->flags(resource);
-        if((flags & (Qn::LayoutIsLocal | Qn::LayoutIsBeingSaved | Qn::LayoutIsFile)) == Qn::LayoutIsLocal) /* Local, not being saved and not a file. */
+        Qn::ResourceSavingFlags flags = snapshotManager()->flags(resource);
+        if((flags & (Qn::ResourceIsLocal | Qn::ResourceIsBeingSaved | Qn::LayoutIsFile)) == Qn::ResourceIsLocal) /* Local, not being saved and not a file. */
             resourcePool()->removeResource(resource);
     }
 }

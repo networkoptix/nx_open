@@ -474,9 +474,9 @@ void QnResourceTreeWidget::expandAll() {
 // -------------------------------------------------------------------------- //
 void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *) {
     /** 
-    * Note that we cannot use event->globalPos() here as it doesn't work when
-    * the widget is embedded into graphics scene.
-    */
+     * Note that we cannot use event->globalPos() here as it doesn't work when
+     * the widget is embedded into graphics scene.
+     */
     showContextMenuAt(QCursor::pos());
 }
 

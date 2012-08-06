@@ -59,13 +59,13 @@ QnAppServerConnectionPtr QnWorkbenchLayoutSnapshotManager::connection() const {
     return QnAppServerConnectionFactory::createConnection();
 }
 
-Qn::LayoutFlags QnWorkbenchLayoutSnapshotManager::flags(const QnLayoutResourcePtr &resource) const {
+Qn::ResourceSavingFlags QnWorkbenchLayoutSnapshotManager::flags(const QnLayoutResourcePtr &resource) const {
     if(!resource) {
         qnNullWarning(resource);
-        return Qn::LayoutIsLocal;
+        return Qn::ResourceIsLocal;
     }
 
-    QHash<QnLayoutResourcePtr, Qn::LayoutFlags>::const_iterator pos = m_flagsByLayout.find(resource);
+    QHash<QnLayoutResourcePtr, Qn::ResourceSavingFlags>::const_iterator pos = m_flagsByLayout.find(resource);
     if(pos == m_flagsByLayout.end()) {
         if(resource->resourcePool() == resourcePool()) {
             /* We didn't get the notification from resource pool yet. */
@@ -79,21 +79,21 @@ Qn::LayoutFlags QnWorkbenchLayoutSnapshotManager::flags(const QnLayoutResourcePt
     return *pos;
 }
 
-Qn::LayoutFlags QnWorkbenchLayoutSnapshotManager::flags(QnWorkbenchLayout *layout) const {
+Qn::ResourceSavingFlags QnWorkbenchLayoutSnapshotManager::flags(QnWorkbenchLayout *layout) const {
     if(!layout) {
         qnNullWarning(layout);
-        return Qn::LayoutIsLocal;
+        return Qn::ResourceIsLocal;
     }
 
     QnLayoutResourcePtr resource = layout->resource();
     if(!resource)
-        return Qn::LayoutIsLocal;
+        return Qn::ResourceIsLocal;
 
     return flags(resource);
 }
 
-void QnWorkbenchLayoutSnapshotManager::setFlags(const QnLayoutResourcePtr &resource, Qn::LayoutFlags flags) {
-    QHash<QnLayoutResourcePtr, Qn::LayoutFlags>::iterator pos = m_flagsByLayout.find(resource);
+void QnWorkbenchLayoutSnapshotManager::setFlags(const QnLayoutResourcePtr &resource, Qn::ResourceSavingFlags flags) {
+    QHash<QnLayoutResourcePtr, Qn::ResourceSavingFlags>::iterator pos = m_flagsByLayout.find(resource);
     if(pos == m_flagsByLayout.end()) {
         pos = m_flagsByLayout.insert(resource, flags);
     } else if(*pos == flags) {
@@ -127,7 +127,7 @@ void QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourceList &resource
     connection()->saveAsync(resources, processor, SLOT(at_finished(int, const QByteArray &, const QnResourceList &, int)));
 
     foreach(const QnLayoutResourcePtr &resource, resources)
-        setFlags(resource, flags(resource) | Qn::LayoutIsBeingSaved);
+        setFlags(resource, flags(resource) | Qn::ResourceIsBeingSaved);
 }
 
 void QnWorkbenchLayoutSnapshotManager::restore(const QnLayoutResourcePtr &resource) {
@@ -146,7 +146,7 @@ void QnWorkbenchLayoutSnapshotManager::restore(const QnLayoutResourcePtr &resour
     }
     connectTo(resource);
 
-    setFlags(resource, flags(resource) & ~Qn::LayoutIsChanged);
+    setFlags(resource, flags(resource) & ~Qn::ResourceIsChanged);
 }
 
 void QnWorkbenchLayoutSnapshotManager::connectTo(const QnLayoutResourcePtr &resource) {
@@ -162,11 +162,11 @@ void QnWorkbenchLayoutSnapshotManager::disconnectFrom(const QnLayoutResourcePtr 
     disconnect(resource.data(), NULL, this, NULL);
 }
 
-Qn::LayoutFlags QnWorkbenchLayoutSnapshotManager::defaultFlags(const QnLayoutResourcePtr &resource) const {
-    Qn::LayoutFlags result;
+Qn::ResourceSavingFlags QnWorkbenchLayoutSnapshotManager::defaultFlags(const QnLayoutResourcePtr &resource) const {
+    Qn::ResourceSavingFlags result;
 
     if(resource->getId().isSpecial())
-        result |= Qn::LayoutIsLocal;
+        result |= Qn::ResourceIsLocal;
 
     if((resource->flags() & QnResource::local_media) == QnResource::local_media)
         result |= Qn::LayoutIsFile;
@@ -186,10 +186,10 @@ void QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceAdded(const QnRes
     /* Consider it saved by default. */
     m_storage->store(layoutResource);
     
-    Qn::LayoutFlags flags = defaultFlags(layoutResource);
+    Qn::ResourceSavingFlags flags = defaultFlags(layoutResource);
     setFlags(layoutResource, flags);
 
-    layoutResource->setFlags(flags & Qn::LayoutIsLocal ? layoutResource->flags() & ~QnResource::remote : layoutResource->flags() | QnResource::remote); // TODO: this code does not belong here.
+    layoutResource->setFlags(flags & Qn::ResourceIsLocal ? layoutResource->flags() & ~QnResource::remote : layoutResource->flags() | QnResource::remote); // TODO: this code does not belong here.
     
     /* Subscribe to changes to track changed status. */
     connectTo(layoutResource);
@@ -216,11 +216,11 @@ void QnWorkbenchLayoutSnapshotManager::at_layouts_saved(const QnLayoutResourceLi
 
 void QnWorkbenchLayoutSnapshotManager::at_layouts_saveFailed(const QnLayoutResourceList &resources) {
     foreach(const QnLayoutResourcePtr &resource, resources)
-        setFlags(resource, flags(resource) & ~Qn::LayoutIsBeingSaved);
+        setFlags(resource, flags(resource) & ~Qn::ResourceIsBeingSaved);
 }
 
 void QnWorkbenchLayoutSnapshotManager::at_layout_changed(const QnLayoutResourcePtr &resource) {
-    setFlags(resource, flags(resource) | Qn::LayoutIsChanged);
+    setFlags(resource, flags(resource) | Qn::ResourceIsChanged);
 }
 
 void QnWorkbenchLayoutSnapshotManager::at_layout_changed() {

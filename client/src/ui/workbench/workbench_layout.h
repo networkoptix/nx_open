@@ -1,14 +1,19 @@
 #ifndef QN_WORKBENCH_LAYOUT_H
 #define QN_WORKBENCH_LAYOUT_H
 
-#include <QObject>
-#include <QSet>
-#include <QHash>
-#include <core/resource/resource_fwd.h>
+#include <QtCore/QObject>
+#include <QtCore/QSet>
+#include <QtCore/QHash>
+
 #include <utils/common/matrix_map.h>
 #include <utils/common/rect_set.h>
 #include <utils/common/hash.h> /* For qHash(const QUuid &). */
+
+#include <core/resource/resource_fwd.h>
+
 #include <ui/common/magnitude.h>
+
+#include "workbench_globals.h"
 
 class QnWorkbenchItem;
 
@@ -329,6 +334,8 @@ private:
 
     /** Empty item list, to return a reference to. */
     const QSet<QnWorkbenchItem *> m_noItems;
+
+    /**  */
 };
 
 Q_DECLARE_METATYPE(QnWorkbenchLayout *);
