@@ -4,7 +4,7 @@
 #include "plugins/resources/archive/archive_stream_reader.h"
 
 QnSignDialogDisplay::QnSignDialogDisplay(): 
-    CLCamDisplay(false),
+    QnCamDisplay(false),
     m_mdctx(EXPORT_SIGN_METHOD)
 {
     m_firstFrameDisplayed = false;

@@ -2,7 +2,7 @@
 
 #include <utils/common/warnings.h>
 
-#include <camera/abstractrenderer.h>
+#include <camera/abstract_renderer.h>
 
 #include <ui/workbench/workbench_display.h>
 #include <ui/graphics/items/resource/resource_widget_renderer.h>

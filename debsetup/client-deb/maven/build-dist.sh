@@ -8,7 +8,7 @@ ARCHITECTURE=${os.arch}
 TARGET=/opt/networkoptix/client
 BINTARGET=$TARGET/bin
 LIBTARGET=$TARGET/lib
-ETCTARGET=$TARGET/etc
+USRTARGET=/usr
 INITTARGET=/etc/init
 INITDTARGET=/etc/init.d
 
@@ -19,11 +19,12 @@ LIBSTAGE=$STAGE$LIBTARGET
 ETCSTAGE=$STAGE$ETCTARGET
 INITSTAGE=$STAGE$INITTARGET
 INITDSTAGE=$STAGE$INITDTARGET
+USRSTAGE=$STAGE$USRTARGET
 
-SERVER_BIN_PATH=${project.build.directory}/bin
-SERVER_LIB_PATH=${project.build.directory}/build/bin/${build.configuration}
+CLIENT_BIN_PATH=${project.build.directory}/bin
+CLIENT_LIB_PATH=${project.build.directory}/build/bin/${build.configuration}
 	
-. $SERVER_BIN_PATH/env.sh
+. $CLIENT_BIN_PATH/env.sh
 
 # Prepare stage dir
 rm -rf $STAGEBASE
@@ -32,15 +33,19 @@ mkdir -p $LIBSTAGE
 mkdir -p $ETCSTAGE
 mkdir -p $INITSTAGE
 mkdir -p $INITDSTAGE
+mkdir -p $USRSTAGE
 
 # Copy client binary
-install -m 755 $SERVER_BIN_PATH/client* $BINSTAGE
+install -m 755 $CLIENT_BIN_PATH/client* $BINSTAGE
 
 # Copy client startup script
 install -m 755 bin/client $BINSTAGE
 
+# Copy icons
+cp -P -Rf usr $STAGE
+
 # Copy libraries
-cp -P $SERVER_LIB_PATH/*.so* $LIBSTAGE
+cp -P $CLIENT_LIB_PATH/*.so* $LIBSTAGE
 cp -P ${qt.dir}/libaudio.so* $LIBSTAGE
 cp -P ${qt.dir}/libXi.so* $LIBSTAGE
 cp -P ${qt.dir}/libXt.so* $LIBSTAGE

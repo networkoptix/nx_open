@@ -44,7 +44,7 @@ class QnWorkbenchStreamSynchronizer;
 class QnToggle;
 
 class QnVideoCamera;
-class CLCamDisplay;
+class QnCamDisplay;
 
 /**
  * This class ties a workbench, a scene and a view together.
@@ -192,7 +192,7 @@ public:
 
     QnVideoCamera *camera(QnWorkbenchItem *item) const;
 
-    CLCamDisplay *camDisplay(QnWorkbenchItem *item) const;
+    QnCamDisplay *camDisplay(QnWorkbenchItem *item) const;
 
     /**
      * \param item                      Item to get enclosing geometry for.

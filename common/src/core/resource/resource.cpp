@@ -319,7 +319,6 @@ QnParamList QnResource::getResourceParamList() const
         }
     }
 
-    
     if (m_resourceParamList.isEmpty())
         m_resourceParamList = resourceParamList;
 
@@ -354,6 +353,8 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
         if (!name.contains(QLatin1String("VideoLayout")))
             qWarning() << "Can't get parameter. Parameter" << name << "does not exists for resource" << getName();
 
+        QMetaObject::invokeMethod( this, "asyncParamGetDone", Qt::DirectConnection, Q_ARG(QString, name), Q_ARG(QVariant, QVariant()), Q_ARG(bool, false) );
+        emit asyncParamGetDone( name, QVariant(), false );
         return false;
     }
 
@@ -368,6 +369,7 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
 
     if (domain == QnDomainMemory)
     {
+        emit asyncParamGetDone( name, val, true );
         return true;
     }
     else if (domain == QnDomainPhysical)
@@ -382,27 +384,36 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
                 m_mutex.unlock();
                 QMetaObject::invokeMethod(this, "parameterValueChanged", Qt::QueuedConnection, Q_ARG(QnParam, param));
             }
+            emit asyncParamGetDone( name, newValue, true );
             return true;
         }
     }
     else if (domain == QnDomainDatabase)
     {
         if (param.isPhysical())
+        {
+            emit asyncParamGetDone( name, val, true );
             return true;
+        }
     }
 
+    emit asyncParamGetDone( name, QVariant(), false );
     return false;
 }
 
 bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain domain)
 {
     if (setSpecialParam(name, val, domain))
+    {
+        emit asyncParamSetDone( name, val, true );
         return true;
+    }
 
     getResourceParamList(); // paramList loaded once. No more changes, instead of param value. So, use mutex for value only
     if (!m_resourceParamList.contains(name))
     {
         qWarning() << "Can't set parameter. Parameter" << name << "does not exists for resource" << getName();
+        emit asyncParamSetDone( name, val, false );
         return false;
     }
 
@@ -412,6 +423,7 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
     {
         cl_log.log("setParam: cannot set readonly param!", cl_logWARNING);
         m_mutex.unlock();
+        emit asyncParamSetDone( name, val, false );
         return false;
     }
     param.setDomain(domain);
@@ -422,7 +434,10 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
     if (domain == QnDomainPhysical)
     {
         if (!param.isPhysical() || !setParamPhysical(param, val))
+        {
+            emit asyncParamSetDone( name, val, false );
             return false;
+        }
     }
 
     //QnDomainMemory should changed anyway
@@ -432,6 +447,7 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
         if (!m_resourceParamList[name].setValue(val))
         {
             cl_log.log("cannot set such param!", cl_logWARNING);
+            emit asyncParamSetDone( name, val, false );
             return false;
 
         }
@@ -441,6 +457,7 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
     if (oldValue != val)
         QMetaObject::invokeMethod(this, "parameterValueChanged", Qt::QueuedConnection, Q_ARG(QnParam, param)); // TODO: queued calls are not needed anymore.
 
+    emit asyncParamSetDone( name, val, true );
     return true;
 }
 

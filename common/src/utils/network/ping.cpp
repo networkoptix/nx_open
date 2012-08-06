@@ -123,7 +123,7 @@ bool CLPing::ping(const QString& ip, int retry, int timeoutPerRetry, int packetS
 
 unsigned short checksum(const struct icmp& packet)
 {
-    int i, j;
+    uint i, j;
 
     for (j = 0, i = 0; i < sizeof(struct icmp) / 2; i++)
       j += ((quint16 *)&packet)[i];

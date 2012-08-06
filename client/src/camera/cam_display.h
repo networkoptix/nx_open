@@ -1,10 +1,8 @@
-#ifndef clcam_display_h_1211
-#define clcam_display_h_1211
-
-
+#ifndef QN_CAM_DISPLAY_H
+#define QN_CAM_DISPLAY_H
 
 #include "decoders/video/abstractdecoder.h"
-#include "videostreamdisplay.h"
+#include "video_stream_display.h"
 #include "core/dataconsumer/dataconsumer.h"
 #include "core/resource/resource_media_layout.h"
 #include "utils/common/adaptivesleep.h"
@@ -18,12 +16,12 @@ struct QnCompressedVideoData;
 /**
   * Stores QnVideoStreamDisplay for each channel/sensor
   */
-class CLCamDisplay : public QnAbstractDataConsumer, public QnlTimeSource
+class QnCamDisplay : public QnAbstractDataConsumer, public QnlTimeSource
 {
     Q_OBJECT
 public:
-    CLCamDisplay(bool generateEndOfStreamSignal);
-    ~CLCamDisplay();
+    QnCamDisplay(bool generateEndOfStreamSignal);
+    ~QnCamDisplay();
 
     void addVideoChannel(int index, QnAbstractRenderer* vw, bool can_downsacle);
     virtual bool processData(QnAbstractDataPacketPtr data);
@@ -192,7 +190,7 @@ protected:
     bool m_isLongWaiting;
     
 
-    static QSet<CLCamDisplay*> m_allCamDisplay;
+    static QSet<QnCamDisplay*> m_allCamDisplay;
     static QMutex m_qualityMutex;
     static qint64 m_lastQualitySwitchTime;
     bool m_executingChangeSpeed;
@@ -203,4 +201,4 @@ protected:
     qint64 m_videoQueueDuration;
 };
 
-#endif //clcam_display_h_1211
+#endif //QN_CAM_DISPLAY_H

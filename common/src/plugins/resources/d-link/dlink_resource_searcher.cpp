@@ -159,6 +159,7 @@ QString QnPlDlinkResourceSearcher::manufacture() const
 
 QnResourcePtr QnPlDlinkResourceSearcher::checkHostAddr(QHostAddress addr)
 {
+    Q_UNUSED(addr)
     return QnResourcePtr(0);
 }
 

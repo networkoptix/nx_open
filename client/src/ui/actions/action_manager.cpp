@@ -246,9 +246,9 @@ namespace {
 QnActionManager::QnActionManager(QObject *parent): 
     QObject(parent),
     QnWorkbenchContextAware(parent),
-    m_shortcutAction(NULL),
-    m_targetProvider(NULL),
     m_root(NULL),
+    m_targetProvider(NULL),
+    m_shortcutAction(NULL),
     m_lastShownMenu(NULL)
 {
     m_root = new QnAction(Qn::NoAction, this);

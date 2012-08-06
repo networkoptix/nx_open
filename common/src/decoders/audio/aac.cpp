@@ -106,7 +106,7 @@ void AACCodec::buildADTSHeader(quint8* buffer, int frameSize)
 	writer.putBit(1); // protection_absent
 	writer.putBits(2, m_profile);
 	m_sample_rates_index = 0;
-	for (int i = 0; i < sizeof(aac_sample_rates); i++)
+	for (uint i = 0; i < sizeof(aac_sample_rates); i++)
 		if (aac_sample_rates[i] == m_sample_rate) {
 			m_sample_rates_index = i;
 			break;
@@ -114,7 +114,7 @@ void AACCodec::buildADTSHeader(quint8* buffer, int frameSize)
 	writer.putBits(4, m_sample_rates_index);
 	writer.putBit(0); /* private_bit */
 	m_channels_index = 0;
-	for (int i = 0; i < sizeof(aac_channels); i++)
+	for (uint i = 0; i < sizeof(aac_channels); i++)
 		if (aac_channels[i] == m_channels) {
 			m_channels_index = i;
 			break;

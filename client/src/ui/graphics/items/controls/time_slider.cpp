@@ -1345,7 +1345,7 @@ void QnTimeSlider::drawMarker(QPainter *painter, qint64 pos, const QColor &color
     painter->drawLine(QPointF(x, rect.top()), QPointF(x, rect.bottom()));
 }
 
-void QnTimeSlider::drawPeriodsBar(QPainter *painter, QnTimePeriodList &recorded, QnTimePeriodList &motion, const QRectF &rect) {
+void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &recorded, const QnTimePeriodList &motion, const QRectF &rect) {
     qint64 minimumValue = this->windowStart();
     qint64 maximumValue = this->windowEnd();
     qreal centralPos = quickPositionFromValue(this->sliderPosition());

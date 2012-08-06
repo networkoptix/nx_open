@@ -55,6 +55,8 @@
 #include "main.h"
 #include "rest/handlers/fs_checker.h"
 #include "rest/handlers/get_statistics.h"
+#include "rest/handlers/cameraparamshttphandler.h"
+
 //#include "plugins/resources/digitalwatchdog/dvr/dw_dvr_resource_searcher.h"
 
 // This constant is used while checking for compatibility.
@@ -601,6 +603,8 @@ void QnMain::run()
     m_restServer->registerHandler("api/CheckPath", new QnFsHelperHandler(true));
     m_restServer->registerHandler("api/GetFreeSpace", new QnFsHelperHandler(false));
     m_restServer->registerHandler("api/statistics", new QnGetStatisticsHandler());
+    m_restServer->registerHandler("api/getCameraParam", new QnGetCameraParamHandler());
+    m_restServer->registerHandler("api/setCameraParam", new QnSetCameraParamHandler());
 
     foreach (QnAbstractStorageResourcePtr storage, m_videoServer->getStorages())
     {

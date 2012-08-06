@@ -43,9 +43,9 @@ private:
     //QMutex m_mutex;
     //bool m_usePrebuffer;
     //QnAbstractMediaDataPtr m_nextData;
+    QnAbstractArchiveReader* m_reader; 
     QnArchiveSyncPlayWrapper* m_syncWrapper;
     QnAbstractArchiveDelegate* m_ownerDelegate;
-    QnAbstractArchiveReader* m_reader;
 };
 
 #endif // _SYNC_PLAY_ARCHIVE_DELEGATE_H__

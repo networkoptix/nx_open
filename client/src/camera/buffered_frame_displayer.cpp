@@ -1,8 +1,8 @@
 #include "buffered_frame_displayer.h"
 #include <utils/media/frame_info.h>
 #include <utils/common/adaptivesleep.h>
-#include "videostreamdisplay.h"
-#include "abstractrenderer.h"
+#include "video_stream_display.h"
+#include "abstract_renderer.h"
 
 QnBufferedFrameDisplayer::QnBufferedFrameDisplayer(QnAbstractRenderer *drawer): 
     m_queue(MAX_FRAME_QUEUE_SIZE - 1), 

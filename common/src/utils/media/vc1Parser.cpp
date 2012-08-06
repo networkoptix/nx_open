@@ -7,8 +7,8 @@ char* pict_type_str[4] = {"I_TYPE", "P_TYPE", "B_TYPE", "BI_TYPE"};
 
 static inline int get_unary(BitStreamReader& bitReader, int stop, int len)
 {
-    int i;
-    for(i = 0; i < len && bitReader.getBit() != stop; i++);
+    uint i;
+    for(i = 0; i < (uint)len && bitReader.getBit() != stop; i++);
     return i;
 } 
 
@@ -435,7 +435,8 @@ int VC1Frame::vc1_parse_frame_header_adv(const VC1SequenceHeader& sequenceHdr)
 	}
 	
 	if(sequenceHdr.tfcntrflag)
-		int TFCNTR = bitReader.getBits(8);
+		//int TFCNTR = bitReader.getBits(8);
+        bitReader.skipBits(8);
 	if(sequenceHdr.pulldown) {
 		rptfrmBitPos = bitReader.getBitsCount();
 		if(!sequenceHdr.interlace || sequenceHdr.psf) {

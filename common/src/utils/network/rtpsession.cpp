@@ -790,14 +790,14 @@ bool RTPSession::sendPlay(qint64 startPos, qint64 endPos, double scale)
     request += "Session: ";
     request += m_SessionId;
     request += "\r\n";
-    if (startPos != AV_NOPTS_VALUE)
+    if (startPos != qint64(AV_NOPTS_VALUE))
     {
         if (startPos != DATETIME_NOW)
             request += QLatin1String("Range: npt=") + QString::number(startPos);
         else
             request += QLatin1String("Range: npt=now");
         request += '-';
-        if (endPos != AV_NOPTS_VALUE)
+        if (endPos != qint64(AV_NOPTS_VALUE))
         {
             if (endPos != DATETIME_NOW)
                 request += QString::number(endPos);

@@ -29,8 +29,8 @@
 #include <plugins/storage/file_storage/layout_storage_resource.h>
 
 #include <camera/resource_display.h>
-#include <camera/camdisplay.h>
-#include <camera/camera.h>
+#include <camera/cam_display.h>
+#include <camera/video_camera.h>
 
 #include <recording/time_period_list.h>
 

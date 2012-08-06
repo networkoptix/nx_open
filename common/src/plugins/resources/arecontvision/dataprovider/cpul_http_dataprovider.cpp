@@ -33,7 +33,7 @@ QnAbstractMediaDataPtr  AVClientPullSSHTTPStreamreader::getNextData()
     int width, height;
 
     int quality;
-    int bitrate;
+    int bitrate = 0;
 
     bool resolutionFULL;
     int streamID;

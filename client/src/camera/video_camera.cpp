@@ -1,4 +1,4 @@
-#include "camera.h"
+#include "video_camera.h"
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "utils/client_util.h"
@@ -135,7 +135,7 @@ QnAbstractStreamDataProvider* QnVideoCamera::getStreamreader()
     return m_reader;
 }
 
-CLCamDisplay* QnVideoCamera::getCamDisplay()
+QnCamDisplay* QnVideoCamera::getCamDisplay()
 {
     return &m_camdispay;
 }
