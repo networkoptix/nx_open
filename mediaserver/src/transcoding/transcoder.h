@@ -17,7 +17,15 @@ class QnCodecTranscoder
 public:
     typedef QMap<QString, QVariant> Params;
 
+    QnCodecTranscoder(CodecID codecId);
     virtual ~QnCodecTranscoder() {}
+    
+    /*
+    * Function provide additional information about transcoded context.
+    * Function may be not implemented in derived classes and return NULL
+    * In this case, all necessary information MUST be present in bitstream. For example, SPS/PPS blocks for H.264
+    */
+    virtual AVCodecContext* getCodecContext();
 
     //!Set codec-specific params for output stream. For list of supported params please refer to derived class' doc
     virtual void setParams(const Params& params);
@@ -32,14 +40,17 @@ public:
     /*!
         Transcoder is allowed to return NULL coded picture for non-NULL input and return coded output pictures with some delay from input.
         To empty transcoder'a coded picture buffer one should provide NULL as input until receiving NULL at output.
-        \a media Coded picture of the input stream. May be NULL
-        \return Coded picture of the output stream. May be NULL
+        \param media Coded picture of the input stream. May be NULL
+        \param result Coded picture of the output stream. May be NULL
+        \return return Return error code or 0 if no error
     */
-    virtual QnAbstractMediaDataPtr transcodePacket(QnAbstractMediaDataPtr media) = 0;
+    virtual int transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr& result) = 0;
+    QString getLastError() const;
 
 private:
     Params m_params;
     int m_bitrate;
+    CodecID m_codecId;
 };
 typedef QSharedPointer<QnCodecTranscoder> QnCodecTranscoderPtr;
 
@@ -47,6 +58,8 @@ typedef QSharedPointer<QnCodecTranscoder> QnCodecTranscoderPtr;
 class QnVideoTranscoder: public QnCodecTranscoder
 {
 public:
+    QnVideoTranscoder(CodecID codecId);
+
     //!Set picture size (in pixels) of output video stream
     /*!
         By default, output stream has the same picture size as input
@@ -64,6 +77,7 @@ typedef QSharedPointer<QnVideoTranscoder> QnVideoTranscoderPtr;
 class QnAudioTranscoder: public QnCodecTranscoder
 {
 public:
+    QnAudioTranscoder(CodecID codecId);
 };
 typedef QSharedPointer<QnAudioTranscoder> QnAudioTranscoderPtr;
 
@@ -115,6 +129,7 @@ public:
     * Return description of the last error code
     */
     QString getLastErrorMessage() const;
+
 protected:
     /*
     *  Prepare to transcode. If 'direct stream copy' is used, function got not empty video and audio data
@@ -124,13 +139,14 @@ protected:
     virtual int open(QnCompressedVideoDataPtr video, QnCompressedAudioDataPtr audio) = 0;
 
     virtual int transcodePacketInternal(QnAbstractMediaDataPtr media, QnByteArray& result) = 0;
-protected:
+
     QnVideoTranscoderPtr m_vTranscoder;
     QnAudioTranscoderPtr m_aTranscoder;
     CodecID m_videoCodec;
     CodecID m_audioCodec;
     bool m_videoStreamCopy;
     bool m_audioStreamCopy;
+
 private:
     QString m_lastErrMessage;
     QQueue<QnCompressedVideoDataPtr> m_delayedVideoQueue;
