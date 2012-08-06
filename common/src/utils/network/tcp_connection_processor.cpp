@@ -6,6 +6,8 @@
 #include <netinet/tcp.h>
 #endif
 
+static const int MAX_REQUEST_SIZE = 1024*1024*15;
+
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(TCPSocket* socket, QnTcpListener* _owner):
     d_ptr(new QnTCPConnectionProcessorPrivate)
 {
@@ -233,4 +235,49 @@ int QnTCPConnectionProcessor::getSocketTimeout()
 {
     Q_D(QnTCPConnectionProcessor);
     return d->socketTimeout;
+}
+
+bool QnTCPConnectionProcessor::readRequest()
+{
+    Q_D(QnTCPConnectionProcessor);
+
+    QTime globalTimeout;
+    d->requestHeaders = QHttpRequestHeader();
+    d->clientRequest.clear();
+    d->responseHeaders = QHttpResponseHeader();
+    d->requestBody.clear();
+    d->responseBody.clear();
+
+    while (!m_needStop && d->socket->isConnected())
+    {
+        int readed = d->socket->recv(d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
+        if (readed > 0) 
+        {
+            globalTimeout.restart();
+            d->clientRequest.append((const char*) d->tcpReadBuffer, readed);
+            if (isFullMessage(d->clientRequest))
+            {
+                return true;
+            }
+            else if (d->clientRequest.size() > MAX_REQUEST_SIZE)
+            {
+                qWarning() << "Too large HTTP client request. Ignoring";
+                return false;
+            }
+        }
+        else //if (globalTimeout.elapsed() > CONNECTION_TIMEOUT)
+        {
+            break;
+        }
+    }
+    return false;
+}
+
+QUrl QnTCPConnectionProcessor::getDecodedUrl() const
+{
+    Q_D(const QnTCPConnectionProcessor);
+    QByteArray data = d->requestHeaders.path().toUtf8();
+    data = data.replace("+", "%20");
+    return QUrl::fromEncoded(data);
+
 }

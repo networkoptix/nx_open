@@ -71,6 +71,7 @@ public:
     virtual ~QnStorageResource();
 
     AVIOContext* createFfmpegIOContext(const QString& url, QIODevice::OpenMode openMode, int IO_BLOCK_SIZE = 32768);
+    static AVIOContext* createFfmpegIOContext(QIODevice* ioDevice, int IO_BLOCK_SIZE = 32768);
     void closeFfmpegIOContext(AVIOContext* ioContext);
     qint64 getFileSizeByIOContext(AVIOContext* ioContext);
 
