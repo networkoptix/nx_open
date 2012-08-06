@@ -27,11 +27,6 @@ contrib/maven-artifacts-deploy/linux
 contrib/maven-artifacts-deploy/target
 contrib/maven-artifacts-deploy/windows
 
-common/bin
-client/bin
-mediaserver/bin
-traytool/bin
-
 appserver/gen
 appserver/db/ecs.db
 appserver/setup/db/ecs.db
@@ -48,9 +43,8 @@ appserver/setup/build
 appserver/version_maven.py
 
 build
-client/src/version.h
-common/src/common.pri
 
+client/bin
 client/src/Info.plist
 client/src/client.pro
 client/src/common.pro
@@ -76,21 +70,25 @@ client/contrib/qtcolorpicker/examples/simple/Makefile*
 client/contrib/qtcolorpicker/examples/simple/debug
 client/contrib/qtcolorpicker/lib/*.ilk
 
+common/bin
 common/src/common.pro
 common/src/plugins/resources/archive/filetypes.h
 common/src/Makefile
 common/src/common.mak*
 common/src/common.vcproj
+common/src/common.pri
 common/common.mak*
 common/x86
 common/x64
 common/src/version.h
 
+mediaserver/bin
 mediaserver/src/server.pro
 mediaserver/src/version.h
 mediaserver/src/Makefile
 mediaserver/src/server.mak*
 mediaserver/src/server.vcproj
+mediaserver/mediaserver.mak*
 mediaserver/x86
 mediaserver/x64
 
@@ -122,6 +120,7 @@ wixsetup/x64
 My Amplifier XE Results*
 My Inspector XE Results*
 
+traytool/bin
 traytool/src/traytool.pro
 traytool/src/version.h
 traytool/src/traytool.vcproj
