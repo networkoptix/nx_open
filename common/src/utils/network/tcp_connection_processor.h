@@ -25,6 +25,7 @@ public:
 
     int getSocketTimeout();
 
+    bool sendChunk(const QnByteArray& chunk);
 protected:
     virtual void pleaseStop();
     virtual void parseRequest();

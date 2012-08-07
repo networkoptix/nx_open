@@ -13,7 +13,7 @@ static qint32 ffmpegReadPacket(void *opaque, quint8* buf, int size)
 static qint32 ffmpegWritePacket(void *opaque, quint8* buf, int size)
 {
     QnFfmpegTranscoder* transcoder = reinterpret_cast<QnFfmpegTranscoder*> (opaque);
-    return transcoder->m_dstByteArray->write((char*) buf, size);
+    return transcoder->writeBuffer((char*) buf, size);
 }
 
 static int64_t ffmpegSeek(void* opaque, int64_t pos, int whence)
@@ -47,7 +47,6 @@ m_audioEncoderCodecCtx(0),
 m_videoBitrate(0),
 m_startDateTime(0),
 m_formatCtx(0),
-m_dstByteArray(0),
 m_ioContext(0)
 {
 }
@@ -181,11 +180,12 @@ int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDa
 
 int QnFfmpegTranscoder::transcodePacketInternal(QnAbstractMediaDataPtr media, QnByteArray& result)
 {
-    m_dstByteArray = &result;
     AVRational srcRate = {1, 1000000};
     AVStream* stream = m_formatCtx->streams[media->dataType == QnAbstractMediaData::VIDEO ? 0 : 1];
     AVPacket packet;
     av_init_packet(&packet);
+    packet.data = 0;
+    packet.size = 0;
     packet.pts = av_rescale_q(media->timestamp-m_startDateTime, srcRate, stream->time_base);
     packet.dts = packet.pts;
 
@@ -200,10 +200,12 @@ int QnFfmpegTranscoder::transcodePacketInternal(QnAbstractMediaDataPtr media, Qn
             int errCode = m_vTranscoder->transcodePacket(media, transcodedData);
             if (errCode != 0)
                 return errCode;
-            packet.data = (quint8*) transcodedData->data.data();
-            packet.size = transcodedData->data.size();
-            if(transcodedData->flags & AV_PKT_FLAG_KEY)
-                packet.flags |= AV_PKT_FLAG_KEY;
+            if (transcodedData) {
+                packet.data = (quint8*) transcodedData->data.data();
+                packet.size = transcodedData->data.size();
+                if(transcodedData->flags & AV_PKT_FLAG_KEY)
+                    packet.flags |= AV_PKT_FLAG_KEY;
+            }
         }
         else {
             // direct stream copy
@@ -217,9 +219,12 @@ int QnFfmpegTranscoder::transcodePacketInternal(QnAbstractMediaDataPtr media, Qn
         Q_ASSERT_X(true, Q_FUNC_INFO, "Not implemented! Under cunstruction!!!");
     }
     
-    if (av_write_frame(m_formatCtx, &packet) < 0) {
-        qWarning() << QLatin1String("Transcoder error: can't write AV packet");
-        //return -1; // ignore error and continue
+    if (packet.size > 0)
+    {
+        if (av_write_frame(m_formatCtx, &packet) < 0) {
+            qWarning() << QLatin1String("Transcoder error: can't write AV packet");
+            //return -1; // ignore error and continue
+        }
     }
     return 0;
 }

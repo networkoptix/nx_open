@@ -108,7 +108,7 @@ public:
     * @param bitrate Bitrate after transcode. By default bitrate is autodetected. Not used if transcode method TM_NoTranscode
     * @param addition codec params. Not used if transcode method TM_NoTranscode
     */
-    virtual bool setVideoCodec(CodecID codec, TranscodeMethod method, const QSize& resolution = QSize(1024,768), int bitrate = -1, const QnCodecTranscoder::Params& params = QnCodecTranscoder::Params());
+    virtual int setVideoCodec(CodecID codec, TranscodeMethod method, const QSize& resolution = QSize(1024,768), int bitrate = -1, const QnCodecTranscoder::Params& params = QnCodecTranscoder::Params());
 
 
     /*
@@ -133,6 +133,9 @@ public:
     */
     QString getLastErrorMessage() const;
 
+    // for internal use only. move to protectd!
+    int writeBuffer(const char* data, int size);
+
 protected:
     /*
     *  Prepare to transcode. If 'direct stream copy' is used, function got not empty video and audio data
@@ -149,7 +152,8 @@ protected:
     CodecID m_audioCodec;
     bool m_videoStreamCopy;
     bool m_audioStreamCopy;
-
+    QnByteArray m_internalBuffer;
+    qint64 m_firstTime;
 private:
     QString m_lastErrMessage;
     QQueue<QnCompressedVideoDataPtr> m_delayedVideoQueue;

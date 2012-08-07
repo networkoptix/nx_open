@@ -55,7 +55,9 @@ QSize QnVideoTranscoder::getResolution() const
 QnTranscoder::QnTranscoder():
     m_initialized(false),
     m_videoCodec(CODEC_ID_NONE),
-    m_audioCodec(CODEC_ID_NONE)
+    m_audioCodec(CODEC_ID_NONE),
+    m_internalBuffer(CL_MEDIA_ALIGNMENT, 1024*1024),
+    m_firstTime(AV_NOPTS_VALUE)
 {
 
 }
@@ -65,7 +67,7 @@ QnTranscoder::~QnTranscoder()
 
 }
 
-bool QnTranscoder::setVideoCodec(CodecID codec, TranscodeMethod method, const QSize& resolution, int bitrate, const QnCodecTranscoder::Params& params)
+int QnTranscoder::setVideoCodec(CodecID codec, TranscodeMethod method, const QSize& resolution, int bitrate, const QnCodecTranscoder::Params& params)
 {
     m_videoCodec = codec;
     switch (method)
@@ -81,14 +83,14 @@ bool QnTranscoder::setVideoCodec(CodecID codec, TranscodeMethod method, const QS
             break;
         case TM_OpenCLTranscode:
             m_lastErrMessage = "OpenCLTranscode is not implemented";
-            return false;
+            return -1;
     }
     if (m_vTranscoder)
     {
         m_vTranscoder->setResolution(resolution);
         m_vTranscoder->setBitrate(bitrate);
     }
-    return true;
+    return 0;
 }
 
 bool QnTranscoder::setAudioCodec(CodecID codec, TranscodeMethod method)
@@ -101,8 +103,12 @@ bool QnTranscoder::setAudioCodec(CodecID codec, TranscodeMethod method)
 
 int QnTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnByteArray& result)
 {
+    m_internalBuffer.clear();
     if (media->dataType != QnAbstractMediaData::VIDEO && media->dataType != QnAbstractMediaData::AUDIO)
         return 0; // transcode only audio and video, skip packet
+
+    if (m_firstTime == AV_NOPTS_VALUE)
+        m_firstTime = media->timestamp;
 
     if (!m_initialized)
     {
@@ -110,6 +116,7 @@ int QnTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnByteArray& res
             m_delayedVideoQueue << qSharedPointerDynamicCast<QnCompressedVideoData> (media);
         else
             m_delayedAudioQueue << qSharedPointerDynamicCast<QnCompressedAudioData> (media);
+        media.clear();
         if (m_videoCodec != CODEC_ID_NONE && m_delayedVideoQueue.isEmpty())
             return 0; // not ready to init
         if (m_audioCodec != CODEC_ID_NONE && m_delayedAudioQueue.isEmpty())
@@ -132,6 +139,24 @@ int QnTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnByteArray& res
         if (errCode != 0)
             return errCode;
     }
-    errCode = transcodePacketInternal(media, result);
-    return errCode;
+    if (media) {
+        errCode = transcodePacketInternal(media, result);
+        if (errCode != 0)
+            return errCode;
+    }
+    
+    result.write(m_internalBuffer.data(), m_internalBuffer.size());
+    
+    return 0;
+}
+
+QString QnTranscoder::getLastErrorMessage() const
+{
+    return m_lastErrMessage;
+}
+
+int QnTranscoder::writeBuffer(const char* data, int size)
+{
+    m_internalBuffer.write(data,size);
+    return size;
 }

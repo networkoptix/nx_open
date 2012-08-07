@@ -14,6 +14,7 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(TCPSocket* socket, QnTcpListe
     Q_D(QnTCPConnectionProcessor);
     d->socket = socket;
     d->owner = _owner;
+    d->chunkedMode = false;
 }
 
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(QnTCPConnectionProcessorPrivate* dptr, TCPSocket* socket, QnTcpListener* _owner):
@@ -23,6 +24,7 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(QnTCPConnectionProcessorPriva
     d->socket = socket;
     //d->socket->setNoDelay(true);
     d->owner = _owner;
+    d->chunkedMode = false;
 }
 
 
@@ -184,10 +186,14 @@ void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int cod
 {
     Q_D(QnTCPConnectionProcessor);
     d->responseHeaders.setStatusLine(code, codeToMessage(code), d->requestHeaders.majorVersion(), d->requestHeaders.minorVersion());
+    if (d->chunkedMode)
+    {
+        d->responseHeaders.setValue(QLatin1String("Transfer-Encoding"), QLatin1String("chunked"));
+        d->responseHeaders.setContentType(QLatin1String(contentType));
+    }
     if (!d->responseBody.isEmpty())
     {
         d->responseHeaders.setContentLength(d->responseBody.length());
-        //d->responseHeaders.setContentType("application/sdp");
         d->responseHeaders.setContentType(QLatin1String(contentType));
     }
 
@@ -203,6 +209,21 @@ void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int cod
 
     QMutexLocker lock(&d->sockMutex);
     d->socket->send(response.data(), response.size());
+}
+
+bool QnTCPConnectionProcessor::sendChunk(const QnByteArray& chunk)
+{
+    Q_D(QnTCPConnectionProcessor);
+    if (d->socket->send(QByteArray::number(chunk.size()).toHex()) < 1)
+        return false;
+    if (d->socket->send("\r\n") < 1)
+        return false;
+    if (d->socket->send(chunk) < 1)
+        return false;
+    if (d->socket->send("\r\n") < 1)
+        return false;
+
+    return true;
 }
 
 QString QnTCPConnectionProcessor::codeToMessage(int code)

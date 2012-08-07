@@ -15,12 +15,6 @@ public:
     ~QnFfmpegTranscoder();
 
     int setContainer(const QString& value);
-
-    int transcodePacket(QnAbstractMediaDataPtr media, QnByteArray& result);
-
-    QString getLastErrorMessage() const;
-
-    qint32 write(quint8* buf, int size);
 protected:
     virtual int open(QnCompressedVideoDataPtr video, QnCompressedAudioDataPtr audio) override;
     virtual int transcodePacketInternal(QnAbstractMediaDataPtr media, QnByteArray& result) override;
@@ -36,7 +30,6 @@ private:
     AVFormatContext* m_formatCtx;
     QString m_lastErrMessage;
    
-    QnByteArray* m_dstByteArray;
     AVIOContext* m_ioContext;
     QString m_container;
 };
