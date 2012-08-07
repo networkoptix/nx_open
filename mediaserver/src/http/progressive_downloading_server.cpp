@@ -82,7 +82,8 @@ QnProgressiveDownloadingConsumer::~QnProgressiveDownloadingConsumer()
 void QnProgressiveDownloadingConsumer::run()
 {
     Q_D(QnProgressiveDownloadingConsumer);
-    if (d->transcoder.setContainer("mpegts") != 0)
+    if (d->transcoder.setContainer("webm") != 0)
+    //if (d->transcoder.setContainer("mpegts") != 0)
     {
         QByteArray msg;
         msg = QByteArray("Transcoding error. Can not setup output format:") + d->transcoder.getLastErrorMessage().toLocal8Bit();
@@ -92,7 +93,8 @@ void QnProgressiveDownloadingConsumer::run()
         return;
     }
 
-    if (d->transcoder.setVideoCodec(CODEC_ID_MPEG2VIDEO, QnTranscoder::TM_FfmpegTranscode, QSize(640,480)) != 0)
+    if (d->transcoder.setVideoCodec(CODEC_ID_VP8, QnTranscoder::TM_FfmpegTranscode, QSize(640,480)) != 0)
+    //if (d->transcoder.setVideoCodec(CODEC_ID_MPEG2VIDEO, QnTranscoder::TM_FfmpegTranscode, QSize(640,480)) != 0)
     {
         QByteArray msg;
         msg = QByteArray("Transcoding error. Can not setup video codec:") + d->transcoder.getLastErrorMessage().toLocal8Bit();

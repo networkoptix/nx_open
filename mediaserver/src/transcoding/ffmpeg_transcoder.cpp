@@ -186,8 +186,6 @@ int QnFfmpegTranscoder::transcodePacketInternal(QnAbstractMediaDataPtr media, Qn
     av_init_packet(&packet);
     packet.data = 0;
     packet.size = 0;
-    packet.pts = av_rescale_q(media->timestamp-m_startDateTime, srcRate, stream->time_base);
-    packet.dts = packet.pts;
 
     QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(media);
     QnAbstractMediaDataPtr transcodedData;
@@ -203,12 +201,14 @@ int QnFfmpegTranscoder::transcodePacketInternal(QnAbstractMediaDataPtr media, Qn
             if (transcodedData) {
                 packet.data = (quint8*) transcodedData->data.data();
                 packet.size = transcodedData->data.size();
+                packet.pts = av_rescale_q(transcodedData->timestamp, srcRate, stream->time_base);
                 if(transcodedData->flags & AV_PKT_FLAG_KEY)
                     packet.flags |= AV_PKT_FLAG_KEY;
             }
         }
         else {
             // direct stream copy
+            packet.pts = av_rescale_q(media->timestamp-m_startDateTime, srcRate, stream->time_base);
             packet.data = (quint8*) media->data.data();
             packet.size = media->data.size();
             if(media->flags & AV_PKT_FLAG_KEY)
@@ -218,6 +218,7 @@ int QnFfmpegTranscoder::transcodePacketInternal(QnAbstractMediaDataPtr media, Qn
     else {
         Q_ASSERT_X(true, Q_FUNC_INFO, "Not implemented! Under cunstruction!!!");
     }
+    packet.dts = packet.pts;
     
     if (packet.size > 0)
     {

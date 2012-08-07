@@ -7,7 +7,8 @@ QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(CodecID codecId):
 QnVideoTranscoder(codecId),
 m_videoDecoder(0),
 scaleContext(0),
-m_encoderCtx(0)
+m_encoderCtx(0),
+m_firstEncodedPts(AV_NOPTS_VALUE)
 {
     m_videoEncodingBuffer = (quint8*) qMallocAligned(MAX_VIDEO_FRAME, 32);
 }
@@ -88,6 +89,14 @@ int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
             rescaleFrame();
             decodedFrame = &m_scaledVideoFrame;
         }
+
+        static AVRational r = {1, 1000000};
+        decodedFrame->pts  = av_rescale_q(decodedFrame->pts, r, m_encoderCtx->time_base);
+        if (m_firstEncodedPts == AV_NOPTS_VALUE)
+            m_firstEncodedPts = decodedFrame->pts;
+        decodedFrame->pts -= m_firstEncodedPts;
+
+
         int encoded = avcodec_encode_video(m_encoderCtx, m_videoEncodingBuffer, MAX_VIDEO_FRAME, decodedFrame);
 
         if (encoded < 0)
@@ -95,6 +104,9 @@ int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
             return -3;
         }
         result = QnCompressedVideoDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, encoded));
+        result->timestamp = av_rescale_q(m_encoderCtx->coded_frame->pts, m_encoderCtx->time_base, r);
+        if(m_encoderCtx->coded_frame->key_frame)
+            result->flags |= AV_PKT_FLAG_KEY;
         result->data.write((const char*) m_videoEncodingBuffer, encoded); // todo: remove data copy here!
         return 0;
     }
