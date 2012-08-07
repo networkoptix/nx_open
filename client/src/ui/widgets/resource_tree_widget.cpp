@@ -634,7 +634,7 @@ void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex 
 void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex &index) {
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     int nodeType = index.data(Qn::NodeTypeRole).toInt();
-    if((resource && resource->checkFlags(QnResource::server)) || nodeType == Qn::ServersNode) 
+    if((resource && resource->hasFlags(QnResource::server)) || nodeType == Qn::ServersNode) 
         ui->resourceTreeView->expand(index);
 
     at_resourceProxyModel_rowsInserted(index, 0, m_resourceProxyModel->rowCount(index) - 1);

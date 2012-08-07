@@ -10,7 +10,7 @@ class DefaultDlgManufacture : public CLAbstractDlgManufacture
 {
 public:
     inline bool canProduceDlg(QnResourcePtr resource) const
-    { return resource->checkFlags(QnResource::live_cam); }
+    { return resource->hasFlags(QnResource::live_cam); }
     inline QDialog *createDlg(QnResourcePtr resource, QWidget *parent)
     { return new CLAbstractDeviceSettingsDlg(resource, parent); }
 };

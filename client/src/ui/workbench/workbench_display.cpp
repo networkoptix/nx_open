@@ -731,13 +731,13 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
         return false;
     }
 
-    if (!resource->checkFlags(QnResource::media) && !resource->checkFlags(QnResource::server)) { // TODO: unsupported for now
+    if (!resource->hasFlags(QnResource::media) && !resource->hasFlags(QnResource::server)) { // TODO: unsupported for now
         qnDeleteLater(item);
         return false;
     }
 
     QnResourceWidget *widget;
-    if (resource->checkFlags(QnResource::server))
+    if (resource->hasFlags(QnResource::server))
         widget = new QnServerResourceWidget(context(), item);
     else
         widget = new QnMediaResourceWidget(context(), item);

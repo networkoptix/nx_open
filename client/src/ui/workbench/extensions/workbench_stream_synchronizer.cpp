@@ -78,7 +78,7 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAdded(QnResourceWidget *wid
 
     connect(mediaWidget->resource().data(), SIGNAL(flagsChanged()), this, SLOT(at_resource_flagsChanged()));
 
-    if(!mediaWidget->resource()->checkFlags(QnResource::utc)) {
+    if(!mediaWidget->resource()->hasFlags(QnResource::utc)) {
         m_queuedWidgets.insert(mediaWidget);
         return;
     }
@@ -113,7 +113,7 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAboutToBeRemoved(QnResource
 
     m_queuedWidgets.remove(mediaWidget);
 
-    if(!mediaWidget->resource()->checkFlags(QnResource::utc))
+    if(!mediaWidget->resource()->hasFlags(QnResource::utc))
         return;
 
     if(mediaWidget->display()->archiveReader() == NULL) 

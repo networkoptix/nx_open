@@ -125,7 +125,7 @@ public:
     
     // flags like network media and so on
     Flags flags() const;
-    inline bool checkFlags(Flags flags) const { return (this->flags() & flags) == flags; }
+    inline bool hasFlags(Flags flags) const { return (this->flags() & flags) == flags; }
     void setFlags(Flags flags);
     void addFlags(Flags flags);
     void removeFlags(Flags flags);
