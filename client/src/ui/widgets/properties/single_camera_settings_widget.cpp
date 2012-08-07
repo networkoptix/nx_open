@@ -188,7 +188,7 @@ bool QnSingleCameraSettingsWidget::parseGroupXml(const QDomElement &groupXml, co
             layout->addWidget(groupBox);
 
             tabWidget = QWidgetPtr(groupBox);
-            groupBox->setObjectName(id.replace(QLatin1String("%%"), QLatin1String(" ")));
+            groupBox->setObjectName(id);
             //groupBox->setFixedWidth(300);
             //groupBox->setFixedHeight(300);
         }

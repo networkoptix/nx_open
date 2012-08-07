@@ -1,72 +1,1043 @@
 #include "onvif_resource_settings.h"
+#include "onvif/soapImagingBindingProxy.h"
+
+enum onvifXsd__WideDynamicMode;
 
 //
 // class OnvifCameraSettingsResp
 //
 
-OnvifCameraSettingsResp::OnvifCameraSettings(const std::string& endpoint, const std::string& login,
+OnvifCameraSettingsResp::OnvifCameraSettingsResp(const std::string& endpoint, const std::string& login,
         const std::string& passwd, const std::string& videoSrcToken, const QString& uniqId):
-    m_rangesSoapWrapper(endpoint, login, passwd),
-    m_valsSoapWrapper(endpoint, login, passwd),
+    m_rangesSoapWrapper(endpoint.empty()? 0: new ImagingSoapWrapper(endpoint, login, passwd)),
+    m_valsSoapWrapper(endpoint.empty()? 0: new ImagingSoapWrapper(endpoint, login, passwd)),
+    m_rangesResponse(new ImagingOptionsResp()),
+    m_valsResponse(new ImagingSettingsResp()),
     m_videoSrcToken(videoSrcToken),
     m_uniqId(uniqId)
 {
-    m_rangesResponse.ImagingOptions = 0;
-    m_valsResponse.ImagingSettings = 0;
+    m_rangesResponse->ImagingOptions = 0;
+    m_valsResponse->ImagingSettings = 0;
+}
+
+OnvifCameraSettingsResp::~OnvifCameraSettingsResp()
+{
+    delete m_rangesSoapWrapper;
+    delete m_valsSoapWrapper;
+    delete m_rangesResponse;
+    delete m_valsResponse;
 }
 
 bool OnvifCameraSettingsResp::isEmpty() const
 { 
-    return !m_rangesResponse.ImagingOptions || !m_valsResponse.ImagingSettings;
+    return !m_rangesResponse->ImagingOptions || !m_valsResponse->ImagingSettings;
 }
 
 bool OnvifCameraSettingsResp::makeRequest()
 {
+    if (!m_rangesSoapWrapper || !m_valsSoapWrapper) {
+        return false;
+    }
+
     ImagingOptionsReq rangesRequest;
     rangesRequest.VideoSourceToken = m_videoSrcToken;
 
-    int soapRes = m_rangesSoapWrapper.getOptions(rangesRequest, m_rangesResponse);
+    int soapRes = m_rangesSoapWrapper->getOptions(rangesRequest, *m_rangesResponse);
     if (soapRes != SOAP_OK) {
         qWarning() << "OnvifCameraSettingsResp::makeRequest: can't fetch imaging options. UniqId: " << m_uniqId
-            << ". Reason: SOAP to endpoint " << m_rangesSoapWrapper.getEndpointUrl() << " failed. GSoap error code: "
-            << soapRes << ". " << m_rangesSoapWrapper.getLastError();
+            << ". Reason: SOAP to endpoint " << m_rangesSoapWrapper->getEndpointUrl() << " failed. GSoap error code: "
+            << soapRes << ". " << m_rangesSoapWrapper->getLastError();
         return false;
     }
 
     ImagingSettingsReq valsRequest;
     valsRequest.VideoSourceToken = m_videoSrcToken;
 
-    int soapRes = m_valsSoapWrapper.getImagingSettings(valsRequest, m_valsResponse);
+    soapRes = m_valsSoapWrapper->getImagingSettings(valsRequest, *m_valsResponse);
     if (soapRes != SOAP_OK) {
         qWarning() << "OnvifCameraSettingsResp::makeRequest: can't fetch imaging settings. UniqId: " << m_uniqId
-            << ". Reason: SOAP to endpoint " << m_rangesSoapWrapper.getEndpointUrl() << " failed. GSoap error code: "
-            << soapRes << ". " << m_rangesSoapWrapper.getLastError();
+            << ". Reason: SOAP to endpoint " << m_valsSoapWrapper->getEndpointUrl() << " failed. GSoap error code: "
+            << soapRes << ". " << m_valsSoapWrapper->getLastError();
         return false;
     }
 
     return true;
 }
 
-const ImagingOptionsResp& OnvifCameraSettingsResp::getRangesREsponse() const
+const ImagingOptionsResp& OnvifCameraSettingsResp::getRangesResponse() const
 {
-  return m_rangesResponse;
+  return *m_rangesResponse;
 }
 
-const ImagingSettingsResp& OnvifCameraSettingsResp::getValsREsponse() const
+const ImagingSettingsResp& OnvifCameraSettingsResp::getValsResponse() const
 {
-  return m_valsResponse;
+  return *m_valsResponse;
 }
 
 //
 // class OnvifCameraSettingOperationAbstract
 // 
 
+const QString& CommonStringValues::ON = *(new QString(QLatin1String("On")));
+const QString& CommonStringValues::OFF = *(new QString(QLatin1String("Off")));
+const QString& CommonStringValues::SEPARATOR = *(new QString(QLatin1String(",")));
+
+const OnvifCameraSettingOperationAbstract& OnvifCameraSettingOperationAbstract::EMPTY_OPERATION = *(new OnvifCameraSettingOperationEmpty());
+
 QHash<QString, OnvifCameraSettingOperationAbstract*>& createOnvifCameraSettingOperationAbstract()
 {
-    return *(new QHash<QString, OnvifCameraSettingOperationAbstract*>());
+    QHash<QString, OnvifCameraSettingOperationAbstract*>* tmp = new QHash<QString, OnvifCameraSettingOperationAbstract*>();
+
+    tmp->insert(QString::fromLatin1("%%Imaging%%White Balance%%Yb Gain"),          new ImagingWhiteBalanceYbGainOperation());
+    tmp->insert(QString::fromLatin1("%%Imaging%%Exposure%%Iris"),                  new ImagingExposureIrisOperation());
+    tmp->insert(QString::fromLatin1("%%Imaging%%Exposure%%Exposure Time"),         new ImagingExposureExposureTimeOperation());
+    tmp->insert(QString::fromLatin1("%%Imaging%%Wide Dynamic Range%%Mode"),        new ImagingWideDynamicRangeModeOperation());
+    tmp->insert(QString::fromLatin1("%%Imaging%%White Balance%%Mode"),             new ImagingWhiteBalanceModeOperation());
+    tmp->insert(QString::fromLatin1("%%Imaging%%Exposure%%Max Gain"),              new ImagingExposureMaxGainOperation());
+    tmp->insert(QString::fromLatin1("%%Imaging%%Exposure%%Min Exposure Time"),     new ImagingExposureMinExposureTimeOperation());
+    tmp->insert(QString::fromLatin1("%%Imaging%%Backlight Compensation%%Level"),   new ImagingBacklightCompensationLevelOperation());
+    tmp->insert(QString::fromLatin1("%%Imaging%%Contrast"),                        new ImagingContrastOperation());
+    tmp->insert(QString::fromLatin1("%%Imaging%%Exposure%%Priority"),              new ImagingExposurePriorityOperation());
+    tmp->insert(QString::fromLatin1("%%Imaging%%Sharpness"),                       new ImagingSharpnessOperation());
+    tmp->insert(QString::fromLatin1("%%Imaging%%Ir Cut Filter Modes"),             new ImagingIrCutFilterModesOperation());
+    tmp->insert(QString::fromLatin1("%%Imaging%%White Balance%%Yr Gain"),          new ImagingWhiteBalanceYrGainOperation());
+    tmp->insert(QString::fromLatin1("%%Imaging%%Exposure%%Min Gain"),              new ImagingExposureMinGainOperation());
+    tmp->insert(QString::fromLatin1("%%Imaging%%Exposure%%Gain"),                  new ImagingExposureGainOperation());
+    tmp->insert(QString::fromLatin1("%%Imaging%%Exposure%%Mode"),                  new ImagingExposureModeOperation());
+    tmp->insert(QString::fromLatin1("%%Imaging%%Wide Dynamic Range%%Level"),       new ImagingWideDynamicRangeLevelOperation());
+    tmp->insert(QString::fromLatin1("%%Imaging%%Exposure%%Max Iris"),              new ImagingExposureMaxIrisOperation());
+    tmp->insert(QString::fromLatin1("%%Imaging%%Brightness"),                      new ImagingBrightnessOperation());
+    tmp->insert(QString::fromLatin1("%%Imaging%%Exposure%%Min Iris"),              new ImagingExposureMinIrisOperation());
+    tmp->insert(QString::fromLatin1("%%Imaging%%Backlight Compensation%%Mode"),    new ImagingBacklightCompensationModeOperation());
+    tmp->insert(QString::fromLatin1("%%Imaging%%Color Saturation"),                new ImagingColorSaturationOperation());
+    tmp->insert(QString::fromLatin1("%%Imaging%%Exposure%%Max Exposure Time"),     new ImagingExposureMaxExposureTimeOperation());
+    tmp->insert(QString::fromLatin1("%%Maintenance%%System Reboot"),               new OnvifCameraSettingOperationEmpty());
+    tmp->insert(QString::fromLatin1("%%Maintenance%%Soft System Factory Default"), new OnvifCameraSettingOperationEmpty());
+    tmp->insert(QString::fromLatin1("%%Maintenance%%Hard System Factory Default"), new OnvifCameraSettingOperationEmpty());
+
+    return *tmp;
 }
 
-const OnvifCameraSettingOperationAbstract::operations = createOnvifCameraSettingOperationAbstract();
+const QHash<QString, OnvifCameraSettingOperationAbstract*> OnvifCameraSettingOperationAbstract::operations = createOnvifCameraSettingOperationAbstract();
+
+bool ImagingWhiteBalanceYbGainOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingOptionsResp& rangesResp = src.getRangesResponse();
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!rangesResp.ImagingOptions || !rangesResp.ImagingOptions->WhiteBalance || !rangesResp.ImagingOptions->WhiteBalance->YbGain ||
+        !valsResp.ImagingSettings || !valsResp.ImagingSettings->WhiteBalance || !valsResp.ImagingSettings->WhiteBalance->CbGain)
+    {
+        return false;
+    }
+
+    output.setMin(rangesResp.ImagingOptions->WhiteBalance->YbGain->Min);
+    output.setMax(rangesResp.ImagingOptions->WhiteBalance->YbGain->Max);
+    output.setStep(1.0);
+    output.setCurrent(*(valsResp.ImagingSettings->WhiteBalance->CbGain));
+
+    return true;
+}
+
+bool ImagingWhiteBalanceYbGainOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!valsResp.ImagingSettings || !valsResp.ImagingSettings->WhiteBalance || !valsResp.ImagingSettings->WhiteBalance->CbGain)
+    {
+        return false;
+    }
+
+    *(valsResp.ImagingSettings->WhiteBalance->CbGain) = static_cast<float>(static_cast<double>(input.getCurrent()));
+
+    return true;
+}
+
+bool ImagingExposureIrisOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingOptionsResp& rangesResp = src.getRangesResponse();
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!rangesResp.ImagingOptions || !rangesResp.ImagingOptions->Exposure || !rangesResp.ImagingOptions->Exposure->Iris ||
+        !valsResp.ImagingSettings || !valsResp.ImagingSettings->Exposure || !valsResp.ImagingSettings->Exposure->Iris)
+    {
+        return false;
+    }
+
+    output.setMin(rangesResp.ImagingOptions->Exposure->Iris->Min);
+    output.setMax(rangesResp.ImagingOptions->Exposure->Iris->Max);
+    output.setStep(1.0);
+    output.setCurrent(*(valsResp.ImagingSettings->Exposure->Iris));
+
+    return true;
+}
+
+bool ImagingExposureIrisOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!valsResp.ImagingSettings || !valsResp.ImagingSettings->Exposure || !valsResp.ImagingSettings->Exposure->Iris)
+    {
+        return false;
+    }
+
+    *(valsResp.ImagingSettings->Exposure->Iris) = static_cast<float>(static_cast<double>(input.getCurrent()));
+
+    return true;
+}
+
+bool ImagingExposureExposureTimeOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingOptionsResp& rangesResp = src.getRangesResponse();
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!rangesResp.ImagingOptions || !rangesResp.ImagingOptions->Exposure || !rangesResp.ImagingOptions->Exposure->ExposureTime ||
+        !valsResp.ImagingSettings || !valsResp.ImagingSettings->Exposure || !valsResp.ImagingSettings->Exposure->ExposureTime)
+    {
+        return false;
+    }
+
+    output.setMin(rangesResp.ImagingOptions->Exposure->ExposureTime->Min);
+    output.setMax(rangesResp.ImagingOptions->Exposure->ExposureTime->Max);
+    output.setStep(1.0);
+    output.setCurrent(*(valsResp.ImagingSettings->Exposure->ExposureTime));
+
+    return true;
+}
+
+bool ImagingExposureExposureTimeOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!valsResp.ImagingSettings || !valsResp.ImagingSettings->Exposure || !valsResp.ImagingSettings->Exposure->ExposureTime)
+    {
+        return false;
+    }
+
+    *(valsResp.ImagingSettings->Exposure->ExposureTime) = static_cast<float>(static_cast<double>(input.getCurrent()));
+
+    return true;
+}
+
+bool ImagingWideDynamicRangeModeOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingOptionsResp& rangesResp = src.getRangesResponse();
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!valsResp.ImagingSettings || !valsResp.ImagingSettings->WideDynamicRange)
+    {
+        return false;
+    }
+
+    output.setMin(CommonStringValues::OFF);
+    output.setMax(CommonStringValues::ON);
+    output.setCurrent(valsResp.ImagingSettings->WideDynamicRange->Mode == onvifXsd__WideDynamicMode__OFF? CommonStringValues::OFF : CommonStringValues::ON);
+
+    return true;
+}
+
+bool ImagingWideDynamicRangeModeOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingOptionsResp& rangesResp = src.getRangesResponse();
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!valsResp.ImagingSettings || !valsResp.ImagingSettings->WideDynamicRange)
+    {
+        return false;
+    }
+
+    valsResp.ImagingSettings->WideDynamicRange->Mode = input.getCurrent() == CommonStringValues::OFF? onvifXsd__WideDynamicMode__OFF : onvifXsd__WideDynamicMode__ON;
+
+    return true;
+}
+
+const QString& ImagingWhiteBalanceModeOperation::AUTO_STR = *(new QString(QLatin1String("Auto")));
+const QString& ImagingWhiteBalanceModeOperation::MANUAL_STR = *(new QString(QLatin1String("Manual")));
+const QString& ImagingWhiteBalanceModeOperation::ALL_VALUES_STR = *(new QString(AUTO_STR + CommonStringValues::SEPARATOR + MANUAL_STR));
+
+bool ImagingWhiteBalanceModeOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingOptionsResp& rangesResp = src.getRangesResponse();
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!valsResp.ImagingSettings || !valsResp.ImagingSettings->WhiteBalance)
+    {
+        return false;
+    }
+
+    output.setMin(ALL_VALUES_STR);
+    output.setMax(ALL_VALUES_STR);
+    output.setCurrent(valsResp.ImagingSettings->WhiteBalance->Mode == onvifXsd__WhiteBalanceMode__AUTO? AUTO_STR : MANUAL_STR);
+
+    return true;
+}
+
+bool ImagingWhiteBalanceModeOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!valsResp.ImagingSettings || !valsResp.ImagingSettings->WhiteBalance)
+    {
+        return false;
+    }
+
+    valsResp.ImagingSettings->WhiteBalance->Mode = input.getCurrent() == AUTO_STR? onvifXsd__WhiteBalanceMode__AUTO : onvifXsd__WhiteBalanceMode__MANUAL;
+
+    return true;
+}
+
+bool ImagingExposureMaxGainOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingOptionsResp& rangesResp = src.getRangesResponse();
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!rangesResp.ImagingOptions || !rangesResp.ImagingOptions->Exposure || !rangesResp.ImagingOptions->Exposure->MaxGain ||
+        !valsResp.ImagingSettings || !valsResp.ImagingSettings->Exposure || !valsResp.ImagingSettings->Exposure->MaxGain)
+    {
+        return false;
+    }
+
+    output.setMin(rangesResp.ImagingOptions->Exposure->MaxGain->Min);
+    output.setMax(rangesResp.ImagingOptions->Exposure->MaxGain->Max);
+    output.setStep(1.0);
+    output.setCurrent(*(valsResp.ImagingSettings->Exposure->MaxGain));
+
+    return true;
+}
+
+bool ImagingExposureMaxGainOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!valsResp.ImagingSettings || !valsResp.ImagingSettings->Exposure || !valsResp.ImagingSettings->Exposure->MaxGain)
+    {
+        return false;
+    }
+
+    *(valsResp.ImagingSettings->Exposure->MaxGain) = static_cast<float>(static_cast<double>(input.getCurrent()));
+
+    return true;
+}
+
+bool ImagingExposureMinExposureTimeOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingOptionsResp& rangesResp = src.getRangesResponse();
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!rangesResp.ImagingOptions || !rangesResp.ImagingOptions->Exposure || !rangesResp.ImagingOptions->Exposure->MinExposureTime ||
+        !valsResp.ImagingSettings || !valsResp.ImagingSettings->Exposure || !valsResp.ImagingSettings->Exposure->MinExposureTime)
+    {
+        return false;
+    }
+
+    output.setMin(rangesResp.ImagingOptions->Exposure->MinExposureTime->Min);
+    output.setMax(rangesResp.ImagingOptions->Exposure->MinExposureTime->Max);
+    output.setStep(1.0);
+    output.setCurrent(*(valsResp.ImagingSettings->Exposure->MinExposureTime));
+
+    return true;
+}
+
+bool ImagingExposureMinExposureTimeOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!valsResp.ImagingSettings || !valsResp.ImagingSettings->Exposure || !valsResp.ImagingSettings->Exposure->MinExposureTime)
+    {
+        return false;
+    }
+
+    *(valsResp.ImagingSettings->Exposure->MinExposureTime) = static_cast<float>(static_cast<double>(input.getCurrent()));
+
+    return true;
+}
+
+bool ImagingBacklightCompensationLevelOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingOptionsResp& rangesResp = src.getRangesResponse();
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!rangesResp.ImagingOptions || !rangesResp.ImagingOptions->BacklightCompensation || !rangesResp.ImagingOptions->BacklightCompensation->Level ||
+        !valsResp.ImagingSettings || !valsResp.ImagingSettings->BacklightCompensation || !valsResp.ImagingSettings->BacklightCompensation->Level)
+    {
+        return false;
+    }
+
+    output.setMin(rangesResp.ImagingOptions->BacklightCompensation->Level->Min);
+    output.setMax(rangesResp.ImagingOptions->BacklightCompensation->Level->Max);
+    output.setStep(1.0);
+    output.setCurrent(*(valsResp.ImagingSettings->BacklightCompensation->Level));
+
+    return true;
+}
+
+bool ImagingBacklightCompensationLevelOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!valsResp.ImagingSettings || !valsResp.ImagingSettings->BacklightCompensation || !valsResp.ImagingSettings->BacklightCompensation->Level)
+    {
+        return false;
+    }
+
+    *(valsResp.ImagingSettings->BacklightCompensation->Level) = static_cast<float>(static_cast<double>(input.getCurrent()));
+
+    return true;
+}
+
+bool ImagingContrastOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingOptionsResp& rangesResp = src.getRangesResponse();
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!rangesResp.ImagingOptions || !rangesResp.ImagingOptions->Contrast ||
+        !valsResp.ImagingSettings || !valsResp.ImagingSettings->Contrast)
+    {
+        return false;
+    }
+
+    output.setMin(rangesResp.ImagingOptions->Contrast->Min);
+    output.setMax(rangesResp.ImagingOptions->Contrast->Max);
+    output.setStep(1.0);
+    output.setCurrent(*(valsResp.ImagingSettings->Contrast));
+
+    return true;
+}
+
+bool ImagingContrastOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!valsResp.ImagingSettings || !valsResp.ImagingSettings->Contrast)
+    {
+        return false;
+    }
+
+    *(valsResp.ImagingSettings->Contrast) = static_cast<float>(static_cast<double>(input.getCurrent()));
+
+    return true;
+}
+
+const QString& ImagingExposurePriorityOperation::LOW_NOISE_STR = *(new QString(QLatin1String("LowNoise")));
+const QString& ImagingExposurePriorityOperation::FRAME_RATE_STR = *(new QString(QLatin1String("FrameRate")));
+const QString& ImagingExposurePriorityOperation::ALL_VALUES_STR = *(new QString(LOW_NOISE_STR + CommonStringValues::SEPARATOR + FRAME_RATE_STR));
+
+bool ImagingExposurePriorityOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!valsResp.ImagingSettings || !valsResp.ImagingSettings->Exposure || !valsResp.ImagingSettings->Exposure->Priority)
+    {
+        return false;
+    }
+
+    output.setMin(ALL_VALUES_STR);
+    output.setMax(ALL_VALUES_STR);
+    output.setCurrent(valsResp.ImagingSettings->WhiteBalance->Mode == onvifXsd__ExposurePriority__LowNoise? LOW_NOISE_STR : FRAME_RATE_STR);
+
+    return true;
+}
+
+bool ImagingExposurePriorityOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!valsResp.ImagingSettings || !valsResp.ImagingSettings->Exposure || !valsResp.ImagingSettings->Exposure->Priority)
+    {
+        return false;
+    }
+
+    *(valsResp.ImagingSettings->Exposure->Priority) = input.getCurrent() == LOW_NOISE_STR? onvifXsd__ExposurePriority__LowNoise : onvifXsd__ExposurePriority__FrameRate;
+
+    return true;
+}
+
+bool ImagingSharpnessOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingOptionsResp& rangesResp = src.getRangesResponse();
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!rangesResp.ImagingOptions || !rangesResp.ImagingOptions->Sharpness ||
+        !valsResp.ImagingSettings || !valsResp.ImagingSettings->Sharpness)
+    {
+        return false;
+    }
+
+    output.setMin(rangesResp.ImagingOptions->Sharpness->Min);
+    output.setMax(rangesResp.ImagingOptions->Sharpness->Max);
+    output.setStep(1.0);
+    output.setCurrent(*(valsResp.ImagingSettings->Sharpness));
+
+    return true;
+}
+
+bool ImagingSharpnessOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!valsResp.ImagingSettings || !valsResp.ImagingSettings->Sharpness)
+    {
+        return false;
+    }
+
+    *(valsResp.ImagingSettings->Sharpness) = static_cast<float>(static_cast<double>(input.getCurrent()));
+
+    return true;
+}
+
+const QString& ImagingIrCutFilterModesOperation::AUTO_STR = *(new QString(QLatin1String("Auto")));
+const QString& ImagingIrCutFilterModesOperation::ALL_VALUES_STR = *(new QString(CommonStringValues::OFF + CommonStringValues::SEPARATOR +
+    CommonStringValues::ON + CommonStringValues::SEPARATOR + AUTO_STR));
+
+bool ImagingIrCutFilterModesOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!valsResp.ImagingSettings || !valsResp.ImagingSettings->IrCutFilter)
+    {
+        return false;
+    }
+
+    output.setMin(ALL_VALUES_STR);
+    output.setMax(ALL_VALUES_STR);
+
+    switch (*(valsResp.ImagingSettings->IrCutFilter))
+    {
+        case onvifXsd__IrCutFilterMode__ON:
+            output.setCurrent(CommonStringValues::ON);
+            break;
+
+        case onvifXsd__IrCutFilterMode__OFF:
+            output.setCurrent(CommonStringValues::OFF);
+            break;
+
+        case onvifXsd__IrCutFilterMode__AUTO:
+            output.setCurrent(AUTO_STR);
+            break;
+
+        default:
+            return false;
+    }
+
+    return true;
+}
+
+bool ImagingIrCutFilterModesOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!valsResp.ImagingSettings || !valsResp.ImagingSettings->IrCutFilter)
+    {
+        return false;
+    }
+
+    QString val = input.getCurrent();
+    if (val == CommonStringValues::ON) {
+        *(valsResp.ImagingSettings->IrCutFilter) = onvifXsd__IrCutFilterMode__ON;
+    } else if (val == CommonStringValues::OFF) {
+        *(valsResp.ImagingSettings->IrCutFilter) = onvifXsd__IrCutFilterMode__OFF;
+    } else if (val == AUTO_STR) {
+        *(valsResp.ImagingSettings->IrCutFilter) = onvifXsd__IrCutFilterMode__AUTO;
+    } else {
+        return false;
+    }
+
+    return true;
+}
+
+bool ImagingWhiteBalanceYrGainOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingOptionsResp& rangesResp = src.getRangesResponse();
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!rangesResp.ImagingOptions || !rangesResp.ImagingOptions->WhiteBalance || !rangesResp.ImagingOptions->WhiteBalance->YrGain ||
+        !valsResp.ImagingSettings || !valsResp.ImagingSettings->WhiteBalance || !valsResp.ImagingSettings->WhiteBalance->CrGain)
+    {
+        return false;
+    }
+
+    output.setMin(rangesResp.ImagingOptions->WhiteBalance->YrGain->Min);
+    output.setMax(rangesResp.ImagingOptions->WhiteBalance->YrGain->Max);
+    output.setStep(1.0);
+    output.setCurrent(*(valsResp.ImagingSettings->WhiteBalance->CrGain));
+
+    return true;
+}
+
+bool ImagingWhiteBalanceYrGainOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!valsResp.ImagingSettings || !valsResp.ImagingSettings->WhiteBalance || !valsResp.ImagingSettings->WhiteBalance->CrGain)
+    {
+        return false;
+    }
+
+    *(valsResp.ImagingSettings->WhiteBalance->CrGain) = static_cast<float>(static_cast<double>(input.getCurrent()));
+
+    return true;
+}
+
+bool ImagingExposureMinGainOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingOptionsResp& rangesResp = src.getRangesResponse();
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!rangesResp.ImagingOptions || !rangesResp.ImagingOptions->Exposure || !rangesResp.ImagingOptions->Exposure->MinGain ||
+        !valsResp.ImagingSettings || !valsResp.ImagingSettings->Exposure || !valsResp.ImagingSettings->Exposure->MinGain)
+    {
+        return false;
+    }
+
+    output.setMin(rangesResp.ImagingOptions->Exposure->MinGain->Min);
+    output.setMax(rangesResp.ImagingOptions->Exposure->MinGain->Max);
+    output.setStep(1.0);
+    output.setCurrent(*(valsResp.ImagingSettings->Exposure->MinGain));
+
+    return true;
+}
+
+bool ImagingExposureMinGainOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!valsResp.ImagingSettings || !valsResp.ImagingSettings->Exposure || !valsResp.ImagingSettings->Exposure->MinGain)
+    {
+        return false;
+    }
+
+    *(valsResp.ImagingSettings->Exposure->MinGain) = static_cast<float>(static_cast<double>(input.getCurrent()));
+
+    return true;
+}
+
+bool ImagingExposureGainOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingOptionsResp& rangesResp = src.getRangesResponse();
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!rangesResp.ImagingOptions || !rangesResp.ImagingOptions->Exposure || !rangesResp.ImagingOptions->Exposure->Gain ||
+        !valsResp.ImagingSettings || !valsResp.ImagingSettings->Exposure || !valsResp.ImagingSettings->Exposure->Gain)
+    {
+        return false;
+    }
+
+    output.setMin(rangesResp.ImagingOptions->Exposure->Gain->Min);
+    output.setMax(rangesResp.ImagingOptions->Exposure->Gain->Max);
+    output.setStep(1.0);
+    output.setCurrent(*(valsResp.ImagingSettings->Exposure->Gain));
+
+    return true;
+}
+
+bool ImagingExposureGainOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!valsResp.ImagingSettings || !valsResp.ImagingSettings->Exposure || !valsResp.ImagingSettings->Exposure->Gain)
+    {
+        return false;
+    }
+
+    *(valsResp.ImagingSettings->Exposure->Gain) = static_cast<float>(static_cast<double>(input.getCurrent()));
+
+    return true;
+}
+
+const QString& ImagingExposureModeOperation::AUTO_STR = *(new QString(QLatin1String("Auto")));
+const QString& ImagingExposureModeOperation::MANUAL_STR = *(new QString(QLatin1String("Manual")));
+const QString& ImagingExposureModeOperation::ALL_VALUES_STR = *(new QString(AUTO_STR + CommonStringValues::SEPARATOR + MANUAL_STR));
+
+bool ImagingExposureModeOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingOptionsResp& rangesResp = src.getRangesResponse();
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!valsResp.ImagingSettings || !valsResp.ImagingSettings->Exposure)
+    {
+        return false;
+    }
+
+    output.setMin(ALL_VALUES_STR);
+    output.setMax(ALL_VALUES_STR);
+    output.setCurrent(valsResp.ImagingSettings->Exposure->Mode == onvifXsd__ExposureMode__AUTO? AUTO_STR : MANUAL_STR);
+
+    return true;
+}
+
+bool ImagingExposureModeOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!valsResp.ImagingSettings || !valsResp.ImagingSettings->Exposure)
+    {
+        return false;
+    }
+
+    valsResp.ImagingSettings->Exposure->Mode = input.getCurrent() == AUTO_STR? onvifXsd__ExposureMode__AUTO : onvifXsd__ExposureMode__MANUAL;
+
+    return true;
+}
+
+bool ImagingWideDynamicRangeLevelOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingOptionsResp& rangesResp = src.getRangesResponse();
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!rangesResp.ImagingOptions || !rangesResp.ImagingOptions->WideDynamicRange || !rangesResp.ImagingOptions->WideDynamicRange->Level ||
+        !valsResp.ImagingSettings || !valsResp.ImagingSettings->WideDynamicRange || !valsResp.ImagingSettings->WideDynamicRange->Level)
+    {
+        return false;
+    }
+
+    output.setMin(rangesResp.ImagingOptions->WideDynamicRange->Level->Min);
+    output.setMax(rangesResp.ImagingOptions->WideDynamicRange->Level->Max);
+    output.setStep(1.0);
+    output.setCurrent(*(valsResp.ImagingSettings->WideDynamicRange->Level));
+
+    return true;
+}
+
+bool ImagingWideDynamicRangeLevelOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!valsResp.ImagingSettings || !valsResp.ImagingSettings->WideDynamicRange || !valsResp.ImagingSettings->WideDynamicRange->Level)
+    {
+        return false;
+    }
+
+    *(valsResp.ImagingSettings->WideDynamicRange->Level) = static_cast<float>(static_cast<double>(input.getCurrent()));
+
+    return true;
+}
+
+bool ImagingExposureMaxIrisOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingOptionsResp& rangesResp = src.getRangesResponse();
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!rangesResp.ImagingOptions || !rangesResp.ImagingOptions->Exposure || !rangesResp.ImagingOptions->Exposure->MaxIris ||
+        !valsResp.ImagingSettings || !valsResp.ImagingSettings->Exposure || !valsResp.ImagingSettings->Exposure->MaxIris)
+    {
+        return false;
+    }
+
+    output.setMin(rangesResp.ImagingOptions->Exposure->MaxIris->Min);
+    output.setMax(rangesResp.ImagingOptions->Exposure->MaxIris->Max);
+    output.setStep(1.0);
+    output.setCurrent(*(valsResp.ImagingSettings->Exposure->MaxIris));
+
+    return true;
+}
+
+bool ImagingExposureMaxIrisOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!valsResp.ImagingSettings || !valsResp.ImagingSettings->Exposure || !valsResp.ImagingSettings->Exposure->MaxIris)
+    {
+        return false;
+    }
+
+    *(valsResp.ImagingSettings->Exposure->MaxIris) = static_cast<float>(static_cast<double>(input.getCurrent()));
+
+    return true;
+}
+
+bool ImagingBrightnessOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingOptionsResp& rangesResp = src.getRangesResponse();
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!rangesResp.ImagingOptions || !rangesResp.ImagingOptions->Brightness ||
+        !valsResp.ImagingSettings || !valsResp.ImagingSettings->Brightness)
+    {
+        return false;
+    }
+
+    output.setMin(rangesResp.ImagingOptions->Brightness->Min);
+    output.setMax(rangesResp.ImagingOptions->Brightness->Max);
+    output.setStep(1.0);
+    output.setCurrent(*(valsResp.ImagingSettings->Brightness));
+
+    return true;
+}
+
+bool ImagingBrightnessOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!valsResp.ImagingSettings || !valsResp.ImagingSettings->Brightness)
+    {
+        return false;
+    }
+
+    *(valsResp.ImagingSettings->Brightness) = static_cast<float>(static_cast<double>(input.getCurrent()));
+
+    return true;
+}
+
+bool ImagingExposureMinIrisOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingOptionsResp& rangesResp = src.getRangesResponse();
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!rangesResp.ImagingOptions || !rangesResp.ImagingOptions->Exposure || !rangesResp.ImagingOptions->Exposure->MinIris ||
+        !valsResp.ImagingSettings || !valsResp.ImagingSettings->Exposure || !valsResp.ImagingSettings->Exposure->MinIris)
+    {
+        return false;
+    }
+
+    output.setMin(rangesResp.ImagingOptions->Exposure->MinIris->Min);
+    output.setMax(rangesResp.ImagingOptions->Exposure->MinIris->Max);
+    output.setStep(1.0);
+    output.setCurrent(*(valsResp.ImagingSettings->Exposure->MinIris));
+
+    return true;
+}
+
+bool ImagingExposureMinIrisOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!valsResp.ImagingSettings || !valsResp.ImagingSettings->Exposure || !valsResp.ImagingSettings->Exposure->MinIris)
+    {
+        return false;
+    }
+
+    *(valsResp.ImagingSettings->Exposure->MinIris) = static_cast<float>(static_cast<double>(input.getCurrent()));
+
+    return true;
+}
+
+bool ImagingBacklightCompensationModeOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingOptionsResp& rangesResp = src.getRangesResponse();
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!valsResp.ImagingSettings || !valsResp.ImagingSettings->BacklightCompensation)
+    {
+        return false;
+    }
+
+    output.setMin(CommonStringValues::OFF);
+    output.setMax(CommonStringValues::ON);
+    output.setCurrent(valsResp.ImagingSettings->BacklightCompensation->Mode == onvifXsd__BacklightCompensationMode__OFF? CommonStringValues::OFF : CommonStringValues::ON);
+
+    return true;
+}
+
+bool ImagingBacklightCompensationModeOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingOptionsResp& rangesResp = src.getRangesResponse();
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!valsResp.ImagingSettings || !valsResp.ImagingSettings->BacklightCompensation)
+    {
+        return false;
+    }
+
+    valsResp.ImagingSettings->BacklightCompensation->Mode = input.getCurrent() == CommonStringValues::OFF? onvifXsd__BacklightCompensationMode__OFF : onvifXsd__BacklightCompensationMode__ON;
+
+    return true;
+}
+
+bool ImagingColorSaturationOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingOptionsResp& rangesResp = src.getRangesResponse();
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!rangesResp.ImagingOptions || !rangesResp.ImagingOptions->ColorSaturation ||
+        !valsResp.ImagingSettings || !valsResp.ImagingSettings->ColorSaturation)
+    {
+        return false;
+    }
+
+    output.setMin(rangesResp.ImagingOptions->ColorSaturation->Min);
+    output.setMax(rangesResp.ImagingOptions->ColorSaturation->Max);
+    output.setStep(1.0);
+    output.setCurrent(*(valsResp.ImagingSettings->ColorSaturation));
+
+    return true;
+}
+
+bool ImagingColorSaturationOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!valsResp.ImagingSettings || !valsResp.ImagingSettings->ColorSaturation)
+    {
+        return false;
+    }
+
+    *(valsResp.ImagingSettings->ColorSaturation) = static_cast<float>(static_cast<double>(input.getCurrent()));
+
+    return true;
+}
+
+bool ImagingExposureMaxExposureTimeOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingOptionsResp& rangesResp = src.getRangesResponse();
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!rangesResp.ImagingOptions || !rangesResp.ImagingOptions->Exposure || !rangesResp.ImagingOptions->Exposure->MaxExposureTime ||
+        !valsResp.ImagingSettings || !valsResp.ImagingSettings->Exposure || !valsResp.ImagingSettings->Exposure->MaxExposureTime)
+    {
+        return false;
+    }
+
+    output.setMin(rangesResp.ImagingOptions->Exposure->MaxExposureTime->Min);
+    output.setMax(rangesResp.ImagingOptions->Exposure->MaxExposureTime->Max);
+    output.setStep(1.0);
+    output.setCurrent(*(valsResp.ImagingSettings->Exposure->MaxExposureTime));
+
+    return true;
+}
+
+bool ImagingExposureMaxExposureTimeOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit)
+{
+    if (!reinitSrc(src, reinit)) return false;
+
+    const ImagingSettingsResp& valsResp = src.getValsResponse();
+
+    if (!valsResp.ImagingSettings || !valsResp.ImagingSettings->Exposure || !valsResp.ImagingSettings->Exposure->MaxExposureTime)
+    {
+        return false;
+    }
+
+    *(valsResp.ImagingSettings->Exposure->MaxExposureTime) = static_cast<float>(static_cast<double>(input.getCurrent()));
+
+    return true;
+}
+
+bool MaintenanceSystemRebootOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit)
+{
+    return true;
+}
+
+bool MaintenanceSystemRebootOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit)
+{
+    //const ImagingSoapWrapper& srcWrapper = src.
+    //DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), auth.user().toStdString(), auth.password().toStdString());
+
+    return true;
+}
+
+bool MaintenanceSoftSystemFactoryDefaultOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit)
+{
+    return true;
+}
+
+bool MaintenanceSoftSystemFactoryDefaultOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit)
+{
+    //DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), auth.user().toStdString(), auth.password().toStdString());
+
+    return true;
+}
+
+bool MaintenanceHardSystemFactoryDefaultOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit)
+{
+    return true;
+}
+
+bool MaintenanceHardSystemFactoryDefaultOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit)
+{
+    //DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), auth.user().toStdString(), auth.password().toStdString());
+
+    return true;
+}
+
 
 //
 // class OnvifCameraSetting: public CameraSetting
@@ -76,7 +1047,15 @@ OnvifCameraSetting::OnvifCameraSetting(const OnvifCameraSettingOperationAbstract
         const QString& name, WIDGET_TYPE type, const CameraSettingValue min, const CameraSettingValue max,
         const CameraSettingValue step, const CameraSettingValue current) :
     CameraSetting(id, name, type, min, max, step, current),
-    m_operation(operation)
+    m_operation(&operation)
 {
 
+}
+
+OnvifCameraSetting& OnvifCameraSetting::operator=(const OnvifCameraSetting& rhs)
+{
+    CameraSetting::operator=(rhs);
+    m_operation = rhs.m_operation;
+
+    return *this;
 }

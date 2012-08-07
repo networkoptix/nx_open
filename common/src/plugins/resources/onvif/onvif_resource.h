@@ -27,6 +27,8 @@ const ResolutionPair SECONDARY_STREAM_DEFAULT_RESOLUTION(320, 240);
 const ResolutionPair SECONDARY_STREAM_MAX_RESOLUTION(640, 480);
 
 
+class QDomElement;
+
 struct CameraPhysicalWindowSize
 {
     int x;
@@ -177,8 +179,12 @@ private:
 
     void save();
 
-    void fetchAndSetCameraSettings(const ImagingOptionsReq& request);
+    void fetchAndSetCameraSettings(const OnvifCameraSettingsResp& onvifSettings);
     
+    bool loadSettingsFromXml(const OnvifCameraSettingsResp& onvifSettings, const QString& filepath, CameraSettings& cameraSettings, QString& error);
+    bool parseCameraXml(const OnvifCameraSettingsResp& onvifSettings, const QDomElement& cameraXml, CameraSettings& cameraSettings, QString& error);
+    bool parseGroupXml(const OnvifCameraSettingsResp& onvifSettings, const QDomElement& groupXml, const QString parentId, CameraSettings& cameraSettings, QString& error);
+    bool parseElementXml(const OnvifCameraSettingsResp& onvifSettings, const QDomElement& elementXml, const QString parentId, CameraSettings& cameraSettings, QString& error);
 
     int round(float value);
     ResolutionPair getNearestResolutionForSecondary(const ResolutionPair& resolution, float aspectRatio) const;
@@ -214,6 +220,7 @@ private:
     QString m_audioEncoderId;
     QString m_videoSourceId;
     QString m_audioSourceId;
+    QString m_videoSourceToken;
 
     bool m_needUpdateOnvifUrl;
     bool m_forceCodecFromPrimaryEncoder;

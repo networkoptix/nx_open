@@ -140,7 +140,7 @@ void CameraSetting::setId(const QString& id) {
     m_id = id;
 }
 
-QString CameraSetting::getId() {
+QString CameraSetting::getId() const {
     return m_id;
 }
 
@@ -148,7 +148,7 @@ void CameraSetting::setName(const QString& name) {
     m_name = name;
 }
 
-QString CameraSetting::getName() {
+QString CameraSetting::getName() const {
     return m_name;
 }
 
@@ -156,7 +156,7 @@ void CameraSetting::setType(WIDGET_TYPE type) {
     m_type = type;
 }
 
-CameraSetting::WIDGET_TYPE CameraSetting::getType() {
+CameraSetting::WIDGET_TYPE CameraSetting::getType() const {
     return m_type;
 }
 
@@ -164,7 +164,7 @@ void CameraSetting::setMin(const CameraSettingValue& min) {
     m_min = min;
 }
 
-CameraSettingValue CameraSetting::getMin() {
+CameraSettingValue CameraSetting::getMin() const {
     return m_min;
 }
 
@@ -172,7 +172,7 @@ void CameraSetting::setMax(const CameraSettingValue& max) {
     m_max = max;
 }
 
-CameraSettingValue CameraSetting::getMax() {
+CameraSettingValue CameraSetting::getMax() const {
     return m_max;
 }
 
@@ -180,7 +180,7 @@ void CameraSetting::setStep(const CameraSettingValue& step) {
     m_step = step;
 }
 
-CameraSettingValue CameraSetting::getStep() {
+CameraSettingValue CameraSetting::getStep() const {
     return m_step;
 }
 
@@ -188,6 +188,19 @@ void CameraSetting::setCurrent(const CameraSettingValue& current) {
     m_current = current;
 }
 
-CameraSettingValue CameraSetting::getCurrent() {
+CameraSettingValue CameraSetting::getCurrent() const {
     return m_current;
+}
+
+CameraSetting& CameraSetting::operator= (const CameraSetting& rhs)
+{
+    setId(rhs.getId());
+    setName(rhs.getName());
+    setType(rhs.getType());
+    setMin(rhs.getMin());
+    setMax(rhs.getMax());
+    setStep(rhs.getStep());
+    setCurrent(rhs.getCurrent());
+    
+    return *this;
 }

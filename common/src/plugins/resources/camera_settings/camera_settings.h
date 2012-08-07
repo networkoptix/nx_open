@@ -33,6 +33,8 @@ public:
 
     static WIDGET_TYPE typeFromStr(const QString& value);
 
+    CameraSetting() {}
+
     CameraSetting(const QString& id,
         const QString& name,
         WIDGET_TYPE type,
@@ -41,29 +43,30 @@ public:
         const CameraSettingValue step = CameraSettingValue(),
         const CameraSettingValue current = CameraSettingValue());
 
+    virtual ~CameraSetting() {};
+
     void setId(const QString& id);
-    QString getId();
+    QString getId() const;
 
     void setName(const QString& name);
-    QString getName();
+    QString getName() const;
 
     void setType(WIDGET_TYPE type);
-    WIDGET_TYPE getType();
+    WIDGET_TYPE getType() const;
 
     void setMin(const CameraSettingValue& min);
-    CameraSettingValue getMin();
+    CameraSettingValue getMin() const;
 
     void setMax(const CameraSettingValue& max);
-    CameraSettingValue getMax();
+    CameraSettingValue getMax() const;
 
     void setStep(const CameraSettingValue& step);
-    CameraSettingValue getStep();
+    CameraSettingValue getStep() const;
 
     void setCurrent(const CameraSettingValue& current);
-    CameraSettingValue getCurrent();
+    CameraSettingValue getCurrent() const;
 
-protected:
-    virtual ~CameraSetting() {};
+    CameraSetting& operator= (const CameraSetting& rhs);
 
 private:
     QString m_id;
