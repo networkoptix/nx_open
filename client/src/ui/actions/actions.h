@@ -252,17 +252,17 @@ namespace Qn {
         OpenInNewWindowAction,
 
         /**
-         * Opens selected layout.
+         * Opens a single layout.
          */
         OpenSingleLayoutAction,
 
         /**
-         * Opens selected layouts.
+         * Opens multiple layouts.
          */
         OpenMultipleLayoutsAction,
 
         /**
-         * Opens selected layouts.
+         * Opens given layouts.
          */
         OpenAnyNumberOfLayoutsAction,
 

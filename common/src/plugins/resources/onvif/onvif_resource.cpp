@@ -460,7 +460,7 @@ int QnPlOnvifResource::getMaxFps()
     QVariant mediaVariant;
     QnSecurityCamResource* this_casted = const_cast<QnPlOnvifResource*>(this);
 
-    if (!hasSuchParam(MAX_FPS_PARAM_NAME))
+    if (!hasParam(MAX_FPS_PARAM_NAME))
     {
         return QnPhysicalCameraResource::getMaxFps();
     }

@@ -30,6 +30,14 @@ namespace Qn {
     };
     Q_DECLARE_FLAGS(ItemFlags, ItemFlag);
 
+    /**
+     * Layout-specific flags.
+     */
+    //enum LayoutFlags {
+    //    LayoutIsFile = 0x1,                 /**< Layout was opened from a MultiStream file. */
+    //    LayoutIsQuickSearch = 0x2,          /**< Layout is a QuickSearch view of some resource. */
+    //};
+
 
     /**
      * Layer of a graphics item on the scene.
@@ -48,7 +56,7 @@ namespace Qn {
         ZoomedLayer,                /**< Layer for zoomed items. */
         FrontLayer,                 /**< Topmost layer for items. Items that are being dragged, resized or manipulated in any other way are to be placed here. */
         EffectsLayer,               /**< Layer for top-level effects. */
-        UiLayer,                    /**< Layer for ui elements, i.e. close button, navigation bar, etc... */
+        UiLayer,                    /**< Layer for ui elements, i.e. navigation bar, resource tree, etc... */
     };
 
 
@@ -80,22 +88,20 @@ namespace Qn {
 
 
     /**
-     * Flags describing state of a layout in the context of client-server interaction.
+     * Flags describing the differences between instances of the same resource
+     * on the client and on the enterprise controller.
      */
-    enum LayoutFlag {
-        /** Layout is local and was never saved to appserver. */
-        LayoutIsLocal = 0x1,
+    enum ResourceSavingFlag {
+        /** Resource is local and has never been saved to EC. */
+        ResourceIsLocal = 0x1,
 
-        /** Layout is currently being saved to appserver. */
-        LayoutIsBeingSaved = 0x2,
+        /** Resource is currently being saved to EC. */
+        ResourceIsBeingSaved = 0x2,
 
-        /** Unsaved changes are present in the layout. */
-        LayoutIsChanged = 0x4,
-
-        /** Layout is a file. */
-        LayoutIsFile = 0x8,
+        /** Unsaved changes are present in the resource. */
+        ResourceIsChanged = 0x4,
     };
-    Q_DECLARE_FLAGS(LayoutFlags, LayoutFlag);
+    Q_DECLARE_FLAGS(ResourceSavingFlags, ResourceSavingFlag);
 
 
     /**
@@ -158,7 +164,7 @@ Q_DECLARE_TYPEINFO(Qn::ItemRole, Q_PRIMITIVE_TYPE);
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ItemFlags);
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::Borders);
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::MarginFlags);
-Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::LayoutFlags);
+Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ResourceSavingFlags);
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::Permissions);
 
 

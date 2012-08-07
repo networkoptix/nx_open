@@ -15,10 +15,10 @@ class QnLayoutItemData;
  * Layout item. Video, image, folder, or anything else.
  */
 class QnWorkbenchItem : public QObject {
-    Q_OBJECT
-    Q_PROPERTY(QString resourceUid READ resourceUid)
-    Q_PROPERTY(QUuid uuid READ uuid)
-    Q_PROPERTY(qreal rotation READ rotation WRITE setRotation)
+    Q_OBJECT;
+    Q_PROPERTY(QString resourceUid READ resourceUid);
+    Q_PROPERTY(QUuid uuid READ uuid);
+    Q_PROPERTY(qreal rotation READ rotation WRITE setRotation);
 
 public:
     /**

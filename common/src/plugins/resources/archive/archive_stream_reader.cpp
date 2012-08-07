@@ -61,7 +61,7 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
 {
     memset(&m_rewSecondaryStarted, 0, sizeof(m_rewSecondaryStarted));
 
-    m_isStillImage = dev->checkFlags(QnResource::still_image);
+    m_isStillImage = dev->hasFlags(QnResource::still_image);
     // Should init packets here as some times destroy (av_free_packet) could be called before init
     //connect(dev.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(onStatusChanged(QnResource::Status, QnResource::Status)));
 

@@ -54,7 +54,7 @@ QString QnSecurityCamResource::oemName() const
 
 int QnSecurityCamResource::getMaxFps()
 {
-    if (!hasSuchParam(QLatin1String("MaxFPS")))
+    if (!hasParam(QLatin1String("MaxFPS")))
     {
         //Q_ASSERT(false);
         return 15;
@@ -67,7 +67,7 @@ int QnSecurityCamResource::getMaxFps()
 
 int QnSecurityCamResource::reservedSecondStreamFps()
 {
-    if (!hasSuchParam(QLatin1String("reservedSecondStreamFps")))
+    if (!hasParam(QLatin1String("reservedSecondStreamFps")))
     {
         //Q_ASSERT(false);
         return 2;
@@ -81,7 +81,7 @@ int QnSecurityCamResource::reservedSecondStreamFps()
 QSize QnSecurityCamResource::getMaxSensorSize()
 {
 
-    if (!hasSuchParam(QLatin1String("MaxSensorWidth")) || !hasSuchParam(QLatin1String("MaxSensorHeight")))
+    if (!hasParam(QLatin1String("MaxSensorWidth")) || !hasParam(QLatin1String("MaxSensorHeight")))
     {
         Q_ASSERT(false);
         return QSize(0,0);
@@ -210,7 +210,7 @@ const QnScheduleTaskList &QnSecurityCamResource::getScheduleTasks() const
 
 bool QnSecurityCamResource::hasDualStreaming() const
 {
-    if (!hasSuchParam(QLatin1String("hasDualStreaming")))
+    if (!hasParam(QLatin1String("hasDualStreaming")))
     {
         //Q_ASSERT(false);
         return false;

@@ -1,15 +1,15 @@
 #ifndef QN_LAYOUT_ITEM_DATA_H
 #define QN_LAYOUT_ITEM_DATA_H
 
-#include <QMetaType>
-#include <QUuid>
-#include <QList>
-#include <QHash>
+#include <QtCore/QMetaType>
+#include <QtCore/QUuid>
+#include <QtCore/QList>
+#include <QtCore/QHash>
+
 #include <utils/common/fuzzy.h>
 #include <utils/common/qnid.h>
 
-class QnLayoutItemData
-{
+class QnLayoutItemData {
 public:
     QnLayoutItemData(): flags(0), rotation(0) {}
 
