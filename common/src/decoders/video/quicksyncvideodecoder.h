@@ -40,6 +40,7 @@ public:
     virtual void flush();
     //!Reset decoder. Used for seek
     virtual void resetDecoder( QnCompressedVideoDataPtr data );
+    virtual void showMotion( bool show );
 
 private:
     MFXVideoSession m_mfxSession;

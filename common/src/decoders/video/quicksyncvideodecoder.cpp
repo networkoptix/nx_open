@@ -157,11 +157,18 @@ void QuickSyncVideoDecoder::resetDecoder( QnCompressedVideoDataPtr data )
     //TODO/IMPL
 }
 
+void QuickSyncVideoDecoder::showMotion( bool /*show*/ )
+{
+    //TODO/IMPL
+}
+
 bool QuickSyncVideoDecoder::initDecoder( const QnCompressedVideoDataPtr& keyFrameWithSeqHeader )
 {
     //opening media session
     mfxVersion version;
-    mfxStatus status = m_mfxSession.Init( MFX_IMPL_AUTO_ANY, &version );
+    memset( &version, 0, sizeof(version) );
+    version.Major = 1;
+    mfxStatus status = m_mfxSession.Init( MFX_IMPL_SOFTWARE, &version );
     if( status != MFX_ERR_NONE )
         return false;
 
@@ -173,7 +180,7 @@ bool QuickSyncVideoDecoder::initDecoder( const QnCompressedVideoDataPtr& keyFram
     streamHeader.Data = reinterpret_cast<mfxU8*>(keyFrameWithSeqHeader->data.data());
     streamHeader.DataLength = keyFrameWithSeqHeader->data.size();
     streamHeader.MaxLength = keyFrameWithSeqHeader->data.size();
-    streamHeader.DataFlag = MFX_BITSTREAM_COMPLETE_FRAME;
+    //streamHeader.DataFlag = MFX_BITSTREAM_COMPLETE_FRAME;
     m_srcStreamParam.mfx.CodecId = 
         keyFrameWithSeqHeader->compressionType == CODEC_ID_H264
         ? MFX_CODEC_AVC
