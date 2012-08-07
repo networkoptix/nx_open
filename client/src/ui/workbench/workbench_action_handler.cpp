@@ -1094,13 +1094,6 @@ void QnWorkbenchActionHandler::at_quickSearchAction_triggered() {
     if(period.isEmpty())
         return;
 
-    QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsParameter);
-    if(periods.isEmpty()) {
-        periods.push_back(period);
-    } else {
-        periods = periods.intersected(period);
-    }
-
     const int matrixWidth = 3, matrixHeight = 3;
     const int itemCount = matrixWidth * matrixHeight;
 
@@ -1109,6 +1102,7 @@ void QnWorkbenchActionHandler::at_quickSearchAction_triggered() {
     layout->setGuid(QUuid::createUuid());
     layout->setName(tr("Quick Search for %1").arg(resource->getName()));
     layout->setParentId(context()->user()->getId());
+    layout->setTimeBounds(period);
 
     QnLayoutItemDataList items;
     for(int i = 0; i < itemCount; i++) {
@@ -1128,16 +1122,16 @@ void QnWorkbenchActionHandler::at_quickSearchAction_triggered() {
 
     /* Then navigate. */
     display()->setStreamsSynchronized(NULL);
-    qint64 d = periods.duration() / itemCount;
-    QnTimePeriodListTimeIterator pos = periods.timeBegin();
-    /*foreach(QnWorkbenchItem *item, items) {
-        QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(display()->widget(item));
+    qint64 t = period.startTimeMs;
+    qint64 d = period.durationMs / itemCount;
+    foreach(const QnLayoutItemData &item, items) {
+        QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(display()->widget(context()->workbench()->currentLayout()->item(item.uuid)));
         if(!widget)
             continue;
 
-        widget->display()->setCurrentTimeUSec(*pos * 1000);
-        pos += d;
-    }*/
+        widget->display()->setCurrentTimeUSec(t * 1000);
+        t += d;
+    }
 }
 
 void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {

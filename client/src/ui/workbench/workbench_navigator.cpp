@@ -675,11 +675,20 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
 
     QnScopedValueRollback<bool> guard(&m_updatingSliderFromReader, true);
 
-    qint64 endTimeUSec = reader->endTime();
-    qint64 endTimeMSec = endTimeUSec == DATETIME_NOW ? qnSyncTime->currentMSecsSinceEpoch() : (endTimeUSec == AV_NOPTS_VALUE ? m_timeSlider->maximum() : endTimeUSec / 1000);
+    qint64 startTimeUSec, endTimeUSec;
+    qint64 endTimeMSec, startTimeMSec;
+    if(workbench()->currentLayout()->resource() && !workbench()->currentLayout()->resource()->timeBounds().isEmpty()) {
+        endTimeMSec = workbench()->currentLayout()->resource()->timeBounds().endTimeMs();
+        endTimeUSec = endTimeMSec * 1000;
+        startTimeMSec = workbench()->currentLayout()->resource()->timeBounds().startTimeMs;
+        startTimeUSec = startTimeMSec * 1000;
+    } else {
+        endTimeUSec = reader->endTime();
+        endTimeMSec = endTimeUSec == DATETIME_NOW ? qnSyncTime->currentMSecsSinceEpoch() : (endTimeUSec == AV_NOPTS_VALUE ? m_timeSlider->maximum() : endTimeUSec / 1000);
 
-    qint64 startTimeUSec = reader->startTime();                       /* vvvvv  If nothing is recorded, set minimum to end - 10s. */
-    qint64 startTimeMSec = startTimeUSec == DATETIME_NOW ? endTimeMSec - 10000 : (startTimeUSec == AV_NOPTS_VALUE ? m_timeSlider->minimum() : startTimeUSec / 1000); 
+        startTimeUSec = reader->startTime();                       /* vvvvv  If nothing is recorded, set minimum to end - 10s. */
+        startTimeMSec = startTimeUSec == DATETIME_NOW ? endTimeMSec - 10000 : (startTimeUSec == AV_NOPTS_VALUE ? m_timeSlider->minimum() : startTimeUSec / 1000); 
+    }
 
     m_timeSlider->setRange(startTimeMSec, endTimeMSec);
     m_calendar->setDateRange(QDateTime::fromMSecsSinceEpoch(startTimeMSec).date(),
