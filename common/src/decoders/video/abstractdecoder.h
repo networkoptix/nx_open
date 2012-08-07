@@ -28,8 +28,6 @@ public:
       */
     virtual bool decode(const QnCompressedVideoDataPtr data, CLVideoDecoderOutput* outFrame) = 0;
 
-    virtual void showMotion(bool show ) = 0;
-
     virtual void setLightCpuMode(DecodeMode val) = 0;
 
     virtual void setMTDecoding(bool value)
@@ -53,8 +51,10 @@ public:
     virtual int getHeight() const { return 0; }
     virtual double getSampleAspectRatio() const { return 1; };
     virtual PixelFormat getFormat() const { return PIX_FMT_YUV420P; }
+    //!Drop any decoded pictures
     virtual void flush() {}
     virtual const AVFrame* lastFrame() { return 0; }
+    //!Reset decoder. Used for seek
     virtual void resetDecoder(QnCompressedVideoDataPtr data) { Q_UNUSED(data); }
 
 private:

@@ -106,7 +106,7 @@ public:
     QnEmptyDataProvider(QnResourcePtr resource): QnAbstractMediaStreamDataProvider(resource){}
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override{
-        QnAbstractMediaDataPtr data(new QnAbstractMediaData(0, 1));
+        QnAbstractMediaDataPtr data(new QnAbstractMediaData(0U, 1));
         return data;}
 };
 

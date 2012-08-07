@@ -6,8 +6,14 @@
 #ifndef QUICK_SYNC_TRANSCODER_H
 #define QUICK_SYNC_TRANSCODER_H
 
+#include <vector>
+
+#include <mfxvideo++.h>
+
 #include "transcoder.h"
 
+
+#if 0
 
 //!Transcodes video using Intel QuickSync API
 /*!
@@ -15,6 +21,8 @@
     - TODO
     Supported output:\n
     - h.264
+
+    \note This class methods are not thread-safe
 */
 class QnQuickSyncVideoTranscoder
 :
@@ -25,6 +33,7 @@ public:
         \param codecId
     */
     QnQuickSyncVideoTranscoder( CodecID codecId );
+    virtual ~QnQuickSyncVideoTranscoder();
 
     //!Implementation of QnCodecTranscoder::setParams
     /*!
@@ -46,6 +55,21 @@ public:
 
     //!Implementation of QnCodecTranscoder::transcodePacket
     virtual int transcodePacket( QnAbstractMediaDataPtr inputAU, QnAbstractMediaDataPtr& outputAU );
+
+private:
+    bool m_transcoderInitialized;
+    bool m_encoderInitialized;
+    bool m_videoProcessorInitialized;
+    std::vector<mfxSyncPoint> m_syncPoints;
+    MFXVideoSession m_mfxSession;
+    MFXVideoDECODE* m_decoder;
+    MFXVideoVPP* m_videoProcessor;
+    MFXVideoENCODE* m_encoder;
+
+    void initializeTranscoding();
+    void reinitializeEncoder();
 };
+
+#endif
 
 #endif  //QUICK_SYNC_TRANSCODER_H
