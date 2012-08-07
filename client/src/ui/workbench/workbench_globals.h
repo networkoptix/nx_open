@@ -33,10 +33,10 @@ namespace Qn {
     /**
      * Layout-specific flags.
      */
-    enum LayoutFlags {
-        LayoutIsFile = 0x1,                 /**< Layout was opened from a MultiStream file. */
-        LayoutIsQuickSearch = 0x2,          /**< Layout is a QuickSearch view of some resource. */
-    };
+    //enum LayoutFlags {
+    //    LayoutIsFile = 0x1,                 /**< Layout was opened from a MultiStream file. */
+    //    LayoutIsQuickSearch = 0x2,          /**< Layout is a QuickSearch view of some resource. */
+    //};
 
 
     /**

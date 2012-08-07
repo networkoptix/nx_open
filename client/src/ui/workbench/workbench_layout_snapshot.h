@@ -4,6 +4,7 @@
 #include <QtCore/QSizeF>
 #include <QtCore/QString>
 
+#include <core/resource/resource_fwd.h>
 #include <core/resource/layout_item_data.h>
 
 class QnWorkbenchLayoutSnapshot {

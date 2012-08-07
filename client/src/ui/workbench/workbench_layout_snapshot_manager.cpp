@@ -168,9 +168,6 @@ Qn::ResourceSavingFlags QnWorkbenchLayoutSnapshotManager::defaultFlags(const QnL
     if(resource->getId().isSpecial())
         result |= Qn::ResourceIsLocal;
 
-    if((resource->flags() & QnResource::local_media) == QnResource::local_media)
-        result |= Qn::LayoutIsFile;
-
     return result;
 }
 

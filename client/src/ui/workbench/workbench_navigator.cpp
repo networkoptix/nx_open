@@ -656,7 +656,7 @@ void QnWorkbenchNavigator::updateCurrentWidgetFlags() {
 void QnWorkbenchNavigator::updateSliderOptions() {
     m_timeSlider->setOption(QnTimeSlider::UseUTC, m_currentWidgetFlags & WidgetUsesUTC);
 
-    bool selectionEditable = !(snapshotManager()->flags(workbench()->currentLayout()->resource()) & Qn::LayoutIsFile);
+    bool selectionEditable = (workbench()->currentLayout()->resource()->flags() & QnResource::local_media) != QnResource::local_media;
     m_timeSlider->setOption(QnTimeSlider::SelectionEditable, selectionEditable);
     if(!selectionEditable)
         m_timeSlider->setSelectionValid(false);

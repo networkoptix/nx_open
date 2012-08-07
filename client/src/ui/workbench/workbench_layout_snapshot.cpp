@@ -1,5 +1,7 @@
 #include "workbench_layout_snapshot.h"
 
+#include <core/resource/layout_resource.h>
+
 QnWorkbenchLayoutSnapshot::QnWorkbenchLayoutSnapshot(const QnLayoutResourcePtr &resource):
     items(resource->getItems()),
     name(resource->getName()),

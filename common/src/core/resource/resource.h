@@ -73,6 +73,8 @@ public:
 
         utc = 0x4000,           /**< Resource uses UTC-based timing. */
 
+        temp = 0x8000,          /**< Resource is temporary (e.g. quicksearch layout). */
+
         local_media = local | media,
 
         local_server = local | server,
