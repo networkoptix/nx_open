@@ -117,7 +117,7 @@ void QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnQuality()
 
 int QnPlAVClinetPullStreamReader::getBitrate() const
 {
-    if (!getResource()->hasSuchParam(QLatin1String("Bitrate")))
+    if (!getResource()->hasParam(QLatin1String("Bitrate")))
         return 0;
 
     QVariant val;
@@ -127,7 +127,7 @@ int QnPlAVClinetPullStreamReader::getBitrate() const
 
 bool QnPlAVClinetPullStreamReader::isH264() const
 {
-    if (!getResource()->hasSuchParam(QLatin1String("Codec")))
+    if (!getResource()->hasParam(QLatin1String("Codec")))
         return false;
 
     QVariant val;

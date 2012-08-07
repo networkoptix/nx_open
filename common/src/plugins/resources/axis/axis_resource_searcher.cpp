@@ -137,7 +137,7 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(QnResourceLi
 
     int channesl = 1;
 
-    if (resource->hasSuchParam(QLatin1String("channelsAmount")))
+    if (resource->hasParam(QLatin1String("channelsAmount")))
     {
         QVariant val;
         resource->getParam(QLatin1String("channelsAmount"), val, QnDomainMemory);

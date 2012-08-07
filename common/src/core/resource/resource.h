@@ -153,7 +153,7 @@ public:
 
     QnParamList getResourceParamList() const; // returns params that can be changed on device level
 
-    bool hasSuchParam(const QString &name) const;
+    bool hasParam(const QString &name) const;
 
     // return true if no error
     bool getParam(const QString &name, QVariant &val, QnDomain domain);
