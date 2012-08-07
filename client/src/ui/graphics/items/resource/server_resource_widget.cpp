@@ -16,9 +16,8 @@
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/painters/radial_gradient_painter.h>
 
-/** How many points are shown on the screen simultaneously */
-// TODO: #GDM use more informative names please =). What kind of limit?
-#define LIMIT 60
+/** How many points of the chart are shown on the screen simultaneously */
+#define CHART_POINTS_LIMIT 60
 
 /** Data update period. For the best result should be equal to server's */
 #define REQUEST_TIME 2000
@@ -153,18 +152,18 @@ namespace {
 
 } // anonymous namespace
 
-QnStatisticsHistoryData::QnStatisticsHistoryData(QString id, QString description):
-    Id(id),
-    Description(description)
+QnServerResourceWidget::QnStatisticsHistoryData::QnStatisticsHistoryData(QString id, QString description)
 {
-    for (int i = 0; i < LIMIT; i++)
-        History.append(0);
+    this->id = id;
+    this->description = description;
+    for (int i = 0; i < CHART_POINTS_LIMIT; i++)
+        history.append(0);
 }
 
-void QnStatisticsHistoryData::append(int value) {
-    History.append(value);
-    if (History.count() > LIMIT)
-        History.pop_front();
+void QnServerResourceWidget::QnStatisticsHistoryData::append(int value) {
+    history.append(value);
+    if (history.count() > CHART_POINTS_LIMIT)
+        history.pop_front();
 }
 
 QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent /* = NULL */):
@@ -240,7 +239,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
     }
     painter->endNativePainting();
 
-    const qreal x_step = (qreal)ow*1.0/(LIMIT - 2);
+    const qreal x_step = (qreal)ow*1.0/(CHART_POINTS_LIMIT - 2);
     qreal elapsed_step = (qreal)qMin(m_elapsedTimer.elapsed(), (qint64)REQUEST_TIME) / (qreal)REQUEST_TIME;
 
     /** Draw grid */
@@ -277,7 +276,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
 
         for (int i = 0; i < m_history.length(); i++){
             qreal current_value = 0;
-            QPainterPath path = createChartPath(&(m_history[i].History), x_step, -1.0 * oh, current_value, elapsed_step);
+            QPainterPath path = createChartPath(&(m_history[i].history), x_step, -1.0 * oh, current_value, elapsed_step);
             values.append(current_value);
 
             graphPen.setColor(getColorById(i));
@@ -328,7 +327,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
                 main_pen.setColor(getColorById(i));
                 painter->setPen(main_pen);
                 painter->strokePath(legend, main_pen);
-                painter->drawText(offset*0.1, offset*0.1, m_history[i].Id);
+                painter->drawText(offset*0.1, offset*0.1, m_history[i].id);
                 legendTransform.translate(offset * 2, 0.0);
                 painter->setTransform(legendTransform);
             }
