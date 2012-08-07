@@ -62,9 +62,6 @@ public:
     void setCurrent(const CameraSettingValue& current);
     CameraSettingValue getCurrent();
 
-private:
-    CameraSetting();
-
 protected:
     virtual ~CameraSetting() {};
 

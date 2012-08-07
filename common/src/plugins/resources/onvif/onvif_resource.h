@@ -10,6 +10,7 @@
 #include "utils/network/simple_http_client.h"
 #include "core/datapacket/mediadatapacket.h"
 #include "soap_wrapper.h"
+#include "onvif_resource_settings.h"
 
 
 class onvifXsd__AudioEncoderConfigurationOption;
@@ -41,12 +42,10 @@ struct CameraPhysicalWindowSize
     }
 };
 
-struct OnvifCameraSettingsResp;
-
 class QnPlOnvifResource : public QnPhysicalCameraResource
 {
 protected:
-    typedef QHash<QString, CameraSetting> CameraSettings;
+    typedef QHash<QString, OnvifCameraSetting> CameraSettings;
 
 public:
     enum CODECS

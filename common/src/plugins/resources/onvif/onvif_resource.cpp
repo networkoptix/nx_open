@@ -1502,35 +1502,17 @@ bool QnPlOnvifResource::setParamPhysical(const QnParam &param, const QVariant& v
 
 void QnPlOnvifResource::fetchAndSetCameraSettings()
 {
-    OnvifCameraSettingsResp settings;
-
     QString imagingUrl = getImagingUrl();
     if (imagingUrl.isEmpty()) {
         qDebug() << "QnPlOnvifResource::fetchAndSetCameraSettings: imaging service is absent on device (URL: "
             << getDeviceOnvifUrl() << ", UniqId: " << getUniqueId() << ").";
-        return;
-    } else {
-        QAuthenticator auth(getAuth());
-        ImagingSoapWrapper rangesSoapWrapper(imagingUrl.toLatin1().data(), auth.user().toStdString(), auth.password().toStdString());
-        ImagingOptionsReq rangesRequest;
-        rangesRequest.VideoSourceToken = getVideoSourceId().toStdString();
+    }
 
-        int soapRes = rangesSoapWrapper.getOptions(rangesRequest, settings.rangesResponse);
-        if (soapRes != SOAP_OK) {
-            qWarning() << "QnPlOnvifResource::fetchAndSetCameraSettings: can't fetch imaging options. Reason: SOAP to endpoint "
-                << rangesSoapWrapper.getEndpointUrl() << " failed. GSoap error code: " << soapRes << ". " << rangesSoapWrapper.getLastError();
-        }
-
-
-        ImagingSoapWrapper valsSoapWrapper(imagingUrl.toLatin1().data(), auth.user().toStdString(), auth.password().toStdString());
-        ImagingSettingsReq valsRequest;
-        valsRequest.VideoSourceToken = getVideoSourceId().toStdString();
-
-        int soapRes = valsSoapWrapper.getImagingSettings(valsRequest, settings.valsResponse);
-        if (soapRes != SOAP_OK) {
-            qWarning() << "QnPlOnvifResource::fetchAndSetCameraSettings: can't fetch imaging settings. Reason: SOAP to endpoint "
-                << valsSoapWrapper.getEndpointUrl() << " failed. GSoap error code: " << soapRes << ". " << valsSoapWrapper.getLastError();
-        }
+    QAuthenticator auth(getAuth());
+    OnvifCameraSettingsResp settings(imagingUrl.toLatin1().data(), auth.user().toStdString(), auth.password().toStdString(),
+        getVideoSourceId().toStdString(), getUniqueId());
+    if (!imagingUrl.isEmpty()) {
+        settings.makeRequest();
     }
 
     fetchAndSetCameraSettings(settings);
@@ -1633,7 +1615,7 @@ bool QnPlOnvifResource::parseGroupXml(const OnvifCameraSettingsResp& onvifSettin
 
         if (onvifSettings.isEmpty() && id == "%%Imaging")
         {
-            cameraSettings.insert(id, CameraSetting());
+            cameraSettings.insert(id, OnvifCameraSetting());
         } else {
             //By default it is assumed that setting that have no value is enabled
             //cameraSettings.insert(...);
@@ -1684,8 +1666,13 @@ bool QnPlOnvifResource::parseElementXml(const OnvifCameraSettingsResp& onvifSett
     switch(widgetType)
     {
     case CameraSetting::OnOff: case CameraSetting::MinMaxStep: case CameraSetting::Enumeration:
-        CameraSetting tmp(id, name, widgetType, min, max, step);
-        cameraSettings.insert(id, fetchOnOffType(id, name, onvifSettings, error));
+        QHash<QString, OnvifCameraSettingOperationAbstract*>::ConstIterator it = 
+            OnvifCameraSettingOperationAbstract::operations.find(id);
+        if (it == OnvifCameraSettingOperationAbstract::operations.end()) {
+            //Operations must be defined for all settings
+            Q_ASSERT(false)
+        }
+        cameraSettings.insert(id, OnvifCameraSetting(*(it.value()), id, name, widgetType, min, max, step));
         break;
 
     case CameraSetting::Button:
