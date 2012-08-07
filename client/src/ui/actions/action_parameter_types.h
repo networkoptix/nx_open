@@ -2,10 +2,13 @@
 #define QN_ACTION_TARGET_TYPES_H
 
 #include "action_fwd.h"
-#include <QUuid>
-#include <QSet>
+
+#include <QtCore/QUuid>
+#include <QtCore/QSet>
+
 #include <core/resource/resource_fwd.h>
 #include <core/resource/layout_item_index.h>
+
 #include "actions.h"
 
 class QVariant;

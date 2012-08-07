@@ -1105,29 +1105,39 @@ void QnWorkbenchActionHandler::at_quickSearchAction_triggered() {
     const int itemCount = matrixWidth * matrixHeight;
 
     /* Construct and add a new layout first. */
-    QnWorkbenchLayout *layout = new QnWorkbenchLayout();
-    QList<QnWorkbenchItem *> items;
+    QnLayoutResourcePtr layout(new QnLayoutResource());
+    layout->setGuid(QUuid::createUuid());
+    layout->setName(tr("Quick Search for %1").arg(resource->getName()));
+    layout->setParentId(context()->user()->getId());
+
+    QnLayoutItemDataList items;
     for(int i = 0; i < itemCount; i++) {
-        QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid());
-        item->setFlag(Qn::Pinned, true);
-        item->setGeometry(QRect(i % matrixWidth, i / matrixWidth, 1, 1));
-        layout->addItem(item);
+        QnLayoutItemData item;
+        item.flags = Qn::Pinned;
+        item.uuid = QUuid::createUuid();
+        item.combinedGeometry = QRect(i % matrixWidth, i / matrixWidth, 1, 1);
+        item.resource.id = resource->getId();
+        item.resource.path = resource->getUniqueId();
+
         items.push_back(item);
+        layout->addItem(item);
     }
-    workbench()->setCurrentLayout(layout);
-    
+
+    resourcePool()->addResource(layout);
+    menu()->trigger(Qn::OpenSingleLayoutAction, layout);
+
     /* Then navigate. */
     display()->setStreamsSynchronized(NULL);
     qint64 d = periods.duration() / itemCount;
     QnTimePeriodListTimeIterator pos = periods.timeBegin();
-    foreach(QnWorkbenchItem *item, items) {
+    /*foreach(QnWorkbenchItem *item, items) {
         QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(display()->widget(item));
         if(!widget)
             continue;
 
         widget->display()->setCurrentTimeUSec(*pos * 1000);
         pos += d;
-    }
+    }*/
 }
 
 void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {

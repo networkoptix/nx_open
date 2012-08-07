@@ -25,6 +25,12 @@ public:
 
     explicit QnActionParameters(const QVariant &items, const QVariantMap &arguments = QVariantMap());
 
+    template<class Resource>
+    QnActionParameters(const QnSharedResourcePointer<Resource> &resource, const QVariantMap &arguments = QVariantMap()) {
+        setArguments(arguments);
+        setItems(QVariant::fromValue<QnResourcePtr>(resource));
+    }
+
     QnActionParameters(const QnResourcePtr &resource, const QVariantMap &arguments = QVariantMap());
 
     QnActionParameters(const QnResourceList &resources, const QVariantMap &arguments = QVariantMap());
