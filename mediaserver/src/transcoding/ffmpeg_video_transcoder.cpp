@@ -29,7 +29,7 @@ int QnFfmpegVideoTranscoder::rescaleFrame()
     if (scaleContext == 0)
     {
         scaleContext = sws_getContext(m_decodedVideoFrame.width, m_decodedVideoFrame.height, (PixelFormat) m_decodedVideoFrame.format, 
-                                      m_resolution.width(), m_resolution.height(), (PixelFormat) PIX_FMT_YUV420P, SWS_POINT, NULL, NULL, NULL);
+                                      m_resolution.width(), m_resolution.height(), (PixelFormat) PIX_FMT_YUV420P, SWS_BILINEAR, NULL, NULL, NULL);
         if (!scaleContext) {
             m_lastErrMessage = QString("Can't allocate scaler context for resolution %1x%2").arg(m_resolution.width()).arg(m_resolution.height());
             return -4;
@@ -67,6 +67,8 @@ int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
         m_encoderCtx->pix_fmt = PIX_FMT_YUV420P;
         m_encoderCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
 
+        if (m_bitrate == -1)
+            m_bitrate = m_resolution.width() * m_resolution.height() * 10;
         m_encoderCtx->bit_rate = m_bitrate;
         m_encoderCtx->gop_size = 32;
         m_encoderCtx->time_base.num = 1;

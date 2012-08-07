@@ -214,7 +214,7 @@ void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int cod
 bool QnTCPConnectionProcessor::sendChunk(const QnByteArray& chunk)
 {
     Q_D(QnTCPConnectionProcessor);
-    if (d->socket->send(QByteArray::number(chunk.size()).toHex()) < 1)
+    if (d->socket->send(QByteArray::number(chunk.size(),16)) < 1)
         return false;
     if (d->socket->send("\r\n") < 1)
         return false;
