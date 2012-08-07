@@ -541,6 +541,7 @@ void QnResourceTreeWidget::timerEvent(QTimerEvent *event) {
             if(flags != 0)
                 model->addCriterion(QnResourceCriterion(flags, QnResourceProperty::flags, QnResourceCriterion::Next, QnResourceCriterion::Reject));
             model->addCriterion(QnResourceCriterion(QnResource::server));
+            ui->filterLineEdit->setFocus();
         }
     }
 
