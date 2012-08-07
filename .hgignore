@@ -97,6 +97,7 @@ mediaproxy/src/mediaproxy.vcproj
 mediaproxy/bin/debug
 mediaproxy/bin/release
 mediaproxy/src/mediaproxy.pro
+mediaproxy/mediaproxy.mak*
 mediaproxy/x86
 mediaproxy/x64
 
@@ -104,6 +105,7 @@ testcamera/src/testCamera.pro
 testcamera/src/testCamera.vcproj
 testcamera/bin/debug
 testcamera/bin/release
+testcamera/testcamera.mak*
 testcamera/x86
 testcamera/x64
 testcamera/src/version.h
