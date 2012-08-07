@@ -187,8 +187,6 @@ public:
 
     //virtual const CLDeviceVideoLayout* getVideoLayout(QnAbstractStreamDataProvider* reader);
 
-    inline bool associatedWithFile() const { return (flags() & (ARCHIVE | SINGLE_SHOT)) != 0; }
-
     QString getUrl() const;
     virtual void setUrl(const QString& value);
 
@@ -210,12 +208,14 @@ signals:
     void parentIdChanged();
     void idChanged(const QnId &oldId, const QnId &newId);
     void flagsChanged();
+
     //!Emitted on completion of every async get started with getParamAsync
     /*!
         \param paramValue in case \a result == false, this value cannot be relied on
         \param result true, if param succesfully read, false otherwises
     */
     void asyncParamGetDone( const QString& paramName, const QVariant& paramValue, bool result );
+    
     //!Emitted on completion of every async set started with setParamAsync
     /*!
         \param paramValue in case \a result == false, this value cannot be relied on
