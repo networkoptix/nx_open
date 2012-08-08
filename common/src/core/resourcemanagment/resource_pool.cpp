@@ -76,7 +76,7 @@ void QnResourcePool::addResources(const QnResourceList &resources)
         // if resources are local assign localserver as parent
         if (!resource->getParentId().isValid())
         {
-            if (resource->checkFlags(QnResource::local))
+            if (resource->hasFlags(QnResource::local))
                 resource->setParentId(localServer->getId());
         }
 
@@ -320,7 +320,7 @@ QnResourceList QnResourcePool::getResourcesWithFlag(QnResource::Flag flag) const
 
     QMutexLocker locker(&m_resourcesMtx);
     foreach (const QnResourcePtr &resource, m_resources)
-        if (resource->checkFlags(flag))
+        if (resource->hasFlags(flag))
             result.append(resource);
 
     return result;

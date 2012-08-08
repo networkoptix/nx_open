@@ -113,6 +113,7 @@ namespace detail {
 } // namespace detail
 
 
+// TODO: split this class into several handlers, group actions by handler. E.g. screen recording should definitely be spun off.
 /**
  * This class implements logic for client actions.
  */

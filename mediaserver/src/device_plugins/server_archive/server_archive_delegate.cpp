@@ -10,16 +10,16 @@ static const int SECOND_STREAM_FIND_EPS = 1000 * 5;
 
 QnServerArchiveDelegate::QnServerArchiveDelegate(): 
     QnAbstractArchiveDelegate(),
+    m_opened(false),
+    m_lastPacketTime(0),
+    m_skipFramesToTime(0),
     m_reverseMode(false),
     m_selectedAudioChannel(0),
-    m_opened(false),
     m_lastSeekTime(AV_NOPTS_VALUE),
     m_afterSeek(false),
     m_sendMotion(false),
     m_eof(false),
-    m_quality(MEDIA_Quality_High),
-    m_skipFramesToTime(0),
-    m_lastPacketTime(0)
+    m_quality(MEDIA_Quality_High)
 {
     m_aviDelegate = QnAviArchiveDelegatePtr(new QnAviArchiveDelegate());
     m_aviDelegate->setUseAbsolutePos(false);

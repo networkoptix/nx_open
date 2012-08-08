@@ -1,13 +1,15 @@
 #ifndef QN_LAYOUT_RESOURCE_H
 #define QN_LAYOUT_RESOURCE_H
 
-#include <QRectF>
-#include <QUuid>
+#include <QtCore/QRectF>
+#include <QtCore/QUuid>
+
+#include <recording/time_period.h>
+
 #include "resource.h"
 #include "layout_item_data.h"
 
-class QnLayoutResource : public QnResource
-{
+class QnLayoutResource: public QnResource {
     Q_OBJECT;
 
     typedef QnResource base_type;
@@ -43,16 +45,22 @@ public:
 
     void setCellSpacing(qreal horizontalSpacing, qreal verticalSpacing);
 
-    /*
-    * Deserialize layout resource from file
-    */
+    /**
+     * Deserialize layout resource from file
+     */
     static QnLayoutResourcePtr fromFile(const QString& xfile);
+
+    QnTimePeriod timeBounds() const;
+
+    void setTimeBounds(const QnTimePeriod &timeBounds);
+
 signals:
     void itemAdded(const QnLayoutItemData &item);
     void itemRemoved(const QnLayoutItemData &item);
     void itemChanged(const QnLayoutItemData &item);
     void cellAspectRatioChanged();
     void cellSpacingChanged();
+    void timeBoundsChanged();
 
 protected:
     virtual void updateInner(QnResourcePtr other) override;
@@ -64,6 +72,7 @@ private:
 
 private:
     QnLayoutItemDataMap m_itemByUuid;
+    QnTimePeriod m_timeBounds;
     qreal m_cellAspectRatio;
     QSizeF m_cellSpacing;
 };

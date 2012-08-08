@@ -186,6 +186,7 @@ namespace {
     
     const QColor tickmarkColor(255, 255, 255, 255);
     const QColor positionMarkerColor(255, 255, 255, 196);
+    const QColor indicatorColor(128, 160, 192, 128);
 
     const QColor selectionColor = qnGlobals->selectionColor();
     const QColor selectionMarkerColor = selectionColor.lighter();
@@ -870,6 +871,13 @@ void QnTimeSlider::freezeThumbnails() {
     }
 }
 
+const QVector<qint64> &QnTimeSlider::indicators() const {
+    return m_indicators;
+}
+
+void QnTimeSlider::setIndicators(const QVector<qint64> &indicators) {
+    m_indicators = indicators;
+}
 
 
 // -------------------------------------------------------------------------- //
@@ -1295,6 +1303,10 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
 
     /* Draw position marker. */
     drawMarker(painter, sliderPosition(), positionMarkerColor);
+
+    /* Draw indicators. */
+    foreach(qint64 position, m_indicators)
+        drawMarker(painter, position, indicatorColor);
 }
 
 void QnTimeSlider::drawSeparator(QPainter *painter, const QRectF &rect) {

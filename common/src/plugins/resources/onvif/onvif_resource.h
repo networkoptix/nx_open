@@ -84,7 +84,6 @@ public:
 
     virtual bool setHostAddress(const QHostAddress &ip, QnDomain domain = QnDomainMemory) override;
 
-    virtual bool setSpecialParam(const QString& name, const QVariant& val, QnDomain domain) override;
 
     virtual bool isResourceAccessible() override;
     virtual bool updateMACAddress() override;
@@ -133,8 +132,8 @@ public:
     const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider);
 
     bool forcePrimaryEncoderCodec() const;
-protected:
 
+protected:
     void setCodec(CODECS c);
     void setAudioCodec(AUDIO_CODECS c);
 
@@ -151,9 +150,7 @@ protected:
     virtual void fetchAndSetCameraSettings();
 
 private:
-
     QString getDeviceOnvifUrl() const;
-    
 
     void setMaxFps(int f);
 
@@ -190,6 +187,7 @@ private:
     float getResolutionAspectRatio(const ResolutionPair& resolution) const;
     int findClosestRateFloor(const std::vector<int>& values, int threshold) const;
     int getH264StreamProfile(const VideoOptionsResp& response);
+
 protected:
     QList<ResolutionPair> m_resolutionList; //Sorted desc
     OnvifCameraSettingsResp* m_onvifAdditionalSettings;
@@ -202,7 +200,6 @@ private:
     QMap<int, QRect> m_motionWindows;
     QMap<int, QRect> m_motionMask;
 
-
     int m_iframeDistance;
     int m_minQuality;
     int m_maxQuality;
@@ -210,6 +207,8 @@ private:
     AUDIO_CODECS m_audioCodec;
     ResolutionPair m_primaryResolution;
     ResolutionPair m_secondaryResolution;
+    int m_primaryH264Profile;
+    int m_secondaryH264Profile;
     int m_audioBitrate;
     int m_audioSamplerate;
     CameraPhysicalWindowSize m_physicalWindowSize;
@@ -222,8 +221,6 @@ private:
 
     bool m_needUpdateOnvifUrl;
     bool m_forceCodecFromPrimaryEncoder;
-    int m_primaryH264Profile;
-    int m_secondaryH264Profile;
 
     QString m_imagingUrl;
 };

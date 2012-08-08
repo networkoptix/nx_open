@@ -123,7 +123,7 @@ public:
     
     // flags like network media and so on
     Flags flags() const;
-    inline bool checkFlags(Flags flags) const { return (this->flags() & flags) == flags; }
+    inline bool hasFlags(Flags flags) const { return (this->flags() & flags) == flags; }
     void setFlags(Flags flags);
     void addFlags(Flags flags);
     void removeFlags(Flags flags);
@@ -151,7 +151,7 @@ public:
 
     QnParamList getResourceParamList() const; // returns params that can be changed on device level
 
-    bool hasSuchParam(const QString &name) const;
+    bool hasParam(const QString &name) const;
 
     // return true if no error
     bool getParam(const QString &name, QVariant &val, QnDomain domain);
@@ -185,8 +185,6 @@ public:
 
     //virtual const CLDeviceVideoLayout* getVideoLayout(QnAbstractStreamDataProvider* reader);
 
-    inline bool associatedWithFile() const { return (flags() & (ARCHIVE | SINGLE_SHOT)) != 0; }
-
     QString getUrl() const;
     virtual void setUrl(const QString& value);
 
@@ -208,12 +206,14 @@ signals:
     void parentIdChanged();
     void idChanged(const QnId &oldId, const QnId &newId);
     void flagsChanged();
+
     //!Emitted on completion of every async get started with getParamAsync
     /*!
         \param paramValue in case \a result == false, this value cannot be relied on
         \param result true, if param succesfully read, false otherwises
     */
     void asyncParamGetDone( const QString& paramName, const QVariant& paramValue, bool result );
+    
     //!Emitted on completion of every async set started with setParamAsync
     /*!
         \param paramValue in case \a result == false, this value cannot be relied on

@@ -274,7 +274,7 @@ bool QnWorkbenchActionHandler::canAutoDelete(const QnResourcePtr &resource) cons
     if(!layoutResource)
         return false;
     
-    return snapshotManager()->flags(layoutResource) == Qn::LayoutIsLocal; /* Local, not changed and not being saved. */
+    return snapshotManager()->flags(layoutResource) == Qn::ResourceIsLocal; /* Local, not changed and not being saved. */
 }
 
 void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, bool usePosition, const QPointF &position) const {
@@ -331,9 +331,9 @@ bool QnWorkbenchActionHandler::closeLayouts(const QnLayoutResourceList &resource
     foreach(const QnLayoutResourcePtr &resource, resources) {
         bool changed, saveable, askable;
 
-        Qn::LayoutFlags flags = snapshotManager()->flags(resource);
-        askable = flags == (Qn::LayoutIsChanged | Qn::LayoutIsLocal); /* Changed, local, not being saved. */
-        changed = flags & Qn::LayoutIsChanged;
+        Qn::ResourceSavingFlags flags = snapshotManager()->flags(resource);
+        askable = flags == (Qn::ResourceIsChanged | Qn::ResourceIsLocal); /* Changed, local, not being saved. */
+        changed = flags & Qn::ResourceIsChanged;
         saveable = accessController()->permissions(resource) & Qn::SavePermission;
 
         if(askable && saveable)
@@ -423,9 +423,10 @@ void QnWorkbenchActionHandler::closeLayouts(const QnLayoutResourceList &resource
             delete layout;
         }
 
-        Qn::LayoutFlags flags = snapshotManager()->flags(resource);
-        if((flags & (Qn::LayoutIsLocal | Qn::LayoutIsBeingSaved | Qn::LayoutIsFile)) == Qn::LayoutIsLocal) /* Local, not being saved and not a file. */
-            resourcePool()->removeResource(resource);
+        Qn::ResourceSavingFlags flags = snapshotManager()->flags(resource);
+        if((flags & (Qn::ResourceIsLocal | Qn::ResourceIsBeingSaved)) == Qn::ResourceIsLocal) /* Local, not being saved. */
+            if((resource->flags() & QnResource::local_media) != QnResource::local_media) /* Not a file. */
+                resourcePool()->removeResource(resource);
     }
 }
 
@@ -1105,39 +1106,43 @@ void QnWorkbenchActionHandler::at_quickSearchAction_triggered() {
     if(period.isEmpty())
         return;
 
-    QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsParameter);
-    if(periods.isEmpty()) {
-        periods.push_back(period);
-    } else {
-        periods = periods.intersected(period);
-    }
-
     const int matrixWidth = 3, matrixHeight = 3;
     const int itemCount = matrixWidth * matrixHeight;
 
     /* Construct and add a new layout first. */
-    QnWorkbenchLayout *layout = new QnWorkbenchLayout();
-    QList<QnWorkbenchItem *> items;
+    QnLayoutResourcePtr layout(new QnLayoutResource());
+    layout->setGuid(QUuid::createUuid());
+    layout->setName(tr("Quick Search for %1").arg(resource->getName()));
+    layout->setParentId(context()->user()->getId());
+    layout->setTimeBounds(period);
+
+    QnLayoutItemDataList items;
     for(int i = 0; i < itemCount; i++) {
-        QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid());
-        item->setFlag(Qn::Pinned, true);
-        item->setGeometry(QRect(i % matrixWidth, i / matrixWidth, 1, 1));
-        layout->addItem(item);
+        QnLayoutItemData item;
+        item.flags = Qn::Pinned;
+        item.uuid = QUuid::createUuid();
+        item.combinedGeometry = QRect(i % matrixWidth, i / matrixWidth, 1, 1);
+        item.resource.id = resource->getId();
+        item.resource.path = resource->getUniqueId();
+
         items.push_back(item);
+        layout->addItem(item);
     }
-    workbench()->setCurrentLayout(layout);
-    
+
+    resourcePool()->addResource(layout);
+    menu()->trigger(Qn::OpenSingleLayoutAction, layout);
+
     /* Then navigate. */
     display()->setStreamsSynchronized(NULL);
-    qint64 d = periods.duration() / itemCount;
-    QnTimePeriodListTimeIterator pos = periods.timeBegin();
-    foreach(QnWorkbenchItem *item, items) {
-        QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(display()->widget(item));
+    qint64 t = period.startTimeMs;
+    qint64 d = period.durationMs / itemCount;
+    foreach(const QnLayoutItemData &item, items) {
+        QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(display()->widget(context()->workbench()->currentLayout()->item(item.uuid)));
         if(!widget)
             continue;
 
-        widget->display()->setCurrentTimeUSec(*pos * 1000);
-        pos += d;
+        widget->display()->setCurrentTimeUSec(t * 1000);
+        t += d;
     }
 }
 

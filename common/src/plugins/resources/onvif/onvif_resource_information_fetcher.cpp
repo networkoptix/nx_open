@@ -164,7 +164,7 @@ void OnvifResourceInformationFetcher::createResource(const QString& manufacturer
     result.push_back(resource);
 }
 
-const bool OnvifResourceInformationFetcher::isMacAlreadyExists(const QString& mac, const QnResourceList& resList) const
+bool OnvifResourceInformationFetcher::isMacAlreadyExists(const QString& mac, const QnResourceList& resList) const
 {
     if (!mac.isEmpty()) {
 
