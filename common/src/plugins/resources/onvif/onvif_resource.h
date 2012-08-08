@@ -46,9 +46,6 @@ struct CameraPhysicalWindowSize
 
 class QnPlOnvifResource : public QnPhysicalCameraResource
 {
-protected:
-    typedef QHash<QString, OnvifCameraSetting> CameraSettings;
-
 public:
     enum CODECS
     {
@@ -81,6 +78,7 @@ public:
     static const QString fetchMacAddress(const NetIfacesResp& response, const QString& senderIpAddress);
 
     QnPlOnvifResource();
+    virtual ~QnPlOnvifResource();
 
     static const QString createOnvifEndpointUrl(const QString& ipAddress);
 
@@ -179,12 +177,12 @@ private:
 
     void save();
 
-    void fetchAndSetCameraSettings(const OnvifCameraSettingsResp& onvifSettings);
+    void fetchAndSetCameraSettings(OnvifCameraSettingsResp& onvifSettings);
     
-    bool loadSettingsFromXml(const OnvifCameraSettingsResp& onvifSettings, const QString& filepath, CameraSettings& cameraSettings, QString& error);
-    bool parseCameraXml(const OnvifCameraSettingsResp& onvifSettings, const QDomElement& cameraXml, CameraSettings& cameraSettings, QString& error);
-    bool parseGroupXml(const OnvifCameraSettingsResp& onvifSettings, const QDomElement& groupXml, const QString parentId, CameraSettings& cameraSettings, QString& error);
-    bool parseElementXml(const OnvifCameraSettingsResp& onvifSettings, const QDomElement& elementXml, const QString parentId, CameraSettings& cameraSettings, QString& error);
+    bool loadSettingsFromXml(OnvifCameraSettingsResp& onvifSettings, const QString& filepath, QString& error);
+    bool parseCameraXml(OnvifCameraSettingsResp& onvifSettings, const QDomElement& cameraXml, QString& error);
+    bool parseGroupXml(OnvifCameraSettingsResp& onvifSettings, const QDomElement& groupXml, const QString parentId, QString& error);
+    bool parseElementXml(OnvifCameraSettingsResp& onvifSettings, const QDomElement& elementXml, const QString parentId, QString& error);
 
     int round(float value);
     ResolutionPair getNearestResolutionForSecondary(const ResolutionPair& resolution, float aspectRatio) const;
@@ -194,7 +192,7 @@ private:
     int getH264StreamProfile(const VideoOptionsResp& response);
 protected:
     QList<ResolutionPair> m_resolutionList; //Sorted desc
-    CameraSettings m_cameraSettings;
+    OnvifCameraSettingsResp* m_onvifAdditionalSettings;
 
 private:
     static const char* ONVIF_PROTOCOL_PREFIX;

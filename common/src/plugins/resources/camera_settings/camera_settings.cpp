@@ -101,27 +101,50 @@ bool CameraSettingValue::operator != ( QString val ) const
 // CameraSetting
 //
 
+QString& CAMERA_SETTING_TYPE_VALUE  = *(new QString(QLatin1String("Value")));
+QString& CAMERA_SETTING_TYPE_ONOFF  = *(new QString(QLatin1String("OnOff")));
+QString& CAMERA_SETTING_TYPE_BOOL   = *(new QString(QLatin1String("Boolean")));
+QString& CAMERA_SETTING_TYPE_MINMAX = *(new QString(QLatin1String("MinMaxStep")));
+QString& CAMERA_SETTING_TYPE_ENUM   = *(new QString(QLatin1String("Enumeration")));
+QString& CAMERA_SETTING_TYPE_BUTTON = *(new QString(QLatin1String("Button")));
+
+QString& CameraSetting::SEPARATOR = *(new QString(QLatin1String(";;")));
+
 CameraSetting::WIDGET_TYPE CameraSetting::typeFromStr(const QString& value)
 {
-    if (value == QLatin1String("Value")) {
+    if (value == CAMERA_SETTING_TYPE_VALUE) {
         return Value;
     }
-    if (value == QLatin1String("OnOff")) {
+    if (value == CAMERA_SETTING_TYPE_ONOFF) {
         return OnOff;
     }
-    if (value == QLatin1String("Boolean")) {
+    if (value == CAMERA_SETTING_TYPE_BOOL) {
         return Boolean;
     }
-    if (value == QLatin1String("MinMaxStep")) {
+    if (value == CAMERA_SETTING_TYPE_MINMAX) {
         return MinMaxStep;
     }
-    if (value == QLatin1String("Enumeration")) {
+    if (value == CAMERA_SETTING_TYPE_ENUM) {
         return Enumeration;
     }
-    if (value == QLatin1String("Button")) {
+    if (value == CAMERA_SETTING_TYPE_BUTTON) {
         return Button;
     }
     return None;
+}
+
+QString CameraSetting::strFromType(const WIDGET_TYPE value)
+{
+    switch (value)
+    {
+        case Value: return CAMERA_SETTING_TYPE_VALUE;
+        case OnOff: return CAMERA_SETTING_TYPE_ONOFF;
+        case Boolean: return CAMERA_SETTING_TYPE_BOOL;
+        case MinMaxStep: return CAMERA_SETTING_TYPE_MINMAX;
+        case Enumeration: return CAMERA_SETTING_TYPE_ENUM;
+        case Button: return CAMERA_SETTING_TYPE_BUTTON;
+        default: return QString();
+    }
 }
 
 CameraSetting::CameraSetting(const QString& id, const QString& name, WIDGET_TYPE type,
@@ -201,6 +224,55 @@ CameraSetting& CameraSetting::operator= (const CameraSetting& rhs)
     setMax(rhs.getMax());
     setStep(rhs.getStep());
     setCurrent(rhs.getCurrent());
-    
+
     return *this;
+}
+
+QString CameraSetting::serializeToStr() const
+{
+    QString result;
+
+    result.append(m_id);
+
+    result.append(SEPARATOR);
+    result.append(m_name);
+
+    result.append(SEPARATOR);
+    result.append(strFromType(m_type));
+
+    result.append(SEPARATOR);
+    result.append(static_cast<QString>(m_min));
+
+    result.append(SEPARATOR);
+    result.append(static_cast<QString>(m_max));
+
+    result.append(SEPARATOR);
+    result.append(static_cast<QString>(m_step));
+
+    result.append(SEPARATOR);
+    result.append(static_cast<QString>(m_current));
+
+    return result;
+}
+
+void CameraSetting::deserializeFromStr(const QString& src)
+{
+    QStringList tokens = src.split(SEPARATOR);
+    if (tokens.length() != 7) {
+        Q_ASSERT(false);
+    }
+
+    m_id = tokens[0];
+    m_name = tokens[1];
+    m_type = typeFromStr(tokens[2]);
+    m_min = CameraSettingValue(tokens[3]);
+    m_max = CameraSettingValue(tokens[4]);
+    m_step = CameraSettingValue(tokens[5]);
+    m_current = CameraSettingValue(tokens[6]);
+}
+
+bool CameraSetting::isDisabled() const
+{
+    return static_cast<QString>(m_current).isEmpty() ||
+        m_type != Enumeration && m_min == m_max;
 }

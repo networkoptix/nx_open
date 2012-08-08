@@ -17,6 +17,10 @@ class _onvifDevice__GetDeviceInformation;
 class _onvifDevice__GetDeviceInformationResponse;
 class _onvifDevice__GetNetworkInterfaces;
 class _onvifDevice__GetNetworkInterfacesResponse;
+class _onvifDevice__SetSystemFactoryDefault;
+class _onvifDevice__SetSystemFactoryDefaultResponse;
+class _onvifDevice__SystemReboot;
+class _onvifDevice__SystemRebootResponse;
 
 typedef _onvifDevice__CreateUsers CreateUsersReq;
 typedef _onvifDevice__CreateUsersResponse CreateUsersResp;
@@ -26,6 +30,10 @@ typedef _onvifDevice__GetDeviceInformation DeviceInfoReq;
 typedef _onvifDevice__GetDeviceInformationResponse DeviceInfoResp;
 typedef _onvifDevice__GetNetworkInterfaces NetIfacesReq;
 typedef _onvifDevice__GetNetworkInterfacesResponse NetIfacesResp;
+typedef _onvifDevice__SetSystemFactoryDefault FactoryDefaultReq;
+typedef _onvifDevice__SetSystemFactoryDefaultResponse FactoryDefaultResp;
+typedef _onvifDevice__SystemReboot RebootReq;
+typedef _onvifDevice__SystemRebootResponse RebootResp;
 
 
 class _onvifMedia__AddAudioEncoderConfiguration;
@@ -116,11 +124,15 @@ class _onvifImg__GetImagingSettings;
 class _onvifImg__GetImagingSettingsResponse;
 class _onvifImg__GetOptions;
 class _onvifImg__GetOptionsResponse;
+class _onvifImg__SetImagingSettings;
+class _onvifImg__SetImagingSettingsResponse;
 
 typedef _onvifImg__GetImagingSettings ImagingSettingsReq;
 typedef _onvifImg__GetImagingSettingsResponse ImagingSettingsResp;
 typedef _onvifImg__GetOptions ImagingOptionsReq;
 typedef _onvifImg__GetOptionsResponse ImagingOptionsResp;
+typedef _onvifImg__SetImagingSettings SetImagingSettingsReq;
+typedef _onvifImg__SetImagingSettingsResponse SetImagingSettingsResp;
 
 
 //
@@ -184,6 +196,10 @@ public:
     int getNetworkInterfaces(NetIfacesReq& request, NetIfacesResp& response);
 
     int createUsers(CreateUsersReq& request, CreateUsersResp& response);
+
+    int systemFactoryDefaultHard(FactoryDefaultReq& request, FactoryDefaultResp& response);
+    int systemFactoryDefaultSoft(FactoryDefaultReq& request, FactoryDefaultResp& response);
+    int systemReboot(RebootReq& request, RebootResp& response);
 
 private:
     DeviceSoapWrapper();
@@ -269,6 +285,8 @@ public:
 
     int getImagingSettings(ImagingSettingsReq& request, ImagingSettingsResp& response);
     int getOptions(ImagingOptionsReq& request, ImagingOptionsResp& response);
+
+    int setImagingSettings(SetImagingSettingsReq& request, SetImagingSettingsResp& response);
 
 private:
     ImagingSoapWrapper();

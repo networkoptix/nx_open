@@ -33,6 +33,10 @@ public:
 
     static WIDGET_TYPE typeFromStr(const QString& value);
 
+    static QString strFromType(const WIDGET_TYPE value);
+
+    static QString& SEPARATOR;
+
     CameraSetting() {}
 
     CameraSetting(const QString& id,
@@ -67,6 +71,11 @@ public:
     CameraSettingValue getCurrent() const;
 
     CameraSetting& operator= (const CameraSetting& rhs);
+
+    QString serializeToStr() const;
+    void deserializeFromStr(const QString& src);
+
+    bool isDisabled() const;
 
 private:
     QString m_id;

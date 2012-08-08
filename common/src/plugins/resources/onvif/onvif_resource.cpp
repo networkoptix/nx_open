@@ -192,8 +192,14 @@ QnPlOnvifResource::QnPlOnvifResource() :
     m_audioBitrate(0),
     m_audioSamplerate(0),
     m_needUpdateOnvifUrl(false),
-    m_forceCodecFromPrimaryEncoder(false)
+    m_forceCodecFromPrimaryEncoder(false),
+    m_onvifAdditionalSettings(0)
 {
+}
+
+QnPlOnvifResource::~QnPlOnvifResource()
+{
+    delete m_onvifAdditionalSettings;
 }
 
 bool QnPlOnvifResource::isResourceAccessible()
@@ -1439,68 +1445,39 @@ bool QnPlOnvifResource::setSpecialParam(const QString& name, const QVariant& val
 
 bool QnPlOnvifResource::getParamPhysical(const QnParam &param, QVariant &val)
 {
-    //if (param.netHelper().isEmpty()) // check if we have paramNetHelper command for this param
-    //    return false;
+    m_mutex.lock();
+    CameraSettings& settings = m_onvifAdditionalSettings->getCameraSettings();
+    CameraSettings::ConstIterator it = settings.find(param.name());
 
-    //CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
+    if (it == settings.end()) {
+        return false;
+    }
 
-    //QString request = QLatin1String("get?") + param.netHelper();
+    OnvifCameraSetting tmp = it.value();
+    if (tmp.getFromCamera(*m_onvifAdditionalSettings)) {
+        val.setValue(tmp.serializeToStr());
+        return true;
+    }
 
-    //CLHttpStatus status = connection.doGET(request);
-    //if (status == CL_HTTP_AUTH_REQUIRED)
-    //    setStatus(QnResource::Unauthorized);
-
-    //if (status != CL_HTTP_SUCCESS)
-    //    return false;
-
-
-    //char c_response[MAX_RESPONSE_LEN];
-
-    //int result_size =  connection.read(c_response,sizeof(c_response));
-
-    //if (result_size <0)
-    //    return false;
-
-    //QByteArray response = QByteArray::fromRawData(c_response, result_size); // QByteArray  will not copy data
-
-    //int index = response.indexOf('=');
-    //if (index==-1)
-    //    return false;
-
-    //QByteArray rarray = response.mid(index+1);
-
-    //val = QLatin1String(rarray.data());
-
-    return true;
+    return false;
 }
 
 bool QnPlOnvifResource::setParamPhysical(const QnParam &param, const QVariant& val )
 {
-    //if (param.netHelper().isEmpty()) // check if we have paramNetHelper command for this param
-    //    return false;
+    m_mutex.lock();
 
-    //CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
+    CameraSettings& settings = m_onvifAdditionalSettings->getCameraSettings();
+    CameraSettings::ConstIterator it = settings.find(param.name());
 
-    //QString request = QLatin1String("set?") + param.netHelper();
-    //if (param.type() != QnParamType::None && param.type() != QnParamType::Button)
-    //    request += QLatin1Char('=') + val.toString();
+    if (it == settings.end()) {
+        return false;
+    }
 
-    //CLHttpStatus status = connection.doGET(request);
-    //if (status != CL_HTTP_SUCCESS)
-    //    status = connection.doGET(request);
-
-    //if (CL_HTTP_SUCCESS == status)
-    //    return true;
-
-    //if (CL_HTTP_AUTH_REQUIRED == status)
-    //{
-    //    setStatus(QnResource::Unauthorized);
-    //    return false;
-    //}
-
-    //return false;
-
-    return true;
+    CameraSetting tmp;
+    tmp.deserializeFromStr(val.toString());
+    OnvifCameraSetting tmpOnvif = it.value();
+    tmpOnvif.setCurrent(tmp.getCurrent());
+    return tmpOnvif.setToCamera(*m_onvifAdditionalSettings);
 }
 
 void QnPlOnvifResource::fetchAndSetCameraSettings()
@@ -1512,33 +1489,39 @@ void QnPlOnvifResource::fetchAndSetCameraSettings()
     }
 
     QAuthenticator auth(getAuth());
-    OnvifCameraSettingsResp settings(imagingUrl.toLatin1().data(), auth.user().toStdString(), auth.password().toStdString(),
-        m_videoSourceToken.toStdString(), getUniqueId());
-    if (!imagingUrl.isEmpty()) {
-        settings.makeRequest();
+    OnvifCameraSettingsResp* settings = 0;
+    {
+        m_mutex.lock();
+
+        if (m_onvifAdditionalSettings) {
+            delete m_onvifAdditionalSettings;
+        }
+
+        m_onvifAdditionalSettings = new OnvifCameraSettingsResp(imagingUrl.toLatin1().data(), auth.user().toStdString(),
+            auth.password().toStdString(), m_videoSourceToken.toStdString(), getUniqueId());
+
+        settings = m_onvifAdditionalSettings;
     }
 
-    fetchAndSetCameraSettings(settings);
+    if (!imagingUrl.isEmpty()) {
+        settings->makeGetRequest();
+    }
+
+    fetchAndSetCameraSettings(*settings);
 }
 
-void QnPlOnvifResource::fetchAndSetCameraSettings(const OnvifCameraSettingsResp& onvifSettings)
+void QnPlOnvifResource::fetchAndSetCameraSettings(OnvifCameraSettingsResp& onvifSettings)
 {
-    CameraSettings cameraSettings;
     QString error;
     QString filepath = QString::fromLatin1("C:\\projects\\networkoptix\\netoptix_vms33\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml");
 
-    if (!loadSettingsFromXml(onvifSettings, filepath, cameraSettings, error))
+    if (!loadSettingsFromXml(onvifSettings, filepath, error))
     {
         qWarning() << "QnPlOnvifResource::fetchAndSetCameraSettings. Can't load camera settings from xml. Details: " << error;
     }
-
-    if (!cameraSettings.isEmpty()) {
-        m_mutex.lock();
-        m_cameraSettings = cameraSettings;
-    }
 }
 
-bool QnPlOnvifResource::loadSettingsFromXml(const OnvifCameraSettingsResp& onvifSettings, const QString& filepath, CameraSettings& cameraSettings, QString& error)
+bool QnPlOnvifResource::loadSettingsFromXml(OnvifCameraSettingsResp& onvifSettings, const QString& filepath, QString& error)
 {
     QFile file(filepath);
 
@@ -1574,7 +1557,7 @@ bool QnPlOnvifResource::loadSettingsFromXml(const OnvifCameraSettingsResp& onvif
             if (node.attributes().namedItem(QLatin1String("name")).nodeValue() != QLatin1String("ONVIF")) {
                 continue;
             }
-            return parseCameraXml(onvifSettings, node.toElement(), cameraSettings, error);
+            return parseCameraXml(onvifSettings, node.toElement(), error);
         }
 
         node = node.nextSibling();
@@ -1583,17 +1566,17 @@ bool QnPlOnvifResource::loadSettingsFromXml(const OnvifCameraSettingsResp& onvif
     return true;
 }
 
-bool QnPlOnvifResource::parseCameraXml(const OnvifCameraSettingsResp& onvifSettings, const QDomElement& cameraXml, CameraSettings& cameraSettings, QString& error)
+bool QnPlOnvifResource::parseCameraXml(OnvifCameraSettingsResp& onvifSettings, const QDomElement& cameraXml, QString& error)
 {
-    if (!parseGroupXml(onvifSettings, cameraXml.firstChildElement(), QLatin1String(""), cameraSettings, error)) {
-        cameraSettings.clear();
+    if (!parseGroupXml(onvifSettings, cameraXml.firstChildElement(), QLatin1String(""), error)) {
+        onvifSettings.getCameraSettings().clear();
         return false;
     }
 
     return true;
 }
 
-bool QnPlOnvifResource::parseGroupXml(const OnvifCameraSettingsResp& onvifSettings, const QDomElement& groupXml, const QString parentId, CameraSettings& cameraSettings, QString& error)
+bool QnPlOnvifResource::parseGroupXml(OnvifCameraSettingsResp& onvifSettings, const QDomElement& groupXml, const QString parentId, QString& error)
 {
     if (groupXml.isNull()) {
         return true;
@@ -1601,7 +1584,7 @@ bool QnPlOnvifResource::parseGroupXml(const OnvifCameraSettingsResp& onvifSettin
 
     QString tagName = groupXml.nodeName();
 
-    if (tagName == QLatin1String("param") && !parseElementXml(onvifSettings, groupXml, parentId, cameraSettings, error)) {
+    if (tagName == QLatin1String("param") && !parseElementXml(onvifSettings, groupXml, parentId, error)) {
         return false;
     }
 
@@ -1618,25 +1601,25 @@ bool QnPlOnvifResource::parseGroupXml(const OnvifCameraSettingsResp& onvifSettin
 
         if (onvifSettings.isEmpty() && id == QLatin1String("%%Imaging"))
         {
-            cameraSettings.insert(id, OnvifCameraSetting());
+            onvifSettings.getCameraSettings().insert(id, OnvifCameraSetting());
         } else {
             //By default it is assumed that setting that have no value is enabled
             //cameraSettings.insert(...);
 
-            if (!parseGroupXml(onvifSettings, groupXml.firstChildElement(), id, cameraSettings, error)) {
+            if (!parseGroupXml(onvifSettings, groupXml.firstChildElement(), id, error)) {
                 return false;
             }
         }
     }
 
-    if (!parseGroupXml(onvifSettings, groupXml.nextSiblingElement(), parentId, cameraSettings, error)) {
+    if (!parseGroupXml(onvifSettings, groupXml.nextSiblingElement(), parentId, error)) {
         return false;
     }
 
     return true;
 }
 
-bool QnPlOnvifResource::parseElementXml(const OnvifCameraSettingsResp& onvifSettings, const QDomElement& elementXml, const QString parentId, CameraSettings& cameraSettings, QString& error)
+bool QnPlOnvifResource::parseElementXml(OnvifCameraSettingsResp& onvifSettings, const QDomElement& elementXml, const QString parentId, QString& error)
 {
     if (elementXml.isNull() || elementXml.nodeName() != QLatin1String("param")) {
         return true;
@@ -1676,7 +1659,7 @@ bool QnPlOnvifResource::parseElementXml(const OnvifCameraSettingsResp& onvifSett
             //Operations must be defined for all settings
             Q_ASSERT(false);
         }
-        cameraSettings.insert(id, OnvifCameraSetting(*(it.value()), id, name, widgetType, min, max, step));
+        onvifSettings.getCameraSettings().insert(id, OnvifCameraSetting(*(it.value()), id, name, widgetType, min, max, step));
         break;
 
     case CameraSetting::Button:

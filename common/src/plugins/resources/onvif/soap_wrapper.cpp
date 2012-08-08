@@ -251,6 +251,26 @@ int DeviceSoapWrapper::getCapabilities(CapabilitiesReq& request, CapabilitiesRes
     return m_soapProxy->GetCapabilities(m_endpoint, NULL, &request, &response);
 }
 
+int DeviceSoapWrapper::systemReboot(RebootReq& request, RebootResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->SystemReboot(m_endpoint, NULL, &request, &response);
+}
+
+int DeviceSoapWrapper::systemFactoryDefaultHard(FactoryDefaultReq& request, FactoryDefaultResp& response)
+{
+    beforeMethodInvocation();
+    request.FactoryDefault = onvifXsd__FactoryDefaultType__Hard;
+    return m_soapProxy->SetSystemFactoryDefault(m_endpoint, NULL, &request, &response);
+}
+
+int DeviceSoapWrapper::systemFactoryDefaultSoft(FactoryDefaultReq& request, FactoryDefaultResp& response)
+{
+    beforeMethodInvocation();
+    request.FactoryDefault = onvifXsd__FactoryDefaultType__Soft;
+    return m_soapProxy->SetSystemFactoryDefault(m_endpoint, NULL, &request, &response);
+}
+
 //
 // MediaSoapWrapper
 //
@@ -429,6 +449,12 @@ int ImagingSoapWrapper::getImagingSettings(ImagingSettingsReq& request, ImagingS
 {
     beforeMethodInvocation();
     return m_soapProxy->GetImagingSettings(m_endpoint, NULL, &request, &response);
+}
+
+int ImagingSoapWrapper::setImagingSettings(SetImagingSettingsReq& request, SetImagingSettingsResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->SetImagingSettings(m_endpoint, NULL, &request, &response);
 }
 
 
