@@ -21,6 +21,11 @@ void QnCodecTranscoder::setBitrate(int value)
     m_bitrate = value;
 }
 
+int QnCodecTranscoder::getBitrate() const
+{
+    return m_bitrate;
+}
+
 AVCodecContext* QnCodecTranscoder::getCodecContext()
 {
     return 0;
@@ -69,6 +74,9 @@ QnTranscoder::~QnTranscoder()
 
 int QnTranscoder::setVideoCodec(CodecID codec, TranscodeMethod method, const QSize& resolution, int bitrate, const QnCodecTranscoder::Params& params)
 {
+    if (bitrate == -1)
+        bitrate = resolution.width() * resolution.height() * 5;
+
     m_videoCodec = codec;
     switch (method)
     {

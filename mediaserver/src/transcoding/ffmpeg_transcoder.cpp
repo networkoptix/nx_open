@@ -123,6 +123,7 @@ int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDa
                 m_videoEncoderCodecCtx->width = m_vTranscoder->getResolution().width();
                 m_videoEncoderCodecCtx->height = m_vTranscoder->getResolution().height();
             }
+            m_videoEncoderCodecCtx->bit_rate = m_vTranscoder->getBitrate();
         }
         else 
         {
@@ -139,9 +140,9 @@ int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDa
                 m_videoEncoderCodecCtx->width = video->width;
                 m_videoEncoderCodecCtx->height = video->height;
             }
+            m_videoEncoderCodecCtx->bit_rate = video->width * video->height*5; // auto fill bitrate. 10Mbit for full HD
         }
         m_videoEncoderCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
-        m_videoEncoderCodecCtx->bit_rate = video->width * video->height*5; // auto fill bitrate. 10Mbit for full HD
         m_videoEncoderCodecCtx->time_base.num = 1;
         m_videoEncoderCodecCtx->time_base.den = 60;
         m_videoEncoderCodecCtx->gop_size = 30;
@@ -222,6 +223,8 @@ int QnFfmpegTranscoder::transcodePacketInternal(QnAbstractMediaDataPtr media, Qn
     
     if (packet.size > 0)
     {
+        qDebug() << "packet.pts=" << packet.pts;
+
         if (av_write_frame(m_formatCtx, &packet) < 0) {
             qWarning() << QLatin1String("Transcoder error: can't write AV packet");
             //return -1; // ignore error and continue
