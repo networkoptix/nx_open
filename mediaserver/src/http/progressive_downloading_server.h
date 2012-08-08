@@ -27,7 +27,7 @@ public:
 protected:
     virtual void run() override;
 private:
-    QByteArray getMimeType() const;
+    static QByteArray getMimeType(QByteArray streamingFormat);
 private:
     QN_DECLARE_PRIVATE_DERIVED(QnProgressiveDownloadingConsumer);
 };

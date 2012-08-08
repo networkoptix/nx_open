@@ -83,13 +83,14 @@ QnProgressiveDownloadingConsumer::~QnProgressiveDownloadingConsumer()
 {
 }
 
-QByteArray QnProgressiveDownloadingConsumer::getMimeType() const
+QByteArray QnProgressiveDownloadingConsumer::getMimeType(QByteArray streamingFormat)
 {
-    Q_D(const QnProgressiveDownloadingConsumer);
-    if (d->streamingFormat == "webm")
+    if (streamingFormat == "webm")
         return "video/webm";
-    else
+    else if (streamingFormat == "mpegts")
         return "video/mp2t";
+    else 
+        return QByteArray();
 }
 
 void QnProgressiveDownloadingConsumer::run()
@@ -126,8 +127,17 @@ void QnProgressiveDownloadingConsumer::run()
     {
         parseRequest();
         d->responseBody.clear();
-        QString path = QFileInfo(getDecodedUrl().path()).baseName();
-        QnResourcePtr resource = qnResPool->getResourceByUniqId(path);
+        QFileInfo fi(getDecodedUrl().path());
+        d->streamingFormat = fi.completeSuffix().toLocal8Bit();
+        QByteArray mimeType = getMimeType(d->streamingFormat);
+        if (mimeType.isEmpty())
+        {
+            d->responseBody = QByteArray("Unsupported streaming format ") + mimeType;
+            sendResponse("HTTP", CODE_INVALID_PARAMETER, "plain/text");
+            return;
+        }
+
+        QnResourcePtr resource = qnResPool->getResourceByUniqId(fi.baseName());
         QnVideoCamera* camera = qnCameraPool->getVideoCamera(resource);
         if (!camera) {
             d->responseBody = "Media not found";
@@ -144,7 +154,7 @@ void QnProgressiveDownloadingConsumer::run()
         }
         dataProvider->addDataProcessor(&dataConsumer);
         d->chunkedMode = true;
-        sendResponse("HTTP", CODE_OK, getMimeType());
+        sendResponse("HTTP", CODE_OK, mimeType);
         dataConsumer.sendResponse();
         QnByteArray emptyChunk(0,0);
         sendChunk(emptyChunk);
