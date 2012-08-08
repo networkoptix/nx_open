@@ -66,6 +66,8 @@ class QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumerPrivate:
 {
 public:
     QnFfmpegTranscoder transcoder;
+    QByteArray streamingFormat;
+    CodecID videoCodec;
 };
 
 QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(TCPSocket* socket, QnTcpListener* _owner):
@@ -73,16 +75,27 @@ QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(TCPSocket* so
 {
     Q_D(QnProgressiveDownloadingConsumer);
     d->socketTimeout = CONNECTION_TIMEOUT;
+    d->streamingFormat = "webm";
+    d->videoCodec = CODEC_ID_VP8;
 }
 
 QnProgressiveDownloadingConsumer::~QnProgressiveDownloadingConsumer()
 {
 }
 
+QByteArray QnProgressiveDownloadingConsumer::getMimeType() const
+{
+    Q_D(const QnProgressiveDownloadingConsumer);
+    if (d->streamingFormat == "webm")
+        return "video/webm";
+    else
+        return "video/mp2t";
+}
+
 void QnProgressiveDownloadingConsumer::run()
 {
     Q_D(QnProgressiveDownloadingConsumer);
-    if (d->transcoder.setContainer("webm") != 0)
+    if (d->transcoder.setContainer(d->streamingFormat) != 0)
     //if (d->transcoder.setContainer("mpegts") != 0)
     {
         QByteArray msg;
@@ -93,7 +106,7 @@ void QnProgressiveDownloadingConsumer::run()
         return;
     }
 
-    if (d->transcoder.setVideoCodec(CODEC_ID_VP8, QnTranscoder::TM_FfmpegTranscode, QSize(640,480)) != 0)
+    if (d->transcoder.setVideoCodec(d->videoCodec, QnTranscoder::TM_FfmpegTranscode, QSize(640,480)) != 0)
     //if (d->transcoder.setVideoCodec(CODEC_ID_MPEG2VIDEO, QnTranscoder::TM_FfmpegTranscode, QSize(640,480)) != 0)
     {
         QByteArray msg;
@@ -131,7 +144,7 @@ void QnProgressiveDownloadingConsumer::run()
         }
         dataProvider->addDataProcessor(&dataConsumer);
         d->chunkedMode = true;
-        sendResponse("HTTP", CODE_OK, "video/mp2t");
+        sendResponse("HTTP", CODE_OK, getMimeType());
         dataConsumer.sendResponse();
         QnByteArray emptyChunk(0,0);
         sendChunk(emptyChunk);
