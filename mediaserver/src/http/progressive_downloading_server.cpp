@@ -8,6 +8,7 @@
 #include "core/resourcemanagment/resource_pool.h"
 #include "camera/camera_pool.h"
 #include "core/dataconsumer/dataconsumer.h"
+#include "plugins/resources/archive/archive_stream_reader.h"
 
 static const int CONNECTION_TIMEOUT = 1000 * 5;
 
@@ -68,6 +69,7 @@ public:
     QnFfmpegTranscoder transcoder;
     QByteArray streamingFormat;
     CodecID videoCodec;
+    QSharedPointer<QnArchiveStreamReader> archiveDP;
 };
 
 QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(TCPSocket* socket, QnTcpListener* _owner):
@@ -138,14 +140,27 @@ void QnProgressiveDownloadingConsumer::run()
         }
 
         QnResourcePtr resource = qnResPool->getResourceByUniqId(fi.baseName());
-        QnVideoCamera* camera = qnCameraPool->getVideoCamera(resource);
-        if (!camera) {
-            d->responseBody = "Media not found";
-            sendResponse("HTTP", CODE_NOT_FOUND, "plain/text");
-            return;
+
+        QByteArray position = getDecodedUrl().queryItemValue("pos").toLocal8Bit();
+        if (position.isEmpty() || position == "now")
+        {
+            QnVideoCamera* camera = qnCameraPool->getVideoCamera(resource);
+            if (!camera) {
+                d->responseBody = "Media not found";
+                sendResponse("HTTP", CODE_NOT_FOUND, "plain/text");
+                return;
+            }
+            dataProvider = camera->getLiveReader(QnResource::Role_LiveVideo);
         }
+        else {
+            d->archiveDP = QSharedPointer<QnArchiveStreamReader> (dynamic_cast<QnArchiveStreamReader*> (resource->createDataProvider(QnResource::Role_Archive)));
+            qint64 timeMs = QDateTime::fromString(position, Qt::ISODate).toMSecsSinceEpoch();
+            d->archiveDP->jumpTo(timeMs*1000, timeMs*1000);
+            d->archiveDP->start();
+            dataProvider = d->archiveDP;
+        }
+        
         QnProgressiveDownloadingDataConsumer dataConsumer(this);
-        dataProvider = camera->getLiveReader(QnResource::Role_LiveVideo);
         if (dataProvider == 0)
         {
             d->responseBody = "Video camera is not ready yet";
