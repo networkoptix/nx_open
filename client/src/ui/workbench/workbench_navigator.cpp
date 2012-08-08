@@ -675,9 +675,11 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
 
     QnScopedValueRollback<bool> guard(&m_updatingSliderFromReader, true);
 
+    bool isQuickSearch = workbench()->currentLayout()->resource() && !workbench()->currentLayout()->resource()->timeBounds().isEmpty();
+
     qint64 startTimeUSec, endTimeUSec;
     qint64 endTimeMSec, startTimeMSec;
-    if(workbench()->currentLayout()->resource() && !workbench()->currentLayout()->resource()->timeBounds().isEmpty()) {
+    if(isQuickSearch) {
         endTimeMSec = workbench()->currentLayout()->resource()->timeBounds().endTimeMs();
         endTimeUSec = endTimeMSec * 1000;
         startTimeMSec = workbench()->currentLayout()->resource()->timeBounds().startTimeMs;
@@ -712,6 +714,16 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
 
         if(timeUSec != AV_NOPTS_VALUE)
             updateLive();
+
+        if(isQuickSearch) {
+            QVector<qint64> indicators;
+            foreach(QnResourceWidget *widget, display()->widgets())
+                if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
+                    indicators.push_back(mediaWidget->display()->camera()->getCurrentTime() / 1000);
+            m_timeSlider->setIndicators(indicators);
+        } else {
+            m_timeSlider->setIndicators(QVector<qint64>());
+        }
     }
 
     if(!m_currentWidgetLoaded && (startTimeUSec != AV_NOPTS_VALUE && endTimeUSec != AV_NOPTS_VALUE)) {
