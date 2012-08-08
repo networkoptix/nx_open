@@ -6,7 +6,7 @@ static const int IO_BLOCK_SIZE = 1024*32;
 
 static qint32 ffmpegReadPacket(void *opaque, quint8* buf, int size)
 {
-    Q_ASSERT_X(true, Q_FUNC_INFO, "This class for streaming encoding! This function call MUST not exists!");
+    Q_ASSERT_X(false, Q_FUNC_INFO, "This class for streaming encoding! This function call MUST not exists!");
     return 0;
 }
 
@@ -18,7 +18,7 @@ static qint32 ffmpegWritePacket(void *opaque, quint8* buf, int size)
 
 static int64_t ffmpegSeek(void* opaque, int64_t pos, int whence)
 {
-    Q_ASSERT_X(true, Q_FUNC_INFO, "This class for streaming encoding! This function call MUST not exists!");
+    Q_ASSERT_X(false, Q_FUNC_INFO, "This class for streaming encoding! This function call MUST not exists!");
     return 0;
 }
 
@@ -36,7 +36,7 @@ AVIOContext* QnFfmpegTranscoder::createFfmpegIOContext()
         &ffmpegReadPacket,
         &ffmpegWritePacket,
         &ffmpegSeek);
-
+    ffmpegIOContext->seekable = 0;
     return ffmpegIOContext;
 }
 
@@ -155,7 +155,7 @@ int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDa
 
     if (m_audioCodec != CODEC_ID_NONE)
     {
-        Q_ASSERT_X(true, Q_FUNC_INFO, "Not implemented! Under construction!!!");
+        Q_ASSERT_X(false, Q_FUNC_INFO, "Not implemented! Under construction!!!");
 
         AVStream* audioStream = av_new_stream(m_formatCtx, 0);
         if (audioStream == 0)
