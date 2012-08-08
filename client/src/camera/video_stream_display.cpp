@@ -38,7 +38,9 @@ QnVideoStreamDisplay::QnVideoStreamDisplay(bool canDownscale) :
     m_speed(1.0),
     m_queueWasFilled(false),
     m_needResetDecoder(false),
-    m_lastDisplayedFrame(NULL)
+    m_lastDisplayedFrame(NULL),
+    m_prevSrcWidth(0),
+    m_prevSrcHeight(0)
 {
     for (int i = 0; i < MAX_FRAME_QUEUE_SIZE; ++i)
         m_frameQueue[i] = new CLVideoDecoderOutput();
@@ -104,7 +106,7 @@ QnFrameScaler::DownscaleFactor QnVideoStreamDisplay::determineScaleFactor(int ch
 
         m_scaleFactor = findScaleFactor(srcWidth, srcHeight, on_screen.width(), on_screen.height());
 
-        if (m_scaleFactor < m_prevFactor)
+        if (m_scaleFactor < m_prevFactor && m_prevSrcWidth == srcWidth && m_prevSrcHeight == srcHeight)
         {
             // new factor is less than prev one; about to change factor => about to increase resource usage
             if ( qAbs((qreal)on_screen.width() - m_previousOnScreenSize.width())/on_screen.width() < 0.05 &&
@@ -117,6 +119,8 @@ QnFrameScaler::DownscaleFactor QnVideoStreamDisplay::determineScaleFactor(int ch
             // we need to do so ( introduce some histerezis )coz downscaling changes resolution not proportionally some time( cut vertical size a bit )
             // so it may be a loop downscale => changed aspectratio => upscale => changed aspectratio => downscale.
         }
+        m_prevSrcWidth = srcWidth;
+        m_prevSrcHeight = srcHeight;
 
         if (m_scaleFactor != m_prevFactor)
         {
