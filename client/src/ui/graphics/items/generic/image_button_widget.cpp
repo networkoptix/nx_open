@@ -41,6 +41,16 @@ namespace {
 
     void glDrawTexturedRect(const QRectF &rect) {
         glBegin(GL_QUADS);
+#ifdef Q_WS_X11
+        glTexCoord(0.0, 0.0);
+        glVertex(rect.topLeft());
+        glTexCoord(1.0, 0.0);
+        glVertex(rect.topRight());
+        glTexCoord(1.0, 1.0);
+        glVertex(rect.bottomRight());
+        glTexCoord(0.0, 1.0);
+        glVertex(rect.bottomLeft());
+#else
         glTexCoord(0.0, 1.0);
         glVertex(rect.topLeft());
         glTexCoord(1.0, 1.0);
@@ -49,6 +59,7 @@ namespace {
         glVertex(rect.bottomRight());
         glTexCoord(0.0, 0.0);
         glVertex(rect.bottomLeft());
+#endif //Q_WS_X11
         glEnd();
     }
 
