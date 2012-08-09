@@ -66,6 +66,7 @@ private slots:
     void at_linkActivated(const QString &urlString);
     void at_motionTypeChanged();
     void at_motionSelectionCleared();
+    void at_advancedSettingsLoaded(int httpStatusCode, const QList<QPair<QString, QVariant> >& params);
 
     void updateMaxFPS();
     void updateMotionWidgetSensitivity();
@@ -85,7 +86,7 @@ private:
     void disconnectFromMotionWidget();
     void connectToMotionWidget();
 
-    void loadSettingsFromXml();
+    void loadAdvancedSettings();
     bool loadSettingsFromXml(const QString& filepath, QString& error);
     bool parseCameraXml(const QDomElement &cameraXml, QString& error);
     bool parseGroupXml(const QDomElement &elementXml, const QString parentId, QString& error);
@@ -110,32 +111,5 @@ private:
     CameraSettings m_cameraSettings;
     WidgetsById m_widgetsById;
 };
-
-/*//
-// class OnvifCameraSettingReader
-//
-
-class OnvifCameraSettingReader: public CameraSettingReader
-{
-    static const QString& IMAGING_GROUP_NAME;
-    static const QString& MAINTENANCE_GROUP_NAME;
-
-    OnvifCameraSettingsResp& m_settings;
-
-public:
-    OnvifCameraSettingReader(OnvifCameraSettingsResp& onvifSettings, const QString& filepath);
-    virtual ~OnvifCameraSettingReader();
-
-protected:
-
-    virtual bool isGroupEnabled(const QString& id);
-    virtual bool isParamEnabled(const QString& id, const QString& parentId);
-    virtual void paramFound(const CameraSetting& value, const QString& parentId);
-    virtual void cleanDataOnFail();
-
-private:
-
-    OnvifCameraSettingReader();
-};*/
 
 #endif // CAMERA_SETTINGS_DIALOG_H

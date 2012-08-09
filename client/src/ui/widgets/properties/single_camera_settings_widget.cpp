@@ -1,5 +1,9 @@
 #include "single_camera_settings_widget.h"
 #include "ui_single_camera_settings_widget.h"
+#include "utils/camera_advanced_settings_xml_parser.h"
+#include "core/resource/video_server.h"
+#include "core/resource/resource_fwd.h"
+#include "api/video_server_connection.h"
 
 #include <QtCore/QUrl>
 #include <QtGui/QMessageBox>
@@ -33,13 +37,13 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->tabWidget,              SIGNAL(currentChanged(int)),            this,   SLOT(at_tabWidget_currentChanged()));
     at_tabWidget_currentChanged();
 
-    connect(ui->nameEdit,               SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dataChanged()));
-    connect(ui->checkBoxEnableAudio,    SIGNAL(stateChanged(int)),              this,   SLOT(at_dataChanged()));
-    connect(ui->loginEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dataChanged()));
-    connect(ui->passwordEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dataChanged()));
+    connect(ui->nameEdit,               SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dbDataChanged()));
+    connect(ui->checkBoxEnableAudio,    SIGNAL(stateChanged(int)),              this,   SLOT(at_dbDataChanged()));
+    connect(ui->loginEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dbDataChanged()));
+    connect(ui->passwordEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dbDataChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleTasksChanged()),         this,   SLOT(at_cameraScheduleWidget_scheduleTasksChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(gridParamsChanged()),            this,   SLOT(updateMaxFPS()));
-    connect(ui->cameraScheduleWidget,   SIGNAL(scheduleEnabledChanged()),       this,   SLOT(at_dataChanged()));
+    connect(ui->cameraScheduleWidget,   SIGNAL(scheduleEnabledChanged()),       this,   SLOT(at_dbDataChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(moreLicensesRequested()),        this,   SIGNAL(moreLicensesRequested()));
     connect(ui->webPageLabel,           SIGNAL(linkActivated(const QString &)), this,   SLOT(at_linkActivated(const QString &)));
     connect(ui->motionWebPageLabel,     SIGNAL(linkActivated(const QString &)), this,   SLOT(at_linkActivated(const QString &)));
@@ -51,8 +55,6 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
 
     connect(ui->advancedCheckBox1,      SIGNAL(stateChanged(int)),              this,   SLOT(updateAdvancedCheckboxValue()));
 
-    loadSettingsFromXml();
-
     updateFromResource();
 }
 
@@ -60,9 +62,40 @@ QnSingleCameraSettingsWidget::~QnSingleCameraSettingsWidget() {
     return;
 }
 
-void QnSingleCameraSettingsWidget::loadSettingsFromXml()
+void QnSingleCameraSettingsWidget::loadAdvancedSettings()
 {
-    QString error;
+    if (!m_camera) {
+        return;
+    }
+
+    QString filepath(QLatin1String("C:\\projects\\networkoptix\\netoptix_vms33\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml"));
+    CameraSettingsLister lister(filepath);
+    QStringList settings = lister.fetchParams();
+    settings.clear();
+    settings.append(QString::fromLatin1("aaaa"));
+
+    QnVideoServerResourcePtr videoServer = qSharedPointerDynamicCast<QnVideoServerResource>(qnResPool->getResourceById(m_camera->getParentId()));
+    if (videoServer.isNull()) {
+        return;
+    }
+
+    QnVideoServerConnectionPtr serverConnection = videoServer->apiConnection();
+
+    qRegisterMetaType<QList<QPair<QString, QVariant> > >("QList<QPair<QString, QVariant> >");
+    serverConnection->asyncGetParamList(m_camera, settings, this, SLOT(at_advancedSettingsLoaded(int, const QList<QPair<QString, QVariant> >&)) );
+//    QList< QPair< QString, QVariant> >* paramValues = new QList< QPair< QString, QVariant> >;
+//    int res = serverConnection->getParamList(m_camera, settings, paramValues);
+//
+//    int res2 = res;    
+
+
+    //QHash<int, QnAbstractStorageResourcePtr> storageByHandle;
+    //foreach (const QnAbstractStorageResourcePtr &storage, storages) {
+    //    int handle = serverConnection->asyncGetFreeSpace(storage->getUrl(), processor.data(), SLOT(processReply(int, qint64, qint64, int)));
+    //    storageByHandle[handle] = storage;
+    //}
+
+    /*QString error;
     //if (loadSettingsFromXml(QCoreApplication::applicationDirPath() + QLatin1String("/plugins/resources/camera_settings/CameraSettings.xml"), error))
     if (loadSettingsFromXml(QLatin1String("C:\\projects\\networkoptix\\netoptix_vms33\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml"), error))
     {
@@ -84,14 +117,14 @@ void QnSingleCameraSettingsWidget::loadSettingsFromXml()
         }
 
         cl_log.log(QLatin1String("Cannot load arecontvision/devices.xml"), cl_logERROR);
-        /*QMessageBox msgBox;
-        msgBox.setText(QMessageBox::tr("Error"));
-        msgBox.setInformativeText(QMessageBox::tr("Cannot load /arecontvision/devices.xml"));
-        msgBox.setStandardButtons(QMessageBox::Ok);
-        msgBox.setDefaultButton(QMessageBox::Ok);
-        msgBox.setIcon(QMessageBox::Warning);
-        msgBox.exec();*/
-    }
+        //QMessageBox msgBox;
+        //msgBox.setText(QMessageBox::tr("Error"));
+        //msgBox.setInformativeText(QMessageBox::tr("Cannot load /arecontvision/devices.xml"));
+        //msgBox.setStandardButtons(QMessageBox::Ok);
+        //msgBox.setDefaultButton(QMessageBox::Ok);
+        //msgBox.setIcon(QMessageBox::Warning);
+        //msgBox.exec();
+    }*/
 }
 
 bool QnSingleCameraSettingsWidget::loadSettingsFromXml(const QString& filepath, QString& error)
@@ -409,6 +442,8 @@ void QnSingleCameraSettingsWidget::submitToResource() {
 }
 
 void QnSingleCameraSettingsWidget::updateFromResource() {
+    loadAdvancedSettings();
+
     if(!m_camera) {
         ui->nameEdit->setText(QString());
         ui->checkBoxEnableAudio->setChecked(false);
@@ -564,7 +599,7 @@ void QnSingleCameraSettingsWidget::disconnectFromMotionWidget() {
 void QnSingleCameraSettingsWidget::connectToMotionWidget() {
     assert(m_motionWidget);
 
-    connect(m_motionWidget, SIGNAL(motionRegionListChanged()), this, SLOT(at_dataChanged()), Qt::UniqueConnection);
+    connect(m_motionWidget, SIGNAL(motionRegionListChanged()), this, SLOT(at_dbDataChanged()), Qt::UniqueConnection);
 }
 
 void QnSingleCameraSettingsWidget::updateMotionWidgetNeedControlMaxRect() {
@@ -630,6 +665,11 @@ void QnSingleCameraSettingsWidget::at_motionTypeChanged() {
     updateMotionWidgetNeedControlMaxRect();
     updateMaxFPS();
     updateMotionAvailability();
+}
+
+void QnSingleCameraSettingsWidget::at_advancedSettingsLoaded(int httpStatusCode, const QList<QPair<QString, QVariant> >& params)
+{
+    at_dbDataChanged();
 }
 
 void QnSingleCameraSettingsWidget::updateMaxFPS() {
