@@ -1366,9 +1366,11 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &rec
      * different motion periods several times over the same location. 
      * It makes transparent time slider look better. */
 
-    QnTimePeriodList periods[Qn::TimePeriodRoleCount] = {recorded, motion};
-    QColor pastColor[Qn::TimePeriodRoleCount + 1] = {pastRecordingColor, pastMotionColor, pastBackgroundColor};
-    QColor futureColor[Qn::TimePeriodRoleCount + 1] = {futureRecordingColor, futureMotionColor, futureBackgroundColor};
+    /* Note that constness of period lists is important here as requesting
+     * iterators from a non-const object will result in detach. */
+    const QnTimePeriodList periods[Qn::TimePeriodRoleCount] = {recorded, motion};
+    const QColor pastColor[Qn::TimePeriodRoleCount + 1] = {pastRecordingColor, pastMotionColor, pastBackgroundColor};
+    const QColor futureColor[Qn::TimePeriodRoleCount + 1] = {futureRecordingColor, futureMotionColor, futureBackgroundColor};
 
     QnTimePeriodList::const_iterator pos[Qn::TimePeriodRoleCount];
     QnTimePeriodList::const_iterator end[Qn::TimePeriodRoleCount];
