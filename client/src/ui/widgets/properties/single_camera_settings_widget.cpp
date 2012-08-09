@@ -251,12 +251,12 @@ bool QnSingleCameraSettingsWidget::parseElementXml(const QDomElement &elementXml
         Q_ASSERT(false);
     }
 
-    //QVBoxLayout *layout = dynamic_cast<QVBoxLayout *>((*parentIt)->layout());
-    //if(!layout) {
-    //    delete (*parentIt)->layout();
-    //    (*parentIt)->setLayout(layout = new QVBoxLayout());
-    //}
-    int currNum = (*parentIt)->children().length();
+    QVBoxLayout *layout = dynamic_cast<QVBoxLayout *>((*parentIt)->layout());
+    if(!layout) {
+        delete (*parentIt)->layout();
+        (*parentIt)->setLayout(layout = new QVBoxLayout());
+    }
+    //int currNum = (*parentIt)->children().length();
 
     if (m_widgetsById.find(id) != m_widgetsById.end()) {
         //Id must be unique!
@@ -286,7 +286,7 @@ bool QnSingleCameraSettingsWidget::parseElementXml(const QDomElement &elementXml
             //Unknown widget type!
             Q_ASSERT(false);
     }
-    tabWidget->move(0, 50 * currNum);
+    //tabWidget->move(0, 50 * currNum);
 
     m_widgetsById.insert(id, QWidgetPtr(tabWidget));
 

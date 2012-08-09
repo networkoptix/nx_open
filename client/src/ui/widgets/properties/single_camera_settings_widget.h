@@ -4,7 +4,7 @@
 #include <QtGui/QWidget>
 #include <core/resource/resource_fwd.h>
 #include "camera_settings_tab.h"
-#include "camera_setting_widget.h"
+#include "camera_advanced_settings_widget.h"
 
 
 namespace Ui {
@@ -110,5 +110,32 @@ private:
     CameraSettings m_cameraSettings;
     WidgetsById m_widgetsById;
 };
+
+/*//
+// class OnvifCameraSettingReader
+//
+
+class OnvifCameraSettingReader: public CameraSettingReader
+{
+    static const QString& IMAGING_GROUP_NAME;
+    static const QString& MAINTENANCE_GROUP_NAME;
+
+    OnvifCameraSettingsResp& m_settings;
+
+public:
+    OnvifCameraSettingReader(OnvifCameraSettingsResp& onvifSettings, const QString& filepath);
+    virtual ~OnvifCameraSettingReader();
+
+protected:
+
+    virtual bool isGroupEnabled(const QString& id);
+    virtual bool isParamEnabled(const QString& id, const QString& parentId);
+    virtual void paramFound(const CameraSetting& value, const QString& parentId);
+    virtual void cleanDataOnFail();
+
+private:
+
+    OnvifCameraSettingReader();
+};*/
 
 #endif // CAMERA_SETTINGS_DIALOG_H
