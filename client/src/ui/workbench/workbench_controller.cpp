@@ -1140,8 +1140,9 @@ void QnWorkbenchController::at_display_widgetChanged(Qn::ItemRole role) {
 
     m_widgetByRole[role] = newWidget;
 
-    if(newWidget)
-        newWidget->setFocus();
+    QGraphicsItem *focusItem = display()->scene()->focusItem();
+    if(newWidget && (!focusItem || dynamic_cast<QnResourceWidget *>(focusItem)))
+        newWidget->setFocus(); /* Move focus only if it's not already grabbed by some control element. */
 
     switch(role) {
     case Qn::ZoomedRole:
