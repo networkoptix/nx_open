@@ -334,4 +334,31 @@ public:
     bool setToCamera(OnvifCameraSettingsResp& src) { return m_operation->set(*this, src); }
 };
 
+//
+// class OnvifCameraSettingReader
+//
+
+class OnvifCameraSettingReader: public CameraSettingReader
+{
+    static const QString& IMAGING_GROUP_NAME;
+    static const QString& MAINTENANCE_GROUP_NAME;
+
+    OnvifCameraSettingsResp& m_settings;
+
+public:
+    OnvifCameraSettingReader(OnvifCameraSettingsResp& onvifSettings, const QString& filepath);
+    virtual ~OnvifCameraSettingReader();
+
+protected:
+
+    virtual bool isGroupEnabled(const QString& id);
+    virtual bool isParamEnabled(const QString& id, const QString& parentId);
+    virtual void paramFound(const CameraSetting& value, const QString& parentId);
+    virtual void cleanDataOnFail();
+
+private:
+
+    OnvifCameraSettingReader();
+};
+
 #endif //onvif_resource_settings_h_2250

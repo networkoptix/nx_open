@@ -174,13 +174,6 @@ private:
 
     void save();
 
-    void fetchAndSetCameraSettings(OnvifCameraSettingsResp& onvifSettings);
-    
-    bool loadSettingsFromXml(OnvifCameraSettingsResp& onvifSettings, const QString& filepath, QString& error);
-    bool parseCameraXml(OnvifCameraSettingsResp& onvifSettings, const QDomElement& cameraXml, QString& error);
-    bool parseGroupXml(OnvifCameraSettingsResp& onvifSettings, const QDomElement& groupXml, const QString parentId, QString& error);
-    bool parseElementXml(OnvifCameraSettingsResp& onvifSettings, const QDomElement& elementXml, const QString parentId, QString& error);
-
     int round(float value);
     ResolutionPair getNearestResolutionForSecondary(const ResolutionPair& resolution, float aspectRatio) const;
     ResolutionPair getNearestResolution(const ResolutionPair& resolution, float aspectRatio, double maxResolutionSquare) const;

@@ -112,11 +112,12 @@ public:
     static QString createId(const QString& parentId, const QString& name);
 
     CameraSettingReader(const QString& filepath, const QString& cameraId);
-    ~CameraSettingReader();
+    virtual ~CameraSettingReader();
 
     bool read();
     bool proceed();
-    const CameraSettingsByIds getSettingsByIds() const;
+
+protected:
 
     virtual bool isGroupEnabled(const QString& id) = 0;
     virtual bool isParamEnabled(const QString& id, const QString& parentId) = 0;

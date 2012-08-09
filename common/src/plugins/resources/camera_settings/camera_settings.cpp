@@ -302,6 +302,11 @@ CameraSettingReader::CameraSettingReader(const QString& filepath, const QString&
 {
 }
 
+CameraSettingReader::~CameraSettingReader()
+{
+
+}
+
 bool CameraSettingReader::read()
 {
     QFile file(m_filepath);

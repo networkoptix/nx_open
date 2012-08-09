@@ -1127,3 +1127,80 @@ OnvifCameraSetting& OnvifCameraSetting::operator=(const OnvifCameraSetting& rhs)
 
     return *this;
 }
+
+//
+// class OnvifCameraSettingReader
+//
+
+const QString& OnvifCameraSettingReader::IMAGING_GROUP_NAME = *(new QString(QLatin1String("%%Imaging")));
+const QString& OnvifCameraSettingReader::MAINTENANCE_GROUP_NAME = *(new QString(QLatin1String("%%Maintenance")));
+
+OnvifCameraSettingReader::OnvifCameraSettingReader(OnvifCameraSettingsResp& onvifSettings, const QString& filepath):
+    CameraSettingReader(filepath, QString::fromLatin1("ONVIF")),
+    m_settings(onvifSettings)
+{
+
+}
+
+OnvifCameraSettingReader::~OnvifCameraSettingReader()
+{
+
+}
+
+bool OnvifCameraSettingReader::isGroupEnabled(const QString& id)
+{
+    if (m_settings.isEmpty() && id == IMAGING_GROUP_NAME)
+    {
+        //Group is enabled by default, to disable we should make a record, which equals empty object
+        m_settings.getCameraSettings().insert(id, OnvifCameraSetting());
+
+        return false;
+    }
+
+    return true;
+}
+
+bool OnvifCameraSettingReader::isParamEnabled(const QString& /*id*/, const QString& parentId)
+{
+    if (parentId.startsWith(MAINTENANCE_GROUP_NAME)) {
+        //Maintenance group contains only buttons and so we don't need to create object with
+        //values, so returning false to prevent parsing param values. 
+        //But buttons themselves will be enabled
+        return false;
+    }
+
+    return true;
+}
+
+void OnvifCameraSettingReader::paramFound(const CameraSetting& value, const QString& /*parentId*/)
+{
+    QString id = value.getId();
+    QHash<QString, OnvifCameraSettingOperationAbstract*>::ConstIterator it;
+
+    switch(value.getType())
+    {
+        case CameraSetting::OnOff: case CameraSetting::MinMaxStep: case CameraSetting::Enumeration:
+            it = OnvifCameraSettingOperationAbstract::operations.find(id);
+            if (it == OnvifCameraSettingOperationAbstract::operations.end()) {
+                //Operations must be defined for all settings
+                Q_ASSERT(false);
+            }
+            m_settings.getCameraSettings().insert(id, OnvifCameraSetting(
+                *(it.value()), id, value.getName(), value.getType(), value.getMin(), value.getMax(), value.getStep()));
+            return;
+
+        case CameraSetting::Button:
+            //If absent = enabled
+            return;
+
+        default:
+            //XML must contain only valid types
+            Q_ASSERT(false);
+            return;
+    }
+}
+
+void OnvifCameraSettingReader::cleanDataOnFail()
+{
+    m_settings.getCameraSettings().clear();
+}

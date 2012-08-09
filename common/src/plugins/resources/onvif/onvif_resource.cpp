@@ -1483,7 +1483,17 @@ void QnPlOnvifResource::fetchAndSetCameraSettings()
     }
 
     QAuthenticator auth(getAuth());
-    OnvifCameraSettingsResp* settings = 0;
+    OnvifCameraSettingsResp* settings = new OnvifCameraSettingsResp(imagingUrl.toLatin1().data(), auth.user().toStdString(),
+        auth.password().toStdString(), m_videoSourceToken.toStdString(), getUniqueId());
+
+    if (!imagingUrl.isEmpty()) {
+        settings->makeGetRequest();
+    }
+
+    QString filepath = QString::fromLatin1("C:\\projects\\networkoptix\\netoptix_vms33\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml");
+    OnvifCameraSettingReader reader(*settings, filepath);
+
+    if (reader.read() && reader.proceed())
     {
         m_mutex.lock();
 
@@ -1491,181 +1501,6 @@ void QnPlOnvifResource::fetchAndSetCameraSettings()
             delete m_onvifAdditionalSettings;
         }
 
-        m_onvifAdditionalSettings = new OnvifCameraSettingsResp(imagingUrl.toLatin1().data(), auth.user().toStdString(),
-            auth.password().toStdString(), m_videoSourceToken.toStdString(), getUniqueId());
-
-        settings = m_onvifAdditionalSettings;
+        m_onvifAdditionalSettings = settings;
     }
-
-    if (!imagingUrl.isEmpty()) {
-        settings->makeGetRequest();
-    }
-
-    fetchAndSetCameraSettings(*settings);
-}
-
-void QnPlOnvifResource::fetchAndSetCameraSettings(OnvifCameraSettingsResp& onvifSettings)
-{
-    QString error;
-    QString filepath = QString::fromLatin1("C:\\projects\\networkoptix\\netoptix_vms33\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml");
-
-    if (!loadSettingsFromXml(onvifSettings, filepath, error))
-    {
-        qWarning() << "QnPlOnvifResource::fetchAndSetCameraSettings. Can't load camera settings from xml. Details: " << error;
-    }
-}
-
-bool QnPlOnvifResource::loadSettingsFromXml(OnvifCameraSettingsResp& onvifSettings, const QString& filepath, QString& error)
-{
-    QFile file(filepath);
-
-    if (!file.exists())
-    {
-        error = QLatin1String("Cannot open file ");
-        error += filepath;
-        return false;
-    }
-
-    QString errorStr;
-    int errorLine;
-    int errorColumn;
-    QDomDocument doc;
-
-    if (!doc.setContent(&file, &errorStr, &errorLine, &errorColumn))
-    {
-        QTextStream str(&error);
-        str << QLatin1String("File ") << filepath << QLatin1String("; Parse error at line ") << errorLine << QLatin1String(" column ") << errorColumn << QLatin1String(" : ") << errorStr;
-        return false;
-    }
-
-    QDomElement root = doc.documentElement();
-    if (root.tagName() != QLatin1String("cameras"))
-        return false;
-
-    QDomNode node = root.firstChild();
-
-    while (!node.isNull())
-    {
-        if (node.toElement().tagName() == QLatin1String("camera"))
-        {
-            if (node.attributes().namedItem(QLatin1String("name")).nodeValue() != QLatin1String("ONVIF")) {
-                continue;
-            }
-            return parseCameraXml(onvifSettings, node.toElement(), error);
-        }
-
-        node = node.nextSibling();
-    }
-
-    return true;
-}
-
-bool QnPlOnvifResource::parseCameraXml(OnvifCameraSettingsResp& onvifSettings, const QDomElement& cameraXml, QString& error)
-{
-    if (!parseGroupXml(onvifSettings, cameraXml.firstChildElement(), QLatin1String(""), error)) {
-        onvifSettings.getCameraSettings().clear();
-        return false;
-    }
-
-    return true;
-}
-
-bool QnPlOnvifResource::parseGroupXml(OnvifCameraSettingsResp& onvifSettings, const QDomElement& groupXml, const QString parentId, QString& error)
-{
-    if (groupXml.isNull()) {
-        return true;
-    }
-
-    QString tagName = groupXml.nodeName();
-
-    if (tagName == QLatin1String("param") && !parseElementXml(onvifSettings, groupXml, parentId, error)) {
-        return false;
-    }
-
-    if (tagName == QLatin1String("group"))
-    {
-        QString name = groupXml.attribute(QLatin1String("name"));
-        if (name.isEmpty()) {
-            error += QLatin1String("One of the tags '");
-            error += tagName;
-            error += QLatin1String("' doesn't have attribute 'name'");
-            return false;
-        }
-        QString id = parentId + QLatin1String("%%") + name;
-
-        if (onvifSettings.isEmpty() && id == QLatin1String("%%Imaging"))
-        {
-            onvifSettings.getCameraSettings().insert(id, OnvifCameraSetting());
-        } else {
-            //By default it is assumed that setting that have no value is enabled
-            //cameraSettings.insert(...);
-
-            if (!parseGroupXml(onvifSettings, groupXml.firstChildElement(), id, error)) {
-                return false;
-            }
-        }
-    }
-
-    if (!parseGroupXml(onvifSettings, groupXml.nextSiblingElement(), parentId, error)) {
-        return false;
-    }
-
-    return true;
-}
-
-bool QnPlOnvifResource::parseElementXml(OnvifCameraSettingsResp& onvifSettings, const QDomElement& elementXml, const QString parentId, QString& error)
-{
-    if (elementXml.isNull() || elementXml.nodeName() != QLatin1String("param")) {
-        return true;
-    }
-
-    //Maintenance contains only buttons, so do nothing
-    if (parentId.startsWith(QLatin1String("%%Maintenance"))) {
-        return true;
-    }
-
-    QString name = elementXml.attribute(QLatin1String("name"));
-    if (name.isEmpty()) {
-        error += QLatin1String("One of the tags 'param' doesn't have attribute 'name'");
-        return false;
-    }
-
-    QString id = parentId + QLatin1String("%%") + name;
-
-    QString widgetTypeStr = elementXml.attribute(QLatin1String("widget_type"));
-    if (widgetTypeStr.isEmpty()) {
-        error += QLatin1String("One of the tags 'param' doesn't have attribute 'widget_type'");
-        return false;
-    }
-    CameraSetting::WIDGET_TYPE widgetType = CameraSetting::typeFromStr(widgetTypeStr);
-
-    CameraSettingValue min = CameraSettingValue(elementXml.attribute(QLatin1String("min")));
-    CameraSettingValue max = CameraSettingValue(elementXml.attribute(QLatin1String("max")));
-    CameraSettingValue step = CameraSettingValue(elementXml.attribute(QLatin1String("step")));
-
-    QHash<QString, OnvifCameraSettingOperationAbstract*>::ConstIterator it;
-
-    switch(widgetType)
-    {
-    case CameraSetting::OnOff: case CameraSetting::MinMaxStep: case CameraSetting::Enumeration:
-        it = OnvifCameraSettingOperationAbstract::operations.find(id);
-        if (it == OnvifCameraSettingOperationAbstract::operations.end()) {
-            //Operations must be defined for all settings
-            Q_ASSERT(false);
-        }
-        onvifSettings.getCameraSettings().insert(id, OnvifCameraSetting(*(it.value()), id, name, widgetType, min, max, step));
-        break;
-
-    case CameraSetting::Button:
-        //If absent = enabled
-        //CameraSettingValue tmp(QLatin1String("ENABLED"));
-        //cameraSettings.insert(id, CameraSetting(id, name, widgetType, tmp, tmp, tmp, tmp));
-        break;
-
-    default:
-        error += QLatin1String("One of the tags 'param' has unexpected value of attribute 'widget_type': ") + widgetTypeStr;
-        return false;
-    }
-
-    return true;
 }
