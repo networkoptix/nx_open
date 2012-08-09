@@ -154,7 +154,10 @@ void QnProgressiveDownloadingConsumer::run()
         }
         else {
             d->archiveDP = QSharedPointer<QnArchiveStreamReader> (dynamic_cast<QnArchiveStreamReader*> (resource->createDataProvider(QnResource::Role_Archive)));
-            qint64 timeMs = QDateTime::fromString(position, Qt::ISODate).toMSecsSinceEpoch();
+            bool ok = false;
+            qint64 timeMs = position.toLongLong(&ok); // try UTC format
+            if (!ok)
+                timeMs = QDateTime::fromString(position, Qt::ISODate).toMSecsSinceEpoch(); // try ISO format
             d->archiveDP->jumpTo(timeMs*1000, timeMs*1000);
             d->archiveDP->start();
             dataProvider = d->archiveDP;
