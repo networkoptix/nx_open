@@ -77,8 +77,8 @@ class OnvifCameraSettingOperationEmpty: public OnvifCameraSettingOperationAbstra
 {
 public:
 
-    virtual bool get(CameraSetting&, OnvifCameraSettingsResp&, bool reinitSrc = false) const { return true; };
-    virtual bool set(const CameraSetting&, OnvifCameraSettingsResp&, bool reinitSrc = false) const { return true; };
+    virtual bool get(CameraSetting&, OnvifCameraSettingsResp&, bool reinitSrc = false) const;
+    virtual bool set(const CameraSetting&, OnvifCameraSettingsResp&, bool reinitSrc = false) const;
 };
 
 class ImagingWhiteBalanceYbGainOperation: public OnvifCameraSettingOperationAbstract

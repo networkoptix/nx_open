@@ -185,6 +185,16 @@ bool OnvifCameraSettingOperationAbstract::compareAndSendToCamera(T* field, const
     return true;
 }
 
+bool OnvifCameraSettingOperationEmpty::get(CameraSetting&, OnvifCameraSettingsResp&, bool) const
+{
+    return true;
+}
+
+bool OnvifCameraSettingOperationEmpty::set(const CameraSetting&, OnvifCameraSettingsResp&, bool) const
+{
+    return true;
+}
+
 bool ImagingWhiteBalanceYbGainOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit) const
 {
     if (!reinitSrc(src, reinit)) return false;
@@ -294,7 +304,6 @@ bool ImagingWideDynamicRangeModeOperation::get(CameraSetting& output, OnvifCamer
 {
     if (!reinitSrc(src, reinit)) return false;
 
-    const ImagingOptionsResp& rangesResp = src.getRangesResponse();
     const ImagingSettingsResp& valsResp = src.getValsResponse();
 
     if (!valsResp.ImagingSettings || !valsResp.ImagingSettings->WideDynamicRange)
@@ -313,7 +322,6 @@ bool ImagingWideDynamicRangeModeOperation::set(const CameraSetting& input, Onvif
 {
     if (!reinitSrc(src, reinit)) return false;
 
-    const ImagingOptionsResp& rangesResp = src.getRangesResponse();
     const ImagingSettingsResp& valsResp = src.getValsResponse();
 
     if (!valsResp.ImagingSettings || !valsResp.ImagingSettings->WideDynamicRange)
@@ -333,7 +341,6 @@ bool ImagingWhiteBalanceModeOperation::get(CameraSetting& output, OnvifCameraSet
 {
     if (!reinitSrc(src, reinit)) return false;
 
-    const ImagingOptionsResp& rangesResp = src.getRangesResponse();
     const ImagingSettingsResp& valsResp = src.getValsResponse();
 
     if (!valsResp.ImagingSettings || !valsResp.ImagingSettings->WhiteBalance)
@@ -755,7 +762,6 @@ bool ImagingExposureModeOperation::get(CameraSetting& output, OnvifCameraSetting
 {
     if (!reinitSrc(src, reinit)) return false;
 
-    const ImagingOptionsResp& rangesResp = src.getRangesResponse();
     const ImagingSettingsResp& valsResp = src.getValsResponse();
 
     if (!valsResp.ImagingSettings || !valsResp.ImagingSettings->Exposure)
@@ -929,7 +935,6 @@ bool ImagingBacklightCompensationModeOperation::get(CameraSetting& output, Onvif
 {
     if (!reinitSrc(src, reinit)) return false;
 
-    const ImagingOptionsResp& rangesResp = src.getRangesResponse();
     const ImagingSettingsResp& valsResp = src.getValsResponse();
 
     if (!valsResp.ImagingSettings || !valsResp.ImagingSettings->BacklightCompensation)
@@ -948,7 +953,6 @@ bool ImagingBacklightCompensationModeOperation::set(const CameraSetting& input, 
 {
     if (!reinitSrc(src, reinit)) return false;
 
-    const ImagingOptionsResp& rangesResp = src.getRangesResponse();
     const ImagingSettingsResp& valsResp = src.getValsResponse();
 
     if (!valsResp.ImagingSettings || !valsResp.ImagingSettings->BacklightCompensation)
@@ -1030,12 +1034,12 @@ bool ImagingExposureMaxExposureTimeOperation::set(const CameraSetting& input, On
     return compareAndSendToCamera(valsResp.ImagingSettings->Exposure->MaxExposureTime, static_cast<float>(static_cast<double>(input.getCurrent())), src);
 }
 
-bool MaintenanceSystemRebootOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit) const
+bool MaintenanceSystemRebootOperation::get(CameraSetting& /*output*/, OnvifCameraSettingsResp& /*src*/, bool /*reinit*/) const
 {
     return true;
 }
 
-bool MaintenanceSystemRebootOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit) const
+bool MaintenanceSystemRebootOperation::set(const CameraSetting& /*input*/, OnvifCameraSettingsResp& src, bool /*reinit*/) const
 {
     QString endpoint = src.getEndpointUrl();
     DeviceSoapWrapper soapWrapper(endpoint.toStdString(), src.getLogin().toStdString(), src.getPassword().toStdString());
@@ -1054,12 +1058,12 @@ bool MaintenanceSystemRebootOperation::set(const CameraSetting& input, OnvifCame
     return true;
 }
 
-bool MaintenanceSoftSystemFactoryDefaultOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit) const
+bool MaintenanceSoftSystemFactoryDefaultOperation::get(CameraSetting& /*output*/, OnvifCameraSettingsResp& /*src*/, bool /*reinit*/) const
 {
     return true;
 }
 
-bool MaintenanceSoftSystemFactoryDefaultOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit) const
+bool MaintenanceSoftSystemFactoryDefaultOperation::set(const CameraSetting& /*input*/, OnvifCameraSettingsResp& src, bool /*reinit*/) const
 {
     QString endpoint = src.getEndpointUrl();
     DeviceSoapWrapper soapWrapper(endpoint.toStdString(), src.getLogin().toStdString(), src.getPassword().toStdString());
@@ -1078,12 +1082,12 @@ bool MaintenanceSoftSystemFactoryDefaultOperation::set(const CameraSetting& inpu
     return true;
 }
 
-bool MaintenanceHardSystemFactoryDefaultOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit) const
+bool MaintenanceHardSystemFactoryDefaultOperation::get(CameraSetting& /*output*/, OnvifCameraSettingsResp& /*src*/, bool /*reinit*/) const
 {
     return true;
 }
 
-bool MaintenanceHardSystemFactoryDefaultOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit) const
+bool MaintenanceHardSystemFactoryDefaultOperation::set(const CameraSetting& /*input*/, OnvifCameraSettingsResp& src, bool /*reinit*/) const
 {
     QString endpoint = src.getEndpointUrl();
     DeviceSoapWrapper soapWrapper(endpoint.toStdString(), src.getLogin().toStdString(), src.getPassword().toStdString());
