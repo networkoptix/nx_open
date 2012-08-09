@@ -276,3 +276,191 @@ bool CameraSetting::isDisabled() const
     return static_cast<QString>(m_current).isEmpty() ||
         m_type != Enumeration && m_min == m_max;
 }
+
+//
+// class CameraSettingReader
+//
+
+const QString& CameraSettingReader::ID_SEPARATOR = *(new QString(QLatin1String("%%")));
+const QString& CameraSettingReader::TAG_GROUP = *(new QString(QLatin1String("group")));
+const QString& CameraSettingReader::TAG_PARAM = *(new QString(QLatin1String("param")));
+const QString& CameraSettingReader::ATTR_ID = *(new QString(QLatin1String("id")));
+const QString& CameraSettingReader::ATTR_NAME = *(new QString(QLatin1String("name")));
+const QString& CameraSettingReader::ATTR_WIDGET_TYPE = *(new QString(QLatin1String("widget_type")));
+const QString& CameraSettingReader::ATTR_MIN = *(new QString(QLatin1String("min")));
+const QString& CameraSettingReader::ATTR_MAX = *(new QString(QLatin1String("max")));
+const QString& CameraSettingReader::ATTR_STEP = *(new QString(QLatin1String("step")));
+
+QString CameraSettingReader::createId(const QString& parentId, const QString& name)
+{
+    return parentId + ID_SEPARATOR + name;
+}
+
+CameraSettingReader::CameraSettingReader(const QString& filepath, const QString& cameraId) :
+    m_filepath(filepath),
+    m_cameraId(cameraId)
+{
+}
+
+bool CameraSettingReader::read()
+{
+    QFile file(m_filepath);
+
+    if (!file.exists())
+    {
+        qWarning() << "Cannot open file '" << m_filepath << "'";
+        return false;
+    }
+
+    QString errorStr;
+    int errorLine;
+    int errorColumn;
+
+    if (!m_doc.setContent(&file, &errorStr, &errorLine, &errorColumn))
+    {
+        qWarning() << "File '" << m_filepath << "'. Parse error at line: " << errorLine << ", column: " << errorColumn << ", error: " << errorStr;
+        return false;
+    }
+
+    return true;
+}
+
+bool CameraSettingReader::proceed()
+{
+    QDomElement root = m_doc.documentElement();
+    if (root.tagName() != QLatin1String("cameras"))
+        return false;
+
+    QDomNode node = root.firstChild();
+
+    while (!node.isNull())
+    {
+        if (node.toElement().tagName() == QLatin1String("camera"))
+        {
+            if (node.attributes().namedItem(ATTR_NAME).nodeValue() != QLatin1String("ONVIF")) {
+                continue;
+            }
+            return parseCameraXml(node.toElement());
+        }
+
+        node = node.nextSibling();
+    }
+
+    qWarning() << "File '" << m_filepath << "'. Can't find camera: " << m_cameraId;
+
+    return true;
+}
+
+/*void CameraSettingReader::groupFound(const CameraSetting& value)
+{
+    QString id = value.getId();
+    CameraSettingsByIds::ConstIterator it = m_settingsByIds.find(id);
+
+    if (it != m_settingsByIds.end()) {
+        //id must be unique
+        Q_ASSERT(false);
+    }
+
+    m_settingsByIds.insert(id, value);
+}
+
+void CameraSettingReader::paramFound(const CameraSetting& value)
+{
+    QString id = value.getId();
+    CameraSettingsByIds::ConstIterator it = m_settingsByIds.find(id);
+
+    if (it != m_settingsByIds.end()) {
+        //id must be unique
+        Q_ASSERT(false);
+    }
+
+    m_settingsByIds.insert(id, value);
+}*/
+
+bool CameraSettingReader::parseCameraXml(const QDomElement& cameraXml)
+{
+    if (!parseGroupXml(cameraXml.firstChildElement(), QLatin1String(""))) {
+        cleanDataOnFail();
+        return false;
+    }
+
+    return true;
+}
+
+bool CameraSettingReader::parseGroupXml(const QDomElement& groupXml, const QString parentId)
+{
+    if (groupXml.isNull()) {
+        return true;
+    }
+
+    QString tagName = groupXml.nodeName();
+
+    if (tagName == TAG_PARAM && !parseElementXml(groupXml, parentId)) {
+        return false;
+    }
+
+    if (tagName == TAG_GROUP)
+    {
+        QString name = groupXml.attribute(ATTR_NAME);
+        if (name.isEmpty()) {
+            qWarning() << "File '" << m_filepath << "' has tag '" << TAG_GROUP << "' w/o attribute '" << ATTR_NAME << "'";
+            return false;
+        }
+        QString id = createId(parentId, name);
+
+        if (isGroupEnabled(id) && !parseGroupXml(groupXml.firstChildElement(), id))
+        {
+            return false;
+        }
+    }
+
+    if (!parseGroupXml(groupXml.nextSiblingElement(), parentId)) {
+        return false;
+    }
+
+    return true;
+}
+
+bool CameraSettingReader::parseElementXml(const QDomElement& elementXml, const QString parentId)
+{
+    if (elementXml.isNull() || elementXml.nodeName() != TAG_PARAM) {
+        return true;
+    }
+
+    QString name = elementXml.attribute(ATTR_NAME);
+    if (name.isEmpty()) {
+        qWarning() << "File '" << m_filepath << "' has tag '" << TAG_PARAM << "' w/o attribute '" << ATTR_NAME << "'";
+        return false;
+    }
+
+    QString id = createId(parentId, name);
+
+    if (!isParamEnabled(id, parentId)) {
+        return true;
+    }
+
+    QString widgetTypeStr = elementXml.attribute(ATTR_WIDGET_TYPE);
+    if (widgetTypeStr.isEmpty()) {
+        qWarning() << "File '" << m_filepath << "' has tag '" << TAG_PARAM << "' w/o attribute '" << ATTR_WIDGET_TYPE << "'";
+        return false;
+    }
+    CameraSetting::WIDGET_TYPE widgetType = CameraSetting::typeFromStr(widgetTypeStr);
+
+    CameraSettingValue min = CameraSettingValue(elementXml.attribute(ATTR_MIN));
+    CameraSettingValue max = CameraSettingValue(elementXml.attribute(ATTR_MAX));
+    CameraSettingValue step = CameraSettingValue(elementXml.attribute(ATTR_STEP));
+
+    switch(widgetType)
+    {
+    case CameraSetting::OnOff: case CameraSetting::MinMaxStep: case CameraSetting::Enumeration: case CameraSetting::Button:
+        paramFound(CameraSetting(id, name, widgetType, min, max, step), parentId);
+        return true;
+
+    default:
+        qWarning() << "File '" << m_filepath << "' has tag '" << TAG_PARAM << "' has unexpected value of attribute '"
+            << ATTR_WIDGET_TYPE << "': " << widgetTypeStr;
+        return false;
+    }
+
+    return true;
+}

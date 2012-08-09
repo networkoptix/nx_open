@@ -1,6 +1,8 @@
 #ifndef camera_settings_h_1726
 #define camera_settings_h_1726
 
+#include "qdom.h"
+
 class CameraSettingValue
 {
     QString value;
@@ -85,6 +87,48 @@ private:
     CameraSettingValue m_max;
     CameraSettingValue m_step;
     CameraSettingValue m_current;
+};
+
+typedef QHash<QString, CameraSetting> CameraSettingsByIds;
+
+class CameraSettingReader
+{
+    QDomDocument m_doc;
+    QString m_filepath;
+    QString m_cameraId;
+
+public:
+
+    static const QString& ID_SEPARATOR;
+    static const QString& TAG_GROUP;
+    static const QString& TAG_PARAM;
+    static const QString& ATTR_ID;
+    static const QString& ATTR_NAME;
+    static const QString& ATTR_WIDGET_TYPE;
+    static const QString& ATTR_MIN;
+    static const QString& ATTR_MAX;
+    static const QString& ATTR_STEP;
+
+    static QString createId(const QString& parentId, const QString& name);
+
+    CameraSettingReader(const QString& filepath, const QString& cameraId);
+    ~CameraSettingReader();
+
+    bool read();
+    bool proceed();
+    const CameraSettingsByIds getSettingsByIds() const;
+
+    virtual bool isGroupEnabled(const QString& id) = 0;
+    virtual bool isParamEnabled(const QString& id, const QString& parentId) = 0;
+    virtual void paramFound(const CameraSetting& value, const QString& parentId) = 0;
+    virtual void cleanDataOnFail() = 0;
+
+private:
+
+    CameraSettingReader();
+    bool parseCameraXml(const QDomElement& cameraXml);
+    bool parseGroupXml(const QDomElement& groupXml, const QString parentId);
+    bool parseElementXml(const QDomElement& elementXml, const QString parentId);
 };
 
 #endif //camera_settings_h_1726
