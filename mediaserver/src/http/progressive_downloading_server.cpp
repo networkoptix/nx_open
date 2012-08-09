@@ -122,8 +122,8 @@ void QnProgressiveDownloadingConsumer::run()
 
     QnAbstractMediaStreamDataProviderPtr dataProvider;
 
-    d->socket->setReadTimeOut(1000*1000);
-    d->socket->setWriteTimeOut(1000*1000);
+    d->socket->setReadTimeOut(CONNECTION_TIMEOUT);
+    d->socket->setWriteTimeOut(CONNECTION_TIMEOUT);
 
     if (readRequest())
     {
