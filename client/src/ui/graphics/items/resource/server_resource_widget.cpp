@@ -179,6 +179,9 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(at_timer_timeout()));
     timer->start(REQUEST_TIME);
+
+    /* Run handlers. */
+    updateButtonsVisibility();
 }
 
 QnServerResourceWidget::~QnServerResourceWidget() {

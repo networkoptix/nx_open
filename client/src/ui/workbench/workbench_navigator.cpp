@@ -693,8 +693,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
     }
 
     m_timeSlider->setRange(startTimeMSec, endTimeMSec);
-    m_calendar->setDateRange(QDateTime::fromMSecsSinceEpoch(startTimeMSec).date(),
-        QDateTime::fromMSecsSinceEpoch(endTimeMSec).date());
+    m_calendar->setDateRange(QDateTime::fromMSecsSinceEpoch(startTimeMSec).date(), QDateTime::fromMSecsSinceEpoch(endTimeMSec).date());
 
     if(!m_pausedOverride) {
         qint64 timeUSec = m_currentMediaWidget->display()->camDisplay()->isRealTimeSource() ? DATETIME_NOW : m_currentMediaWidget->display()->camera()->getCurrentTime();
@@ -703,7 +702,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
         if (timeUSec != DATETIME_NOW && timeUSec != AV_NOPTS_VALUE){
             qint64 now = QDateTime::currentDateTimeUtc().toMSecsSinceEpoch();
             if (m_lastUpdateSlider && m_lastCameraTime == timeMSec){
-                timeMSec += (now - m_lastUpdateSlider) * this->speed();
+                timeMSec += (now - m_lastUpdateSlider) * speed();
             } else {
                 m_lastCameraTime = timeMSec;
                 m_lastUpdateSlider = now;
