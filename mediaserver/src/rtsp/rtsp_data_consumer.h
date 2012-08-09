@@ -58,6 +58,7 @@ public:
     // put data without mutex. Used for RTSP connection after lockDataQueue
     void addData(QnAbstractMediaDataPtr data);
     void setUseRealTimeStreamingMode(bool value);
+    void setUseUTCTime(bool value);
 protected:
     void buildRtspTcpHeader(quint8 channelNum, quint32 ssrc, quint16 len, int markerBit, quint32 timestamp, quint8 payloadType);
     //QnMediaContextPtr getGeneratedContext(CodecID compressionType);
@@ -104,6 +105,6 @@ private:
     qint64 m_rtStartTime; // used for realtime streaming mode
     qint64 m_lastRtTime; // used for realtime streaming mode
     QnAdaptiveSleep m_adaptiveSleep;
+    bool m_useUTCTime; // use absolute UTC file for RTP (used for proprietary format)
 };
-
 #endif // __RTSP_DATA_CONSUMER_H__
