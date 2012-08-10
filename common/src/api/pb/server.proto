@@ -21,4 +21,5 @@ message Server {
     optional string       netAddrList  = 2;
     optional bool         reserve      = 3;
     repeated Storage      storage      = 4;
+    optional bool         panicMode        = 5;
 }
