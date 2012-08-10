@@ -104,12 +104,12 @@ void QnVideoServerResource::setStorages(const QnAbstractStorageResourceList &sto
 class QnEmptyDataProvider: public QnAbstractMediaStreamDataProvider{
 public:
     QnEmptyDataProvider(QnResourcePtr resource): QnAbstractMediaStreamDataProvider(resource){}
-protected:
-    virtual QnAbstractMediaDataPtr getNextData() override{
-        QnAbstractMediaDataPtr data(new QnAbstractMediaData(0, 1));
-        return data;}
-};
 
+protected:
+    virtual QnAbstractMediaDataPtr getNextData() override {
+        return QnAbstractMediaDataPtr(new QnAbstractMediaData(0, 1));
+    }
+};
 
 QnAbstractStreamDataProvider* QnVideoServerResource::createDataProviderInternal(ConnectionRole ){
     return new QnEmptyDataProvider(toSharedPointer());
@@ -166,6 +166,19 @@ void QnVideoServerResource::setReserve(bool reserve)
 bool QnVideoServerResource::getReserve() const
 {
     return m_reserve;
+}
+
+bool QnVideoServerResource::isPanicMode() const {
+    return m_panicMode;
+}
+
+void QnVideoServerResource::setPanicMode(bool panicMode) {
+    if(m_panicMode == panicMode)
+        return;
+
+    m_panicMode = panicMode;
+
+    emit panicModeChanged();
 }
 
 void QnVideoServerResource::determineOptimalNetIF()
