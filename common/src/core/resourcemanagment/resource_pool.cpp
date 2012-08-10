@@ -4,7 +4,7 @@
 
 #include "utils/common/warnings.h"
 #include "utils/common/checked_cast.h"
-#include "core/resource/video_server.h"
+#include "core/resource/video_server_resource.h"
 #include "core/resource/layout_resource.h"
 #include "core/resource/user_resource.h"
 #include "core/resource/camera_resource.h"

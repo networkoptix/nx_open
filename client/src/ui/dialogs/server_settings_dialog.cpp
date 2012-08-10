@@ -14,7 +14,7 @@
 #include <utils/common/counter.h>
 
 #include <core/resource/storage_resource.h>
-#include <core/resource/video_server.h>
+#include <core/resource/video_server_resource.h>
 
 static const qint64 MIN_RECORD_FREE_SPACE = 1000ll * 1000ll * 1000ll * 5;
 

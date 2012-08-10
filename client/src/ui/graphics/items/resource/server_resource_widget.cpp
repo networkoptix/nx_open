@@ -5,7 +5,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 
-#include <core/resource/video_server.h>
+#include <core/resource/video_server_resource.h>
 #include <api/video_server_connection.h>
 
 #include <ui/style/globals.h>

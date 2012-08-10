@@ -1,4 +1,4 @@
-#include "video_server.h"
+#include "video_server_resource.h"
 
 #include <QtCore/QUrl>
 #include "utils/common/delete_later.h"

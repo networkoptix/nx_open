@@ -10,7 +10,7 @@
 #include "core/misc/scheduleTask.h"
 #include "server_stream_recorder.h"
 #include "utils/common/synctime.h"
-#include "core/resource/video_server.h"
+#include "core/resource/video_server_resource.h"
 #include "core/resource/resource_fwd.h"
 #include "core/resource/camera_resource.h"
 #include "core/resource/camera_history.h"

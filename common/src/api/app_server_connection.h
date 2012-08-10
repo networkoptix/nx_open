@@ -9,7 +9,7 @@
 #include "core/resource/resource_type.h"
 #include "core/resource/resource.h"
 #include "core/resource/network_resource.h"
-#include "core/resource/video_server.h"
+#include "core/resource/video_server_resource.h"
 #include "core/resource/storage_resource.h"
 #include "core/misc/scheduleTask.h"
 #include "core/resource/camera_resource.h"

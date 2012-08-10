@@ -27,7 +27,7 @@
 #include "recording/file_deletor.h"
 #include "rest/server/rest_server.h"
 #include "rest/handlers/recorded_chunks.h"
-#include "core/resource/video_server.h"
+#include "core/resource/video_server_resource.h"
 #include "api/session_manager.h"
 #include <signal.h>
 #include "core/misc/scheduleTask.h"
