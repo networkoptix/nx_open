@@ -15,26 +15,26 @@
 
 class QnResource;
 typedef QnSharedResourcePointer<QnResource> QnResourcePtr;
-typedef QnSharedResourcePointerList<QnResourcePtr> QnResourceList;
+typedef QnSharedResourcePointerList<QnResource> QnResourceList;
 
 class QnVirtualCameraResource;
 typedef QnSharedResourcePointer<QnVirtualCameraResource> QnVirtualCameraResourcePtr;
-typedef QnSharedResourcePointerList<QnVirtualCameraResourcePtr> QnVirtualCameraResourceList;
+typedef QnSharedResourcePointerList<QnVirtualCameraResource> QnVirtualCameraResourceList;
 
 class QnPhysicalCameraResource;
 typedef QnSharedResourcePointer<QnPhysicalCameraResource> QnPhysicalCameraResourcePtr;
-typedef QnSharedResourcePointerList<QnPhysicalCameraResourcePtr> QnPhysicalCameraResourceList;
+typedef QnSharedResourcePointerList<QnPhysicalCameraResource> QnPhysicalCameraResourceList;
 
 class QnLayoutResource;
 typedef QnSharedResourcePointer<QnLayoutResource> QnLayoutResourcePtr;
-typedef QnSharedResourcePointerList<QnLayoutResourcePtr> QnLayoutResourceList;
+typedef QnSharedResourcePointerList<QnLayoutResource> QnLayoutResourceList;
 
 class QnLayoutItemIndex;
-typedef QnSharedResourcePointerList<QnLayoutItemIndex> QnLayoutItemIndexList;
+typedef QList<QnLayoutItemIndex> QnLayoutItemIndexList;
 
 class QnMediaResource;
 typedef QnSharedResourcePointer<QnMediaResource> QnMediaResourcePtr;
-typedef QnSharedResourcePointerList<QnMediaResourcePtr> QnMediaResourceList;
+typedef QnSharedResourcePointerList<QnMediaResource> QnMediaResourceList;
 
 class QnAbstractArchiveResource;
 typedef QnSharedResourcePointer<QnAbstractArchiveResource> QnAbstractArchiveResourcePtr;
@@ -42,41 +42,46 @@ typedef QnSharedResourcePointerList<QnAbstractArchiveResource> QnAbstractArchive
 
 class QnNetworkResource;
 typedef QnSharedResourcePointer<QnNetworkResource> QnNetworkResourcePtr;
-typedef QnSharedResourcePointerList<QnNetworkResourcePtr> QnNetworkResourceList;
+typedef QnSharedResourcePointerList<QnNetworkResource> QnNetworkResourceList;
 
 class QnSecurityCamResource;
 typedef QnSharedResourcePointer<QnSecurityCamResource> QnSecurityCamResourcePtr;
-typedef QnSharedResourcePointerList<QnSecurityCamResourcePtr> QnSecurityCamResourceList;
+typedef QnSharedResourcePointerList<QnSecurityCamResource> QnSecurityCamResourceList;
 
 class QnStorageResource;
 typedef QnSharedResourcePointer<QnStorageResource> QnStorageResourcePtr;
+typedef QnSharedResourcePointerList<QnStorageResource> QnStorageResourceList;
 
 class QnAbstractStorageResource;
 typedef QnSharedResourcePointer<QnAbstractStorageResource> QnAbstractStorageResourcePtr;
-typedef QnSharedResourcePointerList<QnAbstractStorageResourcePtr> QnAbstractStorageResourceList;
+typedef QnSharedResourcePointerList<QnAbstractStorageResource> QnAbstractStorageResourceList;
 
 class QnUserResource;
 typedef QnSharedResourcePointer<QnUserResource> QnUserResourcePtr;
-typedef QnSharedResourcePointerList<QnUserResourcePtr> QnUserResourceList;
+typedef QnSharedResourcePointerList<QnUserResource> QnUserResourceList;
 
 class QnVideoServerResource;
 typedef QnSharedResourcePointer<QnVideoServerResource> QnVideoServerResourcePtr;
-typedef QnSharedResourcePointerList<QnVideoServerResourcePtr> QnVideoServerResourceList;
+typedef QnSharedResourcePointerList<QnVideoServerResource> QnVideoServerResourceList;
 
 class QnLocalVideoServerResource;
 typedef QnSharedResourcePointer<QnLocalVideoServerResource> QnLocalVideoServerResourcePtr;
-typedef QnSharedResourcePointerList<QnLocalVideoServerResourcePtr> QnLocalVideoServerResourceList;
+typedef QnSharedResourcePointerList<QnLocalVideoServerResource> QnLocalVideoServerResourceList;
 
 class QnPlColdStoreStorage;
 typedef QnSharedResourcePointer<QnPlColdStoreStorage> QnPlColdStoreStoragePtr;
+typedef QnSharedResourcePointerList<QnPlColdStoreStorage> QnPlColdStoreStorageList;
 
 class QnPlAxisResource;
 typedef QnSharedResourcePointer<QnPlAxisResource> QnPlAxisResourcePtr;
+typedef QnSharedResourcePointerList<QnPlAxisResource> QnPlAxisResourceList;
 
 class QnPlOnvifResource;
 typedef QnSharedResourcePointer<QnPlOnvifResource> QnPlOnvifResourcePtr;
+typedef QnSharedResourcePointerList<QnPlOnvifResource> QnPlOnvifResourceList;
 
 class QnPlIsdResource;
 typedef QnSharedResourcePointer<QnPlIsdResource> QnPlIsdResourcePtr;
+typedef QnSharedResourcePointerList<QnPlIsdResource> QnPlIsdResourceList;
 
 #endif // QN_RESOURCE_FWD_H

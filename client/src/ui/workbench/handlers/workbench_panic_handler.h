@@ -12,8 +12,8 @@ public:
     virtual ~QnWorkbenchPanicHandler();
 
 
-protected slots:
-    void at_
+//protected slots:
+    //void at_
 
 private:
 

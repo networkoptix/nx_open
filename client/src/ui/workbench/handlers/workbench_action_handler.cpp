@@ -526,7 +526,7 @@ void QnWorkbenchActionHandler::submitDelayedDrops() {
         data.toMimeData(&mimeData);
 
         QnResourceList resources = QnWorkbenchResource::deserializeResources(&mimeData);
-        QnResourceList layouts = QnResourceCriterion::filter<QnLayoutResource, QnResourceList>(resources);
+        QnLayoutResourceList layouts = resources.filtered<QnLayoutResource>();
         if (!layouts.isEmpty()){
             workbench()->clear();
             menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
@@ -549,7 +549,7 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
 
     /* Open all user's layouts. */
     if(qnSettings->isLayoutsOpenedOnLogin()) {
-        QnResourceList layouts = QnResourceCriterion::filter<QnLayoutResource, QnResourceList>(context()->resourcePool()->getResourcesWithParentId(user->getId()));
+        QnLayoutResourceList layouts = context()->resourcePool()->getResourcesWithParentId(user->getId()).filtered<QnLayoutResource>();
         menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
     }
     
@@ -630,7 +630,8 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
         return;
     }
 
-    QnResourceList resources = QnResourceCriterion::filter<QnResource>(parameters.resources());
+    // TODO: server & media resources only!
+    QnResourceList resources = parameters.resources();
     if(!resources.isEmpty()) {
         addToLayout(layout, resources, !position.isNull(), position);
         return;
@@ -649,12 +650,13 @@ void QnWorkbenchActionHandler::at_openInNewLayoutAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_openInNewWindowAction_triggered() {
-    QnResourceList medias = QnResourceCriterion::filter<QnResource, QnResourceList>(menu()->currentParameters(sender()).resources());
-    if(medias.isEmpty()) 
+    // TODO: server & media resources only!
+    QnResourceList resources = menu()->currentParameters(sender()).resources();
+    if(resources.isEmpty()) 
         return;
     
     QMimeData mimeData;
-    QnWorkbenchResource::serializeResources(medias, QnWorkbenchResource::resourceMimeTypes(), &mimeData);
+    QnWorkbenchResource::serializeResources(resources, QnWorkbenchResource::resourceMimeTypes(), &mimeData);
     QnMimeData data(&mimeData);
     QByteArray serializedData;
     QDataStream stream(&serializedData, QIODevice::WriteOnly);
@@ -684,12 +686,15 @@ void QnWorkbenchActionHandler::at_openLayoutsAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_openNewWindowLayoutsAction_triggered() {
-    QnResourceList medias = QnResourceCriterion::filter<QnLayoutResource, QnResourceList>(menu()->currentParameters(sender()).resources());
-    if(medias.isEmpty()) 
+    // TODO: #GDM this won't work for layouts that are not saved. (de)serialization of layouts is not implemented.
+    // TODO: #GDM avoid copypasta.
+
+    QnLayoutResourceList layouts = menu()->currentParameters(sender()).resources().filtered<QnLayoutResource>();
+    if(layouts.isEmpty()) 
         return;
 
     QMimeData mimeData;
-    QnWorkbenchResource::serializeResources(medias, QnWorkbenchResource::resourceMimeTypes(), &mimeData);
+    QnWorkbenchResource::serializeResources(layouts, QnWorkbenchResource::resourceMimeTypes(), &mimeData);
     QnMimeData data(&mimeData);
     QByteArray serializedData;
     QDataStream stream(&serializedData, QIODevice::WriteOnly);
@@ -834,7 +839,7 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
     QnVideoServerResourcePtr server = parameters.argument<QnVideoServerResourcePtr>(Qn::ServerParameter);
     if(!server)
         return;
-    QnVirtualCameraResourceList serverCameras = QnResourceCriterion::filter<QnVirtualCameraResource>(resourcePool()->getResourcesWithParentId(server->getId()));
+    QnVirtualCameraResourceList serverCameras = resourcePool()->getResourcesWithParentId(server->getId()).filtered<QnVirtualCameraResource>();
 
     QnVirtualCameraResourceList modifiedResources;
     QnResourceList errorResources;
@@ -901,7 +906,7 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
 void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
 
-    QnResourceList layouts = QnResourceCriterion::filter<QnLayoutResource, QnResourceList>(parameters.resources());
+    QnLayoutResourceList layouts = parameters.resources().filtered<QnLayoutResource>();
     if(!layouts.empty()) {
         menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
     } else {
@@ -913,7 +918,7 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
 void QnWorkbenchActionHandler::at_dropResourcesIntoNewLayoutAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
 
-    QnResourceList layouts = QnResourceCriterion::filter<QnLayoutResource, QnResourceList>(parameters.resources());
+    QnLayoutResourceList layouts = parameters.resources().filtered<QnLayoutResource>();
     if(layouts.empty()) /* That's media drop, open new layout. */
         menu()->trigger(Qn::OpenNewTabAction);
 
@@ -961,7 +966,7 @@ void QnWorkbenchActionHandler::at_openLayoutAction_triggered() {
     dialog->setNameFilters(filters);
 
     if(dialog->exec())
-        menu()->trigger(Qn::DropResourcesAction, QnResourceCriterion::filter<QnLayoutResource, QnResourceList>(addToResourcePool(dialog->selectedFiles())));
+        menu()->trigger(Qn::DropResourcesAction, addToResourcePool(dialog->selectedFiles()).filtered<QnLayoutResource>());
 }
 
 void QnWorkbenchActionHandler::at_openFolderAction_triggered() {
@@ -1136,7 +1141,7 @@ void QnWorkbenchActionHandler::at_quickSearchAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
-    QnResourceList resources = QnResourceCriterion::filter<QnVirtualCameraResource, QnResourceList>(menu()->currentParameters(sender()).resources());
+    QnVirtualCameraResourceList resources = menu()->currentParameters(sender()).resources().filtered<QnVirtualCameraResource>();
 
     bool newlyCreated = false;
     if(!cameraSettingsDialog()) {
@@ -1196,7 +1201,7 @@ void QnWorkbenchActionHandler::at_selectionChangeAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
-    QnVideoServerResourceList resources = QnResourceCriterion::filter<QnVideoServerResource>(menu()->currentParameters(sender()).resources());
+    QnVideoServerResourceList resources = menu()->currentParameters(sender()).resources().filtered<QnVideoServerResource>();
     if(resources.size() != 1)
         return;
 
@@ -1406,7 +1411,7 @@ void QnWorkbenchActionHandler::at_exitAction_triggered() {
     if(cameraSettingsDialog() && cameraSettingsDialog()->isVisible())
         menu()->trigger(Qn::OpenInCameraSettingsDialogAction, QnResourceList());
 
-    if(closeLayouts(QnResourceCriterion::filter<QnLayoutResource>(resourcePool()->getResources()), true))
+    if(closeLayouts(resourcePool()->getResources().filtered<QnLayoutResource>(), true))
         qApp->closeAllWindows();
 }
 
@@ -1914,7 +1919,7 @@ void QnWorkbenchActionHandler::at_resources_saved(int status, const QByteArray& 
     if(status == 0)
         return;
 
-    QnLayoutResourceList layoutResources = QnResourceCriterion::filter<QnLayoutResource>(resources);
+    QnLayoutResourceList layoutResources = resources.filtered<QnLayoutResource>();
     QnLayoutResourceList reopeningLayoutResources;
     foreach(const QnLayoutResourcePtr &layoutResource, layoutResources)
         if(snapshotManager()->isLocal(layoutResource) && !QnWorkbenchLayout::instance(layoutResource))
