@@ -27,7 +27,7 @@ public:
     void setMaxStoreTime(int timeInSeconds);
     int getMaxStoreTime() const;
 
-    float bitrate() const;
+    virtual float bitrate() const;
     void addBitrate(QnAbstractMediaStreamDataProvider* provider);
     void releaseBitrate(QnAbstractMediaStreamDataProvider* provider);
 
