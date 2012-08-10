@@ -1984,7 +1984,7 @@ void QnWorkbenchActionHandler::at_resources_statusSaved(int status, const QByteA
 }
 
 void QnWorkbenchActionHandler::at_togglePanicModeAction_toggled(bool checked) {
-    QnVideoServerResourceList resources = QnResourceCriterion::filter<QnVideoServerResource>(resourcePool()->getResources());
+    QnVideoServerResourceList resources = resourcePool()->getResources().filtered<QnVideoServerResource>();
 
     foreach(QnVideoServerResourcePtr resource, resources) {
         resource->setPanicMode(checked);
