@@ -2,6 +2,9 @@ package pb;
 
 import "resource.proto";
 
+option java_package = "com.networkoptix.hdwitness.protobuf";
+option java_outer_classname = "LayoutProtos";
+
 message Layout {
     extend Resource {
         required Layout resource = 103;

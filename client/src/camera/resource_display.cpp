@@ -5,9 +5,9 @@
 #include <core/resource/media_resource.h>
 #include <core/resource/video_server.h>
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
-#include <camera/camdisplay.h>
-#include <camera/camera.h>
-#include <camera/abstractrenderer.h>
+#include <camera/cam_display.h>
+#include <camera/video_camera.h>
+#include <camera/abstract_renderer.h>
 #include <utils/common/warnings.h>
 #include <utils/common/counter.h>
 
@@ -37,7 +37,7 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
 
         if(m_mediaProvider != NULL) {
             /* Camera will free media provider in its destructor. */
-            m_camera = new CLVideoCamera(m_mediaResource, false, m_mediaProvider);
+            m_camera = new QnVideoCamera(m_mediaResource, false, m_mediaProvider);
 
             connect(this,                           SIGNAL(destroyed()),    m_camera,   SLOT(beforeStopDisplay()));
 
@@ -61,7 +61,7 @@ QnResourceDisplay::~QnResourceDisplay() {
     disconnectFromResource();
 }
 
-void QnResourceDisplay::cleanUp(CLLongRunnable *runnable) const {
+void QnResourceDisplay::cleanUp(QnLongRunnable *runnable) const {
     if(runnable == NULL)
         return;
 
@@ -72,7 +72,7 @@ void QnResourceDisplay::cleanUp(CLLongRunnable *runnable) const {
     }
 }
 
-CLCamDisplay *QnResourceDisplay::camDisplay() const {
+QnCamDisplay *QnResourceDisplay::camDisplay() const {
     if(m_camera == NULL)
         return NULL;
 
@@ -176,8 +176,6 @@ bool QnResourceDisplay::isPaused() {
 }
 
 bool QnResourceDisplay::isStillImage() const {
-    if (resource().dynamicCast<QnVideoServerResource>())
-        return true;
     return m_camera->getCamDisplay()->isStillImage();
 }
 

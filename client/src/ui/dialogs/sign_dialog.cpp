@@ -4,17 +4,17 @@
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 
-#include "camera/camera.h"
+#include "camera/video_camera.h"
 #include "camera/gl_renderer.h"
-#include "camera/camdisplay.h"
+#include "camera/cam_display.h"
 #include "camera/sync_dialog_display.h"
 
-#include "ui/graphics/items/resource_widget_renderer.h"
+#include "ui/graphics/items/resource/resource_widget_renderer.h"
 
 #include "decoders/video/ffmpeg.h"
 #include "export/sign_helper.h"
 
-
+// TODO: replace with QnRenderingWidget
 class QnSignDialogGlWidget: public QGLWidget
 {
 public:
@@ -70,12 +70,12 @@ private:
 SignDialog::SignDialog(const QString& fileName, QWidget *parent) :
     QDialog(parent, Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint),
     ui(new Ui::SignDialog),
-    m_requestHandle(-1),
-    m_camDispay(0),
-    m_reader(0),
     m_fileName(fileName),
-    m_renderer(0),
-    m_glWindow(0)
+    m_camDispay(NULL),
+    m_reader(NULL),
+    m_renderer(NULL),
+    m_glWindow(NULL),
+    m_requestHandle(-1)
 {
     ui->setupUi(this);
 

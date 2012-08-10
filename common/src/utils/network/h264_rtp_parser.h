@@ -34,10 +34,10 @@ private:
     int m_prevSequenceNum;
 
     QnCompressedVideoDataPtr m_videoData;
-    CLByteArray m_videoBuffer;
+    QnByteArray m_videoBuffer;
     bool m_frameExists;
 private:
-    void serializeSpsPps(CLByteArray& dst);
+    void serializeSpsPps(QnByteArray& dst);
     void decodeSpsInfo(const QByteArray& data);
     QnCompressedVideoDataPtr createVideoData(quint32 rtpTime, const RtspStatistic& statistics);
     bool clearInternalBuffer(); // function always returns false to convenient exit from main routine

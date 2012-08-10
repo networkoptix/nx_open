@@ -6,7 +6,7 @@
 
 struct QnCSFile;
 
-class QnColdStoreWriter : public QnResourceConsumer, public CLLongRunnable
+class QnColdStoreWriter : public QnResourceConsumer, public QnLongRunnable
 {
 public:
     QnColdStoreWriter(QnResourcePtr res);

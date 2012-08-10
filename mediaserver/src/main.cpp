@@ -55,6 +55,8 @@
 #include "main.h"
 #include "rest/handlers/fs_checker.h"
 #include "rest/handlers/get_statistics.h"
+#include "rest/handlers/cameraparamshttphandler.h"
+
 //#include "plugins/resources/digitalwatchdog/dvr/dw_dvr_resource_searcher.h"
 
 // This constant is used while checking for compatibility.
@@ -311,14 +313,16 @@ int serverMain(int argc, char *argv[])
         return 0;
     }
 
-    QnCommandLineParser commandLinePreParser;
-    commandLinePreParser.addParameter(QnCommandLineParameter(QnCommandLineParameter::String, "--log-level", NULL, NULL));
-    commandLinePreParser.parse(argc, argv);
+    QString logLevel;
 
-    QnLog::initLog(commandLinePreParser.value("--log-level").toString());
+    QnCommandLineParser commandLineParser;
+    commandLineParser.addParameter(&logLevel, "--log-level", NULL, QString());
+    commandLineParser.parse(argc, argv, stderr);
+
+    QnLog::initLog(logLevel);
     cl_log.log(APPLICATION_NAME, " started", cl_logALWAYS);
     cl_log.log("Software version: ", APPLICATION_VERSION, cl_logALWAYS);
-	cl_log.log("Software revision: ", APPLICATION_REVISION, cl_logALWAYS);
+    cl_log.log("Software revision: ", APPLICATION_REVISION, cl_logALWAYS);
     cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
 
     defaultMsgHandler = qInstallMsgHandler(myMsgHandler);
@@ -369,7 +373,7 @@ void initAppServerEventConnection(const QSettings &settings, const QnVideoServer
     appServerEventsUrl.setPath("/events/");
     appServerEventsUrl.addQueryItem("id", mediaServer->getId().toString());
     appServerEventsUrl.addQueryItem("guid", QnAppServerConnectionFactory::clientGuid());
-	appServerEventsUrl.addQueryItem("format", "pb");
+    appServerEventsUrl.addQueryItem("format", "pb");
 
     static const int EVENT_RECONNECT_TIMEOUT = 3000;
 
@@ -402,7 +406,8 @@ QnMain::QnMain(int argc, char* argv[])
     m_argv(argv),
     m_processor(0),
     m_rtspListener(0),
-    m_restServer(0)
+    m_restServer(0),
+    m_progressiveDownloadingServer(0)
 {
     serviceMainInstance = this;
 }
@@ -420,6 +425,11 @@ void QnMain::stopObjects()
     {
         delete m_restServer;
         m_restServer = 0;
+    }
+
+    if (m_progressiveDownloadingServer) {
+        delete m_progressiveDownloadingServer;
+        m_progressiveDownloadingServer = 0;
     }
 
     if (m_rtspListener)
@@ -597,8 +607,12 @@ void QnMain::run()
     m_restServer = new QnRestServer(QHostAddress::Any, apiUrl.port());
     m_restServer->registerHandler("api/RecordedTimePeriods", new QnRecordedChunkListHandler());
     m_restServer->registerHandler("api/CheckPath", new QnFsHelperHandler(true));
-	m_restServer->registerHandler("api/GetFreeSpace", new QnFsHelperHandler(false));
+    m_restServer->registerHandler("api/GetFreeSpace", new QnFsHelperHandler(false));
     m_restServer->registerHandler("api/statistics", new QnGetStatisticsHandler());
+    m_restServer->registerHandler("api/getCameraParam", new QnGetCameraParamHandler());
+    m_restServer->registerHandler("api/setCameraParam", new QnSetCameraParamHandler());
+
+    m_progressiveDownloadingServer = new QnProgressiveDownloadingServer(QHostAddress::Any, 8890);
 
     foreach (QnAbstractStorageResourcePtr storage, m_videoServer->getStorages())
     {
@@ -727,6 +741,7 @@ private:
 
 void stopServer(int signal)
 {
+    Q_UNUSED(signal)
     qApp->quit();
 }
 

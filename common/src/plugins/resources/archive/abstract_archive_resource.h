@@ -9,7 +9,7 @@ class QnAbstractArchiveResource : public QnMediaResource
 
 public:
     QnAbstractArchiveResource();
-	~QnAbstractArchiveResource();
+    ~QnAbstractArchiveResource();
 
     virtual QString getUniqueId() const;
 

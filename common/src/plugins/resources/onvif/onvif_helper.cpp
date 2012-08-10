@@ -5,7 +5,7 @@
 #include <QDebug>
 
 //const QRegExp& UNNEEDED_CHARACTERS = *new QRegExp("[\\t\\n -]+");
-const QRegExp& UNNEEDED_CHARACTERS = *new QRegExp("[^\\d\\w]+");
+const QRegExp& UNNEEDED_CHARACTERS = *new QRegExp(QLatin1String("[^\\d\\w]+"));
 
 const char* PasswordHelper::ACTI_MANUFACTURER = "acti";
 const char* PasswordHelper::ARECONT_VISION_MANUFACTURER = "arecontvision";
@@ -74,11 +74,11 @@ bool PasswordHelper::isNotAuthenticated(const SOAP_ENV__Fault* faultInfo)
     qDebug() << "PasswordHelper::isNotAuthenticated: all fault info: " << SoapErrorHelper::fetchDescription(faultInfo);
 
     if (faultInfo && faultInfo->SOAP_ENV__Code && faultInfo->SOAP_ENV__Code->SOAP_ENV__Subcode) {
-        QString subcodeValue(faultInfo->SOAP_ENV__Code->SOAP_ENV__Subcode->SOAP_ENV__Value);
+        QString subcodeValue(QLatin1String(faultInfo->SOAP_ENV__Code->SOAP_ENV__Subcode->SOAP_ENV__Value));
         subcodeValue = subcodeValue.toLower();
         qDebug() << "PasswordHelper::isNotAuthenticated: gathered string: " << subcodeValue;
-        return subcodeValue.indexOf("notauthorized") != -1 || subcodeValue.indexOf("not permitted") != -1
-                || subcodeValue.indexOf("failedauthentication") != -1 || subcodeValue.indexOf("operationprohibited") != -1;
+        return subcodeValue.indexOf(QLatin1String("notauthorized")) != -1 || subcodeValue.indexOf(QLatin1String("not permitted")) != -1
+                || subcodeValue.indexOf(QLatin1String("failedauthentication")) != -1 || subcodeValue.indexOf(QLatin1String("operationprohibited")) != -1;
     }
 
     return false;
@@ -88,10 +88,10 @@ bool PasswordHelper::isConflictError(const SOAP_ENV__Fault* faultInfo)
 {
     if (faultInfo && faultInfo->SOAP_ENV__Reason && faultInfo->SOAP_ENV__Reason->SOAP_ENV__Text)
     {
-        QString reasonValue(faultInfo->SOAP_ENV__Reason->SOAP_ENV__Text);
+        QString reasonValue(QLatin1String(faultInfo->SOAP_ENV__Reason->SOAP_ENV__Text));
         reasonValue = reasonValue.toLower();
 
-        return reasonValue.indexOf("conflict") != -1;
+        return reasonValue.indexOf(QLatin1String("conflict")) != -1;
     }
 
     return false;
@@ -168,7 +168,7 @@ PasswordHelper::PasswordHelper()
 
 void PasswordHelper::setPasswordInfo(const char* manufacturer, const char* login, const char* passwd)
 {
-    QString manufacturerStr(manufacturer);
+    QString manufacturerStr = QLatin1String(manufacturer);
     ManufacturerPasswords::Iterator iter = manufacturerPasswords.find(manufacturerStr);
     if (iter == manufacturerPasswords.end()) {
         iter = manufacturerPasswords.insert(manufacturerStr, PasswordList());
@@ -180,7 +180,7 @@ void PasswordHelper::setPasswordInfo(const char* manufacturer, const char* login
 
 void PasswordHelper::setPasswordInfo(const char* manufacturer)
 {
-    QString manufacturerStr(manufacturer);
+    QString manufacturerStr = QLatin1String(manufacturer);
     ManufacturerPasswords::Iterator iter = manufacturerPasswords.find(manufacturerStr);
     if (iter == manufacturerPasswords.end()) {
         manufacturerPasswords.insert(manufacturerStr, PasswordList());
@@ -190,9 +190,9 @@ void PasswordHelper::setPasswordInfo(const char* manufacturer)
 const PasswordList& PasswordHelper::getPasswordsByManufacturer(const QString& manufacturer) const
 {
     qDebug() << "PasswordHelper::getPasswordsByManufacturer: manufacturer: " << manufacturer
-        << ", normalized: " << manufacturer.toLower().replace(UNNEEDED_CHARACTERS, "");
+        << ", normalized: " << manufacturer.toLower().replace(UNNEEDED_CHARACTERS, QString());
     ManufacturerPasswords::ConstIterator it = manufacturer.isEmpty()? manufacturerPasswords.end():
-        manufacturerPasswords.find(manufacturer.toLower().replace(UNNEEDED_CHARACTERS, ""));
+        manufacturerPasswords.find(manufacturer.toLower().replace(UNNEEDED_CHARACTERS, QString()));
 
     if (it == manufacturerPasswords.end()) {
         return allPasswords;
@@ -238,7 +238,7 @@ const QString SoapErrorHelper::fetchDescription(const SOAP_ENV__Fault* faultInfo
         return QString();
     }
 
-    QString result("Fault Info. ");
+    QByteArray result("Fault Info. ");
 
     if (faultInfo->faultcode) {
         result += "Code: ";
@@ -291,7 +291,7 @@ const QString SoapErrorHelper::fetchDescription(const SOAP_ENV__Fault* faultInfo
         result += ". ";
     }
 
-    return result;
+    return QLatin1String(result);
 }
 
 //
@@ -303,8 +303,8 @@ NameHelper::NameHelper()
     QnResourceTypePool::QnResourceTypeMap typeMap = qnResTypePool->getResourceTypeMap();
 
     foreach(QnResourceTypePtr rt, typeMap) {
-        QString normalizedManufacturer = rt->getManufacture().toLower().replace(UNNEEDED_CHARACTERS, "");
-        QString normalizedName = rt->getName().toLower().replace(UNNEEDED_CHARACTERS, "").replace(normalizedManufacturer, "");
+        QString normalizedManufacturer = rt->getManufacture().toLower().replace(UNNEEDED_CHARACTERS, QString());
+        QString normalizedName = rt->getName().toLower().replace(UNNEEDED_CHARACTERS, QString()).replace(normalizedManufacturer, QString());
         camerasNames.insert(normalizedName);
     }
 }
@@ -321,10 +321,10 @@ bool NameHelper::isSupported(const QString& cameraName) const
         return false;
     }
 
-    qDebug() << "NameHelper::isSupported: camera name: " << cameraName << ", normalized: "
-             << cameraName.toLower().replace(UNNEEDED_CHARACTERS, "");
+    //qDebug() << "NameHelper::isSupported: camera name: " << cameraName << ", normalized: "
+    //         << cameraName.toLower().replace(UNNEEDED_CHARACTERS, QString());
 
-    QSet<QString>::ConstIterator it = camerasNames.constFind(cameraName.toLower().replace(UNNEEDED_CHARACTERS, ""));
+    QSet<QString>::ConstIterator it = camerasNames.constFind(cameraName.toLower().replace(UNNEEDED_CHARACTERS, QString()));
     if (it == camerasNames.constEnd()) {
         qDebug() << "NameHelper::isSupported: can't find " << cameraName;
         return false;
@@ -336,10 +336,10 @@ bool NameHelper::isSupported(const QString& cameraName) const
 
 bool NameHelper::isManufacturerSupported(const QString& manufacturer) const
 {
-    QString tmp = manufacturer.toLower().replace(UNNEEDED_CHARACTERS, "");
-    if (tmp == "sony" ||
-        tmp == "brickcom" ||
-        tmp == "digitalwatchdog")
+    QString tmp = manufacturer.toLower().replace(UNNEEDED_CHARACTERS, QString());
+    if (tmp == QLatin1String("sony") ||
+        tmp == QLatin1String("brickcom") ||
+        tmp == QLatin1String("digitalwatchdog"))
     {
         return false;
     }

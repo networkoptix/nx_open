@@ -219,13 +219,13 @@ FORMS += \
     ui/dialogs/about_dialog.ui \
     youtube/youtubeuploaddialog.ui \
     youtube/youtubesetting.ui \
-    ui/device_settings/camera_schedule_widget.ui \
     ui/widgets/settings/connections_settings_widget.ui \
     ui/widgets/settings/license_widget.ui \
     ui/widgets/settings/license_manager_widget.ui \
     ui/widgets/settings/recording_settings_widget.ui \
     ui/widgets/help_widget.ui \
     ui/widgets/resource_tree_widget.ui \
+    ui/widgets/properties/camera_schedule_widget.ui \
     ui/widgets/properties/single_camera_settings_widget.ui \
     ui/widgets/properties/multiple_camera_settings_widget.ui \
 

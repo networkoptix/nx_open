@@ -9,7 +9,8 @@ QnLocalVideoServerResource::QnLocalVideoServerResource()
     : QnResource()
 {
     //setTypeId(qnResTypePool->getResourceTypeId("", QLatin1String("LocalServer"))); // ###
-    addFlags(server | local);
+    addFlags(QnResource::server | QnResource::local);
+    removeFlags(QnResource::media);
     setName(QLatin1String("Local"));
     setStatus(Online);
 }
@@ -24,8 +25,9 @@ QnVideoServerResource::QnVideoServerResource():
     QnResource()
     //,m_rtspListener(0)
 {
-    setTypeId(qnResTypePool->getResourceTypeId("", QLatin1String("Server")));
-    addFlags(server | remote);
+    setTypeId(qnResTypePool->getResourceTypeId(QString(), QLatin1String("Server")));
+    addFlags(QnResource::server | QnResource::remote);
+    removeFlags(QnResource::media);
     m_primaryIFSelected = false;
 }
 
@@ -119,20 +121,21 @@ class TestConnectionTask: public QRunnable
 {
 public:
     TestConnectionTask(QnVideoServerResource* owner, const QUrl& url): m_owner(owner), m_url(url) {}
+
     void run()
     {
         QByteArray reply;
         QByteArray errorString;
-        QnSessionManager::instance()->sendGetRequest(m_url.toString(), "RecordedTimePeriods", QnRequestParamList(), reply, errorString);
-        if (reply.contains("Parameter startTime must be provided"))
+        QnSessionManager::instance()->sendGetRequest(m_url.toString(), QLatin1String("ping"), QnRequestParamList(), reply, errorString);
+        if (reply.contains("Requested method is absent"))
         {
             // server OK
             m_owner->setPrimaryIF(m_url.host());
         }
     }
 private:
-    QUrl m_url;
     QnVideoServerResource* m_owner;
+    QUrl m_url;
 };
 
 void QnVideoServerResource::setPrimaryIF(const QString& primaryIF)
@@ -150,7 +153,7 @@ void QnVideoServerResource::setPrimaryIF(const QString& primaryIF)
     url.setHost(primaryIF);
     setUrl(url.toString());
     if (getName().isEmpty())
-        setName(QString("Server ") + primaryIF);
+        setName(QLatin1String("Server ") + primaryIF);
 
     emit serverIFFound(primaryIF);
 }
@@ -210,5 +213,5 @@ void QnVideoServerResource::updateInner(QnResourcePtr other)
         setStorages(otherStorages);
         determineOptimalNetIF();
     }
-	determineOptimalNetIF();
+    determineOptimalNetIF();
 }

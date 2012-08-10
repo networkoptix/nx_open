@@ -45,6 +45,7 @@ private:
     void submitToSettings();
 
     void initColorPicker();
+    void initLanguages();
 
 private slots:
     void at_animateBackgroundCheckBox_stateChanged(int state);

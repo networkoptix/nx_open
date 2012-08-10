@@ -21,6 +21,7 @@
 			<outputDirectory>/</outputDirectory>
 			<includes>
 				<include>*-${arch}.zip</include>
+				<include>*-${arch}-${compiler}.zip</include>
 			</includes>			
 		</fileSet>		
 	</fileSets>

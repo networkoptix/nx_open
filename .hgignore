@@ -22,6 +22,11 @@ syntax: glob
 Debug
 Release
 
+contrib/maven-artifacts-deploy/include
+contrib/maven-artifacts-deploy/linux
+contrib/maven-artifacts-deploy/target
+contrib/maven-artifacts-deploy/windows
+
 common/bin
 client/bin
 mediaserver/bin
@@ -54,6 +59,7 @@ client/src/Makefile
 client/src/client.mak*
 client/src/ipch
 client/src/client.vcproj
+client/client.mak*
 client/x86
 client/x64
 
@@ -75,6 +81,7 @@ common/src/plugins/resources/archive/filetypes.h
 common/src/Makefile
 common/src/common.mak*
 common/src/common.vcproj
+common/common.mak*
 common/x86
 common/x64
 common/src/version.h

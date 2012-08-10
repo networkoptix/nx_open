@@ -4,6 +4,8 @@
 #include <QtCore/QMutex>
 #include <QtCore/QUrl>
 
+#include "utils/common/request_param.h"
+
 #include "core/resource/resource_type.h"
 #include "core/resource/resource.h"
 #include "core/resource/network_resource.h"

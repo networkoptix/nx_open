@@ -14,7 +14,7 @@ namespace {
         connection.name = settings->value(QLatin1String("name")).toString();
         connection.url = settings->value(QLatin1String("url")).toString();
         connection.url.setScheme(QLatin1String("https"));
-        connection.readOnly = (settings->value(QLatin1String("readOnly")).toString() == "true");
+        connection.readOnly = (settings->value(QLatin1String("readOnly")).toString() == QLatin1String("true"));
 
         return connection;
     }
@@ -35,7 +35,6 @@ namespace {
 Q_GLOBAL_STATIC(QnSettings, qn_settings)
 
 QnSettings::QnSettings():
-    m_mutex(QMutex::Recursive),
     m_settings(new QSettings(this)),
     m_loading(true)
 {
@@ -57,10 +56,15 @@ QnSettings::QnSettings():
     setName(DOWNMIX_AUDIO,          QLatin1String("downmixAudio"));
     setName(OPEN_LAYOUTS_ON_LOGIN,  QLatin1String("openLayoutsOnLogin"));
 
-    connect(notifier(LAST_USED_CONNECTION), SIGNAL(valueChanged(int)), this, SIGNAL(lastUsedConnectionChanged()));
+    /* Set command line switch names. */
+    addArgumentName(SOFTWARE_YUV,          "--soft-yuv");
+    addArgumentName(OPEN_LAYOUTS_ON_LOGIN, "--open-layouts-on-login");
+    addArgumentName(MAX_VIDEO_ITEMS,       "--max-video-items");
 
     /* Load from settings. */
     load();
+
+    setThreadSafe(true);
 
     m_loading = false;
 }
@@ -73,22 +77,14 @@ QnSettings *QnSettings::instance() {
     return qn_settings();
 }
 
-void QnSettings::lock() const {
-    m_mutex.lock();
-}
-
-void QnSettings::unlock() const {
-    m_mutex.unlock();
-}
-
-QVariant QnSettings::updateValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) {
+QVariant QnSettings::readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) {
     switch(id) {
     case DEFAULT_CONNECTION: {
         QnConnectionData result;
         result.url.setScheme(QLatin1String("https"));
-        result.url.setHost(settings->value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString());
-        result.url.setPort(settings->value("appserverPort", DEFAULT_APPSERVER_PORT).toInt());
-        result.url.setUserName(settings->value("appserverLogin", QLatin1String("admin")).toString());
+        result.url.setHost(settings->value(QLatin1String("appserverHost"), QLatin1String(DEFAULT_APPSERVER_HOST)).toString());
+        result.url.setPort(settings->value(QLatin1String("appserverPort"), DEFAULT_APPSERVER_PORT).toInt());
+        result.url.setUserName(settings->value(QLatin1String("appserverLogin"), QLatin1String("admin")).toString());
         result.name = QLatin1String("default");
         result.readOnly = true;
 
@@ -126,12 +122,12 @@ QVariant QnSettings::updateValueFromSettings(QSettings *settings, int id, const 
     case DEBUG_COUNTER:
         return defaultValue; /* Not to be read from settings. */
     default:
-        return base_type::updateValueFromSettings(settings, id, defaultValue);
+        return base_type::readValueFromSettings(settings, id, defaultValue);
         break;
     }
 }
 
-void QnSettings::submitValueToSettings(QSettings *settings, int id, const QVariant &value) const {
+void QnSettings::writeValueToSettings(QSettings *settings, int id, const QVariant &value) const {
     switch(id) {
     case LAST_USED_CONNECTION:
         settings->beginGroup(QLatin1String("AppServerConnections"));
@@ -157,7 +153,7 @@ void QnSettings::submitValueToSettings(QSettings *settings, int id, const QVaria
         settings->endArray();
 
         /* Write out last used connection as it has been cleared. */
-        submitValueToSettings(settings, LAST_USED_CONNECTION, QVariant::fromValue<QnConnectionData>(lastUsedConnection()));
+        writeValueToSettings(settings, LAST_USED_CONNECTION, QVariant::fromValue<QnConnectionData>(lastUsedConnection()));
         break;
     }
 #ifndef QN_HAS_BACKGROUND_COLOR_ADJUSTMENT
@@ -167,26 +163,25 @@ void QnSettings::submitValueToSettings(QSettings *settings, int id, const QVaria
     case DEBUG_COUNTER:
         break; /* Not to be saved to settings. */
     default:
-        base_type::submitValueToSettings(settings, id, value);
+        base_type::writeValueToSettings(settings, id, value);
         break;
     }
 }
 
-void QnSettings::updateFromSettings(QSettings *settings) {
-    QMutexLocker locker(&m_mutex);
+void QnSettings::updateValuesFromSettings(QSettings *settings, const QList<int> &ids) {
     QnScopedValueRollback<bool> guard(&m_loading, true);
 
-    base_type::updateFromSettings(settings);
+    base_type::updateValuesFromSettings(settings, ids);
 }
 
-bool QnSettings::updateValue(int id, const QVariant &value) {
-    bool changed = base_type::updateValue(id, value);
+QnPropertyStorage::UpdateStatus QnSettings::updateValue(int id, const QVariant &value) {
+    UpdateStatus status = base_type::updateValue(id, value);
 
     /* Settings are to be written out right away. */
-    if(!m_loading && changed)
-        submitValueToSettings(m_settings, id, this->value(id));
+    if(!m_loading && status == Changed)
+        writeValueToSettings(m_settings, id, this->value(id));
 
-    return changed;
+    return status;
 }
 
 void QnSettings::load() {

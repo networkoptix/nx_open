@@ -4,7 +4,7 @@
 #include "core/datapacket/datapacket.h"
 #include "utils/common/longrunnable.h"
 
-class QN_EXPORT QnAbstractDataConsumer : public CLLongRunnable
+class QN_EXPORT QnAbstractDataConsumer : public QnLongRunnable
 {
     Q_OBJECT
 

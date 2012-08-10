@@ -7,6 +7,12 @@ class QGraphicsView;
 class QGraphicsItem;
 class QGraphicsScene;
 
+// TODO: refactor Drag* classes into templates.
+// * DragProcessor<QWidget>
+// * DragProcessor<QGraphicsView>
+// * DragProcessor<QGraphicsScene>
+// * DragProcessor<QGraphicsItem>
+
 /**
  * Dragging information that is passed to handler on each drag move.
  */

@@ -19,7 +19,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resourcemanagment/resource_pool.h>
 #include <camera/resource_display.h>
-#include <camera/camera.h>
+#include <camera/video_camera.h>
 
 #include <ui/animation/viewport_animator.h>
 #include <ui/animation/widget_animator.h>
@@ -36,13 +36,13 @@
 #include <ui/graphics/instruments/selection_overlay_hack_instrument.h>
 #include <ui/graphics/instruments/focus_listener_instrument.h>
 
-#include <ui/graphics/items/resource_widget.h>
-#include <ui/graphics/items/server_resource_widget.h>
-#include <ui/graphics/items/media_resource_widget.h>
-#include <ui/graphics/items/resource_widget_renderer.h>
-#include <ui/graphics/items/curtain_item.h>
-#include <ui/graphics/items/image_button_widget.h>
-#include <ui/graphics/items/grid_item.h>
+#include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/graphics/items/resource/server_resource_widget.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/graphics/items/resource/resource_widget_renderer.h>
+#include <ui/graphics/items/grid/curtain_item.h>
+#include <ui/graphics/items/generic/image_button_widget.h>
+#include <ui/graphics/items/grid/grid_item.h>
 
 #include <ui/graphics/opengl/gl_hardware_checker.h>
 
@@ -138,7 +138,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_curtainAnimator(NULL),
     m_frontZ(0.0),
     m_dummyScene(new QGraphicsScene(this)),
-	m_streamSynchronizer(NULL),
+    m_streamSynchronizer(NULL),
     m_frameOpacity(1.0),
     m_frameWidthsDirty(false),
     m_zoomedMarginFlags(0),
@@ -423,7 +423,8 @@ void QnWorkbenchDisplay::setView(QGraphicsView *view) {
             glFormat.setSwapInterval(1); /* Turn vsync on. */
 
             QGLWidget *glWidget = new QGLWidget(glFormat);
-            QnGlHardwareChecker* filter = new QnGlHardwareChecker(glWidget);
+            /*QnGlHardwareChecker* filter =*/
+            new QnGlHardwareChecker(glWidget);
             m_view->setViewport(glWidget);
         }
 
@@ -491,7 +492,7 @@ void QnWorkbenchDisplay::setLayer(QGraphicsItem *item, Qn::ItemLayer layer) {
     item->setZValue(layer * layerZSize + std::fmod(item->zValue(), layerZSize));
 
     QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
-    if(widget)
+    if(widget && widget->shadowItem()) /* Shadow may already be destroyed. */
         widget->shadowItem()->setZValue(shadowLayer(layer) * layerZSize);
 }
 
@@ -612,13 +613,13 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
     case Qn::CentralRole: {
         /* Update audio playback. */
         if(QnMediaResourceWidget *oldMediaWidget = dynamic_cast<QnMediaResourceWidget *>(oldWidget)) {
-            CLCamDisplay *oldCamDisplay = oldMediaWidget ? oldMediaWidget->display()->camDisplay() : NULL;
+            QnCamDisplay *oldCamDisplay = oldMediaWidget ? oldMediaWidget->display()->camDisplay() : NULL;
             if(oldCamDisplay)
                 oldCamDisplay->playAudio(false);
         }
 
         if(QnMediaResourceWidget *newMediaWidget = dynamic_cast<QnMediaResourceWidget *>(newWidget)) { 
-            CLCamDisplay *newCamDisplay = newMediaWidget ? newMediaWidget->display()->camDisplay() : NULL;
+            QnCamDisplay *newCamDisplay = newMediaWidget ? newMediaWidget->display()->camDisplay() : NULL;
             if(newCamDisplay)
                 newCamDisplay->playAudio(true);
         }
@@ -646,7 +647,7 @@ QnResourceDisplay *QnWorkbenchDisplay::display(QnWorkbenchItem *item) const {
     return NULL;
 }
 
-CLVideoCamera *QnWorkbenchDisplay::camera(QnWorkbenchItem *item) const {
+QnVideoCamera *QnWorkbenchDisplay::camera(QnWorkbenchItem *item) const {
     QnResourceDisplay *display = this->display(item);
     if(display == NULL)
         return NULL;
@@ -654,8 +655,8 @@ CLVideoCamera *QnWorkbenchDisplay::camera(QnWorkbenchItem *item) const {
     return display->camera();
 }
 
-CLCamDisplay *QnWorkbenchDisplay::camDisplay(QnWorkbenchItem *item) const {
-    CLVideoCamera *camera = this->camera(item);
+QnCamDisplay *QnWorkbenchDisplay::camDisplay(QnWorkbenchItem *item) const {
+    QnVideoCamera *camera = this->camera(item);
     if(camera == NULL)
         return NULL;
 
@@ -730,7 +731,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
         return false;
     }
 
-    if (!resource->checkFlags(QnResource::media)) { // TODO: unsupported for now
+    if (!resource->checkFlags(QnResource::media) && !resource->checkFlags(QnResource::server)) { // TODO: unsupported for now
         qnDeleteLater(item);
         return false;
     }

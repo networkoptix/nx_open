@@ -1,5 +1,5 @@
-#ifndef __AVI_DVD_ARCHIVE_DELEGATE_H
-#define __AVI_DVD_ARCHIVE_DELEGATE_H
+#ifndef QN_AVI_DVD_ARCHIVE_DELEGATE_H
+#define QN_AVI_DVD_ARCHIVE_DELEGATE_H
 
 #include <QStringList>
 #include <QFile>
@@ -14,8 +14,8 @@ class QnAVIDvdArchiveDelegate : public QnAVIPlaylistArchiveDelegate
     Q_OBJECT;
 
 public:
-	QnAVIDvdArchiveDelegate();
-	virtual ~QnAVIDvdArchiveDelegate();
+    QnAVIDvdArchiveDelegate();
+    virtual ~QnAVIDvdArchiveDelegate();
     void setChapterNum(int chupter);
     static QStringList getTitleList(const QString& url);
 
@@ -47,4 +47,4 @@ private:
     ifo_handle_t* m_mainIfo;
 };
 
-#endif __AVI_DVD_ARCHIVE_DELEGATE_H
+#endif // QN_AVI_DVD_ARCHIVE_DELEGATE_H

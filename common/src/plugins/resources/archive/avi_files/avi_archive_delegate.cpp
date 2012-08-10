@@ -114,10 +114,10 @@ private:
 
 QnAviArchiveDelegate::QnAviArchiveDelegate():
     m_formatContext(0),
-    m_videoLayout(0),
-    m_firstVideoIndex(0),
-    m_audioStreamIndex(-1),
     m_selectedAudioChannel(0),
+    m_audioStreamIndex(-1),
+    m_firstVideoIndex(0),
+    m_videoLayout(0),
     m_startTime(0),
     m_useAbsolutePos(true),
     m_duration(AV_NOPTS_VALUE),
@@ -149,7 +149,7 @@ qint64 QnAviArchiveDelegate::endTime()
 {
     //if (!m_streamsFound && !findStreams())
     //    return 0;
-    if (m_duration == AV_NOPTS_VALUE)
+    if (m_duration == qint64(AV_NOPTS_VALUE))
         return m_duration;
     else
         return m_duration + m_startTime;
@@ -231,10 +231,10 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
 
 qint64 QnAviArchiveDelegate::seek(qint64 time, bool findIFrame)
 {
-	if (!findStreams())
-		return -1;
+    if (!findStreams())
+        return -1;
 
-	m_eofReached = time > endTime();
+    m_eofReached = time > endTime();
     if (m_eofReached)
         return time;
 
@@ -319,26 +319,26 @@ QnVideoResourceLayout* QnAviArchiveDelegate::getVideoLayout()
         m_videoLayout = new QnCustomDeviceVideoLayout(1, 1);
 
         // prevent standart tag name parsing in 'avi' format
-        QString format = QString(m_formatContext->iformat->name).split(',')[0];
+        QString format = QString(QLatin1String(m_formatContext->iformat->name)).split(QLatin1Char(','))[0];
 
         AVDictionaryEntry* software = av_dict_get(m_formatContext->metadata, getTagName(Tag_Software, format), 0, 0);
-        bool allowTags = format != QString("avi") || (software && QString(software->value) == QString("Network Optix"));
+        bool allowTags = format != QLatin1String("avi") || (software && QString(QLatin1String(software->value)) == QLatin1String("Network Optix"));
 
         if (allowTags)
         {
             AVDictionaryEntry* layoutInfo = av_dict_get(m_formatContext->metadata,getTagName(Tag_LayoutInfo, format), 0, 0);
             if (layoutInfo)
-                deserializeLayout(m_videoLayout, layoutInfo->value);
+                deserializeLayout(m_videoLayout, QLatin1String(layoutInfo->value));
 
             if (m_useAbsolutePos)
             {
                 AVDictionaryEntry* start_time = av_dict_get(m_formatContext->metadata,getTagName(Tag_startTime, format), 0, 0);
                 if (start_time) {
-                    m_startTime = QString(start_time->value).toLongLong()*1000ll;
-					if (m_startTime >= UTC_TIME_DETECTION_THRESHOLD) {
-						if (qSharedPointerDynamicCast<QnLayoutFileStorageResource>(m_storage))
-							m_resource->addFlags(QnResource::utc); // use sync for exported layout only
-					}
+                    m_startTime = QString(QLatin1String(start_time->value)).toLongLong()*1000ll;
+                    if (m_startTime >= UTC_TIME_DETECTION_THRESHOLD) {
+                        if (qSharedPointerDynamicCast<QnLayoutFileStorageResource>(m_storage))
+                            m_resource->addFlags(QnResource::utc); // use sync for exported layout only
+                    }
                 }
             }
         }
@@ -364,9 +364,10 @@ bool QnAviArchiveDelegate::findStreams()
         if (m_streamsFound) 
         {
             m_duration = m_formatContext->duration;
-            if (m_formatContext->start_time != AV_NOPTS_VALUE)
+            if (m_formatContext->start_time != qint64(AV_NOPTS_VALUE))
                 m_startMksec = m_formatContext->start_time;
-            if ((m_startMksec == 0 || m_startMksec == AV_NOPTS_VALUE) && m_formatContext->streams > 0 && m_formatContext->streams[0]->first_dts != AV_NOPTS_VALUE)
+            if ((m_startMksec == 0 || m_startMksec == qint64(AV_NOPTS_VALUE)) &&
+                m_formatContext->streams > 0 && m_formatContext->streams[0]->first_dts != qint64(AV_NOPTS_VALUE))
             {
                 AVStream* stream = m_formatContext->streams[0];
                 double timeBase = av_q2d(stream->time_base) * 1000000;
@@ -428,20 +429,20 @@ qint64 QnAviArchiveDelegate::packetTimestamp(const AVPacket& packet)
     AVStream* stream = m_formatContext->streams[packet.stream_index];
     double timeBase = av_q2d(stream->time_base) * 1000000;
     qint64 firstDts = m_firstVideoIndex >= 0 ? m_formatContext->streams[m_firstVideoIndex]->first_dts : 0;
-    if (firstDts == AV_NOPTS_VALUE)
+    if (firstDts == qint64(AV_NOPTS_VALUE))
         firstDts = 0;
-    qint64 packetTime = packet.dts != AV_NOPTS_VALUE ? packet.dts : packet.pts;
-    if (packetTime == AV_NOPTS_VALUE)
+    qint64 packetTime = packet.dts != qint64(AV_NOPTS_VALUE) ? packet.dts : packet.pts;
+    if (packetTime == qint64(AV_NOPTS_VALUE))
         return AV_NOPTS_VALUE;
     return qMax(0ll, (qint64) (timeBase * (packetTime - firstDts))) +  m_startTime;
 }
 
 bool QnAviArchiveDelegate::deserializeLayout(QnCustomDeviceVideoLayout* layout, const QString& layoutStr)
 {
-    QStringList info = layoutStr.split(';');
+    QStringList info = layoutStr.split(QLatin1Char(';'));
     for (int i = 0; i < info.size(); ++i)
     {
-        QStringList params = info[i].split(',');
+        QStringList params = info[i].split(QLatin1Char(','));
         if (params.size() != 2) {
             cl_log.log("Invalid layout string stored at file metadata. Ignored.", cl_logWARNING);
             return false;
@@ -466,7 +467,7 @@ AVCodecContext* QnAviArchiveDelegate::setAudioChannel(int num)
     // convert num to absolute track number
     m_audioStreamIndex = -1;
     int lastStreamID = -1;
-    unsigned currentAudioTrackNum = 0;
+    int currentAudioTrackNum = 0;
     for (unsigned i = 0; i < m_formatContext->nb_streams; i++)
     {
         AVStream *strm= m_formatContext->streams[i];
@@ -512,7 +513,7 @@ void QnAviArchiveDelegate::setStorage(const QnStorageResourcePtr &storage)
 
 const char* QnAviArchiveDelegate::getTagName(Tag tag, const QString& formatName)
 {
-    if (formatName == QString("avi"))
+    if (formatName == QLatin1String("avi"))
     {
         switch(tag)
         {

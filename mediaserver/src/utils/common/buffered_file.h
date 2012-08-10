@@ -10,7 +10,7 @@
 
 class QBufferedFile;
 
-class QN_EXPORT QueueFileWriter: public CLLongRunnable
+class QN_EXPORT QueueFileWriter: public QnLongRunnable
 {
     Q_OBJECT;
 
@@ -84,8 +84,8 @@ public:
     void setSystemFlags(int setSystemFlags);
 
     virtual bool open(QIODevice::OpenMode mode) override;
-    virtual qint64	size () const override;
-    virtual qint64	pos() const override;
+    virtual qint64 size() const override;
+    virtual qint64 pos() const override;
     virtual void close() override;
     virtual bool seek(qint64 pos) override;
 

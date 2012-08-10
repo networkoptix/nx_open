@@ -54,7 +54,8 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
 
 void QnAppserverResourceProcessor::requestFinished(int status, const QByteArray &data, const QByteArray& errorString, int handle)
 {
-
+    Q_UNUSED(handle)
+    Q_UNUSED(errorString)
     if (status == 0)
     {
         qDebug() << "Successfully updated resource status" << data;

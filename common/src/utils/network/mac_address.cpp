@@ -16,7 +16,7 @@ QnMacAddress::QnMacAddress(const unsigned char* mac)
 
 QnMacAddress::QnMacAddress(const QString& mac)
 {
-    if (mac.contains("-"))
+    if (mac.contains(QLatin1Char('-')))
         MACsToByte(mac, m_data);
     else
         MACsToByte2(mac, m_data);

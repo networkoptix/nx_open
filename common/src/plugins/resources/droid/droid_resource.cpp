@@ -25,7 +25,7 @@ bool QnDroidResource::updateMACAddress()
 
 QString QnDroidResource::manufacture() const
 {
-    return MANUFACTURE;
+    return QLatin1String(MANUFACTURE);
 }
 
 void QnDroidResource::setIframeDistance(int /*frames*/, int /*timems*/)
@@ -47,8 +47,8 @@ void QnDroidResource::setCropingPhysical(QRect /*croping*/)
 QHostAddress QnDroidResource::getHostAddress() const
 {
     QString url = getUrl();
-    int start = QString("raw://").length();
-    int end = url.indexOf(':', start);
+    int start = QString(QLatin1String("raw://")).length();
+    int end = url.indexOf(QLatin1Char(':'), start);
     if (start >= 0 && end > start)
         return QHostAddress(url.mid(start, end-start));
     else

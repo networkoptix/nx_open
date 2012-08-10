@@ -266,6 +266,12 @@ namespace Qn {
          */
         OpenAnyNumberOfLayoutsAction,
 
+
+        /**
+         * Opens selected layouts in a new window.
+         */
+        OpenNewWindowLayoutsAction,
+
         /**
          * Saves selected layout.
          */
@@ -410,6 +416,7 @@ namespace Qn {
          * Changes resource name.
          * 
          * Parameters:
+         * 
          * <tt>QString NameParameter</tt> --- new name for the resource. If not
          * supplied, name dialog will pop up.
          */
@@ -489,6 +496,19 @@ namespace Qn {
          */
         ToggleThumbnailsAction,
 
+        /**
+         * Opens new layout for Quick Search.
+         * 
+         * Parameters:
+         * 
+         * <tt>QnTimePeriod TimePeriodParameter</tt> --- time period for quick search.
+         */
+        QuickSearchAction,
+
+        /**
+         * Shows/hides calendar.
+         */
+        ToggleCalendarAction,
 
 
         /* Debug actions. */

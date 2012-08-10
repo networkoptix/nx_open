@@ -10,7 +10,7 @@ class QnAbstractMediaStreamDataProvider;
 class QnVideoResourceLayout;
 class QnResourceAudioLayout;
 
-enum QnStreamQuality {QnQualityLowest, QnQualityLow, QnQualityNormal, QnQualityHigh, QnQualityHighest, QnQualityPreSeted};
+enum QnStreamQuality {QnQualityLowest, QnQualityLow, QnQualityNormal, QnQualityHigh, QnQualityHighest, QnQualityPreSet};
 
 class QnMediaResource : virtual public QnResource
 {

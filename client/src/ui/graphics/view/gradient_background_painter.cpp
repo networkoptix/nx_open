@@ -68,19 +68,19 @@ void QnGradientBackgroundPainter::drawLayer(QPainter * painter, const QRectF & r
     qreal radius = qMin(rect.width(), rect.height()) / 1.4142;
 
 #ifdef QN_BACKGROUND_PAINTER_NO_OPENGL
-	{
-		QRadialGradient radialGrad(center1, radius);
-		radialGrad.setColorAt(0, color);
-		radialGrad.setColorAt(1, QColor(0, 0, 0, 0));
-		painter->fillRect(rect, radialGrad);
-	}
+    {
+        QRadialGradient radialGrad(center1, radius);
+        radialGrad.setColorAt(0, color);
+        radialGrad.setColorAt(1, QColor(0, 0, 0, 0));
+        painter->fillRect(rect, radialGrad);
+    }
 
-	{
-		QRadialGradient radialGrad(center2, radius);
-		radialGrad.setColorAt(0, color);
-		radialGrad.setColorAt(1, QColor(0, 0, 0, 0));
-		painter->fillRect(rect, radialGrad);
-	}
+    {
+        QRadialGradient radialGrad(center2, radius);
+        radialGrad.setColorAt(0, color);
+        radialGrad.setColorAt(1, QColor(0, 0, 0, 0));
+        painter->fillRect(rect, radialGrad);
+    }
 #else
     painter->beginNativePainting();
     {

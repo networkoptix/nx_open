@@ -15,7 +15,8 @@
 namespace {
     class QnResourceDirectoryBrowserInstance: public QnResourceDirectoryBrowser {};
 
-    Q_GLOBAL_STATIC(QnResourceDirectoryBrowserInstance, qnResourceDirectoryBrowserInstance);
+   // defined but never used
+   // Q_GLOBAL_STATIC(QnResourceDirectoryBrowserInstance, qnResourceDirectoryBrowserInstance);
 }
 
 
@@ -34,9 +35,9 @@ QnResourcePtr QnResourceDirectoryBrowser::createResource(QnId resourceTypeId, co
         return result;
     }
 
-    if (parameters.contains("file"))
+    if (parameters.contains(QLatin1String("file")))
     {
-        result = createArchiveResource(parameters["file"]);
+        result = createArchiveResource(parameters[QLatin1String("file")]);
         result->setTypeId(resourceTypeId);
         result->deserialize(parameters);
     }
@@ -64,7 +65,7 @@ void QnResourceDirectoryBrowser::cleanup()
 
 QnResourceList QnResourceDirectoryBrowser::findResources()
 {
-    if (m_resourceReady)
+    if (m_resourceReady) // TODO: if path check list is changed, this check will prevent us from re-updating the resource list.
     {
         return QnResourceList();
     }

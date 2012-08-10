@@ -449,7 +449,7 @@ void QnResourceTreeWidget::updateFilter(bool force) {
         return;
 
     if(!force) {
-        int pos = qMax(filter.lastIndexOf(QChar('+')), filter.lastIndexOf(QChar('\\'))) + 1;
+        int pos = qMax(filter.lastIndexOf(QLatin1Char('+')), filter.lastIndexOf(QLatin1Char('\\'))) + 1;
         
         /* Estimate size of the last term in filter expression. */
         int size = 0;
@@ -618,7 +618,10 @@ void QnResourceTreeWidget::at_treeView_enterPressed(const QModelIndex &index) {
 
 void QnResourceTreeWidget::at_treeView_doubleClicked(const QModelIndex &index) {
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-    if (resource && !(resource->flags() & QnResource::layout)) /* Layouts cannot be activated by double clicking. */
+
+    if (resource && 
+        !(resource->flags() & QnResource::layout) &&    /* Layouts cannot be activated by double clicking. */
+        !(resource->flags() & QnResource::server))      /* Bug #1009: Servers should not be activated by double clicking. */
         emit activated(resource);
 }
 

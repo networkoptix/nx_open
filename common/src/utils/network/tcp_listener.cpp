@@ -13,7 +13,7 @@ public:
         newPort = 0;
     }
     TCPServerSocket* serverSocket;
-    QMap<TCPSocket*, CLLongRunnable*> connections;
+    QMap<TCPSocket*, QnLongRunnable*> connections;
     QByteArray authDigest;
     QMutex portMutex;
     int newPort;
@@ -27,12 +27,12 @@ bool QnTcpListener::authenticate(const QHttpRequestHeader& headers, QHttpRespons
     Q_D(const QnTcpListener);
     if (d->authDigest.isEmpty())
         return true;
-    QList<QByteArray> data = headers.value("Authorization").toUtf8().split(' ');
+    QList<QByteArray> data = headers.value(QLatin1String("Authorization")).toUtf8().split(' ');
     bool rez = false;
     if (data[0].toLower() == "basic" && data.size() > 1)
         rez = data[1] == d->authDigest;
     if (!rez) {
-        responseHeaders.addValue("WWW-Authenticate", "Basic realm=\"Secure Area\"");
+        responseHeaders.addValue(QLatin1String("WWW-Authenticate"), QLatin1String("Basic realm=\"Secure Area\""));
     }
     return rez;
 }
@@ -53,7 +53,7 @@ QnTcpListener::QnTcpListener(const QHostAddress& address, int port):
         d->serverAddress = address;
         d->serverSocket = new TCPServerSocket(address.toString(), port, 5 ,true);
         start();
-        cl_log.log("Server started at ", address.toString() + QString(":") + QString::number(port), cl_logINFO);
+        cl_log.log("Server started at ", address.toString() + QLatin1String(":") + QString::number(port), cl_logINFO);
     }
     catch(const SocketException &e) {
         qCritical() << "Can't start TCP listener at address" << address << ":" << port << ". Reason: " << e.what();
@@ -73,9 +73,9 @@ QnTcpListener::~QnTcpListener()
 void QnTcpListener::removeDisconnectedConnections()
 {
     Q_D(QnTcpListener);
-    for (QMap<TCPSocket*, CLLongRunnable*>::iterator itr = d->connections.begin(); itr != d->connections.end();)
+    for (QMap<TCPSocket*, QnLongRunnable*>::iterator itr = d->connections.begin(); itr != d->connections.end();)
     {
-        CLLongRunnable* processor = itr.value();
+        QnLongRunnable* processor = itr.value();
         if (!processor->isRunning()) {
             delete processor;
             itr = d->connections.erase(itr);
@@ -89,15 +89,15 @@ void QnTcpListener::removeAllConnections()
 {
     Q_D(QnTcpListener);
 
-    for (QMap<TCPSocket*, CLLongRunnable*>::iterator itr = d->connections.begin(); itr != d->connections.end(); ++itr)
+    for (QMap<TCPSocket*, QnLongRunnable*>::iterator itr = d->connections.begin(); itr != d->connections.end(); ++itr)
     {
-        CLLongRunnable* processor = itr.value();
+        QnLongRunnable* processor = itr.value();
         processor->pleaseStop();
     }
 
-    for (QMap<TCPSocket*, CLLongRunnable*>::iterator itr = d->connections.begin(); itr != d->connections.end(); ++itr)
+    for (QMap<TCPSocket*, QnLongRunnable*>::iterator itr = d->connections.begin(); itr != d->connections.end(); ++itr)
     {
-        CLLongRunnable* processor = itr.value();
+        QnLongRunnable* processor = itr.value();
         delete processor;
     }
     d->connections.clear();

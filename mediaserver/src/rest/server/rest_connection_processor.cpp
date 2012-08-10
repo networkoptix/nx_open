@@ -8,9 +8,8 @@
 #include <QTime>
 
 static const int CONNECTION_TIMEOUT = 60 * 1000;
-static const int MAX_REQUEST_SIZE = 1024*1024*15;
 
-struct QnRestConnectionProcessor::QnRestConnectionProcessorPrivate: public QnTCPConnectionProcessor::QnTCPConnectionProcessorPrivate
+class QnRestConnectionProcessor::QnRestConnectionProcessorPrivate: public QnTCPConnectionProcessor::QnTCPConnectionProcessorPrivate
 {
 };
 
@@ -29,40 +28,9 @@ QnRestConnectionProcessor::~QnRestConnectionProcessor()
 void QnRestConnectionProcessor::run()
 {
     Q_D(QnRestConnectionProcessor);
-    QTime globalTimeout;
     while (1)
     {
-        globalTimeout.restart();
-        d->requestHeaders = QHttpRequestHeader();
-        d->responseHeaders = QHttpResponseHeader();
-        d->clientRequest.clear();
-        d->requestBody.clear();
-        d->responseBody.clear();
-        bool ready = false;
-        while (!m_needStop && d->socket->isConnected())
-        {
-            int readed = d->socket->recv(d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
-            if (readed > 0) 
-            {
-                globalTimeout.restart();
-                d->clientRequest.append((const char*) d->tcpReadBuffer, readed);
-                if (isFullMessage(d->clientRequest))
-                {
-                    ready = true;
-                    break;
-                }
-                else if (d->clientRequest.size() > MAX_REQUEST_SIZE)
-                {
-                    qWarning() << "Too large HTTP client request. Ignoring";
-                    break;
-                }
-            }
-            else //if (globalTimeout.elapsed() > CONNECTION_TIMEOUT)
-            {
-                break;
-            }
-        }
-
+        bool ready = readRequest();
         bool isKeepAlive = false;
         if (ready)
         {
@@ -73,14 +41,10 @@ void QnRestConnectionProcessor::run()
                 d->responseHeaders.addValue(QString("Keep-Alive"), QString("timeout=%1").arg(d->socketTimeout/1000));
             }
 
-            QByteArray data = d->requestHeaders.path().toUtf8();
-            data = data.replace("+", "%20");
-            QUrl url = QUrl::fromEncoded(data);
-
             d->responseBody.clear();
             int rez = CODE_OK;
             QByteArray encoding = "application/xml";
-
+            QUrl url = getDecodedUrl();
             QnRestRequestHandler* handler = static_cast<QnRestServer*>(d->owner)->findHandler(url.path());
             if (handler) 
             {
@@ -149,6 +113,5 @@ void QnRestConnectionProcessor::run()
 
 void QnRestConnectionProcessor::parseRequest()
 {
-    Q_D(QnRestConnectionProcessor);
     QnTCPConnectionProcessor::parseRequest();
 }

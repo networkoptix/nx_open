@@ -3,6 +3,8 @@
 #include "core/datapacket/mediadatapacket.h"
 #include "core/resource/camera_resource.h"
 #include "core/dataprovider/cpull_media_stream_provider.h"
+#include "utils/media/frame_info.h"
+#include "decoders/video/ffmpeg.h"
 
 // ------------------------------ QnVideoCameraGopKeeper --------------------------------
 
@@ -21,9 +23,15 @@ public:
     virtual void putData(QnAbstractDataPacketPtr data);
     virtual bool processData(QnAbstractDataPacketPtr data);
 
+    //QnMediaContextPtr getVideoCodecContext();
+    //QnMediaContextPtr getAudioCodecContext();
+    QnCompressedVideoDataPtr getLastVideoFrame();
+    QnCompressedAudioDataPtr getLastAudioFrame();
 private:
     QMutex m_queueMtx;
     int m_lastKeyFrameChannel;
+    QnCompressedAudioDataPtr m_lastAudioData;
+    QnCompressedVideoDataPtr m_lastKeyFrame;
 };
 
 QnVideoCameraGopKeeper::QnVideoCameraGopKeeper(QnResourcePtr resource): 
@@ -58,16 +66,23 @@ bool channelCheckFunctor(const QnAbstractDataPacketPtr& data, QVariant channelNu
 void QnVideoCameraGopKeeper::putData(QnAbstractDataPacketPtr data)
 {
     QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
-    if (!video)
-        return;
+    QnCompressedAudioDataPtr audio = qSharedPointerDynamicCast<QnCompressedAudioData>(data);
+
     QMutexLocker lock(&m_queueMtx);
-    if (video->flags & AV_PKT_FLAG_KEY) {
-        m_lastKeyFrameChannel = video->channelNumber;
-        m_dataQueue.removeDataByCondition(channelCheckFunctor, video->channelNumber);
+    if (video)
+    {
+        if (video->flags & AV_PKT_FLAG_KEY) {
+            m_lastKeyFrameChannel = video->channelNumber;
+            m_dataQueue.removeDataByCondition(channelCheckFunctor, video->channelNumber);
+            m_lastKeyFrame = video;
+        }
+        if (m_dataQueue.size() < m_dataQueue.maxSize()) {
+            video->flags |= QnAbstractMediaData::MediaFlags_LIVE;
+            QnAbstractDataConsumer::putData(video);
+        }
     }
-    if (m_dataQueue.size() < m_dataQueue.maxSize()) {
-        video->flags |= QnAbstractMediaData::MediaFlags_LIVE;
-        QnAbstractDataConsumer::putData(video);
+    else if (audio) {
+        m_lastAudioData = audio;
     }
 }
 
@@ -75,6 +90,33 @@ bool QnVideoCameraGopKeeper::processData(QnAbstractDataPacketPtr /*data*/)
 {
     return true;
 }
+
+/*
+QnMediaContextPtr QnVideoCameraGopKeeper::getVideoCodecContext()
+{
+    QnMediaContextPtr rez;
+    QMutexLocker lock(&m_queueMtx);
+    if (m_lastKeyFrame == 0)
+        return rez;
+    
+    rez = m_lastKeyFrame->context;
+    if (rez == 0)
+    {
+        // context is not filled. determine context by video payload
+        CLVideoDecoderOutput outFrame;
+        CLFFmpegVideoDecoder decoder(m_lastKeyFrame->compressionType, m_lastKeyFrame, false);
+        decoder.decode(m_lastKeyFrame, &outFrame);
+        rez = QnMediaContextPtr(new QnMediaContext(decoder.getContext()));
+    }
+
+    return rez;
+}
+
+QnMediaContextPtr QnVideoCameraGopKeeper::getAudioCodecContext()
+{
+    return m_lastAudioData->context;
+}
+*/
 
 int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, CLDataQueue& dstQueue)
 {
@@ -94,6 +136,20 @@ int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, CLDataQueue& dstQueue)
     }
     return rez;
 }
+
+
+QnCompressedVideoDataPtr QnVideoCameraGopKeeper::getLastVideoFrame()
+{
+    QMutexLocker lock(&m_queueMtx);
+    return m_lastKeyFrame;
+}
+
+QnCompressedAudioDataPtr QnVideoCameraGopKeeper::getLastAudioFrame()
+{
+    QMutexLocker lock(&m_queueMtx);
+    return m_lastAudioData;
+}
+
 
 // --------------- QnVideoCamera ----------------------------
 
@@ -168,6 +224,41 @@ int QnVideoCamera::copyLastGop(bool primaryLiveStream, qint64 skipTime, CLDataQu
         return m_secondaryGopKeeper->copyLastGop(skipTime, dstQueue);
 }
 
+/*
+QnMediaContextPtr QnVideoCamera::getVideoCodecContext(bool primaryLiveStream)
+{
+    if (primaryLiveStream)
+        return m_primaryGopKeeper->getVideoCodecContext();
+    else
+        return m_secondaryGopKeeper->getVideoCodecContext();
+}
+
+QnMediaContextPtr QnVideoCamera::getAudioCodecContext(bool primaryLiveStream)
+{
+    if (primaryLiveStream)
+        return m_primaryGopKeeper->getAudioCodecContext();
+    else
+        return m_secondaryGopKeeper->getAudioCodecContext();
+}
+*/
+
+
+QnCompressedVideoDataPtr QnVideoCamera::getLastVideoFrame(bool primaryLiveStream)
+{
+    if (primaryLiveStream)
+        return m_primaryGopKeeper->getLastVideoFrame();
+    else
+        return m_secondaryGopKeeper->getLastVideoFrame();
+}
+
+QnCompressedAudioDataPtr QnVideoCamera::getLastAudioFrame(bool primaryLiveStream)
+{
+    if (primaryLiveStream)
+        return m_primaryGopKeeper->getLastAudioFrame();
+    else
+        return m_secondaryGopKeeper->getLastAudioFrame();
+}
+
 void QnVideoCamera::inUse(void* user)
 {
     QMutexLocker lock(&m_getReaderMutex);
@@ -182,7 +273,7 @@ void QnVideoCamera::notInUse(void* user)
 
 bool QnVideoCamera::isSomeActivity() const
 {
-	return !m_cameraUsers.isEmpty() && !m_resource->isDisabled();
+    return !m_cameraUsers.isEmpty() && !m_resource->isDisabled();
 }
 
 void QnVideoCamera::stopIfNoActivity()

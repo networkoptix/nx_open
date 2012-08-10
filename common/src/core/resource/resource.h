@@ -19,7 +19,16 @@ class QnAbstractStreamDataProvider;
 class QnResourceConsumer;
 class QnResourcePool;
 
-typedef QMap<QString, QString> QnResourceParameters;
+class QnResourceParameters: public QMap<QString, QString> {
+    typedef QMap<QString, QString> base_type;
+
+public:
+    using base_type::operator[];
+
+    QString &operator[](const char *key) {
+        return base_type::operator[](QLatin1String(key));
+    }
+};
 
 class QN_EXPORT QnResource : public QObject
 {
@@ -33,7 +42,7 @@ class QN_EXPORT QnResource : public QObject
     Q_PROPERTY(QString searchString READ toSearchString)
     Q_PROPERTY(QnId parentId READ getParentId WRITE setParentId)
     Q_PROPERTY(Status status READ getStatus WRITE setStatus)
-	Q_PROPERTY(bool disabled READ isDisabled WRITE setDisabled)
+    Q_PROPERTY(bool disabled READ isDisabled WRITE setDisabled)
     Q_PROPERTY(Flags flags READ flags WRITE setFlags)
     Q_PROPERTY(QString url READ getUrl WRITE setUrl)
     Q_PROPERTY(QDateTime lastDiscoveredTime READ getLastDiscoveredTime WRITE setLastDiscoveredTime)
@@ -42,7 +51,7 @@ class QN_EXPORT QnResource : public QObject
 public:
     enum ConnectionRole { Role_Default, Role_LiveVideo, Role_SecondaryLiveVideo, Role_Archive };
 
-	enum Status { Offline, Unauthorized, Online, Recording };
+    enum Status { Offline, Unauthorized, Online, Recording };
 
     enum Flag {
         network = 0x01,         /**< Has ip and mac. */
@@ -101,8 +110,8 @@ public:
     QnId getTypeId() const;
     void setTypeId(QnId id);
 
-	bool isDisabled() const;
-	void setDisabled(bool disabled = true);
+    bool isDisabled() const;
+    void setDisabled(bool disabled = true);
 
     Status getStatus() const;
     virtual void setStatus(Status newStatus, bool silenceMode = false);
@@ -194,14 +203,27 @@ public:
 signals:
     void parameterValueChanged(const QnParam &param);
     void statusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
-	void disabledChanged(bool oldValue, bool newValue);
+    void disabledChanged(bool oldValue, bool newValue);
     void nameChanged();
     void parentIdChanged();
     void idChanged(const QnId &oldId, const QnId &newId);
     void flagsChanged();
+    //!Emitted on completion of every async get started with getParamAsync
+    /*!
+        \param paramValue in case \a result == false, this value cannot be relied on
+        \param result true, if param succesfully read, false otherwises
+    */
+    void asyncParamGetDone( const QString& paramName, const QVariant& paramValue, bool result );
+    //!Emitted on completion of every async set started with setParamAsync
+    /*!
+        \param paramValue in case \a result == false, this value cannot be relied on
+        \param result true, if param succesfully set, false otherwises
+    */
+    void asyncParamSetDone( const QString& paramName, const QVariant& paramValue, bool result );
 
     void resourceChanged();
     void initAsyncFinished(QnResourcePtr resource, bool initialized);
+
 public:
     // this is thread to process commands like setparam
     static void startCommandProc();
@@ -286,8 +308,8 @@ private:
     /** Name of this resource. */
     QString m_name;
 
-	/** Disable flag of the resource. */
-	bool m_disabled;
+    /** Disable flag of the resource. */
+    bool m_disabled;
 
     /** Status of this resource. */
     Status m_status;

@@ -6,12 +6,15 @@
 #include <netinet/tcp.h>
 #endif
 
+static const int MAX_REQUEST_SIZE = 1024*1024*15;
+
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(TCPSocket* socket, QnTcpListener* _owner):
     d_ptr(new QnTCPConnectionProcessorPrivate)
 {
     Q_D(QnTCPConnectionProcessor);
     d->socket = socket;
     d->owner = _owner;
+    d->chunkedMode = false;
 }
 
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(QnTCPConnectionProcessorPrivate* dptr, TCPSocket* socket, QnTcpListener* _owner):
@@ -21,6 +24,7 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(QnTCPConnectionProcessorPriva
     d->socket = socket;
     //d->socket->setNoDelay(true);
     d->owner = _owner;
+    d->chunkedMode = false;
 }
 
 
@@ -102,14 +106,14 @@ void QnTCPConnectionProcessor::parseRequest()
                 if (v.length() > 1)
                     minor = v[1].toInt();
             }
-            d->requestHeaders = QHttpRequestHeader(params[0], params[1], major, minor);
+            d->requestHeaders = QHttpRequestHeader(QLatin1String(params[0]), QLatin1String(params[1]), major, minor);
             firstLine = false;
         }
         else
         {
             QList<QByteArray> params = line.split(':');
             if (params.size() > 1)
-                d->requestHeaders.addValue(params[0].trimmed(), params[1].trimmed());
+                d->requestHeaders.addValue(QLatin1String(params[0].trimmed()), QLatin1String(params[1].trimmed()));
         }
     }
     QByteArray delimiter = "\n";
@@ -120,7 +124,7 @@ void QnTCPConnectionProcessor::parseRequest()
         delimiter = "\r\n";
     QByteArray dblDelim = delimiter + delimiter;
     int bodyStart = d->clientRequest.indexOf(dblDelim);
-    if (bodyStart >= 0 && d->requestHeaders.value("content-length").toInt() > 0)
+    if (bodyStart >= 0 && d->requestHeaders.value(QLatin1String("content-length")).toInt() > 0)
         d->requestBody = d->clientRequest.mid(bodyStart + dblDelim.length());
 }
 
@@ -128,6 +132,12 @@ void QnTCPConnectionProcessor::bufferData(const char* data, int size)
 {
     Q_D(QnTCPConnectionProcessor);
     d->sendBuffer.write(data, size);
+}
+
+QnByteArray& QnTCPConnectionProcessor::getSendBuffer()
+{
+    Q_D(QnTCPConnectionProcessor);
+    return d->sendBuffer;
 }
 
 void QnTCPConnectionProcessor::sendBuffer()
@@ -163,10 +173,10 @@ QString QnTCPConnectionProcessor::extractPath() const
 {
     Q_D(const QnTCPConnectionProcessor);
     QString path = d->requestHeaders.path();
-    int pos = path.indexOf("://");
+    int pos = path.indexOf(QLatin1String("://"));
     if (pos == -1)
         return QString();
-    pos = path.indexOf('/', pos+3);
+    pos = path.indexOf(QLatin1Char('/'), pos+3);
     if (pos == -1)
         return QString();
     return path.mid(pos+1);
@@ -176,11 +186,15 @@ void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int cod
 {
     Q_D(QnTCPConnectionProcessor);
     d->responseHeaders.setStatusLine(code, codeToMessage(code), d->requestHeaders.majorVersion(), d->requestHeaders.minorVersion());
+    if (d->chunkedMode)
+    {
+        d->responseHeaders.setValue(QLatin1String("Transfer-Encoding"), QLatin1String("chunked"));
+        d->responseHeaders.setContentType(QLatin1String(contentType));
+    }
     if (!d->responseBody.isEmpty())
     {
         d->responseHeaders.setContentLength(d->responseBody.length());
-        //d->responseHeaders.setContentType("application/sdp");
-        d->responseHeaders.setContentType(contentType);
+        d->responseHeaders.setContentType(QLatin1String(contentType));
     }
 
     QByteArray response = d->responseHeaders.toString().toUtf8();
@@ -197,20 +211,35 @@ void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int cod
     d->socket->send(response.data(), response.size());
 }
 
+bool QnTCPConnectionProcessor::sendChunk(const QnByteArray& chunk)
+{
+    Q_D(QnTCPConnectionProcessor);
+    if (d->socket->send(QByteArray::number(chunk.size(),16)) < 1)
+        return false;
+    if (d->socket->send("\r\n") < 1)
+        return false;
+    if (d->socket->send(chunk) < 1)
+        return false;
+    if (d->socket->send("\r\n") < 1)
+        return false;
+
+    return true;
+}
+
 QString QnTCPConnectionProcessor::codeToMessage(int code)
 {
     switch(code)
     {
     case CODE_OK:
-        return "OK";
+        return tr("OK");
     case CODE_NOT_FOUND:
-        return "Not Found";
+        return tr("Not Found");
     case CODE_NOT_IMPLEMETED:
-        return "Not Implemented";
+        return tr("Not Implemented");
     case CODE_INTERNAL_ERROR:
-        return "Internal Server Error";
+        return tr("Internal Server Error");
     case CODE_INVALID_PARAMETER:
-        return "Invalid Parameter";
+        return tr("Invalid Parameter");
     }
     return QString ();
 }
@@ -220,11 +249,56 @@ void QnTCPConnectionProcessor::pleaseStop()
     Q_D(QnTCPConnectionProcessor);
     if (d->socket)
         d->socket->close();
-    CLLongRunnable::pleaseStop();
+    QnLongRunnable::pleaseStop();
 }
 
 int QnTCPConnectionProcessor::getSocketTimeout()
 {
     Q_D(QnTCPConnectionProcessor);
     return d->socketTimeout;
+}
+
+bool QnTCPConnectionProcessor::readRequest()
+{
+    Q_D(QnTCPConnectionProcessor);
+
+    QTime globalTimeout;
+    d->requestHeaders = QHttpRequestHeader();
+    d->clientRequest.clear();
+    d->responseHeaders = QHttpResponseHeader();
+    d->requestBody.clear();
+    d->responseBody.clear();
+
+    while (!m_needStop && d->socket->isConnected())
+    {
+        int readed = d->socket->recv(d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
+        if (readed > 0) 
+        {
+            globalTimeout.restart();
+            d->clientRequest.append((const char*) d->tcpReadBuffer, readed);
+            if (isFullMessage(d->clientRequest))
+            {
+                return true;
+            }
+            else if (d->clientRequest.size() > MAX_REQUEST_SIZE)
+            {
+                qWarning() << "Too large HTTP client request. Ignoring";
+                return false;
+            }
+        }
+        else //if (globalTimeout.elapsed() > CONNECTION_TIMEOUT)
+        {
+            break;
+        }
+    }
+    return false;
+}
+
+QUrl QnTCPConnectionProcessor::getDecodedUrl() const
+{
+    Q_D(const QnTCPConnectionProcessor);
+    QByteArray data = d->requestHeaders.path().toUtf8();
+    data = data.replace("+", "%20");
+    return QUrl::fromEncoded(data);
+
 }

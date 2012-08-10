@@ -44,7 +44,7 @@ QnResourcePtr QnPlISDResourceSearcher::createResource(QnId resourceTypeId, const
 
 QString QnPlISDResourceSearcher::manufacture() const
 {
-    return QnPlIsdResource::MANUFACTURE;
+    return QLatin1String(QnPlIsdResource::MANUFACTURE);
 }
 
 
@@ -53,8 +53,11 @@ QnResourcePtr QnPlISDResourceSearcher::checkHostAddr(QHostAddress addr)
     return QnResourcePtr(0);
 }
 
-QnNetworkResourcePtr QnPlISDResourceSearcher::processPacket(QnResourceList& result, QByteArray& responseData, const QHostAddress& discoveryAddress)
+QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(QnResourceList& result, QByteArray& responseData, const QHostAddress& discoveryAddress)
 {
+
+    QList<QnNetworkResourcePtr> local_result;
+
 
     QString smac;
     QString name;
@@ -63,28 +66,28 @@ QnNetworkResourcePtr QnPlISDResourceSearcher::processPacket(QnResourceList& resu
 
 
     if (iqpos<0)
-        return QnNetworkResourcePtr(0);
+        return local_result;
 
     int macpos = responseData.indexOf("macaddress=");
     if (macpos < 0)
-        return QnNetworkResourcePtr(0);
+        return local_result;
 
-    macpos += QString("macaddress=").length();
+    macpos += QString(QLatin1String("macaddress=")).length();
     if (macpos + 12 > responseData.size())
-        return QnNetworkResourcePtr(0);
+        return local_result;
 
 
     //name = responseData.mid();
-    name = "ISDcam";
+    name = QLatin1String("ISDcam");
 //
 //    for (int i = iqpos; i < macpos; i++)
 //    {
 //        name += QLatin1Char(responseData[i]);
 //    }
 //
-    name.replace(QString(" "), QString()); // remove spaces
-    name.replace(QString("-"), QString()); // remove spaces
-    name.replace(QString("\t"), QString()); // remove tabs
+    name.replace(QLatin1Char(' '), QString()); // remove spaces
+    name.replace(QLatin1Char('-'), QString()); // remove spaces
+    name.replace(QLatin1Char('\t'), QString()); // remove tabs
 
     //macpos++; // -
 //
@@ -118,7 +121,7 @@ QnNetworkResourcePtr QnPlISDResourceSearcher::processPacket(QnResourceList& resu
         {
             if (isNewDiscoveryAddressBetter(net_res->getHostAddress().toString(), discoveryAddress.toString(), net_res->getDiscoveryAddr().toString()))
                 net_res->setDiscoveryAddr(discoveryAddress);
-            return QnNetworkResourcePtr(0); // already found;
+            return local_result; // already found;
         }
     }
 
@@ -128,14 +131,16 @@ QnNetworkResourcePtr QnPlISDResourceSearcher::processPacket(QnResourceList& resu
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
     if (!rt.isValid())
     {
-        return QnNetworkResourcePtr(0);
+        return local_result;
     }
 
     resource->setTypeId(rt);
     resource->setName(name);
     resource->setMAC(smac);
 
-    return resource;
+    local_result.push_back(resource);
+
+    return local_result;
 
 
 }

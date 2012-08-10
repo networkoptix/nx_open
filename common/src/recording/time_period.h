@@ -1,10 +1,9 @@
 #ifndef QN_TIME_PERIOD_H
 #define QN_TIME_PERIOD_H
 
-#include <QtCore/QVector>
 #include <QtCore/QMetaType>
 
-struct QnTimePeriod;
+class QnTimePeriod;
 class QnTimePeriodList;
 
 namespace Qn {
@@ -24,27 +23,29 @@ namespace Qn {
 } // namespace Qn
 
 
-struct QN_EXPORT QnTimePeriod
-{
+class QN_EXPORT QnTimePeriod {
+public:
     /**
      * Constructs a null time period.
      */
     QnTimePeriod(): startTimeMs(0), durationMs(0) {}
 
     /**
+     * Constructor.
+     *
      * \param startTimeMs               Period's start time, normally in milliseconds since epoch.
      * \param durationMs                Period's duration, in milliseconds.
      */
     QnTimePeriod(qint64 startTimeMs, qint64 durationMs): startTimeMs(startTimeMs), durationMs(durationMs) {}
 
-    bool operator==(const QnTimePeriod& other) const;
+    bool operator==(const QnTimePeriod &other) const;
 
     static QnTimePeriodList mergeTimePeriods(const QVector<QnTimePeriodList>& periods);
     static QnTimePeriodList aggregateTimePeriods(const QnTimePeriodList& periods, int detailLevelMs);
     
     /** 
      * Encode (compress) data to a byte array. 
-     * TimePeriods must be arranged by time and must not intersect. If this condition is not met, the function returns false. 
+     * TimePeriods must be arranged by time and must not intersected. If this condition is not met, the function returns false. 
      * Average compressed QnTimePeriod size is close to 6 bytes.
      * 
      * \param stream                    Byte array to compress time periods to. 
@@ -69,10 +70,10 @@ struct QN_EXPORT QnTimePeriod
      */
     static bool decode(const quint8 *data, int dataSize, QnTimePeriodList &periods);
 
-    bool containTime(qint64 timeMs) const;
-    bool containPeriod(const QnTimePeriod &timePeriod) const;
+    bool contains(qint64 timeMs) const;
+    bool contains(const QnTimePeriod &timePeriod) const;
     void addPeriod(const QnTimePeriod &timePeriod);
-    QnTimePeriod intersect(const QnTimePeriod &other) const;
+    QnTimePeriod intersected(const QnTimePeriod &other) const;
     void clear();
 
     /**
@@ -115,55 +116,9 @@ struct QN_EXPORT QnTimePeriod
     qint64 durationMs;
 };
 
-class QnTimePeriodList: public QVector<QnTimePeriod>
-{
-public:
-    QnTimePeriodList(): QVector<QnTimePeriod>() 
-    {
-    }
-
-    /**
-     * \param timeMs                    Time value to search for, in milliseconds.
-     * \param searchForward             How to behave when there is no interval containing the given time value.
-     *                                  If false, position of an interval preceding the value is returned. 
-     *                                  Otherwise, position of an interval that follows the value is returned. 
-     *                                  Note that this position may equal <tt>end</tt>.
-     * \returns                         Position of a time period that is closest to the given time value.
-     */
-    const_iterator findNearestPeriod(qint64 timeMs, bool searchForward) const
-    {
-        if (isEmpty())
-            return end();
-
-        const_iterator itr = qUpperBound(begin(), end(), timeMs);
-        if (itr != begin())
-            --itr;
-
-        /* Note that there is no need to check for itr != end() here as
-         * the container is not empty. */
-        if (searchForward && itr->endTimeMs() <= timeMs)
-            ++itr;
-        return itr;
-    }
-
-    /**
-     * Returns true if timePeriodList intersect period
-     */
-    bool intersectPeriod(const QnTimePeriod& period) const
-    {
-        const_iterator itrStart = findNearestPeriod(period.startTimeMs, true);
-        const_iterator itrEnd = findNearestPeriod(period.endTimeMs(), true);
-        for (const_iterator itr = itrStart; itr != itrEnd; ++itr) {
-            if (!itr->intersect(period).isEmpty())
-                return true;
-        }
-        return itrEnd != end() && !itrEnd->intersect(period).isEmpty();
-    }
-};
-
-bool operator < (const QnTimePeriod& first, const QnTimePeriod& other);
-bool operator < (qint64 first, const QnTimePeriod& other);
-bool operator < (const QnTimePeriod& other, qint64 first);
+bool operator<(const QnTimePeriod &first, const QnTimePeriod &other);
+bool operator<(qint64 first, const QnTimePeriod &other);
+bool operator<(const QnTimePeriod &other, qint64 first);
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::TimePeriodTypes);
 
@@ -173,6 +128,5 @@ Q_DECLARE_METATYPE(Qn::TimePeriodTypes);
 Q_DECLARE_METATYPE(Qn::TimePeriodType);
 Q_DECLARE_METATYPE(Qn::TimePeriodRole);
 Q_DECLARE_METATYPE(QnTimePeriod);
-Q_DECLARE_METATYPE(QnTimePeriodList);
 
 #endif // QN_TIME_PERIOD_H

@@ -96,7 +96,7 @@ QnConnectionDataList QnConnectionsSettingsWidget::connections() const
         QString host = m_connectionsRootItem->child(row, 1)->text();
         int port = m_connectionsRootItem->child(row, 2)->text().toInt();
         
-        connection.url.setScheme("https");
+        connection.url.setScheme(QLatin1String("https"));
         connection.url.setHost(host);
         connection.url.setPort(port);
         connection.url.setUserName(m_connectionsRootItem->child(row, 3)->text());
@@ -127,7 +127,7 @@ void QnConnectionsSettingsWidget::addConnection(const QnConnectionData &connecti
         << new QStandardItem(QString::number(connection.url.port()))
         << new QStandardItem(connection.url.userName())
         << new QStandardItem(connection.url.password())
-        << new QStandardItem(connection.readOnly ? "ro" : "rw");
+        << new QStandardItem(connection.readOnly ? QLatin1String("ro") : QLatin1String("rw"));
     m_connectionsRootItem->appendRow(row);
 }
 
@@ -152,7 +152,7 @@ void QnConnectionsSettingsWidget::currentRowChanged(const QModelIndex &current, 
     {
         QModelIndex index = current.sibling(current.row(), 5);
         QStandardItem *item = m_connectionsModel->itemFromIndex(index);
-        disable = (item->text() == "ro");
+        disable = (item->text() == QLatin1String("ro"));
     }
 
     ui->connectionNameLineEdit->setEnabled(!disable);
@@ -183,7 +183,7 @@ QUrl QnConnectionsSettingsWidget::currentUrl()
     QString host = m_connectionsModel->itemFromIndex(current.sibling(current.row(), 1))->text();
     int port = m_connectionsModel->itemFromIndex(current.sibling(current.row(), 2))->text().toInt();
 
-    url.setScheme("https");
+    url.setScheme(QLatin1String("https"));
     url.setHost(host);
     url.setPort(port);
     url.setUserName(m_connectionsModel->itemFromIndex(current.sibling(current.row(), 3))->text());
@@ -223,7 +223,7 @@ void QnConnectionsSettingsWidget::newConnection()
     QList<QStandardItem *> row;
     row << new QStandardItem(tr("Unnamed"))
         << new QStandardItem()
-        << new QStandardItem("8000")
+        << new QStandardItem(QLatin1String("8000"))
         << new QStandardItem()
         << new QStandardItem()
         << new QStandardItem();
@@ -248,7 +248,7 @@ void QnConnectionsSettingsWidget::duplicateConnection()
         row << m_connectionsModel->itemFromIndex(index)->clone();
     }
     row.first()->setText(tr("Another ") + row.first()->text());
-    row.at(5)->setText("rw");
+    row.at(5)->setText(QLatin1String("rw"));
     m_connectionsRootItem->appendRow(row);
 
     ui->connectionsTreeView->setCurrentIndex(row.first()->index());

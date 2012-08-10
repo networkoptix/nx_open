@@ -19,16 +19,16 @@ class QnAbstractMediaStreamDataProvider : public QnAbstractStreamDataProvider
     Q_OBJECT;
 
 public:
-	explicit QnAbstractMediaStreamDataProvider(QnResourcePtr res);
-	virtual ~QnAbstractMediaStreamDataProvider();
+    explicit QnAbstractMediaStreamDataProvider(QnResourcePtr res);
+    virtual ~QnAbstractMediaStreamDataProvider();
 
 
-	const QnStatistics* getStatistics(int channel) const;
+    const QnStatistics* getStatistics(int channel) const;
     float getBitrate() const;
 
-	virtual void setNeedKeyData();
-	virtual bool needKeyData(int channel) const;
-	virtual bool needKeyData() const;
+    virtual void setNeedKeyData();
+    virtual bool needKeyData(int channel) const;
+    virtual bool needKeyData() const;
 
     virtual QnMediaContextPtr getCodecContext() const;
 
@@ -46,8 +46,8 @@ protected:
     
     void checkTime(QnAbstractMediaDataPtr data);
 protected:
-	QnStatistics m_stat[CL_MAX_CHANNEL_NUMBER];
-	int m_gotKeyFrame[CL_MAX_CHANNEL_NUMBER];
+    QnStatistics m_stat[CL_MAX_CHANNEL_NUMBER];
+    int m_gotKeyFrame[CL_MAX_CHANNEL_NUMBER];
 
     int mFramesLost;
     QnMediaResourcePtr m_mediaResource;

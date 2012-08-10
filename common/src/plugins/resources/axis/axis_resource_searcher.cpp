@@ -43,42 +43,45 @@ QnResourcePtr QnPlAxisResourceSearcher::createResource(QnId resourceTypeId, cons
 
 QString QnPlAxisResourceSearcher::manufacture() const
 {
-    return QnPlAxisResource::MANUFACTURE;
+    return QLatin1String(QnPlAxisResource::MANUFACTURE);
 }
 
 
 QnResourcePtr QnPlAxisResourceSearcher::checkHostAddr(QHostAddress addr)
 {
+    Q_UNUSED(addr)
     return QnResourcePtr(0);
 }
 
-QnNetworkResourcePtr QnPlAxisResourceSearcher::processPacket(QnResourceList& result, QByteArray& responseData, const QHostAddress& discoveryAddress)
+QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(QnResourceList& result, QByteArray& responseData, const QHostAddress& discoveryAddress)
 {
 
     QString smac;
     QString name;
 
+    QList<QnNetworkResourcePtr> local_results;
+
     int iqpos = responseData.indexOf("AXIS");
 
 
     if (iqpos<0)
-        return QnNetworkResourcePtr(0);
+        return local_results;
 
     int macpos = responseData.indexOf("00", iqpos);
     if (macpos < 0)
-        return QnNetworkResourcePtr(0);
+        return local_results;
 
     for (int i = iqpos; i < macpos; i++)
     {
         name += QLatin1Char(responseData[i]);
     }
 
-    name.replace(QString(" "), QString()); // remove spaces
-    name.replace(QString("-"), QString()); // remove spaces
-    name.replace(QString("\t"), QString()); // remove tabs
+    name.replace(QLatin1Char(' '), QString()); // remove spaces
+    name.replace(QLatin1Char('-'), QString()); // remove spaces
+    name.replace(QLatin1Char('\t'), QString()); // remove tabs
 
     if (macpos+12 > responseData.size())
-        return QnNetworkResourcePtr(0);
+        return local_results;
 
 
     //macpos++; // -
@@ -88,7 +91,7 @@ QnNetworkResourcePtr QnPlAxisResourceSearcher::processPacket(QnResourceList& res
 
 
     if (macpos+12 > responseData.size())
-        return QnNetworkResourcePtr(0);
+        return local_results;
 
 
 
@@ -112,7 +115,7 @@ QnNetworkResourcePtr QnPlAxisResourceSearcher::processPacket(QnResourceList& res
         if (net_res->getMAC().toString() == smac) {
             if (isNewDiscoveryAddressBetter(net_res->getHostAddress().toString(), discoveryAddress.toString(), net_res->getDiscoveryAddr().toString()))
                 net_res->setDiscoveryAddr(discoveryAddress);
-            return QnNetworkResourcePtr(0); // already found;
+            return local_results; // already found;
         }
     }
 
@@ -121,13 +124,50 @@ QnNetworkResourcePtr QnPlAxisResourceSearcher::processPacket(QnResourceList& res
 
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
     if (!rt.isValid())
-        return QnNetworkResourcePtr(0);
+        return local_results;
 
     resource->setTypeId(rt);
     resource->setName(name);
     resource->setMAC(smac);
 
-    return resource;
+    local_results.push_back(resource);
 
 
+    
+
+    int channesl = 1;
+
+    if (resource->hasSuchParam(QLatin1String("channelsAmount")))
+    {
+        QVariant val;
+        resource->getParam(QLatin1String("channelsAmount"), val, QnDomainMemory);
+        channesl = val.toUInt();
+    }
+
+    if (channesl > 1) //
+    {
+
+        resource->setPhysicalId(resource->getPhysicalId() + QLatin1String("_channel_") + QString::number(1));
+
+        for (int i = 2; i <= channesl; ++i)
+        {
+            QnNetworkResourcePtr resource ( new QnPlAxisResource() );
+
+            QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
+            if (!rt.isValid())
+                return local_results;
+
+            resource->setTypeId(rt);
+            resource->setName(name);
+            resource->setMAC(smac);
+
+            resource->setPhysicalId(resource->getPhysicalId() + QLatin1String("_channel_") + QString::number(i));
+
+            local_results.push_back(resource);
+
+        }
+    }
+
+
+    return local_results;
 }

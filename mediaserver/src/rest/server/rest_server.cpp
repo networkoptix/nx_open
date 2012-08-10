@@ -32,8 +32,8 @@ QnRestRequestHandler* QnRestServer::findHandler(QString path)
 {
     if (path.startsWith('/'))
         path = path.mid(1);
-	if (path.endsWith('/'))
-		path = path.left(path.length()-1);
+    if (path.endsWith('/'))
+        path = path.left(path.length()-1);
 
     for (Handlers::iterator i = m_handlers.begin();i != m_handlers.end(); ++i)
     {

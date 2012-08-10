@@ -9,9 +9,9 @@
 #include "core/resource/resource.h"
 #include "core/resource/camera_resource.h"
 #include "ui/common/read_only.h"
-#include "ui/device_settings/camera_schedule_widget.h"
-#include "ui/device_settings/camera_motion_mask_widget.h"
-#include "ui/graphics/items/resource_widget.h"
+#include "ui/widgets/properties/camera_schedule_widget.h"
+#include "ui/widgets/properties/camera_motion_mask_widget.h"
+#include "ui/graphics/items/resource/resource_widget.h"
 
 QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent): 
     QWidget(parent),
@@ -298,8 +298,8 @@ void QnMultipleCameraSettingsWidget::updateMaxFPS(){
     float currentMaxFps = ui->cameraScheduleWidget->getGridMaxFps();
     if (currentMaxFps > maxFps)
     {
-        QMessageBox::warning(this, tr("Warning. FPS value is too high"), 
-            tr("For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps dropped down to %2").arg(currentMaxFps).arg(maxFps));
+        QMessageBox::warning(this, tr("FPS value is too high"), 
+            tr("For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2").arg(currentMaxFps).arg(maxFps));
     }
     ui->cameraScheduleWidget->setMaxFps(maxFps);
 

@@ -1,13 +1,14 @@
+//
+// This file is generated. Go to pom.xml.
+//
 #ifndef ${artifactId}_VERSION_H_
 #define ${artifactId}_VERSION_H_
-// This file is generated. Go to version.py or pom.xml
-static const char* ORGANIZATION_NAME="${company.name}";
-static const char* APPLICATION_NAME="${product.title}";
-static const char* APPLICATION_VERSION="${project.version}.${buildNumber}";
-const char* const APPLICATION_REVISION="${changeSet}";
-const char* const FFMPEG_VERSION="${ffmpeg.version}";
 
-//HD Witness Components Custom Names
+static const char *const ORGANIZATION_NAME="${company.name}";
+static const char *const APPLICATION_NAME="${product.title}";
+static const char *const APPLICATION_VERSION="${project.version}.${buildNumber}";
+static const char *const APPLICATION_REVISION="${changeSet}";
+static const char *const FFMPEG_VERSION="${ffmpeg.version}";
 
 // These constans are here for windows resouce file.
 #define VER_FILEVERSION             ${parsedVersion.majorVersion},${parsedVersion.minorVersion},${parsedVersion.incrementalVersion},${buildNumber}
@@ -23,4 +24,5 @@ const char* const FFMPEG_VERSION="${ffmpeg.version}";
 #define VER_ORIGINALFILENAME_STR    "${artifactId}.exe"
 #define VER_PRODUCTNAME_STR         "${artifactId}"
 #define VER_COMPANYDOMAIN_STR       "${company.url}"
+
 #endif // ${artifactId}_VERSION_H_

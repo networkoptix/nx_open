@@ -42,6 +42,13 @@ public:
     * \returns                          Number of CPU cores
     */
     static int cpuCoreCount();
+
+    /**
+     * \returns                         Percentage of elapsed time that the fixed disk drives
+     *                                  are busy servicing read or write requests.
+     * \param hddUsage                  Output list of hdd usage data.
+     */
+    static bool currentHddUsage(QList<int> *output);
 };
 
 

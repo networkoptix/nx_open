@@ -3,12 +3,13 @@
 
 #include "utils/common/longrunnable.h"
 #include "core/resource/video_server.h"
+#include "http/progressive_downloading_server.h"
 
 class QnAppserverResourceProcessor;
 class QnRtspListener;
 class QnRestServer;
 
-class QnMain : public CLLongRunnable
+class QnMain : public QnLongRunnable
 {
     Q_OBJECT
 
@@ -31,6 +32,7 @@ private:
     QnAppserverResourceProcessor* m_processor;
     QnRtspListener* m_rtspListener;
     QnRestServer* m_restServer;
+    QnProgressiveDownloadingServer* m_progressiveDownloadingServer;
     QnVideoServerResourcePtr m_videoServer;
 };
 

@@ -1,18 +1,22 @@
 #ifndef __PRACTICALSOCKET_INCLUDED__
 #define __PRACTICALSOCKET_INCLUDED__
 
-#include <QString>
-#include <string>            // For QString
-#include <exception>         // For exception class
+#include <string>
+#include <exception>
+
+#include <QtCore/QString>
+#include <QtCore/QCoreApplication> /* For Q_DECLARE_TR_FUNCTIONS. */
 
 #ifdef Q_OS_WIN
-#  include <winsock2.h>
+#   include <winsock2.h>
 #else
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <netinet/in.h>
+#   include <sys/socket.h>
+#   include <sys/types.h>
+#   include <netinet/in.h>
 #endif
+
 #include "nettools.h"
+#include "utils/common/bytearray.h"
 
 #define MAX_ERROR_MSG_LENGTH 1024
 
@@ -48,6 +52,7 @@ private:
  *   Base class representing basic communication endpoint
  */
 class Socket {
+    Q_DECLARE_TR_FUNCTIONS(Socket)
 public:
     /**
      *   Close and deallocate this socket
@@ -124,7 +129,7 @@ public:
      *   @param protocol protocol of service to resolve.  Default is "tcp".
      */
     static unsigned short resolveService(const QString &service,
-                                         const QString &protocol = "tcp");
+                                         const QString &protocol = QLatin1String("tcp"));
 
     int handle() const { return sockDesc; }
 
@@ -155,8 +160,8 @@ protected:
 /**
  *   Socket which is able to connect, send, and receive
  */
-class CommunicatingSocket : public Socket
-{
+class CommunicatingSocket : public Socket {
+    Q_DECLARE_TR_FUNCTIONS(CommunicatingSocket)
 public:
     /**
      *   Establish a socket connection with the given foreign
@@ -179,6 +184,9 @@ public:
      *   @exception SocketException thrown if unable to send data
      */
     int send(const void *buffer, int bufferLen) ;
+    int send(const QnByteArray& data);
+    int send(const QByteArray& data);
+
 
     /**
      *   Read into the given buffer up to bufferLen bytes data from this
@@ -219,6 +227,7 @@ protected:
  *   TCP socket for communication with other TCP sockets
  */
 class TCPSocket : public CommunicatingSocket {
+    Q_DECLARE_TR_FUNCTIONS(TCPSocket)
 public:
     /**
      *   Construct a TCP socket with no connection
@@ -248,6 +257,7 @@ private:
  *   TCP socket class for servers
  */
 class TCPServerSocket : public Socket {
+    Q_DECLARE_TR_FUNCTIONS(TCPServerSocket)
 public:
     /**
      *   Construct a TCP socket for use with a server, accepting connections
@@ -288,6 +298,7 @@ private:
   *   UDP socket class
   */
 class UDPSocket : public CommunicatingSocket {
+    Q_DECLARE_TR_FUNCTIONS(UDPSocket)
 public:
     /**
      *   Construct a UDP socket
@@ -381,6 +392,7 @@ public:
 
 private:
     void setBroadcast();
+
 private:
     sockaddr_in* m_destAddr;
 };

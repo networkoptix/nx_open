@@ -1,11 +1,13 @@
 #include "buffered_screen_grabber.h"
 
+#ifdef Q_OS_WIN
+
 static const int MAX_JITTER = 60;
 
-CLBufferedScreenGrabber::CLBufferedScreenGrabber(int displayNumber,
+QnBufferedScreenGrabber::QnBufferedScreenGrabber(int displayNumber,
                                                  int queueSize,
                                                  int frameRate,
-                                                 CLScreenGrabber::CaptureMode mode,
+                                                 QnScreenGrabber::CaptureMode mode,
                                                  bool captureCursor,
                                                  const QSize& captureResolution,
                                                  QWidget* widget):
@@ -28,18 +30,18 @@ CLBufferedScreenGrabber::CLBufferedScreenGrabber(int displayNumber,
         m_frames[i] = avcodec_alloc_frame();
 }
 
-CLBufferedScreenGrabber::~CLBufferedScreenGrabber()
+QnBufferedScreenGrabber::~QnBufferedScreenGrabber()
 {
     m_needStop = true;
     wait();
 }
 
-void CLBufferedScreenGrabber::stop()
+void QnBufferedScreenGrabber::stop()
 {
     m_needStop = true;
 }
 
-void CLBufferedScreenGrabber::run()
+void QnBufferedScreenGrabber::run()
 {
     m_grabber.restartTimer();
     //m_timer.start();
@@ -54,7 +56,7 @@ void CLBufferedScreenGrabber::run()
             break;
         AVFrame* curFrame = m_frames[m_frameIndex];
         m_frameIndex = m_frameIndex < m_frames.size()-1 ? m_frameIndex+1 : 0;
-        CLScreenGrabber::CaptureInfo info = m_grabber.captureFrame();
+        QnScreenGrabber::CaptureInfo info = m_grabber.captureFrame();
         if (info.opaque == 0)
             continue;
         m_queue.push(info);
@@ -72,23 +74,25 @@ void CLBufferedScreenGrabber::run()
     }
 }
 
-bool CLBufferedScreenGrabber::dataExist()
+bool QnBufferedScreenGrabber::dataExist()
 {
     return m_queue.size() > 0;
 }
 
-CLScreenGrabber::CaptureInfo CLBufferedScreenGrabber::getNextFrame()
+QnScreenGrabber::CaptureInfo QnBufferedScreenGrabber::getNextFrame()
 {
-    CLScreenGrabber::CaptureInfo rez;
+    QnScreenGrabber::CaptureInfo rez;
     rez.opaque = 0;
     m_queue.pop(rez, 40);
     return rez;
 }
 
-AVRational CLBufferedScreenGrabber::getFrameRate()
+AVRational QnBufferedScreenGrabber::getFrameRate()
 {
     AVRational rez;
     rez.num = 1;
     rez.den = m_frameRate;
     return rez;
 }
+
+#endif // Q_OS_WIN

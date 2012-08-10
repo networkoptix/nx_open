@@ -65,7 +65,7 @@ public:
     static QString MAX_FPS_PARAM_NAME;
     static QString AUDIO_SUPPORTED_PARAM_NAME;
     static QString DUAL_STREAMING_PARAM_NAME;
-	static const float QUALITY_COEF;
+    static const float QUALITY_COEF;
     static const double MAX_SECONDARY_RESOLUTION_SQUARE;
     static const char* PROFILE_NAME_PRIMARY;
     static const char* PROFILE_NAME_SECONDARY;
@@ -163,8 +163,8 @@ private:
     void setMinMaxQuality(int min, int max);
 
     void save();
-	
-	int round(float value);
+    
+    int round(float value);
     ResolutionPair getNearestResolutionForSecondary(const ResolutionPair& resolution, float aspectRatio) const;
     ResolutionPair getNearestResolution(const ResolutionPair& resolution, float aspectRatio, double maxResolutionSquare) const;
     float getResolutionAspectRatio(const ResolutionPair& resolution) const;

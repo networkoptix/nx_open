@@ -140,6 +140,16 @@ public:
         return *this;
     }
 
+    QnActionBuilder conditionalText(const QString &text, QnActionCondition *condition){
+        m_action->addConditionalText(condition, text);
+        return *this;
+    }
+
+    QnActionBuilder conditionalText(const QString &text, const QnResourceCriterion &criterion, Qn::MatchMode matchMode = Qn::All){
+        m_action->addConditionalText(new QnResourceActionCondition(criterion, matchMode, m_manager), text);
+        return *this;
+    }
+
     void showCheckBoxInMenu(bool show) {
         m_action->setProperty(Qn::HideCheckBoxInMenu, !show);
     }
@@ -236,9 +246,9 @@ namespace {
 QnActionManager::QnActionManager(QObject *parent): 
     QObject(parent),
     QnWorkbenchContextAware(parent),
-    m_shortcutAction(NULL),
-    m_targetProvider(NULL),
     m_root(NULL),
+    m_targetProvider(NULL),
+    m_shortcutAction(NULL),
     m_lastShownMenu(NULL)
 {
     m_root = new QnAction(Qn::NoAction, this);
@@ -524,17 +534,20 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission | Qn::AddRemoveItemsPermission).
         text(tr("Open")).
-        condition(hasFlags(QnResource::media), Qn::Any);
+        conditionalText(tr("Monitor"), hasFlags(QnResource::server), Qn::All).
+        condition(hasFlags(QnResource::media) || hasFlags(QnResource::server), Qn::Any);
 
     factory(Qn::OpenInNewLayoutAction).
         flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         text(tr("Open in a New Tab")).
-        condition(hasFlags(QnResource::media), Qn::Any);
+        conditionalText(tr("Monitor in a New Tab"), hasFlags(QnResource::server), Qn::All).
+        condition(hasFlags(QnResource::media) || hasFlags(QnResource::server), Qn::Any);
 
     factory(Qn::OpenInNewWindowAction).
         flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         text(tr("Open in a New Window")).
-        condition(hasFlags(QnResource::media), Qn::Any);
+        conditionalText(tr("Monitor in a New Window"), hasFlags(QnResource::server), Qn::All).
+        condition(hasFlags(QnResource::media) || hasFlags(QnResource::server), Qn::Any);
 
     factory(Qn::OpenInFolderAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
@@ -546,12 +559,17 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::OpenSingleLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
-        text(tr("Open Layout")).
+        text(tr("Open Layout in a new Tab")).
         condition(hasFlags(QnResource::layout));
 
     factory(Qn::OpenMultipleLayoutsAction).
         flags(Qn::Tree | Qn::MultiTarget | Qn::ResourceTarget).
         text(tr("Open Layouts")).
+        condition(hasFlags(QnResource::layout));
+
+    factory(Qn::OpenNewWindowLayoutsAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
+        text(tr("Open Layout(s) in a new Window")).
         condition(hasFlags(QnResource::layout));
 
     factory(Qn::OpenAnyNumberOfLayoutsAction).
@@ -808,6 +826,11 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Export Selection as Multi-Stream...")).
         condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::DisabledAction, this));
 
+    factory(Qn::QuickSearchAction).
+        flags(Qn::Slider | Qn::SingleTarget).
+        text(tr("Quick Search...")).
+        condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::DisabledAction, this));
+
     factory().
         flags(Qn::Slider).
         separator();
@@ -818,6 +841,11 @@ QnActionManager::QnActionManager(QObject *parent):
         toggledText(tr("Hide Thumbnails")).
         icon(qnSkin->icon("thumbnails.png"));
 
+    factory(Qn::ToggleCalendarAction).
+        flags(Qn::Slider | Qn::SingleTarget).
+        text(tr("Show Calendar")).
+        toggledText(tr("Hide Calendar")).
+        icon(qnSkin->icon("thumbnails.png"));
 
     factory(Qn::IncrementDebugCounterAction).
         flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::NoTarget).
@@ -949,6 +977,9 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
         } else {
             newAction = action;
         }
+
+        if (action->hasConditionalTexts())
+            newAction->setText(action->checkConditionalText(parameters));
 
         if(visibility != Qn::InvisibleAction)
             result->addAction(newAction);

@@ -3,12 +3,12 @@
 	<parent>
 		<artifactId>hdwitness</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>1.2.0</version>
+		<version>1.2.2</version>
 		<relativePath>..</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>1.2.0</version>
+	<version>1.2.2</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>cpp</artifactId>
 	<packaging>pom</packaging>
@@ -17,7 +17,7 @@
 	<properties>
 		<assembly-skip>false</assembly-skip>
 		<convert-only>true</convert-only>
-		<ffmpeg.version>2012-04-10-N-39672-g40b7a27</ffmpeg.version>
+		<ffmpeg.version>git-SNAPSHOT</ffmpeg.version>
 		<openssl.version>1.0.0j-custom</openssl.version>
 		<onvif.version>2.1.1-ptz-SNAPSHOT</onvif.version>
         <dvr.version>openAPI_19_2.5.8.35-SNAPSHOT</dvr.version>
@@ -272,6 +272,7 @@
 				</os>
 			</activation>
 			<properties>
+                <compiler>msvc2008</compiler>
 				<arch>x86</arch>
 				<platform>windows</platform>
 			</properties>
@@ -328,7 +329,7 @@
 								</goals>
 								<configuration>
 									<includes>
-										<include>${arch}/${project.artifactId}-x64.vcproj</include>
+										<include>**/${project.artifactId}-x64.vcproj</include>
 									</includes>
 									<replacements>
 										<replacement>
@@ -372,6 +373,7 @@
 				</os>		
 			</activation>
 			<properties>
+                <compiler>gcc</compiler>
 				<rename-skip>false</rename-skip>
 			</properties>
 			<build>	
@@ -424,14 +426,8 @@
 									<goal>exec</goal>
 								</goals>
 								<configuration>
-									<executable>make</executable>
+									<executable>${project.build.directory}/build.sh</executable>
 									<workingDirectory>${project.build.directory}</workingDirectory>		
-									<arguments>
-										<commandlineArgs>-f</commandlineArgs>
-										<commandlineArgs>Makefile.${build.configuration}</commandlineArgs>
-										<commandlineArgs>-j</commandlineArgs>
-										<commandlineArgs>1</commandlineArgs>
-									</arguments>
 								</configuration>
 							</execution>
 
@@ -513,7 +509,7 @@
 					<plugin>
 						<groupId>com.goldin.plugins</groupId>
 						<artifactId>maven-copy-plugin</artifactId>
-						<version>0.2.3.6</version>
+						<version>0.2.3.8-beta-9</version>
 						<executions>
 							<execution>
 								<id>copy-qt-libraries</id>

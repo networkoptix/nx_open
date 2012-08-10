@@ -49,23 +49,23 @@ QnResourceList QnPlDroidResourceSearcher::findResources(void)
             QHostAddress sender;
             quint16 senderPort;
 
-            m_socketList[i]->readDatagram(responseData.data(), responseData.size(),	&sender, &senderPort);
+            m_socketList[i]->readDatagram(responseData.data(), responseData.size(),    &sender, &senderPort);
 
-            QString response(responseData);
+            QString response = QLatin1String(responseData);
 
-            QStringList data = response.split(';');
+            QStringList data = response.split(QLatin1Char(';'));
             if (data.size() < 3)
                 continue;
 
-            if (data[0] != "Network Optix Cam")
+            if (data[0] != QLatin1String("Network Optix Cam"))
                 continue;
 
-            QStringList ports = data[1].split(',');
+            QStringList ports = data[1].split(QLatin1Char(','));
             if (ports.size() < 2) {
                 qWarning() << "Invalid droid response. Expected at least 4 ports";
                 continue;
             }
-            QStringList ipParams = ports[0].split(':');
+            QStringList ipParams = ports[0].split(QLatin1Char(':'));
             if (ipParams.size() < 2) {
                 qWarning() << "Invalid droid response. Expected IP:port";
                 continue;
@@ -84,18 +84,18 @@ QnResourceList QnPlDroidResourceSearcher::findResources(void)
 
             QnDroidResourcePtr resource ( new QnDroidResource() );
 
-            QnId rt = qnResTypePool->getResourceTypeId(manufacture(), "DroidLive");
+            QnId rt = qnResTypePool->getResourceTypeId(manufacture(), QLatin1String("DroidLive"));
             if (!rt.isValid())
                 continue;
 
             resource->setTypeId(rt);
             //resource->setName(QString("Droid device ") + ip);
-            resource->setName("DroidLive");
-            resource->setMAC(data[2].replace(':', '-').toUpper());
+            resource->setName(QLatin1String("DroidLive"));
+            resource->setMAC(data[2].replace(QLatin1Char(':'), QLatin1Char('-')).toUpper());
             //resource->setHostAddress(hostAddr, QnDomainMemory);
             resource->setDiscoveryAddr(m_socketList[i]->localAddress());
 
-            resource->setUrl(QString("raw://") + data[1]);
+            resource->setUrl(QLatin1String("raw://") + data[1]);
 
             result.insert(resource->getUrl(), resource);
         }
@@ -126,7 +126,7 @@ QnResourcePtr QnPlDroidResourceSearcher::createResource(QnId resourceTypeId, con
         return result;
     }
 
-    if (!parameters.value("url").contains("raw://"))
+    if (!parameters.value(QLatin1String("url")).contains(QLatin1String("raw://")))
     {
         return result; // it is not a new droid resource
     }
@@ -144,7 +144,7 @@ QnResourcePtr QnPlDroidResourceSearcher::createResource(QnId resourceTypeId, con
 
 QString QnPlDroidResourceSearcher::manufacture() const
 {
-    return QnDroidResource::MANUFACTURE;
+    return QLatin1String(QnDroidResource::MANUFACTURE);
 }
 
 QnResourcePtr QnPlDroidResourceSearcher::checkHostAddr(QHostAddress addr)

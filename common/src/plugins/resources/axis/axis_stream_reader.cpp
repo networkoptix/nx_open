@@ -40,7 +40,7 @@ int QnAxisStreamReader::toAxisQuality(QnStreamQuality quality)
             return 20;
         case QnQualityHighest:
             return 15;
-        case QnQualityPreSeted:
+        case QnQualityPreSet:
             return -1;
     }
     return -1;
@@ -57,17 +57,34 @@ void QnAxisStreamReader::openStream()
     QnResource::ConnectionRole role = getRole();
     QnPlAxisResourcePtr res = getResource().dynamicCast<QnPlAxisResource>();
 
+    int channels = 1;
+    if (res->hasSuchParam(QLatin1String("channelsAmount")))
+    {
+        QVariant val;
+        res->getParam(QLatin1String("channelsAmount"), val, QnDomainMemory);
+        channels = val.toUInt();
+    }
+
+
     QByteArray profileNumber("S");
     QByteArray profileName;
     QByteArray profileDescription;
     QByteArray action = "add";
+
+    QByteArray profileSufix;
+    if (channels > 1)
+    {
+        // multiple channel encoder
+        profileSufix = QByteArray::number(res->getChannelNum());
+    }
+
     if (role == QnResource::Role_LiveVideo)
     {
-        profileName = "netOptixPrimary";
+        profileName = "netOptixPrimary" + profileSufix;
         profileDescription = "Network Optix Primary Stream";
     }
     else {
-        profileName = "netOptixSecondary";
+        profileName = "netOptixSecondary" + profileSufix;
         profileDescription = "Network Optix Secondary Stream";
     }
 
@@ -111,7 +128,9 @@ void QnAxisStreamReader::openStream()
     // ------------------- determine stream parameters ----------------------------
     float fps = getFps();
     float ar = res->getResolutionAspectRatio(res->getMaxResolution());
-    QString resolution = (role == QnResource::Role_LiveVideo) ? res->getMaxResolution() : res->getNearestResolution("320x240", ar);
+    QString resolution = (role == QnResource::Role_LiveVideo) 
+        ? QLatin1String(res->getMaxResolution()) 
+        : res->getNearestResolution("320x240", ar);
     if (resolution.isEmpty()) 
         qWarning() << "Can't determine max resolution for axis camera " << res->getName() << "use default resolution";
     QnStreamQuality quality = getQuality();
@@ -122,7 +141,7 @@ void QnAxisStreamReader::openStream()
         paramsStr.append("&resolution=").append(resolution);
     //paramsStr.append("&text=0"); // do not use onscreen text message (fps e.t.c)
     paramsStr.append("&fps=").append(QByteArray::number(fps));
-    if (quality != QnQualityPreSeted)
+    if (quality != QnQualityPreSet)
         paramsStr.append("&compression=").append(QByteArray::number(toAxisQuality(quality)));
     paramsStr.append("&audio=").append(res->isAudioEnabled() ? "1" : "0");
 
@@ -135,8 +154,8 @@ void QnAxisStreamReader::openStream()
     str << "&template=streamprofile";
     str << "&group=StreamProfile";
     str << "&StreamProfile." << profileNumber << ".Name=" << profileName;
-    str << "&StreamProfile." << profileNumber << ".Description=" << QUrl::toPercentEncoding(profileDescription);
-    str << "&StreamProfile." << profileNumber << ".Parameters=" << QUrl::toPercentEncoding(paramsStr);
+    str << "&StreamProfile." << profileNumber << ".Description=" << QUrl::toPercentEncoding(QLatin1String(profileDescription));
+    str << "&StreamProfile." << profileNumber << ".Parameters=" << QUrl::toPercentEncoding(QLatin1String(paramsStr));
     str.flush();
 
     CLSimpleHTTPClient http (res->getHostAddress(), QUrl(res->getUrl()).port(80), res->getNetworkTimeout(), res->getAuth());
@@ -155,9 +174,20 @@ void QnAxisStreamReader::openStream()
         res->setMotionMaskPhysical(0);
     }
 
+    QString request;
+    QTextStream stream(&request);
+    stream << "axis-media/media.amp?streamprofile=" << profileName;
+
+
+    if (channels > 1)
+    {
+        stream << "&camera=" << res->getChannelNum();
+    }
+
+    
 
     // ============== requesting a video ==========================
-    m_rtpStreamParser.setRequest(QString("axis-media/media.amp?streamprofile=") + profileName);
+    m_rtpStreamParser.setRequest(request);
     m_rtpStreamParser.openStream();
 }
 
@@ -263,6 +293,7 @@ void QnAxisStreamReader::parseMotionInfo(QnCompressedVideoDataPtr videoData)
     }
 }
 
+
 bool QnAxisStreamReader::isGotFrame(QnCompressedVideoDataPtr videoData)
 {
     const quint8* curNal = (const quint8*) videoData->data.data();
@@ -282,7 +313,7 @@ bool QnAxisStreamReader::isGotFrame(QnCompressedVideoDataPtr videoData)
 
 void QnAxisStreamReader::pleaseStop()
 {
-    CLLongRunnable::pleaseStop();
+    QnLongRunnable::pleaseStop();
     m_rtpStreamParser.closeStream();
 }
 

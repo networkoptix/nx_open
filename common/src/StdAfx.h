@@ -1,5 +1,8 @@
+#define QT_NO_CAST_FROM_ASCII
+
+#include "utils/common/config.h"
+
 #ifdef _WIN32
-#define NOMINMAX 
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <iphlpapi.h>
@@ -18,22 +21,22 @@
 #endif
 
 // ffmpeg headers
-#if defined __cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
-	#include <libavcodec/avcodec.h>
-	#include <libavformat/avformat.h>
-	#ifdef _USE_DXVA
-	#include <libavcodec/dxva2.h>
-	#endif
-	#include <libswscale/swscale.h>
-	#include <libavutil/avstring.h>
-#if defined __cplusplus
+#   include <libavcodec/avcodec.h>
+#   include <libavformat/avformat.h>
+#   ifdef _USE_DXVA
+#       include <libavcodec/dxva2.h>
+#   endif
+#   include <libswscale/swscale.h>
+#   include <libavutil/avstring.h>
+#ifdef __cplusplus
 }
 #endif
 
 
-#if defined __cplusplus
+#ifdef __cplusplus
 
 #include "utils/media/sse_helper.h"
 

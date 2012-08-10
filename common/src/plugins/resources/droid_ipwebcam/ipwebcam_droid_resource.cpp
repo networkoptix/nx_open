@@ -7,8 +7,7 @@ const char* QnPlDriodIpWebCamResource::MANUFACTURE = "NetworkOptixDroid";
 
 QnPlDriodIpWebCamResource::QnPlDriodIpWebCamResource()
 {
-    setAuth("", "");
-    
+    setAuth(QString(), QString());
 }
 
 bool QnPlDriodIpWebCamResource::isResourceAccessible()
@@ -23,7 +22,7 @@ bool QnPlDriodIpWebCamResource::updateMACAddress()
 
 QString QnPlDriodIpWebCamResource::manufacture() const
 {
-    return MANUFACTURE;
+    return QLatin1String(MANUFACTURE);
 }
 
 void QnPlDriodIpWebCamResource::setIframeDistance(int /*frames*/, int /*timems*/)

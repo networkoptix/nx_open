@@ -7,8 +7,8 @@ const char* QnPlDlinkResource::MANUFACTURE = "Dlink";
 
 QnDlink_cam_info::QnDlink_cam_info():
 hasMPEG4(false),
-numberOfVideoProfiles(0),
-hasFixedQuality(false)
+hasFixedQuality(false),
+numberOfVideoProfiles(0)
 {
 
 }
@@ -17,7 +17,7 @@ void QnDlink_cam_info::clear()
 {
     numberOfVideoProfiles = 0;
     hasMPEG4 = false;
-    hasH264 = "";
+    hasH264 = QString();
     hasFixedQuality = false;
 
     videoProfileUrls.clear();
@@ -25,7 +25,7 @@ void QnDlink_cam_info::clear()
     possibleBitrates.clear();
     possibleFps.clear();
 
-    possibleQualities = "";
+    possibleQualities = QString();
 }
 
 bool QnDlink_cam_info::inited() const
@@ -65,7 +65,7 @@ QString QnDlink_cam_info::bitrateCloseTo(int val)
     if (possibleBitrates.size()==0)
     {
         Q_ASSERT(false);
-        return "";
+        return QString();
     }
 
     QMap<int, QString>::iterator it = possibleBitrates.lowerBound(val);
@@ -105,7 +105,7 @@ int QnDlink_cam_info::frameRateCloseTo(int fr)
 
 QnPlDlinkResource::QnPlDlinkResource()
 {
-    setAuth("admin", "1");
+    setAuth(QLatin1String("admin"), QLatin1String("1"));
 }
 
 
@@ -121,7 +121,7 @@ bool QnPlDlinkResource::updateMACAddress()
 
 QString QnPlDlinkResource::manufacture() const
 {
-    return MANUFACTURE;
+    return QLatin1String(MANUFACTURE);
 }
 
 void QnPlDlinkResource::setIframeDistance(int /*frames*/, int /*timems*/)
@@ -152,23 +152,23 @@ static QStringList getValues(const QString& line)
 {
     QStringList result;
 
-    int index = line.indexOf("=");
+    int index = line.indexOf(QLatin1Char('='));
 
     if (index < 0)
         return result;
 
     QString values = line.mid(index+1);
 
-    return values.split(",");
+    return values.split(QLatin1Char(','));
 }
 
 QString getValueFromString(const QString& line)
 {
     
-    int index = line.indexOf("=");
+    int index = line.indexOf(QLatin1Char('='));
 
     if (index < 1)
-        return "";
+        return QString();
 
     return line.mid(index+1);
 }
@@ -182,11 +182,11 @@ bool QnPlDlinkResource::initInternal()
 {
 
     CLHttpStatus status;
-    QByteArray cam_info_file = downloadFile(status, "config/stream_info.cgi",  getHostAddress(), 80, 1000, getAuth());
+    QByteArray cam_info_file = downloadFile(status, QLatin1String("config/stream_info.cgi"),  getHostAddress(), 80, 1000, getAuth());
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
-		setStatus(Unauthorized);
+        setStatus(Unauthorized);
         return false;
     }
 
@@ -197,32 +197,32 @@ bool QnPlDlinkResource::initInternal()
 
     QMutexLocker mutexLocker(&m_mutex);
 
-    QString file_s(cam_info_file);
-    QStringList lines = file_s.split("\r\n", QString::SkipEmptyParts);
+    QString file_s = QLatin1String(cam_info_file);
+    QStringList lines = file_s.split(QLatin1String("\r\n"), QString::SkipEmptyParts);
 
     m_camInfo.clear();
 
     foreach(QString line, lines)
     {
-        if (line.contains("videos="))
+        if (line.contains(QLatin1String("videos=")))
         {
-            if (line.contains("H.264"))
-                m_camInfo.hasH264 = "H.264";
+            if (line.contains(QLatin1String("H.264")))
+                m_camInfo.hasH264 = QLatin1String("H.264");
             else
-                if (line.contains("H264"))
-                    m_camInfo.hasH264 = "H264";
+                if (line.contains(QLatin1String("H264")))
+                    m_camInfo.hasH264 = QLatin1String("H264");
 
 
-            if (line.contains("MPEG4"))
+            if (line.contains(QLatin1String("MPEG4")))
                 m_camInfo.hasMPEG4 = true;
 
         }
-        else if (line.contains("resolutions="))
+        else if (line.contains(QLatin1String("resolutions=")))
         {
             QStringList vals = getValues(line);
             foreach(const QString& val,  vals)
             {
-                QStringList wh_s = val.split("x");
+                QStringList wh_s = val.split(QLatin1Char('x'));
                 if (wh_s.size()<2)
                     continue;
 
@@ -230,7 +230,7 @@ bool QnPlDlinkResource::initInternal()
             }
 
         }
-        else if (line.contains("framerates="))
+        else if (line.contains(QLatin1String("framerates=")))
         {
             QStringList vals = getValues(line);
             foreach(const QString& val,  vals)
@@ -239,13 +239,13 @@ bool QnPlDlinkResource::initInternal()
 
             }
         }
-        else if (line.contains("vbitrates="))
+        else if (line.contains(QLatin1String("vbitrates=")))
         {
             QStringList vals = getValues(line);
             foreach(QString bs, vals)
             {
-                bool m = bs.toLower().contains("m");
-                bool k = bs.toLower().contains("k");
+                bool m = bs.toLower().contains(QLatin1Char('m'));
+                bool k = bs.toLower().contains(QLatin1Char('k'));
 
                 QString t = bs;
 
@@ -261,22 +261,22 @@ bool QnPlDlinkResource::initInternal()
 
             
         }
-        else if (line.contains("vprofilenum="))
+        else if (line.contains(QLatin1String("vprofilenum=")))
         {
             m_camInfo.numberOfVideoProfiles = getValueFromString(line).toInt();
         }
-        else if (line.contains("qualities="))
+        else if (line.contains(QLatin1String("qualities=")))
         {
             m_camInfo.possibleQualities = getValueFromString(line);
 
-            if (m_camInfo.possibleQualities.toLower().contains("good"))
+            if (m_camInfo.possibleQualities.toLower().contains(QLatin1String("good")))
                 m_camInfo.hasFixedQuality = true;
         }
-        else if (line.contains("vprofileurl"))
+        else if (line.contains(QLatin1String("vprofileurl")))
         {
             for(int i = 1; i <= m_camInfo.numberOfVideoProfiles; ++i)
             {
-                QString s = QString("vprofileurl") + QString::number(i);
+                QString s = QLatin1String("vprofileurl") + QString::number(i);
                 if (line.contains(s))
                 {
                     m_camInfo.videoProfileUrls[i] = getValueFromString(line);
@@ -416,11 +416,11 @@ void QnPlDlinkResource::setMotionMaskPhysical(int channel)
     QTextStream stream(&str);
     stream << "config/motion.cgi?enable=yes&motioncvalue=" << sensitivity << "&mbmask=";
 
-    for (int i = 0; i < sizeof(outData); ++i)
+    for (uint i = 0; i < sizeof(outData); ++i)
     {
         QString t = QString::number(outData[i], 16).toUpper();
         if (t.length() < 2)
-            t = QString("0") + t;
+            t = QLatin1String("0") + t;
         stream << t[1] << t[0];
     }
 
@@ -432,7 +432,7 @@ void QnPlDlinkResource::setMotionMaskPhysical(int channel)
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
-		setStatus(Unauthorized);
+        setStatus(Unauthorized);
         return;
     }
 

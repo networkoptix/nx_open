@@ -1,7 +1,7 @@
 #ifndef QN_VOLUME_SLIDER_H
 #define QN_VOLUME_SLIDER_H
 
-#include "tool_tip_slider.h"
+#include <ui/graphics/items/generic/tool_tip_slider.h>
 
 class QnVolumeSlider : public QnToolTipSlider {
     Q_OBJECT;

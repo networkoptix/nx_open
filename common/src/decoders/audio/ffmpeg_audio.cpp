@@ -4,14 +4,13 @@
 
 #include "core/datapacket/mediadatapacket.h"
 #include "audio_struct.h"
-#include "utils/common/aligned_data.h"
 
 struct AVCodecContext;
 
 #define INBUF_SIZE 4096
 
-extern QMutex global_ffmpeg_mutex;
-extern int MAX_AUDIO_FRAME_SIZE;
+extern QMutex global_ffmpeg_mutex; // TODO: evil externs, my god!
+extern int MAX_AUDIO_FRAME_SIZE; // TODO: this is totally evil.
 
 bool CLFFmpegAudioDecoder::m_first_instance = true;
 
@@ -60,7 +59,7 @@ CLFFmpegAudioDecoder::CLFFmpegAudioDecoder(QnCompressedAudioDataPtr data):
         return;
     }
 
-	c = avcodec_alloc_context();
+	c = avcodec_alloc_context3(codec);
 
     if (data->context)
     {
@@ -88,7 +87,7 @@ CLFFmpegAudioDecoder::CLFFmpegAudioDecoder(QnCompressedAudioDataPtr data):
         }
         */
     }
-	avcodec_open(c, codec);
+	avcodec_open2(c, codec, NULL);
 
 }
 
@@ -107,7 +106,7 @@ CLFFmpegAudioDecoder::~CLFFmpegAudioDecoder(void)
 
 //The input buffer must be FF_INPUT_BUFFER_PADDING_SIZE larger than the actual read bytes because some optimized bit stream readers read 32 or 64 bits at once and could read over the end.
 //The end of the input buffer buf should be set to 0 to ensure that no over reading happens for damaged MPEG streams.
-bool CLFFmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, CLByteArray& result)
+bool CLFFmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, QnByteArray& result)
 {
     result.clear();
 
@@ -127,10 +126,10 @@ bool CLFFmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, CLByteArray& r
 
 		//cl_log.log("before dec",  cl_logALWAYS);
 
-		if (outbuf_len + out_size > result.capacity())
+		if (outbuf_len + out_size > (int)result.capacity())
 		{
             //Q_ASSERT_X(false, Q_FUNC_INFO, "Too small output buffer for audio decoding!");
-            result.reallocate(result.capacity()*2);
+            result.reserve(result.capacity() * 2);
             outbuf = (quint8*) result.data() + outbuf_len;
 		}
 
@@ -139,6 +138,7 @@ bool CLFFmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, CLByteArray& r
         avpkt.data = (quint8*)inbuf_ptr;
         avpkt.size = size;
 
+        //TODO: use avcodec_decode_audio4 instead
         int len = avcodec_decode_audio3(c, (short *)outbuf, &out_size, &avpkt);
 
 		//cl_log.log("after dec",  cl_logALWAYS);
@@ -152,6 +152,6 @@ bool CLFFmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, CLByteArray& r
 		inbuf_ptr += len;
 
 	}
-    result.done(outbuf_len);
+    result.finishWriting(outbuf_len);
 	return true;
 }

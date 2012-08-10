@@ -128,13 +128,14 @@ public:
 	int num_slice_groups_minus1;
 	int slice_group_map_type;
 
-    PPSUnit(): NALUnit(), m_ready(false), transform_8x8_mode_flag(0), pic_scaling_matrix_present_flag(0) {}
+    PPSUnit(): NALUnit(), transform_8x8_mode_flag(0), pic_scaling_matrix_present_flag(0), m_ready(false) {}
 	virtual ~PPSUnit() {}
 	bool isReady() {return m_ready;}
 	int deserialize();
 	int deserializeID(quint8* buffer, quint8* end);
 	// duplicate PPS and change ppsID and cabac parameter for new PPS
 	void duplicatePPS(PPSUnit& oldPPS, int ppsID, bool cabac);
+
 private:
 	int m_ppsLenInMbit;
 	bool m_ready;

@@ -1,5 +1,7 @@
 #include "desktop_stream_reader.h"
 
+#ifdef Q_OS_WIN
+
 extern QMutex global_ffmpeg_mutex;
 
 struct FffmpegLog
@@ -23,7 +25,7 @@ struct FffmpegLog
 };
 
 
-CLDesktopStreamreader::CLDesktopStreamreader(QnResourcePtr dev):
+QnDesktopStreamreader::QnDesktopStreamreader(QnResourcePtr dev):
     CLServerPushStreamreader(dev),
     m_videoBuf(0),
     m_videoBufSize(0),
@@ -34,18 +36,18 @@ CLDesktopStreamreader::CLDesktopStreamreader(QnResourcePtr dev):
     int idx = num.length()-1;
     while (idx >= 0 && num[idx].unicode() >= '0' && num[idx].unicode() <= '9')
         idx--;
-    m_grabber = new CLBufferedScreenGrabber(num.right(num.length()-idx-1).toInt()-1);
+    m_grabber = new QnBufferedScreenGrabber(num.right(num.length()-idx-1).toInt()-1);
     m_encoderCodecName = "mpeg2video";
     m_grabber->start(QThread::HighestPriority);
     //m_encoderCodecName = "mpeg4";
 }
 
-CLDesktopStreamreader::~CLDesktopStreamreader()
+QnDesktopStreamreader::~QnDesktopStreamreader()
 {
     closeStream();
 }
 
-bool CLDesktopStreamreader::init()
+bool QnDesktopStreamreader::init()
 {
     QMutexLocker mutex(&global_ffmpeg_mutex);
 
@@ -91,13 +93,13 @@ bool CLDesktopStreamreader::init()
     return true;
 }
 
-QnAbstractMediaDataPtr CLDesktopStreamreader::getNextData()
+QnAbstractMediaDataPtr QnDesktopStreamreader::getNextData()
 {
     if (!m_initialized)
         return QnAbstractMediaDataPtr();
     while (!m_needStop)
     {
-        CLScreenGrabber::CaptureInfo capturedData = m_grabber->getNextFrame();
+        QnScreenGrabber::CaptureInfo capturedData = m_grabber->getNextFrame();
         if (!capturedData.opaque)
             continue;
         m_grabber->capturedDataToFrame(capturedData, m_frame);
@@ -121,13 +123,13 @@ QnAbstractMediaDataPtr CLDesktopStreamreader::getNextData()
     return QnAbstractMediaDataPtr();
 }
 
-void CLDesktopStreamreader::openStream()
+void QnDesktopStreamreader::openStream()
 {
     if (init())
         m_initialized = true;
 }
 
-void CLDesktopStreamreader::closeStream()
+void QnDesktopStreamreader::closeStream()
 {
     delete m_grabber;
     m_grabber = 0;
@@ -147,7 +149,10 @@ void CLDesktopStreamreader::closeStream()
     m_initialized = false;
 }
 
-bool CLDesktopStreamreader::isStreamOpened() const
+bool QnDesktopStreamreader::isStreamOpened() const
 {
     return m_initialized;
 }
+
+#endif // Q_OS_WIN
+

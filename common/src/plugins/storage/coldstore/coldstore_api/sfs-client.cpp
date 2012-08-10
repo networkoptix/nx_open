@@ -943,7 +943,7 @@ namespace Veracity
 		{
 			packet.AddParameter(SFSPacket::PARAMETER_SEEK_DIRECTION, &seek_direction);
 		}
-		if (file_offset != (u64)-1)
+		if ((u64)file_offset != (u64)-1)
 		{
 			packet.AddParameter(SFSPacket::PARAMETER_SEEK_WHENCE, &seek_whence);
 		}

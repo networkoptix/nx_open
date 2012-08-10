@@ -35,6 +35,7 @@ class QnCompatibilityChecker
 public:
     QnCompatibilityChecker(const QList<QnCompatibilityItem> compatiblityInfo);
 
+    /** TODO: write comments PLEASE! what comp1 and comp2 mean and should they be translated? */
     bool isCompatible(const QString& comp1, const QString& ver1, const QString& comp2, const QString& ver2) const;
     int size() const;
 

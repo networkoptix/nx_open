@@ -59,12 +59,12 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces()
                 {
                     for (int j = 1; j < qApp->argc(); ++j)
                     {
-                        QString arg = qApp->argv()[j];
+                        QString arg = QLatin1String(qApp->argv()[j]);
                         arg = arg.toLower();
-                        while (arg.startsWith('-'))
+                        while (arg.startsWith(QLatin1Char('-')))
                             arg = arg.mid(1);
-                        if (arg.startsWith("if=")) {
-                            QStringList tmp = arg.split('=')[1].split(';');
+                        if (arg.startsWith(QLatin1String("if="))) {
+                            QStringList tmp = arg.split(QLatin1Char('='))[1].split(QLatin1Char(';'));
                             foreach(QString s, tmp)
                                 allowedInterfaces << QHostAddress(s);
                         }
@@ -74,7 +74,7 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces()
                     if (allowedInterfaces.isEmpty())
                     {
                         QSettings settings;
-                        QStringList tmp = settings.value("if").toString().split(';');
+                        QStringList tmp = settings.value(QLatin1String("if")).toString().split(QLatin1Char(';'));
                         foreach(QString s, tmp) {
                             if (!s.isEmpty())
                                 allowedInterfaces << QHostAddress(s);
@@ -115,7 +115,7 @@ QList<QHostAddress> allLocalAddresses()
     }
 
     if (rez.isEmpty())
-        rez << QHostAddress("127.0.0.1");
+        rez << QHostAddress(QLatin1String("127.0.0.1"));
 
     return rez;
 }
@@ -342,9 +342,9 @@ QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHost
 
     CL_LOG(cl_logDEBUG1)
     {
-        cl_log.log(QLatin1String("ping results..."), cl_logALWAYS);
+        cl_log.log(QLatin1String("ping results..."), cl_logDEBUG1);
         foreach(QHostAddress addr, result)
-            cl_log.log(addr.toString(), cl_logALWAYS);
+            cl_log.log(addr.toString(), cl_logDEBUG1);
     }
 
 
@@ -369,7 +369,7 @@ void removeARPrecord(const QHostAddress& ip)
         //GetIpNetTable(mtb, &ulSize, TRUE);
 
         in_addr addr;
-        for (int i = 0; i < mtb->dwNumEntries; ++i)
+        for (uint i = 0; i < mtb->dwNumEntries; ++i)
         {
             addr.S_un.S_addr = mtb->table[i].dwAddr;
 
@@ -433,7 +433,7 @@ QString getMacByIP(const QHostAddress& ip, bool net)
         //GetIpNetTable(mtb, &ulSize, TRUE);
 
         in_addr addr;
-        for (int i = 0; i < mtb->dwNumEntries; ++i)
+        for (uint i = 0; i < mtb->dwNumEntries; ++i)
         {
             addr.S_un.S_addr = mtb->table[i].dwAddr;
             QString wip = QString::fromLatin1(inet_ntoa(addr)); // ### NLS support?
@@ -510,8 +510,7 @@ QString getMacByIP(const QHostAddress& ip, bool /*net*/)
         {
             /* complete ARP entry */
             cl_log.log(cl_logDEBUG1, "%d ? %d", ip.toIPv4Address(), ntohl(sinarp->sin_addr.s_addr));
-            if (ip.toIPv4Address() == ntohl(sinarp->sin_addr.s_addr))
-            {
+            if (ip.toIPv4Address() == ntohl(sinarp->sin_addr.s_addr)) {
                 free(buf);
                 return MACToString((unsigned char*)LLADDR(sdl));
             }
@@ -529,7 +528,7 @@ void removeARPrecord(const QHostAddress& /*ip*/) {}
 
 QString getMacByIP(const QHostAddress& ip, bool /*net*/)
 {
-    return "";
+    return QString();
 }
 
 #endif

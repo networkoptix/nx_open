@@ -141,8 +141,7 @@ QByteArray QnSignHelper::getSign(const AVFrame* frame, int signLen)
 
 QFontMetrics QnSignHelper::updateFontSize(QPainter& painter, const QSize& paintSize)
 {
-    QString versionStr = qApp->applicationName().append(" v").append(qApp->applicationVersion());
-
+    QString versionStr = qApp->applicationName().append(QLatin1String(" v")).append(qApp->applicationVersion());
     if (m_lastPaintSize == paintSize)
     {
         painter.setFont(m_cachedFont);
@@ -168,11 +167,11 @@ QFontMetrics QnSignHelper::updateFontSize(QPainter& painter, const QSize& paintS
     return metric;
 }
 
-void QnSignHelper::drawTextLine(QPainter& painter, const QSize& paintSize,int lineNum, const QString& text)
+/*void QnSignHelper::drawTextLine(QPainter& painter, const QSize& paintSize,int lineNum, const QString& text)
 {
     QFontMetrics metric = updateFontSize(painter, paintSize);
     painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*lineNum), text);
-}
+}*/
 
 void QnSignHelper::setSignOpacity(float opacity, QColor color)
 {
@@ -214,25 +213,25 @@ void QnSignHelper::draw(QPainter& painter, const QSize& paintSize, bool drawText
 
     if (drawText)
     {
-        QString versionStr = qApp->applicationName().append(" v").append(qApp->applicationVersion());
+        QString versionStr = qApp->applicationName().append(QLatin1String(" v")).append(qApp->applicationVersion());
         QFontMetrics metric = updateFontSize(painter, paintSize);
 
         //painter.drawText(QPoint(text_x_offs, text_y_offs), qApp->organizationName());
         painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()), versionStr);
-        QString hid = qnLicensePool->getLicenses().hardwareId();
+        QString hid = QLatin1String(qnLicensePool->getLicenses().hardwareId());
         if (hid.isEmpty())
-            hid = "Unknown";
-        painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*2), QString("Hardware ID: ").append(hid));
+            hid = tr("Unknown");
+        painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*2), tr("Hardware ID: ").append(hid));
         QList<QnLicensePtr> list = qnLicensePool->getLicenses().licenses();
-        QString licenseName("FREE license");
+        QString licenseName(tr("FREE license"));
         foreach (QnLicensePtr license, list)
         {
-            if (license->name() != "FREE")
+            if (license->name() != QLatin1String("FREE"))
                 licenseName = license->name();
         }
 
-        painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*3), QString("Licensed to: ").append(licenseName));
-        painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*4), QString("Watermark: ").append(m_sign.toHex()));
+        painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*3), tr("Licensed to: ").append(licenseName));
+        painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*4), tr("Watermark: ").append(QLatin1String(m_sign.toHex())));
     }
 
     // draw Hash
@@ -377,22 +376,25 @@ QString QnSignHelper::fillH264EncoderParams(const QByteArray& srcCodecExtraData,
     if (spsReady && ppsReady)
     {
         if (sps.profile_idc >= 100)
-            profile = "high";
+            profile = QLatin1String("high");
         else if (sps.pic_order_cnt_type == 0)
-            profile = "main";
+            profile = QLatin1String("main");
         else
-            profile = "baseline";
+            profile = QLatin1String("baseline");
 
         int bframes = 1;
         if (sps.pic_order_cnt_type == 2)
             bframes = 0;
         int gopLen = 16;
-        QString deblockFilter("");
+        QString deblockFilter = QString();
         if (pps.deblocking_filter_control_present_flag == 0)
-            deblockFilter = "--no-deblock";
-        QString x264Params("--bitrate 20000 --profile %1 --level %2 --ref %3 --%4 --keyint %5 --subme 5 --b-pyramid none --bframes %6 --%7 --weightp %8 %9");
-        result = x264Params.arg(profile).arg(51).arg(sps.num_ref_frames).arg(pps.entropy_coding_mode_flag ? "cabac" : "no-cabac").
-                                arg(gopLen).arg(bframes).arg(pps.transform_8x8_mode_flag ? "8x8dct" : "no-8x8dct").arg(pps.weighted_pred_flag).arg(deblockFilter);
+            deblockFilter = QLatin1String("--no-deblock");
+        QString x264Params(QLatin1String("--bitrate 20000 --profile %1 --level %2 --ref %3 --%4 --keyint %5 --subme 5 --b-pyramid none --bframes %6 --%7 --weightp %8 %9"));
+        result = x264Params.arg(profile).arg(51).arg(sps.num_ref_frames)
+            .arg(pps.entropy_coding_mode_flag ? QLatin1String("cabac") : QLatin1String("no-cabac"))
+            .arg(gopLen).arg(bframes)
+            .arg(pps.transform_8x8_mode_flag ? QLatin1String("8x8dct") : QLatin1String("no-8x8dct"))
+            .arg(pps.weighted_pred_flag).arg(deblockFilter);
     }
     return result;
 }
@@ -495,9 +497,9 @@ int QnSignHelper::runX264Process(AVFrame* frame, QString optionStr, quint8* rezB
     file.write((const char*) frame->data[2], frame->linesize[2]*frame->height/(1 << descr->log2_chroma_h));
     file.close();
 
-    QString executableName = closeDirPath(QFileInfo(qApp->argv()[0]).absolutePath()) + QString("x264");
-    QString command("\"%1\" %2 -o \"%3\" --input-res %4x%5 \"%6\"");
-    QString outFileName(tempName+QString(".264"));
+    QString executableName = closeDirPath(QFileInfo(QLatin1String(qApp->argv()[0])).absolutePath()) + QLatin1String("x264");
+    QString command(QLatin1String("\"%1\" %2 -o \"%3\" --input-res %4x%5 \"%6\""));
+    QString outFileName(tempName + QLatin1String(".264"));
     command = command.arg(executableName).arg(optionStr).arg(outFileName).arg(frame->width).arg(frame->height).arg(tempName);
     int execResult = QProcess::execute(command);
     if (execResult != 0)
@@ -542,7 +544,7 @@ QnCompressedVideoDataPtr QnSignHelper::createSgnatureFrame(AVCodecContext* srcCo
     QnCompressedVideoDataPtr generatedFrame;
     QByteArray srcCodecExtraData((const char*) srcCodec->extradata, srcCodec->extradata_size);
 
-    AVCodecContext* videoCodecCtx = avcodec_alloc_context(); //m_formatCtx->streams[0]->codec;
+    AVCodecContext* videoCodecCtx = avcodec_alloc_context3(srcCodec->codec); //m_formatCtx->streams[0]->codec;
     videoCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
     videoCodecCtx->codec_id = srcCodec->codec_id;
     videoCodecCtx->width = srcCodec->width;
@@ -588,6 +590,7 @@ QnCompressedVideoDataPtr QnSignHelper::createSgnatureFrame(AVCodecContext* srcCo
             goto error_label;
         }
 
+        // TODO: use avcodec_encode_video2 instead
         out_size = avcodec_encode_video(videoCodecCtx, videoBuf, videoBufSize, frame);
         if (out_size == 0)
             out_size = avcodec_encode_video(videoCodecCtx, videoBuf, videoBufSize, 0); // flush encoder buffer

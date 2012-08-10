@@ -59,7 +59,7 @@ void QnSignInfo::paintEvent(QPaintEvent *)
         m_signHelper.setSignOpacity(opacity, m_sign == m_signFromFrame ? QColor(0,128,0) : QColor(128,0,0));
     m_signHelper.draw(p, QSize(m_textureWidth, m_textureHeight), false);
     QString text;
-    text = QString("Analyzing: %1%").arg(m_progress);
+    text = tr("Analyzing: %1%").arg(m_progress);
     p.end();
 
     //qDebug() << "t1=" << t.elapsed();
@@ -69,15 +69,15 @@ void QnSignInfo::paintEvent(QPaintEvent *)
     {
         if (m_signFromFrame.isEmpty()) {
             p2.setPen(QColor(128,0,0));
-            text = "Watermark not found";
+            text = tr("Watermark not found");
         }
         else if (m_sign == m_signFromFrame) {
             p2.setPen(QColor(0,128,0));
-            text = "Watermark matched";
+            text = tr("Watermark matched");
         }
         else {
             p2.setPen(QColor(128,0,0));
-            text = "Invalid watermark";
+            text = tr("Invalid watermark");
         }
     }
     else {

@@ -10,12 +10,12 @@
 #include <plugins/resources/archive/syncplay_wrapper.h>
 
 #include <camera/resource_display.h>
-#include <camera/camdisplay.h>
-#include <camera/camera.h>
+#include <camera/cam_display.h>
+#include <camera/video_camera.h>
 
 #include <ui/workbench/workbench_display.h>
-#include <ui/graphics/items/resource_widget.h>
-#include <ui/graphics/items/media_resource_widget.h>
+#include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
 
 #include "workbench_render_watcher.h"
 
@@ -86,7 +86,7 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAdded(QnResourceWidget *wid
     if(mediaWidget->display()->archiveReader() == NULL) 
         return;
     
-    CLVideoCamera *camera = mediaWidget->display()->camera();
+    QnVideoCamera *camera = mediaWidget->display()->camera();
     m_syncPlay->addArchiveReader(mediaWidget->display()->archiveReader(), camera->getCamDisplay());
     camera->setExternalTimeSource(m_syncPlay);
     camera->getCamDisplay()->setExternalTimeSource(m_syncPlay);

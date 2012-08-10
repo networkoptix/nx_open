@@ -71,7 +71,7 @@ QnGlobals::QnGlobals(QObject *parent):
 
     QString path = QString(QN_SKIN_PATH) + QLatin1String("/skin/globals.ini");
     QScopedPointer<QSettings> settings(new QSettings(path, QSettings::IniFormat));
-    settings->beginGroup("globals");
+    settings->beginGroup(QLatin1String("globals"));
     updateFromSettings(settings.data());
     settings->endGroup();
 }
@@ -84,12 +84,12 @@ QnGlobals *QnGlobals::instance() {
     return qn_globalsInstance();
 }
 
-QVariant QnGlobals::updateValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) {
+QVariant QnGlobals::readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) {
     int type = this->type(id);
     if(type == QMetaType::QColor) {
         return parseColor(settings->value(name(id)), defaultValue.value<QColor>());
     } else {
-        return base_type::updateValueFromSettings(settings, id, defaultValue);
+        return base_type::readValueFromSettings(settings, id, defaultValue);
     }
 }
 

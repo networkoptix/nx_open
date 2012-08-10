@@ -221,10 +221,10 @@ namespace {
         {
             if (dd.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE){
                 QString v = QString::fromWCharArray(dd.DeviceString);
-                if (v.contains("Intel(R) HD Graphics 3000"))
+                if (v.contains(QLatin1String("Intel(R) HD Graphics 3000")))
                     result |= QnGlFunctions::OpenGLBroken;
                 else
-                if (v.contains("Gallium 0.1, Poulsbo on EMGD"))
+                if (v.contains(QLatin1String("Gallium 0.1, Poulsbo on EMGD")))
                     result |= QnGlFunctions::ShadersBroken;
                 break;
             }

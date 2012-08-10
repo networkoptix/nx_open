@@ -9,12 +9,12 @@
     <parent>
         <artifactId>cpp</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>1.2.0</version>
+        <version>1.2.2</version>
         <relativePath>../cpp</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>1.2.0</version>
+    <version>1.2.2</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>client</artifactId>
     <packaging>pom</packaging>
@@ -28,8 +28,8 @@
         <qtlib3>network</qtlib3>
         <qtlib4>opengl</qtlib4>
         <qtlib5>xml</qtlib5>
-        <!--<qtlib6/>
-        <qtlib7/>
+        <qtlib6>multimedia</qtlib6>
+        <!--<qtlib7/>
         <qtlib8/>
         <qtlib9/> -->
         <!--QT plugins used-->      
@@ -70,7 +70,7 @@
             <artifactId>protobuf</artifactId>
             <version>2.4.1</version>
             <type>zip</type>
-            <classifier>${platform}-${arch}</classifier>
+            <classifier>${platform}-${arch}-${compiler}</classifier>
         </dependency>                           
         <dependency>
             <groupId>com.nokia.qt.addons</groupId>
@@ -82,31 +82,23 @@
         <dependency>
             <groupId>com.sourceforge.cloudcity</groupId>
             <artifactId>bespin</artifactId>
-            <version>1.1</version>
+            <version>1.1-SNAPSHOT</version>
             <type>zip</type>
             <classifier>${platform}-${arch}</classifier>
         </dependency>                               
         <dependency>
             <groupId>com.creativelabs</groupId>
             <artifactId>openal</artifactId>
-            <version>1.1</version>
+            <version>1.1-SNAPSHOT</version>
             <type>zip</type>
             <classifier>${platform}-${arch}</classifier>
         </dependency>
-        <dependency>
-            <groupId>com.microsoft.directx</groupId>
-            <artifactId>d3d9</artifactId>
-            <version>JUN2010</version>
-            <type>zip</type>
-            <classifier>${platform}-${arch}</classifier>
-        </dependency>   
-        <dependency>
-            <groupId>com.microsoft.directx</groupId>
-            <artifactId>d3dx9</artifactId>
-            <version>JUN2010</version>
-            <type>zip</type>
-            <classifier>${platform}-${arch}</classifier>
-        </dependency>   
+		<dependency>
+			<groupId>com.nokia.qt</groupId>
+			<artifactId>qtcore</artifactId>
+			<version>4.7.4</version>
+			<type>zip</type>
+		</dependency>     		
         <dependency>
             <groupId>com.nokia.qt</groupId>
             <artifactId>qtsingleapplication</artifactId>
@@ -118,4 +110,32 @@
     <build>
 
     </build>    
+    
+    <profiles>
+		<profile>
+			<id>convert-clean-windows</id>
+			<activation>
+				<os>
+					<family>Windows</family>
+				</os>
+			</activation>	
+			<dependencies>
+                <dependency>
+                    <groupId>com.microsoft.directx</groupId>
+                    <artifactId>d3d9</artifactId>
+                    <version>JUN2010</version>
+                    <type>zip</type>
+                    <classifier>${platform}-${arch}</classifier>
+                </dependency>   
+                <dependency>
+                    <groupId>com.microsoft.directx</groupId>
+                    <artifactId>d3dx9</artifactId>
+                    <version>JUN2010</version>
+                    <type>zip</type>
+                    <classifier>${platform}-${arch}</classifier>
+                </dependency>   
+			</dependencies>				
+		</profile> 
+	</profiles>		
+
 </project>

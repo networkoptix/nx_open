@@ -29,7 +29,7 @@
 #include <core/resourcemanagment/resource_pool.h>
 
 #include <camera/resource_display.h>
-#include <camera/camdisplay.h>
+#include <camera/cam_display.h>
 
 #include <ui/screen_recording/screen_recorder.h>
 #include <ui/style/globals.h>
@@ -64,9 +64,9 @@
 #include <ui/graphics/instruments/selection_overlay_hack_instrument.h>
 #include <ui/graphics/instruments/grid_adjustment_instrument.h>
 
-#include <ui/graphics/items/resource_widget.h>
-#include <ui/graphics/items/media_resource_widget.h>
-#include <ui/graphics/items/grid_item.h>
+#include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/graphics/items/grid/grid_item.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_target_provider.h>
@@ -80,7 +80,7 @@
 #include "workbench_context.h"
 #include "workbench.h"
 #include "workbench_display.h"
-#include "help/qncontext_help.h"
+#include "help/context_help.h"
 
 
 //#define QN_WORKBENCH_CONTROLLER_DEBUG
@@ -629,7 +629,7 @@ void QnWorkbenchController::at_screenRecorder_recordingStarted() {
 void QnWorkbenchController::at_screenRecorder_error(const QString &errorMessage) {
     action(Qn::ScreenRecordingAction)->setChecked(false);
 
-    QMessageBox::warning(display()->view(), tr("Warning"), tr("Can't start recording due to following error: %1").arg(errorMessage));
+    QMessageBox::warning(display()->view(), tr("Warning"), tr("Can't start recording due to the following error: %1").arg(errorMessage));
 }
 
 void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &recordedFileName) {
@@ -740,11 +740,8 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
         if (items.count() == 0)
             showContextMenuAt(offset);
         else{ 
-            //items[0]->boundingRect();
             QRectF rect = items[0]->mapToScene(items[0]->boundingRect()).boundingRect();
-            QnResourceWidget* item = dynamic_cast<QnResourceWidget *>(items[0]);
-            QnSceneTransformations t;
-            QRect testRect = t.mapRectFromScene(view, rect); /* Where is the static analogue? */ 
+            QRect testRect = QnSceneTransformations::mapRectFromScene(view, rect); /* Where is the static analogue? */ 
             showContextMenuAt(offset + testRect.bottomRight());
         }
         }
@@ -770,6 +767,7 @@ void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget 
 }
 
 void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, const ResizingInfo &info) {
+    Q_UNUSED(info)
     if(m_resizedWidget != item || item == NULL)
         return;
 
@@ -880,7 +878,6 @@ void QnWorkbenchController::at_move(QGraphicsView *, const QPointF &totalDelta) 
             QnWorkbenchItem *draggedWorkbenchItem = m_draggedWorkbenchItems[0];
 
             /* Find item that dragged item was dropped on. */
-            QPoint cursorPos = QCursor::pos();
             QSet<QnWorkbenchItem *> replacedWorkbenchItems = layout->items(draggedWorkbenchItem->geometry().adjusted(m_dragDelta.x(), m_dragDelta.y(), m_dragDelta.x(), m_dragDelta.y()));
             if(replacedWorkbenchItems.size() == 1) {
                 QnWorkbenchItem *replacedWorkbenchItem = *replacedWorkbenchItems.begin();
@@ -1041,6 +1038,7 @@ void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *
 }
 
 void QnWorkbenchController::at_item_rightClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info) {
+    Q_UNUSED(view)
     TRACE("ITEM RCLICKED");
 
     QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;

@@ -254,7 +254,7 @@ void QnOnvifStreamReader::updateVideoEncoder(VideoEncoder& encoder, bool isPrima
     }
 
     
-    if (quality != QnQualityPreSeted) 
+    if (quality != QnQualityPreSet) 
     {
         encoder.Quality = m_onvifRes->innerQualityToOnvif(quality);
     }
@@ -343,7 +343,8 @@ bool QnOnvifStreamReader::fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper,
     VideoEncoder* result = fetchVideoEncoder(response, isPrimary);
 
     if (result) {
-        info.videoEncoderId = result->token.c_str();
+        //TODO:UTF unuse std::string
+        info.videoEncoderId = QString::fromStdString(result->token);
         updateVideoEncoder(*result, isPrimary);
 
         int triesLeft = m_onvifRes->getMaxOnvifRequestTries();
@@ -368,7 +369,8 @@ VideoEncoder* QnOnvifStreamReader::fetchVideoEncoder(VideoConfigsResp& response,
     for (;iter != response.Configurations.end(); ++iter) 
     {
         VideoEncoder* conf = *iter;
-        if (conf && id == conf->token.c_str()) {
+        //TODO:UTF unuse std::string
+        if (conf && id == QString::fromStdString(conf->token)) {
             if (!isPrimary && m_onvifRes->forcePrimaryEncoderCodec()) 
             {
                 // get codec list from primary encoder, but use ID of secondary encoder
@@ -399,14 +401,16 @@ bool QnOnvifStreamReader::fetchUpdateProfile(MediaSoapWrapper& soapWrapper, Came
 
     bool result = false;
     if (profiles.netoptix) {
-        info.netoptixProfileId = profiles.netoptix->token.c_str();
+        //TODO:UTF unuse std::string
+        info.netoptixProfileId = QString::fromStdString(profiles.netoptix->token);
         updateProfile(*profiles.netoptix, isPrimary);
         result = sendProfileToCamera(info, *profiles.netoptix, profiles.profileAbsent);
         info.finalProfileId = result? info.netoptixProfileId : QString();
     }
 
     if (!result && profiles.predefined) {
-        info.predefinedProfileId = profiles.predefined->token.c_str();
+        //TODO:UTF unuse std::string
+        info.predefinedProfileId = QString::fromStdString(profiles.predefined->token);
         updateProfile(*profiles.predefined, isPrimary);
         result = sendProfileToCamera(info, *profiles.predefined, false);
         info.finalProfileId = result? info.predefinedProfileId : QString();
@@ -448,9 +452,9 @@ void QnOnvifStreamReader::fetchProfile(ProfilesResp& response, ProfilePair& prof
             bool finish = false;
             if (profile->VideoEncoderConfiguration)
             {
-                if (encoderToken == profile->VideoEncoderConfiguration->token.c_str()) {
+                if (encoderToken == QString::fromStdString(profile->VideoEncoderConfiguration->token)) {
                     profiles.predefined = profile;
-                } else if (filteredEncoderToken == profile->VideoEncoderConfiguration->token.c_str()) {
+                } else if (filteredEncoderToken == QString::fromStdString(profile->VideoEncoderConfiguration->token)) {
                     finish = true;
                 }
             }
@@ -498,7 +502,8 @@ bool QnOnvifStreamReader::fetchUpdateVideoSource(MediaSoapWrapper& soapWrapper, 
     VideoSource* result = fetchVideoSource(response, isPrimary);
 
     if (result) {
-        info.videoSourceId = result->token.c_str();
+        //TODO:UTF unuse std::string
+        info.videoSourceId = QString::fromStdString(result->token);
         updateVideoSource(*result, isPrimary);
         return sendVideoSourceToCamera(*result);
     }
@@ -516,7 +521,8 @@ VideoSource* QnOnvifStreamReader::fetchVideoSource(VideoSrcConfigsResp& response
     std::vector<onvifXsd__VideoSourceConfiguration*>::const_iterator it = response.Configurations.begin();
     for (;it != response.Configurations.end(); ++it) 
     {
-        if (*it && id == (*it)->token.c_str()) {
+        //TODO:UTF unuse std::string
+        if (*it && id == QString::fromStdString((*it)->token)) {
             return *it;
         }
     }
@@ -719,7 +725,8 @@ bool QnOnvifStreamReader::fetchUpdateAudioEncoder(MediaSoapWrapper& soapWrapper,
     AudioEncoder* result = fetchAudioEncoder(response, isPrimary);
 
     if (result) {
-        info.audioEncoderId = result->token.c_str();
+        //TODO:UTF unuse std::string
+        info.audioEncoderId = QString::fromStdString(result->token);
         updateAudioEncoder(*result, isPrimary);
         return sendAudioEncoderToCamera(*result);
     }
@@ -736,7 +743,8 @@ AudioEncoder* QnOnvifStreamReader::fetchAudioEncoder(AudioConfigsResp& response,
 
     std::vector<onvifXsd__AudioEncoderConfiguration*>::const_iterator iter = response.Configurations.begin();
     for (; iter != response.Configurations.end(); ++iter) {
-        if (*iter && id == (*iter)->token.c_str()) {
+        //TODO:UTF unuse std::string
+        if (*iter && id == QString::fromStdString((*iter)->token)) {
             return *iter;
         }
     }
@@ -823,7 +831,8 @@ bool QnOnvifStreamReader::fetchUpdateAudioSource(MediaSoapWrapper& soapWrapper, 
     AudioSource* result = fetchAudioSource(response, isPrimary);
 
     if (result) {
-        info.audioSourceId = result->token.c_str();
+        //TODO:UTF unuse std::string
+        info.audioSourceId = QString::fromStdString(result->token);
         updateAudioSource(*result, isPrimary);
         return sendAudioSourceToCamera(*result);
     }
@@ -840,7 +849,8 @@ AudioSource* QnOnvifStreamReader::fetchAudioSource(AudioSrcConfigsResp& response
 
     std::vector<AudioSource*>::const_iterator it = response.Configurations.begin();
     for (; it != response.Configurations.end(); ++it) {
-        if (*it && id == (*it)->token.c_str()) {
+        //TODO:UTF unuse std::string
+        if (*it && id == QString::fromStdString((*it)->token)) {
             return *it;
         }
     }
