@@ -239,7 +239,7 @@ void QnWorkbenchDisplay::setStreamsSynchronized(bool synchronized, qint64 curren
         return;
 
     if(!m_streamSynchronizer) {
-        QnWorkbenchRenderWatcher *renderWatcher = new QnWorkbenchRenderWatcher(this, this);
+        QnWorkbenchRenderWatcher *renderWatcher = new QnWorkbenchRenderWatcher(this);
         m_streamSynchronizer = new QnWorkbenchStreamSynchronizer(this, renderWatcher, this);
 
         connect(m_streamSynchronizer, SIGNAL(effectiveChanged()), this, SIGNAL(streamsSynchronizationEffectiveChanged()));

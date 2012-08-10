@@ -22,10 +22,6 @@ QnWorkbenchRenderWatcher::QnWorkbenchRenderWatcher(QObject *parent):
     connect(display()->afterPaintInstrument(),  SIGNAL(activated(QWidget *, QEvent *)),             this,   SLOT(at_afterPaintInstrument_activated()));
 }
 
-QnWorkbenchRenderWatcher::QnWorkbenchRenderWatcher(QObject *parent): 
-    QObject(parent)
-{}
-
 void QnWorkbenchRenderWatcher::registerRenderer(QnAbstractRenderer *renderer) {
     if(renderer == NULL) {
         qnNullWarning(renderer);

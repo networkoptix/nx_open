@@ -56,20 +56,21 @@
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
+#include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_synchronizer.h>
+#include <ui/workbench/workbench_layout.h>
+#include <ui/workbench/workbench_item.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_layout_snapshot_manager.h>
+#include <ui/workbench/workbench_resource.h>
+#include <ui/workbench/workbench_access_controller.h>
+
 #include <utils/settings.h>
 
 #include "client_message_processor.h"
 #include "file_processor.h"
 
-#include "workbench.h"
-#include "workbench_display.h"
-#include "workbench_synchronizer.h"
-#include "workbench_layout.h"
-#include "workbench_item.h"
-#include "workbench_context.h"
-#include "workbench_layout_snapshot_manager.h"
-#include "workbench_resource.h"
-#include "workbench_access_controller.h"
 
 
 // -------------------------------------------------------------------------- //

@@ -4,26 +4,20 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 
-QnWorkbenchMotionDisplayWatcher::QnWorkbenchMotionDisplayWatcher(QnWorkbenchDisplay *display, QObject *parent):
+QnWorkbenchMotionDisplayWatcher::QnWorkbenchMotionDisplayWatcher(QObject *parent):
     QObject(parent),
-    m_display(display)
+    QnWorkbenchContextAware(parent)
 {
-    if(display == NULL) {
-        qnNullWarning(display);
-        return;
-    }
+    connect(display(),  SIGNAL(widgetAdded(QnResourceWidget *)),            this,   SLOT(at_display_widgetAdded(QnResourceWidget *)));
+    connect(display(),  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)), this,   SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
 
-    connect(display,    SIGNAL(widgetAdded(QnResourceWidget *)),            this,   SLOT(at_display_widgetAdded(QnResourceWidget *)));
-    connect(display,    SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)), this,   SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
-
-    foreach(QnResourceWidget *widget, display->widgets())
+    foreach(QnResourceWidget *widget, display()->widgets())
         at_display_widgetAdded(widget);
 }
 
 QnWorkbenchMotionDisplayWatcher::~QnWorkbenchMotionDisplayWatcher() {
-    if(m_display)
-        foreach(QnResourceWidget *widget, m_display.data()->widgets())
-            at_display_widgetAboutToBeRemoved(widget);
+    foreach(QnResourceWidget *widget, display()->widgets())
+        at_display_widgetAboutToBeRemoved(widget);
 }
 
 

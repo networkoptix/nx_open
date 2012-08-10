@@ -8,8 +8,7 @@
 
 #include <api/app_server_connection.h>
 #include <ui/actions/actions.h>
-
-#include "workbench_context_aware.h"
+#include <ui/workbench/workbench_context_aware.h>
 
 class QAction;
 class QMenu;

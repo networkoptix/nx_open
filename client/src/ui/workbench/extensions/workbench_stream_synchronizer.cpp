@@ -17,7 +17,7 @@
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
-#include "workbench_render_watcher.h"
+#include <ui/workbench/watchers/workbench_render_watcher.h>
 
 QnWorkbenchStreamSynchronizer::QnWorkbenchStreamSynchronizer(QnWorkbenchDisplay *display, QnWorkbenchRenderWatcher *renderWatcher, QObject *parent):
     QObject(parent),
