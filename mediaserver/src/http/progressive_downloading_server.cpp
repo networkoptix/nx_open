@@ -135,7 +135,7 @@ void QnProgressiveDownloadingConsumer::run()
         if (mimeType.isEmpty())
         {
             d->responseBody = QByteArray("Unsupported streaming format ") + mimeType;
-            sendResponse("HTTP", CODE_INVALID_PARAMETER, "plain/text");
+            sendResponse("HTTP", CODE_NOT_FOUND, "text/plain");
             return;
         }
 
@@ -147,7 +147,7 @@ void QnProgressiveDownloadingConsumer::run()
             QnVideoCamera* camera = qnCameraPool->getVideoCamera(resource);
             if (!camera) {
                 d->responseBody = "Media not found";
-                sendResponse("HTTP", CODE_NOT_FOUND, "plain/text");
+                sendResponse("HTTP", CODE_NOT_FOUND, "text/plain");
                 return;
             }
             dataProvider = camera->getLiveReader(QnResource::Role_LiveVideo);
@@ -167,7 +167,7 @@ void QnProgressiveDownloadingConsumer::run()
         if (dataProvider == 0)
         {
             d->responseBody = "Video camera is not ready yet";
-            sendResponse("HTTP", CODE_NOT_FOUND, "plain/text");
+            sendResponse("HTTP", CODE_NOT_FOUND, "text/plain");
             return;
         }
         dataProvider->addDataProcessor(&dataConsumer);
