@@ -27,7 +27,7 @@ public:
 
     template<class OtherResource>
     bool operator==(const QList<QnSharedResourcePointer<OtherResource> > &other) const {
-        return size() == other.size() && qEqual(begin(), end(), other.begin());
+        return this->size() == other.size() && qEqual(this->begin(), this->end(), other.begin());
     }
 
     template<class OtherResource>
