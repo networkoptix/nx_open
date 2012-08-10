@@ -357,6 +357,12 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         icon(qnSkin->icon("connected.png"));
 
+    factory(Qn::TogglePanicModeAction).
+        flags(Qn::Main).
+        text(tr("Start Panic Recording")).
+        toggledText(tr("Stop Panic Recording")).
+        autoRepeat(false);
+
     factory().
         flags(Qn::Main | Qn::Tree).
         separator();

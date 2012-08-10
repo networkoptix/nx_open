@@ -1,0 +1,2 @@
+#ifndef QN_
+#endif

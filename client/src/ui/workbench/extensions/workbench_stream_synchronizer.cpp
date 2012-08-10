@@ -45,7 +45,7 @@ QnWorkbenchStreamSynchronizer::QnWorkbenchStreamSynchronizer(QnWorkbenchDisplay 
     connect(m_counter,                  SIGNAL(reachedZero()),  m_counter,      SLOT(deleteLater()));
 
     /* Prepare render watcher. */
-    connect(renderWatcher, SIGNAL(displayingStateChanged(QnAbstractRenderer *, bool)), this, SLOT(at_renderWatcher_displayingStateChanged(QnAbstractRenderer *, bool)));
+    connect(renderWatcher, SIGNAL(displayingChanged(QnAbstractRenderer *, bool)), this, SLOT(at_renderWatcher_displayingChanged(QnAbstractRenderer *, bool)));
 
     /* Run handlers for all widgets already on display. */
     foreach(QnResourceWidget *widget, display->widgets())
@@ -126,7 +126,7 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAboutToBeRemoved(QnResource
         emit effectiveChanged();
 }
 
-void QnWorkbenchStreamSynchronizer::at_renderWatcher_displayingStateChanged(QnAbstractRenderer *renderer, bool displaying) {
+void QnWorkbenchStreamSynchronizer::at_renderWatcher_displayingChanged(QnAbstractRenderer *renderer, bool displaying) {
     if(m_display.isNull())
         return;
 

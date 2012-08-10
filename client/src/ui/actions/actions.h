@@ -462,6 +462,11 @@ namespace Qn {
          */
         SetCurrentLayoutItemSpacing30Action,
 
+        /**
+         * Toggles panic recording.
+         */
+        TogglePanicModeAction,
+
 
 
         /* Slider actions. */

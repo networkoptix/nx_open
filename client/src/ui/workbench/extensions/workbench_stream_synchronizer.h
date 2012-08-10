@@ -57,7 +57,7 @@ signals:
 protected slots:
     void at_display_widgetAdded(QnResourceWidget *widget);
     void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
-    void at_renderWatcher_displayingStateChanged(QnAbstractRenderer *renderer, bool displaying);
+    void at_renderWatcher_displayingChanged(QnAbstractRenderer *renderer, bool displaying);
 
     void at_resource_flagsChanged();
     void at_resource_flagsChanged(const QnResourcePtr &resource);

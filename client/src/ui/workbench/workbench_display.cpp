@@ -50,7 +50,7 @@
 #include <ui/style/globals.h>
 
 #include "extensions/workbench_stream_synchronizer.h"
-#include "extensions/workbench_render_watcher.h"
+#include "watchers/workbench_render_watcher.h"
 #include "workbench_layout.h"
 #include "workbench_item.h"
 #include "workbench_grid_mapper.h"

@@ -66,8 +66,8 @@
 #include "core/resourcemanagment/resource_pool.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 
-#include "extensions/workbench_render_watcher.h"
-#include "extensions/workbench_motion_display_watcher.h"
+#include "watchers/workbench_render_watcher.h"
+#include "watchers/workbench_motion_display_watcher.h"
 #include "workbench.h"
 #include "workbench_display.h"
 #include "workbench_layout.h"
