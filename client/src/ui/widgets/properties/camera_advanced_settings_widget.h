@@ -9,10 +9,6 @@
 //class QnDevice;
 class QGroupBox;
 
-typedef QSharedPointer<QWidget> QWidgetPtr;
-typedef QHash<QString, CameraSetting> CameraSettings;
-typedef QHash<QString, QWidgetPtr> WidgetsById;
-
 class QnSettingsSlider : public QSlider
 {
     Q_OBJECT

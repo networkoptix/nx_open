@@ -818,13 +818,13 @@ void QnPlOnvifResource::setMediaUrl(const QString& src)
 
 QString QnPlOnvifResource::getImagingUrl() const 
 { 
-    m_mutex.lock();
+    QMutexLocker lock(&m_mutex);
     return m_imagingUrl;
 }
 
 void QnPlOnvifResource::setImagingUrl(const QString& src) 
 {
-    m_mutex.lock();
+    QMutexLocker lock(&m_mutex);
     m_imagingUrl = src;
 }
 
@@ -1439,7 +1439,7 @@ bool QnPlOnvifResource::forcePrimaryEncoderCodec() const
 
 bool QnPlOnvifResource::getParamPhysical(const QnParam &param, QVariant &val)
 {
-    m_mutex.lock();
+    QMutexLocker lock(&m_mutex);
     CameraSettings& settings = m_onvifAdditionalSettings->getCameraSettings();
     CameraSettings::ConstIterator it = settings.find(param.name());
 
@@ -1458,7 +1458,7 @@ bool QnPlOnvifResource::getParamPhysical(const QnParam &param, QVariant &val)
 
 bool QnPlOnvifResource::setParamPhysical(const QnParam &param, const QVariant& val )
 {
-    m_mutex.lock();
+    QMutexLocker lock(&m_mutex);
 
     CameraSettings& settings = m_onvifAdditionalSettings->getCameraSettings();
     CameraSettings::ConstIterator it = settings.find(param.name());
@@ -1495,12 +1495,19 @@ void QnPlOnvifResource::fetchAndSetCameraSettings()
 
     if (reader.read() && reader.proceed())
     {
-        m_mutex.lock();
+        QMutexLocker lock(&m_mutex);
 
         if (m_onvifAdditionalSettings) {
             delete m_onvifAdditionalSettings;
         }
 
         m_onvifAdditionalSettings = settings;
+    }
+
+    CameraSettings& onvifSettings = m_onvifAdditionalSettings->getCameraSettings();
+    CameraSettings::ConstIterator it = onvifSettings.begin();
+
+    for (; it != onvifSettings.end(); ++it) {
+        setParam(it.key(), it.value().serializeToStr(), QnDomain::QnDomainPhysical);
     }
 }

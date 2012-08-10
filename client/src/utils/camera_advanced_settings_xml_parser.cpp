@@ -26,7 +26,7 @@ QStringList CameraSettingsLister::fetchParams()
     return m_params;
 }
 
-bool CameraSettingsLister::isGroupEnabled(const QString& id)
+bool CameraSettingsLister::isGroupEnabled(const QString& id, const QString& /*parentId*/, const QString& /*name*/)
 {
     m_params.push_back(id);
 
@@ -56,8 +56,10 @@ void CameraSettingsLister::cleanDataOnFail()
 // class CameraSettingsWidgetsCreator
 //
 
-CameraSettingsWidgetsCreator::CameraSettingsWidgetsCreator(const QString& filepath):
-CameraSettingReader(filepath, QString::fromLatin1("ONVIF"))
+CameraSettingsWidgetsCreator::CameraSettingsWidgetsCreator(const QString& filepath, CameraSettings& settings, QTabWidget& rootWidget):
+    CameraSettingReader(filepath, QString::fromLatin1("ONVIF")),
+    m_settings(settings),
+    m_rootWidget(rootWidget)
 {
 
 }
@@ -67,36 +69,112 @@ CameraSettingsWidgetsCreator::~CameraSettingsWidgetsCreator()
 
 }
 
-QStringList CameraSettingsWidgetsCreator::fetchParams()
+bool CameraSettingsWidgetsCreator::isGroupEnabled(const QString& id, const QString& parentId, const QString& name)
 {
-    read();
-    proceed();
+    if (m_settings.find(id) != m_settings.end()) {
+        //By default, group is enabled. It can be disabled by mediaserver
+        //Disabled - means empty value. Group can have only empty value, so 
+        //if we found it - it is disabled
+        return false;
+    }
 
-    return m_params;
-}
 
-bool CameraSettingsWidgetsCreator::isGroupEnabled(const QString& id)
-{
-    m_params.push_back(id);
+
+    QWidget* tabWidget = 0;
+
+    if (parentId.isEmpty())
+    {
+        tabWidget = new QWidget();
+        m_rootWidget.addTab(tabWidget, QString()); // TODO:        vvvv   strange code
+        m_rootWidget.setTabText(m_rootWidget.indexOf(tabWidget), QApplication::translate("SingleCameraSettingsWidget",
+            name.toLatin1().data(), 0, QApplication::UnicodeUTF8));
+
+    } else {
+
+        WidgetsById::ConstIterator it = m_widgetsById.find(parentId);
+        if (it == m_widgetsById.end()) {
+            //Parent must be already created!
+            Q_ASSERT(false);
+        }
+        QVBoxLayout *layout = dynamic_cast<QVBoxLayout *>((*it)->layout());
+        if(!layout) {
+            delete (*it)->layout();
+            (*it)->setLayout(layout = new QVBoxLayout());
+        }
+
+        QWidget* tabWidget = new QGroupBox(name);
+        layout->addWidget(tabWidget);
+
+        //tabWidget->setFixedWidth(300);
+        //tabWidget->setFixedHeight(300);
+    }
+
+    tabWidget->setObjectName(id);
+    m_widgetsById.insert(id, tabWidget);
 
     return true;
 }
 
 bool CameraSettingsWidgetsCreator::isParamEnabled(const QString& id, const QString& /*parentId*/)
 {
-    m_params.push_back(id);
+    CameraSettings::ConstIterator it = m_settings.find(id);
+    if (it == m_settings.end()) {
+        //It means enabled, but have no value
+        return true;
+    }
 
-    //We don't need creation of the object, so returning false
-    return false;
+    return isEnabled(it.value());
 }
 
-void CameraSettingsWidgetsCreator::paramFound(const CameraSetting& /*value*/, const QString& /*parentId*/)
+void CameraSettingsWidgetsCreator::paramFound(const CameraSetting& value, const QString& parentId)
 {
-    //This code is unreachable
-    Q_ASSERT(false);
+    WidgetsById::ConstIterator parentIt = m_widgetsById.find(parentId);
+    if (parentIt == m_widgetsById.end()) {
+        //Parent must be already created!
+        Q_ASSERT(false);
+    }
+
+    QVBoxLayout *layout = dynamic_cast<QVBoxLayout *>((*parentIt)->layout());
+    if(!layout) {
+        delete (*parentIt)->layout();
+        (*parentIt)->setLayout(layout = new QVBoxLayout());
+    }
+    //int currNum = (*parentIt)->children().length();
+
+    CameraSettings::Iterator currIt = m_settings.find(value.getId());
+    CameraSetting& setting = currIt == m_settings.end()? value: currIt.value();
+
+    QWidget* tabWidget = 0;
+    switch(setting.getType())
+    {
+        case CameraSetting::OnOff:
+            tabWidget = new QnSettingsOnOffWidget(this, setting, *(parentIt.value().data()));
+            break;
+
+        case CameraSetting::MinMaxStep:
+            tabWidget = new QnSettingsMinMaxStepWidget(this, setting, *(parentIt.value().data()));
+            break;
+
+        case CameraSetting::Enumeration:
+            tabWidget = new QnSettingsEnumerationWidget(this, setting, *(parentIt.value().data()));
+            break;
+
+        case CameraSetting::Button:
+            tabWidget = new QnSettingsButtonWidget(this, setting, *(parentIt.value().data()));
+            break;
+
+        default:
+            //Unknown widget type!
+            Q_ASSERT(false);
+    }
+    //tabWidget->move(0, 50 * currNum);
+
+    m_widgetsById.insert(setting.getId(), QWidgetPtr(tabWidget));
+
+    return true;
 }
 
 void CameraSettingsWidgetsCreator::cleanDataOnFail()
 {
-    m_params.clear();
+    m_widgetsById.clear();
 }

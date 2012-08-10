@@ -71,8 +71,6 @@ void QnSingleCameraSettingsWidget::loadAdvancedSettings()
     QString filepath(QLatin1String("C:\\projects\\networkoptix\\netoptix_vms33\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml"));
     CameraSettingsLister lister(filepath);
     QStringList settings = lister.fetchParams();
-    settings.clear();
-    settings.append(QString::fromLatin1("aaaa"));
 
     QnVideoServerResourcePtr videoServer = qSharedPointerDynamicCast<QnVideoServerResource>(qnResPool->getResourceById(m_camera->getParentId()));
     if (videoServer.isNull()) {
@@ -83,258 +81,6 @@ void QnSingleCameraSettingsWidget::loadAdvancedSettings()
 
     qRegisterMetaType<QList<QPair<QString, QVariant> > >("QList<QPair<QString, QVariant> >");
     serverConnection->asyncGetParamList(m_camera, settings, this, SLOT(at_advancedSettingsLoaded(int, const QList<QPair<QString, QVariant> >&)) );
-//    QList< QPair< QString, QVariant> >* paramValues = new QList< QPair< QString, QVariant> >;
-//    int res = serverConnection->getParamList(m_camera, settings, paramValues);
-//
-//    int res2 = res;    
-
-
-    //QHash<int, QnAbstractStorageResourcePtr> storageByHandle;
-    //foreach (const QnAbstractStorageResourcePtr &storage, storages) {
-    //    int handle = serverConnection->asyncGetFreeSpace(storage->getUrl(), processor.data(), SLOT(processReply(int, qint64, qint64, int)));
-    //    storageByHandle[handle] = storage;
-    //}
-
-    /*QString error;
-    //if (loadSettingsFromXml(QCoreApplication::applicationDirPath() + QLatin1String("/plugins/resources/camera_settings/CameraSettings.xml"), error))
-    if (loadSettingsFromXml(QLatin1String("C:\\projects\\networkoptix\\netoptix_vms33\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml"), error))
-    {
-        CL_LOG(cl_logINFO)
-        {
-            QString msg;
-            QTextStream str(&msg);
-            str << QLatin1String("XML loaded");
-            cl_log.log(msg, cl_logINFO);
-        }
-    }
-    else
-    {
-        CL_LOG(cl_logERROR)
-        {
-            QString log = QLatin1String("Cannot load devices list. Error:");
-            log += error;
-            cl_log.log(log, cl_logERROR);
-        }
-
-        cl_log.log(QLatin1String("Cannot load arecontvision/devices.xml"), cl_logERROR);
-        //QMessageBox msgBox;
-        //msgBox.setText(QMessageBox::tr("Error"));
-        //msgBox.setInformativeText(QMessageBox::tr("Cannot load /arecontvision/devices.xml"));
-        //msgBox.setStandardButtons(QMessageBox::Ok);
-        //msgBox.setDefaultButton(QMessageBox::Ok);
-        //msgBox.setIcon(QMessageBox::Warning);
-        //msgBox.exec();
-    }*/
-}
-
-bool QnSingleCameraSettingsWidget::loadSettingsFromXml(const QString& filepath, QString& error)
-{
-    QFile file(filepath);
-
-    if (!file.exists())
-    {
-        error = QLatin1String("Cannot open file ");
-        error += filepath;
-        return false;
-    }
-
-    QString errorStr;
-    int errorLine;
-    int errorColumn;
-    QDomDocument doc;
-
-    if (!doc.setContent(&file, &errorStr, &errorLine, &errorColumn))
-    {
-        QTextStream str(&error);
-        str << QLatin1String("File ") << filepath << QLatin1String("; Parse error at line ") << errorLine << QLatin1String(" column ") << errorColumn << QLatin1String(" : ") << errorStr;
-        return false;
-    }
-
-    QDomElement root = doc.documentElement();
-    if (root.tagName() != QLatin1String("cameras"))
-        return false;
-
-    QDomNode node = root.firstChild();
-
-    while (!node.isNull())
-    {
-        if (node.toElement().tagName() == QLatin1String("camera"))
-        {
-            if (node.attributes().namedItem(QLatin1String("name")).nodeValue() != QLatin1String("ONVIF")) {
-                continue;
-            }
-            return parseCameraXml(node.toElement(), error);
-        }
-
-        node = node.nextSibling();
-    }
-
-    return true;
-}
-
-bool QnSingleCameraSettingsWidget::parseGroupXml(const QDomElement &groupXml, const QString parentId, QString& error)
-{
-    if (groupXml.isNull()) {
-        return true;
-    }
-
-    QString tagName = groupXml.nodeName();
-
-    if (tagName == QLatin1String("param") && !parseElementXml(groupXml, parentId, error)) {
-        return false;
-    }
-
-    if (tagName == QLatin1String("group"))
-    {
-        QString name = groupXml.attribute(QLatin1String("name"));
-        if (name.isEmpty()) {
-            error += QLatin1String("One of the tags '");
-            error += tagName;
-            error += QLatin1String("' doesn't have attribute 'name'");
-            return false;
-        }
-        QString id = parentId + QLatin1String("%%") + name;
-
-        if (m_widgetsById.find(id) != m_widgetsById.end()) {
-            //Id must be unique!
-            Q_ASSERT(false);
-        }
-
-        QWidgetPtr tabWidget(0);
-        if (parentId.isEmpty()) {
-            tabWidget = QWidgetPtr(new QWidget());
-            ui->tabWidget->addTab(tabWidget.data(), QString()); // TODO:        vvvv   strange code
-            ui->tabWidget->setTabText(ui->tabWidget->indexOf(tabWidget.data()), QApplication::translate("SingleCameraSettingsWidget", name.toStdString().c_str(), 0, QApplication::UnicodeUTF8));
-        } else {
-            WidgetsById::ConstIterator it = m_widgetsById.find(parentId);
-            if (it == m_widgetsById.end()) {
-                //Parent must be already created!
-                Q_ASSERT(false);
-            }
-            QVBoxLayout *layout = dynamic_cast<QVBoxLayout *>((*it)->layout());
-            if(!layout) {
-                delete (*it)->layout();
-                (*it)->setLayout(layout = new QVBoxLayout());
-            }
-
-            QGroupBox* groupBox = new QGroupBox(name);
-            layout->addWidget(groupBox);
-
-            tabWidget = QWidgetPtr(groupBox);
-            groupBox->setObjectName(id);
-            //groupBox->setFixedWidth(300);
-            //groupBox->setFixedHeight(300);
-        }
-        tabWidget->setObjectName(name);
-        m_widgetsById.insert(id, tabWidget);
-
-        if (!parseGroupXml(groupXml.firstChildElement(), id, error)) {
-            return false;
-        }
-    }
-
-    if (!parseGroupXml(groupXml.nextSiblingElement(), parentId, error)) {
-        return false;
-    }
-
-    return true;
-}
-
-bool QnSingleCameraSettingsWidget::parseElementXml(const QDomElement &elementXml, const QString parentId, QString& error)
-{
-    if (elementXml.isNull() || elementXml.nodeName() != QLatin1String("param")) {
-        return true;
-    }
-
-    QString name = elementXml.attribute(QLatin1String("name"));
-    if (name.isEmpty()) {
-        error += QLatin1String("One of the tags 'param' doesn't have attribute 'name'");
-        return false;
-    }
-
-    QString id = parentId + QLatin1String("%%") + name;
-
-    QString widgetTypeStr = elementXml.attribute(QLatin1String("widget_type"));
-    if (widgetTypeStr.isEmpty()) {
-        error += QLatin1String("One of the tags 'param' doesn't have attribute 'widget_type'");
-        return false;
-    }
-    CameraSetting::WIDGET_TYPE widgetType = CameraSetting::typeFromStr(widgetTypeStr);
-    if (widgetType == CameraSetting::None) {
-        error += QLatin1String("One of the tags 'param' has unexpected value of attribute 'widget_type': ") + widgetTypeStr;
-        return false;
-    }
-
-    CameraSettingValue min = CameraSettingValue(elementXml.attribute(QLatin1String("min")));
-    CameraSettingValue max = CameraSettingValue(elementXml.attribute(QLatin1String("max")));
-    CameraSettingValue step = CameraSettingValue(elementXml.attribute(QLatin1String("step")));
-    CameraSettingValue current = CameraSettingValue();
-    //ToDo: remove following lines:
-    if (widgetType != CameraSetting::Enumeration)
-    {
-        min = CameraSettingValue(QLatin1String("0"));
-        max = CameraSettingValue(QLatin1String("100"));
-        step = CameraSettingValue(QLatin1String("5"));
-        current = CameraSettingValue(QLatin1String("20"));
-    }
-
-    WidgetsById::ConstIterator parentIt = m_widgetsById.find(parentId);
-    if (parentIt == m_widgetsById.end()) {
-        //Parent must be already created!
-        Q_ASSERT(false);
-    }
-
-    QVBoxLayout *layout = dynamic_cast<QVBoxLayout *>((*parentIt)->layout());
-    if(!layout) {
-        delete (*parentIt)->layout();
-        (*parentIt)->setLayout(layout = new QVBoxLayout());
-    }
-    //int currNum = (*parentIt)->children().length();
-
-    if (m_widgetsById.find(id) != m_widgetsById.end()) {
-        //Id must be unique!
-        Q_ASSERT(false);
-    }
-    CameraSettings::Iterator currIt = m_cameraSettings.insert(id, CameraSetting(id, name, widgetType, min, max, step, current));
-
-    QWidgetPtr tabWidget = QWidgetPtr(0);
-    switch(widgetType)
-    {
-        case CameraSetting::OnOff:
-            tabWidget = QWidgetPtr(new QnSettingsOnOffWidget(this, currIt.value(), *(parentIt.value().data())));
-            break;
-
-        case CameraSetting::MinMaxStep:
-            tabWidget = QWidgetPtr(new QnSettingsMinMaxStepWidget(this, currIt.value(), *(parentIt.value().data())));
-            break;
-
-        case CameraSetting::Enumeration:
-            tabWidget = QWidgetPtr(new QnSettingsEnumerationWidget(this, currIt.value(), *(parentIt.value().data())));
-            break;
-
-        case CameraSetting::Button:
-            tabWidget = QWidgetPtr(new QnSettingsButtonWidget(this, currIt.value(), *(parentIt.value().data())));
-            break;
-        default:
-            //Unknown widget type!
-            Q_ASSERT(false);
-    }
-    //tabWidget->move(0, 50 * currNum);
-
-    m_widgetsById.insert(id, QWidgetPtr(tabWidget));
-
-    return true;
-}
-
-bool QnSingleCameraSettingsWidget::parseCameraXml(const QDomElement &cameraXml, QString& error)
-{
-    if (!parseGroupXml(cameraXml.firstChildElement(), QLatin1String(""), error)) {
-        m_cameraSettings.clear();
-        m_widgetsById.clear();
-        return false;
-    }
-
-    return true;
 }
 
 const QnVirtualCameraResourcePtr &QnSingleCameraSettingsWidget::camera() const {
@@ -669,7 +415,31 @@ void QnSingleCameraSettingsWidget::at_motionTypeChanged() {
 
 void QnSingleCameraSettingsWidget::at_advancedSettingsLoaded(int httpStatusCode, const QList<QPair<QString, QVariant> >& params)
 {
-    at_dbDataChanged();
+    //at_dbDataChanged();
+    bool fill = m_cameraSettings;
+    QList<QPair<QString, QVariant> >::ConstIterator it = params.begin();
+
+    for (; it != params.end(); ++it)
+    {
+        QString name = it->first;
+        QString val = it->second.toString();
+
+        if (!val.isEmpty())
+        {
+            CameraSetting tmp;
+            tmp.deserializeFromStr(val);
+
+            CameraSettings::ConstIterator it = m_cameraSettings.find(tmp.getId());
+            if (it == m_cameraSettings.end()) {
+                m_cameraSettings.insert(tmp.getId(), tmp);
+            } else {
+                it.value().setCurrent(getCurrent());
+            }
+        }
+    }
+
+    QString filepath(QLatin1String("C:\\projects\\networkoptix\\netoptix_vms33\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml"));
+    CameraSettingsWidgetsCreator creator(filepath, m_cameraSettings, ui->tabWidget);
 }
 
 void QnSingleCameraSettingsWidget::updateMaxFPS() {

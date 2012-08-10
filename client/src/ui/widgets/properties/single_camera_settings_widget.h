@@ -87,10 +87,6 @@ private:
     void connectToMotionWidget();
 
     void loadAdvancedSettings();
-    bool loadSettingsFromXml(const QString& filepath, QString& error);
-    bool parseCameraXml(const QDomElement &cameraXml, QString& error);
-    bool parseGroupXml(const QDomElement &elementXml, const QString parentId, QString& error);
-    bool parseElementXml(const QDomElement &elementXml, const QString parentId, QString& error);
 
 private:
     Q_DISABLE_COPY(QnSingleCameraSettingsWidget);
@@ -109,7 +105,6 @@ private:
     bool m_inUpdateMaxFps;
 
     CameraSettings m_cameraSettings;
-    WidgetsById m_widgetsById;
 };
 
 #endif // CAMERA_SETTINGS_DIALOG_H

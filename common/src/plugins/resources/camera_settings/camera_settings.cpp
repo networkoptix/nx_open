@@ -255,11 +255,12 @@ QString CameraSetting::serializeToStr() const
     return result;
 }
 
-void CameraSetting::deserializeFromStr(const QString& src)
+bool CameraSetting::deserializeFromStr(const QString& src)
 {
     QStringList tokens = src.split(SEPARATOR);
     if (tokens.length() != 7) {
-        Q_ASSERT(false);
+        qWarning() << "CameraSetting::deserializeFromStr: unexpected serialized data: " << src;
+        return false;
     }
 
     m_id = tokens[0];
@@ -269,6 +270,8 @@ void CameraSetting::deserializeFromStr(const QString& src)
     m_max = CameraSettingValue(tokens[4]);
     m_step = CameraSettingValue(tokens[5]);
     m_current = CameraSettingValue(tokens[6]);
+
+    return true;
 }
 
 bool CameraSetting::isDisabled() const
@@ -294,6 +297,12 @@ const QString& CameraSettingReader::ATTR_STEP = *(new QString(QLatin1String("ste
 QString CameraSettingReader::createId(const QString& parentId, const QString& name)
 {
     return parentId + ID_SEPARATOR + name;
+}
+
+bool CameraSettingReader::isEnabled(const CameraSetting& val)
+{
+    return !static_cast<QString>(val.getCurrent()).isEmpty() &&
+        (val.getType() == CameraSetting::Enumeration || val.getMin() != val.getMax());
 }
 
 CameraSettingReader::CameraSettingReader(const QString& filepath, const QString& cameraId) :
@@ -413,7 +422,7 @@ bool CameraSettingReader::parseGroupXml(const QDomElement& groupXml, const QStri
         }
         QString id = createId(parentId, name);
 
-        if (isGroupEnabled(id) && !parseGroupXml(groupXml.firstChildElement(), id))
+        if (isGroupEnabled(id, parentId, name) && !parseGroupXml(groupXml.firstChildElement(), id))
         {
             return false;
         }

@@ -1147,7 +1147,7 @@ OnvifCameraSettingReader::~OnvifCameraSettingReader()
 
 }
 
-bool OnvifCameraSettingReader::isGroupEnabled(const QString& id)
+bool OnvifCameraSettingReader::isGroupEnabled(const QString& id, const QString& /*parentId*/, const QString& /*name*/)
 {
     if (m_settings.isEmpty() && id == IMAGING_GROUP_NAME)
     {

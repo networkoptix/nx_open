@@ -3,6 +3,9 @@
 
 #include "plugins/resources/camera_settings/camera_settings.h"
 
+typedef QHash<QString, CameraSetting> CameraSettings;
+typedef QHash<QString, QWidget*> WidgetsById;
+
 //
 // class CameraSettingsLister
 //
@@ -19,7 +22,7 @@ public:
 
 protected:
 
-    virtual bool isGroupEnabled(const QString& id);
+    virtual bool isGroupEnabled(const QString& id, const QString& parentId, const QString& name);
     virtual bool isParamEnabled(const QString& id, const QString& parentId);
     virtual void paramFound(const CameraSetting& value, const QString& parentId);
     virtual void cleanDataOnFail();
@@ -35,17 +38,17 @@ private:
 
 class CameraSettingsWidgetsCreator: public CameraSettingReader
 {
-    QStringList m_params;
+    CameraSettings& m_settings;
+    QTabWidget& m_rootWidget;
+    WidgetsById m_widgetsById;
 
 public:
-    CameraSettingsWidgetsCreator(const QString& filepath);
+    CameraSettingsWidgetsCreator(const QString& filepath, CameraSettings& settings, QTabWidget& rootWidget);
     virtual ~CameraSettingsWidgetsCreator();
-
-    QStringList fetchParams();
 
 protected:
 
-    virtual bool isGroupEnabled(const QString& id);
+    virtual bool isGroupEnabled(const QString& id, const QString& parentId, const QString& name);
     virtual bool isParamEnabled(const QString& id, const QString& parentId);
     virtual void paramFound(const CameraSetting& value, const QString& parentId);
     virtual void cleanDataOnFail();

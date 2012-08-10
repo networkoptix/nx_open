@@ -75,7 +75,7 @@ public:
     CameraSetting& operator= (const CameraSetting& rhs);
 
     QString serializeToStr() const;
-    void deserializeFromStr(const QString& src);
+    bool deserializeFromStr(const QString& src);
 
     bool isDisabled() const;
 
@@ -110,6 +110,7 @@ public:
     static const QString& ATTR_STEP;
 
     static QString createId(const QString& parentId, const QString& name);
+    static bool isEnabled(const CameraSetting& val);
 
     CameraSettingReader(const QString& filepath, const QString& cameraId);
     virtual ~CameraSettingReader();
@@ -119,7 +120,7 @@ public:
 
 protected:
 
-    virtual bool isGroupEnabled(const QString& id) = 0;
+    virtual bool isGroupEnabled(const QString& id, const QString& parentId, const QString& name) = 0;
     virtual bool isParamEnabled(const QString& id, const QString& parentId) = 0;
     virtual void paramFound(const CameraSetting& value, const QString& parentId) = 0;
     virtual void cleanDataOnFail() = 0;
