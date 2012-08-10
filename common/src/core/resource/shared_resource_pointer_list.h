@@ -26,12 +26,12 @@ public:
     }
 
     template<class OtherResource>
-    bool operator==(const QList<QnSharedResourcePointer<OtherResource>> &other) const {
+    bool operator==(const QList<QnSharedResourcePointer<OtherResource> > &other) const {
         return size() == other.size() && qEqual(begin(), end(), other.begin());
     }
 
     template<class OtherResource>
-    bool operator!=(const QList<QnSharedResourcePointer<OtherResource>> &other) const {
+    bool operator!=(const QList<QnSharedResourcePointer<OtherResource> > &other) const {
         return !(*this == other);
     }
 
