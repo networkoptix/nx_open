@@ -216,6 +216,8 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::Rotate180Action),                        SIGNAL(triggered()),    this,   SLOT(at_rotate180Action_triggered()));
     connect(action(Qn::Rotate270Action),                        SIGNAL(triggered()),    this,   SLOT(at_rotate270Action_triggered()));
 
+    connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
+
     /* Run handlers that update state. */
     at_eventManager_connectionClosed();
 }
@@ -1974,5 +1976,14 @@ void QnWorkbenchActionHandler::at_resources_statusSaved(int status, const QByteA
 
     for(int i = 0; i < resources.size(); i++)
         resources[i]->setDisabled(oldDisabledFlags[i]);
+}
+
+void QnWorkbenchActionHandler::at_togglePanicModeAction_toggled(bool checked) {
+    QnVideoServerResourceList resources = QnResourceCriterion::filter<QnVideoServerResource>(resourcePool()->getResources());
+
+    foreach(QnVideoServerResourcePtr resource, resources) {
+        resource->setPanicMode(checked);
+        connection()->saveAsync(resource, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+    }
 }
 
