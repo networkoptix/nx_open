@@ -206,6 +206,8 @@ void QnVideoServerResource::updateInner(QnResourcePtr other)
 
     QnVideoServerResourcePtr localOther = other.dynamicCast<QnVideoServerResource>();
     if(localOther) {
+        m_panicMode = localOther->m_panicMode;
+        m_reserve = localOther->m_reserve;
         m_netAddrList = localOther->m_netAddrList;
         setApiUrl(localOther->m_apiUrl);
 
