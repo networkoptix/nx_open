@@ -16,11 +16,11 @@ public:
 	CLServerPushStreamreader(QnResourcePtr dev );
 	virtual ~CLServerPushStreamreader(){stop();}
 
+    virtual bool isStreamOpened() const = 0;
 protected:
 	
     virtual void openStream() = 0;
     virtual void closeStream() = 0;
-    virtual bool isStreamOpened() const = 0;
 	void pleaseReOpen();
     virtual void afterUpdate() override;
 private:
