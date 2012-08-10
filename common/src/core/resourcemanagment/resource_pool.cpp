@@ -198,7 +198,7 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
         disconnect(resource.data(), NULL, this, NULL);
 
         if(m_updateLayouts)
-            foreach (const QnLayoutResourcePtr &layoutResource, QnResourceCriterion::filter<QnLayoutResource>(getResources())) // TODO: this is way beyond what one may call 'not optimal'.
+            foreach (const QnLayoutResourcePtr &layoutResource, getResources().filtered<QnLayoutResource>()) // TODO: this is way beyond what one may call 'suboptimal'.
                 foreach(const QnLayoutItemData &data, layoutResource->getItems())
                     if(data.resource.id == resource->getId() || data.resource.path == resource->getUniqueId())
                         layoutResource->removeItem(data);
