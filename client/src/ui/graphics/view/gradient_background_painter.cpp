@@ -54,7 +54,8 @@ QColor QnGradientBackgroundPainter::backgroundColor() const {
     if(!m_settings)
         return QColor(0, 0, 0, 0);
 
-    context()->watcher<QnWorkbenchPanicWatcher>();
+    if(context()->watcher<QnWorkbenchPanicWatcher>()->isPanicMode())
+        return QColor(255, 0, 0, 255);
 
     return m_settings.data()->backgroundColor();
 }

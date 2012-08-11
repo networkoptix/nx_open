@@ -178,7 +178,7 @@ void QnVideoServerResource::setPanicMode(bool panicMode) {
 
     m_panicMode = panicMode;
 
-    emit panicModeChanged(::toSharedPointer(this));
+    emit panicModeChanged(::toSharedPointer(this)); // TODO: emit it AFTER mutex unlock.
 }
 
 void QnVideoServerResource::determineOptimalNetIF()
@@ -206,7 +206,8 @@ void QnVideoServerResource::updateInner(QnResourcePtr other)
 
     QnVideoServerResourcePtr localOther = other.dynamicCast<QnVideoServerResource>();
     if(localOther) {
-        m_panicMode = localOther->m_panicMode;
+        setPanicMode(localOther->isPanicMode());
+
         m_reserve = localOther->m_reserve;
         m_netAddrList = localOther->m_netAddrList;
         setApiUrl(localOther->m_apiUrl);
