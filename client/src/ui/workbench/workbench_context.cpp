@@ -47,6 +47,7 @@ QnWorkbenchContext::~QnWorkbenchContext() {
 
     qDeleteAll(m_watcherByTypeName);
     m_watcherByTypeName.clear();
+    m_userWatcher = NULL;
 
     /* Destruction order of these objects is important. */
     m_navigator.reset();
@@ -65,11 +66,16 @@ QAction *QnWorkbenchContext::action(const Qn::ActionId id) const {
 }
 
 QnUserResourcePtr QnWorkbenchContext::user() const {
-    return m_userWatcher->user();
+    if(m_userWatcher) {
+        return m_userWatcher->user();
+    } else {
+        return QnUserResourcePtr();
+    }
 }
 
 void QnWorkbenchContext::setUserName(const QString &userName) {
-    m_userWatcher->setUserName(userName);
+    if(m_userWatcher)
+        m_userWatcher->setUserName(userName);
 }
 
 

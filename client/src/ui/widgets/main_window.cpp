@@ -125,7 +125,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
         m_view->setPalette(palette);
     }
 
-    m_backgroundPainter.reset(new QnGradientBackgroundPainter(120.0));
+    m_backgroundPainter.reset(new QnGradientBackgroundPainter(120.0, this));
     m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
 
 

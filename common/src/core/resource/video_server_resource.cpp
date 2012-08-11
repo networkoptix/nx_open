@@ -22,8 +22,8 @@ QString QnLocalVideoServerResource::getUniqueId() const
 
 
 QnVideoServerResource::QnVideoServerResource():
-    QnResource()
-    //,m_rtspListener(0)
+    QnResource(),
+    m_panicMode(false)
 {
     setTypeId(qnResTypePool->getResourceTypeId(QString(), QLatin1String("Server")));
     addFlags(QnResource::server | QnResource::remote);

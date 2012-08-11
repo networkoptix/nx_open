@@ -12,7 +12,12 @@
 
 #include "utils/settings.h"
 
-QnGradientBackgroundPainter::QnGradientBackgroundPainter(qreal cycleIntervalSecs):
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/watchers/workbench_panic_watcher.h>
+
+QnGradientBackgroundPainter::QnGradientBackgroundPainter(qreal cycleIntervalSecs, QObject *parent):
+    QObject(parent),
+    QnWorkbenchContextAware(parent),
     m_cycleIntervalSecs(cycleIntervalSecs),
     m_settings(qnSettings)
 {
@@ -48,6 +53,8 @@ void QnGradientBackgroundPainter::installedNotify() {
 QColor QnGradientBackgroundPainter::backgroundColor() const {
     if(!m_settings)
         return QColor(0, 0, 0, 0);
+
+    context()->watcher<QnWorkbenchPanicWatcher>();
 
     return m_settings.data()->backgroundColor();
 }
