@@ -138,6 +138,15 @@ void QnServerSettingsDialog::updateFromResources() {
     ui->apiPortLineEdit->setText(QString::number(QUrl(m_server->getApiUrl()).port()));
     ui->rtspPortLineEdit->setText(QString::number(QUrl(m_server->getUrl()).port()));
 
+    bool panicMode = m_server->isPanicMode();
+    ui->recordingModeLabel->setText(panicMode ? tr("Panic") : tr("Normal"));
+    {
+        QPalette palette = this->palette();
+        if(panicMode)
+            palette.setColor(QPalette::WindowText, QColor(255, 0, 0));
+        ui->recordingModeLabel->setPalette(palette);
+    }
+
     setTableStorages(m_server->getStorages());
 
     m_hasStorageChanges = false;
