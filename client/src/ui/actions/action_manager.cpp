@@ -361,7 +361,9 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main).
         text(tr("Start Panic Recording")).
         toggledText(tr("Stop Panic Recording")).
-        autoRepeat(false);
+        autoRepeat(false).
+        shortcut(tr("Ctrl+P")).
+        requiredPermissions(Qn::AllVideoServersParameter, Qn::ReadWriteSavePermission);
 
     factory().
         flags(Qn::Main | Qn::Tree).
@@ -483,7 +485,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::SystemSettingsAction).
         flags(Qn::Main).
         text(tr("System Settings...")).
-        shortcut(tr("Ctrl+P")).
+        //shortcut(tr("Ctrl+P")).
         role(QAction::PreferencesRole).
         autoRepeat(false).
         icon(qnSkin->icon("decorations/settings.png"));
