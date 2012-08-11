@@ -12,13 +12,13 @@
 class QAction;
 
 class QnResourcePool;
-class QnResourcePoolUserWatcher;
 class QnWorkbench;
 class QnWorkbenchSynchronizer;
 class QnWorkbenchLayoutSnapshotManager;
 class QnWorkbenchAccessController;
 class QnWorkbenchDisplay;
 class QnWorkbenchNavigator;
+class QnWorkbenchUserWatcher;
 class QnActionManager;
 
 /**
@@ -99,7 +99,6 @@ protected slots:
 private:
     QnResourcePool *m_resourcePool;
     QScopedPointer<QnWorkbench> m_workbench;
-    QScopedPointer<QnResourcePoolUserWatcher> m_userWatcher;
     QScopedPointer<QnWorkbenchSynchronizer> m_synchronizer;
     QScopedPointer<QnWorkbenchLayoutSnapshotManager> m_snapshotManager;
     QScopedPointer<QnWorkbenchAccessController> m_accessController;
@@ -107,6 +106,7 @@ private:
     QScopedPointer<QnWorkbenchDisplay> m_display;
     QScopedPointer<QnWorkbenchNavigator> m_navigator;
 
+    QnWorkbenchUserWatcher *m_userWatcher;
     QHash<QByteArray, QObject *> m_watcherByTypeName;
 };
 

@@ -16,7 +16,6 @@
 
 #include <core/resourcemanagment/resource_discovery_manager.h>
 #include <core/resourcemanagment/resource_pool.h>
-#include <core/resourcemanagment/resource_pool_user_watcher.h>
 
 #include <api/app_server_connection.h>
 #include <api/session_manager.h>

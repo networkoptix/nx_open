@@ -19,7 +19,6 @@
 #include <utils/common/string.h>
 
 #include <core/resourcemanagment/resource_discovery_manager.h>
-#include <core/resourcemanagment/resource_pool_user_watcher.h>
 #include <core/resourcemanagment/resource_pool.h>
 
 #include <api/session_manager.h>
