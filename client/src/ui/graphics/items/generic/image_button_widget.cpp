@@ -40,6 +40,8 @@ namespace {
     }
 
     void glDrawTexturedRect(const QRectF &rect) {
+        /* For reasons unknown, default code path produces upside-down quads on X11,
+         * so we work this around by supplying mirrored texture coordinates. */
         glBegin(GL_QUADS);
 #ifdef Q_WS_X11
         glTexCoord(0.0, 0.0);
@@ -245,7 +247,6 @@ void QnImageButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsIte
 
 void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget) {
     painter->beginNativePainting();
-    //glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
     glEnable(GL_BLEND);
     glEnable(GL_TEXTURE_2D);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
