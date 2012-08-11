@@ -43,6 +43,8 @@ protected:
     QColor backgroundColor() const;
     void setBackgroundColor(const QColor &backgroundColor);
 
+    VariantAnimator *backgroundColorAnimator();
+
 protected slots:
     void updateBackgroundColor(bool animate = true);
 
