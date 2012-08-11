@@ -21,6 +21,8 @@
 
 #include "api/serializer/pb_serializer.h"
 
+#include "api_fwd.h"
+
 class QnAppServerConnectionFactory;
 
 class QnApiSerializer;
@@ -151,8 +153,6 @@ private:
 
     friend class QnAppServerConnectionFactory;
 };
-
-typedef QSharedPointer<QnAppServerConnection> QnAppServerConnectionPtr;
 
 class QN_EXPORT QnAppServerConnectionFactory
 {

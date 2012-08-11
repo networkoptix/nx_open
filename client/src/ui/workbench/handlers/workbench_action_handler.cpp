@@ -65,6 +65,9 @@
 #include <ui/workbench/workbench_resource.h>
 #include <ui/workbench/workbench_access_controller.h>
 
+#include <ui/workbench/watchers/workbench_panic_watcher.h>
+
+
 #include <utils/settings.h>
 
 #include "client_message_processor.h"
@@ -216,9 +219,11 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::Rotate270Action),                        SIGNAL(triggered()),    this,   SLOT(at_rotate270Action_triggered()));
 
     connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
+    connect(context()->watcher<QnWorkbenchPanicWatcher>(),      SIGNAL(panicModeChanged()), this, SLOT(at_panicWatcher_panicModeChanged()));
 
     /* Run handlers that update state. */
     at_eventManager_connectionClosed();
+    at_panicWatcher_panicModeChanged();
 }
 
 QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
@@ -1982,12 +1987,18 @@ void QnWorkbenchActionHandler::at_resources_statusSaved(int status, const QByteA
         resources[i]->setDisabled(oldDisabledFlags[i]);
 }
 
+void QnWorkbenchActionHandler::at_panicWatcher_panicModeChanged() {
+    action(Qn::TogglePanicModeAction)->setChecked(context()->watcher<QnWorkbenchPanicWatcher>()->isPanicMode());
+}
+
 void QnWorkbenchActionHandler::at_togglePanicModeAction_toggled(bool checked) {
     QnVideoServerResourceList resources = resourcePool()->getResources().filtered<QnVideoServerResource>();
 
     foreach(QnVideoServerResourcePtr resource, resources) {
-        resource->setPanicMode(checked);
-        connection()->saveAsync(resource, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+        if(resource->isPanicMode() != checked) {
+            resource->setPanicMode(checked);
+            connection()->saveAsync(resource, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+        }
     }
 }
 

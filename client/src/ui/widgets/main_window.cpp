@@ -25,6 +25,7 @@
 #include "ui/graphics/view/graphics_view.h"
 #include "ui/graphics/view/gradient_background_painter.h"
 #include "ui/workbench/handlers/workbench_action_handler.h"
+#include "ui/workbench/handlers/workbench_panic_handler.h"
 #include "ui/workbench/workbench_controller.h"
 #include "ui/workbench/workbench_grid_mapper.h"
 #include "ui/workbench/workbench_layout.h"
@@ -139,8 +140,11 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_ui = new QnWorkbenchUi(this);
     m_ui->setFlags(QnWorkbenchUi::HideWhenZoomed | QnWorkbenchUi::AdjustMargins);
 
-    m_actionHandler = new QnWorkbenchActionHandler(this);
-    m_actionHandler->setWidget(this);
+
+    /* Set up handlers. */
+    QnWorkbenchActionHandler *actionHandler = context->handler<QnWorkbenchActionHandler>();
+    actionHandler->setWidget(this);
+
 
     /* Set up actions. */
     addAction(action(Qn::NextLayoutAction));

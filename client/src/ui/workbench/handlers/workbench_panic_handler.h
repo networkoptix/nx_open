@@ -1,6 +1,8 @@
 #ifndef QN_WORKBENCH_PANIC_HANDLER_H
 #define QN_WORKBENCH_PANIC_HANDLER_H
 
+#if 0
+
 #include <QtCore/QObject>
 
 #include <ui/workbench/workbench_context_aware.h>
@@ -11,12 +13,13 @@ public:
     QnWorkbenchPanicHandler(QObject *parent = NULL);
     virtual ~QnWorkbenchPanicHandler();
 
-
 protected slots:
-    //void at_
+    void at_togglePanicModeAction_toggled(bool checked);
 
 private:
 
 };
+
+#endif
 
 #endif // QN_WORKBENCH_PANIC_HANDLER_H

@@ -45,8 +45,8 @@ QnWorkbenchContext::~QnWorkbenchContext() {
     emit aboutToBeDestroyed();
     blockSignals(signalsBlocked);
 
-    qDeleteAll(m_watcherByTypeName);
-    m_watcherByTypeName.clear();
+    qDeleteAll(m_instanceByTypeName);
+    m_instanceByTypeName.clear();
     m_userWatcher = NULL;
 
     /* Destruction order of these objects is important. */

@@ -73,10 +73,15 @@ public:
     template<class Watcher>
     Watcher *watcher() {
         QByteArray key(typeid(Watcher).name());
-        QObject *&result = m_watcherByTypeName[key];
+        QObject *&result = m_instanceByTypeName[key];
         if(!result)
             result = new Watcher(this);
         return static_cast<Watcher *>(result);
+    }
+
+    template<class Handler>
+    Handler *handler() {
+        return watcher<Handler>();
     }
 
 signals:
@@ -107,7 +112,7 @@ private:
     QScopedPointer<QnWorkbenchNavigator> m_navigator;
 
     QnWorkbenchUserWatcher *m_userWatcher;
-    QHash<QByteArray, QObject *> m_watcherByTypeName;
+    QHash<QByteArray, QObject *> m_instanceByTypeName;
 };
 
 
