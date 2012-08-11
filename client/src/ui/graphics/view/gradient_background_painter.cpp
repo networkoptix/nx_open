@@ -12,15 +12,27 @@
 
 #include "utils/settings.h"
 
+#include <ui/animation/variant_animator.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
 
 QnGradientBackgroundPainter::QnGradientBackgroundPainter(qreal cycleIntervalSecs, QObject *parent):
     QObject(parent),
     QnWorkbenchContextAware(parent),
-    m_cycleIntervalSecs(cycleIntervalSecs),
-    m_settings(qnSettings)
+    m_settings(qnSettings),
+    m_cycleIntervalSecs(cycleIntervalSecs)
 {
+    m_backgroundColorAnimator = new VariantAnimator(this);
+    m_backgroundColorAnimator->setTargetObject(this);
+    m_backgroundColorAnimator->setAccessor(new PropertyAccessor("backgroundColor"));
+    m_backgroundColorAnimator->setConverter(new QnColorToVectorConverter());
+    m_backgroundColorAnimator->setSpeed(2.0);
+
+    connect(qnSettings->notifier(QnSettings::BACKGROUND_COLOR), SIGNAL(valueChanged(int)),  this,   SLOT(updateBackgroundColor()));
+    connect(context()->watcher<QnWorkbenchPanicWatcher>(),      SIGNAL(panicModeChanged()), this,   SLOT(updateBackgroundColor()));
+
+    updateBackgroundColor(false);
+
     m_timer.start();
 }
 
@@ -51,13 +63,29 @@ void QnGradientBackgroundPainter::installedNotify() {
 }
 
 QColor QnGradientBackgroundPainter::backgroundColor() const {
-    if(!m_settings)
-        return QColor(0, 0, 0, 0);
+    return m_backgroundColor;
+}
 
-    if(context()->watcher<QnWorkbenchPanicWatcher>()->isPanicMode())
-        return QColor(255, 0, 0, 255);
+void QnGradientBackgroundPainter::setBackgroundColor(const QColor &backgroundColor) {
+    m_backgroundColor = backgroundColor;
+}
 
-    return m_settings.data()->backgroundColor();
+void QnGradientBackgroundPainter::updateBackgroundColor(bool animate) {
+    QColor backgroundColor;
+
+    if(context()->watcher<QnWorkbenchPanicWatcher>()->isPanicMode()) {
+        backgroundColor = QColor(255, 0, 0, 255);
+    } else if(m_settings) {
+        backgroundColor = m_settings.data()->backgroundColor();
+    } else {
+        backgroundColor = QColor(0, 0, 0, 0);
+    }
+
+    if(animate) {
+        m_backgroundColorAnimator->animateTo(backgroundColor);
+    } else {
+        m_backgroundColor = backgroundColor;
+    }
 }
 
 void QnGradientBackgroundPainter::drawLayer(QPainter * painter, const QRectF & rect) {
