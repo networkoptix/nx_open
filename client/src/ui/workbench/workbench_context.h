@@ -1,6 +1,8 @@
 #ifndef QN_WORKBENCH_CONTEXT_H
 #define QN_WORKBENCH_CONTEXT_H
 
+#include <typeinfo>
+
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
 
@@ -68,7 +70,14 @@ public:
 
     void setUserName(const QString &userName);
 
-    static QnWorkbenchContext *instance(QnWorkbench *workbench);
+    template<class Watcher>
+    Watcher *watcher() {
+        QByteArray key(typeid(Watcher).name());
+        QObject *&result = m_watcherByTypeName[key];
+        if(!result)
+            result = new Watcher(this);
+        return static_cast<Watcher *>(result);
+    }
 
 signals:
     /**
@@ -97,6 +106,8 @@ private:
     QScopedPointer<QnActionManager> m_menu;
     QScopedPointer<QnWorkbenchDisplay> m_display;
     QScopedPointer<QnWorkbenchNavigator> m_navigator;
+
+    QHash<QByteArray, QObject *> m_watcherByTypeName;
 };
 
 

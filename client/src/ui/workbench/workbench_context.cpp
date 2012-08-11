@@ -65,10 +65,6 @@ void QnWorkbenchContext::setUserName(const QString &userName) {
     m_userWatcher->setUserName(userName);
 }
 
-QnWorkbenchContext *QnWorkbenchContext::instance(QnWorkbench *workbench) {
-    return dynamic_cast<QnWorkbenchContext *>(workbench->parent());
-}
-
 
 // -------------------------------------------------------------------------- //
 // Handlers

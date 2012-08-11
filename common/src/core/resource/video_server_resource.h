@@ -56,8 +56,8 @@ public:
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
 
 signals:
-    void serverIFFound(QString);
-    void panicModeChanged();
+    void serverIFFound(const QString &);
+    void panicModeChanged(const QnVideoServerResourcePtr &resource);
 
 protected:
 

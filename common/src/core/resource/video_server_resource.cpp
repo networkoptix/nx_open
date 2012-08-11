@@ -178,7 +178,7 @@ void QnVideoServerResource::setPanicMode(bool panicMode) {
 
     m_panicMode = panicMode;
 
-    emit panicModeChanged();
+    emit panicModeChanged(::toSharedPointer(this));
 }
 
 void QnVideoServerResource::determineOptimalNetIF()
