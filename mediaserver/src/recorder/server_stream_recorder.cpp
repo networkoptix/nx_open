@@ -224,13 +224,14 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
                 m_panicSchedileRecord.setFps(camera->getMaxFps()-2);
             else
                 m_panicSchedileRecord.setFps(2);
-            updateRecordingType(m_panicSchedileRecord);
 
             // If stream already recording, do not change params in panic mode because if ServerPush provider has some large reopening time
             CLServerPushStreamreader* sPushProvider = dynamic_cast<CLServerPushStreamreader*> (m_mediaProvider);
-            bool doNotChangeParams = sPushProvider && sPushProvider->isStreamOpened();
+            bool doNotChangeParams = false; //sPushProvider && sPushProvider->isStreamOpened() && m_currentScheduleTask->getFps() >= m_panicSchedileRecord.getFps()*0.75;
+            updateRecordingType(m_panicSchedileRecord);
             if (!doNotChangeParams)
                 updateStreamParams();
+            m_lastSchedulePeriod.clear();
             m_usedPanicMode = true;
         }
         return;
