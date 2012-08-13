@@ -288,7 +288,7 @@ int main(int argc, char *argv[])
         application->installTranslator(&commonTranslator);
 
     QTranslator qtTranslator;
-    if (qtTranslator.load(QLatin1String(":/translations/qt_") + language + QLatin1String(".qm")))
+    if (qtTranslator.load(QLatin1String("qt_") + language + QLatin1String(".qm"), QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
         application->installTranslator(&qtTranslator);
     
     QnToolTip::instance();
