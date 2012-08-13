@@ -93,13 +93,14 @@ private:
     bool m_timeChangeEnabled;
     QnBufferedFrameDisplayer* m_bufferedFrameDisplayer;
     bool m_canUseBufferedFrameDisplayer;
-
 private:
     float m_speed;
     bool m_queueWasFilled;
     bool m_needResetDecoder;
     CLVideoDecoderOutput* m_lastDisplayedFrame;
     QSize m_imageSize;
+    int m_prevSrcWidth;
+    int m_prevSrcHeight;
 
     void reorderPrevFrames();
     bool allocScaleContext(const CLVideoDecoderOutput& outFrame, int newWidth, int newHeight);
