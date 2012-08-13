@@ -120,6 +120,8 @@ bool operator<(const QnTimePeriod &first, const QnTimePeriod &other);
 bool operator<(qint64 first, const QnTimePeriod &other);
 bool operator<(const QnTimePeriod &other, qint64 first);
 
+QDebug operator<<(QDebug dbg, const QnTimePeriod &period);
+
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::TimePeriodTypes);
 
 Q_DECLARE_TYPEINFO(QnTimePeriod, Q_MOVABLE_TYPE);

@@ -6,20 +6,55 @@
 #include <QtGui/QRadialGradient>
 
 #include <ui/common/linear_combination.h>
+#include <ui/animation/variant_animator.h>
+#include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/painters/radial_gradient_painter.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_functions.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/watchers/workbench_panic_watcher.h>
 
 #include "utils/settings.h"
 
-QnGradientBackgroundPainter::QnGradientBackgroundPainter(qreal cycleIntervalSecs):
-    m_cycleIntervalSecs(cycleIntervalSecs),
-    m_settings(qnSettings)
+
+QnGradientBackgroundPainter::QnGradientBackgroundPainter(qreal cycleIntervalSecs, QObject *parent):
+    QObject(parent),
+    QnWorkbenchContextAware(parent),
+    m_settings(qnSettings),
+    m_backgroundColorAnimator(NULL),
+    m_cycleIntervalSecs(cycleIntervalSecs)
 {
+    connect(qnSettings->notifier(QnSettings::BACKGROUND_COLOR), SIGNAL(valueChanged(int)),  this,   SLOT(updateBackgroundColor()));
+    connect(context()->watcher<QnWorkbenchPanicWatcher>(),      SIGNAL(panicModeChanged()), this,   SLOT(updateBackgroundColor()));
+
+    updateBackgroundColor(false);
+
     m_timer.start();
 }
 
-QnGradientBackgroundPainter::~QnGradientBackgroundPainter() {}
+QnGradientBackgroundPainter::~QnGradientBackgroundPainter() {
+    return;
+}
+
+VariantAnimator *QnGradientBackgroundPainter::backgroundColorAnimator() {
+    if(m_backgroundColorAnimator)
+        return m_backgroundColorAnimator;
+
+    if(!view() || !view()->scene())
+        return NULL;
+
+    AnimationTimer *animationTimer = InstrumentManager::animationTimerOf(view()->scene());
+    if(!animationTimer)
+        return NULL;
+
+    m_backgroundColorAnimator = new VariantAnimator(this);
+    m_backgroundColorAnimator->setTimer(animationTimer);
+    m_backgroundColorAnimator->setTargetObject(this);
+    m_backgroundColorAnimator->setAccessor(new PropertyAccessor("backgroundColor"));
+    m_backgroundColorAnimator->setConverter(new QnColorToVectorConverter());
+    m_backgroundColorAnimator->setSpeed(2.0);
+    return m_backgroundColorAnimator;
+}
 
 qreal QnGradientBackgroundPainter::position() {
     qreal t = std::fmod(m_timer.elapsed() / 1000.0, m_cycleIntervalSecs) / m_cycleIntervalSecs;
@@ -46,10 +81,29 @@ void QnGradientBackgroundPainter::installedNotify() {
 }
 
 QColor QnGradientBackgroundPainter::backgroundColor() const {
-    if(!m_settings)
-        return QColor(0, 0, 0, 0);
+    return m_backgroundColor;
+}
 
-    return m_settings.data()->backgroundColor();
+void QnGradientBackgroundPainter::setBackgroundColor(const QColor &backgroundColor) {
+    m_backgroundColor = backgroundColor;
+}
+
+void QnGradientBackgroundPainter::updateBackgroundColor(bool animate) {
+    QColor backgroundColor;
+
+    if(context()->watcher<QnWorkbenchPanicWatcher>()->isPanicMode()) {
+        backgroundColor = QColor(255, 0, 0, 255);
+    } else if(m_settings) {
+        backgroundColor = m_settings.data()->backgroundColor();
+    } else {
+        backgroundColor = QColor(0, 0, 0, 0);
+    }
+
+    if(animate) {
+        backgroundColorAnimator()->animateTo(backgroundColor);
+    } else {
+        m_backgroundColor = backgroundColor;
+    }
 }
 
 void QnGradientBackgroundPainter::drawLayer(QPainter * painter, const QRectF & rect) {

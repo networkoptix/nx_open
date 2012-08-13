@@ -1,12 +1,14 @@
-#include "resource_pool_user_watcher.h"
+#include "workbench_user_watcher.h"
+
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
-#include <core/resource/user_resource.h>
-#include "resource_pool.h"
 
-QnResourcePoolUserWatcher::QnResourcePoolUserWatcher(QnResourcePool *resourcePool, QObject *parent):
+#include <core/resource/user_resource.h>
+#include <core/resourcemanagment/resource_pool.h>
+
+QnWorkbenchUserWatcher::QnWorkbenchUserWatcher(QObject *parent):
     QObject(parent),
-    m_resourcePool(resourcePool)
+    QnWorkbenchContextAware(parent)
 {
     static volatile bool metaTypesInitialized = false;
     if (!metaTypesInitialized) {
@@ -15,23 +17,18 @@ QnResourcePoolUserWatcher::QnResourcePoolUserWatcher(QnResourcePool *resourcePoo
         metaTypesInitialized = true;
     }
 
-    if(resourcePool == NULL) {
-        qnNullWarning(resourcePool);
-        return;
-    }
-
-    connect(m_resourcePool, SIGNAL(resourceAdded(const QnResourcePtr &)), this, SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
-    connect(m_resourcePool, SIGNAL(resourceRemoved(const QnResourcePtr &)), this, SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
-    foreach(const QnResourcePtr &resource, m_resourcePool->getResources())
+    connect(resourcePool(), SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
+    connect(resourcePool(), SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
+    foreach(const QnResourcePtr &resource, resourcePool()->getResources())
         at_resourcePool_resourceAdded(resource);
 }
 
-QnResourcePoolUserWatcher::~QnResourcePoolUserWatcher() {
+QnWorkbenchUserWatcher::~QnWorkbenchUserWatcher() {
     while(!m_users.empty())
         at_resourcePool_resourceRemoved(m_users.back());
 }
 
-void QnResourcePoolUserWatcher::setCurrentUser(const QnUserResourcePtr &user) {
+void QnWorkbenchUserWatcher::setCurrentUser(const QnUserResourcePtr &user) {
     if(m_user == user)
         return;
 
@@ -40,7 +37,7 @@ void QnResourcePoolUserWatcher::setCurrentUser(const QnUserResourcePtr &user) {
     emit userChanged(user);
 }
 
-void QnResourcePoolUserWatcher::setUserName(const QString &name) {
+void QnWorkbenchUserWatcher::setUserName(const QString &name) {
     if(m_userName == name)
         return;
 
@@ -50,7 +47,7 @@ void QnResourcePoolUserWatcher::setUserName(const QString &name) {
         at_userResource_nameChanged(user);
 }
 
-void QnResourcePoolUserWatcher::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
+void QnWorkbenchUserWatcher::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
     QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
     if(!user)
         return;
@@ -61,7 +58,7 @@ void QnResourcePoolUserWatcher::at_resourcePool_resourceAdded(const QnResourcePt
     at_userResource_nameChanged(user);
 }
 
-void QnResourcePoolUserWatcher::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
+void QnWorkbenchUserWatcher::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
     QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
     if(!user)
         return;
@@ -73,7 +70,7 @@ void QnResourcePoolUserWatcher::at_resourcePool_resourceRemoved(const QnResource
         setCurrentUser(QnUserResourcePtr()); /* Assume there are no users with duplicate names. */
 }
 
-void QnResourcePoolUserWatcher::at_userResource_nameChanged(const QnUserResourcePtr &user) {
+void QnWorkbenchUserWatcher::at_userResource_nameChanged(const QnUserResourcePtr &user) {
     if(user->getName() == m_userName) {
         setCurrentUser(user);
     } else if(user == m_user) {
@@ -81,7 +78,7 @@ void QnResourcePoolUserWatcher::at_userResource_nameChanged(const QnUserResource
     }
 }
 
-void QnResourcePoolUserWatcher::at_userResource_nameChanged() {
+void QnWorkbenchUserWatcher::at_userResource_nameChanged() {
     at_userResource_nameChanged(toSharedPointer(checked_cast<QnUserResource *>(sender())));
 }
 

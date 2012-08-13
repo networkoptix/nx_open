@@ -14,29 +14,25 @@
 #include <camera/video_camera.h>
 
 #include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_context.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
-#include "workbench_render_watcher.h"
+#include <ui/workbench/watchers/workbench_render_watcher.h>
 
-QnWorkbenchStreamSynchronizer::QnWorkbenchStreamSynchronizer(QnWorkbenchDisplay *display, QnWorkbenchRenderWatcher *renderWatcher, QObject *parent):
+QnWorkbenchStreamSynchronizer::QnWorkbenchStreamSynchronizer(QObject *parent):
     QObject(parent),
+    QnWorkbenchContextAware(parent),
     m_widgetCount(0),
     m_syncPlay(NULL),
-    m_display(display),
     m_counter(NULL)
 {
-    if(display == NULL) {
-        qnNullWarning(display);
-        return;
-    }
-
     /* Prepare syncplay. */
     m_syncPlay = new QnArchiveSyncPlayWrapper(); // TODO: QnArchiveSyncPlayWrapper destructor doesn't get called, investigate.
 
     /* Connect to display. */
-    connect(display,    SIGNAL(widgetAdded(QnResourceWidget *)),              this,   SLOT(at_display_widgetAdded(QnResourceWidget *)));
-    connect(display,    SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),   this,   SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
+    connect(display(),  SIGNAL(widgetAdded(QnResourceWidget *)),              this,   SLOT(at_display_widgetAdded(QnResourceWidget *)));
+    connect(display(),  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),   this,   SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
     
     /* Prepare counter. */
     m_counter = new QnCounter(1); // TODO: this one also doesn't get destroyed.
@@ -45,10 +41,11 @@ QnWorkbenchStreamSynchronizer::QnWorkbenchStreamSynchronizer(QnWorkbenchDisplay 
     connect(m_counter,                  SIGNAL(reachedZero()),  m_counter,      SLOT(deleteLater()));
 
     /* Prepare render watcher. */
-    connect(renderWatcher, SIGNAL(displayingStateChanged(QnAbstractRenderer *, bool)), this, SLOT(at_renderWatcher_displayingStateChanged(QnAbstractRenderer *, bool)));
+    QnWorkbenchRenderWatcher *renderWatcher = context()->watcher<QnWorkbenchRenderWatcher>();
+    connect(renderWatcher, SIGNAL(displayingChanged(QnAbstractRenderer *, bool)), this, SLOT(at_renderWatcher_displayingChanged(QnAbstractRenderer *, bool)));
 
     /* Run handlers for all widgets already on display. */
-    foreach(QnResourceWidget *widget, display->widgets())
+    foreach(QnResourceWidget *widget, display()->widgets())
         at_display_widgetAdded(widget);
 }
 
@@ -78,7 +75,7 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAdded(QnResourceWidget *wid
 
     connect(mediaWidget->resource().data(), SIGNAL(flagsChanged()), this, SLOT(at_resource_flagsChanged()));
 
-    if(!mediaWidget->resource()->checkFlags(QnResource::utc)) {
+    if(!mediaWidget->resource()->hasFlags(QnResource::utc)) {
         m_queuedWidgets.insert(mediaWidget);
         return;
     }
@@ -113,7 +110,7 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAboutToBeRemoved(QnResource
 
     m_queuedWidgets.remove(mediaWidget);
 
-    if(!mediaWidget->resource()->checkFlags(QnResource::utc))
+    if(!mediaWidget->resource()->hasFlags(QnResource::utc))
         return;
 
     if(mediaWidget->display()->archiveReader() == NULL) 
@@ -126,11 +123,8 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAboutToBeRemoved(QnResource
         emit effectiveChanged();
 }
 
-void QnWorkbenchStreamSynchronizer::at_renderWatcher_displayingStateChanged(QnAbstractRenderer *renderer, bool displaying) {
-    if(m_display.isNull())
-        return;
-
-    QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(m_display.data()->widget(renderer));
+void QnWorkbenchStreamSynchronizer::at_renderWatcher_displayingChanged(QnAbstractRenderer *renderer, bool displaying) {
+    QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(display()->widget(renderer));
     if(mediaWidget == NULL)
         return;
 

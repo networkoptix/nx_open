@@ -16,7 +16,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <core/resourcemanagment/resource_pool.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/video_server.h>
+#include <core/resource/video_server_resource.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
@@ -474,9 +474,9 @@ void QnResourceTreeWidget::expandAll() {
 // -------------------------------------------------------------------------- //
 void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *) {
     /** 
-    * Note that we cannot use event->globalPos() here as it doesn't work when
-    * the widget is embedded into graphics scene.
-    */
+     * Note that we cannot use event->globalPos() here as it doesn't work when
+     * the widget is embedded into graphics scene.
+     */
     showContextMenuAt(QCursor::pos());
 }
 
@@ -633,7 +633,7 @@ void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex 
 void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex &index) {
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     int nodeType = index.data(Qn::NodeTypeRole).toInt();
-    if((resource && resource->checkFlags(QnResource::server)) || nodeType == Qn::ServersNode) 
+    if((resource && resource->hasFlags(QnResource::server)) || nodeType == Qn::ServersNode) 
         ui->resourceTreeView->expand(index);
 
     at_resourceProxyModel_rowsInserted(index, 0, m_resourceProxyModel->rowCount(index) - 1);

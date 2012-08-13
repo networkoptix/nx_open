@@ -66,8 +66,8 @@
 #include "core/resourcemanagment/resource_pool.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 
-#include "extensions/workbench_render_watcher.h"
-#include "extensions/workbench_motion_display_watcher.h"
+#include "watchers/workbench_render_watcher.h"
+#include "watchers/workbench_motion_display_watcher.h"
 #include "workbench.h"
 #include "workbench_display.h"
 #include "workbench_layout.h"
@@ -603,7 +603,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     dropInstrument->setSurface(m_titleBackgroundItem);
 
     /* Set up help context processing. */
-    m_motionDisplayWatcher = new QnWorkbenchMotionDisplayWatcher(display(), this);
+    m_motionDisplayWatcher = context()->watcher<QnWorkbenchMotionDisplayWatcher>();
     connect(display()->focusListenerInstrument(), SIGNAL(focusItemChanged()),                                                       this,                           SLOT(updateHelpContext()));
     connect(m_treeWidget,               SIGNAL(currentTabChanged()),                                                                this,                           SLOT(updateHelpContext()));
     connect(m_motionDisplayWatcher,     SIGNAL(motionGridShown()),                                                                  this,                           SLOT(updateHelpContext()));

@@ -3,7 +3,7 @@
 #include <core/dataprovider/media_streamdataprovider.h>
 #include <core/resource/resource_media_layout.h>
 #include <core/resource/media_resource.h>
-#include <core/resource/video_server.h>
+#include <core/resource/video_server_resource.h>
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
 #include <camera/cam_display.h>
 #include <camera/video_camera.h>

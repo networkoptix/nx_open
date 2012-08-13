@@ -38,7 +38,7 @@
 #define TEST_RTSP_SERVER
 //#define STANDALONE_MODE
 
-#include "core/resource/video_server.h"
+#include "core/resource/video_server_resource.h"
 #include "core/resource/storage_resource.h"
 
 #include "plugins/resources/axis/axis_resource_searcher.h"

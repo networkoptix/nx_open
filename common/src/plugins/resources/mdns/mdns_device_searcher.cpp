@@ -27,7 +27,7 @@ QnResourceList QnMdnsResourceSearcher::findResources()
     for (int i = 0; i < data.size(); ++i)
     {
         QString localAddress = data[i].localAddress;
-        QString removeAddress = data[i].removeAddress;
+        QString removeAddress = data[i].remoteAddress;
 
         QList<QnNetworkResourcePtr> nresourceLst = processPacket(result, data[i].response, QHostAddress(localAddress));
 

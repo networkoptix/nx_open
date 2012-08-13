@@ -12,6 +12,7 @@ QnTimePeriodList::const_iterator QnTimePeriodList::findNearestPeriod(qint64 time
      * the container is not empty. */
     if (searchForward && itr->endTimeMs() <= timeMs)
         ++itr;
+
     return itr;
 }
 

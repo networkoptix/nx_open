@@ -12,6 +12,7 @@ CLH264RtpParser::CLH264RtpParser():
         QnRtpStreamParser(),
         m_frequency(90000), // default value
         m_rtpChannel(98),
+        m_prevSequenceNum(-1),
         m_builtinSpsFound(false),
         m_builtinPpsFound(false),
         m_keyDataExists(false),
@@ -20,8 +21,7 @@ CLH264RtpParser::CLH264RtpParser():
         m_lastTimeStamp(0),
         m_firstSeqNum(0),
         m_packetPerNal(0),
-        m_videoBuffer(CL_MEDIA_ALIGNMENT, 1024*128),
-        m_prevSequenceNum(-1)
+        m_videoBuffer(CL_MEDIA_ALIGNMENT, 1024*128)
 {
 }
 
@@ -196,7 +196,7 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStati
     result.clear();
 
     int nalUnitLen;
-    int don;
+    //int don;
     quint8 nalUnitType;
 
     if (readed < RtpHeader::RTP_HEADER_SIZE + 1) 
@@ -234,11 +234,13 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStati
         case STAP_B_PACKET:
             if (bufferEnd-curPtr < 2)
                 return clearInternalBuffer();
-            don = (*curPtr++ << 8) + *curPtr++;
+            //don = (curPtr[0] << 8) + curPtr[1];
+            curPtr += 2;
         case STAP_A_PACKET:
             if (bufferEnd-curPtr < 2)
                 return clearInternalBuffer();
-            nalUnitLen = (*curPtr++ << 8) + *curPtr++;
+            nalUnitLen = (curPtr[0] << 8) + curPtr[1];
+            curPtr += 2;
             if (bufferEnd-curPtr < nalUnitLen)
                 return clearInternalBuffer();
 
@@ -278,7 +280,9 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStati
             {
                 if (bufferEnd-curPtr < 2)
                     return clearInternalBuffer();
-                don = (*curPtr++ << 8) + *curPtr++;
+                //don = (curPtr[0] << 8) + curPtr[1];
+                curPtr += 2;
+
             }
             m_videoBuffer.write( (const char*) curPtr, bufferEnd - curPtr);
             break;
