@@ -30,10 +30,6 @@ public:
         return m_timeScrollBar;
     }
 
-    QGraphicsProxyWidget *calendar() const {
-        return m_calendar;
-    }
-
     virtual bool eventFilter(QObject *watched, QEvent *event) override;
 
 private slots:
@@ -82,7 +78,6 @@ private:
     QnTimeScrollBar *m_timeScrollBar;
     QnSpeedSlider *m_speedSlider;
     QnVolumeSlider *m_volumeSlider;
-    QGraphicsProxyWidget *m_calendar;
 
     QnWorkbenchNavigator *m_navigator;
 };

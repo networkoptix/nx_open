@@ -404,6 +404,8 @@ private:
     AnimatorGroup *m_helpOpacityAnimatorGroup;
 
     QnWorkbenchMotionDisplayWatcher *m_motionDisplayWatcher;
+
+    QGraphicsProxyWidget *m_calendar;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchUi::Flags);
