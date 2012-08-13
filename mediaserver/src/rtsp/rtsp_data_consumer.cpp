@@ -43,7 +43,8 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
   m_newLiveQuality(MEDIA_Quality_None),
   m_hiQualityRetryCounter(0),
   m_realtimeMode(false),
-  m_adaptiveSleep(MAX_FRAME_DURATION*1000)
+  m_adaptiveSleep(MAX_FRAME_DURATION*1000),
+  m_useUTCTime(true)
 {
     memset(m_sequence, 0, sizeof(m_sequence));
     for (int i = 0; i < MAX_RTP_CHANNELS; ++i)
@@ -503,7 +504,9 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         m_firstRtpTime[media->channelNumber] = media->timestamp;
     static AVRational r = {1, 1000000};
     AVRational time_base = {1, codecEncoder->getFrequency() };
-    qint64 timeDiff = media->timestamp - m_firstRtpTime[media->channelNumber];
+    qint64 timeDiff = media->timestamp;
+    if (!m_useUTCTime)
+        timeDiff -= m_firstRtpTime[media->channelNumber]; // enumerate RTP time from 0 after seek
     qint64 packetTime = av_rescale_q(timeDiff, r, time_base);
 
 
@@ -607,4 +610,9 @@ void QnRtspDataConsumer::clearUnprocessedData()
     m_newLiveQuality = MEDIA_Quality_None;
     m_dataQueue.setMaxSize(MAX_QUEUE_SIZE);
     m_hiQualityRetryCounter = 0;
+}
+
+void QnRtspDataConsumer::setUseUTCTime(bool value)
+{
+    m_useUTCTime = value;
 }
