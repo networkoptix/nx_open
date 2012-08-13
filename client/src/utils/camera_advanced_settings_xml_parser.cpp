@@ -57,13 +57,14 @@ void CameraSettingsLister::cleanDataOnFail()
 // class CameraSettingsWidgetsCreator
 //
 
-CameraSettingsWidgetsCreator::CameraSettingsWidgetsCreator(const QString& filepath, QTabWidget& rootWidget, QObject* handler):
+CameraSettingsWidgetsCreator::CameraSettingsWidgetsCreator(const QString& filepath, QTreeWidget& rootWidget, QStackedLayout& rootLayout, QObject* handler):
     CameraSettingReader(filepath, QString::fromLatin1("ONVIF")),
     m_settings(0),
     m_rootWidget(rootWidget),
+    m_rootLayout(rootLayout),
     m_handler(handler)
 {
-    
+    connect(&m_rootWidget, SIGNAL(itemPressed(QTreeWidgetItem*, int)), this,   SLOT(treeWidgetItemPressed(QTreeWidgetItem*, int)));
 }
 
 CameraSettingsWidgetsCreator::~CameraSettingsWidgetsCreator()
@@ -90,6 +91,8 @@ bool CameraSettingsWidgetsCreator::recreateWidgets(CameraSettings* settings)
     }
     m_widgetsById.clear();
 
+    m_rootWidget.clear();
+
     return read() && proceed();
 }
 
@@ -106,10 +109,11 @@ bool CameraSettingsWidgetsCreator::isGroupEnabled(const QString& id, const QStri
 
     if (parentId.isEmpty())
     {
+        QTreeWidgetItem* item = new QTreeWidgetItem((QTreeWidget*)0, QStringList(name));
+        m_rootWidget.addTopLevelItem(item);
+
         tabWidget = new QWidget();
-        m_rootWidget.addTab(tabWidget, QString()); // TODO:        vvvv   strange code
-        m_rootWidget.setTabText(m_rootWidget.indexOf(tabWidget), QApplication::translate("SingleCameraSettingsWidget",
-            name.toLatin1().data(), 0, QApplication::UnicodeUTF8));
+        m_rootLayout.addWidget(tabWidget);
 
     } else {
 
@@ -192,4 +196,25 @@ void CameraSettingsWidgetsCreator::paramFound(const CameraSetting& value, const 
 void CameraSettingsWidgetsCreator::cleanDataOnFail()
 {
     
+}
+
+void CameraSettingsWidgetsCreator::treeWidgetItemPressed(QTreeWidgetItem* item, int /*column*/)
+{
+    if (!item) {
+        return;
+    }
+
+    QTreeWidget* treeItem = item->treeWidget();
+    if (!treeItem) {
+        qDebug() << "CameraSettingsWidgetsCreator::treeWidgetItemPressed: QTreeWidgetItem w/o a parent found!";
+        return;
+    }
+
+    int ind = treeItem->indexOfTopLevelItem(item);
+    if (ind < 0 || ind > m_rootLayout.count() - 1) {
+        qDebug() << "CameraSettingsWidgetsCreator::treeWidgetItemPressed: index out of range! Ind = " << ind << ", Count = " << m_rootLayout.count();
+        return;
+    }
+
+    m_rootLayout.setCurrentIndex(ind);
 }

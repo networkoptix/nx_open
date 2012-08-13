@@ -86,6 +86,7 @@ private:
     void disconnectFromMotionWidget();
     void connectToMotionWidget();
 
+    void initAdvancedTab();
     void loadAdvancedSettings();
 
 private:

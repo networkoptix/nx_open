@@ -55,15 +55,35 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
 
     //connect(ui->advancedCheckBox1,      SIGNAL(stateChanged(int)),              this,   SLOT(updateAdvancedCheckboxValue()));
 
-    QString filepath(QLatin1String("C:\\projects\\networkoptix\\netoptix_vms33\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml"));
-    //QString filepath = QString::fromLatin1("C:\\Data\\Projects\\networkoptix\\netoptix_vms\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml");
-    m_widgetsRecreator = new CameraSettingsWidgetsCreator(filepath, *(ui->tabWidget), this);
+    initAdvancedTab();
 
     updateFromResource();
 }
 
 QnSingleCameraSettingsWidget::~QnSingleCameraSettingsWidget() {
     delete m_widgetsRecreator;
+}
+
+void QnSingleCameraSettingsWidget::initAdvancedTab()
+{
+    QHBoxLayout *layout = dynamic_cast<QHBoxLayout*>(ui->tabAdvanced->layout());
+    if(!layout) {
+        delete ui->tabAdvanced->layout();
+        ui->tabAdvanced->setLayout(layout = new QHBoxLayout());
+    }
+
+    QTreeWidget* advancedTreeWidget = new QTreeWidget();
+    advancedTreeWidget->setColumnCount(1);
+    advancedTreeWidget->setHeaderLabel(QString::fromLatin1("Category"));
+
+    QWidget* advancedWidget = new QWidget();
+    QStackedLayout* advancedLayout = new QStackedLayout(advancedWidget);
+    layout->addWidget(advancedTreeWidget);
+    layout->addWidget(advancedWidget);
+
+    QString filepath(QLatin1String("C:\\projects\\networkoptix\\netoptix_vms33\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml"));
+    //QString filepath = QString::fromLatin1("C:\\Data\\Projects\\networkoptix\\netoptix_vms\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml");
+    m_widgetsRecreator = new CameraSettingsWidgetsCreator(filepath, *advancedTreeWidget, *advancedLayout, this);
 }
 
 void QnSingleCameraSettingsWidget::loadAdvancedSettings()

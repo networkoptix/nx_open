@@ -402,16 +402,6 @@
       <attribute name="title">
        <string>Advanced</string>
       </attribute>
-      <widget class="QTreeView" name="treeViewAdvanced">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>10</y>
-         <width>661</width>
-         <height>521</height>
-        </rect>
-       </property>
-      </widget>
      </widget>
     </widget>
    </item>

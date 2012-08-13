@@ -36,17 +36,20 @@ private:
 // class CameraSettingsWidgetsCreator
 //
 
-class CameraSettingsWidgetsCreator: public CameraSettingReader
+class CameraSettingsWidgetsCreator: public QObject, public CameraSettingReader
 {
+    Q_OBJECT
+
     typedef QHash<QString, QWidget*> WidgetsById;
 
     CameraSettings* m_settings;
-    QTabWidget& m_rootWidget;
+    QTreeWidget& m_rootWidget;
+    QStackedLayout& m_rootLayout;
     WidgetsById m_widgetsById;
     QObject* m_handler;
 
 public:
-    CameraSettingsWidgetsCreator(const QString& filepath, QTabWidget& rootWidget, QObject* handler);
+    CameraSettingsWidgetsCreator(const QString& filepath, QTreeWidget& rootWidget, QStackedLayout& rootLayout, QObject* handler);
     virtual ~CameraSettingsWidgetsCreator();
 
     bool recreateWidgets(CameraSettings* settings);
@@ -57,6 +60,9 @@ protected:
     virtual bool isParamEnabled(const QString& id, const QString& parentId);
     virtual void paramFound(const CameraSetting& value, const QString& parentId);
     virtual void cleanDataOnFail();
+
+protected slots:
+    void treeWidgetItemPressed(QTreeWidgetItem * item, int column);
 
 private:
 
