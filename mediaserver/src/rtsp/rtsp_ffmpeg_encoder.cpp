@@ -9,7 +9,8 @@ QnRtspFfmpegEncoder::QnRtspFfmpegEncoder():
     m_gotLivePacket(false),
     m_curDataBuffer(0),
     m_liveMarker(0),
-    m_additionFlags(0)
+    m_additionFlags(0),
+    m_eofReached(false)
 {
 
 }    
@@ -18,6 +19,7 @@ void QnRtspFfmpegEncoder::init()
 { 
     m_ctxSended.clear();
     m_gotLivePacket = false;
+    m_eofReached = false;
 }
 
 QnMediaContextPtr QnRtspFfmpegEncoder::getGeneratedContext(CodecID compressionType)
@@ -55,6 +57,7 @@ void QnRtspFfmpegEncoder::setDataPacket(QnAbstractMediaDataPtr media)
             QnFfmpegHelper::serializeCodecContext(currentContext->ctx(), &m_codecCtxData);
         }
     }
+    m_eofReached = false;
 }
 
 bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
@@ -86,8 +89,9 @@ bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
     // one video channel may has several subchannels (video combined with frames from difference codecContext)
     // max amount of subchannels is MAX_CONTEXTS_AT_VIDEO. Each channel used 2 ssrc: for data and for CodecContext
 
-    int dataRest = m_media->data.data() + m_media->data.size() - m_curDataBuffer;
-    if (dataRest == 0)
+    const char* dataEnd = m_media->data.data() + m_media->data.size();
+    int dataRest = dataEnd - m_curDataBuffer;
+    if (m_eofReached)
         return false; // no more data to send
     int sendLen = qMin(MAX_RTSP_DATA_LEN - RTSP_FFMPEG_MAX_HEADER_SIZE, dataRest);
 
@@ -128,6 +132,8 @@ bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
 
     sendBuffer.write(m_curDataBuffer, sendLen);
     m_curDataBuffer += sendLen;
+
+    m_eofReached = m_curDataBuffer == dataEnd;
 
     return true;
 }

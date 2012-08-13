@@ -34,6 +34,7 @@ private:
     QByteArray m_codecCtxData;
     int m_liveMarker;
     quint16 m_additionFlags;
+    bool m_eofReached;
 };
 
 typedef QSharedPointer<QnRtspFfmpegEncoder> QnRtspFfmpegEncoderPtr;
