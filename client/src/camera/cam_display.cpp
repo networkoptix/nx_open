@@ -365,7 +365,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         needToSleep = m_lastSleepInterval = (currentTime - m_previousVideoTime) * 1.0/qAbs(speed);
     }
 
-    qDebug() << "vd->flags & QnAbstractMediaData::MediaFlags_FCZ" << (vd->flags & QnAbstractMediaData::MediaFlags_FCZ);
+    //qDebug() << "vd->flags & QnAbstractMediaData::MediaFlags_FCZ" << (vd->flags & QnAbstractMediaData::MediaFlags_FCZ);
 
     if (m_isRealTimeSource)
     {
