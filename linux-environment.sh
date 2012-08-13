@@ -1,4 +1,4 @@
-# sudo apt-get install -y openjdk-6-jre-headless protobuf-compiler build-essential unzip zip libqt4-dev libz-dev python-dev  libasound2 libxrender-dev libfreetype6-dev
+# sudo apt-get install -y openjdk-6-jre-headless protobuf-compiler build-essential unzip zip libqt4-dev libz-dev python-dev  libasound2 libxrender-dev libfreetype6-dev libfontconfig1-dev libxrandr-dev libxinerama-dev libxcursor-dev
 
 #mkdir -p ~/environment
 #cd ~/environment
