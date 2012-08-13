@@ -64,6 +64,7 @@ public:
     bool isStillImage() const;
     virtual void putData(QnAbstractDataPacketPtr data) override;
 
+    virtual void setTimeParams(qint64 timeOffsetUsec, qint64 minTimeUsec, qint64 maxTimeUsec) override;
 public slots:
     void onBeforeJump(qint64 time);
     void onJumpOccured(qint64 time);
@@ -199,6 +200,10 @@ protected:
     int m_audioBufferSize;
     qint64 m_minAudioDetectJumpInterval;
     qint64 m_videoQueueDuration;
+
+    qint64 m_timeOffsetUsec;
+    qint64 m_minTimeUsec;
+    qint64 m_maxTimeUsec;
 };
 
 #endif //QN_CAM_DISPLAY_H

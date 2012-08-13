@@ -112,7 +112,9 @@ bool QnTranscoder::setAudioCodec(CodecID codec, TranscodeMethod method)
 int QnTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnByteArray& result)
 {
     m_internalBuffer.clear();
-    if (media->dataType != QnAbstractMediaData::VIDEO && media->dataType != QnAbstractMediaData::AUDIO)
+    if (media->dataType == QnAbstractMediaData::EMPTY_DATA)
+        return -8; // EOF reached
+    else if (media->dataType != QnAbstractMediaData::VIDEO && media->dataType != QnAbstractMediaData::AUDIO)
         return 0; // transcode only audio and video, skip packet
 
     if (m_firstTime == AV_NOPTS_VALUE)

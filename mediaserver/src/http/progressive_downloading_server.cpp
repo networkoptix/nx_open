@@ -158,6 +158,7 @@ void QnProgressiveDownloadingConsumer::run()
             qint64 timeMs = position.toLongLong(&ok); // try UTC format
             if (!ok)
                 timeMs = QDateTime::fromString(position, Qt::ISODate).toMSecsSinceEpoch(); // try ISO format
+            d->archiveDP->open();
             d->archiveDP->jumpTo(timeMs*1000, timeMs*1000);
             d->archiveDP->start();
             dataProvider = d->archiveDP;

@@ -25,6 +25,8 @@ public:
 
     virtual void setSpeed(double value, qint64 currentTimeHint) = 0;
 
+    virtual void setTimeParams(qint64 timeOffsetUsec, qint64 minTimeUsec, qint64 maxTimeUsec) {}
+
     // playback filter by motion detection mask
     // delivery motion data to a client
     //virtual bool setSendMotion(bool value) = 0;

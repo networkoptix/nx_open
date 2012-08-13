@@ -121,7 +121,10 @@ QnCamDisplay::QnCamDisplay(bool generateEndOfStreamSignal):
     m_executingChangeSpeed(false),
     m_eofSignalSended(false),
     m_lastLiveIsLowQuality(false),
-    m_videoQueueDuration(0)
+    m_videoQueueDuration(0),
+    m_timeOffsetUsec(0),
+    m_minTimeUsec(0),
+    m_maxTimeUsec(0)
 {
     m_storedMaxQueueSize = m_dataQueue.maxSize();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
@@ -1383,4 +1386,11 @@ bool QnCamDisplay::isNoData() const
     int sign = m_speed >= 0 ? 1 : -1;
     return sign *(getCurrentTime() - ct) > MAX_FRAME_DURATION*1000;
     */
+}
+
+void QnCamDisplay::setTimeParams(qint64 timeOffsetUsec, qint64 minTimeUsec, qint64 maxTimeUsec)
+{
+    m_timeOffsetUsec = timeOffsetUsec;
+    m_minTimeUsec = minTimeUsec;
+    m_maxTimeUsec = maxTimeUsec;
 }
