@@ -106,5 +106,6 @@ private:
     qint64 m_lastRtTime; // used for realtime streaming mode
     QnAdaptiveSleep m_adaptiveSleep;
     bool m_useUTCTime; // use absolute UTC file for RTP (used for proprietary format)
+    int m_fastChannelZappingSize;
 };
 #endif // __RTSP_DATA_CONSUMER_H__

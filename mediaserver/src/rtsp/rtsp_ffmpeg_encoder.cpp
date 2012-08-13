@@ -7,7 +7,9 @@
 
 QnRtspFfmpegEncoder::QnRtspFfmpegEncoder(): 
     m_gotLivePacket(false),
-    m_curDataBuffer(0)
+    m_curDataBuffer(0),
+    m_liveMarker(0),
+    m_additionFlags(0)
 {
 
 }    
@@ -66,10 +68,13 @@ bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
     }
 
     quint16 flags = m_media->flags;
+    flags |= m_additionFlags;
+
     int cseq = m_media->opaque;
 
     bool isLive = m_media->flags & QnAbstractMediaData::MediaFlags_LIVE;
     if (isLive) {
+        cseq = m_liveMarker;
         if (!m_gotLivePacket)
             flags |= QnAbstractMediaData::MediaFlags_BOF;
         m_gotLivePacket = true;
@@ -163,4 +168,14 @@ QByteArray QnRtspFfmpegEncoder::getAdditionSDP()
 QString QnRtspFfmpegEncoder::getName()
 {
     return RTP_FFMPEG_GENERIC_STR;
+}
+
+void QnRtspFfmpegEncoder::setLiveMarker(int value)
+{
+    m_liveMarker = value;
+}
+
+void QnRtspFfmpegEncoder::setAdditionFlags(quint16 value)
+{
+    m_additionFlags = value;
 }

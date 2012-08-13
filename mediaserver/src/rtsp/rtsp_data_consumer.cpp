@@ -44,7 +44,8 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
   m_hiQualityRetryCounter(0),
   m_realtimeMode(false),
   m_adaptiveSleep(MAX_FRAME_DURATION*1000),
-  m_useUTCTime(true)
+  m_useUTCTime(true),
+  m_fastChannelZappingSize(0)
 {
     memset(m_sequence, 0, sizeof(m_sequence));
     for (int i = 0; i < MAX_RTP_CHANNELS; ++i)
@@ -72,6 +73,7 @@ QnRtspDataConsumer::~QnRtspDataConsumer()
   void QnRtspDataConsumer::pauseNetwork()
 {
     m_pauseNetwork = true;
+    m_fastChannelZappingSize = 0;
 }
 void QnRtspDataConsumer::resumeNetwork()
 {
@@ -495,8 +497,18 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
 
 
     bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
-    if (isLive) 
-        media->opaque = m_liveMarker;
+    QnRtspFfmpegEncoderPtr ffmpegEncoder = qSharedPointerDynamicCast<QnRtspFfmpegEncoder>(codecEncoder);
+    if (ffmpegEncoder)
+    {
+        ffmpegEncoder->setAdditionFlags(0);
+        if (isLive) {
+            ffmpegEncoder->setLiveMarker(m_liveMarker);
+            if (m_fastChannelZappingSize > 0) {
+                ffmpegEncoder->setAdditionFlags(QnAbstractMediaData::MediaFlags_FCZ);
+                m_fastChannelZappingSize--;
+            }
+        }
+    }
 
     codecEncoder->setDataPacket(media);
     bool dataExists = true;
@@ -577,6 +589,7 @@ int QnRtspDataConsumer::copyLastGopFromCamera(bool usePrimaryStream, qint64 skip
     if (camera)
         copySize = camera->copyLastGop(usePrimaryStream, skipTime, m_dataQueue);
     m_dataQueue.setMaxSize(m_dataQueue.size()-prevSize + MAX_QUEUE_SIZE);
+    m_fastChannelZappingSize = copySize;
     return copySize;
 }
 
