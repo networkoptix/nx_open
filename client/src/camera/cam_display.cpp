@@ -368,7 +368,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         if (m_dataQueue.size() > 0) {
             sleep = false;
             m_realTimeHurryUp = 5;
-            if (m_dataQueue.size() > m_dataQueue.maxSize()/2 && m_playAudio && needToSleep < 50000) {
+            if (m_dataQueue.size() > m_dataQueue.maxSize()/2 && m_playAudio && needToSleep < 1000000ll / 15) {
                 // looks like not enought CPU for camera with high FPS value. I've add fps to switch logic to reduce real-time lag (MT decoding has addition 2-th frame delay)
                 setMTDecoding(true); 
             }
