@@ -233,8 +233,10 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent, QnWorkbenchContext *
     ui->resourceTreeView->setProperty(Qn::ItemViewItemBackgroundOpacity, 0.5);
     ui->searchTreeView->setProperty(Qn::ItemViewItemBackgroundOpacity, 0.5);
 
-    /* This is needed so that filter edit's context menu is not embedded into the scene. */
+    /* This is needed so that control's context menu is not embedded into the scene. */
     ui->filterLineEdit->setWindowFlags(ui->filterLineEdit->windowFlags() | Qt::BypassGraphicsProxyWidget);
+    ui->resourceTreeView->setWindowFlags(ui->resourceTreeView->windowFlags() | Qt::BypassGraphicsProxyWidget);
+    ui->searchTreeView->setWindowFlags(ui->resourceTreeView->windowFlags() | Qt::BypassGraphicsProxyWidget);
 
     m_renameAction = new QAction(this);
 
