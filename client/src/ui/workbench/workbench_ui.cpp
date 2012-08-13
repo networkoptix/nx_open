@@ -572,6 +572,14 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(action(Qn::ToggleCalendarAction), SIGNAL(toggled(bool)),                                                                this,                           SLOT(at_toggleCalendarAction_toggled(bool)));
 
 
+    /* Calendar. */
+    m_calendar = new QGraphicsProxyWidget(m_controlsWidget);
+    QnCalendarWidget *calendar = new QnCalendarWidget();
+    m_calendar->setWidget(calendar);
+    m_calendar->setVisible(false);
+    navigator()->setCalendar(calendar);
+
+
     /* Connect to display. */
     display()->view()->addAction(action(Qn::FreespaceAction));
     connect(action(Qn::FreespaceAction),SIGNAL(triggered()),                                                                        this,                           SLOT(at_freespaceAction_triggered()));
@@ -1076,14 +1084,13 @@ void QnWorkbenchUi::updateFpsGeometry() {
     m_fpsItem->setPos(pos);
 }
 
-void QnWorkbenchUi::updateCalendarGeometry(){
-    QGraphicsProxyWidget* calendar = m_sliderItem->calendar();
+void QnWorkbenchUi::updateCalendarGeometry() {
     QnTimeSlider *timeSlider = m_sliderItem->timeSlider();
     QRectF timeSliderRect = timeSlider->rect();
     QPointF bottomRight = m_controlsWidget->mapFromItem(timeSlider, timeSliderRect.topRight());
-    QRectF calendarGeometry = calendar->geometry();
+    QRectF calendarGeometry = m_calendar->geometry();
     calendarGeometry.moveTo(bottomRight - QPointF(calendarGeometry.width(), calendarGeometry.height()));
-    calendar->setGeometry(calendarGeometry);
+    m_calendar->setGeometry(calendarGeometry);
 }
 
 void QnWorkbenchUi::updateSliderResizerGeometry() {
@@ -1253,7 +1260,7 @@ void QnWorkbenchUi::setThumbnailsVisible(bool visible) {
 }
 
 bool QnWorkbenchUi::isCalendarVisible() const {
-    return m_sliderItem->calendar()->isVisible();
+    return m_calendar->isVisible();
 }
 
 void QnWorkbenchUi::setCalendarVisible(bool visible) {
@@ -1261,7 +1268,7 @@ void QnWorkbenchUi::setCalendarVisible(bool visible) {
         return;
 
     updateCalendarGeometry();
-    m_sliderItem->calendar()->setVisible(visible);
+    m_calendar->setVisible(visible);
 }
 
 // -------------------------------------------------------------------------- //
