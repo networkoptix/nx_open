@@ -12,11 +12,15 @@ QnCalendarWidget::QnCalendarWidget():
 void QnCalendarWidget::setCurrentTimePeriods( Qn::TimePeriodRole type, QnTimePeriodList periods )
 {
     m_currentTimeStorage.updatePeriods(type, periods);
+
+    update();
 }
 
 void QnCalendarWidget::setSyncedTimePeriods( Qn::TimePeriodRole type, QnTimePeriodList periods )
 {
     m_syncedTimeStorage.updatePeriods(type, periods);
+
+    update();
 }
 
 void QnCalendarWidget::paintCell(QPainter *painter, const QRect & rect, const QDate & date ) const{
