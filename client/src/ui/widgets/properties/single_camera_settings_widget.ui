@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>3</number>
+      <number>4</number>
      </property>
      <widget class="QWidget" name="tabGeneral">
       <attribute name="title">
@@ -402,20 +402,14 @@
       <attribute name="title">
        <string>Advanced</string>
       </attribute>
-      <widget class="QCheckBox" name="advancedCheckBox1">
+      <widget class="QTreeView" name="treeViewAdvanced">
        <property name="geometry">
         <rect>
-         <x>20</x>
-         <y>20</y>
-         <width>71</width>
-         <height>17</height>
+         <x>10</x>
+         <y>10</y>
+         <width>661</width>
+         <height>521</height>
         </rect>
-       </property>
-       <property name="text">
-        <string>Turned On</string>
-       </property>
-       <property name="tristate">
-        <bool>false</bool>
        </property>
       </widget>
      </widget>

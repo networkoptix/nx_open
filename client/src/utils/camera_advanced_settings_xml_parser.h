@@ -39,12 +39,10 @@ private:
 class CameraSettingsWidgetsCreator: public CameraSettingReader
 {
     typedef QHash<QString, QWidget*> WidgetsById;
-    typedef QHash<QString, int> IndexById;
 
     CameraSettings* m_settings;
     QTabWidget& m_rootWidget;
     WidgetsById m_widgetsById;
-    IndexById m_indexById;
     QObject* m_handler;
 
 public:

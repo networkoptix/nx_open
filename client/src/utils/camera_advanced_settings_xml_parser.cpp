@@ -79,21 +79,15 @@ bool CameraSettingsWidgetsCreator::recreateWidgets(CameraSettings* settings)
 
     m_settings = settings;
 
-    IndexById::Iterator it = m_indexById.begin();
-    for (; it != m_indexById.end(); ++it)
+    WidgetsById::Iterator it = m_widgetsById.begin();
+    for (; it != m_widgetsById.end(); ++it)
     {
-        m_rootWidget.removeTab(it.value());
-
-        WidgetsById::Iterator wIt = m_widgetsById.find(it.key());
-        if (wIt == m_widgetsById.end()) {
-            //Object must be in hash
-            Q_ASSERT(false);
+        //Deleting root element (automaticaly all children will be deleted)
+        if (it.key().count(QString::fromLatin1("%%")) == 1)
+        {
+            delete it.value();
         }
-
-        delete wIt.value();
     }
-
-    m_indexById.clear();
     m_widgetsById.clear();
 
     return read() && proceed();
@@ -113,7 +107,7 @@ bool CameraSettingsWidgetsCreator::isGroupEnabled(const QString& id, const QStri
     if (parentId.isEmpty())
     {
         tabWidget = new QWidget();
-        m_indexById.insert(id, m_rootWidget.addTab(tabWidget, QString())); // TODO:        vvvv   strange code
+        m_rootWidget.addTab(tabWidget, QString()); // TODO:        vvvv   strange code
         m_rootWidget.setTabText(m_rootWidget.indexOf(tabWidget), QApplication::translate("SingleCameraSettingsWidget",
             name.toLatin1().data(), 0, QApplication::UnicodeUTF8));
 
@@ -124,13 +118,13 @@ bool CameraSettingsWidgetsCreator::isGroupEnabled(const QString& id, const QStri
             //Parent must be already created!
             Q_ASSERT(false);
         }
-        QVBoxLayout *layout = dynamic_cast<QVBoxLayout *>((*it)->layout());
+        QVBoxLayout *layout = dynamic_cast<QVBoxLayout *>(it.value()->layout());
         if(!layout) {
-            delete (*it)->layout();
-            (*it)->setLayout(layout = new QVBoxLayout());
+            delete it.value()->layout();
+            it.value()->setLayout(layout = new QVBoxLayout());
         }
 
-        QWidget* tabWidget = new QGroupBox(name);
+        tabWidget = new QGroupBox(name);
         layout->addWidget(tabWidget);
 
         //tabWidget->setFixedWidth(300);
@@ -162,14 +156,11 @@ void CameraSettingsWidgetsCreator::paramFound(const CameraSetting& value, const 
         Q_ASSERT(false);
     }
 
-    QVBoxLayout *layout = dynamic_cast<QVBoxLayout *>((*parentIt)->layout());
-    if(!layout) {
-        delete (*parentIt)->layout();
-        (*parentIt)->setLayout(layout = new QVBoxLayout());
-    }
-    //int currNum = (*parentIt)->children().length();
-
     CameraSettings::Iterator currIt = m_settings->find(value.getId());
+    if (currIt == m_settings->end() && value.getType() != CameraSetting::Button) {
+        qDebug() << "CameraSettingsWidgetsCreator::paramFound: didn't disable the following param: " << value.serializeToStr();
+        return;
+    }
 
     QWidget* tabWidget = 0;
     switch(value.getType())
@@ -194,12 +185,11 @@ void CameraSettingsWidgetsCreator::paramFound(const CameraSetting& value, const 
             //Unknown widget type!
             Q_ASSERT(false);
     }
-    //tabWidget->move(0, 50 * currNum);
 
     m_widgetsById.insert(value.getId(), tabWidget);
 }
 
 void CameraSettingsWidgetsCreator::cleanDataOnFail()
 {
-    m_widgetsById.clear();
+    
 }
