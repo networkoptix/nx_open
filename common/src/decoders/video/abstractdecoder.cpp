@@ -2,12 +2,14 @@
 #include "abstractdecoder.h"
 #include "ffmpeg.h"
 #include "ipp_h264_decoder.h"
+#ifdef Q_OS_WIN
 #include "quicksyncvideodecoder.h"
+#endif
 
 
 CLVideoDecoderFactory::CLCodecManufacture CLVideoDecoderFactory::m_codecManufacture = FFMPEG;
 
-QnAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder(const QnCompressedVideoDataPtr data, bool mtDecoding)
+QnAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder( const QnCompressedVideoDataPtr data, bool mtDecoding )
 {
     // h264 
     switch(m_codecManufacture)
@@ -16,18 +18,18 @@ QnAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder(const QnCompressedV
     case INTELIPP:
         return new IPPH264Decoder();
         break;
+
+    case INTEL_QUICK_SYNC:
+    {
+        QuickSyncVideoDecoder* decoder = new QuickSyncVideoDecoder();
+        decoder->decode( data, NULL );
+        return decoder;
+    }
 #endif
+
     case FFMPEG:
     default:
-        {
-#ifdef _DEBUG
-            QuickSyncVideoDecoder* decoder = new QuickSyncVideoDecoder();
-            decoder->decode( data, NULL );
-            return decoder;
-#else
         return new CLFFmpegVideoDecoder(data->compressionType, data, mtDecoding);
-#endif
-        }
     }
 
     return 0;
