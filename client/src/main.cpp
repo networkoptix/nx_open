@@ -276,7 +276,10 @@ int main(int argc, char *argv[])
     /* Initialize application instance. */
     application->setStartDragDistance(20);
 
+    /* Support old straight build scripts. */
+#ifndef NO_TRANSLATIONS
     Q_INIT_RESOURCE(common_translations);
+#endif
 
     QString language = qnSettings->language();
     QTranslator appTranslator;
