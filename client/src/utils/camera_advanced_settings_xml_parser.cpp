@@ -62,7 +62,8 @@ CameraSettingsWidgetsCreator::CameraSettingsWidgetsCreator(const QString& filepa
     m_settings(0),
     m_rootWidget(rootWidget),
     m_rootLayout(rootLayout),
-    m_handler(handler)
+    m_handler(handler),
+    m_owner(0)
 {
     connect(&m_rootWidget, SIGNAL(itemPressed(QTreeWidgetItem*, int)), this,   SLOT(treeWidgetItemPressed(QTreeWidgetItem*, int)));
 }
@@ -80,18 +81,28 @@ bool CameraSettingsWidgetsCreator::recreateWidgets(CameraSettings* settings)
 
     m_settings = settings;
 
-    WidgetsById::Iterator it = m_widgetsById.begin();
-    for (; it != m_widgetsById.end(); ++it)
-    {
-        //Deleting root element (automaticaly all children will be deleted)
-        if (it.key().count(QString::fromLatin1("%%")) == 1)
-        {
-            delete it.value();
-        }
-    }
+    //WidgetsById::Iterator it = m_widgetsById.begin();
+    //for (; it != m_widgetsById.end(); ++it)
+    //{
+    //    //Deleting root element (automaticaly all children will be deleted)
+    //    if (it.key().count(QString::fromLatin1("%%")) == 1)
+    //    {
+    //        delete it.value();
+    //    }
+    //}
     m_widgetsById.clear();
-
     m_rootWidget.clear();
+
+    if (m_owner)
+    {
+        QObjectList children = m_owner->children();
+        for (int i = 0; i < children.count(); ++i)
+        {
+            m_rootLayout.removeWidget(static_cast<QWidget*>(children[i]));
+        }
+        delete m_owner;
+    }
+    m_owner = new QWidget();
 
     return read() && proceed();
 }
@@ -105,15 +116,15 @@ bool CameraSettingsWidgetsCreator::isGroupEnabled(const QString& id, const QStri
         return false;
     }
 
-    QWidget* tabWidget = 0;
+    //QTreeWidgetItem* tabWidget = 0;
+    QTreeWidgetItem* item = new QTreeWidgetItem((QTreeWidget*)0, QStringList(name));
 
     if (parentId.isEmpty())
     {
-        QTreeWidgetItem* item = new QTreeWidgetItem((QTreeWidget*)0, QStringList(name));
         m_rootWidget.addTopLevelItem(item);
 
-        tabWidget = new QWidget();
-        m_rootLayout.addWidget(tabWidget);
+        //tabWidget = new QWidget();
+        //m_rootLayout.addWidget(tabWidget);
 
     } else {
 
@@ -122,21 +133,22 @@ bool CameraSettingsWidgetsCreator::isGroupEnabled(const QString& id, const QStri
             //Parent must be already created!
             Q_ASSERT(false);
         }
-        QVBoxLayout *layout = dynamic_cast<QVBoxLayout *>(it.value()->layout());
-        if(!layout) {
-            delete it.value()->layout();
-            it.value()->setLayout(layout = new QVBoxLayout());
-        }
+        it.value()->addChild(item);
+        //QVBoxLayout *layout = dynamic_cast<QVBoxLayout *>(it.value()->layout());
+        //if(!layout) {
+        //    delete it.value()->layout();
+        //    it.value()->setLayout(layout = new QVBoxLayout());
+        //}
 
-        tabWidget = new QGroupBox(name);
-        layout->addWidget(tabWidget);
+        //tabWidget = new QGroupBox(name);
+        //layout->addWidget(tabWidget);
 
         //tabWidget->setFixedWidth(300);
         //tabWidget->setFixedHeight(300);
     }
 
-    tabWidget->setObjectName(id);
-    m_widgetsById.insert(id, tabWidget);
+    //item->setObjectName(id);
+    m_widgetsById.insert(id, item);
 
     return true;
 }
@@ -170,19 +182,19 @@ void CameraSettingsWidgetsCreator::paramFound(const CameraSetting& value, const 
     switch(value.getType())
     {
         case CameraSetting::OnOff:
-            tabWidget = new QnSettingsOnOffWidget(m_handler, *(currIt.value()), *(parentIt.value()));
+            tabWidget = new QnSettingsOnOffWidget(m_handler, *(currIt.value()), *m_owner);
             break;
 
         case CameraSetting::MinMaxStep:
-            tabWidget = new QnSettingsMinMaxStepWidget(m_handler, *(currIt.value()), *(parentIt.value()));
+            tabWidget = new QnSettingsMinMaxStepWidget(m_handler, *(currIt.value()), *m_owner);
             break;
 
         case CameraSetting::Enumeration:
-            tabWidget = new QnSettingsEnumerationWidget(m_handler, *(currIt.value()), *(parentIt.value()));
+            tabWidget = new QnSettingsEnumerationWidget(m_handler, *(currIt.value()), *m_owner);
             break;
 
         case CameraSetting::Button:
-            tabWidget = new QnSettingsButtonWidget(m_handler, *(parentIt.value()));
+            tabWidget = new QnSettingsButtonWidget(m_handler, *m_owner);
             break;
 
         default:
@@ -190,7 +202,13 @@ void CameraSettingsWidgetsCreator::paramFound(const CameraSetting& value, const 
             Q_ASSERT(false);
     }
 
-    m_widgetsById.insert(value.getId(), tabWidget);
+    int ind = m_rootLayout.addWidget(tabWidget);
+
+    QTreeWidgetItem* item = new QTreeWidgetItem((QTreeWidget*)0, QStringList(value.getName()));
+    item->setData(0, Qt::UserRole, ind);
+    parentIt.value()->addChild(item);
+
+    //m_widgetsById.insert(value.getId(), tabWidget);
 }
 
 void CameraSettingsWidgetsCreator::cleanDataOnFail()
@@ -204,14 +222,8 @@ void CameraSettingsWidgetsCreator::treeWidgetItemPressed(QTreeWidgetItem* item, 
         return;
     }
 
-    QTreeWidget* treeItem = item->treeWidget();
-    if (!treeItem) {
-        qDebug() << "CameraSettingsWidgetsCreator::treeWidgetItemPressed: QTreeWidgetItem w/o a parent found!";
-        return;
-    }
-
-    int ind = treeItem->indexOfTopLevelItem(item);
-    if (ind < 0 || ind > m_rootLayout.count() - 1) {
+    unsigned int ind = item->data(0, Qt::UserRole).toUInt();
+    if (ind > m_rootLayout.count() - 1) {
         qDebug() << "CameraSettingsWidgetsCreator::treeWidgetItemPressed: index out of range! Ind = " << ind << ", Count = " << m_rootLayout.count();
         return;
     }

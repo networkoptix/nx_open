@@ -40,13 +40,14 @@ class CameraSettingsWidgetsCreator: public QObject, public CameraSettingReader
 {
     Q_OBJECT
 
-    typedef QHash<QString, QWidget*> WidgetsById;
+    typedef QHash<QString, QTreeWidgetItem*> WidgetsById;
 
     CameraSettings* m_settings;
     QTreeWidget& m_rootWidget;
     QStackedLayout& m_rootLayout;
     WidgetsById m_widgetsById;
     QObject* m_handler;
+    QWidget* m_owner;
 
 public:
     CameraSettingsWidgetsCreator(const QString& filepath, QTreeWidget& rootWidget, QStackedLayout& rootLayout, QObject* handler);
