@@ -197,8 +197,8 @@ QRadioButton* QnSettingsEnumerationWidget::getBtnByname(const QString& name)
 }
 
 //==================================================
-QnSettingsButtonWidget::QnSettingsButtonWidget(QObject* handler, CameraSetting& obj, QWidget& parent):
-    QnAbstractSettingsWidget(handler, obj)
+QnSettingsButtonWidget::QnSettingsButtonWidget(QObject* handler, QWidget& parent):
+    QnAbstractSettingsWidget(handler, dummyVal)
 {
     QPushButton* btn = new QPushButton(mParam.getName(), &parent);
 

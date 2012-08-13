@@ -3,8 +3,8 @@
 
 #include "plugins/resources/camera_settings/camera_settings.h"
 
-typedef QHash<QString, CameraSetting> CameraSettings;
-typedef QHash<QString, QWidget*> WidgetsById;
+typedef QSharedPointer<CameraSetting> CameraSettingPtr;
+typedef QHash<QString, CameraSettingPtr> CameraSettings;
 
 //
 // class CameraSettingsLister
@@ -38,13 +38,20 @@ private:
 
 class CameraSettingsWidgetsCreator: public CameraSettingReader
 {
-    CameraSettings& m_settings;
+    typedef QHash<QString, QWidget*> WidgetsById;
+    typedef QHash<QString, int> IndexById;
+
+    CameraSettings* m_settings;
     QTabWidget& m_rootWidget;
     WidgetsById m_widgetsById;
+    IndexById m_indexById;
+    QObject* m_handler;
 
 public:
-    CameraSettingsWidgetsCreator(const QString& filepath, CameraSettings& settings, QTabWidget& rootWidget);
+    CameraSettingsWidgetsCreator(const QString& filepath, QTabWidget& rootWidget, QObject* handler);
     virtual ~CameraSettingsWidgetsCreator();
+
+    bool recreateWidgets(CameraSettings* settings);
 
 protected:
 

@@ -106,7 +106,7 @@ class QnSettingsButtonWidget : public QnAbstractSettingsWidget
 {
     Q_OBJECT
 public:
-    QnSettingsButtonWidget(QObject* handler, CameraSetting& obj, QWidget& parent);
+    QnSettingsButtonWidget(QObject* handler, QWidget& parent);
 
     public slots:
         void updateParam(QString val);
@@ -114,6 +114,8 @@ public:
         private slots:
             void onClicked();
 
+private:
+    CameraSetting dummyVal;
 };
 
 #endif //camera_settings_widgets_h_1214

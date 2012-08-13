@@ -1,6 +1,5 @@
 #include "single_camera_settings_widget.h"
 #include "ui_single_camera_settings_widget.h"
-#include "utils/camera_advanced_settings_xml_parser.h"
 #include "core/resource/video_server.h"
 #include "core/resource/resource_fwd.h"
 #include "api/video_server_connection.h"
@@ -27,7 +26,8 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     m_hasScheduleChanges(false),
     m_readOnly(false),
     m_inUpdateMaxFps(false),
-    m_cameraSupportsMotion(false)
+    m_cameraSupportsMotion(false),
+    m_widgetsRecreator(0)
 {
     ui->setupUi(this);
 
@@ -55,11 +55,15 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
 
     connect(ui->advancedCheckBox1,      SIGNAL(stateChanged(int)),              this,   SLOT(updateAdvancedCheckboxValue()));
 
+    //QString filepath(QLatin1String("C:\\projects\\networkoptix\\netoptix_vms33\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml"));
+    QString filepath = QString::fromLatin1("C:\\Data\\Projects\\networkoptix\\netoptix_vms\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml");
+    m_widgetsRecreator = new CameraSettingsWidgetsCreator(filepath, *(ui->tabWidget), this);
+
     updateFromResource();
 }
 
 QnSingleCameraSettingsWidget::~QnSingleCameraSettingsWidget() {
-    return;
+    delete m_widgetsRecreator;
 }
 
 void QnSingleCameraSettingsWidget::loadAdvancedSettings()
@@ -68,7 +72,8 @@ void QnSingleCameraSettingsWidget::loadAdvancedSettings()
         return;
     }
 
-    QString filepath(QLatin1String("C:\\projects\\networkoptix\\netoptix_vms33\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml"));
+    //QString filepath(QLatin1String("C:\\projects\\networkoptix\\netoptix_vms33\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml"));
+    QString filepath = QString::fromLatin1("C:\\Data\\Projects\\networkoptix\\netoptix_vms\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml");
     CameraSettingsLister lister(filepath);
     QStringList settings = lister.fetchParams();
 
@@ -415,31 +420,50 @@ void QnSingleCameraSettingsWidget::at_motionTypeChanged() {
 
 void QnSingleCameraSettingsWidget::at_advancedSettingsLoaded(int httpStatusCode, const QList<QPair<QString, QVariant> >& params)
 {
-    //at_dbDataChanged();
-    bool fill = m_cameraSettings;
+    if (!m_widgetsRecreator) {
+        qWarning() << "QnSingleCameraSettingsWidget::at_advancedSettingsLoaded: widgets creator ptr is null, camera id: "
+            << (m_camera == 0? QString::fromLatin1("unknown"): m_camera->getUniqueId());
+        return;
+    }
+    if (!httpStatusCode) {
+        qWarning() << "QnSingleCameraSettingsWidget::at_advancedSettingsLoaded: http status code is not OK: " << httpStatusCode
+            << ". Camera id: " << (m_camera == 0? QString::fromLatin1("unknown"): m_camera->getUniqueId());
+        return;
+    }
+
     QList<QPair<QString, QVariant> >::ConstIterator it = params.begin();
 
     for (; it != params.end(); ++it)
     {
-        QString name = it->first;
         QString val = it->second.toString();
 
         if (!val.isEmpty())
         {
-            CameraSetting tmp;
-            tmp.deserializeFromStr(val);
+            CameraSettingPtr tmp(new CameraSetting());
+            tmp->deserializeFromStr(val);
 
-            CameraSettings::ConstIterator it = m_cameraSettings.find(tmp.getId());
-            if (it == m_cameraSettings.end()) {
-                m_cameraSettings.insert(tmp.getId(), tmp);
-            } else {
-                it.value().setCurrent(getCurrent());
+            CameraSettings::Iterator sIt = m_cameraSettings.find(tmp->getId());
+            if (sIt == m_cameraSettings.end()) {
+                m_cameraSettings.insert(tmp->getId(), tmp);
+                continue;
+            }
+
+            CameraSetting& savedVal = *(sIt.value());
+            if (CameraSettingReader::isEnabled(savedVal)) {
+                sIt.value()->setCurrent(tmp->getCurrent());
+                continue;
+            }
+
+            if (CameraSettingReader::isEnabled(*tmp)) {
+                m_cameraSettings.erase(sIt);
+                m_cameraSettings.insert(tmp->getId(), tmp);
             }
         }
     }
 
-    QString filepath(QLatin1String("C:\\projects\\networkoptix\\netoptix_vms33\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml"));
-    CameraSettingsWidgetsCreator creator(filepath, m_cameraSettings, ui->tabWidget);
+    m_widgetsRecreator->recreateWidgets(&m_cameraSettings);
+
+    //at_dbDataChanged();
 }
 
 void QnSingleCameraSettingsWidget::updateMaxFPS() {

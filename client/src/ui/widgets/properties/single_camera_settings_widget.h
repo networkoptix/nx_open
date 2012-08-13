@@ -4,7 +4,7 @@
 #include <QtGui/QWidget>
 #include <core/resource/resource_fwd.h>
 #include "camera_settings_tab.h"
-#include "camera_advanced_settings_widget.h"
+#include "utils/camera_advanced_settings_xml_parser.h"
 
 
 namespace Ui {
@@ -105,6 +105,7 @@ private:
     bool m_inUpdateMaxFps;
 
     CameraSettings m_cameraSettings;
+    CameraSettingsWidgetsCreator* m_widgetsRecreator;
 };
 
 #endif // CAMERA_SETTINGS_DIALOG_H
