@@ -199,6 +199,8 @@ protected:
     int m_audioBufferSize;
     qint64 m_minAudioDetectJumpInterval;
     qint64 m_videoQueueDuration;
+    int m_fczFrames;
+    bool m_useMTRealTimeDecode;
 };
 
 #endif //QN_CAM_DISPLAY_H

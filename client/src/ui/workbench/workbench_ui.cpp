@@ -523,61 +523,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(m_helpItem,                 SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_helpItem_paintGeometryChanged()));
 
 
-    /* Navigation slider. */
-    m_sliderEaterItem = new QnEventEatingWidget(m_controlsWidget);
-
-    m_sliderResizerItem = new QnTopResizerWidget(m_controlsWidget);
-    m_sliderResizerItem->setProperty(Qn::NoHandScrollOver, true);
-    m_instrumentManager->registerItem(m_sliderResizerItem); /* We want it registered right away. */
-
-    m_sliderItem = new QnNavigationItem(m_controlsWidget);
-    m_sliderItem->setFrameColor(QColor(110, 110, 110, 255));
-    m_sliderItem->setFrameWidth(0.5);
-    m_sliderItem->timeSlider()->toolTipItem()->setParentItem(m_controlsWidget);
-
-    m_sliderShowButton = newShowHideButton(m_controlsWidget);
-    {
-        QTransform transform;
-        transform.rotate(-90);
-        m_sliderShowButton->setTransform(transform);
-    }
-    m_sliderShowButton->setFocusProxy(m_sliderItem);
-
-    /* There is no stackAfter function, so we have to resort to ugly copypasta. */
-    m_sliderShowButton->stackBefore(m_sliderItem->timeSlider()->toolTipItem());
-    m_sliderResizerItem->stackBefore(m_sliderShowButton);
-    m_sliderItem->stackBefore(m_sliderResizerItem);
-
-    m_sliderOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
-    m_sliderOpacityProcessor->addTargetItem(m_sliderItem);
-    m_sliderOpacityProcessor->addTargetItem(m_sliderItem->timeSlider()->toolTipItem());
-    m_sliderOpacityProcessor->addTargetItem(m_sliderShowButton);
-    m_sliderOpacityProcessor->addTargetItem(m_sliderResizerItem);
-
-    m_sliderYAnimator = new VariantAnimator(this);
-    m_sliderYAnimator->setTimer(m_instrumentManager->animationTimer());
-    m_sliderYAnimator->setTargetObject(m_sliderItem);
-    m_sliderYAnimator->setAccessor(new PropertyAccessor("y"));
-    m_sliderYAnimator->setSpeed(m_sliderItem->size().height() * 2.0);
-    m_sliderYAnimator->setTimeLimit(500);
-
-    m_sliderOpacityAnimatorGroup = new AnimatorGroup(this);
-    m_sliderOpacityAnimatorGroup->setTimer(m_instrumentManager->animationTimer());
-    m_sliderOpacityAnimatorGroup->addAnimator(opacityAnimator(m_sliderItem));
-    m_sliderOpacityAnimatorGroup->addAnimator(opacityAnimator(m_sliderShowButton)); /* Speed of 1.0 is OK here. */
-
-    connect(m_sliderShowButton,         SIGNAL(toggled(bool)),                                                                      this,                           SLOT(at_sliderShowButton_toggled(bool)));
-    connect(m_sliderOpacityProcessor,   SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateSliderOpacity()));
-    connect(m_sliderOpacityProcessor,   SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateSliderOpacity()));
-    connect(m_sliderOpacityProcessor,   SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateControlsVisibility()));
-    connect(m_sliderOpacityProcessor,   SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateControlsVisibility()));
-    connect(m_sliderItem,               SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_sliderItem_geometryChanged()));
-    connect(m_sliderResizerItem,        SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_sliderResizerItem_geometryChanged()));
-    connect(navigator(),                SIGNAL(currentWidgetChanged()),                                                             this,                           SLOT(updateControlsVisibility()));
-    connect(action(Qn::ToggleThumbnailsAction), SIGNAL(toggled(bool)),                                                              this,                           SLOT(at_toggleThumbnailsAction_toggled(bool)));
-    connect(action(Qn::ToggleCalendarAction), SIGNAL(toggled(bool)),                                                                this,                           SLOT(at_toggleCalendarAction_toggled(bool)));
-    
-
     /* Calendar. */
     QnCalendarWidget *calendarWidget = new QnCalendarWidget();
     navigator()->setCalendar(calendarWidget);
@@ -610,8 +555,8 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_calendarOpacityAnimatorGroup->addAnimator(opacityAnimator(m_calendarItem));
     m_calendarOpacityAnimatorGroup->addAnimator(opacityAnimator(m_calendarShowButton)); /* Speed of 1.0 is OK here. */
 
-    m_calendarItem->stackBefore(m_sliderItem->timeSlider()->toolTipItem());
-    m_calendarShowButton->stackBefore(m_sliderItem->timeSlider()->toolTipItem());
+    /*m_calendarItem->stackBefore(m_sliderItem->timeSlider()->toolTipItem());
+    m_calendarShowButton->stackBefore(m_sliderItem->timeSlider()->toolTipItem());*/
 
     connect(m_calendarShowButton,       SIGNAL(toggled(bool)),                                                                      this,                           SLOT(at_calendarShowButton_toggled(bool)));
     connect(m_calendarOpacityProcessor, SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateCalendarOpacity()));
@@ -620,7 +565,63 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(m_calendarOpacityProcessor, SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateControlsVisibility()));
     connect(m_calendarItem,             SIGNAL(paintRectChanged()),                                                                 this,                           SLOT(at_calendarItem_paintGeometryChanged()));
     connect(m_calendarItem,             SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_calendarItem_paintGeometryChanged()));
+    connect(action(Qn::ToggleCalendarAction), SIGNAL(toggled(bool)),                                                                this,                           SLOT(at_toggleCalendarAction_toggled(bool)));
 
+
+    /* Navigation slider. */
+    m_sliderEaterItem = new QnEventEatingWidget(m_controlsWidget);
+
+    m_sliderResizerItem = new QnTopResizerWidget(m_controlsWidget);
+    m_sliderResizerItem->setProperty(Qn::NoHandScrollOver, true);
+    m_instrumentManager->registerItem(m_sliderResizerItem); /* We want it registered right away. */
+
+    m_sliderItem = new QnNavigationItem(m_controlsWidget);
+    m_sliderItem->setFrameColor(QColor(110, 110, 110, 255));
+    m_sliderItem->setFrameWidth(0.5);
+    m_sliderItem->timeSlider()->toolTipItem()->setParentItem(m_controlsWidget);
+
+    m_sliderShowButton = newShowHideButton(m_controlsWidget);
+    {
+        QTransform transform;
+        transform.rotate(-90);
+        m_sliderShowButton->setTransform(transform);
+    }
+    m_sliderShowButton->setFocusProxy(m_sliderItem);
+
+    /* There is no stackAfter function, so we have to resort to ugly copypasta. */
+    m_sliderShowButton->stackBefore(m_sliderItem->timeSlider()->toolTipItem());
+    m_sliderResizerItem->stackBefore(m_sliderShowButton);
+    m_sliderItem->stackBefore(m_sliderResizerItem);
+    m_sliderEaterItem->stackBefore(m_calendarShowButton);
+    m_sliderEaterItem->stackBefore(m_calendarItem);
+
+    m_sliderOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
+    m_sliderOpacityProcessor->addTargetItem(m_sliderItem);
+    m_sliderOpacityProcessor->addTargetItem(m_sliderItem->timeSlider()->toolTipItem());
+    m_sliderOpacityProcessor->addTargetItem(m_sliderShowButton);
+    m_sliderOpacityProcessor->addTargetItem(m_sliderResizerItem);
+
+    m_sliderYAnimator = new VariantAnimator(this);
+    m_sliderYAnimator->setTimer(m_instrumentManager->animationTimer());
+    m_sliderYAnimator->setTargetObject(m_sliderItem);
+    m_sliderYAnimator->setAccessor(new PropertyAccessor("y"));
+    m_sliderYAnimator->setSpeed(m_sliderItem->size().height() * 2.0);
+    m_sliderYAnimator->setTimeLimit(500);
+
+    m_sliderOpacityAnimatorGroup = new AnimatorGroup(this);
+    m_sliderOpacityAnimatorGroup->setTimer(m_instrumentManager->animationTimer());
+    m_sliderOpacityAnimatorGroup->addAnimator(opacityAnimator(m_sliderItem));
+    m_sliderOpacityAnimatorGroup->addAnimator(opacityAnimator(m_sliderShowButton)); /* Speed of 1.0 is OK here. */
+
+    connect(m_sliderShowButton,         SIGNAL(toggled(bool)),                                                                      this,                           SLOT(at_sliderShowButton_toggled(bool)));
+    connect(m_sliderOpacityProcessor,   SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateSliderOpacity()));
+    connect(m_sliderOpacityProcessor,   SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateSliderOpacity()));
+    connect(m_sliderOpacityProcessor,   SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateControlsVisibility()));
+    connect(m_sliderOpacityProcessor,   SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateControlsVisibility()));
+    connect(m_sliderItem,               SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_sliderItem_geometryChanged()));
+    connect(m_sliderResizerItem,        SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_sliderResizerItem_geometryChanged()));
+    connect(navigator(),                SIGNAL(currentWidgetChanged()),                                                             this,                           SLOT(updateControlsVisibility()));
+    connect(action(Qn::ToggleThumbnailsAction), SIGNAL(toggled(bool)),                                                              this,                           SLOT(at_toggleThumbnailsAction_toggled(bool)));
 
 
     /* Connect to display. */
