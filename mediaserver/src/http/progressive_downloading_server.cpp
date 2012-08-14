@@ -42,7 +42,23 @@ public:
     }
     void copyLastGopFromCamera(QnVideoCamera* camera)
     {
-        camera->copyLastGop(true, 0, m_dataQueue);
+        CLDataQueue tmpQueue(20);
+        camera->copyLastGop(true, 0, tmpQueue);
+
+        if (tmpQueue.size() > 0)
+        {
+            qint64 lastTime = tmpQueue.last()->timestamp;
+            int timeResolution = (1000000ll / m_owner->getVideoStreamResolution());
+            qint64 firstTime = lastTime - tmpQueue.size() * timeResolution;
+            for (int i = 0; i < tmpQueue.size(); ++i)
+            {
+                QnAbstractMediaDataPtr srcMedia = qSharedPointerDynamicCast<QnAbstractMediaData>(tmpQueue.at(i));
+                QnAbstractMediaDataPtr media = QnAbstractMediaDataPtr(srcMedia->clone());
+                media->timestamp = firstTime + i*timeResolution;
+                m_dataQueue.push(media);
+            }
+        }
+
         m_dataQueue.setMaxSize(m_dataQueue.size() + MAX_QUEUE_SIZE);
     }
 protected:
@@ -50,6 +66,7 @@ protected:
     {
         QnByteArray result(CL_MEDIA_ALIGNMENT, 0);
         QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
+
         int errCode = m_owner->getTranscoder()->transcodePacket(media, result);
         if (errCode == 0) {
             if (result.size() > 0) {
@@ -185,6 +202,7 @@ void QnProgressiveDownloadingConsumer::run()
         }
         dataProvider->addDataProcessor(&dataConsumer);
         d->chunkedMode = true;
+        d->responseHeaders.setValue("Cache-Control", "no-cache");
         sendResponse("HTTP", CODE_OK, mimeType);
         dataConsumer.sendResponse();
         QnByteArray emptyChunk(0,0);
@@ -194,6 +212,17 @@ void QnProgressiveDownloadingConsumer::run()
 
     d->socket->close();
     m_runing = false;
+}
+
+int QnProgressiveDownloadingConsumer::getVideoStreamResolution() const
+{
+    Q_D(const QnProgressiveDownloadingConsumer);
+    if (d->streamingFormat == "webm")
+        return 1000;
+    else if (d->streamingFormat == "mpegts")
+        return 90000;
+    else 
+        return 60;
 }
 
 QnFfmpegTranscoder* QnProgressiveDownloadingConsumer::getTranscoder()

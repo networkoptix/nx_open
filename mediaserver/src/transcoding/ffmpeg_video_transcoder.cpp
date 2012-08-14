@@ -67,6 +67,7 @@ int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
         m_encoderCtx->height = m_resolution.height();
         m_encoderCtx->pix_fmt = PIX_FMT_YUV420P;
         m_encoderCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
+        m_encoderCtx->flags |= CODEC_FLAG_LOW_DELAY;
 
         m_encoderCtx->bit_rate = m_bitrate;
         m_encoderCtx->gop_size = 32;

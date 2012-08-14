@@ -2,7 +2,7 @@
 #include <QDebug>
 
 extern QMutex global_ffmpeg_mutex;
-static const int IO_BLOCK_SIZE = 1024*32;
+static const int IO_BLOCK_SIZE = 1024*16;
 
 static qint32 ffmpegReadPacket(void *opaque, quint8* buf, int size)
 {
@@ -140,7 +140,7 @@ int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDa
                 m_videoEncoderCodecCtx->width = video->width;
                 m_videoEncoderCodecCtx->height = video->height;
             }
-            m_videoEncoderCodecCtx->bit_rate = video->width * video->height*5; // auto fill bitrate. 10Mbit for full HD
+            m_videoEncoderCodecCtx->bit_rate = video->width * video->height; // auto fill bitrate. 2Mbit for full HD, 1Mbit for 720x768
         }
         m_videoEncoderCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
         m_videoEncoderCodecCtx->time_base.num = 1;

@@ -79,6 +79,8 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
     {
     }
 
+    virtual QnAbstractMediaData* clone();
+
     virtual ~QnAbstractMediaData()
     {
     }
@@ -91,7 +93,8 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
     quint32 subChannelNumber; // video camera can provide combination of different context at single channel (H.264 hi-res and low-res for example)
     QnMediaContextPtr context;
     int opaque;
-
+protected:
+    void assign(QnAbstractMediaData* other);
 private:
     QnAbstractMediaData(): data(0, 1) {};
 };
@@ -124,6 +127,8 @@ struct QnCompressedVideoData : public QnAbstractMediaData
         width = height = -1;
     }
 
+    virtual QnCompressedVideoData* clone() override;
+
 
     int width;
     int height;
@@ -131,7 +136,8 @@ struct QnCompressedVideoData : public QnAbstractMediaData
     //int flags;
     //bool ignore;
     QnMetaDataV1Ptr motion;
-    
+protected:
+    void assign(QnCompressedVideoData* other);
 };
 
 typedef QSharedPointer<QnCompressedVideoData> QnCompressedVideoDataPtr;
@@ -183,10 +189,13 @@ struct QnMetaDataV1 : public QnAbstractMediaData
 
     static void createMask(const QRegion& region,  char* mask, int* maskStart = 0, int* maskEnd = 0);
 
+    virtual QnMetaDataV1* clone() override;
+
     unsigned char i_mask;
     quint8 m_input;
     qint64 m_duration;
-
+protected:
+    void assign(QnMetaDataV1* other);
 private:
     qint64 m_firstTimestamp;
 };
@@ -279,8 +288,13 @@ struct QnCompressedAudioData : public QnAbstractMediaData
         duration = 0;
         context = ctx;
     }
+
+    virtual QnCompressedAudioData* clone() override;
+
     //QnCodecAudioFormat format;
     quint64 duration;
+private:
+    void assign(QnCompressedAudioData* other);
 };
 typedef QSharedPointer<QnCompressedAudioData> QnCompressedAudioDataPtr;
 
