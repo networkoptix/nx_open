@@ -45,7 +45,6 @@ QnTranscoder(),
 m_videoEncoderCodecCtx(0),
 m_audioEncoderCodecCtx(0),
 m_videoBitrate(0),
-m_startDateTime(0),
 m_formatCtx(0),
 m_ioContext(0)
 {
@@ -209,7 +208,7 @@ int QnFfmpegTranscoder::transcodePacketInternal(QnAbstractMediaDataPtr media, Qn
         }
         else {
             // direct stream copy
-            packet.pts = av_rescale_q(media->timestamp-m_startDateTime, srcRate, stream->time_base);
+            packet.pts = av_rescale_q(media->timestamp, srcRate, stream->time_base);
             packet.data = (quint8*) media->data.data();
             packet.size = media->data.size();
             if(media->flags & AV_PKT_FLAG_KEY)

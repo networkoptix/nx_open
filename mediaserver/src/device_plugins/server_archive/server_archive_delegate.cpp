@@ -219,7 +219,8 @@ QnAbstractMediaDataPtr QnServerArchiveDelegate::getNextData()
     //int waitMotionCnt = 0;
 begin_label:
     QnAbstractMediaDataPtr data = m_aviDelegate->getNextData();
-    if (!data || m_currentChunk.durationMs != -1 && data->timestamp >= m_currentChunk.durationMs*1000)
+    int chunkSwitchCnt = 0;
+    while (!data || m_currentChunk.durationMs != -1 && data->timestamp >= m_currentChunk.durationMs*1000)
     {
         DeviceFileCatalog::Chunk chunk;
         DeviceFileCatalogPtr chunkCatalog;
@@ -243,8 +244,13 @@ begin_label:
         }
 
         data = m_aviDelegate->getNextData();
-        if (data) 
+        if (data) {
             data->flags &= ~QnAbstractMediaData::MediaFlags_BOF;
+        }
+        else {
+            if (++chunkSwitchCnt > 10)
+                break;
+        }
     }
 
     if (data && !(data->flags & QnAbstractMediaData::MediaFlags_LIVE)) 

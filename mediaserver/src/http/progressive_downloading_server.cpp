@@ -10,6 +10,7 @@
 #include "core/dataconsumer/dataconsumer.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "device_plugins/server_archive/server_archive_delegate.h"
+#include "utils/common/util.h"
 
 static const int CONNECTION_TIMEOUT = 1000 * 5;
 static const int MAX_QUEUE_SIZE = 10;
@@ -35,7 +36,12 @@ QnTCPConnectionProcessor* QnProgressiveDownloadingServer::createRequestProcessor
 class QnProgressiveDownloadingDataConsumer: public QnAbstractDataConsumer
 {
 public:
-    QnProgressiveDownloadingDataConsumer (QnProgressiveDownloadingConsumer* owner): m_owner(owner), QnAbstractDataConsumer(50) {}
+    QnProgressiveDownloadingDataConsumer (QnProgressiveDownloadingConsumer* owner): m_owner(owner), 
+        QnAbstractDataConsumer(50),
+        m_lastMediaTime(AV_NOPTS_VALUE),
+        m_utcShift(0)
+
+    {}
     void sendResponse()
     {
         m_needStop = false;
@@ -67,6 +73,16 @@ protected:
     {
         QnByteArray result(CL_MEDIA_ALIGNMENT, 0);
         QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
+        if (media && !(media->flags & QnAbstractMediaData::MediaFlags_LIVE))
+        {
+            if (m_lastMediaTime != AV_NOPTS_VALUE && media->timestamp - m_lastMediaTime > MAX_FRAME_DURATION*1000 && 
+                media->timestamp != AV_NOPTS_VALUE && media->timestamp != DATETIME_NOW)
+            {
+                m_utcShift -= (media->timestamp - m_lastMediaTime) - 1000000/60;
+            }
+            m_lastMediaTime = media->timestamp;
+            media->timestamp += m_utcShift;
+        }
 
         int errCode = m_owner->getTranscoder()->transcodePacket(media, result);
         if (errCode == 0) {
@@ -81,6 +97,8 @@ protected:
     }
 private:
     QnProgressiveDownloadingConsumer* m_owner;
+    qint64 m_lastMediaTime;
+    qint64 m_utcShift;
 };
 
 // -------------- QnProgressiveDownloadingConsumer -------------------

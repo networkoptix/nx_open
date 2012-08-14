@@ -62,7 +62,8 @@ QnTranscoder::QnTranscoder():
     m_videoCodec(CODEC_ID_NONE),
     m_audioCodec(CODEC_ID_NONE),
     m_internalBuffer(CL_MEDIA_ALIGNMENT, 1024*1024),
-    m_firstTime(AV_NOPTS_VALUE)
+    m_firstTime(AV_NOPTS_VALUE),
+    m_eofCounter(0)
 {
 
 }
@@ -113,9 +114,16 @@ int QnTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnByteArray& res
 {
     m_internalBuffer.clear();
     if (media->dataType == QnAbstractMediaData::EMPTY_DATA)
-        return -8; // EOF reached
+    {
+        if (++m_eofCounter >= 3)
+            return -8; // EOF reached
+        else
+            return 0;
+    }
     else if (media->dataType != QnAbstractMediaData::VIDEO && media->dataType != QnAbstractMediaData::AUDIO)
         return 0; // transcode only audio and video, skip packet
+
+    m_eofCounter = 0;
 
     if (m_firstTime == AV_NOPTS_VALUE)
         m_firstTime = media->timestamp;

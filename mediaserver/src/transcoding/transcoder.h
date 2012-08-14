@@ -159,6 +159,7 @@ private:
     QQueue<QnCompressedVideoDataPtr> m_delayedVideoQueue;
     QQueue<QnCompressedAudioDataPtr> m_delayedAudioQueue;
     bool m_initialized;
+    int m_eofCounter;
 };
 
 #endif  // __TRANSCODER_H
