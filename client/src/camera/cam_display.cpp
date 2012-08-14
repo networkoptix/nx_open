@@ -83,6 +83,7 @@ QnCamDisplay::QnCamDisplay(bool generateEndOfStreamSignal):
     m_lastAudioPacketTime(0),
     m_syncAudioTime(AV_NOPTS_VALUE),
     m_totalFrames(0),
+    m_fczFrames(0),
     m_iFrames(0),
     m_lastVideoPacketTime(0),
     m_lastDecodedTime(AV_NOPTS_VALUE),
@@ -122,6 +123,8 @@ QnCamDisplay::QnCamDisplay(bool generateEndOfStreamSignal):
     m_eofSignalSended(false),
     m_lastLiveIsLowQuality(false),
     m_videoQueueDuration(0),
+    m_useMTRealTimeDecode(false),
+    m_timeMutex(QMutex::Recursive)	
     m_timeOffsetUsec(0),
     m_minTimeUsec(0),
     m_maxTimeUsec(0)
@@ -341,7 +344,8 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
     m_totalFrames++;
     if (vd->flags & AV_PKT_FLAG_KEY)
         m_iFrames++;
-
+    if (vd->flags & QnAbstractMediaData::MediaFlags_FCZ)
+        m_fczFrames++; // fast channel zapping
 
     // in ideal world data comes to queue at the same speed as it goes out
     // but timer on the sender side runs at a bit different rate in comparison to the timer here
@@ -364,16 +368,23 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         needToSleep = m_lastSleepInterval = (currentTime - m_previousVideoTime) * 1.0/qAbs(speed);
     }
 
-    //qDebug() << "needToSleep" << needToSleep/1000.0;
+    //qDebug() << "vd->flags & QnAbstractMediaData::MediaFlags_FCZ" << (vd->flags & QnAbstractMediaData::MediaFlags_FCZ);
 
     if (m_isRealTimeSource)
     {
         if (m_dataQueue.size() > 0) {
             sleep = false;
             m_realTimeHurryUp = 5;
-            if (m_dataQueue.size() > m_dataQueue.maxSize()/2 && m_playAudio && needToSleep < 50000) {
+            if (m_dataQueue.size() > m_dataQueue.maxSize()/2 && m_playAudio && needToSleep < 1000000ll / 15) 
+            {
+                bool isFCZ = vd->flags & QnAbstractMediaData::MediaFlags_FCZ;
                 // looks like not enought CPU for camera with high FPS value. I've add fps to switch logic to reduce real-time lag (MT decoding has addition 2-th frame delay)
-                setMTDecoding(true); 
+                //if (needToSleep >= m_display[0]->getAvgDecodingTime())
+                //    setMTDecoding(true);                     
+                if (m_totalFrames > m_fczFrames*2 && !m_useMTRealTimeDecode) {
+                    m_useMTRealTimeDecode = true;
+                    setMTDecoding(true); 
+                }
             }
         }
         else if (m_realTimeHurryUp)
@@ -649,6 +660,7 @@ void QnCamDisplay::afterJump(QnAbstractMediaDataPtr media)
     m_lastFrameDisplayed = QnVideoStreamDisplay::Status_Skipped;
     //m_previousVideoDisplayedTime = 0;
     m_totalFrames = 0;
+    m_fczFrames = 0;
     m_iFrames = 0;
     if (!m_afterJump) // if not more (not handled yet) jumps expected
     {
@@ -1155,8 +1167,10 @@ void QnCamDisplay::playAudio(bool play)
         else
             m_audioDisplay->resume();
     }
-    if (!play)
-        setMTDecoding(false);
+    if (m_isRealTimeSource)
+        setMTDecoding(play && m_useMTRealTimeDecode);
+    else
+        setMTDecoding(play);
 }
 
 //==========================================================================
@@ -1251,15 +1265,18 @@ void QnCamDisplay::enqueueVideo(QnCompressedVideoDataPtr vd)
 
 void QnCamDisplay::setMTDecoding(bool value)
 {
-    m_useMtDecoding = value;
-    for (int i = 0; i < CL_MAX_CHANNELS; i++)
+    if (m_useMtDecoding != value)
     {
-        if (m_display[i])
-            m_display[i]->setMTDecoding(value);
+        m_useMtDecoding = value;
+        for (int i = 0; i < CL_MAX_CHANNELS; i++)
+        {
+            if (m_display[i])
+                m_display[i]->setMTDecoding(value);
+        }
+        if (value)
+            setSpeed(m_speed); // decoder now faster. reinit speed statistics
+        m_realTimeHurryUp = 5;
     }
-    if (value)
-        setSpeed(m_speed); // decoder now faster. reinit speed statistics
-    m_realTimeHurryUp = 5;
 }
 
 void QnCamDisplay::onRealTimeStreamHint(bool value)
@@ -1267,6 +1284,8 @@ void QnCamDisplay::onRealTimeStreamHint(bool value)
     if (value == m_isRealTimeSource)
         return;
     m_isRealTimeSource = value;
+    if (m_isRealTimeSource)
+        setMTDecoding(m_playAudio && m_useMTRealTimeDecode);
     emit liveMode(m_isRealTimeSource);
     if (m_isRealTimeSource && m_speed > 1)
         m_speed = 1.0f;

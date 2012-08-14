@@ -118,15 +118,9 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
 
     m_timeScrollBar = new QnTimeScrollBar(this);
     
-    m_calendar = new QGraphicsProxyWidget(parent);
-    QnCalendarWidget *calendar = new QnCalendarWidget();
-    m_calendar->setWidget(calendar);
-    m_calendar->setVisible(false);
-
     /* Initialize navigator. */
     navigator()->setTimeSlider(m_timeSlider);
     navigator()->setTimeScrollBar(m_timeScrollBar);
-    navigator()->setCalendar(calendar);
 
     /* Put it all into layouts. */
     QGraphicsLinearLayout *buttonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);

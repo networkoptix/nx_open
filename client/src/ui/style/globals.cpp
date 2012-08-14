@@ -95,10 +95,15 @@ QVariant QnGlobals::readValueFromSettings(QSettings *settings, int id, const QVa
 
 QnColorVector QnGlobals::initSystemHealthColors(){
     QnColorVector result;
-    // TODO: get some beautiful colors
-    result.append(QColor(116, 151, 255));
-    result.append(Qt::green);
-    result.append(Qt::red);
+    result.append(QColor(66, 140, 237));
+    result.append(QColor(237, 66, 138));
+    result.append(QColor(237, 200, 66));
+    result.append(QColor(103, 237, 66));
+    result.append(QColor(237, 237, 237));
+    result.append(QColor(59, 169, 219));
+    result.append(QColor(115, 219, 59));
+    result.append(QColor(219, 59, 169));
+    result.append(QColor(219, 163, 59));
     return result;
 }
 

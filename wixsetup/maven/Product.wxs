@@ -472,12 +472,12 @@
                             
                             <Component Id="ServerFFmpegLibraries" Guid="{692DCCAD-138B-4763-822E-8BC8712F5007}">
                                 <File Id="ServerAvcodecDll" Name="avcodec-54.dll" Source="mediaserver/avcodec-54.dll"/>
-                                <File Id="ServerAvdeviceDll" Name="avdevice-53.dll" Source="mediaserver/avdevice-53.dll"/>
-                                <File Id="ServerAvfilterDll" Name="avfilter-2.dll" Source="mediaserver/avfilter-2.dll"/>
+                                <File Id="ServerAvdeviceDll" Name="avdevice-54.dll" Source="mediaserver/avdevice-54.dll"/>
+                                <File Id="ServerAvfilterDll" Name="avfilter-3.dll" Source="mediaserver/avfilter-3.dll"/>
                                 <File Id="ServerAvformatDll" Name="avformat-54.dll" Source="mediaserver/avformat-54.dll"/>
                                 <File Id="ServerAvutilDll" Name="avutil-51.dll" Source="mediaserver/avutil-51.dll"/>
                                 <File Id="ServerSwscaleDll" Name="swscale-2.dll" Source="mediaserver/swscale-2.dll"/>
-                                <File Id="ServerMp3lameDll" Name="libmp3lame-0.dll" Source="mediaserver/libmp3lame-0.dll"/> 
+                                <!-- <File Id="ServerMp3lameDll" Name="libmp3lame-0.dll" Source="mediaserver/libmp3lame-0.dll"/> -->
                             </Component>
                             
                             <Component Id="ServerQTLibraries" Guid="{97B2E8C3-274A-4e3e-8FBD-F60355A75A8A}">
@@ -538,12 +538,12 @@
                             
                             <Component Id="ClientFFmpegLibraries" Guid="{5D256521-DE39-4264-A44F-69728AA650EF}">
                                 <File Id="ClientAvcodecDll" Name="avcodec-54.dll" Source="client/avcodec-54.dll"/>
-                                <File Id="ClientAvdeviceDll" Name="avdevice-53.dll" Source="client/avdevice-53.dll"/>
-                                <File Id="ClientAvfilterDll" Name="avfilter-2.dll" Source="client/avfilter-2.dll"/>
+                                <File Id="ClientAvdeviceDll" Name="avdevice-54.dll" Source="client/avdevice-54.dll"/>
+                                <File Id="ClientAvfilterDll" Name="avfilter-3.dll" Source="client/avfilter-3.dll"/>
                                 <File Id="ClientAvformatDll" Name="avformat-54.dll" Source="client/avformat-54.dll"/>
                                 <File Id="ClientAvutilDll" Name="avutil-51.dll" Source="client/avutil-51.dll"/>
                                 <File Id="ClientSwscaleDll" Name="swscale-2.dll" Source="client/swscale-2.dll"/>
-                                <File Id="ClientMp3lameDll" Name="libmp3lame-0.dll" Source="client/libmp3lame-0.dll"/>
+                                <!-- <File Id="ClientMp3lameDll" Name="libmp3lame-0.dll" Source="client/libmp3lame-0.dll"/> -->
                                 <File Id="ClientX264" Name="x264.exe" Source="client/x264.exe"/>                                
                             </Component>
                             

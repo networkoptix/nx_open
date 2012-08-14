@@ -204,6 +204,8 @@ protected:
     qint64 m_timeOffsetUsec;
     qint64 m_minTimeUsec;
     qint64 m_maxTimeUsec;
+    int m_fczFrames;
+    bool m_useMTRealTimeDecode;
 };
 
 #endif //QN_CAM_DISPLAY_H

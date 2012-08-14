@@ -693,7 +693,8 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
     }
 
     m_timeSlider->setRange(startTimeMSec, endTimeMSec);
-    m_calendar->setDateRange(QDateTime::fromMSecsSinceEpoch(startTimeMSec).date(), QDateTime::fromMSecsSinceEpoch(endTimeMSec).date());
+    if(m_calendar)
+        m_calendar->setDateRange(QDateTime::fromMSecsSinceEpoch(startTimeMSec).date(), QDateTime::fromMSecsSinceEpoch(endTimeMSec).date());
 
     if(!m_pausedOverride) {
         qint64 timeUSec = m_currentMediaWidget->display()->camDisplay()->isRealTimeSource() ? DATETIME_NOW : m_currentMediaWidget->display()->camera()->getCurrentTime();
@@ -770,7 +771,8 @@ void QnWorkbenchNavigator::updateCurrentPeriods(Qn::TimePeriodRole type) {
     }
 
     m_timeSlider->setTimePeriods(CurrentLine, type, periods);
-    m_calendar->setCurrentTimePeriods(type, periods);
+    if(m_calendar)
+        m_calendar->setCurrentTimePeriods(type, periods);
 }
 
 void QnWorkbenchNavigator::updateSyncedPeriods() {
@@ -799,7 +801,8 @@ void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodRole type) {
     }
 
     m_timeSlider->setTimePeriods(SyncedLine, type, periods);
-    m_calendar->setSyncedTimePeriods(type, periods);
+    if(m_calendar)
+        m_calendar->setSyncedTimePeriods(type, periods);
 }
 
 void QnWorkbenchNavigator::updateLines() {
@@ -1195,6 +1198,6 @@ void QnWorkbenchNavigator::at_calendar_selectionChanged(){
     m_timeSlider->finishAnimations();
     m_timeSlider->setWindow(startMSec, endMSec);
     // do not update value to avoid window scrolling if no data is recorded
-//  m_timeSlider->setValue(startMSec);
+    //  m_timeSlider->setValue(startMSec);
 }
 
