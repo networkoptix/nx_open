@@ -4,28 +4,25 @@
 
 #define DAY 1000 * 60 * 60 * 24
 
-QnCalendarWidget::QnCalendarWidget(): 
+QnCalendarWidget::QnCalendarWidget():
     QCalendarWidget()
 {
     /* Month button's drop-down menu doesn't work well with graphics scene, so we simply remove it. */
     QToolButton *monthButton = findChild<QToolButton *>(QLatin1String("qt_calendar_monthbutton"));
     if(monthButton)
         monthButton->setMenu(NULL);
-
-    m_currentTimeStorage.setAggregationMSecs(DAY);
-    m_syncedTimeStorage.setAggregationMSecs(DAY);
 }
 
 void QnCalendarWidget::setCurrentTimePeriods( Qn::TimePeriodRole type, QnTimePeriodList periods )
 {
-    m_currentTimeStorage.updatePeriods(type, periods);
+    m_currentTimeStorage.setPeriods(type, periods);
 
     update();
 }
 
 void QnCalendarWidget::setSyncedTimePeriods( Qn::TimePeriodRole type, QnTimePeriodList periods )
 {
-    m_syncedTimeStorage.updatePeriods(type, periods);
+    m_syncedTimeStorage.setPeriods(type, periods);
 
     update();
 }
@@ -41,19 +38,19 @@ void QnCalendarWidget::paintCell(QPainter *painter, const QRect & rect, const QD
 
     QBrush brush = painter->brush();
 
-    if (m_currentTimeStorage.aggregated(Qn::MotionRole).intersects(current)){
+    if (m_currentTimeStorage.periods(Qn::MotionRole).intersects(current)){
         brush.setColor(QColor(255, 0, 0, 70));
         brush.setStyle(Qt::SolidPattern);
     }
-    else if (m_currentTimeStorage.aggregated(Qn::RecordingRole).intersects(current)){
+    else if (m_currentTimeStorage.periods(Qn::RecordingRole).intersects(current)){
         brush.setColor(QColor(0, 255, 0, 70));
         brush.setStyle(Qt::SolidPattern);
     } 
-    else if (m_syncedTimeStorage.aggregated(Qn::MotionRole).intersects(current)){
+    else if (m_syncedTimeStorage.periods(Qn::MotionRole).intersects(current)){
         brush.setColor(QColor(255, 0, 0, 70));
         brush.setStyle(Qt::BDiagPattern);
     }
-    else if (m_syncedTimeStorage.aggregated(Qn::RecordingRole).intersects(current)){
+    else if (m_syncedTimeStorage.periods(Qn::RecordingRole).intersects(current)){
         brush.setColor(QColor(0, 255, 0, 70));
         brush.setStyle(Qt::BDiagPattern);
     } 
