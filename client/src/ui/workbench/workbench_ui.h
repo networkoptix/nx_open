@@ -194,6 +194,7 @@ protected slots:
     void updateTitleOpacity(bool animate = true);
     void updateHelpOpacity(bool animate = true);
     void updateCalendarOpacity(bool animate = true);
+    void updateCalendarVisibility(bool animate = true);
     void updateControlsVisibility(bool animate = true);
 
     void setTreeShowButtonUsed(bool used = true);

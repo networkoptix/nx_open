@@ -735,6 +735,8 @@ void QnWorkbenchUi::setSliderOpened(bool opened, bool animate) {
         m_sliderItem->setY(newY);
     }
 
+    updateCalendarVisibility(animate);
+
     QnScopedValueRollback<bool> rollback(&m_ignoreClickEvent, true);
     m_sliderShowButton->setChecked(opened);
 }
@@ -816,6 +818,7 @@ void QnWorkbenchUi::setSliderVisible(bool visible, bool animate) {
     if(changed) {
         updateTreeGeometry();
         updateHelpGeometry();
+        updateCalendarVisibility(animate);
     }
 }
 
@@ -1040,9 +1043,19 @@ void QnWorkbenchUi::updateCalendarOpacity(bool animate) {
     }
 }
 
+void QnWorkbenchUi::updateCalendarVisibility(bool animate) {
+    bool calendarVisible = m_sliderVisible && m_sliderOpened && (navigator()->currentWidget() && navigator()->currentWidget()->resource()->flags() & QnResource::utc);
+
+    if(m_inactive) {
+        bool hovered = m_sliderOpacityProcessor->isHovered() || m_treeOpacityProcessor->isHovered() || m_titleOpacityProcessor->isHovered() || m_helpOpacityProcessor->isHovered() || m_calendarOpacityProcessor->isHovered();
+        setCalendarVisible(calendarVisible && hovered, animate);
+    } else {
+        setCalendarVisible(calendarVisible, animate);
+    }
+}
+
 void QnWorkbenchUi::updateControlsVisibility(bool animate) {    // TODO
     bool sliderVisible = navigator()->currentWidget() != NULL && !(navigator()->currentWidget()->resource()->flags() & (QnResource::still_image | QnResource::server));
-    bool calendarVisible = sliderVisible && m_sliderOpened && (navigator()->currentWidget() && navigator()->currentWidget()->resource()->flags() & QnResource::utc);
 
     if(m_inactive) {
         bool hovered = m_sliderOpacityProcessor->isHovered() || m_treeOpacityProcessor->isHovered() || m_titleOpacityProcessor->isHovered() || m_helpOpacityProcessor->isHovered() || m_calendarOpacityProcessor->isHovered();
@@ -1050,14 +1063,14 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate) {    // TODO
         setTreeVisible(hovered, animate);
         setTitleVisible(hovered, animate);
         setHelpVisible(hovered, animate);
-        setCalendarVisible(calendarVisible && hovered, animate);
     } else {
         setSliderVisible(sliderVisible, animate);
         setTreeVisible(true, animate);
         setTitleVisible(true, animate);
         setHelpVisible(true, animate);
-        setCalendarVisible(calendarVisible, animate);
     }
+
+    updateCalendarVisibility(animate);
 }
 
 QRectF QnWorkbenchUi::updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry) {
