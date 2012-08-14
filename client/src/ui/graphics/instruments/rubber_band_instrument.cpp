@@ -314,7 +314,7 @@ void RubberBandInstrument::dragMove(DragInfo *info) {
     selectionArea.closeSubpath();
 
     if (info->modifiers() & Qt::ShiftModifier) {
-        /* TODO: this can be implemented more efficiently using intersection of several regions. */
+        // TODO: this can be implemented more efficiently using intersection of several regions. 
         QSet<QGraphicsItem *> newlySelected = toSet(scene()->items(selectionArea, view->rubberBandSelectionMode(), Qt::DescendingOrder, view->viewportTransform()));
 
         /* Unselect all items that went out of rubber band. */
