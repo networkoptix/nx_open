@@ -9,6 +9,7 @@
 #include "camera/camera_pool.h"
 #include "core/dataconsumer/dataconsumer.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
+#include "device_plugins/server_archive/server_archive_delegate.h"
 
 static const int CONNECTION_TIMEOUT = 1000 * 5;
 static const int MAX_QUEUE_SIZE = 10;
@@ -170,8 +171,16 @@ void QnProgressiveDownloadingConsumer::run()
 
         QnProgressiveDownloadingDataConsumer dataConsumer(this);
         QByteArray position = getDecodedUrl().queryItemValue("pos").toLocal8Bit();
+        bool isUTCRequest = !getDecodedUrl().queryItemValue("posonly").isNull();
         if (position.isEmpty() || position == "now")
         {
+            if (isUTCRequest)
+            {
+                d->responseBody = "now";
+                sendResponse("HTTP", CODE_OK, "text/plain");
+                return;
+            }
+
             QnVideoCamera* camera = qnCameraPool->getVideoCamera(resource);
             if (!camera) {
                 d->responseBody = "Media not found";
@@ -183,13 +192,38 @@ void QnProgressiveDownloadingConsumer::run()
                 dataConsumer.copyLastGopFromCamera(camera);
         }
         else {
-            d->archiveDP = QSharedPointer<QnArchiveStreamReader> (dynamic_cast<QnArchiveStreamReader*> (resource->createDataProvider(QnResource::Role_Archive)));
-            bool ok = false;
-            qint64 timeMs = position.toLongLong(&ok); // try UTC format
-            if (!ok)
+            bool utcFormatOK = false;
+            qint64 timeMs = position.toLongLong(&utcFormatOK); // try UTC format
+            if (!utcFormatOK)
                 timeMs = QDateTime::fromString(position, Qt::ISODate).toMSecsSinceEpoch(); // try ISO format
+            timeMs *= 1000;
+
+            if (isUTCRequest)
+            {
+                QnServerArchiveDelegate serverArchive;
+                serverArchive.open(resource);
+                serverArchive.seek(timeMs, true);
+                for (int i = 0; i < 20; ++i) 
+                {
+                    QnAbstractMediaDataPtr data = serverArchive.getNextData();
+                    if (data->dataType == QnAbstractMediaData::VIDEO || data->dataType == QnAbstractMediaData::AUDIO)
+                    {
+                        if (utcFormatOK)
+                            d->responseBody = QByteArray::number(data->timestamp/1000);
+                        else
+                            d->responseBody = QDateTime::fromMSecsSinceEpoch(data->timestamp/1000).toString(Qt::ISODate).toLocal8Bit();
+                        sendResponse("HTTP", CODE_OK, "text/plain");
+                        return;
+                    }
+                }
+                d->responseBody = "Internal server error";
+                sendResponse("HTTP", CODE_INTERNAL_ERROR, "text/plain");
+                return;
+            }
+
+            d->archiveDP = QSharedPointer<QnArchiveStreamReader> (dynamic_cast<QnArchiveStreamReader*> (resource->createDataProvider(QnResource::Role_Archive)));
             d->archiveDP->open();
-            d->archiveDP->jumpTo(timeMs*1000, timeMs*1000);
+            d->archiveDP->jumpTo(timeMs, timeMs);
             d->archiveDP->start();
             dataProvider = d->archiveDP;
         }
