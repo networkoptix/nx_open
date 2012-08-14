@@ -38,7 +38,7 @@ namespace {
     const qint64 invalidProcessingTime = std::numeric_limits<qint64>::min() / 2;
 }
 
-//#define QN_THUMBNAILS_LOADER_DEBUG
+#define QN_THUMBNAILS_LOADER_DEBUG
 
 QnThumbnailsLoader::QnThumbnailsLoader(QnResourcePtr resource):
     m_mutex(QMutex::NonRecursive),

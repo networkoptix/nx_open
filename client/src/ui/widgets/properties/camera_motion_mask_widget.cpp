@@ -123,16 +123,15 @@ void QnCameraMotionMaskWidget::setReadOnly(bool readOnly) {
     m_readOnly = readOnly;
 }
 
-const QList<QnMotionRegion> &QnCameraMotionMaskWidget::motionRegionList() const {
+QList<QnMotionRegion> QnCameraMotionMaskWidget::motionRegionList() const {
     if (m_resourceWidget)
         return m_resourceWidget->motionSensitivity();
     else
-        // TODO: returning temporary here.
         return QList<QnMotionRegion>();
 }
 
-const QnResourcePtr &QnCameraMotionMaskWidget::camera() const {
-    return m_camera; // TODO: returning temporary here.
+QnResourcePtr QnCameraMotionMaskWidget::camera() const {
+    return m_camera;
 }
 
 void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource) {

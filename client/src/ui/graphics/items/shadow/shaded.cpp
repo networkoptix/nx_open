@@ -16,7 +16,7 @@ void detail::ShadedBase::initShadow(QGraphicsItem *item) {
     updateShadowVisibility(item);
 }
 
-void detail::ShadedBase::deinitShadow(QGraphicsItem *item) {
+void detail::ShadedBase::deinitShadow(QGraphicsItem *) {
     if(shadowItem())
         delete shadowItem();
 }
