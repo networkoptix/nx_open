@@ -1042,7 +1042,7 @@ void QnWorkbenchUi::updateCalendarOpacity(bool animate) {
 
 void QnWorkbenchUi::updateControlsVisibility(bool animate) {    // TODO
     bool sliderVisible = navigator()->currentWidget() != NULL && !(navigator()->currentWidget()->resource()->flags() & (QnResource::still_image | QnResource::server));
-    bool calendarVisible = sliderVisible && m_sliderOpened;
+    bool calendarVisible = sliderVisible && m_sliderOpened && (navigator()->currentWidget() && navigator()->currentWidget()->resource()->flags() & QnResource::utc);
 
     if(m_inactive) {
         bool hovered = m_sliderOpacityProcessor->isHovered() || m_treeOpacityProcessor->isHovered() || m_titleOpacityProcessor->isHovered() || m_helpOpacityProcessor->isHovered() || m_calendarOpacityProcessor->isHovered();
