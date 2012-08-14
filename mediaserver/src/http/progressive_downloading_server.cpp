@@ -11,6 +11,7 @@
 #include "plugins/resources/archive/archive_stream_reader.h"
 
 static const int CONNECTION_TIMEOUT = 1000 * 5;
+static const int MAX_QUEUE_SIZE = 10;
 
 QnProgressiveDownloadingServer::QnProgressiveDownloadingServer(const QHostAddress& address, int port):
     QnTcpListener(address, port)
@@ -37,9 +38,12 @@ public:
     void sendResponse()
     {
         m_needStop = false;
-        bool isr = isRunning();
         run();
-        int gg = 4;
+    }
+    void copyLastGopFromCamera(QnVideoCamera* camera)
+    {
+        camera->copyLastGop(true, 0, m_dataQueue);
+        m_dataQueue.setMaxSize(m_dataQueue.size() + MAX_QUEUE_SIZE);
     }
 protected:
     virtual bool processData(QnAbstractDataPacketPtr data) override
@@ -140,7 +144,14 @@ void QnProgressiveDownloadingConsumer::run()
         }
 
         QnResourcePtr resource = qnResPool->getResourceByUniqId(fi.baseName());
+        if (resource == 0)
+        {
+            d->responseBody = QByteArray("Resource with unicId ") + QByteArray(fi.baseName().toLocal8Bit()) + QByteArray(" not found ");
+            sendResponse("HTTP", CODE_NOT_FOUND, "text/plain");
+            return;
+        }
 
+        QnProgressiveDownloadingDataConsumer dataConsumer(this);
         QByteArray position = getDecodedUrl().queryItemValue("pos").toLocal8Bit();
         if (position.isEmpty() || position == "now")
         {
@@ -151,6 +162,8 @@ void QnProgressiveDownloadingConsumer::run()
                 return;
             }
             dataProvider = camera->getLiveReader(QnResource::Role_LiveVideo);
+            if (dataProvider)
+                dataConsumer.copyLastGopFromCamera(camera);
         }
         else {
             d->archiveDP = QSharedPointer<QnArchiveStreamReader> (dynamic_cast<QnArchiveStreamReader*> (resource->createDataProvider(QnResource::Role_Archive)));
@@ -164,7 +177,6 @@ void QnProgressiveDownloadingConsumer::run()
             dataProvider = d->archiveDP;
         }
         
-        QnProgressiveDownloadingDataConsumer dataConsumer(this);
         if (dataProvider == 0)
         {
             d->responseBody = "Video camera is not ready yet";
