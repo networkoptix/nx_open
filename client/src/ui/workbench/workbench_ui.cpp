@@ -526,10 +526,10 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     /* Calendar. */
     QnCalendarWidget *calendarWidget = new QnCalendarWidget();
     navigator()->setCalendar(calendarWidget);
-    calendarWidget->resize(250, 200);
 
     m_calendarItem = new QnMaskedProxyWidget(m_controlsWidget);
     m_calendarItem->setWidget(calendarWidget);
+    m_calendarItem->resize(250, 200);
 
     m_calendarShowButton = newShowHideButton(m_controlsWidget);
     {
@@ -1203,7 +1203,6 @@ void QnWorkbenchUi::updateCalendarGeometry() {
     /* Always change position. */
     m_calendarItem->setPos(geometry.topLeft());
 
-//#if 0
     /* Whether actual size change should be deferred. */
     bool defer = m_calendarSizeAnimator->isRunning();
 
@@ -1218,17 +1217,7 @@ void QnWorkbenchUi::updateCalendarGeometry() {
         sliderPos = m_sliderItem->pos();
     }
 
-    /* Calculate target geometry. */
-    geometry = updatedCalendarGeometry(QRectF(sliderPos, m_sliderItem->size()));
-    if(qFuzzyCompare(geometry, m_calendarItem->geometry()))
-        return;
-
-    /* Defer size change if it doesn't cause empty space to occur. */
-    if(defer && geometry.height() < m_calendarItem->size().height())
-        return;
-
-    m_calendarItem->resize(geometry.size());
-//#endif
+    /* Don't change size. */
 }
 
 void QnWorkbenchUi::updateFpsGeometry() {
