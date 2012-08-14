@@ -1157,7 +1157,7 @@ void QnTimeSlider::updateThumbnailsStepSize(bool instant, bool forced) {
     bool timeStepChanged = qAbs(timeStep / m_msecsPerPixel - thumbnailsLoader()->timeStep() / m_msecsPerPixel) >= 1;
 
     /* Nothing changed? Leave. */
-    if(!timeStepChanged && !boundingSizeChanged)
+    if(!timeStepChanged && !boundingSizeChanged && !m_thumbnailData.isEmpty())
         return;
 
     /* Ok, thumbnails have to be re-generated. So we first freeze our old thumbnails. */
@@ -1171,6 +1171,7 @@ void QnTimeSlider::updateThumbnailsStepSize(bool instant, bool forced) {
         updateThumbnailsStepSizeLater();
     } else {
         m_lastThumbnailsUpdateTime = currentTime;
+        thumbnailsLoader()->setBoundingSize(boundingSize + QSize(1, 1)); /* Evil hack to force update even if size didn't change. */
         thumbnailsLoader()->setBoundingSize(boundingSize);
         thumbnailsLoader()->setTimeStep(timeStep);
         updateThumbnailsPeriod();
