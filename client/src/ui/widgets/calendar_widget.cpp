@@ -27,6 +27,9 @@ QnCalendarWidget::QnCalendarWidget():
     QTableView *table = findChild<QTableView *>(QLatin1String("qt_calendar_calendarview"));
     QHeaderView* header = table->horizontalHeader();
     header->setMinimumSectionSize(18);
+
+    QWidget* navBarBackground = findChild<QWidget *>(QLatin1String("qt_calendar_navigationbar"));
+    navBarBackground->setBackgroundRole(QPalette::Window);
 }
 
 void QnCalendarWidget::setCurrentTimePeriods( Qn::TimePeriodRole type, QnTimePeriodList periods )
