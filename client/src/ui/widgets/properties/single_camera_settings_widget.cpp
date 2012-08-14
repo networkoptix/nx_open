@@ -53,8 +53,6 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->sensitivitySlider,      SIGNAL(valueChanged(int)),              this,   SLOT(updateMotionWidgetSensitivity()));
     connect(ui->resetMotionRegionsButton, SIGNAL(clicked()),                    this,   SLOT(at_motionSelectionCleared()));
 
-    //connect(ui->advancedCheckBox1,      SIGNAL(stateChanged(int)),              this,   SLOT(updateAdvancedCheckboxValue()));
-
     initAdvancedTab();
 
     updateFromResource();
@@ -198,16 +196,19 @@ void QnSingleCameraSettingsWidget::submitToResource() {
         else
             m_camera->setMotionType(MT_SoftwareGrid);
 
-        //m_camera->setAdvancedWorking(ui->advancedCheckBox1->isChecked());
-
         submitMotionWidgetToResource();
 
         setHasDbChanges(false);
     }
 
     if (hasCameraChanges()) {
-        //m_camera->setAdvancedWorking(ui->advancedCheckBox1->isChecked());
+        QList< QPair< QString, QVariant> >::ConstIterator it = m_modifiedAdvancedParams.begin();
+        for (; it != m_modifiedAdvancedParams.end(); ++it)
+        {
+            m_camera->setParam(it->first, it->second, QnDomainPhysical);
+        }
 
+        m_modifiedAdvancedParams.clear();
         setHasCameraChanges(false);
     }
 }
@@ -238,8 +239,6 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         m_cameraSupportsMotion = false;
         ui->motionSettingsGroupBox->setEnabled(false);
         ui->motionAvailableLabel->setVisible(true);
-
-        //ui->advancedCheckBox1->setChecked(false);
     } else {
         QString webPageAddress = QString(QLatin1String("http://%1")).arg(m_camera->getHostAddress().toString());
 
@@ -284,8 +283,6 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         m_cameraSupportsMotion = m_camera->supportedMotionType() != MT_NoMotion;
         ui->motionSettingsGroupBox->setEnabled(m_cameraSupportsMotion);
         ui->motionAvailableLabel->setVisible(!m_cameraSupportsMotion);
-
-        //ui->advancedCheckBox1->setChecked(m_camera->isAdvancedWorking());
     }
 
     updateMotionWidgetFromResource();
@@ -398,12 +395,6 @@ bool QnSingleCameraSettingsWidget::isValidMotionRegion(){
         return true;
     return m_motionWidget->isValidMotionRegion();
 }
-
-void QnSingleCameraSettingsWidget::updateAdvancedCheckboxValue() {
-    //bool result = ui->advancedCheckBox1->isChecked();
-    at_cameraDataChanged();
-}
-
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -555,4 +546,10 @@ void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleTasksChanged(
     at_cameraDataChanged();
 
     m_hasScheduleChanges = true;
+}
+
+void QnSingleCameraSettingsWidget::setAdvancedParam(const CameraSetting& val)
+{
+    m_modifiedAdvancedParams.push_back(QPair<QString, QVariant>(val.getId(), QVariant(val.serializeToStr())));
+    at_cameraDataChanged();
 }

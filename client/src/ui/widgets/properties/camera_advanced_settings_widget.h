@@ -25,11 +25,11 @@ protected:
 
 //==============================================
 
-class QnAbstractSettingsWidget : public QWidget //public QObject
+class QnAbstractSettingsWidget : public QWidget
 {
     Q_OBJECT
 public:
-    QnAbstractSettingsWidget(QObject* handler, CameraSetting& obj);
+    QnAbstractSettingsWidget(QObject* handler, CameraSetting& obj, QWidget& parent);
     virtual ~QnAbstractSettingsWidget();
 
     virtual QWidget* toWidget();
@@ -37,17 +37,18 @@ public:
     const CameraSetting& param() const;
 
 signals:
-    void setParam(const QString& name, const CameraSettingValue& val);
+    void setAdvancedParam(const CameraSetting& val);
 
-    public slots:
-        virtual void updateParam(QString val) = 0;
+public slots:
+    virtual void updateParam(QString val) = 0;
 
 protected:
-    virtual void setParam_helper(const QString& name, const CameraSettingValue& val);
+    virtual void setParam(const CameraSettingValue& val);
 protected:
     CameraSetting& mParam;
     QObject* mHandler;
     QWidget* mWidget;
+    QHBoxLayout *mlayout;
 };
 //==============================================
 class QnSettingsOnOffWidget : public QnAbstractSettingsWidget
@@ -57,11 +58,11 @@ public:
     QnSettingsOnOffWidget(QObject* handler, CameraSetting& obj, QWidget& parent);
     ~QnSettingsOnOffWidget();
 
-    public slots:
-        void updateParam(QString val);
+public slots:
+    void updateParam(QString val);
 
-        private slots:
-            void stateChanged (int state);
+    private slots:
+        void stateChanged (int state);
 private:
     QCheckBox * m_checkBox;
 };
@@ -72,12 +73,12 @@ class QnSettingsMinMaxStepWidget : public QnAbstractSettingsWidget
 public:
     QnSettingsMinMaxStepWidget(QObject* handler, CameraSetting& obj, QWidget& parent);
 
-    public slots:
-        void updateParam(QString val);
+public slots:
+    void updateParam(QString val);
 
-        private slots:
-            void onValChanged();
-            void onValChanged(int val);
+    private slots:
+        void onValChanged();
+        void onValChanged(int val);
 
 private:
     QnSettingsSlider* m_slider;
@@ -90,11 +91,12 @@ class QnSettingsEnumerationWidget : public QnAbstractSettingsWidget
 public:
     QnSettingsEnumerationWidget(QObject* handler, CameraSetting& obj, QWidget& parent);
 
-    public slots:
-        void updateParam(QString val);
+public slots:
+    void updateParam(QString val);
 
-        private slots:
-            void onClicked();
+private slots:
+    void onClicked();
+
 private:
     QRadioButton* getBtnByname(const QString& name);
 private:
@@ -106,13 +108,13 @@ class QnSettingsButtonWidget : public QnAbstractSettingsWidget
 {
     Q_OBJECT
 public:
-    QnSettingsButtonWidget(QObject* handler, QWidget& parent);
+    QnSettingsButtonWidget(QObject* handler, const CameraSetting& obj, QWidget& parent);
 
-    public slots:
-        void updateParam(QString val);
+public slots:
+    void updateParam(QString val);
 
-        private slots:
-            void onClicked();
+private slots:
+    void onClicked();
 
 private:
     CameraSetting dummyVal;

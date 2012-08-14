@@ -487,8 +487,30 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog() {
     }
 
     if (hasCameraChanges) {
-        //ToDo: change to appropriate saveAsync function
-        connection()->saveAsync(cameras, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+        if (cameraSettingsDialog()->widget()->mode() != QnCameraSettingsWidget::SingleMode || cameras.size() != 1)
+        {
+            //Camera changes must be available only for single mode
+            Q_ASSERT(false);
+        }
+        else
+        {
+            QnVirtualCameraResourcePtr cameraPtr = cameras.front();
+            QnVideoServerResourcePtr serverPtr = qSharedPointerDynamicCast<QnVideoServerResource>(qnResPool->getResourceById(cameraPtr->getParentId()));
+            if (serverPtr.isNull())
+            {
+                //
+                // Add record to log + message to user
+                //
+            }
+            else
+            {
+                /*QnVideoServerConnectionPtr serverConnection = serverPtr->apiConnection();
+
+                //( int httpStatusCode, const QList<QPair<QString, bool> >& operationResult )
+                qRegisterMetaType<QList<QPair<QString, bool> > >("QList<QPair<QString, bool> >");
+                serverConnection->asyncSetParam(cameraPtr, params, SLOT(at_camera_settings_saved(int, const QList<QPair<QString, bool> >&)) );*/
+            }
+        }
     }
 }
 

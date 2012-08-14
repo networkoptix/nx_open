@@ -98,11 +98,14 @@ bool CameraSettingsWidgetsCreator::recreateWidgets(CameraSettings* settings)
         QObjectList children = m_owner->children();
         for (int i = 0; i < children.count(); ++i)
         {
-            m_rootLayout.removeWidget(static_cast<QWidget*>(children[i]));
+            m_rootLayout.removeWidget(static_cast<QnAbstractSettingsWidget*>(children[i])->toWidget());
         }
         delete m_owner;
     }
     m_owner = new QWidget();
+
+    //Default - show empty widget
+    m_rootLayout.addWidget(new QWidget(m_owner));
 
     return read() && proceed();
 }
@@ -148,6 +151,7 @@ bool CameraSettingsWidgetsCreator::isGroupEnabled(const QString& id, const QStri
     }
 
     //item->setObjectName(id);
+    item->setData(0, Qt::UserRole, 0);
     m_widgetsById.insert(id, item);
 
     return true;
@@ -174,7 +178,7 @@ void CameraSettingsWidgetsCreator::paramFound(const CameraSetting& value, const 
 
     CameraSettings::Iterator currIt = m_settings->find(value.getId());
     if (currIt == m_settings->end() && value.getType() != CameraSetting::Button) {
-        qDebug() << "CameraSettingsWidgetsCreator::paramFound: didn't disable the following param: " << value.serializeToStr();
+        //ToDo: uncomment and explore: qDebug() << "CameraSettingsWidgetsCreator::paramFound: didn't disable the following param: " << value.serializeToStr();
         return;
     }
 
@@ -194,7 +198,7 @@ void CameraSettingsWidgetsCreator::paramFound(const CameraSetting& value, const 
             break;
 
         case CameraSetting::Button:
-            tabWidget = new QnSettingsButtonWidget(m_handler, *m_owner);
+            tabWidget = new QnSettingsButtonWidget(m_handler, value, *m_owner);
             break;
 
         default:

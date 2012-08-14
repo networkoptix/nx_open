@@ -50,6 +50,9 @@ public:
     /** Check if motion region is valid */
     bool isValidMotionRegion();
 
+public slots:
+    void setAdvancedParam(const CameraSetting& val);
+
 signals:
     void hasChangesChanged();
     void moreLicensesRequested();
@@ -70,8 +73,6 @@ private slots:
 
     void updateMaxFPS();
     void updateMotionWidgetSensitivity();
-
-    void updateAdvancedCheckboxValue();
 
 private:
     void setHasCameraChanges(bool hasChanges);
@@ -107,6 +108,7 @@ private:
 
     CameraSettings m_cameraSettings;
     CameraSettingsWidgetsCreator* m_widgetsRecreator;
+    QList< QPair< QString, QVariant> > m_modifiedAdvancedParams;
 };
 
 #endif // CAMERA_SETTINGS_DIALOG_H
