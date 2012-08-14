@@ -21,7 +21,8 @@ QnCalendarWidget::QnCalendarWidget():
     contextMenuEater->setEventType(QEvent::ContextMenu);
     yearEdit->installEventFilter(contextMenuEater);
 
-    setHorizontalHeaderFormat(SingleLetterDayNames);
+    setHorizontalHeaderFormat(QCalendarWidget::ShortDayNames);
+    setVerticalHeaderFormat(QnCalendarWidget::NoVerticalHeader);
 
     QTableView *table = findChild<QTableView *>(QLatin1String("qt_calendar_calendarview"));
     QHeaderView* header = table->horizontalHeader();
@@ -32,8 +33,6 @@ void QnCalendarWidget::setCurrentTimePeriods( Qn::TimePeriodRole type, QnTimePer
 {
     m_currentTimeStorage.setPeriods(type, periods);
 
-    int w = minimumSizeHint().width();
-    qDebug() << w;
     update();
 }
 
