@@ -197,21 +197,6 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
             else if (m_dataQueue.size() <= 1 && m_liveQuality == MEDIA_Quality_Low && canSwitchToHiQuality()) 
                 m_newLiveQuality = MEDIA_Quality_High;
         }
-        
-        bool isKeyFrame = media->flags & AV_PKT_FLAG_KEY;
-        /*
-        if (isKeyFrame && m_newLiveQuality != MEDIA_Quality_None)
-        {
-            if (m_newLiveQuality == MEDIA_Quality_Low && isSecondaryProvider) {
-                m_liveQuality = MEDIA_Quality_Low; // slow network. Reduce quality
-                m_newLiveQuality = MEDIA_Quality_None;
-            }
-            else if (m_newLiveQuality == MEDIA_Quality_High && !isSecondaryProvider) {
-                m_liveQuality = MEDIA_Quality_High;
-                m_newLiveQuality = MEDIA_Quality_None;
-            }
-        }
-        */
     }
 
     // overflow control
