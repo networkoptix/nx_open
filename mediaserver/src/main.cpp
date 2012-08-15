@@ -291,11 +291,6 @@ int serverMain(int argc, char *argv[])
     signal(SIGABRT, stopServer);
     signal(SIGTERM, stopServer);
 
-#ifdef Q_OS_WIN
-    int hrez = SetPriorityClass(GetCurrentProcess(), ABOVE_NORMAL_PRIORITY_CLASS);
-#else
-#endif
-
 //    av_log_set_callback(decoderLogCallback);
 
     QCoreApplication::setOrganizationName(QLatin1String(ORGANIZATION_NAME));
@@ -331,6 +326,24 @@ int serverMain(int argc, char *argv[])
     cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
 
     defaultMsgHandler = qInstallMsgHandler(myMsgHandler);
+
+#ifdef Q_OS_WIN
+    int priority = ABOVE_NORMAL_PRIORITY_CLASS;
+    int hrez = SetPriorityClass(GetCurrentProcess(), priority);
+    if (hrez == 0)
+        qWarning() << "Error increasing process priority. " << strerror(errno);
+    else
+        qDebug() << "Successfully increasing process priority to" << priority;
+#endif
+#ifdef Q_OS_LINUX
+    errno = 0;
+    int newNiceVal = nice( -10 );
+    if( newNiceVal == -1 && errno != 0 )
+        qWarning() << "Error increasing process priority. " << strerror(errno);
+    else
+        qDebug() << "Successfully increasing process priority to" << newNiceVal;
+#endif
+
 
     ffmpegInit();
 
