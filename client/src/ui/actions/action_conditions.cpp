@@ -2,6 +2,7 @@
 
 #include <utils/common/warnings.h>
 #include <core/resourcemanagment/resource_criterion.h>
+#include <core/resourcemanagment/resource_pool.h>
 #include <recording/time_period_list.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
@@ -275,3 +276,11 @@ Qn::ActionVisibility QnExportActionCondition::check(const QnActionParameters &pa
     
     return Qn::EnabledAction;
 }
+
+Qn::ActionVisibility QnPanicActionCondition::check(const QnActionParameters &) {
+    foreach(const QnVirtualCameraResourcePtr &camera, resourcePool()->getResources().filtered<QnVirtualCameraResource>())
+        if(!camera->isScheduleDisabled())
+            return Qn::EnabledAction;
+    return Qn::DisabledAction;
+}
+
