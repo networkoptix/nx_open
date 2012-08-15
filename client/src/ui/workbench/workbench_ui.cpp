@@ -539,6 +539,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
         m_calendarShowButton->setTransform(transform);
     }
     m_calendarShowButton->setFocusProxy(m_calendarItem);
+    m_calendarShowButton->setVisible(false);
 
     m_calendarOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_calendarOpacityProcessor->addTargetItem(m_calendarItem);
