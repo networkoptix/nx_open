@@ -1,8 +1,16 @@
 #include "digital_watchdog_resource.h"
 
-QnPlWatchDogResource::QnPlWatchDogResource()
+QnPlWatchDogResource::QnPlWatchDogResource():
+    QnPlOnvifResource(),
+    m_cameraProxy(0),
+    m_settings()
 {
 
+}
+
+QnPlWatchDogResource::~QnPlWatchDogResource()
+{
+    delete m_cameraProxy;
 }
 
 bool QnPlWatchDogResource::isDualStreamingEnabled()
@@ -53,7 +61,12 @@ bool QnPlWatchDogResource::initInternal()
     }
     else 
     {
-        return QnPlOnvifResource::initInternal();
+        bool res = QnPlOnvifResource::initInternal();
+        if (res) {
+            m_cameraProxy = new DWCameraProxy(getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth());
+        }
+
+        return res;
     }
 }
 
@@ -80,15 +93,46 @@ int QnPlWatchDogResource::suggestBitrateKbps(QnStreamQuality q, QSize resolution
 
 void QnPlWatchDogResource::fetchAndSetCameraSettings()
 {
+    if (!m_cameraProxy) {
+        //ToDo: log warning
+        return;
+    }
+
     QnPlOnvifResource::fetchAndSetCameraSettings();
 }
 
 bool QnPlWatchDogResource::getParamPhysical(const QnParam &param, QVariant &val)
 {
-    return QnPlOnvifResource::getParamPhysical();
+    if (!m_cameraProxy) {
+        //ToDo: log warning
+        return false;
+    }
+
+    CameraSettings::ConstIterator it = m_settings.find(param.name());
+    if (it != m_settings.end()) {
+        if (it.value().getFromCamera(*m_cameraProxy)){
+            val.setValue(static_cast<QString>(it.value().getCurrent()));
+            return true;
+        }
+
+        return false;
+    }
+
+    return QnPlOnvifResource::getParamPhysical(param, val);
 }
 
 bool QnPlWatchDogResource::setParamPhysical(const QnParam &param, const QVariant& val )
 {
+    if (!m_cameraProxy) {
+        //ToDo: log warning
+        return false;
+    }
+
+    CameraSettings::ConstIterator it = m_settings.find(param.name());
+    if (it != m_settings.end()) {
+        it.value().setCurrent(val.toString());
+        return it.value().setToCamera(*m_cameraProxy));
+    }
+
     return QnPlOnvifResource::setParamPhysical();
 }

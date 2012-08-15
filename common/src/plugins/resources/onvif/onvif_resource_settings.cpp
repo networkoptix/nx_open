@@ -1112,9 +1112,9 @@ bool MaintenanceHardSystemFactoryDefaultOperation::set(const CameraSetting& /*in
 // 
 
 OnvifCameraSetting::OnvifCameraSetting(const OnvifCameraSettingOperationAbstract& operation, const QString& id,
-        const QString& name, WIDGET_TYPE type, const CameraSettingValue min, const CameraSettingValue max,
-        const CameraSettingValue step, const CameraSettingValue current) :
-    CameraSetting(id, name, type, min, max, step, current),
+        const QString& name, WIDGET_TYPE type, const QString& query, const CameraSettingValue min,
+        const CameraSettingValue max, const CameraSettingValue step, const CameraSettingValue current) :
+    CameraSetting(id, name, type, query, min, max, step, current),
     m_operation(&operation)
 {
 
@@ -1186,7 +1186,7 @@ void OnvifCameraSettingReader::paramFound(const CameraSetting& value, const QStr
                 Q_ASSERT(false);
             }
             m_settings.getCameraSettings().insert(id, OnvifCameraSetting(
-                *(it.value()), id, value.getName(), value.getType(), value.getMin(), value.getMax(), value.getStep()));
+                *(it.value()), id, value.getName(), value.getType(), value.getQuery(), value.getMin(), value.getMax(), value.getStep()));
             return;
 
         case CameraSetting::Button:

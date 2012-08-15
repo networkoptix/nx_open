@@ -147,7 +147,7 @@
 
   </camera>
 
-  <camera name = "ONVIF"
+  <camera name = "DIGITALWATCHDOG"
           description =""
           parent = "ONVIF">
 

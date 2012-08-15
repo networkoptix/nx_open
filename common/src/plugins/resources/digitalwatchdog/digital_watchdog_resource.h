@@ -6,6 +6,7 @@
 #include "utils/network/simple_http_client.h"
 #include "core/datapacket/mediadatapacket.h"
 #include "../onvif/onvif_resource.h"
+#include "dw_resource_settings.h"
 
 class QnPlWatchDogResource : public QnPlOnvifResource
 {
@@ -22,6 +23,10 @@ protected:
 
 private:
     bool isDualStreamingEnabled();
+
+private:
+    DWCameraProxy* m_cameraProxy;
+    CameraSettings m_settings;
 };
 
 typedef QnSharedResourcePointer<QnPlWatchDogResource> QnPlWatchDogResourcePtr;

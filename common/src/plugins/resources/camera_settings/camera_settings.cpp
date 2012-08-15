@@ -148,11 +148,12 @@ QString CameraSetting::strFromType(const WIDGET_TYPE value)
 }
 
 CameraSetting::CameraSetting(const QString& id, const QString& name, WIDGET_TYPE type,
-        const CameraSettingValue min, const CameraSettingValue max,
+        const QString& query, const CameraSettingValue min, const CameraSettingValue max,
         const CameraSettingValue step, const CameraSettingValue current) :
     m_id(id),
     m_name(name),
     m_type(type),
+    m_query(query),
     m_min(min),
     m_max(max),
     m_step(step),
@@ -181,6 +182,16 @@ void CameraSetting::setType(WIDGET_TYPE type) {
 
 CameraSetting::WIDGET_TYPE CameraSetting::getType() const {
     return m_type;
+}
+
+void CameraSetting::setQuery(const QString& query)
+{
+    m_query = query;
+}
+
+QString CameraSetting::getQuery() const
+{
+    return m_query;
 }
 
 void CameraSetting::setMin(const CameraSettingValue& min) {
@@ -290,6 +301,7 @@ const QString& CameraSettingReader::TAG_PARAM = *(new QString(QLatin1String("par
 const QString& CameraSettingReader::ATTR_ID = *(new QString(QLatin1String("id")));
 const QString& CameraSettingReader::ATTR_NAME = *(new QString(QLatin1String("name")));
 const QString& CameraSettingReader::ATTR_WIDGET_TYPE = *(new QString(QLatin1String("widget_type")));
+const QString& CameraSettingReader::ATTR_QUERY = *(new QString(QLatin1String("query")));
 const QString& CameraSettingReader::ATTR_MIN = *(new QString(QLatin1String("min")));
 const QString& CameraSettingReader::ATTR_MAX = *(new QString(QLatin1String("max")));
 const QString& CameraSettingReader::ATTR_STEP = *(new QString(QLatin1String("step")));
@@ -460,6 +472,7 @@ bool CameraSettingReader::parseElementXml(const QDomElement& elementXml, const Q
     }
     CameraSetting::WIDGET_TYPE widgetType = CameraSetting::typeFromStr(widgetTypeStr);
 
+    QString query = elementXml.attribute(ATTR_QUERY);
     CameraSettingValue min = CameraSettingValue(elementXml.attribute(ATTR_MIN));
     CameraSettingValue max = CameraSettingValue(elementXml.attribute(ATTR_MAX));
     CameraSettingValue step = CameraSettingValue(elementXml.attribute(ATTR_STEP));

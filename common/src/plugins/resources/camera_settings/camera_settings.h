@@ -44,6 +44,7 @@ public:
     CameraSetting(const QString& id,
         const QString& name,
         WIDGET_TYPE type,
+        const QString& query,
         const CameraSettingValue min = CameraSettingValue(),
         const CameraSettingValue max = CameraSettingValue(),
         const CameraSettingValue step = CameraSettingValue(),
@@ -59,6 +60,9 @@ public:
 
     void setType(WIDGET_TYPE type);
     WIDGET_TYPE getType() const;
+
+    void setQuery(const QString& query);
+    QString getQuery() const;
 
     void setMin(const CameraSettingValue& min);
     CameraSettingValue getMin() const;
@@ -83,6 +87,7 @@ private:
     QString m_id;
     QString m_name;
     WIDGET_TYPE m_type;
+    QString m_query;
     CameraSettingValue m_min;
     CameraSettingValue m_max;
     CameraSettingValue m_step;
@@ -105,6 +110,7 @@ public:
     static const QString& ATTR_ID;
     static const QString& ATTR_NAME;
     static const QString& ATTR_WIDGET_TYPE;
+    static const QString& ATTR_QUERY;
     static const QString& ATTR_MIN;
     static const QString& ATTR_MAX;
     static const QString& ATTR_STEP;
