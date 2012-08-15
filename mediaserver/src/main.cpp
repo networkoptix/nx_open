@@ -291,6 +291,11 @@ int serverMain(int argc, char *argv[])
     signal(SIGABRT, stopServer);
     signal(SIGTERM, stopServer);
 
+#ifdef Q_OS_WIN
+    int hrez = SetPriorityClass(GetCurrentProcess(), ABOVE_NORMAL_PRIORITY_CLASS);
+#else
+#endif
+
 //    av_log_set_callback(decoderLogCallback);
 
     QCoreApplication::setOrganizationName(QLatin1String(ORGANIZATION_NAME));
