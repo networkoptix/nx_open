@@ -12,7 +12,7 @@ public:
     QnTimePeriodStorage(): m_aggregationMSecs(0) {}
     QnTimePeriodList periods(Qn::TimePeriodRole type) const;
     QnTimePeriodList aggregated(Qn::TimePeriodRole type) const;
-    void updatePeriods( Qn::TimePeriodRole type, const QnTimePeriodList &timePeriods );
+    void setPeriods( Qn::TimePeriodRole type, const QnTimePeriodList &timePeriods );
     void setAggregationMSecs(int value);
     int aggregationMSecs() const;
 protected:

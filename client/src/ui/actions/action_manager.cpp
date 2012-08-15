@@ -363,7 +363,8 @@ QnActionManager::QnActionManager(QObject *parent):
         toggledText(tr("Stop Panic Recording")).
         autoRepeat(false).
         shortcut(tr("Ctrl+P")).
-        requiredPermissions(Qn::AllVideoServersParameter, Qn::ReadWriteSavePermission);
+        requiredPermissions(Qn::AllVideoServersParameter, Qn::ReadWriteSavePermission).
+        condition(new QnPanicActionCondition(this));
 
     factory().
         flags(Qn::Main | Qn::Tree).
@@ -928,7 +929,10 @@ void QnActionManager::copyAction(QAction *dst, QnAction *src, bool forwardSignal
     dst->setChecked(src->isChecked());
     dst->setFont(src->font());
     dst->setIconText(src->iconText());
+    
     dst->setProperty(sourceActionPropertyName, QVariant::fromValue<QnAction *>(src));
+    foreach(const QByteArray &name, src->dynamicPropertyNames())
+        dst->setProperty(name.data(), src->property(name.data()));
     
     if(forwardSignals) {
         connect(dst, SIGNAL(triggered()),   src, SLOT(trigger()));

@@ -71,8 +71,8 @@ private:
 
     GraphicsLabel *m_timeLabel;
 
-    bool m_updatingNavigatorFromSpeedSlider;
     bool m_updatingSpeedSliderFromNavigator;
+    bool m_updatingNavigatorFromSpeedSlider;
 
     QnTimeSlider *m_timeSlider;
     QnTimeScrollBar *m_timeScrollBar;

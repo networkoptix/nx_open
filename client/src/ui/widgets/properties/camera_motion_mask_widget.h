@@ -26,10 +26,10 @@ public:
     QnCameraMotionMaskWidget(QWidget *parent = 0);
     virtual ~QnCameraMotionMaskWidget();
 
-    const QnResourcePtr &camera() const;
+    QnResourcePtr camera() const;
     void setCamera(const QnResourcePtr &resource);
 
-    const QList<QnMotionRegion> &motionRegionList() const;
+    QList<QnMotionRegion> motionRegionList() const;
 
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);

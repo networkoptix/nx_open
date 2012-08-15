@@ -327,6 +327,24 @@ int serverMain(int argc, char *argv[])
 
     defaultMsgHandler = qInstallMsgHandler(myMsgHandler);
 
+#ifdef Q_OS_WIN
+    int priority = ABOVE_NORMAL_PRIORITY_CLASS;
+    int hrez = SetPriorityClass(GetCurrentProcess(), priority);
+    if (hrez == 0)
+        qWarning() << "Error increasing process priority. " << strerror(errno);
+    else
+        qDebug() << "Successfully increasing process priority to" << priority;
+#endif
+#ifdef Q_OS_LINUX
+    errno = 0;
+    int newNiceVal = nice( -10 );
+    if( newNiceVal == -1 && errno != 0 )
+        qWarning() << "Error increasing process priority. " << strerror(errno);
+    else
+        qDebug() << "Successfully increasing process priority to" << newNiceVal;
+#endif
+
+
     ffmpegInit();
 
     // ------------------------------------------

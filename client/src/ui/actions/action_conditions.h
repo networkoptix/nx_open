@@ -245,6 +245,14 @@ public:
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 
+class QnPanicActionCondition: public QnActionCondition {
+public:
+    QnPanicActionCondition(QObject *parent = NULL):
+        QnActionCondition(parent)
+    {}
+
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+};
 
 
 #endif // QN_ACTION_CONDITIONS_H

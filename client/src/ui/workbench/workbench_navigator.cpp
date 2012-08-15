@@ -41,6 +41,9 @@
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "libavutil/avutil.h" // TODO: remove
 
+/** Maximum time when slider interpolation is considered valid, in msecs */
+#define MAX_VALID_INTERPOLATION_TIME 5000
+
 QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     QObject(parent),
     QnWorkbenchContextAware(parent),
@@ -703,7 +706,9 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
         if (timeUSec != DATETIME_NOW && timeUSec != AV_NOPTS_VALUE){
             qint64 now = QDateTime::currentDateTimeUtc().toMSecsSinceEpoch();
             if (m_lastUpdateSlider && m_lastCameraTime == timeMSec){
-                timeMSec += (now - m_lastUpdateSlider) * speed();
+                qint64 timeDiff = (now - m_lastUpdateSlider) * speed();
+                if (timeDiff < MAX_VALID_INTERPOLATION_TIME)
+                    timeMSec += timeDiff;
             } else {
                 m_lastCameraTime = timeMSec;
                 m_lastUpdateSlider = now;
