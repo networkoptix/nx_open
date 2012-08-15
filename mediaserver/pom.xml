@@ -59,7 +59,7 @@
 			<artifactId>onvif</artifactId>
 			<version>${onvif.version}</version>
 			<type>zip</type>
-			<classifier>${platform}-${arch}</classifier>
+			<classifier>${platform}-${arch}-${compiler}</classifier>
 		</dependency>                                 
 		<dependency>
 			<groupId>com.google</groupId>
