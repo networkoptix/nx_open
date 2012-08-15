@@ -90,10 +90,10 @@ win* {
     } else {
         OPENAL_LIBS_PATH = $$PWD/../contrib/openal/bin/win64
     }
-    INCLUDEPATH += $$PWD/../contrib/openal/include
     LIBS += -L$$OPENAL_LIBS_PATH -lOpenAL32
 
     INCLUDEPATH += $$PWD/../../common/contrib/openssl/include
+    INCLUDEPATH += $$PWD/../contrib/openal/include
 
     win32-msvc2010 {
         LIBS += -L$$PWD/../../common/contrib/openssl/bin/win32-msvc2010
@@ -248,3 +248,4 @@ DEFINES += $$OVERRIDE_DEFINITION
 # DEFINES += QN_HAS_BACKGROUND_COLOR_ADJUSTMENT
 
 SOURCES += $$PWD/../build/generated/compatibility_info.cpp
+
