@@ -199,6 +199,7 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
         }
         
         bool isKeyFrame = media->flags & AV_PKT_FLAG_KEY;
+        /*
         if (isKeyFrame && m_newLiveQuality != MEDIA_Quality_None)
         {
             if (m_newLiveQuality == MEDIA_Quality_Low && isSecondaryProvider) {
@@ -210,6 +211,7 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
                 m_newLiveQuality = MEDIA_Quality_None;
             }
         }
+        */
     }
 
     // overflow control
@@ -474,7 +476,21 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
 
     if (metadata == 0)
     {
-        if (m_liveQuality == MEDIA_Quality_High && m_owner->isSecondaryLiveDP(media->dataProvider))
+        bool isKeyFrame = media->flags & AV_PKT_FLAG_KEY;
+        bool isSecondaryProvider = m_owner->isSecondaryLiveDP(media->dataProvider);
+        if (isKeyFrame && m_newLiveQuality != MEDIA_Quality_None)
+        {
+            if (m_newLiveQuality == MEDIA_Quality_Low && isSecondaryProvider) {
+                m_liveQuality = MEDIA_Quality_Low; // slow network. Reduce quality
+                m_newLiveQuality = MEDIA_Quality_None;
+            }
+            else if (m_newLiveQuality == MEDIA_Quality_High && !isSecondaryProvider) {
+                m_liveQuality = MEDIA_Quality_High;
+                m_newLiveQuality = MEDIA_Quality_None;
+            }
+        }
+
+        if (m_liveQuality == MEDIA_Quality_High && isSecondaryProvider)
             return true; // data for other live quality stream
         else if (m_liveQuality == MEDIA_Quality_Low && m_owner->isPrimaryLiveDP(media->dataProvider))
             return true; // data for other live quality stream
