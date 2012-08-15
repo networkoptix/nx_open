@@ -153,6 +153,24 @@ bool QnCameraSettingsWidget::hasCameraChanges() const {
     }
 }
 
+const QList< QPair< QString, QVariant> >& QnCameraSettingsWidget::getModifiedAdvancedParams() const
+{
+    switch(mode()) {
+    case SingleMode: return m_singleWidget->getModifiedAdvancedParams();
+    case MultiMode: return m_multiWidget->getModifiedAdvancedParams();
+    default: Q_ASSERT(false); return *(new QList< QPair< QString, QVariant> >());
+    }
+}
+
+QnVideoServerConnectionPtr QnCameraSettingsWidget::getServerConnection() const
+{
+    switch(mode()) {
+    case SingleMode: return m_singleWidget->getServerConnection();
+    case MultiMode: return m_multiWidget->getServerConnection();
+    default: return QnVideoServerConnectionPtr(0);
+    }
+}
+
 bool QnCameraSettingsWidget::isReadOnly() const {
     return m_singleWidget->isReadOnly();
 }

@@ -487,31 +487,32 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog() {
     }
 
     if (hasCameraChanges) {
-        if (cameraSettingsDialog()->widget()->mode() != QnCameraSettingsWidget::SingleMode || cameras.size() != 1)
-        {
-            //Camera changes must be available only for single mode
-            Q_ASSERT(false);
-        }
-        else
-        {
-            QnVirtualCameraResourcePtr cameraPtr = cameras.front();
-            QnVideoServerResourcePtr serverPtr = qSharedPointerDynamicCast<QnVideoServerResource>(qnResPool->getResourceById(cameraPtr->getParentId()));
-            if (serverPtr.isNull())
-            {
-                //
-                // Add record to log + message to user
-                //
-            }
-            else
-            {
-                /*QnVideoServerConnectionPtr serverConnection = serverPtr->apiConnection();
-
-                //( int httpStatusCode, const QList<QPair<QString, bool> >& operationResult )
-                qRegisterMetaType<QList<QPair<QString, bool> > >("QList<QPair<QString, bool> >");
-                serverConnection->asyncSetParam(cameraPtr, params, SLOT(at_camera_settings_saved(int, const QList<QPair<QString, bool> >&)) );*/
-            }
-        }
+        saveAdvancedCameraSettingsAsync(cameras);
     }
+}
+
+void QnWorkbenchActionHandler::saveAdvancedCameraSettingsAsync(QnVirtualCameraResourceList cameras)
+{
+    if (cameraSettingsDialog()->widget()->mode() != QnCameraSettingsWidget::SingleMode || cameras.size() != 1)
+    {
+        //Advanced camera settings must be available only for single mode
+        Q_ASSERT(false);
+    }
+
+    QnVirtualCameraResourcePtr cameraPtr = cameras.front();
+    QnVideoServerConnectionPtr serverConnectionPtr = cameraSettingsDialog()->widget()->getServerConnection();
+    if (serverConnectionPtr.isNull())
+    {
+        //
+        // ToDo: Add record to log + message to user
+        //
+
+        return;
+    }
+
+    qRegisterMetaType<QList<QPair<QString, bool> > >("QList<QPair<QString, bool> >");
+    serverConnectionPtr->asyncSetParam(cameraPtr, cameraSettingsDialog()->widget()->getModifiedAdvancedParams(),
+        this, SLOT(at_camera_settings_saved(int, const QList<QPair<QString, bool> >&)) );
 }
 
 void QnWorkbenchActionHandler::rotateItems(int degrees){
@@ -1759,6 +1760,23 @@ void QnWorkbenchActionHandler::at_cameraCamera_exportFailed(QString errorMessage
         camera->stopExport();
 
     QMessageBox::warning(widget(), tr("Could not export layout"), errorMessage, QMessageBox::Ok);
+}
+
+void QnWorkbenchActionHandler::at_camera_settings_saved(int httpStatusCode, const QList<QPair<QString, bool> >& operationResult)
+{
+    //ToDo: implement this method like "at_resources_saved"
+    if (httpStatusCode != 0) {
+        int i = 0;
+    }
+
+    QList<QPair<QString, bool> >::ConstIterator it = operationResult.begin();
+    for (; it != operationResult.end(); ++it)
+    {
+        if (it->second) {
+            QString key = it->first;
+            int i = 0;
+        }
+    }
 }
 
 void QnWorkbenchActionHandler::at_exportTimeSelectionAction_triggered() {

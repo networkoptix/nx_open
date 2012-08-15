@@ -2,7 +2,6 @@
 #include "ui_single_camera_settings_widget.h"
 #include "core/resource/video_server.h"
 #include "core/resource/resource_fwd.h"
-#include "api/video_server_connection.h"
 
 #include <QtCore/QUrl>
 #include <QtGui/QMessageBox>
@@ -27,7 +26,8 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     m_readOnly(false),
     m_inUpdateMaxFps(false),
     m_cameraSupportsMotion(false),
-    m_widgetsRecreator(0)
+    m_widgetsRecreator(0),
+    m_serverConnection(0)
 {
     ui->setupUi(this);
 
@@ -62,6 +62,20 @@ QnSingleCameraSettingsWidget::~QnSingleCameraSettingsWidget() {
     delete m_widgetsRecreator;
 }
 
+QnVideoServerConnectionPtr QnSingleCameraSettingsWidget::getServerConnection() const {
+    if (!m_camera.isNull() && m_serverConnection.isNull())
+    {
+        QnVideoServerResourcePtr videoServer = qSharedPointerDynamicCast<QnVideoServerResource>(qnResPool->getResourceById(m_camera->getParentId()));
+        if (videoServer.isNull()) {
+            return m_serverConnection;
+        }
+
+        m_serverConnection = QnVideoServerConnectionPtr(videoServer->apiConnection());
+    }
+
+    return m_serverConnection;
+}
+
 void QnSingleCameraSettingsWidget::initAdvancedTab()
 {
     QHBoxLayout *layout = dynamic_cast<QHBoxLayout*>(ui->tabAdvanced->layout());
@@ -90,17 +104,15 @@ void QnSingleCameraSettingsWidget::loadAdvancedSettings()
         return;
     }
 
+    QnVideoServerConnectionPtr serverConnection = getServerConnection();
+    if (serverConnection.isNull()) {
+        return;
+    }
+
     QString filepath(QLatin1String("C:\\projects\\networkoptix\\netoptix_vms33\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml"));
     //QString filepath = QString::fromLatin1("C:\\Data\\Projects\\networkoptix\\netoptix_vms\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml");
     CameraSettingsLister lister(filepath);
     QStringList settings = lister.fetchParams();
-
-    QnVideoServerResourcePtr videoServer = qSharedPointerDynamicCast<QnVideoServerResource>(qnResPool->getResourceById(m_camera->getParentId()));
-    if (videoServer.isNull()) {
-        return;
-    }
-
-    QnVideoServerConnectionPtr serverConnection = videoServer->apiConnection();
 
     qRegisterMetaType<QList<QPair<QString, QVariant> > >("QList<QPair<QString, QVariant> >");
     serverConnection->asyncGetParamList(m_camera, settings, this, SLOT(at_advancedSettingsLoaded(int, const QList<QPair<QString, QVariant> >&)) );
@@ -202,12 +214,8 @@ void QnSingleCameraSettingsWidget::submitToResource() {
     }
 
     if (hasCameraChanges()) {
-        QList< QPair< QString, QVariant> >::ConstIterator it = m_modifiedAdvancedParams.begin();
-        for (; it != m_modifiedAdvancedParams.end(); ++it)
-        {
-            m_camera->setParam(it->first, it->second, QnDomainPhysical);
-        }
-
+        m_modifiedAdvancedParamsOutgoing.clear();
+        m_modifiedAdvancedParamsOutgoing.append(m_modifiedAdvancedParams);
         m_modifiedAdvancedParams.clear();
         setHasCameraChanges(false);
     }

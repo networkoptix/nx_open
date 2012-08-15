@@ -2,6 +2,7 @@
 #define QN_MULTIPLE_CAMERA_SETTINGS_DIALOG_H
 
 #include <QtGui/QWidget>
+#include "api/video_server_connection.h"
 #include <core/resource/resource_fwd.h>
 #include "camera_settings_tab.h"
 
@@ -31,6 +32,18 @@ public:
 
     bool hasDbChanges() const {
         return m_hasDbChanges;
+    }
+
+    const QList< QPair< QString, QVariant> >& getModifiedAdvancedParams() const {
+        //Currently this ability avaible only for single camera settings
+        Q_ASSERT(false);
+        return *(new QList< QPair< QString, QVariant> >);
+    }
+
+    QnVideoServerConnectionPtr getServerConnection() const {
+        //This ability avaible only for single camera settings
+        Q_ASSERT(false);
+        return QnVideoServerConnectionPtr(0);
     }
 
     bool isReadOnly() const;

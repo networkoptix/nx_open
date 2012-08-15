@@ -2,6 +2,7 @@
 #define QN_CAMERA_SETTINGS_WIDGET_H
 
 #include <QWidget>
+#include "api/video_server_connection.h"
 #include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include "camera_settings_tab.h"
@@ -38,6 +39,9 @@ public:
 
     bool hasDbChanges() const;
     bool hasCameraChanges() const;
+
+    const QList< QPair< QString, QVariant> >& getModifiedAdvancedParams() const;
+    QnVideoServerConnectionPtr getServerConnection() const;
 
     bool isReadOnly() const;
     void setReadOnly(bool readOnly) const;

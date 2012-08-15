@@ -2,6 +2,7 @@
 #define CAMERA_SETTINGS_DIALOG_H
 
 #include <QtGui/QWidget>
+#include "api/video_server_connection.h"
 #include <core/resource/resource_fwd.h>
 #include "camera_settings_tab.h"
 #include "utils/camera_advanced_settings_xml_parser.h"
@@ -39,6 +40,12 @@ public:
     }
     bool hasDbChanges() const {
         return m_hasDbChanges;
+    }
+
+    QnVideoServerConnectionPtr getServerConnection() const;
+
+    const QList< QPair< QString, QVariant> >& getModifiedAdvancedParams() const {
+        return m_modifiedAdvancedParamsOutgoing;
     }
 
     bool isReadOnly() const;
@@ -109,6 +116,8 @@ private:
     CameraSettings m_cameraSettings;
     CameraSettingsWidgetsCreator* m_widgetsRecreator;
     QList< QPair< QString, QVariant> > m_modifiedAdvancedParams;
+    QList< QPair< QString, QVariant> > m_modifiedAdvancedParamsOutgoing;
+    mutable QnVideoServerConnectionPtr m_serverConnection;
 };
 
 #endif // CAMERA_SETTINGS_DIALOG_H
