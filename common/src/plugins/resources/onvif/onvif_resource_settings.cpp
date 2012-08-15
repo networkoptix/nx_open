@@ -165,9 +165,9 @@ QHash<QString, OnvifCameraSettingOperationAbstract*>& createOnvifCameraSettingOp
     tmp->insert(QString::fromLatin1("%%Imaging%%Backlight Compensation%%Mode"),    new ImagingBacklightCompensationModeOperation());
     tmp->insert(QString::fromLatin1("%%Imaging%%Color Saturation"),                new ImagingColorSaturationOperation());
     tmp->insert(QString::fromLatin1("%%Imaging%%Exposure%%Max Exposure Time"),     new ImagingExposureMaxExposureTimeOperation());
-    tmp->insert(QString::fromLatin1("%%Maintenance%%System Reboot"),               new OnvifCameraSettingOperationEmpty());
-    tmp->insert(QString::fromLatin1("%%Maintenance%%Soft System Factory Default"), new OnvifCameraSettingOperationEmpty());
-    tmp->insert(QString::fromLatin1("%%Maintenance%%Hard System Factory Default"), new OnvifCameraSettingOperationEmpty());
+    tmp->insert(QString::fromLatin1("%%Maintenance%%System Reboot"),               new MaintenanceSystemRebootOperation());
+    tmp->insert(QString::fromLatin1("%%Maintenance%%Soft System Factory Default"), new MaintenanceSoftSystemFactoryDefaultOperation());
+    tmp->insert(QString::fromLatin1("%%Maintenance%%Hard System Factory Default"), new MaintenanceHardSystemFactoryDefaultOperation());
 
     return *tmp;
 }
