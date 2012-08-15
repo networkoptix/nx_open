@@ -39,6 +39,8 @@ public:
 
     QnActionParameters(const QList<QGraphicsItem *> &items, const QVariantMap &arguments = QVariantMap());
 
+    QnActionParameters(QnResourceWidget *widget, const QVariantMap &arguments = QVariantMap());
+
     QnActionParameters(const QnResourceWidgetList &widgets, const QVariantMap &arguments = QVariantMap());
 
     QnActionParameters(const QnWorkbenchLayoutList &layouts, const QVariantMap &arguments = QVariantMap());

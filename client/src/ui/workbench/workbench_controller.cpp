@@ -403,7 +403,7 @@ bool QnWorkbenchController::eventFilter(QObject *watched, QEvent *event)
                 widget->setSelected(true);
             }
 
-            menu()->trigger(Qn::RemoveLayoutItemAction, display()->scene()->selectedItems());
+            menu()->trigger(Qn::RemoveLayoutItemAction, widget);
             event->ignore();
             return true;
         }
