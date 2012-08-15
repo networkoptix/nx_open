@@ -77,3 +77,18 @@ int QnPlWatchDogResource::suggestBitrateKbps(QnStreamQuality q, QSize resolution
 
     return qMax(128,result);
 }
+
+void QnPlWatchDogResource::fetchAndSetCameraSettings()
+{
+    QnPlOnvifResource::fetchAndSetCameraSettings();
+}
+
+bool QnPlWatchDogResource::getParamPhysical(const QnParam &param, QVariant &val)
+{
+    return QnPlOnvifResource::getParamPhysical();
+}
+
+bool QnPlWatchDogResource::setParamPhysical(const QnParam &param, const QVariant& val )
+{
+    return QnPlOnvifResource::setParamPhysical();
+}

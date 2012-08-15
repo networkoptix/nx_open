@@ -147,4 +147,22 @@
 
   </camera>
 
+  <camera name = "ONVIF"
+          description =""
+          parent = "ONVIF">
+
+    <group name = "Imaging"
+           description ="">
+
+      <param name = "WB mode"
+             description = ""
+             widget_type = "Enumeration"
+             min = "AUTO,AUTO_H,AUTO_L,PRESET,MANUAL"
+             max = "AUTO,AUTO_H,AUTO_L,PRESET,MANUAL"
+             query = "wbmode1"/>
+
+    </group>
+
+  </camera>
+
 </cameras>

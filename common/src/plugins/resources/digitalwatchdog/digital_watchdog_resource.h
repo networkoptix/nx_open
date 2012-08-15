@@ -13,8 +13,13 @@ public:
     QnPlWatchDogResource();
 
     virtual int suggestBitrateKbps(QnStreamQuality q, QSize resolution, int fps) const override;
+
 protected:
     bool initInternal() override;
+    virtual void fetchAndSetCameraSettings() override;
+    virtual bool getParamPhysical(const QnParam &param, QVariant &val) override;
+    virtual bool setParamPhysical(const QnParam &param, const QVariant& val) override;
+
 private:
     bool isDualStreamingEnabled();
 };
