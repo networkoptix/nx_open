@@ -523,6 +523,51 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(m_helpItem,                 SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_helpItem_paintGeometryChanged()));
 
 
+    /* Calendar. */
+    QnCalendarWidget *calendarWidget = new QnCalendarWidget();
+    navigator()->setCalendar(calendarWidget);
+
+    m_calendarItem = new QnMaskedProxyWidget(m_controlsWidget);
+    m_calendarItem->setWidget(calendarWidget);
+    m_calendarItem->resize(250, 200);
+
+    m_calendarShowButton = newShowHideButton(m_controlsWidget);
+    {
+        QTransform transform;
+        transform.rotate(-90);
+        m_calendarShowButton->setTransform(transform);
+    }
+    m_calendarShowButton->setFocusProxy(m_calendarItem);
+
+    m_calendarOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
+    m_calendarOpacityProcessor->addTargetItem(m_calendarItem);
+    m_calendarOpacityProcessor->addTargetItem(m_calendarShowButton);
+
+    m_calendarSizeAnimator = new VariantAnimator(this);
+    m_calendarSizeAnimator->setTimer(m_instrumentManager->animationTimer());
+    m_calendarSizeAnimator->setTargetObject(m_calendarItem);
+    m_calendarSizeAnimator->setAccessor(new PropertyAccessor("paintSize"));
+    m_calendarSizeAnimator->setSpeed(100.0 * 2.0);
+    m_calendarSizeAnimator->setTimeLimit(500);
+
+    m_calendarOpacityAnimatorGroup = new AnimatorGroup(this);
+    m_calendarOpacityAnimatorGroup->setTimer(m_instrumentManager->animationTimer());
+    m_calendarOpacityAnimatorGroup->addAnimator(opacityAnimator(m_calendarItem));
+    m_calendarOpacityAnimatorGroup->addAnimator(opacityAnimator(m_calendarShowButton)); /* Speed of 1.0 is OK here. */
+
+    /*m_calendarItem->stackBefore(m_sliderItem->timeSlider()->toolTipItem());
+    m_calendarShowButton->stackBefore(m_sliderItem->timeSlider()->toolTipItem());*/
+
+    connect(m_calendarShowButton,       SIGNAL(toggled(bool)),                                                                      this,                           SLOT(at_calendarShowButton_toggled(bool)));
+    connect(m_calendarOpacityProcessor, SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateCalendarOpacity()));
+    connect(m_calendarOpacityProcessor, SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateCalendarOpacity()));
+    connect(m_calendarOpacityProcessor, SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateControlsVisibility()));
+    connect(m_calendarOpacityProcessor, SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateControlsVisibility()));
+    connect(m_calendarItem,             SIGNAL(paintRectChanged()),                                                                 this,                           SLOT(at_calendarItem_paintGeometryChanged()));
+    connect(m_calendarItem,             SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_calendarItem_paintGeometryChanged()));
+    connect(action(Qn::ToggleCalendarAction), SIGNAL(toggled(bool)),                                                                this,                           SLOT(at_toggleCalendarAction_toggled(bool)));
+
+
     /* Navigation slider. */
     m_sliderEaterItem = new QnEventEatingWidget(m_controlsWidget);
 
@@ -547,6 +592,8 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_sliderShowButton->stackBefore(m_sliderItem->timeSlider()->toolTipItem());
     m_sliderResizerItem->stackBefore(m_sliderShowButton);
     m_sliderItem->stackBefore(m_sliderResizerItem);
+    m_sliderEaterItem->stackBefore(m_calendarShowButton);
+    m_sliderEaterItem->stackBefore(m_calendarItem);
 
     m_sliderOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_sliderOpacityProcessor->addTargetItem(m_sliderItem);
@@ -575,52 +622,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(m_sliderResizerItem,        SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_sliderResizerItem_geometryChanged()));
     connect(navigator(),                SIGNAL(currentWidgetChanged()),                                                             this,                           SLOT(updateControlsVisibility()));
     connect(action(Qn::ToggleThumbnailsAction), SIGNAL(toggled(bool)),                                                              this,                           SLOT(at_toggleThumbnailsAction_toggled(bool)));
-    connect(action(Qn::ToggleCalendarAction), SIGNAL(toggled(bool)),                                                                this,                           SLOT(at_toggleCalendarAction_toggled(bool)));
-    
-
-    /* Calendar. */
-    QnCalendarWidget *calendarWidget = new QnCalendarWidget();
-    navigator()->setCalendar(calendarWidget);
-    calendarWidget->resize(250, 200);
-
-    m_calendarItem = new QnMaskedProxyWidget(m_controlsWidget);
-    m_calendarItem->setWidget(calendarWidget);
-
-    m_calendarShowButton = newShowHideButton(m_controlsWidget);
-    {
-        QTransform transform;
-        transform.rotate(-90);
-        m_calendarShowButton->setTransform(transform);
-    }
-    m_calendarShowButton->setFocusProxy(m_calendarItem);
-
-    m_calendarOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
-    m_calendarOpacityProcessor->addTargetItem(m_calendarItem);
-    m_calendarOpacityProcessor->addTargetItem(m_calendarShowButton);
-
-    m_calendarSizeAnimator = new VariantAnimator(this);
-    m_calendarSizeAnimator->setTimer(m_instrumentManager->animationTimer());
-    m_calendarSizeAnimator->setTargetObject(m_calendarItem);
-    m_calendarSizeAnimator->setAccessor(new PropertyAccessor("paintSize"));
-    m_calendarSizeAnimator->setSpeed(100.0 * 2.0);
-    m_calendarSizeAnimator->setTimeLimit(500);
-
-    m_calendarOpacityAnimatorGroup = new AnimatorGroup(this);
-    m_calendarOpacityAnimatorGroup->setTimer(m_instrumentManager->animationTimer());
-    m_calendarOpacityAnimatorGroup->addAnimator(opacityAnimator(m_calendarItem));
-    m_calendarOpacityAnimatorGroup->addAnimator(opacityAnimator(m_calendarShowButton)); /* Speed of 1.0 is OK here. */
-
-    m_calendarItem->stackBefore(m_sliderItem->timeSlider()->toolTipItem());
-    m_calendarShowButton->stackBefore(m_sliderItem->timeSlider()->toolTipItem());
-
-    connect(m_calendarShowButton,       SIGNAL(toggled(bool)),                                                                      this,                           SLOT(at_calendarShowButton_toggled(bool)));
-    connect(m_calendarOpacityProcessor, SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateCalendarOpacity()));
-    connect(m_calendarOpacityProcessor, SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateCalendarOpacity()));
-    connect(m_calendarOpacityProcessor, SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateControlsVisibility()));
-    connect(m_calendarOpacityProcessor, SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateControlsVisibility()));
-    connect(m_calendarItem,             SIGNAL(paintRectChanged()),                                                                 this,                           SLOT(at_calendarItem_paintGeometryChanged()));
-    connect(m_calendarItem,             SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_calendarItem_paintGeometryChanged()));
-
 
 
     /* Connect to display. */
@@ -734,6 +735,8 @@ void QnWorkbenchUi::setSliderOpened(bool opened, bool animate) {
         m_sliderItem->setY(newY);
     }
 
+    updateCalendarVisibility(animate);
+
     QnScopedValueRollback<bool> rollback(&m_ignoreClickEvent, true);
     m_sliderShowButton->setChecked(opened);
 }
@@ -815,6 +818,7 @@ void QnWorkbenchUi::setSliderVisible(bool visible, bool animate) {
     if(changed) {
         updateTreeGeometry();
         updateHelpGeometry();
+        updateCalendarVisibility(animate);
     }
 }
 
@@ -1039,9 +1043,19 @@ void QnWorkbenchUi::updateCalendarOpacity(bool animate) {
     }
 }
 
+void QnWorkbenchUi::updateCalendarVisibility(bool animate) {
+    bool calendarVisible = m_sliderVisible && m_sliderOpened && (navigator()->currentWidget() && navigator()->currentWidget()->resource()->flags() & QnResource::utc);
+
+    if(m_inactive) {
+        bool hovered = m_sliderOpacityProcessor->isHovered() || m_treeOpacityProcessor->isHovered() || m_titleOpacityProcessor->isHovered() || m_helpOpacityProcessor->isHovered() || m_calendarOpacityProcessor->isHovered();
+        setCalendarVisible(calendarVisible && hovered, animate);
+    } else {
+        setCalendarVisible(calendarVisible, animate);
+    }
+}
+
 void QnWorkbenchUi::updateControlsVisibility(bool animate) {    // TODO
     bool sliderVisible = navigator()->currentWidget() != NULL && !(navigator()->currentWidget()->resource()->flags() & (QnResource::still_image | QnResource::server));
-    bool calendarVisible = sliderVisible && m_sliderOpened;
 
     if(m_inactive) {
         bool hovered = m_sliderOpacityProcessor->isHovered() || m_treeOpacityProcessor->isHovered() || m_titleOpacityProcessor->isHovered() || m_helpOpacityProcessor->isHovered() || m_calendarOpacityProcessor->isHovered();
@@ -1049,14 +1063,14 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate) {    // TODO
         setTreeVisible(hovered, animate);
         setTitleVisible(hovered, animate);
         setHelpVisible(hovered, animate);
-        setCalendarVisible(calendarVisible && hovered, animate);
     } else {
         setSliderVisible(sliderVisible, animate);
         setTreeVisible(true, animate);
         setTitleVisible(true, animate);
         setHelpVisible(true, animate);
-        setCalendarVisible(calendarVisible, animate);
     }
+
+    updateCalendarVisibility(animate);
 }
 
 QRectF QnWorkbenchUi::updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry) {
@@ -1202,7 +1216,6 @@ void QnWorkbenchUi::updateCalendarGeometry() {
     /* Always change position. */
     m_calendarItem->setPos(geometry.topLeft());
 
-//#if 0
     /* Whether actual size change should be deferred. */
     bool defer = m_calendarSizeAnimator->isRunning();
 
@@ -1217,17 +1230,7 @@ void QnWorkbenchUi::updateCalendarGeometry() {
         sliderPos = m_sliderItem->pos();
     }
 
-    /* Calculate target geometry. */
-    geometry = updatedCalendarGeometry(QRectF(sliderPos, m_sliderItem->size()));
-    if(qFuzzyCompare(geometry, m_calendarItem->geometry()))
-        return;
-
-    /* Defer size change if it doesn't cause empty space to occur. */
-    if(defer && geometry.height() < m_calendarItem->size().height())
-        return;
-
-    m_calendarItem->resize(geometry.size());
-//#endif
+    /* Don't change size. */
 }
 
 void QnWorkbenchUi::updateFpsGeometry() {
@@ -1601,7 +1604,6 @@ void QnWorkbenchUi::at_sliderResizerItem_geometryChanged() {
     updateSliderResizerGeometry();
 
     action(Qn::ToggleThumbnailsAction)->setChecked(isThumbnailsVisible());
-    action(Qn::ToggleCalendarAction)->setChecked(isCalendarVisible());
 }
 
 void QnWorkbenchUi::at_treeWidget_activated(const QnResourcePtr &resource) {

@@ -2,6 +2,8 @@
 
 #include <utils/common/warnings.h>
 
+#include <ui/graphics/items/resource/resource_widget.h>
+
 #include "action_parameter_types.h"
 
 namespace {
@@ -30,6 +32,11 @@ QnActionParameters::QnActionParameters(const QVariant &items, const QVariantMap 
 QnActionParameters::QnActionParameters(const QList<QGraphicsItem *> &items, const QVariantMap &arguments) {
     setArguments(arguments);
     setItems(QVariant::fromValue<QnResourceWidgetList>(QnActionParameterTypes::widgets(items)));
+}
+
+QnActionParameters::QnActionParameters(QnResourceWidget *widget, const QVariantMap &arguments) {
+    setArguments(arguments);
+    setItems(QVariant::fromValue<QnResourceWidget *>(widget));
 }
 
 QnActionParameters::QnActionParameters(const QnResourceWidgetList &widgets, const QVariantMap &arguments) {
