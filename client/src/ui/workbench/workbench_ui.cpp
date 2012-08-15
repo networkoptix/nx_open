@@ -1604,7 +1604,6 @@ void QnWorkbenchUi::at_sliderResizerItem_geometryChanged() {
     updateSliderResizerGeometry();
 
     action(Qn::ToggleThumbnailsAction)->setChecked(isThumbnailsVisible());
-    action(Qn::ToggleCalendarAction)->setChecked(isCalendarVisible());
 }
 
 void QnWorkbenchUi::at_treeWidget_activated(const QnResourcePtr &resource) {
