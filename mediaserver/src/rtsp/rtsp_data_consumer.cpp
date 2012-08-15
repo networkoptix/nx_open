@@ -192,7 +192,7 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
         if (m_newLiveQuality == MEDIA_Quality_None)
         {
             //if (m_dataQueue.size() >= m_dataQueue.maxSize()-MAX_QUEUE_SIZE/4 && m_liveQuality == MEDIA_Quality_High  && canSwitchToLowQuality())
-            if (m_dataQueue.size() >= m_dataQueue.maxSize()/2 && m_liveQuality == MEDIA_Quality_High && canSwitchToLowQuality() && isMediaTimingsSlow())
+            if (m_dataQueue.size() >= m_dataQueue.maxSize()-MAX_QUEUE_SIZE/4 && m_liveQuality == MEDIA_Quality_High && canSwitchToLowQuality() && isMediaTimingsSlow())
                 m_newLiveQuality = MEDIA_Quality_Low; // slow network. Reduce quality
             else if (m_dataQueue.size() <= 1 && m_liveQuality == MEDIA_Quality_Low && canSwitchToHiQuality()) 
                 m_newLiveQuality = MEDIA_Quality_High;
