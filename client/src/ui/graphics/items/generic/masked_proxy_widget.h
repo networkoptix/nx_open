@@ -11,6 +11,9 @@
 class QnMaskedProxyWidget: public QGraphicsProxyWidget {
     Q_OBJECT;
     Q_PROPERTY(bool updatesEnabled READ isUpdatesEnabled WRITE setUpdatesEnabled);
+    Q_PROPERTY(QRectF paintRect READ paintRect WRITE setPaintRect);
+    Q_PROPERTY(QRectF paintGeometry READ paintGeometry WRITE setPaintGeometry);
+    Q_PROPERTY(QSizeF paintSize READ paintSize WRITE setPaintSize);
 
     typedef QGraphicsProxyWidget base_type;
 
@@ -21,10 +24,11 @@ public:
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
-    const QRectF &paintRect() const {
-        return m_paintRect;
-    }
+    QRectF paintRect() const;
     void setPaintRect(const QRectF &paintRect);
+
+    QSizeF paintSize() const;
+    void setPaintSize(const QSizeF &paintSize);
 
     QRectF paintGeometry() const;
     void setPaintGeometry(const QRectF &paintGeometry);

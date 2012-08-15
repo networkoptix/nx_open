@@ -5,7 +5,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 
-#include <core/resource/video_server.h>
+#include <core/resource/video_server_resource.h>
 #include <api/video_server_connection.h>
 
 #include <ui/style/globals.h>
@@ -168,9 +168,9 @@ void QnServerResourceWidget::QnStatisticsHistoryData::append(int value) {
 
 QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent /* = NULL */):
     QnResourceWidget(context, item, parent),
-    m_alreadyUpdating(false),
     m_counter(0),
-    m_renderStatus(Qn::NothingRendered)
+    m_renderStatus(Qn::NothingRendered),
+    m_alreadyUpdating(false)
 {
     m_resource = base_type::resource().dynamicCast<QnVideoServerResource>();
     if(!m_resource) 
@@ -179,6 +179,9 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(at_timer_timeout()));
     timer->start(REQUEST_TIME);
+
+    /* Run handlers. */
+    updateButtonsVisibility();
 }
 
 QnServerResourceWidget::~QnServerResourceWidget() {
@@ -298,17 +301,18 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
 
         QnScopedPainterFontRollback fontRollback(painter);
         QFont font(this->font());
+
+#ifndef Q_WS_X11
         font.setPointSizeF(offset * 0.3);
         painter->setFont(font);
-
         /** Draw text values */
         {
-            int x = offset*1.1 + ow;
+            qreal x = offset*1.1 + ow;
             for (int i = 0; i < values.length(); i++){
                 qreal inter_value = values[i];
                 main_pen.setColor(getColorById(i));
                 painter->setPen(main_pen);
-                int y = offset + oh * (1.0 - inter_value * 0.01);
+                qreal y = offset + oh * (1.0 - inter_value * 0.01);
                 painter->drawText(x, y, QString::number(qRound(inter_value))+QLatin1Char('%'));
             }
         }
@@ -316,6 +320,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
         /** Draw legend */
         {
             QnScopedPainterTransformRollback transformRollback(painter);
+            Q_UNUSED(transformRollback) //ugly hack to prevent warning
             QTransform legendTransform = painter->transform();
             QPainterPath legend;
 
@@ -332,6 +337,48 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
                 painter->setTransform(legendTransform);
             }
         }
+#else //Q_WS_X11
+        font.setPixelSize(20);
+        painter->setFont(font);
+        /** Draw text values */
+        {
+            qreal c = offset*0.02;
+            painter->scale(c, c);
+            c = 1/c;
+            qreal x = offset*1.1 + ow;
+            for (int i = 0; i < values.length(); i++){
+                qreal inter_value = values[i];
+                main_pen.setColor(getColorById(i));
+                painter->setPen(main_pen);
+                qreal y = offset + oh * (1.0 - inter_value * 0.01);
+                painter->drawText(x*c, y*c, QString::number(qRound(inter_value))+QLatin1Char('%'));
+            }
+            painter->scale(c, c);
+        }
+
+        /** Draw legend */
+        {
+            QnScopedPainterTransformRollback transformRollback(painter);
+
+            painter->translate(width * 0.5 - offset * m_history.length(), oh + offset * 1.5);
+            qreal c = offset*0.02;
+            painter->scale(c, c);
+            c = 1/c;
+
+            QPainterPath legend;
+            legend.addRect(0.0, 0.0, -offset*0.2*c, -offset*0.2*c);
+            main_pen.setWidthF(pen_width * 2 * c);
+
+            for (int i = 0; i < m_history.length(); i++){
+                main_pen.setColor(getColorById(i));
+                painter->setPen(main_pen);
+                painter->strokePath(legend, main_pen);
+                painter->drawText(offset*0.1*c, offset*0.1*c, m_history[i].id);
+                painter->translate(offset * 2*c, 0.0);
+            }
+            painter->scale(c, c);
+        }
+    #endif //Q_WS_X11
     }
 }
 

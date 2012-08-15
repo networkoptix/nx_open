@@ -31,14 +31,17 @@ unix {
 include(../contrib/qtcolorpicker/src/qtcolorpicker.pri)
 }
 
-TRANSLATIONS += help/context_help_en.ts
-RESOURCES += help/context_help.qrc
+TRANSLATIONS += # help/context_help_en.ts
+RESOURCES += # help/context_help.qrc
 
 INCLUDEPATH += $$PWD
 PRECOMPILED_HEADER = $$PWD/StdAfx.h
 PRECOMPILED_SOURCE = $$PWD/StdAfx.cpp
 
 QMAKE_CXXFLAGS += -I$$EVETOOLS_DIR/include
+
+# Boris build doesn't use const.pro
+QMAKE_CXXFLAGS += -DNO_TRANSLATIONS
 
 unix {
   QMAKE_CXXFLAGS += -I/usr/include

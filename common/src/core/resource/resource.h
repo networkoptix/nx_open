@@ -333,7 +333,7 @@ QnSharedResourcePointer<Resource> toSharedPointer(Resource *resource) {
     if(resource == NULL) {
         return QnSharedResourcePointer<Resource>();
     } else {
-        return resource->toSharedPointer().template staticCast<Resource>();
+        return resource->toSharedPointer().template dynamicCast<Resource>(); // TODO: replace with staticCast once we deal with virtual inheritance
     }
 }
 

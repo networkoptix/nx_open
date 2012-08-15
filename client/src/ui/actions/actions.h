@@ -12,6 +12,7 @@ namespace Qn {
     inline QLatin1String qn_layoutParameter()               { return QLatin1String("_qn_layoutParameter"); }
     inline QLatin1String qn_currentLayoutParameter()        { return QLatin1String("_qn_currentLayoutParameter"); }
     inline QLatin1String qn_currentUserParameter()          { return QLatin1String("_qn_currentUserParameter"); }
+    inline QLatin1String qn_allVideoServersParameter()      { return QLatin1String("_qn_allVideoServers"); }
     inline QLatin1String qn_serializedResourcesParameter()  { return QLatin1String("_qn_serializedResourcesParameter"); }
     inline QLatin1String qn_timePeriodParameter()           { return QLatin1String("_qn_timePeriodParameter"); }
     inline QLatin1String qn_timePeriodsParameter()          { return QLatin1String("_qn_timePeriodsParameter"); }
@@ -24,6 +25,7 @@ namespace Qn {
 #define LayoutParameter qn_layoutParameter()
 #define CurrentLayoutParameter qn_currentLayoutParameter()
 #define CurrentUserParameter qn_currentUserParameter()
+#define AllVideoServersParameter qn_allVideoServersParameter()
 #define SerializedResourcesParameter qn_serializedResourcesParameter()
 #define TimePeriodParameter qn_timePeriodParameter()
 #define TimePeriodsParameter qn_timePeriodsParameter()
@@ -461,6 +463,11 @@ namespace Qn {
          * Sets spacing of current layout's cells to 30%.
          */
         SetCurrentLayoutItemSpacing30Action,
+
+        /**
+         * Toggles panic recording.
+         */
+        TogglePanicModeAction,
 
 
 

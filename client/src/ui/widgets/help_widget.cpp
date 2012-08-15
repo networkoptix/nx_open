@@ -16,6 +16,9 @@ QnHelpWidget::QnHelpWidget(QnContextHelp *contextHelp, QWidget *parent):
     ui->checkBox->hide();
 #endif
 
+    /* This is needed so that control's context menu is not embedded into the scene. */
+    ui->textEdit->setWindowFlags(ui->textEdit->windowFlags() | Qt::BypassGraphicsProxyWidget);
+
     connect(contextHelp,    SIGNAL(helpContextChanged(QnContextHelp::ContextId)),   this,   SLOT(at_contextHelp_helpContextChanged(QnContextHelp::ContextId)));
     connect(ui->checkBox,   SIGNAL(clicked(bool)),                                  this,   SLOT(at_checkBox_clicked(bool)));
 }

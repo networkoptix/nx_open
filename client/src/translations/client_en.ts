@@ -55,13 +55,6 @@
     </message>
 </context>
 <context>
-    <name>CLVideoCamera</name>
-    <message>
-        <source>Invalid resource type for data export.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>CameraScheduleWidget</name>
     <message>
         <source>Camera schedule editor</source>
@@ -1200,6 +1193,22 @@ For easy instructions on how to install or update your video driver, follow inst
         <source>Open Layout(s) in a new Window</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Start Panic Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop Panic Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Calendar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide Calendar</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnAutoTester</name>
@@ -1969,6 +1978,14 @@ You have less storage space available than reserved free space value. Additional
 You have only %2Gb left for video archive.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Panic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normal</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnSignInfo</name>
@@ -2188,6 +2205,13 @@ AVAILABLE</source>
     </message>
     <message>
         <source>Choose access rights.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnVideoCamera</name>
+    <message>
+        <source>Invalid resource type for data export.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2486,6 +2510,10 @@ Error description: &apos;%2&apos;</source>
 %1</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Quick Search for %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchController</name>
@@ -2515,6 +2543,45 @@ Error description: &apos;%2&apos;</source>
     </message>
     <message>
         <source>Can&apos;t start recording due to the following error: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnWorkbenchEcsHandler</name>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not save the following %n layout(s) to Enterprise Controller.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do you want to restore these %n layout(s)?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not save the following %n items to Enterprise Controller.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error description: 
+%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not delete resource from Enterprise Controller. 
+
+Error description: &apos;%2&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not save changes made to the following %n resource(s).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error description:
+%1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2734,6 +2801,10 @@ hh:mm:ss</source>
     </message>
     <message>
         <source>Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording mode:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -27,7 +27,10 @@ QnToolTipItem::QnToolTipItem(QGraphicsItem *parent):
     setTextPen(QPen(style->standardPalette().windowText(), 0));
     setBorderPen(QPen(style->standardPalette().windowText(), 0));
     setBrush(style->standardPalette().window());
-    setFont(QApplication::font());
+
+    QFont fixedFont = QApplication::font();
+    fixedFont.setPixelSize(14);
+    setFont(fixedFont);
 
     /* Update. */
     updateTextSize();

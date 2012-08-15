@@ -11,33 +11,26 @@
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/instruments/forwarding_instrument.h>
 
-QnWorkbenchRenderWatcher::QnWorkbenchRenderWatcher(QnWorkbenchDisplay *display, QObject *parent):
-    QObject(parent) 
+QnWorkbenchRenderWatcher::QnWorkbenchRenderWatcher(QObject *parent):
+    QObject(parent),
+    QnWorkbenchContextAware(parent)
 {
-    if(display == NULL) {
-        qnNullWarning(display);
-        return;
-    }
-
     /* Connect to display. */
-    connect(display,                            SIGNAL(widgetAdded(QnResourceWidget *)),            this,   SLOT(at_display_widgetAdded(QnResourceWidget *)));
-    connect(display,                            SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)), this,   SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
-    connect(display->beforePaintInstrument(),   SIGNAL(activated(QWidget *, QEvent *)),             this,   SLOT(startDisplay()));
-    connect(display->afterPaintInstrument(),    SIGNAL(activated(QWidget *, QEvent *)),             this,   SLOT(finishDisplay()));
+    connect(display(),                          SIGNAL(widgetAdded(QnResourceWidget *)),            this,   SLOT(at_display_widgetAdded(QnResourceWidget *)));
+    connect(display(),                          SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)), this,   SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
+    connect(display()->beforePaintInstrument(), SIGNAL(activated(QWidget *, QEvent *)),             this,   SLOT(at_beforePaintInstrument_activated()));
+    connect(display()->afterPaintInstrument(),  SIGNAL(activated(QWidget *, QEvent *)),             this,   SLOT(at_afterPaintInstrument_activated()));
 }
 
-QnWorkbenchRenderWatcher::QnWorkbenchRenderWatcher(QObject *parent): 
-    QObject(parent)
-{}
-
-void QnWorkbenchRenderWatcher::registerRenderer(QnAbstractRenderer *renderer, QObject *lifetime) {
+void QnWorkbenchRenderWatcher::registerRenderer(QnAbstractRenderer *renderer) {
     if(renderer == NULL) {
         qnNullWarning(renderer);
         return;
     }
 
+    QObject *lifetime = dynamic_cast<QObject *>(renderer);
     if(lifetime == NULL) {
-        qnNullWarning(lifetime);
+        qnWarning("Given renderer must be derived from QObject.");
         return;
     }
 
@@ -68,27 +61,27 @@ void QnWorkbenchRenderWatcher::unregisterRenderer(QnAbstractRenderer *renderer) 
     m_infoByRenderer.remove(renderer);
 }
 
-void QnWorkbenchRenderWatcher::at_lifetime_destroyed() {
-    unregisterRenderer(m_rendererByLifetime[sender()]);
-}
 
-void QnWorkbenchRenderWatcher::startDisplay() {
+// -------------------------------------------------------------------------- //
+// Handlers
+// -------------------------------------------------------------------------- //
+void QnWorkbenchRenderWatcher::at_beforePaintInstrument_activated() {
     for(QHash<QnAbstractRenderer *, Info>::iterator pos = m_infoByRenderer.begin(); pos != m_infoByRenderer.end(); pos++)
         pos->displayCounter = pos.key()->displayCounter();
 }
 
-void QnWorkbenchRenderWatcher::finishDisplay() {
+void QnWorkbenchRenderWatcher::at_afterPaintInstrument_activated() {
     for(QHash<QnAbstractRenderer *, Info>::iterator pos = m_infoByRenderer.begin(); pos != m_infoByRenderer.end(); pos++) {
         bool displayed = pos->displayCounter != pos.key()->displayCounter();
 
         if(displayed && !pos->displaying) {
             pos->displaying = true;
 
-            emit displayingStateChanged(pos.key(), pos->displaying);
+            emit displayingChanged(pos.key(), pos->displaying);
         } else if(!displayed && pos->displaying) {
             pos->displaying = false;
 
-            emit displayingStateChanged(pos.key(), pos->displaying);
+            emit displayingChanged(pos.key(), pos->displaying);
         }
     }
 }
@@ -101,7 +94,7 @@ void QnWorkbenchRenderWatcher::at_display_widgetAdded(QnResourceWidget *widget) 
     if(mediaWidget->renderer() == NULL) 
         return;
 
-    registerRenderer(mediaWidget->renderer(), mediaWidget->renderer());
+    registerRenderer(mediaWidget->renderer());
 }
 
 void QnWorkbenchRenderWatcher::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {
@@ -113,5 +106,9 @@ void QnWorkbenchRenderWatcher::at_display_widgetAboutToBeRemoved(QnResourceWidge
         return;
 
     unregisterRenderer(mediaWidget->renderer());
+}
+
+void QnWorkbenchRenderWatcher::at_lifetime_destroyed() {
+    unregisterRenderer(m_rendererByLifetime[sender()]);
 }
 

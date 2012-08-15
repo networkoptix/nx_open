@@ -1,69 +1,69 @@
 #ifndef QN_SHARED_RESOURCE_POINTER_H
 #define QN_SHARED_RESOURCE_POINTER_H
 
-#include <QSharedPointer>
+#include <QtCore/QSharedPointer>
 
-template<class T>
-class QnSharedResourcePointer: public QSharedPointer<T> {
-    typedef QSharedPointer<T> base_type;
+template<class Resource>
+class QnSharedResourcePointer: public QSharedPointer<Resource> {
+    typedef QSharedPointer<Resource> base_type;
 
 public:
     QnSharedResourcePointer() {}
 
-    explicit QnSharedResourcePointer(T *ptr): base_type(ptr) { initialize(*this); }
+    explicit QnSharedResourcePointer(Resource *ptr): base_type(ptr) { initialize(*this); }
 
     template<class Deleter>
-    QnSharedResourcePointer(T *ptr, Deleter d): base_type(ptr, d) { initialize(*this); }
+    QnSharedResourcePointer(Resource *ptr, Deleter d): base_type(ptr, d) { initialize(*this); }
 
-    QnSharedResourcePointer(const QSharedPointer<T> &other): base_type(other) {}
+    QnSharedResourcePointer(const QSharedPointer<Resource> &other): base_type(other) {}
 
-    QnSharedResourcePointer<T> &operator=(const QSharedPointer<T> &other) {
+    QnSharedResourcePointer<Resource> &operator=(const QSharedPointer<Resource> &other) {
         base_type::operator=(other);
         return *this;
     }
 
-    template<class X>
-    QnSharedResourcePointer(const QSharedPointer<X> &other): base_type(other) {}
+    template<class OtherResource>
+    QnSharedResourcePointer(const QSharedPointer<OtherResource> &other): base_type(other) {}
 
-    template<class X>
-    QnSharedResourcePointer<T> &operator=(const QSharedPointer<X> &other) {
+    template<class OtherResource>
+    QnSharedResourcePointer<Resource> &operator=(const QSharedPointer<OtherResource> &other) {
         base_type::operator=(other);
         return *this;
     }
 
-    template<class X>
-    QnSharedResourcePointer(const QWeakPointer<X> &other): base_type(other) {}
+    template<class OtherResource>
+    QnSharedResourcePointer(const QWeakPointer<OtherResource> &other): base_type(other) {}
 
-    template<class X>
-    QnSharedResourcePointer<T> &operator=(const QWeakPointer<X> &other) { 
+    template<class OtherResource>
+    QnSharedResourcePointer<Resource> &operator=(const QWeakPointer<OtherResource> &other) { 
         base_type::operator=(other);
         return *this; 
     }
 
-    template<class X>
-    QnSharedResourcePointer<X> staticCast() const {
-        return qSharedPointerCast<X, T>(*this);
+    template<class OtherResource>
+    QnSharedResourcePointer<OtherResource> staticCast() const {
+        return qSharedPointerCast<OtherResource, Resource>(*this);
     }
 
-    template<class X>
-    QnSharedResourcePointer<X> dynamicCast() const {
-        return qSharedPointerDynamicCast<X, T>(*this);
+    template<class OtherResource>
+    QnSharedResourcePointer<OtherResource> dynamicCast() const {
+        return qSharedPointerDynamicCast<OtherResource, Resource>(*this);
     }
 
-    template<class X>
-    QnSharedResourcePointer<X> constCast() const {
-        return qSharedPointerConstCast<X, T>(*this);
+    template<class OtherResource>
+    QnSharedResourcePointer<OtherResource> constCast() const {
+        return qSharedPointerConstCast<OtherResource, Resource>(*this);
     }
 
-    template<class X>
-    QnSharedResourcePointer<X> objectCast() const {
-        return qSharedPointerObjectCast<X, T>(*this);
+    template<class OtherResource>
+    QnSharedResourcePointer<OtherResource> objectCast() const {
+        return qSharedPointerObjectCast<OtherResource, Resource>(*this);
     }
 
-    template<class X>
-    static void initialize(const QSharedPointer<X> &other) {
-        if(other)
-            other->initWeakPointer(other);
+    template<class OtherResource>
+    static void initialize(const QSharedPointer<OtherResource> &resource) {
+        if(resource)
+            resource->initWeakPointer(resource);
     }
 };
 

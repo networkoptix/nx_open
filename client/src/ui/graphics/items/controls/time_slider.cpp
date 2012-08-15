@@ -269,25 +269,25 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     base_type(parent),
     m_windowStart(0),
     m_windowEnd(0),
-    m_options(0),
-    m_oldMinimum(0),
-    m_oldMaximum(0),
-    m_animationUpdateMSecsPerPixel(1.0),
-    m_msecsPerPixel(1.0),
     m_minimalWindow(0),
     m_selectionValid(false),
-    m_pixmapCache(QnTimeSliderPixmapCache::instance()),
+    m_oldMinimum(0),
+    m_oldMaximum(0),
+    m_options(0),
     m_unzooming(false),
+    m_dragMarker(NoMarker),
     m_dragIsClick(false),
     m_selecting(false),
-    m_dragMarker(NoMarker),
     m_lineCount(0),
     m_totalLineStretch(0.0),
-    m_rulerHeight(0.0),
-    m_prefferedHeight(0.0),
+    m_msecsPerPixel(1.0),
+    m_animationUpdateMSecsPerPixel(1.0),
     m_lastThumbnailsUpdateTime(0),
     m_lastHoverThumbnail(-1),
-    m_thumbnailsVisible(false)
+    m_thumbnailsVisible(false),
+    m_rulerHeight(0.0),
+    m_prefferedHeight(0.0),
+    m_pixmapCache(QnTimeSliderPixmapCache::instance())
 {
     m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("NO THUMBNAILS\nAVAILABLE"), 16, QColor(255, 255, 255, 255));
 
@@ -484,7 +484,7 @@ void QnTimeSlider::setTimePeriods(int line, Qn::TimePeriodRole type, const QnTim
     if(!checkLinePeriod(line, type))
         return;
 
-    m_lineData[line].timeStorage.updatePeriods(type, timePeriods);
+    m_lineData[line].timeStorage.setPeriods(type, timePeriods);
 }
 
 QnTimeSlider::Options QnTimeSlider::options() const {
@@ -1157,7 +1157,7 @@ void QnTimeSlider::updateThumbnailsStepSize(bool instant, bool forced) {
     bool timeStepChanged = qAbs(timeStep / m_msecsPerPixel - thumbnailsLoader()->timeStep() / m_msecsPerPixel) >= 1;
 
     /* Nothing changed? Leave. */
-    if(!timeStepChanged && !boundingSizeChanged)
+    if(!timeStepChanged && !boundingSizeChanged && !m_thumbnailData.isEmpty())
         return;
 
     /* Ok, thumbnails have to be re-generated. So we first freeze our old thumbnails. */
@@ -1171,6 +1171,7 @@ void QnTimeSlider::updateThumbnailsStepSize(bool instant, bool forced) {
         updateThumbnailsStepSizeLater();
     } else {
         m_lastThumbnailsUpdateTime = currentTime;
+        thumbnailsLoader()->setBoundingSize(boundingSize + QSize(1, 1)); /* Evil hack to force update even if size didn't change. */
         thumbnailsLoader()->setBoundingSize(boundingSize);
         thumbnailsLoader()->setTimeStep(timeStep);
         updateThumbnailsPeriod();
@@ -1366,9 +1367,11 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &rec
      * different motion periods several times over the same location. 
      * It makes transparent time slider look better. */
 
-    QnTimePeriodList periods[Qn::TimePeriodRoleCount] = {recorded, motion};
-    QColor pastColor[Qn::TimePeriodRoleCount + 1] = {pastRecordingColor, pastMotionColor, pastBackgroundColor};
-    QColor futureColor[Qn::TimePeriodRoleCount + 1] = {futureRecordingColor, futureMotionColor, futureBackgroundColor};
+    /* Note that constness of period lists is important here as requesting
+     * iterators from a non-const object will result in detach. */
+    const QnTimePeriodList periods[Qn::TimePeriodRoleCount] = {recorded, motion};
+    const QColor pastColor[Qn::TimePeriodRoleCount + 1] = {pastRecordingColor, pastMotionColor, pastBackgroundColor};
+    const QColor futureColor[Qn::TimePeriodRoleCount + 1] = {futureRecordingColor, futureMotionColor, futureBackgroundColor};
 
     QnTimePeriodList::const_iterator pos[Qn::TimePeriodRoleCount];
     QnTimePeriodList::const_iterator end[Qn::TimePeriodRoleCount];

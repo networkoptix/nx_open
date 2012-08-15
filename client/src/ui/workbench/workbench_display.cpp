@@ -50,7 +50,6 @@
 #include <ui/style/globals.h>
 
 #include "extensions/workbench_stream_synchronizer.h"
-#include "extensions/workbench_render_watcher.h"
 #include "workbench_layout.h"
 #include "workbench_item.h"
 #include "workbench_grid_mapper.h"
@@ -239,8 +238,7 @@ void QnWorkbenchDisplay::setStreamsSynchronized(bool synchronized, qint64 curren
         return;
 
     if(!m_streamSynchronizer) {
-        QnWorkbenchRenderWatcher *renderWatcher = new QnWorkbenchRenderWatcher(this, this);
-        m_streamSynchronizer = new QnWorkbenchStreamSynchronizer(this, renderWatcher, this);
+        m_streamSynchronizer = new QnWorkbenchStreamSynchronizer(this);
 
         connect(m_streamSynchronizer, SIGNAL(effectiveChanged()), this, SIGNAL(streamsSynchronizationEffectiveChanged()));
         if(m_streamSynchronizer->isEffective())

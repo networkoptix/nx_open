@@ -27,7 +27,7 @@
 #include "recording/file_deletor.h"
 #include "rest/server/rest_server.h"
 #include "rest/handlers/recorded_chunks.h"
-#include "core/resource/video_server.h"
+#include "core/resource/video_server_resource.h"
 #include "api/session_manager.h"
 #include <signal.h>
 #include "core/misc/scheduleTask.h"
@@ -326,6 +326,24 @@ int serverMain(int argc, char *argv[])
     cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
 
     defaultMsgHandler = qInstallMsgHandler(myMsgHandler);
+
+#ifdef Q_OS_WIN
+    int priority = ABOVE_NORMAL_PRIORITY_CLASS;
+    int hrez = SetPriorityClass(GetCurrentProcess(), priority);
+    if (hrez == 0)
+        qWarning() << "Error increasing process priority. " << strerror(errno);
+    else
+        qDebug() << "Successfully increasing process priority to" << priority;
+#endif
+#ifdef Q_OS_LINUX
+    errno = 0;
+    int newNiceVal = nice( -10 );
+    if( newNiceVal == -1 && errno != 0 )
+        qWarning() << "Error increasing process priority. " << strerror(errno);
+    else
+        qDebug() << "Successfully increasing process priority to" << newNiceVal;
+#endif
+
 
     ffmpegInit();
 

@@ -41,8 +41,6 @@ mkdir -p $INITDSTAGE
 
 ############### Enterprise Controller
 cp -r $ECS_PRESTAGE_PATH $PKGSTAGE
-cp ${qt.dir}/libssl.so.1.0.0 $LIBSTAGE
-cp ${qt.dir}/libcrypto.so.1.0.0 $LIBSTAGE
 
 touch $ETCSTAGE/entcontroller.conf
 
@@ -59,13 +57,6 @@ install -m 755 $PROXY_BIN_PATH/mediaproxy-bin $BINSTAGE
 
 # Copy libraries
 cp -P $PROXY_LIB_PATH/*.so* $LIBSTAGE
-cp -P ${qt.dir}/libaudio.so* $LIBSTAGE
-cp -P ${qt.dir}/libXi.so* $LIBSTAGE
-cp -P ${qt.dir}/libXt.so* $LIBSTAGE
-cp -P ${qt.dir}/libXrender.so* $LIBSTAGE
-cp -P ${qt.dir}/libfontconfig.so* $LIBSTAGE
-cp -P ${qt.dir}/libICE.so* $LIBSTAGE
-cp -P ${qt.dir}/libSM.so* $LIBSTAGE
 
 # Copy mediaproxy startup script
 install -m 755 bin/mediaproxy $BINSTAGE

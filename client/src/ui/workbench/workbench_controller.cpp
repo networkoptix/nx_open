@@ -403,7 +403,7 @@ bool QnWorkbenchController::eventFilter(QObject *watched, QEvent *event)
                 widget->setSelected(true);
             }
 
-            menu()->trigger(Qn::RemoveLayoutItemAction, display()->scene()->selectedItems());
+            menu()->trigger(Qn::RemoveLayoutItemAction, widget);
             event->ignore();
             return true;
         }
@@ -1080,10 +1080,7 @@ void QnWorkbenchController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem
         QRectF viewportGeometry = display()->viewportGeometry();
         QRectF zoomedItemGeometry = display()->itemGeometry(zoomedItem);
 
-        if(
-            (viewportGeometry.width() < zoomedItemGeometry.width() && !qFuzzyCompare(viewportGeometry.width(), zoomedItemGeometry.width())) ||
-            (viewportGeometry.height() < zoomedItemGeometry.height() && !qFuzzyCompare(viewportGeometry.height(), zoomedItemGeometry.height()))
-        ) {
+        if(viewportGeometry.width() < zoomedItemGeometry.width() * 0.975 || viewportGeometry.height() < zoomedItemGeometry.height() * 0.975) {
             workbench()->setItem(Qn::ZoomedRole, NULL);
             workbench()->setItem(Qn::ZoomedRole, workbenchItem);
         } else {
@@ -1140,8 +1137,9 @@ void QnWorkbenchController::at_display_widgetChanged(Qn::ItemRole role) {
 
     m_widgetByRole[role] = newWidget;
 
-    if(newWidget)
-        newWidget->setFocus();
+    QGraphicsItem *focusItem = display()->scene()->focusItem();
+    if(newWidget && (!focusItem || dynamic_cast<QnResourceWidget *>(focusItem)))
+        newWidget->setFocus(); /* Move focus only if it's not already grabbed by some control element. */
 
     switch(role) {
     case Qn::ZoomedRole:

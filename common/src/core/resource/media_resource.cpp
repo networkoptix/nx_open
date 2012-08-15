@@ -17,7 +17,7 @@ QnMediaResource::~QnMediaResource()
     delete m_customVideoLayout;
 }
 
-QImage QnMediaResource::getImage(int /*channnel*/, QDateTime /*time*/, QnStreamQuality /*quality*/) const
+QImage QnMediaResource::getImage(int /*channel*/, QDateTime /*time*/, QnStreamQuality /*quality*/) const
 {
     return QImage();
 }

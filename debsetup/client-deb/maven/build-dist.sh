@@ -16,12 +16,9 @@ STAGEBASE=deb
 STAGE=$STAGEBASE/${PACKAGENAME}-${project.version}.${buildNumber}-${arch}-${build.configuration}
 BINSTAGE=$STAGE$BINTARGET
 LIBSTAGE=$STAGE$LIBTARGET
-ETCSTAGE=$STAGE$ETCTARGET
-INITSTAGE=$STAGE$INITTARGET
-INITDSTAGE=$STAGE$INITDTARGET
-USRSTAGE=$STAGE$USRTARGET
 
 CLIENT_BIN_PATH=${project.build.directory}/bin
+CLIENT_STYLES_PATH=$CLIENT_BIN_PATH/${build.configuration}/styles
 CLIENT_LIB_PATH=${project.build.directory}/build/bin/${build.configuration}
 	
 . $CLIENT_BIN_PATH/env.sh
@@ -29,11 +26,8 @@ CLIENT_LIB_PATH=${project.build.directory}/build/bin/${build.configuration}
 # Prepare stage dir
 rm -rf $STAGEBASE
 mkdir -p $BINSTAGE
+mkdir -p $BINSTAGE/styles
 mkdir -p $LIBSTAGE
-mkdir -p $ETCSTAGE
-mkdir -p $INITSTAGE
-mkdir -p $INITDSTAGE
-mkdir -p $USRSTAGE
 
 # Copy client binary
 install -m 755 $CLIENT_BIN_PATH/client* $BINSTAGE
@@ -46,13 +40,16 @@ cp -P -Rf usr $STAGE
 
 # Copy libraries
 cp -P $CLIENT_LIB_PATH/*.so* $LIBSTAGE
-cp -P ${qt.dir}/libaudio.so* $LIBSTAGE
-cp -P ${qt.dir}/libXi.so* $LIBSTAGE
-cp -P ${qt.dir}/libXt.so* $LIBSTAGE
-cp -P ${qt.dir}/libXrender.so* $LIBSTAGE
-cp -P ${qt.dir}/libfontconfig.so* $LIBSTAGE
-cp -P ${qt.dir}/libICE.so* $LIBSTAGE
-cp -P ${qt.dir}/libSM.so* $LIBSTAGE
+cp -P $CLIENT_STYLES_PATH/libbespin.so* $BINSTAGE/styles
+
+# Must use system libraries due to compatibility issues
+# cp -P ${qt.dir}/libaudio.so* $LIBSTAGE
+# cp -P ${qt.dir}/libXi.so* $LIBSTAGE
+# cp -P ${qt.dir}/libXt.so* $LIBSTAGE
+# cp -P ${qt.dir}/libXrender.so* $LIBSTAGE
+# cp -P ${qt.dir}/libfontconfig.so* $LIBSTAGE
+# cp -P ${qt.dir}/libICE.so* $LIBSTAGE
+# cp -P ${qt.dir}/libSM.so* $LIBSTAGE
 
 # Prepare DEBIAN dir
 mkdir -p $STAGE/DEBIAN

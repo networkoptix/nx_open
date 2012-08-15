@@ -14,7 +14,6 @@ namespace {
     public:
         QnSliderToolTipItem(QGraphicsItem *parent = 0) : QnToolTipItem(parent)
         {
-            setFont(QFont()); /* Default application font. */
             setTextPen(QColor(63, 159, 216));
             setBrush(QColor(0, 0, 0, 255));
             setBorderPen(QPen(QColor(203, 210, 233, 128), 0.7));

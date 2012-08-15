@@ -693,8 +693,8 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
     }
 
     m_timeSlider->setRange(startTimeMSec, endTimeMSec);
-    m_calendar->setDateRange(QDateTime::fromMSecsSinceEpoch(startTimeMSec).date(),
-        QDateTime::fromMSecsSinceEpoch(endTimeMSec).date());
+    if(m_calendar)
+        m_calendar->setDateRange(QDateTime::fromMSecsSinceEpoch(startTimeMSec).date(), QDateTime::fromMSecsSinceEpoch(endTimeMSec).date());
 
     if(!m_pausedOverride) {
         qint64 timeUSec = m_currentMediaWidget->display()->camDisplay()->isRealTimeSource() ? DATETIME_NOW : m_currentMediaWidget->display()->camera()->getCurrentTime();
@@ -703,7 +703,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
         if (timeUSec != DATETIME_NOW && timeUSec != AV_NOPTS_VALUE){
             qint64 now = QDateTime::currentDateTimeUtc().toMSecsSinceEpoch();
             if (m_lastUpdateSlider && m_lastCameraTime == timeMSec){
-                timeMSec += (now - m_lastUpdateSlider) * this->speed();
+                timeMSec += (now - m_lastUpdateSlider) * speed();
             } else {
                 m_lastCameraTime = timeMSec;
                 m_lastUpdateSlider = now;
@@ -771,7 +771,8 @@ void QnWorkbenchNavigator::updateCurrentPeriods(Qn::TimePeriodRole type) {
     }
 
     m_timeSlider->setTimePeriods(CurrentLine, type, periods);
-    m_calendar->setCurrentTimePeriods(type, periods);
+    if(m_calendar)
+        m_calendar->setCurrentTimePeriods(type, periods);
 }
 
 void QnWorkbenchNavigator::updateSyncedPeriods() {
@@ -800,7 +801,8 @@ void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodRole type) {
     }
 
     m_timeSlider->setTimePeriods(SyncedLine, type, periods);
-    m_calendar->setSyncedTimePeriods(type, periods);
+    if(m_calendar)
+        m_calendar->setSyncedTimePeriods(type, periods);
 }
 
 void QnWorkbenchNavigator::updateLines() {
@@ -1196,6 +1198,6 @@ void QnWorkbenchNavigator::at_calendar_selectionChanged(){
     m_timeSlider->finishAnimations();
     m_timeSlider->setWindow(startMSec, endMSec);
     // do not update value to avoid window scrolling if no data is recorded
-//  m_timeSlider->setValue(startMSec);
+    //  m_timeSlider->setValue(startMSec);
 }
 

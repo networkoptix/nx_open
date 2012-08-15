@@ -31,11 +31,15 @@ public:
         setItems(QVariant::fromValue<QnResourcePtr>(resource));
     }
 
-    QnActionParameters(const QnResourcePtr &resource, const QVariantMap &arguments = QVariantMap());
-
-    QnActionParameters(const QnResourceList &resources, const QVariantMap &arguments = QVariantMap());
+    template<class Resource>
+    QnActionParameters(const QnSharedResourcePointerList<Resource> &resources, const QVariantMap &arguments = QVariantMap()) {
+        setArguments(arguments);
+        setItems(QVariant::fromValue<QnResourceList>(resources));
+    }
 
     QnActionParameters(const QList<QGraphicsItem *> &items, const QVariantMap &arguments = QVariantMap());
+
+    QnActionParameters(QnResourceWidget *widget, const QVariantMap &arguments = QVariantMap());
 
     QnActionParameters(const QnResourceWidgetList &widgets, const QVariantMap &arguments = QVariantMap());
 

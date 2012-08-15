@@ -16,7 +16,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <core/resourcemanagment/resource_pool.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/video_server.h>
+#include <core/resource/video_server_resource.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
@@ -233,8 +233,10 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent, QnWorkbenchContext *
     ui->resourceTreeView->setProperty(Qn::ItemViewItemBackgroundOpacity, 0.5);
     ui->searchTreeView->setProperty(Qn::ItemViewItemBackgroundOpacity, 0.5);
 
-    /* This is needed so that filter edit's context menu is not embedded into the scene. */
+    /* This is needed so that control's context menu is not embedded into the scene. */
     ui->filterLineEdit->setWindowFlags(ui->filterLineEdit->windowFlags() | Qt::BypassGraphicsProxyWidget);
+    ui->resourceTreeView->setWindowFlags(ui->resourceTreeView->windowFlags() | Qt::BypassGraphicsProxyWidget);
+    ui->searchTreeView->setWindowFlags(ui->resourceTreeView->windowFlags() | Qt::BypassGraphicsProxyWidget);
 
     m_renameAction = new QAction(this);
 
@@ -541,7 +543,6 @@ void QnResourceTreeWidget::timerEvent(QTimerEvent *event) {
             if(flags != 0)
                 model->addCriterion(QnResourceCriterion(flags, QnResourceProperty::flags, QnResourceCriterion::Next, QnResourceCriterion::Reject));
             model->addCriterion(QnResourceCriterion(QnResource::server));
-            ui->filterLineEdit->setFocus();
         }
     }
 

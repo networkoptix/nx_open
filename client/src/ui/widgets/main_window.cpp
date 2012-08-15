@@ -16,7 +16,6 @@
 
 #include <core/resourcemanagment/resource_discovery_manager.h>
 #include <core/resourcemanagment/resource_pool.h>
-#include <core/resourcemanagment/resource_pool_user_watcher.h>
 
 #include <api/app_server_connection.h>
 #include <api/session_manager.h>
@@ -25,13 +24,14 @@
 #include "ui/actions/action_manager.h"
 #include "ui/graphics/view/graphics_view.h"
 #include "ui/graphics/view/gradient_background_painter.h"
+#include "ui/workbench/handlers/workbench_action_handler.h"
+#include "ui/workbench/handlers/workbench_panic_handler.h"
 #include "ui/workbench/workbench_controller.h"
 #include "ui/workbench/workbench_grid_mapper.h"
 #include "ui/workbench/workbench_layout.h"
 #include "ui/workbench/workbench_display.h"
 #include "ui/workbench/workbench_ui.h"
 #include "ui/workbench/workbench_synchronizer.h"
-#include "ui/workbench/workbench_action_handler.h"
 #include "ui/workbench/workbench_context.h"
 #include "ui/workbench/workbench_resource.h"
 #include "ui/processors/drag_processor.h"
@@ -126,7 +126,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
         m_view->setPalette(palette);
     }
 
-    m_backgroundPainter.reset(new QnGradientBackgroundPainter(120.0));
+    m_backgroundPainter.reset(new QnGradientBackgroundPainter(120.0, this));
     m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
 
 
@@ -140,8 +140,11 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_ui = new QnWorkbenchUi(this);
     m_ui->setFlags(QnWorkbenchUi::HideWhenZoomed | QnWorkbenchUi::AdjustMargins);
 
-    m_actionHandler = new QnWorkbenchActionHandler(this);
-    m_actionHandler->setWidget(this);
+
+    /* Set up handlers. */
+    QnWorkbenchActionHandler *actionHandler = context->handler<QnWorkbenchActionHandler>();
+    actionHandler->setWidget(this);
+
 
     /* Set up actions. */
     addAction(action(Qn::NextLayoutAction));
@@ -167,6 +170,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::TakeScreenshotAction));
     addAction(action(Qn::IncrementDebugCounterAction));
     addAction(action(Qn::DecrementDebugCounterAction));
+    addAction(action(Qn::TogglePanicModeAction));
 
     connect(action(Qn::FullscreenAction),   SIGNAL(toggled(bool)),                          this,                                   SLOT(setFullScreen(bool)));
     connect(action(Qn::MinimizeAction),     SIGNAL(triggered()),                            this,                                   SLOT(minimize()));

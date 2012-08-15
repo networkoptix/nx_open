@@ -357,6 +357,15 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         icon(qnSkin->icon("connected.png"));
 
+    factory(Qn::TogglePanicModeAction).
+        flags(Qn::Main).
+        text(tr("Start Panic Recording")).
+        toggledText(tr("Stop Panic Recording")).
+        autoRepeat(false).
+        shortcut(tr("Ctrl+P")).
+        requiredPermissions(Qn::AllVideoServersParameter, Qn::ReadWriteSavePermission).
+        condition(new QnPanicActionCondition(this));
+
     factory().
         flags(Qn::Main | Qn::Tree).
         separator();
@@ -477,7 +486,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::SystemSettingsAction).
         flags(Qn::Main).
         text(tr("System Settings...")).
-        shortcut(tr("Ctrl+P")).
+        //shortcut(tr("Ctrl+P")).
         role(QAction::PreferencesRole).
         autoRepeat(false).
         icon(qnSkin->icon("decorations/settings.png"));
@@ -920,7 +929,10 @@ void QnActionManager::copyAction(QAction *dst, QnAction *src, bool forwardSignal
     dst->setChecked(src->isChecked());
     dst->setFont(src->font());
     dst->setIconText(src->iconText());
+    
     dst->setProperty(sourceActionPropertyName, QVariant::fromValue<QnAction *>(src));
+    foreach(const QByteArray &name, src->dynamicPropertyNames())
+        dst->setProperty(name.data(), src->property(name.data()));
     
     if(forwardSignals) {
         connect(dst, SIGNAL(triggered()),   src, SLOT(trigger()));

@@ -100,6 +100,10 @@ public:
         return m_helpOpened;
     }
 
+    bool isCalendarOpened() const {
+        return m_calendarOpened;
+    }
+
     bool isTreeVisible() const {
         return m_treeVisible;
     }
@@ -116,6 +120,11 @@ public:
         return m_helpVisible;
     }
 
+    bool isCalendarVisible() const {
+        return m_calendarVisible;
+    }
+
+
 public slots:
     void setProxyUpdatesEnabled(bool updatesEnabled);
     void enableProxyUpdates() { setProxyUpdatesEnabled(true); }
@@ -129,11 +138,13 @@ public slots:
     void setSliderVisible(bool visible = true, bool animate = true);
     void setTitleVisible(bool visible = true, bool animate = true);
     void setHelpVisible(bool visible = true, bool animate = true);
+    void setCalendarVisible(bool visible = true, bool animate = true);
 
     void setTreeOpened(bool opened = true, bool animate = true);
     void setSliderOpened(bool opened = true, bool animate = true);
     void setTitleOpened(bool opened = true, bool animate = true);
     void setHelpOpened(bool opened = true, bool animate = true);
+    void setCalendarOpened(bool opened = true, bool animate = true);
 
     void toggleTreeOpened() {
         setTreeOpened(!isTreeOpened());
@@ -162,19 +173,18 @@ protected:
     Q_SLOT void updateSliderResizerGeometry();
 
     QRectF updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
-    QRectF updatedHelpGeometry(const QRectF &helpGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
+    QRectF updatedHelpGeometry(const QRectF &helpGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry, const QRectF &calendarGeometry);
+    QRectF updatedCalendarGeometry(const QRectF &sliderGeometry);
     void updateActivityInstrumentState();
 
     void setTreeOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
     void setSliderOpacity(qreal opacity, bool animate);
     void setTitleOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
     void setHelpOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
+    void setCalendarOpacity(qreal opacity, bool animate);
 
     bool isThumbnailsVisible() const;
     void setThumbnailsVisible(bool visible);
-
-    bool isCalendarVisible() const;
-    void setCalendarVisible(bool visible);
 
 protected slots:
     void updateHelpContext();
@@ -183,6 +193,8 @@ protected slots:
     void updateSliderOpacity(bool animate = true);
     void updateTitleOpacity(bool animate = true);
     void updateHelpOpacity(bool animate = true);
+    void updateCalendarOpacity(bool animate = true);
+    void updateCalendarVisibility(bool animate = true);
     void updateControlsVisibility(bool animate = true);
 
     void setTreeShowButtonUsed(bool used = true);
@@ -225,6 +237,9 @@ protected slots:
     void at_helpItem_paintGeometryChanged();
     void at_helpWidget_showRequested();
     void at_helpWidget_hideRequested();
+
+    void at_calendarShowButton_toggled(bool checked);
+    void at_calendarItem_paintGeometryChanged();
 
     void at_fpsItem_geometryChanged();
 
@@ -280,6 +295,10 @@ private:
     bool m_helpOpened;
 
     bool m_helpVisible;
+
+    bool m_calendarOpened;
+
+    bool m_calendarVisible;
 
     bool m_windowButtonsUsed;
 
@@ -404,6 +423,21 @@ private:
     AnimatorGroup *m_helpOpacityAnimatorGroup;
 
     QnWorkbenchMotionDisplayWatcher *m_motionDisplayWatcher;
+
+
+    /* Calendar window-related state. */
+
+    QnMaskedProxyWidget *m_calendarItem;
+
+    VariantAnimator *m_calendarSizeAnimator;
+
+    QnImageButtonWidget *m_calendarShowButton;
+
+    AnimatorGroup *m_calendarOpacityAnimatorGroup;
+
+    HoverFocusProcessor *m_calendarOpacityProcessor;
+
+    bool m_inCalendarGeometryUpdate;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchUi::Flags);

@@ -243,7 +243,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         ui->motionWebPageLabel->setText(QString());
         ui->cameraMotionButton->setChecked(false);
         ui->softwareMotionButton->setChecked(false);
-        
+
         m_cameraSupportsMotion = false;
         ui->motionSettingsGroupBox->setEnabled(false);
         ui->motionAvailableLabel->setVisible(true);
