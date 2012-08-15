@@ -41,13 +41,15 @@ cp -P -Rf usr $STAGE
 # Copy libraries
 cp -P $CLIENT_LIB_PATH/*.so* $LIBSTAGE
 cp -P $CLIENT_STYLES_PATH/libbespin.so* $BINSTAGE/styles
-cp -P ${qt.dir}/libaudio.so* $LIBSTAGE
-cp -P ${qt.dir}/libXi.so* $LIBSTAGE
-cp -P ${qt.dir}/libXt.so* $LIBSTAGE
-cp -P ${qt.dir}/libXrender.so* $LIBSTAGE
-cp -P ${qt.dir}/libfontconfig.so* $LIBSTAGE
-cp -P ${qt.dir}/libICE.so* $LIBSTAGE
-cp -P ${qt.dir}/libSM.so* $LIBSTAGE
+
+# Must use system libraries due to compatibility issues
+# cp -P ${qt.dir}/libaudio.so* $LIBSTAGE
+# cp -P ${qt.dir}/libXi.so* $LIBSTAGE
+# cp -P ${qt.dir}/libXt.so* $LIBSTAGE
+# cp -P ${qt.dir}/libXrender.so* $LIBSTAGE
+# cp -P ${qt.dir}/libfontconfig.so* $LIBSTAGE
+# cp -P ${qt.dir}/libICE.so* $LIBSTAGE
+# cp -P ${qt.dir}/libSM.so* $LIBSTAGE
 
 # Prepare DEBIAN dir
 mkdir -p $STAGE/DEBIAN
