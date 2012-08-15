@@ -110,6 +110,7 @@ protected:
 
 protected:
     void updateState(StateFlags state);
+    void updateFromDefaultAction();
 
     void ensurePixmapCache() const;
     void invalidatePixmapCache();
@@ -139,6 +140,9 @@ private:
     qreal m_hoverProgress;
 
     QAction *m_action;
+    bool m_actionIconOverridden;
+
+
     QSharedPointer<QnTextureTransitionShaderProgram> m_shader;
     QScopedPointer<QnGlFunctions> m_gl;
 };
