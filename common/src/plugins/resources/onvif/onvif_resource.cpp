@@ -1460,15 +1460,29 @@ bool QnPlOnvifResource::setParamPhysical(const QnParam &param, const QVariant& v
 {
     QMutexLocker lock(&m_mutex);
 
+    CameraSetting tmp;
+    tmp.deserializeFromStr(val.toString());
+
     CameraSettings& settings = m_onvifAdditionalSettings->getCameraSettings();
     CameraSettings::ConstIterator it = settings.find(param.name());
 
-    if (it == settings.end()) {
-        return false;
+    if (it == settings.end())
+    {
+        if (tmp.getType() != CameraSetting::Button) {
+            return false;
+        }
+
+        //For Button only operation object is required
+        QHash<QString, OnvifCameraSettingOperationAbstract*>::ConstIterator it =
+            OnvifCameraSettingOperationAbstract::operations.find(param.name());
+
+        if (it == OnvifCameraSettingOperationAbstract::operations.end()) {
+            return false;
+        }
+
+        return it.value()->set(tmp, *m_onvifAdditionalSettings);
     }
 
-    CameraSetting tmp;
-    tmp.deserializeFromStr(val.toString());
     OnvifCameraSetting tmpOnvif = it.value();
     tmpOnvif.setCurrent(tmp.getCurrent());
     return tmpOnvif.setToCamera(*m_onvifAdditionalSettings);
