@@ -496,7 +496,7 @@ QnResourceWidget::Overlay QnMediaResourceWidget::calculateChannelOverlay(int cha
     } else if(m_display->isPaused()) {
         return EmptyOverlay;
     } else {
-        return base_type::calculateChannelOverlay(channel);
+        return base_type::calculateChannelOverlay(channel, QnResource::Online);
     }
 }
 

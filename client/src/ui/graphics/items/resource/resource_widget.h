@@ -262,6 +262,7 @@ protected:
 
     Overlay channelOverlay(int channel) const;
     void setChannelOverlay(int channel, Overlay overlay);
+    Overlay calculateChannelOverlay(int channel, int resourceStatus) const;
     virtual Overlay calculateChannelOverlay(int channel) const;
     Q_SLOT void updateChannelOverlay(int channel);
 
