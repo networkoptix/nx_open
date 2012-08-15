@@ -12,11 +12,21 @@
  * based on the time period lists
  */
 class QnCalendarWidget: public QCalendarWidget {
-    Q_OBJECT;
+    Q_OBJECT
 public: 
     QnCalendarWidget();
     void setCurrentTimePeriods(Qn::TimePeriodRole type, QnTimePeriodList periods );
     void setSyncedTimePeriods(Qn::TimePeriodRole type, QnTimePeriodList periods );
+
+    /**
+    * \return true is all loaded periods of all roles are empty
+    */
+    bool isEmpty();
+signals:
+    /**
+    * Signal is emitted when empty state is changed, e.g. loaded new time periods.
+    */
+    void emptyChanged();
 protected:
     virtual void paintCell(QPainter * painter, const QRect & rect, const QDate & date ) const override;
 private:

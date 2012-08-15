@@ -34,16 +34,33 @@ QnCalendarWidget::QnCalendarWidget():
 
 void QnCalendarWidget::setCurrentTimePeriods( Qn::TimePeriodRole type, QnTimePeriodList periods )
 {
+    bool oldEmpty = isEmpty();
     m_currentTimeStorage.setPeriods(type, periods);
+    bool newEmpty = isEmpty();
+    if (newEmpty != oldEmpty)
+        emit emptyChanged();
 
     update();
 }
 
 void QnCalendarWidget::setSyncedTimePeriods( Qn::TimePeriodRole type, QnTimePeriodList periods )
 {
+    bool oldEmpty = isEmpty();
     m_syncedTimeStorage.setPeriods(type, periods);
+    bool newEmpty = isEmpty();
+    if (newEmpty != oldEmpty)
+        emit emptyChanged();
 
     update();
+}
+
+bool QnCalendarWidget::isEmpty(){
+    for(int type = 0; type < Qn::TimePeriodRoleCount; type++)
+        if (!m_currentTimeStorage.periods(static_cast<Qn::TimePeriodRole>(type)).empty()
+                ||
+            !m_syncedTimeStorage.periods(static_cast<Qn::TimePeriodRole>(type)).empty())
+            return false;
+    return true;
 }
 
 void QnCalendarWidget::paintCell(QPainter *painter, const QRect & rect, const QDate & date ) const{

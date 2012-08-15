@@ -526,6 +526,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     /* Calendar. */
     QnCalendarWidget *calendarWidget = new QnCalendarWidget();
     navigator()->setCalendar(calendarWidget);
+    connect(calendarWidget, SIGNAL(emptyChanged()), this, SLOT(updateCalendarVisibility()));
 
     m_calendarItem = new QnMaskedProxyWidget(m_controlsWidget);
     m_calendarItem->setWidget(calendarWidget);
@@ -1044,7 +1045,11 @@ void QnWorkbenchUi::updateCalendarOpacity(bool animate) {
 }
 
 void QnWorkbenchUi::updateCalendarVisibility(bool animate) {
-    bool calendarVisible = m_sliderVisible && m_sliderOpened && (navigator()->currentWidget() && navigator()->currentWidget()->resource()->flags() & QnResource::utc);
+    bool calendarEmpty = true;
+    if (QnCalendarWidget* c = dynamic_cast<QnCalendarWidget *>(m_calendarItem->widget()))
+        calendarEmpty = c->isEmpty(); /* Small hack. We have a signal that updates visibility if a calendar receive new data */
+
+    bool calendarVisible = !calendarEmpty && m_sliderVisible && m_sliderOpened && (navigator()->currentWidget() && navigator()->currentWidget()->resource()->flags() & QnResource::utc);
 
     if(m_inactive) {
         bool hovered = m_sliderOpacityProcessor->isHovered() || m_treeOpacityProcessor->isHovered() || m_titleOpacityProcessor->isHovered() || m_helpOpacityProcessor->isHovered() || m_calendarOpacityProcessor->isHovered();
