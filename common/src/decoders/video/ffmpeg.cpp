@@ -199,7 +199,7 @@ void CLFFmpegVideoDecoder::openDecoder(const QnCompressedVideoDataPtr data)
         m_codec = 0;
         Q_ASSERT_X(1, Q_FUNC_INFO, "Can't open decoder");
     }
-    Q_ASSERT(m_context->codec);
+    //Q_ASSERT(m_context->codec);
 
     int roundWidth = qPower2Ceil((unsigned) m_context->width, 32);
     int numBytes = avpicture_get_size(PIX_FMT_YUV420P, roundWidth, m_context->height);

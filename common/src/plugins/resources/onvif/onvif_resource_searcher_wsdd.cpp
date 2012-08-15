@@ -1,8 +1,4 @@
-#ifdef WIN32
 #include "openssl/evp.h"
-#else
-#include "evp.h"
-#endif
 
 #include "onvif_resource_searcher_wsdd.h"
 #include "core/resource/camera_resource.h"
