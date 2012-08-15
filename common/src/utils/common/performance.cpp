@@ -1,5 +1,9 @@
 #include "performance.h"
 
+#include <map>
+#include <set>
+#include <string>
+
 #include <QtCore/QtGlobal>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QThread>
@@ -25,6 +29,8 @@
 
 /** statistics usage update timer, in seconds. */
 #define STATISTICS_USAGE_REFRESH 1
+
+using namespace std;
 
 // -------------------------------------------------------------------------- //
 // CPU Usage
@@ -67,6 +73,8 @@ namespace {
         }
 
         bool hddUsage(QList<int> *output){
+            QMutexLocker lk( &m_mutex );
+
             output->clear();
             foreach(int item, m_hddUsage)
                 output->append(item);
@@ -148,6 +156,8 @@ namespace {
         }
 
         void refresh() {
+            QMutexLocker lk( &m_mutex );
+
             const quint64 PERCENT_CAP = 100;
 
             quint64 cpu = enumerateWbem(
@@ -310,6 +320,8 @@ namespace {
         }
 
     private:
+        QMutex m_mutex;
+
         /** Flag of successful initialization. */
         bool m_initialized;
 
@@ -399,6 +411,7 @@ namespace{
             m_totalUsage = 0;
             m_timer = 0;
             m_initialized = init();
+            memset( &m_prevClock, 0, sizeof(m_prevClock) );
         }
 
         ~CpuUsageRefresher() {
@@ -406,11 +419,11 @@ namespace{
                 timer_delete(m_timer);
         }
 
-        uint usage() {
+        uint usage() const {
             return m_usage;
         }
 
-        uint totalUsage() {
+        uint totalUsage() const {
             return m_totalUsage;
         }
 
@@ -431,9 +444,28 @@ namespace{
             m_cpu = cpu;
             m_processCpu = process_cpu;
             m_busyCpu = busy;
+
+            calcDiskUsage();
+        }
+
+        bool hddUsage( QList<int>* output ) const
+        {
+            QMutexLocker lk( &m_mutex );
+
+            output->clear();
+            for( map<pair<int, int>, DiskStatContext>::const_iterator
+                 it = m_devNameToStat.begin();
+                 it != m_devNameToStat.begin();
+                 ++it )
+            {
+                output->append( it->second.prevStat.diskUtilizationPercent );
+            }
+            return !output->isEmpty();
         }
 
     private:
+        mutable QMutex m_mutex;
+
         bool init() {
             /* Establish handler for timer signal */
             struct sigaction sa;
@@ -501,6 +533,156 @@ namespace{
             }
         }
 
+        //!This structure is read from /proc/diskstat
+        struct DiskStatSys
+        {
+            int major_num;
+            int minor_num;
+            char device_name[FILENAME_MAX];
+            unsigned int num_reads;
+            unsigned int reads_merged;
+            unsigned int sectors_read;
+            unsigned int tot_read_ms;
+            unsigned int num_writes;
+            unsigned int writes_merged;
+            unsigned int sectors_written;
+            unsigned int tot_write_ms;
+            unsigned int cur_io_cnt;
+            unsigned int tot_io_ms;
+            unsigned int io_weighted_ms;
+        };
+
+        class DiskStat
+        {
+        public:
+            int major_num;
+            int minor_num;
+            std::string deviceName;
+            unsigned int diskUtilizationPercent;
+
+            DiskStat()
+            :
+                major_num(0),
+                minor_num(0),
+                diskUtilizationPercent(0)
+            {
+            }
+        };
+
+        class DiskStatContext
+        {
+        public:
+            DiskStatSys prevSysStat;
+            DiskStat prevStat;
+            bool initialized;
+
+            DiskStatContext()
+            :
+                initialized( false )
+            {
+                memset( &prevSysStat, 0, sizeof(prevSysStat) );
+            }
+        };
+
+        void calcDiskUsage()
+        {
+            static const size_t MAX_LINE_LENGTH = 256;
+            char line[MAX_LINE_LENGTH];
+
+            char devName[MAX_LINE_LENGTH];
+            memset( devName, 0, sizeof(devName) );
+            if( m_partitions.empty() )
+            {
+                unsigned int majorNumber = 0, minorNumber = 0, numBlocks = 0;
+                //reading partition names
+                FILE* partitionsFile = fopen( "/proc/partitions", "r" );
+                if( !partitionsFile )
+                    return;
+                for( int i = 0; fgets( line, MAX_LINE_LENGTH, partitionsFile ) != NULL; ++i )
+                {
+                    if( i == 0 ||   //skipping header
+                            sscanf( line, "%u %u %u %s", &majorNumber, &minorNumber, &numBlocks, devName ) != 4 )  //skipping unrecognized line
+                        continue;
+                    m_partitions.insert( string( devName ) );
+                }
+                fclose( partitionsFile );
+            }
+
+            DiskStatSys curDiskStat;
+            memset( &curDiskStat, 0, sizeof(curDiskStat) );
+
+            struct timespec curClock;
+            memset( &curClock, 0, sizeof(curClock) );
+            clock_gettime( CLOCK_MONOTONIC, &curClock );
+            if( !m_prevClock.tv_sec )   //m_prevClock can overflow and become 0. In this case we will skip one calculation. Nothing serious...
+            {
+                m_prevClock = curClock;
+                return; //first time doing nothing
+            }
+            unsigned int clockElapsed = (curClock.tv_sec - m_prevClock.tv_sec) * 1000;
+            if( curClock.tv_nsec >= m_prevClock.tv_nsec )
+                clockElapsed += (curClock.tv_nsec - m_prevClock.tv_nsec) / 1000000;
+            else
+                clockElapsed -= (m_prevClock.tv_nsec - curClock.tv_nsec) / 1000000;
+            if( clockElapsed == 0 )
+                return; //there's no sense to calculate anything
+            m_prevClock = curClock;
+
+            //reading current disk statistics
+            FILE* diskstatFile = fopen( "/proc/diskstats", "r" );
+            if( !diskstatFile )
+                return;
+
+            while( fgets( line, FILENAME_MAX, diskstatFile ) != NULL )
+            {
+                memset( curDiskStat.device_name, 0, sizeof(curDiskStat.device_name) );
+                if( sscanf( line, "%u %u %s %u %u %u %u %u %u %u %u %u %u %u",
+                        &curDiskStat.major_num,
+                        &curDiskStat.minor_num,
+                        curDiskStat.device_name,
+                        &curDiskStat.num_reads,
+                        &curDiskStat.reads_merged,
+                        &curDiskStat.sectors_read,
+                        &curDiskStat.tot_read_ms,
+                        &curDiskStat.num_writes,
+                        &curDiskStat.writes_merged,
+                        &curDiskStat.sectors_written,
+                        &curDiskStat.tot_write_ms,
+                        &curDiskStat.cur_io_cnt,
+                        &curDiskStat.tot_io_ms,
+                        &curDiskStat.io_weighted_ms ) != 14 )
+                {
+                    continue;
+                }
+
+                if( m_partitions.find( curDiskStat.device_name ) == m_partitions.end() )
+                    continue;   //not a partition
+
+                QMutexLocker lk( &m_mutex );
+
+                pair<map<pair<int, int>, DiskStatContext>::iterator, bool> p = m_devNameToStat.insert( make_pair(
+                    make_pair(curDiskStat.major_num, curDiskStat.minor_num),
+                    DiskStatContext() ) );
+
+                DiskStatContext& ctx = p.first->second;
+                if( p.second )
+                {
+                    //initializing...
+                    ctx.prevStat.major_num = curDiskStat.major_num;
+                    ctx.prevStat.minor_num = curDiskStat.minor_num;
+                    ctx.prevStat.deviceName = curDiskStat.device_name;
+                }
+                else
+                {
+                    //calculating disk utilization
+                    ctx.prevStat.diskUtilizationPercent = (curDiskStat.tot_io_ms - ctx.prevSysStat.tot_io_ms) * 100 / clockElapsed;
+                }
+                ctx.prevSysStat = curDiskStat;
+            }
+
+            fclose( diskstatFile );
+        }
+
         bool m_initialized;
         quint64 m_cpu;
         quint64 m_processCpu;
@@ -508,6 +690,10 @@ namespace{
         uint m_usage;
         uint m_totalUsage;
         timer_t m_timer;
+        struct timespec m_prevClock;
+        //!map<pair<majorNumber, minorNumber>, statistics calculation context>
+        map<pair<int, int>, DiskStatContext> m_devNameToStat;
+        set<string> m_partitions;
     };
 
     Q_GLOBAL_STATIC(CpuUsageRefresher, refresherInstance);
@@ -675,11 +861,7 @@ int QnPerformance::cpuCoreCount() {
 }
 
 bool QnPerformance::currentHddUsage(QList<int> *output){
-#if defined(Q_OS_WIN)
     return refresherInstance()->hddUsage(output);
-#else
-    return false;
-#endif
 }
 
 
