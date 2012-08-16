@@ -156,17 +156,150 @@
 
       <group name = "White Balance"
            description ="">
-        
-        
-        
-      </group>
 
-      <param name = "WB mode"
+        <param name = "Mode"
              description = ""
              widget_type = "Enumeration"
              min = "AUTO,AUTO_H,AUTO_L,PRESET,MANUAL"
              max = "AUTO,AUTO_H,AUTO_L,PRESET,MANUAL"
              query = "wbmode1"/>
+
+        <param name = "Kelvin"
+             description = ""
+             widget_type = "Enumeration"
+             min = "LOW,MIDDLE,HIGH"
+             max = "LOW,MIDDLE,HIGH"
+             query = "wbkelvin1"/>
+
+        <param name = "Red"
+             description = ""
+             widget_type = "MinMaxStep"
+             min = "0"
+             max = "20"
+             query = "wbred1"/>
+
+        <param name = "Blue"
+             description = ""
+             widget_type = "MinMaxStep"
+             min = "0"
+             max = "20"
+             query = "wbblue1"/>
+
+      </group>
+
+      <group name = "Exposure"
+           description ="">
+
+        <param name = "Brightness"
+             description = ""
+             widget_type = "MinMaxStep"
+             min = "0"
+             max = "20"
+             query = "brightness1"/>
+
+        <param name = "Shutter Mode"
+             description = ""
+             widget_type = "Enumeration"
+             min = "AUTO,MANUAL"
+             max = "AUTO,MANUAL"
+             query = "dssmode1"/>
+
+        <param name = "Shutter Speed"
+             description = ""
+             widget_type = "Enumeration"
+             min = "1/30,1/60,1/120"
+             max = "1/30,1/60,1/120"
+             query = "shutspeed1"/>
+
+        <param name = "Digital Slow Shutter"
+             description = ""
+             widget_type = "Enumeration"
+             min = "OFF,2x,3x,4x"
+             max = "OFF,2x,3x,4x"
+             query = "dsslimit1"/>
+
+        <param name = "AGC Gain"
+             description = ""
+             widget_type = "MinMaxStep"
+             min = "0"
+             max = "20"
+             query = "gain1"/>
+
+        <param name = "BLC Mode"
+             description = ""
+             widget_type = "OnOff"
+             query = "blcmode1"/>
+
+      </group>
+
+      <group name = "Day &amp; Night"
+           description ="">
+
+        <param name = "Mode"
+             description = ""
+             widget_type = "Enumeration"
+             min = "NIGHT(B/W),DAY(COLOR),AUTO"
+             max = "NIGHT(B/W),DAY(COLOR),AUTO"
+             query = "dnmode1"/>
+
+        <param name = "Switching from Color to B/W"
+             description = ""
+             widget_type = "MinMaxStep"
+             min = "0"
+             max = "10"
+             query = "dnbwlevel1"/>
+
+        <param name = "Switching from Color to B/W"
+             description = ""
+             widget_type = "MinMaxStep"
+             min = "0"
+             max = "10"
+             query = "dncolorlevel1"/>
+
+      </group>
+
+      <group name = "Extra Setting"
+           description ="">
+
+        <param name = "Lens Mode"
+             description = ""
+             widget_type = "Enumeration"
+             min = "OUTDOOR,INDOOR"
+             max = "OUTDOOR,INDOOR"
+             query = "lensmode1"/>
+
+        <param name = "Chroma"
+             description = ""
+             widget_type = "MinMaxStep"
+             min = "0"
+             max = "20"
+             query = "chroma1"/>
+
+        <param name = "Sharpness"
+             description = ""
+             widget_type = "MinMaxStep"
+             min = "0"
+             max = "10"
+             query = "sharpness1"/>
+
+        <param name = "Mirror"
+             description = ""
+             widget_type = "OnOff"
+             query = "mirrormode1"/>
+
+        <param name = "Flip"
+             description = ""
+             widget_type = "OnOff"
+             query = "flipmode1"/>
+
+        <param name = "Digital Noise Reduction"
+             description = ""
+             widget_type = "Enumeration"
+             min = "OFF,LOW,MIDDLE,HIGH"
+             max = "OFF,LOW,MIDDLE,HIGH"
+             query = "nrmode1"/>
+
+      </group>
 
     </group>
 
