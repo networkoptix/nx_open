@@ -224,13 +224,17 @@ void QnProgressiveDownloadingConsumer::run()
                 for (int i = 0; i < 20; ++i) 
                 {
                     QnAbstractMediaDataPtr data = serverArchive.getNextData();
-                    if (data->dataType == QnAbstractMediaData::VIDEO || data->dataType == QnAbstractMediaData::AUDIO)
+                    if (data && (data->dataType == QnAbstractMediaData::VIDEO || data->dataType == QnAbstractMediaData::AUDIO))
                     {
-                        if (utcFormatOK)
-                            d->responseBody = QByteArray::number(data->timestamp/1000);
-                        else
+                        if (utcFormatOK) {
+                            QByteArray callback = getDecodedUrl().queryItemValue("callback").toLocal8Bit();
+                            d->responseBody = callback + QByteArray("({'pos' : ") + QByteArray::number(data->timestamp/1000) + QByteArray("});"); 
+                            sendResponse("HTTP", CODE_OK, "application/json");
+                        } else {
                             d->responseBody = QDateTime::fromMSecsSinceEpoch(data->timestamp/1000).toString(Qt::ISODate).toLocal8Bit();
-                        sendResponse("HTTP", CODE_OK, "text/plain");
+                            sendResponse("HTTP", CODE_OK, "text/plain");
+                        }
+
                         return;
                     }
                 }

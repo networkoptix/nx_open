@@ -8,7 +8,7 @@
 #include "recorder/storage_manager.h"
 #include "utils/common/performance.h"
 
-int QnGetStatisticsHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& resultByteArray)
+int QnGetStatisticsHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& resultByteArray, QByteArray& contentType)
 {
     Q_UNUSED(params)
     Q_UNUSED(path)
@@ -56,10 +56,10 @@ int QnGetStatisticsHandler::executeGet(const QString& path, const QnRequestParam
     return CODE_OK;
 }
 
-int QnGetStatisticsHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result)
+int QnGetStatisticsHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(body)
-    return executeGet(path, params, result);
+    return executeGet(path, params, result, contentType);
 }
 
 QString QnGetStatisticsHandler::description(TCPSocket* tcpSocket) const
