@@ -2,6 +2,7 @@
 #define QN_CALENDAR_WIDGET_H
 
 #include <QtGui/QCalendarWidget>
+#include <QtGui/QTableView>
 
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
@@ -17,6 +18,7 @@ public:
     QnCalendarWidget();
     void setCurrentTimePeriods(Qn::TimePeriodRole type, QnTimePeriodList periods );
     void setSyncedTimePeriods(Qn::TimePeriodRole type, QnTimePeriodList periods );
+    void setSelectedWindow(quint64 windowStart, quint64 windowEnd);
 
     /**
     * \return true is all loaded periods of all roles are empty
@@ -27,11 +29,20 @@ signals:
     * Signal is emitted when empty state is changed, e.g. loaded new time periods.
     */
     void emptyChanged();
+
+    /**
+    * Signal is emitted when cell was clicked (even if it is already selected date)
+    */
+    void dateUpdate(const QDate &date);
 protected:
     virtual void paintCell(QPainter * painter, const QRect & rect, const QDate & date ) const override;
+protected slots:
+    void dateChanged(const QDate &date);
 private:
     QnTimePeriodStorage m_currentTimeStorage;
     QnTimePeriodStorage m_syncedTimeStorage;
+    QTableView* m_tableView;
+    QnTimePeriod m_window;
 };
 
 
