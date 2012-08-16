@@ -29,13 +29,13 @@ QnCalendarWidget::QnCalendarWidget():
     m_tableView = findChild<QTableView *>(QLatin1String("qt_calendar_calendarview"));
     Q_ASSERT(m_tableView);
     m_tableView->horizontalHeader()->setMinimumSectionSize(18);
-    connect(m_tableView, SIGNAL(changeDate(const QDate&, bool)), SLOT(dateChanged(const QDate&)));
+    connect(m_tableView, SIGNAL(changeDate(const QDate&, bool)), SLOT(dateChanged(const QDate&))); // TODO: please use static QObject::connect(QObject *, const char *, QObject *, const char *)
 
     QWidget* navBarBackground = findChild<QWidget *>(QLatin1String("qt_calendar_navigationbar"));
     navBarBackground->setBackgroundRole(QPalette::Window);
 }
 
-void QnCalendarWidget::setCurrentTimePeriods( Qn::TimePeriodRole type, QnTimePeriodList periods )
+void QnCalendarWidget::setCurrentTimePeriods(Qn::TimePeriodRole type, QnTimePeriodList periods)
 {
     bool oldEmpty = isEmpty();
     m_currentTimeStorage.setPeriods(type, periods);
@@ -46,8 +46,7 @@ void QnCalendarWidget::setCurrentTimePeriods( Qn::TimePeriodRole type, QnTimePer
     update();
 }
 
-void QnCalendarWidget::setSyncedTimePeriods( Qn::TimePeriodRole type, QnTimePeriodList periods )
-{
+void QnCalendarWidget::setSyncedTimePeriods(Qn::TimePeriodRole type, QnTimePeriodList periods) {
     bool oldEmpty = isEmpty();
     m_syncedTimeStorage.setPeriods(type, periods);
     bool newEmpty = isEmpty();
@@ -57,7 +56,7 @@ void QnCalendarWidget::setSyncedTimePeriods( Qn::TimePeriodRole type, QnTimePeri
     update();
 }
 
-void QnCalendarWidget::setSelectedWindow(quint64 windowStart, quint64 windowEnd){
+void QnCalendarWidget::setSelectedWindow(quint64 windowStart, quint64 windowEnd) {
 
     bool modified = false;
     if (windowStart != (quint64)m_window.startTimeMs){
@@ -74,7 +73,7 @@ void QnCalendarWidget::setSelectedWindow(quint64 windowStart, quint64 windowEnd)
         update();
 }
 
-bool QnCalendarWidget::isEmpty(){
+bool QnCalendarWidget::isEmpty() {
     for(int type = 0; type < Qn::TimePeriodRoleCount; type++)
         if (!m_currentTimeStorage.periods(static_cast<Qn::TimePeriodRole>(type)).empty()
                 ||
@@ -83,7 +82,7 @@ bool QnCalendarWidget::isEmpty(){
     return true;
 }
 
-void QnCalendarWidget::paintCell(QPainter *painter, const QRect & rect, const QDate & date ) const{
+void QnCalendarWidget::paintCell(QPainter *painter, const QRect &rect, const QDate &date) const {
     QDateTime dt(date);
     QnTimePeriod current(dt.toMSecsSinceEpoch(), DAY);
 
@@ -105,6 +104,9 @@ void QnCalendarWidget::paintCell(QPainter *painter, const QRect & rect, const QD
         brush.setStyle(Qt::SolidPattern);
     }
     painter->fillRect(rect, brush);
+
+    // TODO: selection with diagonal pattern looks really strange...
+    // Maybe we should paint a blue rect around a cell instead?
 
     if (!current.intersected(m_window).isEmpty()){
         brush.setColor(QColor(0, 127, 255));
@@ -141,7 +143,7 @@ void QnCalendarWidget::paintCell(QPainter *painter, const QRect & rect, const QD
     if (date < this->minimumDate() || date > this->maximumDate()){
         pen.setColor(palette().color(QPalette::Disabled, QPalette::Text));
     }
-    else{
+    else {
     //    pen.setColor(date.dayOfWeek() > 5 ? Qt::red : Qt::white);
         pen.setColor(palette().color(QPalette::Active, QPalette::Text));
         font.setBold(true);
@@ -152,7 +154,7 @@ void QnCalendarWidget::paintCell(QPainter *painter, const QRect & rect, const QD
     painter->drawText(rect, Qt::AlignCenter, text);
 }
 
-void QnCalendarWidget::dateChanged(const QDate &date){
-    qDebug() << "date changed" << date;
+void QnCalendarWidget::dateChanged(const QDate &date) {
+    qDebug() << "date changed" << date; // TODO: remove debug output
     emit dateUpdate(date);
 }
